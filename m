@@ -1,108 +1,120 @@
-Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 400AA3126B9
-	for <kvmarm@lists.linux.dev>; Tue, 14 Jul 2026 17:54:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 623D83CBE6D
+	for <kvmarm@lists.linux.dev>; Tue, 14 Jul 2026 18:10:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784051680; cv=none; b=fOXpP1RgPi52UaOu3DyKhylEkcSf8W3IiPrPQ0FwXJFJiszQYy9mx+kmf3uWMgLMyGnlSPk9+VD6YpmMjaoyDyQyovDIIPRnKh6flvvk7A4J0pE9+pYD+e6HDqQkUOAV8U277YSFtDK9TWwU+gP0/2Dyo5RVLeVPBx7WLM3cI5s=
+	t=1784052658; cv=none; b=j1e2MVVh2D7k+kPQlXPyK2unESItq5qJdP5+In+7xwmxh1oryRrceozFlhW7D6+Mb51MRYYSghoRGNYRCQkXuMPBal7alv2JhKO9QHHHcbrt3PoaBIfVImc5BtXiJwqIcGzRuGOh+7ugJW2Kpu1CjFpGHwt7BVQVtMtnpCTg25U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784051680; c=relaxed/simple;
-	bh=ZpVVebsI0yxw5WW2CxTkqmepFmTlatern8ksUkvw/30=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ta/Ro7PlRAC3DSTY5YJY6XNisILZwnG29LNJfjZtb4n0gopvKgHmaQrHFtcZHmzR8MqhDmifygMg+dbFPM6YRupg3pCYJGKPP4Ji3+i65DBnpzv6l9deABTgZGJqeSPjuJUwARukbxosGOGec8TdzjUmcjef5Gwh+ffwXa7QNN0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=OASUEUQk; arc=none smtp.client-ip=95.215.58.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1784052658; c=relaxed/simple;
+	bh=mxi/g0FaxjexQONpL8gDyj3+J2M7UP6EPbdnqaQKL8Q=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=s57nLDxs4Zj7lAF43CjEZgzpoyJlBEpWKcYWTAn61P4tyL1NFxRCVgQPA9WcmdwWOYqpaHrb8j7T/mg9HZjJg5ToaCHRwbZamLwSOSyqiFyzf1SHkhqbiJmJP9+VrsirHzXi8V6VqOLJhchYgXlacLvV2t7UT8oGMpVntJGRcFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=o3pozvv3; arc=none smtp.client-ip=209.85.128.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="OASUEUQk"
-X-Forwarded-Encrypted: i=1; AHgh+RrrPrtlha3b5r8gX4xbUObl9tKfMdlCB8f/A/z2fqFtTNiG1OsNaRytM1zULNXueWan8ybA2CI=@lists.linux.dev
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1784051674;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=10VT7gL+lmA+QIPWzvdgixXz8JOFpc48OxM2n67zUxY=;
-	b=OASUEUQk4oeMT6HnQQkxIMAAUySXqYYtlO5t3zzN07jbzfq0sM5Vd7790upk6fD2NvBjKP
-	67sAk1cRKL0k/TTz5HVAS+PmryqquQMtjKTmPcfQ9eX7JEndl1OPF2wwJ4vHiDH+SBqqYq
-	3Zux09lqBqFVETOWj8t+YPrD9waNPXM=
-X-Gm-Message-State: AOJu0YwRRaxJhcOG5AUhGHiSSFMFkBwBdXexJJpKjtuM1gSLx4DU6wk8
-	4Cg/ZDuFJZk+nzCv6KZpZRKnW88BE5rqNpbptbMIQKpnYiIR4Dx3yOEonVIrkpZT9rh9B1tLzly
-	Kb/wHyc0FNhBhv4/w+AEXnqD9J/j+bNEj8tlsotlo
-X-Received: by 2002:a05:622a:4d47:b0:517:5e32:2d14 with SMTP id
- d75a77b69052e-51d7bc5094cmr17035731cf.10.1784051672252; Tue, 14 Jul 2026
- 10:54:32 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="o3pozvv3"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-492488f8583so66157425e9.2
+        for <kvmarm@lists.linux.dev>; Tue, 14 Jul 2026 11:10:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1784052655; x=1784657455; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=cfKdTJ0UW1n66HS6tgSej7/MevFTojdr1dMFwbyGTJ8=;
+        b=o3pozvv36rbdvSvmmgi7fiketVXDaLpDKNlCFo6TyPRcOm3FLXgcyGnsRG+DiWpKXc
+         Tb3gBHZF+LiBNhe7UYBsvNRzKzCbUW3kTYUJyIH1vRP/ZA6a4KuMBQrw1GvAb9FdXhKC
+         Gcn+nOYmex2pDWKs5WtmyGo6kXoFU7hfYf06gDKERCujSEYqk2C8HUM3BDZLP17xBQ7I
+         VMtPxtJizQmP5RrLCa3OMC3oGg3HD5G7PwtqIQ44fA+q9LtJ2u7/CPxxMNIYJufo1I2h
+         xeAAAdY0y15qy43geHi1moxfxTsDT2Q7PccoZkWLwrYTEb/6w12VWhxFfE7mSedirn9a
+         M3pA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784052655; x=1784657455;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=cfKdTJ0UW1n66HS6tgSej7/MevFTojdr1dMFwbyGTJ8=;
+        b=ib0OxjqzqLR4rs1qDmLLsgVWi/faJnCEycWbUL8ZNqiSxTR+PhjG59qiSWbP6gKk1q
+         JZIZotfHbjRjKe+wbkI1LKrtl/2SyPj3gNcuP4/PGt9I/kqZ11TXzbAeOZLpYXl4yzSg
+         EFQBbieQrRAb/RIbncgbhY7Vh4xBSCOVv4E1oCbW5HbP3zcYTeiaT9GFDbR4v7yvUl1k
+         CH3cb3UitwOzCyKqMQtqO7W1fVqvc/o/1nb837L11PcdHwGoU0TMd15hLTLTvCFypEyW
+         CcL1wa+BPThrJ+mihbQzNVUxmTRuNCzDCELnJEbHvxEbdDvnaGKcdCeAGK0XM5xkvlFy
+         2qaw==
+X-Forwarded-Encrypted: i=1; AHgh+Rq+awpAEP4Wo5s9tRSlMmRKnm/oyHpI1OV77JOvqsgI8SI6LCTjuVE7R0/TgLTgwgA2jaeJlU0=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxUxfmLGbCTnU0w/z+xb4V75yRwHe84AdpNac+TUV3WnKH2ndl/
+	eXmXEBSPSrl6qnH2l/7QLl07JIi3A0pcLoAsd9IZMsqyOalBcnk1wgZeP4jH8F8tZlkASGjo2ug
+	Rtlwkncv9UNlmizFmT2noDg==
+X-Received: from wmrk19.prod.google.com ([2002:a05:600c:b53:b0:493:c111:8ed4])
+ (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:524c:b0:494:df:8895 with SMTP id 5b1f17b1804b1-49538a0251emr41049885e9.24.1784052655128;
+ Tue, 14 Jul 2026 11:10:55 -0700 (PDT)
+Date: Tue, 14 Jul 2026 19:10:10 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20260706175415.2604046-1-vdonnefort@google.com> <20260706175415.2604046-4-vdonnefort@google.com>
-In-Reply-To: <20260706175415.2604046-4-vdonnefort@google.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Tue, 14 Jul 2026 18:53:55 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTwMz+Ojq18Fq9USJqz_pZmemryNhy99Sw36sOejtpaf4w@mail.gmail.com>
-X-Gm-Features: AUfX_mx9lqp3kjAw6qAWT5YzHWzZHDucv8goST7s8ZDRn3t91Ab_Li535_XJs6w
-Message-ID: <CA+EHjTwMz+Ojq18Fq9USJqz_pZmemryNhy99Sw36sOejtpaf4w@mail.gmail.com>
-Subject: Re: [PATCH v2 03/18] KVM: arm64: Add __hyp_allocator_map for the pKVM hyp
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
-	will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kernel-team@android.com, qperret@google.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.55.0.141.g00534a21ce-goog
+Message-ID: <20260714181010.2527225-1-vdonnefort@google.com>
+Subject: [PATCH] KVM: arm64: Fix hyp_trace clock disabling
+From: Vincent Donnefort <vdonnefort@google.com>
+To: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org
+Cc: joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
+	kernel-team@android.com, tabba@google.com, 
+	Vincent Donnefort <vdonnefort@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Migadu-Flow: FLOW_OUT
 
-On Mon, 6 Jul 2026 at 18:54, Vincent Donnefort <vdonnefort@google.com> wrote:
->
-> In preparation for the pKVM heap allocator, introduce __hyp_allocator_map()
-> to map a single physical page to a given virtual address in the hypervisor
-> stage-1 page-table.
->
-> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
->
-> diff --git a/arch/arm64/kvm/hyp/include/nvhe/mm.h b/arch/arm64/kvm/hyp/include/nvhe/mm.h
-> index 725bb0fb941d..98a7774b541c 100644
-> --- a/arch/arm64/kvm/hyp/include/nvhe/mm.h
-> +++ b/arch/arm64/kvm/hyp/include/nvhe/mm.h
-> @@ -32,5 +32,6 @@ int __pkvm_create_private_mapping(phys_addr_t phys, size_t size,
->  int pkvm_create_stack(phys_addr_t phys, unsigned long *haddr);
->  int pkvm_alloc_private_va_range(size_t size, unsigned long *haddr);
->  phys_addr_t __pkvm_private_range_pa(void *va);
-> +int __hyp_allocator_map(void *va, phys_addr_t phys);
->
->  #endif /* __KVM_HYP_MM_H */
-> diff --git a/arch/arm64/kvm/hyp/nvhe/mm.c b/arch/arm64/kvm/hyp/nvhe/mm.c
-> index ec59da1322a7..c1c01f81ac5f 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/mm.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/mm.c
-> @@ -160,6 +160,11 @@ void pkvm_remove_mappings(void *from, void *to)
->         hyp_spin_unlock(&pkvm_pgd_lock);
->  }
->
-> +int __hyp_allocator_map(void *va, phys_addr_t phys)
-> +{
-> +       return __pkvm_create_mappings((unsigned long)va, PAGE_SIZE, phys, PAGE_HYP);
-> +}
-> +
+Fix the disable path in hyp_trace_clock_enable(), which fell through to
+re-initialize and reschedule the clock after cancelling the work. Return
+early instead.
 
-nit: __hyp_allocator_map() is named for its caller rather than what it does
-(map a single hyp page). Its siblings here (pkvm_create_mappings,
-pkvm_remove_mappings) are named for the operation. Consider a name like
-pkvm_map_page() so it reads as a generic primitive.
+While at it, cleanup hyp_trace_clock::lock which is unused and
+hyp_trace_clock::running which is redundant: the trace_remote framework
+already serializes calls to the callback enable_tracing.
 
-That said, naming is hard:
+Fixes: b22888917fa4 ("KVM: arm64: Sync boot clock with the nVHE/pKVM hyp")
+Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 
-Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
+diff --git a/arch/arm64/kvm/hyp_trace.c b/arch/arm64/kvm/hyp_trace.c
+index 2411b4c32932..0b03117a38ec 100644
+--- a/arch/arm64/kvm/hyp_trace.c
++++ b/arch/arm64/kvm/hyp_trace.c
+@@ -37,8 +37,6 @@ static struct hyp_trace_clock {
+ 	u32			shift;
+ 	struct delayed_work	work;
+ 	struct completion	ready;
+-	struct mutex		lock;
+-	bool			running;
+ } hyp_clock;
+ 
+ static void __hyp_clock_work(struct work_struct *work)
+@@ -110,12 +108,9 @@ static void hyp_trace_clock_enable(struct hyp_trace_clock *hyp_clock, bool enabl
+ {
+ 	struct system_time_snapshot snap;
+ 
+-	if (hyp_clock->running == enable)
+-		return;
+-
+ 	if (!enable) {
+ 		cancel_delayed_work_sync(&hyp_clock->work);
+-		hyp_clock->running = false;
++		return;
+ 	}
+ 
+ 	ktime_get_snapshot_id(CLOCK_BOOTTIME, &snap);
+@@ -128,7 +123,6 @@ static void hyp_trace_clock_enable(struct hyp_trace_clock *hyp_clock, bool enabl
+ 	INIT_DELAYED_WORK(&hyp_clock->work, __hyp_clock_work);
+ 	schedule_delayed_work(&hyp_clock->work, msecs_to_jiffies(CLOCK_INIT_MS));
+ 	wait_for_completion(&hyp_clock->ready);
+-	hyp_clock->running = true;
+ }
+ 
+ /* Access to this struct within the trace_remote_callbacks are protected by the trace_remote lock */
 
-Cheers,
-/fuad
+base-commit: a13c140cc289c0b7b3770bce5b3ad42ab35074aa
+-- 
+2.55.0.141.g00534a21ce-goog
 
->  int hyp_back_vmemmap(phys_addr_t back)
->  {
->         unsigned long i, start, size, end = 0;
-> --
-> 2.55.0.rc2.803.g1fd1e6609c-goog
->
