@@ -1,121 +1,122 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC0E11FFC59
-	for <kvmarm@lists.linux.dev>; Tue, 14 Jul 2026 05:48:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C6EDDF76
+	for <kvmarm@lists.linux.dev>; Tue, 14 Jul 2026 06:42:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784008093; cv=none; b=e1UJO6mHDN+y/eFOh4reIJBi4ILzh3INBNvLN0ZdisLukQDM8PjENNe7O0t0M5Mg9L+XuoNubY/lJ7r30Jik8QV0RkdObxzkE0lBSaaveCUYR+9NMKQumoiTyumvXZ+gmdRluhRQedUj5nsXHO+7LExMv5NP0cWwQ1TnO0XvEz8=
+	t=1784011327; cv=none; b=HyuYyrbEjTCEYtbQzgsOmk4Y+I/NgC9PUIEnFOWRYu5YLqynKef/avWPnMfrdhvh/+a4xg4wL66fpxYkP9QdehgvpfjfliFUxTOW0LmLunU3vSVhfkisAD4o8YazmsVyBx+VlJE9KlmRrlwDOOPxNzIvdB+YKeetCbyUyHquZtg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784008093; c=relaxed/simple;
-	bh=LnW4ts9Lwbe3BPXxuqMwhfTHqufwNRGWcggpm0tvBew=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VW6frKDQ+GUtgOieIXLwacqjK01dCmN2bapEdU2+/qgTjeV2D6/ptlCJdVzs9V/M0Noh7PlChhhkHLoZ1AeuduklcxnxqK+uzWESDSMvlbZ/R4V005WyKuRzilbLYE2THSXvCZRdgMf0ouEguyUaB1TW233aTQBhfZU2DlLndOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=QkBjiN/M; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1784011327; c=relaxed/simple;
+	bh=uDZzdzJlYvwUuJhs7Qh43kiA8VzvLxJOc3P1/aneLnc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=p+HT4ihGySiJOP8I7vu8h1jFHUppZwQZou4aLVG1GfycT91qfwz5voYfrnipbLg02u6H4N2yJgnHYWxOoqlqJedrgfIaR83mGA073FUwH5+ZCVBj208Pg8oYHAYVZ4sfnrg3ZpMY6UIpG0BeZG/ZQml+e5/Kx8j4zIFUJ54Qrpk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pmyDJ5Oc; arc=none smtp.client-ip=95.215.58.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="QkBjiN/M"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0F4161570;
-	Mon, 13 Jul 2026 22:48:06 -0700 (PDT)
-Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4776E3F7D8;
-	Mon, 13 Jul 2026 22:48:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1784008090; bh=LnW4ts9Lwbe3BPXxuqMwhfTHqufwNRGWcggpm0tvBew=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QkBjiN/MvkBffP/FzGvlZqOgTYAlnIXETK3uWmobYyBHaVLT0R47JIZ55AA68T0My
-	 ESgPLI8Yl/40kJ+jQs7FjrimUBDULfv0uFCr0Q7sHtNnPJTqc1TwVa5FW05TekZbDs
-	 05Ai63DX98GIXiCBZY0DkcquX50aTkmTd1vAcIOQ=
-Date: Tue, 14 Jul 2026 06:47:54 +0100
-From: Wei-Lin Chang <weilin.chang@arm.com>
-To: Itaru Kitayama <itaru.kitayama@fujitsu.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v3 0/5] KVM: arm64: nv: Implement nested stage-2 reverse
- map
-Message-ID: <ytl6idu3chd7hg5xsgbqwdh24gdckinngirflls7o2st3moyw2@m5jeouveqw6n>
-References: <20260510145338.322962-1-weilin.chang@arm.com>
- <alVweBtKt_4jH1q3@sm-arm-grace07>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pmyDJ5Oc"
+X-Forwarded-Encrypted: i=1; AHgh+RrStUdjdq9ob3XD4TUg22xcQRRkDCZWQImbFRi1jyMAwjNP4q07njMdFIdwRjQdnIYtbWp0GSM=@lists.linux.dev
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1784011323;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gCVaWlwXy1h6K7yqumgVi+lXEd0MerF1f9OEA/4dDMA=;
+	b=pmyDJ5OcmqxCE7LCU7tErR0CnmsYAhPELFEsS6fMJla0LsQyHtesFyKlaUkV09ktIsU72Q
+	8Izytqrm+lmK/TzWWvkvmJlSrMUgNyVX9wSS1uUwYCypStSTX8Lap4t1pZcDAey3nH0m+G
+	NuAj5TpJjLS6zYlfRca5u/YqdHuf5GE=
+X-Gm-Message-State: AOJu0YwEeEilzjC25RPejbm5ZIoC1CApLjjcHfsGABCk0QEnd6yuI0+8
+	+KkL4/ibnnvy8M8sitre6gXA9XOZf5hiN+2qtKbLjCKcXrD08qx48ASpDc0u5lJEAIK+o05louU
+	lW8TeRNoc5AVOxMdAETQ3ItEZunZXSc7PSMUL8KT9
+X-Received: by 2002:a05:622a:512:b0:50f:af60:3496 with SMTP id
+ d75a77b69052e-51d7bc994f7mr11182851cf.1.1784011304760; Mon, 13 Jul 2026
+ 23:41:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alVweBtKt_4jH1q3@sm-arm-grace07>
+References: <20260706095927.560795-1-fuad.tabba@linux.dev> <20260706095927.560795-3-fuad.tabba@linux.dev>
+ <alWDI7uj9YFedXET@kernel.org>
+In-Reply-To: <alWDI7uj9YFedXET@kernel.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Tue, 14 Jul 2026 07:41:08 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTwX-q5WEJ0pF5CJvtxwc2Vy4y=mmEvzo07sUa1SiyCM0A@mail.gmail.com>
+X-Gm-Features: AUfX_mw5sgsKATxPxS4kpnWDGYO2p3GXI8BHq80imxIR3rQoh-xFNvj2QTUN5uI
+Message-ID: <CA+EHjTwX-q5WEJ0pF5CJvtxwc2Vy4y=mmEvzo07sUa1SiyCM0A@mail.gmail.com>
+Subject: Re: [PATCH v4 2/8] KVM: arm64: Make vcpu_{read,write}_sys_reg
+ available to HYP code
+To: Oliver Upton <oupton@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Vincent Donnefort <vdonnefort@google.com>, Quentin Perret <qperret@google.com>, 
+	Sebastian Ene <sebastianene@google.com>, Hyunwoo Kim <imv4bel@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Jul 14, 2026 at 08:10:48AM +0900, Itaru Kitayama wrote:
-> On Sun, May 10, 2026 at 03:53:33PM +0100, Wei-Lin Chang wrote:
-> > Hi,
-> > 
-> > This is v3 of optimizing the shadow s2 mmu unmapping during MMU
-> > notifiers.
-> > 
-> > Two new preparatory patches are added, one reduces a hole in kvm_s2_mmu
-> > and another refactors the code a bit during s2 faults. Other changes are
-> > listed below.
-> > 
-> > * Changes from v2 [1]:
-> > 
-> >   - Removed "polluted" teminology.
-> > 
-> >   - Use xa_{mk, to}_value() when storing and retriving values from maple
-> >     trees.
-> > 
-> >   - Avoid using the 63rd bit in maple tree values so that xa_{mk, to}_value()
-> >     does not lose us a bit.
-> > 
-> >   - Added reverse map removal during TLBI handling.
-> > 
-> >   - Other suggested refactorings.
-> > 
-> > Thanks!
-> 
-> Hi Wei-Lin
-> As this series is no longer cleanly applied on top of the recent kvmarm/fixes,
-> I wonder if you could update the series; I can wait if you're in the
-> works of preparing v4. I am planning to test this series on HW with your
-> proposed nested virtualization KVM selftests.
+On Tue, 14 Jul 2026 at 01:30, Oliver Upton <oupton@kernel.org> wrote:
+>
+> Hi Fuad,
+>
+> On Mon, Jul 06, 2026 at 10:59:21AM +0100, Fuad Tabba wrote:
+> > The vcpu_{read,write}_sys_reg() accessors are host-only, so helpers
+> > built on them such as kvm_vcpu_set_be()/kvm_vcpu_is_be() cannot be
+> > shared with hyp code. exception.c already wraps them in
+> > __vcpu_{read,write}_sys_reg(), which pick the host- or hyp-side accessor
+> > via has_vhe() and so are valid in any context.
+> >
+> > Move those wrappers to kvm_emulate.h as kvm_vcpu_{read,write}_sys_reg()
+> > and switch the callers over, so a follow-up series can share that
+> > emulation code at EL2.
+> >
+> > No functional change intended.
+> >
+> > Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
+> > Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+> > ---
+> >  arch/arm64/include/asm/kvm_emulate.h | 22 +++++++++++++++---
+> >  arch/arm64/kvm/hyp/exception.c       | 34 ++++++++--------------------
+> >  2 files changed, 28 insertions(+), 28 deletions(-)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> > index 5bf3d7e1d92c7..80b30fead3d16 100644
+> > --- a/arch/arm64/include/asm/kvm_emulate.h
+> > +++ b/arch/arm64/include/asm/kvm_emulate.h
+> > @@ -506,6 +506,22 @@ static inline unsigned long kvm_vcpu_get_mpidr_aff(struct kvm_vcpu *vcpu)
+> >       return __vcpu_sys_reg(vcpu, MPIDR_EL1) & MPIDR_HWID_BITMASK;
+> >  }
+> >
+> > +static inline u64 kvm_vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
+> > +{
+> > +     if (has_vhe())
+> > +             return vcpu_read_sys_reg(vcpu, reg);
+> > +
+> > +     return __vcpu_sys_reg(vcpu, reg);
+> > +}
+> > +
+> > +static inline void kvm_vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
+> > +{
+> > +     if (has_vhe())
+> > +             vcpu_write_sys_reg(vcpu, val, reg);
+> > +     else
+> > +             __vcpu_assign_sys_reg(vcpu, reg, val);
+> > +}
+> > +
+>
+> Can you instead name the wrappers vcpu_{read,write}_sys_reg() and rename
+> the current implementations, like __vcpu_{read,write}_sysreg_vhe()?
+>
+> Just want to avoid confusion between kvm_vcpu_ and vcpu_
 
-Hey Itaru,
+Will do, thanks!
+/fuad
 
-Sorry for the delay. I have been working on something else in parallel
-hence I haven't updated this series for a while. Yes I am almost done
-preparing v4, it should be posted sometime this week.
-
-Thanks for your feedback and testing!
-
-Thanks,
-Wei-Lin Chang
-
-> 
+>
 > Thanks,
-> Itaru.
-> 
-> > 
-> > [1]: https://lore.kernel.org/kvmarm/20260411125024.3735989-1-weilin.chang@arm.com/
-> > 
-> > Wei-Lin Chang (5):
-> >   KVM: arm64: Use a variable for the canonical GPA in kvm_s2_fault_map()
-> >   KVM: arm64: Move shadow_pt_debugfs_dentry to reduce holes in
-> >     kvm_s2_mmu
-> >   KVM: arm64: nv: Avoid full shadow s2 unmap
-> >   KVM: arm64: nv: Remove reverse map entries during TLBI handling
-> >   KVM: arm64: nv: Create nested IPA direct map to speed up reverse map
-> >     removal
-> > 
-> >  arch/arm64/include/asm/kvm_host.h   |  17 +-
-> >  arch/arm64/include/asm/kvm_nested.h |   6 +
-> >  arch/arm64/kvm/mmu.c                |  43 +++--
-> >  arch/arm64/kvm/nested.c             | 238 +++++++++++++++++++++++++++-
-> >  arch/arm64/kvm/sys_regs.c           |   3 +
-> >  5 files changed, 290 insertions(+), 17 deletions(-)
-> > 
-> > -- 
-> > 2.43.0
-> > 
+> Oliver
