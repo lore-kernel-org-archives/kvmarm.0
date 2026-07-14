@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAA3A43E9DC;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D529C43E4BE;
 	Tue, 14 Jul 2026 09:16:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784020612; cv=none; b=Jp3xQ9SrkFK0TMeNWQXBZYw8UVGZOxNq2tjhMV6YBB8JA70H1nOd6jD1sT3ENB4tIRTCvue9g+7LhYUgC5j8ikh0RHiY5Q5EBT3N3IczQCyRDL0E22ailltmNs+83si9uBjszbOKFpdzKMgXd8jXVMHtTk5Nu+zWRCAufDqi4dA=
+	t=1784020612; cv=none; b=OvYLLOuq0TvkVzcgxFpkqgkhB4tNN06dxGCEIuua1BhnM4BJHy2GPh3UQvY+2wYGad8x+oGnnM6D5g017ccgfPMjpeqJfSbpn0IW3WjQv7gExLbZxD3rxVfGn4wtbyGfp10u2/9lD9enC/0Bh1mZLmzma4sOlWqTd8q0h+X8/DY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1784020612; c=relaxed/simple;
-	bh=+7jFGniBNclzIaFlVXX9Cvi5pf0+Y06aAXhYuCJmI50=;
+	bh=aEd1iFbRjkjadOSikTT8JfXBLxZqA4b1KEViy2Q30y4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=arpXc3MOYvauIa6OVcW3TsYsXQv29mIoty2J44iRO3PJP2RI2ZrAjML/O2rGJBn7zxBF9lUNZ35VL2qM+92ZrNf/UH0oCn43DONHNjuzjmNQPOl5cHmoMjSI6k/nPau9Zb3c/wGX24bY7Gk0J3xiI6ljF4W1X/KLAySGAOAaVdU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UQeT3+2+; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=Saa0Mc20k9a23iB2UD7XhzdhjGkXXnuNFasaiVT/P86cGi/BAXYI95nCPiUZs2ZEiuIcAZmcEVpYxE2hRH89hBqySAZFzRvnYkgVpOepTjRkKyQGpDELs8/AgyQlV1nJMhNURm7Og8XA35UFD4adjrKVQdPpWEFofYHcFwqZSmQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EVR77mP9; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UQeT3+2+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C949E1F0155B;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EVR77mP9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87EB81F00A3E;
 	Tue, 14 Jul 2026 09:16:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1784020610;
-	bh=7qRzhMyRtUFwvrdRgEcMK88rCkmdI2qILS64BOePkLQ=;
+	bh=Z9PSMZ4DU3SB7MZOcmjM/U9K6hLtCBzBnZ9uQmrX33I=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=UQeT3+2+AQt4qhY2T2toVzAzdskvxSQofzjYDuqBGStvRcci/ek8/qcq5KOb+6im2
-	 qiiIAd7cyLuCvEJy0pPD3ww0DPQalUq9LlH2xT4UJntP4f0UGh5Tjnt5Ais819XbMF
-	 LWr4Oq4nMkLeRA9YjT1jGhsh06jNFVsU48pz1MYu+tFGgbTV6rVFVwV/rSggpRuOQJ
-	 nm1tdG2vQcnTXumsOBCvR5XxiTEbh4LxRu04s6rY+KeCm84AIGXIWjU5Mn8mB3uKsR
-	 yApVryJCpgu6C1SWi6W9E7wUciyTpzXCDuBrfQoVA1i+PJEEBbw3uSe3Ce9Y0/Vuga
-	 yDPdKRv+cRiSw==
+	b=EVR77mP9F5wZslq8g5qVJ8ORQ3KpYY9EzseNexYMqoQHxQDkTWx45iNmUJRpv9NGv
+	 AypEJgoWGHJflpyB34Pp3s7o7tOWzqCIBS0OwAzOTXhGEY0u3hrjdKewBKa1nvKt4O
+	 uhieKWHypgHcf/4IP08f4WASpvZfyyDHq3d7vodlcDtK4UIOEva4Awk5pHKtJmJkUa
+	 PK4UI1A5AxmQXixTj4FC6Q/+o368kkmvuS//47KYR0xIHhGQe6HhbfgIUo+QMwZUQo
+	 jgGFoPqIOsNsYJuPOWhg6n48GsaNVv3OeUo+083e1xBnl1w+Dt2281OLOfW0DvIxn1
+	 Ie9olAkVa5lkg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wjZFx-00000004ny1-0Fl5;
-	Tue, 14 Jul 2026 09:16:49 +0000
+	id 1wjZFw-00000004ny1-3dGN;
+	Tue, 14 Jul 2026 09:16:48 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -41,9 +41,9 @@ Cc: Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oupton@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v2 10/28] KVM: arm64: Relax CNTHCTL_EL2 handling when FEAT_NV2p1 is present
-Date: Tue, 14 Jul 2026 10:16:23 +0100
-Message-ID: <20260714091641.1970822-11-maz@kernel.org>
+Subject: [PATCH v2 09/28] KVM: arm64: Relax CPTR_EL2 handling when FEAT_NV2p1 is present
+Date: Tue, 14 Jul 2026 10:16:22 +0100
+Message-ID: <20260714091641.1970822-10-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260714091641.1970822-1-maz@kernel.org>
 References: <20260714091641.1970822-1-maz@kernel.org>
@@ -59,83 +59,88 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-With NV2p1, it is no longer necessary to use the split approach
-where bits of CNTHCTL_EL2 cannot be accessed via CNTKCTL_EL1,
-and we can treat the CNTKCTL_EL1 accessor as if it was "normal".
+With FEAT_NV2P1, it is no longer necessary to trap CPTR_EL2 accesses
+via CPACR_EL1, as CPACR_EL1.TCPAC is guaranteed to be stateful.
 
-Key the special casing on FEAT_NV2P1 not being implemented.
+Prevent such trapping and context switch CPACTR_EL1 in NV contexts
+when NV2P1 is present.
 
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/arch_timer.c        | 10 ++++++++--
- arch/arm64/kvm/hyp/vhe/sysreg-sr.c | 13 ++++++++++---
- arch/arm64/kvm/sys_regs.c          |  6 ++++--
- 3 files changed, 22 insertions(+), 7 deletions(-)
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 5 +++--
+ arch/arm64/kvm/hyp/vhe/switch.c         | 3 +++
+ arch/arm64/kvm/hyp/vhe/sysreg-sr.c      | 8 +++++---
+ arch/arm64/kvm/sys_regs.c               | 5 ++++-
+ 4 files changed, 15 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-index 4155fe89b58a1..db60facad9f3c 100644
---- a/arch/arm64/kvm/arch_timer.c
-+++ b/arch/arm64/kvm/arch_timer.c
-@@ -876,8 +876,14 @@ static void timer_set_traps(struct kvm_vcpu *vcpu, struct timer_map *map)
- 	assign_clear_set_bit(tvt02, CNTHCTL_EL1NVVCT, clr, set);
- 	assign_clear_set_bit(tpt02, CNTHCTL_EL1NVPCT, clr, set);
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 8e5f492f39086..7b27296c94607 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -108,9 +108,10 @@ static inline void __activate_cptr_traps_vhe(struct kvm_vcpu *vcpu)
+ 	 * The architecture is a bit crap (what a surprise): an EL2 guest
+ 	 * writing to CPTR_EL2 via CPACR_EL1 can't set any of TCPAC or TTA,
+ 	 * as they are RES0 in the guest's view. To work around it, trap the
+-	 * sucker using the very same bit it can't set...
++	 * sucker using the very same bit it can't set. FEAT_NV2p1 fixes it.
+ 	 */
+-	if (vcpu_el2_e2h_is_set(vcpu) && is_hyp_ctxt(vcpu))
++	if (!cpus_have_final_cap(ARM64_HAS_NV2P1) &&
++	    vcpu_el2_e2h_is_set(vcpu) && is_hyp_ctxt(vcpu))
+ 		val |= CPTR_EL2_TCPAC;
  
--	/* This only happens on VHE, so use the CNTHCTL_EL2 accessor. */
--	sysreg_clear_set(cnthctl_el2, clr, set);
-+	/*
-+	 * This only happens on VHE, so use the CNTHCTL_EL2 accessor, unless
-+	 * we are sure CNTKCTL_EL1 is completely stateful with FEAT_NV2p1.
-+	 */
-+	if (!cpus_have_final_cap(ARM64_HAS_NV2P1))
-+		sysreg_clear_set(cnthctl_el2, clr, set);
-+	else
-+		sysreg_clear_set(cntkctl_el1, clr, set);
- }
+ 	/*
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index a83be345f8450..8460a8a6745b3 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -438,6 +438,9 @@ static bool kvm_hyp_handle_cpacr_el1(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 	u64 esr = kvm_vcpu_get_esr(vcpu);
+ 	int rt;
  
- void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
++	if (cpus_have_final_cap(ARM64_HAS_NV2P1))
++		return false;
++
+ 	if (!is_hyp_ctxt(vcpu) || esr_sys64_to_sysreg(esr) != SYS_CPACR_EL1)
+ 		return false;
+ 
 diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-index 6f0f046e4ca4e..0c4ef1ce32ae7 100644
+index be685b63e8cf2..6f0f046e4ca4e 100644
 --- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
 +++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-@@ -69,11 +69,18 @@ static void __sysreg_save_vel2_state(struct kvm_vcpu *vcpu)
- 		 * The EL1 view of CNTKCTL_EL1 has a bunch of RES0 bits where
- 		 * the interesting CNTHCTL_EL2 bits live. So preserve these
- 		 * bits when reading back the guest-visible value.
-+		 *
-+		 * While NV2p1 fixes some of that, it makes CNTHCTL_EL2.ECV
-+		 * even more broken than it already was with NV2.
- 		 */
- 		val = read_sysreg_el1(SYS_CNTKCTL);
--		val &= CNTKCTL_VALID_BITS;
--		__vcpu_rmw_sys_reg(vcpu, CNTHCTL_EL2, &=, ~CNTKCTL_VALID_BITS);
--		__vcpu_rmw_sys_reg(vcpu, CNTHCTL_EL2, |=, val);
-+		if (!cpus_have_final_cap(ARM64_HAS_NV2P1)) {
-+			val &= CNTKCTL_VALID_BITS;
-+			__vcpu_rmw_sys_reg(vcpu, CNTHCTL_EL2, &=, ~CNTKCTL_VALID_BITS);
-+			__vcpu_rmw_sys_reg(vcpu, CNTHCTL_EL2, |=, val);
-+		} else {
-+			__vcpu_assign_sys_reg(vcpu, CNTHCTL_EL2, val);
-+		}
- 	}
+@@ -42,10 +42,12 @@ static void __sysreg_save_vel2_state(struct kvm_vcpu *vcpu)
+ 		u64 val;
  
- 	__vcpu_assign_sys_reg(vcpu, SP_EL2,	 read_sysreg(sp_el1));
+ 		/*
+-		 * We don't save CPTR_EL2, as accesses to CPACR_EL1
+-		 * are always trapped, ensuring that the in-memory
+-		 * copy is always up-to-date. A small blessing...
++		 * Without FEAT_NV2p1, we don't save CPTR_EL2, as accesses
++		 * to CPACR_EL1 are always trapped, ensuring that the
++		 * in-memory copy is always up-to-date. A small blessing...
+ 		 */
++		if (cpus_have_final_cap(ARM64_HAS_NV2P1))
++			__vcpu_assign_sys_reg(vcpu, CPTR_EL2, read_sysreg_el1(SYS_CPACR));
+ 		__vcpu_assign_sys_reg(vcpu, SCTLR_EL2,	 read_sysreg_el1(SYS_SCTLR));
+ 		__vcpu_assign_sys_reg(vcpu, TTBR0_EL2,	 read_sysreg_el1(SYS_TTBR0));
+ 		__vcpu_assign_sys_reg(vcpu, TTBR1_EL2,	 read_sysreg_el1(SYS_TTBR1));
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 1dfc1f88bec82..9439c5b2b1fe8 100644
+index 6b47d936efb32..1dfc1f88bec82 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -322,8 +322,10 @@ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, enum vcpu_sysreg reg)
- 		switch (reg) {
- 		case CNTHCTL_EL2:
- 			val = read_sysreg_el1(SYS_CNTKCTL);
--			val &= CNTKCTL_VALID_BITS;
--			val |= __vcpu_sys_reg(vcpu, reg) & ~CNTKCTL_VALID_BITS;
-+			if (!cpus_have_final_cap(ARM64_HAS_NV2P1)) {
-+				val &= CNTKCTL_VALID_BITS;
-+				val |= __vcpu_sys_reg(vcpu, reg) & ~CNTKCTL_VALID_BITS;
-+			}
+@@ -326,7 +326,10 @@ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, enum vcpu_sysreg reg)
+ 			val |= __vcpu_sys_reg(vcpu, reg) & ~CNTKCTL_VALID_BITS;
  			return val;
  		case CPTR_EL2:
- 			if (cpus_have_final_cap(ARM64_HAS_NV2P1))
+-			return __vcpu_sys_reg(vcpu, reg);
++			if (cpus_have_final_cap(ARM64_HAS_NV2P1))
++				return read_sysreg_el1(SYS_CPACR);
++			else
++				return __vcpu_sys_reg(vcpu, reg);
+ 		default:
+ 			WARN_ON_ONCE(1);
+ 		}
 -- 
 2.47.3
 
