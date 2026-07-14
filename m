@@ -1,173 +1,131 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBA6E44BC93
-	for <kvmarm@lists.linux.dev>; Tue, 14 Jul 2026 12:33:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 410BE342CBA;
+	Tue, 14 Jul 2026 12:56:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784032446; cv=none; b=Kh4ToWeX5pzGhSDAsae575ljroYv4kvrzynzmeWWLSE3X+7BqnSa+UuLLNeZrUJBQDKrleZ7oTQ1w5tvj8KE7mRGwMf6O1LYqe+NIRU5BsrjDbEzN4zm98D2fIu/Ex2rlWVAT0FKPzbYwFB1Xk15/+3LYNHTICGXfMllXDcVWgU=
+	t=1784033816; cv=none; b=o+u7C+aVSJdgqtt+AaVPFxcc+GfWiqyE0aBE0ZbEgqKkYZULzLY2UH5nTeUz7pySrQ+ZnJKZemSnrI02qxPf0YomApfNfx/D6IITMgqwAgonY6NQ9Al4ZWLrw6Mi17oqVXv/8JPIoX6/fqFI4cFbeUn22RSvK3q2NWB39JcxFBM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784032446; c=relaxed/simple;
-	bh=hzcPzvNESfxGy1SXAQLnDqi2wmxDzHe0CfNsN9cL/xI=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=SIU9FptfXfBnxlm7uDIR8mJ5O/LJjFHuWYP6iw2PmYd/GMhlj9Ks8AO1J/cSGItW9NCwGVe5aoyuKNOr5deS4A5hThWV5PUmmdNB63vWXlbN78rnj4YXXkdtRH7uHBATG0ONei7xeBCa5/E22EWJh+bZP2AA2WeFWFNniFu+k2I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iXQqqCGg; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784033816; c=relaxed/simple;
+	bh=Pimx1eRaDNLaPvWOwAywMPtkm45HP5qyW6AUuGlmxYE=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Vvp8TIUhr0IHK4wLTzqo0OSkZjUdXDleJX+OefXIA1Jkm8fmbVx6z+iiCHue8t4VLp4vOs0DQlLZtBZBnEDYz7gBHGfNSZA5Ikx4A5kEt1Yk/ItTs2JLoeeFrzz8ZV/XuOyDLaEOlWTAOCk4IjuBIBN9thXsvfcTY8s6v/ogR7U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T4yguSvy; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iXQqqCGg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 631A51F00A3A;
-	Tue, 14 Jul 2026 12:33:55 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T4yguSvy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E69A11F00AC4;
+	Tue, 14 Jul 2026 12:56:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784032435;
-	bh=BCw3Ba4jiEhVo8Yhr5XF9tpF8LRNvQB3kl+9sTXFju4=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=iXQqqCGgxp18hBNXWwP+bSBBMrj46eIP44/Wo6iCJECbZwFVfDcFqKnxJJzOHs9AZ
-	 l1Dk4xOB5PnLY84lJTzT5yMZ6Hcly3pe44FYYoTyMhxg/feyeXE+pBKxG9STWPhHX8
-	 DerxgIVPsEyDO71AxgfTDGwCwH9yPZUHose5bykvMr08rgD0p6PTEoSu/JAkW87Vac
-	 hTZaMgKfWOd/3l+CZSZi9fgp2uZTlSNHv7qVQedCIk6fWkF6v5Bnr0K8ecaYm8f+qg
-	 pht72z5BRfHrM2a1N4TW96xuc4QqQwQqMoa5CGLEaAGVUNHIa8agMlCl/QUbW3zXdP
-	 lTNDU1LeAbv8A==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v5 8/8] KVM: arm64: Implement lazy vCPU state sync for
- non-protected guests
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Fuad Tabba" <fuad.tabba@linux.dev>
-Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev
-In-Reply-To: <20260714101601.4142645-9-fuad.tabba@linux.dev>
-References: <20260714101601.4142645-1-fuad.tabba@linux.dev>
- <20260714101601.4142645-9-fuad.tabba@linux.dev>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 14 Jul 2026 12:33:54 +0000
-Message-Id: <20260714123355.631A51F00A3A@smtp.kernel.org>
+	s=k20260515; t=1784033814;
+	bh=AqkB+gO3NqzY6QcNh0Spffa4y8b55Eb7I3qYIfkQ0n0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=T4yguSvyUyBLnSEEP94ITpS6IYpT94x1xSFxLyg0jtFmOoBatX/MB7LHw0F4Dv0UG
+	 UNq0ZRsR17W/qz1SX8VgJ4elK6fsl3UbC1Ad4f6+TWPHzDkC+cdxFifCYBHqPmOj7T
+	 24ildxcg2a86iELph1JeJT7WlGTNTwrlZBLSLDni68RDsmObfWYq/N3NCT/Kkfb1Al
+	 Ju+TINu51biRJuOv3oGiZGmmA1A9YO5i+hALg8BTfyyaHC3XpzOCAht137PGJqIYYq
+	 yob5r8EBboF9U9IvArFCGjd6TGbz5B0EpWdr3N9PUjOMNuH3pejkdFg8Wu2pk+CopI
+	 W7/CVXs4XOKbw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wjcgv-00000004tpA-04iQ;
+	Tue, 14 Jul 2026 12:56:53 +0000
+Date: Tue, 14 Jul 2026 13:56:52 +0100
+Message-ID: <86v7ahohkb.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: sashiko-reviews@lists.linux.dev
+Cc: kvm@vger.kernel.org,
+	"Oliver Upton" <oupton@kernel.org>,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v2 21/28] KVM: arm64: Add NVHCR_EL2 handling to the sysreg array
+In-Reply-To: <20260714102421.E51341F000E9@smtp.kernel.org>
+References: <20260714091641.1970822-1-maz@kernel.org>
+	<20260714091641.1970822-22-maz@kernel.org>
+	<20260714102421.E51341F000E9@smtp.kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, kvm@vger.kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Thank you for your contribution! Sashiko AI review found 3 potential issue(=
-s) to consider:
+On Tue, 14 Jul 2026 11:24:21 +0100,
+sashiko-bot@kernel.org wrote:
+> 
+> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
+> - [Medium] Userspace writes to NVHCR_EL2 via KVM_SET_ONE_REG are silently discarded upon L1 guest entry.
+> --
+> 
+> --- Patch [21]: [PATCH v2 21/28] KVM: arm64: Add NVHCR_EL2 handling to the sysreg array ---
+> commit 40ce0e0627839603da739968567e9f3998f1ed15
+> Author: Marc Zyngier <maz@kernel.org>
+> 
+> KVM: arm64: Add NVHCR_EL2 handling to the sysreg array
+> 
+> Expose NVHCR_EL2 to userspace, and treat the direct access as UNDEF,
+> as that would only outline a bug in our exception routing.
+> 
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index 9439c5b2b1fe8..0aeb2e736fde3 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> 
+> [ ... ]
+> 
+> > @@ -3774,6 +3800,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+> >  			 sve_el2_visibility),
+> >  
+> >  	EL2_REG_VNCR(HCRX_EL2, reset_val, 0),
+> > +	EL2_REG_FILTERED(NVHCR_EL2, undef_access, reset_val, 0,
+> > +			 nvhcr_el2_visibility),
+> 
+> [Severity: Medium]
+> Will userspace writes to NVHCR_EL2 be silently discarded upon L1 guest entry?
 
-New issues:
-- [High] Removal of `hcr_el2` synchronization back to the host prevents cle=
-arance of `HCR_VSE`, causing infinite virtual SError storms in the guest.
-- [High] Lazy state sync skips synchronization and clears `PKVM_HOST_STATE_=
-DIRTY` on IRQ and IL exits, silently discarding host-side context modificat=
-ions.
+Short answer: no. Longer answer follows.
 
-Pre-existing issues:
-- [Critical] Protected guest register state is unconditionally leaked to an=
-d overwritten by untrusted host memory (`host_vcpu->arch.ctxt`) on every wo=
-rld switch.
---
+> Because NVHCR_EL2 is exposed without a custom .set_user handler, writes via
+> KVM_SET_ONE_REG will update vcpu->arch.ctxt.sys_regs[NVHCR_EL2] using the
+> default behavior. However, upon running the VCPU in hyp_ctxt (L1 hypervisor),
+> __compute_hcr() unconditionally executes:
+> 
+>   __vcpu_assign_sys_reg(vcpu, NVHCR_EL2, __vcpu_sys_reg(vcpu, HCR_EL2));
 
---- Patch [8]: [PATCH v5 8/8] KVM: arm64: Implement lazy vCPU state sync fo=
-r non-protected guests ---
-commit e68e83fa70438b2538d1ea836d971c6d52ffb760
-Author: Fuad Tabba <fuad.tabba@linux.dev>
+If userspace can write to NVHCR_EL2, that's because the guest has NV3
+exposed to it. And if so, then the host also has NV3 and is using it.
+Then the code looks like this:
 
-KVM: arm64: Implement lazy vCPU state sync for non-protected guests
+	/* Publish the guest's view of HCR_EL2 to the HW */
+	if (cpus_have_final_cap(ARM64_HAS_NV3) && vcpu_el2_e2h_is_set(vcpu))
+		write_sysreg_s(__vcpu_sys_reg(vcpu, HCR_EL2), SYS_NVHCR_EL2);
+	else
+		__vcpu_assign_sys_reg(vcpu, NVHCR_EL2, __vcpu_sys_reg(vcpu, HCR_EL2));
 
-pKVM copies a non-protected guest's register context between the host
-and the hypervisor on every world switch, even when the host never
-inspects it. Defer the copy: on entry, flush the host context into the
-hyp vCPU only when the host marked it dirty; on exit, leave it in the
-hyp vCPU and copy it back only when the host needs it.
+and the value of HCR_EL2 is written into the NVHCR_EL2 *register*.
 
-> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-> --- a/arch/arm64/kvm/handle_exit.c
-> +++ b/arch/arm64/kvm/handle_exit.c
-> @@ -486,9 +486,32 @@ int handle_exit(struct kvm_vcpu *vcpu, int exception=
-_index)
+>
+> This seems to clobber the userspace write, causing UAPI state loss and a KVM
+> ABI violation where KVM_SET_ONE_REG writes are expected to be preserved.
 
-[ ... ]
+See above?
 
-> +static void handle_exit_pkvm_state(struct kvm_vcpu *vcpu, int exception_=
-index)
-> +{
+>
+> Does this require a custom .set_user handler to maintain alias synchronization
+> between NVHCR_EL2 and HCR_EL2?
 
-[ ... ]
+No.
 
-> +	if (exception_code =3D=3D ARM_EXCEPTION_TRAP ||
-> +	    exception_code =3D=3D ARM_EXCEPTION_EL1_SERROR ||
-> +	    ARM_SERROR_PENDING(exception_index)) {
-> +		kvm_call_hyp_nvhe(__pkvm_vcpu_sync_state);
-> +		vcpu_set_flag(vcpu, PKVM_HOST_STATE_DIRTY);
-> +	} else {
-> +		vcpu_clear_flag(vcpu, PKVM_HOST_STATE_DIRTY);
-> +	}
-> +}
+	M.
 
-[Severity: High]
-If a non-protected guest exits due to an IRQ (such as a PMU overflow), this
-clears PKVM_HOST_STATE_DIRTY. If the host kernel then handles the IRQ and
-modifies the guest context (for example, setting PMOVSSET_EL0 for the
-overflow or applying a reset like KVM_REQ_SUSPEND), these updates appear to
-be lost.
-
-On the next entry, flush_hyp_vcpu() will skip copying the host state because
-the dirty flag is clear. Then, on a subsequent exit or vcpu_put,
-handle___pkvm_vcpu_put() will reverse-sync the stale hyp state back over the
-host state. Does this clear flag path silently discard host-side context
-modifications?
-
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe=
-/hyp-main.c
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -172,7 +214,17 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp=
-_vcpu)
->  	fpsimd_sve_flush();
->  	flush_debug_state(hyp_vcpu);
-> =20
-> -	hyp_vcpu->vcpu.arch.ctxt	=3D host_vcpu->arch.ctxt;
-> +	/*
-> +	 * If we deal with a non-protected guest and the state is potentially
-> +	 * dirty (from a host perspective), copy the state back into the hyp
-> +	 * vcpu.
-> +	 */
-> +	if (!pkvm_hyp_vcpu_is_protected(hyp_vcpu)) {
-> +		if (vcpu_get_flag(host_vcpu, PKVM_HOST_STATE_DIRTY))
-> +			flush_hyp_vcpu_state(hyp_vcpu);
-> +	} else {
-> +		hyp_vcpu->vcpu.arch.ctxt =3D host_vcpu->arch.ctxt;
-> +	}
-
-[Severity: Critical]
-This is a pre-existing issue, but doesn't this unconditionally overwrite the
-protected guest's private EL2 registers with the values from the untrusted
-host memory? By copying host_vcpu->arch.ctxt into the hyp_vcpu on entry,
-could the host arbitrarily modify a protected VM's state before execution?
-
-> @@ -203,9 +255,13 @@ static void sync_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_=
-vcpu)
->  	fpsimd_sve_sync(&hyp_vcpu->vcpu);
->  	sync_debug_state(hyp_vcpu);
-> =20
-> -	host_vcpu->arch.ctxt		=3D hyp_vcpu->vcpu.arch.ctxt;
-> -
-> -	host_vcpu->arch.hcr_el2		=3D hyp_vcpu->vcpu.arch.hcr_el2;
-> +	if (pkvm_hyp_vcpu_is_protected(hyp_vcpu)) {
-> +		host_vcpu->arch.ctxt =3D hyp_vcpu->vcpu.arch.ctxt;
-
-[Severity: Critical]
-This is also a pre-existing issue, but leaking the protected guest's
-register state into the untrusted host memory seems to violate pKVM's
-confidentiality guarantees. The untrusted host EL1 can read all private EL2
-registers via its mapped kvm_vcpu structure. Should this copy be avoided for
-protected VMs?
-
-[Severity: High]
-By removing the assignment that copies hcr_el2 back to the host, do we break
-virtual SError injection?
-
-When the guest takes a virtual SError, the hardware clears the VSE bit in
-the hyp vCPU's hcr_el2. Because we no longer sync this back in
-sync_hyp_vcpu(), the host's copy remains set. On the next entry,
-flush_hyp_vcpu() will read the stale host HCR_VSE bit and set it again,
-which seems like it would trap the guest in an infinite virtual SError
-storm.
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260714101601.4142=
-645-1-fuad.tabba@linux.dev?part=3D8
+-- 
+Without deviation from the norm, progress is not possible.
