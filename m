@@ -1,120 +1,131 @@
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 623D83CBE6D
-	for <kvmarm@lists.linux.dev>; Tue, 14 Jul 2026 18:10:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EEF4412C1D
+	for <kvmarm@lists.linux.dev>; Tue, 14 Jul 2026 18:25:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784052658; cv=none; b=j1e2MVVh2D7k+kPQlXPyK2unESItq5qJdP5+In+7xwmxh1oryRrceozFlhW7D6+Mb51MRYYSghoRGNYRCQkXuMPBal7alv2JhKO9QHHHcbrt3PoaBIfVImc5BtXiJwqIcGzRuGOh+7ugJW2Kpu1CjFpGHwt7BVQVtMtnpCTg25U=
+	t=1784053547; cv=none; b=uTjBg48SDi99d0KSpiuldmrmYGAKV+S7yDtIV78GEr+9DC88giBJ945pTaVELd9k1ED+182T8bLzM+0ohX0cr3WOonH+Jsrg9M47JxheVB3HyR2sNFlpGYFfmcHe5qFfHPnv9nG5qkasacjEZ6AFzwKUGnQtdbfGKPqmpUFZzuU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784052658; c=relaxed/simple;
-	bh=mxi/g0FaxjexQONpL8gDyj3+J2M7UP6EPbdnqaQKL8Q=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=s57nLDxs4Zj7lAF43CjEZgzpoyJlBEpWKcYWTAn61P4tyL1NFxRCVgQPA9WcmdwWOYqpaHrb8j7T/mg9HZjJg5ToaCHRwbZamLwSOSyqiFyzf1SHkhqbiJmJP9+VrsirHzXi8V6VqOLJhchYgXlacLvV2t7UT8oGMpVntJGRcFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=o3pozvv3; arc=none smtp.client-ip=209.85.128.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
+	s=arc-20240116; t=1784053547; c=relaxed/simple;
+	bh=UJxitkdaPC5SZC4R34vCKL7FkTZNjaFflB5Ik5kfwb4=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=UGQE9WX3RxfBQMK3pR4/Je48cBemifTfa/x1TLT1mp3jjCDTIH4+b13JK6qnGRIAd8blBIytHHq0DH8VT2X8TxXNVUSDXL5Oc7a00OixV5ZLEQqjWJ8kRFHz8OTRuCmYUBnqK12pz8sYgYNUL26hTmAAr1ZJug3p/92DNI95WXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SMyvq7jc; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="o3pozvv3"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-492488f8583so66157425e9.2
-        for <kvmarm@lists.linux.dev>; Tue, 14 Jul 2026 11:10:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1784052655; x=1784657455; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=cfKdTJ0UW1n66HS6tgSej7/MevFTojdr1dMFwbyGTJ8=;
-        b=o3pozvv36rbdvSvmmgi7fiketVXDaLpDKNlCFo6TyPRcOm3FLXgcyGnsRG+DiWpKXc
-         Tb3gBHZF+LiBNhe7UYBsvNRzKzCbUW3kTYUJyIH1vRP/ZA6a4KuMBQrw1GvAb9FdXhKC
-         Gcn+nOYmex2pDWKs5WtmyGo6kXoFU7hfYf06gDKERCujSEYqk2C8HUM3BDZLP17xBQ7I
-         VMtPxtJizQmP5RrLCa3OMC3oGg3HD5G7PwtqIQ44fA+q9LtJ2u7/CPxxMNIYJufo1I2h
-         xeAAAdY0y15qy43geHi1moxfxTsDT2Q7PccoZkWLwrYTEb/6w12VWhxFfE7mSedirn9a
-         M3pA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784052655; x=1784657455;
-        h=content-type:cc:to:from:subject:message-id:mime-version:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=cfKdTJ0UW1n66HS6tgSej7/MevFTojdr1dMFwbyGTJ8=;
-        b=ib0OxjqzqLR4rs1qDmLLsgVWi/faJnCEycWbUL8ZNqiSxTR+PhjG59qiSWbP6gKk1q
-         JZIZotfHbjRjKe+wbkI1LKrtl/2SyPj3gNcuP4/PGt9I/kqZ11TXzbAeOZLpYXl4yzSg
-         EFQBbieQrRAb/RIbncgbhY7Vh4xBSCOVv4E1oCbW5HbP3zcYTeiaT9GFDbR4v7yvUl1k
-         CH3cb3UitwOzCyKqMQtqO7W1fVqvc/o/1nb837L11PcdHwGoU0TMd15hLTLTvCFypEyW
-         CcL1wa+BPThrJ+mihbQzNVUxmTRuNCzDCELnJEbHvxEbdDvnaGKcdCeAGK0XM5xkvlFy
-         2qaw==
-X-Forwarded-Encrypted: i=1; AHgh+Rq+awpAEP4Wo5s9tRSlMmRKnm/oyHpI1OV77JOvqsgI8SI6LCTjuVE7R0/TgLTgwgA2jaeJlU0=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxUxfmLGbCTnU0w/z+xb4V75yRwHe84AdpNac+TUV3WnKH2ndl/
-	eXmXEBSPSrl6qnH2l/7QLl07JIi3A0pcLoAsd9IZMsqyOalBcnk1wgZeP4jH8F8tZlkASGjo2ug
-	Rtlwkncv9UNlmizFmT2noDg==
-X-Received: from wmrk19.prod.google.com ([2002:a05:600c:b53:b0:493:c111:8ed4])
- (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:524c:b0:494:df:8895 with SMTP id 5b1f17b1804b1-49538a0251emr41049885e9.24.1784052655128;
- Tue, 14 Jul 2026 11:10:55 -0700 (PDT)
-Date: Tue, 14 Jul 2026 19:10:10 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SMyvq7jc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F33421F000E9;
+	Tue, 14 Jul 2026 18:25:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1784053543;
+	bh=GtoP/ip2x5uO8OzulHUDfJIe+9sD61VUdNQYhX9tTHw=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=SMyvq7jccJmpo1IWoRpUVVwJO2Vz2gtQmSAkby/X1xjXEBHs2ndIHaRAg3T9E+Mdk
+	 oWQ1N65guRcnJZm0rzdjS4ZlNZj5rOSewvctHxOrwuHsB2Czx6rou9cH6pYutlH5Np
+	 y0I/nzyFe606I3l8qw1Pk/UoOyqXFfADGgkcN3iSwSLxETU8yDkjwOiqhx8If/lbI8
+	 KhwJIE40xCLxorViUseNTC7I0hjV48FK+RgDTii0fp1yST0VeYbZKHGgHT5SYh5EP3
+	 IKKftH3kCrEwhZJYU8DKhzm1yJfMusvE7myOr7dF2yveBI4jxi/Lx1w5UyHbfVdC3u
+	 DhtM9dm643VTg==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH] KVM: arm64: Fix hyp_trace clock disabling
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Vincent Donnefort" <vdonnefort@google.com>
+Cc: "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20260714181010.2527225-1-vdonnefort@google.com>
+References: <20260714181010.2527225-1-vdonnefort@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 14 Jul 2026 18:25:42 +0000
+Message-Id: <20260714182542.F33421F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.55.0.141.g00534a21ce-goog
-Message-ID: <20260714181010.2527225-1-vdonnefort@google.com>
-Subject: [PATCH] KVM: arm64: Fix hyp_trace clock disabling
-From: Vincent Donnefort <vdonnefort@google.com>
-To: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org
-Cc: joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
-	kernel-team@android.com, tabba@google.com, 
-	Vincent Donnefort <vdonnefort@google.com>
-Content-Type: text/plain; charset="UTF-8"
 
-Fix the disable path in hyp_trace_clock_enable(), which fell through to
-re-initialize and reschedule the clock after cancelling the work. Return
-early instead.
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [Medium] Missing cleanup in the error path of `hyp_trace_enable_tracing()=
+` leaks the clock synchronization delayed work. Furthermore, this patch int=
+roduces a workqueue corruption if tracing is subsequently re-enabled.
+--
 
-While at it, cleanup hyp_trace_clock::lock which is unused and
-hyp_trace_clock::running which is redundant: the trace_remote framework
-already serializes calls to the callback enable_tracing.
+--- Patch [1]: [PATCH] KVM: arm64: Fix hyp_trace clock disabling ---
+commit c37a59b3ffe1e163385bedc8f21496d8af6fbc61
+Author: Vincent Donnefort <vdonnefort@google.com>
 
-Fixes: b22888917fa4 ("KVM: arm64: Sync boot clock with the nVHE/pKVM hyp")
-Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+KVM: arm64: Fix hyp_trace clock disabling
 
-diff --git a/arch/arm64/kvm/hyp_trace.c b/arch/arm64/kvm/hyp_trace.c
-index 2411b4c32932..0b03117a38ec 100644
---- a/arch/arm64/kvm/hyp_trace.c
-+++ b/arch/arm64/kvm/hyp_trace.c
-@@ -37,8 +37,6 @@ static struct hyp_trace_clock {
- 	u32			shift;
- 	struct delayed_work	work;
- 	struct completion	ready;
--	struct mutex		lock;
--	bool			running;
- } hyp_clock;
- 
- static void __hyp_clock_work(struct work_struct *work)
-@@ -110,12 +108,9 @@ static void hyp_trace_clock_enable(struct hyp_trace_clock *hyp_clock, bool enabl
- {
- 	struct system_time_snapshot snap;
- 
--	if (hyp_clock->running == enable)
--		return;
--
- 	if (!enable) {
- 		cancel_delayed_work_sync(&hyp_clock->work);
--		hyp_clock->running = false;
-+		return;
- 	}
- 
- 	ktime_get_snapshot_id(CLOCK_BOOTTIME, &snap);
-@@ -128,7 +123,6 @@ static void hyp_trace_clock_enable(struct hyp_trace_clock *hyp_clock, bool enabl
- 	INIT_DELAYED_WORK(&hyp_clock->work, __hyp_clock_work);
- 	schedule_delayed_work(&hyp_clock->work, msecs_to_jiffies(CLOCK_INIT_MS));
- 	wait_for_completion(&hyp_clock->ready);
--	hyp_clock->running = true;
- }
- 
- /* Access to this struct within the trace_remote_callbacks are protected by the trace_remote lock */
+This commit fixes the disable path in hyp_trace_clock_enable() by returning
+early instead of re-initializing the clock. It also cleans up the unused
+lock and redundant running state from the clock structure.
 
-base-commit: a13c140cc289c0b7b3770bce5b3ad42ab35074aa
--- 
-2.55.0.141.g00534a21ce-goog
+> diff --git a/arch/arm64/kvm/hyp_trace.c b/arch/arm64/kvm/hyp_trace.c
+> index 2411b4c32932c..0b03117a38ecd 100644
+> --- a/arch/arm64/kvm/hyp_trace.c
+> +++ b/arch/arm64/kvm/hyp_trace.c
+> @@ -37,8 +37,6 @@ static struct hyp_trace_clock {
+>  	u32			shift;
+>  	struct delayed_work	work;
+>  	struct completion	ready;
+> -	struct mutex		lock;
+> -	bool			running;
+>  } hyp_clock;
 
+[ ... ]
+
+> @@ -110,12 +108,9 @@ static void hyp_trace_clock_enable(struct hyp_trace_=
+clock *hyp_clock, bool enabl
+>  {
+>  	struct system_time_snapshot snap;
+> =20
+> -	if (hyp_clock->running =3D=3D enable)
+> -		return;
+> -
+>  	if (!enable) {
+>  		cancel_delayed_work_sync(&hyp_clock->work);
+> -		hyp_clock->running =3D false;
+> +		return;
+>  	}
+> =20
+>  	ktime_get_snapshot_id(CLOCK_BOOTTIME, &snap);
+> @@ -128,7 +123,6 @@ static void hyp_trace_clock_enable(struct hyp_trace_c=
+lock *hyp_clock, bool enabl
+>  	INIT_DELAYED_WORK(&hyp_clock->work, __hyp_clock_work);
+
+[Severity: Medium]
+Is it safe to remove the hyp_clock->running check above, considering how
+errors are handled in hyp_trace_enable_tracing()?
+
+Looking at hyp_trace_enable_tracing(), if the hypercall fails, the error
+is propagated but the clock is not stopped:
+
+static int hyp_trace_enable_tracing(bool enable, void *priv)
+{
+	hyp_trace_clock_enable(&hyp_clock, enable);
+
+	return kvm_call_hyp_nvhe(__tracing_enable, enable);
+}
+
+If the hypercall returns an error when enable is true, the user might
+try to enable tracing again. This would result in a second call to
+hyp_trace_clock_enable() with enable as true.
+
+Without the running check returning early, the code will fall through and
+call INIT_DELAYED_WORK() on the already active hyp_clock->work item. Can
+this corrupt the workqueue list pointers?
+
+Even though the hypercall might currently be prevented from failing due
+to the remote lock serialization, should we add a rollback to the error
+path in hyp_trace_enable_tracing() before dropping the running state check?
+
+>  	schedule_delayed_work(&hyp_clock->work, msecs_to_jiffies(CLOCK_INIT_MS)=
+);
+>  	wait_for_completion(&hyp_clock->ready);
+> -	hyp_clock->running =3D true;
+>  }
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260714181010.2527=
+225-1-vdonnefort@google.com?part=3D1
