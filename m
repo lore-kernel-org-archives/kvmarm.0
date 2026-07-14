@@ -1,49 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30FE347CC6B;
-	Tue, 14 Jul 2026 14:22:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0413371873;
+	Tue, 14 Jul 2026 14:23:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784038952; cv=none; b=NQbit/u8kovamwhGv7++KNKG7RLLJr/7n4xAItC1XIi1pvwz5lcKkEPOqksd57WFGi1IebwZBFSq5GJ9ZzxoSnU1zw9xS6QEsdRE9Xi8qexMtQ3SgvicIpbvIYB/uT8YfGwOkoQ0TLa0rzX8ybhi0tNMXShri+h6/rZ4gqWUfCc=
+	t=1784039027; cv=none; b=ksDre56VWj2NnPutqSDeNHhGu74ydzW5fdSsCGBUZzrRGhdqD11URAlixFSPM8HYhLY9G0soiymMvDgSRBEn1Via7X/K9UJjTVQfd10l90va0+rsiN6ZEVifVUMRx742+lrZihqKldLNjwSzn9dnsSS+ZT1fULFwcj8igLrIJ1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784038952; c=relaxed/simple;
-	bh=pSujG4fpg3r88fOMWrnfYvAIeMhR212/tPgm/tOK+GI=;
+	s=arc-20240116; t=1784039027; c=relaxed/simple;
+	bh=gWk9yXqf6qSyLggNRpfDizVEfzcVgGoCOuJzxY/D5yY=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IJNDAOFW0hW4KMoeIqZu24szcXHTpN82uyX5HYHLihzoiroh229wxSIABxQizduZVJWpAGwgeaHPAwNFklNlTUkcD9a5u+cx+KaemXLyPyxMk8UG5SjD2J3Akxv6xXnrQ+FVyZsQfU7C686kzPvdvActe1Timj1V7uIsrwSmCTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HAQNYsQe; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=TVVSUXKOC2UcM+iMezIw/Z6EfQcJji9ESGEx1Bs4VlavfKSGz0f1+mUxQNOw1ZI5YwUwYGF+W3MpDzmr1wnlw028kuwYAp2Bp5XPUBca5uytY64KJsHPd3JsZQ9UGF4D6Jql1LPnwIN3M5m8J33z0mdr8KylIHJUPEnSOYNl9h8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YDxjuwhF; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HAQNYsQe"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB98F1F000E9;
-	Tue, 14 Jul 2026 14:22:30 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YDxjuwhF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FCFF1F000E9;
+	Tue, 14 Jul 2026 14:23:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784038950;
-	bh=+m2w/qHjZy2AWjFKd8uIdBkf4Yzja0dmBvbH2/OEILE=;
+	s=k20260515; t=1784039025;
+	bh=3deSPY6p7cZU3t7Ksy8ouyzbaZoLlYF+1c0RK/jgVdg=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=HAQNYsQeCaKz2zqUbpjWVjQiTg4pcCVA5FkRRmglNAzjGoHffQmwQhGlKeEVw17oO
-	 GgDYK1BmK6McDNCAuISrFeGepV2siq77TN1z+jcoQvasQNsTW8qigcECl2vBI+B6Qe
-	 ioRplYqckXmwSKnbpbQSsWqFXP66SNN5T1/xOKFqugDFgXVElGbmUHLanCZQfZvmRB
-	 KF+xMelhu+hLTcmRUwr8CzYe28sFReItsFg7U1+pt38FmmWP/xlD3li4DbKPbC92KH
-	 yK9QrgH5oMUGgRB/Lj07oAXG4JISPEJ6hK1LxRP7gcuSCqzUofY6mA4CUclknU/Kdr
-	 /RcHI7MIMYL0w==
+	b=YDxjuwhFudOSzOFFQ3wLvFlKmE8qgW88T9Fa8JgdReMF6DZB3tsKrdjDehIIFBx6j
+	 PAOqKkcHbMJOGTZonJvnfShUSLpaAPAHOf+8m6a5r9n0v85dz2s++hXj/CM7B9tQtM
+	 HNydGptLYXWDcoxCxMkut+LwH+MzzMC7gmpFPZ7FaFFZC1KWORuLDbJT4ca3IirXLd
+	 87K9AKws2u0k0OiYoCSnXE3+m8DiDQz8vPfHdgduZEAt4mfe+GgQ7wja8QFlVzplQn
+	 bhjq9Z/Sv+H1hRvBEvIeN4eZUWKzONZ4n6nLZy1JalFwqgm4SdP41VZf32BDxw+t1B
+	 V6C2htL0vjC8Q==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wje1l-00000004wOU-0Ecn;
-	Tue, 14 Jul 2026 14:22:29 +0000
-Date: Tue, 14 Jul 2026 15:22:28 +0100
-Message-ID: <86qzl5odln.wl-maz@kernel.org>
+	id 1wje2x-00000004wR2-3I2B;
+	Tue, 14 Jul 2026 14:23:43 +0000
+Date: Tue, 14 Jul 2026 15:23:43 +0100
+Message-ID: <86pl0podjk.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: sashiko-reviews@lists.linux.dev
 Cc: kvmarm@lists.linux.dev,
 	"Oliver Upton" <oupton@kernel.org>,
 	kvm@vger.kernel.org
-Subject: Re: [PATCH v2 10/28] KVM: arm64: Relax CNTHCTL_EL2 handling when FEAT_NV2p1 is present
-In-Reply-To: <20260714095350.20AE91F00A3A@smtp.kernel.org>
+Subject: Re: [PATCH v2 18/28] KVM: arm64: Add kvm_has_nv{2,3}() predicates
+In-Reply-To: <20260714094803.B3C371F000E9@smtp.kernel.org>
 References: <20260714091641.1970822-1-maz@kernel.org>
-	<20260714091641.1970822-11-maz@kernel.org>
-	<20260714095350.20AE91F00A3A@smtp.kernel.org>
+	<20260714091641.1970822-19-maz@kernel.org>
+	<20260714094803.B3C371F000E9@smtp.kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -59,128 +59,44 @@ X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev, oupt
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 14 Jul 2026 10:53:49 +0100,
+On Tue, 14 Jul 2026 10:48:03 +0100,
 sashiko-bot@kernel.org wrote:
 > 
 > Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> - [High] Removing the split-state preservation for `CNTHCTL_EL2` on FEAT_NV2p1 systems permanently corrupts the guest's in-memory ECV bit and leaks host-specific trap overrides to userspace.
+> - [Medium] kvm_has_nv3() will always return false because ARM64_HAS_NV3 is never populated in the capabilities bitmap.
 > --
 > 
-> --- Patch [10]: [PATCH v2 10/28] KVM: arm64: Relax CNTHCTL_EL2 handling when FEAT_NV2p1 is present ---
-> commit e272e43dc6ce85d3337902d78430aad6bf5b83fc
+> --- Patch [18]: [PATCH v2 18/28] KVM: arm64: Add kvm_has_nv{2,3}() predicates ---
+> commit e61ff01470e9cbe730c6702e605c3c17d525ca4e
 > Author: Marc Zyngier <maz@kernel.org>
 > 
-> KVM: arm64: Relax CNTHCTL_EL2 handling when FEAT_NV2p1 is present
->     
-> With NV2p1, it is no longer necessary to use the split approach
-> where bits of CNTHCTL_EL2 cannot be accessed via CNTKCTL_EL1,
-> and we can treat the CNTKCTL_EL1 accessor as if it was "normal".
+> KVM: arm64: Add kvm_has_nv{2,3}() predicates
 > 
-> > diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-> > index 4155fe89b58a1..db60facad9f3c 100644
-> > --- a/arch/arm64/kvm/arch_timer.c
-> > +++ b/arch/arm64/kvm/arch_timer.c
+> This commit adds a new set of predicates indicating whether a VM is capable
+> of NV2, NV3, and is in a nested NV3 context.
 > 
-> [ ... ]
-> 
-> > @@ -876,8 +876,14 @@ static void timer_set_traps(struct kvm_vcpu *vcpu, struct timer_map *map)
-> >  	assign_clear_set_bit(tvt02, CNTHCTL_EL1NVVCT, clr, set);
-> >  	assign_clear_set_bit(tpt02, CNTHCTL_EL1NVPCT, clr, set);
-> >  
-> > -	/* This only happens on VHE, so use the CNTHCTL_EL2 accessor. */
-> > -	sysreg_clear_set(cnthctl_el2, clr, set);
-> > +	/*
-> > +	 * This only happens on VHE, so use the CNTHCTL_EL2 accessor, unless
-> > +	 * we are sure CNTKCTL_EL1 is completely stateful with FEAT_NV2p1.
-> > +	 */
-> > +	if (!cpus_have_final_cap(ARM64_HAS_NV2P1))
-> > +		sysreg_clear_set(cnthctl_el2, clr, set);
-> > +	else
-> > +		sysreg_clear_set(cntkctl_el1, clr, set);
-> >  }
+> > diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> > index 9831166695186..c562d8171d5e1 100644
+> > --- a/arch/arm64/include/asm/kvm_emulate.h
+> > +++ b/arch/arm64/include/asm/kvm_emulate.h
 > 
 > [ ... ]
 > 
-> > diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-> > index 6f0f046e4ca4e..0c4ef1ce32ae7 100644
-> > --- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-> > +++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+> > +static inline bool kvm_has_nv3(struct kvm *kvm)
+> > +{
+> > +	return (cpus_have_final_cap(ARM64_HAS_NESTED_VIRT) &&
+> > +		cpus_have_final_cap(ARM64_HAS_NV3) &&
 > 
-> [ ... ]
+> [Severity: Medium]
+> Will kvm_has_nv3() always return false here?
 > 
-> > @@ -69,11 +69,18 @@ static void __sysreg_save_vel2_state(struct kvm_vcpu *vcpu)
-> >  		 * The EL1 view of CNTKCTL_EL1 has a bunch of RES0 bits where
-> >  		 * the interesting CNTHCTL_EL2 bits live. So preserve these
-> >  		 * bits when reading back the guest-visible value.
-> > +		 *
-> > +		 * While NV2p1 fixes some of that, it makes CNTHCTL_EL2.ECV
-> > +		 * even more broken than it already was with NV2.
-> >  		 */
-> >  		val = read_sysreg_el1(SYS_CNTKCTL);
-> > -		val &= CNTKCTL_VALID_BITS;
-> > -		__vcpu_rmw_sys_reg(vcpu, CNTHCTL_EL2, &=, ~CNTKCTL_VALID_BITS);
-> > -		__vcpu_rmw_sys_reg(vcpu, CNTHCTL_EL2, |=, val);
-> > +		if (!cpus_have_final_cap(ARM64_HAS_NV2P1)) {
-> > +			val &= CNTKCTL_VALID_BITS;
-> > +			__vcpu_rmw_sys_reg(vcpu, CNTHCTL_EL2, &=, ~CNTKCTL_VALID_BITS);
-> > +			__vcpu_rmw_sys_reg(vcpu, CNTHCTL_EL2, |=, val);
-> > +		} else {
-> > +			__vcpu_assign_sys_reg(vcpu, CNTHCTL_EL2, val);
-> > +		}
-> 
-> [Severity: High]
-> Does removing the split-state preservation for CNTHCTL_EL2 unconditionally
-> overwrite the guest's in-memory register state?
+> It appears the ARM64_HAS_NV3 capability was added to the cpucaps tools, but
+> the corresponding hardware detection entry is missing from the arm64_features
+> array in arch/arm64/kernel/cpufeature.c. Since it is never populated,
+> cpus_have_final_cap(ARM64_HAS_NV3) will unconditionally evaluate to false,
+> turning any code relying on this predicate into dead code.
 
-How?
-
-> 
-> Since timer_set_traps() applies host-specific overrides to CNTKCTL_EL1 on the
-> host side, calling __vcpu_assign_sys_reg() here appears to blindly copy those
-> host-specific traps directly into the guest's architectural state on exit.
-
-No. CNTKCTL_EL1 is not CNTKCTL_EL12. Not only you don't understand NV,
-you don't even understand VHE.
-
->
-> Furthermore, as the comment above notes that NV2p1 makes the ECV bit even more
-> broken, won't this assignment corrupt the guest's ECV state as well?
-> 
-> >  	}
-> >  
-> >  	__vcpu_assign_sys_reg(vcpu, SP_EL2,	 read_sysreg(sp_el1));
-> 
-> [ ... ]
-> 
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index 1dfc1f88bec82..9439c5b2b1fe8 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> 
-> [ ... ]
-> 
-> > @@ -322,8 +322,10 @@ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, enum vcpu_sysreg reg)
-> >  		switch (reg) {
-> >  		case CNTHCTL_EL2:
-> >  			val = read_sysreg_el1(SYS_CNTKCTL);
-> > -			val &= CNTKCTL_VALID_BITS;
-> > -			val |= __vcpu_sys_reg(vcpu, reg) & ~CNTKCTL_VALID_BITS;
-> > +			if (!cpus_have_final_cap(ARM64_HAS_NV2P1)) {
-> > +				val &= CNTKCTL_VALID_BITS;
-> > +				val |= __vcpu_sys_reg(vcpu, reg) & ~CNTKCTL_VALID_BITS;
-> > +			}
-> >  			return val;
-> 
-> [Severity: High]
-> Does this directly return the host-polluted physical register to userspace
-> during KVM_GET_ONE_REG?
-> 
-> Because the host-specific overrides from timer_set_traps() are present in
-> CNTKCTL_EL1, skipping the bitmasking on ARM64_HAS_NV2P1 systems seems to leak
-> these hypervisor-specific configurations to userspace. This could break live
-> migration by restoring an altered execution environment.
-
-CNTKCTL_EL1 != CNTKCTL_EL12.
+Patch #26 is your friend.
 
 	M.
 
