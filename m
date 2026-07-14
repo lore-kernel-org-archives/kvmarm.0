@@ -1,44 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7D8936921E;
-	Tue, 14 Jul 2026 09:46:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CA3043F4B5;
+	Tue, 14 Jul 2026 09:48:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784022373; cv=none; b=KlPA1bChHyJg6BRBydpb7b3NXj6ZvXHgTVucN+JoyCf1S+jaj9mVVsk9njc3FZI9pgz0bYjxkn85we8v/LtsDYnYUC7QSITqBQrZy5aKxF/DrmnJ94qhEKIMmyIVBeuVe5ER1FI507QLeXSX+7JXp9mJQtdYPh9XHnsYKYH9T1Q=
+	t=1784022489; cv=none; b=dRLJ1hkGf34YS/tcQ/iRMwDHUGJAgwcalbRONH8j2Aie8+Lqld7RKJRa0UgdOxn440+NMNWLb+5TT04ViVyxRYV3X9PvUCz1t9t4zV7Y6Bj5YSM0meD2hdhb+QoiNwDDGGxpExqbKbjCf06OsTYzTwACkGw2ST759jriBN1FS+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784022373; c=relaxed/simple;
-	bh=nd3tXWs2bLq8vphZEYWHzpKam+fxUz8CzZZzLOajrWo=;
+	s=arc-20240116; t=1784022489; c=relaxed/simple;
+	bh=rBaQSpN6PLbdyg/Mnd3Njbzm22x7FFxu6sD4tLtdwr0=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=UvhsUPOIBVhQVI2GRA8C1VDFYmylLiA11kbjiiO7/6uJeGcCJ9jXYD4X3UQudcTU8mfr3vexAI5GBhWjvNlswnlcg8rvw0vaImGJF1kT2PUGRobqQA/WlFXkcefBosJu/IQ1Mq5Z4kiHia1PoIqzhSH2pdE5p3WOH/FxUp3iwBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eFPaaBuO; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=uifOwiNQGt38tPhthfhYeS8uPnVij8BqQ1wZOJqDJ9Hoy2lNA2oYaB03xWLat4TRFrSuK79LrH2oAIKcysUzQPbFpkfBc4Gd8HyZNsrypeYWFd7mlSyTaf8pl7innusZhHIaDjU8ZL6ldtthk74Z9MvoVcVHtB381OYwyrIkbaY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JpzsGFcf; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eFPaaBuO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4ACD11F00A3E;
-	Tue, 14 Jul 2026 09:46:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JpzsGFcf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3C371F000E9;
+	Tue, 14 Jul 2026 09:48:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784022369;
-	bh=gUC8fxJDGNOaiW1RXvIHxFL1gk2RrPcTibctzVPs0tE=;
+	s=k20260515; t=1784022483;
+	bh=bGK0ER9Hb6NMoajTKYxaP18onOXcqieGADslBbXzSOg=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=eFPaaBuODlmmxos/roycZykNJ5cbQLXNIGMzj4XetPejyHM9DsUagMEk4OYp2jMav
-	 V05qwUG2xs26kjIfBX2+wSZH7ix9/zoDIkBNKPuWU3wsZ4B3vEAfP6fXoPpwJlceeh
-	 2mkJd8O8H9a/mokZV8wFsCBByXwzhP9tk91/cQXZooZ/ByoOC5xcxMpLhd9KO++yB/
-	 aa99Zttn2RpWb7zYuSbSuYHDI9j9pXaROjVQ0tAuyBw4FoHdwLKA0ENUu/1QouIKWa
-	 ap4lZFrgd89VoLtDhZVFEvtwv4JVAerceOt0DgrAtgiPKwFD1GQOFfaEbuLYLpsfgf
-	 qSlaoJAl4Myvg==
+	b=JpzsGFcfiEmEVA7rMVE0EKu8V/MxwWWDkbE0uX0k4yJGtgx8Vq47jVyErP4a1QsnH
+	 BQfnzoJSy9lSZut5k4DV5GeziVvo0vQ+znhuzOLtLNCmmnyKSKxJr/0/iKRhUGKSTh
+	 ey+YQ1VJIH/snqsUVVyM6YUaKENtBSgeMwny4znIf/+vkILoKIuCmCNeXKRMMsXMVL
+	 sHYg2/p4o4lTQiQ6YW3kPyMS2GD1phPnhmOvVB9BT/9R6jBhkje2oCdieZtwu4xBWB
+	 AlWFUfmTD5NsVe/7+i4W/Swx88Zra/hBwjqbJ0K1YQPgQe4FaEj2HFn6zHAtpBjm1q
+	 gEAOEO2l6K2Lw==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2 12/28] arm64: Add FEAT_NV2p1 detection
+Subject: Re: [PATCH v2 18/28] KVM: arm64: Add kvm_has_nv{2,3}() predicates
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Marc Zyngier" <maz@kernel.org>
-Cc: kvm@vger.kernel.org, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, "Oliver
- Upton" <oupton@kernel.org>
-In-Reply-To: <20260714091641.1970822-13-maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>, kvm@vger.kernel.org
+In-Reply-To: <20260714091641.1970822-19-maz@kernel.org>
 References: <20260714091641.1970822-1-maz@kernel.org>
- <20260714091641.1970822-13-maz@kernel.org>
+ <20260714091641.1970822-19-maz@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 14 Jul 2026 09:46:08 +0000
-Message-Id: <20260714094609.4ACD11F00A3E@smtp.kernel.org>
+Date: Tue, 14 Jul 2026 09:48:03 +0000
+Message-Id: <20260714094803.B3C371F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,60 +47,48 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [Medium] Missing immediate Context Synchronization Event (isb) after writ=
-ing to control-plane system registers cnthctl_el2 and cntkctl_el1.
+- [Medium] kvm_has_nv3() will always return false because ARM64_HAS_NV3 is =
+never populated in the capabilities bitmap.
 --
 
---- Patch [12]: [PATCH v2 12/28] arm64: Add FEAT_NV2p1 detection ---
-commit e272e43dc6ce85d3337902d78430aad6bf5b83fc
+--- Patch [18]: [PATCH v2 18/28] KVM: arm64: Add kvm_has_nv{2,3}() predicat=
+es ---
+commit e61ff01470e9cbe730c6702e605c3c17d525ca4e
 Author: Marc Zyngier <maz@kernel.org>
 
-KVM: arm64: Relax CNTHCTL_EL2 handling when FEAT_NV2p1 is present
+KVM: arm64: Add kvm_has_nv{2,3}() predicates
 
-This commit relaxes the handling of CNTHCTL_EL2 when FEAT_NV2p1 is present.
-It removes the need for a split approach to access bits and instead relies
-on the normal CNTKCTL_EL1 accessor.
+This commit adds a new set of predicates indicating whether a VM is capable
+of NV2, NV3, and is in a nested NV3 context.
 
-> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-> index 4155fe89b58a1..db60facad9f3c 100644
-> --- a/arch/arm64/kvm/arch_timer.c
-> +++ b/arch/arm64/kvm/arch_timer.c
-> @@ -876,8 +876,14 @@ static void timer_set_traps(struct kvm_vcpu *vcpu, s=
-truct timer_map *map)
->  	assign_clear_set_bit(tvt02, CNTHCTL_EL1NVVCT, clr, set);
->  	assign_clear_set_bit(tpt02, CNTHCTL_EL1NVPCT, clr, set);
-> =20
-> -	/* This only happens on VHE, so use the CNTHCTL_EL2 accessor. */
-> -	sysreg_clear_set(cnthctl_el2, clr, set);
-> +	/*
-> +	 * This only happens on VHE, so use the CNTHCTL_EL2 accessor, unless
-> +	 * we are sure CNTKCTL_EL1 is completely stateful with FEAT_NV2p1.
-> +	 */
-> +	if (!cpus_have_final_cap(ARM64_HAS_NV2P1))
-> +		sysreg_clear_set(cnthctl_el2, clr, set);
-> +	else
-> +		sysreg_clear_set(cntkctl_el1, clr, set);
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/as=
+m/kvm_emulate.h
+> index 9831166695186..c562d8171d5e1 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+
+[ ... ]
+
+> +static inline bool kvm_has_nv3(struct kvm *kvm)
+> +{
+> +	return (cpus_have_final_cap(ARM64_HAS_NESTED_VIRT) &&
+> +		cpus_have_final_cap(ARM64_HAS_NV3) &&
 
 [Severity: Medium]
-Does this code need an immediate context synchronization event after writing
-to these control-plane system registers?
+Will kvm_has_nv3() always return false here?
 
-Modifying cntkctl_el1 (and cnthctl_el2) via sysreg_clear_set() expands to a
-conditional write_sysreg() without an immediate isb() barrier. The function
-returns immediately after, which may allow intervening instructions to exec=
-ute
-with architecturally undefined pipeline state before a context synchronizat=
-ion
-event occurs.
+It appears the ARM64_HAS_NV3 capability was added to the cpucaps tools, but
+the corresponding hardware detection entry is missing from the arm64_featur=
+es
+array in arch/arm64/kernel/cpufeature.c. Since it is never populated,
+cpus_have_final_cap(ARM64_HAS_NV3) will unconditionally evaluate to false,
+turning any code relying on this predicate into dead code.
 
-This path is reachable during normal VM execution when loading vCPU timer
-state. While the cnthctl_el2 write is pre-existing, the cntkctl_el1 write
-was newly introduced here, which could introduce a regression.
+> +		kvm_has_feat(kvm, ID_AA64MMFR4_EL1, NV_frac, NV3));
+> +}
 
->  }
-> =20
->  void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
+[ ... ]
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260714091641.1970=
-822-1-maz@kernel.org?part=3D12
+822-1-maz@kernel.org?part=3D18
