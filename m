@@ -1,185 +1,97 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C285527587D
-	for <kvmarm@lists.linux.dev>; Tue, 14 Jul 2026 23:50:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED1302F84F
+	for <kvmarm@lists.linux.dev>; Wed, 15 Jul 2026 00:17:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784073022; cv=none; b=qlWaiZVK9W7KW7o/8MhDS7drDqO22t9q1l1UQaWQSS/Ybk9HMfM282T9gF4nKNwd67bRFuGeHA1cAxBWavtBEBb8/G7DcqVED/28TFtIOMjp3njDanMQnuDrXtukWyUKRWnomUcvhRiAFCPug9eY2T4+tSS26vq2HQRvMpfufU0=
+	t=1784074638; cv=none; b=I5Ob1qUKNeITLiz1RQngcT/9MrkV1htkqv6i4veeO1z9NX2dlE4eAL/aByZrgawXLgl2qxa6QE5OKOkS4ouKT+tdsFwgNmZWA0p6CxxuVtx22jWQptzlGOtLpYpZrAGBVWkQzbWX9Uf91eNu4AlB8iZcxZMnU4M8M4v48AxVzUk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784073022; c=relaxed/simple;
-	bh=BP8XtrmKbhXPwLmB59MjQ26J3MuQf8QXDFm1DhgRPKs=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=XN61Kf3ABiK9njeTdP6senm8I3Gws31OTand10eJ0BUmgk+Th+VvB6BsQSW6D87wSNoIfhPqoU9QTC3C4dmjHN556n+1w51mxK7vKiCmnA7xhK2jHz9bBXNP1lOZAjwLP6w4QB338SUqo/V+V5sQWjwHvM+zC0uW7gACgQUQ3P4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dHZtj/zp; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784074638; c=relaxed/simple;
+	bh=yKfQ0GflKniKbcTiQEcokqqiBLZSSKEnGRM/ps+7LEw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=i7uIiLgKL308YVAYhFX0KdEGPnkKb5KwGSOflvauyQMppXaXCh5Ei/ImRmNe+t0E9nPP9aiQv7dW68VmJAycjTycbayXBldndQ1Y/kUVLiOKjvvwjun1HVD+nMrqU83vndrrw7pK8KxkwHjnMIxaDbrUcFqX7LoPvqZk937NCDU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=fRua4iHZ; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dHZtj/zp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F4151F000E9;
-	Tue, 14 Jul 2026 23:50:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784073020;
-	bh=Xe1sowKFNzfz1bY6XXjXz6HUgbPL2qtb1rtC3896b+E=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=dHZtj/zpAVVRoFmzzFz49Ntddw6l7OkDJJxds8fMMr+Pp/T5j2OPaBOHzpwQmgtQ5
-	 vrPkgIg+Yp6YebqwnfKQBTW4l+7m3sbJ4Q2CH/WERRfEP+YS4D5AVa+nqJQ5MkisOX
-	 HfmUbYxdtXBr+3XpRMJi4KI8AaXM3VdzokqiRBZ1M2DVav5fOKECRJ7ur9OlYvSwf1
-	 fDBWcznwKmIYgKOBHXbq2LPoqB3wSsCX69BxU8X5aei9eXSZKd1gVVApydeQ+PKZ1z
-	 lg8xz/O9pRAI74FrlBsDzwV7QQA4PcD//cg37Qkm7h9V0fOKPxLLoqcU8ubILc9qDK
-	 2wRpV+j8tSA5w==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2] KVM: arm64: vgic: Avoid double-deactivate of IRQs in
- the nested context.
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "D Scott Phillips" <scott@os.amperecomputing.com>
-Cc: "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>
-In-Reply-To: <20260714231158.496808-1-scott@os.amperecomputing.com>
-References: <20260714231158.496808-1-scott@os.amperecomputing.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 14 Jul 2026 23:50:19 +0000
-Message-Id: <20260714235020.2F4151F000E9@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="fRua4iHZ"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3B1BE339;
+	Tue, 14 Jul 2026 17:17:09 -0700 (PDT)
+Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C67573F7D8;
+	Tue, 14 Jul 2026 17:17:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1784074633; bh=yKfQ0GflKniKbcTiQEcokqqiBLZSSKEnGRM/ps+7LEw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=fRua4iHZvThGUR/J15sDSpBSVZDSq6MoZM6eoRmjBJ/YIJW0HpdFfris79gLUuOcR
+	 HE43sySB5EsjwfP/Q3jUaSMJgqZwaUahQJAFu2eNtvT60+DnwWfLtA8L3x7bA8oUYW
+	 EXfqwaFXdu3vj+FUWVM1qh3SEn8n+cPYopQ8l2cw=
+Date: Wed, 15 Jul 2026 01:16:44 +0100
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: Steffen Eiden <seiden@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oupton@kernel.org>, 
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v2 25/28] KVM: arm64: Engage NV3 TLBI trap elision
+Message-ID: <nre6kiamcmf4azxni5def5kd5p74ia7rp7ynenpyczqticjcof@4inxwalqfyth>
+References: <20260714091641.1970822-1-maz@kernel.org>
+ <20260714091641.1970822-26-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260714091641.1970822-26-maz@kernel.org>
 
-Thank you for your contribution! Sashiko AI review found 3 potential issue(=
-s) to consider:
+On Tue, Jul 14, 2026 at 10:16:38AM +0100, Marc Zyngier wrote:
+> Similarly to the ERET elision mechanism, FEAT_NV3 can elide TLBIs
+> that only affects the guest's S1 translation. Enable this, with the
+> express condition that the guest isn't NV2 aware, as we otherwise
+> need to trap these TLBIs to deal with VNCR mappings.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_emulate.h | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index b32870a5e1236..d17b161d4ba3a 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -715,6 +715,19 @@ static inline void vcpu_set_hcrx(struct kvm_vcpu *vcpu)
+>  		if (cpus_have_final_cap(ARM64_HAS_NV3) &&
+>  		    vcpu_has_nv(vcpu) && vcpu_el2_e2h_is_set(vcpu)) {
+>  			vcpu->arch.hcrx_el2 |= HCRX_EL2_NVTGE;
+> +
+> +			/*
+> +			 * If the guest is NV2-capable, then we need to see
+> +			 * all the TLBIs, as configured in HCR_EL2.
+> +			 * Otherwise, relax the TLBI traps to only TGE=0.
+> +			 */
+> +			if (!kvm_has_nv2(vcpu->kvm)) {
+> +				vcpu->arch.hcrx_el2 |= (HCRX_EL2_NVnTTLB   |
+> +							HCRX_EL2_NVnTTLBIS);
+> +
+> +				if (kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, OS))
+> +					vcpu->arch.hcrx_el2 |= HCRX_EL2_NVnTTLBOS;;
+> +			}
 
-New issues:
-- [High] The patch skips `vgic_v3_deactivate_phys()` unconditionally when `=
-vgic_state_is_nested(vcpu)` is true, which leaves physical interrupts perma=
-nently active if the deactivation was triggered via a sysreg trap rather th=
-an an LR hardware sync.
+I also suspected if this is dead code, but Sashiko had beat me to it :P
+So from your response in v1, is this code here just for completeness?
 
-Pre-existing issues:
-- [High] KVM natively processes trapped L2 `SYS_ICC_DIR_EL1` accesses using=
- L1's virtual interrupt state, resulting in corruption of L1's VGIC state.
-- [High] A malicious nested guest hypervisor (L1) can trigger a host `WARN_=
-ONCE` by configuring mismatched virtual IMO and FMO bits.
---
+It's amusing that we're not able to take advantage of this feature at
+all!
 
---- Patch [1]: [PATCH v2] KVM: arm64: vgic: Avoid double-deactivate of IRQs=
- in the nested context. ---
-commit 4b2bb201a4176459b35d819c32daab08bb5354bf
-Author: D Scott Phillips <scott@os.amperecomputing.com>
+Thanks,
+Wei-Lin Chang
 
-KVM: arm64: vgic: Avoid double-deactivate of IRQs in the nested context.
-
-In the nested state, the physical interrupt has already been deactivated
-through the HW bit in the LR. The extra deactivation would be harmless but
-can hit an errata case on AmpereOne, so avoid it here.
-
-Link: https://lore.kernel.org/linux-arm-kernel/20260710222128.416581-1-scot=
-t@os.amperecomputing.com/
-
-> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-> index 9e841e7afd4a7..7aa417440f6a2 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v3.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
-> @@ -275,7 +275,13 @@ void vgic_v3_deactivate(struct kvm_vcpu *vcpu, u64 v=
-al)
->  		lr =3D vgic_v3_compute_lr(vcpu, irq) & ~ICH_LR_ACTIVE_BIT;
+>  		}
 >  	}
-> =20
-> -	if (lr & ICH_LR_HW)
-> +	/*
-> +	 * In the nested state, the irq has already been deactivated via the HW
-> +	 * bit in the LR. Deactivating again would be harmless except AmpereOne
-> +	 * errata AC03_CPU_57, AC04_CPU_29 could cause irq delivery to break if
-> +	 * the deactivation hits the highest priority pending irq.
-> +	 */
-> +	if ((lr & ICH_LR_HW) && !vgic_state_is_nested(vcpu))
->  		vgic_v3_deactivate_phys(FIELD_GET(ICH_LR_PHYS_ID_MASK, lr));
-
-[Severity: High]
-Does skipping the physical deactivation here leave the physical interrupt
-permanently active if the deactivation was triggered via a sysreg trap
-rather than an LR hardware sync?
-
-If an untrusted L2 nested guest executes SYS_ICC_DIR_EL1 for a hardware-bac=
-ked
-virtual interrupt, and this traps to L0 (for instance, due to an L0-level
-erratum workaround like vgic_v3_broken_seis() that sets TDIR=3D1), L0's nat=
-ive
-sysreg handler access_gic_dir() will call vgic_v3_deactivate().
-
-Since the access was trapped, the hardware did not execute it, so the physi=
-cal
-interrupt was never deactivated. However, vgic_state_is_nested(vcpu) evalua=
-tes
-to true, causing vgic_v3_deactivate_phys() to be unconditionally skipped.
-
-Could this prevent future interrupts of equal or lower priority from being
-delivered, potentially hanging the associated physical device or host timer?
-
-
-[Severity: High]
-This isn't a bug introduced by this patch, but does KVM natively process
-trapped L2 SYS_ICC_DIR_EL1 accesses using L1's virtual interrupt state,
-resulting in corruption of L1's VGIC state?
-
-If L0 forces DIR to trap, but L1 did not set ICH_HCR_EL2.TDIR, L2's DIR acc=
-ess
-traps to L0. sysreg_emulate_nested() checks L1's TDIR and returns false:
-
-arch/arm64/kvm/emulate-nested.c:sysreg_emulate_nested() {
-    ...
-    case CGT_ICH_HCR_TC_TDIR:
-        if (!__forward_traps(vcpu, ICH_HCR_EL2, tc.mask))
-            goto emul;
-    ...
-}
-
-This causes KVM to fall back to native emulation via access_gic_dir(), which
-calls vgic_v3_deactivate() using L2's virtual INTID:
-
-arch/arm64/kvm/sys_regs.c:access_gic_dir() {
-    ...
-    vgic_v3_deactivate(vcpu, p->regval);
-    ...
-}
-
-Since KVM mistakenly looks up this INTID in vcpu->arch.vgic_cpu (representi=
-ng
-L1's virtual interrupt state), could a malicious L2 guest arbitrarily execu=
-te
-SYS_ICC_DIR_EL1 to modify the active state of L1's virtual interrupts and
-disrupt the L1 hypervisor?
-
-
-[Severity: High]
-This is a pre-existing issue, but can a malicious nested guest hypervisor (=
-L1)
-trigger a host kernel panic by configuring mismatched virtual IMO and FMO
-bits?
-
-When vgic_state_is_nested() is called, it evaluates the guest's virtual
-HCR_EL2 and triggers a WARN_ONCE if HCR_IMO is set without HCR_FMO (or vice
-versa):
-
-arch/arm64/kvm/vgic/vgic-v3-nested.c:vgic_state_is_nested() {
-    ...
-    if (is_nested_ctxt(vcpu)) {
-        xmo =3D __vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_IMO | HCR_FMO);
-        WARN_ONCE(xmo && xmo !=3D (HCR_IMO | HCR_FMO),
-                  "Separate virtual IRQ/FIQ settings not supported\n");
-    ...
-}
-
-A malicious L1 hypervisor can trivially reach this by writing to its virtual
-HCR_EL2 sysreg and executing an ERET to L2. When KVM L0 processes any exit
-from L2, it calls kvm_vgic_sync_hwstate(), which evaluates
-vgic_state_is_nested().
-
-If panic_on_warn is enabled, would this allow an unprivileged guest to crash
-the host?
-
-> =20
->  	vgic_v3_fold_lr(vcpu, lr);
->
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260714231158.4968=
-08-1-scott@os.amperecomputing.com?part=3D1
+>  }
+> -- 
+> 2.47.3
+> 
