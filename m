@@ -1,35 +1,35 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EBFC481FC1;
-	Wed, 15 Jul 2026 14:31:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A14348AE06;
+	Wed, 15 Jul 2026 14:31:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784125862; cv=none; b=ERb2N0itMJMjxAHi5exAVEUekpV5tM7pogPe2zElyyt1Ax1V8zrZBW1Y/zZjimrkukHL4S+oKkvE+s86D1U68QtMAKlm0S7ygmNIhBObv6iuVaBrst+gADbhWsxLpD8yNklBSf8VU9zSOfrtAKMUbO/y5WQDwnA+yViOvns5zpg=
+	t=1784125868; cv=none; b=GZUhaxVOgV4WXc8RVaJt9aaaDljrC8kDuVKV3TZCSJOK+mgO9TLRpFnrl7OiI+nPwx3rHekyC82chRJkqfa+n7r1Bvs1K/jjKq/6J33e59je0XgteFlu/bvWBbJ+nPF3g+7ArYZGkXZgGZWhJUg/K+KVCC/wi5y6UExyxXguBSQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784125862; c=relaxed/simple;
-	bh=2aEkh45BUa3FK3LhN0kNkj+5k/8j4Xl4y0clqTp86E4=;
+	s=arc-20240116; t=1784125868; c=relaxed/simple;
+	bh=tgn8iDXNgu5mVAiBC+c6ImZ3Rk5yLqEv8Ic4zHNhfuI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ClHtxTvB8c871yyki1kK50uxyvxDR8e8xG/KdYEmPihycPsYnuuKynTcNRuMhrECL/EjH9hHV0Ls6iD0ndqdDYweBmvaKevIpv4V4pGBUOMHi4g5ieENjaYCyhAyDRvxje7yJzFuczT119b/FasM+hY7YYl+ZIzw/urD0CdY8qU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=WdClv8Nn; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=orTw0/EwqAsuBPHgLPNpGdXnalsy0LX/L5fMPrNj1Hda5CvudiLbb+w8aDya8oC6VxIyMv1NenDnTH6zjipTvJ+5t9M2iEjM2Occxnzs83+Ybcu5hj5azpAr9KlqX/sMK2eH6vMTcLtFtebTV+D0TRkxQh6w7roY5NU1xqXbPUM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=pY3uiBwd; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="WdClv8Nn"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="pY3uiBwd"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7ED2D1576;
-	Wed, 15 Jul 2026 07:30:55 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CF59615A1;
+	Wed, 15 Jul 2026 07:30:59 -0700 (PDT)
 Received: from e122027.cambridge.arm.com (e122027.cambridge.arm.com [10.1.25.27])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DAA273F7B4;
-	Wed, 15 Jul 2026 07:30:55 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 28EA83F7B4;
+	Wed, 15 Jul 2026 07:31:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1784125859; bh=2aEkh45BUa3FK3LhN0kNkj+5k/8j4Xl4y0clqTp86E4=;
+	t=1784125864; bh=tgn8iDXNgu5mVAiBC+c6ImZ3Rk5yLqEv8Ic4zHNhfuI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WdClv8Nnewj7SDK99ddz4Y2bT+yeTAd1HYAfW+ATvuRDIXSL+RzB9ZxC6zFN382T3
-	 I1+1Zx5hvN7S16QnFNy1kuiGFjKk5mzqtRUMIuLzNzww+3Eac1pvM83w8oqq2bZqs9
-	 lpg/JL8au3NzURpfQrB76GZDUlMaWjnuC5gfuowI=
+	b=pY3uiBwduwz5KkvvYe2YfDc5v1QEM6FcojmNtmLTtOTMV3cFNw2y4y0azEUZamzQo
+	 3xULvBDMQzPcp/81zFxALrSOvNF+LDRp0MkdyT7pBtX7pbqDVCSI0n/GQRxg21i+Js
+	 d8ybD/xbyb7m2/8ttm8Qkx6y3DS0hwlrycwTnqp8=
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
-Cc: Steven Price <steven.price@arm.com>,
+Cc: Joey Gouly <joey.gouly@arm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Marc Zyngier <maz@kernel.org>,
 	Will Deacon <will@kernel.org>,
@@ -39,7 +39,6 @@ Cc: Steven Price <steven.price@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Christoffer Dall <christoffer.dall@arm.com>,
 	Fuad Tabba <tabba@google.com>,
@@ -52,10 +51,11 @@ Cc: Steven Price <steven.price@arm.com>,
 	Emi Kisanuki <fj0570is@fujitsu.com>,
 	Vishal Annapurve <vannapurve@google.com>,
 	WeiLin.Chang@arm.com,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>
-Subject: [PATCH v15 26/37] KVM: arm64: WARN on injected undef exceptions
-Date: Wed, 15 Jul 2026 15:28:28 +0100
-Message-ID: <20260715142841.80544-27-steven.price@arm.com>
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Steven Price <steven.price@arm.com>
+Subject: [PATCH v15 27/37] KVM: arm64: CCA: Allow userspace to inject aborts
+Date: Wed, 15 Jul 2026 15:28:29 +0100
+Message-ID: <20260715142841.80544-28-steven.price@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260715142841.80544-1-steven.price@arm.com>
 References: <20260715142841.80544-1-steven.price@arm.com>
@@ -67,31 +67,67 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The RMM doesn't allow injection of a undefined exception into a realm
-guest. Add a WARN to catch if this ever happens.
+From: Joey Gouly <joey.gouly@arm.com>
 
+Extend KVM_SET_VCPU_EVENTS to support realms, where KVM cannot set the
+system registers, and the RMM must perform it on next REC entry.
+
+Signed-off-by: Joey Gouly <joey.gouly@arm.com>
 Signed-off-by: Steven Price <steven.price@arm.com>
 Reviewed-by: Gavin Shan <gshan@redhat.com>
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
-Changes since v6:
- * if (x) WARN(1, ...) makes no sense, just WARN(x, ...)!
----
- arch/arm64/kvm/inject_fault.c | 1 +
- 1 file changed, 1 insertion(+)
+ Documentation/virt/kvm/api.rst |  2 ++
+ arch/arm64/kvm/guest.c         | 24 ++++++++++++++++++++++++
+ 2 files changed, 26 insertions(+)
 
-diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-index 6492397b73d7..613f223bc7a3 100644
---- a/arch/arm64/kvm/inject_fault.c
-+++ b/arch/arm64/kvm/inject_fault.c
-@@ -327,6 +327,7 @@ void kvm_inject_size_fault(struct kvm_vcpu *vcpu)
-  */
- void kvm_inject_undefined(struct kvm_vcpu *vcpu)
- {
-+	WARN(vcpu_is_rec(vcpu), "Unexpected undefined exception injection to REC");
- 	if (vcpu_el1_is_32bit(vcpu))
- 		inject_undef32(vcpu);
- 	else
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index e39d146b34a3..85bec9b4f021 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -1314,6 +1314,8 @@ User space may need to inject several types of events to the guest.
+ Set the pending SError exception state for this VCPU. It is not possible to
+ 'cancel' an Serror that has been made pending.
+ 
++User space cannot inject SErrors into Realms.
++
+ If the guest performed an access to I/O memory which could not be handled by
+ userspace, for example because of missing instruction syndrome decode
+ information or because there is no device mapped at the accessed IPA, then
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index 3e970c4f6214..5469c9a97fad 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -827,6 +827,30 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+ 	u64 esr = events->exception.serror_esr;
+ 	int ret = 0;
+ 
++	if (vcpu_is_rec(vcpu)) {
++		/* Cannot inject SError into a Realm. */
++		if (serror_pending)
++			return -EINVAL;
++
++		/*
++		 * If a data abort is pending, set the flag and let the RMM
++		 * inject an SEA when the REC is scheduled to be run.
++		 */
++		if (ext_dabt_pending) {
++			/*
++			 * Can only inject SEA into a Realm if the previous exit
++			 * was due to a data abort of an Unprotected IPA.
++			 */
++			if (!(vcpu->arch.rec.run->enter.flags & REC_ENTER_FLAG_EMULATED_MMIO))
++				return -EINVAL;
++
++			vcpu->arch.rec.run->enter.flags &= ~REC_ENTER_FLAG_EMULATED_MMIO;
++			vcpu->arch.rec.run->enter.flags |= REC_ENTER_FLAG_INJECT_SEA;
++		}
++
++		return 0;
++	}
++
+ 	/*
+ 	 * Immediately commit the pending SEA to the vCPU's architectural
+ 	 * state which is necessary since we do not return a pending SEA
 -- 
 2.43.0
 
