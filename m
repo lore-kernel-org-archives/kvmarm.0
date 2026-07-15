@@ -1,98 +1,173 @@
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 194F0353A7F
-	for <kvmarm@lists.linux.dev>; Wed, 15 Jul 2026 11:31:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDA9E4483B2
+	for <kvmarm@lists.linux.dev>; Wed, 15 Jul 2026 11:35:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784115081; cv=none; b=hsa8Xq23G8+zjRz7RpXxuHWSUfnqpJfIaXy8w3RYToe0AEyXuur82zmOvIfaqz+rlmcncXgOe1UQIAnGy0/eQ+LfADl9hUu24fKvP8lgpLIjK3NRpEAz2wYsuAHVOixPTqKZVm06b3Uc/3r55b+yqQeeEZ5u16+v1/tXpRUadI8=
+	t=1784115328; cv=none; b=afRRc3987RWSA6S6nfLRUers5HRHPUCeyNS8AofqHkVRrRZseHQmEgyL5nI0gG6IMG6APlzH1DMgX2Ze4ngmFahb/yqnuxVkYOaz2b64rm2BIa/Na1NpGjXYS5HKLi2HaGH63+vHyez2tcaVFaIGlNd9wcZLQBdGlRnoRHrVRDg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784115081; c=relaxed/simple;
-	bh=mYFt+p5c8uRMZe9Xo3qwxk50hzS/JwfoUzvNS7RCtJ0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=f/dfaceci+7rv8LCJCG+F4klDqGKDU9NURmF1Ozgj9b5QDKxf9plJu+HNBpEnOj5OhXeRRAVpvZ3lWdns3bjHNEW0cg16g7fVeFYqs03KBO8ioqN0PFCcU+5dkBjOJHWwcu8tqf6IllTSBvOUkipM0naoq71YJh/P33rbkExiZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FvusVPxR; arc=none smtp.client-ip=95.215.58.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1784115328; c=relaxed/simple;
+	bh=s4sp1mZjm4iPCbhW5Hmd7xXLSHYT9N4xiEmXB1rIJZ0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZJfZiu86rOfJHcDLhOK7piIDON2kgnP9X1YQ1y7I9aG6hKWbEqHrIfyXTdtLvV/BG4vc04RMUtwIc597XYSwYkP4WgnBM5AHvaUTsLo3B21uzWXzTzFmi7LayItLOd1UlwHL4Hw3uJVyqvS1h+bRaHOFVGJYFIOcEdIMBcNW2E8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OnrsLIBw; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FvusVPxR"
-X-Forwarded-Encrypted: i=1; AHgh+RrhYuDwmo0oCXWoppRl4vqbuBWNLsIWhfWVsnc4MsN53++gbq8ZkVyqQiYaLG0H9MTpLdr1+cc=@lists.linux.dev
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1784115075;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gxp3fXNq8XYNE/nkPh7KFYIhP3YHcDVUtPAtTd5Tryg=;
-	b=FvusVPxRPvaZ7N/UegN2vx8ltoMrWsjq4lSS2/QkdnmpOfVut4Bn/E76feJ+s6+J2tZkZr
-	uLLIvB2eIOYxaxnqOdXPINVWaaq4MfSQ12rx3YYPupGBCAQ6XMvBHuwOm/ni3zcyhn3OKU
-	xKMdLxRjhfSZ9yDQo+biprfUq2o5/I8=
-X-Gm-Message-State: AOJu0Yw9gqrLipz6NvraQ55Jt1lqK6rP38aGwxk+80lElU+eu/LNzQ/y
-	CCllG53ZjeLV8OrRSLylNpJrA7lj1osLKKLOiUSSovqbAF98ScCaKY+7Ii29QN2Sd7+YWryD1r1
-	eXen1WyjDCBdDqddK8gd9ofJ6oFxgxvoKWZvjDKfZ
-X-Received: by 2002:a05:622a:4d:b0:51c:ba4f:9d19 with SMTP id
- d75a77b69052e-51d7bd752e0mr24873701cf.19.1784115061509; Wed, 15 Jul 2026
- 04:31:01 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OnrsLIBw"
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-493e497643fso9634255e9.0
+        for <kvmarm@lists.linux.dev>; Wed, 15 Jul 2026 04:35:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1784115324; x=1784720124; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=ta+kur5ryJs2I5yQGZkvpcOeEwa4qpkvMvmH1OmJGTs=;
+        b=OnrsLIBw7tJKugd3r9FbDjczYRUEPCNcWziOxOwIf0aM78mzJh88bTbxi4/PDRZRzt
+         wvOeeJGqKNl5p0fOY1+miv1/oIrFNwZ8zbGPMnqP7qCRH6pJfrD3JnuMTXCZNa3p9W2B
+         zQyD4MIq5SLI5IeW/DeEloRl/83a3HbheaI9HCQo630XD36Bm1Cgl9k23bKwsu9zKbSi
+         YUmZLo7vbPGm1hGM2Dekls2RjjqJOB+MI87nccYjEVOa87iMmeJQypFB7TyhvNHaInsJ
+         gFNmSqaiGqX8FuEdnvpPVppSFBDM6XHxWCQlsa5qWoTnEp9Fc17YMsjxbMkg7SoRC8tD
+         qrFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784115324; x=1784720124;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=ta+kur5ryJs2I5yQGZkvpcOeEwa4qpkvMvmH1OmJGTs=;
+        b=N1ynME8ComU8a4W8lv50junP2gNNdn61Qec0fVAf9GGnxinhevoYr3A67pbaC20ndU
+         nDGdq0zRqHAMnVev3Rsq7yDZIiG/BBlW7UMs8a6ieT+1zFkghQfxI7pcREzCHoH9eBbm
+         x6WIbRlxofkSnuJKx9Qrajw9T668iLMlDT2i7Dz6Igfx/D5YlqvNdX6NPfgA9QBiuc1B
+         OTdffmH2bvVZGkZnoQ9k9i2ixBCoqLAme3C/NFpxBokLHmDNqwgVmJgmTSAsYECpvuly
+         lnsJnHBBDiVNc33tJBEZrER+XxU1a3hHrMJmm3ErCaUoD3GPMCyzVSkeloX0qOgYQu8W
+         wsYg==
+X-Forwarded-Encrypted: i=1; AHgh+Rqz2k9X7tuSFOhNc9nl/Qh/XzTzlQu0rYSdSDDf89Hq87YUESf1QxbE3jOJJKDp2aHyMaU0MEA=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yyq6CF2ZQ/cZ05yBNWs1wnnsRTA/3h1igAL3i6p9ci0IPWNRPtx
+	9homJP3CLgaPZRlJggBcHYPe3Qpcxi0gZbpCgtO7/moZcw3vVYzLl0C4Ud4Ij21yvA==
+X-Gm-Gg: AfdE7cnxwK8gqzBJ8F8/R08E1POjr0Myz+sUTPAJ9H8bNcCHSJLLZ1C4RTmTuxbFePQ
+	9U/6J0g2ytT/wMvTsxVgkfwPNQDyeWIweTS7+6/QLdEIeNhxEGsy9boidYVdSnl4O5+juJeZXGR
+	OsyE59iVZpFlUVz0+4Jshnfixn+IZorB/7/+tBK8a923zSPaqBXSNCLVu1xdg2aWqzT9xmxA9we
+	5VQYrb1Afa9f3LmU7eSW5bO4FkY6H7CR/kLcrsnBm+IXiU5w8YFZjgTruT/Kz4BS0eFUnbcZgXa
+	6A/h6qNhCochBovFSwgSVmeIYynbJI0nlLj2Q6qJ0zqRqcH+U7EBaSbnNKRCGH9H2KKsNZKhEHU
+	EgsojWUhgkSGA76J1ElpGhCpisc9eIfQAF1hSZ6RAFwvJngCboP90qpNRBWC3Ni7nCdF4HYkLDy
+	WH9JSKa7naFx5i6sMeQ1dUu2QJQGW/8sjUEAIR5Fc2uXmviB+LHOw=
+X-Received: by 2002:a05:600c:a40c:b0:493:ee4d:5c5d with SMTP id 5b1f17b1804b1-493f882cb8cmr125670585e9.31.1784115323077;
+        Wed, 15 Jul 2026 04:35:23 -0700 (PDT)
+Received: from google.com (137.69.77.34.bc.googleusercontent.com. [34.77.69.137])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4953c6ff429sm35719355e9.1.2026.07.15.04.35.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Jul 2026 04:35:22 -0700 (PDT)
+Date: Wed, 15 Jul 2026 12:35:18 +0100
+From: Vincent Donnefort <vdonnefort@google.com>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	kernel-team@android.com, qperret@google.com
+Subject: Re: [PATCH v2 11/18] KVM: arm64: Add a shrinker for pKVM
+Message-ID: <aldwduiixzAFNCa1@google.com>
+References: <20260706175415.2604046-1-vdonnefort@google.com>
+ <20260706175415.2604046-12-vdonnefort@google.com>
+ <CA+EHjTwcz8T_RfgE46+xMKP_nz7Mi9rVCdhtnC2CbjtO1O5xCQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260706175415.2604046-1-vdonnefort@google.com> <20260706175415.2604046-13-vdonnefort@google.com>
-In-Reply-To: <20260706175415.2604046-13-vdonnefort@google.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Wed, 15 Jul 2026 12:30:24 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTynPXq+h8z4U7kg6Vqh5+Jvi2dDY4w9eL_6YOW=yN=i-w@mail.gmail.com>
-X-Gm-Features: AUfX_mxhMGLkpuT8Eh9JQ0ObVBlPYewUpp8cXDJp91EMiI7N1SswSQZWtF5PdKw
-Message-ID: <CA+EHjTynPXq+h8z4U7kg6Vqh5+Jvi2dDY4w9eL_6YOW=yN=i-w@mail.gmail.com>
-Subject: Re: [PATCH v2 12/18] KVM: arm64: Filter out non-kernel addresses in kern_hyp_va
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
-	will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kernel-team@android.com, qperret@google.com
-Content-Type: text/plain; charset="UTF-8"
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTwcz8T_RfgE46+xMKP_nz7Mi9rVCdhtnC2CbjtO1O5xCQ@mail.gmail.com>
 
-On Mon, 6 Jul 2026 at 18:54, Vincent Donnefort <vdonnefort@google.com> wrote:
->
-> kern_hyp_va() is idempotent for the hypervisor linear space. This is
-> handy for nVHE hypervisor callers handling kvm_vcpu or kvm_arch
-> pointers. Those pointers can originate from the hypervisor space (when
-> protected mode is enabled, we don't trust the kernel and the hypervisor
-> uses its own copy) or from the kernel space (we do trust the kernel in
-> "non-protected" nVHE).
->
-> This idempotence does not hold for addresses within the hypervisor
-> private range, like the ones you get from the pKVM heap allocator
-> (hyp_alloc()). To resolve this, filter out non-kernel addresses based on
-> PAGE_OFFSET.
->
-> Leave the assembly version untouched as it has no current users.
->
-> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+On Wed, Jul 15, 2026 at 12:20:51PM +0100, Fuad Tabba wrote:
+> On Mon, 6 Jul 2026 at 18:54, Vincent Donnefort <vdonnefort@google.com> wrote:
+> >
+> > Integrate the pKVM memory reclaim interface with the host's memory
+> > management subsystem.
+> >
+> > This allows the host to automatically recover unused memory fom the
+> > hypervisor's heap allocator when the host is under memory pressure.
+> >
+> > Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+> >
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index 50adfff75be8..3dc2b9d2c322 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -122,6 +122,8 @@ static bool vgic_present, kvm_arm_initialised;
+> >
+> >  static DEFINE_PER_CPU(unsigned char, kvm_hyp_initialized);
+> >
+> > +static struct shrinker *pkvm_shrinker;
+> > +
+> >  bool is_kvm_arm_initialised(void)
+> >  {
+> >         return kvm_arm_initialised;
+> > @@ -2526,8 +2528,8 @@ static void __init teardown_hyp_mode(void)
+> >                 }
+> >
+> >                 free_pages(kvm_nvhe_sym(kvm_arm_hyp_percpu_base)[cpu], nvhe_percpu_order());
+> > -
+> >         }
+> > +       shrinker_free(pkvm_shrinker);
+> >  }
+> >
+> >  static int __init do_pkvm_init(u32 hyp_va_bits)
+> > @@ -2713,6 +2715,18 @@ static void pkvm_hyp_init_ptrauth(void)
+> >         }
+> >  }
+> >
+> > +static unsigned long
+> > +pkvm_shrinker_count(struct shrinker *shrink, struct shrink_control *sc)
+> > +{
+> > +       return pkvm_hyp_reclaimable(PKVM_TOPUP_HYP_ALLOC) ?: SHRINK_EMPTY;
+> > +}
+> > +
+> > +static unsigned long
+> > +pkvm_shrinker_scan(struct shrinker *shrink, struct shrink_control *sc)
+> > +{
+> > +       return pkvm_hyp_reclaim(PKVM_TOPUP_HYP_ALLOC, sc->nr_to_scan);
+> > +}
+> > +
+> >  /* Inits Hyp-mode on all online CPUs */
+> >  static int __init init_hyp_mode(void)
+> >  {
+> > @@ -2883,6 +2897,16 @@ static int __init init_hyp_mode(void)
+> >                         kvm_err("Failed to init hyp memory protection\n");
+> >                         goto out_err;
+> >                 }
+> > +
+> > +               pkvm_shrinker = shrinker_alloc(0, "pkvm");
+> > +               if (pkvm_shrinker) {
+> > +                       pkvm_shrinker->count_objects = pkvm_shrinker_count;
+> > +                       pkvm_shrinker->scan_objects = pkvm_shrinker_scan;
+> > +                       shrinker_register(pkvm_shrinker);
+> > +               } else {
+> > +                       kvm_err("Failed to register shrinker for pKVM\n");
+> > +               }
+> > +
+> >         }
+> 
+> Sashiko might be onto something here. The shrinker goes live in
+> init_hyp_mode(), but kvm_protected_mode_initialized isn't set until
+> finalize_pkvm()...
 
-Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
+I doubt the shrinker can be triggered that early... BUT 
 
-Cheers,
-/fuad
+The hyp tracing is a user of this hyp allocator and I have been working on
+enabling early tracing [1] so I shall move those HVCs as well!
 
->
-> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-> index 6eae7e7e2a68..d60e5f2de10c 100644
-> --- a/arch/arm64/include/asm/kvm_mmu.h
-> +++ b/arch/arm64/include/asm/kvm_mmu.h
-> @@ -126,6 +126,9 @@ static __always_inline unsigned long __kern_hyp_va(unsigned long v)
->   * replace the instructions with `nop`s.
->   */
->  #ifndef __KVM_VHE_HYPERVISOR__
-> +       if (!is_ttbr1_addr(v))
-> +               return v;
-> +
->         asm volatile(ALTERNATIVE_CB("and %0, %0, #1\n"         /* mask with va_mask */
->                                     "ror %0, %0, #1\n"         /* rotate to the first tag bit */
->                                     "add %0, %0, #0\n"         /* insert the low 12 bits of the tag */
-> --
-> 2.55.0.rc2.803.g1fd1e6609c-goog
->
+[1] https://lore.kernel.org/all/20260708075435.47419-2-vdonnefort@google.com/
+
+> 
+> Cheers,
+> /fuad
+> 
+> >
+> >         return 0;
+> > --
+> > 2.55.0.rc2.803.g1fd1e6609c-goog
+> >
