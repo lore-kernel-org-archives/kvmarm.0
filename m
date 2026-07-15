@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93ABE388385;
-	Wed, 15 Jul 2026 14:29:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AB05388397;
+	Wed, 15 Jul 2026 14:29:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784125749; cv=none; b=YkCwEmU3A2iHUiArV+hYyNY2Hoiv0ZPeWK7RYYCZ91yzG62L27HdIdblOirNo/4bN1thazGvFGWoznn3yzlNOKLn8mKc6sh6txR1YuZ6aSnQEiwimiDaEtXOdH9BuBzVSKip4F7leO1YtaRUDv90uKW+Z4uDU7DXtOdRaQwwOQQ=
+	t=1784125755; cv=none; b=moBG0o8BOHHG/idXLVWUk3O2N0cN6OpZ70QX8K7Lo8IS/wZF0HVreMVcAVx4+7VxvDpffPRqhtHzzeGvhC00qAuZpCoeHG8QW2e5ykgA6mtRnmeHG1gPRQMH8+DmlKlR3WJgGOjuk3K577ph2m/O3XnNpsCex2mfLOEZmG6nfAI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784125749; c=relaxed/simple;
-	bh=atB3+AUi+d6UB2ANLJFnJ3D22hkMovBf+VHS20wL0+U=;
+	s=arc-20240116; t=1784125755; c=relaxed/simple;
+	bh=YLMzS57B0Blt2+xGLVJcY5KsMCzwEAb8VT/RdBje/y4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fRTAgcl89aSulW2OnmCeIhwQ33irAGGqDM+bkAGClOV52OqK363i9KzrPWLW+FhfBZqqsRl42fpa4ghbnLSIxyTgqLn1olNLhfwC78KbyvhkbRXLbE2A7l3dyFzlVzAL4jIZFFla5QcLMp32apSgYhE5sGvzzfec00vCQcAND6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=qKkUOszI; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=hp52dJZK2ppeij00gNFBXUTJNnkMSuacwsON+EFZZcPeF/7/d7/65LLYkPtMrhiv6rrhQsAA1VpucYUrrJJJ64w9euq3fJ+vSOZuoIJWY6zpKUaq7NK8vKkLIVI2RUKVAccoSD5Ottgq12z1p7V40AeXlJi1z3ZBUF3Sy/NEaDw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=ZMfHf9TT; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="qKkUOszI"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="ZMfHf9TT"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DC229153B;
-	Wed, 15 Jul 2026 07:29:02 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 55FA9153B;
+	Wed, 15 Jul 2026 07:29:08 -0700 (PDT)
 Received: from e122027.cambridge.arm.com (e122027.cambridge.arm.com [10.1.25.27])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A60933F7B4;
-	Wed, 15 Jul 2026 07:29:01 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7268F3F7B4;
+	Wed, 15 Jul 2026 07:29:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1784125747; bh=atB3+AUi+d6UB2ANLJFnJ3D22hkMovBf+VHS20wL0+U=;
+	t=1784125752; bh=YLMzS57B0Blt2+xGLVJcY5KsMCzwEAb8VT/RdBje/y4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=qKkUOszIIQxlaCE9w9AlUV4y2niUW0T0eJaCd59109QYbgs7Smw44s254HJKFrtsL
-	 v+133ew0exD0UcdaNszIuGGnTguZkA/+Nq2Z6j0/Ks4YQjonpY160+Sn8dDcZeNrqc
-	 iYZ784cvyMggK59aEpw9PfQ/SBnIYdTWKGETSif0=
+	b=ZMfHf9TTUkP464HJliAB1TfZlnpTzye9SJHOcf4QfX1j3+LqNvILiyRJ65QhIaKye
+	 4Mp3hamhxFMqpfa2tKnRQLsvGIMZJWrNou2lZLmS/odywqAYKhF6X4eFC/FN3hh9dL
+	 WZPpA4twWOz58Ml7v2s5LuHx3IdDWWlmOXDb71J0=
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -53,9 +53,9 @@ Cc: Steven Price <steven.price@arm.com>,
 	Vishal Annapurve <vannapurve@google.com>,
 	WeiLin.Chang@arm.com,
 	Lorenzo Pieralisi <lpieralisi@kernel.org>
-Subject: [PATCH v15 03/37] arm64: mm: Handle Granule Protection Faults (GPFs)
-Date: Wed, 15 Jul 2026 15:28:05 +0100
-Message-ID: <20260715142841.80544-4-steven.price@arm.com>
+Subject: [PATCH v15 04/37] KVM: arm64: CCA: Check for RMI support at KVM init
+Date: Wed, 15 Jul 2026 15:28:06 +0100
+Message-ID: <20260715142841.80544-5-steven.price@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260715142841.80544-1-steven.price@arm.com>
 References: <20260715142841.80544-1-steven.price@arm.com>
@@ -67,74 +67,187 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-If the host attempts to access granules that have been delegated for use
-in a realm these accesses will be caught and will trigger a Granule
-Protection Fault (GPF).
+Check if the RMI support is sufficient for using in KVM. Specifically, we
+currently only support creating realm VMs when KVM is running in VHE mode.
 
-A fault during a page walk signals a bug in the kernel and is handled by
-oopsing the kernel. A non-page walk fault could be caused by user space
-having access to a page which has been delegated to the kernel and will
-trigger a SIGBUS to allow debugging why user space is trying to access a
-delegated page.
-
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-Reviewed-by: Gavin Shan <gshan@redhat.com>
 Signed-off-by: Steven Price <steven.price@arm.com>
 ---
+Changes since v13:
+ * Most of the init has been moved out of the 'kvm' directory so this is
+   much more basic now.
+Changes since v12:
+ * Drop check for 4k page size.
+Changes since v11:
+ * Reword slightly the comments on the realm states.
 Changes since v10:
- * Don't call arm64_notify_die() in do_gpf() but simply return 1.
+ * kvm_is_realm() no longer has a NULL check.
+ * Rename from "rme" to "rmi" when referring to the RMM interface.
+ * Check for RME (hardware) support before probing for RMI support.
+Changes since v8:
+ * No need to guard kvm_init_rme() behind 'in_hyp_mode'.
+Changes since v6:
+ * Improved message for an unsupported RMI ABI version.
+Changes since v5:
+ * Reword "unsupported" message from "host supports" to "we want" to
+   clarify that 'we' are the 'host'.
 Changes since v2:
- * Include missing "Granule Protection Fault at level -1"
+ * Drop return value from kvm_init_rme(), it was always 0.
+ * Rely on the RMM return value to identify whether the RSI ABI is
+   compatible.
 ---
- arch/arm64/mm/fault.c | 28 ++++++++++++++++++++++------
- 1 file changed, 22 insertions(+), 6 deletions(-)
+ arch/arm64/include/asm/kvm_host.h |  4 ++++
+ arch/arm64/include/asm/kvm_rmi.h  | 17 +++++++++++++++++
+ arch/arm64/include/asm/virt.h     |  1 +
+ arch/arm64/kvm/Kconfig            |  1 +
+ arch/arm64/kvm/Makefile           |  2 +-
+ arch/arm64/kvm/arm.c              |  5 +++++
+ arch/arm64/kvm/rmi.c              | 24 ++++++++++++++++++++++++
+ 7 files changed, 53 insertions(+), 1 deletion(-)
+ create mode 100644 arch/arm64/include/asm/kvm_rmi.h
+ create mode 100644 arch/arm64/kvm/rmi.c
 
-diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
-index 85e23388f9bb..ea3ae0ca7dba 100644
---- a/arch/arm64/mm/fault.c
-+++ b/arch/arm64/mm/fault.c
-@@ -909,6 +909,22 @@ static int do_tag_check_fault(unsigned long far, unsigned long esr,
- 	return 0;
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index bae2c4f92ef5..1a5e15040111 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -27,6 +27,7 @@
+ #include <asm/fpsimd.h>
+ #include <asm/kvm.h>
+ #include <asm/kvm_asm.h>
++#include <asm/kvm_rmi.h>
+ #include <asm/vncr_mapping.h>
+ 
+ #define __KVM_HAVE_ARCH_INTC_INITIALIZED
+@@ -424,6 +425,9 @@ struct kvm_arch {
+ 	/* Nested virtualization info */
+ 	struct dentry *debugfs_nv_dentry;
+ #endif
++
++	bool is_realm;
++	struct realm realm;
+ };
+ 
+ struct kvm_vcpu_fault_info {
+diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
+new file mode 100644
+index 000000000000..57d24b244c95
+--- /dev/null
++++ b/arch/arm64/include/asm/kvm_rmi.h
+@@ -0,0 +1,17 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Copyright (C) 2023-2026 ARM Ltd.
++ */
++
++#ifndef __ASM_KVM_RMI_H
++#define __ASM_KVM_RMI_H
++
++/**
++ * struct realm - Additional per VM data for a Realm
++ */
++struct realm {
++};
++
++void kvm_init_rmi(void);
++
++#endif /* __ASM_KVM_RMI_H */
+diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
+index b546703c3ab9..92cec42952f4 100644
+--- a/arch/arm64/include/asm/virt.h
++++ b/arch/arm64/include/asm/virt.h
+@@ -87,6 +87,7 @@ void __hyp_reset_vectors(void);
+ bool is_kvm_arm_initialised(void);
+ 
+ DECLARE_STATIC_KEY_FALSE(kvm_protected_mode_initialized);
++DECLARE_STATIC_KEY_FALSE(kvm_rmi_is_available);
+ 
+ static inline bool is_pkvm_initialized(void)
+ {
+diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+index 449154f9a485..189e8ad78b22 100644
+--- a/arch/arm64/kvm/Kconfig
++++ b/arch/arm64/kvm/Kconfig
+@@ -37,6 +37,7 @@ menuconfig KVM
+ 	select SCHED_INFO
+ 	select GUEST_PERF_EVENTS if PERF_EVENTS
+ 	select KVM_GUEST_MEMFD
++	select ARM_RMM
+ 	help
+ 	  Support hosting virtualized guest machines.
+ 
+diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+index 59612d2f277c..ed3cf30eb06e 100644
+--- a/arch/arm64/kvm/Makefile
++++ b/arch/arm64/kvm/Makefile
+@@ -16,7 +16,7 @@ CFLAGS_handle_exit.o += -Wno-override-init
+ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
+ 	 inject_fault.o va_layout.o handle_exit.o config.o \
+ 	 guest.o debug.o reset.o sys_regs.o stacktrace.o \
+-	 vgic-sys-reg-v3.o fpsimd.o pkvm.o \
++	 vgic-sys-reg-v3.o fpsimd.o pkvm.o rmi.o \
+ 	 arch_timer.o trng.o vmid.o emulate-nested.o nested.o at.o \
+ 	 vgic/vgic.o vgic/vgic-init.o \
+ 	 vgic/vgic-irqfd.o vgic/vgic-v2.o \
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 50adfff75be8..b961c22fce3d 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -42,6 +42,7 @@
+ #include <asm/kvm_nested.h>
+ #include <asm/kvm_pkvm.h>
+ #include <asm/kvm_ptrauth.h>
++#include <asm/kvm_rmi.h>
+ #include <asm/sections.h>
+ #include <asm/stacktrace/nvhe.h>
+ 
+@@ -111,6 +112,8 @@ long kvm_get_cap_for_kvm_ioctl(unsigned int ioctl, long *ext)
+ 	return -EINVAL;
  }
  
-+static int do_gpf_ptw(unsigned long far, unsigned long esr, struct pt_regs *regs)
++DEFINE_STATIC_KEY_FALSE(kvm_rmi_is_available);
++
+ DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
+ 
+ DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_base);
+@@ -3019,6 +3022,8 @@ static __init int kvm_arm_init(void)
+ 
+ 	in_hyp_mode = is_kernel_in_hyp_mode();
+ 
++	kvm_init_rmi();
++
+ 	if (cpus_have_final_cap(ARM64_WORKAROUND_DEVICE_LOAD_ACQUIRE) ||
+ 	    cpus_have_final_cap(ARM64_WORKAROUND_1508412))
+ 		kvm_info("Guests without required CPU erratum workarounds can deadlock system!\n" \
+diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
+new file mode 100644
+index 000000000000..384991d69f78
+--- /dev/null
++++ b/arch/arm64/kvm/rmi.c
+@@ -0,0 +1,24 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) 2023-2026 ARM Ltd.
++ */
++
++#include <linux/kvm_host.h>
++
++#include <asm/rmi_cmds.h>
++#include <asm/virt.h>
++
++void kvm_init_rmi(void)
 +{
-+	const struct fault_info *inf = esr_to_fault_info(esr);
++	/*
++	 * TODO: Support Realm guests in nVHE mode, this will require adding
++	 * EL2 stub(s) for REC entry and possibly other things.
++	 */
++	if (!is_kernel_in_hyp_mode())
++		return;
 +
-+	die_kernel_fault(inf->name, far, esr, regs);
-+	return 0;
++	if (!is_rmi_available())
++		return;
++
++	/* Future patch will enable static branch kvm_rmi_is_available */
 +}
-+
-+static int do_gpf(unsigned long far, unsigned long esr, struct pt_regs *regs)
-+{
-+	if (!is_el1_instruction_abort(esr) && fixup_exception(regs, esr))
-+		return 0;
-+
-+	return 1;
-+}
-+
- static const struct fault_info fault_info[] = {
- 	{ do_bad,		SIGKILL, SI_KERNEL,	"ttbr address size fault"	},
- 	{ do_bad,		SIGKILL, SI_KERNEL,	"level 1 address size fault"	},
-@@ -945,12 +961,12 @@ static const struct fault_info fault_info[] = {
- 	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 32"			},
- 	{ do_alignment_fault,	SIGBUS,  BUS_ADRALN,	"alignment fault"		},
- 	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 34"			},
--	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 35"			},
--	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 36"			},
--	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 37"			},
--	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 38"			},
--	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 39"			},
--	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 40"			},
-+	{ do_gpf_ptw,		SIGKILL, SI_KERNEL,	"level -1 granule protection fault (translation table walk)" },
-+	{ do_gpf_ptw,		SIGKILL, SI_KERNEL,	"level 0 granule protection fault (translation table walk)" },
-+	{ do_gpf_ptw,		SIGKILL, SI_KERNEL,	"level 1 granule protection fault (translation table walk)" },
-+	{ do_gpf_ptw,		SIGKILL, SI_KERNEL,	"level 2 granule protection fault (translation table walk)" },
-+	{ do_gpf_ptw,		SIGKILL, SI_KERNEL,	"level 3 granule protection fault (translation table walk)" },
-+	{ do_gpf,		SIGBUS,  SI_KERNEL,	"granule protection fault" },
- 	{ do_bad,		SIGKILL, SI_KERNEL,	"level -1 address size fault"	},
- 	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 42"			},
- 	{ do_translation_fault,	SIGSEGV, SEGV_MAPERR,	"level -1 translation fault"	},
 -- 
 2.43.0
 
