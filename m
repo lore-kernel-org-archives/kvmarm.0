@@ -1,111 +1,89 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6A3D42BC58;
-	Wed, 15 Jul 2026 15:06:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D85F247886D
+	for <kvmarm@lists.linux.dev>; Wed, 15 Jul 2026 15:07:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784128017; cv=none; b=jNriJo1O/LfSOwwzthpGHsWcHmizie2lCsPB4IWw0k8QgUbI9vHMhVxrQ1HQwhpttErq21VAajghmDNbBBn+UxK9H/0YFcMriEfdgZ7mO92Q5GKpXFC2HAa45OWpfR9J1PPM8twOLcKzq7hBtzlA5zsTPceglaZk8Q0J+bw1pnw=
+	t=1784128071; cv=none; b=L+GPKyEHdfksMTgXyOaflJWbXaYsRrm9tXiBuMUVezN/l5rNTFQc6YZL3Mtqf+ccTwiVi08aL9wYmOmPNpUNRhnwvDNueUJ/NQMyA5qeKsppHpVFr8wGBMClG3DP4ra1bENZ563FsLz5/mKQmAEW8TrHZIlUSmsmyVg9WcOuYy8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784128017; c=relaxed/simple;
-	bh=TUZGVsbgQlqpPNw19QmZ4TpzXd38zHRHXwauyCE/oz4=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=WIbLa7ZqI+JWKvr6SJRdh+7Bz0P5prOLI8/QWJ7tcoyHiBKpNTKHnE+Tvh7zYccqeoRlGpUt8n48/Vskvjd4mrosZ5VMUo4CG29a/ygHUcrhQ+AfNNahZOhw7g6SSaqkr8S2MVt01sUMzaqtBeXMjCRGJ9pQghagpMs760bZp28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MQwrA61Y; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784128071; c=relaxed/simple;
+	bh=prc3uAEHwoGnYr1c7/aZdqLr0VyU/73L7MWgzk/JWK0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=swV7zvm+W4mkSuuZJU+QBdEJl0s3YoqlnPtyex6LglBMblizwOJkYa2dB+9w74H9rdXxas0/41+SY6PhNWtLeqvbE0LV43O1ewmcUDj1p30ftNVhOI09qA5RdXNj2Ce9gE5wTWr36bFJJmaO2astcBKNd+ahMI7zrpA+fb6SEHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Y9GcF9vf; arc=none smtp.client-ip=91.218.175.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MQwrA61Y"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D0A61F00A3A;
-	Wed, 15 Jul 2026 15:06:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784128016;
-	bh=8gNRNQSW6vsktM1lbk7lGhKHurw9QaFYDhPaWxlP0Cc=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=MQwrA61Ykf0ssG5unhBw8veYKROdA1mQdlXY+yx9U6WOajRyL7xTsVfub5kEaP+eW
-	 /eals2r8UCuZjDKMGKKgfdyF3NuXFCpGofNIi4ZqzP4cXiBj8sMxnmZVBevTKBUYOJ
-	 J7rJwEnFCsxPP2RvfW3rSaNQRK+NN6BcDpmAvexlldJIXcoaSJfVyvXBpJduZ6YPlG
-	 9NJspzKdHkoeiUwFQK+6rztLz8C+nd5zi6KUjyO4yCj35H4uATihIZrvNinHokfO4R
-	 QkSNurk+G36Ec30P7HrIhb4qH4WnDZfTKwD0CRHM+G8od7DThAbXRw/+wULqlhIwpI
-	 zhgfZXrc5kS3A==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 3/6] firmware: arm_rmm: Check for RMI support at init
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Steven Price" <steven.price@arm.com>
-Cc: "Marc Zyngier" <maz@kernel.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, "Oliver
- Upton" <oupton@kernel.org>
-In-Reply-To: <20260715142739.80398-4-steven.price@arm.com>
-References: <20260715142739.80398-1-steven.price@arm.com>
- <20260715142739.80398-4-steven.price@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 15 Jul 2026 15:06:55 +0000
-Message-Id: <20260715150656.4D0A61F00A3A@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Y9GcF9vf"
+X-Forwarded-Encrypted: i=1; AHgh+RpNxA8SSGwtqEDIzz3sZRedV9tpBPb5IrvjQ0MIPTqt/W4PzIOZVtSKXtSYd1BABA5S4r3sPJE=@lists.linux.dev
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1784128065;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1UksYG3BGMSWQLFo2u7eoMh9Nmo4SqJ9rgJuiisEQVo=;
+	b=Y9GcF9vfCLA4rRR/467dm8y+3laVSHgvk/9IFi+zKNLarob50xdflURvNA6Zcv9oucAlZv
+	+FIElWX4z6jivh1ILm0oSGqmarkuBENG+enxL5fjVbufs4ZTQx2WmKV6nzO0Z+b7y9HPti
+	C/l2TaOtNb7sHJoficOXOjSAaVfZ5J8=
+X-Gm-Message-State: AOJu0YxOT7UyNR9DBNFXepABgLxoGeI6yleoh4hLCf8bq7kMOcQ/jbCK
+	E9cJfk2soY8cs4oCNtxUpT1r8oFDZPtG07SyF2eE/kMkBBE4rtB2S2mVYDaMYf+B1UdHhGd2SzR
+	kGFT0idhyyJBDW+bt/6BNkOAVslfZIwEW1MFt+w+U
+X-Received: by 2002:a05:622a:1314:b0:516:3f51:81cb with SMTP id
+ d75a77b69052e-51d7bdcb522mr26277441cf.13.1784128062853; Wed, 15 Jul 2026
+ 08:07:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+References: <20260706175415.2604046-1-vdonnefort@google.com> <20260706175415.2604046-19-vdonnefort@google.com>
+In-Reply-To: <20260706175415.2604046-19-vdonnefort@google.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Wed, 15 Jul 2026 16:07:05 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTxRFSW=9fAYvikL2t48ykaiGp7O3Mg6ddXdtFZrmWWaGQ@mail.gmail.com>
+X-Gm-Features: AUfX_mwQkLtR_K54e2-Z1gB3kd7lVeTizQhfcU3nhShnO-K3WpnpK5Ukazz8LTw
+Message-ID: <CA+EHjTxRFSW=9fAYvikL2t48ykaiGp7O3Mg6ddXdtFZrmWWaGQ@mail.gmail.com>
+Subject: Re: [PATCH v2 18/18] KVM: arm64: Alloc simple_buffer_page using pKVM
+ hyp allocator
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
+	will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kernel-team@android.com, qperret@google.com
+Content-Type: text/plain; charset="UTF-8"
+X-Migadu-Flow: FLOW_OUT
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [Low] The function `is_rmi_available()` is declared in the header but its=
- implementation is missing.
---
+On Mon, 6 Jul 2026 at 18:54, Vincent Donnefort <vdonnefort@google.com> wrote:
 
---- Patch [3]: [PATCH 3/6] firmware: arm_rmm: Check for RMI support at init=
- ---
-commit 422535e6880c00ddffdc5f970e459e2cf571e957
-Author: Steven Price <steven.price@arm.com>
+...
 
-firmware: arm_rmm: Check for RMI support at init
+> @@ -193,17 +211,8 @@ static bool hyp_trace_desc_is_valid(struct hyp_trace_desc *desc, size_t desc_siz
+>                 if ((void *)rb_desc + struct_size(rb_desc, page_va, rb_desc->nr_page_va) > desc_end)
+>                         return false;
+>
+> -               /* Overflow bpages backing memory? */
+> -               if (nr_bpages < rb_desc->nr_page_va)
+> -                       return false;
+> -
+> -               if (cpu >= hyp_nr_cpus)
+> -                       return false;
+> -
+>                 if (cpu != rb_desc->cpu)
+>                         return false;
 
-Query the RMI version number and check if it is a compatible version.
-The first two feature registers are read and exposed for future code to
-use.
+Sashiko flagged this. Nothing here bounds nr_page_va from below, so
+with nr_page_va == 0 on every CPU the bpage size sums to 0.
+hyp_alloc() still hands back a chunk, but bpages_backing_size is
+stored as 0, so when init_mm() fails on nr_page_va < 3 the free path
+takes its if (!size) return and never frees it. The host can repeat
+it. Would validating nr_page_va >= 3 here work?
 
-> diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/arm_rmm/rm=
-i.c
-> new file mode 100644
-> index 0000000000000..c4850976544ff
-> --- /dev/null
-> +++ b/drivers/firmware/arm_rmm/rmi.c
+I don't think the rest of Sashiko's note holds: the zero-size path
+succeeds rather than hitting -ENOMEM. And it's only reachable from the
+host kernel, not userspace.
 
-[ ... ]
-
-> +static int __init arm64_init_rmi(void)
-> +{
-> +	int ret;
-> +
-> +	/* Continue without realm support if we can't agree on a version */
-> +	ret =3D rmi_check_version();
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret =3D rmi_read_features();
-> +	if (ret)
-> +		return ret;
-> +
-> +	return 0;
-> +}
-> +
-> +/*
-> + * Note arm64_init_rmi() must be called before kvm_init_rmi() otherwise =
-KVM
-> + * will not support realm guests. subsys_initcall() is called before
-> + * module_init() (used for KVM) so this is OK.
-> + */
-> +subsys_initcall(arm64_init_rmi);
-
-[Severity: Low]
-Is the implementation of is_rmi_available() missing here?
-
-It is declared for external callers in include/linux/arm-rmi-cmds.h:
-
-bool is_rmi_available(void);
-
-However, the corresponding definition appears to be missing from
-drivers/firmware/arm_rmm/rmi.c, which could lead to link-time undefined
-reference errors when another subsystem attempts to use it.
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260715142739.8039=
-8-1-steven.price@arm.com?part=3D3
+Cheers,
+/fuad
