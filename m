@@ -1,32 +1,32 @@
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 661C23CB91F
-	for <kvmarm@lists.linux.dev>; Wed, 15 Jul 2026 08:12:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6547A3CAE70
+	for <kvmarm@lists.linux.dev>; Wed, 15 Jul 2026 08:13:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784103178; cv=none; b=alxlGaNe9xShnH+Qn+yCGQCeLxS5w+m0LpfWtMJBzDEg4Q/0M9oXYVOU2Z8lgQL9561efvd+hrxl4auGg+gC/Xjha9RTJsIzVbEXcVANbtnrfrWDkQMzDMLda9AZNWLZm9TdIP00Ydw4ZZeXwXOjgKepdLge+eWDN3NO8PR0ML4=
+	t=1784103183; cv=none; b=r5fotNmw3ayhhgQ1UEPR2E7j+Z1YeZN4I875FZl/j+bwKkORXm/5WGtcM8KMQZnianpGLtz2TpYxuLFCuBF/fCrvsWB/ohLYfFjMtXUU2o8KeJyR+ffU/PO7UWtqspjFqjC3t9AHBhoGOzVUk8fwSP+AFN86vqQMRXsoAr2do2I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784103178; c=relaxed/simple;
-	bh=seU745NFUCu9ykrsy0Mp34nXJ0y0BN2RmeJoWPkFp7A=;
+	s=arc-20240116; t=1784103183; c=relaxed/simple;
+	bh=nLy2K7GRel9NEq+9AFAtHubmTI7/yDD8KwlMbT9qc20=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Lz1AG7PRHQBOnTEEnTOuGFm5FGLNPTMVTCPuGE9hcjQLAfUKkfFT5sOvMZD3HnS2xluwhL8YZSfW4cBEfR+4LZyPLrt+0mLtKR6fphoPaLFDRQoPETr7UEkISFggBLsEz4R9VTJCs4XBecP/ba81lmx9QiCvs/18Z7TMxo2M/e0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=eCIhHM65; arc=none smtp.client-ip=91.218.175.177
+	 MIME-Version; b=vFK7C5ya+CeIFWXea8FO7gLeq2ePUn+NWJiZrukBIWZ6VZRFSBkDXuMqJxCzXqKp18ZsT0hstLaSdcGGkH9ssYgiJyBDjJb4QqgJZ7QyZXS3J8MdSzGmedvXJAK5ugUENpyvRX8pCWwAhcpv1KlHnBG7I8brOreI60qJSfHgbHw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=KtMHStUf; arc=none smtp.client-ip=91.218.175.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="eCIhHM65"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="KtMHStUf"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1784103173;
+	t=1784103179;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=n4y4UR4PmK16GfMJFUFQ14Kb30LFrA+TnM7Dyu73NEs=;
-	b=eCIhHM65MbQw+PZahy14nRS+hR64MQRXwB4ghUY27ZkOfk22bJZr79jUu40oFbPbs+Zyaa
-	QE5DgXtE0MY4OOR3QLR7p2g1lmN2S+8258uwlwEd0MrtxMrQlqSKPUGGWDy1rVCB8hRSAc
-	wZoxbNNETjYjprjLj3+g3+ocWEfIYbU=
+	bh=ptobWscVWFitUE7YzTMPHgY1rovNIaVBt3vxnNpD814=;
+	b=KtMHStUfAuuNTIRfIg04A7afIHAyaLAcaVSFJwwNevb1uK47Q4L935VHr9DEvhq57TZnxr
+	Jd2qwMSmKqZ1Yaalzmlhn86wPBDw6apQG+PASU6GZoVQz5yJddJRwjawtIMQtVOsm2EmI8
+	RGolPvSM+anLsyGGZB7ogKQ32Bz6G6Y=
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oupton@kernel.org>,
@@ -44,9 +44,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Sebastian Ene <sebastianene@google.com>,
 	Hyunwoo Kim <imv4bel@gmail.com>,
 	Fuad Tabba <tabba@google.com>
-Subject: [PATCH v6 4/8] KVM: arm64: Move PSCI helper functions to a shared header
-Date: Wed, 15 Jul 2026 09:12:34 +0100
-Message-Id: <20260715081238.1891918-5-fuad.tabba@linux.dev>
+Subject: [PATCH v6 5/8] KVM: arm64: Add host and hypervisor vCPU lookup primitives
+Date: Wed, 15 Jul 2026 09:12:35 +0100
+Message-Id: <20260715081238.1891918-6-fuad.tabba@linux.dev>
 In-Reply-To: <20260715081238.1891918-1-fuad.tabba@linux.dev>
 References: <20260715081238.1891918-1-fuad.tabba@linux.dev>
 Precedence: bulk
@@ -58,121 +58,110 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Move kvm_psci_valid_affinity() and kvm_psci_narrow_to_32bit() from
-psci.c to include/kvm/arm_psci.h, and move psci_affinity_mask() there
-too, renaming it kvm_psci_affinity_mask() now that it is no longer
-file-local. A follow-up series handles some protected-guest PSCI calls
-at EL2 using these helpers.
+From: Marc Zyngier <maz@kernel.org>
+
+The nVHE hypervisor repeatedly resolves a host vCPU into the EL2
+address space and validates that the loaded hyp vCPU matches it, with
+that logic open-coded in each handler.
+
+Add __get_host_hyp_vcpus() and the get_host_hyp_vcpus() macro, which
+translate the host vCPU into the hypervisor's address space and, when
+pKVM is enabled, also return the loaded hyp vCPU if it matches. If pKVM
+is enabled but the loaded hyp vCPU does not correspond to the requested
+host vCPU, both the host and hyp vCPU are returned as NULL. Convert
+handle___kvm_vcpu_run() to use it.
 
 No functional change intended.
 
 Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Co-developed-by: Fuad Tabba <fuad.tabba@linux.dev>
 Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
- arch/arm64/kvm/psci.c  | 30 +-----------------------------
- include/kvm/arm_psci.h | 27 +++++++++++++++++++++++++++
- 2 files changed, 28 insertions(+), 29 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c | 52 ++++++++++++++++++++++--------
+ 1 file changed, 38 insertions(+), 14 deletions(-)
 
-diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
-index 3b5dbe9a0a0ea..e3db84400d1f8 100644
---- a/arch/arm64/kvm/psci.c
-+++ b/arch/arm64/kvm/psci.c
-@@ -21,16 +21,6 @@
-  * as described in ARM document number ARM DEN 0022A.
-  */
- 
--#define AFFINITY_MASK(level)	~((0x1UL << ((level) * MPIDR_LEVEL_BITS)) - 1)
--
--static unsigned long psci_affinity_mask(unsigned long affinity_level)
--{
--	if (affinity_level <= 3)
--		return MPIDR_HWID_BITMASK & AFFINITY_MASK(affinity_level);
--
--	return 0;
--}
--
- static unsigned long kvm_psci_vcpu_suspend(struct kvm_vcpu *vcpu)
- {
- 	/*
-@@ -51,12 +41,6 @@ static unsigned long kvm_psci_vcpu_suspend(struct kvm_vcpu *vcpu)
- 	return PSCI_RET_SUCCESS;
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+index d3c69de698f48..45d717889f6ea 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+@@ -214,14 +214,45 @@ static void handle___pkvm_vcpu_put(struct kvm_cpu_context *host_ctxt)
+ 		pkvm_put_hyp_vcpu(hyp_vcpu);
  }
  
--static inline bool kvm_psci_valid_affinity(struct kvm_vcpu *vcpu,
--					   unsigned long affinity)
--{
--	return !(affinity & ~MPIDR_HWID_BITMASK);
--}
--
- static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+-static void handle___kvm_vcpu_run(struct kvm_cpu_context *host_ctxt)
++static struct kvm_vcpu *__get_host_hyp_vcpus(struct kvm_vcpu *arg,
++					     struct pkvm_hyp_vcpu **hyp_vcpup)
  {
- 	struct vcpu_reset_state *reset_state;
-@@ -135,7 +119,7 @@ static unsigned long kvm_psci_vcpu_affinity_info(struct kvm_vcpu *vcpu)
- 		return PSCI_RET_INVALID_PARAMS;
+-	DECLARE_REG(struct kvm_vcpu *, host_vcpu, host_ctxt, 1);
+-	int ret;
++	struct kvm_vcpu *host_vcpu = kern_hyp_va(arg);
++	struct pkvm_hyp_vcpu *hyp_vcpu = NULL;
  
- 	/* Determine target affinity mask */
--	target_affinity_mask = psci_affinity_mask(lowest_affinity_level);
-+	target_affinity_mask = kvm_psci_affinity_mask(lowest_affinity_level);
- 	if (!target_affinity_mask)
- 		return PSCI_RET_INVALID_PARAMS;
+ 	if (unlikely(is_protected_kvm_enabled())) {
+-		struct pkvm_hyp_vcpu *hyp_vcpu = pkvm_get_loaded_hyp_vcpu();
++		hyp_vcpu = pkvm_get_loaded_hyp_vcpu();
  
-@@ -220,18 +204,6 @@ static void kvm_psci_system_suspend(struct kvm_vcpu *vcpu)
- 	run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
- }
++		if (!hyp_vcpu || hyp_vcpu->host_vcpu != host_vcpu) {
++			hyp_vcpu = NULL;
++			host_vcpu = NULL;
++		}
++	}
++
++	*hyp_vcpup = hyp_vcpu;
++	return host_vcpu;
++}
++
++#define get_host_hyp_vcpus(ctxt, regnr, hyp_vcpup)			\
++	({								\
++		DECLARE_REG(struct kvm_vcpu *, __vcpu, ctxt, regnr);	\
++		__get_host_hyp_vcpus(__vcpu, hyp_vcpup);		\
++	})
++
++static void handle___kvm_vcpu_run(struct kvm_cpu_context *host_ctxt)
++{
++	struct pkvm_hyp_vcpu *hyp_vcpu;
++	struct kvm_vcpu *host_vcpu;
++	int ret;
++
++	host_vcpu = get_host_hyp_vcpus(host_ctxt, 1, &hyp_vcpu);
++
++	if (!host_vcpu) {
++		ret = -EINVAL;
++		goto out;
++	}
++
++	if (unlikely(hyp_vcpu)) {
+ 		/*
+ 		 * KVM (and pKVM) doesn't support SME guests for now, and
+ 		 * ensures that SME features aren't enabled in pstate when
+@@ -233,23 +264,16 @@ static void handle___kvm_vcpu_run(struct kvm_cpu_context *host_ctxt)
+ 			goto out;
+ 		}
  
--static void kvm_psci_narrow_to_32bit(struct kvm_vcpu *vcpu)
--{
--	int i;
+-		if (!hyp_vcpu) {
+-			ret = -EINVAL;
+-			goto out;
+-		}
 -
--	/*
--	 * Zero the input registers' upper 32 bits. They will be fully
--	 * zeroed on exit, so we're fine changing them in place.
--	 */
--	for (i = 1; i < 4; i++)
--		vcpu_set_reg(vcpu, i, lower_32_bits(vcpu_get_reg(vcpu, i)));
--}
+ 		flush_hyp_vcpu(hyp_vcpu);
+ 
+ 		ret = __kvm_vcpu_run(&hyp_vcpu->vcpu);
+ 
+ 		sync_hyp_vcpu(hyp_vcpu);
+ 	} else {
+-		struct kvm_vcpu *vcpu = kern_hyp_va(host_vcpu);
 -
- static unsigned long kvm_psci_check_allowed_function(struct kvm_vcpu *vcpu, u32 fn)
- {
- 	/*
-diff --git a/include/kvm/arm_psci.h b/include/kvm/arm_psci.h
-index cbaec804eb839..f86a006d67136 100644
---- a/include/kvm/arm_psci.h
-+++ b/include/kvm/arm_psci.h
-@@ -38,6 +38,33 @@ static inline int kvm_psci_version(struct kvm_vcpu *vcpu)
- 	return KVM_ARM_PSCI_0_1;
- }
- 
-+/* Narrow the PSCI register arguments (r1 to r3) to 32 bits. */
-+static inline void kvm_psci_narrow_to_32bit(struct kvm_vcpu *vcpu)
-+{
-+	int i;
-+
-+	/*
-+	 * Zero the input registers' upper 32 bits. They will be fully
-+	 * zeroed on exit, so we're fine changing them in place.
-+	 */
-+	for (i = 1; i < 4; i++)
-+		vcpu_set_reg(vcpu, i, lower_32_bits(vcpu_get_reg(vcpu, i)));
-+}
-+
-+static inline bool kvm_psci_valid_affinity(struct kvm_vcpu *vcpu,
-+					   unsigned long affinity)
-+{
-+	return !(affinity & ~MPIDR_HWID_BITMASK);
-+}
-+
-+static inline unsigned long kvm_psci_affinity_mask(unsigned long affinity_level)
-+{
-+	if (affinity_level <= 3)
-+		return MPIDR_HWID_BITMASK &
-+			~((0x1UL << (affinity_level * MPIDR_LEVEL_BITS)) - 1);
-+
-+	return 0;
-+}
- 
- int kvm_psci_call(struct kvm_vcpu *vcpu);
- 
+ 		/* The host is fully trusted, run its vCPU directly. */
+-		fpsimd_lazy_switch_to_guest(vcpu);
+-		ret = __kvm_vcpu_run(vcpu);
+-		fpsimd_lazy_switch_to_host(vcpu);
++		fpsimd_lazy_switch_to_guest(host_vcpu);
++		ret = __kvm_vcpu_run(host_vcpu);
++		fpsimd_lazy_switch_to_host(host_vcpu);
+ 	}
+ out:
+ 	cpu_reg(host_ctxt, 1) =  ret;
 -- 
 2.39.5
 
