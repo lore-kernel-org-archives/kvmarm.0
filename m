@@ -1,56 +1,56 @@
-Received: from mail-ed1-f74.google.com (mail-ed1-f74.google.com [209.85.208.74])
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB9A647278A
-	for <kvmarm@lists.linux.dev>; Wed, 15 Jul 2026 11:59:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED73B44C660
+	for <kvmarm@lists.linux.dev>; Wed, 15 Jul 2026 11:59:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784116774; cv=none; b=RTUs5qSZAw2+PgoaLLNKbYtT8Qy4JDT++wyI58ezZjOr0QlJGPFnVzZIixLTKatQ/W4urJSQikmvoUtIw0ZovKdkukRJBDOcnw2i0D87hZU9GytxUqD15fNuNI/MR3Y3qhWd6wcJLf5hfaqwzRFrRrvai8JYkOiAoON4/OcAapU=
+	t=1784116775; cv=none; b=t3PP+0swOi2AE5bHmgu/N4s2JUKaTm8bmwLY78Epp9s0OmLeRrMAO1l2ufewtZpe91qZ3sfTXpIoQkcYAw8+r7cFfeoK+BIy8novKkQ/TgcuEPZFNszPjqNTD2gkQrknMooxeapy7olx8xYjlvjKP9HwsfFuJ2H7acTrIKS1i6U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784116774; c=relaxed/simple;
-	bh=avKKUR3ivX1o4eXWAvFx7D4B/bGHctrz504BKkAdasI=;
+	s=arc-20240116; t=1784116775; c=relaxed/simple;
+	bh=Vc51+tDXkTxNkQKt0ujm+ycuJbTsubABwtHPycKRIE0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Gn+LDZQ/MyWboYrCKysF4/nKzsnyOm36bhuiHQi5mnGDk690jwVuPvg7EiCNx49ZgLfGk7kB1HTTzlvvYpfhnx81uesOuv+enrw3KhJPPNeTlwWEj0O9JXFTASAyDJdnOLk+OP9QsiCdg2nLP5y8dhgmZcK2ykplDBXYPr1/J6g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=j8XpNDK0; arc=none smtp.client-ip=209.85.208.74
+	 To:Cc:Content-Type; b=dSq1Df2jBXt20KXj0nB2kyjh7Ext3kkHnAZbwbl9f4y5YnQhUD0x+8YQHxN/aG61q0fNflzSZWmW5BhPrqsHtkOVJFfX4XhFqyTYXFnD1jg8rzFSo5fCf956MAai7vhAkNYdbRXYkWTdaohv10tNpKlbBMdkXIn5wvWjKVYzO1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fHvLqUGF; arc=none smtp.client-ip=209.85.128.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="j8XpNDK0"
-Received: by mail-ed1-f74.google.com with SMTP id 4fb4d7f45d1cf-6983e384c66so1874356a12.1
-        for <kvmarm@lists.linux.dev>; Wed, 15 Jul 2026 04:59:30 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fHvLqUGF"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-493b21b1fe8so18019365e9.0
+        for <kvmarm@lists.linux.dev>; Wed, 15 Jul 2026 04:59:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1784116768; x=1784721568; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1784116769; x=1784721569; darn=lists.linux.dev;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=U+wIzMWf2cSB6EX/Jc8f2fGh3ASjjz6WosFQJCh8Jwc=;
-        b=j8XpNDK0a5JvbAizaQA8fwbytpispmfR8bKA0ruXbMzr3HZ6yl4S/F4xkJ1417jq1V
-         FoJidINMPMDR/eerdoyouregAKJCEpI8gAAhbt3IVYf4xbPtJ44nS0ROEpbmN0CipDUj
-         gyQf3D/3lCTmsiEjWhYEMZ6IwK6o+l3411DnHj0ufbaApPBc6GYy5G+ZExDC1fndsbcs
-         ZDMvNY29Sy7LEYW+IwZo0/OePoCYk52e6mzAAexPmyys/695fPdKGV25oFfpH0v+6B39
-         Jmm72Lez0z+DDAWMIkmR6QKRuBmjKokgtvhK639pxzZvu+Tfjj4SElfovfTmuHG0SXPe
-         GSiw==
+        bh=wRJ18s+161s2edooAsExJtsANoe4PXbtE7ux+6Z/9CQ=;
+        b=fHvLqUGFLqc6r7W3+fq6PwU998ekMNDBi0vkDL74pWj1ThJ/DeQjoNFlmdF/ljOX1E
+         KbFvPU99jSJQ0xhCwaOVUILzCMKkN01kb/iKrp2khQybH9sQmhVlMcDyUf5UOxrTl7zG
+         rBCGGNkOep65Zv2ZuPwMmvauOWozIsDTPK+zPWxZE5TWD5JCZUrHFfqvv5VZEPay76sD
+         +bguhULVMIeHHu0gcb0RUOHXPZtp2X2oJ8N9LxTXSiGNhABzoBB7XApHJ5WEvKu8CrBu
+         FNHcar041BTYx5FXxeOdCq88jJieaMQSZrPymnZirx94y/wRdyl3emmsOldQ2ThZ8r4S
+         Uz3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784116768; x=1784721568;
+        d=1e100.net; s=20251104; t=1784116769; x=1784721569;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=U+wIzMWf2cSB6EX/Jc8f2fGh3ASjjz6WosFQJCh8Jwc=;
-        b=mWgufLkWgM4sRxt7W8Amkd+qHs9T1EkCdapH5Z+bhg4RBq5/c+JH2+rp7bfyNLZ1oZ
-         JGWsVCcaMkGhkz5ezWbp8RoRWiFCAxr8xZ39Rp5NTV4ZUZFcX2IxQ83dQI1E7y51Aja/
-         yb8bSQqKQlz46cLCE2UIJSaaCFQMLnHK/botJvRe9BSsFbTsr3RnCIRnj+vrAqAdcjaZ
-         HxuLFxhNqxRbSIsKVGlWAbe8rzGQL8+5dAYFnHwS6ue3rwmdU77kCy7a32BuUuKVBu8S
-         Sqy7/Q3Ru9MPWh4XWr3npfYb3+2ysNGhPxnDMiW5j4Xc6GmS6EPfvPPd7VDlgipFVVuG
-         sBqA==
-X-Forwarded-Encrypted: i=1; AHgh+RpFp2XVMyFwhS3Gz+DIURgwfZasUdEe2sQx3VMJ4BYFT8hQcWLyRbazxgiYAUy2RRitzHQCPys=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yx3lUuucNEHxCNyYlEz07lJIeaHjn6xfLJUtrmmGROT4Q62Epnv
-	lKT1mNY7hZB3l2f3mH5cku5lHqpe/Gd6lf+Mue7qNc1xCQcmXjI8wWI60+m+EZB0lPlNz3jCUQ0
-	RWz2FylJbQTUoMQ==
-X-Received: from edou7.prod.google.com ([2002:aa7:d0c7:0:b0:69c:458d:1598])
+        bh=wRJ18s+161s2edooAsExJtsANoe4PXbtE7ux+6Z/9CQ=;
+        b=W2fFU4K1iQXQmvOADRXkgH2Q33SQt49wtncCKF6GiGb93AozLUtWCSB03XTqDCs9Ul
+         8NyFOXh2Dxm8qq61Ahnqi3ku/XB3HrWN/wFtMtX9RFt00uHmI8Xs87subTbSnFnx4rWU
+         6eiLvT3i3Klta4QaAWS6nRuVdbSIxVbC8F3q57E1ityoLmhml1cQgPR8ivTsgyBrcWui
+         we1BQFXsHrSphobRoRXhf84v3I6mdvJ/bhZp6/KEMTdsLUjVAzUGl56xySjkalnJB19c
+         GfB2ADf3PA2ZRp8fdFhh/4aofcUzqzUY/VMOjtRfO9oTGT8NF+RHcyzs4txROnyYaknT
+         9JGw==
+X-Forwarded-Encrypted: i=1; AHgh+RqIwpJ0h7wbEdSmHtkyMaMNwyDGdpuit/pqh41ZfJxU2wLb6kMGsC531y7zE91Icu4C9w5Z+ts=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yz8TxeaYiNpQJxvMLW6UdWnoh4mF9Z6hL/jw/t3/h8+weBJt3rt
+	1rzFlBuQUUhrFR1p7+Ekq5ak6qL9q3QLyryXTrOD6J+TroxkShZoxu28Hgt5L9pYLcwpdQaIbLF
+	JsbSZHGcUF7mDmw==
+X-Received: from wmaq7.prod.google.com ([2002:a05:600c:6c87:b0:493:b328:830b])
  (user=smostafa job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6402:1d4b:b0:69c:7754:f8b7 with SMTP id 4fb4d7f45d1cf-69c7754f940mr8902542a12.38.1784116767878;
- Wed, 15 Jul 2026 04:59:27 -0700 (PDT)
-Date: Wed, 15 Jul 2026 11:58:53 +0000
+ 2002:a05:600c:3e19:b0:493:f28e:462a with SMTP id 5b1f17b1804b1-493f87e6ba2mr184102835e9.12.1784116769008;
+ Wed, 15 Jul 2026 04:59:29 -0700 (PDT)
+Date: Wed, 15 Jul 2026 11:58:54 +0000
 In-Reply-To: <20260715115906.2664882-1-smostafa@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -60,8 +60,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20260715115906.2664882-1-smostafa@google.com>
 X-Mailer: git-send-email 2.55.0.141.g00534a21ce-goog
-Message-ID: <20260715115906.2664882-13-smostafa@google.com>
-Subject: [PATCH v7 12/24] iommu/arm-smmu-v3-kvm: Probe SMMU HW
+Message-ID: <20260715115906.2664882-14-smostafa@google.com>
+Subject: [PATCH v7 13/24] iommu/arm-smmu-v3-kvm: Add MMIO emulation
 From: Mostafa Saleh <smostafa@google.com>
 To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
 	kvmarm@lists.linux.dev, iommu@lists.linux.dev
@@ -73,116 +73,249 @@ Cc: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
 	Mostafa Saleh <smostafa@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Probe SMMU features from the IDR register space, most of
-the logic is common with the kernel.
+Add data abort handler for the SMMUs, at the moment most registers
+are just passthrough.
+In the next patches CMDQ/STE emulation will be added which inserts
+logic to some register access.
 
 Signed-off-by: Mostafa Saleh <smostafa@google.com>
 ---
- .../iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c  | 54 +++++++++++++++++++
- .../iommu/arm/arm-smmu-v3/pkvm/arm_smmu_v3.h  |  6 +++
- 2 files changed, 60 insertions(+)
+ .../iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c  | 159 ++++++++++++++++++
+ .../iommu/arm/arm-smmu-v3/pkvm/arm_smmu_v3.h  |  14 ++
+ 2 files changed, 173 insertions(+)
 
 diff --git a/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c
-index fee5db6c9c20..be5922d80184 100644
+index be5922d80184..af06c832fc6f 100644
 --- a/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c
 +++ b/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c
-@@ -10,6 +10,7 @@
+@@ -8,6 +8,7 @@
+ 
+ #include <nvhe/iommu.h>
  #include <nvhe/mem_protect.h>
++#include <nvhe/trap_handler.h>
  
  #include "arm_smmu_v3.h"
-+#include "../arm-smmu-v3.h"
+ #include "../arm-smmu-v3.h"
+@@ -82,6 +83,8 @@ static int smmu_init_device(struct hyp_arm_smmu_v3_device *smmu)
+ 	if (!PAGE_ALIGNED(smmu->mmio_addr | smmu->mmio_size))
+ 		return -EINVAL;
  
- size_t __ro_after_init kvm_hyp_arm_smmu_v3_count;
- struct hyp_arm_smmu_v3_device *kvm_hyp_arm_smmu_v3_smmus;
-@@ -26,6 +27,53 @@ static void smmu_deinit_device(struct hyp_arm_smmu_v3_device *smmu)
- 	smmu->base = NULL;
++	hyp_spin_lock_init(&smmu->lock);
++	hyp_spin_lock_init(&smmu->hw_lock);
+ 	ret = __pkvm_host_donate_hyp_mmio(smmu->mmio_addr, smmu->mmio_size, &haddr);
+ 	if (ret)
+ 		return ret;
+@@ -120,6 +123,8 @@ static int smmu_init(void)
+ 			goto out_reclaim_smmu;
+ 	}
+ 
++	BUILD_BUG_ON(sizeof(hyp_spinlock_t) != sizeof(u32));
++
+ 	return 0;
+ 
+ out_reclaim_smmu:
+@@ -129,6 +134,159 @@ static int smmu_init(void)
+ 	return ret;
  }
  
-+/*
-+ * Mini-probe and validation for the hypervisor.
-+ */
-+static int smmu_probe(struct hyp_arm_smmu_v3_device *smmu)
++static bool smmu_dabt_device(struct hyp_arm_smmu_v3_device *smmu,
++			     struct user_pt_regs *regs,
++			     u64 esr, u32 off)
 +{
-+	u32 reg;
++	bool is_write = esr & ESR_ELx_WNR;
++	unsigned int len = BIT((esr & ESR_ELx_SAS) >> ESR_ELx_SAS_SHIFT);
++	int rd = (esr & ESR_ELx_SRT_MASK) >> ESR_ELx_SRT_SHIFT;
++	const u64 read_write = -1ULL;
++	const u64 no_access = 0;
++	u64 mask = no_access;
++	const u64 read_only = is_write ? no_access : read_write;
++	bool is_xzr = (rd == 31);
++	u64 val = is_xzr ? 0 : regs->regs[rd];
 +
-+	/* Similar to the kernel, rely on firmware override. */
-+	if (!(smmu->features & ARM_SMMU_FEAT_COHERENCY))
-+		return -EINVAL;
++	switch (off) {
++	case ARM_SMMU_IDR0:
++		if (len != sizeof(u32))
++			break;
++		/*
++		 * Clear stage-2 support, hide MSI to avoid write back to cmdq,
++		 * and hide ATS as it is not emulated or handled in TLB invalidation.
++		 */
++		mask = read_only & ~(IDR0_S2P | IDR0_VMID16 | IDR0_MSI | IDR0_HYP | IDR0_ATS);
++		break;
++	/* Passthrough the register access for bisectiblity, handled later */
++	case ARM_SMMU_CMDQ_BASE:
++	case ARM_SMMU_CMDQ_PROD:
++	case ARM_SMMU_CMDQ_CONS:
++	case ARM_SMMU_STRTAB_BASE:
++	case ARM_SMMU_STRTAB_BASE_CFG:
++	case ARM_SMMU_GBPA:
++		mask = read_write;
++		break;
++	case ARM_SMMU_CR0:
++		if (len != sizeof(u32))
++			break;
++		mask = read_write;
++		break;
++	case ARM_SMMU_CR1: {
++		if (len != sizeof(u32))
++			break;
++		/* Don't mess with shareability/cacheability.  */
++		if (is_write &&
++		    (val != (FIELD_PREP(CR1_TABLE_SH, ARM_SMMU_SH_ISH) |
++			     FIELD_PREP(CR1_TABLE_OC, CR1_CACHE_WB) |
++			     FIELD_PREP(CR1_TABLE_IC, CR1_CACHE_WB) |
++			     FIELD_PREP(CR1_QUEUE_SH, ARM_SMMU_SH_ISH) |
++			     FIELD_PREP(CR1_QUEUE_OC, CR1_CACHE_WB) |
++			     FIELD_PREP(CR1_QUEUE_IC, CR1_CACHE_WB))))
++			break;
 +
-+	/* IDR0 */
-+	reg = readl_relaxed(smmu->base + ARM_SMMU_IDR0);
++		mask = read_write;
++		break;
++	}
 +
-+	smmu->features |= smmu_idr0_features(reg);
-+	if (!(smmu->features & (ARM_SMMU_FEAT_TT_LE | ARM_SMMU_FEAT_TT_BE)))
-+		return -ENXIO;
++	/* Allowed 32 bit registers. */
++	case ARM_SMMU_EVTQ_IRQ_CFG1:
++	case ARM_SMMU_EVTQ_IRQ_CFG2:
++	case ARM_SMMU_GERROR_IRQ_CFG1:
++	case ARM_SMMU_GERROR_IRQ_CFG2:
++	case ARM_SMMU_PRIQ_IRQ_CFG1:
++	case ARM_SMMU_PRIQ_IRQ_CFG2:
++		/* These are RES0 as MSI support is hidden. */
++		val = 0;
++		if (!is_write)
++			goto out_update_regs;
++		fallthrough;
++	case ARM_SMMU_EVTQ_PROD + SZ_64K:
++	case ARM_SMMU_EVTQ_CONS + SZ_64K:
++	case ARM_SMMU_PRIQ_PROD + SZ_64K:
++	case ARM_SMMU_PRIQ_CONS + SZ_64K:
++	case ARM_SMMU_GERRORN:
++	case ARM_SMMU_IRQ_CTRLACK:
++	case ARM_SMMU_IRQ_CTRL:
++	case ARM_SMMU_CR0ACK:
++	case ARM_SMMU_CR2:
++		if (len != sizeof(u32))
++			break;
++		mask = read_write;
++		break;
++	/* Allowed 64 bit registers. */
++	case ARM_SMMU_EVTQ_IRQ_CFG0:
++	case ARM_SMMU_PRIQ_IRQ_CFG0:
++	case ARM_SMMU_GERROR_IRQ_CFG0:
++		/* These are RES0 as MSI support is hidden. */
++		val = 0;
++		if (!is_write)
++			goto out_update_regs;
++		fallthrough;
++	case ARM_SMMU_EVTQ_BASE:
++	case ARM_SMMU_PRIQ_BASE:
++		if (len != sizeof(u64))
++			break;
++		mask = read_write;
++		break;
++	/* Allowed RO 32 bit registers. */
++	case ARM_SMMU_IIDR:
++	case ARM_SMMU_IDR5:
++	case ARM_SMMU_IDR3:
++	case ARM_SMMU_IDR1:
++	case ARM_SMMU_GERROR:
++		if (len != sizeof(u32))
++			break;
++		mask = read_only;
++	};
 +
-+	reg = readl_relaxed(smmu->base + ARM_SMMU_IDR1);
-+	if (reg & (IDR1_TABLES_PRESET | IDR1_QUEUES_PRESET | IDR1_REL))
-+		return -EINVAL;
++	if (WARN_ON(!mask))
++		goto out_ret;
 +
-+	smmu->sid_bits = FIELD_GET(IDR1_SIDSIZE, reg);
-+	/* Follows the kernel logic */
-+	if (smmu->sid_bits <= STRTAB_SPLIT)
-+		smmu->features &= ~ARM_SMMU_FEAT_2_LVL_STRTAB;
++	hyp_spin_lock(&smmu->hw_lock);
++	if (is_write) {
++		if (len == sizeof(u64))
++			writeq_relaxed(val & mask, smmu->base + off);
++		else
++			writel_relaxed(val & mask, smmu->base + off);
 +
-+	reg = readl_relaxed(smmu->base + ARM_SMMU_IDR3);
-+	smmu->features |= smmu_idr3_features(reg);
++		hyp_spin_unlock(&smmu->hw_lock);
++		return true;
++	}
 +
-+	reg = readl_relaxed(smmu->base + ARM_SMMU_IDR5);
-+	smmu->pgsize_bitmap = smmu_idr5_to_pgsize(reg);
++	if (len == sizeof(u64))
++		val = readq_relaxed(smmu->base + off) & mask;
++	else
++		val = readl_relaxed(smmu->base + off) & mask;
++	hyp_spin_unlock(&smmu->hw_lock);
++out_update_regs:
++	/*
++	 * Device might be read senstive, so do it but ignore writing
++	 * back for xzr.
++	 */
++	if (!is_xzr)
++		regs->regs[rd] = val;
 +
-+	smmu->oas = smmu_idr5_to_oas(reg);
-+	if (smmu->oas == 52)
-+		smmu->pgsize_bitmap |= 1ULL << 42;
-+	else if (!smmu->oas)
-+		smmu->oas = 48;
-+
-+	reg = readl_relaxed(smmu->base + ARM_SMMU_IIDR);
-+	smmu->features = smmu_iidr_features(reg, smmu->features);
-+	if (!(smmu->features & ARM_SMMU_FEAT_NESTING))
-+		return -ENXIO;
-+
-+	return 0;
++out_ret:
++	return true;
 +}
 +
- static int smmu_init_device(struct hyp_arm_smmu_v3_device *smmu)
++static bool smmu_dabt_handler(struct user_pt_regs *regs, u64 esr, u64 addr)
++{
++	struct hyp_arm_smmu_v3_device *smmu;
++	bool ret;
++
++	for_each_smmu(smmu) {
++		if (addr < smmu->mmio_addr || addr >= smmu->mmio_addr + smmu->mmio_size)
++			continue;
++		hyp_spin_lock(&smmu->lock);
++		ret = smmu_dabt_device(smmu, regs, esr, addr - smmu->mmio_addr);
++		hyp_spin_unlock(&smmu->lock);
++		return ret;
++	}
++	return false;
++}
++
+ static int smmu_host_stage2_idmap(phys_addr_t start, phys_addr_t end, int prot)
  {
- 	unsigned long haddr;
-@@ -39,8 +87,14 @@ static int smmu_init_device(struct hyp_arm_smmu_v3_device *smmu)
- 		return ret;
- 
- 	smmu->base = (void __iomem *)haddr;
-+	ret = smmu_probe(smmu);
-+	if (ret)
-+		goto out_ret;
- 
  	return 0;
-+out_ret:
-+	smmu_deinit_device(smmu);
-+	return ret;
- }
- 
- /* Called while is the host is still trusted. */
+@@ -138,4 +296,5 @@ static int smmu_host_stage2_idmap(phys_addr_t start, phys_addr_t end, int prot)
+ struct pkvm_iommu_ops smmu_ops = {
+ 	.init				= smmu_init,
+ 	.host_stage2_idmap		= smmu_host_stage2_idmap,
++	.dabt_handler			= smmu_dabt_handler,
+ };
 diff --git a/drivers/iommu/arm/arm-smmu-v3/pkvm/arm_smmu_v3.h b/drivers/iommu/arm/arm-smmu-v3/pkvm/arm_smmu_v3.h
-index 744ee2b7f0b4..82b84673e85b 100644
+index 82b84673e85b..2bda6e03c96c 100644
 --- a/drivers/iommu/arm/arm-smmu-v3/pkvm/arm_smmu_v3.h
 +++ b/drivers/iommu/arm/arm-smmu-v3/pkvm/arm_smmu_v3.h
-@@ -12,12 +12,18 @@
-  *
-  * Other members are filled and used at runtime by the SMMU driver.
-  * @base		Virtual address of SMMU registers
-+ * @oas			PA size
-+ * @pgsize_bitmap	Supported page sizes
-+ * @sid_bits		Max number of SID bits supported
+@@ -4,6 +4,10 @@
+ 
+ #include <asm/kvm_asm.h>
+ 
++#ifdef __KVM_NVHE_HYPERVISOR__
++#include <nvhe/spinlock.h>
++#endif
++
+ /*
+  * Parameters from the trusted host:
+  * @mmio_addr		base address of the SMMU registers
+@@ -15,6 +19,9 @@
+  * @oas			PA size
+  * @pgsize_bitmap	Supported page sizes
+  * @sid_bits		Max number of SID bits supported
++ * @lock		Lock to protect SMMU emulation
++ * @hw_lock		Lock to protect SMMU HW (as CMDQ)
++			Order smmu.lock => host_mmu.lock => smmu.hw_lock
   */
  struct hyp_arm_smmu_v3_device {
  	phys_addr_t		mmio_addr;
- 	size_t			mmio_size;
- 	void __iomem		*base;
- 	u32			features;
-+	unsigned long		oas;
-+	unsigned long		pgsize_bitmap;
-+	unsigned int		sid_bits;
+@@ -24,6 +31,13 @@ struct hyp_arm_smmu_v3_device {
+ 	unsigned long		oas;
+ 	unsigned long		pgsize_bitmap;
+ 	unsigned int		sid_bits;
++#ifdef __KVM_NVHE_HYPERVISOR__
++	hyp_spinlock_t		lock;
++	hyp_spinlock_t		hw_lock;
++#else
++	u32			lock;
++	u32			hw_lock;
++#endif
  };
  
  extern size_t kvm_nvhe_sym(kvm_hyp_arm_smmu_v3_count);
