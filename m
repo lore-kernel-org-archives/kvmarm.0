@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8EA239061C;
-	Wed, 15 Jul 2026 14:31:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D66AB48C3E5;
+	Wed, 15 Jul 2026 14:31:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784125886; cv=none; b=mX1AVcY823OYV4FvxUB7XbpJ8OdD2oxEBINXM2/HqCDPRZCjlxlLvWIDGFVonVcvXbsfRuOPooNMbFuc5h5WGT5VLzLYHY7gvhbnqenYlBfbjFGRWvt7hL9fjQf2mI1HCDOfsX1reWd5DZmJkxO7lBL0EhQfQ2/m8IDxYquGCUk=
+	t=1784125890; cv=none; b=JjdQqdH9lQ/Sh+fv4O3bMMz63PcjPb0lrz/Airgy8Eo2CDbGebG9MFg4Xe3JZhroCQLARluoVr/hAvOxa5T6DjAQgaUcUG3IPrMvCyoiTBvU/dAL41jWdSqWpKdMd2W/n41H86Q7LiJhMIHUHk5LAuYJ26oGVK1zJi91Ij4l4ac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784125886; c=relaxed/simple;
-	bh=0MsM9pKBxJreAuCyKGFQTgLjjuhyGR3qTYLbWXvJXjU=;
+	s=arc-20240116; t=1784125890; c=relaxed/simple;
+	bh=bzMrd1BqoPkxp7vkmCHD+vARLfctGd6IuFpz4Uz0tUQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VK0TtYkXuQC02DaaoA4xCosc4nd1Md1kL7jWBWMYj/n0H93/nmOFrxZ/H71ATnYN1OC8PtHKA1G1eARxasLULXvgJVUMJh8SeYz4BjJJy8aemIf10rPmRe9tpoSnzwZmUxRADAD6yPg0D9YUJo0FpTsqGFllakd34aTs+Jy89xU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Tz6qlmCI; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=aJgykBIB0PTQjrld3Sn0BtRUHAT7MSJrAtSt93Rs0uApfSrAZ2CHqxl0uRJ/o0NuCFcTvMc8SxISTJLTv5h54BKH3m8WdcgrZBPxR+i13j+Twk/vFvYyCE6Vsh71DZ9jXimo0UtMNitWkPOgwQj5LxLfWIEhD1l3i0XCHRtd5h0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=tjCwL1Ne; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Tz6qlmCI"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="tjCwL1Ne"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8DF2B1691;
-	Wed, 15 Jul 2026 07:31:17 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0574E1576;
+	Wed, 15 Jul 2026 07:31:23 -0700 (PDT)
 Received: from e122027.cambridge.arm.com (e122027.cambridge.arm.com [10.1.25.27])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 992AB3F7B4;
-	Wed, 15 Jul 2026 07:31:17 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 392E63F7B4;
+	Wed, 15 Jul 2026 07:31:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1784125881; bh=0MsM9pKBxJreAuCyKGFQTgLjjuhyGR3qTYLbWXvJXjU=;
+	t=1784125887; bh=bzMrd1BqoPkxp7vkmCHD+vARLfctGd6IuFpz4Uz0tUQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Tz6qlmCI+1/btC5Tib5mw3MJudEJYPNFQ6igymIhrJslwk9NMsbpXOwfs3Jygpc7K
-	 nVyoMlCIGeIG5YYSVGjDbz+MTqaq5m9rHsk+IwAUkWCk049xXgfb5fx+NU/21S8I/u
-	 mGAYSvyHq/ZLQ/y8tp6qQ1LMFIey6zk8npFywobk=
+	b=tjCwL1NewjLx7UjGlSY6+a0y1aq4ttXG8Ij+BMFCeWeArd0BrU7pjtjMU/MYJJfeW
+	 8Z2LzLQUNeHIckbE3XSuWXo8VkiqAMUAh3zQPPVV45kIfoT0BJMMiwOsOBKhhjTuwO
+	 LDPgXNv1QvGfxlWBbnXU/wkoF6gIcJ5pMdPUPqt4=
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -54,9 +54,9 @@ Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>,
 	WeiLin.Chang@arm.com,
 	Lorenzo Pieralisi <lpieralisi@kernel.org>,
 	Steven Price <steven.price@arm.com>
-Subject: [PATCH v15 31/37] KVM: arm64: CCA: Propagate breakpoint and watchpoint counts to userspace
-Date: Wed, 15 Jul 2026 15:28:33 +0100
-Message-ID: <20260715142841.80544-32-steven.price@arm.com>
+Subject: [PATCH v15 32/37] KVM: arm64: CCA: Set breakpoint parameters through SET_ONE_REG
+Date: Wed, 15 Jul 2026 15:28:34 +0100
+Message-ID: <20260715142841.80544-33-steven.price@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260715142841.80544-1-steven.price@arm.com>
 References: <20260715142841.80544-1-steven.price@arm.com>
@@ -70,79 +70,116 @@ Content-Transfer-Encoding: 8bit
 
 From: Jean-Philippe Brucker <jean-philippe@linaro.org>
 
-The RMM describes the maximum number of BPs/WPs available to the guest
-in the Feature Register 0. Propagate those numbers into ID_AA64DFR0_EL1,
-which is visible to userspace. A VMM needs this information in order to
-set up realm parameters.
+Allow userspace to configure the number of breakpoints and watchpoints
+of a Realm VM through KVM_SET_ONE_REG ID_AA64DFR0_EL1.
+
+The KVM sys_reg handler checks the user value against the maximum value
+given by RMM (arm64_check_features() gets it from the
+read_sanitised_id_aa64dfr0_el1() reset handler).
+
+Userspace discovers that it can write these fields by issuing a
+KVM_ARM_GET_REG_WRITABLE_MASKS ioctl.
 
 Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
 Signed-off-by: Steven Price <steven.price@arm.com>
 Reviewed-by: Gavin Shan <gshan@redhat.com>
 Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 ---
- arch/arm64/include/asm/kvm_rmi.h |  2 ++
- arch/arm64/kvm/rmi.c             | 19 +++++++++++++++++++
- arch/arm64/kvm/sys_regs.c        |  3 +++
- 3 files changed, 24 insertions(+)
+ arch/arm64/kvm/guest.c    |  7 +++++++
+ arch/arm64/kvm/rmi.c      |  3 +++
+ arch/arm64/kvm/sys_regs.c | 17 +++++++++++------
+ 3 files changed, 21 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
-index 7f0c059ac7cf..3ec6525ae95f 100644
---- a/arch/arm64/include/asm/kvm_rmi.h
-+++ b/arch/arm64/include/asm/kvm_rmi.h
-@@ -96,6 +96,8 @@ struct realm_rec {
- void kvm_init_rmi(void);
- u32 kvm_rmm_ipa_limit(void);
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index 5469c9a97fad..3ed563e85572 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -735,6 +735,8 @@ int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+ 	return kvm_arm_sys_reg_get_reg(vcpu, reg);
+ }
  
-+u64 kvm_realm_reset_id_aa64dfr0_el1(const struct kvm_vcpu *vcpu, u64 val);
++#define KVM_REG_ARM_ID_AA64DFR0_EL1	ARM64_SYS_REG(3, 0, 0, 5, 0)
 +
- bool kvm_rmi_supports_sve(void);
+ /*
+  * The RMI ABI only enables setting some GPRs and PC. The selection of GPRs
+  * that are available depends on the Realm state and the reason for the last
+@@ -749,6 +751,11 @@ static bool validate_realm_set_reg(struct kvm_vcpu *vcpu,
+ 		u64 off = core_reg_offset_from_id(reg->id);
  
- int kvm_init_realm(struct kvm *kvm);
+ 		return kvm_realm_validate_core_reg(off);
++	} else {
++		switch (reg->id) {
++		case KVM_REG_ARM_ID_AA64DFR0_EL1:
++			return true;
++		}
+ 	}
+ 
+ 	return false;
 diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
-index 2310f2b608a7..491097a57328 100644
+index 491097a57328..6850338e2f19 100644
 --- a/arch/arm64/kvm/rmi.c
 +++ b/arch/arm64/kvm/rmi.c
-@@ -35,6 +35,25 @@ u32 kvm_rmm_ipa_limit(void)
- 	return u64_get_bits(rmi_feat_reg(0), RMI_FEATURE_REGISTER_0_S2SZ);
- }
+@@ -493,6 +493,7 @@ static int realm_create_rd(struct kvm *kvm)
+ 	void *rd = NULL;
+ 	phys_addr_t rd_phys, params_phys, top_delegated;
+ 	size_t pgd_size = kvm_pgtable_stage2_pgd_size(kvm->arch.mmu.vtcr);
++	u64 dfr0 = kvm_read_vm_id_reg(kvm, SYS_ID_AA64DFR0_EL1);
+ 	int r;
  
-+u64 kvm_realm_reset_id_aa64dfr0_el1(const struct kvm_vcpu *vcpu, u64 val)
-+{
-+	u32 bps = u64_get_bits(rmi_feat_reg(0), RMI_FEATURE_REGISTER_0_NUM_BPS);
-+	u32 wps = u64_get_bits(rmi_feat_reg(0), RMI_FEATURE_REGISTER_0_NUM_WPS);
-+	u32 ctx_cmps;
-+
-+	/* Ensure CTX_CMPs is still valid */
-+	ctx_cmps = FIELD_GET(ID_AA64DFR0_EL1_CTX_CMPs, val);
-+	ctx_cmps = min(bps, ctx_cmps);
-+
-+	val &= ~(ID_AA64DFR0_EL1_BRPs_MASK | ID_AA64DFR0_EL1_WRPs_MASK |
-+		 ID_AA64DFR0_EL1_CTX_CMPs);
-+	val |= FIELD_PREP(ID_AA64DFR0_EL1_BRPs_MASK, bps) |
-+	       FIELD_PREP(ID_AA64DFR0_EL1_WRPs_MASK, wps) |
-+	       FIELD_PREP(ID_AA64DFR0_EL1_CTX_CMPs, ctx_cmps);
-+
-+	return val;
-+}
-+
- static int get_start_level(struct realm *realm)
- {
- 	return 4 - stage2_pgtable_levels(realm->ia_bits);
+ 	realm->ia_bits = VTCR_EL2_IPA(kvm->arch.mmu.vtcr);
+@@ -520,6 +521,8 @@ static int realm_create_rd(struct kvm *kvm)
+ 	params->rtt_level_start = get_start_level(realm);
+ 	params->rtt_num_start = pgd_size / PAGE_SIZE;
+ 	params->rtt_base = kvm->arch.mmu.pgd_phys;
++	params->num_bps = SYS_FIELD_GET(ID_AA64DFR0_EL1, BRPs, dfr0);
++	params->num_wps = SYS_FIELD_GET(ID_AA64DFR0_EL1, WRPs, dfr0);
+ 	params->hash_algo = RMI_HASH_SHA_256;
+ 
+ 	if (kvm->arch.arm_pmu) {
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 5d5c579d4579..e0fe9f2562bc 100644
+index e0fe9f2562bc..e47be8f8d259 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -2142,6 +2142,9 @@ static u64 sanitise_id_aa64dfr0_el1(const struct kvm_vcpu *vcpu, u64 val)
- 	/* Hide BRBE from guests */
- 	val &= ~ID_AA64DFR0_EL1_BRBE_MASK;
+@@ -2174,6 +2174,9 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+ {
+ 	u8 debugver = SYS_FIELD_GET(ID_AA64DFR0_EL1, DebugVer, val);
+ 	u8 pmuver = SYS_FIELD_GET(ID_AA64DFR0_EL1, PMUVer, val);
++	u8 bps = SYS_FIELD_GET(ID_AA64DFR0_EL1, BRPs, val);
++	u8 wps = SYS_FIELD_GET(ID_AA64DFR0_EL1, WRPs, val);
++	u8 ctx_cmps = SYS_FIELD_GET(ID_AA64DFR0_EL1, CTX_CMPs, val);
  
-+	if (vcpu_is_rec(vcpu))
-+		return kvm_realm_reset_id_aa64dfr0_el1(vcpu, val);
-+
- 	return val;
- }
+ 	/*
+ 	 * Prior to commit 3d0dba5764b9 ("KVM: arm64: PMU: Move the
+@@ -2193,10 +2196,11 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+ 		val &= ~ID_AA64DFR0_EL1_PMUVer_MASK;
  
+ 	/*
+-	 * ID_AA64DFR0_EL1.DebugVer is one of those awkward fields with a
+-	 * nonzero minimum safe value.
++	 * ID_AA64DFR0_EL1.DebugVer, BRPs and WRPs all have to be greater than
++	 * zero. CTX_CMPs is never greater than BRPs.
+ 	 */
+-	if (debugver < ID_AA64DFR0_EL1_DebugVer_IMP)
++	if (debugver < ID_AA64DFR0_EL1_DebugVer_IMP || !bps || !wps ||
++	    ctx_cmps > bps)
+ 		return -EINVAL;
+ 
+ 	if (ignore_feat_doublelock(vcpu, val)) {
+@@ -2429,10 +2433,11 @@ static int set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ 	mutex_lock(&vcpu->kvm->arch.config_lock);
+ 
+ 	/*
+-	 * Once the VM has started the ID registers are immutable. Reject any
+-	 * write that does not match the final register value.
++	 * Once the VM has started or the Realm descriptor is created, the ID
++	 * registers are immutable. Reject any write that does not match the
++	 * final register value.
+ 	 */
+-	if (kvm_vm_has_ran_once(vcpu->kvm)) {
++	if (kvm_vm_has_ran_once(vcpu->kvm) || kvm_realm_is_created(vcpu->kvm)) {
+ 		if (val != read_id_reg(vcpu, rd))
+ 			ret = -EBUSY;
+ 		else
 -- 
 2.43.0
 
