@@ -1,152 +1,341 @@
-Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11023085.outbound.protection.outlook.com [40.93.196.85])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DFB82F619D
-	for <kvmarm@lists.linux.dev>; Wed, 15 Jul 2026 13:55:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.196.85
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784123721; cv=fail; b=QYJmru7caAZpPvWcxN0zzu8GjbqvrsPYJMOuFqBH8lO9kmDX3TNI4UxkrGtXvZIrENhtEO6L19YlsOtn9bmDDxgfm4T6WIKQiTC6cJJ/cz2+u9J/5P+WoGCPUdptrCmWzZe5v0Tm+V4d+2dU/zYd/Xp0DcT1U+kvGWdZn36/CTw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784123721; c=relaxed/simple;
-	bh=YF9LBUCx1FLsvxFG1Rx2tJwuuVBcGhwtNZshZqzn+h0=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 Content-Type:MIME-Version; b=YuJKlBc6BYnyXy7cvFiFKZF16T9akthqVne7shvbs9si2d3j0UVhb9exjvI1+OICtzfKfA52ck6BLmBHTPJPuCOMmGRgJbOH8LyR6WJHT8tL5OIVWiMqvHbc2+dJpHzbjLC37xSP6+LI3lqqHWjMYPvatHFSUf3cJ0n0EmmQNq4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b=L266C5rd; arc=fail smtp.client-ip=40.93.196.85
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BC17360EFF;
+	Wed, 15 Jul 2026 14:06:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784124416; cv=none; b=pngupLVWo2Tauycfy6vC29D2uZHt0vKZkLOYcEA7KLsweHEqZOVcqe8dYWobF24qIYAjRaOJKLeHezWAeU73qpF0+lF7Rt3q4BVNg7z9VwE577/Z6EDdMlPh1OLob4wtQcC0E5MPRnttAge0ujMsHTVk3xXpEDpNXRMMYE9BVKo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784124416; c=relaxed/simple;
+	bh=1ZeNg9YTuPw/AmC+GZRY0j4BvPPBnhLsNmw1jbgJg7Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ljw85wJboRFsXupkAfQ9mz8M+cpLl2OhBltrAY2v07g5VsDP4STraXBPwaqjgEr8serOXsFFY4j9VsyWt6fNEk02OeLk+7CfsfcKoFIF5jpfdKhsKgWcJNBK+gcRx7mvTl+MTNgNRMYiwfPFgSvWneXz1WRjzICCYXGDjS18l9E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=qFS5q/GE; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="L266C5rd"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=xwWdQAd13oB66ag0nT67Xa9gzT+GpDKfcHOqM2clr8APf1HChT5l6LZ1jq2d87L+L7JvnOA6gden2tVukZEikbcDpKWG8YsUObHv3E4EObaO5zVru3quFmjq+qNenJIFsU9Bh5nwr9SEKeqLxAjcOjLyVnqQCkabQxUjzxF6eRc7sc8si1Yvy5B4kdCP6A57/jIw7yOstYJdpWCViCWXTvop2VDG1jjxSozIKPL2WGwUplIOKM8qAwS7IS2cKZstOlzMppcCbmWun8Kw3lUeAKbGxLyvE8On9Nc4z3HRV+aWIKqvVSZPdPmmRcjcmw9ksMIfnb1sRS2mocE8q7Bu8g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=q0lavJMDRzh03hmhWzKL3UsDeEWGNzJ/rNkAa57IFNM=;
- b=MlK33UIWl2UKQEN/pK4a//3jCEn2LlAibc8wXMtj0EPnnMFfMAaCj+3+Rw3TpmGIomSrlRFbFkuLZg4MWIX1ThaJ5ReQLd4DNW/k93QH9swy4sfN600OcrCCf4MpPucLt3jJOE6dv+W2cxVdjeEonrBDXyn/0wp1BPa0R6hbvNhaJ1MoVkzMHcXUUMmT7xe5w+UF3bBSul3EPl3djBTAw3yoOd0LFvPSmfH6eoPg2bDL2fO1xdU9aks5F91CwuPYNtbo92/tSEeJ3mX0pY2BCOlL3HSAMjULwzpQk/Sjzoi2wcFXdxUfYlpp3b6QfF83cT1jROZqeYtELFnmgBshoA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
- header.from=os.amperecomputing.com; dkim=pass
- header.d=os.amperecomputing.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=os.amperecomputing.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=q0lavJMDRzh03hmhWzKL3UsDeEWGNzJ/rNkAa57IFNM=;
- b=L266C5rd7OMNF67rwcuOab7Gq10OoCw7pqw7/5V+lmhU5HrXuaWvaxPZhupHaSW5vXeLcxzGwneh/jLQ5o1xzounRpaWN07s7myVAuXcwReFNa1or/+z5tq6c4AMxY/fMEDgJZrwHFm4Wv3wakAwTP8mt+LetAqMa3kyZ4Gl/Tg=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
-Received: from LV2PR01MB7792.prod.exchangelabs.com (2603:10b6:408:14f::10) by
- MW4PR01MB6290.prod.exchangelabs.com (2603:10b6:303:70::15) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.202.18; Wed, 15 Jul 2026 13:55:13 +0000
-Received: from LV2PR01MB7792.prod.exchangelabs.com
- ([fe80::3ee4:7b7c:ee84:7c1a]) by LV2PR01MB7792.prod.exchangelabs.com
- ([fe80::3ee4:7b7c:ee84:7c1a%4]) with mapi id 15.21.0223.008; Wed, 15 Jul 2026
- 13:55:12 +0000
-From: D Scott Phillips <scott@os.amperecomputing.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>, Catalin Marinas
- <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Jonathan Corbet
- <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, Joey Gouly
- <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, Suzuki K
- Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, Mark
- Rutland <mark.rutland@arm.com>, Zeng Heng <zengheng4@huawei.com>, Wei Xu
- <xuwei5@hisilicon.com>, Vladimir Murzin <vladimir.murzin@arm.com>, Lucas
- Wei <lucaswei@google.com>, Kuninori Morimoto
- <kuninori.morimoto.gx@renesas.com>, Sascha Bischoff
- <Sascha.Bischoff@arm.com>, Yicong Yang <yangyicong@hisilicon.com>, Yeoreum
- Yun <yeoreum.yun@arm.com>, linux-arm-kernel@lists.infradead.org,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- kvmarm@lists.linux.dev
-Subject: Re: [PATCH] arm64: errata: Mitigate AmpereOne erratum AC03_CPU_57
- and AC04_CPU_29
-In-Reply-To: <86a4rso2qs.wl-maz@kernel.org>
-References: <20260710222128.416581-1-scott@os.amperecomputing.com>
- <87mrvy5640.wl-maz@kernel.org>
- <86jyqx189z.fsf@scott-ph-mail.amperecomputing.com>
- <86a4rso2qs.wl-maz@kernel.org>
-Date: Wed, 15 Jul 2026 06:55:08 -0700
-Message-ID: <86h5m01hoj.fsf@scott-ph-mail.amperecomputing.com>
-Content-Type: text/plain
-X-ClientProxiedBy: MW4PR04CA0198.namprd04.prod.outlook.com
- (2603:10b6:303:86::23) To LV2PR01MB7792.prod.exchangelabs.com
- (2603:10b6:408:14f::10)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="qFS5q/GE"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ABD0F1477;
+	Wed, 15 Jul 2026 07:06:48 -0700 (PDT)
+Received: from [10.1.25.27] (e122027.cambridge.arm.com [10.1.25.27])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 73C703F7B4;
+	Wed, 15 Jul 2026 07:06:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1784124412; bh=1ZeNg9YTuPw/AmC+GZRY0j4BvPPBnhLsNmw1jbgJg7Y=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=qFS5q/GEJBFM5qm1yviVBB20cZjHISg0vJ8nxqcQRXasfZg1u3OjdqRliIqw9JYsV
+	 LPp+Iy5h4umC2YCdohZ+MSbdfnQEob8eaowep9qLC2vtu6yAHTkZxT7pqmPBouYvn3
+	 5INR4WzBfrCmMJuk21PrysPuWCAIeqSAu0xZ5FdI=
+Message-ID: <b605b7bc-7d0f-478a-8df4-ef1bea67c8fb@arm.com>
+Date: Wed, 15 Jul 2026 15:06:43 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR01MB7792:EE_|MW4PR01MB6290:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4f4ef272-7d89-49cf-d5ba-08dee278b0d9
-X-MS-Exchange-AtpMessageProperties: SA
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|1800799024|366016|376014|23010399003|55112099003|18002099003|22082099003|10067099003|4143699003|56012099006|11063799006;
-X-Microsoft-Antispam-Message-Info:
-	P9wOz9yblJ9a/DbN+eYwgzCrTeh/QmF6MbSl0ZW+ZtA2Z1pwwf+qAlyRcirlIdE6XWZmUzKYpOam6wIKGDbInUxSlp6r7qJotsFFL9y3nD+qLMC4QTPIrCnW0RJ2sKfsPn85/6CsmD3qPso34pd1Tr2ZvPz9+NXS8WhiSc2W4br45jBeiw+OxE6/2jmEYIu+TLtxR/Ucw6FVr/OMyKdb7/C72kJ6CAsjxgbudpeLblDLDsT+WRJuRdCWeC4IgaAMvf8ar6BXEz9FaQMccsY/CCAjP/AUdhm6L/+3+08P5L/xm2fr3oQ7GPe6Vi+7GsifNUB7T02a99xau5uUTFaqaaJZ/eh+j3ejJ49LK9eydYiux4dydgSDGlwpeukTTBjUZA9pT9owpEbeTKzFhUfHpT/c7S0XFOO8lCvYsh+pxE128B6MhzHhjKgYmaVxLtpNTd5nqmPPG1+OJP4o5oURlzRZXKDlMAe30kiOAr2Z3ETffotw+tibsYrvzDMXB7rRmjl+i4zJN91XAosNCvuze4UB+154rHDGSkevYFkF3c820NCAL8ScQFAo+OgbmyYDKdU7FSGFAEuFS7AejkOBMTdatfOWcyO61ryKYbDZQ9SkSwQsHl2/j2vvJqcczzojPSiDvYDHMVgtKGjsNoqKUmmpfxnzW75KQl3fe6Q0WjY=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR01MB7792.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(366016)(376014)(23010399003)(55112099003)(18002099003)(22082099003)(10067099003)(4143699003)(56012099006)(11063799006);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?IrsuWdWrIy64EXcSEc12HFyMrbhMokKftPIIq8SoVzlN+kwg0qbeNkrioKR3?=
- =?us-ascii?Q?p8rwzXBBOfTIezSbK9xpLFzNOkJ8ZCP7eY7XFGwm37qNbmNOg9vCtpCe1wrn?=
- =?us-ascii?Q?f+yDolVMnHxXki9ut8lYloevHHvvC/o6qq+2gdhUEv4lldcOwG7eYzIzOJyh?=
- =?us-ascii?Q?DcY9IkZT+CFBQTetzs/PDC07VTuGTUdI3TwYYqWeSCRwLifdgLrb3mADiuX+?=
- =?us-ascii?Q?n+UJOprGrNBwGlgqspfGfcElD0LHmAlCag++zUniJEtslDpQYgOQf1E+2L5H?=
- =?us-ascii?Q?PqzoCPUDxZ7mlucTXlyNmhgtERdcRvicEsairB/H7HoK8IlvLoZ228ZJjO25?=
- =?us-ascii?Q?exW37CIh8rVOX3VCKoaTAgOvo8eTistinttFVWXw/SD4B+4oEK6PTEd6V4Bf?=
- =?us-ascii?Q?gahEtpUVM3vIjIgNHWPGe4Om3u0E0076wRrsOUNGzxcjrnietJfhqXQwKjGZ?=
- =?us-ascii?Q?RstAWaov+HOkQ6X3KwOrYU27k6W0U5cjsuc6kmeZJ6RzEdZyzG6RRLiktBfj?=
- =?us-ascii?Q?fUCDlvT13cRASDIwGFLxxWs6C5e1NK09zI6YqsK4IRTCNcrrusLHLmpfJL5k?=
- =?us-ascii?Q?a7b/vOKtm5Gn749UxqVkSRFYVMlgi5O/3zFgkN6YoykK9iBPmg98g5B4/7S6?=
- =?us-ascii?Q?RLnKYhlp+v34Oj+BR8JhtD/x5AwkXLKVYBNi1TYvrvZBdJK3B9l7/kppWC6f?=
- =?us-ascii?Q?+dhgmA48TlZ/Zu1KAc/cfvQ43JaSg0MMXRscVzub+yROEEGR6uiYhB1wYQSW?=
- =?us-ascii?Q?V0+LZQpPKr0Bpc5I6bhSd+/5VDg0ukU21e0AO+Dc0ONPOBk9uFoKl5UtfxN7?=
- =?us-ascii?Q?oq2Uaqeme5YI/KJGBvGM96tBquYCKC3Qlivnkk7N4ll6kXDq2fKie/tETGxg?=
- =?us-ascii?Q?og45uunj/aDJPBl3NyK74ZW8Kt13nnCp3ZyiAxlH6Zn33MXgbnVSejVF8Hv0?=
- =?us-ascii?Q?FhylqmrbtujT66XE53gIWNqC/4XJkFfJbKNWHRkqCfHDgkW+qpLr4TYxiH8R?=
- =?us-ascii?Q?VbDNULBtRytJ/HDwmDycEA/hRg2qUrtgOoJTUOvWwzsUCsPmQE/0vzRNwVuF?=
- =?us-ascii?Q?h8dP0zzmUt0P5X7kf8XRv7Ftzt/acj5H0LneofTFnstCt0I3RqoM5ulOLrmq?=
- =?us-ascii?Q?DtXIyQVwYwLsBLWzIkAnq5wKY1R3x6ri3EE7Y1Ibmi9i1p0JQp7RdarwInKD?=
- =?us-ascii?Q?67Ef2GcSVId5JQwWI9+9OUSeVRQ9EAlDVUaTTeLMa/KTUwfO0Eoat8Kaq7M9?=
- =?us-ascii?Q?dsNqLrPfN5Do8fkuSgiE79L0x5+6YWMrLxnSETwvK0Xw+QIj2P82E5kX8r6+?=
- =?us-ascii?Q?w6YZW9subZTcY5j5DmHbZt4HWja4l2RmR3hxvdT8c7FyHiPkeLTHdxBN4clC?=
- =?us-ascii?Q?aMGhcfLYXQLY7xlh5X4hWAysZFbE0SRdn12cFDioBC4OIpJ5MyEPU3xN1XWA?=
- =?us-ascii?Q?xyvo1KzoyCNbcudQbmloJXzrsbQjGJMtr+xiFdzDY4urdab5Dqd1uCaysU16?=
- =?us-ascii?Q?3iTe24BN3f+8sreMc5XL76xlDATB7HdlnaDOFu/9UeJbgRbMr36gjDlUFURx?=
- =?us-ascii?Q?zXKzdR1pFglcNSBm/ijmfjtcMm1yLpylO0WBEDgqWpRevBN/9Cx/6BOTF41R?=
- =?us-ascii?Q?zgwErPvSx8lqhpewi/foV3abPN161d8ZJdifkHoqggmhdID/bYSq1oD2R6yC?=
- =?us-ascii?Q?yc4uxvewmu4iLGSwvJjTeJTc4qYTJFN8RtQ4HaqoCnicP/xcdei5bSGdfUaA?=
- =?us-ascii?Q?88iJo5VWmQtKDHFwCNYNFhUk3VU7f3g=3D?=
-X-OriginatorOrg: os.amperecomputing.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4f4ef272-7d89-49cf-d5ba-08dee278b0d9
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR01MB7792.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jul 2026 13:55:12.7536
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: oBO7ei6ljzHkRK0xjyCxWbngRJHC1OQKObfj5GcVGauOxf2GRJRmMyICKQ44m1TulfAJYRFIuUzZG+xbr0bsVwOo6clWXTnWteENj+O7n2m5JiKCtxVZqPdyyv8fvWnb
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR01MB6290
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v14 26/44] arm64: RMI: Allow populating initial contents
+To: Kohei Enju <enju.kohei@fujitsu.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
+ Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
+ Lorenzo.Pieralisi2@arm.com
+References: <20260513131757.116630-1-steven.price@arm.com>
+ <20260513131757.116630-27-steven.price@arm.com>
+ <alWzvLK1RRotK1LL@FCCLS0092175.localdomain>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <alWzvLK1RRotK1LL@FCCLS0092175.localdomain>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Marc Zyngier <maz@kernel.org> writes:
+On 14/07/2026 05:37, Kohei Enju wrote:
+> On 05/13 14:17, Steven Price wrote:
+>> The VMM needs to populate the realm with some data before starting (e.g.
+>> a kernel and initrd). This is measured by the RMM and used as part of
+>> the attestation later on.
+>>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>> Changes since v13:
+>>  * Rename realm_create_protected_data_page() to realm_data_map_init().
+>> Changes since v12:
+>>  * The ioctl now updates the structure with the amount populated rather
+>>    than returning this through the ioctl return code.
+>>  * Use the new RMM v2.0 range based RMI calls.
+>>  * Adapt to upstream changes in kvm_gmem_populate().
+>> Changes since v11:
+>>  * The multiplex CAP is gone and there's a new ioctl which makes use of
+>>    the generic kvm_gmem_populate() functionality.
+>> Changes since v7:
+>>  * Improve the error codes.
+>>  * Other minor changes from review.
+>> Changes since v6:
+>>  * Handle host potentially having a larger page size than the RMM
+>>    granule.
+>>  * Drop historic "par" (protected address range) from
+>>    populate_par_region() - it doesn't exist within the current
+>>    architecture.
+>>  * Add a cond_resched() call in kvm_populate_realm().
+>> Changes since v5:
+>>  * Refactor to use PFNs rather than tracking struct page in
+>>    realm_create_protected_data_page().
+>>  * Pull changes from a later patch (in the v5 series) for accessing
+>>    pages from a guest memfd.
+>>  * Do the populate in chunks to avoid holding locks for too long and
+>>    triggering RCU stall warnings.
+>> ---
+>>  arch/arm64/include/asm/kvm_rmi.h |   4 ++
+>>  arch/arm64/kvm/Kconfig           |   1 +
+>>  arch/arm64/kvm/arm.c             |  13 ++++
+>>  arch/arm64/kvm/rmi.c             | 106 +++++++++++++++++++++++++++++++
+>>  4 files changed, 124 insertions(+)
+>>
+>> diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
+>> index 007249a13dbc..a2b6bc412a22 100644
+>> --- a/arch/arm64/include/asm/kvm_rmi.h
+>> +++ b/arch/arm64/include/asm/kvm_rmi.h
+>> @@ -88,6 +88,10 @@ int kvm_rec_enter(struct kvm_vcpu *vcpu);
+>>  int kvm_rec_pre_enter(struct kvm_vcpu *vcpu);
+>>  int handle_rec_exit(struct kvm_vcpu *vcpu, int rec_run_status);
+>>  
+>> +struct kvm_arm_rmi_populate;
+>> +
+>> +int kvm_arm_rmi_populate(struct kvm *kvm,
+>> +			 struct kvm_arm_rmi_populate *arg);
+>>  void kvm_realm_unmap_range(struct kvm *kvm,
+>>  			   unsigned long ipa,
+>>  			   unsigned long size,
+>> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+>> index 4e16719fda22..d0cd011cf672 100644
+>> --- a/arch/arm64/kvm/Kconfig
+>> +++ b/arch/arm64/kvm/Kconfig
+>> @@ -38,6 +38,7 @@ menuconfig KVM
+>>  	select GUEST_PERF_EVENTS if PERF_EVENTS
+>>  	select KVM_GUEST_MEMFD
+>>  	select KVM_GENERIC_MEMORY_ATTRIBUTES
+>> +	select HAVE_KVM_ARCH_GMEM_POPULATE
+>>  	help
+>>  	  Support hosting virtualized guest machines.
+>>  
+>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+>> index ed88a203b892..073ba9181da9 100644
+>> --- a/arch/arm64/kvm/arm.c
+>> +++ b/arch/arm64/kvm/arm.c
+>> @@ -2131,6 +2131,19 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
+>>  			return -EFAULT;
+>>  		return kvm_vm_ioctl_get_reg_writable_masks(kvm, &range);
+>>  	}
+>> +	case KVM_ARM_RMI_POPULATE: {
+>> +		struct kvm_arm_rmi_populate req;
+>> +		int ret;
+>> +
+>> +		if (!kvm_is_realm(kvm))
+>> +			return -ENXIO;
+>> +		if (copy_from_user(&req, argp, sizeof(req)))
+>> +			return -EFAULT;
+>> +		ret = kvm_arm_rmi_populate(kvm, &req);
+>> +		if (copy_to_user(argp, &req, sizeof(req)))
+>> +			return -EFAULT;
+>> +		return ret;
+>> +	}
+>>  	default:
+>>  		return -EINVAL;
+>>  	}
+>> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
+>> index a89873a5eb77..209087bcf399 100644
+>> --- a/arch/arm64/kvm/rmi.c
+>> +++ b/arch/arm64/kvm/rmi.c
+>> @@ -486,6 +486,75 @@ void kvm_realm_unmap_range(struct kvm *kvm, unsigned long start,
+>>  		realm_unmap_private_range(kvm, start, end, may_block);
+>>  }
+>>  
+>> +static int realm_data_map_init(struct kvm *kvm, unsigned long ipa,
+>> +			       kvm_pfn_t dst_pfn, kvm_pfn_t src_pfn,
+>> +			       unsigned long flags)
+>> +{
+>> +	struct realm *realm = &kvm->arch.realm;
+>> +	phys_addr_t rd = virt_to_phys(realm->rd);
+>> +	phys_addr_t dst_phys, src_phys;
+>> +	int ret;
+>> +
+>> +	dst_phys = __pfn_to_phys(dst_pfn);
+>> +	src_phys = __pfn_to_phys(src_pfn);
+>> +
+>> +	if (rmi_delegate_page(dst_phys))
+>> +		return -ENXIO;
+>> +
+>> +	ret = rmi_rtt_data_map_init(rd, dst_phys, ipa, src_phys, flags);
+>> +	if (RMI_RETURN_STATUS(ret) == RMI_ERROR_RTT) {
+>> +		/* Create missing RTTs and retry */
+>> +		int level = RMI_RETURN_INDEX(ret);
+>> +
+>> +		KVM_BUG_ON(level == KVM_PGTABLE_LAST_LEVEL, kvm);
+>> +
+>> +		ret = realm_create_rtt_levels(realm, ipa, level,
+>> +					      KVM_PGTABLE_LAST_LEVEL, NULL);
+>> +		if (!ret) {
+>> +			ret = rmi_rtt_data_map_init(rd, dst_phys, ipa, src_phys,
+>> +						    flags);
+> 
+> I think rmi_rtt_data_map_init() returns a raw RMI return value which is
+> positive on failure. Shouldn't it be converted to -ENXIO or another
+> Linux errno before returning it?
+> 
+> Otherwise, the positive error value can propagate through
+> kvm_gmem_populate() and populate_region() to kvm_arm_rmi_populate().
+> There, it would be treated as the number of pages populated, even though
+> the operation did not populate any pages.
 
-> On Wed, 15 Jul 2026 00:06:00 +0100,
-> D Scott Phillips <scott@os.amperecomputing.com> wrote:
->> 
->> > OK, that's pretty good news. Can I safely assume that your HW doesn't
->> > support VLPIs/VSGIs in any form (no GICv4+)?
->> 
->> AmpereOne AC04 does have gicv4.1 with vlpis/vsgis. Those take a
->> different enough path in the core that a deactivation of a pending
->> vlpi/vsgi won't cause the issue. The wording about "physical interrupt"
->> is meant to exclude vlpis/vsgis, sorry that it didn't come out clearly.
->
-> Given that the write-up didn't mention direct injection at all, it
-> wasn't totally obvious whether this was taken into account or not.
-> Might be worth adding to the errata document for clarity.
+Good spot.
 
-Yep, makes sense. I'll work on getting that clarification added.
+>> +		}
+>> +	}
+>> +
+>> +	if (ret) {
+>> +		if (WARN_ON(rmi_undelegate_page(dst_phys))) {
+>> +			/* Undelegate failed, so we leak the page */
+>> +			get_page(pfn_to_page(dst_pfn));
+> 
+> Since realm_create_rtt_levels() returns either 0 or a negative errno,
+> how about preserving that error and converting any raw RMI erorr to
+> -ENXIO here?
+> 
+> 		return ret < 0 ? ret : -ENXIO;
+
+Makes sense, although this needs to be:
+
+	return ret <= 0 ? ret : -ENXIO;
+
+to handle the ret==0 case. I'll fix this in my next posting.
+
+>> +		}
+>> +	}
+>> +
+>> +	return ret;
+>> +}
+>> +
+>> +static int populate_region_cb(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn,
+>> +			      struct page *src_page, void *opaque)
+>> +{
+>> +	unsigned long data_flags = *(unsigned long *)opaque;
+>> +	phys_addr_t ipa = gfn_to_gpa(gfn);
+>> +
+>> +	if (!src_page)
+>> +		return -EOPNOTSUPP;
+>> +
+>> +	return realm_data_map_init(kvm, ipa, pfn, page_to_pfn(src_page),
+>> +				   data_flags);
+>> +}
+>> +
+>> +static long populate_region(struct kvm *kvm,
+>> +			    gfn_t base_gfn,
+>> +			    unsigned long pages,
+>> +			    u64 uaddr,
+>> +			    unsigned long data_flags)
+>> +{
+>> +	long ret = 0;
+>> +
+>> +	mutex_lock(&kvm->slots_lock);
+>> +	ret = kvm_gmem_populate(kvm, base_gfn, u64_to_user_ptr(uaddr), pages,
+>> +				populate_region_cb, &data_flags);
+>> +	mutex_unlock(&kvm->slots_lock);
+>> +
+>> +	return ret;
+>> +}
+>> +
+>>  enum ripas_action {
+>>  	RIPAS_INIT,
+>>  	RIPAS_SET,
+>> @@ -574,6 +643,43 @@ static int realm_ensure_created(struct kvm *kvm)
+>>  	return -ENXIO;
+>>  }
+>>  
+>> +int kvm_arm_rmi_populate(struct kvm *kvm,
+>> +			 struct kvm_arm_rmi_populate *args)
+>> +{
+>> +	unsigned long data_flags = 0;
+>> +	unsigned long ipa_start = args->base;
+>> +	unsigned long ipa_end = ipa_start + args->size;
+>> +	long pages_populated;
+>> +	int ret;
+>> +
+>> +	if (args->reserved ||
+>> +	    (args->flags & ~KVM_ARM_RMI_POPULATE_FLAGS_MEASURE) ||
+>> +	    !IS_ALIGNED(ipa_start, PAGE_SIZE) ||
+>> +	    !IS_ALIGNED(ipa_end, PAGE_SIZE) ||
+>> +	    !IS_ALIGNED(args->source_uaddr, PAGE_SIZE))
+>> +		return -EINVAL;
+>> +
+>> +	ret = realm_ensure_created(kvm);
+>> +	if (ret)
+>> +		return ret;
+> 
+> If I understand correctly, concurrent KVM_ARM_RMI_POPULATE calls can
+> race with each other in realm_ensure_created(). 
+> 
+> realm_ensure_created() calls realm_create_rd() when kvm_realm_state() ==
+> REALM_STATE_NONE. Since kvm->arch.config_lock is not held here, multiple
+> threads could enter realm_create_rd() concurrently.
+> 
+> KVM_ARM_RMI_POPULATE can also race with KVM_RUN through
+> kvm_activate_realm(). kvm_activate_realm() takes kvm->arch.config_lock
+> while checking the Realm state, calling realm_ensure_created(), and
+> updating the state, whereas KVM_ARM_RMI_POPULATE does not.
+> 
+> How about serializing Realm creation here as follows?
+> 	scoped_guard(mutex, &kvm->arch.config_lock) {
+> 		ret = realm_ensure_created(kvm);
+> 		if (ret)
+> 			return ret;
+> 	}
+> 
+> Does that make sense?
+
+Yes this is a bug I'd already caught and is due to the fixed in my next
+posting - similar to what you suggest the config_lock is now held when
+realm_ensure_created() is called (and I've put a lockdep_assert_held()
+in realm_ensure_created).
+
+Thanks,
+Steve
+
+>> +
+>> +	if (args->flags & KVM_ARM_RMI_POPULATE_FLAGS_MEASURE)
+>> +		data_flags |= RMI_MEASURE_CONTENT;
+>> +
+>> +	pages_populated = populate_region(kvm, gpa_to_gfn(ipa_start),
+>> +					  args->size >> PAGE_SHIFT,
+>> +					  args->source_uaddr, data_flags);
+>> +
+>> +	if (pages_populated < 0)
+>> +		return pages_populated;
+>> +
+>> +	args->size -= pages_populated << PAGE_SHIFT;
+>> +	args->source_uaddr += pages_populated << PAGE_SHIFT;
+>> +	args->base += pages_populated << PAGE_SHIFT;
+>> +
+>> +	return 0;
+>> +}
+>> +
+>>  static void kvm_complete_ripas_change(struct kvm_vcpu *vcpu)
+>>  {
+>>  	struct kvm *kvm = vcpu->kvm;
+>> -- 
+>> 2.43.0
+>>
+>>
+
