@@ -1,97 +1,120 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED1302F84F
-	for <kvmarm@lists.linux.dev>; Wed, 15 Jul 2026 00:17:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7F002BDC26
+	for <kvmarm@lists.linux.dev>; Wed, 15 Jul 2026 06:29:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784074638; cv=none; b=I5Ob1qUKNeITLiz1RQngcT/9MrkV1htkqv6i4veeO1z9NX2dlE4eAL/aByZrgawXLgl2qxa6QE5OKOkS4ouKT+tdsFwgNmZWA0p6CxxuVtx22jWQptzlGOtLpYpZrAGBVWkQzbWX9Uf91eNu4AlB8iZcxZMnU4M8M4v48AxVzUk=
+	t=1784096954; cv=none; b=d6VP3ycnWQPJ4sBMp/8nFkFg14QLYO29j4nqFx+6SZUsx4xBH7AAV4dP57PbMLXcawDscEVx/H5GbIhKNR8Jg5pBnJHAT71fK9/pX3PypXfggbWiFU8SVndHsJ1PspGnnZ1Lr+or7g8NfKTQj/kD9U9SoBeJDnHTHH+AP+EscKA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784074638; c=relaxed/simple;
-	bh=yKfQ0GflKniKbcTiQEcokqqiBLZSSKEnGRM/ps+7LEw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i7uIiLgKL308YVAYhFX0KdEGPnkKb5KwGSOflvauyQMppXaXCh5Ei/ImRmNe+t0E9nPP9aiQv7dW68VmJAycjTycbayXBldndQ1Y/kUVLiOKjvvwjun1HVD+nMrqU83vndrrw7pK8KxkwHjnMIxaDbrUcFqX7LoPvqZk937NCDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=fRua4iHZ; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1784096954; c=relaxed/simple;
+	bh=blIVwwmkQUYplqZOvB7hE/t6rdKn6RDU0ldgx3zBgyQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uDwCLj1iHVS1EMSE2YwHYPsPcXWEoG8CgctoVHO/yk3sIeSuXQe7v7NBMFpE/yuvgGehOx62ohgMZ2RPLO0D7C9JYpPM++EV3ilxMUTM6CWCBDAsWCwDzFvodbDd2ENxaOxKr0UDNFsGgGr3gZEWijI3P4GjgNXp/PfnaV6znbU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=o/6dLxkn; arc=none smtp.client-ip=91.218.175.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="fRua4iHZ"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3B1BE339;
-	Tue, 14 Jul 2026 17:17:09 -0700 (PDT)
-Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C67573F7D8;
-	Tue, 14 Jul 2026 17:17:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1784074633; bh=yKfQ0GflKniKbcTiQEcokqqiBLZSSKEnGRM/ps+7LEw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fRua4iHZvThGUR/J15sDSpBSVZDSq6MoZM6eoRmjBJ/YIJW0HpdFfris79gLUuOcR
-	 HE43sySB5EsjwfP/Q3jUaSMJgqZwaUahQJAFu2eNtvT60+DnwWfLtA8L3x7bA8oUYW
-	 EXfqwaFXdu3vj+FUWVM1qh3SEn8n+cPYopQ8l2cw=
-Date: Wed, 15 Jul 2026 01:16:44 +0100
-From: Wei-Lin Chang <weilin.chang@arm.com>
-To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-Cc: Steffen Eiden <seiden@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oupton@kernel.org>, 
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v2 25/28] KVM: arm64: Engage NV3 TLBI trap elision
-Message-ID: <nre6kiamcmf4azxni5def5kd5p74ia7rp7ynenpyczqticjcof@4inxwalqfyth>
-References: <20260714091641.1970822-1-maz@kernel.org>
- <20260714091641.1970822-26-maz@kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="o/6dLxkn"
+X-Forwarded-Encrypted: i=1; AHgh+Rqzdk4crbNE4UXRa1VjJSzKE1GceZxh/bMDIljJPow7fQGJVjSO2sxifiXaacSNdSlmSzUgzg4=@lists.linux.dev
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1784096950;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6EkGPun7Mf1SwMti55JzBEC0aSDCyjyMtJCBge++9uc=;
+	b=o/6dLxknLx12EJSSHGZhUloAriu1lpLWZcJci27ByOPHnLS7XxcNZyAQcz1NxQL+yS2zvU
+	pUPZEB153DD+Kd3dIrSxGTpOz1Q9dvprkR9K24E6ituzpck8KDTEj3YDwnda1SzIlY9t+q
+	TgG2rhehB+pJNh6Xmfm1+j/TI0m0zXI=
+X-Gm-Message-State: AOJu0Ywba31RVc8dbn0rvgUPPPuVybWHO7yW0Aw4JuDfmjpQNiovn+uT
+	VnSu3OsjX9UShkUKkNL8sNPtnnlbdN4jm33Zk6wfCs5OiHUb90bCyzrpf0G8Y/INNQ2t7nUxLln
+	8alZC8SXYiENxiZY3evdaXS92cLyL6BUqTkK+Dk0k
+X-Received: by 2002:a05:622a:2590:b0:50e:38f0:ccb2 with SMTP id
+ d75a77b69052e-51d7bd1d6damr24365831cf.15.1784096938033; Tue, 14 Jul 2026
+ 23:28:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260714091641.1970822-26-maz@kernel.org>
+References: <20260706175415.2604046-1-vdonnefort@google.com> <20260706175415.2604046-9-vdonnefort@google.com>
+In-Reply-To: <20260706175415.2604046-9-vdonnefort@google.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Wed, 15 Jul 2026 07:28:20 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTzCaEnOJnbDk_9GTo1N0U95zFTEw-HGyBetx3RkOfX4wA@mail.gmail.com>
+X-Gm-Features: AUfX_myt8i1XINmMoG2MOijeMuzd2suULSaK515-nalLslNoZEiQ5HOO1OeJh7I
+Message-ID: <CA+EHjTzCaEnOJnbDk_9GTo1N0U95zFTEw-HGyBetx3RkOfX4wA@mail.gmail.com>
+Subject: Re: [PATCH v2 08/18] KVM: arm64: Handle PKVM_HYP_REQ_HYP_ALLOC request
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
+	will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kernel-team@android.com, qperret@google.com
+Content-Type: text/plain; charset="UTF-8"
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Jul 14, 2026 at 10:16:38AM +0100, Marc Zyngier wrote:
-> Similarly to the ERET elision mechanism, FEAT_NV3 can elide TLBIs
-> that only affects the guest's S1 translation. Enable this, with the
-> express condition that the guest isn't NV2 aware, as we otherwise
-> need to trap these TLBIs to deal with VNCR mappings.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_emulate.h | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index b32870a5e1236..d17b161d4ba3a 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -715,6 +715,19 @@ static inline void vcpu_set_hcrx(struct kvm_vcpu *vcpu)
->  		if (cpus_have_final_cap(ARM64_HAS_NV3) &&
->  		    vcpu_has_nv(vcpu) && vcpu_el2_e2h_is_set(vcpu)) {
->  			vcpu->arch.hcrx_el2 |= HCRX_EL2_NVTGE;
+On Mon, 6 Jul 2026 at 18:54, Vincent Donnefort <vdonnefort@google.com> wrote:
+>
+> Introduce a new pkvm_hyp_request type asking the host to top up the pKVM
+> heap allocator.
+>
+> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+>
+> diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
+> index 0be1469e7874..99daa985856f 100644
+> --- a/arch/arm64/include/asm/kvm_pkvm.h
+> +++ b/arch/arm64/include/asm/kvm_pkvm.h
+> @@ -205,6 +205,7 @@ struct pkvm_mapping {
+>
+>  enum pkvm_hyp_req_type {
+>         PKVM_HYP_NO_REQ = 0,
+> +       PKVM_HYP_REQ_HYP_ALLOC,
+
+Now that the enum has a request type the tracepoint can actually fire
+for, would you be able to print it symbolically:
+TRACE_DEFINE_ENUM(PKVM_HYP_REQ_HYP_ALLOC) plus __print_symbolic() in
+kvm_handle_pkvm_hyp_req's TP_printk, so traces read HYP_ALLOC rather
+than a raw number. I'm referring to trace_pkvm.h from the previous
+patch.
+
+Cheers,
+/fuad
+
+
+
+>         __PKVM_HYP_REQ_TYPE_MAX,
+>  };
+>
+> @@ -226,9 +227,13 @@ struct pkvm_hyp_req {
+>
+>  static inline size_t pkvm_hyp_req_arg_size(u8 type)
+>  {
+> +       struct pkvm_hyp_req *req;
 > +
-> +			/*
-> +			 * If the guest is NV2-capable, then we need to see
-> +			 * all the TLBIs, as configured in HCR_EL2.
-> +			 * Otherwise, relax the TLBI traps to only TGE=0.
-> +			 */
-> +			if (!kvm_has_nv2(vcpu->kvm)) {
-> +				vcpu->arch.hcrx_el2 |= (HCRX_EL2_NVnTTLB   |
-> +							HCRX_EL2_NVnTTLBIS);
-> +
-> +				if (kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, OS))
-> +					vcpu->arch.hcrx_el2 |= HCRX_EL2_NVnTTLBOS;;
-> +			}
-
-I also suspected if this is dead code, but Sashiko had beat me to it :P
-So from your response in v1, is this code here just for completeness?
-
-It's amusing that we're not able to take advantage of this feature at
-all!
-
-Thanks,
-Wei-Lin Chang
-
->  		}
->  	}
->  }
-> -- 
-> 2.47.3
-> 
+>         switch (type) {
+>         case PKVM_HYP_NO_REQ:
+>                 return 0;
+> +       case PKVM_HYP_REQ_HYP_ALLOC:
+> +               return sizeof(req->mem);
+>         default:
+>                 WARN_ON(1);
+>         }
+> diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+> index 5ba8b81b8c6c..adc418076cb0 100644
+> --- a/arch/arm64/kvm/pkvm.c
+> +++ b/arch/arm64/kvm/pkvm.c
+> @@ -626,6 +626,9 @@ static int pkvm_handle_hyp_req(struct pkvm_hyp_req *req)
+>         int ret = -EINVAL;
+>
+>         switch (req->type) {
+> +       case PKVM_HYP_REQ_HYP_ALLOC:
+> +               ret = pkvm_hyp_topup(PKVM_TOPUP_HYP_ALLOC, req->mem.nr_pages);
+> +               break;
+>         }
+>
+>         trace_kvm_handle_pkvm_hyp_req(req, ret);
+> --
+> 2.55.0.rc2.803.g1fd1e6609c-goog
+>
