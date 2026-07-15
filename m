@@ -1,117 +1,111 @@
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 929E9388879
-	for <kvmarm@lists.linux.dev>; Wed, 15 Jul 2026 14:34:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E91739182F;
+	Wed, 15 Jul 2026 14:38:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784126058; cv=none; b=AMYO4ooGxrRkK1lV2p8RJps7wFG/b1ZbCgp6qYuVhocvAphSCqwjUDVgrn/UHxR+d7CuIoTOiFmX7QZjYwqNA/uS69qCc4OX3NYrwZNqgO9kXEWz7CdTmUvQJSDrtClGO1051K4zz2DeSqRKOHyRUX+KUJVgk4UWrJLrFSjxY+o=
+	t=1784126286; cv=none; b=X40VSfJhzSIxfaYdUkeZCyNJBLzvYK1lvY3TiWkyRFpGzCegYJslCKI80PVOXc2qxSQoNyUPBnLa+cIqJF5U6ZCOVBkqQM/N82rLllHjmwAQ2ht9fAZ+MZNVV+nw988fOFGN0a5IBH72n5gbZse9SGVt6yEfQmlTOOj6teb4epQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784126058; c=relaxed/simple;
-	bh=k8eKHIpCaaPLKTjtgUqCHzqXzJ9WDZ7k24XDEaWgMaw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p3SuSpDA/XK9+0ssC4QepptTpKlUwTuOCeReczyDJJM8lulMCnfsRXX59cDB5bxsrTPKEYa4gcWJKAGfFLq2kzFVKddxgW2lD4AyM75qJQoymHsVTeb5mvnZ7D9XHadXixdJjiiAyN3VZY/KTpXiR+wXoAL08r6iYb13EQQEGhw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iEU/jQv9; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1784126286; c=relaxed/simple;
+	bh=9aJAXcchJ+rfE/kpIHbVZ9K/PIeoh4HZqadIKM5TZgk=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=MbhDwAudFPDmYElkDM97cawPF4K79JCGExJvCRtpGoaynU5zh9Ui4aY5PH5b5Lu9Dl3WrNPVXxFCoIlFOMlhyEVZZqeMNmUa0eJdSXvrcHxIFD49ZERsUFhSnXjD0GDV4U4T/mvmKkGms1tyZGbXHo6nRQI8S8a5OutgjE2X/UA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gfbsuczh; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iEU/jQv9"
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-47de0093c42so1855851f8f.3
-        for <kvmarm@lists.linux.dev>; Wed, 15 Jul 2026 07:34:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1784126055; x=1784730855; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=knIg8/634584Ytue9vf6OuJG9Of4+644gUu2jDQuGXU=;
-        b=iEU/jQv9FWo56wu+l37oMd60MoHhZqc0izobT1lGiZk0ZU6D5c9GnPaJvE3E1aF1ip
-         hh4ajrhs2dzvWc8LLixIGcqp0tgtgc54wSnFzFXPOr/5f4v4Rjaru0ccAwakltvV42Eq
-         Kj8msDxPfOaDbDWgUA5RkKkYO34Zuz/IhCvlYrsMO73SZWSvY2qTlllE/CvNzz9b87OT
-         358ErdI1QG0a2mmyNSJAS1NCpUM70LMx963qjuj/iRrq5g8q3Mp31kyz6HzqzPhLsP0Q
-         54kxsbVktLBeTrVRR/5iiyv8qXDwpPjN8YppMSG6VfdQMRHziU4zYHYjIIuozXxrpwlv
-         U+Xw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784126055; x=1784730855;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=knIg8/634584Ytue9vf6OuJG9Of4+644gUu2jDQuGXU=;
-        b=qXhPBdc3FQqTWIX4+x2AdjwFNeWICGdKxMG3PP073UHcPdmZzcK+FpQxHrK9/ca7p+
-         L0Ba3nM/o98E1TaHRTW7ys1/yCgBik2pjVLim0RUDtnh630NAiM1Q4kRw67KOYkja15h
-         3z9Yp6d29CwyfzFB7eO+7mjD3TomFY4lG3jcqrh5RUeTqsO8ga1c2qptCKtSnBlkqsgd
-         jc7/IN50xgFvM/nvPC1dmZ+XfjwbW4GDkmggAW8E4asr0nIbYTGQqCn5MAjhw/pTepdc
-         kEXDjNvGVcjKhSf6uS++CretvFDVXkpWmaAk94Q0oh/Wgt1Srml7dolAs+SnWGBTsT4H
-         PbTw==
-X-Forwarded-Encrypted: i=1; AHgh+RrjXvpm0u/vio8XPcLNBCHQkBB0HTg35u8k902xKbM9pzka8gj9Hfhge8ANZMS9DSzXBGdnSxQ=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzzIdhqbm+LXRBwg0ufsogDCn4gzxqdziTSDiyrlCUjYpOniY4v
-	8X225zcgrLU1OqexKwly5agYBP2Q9ehGJlN4SD92aKvLbHVvapPMcNaQhYGNSTAA7Q==
-X-Gm-Gg: AfdE7ckSYqaGV6AwWPtdr/yJy3XlrkMyWysV3rSGnG4BuN6qPvumR7xb7+xlnncN0Ks
-	moAP6nWxLltW/267jTZyEEaQ8iXHQ4abuoyVVu+wn1GMxjBtRjXQEqTil+5zzm3U7aNC5uCjcAJ
-	BwbOmXnL4752r2lAr4y5IfCxZazwdLSWZWk9GPg3KhQnvd2csrer3yHn2MOmliyOs0GbBAI71yQ
-	LaLBxOA6VNTotKyeJJQQ+iRik036D20Oz9APDLcNd8GkuTlvogOfytvHtRi7w4uixysZpxWeK9/
-	vOsEkm/A3CGV2p14THev2T2rcLsnvHNQt8+Y9BqCvHBpm5U4fl/BHFV0UAcOHtrD/9u2wBfwmnu
-	hO7qF8m53H6EMGyfYdjoCyjfVJVRc6CAZpia9TeaVrCfyeQ9C4KhvvKRn5wDJpPPs7pN9lFJizl
-	/ApZJ3PgL8/t/xyotc+0aTLNckaltoEKfQxips/hndxyhIoPplcEOzdnyYVcfPuA==
-X-Received: by 2002:a05:6000:220e:b0:474:e0f2:905c with SMTP id ffacd0b85a97d-47f2dccb729mr19822692f8f.26.1784126054166;
-        Wed, 15 Jul 2026 07:34:14 -0700 (PDT)
-Received: from google.com (137.69.77.34.bc.googleusercontent.com. [34.77.69.137])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47f464a96cfsm17087436f8f.20.2026.07.15.07.34.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Jul 2026 07:34:13 -0700 (PDT)
-Date: Wed, 15 Jul 2026 15:34:09 +0100
-From: Vincent Donnefort <vdonnefort@google.com>
-To: Mostafa Saleh <smostafa@google.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, iommu@lists.linux.dev,
-	catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
-	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, joro@8bytes.org, jgg@ziepe.ca,
-	mark.rutland@arm.com, qperret@google.com, tabba@google.com,
-	sebastianene@google.com, keirf@google.com
-Subject: Re: [PATCH v7 01/24] KVM: arm64: Add a generic clock
-Message-ID: <aleaYVz5m19veRjT@google.com>
-References: <20260715115906.2664882-1-smostafa@google.com>
- <20260715115906.2664882-2-smostafa@google.com>
- <alePwq2eKV5g_7Gc@google.com>
- <aleVozZEcxiGE4Y3@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gfbsuczh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADDF41F000E9;
+	Wed, 15 Jul 2026 14:38:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1784126285;
+	bh=haHzTa+1fgT3vzs6VVQ/iPu/MW28WXGQBU/ZPKrQRtQ=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=GfbsuczhuAHAzcnmjR63XqP+D2Eq5GfXqgWE6Ep23IJNwTQDmHagAYc2LYfX+hgO2
+	 21W4+JUxn88IoedTbAK8FyQpcT89si0pxrLf/HayUDwDQigh1TXrJVcg2GE1O/IlOh
+	 2uzeYeRLe8TzgcE3nGZEPxjWCL8xc6RWxrwa2CtsWWsqm8Mbemf8IyrdAoFDxZEEKb
+	 Dzm8hp2/VjLyUGu5qOgF89J8HGEkS2ixIiOTVmZZJxuQM1QQLtUWZqLkqwIgrmzjPR
+	 ilV+XdlnG3g8hCsMqqREUIO8uGsvTGJlemYW4m1GDtVUgsZpCNAlyDrJS1MC1kFhXJ
+	 1yMbuMtSV7UIw==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH 1/6] firmware: arm_rmm: Add SMC definitions for calling
+ the RMM
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Steven Price" <steven.price@arm.com>
+Cc: "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, kvm@vger.kernel.org
+In-Reply-To: <20260715142739.80398-2-steven.price@arm.com>
+References: <20260715142739.80398-1-steven.price@arm.com>
+ <20260715142739.80398-2-steven.price@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 15 Jul 2026 14:38:04 +0000
+Message-Id: <20260715143804.ADDF41F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aleVozZEcxiGE4Y3@google.com>
 
-[...]
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+s) to consider:
+- [Low] `struct rec_exit` contains 4 bytes of implicit compiler padding bet=
+ween `padding9` and `plane`.
+- [Low] Discrepancy between the `PROT_MAP` macro prefix and the `DATA_MAP` =
+comment and SMC command name.
+--
 
-> > #define smmu_wait() {
-> >     static u32 window = arch_timer_get_cntfrq() / ARM_SMMU_EL2_POLL_TIMEOUT_US
-> >     u64 timeout = __arch_counter_get_cntvct() + window;
-> >     u64 cur;
-> > 
-> >     ...
-> > 
-> >     while (!(__cond)) {
-> >       ...
-> > 
-> >       cur = __arch_counter_get_cntvct();
-> >       if (cur >= timeout)
-> >           __ret = -ETIMEOUT;
-> > 
-> > 
-> > No risk of overflowing u64
-> > No init necessary
-> 
-> It believe init will be needed as caching arch_timer_get_cntfrq()
-> is much better that re-reading everytime. But I can make all of this
-> contained in the SMMUv3 driver and remove this patch.
+--- Patch [1]: [PATCH 1/6] firmware: arm_rmm: Add SMC definitions for calli=
+ng the RMM ---
+commit c161f24da1669945cb4dc961f3a3c4ef452450b6
+Author: Steven Price <steven.price@arm.com>
+firmware: arm_rmm: Add SMC definitions for calling the RMM
 
-That's why I have made window static :) (well of course it is per callsite...) 
+The RMM (Realm Management Monitor) provides functionality that can be
+accessed by SMC calls from the host.
 
-> 
-> Thanks,
-> Mostafa
-> 
+> diff --git a/include/linux/arm-smccc-rmi.h b/include/linux/arm-smccc-rmi.h
+> new file mode 100644
+> index 0000000000000..c965e8867518f
+> --- /dev/null
+> +++ b/include/linux/arm-smccc-rmi.h
+
+[ ... ]
+
+> +	union { /* 0x600 */
+> +		struct {
+> +			u16 imm;
+> +			u16 padding9;
+> +			u64 plane;
+
+[Severity: Low]
+Does this struct layout contain implicit padding? The sequence of two u16
+fields followed by a u64 field forces the compiler to inject 4 bytes of
+padding to align the plane field to an 8-byte boundary. While deterministic
+on ARM64, implicit padding in ABI structures shared with firmware is usually
+avoided. Should an explicit 32-bit padding field be added here?
+
+> +		};
+> +		u8 padding6[0x100];
+> +	};
+
+[ ... ]
+
+> +/* RMI_RTT_DATA_MAP_FLAGS definitions */
+> +#define RMI_RTT_PROT_MAP_FLAGS_OADDR_TYPE	GENMASK(1, 0)
+> +#define RMI_RTT_PROT_MAP_FLAGS_LIST_COUNT	GENMASK(15, 2)
+
+[Severity: Low]
+This isn't a bug, but there seems to be a naming discrepancy. The comment
+mentions RMI_RTT_DATA_MAP_FLAGS, which corresponds to the
+SMC_RMI_RTT_DATA_MAP command, but the macros are prefixed with
+RMI_RTT_PROT_MAP_FLAGS. Should these macros use the DATA_MAP prefix instead?
+
+> +
+> +/* S2AP Direct Encodings, used in RMI_RTT_UNPROT_MAP_FLAGS_S2AP */
+> +#define RMI_S2AP_DIRECT_WRITE			BIT(0)
+> +#define RMI_S2AP_DIRECT_READ			BIT(1)
+> +
+> +#endif /* __LINUX_ARM_SMCCC_RMI_H_ */
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260715142739.8039=
+8-1-steven.price@arm.com?part=3D1
