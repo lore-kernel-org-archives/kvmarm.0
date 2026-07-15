@@ -1,32 +1,32 @@
-Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
+Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5A312DCC1C
-	for <kvmarm@lists.linux.dev>; Wed, 15 Jul 2026 08:12:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF2223CAA51
+	for <kvmarm@lists.linux.dev>; Wed, 15 Jul 2026 08:12:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784103168; cv=none; b=t6Qj+kXXPMOCzppL/Oy+qFWCJqcHGrHq0LlITxaoOZQz8XxC4L+R+3cpDp2Ynf3HqMgjkClZiPRkUcYuAIW7Kxlj9jf0siWp6qZitDV2zVnwMpll1TzVRse0R+WuLEVoVz/aEoMYAa55n7HHb7kA+NhQtXIQpGA2JvG2DN9FgqU=
+	t=1784103170; cv=none; b=Y/Um8xiwYTRgdKN9SjAOWPwLuBD9E7FceGEkXSS3Y4NFYBtBkCxrvRb7pQ4AYafpIEkG68GAbzFUTcWbKjBZyOXbZ9pUUwlvf9uT4N2tl6OQTeWUUmp0KBJF3L/kW83APxcWQ7p/d2eHDGIif0OQXChNouAzx+X7K8Gjk0++nFQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784103168; c=relaxed/simple;
-	bh=dxjalqj5BqGRPZJJwgSTA+UoOThYr98Cj1w7xDsJj0k=;
+	s=arc-20240116; t=1784103170; c=relaxed/simple;
+	bh=ifSPWQtYb8Tfnx8ljRSFlpqZihdZjPjVUdNtREdVkY4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=JIAhF+5sZTOSXSQtvPlL2M1mdacyTB3oMQTbFRIMcfBcS2IOLekJl9XXmHhV/4Koutkg9HR4yavLTVq+lje0l3Thg5jRnVQsZHj0qXdkj3zDRYr3NIN8lPO2x45q0sx9zY3JDUxQXNK9JF+N8rg0kM+OEpe/i8I88sinnjkPXI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dXVr0GhC; arc=none smtp.client-ip=91.218.175.174
+	 MIME-Version; b=hOBV64u9DoO5LyJ0CoyhUqVgwfTGM/vHWKD397th08w5u+aF+WHpRLVbj5uO8EThlxkSVKetiuuvku9hbi8oANgXFeJSts+yCDG24t4y+QZlocauCsTkE5yDF4fdYmo1aWFaaeURZL0Yy60nzRg/3LNOG/BQ+5QwH2OCOt+1wnI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Mzs/oC0q; arc=none smtp.client-ip=91.218.175.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dXVr0GhC"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Mzs/oC0q"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1784103163;
+	t=1784103165;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=JD+xMDKjS2IygHN9Wf+Ijexh057Y2GhvdMNbnCBzQRE=;
-	b=dXVr0GhCMCHLN0CsdWGRFHLpskhM1jp/sJimFPOIYS/ugVZxsxg8HOrxXRgR/4i8I6povM
-	ryEUUDJGhB7KwWCZErS8wch2ii5Zml0fs5PUVczlo+I5oVq9k2rS0RFO7uW5WvKNUDNn4P
-	gRwvRCgdIt++JLOpprMH7PSwvszqR18=
+	bh=qxoy1Kzk49UcTJHO4dzJoh7+3ty/viZDiAEnpAXvxVg=;
+	b=Mzs/oC0qRrTvnf0RoSXMut8S7FZS4q3Yr1okEnTdSEaYoceUAWBbKJN1JqtYqMkW3/vNz9
+	YmHX421gDQLbWKwde2IGyKf5vnH1wNLQ2/J9BTP2Ro1ZR++DJ0uKHQ+dSBW2Ard4ATaeOK
+	EE+f/ZItA7p8Au8MNOmJw93zMa5ZcPo=
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oupton@kernel.org>,
@@ -44,9 +44,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Sebastian Ene <sebastianene@google.com>,
 	Hyunwoo Kim <imv4bel@gmail.com>,
 	Fuad Tabba <tabba@google.com>
-Subject: [PATCH v6 1/8] KVM: arm64: Extract MPIDR computation into a shared header
-Date: Wed, 15 Jul 2026 09:12:31 +0100
-Message-Id: <20260715081238.1891918-2-fuad.tabba@linux.dev>
+Subject: [PATCH v6 2/8] KVM: arm64: Make vcpu_{read,write}_sys_reg available to HYP code
+Date: Wed, 15 Jul 2026 09:12:32 +0100
+Message-Id: <20260715081238.1891918-3-fuad.tabba@linux.dev>
 In-Reply-To: <20260715081238.1891918-1-fuad.tabba@linux.dev>
 References: <20260715081238.1891918-1-fuad.tabba@linux.dev>
 Precedence: bulk
@@ -58,77 +58,115 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Extract the vCPU MPIDR computation embedded in reset_mpidr() into a
-kvm_calculate_mpidr() inline in sys_regs.h, so it can be computed
-without duplicating the logic. A follow-up series reuses it to reset
-protected vCPUs at EL2.
+The vcpu_{read,write}_sys_reg() accessors abstract where a system
+register lives, but their VHE implementation cannot be linked into the
+nVHE hypervisor, so exception.c open-codes has_vhe() wrappers instead.
+
+Redirect the accessors to the raw context accessors for nVHE hyp builds,
+where registers are always in memory, and drop the local wrappers. This
+lets hyp code reuse helpers built on the canonical accessors.
 
 No functional change intended.
 
-Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
+Suggested-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
- arch/arm64/kvm/sys_regs.c | 14 +-------------
- arch/arm64/kvm/sys_regs.h | 19 +++++++++++++++++++
- 2 files changed, 20 insertions(+), 13 deletions(-)
+ arch/arm64/include/asm/kvm_emulate.h |  6 +++++
+ arch/arm64/kvm/hyp/exception.c       | 34 ++++++++--------------------
+ 2 files changed, 15 insertions(+), 25 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 5d5c579d45790..08ba882799d48 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -976,21 +976,9 @@ static u64 reset_actlr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 5bf3d7e1d92c7..fb4062b3ce55a 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -506,6 +506,12 @@ static inline unsigned long kvm_vcpu_get_mpidr_aff(struct kvm_vcpu *vcpu)
+ 	return __vcpu_sys_reg(vcpu, MPIDR_EL1) & MPIDR_HWID_BITMASK;
+ }
  
- static u64 reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
++/* In nVHE hyp code, registers are always in memory: use the raw accessors. */
++#if defined(__KVM_NVHE_HYPERVISOR__)
++#define vcpu_read_sys_reg(v, r)		__vcpu_sys_reg(v, r)
++#define vcpu_write_sys_reg(v, x, r)	__vcpu_assign_sys_reg(v, r, x)
++#endif
++
+ static inline void kvm_vcpu_set_be(struct kvm_vcpu *vcpu)
  {
--	u64 mpidr;
-+	u64 mpidr = kvm_calculate_mpidr(vcpu);
+ 	if (vcpu_mode_is_32bit(vcpu)) {
+diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
+index bef40ddb16dbc..754e2dc1df54a 100644
+--- a/arch/arm64/kvm/hyp/exception.c
++++ b/arch/arm64/kvm/hyp/exception.c
+@@ -20,22 +20,6 @@
+ #error Hypervisor code only!
+ #endif
  
--	/*
--	 * Map the vcpu_id into the first three affinity level fields of
--	 * the MPIDR. We limit the number of VCPUs in level 0 due to a
--	 * limitation to 16 CPUs in that level in the ICC_SGIxR registers
--	 * of the GICv3 to be able to address each CPU directly when
--	 * sending IPIs.
--	 */
--	mpidr = (vcpu->vcpu_id & 0x0f) << MPIDR_LEVEL_SHIFT(0);
--	mpidr |= ((vcpu->vcpu_id >> 4) & 0xff) << MPIDR_LEVEL_SHIFT(1);
--	mpidr |= ((vcpu->vcpu_id >> 12) & 0xff) << MPIDR_LEVEL_SHIFT(2);
--	mpidr |= (1ULL << 31);
- 	vcpu_write_sys_reg(vcpu, mpidr, MPIDR_EL1);
+-static inline u64 __vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
+-{
+-	if (has_vhe())
+-		return vcpu_read_sys_reg(vcpu, reg);
 -
- 	return mpidr;
- }
+-	return __vcpu_sys_reg(vcpu, reg);
+-}
+-
+-static inline void __vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
+-{
+-	if (has_vhe())
+-		vcpu_write_sys_reg(vcpu, val, reg);
+-	else
+-		__vcpu_assign_sys_reg(vcpu, reg, val);
+-}
+-
+ static void __vcpu_write_spsr(struct kvm_vcpu *vcpu, unsigned long target_mode,
+ 			      u64 val)
+ {
+@@ -101,14 +85,14 @@ static void enter_exception64(struct kvm_vcpu *vcpu, unsigned long target_mode,
  
-diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-index 2a983664220ce..bd56a45abbf9c 100644
---- a/arch/arm64/kvm/sys_regs.h
-+++ b/arch/arm64/kvm/sys_regs.h
-@@ -222,6 +222,25 @@ find_reg(const struct sys_reg_params *params, const struct sys_reg_desc table[],
- 	return __inline_bsearch((void *)pval, table, num, sizeof(table[0]), match_sys_reg);
- }
+ 	switch (target_mode) {
+ 	case PSR_MODE_EL1h:
+-		vbar = __vcpu_read_sys_reg(vcpu, VBAR_EL1);
+-		sctlr = __vcpu_read_sys_reg(vcpu, SCTLR_EL1);
+-		__vcpu_write_sys_reg(vcpu, *vcpu_pc(vcpu), ELR_EL1);
++		vbar = vcpu_read_sys_reg(vcpu, VBAR_EL1);
++		sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL1);
++		vcpu_write_sys_reg(vcpu, *vcpu_pc(vcpu), ELR_EL1);
+ 		break;
+ 	case PSR_MODE_EL2h:
+-		vbar = __vcpu_read_sys_reg(vcpu, VBAR_EL2);
+-		sctlr = __vcpu_read_sys_reg(vcpu, SCTLR_EL2);
+-		__vcpu_write_sys_reg(vcpu, *vcpu_pc(vcpu), ELR_EL2);
++		vbar = vcpu_read_sys_reg(vcpu, VBAR_EL2);
++		sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL2);
++		vcpu_write_sys_reg(vcpu, *vcpu_pc(vcpu), ELR_EL2);
+ 		break;
+ 	default:
+ 		/* Don't do that */
+@@ -185,7 +169,7 @@ static void enter_exception64(struct kvm_vcpu *vcpu, unsigned long target_mode,
+  */
+ static unsigned long get_except32_cpsr(struct kvm_vcpu *vcpu, u32 mode)
+ {
+-	u32 sctlr = __vcpu_read_sys_reg(vcpu, SCTLR_EL1);
++	u32 sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL1);
+ 	unsigned long old, new;
  
-+static inline u64 kvm_calculate_mpidr(const struct kvm_vcpu *vcpu)
-+{
-+	u64 mpidr;
-+
-+	/*
-+	 * Map the vcpu_id into the first three affinity level fields of
-+	 * the MPIDR. We limit the number of VCPUs in level 0 due to a
-+	 * limitation to 16 CPUs in that level in the ICC_SGIxR registers
-+	 * of the GICv3 to be able to address each CPU directly when
-+	 * sending IPIs.
-+	 */
-+	mpidr = (vcpu->vcpu_id & 0x0f) << MPIDR_LEVEL_SHIFT(0);
-+	mpidr |= ((vcpu->vcpu_id >> 4) & 0xff) << MPIDR_LEVEL_SHIFT(1);
-+	mpidr |= ((vcpu->vcpu_id >> 12) & 0xff) << MPIDR_LEVEL_SHIFT(2);
-+	mpidr |= (1ULL << 31);
-+
-+	return mpidr;
-+}
-+
- const struct sys_reg_desc *get_reg_by_id(u64 id,
- 					 const struct sys_reg_desc table[],
- 					 unsigned int num);
+ 	old = *vcpu_cpsr(vcpu);
+@@ -281,7 +265,7 @@ static void enter_exception32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
+ {
+ 	unsigned long spsr = *vcpu_cpsr(vcpu);
+ 	bool is_thumb = (spsr & PSR_AA32_T_BIT);
+-	u32 sctlr = __vcpu_read_sys_reg(vcpu, SCTLR_EL1);
++	u32 sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL1);
+ 	u32 return_address;
+ 
+ 	*vcpu_cpsr(vcpu) = get_except32_cpsr(vcpu, mode);
+@@ -305,7 +289,7 @@ static void enter_exception32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
+ 	if (sctlr & (1 << 13))
+ 		vect_offset += 0xffff0000;
+ 	else /* always have security exceptions */
+-		vect_offset += __vcpu_read_sys_reg(vcpu, VBAR_EL1);
++		vect_offset += vcpu_read_sys_reg(vcpu, VBAR_EL1);
+ 
+ 	*vcpu_pc(vcpu) = vect_offset;
+ }
 -- 
 2.39.5
 
