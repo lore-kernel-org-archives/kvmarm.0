@@ -1,363 +1,191 @@
-Received: from canpmsgout01.his.huawei.com (canpmsgout01.his.huawei.com [113.46.200.216])
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 427FB3F4112
-	for <kvmarm@lists.linux.dev>; Wed, 15 Jul 2026 09:17:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.216
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA9D941F35C
+	for <kvmarm@lists.linux.dev>; Wed, 15 Jul 2026 09:19:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784107029; cv=none; b=tIRtyIYzGYt2m+b1KXZOuUbMHxrM5VB1lp+u0XxXK5oVKR70LXM1l0AhNf8M7kIQxUlEanEAfJhWk8yXWJhnSZK44g33OL+zAq4j47iZ8KfpH7mhc7CcpWlNO4CeLQyq/eCAnBw1QfUiKkNihZ0a2D/UACUsxBdr/9K808WQ2dI=
+	t=1784107159; cv=none; b=f+ftFpYniw0IKQ9ABpLX1gYFtkk1mICzyTIp7BdE2t2LS77eFhBqoQ4QsGCjOIqJpFGjdOu4g5/PbA+pZYFIu0l7Tx/Zzlcn5aSssYACDbV+DiLhYHEK1mBDYr5AtVtHbI0bSxqTENta08slvpprTRGH9Dw3j4wFOBqwK6NXG44=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784107029; c=relaxed/simple;
-	bh=eElwgUkUkox9F70gv1LzUtbkgfuSf6Q+6LsipvKxauA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=Hn0aFRG8PN9/qXz7AKRHY4QrlzBUculpqxbepln3C6K0GsCcN11hNqrA6fno+g+70m9A6Tdf0XLMdQQWkaOIufFwobKp+c17Pa5CXmkv3HogbsjWzLHshcL13x8gF/tORzfvLjpwD7nIqXAXnIIn3G9h1YkIKIMZyB+10rZ4qhQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=2LI+n88z; arc=none smtp.client-ip=113.46.200.216
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1784107159; c=relaxed/simple;
+	bh=E4zDmmpmeZaORO/vPb3fiEfTwfrYdFUlhgjCMr17hwI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tih+DbMwnXYAqfLc8gjUx3jvGQQtqYMRfhNSWxn9ehQ8QfgC/gjwQwCsVhAXXRxY+Yj16KPDUgZdQ8VYC7UWnfd4cfb9MPfvSGJ1d0cyrDTVuuUl81LKOQSINMaS6d2nx/vYeuWQvuLvX/rQuWokgoInPDmtXuKSr5pZNJIX/x4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=S/xW8Rhg; arc=none smtp.client-ip=91.218.175.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="2LI+n88z"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=dH5jL6YB5OieydwdIYKQd8DRqZORSBSglWLgHTZ76SM=;
-	b=2LI+n88z7up6IjvryZB1GQjeuLBiqIQH7kp3OEr5kk5AREpcwFFs0pPwLXL2OrgTkU/IYYqgW
-	dpF/15bOYBxSN0mpjcG67+KKlYTJ/eFjGtsBuHUXvKy3O6RPLJRjSBrH5EFVk0umeV0T4MA+Ohy
-	opcSdClMmSRQUFSrP+zP3gM=
-Received: from mail.maildlp.com (unknown [172.19.163.0])
-	by canpmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4h0Vgd56Bzz1T4Mc;
-	Wed, 15 Jul 2026 17:07:41 +0800 (CST)
-Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
-	by mail.maildlp.com (Postfix) with ESMTPS id 547B740537;
-	Wed, 15 Jul 2026 17:16:52 +0800 (CST)
-Received: from [10.67.120.103] (10.67.120.103) by
- kwepemr100010.china.huawei.com (7.202.195.125) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Wed, 15 Jul 2026 17:16:51 +0800
-Message-ID: <f360c92e-878d-49b5-bcd4-e18240a3600a@huawei.com>
-Date: Wed, 15 Jul 2026 17:16:51 +0800
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="S/xW8Rhg"
+X-Forwarded-Encrypted: i=1; AHgh+RqERa7kHBjtczzqLagZuwIbEY1l9C6n7FMLErkBGXpxxOyrmQeDPG11FrG3yYsfufmUoKl32TI=@lists.linux.dev
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1784107152;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Rjn1CF6e23GD6w9GNHyPRfdKmhPZEOpgmcfSe8x/Z7Y=;
+	b=S/xW8RhgV4XeGrJEE+qYfpMdqNqhRoxu2X/xUUtxI9J0h+U0mB4lLq4e4hAXhIA2NYlw9V
+	mWmPIWwfwhiU+p1FLYtkus4FkHTi25Hcx5JtQnFZu2UEW4wy/t0jl0u6wx2Blq9/xr99GP
+	cNYNqBu/gYkk2Ih4XohBaaNrpC7gXLs=
+X-Gm-Message-State: AOJu0YyibIqlHi/tW+ULqkna22yk+P37JX7Z3WgQEVdv45+N2tcVIh9b
+	3lUcMVY4bTBXGPu/PN07vdE+5xBbgKE5X8xHuZApyLogvxoO/T0ZYSz//FYrCrA4FFnmiv47JkS
+	dw74c+5lYfaqzSFzcqoprzGbasgMar9ej5x77z+d9
+X-Received: by 2002:a05:622a:53cb:b0:51c:ba4f:9d14 with SMTP id
+ d75a77b69052e-51d7bd70c65mr25990601cf.17.1784107149447; Wed, 15 Jul 2026
+ 02:19:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 4/6] KVM: arm64: Add HDBSS per-vCPU buffer management
-To: Leonardo Bras <leo.bras@arm.com>
-CC: <maz@kernel.org>, <oupton@kernel.org>, <catalin.marinas@arm.com>,
-	<will@kernel.org>, <yuzenghui@huawei.com>, <wangzhou1@hisilicon.com>,
-	<yangjinqian1@huawei.com>, <caijian11@h-partners.com>,
-	<liuyonglong@huawei.com>, <yezhenyu2@huawei.com>, <yubihong@huawei.com>,
-	<linuxarm@huawei.com>, <joey.gouly@arm.com>, <kvmarm@lists.linux.dev>,
-	<kvm@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-kernel@vger.kernel.org>, <seiden@linux.ibm.com>,
-	<suzuki.poulose@arm.com>
-References: <20260709104026.2612599-1-zhengtian10@huawei.com>
- <20260709104026.2612599-5-zhengtian10@huawei.com>
- <alTqqxEZLuYN-gY6@LeoBrasDK>
- <df479edc-cca0-4b54-aed0-4d8c6fd4ffc7@huawei.com>
- <alYTt-fG5rJ9D6Dm@LeoBrasDK>
-From: Tian Zheng <zhengtian10@huawei.com>
-In-Reply-To: <alYTt-fG5rJ9D6Dm@LeoBrasDK>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
- kwepemr100010.china.huawei.com (7.202.195.125)
+References: <20260715081238.1891918-1-fuad.tabba@linux.dev>
+ <20260715081238.1891918-7-fuad.tabba@linux.dev> <20260715083708.68D2A1F000E9@smtp.kernel.org>
+In-Reply-To: <20260715083708.68D2A1F000E9@smtp.kernel.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Wed, 15 Jul 2026 10:18:32 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTwWUCHfPuiO3cJD4KAqNq_LvPotRiaABqUmfK08EmKOyQ@mail.gmail.com>
+X-Gm-Features: AUfX_mxdMLfioSdsNDXgzAuLNv3ySH5AAzK1PAR-zfK_ZUTlW3ycQsl3sgu-zFU
+Message-ID: <CA+EHjTwWUCHfPuiO3cJD4KAqNq_LvPotRiaABqUmfK08EmKOyQ@mail.gmail.com>
+Subject: Re: [PATCH v6 6/8] KVM: arm64: Minimise EL2's exposure of host VGIC
+ state during world switch
+To: sashiko-reviews@lists.linux.dev
+Cc: Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
+	Marc Zyngier <maz@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Migadu-Flow: FLOW_OUT
+
+On Wed, 15 Jul 2026 at 09:37, <sashiko-bot@kernel.org> wrote:
+>
+> Thank you for your contribution! Sashiko AI review found 2 potential issu=
+e(s) to consider:
+>
+> New issues:
+> - [High] handle___vgic_v3_save_aprs silently overwrites host modification=
+s to vgic_vmcr with a stale value.
+>
+> Pre-existing issues:
+> - [Critical] The patch addresses the host-pointer trust vulnerability for=
+ GICv3 but leaves the identical vulnerability open for GICv5.
+
+Both already covered:
+https://lore.kernel.org/all/CA+EHjTyGULmVCgyoya3bXG4gRj0OYFE1gnJLhNE6kvCrZF=
+tXyQ@mail.gmail.com/
+
+/fuad
 
 
-On 7/14/2026 6:47 PM, Leonardo Bras wrote:
-> On Tue, Jul 14, 2026 at 03:15:03PM +0800, Tian Zheng wrote:
->> On 7/13/2026 9:39 PM, Leonardo Bras wrote:
->>> On Thu, Jul 09, 2026 at 06:40:24PM +0800, Tian Zheng wrote:
->>>> From: eillon <yezhenyu2@huawei.com>
->>>>
->>>> Add HDBSS (Hardware Dirty Bit State Structure) per-vCPU buffer
->>>> management including allocation, freeing, and loading of HDBSS
->>>> registers during vCPU load.
->>>>
->>>> This patch creates the foundational infrastructure:
->>>> - struct vcpu_hdbss_state and enable_hdbss/hdbss_order in kvm_arch
->>>> - kvm_dirty_bit.h header with alloc/free declarations
->>>> - dirty_bit.c with alloc/free helpers
->>>> - __load_hdbss() in VHE switch for register loading
->>>> - vCPU create/destroy hooks for buffer lifecycle
->>>> - sysreg definitions for HDBSS register manipulation
->>>> - Makefile update for dirty_bit.o
->>>>
->>>> Signed-off-by: Eillon <yezhenyu2@huawei.com>
->>>> Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
->>>> ---
->>>>    arch/arm64/include/asm/kvm_dirty_bit.h | 16 ++++++++
->>>>    arch/arm64/include/asm/kvm_host.h      | 13 +++++++
->>>>    arch/arm64/include/asm/sysreg.h        | 11 ++++++
->>>>    arch/arm64/kvm/Makefile                |  1 +
->>>>    arch/arm64/kvm/arm.c                   |  7 ++++
->>>>    arch/arm64/kvm/dirty_bit.c             | 52 ++++++++++++++++++++++++++
->>>>    arch/arm64/kvm/hyp/vhe/switch.c        | 15 ++++++++
->>>>    arch/arm64/kvm/mmu.c                   |  1 +
->>>>    arch/arm64/kvm/reset.c                 |  4 ++
->>>>    9 files changed, 120 insertions(+)
->>>>    create mode 100644 arch/arm64/include/asm/kvm_dirty_bit.h
->>>>    create mode 100644 arch/arm64/kvm/dirty_bit.c
->>>>
->>>> diff --git a/arch/arm64/include/asm/kvm_dirty_bit.h b/arch/arm64/include/asm/kvm_dirty_bit.h
->>>> new file mode 100644
->>>> index 000000000000..84b12f0a10af
->>>> --- /dev/null
->>>> +++ b/arch/arm64/include/asm/kvm_dirty_bit.h
->>>> @@ -0,0 +1,16 @@
->>>> +/* SPDX-License-Identifier: GPL-2.0-only */
->>>> +/*
->>>> + * Copyright (C) 2026 ARM Ltd.
->>>> + * Author: Leonardo Bras <leo.bras@arm.com>
->>> You are adding the file, so the copyright note should be yours, then?
->>
->> I originally thought your earlier patchset had already created this file, so
->> I
->>
->> kept your copyright and author info. I'll update it to mine in the next
->> version.
->>
->>
->> Thanks for pointing that out!
-> :)
->
->>
->>>> + */
->>>> +
->>>> +#ifndef __ARM64_KVM_DIRTY_BIT_H__
->>>> +#define __ARM64_KVM_DIRTY_BIT_H__
->>>> +
->>>> +#include <asm/kvm_pgtable.h>
->>>> +#include <asm/sysreg.h>
->>>> +
->>>> +int kvm_arm_vcpu_alloc_hdbss(struct kvm_vcpu *vcpu, unsigned int order);
->>>> +void kvm_arm_vcpu_free_hdbss(struct kvm_vcpu *vcpu);
->>>> +
->>>> +#endif /* __ARM64_KVM_DIRTY_BIT_H__ */
->>>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->>>> index bae2c4f92ef5..c41ec6d9c45a 100644
->>>> --- a/arch/arm64/include/asm/kvm_host.h
->>>> +++ b/arch/arm64/include/asm/kvm_host.h
->>>> @@ -420,6 +420,10 @@ struct kvm_arch {
->>>>    	 */
->>>>    	struct kvm_protected_vm pkvm;
->>>>
->>>> +	/* HDBSS: per-VM dirty tracking state */
->>>> +	bool enable_hdbss;
->>> Is there not a way of checking hdbss without adding this new member on the
->>> struct? Would not checking the vcpu_hdbss_state from current vcpu should be
->>> enough?
->>
->> HDBSS is a VM-wide property, so I currently use a VM-level flag
->> (kvm->arch.enable_hdbss)
->>
->> to track whether it's enabled. Paths like kvm_arch_commit_memory_region()
->> and VM teardown
->>
->> don't have a vCPU context to query, so per-vCPU state wouldn't work there.
->>
->>
->> But you're right, maybe we don't need a value to store it — we could remove
->> this flag and instead
->>
->> check the VTCR_EL2_HDBSS bit directly from kvm->arch.mmu.vtcr:
->>
->>
->> ```
->> static inline bool kvm_hdbss_enabled(const struct kvm *kvm)
->> {
->>      return kvm->arch.mmu.vtcr & VTCR_EL2_HDBSS;
->> }
->>
->> if (kvm_hdbss_enabled(kvm))
->>      ...
->> ```
-> That looks better :)
->
->>
->>>> +	unsigned int hdbss_order;
->>> Is that the order for hdbss buffer size?
->>> Haven't finished reading the series, but would that be bad if this was also
->>> in the per-vcpu state struct, instead?
->>>
->>> Also, here I suggest that we save a number, instead of the encoding for
->>> HDBSSBR_ELS_SZ, and convert it on hdbss setup. It could be either a
->>> shift, or size.
->>>
->>> Reason being that you used this to compare with HDBSS_MAX_ORDER at some
->>> point, and there is no guarantee that the encoding will always be in
->>> crescent form.
->>>
->>> Also, it's not clear where you set this value.
->>
->> Yes, this is the HDBSS buffer order (2^order bytes per vCPU).
->>
->> I put it in kvm->arch *to make sure all vCPUs in a VM have the same order*.
->>
-> Right, but do we need to retrieve this value at any context that is not
-> per-vcpu later? If all allocations happen at the same time, and the vcpus
-> can get the size of their arrays (even by the register itself), maybe there
-> is no need to add this member in the kvm_arch structure.
->
->>
->> I agree we should store a plain order number rather than the raw SZ
->> encoding.
->>
-> I would recommend we always save the value in the way its most convenient
-> to use. In this case, I only recall it to be used as bounds to read the
-> HDBSS array, so it would be better if we save it as plain size.
->
->> The assignment should happen in kvm_arm_enable_hdbss_global(), which I
->> missed in v4 and will add in v5.
->>
-> Okay
->
->>>> +
->>>>    #ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
->>>>    	/* Nested virtualization info */
->>>>    	struct dentry *debugfs_nv_dentry;
->>>> @@ -838,6 +842,12 @@ struct vcpu_reset_state {
->>>>    	bool		reset;
->>>>    };
->>>>
->>>> +struct vcpu_hdbss_state {
->>>> +	phys_addr_t base_phys;   /* for memory free */
->>>> +	u64 hdbssbr_el2;         /* load directly */
->>>> +	u64 hdbssprod_el2;       /* save directly */
->>>> +};
->>>> +
->>>>    struct vncr_tlb;
->>>>
->>>>    struct kvm_vcpu_arch {
->>>> @@ -945,6 +955,9 @@ struct kvm_vcpu_arch {
->>>>
->>>>    	/* Hyp-readable copy of kvm_vcpu::pid */
->>>>    	pid_t pid;
->>>> +
->>>> +	/* HDBSS registers info */
->>>> +	struct vcpu_hdbss_state hdbss;/
->>>>    };
->>>>
->>>>    /*
->>>> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
->>>> index 7aa08d59d494..1354a58c3316 100644
->>>> --- a/arch/arm64/include/asm/sysreg.h
->>>> +++ b/arch/arm64/include/asm/sysreg.h
->>>> @@ -1039,6 +1039,17 @@
->>>>
->>>>    #define GCS_CAP(x)	((((unsigned long)x) & GCS_CAP_ADDR_MASK) | \
->>>>    					       GCS_CAP_VALID_TOKEN)
->>>> +
->>>> +/*
->>>> + * Definitions for the HDBSS feature
->>>> + */
->>>> +#define HDBSS_MAX_ORDER		HDBSSBR_EL2_SZ_2MB
->>>> +
->>> See above comment on using the encoding instead of an actual size/shift
->>> number.
->>
->> You're right — I will fix this in the next version as follows:
->>
->> First, HDBSS_MAX_ORDER will be defined as a plain order number. In v4 I only
->> considered the 4KB page
-> Maybe consider a plain size number, instead.
->
->> case and hard-coded it to 9. To make it work for any PAGE_SIZE configuration
->> (4KB, 16KB, or 64KB), I'll derive
->>
->> it from HDBSSBR_EL2_SZ_2MB:
->>
->> ```
->> #define HDBSS_MAX_ORDER    (12 + HDBSSBR_EL2_SZ_2MB - PAGE_SHIFT)
->> ```
->>
->> This evaluates to 9 on 4KB pages, and the correct value on 16KB/64KB pages
->> as well.
-> Wait, I don't see what you are trying to achieve here with this.
-> This order is related to the size of a HDBSS buffer, which is defined
-> independently of the page size being used. In 2MB example, it does hold
-> 256K HDBSS entries, disregarding on the page size, IIRC.
->
->
->> Second, I will add two conversion helpers in sysreg.h to bridge between
->> kernel semantics (alloc_pages order)
->>
->> and hardware encoding (HDBSSBR_EL2.SZ):
->>
->> ```
->> /* Convert alloc_pages order to HDBSSBR_EL2.SZ encoding */
->> #define hdbss_order_to_sz(order)  (PAGE_SHIFT + (order) - 12)
->> ```
-> (would be *_to_shift() no?)
->
-> In any case, see above.
->
->> These helpers work for any PAGE_SIZE configuration (4KB, 16KB, or 64KB)
->> because they use PAGE_SHIFT directly.
->>
->> Third, I will update the HDBSSBR_EL2 register construction in
->> kvm_arm_vcpu_alloc_hdbss()：
->>
->> ```
->> /* before */
->> .hdbssbr_el2 = HDBSSBR_EL2(page_to_phys(hdbss_pg), order),
->>
->> /* after */
->> .hdbssbr_el2 = HDBSSBR_EL2(page_to_phys(hdbss_pg),
->>                              hdbss_order_to_sz(order)),
->> ```
->>
-> That would be the other way around, right? I mean, here you would want the
-> order encoded in HDBSSBR_SZ from the page shift, not the other way around.
->
-> In any case, see above.
->
->
->> And I will also update the __free_pages() call to use
->> vcpu->kvm->arch.hdbss_order directly, since that field
->>
->> stores the plain order number and avoids decoding the SZ encoding at free
->> time:
->>
->>
->> ```
->> /* before */
->> __free_pages(hdbss_pg,
->>       FIELD_GET(HDBSSBR_EL2_SZ_MASK,
->>                 vcpu->arch.hdbss.hdbssbr_el2));
->>
->> /* after */
->> __free_pages(hdbss_pg,
->>       vcpu->kvm->arch.hdbss_order);
->> ```
->>
-> Ah, you use the 'order' to free the buffers as well, ok.
-> But those are per-vcpu buffers as well, right?
->
-> Again, the HDBSSBR_EL2.SZ AFAIK is not related to page size.
->
-> Thanks!
-> Leo
 
-
-Got it. I'll store the plain size (in bytes) instead of the order or SZ
-encoding.
-
-One clarification though: I'd like to keep this as a VM-level field
-(kvm->arch.hdbss_buffer_size) in case we may want to allow userspace to
-configure the buffer size via ioctl in the future.
-
-The field would be unsigned long hdbss_buffer_size (in bytes), with helpers
-to convert to order or SZ encoding when needed:
-   - get_order(size) → for alloc_pages()
-   - ilog2(size) - 12 → for HDBSSBR_EL2.SZ
-
-Does that work for you?
-
-
-Thanks!
-
-Tian
-
-
+> --
+>
+> --- Patch [6]: [PATCH v6 6/8] KVM: arm64: Minimise EL2's exposure of host=
+ VGIC state during world switch ---
+> commit d47381d6be1828e59e8906a9d69d3c104d673dc3
+> Author: Marc Zyngier <maz@kernel.org>
+>
+> KVM: arm64: Minimise EL2's exposure of host VGIC state during world switc=
+h
+>
+> This commit modifies the world switch to stop EL2 from dereferencing the =
+host's
+> vgic_v3_cpu_if pointer wholesale. It copies only vgic_vmcr and active pri=
+ority
+> registers to the hyp-side state.
+>
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nv=
+he/hyp-main.c
+> > index 45d717889f6ea..f3233ee343a39 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> [ ... ]
+> > @@ -508,16 +520,63 @@ static void handle___vgic_v3_init_lrs(struct kvm_=
+cpu_context *host_ctxt)
+> >
+> >  static void handle___vgic_v3_save_aprs(struct kvm_cpu_context *host_ct=
+xt)
+> >  {
+> > -     DECLARE_REG(struct vgic_v3_cpu_if *, cpu_if, host_ctxt, 1);
+> > +     struct pkvm_hyp_vcpu *hyp_vcpu;
+> > +     struct kvm_vcpu *host_vcpu;
+> >
+> > -     __vgic_v3_save_aprs(kern_hyp_va(cpu_if));
+> > +     host_vcpu =3D get_host_hyp_vcpus_from_vgic_v3_cpu_if(host_ctxt, 1=
+,
+> > +                                                        &hyp_vcpu);
+> > +     if (!host_vcpu)
+> > +             return;
+> > +
+> > +     if (unlikely(hyp_vcpu)) {
+> > +             struct vgic_v3_cpu_if *hyp_cpu_if, *host_cpu_if;
+> > +             int i;
+> > +
+> > +             hyp_cpu_if =3D &hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3;
+> > +             __vgic_v3_save_aprs(hyp_cpu_if);
+> > +
+> > +             host_cpu_if =3D &host_vcpu->arch.vgic_cpu.vgic_v3;
+> > +             host_cpu_if->vgic_vmcr =3D hyp_cpu_if->vgic_vmcr;
+>
+> [Severity: High]
+> Does this assignment overwrite host modifications to vgic_vmcr with a sta=
+le
+> value?
+>
+> When userspace modifies a VMCR field (like SYS_ICC_PMR_EL1) via
+> KVM_SET_ONE_REG, the execution flow modifies the host state:
+>
+> kvm_vcpu_ioctl()
+>   vcpu_load()
+>     handle___vgic_v3_restore_vmcr_aprs()
+>   // ioctl modifies host_cpu_if->vgic_vmcr
+>   vcpu_put()
+>     handle___vgic_v3_save_aprs()
+>
+> Since __vgic_v3_save_aprs() does not read ICH_VMCR_EL2 from the hardware,
+> hyp_cpu_if->vgic_vmcr contains the old value. Does copying it back to
+> host_cpu_if->vgic_vmcr here cause the userspace changes to be lost?
+>
+> > +             for (i =3D 0; i < ARRAY_SIZE(host_cpu_if->vgic_ap0r); i++=
+) {
+> > +                     host_cpu_if->vgic_ap0r[i] =3D hyp_cpu_if->vgic_ap=
+0r[i];
+> > +                     host_cpu_if->vgic_ap1r[i] =3D hyp_cpu_if->vgic_ap=
+1r[i];
+> > +             }
+> > +     } else {
+> > +             __vgic_v3_save_aprs(&host_vcpu->arch.vgic_cpu.vgic_v3);
+> > +     }
+> >  }
+> [ ... ]
+>
+> [Severity: Critical]
+> This is a pre-existing issue and was not introduced by the patch under re=
+view,
+> but does the same pattern remain open for GICv5?
+>
+> Looking at handle___vgic_v5_save_apr():
+>
+> arch/arm64/kvm/hyp/nvhe/hyp-main.c:handle___vgic_v5_save_apr() {
+>         DECLARE_REG(struct vgic_v5_cpu_if *, cpu_if, host_ctxt, 1);
+>         __vgic_v5_save_apr(kern_hyp_va(cpu_if));
+> }
+>
+> And similarly in handle___vgic_v5_restore_vmcr_apr():
+>
+> arch/arm64/kvm/hyp/nvhe/hyp-main.c:handle___vgic_v5_restore_vmcr_apr() {
+>         DECLARE_REG(struct vgic_v5_cpu_if *, cpu_if, host_ctxt, 1);
+>         __vgic_v5_restore_vmcr_apr(kern_hyp_va(cpu_if));
+> }
+>
+> Since these handlers apply kern_hyp_va() to an untrusted host pointer wit=
+hout
+> validation, and kern_hyp_va() is idempotent for already-hyp-tagged pointe=
+rs,
+> could a malicious host provide a pointer to EL2 private metadata?
+>
+> Could this allow the host to arbitrarily read or write EL2 memory?
+>
+> --
+> Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260715081238.18=
+91918-1-fuad.tabba@linux.dev?part=3D6
