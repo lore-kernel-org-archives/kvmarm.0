@@ -1,138 +1,83 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FD8B3CCFB4;
-	Wed, 15 Jul 2026 08:19:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96DCB3CDBB1
+	for <kvmarm@lists.linux.dev>; Wed, 15 Jul 2026 08:24:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784103553; cv=none; b=p+Bi1KK1XouU4dn3MWoXPzWC9zyM+CbJzYiKePYq+us4u06o37IvfccyrdKbDbkypSa7ANQdIQIiFei2Cv/H5bYKwVa8wy/QOSZRRVMs4uPb77mAXFalJm8bjU+QgjMpvDLhrpnGPXEYlUVSa7kxfEch+8qSCx4BFYC9OTOjqt8=
+	t=1784103852; cv=none; b=KyfRFxVbrsfSVd9pjhOWByFlYsQs0k+Ugp2dwrsJeaei9rpyU8SMn0xvtMGjo8unYqMxYv7TDqR4gk2tiJ9e/71F6P0+6Zyki9dpefwg1J9O46VD4jaz6NVAtHLc+7XeUb/+RrKZplEjOQn/g6arp5k09vKaw9SuqvXW1MzHXS8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784103553; c=relaxed/simple;
-	bh=gNxk6vXq829mh4d+7zt2FEOFWIMJWMdp/e4v1P0G1ds=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KmZvVvZVy2UdZGCFrTGH+NZUhaD5r74bsK96bGSkMduiXBFW22vQWrPJlRvbHSwUKp0ffwnqRk1oKjWeYsDWiaetR80HYapEoo2Avosh6hsv4bzq36eYjAhhgmQAidzqy2m93ZCX6vmc2iFpow7Tm/wR3gXJbDBazmExqXNMXxM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kQK1MBtw; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784103852; c=relaxed/simple;
+	bh=qeRkCUPxrSwKbSS2Yk2lOyfBRAA957XxfacJczLZ/FU=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=T5IB3X1F5MurLI1F86KbM8Gq26SChkZ67sjRfP2rtSeM4JZn3RD67X27I4p14ML6qwiCiAefRL0TLdXO158du95ZW0mOSqGr/6Cyx68Ewg93cl55LK6YreoNtjikeCLckVlhwkedd6WwpUJ/OijgvfJP40Q2hB3aSAiN5ihRqzQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FsJGv2Qo; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kQK1MBtw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DADDF1F000E9;
-	Wed, 15 Jul 2026 08:19:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FsJGv2Qo"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3987F1F000E9;
+	Wed, 15 Jul 2026 08:24:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784103551;
-	bh=9di0iPNirA8i2aRvfh+nDPIZh/v7N+As+I0AKLeoCG0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=kQK1MBtwlgMoUlw+ZFZSEhZkWzYiwM2C/vf8niFWavErPgPikzRicOEYoGcwwepk7
-	 YZg960F967Jt5M7QRlZl11I5DfvP0ZMzXEkdaAufi9S065qa7Q/+o1ClThI1TMWY7Z
-	 nCG3wDL2zfiO8jbCKZEsajqFsSO8cvdXFXSY/CUOXLBqveWGc+nf+RuP82N8xYqjOg
-	 BEJIF5uG8RcqPog75uL5SxO3HOGy9ibKdI64bDU/HO3+8I2+EB0wB3Bf4UvID2uqE6
-	 MmV8LPG6YKD2vNb7HDEmBEzJs1q0S95BCZvEmqilgFpsp2D13u1xsNEFd7Fbg/9mLK
-	 XhJNXkIYxRrJA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wjuph-00000005CWU-3n29;
-	Wed, 15 Jul 2026 08:19:09 +0000
-Date: Wed, 15 Jul 2026 09:19:09 +0100
-Message-ID: <86ech4oebm.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oupton@kernel.org>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v2 07/28] KVM: arm64: Don't evaluate HCR_EL2.NV nor HFGITR_EL2.ERET on ERET fast path
-In-Reply-To: <alc-JSvHDjSV5c_G@kernel.org>
-References: <20260714091641.1970822-1-maz@kernel.org>
-	<20260714091641.1970822-8-maz@kernel.org>
-	<alc-JSvHDjSV5c_G@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20260515; t=1784103851;
+	bh=qeRkCUPxrSwKbSS2Yk2lOyfBRAA957XxfacJczLZ/FU=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=FsJGv2Qo+hDXZ6vRPiiex4erZMjRicvu7tG1y3K94hmD9/QKVcnJMuYmLs13V6OaS
+	 AGb6TdlZlEtzCHSFAOZgr2JROzsIBx/UmTUOSaO8VS4Xj5X3SMtQrnJDD0vUw8WmB9
+	 ZxHLFBaJiZ7kFYc54QsNEudr20uS5GKN37ak3vwcNXXG9hfZIOxi5UNBNWk/Y087PY
+	 cJhI/hOKJjDkqJ5DPZta5HsI9JdVFbDYKEksw+lnemxEGrIly6JuwHykQt2JIXVKpV
+	 sGIfRI45ztQMlko9ixgeXr0sIspMhl3w106A7yqCcBiRfPF/FnpdmoVygK3Pxl+8hR
+	 E9wcRUTSplSiw==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v6 4/8] KVM: arm64: Move PSCI helper functions to a
+ shared header
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Fuad Tabba" <fuad.tabba@linux.dev>
+Cc: "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>
+In-Reply-To: <20260715081238.1891918-5-fuad.tabba@linux.dev>
+References: <20260715081238.1891918-1-fuad.tabba@linux.dev>
+ <20260715081238.1891918-5-fuad.tabba@linux.dev>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 15 Jul 2026 08:24:10 +0000
+Message-Id: <20260715082411.3987F1F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 15 Jul 2026 09:00:37 +0100,
-Oliver Upton <oupton@kernel.org> wrote:
-> 
-> Hey,
-> 
-> On Tue, Jul 14, 2026 at 10:16:20AM +0100, Marc Zyngier wrote:
-> > We currently avoid using the ERET fast path if the guest has HCR_EL2.NV
-> > set. This is an odd check, as NV doesn't mean much if HCR_EL2.TGE==1.
-> > 
-> > Similarly, evaluating HFGITR_EL2.ERET makes little sense, as
-> > this only applies to the nested context, while the ERET fast-path
-> > is purely for the benefit of L1.
-> > 
-> > Replace these bizarre checks with is_nested_ctxt() which makes a lot
-> > more sense: if we are running an L2, the ERET trap must go to L1.
-> > 
-> > Fixes: dd0717a998f77 ("KVM: arm64: nv: Fast-track 'InHost' exception returns")
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/hyp/vhe/switch.c | 9 +++------
-> >  1 file changed, 3 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-> > index bbe9cebd3d9d5..a83be345f8450 100644
-> > --- a/arch/arm64/kvm/hyp/vhe/switch.c
-> > +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-> > @@ -344,13 +344,10 @@ static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
-> >  	 * if this is a VHE guest hypervisor returning to its own
-> >  	 * userspace, or the hypervisor performing a local exception
-> >  	 * return. No need to save/restore registers, no need to
-> > -	 * switch S2 MMU. Just do the canonical ERET.
-> > -	 *
-> > -	 * Unless the trap has to be forwarded further down the line,
-> > -	 * of course...
-> > +	 * switch S2 MMU. Just do the canonical ERET unlesss we are in
-> > +	 * nested context.
-> >  	 */
-> 
-> typo: unless
-> 
-> I feel like it wouldn't hurt to add a bit more detail to the comment
-> here, that L0 KVM doesn't use ERET traps in the nested context.
-> Otherwise it isn't clear why these always belong to the L1.
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [Low] The header `include/kvm/arm_psci.h` is not self-contained because i=
+t uses `vcpu_set_reg()` and `vcpu_get_reg()` without including `<asm/kvm_em=
+ulate.h>`.
+--
 
-We already have a tiny bit of information in kvm_handle_eret(), but
-that's obviously a bit far down the line. Something like this?
+--- Patch [4]: [PATCH v6 4/8] KVM: arm64: Move PSCI helper functions to a s=
+hared header ---
+(Note: The format of this report has been altered to a free-form summary wi=
+thout direct patch quotation due to automated system recitation restriction=
+s.)
 
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index a83be345f8450..684cebf23aa0e 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -344,8 +344,13 @@ static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
- 	 * if this is a VHE guest hypervisor returning to its own
- 	 * userspace, or the hypervisor performing a local exception
- 	 * return. No need to save/restore registers, no need to
--	 * switch S2 MMU. Just do the canonical ERET unlesss we are in
-+	 * switch S2 MMU. Just do the canonical ERET unless we are in
- 	 * nested context.
-+	 *
-+	 * Note that this is made possible because KVM itself never traps
-+	 * ERET when running an L2. The consequence is that any ERET trap is
-+	 * the result of HCR_EL2 or HFGITR_EL2 programming by L1 for its own
-+	 * guest, and the exception must be forwarded to L1.
- 	 */
- 	if (is_nested_ctxt(vcpu))
- 		return false;
+commit 41ab99d154503d49e14931a3e9bb6c067e760b44
+Author: Fuad Tabba <fuad.tabba@linux.dev>
 
-Thanks,
+KVM: arm64: Move PSCI helper functions to a shared header
 
-	M.
+This patch moves several PSCI helper functions out of psci.c and into the
+shared include/kvm/arm_psci.h header. It renames the file-local
+psci_affinity_mask() to kvm_psci_affinity_mask() to support follow-up work
+for protected-guest PSCI calls.
 
--- 
-Without deviation from the norm, progress is not possible.
+[Severity: Low]
+In the newly moved kvm_psci_narrow_to_32bit() function within
+include/kvm/arm_psci.h, the code makes use of vcpu_set_reg() and
+vcpu_get_reg(). Does this new header location need an explicit include
+for asm/kvm_emulate.h to ensure it remains self-contained?
+
+If a C file includes kvm/arm_psci.h without having already included
+asm/kvm_emulate.h, it looks like it might lead to a build failure due to
+missing function declarations.
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260715081238.1891=
+918-1-fuad.tabba@linux.dev?part=3D4
