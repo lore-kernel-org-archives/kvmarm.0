@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89E3C383C96;
-	Wed, 15 Jul 2026 14:28:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95771383328;
+	Wed, 15 Jul 2026 14:28:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784125692; cv=none; b=g3oGoFbr9kvaqQLLHk6i0J/5X2csYF4t/bdvOnKvPCIfe7AaEYK29p8GqPFQg9+11mwC9PAoWjmXQ2CkxguFgw4YRgk4F+1bybv6RdZBovUDI0Xe7BcVkZsVlbbncbHt5B7d7bAjPyHEBttl7iOERRoQM1WVskYFMBohGhsHcDg=
+	t=1784125697; cv=none; b=e90rDgtmi5r3d2t2NNJpkndp9v3hv4caYMZQou3t2gLEasH50cEyINWuN3pXtkQ+KIZuh+J1m763CVI/cW7z2En6Br2ZYuad6/SnOQXBRTi4vOhDRlJ9/hSDAOGHR4QwHA9nHTh1WOhFWMTmF3OfnA676w0FyDF+uX4/+xHed08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784125692; c=relaxed/simple;
-	bh=jjzHVD9CHi0rqJocrAQSJ4tPv2zmiVUq7nNDyfPPsSY=;
+	s=arc-20240116; t=1784125697; c=relaxed/simple;
+	bh=9SSl2JWVW8vq8iRnNLAbFtsbXg6+OfUaJ0kt6uFH3uI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gePDY7HFXMthrPFNhAnoA8YJJ36sq0IKT+N3HgRUfGmjAHatgVaeba4GpB0bydLfuviq0W8kQ1arU721MmodMBK2TFenfq0nWtkeuv4BiYAYy4DxkjF2N4K6b92cp9XAYsoM6/Ma+I5EG+gjFfcF9AvNl5rnNc5T0U/riiiwVTA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=b1kaLlnA; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=S69j0Muj0Kem6qp/PfR9pPxJIpmtBvjttO/VRgiQMpPXtQCnXazaJHtqIq4qd03akOt75HucaWrIVmmmV7OnWs+jjP+oxW9a6kCsvZEMGDedkJ8LVlgRcaPiJGFAAJAt1N97OR7kr5I6O7lrljj+DIGdv/1/4xrDnVYipA61QsQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=eglhRL3v; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="b1kaLlnA"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="eglhRL3v"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 944761477;
-	Wed, 15 Jul 2026 07:28:05 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C5DF8153B;
+	Wed, 15 Jul 2026 07:28:10 -0700 (PDT)
 Received: from e122027.cambridge.arm.com (e122027.cambridge.arm.com [10.1.25.27])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1C4D93F93E;
-	Wed, 15 Jul 2026 07:28:04 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3993E3F7B4;
+	Wed, 15 Jul 2026 07:28:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1784125689; bh=jjzHVD9CHi0rqJocrAQSJ4tPv2zmiVUq7nNDyfPPsSY=;
+	t=1784125694; bh=9SSl2JWVW8vq8iRnNLAbFtsbXg6+OfUaJ0kt6uFH3uI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=b1kaLlnAD0M+KQcSnost6Pe5JX+aq1SHqN+i8W4ZVEyyM53KMhzmghN8/x/fZ/kM8
-	 XgaJZnVhgE755ttrjKP9h+LcJU6deJaWGRTYckCQ58H0E3amSm5Xn7Z/oFFTRDl5Ko
-	 lnSohg9zDWtIxxVtSGsua//c2Arog0llQN8c27fQ=
+	b=eglhRL3vUU1BB0LEkBPkDMQI9/KkdvZ4mylOK4Hxmd6XOt0UFDWe2S8QgfhkfsquC
+	 LFpESjm7PXpELghxjU4/jtOd+Yp6E7kkmYquwYzWY8vcLCh8hoxQRQfcEDgsYc/R6W
+	 0nZJkASNrqaKalzbboOaNKPpC29bqTEMfEwS7RGw=
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -53,9 +53,9 @@ Cc: Steven Price <steven.price@arm.com>,
 	Vishal Annapurve <vannapurve@google.com>,
 	WeiLin.Chang@arm.com,
 	Lorenzo Pieralisi <lpieralisi@kernel.org>
-Subject: [PATCH 3/6] firmware: arm_rmm: Check for RMI support at init
-Date: Wed, 15 Jul 2026 15:27:34 +0100
-Message-ID: <20260715142739.80398-4-steven.price@arm.com>
+Subject: [PATCH 4/6] firmware: arm_rmm: Configure the RMM with the host's page size
+Date: Wed, 15 Jul 2026 15:27:35 +0100
+Message-ID: <20260715142739.80398-5-steven.price@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260715142739.80398-1-steven.price@arm.com>
 References: <20260715142739.80398-1-steven.price@arm.com>
@@ -67,217 +67,82 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Query the RMI version number and check if it is a compatible version.
-The first two feature registers are read and exposed for future code to
-use.
+RMM v2.0 brings the ability to set the RMM's granule size. Check the
+feature registers and configure the RMM so that it matches the host's
+page size. This means that operations can be done with a granularity
+equal to PAGE_SIZE.
 
 Signed-off-by: Steven Price <steven.price@arm.com>
 ---
-v15:
- * The code is moved again, this time into the 'firmware' directory.
-v14:
- * This moves the basic RMI setup into the 'kernel' directory. This is
-   because RMI will be used for some features outside of KVM so should
-   be available even if KVM isn't compiled in.
+Changes since v14:
+ * Move the implementation into drivers/firmware/arm_rmm.
+Changes since v13:
+ * Moved out of KVM.
 ---
- arch/arm64/Kconfig                |   1 +
- arch/arm64/kernel/cpufeature.c    |   1 +
- drivers/firmware/Kconfig          |   1 +
- drivers/firmware/Makefile         |   1 +
- drivers/firmware/arm_rmm/Kconfig  |  22 +++++++
- drivers/firmware/arm_rmm/Makefile |   2 +
- drivers/firmware/arm_rmm/rmi.c    | 100 ++++++++++++++++++++++++++++++
- 7 files changed, 128 insertions(+)
- create mode 100644 drivers/firmware/arm_rmm/Kconfig
- create mode 100644 drivers/firmware/arm_rmm/Makefile
- create mode 100644 drivers/firmware/arm_rmm/rmi.c
+ drivers/firmware/arm_rmm/rmi.c | 43 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 43 insertions(+)
 
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index b3afe0688919..0f1956edf130 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -38,6 +38,7 @@ config ARM64
- 	select ARCH_HAS_MEMBARRIER_SYNC_CORE
- 	select ARCH_HAS_MEM_ENCRYPT
- 	select ARCH_SUPPORTS_MSEAL_SYSTEM_MAPPINGS
-+	select ARCH_SUPPORTS_RMM
- 	select ARCH_HAS_NMI_SAFE_THIS_CPU_OPS
- 	select ARCH_HAS_NON_OVERLAPPING_ADDRESS_SPACE
- 	select ARCH_HAS_NONLEAF_PMD_YOUNG if ARM64_HAFT
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 9a22df0c5120..4ae63c89cda9 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -293,6 +293,7 @@ static const struct arm64_ftr_bits ftr_id_aa64isar3[] = {
- static const struct arm64_ftr_bits ftr_id_aa64pfr0[] = {
- 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_CSV3_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_CSV2_SHIFT, 4, 0),
-+	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_RME_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_DIT_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_AMU_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_MPAM_SHIFT, 4, 0),
-diff --git a/drivers/firmware/Kconfig b/drivers/firmware/Kconfig
-index 12dc70254842..55542879fbb8 100644
---- a/drivers/firmware/Kconfig
-+++ b/drivers/firmware/Kconfig
-@@ -301,5 +301,6 @@ source "drivers/firmware/samsung/Kconfig"
- source "drivers/firmware/smccc/Kconfig"
- source "drivers/firmware/tegra/Kconfig"
- source "drivers/firmware/xilinx/Kconfig"
-+source "drivers/firmware/arm_rmm/Kconfig"
- 
- endmenu
-diff --git a/drivers/firmware/Makefile b/drivers/firmware/Makefile
-index 4ddec2820c96..07e8ca1789b4 100644
---- a/drivers/firmware/Makefile
-+++ b/drivers/firmware/Makefile
-@@ -38,3 +38,4 @@ obj-y				+= samsung/
- obj-y				+= smccc/
- obj-y				+= tegra/
- obj-y				+= xilinx/
-+obj-y				+= arm_rmm/
-diff --git a/drivers/firmware/arm_rmm/Kconfig b/drivers/firmware/arm_rmm/Kconfig
-new file mode 100644
-index 000000000000..d224a72cca90
---- /dev/null
-+++ b/drivers/firmware/arm_rmm/Kconfig
-@@ -0,0 +1,22 @@
-+
-+config ARCH_SUPPORTS_RMM
-+	bool
-+
-+config ARM_RMM
-+	bool "Realm Management Monitor (RMM) Support"
-+	depends on ARCH_SUPPORTS_RMM
-+	default y
-+	help
-+	  Support the Realm Management Monitor (RMM) on Arm systems that
-+	  implement the Realm Management Extension (RME), as defined by the
-+	  Arm Confidential Compute Architecture.
-+
-+	  The RMM runs in the Realm world and provides the Realm Management
-+	  Interface (RMI) used by a Normal World host to create, manage and run
-+	  protected virtual machines called Realms. This option builds the
-+	  host-side RMI support used by KVM to detect a compatible RMM,
-+	  configure it, manage delegated memory and enable Realm guests.
-+
-+	  Selecting this option does not by itself make Realm guests available:
-+	  the system must also provide RME-capable hardware and firmware with a
-+	  compatible RMM implementation.
-diff --git a/drivers/firmware/arm_rmm/Makefile b/drivers/firmware/arm_rmm/Makefile
-new file mode 100644
-index 000000000000..51aef5cc04b0
---- /dev/null
-+++ b/drivers/firmware/arm_rmm/Makefile
-@@ -0,0 +1,2 @@
-+
-+obj-$(CONFIG_ARM_RMM)	= rmi.o
 diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/arm_rmm/rmi.c
-new file mode 100644
-index 000000000000..c4850976544f
---- /dev/null
+index c4850976544f..e7ab4a7df3ca 100644
+--- a/drivers/firmware/arm_rmm/rmi.c
 +++ b/drivers/firmware/arm_rmm/rmi.c
-@@ -0,0 +1,100 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) 2023-2026 ARM Ltd.
-+ */
-+
-+#include <linux/cpufeature.h>
-+#include <linux/memblock.h>
-+#include <linux/arm-rmi-cmds.h>
-+#include <linux/slab.h>
-+
-+#include <asm/memory.h>
-+#include <asm/pgtable-hwdef.h>
-+
-+/* Currently only the first 2 registers are used by Linux */
-+#define RMI_FEAT_REG_COUNT	2
-+static __ro_after_init unsigned long rmi_feat_reg_cache[RMI_FEAT_REG_COUNT];
-+
-+unsigned long rmi_feat_reg(unsigned long id)
+@@ -76,6 +76,45 @@ static int rmi_read_features(void)
+ 	return 0;
+ }
+ 
++static int rmi_configure(void)
 +{
-+	if (WARN_ON(id >= RMI_FEAT_REG_COUNT))
-+		return 0;
++	unsigned long ret;
++	struct rmm_config *config __free(free_page) = (struct rmm_config *)get_zeroed_page(GFP_KERNEL);
 +
-+	return rmi_feat_reg_cache[id];
-+}
++	if (!config)
++		return -ENOMEM;
 +
-+static int rmi_check_version(void)
-+{
-+	struct arm_smccc_res res;
-+	unsigned short version_major, version_minor;
-+	unsigned long host_version = RMI_ABI_VERSION(RMI_ABI_MAJOR_VERSION,
-+						     RMI_ABI_MINOR_VERSION);
-+	unsigned long aa64pfr0 = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
-+
-+	/* If RME isn't supported, then RMI can't be */
-+	if (cpuid_feature_extract_unsigned_field(aa64pfr0, ID_AA64PFR0_EL1_RME_SHIFT) == 0)
-+		return -ENXIO;
-+
-+	arm_smccc_1_1_invoke(SMC_RMI_VERSION, host_version, &res);
-+
-+	if (res.a0 == SMCCC_RET_NOT_SUPPORTED)
-+		return -ENXIO;
-+
-+	version_major = RMI_ABI_VERSION_GET_MAJOR(res.a1);
-+	version_minor = RMI_ABI_VERSION_GET_MINOR(res.a1);
-+
-+	if (res.a0 != RMI_SUCCESS) {
-+		unsigned short high_version_major, high_version_minor;
-+
-+		high_version_major = RMI_ABI_VERSION_GET_MAJOR(res.a2);
-+		high_version_minor = RMI_ABI_VERSION_GET_MINOR(res.a2);
-+
-+		pr_err("Unsupported RMI ABI (v%d.%d - v%d.%d) we want v%d.%d\n",
-+		       version_major, version_minor,
-+		       high_version_major, high_version_minor,
-+		       RMI_ABI_MAJOR_VERSION,
-+		       RMI_ABI_MINOR_VERSION);
-+		return -ENXIO;
++	switch (PAGE_SIZE) {
++	case SZ_4K:
++		config->rmi_granule_size = RMI_GRANULE_SIZE_4KB;
++		break;
++	case SZ_16K:
++		config->rmi_granule_size = RMI_GRANULE_SIZE_16KB;
++		break;
++	case SZ_64K:
++		config->rmi_granule_size = RMI_GRANULE_SIZE_64KB;
++		break;
++	default:
++		BUILD_BUG();
 +	}
 +
-+	pr_info("RMI ABI version %d.%d\n", version_major, version_minor);
-+
-+	return 0;
-+}
-+
-+static int rmi_read_features(void)
-+{
 +	/*
-+	 * Since we've negotiated a compatible version these feature registers
-+	 * should always be available
++	 * For now we set the tracking_region_size to 0 which is the only option
++	 * for 4KB PAGE_SIZE (1GB for 4KB PAGE_SIZE, 32MB/512MB for 16KB/64KB).
++	 * TODO: Support other tracking sizes via Kconfig option for other
++	 * PAGE_SIZES
 +	 */
-+	for (int i = 0; i < RMI_FEAT_REG_COUNT; i++) {
-+		if (WARN_ON(rmi_features(i, &rmi_feat_reg_cache[i])))
-+			return -EINVAL;
++	config->tracking_region_size = 0;
++
++	ret = rmi_rmm_config_set(virt_to_phys(config));
++	if (ret) {
++		pr_err("RMM config set failed\n");
++		return -EINVAL;
 +	}
 +
 +	return 0;
 +}
 +
-+static int __init arm64_init_rmi(void)
-+{
-+	int ret;
-+
-+	/* Continue without realm support if we can't agree on a version */
-+	ret = rmi_check_version();
+ static int __init arm64_init_rmi(void)
+ {
+ 	int ret;
+@@ -89,6 +128,10 @@ static int __init arm64_init_rmi(void)
+ 	if (ret)
+ 		return ret;
+ 
++	ret = rmi_configure();
 +	if (ret)
 +		return ret;
 +
-+	ret = rmi_read_features();
-+	if (ret)
-+		return ret;
-+
-+	return 0;
-+}
-+
-+/*
-+ * Note arm64_init_rmi() must be called before kvm_init_rmi() otherwise KVM
-+ * will not support realm guests. subsys_initcall() is called before
-+ * module_init() (used for KVM) so this is OK.
-+ */
-+subsys_initcall(arm64_init_rmi);
+ 	return 0;
+ }
+ 
 -- 
 2.43.0
 
