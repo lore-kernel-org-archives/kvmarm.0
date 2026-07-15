@@ -1,35 +1,35 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9515249691F;
-	Wed, 15 Jul 2026 14:31:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 001614A13AA;
+	Wed, 15 Jul 2026 14:31:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784125909; cv=none; b=nIeZIrcUbI1SZgNg5UGmaI5e48JKYGP72LwXfDebCqOy9wNyio8HQ7U/Zh+XapLXHLSoUHw/Drq3RUTWZjOLgKiM66+PpsYOWizkVyRP6qciduN83UAVp+0TcmLOUK9xJGal1dGakI8y6J+1VDlmQ1vNQ1jioLx5fBgw+DxoMz8=
+	t=1784125919; cv=none; b=RUFm9IdZwTiN0IdC9lV3ay8dY+oVBBeS4Oawyn+aspxdlCdfLQLo/P9wTYYv9iEHyQrfauNH10Yv3HfQV63hnH+oHEn2T37IKKnWJz0lRq6d6Gb20bK/pum8WOWtOwB1VhaqS9c/x7bCT6RNGmHNvVSA3EZmqJLyQYAlQE4XmiE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784125909; c=relaxed/simple;
-	bh=R2faogoYaXkfqGHnF6vJJOqEqJmwTNS9i4WmOVnJpXU=;
+	s=arc-20240116; t=1784125919; c=relaxed/simple;
+	bh=hTHvGHo3aq13/0hCdni+YB/1LbAGuEZAjUd+4tZoURQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mXWbczMSdYGf8gldxFVea1dwo35/rEt/Q9sTyePU/gcwWwbDI7KIJMtOhvQ/8B9F7euPkJXvn+6GUsxGqa+52Oxsbi4nas2Nsxn1DfS4Z2l1Aj2cSY/vy/b0+bxXSk18Qm+TbbM0LVLxYQiKYdgCQi9eXPWFhn6KUZKe/OidJJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=QdZarbfS; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=iovo207IGyZTK4gzgTTJXh8Es/3I3bB9+GvsciMOnpMjppMRazUqSySDnlyRcVMkTUGQW8BANOHyujVf/b019I4g1IhC1dvV/fNlO9KxHaqcB/U1Bp/r7ZVi2p+sxwzWenVTqd9mhRz/T/DuUHIK+fRq8s6chcgDCGL0D+EeQPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=AR2vGpGk; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="QdZarbfS"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="AR2vGpGk"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B7B3915A1;
-	Wed, 15 Jul 2026 07:31:41 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4133D1576;
+	Wed, 15 Jul 2026 07:31:46 -0700 (PDT)
 Received: from e122027.cambridge.arm.com (e122027.cambridge.arm.com [10.1.25.27])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A83563F7B4;
-	Wed, 15 Jul 2026 07:31:41 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4B4FA3F7B4;
+	Wed, 15 Jul 2026 07:31:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1784125905; bh=R2faogoYaXkfqGHnF6vJJOqEqJmwTNS9i4WmOVnJpXU=;
+	t=1784125910; bh=hTHvGHo3aq13/0hCdni+YB/1LbAGuEZAjUd+4tZoURQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=QdZarbfSdc5lkye8g/rO8oqfaXwf8ScDp8caHxqwKFZ8INWULaG+6xkKtRgeak9pI
-	 Yiqf1IJP517QX6gci4s1cPvqpZK0n4+k+2sm/sZy8D79U4OEUQEhv8qsNkQxpTqh1B
-	 YnkZsMZBIkGGmBgzEDLsPAE9/ns1U2mahYMlgGHs=
+	b=AR2vGpGk/pJKe3cSknWcS3UCEVyGMxAWtRMINXoVYuQ5KnoUiu3HircLCLB7+QqRS
+	 l3NnR1yUEHGBt1G8I6z0uTusataDJtdw1V5AnjVcCS7dcysd+dq64vL73OVK3VSJOu
+	 RelST7tzou4LH3wGD49r4zLAwVpDqy0yuTwKEPTQ=
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
-Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>,
+Cc: Steven Price <steven.price@arm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Marc Zyngier <maz@kernel.org>,
 	Will Deacon <will@kernel.org>,
@@ -52,11 +52,10 @@ Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>,
 	Emi Kisanuki <fj0570is@fujitsu.com>,
 	Vishal Annapurve <vannapurve@google.com>,
 	WeiLin.Chang@arm.com,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Steven Price <steven.price@arm.com>
-Subject: [PATCH v15 36/37] KVM: arm64: CCA: Provide an accurate register list
-Date: Wed, 15 Jul 2026 15:28:38 +0100
-Message-ID: <20260715142841.80544-37-steven.price@arm.com>
+	Lorenzo Pieralisi <lpieralisi@kernel.org>
+Subject: [PATCH v15 37/37] KVM: arm64: CCA: Enable realms to be created
+Date: Wed, 15 Jul 2026 15:28:39 +0100
+Message-ID: <20260715142841.80544-38-steven.price@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260715142841.80544-1-steven.price@arm.com>
 References: <20260715142841.80544-1-steven.price@arm.com>
@@ -68,144 +67,26 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+All the pieces are now in place, so enable kvm_rmi_is_available when the
+RMM is detected.
 
-Userspace can set a few registers with KVM_SET_ONE_REG (9 GP registers
-at runtime, and 3 system registers during initialization). Update the
-register list returned by KVM_GET_REG_LIST.
-
-Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
 Signed-off-by: Steven Price <steven.price@arm.com>
 ---
-Changes since v11:
- * Reworked due to upstream changes.
-Changes since v8:
- * Minor type changes following review.
-Changes since v7:
- * Reworked on upstream changes.
----
- arch/arm64/kvm/guest.c      |  6 ++++++
- arch/arm64/kvm/hypercalls.c |  4 ++--
- arch/arm64/kvm/sys_regs.c   | 27 +++++++++++++++++++++------
- 3 files changed, 29 insertions(+), 8 deletions(-)
+ arch/arm64/kvm/rmi.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index 128fec56993a..5e495dd39e39 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -620,6 +620,9 @@ static unsigned long num_sve_regs(const struct kvm_vcpu *vcpu)
- 	if (!kvm_arm_vcpu_sve_finalized(vcpu))
- 		return 1; /* KVM_REG_ARM64_SVE_VLS */
+diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
+index 3f1c6351b71a..06cc85fb5092 100644
+--- a/arch/arm64/kvm/rmi.c
++++ b/arch/arm64/kvm/rmi.c
+@@ -1518,5 +1518,6 @@ void kvm_init_rmi(void)
+ 	if (rmm_check_features())
+ 		return;
  
-+	if (kvm_is_realm(vcpu->kvm))
-+		return 1; /* KVM_REG_ARM64_SVE_VLS */
-+
- 	return slices * (SVE_NUM_PREGS + SVE_NUM_ZREGS + 1 /* FFR */)
- 		+ 1; /* KVM_REG_ARM64_SVE_VLS */
+-	/* Future patch will enable static branch kvm_rmi_is_available */
++	kvm_info("Realm guests supported\n");
++	static_branch_enable(&kvm_rmi_is_available);
  }
-@@ -647,6 +650,9 @@ static int copy_sve_reg_indices(const struct kvm_vcpu *vcpu,
- 	if (!kvm_arm_vcpu_sve_finalized(vcpu))
- 		return num_regs;
- 
-+	if (kvm_is_realm(vcpu->kvm))
-+		return num_regs;
-+
- 	for (i = 0; i < slices; i++) {
- 		for (n = 0; n < SVE_NUM_ZREGS; n++) {
- 			reg = KVM_REG_ARM64_SVE_ZREG(n, i);
-diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-index b11b8821c9fb..82278ccb19ae 100644
---- a/arch/arm64/kvm/hypercalls.c
-+++ b/arch/arm64/kvm/hypercalls.c
-@@ -414,14 +414,14 @@ void kvm_arm_teardown_hypercalls(struct kvm *kvm)
- 
- int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu)
- {
--	return ARRAY_SIZE(kvm_arm_fw_reg_ids);
-+	return kvm_is_realm(vcpu->kvm) ? 0 : ARRAY_SIZE(kvm_arm_fw_reg_ids);
- }
- 
- int kvm_arm_copy_fw_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
- {
- 	int i;
- 
--	for (i = 0; i < ARRAY_SIZE(kvm_arm_fw_reg_ids); i++) {
-+	for (i = 0; i < kvm_arm_get_fw_num_regs(vcpu); i++) {
- 		if (put_user(kvm_arm_fw_reg_ids[i], uindices++))
- 			return -EFAULT;
- 	}
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index e47be8f8d259..6d805160d70e 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -5540,18 +5540,18 @@ int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
- 				    sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
- }
- 
--static unsigned int num_demux_regs(void)
-+static inline unsigned int num_demux_regs(struct kvm_vcpu *vcpu)
- {
--	return CSSELR_MAX;
-+	return kvm_is_realm(vcpu->kvm) ? 0 : CSSELR_MAX;
- }
- 
--static int write_demux_regids(u64 __user *uindices)
-+static int write_demux_regids(struct kvm_vcpu *vcpu, u64 __user *uindices)
- {
- 	u64 val = KVM_REG_ARM64 | KVM_REG_SIZE_U32 | KVM_REG_ARM_DEMUX;
- 	unsigned int i;
- 
- 	val |= KVM_REG_ARM_DEMUX_ID_CCSIDR;
--	for (i = 0; i < CSSELR_MAX; i++) {
-+	for (i = 0; i < num_demux_regs(vcpu); i++) {
- 		if (put_user(val | i, uindices))
- 			return -EFAULT;
- 		uindices++;
-@@ -5595,11 +5595,26 @@ static bool copy_reg_to_user(const struct sys_reg_desc *reg, u64 __user **uind)
- 	return true;
- }
- 
-+static inline bool kvm_realm_sys_reg_hidden_user(const struct kvm_vcpu *vcpu,
-+						 u64 reg)
-+{
-+	switch (reg) {
-+	case SYS_ID_AA64DFR0_EL1:
-+	case SYS_PMCR_EL0:
-+		return false;
-+	}
-+	return true;
-+}
-+
- static int walk_one_sys_reg(const struct kvm_vcpu *vcpu,
- 			    const struct sys_reg_desc *rd,
- 			    u64 __user **uind,
- 			    unsigned int *total)
- {
-+	if (vcpu_is_rec(vcpu) &&
-+	    kvm_realm_sys_reg_hidden_user(vcpu, reg_to_encoding(rd)))
-+		return 0;
-+
- 	/*
- 	 * Ignore registers we trap but don't save,
- 	 * and for which no custom user accessor is provided.
-@@ -5637,7 +5652,7 @@ static int walk_sys_regs(struct kvm_vcpu *vcpu, u64 __user *uind)
- 
- unsigned long kvm_arm_num_sys_reg_descs(struct kvm_vcpu *vcpu)
- {
--	return num_demux_regs()
-+	return num_demux_regs(vcpu)
- 		+ walk_sys_regs(vcpu, (u64 __user *)NULL);
- }
- 
-@@ -5650,7 +5665,7 @@ int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
- 		return err;
- 	uindices += err;
- 
--	return write_demux_regids(uindices);
-+	return write_demux_regids(vcpu, uindices);
- }
- 
- #define KVM_ARM_FEATURE_ID_RANGE_INDEX(r)			\
 -- 
 2.43.0
 
