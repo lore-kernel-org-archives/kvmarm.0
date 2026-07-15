@@ -1,52 +1,52 @@
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF521331A63
-	for <kvmarm@lists.linux.dev>; Wed, 15 Jul 2026 11:21:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 194F0353A7F
+	for <kvmarm@lists.linux.dev>; Wed, 15 Jul 2026 11:31:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784114503; cv=none; b=AoTDZF5aUXD3S8SbHujWd4unGbGgXB77HTR+XkiMANsAOZFUdAXhqwQquEmrZXulZPs7xYnidqg3bOsf50X/fAyCSB/q93Uk0IEBuXPI60G0H8c0FrcTxX8xmYqjsNychfxGJp18ozZsYLNzEz28/Su2giIzzIgjRx5jnamG1OE=
+	t=1784115081; cv=none; b=hsa8Xq23G8+zjRz7RpXxuHWSUfnqpJfIaXy8w3RYToe0AEyXuur82zmOvIfaqz+rlmcncXgOe1UQIAnGy0/eQ+LfADl9hUu24fKvP8lgpLIjK3NRpEAz2wYsuAHVOixPTqKZVm06b3Uc/3r55b+yqQeeEZ5u16+v1/tXpRUadI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784114503; c=relaxed/simple;
-	bh=zjRJFc0fMMunqcORPqfH+M7qVy9GPREs6UeoJ0DLZNQ=;
+	s=arc-20240116; t=1784115081; c=relaxed/simple;
+	bh=mYFt+p5c8uRMZe9Xo3qwxk50hzS/JwfoUzvNS7RCtJ0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HA43RKOGYHPOft/IylSQXIo4a1Se9VnJqZqFgxLeZ2+gCfw/ilubxfcvzavqOn4J6eAYgFW+ocMFhBuimqOmhp7t5xG5s9ZsAibH2imPQg3KU1zbvmXy8qFPraN4bKU1g8nRvpqFxqCaMlQ1CPs2D0SC+yLsweEwJibtTGApads=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=VuveKuRJ; arc=none smtp.client-ip=95.215.58.186
+	 To:Cc:Content-Type; b=f/dfaceci+7rv8LCJCG+F4klDqGKDU9NURmF1Ozgj9b5QDKxf9plJu+HNBpEnOj5OhXeRRAVpvZ3lWdns3bjHNEW0cg16g7fVeFYqs03KBO8ioqN0PFCcU+5dkBjOJHWwcu8tqf6IllTSBvOUkipM0naoq71YJh/P33rbkExiZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FvusVPxR; arc=none smtp.client-ip=95.215.58.188
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="VuveKuRJ"
-X-Forwarded-Encrypted: i=1; AHgh+RrF/gLOrfRijeBUvAGeVVcEZeLLHevIO0lLBZWA78FoOt9A/Wgwj1hPXUS/U7icPlReqEi0M2g=@lists.linux.dev
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FvusVPxR"
+X-Forwarded-Encrypted: i=1; AHgh+RrhYuDwmo0oCXWoppRl4vqbuBWNLsIWhfWVsnc4MsN53++gbq8ZkVyqQiYaLG0H9MTpLdr1+cc=@lists.linux.dev
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1784114499;
+	t=1784115075;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=g2xc5XImhz7yv/LH3/qlvK74Dh7JZH9qnVWu+RRjZYc=;
-	b=VuveKuRJs7E0fk5mfh0V4EbyVsX/lcOlC1wAXZ7SvnOjGKWbAHgrE0dwwUAcsBURWC3iAs
-	aVsALJSoTT6Hnxx8YJxDr94yFQ3mhS+qEJIIZfbeUYBBdB5sY058yWjGZm+KBrRJweF8mK
-	NwL9+8S9jkwhaz92jZpwxEp6jnGKC2E=
-X-Gm-Message-State: AOJu0YwNFL1y+CTssFNqpgAzpYSWYZCFamgHak245HUS+ltBKGtpjX4L
-	0wWlhPFPUWoJZZ14LbPJ41iKHQ/mVWWD40Tk9Fh1fMVSN77AWIMdlj9DHOuI4oHtWTH7+ue3v1t
-	6HumLoepphOpwmHwK5kKnMS5JWp3jOx2WBhW1bh7N
-X-Received: by 2002:a05:622a:1803:b0:51b:fd21:c077 with SMTP id
- d75a77b69052e-51d7bd8c7aemr25509781cf.21.1784114490270; Wed, 15 Jul 2026
- 04:21:30 -0700 (PDT)
+	bh=gxp3fXNq8XYNE/nkPh7KFYIhP3YHcDVUtPAtTd5Tryg=;
+	b=FvusVPxRPvaZ7N/UegN2vx8ltoMrWsjq4lSS2/QkdnmpOfVut4Bn/E76feJ+s6+J2tZkZr
+	uLLIvB2eIOYxaxnqOdXPINVWaaq4MfSQ12rx3YYPupGBCAQ6XMvBHuwOm/ni3zcyhn3OKU
+	xKMdLxRjhfSZ9yDQo+biprfUq2o5/I8=
+X-Gm-Message-State: AOJu0Yw9gqrLipz6NvraQ55Jt1lqK6rP38aGwxk+80lElU+eu/LNzQ/y
+	CCllG53ZjeLV8OrRSLylNpJrA7lj1osLKKLOiUSSovqbAF98ScCaKY+7Ii29QN2Sd7+YWryD1r1
+	eXen1WyjDCBdDqddK8gd9ofJ6oFxgxvoKWZvjDKfZ
+X-Received: by 2002:a05:622a:4d:b0:51c:ba4f:9d19 with SMTP id
+ d75a77b69052e-51d7bd752e0mr24873701cf.19.1784115061509; Wed, 15 Jul 2026
+ 04:31:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260706175415.2604046-1-vdonnefort@google.com> <20260706175415.2604046-12-vdonnefort@google.com>
-In-Reply-To: <20260706175415.2604046-12-vdonnefort@google.com>
+References: <20260706175415.2604046-1-vdonnefort@google.com> <20260706175415.2604046-13-vdonnefort@google.com>
+In-Reply-To: <20260706175415.2604046-13-vdonnefort@google.com>
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Wed, 15 Jul 2026 12:20:51 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTwcz8T_RfgE46+xMKP_nz7Mi9rVCdhtnC2CbjtO1O5xCQ@mail.gmail.com>
-X-Gm-Features: AUfX_mz1RLvH9JXOmIBy2vCcAXLuKzZgjvV33kiVgqna39ElIrdN_-tuf2FZors
-Message-ID: <CA+EHjTwcz8T_RfgE46+xMKP_nz7Mi9rVCdhtnC2CbjtO1O5xCQ@mail.gmail.com>
-Subject: Re: [PATCH v2 11/18] KVM: arm64: Add a shrinker for pKVM
+Date: Wed, 15 Jul 2026 12:30:24 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTynPXq+h8z4U7kg6Vqh5+Jvi2dDY4w9eL_6YOW=yN=i-w@mail.gmail.com>
+X-Gm-Features: AUfX_mxhMGLkpuT8Eh9JQ0ObVBlPYewUpp8cXDJp91EMiI7N1SswSQZWtF5PdKw
+Message-ID: <CA+EHjTynPXq+h8z4U7kg6Vqh5+Jvi2dDY4w9eL_6YOW=yN=i-w@mail.gmail.com>
+Subject: Re: [PATCH v2 12/18] KVM: arm64: Filter out non-kernel addresses in kern_hyp_va
 To: Vincent Donnefort <vdonnefort@google.com>
 Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
 	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
@@ -57,81 +57,42 @@ X-Migadu-Flow: FLOW_OUT
 
 On Mon, 6 Jul 2026 at 18:54, Vincent Donnefort <vdonnefort@google.com> wrote:
 >
-> Integrate the pKVM memory reclaim interface with the host's memory
-> management subsystem.
+> kern_hyp_va() is idempotent for the hypervisor linear space. This is
+> handy for nVHE hypervisor callers handling kvm_vcpu or kvm_arch
+> pointers. Those pointers can originate from the hypervisor space (when
+> protected mode is enabled, we don't trust the kernel and the hypervisor
+> uses its own copy) or from the kernel space (we do trust the kernel in
+> "non-protected" nVHE).
 >
-> This allows the host to automatically recover unused memory fom the
-> hypervisor's heap allocator when the host is under memory pressure.
+> This idempotence does not hold for addresses within the hypervisor
+> private range, like the ones you get from the pKVM heap allocator
+> (hyp_alloc()). To resolve this, filter out non-kernel addresses based on
+> PAGE_OFFSET.
+>
+> Leave the assembly version untouched as it has no current users.
 >
 > Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
->
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 50adfff75be8..3dc2b9d2c322 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -122,6 +122,8 @@ static bool vgic_present, kvm_arm_initialised;
->
->  static DEFINE_PER_CPU(unsigned char, kvm_hyp_initialized);
->
-> +static struct shrinker *pkvm_shrinker;
-> +
->  bool is_kvm_arm_initialised(void)
->  {
->         return kvm_arm_initialised;
-> @@ -2526,8 +2528,8 @@ static void __init teardown_hyp_mode(void)
->                 }
->
->                 free_pages(kvm_nvhe_sym(kvm_arm_hyp_percpu_base)[cpu], nvhe_percpu_order());
-> -
->         }
-> +       shrinker_free(pkvm_shrinker);
->  }
->
->  static int __init do_pkvm_init(u32 hyp_va_bits)
-> @@ -2713,6 +2715,18 @@ static void pkvm_hyp_init_ptrauth(void)
->         }
->  }
->
-> +static unsigned long
-> +pkvm_shrinker_count(struct shrinker *shrink, struct shrink_control *sc)
-> +{
-> +       return pkvm_hyp_reclaimable(PKVM_TOPUP_HYP_ALLOC) ?: SHRINK_EMPTY;
-> +}
-> +
-> +static unsigned long
-> +pkvm_shrinker_scan(struct shrinker *shrink, struct shrink_control *sc)
-> +{
-> +       return pkvm_hyp_reclaim(PKVM_TOPUP_HYP_ALLOC, sc->nr_to_scan);
-> +}
-> +
->  /* Inits Hyp-mode on all online CPUs */
->  static int __init init_hyp_mode(void)
->  {
-> @@ -2883,6 +2897,16 @@ static int __init init_hyp_mode(void)
->                         kvm_err("Failed to init hyp memory protection\n");
->                         goto out_err;
->                 }
-> +
-> +               pkvm_shrinker = shrinker_alloc(0, "pkvm");
-> +               if (pkvm_shrinker) {
-> +                       pkvm_shrinker->count_objects = pkvm_shrinker_count;
-> +                       pkvm_shrinker->scan_objects = pkvm_shrinker_scan;
-> +                       shrinker_register(pkvm_shrinker);
-> +               } else {
-> +                       kvm_err("Failed to register shrinker for pKVM\n");
-> +               }
-> +
->         }
 
-Sashiko might be onto something here. The shrinker goes live in
-init_hyp_mode(), but kvm_protected_mode_initialized isn't set until
-finalize_pkvm()...
+Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
 
 Cheers,
 /fuad
 
 >
->         return 0;
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> index 6eae7e7e2a68..d60e5f2de10c 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -126,6 +126,9 @@ static __always_inline unsigned long __kern_hyp_va(unsigned long v)
+>   * replace the instructions with `nop`s.
+>   */
+>  #ifndef __KVM_VHE_HYPERVISOR__
+> +       if (!is_ttbr1_addr(v))
+> +               return v;
+> +
+>         asm volatile(ALTERNATIVE_CB("and %0, %0, #1\n"         /* mask with va_mask */
+>                                     "ror %0, %0, #1\n"         /* rotate to the first tag bit */
+>                                     "add %0, %0, #0\n"         /* insert the low 12 bits of the tag */
 > --
 > 2.55.0.rc2.803.g1fd1e6609c-goog
 >
