@@ -1,153 +1,111 @@
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6B124779B3
-	for <kvmarm@lists.linux.dev>; Wed, 15 Jul 2026 15:01:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6A3D42BC58;
+	Wed, 15 Jul 2026 15:06:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784127693; cv=none; b=PFBTv0vokTEYpt+Skpuy8noVmKat4VZj3TIvHS4RB+2U+sL2QrJy0Vil1rGIpVg7eAV0l3eysatRacu4uoC1dKY6vGekomyhPAQkH17qLGpdAo5c1wdz4awHZPqwcaKAXY7fwxfsnVLelcw9ljXmUcWr6OWP00QRdfDQ2YTdU4M=
+	t=1784128017; cv=none; b=jNriJo1O/LfSOwwzthpGHsWcHmizie2lCsPB4IWw0k8QgUbI9vHMhVxrQ1HQwhpttErq21VAajghmDNbBBn+UxK9H/0YFcMriEfdgZ7mO92Q5GKpXFC2HAa45OWpfR9J1PPM8twOLcKzq7hBtzlA5zsTPceglaZk8Q0J+bw1pnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784127693; c=relaxed/simple;
-	bh=8+jGNB5irA8u1mmyluWOv/fGSc4MZVL9ROhTZSbY5us=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=FFXLxCiTWxKeFF+t+fWh1VcIDem2oRxqcZ1krb9v+YOLrd+2DUcZbAk+AQ2YiG+B3eAjcw0zBekjwtJ5pv5bq9V/kZcgnMG+vKAHp6muGn2BvDdixHRA212CYTk83yQiVC4FxGTJsSsGxtkpnAqIJPKhdpkDegcW0FgGJqUUHfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EJPOBv2w; arc=none smtp.client-ip=209.85.221.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com
+	s=arc-20240116; t=1784128017; c=relaxed/simple;
+	bh=TUZGVsbgQlqpPNw19QmZ4TpzXd38zHRHXwauyCE/oz4=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=WIbLa7ZqI+JWKvr6SJRdh+7Bz0P5prOLI8/QWJ7tcoyHiBKpNTKHnE+Tvh7zYccqeoRlGpUt8n48/Vskvjd4mrosZ5VMUo4CG29a/ygHUcrhQ+AfNNahZOhw7g6SSaqkr8S2MVt01sUMzaqtBeXMjCRGJ9pQghagpMs760bZp28=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MQwrA61Y; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EJPOBv2w"
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-4629f312a67so4640219f8f.2
-        for <kvmarm@lists.linux.dev>; Wed, 15 Jul 2026 08:01:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1784127690; x=1784732490; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=j8UdcPrCWpOwvzYn0GBOE+Kb77J6h4WrSrgHpYB821s=;
-        b=EJPOBv2wM7kjASweoINaWM8mo4HXqeSr2XgzoexQlbL8xNThjMBWBFBLb9BH/GEsa5
-         /iu74/UqAC172zd991wzO/UJprACKxHu+uyYyd+y9UCdz5wNK4thOi5CHyNaZXtbGkqf
-         YkNOhY735wUkMK/6yOXEwLu/cl/SdyUhAAc7bsL3pfl7rd93xHY2wizIfBb0B2HdBZzM
-         4F28hcwf4b4yW7I5NKb+3v3UaST13NUI10GT700TcwhfytiiXqLFYLdvkpXYUTajTvuE
-         vXqNaxQ7fDE9FqsQWxdJJLpmJttKXpudUqlvDd0nWfCsvOdlRfPaJ4QA19eb4xQwIThF
-         befQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784127690; x=1784732490;
-        h=content-type:cc:to:from:subject:message-id:mime-version:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=j8UdcPrCWpOwvzYn0GBOE+Kb77J6h4WrSrgHpYB821s=;
-        b=aGi3ttW2GuT9qRG7Vx2/xafeHrpiv+d5ut9fjuz4mAB3UnEJ8OW7/n7TW9PW+tUVm8
-         oPsy9LSaJKSGmXKfiXBYINowXjpScr4mnxbDfgZPa7ARsYw3M6pG4AL0dnALsfKWNPs9
-         kvtEUugle9Ef0PaUXGJFUck44e282cRj+i4tM6gwQoWQL2bOWFIRPRocxXYu3+bX/5yk
-         WOOT8gIILx/rLX58ryhIIGWMs8lshW6e5D8aqCV7CYnPqJn/0xRdlb89FwR15jRq68qD
-         uXAo9L9GnywhVeEWGqj+6mi279x5BhO23JN88SpFAPIUBmUvpRwlkZa3Ed8HmNwTgNm/
-         Oj4Q==
-X-Forwarded-Encrypted: i=1; AHgh+RpTuaxyS+wdtJGmgGr8q9eV3Q1asglusVo4JUb8bxS/jGO3qz+wXq+3AscQeLKfNkZAezjfmsw=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyE5CJ3u24gfqs+7rHX+Qr0Sm6OuMw8rHQ7FJbTYzpENW8+2DT5
-	LMr1kyo5S4iF6iS1X2uv/UWL7TRe5aRrTpZ1NvHGeXItOSzHs7AA65DeNC64/S4KDtLsGqXUHuk
-	T1p3ksuTa8PlRcQ==
-X-Received: from wrwq6.prod.google.com ([2002:a5d:5746:0:b0:47a:6462:7fbe])
- (user=smostafa job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6000:2c0a:b0:474:4525:eb55 with SMTP id ffacd0b85a97d-47f4fd1fc60mr3529438f8f.47.1784127689429;
- Wed, 15 Jul 2026 08:01:29 -0700 (PDT)
-Date: Wed, 15 Jul 2026 15:01:25 +0000
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MQwrA61Y"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D0A61F00A3A;
+	Wed, 15 Jul 2026 15:06:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1784128016;
+	bh=8gNRNQSW6vsktM1lbk7lGhKHurw9QaFYDhPaWxlP0Cc=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=MQwrA61Ykf0ssG5unhBw8veYKROdA1mQdlXY+yx9U6WOajRyL7xTsVfub5kEaP+eW
+	 /eals2r8UCuZjDKMGKKgfdyF3NuXFCpGofNIi4ZqzP4cXiBj8sMxnmZVBevTKBUYOJ
+	 J7rJwEnFCsxPP2RvfW3rSaNQRK+NN6BcDpmAvexlldJIXcoaSJfVyvXBpJduZ6YPlG
+	 9NJspzKdHkoeiUwFQK+6rztLz8C+nd5zi6KUjyO4yCj35H4uATihIZrvNinHokfO4R
+	 QkSNurk+G36Ec30P7HrIhb4qH4WnDZfTKwD0CRHM+G8od7DThAbXRw/+wULqlhIwpI
+	 zhgfZXrc5kS3A==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH 3/6] firmware: arm_rmm: Check for RMI support at init
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Steven Price" <steven.price@arm.com>
+Cc: "Marc Zyngier" <maz@kernel.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, "Oliver
+ Upton" <oupton@kernel.org>
+In-Reply-To: <20260715142739.80398-4-steven.price@arm.com>
+References: <20260715142739.80398-1-steven.price@arm.com>
+ <20260715142739.80398-4-steven.price@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 15 Jul 2026 15:06:55 +0000
+Message-Id: <20260715150656.4D0A61F00A3A@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.55.0.141.g00534a21ce-goog
-Message-ID: <20260715150125.2798116-1-smostafa@google.com>
-Subject: [PATCH] KVM: arm64: Use consistent type for pool size
-From: Mostafa Saleh <smostafa@google.com>
-To: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org
-Cc: maz@kernel.org, oupton@kernel.org, seiden@linux.ibm.com, 
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	catalin.marinas@arm.com, will@kernel.org, vdonnefort@google.com, 
-	tabba@google.com, Mostafa Saleh <smostafa@google.com>
-Content-Type: text/plain; charset="UTF-8"
 
-All the pool sizes in the hypervisor are "unsigned long" but when
-they get passed to hyp_early_alloc_contig() or hyp_pool_init() they get
-truncated to 32-bits.
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [Low] The function `is_rmi_available()` is declared in the header but its=
+ implementation is missing.
+--
 
-That is not a big problem at the moment as to overflow this we need
-4G bytes of carveout (2 TB of host or guest system memory).
+--- Patch [3]: [PATCH 3/6] firmware: arm_rmm: Check for RMI support at init=
+ ---
+commit 422535e6880c00ddffdc5f970e459e2cf571e957
+Author: Steven Price <steven.price@arm.com>
 
-However when new users are added (as IOMMU) it is hard to reason
-about the carveout size anymore.
+firmware: arm_rmm: Check for RMI support at init
 
-Signed-off-by: Mostafa Saleh <smostafa@google.com>
----
-For example in the SMMUv3 to avoid this overflow, I add a cap
-for the pools size to UINT_MAX to work around this:
-https://lore.kernel.org/linux-iommu/20260715115906.2664882-9-smostafa@google.com/
----
- arch/arm64/kvm/hyp/include/nvhe/early_alloc.h | 2 +-
- arch/arm64/kvm/hyp/include/nvhe/gfp.h         | 4 ++--
- arch/arm64/kvm/hyp/nvhe/early_alloc.c         | 2 +-
- arch/arm64/kvm/hyp/nvhe/page_alloc.c          | 6 +++---
- 4 files changed, 7 insertions(+), 7 deletions(-)
+Query the RMI version number and check if it is a compatible version.
+The first two feature registers are read and exposed for future code to
+use.
 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/early_alloc.h b/arch/arm64/kvm/hyp/include/nvhe/early_alloc.h
-index dc61aaa56f31..462883c4e325 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/early_alloc.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/early_alloc.h
-@@ -7,7 +7,7 @@
- void hyp_early_alloc_init(void *virt, unsigned long size);
- unsigned long hyp_early_alloc_nr_used_pages(void);
- void *hyp_early_alloc_page(void *arg);
--void *hyp_early_alloc_contig(unsigned int nr_pages);
-+void *hyp_early_alloc_contig(unsigned long nr_pages);
- 
- extern struct kvm_pgtable_mm_ops hyp_early_alloc_mm_ops;
- 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/gfp.h b/arch/arm64/kvm/hyp/include/nvhe/gfp.h
-index 3766333bace9..3a428dc40b14 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/gfp.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/gfp.h
-@@ -29,6 +29,6 @@ void hyp_get_page(struct hyp_pool *pool, void *addr);
- void hyp_put_page(struct hyp_pool *pool, void *addr);
- 
- /* Used pages cannot be freed */
--int hyp_pool_init(struct hyp_pool *pool, u64 pfn, unsigned int nr_pages,
--		  unsigned int reserved_pages);
-+int hyp_pool_init(struct hyp_pool *pool, u64 pfn, unsigned long nr_pages,
-+		  unsigned long reserved_pages);
- #endif /* __KVM_HYP_GFP_H */
-diff --git a/arch/arm64/kvm/hyp/nvhe/early_alloc.c b/arch/arm64/kvm/hyp/nvhe/early_alloc.c
-index 00de04153cc6..9fef0c7d2185 100644
---- a/arch/arm64/kvm/hyp/nvhe/early_alloc.c
-+++ b/arch/arm64/kvm/hyp/nvhe/early_alloc.c
-@@ -21,7 +21,7 @@ unsigned long hyp_early_alloc_nr_used_pages(void)
- 	return (cur - base) >> PAGE_SHIFT;
- }
- 
--void *hyp_early_alloc_contig(unsigned int nr_pages)
-+void *hyp_early_alloc_contig(unsigned long nr_pages)
- {
- 	unsigned long size = (nr_pages << PAGE_SHIFT);
- 	void *ret = (void *)cur;
-diff --git a/arch/arm64/kvm/hyp/nvhe/page_alloc.c b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
-index 57f86aa0f82f..51460d420c94 100644
---- a/arch/arm64/kvm/hyp/nvhe/page_alloc.c
-+++ b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
-@@ -229,12 +229,12 @@ void *hyp_alloc_pages(struct hyp_pool *pool, u8 order)
- 	return hyp_page_to_virt(p);
- }
- 
--int hyp_pool_init(struct hyp_pool *pool, u64 pfn, unsigned int nr_pages,
--		  unsigned int reserved_pages)
-+int hyp_pool_init(struct hyp_pool *pool, u64 pfn, unsigned long nr_pages,
-+		  unsigned long reserved_pages)
- {
- 	phys_addr_t phys = hyp_pfn_to_phys(pfn);
- 	struct hyp_page *p;
--	int i;
-+	unsigned long i;
- 
- 	hyp_spin_lock_init(&pool->lock);
- 	pool->max_order = min(MAX_PAGE_ORDER,
--- 
-2.55.0.141.g00534a21ce-goog
+> diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/arm_rmm/rm=
+i.c
+> new file mode 100644
+> index 0000000000000..c4850976544ff
+> --- /dev/null
+> +++ b/drivers/firmware/arm_rmm/rmi.c
 
+[ ... ]
+
+> +static int __init arm64_init_rmi(void)
+> +{
+> +	int ret;
+> +
+> +	/* Continue without realm support if we can't agree on a version */
+> +	ret =3D rmi_check_version();
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret =3D rmi_read_features();
+> +	if (ret)
+> +		return ret;
+> +
+> +	return 0;
+> +}
+> +
+> +/*
+> + * Note arm64_init_rmi() must be called before kvm_init_rmi() otherwise =
+KVM
+> + * will not support realm guests. subsys_initcall() is called before
+> + * module_init() (used for KVM) so this is OK.
+> + */
+> +subsys_initcall(arm64_init_rmi);
+
+[Severity: Low]
+Is the implementation of is_rmi_available() missing here?
+
+It is declared for external callers in include/linux/arm-rmi-cmds.h:
+
+bool is_rmi_available(void);
+
+However, the corresponding definition appears to be missing from
+drivers/firmware/arm_rmm/rmi.c, which could lead to link-time undefined
+reference errors when another subsystem attempts to use it.
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260715142739.8039=
+8-1-steven.price@arm.com?part=3D3
