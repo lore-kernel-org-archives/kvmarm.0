@@ -1,56 +1,56 @@
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 153B544CF2C
-	for <kvmarm@lists.linux.dev>; Wed, 15 Jul 2026 11:59:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E540B44D03B
+	for <kvmarm@lists.linux.dev>; Wed, 15 Jul 2026 11:59:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784116762; cv=none; b=TF4qefdqeO9tbcNvnKekpQJboBCSSbOgoiOGwCxpMvt8OJtgjxo4DWJD8vh/7yZdscd+Kv/N9N6Py8Bc9SLIf3g1fkyNzxJR3N25yWiFQTYYsJlktfYxp+ZGKXELx4pT0owMTyh3JY3jz28I0ic9rUPVpu4lzy9/6GN62ad8/vs=
+	t=1784116763; cv=none; b=lAFXm4/Enhfd1ta7L475i2+nKmkvQ0R5anRl4r4ISZN3lsL7frrD91GlZKs6t+n07nAKBN8W8WR/mrvwRYkCAksVjVrmdCzeXKmhlbKiPGOQdsbg8cHlYk0q4NiIiEvo8L+iCrEpN3+Y5CDoarnaaXn3uSItqamyNLsUl8Zjy98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784116762; c=relaxed/simple;
-	bh=1nwreBOIoo8Nq3x/9cqsrE39IlPY4nM+9QYDUvVAOnY=;
+	s=arc-20240116; t=1784116763; c=relaxed/simple;
+	bh=STqKZu1+JRPT/I5ZbjlCOBueLZbvaon11+KOo0bmUWc=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=LQQmTD60T1LjaX+YEGOr8NuDwmdFstXWJlHGRYfCi1Cwa83u+8Uhd5D+uLG5P95HJLbCwUGxm+YbB2UYjSrcWaCZFYm9lV86c4G1opgVHpaDgKIZNWjxH0Ub7SxV+m8GGT2sZQv4QDtCNqe6uW5kmIvlwBkVuyZAhtr/htzVUoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rJu9F3Ya; arc=none smtp.client-ip=209.85.221.74
+	 To:Cc:Content-Type; b=YGrJUOFPr7JP6v9/LknIxk9BwnIvOIbqMh1+h/QhzIej+LhcnAi2qYqoP6EV/26ulbbogExK4m7SO+PKdRp2x4Qr7/hbDgzFfB3V/myJRuZ9az0JPdIRmCQ1wFRBFfPpUehSzRO5C5BNDY3J0/1tvEVlqlxjHx6guR9x6F9fiLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CjOVNLpV; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rJu9F3Ya"
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-4744b72f90bso2892887f8f.0
-        for <kvmarm@lists.linux.dev>; Wed, 15 Jul 2026 04:59:19 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CjOVNLpV"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-493b21b1fe8so18018485e9.0
+        for <kvmarm@lists.linux.dev>; Wed, 15 Jul 2026 04:59:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1784116758; x=1784721558; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1784116759; x=1784721559; darn=lists.linux.dev;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=116XGPIsH3uc1TP/YR0VtloeUIWM18cD/kEPtzKIUwA=;
-        b=rJu9F3Ya26gcyKVjlvHNIRpfPPr0H6qBsQGWhzRsQt2MvnXIQKsmZLJFdU/sUVSFA0
-         4NkLhIsl8aWI0oLC7ls0yscz6OBsLzofMTMmS5u8D7Yu8ctWtwQo2EL2eGzI6h3DUjnq
-         QvNEt+VrcIi2wDF2P4q9c0b8Tw8O6y8pEi4eXyRChk/OIL5aZd1+9N8+dWCf65226b+l
-         m7vjxfl4wwFjBl74X7oAztb7XVaF8fOa5wKxj1hXvYwgka4oSMRozvD4gyLX57KLrSo3
-         Pf2d5arK+Xi4AsYQFlITG5zu2+hzsCiTeE0oNVdQzu9Oi1fAu3wrdGQ+lkG7d3citsSC
-         MG2w==
+        bh=2KYF2oL0lGPGcMYNCJmZKWaj3D1T4zoKMpkf+eN5NFY=;
+        b=CjOVNLpVcL6kqj7v6LrNsZLvDT5DDVc1vAX/8fZhGIPdp7T8a/QSaPrbPICS8gjwkd
+         nBJOicsUY5vF5vmGLc0R+CeyqkEp3y135ub8DaKGo9KSvgGyXzgI2PIA8swIvBIfPaOD
+         Up5pJuS9YES5i02ZBweDrzrJ6wJKP5wyVG7FI9i/JS5EYSIRKO9zdfg6Rq5IfgXbngut
+         PHuWk7o49CQqsFp/r8QbzIwrbLbc0rQiuZhavh7gXej0u60/0v0A3srYFhfdisEeD3mv
+         1hpS7nDtEaycwBOw3YEwX3+YN7j5t8r79F7gMXTdPBFiCEFv8unz4CkCsFOFhsp4zo5l
+         9u5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784116758; x=1784721558;
+        d=1e100.net; s=20251104; t=1784116759; x=1784721559;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=116XGPIsH3uc1TP/YR0VtloeUIWM18cD/kEPtzKIUwA=;
-        b=Lh5f4WBfyS3o+nroSVklHDGMsWZbOcyU6w+hcXP7U1+Jag1JD80swl/ZYT9TEFeKy2
-         Qr44Y8C28fATA8WT6szZfmynZKVGHZT6A3yZJSQ18E7Xsl6IHEvARkBego5WOCqNGRoq
-         V8+eQJKjLZMuzjA+zx/DrrUXljy5zQfRp0ayIpWUukfS+uHTlfTEq0AbTcs+ZlNDGrFT
-         rJ2MfgQvaw7EjZq9d9dP92eTJcgzvVVHTS/7Dwp2usckdndcoXV8hLA1193iDIkbQM4y
-         0RhKTSBjrMU6WnhUolvI+J3fg8ds2PEpucv/NWnky7x0cOzfU5ZyO1Q3FDmlNTObPxyd
-         vVqQ==
-X-Forwarded-Encrypted: i=1; AHgh+RrKHfHZxfV46j/CtaTrCOwpX55QjAfRTguq0EyLPX0t1Eyiu9zH8X2MmG4soswmiC0J1v2H6pY=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwmoCFgTSnwv+Uw0L2EAwdFZlJ9WSJG0iMGwjmiVzrNoSEXNLoA
-	WnRgrzB6ODyrAbhRoxwXf1KvRFNbZ/bjkOgTUnKaoE3onjBtxEqzkQwTGsqPTNTFNei8I+GnNGH
-	YDuAgDyi5AHiZHQ==
+        bh=2KYF2oL0lGPGcMYNCJmZKWaj3D1T4zoKMpkf+eN5NFY=;
+        b=B4evwfSThBORkGXY48X60hGrOMEIn5fHAfgPMBrBiUvcf4KGRd/L+HQpnSfzJ7U4s9
+         zAKuQviNuuFRotUHmNVg17VsXFfGK66nskCMi/0WquHZCke5npa5P6l56clY0tlPEIl1
+         oRPTRv5Mgi+YfA1QsdA/sc7YAQ35n44PJkFDp2CwN1JCaK2g3TcZNdfcXLtY4P1yrWyJ
+         9i4VKAp6vdg2Xdy00VF1uuf/mm1Ndll4Nc+t9ZbBIM2JwZVWb6gEHd2tPWFveHPtDSz+
+         pciV4YQWPTngeAMqvnzd+vuq1hf7stqLq7egqQYgiusXZOixLBzTkTgp0BInaI1F0uG4
+         BsXg==
+X-Forwarded-Encrypted: i=1; AHgh+RqMNFZe96sWCM6IaWenyC8EOqHwj47AFkNLqY000kvPgblUkWnzWT1gNl7/aU3D/uzNakXT7/4=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yw8aPILi0zSN4REbS6xxq4o3wtU5eI4AfMQbj+/BJB4N0jlRk3U
+	PS9+0CspohoShbCj8h/D4HLkXyBQoSoMOr403C8HrBtXjghO/6imgx8vgV02MYkdHtP0cOO0NEc
+	pzzn78hnIq+a6sg==
 X-Received: from wmap7.prod.google.com ([2002:a7b:cc87:0:b0:487:3739:c5c4])
  (user=smostafa job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600d:108:20b0:495:401d:9f4f with SMTP id 5b1f17b1804b1-495401da1a5mr2255395e9.25.1784116757928;
- Wed, 15 Jul 2026 04:59:17 -0700 (PDT)
-Date: Wed, 15 Jul 2026 11:58:45 +0000
+ 2002:a05:600c:3f06:b0:495:3c8c:c16a with SMTP id 5b1f17b1804b1-4953c8cc25bmr27539775e9.0.1784116759041;
+ Wed, 15 Jul 2026 04:59:19 -0700 (PDT)
+Date: Wed, 15 Jul 2026 11:58:46 +0000
 In-Reply-To: <20260715115906.2664882-1-smostafa@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -60,9 +60,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20260715115906.2664882-1-smostafa@google.com>
 X-Mailer: git-send-email 2.55.0.141.g00534a21ce-goog
-Message-ID: <20260715115906.2664882-5-smostafa@google.com>
-Subject: [PATCH v7 04/24] iommu/arm-smmu-v3: Move TLB range invalidation into
- common code
+Message-ID: <20260715115906.2664882-6-smostafa@google.com>
+Subject: [PATCH v7 05/24] iommu/arm-smmu-v3: Move IDR parsing to common functions
 From: Mostafa Saleh <smostafa@google.com>
 To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
 	kvmarm@lists.linux.dev, iommu@lists.linux.dev
@@ -74,215 +73,474 @@ Cc: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
 	Mostafa Saleh <smostafa@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Range TLB invalidation has a very specific algorithm. Instead of
-re-writing it for the hypervisor, move it to a function that can
-be re-used.
+Move parsing of IDRs to functions so that it can be re-used
+from the hypervisor.
 
 Signed-off-by: Mostafa Saleh <smostafa@google.com>
 ---
- drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 79 +++---------------
- drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h | 89 +++++++++++++++++++++
- 2 files changed, 102 insertions(+), 66 deletions(-)
+ drivers/iommu/arm/arm-smmu-v3/Makefile        |   2 +-
+ .../arm/arm-smmu-v3/arm-smmu-v3-common-lib.c  | 184 ++++++++++++++++++
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c   | 162 ++-------------
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h   |  13 ++
+ 4 files changed, 215 insertions(+), 146 deletions(-)
+ create mode 100644 drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-common-lib.c
 
+diff --git a/drivers/iommu/arm/arm-smmu-v3/Makefile b/drivers/iommu/arm/arm-smmu-v3/Makefile
+index 493a659cc66b..c9ce392e6d31 100644
+--- a/drivers/iommu/arm/arm-smmu-v3/Makefile
++++ b/drivers/iommu/arm/arm-smmu-v3/Makefile
+@@ -1,6 +1,6 @@
+ # SPDX-License-Identifier: GPL-2.0
+ obj-$(CONFIG_ARM_SMMU_V3) += arm_smmu_v3.o
+-arm_smmu_v3-y := arm-smmu-v3.o
++arm_smmu_v3-y := arm-smmu-v3.o arm-smmu-v3-common-lib.o
+ arm_smmu_v3-$(CONFIG_ARM_SMMU_V3_IOMMUFD) += arm-smmu-v3-iommufd.o
+ arm_smmu_v3-$(CONFIG_ARM_SMMU_V3_SVA) += arm-smmu-v3-sva.o
+ arm_smmu_v3-$(CONFIG_TEGRA241_CMDQV) += tegra241-cmdqv.o
+diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-common-lib.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-common-lib.c
+new file mode 100644
+index 000000000000..ce0ad88b81e3
+--- /dev/null
++++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-common-lib.c
+@@ -0,0 +1,184 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) 2015 ARM Limited
++ *
++ * Author: Will Deacon <will.deacon@arm.com>
++ * Arm SMMUv3 driver functions shared with hypervisor.
++ */
++
++#include "arm-smmu-v3.h"
++#include <asm-generic/errno-base.h>
++
++#include <linux/string.h>
++
++u32 smmu_idr0_features(u32 reg)
++{
++	u32 features = 0;
++
++	/* 2-level structures */
++	if (FIELD_GET(IDR0_ST_LVL, reg) == IDR0_ST_LVL_2LVL)
++		features |= ARM_SMMU_FEAT_2_LVL_STRTAB;
++
++	if (reg & IDR0_CD2L)
++		features |= ARM_SMMU_FEAT_2_LVL_CDTAB;
++
++	/*
++	 * Translation table endianness.
++	 * We currently require the same endianness as the CPU, but this
++	 * could be changed later by adding a new IO_PGTABLE_QUIRK.
++	 */
++	switch (FIELD_GET(IDR0_TTENDIAN, reg)) {
++	case IDR0_TTENDIAN_MIXED:
++		features |= ARM_SMMU_FEAT_TT_LE | ARM_SMMU_FEAT_TT_BE;
++		break;
++#ifdef __BIG_ENDIAN
++	case IDR0_TTENDIAN_BE:
++		features |= ARM_SMMU_FEAT_TT_BE;
++		break;
++#else
++	case IDR0_TTENDIAN_LE:
++		features |= ARM_SMMU_FEAT_TT_LE;
++		break;
++#endif
++	}
++
++	/* Boolean feature flags */
++	if (IS_ENABLED(CONFIG_PCI_PRI) && reg & IDR0_PRI)
++		features |= ARM_SMMU_FEAT_PRI;
++
++	if (IS_ENABLED(CONFIG_PCI_ATS) && reg & IDR0_ATS)
++		features |= ARM_SMMU_FEAT_ATS;
++
++	if (reg & IDR0_SEV)
++		features |= ARM_SMMU_FEAT_SEV;
++
++	if (reg & IDR0_MSI)
++		features |= ARM_SMMU_FEAT_MSI;
++
++	if (reg & IDR0_HYP)
++		features |= ARM_SMMU_FEAT_HYP;
++
++	switch (FIELD_GET(IDR0_STALL_MODEL, reg)) {
++	case IDR0_STALL_MODEL_FORCE:
++		features |= ARM_SMMU_FEAT_STALL_FORCE;
++		fallthrough;
++	case IDR0_STALL_MODEL_STALL:
++		features |= ARM_SMMU_FEAT_STALLS;
++	}
++
++	if (reg & IDR0_S1P)
++		features |= ARM_SMMU_FEAT_TRANS_S1;
++
++	if (reg & IDR0_S2P)
++		features |= ARM_SMMU_FEAT_TRANS_S2;
++
++	if ((features & ARM_SMMU_FEAT_TRANS_S1) &&
++	    (features & ARM_SMMU_FEAT_TRANS_S2))
++		features |= ARM_SMMU_FEAT_NESTING;
++
++	return features;
++}
++
++u32 smmu_idr3_features(u32 reg)
++{
++	u32 features = 0;
++
++	if (FIELD_GET(IDR3_RIL, reg))
++		features |= ARM_SMMU_FEAT_RANGE_INV;
++	if (FIELD_GET(IDR3_FWB, reg))
++		features |= ARM_SMMU_FEAT_S2FWB;
++	if (FIELD_GET(IDR3_BBM, reg) == 2)
++		features |= ARM_SMMU_FEAT_BBML2;
++	return features;
++}
++
++u32 smmu_idr5_to_oas(u32 reg)
++{
++	switch (FIELD_GET(IDR5_OAS, reg)) {
++	case IDR5_OAS_32_BIT:
++		return 32;
++	case IDR5_OAS_36_BIT:
++		return 36;
++	case IDR5_OAS_40_BIT:
++		return 40;
++	case IDR5_OAS_42_BIT:
++		return 42;
++	case IDR5_OAS_44_BIT:
++		return 44;
++	case IDR5_OAS_48_BIT:
++		return 48;
++	case IDR5_OAS_52_BIT:
++		return 52;
++	}
++	return 0;
++}
++
++unsigned long smmu_idr5_to_pgsize(u32 reg)
++{
++	unsigned long pgsize_bitmap = 0;
++
++	if (reg & IDR5_GRAN64K)
++		pgsize_bitmap |= SZ_64K | SZ_512M;
++	if (reg & IDR5_GRAN16K)
++		pgsize_bitmap |= SZ_16K | SZ_32M;
++	if (reg & IDR5_GRAN4K)
++		pgsize_bitmap |= SZ_4K | SZ_2M | SZ_1G;
++	return pgsize_bitmap;
++}
++
++unsigned long smmu_iidr_features(u32 reg, unsigned long features)
++{
++	unsigned int implementer, productid, variant, revision;
++
++	implementer = FIELD_GET(IIDR_IMPLEMENTER, reg);
++	productid = FIELD_GET(IIDR_PRODUCTID, reg);
++	variant = FIELD_GET(IIDR_VARIANT, reg);
++	revision = FIELD_GET(IIDR_REVISION, reg);
++
++	switch (implementer) {
++	case IIDR_IMPLEMENTER_ARM:
++		switch (productid) {
++		case IIDR_PRODUCTID_ARM_MMU_600:
++			/* Arm erratum 1076982 */
++			if (variant == 0 && revision <= 2)
++				features &= ~ARM_SMMU_FEAT_SEV;
++			/* Arm erratum 1209401 */
++			if (variant < 2)
++				features &= ~ARM_SMMU_FEAT_NESTING;
++			break;
++		case IIDR_PRODUCTID_ARM_MMU_700:
++			/* Many errata... */
++			features &= ~ARM_SMMU_FEAT_BTM;
++			if (variant < 1 || revision < 1) {
++				/* Arm errata 2268618, 2812531 */
++				features &= ~ARM_SMMU_FEAT_NESTING;
++			}
++			break;
++		case IIDR_PRODUCTID_ARM_MMU_L1:
++		case IIDR_PRODUCTID_ARM_MMU_S3:
++			/* Arm errata 3878312/3995052 */
++			features &= ~ARM_SMMU_FEAT_BTM;
++			break;
++		}
++		break;
++	}
++	return features;
++}
++
++unsigned long smmu_iidr_options(u32 reg, unsigned long options)
++{
++	unsigned int implementer, productid, variant, revision;
++
++	implementer = FIELD_GET(IIDR_IMPLEMENTER, reg);
++	productid = FIELD_GET(IIDR_PRODUCTID, reg);
++	variant = FIELD_GET(IIDR_VARIANT, reg);
++	revision = FIELD_GET(IIDR_REVISION, reg);
++
++	if ((implementer == IIDR_IMPLEMENTER_ARM) &&
++	    (productid == IIDR_PRODUCTID_ARM_MMU_700) &&
++	    (variant < 1 || revision < 1)) {
++		/* Arm erratum 2812531 */
++		options |= ARM_SMMU_OPT_CMDQ_FORCE_SYNC;
++	}
++	return options;
++}
 diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-index 2a2289d4a3f3..cd17a3255312 100644
+index cd17a3255312..674ff98706f6 100644
 --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
 +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-@@ -2336,81 +2336,28 @@ static void arm_smmu_tlb_inv_context(void *cookie)
- 	arm_smmu_domain_inv(smmu_domain);
+@@ -4759,52 +4759,13 @@ static int arm_smmu_device_reset(struct arm_smmu_device *smmu)
+ 	return 0;
  }
  
-+static void __arm_smmu_cmdq_batch_add(void *__opaque,
-+				      struct arm_smmu_cmdq_batch *cmds,
-+				      struct arm_smmu_cmd *cmd)
-+{
-+	struct arm_smmu_device *smmu = (struct arm_smmu_device *)__opaque;
-+
-+	arm_smmu_cmdq_batch_add_cmd_p(smmu, cmds, cmd);
-+}
-+
- static void arm_smmu_cmdq_batch_add_range(struct arm_smmu_device *smmu,
- 					  struct arm_smmu_cmdq_batch *cmds,
- 					  struct arm_smmu_cmd *cmd, bool leaf,
- 					  unsigned long iova, size_t size,
- 					  size_t granule, size_t pgsize)
+-#define IIDR_IMPLEMENTER_ARM		0x43b
+-#define IIDR_PRODUCTID_ARM_MMU_600	0x483
+-#define IIDR_PRODUCTID_ARM_MMU_700	0x487
+-#define IIDR_PRODUCTID_ARM_MMU_L1	0x48a
+-#define IIDR_PRODUCTID_ARM_MMU_S3	0x498
+-
+ static void arm_smmu_device_iidr_probe(struct arm_smmu_device *smmu)
  {
--	unsigned long end = iova + size, num_pages = 0, tg = pgsize;
--	u64 orig_data0 = cmd->data[0];
--	size_t inv_range = granule;
--	u8 ttl = 0, tg_enc = 0;
--
- 	if (WARN_ON_ONCE(!size))
- 		return;
+ 	u32 reg;
+-	unsigned int implementer, productid, variant, revision;
  
--	if (smmu->features & ARM_SMMU_FEAT_RANGE_INV) {
--		num_pages = size >> tg;
+ 	reg = readl_relaxed(smmu->base + ARM_SMMU_IIDR);
+-	implementer = FIELD_GET(IIDR_IMPLEMENTER, reg);
+-	productid = FIELD_GET(IIDR_PRODUCTID, reg);
+-	variant = FIELD_GET(IIDR_VARIANT, reg);
+-	revision = FIELD_GET(IIDR_REVISION, reg);
 -
--		/* Convert page size of 12,14,16 (log2) to 1,2,3 */
--		tg_enc = (tg - 10) / 2;
--
--		/*
--		 * Determine what level the granule is at. For non-leaf, both
--		 * io-pgtable and SVA pass a nominal last-level granule because
--		 * they don't know what level(s) actually apply, so ignore that
--		 * and leave TTL=0. However for various errata reasons we still
--		 * want to use a range command, so avoid the SVA corner case
--		 * where both scale and num could be 0 as well.
--		 */
--		if (leaf)
--			ttl = 4 - ((ilog2(granule) - 3) / (tg - 3));
--		else if ((num_pages & CMDQ_TLBI_RANGE_NUM_MAX) == 1)
--			num_pages++;
--	}
--
--	while (iova < end) {
--		if (smmu->features & ARM_SMMU_FEAT_RANGE_INV) {
--			/*
--			 * On each iteration of the loop, the range is 5 bits
--			 * worth of the aligned size remaining.
--			 * The range in pages is:
--			 *
--			 * range = (num_pages & (0x1f << __ffs(num_pages)))
--			 */
--			unsigned long scale, num;
--
--			/* Determine the power of 2 multiple number of pages */
--			scale = __ffs(num_pages);
--
--			/* Determine how many chunks of 2^scale size we have */
--			num = (num_pages >> scale) & CMDQ_TLBI_RANGE_NUM_MAX;
--
--			cmd->data[0] = orig_data0 |
--				FIELD_PREP(CMDQ_TLBI_0_NUM, num - 1) |
--				FIELD_PREP(CMDQ_TLBI_0_SCALE, scale);
--
--			/* range is num * 2^scale * pgsize */
--			inv_range = num << (scale + tg);
--
--			/* Clear out the lower order bits for the next iteration */
--			num_pages -= num << scale;
+-	switch (implementer) {
+-	case IIDR_IMPLEMENTER_ARM:
+-		switch (productid) {
+-		case IIDR_PRODUCTID_ARM_MMU_600:
+-			/* Arm erratum 1076982 */
+-			if (variant == 0 && revision <= 2)
+-				smmu->features &= ~ARM_SMMU_FEAT_SEV;
+-			/* Arm erratum 1209401 */
+-			if (variant < 2)
+-				smmu->features &= ~ARM_SMMU_FEAT_NESTING;
+-			break;
+-		case IIDR_PRODUCTID_ARM_MMU_700:
+-			/* Many errata... */
+-			smmu->features &= ~ARM_SMMU_FEAT_BTM;
+-			if (variant < 1 || revision < 1) {
+-				/* Arm erratum 2812531 */
+-				smmu->options |= ARM_SMMU_OPT_CMDQ_FORCE_SYNC;
+-				/* Arm errata 2268618, 2812531 */
+-				smmu->features &= ~ARM_SMMU_FEAT_NESTING;
+-			}
+-			break;
+-		case IIDR_PRODUCTID_ARM_MMU_L1:
+-		case IIDR_PRODUCTID_ARM_MMU_S3:
+-			/* Arm errata 3878312/3995052 */
+-			smmu->features &= ~ARM_SMMU_FEAT_BTM;
+-			break;
 -		}
--
--		/*
--		 * IPA has fewer bits than VA, but they are reserved in the
--		 * command and something would be very broken if iova had them
--		 * set.
--		 */
--		cmd->data[1] = FIELD_PREP(CMDQ_TLBI_1_LEAF, leaf) |
--			       FIELD_PREP(CMDQ_TLBI_1_TTL, ttl) |
--			       FIELD_PREP(CMDQ_TLBI_1_TG, tg_enc) |
--			       (iova & ~GENMASK_U64(11, 0));
--
--		arm_smmu_cmdq_batch_add_cmd_p(smmu, cmds, cmd);
--		iova += inv_range;
+-		break;
 -	}
-+	arm_smmu_tlb_inv_build(cmd, iova, size, granule, pgsize,
-+			       smmu->features & ARM_SMMU_FEAT_RANGE_INV,
-+			       smmu, leaf, __arm_smmu_cmdq_batch_add,
-+			       cmds);
++	smmu->features = smmu_iidr_features(reg, smmu->features);
++	smmu->options = smmu_iidr_options(reg, smmu->options);
  }
  
- static bool arm_smmu_inv_size_too_big(struct arm_smmu_device *smmu, size_t size,
+ static void arm_smmu_get_httu(struct arm_smmu_device *smmu, u32 reg)
+@@ -4837,57 +4798,17 @@ static int arm_smmu_device_hw_probe(struct arm_smmu_device *smmu)
+ 	/* IDR0 */
+ 	reg = readl_relaxed(smmu->base + ARM_SMMU_IDR0);
+ 
+-	/* 2-level structures */
+-	if (FIELD_GET(IDR0_ST_LVL, reg) == IDR0_ST_LVL_2LVL)
+-		smmu->features |= ARM_SMMU_FEAT_2_LVL_STRTAB;
+-
+-	if (reg & IDR0_CD2L)
+-		smmu->features |= ARM_SMMU_FEAT_2_LVL_CDTAB;
+-
+-	/*
+-	 * Translation table endianness.
+-	 * We currently require the same endianness as the CPU, but this
+-	 * could be changed later by adding a new IO_PGTABLE_QUIRK.
+-	 */
+-	switch (FIELD_GET(IDR0_TTENDIAN, reg)) {
+-	case IDR0_TTENDIAN_MIXED:
+-		smmu->features |= ARM_SMMU_FEAT_TT_LE | ARM_SMMU_FEAT_TT_BE;
+-		break;
+-#ifdef __BIG_ENDIAN
+-	case IDR0_TTENDIAN_BE:
+-		smmu->features |= ARM_SMMU_FEAT_TT_BE;
+-		break;
+-#else
+-	case IDR0_TTENDIAN_LE:
+-		smmu->features |= ARM_SMMU_FEAT_TT_LE;
+-		break;
+-#endif
+-	default:
++	smmu->features |= smmu_idr0_features(reg);
++	if (!(smmu->features & (ARM_SMMU_FEAT_TT_LE | ARM_SMMU_FEAT_TT_BE))) {
+ 		dev_err(smmu->dev, "unknown/unsupported TT endianness!\n");
+ 		return -ENXIO;
+ 	}
+-
+-	/* Boolean feature flags */
+-	if (IS_ENABLED(CONFIG_PCI_PRI) && reg & IDR0_PRI)
+-		smmu->features |= ARM_SMMU_FEAT_PRI;
+-
+-	if (IS_ENABLED(CONFIG_PCI_ATS) && reg & IDR0_ATS)
+-		smmu->features |= ARM_SMMU_FEAT_ATS;
+-
+-	if (reg & IDR0_SEV)
+-		smmu->features |= ARM_SMMU_FEAT_SEV;
+-
+-	if (reg & IDR0_MSI) {
+-		smmu->features |= ARM_SMMU_FEAT_MSI;
+-		if (coherent && !disable_msipolling)
+-			smmu->options |= ARM_SMMU_OPT_MSIPOLL;
+-	}
+-
+-	if (reg & IDR0_HYP) {
+-		smmu->features |= ARM_SMMU_FEAT_HYP;
+-		if (cpus_have_cap(ARM64_HAS_VIRT_HOST_EXTN))
+-			smmu->features |= ARM_SMMU_FEAT_E2H;
+-	}
++	if (coherent && !disable_msipolling &&
++	    smmu->features & ARM_SMMU_FEAT_MSI)
++		smmu->options |= ARM_SMMU_OPT_MSIPOLL;
++	if (smmu->features & ARM_SMMU_FEAT_HYP &&
++	    cpus_have_cap(ARM64_HAS_VIRT_HOST_EXTN))
++		smmu->features |= ARM_SMMU_FEAT_E2H;
+ 
+ 	arm_smmu_get_httu(smmu, reg);
+ 
+@@ -4899,21 +4820,7 @@ static int arm_smmu_device_hw_probe(struct arm_smmu_device *smmu)
+ 		dev_warn(smmu->dev, "IDR0.COHACC overridden by FW configuration (%s)\n",
+ 			 str_true_false(coherent));
+ 
+-	switch (FIELD_GET(IDR0_STALL_MODEL, reg)) {
+-	case IDR0_STALL_MODEL_FORCE:
+-		smmu->features |= ARM_SMMU_FEAT_STALL_FORCE;
+-		fallthrough;
+-	case IDR0_STALL_MODEL_STALL:
+-		smmu->features |= ARM_SMMU_FEAT_STALLS;
+-	}
+-
+-	if (reg & IDR0_S1P)
+-		smmu->features |= ARM_SMMU_FEAT_TRANS_S1;
+-
+-	if (reg & IDR0_S2P)
+-		smmu->features |= ARM_SMMU_FEAT_TRANS_S2;
+-
+-	if (!(reg & (IDR0_S1P | IDR0_S2P))) {
++	if (!(smmu->features & (ARM_SMMU_FEAT_TRANS_S1 | ARM_SMMU_FEAT_TRANS_S2))) {
+ 		dev_err(smmu->dev, "no translation support!\n");
+ 		return -ENXIO;
+ 	}
+@@ -4972,13 +4879,7 @@ static int arm_smmu_device_hw_probe(struct arm_smmu_device *smmu)
+ 
+ 	/* IDR3 */
+ 	reg = readl_relaxed(smmu->base + ARM_SMMU_IDR3);
+-	if (FIELD_GET(IDR3_RIL, reg))
+-		smmu->features |= ARM_SMMU_FEAT_RANGE_INV;
+-	if (FIELD_GET(IDR3_FWB, reg))
+-		smmu->features |= ARM_SMMU_FEAT_S2FWB;
+-
+-	if (FIELD_GET(IDR3_BBM, reg) == 2)
+-		smmu->features |= ARM_SMMU_FEAT_BBML2;
++	smmu->features |= smmu_idr3_features(reg);
+ 
+ 	/* IDR5 */
+ 	reg = readl_relaxed(smmu->base + ARM_SMMU_IDR5);
+@@ -4987,43 +4888,18 @@ static int arm_smmu_device_hw_probe(struct arm_smmu_device *smmu)
+ 	smmu->evtq.max_stalls = FIELD_GET(IDR5_STALL_MAX, reg);
+ 
+ 	/* Page sizes */
+-	if (reg & IDR5_GRAN64K)
+-		smmu->pgsize_bitmap |= SZ_64K | SZ_512M;
+-	if (reg & IDR5_GRAN16K)
+-		smmu->pgsize_bitmap |= SZ_16K | SZ_32M;
+-	if (reg & IDR5_GRAN4K)
+-		smmu->pgsize_bitmap |= SZ_4K | SZ_2M | SZ_1G;
++	smmu->pgsize_bitmap = smmu_idr5_to_pgsize(reg);
+ 
+ 	/* Input address size */
+ 	if (FIELD_GET(IDR5_VAX, reg) == IDR5_VAX_52_BIT)
+ 		smmu->features |= ARM_SMMU_FEAT_VAX;
+ 
+-	/* Output address size */
+-	switch (FIELD_GET(IDR5_OAS, reg)) {
+-	case IDR5_OAS_32_BIT:
+-		smmu->oas = 32;
+-		break;
+-	case IDR5_OAS_36_BIT:
+-		smmu->oas = 36;
+-		break;
+-	case IDR5_OAS_40_BIT:
+-		smmu->oas = 40;
+-		break;
+-	case IDR5_OAS_42_BIT:
+-		smmu->oas = 42;
+-		break;
+-	case IDR5_OAS_44_BIT:
+-		smmu->oas = 44;
+-		break;
+-	case IDR5_OAS_52_BIT:
+-		smmu->oas = 52;
++	smmu->oas = smmu_idr5_to_oas(reg);
++	if (smmu->oas == 52)
+ 		smmu->pgsize_bitmap |= 1ULL << 42; /* 4TB */
+-		break;
+-	default:
++	else if (!smmu->oas) {
+ 		dev_info(smmu->dev,
+-			"unknown output address size. Truncating to 48-bit\n");
+-		fallthrough;
+-	case IDR5_OAS_48_BIT:
++			 "unknown output address size. Truncating to 48-bit\n");
+ 		smmu->oas = 48;
+ 	}
+ 
+@@ -5032,10 +4908,6 @@ static int arm_smmu_device_hw_probe(struct arm_smmu_device *smmu)
+ 		dev_warn(smmu->dev,
+ 			 "failed to set DMA mask for table walker\n");
+ 
+-	if ((smmu->features & ARM_SMMU_FEAT_TRANS_S1) &&
+-	    (smmu->features & ARM_SMMU_FEAT_TRANS_S2))
+-		smmu->features |= ARM_SMMU_FEAT_NESTING;
+-
+ 	arm_smmu_device_iidr_probe(smmu);
+ 
+ 	if (arm_smmu_sva_supported(smmu))
 diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
-index e93489841ec7..494e55a2dc34 100644
+index 494e55a2dc34..842d0c9b883c 100644
 --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
 +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
-@@ -1272,6 +1272,95 @@ static inline void arm_smmu_write_strtab_l1_desc(struct arm_smmu_strtab_l1 *dst,
- 	WRITE_ONCE(dst->l2ptr, cpu_to_le64(val));
- }
+@@ -84,6 +84,12 @@ struct arm_vsmmu;
+ #define IIDR_REVISION			GENMASK(15, 12)
+ #define IIDR_IMPLEMENTER		GENMASK(11, 0)
  
-+/**
-+ * arm_smmu_tlb_inv_build - Create a range invalidation command
-+ * @cmd: Base command initialized with OPCODE (S1, S2..), vmid and asid
-+ * @iova: Start IOVA to invalidate
-+ * @size: Size of range
-+ * @granule: Granule of invalidation
-+ * @pgsize: Page size of the invalidation
-+ * @is_range: Use range invalidation commands
-+ * @opaque: Pointer to pass to add_cmd
-+ * @leaf: Is leaf invalidation
-+ * @add_cmd: Function to send/batch the invalidation command
-+ * @cmds: Incase of batching, it includes the pointer to the batch
-+ */
-+static inline void arm_smmu_tlb_inv_build(struct arm_smmu_cmd *cmd,
-+					  unsigned long iova, size_t size,
-+					  size_t granule, unsigned long pgsize,
-+					  bool is_range, void *opaque, bool leaf,
-+					  void (*add_cmd)(void *_opaque,
-+							  struct arm_smmu_cmdq_batch *cmds,
-+							  struct arm_smmu_cmd *cmd),
-+					  struct arm_smmu_cmdq_batch *cmds)
-+{
-+	unsigned long end = iova + size, num_pages = 0, tg = pgsize;
-+	u64 orig_data0 = cmd->data[0];
-+	size_t inv_range = granule;
-+	u8 ttl = 0, tg_enc = 0;
++#define IIDR_IMPLEMENTER_ARM		0x43b
++#define IIDR_PRODUCTID_ARM_MMU_600	0x483
++#define IIDR_PRODUCTID_ARM_MMU_700	0x487
++#define IIDR_PRODUCTID_ARM_MMU_L1	0x48a
++#define IIDR_PRODUCTID_ARM_MMU_S3	0x498
 +
-+	if (is_range) {
-+		num_pages = size >> tg;
+ #define ARM_SMMU_AIDR			0x1C
+ 
+ #define ARM_SMMU_CR0			0x20
+@@ -1212,6 +1218,13 @@ int arm_smmu_cmdq_issue_cmdlist(struct arm_smmu_device *smmu,
+ 				struct arm_smmu_cmd *cmds, int n,
+ 				bool sync);
+ 
++u32 smmu_idr0_features(u32 reg);
++u32 smmu_idr3_features(u32 reg);
++u32 smmu_idr5_to_oas(u32 reg);
++unsigned long smmu_idr5_to_pgsize(u32 reg);
++unsigned long smmu_iidr_features(u32 reg, unsigned long features);
++unsigned long smmu_iidr_options(u32 reg, unsigned long options);
 +
-+		/* Convert page size of 12,14,16 (log2) to 1,2,3 */
-+		tg_enc = (tg - 10) / 2;
-+
-+		/*
-+		 * Determine what level the granule is at. For non-leaf, both
-+		 * io-pgtable and SVA pass a nominal last-level granule because
-+		 * they don't know what level(s) actually apply, so ignore that
-+		 * and leave TTL=0. However for various errata reasons we still
-+		 * want to use a range command, so avoid the SVA corner case
-+		 * where both scale and num could be 0 as well.
-+		 */
-+		if (leaf)
-+			ttl = 4 - ((ilog2(granule) - 3) / (tg - 3));
-+		else if ((num_pages & CMDQ_TLBI_RANGE_NUM_MAX) == 1)
-+			num_pages++;
-+	}
-+
-+	while (iova < end) {
-+		if (is_range) {
-+			/*
-+			 * On each iteration of the loop, the range is 5 bits
-+			 * worth of the aligned size remaining.
-+			 * The range in pages is:
-+			 *
-+			 * range = (num_pages & (0x1f << __ffs(num_pages)))
-+			 */
-+			unsigned long scale, num;
-+
-+			/* Determine the power of 2 multiple number of pages */
-+			scale = __ffs(num_pages);
-+
-+			/* Determine how many chunks of 2^scale size we have */
-+			num = (num_pages >> scale) & CMDQ_TLBI_RANGE_NUM_MAX;
-+
-+			cmd->data[0] = orig_data0 |
-+				FIELD_PREP(CMDQ_TLBI_0_NUM, num - 1) |
-+				FIELD_PREP(CMDQ_TLBI_0_SCALE, scale);
-+
-+			/* range is num * 2^scale * pgsize */
-+			inv_range = num << (scale + tg);
-+
-+			/* Clear out the lower order bits for the next iteration */
-+			num_pages -= num << scale;
-+		}
-+		/*
-+		 * IPA has fewer bits than VA, but they are reserved in the
-+		 * command and something would be very broken if iova had them
-+		 * set.
-+		 */
-+		cmd->data[1] = FIELD_PREP(CMDQ_TLBI_1_LEAF, leaf) |
-+			       FIELD_PREP(CMDQ_TLBI_1_TTL, ttl) |
-+			       FIELD_PREP(CMDQ_TLBI_1_TG, tg_enc) |
-+			       (iova & ~GENMASK_U64(11, 0));
-+
-+		add_cmd(opaque, cmds, cmd);
-+		iova += inv_range;
-+	}
-+}
-+
- #ifdef CONFIG_ARM_SMMU_V3_SVA
- bool arm_smmu_sva_supported(struct arm_smmu_device *smmu);
- void arm_smmu_sva_notifier_synchronize(void);
+ /* Queue functions shared between kernel and hyp. */
+ static inline bool queue_has_space(struct arm_smmu_ll_queue *q, u32 n)
+ {
 -- 
 2.55.0.141.g00534a21ce-goog
 
