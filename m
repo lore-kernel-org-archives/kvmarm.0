@@ -1,305 +1,138 @@
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C81FD3C4171
-	for <kvmarm@lists.linux.dev>; Wed, 15 Jul 2026 08:13:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FD8B3CCFB4;
+	Wed, 15 Jul 2026 08:19:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784103191; cv=none; b=F8HuhLUy3r9C6HgOfdK3U9nldIzWRlBVPJG+cduk5+2Ag9iNcQdZJyW5Ogs5K3rI0yuWoKLXVq4gS5BY79N/ksa5/Jkb84Dt7ROrLdf/Cay9YWU797F9kFKKTfYnY2lJBEwQQyuytfNaIGWX3cX8xM5hrOHjswiSGyk/DIrttqM=
+	t=1784103553; cv=none; b=p+Bi1KK1XouU4dn3MWoXPzWC9zyM+CbJzYiKePYq+us4u06o37IvfccyrdKbDbkypSa7ANQdIQIiFei2Cv/H5bYKwVa8wy/QOSZRRVMs4uPb77mAXFalJm8bjU+QgjMpvDLhrpnGPXEYlUVSa7kxfEch+8qSCx4BFYC9OTOjqt8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784103191; c=relaxed/simple;
-	bh=vViB5U9zIQB23IFbFslkFLNdvBXJnIVm3RmXDg2gpCc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=JV2XBmkN3kiqXR0TfV9D1bh4iPd2c1u4m0v29lOmdlxP0E5UI7xqAG12mAW34xKou7lVT5ciJIWG+GtSE86cH9bGOTmpBwwn9j+446mn/1akTR+nIgcs1KZDyHqjZ07KkQHcDRb6obC2dZSRx5mTVtjbfB8XR8lpveWVuat9Ce8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fi69MUet; arc=none smtp.client-ip=91.218.175.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1784103553; c=relaxed/simple;
+	bh=gNxk6vXq829mh4d+7zt2FEOFWIMJWMdp/e4v1P0G1ds=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KmZvVvZVy2UdZGCFrTGH+NZUhaD5r74bsK96bGSkMduiXBFW22vQWrPJlRvbHSwUKp0ffwnqRk1oKjWeYsDWiaetR80HYapEoo2Avosh6hsv4bzq36eYjAhhgmQAidzqy2m93ZCX6vmc2iFpow7Tm/wR3gXJbDBazmExqXNMXxM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kQK1MBtw; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fi69MUet"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1784103187;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zStigLhV4Yy76Iea0IqvLSUMMxu60sak2zphCm7EfOk=;
-	b=fi69MUetKLiPoB9kSGFklvsov0Mw+v6XMninxkhobiuedKz4VirOyGjVlg8hPGmBLNOveb
-	UVhTTY+chjjRgdUhyVoFEA6OGiMm+JUsNM8zOMlE4s2A/1NHR8XOqim9CP3xF2Vev2+EDJ
-	EpAUs38VYHZxgogSk2SRhd6WsOSxQVc=
-From: Fuad Tabba <fuad.tabba@linux.dev>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	kvmarm@lists.linux.dev,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kQK1MBtw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DADDF1F000E9;
+	Wed, 15 Jul 2026 08:19:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1784103551;
+	bh=9di0iPNirA8i2aRvfh+nDPIZh/v7N+As+I0AKLeoCG0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=kQK1MBtwlgMoUlw+ZFZSEhZkWzYiwM2C/vf8niFWavErPgPikzRicOEYoGcwwepk7
+	 YZg960F967Jt5M7QRlZl11I5DfvP0ZMzXEkdaAufi9S065qa7Q/+o1ClThI1TMWY7Z
+	 nCG3wDL2zfiO8jbCKZEsajqFsSO8cvdXFXSY/CUOXLBqveWGc+nf+RuP82N8xYqjOg
+	 BEJIF5uG8RcqPog75uL5SxO3HOGy9ibKdI64bDU/HO3+8I2+EB0wB3Bf4UvID2uqE6
+	 MmV8LPG6YKD2vNb7HDEmBEzJs1q0S95BCZvEmqilgFpsp2D13u1xsNEFd7Fbg/9mLK
+	 XhJNXkIYxRrJA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wjuph-00000005CWU-3n29;
+	Wed, 15 Jul 2026 08:19:09 +0000
+Date: Wed, 15 Jul 2026 09:19:09 +0100
+Message-ID: <86ech4oebm.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oupton@kernel.org>
+Cc: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
+	kvm@vger.kernel.org,
 	Steffen Eiden <seiden@linux.ibm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Quentin Perret <qperret@google.com>,
-	Sebastian Ene <sebastianene@google.com>,
-	Hyunwoo Kim <imv4bel@gmail.com>,
-	Fuad Tabba <tabba@google.com>
-Subject: [PATCH v6 8/8] KVM: arm64: Implement lazy vCPU state sync for non-protected guests
-Date: Wed, 15 Jul 2026 09:12:38 +0100
-Message-Id: <20260715081238.1891918-9-fuad.tabba@linux.dev>
-In-Reply-To: <20260715081238.1891918-1-fuad.tabba@linux.dev>
-References: <20260715081238.1891918-1-fuad.tabba@linux.dev>
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v2 07/28] KVM: arm64: Don't evaluate HCR_EL2.NV nor HFGITR_EL2.ERET on ERET fast path
+In-Reply-To: <alc-JSvHDjSV5c_G@kernel.org>
+References: <20260714091641.1970822-1-maz@kernel.org>
+	<20260714091641.1970822-8-maz@kernel.org>
+	<alc-JSvHDjSV5c_G@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-pKVM copies a non-protected guest's register context between the host
-and the hypervisor on every world switch, even when the host never
-inspects it. Defer the copy: on entry, flush the host context into the
-hyp vCPU only when the host marked it dirty (PKVM_HOST_STATE_DIRTY); on
-exit, leave it in the hyp vCPU and copy it back only when the host needs
-it, via a __pkvm_vcpu_sync_state hypercall or at vcpu put. A protected
-guest's context is copied as before, since lazy sync only helps where
-the host is trusted to see the guest's registers.
+On Wed, 15 Jul 2026 09:00:37 +0100,
+Oliver Upton <oupton@kernel.org> wrote:
+> 
+> Hey,
+> 
+> On Tue, Jul 14, 2026 at 10:16:20AM +0100, Marc Zyngier wrote:
+> > We currently avoid using the ERET fast path if the guest has HCR_EL2.NV
+> > set. This is an odd check, as NV doesn't mean much if HCR_EL2.TGE==1.
+> > 
+> > Similarly, evaluating HFGITR_EL2.ERET makes little sense, as
+> > this only applies to the nested context, while the ERET fast-path
+> > is purely for the benefit of L1.
+> > 
+> > Replace these bizarre checks with is_nested_ctxt() which makes a lot
+> > more sense: if we are running an L2, the ERET trap must go to L1.
+> > 
+> > Fixes: dd0717a998f77 ("KVM: arm64: nv: Fast-track 'InHost' exception returns")
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/hyp/vhe/switch.c | 9 +++------
+> >  1 file changed, 3 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> > index bbe9cebd3d9d5..a83be345f8450 100644
+> > --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> > +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> > @@ -344,13 +344,10 @@ static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
+> >  	 * if this is a VHE guest hypervisor returning to its own
+> >  	 * userspace, or the hypervisor performing a local exception
+> >  	 * return. No need to save/restore registers, no need to
+> > -	 * switch S2 MMU. Just do the canonical ERET.
+> > -	 *
+> > -	 * Unless the trap has to be forwarded further down the line,
+> > -	 * of course...
+> > +	 * switch S2 MMU. Just do the canonical ERET unlesss we are in
+> > +	 * nested context.
+> >  	 */
+> 
+> typo: unless
+> 
+> I feel like it wouldn't hurt to add a bit more detail to the comment
+> here, that L0 KVM doesn't use ERET traps in the nested context.
+> Otherwise it isn't clear why these always belong to the L1.
 
-PC and PSTATE are the exception: they are copied back on every exit so
-the kvm_exit tracepoint reports the guest's real exit PC, and the run
-loop's vcpu_mode_is_bad_32bit() and SError-masking checks evaluate the
-guest's current PSTATE rather than the value left by the previous sync.
+We already have a tiny bit of information in kvm_handle_eret(), but
+that's obviously a bit far down the line. Something like this?
 
-The host needs the full context when it is about to read it (trap
-handling) or write it (the SError injection that writes ESR_EL1). Sync
-both from handle_exit_early(), which runs non-preemptible so the loaded
-hyp vCPU is stable without a preempt guard.
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index a83be345f8450..684cebf23aa0e 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -344,8 +344,13 @@ static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 	 * if this is a VHE guest hypervisor returning to its own
+ 	 * userspace, or the hypervisor performing a local exception
+ 	 * return. No need to save/restore registers, no need to
+-	 * switch S2 MMU. Just do the canonical ERET unlesss we are in
++	 * switch S2 MMU. Just do the canonical ERET unless we are in
+ 	 * nested context.
++	 *
++	 * Note that this is made possible because KVM itself never traps
++	 * ERET when running an L2. The consequence is that any ERET trap is
++	 * the result of HCR_EL2 or HFGITR_EL2 programming by L1 for its own
++	 * guest, and the exception must be forwarded to L1.
+ 	 */
+ 	if (is_nested_ctxt(vcpu))
+ 		return false;
 
-Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
-Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
----
- arch/arm64/include/asm/kvm_asm.h   |  1 +
- arch/arm64/include/asm/kvm_host.h  |  2 +
- arch/arm64/kvm/arm.c               |  7 +++
- arch/arm64/kvm/handle_exit.c       | 23 ++++++++
- arch/arm64/kvm/hyp/nvhe/hyp-main.c | 86 ++++++++++++++++++++++++++++--
- 5 files changed, 114 insertions(+), 5 deletions(-)
+Thanks,
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 043495f7fc78b..6e1135b3ded44 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -113,6 +113,7 @@ enum __kvm_host_smccc_func {
- 	__KVM_HOST_SMCCC_FUNC___pkvm_finalize_teardown_vm,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_load,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_put,
-+	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_sync_state,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_tlb_flush_vmid,
- 
- 	MARKER(__KVM_HOST_SMCCC_FUNC_MAX)
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index bae2c4f92ef5c..86d45bc8f4959 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -1051,6 +1051,8 @@ struct kvm_vcpu_arch {
- #define INCREMENT_PC		__vcpu_single_flag(iflags, BIT(1))
- /* Target EL/MODE (not a single flag, but let's abuse the macro) */
- #define EXCEPT_MASK		__vcpu_single_flag(iflags, GENMASK(3, 1))
-+/* Host-set: the hyp flushes the non-protected vCPU state in on entry */
-+#define PKVM_HOST_STATE_DIRTY	__vcpu_single_flag(iflags, BIT(4))
- 
- /* Helpers to encode exceptions with minimum fuss */
- #define __EXCEPT_MASK_VAL	unpack_vcpu_flag(EXCEPT_MASK)
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 50adfff75be82..ace7b67fe1cc8 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -735,6 +735,10 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
- 	if (is_protected_kvm_enabled()) {
- 		kvm_call_hyp(__vgic_v3_save_aprs, &vcpu->arch.vgic_cpu.vgic_v3);
- 		kvm_call_hyp_nvhe(__pkvm_vcpu_put);
-+
-+		/* __pkvm_vcpu_put implies a sync of the state */
-+		if (!kvm_vm_is_protected(vcpu->kvm))
-+			vcpu_set_flag(vcpu, PKVM_HOST_STATE_DIRTY);
- 	}
- 
- 	kvm_vcpu_put_debug(vcpu);
-@@ -966,6 +970,9 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
- 		return ret;
- 
- 	if (is_protected_kvm_enabled()) {
-+		/* Start with the vcpu in a dirty state */
-+		if (!kvm_vm_is_protected(vcpu->kvm))
-+			vcpu_set_flag(vcpu, PKVM_HOST_STATE_DIRTY);
- 		ret = pkvm_create_hyp_vm(kvm);
- 		if (ret)
- 			return ret;
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 54aedf93c78b6..29108e5c0206e 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -486,9 +486,32 @@ int handle_exit(struct kvm_vcpu *vcpu, int exception_index)
- 	}
- }
- 
-+static void handle_exit_pkvm_state(struct kvm_vcpu *vcpu, int exception_index)
-+{
-+	int exception_code = ARM_EXCEPTION_CODE(exception_index);
-+
-+	if (!is_protected_kvm_enabled() || kvm_vm_is_protected(vcpu->kvm))
-+		return;
-+
-+	/*
-+	 * Sync the context back when the host will read (trap) or write
-+	 * (SError) it. Preempt-off here, so the loaded hyp vCPU is stable.
-+	 */
-+	if (exception_code == ARM_EXCEPTION_TRAP ||
-+	    exception_code == ARM_EXCEPTION_EL1_SERROR ||
-+	    ARM_SERROR_PENDING(exception_index)) {
-+		kvm_call_hyp_nvhe(__pkvm_vcpu_sync_state);
-+		vcpu_set_flag(vcpu, PKVM_HOST_STATE_DIRTY);
-+	} else {
-+		vcpu_clear_flag(vcpu, PKVM_HOST_STATE_DIRTY);
-+	}
-+}
-+
- /* For exit types that need handling before we can be preempted */
- void handle_exit_early(struct kvm_vcpu *vcpu, int exception_index)
- {
-+	handle_exit_pkvm_state(vcpu, exception_index);
-+
- 	if (ARM_SERROR_PENDING(exception_index)) {
- 		if (this_cpu_has_cap(ARM64_HAS_RAS_EXTN)) {
- 			u64 disr = kvm_vcpu_get_disr(vcpu);
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 2db56146ec493..4a8445b636e60 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -143,6 +143,48 @@ static void sync_hyp_vgic_state(struct pkvm_hyp_vcpu *hyp_vcpu)
- 		host_cpu_if->vgic_lr[i] = hyp_cpu_if->vgic_lr[i];
- }
- 
-+static void __copy_vcpu_state(const struct kvm_vcpu *from_vcpu,
-+			      struct kvm_vcpu *to_vcpu)
-+{
-+	int i;
-+
-+	to_vcpu->arch.ctxt.regs		= from_vcpu->arch.ctxt.regs;
-+	to_vcpu->arch.ctxt.spsr_abt	= from_vcpu->arch.ctxt.spsr_abt;
-+	to_vcpu->arch.ctxt.spsr_und	= from_vcpu->arch.ctxt.spsr_und;
-+	to_vcpu->arch.ctxt.spsr_irq	= from_vcpu->arch.ctxt.spsr_irq;
-+	to_vcpu->arch.ctxt.spsr_fiq	= from_vcpu->arch.ctxt.spsr_fiq;
-+	to_vcpu->arch.ctxt.fp_regs	= from_vcpu->arch.ctxt.fp_regs;
-+
-+	/*
-+	 * Copy the sysregs, but don't mess with the timer state which
-+	 * is directly handled by EL1 and is expected to be preserved.
-+	 * enum vcpu_sysreg is sparse: VNCR-mapped registers take values
-+	 * derived from their VNCR page offset, so the timer registers do
-+	 * not form a contiguous numeric range and must be skipped by name.
-+	 */
-+	for (i = 1; i < NR_SYS_REGS; i++) {
-+		switch (i) {
-+		case CNTVOFF_EL2:
-+		case CNTV_CVAL_EL0:
-+		case CNTV_CTL_EL0:
-+		case CNTP_CVAL_EL0:
-+		case CNTP_CTL_EL0:
-+			continue;
-+		}
-+		to_vcpu->arch.ctxt.sys_regs[i] = from_vcpu->arch.ctxt.sys_regs[i];
-+	}
-+}
-+
-+static void sync_hyp_vcpu_state(struct pkvm_hyp_vcpu *hyp_vcpu)
-+{
-+	__copy_vcpu_state(&hyp_vcpu->vcpu, hyp_vcpu->host_vcpu);
-+}
-+
-+static void flush_hyp_vcpu_state(struct pkvm_hyp_vcpu *hyp_vcpu)
-+{
-+	__copy_vcpu_state(hyp_vcpu->host_vcpu, &hyp_vcpu->vcpu);
-+}
-+
- static void flush_debug_state(struct pkvm_hyp_vcpu *hyp_vcpu)
- {
- 	struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
-@@ -172,7 +214,17 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
- 	fpsimd_sve_flush();
- 	flush_debug_state(hyp_vcpu);
- 
--	hyp_vcpu->vcpu.arch.ctxt	= host_vcpu->arch.ctxt;
-+	/*
-+	 * If we deal with a non-protected guest and the state is potentially
-+	 * dirty (from a host perspective), copy the state back into the hyp
-+	 * vcpu.
-+	 */
-+	if (!pkvm_hyp_vcpu_is_protected(hyp_vcpu)) {
-+		if (vcpu_get_flag(host_vcpu, PKVM_HOST_STATE_DIRTY))
-+			flush_hyp_vcpu_state(hyp_vcpu);
-+	} else {
-+		hyp_vcpu->vcpu.arch.ctxt = host_vcpu->arch.ctxt;
-+	}
- 
- 	/* __hyp_running_vcpu must be NULL in a guest context. */
- 	hyp_vcpu->vcpu.arch.ctxt.__hyp_running_vcpu = NULL;
-@@ -203,9 +255,13 @@ static void sync_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
- 	fpsimd_sve_sync(&hyp_vcpu->vcpu);
- 	sync_debug_state(hyp_vcpu);
- 
--	host_vcpu->arch.ctxt		= hyp_vcpu->vcpu.arch.ctxt;
--
--	host_vcpu->arch.hcr_el2		= hyp_vcpu->vcpu.arch.hcr_el2;
-+	if (pkvm_hyp_vcpu_is_protected(hyp_vcpu)) {
-+		host_vcpu->arch.ctxt = hyp_vcpu->vcpu.arch.ctxt;
-+	} else {
-+		/* Keep PC (tracepoint) and PSTATE (vcpu_mode_is_bad_32bit) current. */
-+		host_vcpu->arch.ctxt.regs.pc = hyp_vcpu->vcpu.arch.ctxt.regs.pc;
-+		host_vcpu->arch.ctxt.regs.pstate = hyp_vcpu->vcpu.arch.ctxt.regs.pstate;
-+	}
- 
- 	host_vcpu->arch.fault		= hyp_vcpu->vcpu.arch.fault;
- 
-@@ -239,8 +295,27 @@ static void handle___pkvm_vcpu_put(struct kvm_cpu_context *host_ctxt)
- {
- 	struct pkvm_hyp_vcpu *hyp_vcpu = pkvm_get_loaded_hyp_vcpu();
- 
--	if (hyp_vcpu)
-+	if (hyp_vcpu) {
-+		struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
-+
-+		if (!pkvm_hyp_vcpu_is_protected(hyp_vcpu) &&
-+		    !vcpu_get_flag(host_vcpu, PKVM_HOST_STATE_DIRTY)) {
-+			sync_hyp_vcpu_state(hyp_vcpu);
-+		}
-+
- 		pkvm_put_hyp_vcpu(hyp_vcpu);
-+	}
-+}
-+
-+static void handle___pkvm_vcpu_sync_state(struct kvm_cpu_context *host_ctxt)
-+{
-+	struct pkvm_hyp_vcpu *hyp_vcpu;
-+
-+	hyp_vcpu = pkvm_get_loaded_hyp_vcpu();
-+	if (!hyp_vcpu || pkvm_hyp_vcpu_is_protected(hyp_vcpu))
-+		return;
-+
-+	sync_hyp_vcpu_state(hyp_vcpu);
- }
- 
- static struct kvm_vcpu *__get_host_hyp_vcpus(struct kvm_vcpu *arg,
-@@ -871,6 +946,7 @@ static const hcall_t host_hcall[] = {
- 	HANDLE_FUNC(__pkvm_finalize_teardown_vm),
- 	HANDLE_FUNC(__pkvm_vcpu_load),
- 	HANDLE_FUNC(__pkvm_vcpu_put),
-+	HANDLE_FUNC(__pkvm_vcpu_sync_state),
- 	HANDLE_FUNC(__pkvm_tlb_flush_vmid),
- };
- 
+	M.
+
 -- 
-2.39.5
-
+Without deviation from the norm, progress is not possible.
