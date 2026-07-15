@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A14348AE06;
-	Wed, 15 Jul 2026 14:31:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58A3E3016E7;
+	Wed, 15 Jul 2026 14:31:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784125868; cv=none; b=GZUhaxVOgV4WXc8RVaJt9aaaDljrC8kDuVKV3TZCSJOK+mgO9TLRpFnrl7OiI+nPwx3rHekyC82chRJkqfa+n7r1Bvs1K/jjKq/6J33e59je0XgteFlu/bvWBbJ+nPF3g+7ArYZGkXZgGZWhJUg/K+KVCC/wi5y6UExyxXguBSQ=
+	t=1784125872; cv=none; b=Tyuvj9lRDHAVZb0wl3PVMKtQoNHcJOXb9xumcfmGql5vSXMLK/waiGdfzm8lLA4g5yb8VZFXuUleJm2wAUO2fGPh6yLPLo13SQ5koq8g4ErCUGeswF4C7XWHFbKaPH9CxTRZqeNqNw3ARc2erBBTGMqM3vPU82RyBGla2WS3fRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784125868; c=relaxed/simple;
-	bh=tgn8iDXNgu5mVAiBC+c6ImZ3Rk5yLqEv8Ic4zHNhfuI=;
+	s=arc-20240116; t=1784125872; c=relaxed/simple;
+	bh=dof2MvH5ZZdVUnaNbvRlQgoLjFLC9SgvdrrOrj7zQ/Q=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=orTw0/EwqAsuBPHgLPNpGdXnalsy0LX/L5fMPrNj1Hda5CvudiLbb+w8aDya8oC6VxIyMv1NenDnTH6zjipTvJ+5t9M2iEjM2Occxnzs83+Ybcu5hj5azpAr9KlqX/sMK2eH6vMTcLtFtebTV+D0TRkxQh6w7roY5NU1xqXbPUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=pY3uiBwd; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=UDzXjkKjZF1B8vZwn2SpCFreVa7X1I4f79qtPUfjp1BYYZ1wzUEX0RFbwHtqs8sqdK+D2ezqcF0PYZhg+9nibQ8QmDGyR4IsNvUV8h/qvnC2GLZcW15cNCiun4/sgxONtQxzbu9EiCFJ3MC7Ye+6Kv6yYfdOvssofvKBlrxFY4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=o2jZ38OJ; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="pY3uiBwd"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="o2jZ38OJ"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CF59615A1;
-	Wed, 15 Jul 2026 07:30:59 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 077731BA8;
+	Wed, 15 Jul 2026 07:31:04 -0700 (PDT)
 Received: from e122027.cambridge.arm.com (e122027.cambridge.arm.com [10.1.25.27])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 28EA83F7B4;
-	Wed, 15 Jul 2026 07:31:00 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6AA253F7B4;
+	Wed, 15 Jul 2026 07:31:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1784125864; bh=tgn8iDXNgu5mVAiBC+c6ImZ3Rk5yLqEv8Ic4zHNhfuI=;
+	t=1784125868; bh=dof2MvH5ZZdVUnaNbvRlQgoLjFLC9SgvdrrOrj7zQ/Q=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=pY3uiBwduwz5KkvvYe2YfDc5v1QEM6FcojmNtmLTtOTMV3cFNw2y4y0azEUZamzQo
-	 3xULvBDMQzPcp/81zFxALrSOvNF+LDRp0MkdyT7pBtX7pbqDVCSI0n/GQRxg21i+Js
-	 d8ybD/xbyb7m2/8ttm8Qkx6y3DS0hwlrycwTnqp8=
+	b=o2jZ38OJ48MTBmi0sJcCw1LnH3btREr/ObkwuJ8+cifSdVYW5zzoV3EjgOvXr2rcr
+	 mJ8SDezMSUUlDutNIoQfw1LeuMpJMpe5BIOHYrzuOasV8PoQomJuzvr+WeZxK5bkfw
+	 FzDNCrzzcNBj8FLBPjK5P/rN2lz8fCrLHC+dbAao=
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -53,9 +53,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	WeiLin.Chang@arm.com,
 	Lorenzo Pieralisi <lpieralisi@kernel.org>,
 	Steven Price <steven.price@arm.com>
-Subject: [PATCH v15 27/37] KVM: arm64: CCA: Allow userspace to inject aborts
-Date: Wed, 15 Jul 2026 15:28:29 +0100
-Message-ID: <20260715142841.80544-28-steven.price@arm.com>
+Subject: [PATCH v15 28/37] KVM: arm64: CCA: Support RSI_HOST_CALL
+Date: Wed, 15 Jul 2026 15:28:30 +0100
+Message-ID: <20260715142841.80544-29-steven.price@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260715142841.80544-1-steven.price@arm.com>
 References: <20260715142841.80544-1-steven.price@arm.com>
@@ -69,65 +69,60 @@ Content-Transfer-Encoding: 8bit
 
 From: Joey Gouly <joey.gouly@arm.com>
 
-Extend KVM_SET_VCPU_EVENTS to support realms, where KVM cannot set the
-system registers, and the RMM must perform it on next REC entry.
+Realm VMs can talk to the hypervisor using the RSI_HOST_CALL SMC. The
+RMM forwards this to the host and KVM handles them as regular
+hypercalls.
 
 Signed-off-by: Joey Gouly <joey.gouly@arm.com>
 Signed-off-by: Steven Price <steven.price@arm.com>
 Reviewed-by: Gavin Shan <gshan@redhat.com>
 ---
- Documentation/virt/kvm/api.rst |  2 ++
- arch/arm64/kvm/guest.c         | 24 ++++++++++++++++++++++++
- 2 files changed, 26 insertions(+)
+Changes since v7:
+ * Avoid turning a negative return from kvm_smccc_call_handler() into a
+   error response to the guest. Instead propagate the error back to user
+   space.
+Changes since v4:
+ * Setting GPRS is now done by kvm_rec_enter() rather than
+   rec_exit_host_call() (see previous patch - arm64: RME: Handle realm
+   enter/exit). This fixes a bug where the registers set by user space
+   were being ignored.
+---
+ arch/arm64/kvm/rmi-exit.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index e39d146b34a3..85bec9b4f021 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -1314,6 +1314,8 @@ User space may need to inject several types of events to the guest.
- Set the pending SError exception state for this VCPU. It is not possible to
- 'cancel' an Serror that has been made pending.
+diff --git a/arch/arm64/kvm/rmi-exit.c b/arch/arm64/kvm/rmi-exit.c
+index c668cbfa971a..78d9189fd5ca 100644
+--- a/arch/arm64/kvm/rmi-exit.c
++++ b/arch/arm64/kvm/rmi-exit.c
+@@ -113,6 +113,19 @@ static int rec_exit_ripas_change(struct kvm_vcpu *vcpu)
+ 	return -EFAULT;
+ }
  
-+User space cannot inject SErrors into Realms.
++static int rec_exit_host_call(struct kvm_vcpu *vcpu)
++{
++	int i;
++	struct realm_rec *rec = &vcpu->arch.rec;
 +
- If the guest performed an access to I/O memory which could not be handled by
- userspace, for example because of missing instruction syndrome decode
- information or because there is no device mapped at the accessed IPA, then
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index 3e970c4f6214..5469c9a97fad 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -827,6 +827,30 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
- 	u64 esr = events->exception.serror_esr;
- 	int ret = 0;
++	vcpu->stat.hvc_exit_stat++;
++
++	for (i = 0; i < REC_RUN_GPRS; i++)
++		vcpu_set_reg(vcpu, i, rec->run->exit.gprs[i]);
++
++	return kvm_smccc_call_handler(vcpu);
++}
++
+ static void update_arch_timer_irq_lines(struct kvm_vcpu *vcpu)
+ {
+ 	struct realm_rec *rec = &vcpu->arch.rec;
+@@ -188,6 +201,8 @@ int handle_rec_exit(struct kvm_vcpu *vcpu, int rec_run_ret)
+ 		return rec_exit_psci(vcpu);
+ 	case RMI_EXIT_RIPAS_CHANGE:
+ 		return rec_exit_ripas_change(vcpu);
++	case RMI_EXIT_HOST_CALL:
++		return rec_exit_host_call(vcpu);
+ 	}
  
-+	if (vcpu_is_rec(vcpu)) {
-+		/* Cannot inject SError into a Realm. */
-+		if (serror_pending)
-+			return -EINVAL;
-+
-+		/*
-+		 * If a data abort is pending, set the flag and let the RMM
-+		 * inject an SEA when the REC is scheduled to be run.
-+		 */
-+		if (ext_dabt_pending) {
-+			/*
-+			 * Can only inject SEA into a Realm if the previous exit
-+			 * was due to a data abort of an Unprotected IPA.
-+			 */
-+			if (!(vcpu->arch.rec.run->enter.flags & REC_ENTER_FLAG_EMULATED_MMIO))
-+				return -EINVAL;
-+
-+			vcpu->arch.rec.run->enter.flags &= ~REC_ENTER_FLAG_EMULATED_MMIO;
-+			vcpu->arch.rec.run->enter.flags |= REC_ENTER_FLAG_INJECT_SEA;
-+		}
-+
-+		return 0;
-+	}
-+
- 	/*
- 	 * Immediately commit the pending SEA to the vCPU's architectural
- 	 * state which is necessary since we do not return a pending SEA
+ 	kvm_pr_unimpl("Unsupported exit reason: %u\n",
 -- 
 2.43.0
 
