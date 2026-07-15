@@ -1,111 +1,102 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2929145BD7F;
-	Wed, 15 Jul 2026 12:29:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C69242BC4B
+	for <kvmarm@lists.linux.dev>; Wed, 15 Jul 2026 12:33:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784118559; cv=none; b=IUpGI4cT3dpZJoDp4SnAQGOunY+X6TErXAZxoQzsXzQInuK/KqDct6jv5VunCL4NugOMQ7goGb9WUHtzUYhUREtCgsBH3HEQ+7lRAUV3eDtV3cN0KUyWJB2aVLaIbDET16qn6neRFMVYdtNp5zQD2eykJWOxYhlN+D6J8MQIrmk=
+	t=1784118835; cv=none; b=ZHlvPKfPJXVrHXqMNAbB4iTHughpIVXpRqQMqaCkSAZhj4f4KRY0O32jIZmq9WbuoBpUcBZcX+S4YFMeJPrEHqJf3665aP6HOFwdJL/yw6kkfSEjZIW4fFb60THY0RXJChJ0rvj030zZXgLOr5s4LQleOQwr/BbW8fVEiJBNuck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784118559; c=relaxed/simple;
-	bh=QHUFLpB+uxIK07nCZD6CPeNKvXxMo1lKwZ7dlrLZQEc=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fIL7eIEVGyTDSxpIm/wUIRxvJCZH+Cyx5qqoLbkipVOoTmbssde0kIJse9jcW7l0KfNrXzNABZssvTcO/dRNl9qkxQnj9eWutvo5XfrAejIP6i7iazaUhd0e34wgdf8PmF6AZErp19E1u0G20zRfF8tHgIkyNmgWYNs7rsZb53s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a7ZSwfgw; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784118835; c=relaxed/simple;
+	bh=G57zKCv+spOPuY/8rVHWOOnl9/D25zYP86zPILQp1lQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ciu8fknp6nUfZIBGIqMF945efvol4FX0FApMHE4o2XZGRmN5OyZAbi+YiTAHjusWBY8y9Ta6MdTea8BHJx7xeltl90WyQBpnTz40BhwcGVpZTeDbY2YwQqAKKQ794zb8AbIHHohlTzoq+kuNGULJSueQLRQNFRzp/qqxpJ9C55g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=M6gTGVQG; arc=none smtp.client-ip=91.218.175.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a7ZSwfgw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1C801F00A3A;
-	Wed, 15 Jul 2026 12:29:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784118557;
-	bh=Tn4O0onV9o21aM12CSR9CJyidbHuGU1mDMe8q6/cLk8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=a7ZSwfgw0RJsZa4e4EpzpuD8YOKULDOX1UBF5t0kla412TQ2DqLOaOWnrsS5HUqV9
-	 GsnISIbtxmmUbHc70S1hQtBaBPdOJMblKcUEPjYiFz+7iRtPydbC/r2bijSmpg0zMw
-	 7PeY1c+zg/w/3ojN9O/8PZIzQUi1S6tVM1dfdzEatAKJ18UHZKpBXEaYa+VbrBWsJw
-	 8dCuaQUFGHrPbNO1mI4ym7Bg+pzkAhfqEhky3Uwd1APgqkgyrOvfmfjOXFLeQfBNo4
-	 92xmUdNyTl7MqfGAkKP4gE3j4FE0uOrcK+PiqdSFF1JhxCe7jv0qsRLiK5PEEPgIb2
-	 AGh1Q5F1Agdyw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wjyjj-00000005I6M-2hdf;
-	Wed, 15 Jul 2026 12:29:15 +0000
-Date: Wed, 15 Jul 2026 13:29:15 +0100
-Message-ID: <86a4rso2qs.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: D Scott Phillips <scott@os.amperecomputing.com>
-Cc: Oliver Upton <oupton@kernel.org>,
-	Catalin Marinas
- <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Jonathan Corbet
- <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Joey Gouly
- <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K
- Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark
- Rutland <mark.rutland@arm.com>,
-	Zeng Heng <zengheng4@huawei.com>,
-	Wei Xu
- <xuwei5@hisilicon.com>,
-	Vladimir Murzin <vladimir.murzin@arm.com>,
-	Lucas
- Wei <lucaswei@google.com>,
-	Kuninori Morimoto
- <kuninori.morimoto.gx@renesas.com>,
-	Sascha Bischoff
- <Sascha.Bischoff@arm.com>,
-	Yicong Yang <yangyicong@hisilicon.com>,
-	Yeoreum
- Yun <yeoreum.yun@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH] arm64: errata: Mitigate AmpereOne erratum AC03_CPU_57 and AC04_CPU_29
-In-Reply-To: <86jyqx189z.fsf@scott-ph-mail.amperecomputing.com>
-References: <20260710222128.416581-1-scott@os.amperecomputing.com>
-	<87mrvy5640.wl-maz@kernel.org>
-	<86jyqx189z.fsf@scott-ph-mail.amperecomputing.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="M6gTGVQG"
+X-Forwarded-Encrypted: i=1; AHgh+RpQLfd5OmmQ5vZWk5QiC1unZOoe2+wNyDzfYnqwojOa52lMBLEBuSQdU3fORdyjJGceNS5wBlc=@lists.linux.dev
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1784118831;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9+guEC8Ex4qrqSkEdXMiwdsEhdbbOIt/n8ixzbFFm7I=;
+	b=M6gTGVQGC1Fss5onHPJbjCC/Y3PJkzdqIeVjigrDJsjbgQpLXIS0R5iEiYKWv6nfvBUPB7
+	D4xxPfz+AW/buDB6Fi734l3BrlxDiz8DTSWGzmd6jpyo0mbdUwx2qPuWyS8c8hVfy4DD7O
+	NFBNr8PHUO3xB4jhJeVUpF6EqE7BjWo=
+X-Gm-Message-State: AOJu0YzQ3GED1SgIGs2tyUyyWC1xdl2OT0Ae5IieJ0+cipJxjBIdc59m
+	J7/KkR64HTwIWZ7gtU38FOPn8cmo0DDcOZ93XSSYwnhS4m7/jb+oJ1L9o8uEJA7N+KW7MGikjkf
+	GqLakqqYd7DharOy0yUQ79PhsnSeDUYyIoyCwHGsC
+X-Received: by 2002:ac8:6992:0:b0:51b:fe30:b8c5 with SMTP id
+ d75a77b69052e-51d7bcc96e9mr20164071cf.6.1784118817577; Wed, 15 Jul 2026
+ 05:33:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: scott@os.amperecomputing.com, oupton@kernel.org, catalin.marinas@arm.com, will@kernel.org, corbet@lwn.net, skhan@linuxfoundation.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, zengheng4@huawei.com, xuwei5@hisilicon.com, vladimir.murzin@arm.com, lucaswei@google.com, kuninori.morimoto.gx@renesas.com, Sascha.Bischoff@arm.com, yangyicong@hisilicon.com, yeoreum.yun@arm.com, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20260706175415.2604046-1-vdonnefort@google.com> <20260706175415.2604046-16-vdonnefort@google.com>
+In-Reply-To: <20260706175415.2604046-16-vdonnefort@google.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Wed, 15 Jul 2026 13:33:00 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTzNMCMAt=VDnCuR2+Pfz9Qh5HmbEm6tdjpdcPBO+UchEg@mail.gmail.com>
+X-Gm-Features: AUfX_mymo_D2O5n0ZAffEBP1RuvXf6XLBjc5Twl5xXcW05_4Gb4iBPyu-EXgdh8
+Message-ID: <CA+EHjTzNMCMAt=VDnCuR2+Pfz9Qh5HmbEm6tdjpdcPBO+UchEg@mail.gmail.com>
+Subject: Re: [PATCH v2 15/18] KVM: arm64: Alloc pkvm_hyp_vm using pKVM heap allocator
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
+	will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kernel-team@android.com, qperret@google.com
+Content-Type: text/plain; charset="UTF-8"
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, 15 Jul 2026 00:06:00 +0100,
-D Scott Phillips <scott@os.amperecomputing.com> wrote:
-> 
-> > OK, that's pretty good news. Can I safely assume that your HW doesn't
-> > support VLPIs/VSGIs in any form (no GICv4+)?
-> 
-> AmpereOne AC04 does have gicv4.1 with vlpis/vsgis. Those take a
-> different enough path in the core that a deactivation of a pending
-> vlpi/vsgi won't cause the issue. The wording about "physical interrupt"
-> is meant to exclude vlpis/vsgis, sorry that it didn't come out clearly.
+On Mon, 6 Jul 2026 at 18:54, 'Vincent Donnefort' via kernel-team
+<kernel-team@android.com> wrote:
 
-Given that the write-up didn't mention direct injection at all, it
-wasn't totally obvious whether this was taken into account or not.
-Might be worth adding to the errata document for clarity.
+...
 
-Thanks,
+> --- a/arch/arm64/kvm/pkvm.c
+> +++ b/arch/arm64/kvm/pkvm.c
+> @@ -191,8 +191,8 @@ static int __pkvm_create_hyp_vcpu(struct kvm_vcpu *vcpu)
+>   */
+>  static int __pkvm_create_hyp_vm(struct kvm *kvm)
+>  {
+> -       size_t pgd_sz, hyp_vm_sz;
+> -       void *pgd, *hyp_vm;
+> +       size_t pgd_sz;
+> +       void *pgd;
+>         int ret;
+>
+>         if (kvm->created_vcpus < 1)
+> @@ -209,28 +209,15 @@ static int __pkvm_create_hyp_vm(struct kvm *kvm)
+>         if (!pgd)
+>                 return -ENOMEM;
+>
+> -       /* Allocate memory to donate to hyp for vm and vcpu pointers. */
+> -       hyp_vm_sz = PAGE_ALIGN(size_add(PKVM_HYP_VM_SIZE,
+> -                                       size_mul(sizeof(void *),
+> -                                                kvm->created_vcpus)));
+> -       hyp_vm = alloc_pages_exact(hyp_vm_sz, GFP_KERNEL_ACCOUNT);
+> -       if (!hyp_vm) {
+> -               ret = -ENOMEM;
+> -               goto free_pgd;
+> -       }
+> -
+> -       /* Donate the VM memory to hyp and let hyp initialize it. */
+> -       ret = kvm_call_hyp_nvhe(__pkvm_init_vm, kvm, hyp_vm, pgd);
+> +       ret = pkvm_call_hyp_req(__pkvm_init_vm, kvm, pgd);
 
-	M.
+Sashiko might be right on the memcg point: hyp_vm used to be
+GFP_KERNEL_ACCOUNT and now comes from the heap unaccounted, while pgd
+next to it is still accounted, so it's inconsistent.
 
--- 
-Without deviation from the norm, progress is not possible.
+If we do want to fix it, would it go in pkvm_hyp_topup() to cover all
+consumers rather than here?
+
+Cheers,
+/fuad
