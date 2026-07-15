@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5794E381EB0;
-	Wed, 15 Jul 2026 14:28:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89E3C383C96;
+	Wed, 15 Jul 2026 14:28:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784125686; cv=none; b=s2hutuXPdH01DbonNvIImy+mm6mMiljha/WT1lbpjy6lkHoEnxYoLzBwHhadKVFmt1jDEile8S7pKH+rZiEEhWNQuVwuPKJQI+qGUszESKCMHNn4tJ3X/Y/QrBwY2hIeeW36Eppu/bSYBp2DzWEN4PrFBp/kZIsic9OoFjlRW6w=
+	t=1784125692; cv=none; b=g3oGoFbr9kvaqQLLHk6i0J/5X2csYF4t/bdvOnKvPCIfe7AaEYK29p8GqPFQg9+11mwC9PAoWjmXQ2CkxguFgw4YRgk4F+1bybv6RdZBovUDI0Xe7BcVkZsVlbbncbHt5B7d7bAjPyHEBttl7iOERRoQM1WVskYFMBohGhsHcDg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784125686; c=relaxed/simple;
-	bh=NWOsNN7l8W9YwPA6xfIL/7P4wLBRe755MxPlY7PfirM=;
+	s=arc-20240116; t=1784125692; c=relaxed/simple;
+	bh=jjzHVD9CHi0rqJocrAQSJ4tPv2zmiVUq7nNDyfPPsSY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kYILSZW8STX+f1LpN70bErk2u8r4wgl0PrU4+aTztEGHo989x8ZDzXsPAwXfepRdf7VmrngSXaWqR0EKRACU8zf/Dot3nC1mOcu0NuMb+UQbtFI4BEXyxTYJw2Hy9cqZ93u6r9Xk+6aIzLremXUDZBAxRVahX8dfoY9NBaEcWc0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=mphvvR75; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=gePDY7HFXMthrPFNhAnoA8YJJ36sq0IKT+N3HgRUfGmjAHatgVaeba4GpB0bydLfuviq0W8kQ1arU721MmodMBK2TFenfq0nWtkeuv4BiYAYy4DxkjF2N4K6b92cp9XAYsoM6/Ma+I5EG+gjFfcF9AvNl5rnNc5T0U/riiiwVTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=b1kaLlnA; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="mphvvR75"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="b1kaLlnA"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 75EF8153B;
-	Wed, 15 Jul 2026 07:28:00 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 944761477;
+	Wed, 15 Jul 2026 07:28:05 -0700 (PDT)
 Received: from e122027.cambridge.arm.com (e122027.cambridge.arm.com [10.1.25.27])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 181143F7B4;
-	Wed, 15 Jul 2026 07:27:59 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1C4D93F93E;
+	Wed, 15 Jul 2026 07:28:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1784125684; bh=NWOsNN7l8W9YwPA6xfIL/7P4wLBRe755MxPlY7PfirM=;
+	t=1784125689; bh=jjzHVD9CHi0rqJocrAQSJ4tPv2zmiVUq7nNDyfPPsSY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=mphvvR75ooi1yaJNM10+H/UaryGV0V3IrcPsl+RkTGRFmqzU/vqhkgF2hwntEMN4P
-	 cf7cKqvbAMo2z/NCUonu6UbysD2AwUEl9Q+k9p74Hv4MWM3FrFzuYysx/uZp5Z2yp2
-	 z+FnKUYEwiXqKHE4ftNMGdXFczelrmbbaT6pRY8k=
+	b=b1kaLlnAD0M+KQcSnost6Pe5JX+aq1SHqN+i8W4ZVEyyM53KMhzmghN8/x/fZ/kM8
+	 XgaJZnVhgE755ttrjKP9h+LcJU6deJaWGRTYckCQ58H0E3amSm5Xn7Z/oFFTRDl5Ko
+	 lnSohg9zDWtIxxVtSGsua//c2Arog0llQN8c27fQ=
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -53,9 +53,9 @@ Cc: Steven Price <steven.price@arm.com>,
 	Vishal Annapurve <vannapurve@google.com>,
 	WeiLin.Chang@arm.com,
 	Lorenzo Pieralisi <lpieralisi@kernel.org>
-Subject: [PATCH 2/6] firmware: arm_rmm: Add wrappers for direct RMI calls
-Date: Wed, 15 Jul 2026 15:27:33 +0100
-Message-ID: <20260715142739.80398-3-steven.price@arm.com>
+Subject: [PATCH 3/6] firmware: arm_rmm: Check for RMI support at init
+Date: Wed, 15 Jul 2026 15:27:34 +0100
+Message-ID: <20260715142739.80398-4-steven.price@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260715142739.80398-1-steven.price@arm.com>
 References: <20260715142739.80398-1-steven.price@arm.com>
@@ -67,210 +67,217 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The wrappers make the call sites easier to read and deal with the
-boilerplate of handling the error codes from the RMM.
+Query the RMI version number and check if it is a compatible version.
+The first two feature registers are read and exposed for future code to
+use.
 
 Signed-off-by: Steven Price <steven.price@arm.com>
 ---
-Changes from v14:
- * Update to RMM v2.0-bet2 spec.
- * Move SRO related wrappers to a later patch due to dependencies.
- * Common wrappers are split into include/linux/arm-rmi-cmds.h.
-Changes from v13:
- * Update to RMM v2.0-bet1 spec including some SRO support (there still
-   some FIXMEs where SRO support is incomplete).
-Changes from v12:
- * Update to RMM v2.0 specification
-Changes from v8:
- * Switch from arm_smccc_1_2_smc() to arm_smccc_1_2_invoke() in
-   rmi_rtt_read_entry() for consistency.
-Changes from v7:
- * Minor renaming of parameters and updated comments
-Changes from v5:
- * Further improve comments
-Changes from v4:
- * Improve comments
-Changes from v2:
- * Make output arguments optional.
- * Mask RIPAS value rmi_rtt_read_entry()
- * Drop unused rmi_rtt_get_phys()
+v15:
+ * The code is moved again, this time into the 'firmware' directory.
+v14:
+ * This moves the basic RMI setup into the 'kernel' directory. This is
+   because RMI will be used for some features outside of KVM so should
+   be available even if KVM isn't compiled in.
 ---
- arch/arm64/include/asm/rmi_cmds.h | 67 +++++++++++++++++++++++
- include/linux/arm-rmi-cmds.h      | 91 +++++++++++++++++++++++++++++++
- 2 files changed, 158 insertions(+)
- create mode 100644 arch/arm64/include/asm/rmi_cmds.h
- create mode 100644 include/linux/arm-rmi-cmds.h
+ arch/arm64/Kconfig                |   1 +
+ arch/arm64/kernel/cpufeature.c    |   1 +
+ drivers/firmware/Kconfig          |   1 +
+ drivers/firmware/Makefile         |   1 +
+ drivers/firmware/arm_rmm/Kconfig  |  22 +++++++
+ drivers/firmware/arm_rmm/Makefile |   2 +
+ drivers/firmware/arm_rmm/rmi.c    | 100 ++++++++++++++++++++++++++++++
+ 7 files changed, 128 insertions(+)
+ create mode 100644 drivers/firmware/arm_rmm/Kconfig
+ create mode 100644 drivers/firmware/arm_rmm/Makefile
+ create mode 100644 drivers/firmware/arm_rmm/rmi.c
 
-diff --git a/arch/arm64/include/asm/rmi_cmds.h b/arch/arm64/include/asm/rmi_cmds.h
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index b3afe0688919..0f1956edf130 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -38,6 +38,7 @@ config ARM64
+ 	select ARCH_HAS_MEMBARRIER_SYNC_CORE
+ 	select ARCH_HAS_MEM_ENCRYPT
+ 	select ARCH_SUPPORTS_MSEAL_SYSTEM_MAPPINGS
++	select ARCH_SUPPORTS_RMM
+ 	select ARCH_HAS_NMI_SAFE_THIS_CPU_OPS
+ 	select ARCH_HAS_NON_OVERLAPPING_ADDRESS_SPACE
+ 	select ARCH_HAS_NONLEAF_PMD_YOUNG if ARM64_HAFT
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 9a22df0c5120..4ae63c89cda9 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -293,6 +293,7 @@ static const struct arm64_ftr_bits ftr_id_aa64isar3[] = {
+ static const struct arm64_ftr_bits ftr_id_aa64pfr0[] = {
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_CSV3_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_CSV2_SHIFT, 4, 0),
++	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_RME_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_DIT_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_AMU_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_MPAM_SHIFT, 4, 0),
+diff --git a/drivers/firmware/Kconfig b/drivers/firmware/Kconfig
+index 12dc70254842..55542879fbb8 100644
+--- a/drivers/firmware/Kconfig
++++ b/drivers/firmware/Kconfig
+@@ -301,5 +301,6 @@ source "drivers/firmware/samsung/Kconfig"
+ source "drivers/firmware/smccc/Kconfig"
+ source "drivers/firmware/tegra/Kconfig"
+ source "drivers/firmware/xilinx/Kconfig"
++source "drivers/firmware/arm_rmm/Kconfig"
+ 
+ endmenu
+diff --git a/drivers/firmware/Makefile b/drivers/firmware/Makefile
+index 4ddec2820c96..07e8ca1789b4 100644
+--- a/drivers/firmware/Makefile
++++ b/drivers/firmware/Makefile
+@@ -38,3 +38,4 @@ obj-y				+= samsung/
+ obj-y				+= smccc/
+ obj-y				+= tegra/
+ obj-y				+= xilinx/
++obj-y				+= arm_rmm/
+diff --git a/drivers/firmware/arm_rmm/Kconfig b/drivers/firmware/arm_rmm/Kconfig
 new file mode 100644
-index 000000000000..7eb2c8d7f7fa
+index 000000000000..d224a72cca90
 --- /dev/null
-+++ b/arch/arm64/include/asm/rmi_cmds.h
-@@ -0,0 +1,67 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
++++ b/drivers/firmware/arm_rmm/Kconfig
+@@ -0,0 +1,22 @@
++
++config ARCH_SUPPORTS_RMM
++	bool
++
++config ARM_RMM
++	bool "Realm Management Monitor (RMM) Support"
++	depends on ARCH_SUPPORTS_RMM
++	default y
++	help
++	  Support the Realm Management Monitor (RMM) on Arm systems that
++	  implement the Realm Management Extension (RME), as defined by the
++	  Arm Confidential Compute Architecture.
++
++	  The RMM runs in the Realm world and provides the Realm Management
++	  Interface (RMI) used by a Normal World host to create, manage and run
++	  protected virtual machines called Realms. This option builds the
++	  host-side RMI support used by KVM to detect a compatible RMM,
++	  configure it, manage delegated memory and enable Realm guests.
++
++	  Selecting this option does not by itself make Realm guests available:
++	  the system must also provide RME-capable hardware and firmware with a
++	  compatible RMM implementation.
+diff --git a/drivers/firmware/arm_rmm/Makefile b/drivers/firmware/arm_rmm/Makefile
+new file mode 100644
+index 000000000000..51aef5cc04b0
+--- /dev/null
++++ b/drivers/firmware/arm_rmm/Makefile
+@@ -0,0 +1,2 @@
++
++obj-$(CONFIG_ARM_RMM)	= rmi.o
+diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/arm_rmm/rmi.c
+new file mode 100644
+index 000000000000..c4850976544f
+--- /dev/null
++++ b/drivers/firmware/arm_rmm/rmi.c
+@@ -0,0 +1,100 @@
++// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Copyright (C) 2023-2026 ARM Ltd.
 + */
 +
-+#ifndef __ASM_RMI_CMDS_H
-+#define __ASM_RMI_CMDS_H
-+
++#include <linux/cpufeature.h>
++#include <linux/memblock.h>
 +#include <linux/arm-rmi-cmds.h>
-+#include <linux/arm-smccc-rmi.h>
++#include <linux/slab.h>
 +
-+/**
-+ * rmi_psci_complete() - Complete pending PSCI command
-+ * @calling_rec: PA of the calling REC
-+ * @status: Status of the PSCI request
-+ *
-+ * Completes a pending PSCI command.
-+ *
-+ * Return: RMI return code
-+ */
-+static inline int rmi_psci_complete(unsigned long calling_rec,
-+				    unsigned long status)
++#include <asm/memory.h>
++#include <asm/pgtable-hwdef.h>
++
++/* Currently only the first 2 registers are used by Linux */
++#define RMI_FEAT_REG_COUNT	2
++static __ro_after_init unsigned long rmi_feat_reg_cache[RMI_FEAT_REG_COUNT];
++
++unsigned long rmi_feat_reg(unsigned long id)
 +{
-+	struct arm_smccc_res res;
++	if (WARN_ON(id >= RMI_FEAT_REG_COUNT))
++		return 0;
 +
-+	arm_smccc_1_1_invoke(SMC_RMI_PSCI_COMPLETE, calling_rec, status, &res);
-+
-+	return res.a0;
++	return rmi_feat_reg_cache[id];
 +}
 +
-+/**
-+ * rmi_realm_activate() - Active a realm
-+ * @rd: PA of the RD
-+ *
-+ * Mark a realm as Active signalling that creation is complete and allowing
-+ * execution of the realm.
-+ *
-+ * Return: RMI return code
-+ */
-+static inline int rmi_realm_activate(unsigned long rd)
++static int rmi_check_version(void)
 +{
 +	struct arm_smccc_res res;
++	unsigned short version_major, version_minor;
++	unsigned long host_version = RMI_ABI_VERSION(RMI_ABI_MAJOR_VERSION,
++						     RMI_ABI_MINOR_VERSION);
++	unsigned long aa64pfr0 = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
 +
-+	arm_smccc_1_1_invoke(SMC_RMI_REALM_ACTIVATE, rd, &res);
++	/* If RME isn't supported, then RMI can't be */
++	if (cpuid_feature_extract_unsigned_field(aa64pfr0, ID_AA64PFR0_EL1_RME_SHIFT) == 0)
++		return -ENXIO;
 +
-+	return res.a0;
++	arm_smccc_1_1_invoke(SMC_RMI_VERSION, host_version, &res);
++
++	if (res.a0 == SMCCC_RET_NOT_SUPPORTED)
++		return -ENXIO;
++
++	version_major = RMI_ABI_VERSION_GET_MAJOR(res.a1);
++	version_minor = RMI_ABI_VERSION_GET_MINOR(res.a1);
++
++	if (res.a0 != RMI_SUCCESS) {
++		unsigned short high_version_major, high_version_minor;
++
++		high_version_major = RMI_ABI_VERSION_GET_MAJOR(res.a2);
++		high_version_minor = RMI_ABI_VERSION_GET_MINOR(res.a2);
++
++		pr_err("Unsupported RMI ABI (v%d.%d - v%d.%d) we want v%d.%d\n",
++		       version_major, version_minor,
++		       high_version_major, high_version_minor,
++		       RMI_ABI_MAJOR_VERSION,
++		       RMI_ABI_MINOR_VERSION);
++		return -ENXIO;
++	}
++
++	pr_info("RMI ABI version %d.%d\n", version_major, version_minor);
++
++	return 0;
 +}
 +
-+/**
-+ * rmi_rec_enter() - Enter a REC
-+ * @rec: PA of the target REC
-+ * @run_ptr: PA of RecRun structure
-+ *
-+ * Starts (or continues) execution within a REC.
-+ *
-+ * Return: RMI return code
-+ */
-+static inline int rmi_rec_enter(unsigned long rec, unsigned long run_ptr)
++static int rmi_read_features(void)
 +{
-+	struct arm_smccc_res res;
++	/*
++	 * Since we've negotiated a compatible version these feature registers
++	 * should always be available
++	 */
++	for (int i = 0; i < RMI_FEAT_REG_COUNT; i++) {
++		if (WARN_ON(rmi_features(i, &rmi_feat_reg_cache[i])))
++			return -EINVAL;
++	}
 +
-+	arm_smccc_1_1_invoke(SMC_RMI_REC_ENTER, rec, run_ptr, &res);
-+
-+	return res.a0;
++	return 0;
 +}
 +
-+#endif /* __ASM_RMI_CMDS_H */
-diff --git a/include/linux/arm-rmi-cmds.h b/include/linux/arm-rmi-cmds.h
-new file mode 100644
-index 000000000000..c038c1d685fa
---- /dev/null
-+++ b/include/linux/arm-rmi-cmds.h
-@@ -0,0 +1,91 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
++static int __init arm64_init_rmi(void)
++{
++	int ret;
++
++	/* Continue without realm support if we can't agree on a version */
++	ret = rmi_check_version();
++	if (ret)
++		return ret;
++
++	ret = rmi_read_features();
++	if (ret)
++		return ret;
++
++	return 0;
++}
++
 +/*
-+ * Copyright (C) 2026 ARM Ltd.
++ * Note arm64_init_rmi() must be called before kvm_init_rmi() otherwise KVM
++ * will not support realm guests. subsys_initcall() is called before
++ * module_init() (used for KVM) so this is OK.
 + */
-+
-+#ifndef __LINUX_ARM_RMI_CMDS_H_
-+#define __LINUX_ARM_RMI_CMDS_H_
-+
-+#include <linux/arm-smccc-rmi.h>
-+#include <linux/bug.h>
-+#include <linux/types.h>
-+
-+#include <asm/page.h>
-+
-+struct rtt_entry {
-+	unsigned long walk_level;
-+	unsigned long desc;
-+	int state;
-+	int ripas;
-+};
-+
-+unsigned long rmi_feat_reg(unsigned long id);
-+
-+bool is_rmi_available(void);
-+
-+/**
-+ * rmi_rmm_config_set() - Configure the RMM
-+ * @cfg_ptr: PA of a struct rmm_config
-+ *
-+ * Sets configuration options on the RMM.
-+ *
-+ * Return: RMI return code
-+ */
-+static inline int rmi_rmm_config_set(unsigned long cfg_ptr)
-+{
-+	struct arm_smccc_res res;
-+
-+	arm_smccc_1_1_invoke(SMC_RMI_RMM_CONFIG_SET, cfg_ptr, &res);
-+
-+	return res.a0;
-+}
-+
-+/**
-+ * rmi_granule_tracking_get() - Get configuration of a Granule tracking region
-+ * @start: Base PA of the tracking region
-+ * @end: End of the PA region
-+ * @out_category: Memory category
-+ * @out_state: Tracking region state
-+ * @out_top: Top of the memory region
-+ *
-+ * Return: RMI return code
-+ */
-+static inline int rmi_granule_tracking_get(unsigned long start,
-+					   unsigned long end,
-+					   unsigned long *out_category,
-+					   unsigned long *out_state,
-+					   unsigned long *out_top)
-+{
-+	struct arm_smccc_res res;
-+
-+	arm_smccc_1_1_invoke(SMC_RMI_GRANULE_TRACKING_GET, start, end, &res);
-+
-+	if (out_category)
-+		*out_category = res.a1;
-+	if (out_state)
-+		*out_state = res.a2;
-+	if (out_top)
-+		*out_top = res.a3;
-+
-+	return res.a0;
-+}
-+
-+/**
-+ * rmi_features() - Read feature register
-+ * @index: Feature register index
-+ * @out: Feature register value is written to this pointer
-+ *
-+ * Return: RMI return code
-+ */
-+static inline int rmi_features(unsigned long index, unsigned long *out)
-+{
-+	struct arm_smccc_res res;
-+
-+	arm_smccc_1_1_invoke(SMC_RMI_FEATURES, index, &res);
-+
-+	if (out)
-+		*out = res.a1;
-+	return res.a0;
-+}
-+
-+#endif
++subsys_initcall(arm64_init_rmi);
 -- 
 2.43.0
 
