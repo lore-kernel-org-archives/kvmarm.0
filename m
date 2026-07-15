@@ -1,186 +1,144 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f73.google.com (mail-ej1-f73.google.com [209.85.218.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F7873EAC9B
-	for <kvmarm@lists.linux.dev>; Wed, 15 Jul 2026 10:14:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C0443CA4AF
+	for <kvmarm@lists.linux.dev>; Wed, 15 Jul 2026 10:51:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784110465; cv=none; b=HoXWL0UrqH9hNZY0zMtDhlfoZhyJ67t5Jkcqe4i4GY7dJZFtjC2MgpI8kJ9mERjfLStRQL9s3Z0FCYEe18kGFw8MYOODLvFQffr4rmeHILWPBPVzm5FknnAFYw45wK6aX227vUzpw5PoERvs38MDAybfvzahT9ll7dr+fpagK/M=
+	t=1784112672; cv=none; b=VPl4xYXUKuV4JFoJCFVrVZxR5gVsv0iE5Al2tg5didsjEG6kVjEqfyIWbmBVo3PAe5NMfwBh7yO5f82b08i25GkJDa3t/T+MyC2ASLNKGTgZlYhaQPloWk4wORowckx0yz+kxbpYMsPX2VFsv96rsMwfn4Y6ZFoK60lFf3ovgLo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784110465; c=relaxed/simple;
-	bh=bQhFfWQ2UxJga9eW4whcQbngDhCAqLTkvi+3GBBScv4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XNLw2HWR70cU8+tjI4LxKPr6vN09RHK4+di8lcidKP+O6Irn4iJVAh8YUN8dmPr+u5eQ8dyHiCLDpsCvav42nZ7dodcViDCxiweP9QpX5ddcZXxUUMl6P7GC3Q5JeLwrSMf8d6cDpaEXweNPbX+qhbyra8KqOAdonvVPGJdWq24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CCz7Lmqj; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1784112672; c=relaxed/simple;
+	bh=qHuuahOhWCgMrhXxu4vZWmkrsOESQSF+i78oRDWtwa4=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=glFppPi8q6zJsEm0wtWm8O0xSyDrmsTMYli3Ogg7zcDugKTDmzGJTeO41CF6wSuEhzaoUrpecqsQ0VZHZNRckVduYGYd20bbeKqFdkO6hYPCoxhc4JChwNUGCOcJjcNRQfnVW3u1EZpMtBvDR9JpG/AnnRGZz+weUwGcYs8yRr0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PsvWN3o5; arc=none smtp.client-ip=209.85.218.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CCz7Lmqj"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1784110463;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OTfS1o6FG2+VSRsM8RoeMYV4oV1nuMVaP/qPFLezgiM=;
-	b=CCz7LmqjaBLeLgxGhJqmXaUUkUyu8fZ3koycP6UsOVGeab/4+X5XuOvCGST07T6hZEnX4x
-	53AJZ1Cgv9a2C226HM0BQ33g9CPObAMW7BwXa2DIWJ9LRocHUzfyD5RV7+4fvj8nknjn88
-	s5+MmTBkbngXe2MqVAFasfVK29afxi4=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-507-c2jxRdaMOJKMUs9x5ZOs6Q-1; Wed, 15 Jul 2026 06:14:21 -0400
-X-MC-Unique: c2jxRdaMOJKMUs9x5ZOs6Q-1
-X-Mimecast-MFC-AGG-ID: c2jxRdaMOJKMUs9x5ZOs6Q_1784110461
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-47dfc23ac71so4275768f8f.1
-        for <kvmarm@lists.linux.dev>; Wed, 15 Jul 2026 03:14:21 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PsvWN3o5"
+Received: by mail-ej1-f73.google.com with SMTP id a640c23a62f3a-c160b9c0676so127675466b.0
+        for <kvmarm@lists.linux.dev>; Wed, 15 Jul 2026 03:51:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1784112667; x=1784717467; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=dwtuWs6fZAlqKW07ZWIa/L7IvORP1bCSU0S6TTxBnXQ=;
+        b=PsvWN3o5yoXoGi6nwy8oCZZ7MaHCgA80z1+Vq5C0lVwGiFvg8utfvRl6ywehScJwLd
+         OEvadMhdJe6xk7lxJnGlhGx8HGwR9rc74CG3iq9/QIiKizX1DYIJDG4wPuXIWOiYyAVl
+         ijar++fE9jhdI62kDqvfS3xQ5RyTFySscV++sHTq2gDhaaNydcZy4WJ8t1c2YbPTKkCj
+         30+/BOeVNgtyqKxju7wx3vsIzn4TeRIjYVTs6JOTHWK1hzztSqEISwzsZAO3j7x4pnur
+         LRBVypVQbXmOY1K/AGc+vVEnNVTITdwI9OEZaBdPsQK8b2tuM8Hif+af/cQ5E/m8GYZN
+         Y2PQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784110460; x=1784715260;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
+        d=1e100.net; s=20251104; t=1784112667; x=1784717467;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=OTfS1o6FG2+VSRsM8RoeMYV4oV1nuMVaP/qPFLezgiM=;
-        b=Jq6zNgoZqxb0EcF/DW4KQSwE6LoIesDs5HV7iwbVQhMSNnSjvXXJ/CBUBmB0CvJtaQ
-         VsYpi2XpPv+gQ3V7nOwUssXfTTWItxVBIzslUrPyzIgC6gSjyGRCw7q6CooY/ZBbuNei
-         ORPMMpDxbE5CKTyOJBrrac4e+sqnH3XW7r1oL0AA0HDIh3qrvSOONtsZRpsUbTYgAD83
-         gzgY+HX3GljqZ1zOusnCn7OLYn6bisK6L6663WwZafZaq2Xh067k1l7070ii9c26MM8U
-         2es2BGllxcfy0Q0dnNsThsfzsEis+s4XF+/T1UGwRCrQrshlifQAyg8tHfwvkNygUdn0
-         9aag==
-X-Forwarded-Encrypted: i=1; AHgh+Ro6PXt5Bh3W7eU+ulnSLtyRUg5W0p1JEwJ7l/Dy8kKinRWPp8xQtJ8+7mOBvnkq8J6p8qL/nuc=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzMYfsA7oaQrPv2MQe8Wr7pwC72DHfbZpbdqMADge2lGHYD0ELm
-	LUAalk6tnr+P26qoOKtWSolDk5Cpg6cnjGdkD7HiU5bOsCaKcDEGOoQ3GcOH3QBQPLYGhPLzBOS
-	A8NT7vCfJRW/jZkyuk0ClYmkL6YTyrxZ/KMv6g+T1u2FaGqBqnNpJVUqPbW6zq0+UL4H569V5qh
-	flrG+pF/0o4FV9Ugg46vFymT8C3Maw+dYF
-X-Gm-Gg: AfdE7cloP35IpvXm1w6PJg+/DrtRtsY2UPtxAc5hU0v511t+shu4JG0hbjOOPZaqS1x
-	QAKmAf5x+GhRWk6fkDcxoHv4EdXGVHJwGzAD20PN5qg/aKhxNIffEtv1rxeXo1Co0g5XyRaMaXm
-	t0biAEBWan8NZcZgGgXEuIrNUX9enJ2KEcS307e/x72WNVlFbecOqG1lje8hTgdIrHSii6bzRjw
-	7cj7S+7r7juT0DuxWAskNVgHKHkOZVlwkY9d+QOnJHTpVvu89k5jjX5YuMiDX4MDVRnpw==
-X-Received: by 2002:adf:f0c3:0:b0:460:3233:beef with SMTP id ffacd0b85a97d-47f46386e3fmr7594781f8f.43.1784110460622;
-        Wed, 15 Jul 2026 03:14:20 -0700 (PDT)
-X-Received: by 2002:adf:f0c3:0:b0:460:3233:beef with SMTP id
- ffacd0b85a97d-47f46386e3fmr7594731f8f.43.1784110460011; Wed, 15 Jul 2026
- 03:14:20 -0700 (PDT)
+        bh=dwtuWs6fZAlqKW07ZWIa/L7IvORP1bCSU0S6TTxBnXQ=;
+        b=XZR4Iiy6JSHme3jxJf4ueHTXW8lORXyo0YPlSDD7BCoXCCKjJuoyB3TtNhatmC9QWY
+         q6UDZVBWwCnwhwhCyZgr/nU/9Gt46UD1v4Jg4Ic32z60J4BhcIPwe5M1dg/t9HWsKmPs
+         3eolocIGvAMR2AIyI129frzKCzBEixRd8E964IDzQTpVvpS8JwBqFRCGlddrcgGuAvYU
+         H8Ur/rfwoJhboLB575DXSLvsa67SReTD8TwWzoCatEa59sH5Kv6mh7KRBJG2LdBy19a1
+         BleTg8zfakAoCtBefDjeoAGZh2Da2T//YqevFiJ33LJbNhl3rp81OE69M+1/cFMOkWSB
+         DD0g==
+X-Forwarded-Encrypted: i=1; AHgh+Ro4YsvE8krJFinfznOp0Q8wbYfyxF2c50hnyI/TwNv2Y+FosjpFectROrk/atX+1qIIlxaXHtk=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxJSCQpckgkgLd+1aRtyC/wlao82/T9ONz7uwD9cVvNzHS2qF8Q
+	zQvS5fv5yMPjoRkbOVArJCMgLnMvpa8igUZY3xW0B1plhatYuSpPTHbBfdcYcNnZANbWcKbKJlp
+	tJU114kCb5R61qLOu5qqmOQ==
+X-Received: from edn4.prod.google.com ([2002:a05:6402:a0c4:b0:69a:a0e5:c4fe])
+ (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:907:a703:b0:c16:66ad:f8ff with SMTP id a640c23a62f3a-c1666adfb6amr360778566b.39.1784112666977;
+ Wed, 15 Jul 2026 03:51:06 -0700 (PDT)
+Date: Wed, 15 Jul 2026 11:51:00 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20260708161242.1912769-1-maz@kernel.org>
-In-Reply-To: <20260708161242.1912769-1-maz@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 15 Jul 2026 12:14:08 +0200
-X-Gm-Features: AUfX_mzYYojltzRopjsZWj-BSyvTHnDNy-EhsjgnxP0aoffOaIAQ3DKZpIh1JXg
-Message-ID: <CABgObfbpDt2iATf=d-BiawY_41rLnYFzNiDLDx8W8c-iRCxEXA@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 7.2, take #2
-To: Marc Zyngier <maz@kernel.org>
-Cc: Fuad Tabba <fuad.tabba@linux.dev>, Mark Brown <broonie@kernel.org>, 
-	Mostafa Saleh <smostafa@google.com>, Oliver Upton <oupton@kernel.org>, 
-	Sebastian Ene <sebastianene@google.com>, Sudeep Holla <sudeep.holla@kernel.org>, 
-	Vincent Donnefort <vdonnefort@google.com>, Wei-Lin Chang <weilin.chang@arm.com>, 
-	Will Deacon <will@kernel.org>, Steffen Eiden <seiden@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: dmtyJBmVt-WHfSJkDOZyjmzzrK5m_VL01-Zcyzz_P-8_1784110461
-X-Mimecast-Originator: redhat.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.55.0.141.g00534a21ce-goog
+Message-ID: <20260715105100.3178255-1-vdonnefort@google.com>
+Subject: [PATCH v2] KVM: arm64: Fix hyp_trace clock disabling
+From: Vincent Donnefort <vdonnefort@google.com>
+To: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org
+Cc: joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
+	kernel-team@android.com, tabba@google.com, 
+	Vincent Donnefort <vdonnefort@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jul 8, 2026 at 6:13=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrote:
->
-> Paolo,
->
-> Here's the second drop of KVM/arm64 fixes for 7.2. This time around,
-> we have a locking issue in kvm_io_bus_get_dev(), which is only used by
-> arm64, a few S2 page table fixes, a set of FFA proxy fixes for pKVM,
-> and finally a very esoteric fix for emulation of sign-extended loads
-> from MMIO. Not only this is rather niche, it dates back to day one of
-> KVM support for 32bit ARM...
->
-> Note that this is on top of the kvmarm-fixes-7.2-1 tag pull request
-> posted at [1] about 12 days ago.
+Fix the disable path in hyp_trace_clock_enable(), which fell through to
+re-initialize and reschedule the clock after cancelling the work. Return
+early instead.
 
-Yes, pulled that first and then this one.
+While at it, cleanup hyp_trace_clock::lock which is unused and
+hyp_trace_clock::running which is redundant: the trace_remote framework
+already serializes calls to the callback enable_tracing.
 
-Paolo
+Fixes: b22888917fa4 ("KVM: arm64: Sync boot clock with the nVHE/pKVM hyp")
+Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 
-> Please pull,
->
->         M.
->
-> [1] https://lore.kernel.org/all/20260626133526.817232-1-maz@kernel.org
->
-> The following changes since commit d098bb75d14fde2f12155f1a95ec0168160867=
-ce:
->
->   KVM: arm64: account pKVM reclaim against the VM mm (2026-06-22 10:48:08=
- +0100)
->
-> are available in the Git repository at:
->
->   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kv=
-marm-fixes-7.2-2
->
-> for you to fetch changes up to 8d187d4b33c262c0f3e44842553521151d8629e8:
->
->   KVM: arm64: Fix propagation of TLBI level in kvm_pgtable_stage2_relax_p=
-erms() (2026-07-07 17:43:39 +0100)
->
-> ----------------------------------------------------------------
-> KVM/arm64 fixes for 7.2, take #2
->
-> - Move locking for kvm_io_bus_get_dev() into the caller, ensuring
->   race-free checks that the returned object is of the correct type
->
-> - Fix initialisation of the page-table walk level when relaxing
->   permissions
->
-> - Correctly update the XN attribute when relaxing permissions
->
-> - Fix the sign extension of loads from emulated MMIO regions
->
-> - Assorted collection of fixes for pKVM's FFA proxy, together with a
->   couple of FFA driver adjustments
->
-> ----------------------------------------------------------------
-> Fuad Tabba (2):
->       KVM: arm64: Fix sign-extension of MMIO loads
->       KVM: arm64: selftests: Add MMIO sign-extending load test
->
-> Marc Zyngier (2):
->       KVM: Move kvm_io_bus_get_dev() locking responsibilities to callers
->       KVM: arm64: Fix propagation of TLBI level in kvm_pgtable_stage2_rel=
-ax_perms()
->
-> Mostafa Saleh (3):
->       KVM: arm64: Fix bounds checking in do_ffa_mem_reclaim()
->       KVM: arm64: Ensure FFA ranges are page aligned
->       firmware: arm_ffa: Fix out-of-bound writes in ffa_setup_and_transmi=
-t()
->
-> Oliver Upton (2):
->       KVM: arm64: Ensure level is always initialized when relaxing perms
->       KVM: arm64: Only update XN attr when requested during S2 relaxation
->
-> Sebastian Ene (3):
->       KVM: arm64: Validate the offset to the mem access descriptor
->       KVM: arm64: Zero out the stack initialized data in the FFA handler
->       firmware: arm_ffa: Fix Endpoint Memory Access Descriptor offset cal=
-culation
->
->  arch/arm64/kvm/hyp/nvhe/ffa.c                     |  44 ++--
->  arch/arm64/kvm/hyp/pgtable.c                      |  15 +-
->  arch/arm64/kvm/mmio.c                             |   7 +-
->  arch/arm64/kvm/vgic/vgic-its.c                    |   2 +
->  drivers/firmware/arm_ffa/driver.c                 |  25 ++-
->  include/linux/arm_ffa.h                           |   9 +-
->  tools/testing/selftests/kvm/Makefile.kvm          |   1 +
->  tools/testing/selftests/kvm/arm64/mmio_sign_ext.c | 255 ++++++++++++++++=
-++++++
->  virt/kvm/kvm_main.c                               |  16 +-
->  9 files changed, 331 insertions(+), 43 deletions(-)
->  create mode 100644 tools/testing/selftests/kvm/arm64/mmio_sign_ext.c
->
+--- 
+
+v1 -> v2:
+  * Rollback hyp_trace_clock_enable() on __tracing_enable error (Sashiko)
+
+v1: https://lore.kernel.org/all/alczBmnItMwq8xj4@google.com/
+
+diff --git a/arch/arm64/kvm/hyp_trace.c b/arch/arm64/kvm/hyp_trace.c
+index 2411b4c32932..9bfa368dd841 100644
+--- a/arch/arm64/kvm/hyp_trace.c
++++ b/arch/arm64/kvm/hyp_trace.c
+@@ -37,8 +37,6 @@ static struct hyp_trace_clock {
+ 	u32			shift;
+ 	struct delayed_work	work;
+ 	struct completion	ready;
+-	struct mutex		lock;
+-	bool			running;
+ } hyp_clock;
+ 
+ static void __hyp_clock_work(struct work_struct *work)
+@@ -110,12 +108,9 @@ static void hyp_trace_clock_enable(struct hyp_trace_clock *hyp_clock, bool enabl
+ {
+ 	struct system_time_snapshot snap;
+ 
+-	if (hyp_clock->running == enable)
+-		return;
+-
+ 	if (!enable) {
+ 		cancel_delayed_work_sync(&hyp_clock->work);
+-		hyp_clock->running = false;
++		return;
+ 	}
+ 
+ 	ktime_get_snapshot_id(CLOCK_BOOTTIME, &snap);
+@@ -128,7 +123,6 @@ static void hyp_trace_clock_enable(struct hyp_trace_clock *hyp_clock, bool enabl
+ 	INIT_DELAYED_WORK(&hyp_clock->work, __hyp_clock_work);
+ 	schedule_delayed_work(&hyp_clock->work, msecs_to_jiffies(CLOCK_INIT_MS));
+ 	wait_for_completion(&hyp_clock->ready);
+-	hyp_clock->running = true;
+ }
+ 
+ /* Access to this struct within the trace_remote_callbacks are protected by the trace_remote lock */
+@@ -304,9 +298,15 @@ static void hyp_trace_unload(struct trace_buffer_desc *desc, void *priv)
+ 
+ static int hyp_trace_enable_tracing(bool enable, void *priv)
+ {
++	int ret;
++
+ 	hyp_trace_clock_enable(&hyp_clock, enable);
+ 
+-	return kvm_call_hyp_nvhe(__tracing_enable, enable);
++	ret = kvm_call_hyp_nvhe(__tracing_enable, enable);
++	if (ret)
++		hyp_trace_clock_enable(&hyp_clock, !enable);
++
++	return ret;
+ }
+ 
+ static int hyp_trace_swap_reader_page(unsigned int cpu, void *priv)
+
+base-commit: a13c140cc289c0b7b3770bce5b3ad42ab35074aa
+-- 
+2.55.0.141.g00534a21ce-goog
 
