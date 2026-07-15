@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C3713A254B;
-	Wed, 15 Jul 2026 14:30:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D20653A6B6D;
+	Wed, 15 Jul 2026 14:30:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784125819; cv=none; b=ferm3fzUE2mlc2IL+rLk5Kt+HA3U7Vj7ncjSjpG9q0D2N6q78wwmNQ6ieOu2aqE5aV/Agz/FUG7jGFt8TIqTlDJlsbV/28/7BJpTKZWtb30nQSQKMKdc12ShOqNPwDqJYzR5/JLWM2ygtVS1scBsQQOoStRhiKbSjjnS6pXxe4s=
+	t=1784125826; cv=none; b=t5Ax3mg6wqrELF/Z5EhCb7oP13pJUOcVu6s0Tb4DQC+3TpSzo3PTvEHRX0Qzx85LB63wd9cMN3ne4T2JIpBIYR6yNU6JWoE9b375V4kc614gDgItIGzYutqkQvvH5TOKmyctFLXbrKfMoZg3Cna57vitupSRV3MUMkm3D5/1iQQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784125819; c=relaxed/simple;
-	bh=Cc6GoF1j4LXTGdBQGtewBJQChy0qePL6iG0TADmp2Dg=;
+	s=arc-20240116; t=1784125826; c=relaxed/simple;
+	bh=G9XH5zZJ1GvOceYjyx4dHra6hejDLcr12uK8ZZtBmz8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZBVkLZTe6BSFPZNfHHsr46MoSJgnV0EAoLvj48lE9c2YuzDvsSwrmBzfXsEMSrraDyXuhcKOFWaClJhSurRsvJht3gfpvoLs+OOilHLfF3sWo1dLvro/YVhX58gsV8ZSq0eft7V6AykD+fje+MmulXMr2luW+/Oi0W9Wdo2NuVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=HYpUpVcw; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=GXoPBGIAC3V1uzlVFU1W7lxXhsrKRUqgl5SypF7+9WHD3qJGhjhss4cui6fuxADDdgNfO0EtWWGtYn7e3Bc6+3R5jZd3Q84mHx9fsNaixflL05outRr+RA+9JOeVh6B8db5XYidrVO4b+yM2bNmf9g6zssS7IPf3BWZwaFfJLSA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=KBg9JTgU; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="HYpUpVcw"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="KBg9JTgU"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 95E7F1576;
-	Wed, 15 Jul 2026 07:30:13 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9C61F153B;
+	Wed, 15 Jul 2026 07:30:18 -0700 (PDT)
 Received: from e122027.cambridge.arm.com (e122027.cambridge.arm.com [10.1.25.27])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 66F7D3F7B4;
-	Wed, 15 Jul 2026 07:30:13 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 525E53F7B4;
+	Wed, 15 Jul 2026 07:30:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1784125817; bh=Cc6GoF1j4LXTGdBQGtewBJQChy0qePL6iG0TADmp2Dg=;
+	t=1784125822; bh=G9XH5zZJ1GvOceYjyx4dHra6hejDLcr12uK8ZZtBmz8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=HYpUpVcwYSBXotiwDYU+p81k6SuEtc6oAMQvKW/4qdcThq/ZOtn4NDvzBRHfwmFjk
-	 1365lwZPsGctd2c8DyuT7D5dUacvPJ2MGzSzMT9sTQmG+r9ZHotH6rRIfWCw8kBLpn
-	 W9kZ3ytf3CyuCgVPwy7A+i8E6eZTlndwhAH2zMbg=
+	b=KBg9JTgU9fq3MMswbBA9g1KIVx8UAsBZXG3Da+XM514kButrHc9Mx6E2a4c5z5z+A
+	 rBNnaCvHaFaOr+uvlsbY6CjBuBWIN1GED/CC39xzJriQzrvyc/NkXSJObSyYxu/Pw5
+	 ntFryhi6rw/H3wmmWIN9fgU20dqVxINIAfo9u6dc=
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -53,9 +53,9 @@ Cc: Steven Price <steven.price@arm.com>,
 	Vishal Annapurve <vannapurve@google.com>,
 	WeiLin.Chang@arm.com,
 	Lorenzo Pieralisi <lpieralisi@kernel.org>
-Subject: [PATCH v15 17/37] KVM: arm64: Expose support for private memory
-Date: Wed, 15 Jul 2026 15:28:19 +0100
-Message-ID: <20260715142841.80544-18-steven.price@arm.com>
+Subject: [PATCH v15 18/37] KVM: arm64: CCA: Create the realm descriptor
+Date: Wed, 15 Jul 2026 15:28:20 +0100
+Message-ID: <20260715142841.80544-19-steven.price@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260715142841.80544-1-steven.price@arm.com>
 References: <20260715142841.80544-1-steven.price@arm.com>
@@ -67,47 +67,139 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Select KVM_GENERIC_MEMORY_ATTRIBUTES and provide the necessary support
-functions.
+Creating a realm involves first creating a realm descriptor (RD). This
+involves passing the configuration information to the RMM. Do this as
+part of realm_ensure_created() so that the realm is created when it is
+first needed. The call to realm_ensure_created() will be added in a
+later patch.
 
 Signed-off-by: Steven Price <steven.price@arm.com>
 ---
+Changes since v14:
+ * Explicitly set hash_algo = RMI_HASH_SHA_256 (which is the default).
+ * Support SRO flow during realm creation.
 Changes since v13:
- * Also update documentation to show that KVM_CAP_MEMORY_ATTRIBUTES is
-   used on arm64.
+ * The RMM no longer uses AUX granules, so no need to ask it how many it
+   needs.
+ * Adapted to other changes.
 Changes since v12:
- * Only define kvm_arch_has_private_mem() when
-   CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES is set to avoid build issues
-   when KVM is disabled.
-Changes since v10:
- * KVM_GENERIC_PRIVATE_MEM replacd with KVM_GENERIC_MEMORY_ATTRIBUTES.
-Changes since v9:
- * Drop the #ifdef CONFIG_KVM_PRIVATE_MEM guard from the definition of
-   kvm_arch_has_private_mem()
-Changes since v2:
- * Switch kvm_arch_has_private_mem() to a macro to avoid overhead of a
-   function call.
- * Guard definitions of kvm_arch_{pre,post}_set_memory_attributes() with
-   #ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES.
- * Early out in kvm_arch_post_set_memory_attributes() if the WARN_ON
-   should trigger.
+ * Since RMM page size is now equal to the host's page size various
+   calculations are simplified.
+ * Switch to using range based APIs to delegate/undelegate.
+ * VMID handling is now handled entirely by the RMM.
 ---
- arch/arm64/include/asm/kvm_host.h | 2 ++
- 1 file changed, 2 insertions(+)
+ arch/arm64/kvm/rmi.c | 91 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 91 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 9b46b39ed11e..993ead6e6449 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -1509,6 +1509,8 @@ struct kvm *kvm_arch_alloc_vm(void);
+diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
+index 1ef676eed172..94776a9262c9 100644
+--- a/arch/arm64/kvm/rmi.c
++++ b/arch/arm64/kvm/rmi.c
+@@ -449,6 +449,79 @@ static void realm_unmap_shared_range(struct kvm *kvm,
+ 			     start, end);
+ }
  
- #define vcpu_is_protected(vcpu)		kvm_vm_is_protected((vcpu)->kvm)
- 
-+#define kvm_arch_has_private_mem(kvm) ((kvm)->arch.is_realm)
++static int realm_create_rd(struct kvm *kvm)
++{
++	struct realm *realm = &kvm->arch.realm;
++	struct realm_params *params = realm->params;
++	void *rd = NULL;
++	phys_addr_t rd_phys, params_phys, top_delegated;
++	size_t pgd_size = kvm_pgtable_stage2_pgd_size(kvm->arch.mmu.vtcr);
++	int r;
 +
- int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature);
- bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
++	realm->ia_bits = VTCR_EL2_IPA(kvm->arch.mmu.vtcr);
++
++	if (WARN_ON(realm->rd || !realm->params))
++		return -EEXIST;
++
++	rd = (void *)__get_free_page(GFP_KERNEL_ACCOUNT);
++	if (!rd)
++		return -ENOMEM;
++
++	rd_phys = virt_to_phys(rd);
++	if (rmi_delegate_page(rd_phys)) {
++		r = -ENXIO;
++		goto free_rd;
++	}
++
++	if (rmi_delegate_range(kvm->arch.mmu.pgd_phys, pgd_size,
++			       &top_delegated)) {
++		r = -ENXIO;
++		goto out_undelegate_tables;
++	}
++
++	params->s2sz = VTCR_EL2_IPA(kvm->arch.mmu.vtcr);
++	params->rtt_level_start = get_start_level(realm);
++	params->rtt_num_start = pgd_size / PAGE_SIZE;
++	params->rtt_base = kvm->arch.mmu.pgd_phys;
++	params->hash_algo = RMI_HASH_SHA_256;
++
++	if (kvm->arch.arm_pmu) {
++		params->pmu_num_ctrs = kvm->arch.nr_pmu_counters;
++		params->flags0 |= RMI_REALM_PARAM_FLAG_PMU;
++	}
++
++	if (kvm_lpa2_is_enabled())
++		params->flags0 |= RMI_REALM_PARAM_FLAG_LPA2;
++
++	params_phys = virt_to_phys(params);
++
++	if (rmi_realm_create(rd_phys, params_phys, realm->sro)) {
++		r = -ENXIO;
++		goto out_undelegate_tables;
++	}
++
++	realm->rd = rd;
++	kvm_set_realm_state(kvm, REALM_STATE_NEW);
++	/* The realm is up, free the parameters.  */
++	free_page((unsigned long)realm->params);
++	realm->params = NULL;
++
++	return 0;
++
++out_undelegate_tables:
++	if (WARN_ON(rmi_undelegate_range(kvm->arch.mmu.pgd_phys, top_delegated - kvm->arch.mmu.pgd_phys))) {
++		/* Leak the pages if they cannot be returned */
++		kvm->arch.mmu.pgt = NULL;
++	}
++	if (WARN_ON(rmi_undelegate_page(rd_phys))) {
++		/* Leak the page if it isn't returned */
++		return r;
++	}
++free_rd:
++	free_page((unsigned long)rd);
++	return r;
++}
++
+ static void realm_unmap_private_range(struct kvm *kvm,
+ 				      unsigned long start,
+ 				      unsigned long end,
+@@ -614,6 +687,24 @@ static int realm_set_ipa_state(struct kvm_vcpu *vcpu,
+ 	return ret;
+ }
  
++static int __maybe_unused realm_ensure_created(struct kvm *kvm)
++{
++	lockdep_assert_held(&kvm->arch.config_lock);
++
++	switch (kvm_realm_state(kvm)) {
++	case REALM_STATE_NONE:
++		break;
++	case REALM_STATE_NEW:
++		return 0;
++	case REALM_STATE_DEAD:
++		return -ENXIO;
++	default:
++		return -EBUSY;
++	}
++
++	return realm_create_rd(kvm);
++}
++
+ static void kvm_complete_ripas_change(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm *kvm = vcpu->kvm;
 -- 
 2.43.0
 
