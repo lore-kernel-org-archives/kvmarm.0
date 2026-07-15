@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ABC8388395;
-	Wed, 15 Jul 2026 14:29:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FCBC397B17;
+	Wed, 15 Jul 2026 14:30:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784125801; cv=none; b=EDGOlWKMbRMRJ3aXsg4csZAPevd5nb3vlt+r1feUAjABQK5ZfoKraPOmOdspqxcQcBs9rDTn9fO09nuj+rFHaWlz/+gtGSAc8HSbxRCfWQEdqg/lv7MRru4VVY4ruu3QmuNXIYdMGl2tMzH7EKlpxR0xLNMvhPNbafraCV+tjeY=
+	t=1784125805; cv=none; b=m5ZTBjrqdv2V2wGcUK35IM7+vxayDrh9UAkMXkgfg9+C9I1ImC7IhBemXfO830DPaL4ZPGxRluW45oAZS0KHJWxxWt5/eFlG7Sauv2vSakbkEum+6rIfqKy2QXbmdW5Qk3NjOCiKbV5S7uIdBHNTP4Sp52Z+Qw44L3kpjY4zt0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784125801; c=relaxed/simple;
-	bh=ALLLCbjfHABpvO+YbrVszcEBpAomTIT3qE5M78Zf9q0=;
+	s=arc-20240116; t=1784125805; c=relaxed/simple;
+	bh=6eG+MNECETE0oFosju2zgPAJsRKT5jskt3SD7r+mXj0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sSpD+UiKb85D0A6sN2fY22W/YtJelj6cA56LHXdNZiXwXHqdXljj9LBad55QJpen96gtNuYNTUI7cEaC2ANk5vo0xmJ3qz7jNJV+ZBGYX1EAIFLZkjCQvFGS7bZUZPtmNnFlN6qipqFctDuZgyuWlFemWwoKVLuIOk+hSfaW5sk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=iFCnmRDM; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=OC77S9g81wCxcqtfji2ZvGJu/prYFqvV7tQTwKQzZmv41bhDihAZC/haDXljWlX+DcAvYch3KUfOk+TTdcLpvMhfdgi4Vs8Mo+/wAVNcRlOj3AkGuANnfokCBfVoF6xnBUyCB0scrDwH6d7ovSOzGB5bS/NaiduPVvadv6a8cGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Uk6nBNw/; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="iFCnmRDM"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Uk6nBNw/"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2852F153B;
-	Wed, 15 Jul 2026 07:29:53 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 332FC1576;
+	Wed, 15 Jul 2026 07:29:58 -0700 (PDT)
 Received: from e122027.cambridge.arm.com (e122027.cambridge.arm.com [10.1.25.27])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F0D5F3F7B4;
-	Wed, 15 Jul 2026 07:29:52 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B819E3F7B4;
+	Wed, 15 Jul 2026 07:29:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1784125797; bh=ALLLCbjfHABpvO+YbrVszcEBpAomTIT3qE5M78Zf9q0=;
+	t=1784125802; bh=6eG+MNECETE0oFosju2zgPAJsRKT5jskt3SD7r+mXj0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=iFCnmRDM0jeVC9Yrqx/QO2Lz8C+Ex5cCZgAmxrJenWt9ZOD2mBhtpSoY8uaPYujWl
-	 N3WAtbiWFZhtSXtbjuaveZc2iratk7L+Xu581qWJxz6JihSbBMGelwsGOh6+d51DS6
-	 eUDm3mBrJD9xeLEN6e0s1lCzPpJhvS2UyJFiCREM=
+	b=Uk6nBNw/zKpsBzDiAtyj6t8FBUoTr++tHABEognOQo+ZuFik4bFiE69R2G5ei/nBx
+	 Q1X+6Gw0QNTPo7qLHH4cUH5oOlMwx6EAndpbYe8qPO3XjKWknWNvaNdSOUCe2WSjLr
+	 agEo6VYTYw3HSy+NnO4V701clmaJU/pagMAnCyZc=
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -53,9 +53,9 @@ Cc: Steven Price <steven.price@arm.com>,
 	Vishal Annapurve <vannapurve@google.com>,
 	WeiLin.Chang@arm.com,
 	Lorenzo Pieralisi <lpieralisi@kernel.org>
-Subject: [PATCH v15 13/37] KVM: arm64: CCA: Support timers in realm RECs
-Date: Wed, 15 Jul 2026 15:28:15 +0100
-Message-ID: <20260715142841.80544-14-steven.price@arm.com>
+Subject: [PATCH v15 14/37] KVM: arm64: CCA: Handle realm enter/exit
+Date: Wed, 15 Jul 2026 15:28:16 +0100
+Message-ID: <20260715142841.80544-15-steven.price@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260715142841.80544-1-steven.price@arm.com>
 References: <20260715142841.80544-1-steven.price@arm.com>
@@ -67,138 +67,403 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The RMM keeps track of the timer while the realm REC is running, but on
-exit to the normal world KVM is responsible for handling the timers.
-
-A later patch adds the support for propagating the timer values from the
-exit data structure and calling kvm_realm_timers_update().
+Entering a realm is done using a SMC call to the RMM. On exit the
+exit-codes need to be handled slightly differently to the normal KVM
+path so define our own functions for realm enter/exit and hook them
+in if the guest is a realm guest.
 
 Signed-off-by: Steven Price <steven.price@arm.com>
+Reviewed-by: Gavin Shan <gshan@redhat.com>
 ---
-Changes since v14:
- * Special case in kvm_timer_vcpu_load()/kvm_timer_vcpu_put() the timer
-   handling.
+Changes since v13:
+ * The RMM is now required to provide an ESR value with the correct
+   information to emulate MMIO, so we no longer need to hardcode 0s in
+   rec_exit_sys_reg().
+ * The PSCI changes mean that there is a potential race when turning on
+   a VCPU which can cause a RMI_ERROR_REC return. Exit to user space
+   with -EAGAIN in this case.
 Changes since v12:
- * Adapt to upstream changes.
-Changes since v11:
- * Drop the kvm_is_realm() check from timer_set_offset(). We already
-   ensure that the offset is 0 when calling the function.
-Changes since v10:
- * KVM_CAP_COUNTER_OFFSET is now already hidden by a previous patch.
-Changes since v9:
- * No need to move the call to kvm_timer_unblocking() in
-   kvm_timer_vcpu_load().
+ * Call guest_state_{enter,exit}_irqoff() around rmi_rec_enter().
+ * Add handling of the IRQ exception case where IRQs need to be briefly
+   enabled before exiting guest timing.
+Changes since v8:
+ * Introduce kvm_rec_pre_enter() called before entering an atomic
+   section to handle operations that might require memory allocation
+   (specifically completing a RIPAS change introduced in a later patch).
+ * Updates to align with upstream changes to hpfar_el2 which now (ab)uses
+   HPFAR_EL2_NS as a valid flag.
+ * Fix exit reason when racing with PSCI shutdown to return
+   KVM_EXIT_SHUTDOWN rather than KVM_EXIT_UNKNOWN.
 Changes since v7:
- * Hide KVM_CAP_COUNTER_OFFSET for realm guests.
+ * A return of 0 from kvm_handle_sys_reg() doesn't mean the register has
+   been read (although that can never happen in the current code). Tidy
+   up the condition to handle any future refactoring.
+Changes since v6:
+ * Use vcpu_err() rather than pr_err/kvm_err when there is an associated
+   vcpu to the error.
+ * Return -EFAULT for KVM_EXIT_MEMORY_FAULT as per the documentation for
+   this exit type.
+ * Split code handling a RIPAS change triggered by the guest to the
+   following patch.
+Changes since v5:
+ * For a RIPAS_CHANGE request from the guest perform the actual RIPAS
+   change on next entry rather than immediately on the exit. This allows
+   the VMM to 'reject' a RIPAS change by refusing to continue
+   scheduling.
+Changes since v4:
+ * Rename handle_rme_exit() to handle_rec_exit()
+ * Move the loop to copy registers into the REC enter structure from the
+   to rec_exit_handlers callbacks to kvm_rec_enter(). This fixes a bug
+   where the handler exits to user space and user space wants to modify
+   the GPRS.
+ * Some code rearrangement in rec_exit_ripas_change().
+Changes since v2:
+ * realm_set_ipa_state() now provides an output parameter for the
+   top_iap that was changed. Use this to signal the VMM with the correct
+   range that has been transitioned.
+ * Adapt to previous patch changes.
 ---
- arch/arm64/kvm/arch_timer.c  | 38 +++++++++++++++++++++++++++++++++---
- include/kvm/arm_arch_timer.h |  2 ++
- 2 files changed, 37 insertions(+), 3 deletions(-)
+ arch/arm64/include/asm/kvm_rmi.h |   4 +
+ arch/arm64/kvm/Makefile          |   2 +-
+ arch/arm64/kvm/arm.c             |  25 ++++-
+ arch/arm64/kvm/rmi-exit.c        | 182 +++++++++++++++++++++++++++++++
+ arch/arm64/kvm/rmi.c             |  42 +++++++
+ 5 files changed, 249 insertions(+), 6 deletions(-)
+ create mode 100644 arch/arm64/kvm/rmi-exit.c
 
-diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-index 4155fe89b58a..fdd68f1f5b7b 100644
---- a/arch/arm64/kvm/arch_timer.c
-+++ b/arch/arm64/kvm/arch_timer.c
-@@ -482,6 +482,20 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
- 			    timer_ctx);
- }
+diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
+index ccd09d55c69f..b1e4cf0f6803 100644
+--- a/arch/arm64/include/asm/kvm_rmi.h
++++ b/arch/arm64/include/asm/kvm_rmi.h
+@@ -100,6 +100,10 @@ void kvm_destroy_realm(struct kvm *kvm);
+ int kvm_realm_teardown_stage2(struct kvm *kvm);
+ void kvm_destroy_rec(struct kvm_vcpu *vcpu);
  
-+void kvm_realm_timers_update(struct kvm_vcpu *vcpu)
-+{
-+	struct arch_timer_cpu *arch_timer = &vcpu->arch.timer_cpu;
-+	int i;
++int kvm_rec_enter(struct kvm_vcpu *vcpu);
++int kvm_rec_pre_enter(struct kvm_vcpu *vcpu);
++int handle_rec_exit(struct kvm_vcpu *vcpu, int rec_run_status);
 +
-+	for (i = 0; i < NR_KVM_EL0_TIMERS; i++) {
-+		struct arch_timer_context *timer = &arch_timer->timers[i];
-+		bool status = timer_get_ctl(timer) & ARCH_TIMER_CTRL_IT_STAT;
-+		bool level = kvm_timer_enabled(timer) && status;
-+
-+		kvm_timer_update_irq(vcpu, level, timer);
-+	}
-+}
-+
- /* Only called for a fully emulated timer */
- static void timer_emulate(struct arch_timer_context *ctx)
+ static inline bool kvm_realm_is_private_address(struct realm *realm,
+ 						unsigned long addr)
  {
-@@ -888,6 +902,11 @@ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
- 	if (unlikely(!timer->enabled))
- 		return;
+diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+index ed3cf30eb06e..4a2d52fdb6a2 100644
+--- a/arch/arm64/kvm/Makefile
++++ b/arch/arm64/kvm/Makefile
+@@ -16,7 +16,7 @@ CFLAGS_handle_exit.o += -Wno-override-init
+ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
+ 	 inject_fault.o va_layout.o handle_exit.o config.o \
+ 	 guest.o debug.o reset.o sys_regs.o stacktrace.o \
+-	 vgic-sys-reg-v3.o fpsimd.o pkvm.o rmi.o \
++	 vgic-sys-reg-v3.o fpsimd.o pkvm.o rmi.o rmi-exit.o \
+ 	 arch_timer.o trng.o vmid.o emulate-nested.o nested.o at.o \
+ 	 vgic/vgic.o vgic/vgic-init.o \
+ 	 vgic/vgic-irqfd.o vgic/vgic-v2.o \
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 2959a1451232..534d33b7c67a 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1341,6 +1341,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 		if (ret > 0)
+ 			ret = check_vcpu_requests(vcpu);
  
-+	if (vcpu_is_rec(vcpu)) {
-+		kvm_timer_unblocking(vcpu);
-+		return;
-+	}
++		if (ret > 0 && vcpu_is_rec(vcpu))
++			ret = kvm_rec_pre_enter(vcpu);
 +
- 	get_timer_map(vcpu, &map);
+ 		/*
+ 		 * Preparing the interrupts to be injected also
+ 		 * involves poking the GIC, which must be done in a
+@@ -1388,7 +1391,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 		trace_kvm_entry(*vcpu_pc(vcpu));
+ 		guest_timing_enter_irqoff();
  
- 	if (static_branch_likely(&has_gic_active_state)) {
-@@ -923,6 +942,12 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
- 	if (unlikely(!timer->enabled))
- 		return;
+-		ret = kvm_arm_vcpu_enter_exit(vcpu);
++		if (vcpu_is_rec(vcpu))
++			ret = kvm_rec_enter(vcpu);
++		else
++			ret = kvm_arm_vcpu_enter_exit(vcpu);
  
-+	if (vcpu_is_rec(vcpu)) {
-+		if (kvm_vcpu_is_blocking(vcpu))
-+			kvm_timer_blocking(vcpu);
-+		return;
-+	}
-+
- 	get_timer_map(vcpu, &map);
+ 		vcpu->mode = OUTSIDE_GUEST_MODE;
+ 		vcpu->stat.exits++;
+@@ -1434,7 +1440,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 		 * context synchronization event) is necessary to ensure that
+ 		 * pending interrupts are taken.
+ 		 */
+-		if (ARM_EXCEPTION_CODE(ret) == ARM_EXCEPTION_IRQ) {
++		if ((!vcpu_is_rec(vcpu) && ARM_EXCEPTION_CODE(ret) == ARM_EXCEPTION_IRQ) ||
++		    (vcpu_is_rec(vcpu) && vcpu->arch.rec.run->exit.exit_reason == RMI_EXIT_IRQ)) {
+ 			local_irq_enable();
+ 			isb();
+ 			local_irq_disable();
+@@ -1446,8 +1453,13 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
  
- 	timer_save_state(map.direct_vtimer);
-@@ -1073,7 +1098,7 @@ static void timer_context_init(struct kvm_vcpu *vcpu, int timerid)
+ 		trace_kvm_exit(ret, kvm_vcpu_trap_get_class(vcpu), *vcpu_pc(vcpu));
  
- 	ctxt->timer_id = timerid;
+-		/* Exit types that need handling before we can be preempted */
+-		handle_exit_early(vcpu, ret);
++		if (!vcpu_is_rec(vcpu)) {
++			/*
++			 * Exit types that need handling before we can be
++			 * preempted
++			 */
++			handle_exit_early(vcpu, ret);
++		}
  
--	if (!kvm_vm_is_protected(vcpu->kvm)) {
-+	if (!kvm_vm_is_protected(vcpu->kvm) && !vcpu_is_rec(vcpu)) {
- 		if (timerid == TIMER_VTIMER)
- 			ctxt->offset.vm_offset = &kvm->arch.timer_data.voffset;
- 		else
-@@ -1104,7 +1129,7 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
- 		timer_context_init(vcpu, i);
+ 		kvm_nested_sync_hwstate(vcpu);
  
- 	/* Synchronize offsets across timers of a VM if not already provided */
--	if (!vcpu_is_protected(vcpu) &&
-+	if (!vcpu_is_protected(vcpu) && !vcpu_is_rec(vcpu) &&
- 	    !test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm->arch.flags)) {
- 		timer_set_offset(vcpu_vtimer(vcpu), kvm_phys_timer_read());
- 		timer_set_offset(vcpu_ptimer(vcpu), 0);
-@@ -1600,6 +1625,13 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
- 		return -EINVAL;
+@@ -1472,7 +1484,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 			ret = ARM_EXCEPTION_IL;
+ 		}
+ 
+-		ret = handle_exit(vcpu, ret);
++		if (vcpu_is_rec(vcpu))
++			ret = handle_rec_exit(vcpu, ret);
++		else
++			ret = handle_exit(vcpu, ret);
  	}
  
+ 	if (unlikely(!irqchip_in_kernel(vcpu->kvm)))
+diff --git a/arch/arm64/kvm/rmi-exit.c b/arch/arm64/kvm/rmi-exit.c
+new file mode 100644
+index 000000000000..973250563d7b
+--- /dev/null
++++ b/arch/arm64/kvm/rmi-exit.c
+@@ -0,0 +1,182 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright (C) 2023-2026 ARM Ltd.
++ */
++
++#include <linux/kvm_host.h>
++#include <kvm/arm_hypercalls.h>
++#include <kvm/arm_psci.h>
++
++#include <linux/arm-smccc-rmi.h>
++#include <asm/kvm_emulate.h>
++#include <asm/kvm_rmi.h>
++#include <asm/kvm_mmu.h>
++
++typedef int (*exit_handler_fn)(struct kvm_vcpu *vcpu);
++
++static int rec_exit_reason_notimpl(struct kvm_vcpu *vcpu)
++{
++	vcpu_err(vcpu, "Unhandled exit reason from realm (ESR: %#llx)\n",
++		 kvm_vcpu_get_esr(vcpu));
++	return -ENXIO;
++}
++
++static int rec_exit_sync_dabt(struct kvm_vcpu *vcpu)
++{
++	return kvm_handle_guest_abort(vcpu);
++}
++
++static int rec_exit_sync_iabt(struct kvm_vcpu *vcpu)
++{
++	vcpu_err(vcpu, "Unhandled instruction abort (ESR: %#llx).\n",
++		 kvm_vcpu_get_esr(vcpu));
++	return -ENXIO;
++}
++
++static int rec_exit_sys_reg(struct kvm_vcpu *vcpu)
++{
++	struct realm_rec *rec = &vcpu->arch.rec;
++	unsigned long esr = kvm_vcpu_get_esr(vcpu);
++	int rt = kvm_vcpu_sys_get_rt(vcpu);
++	bool is_write = (esr & ESR_ELx_SYS64_ISS_DIR_MASK) == ESR_ELx_SYS64_ISS_DIR_WRITE;
++	int ret;
++
++	if (is_write)
++		vcpu_set_reg(vcpu, rt, rec->run->exit.gprs[rt]);
++
++	ret = kvm_handle_sys_reg(vcpu);
++	if (!is_write)
++		rec->run->enter.gprs[rt] = vcpu_get_reg(vcpu, rt);
++
++	return ret;
++}
++
++static exit_handler_fn rec_exit_handlers[] = {
++	[0 ... ESR_ELx_EC_MAX]	= rec_exit_reason_notimpl,
++	[ESR_ELx_EC_SYS64]	= rec_exit_sys_reg,
++	[ESR_ELx_EC_DABT_LOW]	= rec_exit_sync_dabt,
++	[ESR_ELx_EC_IABT_LOW]	= rec_exit_sync_iabt
++};
++
++static int rec_exit_psci(struct kvm_vcpu *vcpu)
++{
++	struct realm_rec *rec = &vcpu->arch.rec;
++	int i;
++
++	for (i = 0; i < REC_RUN_GPRS; i++)
++		vcpu_set_reg(vcpu, i, rec->run->exit.gprs[i]);
++
++	return kvm_smccc_call_handler(vcpu);
++}
++
++static int rec_exit_ripas_change(struct kvm_vcpu *vcpu)
++{
++	struct kvm *kvm = vcpu->kvm;
++	struct realm *realm = &kvm->arch.realm;
++	struct realm_rec *rec = &vcpu->arch.rec;
++	unsigned long base = rec->run->exit.ripas_base;
++	unsigned long top = rec->run->exit.ripas_top;
++	unsigned long ripas = rec->run->exit.ripas_value;
++
++	if (!kvm_realm_is_private_address(realm, base) ||
++	    !kvm_realm_is_private_address(realm, top - 1)) {
++		vcpu_err(vcpu, "Invalid RIPAS_CHANGE for %#lx - %#lx, ripas: %#lx\n",
++			 base, top, ripas);
++		/* Set RMI_REJECT bit */
++		rec->run->enter.flags = REC_ENTER_FLAG_RIPAS_RESPONSE;
++		return -EINVAL;
++	}
++
++	/* Exit to VMM, the actual RIPAS change is done on next entry */
++	kvm_prepare_memory_fault_exit(vcpu, base, top - base, false, false,
++				      ripas == RMI_RAM);
++
 +	/*
-+	 * We don't use mapped IRQs for Realms because the RMI doesn't allow
-+	 * us setting the LR.HW bit in the VGIC.
++	 * KVM_EXIT_MEMORY_FAULT requires an return code of -EFAULT, see the
++	 * API documentation
 +	 */
-+	if (vcpu_is_rec(vcpu))
++	return -EFAULT;
++}
++
++static void update_arch_timer_irq_lines(struct kvm_vcpu *vcpu)
++{
++	struct realm_rec *rec = &vcpu->arch.rec;
++
++	__vcpu_assign_sys_reg(vcpu, CNTV_CTL_EL0, rec->run->exit.cntv_ctl);
++	__vcpu_assign_sys_reg(vcpu, CNTV_CVAL_EL0, rec->run->exit.cntv_cval);
++	__vcpu_assign_sys_reg(vcpu, CNTP_CTL_EL0, rec->run->exit.cntp_ctl);
++	__vcpu_assign_sys_reg(vcpu, CNTP_CVAL_EL0, rec->run->exit.cntp_cval);
++
++	kvm_realm_timers_update(vcpu);
++}
++
++/*
++ * Return > 0 to return to guest, < 0 on error, 0 (and set exit_reason) on
++ * proper exit to userspace.
++ */
++int handle_rec_exit(struct kvm_vcpu *vcpu, int rec_run_ret)
++{
++	struct realm_rec *rec = &vcpu->arch.rec;
++	u8 esr_ec = ESR_ELx_EC(rec->run->exit.esr);
++	unsigned long status, index;
++
++	status = RMI_RETURN_STATUS(rec_run_ret);
++	index = RMI_RETURN_INDEX(rec_run_ret);
++
++	/*
++	 * If a PSCI_SYSTEM_OFF request raced with a vcpu executing, we might
++	 * see the following status code and index indicating an attempt to run
++	 * a REC when the RD state is SYSTEM_OFF.  In this case, we just need to
++	 * return to user space which can deal with the system event or will try
++	 * to run the KVM VCPU again, at which point we will no longer attempt
++	 * to enter the Realm because we will have a sleep request pending on
++	 * the VCPU as a result of KVM's PSCI handling.
++	 */
++	if (status == RMI_ERROR_REALM) {
++		vcpu->run->exit_reason = KVM_EXIT_SHUTDOWN;
 +		return 0;
++	}
 +
- 	get_timer_map(vcpu, &map);
- 
- 	ops = vgic_is_v5(vcpu->kvm) ? &arch_timer_irq_ops_vgic_v5 :
-@@ -1729,7 +1761,7 @@ int kvm_vm_ioctl_set_counter_offset(struct kvm *kvm,
- 	if (offset->reserved)
- 		return -EINVAL;
- 
--	if (kvm_vm_is_protected(kvm))
-+	if (kvm_vm_is_protected(kvm) || kvm_is_realm(kvm))
- 		return -EINVAL;
- 
- 	mutex_lock(&kvm->lock);
-diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-index 15a4f97f8105..31e48d5dbc31 100644
---- a/include/kvm/arm_arch_timer.h
-+++ b/include/kvm/arm_arch_timer.h
-@@ -108,6 +108,8 @@ int kvm_arm_timer_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
- int kvm_arm_timer_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
- int kvm_arm_timer_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
- 
-+void kvm_realm_timers_update(struct kvm_vcpu *vcpu);
++	/*
++	 * If a VCPU has been turned on, but the REC state hasn't been updated
++	 * we may experience RMI_ERROR_REC. Exit to the userspace with -EAGAIN
++	 * for a retry.
++	 */
++	if (status == RMI_ERROR_REC)
++		return -EAGAIN;
++	if (rec_run_ret)
++		return -ENXIO;
 +
- u64 kvm_phys_timer_read(void);
++	vcpu->arch.fault.esr_el2 = rec->run->exit.esr;
++	vcpu->arch.fault.far_el2 = rec->run->exit.far;
++	/* HPFAR_EL2 is only valid for RMI_EXIT_SYNC */
++	vcpu->arch.fault.hpfar_el2 = 0;
++
++	update_arch_timer_irq_lines(vcpu);
++
++	/* Reset the emulation flags for the next run of the REC */
++	rec->run->enter.flags = 0;
++
++	switch (rec->run->exit.exit_reason) {
++	case RMI_EXIT_SYNC:
++		/*
++		 * HPFAR_EL2_NS is hijacked to indicate a valid HPFAR value,
++		 * see __get_fault_info()
++		 */
++		vcpu->arch.fault.hpfar_el2 = rec->run->exit.hpfar | HPFAR_EL2_NS;
++		return rec_exit_handlers[esr_ec](vcpu);
++	case RMI_EXIT_IRQ:
++	case RMI_EXIT_FIQ:
++	case RMI_EXIT_SERROR:
++		return 1;
++	case RMI_EXIT_PSCI:
++		return rec_exit_psci(vcpu);
++	case RMI_EXIT_RIPAS_CHANGE:
++		return rec_exit_ripas_change(vcpu);
++	}
++
++	kvm_pr_unimpl("Unsupported exit reason: %u\n",
++		      rec->run->exit.exit_reason);
++	vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
++	return 0;
++}
+diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
+index aa97ad5fd7e9..430b82c02d15 100644
+--- a/arch/arm64/kvm/rmi.c
++++ b/arch/arm64/kvm/rmi.c
+@@ -203,6 +203,48 @@ int kvm_realm_teardown_stage2(struct kvm *kvm)
+ 	return realm_destroy_rtts(kvm);
+ }
  
- void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu);
++/*
++ * kvm_rec_pre_enter - Complete operations before entering a REC
++ *
++ * Some operations require work to be completed before entering a realm. That
++ * work may require memory allocation so cannot be done in the kvm_rec_enter()
++ * call.
++ *
++ * Return: 1 if we should enter the guest
++ *	   0 if we should exit to userspace
++ *	   < 0 if we should exit to userspace, where the return value indicates
++ *	   an error
++ */
++int kvm_rec_pre_enter(struct kvm_vcpu *vcpu)
++{
++	struct realm_rec *rec = &vcpu->arch.rec;
++
++	if (kvm_realm_state(vcpu->kvm) != REALM_STATE_ACTIVE)
++		return -EINVAL;
++
++	switch (rec->run->exit.exit_reason) {
++	case RMI_EXIT_HOST_CALL:
++		for (int i = 0; i < REC_RUN_GPRS; i++)
++			rec->run->enter.gprs[i] = vcpu_get_reg(vcpu, i);
++		break;
++	}
++
++	return 1;
++}
++
++int noinstr kvm_rec_enter(struct kvm_vcpu *vcpu)
++{
++	struct realm_rec *rec = &vcpu->arch.rec;
++	int ret;
++
++	guest_state_enter_irqoff();
++	ret = rmi_rec_enter(virt_to_phys(rec->rec_page),
++			    virt_to_phys(rec->run));
++	guest_state_exit_irqoff();
++
++	return ret;
++}
++
+ static int __maybe_unused kvm_create_rec(struct kvm_vcpu *vcpu)
+ {
+ 	struct user_pt_regs *vcpu_regs = vcpu_gp_regs(vcpu);
 -- 
 2.43.0
 
