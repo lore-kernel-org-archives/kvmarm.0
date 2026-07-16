@@ -1,399 +1,255 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07354371CE3;
-	Thu, 16 Jul 2026 16:04:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B33730FF20
+	for <kvmarm@lists.linux.dev>; Thu, 16 Jul 2026 16:15:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784217899; cv=none; b=qqa8WCT4x3YYEM7g0loB++ZqkjFY8mQ3zrfov4GIf85+bifK5VItlC9DXtmjWd2/XJ3bDxB5F7ezPz13VxjEWXv7hR7EOYFAsUQ2lmo0mxjDwOKObaDjeb/Jyzl+KFW23O9dIjOp1i0p1EQdfnHaQKSr7TVZYbQ2bsVZ6APXkKA=
+	t=1784218507; cv=none; b=czgE6MgaN3QBcAG5ThWSerwjRjL63wuCaRpEZm0iyQJZRaDHhw+2HM1YrY1CqpV1/+CcOp+OULmnV7WS3GHOrcJOSBLohPREnxP7Bkvn4F/t20iFsfS2xbo92kmyQ1qOXb8Ii0EpEIpvgmdn4ifbjAQfbG3CLC7BQ1Diyj4FntQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784217899; c=relaxed/simple;
-	bh=e+knd2aySDpztrDcilmsVa3LPUBYbigaUm4PhJZZo+M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=S67dV8Wmil0pvpDyQHuSxuKC5nAMA3sEq1L3uewj0ezFur2/hNMcIqhCiWWeX9hAAXheAXVunQ/ZXYHqveBQphlCAzkBXecbM5WyZF3bzdO0l+/wKdNO2o1s4n4/agguLm0PlP3wcLGbXdmJr0MogmTECTxQ2hdgKdTLdfvD4B4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=HDdsPvgo; arc=none smtp.client-ip=217.140.110.172
+	s=arc-20240116; t=1784218507; c=relaxed/simple;
+	bh=zQ7EW/DiYP7ct8mHMC81LF+qTsnzd6OWO+eVwdHzyOY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=t1tC9Z9AGablkOtpuLElm8KoF/PE95MxzwNOSRo5gG60J/UtRQ/5LcK6L2tui09eJ6GGaoN7FrVB9OEisBOPYmZSEagsS4w3q4/FOKI3MrJggfganv8kuyfzqqa+1q6dh31RhgOZCWvlJf62AyisVqbZJRFj3VXf2ZL6lweiDaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Vj3wK4wk; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="HDdsPvgo"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Vj3wK4wk"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1B5992B;
-	Thu, 16 Jul 2026 09:04:51 -0700 (PDT)
-Received: from [10.1.25.27] (e122027.cambridge.arm.com [10.1.25.27])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3439B3F7B4;
-	Thu, 16 Jul 2026 09:04:54 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C471C2F;
+	Thu, 16 Jul 2026 09:14:55 -0700 (PDT)
+Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EB4FA3F7B4;
+	Thu, 16 Jul 2026 09:14:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1784217895; bh=e+knd2aySDpztrDcilmsVa3LPUBYbigaUm4PhJZZo+M=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=HDdsPvgo59wTS2pWZEFgH3Ffhl5VVm5i72D/PjJ1GhJ8lrAIS+jYY+I75uf94btUC
-	 O9bfBs9NlrcKHqWEuGJfuIyTOEZIjbfD/5B+NvpnPTOgOT20s9+uAdLoA2vWarKZp2
-	 7RpBN6/HjdRMzeSKIfMmgXVPDBPYBE0UD+CYRdrE=
-Message-ID: <69af1617-bd20-4cb3-bdb8-725b8f22b072@arm.com>
-Date: Thu, 16 Jul 2026 17:04:52 +0100
+	t=1784218500; bh=zQ7EW/DiYP7ct8mHMC81LF+qTsnzd6OWO+eVwdHzyOY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Vj3wK4wkYP+VHIMDqaQwR53oqkvcVu/gwVCkzmT0Jayp5iJGZcwxGnEUJuCeYt7xt
+	 Ur+BsX+mAvEN5kY4Vw9NGmFXzZPXZeByGayKHAKOSBlBZYTeHAD59k960pHsdC0ixw
+	 5joMwiEHE5jASc7wY48EALmiNo3H2nI1VumiBYFk=
+Date: Thu, 16 Jul 2026 17:14:46 +0100
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: Oliver Upton <oupton@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>, Fuad Tabba <tabba@google.com>, 
+	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Itaru Kitayama <itaru.kitayama@fujitsu.com>, Sebastian Ene <sebastianene@google.com>
+Subject: Re: [PATCH v4 2/6] KVM: arm64: nv: Avoid full shadow s2 unmap
+Message-ID: <upkq27f2mo3fy27ubkxxgfwkgn2oamnbxom2o6gce5ocfyauo5@6tfu3ppaw7o6>
+References: <20260714115926.2044757-1-weilin.chang@arm.com>
+ <20260714115926.2044757-3-weilin.chang@arm.com>
+ <aliCuX3ZIvxWlFE-@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 5/6] firmware: arm_rmm: Add support for SRO
-To: sashiko-reviews@lists.linux.dev
-Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>,
- Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org
-References: <20260715142739.80398-1-steven.price@arm.com>
- <20260715142739.80398-6-steven.price@arm.com>
- <20260715152954.ECAEA1F000E9@smtp.kernel.org>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <20260715152954.ECAEA1F000E9@smtp.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aliCuX3ZIvxWlFE-@kernel.org>
 
-On 15/07/2026 16:29, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 8 potential issue(s) to consider:
-> - [High] Kernel infinite loop when SRO memory allocation fails and the operation cannot be cancelled.
-> - [High] SRO wrappers wipe and free the `rmi_sro_state` struct unconditionally, leaking cached memory and breaking cross-call reuse.
-> - [High] `rmi_op_cancel` overwrites the `regs` structure with the cancellation request result, destroying the SRO loop state and leaving the RMM operation incomplete.
-> - [High] Out-of-bounds array read and arbitrary memory free when handling an overflow condition in SRO reclaim.
-> - [High] Missing clamp on `donated_granules` in `rmi_sro_donate_contig` allows a malicious or buggy RMM to trigger arbitrary out-of-bounds page frees.
-> - [Medium] Incorrect alignment check using `IS_ALIGNED` with potentially non-power-of-two sizes.
-> - [Medium] SRO wrappers hardcode `GFP_KERNEL`, directly contradicting the stated goal of supporting atomic execution contexts.
-> - [Low] Usage of non-standard macro `kmalloc_obj()` causes compilation failure.
-> --
+On Thu, Jul 16, 2026 at 12:05:29AM -0700, Oliver Upton wrote:
+> Hey,
 > 
-> --- Patch [5]: [PATCH 5/6] firmware: arm_rmm: Add support for SRO ---
-> commit 105823e0511b9065ecd4f5281f43bd808384b24c
-> Author: Steven Price <steven.price@arm.com>
+> On Tue, Jul 14, 2026 at 12:59:21PM +0100, Wei-Lin Chang wrote:
+> > +static bool valid_entry(unsigned long entry)
+> > +{
+> > +	WARN_ON(entry & VALID_ENTRY && entry & UNKNOWN_IPA);
+> > +	return entry & VALID_ENTRY;
+> > +}
+> > +
+> > +static bool unknown_ipa_entry(unsigned long entry)
+> > +{
+> > +	WARN_ON(entry & VALID_ENTRY && entry & UNKNOWN_IPA);
+> > +	return entry & UNKNOWN_IPA;
+> > +}
 > 
-> firmware: arm_rmm: Add support for SRO
+> These should be WARN_ON_ONCE(), but I find the condition you're
+> asserting to be a bit confusing. An aliased reverse map entry is still a
+> valid entry, would you not set the valid bit?
+
+Sorry, VALID_ENTRY might not be the best name for this flag. I used it
+to mean entries in the maple tree, that are not UNKNOWN_IPA, meaning the
+canonical IPA <-> nested IPA relation is one-to-one.
+
+So by definition UNKNOWN_IPA and "VALID_ENTRY" should not be set at the
+same time. Unfortunately they can't be a single flag, as the stored
+address can be 0, this can make the whole value 0 when being stored if
+the single flag is also 0, effectively not doing the store.
+
+Maybe it's better with just "KNOWN_IPA"?
+
 > 
-> This commit introduces Stateful RMI Operations (SRO) for RMM v2.0, allowing
-> SMC operations to return while still in progress and be continued later. It
-> adds infrastructure to track and reuse allocated memory during these
-> operations to support execution in contexts where memory allocation is
-> difficult. The patch also provides wrappers for SRO commands and modifies
-> delegate/undelegate handlers to use the stateful infrastructure.
+> > +void kvm_record_nested_revmap(gpa_t canonical_ipa, struct kvm_s2_mmu *mmu,
+> > +			      gpa_t nested_ipa, size_t map_size)
+> > +{
+> > +	struct maple_tree *revmap_mt = &mmu->nested_revmap_mt;
+> > +	gpa_t canonical_ipa_end;
+> > +	u64 entry, new_entry = 0;
+> > +
+> > +	lockdep_assert_held_read(&kvm_s2_mmu_to_kvm(mmu)->mmu_lock);
+> > +
+> > +	if (mmu->nested_revmap_broken)
+> > +		return;
+> > +
+> > +	if (WARN_ON(!IS_ALIGNED(canonical_ipa, map_size)))
+> > +		canonical_ipa = ALIGN_DOWN(canonical_ipa, map_size);
+> > +
+> > +	canonical_ipa_end = canonical_ipa + map_size - 1;
+> > +	MA_STATE(mas_rmap, revmap_mt, canonical_ipa, canonical_ipa_end);
+> > +
+> > +	mtree_lock(revmap_mt);
+> > +	entry = xa_to_value(mas_find(&mas_rmap, canonical_ipa_end));
+> > +
+> > +	if (entry) {
+> > +		/* parallel faults can be adding the same mapping */
+> > +		if (valid_entry(entry) &&
+> > +		    mas_rmap.index == canonical_ipa &&
+> > +		    mas_rmap.last == canonical_ipa_end &&
+> > +		    nested_ipa == (entry & ADDR_MASK))
+> > +			goto unlock;
+> > +		/*
+> > +		 * Create a "UNKNOWN_IPA" range that spans all the overlapping
+> > +		 * ranges and store it.
+> > +		 */
+> > +		while (entry && mas_rmap.index <= canonical_ipa_end) {
+> > +			canonical_ipa = min(mas_rmap.index, canonical_ipa);
+> > +			canonical_ipa_end = max(mas_rmap.last, canonical_ipa_end);
+> > +			entry = xa_to_value(mas_find(&mas_rmap, canonical_ipa_end));
+> > +		}
+> > +		new_entry |= UNKNOWN_IPA;
+> > +	} else {
+> > +		new_entry |= nested_ipa;
+> > +		new_entry |= VALID_ENTRY;
+> > +	}
+> > +
+> > +	mas_set_range(&mas_rmap, canonical_ipa, canonical_ipa_end);
+> > +	if (mas_store_gfp(&mas_rmap, xa_mk_value(new_entry),
+> > +			  GFP_NOWAIT | __GFP_ACCOUNT))
 > 
->> diff --git a/arch/arm64/include/asm/rmi_cmds.h b/arch/arm64/include/asm/rmi_cmds.h
->> index 7eb2c8d7f7fa8..f13ecdb40ded4 100644
->> --- a/arch/arm64/include/asm/rmi_cmds.h
->> +++ b/arch/arm64/include/asm/rmi_cmds.h
+> The general pattern for handling this situation would be to preallocate
+> nodes prior to acquiring the lock. If we can preallocate then we can
+> just outright refuse to create a shadow stage-2 mapping if the update to
+> the reverse map fails.
+
+Preallocation was thought about, but it was found to be impractical in
+this case [*], mainly because we must hold the lock in order to know
+what range to store.
+
+However, we can make this function return an error when storing to the
+maple tree fails, and just not do the shadow mapping. This ties the
+wellness of the maple tree to guest progress. For repeated failure I
+think of these possibilities:
+
+ - The maple tree code is somehow broken that stores never succeed.
+ - We have so little available memory that maple tree stores don't
+   succeed.
+
+These cause the guest fault repeatedly, but do we still care about the
+guest when these happen? Probably not for the OOM case, and it solves
+itself when the kernel gets back memory. For the first case I'm not so
+sure, and I might have missed some other important possibilities.
+
+[*]: https://lore.kernel.org/kvmarm/867bq72n7l.wl-maz@kernel.org/
+
 > 
-> [ ... ]
+> > +		mmu->nested_revmap_broken = true;
+> > +unlock:
+> > +	mtree_unlock(revmap_mt);
+> > +}
+> > +
+> >  void kvm_init_nested_s2_mmu(struct kvm_s2_mmu *mmu)
+> >  {
+> >  	/* CnP being set denotes an invalid entry */
+> >  	mmu->tlb_vttbr = VTTBR_CNP_BIT;
+> >  	mmu->nested_stage2_enabled = false;
+> >  	atomic_set(&mmu->refcnt, 0);
+> > +	mt_init(&mmu->nested_revmap_mt);
+> > +	mmu->nested_revmap_broken = false;
+> >  }
+> >  
+> >  void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu)
+> > @@ -1225,6 +1305,89 @@ void kvm_nested_s2_wp(struct kvm *kvm)
+> >  	kvm_invalidate_vncr_ipa(kvm, 0, BIT(kvm->arch.mmu.pgt->ia_bits));
+> >  }
+> >  
+> > +static void reset_revmap_and_unmap(struct kvm_s2_mmu *mmu, bool may_block)
+> > +{
+> > +	mtree_destroy(&mmu->nested_revmap_mt);
+> > +	mmu->nested_revmap_broken = false;
+> > +	kvm_stage2_unmap_range(mmu, 0, kvm_phys_size(mmu), may_block);
+> > +}
+> > +
+> > +static void unmap_mmu_cipa_range(struct kvm_s2_mmu *mmu, gpa_t canonical_ipa,
+> > +				  size_t unmap_size, bool may_block)
+> > +{
+> > +	struct maple_tree *revmap_mt = &mmu->nested_revmap_mt;
+> > +	gpa_t canonical_ipa_end = canonical_ipa + unmap_size - 1;
+> > +	size_t entry_size;
+> > +	gpa_t next_addr;
+> > +	u64 entry;
+> > +	MA_STATE(mas_rmap, revmap_mt, canonical_ipa, canonical_ipa_end);
+> > +
+> > +	lockdep_assert_held_write(&kvm_s2_mmu_to_kvm(mmu)->mmu_lock);
+> > +
+> > +	if (mmu->nested_revmap_broken) {
+> > +		reset_revmap_and_unmap(mmu, may_block);
+> > +		return;
+> > +	}
+> > +
+> > +	if (!mmu->nested_stage2_enabled) {
+> > +		kvm_stage2_unmap_range(mmu, canonical_ipa, unmap_size, may_block);
+> > +		return;
+> > +	}
+> > +
+> > +	mtree_lock(revmap_mt);
+> > +	entry = xa_to_value(mas_find(&mas_rmap, canonical_ipa_end));
+> > +
+> > +	while (entry && mas_rmap.index <= canonical_ipa_end) {
+> > +		entry_size = mas_rmap.last - mas_rmap.index + 1;
+> > +		next_addr = mas_rmap.index + entry_size;
+> > +		/*
+> > +		 * Give up and invalidate this s2 mmu if the unmap range
+> > +		 * touches any UNKNOWN_IPA range.
+> > +		 */
+> > +		if (unknown_ipa_entry(entry)) {
+> > +			mtree_unlock(revmap_mt);
+> > +			reset_revmap_and_unmap(mmu, may_block);
+> > +			return;
+> > +		}
+> > +
+> > +		/*
+> > +		 * Ignore result, it is okay if a reverse mapping erase
+> > +		 * fails.
+> > +		 */
+> > +		mas_store_gfp(&mas_rmap, NULL, GFP_NOWAIT | __GFP_ACCOUNT);
 > 
->> @@ -46,6 +142,98 @@ static inline int rmi_realm_activate(unsigned long rd)
->>  	return res.a0;
->>  }
->>  
->> +/**
->> + * rmi_realm_create() - Create a realm
->> + * @rd: PA of the RD
->> + * @params: PA of realm parameters
->> + * @sro: Preallocated SRO context to be used
->> + *
->> + * Create a new realm using the given parameters.
->> + *
->> + * Return: RMI return code
->> + */
->> +static inline int rmi_realm_create(unsigned long rd, unsigned long params,
->> +				   struct rmi_sro_state *sro)
->> +{
->> +	return rmi_sro_memxfer_cmd(sro, GFP_KERNEL,
->> +				   SMC_RMI_REALM_CREATE, rd, params);
->> +}
+> I wonder if we can handle this a bit more gracefully.
 > 
-> [Severity: Medium]
-> The commit message states the SRO framework permits operations to be done in a
-> context where memory allocation may be difficult, such as an atomic context.
-> However, does passing GFP_KERNEL here directly contradict that goal? If
-> rmi_sro_ensure_capacity() requires memory, it will call alloc_pages_exact()
-> with GFP_KERNEL, which will sleep.
-
-But this particular RMI function is called from a context where sleeping
-is fine.
-
->> diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/arm_rmm/rmi.c
->> index e7ab4a7df3ca8..6a9f61760fd77 100644
->> --- a/drivers/firmware/arm_rmm/rmi.c
->> +++ b/drivers/firmware/arm_rmm/rmi.c
+> Ideally we'd be able to place a search mark on the entry flagging it as
+> stale which could be used to avoid attempting to overinvalidate the
+> shadow stage-2.
 > 
-> [ ... ]
+> Interestingly enough, Liam recently gave the suggestion [*] of storing
+> XA_ZERO_ENTRY for a similar use case where erasure happens in an atomic
+> context. We should be able to do the exact same thing here and push the
+> cleanup to the next insertion.
+
+I see. Not saying I have a better idea, but this is relying on the fact
+that replacing an existing range with another value does not require
+memory allocation. I would say this is an obvious assumption and I don't
+see it becoming false in the future, but still it's an implementation
+detail and relying on it as a user feels strange...
+
+What do you think?
+
+Thanks,
+Wei-Lin Chang
+
 > 
->> @@ -22,6 +23,487 @@ unsigned long rmi_feat_reg(unsigned long id)
+> [*] https://lore.kernel.org/all/iv7sxqezzz42xieytbf3lskutricz7ltkr3wii3w4jbnbzto7f@2tz5hwa43l37/
 > 
-> [ ... ]
-> 
->> +static void rmi_op_cancel(unsigned long sro_handle,
->> +			  struct arm_smccc_1_2_regs *out_regs)
->> +{
->> +	struct arm_smccc_1_2_regs regs = {
->> +		SMC_RMI_OP_CANCEL, sro_handle
->> +	};
->> +
->> +	rmi_smccc_invoke(&regs, out_regs);
->> +}
-> 
-> [Severity: High]
-> Does rmi_op_cancel() overwrite the caller's out_regs with the cancellation
-> result?
-
-Yes
-
-> When called from rmi_sro_memxfer_execute(), a successful cancel
-> returns RMI_SUCCESS in out_regs->a0.
-
-A 'successful' cancel returns RMI_INCOMPLETE. Or as the spec puts it:
-
- | The RMI_OP_CANCEL command does not have any success conditions
-
-> This would cause the loop condition
-> (RMI_RETURN_STATUS(regs->a0) == RMI_INCOMPLETE) to fail early and abandon
-> the operation before it completes, potentially causing future RMM operations
-> to fail.
-
-There's a WARN_ON_ONCE if regs->a0 is anything but RMI_INCOMPLETE in
-rmi_sro_memxfer_execute(). This should never happen.
-
-> [ ... ]
-> 
->> +static int rmi_sro_donate_contig(struct rmi_sro_state *sro,
->> +				 unsigned long sro_handle,
->> +				 unsigned long donatereq,
->> +				 struct arm_smccc_1_2_regs *out_regs,
->> +				 gfp_t gfp)
->> +{
->> +	unsigned long unit_size = RMI_DONATE_SIZE(donatereq);
->> +	unsigned long unit_size_bytes = donate_req_to_size(donatereq);
->> +	unsigned long count = RMI_DONATE_COUNT(donatereq);
->> +	unsigned long state = RMI_DONATE_STATE(donatereq);
->> +	unsigned long size = unit_size_bytes * count;
->> +	unsigned long addr_range;
->> +	int ret;
->> +	void *virt;
->> +	phys_addr_t phys;
->> +
->> +	for (int i = 0; i < sro->addr_count; i++) {
->> +		unsigned long entry = sro->addr_list[i];
->> +
->> +		if (RMI_ADDR_RANGE_SIZE(entry) == unit_size &&
->> +		    RMI_ADDR_RANGE_COUNT(entry) == count &&
->> +		    RMI_ADDR_RANGE_STATE(entry) == state &&
->> +		    IS_ALIGNED(RMI_ADDR_RANGE_ADDR(entry), size)) {
-> 
-> [Severity: Medium]
-> Can size be a non-power-of-two here?
-
-According to the spec: no.
-
-> The IS_ALIGNED() macro evaluates a> bitwise AND with (size - 1) and
-strictly requires the alignment to be a
-> power of two. If the RMM requests a contiguous donation where count is not a
-> power of two, this check uses an invalid bitmask.
-
-I'll add a check (with a WARN_ON_ONCE) for buggy RMM behaviour which
-errors out early.
-
->> +			sro->addr_count--;
->> +			swap(sro->addr_list[sro->addr_count],
->> +			     sro->addr_list[i]);
->> +
->> +			goto out;
->> +		}
->> +	}
-> 
-> [ ... ]
-> 
->> +out:
->> +	rmi_op_mem_donate(sro_handle,
->> +			  virt_to_phys(&sro->addr_list[sro->addr_count]), 1,
->> +			  0, out_regs);
->> +
->> +	unsigned long donated_granules = out_regs->a1;
->> +	unsigned long donated_size = donated_granules << PAGE_SHIFT;
->> +
->> +	if (donated_granules == 0) {
->> +		/* No pages used by the RMM */
->> +		sro->addr_count++;
->> +	} else if (donated_size < size) {
-> 
-> [Severity: High]
-> Is it possible for the RMM to return a maliciously large value for
-> donated_granules here?
-
-Yes, but the RMM is considered trusted.
-
-> Unlike rmi_sro_donate_noncontig() which clamps
-> this value, this function does not. If the value overflows the bitwise shift,
-> donated_size could appear small, causing the kernel to erroneously enter the
-> free loop below and release pages that the RMM may actively be using.
-
-There are plenty of other ways of the RMM breaking the normal world. In
-particular APIs like RMI_RTT_DATA_UNMAP return physical addresses which
-Linux trusts are correct.
-
->> +		phys = sro->addr_list[sro->addr_count] & RMI_ADDR_RANGE_ADDR_MASK;
->> +
->> +		/* Not all granules used by the RMM, free the remaining pages */
->> +		for (long i = donated_size; i < size; i += PAGE_SIZE) {
->> +			if (state == RMI_OP_MEM_DELEGATED)
->> +				free_delegated_page(phys + i);
->> +			else
->> +				__free_page(phys_to_page(phys + i));
->> +		}
->> +	}
->> +
->> +	return 0;
->> +}
-> 
-> [ ... ]
-> 
->> +static int rmi_sro_reclaim(struct rmi_sro_state *sro,
->> +			   unsigned long sro_handle,
->> +			   struct arm_smccc_1_2_regs *out_regs)
->> +{
->> +	unsigned long capacity;
->> +	int ret;
->> +
->> +	ret = rmi_sro_ensure_capacity(sro, 1);
->> +	if (ret)
->> +		rmi_sro_free(sro);
-> 
-> [Severity: High]
-> If rmi_sro_ensure_capacity() fails because sro->addr_count is greater than
-> RMI_MAX_ADDR_LIST, it returns -EOVERFLOW.
-
-This is a "should never happen" condition (which has a WARN_ON_ONCE).
-
-> Passing sro to rmi_sro_free() in> this state will cause the loop in
-rmi_sro_free() to iterate out-of-bounds
-> past the end of the addr_list array, reading garbage data and attempting to
-> free it.
-
-True - a corrupted list length causes further things to break. It seems
-a bit much to try to handle such corruption.
-
->> +
->> +	capacity = RMI_MAX_ADDR_LIST - sro->addr_count;
-> 
-> [ ... ]
-> 
->> +unsigned long rmi_sro_memxfer_execute(struct rmi_sro_state *sro, gfp_t gfp)
->> +{
->> +	unsigned long sro_handle;
->> +	struct arm_smccc_1_2_regs *regs = &sro->regs;
->> +
->> +	rmi_smccc_invoke(regs, regs);
->> +
->> +	sro_handle = regs->a1;
->> +
->> +	while (RMI_RETURN_STATUS(regs->a0) == RMI_INCOMPLETE) {
->> +		bool can_cancel = RMI_RETURN_CAN_CANCEL(regs->a0);
->> +		int ret = 0;
->> +
->> +		switch (RMI_RETURN_MEMREQ(regs->a0)) {
->> +		case RMI_OP_MEM_REQ_NONE:
->> +			rmi_op_continue(sro_handle, RMI_CONTINUE_KEEP_GOING,
->> +					regs);
->> +			break;
->> +		case RMI_OP_MEM_REQ_DONATE:
->> +			ret = rmi_sro_donate(sro, sro_handle, regs->a2, regs,
->> +					     gfp);
->> +			break;
->> +		case RMI_OP_MEM_REQ_RECLAIM:
->> +			ret = rmi_sro_reclaim(sro, sro_handle, regs);
->> +			break;
->> +		default:
->> +			ret = WARN_ON_ONCE(1);
->> +			break;
->> +		}
->> +
->> +		if (ret) {
->> +			if (can_cancel)
->> +				rmi_op_cancel(sro_handle, regs);
->> +
->> +			if (WARN_ON_ONCE(RMI_RETURN_STATUS(regs->a0) != RMI_INCOMPLETE))
->> +				return ret;
->> +		}
->> +	}
-> 
-> [Severity: High]
-> Does this code loop infinitely if a memory allocation fails and can_cancel is
-> false?
-
-The specification requires that can_cancel is true when a memory
-allocation is requested.
-
-It's also not really clear what the alternative is here - if the RMM
-requests memory and doesn't allow cancellation then the only way of
-finishing the operation is to provide it with the memory.
-
-> If ret is set to an error code and can_cancel is false,
-> rmi_op_cancel()> is skipped. The regs state is not modified, so
-RMI_RETURN_STATUS(regs->a0)
-> remains RMI_INCOMPLETE, the WARN_ON_ONCE check fails, and the loop repeats
-> indefinitely without returning the error.
-
-Indeed, if the operation is incomplete the code attempts to complete the
-operation. The only other option would be to give up on using the RMM,
-but how do we choose the maximum number of loops before giving up?
-
-Ultimately we do have to trust the RMM to some extent to obey the spec.
-
-> [ ... ]
-> 
->> @@ -80,8 +562,9 @@ static int rmi_configure(void)
->>  {
->>  	unsigned long ret;
->>  	struct rmm_config *config __free(free_page) = (struct rmm_config *)get_zeroed_page(GFP_KERNEL);
->> +	struct rmi_sro_state *sro __free(kfree) = (struct rmi_sro_state *)kmalloc_obj(*sro);
-> 
-> [Severity: Low]
-> Is kmalloc_obj() a standard kernel macro?
-
-Yes
-
-> It does not appear to exist in the> standard kernel headers, which
-will result in an implicit function declaration
-> error and build failure.
-
-I'm not sure what braindead version of Sashiko was used on this patch.
-For some reason it seems to have completely forgotten standard Linux and
-somewhat missed the context of how the RMM fits into the system.
-
->> diff --git a/include/linux/arm-rmi-cmds.h b/include/linux/arm-rmi-cmds.h
->> index c038c1d685fad..138983ab4e3c2 100644
->> --- a/include/linux/arm-rmi-cmds.h
->> +++ b/include/linux/arm-rmi-cmds.h
-> 
-> [ ... ]
-> 
->> @@ -19,10 +19,45 @@ struct rtt_entry {
-> 
-> [ ... ]
-> 
->> +#define rmi_sro_memxfer_cmd(sro, gfp, ...) ({				\
->> +	struct rmi_sro_state *__sro = (sro);				\
->> +	*__sro = (struct rmi_sro_state){ .regs = {__VA_ARGS__} };	\
->> +	int __ret = rmi_sro_memxfer_execute(__sro, gfp);		\
->> +	rmi_sro_free(__sro);						\
->> +	__ret;								\
->> +})
-> 
-> [Severity: High]
-> Does this macro unconditionally wipe and free the rmi_sro_state struct? The
-> compound literal assignment *__sro = (struct rmi_sro_state){ ... } will
-> zero-initialize addr_count and addr_list, wiping any cached addresses from a
-> previous attempt. Furthermore, calling rmi_sro_free() unconditionally before
-> returning frees any allocated memory, defeating the stated design goal of
-> reusing memory across calls.
-> 
-
-Yes it unconditionally wipes the context of the struct - the struct is
-provided purely to avoid having to do an extra memory allocation. This
-is a helper maco for the cases where we don't provide a way of dropping
-into a less restrictive state to retry the allocation.
-
-This is admittedly a missing piece - currently there are no call sites
-that do the stated dance of dropping locks to retry a memory allocation.
-
-Steve
-
+> Thanks,
+> Oliver
