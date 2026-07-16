@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E3BC41F37E;
-	Thu, 16 Jul 2026 14:09:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E38FE425884;
+	Thu, 16 Jul 2026 14:10:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784210999; cv=none; b=IBsS0XfuIsOCdN4anLeRxnzTJiRw2/2OeKQ4bE+PvnwqgvHlfAK3DFMmqkjvqhWrs1JLl2SDaumh83yqZtloHuuRG9fDtV350/il3plCXgg0lJUxFTwqX+aYIXoQqrMetZCOjucq6OIECRwtCqe4rTfbwAeBMkglwCMHzppGypI=
+	t=1784211004; cv=none; b=j0TALeQjbf4RICX/UxSU4kCogypgg0NolXsTLeALMzuLnXy1wEmCZb0zbLRgtvJRNuTWENO6cUb0zIT7D8Xsb8Zlat8QOvfQWbBF1JqolTc8anolZN/X/yvW4Bodr4qMM4jC7ck+QfR8iaHgIhifjN1KzWEV6nj+Zx85+plPf8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784210999; c=relaxed/simple;
-	bh=w0juLWssNH6OlODoK0hQewuMPxF50K2J8wxRk8w5Q7Y=;
+	s=arc-20240116; t=1784211004; c=relaxed/simple;
+	bh=Qkq4WHhNG2sp8SakFb2ZAOUpg/WLOqCsLiXhN2MZPFg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SNWjoLTLFXlTXV4TpG0/HDPW4e+DbvBQfVxvB7cuIuSUIhmKRZeVB373vBTfXPXg7C2Fh/Kn2LZwMDXDeLeGeU7ahBe7yyPqjx007hbqvSahygqVCPCM3xQtI+ZRKRucUAIbc/FVU8NmEetF1JXZrPSIAlP7i7ulw5SD+nI/2Zc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TaqlmgNH; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=IaBusuAF2yn7vSa5aTcpQNQIaR7RLm1CckzTMQpmw5gbmfsFrAegpV1KrwzqYD1QsUeXvFEicWgUQzlKXTcXGEuHLmjKc5GYcVMpUTOrj4sew07c19HFNIEpzxpM9yWJRqB7l4AoKhFt2brbkbTYuz5TUyOR8WwjJHmu/FuIGBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I74tlGvr; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TaqlmgNH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 128C81F000E9;
-	Thu, 16 Jul 2026 14:09:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I74tlGvr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65E6D1F00A3A;
+	Thu, 16 Jul 2026 14:09:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784210997;
-	bh=pGjkGxlJuV1y6dw2eZzjP+247wJLZyc/NOARJ+i0tsY=;
+	s=k20260515; t=1784211002;
+	bh=qVn/qwPXA97H6053Zd5tcPuPNzdGfESKigCqcNfJyJ0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=TaqlmgNHxf7v6dfxYDKUNK3NIREPzioMN1RM9+U49mVKlpU6dCBOGUbNJkT+lzBZn
-	 Bos1N7in0wJCKDbjkJUfejmLzgfF53FUhRJHpkN//s6evtmE+Ewjnk1r0sEbOB9ODR
-	 252P8AfK4VDGqyA+Iu6DX12FWOCZTjCkq5+BABIQCwPQasORC6jXWbOcY16+eJ6kV+
-	 gSVrzZbzJBlO1farHBA5Q6APephp1EC3MVfujeE0lB7i2+ucPhu/9RD44ErHOxin72
-	 U9ishXTogAyFJ/yo9RjaVs1SjOo7jLRElugCYOYnKea0ePZbJfqYcC/n7ifnUp9S9E
-	 /XFL1CNqlDlZw==
+	b=I74tlGvrFWwGVKwTtbJ3bETrDuWXDc1tJqvFSERH63hVCDVaDxplfDOtvlbOB30kb
+	 A1QK3LXx4dc0Ezu32LEOgk/pwAtoNhii8H89q76g/n/tjxdrGBSYR+Jst3x6XsF3Oa
+	 qNKkjq/AWPRDBESqA0yCiN+PSOyWmKzDGLa9SJGITwhB7/ehrWba/dk3tkRZTpssrn
+	 UEmxg7GOqer9ku3wM2X44lZVYJfss2XobeqF69A4njU6SO4a2M1MRzklOk/6hsrljF
+	 /nIDVSViR0/EfEcPtmwugZSW142+deMgK8QlQkz4Cd4tTRppm0HT1n+b2/VsnWwIOx
+	 f4FMZ6MSDEa1Q==
 From: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
@@ -39,9 +39,9 @@ Cc: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>
-Subject: [RFC PATCH 2/5] KVM: arm64: Split hyp mapping APIs by address type
-Date: Thu, 16 Jul 2026 19:39:33 +0530
-Message-ID: <20260716140936.4003182-3-aneesh.kumar@kernel.org>
+Subject: [RFC PATCH 3/5] KVM: arm64: Split hyp VA-to-PA conversion by address type
+Date: Thu, 16 Jul 2026 19:39:34 +0530
+Message-ID: <20260716140936.4003182-4-aneesh.kumar@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260716140936.4003182-1-aneesh.kumar@kernel.org>
 References: <20260716140936.4003182-1-aneesh.kumar@kernel.org>
@@ -53,460 +53,383 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Kernel-image symbols and linear-map addresses may refer to the same
-physical memory, but they are not interchangeable when constructing the
-EL2 address space. A kernel-image symbol requires __pa_symbol() for its
-physical address and kern_sym_hyp_va() for its runtime hyp VA, whereas a
-linear-map address requires __pa() and kern_hyp_va().
+The existing hyp VA-to-PA conversion uses one physvirt offset for both
+kernel-image symbols and linear-map addresses. This only works while both
+address types use the same EL2 VA transformation.
 
-The existing create_hyp_mappings() and pkvm_create_mappings() interfaces
-do not express this distinction. Host callers prepare symbol addresses
-before invoking create_hyp_mappings(), while the common implementation
-attempts to infer the physical address from the resulting pointer. The
-pKVM implementation similarly assumes that every input can be translated
-using the linear hyp VA-to-PA offset.
+With hVHE TTBR1, hyp symbols retain their kernel-image VAs while pools,
+per-CPU data and shared memory remain linear-map-derived. Introduce a
+separate symbol physvirt offset and explicit symbol and linear conversion
+helpers.
 
-This ambiguity works while hyp symbols and linear allocations share the
-same fixed-offset translation. A later patch introduces an hVHE TTBR1
-layout which retains kernel-image VAs for hyp symbols. That layout
-requires symbol addresses to be distinguished from linear-map addresses.
-
-Replace create_hyp_mappings() with explicit create_hyp_symbol_mappings()
-and create_hyp_linear_mappings() interfaces. Resolve the appropriate hyp
-VA and PA in each wrapper, then pass those values to a common mapping
-helper. This also removes the need for the generic
-kernel-address-to-physical-address classifier.
-
-Apply the same separation to the pKVM mapping code. Introduce symbol and
-linear-map wrappers around an internal helper which receives an already
-resolved hyp VA range and starting PA. Retain a locked linear variant for
-callers which already hold the hyp page-table lock.
-
-Update all callers to use the interface matching the address type they
-provide.
+Update every caller according to its address type and remove the
+ambiguous hyp_pa and __hyp_pa helpers. The offsets remain same as
+hyp_physvirt_offset, making this preparatory for the TTBR1 layout.
 
 Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
 ---
- arch/arm64/include/asm/kvm_mmu.h      |  5 +-
- arch/arm64/kvm/arm.c                  | 29 +++++------
- arch/arm64/kvm/hyp/include/nvhe/mm.h  |  8 ++-
- arch/arm64/kvm/hyp/nvhe/mem_protect.c | 16 ++++--
- arch/arm64/kvm/hyp/nvhe/mm.c          | 46 ++++++++++++-----
- arch/arm64/kvm/hyp/nvhe/setup.c       | 18 ++++---
- arch/arm64/kvm/hyp_trace.c            |  2 +-
- arch/arm64/kvm/mmu.c                  | 71 +++++++++++++++------------
- 8 files changed, 122 insertions(+), 73 deletions(-)
+ arch/arm64/include/asm/kvm_host.h        |  2 ++
+ arch/arm64/include/asm/kvm_mmu.h         | 17 ++++++++++++-----
+ arch/arm64/kvm/arm.c                     |  2 +-
+ arch/arm64/kvm/hyp/include/nvhe/memory.h | 13 +++++++------
+ arch/arm64/kvm/hyp/nvhe/early_alloc.c    |  1 +
+ arch/arm64/kvm/hyp/nvhe/events.c         |  2 +-
+ arch/arm64/kvm/hyp/nvhe/host.S           |  4 ++--
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c    | 14 +++++++-------
+ arch/arm64/kvm/hyp/nvhe/mm.c             | 11 ++++++-----
+ arch/arm64/kvm/hyp/nvhe/psci-relay.c     | 12 ++++++------
+ arch/arm64/kvm/hyp/nvhe/setup.c          |  4 ++--
+ arch/arm64/kvm/va_layout.c               |  2 ++
+ 12 files changed, 49 insertions(+), 35 deletions(-)
 
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index bae2c4f92ef5..d92e0d066de3 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -827,6 +827,8 @@ extern struct kvm_host_psci_config kvm_nvhe_sym(kvm_host_psci_config);
+ 
+ extern s64 kvm_nvhe_sym(hyp_physvirt_offset);
+ #define hyp_physvirt_offset CHOOSE_NVHE_SYM(hyp_physvirt_offset)
++extern s64 kvm_nvhe_sym(hyp_symbol_physvirt_offset);
++#define hyp_symbol_physvirt_offset CHOOSE_NVHE_SYM(hyp_symbol_physvirt_offset)
+ 
+ extern u64 kvm_nvhe_sym(hyp_cpu_logical_map)[NR_CPUS];
+ #define hyp_cpu_logical_map CHOOSE_NVHE_SYM(hyp_cpu_logical_map)
 diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 6b708ff176fd..8c2972aa83b0 100644
+index 8c2972aa83b0..bcc8e28985f7 100644
 --- a/arch/arm64/include/asm/kvm_mmu.h
 +++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -190,7 +190,10 @@ extern u32 __hyp_va_bits;
+@@ -54,15 +54,21 @@
+ #include <asm/alternative.h>
  
- int kvm_share_hyp(void *from, void *to);
- void kvm_unshare_hyp(void *from, void *to);
--int create_hyp_mappings(void *from, void *to, enum kvm_pgtable_prot prot);
-+int create_hyp_linear_mappings(void *from, void *to,
-+			       enum kvm_pgtable_prot prot);
-+int create_hyp_symbol_mappings(void *from, void *to,
-+			       enum kvm_pgtable_prot prot);
- int __create_hyp_mappings(unsigned long start, unsigned long size,
- 			  unsigned long phys, enum kvm_pgtable_prot prot);
- int hyp_alloc_private_va_range(size_t size, unsigned long *haddr);
+ /*
+- * Convert a hypervisor VA to a PA
++ * Convert an address in the hypervisor linear map to a PA
+  * reg: hypervisor address to be converted in place
+  * tmp: temporary register
+  */
+-.macro hyp_pa reg, tmp
++.macro hyp_linear_pa reg, tmp
+ 	ldr_l	\tmp, hyp_physvirt_offset
+ 	add	\reg, \reg, \tmp
+ .endm
+ 
++/* Convert a hypervisor kernel-image VA to a PA. */
++.macro hyp_symbol_pa reg, tmp
++	ldr_l	\tmp, hyp_symbol_physvirt_offset
++	add	\reg, \reg, \tmp
++.endm
++
+ /*
+  * Convert a hypervisor VA to a kernel image address
+  * reg: hypervisor address to be converted in place
+@@ -74,8 +80,8 @@
+  * specific registers encoded in the instructions).
+  */
+ .macro hyp_kimg_va reg, tmp
+-	/* Convert hyp VA -> PA. */
+-	hyp_pa	\reg, \tmp
++	/* Convert hyp kernel-image VA -> PA. */
++	hyp_symbol_pa	\reg, \tmp
+ 
+ 	/* Load kimage_voffset. */
+ alternative_cb ARM64_ALWAYS_SYSTEM, kvm_get_kimage_voffset
+@@ -106,7 +112,6 @@ void kvm_compute_layout(void);
+ u32 kvm_hyp_va_bits(void);
+ void kvm_apply_hyp_relocations(void);
+ 
+-#define __hyp_pa(x) (((phys_addr_t)(x)) + hyp_physvirt_offset)
+ /**
+  * kvm_hyp_kimg_kaddr - Select the kernel address used for an EL2 mapping
+  * @ptr: Address within the kernel image
+@@ -130,6 +135,8 @@ static __always_inline void *kvm_hyp_kimg_kaddr(void *ptr)
+ 	return lm_alias(ptr);
+ }
+ 
++#define __hyp_linear_pa(x) (((phys_addr_t)(x)) + hyp_physvirt_offset)
++#define __hyp_symbol_pa(x) (((phys_addr_t)(x)) + hyp_symbol_physvirt_offset)
+ /*
+  * Convert a kernel VA into a HYP VA.
+  *
 diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index e1613186efb0..e498bb780382 100644
+index e498bb780382..924f33c1a9d4 100644
 --- a/arch/arm64/kvm/arm.c
 +++ b/arch/arm64/kvm/arm.c
-@@ -2620,7 +2620,7 @@ static int __init kvm_hyp_init_protection(u32 hyp_va_bits)
- 	void *addr = phys_to_virt(hyp_mem_base);
- 	int ret;
+@@ -2835,7 +2835,7 @@ static int __init init_hyp_mode(void)
+ 		/*
+ 		 * Save the stack PA in nvhe_init_params. This will be needed
+ 		 * to recreate the stack mapping in protected nVHE mode.
+-		 * __hyp_pa() won't do the right thing there, since the stack
++		 * __hyp_linear_pa() won't do the right thing there, since the stack
+ 		 * has been mapped in the flexible private VA space.
+ 		 */
+ 		params->stack_pa = __pa(stack_base);
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/memory.h b/arch/arm64/kvm/hyp/include/nvhe/memory.h
+index b50712d47f6d..a7c3e70f7256 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/memory.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/memory.h
+@@ -73,16 +73,17 @@ struct hyp_page {
+ extern u64 __hyp_vmemmap;
+ #define hyp_vmemmap ((struct hyp_page *)__hyp_vmemmap)
  
--	ret = create_hyp_mappings(addr, addr + hyp_mem_size, PAGE_HYP);
-+	ret = create_hyp_linear_mappings(addr, addr + hyp_mem_size, PAGE_HYP);
+-#define __hyp_va(phys)	((void *)((phys_addr_t)(phys) - hyp_physvirt_offset))
++#define __hyp_linear_va(phys) \
++	((void *)((phys_addr_t)(phys) - hyp_physvirt_offset))
+ 
+ static inline void *hyp_phys_to_virt(phys_addr_t phys)
+ {
+-	return __hyp_va(phys);
++	return __hyp_linear_va(phys);
+ }
+ 
+ static inline phys_addr_t hyp_virt_to_phys(void *addr)
+ {
+-	return __hyp_pa(addr);
++	return __hyp_linear_pa(addr);
+ }
+ 
+ #define hyp_phys_to_pfn(phys)	((phys) >> PAGE_SHIFT)
+@@ -94,12 +95,12 @@ static inline struct hyp_page *hyp_phys_to_page(phys_addr_t phys)
+ 	return &hyp_vmemmap[hyp_phys_to_pfn(phys)];
+ }
+ 
+-#define hyp_virt_to_page(virt)	hyp_phys_to_page(__hyp_pa(virt))
+-#define hyp_virt_to_pfn(virt)	hyp_phys_to_pfn(__hyp_pa(virt))
++#define hyp_virt_to_page(virt)	hyp_phys_to_page(__hyp_linear_pa(virt))
++#define hyp_virt_to_pfn(virt)	hyp_phys_to_pfn(__hyp_linear_pa(virt))
+ 
+ #define hyp_page_to_pfn(page)	((struct hyp_page *)(page) - hyp_vmemmap)
+ #define hyp_page_to_phys(page)  hyp_pfn_to_phys((hyp_page_to_pfn(page)))
+-#define hyp_page_to_virt(page)	__hyp_va(hyp_page_to_phys(page))
++#define hyp_page_to_virt(page)	__hyp_linear_va(hyp_page_to_phys(page))
+ #define hyp_page_to_pool(page)	(((struct hyp_page *)page)->pool)
+ 
+ static inline enum pkvm_page_state get_host_state(struct hyp_page *p)
+diff --git a/arch/arm64/kvm/hyp/nvhe/early_alloc.c b/arch/arm64/kvm/hyp/nvhe/early_alloc.c
+index 00de04153cc6..6002c61ae62c 100644
+--- a/arch/arm64/kvm/hyp/nvhe/early_alloc.c
++++ b/arch/arm64/kvm/hyp/nvhe/early_alloc.c
+@@ -11,6 +11,7 @@
+ 
+ struct kvm_pgtable_mm_ops hyp_early_alloc_mm_ops;
+ s64 __ro_after_init hyp_physvirt_offset;
++s64 __ro_after_init hyp_symbol_physvirt_offset;
+ 
+ static unsigned long base;
+ static unsigned long end;
+diff --git a/arch/arm64/kvm/hyp/nvhe/events.c b/arch/arm64/kvm/hyp/nvhe/events.c
+index add9383aadb5..4204cf81f0e4 100644
+--- a/arch/arm64/kvm/hyp/nvhe/events.c
++++ b/arch/arm64/kvm/hyp/nvhe/events.c
+@@ -17,7 +17,7 @@ int __tracing_enable_event(unsigned short id, bool enable)
+ 	if (event_id >= __hyp_event_ids_end)
+ 		return -EINVAL;
+ 
+-	enabled = hyp_fixmap_map(__hyp_pa(&event_id->enabled));
++	enabled = hyp_fixmap_map(__hyp_symbol_pa(&event_id->enabled));
+ 	atomic_set(enabled, enable);
+ 	hyp_fixmap_unmap();
+ 
+diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
+index 9393fe3ea6a1..079788f152d1 100644
+--- a/arch/arm64/kvm/hyp/nvhe/host.S
++++ b/arch/arm64/kvm/hyp/nvhe/host.S
+@@ -133,7 +133,7 @@ SYM_FUNC_START(__hyp_do_panic)
+ 	mrs	x0, esr_el2
+ 	mov	x4, x3
+ 	mov	x3, x2
+-	hyp_pa	x3, x6
++	hyp_symbol_pa	x3, x6
+ 	get_vcpu_ptr x5, x6
+ 	mrs	x6, far_el2
+ 	mrs	x7, hpfar_el2
+@@ -163,7 +163,7 @@ alternative_else_nop_endif
+ 	 * Preserve x0-x4, which may contain stub parameters.
+ 	 */
+ 	adr_l	x5, __kvm_handle_stub_hvc
+-	hyp_pa	x5, x6
++	hyp_symbol_pa	x5, x6
+ 	br	x5
+ SYM_FUNC_END(__host_hvc)
+ 
+diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+index 7f815345d6a5..593359d04053 100644
+--- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
++++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+@@ -175,7 +175,7 @@ int kvm_host_prepare_stage2(void *pgt_pool_base)
  	if (ret)
  		return ret;
  
-@@ -2772,29 +2772,29 @@ static int __init init_hyp_mode(void)
- 	/*
- 	 * Map the Hyp-code called directly from the host
- 	 */
--	err = create_hyp_mappings(kvm_hyp_kimg_kaddr(__hyp_text_start),
--				  kvm_hyp_kimg_kaddr(__hyp_text_end), PAGE_HYP_EXEC);
-+	err = create_hyp_symbol_mappings(__hyp_text_start, __hyp_text_end,
-+					 PAGE_HYP_EXEC);
- 	if (err) {
- 		kvm_err("Cannot map world-switch code\n");
- 		goto out_err;
- 	}
+-	mmu->pgd_phys = __hyp_pa(host_mmu.pgt.pgd);
++	mmu->pgd_phys = __hyp_linear_pa(host_mmu.pgt.pgd);
+ 	mmu->pgt = &host_mmu.pgt;
+ 	atomic64_set(&mmu->vmid.id, 0);
  
--	err = create_hyp_mappings(kvm_hyp_kimg_kaddr(__hyp_data_start),
--				  kvm_hyp_kimg_kaddr(__hyp_data_end), PAGE_HYP);
-+	err = create_hyp_symbol_mappings(__hyp_data_start, __hyp_data_end,
-+					 PAGE_HYP);
- 	if (err) {
- 		kvm_err("Cannot map .hyp.data section\n");
- 		goto out_err;
- 	}
+@@ -243,9 +243,9 @@ static void __apply_guest_page(void *va, size_t size,
+ 		void *map;
  
--	err = create_hyp_mappings(kvm_hyp_kimg_kaddr(__hyp_rodata_start),
--				  kvm_hyp_kimg_kaddr(__hyp_rodata_end), PAGE_HYP_RO);
-+	err = create_hyp_symbol_mappings(__hyp_rodata_start, __hyp_rodata_end,
-+					 PAGE_HYP_RO);
- 	if (err) {
- 		kvm_err("Cannot map .hyp.rodata section\n");
- 		goto out_err;
- 	}
+ 		if (IS_ALIGNED((unsigned long)va, PMD_SIZE) && size >= PMD_SIZE)
+-			map = hyp_fixblock_map(__hyp_pa(va), &map_size);
++			map = hyp_fixblock_map(__hyp_linear_pa(va), &map_size);
+ 		else
+-			map = hyp_fixmap_map(__hyp_pa(va));
++			map = hyp_fixmap_map(__hyp_linear_pa(va));
  
--	err = create_hyp_mappings(kvm_hyp_kimg_kaddr(__start_rodata),
--				  kvm_hyp_kimg_kaddr(__end_rodata), PAGE_HYP_RO);
-+	err = create_hyp_symbol_mappings(__start_rodata, __end_rodata,
-+					 PAGE_HYP_RO);
- 	if (err) {
- 		kvm_err("Cannot map rodata section\n");
- 		goto out_err;
-@@ -2805,15 +2805,15 @@ static int __init init_hyp_mode(void)
- 	 * section thanks to an assertion in the linker script. Map it RW and
- 	 * the rest of .bss RO.
- 	 */
--	err = create_hyp_mappings(kvm_hyp_kimg_kaddr(__hyp_bss_start),
--				  kvm_hyp_kimg_kaddr(__hyp_bss_end), PAGE_HYP);
-+	err = create_hyp_symbol_mappings(__hyp_bss_start, __hyp_bss_end,
-+					 PAGE_HYP);
- 	if (err) {
- 		kvm_err("Cannot map hyp bss section: %d\n", err);
- 		goto out_err;
- 	}
+ 		func(map, map_size);
  
--	err = create_hyp_mappings(kvm_hyp_kimg_kaddr(__hyp_bss_end),
--				  kvm_hyp_kimg_kaddr(__bss_stop), PAGE_HYP_RO);
-+	err = create_hyp_symbol_mappings(__hyp_bss_end, __bss_stop,
-+					 PAGE_HYP_RO);
- 	if (err) {
- 		kvm_err("Cannot map bss section\n");
- 		goto out_err;
-@@ -2846,7 +2846,8 @@ static int __init init_hyp_mode(void)
- 		char *percpu_end = percpu_begin + nvhe_percpu_size();
+@@ -300,7 +300,7 @@ int kvm_guest_prepare_stage2(struct pkvm_hyp_vm *vm, void *pgd)
+ 	if (ret)
+ 		return ret;
  
- 		/* Map Hyp percpu pages */
--		err = create_hyp_mappings(percpu_begin, percpu_end, PAGE_HYP);
-+		err = create_hyp_linear_mappings(percpu_begin, percpu_end,
-+						 PAGE_HYP);
- 		if (err) {
- 			kvm_err("Cannot map hyp percpu region\n");
- 			goto out_err;
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/mm.h b/arch/arm64/kvm/hyp/include/nvhe/mm.h
-index 6e83ce35c2f2..c41152c84705 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/mm.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/mm.h
-@@ -23,8 +23,12 @@ int hyp_create_idmap(u32 hyp_va_bits);
- int hyp_map_vectors(void);
- int hyp_back_vmemmap(phys_addr_t back);
- int pkvm_cpu_set_vector(enum arm64_hyp_spectre_vector slot);
--int pkvm_create_mappings(void *from, void *to, enum kvm_pgtable_prot prot);
--int pkvm_create_mappings_locked(void *from, void *to, enum kvm_pgtable_prot prot);
-+int pkvm_create_linear_mappings(void *from, void *to,
-+				enum kvm_pgtable_prot prot);
-+int pkvm_create_symbol_mappings(void *from, void *to,
-+				enum kvm_pgtable_prot prot);
-+int pkvm_create_linear_mappings_locked(void *from, void *to,
-+				       enum kvm_pgtable_prot prot);
- int __pkvm_create_private_mapping(phys_addr_t phys, size_t size,
- 				  enum kvm_pgtable_prot prot,
- 				  unsigned long *haddr);
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index 4e329e39a695..7f815345d6a5 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -1109,7 +1109,7 @@ int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages)
- 		goto unlock;
+-	vm->kvm.arch.mmu.pgd_phys = __hyp_pa(vm->pgt.pgd);
++	vm->kvm.arch.mmu.pgd_phys = __hyp_linear_pa(vm->pgt.pgd);
  
- 	__hyp_set_page_state_range(phys, size, PKVM_PAGE_OWNED);
--	WARN_ON(pkvm_create_mappings_locked(virt, virt + size, PAGE_HYP));
-+	WARN_ON(pkvm_create_linear_mappings_locked(virt, virt + size, PAGE_HYP));
- 	WARN_ON(host_stage2_set_owner_locked(phys, size, PKVM_ID_HYP));
- 
- unlock:
-@@ -1175,12 +1175,18 @@ int hyp_pin_shared_mem(void *from, void *to)
- 		goto unlock;
- 
- 	for (cur = start; cur < end; cur += PAGE_SIZE) {
-+		void *addr = (void *)cur;
-+
- 		p = hyp_virt_to_page(cur);
- 		hyp_page_ref_inc(p);
--		if (p->refcount == 1)
--			WARN_ON(pkvm_create_mappings_locked((void *)cur,
--							    (void *)cur + PAGE_SIZE,
--							    PAGE_HYP));
-+		if (p->refcount == 1) {
-+			int err;
-+
-+			err = pkvm_create_linear_mappings_locked(addr,
-+								 addr + PAGE_SIZE,
-+								 PAGE_HYP);
-+			WARN_ON(err);
-+		}
- 	}
- 
- unlock:
-diff --git a/arch/arm64/kvm/hyp/nvhe/mm.c b/arch/arm64/kvm/hyp/nvhe/mm.c
-index 3b0bee496bff..9150ff94b01a 100644
---- a/arch/arm64/kvm/hyp/nvhe/mm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mm.c
-@@ -110,23 +110,21 @@ int __pkvm_create_private_mapping(phys_addr_t phys, size_t size,
- 	return err;
- }
- 
--int pkvm_create_mappings_locked(void *from, void *to, enum kvm_pgtable_prot prot)
-+static int __pkvm_create_mappings_locked(unsigned long start,
-+					 unsigned long end,
-+					 phys_addr_t phys,
-+					 enum kvm_pgtable_prot prot)
- {
--	unsigned long start = (unsigned long)from;
--	unsigned long end = (unsigned long)to;
--	unsigned long virt_addr;
--	phys_addr_t phys;
--
- 	hyp_assert_lock_held(&pkvm_pgd_lock);
- 
- 	start = start & PAGE_MASK;
- 	end = PAGE_ALIGN(end);
-+	phys = ALIGN_DOWN(phys, PAGE_SIZE);
- 
--	for (virt_addr = start; virt_addr < end; virt_addr += PAGE_SIZE) {
-+	for (; start < end; start += PAGE_SIZE, phys += PAGE_SIZE) {
- 		int err;
- 
--		phys = hyp_virt_to_phys((void *)virt_addr);
--		err = kvm_pgtable_hyp_map(&pkvm_pgtable, virt_addr, PAGE_SIZE,
-+		err = kvm_pgtable_hyp_map(&pkvm_pgtable, start, PAGE_SIZE,
- 					  phys, prot);
- 		if (err)
- 			return err;
-@@ -135,12 +133,38 @@ int pkvm_create_mappings_locked(void *from, void *to, enum kvm_pgtable_prot prot
  	return 0;
  }
- 
--int pkvm_create_mappings(void *from, void *to, enum kvm_pgtable_prot prot)
-+int pkvm_create_linear_mappings_locked(void *from, void *to,
-+				       enum kvm_pgtable_prot prot)
-+{
-+	unsigned long start = (unsigned long)from & PAGE_MASK;
-+	phys_addr_t phys = hyp_virt_to_phys((void *)start);
-+
-+	return __pkvm_create_mappings_locked(start, (unsigned long)to,
-+					     phys, prot);
-+}
-+
-+int pkvm_create_linear_mappings(void *from, void *to,
-+				enum kvm_pgtable_prot prot)
-+{
-+	int ret;
-+
-+	hyp_spin_lock(&pkvm_pgd_lock);
-+	ret = pkvm_create_linear_mappings_locked(from, to, prot);
-+	hyp_spin_unlock(&pkvm_pgd_lock);
-+
-+	return ret;
-+}
-+
-+int pkvm_create_symbol_mappings(void *from, void *to,
-+				enum kvm_pgtable_prot prot)
+@@ -1092,7 +1092,7 @@ int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages)
  {
-+	unsigned long start = (unsigned long)from & PAGE_MASK;
-+	phys_addr_t phys = __hyp_pa(start);
+ 	u64 phys = hyp_pfn_to_phys(pfn);
+ 	u64 size = PAGE_SIZE * nr_pages;
+-	void *virt = __hyp_va(phys);
++	void *virt = __hyp_linear_va(phys);
+ 	int ret;
+ 
+ 	if (!pfn_range_is_valid(pfn, nr_pages))
+@@ -1123,7 +1123,7 @@ int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages)
+ {
+ 	u64 phys = hyp_pfn_to_phys(pfn);
+ 	u64 size = PAGE_SIZE * nr_pages;
+-	u64 virt = (u64)__hyp_va(phys);
++	u64 virt = (u64)__hyp_linear_va(phys);
+ 	int ret;
+ 
+ 	if (!pfn_range_is_valid(pfn, nr_pages))
+@@ -1158,7 +1158,7 @@ int hyp_pin_shared_mem(void *from, void *to)
+ {
+ 	u64 cur, start = ALIGN_DOWN((u64)from, PAGE_SIZE);
+ 	u64 end = PAGE_ALIGN((u64)to);
+-	u64 phys = __hyp_pa(start);
++	u64 phys = __hyp_linear_pa(start);
+ 	u64 size = end - start;
+ 	struct hyp_page *p;
+ 	int ret;
+diff --git a/arch/arm64/kvm/hyp/nvhe/mm.c b/arch/arm64/kvm/hyp/nvhe/mm.c
+index 9150ff94b01a..061fca95a78a 100644
+--- a/arch/arm64/kvm/hyp/nvhe/mm.c
++++ b/arch/arm64/kvm/hyp/nvhe/mm.c
+@@ -159,7 +159,7 @@ int pkvm_create_symbol_mappings(void *from, void *to,
+ 				enum kvm_pgtable_prot prot)
+ {
+ 	unsigned long start = (unsigned long)from & PAGE_MASK;
+-	phys_addr_t phys = __hyp_pa(start);
++	phys_addr_t phys = __hyp_symbol_pa(start);
  	int ret;
  
  	hyp_spin_lock(&pkvm_pgd_lock);
--	ret = pkvm_create_mappings_locked(from, to, prot);
-+	ret = __pkvm_create_mappings_locked(start, (unsigned long)to,
-+					    phys, prot);
- 	hyp_spin_unlock(&pkvm_pgd_lock);
+@@ -242,7 +242,7 @@ int hyp_map_vectors(void)
+ 		return 0;
+ 	}
  
- 	return ret;
+-	phys = __hyp_pa(__bp_harden_hyp_vecs);
++	phys = __hyp_symbol_pa(__bp_harden_hyp_vecs);
+ 	ret = __pkvm_create_private_mapping(phys, __BP_HARDEN_HYP_VECS_SZ,
+ 					    PAGE_HYP_EXEC, &bp_base);
+ 	if (ret)
+@@ -418,7 +418,8 @@ int hyp_create_fixmap(void)
+ 			return ret;
+ 
+ 		ret = kvm_pgtable_hyp_map(&pkvm_pgtable, addr, PAGE_SIZE,
+-					  __hyp_pa(__hyp_bss_start), PAGE_HYP);
++					  __hyp_symbol_pa(__hyp_bss_start),
++					  PAGE_HYP);
+ 		if (ret)
+ 			return ret;
+ 
+@@ -434,10 +435,10 @@ int hyp_create_idmap(u32 hyp_va_bits)
+ {
+ 	unsigned long start, end;
+ 
+-	start = hyp_virt_to_phys((void *)__hyp_idmap_text_start);
++	start = __hyp_symbol_pa(__hyp_idmap_text_start);
+ 	start = ALIGN_DOWN(start, PAGE_SIZE);
+ 
+-	end = hyp_virt_to_phys((void *)__hyp_idmap_text_end);
++	end = __hyp_symbol_pa(__hyp_idmap_text_end);
+ 	end = ALIGN(end, PAGE_SIZE);
+ 
+ 	/*
+diff --git a/arch/arm64/kvm/hyp/nvhe/psci-relay.c b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
+index e20db999e328..91b658ac74ee 100644
+--- a/arch/arm64/kvm/hyp/nvhe/psci-relay.c
++++ b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
+@@ -139,8 +139,8 @@ static int psci_cpu_on(u64 func_id, struct kvm_cpu_context *host_ctxt)
+ 	wmb();
+ 
+ 	ret = psci_call(func_id, mpidr,
+-			__hyp_pa(&kvm_hyp_cpu_entry),
+-			__hyp_pa(init_params));
++			__hyp_symbol_pa(&kvm_hyp_cpu_entry),
++			__hyp_linear_pa(init_params));
+ 
+ 	/* If successful, the lock will be released by the target CPU. */
+ 	if (ret != PSCI_RET_SUCCESS)
+@@ -173,8 +173,8 @@ static int psci_cpu_suspend(u64 func_id, struct kvm_cpu_context *host_ctxt)
+ 	 * point if it is a deep sleep state.
+ 	 */
+ 	return psci_call(func_id, power_state,
+-			 __hyp_pa(&kvm_hyp_cpu_resume),
+-			 __hyp_pa(init_params));
++			 __hyp_symbol_pa(&kvm_hyp_cpu_resume),
++			 __hyp_linear_pa(init_params));
+ }
+ 
+ static int psci_system_suspend(u64 func_id, struct kvm_cpu_context *host_ctxt)
+@@ -197,8 +197,8 @@ static int psci_system_suspend(u64 func_id, struct kvm_cpu_context *host_ctxt)
+ 
+ 	/* Will only return on error. */
+ 	return psci_call(func_id,
+-			 __hyp_pa(&kvm_hyp_cpu_resume),
+-			 __hyp_pa(init_params), 0);
++			 __hyp_symbol_pa(&kvm_hyp_cpu_resume),
++			 __hyp_linear_pa(init_params), 0);
+ }
+ 
+ static void __noreturn __kvm_host_psci_cpu_entry(unsigned long pc, unsigned long r0)
 diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-index 75b00c323310..66a3d01cd79e 100644
+index 66a3d01cd79e..2ef1972cc3dd 100644
 --- a/arch/arm64/kvm/hyp/nvhe/setup.c
 +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-@@ -86,7 +86,7 @@ static int pkvm_create_host_sve_mappings(void)
+@@ -169,7 +169,7 @@ static void update_nvhe_init_params(void)
  
- 		start = kern_hyp_va(sve_regs);
- 		end = start + PAGE_ALIGN(pkvm_host_sve_state_size());
--		ret = pkvm_create_mappings(start, end, PAGE_HYP);
-+		ret = pkvm_create_linear_mappings(start, end, PAGE_HYP);
- 		if (ret)
- 			return ret;
+ 	for (i = 0; i < hyp_nr_cpus; i++) {
+ 		params = per_cpu_ptr(&kvm_init_params, i);
+-		params->pgd_pa = __hyp_pa(pkvm_pgtable.pgd);
++		params->pgd_pa = __hyp_linear_pa(pkvm_pgtable.pgd);
+ 		dcache_clean_inval_poc((unsigned long)params,
+ 				    (unsigned long)params + sizeof(*params));
  	}
-@@ -121,23 +121,27 @@ static int recreate_hyp_mappings(phys_addr_t phys, unsigned long size,
- 	if (ret)
- 		return ret;
+@@ -371,7 +371,7 @@ int __pkvm_init(phys_addr_t phys, unsigned long size, unsigned long *per_cpu_bas
  
--	ret = pkvm_create_mappings(__hyp_text_start, __hyp_text_end, PAGE_HYP_EXEC);
-+	ret = pkvm_create_symbol_mappings(__hyp_text_start, __hyp_text_end,
-+					  PAGE_HYP_EXEC);
- 	if (ret)
- 		return ret;
+ 	/* Jump in the idmap page to switch to the new page-tables */
+ 	params = this_cpu_ptr(&kvm_init_params);
+-	fn = (typeof(fn))__hyp_pa(__pkvm_init_switch_pgd);
++	fn = (typeof(fn))__hyp_symbol_pa(__pkvm_init_switch_pgd);
+ 	fn(params->pgd_pa, params->stack_hyp_va, __pkvm_init_finalise);
  
--	ret = pkvm_create_mappings(__hyp_data_start, __hyp_data_end, PAGE_HYP);
-+	ret = pkvm_create_symbol_mappings(__hyp_data_start, __hyp_data_end,
-+					  PAGE_HYP);
- 	if (ret)
- 		return ret;
- 
--	ret = pkvm_create_mappings(__hyp_rodata_start, __hyp_rodata_end, PAGE_HYP_RO);
-+	ret = pkvm_create_symbol_mappings(__hyp_rodata_start, __hyp_rodata_end,
-+					  PAGE_HYP_RO);
- 	if (ret)
- 		return ret;
- 
--	ret = pkvm_create_mappings(__hyp_bss_start, __hyp_bss_end, PAGE_HYP);
-+	ret = pkvm_create_symbol_mappings(__hyp_bss_start, __hyp_bss_end,
-+					  PAGE_HYP);
- 	if (ret)
- 		return ret;
- 
--	ret = pkvm_create_mappings(virt, virt + size, PAGE_HYP);
-+	ret = pkvm_create_linear_mappings(virt, virt + size, PAGE_HYP);
- 	if (ret)
- 		return ret;
- 
-@@ -146,7 +150,7 @@ static int recreate_hyp_mappings(phys_addr_t phys, unsigned long size,
- 
- 		start = (void *)kern_hyp_va(per_cpu_base[i]);
- 		end = start + PAGE_ALIGN(hyp_percpu_size);
--		ret = pkvm_create_mappings(start, end, PAGE_HYP);
-+		ret = pkvm_create_linear_mappings(start, end, PAGE_HYP);
- 		if (ret)
- 			return ret;
- 
-diff --git a/arch/arm64/kvm/hyp_trace.c b/arch/arm64/kvm/hyp_trace.c
-index 2411b4c32932..0cf073682173 100644
---- a/arch/arm64/kvm/hyp_trace.c
-+++ b/arch/arm64/kvm/hyp_trace.c
-@@ -142,7 +142,7 @@ static int __map_hyp(void *start, size_t size)
- 	if (is_protected_kvm_enabled())
- 		return 0;
- 
--	return create_hyp_mappings(start, start + size, PAGE_HYP);
-+	return create_hyp_linear_mappings(start, start + size, PAGE_HYP);
+ 	unreachable();
+diff --git a/arch/arm64/kvm/va_layout.c b/arch/arm64/kvm/va_layout.c
+index 63bb58a7868a..75a89ad8fecf 100644
+--- a/arch/arm64/kvm/va_layout.c
++++ b/arch/arm64/kvm/va_layout.c
+@@ -44,6 +44,8 @@ static void init_hyp_physvirt_offset(void)
+ 	kern_va = (u64)lm_alias(__hyp_text_start);
+ 	hyp_va = __early_kern_hyp_va(kern_va);
+ 	hyp_physvirt_offset = (s64)__pa(kern_va) - (s64)hyp_va;
++
++	hyp_symbol_physvirt_offset = hyp_physvirt_offset;
  }
  
- static int __share_page(unsigned long va)
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 6c941aaa10c6..154d53dca619 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -436,17 +436,6 @@ int __create_hyp_mappings(unsigned long start, unsigned long size,
- 	return err;
- }
- 
--static phys_addr_t kvm_kaddr_to_phys(void *kaddr)
--{
--	if (!is_vmalloc_addr(kaddr)) {
--		BUG_ON(!virt_addr_valid(kaddr));
--		return __pa(kaddr);
--	} else {
--		return page_to_phys(vmalloc_to_page(kaddr)) +
--		       offset_in_page(kaddr);
--	}
--}
--
- struct hyp_shared_pfn {
- 	u64 pfn;
- 	int count;
-@@ -559,7 +548,7 @@ int kvm_share_hyp(void *from, void *to)
- 		return -EINVAL;
- 
- 	if (kvm_host_owns_hyp_mappings())
--		return create_hyp_mappings(from, to, PAGE_HYP);
-+		return create_hyp_linear_mappings(from, to, PAGE_HYP);
- 
- 	start = ALIGN_DOWN(__pa(from), PAGE_SIZE);
- 	end = PAGE_ALIGN(__pa(to));
-@@ -608,23 +597,10 @@ void kvm_unshare_hyp(void *from, void *to)
- 	}
- }
- 
--/**
-- * create_hyp_mappings - duplicate a kernel virtual address range in Hyp mode
-- * @from:	The virtual kernel start address of the range
-- * @to:		The virtual kernel end address of the range (exclusive)
-- * @prot:	The protection to be applied to this range
-- *
-- * The same virtual address as the kernel virtual address is also used
-- * in Hyp-mode mapping (modulo HYP_PAGE_OFFSET) to the same underlying
-- * physical pages.
-- */
--int create_hyp_mappings(void *from, void *to, enum kvm_pgtable_prot prot)
-+static int __create_hyp_mapping_range(unsigned long start, unsigned long end,
-+				      phys_addr_t phys,
-+				      enum kvm_pgtable_prot prot)
- {
--	phys_addr_t phys_addr;
--	unsigned long virt_addr;
--	unsigned long start = kern_hyp_va((unsigned long)from);
--	unsigned long end = kern_hyp_va((unsigned long)to);
--
- 	if (is_kernel_in_hyp_mode())
- 		return 0;
- 
-@@ -633,13 +609,12 @@ int create_hyp_mappings(void *from, void *to, enum kvm_pgtable_prot prot)
- 
- 	start = start & PAGE_MASK;
- 	end = PAGE_ALIGN(end);
-+	phys = ALIGN_DOWN(phys, PAGE_SIZE);
- 
--	for (virt_addr = start; virt_addr < end; virt_addr += PAGE_SIZE) {
-+	for (; start < end; start += PAGE_SIZE, phys += PAGE_SIZE) {
- 		int err;
- 
--		phys_addr = kvm_kaddr_to_phys(from + virt_addr - start);
--		err = __create_hyp_mappings(virt_addr, PAGE_SIZE, phys_addr,
--					    prot);
-+		err = __create_hyp_mappings(start, PAGE_SIZE, phys, prot);
- 		if (err)
- 			return err;
- 	}
-@@ -647,6 +622,38 @@ int create_hyp_mappings(void *from, void *to, enum kvm_pgtable_prot prot)
- 	return 0;
- }
- 
-+/**
-+ * create_hyp_linear_mappings - map a host linear-map range at EL2
-+ * @from:	The host linear-map start address
-+ * @to:		The host linear-map end address (exclusive)
-+ * @prot:	The protection to apply to the mapping
-+ */
-+int create_hyp_linear_mappings(void *from, void *to,
-+			       enum kvm_pgtable_prot prot)
-+{
-+	unsigned long start = kern_hyp_va((unsigned long)from);
-+	unsigned long end = kern_hyp_va((unsigned long)to);
-+	phys_addr_t phys = __pa((unsigned long)from & PAGE_MASK);
-+
-+	return __create_hyp_mapping_range(start, end, phys, prot);
-+}
-+
-+/**
-+ * create_hyp_symbol_mappings - map a kernel-image symbol range at EL2
-+ * @from:	The kernel-image symbol at the start of the range
-+ * @to:		The kernel-image symbol at the end of the range (exclusive)
-+ * @prot:	The protection to apply to the mapping
-+ */
-+int create_hyp_symbol_mappings(void *from, void *to,
-+			       enum kvm_pgtable_prot prot)
-+{
-+	unsigned long start = (unsigned long)kern_sym_hyp_va(from);
-+	unsigned long end = (unsigned long)kern_sym_hyp_va(to);
-+	phys_addr_t phys = __pa_symbol((unsigned long)from & PAGE_MASK);
-+
-+	return __create_hyp_mapping_range(start, end, phys, prot);
-+}
-+
- static int __hyp_alloc_private_va_range(unsigned long base)
- {
- 	lockdep_assert_held(&kvm_hyp_pgd_mutex);
+ /*
 -- 
 2.43.0
 
