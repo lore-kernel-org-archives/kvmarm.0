@@ -1,208 +1,178 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA7C43D2FFC;
-	Thu, 16 Jul 2026 10:38:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCA37331A57
+	for <kvmarm@lists.linux.dev>; Thu, 16 Jul 2026 10:52:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784198310; cv=none; b=U4j4j36pnDmcTPcdrtyX4WleeeyKyxLgWX/duHbamIReOMFqi8/n8U2WobGJlC3/JD8R2lq3IdSK1me++cqU9e6zBgNLtJbBoQKqyMc0F9ey8i9alxw9Y5v5stij/kigaYon9bUAYrrL6hVJcGbDRwtiY8A70/5/uHITn8vDPOc=
+	t=1784199170; cv=none; b=mh3vU80XRAX4ePrwiavIGysfDJ9DRYteLnf+6Pu/S+wFJ9LbFVLaaRChKHbdU8wvJ15gKny52HiSGNUdAclKFduoQXwv1hZD7Fr1WJvH4hmVzcuXSwgOycVYaO/WdArRSv4CWC1H6JMucDl0rPhYng8rvc+wIi/Y4JuzOi0PD10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784198310; c=relaxed/simple;
-	bh=eatil/BgWzzUzjknYQO/rfLqqSuIy87cjTAYJwTkPlQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Q3XWt4sekz4tb2UGgTEQaUa/sO4u57o7al/orQTBXILx0T4ao1Oc8qC1Mlxc2Ez87kTFnR0ok6721ho9TqegeFBd4aVxgygdfHYOIwyfDDhDJ6YNy6nFhisNJpiXYmjE4CFXGnl3cgP+biHJz3MRTag3PwvEU72VSCahig1UA+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=ObQrMAPv; arc=none smtp.client-ip=217.140.110.172
+	s=arc-20240116; t=1784199170; c=relaxed/simple;
+	bh=TAfcUCm/FJRtFHstBcSY6HRJHtBTxuvxYMJlg5wYuG4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YAFMYe7x9CGkzd49gWoKI/YZ7jW7eRUI+YEoyElawDlthidvnURCuLfiP00pMsOHxHT22Yo3QviKSDXSoicQatF0Gm33R6W/4W4kqezhxcGplMc9rWI+pCFu/+oVbXZOczB4T5WFtYee0W4PkpoFgdke8fxrbDxukj4/nvATgSA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Z0TP9OOw; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="ObQrMAPv"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Z0TP9OOw"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CFAA4339;
-	Thu, 16 Jul 2026 03:38:23 -0700 (PDT)
-Received: from [10.2.197.99] (ewhatever.cambridge.arm.com [10.2.197.99])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CD1F93F93E;
-	Thu, 16 Jul 2026 03:38:23 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B7611339;
+	Thu, 16 Jul 2026 03:52:43 -0700 (PDT)
+Received: from J2N7QTR9R3.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F40A03F7B4;
+	Thu, 16 Jul 2026 03:52:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1784198308; bh=eatil/BgWzzUzjknYQO/rfLqqSuIy87cjTAYJwTkPlQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ObQrMAPvENDnI4UYljIfKi3c66d6yFzXc7APc/4AQnh2Kjf2K++w7kUQv6jonhB8I
-	 mdp93z/QHSDFwC0OMjyGWN6bOymarLt2VrW2G/qD/QIHo9y6u5q/JbpaV4eOtrx9or
-	 Su+SguHT78PMEtpDRzFEF2a5FR92VMwEVK8VzgcY=
-Message-ID: <609440c1-7bdc-4f43-9b16-23521ca96394@arm.com>
-Date: Thu, 16 Jul 2026 11:38:21 +0100
+	t=1784199167; bh=TAfcUCm/FJRtFHstBcSY6HRJHtBTxuvxYMJlg5wYuG4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Z0TP9OOwkIMvZ272QpmYDzD1w0Nl8JaKp06EN5WyxC32thIqsC52Kl6jN+Xgz/J/u
+	 x5JXf7MEvPzmEYmCDg0XNLboWyUvHAHHLOFySWD3jodc56mMpJwDcjMjBNVUGaqunj
+	 vHEmwagoZtmUJTKjAsCiKdQDKtR6gAgaZBZt6bwA=
+Date: Thu, 16 Jul 2026 11:52:36 +0100
+From: Mark Rutland <mark.rutland@arm.com>
+To: Mark Brown <broonie@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
+	Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>,
+	Fuad Tabba <tabba@google.com>, Ben Horgan <ben.horgan@arm.com>,
+	Jean-Philippe Brucker <jpb@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Eric Auger <eric.auger@redhat.com>
+Subject: Re: [PATCH v12 02/29] arm64/fpsimd: Update FA64 and ZT0 enables when
+ loading SME state
+Message-ID: <ali39DG6qie7XTuD@J2N7QTR9R3.cambridge.arm.com>
+References: <20260709-kvm-arm64-sme-v12-0-d0301d79ef58@kernel.org>
+ <20260709-kvm-arm64-sme-v12-2-d0301d79ef58@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v15 25/37] KVM: arm64: CCA: Handle Realm PSCI requests
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
- Lorenzo Pieralisi <lpieralisi@kernel.org>
-References: <20260715142841.80544-1-steven.price@arm.com>
- <20260715142841.80544-26-steven.price@arm.com>
-Content-Language: en-US
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20260715142841.80544-26-steven.price@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260709-kvm-arm64-sme-v12-2-d0301d79ef58@kernel.org>
 
-On 15/07/2026 15:28, Steven Price wrote:
-> Some PSCI commands cause a REC exit and the host has to call
-> RMI_PSCI_COMPLETE to provide the status value to return to the guest.
+Hi Mark,
+
+This generally looks good, but I have a few thoughts below. The key
+things are:
+
+(1) I think the commit message could be clearer. I've provided some
+    suggested wording below.
+
+(2) There are a couple of trivial bits to change in the code, commented
+    below.
+
+(3) AFAICT there's a latent bug where ZCR_ELx[63:4] aren't always reset
+    before returning to userspace when we have a return from idle. We
+    get away with that because those bits haven't been allocated yet,
+    but given that they're RES0, we should reset them to avoid
+    unexpected behaviour once they are allocated a meaning in future.
+    
+    This patch happens to fix that, but for the sake of stable I think
+    we should have a preparatory patch to reset ZCR_ELx when returning
+    from idle. For example, rename sme_suspend_exit() to
+    fpsimd_suspend_exit(), and add the appropriate logic there.
+
+On Thu, Jul 09, 2026 at 07:27:23PM +0100, Mark Brown wrote:
+> Currently we enable EL0 and EL1 access to FA64 and ZT0 at boot and leave
+> them enabled throughout the runtime of the system. When we add KVM support
+> we will need to make this configuration dynamic, these features may be
+> disabled for some KVM guests. Since the host kernel saves the floating
+> point state for non-protected guests and we wish to avoid KVM having to
+> reload the floating point state needlessly on guest reentry let's move the
+> configuration of these enables to the floating point state reload.
+
+This description is hard to follow.
+
+How about:
+
+| arm64/fpsimd: Configure all ZCR/SMCR bits when loading task state
+|
+| Currently, when loading a task's SVE and/or SME state, we configure
+| ZCR_ELx.LEN and/or SMCR_ELx.LEN with read-modify-write sequences,
+| preserving all other bits of the registers (e.g. SMCR_ELx.{FA64,ZT0}).
+| This relies on all the other bits already holding the expected value
+| for the task.
+|
+| It would be simpler and more robust to configure all the bits without
+| a read-modify-write sequence:
+|
+| * Doing so will remove the need to configure these registers during
+|   feature detection and when returning from idle, simplifying the code
+|   and removing some redundant writes to the registers.
+|
+| * Doing so will permit KVM to clobber other bits of the registers when
+|   no task state is bound. Along with other changes (e.g. when saving
+|   state), this will make it possible for KVM to expose a different
+|   configuration to guests (e.g. disabling ZT0 for vCPUs, even if ZT0
+|   is exposed to userspace).
+|
+| When SVE and/or SME is not exposed to userspace (and userspace access
+| it prevented by CPACR_ELx.{ZEN,SMEN}), the values of ZCR_ELx and
+| SMCR_ELx are immaterial, as all functionality affected by those
+| registers will be trapped. Thus there is no need to reset those
+| registers to ensure correct behaviour when SVE and/or SME is not used
+| by a task.
+
+I've deliberately avoided detail on how KVM saves or relaods state,
+because there are a large number of interacting pieces there, and I
+don't think it's material beyond "this change is a step towards allowing
+KVM to expose a different configuration to vCPUs".
+
+> Provide a helper task_smcr() which generates the value of SMCR_EL1 to
+> use based on the task struct and use it when we set the vector length
+> SMCR_EL1, currently while handling SME access traps or FP state load.
 > 
-> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Signed-off-by: Steven Price <steven.price@arm.com>
+> For consistency handle ZCR_EL1 the same way, currently the only field it
+> has is the LEN so the change is less meaningful there.
+
+I think we can drop this part of the description.
+
+> Signed-off-by: Mark Brown <broonie@kernel.org>
 > ---
-> Changes since v14:
->   * Dropped the support for providing the target REC for a PSCI call (as
->     per v2.0-bet2 spec).
-> Changes since v13:
->   * The ioctl KVM_ARM_VCPU_RMI_PSCI_COMPLETE has gone. The RMI call is
->     made automatically just before entering the REC again.
-> Changes since v12:
->   * Change return code for non-realms to -ENXIO to better represent that
->     the ioctl is invalid for non-realms (checkpatch is insistent that
->     "ENOSYS means 'invalid syscall nr' and nothing else").
-> Changes since v11:
->   * RMM->RMI renaming.
-> Changes since v6:
->   * Use vcpu_is_rec() rather than kvm_is_realm(vcpu->kvm).
->   * Minor renaming/formatting fixes.
-> ---
->   arch/arm64/include/asm/kvm_rmi.h |  2 ++
->   arch/arm64/kvm/psci.c            | 14 ++++++++++++
->   arch/arm64/kvm/rmi.c             | 38 ++++++++++++++++++++++++++++++++
->   3 files changed, 54 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
-> index 718c7128a3c3..a9bb9aabee5d 100644
-> --- a/arch/arm64/include/asm/kvm_rmi.h
-> +++ b/arch/arm64/include/asm/kvm_rmi.h
-> @@ -120,6 +120,8 @@ int realm_map_ipa(struct kvm *kvm, phys_addr_t ipa,
->   		  enum kvm_pgtable_prot prot,
->   		  struct kvm_mmu_memory_cache *memcache);
->   
-> +int realm_psci_complete(struct kvm_vcpu *source, unsigned long status);
-> +
->   static inline bool kvm_realm_is_private_address(struct realm *realm,
->   						unsigned long addr)
->   {
-> diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
-> index 3b5dbe9a0a0e..b0983ee416a2 100644
-> --- a/arch/arm64/kvm/psci.c
-> +++ b/arch/arm64/kvm/psci.c
-> @@ -142,6 +142,20 @@ static unsigned long kvm_psci_vcpu_affinity_info(struct kvm_vcpu *vcpu)
->   	/* Ignore other bits of target affinity */
->   	target_affinity &= target_affinity_mask;
->   
-> +	if (vcpu_is_rec(vcpu)) {
-> +		struct kvm_vcpu *target_vcpu;
-> +
-> +		/* RMM supports only zero affinity level */
-> +		if (lowest_affinity_level != 0)
-> +			return PSCI_RET_INVALID_PARAMS;
-> +
-> +		target_vcpu = kvm_mpidr_to_vcpu(kvm, target_affinity);
-> +		if (!target_vcpu)
-> +			return PSCI_RET_INVALID_PARAMS;
-> +
-> +		return PSCI_RET_SUCCESS;
-> +	}
-> +
+>  arch/arm64/include/asm/fpsimd.h |  2 --
+>  arch/arm64/kernel/cpufeature.c  |  2 --
+>  arch/arm64/kernel/fpsimd.c      | 72 ++++++++++++++++++-----------------------
+>  3 files changed, 31 insertions(+), 45 deletions(-)
 
-We don't have to deal with AFFINITY_INFO anymore with the RMM
-maintaining the MPIDR to REC mapping. This can be removed.
+[...]
 
-Otherwise looks good to me.
+> @@ -402,12 +421,13 @@ static void task_fpsimd_load(void)
+>  
+>  	/* Restore SME, override SVE register configuration if needed */
+>  	if (system_supports_sme()) {
+> -		unsigned long sme_vl = task_get_sme_vl(current);
+> -
+> -		/* Ensure VL is set up for restoring data */
+> +		/*
+> +		 * Ensure VL is set up for restoring data.  KVM might
+> +		 * disable subfeatures so we reset them each time.
+> +		 */
 
-Suzuki
+Let's delete the comment.
 
+The existing principle that we must restore the length before the data
+also applies to ZCR_ELx (which has no similar comment), and the general
+principle that KVM might clobber the register is common to all the
+FPSIMD/SVE/SME registers.
 
->   	/*
->   	 * If one or more VCPU matching target affinity are running
->   	 * then ON else OFF
-> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
-> index 31effae067c8..8fb6403893e8 100644
-> --- a/arch/arm64/kvm/rmi.c
-> +++ b/arch/arm64/kvm/rmi.c
-> @@ -3,6 +3,7 @@
->    * Copyright (C) 2023-2026 ARM Ltd.
->    */
->   
-> +#include <uapi/linux/psci.h>
->   #include <linux/kvm_host.h>
->   
->   #include <asm/kvm_emulate.h>
-> @@ -119,6 +120,18 @@ static void free_rtt(phys_addr_t phys)
->   	kvm_account_pgtable_pages(phys_to_virt(phys), -1);
->   }
->   
-> +int realm_psci_complete(struct kvm_vcpu *source, unsigned long status)
-> +{
-> +	int ret;
-> +
-> +	ret = rmi_psci_complete(virt_to_phys(source->arch.rec.rec_page),
-> +				status);
-> +	if (ret)
-> +		return -ENXIO;
-> +
-> +	return 0;
-> +}
-> +
->   static int realm_rtt_create(struct realm *realm,
->   			    unsigned long addr,
->   			    int level,
-> @@ -1115,6 +1128,28 @@ static void kvm_complete_ripas_change(struct kvm_vcpu *vcpu)
->   	rec->run->exit.ripas_base = base;
->   }
->   
-> +static void kvm_rec_complete_psci(struct kvm_vcpu *vcpu)
-> +{
-> +	struct rec_run *run = vcpu->arch.rec.run;
-> +	unsigned long status = PSCI_RET_DENIED;
-> +	unsigned long ret = vcpu_get_reg(vcpu, 0);
-> +
-> +	switch (run->exit.gprs[0]) {
-> +	case PSCI_0_2_FN64_CPU_ON: {
-> +		if (ret != PSCI_RET_SUCCESS &&
-> +		    ret != PSCI_RET_ALREADY_ON)
-> +			status = PSCI_RET_DENIED;
-> +		else
-> +			status = PSCI_RET_SUCCESS;
-> +		break;
-> +	}
-> +	default:
-> +		return;
-> +	}
-> +
-> +	realm_psci_complete(vcpu, status);
-> +}
-> +
->   /*
->    * kvm_rec_pre_enter - Complete operations before entering a REC
->    *
-> @@ -1139,6 +1174,9 @@ int kvm_rec_pre_enter(struct kvm_vcpu *vcpu)
->   		for (int i = 0; i < REC_RUN_GPRS; i++)
->   			rec->run->enter.gprs[i] = vcpu_get_reg(vcpu, i);
->   		break;
-> +	case RMI_EXIT_PSCI:
-> +		kvm_rec_complete_psci(vcpu);
-> +		break;
->   	case RMI_EXIT_RIPAS_CHANGE:
->   		kvm_complete_ripas_change(vcpu);
->   		break;
+>  		if (test_thread_flag(TIF_SME)) {
+> -			unsigned long vq = sve_vq_from_vl(sme_vl);
+> -			sysreg_clear_set_s(SYS_SMCR_EL1, SMCR_ELx_LEN, vq - 1);
+> +			sysreg_cond_update_s(SYS_SMCR_EL1, task_smcr(current));
+> +			isb();
+>  		}
 
+What's the ISB for? That mysteriously appeared in v11 without
+explanation. It wasn't in the original code, prior versions of the
+series, or my suggested rework with the task_smcr() helper.
+
+I don't believe it's necessary to add an ISB here.
+
+Mark.
