@@ -1,137 +1,231 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 710E63BB126;
-	Thu, 16 Jul 2026 09:37:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58B89347FC8;
+	Thu, 16 Jul 2026 09:40:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784194651; cv=none; b=pCYDv+9WBWsGhKA9dKT6hiVgRPLN0mJFuT8uA2r1rQdF5D5KHv/lXkpQMv9lANNWFJvYw4nk7yqpkqSSdOHaDaZEPKjGkwxFkncB8lEB9W7avAB5IQqj7qaa+hyYdr5quBwdg5MheNPEgNiByzGUZd+jx5qgrflbugt+MVadowY=
+	t=1784194808; cv=none; b=tyA2F6CFVe2/UqyXSuKkKUl+npW1f/rxOAsuLLH4gps/yBELY8/y5XCQ60tePm//OCtkGjh/FtxrHVDp8jqNgayJ4GCgmXsXaM0ZroO7qH8CWRCezK2/M83l6n2jN9kRebewFROMvEGoZhXabzxvVow3bY6+7AlS+L7HL7rwZOc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784194651; c=relaxed/simple;
-	bh=GozKNxM+V0o39iZwsloK/FOhTaRmLabJa9h/vKm+xkU=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=q6oO1DhhyUcN1iCmPou3HaVdTfRypF6bBYN+vh8tPTSgguv+efqIImbT7nogaaQl/ZqCqiGuIzh1oysV+DOhOs6YQtKbQ2dp2qGCZhsdZj7A7f3qx2+Q5BhBaYxKpsKkyXz67ufIFg+52sArfUw6TTeYqqRjkHdUiHfhp8YfE/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bLOfCpsh; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784194808; c=relaxed/simple;
+	bh=Vi6PaAstGdOIpufYh/LJ8ZAHKFeYxPSyuWcCmxj80tU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NDFO/1iLvRdoAzLWHbExrXfc2Qka2Y/49Nn3QHEdVvMADvrqBvzryXpJN1SUFn7MvBXjuWKAD7i5JsxpDIIGbjVlgiNv5CTfY2DAvWQvc6ywYeHfAHAa7A9YKobYjEDyMlDd3IkPmFcJvs+qfHc0JI5Y093jJM3q3PdPPWWruGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=YBADHSsa; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bLOfCpsh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 000121F000E9;
-	Thu, 16 Jul 2026 09:37:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784194650;
-	bh=EPFwJ3WEuBcm2rx9cZEvteDwo2+iijOpn/63IcGELo4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=bLOfCpshJI9arPQk13D/3FzzjPN5KW7Lwe2sFGx9PbCCHlW5Nwh+GGSY1Y8/Vz+f/
-	 /aWunZGjzog0ejKw+sqk4c7Da/L/uOGrjrJKvnzNItOUdk3U7WAB0zSw2AD1q0IBu6
-	 s2Zr2R6l3yo9DPObKM5TmY18oKkz8dp3xEM/w3QK8V0Pw2I4ccPA4gtSHmnzXOzvoI
-	 0hZlaif37EuuKP/s4boMscRXhDaFJYMVCordJwTO2dLdiUaCTXoC9YUCE3bM83zM3S
-	 7MAlPtOKNqvPzT6t7jJf3NHdxPAmk0W8SMTiREEDaU/MzyiXlpVVDFSpn/u5v+dp2m
-	 OMeccACFs6rYA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wkIX1-00000005ccs-1RQq;
-	Thu, 16 Jul 2026 09:37:27 +0000
-Date: Thu, 16 Jul 2026 10:37:21 +0100
-Message-ID: <86fr1jff72.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org,	kvmarm@lists.linux.dev,	Catalin Marinas <catalin.marinas@arm.com>,	Will Deacon <will@kernel.org>,	James Morse <james.morse@arm.com>,	Oliver Upton <oliver.upton@linux.dev>,	Suzuki K Poulose <suzuki.poulose@arm.com>,	Zenghui Yu <yuzenghui@huawei.com>,	linux-arm-kernel@lists.infradead.org,	linux-kernel@vger.kernel.org,	Joey Gouly <joey.gouly@arm.com>,	Alexandru Elisei <alexandru.elisei@arm.com>,	Christoffer Dall <christoffer.dall@arm.com>,	Fuad Tabba <tabba@google.com>,	linux-coco@lists.linux.dev,	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,	Gavin Shan <gshan@redhat.com>,	Shanker Donthineni <sdonthineni@nvidia.com>,	Alper Gun <alpergun@google.com>,	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,	Emi Kisanuki <fj0570is@fujitsu.com>,	Vishal Annapurve <vannapurve@google.com>,	WeiLin.Chang@arm.com,	Lorenzo Pieralisi <lpieralisi@kernel.org>
-Subject: Re: [PATCH v15 09/37] KVM: arm64: CCA: Allow passing the machine type in KVM creation
-In-Reply-To: <9eb4e4c0-f1f6-4ab9-956a-0b233d1656c9@arm.com>
-References: <20260715142841.80544-1-steven.price@arm.com>
-	<20260715142841.80544-10-steven.price@arm.com>
-	<87zezs44cf.wl-maz@kernel.org>
-	<9eb4e4c0-f1f6-4ab9-956a-0b233d1656c9@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="YBADHSsa"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9B1EA2F;
+	Thu, 16 Jul 2026 02:40:01 -0700 (PDT)
+Received: from [10.2.197.99] (ewhatever.cambridge.arm.com [10.2.197.99])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 84A553F905;
+	Thu, 16 Jul 2026 02:40:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1784194805; bh=Vi6PaAstGdOIpufYh/LJ8ZAHKFeYxPSyuWcCmxj80tU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=YBADHSsaLQTJSLSfd9CnTRcz+PoCO0RyrYniil6H8Rrh4JnQa/qEd6pDSAOMGNWbK
+	 Rw9rWq+8ds7LsR+7L6M1XYCIhcbl/5la+JrM2c6sOzPxyyEwoxQ87T7nYSCJz4T/8C
+	 ch9M0uKM18j0jD87hhmO6CAcMsS/h2AkBvtNYoME=
+Message-ID: <807a34c3-6c29-473c-bcb2-0546c3df85a7@arm.com>
+Date: Thu, 16 Jul 2026 10:40:00 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com, aneesh.kumar@kernel.org, fj0570is@fujitsu.com, vannapurve@google.com, WeiLin.Chang@arm.com, lpieralisi@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v15 06/37] KVM: arm64: CCA: Define the user ABI
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
+ Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
+ Lorenzo Pieralisi <lpieralisi@kernel.org>
+References: <20260715142841.80544-1-steven.price@arm.com>
+ <20260715142841.80544-7-steven.price@arm.com>
+Content-Language: en-US
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20260715142841.80544-7-steven.price@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, 16 Jul 2026 10:17:21 +0100,
-Steven Price <steven.price@arm.com> wrote:
+On 15/07/2026 15:28, Steven Price wrote:
+> There is one CAP (KVM_CAP_ARM_RMI) which identifies the presence of CCA,
+> and one ioctl.  The ioctl (KVM_ARM_RMI_POPULATE) is used to populate
+> memory during creation of the realm as this requires the RMM to copy
+> data from an unprotected address to the protected memory - CCA does not
+> support shared <-> private memory conversion where the memory contents
+> is preserved as this is incompatible with memory encryption.
+
+May be we could add the above constraint to the Documentation to make it
+clear from the source. The code later adds this restriction and it would
+be good to reflect in the Documentation, given other CC architectures
+seem to provide it.
+
+
+Please see below.
+
 > 
-> On 15/07/2026 17:14, Marc Zyngier wrote:
-> > On Wed, 15 Jul 2026 15:28:11 +0100,
-> > Steven Price <steven.price@arm.com> wrote:
-> >>
-> >> Previously machine type was used purely for specifying the physical
-> >> address size of the guest. Reserve the higher bits to specify an ARM
-> >> specific machine type and declare a new type 'KVM_VM_TYPE_ARM_REALM'
-> >> used to create a realm guest.
-> >>
-> >> Signed-off-by: Steven Price <steven.price@arm.com>
-> >> ---
-> >> Changes since v13:
-> >>  * Rework to use the two top bits for the machine type now that pKVM has
-> >>    merged and used the top bit for KVM_VM_TYPE_ARM_PROTECTED.
-> >>  * Update the documentation to include KVM_VM_TYPE_ARM_PROTECTED as
-> >>    well.
-> >> Changes since v9:
-> >>  * Explictly set realm.state to REALM_STATE_NONE rather than rely on the
-> >>    zeroing of the structure.
-> >> Changes since v7:
-> >>  * Add some documentation explaining the new machine type.
-> >> Changes since v6:
-> >>  * Make the check for kvm_rme_is_available more visible and report an
-> >>    error code of -EPERM (instead of -EINVAL) to make it explicit that
-> >>    the kernel supports RME, but the platform doesn't.
-> >> ---
-> >>  Documentation/virt/kvm/api.rst | 18 ++++++++++++++++--
-> >>  arch/arm64/kvm/arm.c           | 11 +++++++++++
-> >>  include/uapi/linux/kvm.h       |  7 ++++++-
-> >>  3 files changed, 33 insertions(+), 3 deletions(-)
-> >>
-> >> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> >> index b38e090ad95d..e39d146b34a3 100644
-> >> --- a/Documentation/virt/kvm/api.rst
-> >> +++ b/Documentation/virt/kvm/api.rst
-> >> @@ -181,8 +181,22 @@ flag KVM_VM_MIPS_VZ.
-> >>  ARM64:
-> >>  ^^^^^^
-> >>  
-> >> -On arm64, the physical address size for a VM (IPA Size limit) is limited
-> >> -to 40bits by default. The limit can be configured if the host supports the
-> >> +On arm64, the machine type identifier is used to encode a type and the
-> >> +physical address size for the VM. The lower byte (bits[7-0]) encode the
-> >> +address size and the upper bits[30-31] encode a machine type. The machine
-> >> +types that might be available are:
-> >> +
-> >> + =========================   ============================================
-> >> + KVM_VM_TYPE_ARM_NORMAL      A standard VM
-> >> + KVM_VM_TYPE_ARM_REALM       A "Realm" VM using the Arm Confidential
-> >> +                             Compute extensions, the VM's memory is
-> >> +                             protected from the host.
-> >> + KVM_VM_TYPE_ARM_PROTECTED   A "protected" VM using pKVM to isolate the
-> >> +                             VM from the host.
-> >> + =========================   ============================================
-> >> +
-> > 
-> > Probably worth mentioning that REALM+PROTECTED is an illegal
-> > combination.
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+> Changes since v13:
+>   * KVM_ARM_VCPU_RMI_PSCI_COMPLETE removed.
+>   * KVM_ARM_RMI_POPULATE documentation updated to reflect that the
+>     structure is written by the kernel.
+>   * CAP number bumped.
+> Changes since v12:
+>   * Change KVM_ARM_RMI_POPULATE to update the structure with the amount
+>     that has been progressed rather than return the number of bytes
+>     populated.
+>   * Describe the flag KVM_ARM_RMI_POPULATE_FLAGS_MEASURE.
+>   * CAP number is bumped.
+>   * NOTE: The PSCI ioctl may be removed in a future spec release.
+> Changes since v11:
+>   * Completely reworked to be more implicit. Rather than having explicit
+>     CAP operations to progress the realm construction these operations
+>     are done when needed (on populating and on first vCPU run).
+>   * Populate and PSCI complete are promoted to proper ioctls.
+> Changes since v10:
+>   * Rename symbols from RME to RMI.
+> Changes since v9:
+>   * Improvements to documentation.
+>   * Bump the magic number for KVM_CAP_ARM_RME to avoid conflicts.
+> Changes since v8:
+>   * Minor improvements to documentation following review.
+>   * Bump the magic numbers to avoid conflicts.
+> Changes since v7:
+>   * Add documentation of new ioctls
+>   * Bump the magic numbers to avoid conflicts
+> Changes since v6:
+>   * Rename some of the symbols to make their usage clearer and avoid
+>     repetition.
+> Changes from v5:
+>   * Actually expose the new VCPU capability (KVM_ARM_VCPU_REC) by bumping
+>     KVM_VCPU_MAX_FEATURES - note this also exposes KVM_ARM_VCPU_HAS_EL2!
+> ---
+>   Documentation/virt/kvm/api.rst | 41 ++++++++++++++++++++++++++++++++++
+>   include/uapi/linux/kvm.h       | 13 +++++++++++
+>   2 files changed, 54 insertions(+)
 > 
-> The original intention was that these were enum values not separate bit
-> fields. Having to adapt to the pKVM changes when they were merged has
-> somewhat messed this up. I'll add a clarification, but hopefully we
-> haven't actually burnt the combination in case we have a 4th type in the
-> future.
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 304b9c3209ae..b38e090ad95d 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -6642,6 +6642,38 @@ if the guest_memfd memory was pinned in IOMMU page tables.
+>   
+>   See also: :ref: `KVM_SET_MEMORY_ATTRIBUTES`.
+>   
+> +4.146 KVM_ARM_RMI_POPULATE
+> +--------------------------
+> +
+> +:Capability: KVM_CAP_ARM_RMI
+> +:Architectures: arm64
+> +:Type: vm ioctl
+> +:Parameters: struct kvm_arm_rmi_populate (in/out)
+> +:Returns: 0 on success, < 0 on error
+> +
+> +::
+> +
+> +  struct kvm_arm_rmi_populate {
+> +	__u64 base;
+> +	__u64 size;
+> +	__u64 source_uaddr;
+> +	__u32 flags;
+> +	__u32 reserved;
+> +  };
+> +
+> +Populate a region of protected address space by copying the data from the
+> +(non-protected) user space pointer provided into a protected region (backed by
+> +guestmem_fd). It implicitly sets the destination region to RIPAS RAM. This is
 
-A good way to avoid ambiguity would be to list the actual values for
-the [31:30] field (0b00, 0b01, 0b10).
+minor nit: RIPAS_RAM for the sake of completeness. Also, I am wondering 
+if this could confuse the reader to imply that the UABI implicitly
+converts the region in guest_memfd to "PRIVATE". May be we could rewrite
+this to make all the preconditions explicit ? Something like:
 
-Thanks,
+"
+Populate the guest address region described by @base and @size, with the
+data pointed to by the userspace pointer @source_uaddr. The guest_memfd
+region backing the memory region must be PRIVATE. Arm CCA cannot
+do in-place conversion, preserving the contents. Thus @source_uaddr must
+be a valid pointer. This operation maps to RMI_RTT_DATA_INIT which also
+converts the region to RIPAS_RAM.
 
-	M.
+"
 
--- 
-Without deviation from the norm, progress is not possible.
+
+Suzuki
+
+
+> +only valid before any VCPUs have been run. The ioctl might not populate the
+> +entire region and in this case the kernel updates the fields `base`, `size` and
+> +`source_uaddr`. User space may have to repeatedly call it until `size` is 0 to
+> +populate the entire region.
+
+
+
+> +
+> +`flags` can be set to `KVM_ARM_RMI_POPULATE_FLAGS_MEASURE` to request that the
+> +populated data is hashed and added to the guest's Realm Initial Measurement
+> +(RIM) stored by the RMM. This can then be retrieved by the guest (using the RSI
+> +interface) to present to an attestation server.
+> +
+>   .. _kvm_run:
+>   
+>   5. The kvm_run structure
+> @@ -9025,6 +9057,15 @@ enabled, cmma can't be enabled anymore and pfmfi and the storage key
+>   interpretation are disabled. If cmma has already been enabled or the
+>   hpage_2g module parameter is not set to 1, -EINVAL is returned.
+>   
+> +7.48 KVM_CAP_ARM_RMI
+> +--------------------
+> +
+> +:Architectures: arm64
+> +:Target: VM
+> +:Parameters: None
+> +
+> +This capability indicates that support for CCA realms is available.
+> +
+>   8. Other capabilities.
+>   ======================
+>   
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 129d6f630325..0231ff174a50 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -998,6 +998,7 @@ struct kvm_enable_cap {
+>   #define KVM_CAP_S390_VSIE_ESAMODE 248
+>   #define KVM_CAP_S390_HPAGE_2G 249
+>   #define KVM_CAP_GUEST_MEMFD_MEMORY_ATTRIBUTES 250
+> +#define KVM_CAP_ARM_RMI 251
+>   
+>   struct kvm_irq_routing_irqchip {
+>   	__u32 irqchip;
+> @@ -1686,4 +1687,16 @@ struct kvm_pre_fault_memory {
+>   	__u64 padding[5];
+>   };
+>   
+> +/* Available with KVM_CAP_ARM_RMI, only for VMs with KVM_VM_TYPE_ARM_REALM */
+> +#define KVM_ARM_RMI_POPULATE	_IOWR(KVMIO, 0xd7, struct kvm_arm_rmi_populate)
+> +#define KVM_ARM_RMI_POPULATE_FLAGS_MEASURE	(1 << 0)
+> +
+> +struct kvm_arm_rmi_populate {
+> +	__u64 base;
+> +	__u64 size;
+> +	__u64 source_uaddr;
+> +	__u32 flags;
+> +	__u32 reserved;
+> +};
+> +
+>   #endif /* __LINUX_KVM_H */
+
