@@ -1,95 +1,106 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 185ED3BCD01;
-	Thu, 16 Jul 2026 07:39:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64A983E025C;
+	Thu, 16 Jul 2026 08:36:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784187558; cv=none; b=OnjqwNB+bln0bFcTlRwh2Ev/csI2LSuWKqsBJJvpQkDr5NMJP/ZqEPonj3HiTs07TleYug0s7Qhi6iBwUyybMMGjDwF1vHcDB+uEZxfbN+3HYhVsFf1nrTagPNsgFzvfDG3k4CXNqDnspAICyTz4ob2ozhyI++3dh+odpp2prew=
+	t=1784190996; cv=none; b=Wvli8SMPJ3LAhAdTTxKCbS8VBV7Tctox9Q9+Iawqr4I7cY1HZaFZmM9CJKB6yjAhZ2sCYe03CMyAMYzbvwGRXQMJOPv7YD06Y5ezqRDTaj8ZeDd8uhG3uP0dSq9NBxKcmWJgwqtxV4P6JKcmElko0n2Ttr9wccgPjv2ruyO0Dks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784187558; c=relaxed/simple;
-	bh=Np5vro/iaKpCDRoTmTN0z2nXvU3o+YX83+k/D/xhD9c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZfY3StGnSZRiqGq5QJ7T/YWM7Lt0oDlUzwKI43dTZAbG0UeBj8eZbb5eN0zF6A/1ByKLO4osi9juZ38/SztKMPGa5HZzmsIbAIU9LFLVB1BDYA0NDctPWn3BnZMoWMva5MTtGynlGohWzzDszm5q98WIrAim3RNibLDYKIoBWuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hO/BIT9l; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784190996; c=relaxed/simple;
+	bh=Ip/KPnE+Go/LuYq8OBVKex5N5LWziQG4Yt9I3sjVWMI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=u2/cDMAncji3ZeRwmrVtvwzMwttDlFRAfu7ytCQD5wzqSwf9ZUpDEvQYmFC6rMIXFX43KwoURId9Z9yzBZDVDbshpxzjuu5BcUrnxwthPMKDBj3baUnSoR+ysQ67bJx5sxPQsc9w65rPveL3mFfqZYg0OOZn4edCTA5OeeROkv0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Au26i0us; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hO/BIT9l"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FD321F00A3A;
-	Thu, 16 Jul 2026 07:39:16 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Au26i0us"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4717F1F000E9;
+	Thu, 16 Jul 2026 08:36:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784187556;
-	bh=malUCnvO8ek8Kt+Gg1lNXeMv1KHUcTELIq/XhwfI6sg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=hO/BIT9ln2bUAPkNbyvzxxux7ErFAgTUvcalcKpl5Jaf+VQYiVFJMug5EX3x8Bqc2
-	 S4U7rwqfVZmmDD2NmfZ/vJVLSZOVa6ASiCBGIma65ebcTMNqGIl959cmGtsobnmYGO
-	 s1xSxQRZv56yqAwUlyV8vZPK7tlE5UhGYqmKl6f7o1+7k0JahWCyC3DUNHhmnkYIwN
-	 zkyGSLvfliQQfKz+IhioE/uCXL21tndw4re04pxz0HUIomjL9BZhcP5DaONo76hN+H
-	 sYnyphfPKqhyi2s9T7mptMyC4kPKF/xNSxFVnr6v1mUMLMHDD87mv65Xn9dB96zc8s
-	 YmAfeXShj9fZw==
-Date: Thu, 16 Jul 2026 00:39:15 -0700
-From: Oliver Upton <oupton@kernel.org>
-To: Tian Zheng <zhengtian10@huawei.com>
-Cc: maz@kernel.org, catalin.marinas@arm.com, will@kernel.org,
-	yuzenghui@huawei.com, wangzhou1@hisilicon.com,
-	yangjinqian1@huawei.com, caijian11@h-partners.com,
-	liuyonglong@huawei.com, yezhenyu2@huawei.com, yubihong@huawei.com,
-	linuxarm@huawei.com, joey.gouly@arm.com, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, seiden@linux.ibm.com,
-	suzuki.poulose@arm.com, leo.bras@arm.com
-Subject: Re: [PATCH v4 3/6] KVM: arm64: Add auto DBM support for hardware
- dirty tracking
-Message-ID: <aliKo7dTZzKcWHzI@kernel.org>
-References: <20260709104026.2612599-1-zhengtian10@huawei.com>
- <20260709104026.2612599-4-zhengtian10@huawei.com>
+	s=k20260515; t=1784190995;
+	bh=V8QPTigTcCC4UZr+acj1ZYLdorlKdGn8i+G4wCG9sso=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=Au26i0us2sYQaroQUjDyPJSDZsHl32dMOiqnb0Hpy4twDI32a+hp96+lQuL83G8SM
+	 IHAHRZSA3LPXHf4AUAe118dY/cuOpJiSSXMCHnX7DN1vG9ojE++4zSjp8/7OlzwwUU
+	 f/X2wF2tbLy90a8noT7WM/DRJZqR1F3eYBH9SdoTu76IOhUCnTjTncNZQ8NLvTQahx
+	 B4qVoEFHdoOdKAy2e+MqPdizZndaDGGXk6dUiDxIP1jWwux/pqZO90KMWgXiY3qJaO
+	 xsi5NAJDLFQmk7FoH7ZR9OYl+xokh8+zPNt33+Muo02oODb5lSAE4XZEkRTJpWH8L7
+	 vaeQARGCzhx1g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wkHa4-00000005b7P-3HoW;
+	Thu, 16 Jul 2026 08:36:32 +0000
+Date: Thu, 16 Jul 2026 09:36:32 +0100
+Message-ID: <868q7bnxf3.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+	Emi Kisanuki <fj0570is@fujitsu.com>,
+	Vishal Annapurve <vannapurve@google.com>,
+	WeiLin.Chang@arm.com,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>
+Subject: Re: [PATCH v15 00/37] arm64: Support for Arm CCA in KVM
+In-Reply-To: <20260715142841.80544-1-steven.price@arm.com>
+References: <20260715142841.80544-1-steven.price@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260709104026.2612599-4-zhengtian10@huawei.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com, aneesh.kumar@kernel.org, fj0570is@fujitsu.com, vannapurve@google.com, WeiLin.Chang@arm.com, lpieralisi@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Tian,
-
-On Thu, Jul 09, 2026 at 06:40:23PM +0800, Tian Zheng wrote:
-> -	if (prot & KVM_PGTABLE_PROT_W)
-> +	if (prot & KVM_PGTABLE_PROT_W) {
->  		set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
+On Wed, 15 Jul 2026 15:28:02 +0100,
+Steven Price <steven.price@arm.com> wrote:
 > 
-> +		/*
-> +		 * No DEVICE filter needed here: relax_perms is only called
-> +		 * on FSC_PERM faults. Device pages always get full RW from
-> +		 * initial mapping and are never write-protected during
-> +		 * migration, so they never trigger a permission fault.
-> +		 */
-> +		if (pgt->flags & KVM_PGTABLE_S2_DBM)
-> +			set |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
-> +	} else {
-> +		/*
-> +		 * Clear DBM on W→RO downgrade to prevent hardware from
-> +		 * silently upgrading RO+DBM back to W+dirty, which would
-> +		 * bypass KVM's write tracking and cause data corruption.
-> +		 */
-> +		clr |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
-> +	}
-> +
+> This series adds support for running protected VMs using KVM under the
+> Arm Confidential Compute Architecture (CCA).
+> 
+> It is the second part of the Arm CCA host support that was previously
+> posted as a single 44-patch series. The generic firmware/RMM support has
+> now been split into a separate 6-patch base series[0] so that it can also be
+> used by other work (and hopefully make reviewing a little easier). This
+> series applies on top of that base.
 
-This block makes it pretty evident that the DBM bit really *is* the
-write permission bit. I'd much rather we introduce the concept of dirty
-state to the page table library and migrate the abstract write
-permission to the DBM field, even if we don't have FEAT_HAFDBS.
+Splitting the series this way means that no Sashiko review can occur,
+as nothing applies on its own:
 
-That way everything 'just works' from outside the page-table library:
-write-protecting hugepages would have the effect of clearing DBM and we
-can separately reap dirty state from page descriptors.
+https://sashiko.dev/#/patchset/20260715142841.80544-1-steven.price%40arm.com
 
-If/when the architecture forces FEAT_S2PIE upon us we will need to make
-this change anyway since dirty state management is unconditional and
-handled separately from the actual permissions.
+In the future, please post this with the relevant patches as an
+integral prefix, so that we can make use of the tooling.
 
 Thanks,
-Oliver
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
