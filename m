@@ -1,128 +1,260 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1A3442D744
-	for <kvmarm@lists.linux.dev>; Thu, 16 Jul 2026 14:26:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB2A941C302
+	for <kvmarm@lists.linux.dev>; Thu, 16 Jul 2026 14:27:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784212005; cv=none; b=nx1pgR1MC0OokIN3cCPotwv6Zwr1KH9ztuR+GmNJ65BkuRQ9sdNTjnnXynAFwNAIlyZrbA8rjYGqCOk310HShsGSACEOyYdJmZaxHpeTQCLJaA0Zzt3d33bcwegROBIpmdO0JgFLoXp3t8cpUNbMm1xjIxgioq1CleAoA9wlxj4=
+	t=1784212074; cv=none; b=r4e1yTDS6tlNfBwKfIE4obupLTcdXEG8Baki85hoYli4i4cTTAPE8L8MC3dxG3s0A5uuSWDVS4eEEvGaUvYC9SXrJ4A+bDoo3OtStnzGiDeFKUbZ0hxULbSD3wjqmojgAcR/nnolrjsm8MJNInhRdaHBCTKWfGbVXo/b3u9PxGM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784212005; c=relaxed/simple;
-	bh=id26l5uZn9xXjo+hd39v9p+tPQ6cugZMHPboE37WPwo=;
+	s=arc-20240116; t=1784212074; c=relaxed/simple;
+	bh=6VqUZxTx9zaOtQy0slpmIRT8TR+P/UTwN1Nn9CtRuDI=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=lskMCWwqy1slYb3w0yZ9A/QaFlqPx/oNy7cBCUd3ir8yNV11ujNS9AJ6NFINlHkrjW/pBnidM48k42aUyd1i5qJ0jDsljqs0RgCDxsQS0yAesamc/9tgzKqezNcELrIsspAh2FVNyO1TNEi+MKUbUNBFZ75UI8YB9Ev9SuuwzmA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g4g+rzQu; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=mAaJoti2is/pLmDqF/CfX8lwQQVWbMoa+FI7vCSuQmJXNNh17t45EN/+bTZSs5vDCtCS+8MMymRhAf0nEYanPI6knkFHFoEA4i2kr7ybowCTAd0x2ga0ZwRFZm2nHM9DwK8TUbGEyeqhlfDdHgLi0Rqo0AGBO4d8v9nh9zvBYDQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=okTUiuGZ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g4g+rzQu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F2D01F00A3A;
-	Thu, 16 Jul 2026 14:26:44 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="okTUiuGZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 899751F000E9;
+	Thu, 16 Jul 2026 14:27:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784212004;
-	bh=WFZSMnIAK/XMRcMmMf18WtcrXo81ELPyzU8KOvY/Z30=;
+	s=k20260515; t=1784212072;
+	bh=aXlLW2xSlzq1hIORezA/X6FmXzS1sQncfhpKr01n8b0=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=g4g+rzQuD6NihoEGJv8xjiqscSCqL/+t5dDzPMixWtzM+Yf0dP2uByAMvdMGUV7+/
-	 42a2kcMMYK3lGh9JnxBnoa01lAO+TB6ickFcyj7GaMlp4JcnaiFBSYOzuyi0sJvv/6
-	 E70D9L7SF2G7rkypKQzfhfkP12gKwjz0o5/eLIj3vCKgJtHjQbw8R4WP+BOH3dR9iz
-	 jrKe1tYrpWIzoXZ6V2cvCF8fLzsyIAM0RTwdbAOWkA3LD770BFS0XnBRf/5Kapomn2
-	 Zik18f7ZeFxNyONK3/Y1DGXVbZC5nrQEkHEiIVdH5J5kLSdzwYx0Kmsh25JfCUAvJ0
-	 7Yki59QSiopGQ==
+	b=okTUiuGZLJos3dmQZ73sPHWXJOLQyYHqXJkABLYnwBryNAaKJdj5oQ6W0XwZVgpqm
+	 QiiJNolGyEnVCTPeN2UyUD/9P7APF1kRGD/a37P8jnj9rBRXUEJzHxR8FDyQRRCzGG
+	 JgHYDVekKCkV2wkN36NlhXzJrqeRsKpGLUmXfgtmfzcW0g5oJ52VkjP5xe3IFFsgw3
+	 skvzgzbY1WDYnX5pP3f2GPBi+PA1Gv8iOYioTjlgf5mgRcNWy6k2MU57twnzvAx2yv
+	 BmDGzNFFEkCY4dPfCWeFv95UJ91Ma8kLvRXbeH6Q4XCnHOge9ejhkr+Tjs5V1f4zVc
+	 Hx/XFhWLEElkw==
 From: sashiko-bot@kernel.org
-Subject: Re: [RFC PATCH 2/5] KVM: arm64: Split hyp mapping APIs by address
- type
+Subject: Re: [RFC PATCH 5/5] KVM: arm64: Use TTBR1_EL2 for hVHE runtime
+ mappings
 Reply-To: sashiko-reviews@lists.linux.dev
 To: =?utf-8?b?QW5lZXNoIEt1bWFyIEsuViAoQXJtKQ==?= <aneesh.kumar@kernel.org>
 Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
  Zyngier" <maz@kernel.org>
-In-Reply-To: <20260716140936.4003182-3-aneesh.kumar@kernel.org>
+In-Reply-To: <20260716140936.4003182-6-aneesh.kumar@kernel.org>
 References: <20260716140936.4003182-1-aneesh.kumar@kernel.org>
- <20260716140936.4003182-3-aneesh.kumar@kernel.org>
+ <20260716140936.4003182-6-aneesh.kumar@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 16 Jul 2026 14:26:43 +0000
-Message-Id: <20260716142644.2F2D01F00A3A@smtp.kernel.org>
+Date: Thu, 16 Jul 2026 14:27:52 +0000
+Message-Id: <20260716142752.899751F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+Thank you for your contribution! Sashiko AI review found 4 potential issue(=
 s) to consider:
-
-Pre-existing issues:
-- [High] This problem wasn't introduced by this patch, but it remains prese=
-nt: Treating EL2 page table allocation failure as fatal by wrapping `pkvm_c=
-reate_linear_mappings_locked()` in `WARN_ON()`. This converts a recoverable=
- `-ENOMEM` condition into a fatal hypervisor panic.
+- [High] Spectre V3A vector hardening branch synthesis truncates TTBR1 cano=
+nical addresses, leading to a fatal EL2 Instruction Abort.
+- [High] Writes to control-plane system registers (`SYS_TTBR1_EL2`) are not=
+ immediately followed by an `isb()` instruction.
+- [Medium] The error-handling branches following `WARN_ON` at EL2 are dead =
+code, as `WARN_ON` expands to a fatal `BRK` instruction.
+- [Medium] Unvalidated software feature override leads to fatal hVHE layout=
+ mismatch on unsupported hardware.
 --
 
---- Patch [2]: [RFC PATCH 2/5] KVM: arm64: Split hyp mapping APIs by addres=
-s type ---
-commit 7eb3ee309a427de1a370d3d0ea72c38646079ff1
+--- Patch [5]: [RFC PATCH 5/5] KVM: arm64: Use TTBR1_EL2 for hVHE runtime m=
+appings ---
+commit c5a5f8a98b4a3d3fc85945a12a0935f8530f85d7
 Author: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
 
-KVM: arm64: Split hyp mapping APIs by address type
+KVM: arm64: Use TTBR1_EL2 for hVHE runtime mappings
 
-This commit replaces create_hyp_mappings() and pkvm_create_mappings()
-with explicit symbol and linear-map interfaces to distinguish between
-kernel-image symbols and linear-map addresses. It updates all callers
-to use the appropriate interface for the address type they provide.
+This patch updates hVHE to place runtime mappings in TTBR1_EL2 and reserves
+TTBR0_EL2 for the identity mapping used during MMU transitions. It introduc=
+es
+support for walking canonical TTBR1 hyp page tables while retaining the
+existing TTBR0-only layout for nVHE.
 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/n=
-vhe/mem_protect.c
-> index 4e329e39a695a..7f815345d6a56 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> @@ -1109,7 +1109,7 @@ int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages)
->  		goto unlock;
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kv=
+m_mmu.h
+> index bcc8e28985f70..30ac5cecaa93b 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -112,13 +113,28 @@ void kvm_compute_layout(void);
+>  u32 kvm_hyp_va_bits(void);
+>  void kvm_apply_hyp_relocations(void);
 > =20
->  	__hyp_set_page_state_range(phys, size, PKVM_PAGE_OWNED);
-> -	WARN_ON(pkvm_create_mappings_locked(virt, virt + size, PAGE_HYP));
-> +	WARN_ON(pkvm_create_linear_mappings_locked(virt, virt + size, PAGE_HYP)=
-);
+> +static __always_inline bool kvm_hyp_init_uses_ttbr1(void)
+> +{
+> +	BUILD_BUG_ON(__is_defined(__KVM_NVHE_HYPERVISOR__));
+> +
+> +	return arm64_test_sw_feature_override(ARM64_SW_FEATURE_OVERRIDE_HVHE);
+> +}
 
-[Severity: High]
-This is a pre-existing issue, but wrapping pkvm_create_linear_mappings_lock=
-ed()
-in a WARN_ON() in __pkvm_host_donate_hyp() converts a legitimate EL2 page t=
-able
-allocation failure into a fatal hypervisor panic. At EL2, WARN_ON() expands=
- to
-BRK, taking down the host. Because userspace processes can exhaust the EL2
-memory pool by triggering operations like host memory donation, could this
-panic be used for a host denial-of-service attack?
+[Severity: Medium]
+Will this lead to a fatal hVHE layout mismatch on hardware that does not
+support VHE?
+
+If a user specifies the arm64.sw_feature_override=3Dhvhe command-line param=
+eter
+on an unsupported CPU, early initialization will use the TTBR1 layout based=
+ on
+this override. However, the final CPU capabilities check in
+kvm_hyp_uses_ttbr1() evaluates to false, causing a desynchronization between
+early-boot and runtime page table layouts.
 
 [ ... ]
 
-> @@ -1175,12 +1175,18 @@ int hyp_pin_shared_mem(void *from, void *to)
->  		goto unlock;
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe=
+/hyp-init.S
+> index 89cb553be1e55..07fc29c34fb36 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> @@ -127,13 +127,22 @@ SYM_CODE_START_LOCAL(___kvm_hyp_init)
+>  	ldr	x1, [x0, #NVHE_INIT_VTCR]
+>  	msr	vtcr_el2, x1
 > =20
->  	for (cur =3D start; cur < end; cur +=3D PAGE_SIZE) {
-> +		void *addr =3D (void *)cur;
+> -	ldr	x1, [x0, #NVHE_INIT_PGD_PA]
+> +	ldr	x1, [x0, #NVHE_INIT_TTBR0_PGD_PA]
+>  	phys_to_ttbr x2, x1
+>  alternative_if ARM64_HAS_CNP
+>  	orr	x2, x2, #TTBRx_EL1_CnP
+>  alternative_else_nop_endif
+>  	msr	ttbr0_el2, x2
+> =20
+> +	ldr	x1, [x0, #NVHE_INIT_TTBR1_PGD_PA]
+> +	cbz	x1, 2f
+> +	phys_to_ttbr x2, x1
+> +alternative_if ARM64_HAS_CNP
+> +	orr	x2, x2, #TTBRx_EL1_CnP
+> +alternative_else_nop_endif
+> +	msr_s	SYS_TTBR1_EL2, x2
+> +2:
 > +
->  		p =3D hyp_virt_to_page(cur);
->  		hyp_page_ref_inc(p);
-> -		if (p->refcount =3D=3D 1)
-> -			WARN_ON(pkvm_create_mappings_locked((void *)cur,
-> -							    (void *)cur + PAGE_SIZE,
-> -							    PAGE_HYP));
-> +		if (p->refcount =3D=3D 1) {
-> +			int err;
-> +
-> +			err =3D pkvm_create_linear_mappings_locked(addr,
-> +								 addr + PAGE_SIZE,
-> +								 PAGE_HYP);
-> +			WARN_ON(err);
+>  	ldr	x0, [x0, #NVHE_INIT_TCR_EL2]
+>  	msr	tcr_el2, x0
 
 [Severity: High]
-This isn't a bug introduced by this patch, but similar to the above, wrappi=
-ng
-pkvm_create_linear_mappings_locked() in WARN_ON() in hyp_pin_shared_mem()
-treats a legitimate -ENOMEM condition as fatal. If the EL2 buddy allocator
-fails when allocating new page table pages, should this path instead return
-the error and gracefully fail the hypercall rather than crashing the
-hypervisor?
+Does the write to SYS_TTBR1_EL2 require an immediate isb?
+
+Subsystem architectural invariants require every write to a control-plane
+system register to be followed by an isb as the very next instruction. Since
+it is delayed here behind register loads and another msr, intervening
+instructions might execute against an undefined pipeline state.
+
+[ ... ]
+
+> @@ -284,14 +295,22 @@ alternative_if ARM64_HAS_CNP
+>  alternative_else_nop_endif
+>  	msr	ttbr0_el2, x5
+> =20
+> +	cbz	x1, 1f
+> +	phys_to_ttbr x5, x1
+> +alternative_if ARM64_HAS_CNP
+> +	orr	x5, x5, #TTBRx_EL1_CnP
+> +alternative_else_nop_endif
+> +	msr_s	SYS_TTBR1_EL2, x5
+> +1:
+> +
+>  	/* Set the new stack pointer */
+> -	mov	sp, x1
+> +	mov	sp, x2
+> =20
+>  	/* And turn the MMU back on! */
+>  	dsb	nsh
+>  	isb
+
+[Severity: High]
+Could the lack of an immediate isb after msr_s SYS_TTBR1_EL2 cause
+unpredictable behavior here as well?
+
+The isb is placed after the stack pointer assignment and dsb, which leaves a
+window where instructions execute against an undefined pipeline state.
+
+[ ... ]
+
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mm.c b/arch/arm64/kvm/hyp/nvhe/mm.c
+> index 3233a7c70f7ca..c856b2399960c 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mm.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mm.c
+> @@ -431,6 +432,22 @@ int hyp_create_fixmap(void)
+>  	return create_fixblock();
+>  }
+> =20
+> +static int pkvm_map_idmap_text(unsigned long start, unsigned long end)
+> +{
+> +	unsigned long idmap_start, idmap_end;
+> +
+> +	idmap_start =3D __hyp_symbol_pa(__hyp_idmap_text_start);
+> +	idmap_start =3D ALIGN_DOWN(idmap_start, PAGE_SIZE);
+> +	idmap_end =3D __hyp_symbol_pa(__hyp_idmap_text_end);
+> +	idmap_end =3D ALIGN(idmap_end, PAGE_SIZE);
+> +
+> +	if (WARN_ON(start !=3D idmap_start || end !=3D idmap_end))
+> +		return -EINVAL;
+
+[Severity: Medium]
+Is the error-handling branch following this WARN_ON dead code?
+
+At EL2 in nVHE/pKVM, WARN_ON expands to a fatal BRK instruction which is
+caught by the hypervisor panic handler. The subsystem does not support
+warn-and-return semantics, meaning the return -EINVAL will never execute.
+
+[ ... ]
+
+> diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/se=
+tup.c
+> index 2ef1972cc3ddc..45b8f7213e396 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/setup.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+> @@ -371,8 +394,12 @@ int __pkvm_init(phys_addr_t phys, unsigned long size=
+, unsigned long *per_cpu_bas
+> =20
+>  	/* Jump in the idmap page to switch to the new page-tables */
+>  	params =3D this_cpu_ptr(&kvm_init_params);
+> +	if (WARN_ON(!pkvm_init_ttbrs_valid(params)))
+> +		return -EINVAL;
+> +
+
+[Severity: Medium]
+Similarly here, is this return -EINVAL unreachable?
+
+The WARN_ON will trigger a hypervisor panic, so the recovery path cannot be
+executed.
+
+[ ... ]
+
+> diff --git a/arch/arm64/kvm/va_layout.c b/arch/arm64/kvm/va_layout.c
+> index 75a89ad8fecfe..1e1816995fe4f 100644
+> --- a/arch/arm64/kvm/va_layout.c
+> +++ b/arch/arm64/kvm/va_layout.c
+> @@ -225,7 +247,7 @@ void kvm_patch_vector_branch(struct alt_instr *alt,
+>  	/*
+>  	 * Compute HYP VA by using the same computation as kern_hyp_va()
+>  	 */
+> -	addr =3D __early_kern_hyp_va((u64)kvm_hyp_kimg_kaddr(__kvm_hyp_vector));
+> +	addr =3D __early_kern_sym_hyp_va(__kvm_hyp_vector);
+> =20
+>  	/* Use PC[10:7] to branch to the same vector in KVM */
+>  	addr |=3D ((u64)origptr & GENMASK_ULL(10, 7));
+
+[Severity: High]
+Does the Spectre V3A vector hardening branch synthesis truncate TTBR1
+canonical addresses?
+
+The AARCH64_INSN_MOVEWIDE_ZERO instruction generated below clears bits 16-63
+to zero:
+
+    insn =3D aarch64_insn_gen_movewide(AARCH64_INSN_REG_0,
+                                     (u16)addr,
+                                     0,
+                                     AARCH64_INSN_VARIANT_64BIT,
+                                     AARCH64_INSN_MOVEWIDE_ZERO);
+    *updptr++ =3D cpu_to_le32(insn);
+
+This branch synthesis relies on a TTBR0 address format. Since a TTBR1 addre=
+ss
+requires bits 48-63 to be set to 1, the address becomes corrupted. When the
+hypervisor exits to the host, this truncated address could lead to a fatal =
+EL2
+Instruction Abort.
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260716140936.4003=
-182-1-aneesh.kumar@kernel.org?part=3D2
+182-1-aneesh.kumar@kernel.org?part=3D5
