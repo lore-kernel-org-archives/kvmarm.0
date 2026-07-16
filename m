@@ -1,123 +1,130 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DB763CF207;
-	Thu, 16 Jul 2026 09:42:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 469B940A92D;
+	Thu, 16 Jul 2026 10:19:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784194961; cv=none; b=l50e4i3un03KRXjTfhI+Q5j5FttXTEMGdb2j6iTBLTx+qTuS9vRtH794/8DxgpyyltOtP9GOykf0JjC8eNzgzzwRgsZ6KbdWkrhBjPNe6suReP9EUoa4KMqGDMFANsC5kXy1D9q1YXsHzGuyuICQJ12JX2h1OxNI2VZ3yWfdjBI=
+	t=1784197187; cv=none; b=RsFXfAxgXKNYHBwGtQCe2G1Dy4xJ/Og2PyRARoqzHJvUoIBWfm+o8MPPA2+6liHNMaAECyA9jPTt2+hTXg29gEJJzjVP8kzWNZyV9H+6NJXQxnF5H7dbtng+3SwLhHY0csWXQV6CFhCUxfTuFoWIXAiGNPNUdEuOFocE73g9xxU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784194961; c=relaxed/simple;
-	bh=lDsA2o0CiYcDtc0UdSTPL7Rg7ox1QEr/Ll9MILNoBDE=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GvYGkzfWg5im/VUSaW1jzbzSVUQe46xyNQGzOtwSCuOszzlyLiTDElZiXAMGU7PUXvddO8h8fjQW8iT3V6FkAvLYf+kCaMkGlUFPWo4TrFC3KLp9VkWZUnIz7KuAdjgbolrNuBXjwKjUzSVOzeCnFCpUIUM8Qt/ms4Wr5sfo9LY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mbw8oxH8; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784197187; c=relaxed/simple;
+	bh=3WOmSOJUE6+XMbdwY5Q6POKB6yIL5s1FNm2WoXf4Wfg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gOofZieFQNNAjHfVFBp33UAo4svvLTkzosMIjAzYWb1iOm2Edgs+D/TQEfyfta3xsOlKUyGkkBrCNAajTw7lPQ/jghZytiY9lIVLS7IwmFfEABcIoXGScwjOHdgqC5H1jgcMotxPprMTsEYP8rZoq0YssBAmVhv82N3n1eh3du4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=NFjy308A; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mbw8oxH8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 626D31F00A3A;
-	Thu, 16 Jul 2026 09:42:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784194957;
-	bh=yi0EepmVgk/ZSGOBm4X0BGSIEyfZ6GxmDiTXsDw96Hw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=mbw8oxH81x13vyIH3ecHa6vW/B7UnUhZ/q0XVerAaTTPlpoKH70NoCAR0K5Wk43dy
-	 jC/hDuCPFTbnhfvwsmUAtIdUwKw/RyxKNZhJcYXWEmZCT6eyfYxMLYalt/IqbfpqIY
-	 29FKVActwiLPjTkBIbflcOlmYg9KYQ7AcK71/Gr0QK48T0Qow3mAExMi9z4ngnnQRl
-	 nbBxQ9OOvP0P2I/gpTXDxX8ZowHSRJZ0FHJdAbTVfLso9OIWL2aEToTADUVuifwL0L
-	 elOqpTUHc1v2sXPhR0FcjDu6d/STxFhloDRHZhhZdMDe6b2AEJrCWQpoVT7UmVBVNF
-	 Mhy5Wqgqm1Jmg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wkIbz-00000005cn6-1GgE;
-	Thu, 16 Jul 2026 09:42:35 +0000
-Date: Thu, 16 Jul 2026 10:42:34 +0100
-Message-ID: <86ech3feyd.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu
- <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>,
-	"Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>,
-	Emi Kisanuki <fj0570is@fujitsu.com>,
-	Vishal Annapurve <vannapurve@google.com>,
-	WeiLin.Chang@arm.com,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>
-Subject: Re: [PATCH v15 00/37] arm64: Support for Arm CCA in KVM
-In-Reply-To: <2aba2dc2-eac5-474f-9bed-af2cb3003136@arm.com>
-References: <20260715142841.80544-1-steven.price@arm.com>
-	<868q7bnxf3.wl-maz@kernel.org>
-	<2aba2dc2-eac5-474f-9bed-af2cb3003136@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="NFjy308A"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 40AF12F;
+	Thu, 16 Jul 2026 03:19:40 -0700 (PDT)
+Received: from [10.2.197.99] (ewhatever.cambridge.arm.com [10.2.197.99])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1E8113F7B4;
+	Thu, 16 Jul 2026 03:19:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1784197184; bh=3WOmSOJUE6+XMbdwY5Q6POKB6yIL5s1FNm2WoXf4Wfg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=NFjy308AFS81BzQdrpSGjAeDy6Hf7XBhjRBE/6OcoG++oXkcBCD3OSw5h600E3GjH
+	 swcDTklYpzr57MS9w5mD4mVaMFTx5pmujDBtvqTsjX3msSQKcHOg3UMlDpP8j+7+ZC
+	 LCM09mvWgzo9NUJrHI2aV29iJK9cv0lkKVG7uWkQ=
+Message-ID: <5c03fc19-43c1-4828-ab8d-4777ba5ff4f3@arm.com>
+Date: Thu, 16 Jul 2026 11:19:39 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com, aneesh.kumar@kernel.org, fj0570is@fujitsu.com, vannapurve@google.com, WeiLin.Chang@arm.com, lpieralisi@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v15 27/37] KVM: arm64: CCA: Allow userspace to inject
+ aborts
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Joey Gouly <joey.gouly@arm.com>, Catalin Marinas
+ <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
+ Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
+ Lorenzo Pieralisi <lpieralisi@kernel.org>
+References: <20260715142841.80544-1-steven.price@arm.com>
+ <20260715142841.80544-28-steven.price@arm.com>
+Content-Language: en-US
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20260715142841.80544-28-steven.price@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, 16 Jul 2026 10:20:49 +0100,
-Steven Price <steven.price@arm.com> wrote:
+On 15/07/2026 15:28, Steven Price wrote:
+> From: Joey Gouly <joey.gouly@arm.com>
 > 
-> On 16/07/2026 09:36, Marc Zyngier wrote:
-> > On Wed, 15 Jul 2026 15:28:02 +0100,
-> > Steven Price <steven.price@arm.com> wrote:
-> >>
-> >> This series adds support for running protected VMs using KVM under the
-> >> Arm Confidential Compute Architecture (CCA).
-> >>
-> >> It is the second part of the Arm CCA host support that was previously
-> >> posted as a single 44-patch series. The generic firmware/RMM support has
-> >> now been split into a separate 6-patch base series[0] so that it can also be
-> >> used by other work (and hopefully make reviewing a little easier). This
-> >> series applies on top of that base.
-> > 
-> > Splitting the series this way means that no Sashiko review can occur,
-> > as nothing applies on its own:
-> > 
-> > https://sashiko.dev/#/patchset/20260715142841.80544-1-steven.price%40arm.com
-> > 
-> > In the future, please post this with the relevant patches as an
-> > integral prefix, so that we can make use of the tooling.
+> Extend KVM_SET_VCPU_EVENTS to support realms, where KVM cannot set the
+> system registers, and the RMM must perform it on next REC entry.
 > 
-> Ah, I wonder if there's a way to teach Sashiko to deal with dependencies
-> like this? Anyway if you're happy with everything in one series and
-> (hopefully) merging a prefix earlier then I'll go back to that - it's
-> easier for me too.
+> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> ---
 
-Sashiko had plenty to say about the first series, and you've been Cc'd
-on the reports. I'd expect responses to the reports explaining why
-this isn't a problem, or how you are planning to address it.
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 
-Thanks,
 
-	M.
+>   Documentation/virt/kvm/api.rst |  2 ++
+>   arch/arm64/kvm/guest.c         | 24 ++++++++++++++++++++++++
+>   2 files changed, 26 insertions(+)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index e39d146b34a3..85bec9b4f021 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -1314,6 +1314,8 @@ User space may need to inject several types of events to the guest.
+>   Set the pending SError exception state for this VCPU. It is not possible to
+>   'cancel' an Serror that has been made pending.
+>   
+> +User space cannot inject SErrors into Realms.
+> +
+>   If the guest performed an access to I/O memory which could not be handled by
+>   userspace, for example because of missing instruction syndrome decode
+>   information or because there is no device mapped at the accessed IPA, then
+> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> index 3e970c4f6214..5469c9a97fad 100644
+> --- a/arch/arm64/kvm/guest.c
+> +++ b/arch/arm64/kvm/guest.c
+> @@ -827,6 +827,30 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+>   	u64 esr = events->exception.serror_esr;
+>   	int ret = 0;
+>   
+> +	if (vcpu_is_rec(vcpu)) {
+> +		/* Cannot inject SError into a Realm. */
+> +		if (serror_pending)
+> +			return -EINVAL;
+> +
+> +		/*
+> +		 * If a data abort is pending, set the flag and let the RMM
+> +		 * inject an SEA when the REC is scheduled to be run.
+> +		 */
+> +		if (ext_dabt_pending) {
+> +			/*
+> +			 * Can only inject SEA into a Realm if the previous exit
+> +			 * was due to a data abort of an Unprotected IPA.
+> +			 */
+> +			if (!(vcpu->arch.rec.run->enter.flags & REC_ENTER_FLAG_EMULATED_MMIO))
+> +				return -EINVAL;
+> +
+> +			vcpu->arch.rec.run->enter.flags &= ~REC_ENTER_FLAG_EMULATED_MMIO;
+> +			vcpu->arch.rec.run->enter.flags |= REC_ENTER_FLAG_INJECT_SEA;
+> +		}
+> +
+> +		return 0;
+> +	}
+> +
+>   	/*
+>   	 * Immediately commit the pending SEA to the vCPU's architectural
+>   	 * state which is necessary since we do not return a pending SEA
 
--- 
-Without deviation from the norm, progress is not possible.
