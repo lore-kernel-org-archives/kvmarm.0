@@ -1,180 +1,276 @@
-Received: from lamorak.hansenpartnership.com (lamorak.hansenpartnership.com [198.37.111.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54DD036C588;
-	Fri, 17 Jul 2026 15:56:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.37.111.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 886C02F7F02
+	for <kvmarm@lists.linux.dev>; Fri, 17 Jul 2026 16:27:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784303779; cv=none; b=Dql+tDdlH5ZQD7v342z9gPUqEE78WrzlezDgvsN0VpVPTLVEtlWKX9EVb9572kAYWxzSAsAuj0g5oz8SRAAk7bcj31BYys4zrF/T7SivE4IpMlG3DO3UJqQCmf4o6IJgWgDM2pHWj+0q+UAepR8d7RBlRhcLACEH3yGWtTBQgZc=
+	t=1784305622; cv=none; b=eUuwTJrlNI+nypth16728aMotuvBfBTlAazm3T4JUj5uo4C0ZXMi9YE1nh5yA0Jxd5ZE+NmGxioXNoQTDDpBT8OGja8Z9NA/zI8+idhXjgkta4l/j+2reIlZNc4yHHth/d8K152DizvRfci7+0OZQcHk+Y/sBOB7bI46pKojzbQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784303779; c=relaxed/simple;
-	bh=8E/aCvafBerjGcyt/czXHn8A+QbSJiP1ZLClAh2Nqf8=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=J12Q+7rjzK002YgS3po8G6mizmeQugLrZ1NDPnUmSc0vEToqW472ZgnyF1wxg59DvWO6E2DNm7JBI0lJsw/ON7C87pFA58Kz5BV8tdd4eOAWKFT/f77XNS4sjMgx4qz1jHfhoVTxNDJ58qyfXXGCQ/EJPPagzohjIS21XmIGYWQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com; spf=pass smtp.mailfrom=HansenPartnership.com; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=pE4JSA7L; arc=none smtp.client-ip=198.37.111.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=HansenPartnership.com
+	s=arc-20240116; t=1784305622; c=relaxed/simple;
+	bh=jc+NwcWgmEhGx3l3WIzlscIOvmVGOgKdKNIu/nrnPJQ=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=VpKSGXpamXNFs2bI8BItn7UqHozSDtvdpiFzEHFZWoYzP3yGW94hlwbPjuzuyDyWfhOlXY+T0mdmpAx4vjGERH/oFTQBfe4hDFutOaVuzHBMdobDZ+xhRugbzKmqvkc+xT23uFEEZopiWZE/jl4GQtCeebYL0Hbm7agEOCxLPC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jingzhangos.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HApxlOpy; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jingzhangos.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="pE4JSA7L"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=hansenpartnership.com; s=20151216; t=1784303776;
-	bh=8E/aCvafBerjGcyt/czXHn8A+QbSJiP1ZLClAh2Nqf8=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
-	b=pE4JSA7LDo31TtOH6lVhRGLmgo69Rq7uIrlsGvhRqaaCuqGH7NIbVKEBzPNgbzlr0
-	 HfhhSUxH3Jy6Mco8uMYCXMhJUMKRW6EZYi47aVY5QkDAHN2pfU1WiTnh9hqOrO5bQR
-	 i7p7VxY4n38UceajEGhvjud0cMrlCjcs/V9aUfxM=
-Received: from lingrow.int.hansenpartnership.com (unknown [IPv6:2601:5c4:4300:d341::8c71])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519MLKEM768 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by lamorak.hansenpartnership.com (Postfix) with ESMTPSA id AA4091C029F;
-	Fri, 17 Jul 2026 11:56:15 -0400 (EDT)
-Message-ID: <976f1a8316438d5b7c2f446a0369dcda3289cc92.camel@HansenPartnership.com>
-Subject: Re: [PATCH 35/60] kvm: Add VCPU plane-scheduling state and helpers
-From: James Bottomley <James.Bottomley@HansenPartnership.com>
-To: "Saenz Julienne, Nicolas" <nsaenz@amazon.es>, 
- =?ISO-8859-1?Q?J=F6rg_R=F6del?=
-	 <joro@8bytes.org>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>, Tom Lendacky	
- <thomas.lendacky@amd.com>, "ashish.kalra@amd.com" <ashish.kalra@amd.com>, 
- "michael.roth@amd.com"	 <michael.roth@amd.com>, "Orazgaliyeva, Anel"
- <anelkz@amazon.de>, Melody Wang	 <huibo.wang@amd.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
- "linux-kernel@vger.kernel.org"	 <linux-kernel@vger.kernel.org>,
- "kvmarm@lists.linux.dev"	 <kvmarm@lists.linux.dev>,
- "loongarch@lists.linux.dev"	 <loongarch@lists.linux.dev>,
- "linux-mips@vger.kernel.org"	 <linux-mips@vger.kernel.org>,
- "linuxppc-dev@lists.ozlabs.org"	 <linuxppc-dev@lists.ozlabs.org>,
- "kvm-riscv@lists.infradead.org"	 <kvm-riscv@lists.infradead.org>,
- "x86@kernel.org" <x86@kernel.org>,  "coconut-svsm@lists.linux.dev"	
- <coconut-svsm@lists.linux.dev>, "joerg.roedel@amd.com"
- <joerg.roedel@amd.com>
-Date: Fri, 17 Jul 2026 11:56:15 -0400
-In-Reply-To: <DK0W6G329B6W.2KGT7FAVSKNYS@amazon.com>
-References: <20260608144252.351443-1-joro@8bytes.org>
-	 <20260608144252.351443-36-joro@8bytes.org>
-	 <e7eb0dba-790a-4644-9895-5c9a7420d7fe@redhat.com>
-	 <aib8n5lO6HKbLC4Y@8bytes.org>
-	 <CABgObfbUsDeStnZF-7oyR-W-Bvd4qTMoeUwGizgn10UTdKtZ2A@mail.gmail.com>
-	 <aigE2EvJyZlYDz0V@8bytes.org> <DK0W6G329B6W.2KGT7FAVSKNYS@amazon.com>
-Autocrypt: addr=James.Bottomley@HansenPartnership.com;
- keydata=mQENBE58FlABCADPM714lRLxGmba4JFjkocqpj1/6/Cx+IXezcS22azZetzCXDpm2MfNE
- lecY3qkFjfnoffQiw5rrOO0/oRSATOh8+2fmJ6el7naRbDuh+i8lVESfdlkoqX57H5R8h/UTIp6gn
- 1mpNlxjQv6QSZbl551zQ1nmkSVRbA5TbEp4br5GZeJ58esmYDCBwxuFTsSsdzbOBNthLcudWpJZHU
- RfMc0ew24By1nldL9F37AktNcCipKpC2U0NtGlJjYPNSVXrCd1izxKmO7te7BLP+7B4DNj1VRnaf8
- X9+VIApCi/l4Kdx+ZR3aLTqSuNsIMmXUJ3T8JRl+ag7kby/KBp+0OpotABEBAAG0N0phbWVzIEJvd
- HRvbWxleSA8SmFtZXMuQm90dG9tbGV5QEhhbnNlblBhcnRuZXJzaGlwLmNvbT6JAVgEEwEIAEICGw
- MGCwkIBwMCBhUIAgkKCwQWAgMBAh4BAheAAhkBFiEE1WBuc8i0YnG+rZrfgUrkfCFIVNYFAml2ZBI
- FCS3GUMIACgkQgUrkfCFIVNZKjQf/deRzlXZClKxTC/Ee2yEPqqS7mm/INUA49KdQQ5oIhSxkUBy0
- 9J4qjMIo5F8ZFkFTqikBqeL35LKu7O7rn8WETfX8Bxvos3HUsl3jHo34DES4MUFIpoQPgtiLRGwLb
- K0cVCAArR2u2qj4ABmTRrs1I1kvdjEw6gatOuXtEe/j5O2fvfzTq9GBr0Q3n2IAsFXi4hLlx6VPE8
- tyWUZ8BWJKtih3JAeUiXFvASL3McV0rV9RnU0VbjEQEhSE7PMYhWpnDC9AyBb0lXJllQRvC3NSkUB
- 8KVQgNNxRPss0WE/nBoZ4dFA42jTyzTz8lNylxZoAWV7WJb3QxVg4oCodRVrxxrQhSmFtZXMgQm90
- dG9tbGV5IDxqZWpiQGtlcm5lbC5vcmc+iQFVBBMBCAA/AhsDBgsJCAcDAgYVCAIJCgsEFgIDAQIeA
- QIXgBYhBNVgbnPItGJxvq2a34FK5HwhSFTWBQJgS5mYBQkbNYS9AAoJEIFK5HwhSFTWBpwIAL5Bk3
- 5FB34U6iHmDzzgdCbxLTs43T/YQyJpcGIvopBvnI/fDY8oSG6Df64/O6B+1R+A8TDp6ZG5ysUWnCC
- 6GuIaEHemBYkitMPglR6+sGCMQY7O0mlsPvdssvKK1KI9Bno4VU6ogaF2qVzefSqg1Djmf/DcsxWP
- rI/jdJ8FB5AYR2rjIdDFc+zRdAJuavo1/anyY2wgpFh/3R8IOYAEfWV9nGgYkf9+tA4EIn1sxE0I3
- L5oW2N3mbyRrkzuBwO8ztMCwqEPk7moWzhokcZqMXiAIahaZdkashJC+s2X2RZSGCy+g+pvY5NN4B
- BVG5XwLgVBqbHMTcxE0fbmPqz+q6O0LEphbWVzIEJvdHRvbWxleSA8amVqYkBoYW5zZW5wYXJ0bmV
- yc2hpcC5jb20+iQFXBBMBCABBFiEE1WBuc8i0YnG+rZrfgUrkfCFIVNYFAmODZ5ACGwMFCRs1hL0F
- CwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AACgkQgUrkfCFIVNZu0Af/TzvL2/NdgAcw9uN3x60H8
- jc4QUq14VpxcFEFEMpcj1morkX/G93V+56HBBaXZj+yK8PhxIA/SIz+sU7C/0YvKuvzakP8ZX/7WJ
- e32SOUtjfr/VTaqjIBzNj6OxLvZpmNbBw7s6DwhhNpHOWqJ/1ml+PtDRDV71IB58yVqQjp1xlNKVl
- ZppcJ5908EJzsFnRIVjiQiDSKoppqB2BCibBbrWcln7CiWMyOC/cco6SIn6twH+f7+aivJ3xGcOE2
- a9gBKF5rNi9TBoX9oyPmshv/TDmnohsVrH7AYXlGYfZTk15SWEiROh1QX8/uD9wl/gcIv5EDUpT/F
- L2jzOsA5663bw==
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HApxlOpy"
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-38de0739ab6so5770070a91.3
+        for <kvmarm@lists.linux.dev>; Fri, 17 Jul 2026 09:27:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1784305620; x=1784910420; darn=lists.linux.dev;
+        h=content-transfer-encoding:content-type:cc:to:from:subject
+         :message-id:mime-version:date:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=oMnn6SXBHrJTwxImwTs7m6CLT8NGFTr2oUehXQ3gnk0=;
+        b=HApxlOpyge0CCsDOQu3qcgdSJ1ipUzZT+uvscYp8kTmfgJBhiC70kXts6idalx06Jt
+         iA1FvwKx8GBTBts4h+e8ecRXGXEzxIJV2LCGZHv68jttBSGdxGD+UCRN8+gH83abDAFS
+         J7jm9PWMU54+4TuNoySA2im4ae/tKojXH4JffOvvSZPOdkr5gmCzq1VsANKcPhzydltr
+         iFWn1RqNejlhQFupCk2iR3S6cx4P7g/Vqo9/8wCv0dCJF1MkAeyvYcfDNmPX+UCVfcOs
+         oYuhQn9L3I6dvylZoioO2yMKNjLppXkdCpKrNDf3giPigIZEupwPhFKTlYcwV1TMdCx7
+         w2Lg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784305620; x=1784910420;
+        h=content-transfer-encoding:content-type:cc:to:from:subject
+         :message-id:mime-version:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=oMnn6SXBHrJTwxImwTs7m6CLT8NGFTr2oUehXQ3gnk0=;
+        b=JuwjBDqzMMHyijErepZPlucYkakoZtFFE6jMOdQHjJ8AjyDX6DFJdKckhQp+FN+znI
+         BJHidlO6G4ekQn8n4EOjWAPx5IN7r02ur2GOHuVdazEuGmHvrKb+OSf5/1DQWdz0osgf
+         /QBH4F8mwqAr7fFCExHD7Do4PRMO8Zly68CMv4ZxTfsgzJKTTVwkeP3vVUlPZbRF48EF
+         Ph9ijgiDN+6izGViILeYegpy50zGJ5pdcFQbtWIMuAkR0TwKCznLzEcNKHLUCZlr8Bce
+         blPHK/8mvhe4i3N783t5St2OCoHTtP/hozleiw+UDdY/myZCH17umC26NgrVBJRJ8pSH
+         AsJA==
+X-Forwarded-Encrypted: i=1; AHgh+RoNBZpdOGH1RqwFhkJ8xSBTWjHS08vSkHwo0ClZkEjya2FG8QB8yjiWNse22ju8wrU1gIsmXOM=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yy936/bgXs+XlIwe8zaDHIVvd5YEAp26zjnL1mD0Ak8T+dh+/Za
+	foPTKeszVZCepodb08P+9zQhQNWShsZLNzsoc+3z73wKb6E4OHtq1i3Ng67J376e3rqRgRz5eFz
+	UsyNyXxCLU2kVaG4By+nrMuaniA==
+X-Received: from pjbfr5.prod.google.com ([2002:a17:90a:e2c5:b0:381:ce43:283c])
+ (user=jingzhangos job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:224e:b0:37f:9ce0:af36 with SMTP id 98e67ed59e1d1-38e4b5a823bmr3348538a91.33.1784305619074;
+ Fri, 17 Jul 2026 09:26:59 -0700 (PDT)
+Date: Fri, 17 Jul 2026 09:26:57 -0700
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.55.0.229.g6434b31f56-goog
+Message-ID: <20260717162658.2833515-1-jingzhangos@google.com>
+Subject: [RFC] KVM: Proposed uAPI for querying GSI and irqbypass status
+From: Jing Zhang <jingzhangos@google.com>
+To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Sean Christopherson <seanjc@google.com>, Mingwei Zhang <mizhang@google.com>, 
+	David Matlack <dmatlack@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 2026-07-17 at 13:48 +0000, Saenz Julienne, Nicolas wrote:
-> Hi Joerg, I'm a bit late to the discussion hope it helps nonetheless,
->=20
-> On Tue Jun 9, 2026 at 2:37 PM CEST, J=C3=B6rg R=C3=B6del wrote:
-> > CAUTION: This email originated from outside of the organization. Do
-> > not click links or open attachments unless you can confirm the
-> > sender and know the content is safe.
-> >=20
-> > > The idea of the userspace scheduling was that you're not forced
-> > > to use it - the kernel can always choose to override it if it's
-> > > using an accelerated implementation of planes (and of plane
-> > > switching). But it also leaves some leeway to different
-> > > accelerated implementations, each of which can pick their own
-> > > algorithm.
-> > >=20
-> > > Conceptually I'd rather keep the possibility of userspace
-> > > scheduling. But maybe it doesn't add much.
-> >=20
-> > My preference is to keep plane scheduling at one place (in the
-> > kernel) to keep it simple. But if you see a need for user-mode to
-> > interact there as well (only really works for VSM), then I can add
-> > it.
->=20
-> The responsibility split we had in mind when we built a VSM emulation
-> prototype [1] was to keep all VTL policing in user-space. This
-> includes VTL switching, Cross VTL IPIs, Intercepts (Memory, MSRs,
-> Insns, CPU regs), VTL aware SMP bring-up, etc. Even with KVM Planes
-> in place, my thinking was to keep it as such. While all this could be
-> implemented in the kernel, in practical terms, I think it'll be
-> easier to get VSM support upstream the more we move the
-> implementation into user-space.
+This RFC proposes a new KVM uAPI to allow a VMM to programmatically
+query the status of a GSI, with a particular focus on determining
+the success or failure of Irqbypass.
 
-I looked at the kernel bit.  The vsm/dev branch contains 72 patches
-over 6.12 which is quite a lot ...
 
-However, from a quick skim, the main thing is that you used multiple
-KVM structures to manage the planes which means each plane naturally
-gets its own address space.  In the current planes model so far there's
-only one address space (or two if you have SMM).  SNP doesn't need
-anything above this because the VMPL protection is naturally managed
-inside the guest (so not really visible to the host) but a VTL
-implementation will.  So I think the big question becomes how are we
-going to achieve address space separation for planes?  It's tempting to
-say simply one address space per plane and make SMM its own plane with
-different switching but it's an awful lot of overhead especially as
-most VMs won't even use planes, so it looks like there has to be a more
-opportunistic model for planes address spaces.
+1. Motivation
 
-> More importantly, I think the area of Virtualization Based Security
-> would benefit from a versatile Planes implementation. Forcing
-> specific plane switching semantics might prevent the introduction VSM
-> alternatives or extensions. Heki and lVBS come to mind here.
->=20
-> > I read a bit more about VSM and it seems their prioritization of
-> > VTLs is a bit more complicated. VTL0 has the least privileges but
-> > boots first, then sets up VTL1. But VTL1 is only higher-privileged
-> > once it is locked by VTL0. Another way to look at it is that VTL0
-> > de-prioritizes itself.
-> >=20
-> > The patches here are built around the assumption that plane0 is the
-> > highest privileged one and is always runnable. Running any lower-
-> > privilege plane must be triggered by the guest. This is clearly not
-> > sufficient for VSM, the question is how to solve that.
->=20
-> I'd suggest inverting the priorities, with higher planes being more
-> privileged. It'll make introducing higher privilege levels easier.
-> This is especially useful with VSM, where it's not possible to know
-> how many levels will be enabled before launching the VM.
+The primary motivation for this uAPI is to bridge the operational gap
+between the VMM and KVM at the kernel level regarding interrupt
+virtualization status:
 
-I already addressed this in a different reply
+* KVM (Kernel) holds the precise, live runtime status of each GSI (such
+  as whether Irqbypass is active, pending, or has encountered a setup
+  error). However, it completely lacks the high-level semantic details
+  of those GSIs=E2=80=94it does not understand which logical function or
+  physical hardware device they represent.
 
-https://lore.kernel.org/kvm/570f82e8b8bc968a31a4ba859145f6c324e41247.camel@=
-HansenPartnership.com/
+* The VMM (Userspace) possesses the complete context of the guest's
+  interrupt topology. It knows exactly which GSI belongs to which
+  passthrough or emulated device because it orchestrated the setup.
+  Yet, the VMM has no stable, programmatic way to query the actual
+  runtime execution status of these GSIs once passed to the kernel.
 
-but basically I think hierarchical privilege will be too limiting.  I
-agree we need to have enough primitives to bring up hierarchical VSMs
-if that's what the guest wants (Windows definitely will) but this
-shouldn't be the only thing we can arrange planes as.  The mutually
-distrusting model has a lot going for it in terms of security
-properties.
+Currently, diagnosing when a high-performance interrupt path falls
+back to software mediation is highly problematic:
 
-Regards,
+* While some architectures (like ARM64) expose virtual ITS states via
+  debugfs, this implementation is highly architecture-specific and
+  fragile.
 
-James
+* debugfs is not a stable API, is prone to breaking changes across
+  kernel versions, and is entirely unsuitable for programmatic
+  production monitoring and fleet-wide observability.
+
+This is not an ARM-specific problem; it is a general, cross-architecture
+limitation within KVM's Irqbypass and interrupt routing subsystem.
+By introducing an architecture-neutral uAPI, we allow the VMM to
+marry its topological knowledge with KVM's live execution state.
+
+
+2. Main Design Idea
+
+Based on recent community discussions, this proposal follows a set of
+agreed-upon design principles:
+
+* Architecture-Neutral: The API is a generic ioctl on the VM file
+  descriptor, using the GSI abstraction.
+
+* Extensible: The API provides an in-struct union with a dedicated size
+  reservation. This avoids the complexity of userspace and kernel
+  managing separate data allocations or chasing userspace pointers.
+
+* Decoupled: It is a KVM ioctl, maintaining the separation between
+  the KVM and VFIO subsystems.
+
+* "Pull" Model: The VMM explicitly queries the state of a GSI on
+  demand.
+
+We propose a new ioctl on the VM file descriptor: KVM_GET_GSI_STATE.
+
+
+3. Proposed API Definition
+
+The following sample code defines the proposed ioctl and its
+associated data structures.
+
+/* To be included in <linux/kvm.h> */
+
+/*
+ * KVM_GET_GSI_STATE: Get the status of a specific GSI.
+ *
+ * The user passes a pointer to struct kvm_gsi_state. The kernel fills in
+ * the status flags, performance counters, and the architecture-specific
+ * union members directly.
+ */
+
+/* Generic flags indicating high-level status */
+
+/*
+ * The GSI's route is theoretically compatible with hardware bypass
+ * on this host (e.g. is an MSI route and GICv4/VT-d is present).
+ */
+#define KVM_GSI_STATE_FLAG_BYPASSABLE      (1 << 0)
+
+/* An IRQFD is currently active and bound to this GSI */
+#define KVM_GSI_STATE_FLAG_HAS_IRQFD       (1 << 1)
+
+/* The irqbypass path is fully enabled and active in hardware */
+#define KVM_GSI_STATE_FLAG_BYPASS_ACTIVE   (1 << 2)
+
+/* Example architecture-specific failure reasons for ARM64 */
+#define KVM_ARM_GSI_FAILURE_REASON_NONE             0
+#define KVM_ARM_GSI_FAILURE_REASON_NO_ITS           1 /* No ITS/GICv4 suppo=
+rt */
+#define KVM_ARM_GSI_FAILURE_REASON_NO_MSI_ADDR      2 /* MSI address unset =
+*/
+#define KVM_ARM_GSI_FAILURE_REASON_GIC_HW_REJECT    3 /* GIC rejected map *=
+/
+#define KVM_ARM_GSI_FAILURE_REASON_INVALID_STATE    4 /* Guest state block =
+*/
+
+struct kvm_gsi_state {
+    __u32 gsi;              /* IN: The GSI to query */
+    __u32 flags;            /* OUT: High-level status flags */
+    __u64 counter_success;  /* OUT: Generic counter for successful bypass *=
+/
+    __u64 counter_failure;  /* OUT: Generic counter for failed bypass */
+
+    union {
+        struct kvm_arm_gsi_state {
+            __u32 failure_reason;   /* OUT: Last reason for bypass failure =
+*/
+            __u32 padding;          /* OUT: Explicit padding alignment */
+            __u64 vgic_its_vlpis_hw;/* OUT: counter for directly injected v=
+LPIs */
+        } arm64;
+
+        /* Pad union to 128 bytes to allow future arch growth */
+        __u64 pad[16];
+    };
+};
+
+#define KVM_GET_GSI_STATE _IOWR(KVMIO, 0xXX, struct kvm_gsi_state)
+
+
+4. Implementation Sketch
+
+The KVM_GET_GSI_STATE ioctl handler would perform the following
+high-level steps:
+
+1. Find the GSI Route: The handler would take the input gsi and look it
+   up in the VM's kvm->irq_routing table to find the corresponding
+   kvm_kernel_irq_routing_entry.
+
+2. Evaluate Bypass Capability: The kernel checks if the GSI
+   routing entry type and target are capable of utilizing hardware bypass
+   under the current host hardware configuration. If so, KVM sets
+   KVM_GSI_STATE_FLAG_BYPASSABLE.
+
+3. Locate the Irqfd Context: The kernel searches its registered
+   irqfds. If an active kvm_kernel_irqfd is bound to this GSI, KVM sets
+   KVM_GSI_STATE_FLAG_HAS_IRQFD. This context is the key to finding
+   the active bypass status, as it contains the irq_bypass_consumer.
+
+4. Inspect Irqbypass Status:
+   If an active irqfd is found, the handler inspects consumer->producer.
+   If a physical producer is successfully paired and the hardware-level
+   link is fully established, KVM sets KVM_GSI_STATE_FLAG_BYPASS_ACTIVE.
+
+5. Gather Performance Counters: To implement the counters, new
+   atomic64_t fields for success_count and failure_count would be added
+   to the struct kvm_kernel_irqfd. These counters are essential for a
+   VMM that polls on a semi-regular basis to detect if the bypass state
+   has changed or flapped over time (e.g., during vCPU migrations,
+   routing updates, or device resets). By observing increases in these
+   counters across poll intervals, the VMM can detect bypass path
+   instability or dynamic teardowns without requiring high-overhead
+   asynchronous event notifications. The ioctl handler simply reads
+   these atomic values.
+
+6. Architecture-Specific Logic (ARM64 Example): The kernel detects the
+   target architecture and directly populates the corresponding arm64
+   nested struct within the kvm_gsi_state union:
+
+   * Inspect the vGIC state for the virtual interrupt corresponding to
+     the GSI.
+
+   * Check internal flags that were set during the
+     kvm_vgic_v4_set_forwarding call to determine the reason for a
+     failure. For example, if vgic_its_resolve_lpi failed because the
+     MSI address was zero, this would have been recorded, and KVM would
+     populate failure_reason with KVM_ARM_GSI_FAILURE_REASON_NO_MSI_ADDR.
+
+   * Check if the host GIC supports the required features (ITS, GICv4),
+     populating failure_reason with KVM_ARM_GSI_FAILURE_REASON_NO_ITS
+     if not.
+
+   * Read KVM-internal counters to populate fields like
+     vgic_its_vlpis_hw.
+
+   * Copy the populated kvm_gsi_state structure back to userspace in a
+     single memory transaction.
+
+
+5. Open Questions and Points for Discussion
+
+1. Structure and Flags: Are the proposed kvm_gsi_state and nested
+   arm64 union structures sufficiently comprehensive? Are the flag
+   names clear?
+
+2. Failure Reasons: Are there other common Irqbypass failure modes on
+   ARM64 (or other architectures) that should be included in the
+   enumeration?
+
+3. Performance Counters: Is adding atomic counters to the
+   kvm_kernel_irqfd struct the right approach, or should this be handled
+   in a different data structure to avoid bloating the Irqfd context?
+
+4. Extensibility: Does the nested union and its 128-byte pad provide
+   enough headroom for other architectures (like x86 posted interrupts
+   or RISC-V) to implement their diagnostic payloads in the future?
+
+We believe this new API would be a significant step forward for the
+observability and manageability of KVM in production environments. We
+look forward to the community's feedback on this proposal.
