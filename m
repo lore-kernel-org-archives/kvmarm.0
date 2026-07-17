@@ -1,32 +1,32 @@
-Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F16FD3FE375
-	for <kvmarm@lists.linux.dev>; Fri, 17 Jul 2026 13:04:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 068B33FE375
+	for <kvmarm@lists.linux.dev>; Fri, 17 Jul 2026 13:04:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784293453; cv=none; b=MkNqIlr9d5MR24nZGt5qPFgg72MJT3av3XHRap4N9hmaWvi9vTpyZLXS8LUPMZdTMuCVLt90VcoUK7KkZ25OeVwWcTrZUP2xe8vrSMt510mbGDKYZhO3UEiz0c1FKrMd+yC6pbRUnzbiAe8qazUqMhMco6h7IZSkcV4HDSxf0ME=
+	t=1784293455; cv=none; b=ietr8Nm0oQQAY+CFlgZU13exbgn50eHVGBdYzPYARHXCWKVVl7PTYaYdm39uv++FREBxRV/5kVqtQiXNhhtbkpv8DFlaseKS/k444mgEHnSdxAHvho7z/Xqo0SfWoLXwTIgQS8U/gXcThbbMMEKzHUoe+MZJpLXSvVtd6OChR4g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784293453; c=relaxed/simple;
-	bh=5KMMgT2ETpoNaISeUolCEGWZMQWe/wTHmfcqBE87/tE=;
+	s=arc-20240116; t=1784293455; c=relaxed/simple;
+	bh=/dJq1ElgkuWD4WVTYnRbakmDuhEmWZkPbbAcOrtDOFg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=g4dEfRhGC+0+dplyQmi4KfDm8U+govfwncp3hMZHyZKrA7z3MDxtn3ASf5fLN28hteuKjJTy7wq2/b7RprPyge0rP8dLZcV26JBFDch+urDt32ljqfEahsOTm/Fc/iFT7a7fbl3zlOkFBsL6r/chNJrWalGVwH44b1FZ8iYZmdU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=OdKlhYzO; arc=none smtp.client-ip=95.215.58.170
+	 MIME-Version; b=tAghpAghXdQBYoJcxALbL2UQ2W4x7PN0GY5Flsw1d8Qwl/8XMZ3ChD9ff1KP71sYTaWPbTMrU5lZuLGA21LKmkOVNVlzoaZ1sZx31KNFfWNYhLHRt6tqHt2D20P311+5Xari1aHJ0UBJuBzkbAAubEQ8GwC9tn6B6mMrYuvn6MY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vTqZQVcv; arc=none smtp.client-ip=95.215.58.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="OdKlhYzO"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vTqZQVcv"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1784293449;
+	t=1784293451;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=t62BgL8MjPLp/vMP9DZbVtXwp29HVKeCqzhIx8Pz0Y8=;
-	b=OdKlhYzO5z90QIvAtZFzdTuaTThgKal3zbR5ENagrtMDYVyYo2JEhmsSEYG61sVy6mDvmo
-	Z0okoOfILrcrBo0mAl6Q3WfUGSPkrvRhx9xRaDkeTjOQoJJt86SMhyH2k0Szb1qdZIWXTy
-	64WfrqN30uGScUnE1fiVvhfe/YokMHY=
+	bh=w6Awn3Cip6WinOaXp4OqAmFuhAYE4A4acDGbfEewbog=;
+	b=vTqZQVcvnbqTera6vR3ctDXJn/somZz5PfLLM0khrASOMvrxrDjGa+jgm1rPclTNFJ9VHZ
+	W4pJeIuM2LskrdT4zeBAcXZHQUPnlN5eiS2bHHkWZJaBd/S03Nu+a9kOjG2hURa0tnI5vo
+	3fnSaxpDtapXRTv/t+dkvxH3HOBBF4I=
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oupton@kernel.org>
@@ -47,9 +47,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v5 5/7] KVM: arm64: Don't WARN on pKVM stage-2 map failures
-Date: Fri, 17 Jul 2026 14:03:15 +0100
-Message-Id: <20260717130317.1953574-6-fuad.tabba@linux.dev>
+Subject: [PATCH v5 6/7] KVM: arm64: Don't advertise eager page splitting under pKVM
+Date: Fri, 17 Jul 2026 14:03:16 +0100
+Message-Id: <20260717130317.1953574-7-fuad.tabba@linux.dev>
 In-Reply-To: <20260717130317.1953574-1-fuad.tabba@linux.dev>
 References: <20260717130317.1953574-1-fuad.tabba@linux.dev>
 Precedence: bulk
@@ -61,36 +61,42 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-pkvm_pgtable_stage2_map() wraps the __pkvm_host_share_guest() and
-__pkvm_host_donate_guest() return in WARN_ON(), but those hypercalls
-fail for reasons that are not EL1 invariant violations: -EINVAL for a
-pfn that is not memblock RAM (check_range_allowed_memory() rejects a
-device page mapped into a non-protected guest) and -ENOMEM under
-memcache pressure. Both are reachable from a guest fault, so the WARN
-splats on host input.
+Under pKVM the stage-2 walker resolves to pkvm_pgtable_stage2_split(), a
+WARN_ON_ONCE(1) stub, yet KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE is still
+enabled and reported for non-protected guests: the capability check keys
+on the per-VM protected state while the walker dispatch keys on the
+host-global mode. Enabling the cap and then dirty-logging the guest
+reaches the stub, splatting a userspace-reachable WARN.
 
-Return the error without warning. The unshare and write-protect WARNs
-stay, since a failure there does signal a broken EL1 invariant.
+Reject the capability, and stop reporting a chunk size and the
+supported block sizes, for every VM once pKVM is enabled, keyed on the
+host-global mode like the split dispatch. Gating only protected VMs
+would leave the non-protected guests that reach the stub still able to
+enable it. Userspace decides whether eager splitting is available from
+the block-size bitmap (QEMU falls back to no eager splitting when it
+reads 0), so leaving it advertised steers an explicit request into the
+enable failure instead of the fallback.
 
-Fixes: 3669ddd8fa8b5 ("KVM: arm64: Add a range to pkvm_mappings")
+Fixes: e912efed485a ("KVM: arm64: Introduce the EL1 pKVM MMU")
 Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
- arch/arm64/kvm/pkvm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_pkvm.h | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index ba6570e37545..1212a2c5613d 100644
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -466,7 +466,7 @@ int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 					size / PAGE_SIZE, prot);
+diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
+index 57afb07d6b13..beea00e693a0 100644
+--- a/arch/arm64/include/asm/kvm_pkvm.h
++++ b/arch/arm64/include/asm/kvm_pkvm.h
+@@ -45,6 +45,9 @@ static inline bool kvm_pkvm_ext_allowed(struct kvm *kvm, long ext)
+ 		return true;
+ 	case KVM_CAP_ARM_MTE:
+ 		return false;
++	case KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE:
++	case KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES:
++		return false;
+ 	default:
+ 		return !kvm || !kvm_vm_is_protected(kvm);
  	}
- 
--	if (WARN_ON(ret))
-+	if (ret)
- 		return ret;
- 
- 	swap(mapping, cache->mapping);
 -- 
 2.39.5
 
