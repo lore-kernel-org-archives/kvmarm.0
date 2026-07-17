@@ -1,206 +1,131 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B69173F870E
-	for <kvmarm@lists.linux.dev>; Fri, 17 Jul 2026 13:09:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 127C73BFAE8
+	for <kvmarm@lists.linux.dev>; Fri, 17 Jul 2026 13:15:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784293751; cv=none; b=uMAx7IKfsjF2iYGYMdKA4h0rtB3ciPVNgVQajlVOSjNSR8R3R7lTeeLN+AVia0nRAP1x4bTjBIl8zOuvVLk0gpLycvuax6iCrrJZktypeHeGIxA3lmWRKrioMc6oNqFWC69NYxyACl19r5N6LFt4SNuVjD+ii0fqn/htpu6uZS8=
+	t=1784294139; cv=none; b=IU/dTsFNIXilm1vfNTW86KNCQvgQH+r/Yo75uOlbztT3CErnydeEkuFEFjbjxcHUu/19KCZDSfUwpC+3xT1SFrZtUG8zT9JgCgO/9T7URlU+r7O4yMfvWgZvUjHHmK0cQNvkD36m1GxEKcWcJeCi4AC2mcQuFtBwHPge9q6buCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784293751; c=relaxed/simple;
-	bh=Mjz8ivQNJtbkbZVgumLby1xtvMOe4isndBrW/gdbi9E=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=TlEQtARkjR+nHy61S0818HgMAPg7vgI9RIT4xr3q2y6AprCYI0WsbnbapDZa7o9h9d+Ztq9QZ9Z9u2vhw4K5oCyIUA9oftGHNoSWl8y1BK25yZDPqfV16I7lVbs5ITJ5VZLX61lOkOzcEqHmIi3ltNiiSccfzu3GF0Z5Igh6q1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bYdKzV0K; arc=none smtp.client-ip=209.85.128.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com
+	s=arc-20240116; t=1784294139; c=relaxed/simple;
+	bh=1kmxQLfeGjYL+3vEnHaKyxl8f1n+8QMmywryUbdgv0o=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=cRqHPsw5/NfBcVYByqLdTMI8LLWb4TlbhMx/2SsS+Gh3SXQ9ajiy1reiDyMxicXJQhv7OXTHYIv+pN2ie2b7RKoTqq8d0+5nURAaHxhWoOdVaXyd28n/V1HkqllNTZoShoH6DjR/DwDQlBaAqbfgjeth7uT0BubutEcGtxo+/rc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hTD+s6kW; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bYdKzV0K"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-49545755b03so12826775e9.0
-        for <kvmarm@lists.linux.dev>; Fri, 17 Jul 2026 06:09:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1784293748; x=1784898548; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=+n0quTBKTLkuwq9QawKwspQRW3gBb6Rua2VTww6C7Lw=;
-        b=bYdKzV0KxTMHoJgDMGdSCL7KawKeHupyHCyT6I3SuJ6mYqeXSn9bIALYdxZTEcAu8W
-         IpsfMa+37sACFoPcEQO8Ij77TZ1wEJslOtGSUDIYuOiJAQPnIpOW6HbGcAvnDGOxXldm
-         AMQsWDgbB6+oVF/T0VUypcb9nq6YD30kuS6AkrhbCJWTTaX7RjsJSSUrmQzQ40Lf5bs+
-         6yzZaB4ktyI0rZj3jMYL7oLDeyZPyur/oTQtjQR8pNb8hM62zL6JKpGRTjFLmpyepGdI
-         0lnqWoOUR3zpX6zWVhkirX0T+mWVH1F5t5AFP17q2GhOoTgWLlopSsrjEH6z6aWSZd+7
-         sxpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784293748; x=1784898548;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=+n0quTBKTLkuwq9QawKwspQRW3gBb6Rua2VTww6C7Lw=;
-        b=jbqCb9wnUnqiCo1+VnENmzsLYnKDgZcmabLOyIHT6gh5myaQaALteiWRjKfbolVuiU
-         oGvfajv/oIlzjXo4AHQuSVuvAsPHT60UEBagqFDhymNmMOPJEufHUk9UPAeaw2HkMf/0
-         gN8BL7b3jZlMg6yMubzC5bZtG6vbYmsDPcvYKeHTfrd+f+AvWEu4n3bc+AsK2uaydRcJ
-         uJ46FqU4D8z3Xn3bdJXLI6daR1wCyOSQ/cAV9QxbuLsdfZBRkBgyRdtcjFrBEjFQjoyf
-         3eCtQXXQzYQKxlu3ZRsAs9pQQyI7dYML2ZMDlYFhKycrPlsfZ7qcPegM50esjET95tDZ
-         XttQ==
-X-Forwarded-Encrypted: i=1; AHgh+RoJ2DUaTZ8Pmuc4XJprEN9DTv2fxMkDFIeer+KkFQE+JJ9zMphPoy7L24Dnesvvl2R8yrvtONw=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxZBE5Pp4YZy73Yk+d7CD2Nly/NhkvfNPe7FKIuJKU02qRU6IHP
-	G65858DCNMwqf87tqQfyicRrR6iD5WJ+7CxVULPkZCCFhUHZjVTNNnfJB4cohwhov8L5twzB2Zn
-	M/ENmkBnqqi6p+A==
-X-Received: from wrbcg5.prod.google.com ([2002:a5d:5cc5:0:b0:47f:4f99:b306])
- (user=smostafa job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:154e:b0:495:49eb:1ccc with SMTP id 5b1f17b1804b1-4954a3eff56mr32478345e9.13.1784293747452;
- Fri, 17 Jul 2026 06:09:07 -0700 (PDT)
-Date: Fri, 17 Jul 2026 13:09:00 +0000
-In-Reply-To: <20260717130901.2239134-1-smostafa@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hTD+s6kW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71F531F000E9;
+	Fri, 17 Jul 2026 13:15:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1784294137;
+	bh=JH7j/oFn9Zuc5/GOG4swBwaMuviuktwDHCn+Nw9zQaI=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=hTD+s6kWGZ80vFwx69V9hyvDRR6Lnde93ugoLlzECR5i558mDfNV1Dqz/1HbUZq2o
+	 mYQqtua6Kf4IvJclUolrxRRgsbWgGGky/YzZVVFov/He/yVwXK+Rbl4wKFCcQ14XJN
+	 yIpcUCo9XUZsDay8WGNKtBicYRLVw32mcH47qxa9XOoKzDzcpCpUgx7oAS4t+j88pL
+	 rQpe7m+qUxIFjffD4eQa7/2IHhfmP2aiHIX3n9oUHGasPlLBNwKWbH8cczh341mKGV
+	 P6IB+XiVuPdhWgiIemQTJUYxYWD+VPpD/Y550SLREOIj5Q0C7K7Nyr90Xy+L8+1/OT
+	 AVXfpiWlLw77Q==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v5 3/7] KVM: arm64: Top up stage-2 memcache for dirty
+ logging faults
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Fuad Tabba" <fuad.tabba@linux.dev>
+Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20260717130317.1953574-4-fuad.tabba@linux.dev>
+References: <20260717130317.1953574-1-fuad.tabba@linux.dev>
+ <20260717130317.1953574-4-fuad.tabba@linux.dev>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 17 Jul 2026 13:15:37 +0000
+Message-Id: <20260717131537.71F531F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20260717130901.2239134-1-smostafa@google.com>
-X-Mailer: git-send-email 2.55.0.229.g6434b31f56-goog
-Message-ID: <20260717130901.2239134-3-smostafa@google.com>
-Subject: [RFC PATCH 2/2] KVM: arm64: Support BBM level 3
-From: Mostafa Saleh <smostafa@google.com>
-To: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org
-Cc: maz@kernel.org, oupton@kernel.org, seiden@linux.ibm.com, 
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	catalin.marinas@arm.com, will@kernel.org, vdonnefort@google.com, 
-	tabba@google.com, Mostafa Saleh <smostafa@google.com>
-Content-Type: text/plain; charset="UTF-8"
 
-If the system supports hardware Break-Before-Make (BBM) level 3, use it
-to replace stage-2 PTEs directly instead of falling back to the software
-break-before-make sequence.
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
 
-1) Get a reference count on the containing table for the new PTE.
-2) Atomically update the PTE with the new valid descriptor.
-3) Invalidate the TLB for the old PTE.
-4) Drop the reference count holding the old PTE.
+Pre-existing issues:
+- [High] A malicious nested (L1) guest can crash the KVM host via a Break-B=
+efore-Make (BBM) violation that triggers a BUG_ON() due to an empty memory =
+cache during a permission fault.
+--
 
-One interesting case, as BBML3 will update the PTE atomically, it
-can only know it raced with another core at the point of the cmpxchg
-failing, unlike the SW implementation which locks the PTE first.
-And as we must issue CMOs to the new mapped page before the update,
-that means with BBML3 racing cores will issue redundant CMOs,
-to improve this:
-- We only use BBML3 if the old PTE was live.
-- To reduce the window of the race, an early check is added before
-  the CMO to exit early, but that does not eliminate the race.
+--- Patch [3]: [PATCH v5 3/7] KVM: arm64: Top up stage-2 memcache for dirty=
+ logging faults ---
+commit bac5488834df4c0a16b08356c8263e8eb67e0fe4
+Author: Bradley Morgan <include@grrlz.net>
 
-Signed-off-by: Mostafa Saleh <smostafa@google.com>
----
- arch/arm64/kvm/hyp/pgtable.c | 53 +++++++++++++++++++++++++++++++-----
- 1 file changed, 46 insertions(+), 7 deletions(-)
+KVM: arm64: Top up stage-2 memcache for dirty logging faults
 
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 127b7f9541b1..69d52308236f 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -838,7 +838,8 @@ static void stage2_clean_old_pte(const struct kvm_pgtable_visit_ctx *ctx,
- /**
-  * stage2_try_break_pte() - Invalidates a pte according to the
-  *			    'break-before-make' requirements of the
-- *			    architecture.
-+ *			    architecture, if BMML3 is supported it
-+ *			    will be used, otherwise fallback to SW.
-  *
-  * @ctx: context of the visited pte.
-  * @mmu: stage-2 mmu
-@@ -854,6 +855,18 @@ static bool stage2_try_break_pte(const struct kvm_pgtable_visit_ctx *ctx,
- {
- 	kvm_pte_t locked_pte;
- 
-+	if (system_supports_bbml3() && kvm_pte_valid(ctx->old)) {
-+		kvm_pte_t curr_pte = READ_ONCE(*ctx->ptep);
-+
-+		/*
-+		 * All handled in stage2_make_pte(). However exit early if we already
-+		 * lost the race to avoid extra CMOs.
-+		 */
-+		 if (curr_pte != ctx->old)
-+			return false;
-+		 return true;
-+	}
-+
- 	if (stage2_pte_is_locked(ctx->old)) {
- 		/*
- 		 * Should never occur if this walker has exclusive access to the
-@@ -873,16 +886,35 @@ static bool stage2_try_break_pte(const struct kvm_pgtable_visit_ctx *ctx,
- 	return true;
- }
- 
--static void stage2_make_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_t new)
-+/* Must be paired with stage2_try_break_pte() */
-+static bool stage2_make_pte(const struct kvm_pgtable_visit_ctx *ctx, struct kvm_s2_mmu *mmu,
-+			    kvm_pte_t new)
- {
- 	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
- 
--	WARN_ON(!stage2_pte_is_locked(*ctx->ptep));
--
- 	if (stage2_pte_is_counted(new))
- 		mm_ops->get_page(ctx->ptep);
- 
-+	if (system_supports_bbml3() && kvm_pte_valid(ctx->old)) {
-+		/*
-+		 * Barrier is required because stage2_try_set_pte() uses
-+		 * WRITE_ONCE for non-shared walks, lacking release semantics
-+		 * used in the software BBM case.
-+		 */
-+		smp_wmb();
-+		if (!stage2_try_set_pte(ctx, new)) {
-+			if (stage2_pte_is_counted(new))
-+				mm_ops->put_page(ctx->ptep);
-+			return false;
-+		}
-+
-+		stage2_clean_old_pte(ctx, mmu);
-+		return true;
-+	}
-+
-+	WARN_ON(!stage2_pte_is_locked(*ctx->ptep));
- 	smp_store_release(ctx->ptep, new);
-+	return true;
- }
- 
- static bool stage2_unmap_defer_tlb_flush(struct kvm_pgtable *pgt)
-@@ -1014,7 +1046,8 @@ static int stage2_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
- 	    stage2_pte_executable(new))
- 		mm_ops->icache_inval_pou(kvm_pte_follow(new, mm_ops), granule);
- 
--	stage2_make_pte(ctx, new);
-+	if (!stage2_make_pte(ctx, data->mmu, new))
-+		return -EAGAIN;
- 
- 	return 0;
- }
-@@ -1069,7 +1102,10 @@ static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
- 	 * will be mapped lazily.
- 	 */
- 	new = kvm_init_table_pte(childp, mm_ops);
--	stage2_make_pte(ctx, new);
-+	if (!stage2_make_pte(ctx, data->mmu, new)) {
-+		mm_ops->put_page(childp);
-+		return -EAGAIN;
-+	}
- 
- 	return 0;
- }
-@@ -1557,7 +1593,10 @@ static int stage2_split_walker(const struct kvm_pgtable_visit_ctx *ctx,
- 	 * writes the PTE using smp_store_release().
- 	 */
- 	new = kvm_init_table_pte(childp, mm_ops);
--	stage2_make_pte(ctx, new);
-+	if (!stage2_make_pte(ctx, mmu, new)) {
-+		kvm_pgtable_stage2_free_unlinked(mm_ops, childp, level);
-+		return -EAGAIN;
-+	}
- 	return 0;
- }
- 
--- 
-2.55.0.229.g6434b31f56-goog
+Dirty logging forces new stage-2 mappings to page size but does not always
+split an existing block first. A non-write permission fault on such a block
+still needs a page-table page to split it, but the top-up was previously
+gated on write faults. This patch tops up the memcache for any permission
+fault while dirty logging is active.
 
+Link: https://lore.kernel.org/all/20260623165634.699011F000E9@smtp.kernel.o=
+rg/
+
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 4d7c9bdcef004..74e7e7f7564c8 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -2113,14 +2113,13 @@ static int user_mem_abort(const struct kvm_s2_fau=
+lt_desc *s2fd)
+>  	 * Permission faults just need to update the existing leaf entry,
+>  	 * and so normally don't require allocations from the memcache. The
+>  	 * only exception to this is when dirty logging is enabled at runtime
+> -	 * and a write fault needs to collapse a block entry into a table.
+> +	 * and a fault needs to collapse a block entry into a table.
+>  	 * Under pKVM a permission fault can also collapse pages into a block,
+>  	 * which needs a fresh mapping object, and the hypervisor requires the
+>  	 * min-pages memcache even when the install allocates nothing.
+>  	 */
+>  	memcache =3D get_mmu_memcache(s2fd->vcpu);
+> -	if (!perm_fault || (memslot_is_logging(s2fd->memslot) &&
+> -			    kvm_is_write_fault(s2fd->vcpu)) ||
+> +	if (!perm_fault || memslot_is_logging(s2fd->memslot) ||
+>  	    is_protected_kvm_enabled()) {
+
+[Severity: High]
+This is a pre-existing issue, but does skipping the memcache top-up here
+leave the host vulnerable to a crash from a malicious nested L1 guest?
+
+If a nested L1 guest establishes a 2MB stage-2 block mapping, and then
+maliciously overwrites it with a 4KB page table descriptor without issuing
+a TLBI (an architectural Break-Before-Make violation), an L2 guest can
+trigger a permission fault on the stale 2MB shadow mapping.
+
+Since KVM optimizes permission faults by assuming they only relax
+permissions, the memcache top-up is skipped here.
+
+However, in kvm_s2_fault_map(), if the mapping size and fault granule
+don't match:
+
+arch/arm64/kvm/mmu.c:kvm_s2_fault_map()
+    ...
+	} else {
+		ret =3D KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, gfn_to_gpa(gfn), mapping_=
+size,
+							 __pfn_to_phys(pfn), prot,
+							 memcache, flags);
+	}
+    ...
+
+kvm_pgtable_stage2_map() will attempt to split the block, which requires
+a new page table allocation. Because the cache wasn't topped up,
+kvm_mmu_memory_cache_alloc() will hit WARN_ON(!mc->nobjs) and fall back
+to a GFP_ATOMIC allocation. If this atomic allocation fails under memory
+pressure, it hits BUG_ON(!p) and crashes the host.
+
+>  		ret =3D topup_mmu_memcache(s2fd->vcpu, memcache);
+>  		if (ret)
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260717130317.1953=
+574-1-fuad.tabba@linux.dev?part=3D3
