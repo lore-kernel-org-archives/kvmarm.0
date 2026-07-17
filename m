@@ -1,131 +1,94 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 127C73BFAE8
-	for <kvmarm@lists.linux.dev>; Fri, 17 Jul 2026 13:15:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 960343FBEAF
+	for <kvmarm@lists.linux.dev>; Fri, 17 Jul 2026 13:22:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784294139; cv=none; b=IU/dTsFNIXilm1vfNTW86KNCQvgQH+r/Yo75uOlbztT3CErnydeEkuFEFjbjxcHUu/19KCZDSfUwpC+3xT1SFrZtUG8zT9JgCgO/9T7URlU+r7O4yMfvWgZvUjHHmK0cQNvkD36m1GxEKcWcJeCi4AC2mcQuFtBwHPge9q6buCs=
+	t=1784294538; cv=none; b=uz5Ywt5w0gbdkQF+WVPmWoAp+/1P+zyenIzFYAEDi4f6Wy0IB+3xwLlmLNlDSoSrzZux2h0mFxgFU4ddjubG6xbeEjsA0AIniXRYYaCUH5RHOnKBnkjK0D6tD6hXYNi3NqGPz704r3AVw1sEZZqYnRxMHYk6/HAP9rCwvj7TnjU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784294139; c=relaxed/simple;
-	bh=1kmxQLfeGjYL+3vEnHaKyxl8f1n+8QMmywryUbdgv0o=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=cRqHPsw5/NfBcVYByqLdTMI8LLWb4TlbhMx/2SsS+Gh3SXQ9ajiy1reiDyMxicXJQhv7OXTHYIv+pN2ie2b7RKoTqq8d0+5nURAaHxhWoOdVaXyd28n/V1HkqllNTZoShoH6DjR/DwDQlBaAqbfgjeth7uT0BubutEcGtxo+/rc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hTD+s6kW; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784294538; c=relaxed/simple;
+	bh=ZpoCI9ofx2p/ua+KhEMRhGi82OXdAYlebI0ztnF7GEI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oNtqnyyoMf5dd6iKx6KIuigUgnuGnxylTKmfSbrdaBbMD8MgSo5b/AHb4HbsHevGbSAVzNqUrjiCvxEFQ7uEkaZ64Le0jN81ltvXXWvoWihx7nY4chZmguDc0tJbjYIbjP0ZTtCxext5cy31dYIdg0yl9YugZ7dUIbCgBoM0mxs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=K6AyEy3S; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hTD+s6kW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71F531F000E9;
-	Fri, 17 Jul 2026 13:15:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784294137;
-	bh=JH7j/oFn9Zuc5/GOG4swBwaMuviuktwDHCn+Nw9zQaI=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=hTD+s6kWGZ80vFwx69V9hyvDRR6Lnde93ugoLlzECR5i558mDfNV1Dqz/1HbUZq2o
-	 mYQqtua6Kf4IvJclUolrxRRgsbWgGGky/YzZVVFov/He/yVwXK+Rbl4wKFCcQ14XJN
-	 yIpcUCo9XUZsDay8WGNKtBicYRLVw32mcH47qxa9XOoKzDzcpCpUgx7oAS4t+j88pL
-	 rQpe7m+qUxIFjffD4eQa7/2IHhfmP2aiHIX3n9oUHGasPlLBNwKWbH8cczh341mKGV
-	 P6IB+XiVuPdhWgiIemQTJUYxYWD+VPpD/Y550SLREOIj5Q0C7K7Nyr90Xy+L8+1/OT
-	 AVXfpiWlLw77Q==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v5 3/7] KVM: arm64: Top up stage-2 memcache for dirty
- logging faults
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Fuad Tabba" <fuad.tabba@linux.dev>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260717130317.1953574-4-fuad.tabba@linux.dev>
-References: <20260717130317.1953574-1-fuad.tabba@linux.dev>
- <20260717130317.1953574-4-fuad.tabba@linux.dev>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 17 Jul 2026 13:15:37 +0000
-Message-Id: <20260717131537.71F531F000E9@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="K6AyEy3S"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6F3231476;
+	Fri, 17 Jul 2026 06:22:11 -0700 (PDT)
+Received: from J2N7QTR9R3 (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 060EE3F7D8;
+	Fri, 17 Jul 2026 06:22:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1784294535; bh=ZpoCI9ofx2p/ua+KhEMRhGi82OXdAYlebI0ztnF7GEI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=K6AyEy3StxJcwPLr/m61NkJzXizkRu07Wyuz+kg41HvvKbPRzZqm+z8Wm0ev8hoxp
+	 OyjIi/WvIUkh3uwZOORa4hYvZ6Idk9ltbu1Ve2kAUkf/IiuFVW4JH1CDAgs8CstcX0
+	 KFIJXYHoTIb3Gq6WTIH4HCNgywrD0MHc3LdKI6H4=
+Date: Fri, 17 Jul 2026 14:22:07 +0100
+From: Mark Rutland <mark.rutland@arm.com>
+To: Vladimir Murzin <vladimir.murzin@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	broonie@kernel.org, catalin.marinas@arm.com, james.morse@arm.com,
+	maz@kernel.org, oupton@kernel.org, tabba@google.com,
+	will@kernel.org
+Subject: Re: [PATCH 17/18] arm64: fpsimd: Move SME save/restore inline
+Message-ID: <alosf_mrqeX668xC@J2N7QTR9R3>
+References: <20260521132556.584676-1-mark.rutland@arm.com>
+ <20260521132556.584676-18-mark.rutland@arm.com>
+ <ahWpST4K3rbMbjWK@J2N7QTR9R3>
+ <08e5ce52-be74-4fc5-a0b2-8f405a5eff99@arm.com>
+ <ahW8Eba3SNqfVDdk@J2N7QTR9R3>
+ <ahXMkPEpgaZQf_Nk@J2N7QTR9R3>
+ <ahlYC2qgqzNQxggP@J2N7QTR9R3>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ahlYC2qgqzNQxggP@J2N7QTR9R3>
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
+On Fri, May 29, 2026 at 10:10:35AM +0100, Mark Rutland wrote:
+> On Tue, May 26, 2026 at 05:38:40PM +0100, Mark Rutland wrote:
+> > On Tue, May 26, 2026 at 04:28:17PM +0100, Mark Rutland wrote:
+> > > On Tue, May 26, 2026 at 03:39:56PM +0100, Vladimir Murzin wrote:
+> > > > I suspect you are intentionally not using "Ucj" constrain to limit register allocator,
+> > > > if so I'm wondering why?
+> > > 
+> > > Thanks for the suggestion; that was ignorance rather than intent.
+> > > 
+> > > I was not aware of "Ucj" as it doesn't appear on the public GCC
+> > > documentation:
+> > > 
+> > >   https://gcc.gnu.org/onlinedocs/gcc/Machine-Constraints.html
+> > > 
+> > > Looking at the machine description file, that's marked with '@internal',
+> > > so IIUC GCC folk don't seem to expect/want people to use it. That said,
+> > > LLVM seems to support it.
+> > > 
+> > > I'll go check that all relevant toolchains support this, and poke GCC
+> > > folk to see if they're happy to promote that to a public constraint.
+> > 
+> > GCC folk seem happy to make this public, which is great! I'll cross-link
+> > a thread here if/when patches appear.
+> 
+> Alex Coplan sent a patch for GCC to make this public:
+> 
+>   https://gcc.gnu.org/pipermail/gcc-patches/2026-May/718560.html
 
-Pre-existing issues:
-- [High] A malicious nested (L1) guest can crash the KVM host via a Break-B=
-efore-Make (BBM) violation that triggers a BUG_ON() due to an empty memory =
-cache during a permission fault.
---
+Just for posterity, that was merged in GCC commit:
 
---- Patch [3]: [PATCH v5 3/7] KVM: arm64: Top up stage-2 memcache for dirty=
- logging faults ---
-commit bac5488834df4c0a16b08356c8263e8eb67e0fe4
-Author: Bradley Morgan <include@grrlz.net>
+  090f3e78a10b5ce14fd80de82d3e8dda8af1cae6 ("aarch64: Make Uc[ij] constraints public")
 
-KVM: arm64: Top up stage-2 memcache for dirty logging faults
+... which can be found at:
 
-Dirty logging forces new stage-2 mappings to page size but does not always
-split an existing block first. A non-write permission fault on such a block
-still needs a page-table page to split it, but the top-up was previously
-gated on write faults. This patch tops up the memcache for any permission
-fault while dirty logging is active.
+  https://gcc.gnu.org/git/?p=gcc.git;a=commit;h=090f3e78a10b5ce14fd80de82d3e8dda8af1cae6
 
-Link: https://lore.kernel.org/all/20260623165634.699011F000E9@smtp.kernel.o=
-rg/
+... so we should be able to use that in future once our minimum
+supported toolchains are GCC 14.1.0+ and and LLVM 18.1.0+.
 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 4d7c9bdcef004..74e7e7f7564c8 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -2113,14 +2113,13 @@ static int user_mem_abort(const struct kvm_s2_fau=
-lt_desc *s2fd)
->  	 * Permission faults just need to update the existing leaf entry,
->  	 * and so normally don't require allocations from the memcache. The
->  	 * only exception to this is when dirty logging is enabled at runtime
-> -	 * and a write fault needs to collapse a block entry into a table.
-> +	 * and a fault needs to collapse a block entry into a table.
->  	 * Under pKVM a permission fault can also collapse pages into a block,
->  	 * which needs a fresh mapping object, and the hypervisor requires the
->  	 * min-pages memcache even when the install allocates nothing.
->  	 */
->  	memcache =3D get_mmu_memcache(s2fd->vcpu);
-> -	if (!perm_fault || (memslot_is_logging(s2fd->memslot) &&
-> -			    kvm_is_write_fault(s2fd->vcpu)) ||
-> +	if (!perm_fault || memslot_is_logging(s2fd->memslot) ||
->  	    is_protected_kvm_enabled()) {
-
-[Severity: High]
-This is a pre-existing issue, but does skipping the memcache top-up here
-leave the host vulnerable to a crash from a malicious nested L1 guest?
-
-If a nested L1 guest establishes a 2MB stage-2 block mapping, and then
-maliciously overwrites it with a 4KB page table descriptor without issuing
-a TLBI (an architectural Break-Before-Make violation), an L2 guest can
-trigger a permission fault on the stale 2MB shadow mapping.
-
-Since KVM optimizes permission faults by assuming they only relax
-permissions, the memcache top-up is skipped here.
-
-However, in kvm_s2_fault_map(), if the mapping size and fault granule
-don't match:
-
-arch/arm64/kvm/mmu.c:kvm_s2_fault_map()
-    ...
-	} else {
-		ret =3D KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, gfn_to_gpa(gfn), mapping_=
-size,
-							 __pfn_to_phys(pfn), prot,
-							 memcache, flags);
-	}
-    ...
-
-kvm_pgtable_stage2_map() will attempt to split the block, which requires
-a new page table allocation. Because the cache wasn't topped up,
-kvm_mmu_memory_cache_alloc() will hit WARN_ON(!mc->nobjs) and fall back
-to a GFP_ATOMIC allocation. If this atomic allocation fails under memory
-pressure, it hits BUG_ON(!p) and crashes the host.
-
->  		ret =3D topup_mmu_memcache(s2fd->vcpu, memcache);
->  		if (ret)
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260717130317.1953=
-574-1-fuad.tabba@linux.dev?part=3D3
+Mark.
