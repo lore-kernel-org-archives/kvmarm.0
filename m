@@ -1,138 +1,253 @@
-Received: from lamorak.hansenpartnership.com (lamorak.hansenpartnership.com [198.37.111.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 326D842A16A;
-	Fri, 17 Jul 2026 14:35:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.37.111.173
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B83FD3BD649;
+	Fri, 17 Jul 2026 14:52:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784298914; cv=none; b=Qto+jqG0tbCL4woK7zIj4GaxHU6ikQwcC3eHRi7b2hgLmLPV7PBLdcXKPw8iVt2aKBogVaUET5EQwAaFgmRXquaT+AejrCnFbPeG74qQQuh5sRdVDrcOVBiCc2BYwgKHBGt5nC1FMhi7VGwb3TcD7uIAE6oQby/V7szwxDxaVyM=
+	t=1784299955; cv=none; b=eBZBIhwcuYNBYmdHmnGa3IUwd9xGrjzrWh75LQCQSwjLjTgHegr8hpt3M0ueH/K4p3uZ74563D+8sZ4sedgFguOS3FwRK2GC4BhbNJmLfhmfkuk9epBxHPabL4VzkaefZFEn4520LL9X0u7SVwwP0oIsGFpLBc08nuidyzdAKqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784298914; c=relaxed/simple;
-	bh=hxGmcHmTQSG/tdRRf+oOX+HiB6sZ5o3RY6F7qAn0Qg8=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=tWwwPwlETNarimWjokbm5xoUf9ANjKC3uLwU2fDayEY6fHO2mN36WuvAuj2qQOzK3eZbpQHgBiXFWVBNyvadwARYYtDuTK6p1kjzx5IS6KpM0avmcoRwSSVAB95cwWwjZ1Ihch1TOlocV6PYQ/W2LmOJf0IXphIdNN8J/n/lT+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com; spf=pass smtp.mailfrom=HansenPartnership.com; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=podJ7VXE; arc=none smtp.client-ip=198.37.111.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=HansenPartnership.com
+	s=arc-20240116; t=1784299955; c=relaxed/simple;
+	bh=geTaRSRCfA4B+W8HfR1RTJSb4KA1DesAeGKjhcCy5KM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UEM63XyROHEoLzBu275w97RL4b1QTmaEwMjxwFuX48RI6/AQy2wqej7vk2+ZucIwz5iGGKljv9PYezFkwj9Tc4tCrhozfbwcnDtMapgdbQ3mv/6/wcUp6h+tfUyjQELvQj0+E2eCQpoKUCG7eGdMMid1TlKEuPOMaAU8HAgSXu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Q17D4JsG; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="podJ7VXE"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=hansenpartnership.com; s=20151216; t=1784298912;
-	bh=hxGmcHmTQSG/tdRRf+oOX+HiB6sZ5o3RY6F7qAn0Qg8=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
-	b=podJ7VXEOrozW0/nEkVk5DUdZHQ+jKSQ6mLUbZdvS3I1Wu4OjMzk94KILfZv/XDzH
-	 Ec/FKjwkDHi4qBngcOq9TDTwLIi7MsReMG/FnZhBNLpB6oXFaxJIMafGhoAw1chHHg
-	 m2Heto7gdDUeUaH+Dkyw2JU4hBcyj2zcgXY27FjQ=
-Received: from lingrow.int.hansenpartnership.com (unknown [IPv6:2601:5c4:4300:d341::8c71])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519MLKEM768 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by lamorak.hansenpartnership.com (Postfix) with ESMTPSA id 6AF891C0278;
-	Fri, 17 Jul 2026 10:35:11 -0400 (EDT)
-Message-ID: <570f82e8b8bc968a31a4ba859145f6c324e41247.camel@HansenPartnership.com>
-Subject: Re: [PATCH 35/60] kvm: Add VCPU plane-scheduling state and helpers
-From: James Bottomley <James.Bottomley@HansenPartnership.com>
-To: =?ISO-8859-1?Q?J=F6rg_R=F6del?= <joro@8bytes.org>, Paolo Bonzini
-	 <pbonzini@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>, Tom Lendacky	
- <thomas.lendacky@amd.com>, ashish.kalra@amd.com, michael.roth@amd.com, 
-	nsaenz@amazon.com, anelkz@amazon.de, Melody Wang <huibo.wang@amd.com>, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
-	loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
- x86@kernel.org, 	coconut-svsm@lists.linux.dev, joerg.roedel@amd.com
-Date: Fri, 17 Jul 2026 10:35:10 -0400
-In-Reply-To: <aigE2EvJyZlYDz0V@8bytes.org>
-References: <20260608144252.351443-1-joro@8bytes.org>
-	 <20260608144252.351443-36-joro@8bytes.org>
-	 <e7eb0dba-790a-4644-9895-5c9a7420d7fe@redhat.com>
-	 <aib8n5lO6HKbLC4Y@8bytes.org>
-	 <CABgObfbUsDeStnZF-7oyR-W-Bvd4qTMoeUwGizgn10UTdKtZ2A@mail.gmail.com>
-	 <aigE2EvJyZlYDz0V@8bytes.org>
-Autocrypt: addr=James.Bottomley@HansenPartnership.com;
- keydata=mQENBE58FlABCADPM714lRLxGmba4JFjkocqpj1/6/Cx+IXezcS22azZetzCXDpm2MfNE
- lecY3qkFjfnoffQiw5rrOO0/oRSATOh8+2fmJ6el7naRbDuh+i8lVESfdlkoqX57H5R8h/UTIp6gn
- 1mpNlxjQv6QSZbl551zQ1nmkSVRbA5TbEp4br5GZeJ58esmYDCBwxuFTsSsdzbOBNthLcudWpJZHU
- RfMc0ew24By1nldL9F37AktNcCipKpC2U0NtGlJjYPNSVXrCd1izxKmO7te7BLP+7B4DNj1VRnaf8
- X9+VIApCi/l4Kdx+ZR3aLTqSuNsIMmXUJ3T8JRl+ag7kby/KBp+0OpotABEBAAG0N0phbWVzIEJvd
- HRvbWxleSA8SmFtZXMuQm90dG9tbGV5QEhhbnNlblBhcnRuZXJzaGlwLmNvbT6JAVgEEwEIAEICGw
- MGCwkIBwMCBhUIAgkKCwQWAgMBAh4BAheAAhkBFiEE1WBuc8i0YnG+rZrfgUrkfCFIVNYFAml2ZBI
- FCS3GUMIACgkQgUrkfCFIVNZKjQf/deRzlXZClKxTC/Ee2yEPqqS7mm/INUA49KdQQ5oIhSxkUBy0
- 9J4qjMIo5F8ZFkFTqikBqeL35LKu7O7rn8WETfX8Bxvos3HUsl3jHo34DES4MUFIpoQPgtiLRGwLb
- K0cVCAArR2u2qj4ABmTRrs1I1kvdjEw6gatOuXtEe/j5O2fvfzTq9GBr0Q3n2IAsFXi4hLlx6VPE8
- tyWUZ8BWJKtih3JAeUiXFvASL3McV0rV9RnU0VbjEQEhSE7PMYhWpnDC9AyBb0lXJllQRvC3NSkUB
- 8KVQgNNxRPss0WE/nBoZ4dFA42jTyzTz8lNylxZoAWV7WJb3QxVg4oCodRVrxxrQhSmFtZXMgQm90
- dG9tbGV5IDxqZWpiQGtlcm5lbC5vcmc+iQFVBBMBCAA/AhsDBgsJCAcDAgYVCAIJCgsEFgIDAQIeA
- QIXgBYhBNVgbnPItGJxvq2a34FK5HwhSFTWBQJgS5mYBQkbNYS9AAoJEIFK5HwhSFTWBpwIAL5Bk3
- 5FB34U6iHmDzzgdCbxLTs43T/YQyJpcGIvopBvnI/fDY8oSG6Df64/O6B+1R+A8TDp6ZG5ysUWnCC
- 6GuIaEHemBYkitMPglR6+sGCMQY7O0mlsPvdssvKK1KI9Bno4VU6ogaF2qVzefSqg1Djmf/DcsxWP
- rI/jdJ8FB5AYR2rjIdDFc+zRdAJuavo1/anyY2wgpFh/3R8IOYAEfWV9nGgYkf9+tA4EIn1sxE0I3
- L5oW2N3mbyRrkzuBwO8ztMCwqEPk7moWzhokcZqMXiAIahaZdkashJC+s2X2RZSGCy+g+pvY5NN4B
- BVG5XwLgVBqbHMTcxE0fbmPqz+q6O0LEphbWVzIEJvdHRvbWxleSA8amVqYkBoYW5zZW5wYXJ0bmV
- yc2hpcC5jb20+iQFXBBMBCABBFiEE1WBuc8i0YnG+rZrfgUrkfCFIVNYFAmODZ5ACGwMFCRs1hL0F
- CwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AACgkQgUrkfCFIVNZu0Af/TzvL2/NdgAcw9uN3x60H8
- jc4QUq14VpxcFEFEMpcj1morkX/G93V+56HBBaXZj+yK8PhxIA/SIz+sU7C/0YvKuvzakP8ZX/7WJ
- e32SOUtjfr/VTaqjIBzNj6OxLvZpmNbBw7s6DwhhNpHOWqJ/1ml+PtDRDV71IB58yVqQjp1xlNKVl
- ZppcJ5908EJzsFnRIVjiQiDSKoppqB2BCibBbrWcln7CiWMyOC/cco6SIn6twH+f7+aivJ3xGcOE2
- a9gBKF5rNi9TBoX9oyPmshv/TDmnohsVrH7AYXlGYfZTk15SWEiROh1QX8/uD9wl/gcIv5EDUpT/F
- L2jzOsA5663bw==
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Q17D4JsG"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9161A1477;
+	Fri, 17 Jul 2026 07:52:21 -0700 (PDT)
+Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D3ECA3F7B4;
+	Fri, 17 Jul 2026 07:52:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1784299945; bh=geTaRSRCfA4B+W8HfR1RTJSb4KA1DesAeGKjhcCy5KM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Q17D4JsGFEBL+6sDpWMcunngyC29rqf+fGimEpqOWyidmQn1Ye5b9Ng024IiN8XO1
+	 BpSiseiXuS3rkwGilTBd0Mtc+3zJUOqdi4vcGpkDxmGIPUfpSc+LE4KLYjoJ+KoKrd
+	 2yX9ouadFjtS1r9vxHfpHw53Lf613JWf8pjSvHzw=
+Date: Fri, 17 Jul 2026 15:52:17 +0100
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: sashiko-reviews@lists.linux.dev
+Cc: Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v2 6/6] KVM: arm64: ptdump: Introduce the shadow ptdump
+ file
+Message-ID: <i2yajpp7keupxj5ltqv25vccubjx5ux6nkbc6dkdwcnlsuw6jv@xx5euxyk4uip>
+References: <20260630121005.1130996-1-weilin.chang@arm.com>
+ <20260630121005.1130996-7-weilin.chang@arm.com>
+ <20260630122758.891011F00A3A@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260630122758.891011F00A3A@smtp.kernel.org>
 
-On Tue, 2026-06-09 at 14:37 +0200, J=C3=B6rg R=C3=B6del wrote:
-> I read a bit more about VSM and it seems their prioritization of VTLs
-> is a bit more complicated. VTL0 has the least privileges but boots
-> first, then sets up VTL1. But VTL1 is only higher-privileged once it
-> is locked by VTL0. Another way to look at it is that VTL0 de-
-> prioritizes itself.
+On Tue, Jun 30, 2026 at 12:27:58PM +0000, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 5 potential issue(s) to consider:
+> 
+> New issues:
+> - [High] Concurrent reallocation of nested_mmus array leads to Use-After-Free in kvm_ptdump_guest_nested_show().
+> - [High] If kvm_ptdump_parser_init() fails, st->kvm is left as NULL, causing a kernel panic on subsequent debugfs reads.
+> - [Medium] Missing note_page_flush() causes the last contiguous block of page table entries to be silently dropped.
+> 
+> Pre-existing issues:
+> - [Critical] kvm_arch_flush_shadow_all() frees the nested_mmus array even if active VCPUs hold references to its elements.
+> - [High] Unprotected iteration over nested_mmus in kvm_arch_flush_shadow_all() races with array reallocation.
+> --
+> 
+> commit 4dce12b467bf2d3540834dccee1f3e623af43d42
+> Author: Wei-Lin Chang <weilin.chang@arm.com>
+> 
+> KVM: arm64: ptdump: Introduce the shadow ptdump file
+> 
+> This commit creates a ptdump file for shadow page tables used in nested
+> virtualization. It dumps all valid shadow page tables, their mmu index,
+> VTCR_EL2, VTTBR_EL2, and stage-2 enablement status. It also modifies
+> kvm_arch_flush_shadow_all() to detach the nested mmu array under mmu_lock.
+> 
+> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> > index efd5d21c7ac75..cbf7143819669 100644
+> > --- a/arch/arm64/kvm/nested.c
+> > +++ b/arch/arm64/kvm/nested.c
+> > @@ -1184,6 +1184,7 @@ void kvm_nested_s2_flush(struct kvm *kvm)
+> >  
+> >  void kvm_arch_flush_shadow_all(struct kvm *kvm)
+> >  {
+> > +	struct kvm_s2_mmu *mmus;
+> >  	int i;
+> >  
+> >  	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
+> 
+> [Severity: High]
+> This is a pre-existing issue, but can this loop race with array reallocation?
+> 
+> If a concurrent thread calls KVM_ARM_VCPU_INIT to initialize a new nested
+> vCPU, kvm_vcpu_init_nested() expands the array via kvrealloc() holding
+> only kvm->arch.config_lock. Since this loop doesn't hold config_lock or
+> mmu_lock, could it dereference the array while or after it is freed?
 
-Actually, I don't think we have to follow the VSM model.  All we at
-Microsoft care about is that we can emulate VSM with the planes
-primitives provided.
+I don't think so, if a concurrent thread calls KVM_ARM_VCPU_INIT, it
+means both the kvm structure and mm_struct is still live, hence
+kvm_arch_flush_shadow_all() won't be called, as it is called when kvm
+unregisters mmu notifiers (kvm_destroy_vm(), when the last kvm reference
+goes), or when the last mmput() happens which call the mmu notifier
+release.
 
-There's a definite reason not to do strict VTL privilege in that one
-can see two mutually distrusting planes sharing a common communication
-area.  This is definitely possible with TDX and so planes shouldn't
-disallow it.
+> 
+> >  		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+> >  
+> >  		if (!WARN_ON(atomic_read(&mmu->refcnt)))
+> >  			kvm_free_stage2_pgd(mmu);
+> >  	}
+> > -	kvfree(kvm->arch.nested_mmus);
+> > -	kvm->arch.nested_mmus = NULL;
+> > -	kvm->arch.nested_mmus_size = 0;
+> > +
+> > +	scoped_guard(write_lock, &kvm->mmu_lock) {
+> > +		mmus = kvm->arch.nested_mmus;
+> > +		kvm->arch.nested_mmus = NULL;
+> > +		kvm->arch.nested_mmus_size = 0;
+> > +	}
+> > +
+> > +	kvfree(mmus);
+> 
+> [Severity: Critical]
+> This is a pre-existing issue, but does this prematurely free the array if 
+> active VCPUs hold references?
+> 
+> If a running vCPU holds a reference to its nested MMU, where atomic_read
+> shows refcnt > 0, the loop above skips freeing the page table, but the
+> backing array is freed anyway. 
+> 
+> When the vCPU exits and calls kvm_vcpu_put_hw_mmu(), it will dereference the
+> freed pointer. Should the array lifetime be tied to the active references?
 
-> The patches here are built around the assumption that plane0 is the
-> highest privileged one and is always runnable. Running any lower-
-> privilege plane must be triggered by the guest. This is clearly not
-> sufficient for VSM, the question is how to solve that.
+Similar to my comment above, when kvm_arch_flush_shadow_all() is called,
+there will be no more mm_struct users, so there can't be any running
+vCPUs to race against.
 
-So this all depends how the planes are started.  If you're starting
-them from an IGVM file that loads the most privileged code and then
-runs the guest in a different plane, absolutely, it can work as you
-describe.  However, the common use case for serviceable security
-enclaves is you start the kernel first (necessarily in plane 0) and
-then bring up the enclaves later which means the planes > 0 are
-technically higher privilege since they're running hidden security
-code.  HOWEVER, there's no reason at all to trust a security enclave
-that's doing something like guarding private keys to be able to poke
-anywhere it wants in the guest ... that's a security breach waiting to
-happen, so it would really be better if the model were not
-hierarchical, but more akin to the ability to seal planes off from each
-other, so the kernel can start the enclave, which would then set itself
-and the communication area up, but then the plane 0 kernel would remove
-access to most memory from the enclave.
+> 
+> >  	kvm_uninit_stage2_mmu(kvm);
+> >  }
+> 
+> [ ... ]
+> 
+> > diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
+> > index 40f93b7c7ad98..1649eaa75798c 100644
+> > --- a/arch/arm64/kvm/ptdump.c
+> > +++ b/arch/arm64/kvm/ptdump.c
+> > @@ -181,6 +181,50 @@ static int kvm_ptdump_guest_canonical_show(struct seq_file *m, void *unused)
+> >  	return 0;
+> >  }
+> >  
+> > +static int kvm_ptdump_guest_nested_show(struct seq_file *m, void *unused)
+> > +{
+> > +	int ret = 0, i;
+> > +	struct kvm_ptdump_guest_state *st = m->private;
+> > +	struct kvm *kvm = st->kvm;
+> > +	struct kvm_pgtable_walker walker = (struct kvm_pgtable_walker) {
+> > +		.cb	= kvm_ptdump_visitor,
+> > +		.arg	= &st->parser_state,
+> > +		.flags	= KVM_PGTABLE_WALK_LEAF,
+> > +	};
+> > +
+> > +	guard(write_lock)(&kvm->mmu_lock);
+> > +
+> > +	if (!kvm->arch.nested_mmus)
+> > +		return 0;
+> > +
+> > +	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
+> 
+> [Severity: High]
+> Is it safe to iterate over the nested_mmus array holding only mmu_lock?
+> 
+> If userspace reads the debugfs file while a concurrent thread issues a
+> KVM_ARM_VCPU_INIT ioctl to initialize a new nested vCPU, kvm_vcpu_init_nested()
+> expands the array via kvrealloc() holding only kvm->arch.config_lock:
+> 
+> kvm_vcpu_init_nested()
+>     tmp = kvrealloc(kvm->arch.nested_mmus, ...);
+>     swap(kvm->arch.nested_mmus, tmp);
+> 
+> Could the debugfs reader dereference the array while or after it is freed by
+> kvrealloc()?
 
-In this sealing model, there's no absolute privilege levels; each plane
-would decide what the other planes can see of its memory space and, on
-security grounds, we'd likely configure the enclaves to have the least
-possible privilege.
+This should be fixed by ("KVM: arm64: Reassign nested_mmus array behind mmu_lock") [*].
 
-Now, Windows applications expect VSM to be strictly hierarchical in
-terms of privilege, but if we create a sealing primitive as described
-above, we can get it to build the strict VSM privilege hierarchy in the
-hyper-v driver.
+[*]: https://lore.kernel.org/kvmarm/aiKIVVeIr1aAB1yp@v4bel/
 
-Regards,
+> 
+> > +		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+> > +
+> > +		if (!mmu->pgt)
+> > +			continue;
+> > +
+> > +		if (kvm_s2_mmu_valid(mmu)) {
+> > +			memset(st, 0, sizeof(*st));
+> > +			ret = kvm_ptdump_parser_init(st, kvm, mmu->pgt);
+> > +			if (ret)
+> > +				return ret;
+> 
+> [Severity: High]
+> Does an early return here leave st->kvm as NULL?
+> 
+> The memset() clears st->kvm. If kvm_ptdump_parser_init() returns an error,
+> the function propagates it, leaving st->kvm NULL. 
+> 
+> If userspace issues another read() on the same file descriptor, seq_read will
+> call the show() callback again, which will dereference the NULL st->kvm
+> at the mmu_lock acquisition:
+> 
+> guard(write_lock)(&kvm->mmu_lock);
+> 
+> Could we restore st->kvm on the error path?
 
-James
+I'll just rearrange kvm_ptdump_parser_init() so that st->kvm is set
+before the possible error return.
+
+> 
+> > +			st->parser_state = (struct ptdump_pg_state) {
+> > +				.marker		= &st->ipa_marker[0],
+> > +				.level		= -1,
+> > +				.pg_level	= &st->level[0],
+> > +				.seq		= m,
+> > +			};
+> > +			seq_printf(m, "nested mmu %d VTCR: 0x%016llx VTTBR: 0x%016llx s2: %s\n",
+> > +				   i, mmu->tlb_vtcr, mmu->tlb_vttbr,
+> > +				   mmu->nested_stage2_enabled ? "enabled" : "disabled");
+> > +			ret = kvm_pgtable_walk(mmu->pgt, 0, BIT(mmu->pgt->ia_bits), &walker);
+> > +			if (ret)
+> > +				return ret;
+> 
+> [Severity: Medium]
+> Does the page table walk lack a subsequent call to note_page_flush()?
+> 
+> The ptdump API requires a final call to note_page_flush() to emit the final
+> buffered contiguous block of page table attributes. Because this is missing
+> after the kvm_pgtable_walk() completion, does the last block get silently
+> dropped from the debugfs output?
+
+Unfortunately yes, we are missing the last row for stage-2 ptdump,
+however the fix is not a note_page_flush(), as it uses 0 for the current
+address. For stage-2 ptdump we should supply the last address of the
+guest IPA space.
+
+However, this is a separate problem and can be fixed after this series.
+
+Thanks,
+Wei-Lin Chang
+
+> 
+> > +		}
+> > +	}
+> > +	return ret;
+> > +}
+> 
+> -- 
+> Sashiko AI review · https://sashiko.dev/#/patchset/20260630121005.1130996-1-weilin.chang@arm.com?part=6
