@@ -1,135 +1,164 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5DBA3F8881;
-	Fri, 17 Jul 2026 12:44:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 662A53FBEAF
+	for <kvmarm@lists.linux.dev>; Fri, 17 Jul 2026 13:04:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784292266; cv=none; b=sarz4R/7YEgjTT1eGrrTmXoSDjRhDFSJP/Uig6BMNs8dkNy5PvTkD3vSjNgjNFgrsWVTmYssz68dBebjWoU2lgDf3ms7/ocoeBWjI6T8hhBBDLooA+gOySu5GwCggAU0GyTC8mnBM1DWe3zo1lV2Tr6Z6lb3HGhP0wyEr9iqAtY=
+	t=1784293442; cv=none; b=lbciKGHhqPIRbz/IjtzIxSUCKLKvlutVFmNo9ECDAzDwn2ZJtymiKgxNcaFQlqRf4bYxUdmsDc1qGMgzZexc78IeBKGgwP/oBnmL3d7Uzr3Xg+HjyJD/gh1jZ4R9u9NzfYQJU8ETqRLoNIlkvIv6FcyU5JoW/3O/eHj5wt0Yb/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784292266; c=relaxed/simple;
-	bh=gz6iJAdUDQ+ZO/Wkp4qDUTE0fFHFse5ZsMzhQkZAwgo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZYBbKnB6YmBYsoOThwtcC6aSO+thoQu6Qgrn+RnRj1EtEYHnXNnM04MyG1JWDlp4AwnaKRa0CQfWc3gW+h4DgugDJRGkzqT8UiNaw/dzWK+/YgWJkjtPFJ4LyKx3Q3EoPoeO1yPVJnbumzDuyLpzCLs4HLdQHj5k+ZskPqZCTqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Dl+bmZWk; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1784293442; c=relaxed/simple;
+	bh=jszNm6gpIq8Fd+3mkdvyJCIrOrbuawvBbzsrSkcTVgw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Lc2z+oj3YsIjZEhxbjpDjWQn5iqolK1foCu7/ZyAY4dHyaRjSWVKpdYsJ0ZX60KqbeGbEXghamtTZ19PtC/oPUFNaCxpEiQQrzyW/Gfl/m1S3wSIUskUEXyySfMd6qQnkFtckWXgD9mZygxP73EaEUvFBNF04c+hor4tnDN2t1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=j7XoEsWu; arc=none smtp.client-ip=95.215.58.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Dl+bmZWk"
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66HCg1WT2033767;
-	Fri, 17 Jul 2026 12:44:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=bA5GdHKtXn2db8UxsUpNgEhioPfin7
-	FEKnKBdzMLZ6I=; b=Dl+bmZWkguo25WfWEXP99Dg/dMDXr0jAng7swVS08Xko1E
-	+A7uFAxDjUN4YeD0TfFAFmIzDgPanUPonMepnMqkoh5gZShbtqfNA9dUJC+wXXEG
-	9CA0ZZeZhZvInle3llfYtUKDejmrVUBYekkxdIeX7oIIOxDgJ6nX+r+6o2wDiJ3H
-	GvlfJ8kQGeYsJO3RrcEAfJZzTSdIZXeqDM9/J95QP45gr1N2VP77tAkh5mvSRdqV
-	Yi/wQt5oiHwW3GIqtTlX5fzIvl5McmD9t9DuMYbWWRMTS95lc8i4fFYe5l7o20pM
-	BPctzR9cyiBnUiClG8Rs3BH9lBp122w65CqK/2GQ==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fbegc5ejw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 17 Jul 2026 12:44:03 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 66HCYcvc028989;
-	Fri, 17 Jul 2026 12:44:03 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4fc15k9n2m-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 17 Jul 2026 12:44:02 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 66HCi0bI50594156
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 17 Jul 2026 12:44:01 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D817D20043;
-	Fri, 17 Jul 2026 12:44:00 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5E98220040;
-	Fri, 17 Jul 2026 12:44:00 +0000 (GMT)
-Received: from osiris (unknown [9.87.159.133])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Fri, 17 Jul 2026 12:44:00 +0000 (GMT)
-Date: Fri, 17 Jul 2026 14:43:59 +0200
-From: Steffen Eiden <seiden@linux.ibm.com>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-        kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Vincent Donnefort <vdonnefort@google.com>,
-        Quentin Perret <qperret@google.com>,
-        Sebastian Ene <sebastianene@google.com>,
-        Hyunwoo Kim <imv4bel@gmail.com>, Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH v6 3/8] KVM: arm64: Factor out reusable vCPU reset helpers
-Message-ID: <20260717124359.319936-B-seiden@linux.ibm.com>
-References: <20260715081238.1891918-1-fuad.tabba@linux.dev>
- <20260715081238.1891918-4-fuad.tabba@linux.dev>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="j7XoEsWu"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1784293433;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=luyZYHeuUIMdIcZ+Peo9TpYeK6jQ0Citnvm8NMn//v0=;
+	b=j7XoEsWuDeWeCjSsx5DaY/fyQBZfglMgGqsOr71Lgdy4pYGVbCuZK8UFs8tNg+TYaDXkAv
+	fMFwqPsfyXmcqHHK8WtiCAAzF7JjomSlwIUmEa69gB+7t0Ilf7JnEJaysaKczgXuNh9c4e
+	0eLISuOk2MrndUaLtvZ3c0K+c9dau4s=
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Quentin Perret <qperret@google.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Dev Jain <dev.jain@arm.com>,
+	Bradley Morgan <include@grrlz.net>,
+	Fuad Tabba <tabba@google.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v5 0/7] KVM: arm64: pKVM stage-2 mapping and memcache fixes
+Date: Fri, 17 Jul 2026 14:03:10 +0100
+Message-Id: <20260717130317.1953574-1-fuad.tabba@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260715081238.1891918-4-fuad.tabba@linux.dev>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Authority-Analysis: v=2.4 cv=fOcJG5ae c=1 sm=1 tr=0 ts=6a5a2394 cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
- a=kj9zAlcOel0A:10 a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=RzCfie-kr_QcCd8fBx8p:22 a=VwQbUJbxAAAA:8
- a=VnNF1IyMAAAA:8 a=1XWaLZrsAAAA:8 a=9jmm95dLNYizn0WUGbMA:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzE3MDEyOSBTYWx0ZWRfX42+OWfiGSYcu
- 2AIsK+wqk6Pu+8v4/XGlNIOqhLGHziw3ozwp8jOFE313yIxf8zdA7dEa8foau5VvD7gy+Ea+NPW
- f3gBHLZyiwZjy9xIQq+w86BHb3BIj443w6qft6G01suJfn4p29WiuZAp4rIyeZVfp+Vl28E4WhT
- h7LMlSggLpDjvj60WWy40nAkEdnoJJA9755S5Ovw0+F0qeYiqNJAEH9eVIax536CbSZ5reGy7Ad
- CYvXRLZ8aySTXiH1iK4Y58b7BjK8E6NXFalURv+t25/OWT+IWuRALjrnsBcvYf8BFhtB5cb1VxA
- H/NWldFof/qz+I/t5+1GsD1UH0lcOd5npyXgVGmpnrYHzbZjAhfe+HTQSMlmef+8bRiUyZrxCto
- RsW6EgIqKoyRo78fzDAiatglD0MjykstldIv19w5fcAUScNrZXku64kdtyT+m7FMciLl86TILfi
- WZoUlRqRMOLNhgEkQew==
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzE3MDEyOSBTYWx0ZWRfX8a9XsghjmHVe
- /p3/ZRjHA6aRtYHm1I9uBG+qTFAXi2u4wLuTATv0pdb+PgAuVyqcY924j/fb0t+Z+Vhte5t9UHT
- wDbuO+Ae0JHOWvOrp6Tt6Uc/hB1m5mg=
-X-Proofpoint-GUID: AAio97567cpyKve32dZnzaYQ0va_67NX
-X-Proofpoint-ORIG-GUID: d6stTD7YvT3wK5FeKvDrUou5uCOAnElc
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-07-17_03,2026-07-17_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 bulkscore=0 impostorscore=0 suspectscore=0 adultscore=0
- priorityscore=1501 malwarescore=0 clxscore=1011 phishscore=0
- lowpriorityscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
- definitions=main-2607170129
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Jul 15, 2026 at 09:12:33AM +0100, Fuad Tabba wrote:
-> Pull the reusable pieces out of kvm_reset_vcpu(): expose the reset
-> PSTATE values in kvm_arm.h, and split the core register reset and the
-> PSCI-driven reset into kvm_reset_vcpu_core() and kvm_reset_vcpu_psci().
-> A follow-up series reuses these to reset protected vCPUs at EL2.
-> 
-> No functional change intended.
-> 
-> Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
-> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+Hi folks,
 
-That looks good. There is another usecase for this. I did a very similar
-thing in [1] to reuse the reset functionality for arm64 on s390. I  just
-did not the move the code to a different file.
+Changes since v4 [1]:
+  - Restored the permission-fault and dirty-logging memcache top-ups
+    that v4 dropped. Both fix real bugs.
+  - Patch 1 uses the anonymous bitfield encoding rather than the
+    open-coded mask and helpers. (Marc)
+  - Reshaped the permission-fault top-up to stage the full memcache
+    under pKVM, not just the mapping object. The object-only form still
+    returned -ENOMEM and tripped a WARN under the hypervisor's
+    unconditional min-pages check.
+  - Re-scoped the dirty-logging top-up to its generic, non-pKVM failure
+    mode, now that the permission-fault patch covers pKVM.
+  - Added three adjacent fixes found while going through the series, and
+    a selftest for the block transitions.
+  - Patches 1 and 3 keep Bradley's Signed-off-by from v3; my changes
+    to each are noted in a [tabba: ...] line.
 
-FWIW: 
+I picked this up while reviewing Bradley's "mapping cache" series [2]:
+v4 dropped two fixes from v3 that address real bugs, so I've collected
+the three fixes back together, reshaped patch 1 per Marc's review [3],
+added a few adjacent fixes I found along the way and a selftest, and am
+reposting as v5.
 
-Reviewed-by: Steffen Eiden <seiden@linux.ibm.com>
+Most of the fixes are in the pKVM stage-2 walker. On a pKVM host a
+non-protected guest's stage-2 faults go through pkvm_pgtable_*(), which
+diverges from the generic walker in several ways that are bugs: cache
+maintenance on non-cacheable mappings (patch 1), a missing memcache
+top-up on permission faults that under pKVM still allocate (patch 2), a
+full flush walk on FWB hardware (patch 4), a WARN on a guest-reachable
+map failure (patch 5), and an eager-split capability whose pKVM backend
+is only a stub (patch 6). These affect non-protected guests only, since
+dispatch and memcache selection key on the host-global pKVM mode, and
+protected guests take no permission faults.
 
-[1] https://lore.kernel.org/all/20260706085229.979525-11-seiden@linux.ibm.com/
+Patch 3 is not pKVM-specific. During dirty logging a non-write
+permission fault, an instruction fetch, still needs a page-table page
+to split a block, but the memcache top-up is gated on write faults.
+That fault path is generic, so the fix is too.
+
+The two memcache top-ups came from sashiko review-bot findings [4][5],
+and both check out against the code.
+
+The series is structured as follows:
+
+  1:    Skip cache maintenance for non-cacheable mappings.
+  2-3:  Top up the memcache for the permission and dirty-logging faults
+        that force stage-2 block transitions.
+  4-6:  Adjacent pkvm_pgtable_*() fixes: FWB flush early-out, drop a
+        spurious map WARN, and gate the eager-split capability.
+  7:    Selftest for the block-collapse and block-split transitions.
+
+Testing: the selftest in patch 7 covers the two dirty-logging block
+transitions (page->block collapse and block->page split) that patch 2
+stages; on the base kernel the collapse oopses the host in
+pkvm_pgtable_stage2_map() with a NULL dereference under mmu_lock, and
+with the series applied it passes. It is a standalone test rather than
+an extension of kvm_page_table_test, whose default anonymous-4K backing
+forms no huge-page blocks, so an automated run never exercises these
+transitions, and whose worker/stage harness does not fit the multi-stage
+logging sequence. Run it with 2M hugepages
+reserved and, for the split half, on a CPU with CTR_EL0.DIC == 0 (e.g.
+-cpu cortex-a710 under QEMU); it self-skips those otherwise. It also
+passes on a non-pKVM host (VHE and nVHE), where patch 3's generic change
+applies. The other fixes are not exercised by the selftest and rest on
+the analysis in their commit messages: patch 3's fault path is generic
+and non-pKVM (under pKVM patch 2 already tops it up, and its failure is
+a WARN_ON(!nobjs) in kvm_mmu_memory_cache_alloc(), not a KVM_RUN error),
+and patches 1 and 4-6 each need a specific pKVM configuration to hit.
+
+Based on Linux v7.2-rc3 (a13c140cc289).
+
+Cheers,
+/fuad
+
+[1] https://lore.kernel.org/r/20260701192428.17430-1-include@grrlz.net
+[2] https://lore.kernel.org/r/20260624160028.15591-1-include@grrlz.net
+[3] https://lore.kernel.org/r/86qzllpy1g.wl-maz@kernel.org
+[4] https://lore.kernel.org/all/20260623161545.EA08E1F000E9@smtp.kernel.org/
+[5] https://lore.kernel.org/all/20260623165634.699011F000E9@smtp.kernel.org/
+
+Bradley Morgan (2):
+  KVM: arm64: Skip cache maintenance for non-cacheable pKVM mappings
+  KVM: arm64: Top up stage-2 memcache for dirty logging faults
+
+Fuad Tabba (5):
+  KVM: arm64: Top up the memcache for pKVM permission faults
+  KVM: arm64: Skip pKVM stage-2 flush when FWB is enabled
+  KVM: arm64: Don't WARN on pKVM stage-2 map failures
+  KVM: arm64: Don't advertise eager page splitting under pKVM
+  KVM: arm64: selftests: Add stage-2 block transition test
+
+ arch/arm64/include/asm/kvm_pkvm.h             |   8 +-
+ arch/arm64/kvm/mmu.c                          |   9 +-
+ arch/arm64/kvm/pkvm.c                         |  21 +-
+ tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+ .../kvm/arm64/stage2_block_transitions.c      | 226 ++++++++++++++++++
+ 5 files changed, 254 insertions(+), 11 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/arm64/stage2_block_transitions.c
 
 
-	Steffen
+base-commit: a13c140cc289c0b7b3770bce5b3ad42ab35074aa
+-- 
+2.39.5
 
