@@ -1,40 +1,40 @@
 Received: from canpmsgout12.his.huawei.com (canpmsgout12.his.huawei.com [113.46.200.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97F2A1531C8
-	for <kvmarm@lists.linux.dev>; Fri, 17 Jul 2026 04:06:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77AF43BCD3E
+	for <kvmarm@lists.linux.dev>; Fri, 17 Jul 2026 06:51:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784261177; cv=none; b=Jo2j8mIP+uYX1yjpfGY87zl/LL0CifVC5uO7qvlERcHLZFMsfEsVtJQCk/89LPtUbpvjuAesB0KgHNcGWvr1yu6w+NaKfPJroysUmyw/GHFvT7n6X8wr+/JqIqFZQE4ykpPkUSGnxuu2a/iJmLlhfJiDAV17qQmz8mNhBZhcd+s=
+	t=1784271080; cv=none; b=EGHXDLOO3XpYVb4oebRoiH/ybzZFSMyyGktsKYQDeZsx8WHXrZSmgJZfF2+uEuGw5aZmtWg30WZfHUUsaGpZqmKyLoPiYaFqZEDy+JFfpuS6JOEriaEzeSt6ePT08cLMPlRtL7yqn4BEacjhyiBUmSqO1jJ2nTbphPepK/Gjsg0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784261177; c=relaxed/simple;
-	bh=nBEonrF+KepR8VPx+cooFBF+qIMh4tLH/YyQrn1C9cE=;
+	s=arc-20240116; t=1784271080; c=relaxed/simple;
+	bh=CsdpTEyznyAJfIsZuifCke7JRlR98stO+wSr0w17VOk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=qV5ia4pKOO4teZ4OL9K2gU/wD0fNQoulXWeKxllxnq8BsBANQqYkRVsgzcevRRUQ7/uONuLIV055rZTMPQU0v6VVQWVQAedLtTJ4nj2Qkm24MX3L0uVT7sTNETpH4aA9za+poe9XYcWbqb7DVR/Oj99CgQwmFwwAaYNtxxN1mlo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=ZFWfUz82; arc=none smtp.client-ip=113.46.200.227
+	 In-Reply-To:Content-Type; b=i4yf34N+JRFgO5kyhxxYLR678jzdJKRnattyfaGQpHVHVKr+FFA9c0E2JQUWAQ4rnVD8rItc1Nin8JhUifASGGJd6SptXew5QZDDu4Tmaj8/t8ngMK8uFIfyI4eII9f6mzVquWrT/2NM7G4MbuGGvcr+p4eZ8S7ZyhY4qMMZcWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=TOBVP6wA; arc=none smtp.client-ip=113.46.200.227
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="ZFWfUz82"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="TOBVP6wA"
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=h8qdpjBLMSRPaA51VvOZtRTSGpJg8nE9iKCAu0rFY10=;
-	b=ZFWfUz82OemF9gVHA3xyjClLTp5Rb4gzNFiLV/PFnphbO92X6aHXVQZW6iW8DiWzwOOcCUzCm
-	lR5N1zBfHNWI6APuHsP9+RxTR1+yy0JN+my5psfsxUz2sqLgozpCDrn4V8ZboRlbvIt5Y1Yx8dW
-	nR2O5j+btvN5Olk64s3YHPg=
-Received: from mail.maildlp.com (unknown [172.19.163.15])
-	by canpmsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4h1bgb2cRgznTVd;
-	Fri, 17 Jul 2026 11:56:27 +0800 (CST)
+	bh=y+pTr1GF5oCrWiw/EduYNgwy8M8mssLlqIc69r0gSWQ=;
+	b=TOBVP6wA49XYyUqW5X3onFnQZEKtw4MUSPLDom+Nnl4IQxy/SrCaiozwaaM/FySRT2zKoD2uD
+	bD4c2NeY3KedyUy3Scs20kQjIVPWY/SFxGUiruj4x4+H5gBndVUkKpoSvTkZoKcb6IjhBYjcSOy
+	wPs8s/w6ZpB7+FL6Dm36tko=
+Received: from mail.maildlp.com (unknown [172.19.163.127])
+	by canpmsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4h1gLB5XByznTtT;
+	Fri, 17 Jul 2026 14:41:38 +0800 (CST)
 Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
-	by mail.maildlp.com (Postfix) with ESMTPS id 8A83B40578;
-	Fri, 17 Jul 2026 12:06:01 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id E343C40572;
+	Fri, 17 Jul 2026 14:51:12 +0800 (CST)
 Received: from [10.67.120.103] (10.67.120.103) by
  kwepemr100010.china.huawei.com (7.202.195.125) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Fri, 17 Jul 2026 12:06:00 +0800
-Message-ID: <df932d54-6e03-4965-a505-ffc23355783e@huawei.com>
-Date: Fri, 17 Jul 2026 12:06:01 +0800
+ 15.2.1544.36; Fri, 17 Jul 2026 14:51:11 +0800
+Message-ID: <3fb4b33e-4618-4523-b140-955e15fd9a8c@huawei.com>
+Date: Fri, 17 Jul 2026 14:51:12 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -42,7 +42,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 4/6] KVM: arm64: Add HDBSS per-vCPU buffer management
+Subject: Re: [PATCH v4 5/6] KVM: arm64: Add HDBSS fault handling and buffer
+ flush
 To: Leonardo Bras <leo.bras@arm.com>
 CC: <maz@kernel.org>, <oupton@kernel.org>, <catalin.marinas@arm.com>,
 	<will@kernel.org>, <yuzenghui@huawei.com>, <wangzhou1@hisilicon.com>,
@@ -53,326 +54,323 @@ CC: <maz@kernel.org>, <oupton@kernel.org>, <catalin.marinas@arm.com>,
 	<linux-kernel@vger.kernel.org>, <seiden@linux.ibm.com>,
 	<suzuki.poulose@arm.com>
 References: <20260709104026.2612599-1-zhengtian10@huawei.com>
- <20260709104026.2612599-5-zhengtian10@huawei.com>
- <alTqqxEZLuYN-gY6@LeoBrasDK>
- <df479edc-cca0-4b54-aed0-4d8c6fd4ffc7@huawei.com>
- <alYTt-fG5rJ9D6Dm@LeoBrasDK>
- <f360c92e-878d-49b5-bcd4-e18240a3600a@huawei.com>
- <aleY9_kZnj_1Awfg@LeoBrasDK>
+ <20260709104026.2612599-6-zhengtian10@huawei.com>
+ <alTw0nwiBDWoFrjB@LeoBrasDK>
+ <9340fa94-6f26-4053-a4ca-0803af725936@huawei.com>
+ <alYUXkub43YxkeH1@LeoBrasDK>
+ <fa0839f9-7d83-4ad1-80e2-7e7dd0280222@huawei.com>
+ <alZFVPkS3lgGdruc@LeoBrasDK>
 From: Tian Zheng <zhengtian10@huawei.com>
-In-Reply-To: <aleY9_kZnj_1Awfg@LeoBrasDK>
+In-Reply-To: <alZFVPkS3lgGdruc@LeoBrasDK>
 Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
  kwepemr100010.china.huawei.com (7.202.195.125)
 
 
-On 7/15/2026 10:28 PM, Leonardo Bras wrote:
-> On Wed, Jul 15, 2026 at 05:16:51PM +0800, Tian Zheng wrote:
->> On 7/14/2026 6:47 PM, Leonardo Bras wrote:
->>> On Tue, Jul 14, 2026 at 03:15:03PM +0800, Tian Zheng wrote:
->>>> On 7/13/2026 9:39 PM, Leonardo Bras wrote:
->>>>> On Thu, Jul 09, 2026 at 06:40:24PM +0800, Tian Zheng wrote:
+On 7/14/2026 10:19 PM, Leonardo Bras wrote:
+> On Tue, Jul 14, 2026 at 09:27:15PM +0800, Tian Zheng wrote:
+>> On 7/14/2026 6:50 PM, Leonardo Bras wrote:
+>>> On Tue, Jul 14, 2026 at 03:38:39PM +0800, Tian Zheng wrote:
+>>>> On 7/13/2026 10:06 PM, Leonardo Bras wrote:
+>>>>> On Thu, Jul 09, 2026 at 06:40:25PM +0800, Tian Zheng wrote:
 >>>>>> From: eillon <yezhenyu2@huawei.com>
 >>>>>>
->>>>>> Add HDBSS (Hardware Dirty Bit State Structure) per-vCPU buffer
->>>>>> management including allocation, freeing, and loading of HDBSS
->>>>>> registers during vCPU load.
+>>>>>> Add HDBSS fault handling for buffer full, external abort, and general
+>>>>>> protection fault (GPF) events. When the HDBSS buffer becomes full,
+>>>>>> the hardware traps to EL2 with an HDBSSF event, which is handled by
+>>>>>> setting a flush request.
 >>>>>>
->>>>>> This patch creates the foundational infrastructure:
->>>>>> - struct vcpu_hdbss_state and enable_hdbss/hdbss_order in kvm_arch
->>>>>> - kvm_dirty_bit.h header with alloc/free declarations
->>>>>> - dirty_bit.c with alloc/free helpers
->>>>>> - __load_hdbss() in VHE switch for register loading
->>>>>> - vCPU create/destroy hooks for buffer lifecycle
->>>>>> - sysreg definitions for HDBSS register manipulation
->>>>>> - Makefile update for dirty_bit.o
+>>>>>> Add kvm_flush_hdbss_buffer() to consume HDBSS buffer entries and
+>>>>>> propagate dirty information into the userspace-visible dirty bitmap.
+>>>>>> Flush is triggered on vcpu_put, check_vcpu_requests, and
+>>>>>> sync_dirty_log.
+>>>>>>
+>>>>>> Add esr_iss2_is_hdbssf() helper for HDBSS fault detection in guest
+>>>>>> abort handling.
 >>>>>>
 >>>>>> Signed-off-by: Eillon <yezhenyu2@huawei.com>
 >>>>>> Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
 >>>>>> ---
->>>>>>     arch/arm64/include/asm/kvm_dirty_bit.h | 16 ++++++++
->>>>>>     arch/arm64/include/asm/kvm_host.h      | 13 +++++++
->>>>>>     arch/arm64/include/asm/sysreg.h        | 11 ++++++
->>>>>>     arch/arm64/kvm/Makefile                |  1 +
->>>>>>     arch/arm64/kvm/arm.c                   |  7 ++++
->>>>>>     arch/arm64/kvm/dirty_bit.c             | 52 ++++++++++++++++++++++++++
->>>>>>     arch/arm64/kvm/hyp/vhe/switch.c        | 15 ++++++++
->>>>>>     arch/arm64/kvm/mmu.c                   |  1 +
->>>>>>     arch/arm64/kvm/reset.c                 |  4 ++
->>>>>>     9 files changed, 120 insertions(+)
->>>>>>     create mode 100644 arch/arm64/include/asm/kvm_dirty_bit.h
->>>>>>     create mode 100644 arch/arm64/kvm/dirty_bit.c
+>>>>>>     arch/arm64/include/asm/esr.h           |  5 +++
+>>>>>>     arch/arm64/include/asm/kvm_dirty_bit.h | 11 +++++
+>>>>>>     arch/arm64/include/asm/kvm_host.h      |  1 +
+>>>>>>     arch/arm64/kvm/arm.c                   | 14 ++++++
+>>>>>>     arch/arm64/kvm/dirty_bit.c             | 62 ++++++++++++++++++++++++++
+>>>>>>     arch/arm64/kvm/mmu.c                   |  4 ++
+>>>>>>     6 files changed, 97 insertions(+)
 >>>>>>
+>>>>>> diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+>>>>>> index 81c17320a588..2e6b679b5908 100644
+>>>>>> --- a/arch/arm64/include/asm/esr.h
+>>>>>> +++ b/arch/arm64/include/asm/esr.h
+>>>>>> @@ -437,6 +437,11 @@
+>>>>>>     #ifndef __ASSEMBLER__
+>>>>>>     #include <asm/types.h>
+>>>>>>
+>>>>>> +static inline bool esr_iss2_is_hdbssf(unsigned long esr)
+>>>>>> +{
+>>>>>> +	return ESR_ELx_ISS2(esr) & ESR_ELx_HDBSSF;
+>>>>> This will return a long, which will be casted as bool.
+>>>>> In general, what I see in the kernel is something like:
+>>>>>
+>>>>> 	return !!(ESR_ELx_ISS2(esr) & ESR_ELx_HDBSSF)
+>>>> ok!
+>>>>
+>>>>
+>>>>>> +}
+>>>>>> +
+>>>>>>     static inline unsigned long esr_brk_comment(unsigned long esr)
+>>>>>>     {
+>>>>>>     	return esr & ESR_ELx_BRK64_ISS_COMMENT_MASK;
 >>>>>> diff --git a/arch/arm64/include/asm/kvm_dirty_bit.h b/arch/arm64/include/asm/kvm_dirty_bit.h
->>>>>> new file mode 100644
->>>>>> index 000000000000..84b12f0a10af
->>>>>> --- /dev/null
+>>>>>> index 84b12f0a10af..4b28000e972f 100644
+>>>>>> --- a/arch/arm64/include/asm/kvm_dirty_bit.h
 >>>>>> +++ b/arch/arm64/include/asm/kvm_dirty_bit.h
->>>>>> @@ -0,0 +1,16 @@
->>>>>> +/* SPDX-License-Identifier: GPL-2.0-only */
->>>>>> +/*
->>>>>> + * Copyright (C) 2026 ARM Ltd.
->>>>>> + * Author: Leonardo Bras <leo.bras@arm.com>
->>>>> You are adding the file, so the copyright note should be yours, then?
->>>> I originally thought your earlier patchset had already created this file, so
->>>> I
->>>>
->>>> kept your copyright and author info. I'll update it to mine in the next
->>>> version.
->>>>
->>>>
->>>> Thanks for pointing that out!
->>> :)
->>>
->>>>>> + */
+>>>>>> @@ -10,7 +10,18 @@
+>>>>>>     #include <asm/kvm_pgtable.h>
+>>>>>>     #include <asm/sysreg.h>
+>>>>>>
+>>>>>> +/* HDBSS entry field definitions */
+>>>>>> +#define HDBSS_ENTRY_VALID	BIT(0)
+>>>>>> +#define HDBSS_ENTRY_TTWL_SHIFT (1)
+>>>>>> +#define HDBSS_ENTRY_TTWL_MASK (GENMASK(3, 1))
+>>>>>> +#define HDBSS_ENTRY_TTWL(x) \
+>>>>>> +	(((x) << HDBSS_ENTRY_TTWL_SHIFT) & HDBSS_ENTRY_TTWL_MASK)
+>>>>>> +#define HDBSS_ENTRY_TTWL_RESV HDBSS_ENTRY_TTWL(-4)
+>>>>>> +#define HDBSS_ENTRY_IPA	GENMASK_ULL(55, 12)
 >>>>>> +
->>>>>> +#ifndef __ARM64_KVM_DIRTY_BIT_H__
->>>>>> +#define __ARM64_KVM_DIRTY_BIT_H__
->>>>>> +
->>>>>> +#include <asm/kvm_pgtable.h>
->>>>>> +#include <asm/sysreg.h>
->>>>>> +
->>>>>> +int kvm_arm_vcpu_alloc_hdbss(struct kvm_vcpu *vcpu, unsigned int order);
->>>>>> +void kvm_arm_vcpu_free_hdbss(struct kvm_vcpu *vcpu);
->>>>>> +
->>>>>> +#endif /* __ARM64_KVM_DIRTY_BIT_H__ */
+>>>>>>     int kvm_arm_vcpu_alloc_hdbss(struct kvm_vcpu *vcpu, unsigned int order);
+>>>>>>     void kvm_arm_vcpu_free_hdbss(struct kvm_vcpu *vcpu);
+>>>>>> +void kvm_flush_hdbss_buffer(struct kvm_vcpu *vcpu);
+>>>>>> +int kvm_handle_hdbss_fault(struct kvm_vcpu *vcpu);
+>>>>>>
+>>>>>>     #endif /* __ARM64_KVM_DIRTY_BIT_H__ */
 >>>>>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->>>>>> index bae2c4f92ef5..c41ec6d9c45a 100644
+>>>>>> index c41ec6d9c45a..cecfb884a64f 100644
 >>>>>> --- a/arch/arm64/include/asm/kvm_host.h
 >>>>>> +++ b/arch/arm64/include/asm/kvm_host.h
->>>>>> @@ -420,6 +420,10 @@ struct kvm_arch {
->>>>>>     	 */
->>>>>>     	struct kvm_protected_vm pkvm;
+>>>>>> @@ -55,6 +55,7 @@
+>>>>>>     #define KVM_REQ_GUEST_HYP_IRQ_PENDING	KVM_ARCH_REQ(9)
+>>>>>>     #define KVM_REQ_MAP_L1_VNCR_EL2		KVM_ARCH_REQ(10)
+>>>>>>     #define KVM_REQ_VGIC_PROCESS_UPDATE	KVM_ARCH_REQ(11)
+>>>>>> +#define KVM_REQ_FLUSH_HDBSS			KVM_ARCH_REQ(12)
 >>>>>>
->>>>>> +	/* HDBSS: per-VM dirty tracking state */
->>>>>> +	bool enable_hdbss;
->>>>> Is there not a way of checking hdbss without adding this new member on the
->>>>> struct? Would not checking the vcpu_hdbss_state from current vcpu should be
->>>>> enough?
->>>> HDBSS is a VM-wide property, so I currently use a VM-level flag
->>>> (kvm->arch.enable_hdbss)
->>>>
->>>> to track whether it's enabled. Paths like kvm_arch_commit_memory_region()
->>>> and VM teardown
->>>>
->>>> don't have a vCPU context to query, so per-vCPU state wouldn't work there.
->>>>
->>>>
->>>> But you're right, maybe we don't need a value to store it — we could remove
->>>> this flag and instead
->>>>
->>>> check the VTCR_EL2_HDBSS bit directly from kvm->arch.mmu.vtcr:
->>>>
->>>>
->>>> ```
->>>> static inline bool kvm_hdbss_enabled(const struct kvm *kvm)
->>>> {
->>>>       return kvm->arch.mmu.vtcr & VTCR_EL2_HDBSS;
->>>> }
->>>>
->>>> if (kvm_hdbss_enabled(kvm))
->>>>       ...
->>>> ```
->>> That looks better :)
->>>
->>>>>> +	unsigned int hdbss_order;
->>>>> Is that the order for hdbss buffer size?
->>>>> Haven't finished reading the series, but would that be bad if this was also
->>>>> in the per-vcpu state struct, instead?
+>>>>>>     #define KVM_DIRTY_LOG_MANUAL_CAPS   (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE | \
+>>>>>>     				     KVM_DIRTY_LOG_INITIALLY_SET)
+>>>>>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+>>>>>> index bf6688245d83..566953a4e23a 100644
+>>>>>> --- a/arch/arm64/kvm/arm.c
+>>>>>> +++ b/arch/arm64/kvm/arm.c
+>>>>>> @@ -755,6 +755,9 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+>>>>>>     		kvm_vcpu_put_hw_mmu(vcpu);
+>>>>>>     	kvm_arm_vmid_clear_active();
+>>>>>>
+>>>>>> +	if (vcpu->kvm->arch.enable_hdbss)
+>>>>>> +		kvm_flush_hdbss_buffer(vcpu);
+>>>>>> +
+>>>>>>     	vcpu_clear_on_unsupported_cpu(vcpu);
+>>>>>>     	vcpu->cpu = -1;
+>>>>>>     }
+>>>>>> @@ -1157,6 +1160,9 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
+>>>>>>     		if (kvm_dirty_ring_check_request(vcpu))
+>>>>>>     			return 0;
+>>>>>>
+>>>>>> +		if (kvm_check_request(KVM_REQ_FLUSH_HDBSS, vcpu))
+>>>>>> +			kvm_flush_hdbss_buffer(vcpu);
+>>>>>> +
+>>>>>>     		check_nested_vcpu_requests(vcpu);
+>>>>>>     	}
+>>>>>>
+>>>>>> @@ -1971,7 +1977,15 @@ long kvm_arch_vcpu_unlocked_ioctl(struct file *filp, unsigned int ioctl,
+>>>>>>
+>>>>>>     void kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot *memslot)
+>>>>>>     {
+>>>>>> +	/*
+>>>>>> +	 * Flush all CPUs' dirty log buffers to the dirty_bitmap.  Called
+>>>>>> +	 * before reporting dirty_bitmap to userspace. Send a request with
+>>>>>> +	 * KVM_REQUEST_WAIT to flush buffer synchronously.
+>>>>>> +	 */
+>>>>>> +	if (!kvm->arch.enable_hdbss)
+>>>>>> +		return;
+>>>>>>
+>>>>>> +	kvm_make_all_cpus_request(kvm, KVM_REQ_FLUSH_HDBSS | KVM_REQUEST_WAIT);
+>>>>>>     }
+>>>>>>
+>>>>>>     static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
+>>>>>> diff --git a/arch/arm64/kvm/dirty_bit.c b/arch/arm64/kvm/dirty_bit.c
+>>>>>> index 6c7a6ef66b5a..002366337637 100644
+>>>>>> --- a/arch/arm64/kvm/dirty_bit.c
+>>>>>> +++ b/arch/arm64/kvm/dirty_bit.c
+>>>>>> @@ -50,3 +50,65 @@ void kvm_arm_vcpu_free_hdbss(struct kvm_vcpu *vcpu)
+>>>>>>
+>>>>>>     	vcpu->arch.hdbss.hdbssbr_el2 = 0;
+>>>>>>     }
+>>>>>> +
+>>>>>> +void kvm_flush_hdbss_buffer(struct kvm_vcpu *vcpu)
+>>>>>> +{
+>>>>>> +	int idx, curr_idx;
+>>>>>> +	u64 *hdbss_buf;
+>>>>>> +	struct kvm *kvm = vcpu->kvm;
+>>>>>> +
+>>>>>> +	if (!kvm->arch.enable_hdbss)
+>>>>>> +		return;
+>>>>>> +
+>>>>>> +	curr_idx = HDBSSPROD_IDX(read_sysreg_s(SYS_HDBSSPROD_EL2));
+>>>>>> +
+>>>>>> +	/* Do nothing if HDBSS buffer is empty or br_el2 is NULL */
+>>>>>> +	if (curr_idx == 0 || vcpu->arch.hdbss.hdbssbr_el2 == 0)
+>>>>>> +		return;
+>>>>>> +
+>>>>>> +	hdbss_buf = page_address(phys_to_page(vcpu->arch.hdbss.base_phys));
+>>>>>> +	if (!hdbss_buf)
+>>>>>> +		return;
+>>>>>> +
+>>>>>> +	guard(write_lock_irqsave)(&vcpu->kvm->mmu_lock);
+>>>>>> +	for (idx = 0; idx < curr_idx; idx++) {
+>>>>>> +		u64 gpa;
+>>>>>> +
+>>>>>> +		gpa = hdbss_buf[idx];
+>>>>>> +		if (!(gpa & HDBSS_ENTRY_VALID))
+>>>>>> +			continue;
+>>>>>> +
+>>>>>> +		gpa &= HDBSS_ENTRY_IPA;
+>>>>>> +		kvm_vcpu_mark_page_dirty(vcpu, gpa >> PAGE_SHIFT);
+>>>>> You mention that it does not support dirty-ring, but above function will
+>>>>> mark the page as dirty in the dirty-ring :/
 >>>>>
->>>>> Also, here I suggest that we save a number, instead of the encoding for
->>>>> HDBSSBR_ELS_SZ, and convert it on hdbss setup. It could be either a
->>>>> shift, or size.
->>>>>
->>>>> Reason being that you used this to compare with HDBSS_MAX_ORDER at some
->>>>> point, and there is no guarantee that the encoding will always be in
->>>>> crescent form.
->>>>>
->>>>> Also, it's not clear where you set this value.
->>>> Yes, this is the HDBSS buffer order (2^order bytes per vCPU).
->>>>
->>>> I put it in kvm->arch *to make sure all vCPUs in a VM have the same order*.
->>>>
->>> Right, but do we need to retrieve this value at any context that is not
->>> per-vcpu later? If all allocations happen at the same time, and the vcpus
->>> can get the size of their arrays (even by the register itself), maybe there
->>> is no need to add this member in the kvm_arch structure.
->>>
->>>> I agree we should store a plain order number rather than the raw SZ
->>>> encoding.
->>>>
->>> I would recommend we always save the value in the way its most convenient
->>> to use. In this case, I only recall it to be used as bounds to read the
->>> HDBSS array, so it would be better if we save it as plain size.
->>>
->>>> The assignment should happen in kvm_arm_enable_hdbss_global(), which I
->>>> missed in v4 and will add in v5.
->>>>
->>> Okay
->>>
->>>>>> +
->>>>>>     #ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
->>>>>>     	/* Nested virtualization info */
->>>>>>     	struct dentry *debugfs_nv_dentry;
->>>>>> @@ -838,6 +842,12 @@ struct vcpu_reset_state {
->>>>>>     	bool		reset;
->>>>>>     };
->>>>>>
->>>>>> +struct vcpu_hdbss_state {
->>>>>> +	phys_addr_t base_phys;   /* for memory free */
->>>>>> +	u64 hdbssbr_el2;         /* load directly */
->>>>>> +	u64 hdbssprod_el2;       /* save directly */
->>>>>> +};
->>>>>> +
->>>>>>     struct vncr_tlb;
->>>>>>
->>>>>>     struct kvm_vcpu_arch {
->>>>>> @@ -945,6 +955,9 @@ struct kvm_vcpu_arch {
->>>>>>
->>>>>>     	/* Hyp-readable copy of kvm_vcpu::pid */
->>>>>>     	pid_t pid;
->>>>>> +
->>>>>> +	/* HDBSS registers info */
->>>>>> +	struct vcpu_hdbss_state hdbss;/
->>>>>>     };
->>>>>>
->>>>>>     /*
->>>>>> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
->>>>>> index 7aa08d59d494..1354a58c3316 100644
->>>>>> --- a/arch/arm64/include/asm/sysreg.h
->>>>>> +++ b/arch/arm64/include/asm/sysreg.h
->>>>>> @@ -1039,6 +1039,17 @@
->>>>>>
->>>>>>     #define GCS_CAP(x)	((((unsigned long)x) & GCS_CAP_ADDR_MASK) | \
->>>>>>     					       GCS_CAP_VALID_TOKEN)
->>>>>> +
->>>>>> +/*
->>>>>> + * Definitions for the HDBSS feature
->>>>>> + */
->>>>>> +#define HDBSS_MAX_ORDER		HDBSSBR_EL2_SZ_2MB
->>>>>> +
->>>>> See above comment on using the encoding instead of an actual size/shift
->>>>> number.
->>>> You're right — I will fix this in the next version as follows:
->>>>
->>>> First, HDBSS_MAX_ORDER will be defined as a plain order number. In v4 I only
->>>> considered the 4KB page
->>> Maybe consider a plain size number, instead.
->>>
->>>> case and hard-coded it to 9. To make it work for any PAGE_SIZE configuration
->>>> (4KB, 16KB, or 64KB), I'll derive
->>>>
->>>> it from HDBSSBR_EL2_SZ_2MB:
+>>>> In kvm_arm_enable_hdbss_global(), we explicitly check and reject HDBSS
+>>>> enablement if dirty-ring is active:
 >>>>
 >>>> ```
->>>> #define HDBSS_MAX_ORDER    (12 + HDBSSBR_EL2_SZ_2MB - PAGE_SHIFT)
+>>>> if (kvm->dirty_ring_size)
+>>>>       return 0;
 >>>> ```
 >>>>
->>>> This evaluates to 9 on 4KB pages, and the correct value on 16KB/64KB pages
->>>> as well.
->>> Wait, I don't see what you are trying to achieve here with this.
->>> This order is related to the size of a HDBSS buffer, which is defined
->>> independently of the page size being used. In 2MB example, it does hold
->>> 256K HDBSS entries, disregarding on the page size, IIRC.
->>>
->>>
->>>> Second, I will add two conversion helpers in sysreg.h to bridge between
->>>> kernel semantics (alloc_pages order)
+>>>> So when kvm_flush_hdbss_buffer() runs (which requires enable_hdbss = true),
+>>>> we know for certain that
 >>>>
->>>> and hardware encoding (HDBSSBR_EL2.SZ):
+>>>> kvm->dirty_ring_size == 0. Therefore, kvm_vcpu_mark_page_dirty() will always
+>>>> take the dirty_bitmap path,
+>>>>
+>>>> never the dirty-ring path.
+>>>>
+>>>> That said, I'll add a comment in kvm_flush_hdbss_buffer() before dirty ring
+>>>> mode is supported, to make this explicit:
 >>>>
 >>>> ```
->>>> /* Convert alloc_pages order to HDBSSBR_EL2.SZ encoding */
->>>> #define hdbss_order_to_sz(order)  (PAGE_SHIFT + (order) - 12)
->>>> ```
->>> (would be *_to_shift() no?)
->>>
->>> In any case, see above.
->>>
->>>> These helpers work for any PAGE_SIZE configuration (4KB, 16KB, or 64KB)
->>>> because they use PAGE_SHIFT directly.
->>>>
->>>> Third, I will update the HDBSSBR_EL2 register construction in
->>>> kvm_arm_vcpu_alloc_hdbss()：
->>>>
->>>> ```
->>>> /* before */
->>>> .hdbssbr_el2 = HDBSSBR_EL2(page_to_phys(hdbss_pg), order),
->>>>
->>>> /* after */
->>>> .hdbssbr_el2 = HDBSSBR_EL2(page_to_phys(hdbss_pg),
->>>>                               hdbss_order_to_sz(order)),
+>>>> /*
+>>>>    * HDBSS is mutually exclusive with dirty-ring mode (see
+>>>>    * kvm_arm_enable_hdbss_global()), so kvm_vcpu_mark_page_dirty()
+>>>>    * will update the dirty_bitmap, not the dirty-ring.
+>>>>    */
 >>>> ```
 >>>>
->>> That would be the other way around, right? I mean, here you would want the
->>> order encoded in HDBSSBR_SZ from the page shift, not the other way around.
+>>> Got it :)
 >>>
->>> In any case, see above.
->>>
->>>
->>>> And I will also update the __free_pages() call to use
->>>> vcpu->kvm->arch.hdbss_order directly, since that field
->>>>
->>>> stores the plain order number and avoids decoding the SZ encoding at free
->>>> time:
->>>>
->>>>
->>>> ```
->>>> /* before */
->>>> __free_pages(hdbss_pg,
->>>>        FIELD_GET(HDBSSBR_EL2_SZ_MASK,
->>>>                  vcpu->arch.hdbss.hdbssbr_el2));
->>>>
->>>> /* after */
->>>> __free_pages(hdbss_pg,
->>>>        vcpu->kvm->arch.hdbss_order);
->>>> ```
->>>>
->>> Ah, you use the 'order' to free the buffers as well, ok.
->>> But those are per-vcpu buffers as well, right?
->>>
->>> Again, the HDBSSBR_EL2.SZ AFAIK is not related to page size.
+>>> Out of curiosity: which issues have you found on supporting dirty-ring at
+>>> this point?
 >>>
 >>> Thanks!
 >>> Leo
 >>
->> Got it. I'll store the plain size (in bytes) instead of the order or SZ
->> encoding.
+>> I haven't looked deeply into dirty-ring yet — my main concern is that if
+>> both the dirty
 >>
->> One clarification though: I'd like to keep this as a VM-level field
->> (kvm->arch.hdbss_buffer_size) in case we may want to allow userspace to
->> configure the buffer size via ioctl in the future.
-> Ah, I see... I agree with that ioctl, as I suggested something similar in
-> https://lore.kernel.org/all/alYamq9BL5CTaAX7@LeoBrasDK
+>> ring and HDBSS buffer fill up, the flush path might get blocked or
+>> complicated.
+>>
+>> For now, I'm planning to match the HDBSS buffer size to the dirty ring size
+>> in v5 and test it.
+>>
+>> Ideally, the two buffers would be the same size, and the entire dirty
+>> tracking path would use
+>>
+> Ah, I see the point.
 >
->> The field would be unsigned long hdbss_buffer_size (in bytes), with helpers
->> to convert to order or SZ encoding when needed:
->>    - get_order(size) → for alloc_pages()
->>    - ilog2(size) - 12 → for HDBSSBR_EL2.SZ
-> nit: ilog2() will round _down_ the buffer size. Take that into account.
+> IIRC, when dirty-ring gets full, the kernel returns to userspace with
+> run->exit_reason == KVM_EXIT_DIRTY_RING_FULL, which will warn the VMM to
+> drain the dirty-ring, and that makes space for us draining HDBSS to the
+> dirty-ring again.
 >
->> Does that work for you?
-> I think it makes sense. Honestly not sure where is the best place to put
-> the variable, though. Maybe some of the maintainers can give us some tip.
+> The best way to achieve that, as I remember, is to always drain
+> HDBSS as much as possible at guest_exitting. That will make more space to
+> newer HDBSS entries, and we can get userspace to drain the dirty-ring
+> earlier.
 >
-> You plan to make hdbss_buffer_size!=0 just when it's in use, right?
-> If that's the case, we can use 'hdbss_buffer_size!=0' as is_hdbss_enabled()
+> I would say to even make HDBSS buffer half (entries) the dirty-ring. Then
+> we can generally fully drain to the dirty-ring and even report ring full
+> if the ring is above a given threshold percentage full.
+>   
+>> HDBSS exclusively — no fallback to the legacy dirty bitmap path. If that
+>> works, I think this approach should be fine.
+>>
+>> Let me know if you have any insights on dirty ring's full-buffer behavior —
+>> that would be helpful.
+>>
+>>
+> Will do!
 >
 > Thanks!
 > Leo
 
 
-Ok. or maybe we can store the number of entries directly, like PML does, 
-to avoid
+Thanks for the insights — reusing PML's reservation mechanism makes sense.
 
-conversions. And yes, hdbss_buffer_size != 0 as is_hdbss_enabled() works 
-for me.
+I think we can*keep the HDBSS buffer at 512 entries* (matching 
+PML_LOG_NR_ENTRIES)
 
-For the variable location — open to maintainers' suggestions.
+for now, and *not expose any ioctl for userspace to configure it*. Since 
+the kernel
 
+auto-enables HDBSS, a userspace size knob would be confusing.
+
+
+The reservation logic would be:
+
+- Implement kvm_cpu_dirty_log_size() on arm64 to return the HDBSS buffer 
+entry
+
+count (512, or 0 if HDBSS is not enabled)
+
+- Reuse kvm_dirty_ring_get_rsvd_entries() to reserve space for one full 
+flush:
+
+KVM_DIRTY_RING_RSVD_ENTRIES + hdbss_entries
+
+- So soft_limit = dirty_ring_size - (KVM_DIRTY_RING_RSVD_ENTRIES + 
+hdbss_entries),
+
+guaranteeing a full flush always fits
+
+kvm_flush_hdbss_buffer() at guest_exit pushes via 
+mark_page_dirty_in_slot() ->
+
+kvm_dirty_ring_push() -> kvm_dirty_ring_soft_full, which triggers
+
+KVM_EXIT_DIRTY_RING_FULL when needed.
+
+If soft_limit is hit, KVM_REQ_DIRTY_RING_FULL is set and the next 
+vcpu_run exits
+
+to userspace for QEMU to drain the ring.
+
+*One more thing: *when userspace sets the dirty ring size via
+
+KVM_VM_IOCTL_ENABLE_DIRTY_LOG_RING, we already enforce that
+
+size >= kvm_dirty_ring_get_rsvd_entries(kvm) * sizeof(struct kvm_dirty_gfn)
+
+or size < PAGE_SIZE. With HDBSS, kvm_dirty_ring_get_rsvd_entries() will 
+include the
+
+HDBSS entries via kvm_cpu_dirty_log_size(), so the same check will 
+automatically guarantee
+
+the ring is large enough to accommodate the HDBSS buffer. No additional 
+validation is needed.
 
 Thanks,
-
 Tian
+
 
