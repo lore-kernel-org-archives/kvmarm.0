@@ -1,128 +1,133 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF9DB330668;
-	Fri, 17 Jul 2026 20:56:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 781D13C0A15
+	for <kvmarm@lists.linux.dev>; Fri, 17 Jul 2026 23:13:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784321767; cv=none; b=jCOle1MxDYVpTtqpHaGrVaTwMrGNEOgGQN+3NzADx0FVHWDdFFYCV9VSxxKlDiMU4Wmfjl32ArTZ6M4+Q+DlETB8D/+/oRn8P+87r1I72lxe3U7qMcA6e6wYVw8AhXyU07TJkbmH3HStc6GlqVVZhJ66eHWX1O1/90jZ+zDq2Rk=
+	t=1784330004; cv=none; b=H26uc/eV5VK/cvUY70ezjfiZlJCWlYKNO9JRkyBk214UxIRop2QtKiJErQFxDIBcZZjLxXCag2pUHFxqYFPNEOk/MQR5DR36cp0CfI+fgbEEHr722qEQmt/kVdHH0MiECWWPSSUmA7FwMzIjbx9w/hchGxg01WO2O8pgLMYjRBc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784321767; c=relaxed/simple;
-	bh=9lz/zL8470hEbZErrlToyCTQ+zDoMBLIq6oQJAe2Xv8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HXYWmg4XRAEIIXZohrzm8yOl4BiqBdMuTcyUcBbl8oblRgBm3U3Y7S+a6+j+bGOkna8cUX3fgkfTjpBt/tOTUjY6LeoLLb+FMjxxIelM4Bca3snrIlPDFTwWJelelxyAGnfia4EGhGPuMCK3//yKMZ2+htFI85RqPVEcBF6cilk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DpUbxi5w; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784330004; c=relaxed/simple;
+	bh=3BlVjgmV5uha5Hv39vi3jBRXCmFZY73SrcLqw6/9YjM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EoWag0j9K/9y27tQeRakGRwCuYlpvNDuufKdWDLO8yNON++f9bNXwEKiyxB0iqUMk1dpWBwTMhDJFrGEn+0dkEoCt/Nsm/MdFFFwcQX17yvSR989jpCTZ+9l3S+rIYVo/4QHd4vtriRk6G7Kb3nfHE2AKAY1AOWqVivHqnoDumw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=MrG2RBy/; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DpUbxi5w"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A4F21F000E9;
-	Fri, 17 Jul 2026 20:56:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784321765;
-	bh=W4ktFL4oH9ldaHz/Q/tS5unjDRgWUUYeFG95R6a98rM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=DpUbxi5wsgZ1+KTYV8FHVj1DoWv4MLJLX0K1+N4yOp8CVIO6WhaJ4dSywKYIFlscs
-	 hxJjPFG4A7Vy2CqMETl6XVxWLEE7HbBVDVnUYJm7CT6T71fGq/eB/15kNRB6Dp6JwO
-	 +Ctt4RwYHxDbswtcTLzP8ZQK8I73x5P6mPIiGizTYJ4ZBf2CN6VabxeqmYj/nc4iaN
-	 LCLWKJNU+pLwve8RMBQARYpwZsfSraoXHvmfPxb8FscpUyMLem12Ib/0SOsbpq8goQ
-	 PyywC89m2Z7xt8ASOWVIli+dBmpk4e583kHO51PqdGP21FQtNfKRaFxFbG7BdyU2Nz
-	 arT+AhV4bbvPg==
-Date: Fri, 17 Jul 2026 13:56:03 -0700
-From: Oliver Upton <oupton@kernel.org>
-To: Mostafa Saleh <smostafa@google.com>
-Cc: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, maz@kernel.org,
-	seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org,
-	vdonnefort@google.com, tabba@google.com
-Subject: Re: [RFC PATCH 2/2] KVM: arm64: Support BBM level 3
-Message-ID: <alqW49CH7eViDpAZ@kernel.org>
-References: <20260717130901.2239134-1-smostafa@google.com>
- <20260717130901.2239134-3-smostafa@google.com>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="MrG2RBy/"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 861851476;
+	Fri, 17 Jul 2026 16:13:13 -0700 (PDT)
+Received: from workstation-e142269.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EDF783F66F;
+	Fri, 17 Jul 2026 16:13:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1784329997; bh=3BlVjgmV5uha5Hv39vi3jBRXCmFZY73SrcLqw6/9YjM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=MrG2RBy/Fb9HTHfDKyEJEEWtqIgzwZwHsP2O0U+aMZ70wHOhQdusEBocp3HC1ZIDn
+	 2Uv0rWgc/CndtB/MaFd/d6FaXjhyP4lt7QBFsmdREZtL2ztY86WIEzi+3ye7n+HkJM
+	 SM96L9nvLBq35DJrPUDZ0YWZvqwEPKc5j+CWqRcQ=
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Cc: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Dev Jain <dev.jain@arm.com>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	Sebastian Ene <sebastianene@google.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Wei-Lin Chang <weilin.chang@arm.com>
+Subject: [PATCH] KVM: arm64: ptdump: Flush the last region
+Date: Sat, 18 Jul 2026 00:12:33 +0100
+Message-ID: <20260717231233.2299068-1-weilin.chang@arm.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260717130901.2239134-3-smostafa@google.com>
+Content-Transfer-Encoding: 8bit
 
-Hi Mostafa,
+Currently the stage-2 ptdump calls note_page() at each leaf entry visit.
+This simply misses the output of the last region, because note_page()
+only dumps output when it detects a change in level/prot, or when the
+walk enters a next marker section. The last region in the guest IPA
+space with the same level/prot is not dumped since there is no change
+after it.
 
-On Fri, Jul 17, 2026 at 01:09:00PM +0000, Mostafa Saleh wrote:
-> If the system supports hardware Break-Before-Make (BBM) level 3, use it
-> to replace stage-2 PTEs directly instead of falling back to the software
-> break-before-make sequence.
-> 
-> 1) Get a reference count on the containing table for the new PTE.
-> 2) Atomically update the PTE with the new valid descriptor.
-> 3) Invalidate the TLB for the old PTE.
-> 4) Drop the reference count holding the old PTE.
-> 
-> One interesting case, as BBML3 will update the PTE atomically, it
-> can only know it raced with another core at the point of the cmpxchg
-> failing, unlike the SW implementation which locks the PTE first.
-> And as we must issue CMOs to the new mapped page before the update,
-> that means with BBML3 racing cores will issue redundant CMOs,
+To dump the final region, manually issue a note_page() call with address
+BIT(ia_bits) (end of guest IPA space) and level == -1 to trigger a level
+change after the last region. Additionally treat level == -1 as a last
+flushing note_page() call and avoid dumping the name of the next marker
+for this case.
 
-I'd rather we just predicate BBML3-style transformations on an
-implementation having FEAT_S2FWB and DIC. You can definitely come along
-later and enable it when using a stage-2 in an SMMU makes this
-mandatory, possibly at the expense of some extra CMOs.
+Fixes: 7c4f73548ed1 ("KVM: arm64: Register ptdump with debugfs on guest creation")
+Reported-by: Sashiko AI <sashiko-bot@kernel.org>
+Closes: https://lore.kernel.org/kvmarm/20260630122758.891011F00A3A@smtp.kernel.org/
+Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
+---
+ arch/arm64/kvm/ptdump.c | 8 +++++---
+ arch/arm64/mm/ptdump.c  | 5 +++--
+ 2 files changed, 8 insertions(+), 5 deletions(-)
 
-There's also an extremely subtle detail that BBML3 enablement relies on,
-which is that KVM will never change the OA of active translation. IOW,
-if the host is moving the PFN we expect an invalidation before
-re-mapping it.
+diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
+index c9140e22abcf..4096e4a92fae 100644
+--- a/arch/arm64/kvm/ptdump.c
++++ b/arch/arm64/kvm/ptdump.c
+@@ -155,11 +155,13 @@ static int kvm_ptdump_guest_show(struct seq_file *m, void *unused)
+ 		.seq		= m,
+ 	};
+ 
+-	write_lock(&kvm->mmu_lock);
++	guard(write_lock)(&kvm->mmu_lock);
+ 	ret = kvm_pgtable_walk(mmu->pgt, 0, BIT(mmu->pgt->ia_bits), &walker);
+-	write_unlock(&kvm->mmu_lock);
++	if (ret)
++		return ret;
++	note_page(&st->parser_state.ptdump, BIT(mmu->pgt->ia_bits), -1, 0);
+ 
+-	return ret;
++	return 0;
+ }
+ 
+ static int kvm_ptdump_guest_open(struct inode *m, struct file *file)
+diff --git a/arch/arm64/mm/ptdump.c b/arch/arm64/mm/ptdump.c
+index ab9899ca1e5f..fed4e4407e0e 100644
+--- a/arch/arm64/mm/ptdump.c
++++ b/arch/arm64/mm/ptdump.c
+@@ -194,6 +194,7 @@ void note_page(struct ptdump_state *pt_st, unsigned long addr, int level,
+ 	struct ptdump_pg_state *st = container_of(pt_st, struct ptdump_pg_state, ptdump);
+ 	struct ptdump_pg_level *pg_level = st->pg_level;
+ 	static const char units[] = "KMGTPE";
++	bool flush = level == -1;
+ 	ptdesc_t prot = 0;
+ 
+ 	/* check if the current level has been folded dynamically */
+@@ -234,7 +235,7 @@ void note_page(struct ptdump_state *pt_st, unsigned long addr, int level,
+ 				  pg_level[st->level].num);
+ 		pt_dump_seq_puts(st->seq, "\n");
+ 
+-		if (addr >= st->marker[1].start_address) {
++		if (addr >= st->marker[1].start_address && !flush) {
+ 			st->marker++;
+ 			pt_dump_seq_printf(st->seq, "---[ %s ]---\n", st->marker->name);
+ 		}
+@@ -244,7 +245,7 @@ void note_page(struct ptdump_state *pt_st, unsigned long addr, int level,
+ 		st->level = level;
+ 	}
+ 
+-	if (addr >= st->marker[1].start_address) {
++	if (addr >= st->marker[1].start_address && !flush) {
+ 		st->marker++;
+ 		pt_dump_seq_printf(st->seq, "---[ %s ]---\n", st->marker->name);
+ 	}
+-- 
+2.43.0
 
-I have no issue with relying on that behavior but we should make that
-assumption abundantly clear.
-
-One of the things on my wish list for a while has been rebuilding
-hugepages after dirty logging is disabled on a memslot. That seems like
-like a very good optimization to do when BBML3 is present.
-
-> to improve this:
-> - We only use BBML3 if the old PTE was live.
-> - To reduce the window of the race, an early check is added before
->   the CMO to exit early, but that does not eliminate the race.
-> 
-> Signed-off-by: Mostafa Saleh <smostafa@google.com>
-> ---
->  arch/arm64/kvm/hyp/pgtable.c | 53 +++++++++++++++++++++++++++++++-----
->  1 file changed, 46 insertions(+), 7 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index 127b7f9541b1..69d52308236f 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -838,7 +838,8 @@ static void stage2_clean_old_pte(const struct kvm_pgtable_visit_ctx *ctx,
->  /**
->   * stage2_try_break_pte() - Invalidates a pte according to the
->   *			    'break-before-make' requirements of the
-> - *			    architecture.
-> + *			    architecture, if BMML3 is supported it
-> + *			    will be used, otherwise fallback to SW.
->   *
->   * @ctx: context of the visited pte.
->   * @mmu: stage-2 mmu
-> @@ -854,6 +855,18 @@ static bool stage2_try_break_pte(const struct kvm_pgtable_visit_ctx *ctx,
->  {
->  	kvm_pte_t locked_pte;
->  
-> +	if (system_supports_bbml3() && kvm_pte_valid(ctx->old)) {
-> +		kvm_pte_t curr_pte = READ_ONCE(*ctx->ptep);
-> +
-> +		/*
-> +		 * All handled in stage2_make_pte(). However exit early if we already
-> +		 * lost the race to avoid extra CMOs.
-> +		 */
-> +		 if (curr_pte != ctx->old)
-> +			return false;
-
-Does this race detection actually move the needle? We haven't gotten
-very far from the read in __kvm_pgtable_visit().
-
-Thanks,
-Oliver
