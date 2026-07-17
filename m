@@ -1,32 +1,32 @@
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F3183FD97F
-	for <kvmarm@lists.linux.dev>; Fri, 17 Jul 2026 13:04:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A16D3FE34E
+	for <kvmarm@lists.linux.dev>; Fri, 17 Jul 2026 13:04:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784293449; cv=none; b=Sd/HhE1KIPZls2QnVpum/32ywRAru0+Js+dR8BqNWGC1kkF3+fDfCJoinVaTSlmaS36CqkeLu92xgmHw0+YfL0Hpn5RxkVt9RavViCvI8qKa62AdUg844wDtYSHTa7ina2byOheNHRLg7Z6swAlmbN7B2ZYW0T/5zWGXBJCY+KU=
+	t=1784293451; cv=none; b=YdWAedrxTYBvQKYRpU89PJ4TOoUTkHKSb59Ws1XIxqWJx6VmT6qr+yapzG4UdZHGcuS07pyUsg8MnZdOEdj/G5tjbJMUXq0epO5Z7hWC8MNvB8s9b6bre1yf+J7FUl4lHjduZb2OPb6+NY/7+/8C2I0F6szidA+oS/HVhV9x/Dg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784293449; c=relaxed/simple;
-	bh=cHaqF91J8k5fNTX15TBR8HD4DACMPbXOC77gjnpK65Q=;
+	s=arc-20240116; t=1784293451; c=relaxed/simple;
+	bh=jmsewc0sWd3StwFaO0x1Igk4O5irp82T8pqNrTcmEQo=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=rCVfbfzWcFmVFyJxr+XyH6ZtF2q/k3B1UGbje0m/9ba9dp2TNpmLH8UMtRnhHYpBpF8BX2Pwihykjd8gwodILU1EGr1FWPdmjEj2wvppkVSjCHk/JP6wQVOXwTjl6AXiMeAcsVbwjDqS7XxyMo59uqqy0oCLbEPSfFHG8iWslX4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=EIdNAbav; arc=none smtp.client-ip=95.215.58.174
+	 MIME-Version; b=olQZ8QhbhFKmmZA5jK793m9Y2/sqzHgWSt1GB0EbMZ9GoetIhJ9qBm4McQa/+VnBganQlmozFx0oU3DOyiDvSjkO+pOgZoo9X9gpylA91z5+bAWP6aCV2AnlfDHCMPoLp7gL/Z7vv5uhnqyTfbwggqtwc/sczcTvP0ydq5vCmCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vqChw9zc; arc=none smtp.client-ip=95.215.58.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="EIdNAbav"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vqChw9zc"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1784293445;
+	t=1784293447;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Tm/R+8+SeI3EIiHJjFKMzh728Ajegh5x45TsNe4aXWo=;
-	b=EIdNAbavmrb8hsL8oklMYZ0FDv2qjouLDJOhckDFY72MVYlnR9MO5TvlRGezc+9Twi9Pt9
-	YC/3unfpE2iBbjMSUznTLLfeaxOrdchIdRAwZ/jEPCT2sJglIgA1PD+1iZm79bOGCVWJP6
-	FAckyQGF/bhUZmvs7toO5zz0XFrCCNI=
+	bh=CI1v8eeCBLFTdJ/DMxS17nabZVLaO47wNFZpGWZf8b4=;
+	b=vqChw9zcOPNplCIkodaAthFKhF9/qHUGIO8HHLx9F8lVMbcLi5gYPYL/7We5a26SbrUd9h
+	qAD/apqCdmgb68x8+zjhhYHf2IA+T/cKcQv/4eXY6msQu4tBdxb8n0OLSvgtVZUBeLurIJ
+	PMoBYcZ8Qpet0gmuNcGgEz7kh/BL75Q=
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oupton@kernel.org>
@@ -47,9 +47,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v5 3/7] KVM: arm64: Top up stage-2 memcache for dirty logging faults
-Date: Fri, 17 Jul 2026 14:03:13 +0100
-Message-Id: <20260717130317.1953574-4-fuad.tabba@linux.dev>
+Subject: [PATCH v5 4/7] KVM: arm64: Skip pKVM stage-2 flush when FWB is enabled
+Date: Fri, 17 Jul 2026 14:03:14 +0100
+Message-Id: <20260717130317.1953574-5-fuad.tabba@linux.dev>
 In-Reply-To: <20260717130317.1953574-1-fuad.tabba@linux.dev>
 References: <20260717130317.1953574-1-fuad.tabba@linux.dev>
 Precedence: bulk
@@ -61,51 +61,36 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-From: Bradley Morgan <include@grrlz.net>
+pkvm_pgtable_stage2_flush() cleans the D-cache for every mapping in the
+range even on hardware with stage-2 Force Write-Back, where FWB keeps
+guest memory coherent to the PoC and the maintenance is unnecessary. The
+generic kvm_pgtable_stage2_flush() returns early in that case, but the
+pKVM MMU does not, so it needlessly cleans the whole range on, e.g.,
+every set/way trap.
 
-Dirty logging forces new stage-2 mappings to page size but does not
-always split an existing block first (eager splitting is best effort
-and off by default). A non-write permission fault on such a block, an
-instruction fetch, still needs a page-table page to split it, but the
-top-up is gated on write faults.
+Return early when FWB is enabled, matching the generic walker.
 
-With the cache empty, kvm_mmu_memory_cache_alloc() hits its
-guest-triggerable WARN_ON(!nobjs) and falls back to a GFP_ATOMIC
-allocation under mmu_lock, with a BUG_ON() if that fails.
-
-Top up the memcache for any permission fault while dirty logging is
-active.
-
-Fixes: 6f745f1bb5bf ("KVM: arm64: Convert user_mem_abort() to generic page-table API")
-Link: https://lore.kernel.org/all/20260623165634.699011F000E9@smtp.kernel.org/
-Signed-off-by: Bradley Morgan <include@grrlz.net>
-[tabba: reword the commit message for the generic, non-pKVM failure mode]
+Fixes: e912efed485a ("KVM: arm64: Introduce the EL1 pKVM MMU")
 Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
- arch/arm64/kvm/mmu.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/pkvm.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 4d7c9bdcef00..74e7e7f7564c 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -2113,14 +2113,13 @@ static int user_mem_abort(const struct kvm_s2_fault_desc *s2fd)
- 	 * Permission faults just need to update the existing leaf entry,
- 	 * and so normally don't require allocations from the memcache. The
- 	 * only exception to this is when dirty logging is enabled at runtime
--	 * and a write fault needs to collapse a block entry into a table.
-+	 * and a fault needs to collapse a block entry into a table.
- 	 * Under pKVM a permission fault can also collapse pages into a block,
- 	 * which needs a fresh mapping object, and the hypervisor requires the
- 	 * min-pages memcache even when the install allocates nothing.
- 	 */
- 	memcache = get_mmu_memcache(s2fd->vcpu);
--	if (!perm_fault || (memslot_is_logging(s2fd->memslot) &&
--			    kvm_is_write_fault(s2fd->vcpu)) ||
-+	if (!perm_fault || memslot_is_logging(s2fd->memslot) ||
- 	    is_protected_kvm_enabled()) {
- 		ret = topup_mmu_memcache(s2fd->vcpu, memcache);
- 		if (ret)
+diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+index f70c601dcf4c..ba6570e37545 100644
+--- a/arch/arm64/kvm/pkvm.c
++++ b/arch/arm64/kvm/pkvm.c
+@@ -518,6 +518,10 @@ int pkvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size)
+ 	struct pkvm_mapping *mapping;
+ 
+ 	lockdep_assert_held(&kvm->mmu_lock);
++
++	if (cpus_have_final_cap(ARM64_HAS_STAGE2_FWB))
++		return 0;
++
+ 	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping) {
+ 		if (!mapping->nc)
+ 			__clean_dcache_guest_page(pfn_to_kaddr(mapping->pfn),
 -- 
 2.39.5
 
