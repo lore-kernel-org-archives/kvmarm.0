@@ -1,172 +1,138 @@
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from lamorak.hansenpartnership.com (lamorak.hansenpartnership.com [198.37.111.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F049306741
-	for <kvmarm@lists.linux.dev>; Fri, 17 Jul 2026 14:17:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 326D842A16A;
+	Fri, 17 Jul 2026 14:35:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.37.111.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784297851; cv=none; b=QRQGEXKHj0Tc1Y3kZNnvEuwzp1DKdCvIQHqQcmRShq4q90r0jXey+PiWAmBCZZ8Dm3eh24zkEI0inNZBA2huxRmp+28+BbYK6DMrhff71S8g3ihAemRszlq2SXhNF3dnY1cDV9Oua9gmg/7oO8kCBURMDk1oT8E9yndUiJ/vLpY=
+	t=1784298914; cv=none; b=Qto+jqG0tbCL4woK7zIj4GaxHU6ikQwcC3eHRi7b2hgLmLPV7PBLdcXKPw8iVt2aKBogVaUET5EQwAaFgmRXquaT+AejrCnFbPeG74qQQuh5sRdVDrcOVBiCc2BYwgKHBGt5nC1FMhi7VGwb3TcD7uIAE6oQby/V7szwxDxaVyM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784297851; c=relaxed/simple;
-	bh=vpdlQlUlhwWA5fW4GCWACaMYt9mrlB1EtFpopqlPn90=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JmNGsqNnoJx0509pri5Z0zJaJbAvC1l7uaFu5w+3WhMAZuia7Yp+52BmJPBWUgY6+DhmtPL1MXsLO+9bn7MIrRJPuHappEkxizLNK7e3GNJXkq2w2P4pcfWpKtFftzYZelqYD/+MmtqJ7DapCTen4EiQ86RaSd9+ktBQPlbgDYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=LhZ4lNZ5; arc=none smtp.client-ip=91.218.175.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1784298914; c=relaxed/simple;
+	bh=hxGmcHmTQSG/tdRRf+oOX+HiB6sZ5o3RY6F7qAn0Qg8=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=tWwwPwlETNarimWjokbm5xoUf9ANjKC3uLwU2fDayEY6fHO2mN36WuvAuj2qQOzK3eZbpQHgBiXFWVBNyvadwARYYtDuTK6p1kjzx5IS6KpM0avmcoRwSSVAB95cwWwjZ1Ihch1TOlocV6PYQ/W2LmOJf0IXphIdNN8J/n/lT+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com; spf=pass smtp.mailfrom=HansenPartnership.com; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=podJ7VXE; arc=none smtp.client-ip=198.37.111.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=HansenPartnership.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="LhZ4lNZ5"
-X-Gm-Message-State: AOJu0YwdyxSgxZvjJJ7F5XnCG/46EqZMuXFyy9glUoDYwJ0PGiXHGM/0
-	Ap7AaxNsKrrI+Aok2O+8FLgo3rbII3QwyniXmjiaS+Lkrf32/dROnsC9M1wAo8gs7WBHk39Abto
-	x/0rGN20AWqK/bwmS/5l03aeH7jWCxD6BnrjusDWo
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1784297846;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=MKiSsrruSxgqSs4lrLJxrjq1eJiRTEmF4VPmduR90h8=;
-	b=LhZ4lNZ5GJ35EhRWGsaumLkyYBnodwCOrmWiKk8FPfFlLAJv3Lol304/PJ90d1xyxk3EhA
-	iVKe1eUBg70Jlw2ZLJGKzP15PNf1j35rwcXSGfibyBfCY8+CWHnNQZinNcptePbFctVGnF
-	Ar7sjzrmhoExxLtNjsBs0uqwYzgsdrM=
-X-Received: by 2002:a05:622a:5a0b:b0:51c:7a8b:c3fe with SMTP id
- d75a77b69052e-52212c60ca6mr113021cf.23.1784297831984; Fri, 17 Jul 2026
- 07:17:11 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="podJ7VXE"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=hansenpartnership.com; s=20151216; t=1784298912;
+	bh=hxGmcHmTQSG/tdRRf+oOX+HiB6sZ5o3RY6F7qAn0Qg8=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+	b=podJ7VXEOrozW0/nEkVk5DUdZHQ+jKSQ6mLUbZdvS3I1Wu4OjMzk94KILfZv/XDzH
+	 Ec/FKjwkDHi4qBngcOq9TDTwLIi7MsReMG/FnZhBNLpB6oXFaxJIMafGhoAw1chHHg
+	 m2Heto7gdDUeUaH+Dkyw2JU4hBcyj2zcgXY27FjQ=
+Received: from lingrow.int.hansenpartnership.com (unknown [IPv6:2601:5c4:4300:d341::8c71])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519MLKEM768 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by lamorak.hansenpartnership.com (Postfix) with ESMTPSA id 6AF891C0278;
+	Fri, 17 Jul 2026 10:35:11 -0400 (EDT)
+Message-ID: <570f82e8b8bc968a31a4ba859145f6c324e41247.camel@HansenPartnership.com>
+Subject: Re: [PATCH 35/60] kvm: Add VCPU plane-scheduling state and helpers
+From: James Bottomley <James.Bottomley@HansenPartnership.com>
+To: =?ISO-8859-1?Q?J=F6rg_R=F6del?= <joro@8bytes.org>, Paolo Bonzini
+	 <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>, Tom Lendacky	
+ <thomas.lendacky@amd.com>, ashish.kalra@amd.com, michael.roth@amd.com, 
+	nsaenz@amazon.com, anelkz@amazon.de, Melody Wang <huibo.wang@amd.com>, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
+	loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+ x86@kernel.org, 	coconut-svsm@lists.linux.dev, joerg.roedel@amd.com
+Date: Fri, 17 Jul 2026 10:35:10 -0400
+In-Reply-To: <aigE2EvJyZlYDz0V@8bytes.org>
+References: <20260608144252.351443-1-joro@8bytes.org>
+	 <20260608144252.351443-36-joro@8bytes.org>
+	 <e7eb0dba-790a-4644-9895-5c9a7420d7fe@redhat.com>
+	 <aib8n5lO6HKbLC4Y@8bytes.org>
+	 <CABgObfbUsDeStnZF-7oyR-W-Bvd4qTMoeUwGizgn10UTdKtZ2A@mail.gmail.com>
+	 <aigE2EvJyZlYDz0V@8bytes.org>
+Autocrypt: addr=James.Bottomley@HansenPartnership.com;
+ keydata=mQENBE58FlABCADPM714lRLxGmba4JFjkocqpj1/6/Cx+IXezcS22azZetzCXDpm2MfNE
+ lecY3qkFjfnoffQiw5rrOO0/oRSATOh8+2fmJ6el7naRbDuh+i8lVESfdlkoqX57H5R8h/UTIp6gn
+ 1mpNlxjQv6QSZbl551zQ1nmkSVRbA5TbEp4br5GZeJ58esmYDCBwxuFTsSsdzbOBNthLcudWpJZHU
+ RfMc0ew24By1nldL9F37AktNcCipKpC2U0NtGlJjYPNSVXrCd1izxKmO7te7BLP+7B4DNj1VRnaf8
+ X9+VIApCi/l4Kdx+ZR3aLTqSuNsIMmXUJ3T8JRl+ag7kby/KBp+0OpotABEBAAG0N0phbWVzIEJvd
+ HRvbWxleSA8SmFtZXMuQm90dG9tbGV5QEhhbnNlblBhcnRuZXJzaGlwLmNvbT6JAVgEEwEIAEICGw
+ MGCwkIBwMCBhUIAgkKCwQWAgMBAh4BAheAAhkBFiEE1WBuc8i0YnG+rZrfgUrkfCFIVNYFAml2ZBI
+ FCS3GUMIACgkQgUrkfCFIVNZKjQf/deRzlXZClKxTC/Ee2yEPqqS7mm/INUA49KdQQ5oIhSxkUBy0
+ 9J4qjMIo5F8ZFkFTqikBqeL35LKu7O7rn8WETfX8Bxvos3HUsl3jHo34DES4MUFIpoQPgtiLRGwLb
+ K0cVCAArR2u2qj4ABmTRrs1I1kvdjEw6gatOuXtEe/j5O2fvfzTq9GBr0Q3n2IAsFXi4hLlx6VPE8
+ tyWUZ8BWJKtih3JAeUiXFvASL3McV0rV9RnU0VbjEQEhSE7PMYhWpnDC9AyBb0lXJllQRvC3NSkUB
+ 8KVQgNNxRPss0WE/nBoZ4dFA42jTyzTz8lNylxZoAWV7WJb3QxVg4oCodRVrxxrQhSmFtZXMgQm90
+ dG9tbGV5IDxqZWpiQGtlcm5lbC5vcmc+iQFVBBMBCAA/AhsDBgsJCAcDAgYVCAIJCgsEFgIDAQIeA
+ QIXgBYhBNVgbnPItGJxvq2a34FK5HwhSFTWBQJgS5mYBQkbNYS9AAoJEIFK5HwhSFTWBpwIAL5Bk3
+ 5FB34U6iHmDzzgdCbxLTs43T/YQyJpcGIvopBvnI/fDY8oSG6Df64/O6B+1R+A8TDp6ZG5ysUWnCC
+ 6GuIaEHemBYkitMPglR6+sGCMQY7O0mlsPvdssvKK1KI9Bno4VU6ogaF2qVzefSqg1Djmf/DcsxWP
+ rI/jdJ8FB5AYR2rjIdDFc+zRdAJuavo1/anyY2wgpFh/3R8IOYAEfWV9nGgYkf9+tA4EIn1sxE0I3
+ L5oW2N3mbyRrkzuBwO8ztMCwqEPk7moWzhokcZqMXiAIahaZdkashJC+s2X2RZSGCy+g+pvY5NN4B
+ BVG5XwLgVBqbHMTcxE0fbmPqz+q6O0LEphbWVzIEJvdHRvbWxleSA8amVqYkBoYW5zZW5wYXJ0bmV
+ yc2hpcC5jb20+iQFXBBMBCABBFiEE1WBuc8i0YnG+rZrfgUrkfCFIVNYFAmODZ5ACGwMFCRs1hL0F
+ CwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AACgkQgUrkfCFIVNZu0Af/TzvL2/NdgAcw9uN3x60H8
+ jc4QUq14VpxcFEFEMpcj1morkX/G93V+56HBBaXZj+yK8PhxIA/SIz+sU7C/0YvKuvzakP8ZX/7WJ
+ e32SOUtjfr/VTaqjIBzNj6OxLvZpmNbBw7s6DwhhNpHOWqJ/1ml+PtDRDV71IB58yVqQjp1xlNKVl
+ ZppcJ5908EJzsFnRIVjiQiDSKoppqB2BCibBbrWcln7CiWMyOC/cco6SIn6twH+f7+aivJ3xGcOE2
+ a9gBKF5rNi9TBoX9oyPmshv/TDmnohsVrH7AYXlGYfZTk15SWEiROh1QX8/uD9wl/gcIv5EDUpT/F
+ L2jzOsA5663bw==
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260717130317.1953574-1-fuad.tabba@linux.dev>
- <20260717130317.1953574-4-fuad.tabba@linux.dev> <20260717131537.71F531F000E9@smtp.kernel.org>
-In-Reply-To: <20260717131537.71F531F000E9@smtp.kernel.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Fri, 17 Jul 2026 15:17:00 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTzZxa7Yb2GJhbJdtnTgGoiPTmSAotWTF7S7acq6M_trwg@mail.gmail.com>
-X-Gm-Features: AUfX_mzZmBnBqC-Gr-icw0K7ZbsBiXqMc93gdpuOW49Urj6_mipYgHljtGsGSb8
-Message-ID: <CA+EHjTzZxa7Yb2GJhbJdtnTgGoiPTmSAotWTF7S7acq6M_trwg@mail.gmail.com>
-Subject: Re: [PATCH v5 3/7] KVM: arm64: Top up stage-2 memcache for dirty
- logging faults
-To: sashiko-reviews@lists.linux.dev
-Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>, 
-	Marc Zyngier <maz@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Migadu-Flow: FLOW_OUT
 
-On Fri, 17 Jul 2026 at 14:15, <sashiko-bot@kernel.org> wrote:
->
-> Thank you for your contribution! Sashiko AI review found 1 potential issu=
-e(s) to consider:
->
-> Pre-existing issues:
-> - [High] A malicious nested (L1) guest can crash the KVM host via a Break=
--Before-Make (BBM) violation that triggers a BUG_ON() due to an empty memor=
-y cache during a permission fault.
+On Tue, 2026-06-09 at 14:37 +0200, J=C3=B6rg R=C3=B6del wrote:
+> I read a bit more about VSM and it seems their prioritization of VTLs
+> is a bit more complicated. VTL0 has the least privileges but boots
+> first, then sets up VTL1. But VTL1 is only higher-privileged once it
+> is locked by VTL0. Another way to look at it is that VTL0 de-
+> prioritizes itself.
 
-From my understanding of NV code, this looks like a real issue. I
-don't think it changes this patch, though: this one only widens the
-top-up for the dirty-logging case, and the path you describe is a
-non-logging permission fault. So, it would be a separate fix, a top up
-for nested permission faults too, the same way we already do for pKVM?
+Actually, I don't think we have to follow the VSM model.  All we at
+Microsoft care about is that we can emulate VSM with the planes
+primitives provided.
 
-        if (!perm_fault || memslot_is_logging(s2fd->memslot) ||
-            is_protected_kvm_enabled() || s2fd->nested) {
+There's a definite reason not to do strict VTL privilege in that one
+can see two mutually distrusting planes sharing a common communication
+area.  This is definitely possible with TDX and so planes shouldn't
+disallow it.
 
-If that's right, I'll send a separate fix later. Marc, what do you think?
+> The patches here are built around the assumption that plane0 is the
+> highest privileged one and is always runnable. Running any lower-
+> privilege plane must be triggered by the guest. This is clearly not
+> sufficient for VSM, the question is how to solve that.
 
-/fuad
+So this all depends how the planes are started.  If you're starting
+them from an IGVM file that loads the most privileged code and then
+runs the guest in a different plane, absolutely, it can work as you
+describe.  However, the common use case for serviceable security
+enclaves is you start the kernel first (necessarily in plane 0) and
+then bring up the enclaves later which means the planes > 0 are
+technically higher privilege since they're running hidden security
+code.  HOWEVER, there's no reason at all to trust a security enclave
+that's doing something like guarding private keys to be able to poke
+anywhere it wants in the guest ... that's a security breach waiting to
+happen, so it would really be better if the model were not
+hierarchical, but more akin to the ability to seal planes off from each
+other, so the kernel can start the enclave, which would then set itself
+and the communication area up, but then the plane 0 kernel would remove
+access to most memory from the enclave.
 
+In this sealing model, there's no absolute privilege levels; each plane
+would decide what the other planes can see of its memory space and, on
+security grounds, we'd likely configure the enclaves to have the least
+possible privilege.
 
+Now, Windows applications expect VSM to be strictly hierarchical in
+terms of privilege, but if we create a sealing primitive as described
+above, we can get it to build the strict VSM privilege hierarchy in the
+hyper-v driver.
 
-/fuad
+Regards,
 
-> --
->
-> --- Patch [3]: [PATCH v5 3/7] KVM: arm64: Top up stage-2 memcache for dir=
-ty logging faults ---
-> commit bac5488834df4c0a16b08356c8263e8eb67e0fe4
-> Author: Bradley Morgan <include@grrlz.net>
->
-> KVM: arm64: Top up stage-2 memcache for dirty logging faults
->
-> Dirty logging forces new stage-2 mappings to page size but does not alway=
-s
-> split an existing block first. A non-write permission fault on such a blo=
-ck
-> still needs a page-table page to split it, but the top-up was previously
-> gated on write faults. This patch tops up the memcache for any permission
-> fault while dirty logging is active.
->
-> Link: https://lore.kernel.org/all/20260623165634.699011F000E9@smtp.kernel=
-.org/
->
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index 4d7c9bdcef004..74e7e7f7564c8 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -2113,14 +2113,13 @@ static int user_mem_abort(const struct kvm_s2_f=
-ault_desc *s2fd)
-> >        * Permission faults just need to update the existing leaf entry,
-> >        * and so normally don't require allocations from the memcache. T=
-he
-> >        * only exception to this is when dirty logging is enabled at run=
-time
-> > -      * and a write fault needs to collapse a block entry into a table=
-.
-> > +      * and a fault needs to collapse a block entry into a table.
-> >        * Under pKVM a permission fault can also collapse pages into a b=
-lock,
-> >        * which needs a fresh mapping object, and the hypervisor require=
-s the
-> >        * min-pages memcache even when the install allocates nothing.
-> >        */
-> >       memcache =3D get_mmu_memcache(s2fd->vcpu);
-> > -     if (!perm_fault || (memslot_is_logging(s2fd->memslot) &&
-> > -                         kvm_is_write_fault(s2fd->vcpu)) ||
-> > +     if (!perm_fault || memslot_is_logging(s2fd->memslot) ||
-> >           is_protected_kvm_enabled()) {
->
-> [Severity: High]
-> This is a pre-existing issue, but does skipping the memcache top-up here
-> leave the host vulnerable to a crash from a malicious nested L1 guest?
->
-> If a nested L1 guest establishes a 2MB stage-2 block mapping, and then
-> maliciously overwrites it with a 4KB page table descriptor without issuin=
-g
-> a TLBI (an architectural Break-Before-Make violation), an L2 guest can
-> trigger a permission fault on the stale 2MB shadow mapping.
->
-> Since KVM optimizes permission faults by assuming they only relax
-> permissions, the memcache top-up is skipped here.
->
-> However, in kvm_s2_fault_map(), if the mapping size and fault granule
-> don't match:
->
-> arch/arm64/kvm/mmu.c:kvm_s2_fault_map()
->     ...
->         } else {
->                 ret =3D KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, gfn_to_gp=
-a(gfn), mapping_size,
->                                                          __pfn_to_phys(pf=
-n), prot,
->                                                          memcache, flags)=
-;
->         }
->     ...
->
-> kvm_pgtable_stage2_map() will attempt to split the block, which requires
-> a new page table allocation. Because the cache wasn't topped up,
-> kvm_mmu_memory_cache_alloc() will hit WARN_ON(!mc->nobjs) and fall back
-> to a GFP_ATOMIC allocation. If this atomic allocation fails under memory
-> pressure, it hits BUG_ON(!p) and crashes the host.
->
-> >               ret =3D topup_mmu_memcache(s2fd->vcpu, memcache);
-> >               if (ret)
->
-> --
-> Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260717130317.19=
-53574-1-fuad.tabba@linux.dev?part=3D3
->
+James
