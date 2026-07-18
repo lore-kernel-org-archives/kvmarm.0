@@ -1,133 +1,108 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 781D13C0A15
-	for <kvmarm@lists.linux.dev>; Fri, 17 Jul 2026 23:13:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46ABC29405;
+	Sat, 18 Jul 2026 00:35:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784330004; cv=none; b=H26uc/eV5VK/cvUY70ezjfiZlJCWlYKNO9JRkyBk214UxIRop2QtKiJErQFxDIBcZZjLxXCag2pUHFxqYFPNEOk/MQR5DR36cp0CfI+fgbEEHr722qEQmt/kVdHH0MiECWWPSSUmA7FwMzIjbx9w/hchGxg01WO2O8pgLMYjRBc=
+	t=1784334929; cv=none; b=LShBIUHDWCEvZWJygo7NklhJPiWA9F6+MbjW75usRdI1KUZbo8zAeuJBSplPpSaws6jiT/1RzWqWpKhmu95r9cZSwPA45LJlOnLY80Tp6iEaqkcu2VNs4JerCY4rErEi1SmcoBrhKSzaGd3eD0sRTxvLBSRAdq1uu/x1kSUC8A8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784330004; c=relaxed/simple;
-	bh=3BlVjgmV5uha5Hv39vi3jBRXCmFZY73SrcLqw6/9YjM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EoWag0j9K/9y27tQeRakGRwCuYlpvNDuufKdWDLO8yNON++f9bNXwEKiyxB0iqUMk1dpWBwTMhDJFrGEn+0dkEoCt/Nsm/MdFFFwcQX17yvSR989jpCTZ+9l3S+rIYVo/4QHd4vtriRk6G7Kb3nfHE2AKAY1AOWqVivHqnoDumw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=MrG2RBy/; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1784334929; c=relaxed/simple;
+	bh=9WCZr/0a6+6yd4+H2iJZREJPaBMBp4S3/hNJ5RCJPrk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UqFoZkof+81zWdqP5YR9PVelDv+hXqe7QcqxHLYD1TW9cpniHr+OsbpHT/XSeBJSdduHpeuBMUnCFeqFY/B4bjML7nvDjL6W3/pV0LTxJ+XxTDLRvl7tyRxbB0HIQval1Hn9ftkiSbWkCN+PhPDagVkXMBjhzfDhDFdWkskkV40=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UZMqhG7j; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="MrG2RBy/"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 861851476;
-	Fri, 17 Jul 2026 16:13:13 -0700 (PDT)
-Received: from workstation-e142269.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EDF783F66F;
-	Fri, 17 Jul 2026 16:13:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1784329997; bh=3BlVjgmV5uha5Hv39vi3jBRXCmFZY73SrcLqw6/9YjM=;
-	h=From:To:Cc:Subject:Date:From;
-	b=MrG2RBy/Fb9HTHfDKyEJEEWtqIgzwZwHsP2O0U+aMZ70wHOhQdusEBocp3HC1ZIDn
-	 2Uv0rWgc/CndtB/MaFd/d6FaXjhyP4lt7QBFsmdREZtL2ztY86WIEzi+3ye7n+HkJM
-	 SM96L9nvLBq35DJrPUDZ0YWZvqwEPKc5j+CWqRcQ=
-From: Wei-Lin Chang <weilin.chang@arm.com>
-To: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Cc: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <tabba@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UZMqhG7j"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF4571F000E9;
+	Sat, 18 Jul 2026 00:35:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1784334927;
+	bh=83/QFKPUAecuur3XiUDSCrCipZXjd2KIGyHaxlFSSCE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=UZMqhG7jOCM0NcG8H7yxHekee//rMmL/U7Ry2BrLImm6unJIexmYIklkgmaYx2kJc
+	 w0QAzde1FMPP7tZgjagzsxmyGTzvWe+VetYaC6HyrUjg4v+PbZo1VN7Q8KWkcEo19T
+	 3EX+dn0yks9KVfhECXAzeEyN/luAsqwLZ2nH/c1kLeZxzu2Q27VxKzyUlYgTME67FT
+	 eIIkaE72/6x6u+8QvFPawI8tcNgDH3IBoD5VJYpu4gG8qoCTUHjV7m/6qrkXWvRkea
+	 vjYcsAWsbreVTHJrKt36aQ67Ts+zrieyLSdwkax7w8Vcuwbb7uH6ZPG5/tRr5i6KHP
+	 YHwLOVzyyTdgg==
+Date: Sat, 18 Jul 2026 01:35:21 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Dev Jain <dev.jain@arm.com>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	Sebastian Ene <sebastianene@google.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Wei-Lin Chang <weilin.chang@arm.com>
-Subject: [PATCH] KVM: arm64: ptdump: Flush the last region
-Date: Sat, 18 Jul 2026 00:12:33 +0100
-Message-ID: <20260717231233.2299068-1-weilin.chang@arm.com>
-X-Mailer: git-send-email 2.43.0
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
+	Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>,
+	Fuad Tabba <tabba@google.com>, Ben Horgan <ben.horgan@arm.com>,
+	Jean-Philippe Brucker <jpb@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Eric Auger <eric.auger@redhat.com>
+Subject: Re: [PATCH v12 02/29] arm64/fpsimd: Update FA64 and ZT0 enables when
+ loading SME state
+Message-ID: <3c76650f-ddda-47ae-a676-86016d8e39a6@sirena.org.uk>
+References: <20260709-kvm-arm64-sme-v12-0-d0301d79ef58@kernel.org>
+ <20260709-kvm-arm64-sme-v12-2-d0301d79ef58@kernel.org>
+ <ali39DG6qie7XTuD@J2N7QTR9R3.cambridge.arm.com>
+ <15a9ae14-395d-472a-a5be-9e46524fb493@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="B1L8qt03Fu74vlzF"
+Content-Disposition: inline
+In-Reply-To: <15a9ae14-395d-472a-a5be-9e46524fb493@sirena.org.uk>
+X-Cookie: Thufir's a Harkonnen now.
 
-Currently the stage-2 ptdump calls note_page() at each leaf entry visit.
-This simply misses the output of the last region, because note_page()
-only dumps output when it detects a change in level/prot, or when the
-walk enters a next marker section. The last region in the guest IPA
-space with the same level/prot is not dumped since there is no change
-after it.
 
-To dump the final region, manually issue a note_page() call with address
-BIT(ia_bits) (end of guest IPA space) and level == -1 to trigger a level
-change after the last region. Additionally treat level == -1 as a last
-flushing note_page() call and avoid dumping the name of the next marker
-for this case.
+--B1L8qt03Fu74vlzF
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Fixes: 7c4f73548ed1 ("KVM: arm64: Register ptdump with debugfs on guest creation")
-Reported-by: Sashiko AI <sashiko-bot@kernel.org>
-Closes: https://lore.kernel.org/kvmarm/20260630122758.891011F00A3A@smtp.kernel.org/
-Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
----
- arch/arm64/kvm/ptdump.c | 8 +++++---
- arch/arm64/mm/ptdump.c  | 5 +++--
- 2 files changed, 8 insertions(+), 5 deletions(-)
+On Thu, Jul 16, 2026 at 04:28:02PM +0100, Mark Brown wrote:
+> On Thu, Jul 16, 2026 at 11:52:36AM +0100, Mark Rutland wrote:
 
-diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
-index c9140e22abcf..4096e4a92fae 100644
---- a/arch/arm64/kvm/ptdump.c
-+++ b/arch/arm64/kvm/ptdump.c
-@@ -155,11 +155,13 @@ static int kvm_ptdump_guest_show(struct seq_file *m, void *unused)
- 		.seq		= m,
- 	};
- 
--	write_lock(&kvm->mmu_lock);
-+	guard(write_lock)(&kvm->mmu_lock);
- 	ret = kvm_pgtable_walk(mmu->pgt, 0, BIT(mmu->pgt->ia_bits), &walker);
--	write_unlock(&kvm->mmu_lock);
-+	if (ret)
-+		return ret;
-+	note_page(&st->parser_state.ptdump, BIT(mmu->pgt->ia_bits), -1, 0);
- 
--	return ret;
-+	return 0;
- }
- 
- static int kvm_ptdump_guest_open(struct inode *m, struct file *file)
-diff --git a/arch/arm64/mm/ptdump.c b/arch/arm64/mm/ptdump.c
-index ab9899ca1e5f..fed4e4407e0e 100644
---- a/arch/arm64/mm/ptdump.c
-+++ b/arch/arm64/mm/ptdump.c
-@@ -194,6 +194,7 @@ void note_page(struct ptdump_state *pt_st, unsigned long addr, int level,
- 	struct ptdump_pg_state *st = container_of(pt_st, struct ptdump_pg_state, ptdump);
- 	struct ptdump_pg_level *pg_level = st->pg_level;
- 	static const char units[] = "KMGTPE";
-+	bool flush = level == -1;
- 	ptdesc_t prot = 0;
- 
- 	/* check if the current level has been folded dynamically */
-@@ -234,7 +235,7 @@ void note_page(struct ptdump_state *pt_st, unsigned long addr, int level,
- 				  pg_level[st->level].num);
- 		pt_dump_seq_puts(st->seq, "\n");
- 
--		if (addr >= st->marker[1].start_address) {
-+		if (addr >= st->marker[1].start_address && !flush) {
- 			st->marker++;
- 			pt_dump_seq_printf(st->seq, "---[ %s ]---\n", st->marker->name);
- 		}
-@@ -244,7 +245,7 @@ void note_page(struct ptdump_state *pt_st, unsigned long addr, int level,
- 		st->level = level;
- 	}
- 
--	if (addr >= st->marker[1].start_address) {
-+	if (addr >= st->marker[1].start_address && !flush) {
- 		st->marker++;
- 		pt_dump_seq_printf(st->seq, "---[ %s ]---\n", st->marker->name);
- 	}
--- 
-2.43.0
+> > >  		if (test_thread_flag(TIF_SME)) {
+> > > -			unsigned long vq = sve_vq_from_vl(sme_vl);
+> > > -			sysreg_clear_set_s(SYS_SMCR_EL1, SMCR_ELx_LEN, vq - 1);
+> > > +			sysreg_cond_update_s(SYS_SMCR_EL1, task_smcr(current));
+> > > +			isb();
+> > >  		}
 
+> > What's the ISB for? That mysteriously appeared in v11 without
+> > explanation. It wasn't in the original code, prior versions of the
+> > series, or my suggested rework with the task_smcr() helper.
+
+> > I don't believe it's necessary to add an ISB here.
+
+> I can't remember or figure it out, I'll delete.
+
+Actually I remembered: while SCMR_EL1.LEN is self synchronising the
+"without the need for explict synchronization" wording is not present
+for SMCR_EL1.{FA64,EZT0} and this is no longer explicitly just an update
+of LEN.  It's possible I'm being overly paranoid here, I'll leave the
+isb() and add a comment for the next version.
+
+--B1L8qt03Fu74vlzF
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmpaykgACgkQJNaLcl1U
+h9DjvAf+Mo2V+vK8ka9ifnzNbT6e4l1B8v1nwzBzZqNOsHRBkYVA+3HzxPfa42iQ
+wBsUd5GDNYhvYnfigzrrCBiqP6iEXL2auvhxC05ZD/FMYpMpjg6l8a5YbyFZrCaI
+VCnHsZDwaYx0qDsmnOUgwi/AvliSoRdtky5XTuT5aJLAPePiiXhE3f3ltNCQqynG
+VzaW9xKH0Tng2mJ8kiajrNPlzKMChuJdcebmYosYMMiYFLiHjnE2FDyBqAf7A0It
+jjU1d99NHubQeKLYc+3Io4KDKVRAafjVK2BfVWpOhGPufaC/a+HxGr2ZkU250Q1q
+8YjIq/ZvP2kx3EodKw5prhfkTiaubw==
+=Oojd
+-----END PGP SIGNATURE-----
+
+--B1L8qt03Fu74vlzF--
