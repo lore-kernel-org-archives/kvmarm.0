@@ -1,123 +1,187 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6811E330D34;
-	Sat, 18 Jul 2026 14:24:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9442E289367
+	for <kvmarm@lists.linux.dev>; Sat, 18 Jul 2026 19:55:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784384668; cv=none; b=ixbDm78SwkSDNZ7I9AqjNaeI2LK03hdW7PJkHLiPO9doTAxxoE8kBhT5EQ40iWWjGdVOdyB0LQjZhwn5qg75zFsJy73N64XXawUnkYTRco1HYN+Y1+M34qtCunwJdzxD19qx8uzgViMXoUK0ZPPaEh3ulw8Nvkcxs2gVpv/Q66k=
+	t=1784404509; cv=none; b=OT3fO49mgBmPihbe5+koRymdSg2r+/ZI69bd/Y5F5ILK07zq+Ncr8aaUs+/h/U9WO6uTIcbI1cIHjcU3oIwgY/JovF4sbkM4dEWsoBsPXlFQIvJORSaEBCOCGQXWjHlXAc2W0VGbPScpNr0KivaTTeHZaRfm+8W2AWei7j46N4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784384668; c=relaxed/simple;
-	bh=Sp6LEIaJIVS9L2IHVMDqH91fkjtvMLk3cHPyMYtk5zw=;
+	s=arc-20240116; t=1784404509; c=relaxed/simple;
+	bh=hZdtk/8woaKTNLmw0wtSCx9vrBFUx14/5HBeedVZsVE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O9jvnjy3AySbDOkGglOqwwieuv5m5kq9kiV1ASoWrfjQHcYRd6Y8fix3x9JW0yKcTaA3lpMfbcgnr0JzYiMSFp6JSI1eDjLyzlMZ/s2RCMO1gRtBkXjZqA0y61Cd7Hyl2uo/Lb3EPSTT3DNW1iUFm9gD8/QroW28m6cV9N45Go4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MLbiH6aG; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=My+/0jZ84MhKSlpxfI81BmRd+axm6EvBZ8OG/+z1GcUlUgqu+b6TUkJu/sY2Y9u3lZumtMoxDxz2uyntQmmaq47il9DizpERjZ/HTkfJ3IUQ10LZhex0/zfOUK3AJJ9QyEt8pzuBqJr2M0NjvooHy6NSZr0yDIHZdUKS2D0Eqf8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QiBHhxK/; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MLbiH6aG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09EA71F000E9;
-	Sat, 18 Jul 2026 14:24:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784384667;
-	bh=I2X51PbVx/BFVJ6LA8OK813ZCDWpSmXg2JC3L04Zccg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=MLbiH6aGlQARFRsEAlT96uAdWJuJ+GS0r6dW7tDq1vw6FAFXkn0jdnMzF3AgpUKTs
-	 +jY/68c6WOZtDdG6v3RSGn1VEqqhvfNDvYgbdvnW0ItgrxgClhpUYrjCfqzhx2Wk8T
-	 PsaW2+yf4C/qclVWDG8cd3lBFNE3hwxF997q66ouMDo2TCZRS0XkpVwAET+7Z1FVRX
-	 AWnVu1p5q7vPD3g0zeInT4+2dB6E/lCWsg2PKFAshPiucSqc80AzCCT2AnvKBIV4E6
-	 Gg2LwnlWCl+d1kBWuzdVbbpb0JBj7FjwJcUbmGnPWb1eeSkOEF4tAVFEXVyKK2TNBZ
-	 RSMst6SU7+/Bg==
-Date: Sat, 18 Jul 2026 15:24:20 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Mark Rutland <mark.rutland@arm.com>, Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
-	Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>,
-	Ben Horgan <ben.horgan@arm.com>,
-	Jean-Philippe Brucker <jpb@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v12 02/29] arm64/fpsimd: Update FA64 and ZT0 enables when
- loading SME state
-Message-ID: <43f21c65-c5ba-44a3-9741-548390df369b@sirena.org.uk>
-References: <20260709-kvm-arm64-sme-v12-0-d0301d79ef58@kernel.org>
- <20260709-kvm-arm64-sme-v12-2-d0301d79ef58@kernel.org>
- <ali39DG6qie7XTuD@J2N7QTR9R3.cambridge.arm.com>
- <15a9ae14-395d-472a-a5be-9e46524fb493@sirena.org.uk>
- <3c76650f-ddda-47ae-a676-86016d8e39a6@sirena.org.uk>
- <CA+EHjTw9rGvQyev-4i7zkO5bPPZKGYn858485dCs8iHmCi0t3w@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QiBHhxK/"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4954d5d814fso60315e9.0
+        for <kvmarm@lists.linux.dev>; Sat, 18 Jul 2026 12:55:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1784404505; x=1785009305; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=/OtteCJd5kLZ2hGXBwK3WYGu95XqRXhomwJCp9pxwjE=;
+        b=QiBHhxK/TEHmKL8K+5QXeassH+BLT4Itsl9No9Vqcm0pTtaBIMwCGm2kt6opvL26FA
+         mS0gRGYsLMuXErfKEwJi8cd2SqUHn1767H6tWKPqU04zwpaE+IwPibCHb2kSCIuKbRRK
+         vaqr/pSBqVsKcAb3v6u/rzz3+zYS+88a3PlOI2odpAys/aLE66gxfcOGVMouIASFyFS1
+         kZUv2XoenDHmAAsaUoL3zqY/lVGt5lXo9A7psPUFAbDmJInbfnvPi2dGF5N6SYxue3ZP
+         DtdwqFWR5goTO4Vx1L6ttYzcE5bKB6xv3sBw+EsNaPIVxJr5t/e4WMD85QCppLhVlx/U
+         X0Fw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784404505; x=1785009305;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=/OtteCJd5kLZ2hGXBwK3WYGu95XqRXhomwJCp9pxwjE=;
+        b=GM/tRi5g4GHSTcP6DzLSDhc9pUElY6C6byrwzIWvAFX8rxmU2dlHzDYOC7agieeQe+
+         FWWHK/mS1rzlXgXsjOxNPYxMaUxp/mE6URnwak4xA1RttL+PQhpzrSAjQhN499Ur1ZuH
+         W/LcTwCq2w17dw1rWMQT1jZ8r9NY/JoL2dvwcbi/Gje55wdREVEWTMadn76a2UAzYeZS
+         YWmBtz3i/uqbgBHAnenRX1pMGM4mfcwN4EEXfTrd0YFvbbGcbIo/QcK9j3DnG8irUq4O
+         aMYKzc7KSLpmsM5mHHhEUzgENE6WQeIIVS4gxKlg4BjYRDH4EUdnVCfOQJ105BtZGWk7
+         drCQ==
+X-Forwarded-Encrypted: i=1; AHgh+Rr7mDExI+5Xazj9eL9jPcfv55RcHwWqB92g+iaom3sq723Bwz9+P9pBgcBFCrLBUWA0gavzCz0=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yx3d/U+kaPFSxoolNIJ/iN948jgufBpJCwQas8XKko8MEPiZw8x
+	IAzC1+irkD930VDlBG0k60+w9aGWseqQr/CQn1GL/pdMuKVaICVCT5UTcDX7MGKELQ==
+X-Gm-Gg: AfdE7cmccu/x2w88xHt1n9Cs/H3KRYxiydaiBUjo+iuDtLA9ieY7yYc5hr2eqbqxyqZ
+	oKRZV8PxdZ8CrjbvF3ETMmBB/J3LDImfGeevsWoihAZoJO9MZwqKE3FNrlaZXW6/Lul7R+Ro6H5
+	oJZZv11KjOuxeZCrowkJnyMwwfNDhFgivg5ObPcilypwzdy0rsBgAKV7L2IOYm84gj4eigfV5eo
+	vOyWr2JjEYMgqumXlHMYLISCa/TSAta12KlpTu/ydbm26cwMPo1X7H6Bk2zJlmqnktwA5wHR2V/
+	uQiHqphzbymtqm29I4xaC6QNAVZNrofJZ1ajKeziJ4iios3Fsc+9sSjql5afPiRsxNKvEVfJabF
+	7Am8t1BwJvyuV8hvyJYMxh2UIXgWfa/PLb2tTidVnatkswW/5eZExnd+yEM3nIbClTXIRMdSu38
+	F9/jemUWH00kzVh3/3qkav/GTSctCizYm9XwhoqA==
+X-Received: by 2002:a05:600c:4995:b0:493:a96b:f9fe with SMTP id 5b1f17b1804b1-4954ff99257mr1026495e9.4.1784404504362;
+        Sat, 18 Jul 2026 12:55:04 -0700 (PDT)
+Received: from google.com (220.60.76.34.bc.googleusercontent.com. [34.76.60.220])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49549a36312sm161560395e9.2.2026.07.18.12.55.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 18 Jul 2026 12:55:03 -0700 (PDT)
+Date: Sat, 18 Jul 2026 19:54:58 +0000
+From: Mostafa Saleh <smostafa@google.com>
+To: Oliver Upton <oupton@kernel.org>
+Cc: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, maz@kernel.org,
+	seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org,
+	vdonnefort@google.com, tabba@google.com
+Subject: Re: [RFC PATCH 2/2] KVM: arm64: Support BBM level 3
+Message-ID: <alvaEgJFJ5DaQaac@google.com>
+References: <20260717130901.2239134-1-smostafa@google.com>
+ <20260717130901.2239134-3-smostafa@google.com>
+ <alqW49CH7eViDpAZ@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="D59yeImOKcklFS0z"
-Content-Disposition: inline
-In-Reply-To: <CA+EHjTw9rGvQyev-4i7zkO5bPPZKGYn858485dCs8iHmCi0t3w@mail.gmail.com>
-X-Cookie: Do not pick the flowers.
-
-
---D59yeImOKcklFS0z
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <alqW49CH7eViDpAZ@kernel.org>
 
-On Sat, Jul 18, 2026 at 02:30:04PM +0100, Fuad Tabba wrote:
-> On Sat, 18 Jul 2026 at 01:35, Mark Brown <broonie@kernel.org> wrote:
+Hi Oliver,
 
-> > Actually I remembered: while SCMR_EL1.LEN is self synchronising the
-> > "without the need for explict synchronization" wording is not present
-> > for SMCR_EL1.{FA64,EZT0} and this is no longer explicitly just an update
-> > of LEN.  It's possible I'm being overly paranoid here, I'll leave the
-> > isb() and add a comment for the next version.
+On Fri, Jul 17, 2026 at 01:56:03PM -0700, Oliver Upton wrote:
+> Hi Mostafa,
+> 
+> On Fri, Jul 17, 2026 at 01:09:00PM +0000, Mostafa Saleh wrote:
+> > If the system supports hardware Break-Before-Make (BBM) level 3, use it
+> > to replace stage-2 PTEs directly instead of falling back to the software
+> > break-before-make sequence.
+> > 
+> > 1) Get a reference count on the containing table for the new PTE.
+> > 2) Atomically update the PTE with the new valid descriptor.
+> > 3) Invalidate the TLB for the old PTE.
+> > 4) Drop the reference count holding the old PTE.
+> > 
+> > One interesting case, as BBML3 will update the PTE atomically, it
+> > can only know it raced with another core at the point of the cmpxchg
+> > failing, unlike the SW implementation which locks the PTE first.
+> > And as we must issue CMOs to the new mapped page before the update,
+> > that means with BBML3 racing cores will issue redundant CMOs,
+> 
+> I'd rather we just predicate BBML3-style transformations on an
+> implementation having FEAT_S2FWB and DIC. You can definitely come along
+> later and enable it when using a stage-2 in an SMMU makes this
+> mandatory, possibly at the expense of some extra CMOs.
 
-> I went through the ARM ARM (DDI 0487 M.c) on this and I don't think
-> you're being overly paranoid, I believe the isb() is needed here.
+Makes sense, I will do that in v2.
 
-Thanks for double checking so thoroughly.
+> 
+> There's also an extremely subtle detail that BBML3 enablement relies on,
+> which is that KVM will never change the OA of active translation. IOW,
+> if the host is moving the PFN we expect an invalidation before
+> re-mapping it.
+> 
+> I have no issue with relying on that behavior but we should make that
+> assumption abundantly clear.
 
-> And task_fpsimd_load() does make indirect reads of both fields before
-> the next context synchronization event: sme_load_state() executes LDR
-> ZT0, whose execution at EL1 is trapped when SMCR_EL1.EZT0 is 0, and
-> when PSTATE.SM is set sve_load_state() executes WRFFR, which is
-> "illegal when executed in Streaming SVE mode, unless FEAT_SME_FA64 is
-> implemented and enabled" (from the WRFFR description). The MSR SVCR in
-> between doesn't provide the synchronization, since SVCR's
-> self-synchronisation wording covers reads of its own SM and ZA fields
-> only.
+I see, I can add a comment as:
+Note: we assume that KVM will never change the OA of an active
+translation. If the host needs to move the backing PFN,it should do
+an explicit unmap to issue the required TLBI.
 
-Yeah.  We should be able to optimise this:
+> 
+> One of the things on my wish list for a while has been rebuilding
+> hugepages after dirty logging is disabled on a memslot. That seems like
+> like a very good optimization to do when BBML3 is present.
+> 
 
- - If there is no change we don't need the isb().
- - If only EZT0 changes and we load state where ZA is disabled then we
-   won't try to access ZT0.
- - If only FA64 changes and we load state where streaming mode is
-   disabled then we won't try to access streaming mode FFR.
+In android we have support for coalescing for KVM_PGTABLE_S2_IDMAP
+on map, that does not rely on BBML3, maybe this can be added in a
+follow-up series, and eventually extended to be more generic.
 
-I've gone and implemented the first which will suppress the isb() for
-current host kernel SME usage, the second two are starting to get more
-fiddly than seems sensible to do right now.
+https://android.googlesource.com/kernel/common/+/refs/heads/android17-6.18/arch/arm64/kvm/hyp/pgtable.c#1107
 
---D59yeImOKcklFS0z
-Content-Type: application/pgp-signature; name="signature.asc"
+> > to improve this:
+> > - We only use BBML3 if the old PTE was live.
+> > - To reduce the window of the race, an early check is added before
+> >   the CMO to exit early, but that does not eliminate the race.
+> > 
+> > Signed-off-by: Mostafa Saleh <smostafa@google.com>
+> > ---
+> >  arch/arm64/kvm/hyp/pgtable.c | 53 +++++++++++++++++++++++++++++++-----
+> >  1 file changed, 46 insertions(+), 7 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> > index 127b7f9541b1..69d52308236f 100644
+> > --- a/arch/arm64/kvm/hyp/pgtable.c
+> > +++ b/arch/arm64/kvm/hyp/pgtable.c
+> > @@ -838,7 +838,8 @@ static void stage2_clean_old_pte(const struct kvm_pgtable_visit_ctx *ctx,
+> >  /**
+> >   * stage2_try_break_pte() - Invalidates a pte according to the
+> >   *			    'break-before-make' requirements of the
+> > - *			    architecture.
+> > + *			    architecture, if BMML3 is supported it
+> > + *			    will be used, otherwise fallback to SW.
+> >   *
+> >   * @ctx: context of the visited pte.
+> >   * @mmu: stage-2 mmu
+> > @@ -854,6 +855,18 @@ static bool stage2_try_break_pte(const struct kvm_pgtable_visit_ctx *ctx,
+> >  {
+> >  	kvm_pte_t locked_pte;
+> >  
+> > +	if (system_supports_bbml3() && kvm_pte_valid(ctx->old)) {
+> > +		kvm_pte_t curr_pte = READ_ONCE(*ctx->ptep);
+> > +
+> > +		/*
+> > +		 * All handled in stage2_make_pte(). However exit early if we already
+> > +		 * lost the race to avoid extra CMOs.
+> > +		 */
+> > +		 if (curr_pte != ctx->old)
+> > +			return false;
+> 
+> Does this race detection actually move the needle? We haven't gotten
+> very far from the read in __kvm_pgtable_visit().
 
------BEGIN PGP SIGNATURE-----
+Yes, doesn't seem to help much with the current users, I will drop it.
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmpbjJMACgkQJNaLcl1U
-h9Aa2wf+MFnftbhCaUZX6WuBgJ/1JcYOGHYcvRPNQIAJbA+FOcoEoAhxy9zmXj4E
-Lj0HbydOLUFDNPTHJkNwKiBFX1bMmV6G4zai0jO0hNEdSrINc3XsQIvPZ05V/wnf
-P/22rDBegxR4h6onZCxuJybhd7tHT7HEzr/PSHT+7jq4UjUwNwFUafSkF1a4Wo+i
-OXEs6TU0LE4WFCXXKAZQDXNwT4uZcNtcFz+zXupnqRMWaaYyXY1h4PNvm7gl4UMK
-nizzA8eTfz10eI2NXtoYUDakxs+r3DKc1PF5a1WQaII9na/Ta1YymODmNqjNOSJv
-PmJ5ahScZWWJKbSaPYCK0A9YyOGYKw==
-=11bz
------END PGP SIGNATURE-----
+Thanks,
+Mostafa
 
---D59yeImOKcklFS0z--
+> 
+> Thanks,
+> Oliver
