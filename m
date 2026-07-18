@@ -1,108 +1,116 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46ABC29405;
-	Sat, 18 Jul 2026 00:35:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9F6626158B;
+	Sat, 18 Jul 2026 08:43:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784334929; cv=none; b=LShBIUHDWCEvZWJygo7NklhJPiWA9F6+MbjW75usRdI1KUZbo8zAeuJBSplPpSaws6jiT/1RzWqWpKhmu95r9cZSwPA45LJlOnLY80Tp6iEaqkcu2VNs4JerCY4rErEi1SmcoBrhKSzaGd3eD0sRTxvLBSRAdq1uu/x1kSUC8A8=
+	t=1784364239; cv=none; b=f5bPQOMhUsf+DeTUZXqSYSk3pdVQdOyzWBj0xzH6N1rD3IZ8e0OpQ1+BP44siMx6X4l/NLLtENPVJCBgatnxSkhx0wQLkx2ZWftAK/BDuVVgrvq3T+Mnh6V7TUdRPGcSMNGNI8auZftbnbebkiDXbw7ks15KzQyRvUZPodAGd+8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784334929; c=relaxed/simple;
-	bh=9WCZr/0a6+6yd4+H2iJZREJPaBMBp4S3/hNJ5RCJPrk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UqFoZkof+81zWdqP5YR9PVelDv+hXqe7QcqxHLYD1TW9cpniHr+OsbpHT/XSeBJSdduHpeuBMUnCFeqFY/B4bjML7nvDjL6W3/pV0LTxJ+XxTDLRvl7tyRxbB0HIQval1Hn9ftkiSbWkCN+PhPDagVkXMBjhzfDhDFdWkskkV40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UZMqhG7j; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784364239; c=relaxed/simple;
+	bh=WG4QyGgRAds4Fx+hUJ/f+/4iwh4iv0+ZRp8WPrJdW+g=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LuinSHC4utly4HGbWQJ7BmV9fn1Cv5/q4LXpXncf+CLd3b8oR22SzuOiLWRV4DWfWSW07wo65qWdB2Zi0gc9h7xmZGuJKegKvOz+UUO+TQIl9iPr5Ugsg2yJKwpWCxEkLS63jG5ZcRbyg69+UbnHAtf9fBNEkignY83q/MC8QzY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cWRB8j95; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UZMqhG7j"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF4571F000E9;
-	Sat, 18 Jul 2026 00:35:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cWRB8j95"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E97D1F000E9;
+	Sat, 18 Jul 2026 08:43:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784334927;
-	bh=83/QFKPUAecuur3XiUDSCrCipZXjd2KIGyHaxlFSSCE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=UZMqhG7jOCM0NcG8H7yxHekee//rMmL/U7Ry2BrLImm6unJIexmYIklkgmaYx2kJc
-	 w0QAzde1FMPP7tZgjagzsxmyGTzvWe+VetYaC6HyrUjg4v+PbZo1VN7Q8KWkcEo19T
-	 3EX+dn0yks9KVfhECXAzeEyN/luAsqwLZ2nH/c1kLeZxzu2Q27VxKzyUlYgTME67FT
-	 eIIkaE72/6x6u+8QvFPawI8tcNgDH3IBoD5VJYpu4gG8qoCTUHjV7m/6qrkXWvRkea
-	 vjYcsAWsbreVTHJrKt36aQ67Ts+zrieyLSdwkax7w8Vcuwbb7uH6ZPG5/tRr5i6KHP
-	 YHwLOVzyyTdgg==
-Date: Sat, 18 Jul 2026 01:35:21 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
-	Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>,
-	Fuad Tabba <tabba@google.com>, Ben Horgan <ben.horgan@arm.com>,
-	Jean-Philippe Brucker <jpb@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v12 02/29] arm64/fpsimd: Update FA64 and ZT0 enables when
- loading SME state
-Message-ID: <3c76650f-ddda-47ae-a676-86016d8e39a6@sirena.org.uk>
-References: <20260709-kvm-arm64-sme-v12-0-d0301d79ef58@kernel.org>
- <20260709-kvm-arm64-sme-v12-2-d0301d79ef58@kernel.org>
- <ali39DG6qie7XTuD@J2N7QTR9R3.cambridge.arm.com>
- <15a9ae14-395d-472a-a5be-9e46524fb493@sirena.org.uk>
+	s=k20260515; t=1784364238;
+	bh=HIuHp9Jni0inkQDV9bDTsEN515xgLllrv7OG/bjPhWI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=cWRB8j95Z23pac909kh1HuO9zcZg/1I9gn5O3CRiu1rqVCHYe+tw0u9lb0WND+T8F
+	 FePN93zDkx4LBNW3qD8COcp+sm/ONTvzk/DP5XpJEC8g3UfqZPZJByZFTmluOhiIPX
+	 hXB/8IkeCBWsQR5lKMUpeFe2S0r21Vmyf362a9spam+D06GLyFpR7nGjziVWsHqacV
+	 lbJUo51GnOSX3ncM7qWqsArm7CbS58H5fUU/PPzXHdLIUpBXsiLMx91j4kfab7qgGc
+	 ZIln4WvRcLZZv4zhSz3BzZ6hIc+/8dpy0lf5SiVdTWLgi/ngSXi1WAhpUltUk9s+U3
+	 voczSAVKlSi6g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wl0eK-00000006Imq-0XRT;
+	Sat, 18 Jul 2026 08:43:56 +0000
+Date: Sat, 18 Jul 2026 09:44:31 +0100
+Message-ID: <87cxwkr8k0.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: sashiko-reviews@lists.linux.dev,
+	kvmarm@lists.linux.dev,
+	Oliver Upton <oupton@kernel.org>
+Subject: Re: [PATCH v5 3/7] KVM: arm64: Top up stage-2 memcache for dirty logging faults
+In-Reply-To: <CA+EHjTzZxa7Yb2GJhbJdtnTgGoiPTmSAotWTF7S7acq6M_trwg@mail.gmail.com>
+References: <20260717130317.1953574-1-fuad.tabba@linux.dev>
+	<20260717130317.1953574-4-fuad.tabba@linux.dev>
+	<20260717131537.71F531F000E9@smtp.kernel.org>
+	<CA+EHjTzZxa7Yb2GJhbJdtnTgGoiPTmSAotWTF7S7acq6M_trwg@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="B1L8qt03Fu74vlzF"
-Content-Disposition: inline
-In-Reply-To: <15a9ae14-395d-472a-a5be-9e46524fb493@sirena.org.uk>
-X-Cookie: Thufir's a Harkonnen now.
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev, oupton@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+On Fri, 17 Jul 2026 15:17:00 +0100,
+Fuad Tabba <fuad.tabba@linux.dev> wrote:
+> 
+> On Fri, 17 Jul 2026 at 14:15, <sashiko-bot@kernel.org> wrote:
+> >
+> > Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
+> >
+> > Pre-existing issues:
+> > - [High] A malicious nested (L1) guest can crash the KVM host via a Break-Before-Make (BBM) violation that triggers a BUG_ON() due to an empty memory cache during a permission fault.
+> 
+> From my understanding of NV code, this looks like a real issue. I
+> don't think it changes this patch, though: this one only widens the
+> top-up for the dirty-logging case, and the path you describe is a
+> non-logging permission fault. So, it would be a separate fix, a top up
+> for nested permission faults too, the same way we already do for pKVM?
+> 
+>         if (!perm_fault || memslot_is_logging(s2fd->memslot) ||
+>             is_protected_kvm_enabled() || s2fd->nested) {
+> 
+> If that's right, I'll send a separate fix later. Marc, what do you think?
 
---B1L8qt03Fu74vlzF
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+I don't think this is correct. Yes, this papers over the guest being
+buggy, but i don't think that's what we should really do.
 
-On Thu, Jul 16, 2026 at 04:28:02PM +0100, Mark Brown wrote:
-> On Thu, Jul 16, 2026 at 11:52:36AM +0100, Mark Rutland wrote:
+Doing the same thing (changing the output size without a TLBI) on real
+HW would result in a permission fault being signalled to EL2, and we
+should model our SW MMU the same way.
 
-> > >  		if (test_thread_flag(TIF_SME)) {
-> > > -			unsigned long vq = sve_vq_from_vl(sme_vl);
-> > > -			sysreg_clear_set_s(SYS_SMCR_EL1, SMCR_ELx_LEN, vq - 1);
-> > > +			sysreg_cond_update_s(SYS_SMCR_EL1, task_smcr(current));
-> > > +			isb();
-> > >  		}
+I think the latent bug here is the way we always walk L1's S2 on S2
+fault, irrespective of the fault type, and that feels wrong. This is
+ignoring the fact that we already have a TLB (the shadow S2) for this
+mapping, and rewalk anyway. Since we now find valid permissions, we
+take it at face value and try to install this new translation (which
+could point to a different OA, and even bigger problem).
 
-> > What's the ISB for? That mysteriously appeared in v11 without
-> > explanation. It wasn't in the original code, prior versions of the
-> > series, or my suggested rework with the task_smcr() helper.
+So ideally we'd simply tell the guest to bugger off, but we need to
+solve a few problems first:
 
-> > I don't believe it's necessary to add an ISB here.
+- some permission faults are caused by the host rather than the guest
+  (dirty logging, HAFDBS), and we need to treat those specially.
 
-> I can't remember or figure it out, I'll delete.
+- we need to rebuild an ESR based on the content of our TLB, not L1's
+  S2, which is not always easy to obtain (we have some limited TTL
+  caching in the shadow S2, but that's not always reliable).
 
-Actually I remembered: while SCMR_EL1.LEN is self synchronising the
-"without the need for explict synchronization" wording is not present
-for SMCR_EL1.{FA64,EZT0} and this is no longer explicitly just an update
-of LEN.  It's possible I'm being overly paranoid here, I'll leave the
-isb() and add a comment for the next version.
+All of this strongly intersects with Wei-Lin's reverse map, and
+Oliver's HAFDBS support.
 
---B1L8qt03Fu74vlzF
-Content-Type: application/pgp-signature; name="signature.asc"
+Oliver?
 
------BEGIN PGP SIGNATURE-----
+	M.
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmpaykgACgkQJNaLcl1U
-h9DjvAf+Mo2V+vK8ka9ifnzNbT6e4l1B8v1nwzBzZqNOsHRBkYVA+3HzxPfa42iQ
-wBsUd5GDNYhvYnfigzrrCBiqP6iEXL2auvhxC05ZD/FMYpMpjg6l8a5YbyFZrCaI
-VCnHsZDwaYx0qDsmnOUgwi/AvliSoRdtky5XTuT5aJLAPePiiXhE3f3ltNCQqynG
-VzaW9xKH0Tng2mJ8kiajrNPlzKMChuJdcebmYosYMMiYFLiHjnE2FDyBqAf7A0It
-jjU1d99NHubQeKLYc+3Io4KDKVRAafjVK2BfVWpOhGPufaC/a+HxGr2ZkU250Q1q
-8YjIq/ZvP2kx3EodKw5prhfkTiaubw==
-=Oojd
------END PGP SIGNATURE-----
-
---B1L8qt03Fu74vlzF--
+-- 
+Jazz isn't dead. It just smells funny.
