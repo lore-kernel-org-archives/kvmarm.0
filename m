@@ -1,132 +1,123 @@
-Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 156141EF36E
-	for <kvmarm@lists.linux.dev>; Sat, 18 Jul 2026 13:30:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6811E330D34;
+	Sat, 18 Jul 2026 14:24:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784381452; cv=none; b=QeHTO/PnhjzKaSU29ObC4QBDgxDO1Mne41ONfHIxKT2TDwL+otBwZbVzxs8Fb+E2iCMwjOfnjpvBqWkvWGCZiuFz+GF2zK3oiGj65ReFvXecBiFQt6EgUpzw9QlfFaFxlDKdgaJeKfpuSgT/DcM/jNNofJ4j0nrfnzOg9t1b5Rs=
+	t=1784384668; cv=none; b=ixbDm78SwkSDNZ7I9AqjNaeI2LK03hdW7PJkHLiPO9doTAxxoE8kBhT5EQ40iWWjGdVOdyB0LQjZhwn5qg75zFsJy73N64XXawUnkYTRco1HYN+Y1+M34qtCunwJdzxD19qx8uzgViMXoUK0ZPPaEh3ulw8Nvkcxs2gVpv/Q66k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784381452; c=relaxed/simple;
-	bh=gQs5POHdONT3YFPAMms0/iLYO69THG8mBGvtn8dsLsI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jwjVh3Ec3ZEo3MyQy76dhZERt18CppDWJJusYFEcerq3LNlB7TfBAYimuD33bphER6UbVdU9zTevftgud0tKEe1JzDRS3HIWFsdZAVeC7AM8kRspyIESwVg5rPsPey1qYQUfAwOczOqRNUEihH1n3u9YLlyJc01Wx4KFXTyMTEY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=exB9zuf8; arc=none smtp.client-ip=91.218.175.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1784384668; c=relaxed/simple;
+	bh=Sp6LEIaJIVS9L2IHVMDqH91fkjtvMLk3cHPyMYtk5zw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=O9jvnjy3AySbDOkGglOqwwieuv5m5kq9kiV1ASoWrfjQHcYRd6Y8fix3x9JW0yKcTaA3lpMfbcgnr0JzYiMSFp6JSI1eDjLyzlMZ/s2RCMO1gRtBkXjZqA0y61Cd7Hyl2uo/Lb3EPSTT3DNW1iUFm9gD8/QroW28m6cV9N45Go4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MLbiH6aG; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="exB9zuf8"
-X-Forwarded-Encrypted: i=1; AHgh+RoNZ1T+M9nCOOhqSdvqEDC+4nmXmATepwRwQSGcgdyQJ/MOzVyWYRbT7GoiPA0pOyAaqScaDY4=@lists.linux.dev
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1784381446;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pqtJZUk5qJxMkA61YT8ypQ7TqHYl3mzM3Ijtm1HishM=;
-	b=exB9zuf8ZhmJHxrB65Efg5zdG1tM1tdOIyFcrgF5z5RvOxNkKMgVyHVwVby577cZZm0BOI
-	edPtfvqSdku+82m1xZOGdRT+FGA5/FB29ImPDR4Tad8kN1I6EvAP62VZKmxcO5xlF5ZG/j
-	kIzWlYBKo8mYK3vE7aXY13mQsgG5ZnA=
-X-Gm-Message-State: AOJu0YxRUw3yr6vhxxa3iToH/X/5oXPTQHpJCgN1GT1SD5PsEQiS277e
-	RGrPHU8MzZJbxbE5AjubAqKC/CsoVhQqAAIjcfRjjloJbeXcC5NYYckBRV2UHRCbe40/6D6zOdA
-	YGKgn/SGEyk3WipvWVdR3gls6e6Iv09ouwh9FdF1M
-X-Received: by 2002:a05:622a:244a:b0:517:64f6:3365 with SMTP id
- d75a77b69052e-5223a857400mr7094371cf.4.1784381441644; Sat, 18 Jul 2026
- 06:30:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MLbiH6aG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09EA71F000E9;
+	Sat, 18 Jul 2026 14:24:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1784384667;
+	bh=I2X51PbVx/BFVJ6LA8OK813ZCDWpSmXg2JC3L04Zccg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=MLbiH6aGlQARFRsEAlT96uAdWJuJ+GS0r6dW7tDq1vw6FAFXkn0jdnMzF3AgpUKTs
+	 +jY/68c6WOZtDdG6v3RSGn1VEqqhvfNDvYgbdvnW0ItgrxgClhpUYrjCfqzhx2Wk8T
+	 PsaW2+yf4C/qclVWDG8cd3lBFNE3hwxF997q66ouMDo2TCZRS0XkpVwAET+7Z1FVRX
+	 AWnVu1p5q7vPD3g0zeInT4+2dB6E/lCWsg2PKFAshPiucSqc80AzCCT2AnvKBIV4E6
+	 Gg2LwnlWCl+d1kBWuzdVbbpb0JBj7FjwJcUbmGnPWb1eeSkOEF4tAVFEXVyKK2TNBZ
+	 RSMst6SU7+/Bg==
+Date: Sat, 18 Jul 2026 15:24:20 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Mark Rutland <mark.rutland@arm.com>, Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
+	Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>,
+	Ben Horgan <ben.horgan@arm.com>,
+	Jean-Philippe Brucker <jpb@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Eric Auger <eric.auger@redhat.com>
+Subject: Re: [PATCH v12 02/29] arm64/fpsimd: Update FA64 and ZT0 enables when
+ loading SME state
+Message-ID: <43f21c65-c5ba-44a3-9741-548390df369b@sirena.org.uk>
+References: <20260709-kvm-arm64-sme-v12-0-d0301d79ef58@kernel.org>
+ <20260709-kvm-arm64-sme-v12-2-d0301d79ef58@kernel.org>
+ <ali39DG6qie7XTuD@J2N7QTR9R3.cambridge.arm.com>
+ <15a9ae14-395d-472a-a5be-9e46524fb493@sirena.org.uk>
+ <3c76650f-ddda-47ae-a676-86016d8e39a6@sirena.org.uk>
+ <CA+EHjTw9rGvQyev-4i7zkO5bPPZKGYn858485dCs8iHmCi0t3w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260709-kvm-arm64-sme-v12-0-d0301d79ef58@kernel.org>
- <20260709-kvm-arm64-sme-v12-2-d0301d79ef58@kernel.org> <ali39DG6qie7XTuD@J2N7QTR9R3.cambridge.arm.com>
- <15a9ae14-395d-472a-a5be-9e46524fb493@sirena.org.uk> <3c76650f-ddda-47ae-a676-86016d8e39a6@sirena.org.uk>
-In-Reply-To: <3c76650f-ddda-47ae-a676-86016d8e39a6@sirena.org.uk>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Sat, 18 Jul 2026 14:30:04 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTw9rGvQyev-4i7zkO5bPPZKGYn858485dCs8iHmCi0t3w@mail.gmail.com>
-X-Gm-Features: AUfX_mxZ-9J4gmHZMd8M6CPDldWUxrDTcSR7f3kR1-CUFXH7d2lH_8uznFFC9qg
-Message-ID: <CA+EHjTw9rGvQyev-4i7zkO5bPPZKGYn858485dCs8iHmCi0t3w@mail.gmail.com>
-Subject: Re: [PATCH v12 02/29] arm64/fpsimd: Update FA64 and ZT0 enables when
- loading SME state
-To: Mark Brown <broonie@kernel.org>
-Cc: Mark Rutland <mark.rutland@arm.com>, Marc Zyngier <maz@kernel.org>, 
-	Joey Gouly <joey.gouly@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Will Deacon <will@kernel.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>, 
-	Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>, Ben Horgan <ben.horgan@arm.com>, 
-	Jean-Philippe Brucker <jpb@kernel.org>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	Peter Maydell <peter.maydell@linaro.org>, Eric Auger <eric.auger@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Migadu-Flow: FLOW_OUT
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="D59yeImOKcklFS0z"
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTw9rGvQyev-4i7zkO5bPPZKGYn858485dCs8iHmCi0t3w@mail.gmail.com>
+X-Cookie: Do not pick the flowers.
 
-On Sat, 18 Jul 2026 at 01:35, Mark Brown <broonie@kernel.org> wrote:
->
-> On Thu, Jul 16, 2026 at 04:28:02PM +0100, Mark Brown wrote:
-> > On Thu, Jul 16, 2026 at 11:52:36AM +0100, Mark Rutland wrote:
->
-> > > >           if (test_thread_flag(TIF_SME)) {
-> > > > -                 unsigned long vq = sve_vq_from_vl(sme_vl);
-> > > > -                 sysreg_clear_set_s(SYS_SMCR_EL1, SMCR_ELx_LEN, vq - 1);
-> > > > +                 sysreg_cond_update_s(SYS_SMCR_EL1, task_smcr(current));
-> > > > +                 isb();
-> > > >           }
->
-> > > What's the ISB for? That mysteriously appeared in v11 without
-> > > explanation. It wasn't in the original code, prior versions of the
-> > > series, or my suggested rework with the task_smcr() helper.
->
-> > > I don't believe it's necessary to add an ISB here.
->
-> > I can't remember or figure it out, I'll delete.
->
-> Actually I remembered: while SCMR_EL1.LEN is self synchronising the
-> "without the need for explict synchronization" wording is not present
-> for SMCR_EL1.{FA64,EZT0} and this is no longer explicitly just an update
-> of LEN.  It's possible I'm being overly paranoid here, I'll leave the
-> isb() and add a comment for the next version.
 
-I went through the ARM ARM (DDI 0487 M.c) on this and I don't think
-you're being overly paranoid, I believe the isb() is needed here.
+--D59yeImOKcklFS0z
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-The self-synchronisation wording in the SMCR_EL1 description is
-attached to the LEN field only: "An indirect read of SMCR_EL1.LEN
-appears to occur in program order relative to a direct write of the
-same register, without the need for explicit synchronization." There
-is no equivalent wording for FA64 or EZT0, so they fall under the
-general rule in D24.1.2.2: "Unless otherwise stated in its System
-register definition, a direct write to a System register requires
-synchronization before software can rely on the effects of that write
-to affect instructions appearing in program order after the write."
-Table D24-1 has direct write -> indirect read as "Required".
+On Sat, Jul 18, 2026 at 02:30:04PM +0100, Fuad Tabba wrote:
+> On Sat, 18 Jul 2026 at 01:35, Mark Brown <broonie@kernel.org> wrote:
 
-And task_fpsimd_load() does make indirect reads of both fields before
-the next context synchronization event: sme_load_state() executes LDR
-ZT0, whose execution at EL1 is trapped when SMCR_EL1.EZT0 is 0, and
-when PSTATE.SM is set sve_load_state() executes WRFFR, which is
-"illegal when executed in Streaming SVE mode, unless FEAT_SME_FA64 is
-implemented and enabled" (from the WRFFR description). The MSR SVCR in
-between doesn't provide the synchronization, since SVCR's
-self-synchronisation wording covers reads of its own SM and ZA fields
-only.
+> > Actually I remembered: while SCMR_EL1.LEN is self synchronising the
+> > "without the need for explict synchronization" wording is not present
+> > for SMCR_EL1.{FA64,EZT0} and this is no longer explicitly just an update
+> > of LEN.  It's possible I'm being overly paranoid here, I'll leave the
+> > isb() and add a comment for the next version.
 
-When the write does change FA64 or EZT0 (once KVM can disable them for
-a guest, and possibly on the return from suspend path now that
-sme_suspend_exit() no longer writes them), K1.2.4 "CONSTRAINED
-UNPREDICTABLE behavior due to inadequate context synchronization"
-applies without the isb(): "the behavior of the PE is consistent with
-the unsynchronized control value being either the old value or the new
-value", independently per use. So the ZT0 load or the FFR restore
-could take an unexpected SME trap (EC 0x1D) in the kernel, depending
-on the implementation.
+> I went through the ARM ARM (DDI 0487 M.c) on this and I don't think
+> you're being overly paranoid, I believe the isb() is needed here.
 
-FWIW the other call sites look consistent with only this one needing
-it: in do_sme_acc() nothing ZT0 or FFR gated executes before the ERET,
-which is the context synchronization event, and ZCR_EL1 only has LEN
-allocated.
+Thanks for double checking so thoroughly.
 
-Cheers,
-/fuad
+> And task_fpsimd_load() does make indirect reads of both fields before
+> the next context synchronization event: sme_load_state() executes LDR
+> ZT0, whose execution at EL1 is trapped when SMCR_EL1.EZT0 is 0, and
+> when PSTATE.SM is set sve_load_state() executes WRFFR, which is
+> "illegal when executed in Streaming SVE mode, unless FEAT_SME_FA64 is
+> implemented and enabled" (from the WRFFR description). The MSR SVCR in
+> between doesn't provide the synchronization, since SVCR's
+> self-synchronisation wording covers reads of its own SM and ZA fields
+> only.
+
+Yeah.  We should be able to optimise this:
+
+ - If there is no change we don't need the isb().
+ - If only EZT0 changes and we load state where ZA is disabled then we
+   won't try to access ZT0.
+ - If only FA64 changes and we load state where streaming mode is
+   disabled then we won't try to access streaming mode FFR.
+
+I've gone and implemented the first which will suppress the isb() for
+current host kernel SME usage, the second two are starting to get more
+fiddly than seems sensible to do right now.
+
+--D59yeImOKcklFS0z
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmpbjJMACgkQJNaLcl1U
+h9Aa2wf+MFnftbhCaUZX6WuBgJ/1JcYOGHYcvRPNQIAJbA+FOcoEoAhxy9zmXj4E
+Lj0HbydOLUFDNPTHJkNwKiBFX1bMmV6G4zai0jO0hNEdSrINc3XsQIvPZ05V/wnf
+P/22rDBegxR4h6onZCxuJybhd7tHT7HEzr/PSHT+7jq4UjUwNwFUafSkF1a4Wo+i
+OXEs6TU0LE4WFCXXKAZQDXNwT4uZcNtcFz+zXupnqRMWaaYyXY1h4PNvm7gl4UMK
+nizzA8eTfz10eI2NXtoYUDakxs+r3DKc1PF5a1WQaII9na/Ta1YymODmNqjNOSJv
+PmJ5ahScZWWJKbSaPYCK0A9YyOGYKw==
+=11bz
+-----END PGP SIGNATURE-----
+
+--D59yeImOKcklFS0z--
