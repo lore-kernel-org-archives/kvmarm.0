@@ -1,35 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44B8F380FFF;
-	Sun, 19 Jul 2026 23:10:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CDB5381B1A;
+	Sun, 19 Jul 2026 23:10:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784502642; cv=none; b=PvSdvbd8SzGw08LurGRKgKc5ltucp0cf1S83BYM23Vbc5hnkyb9cWZfqpNtTOKzBByZcyk9Nxw/u4EBqZdLzgtW69bXmL/j+pzmZU8nudlHxymcIoiVFWrk4HMI2fzCibomJGUcKXe3ezk/FKf9PLIGHMe/O5KNVc1IRx2CyhkM=
+	t=1784502646; cv=none; b=rC3/48cp580hRwzVSGHMPyHJlutkgSP7+OrqPQxwKWxcdOCoLOwsFhOkGX3mSB/Z1DdCJIPr3GmCxJy28G+BU1ApVVErlH5i6IafzJXL7buZEG8eYoqm+nHgwRmiK2iP/Pq5Sx6xPpp1tNBCW7vOmulTpmwV7ZXy0mGAAqX0Bmc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784502642; c=relaxed/simple;
-	bh=z7S7gabtTQubvf1C5BhMhuZ4burPUnffHou5hS57R50=;
+	s=arc-20240116; t=1784502646; c=relaxed/simple;
+	bh=01MOCCSmzfiDMZ4P33yBk6+tJ6PaDO0mQnR5AsHR3Mw=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=i6+EqtN4mcBwmq/1k601Nzu5jI4n8W6ZQZ5RZV+rPgP89RQ5m2G6qnevpWV6KiUueZ2U85qhkzZovjnxNgnEH7kvK3L0PNQN9bwEvYKSy6v1MaThoMOBQopNVo3LFHctd25+hDolfEaO8eD+Gm/vNIn7uevvLWBRN9fDIXOwNBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PrrORKpb; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=UZ74M/C+MoX/fb1E5bgCGg1OoY+bklMT5UyAt7u9nGkdKATZiDvHtAJGoqHlkXHyJ48jOqRsGH0N8qUq0p1WhAfVdOtfj75CfwumXOJd4ILeYt5hFStktGBelCKvr0k/kK9LDnjnMBP/bMzVn7obed23wfQsqLBapDFO3hwu8pA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IfHDFrQB; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PrrORKpb"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFC0D1F000E9;
-	Sun, 19 Jul 2026 23:10:36 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IfHDFrQB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C3981F00A3A;
+	Sun, 19 Jul 2026 23:10:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784502640;
-	bh=I4xrVSbCp5yAA6Gucb4v+xBsvRi+5+69PJv2auOuOQs=;
+	s=k20260515; t=1784502645;
+	bh=LBGo8J9fHQYp9Dr1R4CvmQH4U2pyd2XsXoly5P/hfh8=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=PrrORKpbNCWlbjDLQM5rtzLD14bkwDFh9Hg6fcX8hLkkpn6yYM1D3nYeFZUOikNDx
-	 Tfv8RL/6fcdY+kSRLkfJUFQ9rYsa/MzxfWLXLcpPumbK2InF1C4/Yuq4MXddxP8dmz
-	 QUe9wI4J6WjRhITUc5GV6QAPGDM9OZxcaU78SSY7ffnuABPEINKC3QmpsX1ekUbaIC
-	 v6QqXNW6ip/eq2dlfVnb2VWCp32PgBXRYl7IwNXWwQHCBg1na6d+P2YseGojugJoZ1
-	 9kCMXdR0lZprDFzXhElReoXOCA7A6OWJX3/Rkuvu50b4AKnMqjR6YWBrxbarTO02aa
-	 LQhQxw7GgTkGg==
+	b=IfHDFrQBLNpytDktGMnouQN8B1XFyV+D+AvTPpuL1AknmQ/Ci1yEQf1yxgPxOo8iz
+	 vXHeUEmy4NqNAdmCtDEJ6i5q+mIYqK1+7QZoKXzhKIHpO91nWWDeaLWk2Yo+DIywlb
+	 w6G8tcwYa1h7nmeLeMvVMZzXO6ii057LkC9cbI7yx2VGqaKh8sFkii9zrHGea/SY8d
+	 bNiBpcXbzTpnf+iO1mh5tTEjlW5+Klud2QuT5Kxb75I+wiq5/Orq7pYZ6gyaau72Rj
+	 6wP320xoiZdrgQHOSSgNW9gL4HlbP+3d53WxyKuhnb+ibM+o/VNRvvqCQAe+s/+A7r
+	 tEHikMQoNUQzg==
 From: Mark Brown <broonie@kernel.org>
-Date: Mon, 20 Jul 2026 00:07:37 +0100
-Subject: [PATCH v13 10/32] KVM: arm64: Rename SVE finalization constants to
- be more general
+Date: Mon, 20 Jul 2026 00:07:38 +0100
+Subject: [PATCH v13 11/32] KVM: arm64: Remove special case for FP state
+ loading from ZCR_EL2 traps
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -38,7 +38,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260720-kvm-arm64-sme-v13-10-d9abd3ffa245@kernel.org>
+Message-Id: <20260720-kvm-arm64-sme-v13-11-d9abd3ffa245@kernel.org>
 References: <20260720-kvm-arm64-sme-v13-0-d9abd3ffa245@kernel.org>
 In-Reply-To: <20260720-kvm-arm64-sme-v13-0-d9abd3ffa245@kernel.org>
 To: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
@@ -55,234 +55,102 @@ Cc: Dave Martin <Dave.Martin@arm.com>, Fuad Tabba <tabba@google.com>,
  Peter Maydell <peter.maydell@linaro.org>, 
  Eric Auger <eric.auger@redhat.com>, Mark Brown <broonie@kernel.org>
 X-Mailer: b4 0.16-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=7699; i=broonie@kernel.org;
- h=from:subject:message-id; bh=z7S7gabtTQubvf1C5BhMhuZ4burPUnffHou5hS57R50=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBqXVkv8SEy05TyU0xo0oHhfgzHjlvMV2Zv0DG1v
- elZwqqIUpSJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCal1ZLwAKCRAk1otyXVSH
- 0IdqB/9l++1aCYkyNdIdzjHJsKTRqv7As0cb+9gpA7uanfxfs2JU7i9xhKjAAB900UFm7SyIHWl
- zRnRXlN2Tu5GQybCdzCvj/d475t6ZN2f+JXUXZpesVXkpbieMMsLObYI/QRV3fDmsD9CgCM4rAI
- t66DApI6H/ZzT/WN3E/FwssOf4t3Vv/LRMY4Krmk8rHnxdtQICRdg5mHHSzrP3QC3drN1Cr6Q0j
- RsLv2tHGihtBTtnIJEn9CZVAC95s6IXBQY/qwjwH710qe0MYHLerlGu9rLP4attuNgcALHXhgBb
- 0oRpkTxh4vtYxit3Me7/aBQ/1XsKrpAdGjmGIKfZ3saMYltN
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3261; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=01MOCCSmzfiDMZ4P33yBk6+tJ6PaDO0mQnR5AsHR3Mw=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBqXVkwVVmjUITqV+2fMkyW3FbqdCcZlHZbvTxH/
+ gMFed0EwvOJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCal1ZMAAKCRAk1otyXVSH
+ 0AdyB/9fjpYwqxCrDAwM14AF8+P6b1/+CNObcTxTKwn07ZLl68QIk+6o8eGvdh28nPIRGmww+cb
+ MKbQJkFS2P0ga0f4v5qX1YOlMCFRt6ZU9V6rKkUQGWMYVBN89ZHzKXTIpX1js7zTq9xrs0zOLWs
+ NEVXnyOozKzghDsdLaf8xjBadaHoGzqUb9LchV/86GGjxdOdajY66xxJNDJYpyGYhcltjH8Rme1
+ e3F/mUAELIwvDhwbdnfCCVay5O7zdEvIkrtj0gyt4KHHPS+SatqTxwm923tnYblATk94CY19ZEv
+ ri+md7EkG78lofrPA6FDRP3Uio3mKUim4JgvSpqXGr607oI0
 X-Developer-Key: i=broonie@kernel.org; a=openpgp;
  fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-Due to the overlap between SVE and SME vector length configuration
-created by streaming mode SVE we will finalize both at once.  Rename the
-existing finalization to use _VEC (vector) for the naming to avoid
-confusion.
+As part of adding the nested virtualisation support commit 0cfc85b8f5cf3
+("KVM: arm64: nv: Load guest FP state for ZCR_EL2 trap") added code
+which handles access to ZCR_EL2 from a guest as a SVE access trap.
+While the reasoning for this was not specifically articulated in the
+commit log it was part of the lazy switching mechanism that we used to
+have for ZCR_ELx.  Since commit 59419f10045bc ("KVM: arm64: Eagerly
+switch ZCR_EL{1,2}") this mechanism has been removed.  We now switch
+ZCR_EL2 in the hypervisor when transitioning between guest and host,
+meaning that we no longer need the special casing.
 
-Since this includes the userspace API we create an alias
-KVM_ARM_VCPU_VEC for the existing KVM_ARM_VCPU_SVE capability, existing
-code which does not enable SME will be unaffected and any SME only code
-will not need to use SVE constants.
+Remove the redundant special casing, this simplifies the code and will
+make the implementation of SME support (which architecturally follows a
+similar pattern to SVE) easier.  Accesses to ZCR_EL2 from a nested EL2
+will use the standard system register access handling path which works
+with the in memory copy, and if the FP state is not yet loaded any
+floating point operations will cause an access trap which we handle by
+loading the state.
 
-No functional change.
-
-Reviewed-by: Fuad Tabba <tabba@google.com>
-Reviewed-by: Jean-Philippe Brucker <jpb@kernel.org>
 Signed-off-by: Mark Brown <broonie@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h |  8 +++++---
- arch/arm64/include/uapi/asm/kvm.h |  6 ++++++
- arch/arm64/kvm/guest.c            | 12 ++++++------
- arch/arm64/kvm/hyp/nvhe/pkvm.c    |  2 +-
- arch/arm64/kvm/reset.c            | 20 ++++++++++----------
- 5 files changed, 28 insertions(+), 20 deletions(-)
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  4 ----
+ arch/arm64/kvm/hyp/vhe/switch.c         | 27 ---------------------------
+ 2 files changed, 31 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index bae2c4f92ef5..8b746b1a1e53 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -1037,8 +1037,8 @@ struct kvm_vcpu_arch {
- 
- /* KVM_ARM_VCPU_INIT completed */
- #define VCPU_INITIALIZED	__vcpu_single_flag(cflags, BIT(0))
--/* SVE config completed */
--#define VCPU_SVE_FINALIZED	__vcpu_single_flag(cflags, BIT(1))
-+/* Vector config completed */
-+#define VCPU_VEC_FINALIZED	__vcpu_single_flag(cflags, BIT(1))
- /* pKVM VCPU setup completed */
- #define VCPU_PKVM_FINALIZED	__vcpu_single_flag(cflags, BIT(2))
- 
-@@ -1133,6 +1133,8 @@ struct kvm_vcpu_arch {
- #define vcpu_has_sve(vcpu)	kvm_has_sve((vcpu)->kvm)
- #endif
- 
-+#define vcpu_has_vec(vcpu) vcpu_has_sve(vcpu)
-+
- #ifdef CONFIG_ARM64_PTR_AUTH
- #define vcpu_has_ptrauth(vcpu)						\
- 	((cpus_have_final_cap(ARM64_HAS_ADDRESS_AUTH) ||		\
-@@ -1505,7 +1507,7 @@ struct kvm *kvm_arch_alloc_vm(void);
- int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature);
- bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
- 
--#define kvm_arm_vcpu_sve_finalized(vcpu) vcpu_get_flag(vcpu, VCPU_SVE_FINALIZED)
-+#define kvm_arm_vcpu_vec_finalized(vcpu) vcpu_get_flag(vcpu, VCPU_VEC_FINALIZED)
- 
- #define kvm_has_mte(kvm)					\
- 	(system_supports_mte() &&				\
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index 1c13bfa2d38a..83af99ca4e1b 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -107,6 +107,12 @@ struct kvm_regs {
- #define KVM_ARM_VCPU_HAS_EL2		7 /* Support nested virtualization */
- #define KVM_ARM_VCPU_HAS_EL2_E2H0	8 /* Limit NV support to E2H RES0 */
- 
-+/*
-+ * An alias for _SVE since we finalize VL configuration for both SVE and SME
-+ * simultaneously.
-+ */
-+#define KVM_ARM_VCPU_VEC		KVM_ARM_VCPU_SVE
-+
- struct kvm_vcpu_init {
- 	__u32 target;
- 	__u32 features[7];
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index b01d6622b872..0b789f73bf7c 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -342,7 +342,7 @@ static int set_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 	if (!vcpu_has_sve(vcpu))
- 		return -ENOENT;
- 
--	if (kvm_arm_vcpu_sve_finalized(vcpu))
-+	if (kvm_arm_vcpu_vec_finalized(vcpu))
- 		return -EPERM; /* too late! */
- 
- 	if (WARN_ON(vcpu->arch.sve_state))
-@@ -374,7 +374,7 @@ static int set_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 	if (max_vq < SVE_VQ_MIN)
- 		return -EINVAL;
- 
--	/* vcpu->arch.sve_state will be alloc'd by kvm_vcpu_finalize_sve() */
-+	/* vcpu->arch.sve_state will be alloc'd by kvm_vcpu_finalize_vec() */
- 	vcpu->arch.sve_max_vl = sve_vl_from_vq(max_vq);
- 
- 	return 0;
-@@ -497,7 +497,7 @@ static int get_sve_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 	if (ret)
- 		return ret;
- 
--	if (!kvm_arm_vcpu_sve_finalized(vcpu))
-+	if (!kvm_arm_vcpu_vec_finalized(vcpu))
- 		return -EPERM;
- 
- 	if (copy_to_user(uptr, (void *)vcpu->arch.sve_state + region.koffset,
-@@ -523,7 +523,7 @@ static int set_sve_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 	if (ret)
- 		return ret;
- 
--	if (!kvm_arm_vcpu_sve_finalized(vcpu))
-+	if (!kvm_arm_vcpu_vec_finalized(vcpu))
- 		return -EPERM;
- 
- 	if (copy_from_user((void *)vcpu->arch.sve_state + region.koffset, uptr,
-@@ -599,7 +599,7 @@ static unsigned long num_sve_regs(const struct kvm_vcpu *vcpu)
- 		return 0;
- 
- 	/* Policed by KVM_GET_REG_LIST: */
--	WARN_ON(!kvm_arm_vcpu_sve_finalized(vcpu));
-+	WARN_ON(!kvm_arm_vcpu_vec_finalized(vcpu));
- 
- 	return slices * (SVE_NUM_PREGS + SVE_NUM_ZREGS + 1 /* FFR */)
- 		+ 1; /* KVM_REG_ARM64_SVE_VLS */
-@@ -617,7 +617,7 @@ static int copy_sve_reg_indices(const struct kvm_vcpu *vcpu,
- 		return 0;
- 
- 	/* Policed by KVM_GET_REG_LIST: */
--	WARN_ON(!kvm_arm_vcpu_sve_finalized(vcpu));
-+	WARN_ON(!kvm_arm_vcpu_vec_finalized(vcpu));
- 
- 	/*
- 	 * Enumerate this first, so that userspace can save/restore in
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index 3b2c4fbc34d8..9d7f632f01f8 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -454,7 +454,7 @@ static int pkvm_vcpu_init_sve(struct pkvm_hyp_vcpu *hyp_vcpu, struct kvm_vcpu *h
- 	int ret = 0;
- 
- 	if (!vcpu_has_feature(vcpu, KVM_ARM_VCPU_SVE)) {
--		vcpu_clear_flag(vcpu, VCPU_SVE_FINALIZED);
-+		vcpu_clear_flag(vcpu, VCPU_VEC_FINALIZED);
- 		return 0;
- 	}
- 
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index b963fd975aac..0fae62a9eaef 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -92,7 +92,7 @@ static void kvm_vcpu_enable_sve(struct kvm_vcpu *vcpu)
-  * Finalize vcpu's maximum SVE vector length, allocating
-  * vcpu->arch.sve_state as necessary.
-  */
--static int kvm_vcpu_finalize_sve(struct kvm_vcpu *vcpu)
-+static int kvm_vcpu_finalize_vec(struct kvm_vcpu *vcpu)
- {
- 	void *buf;
- 	unsigned int vl;
-@@ -122,21 +122,21 @@ static int kvm_vcpu_finalize_sve(struct kvm_vcpu *vcpu)
- 	}
- 	
- 	vcpu->arch.sve_state = buf;
--	vcpu_set_flag(vcpu, VCPU_SVE_FINALIZED);
-+	vcpu_set_flag(vcpu, VCPU_VEC_FINALIZED);
- 	return 0;
- }
- 
- int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature)
- {
- 	switch (feature) {
--	case KVM_ARM_VCPU_SVE:
--		if (!vcpu_has_sve(vcpu))
-+	case KVM_ARM_VCPU_VEC:
-+		if (!vcpu_has_vec(vcpu))
- 			return -EINVAL;
- 
--		if (kvm_arm_vcpu_sve_finalized(vcpu))
-+		if (kvm_arm_vcpu_vec_finalized(vcpu))
- 			return -EPERM;
- 
--		return kvm_vcpu_finalize_sve(vcpu);
-+		return kvm_vcpu_finalize_vec(vcpu);
- 	}
- 
- 	return -EINVAL;
-@@ -144,7 +144,7 @@ int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature)
- 
- bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu)
- {
--	if (vcpu_has_sve(vcpu) && !kvm_arm_vcpu_sve_finalized(vcpu))
-+	if (vcpu_has_vec(vcpu) && !kvm_arm_vcpu_vec_finalized(vcpu))
- 		return false;
- 
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 18131e395e24..b4680baffc6e 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -601,10 +601,6 @@ static inline bool kvm_hyp_handle_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 		if (guest_hyp_fpsimd_traps_enabled(vcpu))
+ 			return false;
+ 		break;
+-	case ESR_ELx_EC_SYS64:
+-		if (WARN_ON_ONCE(!is_hyp_ctxt(vcpu)))
+-			return false;
+-		fallthrough;
+ 	case ESR_ELx_EC_SVE:
+ 		if (!sve_guest)
+ 			return false;
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index bbe9cebd3d9d..625fe81a20b1 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -458,30 +458,6 @@ static bool kvm_hyp_handle_cpacr_el1(struct kvm_vcpu *vcpu, u64 *exit_code)
  	return true;
-@@ -163,7 +163,7 @@ void kvm_arm_vcpu_destroy(struct kvm_vcpu *vcpu)
- 	kfree(vcpu->arch.ccsidr);
  }
  
--static void kvm_vcpu_reset_sve(struct kvm_vcpu *vcpu)
-+static void kvm_vcpu_reset_vec(struct kvm_vcpu *vcpu)
+-static bool kvm_hyp_handle_zcr_el2(struct kvm_vcpu *vcpu, u64 *exit_code)
+-{
+-	u32 sysreg = esr_sys64_to_sysreg(kvm_vcpu_get_esr(vcpu));
+-
+-	if (!vcpu_has_nv(vcpu))
+-		return false;
+-
+-	if (sysreg != SYS_ZCR_EL2)
+-		return false;
+-
+-	if (guest_owns_fp_regs())
+-		return false;
+-
+-	/*
+-	 * ZCR_EL2 traps are handled in the slow path, with the expectation
+-	 * that the guest's FP context has already been loaded onto the CPU.
+-	 *
+-	 * Load the guest's FP context and unconditionally forward to the
+-	 * slow path for handling (i.e. return false).
+-	 */
+-	kvm_hyp_handle_fpsimd(vcpu, exit_code);
+-	return false;
+-}
+-
+ static bool kvm_hyp_handle_sysreg_vhe(struct kvm_vcpu *vcpu, u64 *exit_code)
  {
- 	if (vcpu_has_sve(vcpu))
- 		memset(vcpu->arch.sve_state, 0, vcpu_sve_state_size(vcpu));
-@@ -203,11 +203,11 @@ void kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- 	if (loaded)
- 		kvm_arch_vcpu_put(vcpu);
+ 	if (kvm_hyp_handle_tlbi_el2(vcpu, exit_code))
+@@ -493,9 +469,6 @@ static bool kvm_hyp_handle_sysreg_vhe(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 	if (kvm_hyp_handle_cpacr_el1(vcpu, exit_code))
+ 		return true;
  
--	if (!kvm_arm_vcpu_sve_finalized(vcpu)) {
-+	if (!kvm_arm_vcpu_vec_finalized(vcpu)) {
- 		if (vcpu_has_feature(vcpu, KVM_ARM_VCPU_SVE))
- 			kvm_vcpu_enable_sve(vcpu);
- 	} else {
--		kvm_vcpu_reset_sve(vcpu);
-+		kvm_vcpu_reset_vec(vcpu);
- 	}
+-	if (kvm_hyp_handle_zcr_el2(vcpu, exit_code))
+-		return true;
+-
+ 	return kvm_hyp_handle_sysreg(vcpu, exit_code);
+ }
  
- 	if (vcpu_el1_is_32bit(vcpu))
 
 -- 
 2.47.3
