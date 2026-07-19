@@ -1,109 +1,84 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4125F22B594;
-	Sun, 19 Jul 2026 12:59:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23FCF3A450F
+	for <kvmarm@lists.linux.dev>; Sun, 19 Jul 2026 16:33:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784465973; cv=none; b=eN4YYGVG1W0T2k5lwrA8uGFTtBbFMykKnlZD4zf9iOXhJ1zJ0WCA5oWlojjCtTp7qjcifXGijNB2VzXypiKPeZAGwzg5A+B/0UKyUvUE7Ra2fA8vzlevZF6eYoYzHW/fZsx6TTioCIFRXpafyYwgXUCUbaqAlGMdwctCgmW/rOs=
+	t=1784478801; cv=none; b=CI+wI6yiem7XsmR+Okxmd17tdlw5eYRH9pzR/s0bFJlkhxted0yEJeMB3g1iWj9CLjfBiYSyYM5826fm8/KBnGZYJ64zx0rpJg0vp2e9YD8JD0TLEiyzJ9muNgnwWx+bATBWnRkDdzyCX1utyG/6tB8b2hjLGKPZqpcFU4CiXho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784465973; c=relaxed/simple;
-	bh=tNtYGC2EJFlGi7TRbEJqSxVtjzAJPz/PG74LELuNwZw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DBOwjFkYMHiexh+QB/8Q92PMpL3tA0fuwZZqU5XP5goFoT+mxIU/VhtOij83qgloGwdYdl66sttzgT4HBxF3HTiUHzw4cdrUr8G+wJx/1fzPGHITYLX0LWnSpeJM1RTD643msKonPahDRXc2YUz7mYnS9DP12HD6NQliiQi3ClE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RMvdkFlp; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784478801; c=relaxed/simple;
+	bh=p0sJ6xbFKfrT+kvRj0p/Ed2cMpOSxbadvf3/VB01zR0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kvpC5bRau8ve1dMso6EivgeGL9tktlGHQCThzZekj51ES2rVZXMzDqxQ0HUcGNwpoyS9xh05xy0K1wYuM4u/hzjlIY2r1R9YMu3gOQUdOIa5CnWI1p+Q+OgIzeCxbdLO5KgeklKh0mT1RAW76JWYv8FLYnFD0LPVJFlNApYgOQE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=AO5lYXSZ; arc=none smtp.client-ip=95.215.58.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RMvdkFlp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABBBB1F000E9;
-	Sun, 19 Jul 2026 12:59:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784465971;
-	bh=dz6nstKPpdzr3m3YV5N5XtGEglEWs9DHWHKhwuF1feU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=RMvdkFlpGDTGUknV5qMv7bvE17VSPmAKTlGBUF0dGAFTJIm5YEMiHRqDBCQodxSTY
-	 Ge9fz3IG2p0LxJTSK4uvO9VLO6lxN9I70ZNr31wO8qXETMT7OK6O8mjwj7gxC5H5Aa
-	 ewZJvnjGNPAZL9onmVrfy8cENJCMslHIdl+eM6QVFGhkQSwKCyZSTlY25S4ltfuh0P
-	 Kv+mAVZazCnspK3pbXmA3iCAqR8+wEd0HAJlUkfnPPYL3D6hA8HBRc0oR91uWmdD+Q
-	 n2D0/dLV9W+Ualim3Ug8bC9mPBH3yO+XeTq+BG9fS7qDxo6NwPxPQ+6bf2ob3AI5YZ
-	 FHoaByhPLJAMQ==
-Date: Sun, 19 Jul 2026 13:59:25 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Fuad Tabba <fuad.tabba@linux.dev>, Mark Rutland <mark.rutland@arm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
-	Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>,
-	Ben Horgan <ben.horgan@arm.com>,
-	Jean-Philippe Brucker <jpb@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v12 02/29] arm64/fpsimd: Update FA64 and ZT0 enables when
- loading SME state
-Message-ID: <df08b81a-13b6-4273-88e7-0627063d4e9c@sirena.org.uk>
-References: <20260709-kvm-arm64-sme-v12-0-d0301d79ef58@kernel.org>
- <20260709-kvm-arm64-sme-v12-2-d0301d79ef58@kernel.org>
- <ali39DG6qie7XTuD@J2N7QTR9R3.cambridge.arm.com>
- <15a9ae14-395d-472a-a5be-9e46524fb493@sirena.org.uk>
- <3c76650f-ddda-47ae-a676-86016d8e39a6@sirena.org.uk>
- <CA+EHjTw9rGvQyev-4i7zkO5bPPZKGYn858485dCs8iHmCi0t3w@mail.gmail.com>
- <43f21c65-c5ba-44a3-9741-548390df369b@sirena.org.uk>
- <87a4rnqsuu.wl-maz@kernel.org>
- <18229974-b26d-4eed-82f7-7af7e1c26634@sirena.org.uk>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="AO5lYXSZ"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1784478796;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=smZHGSZd+IO/AnN/uVg98gEhWkbFF04beTjXtjoJyL0=;
+	b=AO5lYXSZ0R465A+cTpfuESj7WV8mppFUwrTglz4gh1Qx83JeIw5v09WYTF5mBOVj3PqWZc
+	UdDbkMSGBBtJw/885isZNMQQxoAGbAlT4TC7xCfHZNYh1dzrJ8uK2fbgzEALpRG3+15e4n
+	cm7yk6tX6B1Rsl9IHmaqJLdnT0x1guc=
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	tabba@google.com
+Subject: [PATCH] KVM: arm64: Update Fuad Tabba's email address
+Date: Sun, 19 Jul 2026 17:32:57 +0100
+Message-Id: <20260719163257.3156529-1-fuad.tabba@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="cL9XJNQtGuI5OnYK"
-Content-Disposition: inline
-In-Reply-To: <18229974-b26d-4eed-82f7-7af7e1c26634@sirena.org.uk>
-X-Cookie: Courage is grace under pressure.
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
+Switch my KVM/arm64 reviewer entry to fuad.tabba@linux.dev, my canonical
+address for kernel work, and add a .mailmap entry so the existing
+tabba@google.com commits map onto it.
 
---cL9XJNQtGuI5OnYK
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+---
+ .mailmap    | 1 +
+ MAINTAINERS | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-On Sun, Jul 19, 2026 at 01:40:28PM +0100, Mark Brown wrote:
-> On Sun, Jul 19, 2026 at 09:35:53AM +0100, Marc Zyngier wrote:
+diff --git a/.mailmap b/.mailmap
+index 735470e21075b..91003fb861367 100644
+--- a/.mailmap
++++ b/.mailmap
+@@ -291,6 +291,7 @@ Frank Rowand <frowand.list@gmail.com> <frank.rowand@sony.com>
+ Frank Rowand <frowand.list@gmail.com> <frank.rowand@sonymobile.com>
+ Frank Rowand <frowand.list@gmail.com> <frowand@mvista.com>
+ Frank Zago <fzago@systemfabricworks.com>
++Fuad Tabba <fuad.tabba@linux.dev> <tabba@google.com>
+ Gao Xiang <xiang@kernel.org> <gaoxiang25@huawei.com>
+ Gao Xiang <xiang@kernel.org> <hsiangkao@aol.com>
+ Gao Xiang <xiang@kernel.org> <hsiangkao@linux.alibaba.com>
+diff --git a/MAINTAINERS b/MAINTAINERS
+index a674e36529f75..5ab6fc1504267 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -14192,7 +14192,7 @@ F:	virt/kvm/*
+ KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)
+ M:	Marc Zyngier <maz@kernel.org>
+ M:	Oliver Upton <oupton@kernel.org>
+-R:	Fuad Tabba <tabba@google.com>
++R:	Fuad Tabba <fuad.tabba@linux.dev>
+ R:	Joey Gouly <joey.gouly@arm.com>
+ R:	Steffen Eiden <seiden@linux.ibm.com>
+ R:	Suzuki K Poulose <suzuki.poulose@arm.com>
+-- 
+2.39.5
 
-> > So leave this is a straight ISB, no optimisation. Once you come back
-> > with actual data showing that this is a terrible bottleneck affecting
-> > real workloads on real HW, we'll look at it. But until then, please
-> > keep it as stupid as possible.
-
-> I've already left the KVM hypervisor code like that - I only updated the
-> code here in the main kernel since that keeps the end effect for
-> existing systems and workloads the same.  I am aware that there has been
-> a great deal of attention paid to the barriers we have in the context
-> switch path so I am concerned that other people might have a different
-> view on adding one.
-
-It does also look odd do a conditional update of SMCR_EL1 and then
-unconditionally add a barrier after it, even if the conditional
-update suppressed the write.
-
---cL9XJNQtGuI5OnYK
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmpcyiwACgkQJNaLcl1U
-h9BpXwf+JYCe7VHaj7TfzZjCVUNf+N0uc2PbXDf9kiTps6TxEHMS/Lt7w8P5oqs3
-RDVLBZIPc43UyiYr27EH+NxHBS/jOGSdzNHCjkN4TN6hg+IEE08yL7RbnSH85hzX
-+iXiGHYKj6uzU0VxOCmw48BLoe1wkh4iToQT+ffGDaAd1yxraMDKWk1gom8j6Eaa
-Br6L+q2EfnbvuqtpZWEQ1WPGuRrcrcnTyrkEz2eQbNNAyMD1boHr9LHNeCRFoJSn
-2nDxtRYj6T2Vocmt59QX4JajZwM9fbfsZOR5NszhGW7Tm1EqgxbVg439ieY+ryMw
-AXrrkxhculDDRGWss27Ds2c+Cu+6ww==
-=CtjM
------END PGP SIGNATURE-----
-
---cL9XJNQtGuI5OnYK--
