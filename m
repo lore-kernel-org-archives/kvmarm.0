@@ -1,181 +1,114 @@
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29C7C383334
-	for <kvmarm@lists.linux.dev>; Sun, 19 Jul 2026 09:56:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 613251BF33;
+	Sun, 19 Jul 2026 12:40:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784455013; cv=none; b=BKVDG0IKfNn2Mda2e6rLWhSwjfTMtKHjJkvqfl1brYPrfE02D4XBfJH8nIlyBCMkQU2dAFCm0Ws4JF4xhUAC4bjkJWDdjDkZVx4vBXl2ghpsGdf7hBwTzEiQdKSeJYzjHYpWOOju57bSTR3x4O8QMLfWAYiJ/dgpt+SK7x5ZoGs=
+	t=1784464829; cv=none; b=VdGXVmtciuYND+SnW+k/lHg6gpfhJB7wxrwDIcinR/sqyyI/YSTbcSNy8Hpnd6WOqHl5mjRjStcUeXee1Dt6EL/+zyBddRXOEIHB/MNxO7xIUMhHtOJ96glsBAHxAlfBP1Vf+fnsl0NaZUH8+HswftBBsHS0Fpet5q4qaDnj6lw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784455013; c=relaxed/simple;
-	bh=+lutaASO8X6EVj0wDu4kybJN2pEIGDmktBVNREZlPYA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cHM8mmW+sRCQu7E+YQzHH9/96vlsfBOi+u2AJE84amThPEygZruxdXq0x3AzOMeWzDv6dA+Bf5h+EIJvkaHlJdUnQ8G3tJquDEMkSeVae5qMVnlbPdhyPDp1XwJezdAs+q0mIy7Ieo3zHqKfY4Na1udrrsUSNWDYW4bnXm49Ork=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FSRXeb5U; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1784464829; c=relaxed/simple;
+	bh=QuqBVQP8NJb7wuHdseF3lIkK9eqxxreMGLr5td5Qi0U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TGGV01tgevEAVqUqNU4SlZwd1JaASq2VJw8rANgqdxMFAYG8NspLjOcbB26+yOe/FI2rstJkrJ86klHrnGDsPNciQ1b3mVsFnqg55htureIqzNljzNvKKem73nDQt2CPoOvktx1cxyzQLNNSyz3sfzHpFDDkiIEOJdxbQf8Nmkg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JQ6dzc9Q; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FSRXeb5U"
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-38e42560ebcso2509341a91.1
-        for <kvmarm@lists.linux.dev>; Sun, 19 Jul 2026 02:56:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784455011; x=1785059811; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=US5w7LHZwWkQRqRftDEFbMcTp4/h5zu5divbt3cpgbk=;
-        b=FSRXeb5U3+hbvJMAa6Ifud19BbrZi+N3MPFlhVO0WNPfl+1aifcUECQHf+4ziJ/oGN
-         FaQ9EkYQ4yPkHaHRp0nbRid9TYz9mkqKtsHG1+mbGvXevr5uVvyN+8qa07R/qb1TA5Jm
-         dwt1PAqjrRMuZEw5d3OLLs2BlHToUL9Jo3rGf69NhtJB00Wt3whEuBa2JWEsAo12WNFj
-         VEifmiZrJwjrGHSgE4d/wwhhnEVZ0O/8ukqycP1GNde2KGfD2z3v71RrGw3pv4W4BSxN
-         xL6EXzwojEUMHkjhPRnlsXpthH8dvVNRxDXdwl2gt+3Q34DAwXCA9/UnHHq44QaxfY/M
-         VUSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784455011; x=1785059811;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=US5w7LHZwWkQRqRftDEFbMcTp4/h5zu5divbt3cpgbk=;
-        b=KIS3jojHwh77UGBrbuEWeI+EdP6JlrhRrKimNBN+a6Oi1ZGRsEkEdtNtN/KKeKVJ8A
-         07cs+kkuBUgYxvraHZwbPzVUCcmISJvdw0JwhhD1kNh/0V9OO2lJyAoO0Fh1ntbJSebh
-         xNs9sSNNGxGxQ6HarzPnSnGC1Yk/dE2J9fXLBsxPYh0hzUeUAcNPJJH6P4ANapYROZwO
-         +ZYk+8O+PpXgtlNw2o880XOs1F1ATD0FqjEo8JF4lDDRcj8uYZhcOTOO5da3qmb18efx
-         Pdw6ccgpg/OMS/EZ71iyp5mhmNrUDFM4S/f25ZhxC/c8bu1ZfE33rT/nJ/PA+U7KDwpN
-         poSg==
-X-Forwarded-Encrypted: i=1; AHgh+Rrhr7PBAQNSoxODwkZXwUYHXQ67KMpJCjHgJ1Hh/wsHSSMmFqPBVEWmDVeEfcvn2R2TILKISic=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxjtQ7ULNvQE/SUwqugboX+LBb50pSQDHSTLOAaei7Qe1nEheyk
-	1zIEFVpbrlhlNdEEkHudi8Nobcz4t9jM7aNtgL5jQOrcc47BmUw6Gkr6
-X-Gm-Gg: AfdE7clKM+WoSt3lxS18a7/0uibKX/oZWwU8TqdUrbhh+o0HtNQTNI0JqtL2VQE+wJ5
-	CC6jZugRLKzuavx6nRWgfl/dQ0MpPDU6YRn0L09DQvbk0XAou5T+m+yfyQktt94P8H8K0STm6H7
-	yI+SUyAvh6+KBCzvybUlxv7FFT8qCJoAlRFDGIdLBhV6Uj74tiyWt7CrFa5RViHUQAdtwrqt6dg
-	mMCBnjydibE4hsJoiFZov/xuhH+pL8azY+bbOtpni1ZJUMvELJkQJ7nvvufzoQeHGc5wsdB6Thk
-	dDdgh/5xlyyTO2jRn220stsMprKRcpZ7FUQclbcJjF+Kt2/xB0ivTgYpwgC+fKFCSbSSUf/Djy9
-	zgL3Um1aiiIklTG9LLMdBdhpVe590+YQI6/dhrU3ip/y3/LyHLu4GZqlCQ7Q6f5+L+L38dKv97K
-	3wHDg/oHE=
-X-Received: by 2002:a17:90b:58a4:b0:38e:69ae:7148 with SMTP id 98e67ed59e1d1-38e69ae720cmr2801838a91.24.1784455011332;
-        Sun, 19 Jul 2026 02:56:51 -0700 (PDT)
-Received: from Default ([2409:40f4:10f0:2d86:32c2:433f:5e09:aed6])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-13ce29c2dcdsm21765254c88.1.2026.07.19.02.56.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 19 Jul 2026 02:56:50 -0700 (PDT)
-From: Jeffin820 <jeffinphilip14@gmail.com>
-To: seanjc@google.com
-Cc: alexandru.elisei@arm.com,
-	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	maz@kernel.org,
-	oupton@kernel.org,
-	sashiko-reviews@lists.linux.dev
-Subject: Re: [RFC PATCH] KVM: Ignore MMU notifiers for guest_memfd-only memslots
-Date: Sun, 19 Jul 2026 15:25:54 +0530
-Message-ID: <20260719095554.10767-1-jeffinphilip14@gmail.com>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <ajA_0TQCQLSz7qcU@google.com>
-References: <ajA_0TQCQLSz7qcU@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JQ6dzc9Q"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F5611F000E9;
+	Sun, 19 Jul 2026 12:40:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1784464828;
+	bh=YOvOB8pIvE3bMR4eqh6BMH0CqqAl676IHewqOrjLT8M=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=JQ6dzc9QYPamUTpUaOaGouWGchnGCu20cdv0d+AyLEkXf3ewVclThnMK0IZuBjccO
+	 LuJqE3WfClBs9/2lkIvk/lIVONDGui/UjZcgbW1hvO1onjvJYgLAM0Up4bvIImtuP4
+	 LID8WR17HyqbW7r15tlenPh0Uz/lyzeC2KnUUmessRhDB3kHnDtFv2HeeBkpu6WSgz
+	 mdfFHC+EbeCbi9vAnFMWeLtCxW6kVCVKUsDerkcC5T8y9tS9jI2AQsMrCSyjpw2pxm
+	 lJZ7LhM9YJiuLpO2At8IOi2N8UQGILSqTodkl+LFDoBEwkmy9+Sv9OogHxghMr3UVg
+	 7RaAu0g0tN8BQ==
+Date: Sun, 19 Jul 2026 13:40:21 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Fuad Tabba <fuad.tabba@linux.dev>, Mark Rutland <mark.rutland@arm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
+	Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>,
+	Ben Horgan <ben.horgan@arm.com>,
+	Jean-Philippe Brucker <jpb@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Eric Auger <eric.auger@redhat.com>
+Subject: Re: [PATCH v12 02/29] arm64/fpsimd: Update FA64 and ZT0 enables when
+ loading SME state
+Message-ID: <18229974-b26d-4eed-82f7-7af7e1c26634@sirena.org.uk>
+References: <20260709-kvm-arm64-sme-v12-0-d0301d79ef58@kernel.org>
+ <20260709-kvm-arm64-sme-v12-2-d0301d79ef58@kernel.org>
+ <ali39DG6qie7XTuD@J2N7QTR9R3.cambridge.arm.com>
+ <15a9ae14-395d-472a-a5be-9e46524fb493@sirena.org.uk>
+ <3c76650f-ddda-47ae-a676-86016d8e39a6@sirena.org.uk>
+ <CA+EHjTw9rGvQyev-4i7zkO5bPPZKGYn858485dCs8iHmCi0t3w@mail.gmail.com>
+ <43f21c65-c5ba-44a3-9741-548390df369b@sirena.org.uk>
+ <87a4rnqsuu.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="OIicqM3g5+ivtiDy"
+Content-Disposition: inline
+In-Reply-To: <87a4rnqsuu.wl-maz@kernel.org>
+X-Cookie: Courage is grace under pressure.
 
-On Mon, Jun 15, 2026, Sean Christopherson wrote:
-> On Mon, Jun 15, 2026, Sean Christopherson wrote:
-> > On Mon, Jun 15, 2026, sashiko-bot@kernel.org wrote:
-> > > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > > > --- a/virt/kvm/kvm_main.c
-> > > > +++ b/virt/kvm/kvm_main.c
-> > > [ ... ]
-> > > > @@ -592,6 +592,10 @@ static __always_inline kvm_mn_ret_t kvm_handle_hva_range(struct kvm *kvm,
-> > > >  			unsigned long hva_start, hva_end;
-> > > >  
-> > > >  			slot = container_of(node, struct kvm_memory_slot, hva_node[slots->node_idx]);
-> > > > +
-> > > > +			if (kvm_slot_has_gmem(slot) && kvm_memslot_is_gmem_only(slot))
-> > > > +				continue;
-> > > > +
-> > > 
-> > > [Severity: Critical]
-> > > Does this change inadvertently introduce a regression in the pfncache retry
-> > > protocol?
-> > > 
-> > > Looking at the pfncache framework, it maps guest memory into kernel space and
-> > > explicitly drops the page reference after mapping it:
-> > > 
-> > > virt/kvm/pfncache.c:hva_to_pfn_retry() {
-> > >     ...
-> > >     kvm_release_page_clean(page);
-> > >     ...
-> > > }
-> > > 
-> > > It appears to rely entirely on KVM's MMU notifiers (kvm->mmu_invalidate_seq)
-> > > to invalidate the cache when the page is unmapped by the host.
-> > > 
-> > > If a VMM defines a guest_memfd-backed memslot with KVM_MEMSLOT_GMEM_ONLY
-> > > but still provides a valid anonymous user mapping as its userspace_addr,
-> > > could this regression lead to a use-after-free?
-> > 
-> > Sadly, yes.  To land this, we would need to first teach the gfn_to_pfn_cache code
-> > to be able to pull directly from guest_memfd.  I forget if anyone is working on
-> > that.
-> 
-> Actually, we just need to ensure the invalidation tracking is updated, the MMU
-> itself can be left as-is.
-> 
-> Compile tested only, but this?
-> 
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 27498e990dff..690ab707816b 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -260,6 +260,7 @@ union kvm_mmu_notifier_arg {
->  enum kvm_gfn_range_filter {
->         KVM_FILTER_SHARED               = BIT(0),
->         KVM_FILTER_PRIVATE              = BIT(1),
-> +       KVM_FILTER_USERSPACE_MAPPINGS   = BIT(2),
->  };
->  
->  struct kvm_gfn_range {
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index e44c20c04961..84b693de7e35 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -608,7 +608,8 @@ static __always_inline kvm_mn_ret_t kvm_handle_hva_range(struct kvm *kvm,
->                          * HVA-based notifications aren't relevant to private
->                          * mappings as they don't have a userspace mapping.
->                          */
-> -                       gfn_range.attr_filter = KVM_FILTER_SHARED;
-> +                       gfn_range.attr_filter = KVM_FILTER_SHARED |
-> +                                               KVM_FILTER_USERSPACE_MAPPINGS;
->  
->                         /*
->                          * {gfn(page) | page intersects with [hva_start, hva_end)} =
-> @@ -715,6 +716,21 @@ void kvm_mmu_invalidate_range_add(struct kvm *kvm, gfn_t start, gfn_t end)
->  bool kvm_mmu_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
->  {
->         kvm_mmu_invalidate_range_add(kvm, range->start, range->end);
-> +
-> +       /*
-> +        * When reacting to changes in userspace mappings, don't unmap memslots
-> +        * that are guest_memfd-only, in which case KVM's MMU mappings are
-> +        * pulled directly from guest_memfd, i.e. don't depend on the userspace
-> +        * mappings.
-> +        *
-> +        * TODO: Skip gmem-only memslots on mmu_notifier events entirely, once
-> +        * gfn_to_pfn_cache is also wired up to directly pull from guest_memfd.
-> +        */
-> +       if (range->attr_filter & KVM_FILTER_USERSPACE_MAPPINGS &&
-> +           kvm_slot_has_gmem(range->slot) &&
-> +           kvm_memslot_is_gmem_only(range->slot))
-> +               return false;
-> +
->         return kvm_unmap_gfn_range(kvm, range);
->  }
 
-I tested the proposed patch against the reproducer provided by 'XIAO WU', vanilla syzbot 
-reproducer and a custom-made reproducer. All reproducers were tested on unpatched kernels and 
-triggered the UAF, but didn't do so on applying the patch.
+--OIicqM3g5+ivtiDy
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Thanks,
-Jeffin
+On Sun, Jul 19, 2026 at 09:35:53AM +0100, Marc Zyngier wrote:
+> Mark Brown <broonie@kernel.org> wrote:
+
+> > I've gone and implemented the first which will suppress the isb() for
+> > current host kernel SME usage, the second two are starting to get more
+> > fiddly than seems sensible to do right now.
+
+> I really wish you didn't optimise anything at all at this stage.
+
+> "Optimisation" is exactly what got us into so much trouble over the
+> past two years, and I really don't want SME in KVM to follow the same
+> trajectory.
+
+> So leave this is a straight ISB, no optimisation. Once you come back
+> with actual data showing that this is a terrible bottleneck affecting
+> real workloads on real HW, we'll look at it. But until then, please
+> keep it as stupid as possible.
+
+I've already left the KVM hypervisor code like that - I only updated the
+code here in the main kernel since that keeps the end effect for
+existing systems and workloads the same.  I am aware that there has been
+a great deal of attention paid to the barriers we have in the context
+switch path so I am concerned that other people might have a different
+view on adding one.
+
+--OIicqM3g5+ivtiDy
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmpcxbQACgkQJNaLcl1U
+h9DuzAf7BxGM4X6minFYapCsREk9SxuGWXgUZbzaq6n4+zLM/myAGA2hw1BwzRdB
+Qv2Iin/BHgelt7fpfJUK+OKlWIfzdPFnUtSytVdER5XMXnEPmwx2bw45YMuwxB4O
+anFUbDn7Q013adk1AEy/WAfmNNBooAzV0VB9OmKPqGvyZx92907MoOk8QzMDY40+
+Hy0AXBkhXOwXq+MinOQlq+PA40qXfCk1cawPFrmDzWeiDZkDvcAHnS83+nX3v7Hw
+izYjvCfY9adu+r7owVAKcP2FVWeoMJ0TFh48efIZmck4HsJmqtiekbGkyXr3Eq60
++Rl8dz5E1e1gxRadq/4qNcvgKUeCkg==
+=354Q
+-----END PGP SIGNATURE-----
+
+--OIicqM3g5+ivtiDy--
