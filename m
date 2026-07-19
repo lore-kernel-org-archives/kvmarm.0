@@ -1,35 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A22923E33D;
-	Sun, 19 Jul 2026 19:27:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B8493019BA;
+	Sun, 19 Jul 2026 19:27:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784489269; cv=none; b=V6fOmwctvrSi3UvBCSNDw9R016X5xWHRXHH0rWi5v+EFdymES8r8n8Ml6lhB40Wz/cwPVjvUNxDVxqNRdmXVQcNVknex4T2nxRmjUKCK2EiCBcKc3UTzFJmcxgv+swXWR/bq2UTgajG3eZk0SlPGhcErnGIqEBZ5vZGOk+UPSd0=
+	t=1784489273; cv=none; b=N2DozKXGwPkxLVG1uh/LJ05mVXEJqlXVh0/JUOgkkGbud7Bpi7lgdnu8PtV4Te4X40PNO3JQCocTwFJH0iBUTQO2jloAFkqZLzSgih/QcQGDHGakq1H31c1HgRrj6VNLC/Z8FxOdj/eLuBhJHU6EBqrzk/oGRtNW2fbCKwGIQ6c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784489269; c=relaxed/simple;
-	bh=IJUCIxvw4excQxKCa7m51cgP09d2ulJBN4CshTpCm2I=;
+	s=arc-20240116; t=1784489273; c=relaxed/simple;
+	bh=DK8u6eI1AOLX9khBmbKeOjy8kwTjeZcin0pkZ329WfM=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Fdh0fzD2hRFeqLJraXfr0z9MryGqxaIpRHefL+DVZ1e8OOzyD7JuX492zZcFOd32jNHHDq6j0PVqKQJLh/9PPAaZDtjxcjCd4rT4ZSV3ZjGq+zOaXh4t3yZz0gECvoH077+9LNCPZzC1SESg7d4TVAAouBwMwpBx+So7v2syv7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bgFOyh3T; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=iH0aQCi6XTEre16hmQq49mdFOYzClkR56QGfKGIh80W29ty+/oX6UFNzYHappaedJQAATeU4cBc8blCuMlUGyJDn8eOI5RnJwXCqsbw1aEqfweWTdbIuO6O2ocVkxMkKK96KrEhX30v39j0ocuwtgnC0IUIDm7j88GjABlFepgU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pr8H2VLC; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bgFOyh3T"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E360A1F000E9;
-	Sun, 19 Jul 2026 19:27:45 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pr8H2VLC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9276B1F00A3A;
+	Sun, 19 Jul 2026 19:27:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784489268;
-	bh=1vfSs3xN+iG2ar+D4KsRWb6ogp8LrkeeccY8yQZbssA=;
+	s=k20260515; t=1784489270;
+	bh=OQ9SblTR7KigLdZW5ofDTAUXhaHQsNkXQ2cHNbZ5LSc=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=bgFOyh3TiTo8/28FIMnEDqPS1XToNuZhoOoul2+x34855j09a2WWFz/wZCLIn9v9r
-	 WIb8HUDOPlIESu9Z+pEVbqnpYZmaizBPZF9hZmhtcACZvaw7aR9aagCbeA1LhO7Rdl
-	 OF3vr7Bmfu7uelTjgxH11qer2/dwIiAmtyLPX+/RaN0HXG+pT5PmFqgPVqVfESYnOe
-	 Tz7fwXCxZ5lry8t9IMHDkebaWnIKEmtC7f2mJvqsVKy8uubKD7CIcDObGl6oF9F2og
-	 YiEWjAW+9uJ4Y/x1jAPt5ySTlZKX9C+QAZLkRCOWDUhrTkUQcx/35aJTGsjjd1Km7M
-	 0rA9n+6jz902Q==
+	b=Pr8H2VLCwW41lfa5NTejqUGUZlXiHZmblOSZV3DEkm+OFVpcJQ+W7IKtmKBfVgH6P
+	 08fSNlJH41MWhRCV5jVTR0Kex56nQ8P4aoFnG8ebBqpuTAO+H9Mz8gt/nZ8RjS2TZW
+	 ZIpa+6OxUUUCEFcdJ5xhjPAgARGA+uHMDYZcDw7Oe0EjBzYF/O/YcE7A2wJVtUc2yJ
+	 MIWcqq85K9KpR6S8E1YLeewWL3Lz0N9C88NerDfLIQZ79hEeYSaGyN1ZmnCBj7ELkr
+	 Qn01bhKrT1s3c8UdKue/3xRtVdEPEPARXBMRqiCOxfn9uY36tnHq8jUxCiWAVIrLcR
+	 dXdbeF51LDfpg==
 From: Mark Brown <broonie@kernel.org>
-Date: Sun, 19 Jul 2026 20:24:41 +0100
-Subject: [PATCH v6 2/3] KVM: selftests: arm64: Report register reset tests
- individually
+Date: Sun, 19 Jul 2026 20:24:42 +0100
+Subject: [PATCH v6 3/3] KVM: selftests: arm64: Make set_id_regs bitfield
+ validatity checks non-fatal
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -38,7 +38,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260719-kvm-arm64-set-id-regs-aarch64-v6-2-724287f5f108@kernel.org>
+Message-Id: <20260719-kvm-arm64-set-id-regs-aarch64-v6-3-724287f5f108@kernel.org>
 References: <20260719-kvm-arm64-set-id-regs-aarch64-v6-0-724287f5f108@kernel.org>
 In-Reply-To: <20260719-kvm-arm64-set-id-regs-aarch64-v6-0-724287f5f108@kernel.org>
 To: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
@@ -50,79 +50,109 @@ Cc: Ben Horgan <ben.horgan@arm.com>, linux-arm-kernel@lists.infradead.org,
  linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
  Mark Brown <broonie@kernel.org>
 X-Mailer: b4 0.16-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2517; i=broonie@kernel.org;
- h=from:subject:message-id; bh=IJUCIxvw4excQxKCa7m51cgP09d2ulJBN4CshTpCm2I=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBqXSUqNPlopUVi10luMCHqIc0BWU7OoV+DV5/10
- +5CCEx3XM2JATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCal0lKgAKCRAk1otyXVSH
- 0CLCB/4sTJQIBl44wnRefXp4qppuX404jEjFkQCC2mwAFci6f/31YJd8feBHQH6pgbRbaq/Fb+M
- Tx8GfMJzo3gcNR/PJ3xBTafaVgK7KAbcMoZHwVpVX7ljTkF/xcBUBGDTYNxbWW/lXknzsC5MrAh
- teed0YTCD92jS73spYGDz/EDytpwDQD2FEcjSuotQaagZ5jKB5dtkBSFLGkiySFGDeGh1OI/V7O
- D4tTzmqyx+yzDrTIS708d7RKFMYHI/5h2Sey4g16jV7/v7m3GTH68RZbCtyR94XGtgcsEkZtdNt
- 1v8BtfxPkhIhCXIZbJp4oJRFzULLe13xuLF4SSXTkvpePVu6
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3509; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=DK8u6eI1AOLX9khBmbKeOjy8kwTjeZcin0pkZ329WfM=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBqXSUrpJq3vjSVtOaSeroeYgbbuyrVgFNCYdsju
+ NhNlusit5GJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCal0lKwAKCRAk1otyXVSH
+ 0GrOB/oC9jMowK2A16z7DlHP0OzNMjMvEpjKNVRF6rNJoGOPSbzXeXIp3KrMh5tVZ0kXmEyMKfr
+ 92T7FwEzvzApE0/mxX2vXrAQbQsJa0ZEcaGfr0HHKbo6EJvikD92ditRFFIevn+HvsMJRq2I0b4
+ T9HmPWaHacqN5/qYGzhx4HuTUwvANVsxAW4C0rYV39iCme43GAP6Ww2/KrypK+Ms6g3N/eEhWQJ
+ 2Z5ZeQki+yAZUQ7u65Ci69OiGfo8SUldtcTclSXtxlcFm5S2sDB2k7TmsD8J87t3/DSrohcEULS
+ paVV1Vwwy/dxlYjna6/hyhlvZ56OFFlJoKmMlMmqi5G/i8Y9
 X-Developer-Key: i=broonie@kernel.org; a=openpgp;
  fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-set_id_regs tests that registers have their values preserved over reset.
-Currently it reports all registers in a single test with an instantly fatal
-assert which isn't great for diagnostics, it's hard to tell which register
-failed or if it's just one register. Change this to report each register as
-a separate test so that it's clear from the program output which registers
-have problems.
+Currently when set_id_regs encounters a problem checking validation of
+writes to feature registers it uses an immediately fatal assert to report
+the problem. This is not idiomatic for kselftest, and it is also not great
+for usability. The affected bitfield is not clearly reported and further
+tests do not have their results reported.
+
+Switch to using standard kselftest result reporting for the two asserts
+we do, these are non-fatal asserts so allow the program to continue and the
+test names include the affected field.
 
 Reviewed-by: Ben Horgan <ben.horgan@arm.com>
 Signed-off-by: Mark Brown <broonie@kernel.org>
 ---
- tools/testing/selftests/kvm/arm64/set_id_regs.c | 19 +++++++++++++------
- 1 file changed, 13 insertions(+), 6 deletions(-)
+ tools/testing/selftests/kvm/arm64/set_id_regs.c | 22 ++++++++++++++++------
+ 1 file changed, 16 insertions(+), 6 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-index db6414a93ad3..3aa8886e8b70 100644
+index 3aa8886e8b70..385e1f1c0133 100644
 --- a/tools/testing/selftests/kvm/arm64/set_id_regs.c
 +++ b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-@@ -819,13 +819,21 @@ static void test_vcpu_non_ftr_id_regs(struct kvm_vcpu *vcpu)
- static void test_assert_id_reg_unchanged(struct kvm_vcpu *vcpu, u32 encoding)
- {
- 	size_t idx = encoding_to_range_idx(encoding);
--	u64 observed;
-+	u64 observed, expected;
-+	bool pass;
+@@ -422,6 +422,7 @@ static u64 test_reg_set_success(struct kvm_vcpu *vcpu, u64 reg,
+ 	u8 shift = ftr_bits->shift;
+ 	u64 mask = ftr_bits->mask;
+ 	u64 val, new_val, ftr;
++	bool match;
  
- 	observed = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(encoding));
--	TEST_ASSERT_EQ(reset_mutable_bits(encoding, test_reg_vals[idx]),
--		       reset_mutable_bits(encoding, observed));
-+	observed = reset_mutable_bits(encoding, observed);
-+	expected = reset_mutable_bits(encoding, test_reg_vals[idx]);
-+	pass = expected == observed;
-+	if (!pass)
-+		ksft_print_msg("%lx != %lx\n", expected, observed);
-+	ksft_test_result(pass, "%s unchanged by reset\n",
-+			 get_reg_name(encoding));
+ 	val = vcpu_get_reg(vcpu, reg);
+ 	ftr = (val & mask) >> shift;
+@@ -434,7 +435,10 @@ static u64 test_reg_set_success(struct kvm_vcpu *vcpu, u64 reg,
+ 
+ 	vcpu_set_reg(vcpu, reg, val);
+ 	new_val = vcpu_get_reg(vcpu, reg);
+-	TEST_ASSERT_EQ(new_val, val);
++	match = new_val == val;
++	if (!match)
++		ksft_print_msg("%lx != %lx\n", new_val, val);
++	ksft_test_result(match, "%s valid write succeeded\n", ftr_bits->name);
+ 
+ 	return new_val;
+ }
+@@ -446,6 +450,7 @@ static void test_reg_set_fail(struct kvm_vcpu *vcpu, u64 reg,
+ 	u64 mask = ftr_bits->mask;
+ 	u64 val, old_val, ftr;
+ 	int r;
++	bool match;
+ 
+ 	val = vcpu_get_reg(vcpu, reg);
+ 	ftr = (val & mask) >> shift;
+@@ -462,7 +467,10 @@ static void test_reg_set_fail(struct kvm_vcpu *vcpu, u64 reg,
+ 		    "Unexpected KVM_SET_ONE_REG error: r=%d, errno=%d", r, errno);
+ 
+ 	val = vcpu_get_reg(vcpu, reg);
+-	TEST_ASSERT_EQ(val, old_val);
++	match = val == old_val;
++	if (!match)
++		ksft_print_msg("%lx != %lx\n", val, old_val);
++	ksft_test_result(match, "%s invalid write rejected\n", ftr_bits->name);
  }
  
-+#define ID_REG_RESET_UNCHANGED_TEST (ARRAY_SIZE(test_regs) + NUM_EXTRA_REGS)
-+
- static void test_reset_preserves_id_regs(struct kvm_vcpu *vcpu)
- {
- 	/*
-@@ -843,8 +851,6 @@ static void test_reset_preserves_id_regs(struct kvm_vcpu *vcpu)
- 	test_assert_id_reg_unchanged(vcpu, SYS_MIDR_EL1);
- 	test_assert_id_reg_unchanged(vcpu, SYS_REVIDR_EL1);
- 	test_assert_id_reg_unchanged(vcpu, SYS_AIDR_EL1);
+ static u64 test_reg_vals[KVM_ARM_FEATURE_ID_RANGE_SIZE];
+@@ -502,7 +510,11 @@ static void test_vm_ftr_id_regs(struct kvm_vcpu *vcpu, bool aarch64_only)
+ 		for (int j = 0;  ftr_bits[j].type != FTR_END; j++) {
+ 			/* Skip aarch32 reg on aarch64 only system, since they are RAZ/WI. */
+ 			if (aarch64_only && sys_reg_CRm(reg_id) < 4) {
+-				ksft_test_result_skip("%s on AARCH64 only system\n",
++				ksft_print_msg("%s on AARCH64 only system\n",
++					       ftr_bits[j].name);
++				ksft_test_result_skip("%s invalid write rejected\n",
++						      ftr_bits[j].name);
++				ksft_test_result_skip("%s valid write succeeded\n",
+ 						      ftr_bits[j].name);
+ 				continue;
+ 			}
+@@ -514,8 +526,6 @@ static void test_vm_ftr_id_regs(struct kvm_vcpu *vcpu, bool aarch64_only)
+ 
+ 			test_reg_vals[idx] = test_reg_set_success(vcpu, reg,
+ 								  &ftr_bits[j]);
 -
--	ksft_test_result_pass("%s\n", __func__);
+-			ksft_test_result_pass("%s\n", ftr_bits[j].name);
+ 		}
+ 	}
  }
- 
- int main(void)
-@@ -872,7 +878,8 @@ int main(void)
- 
- 	ksft_print_header();
- 
--	test_cnt = 3 + MPAM_IDREG_TEST + MTE_IDREG_TEST + GUEST_READ_TEST;
-+	test_cnt = 2 + MPAM_IDREG_TEST + MTE_IDREG_TEST + GUEST_READ_TEST +
-+		ID_REG_RESET_UNCHANGED_TEST;
+@@ -882,7 +892,7 @@ int main(void)
+ 		ID_REG_RESET_UNCHANGED_TEST;
  	for (i = 0; i < ARRAY_SIZE(test_regs); i++)
  		for (j = 0; test_regs[i].ftr_bits[j].type != FTR_END; j++)
- 			test_cnt++;
+-			test_cnt++;
++			test_cnt += 2;
+ 
+ 	ksft_set_plan(test_cnt);
+ 
 
 -- 
 2.47.3
