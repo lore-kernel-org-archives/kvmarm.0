@@ -1,35 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF786384CE1;
-	Sun, 19 Jul 2026 23:12:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F32573B6BF1;
+	Sun, 19 Jul 2026 23:12:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784502729; cv=none; b=rk8Pz364iHUNxgeXpuwcfBvdUqS82KNUv3cSTELzy36E2lZoe7rgnvUJ/2BAMfna3ZPhENUa8sAGmDFFeB/HSmsFy87ab6x9lGEIsW5fjWwcLVZw3OJ5Qh7Gj4bJAeNzxcLb5ax2VYn6DWYzbW9hk+jaITR1yADu7jbGP7ePoBo=
+	t=1784502733; cv=none; b=eWHVF/tB33NekykCEzeRzevn/zKROHihF9VjSAycxOQAp1XWaJ8+BMOgubgXLEIkWexBtreWxBz2cxqlz0v2l7Ei/50yPrmrPJPFUuynljRDmok5H72YwceFSygV9ZVtizRYvrYCmrcV313vJ5/UU7Ly0lHXdo0VdEGmc5lf9l0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784502729; c=relaxed/simple;
-	bh=DoSXFT1XFLMt5bL77ymD5uWM5fFd8Skxma7c37DB6O8=;
+	s=arc-20240116; t=1784502733; c=relaxed/simple;
+	bh=I21JH58CR/AbSnYTHYyjog9l03x/hS5CLetpI7AAePU=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=mJ54TH7Zblw+H0s2KloU81+5zymNVLHnuELpaCuOS3e5YmqbrBItM7TdalrvG2Onfxe0SPy2wgVIc7k7C9nHzfLu3+t1/EWjKzaSP68EKFrw0vuOcUTwbEjUqaxqvxHpQiTYSjcTm/WVoqccWGsKKBCqn66dmX0hvnkFlQGjOBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VHItgEX6; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=JYpjPA9QTFS3m25iS0OMK0rr8nzODomCpxjGsGDAk/yk3podPmMFO3HmXuXWL8dV1mlD7nflz9VWsqK1QaxXXvWzbPgSvOkFLYXF73L+XMWha47NptXbuybk99tsj77OONPuKvPPXMMrDoDrBkN2NljUbu6qAXw4DsK+zivS13Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gk68iheG; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VHItgEX6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C2801F000E9;
-	Sun, 19 Jul 2026 23:12:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gk68iheG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC8011F00ADE;
+	Sun, 19 Jul 2026 23:12:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784502727;
-	bh=k6q2RcAVUcHJXSDerZte/wZkUxNLtsu6zF4B+0lVk2U=;
+	s=k20260515; t=1784502731;
+	bh=xQPjYFjbIcAmw/vy47XjvylGbXgKpoMyOES+M/yVDZc=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=VHItgEX6/YP2Ozy/roLHwG3vf3bR69hSpR1DUlRiB81FP7Gbm5ey4b6DhDJpNcmbr
-	 TLk5dNTHYuEsw/0fZpNl6QDoGh0z6zUmlT2JJ20h9vCoDigNdDagYZRKqzlU+GhfcI
-	 8x+uCcb2Yee4Y+quz/okcIyNoRuyDN03TYOrq7gZ/qiaGxgUmF4CJdXYpyPSwWLtwo
-	 RAWgc4xkrEMp0j1KaL6F6nMMfNVbZ4/OzqIsSyrncER7wNtWkEq4zxMlyFocVDd/Uh
-	 tJzgtloC8ctgNyMqkAGCgGSigPKJI7CiHVY6BI+CBHPZfp4LeuGF93jZsoPcP1XtPH
-	 dVUKaBcSFMvuA==
+	b=gk68iheGGeBlO/D3hN2G7SIkPZ9UnndwVxpgJ0VU06DNS3GHGRqae8B1kmhiZv70q
+	 ehIs9D87XgTHXPpHu8RW05yrA3YZSC1FIzqtO+DfJEgg7QjO/c14vMOLxnr/F7Xel8
+	 Xvd8Rp6cH0n5xLRvlAtzvJCpXnzJFmSXgitnTaw8XbakqxcDab5sud5lG/C0gdbLMZ
+	 HNxi6iQYodaCrQQ9KS/fNo3iTGfaD/SpP1MCsWP1fN+kLXXT6dkfLhfn+Qs/IDJuWN
+	 DWVPEjdILxq4PEsgiqScMa3ieA0ptAD1wloaOVfrUjZAfM4LTEO9KJOMQ2jOp2q7jW
+	 z2CfSFD5bhswg==
 From: Mark Brown <broonie@kernel.org>
-Date: Mon, 20 Jul 2026 00:07:57 +0100
-Subject: [PATCH v13 30/32] KVM: arm64: selftests: Skip impossible invalid
- value tests
+Date: Mon, 20 Jul 2026 00:07:58 +0100
+Subject: [PATCH v13 31/32] KVM: arm64: selftests: Add SME system registers
+ to get-reg-list
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -38,7 +38,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260720-kvm-arm64-sme-v13-30-d9abd3ffa245@kernel.org>
+Message-Id: <20260720-kvm-arm64-sme-v13-31-d9abd3ffa245@kernel.org>
 References: <20260720-kvm-arm64-sme-v13-0-d9abd3ffa245@kernel.org>
 In-Reply-To: <20260720-kvm-arm64-sme-v13-0-d9abd3ffa245@kernel.org>
 To: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
@@ -55,160 +55,83 @@ Cc: Dave Martin <Dave.Martin@arm.com>, Fuad Tabba <tabba@google.com>,
  Peter Maydell <peter.maydell@linaro.org>, 
  Eric Auger <eric.auger@redhat.com>, Mark Brown <broonie@kernel.org>
 X-Mailer: b4 0.16-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3690; i=broonie@kernel.org;
- h=from:subject:message-id; bh=DoSXFT1XFLMt5bL77ymD5uWM5fFd8Skxma7c37DB6O8=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBqXVk+ePDwSiD4VpzeYE3Id9Rc+zhBWemm3WIxc
- k5BrRZvK1yJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCal1ZPgAKCRAk1otyXVSH
- 0AdJB/wP/giklcwigwFEGFkW6wN64uXabgyc3gw+Vbq+QvoRCYFBOd/fUghgQKbm155Ze2D8KyK
- MnBusZQAzlKmg/sFstsLmakD/2vTWZOLjLblcx9dLnzlHoi/bCS8ynS0DYHu5RcDwdvT8sIs/Vg
- xzXqk3GCIdWl7L/Fe4ApJK65MYGRjFa91uJfHf+6EzuiGfEXhXZykSweG9xQe+qcFUzcPKe0E2t
- lJtfSUcnd5gbPzM5M4sxvdHL030+dol1TIi2qtt9C/QXkaWC1QuPZANzx57gIZ2Z1HB4EfEHSNr
- w5R5Www7gZwUifp6pFf1/H2RfcdcPriBjttYHs2MerjIUzVC
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3018; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=I21JH58CR/AbSnYTHYyjog9l03x/hS5CLetpI7AAePU=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBqXVk/lK0YUl/cK8VlgLUT9a9L2FGYBj04Shosk
+ xgAJXeYxzKJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCal1ZPwAKCRAk1otyXVSH
+ 0M+vB/9+8EBa+OkLa8yKHbdU44Xgx4s1d3kwbL1fS0ukDHn/KW93mHAkL9hs0FfLdK7cdohDPhk
+ CfCp4nJK1TUEcxHk8D2pGGZgACuKDb3SPQuFsk0ynKgDZCNMIDdUOGwFUxZkVYVlvOOMVAvgcvk
+ Rp8LEeVKe00w+DBQonc6rnLXJXKrbqln+6uG/9N1xJf44WGbb6lgBAsgw80jCvySWK+PRVAziB8
+ mPGa3CyVP+UXmexh5S08O7ySNEVp6hlyp1afGD35raX0M+FLM9uSEM/2Q5wiFBIpNnXSmPDwORA
+ 8IUGl38C+cBWrnCSc4glAsjkK1MBfzUw3siblPylLp6jfO7l
 X-Developer-Key: i=broonie@kernel.org; a=openpgp;
  fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-The set_id_regs test currently assumes that there will always be invalid
-values available in bitfields for it to generate but this may not be the
-case if the architecture has defined meanings for every possible value for
-the bitfield. An assert added in commit bf09ee918053e ("KVM: arm64:
-selftests: Remove ARM64_FEATURE_FIELD_BITS and its last user") refuses to
-run for single bit fields which will show the issue most readily but there
-is no reason wider ones can't show the same issue.
-
-Rework the tests for invalid value to check if an invalid value can be
-generated and skip the test if not, removing the assert.
+SME adds a number of new system registers, update get-reg-list to check for
+them based on the visibility of SME.
 
 Signed-off-by: Mark Brown <broonie@kernel.org>
 ---
- tools/testing/selftests/kvm/arm64/set_id_regs.c | 64 +++++++++++++++++++++----
- 1 file changed, 54 insertions(+), 10 deletions(-)
+ tools/testing/selftests/kvm/arm64/get-reg-list.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-index 9eceac84e297..da9349bf31ab 100644
---- a/tools/testing/selftests/kvm/arm64/set_id_regs.c
-+++ b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-@@ -327,54 +327,95 @@ u64 get_safe_value(const struct reg_ftr_bits *ftr_bits, u64 ftr)
- }
- 
- /* Return an invalid value to a given ftr_bits an ftr value */
--u64 get_invalid_value(const struct reg_ftr_bits *ftr_bits, u64 ftr)
-+u64 get_invalid_value(const struct reg_ftr_bits *ftr_bits, u64 ftr, bool *skip)
- {
- 	u64 ftr_max = ftr_bits->mask >> ftr_bits->shift;
- 
--	TEST_ASSERT(ftr_max > 1, "This test doesn't support single bit features");
-+	*skip = false;
- 
- 	if (ftr_bits->sign == FTR_UNSIGNED) {
- 		switch (ftr_bits->type) {
- 		case FTR_EXACT:
- 			ftr = max((u64)ftr_bits->safe_val + 1, ftr + 1);
-+			if (ftr >= ftr_max)
-+				*skip = true;
- 			break;
- 		case FTR_LOWER_SAFE:
-+			if (ftr == ftr_max)
-+				*skip = true;
- 			ftr++;
- 			break;
- 		case FTR_HIGHER_SAFE:
-+			if (ftr == 0)
-+				*skip = true;
- 			ftr--;
- 			break;
- 		case FTR_HIGHER_OR_ZERO_SAFE:
--			if (ftr == 0)
-+			switch (ftr) {
-+			case 0:
- 				ftr = ftr_max;
--			else
-+				break;
-+			case 1:
-+				*skip = true;
-+				break;
-+			default:
- 				ftr--;
-+				break;
-+			}
- 			break;
- 		default:
-+			*skip = true;
- 			break;
- 		}
- 	} else if (ftr != ftr_max) {
- 		switch (ftr_bits->type) {
- 		case FTR_EXACT:
- 			ftr = max((u64)ftr_bits->safe_val + 1, ftr + 1);
-+			if (ftr >= ftr_max)
-+				*skip = true;
- 			break;
- 		case FTR_LOWER_SAFE:
- 			ftr++;
- 			break;
- 		case FTR_HIGHER_SAFE:
--			ftr--;
-+			/* FIXME: "need to check for the actual highest." */
-+			if (ftr == 0 || ftr == ftr_max)
-+				*skip = true;
-+			else
-+				ftr--;
- 			break;
- 		case FTR_HIGHER_OR_ZERO_SAFE:
--			if (ftr == 0)
--				ftr = ftr_max - 1;
--			else
-+			switch (ftr) {
-+			case 0:
-+				if (ftr_max > 1)
-+					ftr = ftr_max - 1;
-+				else
-+					*skip = true;
-+				break;
-+			case 1:
-+				*skip = true;
-+				break;
-+			default:
- 				ftr--;
-+				break;
-+			}
- 			break;
- 		default:
-+			*skip = true;
- 			break;
- 		}
- 	} else {
--		ftr = 0;
-+		switch (ftr_bits->type) {
-+		case FTR_LOWER_SAFE:
-+			if (ftr == 0)
-+				*skip = true;
-+			else
-+				ftr = 0;
-+			break;
-+		default:
-+			*skip = true;
-+			break;
-+		}
- 	}
- 
- 	return ftr;
-@@ -409,12 +450,15 @@ static void test_reg_set_fail(struct kvm_vcpu *vcpu, u64 reg,
- 	u8 shift = ftr_bits->shift;
- 	u64 mask = ftr_bits->mask;
- 	u64 val, old_val, ftr;
-+	bool skip;
- 	int r;
- 
- 	val = vcpu_get_reg(vcpu, reg);
- 	ftr = (val & mask) >> shift;
- 
--	ftr = get_invalid_value(ftr_bits, ftr);
-+	ftr = get_invalid_value(ftr_bits, ftr, &skip);
-+	if (skip)
-+		return;
- 
- 	old_val = val;
- 	ftr <<= shift;
+diff --git a/tools/testing/selftests/kvm/arm64/get-reg-list.c b/tools/testing/selftests/kvm/arm64/get-reg-list.c
+index 0a3a94c4cca1..876c4719e2e2 100644
+--- a/tools/testing/selftests/kvm/arm64/get-reg-list.c
++++ b/tools/testing/selftests/kvm/arm64/get-reg-list.c
+@@ -61,7 +61,13 @@ static struct feature_id_reg feat_id_regs[] = {
+ 	REG_FEAT(HFGITR2_EL2,	ID_AA64MMFR0_EL1, FGT, FGT2),
+ 	REG_FEAT(HDFGRTR2_EL2,	ID_AA64MMFR0_EL1, FGT, FGT2),
+ 	REG_FEAT(HDFGWTR2_EL2,	ID_AA64MMFR0_EL1, FGT, FGT2),
+-	REG_FEAT(ZCR_EL2,	ID_AA64PFR0_EL1, SVE, IMP),
++	REG_FEAT(SMCR_EL1,	ID_AA64PFR1_EL1, SME, IMP),
++	REG_FEAT(SMCR_EL2,	ID_AA64PFR1_EL1, SME, IMP),
++	REG_FEAT(SMIDR_EL1,	ID_AA64PFR1_EL1, SME, IMP),
++	REG_FEAT(SMPRI_EL1,	ID_AA64PFR1_EL1, SME, IMP),
++	REG_FEAT(SMPRIMAP_EL2,	ID_AA64PFR1_EL1, SME, IMP),
++	REG_FEAT(TPIDR2_EL0,	ID_AA64PFR1_EL1, SME, IMP),
++	REG_FEAT(SVCR,		ID_AA64PFR1_EL1, SME, IMP),
+ 	REG_FEAT(SCTLR2_EL1,	ID_AA64MMFR3_EL1, SCTLRX, IMP),
+ 	REG_FEAT(SCTLR2_EL2,	ID_AA64MMFR3_EL1, SCTLRX, IMP),
+ 	REG_FEAT(VDISR_EL2,	ID_AA64PFR0_EL1, RAS, IMP),
+@@ -367,6 +373,7 @@ static __u64 base_regs[] = {
+ 	ARM64_SYS_REG(3, 0, 0, 0, 0),	/* MIDR_EL1 */
+ 	ARM64_SYS_REG(3, 0, 0, 0, 6),	/* REVIDR_EL1 */
+ 	ARM64_SYS_REG(3, 1, 0, 0, 1),	/* CLIDR_EL1 */
++	ARM64_SYS_REG(3, 1, 0, 0, 6),	/* SMIDR_EL1 */
+ 	ARM64_SYS_REG(3, 1, 0, 0, 7),	/* AIDR_EL1 */
+ 	ARM64_SYS_REG(3, 3, 0, 0, 1),	/* CTR_EL0 */
+ 	ARM64_SYS_REG(2, 0, 0, 0, 4),
+@@ -498,6 +505,8 @@ static __u64 base_regs[] = {
+ 	ARM64_SYS_REG(3, 0, 1, 0, 1),	/* ACTLR_EL1 */
+ 	ARM64_SYS_REG(3, 0, 1, 0, 2),	/* CPACR_EL1 */
+ 	KVM_ARM64_SYS_REG(SYS_SCTLR2_EL1),
++	ARM64_SYS_REG(3, 0, 1, 2, 4),	/* SMPRI_EL1 */
++	ARM64_SYS_REG(3, 0, 1, 2, 6),	/* SMCR_EL1 */
+ 	ARM64_SYS_REG(3, 0, 2, 0, 0),	/* TTBR0_EL1 */
+ 	ARM64_SYS_REG(3, 0, 2, 0, 1),	/* TTBR1_EL1 */
+ 	ARM64_SYS_REG(3, 0, 2, 0, 2),	/* TCR_EL1 */
+@@ -518,9 +527,11 @@ static __u64 base_regs[] = {
+ 	ARM64_SYS_REG(3, 0, 13, 0, 4),	/* TPIDR_EL1 */
+ 	ARM64_SYS_REG(3, 0, 14, 1, 0),	/* CNTKCTL_EL1 */
+ 	ARM64_SYS_REG(3, 2, 0, 0, 0),	/* CSSELR_EL1 */
++	ARM64_SYS_REG(3, 3, 4, 2, 2),	/* SVCR */
+ 	ARM64_SYS_REG(3, 3, 10, 2, 4),	/* POR_EL0 */
+ 	ARM64_SYS_REG(3, 3, 13, 0, 2),	/* TPIDR_EL0 */
+ 	ARM64_SYS_REG(3, 3, 13, 0, 3),	/* TPIDRRO_EL0 */
++	ARM64_SYS_REG(3, 3, 13, 0, 5),	/* TPIDR2_EL0 */
+ 	ARM64_SYS_REG(3, 3, 14, 0, 1),	/* CNTPCT_EL0 */
+ 	ARM64_SYS_REG(3, 3, 14, 2, 1),	/* CNTP_CTL_EL0 */
+ 	ARM64_SYS_REG(3, 3, 14, 2, 2),	/* CNTP_CVAL_EL0 */
+@@ -730,6 +741,8 @@ static __u64 el2_regs[] = {
+ 	SYS_REG(HFGITR_EL2),
+ 	SYS_REG(HACR_EL2),
+ 	SYS_REG(ZCR_EL2),
++	SYS_REG(SMPRIMAP_EL2),
++	SYS_REG(SMCR_EL2),
+ 	SYS_REG(HCRX_EL2),
+ 	SYS_REG(TTBR0_EL2),
+ 	SYS_REG(TTBR1_EL2),
 
 -- 
 2.47.3
