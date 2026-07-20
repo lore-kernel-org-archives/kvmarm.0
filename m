@@ -1,480 +1,372 @@
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm2-f10.google.com (mail-wm2-f10.google.com [74.125.225.138])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4270C441041
-	for <kvmarm@lists.linux.dev>; Mon, 20 Jul 2026 16:24:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5D232DC331
+	for <kvmarm@lists.linux.dev>; Mon, 20 Jul 2026 16:46:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784564675; cv=none; b=VnVH5fpFGsTYMM4yqrWf8wPy5Gkg4+qjCtkYcV5SCOgO4eY4Wm+ZuJKdU7ChlwQAovf0jUdwj3zULPjKRHurEX4gI5KjNyjbjaZ5GY9tsLG//Lekx8zGJMO8Priyk87MX/HY380M+mQXWOj+d48D2KfcvnNfiebVlvSsuf0s8Q0=
+	t=1784565991; cv=none; b=dC4u3/SFJ2uJMk4FyxInDWqcSQ189N5zfCuKmznc1hnbLE6KC+TOkRogLxD3Q7FaNB9AH9gBF+JUid7t6+WOfliePWzY5t5IP1GOIdWQ0epW9WW9fR7Ncc8H26e2xy5TdS6YFFmNzUL1ngs85ZPZzwL2g8/iH1cAgAmniSywzhM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784564675; c=relaxed/simple;
-	bh=WfU7cvSohgh9rKGdahQFG7+jr/hitSdjU3ev1HL2kxA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=TAOhkZYsXIeemNLzNz7S8z7maZqGfAyegjrtNBw/sg8gK3WGxQJSKVoosa8eIuWIUqKP/mXwPTVp9m62kDlXRY3GIQo94Dnd8xGg9EngFNvNPp7dvWm6Lb2GWYI7imAejXf5v/ZH2m/+AKx/nR+j+J1Z4Q7IoZduGu3w/EcLFi0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=r1AyefxU; arc=none smtp.client-ip=91.218.175.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1784565991; c=relaxed/simple;
+	bh=23neV0u7FET9/z9SJJoTk52Qf6X3eq3Lrj2Yn79kENk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sJya18vwsMXVRho65zbEmhZ7Ix6qdSPjFiszV/rW/5Prg8WNY8WsnA9x9avgsxwywn83ex92jve0bgN8G3KAE/ya2yzdMhgvY9M/Gsen0JfiBsBTnLm+CTsYZ2EV2G3lX7+zTWVDZc/auxCg0p5H6YtoS11CgX9bQBkdt0elaWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=MkW0PRbz; arc=none smtp.client-ip=74.125.225.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="r1AyefxU"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1784564662;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zCtdUeHjTXBntKb5iv5WPPyjGG0MBs7LtOiukTeIDGo=;
-	b=r1AyefxU02AmjY47dyaNrax8TNAV8uMHIKYzmxAHr4NTjw17sRTZl0cS1Lc5KaYlseOOVF
-	ramj+9VD2rAJjaS7w3PA5BNdmFQ2n56LB3TrAKwPEcze8NV3kD4rQ4rqrbB7mOqbmW6Egg
-	Z0QkKyF3HNwNU5cXE5WrnHqq75a40E0=
-From: Fuad Tabba <fuad.tabba@linux.dev>
-To: maz@kernel.org,
-	oupton@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Cc: catalin.marinas@arm.com,
-	will@kernel.org,
-	rostedt@goodmis.org,
-	mhiramat@kernel.org,
-	alexandru.elisei@arm.com,
-	vdonnefort@google.com,
-	joey.gouly@arm.com,
-	seiden@linux.ibm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	qperret@google.com,
-	ardb@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	tabba@google.com,
-	fuad.tabba@linux.dev
-Subject: [PATCH v1 11/11] KVM: arm64: Tag host-VA hypercall parameters __hostva
-Date: Mon, 20 Jul 2026 17:24:12 +0100
-Message-Id: <20260720162412.1401272-2-fuad.tabba@linux.dev>
-In-Reply-To: <20260720162412.1401272-1-fuad.tabba@linux.dev>
-References: <20260720161343.1367007-1-fuad.tabba@linux.dev>
- <20260720162412.1401272-1-fuad.tabba@linux.dev>
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MkW0PRbz"
+Received: by mail-wm2-f10.google.com with SMTP id 5b1f17b1804b1-495501e57beso7106625e9.1
+        for <kvmarm@lists.linux.dev>; Mon, 20 Jul 2026 09:46:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1784565982; x=1785170782; darn=lists.linux.dev;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=AwqLdIDEx0RhLN1mKUdDDLnyo1kDLj53Ia9+5Bri/iU=;
+        b=MkW0PRbzbw4n8QgcKniTCodwnK3lbT6cjaVG0/VLFkubgeS2wDdyj3G7FhbfZxPgCj
+         juJgCK4cmyvUISFPaNZ0W2riqSpsGy7vk7EEEvekny+Ob4NWSGa6DHwdVzXf8Q7b7KMC
+         YQqQT1XiA2e9u7XAo2KcEEPBJc/AENjxkAVfg4jw823+J4JoQ0rFxGCV3FVNl4YVCSuQ
+         IKbXRQJmedqR9uPOiMWzmxa4yU4CdFsRJSYK4aqrRx6byS1I1gVVZ8zhtnx/RSyeGmSG
+         weciwi9v7gRajc6I+c17sI95mG7OAb7m+mR2AlvOQY39ksJEYwihqZlARHfcMi5mY89O
+         YKJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784565982; x=1785170782;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=AwqLdIDEx0RhLN1mKUdDDLnyo1kDLj53Ia9+5Bri/iU=;
+        b=sZJ1q/RsMGWtkLNb+MJx3W15SuoPEBTQD5OCG6kYoqbSGOJtkXMiqwAZQTufKJ49+r
+         lD4cNI8RF/B2ltr994d2Def3gR3GbWVPGWjmVYCGNKuizk7LWcRbd2ZInLGxLnH8Wmbk
+         0L3D3N6tJ/f7mM1CwwqMWkiLx2t0Jzzgd2HqkoCWi6mo+kMEb5G3GGnbvRy0gjGRk0h1
+         RCjJpZcYIcxCsL2KLWIjwWEg36RtAuh1n/9ZAeDmdzL2yIfQAtRVgJnI2WL4k2ZTYCWH
+         cxwAP7E+yMzQ9CNJzBsKJSps2vBsVmkx3xYEWq//ucq+X47+I09kdUIfphkfc3K6veVP
+         llVw==
+X-Forwarded-Encrypted: i=1; AHgh+RpBOG88nnx1ykxjNUEnpCBAj5iNkC2Ff30/u27+Z9tL2OZJSyHpdI2+zUE26gL5S8oCScfYYXI=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxkMtw3onn1gm3+MVz2P2mT0V/XlHlrXnj/Zu1YPa1vtEN5w2od
+	89JPRs/zFOuQf6DrMLEL29RCZOFTVrwJrafseAWpZOhTG4bU60pdbJ8Br02REwehgi8=
+X-Gm-Gg: AfdE7clZGn3QjXAuKz/mf1AYuvmyVVEitQFp1qYCy74W/DN1DPyGKks8D+kSrYKJ9ab
+	u/YqUepgUllU4UaN5NauuQnHSoZiLJmuTQAtop8TsAb2ljXoZGvuILwFYngYBBYo3UdkBg1ZcYb
+	QxWfXUJ4bM1UfASJSoDoemKeBwiFnIntWvAyHeSWfzWwgAXAWE1tSzsYmrArqJ4DdHSQFRlDuyb
+	D0qJ249His7RTa77darJN5vmQP/+IlUDhGcB5LBr4rBL3+Be2MJwQCaCeGh6jaogP65ffgVMarX
+	nPYxwQElLuciWypnuGukavT9+3PD89bIGpx1WYWfwx9YGeB9WszhILHrw6YaJ0GFl/HRoBZL1Ac
+	Rspv1pRVCq2ex9OqLKdamm9FfqpZFGwMjIIGap5t9JuwpCIfvK1UP8OuhOhulXHf9cdAhAIpoWx
+	+fULXAEy4=
+X-Received: by 2002:a05:600c:4505:b0:493:f176:dc69 with SMTP id 5b1f17b1804b1-4954a413087mr159328555e9.37.1784565982263;
+        Mon, 20 Jul 2026 09:46:22 -0700 (PDT)
+Received: from [192.168.1.3] ([37.18.141.193])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-495653d38dbsm1517285e9.15.2026.07.20.09.46.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 20 Jul 2026 09:46:21 -0700 (PDT)
+Message-ID: <515af040-deec-471f-92df-ca3e4e91e789@linaro.org>
+Date: Mon, 20 Jul 2026 17:46:19 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 00/21] ARM64 PMU Partitioning
+To: Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org
+Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+ Russell King <linux@armlinux.org.uk>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ Mingwei Zhang <mizhang@google.com>, Joey Gouly <joey.gouly@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, Mark Rutland <mark.rutland@arm.com>,
+ Shuah Khan <shuah@kernel.org>,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20260612192909.1153907-1-coltonlewis@google.com>
+Content-Language: en-US
+From: James Clark <james.clark@linaro.org>
+In-Reply-To: <20260612192909.1153907-1-coltonlewis@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The nVHE hypervisor takes host virtual addresses as hypercall arguments
-and translates each with kern_hyp_va() before use. Nothing marks them as
-host-owned, so dereferencing one untranslated at EL2 - a recurring bug
-class - is invisible to the compiler.
 
-Add a __hostva sparse address space, active only for EL2 code, and tag
-the host-VA parameters in the hypercall declarations. kern_hyp_va_host()
-is the only sanctioned unwrap: it translates the address, preserves the
-pointee type (stripped of qualifiers, as with the percpu accessors) and
-drops the tag with a __force cast, so an untranslated host VA fails
-sparse. The tag flows from the shared declaration into the generated
-handler and on into the donated-memory and tracing-descriptor helpers,
-so a handler cannot extract a host VA without it. Host code sees plain
-pointers, and the tag is checker-only: no code is generated.
 
-Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
----
- arch/arm64/include/asm/kvm_hcall.h      | 43 ++++++++++++-------
- arch/arm64/include/asm/kvm_mmu.h        | 10 +++++
- arch/arm64/kvm/hyp/include/nvhe/pkvm.h  |  6 ++-
- arch/arm64/kvm/hyp/include/nvhe/trace.h |  5 ++-
- arch/arm64/kvm/hyp/nvhe/hyp-main.c      | 57 +++++++++++++------------
- arch/arm64/kvm/hyp/nvhe/pkvm.c          | 11 ++---
- arch/arm64/kvm/hyp/nvhe/trace.c         |  4 +-
- 7 files changed, 82 insertions(+), 54 deletions(-)
+On 12/06/2026 8:28 pm, Colton Lewis wrote:
+> This series creates a new PMU scheme on ARM, a partitioned PMU that
+> allows reserving a subset of counters for more direct guest access,
+> significantly reducing overhead. More details, including performance
+> benchmarks, can be read in the v1 cover letter linked below.
+> 
+> An overview of what this series accomplishes was presented at KVM
+> Forum 2025. Slides [1] and video [2] are linked below.
+> 
+> The kernel command line parameter for the driver still exists, but now
+> only defines an upper limit of counters the guest might use rather
+> than taking those counters from the host permanently.
+> 
+> I would appreciate any discussion on whether that parameter should
+> still exist as it's an inconvenient enabling gate on the feature that
+> is no longer required. The question comes down to what, if any, guards
+> we want against a guest monopolizing all counters on a system.
+> 
 
-diff --git a/arch/arm64/include/asm/kvm_hcall.h b/arch/arm64/include/asm/kvm_hcall.h
-index 6aa2df90a14a4..3033a6ba1462a 100644
---- a/arch/arm64/include/asm/kvm_hcall.h
-+++ b/arch/arm64/include/asm/kvm_hcall.h
-@@ -27,6 +27,18 @@ struct kvm_vcpu;
- struct vgic_v3_cpu_if;
- struct vgic_v5_cpu_if;
- 
-+/*
-+ * A host VA carried by a hypercall argument. At EL2 such a pointer must not
-+ * be dereferenced until it is translated with kern_hyp_va_host(); sparse
-+ * flags any use that skips the translation. The tag describes the EL2 view
-+ * only: the host dereferences its own VAs freely.
-+ */
-+#if defined(__KVM_NVHE_HYPERVISOR__) && defined(__CHECKER__)
-+#define __hostva	__attribute__((noderef, address_space(__hostva)))
-+#else
-+#define __hostva
-+#endif
-+
- /*
-  * Hypercall signatures are declared as (type, name) argument pairs.
-  * __KVM_HCALL_MAP() applies a macro to each pair, in the mold of __MAP()
-@@ -157,24 +169,24 @@ DECLARE_KVM_HOST_HCALL0(int, __pkvm_prot_finalize)
- 
- /* Hypercalls that are always available and common to [nh]VHE/pKVM. */
- DECLARE_KVM_HOST_HCALL_VOID(__kvm_adjust_pc, 1,
--	struct kvm_vcpu *, vcpu)
-+	struct kvm_vcpu __hostva *, vcpu)
- DECLARE_KVM_HOST_HCALL(int, __kvm_vcpu_run, 1,
--	struct kvm_vcpu *, vcpu)
-+	struct kvm_vcpu __hostva *, vcpu)
- DECLARE_KVM_HOST_HCALL0_VOID(__kvm_flush_vm_context)
- DECLARE_KVM_HOST_HCALL_VOID(__kvm_tlb_flush_vmid_ipa, 3,
--	struct kvm_s2_mmu *, mmu, phys_addr_t, ipa, int, level)
-+	struct kvm_s2_mmu __hostva *, mmu, phys_addr_t, ipa, int, level)
- DECLARE_KVM_HOST_HCALL_VOID(__kvm_tlb_flush_vmid_ipa_nsh, 3,
--	struct kvm_s2_mmu *, mmu, phys_addr_t, ipa, int, level)
-+	struct kvm_s2_mmu __hostva *, mmu, phys_addr_t, ipa, int, level)
- DECLARE_KVM_HOST_HCALL_VOID(__kvm_tlb_flush_vmid, 1,
--	struct kvm_s2_mmu *, mmu)
-+	struct kvm_s2_mmu __hostva *, mmu)
- DECLARE_KVM_HOST_HCALL_VOID(__kvm_tlb_flush_vmid_range, 3,
--	struct kvm_s2_mmu *, mmu, phys_addr_t, start, unsigned long, pages)
-+	struct kvm_s2_mmu __hostva *, mmu, phys_addr_t, start, unsigned long, pages)
- DECLARE_KVM_HOST_HCALL_VOID(__kvm_flush_cpu_context, 1,
--	struct kvm_s2_mmu *, mmu)
-+	struct kvm_s2_mmu __hostva *, mmu)
- DECLARE_KVM_HOST_HCALL_VOID(__kvm_timer_set_cntvoff, 1,
- 	u64, cntvoff)
- DECLARE_KVM_HOST_HCALL(int, __tracing_load, 2,
--	void *, desc_hva, size_t, desc_size)
-+	void __hostva *, desc_hva, size_t, desc_size)
- DECLARE_KVM_HOST_HCALL0_VOID(__tracing_unload)
- DECLARE_KVM_HOST_HCALL(int, __tracing_enable, 1,
- 	bool, enable)
-@@ -189,13 +201,13 @@ DECLARE_KVM_HOST_HCALL(int, __tracing_enable_event, 2,
- DECLARE_KVM_HOST_HCALL_VOID(__tracing_write_event, 1,
- 	u64, id)
- DECLARE_KVM_HOST_HCALL_VOID(__vgic_v3_save_aprs, 1,
--	struct vgic_v3_cpu_if *, cpu_if)
-+	struct vgic_v3_cpu_if __hostva *, cpu_if)
- DECLARE_KVM_HOST_HCALL_VOID(__vgic_v3_restore_vmcr_aprs, 1,
--	struct vgic_v3_cpu_if *, cpu_if)
-+	struct vgic_v3_cpu_if __hostva *, cpu_if)
- DECLARE_KVM_HOST_HCALL_VOID(__vgic_v5_save_apr, 1,
--	struct vgic_v5_cpu_if *, cpu_if)
-+	struct vgic_v5_cpu_if __hostva *, cpu_if)
- DECLARE_KVM_HOST_HCALL_VOID(__vgic_v5_restore_vmcr_apr, 1,
--	struct vgic_v5_cpu_if *, cpu_if)
-+	struct vgic_v5_cpu_if __hostva *, cpu_if)
- 
- /* Hypercalls that are available only when pKVM has finalised. */
- DECLARE_KVM_HOST_HCALL(int, __pkvm_host_share_hyp, 1,
-@@ -220,10 +232,11 @@ DECLARE_KVM_HOST_HCALL0(int, __pkvm_reserve_vm)
- DECLARE_KVM_HOST_HCALL_VOID(__pkvm_unreserve_vm, 1,
- 	pkvm_handle_t, handle)
- DECLARE_KVM_HOST_HCALL(int, __pkvm_init_vm, 3,
--	struct kvm *, host_kvm, void *, vm_hva, void *, pgd_hva)
-+	struct kvm __hostva *, host_kvm, void __hostva *, vm_hva,
-+	void __hostva *, pgd_hva)
- DECLARE_KVM_HOST_HCALL(int, __pkvm_init_vcpu, 3,
--	pkvm_handle_t, handle, struct kvm_vcpu *, host_vcpu,
--	void *, vcpu_hva)
-+	pkvm_handle_t, handle, struct kvm_vcpu __hostva *, host_vcpu,
-+	void __hostva *, vcpu_hva)
- DECLARE_KVM_HOST_HCALL0(int, __pkvm_vcpu_in_poison_fault)
- DECLARE_KVM_HOST_HCALL(int, __pkvm_force_reclaim_guest_page, 1,
- 	phys_addr_t, phys)
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 6eae7e7e2a684..55fac40377c03 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -7,6 +7,8 @@
- #ifndef __ARM64_KVM_MMU_H__
- #define __ARM64_KVM_MMU_H__
- 
-+#include <linux/compiler.h>
-+
- #include <asm/page.h>
- #include <asm/memory.h>
- #include <asm/mmu.h>
-@@ -140,6 +142,14 @@ static __always_inline unsigned long __kern_hyp_va(unsigned long v)
- 
- #define kern_hyp_va(v) 	((typeof(v))(__kern_hyp_va((unsigned long)(v))))
- 
-+/*
-+ * Translate a __hostva-tagged host VA, dropping the tag: the only sanctioned
-+ * unwrap. Translation only, no ownership or bounds validation; the result
-+ * carries the pointee type stripped of the tag and of any cv-qualifiers.
-+ */
-+#define kern_hyp_va_host(v)						\
-+	((TYPEOF_UNQUAL(*(v)) *)__kern_hyp_va((unsigned long)(__force void *)(v)))
-+
- extern u32 __hyp_va_bits;
- 
- /*
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-index 2643a1a819668..dcbe8b8913270 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-@@ -7,6 +7,7 @@
- #ifndef __ARM64_KVM_NVHE_PKVM_H__
- #define __ARM64_KVM_NVHE_PKVM_H__
- 
-+#include <asm/kvm_hcall.h>
- #include <asm/kvm_pkvm.h>
- 
- #include <nvhe/gfp.h>
-@@ -69,9 +70,10 @@ void pkvm_hyp_vm_table_init(void *tbl);
- 
- int __pkvm_reserve_vm(void);
- void __pkvm_unreserve_vm(pkvm_handle_t handle);
--int __pkvm_init_vm(struct kvm *host_kvm, void *vm_hva, void *pgd_hva);
-+int __pkvm_init_vm(struct kvm *host_kvm, void __hostva *vm_hva,
-+		   void __hostva *pgd_hva);
- int __pkvm_init_vcpu(pkvm_handle_t handle, struct kvm_vcpu *host_vcpu,
--		     void *vcpu_hva);
-+		     void __hostva *vcpu_hva);
- 
- int __pkvm_reclaim_dying_guest_page(pkvm_handle_t handle, u64 gfn);
- int __pkvm_start_teardown_vm(pkvm_handle_t handle);
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/trace.h b/arch/arm64/kvm/hyp/include/nvhe/trace.h
-index 4aa36fd76b9e2..58e0ad3329034 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/trace.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/trace.h
-@@ -4,6 +4,7 @@
- 
- #include <linux/trace_remote_event.h>
- 
-+#include <asm/kvm_hcall.h>
- #include <asm/kvm_hyptrace.h>
- 
- static inline pid_t __tracing_get_vcpu_pid(struct kvm_cpu_context *host_ctxt)
-@@ -46,7 +47,7 @@ static inline pid_t __tracing_get_vcpu_pid(struct kvm_cpu_context *host_ctxt)
- void *tracing_reserve_entry(unsigned long length);
- void tracing_commit_entry(void);
- 
--int __tracing_load(void *desc_va, size_t desc_size);
-+int __tracing_load(void __hostva *desc_va, size_t desc_size);
- void __tracing_unload(void);
- int __tracing_enable(bool enable);
- int __tracing_swap_reader(unsigned int cpu);
-@@ -59,7 +60,7 @@ static inline void tracing_commit_entry(void) { }
- #define HYP_EVENT(__name, __proto, __struct, __assign, __printk)      \
- 	static inline void trace_##__name(__proto) {}
- 
--static inline int __tracing_load(void *desc_va, size_t desc_size) { return -ENODEV; }
-+static inline int __tracing_load(void __hostva *desc_va, size_t desc_size) { return -ENODEV; }
- static inline void __tracing_unload(void) { }
- static inline int __tracing_enable(bool enable) { return -ENODEV; }
- static inline int __tracing_swap_reader(unsigned int cpu) { return -ENODEV; }
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index f2501249f4391..679b6df9c998d 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -269,7 +269,7 @@ DEFINE_KVM_HOST_HCALL0_VOID(__pkvm_vcpu_put)
- }
- 
- DEFINE_KVM_HOST_HCALL(int, __kvm_vcpu_run, 1,
--	struct kvm_vcpu *, host_vcpu)
-+	struct kvm_vcpu __hostva *, host_vcpu)
- {
- 	int ret;
- 
-@@ -294,7 +294,7 @@ DEFINE_KVM_HOST_HCALL(int, __kvm_vcpu_run, 1,
- 
- 		sync_hyp_vcpu(hyp_vcpu);
- 	} else {
--		struct kvm_vcpu *vcpu = kern_hyp_va(host_vcpu);
-+		struct kvm_vcpu *vcpu = kern_hyp_va_host(host_vcpu);
- 
- 		/* The host is fully trusted, run its vCPU directly. */
- 		fpsimd_lazy_switch_to_guest(vcpu);
-@@ -421,9 +421,9 @@ DEFINE_KVM_HOST_HCALL(int, __pkvm_host_mkyoung_guest, 1,
- }
- 
- DEFINE_KVM_HOST_HCALL_VOID(__kvm_adjust_pc, 1,
--	struct kvm_vcpu *, vcpu)
-+	struct kvm_vcpu __hostva *, vcpu)
- {
--	__kvm_adjust_pc(kern_hyp_va(vcpu));
-+	__kvm_adjust_pc(kern_hyp_va_host(vcpu));
- }
- 
- DEFINE_KVM_HOST_HCALL0_VOID(__kvm_flush_vm_context)
-@@ -432,27 +432,27 @@ DEFINE_KVM_HOST_HCALL0_VOID(__kvm_flush_vm_context)
- }
- 
- DEFINE_KVM_HOST_HCALL_VOID(__kvm_tlb_flush_vmid_ipa, 3,
--	struct kvm_s2_mmu *, mmu, phys_addr_t, ipa, int, level)
-+	struct kvm_s2_mmu __hostva *, mmu, phys_addr_t, ipa, int, level)
- {
--	__kvm_tlb_flush_vmid_ipa(kern_hyp_va(mmu), ipa, level);
-+	__kvm_tlb_flush_vmid_ipa(kern_hyp_va_host(mmu), ipa, level);
- }
- 
- DEFINE_KVM_HOST_HCALL_VOID(__kvm_tlb_flush_vmid_ipa_nsh, 3,
--	struct kvm_s2_mmu *, mmu, phys_addr_t, ipa, int, level)
-+	struct kvm_s2_mmu __hostva *, mmu, phys_addr_t, ipa, int, level)
- {
--	__kvm_tlb_flush_vmid_ipa_nsh(kern_hyp_va(mmu), ipa, level);
-+	__kvm_tlb_flush_vmid_ipa_nsh(kern_hyp_va_host(mmu), ipa, level);
- }
- 
- DEFINE_KVM_HOST_HCALL_VOID(__kvm_tlb_flush_vmid_range, 3,
--	struct kvm_s2_mmu *, mmu, phys_addr_t, start, unsigned long, pages)
-+	struct kvm_s2_mmu __hostva *, mmu, phys_addr_t, start, unsigned long, pages)
- {
--	__kvm_tlb_flush_vmid_range(kern_hyp_va(mmu), start, pages);
-+	__kvm_tlb_flush_vmid_range(kern_hyp_va_host(mmu), start, pages);
- }
- 
- DEFINE_KVM_HOST_HCALL_VOID(__kvm_tlb_flush_vmid, 1,
--	struct kvm_s2_mmu *, mmu)
-+	struct kvm_s2_mmu __hostva *, mmu)
- {
--	__kvm_tlb_flush_vmid(kern_hyp_va(mmu));
-+	__kvm_tlb_flush_vmid(kern_hyp_va_host(mmu));
- }
- 
- DEFINE_KVM_HOST_HCALL_VOID(__pkvm_tlb_flush_vmid, 1,
-@@ -468,9 +468,9 @@ DEFINE_KVM_HOST_HCALL_VOID(__pkvm_tlb_flush_vmid, 1,
- }
- 
- DEFINE_KVM_HOST_HCALL_VOID(__kvm_flush_cpu_context, 1,
--	struct kvm_s2_mmu *, mmu)
-+	struct kvm_s2_mmu __hostva *, mmu)
- {
--	__kvm_flush_cpu_context(kern_hyp_va(mmu));
-+	__kvm_flush_cpu_context(kern_hyp_va_host(mmu));
- }
- 
- DEFINE_KVM_HOST_HCALL_VOID(__kvm_timer_set_cntvoff, 1,
-@@ -499,15 +499,15 @@ DEFINE_KVM_HOST_HCALL0_VOID(__vgic_v3_init_lrs)
- }
- 
- DEFINE_KVM_HOST_HCALL_VOID(__vgic_v3_save_aprs, 1,
--	struct vgic_v3_cpu_if *, cpu_if)
-+	struct vgic_v3_cpu_if __hostva *, cpu_if)
- {
--	__vgic_v3_save_aprs(kern_hyp_va(cpu_if));
-+	__vgic_v3_save_aprs(kern_hyp_va_host(cpu_if));
- }
- 
- DEFINE_KVM_HOST_HCALL_VOID(__vgic_v3_restore_vmcr_aprs, 1,
--	struct vgic_v3_cpu_if *, cpu_if)
-+	struct vgic_v3_cpu_if __hostva *, cpu_if)
- {
--	__vgic_v3_restore_vmcr_aprs(kern_hyp_va(cpu_if));
-+	__vgic_v3_restore_vmcr_aprs(kern_hyp_va_host(cpu_if));
- }
- 
- DEFINE_KVM_HOST_HCALL(int, __pkvm_init, 4,
-@@ -579,16 +579,17 @@ DEFINE_KVM_HOST_HCALL_VOID(__pkvm_unreserve_vm, 1,
- }
- 
- DEFINE_KVM_HOST_HCALL(int, __pkvm_init_vm, 3,
--	struct kvm *, host_kvm, void *, vm_hva, void *, pgd_hva)
-+	struct kvm __hostva *, host_kvm, void __hostva *, vm_hva,
-+	void __hostva *, pgd_hva)
- {
--	return __pkvm_init_vm(kern_hyp_va(host_kvm), vm_hva, pgd_hva);
-+	return __pkvm_init_vm(kern_hyp_va_host(host_kvm), vm_hva, pgd_hva);
- }
- 
- DEFINE_KVM_HOST_HCALL(int, __pkvm_init_vcpu, 3,
--	pkvm_handle_t, handle, struct kvm_vcpu *, host_vcpu,
--	void *, vcpu_hva)
-+	pkvm_handle_t, handle, struct kvm_vcpu __hostva *, host_vcpu,
-+	void __hostva *, vcpu_hva)
- {
--	return __pkvm_init_vcpu(handle, kern_hyp_va(host_vcpu), vcpu_hva);
-+	return __pkvm_init_vcpu(handle, kern_hyp_va_host(host_vcpu), vcpu_hva);
- }
- 
- DEFINE_KVM_HOST_HCALL0(int, __pkvm_vcpu_in_poison_fault)
-@@ -623,7 +624,7 @@ DEFINE_KVM_HOST_HCALL(int, __pkvm_finalize_teardown_vm, 1,
- }
- 
- DEFINE_KVM_HOST_HCALL(int, __tracing_load, 2,
--	void *, desc_hva, size_t, desc_size)
-+	void __hostva *, desc_hva, size_t, desc_size)
- {
- 	return __tracing_load(desc_hva, desc_size);
- }
-@@ -670,15 +671,15 @@ DEFINE_KVM_HOST_HCALL_VOID(__tracing_write_event, 1,
- }
- 
- DEFINE_KVM_HOST_HCALL_VOID(__vgic_v5_save_apr, 1,
--	struct vgic_v5_cpu_if *, cpu_if)
-+	struct vgic_v5_cpu_if __hostva *, cpu_if)
- {
--	__vgic_v5_save_apr(kern_hyp_va(cpu_if));
-+	__vgic_v5_save_apr(kern_hyp_va_host(cpu_if));
- }
- 
- DEFINE_KVM_HOST_HCALL_VOID(__vgic_v5_restore_vmcr_apr, 1,
--	struct vgic_v5_cpu_if *, cpu_if)
-+	struct vgic_v5_cpu_if __hostva *, cpu_if)
- {
--	__vgic_v5_restore_vmcr_apr(kern_hyp_va(cpu_if));
-+	__vgic_v5_restore_vmcr_apr(kern_hyp_va_host(cpu_if));
- }
- 
- typedef void (*hcall_t)(struct kvm_cpu_context *);
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index 205c52535c887..bfc9f07f336a1 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -644,9 +644,9 @@ static size_t pkvm_get_hyp_vm_size(unsigned int nr_vcpus)
- 		size_mul(sizeof(struct pkvm_hyp_vcpu *), nr_vcpus));
- }
- 
--static void *map_donated_memory_noclear(void *host_va, size_t size)
-+static void *map_donated_memory_noclear(void __hostva *host_va, size_t size)
- {
--	void *va = kern_hyp_va(host_va);
-+	void *va = kern_hyp_va_host(host_va);
- 
- 	if (!PAGE_ALIGNED(va))
- 		return NULL;
-@@ -658,7 +658,7 @@ static void *map_donated_memory_noclear(void *host_va, size_t size)
- 	return va;
- }
- 
--static void *map_donated_memory(void *host_va, size_t size)
-+static void *map_donated_memory(void __hostva *host_va, size_t size)
- {
- 	void *va = map_donated_memory_noclear(host_va, size);
- 
-@@ -805,7 +805,8 @@ void teardown_selftest_vm(void)
-  *
-  * Return 0 success, negative error code on failure.
-  */
--int __pkvm_init_vm(struct kvm *host_kvm, void *vm_hva, void *pgd_hva)
-+int __pkvm_init_vm(struct kvm *host_kvm, void __hostva *vm_hva,
-+		   void __hostva *pgd_hva)
- {
- 	struct pkvm_hyp_vm *hyp_vm = NULL;
- 	size_t vm_size, pgd_size;
-@@ -896,7 +897,7 @@ static int register_hyp_vcpu(struct pkvm_hyp_vm *hyp_vm,
- }
- 
- int __pkvm_init_vcpu(pkvm_handle_t handle, struct kvm_vcpu *host_vcpu,
--		     void *vcpu_hva)
-+		     void __hostva *vcpu_hva)
- {
- 	struct pkvm_hyp_vcpu *hyp_vcpu;
- 	struct pkvm_hyp_vm *hyp_vm;
-diff --git a/arch/arm64/kvm/hyp/nvhe/trace.c b/arch/arm64/kvm/hyp/nvhe/trace.c
-index 97203ddd3cf45..5d0fcdce9507d 100644
---- a/arch/arm64/kvm/hyp/nvhe/trace.c
-+++ b/arch/arm64/kvm/hyp/nvhe/trace.c
-@@ -206,9 +206,9 @@ static bool hyp_trace_desc_is_valid(struct hyp_trace_desc *desc, size_t desc_siz
- 	return true;
- }
- 
--int __tracing_load(void *desc_hva, size_t desc_size)
-+int __tracing_load(void __hostva *desc_hva, size_t desc_size)
- {
--	struct hyp_trace_desc *desc = kern_hyp_va(desc_hva);
-+	struct hyp_trace_desc *desc = kern_hyp_va_host(desc_hva);
- 	int ret;
- 
- 	ret = __admit_host_mem(desc, desc_size);
--- 
-2.39.5
+Hi Colton,
+
+The existence of the parameter makes sense, but can't the default be 
+arm_pmuv3.reserved_host_counters=0 instead of -1 (partition disabled)? 
+It's still a bit fiddly having to do two things to make it work, and 
+there's no documentation about what the defaults or other prerequisites 
+are. IMO it's not even trivial to work out that you need to prefix it 
+with "arm_pmuv3.", which documentation would improve.
+
+Testing the whole set I ran into a few issues:
+
+This warn is hit when there is some kind of interaction with sleeping. I 
+tried to bisect it but it only appears on the last commit when the 
+option to enable partitioning is added.
+
+	/*
+	 * ARM pmu always has to reprogram the period, so ignore
+	 * PERF_EF_RELOAD, see the comment below.
+	 */
+	if (flags & PERF_EF_RELOAD)
+		WARN_ON_ONCE(!(hwc->state & PERF_HES_UPTODATE));
+
+Steps to reproduce:
+
+Host (arm_pmuv3.reserved_host_counters=0):
+  $ sudo perf stat -C 2 -e \
+    'branches,branches,branches,branches,branches,branches'
+  $ sudo taskset --cpu-list 2 ./lkvm run --kernel \
+    /boot/vmlinux-7.1.0-rc7+ -m 1024 -c 1 --pmu
+
+Guest:
+  $ sleep 1
+
+   WARNING: drivers/perf/arm_pmu.c:302 at cpu_pm_pmu_notify+0x278/0x2c0, 
+CPU#2: swapper/2/0
+    Call trace:
+   cpu_pm_pmu_notify+0x278/0x2c0 (P)
+   notifier_call_chain+0x84/0x1d0
+   raw_notifier_call_chain+0x24/0x38
+   cpu_pm_exit+0x34/0x68
+   acpi_processor_ffh_lpi_enter+0x40/0x78
+   acpi_idle_lpi_enter+0x54/0x78
+   cpuidle_enter_state+0xb4/0x248
+   cpuidle_enter+0x44/0x68
+   do_idle+0x21c/0x300
+   cpu_startup_entry+0x40/0x50
+   secondary_start_kernel+0x120/0x150
+   __secondary_switched+0xc0/0xc8
+
+
+When running the guest on a single CPU I get different counts for the 
+same event for a single process, although this never happens on a host. 
+I think there might even be some Perf tests which expect them to be the 
+same, and this doesn't depend on whether any events are running on the 
+host or not. Not sure if you ran all the Perf selftests in a guest or not?
+
+I'm not sure if the exception level filtering isn't working or there is 
+something wrong with freezing. Doesn't the host PMU driver need to 
+freeze with HPME? I see it's still doing it with PMCR_EL0.E which 
+freezes the guest's counters now doesn't it?
+
+Host (arm_pmuv3.reserved_host_counters=0):
+  $ sudo taskset --cpu-list 2 ./lkvm run --kernel \
+    /boot/vmlinux-7.1.0-rc7+ -m 1024 -c 1 --pmu
+
+Guest:
+  $ perf stat -e branches,branches true
+
+   Performance counter stats for 'true':
+
+             167963      branches 
+
+             160925      branches
+
+
+  $ perf stat -e branches,branches,branches,branches,branches true
+
+   Performance counter stats for 'true':
+
+             164425      branches 
+
+             164425      branches 
+
+             164425      branches 
+
+             157743      branches 
+
+             157743      branches
+
+
+When running the guest on two CPUs I just get zeros. Do the kvm 
+selftests not catch this? Or is it something to do with my setup:
+
+Host (arm_pmuv3.reserved_host_counters=0):
+  $ sudo taskset --cpu-list 2-3 ./lkvm run --kernel \
+    /boot/vmlinux-7.1.0-rc7+ -m 1024 -c 1 --pmu
+
+Guest:
+  $ perf stat -e branches,branches true
+
+  Performance counter stats for 'true':
+
+                  0      branches 
+
+                  0      branches
+
+I also noticed I get the "squeezed" warning printed after launching the 
+guest but not using Perf. This comment implies that not using counters 
+makes it a nop:
+
+  	/*
+	 * If we aren't guest-owned then we know the guest isn't using
+	 * the PMU anyway, so no need to bother with the swap.
+	 */
+	if (vcpu->arch.pmu.access != VCPU_PMU_ACCESS_GUEST_OWNED)
+		return;
+
+But maybe linux is touching them in a way that makes them guest owned, 
+even on probe? Or is the guest/host ownership tracking not working, I 
+didn't look too hard.
+
+Finally I think there are 3 critical Sashiko comments on this version. 
+If they're false positives, then maybe some comments in the code or 
+commit messages could reassure it.
+
+Thanks
+James
+
+> v8:
+> 
+> * Rebase on top of v7.1-rc7.
+> 
+> * Implement Oliver Upton's accessor proposal to centralize PMU
+>    register access and simplify trap handlers. Instead of one singular
+>    accessor, implement as two because the read and write paths are
+>    always different anyway.
+> 
+> * Introduce the partitioning flag along with the
+>    kvm_pmu_is_partitioned predicate
+> 
+> * Don't use ifdef for partitioning predicates as that can be handled
+>    by has_vhe
+> 
+> * Clean up MDCR_EL2 handling by open-coding use_fgt and hpmn and
+>    unconditionally setting RES0 bits.
+> 
+> * Use {read,write}_pmcrcntrn in context swaps
+> 
+> * Put operators on preceeding lines
+> 
+> * Rename hw_cntr_mask to hw_cntr_impl to clarify it tracks the number
+>    of counters implemented by hardware
+> 
+> * Use GENMASK_ULL in mask functions returning u64
+> 
+> * warn_once when host events are squeezed out by guest counter
+>    allocations.
+> 
+> * Address Sashiko AI Review findings:
+> 
+>    - Critical fixes for lazy PMU context swaps (ensuring guest state is
+>      loaded on transition to GUEST_OWNED), PMSELR_EL0 trapping to
+>      prevent stale selector index, and masking guest PMCR_EL0 writes to
+>      prevent host reset.
+> 
+>    - High priority fixes for lock safety (disabling IRQs when acquiring
+>      perf context lock), disabling guest counters on vCPU put,
+>      preserving VHE host profiling in MDCR_EL2, waking halted vCPUs on
+>      guest PMU interrupts, masking host configuration leaks, preemption
+>      safety in per-CPU accesses, emulating PMCR.N reads, and preventing
+>      data races in PMOVSSET_EL0 accesses.
+> 
+>    - Medium/Low fixes for user-access fallback safety, VM-wide state
+>      modification restrictions, selftests type safety, and cleanup of
+>      unused fields and typos.
+> 
+> v7:
+> https://lore.kernel.org/kvmarm/20260504211813.1804997-1-coltonlewis@google.com/
+> 
+> v6:
+> https://lore.kernel.org/kvmarm/20260209221414.2169465-1-coltonlewis@google.com/
+> 
+> v5:
+> https://lore.kernel.org/kvmarm/20251209205121.1871534-1-coltonlewis@google.com/
+> 
+> v4:
+> https://lore.kernel.org/kvmarm/20250714225917.1396543-1-coltonlewis@google.com/
+> 
+> v3:
+> https://lore.kernel.org/kvm/20250626200459.1153955-1-coltonlewis@google.com/
+> 
+> v2:
+> https://lore.kernel.org/kvm/20250620221326.1261128-1-coltonlewis@google.com/
+> 
+> v1:
+> https://lore.kernel.org/kvm/20250602192702.2125115-1-coltonlewis@google.com/
+> 
+> [1] https://gitlab.com/qemu-project/kvm-forum/-/raw/main/_attachments/2025/Optimizing__itvHkhc.pdf
+> [2] https://www.youtube.com/watch?v=YRzZ8jMIA6M&list=PLW3ep1uCIRfxwmllXTOA2txfDWN6vUOHp&index=9
+> 
+> Colton Lewis (20):
+>    arm64: cpufeature: Add cpucap for HPMN0
+>    KVM: arm64: Reorganize PMU functions
+>    perf: arm_pmuv3: Generalize counter bitmasks
+>    perf: arm_pmuv3: Check cntr_mask before using pmccntr
+>    perf: arm_pmuv3: Allocate counter indices from high to low
+>    perf: arm_pmuv3: Add method to partition the PMU
+>    KVM: arm64: Set up FGT for Partitioned PMU
+>    KVM: arm64: Add Partitioned PMU register trap handlers
+>    KVM: arm64: Set up MDCR_EL2 to handle a Partitioned PMU
+>    KVM: arm64: Context swap Partitioned PMU guest registers
+>    KVM: arm64: Enforce PMU event filter at vcpu_load()
+>    perf: Add perf_pmu_resched_update()
+>    KVM: arm64: Apply dynamic guest counter reservations
+>    KVM: arm64: Implement lazy PMU context swaps
+>    perf: arm_pmuv3: Handle IRQs for Partitioned PMU guest counters
+>    KVM: arm64: Detect overflows for the Partitioned PMU
+>    KVM: arm64: Add vCPU device attr to partition the PMU
+>    KVM: selftests: Add find_bit to KVM library
+>    KVM: arm64: selftests: Add test case for Partitioned PMU
+>    KVM: arm64: selftests: Relax testing for exceptions when partitioned
+> 
+> Marc Zyngier (1):
+>    KVM: arm64: Reorganize PMU includes
+> 
+>   arch/arm/include/asm/arm_pmuv3.h              |  18 +
+>   arch/arm64/include/asm/arm_pmuv3.h            |  12 +-
+>   arch/arm64/include/asm/kvm_host.h             |  17 +-
+>   arch/arm64/include/asm/kvm_types.h            |   6 +-
+>   arch/arm64/include/uapi/asm/kvm.h             |   2 +
+>   arch/arm64/kernel/cpufeature.c                |  10 +-
+>   arch/arm64/kvm/Makefile                       |   2 +-
+>   arch/arm64/kvm/arm.c                          |   2 +
+>   arch/arm64/kvm/config.c                       |  41 +-
+>   arch/arm64/kvm/debug.c                        |  30 +-
+>   arch/arm64/kvm/pmu-direct.c                   | 507 ++++++++++++
+>   arch/arm64/kvm/pmu-emul.c                     | 684 +----------------
+>   arch/arm64/kvm/pmu.c                          | 720 ++++++++++++++++++
+>   arch/arm64/kvm/sys_regs.c                     | 271 +++++--
+>   arch/arm64/tools/cpucaps                      |   1 +
+>   arch/arm64/tools/sysreg                       |   6 +-
+>   drivers/perf/arm_pmuv3.c                      | 136 +++-
+>   include/kvm/arm_pmu.h                         |  93 ++-
+>   include/linux/perf/arm_pmu.h                  |   8 +
+>   include/linux/perf/arm_pmuv3.h                |  14 +-
+>   include/linux/perf_event.h                    |   3 +
+>   kernel/events/core.c                          |  31 +-
+>   tools/include/perf/arm_pmuv3.h                |  12 +-
+>   tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+>   .../selftests/kvm/arm64/vpmu_counter_access.c | 112 ++-
+>   tools/testing/selftests/kvm/lib/find_bit.c    |   2 +
+>   26 files changed, 1918 insertions(+), 823 deletions(-)
+>   create mode 100644 arch/arm64/kvm/pmu-direct.c
+>   create mode 100644 tools/testing/selftests/kvm/lib/find_bit.c
+> 
+> 
+> base-commit: 4549871118cf616eecdd2d939f78e3b9e1dddc48
 
