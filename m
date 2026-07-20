@@ -1,45 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D20B2DC767
-	for <kvmarm@lists.linux.dev>; Mon, 20 Jul 2026 17:26:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EBA43BF660
+	for <kvmarm@lists.linux.dev>; Mon, 20 Jul 2026 17:27:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784568371; cv=none; b=uBqHBG7Kj0cO8ilDCrYTj+vIenK/O5llRpoJgL5Qafh3Y6eMerY4YY8wAn8/PiEFWnfnqUF13s3h0LIlj08Jm8Mq4wCJ7hoP8g7Yf/TQlbP+oeS2MjBoPpRZw5X+L/4z/vlBwg0kPtZdXoal5ye53zCx1g9IxgRkSBdESj2HFRo=
+	t=1784568432; cv=none; b=lZ88m+yD1X+tDAhb6Z5pOKyR3InDUBnsTjUNExwYvdbmDIdUQGue8crObiEhR7UkxG92M+jYdxVFlmWq9NMSXTim2Z1lG2m/3UU6DiDB/LPRxQm7ViVZaVYoPzyMKVYUOfxUEFLOW34xDBxCBlYxFZj8ZjIq44S1yV3sts6HgKc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784568371; c=relaxed/simple;
-	bh=jitLO3J2G+rOHn6QSujUQFlQ/Ni5oaNqpBkx0d4mF2o=;
+	s=arc-20240116; t=1784568432; c=relaxed/simple;
+	bh=HrfSc50n+RKrv/xcfY1WSc86lQExZo2kmBW10ErMIAI=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=Jkfk8OfvVYMLidRPW4y3wIe8+n+5/IX65UM3ED0U4hLEp7S8FIvF+e/oEFAmq69pR1miLGOkhzLWDrF9xGfdaPylMPdWqKauRyesIU9nEZSbgazYMz+fF9eDj8GnIUt8fEx4R1+7pWSunLFpm+jTlsG8Kl9Ub0NUzCVPYr8aTfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=muUcm0YL; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=izVQxbE/Z+9/n1L3FjIEC8kx1CI9u93BIUcz8R4v2BqBneHGQsGFOWk6hnpmLFL14jQc+xB/jtY5RY/P9A/UvvYLfepkaZlJmAbRtGW8rW6FLAsJZhm6SBH+hXahGDFvzNSZpNdNdDJ4lm1K6jOC3BpSFaHE/21IvA0wi8JX6ms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QCoGZBf0; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="muUcm0YL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C1311F00A3A;
-	Mon, 20 Jul 2026 17:26:05 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QCoGZBf0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA6521F000E9;
+	Mon, 20 Jul 2026 17:27:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784568365;
-	bh=/ELN5yyeSjAvLqeKvuXZLpEoAFERkREAJ4XnyKcgHCk=;
+	s=k20260515; t=1784568428;
+	bh=YpuI9BADy8usDUG/l4/q/5dX16WB0oUvc2tdDhZeNPg=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=muUcm0YLzCSWrn8YaLGQsnTZ+9ZZokXPXCC2Loj9tg2+rFG1LbUHTsaFOcmrGpZVD
-	 zDL1gBbVJzwfuOxLB0aNoMaADKsMLVrNY1cjcomIm6yOUhqkrmo0AbZN09/K0Gv9xN
-	 eEHRa6oxGkkBojGbKitpXnNLI2suXfamdbVqt8VH8oGH0eVYEKFe2t0Ikr0lQYlbTL
-	 v0GUYHK74cNNiXw7kkwXEn2ezUiS4naC7jb9dCbsPGDyRvFyU/YyEN9+q0qohTPfjw
-	 yn4Q2D3z0dDdoiSuAyXkBDmUnskqJc/UTx4DKxvA7RILyOWbUQmggfz16GT6pVwv4k
-	 6QuQEPViyoIvQ==
+	b=QCoGZBf0cQ0yQF/aPAK0LYHpexfE92iUDnWe8bNE30DIgsPiNHpz96czvW5RaJ6qn
+	 L5SraiC5L/trobFJnqCeQbfyW1xuGzBiJXtkFUEfVOcFSp8EHP9rRj5JBBJP0QZYE4
+	 ndsE/mfQNqn89DngZ4L2GyiB4wcesNcyR2SXNqRV9YPVVCeMxP1d1Q9Xxn1d5aC2GK
+	 OUHEzZ8ubivLNZYh0PXQVr3UKOjgxM0OS8xojyVzUuydI+qTOLyBdE78duTUV3CHjW
+	 f6SjUO8BlR8fVfa7iAHI0Jp1UT2uQSdK/lnn9ybKTFA0xxWWw1n/d5HMLyp5xh1V87
+	 pONtHwaeZq54A==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v3 04/17] KVM: arm64: Add a heap allocator for the pKVM
- hyp
+Subject: Re: [PATCH v3 02/17] KVM: arm64: Add pkvm_remove_mappings
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Vincent Donnefort" <vdonnefort@google.com>
-Cc: "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260720171513.1415357-5-vdonnefort@google.com>
+Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev
+In-Reply-To: <20260720171513.1415357-3-vdonnefort@google.com>
 References: <20260720171513.1415357-1-vdonnefort@google.com>
- <20260720171513.1415357-5-vdonnefort@google.com>
+ <20260720171513.1415357-3-vdonnefort@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 20 Jul 2026 17:26:05 +0000
-Message-Id: <20260720172605.8C1311F00A3A@smtp.kernel.org>
+Date: Mon, 20 Jul 2026 17:27:07 +0000
+Message-Id: <20260720172707.BA6521F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,88 +46,60 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [High] ABBA deadlock between `allocator->lock` and global component locks=
- (`host_lock_component` / `hyp_lock_component`) during memory reclaim.
+- [Medium] Bounds checking `WARN_ON(from > to)` is evaluated after pointer =
+page-alignment, silently masking inverted address ranges and unmapping unin=
+tended memory.
 --
 
---- Patch [4]: [PATCH v3 04/17] KVM: arm64: Add a heap allocator for the pK=
-VM hyp ---
-commit d447b5e9c6a4ffa49271c884ed8ffeb170f35542
+--- Patch [2]: [PATCH v3 02/17] KVM: arm64: Add pkvm_remove_mappings ---
+commit baa2f13b846b3ed54bd502767e4372648ba03b42
 Author: Vincent Donnefort <vdonnefort@google.com>
-   =20
-KVM: arm64: Add a heap allocator for the pKVM hyp
 
-This commit introduces a generic heap allocator for the pKVM hypervisor
-to manage VA-contiguous memory dynamically. It allows the hypervisor to
-allocate and free memory on demand, replacing static memory donations
-from the host. The allocator supports memory reclaim, topping up, and=20
-includes chunk metadata hashing for corruption detection.
+KVM: arm64: Add pkvm_remove_mappings
 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/alloc.c b/arch/arm64/kvm/hyp/nvhe/al=
-loc.c
-> new file mode 100644
-> index 0000000000000..32c923d83f78b
-> --- /dev/null
-> +++ b/arch/arm64/kvm/hyp/nvhe/alloc.c
+This commit adds pkvm_remove_mappings() as a counterpart to
+pkvm_create_mappings(). It allows previously mapped ranges to be removed,
+which will be used by the upcoming pKVM heap allocator.
 
 [ ... ]
 
-> +static unsigned long hyp_allocator_drain_memcache(struct hyp_allocator *=
-allocator,
-> +						  struct kvm_hyp_memcache *host_mc,
-> +						  unsigned long target)
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mm.c b/arch/arm64/kvm/hyp/nvhe/mm.c
+> index 8b8c9d3dc82ad..5cd2f1fe51e4c 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mm.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mm.c
+> @@ -157,6 +157,19 @@ int pkvm_create_mappings(void *from, void *to, enum =
+kvm_pgtable_prot prot)
+>  	return ret;
+>  }
+> =20
+> +void pkvm_remove_mappings(void *from, void *to)
 > +{
-> +	struct kvm_hyp_memcache *mc =3D &allocator->mc;
-> +	unsigned long drained =3D 0;
+> +	u64 size;
 > +
-> +	while (target && mc->nr_pages) {
-> +		void *page =3D pop_hyp_memcache(mc, hyp_phys_to_virt);
+> +	to =3D PTR_ALIGN(to, PAGE_SIZE);
+> +	from =3D PTR_ALIGN_DOWN(from, PAGE_SIZE);
+> +	size =3D (u64)to - (u64)from;
+> +	WARN_ON(from > to);
+[Severity: Medium]
+Does checking from > to after page-alignment mask inverted bounds?
+
+If a caller provides inverted address bounds that are close enough (e.g.,
+from =3D 0x1050, to =3D 0x1040), the page-alignment operations will transfo=
+rm
+them into a valid range (from =3D 0x1000, to =3D 0x2000).
+
+The WARN_ON(from > to) check would then evaluate to false, bypassing the
+warning and silently unmapping unintended hypervisor memory.
+
+Could the WARN_ON(from > to) check be moved before the pointers are
+modified by PTR_ALIGN and PTR_ALIGN_DOWN?
+
 > +
-> +		memset(page, 0, PAGE_SIZE);
-> +		kvm_flush_dcache_to_poc(page, PAGE_SIZE);
-> +		push_hyp_memcache(host_mc, page, hyp_virt_to_phys);
-> +		WARN_ON(__pkvm_hyp_donate_host(hyp_virt_to_pfn(page), 1));
-> +
-> +		target--;
-> +		drained++;
-> +	}
-> +
-> +	return drained;
+> +	guard(hyp_spinlock)(&pkvm_pgd_lock);
+> +	WARN_ON(kvm_pgtable_hyp_unmap(&pkvm_pgtable, (u64)from, size) !=3D size=
+);
 > +}
-> +
-> +static void hyp_allocator_reclaim(struct hyp_allocator *allocator, struc=
-t kvm_hyp_memcache *host_mc,
-> +				  unsigned long target)
-> +{
-> +	if (!target)
-> +		return;
-> +
-> +	guard(hyp_spinlock)(&allocator->lock);
-> +
-> +	target -=3D hyp_allocator_drain_memcache(allocator, host_mc, target);
-
-[Severity: High]
-Does this sequence create an ABBA deadlock?
-
-In hyp_allocator_reclaim(), allocator->lock is held via the guard()
-before calling hyp_allocator_drain_memcache().
-
-hyp_allocator_drain_memcache() then calls __pkvm_hyp_donate_host(),
-which acquires the global component locks (host_lock_component() and
-hyp_lock_component()). This establishes a locking order of:
-allocator->lock -> component locks.
-
-Since hyp_alloc() is intended to be a generic heap allocator called
-during hypervisor operations (such as VM or vCPU creation) where
-component locks are likely already held prior to the allocation, could a
-concurrent reclaim trigger a deadlock when it tries to acquire the
-component locks?
-
-> +	if (!target)
-> +		return;
-> +
-> +	do {
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260720171513.1415=
-357-1-vdonnefort@google.com?part=3D4
+357-1-vdonnefort@google.com?part=3D2
