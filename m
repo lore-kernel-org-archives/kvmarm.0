@@ -1,149 +1,124 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58748450903
-	for <kvmarm@lists.linux.dev>; Mon, 20 Jul 2026 17:55:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 837FD449983
+	for <kvmarm@lists.linux.dev>; Mon, 20 Jul 2026 17:59:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784570120; cv=none; b=J/eVTPNAiSXkJ/nvEi3AnecP/gPB3iHdd+ZVujw3RYi1sCSRfq44swehc0zT4srvmRPIN93Vx3ojU0k3yw0KfJL2MJ5PT5y1PoUEDegvAsKWIbkqDzAzQREqp5M1Tp0HYFrOrFkHDh+wS5GzH6JXlFi9Y7UbL6vFyycbkFBiTWk=
+	t=1784570394; cv=none; b=NAqyUa3fIAlBztrbCecIcGQXgbps6mtnkEXeaePl0AkaJsRcDPLbbwZwr2TSqsIX2wofxNtLdGpOMWG7i5Lmvcn/K7tChkQ9o1okMlwCGyjxerodksaD3VhUoXYOeh2uPIFZxiSyecw3Ls5olG58Z3IO/58BXkhhCjp/nEHA9qk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784570120; c=relaxed/simple;
-	bh=VOMXgbgsC5LW7qn4YzmPLwyDSO8MkVLKOUNt1RRhFA0=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=RI96u6k8E+0+OEF1icTZzD6MXfxMnRJTv917J3Mq+HZ4hcd7gvHmahXiobJfVgqOjsHFBrbzrWrbpTWbBfIEmiM7guA6aKFS/iXelCvDBDkmt93a/ZmzMNiyrqvJ0GpsRyeeKARc+rQaII5GhtdnH5c/RrrF+j9guF4v132NN/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MAsc+Xm5; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784570394; c=relaxed/simple;
+	bh=eJV/QKPRl0nQ58CX6raU94v8GT2LbNVT4nHU4Cu9Qxk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ajcXjdzlCp7dB44TErAZuqBYw4WBVjxVmbsTxKMa6usd8JBBEhPNAcjyIbQeBvd4F4/5CJu6bzBW+T3214QYeeZkjPBxJn378uJSCEQ2s6HxNnA8LrRMX7+Ep6rGsSAuFEwLSGpv1beLbycCYafd2kDxVRJ4xR9AXME+HOTnVyg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BuqRmuxX; arc=none smtp.client-ip=95.215.58.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MAsc+Xm5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D4DF1F00A3A;
-	Mon, 20 Jul 2026 17:55:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784570114;
-	bh=EvtwgKob90Kqw/vuQAR5BMr7eGHLbwtw6ts07iL3wVA=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=MAsc+Xm5OyHzJrPgKCKqKr/4YNwn4yU/UqhuYpZImsAOj+pNJpOjJn8zrMFJjIYUf
-	 BTOV/ql4Ph7Z+MBz/AOn1+E+AmV13VopOINhwya7lXu2RMvrrDsMoJQDdQf9PBupIT
-	 9DawznTngoZ0TIMclFQXOG+cbtEoFQ3S5T+7Tis0iVEC7U8+IhBDAEQcbopIx6tmSN
-	 rQsGHq/7xAsQ8o+BUHWS8Wp3pZu61Hub7+R/5hdou9nJP2dQY+QEx50vmeDKJJfnSd
-	 J0x6SSChzy4LrnT1R63MBI6jUPcfSnulAAu17ltA9o4zApcaU3P9ws+CiZSgAcvJSQ
-	 FN5GXAXiDhg+A==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v1 11/11] KVM: arm64: Tag host-VA hypercall parameters
- __hostva
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Fuad Tabba" <fuad.tabba@linux.dev>
-Cc: "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>
-In-Reply-To: <20260720162412.1401272-2-fuad.tabba@linux.dev>
-References: <20260720161343.1367007-1-fuad.tabba@linux.dev>
- <20260720162412.1401272-1-fuad.tabba@linux.dev>
- <20260720162412.1401272-2-fuad.tabba@linux.dev>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 20 Jul 2026 17:55:13 +0000
-Message-Id: <20260720175513.8D4DF1F00A3A@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BuqRmuxX"
+X-Forwarded-Encrypted: i=1; AHgh+Rr0Hh1xDz47bnpTX7vLyQRToHKAnOEDMDNF+Z96wWFNgzDvSdGU3FjJwR0NbqWwiS4+bCvCtjQ=@lists.linux.dev
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1784570386;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pSjjs1T/fGlvzcUytES43w/zoIxeAWRYz4e8PGpL2fc=;
+	b=BuqRmuxXl+mvltlRSnUDam+gsIEEa9aNoqBHOws9Sxnf1FUsCCXMLR5eX+0dTiHcR75j6K
+	AVAWgd7Rh3xnTydhqV929I/dPssn7Y/iG+VEbRvWGM8rNEbD39WKs+lNlRyZaXZuJSox/W
+	3Klowie+srl8IWZusaZG7fvKaNpGvzc=
+X-Gm-Message-State: AOJu0YwhFGKuxlAMybAtRlgYOvFXz3qRU6+HjaAem2z7YUpUncoUWunQ
+	YXgqTgly4sBr4A7UfsleB6ObBMCTZUdpHNwvUzVPzk0nsb5RQtfq3ToOA7GcVCgCoR74Xbh/vVs
+	ag8asXE7VX3NYeYvN9OnzloSzcK63rnedL7ZkIY/I
+X-Received: by 2002:a05:622a:2b47:b0:4ff:c0e7:be9c with SMTP id
+ d75a77b69052e-525fcfa53f6mr4668601cf.0.1784570378553; Mon, 20 Jul 2026
+ 10:59:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+References: <20260720161343.1367007-1-fuad.tabba@linux.dev>
+ <20260720161343.1367007-10-fuad.tabba@linux.dev> <20260720172923.E4F161F000E9@smtp.kernel.org>
+In-Reply-To: <20260720172923.E4F161F000E9@smtp.kernel.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Mon, 20 Jul 2026 18:59:01 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTyOWhWRo=W0dp5qdBOLnaQMB9WW0Y8MOYDnJR_qHCs3AA@mail.gmail.com>
+X-Gm-Features: AUfX_mwcTtHzH5EdgVipRg09TkTHSMSuxIF002h3-f_9PAq_fJ2tY675UvpwgRI
+Message-ID: <CA+EHjTyOWhWRo=W0dp5qdBOLnaQMB9WW0Y8MOYDnJR_qHCs3AA@mail.gmail.com>
+Subject: Re: [PATCH v1 09/11] KVM: arm64: Type-check hypercall arguments at
+ the caller
+To: sashiko-reviews@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev, 
+	Oliver Upton <oupton@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Migadu-Flow: FLOW_OUT
 
-Thank you for your contribution! Sashiko AI review found 2 potential issue(=
-s) to consider:
+On Mon, 20 Jul 2026 at 18:29, <sashiko-bot@kernel.org> wrote:
+>
+> Thank you for your contribution! Sashiko AI review found 1 potential issu=
+e(s) to consider:
+>
+> Pre-existing issues:
+> - [High] Disabling the hypervisor trace clock fails to stop the backgroun=
+d clock synchronization worker.
+> --
+>
+> --- Patch [9]: [PATCH v1 09/11] KVM: arm64: Type-check hypercall argument=
+s at the caller ---
+> commit 171ebbffa4142a86e7fab981732cd83df6923869
+> Author: Fuad Tabba <fuad.tabba@linux.dev>
+>
+> KVM: arm64: Type-check hypercall arguments at the caller
+>
+> This commit replaces the untyped kvm_call_hyp_nvhe macro with typed stubs
+> generated for each declared hypercall. This ensures that hypercall argume=
+nts
+> are checked for correct number and types at compile time.
+>
+> > diff --git a/arch/arm64/kvm/hyp_trace.c b/arch/arm64/kvm/hyp_trace.c
+> > index 2411b4c32932c..7fe0e8feb7d7c 100644
+> > --- a/arch/arm64/kvm/hyp_trace.c
+> > +++ b/arch/arm64/kvm/hyp_trace.c
+>
+> [ ... ]
+>
+> [Severity: High]
+> This is a pre-existing issue, but I noticed a logic error in this same fi=
+le
+> in hyp_trace_clock_enable() when tracing is disabled:
+>
+> arch/arm64/kvm/hyp_trace.c:hyp_trace_clock_enable() {
+> ...
+>         if (!enable) {
+>                 cancel_delayed_work_sync(&hyp_clock->work);
+>                 hyp_clock->running =3D false;
+>         }
+> ...
+>
+> Does this accidentally restart the background clock synchronization worke=
+r
+> instead of stopping it?
 
-New issues:
-- [Medium] `kern_hyp_va_host()` macro fails to strip the `__hostva` address=
- space tag for Sparse.
+Yes. I will send a separate patch to fix this, as you noted, it's not
+introduced by this series.
 
-Pre-existing issues:
-- [Critical] Missing host pointer ownership validation in always-on hyperca=
-lls allows a malicious host to corrupt EL2-private memory (Confused Deputy).
---
 
---- Patch [11]: [PATCH v1 11/11] KVM: arm64: Tag host-VA hypercall paramete=
-rs __hostva ---
-commit 4acf0dff6116caffddce5517211ac9136d9b0ee1
-Author: Fuad Tabba <fuad.tabba@linux.dev>
+/fuad
 
-KVM: arm64: Tag host-VA hypercall parameters __hostva
-
-This commit introduces the __hostva sparse address space to tag host virtual
-addresses passed as hypercall arguments in the nVHE hypervisor. It adds
-kern_hyp_va_host() to explicitly unwrap and translate these tagged pointers,
-ensuring that untranslated host VAs are caught by sparse checks.
-
-> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kv=
-m_mmu.h
-> --- a/arch/arm64/include/asm/kvm_mmu.h
-> +++ b/arch/arm64/include/asm/kvm_mmu.h
-
-[ ... ]
-
-> @@ -140,6 +142,14 @@ static __always_inline unsigned long __kern_hyp_va(u=
-nsigned long v)
-> =20
->  #define kern_hyp_va(v) 	((typeof(v))(__kern_hyp_va((unsigned long)(v))))
-> =20
-> +/*
-> + * Translate a __hostva-tagged host VA, dropping the tag: the only sanct=
-ioned
-> + * unwrap. Translation only, no ownership or bounds validation; the resu=
-lt
-> + * carries the pointee type stripped of the tag and of any cv-qualifiers.
-> + */
-> +#define kern_hyp_va_host(v)						\
-> +	((TYPEOF_UNQUAL(*(v)) *)__kern_hyp_va((unsigned long)(__force void *)(v=
-)))
-
-[Severity: Medium]
-Does TYPEOF_UNQUAL() actually strip the address space tag in Sparse?
-
-Sparse treats address spaces as type qualifiers that typeof_unqual (and
-by extension TYPEOF_UNQUAL) does not remove, unlike const or volatile.
-Consequently, this cast evaluates to a pointer that still carries the
-__hostva tag.
-
-When assigned to a regular kernel pointer, this will trigger incorrect type
-in assignment (different address spaces) false positive warnings across the
-codebase when running make C=3D2.
-
-Should this use an explicit cast to __kernel (address_space(0)) to
-correctly strip the tag, similar to how per_cpu_ptr handles __percpu?
-
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe=
-/hyp-main.c
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-
-[ ... ]
-
-> @@ -421,9 +421,9 @@ DEFINE_KVM_HOST_HCALL(int, __pkvm_host_mkyoung_guest,=
- 1,
->  }
-> =20
->  DEFINE_KVM_HOST_HCALL_VOID(__kvm_adjust_pc, 1,
-> -	struct kvm_vcpu *, vcpu)
-> +	struct kvm_vcpu __hostva *, vcpu)
->  {
-> -	__kvm_adjust_pc(kern_hyp_va(vcpu));
-> +	__kvm_adjust_pc(kern_hyp_va_host(vcpu));
->  }
-
-[Severity: Critical]
-This is a pre-existing issue, but does this lack of ownership validation
-allow the host to corrupt EL2-private memory?
-
-Under pKVM, the host is treated as an adversary. If the host provides a
-TTBR1 virtual address that maps to an EL2-private physical address,
-kern_hyp_va_host() will translate it into a valid EL2 linear map pointer
-without verifying ownership.=20
-
-The hypervisor will then write into EL2-private memory when modifying
-flags in __kvm_adjust_pc() or hardware register state in
-__vgic_v3_save_aprs(), corrupting its own state or the state of
-protected guests.
-
-Should there be an explicit ownership check before dereferencing
-pointers from these always-on hypercalls?
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260720162412.1401=
-272-1-fuad.tabba@linux.dev?part=3D11
+>
+> Without a return statement inside the if (!enable) block, execution appea=
+rs
+> to continue down the function. This would cause the worker to be inadvert=
+ently
+> re-initialized and restarted, leaving the background task running and mak=
+ing
+> periodic __tracing_update_clock hypercalls indefinitely after tracing has
+> been disabled.
+>
+> --
+> Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260720162412.14=
+01272-1-fuad.tabba@linux.dev?part=3D9
