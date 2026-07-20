@@ -1,60 +1,62 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C9502F28EA
-	for <kvmarm@lists.linux.dev>; Mon, 20 Jul 2026 08:35:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB65537F732
+	for <kvmarm@lists.linux.dev>; Mon, 20 Jul 2026 08:53:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784536512; cv=none; b=tOX690lt4dl9OPc470G4F6g8yigapw7SkFoudYxc4zilYDslHtamOmCPNzF2LiW/wAsMOWPSczSJBGtJ74SuiG4oAGrsiHmWphhv1AH/kZJ37WWfaHVAWE3m+ZpL1XbRltuANlmG9Szl5hPxRcNYek1M+Vz94Uxw44mYUIx2S1E=
+	t=1784537619; cv=none; b=VMfHzT/Le04YHqQif8+7nZ1qIZg6QjREcbmiTv0X9XBLhODveeZsc62ipswvlf5mzVi7yxa2gAk0QdgsGDPGkAFRrukfsTtYANZM7T67bxfCI5GRyT3624w8Z25CepHZz/pjCVj2NHCbf5FZ44iLv91/UuO4uVlT6pshJq/Rmw4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784536512; c=relaxed/simple;
-	bh=Zd1wpy6j5eslq7JRXhCnn94i7JTqW6/xMDM1ttvsk3g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FFoJw1z9Wjbos7DtIJgoBz4GAj2TE6dbVwFx4FiSqji2YAnx1jTxWXx7/9OWG7qUUWsu1Iv+kkqg2DvBMG+e/C4BHmHiEEyuxkizN4g1CceC45OygYspoIZ2sTt6DjnNvWG0m5ARwJvvZDQ5BIIpkPiyc2x2VOtM5b3DD2gxggA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=VUn7VLZz; arc=none smtp.client-ip=217.140.110.172
+	s=arc-20240116; t=1784537619; c=relaxed/simple;
+	bh=GPcoRiOabqZcrKhtCc+010r/lyLlvM0NRgvjbYmd7Ls=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mFIxz9rEnLa8eRf4NHFsvOHquaDFBRY184iq8wakQTulJXTZ84aQgaxyOabO2X472judUoBkZwBPvjgD+v1JAF7mn0L8ZQrPgxwKtmVzuVHe1NX53W1kbULtUdsXLOZoykD9zJOoEApC3wn1O+t14Pg3Lwbxpbbwl0H4PI0+V8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=a3p+arOH; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="VUn7VLZz"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="a3p+arOH"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ABA102B;
-	Mon, 20 Jul 2026 01:35:05 -0700 (PDT)
-Received: from J2N7QTR9R3.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F01EE3F66F;
-	Mon, 20 Jul 2026 01:35:06 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BC9C42B;
+	Mon, 20 Jul 2026 01:53:31 -0700 (PDT)
+Received: from [10.164.19.57] (unknown [10.164.19.57])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D49D03FB82;
+	Mon, 20 Jul 2026 01:53:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1784536509; bh=Zd1wpy6j5eslq7JRXhCnn94i7JTqW6/xMDM1ttvsk3g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VUn7VLZzdIMhGN3GGLPkKrxXQfjuWBcPIW477yxizdTHNbmLa/OZf+x0wuxuItp02
-	 QNyX7iMqH/Pn3VO1oTNTKDwZgmsnJilYT38hOOR/cYKWtWg/Q1CVC2D8Jrx3xhmDak
-	 Btdy42sgXTdxHVr1o7vv5WzoU0Ldc0ZrIxc07c8A=
-Date: Mon, 20 Jul 2026 09:35:01 +0100
-From: Mark Rutland <mark.rutland@arm.com>
-To: Wei-Lin Chang <weilin.chang@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>, Fuad Tabba <tabba@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Dev Jain <dev.jain@arm.com>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	Sebastian Ene <sebastianene@google.com>,
-	Vincent Donnefort <vdonnefort@google.com>
-Subject: Re: [PATCH] KVM: arm64: ptdump: Flush the last region
-Message-ID: <al3dtUVPxBXY0AJP@J2N7QTR9R3.cambridge.arm.com>
-References: <20260717231233.2299068-1-weilin.chang@arm.com>
+	t=1784537615; bh=GPcoRiOabqZcrKhtCc+010r/lyLlvM0NRgvjbYmd7Ls=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=a3p+arOH4IgRk1UdjlpkNlL7fdOacQQheCQ+AEjtvgt29y2yTQ+2P3ZI+RRoC88+z
+	 2+C/Ph2/U6oUkMdI01CqAqixS5bJMyrn5sMtdEGWCGqEQ62x6ZOeL5haE9cSZKnn1q
+	 dzBpzHaZ2684ZHWnVMEbh9AcXc8LV6TcaGy/jANI=
+Message-ID: <ad52d1ee-04cb-42d7-b50c-dfb3d28db5df@arm.com>
+Date: Mon, 20 Jul 2026 14:23:29 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: arm64: ptdump: Flush the last region
+To: Wei-Lin Chang <weilin.chang@arm.com>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ linux-kernel@vger.kernel.org
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+ Fuad Tabba <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>,
+ Steffen Eiden <seiden@linux.ibm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, Ryan Roberts <ryan.roberts@arm.com>,
+ Sebastian Ene <sebastianene@google.com>,
+ Vincent Donnefort <vdonnefort@google.com>
+References: <20260717231233.2299068-1-weilin.chang@arm.com>
+Content-Language: en-US
+From: Dev Jain <dev.jain@arm.com>
 In-Reply-To: <20260717231233.2299068-1-weilin.chang@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sat, Jul 18, 2026 at 12:12:33AM +0100, Wei-Lin Chang wrote:
+
+
+On 18/07/26 4:42 am, Wei-Lin Chang wrote:
 > Currently the stage-2 ptdump calls note_page() at each leaf entry visit.
 > This simply misses the output of the last region, because note_page()
 > only dumps output when it detects a change in level/prot, or when the
@@ -67,9 +69,7 @@ On Sat, Jul 18, 2026 at 12:12:33AM +0100, Wei-Lin Chang wrote:
 > change after the last region. Additionally treat level == -1 as a last
 > flushing note_page() call and avoid dumping the name of the next marker
 > for this case.
-
-I think you can use note_page_flush() rather than doing that manually.
-
+> 
 > Fixes: 7c4f73548ed1 ("KVM: arm64: Register ptdump with debugfs on guest creation")
 > Reported-by: Sashiko AI <sashiko-bot@kernel.org>
 > Closes: https://lore.kernel.org/kvmarm/20260630122758.891011F00A3A@smtp.kernel.org/
@@ -89,25 +89,17 @@ I think you can use note_page_flush() rather than doing that manually.
 >  
 > -	write_lock(&kvm->mmu_lock);
 > +	guard(write_lock)(&kvm->mmu_lock);
+
+The guard clause change has nothing to do with the fix I think? Although the change
+is small and the fix is for a recent commit so maybe we don't care having this
+in the same patch - not sure how strict kvm reviewers are about this : )
+
+
 >  	ret = kvm_pgtable_walk(mmu->pgt, 0, BIT(mmu->pgt->ia_bits), &walker);
 > -	write_unlock(&kvm->mmu_lock);
 > +	if (ret)
 > +		return ret;
 > +	note_page(&st->parser_state.ptdump, BIT(mmu->pgt->ia_bits), -1, 0);
-
-This can be:
-
-	note_page_flush(&st->parser_state.ptdump);
-
-The level change alone should trigger the dump, so the address doesn't
-need to be at the end of the guest IPA space.
-
-Importantly, note_page_flush() will pass 0 as the address, which won't
-trigger the checks you try to suppress below.
-
-Please use note_page_flush() here, and drop the changes to
-arch/arm64/mm/ptdump.c.
-
 >  
 > -	return ret;
 > +	return 0;
@@ -123,6 +115,10 @@ arch/arm64/mm/ptdump.c.
 >  	struct ptdump_pg_level *pg_level = st->pg_level;
 >  	static const char units[] = "KMGTPE";
 > +	bool flush = level == -1;
+
+Can we do something similar to what S1 ptdump does (note_page_flush in ptdump_walk_pgd).
+
+
 >  	ptdesc_t prot = 0;
 >  
 >  	/* check if the current level has been folded dynamically */
@@ -135,10 +131,6 @@ arch/arm64/mm/ptdump.c.
 >  			st->marker++;
 >  			pt_dump_seq_printf(st->seq, "---[ %s ]---\n", st->marker->name);
 >  		}
-
-If you use note_page_flush(), addr will be 0. As the final marker is at
-BIT(pgtable->ia_bits), this condition cannot fire.
-
 > @@ -244,7 +245,7 @@ void note_page(struct ptdump_state *pt_st, unsigned long addr, int level,
 >  		st->level = level;
 >  	}
@@ -149,6 +141,3 @@ BIT(pgtable->ia_bits), this condition cannot fire.
 >  		pt_dump_seq_printf(st->seq, "---[ %s ]---\n", st->marker->name);
 >  	}
 
-Likewise here.
-
-Mark.
