@@ -1,129 +1,122 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9035337E5FD;
-	Mon, 20 Jul 2026 06:01:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6599323A561;
+	Mon, 20 Jul 2026 06:03:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784527271; cv=none; b=FuGMPHwFtr60yIMM2hURNlX8fjgAkjDSkpINZ7JZK3hWiPPxbVDPLKFXME9vuLiFg/iBWZtEePrn1seGIFnHu2roFEEvTCm9AFfppPB8BAxbL5zmgzcdcmOFOem0WoMXx8RSSEQA8JVt0PO8lD2HReuf3bf8Fbnh6hb3eqX84Jo=
+	t=1784527424; cv=none; b=FHgfV6k/6kAPcJ+utt71SI2rXlTtpu1VvpbP+lBJfKV6mRUBznAziLixjW78pffo58TD9l7h7oEJZb0azU+RO7H+ERQk/oEMtmqiwLoLwmFfQ13TEwLLu92d4OrI8AZAZEAT++dxQmkJ4Epn5C+N6SexkyW+5x4+1xEB1DLp1IE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784527271; c=relaxed/simple;
-	bh=odDOMYIFFSe5z17RLybFuXptLCjisF/47PJJeKbsbwI=;
+	s=arc-20240116; t=1784527424; c=relaxed/simple;
+	bh=AOqhmVm05+IXCHYbVyuORNDAcOWT2UJy4tAOpaBlr4k=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=I31xd8Rt9aTbY1RJwY1AkgcBiFCZZTTmbnLHtPoAZyahlToe5w5akAZgNndITfmZMlM3T+rFD7kCXZcIRIMhSf177VHOSMwb+UFWV8tgbBABOreRJBuuxxASuTtdLUzJ9lRHwkCsLbwcN1Y1kgklz7W/9mJKHi7HpRCAuDzOijo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KpLsx65o; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=WyQWAHdJGI4iEqbKYMlo172jL80iMFZqToTCaamhcuPIDoLTxtQ+pGQalsGMPQPV+/H+hg4v8xkRqCW7/XMz/eyJlLX9vfnX+NtmmZql2S5lTKo47sifJq4Pek5ikB+/xCiaJj7rfsW96pqqtNzZuKOdgaQIpSojhuDGRta4A7I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V8AnlbF1; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KpLsx65o"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 764901F000E9;
-	Mon, 20 Jul 2026 06:01:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V8AnlbF1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9C6C1F000E9;
+	Mon, 20 Jul 2026 06:03:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784527261;
-	bh=LeBLqrVuwp539+jfocvOT7dA2VjnTJS2r176DKcWYAc=;
+	s=k20260515; t=1784527415;
+	bh=3PLAZ2F8Ek2W3c5JVGwAy/aJ57wl9izpplJ3MzxwtYQ=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=KpLsx65onGSnw/rFuA0rR2TGEswO+AVLVWvTFxkRz7tr2xrWW9So0IKJzBrlyAZsH
-	 l6RpgEqh3HBofLgATVcjpxGpemDJFjppenwiKYbmGGkxS1oyqlC3lzlQSLYKfbO7QM
-	 HB8v/eaKtZ9/Dd5xUHC7bJSTbmIaXlwG9RUtdf2GA4jhIWtpaznlh1a1Iocd4Pf1ut
-	 E0kD/Kw07NFSWimOUtmVUAoP3cuQlp5qg82//vCKnkaZ7MRvEyOmx9K8XbNNveC3UA
-	 8Mu2bo1McXR1jsia4P0Feu893fIb0CH1CL/s3lmmFidlqDP5ont66CXXVvRd5NX6gH
-	 EbUmWm+bc6LpQ==
+	b=V8AnlbF10ABgFzCGBsMRr/tWpYjS4HEyAEAQPoI1jT+Y7O/+vOdYPM+Q1UdKSx6Hh
+	 KArY47KP0/7WpBqGx9N+JyHkKrEotPJiqS5sFfC0CAKwZAafZeEAlkARSh15bCJpyD
+	 bOGoUbxyW3tcDVOCmO0lzrnl5gtmrB9ARfENcgS9TuV5cCYMMDIPTvlTIzOcs0RJE0
+	 VG0yWVhS+JojWs6ect9EpbpIv+yl7pylVj0I2c7jIo22tHJZtHv2SSObDeMAEuHdfh
+	 jDBeRVrpvKq7xXcfKMMchXkj3Izhob6vZAgvimPdC4rQoP9h5IZMI2NqMcuJr0SEa8
+	 pJSigDqoI7atg==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v9 09/16] arm64: errata: Require Apple IMPDEF PMUv3
- traps on all CPUs
+Subject: Re: [PATCH v9 12/16] KVM: arm64: PMU: Pass the pPMU to
+ kvm_map_pmu_event()
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Akihiko Odaki" <odaki@rsg.ci.i.u-tokyo.ac.jp>
-Cc: kvm@vger.kernel.org, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, "Oliver
- Upton" <oupton@kernel.org>
-In-Reply-To: <20260720-hybrid-v9-9-2b713ca1b5dc@rsg.ci.i.u-tokyo.ac.jp>
+Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>, kvm@vger.kernel.org
+In-Reply-To: <20260720-hybrid-v9-12-2b713ca1b5dc@rsg.ci.i.u-tokyo.ac.jp>
 References: <20260720-hybrid-v9-0-2b713ca1b5dc@rsg.ci.i.u-tokyo.ac.jp>
- <20260720-hybrid-v9-9-2b713ca1b5dc@rsg.ci.i.u-tokyo.ac.jp>
+ <20260720-hybrid-v9-12-2b713ca1b5dc@rsg.ci.i.u-tokyo.ac.jp>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 20 Jul 2026 06:01:00 +0000
-Message-Id: <20260720060101.764901F000E9@smtp.kernel.org>
+Date: Mon, 20 Jul 2026 06:03:34 +0000
+Message-Id: <20260720060334.E9C6C1F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
 
-New issues:
-- [Critical] Permitting late CPUs with IMPDEF PMUv3 to boot without enablin=
-g hypervisor traps allows untrapped guest access to host PMU registers.
-
 Pre-existing issues:
-- [High] Writes to control-plane system registers in CPU capability enable =
-callbacks lack a mandatory `isb()` instruction.
+- [Critical] Host kernel panic via NULL pointer dereference in PMU event cr=
+eation when a guest without a PMU toggles `MDCR_EL2.HPME`.
 --
 
---- Patch [9]: [PATCH v9 09/16] arm64: errata: Require Apple IMPDEF PMUv3 t=
-raps on all CPUs ---
-commit 3e98f085c1f1b418fb0ec6e336b981ba1df07b03
+--- Patch [12]: [PATCH v9 12/16] KVM: arm64: PMU: Pass the pPMU to kvm_map_=
+pmu_event() ---
+commit 61c39cb093b2170b92839ae7097044db9d1474cc
 Author: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
 
-arm64: errata: Require Apple IMPDEF PMUv3 traps on all CPUs
+KVM: arm64: PMU: Pass the pPMU to kvm_map_pmu_event()
 
-This commit changes the ARM64_WORKAROUND_PMUV3_IMPDEF_TRAPS erratum to an
-all-early-CPU capability. It ensures the capability is only advertised if a=
-ll
-early CPUs match, aiming to reject late CPUs that miss the capability while
-permitting late CPUs to have it when the system does not.
+This patch updates kvm_map_pmu_event() to accept the PMU structure directly
+rather than implicitly looking it up via the VM argument. This prepares the
+code to map events against a per-vCPU selected pPMU in the future.
 
-> diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errat=
-a.c
-> index 1995e1198648e..a5ae628204a12 100644
-> --- a/arch/arm64/kernel/cpu_errata.c
-> +++ b/arch/arm64/kernel/cpu_errata.c
-
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index c5c505b6fc61c..27db8877f96ea 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
 [ ... ]
-
-> @@ -1005,7 +1005,7 @@ const struct arm64_cpu_capabilities arm64_errata[] =
-=3D {
->  	{
->  		.desc =3D "Apple IMPDEF PMUv3 Traps",
->  		.capability =3D ARM64_WORKAROUND_PMUV3_IMPDEF_TRAPS,
-> -		.type =3D ARM64_CPUCAP_LOCAL_CPU_ERRATUM,
-> +		.type =3D ARM64_CPUCAP_EARLY_LOCAL_CPU_FEATURE,
+> @@ -725,7 +723,7 @@ static void kvm_pmu_create_perf_event(struct kvm_pmc =
+*pmc)
+>  	 * Don't create an event if we're running on hardware that requires
+>  	 * PMUv3 event translation and we couldn't find a valid mapping.
+>  	 */
+> -	eventsel =3D kvm_map_pmu_event(vcpu->kvm, eventsel);
+> +	eventsel =3D kvm_map_pmu_event(vcpu->kvm->arch.arm_pmu, eventsel);
 
 [Severity: Critical]
-By changing the capability type to ARM64_CPUCAP_EARLY_LOCAL_CPU_FEATURE,
-does this allow a late CPU with IMPDEF PMUv3 to boot without enabling the
-hypervisor trap if the system lacks the capability system-wide?
+This is a pre-existing issue, but this change makes it a bit more explicit.
+Could this pass a NULL pointer to kvm_map_pmu_event() and cause a host kern=
+el
+panic?
 
-If an asymmetric system boots without the PMUv3 IMPDEF capability system-wi=
-de
-and a late Apple CPU with the feature is onlined, verify_local_cpu_caps()
-will permit the CPU. However, because system_has_cap is false, it skips
-caps->cpu_enable() which leaves HACR_EL2 bit 56 clear.
+If a guest with nested virtualization enabled but no PMU configured toggles
+the MDCR_EL2.HPME bit, access_mdcr() will unconditionally trigger a
+KVM_REQ_RELOAD_PMU request without checking if the VM actually has a PMU.
 
-Since KVM relies on this hardware trap to intercept these instructions and
-inject an UNDEF exception, could this missing trap allow a malicious guest
-scheduled on the late CPU to execute IMPDEF PMU instructions natively and
-manipulate host physical PMU state?
+When kvm_vcpu_reload_pmu() handles this request on the next vCPU entry,
+it tries to reprogram the cycle counter (which defaults to enabled). This
+eventually reaches kvm_pmu_create_perf_event():
 
->  		.matches =3D has_impdef_pmuv3,
->  		.cpu_enable =3D cpu_enable_impdef_pmuv3_traps,
+arch/arm64/kvm/sys_regs.c:access_mdcr() {
+    ...
+    kvm_pmu_handle_mdcr(vcpu, old, val); /* Triggers KVM_REQ_RELOAD_PMU */
+}
 
-[Severity: High]
-This is a pre-existing issue, but do the writes to control-plane system
-registers in capability enable callbacks require an isb() synchronization
-barrier?
+arch/arm64/kvm/pmu-emul.c:kvm_pmu_create_perf_event() {
+    ...
+    eventsel =3D kvm_map_pmu_event(vcpu->kvm->arch.arm_pmu, eventsel);
+}
 
-Currently, callbacks like cpu_enable_impdef_pmuv3_traps update SYS_HACR_EL2
-using sysreg_clear_set_s, and then return immediately without a trailing
-isb(). Other callbacks like cpu_enable_trap_ctr_access and
-cpu_enable_cache_maint_trap update sctlr_el1 in a similar way.
+arch/arm64/kvm/pmu-emul.c:kvm_map_pmu_event() {
+    ...
+    if (unlikely(pmu->map_pmuv3_event)) /* NULL pointer dereference */
+}
 
-Under the ARM64 subsystem rules, every write to a control-plane system
-register must be followed by an isb() as the very next instruction. Since
-sysreg_clear_set_s does not issue this barrier, returning immediately places
-the return branch instruction against an architecturally undefined pipeline
-state. Should these callbacks issue an explicit isb() before returning?
+Because no PMU was initialized for this guest, vcpu->kvm->arch.arm_pmu is N=
+ULL.
 
->  	},
+Could access_mdcr() or kvm_pmu_create_perf_event() check if the PMU is
+actually initialized before attempting to create events?
+
+>  	if (eventsel < 0)
+>  		return;
+>
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260720-hybrid-v9-=
-0-2b713ca1b5dc@rsg.ci.i.u-tokyo.ac.jp?part=3D9
+0-2b713ca1b5dc@rsg.ci.i.u-tokyo.ac.jp?part=3D12
