@@ -1,56 +1,56 @@
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com [209.85.128.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4DA2445AC6
-	for <kvmarm@lists.linux.dev>; Mon, 20 Jul 2026 17:15:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D1153DA5AE
+	for <kvmarm@lists.linux.dev>; Mon, 20 Jul 2026 17:15:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784567725; cv=none; b=BgZ15i5Pex5qogU01u7Gj+Pob57HwiPFqTjscoRJFxNInL66rcBSIKEPYlYGWpA/biVC0CJMXwUPQ6MdMyt8DhhuMmvcG5AjF46rfXiFtrJN6kzKLXmPS8l8WffleXIdiil6Vbd8kH7WApqNSH3rmWfNnER8VdUOaJZcnny/CXg=
+	t=1784567727; cv=none; b=dsLA6AzwbY8sKAJf4DPtCoupykhKZ0cKO5u4DhhVK+H3XqDeaRXOzHpLA+psk5KIgbtiu6t8C4lIEdKSoE8+pRgSMcapfJDQrcu7K3PCxtVp8pn0/OCyhI6iwfTZilvRYXsefJi3jw3TKgNtK+bPkO1QOWErcHF1hIxAl+5vAs0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784567725; c=relaxed/simple;
-	bh=xPhHotVgi3UtDDRRKgaZEXaRB8BvlrE6zwflileImCA=;
+	s=arc-20240116; t=1784567727; c=relaxed/simple;
+	bh=STrNSoaRaszPDCM5qa+W1sX2l8dltFZoaa9YzJXTibY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=MCwHzrA6ag2M8vOC09tk1xKAuzbVogeFwCBPNYP+eSAVD6OPgoMCa0BapgWSE1RH1RjT/seCRA0W7i5dxIb0oxMYHp9WChPug9sG9TpTbJcnoeIAtY9hXFW7eimBL55wm3+4DHlCsMT6VIkujIjOy0JrMcOGtQOVqwUV7YH+elI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=p5PzbDwB; arc=none smtp.client-ip=209.85.128.69
+	 To:Cc:Content-Type; b=qaLuaGhS58TYx8xAeQOZ+y1obExcM/6z3mmsJD8HWtnbjynS9qrs++5IQUFA5cqDstU4qIRhGkXFh6bGgYN95YaQgIigwZbefpZi+VTu77gRY2BoruEOuje/EHq38YoIihl/2quo5oK6ry24B7nzCiadJ8HeZbeqUFfhkvwmAOw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=a4WGapbj; arc=none smtp.client-ip=209.85.128.71
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="p5PzbDwB"
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4955fd77c18so6770265e9.2
-        for <kvmarm@lists.linux.dev>; Mon, 20 Jul 2026 10:15:22 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="a4WGapbj"
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-493bfc3b84aso53560565e9.0
+        for <kvmarm@lists.linux.dev>; Mon, 20 Jul 2026 10:15:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1784567719; x=1785172519; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1784567721; x=1785172521; darn=lists.linux.dev;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=o9KxvNMIvUtQq3xLQOoAWnVxOnpsU0qAP80ryNPLHJM=;
-        b=p5PzbDwBYOw9VeNt7PRmDlQDgWclCVKFX69kHR61+kV95AllkB9wps7ImcSIjI35y2
-         zaVtvpY0INRasEN7us1C0kdxBYL1mOML8EGNLkwIDXMopEa9T+tnulLDR7kC083jkftz
-         jvzYajpn444yA8Mxwl2uGy9SR8tY/6eeQFliuXb6I7jC43q6CrkgNKpSTqFVp/H+Oaq0
-         ZgGWpsON5OzSrxYxoKNiUVk9YDBz9taLP5w5e/uAQqbo+5dPCpOvhhF46IFzP2F42y16
-         IzN7gjNqviGxj7kE6MuGcAdSSdrDowgqnRMCG5EK8sNhlWwsHieay+xPFAchmyVwKWO3
-         ciZA==
+        bh=4di4LOaQ0A+3KcJ0AQoWnaq05/jwn7QirA2DB77Ss6c=;
+        b=a4WGapbjR5vcnkY42fbZOPu5ujIAbtT+Etur9FHRoDZWCPCOdWUxcLe+r2/nAqnRwe
+         UK5UAZDp0oOdhersYMLgYRV/Z7TiJHCWJZrqExkhQjcYT3UhJiDf0zBYUfJ4O8NihnxV
+         NNIw6yZUPMFVUYHZoFxMLoCaaLjRhE6c6qfchxsPm7c3oB3W0pdIUaS6OI/OrsFpw496
+         urtvO+chgeYAlTm47V03JRhYWVS86Od2Q/r6k1Lo+tXx5TP+tXFzlybptCpdDXFhHmCT
+         RZ9j7/QEYHSxG+c/UX/lnRw3XYvc90Qiw8Oj7z5VK/yco626RK9LiHqNQy7qLaRzQA1Q
+         k4sA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784567719; x=1785172519;
+        d=1e100.net; s=20251104; t=1784567721; x=1785172521;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=o9KxvNMIvUtQq3xLQOoAWnVxOnpsU0qAP80ryNPLHJM=;
-        b=CZDK36TG/IbGInZiseCdWHK8Ok36BETxQH0zRHYy3qvvqIPjoR5TJ3PaB868x89l9Q
-         zAwN5a4FS0aoccFcfflRlNT6U3fAcmRrJXN9KD+kcGxEQzYPVQKixOdLaecLlAquksd3
-         aHu+HbYWOSvt1eSZUE1NmIoC8rqJOVJptEB3OS6txxCanECZRajq4JrL4fi3nTgaPdIJ
-         ZKvEdIgB9e3QQ5tKjqnAyTWkemDFIK9DoZSITGgUWdKneOX4TgZZFBQoMdHPZ8f1r4XH
-         jGZQ7Xd5z9dZywXZE0MQ0LF7qQg6UpnyK9igbJKFgtE3zsEubDHBb5yC3rUPF8+0s2yZ
-         4BHw==
-X-Forwarded-Encrypted: i=1; AHgh+Rolc9LQcz8UskqVBflEVIuyH9aUBGdNY8J2TOF5EpIkpDinE4+9CQDfwEW0f+g19Bsirigs10c=@lists.linux.dev
-X-Gm-Message-State: AOJu0YztC0cGOzGnt4d4odITxLQSNVegsogQe9AgDZvdxx0q94pPa7Cl
-	py/z+en+MXJ4pVsSQq+P9MnfMJq+TyThZg1rZM0O9cFCCV5mIHq4nCmy64vsNnDkphLo4ZhzYpA
-	JIseaFziyIVNoNYCYElM7yw==
-X-Received: from wmbjl1.prod.google.com ([2002:a05:600c:6a81:b0:495:571e:e5e2])
+        bh=4di4LOaQ0A+3KcJ0AQoWnaq05/jwn7QirA2DB77Ss6c=;
+        b=CMr0oiR+pjgXVv/O+/JFpXrjN7aGwloBwNlmEspwkPxb2kcUvbKg/rGcf7UM3znETW
+         /DhKLUj1YZ04K3O2wxyEJ/0cyMeXaaBoZGSP3WUMO6Ht46r2YCql3KgT5sr9EbmtiTjb
+         teYAOyoKnq97237t2Csc1f7AVewZRP+Er3Op5eGGLyC4PHb6fKMG4A1Mj+8QpS6u871r
+         CyUmTsQMxngMJZnhB2wuAWPPLKMIdFNhAQWciMBlpMD6w6Wo5pmdZnf/3EPBAd1ED4fk
+         HYfud1RJDF0U2ilSefL5nKm9wBCnb+Cgnu+HXDQq5HcDWSH5ky3rPLLBz8/gCyatlM3M
+         DN1Q==
+X-Forwarded-Encrypted: i=1; AHgh+RonmqV8DJDSvU0g7GVI1JyLa9L4nJO6FfGMQTfzOcGvYOudcj/dwcLhQWMebp8+J6mdlL0IVM4=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzrebEjOdxLY1JkVdrVBx8cCj0lAq8KmQlwjRjW3DtLOm1Fe4LY
+	/wfgGg1Fv0CPsJMzRmef2lLQoNKI+ZAcGCOcl9ig1TwnGr1ajs24Fg6Tbro+OKtJLpr6NU/nQn6
+	y3jZZmrtBdenlkOmUvZR2WA==
+X-Received: from wmcq16.prod.google.com ([2002:a05:600c:c110:b0:495:43e1:542c])
  (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:1554:b0:493:c10c:22f0 with SMTP id 5b1f17b1804b1-4954a50d963mr194510095e9.20.1784567719153;
- Mon, 20 Jul 2026 10:15:19 -0700 (PDT)
-Date: Mon, 20 Jul 2026 18:14:57 +0100
+ 2002:a05:600c:6d82:b0:495:4072:4194 with SMTP id 5b1f17b1804b1-4954a40c4acmr115784495e9.28.1784567720395;
+ Mon, 20 Jul 2026 10:15:20 -0700 (PDT)
+Date: Mon, 20 Jul 2026 18:14:58 +0100
 In-Reply-To: <20260720171513.1415357-1-vdonnefort@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -60,8 +60,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20260720171513.1415357-1-vdonnefort@google.com>
 X-Mailer: git-send-email 2.55.0.229.g6434b31f56-goog
-Message-ID: <20260720171513.1415357-2-vdonnefort@google.com>
-Subject: [PATCH v3 01/17] KVM: arm64: Add pkvm_private_va_range_pa
+Message-ID: <20260720171513.1415357-3-vdonnefort@google.com>
+Subject: [PATCH v3 02/17] KVM: arm64: Add pkvm_remove_mappings
 From: Vincent Donnefort <vdonnefort@google.com>
 To: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
 	linux-arm-kernel@lists.infradead.org
@@ -71,69 +71,49 @@ Cc: joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com,
 	Vincent Donnefort <vdonnefort@google.com>, Fuad Tabba <fuad.tabba@linux.dev>
 Content-Type: text/plain; charset="UTF-8"
 
-Mappings in the pKVM private range are not identity mapped, making the
-standard __hyp_pa() unsuitable for translating these addresses.
-
-Introduce pkvm_private_va_range_pa() to resolve physical addresses for
-this range by walking the hypervisor page-table. This will be useful for
-the upcoming pKVM heap allocator.
+Add the counterpart to pkvm_create_mappings(), allowing previously
+mapped ranges to be removed. This will be useful for the upcoming pKVM
+heap allocator to manage its private mappings.
 
 Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
 
 diff --git a/arch/arm64/kvm/hyp/include/nvhe/mm.h b/arch/arm64/kvm/hyp/include/nvhe/mm.h
-index 6e83ce35c2f2..85f1e3c711d9 100644
+index 85f1e3c711d9..00cadd13ee5d 100644
 --- a/arch/arm64/kvm/hyp/include/nvhe/mm.h
 +++ b/arch/arm64/kvm/hyp/include/nvhe/mm.h
-@@ -30,5 +30,6 @@ int __pkvm_create_private_mapping(phys_addr_t phys, size_t size,
+@@ -25,6 +25,7 @@ int hyp_back_vmemmap(phys_addr_t back);
+ int pkvm_cpu_set_vector(enum arm64_hyp_spectre_vector slot);
+ int pkvm_create_mappings(void *from, void *to, enum kvm_pgtable_prot prot);
+ int pkvm_create_mappings_locked(void *from, void *to, enum kvm_pgtable_prot prot);
++void pkvm_remove_mappings(void *from, void *to);
+ int __pkvm_create_private_mapping(phys_addr_t phys, size_t size,
+ 				  enum kvm_pgtable_prot prot,
  				  unsigned long *haddr);
- int pkvm_create_stack(phys_addr_t phys, unsigned long *haddr);
- int pkvm_alloc_private_va_range(size_t size, unsigned long *haddr);
-+phys_addr_t pkvm_private_va_range_pa(void *va);
- 
- #endif /* __KVM_HYP_MM_H */
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/spinlock.h b/arch/arm64/kvm/hyp/include/nvhe/spinlock.h
-index 7c7ea8c55405..260e14d6d200 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/spinlock.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/spinlock.h
-@@ -17,6 +17,8 @@
- #include <asm/lse.h>
- #include <asm/rwonce.h>
- 
-+#include <linux/cleanup.h>
-+
- typedef union hyp_spinlock {
- 	u32	__val;
- 	struct {
-@@ -122,4 +124,6 @@ static inline void hyp_assert_lock_held(hyp_spinlock_t *lock)
- static inline void hyp_assert_lock_held(hyp_spinlock_t *lock) { }
- #endif
- 
-+DEFINE_LOCK_GUARD_1(hyp_spinlock, hyp_spinlock_t, hyp_spin_lock(_T->lock),
-+		    hyp_spin_unlock(_T->lock))
- #endif /* __ARM64_KVM_NVHE_SPINLOCK_H__ */
 diff --git a/arch/arm64/kvm/hyp/nvhe/mm.c b/arch/arm64/kvm/hyp/nvhe/mm.c
-index 3b0bee496bff..8b8c9d3dc82a 100644
+index 8b8c9d3dc82a..5cd2f1fe51e4 100644
 --- a/arch/arm64/kvm/hyp/nvhe/mm.c
 +++ b/arch/arm64/kvm/hyp/nvhe/mm.c
-@@ -90,6 +90,17 @@ int pkvm_alloc_private_va_range(size_t size, unsigned long *haddr)
+@@ -157,6 +157,19 @@ int pkvm_create_mappings(void *from, void *to, enum kvm_pgtable_prot prot)
  	return ret;
  }
  
-+phys_addr_t pkvm_private_va_range_pa(void *va)
++void pkvm_remove_mappings(void *from, void *to)
 +{
-+	kvm_pte_t pte = 0;
++	u64 size;
++
++	to = PTR_ALIGN(to, PAGE_SIZE);
++	from = PTR_ALIGN_DOWN(from, PAGE_SIZE);
++	size = (u64)to - (u64)from;
++	WARN_ON(from > to);
 +
 +	guard(hyp_spinlock)(&pkvm_pgd_lock);
-+	WARN_ON(kvm_pgtable_get_leaf(&pkvm_pgtable, (u64)va, &pte, NULL));
-+	WARN_ON(!kvm_pte_valid(pte));
-+
-+	return kvm_pte_to_phys(pte) + offset_in_page(va);
++	WARN_ON(kvm_pgtable_hyp_unmap(&pkvm_pgtable, (u64)from, size) != size);
 +}
 +
- int __pkvm_create_private_mapping(phys_addr_t phys, size_t size,
- 				  enum kvm_pgtable_prot prot,
- 				  unsigned long *haddr)
+ int hyp_back_vmemmap(phys_addr_t back)
+ {
+ 	unsigned long i, start, size, end = 0;
 -- 
 2.55.0.229.g6434b31f56-goog
 
