@@ -1,109 +1,202 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F355A1CAA7D
-	for <kvmarm@lists.linux.dev>; Mon, 20 Jul 2026 15:46:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37C864398FA
+	for <kvmarm@lists.linux.dev>; Mon, 20 Jul 2026 16:14:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784562397; cv=none; b=FNDt0RRKDeHMK0xSZT6XJb7dAlIxGvydwSO1p6xsGbqpE5MXOpbbRNxHQ8Lecmmb6E5DShn8x3MxrrZm3e/8VjyUd3H9Q00SPYsytn6lEGh9AwWLJxLxVni0zs3yMm3q8bkkT1Oi6boB+GbcRAfvDvV9tAYBWLa5chI92He/SKQ=
+	t=1784564051; cv=none; b=DCP8kejV966PBk4kG+f7UuT80uAnwymcSANCdUNxYOdQDwGl9OPrd1bzKE5TfY1QwNq8CmMbhktqbBf7zdVrKioJPPqD6oimY9QnFgFoC15dzt5JwY4pSw76MEGpMEA1mLFMnaXYamy+ccVQciu5TNC7vAowI0T+6TgOn2h+qyI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784562397; c=relaxed/simple;
-	bh=r4x0n1LKwXTyDUZsDsnMK4xrUnQI2OhvQynwowkDjL4=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RB18SRECJYWPU9JmwQj53J6LFwD8lD7W1HlGhPApu0/w4rws4ugEewqdzDLIuC4w2aPppP3OfFMWjMP/9KbZKnS9rbZRzoPRkCxXnWz0wAtgm1hEd/yTeOJ0AvYFyYobHulVqmztj0DSRA8K4D4Mfn0AP//fB7ZG3TAhZ5m7vOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dstj0oUR; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784564051; c=relaxed/simple;
+	bh=fPa6dpmnRCFCwQAqANXk3gqiLiLlquzYpH8tTx/tlZ4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=EFckgKDkkp05n/EcHUGRDe71NK9rdHA0CEoT/QrkXA8+XsICw5QLu0fCBx/NIs/cRNZqWTX4Mn6VJEjAJbjxIWlHD2y+Bcdx85VQmwjqE1pAMGLiaHRzfTwjOjCjDx10op88X/nUPcWx10XeP0oiYX7aFTvWc5LRy9KiaNHKZt8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BmBCJn/z; arc=none smtp.client-ip=91.218.175.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dstj0oUR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C57A61F000E9;
-	Mon, 20 Jul 2026 15:46:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784562395;
-	bh=qC0oyjZRLPuK+GQFJvM2S1G+hvGV2beKz0IWEpIWH4M=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=dstj0oURLKHuCq5UW8kl0eKs+3ksI9ZqIhNDPJkhi9HXLY5m8F5LmUBdmTBRH7HtK
-	 79E4BsfdQH8BnZF9d1oIiGnLOCO7Nnr58LIgYZKGnD5XY3/Oh7qJlEx9bkoSNz8JzN
-	 JH7Goi+aIEmtJSnja3NO9UxLMi9a1t/770B6EqSV7l8d0uI482v4ub0N7Qs4Z/4uf2
-	 VSR9VsqOogHHMnavKVEXGXFZEFtfBjEubp5tmQAvOjJAPrp/dvGO8+i3VCnYdHwkFs
-	 upYRNyQ3+kRY3XNqwa+nM7PnlVx2lcFyXgGCk7pFiYXw4EHYAgBIcOvG3VCjNGMz+2
-	 YyL65Az7fJx8w==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wlqCP-00000006s7w-3Gwd;
-	Mon, 20 Jul 2026 15:46:33 +0000
-Date: Mon, 20 Jul 2026 16:46:33 +0100
-Message-ID: <864ihtfyue.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: oupton@kernel.org,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BmBCJn/z"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1784564037;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=+T4XfGGWKqGO5qW1/hqmDcFVs8BqeHmlk6ZGjsJbB94=;
+	b=BmBCJn/zjvoUN3dJ/h86NgWrMl2qctmyTZq5mSsahYAlreJS4EGoNak7ghDwYNWl5SmcLW
+	xfWStDIGO50m9DnWxygu+hizx6GIzcf2E06pS7FNh4kJzeW921f3kgfHaz3E1/gGpUqPW0
+	wm+kFXcs7ITJPC2SzWJcdaN6iir0Dq4=
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: maz@kernel.org,
+	oupton@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Cc: catalin.marinas@arm.com,
+	will@kernel.org,
+	rostedt@goodmis.org,
+	mhiramat@kernel.org,
+	alexandru.elisei@arm.com,
+	vdonnefort@google.com,
 	joey.gouly@arm.com,
 	seiden@linux.ibm.com,
 	suzuki.poulose@arm.com,
 	yuzenghui@huawei.com,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	steven.price@arm.com,
+	qperret@google.com,
+	ardb@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org,
+	tabba@google.com,
 	fuad.tabba@linux.dev
-Subject: Re: [PATCH v2] KVM: arm64: Reject guest_memfd memslots when the VM has MTE
-In-Reply-To: <20260720130942.135033-1-alexandru.elisei@arm.com>
-References: <20260720130942.135033-1-alexandru.elisei@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+Subject: [PATCH v1 00/11] KVM: arm64: Restore type-checking across the host/hyp hypercall boundary
+Date: Mon, 20 Jul 2026 17:13:32 +0100
+Message-Id: <20260720161343.1367007-1-fuad.tabba@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, oupton@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, steven.price@arm.com, fuad.tabba@linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, 20 Jul 2026 14:09:42 +0100,
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> 
-> The user cannot use MTE on VMAs created by mapping a guest_memfd file,
-> as arch_calc_vm_flag_bits() does not set VM_MTE_ALLOWED.
-> 
-> When creating a guest_memfd backed memslot,
-> kvm_arch_prepare_memory_region() rejects the memslot if MTE is enabled for
-> the VM and if guest_memfd has been mapped in a VMA that intersects the
-> memslot.
-> 
-> However, the documentation for KVM_SET_USER_MEMORY_REGION2 explicitly
-> states that the only condition for userspace_addr is for it to be a legal
-> userspace address, but the mapping is not required to be valid nor
-> populated at memslot creation.
-> 
-> If userspace sets userspace_addr to an address that hasn't been mapped, or
-> if userspace_addr belongs to a VMA that isn't backed by the guest_memfd
-> file, or if the VMA doesn't intersect the memslot, memslot creation is
-> successful and KVM ends up with a VM with MTE and guest_memfd-backed
-> memslots.
-> 
-> The same happens if the order is reversed: when userspace enables MTE, KVM
-> does not check if memslots backed by guest_memfd are already present.
-> 
-> Fix both issues by rejecting guest_memfd-backed memslots when MTE is
-> enabled, and by reject MTE when guest_memfd-backed memslots are already
-> present.
-> 
-> Fixes: 32e200bd6e44 ("KVM: arm64: Enable support for guest_memfd backed memory")
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Hi folks,
 
-This looks reasonable to me, but you probably want to capture some of
-that in the documentation one way or another, because this will leave
-the amateur VMM author puzzled for a bit...
+For a change, I thought I'd send a series that's neither a bunch of
+Sashiko bug fixes nor pKVM-specific.
 
-Thanks,
+The SMCCC conversion of the host/hyp interface reduced every hypercall
+to a function number and a pile of registers: kvm_call_hyp_nvhe() never
+shows the compiler a callable, so the caller's arguments and the
+handler's DECLARE_REG() casts can disagree in type, count or order
+without a diagnostic. Reviewing a fix for exactly that class of bug,
+Marc wrote [1]:
 
-	M.
+  "we lost all form of type-checking when everything was hastily
+   converted to SMCCC to avoid function pointers. Somehow, I feel that
+   the cure was worse than the disease.
 
+   I wish we'd reintroduce some form of compile-time checks, maybe by
+   having generated stubs?"
+
+and sketched the shape he preferred [2]: a generated nvhe_hvc_##f()
+stub that does the type-checking, driven by "some form of declarative
+IDL", with "both the caller and callee stubs ... totally generated".
+
+This series implements that, in plain preprocessor macros rather
+than an external generator, in the mold of the syscall wrappers.
+Each hypercall's signature is declared once, in kvm_hcall.h:
+kvm_call_hyp_nvhe() resolves to a typed nvhe_hvc_##f() stub
+generated from the declaration, and the hyp-main.c handlers
+unmarshal their arguments through glue that is type-checked
+against the same declaration. A mistyped or stale call, or a
+handler that drifts from its caller, now fails to compile. On top
+of that shared declaration, host-VA parameters gain a __hostva
+sparse address space, so dereferencing one at EL2 without
+kern_hyp_va_host() translation is flagged by sparse. The address
+space is KVM-private and lives with the interface it annotates
+rather than in compiler_types.h, like x86's __seg_gs in asm/percpu.h.
+The deeper instances of that bug class, host VAs reached through
+struct fields after the boundary, are follow-up work.
+
+The declarations do not also generate the function-number enum or the
+dispatch table. The enum carries the availability-band markers that
+decide when each hypercall becomes reachable, and its base entry is
+consumed from assembly, so generating it would hide the banding. The
+remaining duplication cannot drift silently: a name mismatch between
+declaration, caller and handler fails to compile, and a missing
+dispatch-table entry is rejected at run time as
+SMCCC_RET_NOT_SUPPORTED.
+
+Along the way it turned out "make C=2" has never checked the nVHE
+objects at all: the custom %.nvhe.o rule reuses rule_cc_o_c, which
+only hooks the checker for C=1, and that only on a rebuild. Patches
+2-5 fix the hook and the handful of pre-existing sparse warnings it
+flushes out, so the checker lands clean. The libfdt objects under
+arch/arm64/kernel/pi/ have the same gap through the same rule, so
+patch 6 gives them the same one-line fix; it touches arm64 core
+rather than KVM, so it can go through either tree. Patch 1 is
+adjacent: trace_remote_event.h is not self-contained (it uses bool
+without including linux/types.h), which the nVHE include order had
+been silently working around; it can go through the tracing tree
+instead if preferred.
+
+The first six patches do not depend on the type-checking work (the
+tracing-header fix, the sparse cleanups, and the two C=2 hook fixes),
+so they could be taken on their own, ahead of the rest of the series
+if that is easier.
+
+The series is structured as follows:
+
+  01:     Make trace_remote_event.h self-contained.
+  02-04:  Fix the pre-existing sparse warnings in the nVHE code.
+  05:     Run the source checker on nVHE objects under C=2.
+  06:     Same for the libfdt objects under arch/arm64/kernel/pi/.
+  07:     Pass the host-VA hypercall arguments as pointers at EL2.
+  08:     Move the dispatch macros to a new kvm_hcall.h.
+  09:     Declare the hypercall signatures, type-check the callers.
+  10:     Generate the handler unmarshalling, type-check the handlers.
+  11:     Tag host-VA parameters __hostva for sparse.
+
+The generated code is unchanged, checked by comparing the disassembly
+of every KVM object, function by function, against the base: the
+callers are identical apart from hypercall returns now being tested at
+their declared width and the stage-2 TLB-flush level argument now
+being sign-extended as it is loaded (an s8 passed as an int), and the
+handlers are instruction-for-instruction identical apart from
+flush_hyp_vcpu()/sync_hyp_vcpu() being inlined into their only
+caller. The extra argument that prompted the thread, a
+mistyped or reordered argument, and a handler that disagrees with its
+declaration all now fail to compile. checkpatch complains about the
+__KVM_HCALL_MAP() machinery, the (type, name) pair syntax and the
+generated signature typedefs, as it does about __MAP() in the syscall
+wrappers; the idiom cannot be parenthesized, and the typedef is what
+checks the handler against the declaration. Enforcing the
+__hostva tag needs sparse v0.6.5-rc1 or later for __typeof_unqual__,
+as all sparse checking on current kernels does; no stable sparse
+release has it yet, so build from sparse.git (checker-valid.sh skips
+the check, with a warning, on anything older).
+
+Based on Linux 7.2-rc4 (1590cf0329716).
+
+Cheers,
+/fuad
+
+[1] https://lore.kernel.org/all/86zf7po2n3.wl-maz@kernel.org/
+[2] https://lore.kernel.org/all/86wm2tnsd8.wl-maz@kernel.org/
+
+Fuad Tabba (11):
+  tracing: Include linux/types.h in trace_remote_event.h
+  KVM: arm64: nVHE: Share the stacktrace per-CPU declarations with EL2
+  KVM: arm64: nVHE: Declare the hyp event IDs before defining them
+  KVM: arm64: nVHE: Use NULL to reset the trace buffer backing pointer
+  KVM: arm64: nVHE: Run the source checker under C=2
+  arm64: pi: Run the source checker on the libfdt objects under C=2
+  KVM: arm64: nVHE: Pass host VA arguments as pointers
+  KVM: arm64: Move the host hypercall interface to its own header
+  KVM: arm64: Type-check hypercall arguments at the caller
+  KVM: arm64: nVHE: Check hypercall handlers against the declared ABI
+  KVM: arm64: Tag host-VA hypercall parameters __hostva
+
+ arch/arm64/include/asm/kvm_hcall.h       | 255 +++++++++++++
+ arch/arm64/include/asm/kvm_host.h        |  48 +--
+ arch/arm64/include/asm/kvm_mmu.h         |  10 +
+ arch/arm64/include/asm/stacktrace/nvhe.h |  10 +-
+ arch/arm64/kernel/pi/Makefile            |   1 +
+ arch/arm64/kvm/hyp/include/nvhe/pkvm.h   |   7 +-
+ arch/arm64/kvm/hyp/include/nvhe/trace.h  |   5 +-
+ arch/arm64/kvm/hyp/nvhe/Makefile         |   1 +
+ arch/arm64/kvm/hyp/nvhe/events.c         |   2 +
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c       | 443 +++++++++++------------
+ arch/arm64/kvm/hyp/nvhe/pkvm.c           |  12 +-
+ arch/arm64/kvm/hyp/nvhe/stacktrace.c     |   3 +-
+ arch/arm64/kvm/hyp/nvhe/trace.c          |   6 +-
+ arch/arm64/kvm/hyp_trace.c               |   2 +-
+ arch/arm64/kvm/stacktrace.c              |   3 -
+ include/linux/trace_remote_event.h       |   2 +
+ 16 files changed, 508 insertions(+), 302 deletions(-)
+ create mode 100644 arch/arm64/include/asm/kvm_hcall.h
+
+
+base-commit: 1590cf0329716306e948a8fc29f1d3ee87d3989f
 -- 
-Without deviation from the norm, progress is not possible.
+2.39.5
+
