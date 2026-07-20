@@ -1,32 +1,32 @@
-Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBAEA40D591
-	for <kvmarm@lists.linux.dev>; Mon, 20 Jul 2026 16:14:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5939D43935B
+	for <kvmarm@lists.linux.dev>; Mon, 20 Jul 2026 16:14:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784564056; cv=none; b=kC8/jD2AR3ka8uqva3toAQ5LQrJ0pzR27XIO4hg28xKduXanOX+B3eqJ9QdFGzSCm1fmWP2iIGpnZz4KcUEyYPybaDHpWFETfZr8bnHUQOlAMebgveh+UYFvznwVScdethsP3w7JfJeHeYCaNGZfvTB756x0FdKyH63acDqbbLM=
+	t=1784564056; cv=none; b=rUik993O5tX1uzTLhnSydnGIjTl3XhfQlT6NeoSnE2x0GwBj91NH+YvYxFz7qrcqEXI8AzRZC3loqFOYphSLfio4xr+A/6VSDfq+ndP6DZAjhbt0Ex1TIoyTfBZRYDiiRsh7CVIJslSeljVj/gacrKR3tZ2PBmbrXA6MhZMp2e0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1784564056; c=relaxed/simple;
-	bh=vvW0/jA7ePm0rNDq+fx+g/wMKArw+9c30EQyqkbccVQ=;
+	bh=HM94zVn6hEapOpL9Tc+aqxmNODShng3ax9h48TTB3TM=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=NyrwIXspiLsQaBBCdKkXEFswtXbfBTDakn1qVG29BhOLw2cclVlIVCT0guw2GJQe99eFWIo1oYof8HqwQJhAOhfFXJZlh7jYAHVfJGX+0z56z0Mag4cTB+DBEhC2YloxTHAYupi21DLpkW/SxpQCwLL1w9htBoVam9taKaEgOcQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=WvkjUqa0; arc=none smtp.client-ip=91.218.175.179
+	 MIME-Version; b=UT0rwIYIX8hiHmVcPKcpkz/6nCFWv7/UWt9G0cTelHZ4NGhWScOgnnQu19CmDJ4uyIjO2GNFY1T+nQZQhla2wl+IBgf76t9TIHXo+5ZY+7+Pwb48UjjTLWrqw5q6BS5l5EzksNHvJDPpRkYv4cs3AKz588s4ery+ZRQ74AOjGfE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mqdnL5Sl; arc=none smtp.client-ip=91.218.175.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="WvkjUqa0"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mqdnL5Sl"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1784564045;
+	t=1784564039;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=MYBvhRVLS4rmHY8yLwRGizM70Cgxz7F7JWhxEszoE3o=;
-	b=WvkjUqa0KjM0Xn4GpET+nJmIjBxJu0jVRji+PsCHPOdAbv8SSmYRjmTPSLVUE17/l8O++d
-	vxkruTYrOlXpjPcAJP4j+gjSfYwiHzFtT2JjAeUYEharXnuPXdA/JVR7UG6FnE1H9bFaSn
-	OdzzGZn/L5E915/VMso73QaXw47lSGs=
+	bh=GCBbrRKcGcDEgLZQwkzDEr2UVDx8peEyXcP2Ix5aats=;
+	b=mqdnL5SlGcDKU3SLKE2x8Q+vrORgSdKeeq8x1APaR01wHnNsOs08UO2R0afR58sZUk5x5x
+	oT85GeacKoVzxpSjMgECKTL/mmQWJ/wsz2x6VB5sUdt92cVTRHle+ml0WNQg38knAjV/gT
+	aCj1XOVzl14GajM5gPQi6uA59ayD19A=
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: maz@kernel.org,
 	oupton@kernel.org,
@@ -48,9 +48,9 @@ Cc: catalin.marinas@arm.com,
 	linux-trace-kernel@vger.kernel.org,
 	tabba@google.com,
 	fuad.tabba@linux.dev
-Subject: [PATCH v1 03/11] KVM: arm64: nVHE: Declare the hyp event IDs before defining them
-Date: Mon, 20 Jul 2026 17:13:35 +0100
-Message-Id: <20260720161343.1367007-4-fuad.tabba@linux.dev>
+Subject: [PATCH v1 01/11] tracing: Include linux/types.h in trace_remote_event.h
+Date: Mon, 20 Jul 2026 17:13:33 +0100
+Message-Id: <20260720161343.1367007-2-fuad.tabba@linux.dev>
 In-Reply-To: <20260720161343.1367007-1-fuad.tabba@linux.dev>
 References: <20260720161343.1367007-1-fuad.tabba@linux.dev>
 Precedence: bulk
@@ -62,32 +62,29 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-The defining expansion of HYP_EVENT() in events.c is the first time
-its translation unit meets hyp_event_id_<name>, so sparse suggests
-making the symbols static. Include kvm_hypevents.h ahead of
-define_events.h so the extern declarations come first, as with the
-tracepoint headers.
+trace_remote_event.h uses bool without including linux/types.h, so a
+translation unit that includes it ahead of anything else that pulls
+types.h in fails to build, as with nvhe/trace.h at EL2.
 
-No functional change intended.
-
+Fixes: 072529158e60 ("tracing: Add events to trace remotes")
 Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
- arch/arm64/kvm/hyp/nvhe/events.c | 2 ++
+ include/linux/trace_remote_event.h | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/events.c b/arch/arm64/kvm/hyp/nvhe/events.c
-index add9383aadb5a..b845be0acd117 100644
---- a/arch/arm64/kvm/hyp/nvhe/events.c
-+++ b/arch/arm64/kvm/hyp/nvhe/events.c
-@@ -7,6 +7,8 @@
- #include <nvhe/mm.h>
- #include <nvhe/trace.h>
+diff --git a/include/linux/trace_remote_event.h b/include/linux/trace_remote_event.h
+index c8ae1e1f5e721..e4cc2d4497bcf 100644
+--- a/include/linux/trace_remote_event.h
++++ b/include/linux/trace_remote_event.h
+@@ -3,6 +3,8 @@
+ #ifndef _LINUX_TRACE_REMOTE_EVENTS_H
+ #define _LINUX_TRACE_REMOTE_EVENTS_H
  
-+#include <asm/kvm_hypevents.h>
++#include <linux/types.h>
 +
- #include <nvhe/define_events.h>
- 
- int __tracing_enable_event(unsigned short id, bool enable)
+ struct trace_remote;
+ struct trace_event_fields;
+ struct trace_seq;
 -- 
 2.39.5
 
