@@ -1,75 +1,179 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35B29430790;
-	Mon, 20 Jul 2026 14:50:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EB912BE7DD;
+	Mon, 20 Jul 2026 15:03:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784559036; cv=none; b=KKCDhL/ZOZnePFFrsUgJ9jn1pL2DINvrCYgHIfv82x60vQ/lpQXss/chLRUSv2gcjYfiZKqQH8LDatPXbJ79DGbZpQSEJDGJh0lpjl6h2IeYWivq7R8lN7ROM7IkwJXIYyM3etyDuasax8LBs1427K35Rz0/JOwtNkoFz+Yg1MU=
+	t=1784559796; cv=none; b=S44T53AFlW3KcX16vrZ/2qHjTYpfbeKD1v4koAwkYxqFniIyb7bewfyFdhOdI2xXPshPSMxDLO6/poYVbBawurkYxvnrg97eU75kfy/vwoBPfmLZyyZjUUlINbTbPNIvi1U2KPA0sukdbqZt41hpGxUnPW/ok6Z6GrL8U6JikWc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784559036; c=relaxed/simple;
-	bh=FRf04JDNyz7fVzp86tX1ALj/XTyrRfiWdXqch44wSac=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ot2g7d/sYgvdVrTREd1BSiIKR7djOEG9Sv6DLMY+7RXDmZaIgUy99Sfz3FfaIsE0Qfw2GcAfMf+FdrJcQTty2GIlkbPHobn16Yk2syPsZHAaDEFT6PMIuim2tLoZDC+8uA2DzcX0bOOfzUH4IO7gNjXZr54WPZiZrE6iqq2toMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mxdvnPWc; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784559796; c=relaxed/simple;
+	bh=ecPphwYcfS/q9xG0DGZNMPggdMTPszdtVDUdQSiFCsU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=emyeqrk7G0QzFg+HLwj8L9CzR9zBLanmLuNAaZG0qVprPlL+WanolhtbQAwaICgGAcO5hSFzpOgZeQW3CQ4fpPc8kXEuw/+a5mpvOY8VfEjhgXpZwuMQGmjtgHVc4Y0zA1ReCcGX7ay9EKMaojlq4BkdH4m3LpP7bfVv/LP4NdA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=tcLaYrQh; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mxdvnPWc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C5281F00A3D;
-	Mon, 20 Jul 2026 14:50:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784559035;
-	bh=KFNU8BJwlHvz1GcHJV+TRpXlJabaxtHRpK2Bxx9BGIw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=mxdvnPWcJth+tLYm10nrY7UUySj0VsCNnDSWxhUkN6WNFp8tXvwRbdyHtW3mcCO4H
-	 o2CY8CwPlj83WhUy9ytsKzdhRvlbFXNTy0XRd/xO3KRlXx9xURw6xuD5MLCtJ+0WuQ
-	 WVeQ7FFb1y/BYqhc/IUUaMrUD2Az8V8Hrn967veMf9Rh3SbtTPP1f8/dbGsqTTlPFI
-	 qenpli2z2T1uReQ+jz4apllaZbK8JDQJyTR6kx3O551qAtADxfJoOe4hISp9iT0cwH
-	 mp/gKdkIHM980cARsHuBMTFfI4enBJ8GSkHMymdaCdpGz3llcLIL81zyt1W0OgKduu
-	 8Jw2tHMzCn7zA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wlpKD-00000006qkA-1qfZ;
-	Mon, 20 Jul 2026 14:50:33 +0000
-Date: Mon, 20 Jul 2026 15:50:33 +0100
-Message-ID: <865x29g1fq.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: sashiko-reviews@lists.linux.dev
-Cc: "Oliver Upton" <oupton@kernel.org>,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH 4/5] KVM: arm64: vgic-v3: Simplify initial GICv3 configuration sampling
-In-Reply-To: <20260720133827.2A32C1F000E9@smtp.kernel.org>
-References: <20260720132220.2143486-1-maz@kernel.org>
-	<20260720132220.2143486-6-maz@kernel.org>
-	<20260720133827.2A32C1F000E9@smtp.kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="tcLaYrQh"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 774EE143D;
+	Mon, 20 Jul 2026 08:03:09 -0700 (PDT)
+Received: from [10.57.85.41] (unknown [10.57.85.41])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 003F03F86F;
+	Mon, 20 Jul 2026 08:03:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1784559793; bh=ecPphwYcfS/q9xG0DGZNMPggdMTPszdtVDUdQSiFCsU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=tcLaYrQhKvN8Yc/TQ2ahVcIOzL1KArRBZfJQehK+OVeZMItiQh446Wp9ivSDlV7lQ
+	 aWjQlWvehMhUZHFZpvyWSII1cF4YDqhTuyZjoco4g1p8g0tQeia3g5T0mv2ldop1/i
+	 EjGNH1BFJmFrCg9cCDzgOQuO8ENAWIShOtG8MgRY=
+Message-ID: <f63c0275-1c26-49dd-a046-459728de6a39@arm.com>
+Date: Mon, 20 Jul 2026 16:03:11 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, oupton@kernel.org, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 6/6] firmware: arm_rmm: Ensure the RMM has GPT entries for
+ memory
+To: sashiko-reviews@lists.linux.dev
+Cc: Oliver Upton <oupton@kernel.org>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>
+References: <20260715142739.80398-1-steven.price@arm.com>
+ <20260715142739.80398-7-steven.price@arm.com>
+ <20260715154738.5339F1F000E9@smtp.kernel.org>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <20260715154738.5339F1F000E9@smtp.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, 20 Jul 2026 14:38:26 +0100,
-sashiko-bot@kernel.org wrote:
+On 15/07/2026 16:47, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 3 potential issue(s) to consider:
+> - [Medium] Host-side memory allocation failures are incorrectly parsed as RMI firmware errors.
+> - [Low] Empty or sub-page memblock regions are expanded into 1GB GPT allocations.
+> - [Low] Missing trailing newline in success message.
+> --
 > 
-> Thank you for your contribution! Sashiko AI review found 2 potential issue(s) to consider:
-> - [Medium] The `noinstr` function `kvm_patch_ich_vtr_el2()` calls a non-`noinstr` function (`vgic_v3_broken_seis()`), causing a `noinstr` section violation.
-> - [Medium] `WARN_ON` inside the `noinstr` alternative patching callback `kvm_patch_ich_vtr_el2()` violates instrumentation rules and risks deadlocks.
+> --- Patch [6]: [PATCH 6/6] firmware: arm_rmm: Ensure the RMM has GPT entries for memory ---
+> commit dfe33cca468028175b080bbcfc671eba1604716c
+> Author: Steven Price <steven.price@arm.com>
+> 
+> firmware: arm_rmm: Ensure the RMM has GPT entries for memory
+>     
+> This commit configures RMM memory tracking to ensure DRAM regions are 
+> tracked at FINE granularity. It statically allocates tracking granules and 
+> creates Level 1 GPT tables for these regions when needed.
+> 
+>> diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/arm_rmm/rmi.c
+>> index 6a9f61760fd77..d0c083bdf251f 100644
+>> --- a/drivers/firmware/arm_rmm/rmi.c
+>> +++ b/drivers/firmware/arm_rmm/rmi.c
+> 
+> [ ... ]
+> 
+>> @@ -604,6 +606,89 @@ static int rmi_configure(void)
+>>  	return 0;
+>>  }
+>>  
+>> +/*
+>> + * Make sure the area is tracked by RMM at FINE granularity.
+>> + * We do not support changing the tracking yet.
+>> + */
+> 
+> [ ... ]
+> 
+>> +static int rmi_create_gpts(phys_addr_t start, phys_addr_t end)
+>> +{
+>> +	struct rmi_sro_state *sro;
+>> +	unsigned long l0gpt_sz;
+>> +
+>> +	sro = kmalloc_obj(*sro, GFP_KERNEL);
+>> +	if (!sro)
+>> +		return -ENOMEM;
+>> +
+>> +	l0gpt_sz = 1UL << (30 + FIELD_GET(RMI_FEATURE_REGISTER_1_L0GPTSZ,
+>> +					  rmi_feat_reg(1)));
+>> +	start = ALIGN_DOWN(start, l0gpt_sz);
+>> +	end = ALIGN(end, l0gpt_sz);
+> 
+> [Severity: Low]
+> If a memblock region is smaller than a page or misaligned, is it possible
+> for the initial start physical address to be greater than or equal to end?
 
-[...]
+I don't understand how start >= end would work. That seems like a very
+broken memblock.
 
-See response to patch #2.
+> If so, applying ALIGN_DOWN() to start and ALIGN() to end could force 
+> start < end to evaluate to true for an originally empty region. Could this
+> cause the loop to inadvertently execute and allocate an L1 GPT table for a
+> 1GB block that contains no full pages?
 
-	M.
+A misaligned/small memblock would be very weird. But we'd still want a
+L1 GPT table to cover it.
 
--- 
-Without deviation from the norm, progress is not possible.
+>> +
+>> +	while (start < end) {
+>> +		int ret = rmi_gpt_l1_create(start, sro, GFP_KERNEL);
+>> +
+>> +		/*
+>> +		 * Make sure the L1 GPT tables are created for the region.
+>> +		 * RMI_ERROR_GPT indicates the L1 table already exists.
+>> +		 */
+>> +		if (ret != RMI_SUCCESS && RMI_RETURN_STATUS(ret) != RMI_ERROR_GPT) {
+> 
+> [Severity: Medium]
+> Since rmi_gpt_l1_create() can return a standard negative POSIX error code
+> like -ENOMEM from a host page allocation failure, does passing it to
+> RMI_RETURN_STATUS(ret) misinterpret the error?
+
+Note that rmi_gpt_l1_create() only returns "a standard negative POSIX
+error code" in the WARN_ON path. In the more usual case of out-of-memory
+then the operation is cancelled and the results of the cancelled
+operation is returned.
+
+> For -ENOMEM (-12), the macro extracts the lower bits (244), which won't
+> match RMI_ERROR_GPT. Could this result in printing a misleading "GPT Level1
+> table missing" error when the real issue is an out-of-memory condition in
+> the host kernel?
+
+Yes, although this is only after the WARN. I'm not sure it's really
+worth fixing the error message for this corner case.
+
+>> +			pr_err("GPT Level1 table missing for %llx\n", start);
+>> +			kfree(sro);
+>> +			return -ENOMEM;
+>> +		}
+>> +		start += l0gpt_sz;
+>> +	}
+>> +
+>> +	kfree(sro);
+>> +	return 0;
+>> +}
+> 
+> [ ... ]
+> 
+>> @@ -621,6 +706,13 @@ static int __init arm64_init_rmi(void)
+>>  	if (ret)
+>>  		return ret;
+>>  
+>> +	ret = rmi_init_metadata();
+>> +	if (ret)
+>> +		return ret;
+>> +
+>> +	arm64_rmi_is_available = true;
+>> +	pr_info("RMI configured");
+> 
+> [Severity: Low]
+> This isn't a bug, but should this include a trailing newline ("\n") to 
+> prevent subsequent kernel logs from being appended to the same line?
+
+This is actually a bug - yes that newline is missing.
+
+>> +
+>>  	return 0;
+>>  }
+>>
+> 
+
