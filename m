@@ -1,43 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20675446049
-	for <kvmarm@lists.linux.dev>; Mon, 20 Jul 2026 17:29:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B777143C7BF
+	for <kvmarm@lists.linux.dev>; Mon, 20 Jul 2026 17:31:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784568576; cv=none; b=jVasOz6PZAdpZV3rRnWvQugum6B+dry6pZZVO28ostAgw0bRyQRmqUMT1b4mJ5jf2e5vuXd7UIjJNAn69Km5J79pTDdtTnjLs/vMFxxlKw+O8IGon7E74BCwjXJeOUhUeNAlVLHmhQZ6nclNKFb5cdoN9CHs1zCP4IF63eG62o0=
+	t=1784568682; cv=none; b=lDyTtK/g4NS2NfeBLfG+JNenJAThsXlyFSCbC+hYfkJvRdaHR/iUZigvlQkNKJjZ6V6T2z1+cR3r08s/6Y27S9WjLjlp9hLMcbCRSxf64Ji4eEln5zAxCo69LseiwmLQZo86BCgf/vLDUyKlNgg7HD7qYmzt/v909/83i63mHO0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784568576; c=relaxed/simple;
-	bh=QH2OqkDdoMh1f0V6QtJoVxuIEuMhmyuhAjUqJmH0FnE=;
+	s=arc-20240116; t=1784568682; c=relaxed/simple;
+	bh=tTD7A7jElPBV6UI465kdtP53Nw0FGwDNdCtC1BODHr4=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=oyC24do7aWY+YIAwui/fgEHFSb5b8AfXAhc7I5dke+q9dDRASO2gb9wElWbt0QsF7699kS4NV1mi72JSIkKiz2aekHaFn7SWBARLQBdnPJn7Vd+ZVQlC9ljrj+jEfISky2EyD8EIDfn7TAR6nKBFDGk0sUXGkJNbc2Kj/1dawGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hUaD11Fa; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=JioNG+fiGId+d/ieQBu7Geb3dFmFKxYUXloOBvZwePaeNEIuvS4IhX302FsrKsEZWKTPtw4sZedAiFmvKT/sHjTOhD4OBkFB5rDwVhE/Bu0PNJxn9bcJqSuBJkpFkeKoA/GyP6zrpwUpDED26/HIFEE5SYe3TDal+nyPwEmnh7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MWH+I4dU; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hUaD11Fa"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9E481F00A3A;
-	Mon, 20 Jul 2026 17:29:25 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MWH+I4dU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA9101F000E9;
+	Mon, 20 Jul 2026 17:31:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784568565;
-	bh=1yX/mPuCzziFNlU3OWvd/HxON/FIH3pTocG55rzn8C0=;
+	s=k20260515; t=1784568673;
+	bh=aafJL6u+MyWawaBp369TCpqAtvMTuJS31h8j4n0O0io=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=hUaD11Fa0c5Vrz5haMkuIomKOgDsQU+W9v1j9WUTiPFzf1w97rJ81OcSnyrfIqzkU
-	 WHJwobzRsk/iyCjGkIr7pRC8G5oJIirPWjpCAFSHe9Pun4nkxLFY71B7m1ro93Sgm5
-	 Bnq29pk0nUb+ql+8WZi61dYSTfZ9CUPbrpRYLMvOOgNQC+LRYc5JJpzLC0LbJi0fc/
-	 N4//eUhMljuwifQio1yLVloEr+K6ZGaYaeCWUU46TJxtnGIZUkpGakFEscIrn4G5kf
-	 +CmFZ4+Y8iwrICpb2qrJuE+KpeuncRDjfq2X95CPSsVA7if5RyWjuNIBNiTVnSr3k9
-	 3C+cBHf2p9azA==
+	b=MWH+I4dU89BLJsV6jBB2mGadFcdLt0Dt63g9qSvpLAABSC/mfvxZ96eJJq+U6sDYS
+	 U7Nyh7NIqogl4N7675oyq+PHhVi2sEh9jHtAxzzohj1khwBSdqzx1KFzdm1GeN0BoE
+	 oA9fOACqYVy3aC4HlM7uLTXajBC+Xp4gMxT1nFCdcL0DvTbCx4s2HweTSnwneXZ4tx
+	 fFBBlXhrvd19p06RARUVdy3sZorjAT393WzuWMsk16MYQjSFVY1DGLUuA8yUb0KSGQ
+	 V1yMub+Pp8EXTDb4Qqe3LDsnsufV3n+a4SMgxHOzfckbL4GkNTdgH1Q3e62dn8Fb/e
+	 B0ujZ+Pr1VQLA==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v3 03/17] KVM: arm64: Add pkvm_map_private_va_range
+Subject: Re: [PATCH v3 09/17] KVM: arm64: Add selftests for the pKVM heap
+ allocator
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Vincent Donnefort" <vdonnefort@google.com>
-Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev
-In-Reply-To: <20260720171513.1415357-4-vdonnefort@google.com>
+Cc: "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>
+In-Reply-To: <20260720171513.1415357-10-vdonnefort@google.com>
 References: <20260720171513.1415357-1-vdonnefort@google.com>
- <20260720171513.1415357-4-vdonnefort@google.com>
+ <20260720171513.1415357-10-vdonnefort@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 20 Jul 2026 17:29:24 +0000
-Message-Id: <20260720172925.A9E481F00A3A@smtp.kernel.org>
+Date: Mon, 20 Jul 2026 17:31:12 +0000
+Message-Id: <20260720173112.EA9101F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -46,89 +47,81 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 2 potential issue(=
 s) to consider:
-- [High] `pkvm_map_private_va_range` does not roll back partially created m=
-appings if `kvm_pgtable_hyp_map` fails, causing Use-After-Free and isolatio=
-n breaches.
-- [Medium] Integer overflow in the bounds check of `pkvm_map_private_va_ran=
-ge` allows out-of-bounds requests to silently bypass validation.
+- [Medium] The `__KVM_HOST_SMCCC_FUNC___pkvm_hyp_alloc_selftest` hypercall =
+is incorrectly placed in the always-on band rather than the init-only band.
+- [Medium] Physical pages are permanently leaked in the hypervisor if the a=
+llocator selftest encounters an error.
 --
 
---- Patch [3]: [PATCH v3 03/17] KVM: arm64: Add pkvm_map_private_va_range -=
---
-commit c11c23d0f630b7a7c96e01ffbcb3dd1f881985c2
+--- Patch [9]: [PATCH v3 09/17] KVM: arm64: Add selftests for the pKVM heap=
+ allocator ---
+commit db8b74b081ab779ef5c70d80095da5b5809ca9d3
 Author: Vincent Donnefort <vdonnefort@google.com>
-Subject: KVM: arm64: Add pkvm_map_private_va_range
 
-This commit introduces pkvm_map_private_va_range() to map a physical range
-into the pKVM private VA range. This is in preparation for the upcoming pKVM
-heap allocator.
+KVM: arm64: Add selftests for the pKVM heap allocator
 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/mm.c b/arch/arm64/kvm/hyp/nvhe/mm.c
-> index 5cd2f1fe51e4c..20e4445dd57b7 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/mm.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/mm.c
+Introduce a comprehensive runtime selftest for the pKVM hypervisor heap
+allocator, executed during init when CONFIG_NVHE_EL2_DEBUG is enabled.
+
+> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kv=
+m_asm.h
+> index 0c3126179704f..08466f608d1f5 100644
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> @@ -92,6 +92,7 @@ enum __kvm_host_smccc_func {
+>  	__KVM_HOST_SMCCC_FUNC___pkvm_hyp_topup,
+>  	__KVM_HOST_SMCCC_FUNC___pkvm_hyp_reclaim,
+>  	__KVM_HOST_SMCCC_FUNC___pkvm_hyp_reclaimable,
+> +	__KVM_HOST_SMCCC_FUNC___pkvm_hyp_alloc_selftest,
+> =20
+>  	MARKER(__KVM_HOST_SMCCC_FUNC_PKVM_ONLY),
+
+[Severity: Medium]
+Does this place the initialization-only test hypercall in the always-on ban=
+d?
+
+If __pkvm_hyp_alloc_selftest is only intended to run during initialization,
+placing it here (before PKVM_ONLY) exposes it to the untrusted host
+post-deprivilege. This allows the host to drive synchronous EL2 execution at
+runtime. Should it be placed in the init-only band instead?
 
 [ ... ]
 
-> @@ -90,6 +91,31 @@ int pkvm_alloc_private_va_range(size_t size, unsigned =
-long *haddr)
->  	return ret;
->  }
-> =20
-> +/**
-> + * pkvm_map_private_va_range() - Map a physical range into the private V=
-A range
-> + * @haddr:	The virtual address in the private range.
-> + * @phys:	The physical address to map.
-> + * @size:	The size of the range to map.
-> + *
-> + * The hypervisor VA @haddr must have been first allocated with pkvm_all=
-oc_private_va_range()
-> + *
-> + * Return: 0 on success, negative error code on failure.
-> + */
-> +int pkvm_map_private_va_range(void *haddr, phys_addr_t phys, size_t size)
-> +{
-> +	unsigned long addr =3D (unsigned long)haddr;
-> +
-> +	if (!PAGE_ALIGNED(addr | phys | size))
+> diff --git a/arch/arm64/kvm/hyp/nvhe/alloc.c b/arch/arm64/kvm/hyp/nvhe/al=
+loc.c
+> index 32c923d83f78b..49d7560ad150e 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/alloc.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/alloc.c
+
+[ ... ]
+
+> +	/* Test reclaiming the last chunk of the list */
+> +	selftest_free(addr4);
+> +	hyp_allocator_reclaim(allocator, &host_mc, SELFTEST_MAX_PAGES);
+> +	if (host_mc.nr_pages !=3D SELFTEST_MAX_PAGES - 3)
 > +		return -EINVAL;
 > +
-> +	guard(hyp_spinlock)(&pkvm_pgd_lock);
+> +	/* Test punching a hole in the middle of a free chunk ... */
+> +	selftest_free(addr2);
+> +	hyp_allocator_reclaim(allocator, &host_mc, SELFTEST_MAX_PAGES);
+> +	if (host_mc.nr_pages !=3D SELFTEST_MAX_PAGES - 2)
+> +		return -EINVAL;
 > +
-> +	if (addr < __hyp_private_va_start || addr + size > __io_map_base)
+> +	if (selftest_alloc(PAGE_SIZE))
+> +		return -EINVAL;
+> +	if (selftest_errno() !=3D -ENOMEM)
 > +		return -EINVAL;
 
 [Severity: Medium]
-Could a very large size cause an integer overflow here? If size is large
-enough, addr + size could wrap around to a small positive value. Since
-__io_map_base is in the upper half of the address space, the wrapped sum
-might be less than __io_map_base, bypassing this validation.
+Are these early return paths in hyp_allocator_selftest() leaking the physic=
+al
+pages accumulated in the local host_mc variable?
 
-The subsequent kvm_pgtable_hyp_map() might then calculate a wrapped end
-boundary, resulting in a zero-iteration loop that returns 0 (success)
-without actually mapping anything. This could lead to a hypervisor panic
-when the caller attempts to access the unmapped memory.
-
-> +
-> +	return kvm_pgtable_hyp_map(&pkvm_pgtable, addr, size, phys, PAGE_HYP);
-
-[Severity: High]
-Does this error path need to roll back partially created mappings?
-
-If kvm_pgtable_hyp_map() fails midway, such as returning -ENOMEM when it
-cannot allocate an intermediate page table, it appears to abort without
-unmapping the leaf PTEs it has already installed.
-
-Because this error is returned directly to the caller without a rollback,
-the underlying physical pages might be freed back to the pool while
-remaining mapped and writable in the EL2 page table.
-
-Could this lead to use-after-free and isolation breaches when these physical
-pages are reallocated?
-
-> +}
+If an error is encountered during the selftest and the function returns
+early, host_mc goes out of scope. Because the physical pages populated
+during the previous hyp_allocator_reclaim() calls are not returned to the
+host or freed, they appear to be permanently leaked in EL2.
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260720171513.1415=
-357-1-vdonnefort@google.com?part=3D3
+357-1-vdonnefort@google.com?part=3D9
