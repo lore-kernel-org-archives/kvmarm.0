@@ -1,48 +1,48 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6EE8430CDF;
-	Mon, 20 Jul 2026 14:49:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35B29430790;
+	Mon, 20 Jul 2026 14:50:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784558995; cv=none; b=E4TVWlS3EYeiz+YcgI6S0MsNQgPA/vEioGkWjuLSxUP8HAK3mE/VOnE+FzZSYi59u3Eek6BW1dAHFEAS0n1NTnnFv04ApXwxJj4MQRT+fZxw8rM2BzvqsUnqx/gHZnFE5iikGmXmggDMtn9FdHeSvQuFHOG8QXSjNJNWECJEj0o=
+	t=1784559036; cv=none; b=KKCDhL/ZOZnePFFrsUgJ9jn1pL2DINvrCYgHIfv82x60vQ/lpQXss/chLRUSv2gcjYfiZKqQH8LDatPXbJ79DGbZpQSEJDGJh0lpjl6h2IeYWivq7R8lN7ROM7IkwJXIYyM3etyDuasax8LBs1427K35Rz0/JOwtNkoFz+Yg1MU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784558995; c=relaxed/simple;
-	bh=Gt4p8m90LjnKpWVt0rIxdsQ18ko373s8oRh8mw/sDA8=;
+	s=arc-20240116; t=1784559036; c=relaxed/simple;
+	bh=FRf04JDNyz7fVzp86tX1ALj/XTyrRfiWdXqch44wSac=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rweIPDxQuzVZYeAzFzwV9wIN/2W9LK+WzniD2bw0XVkVrZrxKoXNblrsz3Kza9A17sWwo70maSE6xIYBOopYeYArDHvcJ1UbQVxGTJbHKZ40P2wkTUYhKgrD9I6Q+Z88I9AgbCKCgIio+vnI3gByxJogCPSymjQz8/Wbq7t3ECI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l6lo7M4M; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=Ot2g7d/sYgvdVrTREd1BSiIKR7djOEG9Sv6DLMY+7RXDmZaIgUy99Sfz3FfaIsE0Qfw2GcAfMf+FdrJcQTty2GIlkbPHobn16Yk2syPsZHAaDEFT6PMIuim2tLoZDC+8uA2DzcX0bOOfzUH4IO7gNjXZr54WPZiZrE6iqq2toMU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mxdvnPWc; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l6lo7M4M"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9ACC81F000E9;
-	Mon, 20 Jul 2026 14:49:53 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mxdvnPWc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C5281F00A3D;
+	Mon, 20 Jul 2026 14:50:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784558993;
-	bh=kcWH8DVHI0oyeNtJrcuZjafVvSZSF6geIfeSDd2TKCs=;
+	s=k20260515; t=1784559035;
+	bh=KFNU8BJwlHvz1GcHJV+TRpXlJabaxtHRpK2Bxx9BGIw=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=l6lo7M4MFIR0nt1q6Npl7jl5v74oXNv+tvm0k0zcXaeoHN+6cG7xphmW1not+qGc/
-	 H1UkPZPVkkl8g9EXq3QOs5LczQ4RsGTEtRgZMHg4ssnTSMHBsbvedVdAILNK3ematM
-	 UMlBQuJ8zqsMoa/UBWeKJN5dPHNIT50G+oa+Mr/p3KvFvaHCDi2djC/g5hIXcW/lV3
-	 3v0fIu6nRzDOWmmiGSYIsSBf6m40dK5FwYO3qViq8YZjD1tdHd69Sgu3dm13y83Rtc
-	 PZ0AzH9JiZdg5WudIHBjWCieW2xjyoZCNdoSyVFKm+zas/RG3S1o9P9fCCAGWLHE2j
-	 ZsPw7NKLpR0+g==
+	b=mxdvnPWcJth+tLYm10nrY7UUySj0VsCNnDSWxhUkN6WNFp8tXvwRbdyHtW3mcCO4H
+	 o2CY8CwPlj83WhUy9ytsKzdhRvlbFXNTy0XRd/xO3KRlXx9xURw6xuD5MLCtJ+0WuQ
+	 WVeQ7FFb1y/BYqhc/IUUaMrUD2Az8V8Hrn967veMf9Rh3SbtTPP1f8/dbGsqTTlPFI
+	 qenpli2z2T1uReQ+jz4apllaZbK8JDQJyTR6kx3O551qAtADxfJoOe4hISp9iT0cwH
+	 mp/gKdkIHM980cARsHuBMTFfI4enBJ8GSkHMymdaCdpGz3llcLIL81zyt1W0OgKduu
+	 8Jw2tHMzCn7zA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wlpJX-00000006qjM-3L1U;
-	Mon, 20 Jul 2026 14:49:51 +0000
-Date: Mon, 20 Jul 2026 15:49:51 +0100
-Message-ID: <867bmpg1gw.wl-maz@kernel.org>
+	id 1wlpKD-00000006qkA-1qfZ;
+	Mon, 20 Jul 2026 14:50:33 +0000
+Date: Mon, 20 Jul 2026 15:50:33 +0100
+Message-ID: <865x29g1fq.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: sashiko-reviews@lists.linux.dev
-Cc: kvmarm@lists.linux.dev,
-	"Oliver Upton" <oupton@kernel.org>
-Subject: Re: [PATCH 2/5] KVM: arm64: Add a helper providing an inlined literal value for ICH_VTR_EL2
-In-Reply-To: <20260720134628.BEB071F000E9@smtp.kernel.org>
+Cc: "Oliver Upton" <oupton@kernel.org>,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH 4/5] KVM: arm64: vgic-v3: Simplify initial GICv3 configuration sampling
+In-Reply-To: <20260720133827.2A32C1F000E9@smtp.kernel.org>
 References: <20260720132220.2143486-1-maz@kernel.org>
-	<20260720132220.2143486-3-maz@kernel.org>
-	<20260720134628.BEB071F000E9@smtp.kernel.org>
+	<20260720132220.2143486-6-maz@kernel.org>
+	<20260720133827.2A32C1F000E9@smtp.kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -54,114 +54,20 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev, oupton@kernel.org
+X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, oupton@kernel.org, kvmarm@lists.linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 20 Jul 2026 14:46:28 +0100,
+On Mon, 20 Jul 2026 14:38:26 +0100,
 sashiko-bot@kernel.org wrote:
 > 
 > Thank you for your contribution! Sashiko AI review found 2 potential issue(s) to consider:
-> - [High] The `kvm_patch_ich_vtr_el2()` helper fails to apply the `vgic_v3_broken_seis()` workaround mask to the `ICH_VTR_EL2` value.
-> - [High] The `noinstr` function `kvm_patch_ich_vtr_el2()` calls out-of-line instrumentable functions, which violates `.noinstr.text` safety rules.
-> --
-> 
-> --- Patch [2]: [PATCH 2/5] KVM: arm64: Add a helper providing an inlined literal value for ICH_VTR_EL2 ---
-> commit aedd950f23aaa5667277a7a495b598168c06eb84
-> Author: Marc Zyngier <maz@kernel.org>
-> 
-> KVM: arm64: Add a helper providing an inlined literal value for ICH_VTR_EL2
-> 
-> This commit adds an alternative patching callback to provide an inlined
-> literal value for the ICH_VTR_EL2 system register. It computes the value
-> at boot time and patches it into the relevant code locations.
-> 
-> > diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-> > index 9e841e7afd4a7..ef62dd498f5cf 100644
-> > --- a/arch/arm64/kvm/vgic/vgic-v3.c
-> > +++ b/arch/arm64/kvm/vgic/vgic-v3.c
-> > @@ -876,6 +876,57 @@ void noinstr kvm_compute_ich_hcr_trap_bits(struct alt_instr *alt,
-> >  	*updptr = cpu_to_le32(insn);
-> >  }
-> >  
-> > +void noinstr kvm_patch_ich_vtr_el2(struct alt_instr *alt,
-> > +				   __le32 *origptr, __le32 *updptr,
-> > +				   int nr_inst)
-> > +{
-> > +	struct arm_smccc_res res = {};
-> > +	u32 insn, oinsn, rd, vtr;
-> > +
-> > +	/* No KVM? Nothing to do */
-> > +	if (!is_hyp_mode_available())
-> > +		return;
-> > +
-> > +	/* No v3 (or v3 compat)? Nothing to do either */
-> > +	if (!this_cpu_has_cap(ARM64_HAS_GICV5_LEGACY) &&
-> > +	    !this_cpu_has_cap(ARM64_HAS_GICV3_CPUIF))
-> > +		return;
-> 
-> [Severity: High]
-> Is it safe to call out-of-line and instrumentable functions like
-> this_cpu_has_cap() from a noinstr context?
+> - [Medium] The `noinstr` function `kvm_patch_ich_vtr_el2()` calls a non-`noinstr` function (`vgic_v3_broken_seis()`), causing a `noinstr` section violation.
+> - [Medium] `WARN_ON` inside the `noinstr` alternative patching callback `kvm_patch_ich_vtr_el2()` violates instrumentation rules and risks deadlocks.
 
-Yeah, that's borderline stupid. This should be "cpus_have_cap()".
+[...]
 
-> 
-> This violates the .noinstr.text safety rules and might expose the
-> alternative patching sequence to ftrace, KASAN, and kprobes, potentially
-> leading to recursive faults.
-> 
-> [ ... ]
-> 
-> > +	if (WARN_ON(res.a0 == HVC_STUB_ERR))
-> > +		return;
-> 
-> [Severity: High]
-> Could WARN_ON() also expand to out-of-line instrumentable trap or warning
-> functions, further violating the noinstr constraints of
-> kvm_patch_ich_vtr_el2()?
-
-I guess that if that fails, we will already have failed much earlier,
-while probing for TDIR. I'll drop that.
-
-> 
-> > +
-> > +	vtr = res.a1;
-> > +
-> > +	/* Compute target register */
-> > +	oinsn = le32_to_cpu(*origptr);
-> 
-> [Severity: High]
-> Does this sequence miss the workaround mask for broken locally generated
-> System Error Interrupts (SEI)?
-
-It isn't missing. It is just that the relevant hunk is in the wrong
-patch and needs to be moved here.
-
-> 
-> The code reads SYS_ICH_VTR_EL2 and directly bakes it into instructions
-> without applying the vgic_v3_broken_seis() mask to clear the
-> ICH_VTR_EL2_SEIS bit. Affected hardware might incorrectly advertise SEI
-> support as a result.
-> 
-> > +	rd = aarch64_insn_decode_register(AARCH64_INSN_REGTYPE_RD, oinsn);
-> > +
-> > +	/* movz rd, #(vtr & 0xffff) */
-> > +	insn = aarch64_insn_gen_movewide(rd,
-> > +					 (u16)vtr,
-> > +					 0,
-> > +					 AARCH64_INSN_VARIANT_64BIT,
-> > +					 AARCH64_INSN_MOVEWIDE_ZERO);
-> > +	*updptr++ = cpu_to_le32(insn);
-> 
-> [Severity: High]
-> Like this_cpu_has_cap() above, aarch64_insn_decode_register() and
-> aarch64_insn_gen_movewide() are out-of-line C functions. Should these
-> calls be avoided inside a noinstr patching callback to prevent recursive
-> faulting during instruction patching?
-
-That's something that needs to be separately addressed. There was some
-work from Ada a long while ago that needs to be brought back to life.
+See response to patch #2.
 
 	M.
 
