@@ -1,146 +1,105 @@
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com [209.85.128.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 268F4449B37
-	for <kvmarm@lists.linux.dev>; Mon, 20 Jul 2026 19:45:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A80653CA49C
+	for <kvmarm@lists.linux.dev>; Mon, 20 Jul 2026 20:35:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784576727; cv=none; b=Usvx9KSP0gWeE17TT+ZB2sF3B99PJlPlwh41e7vlpSxsfOm32FBK2eyFW199WarVHTsaW7Hy/RcjbX7RDpwr1u8Xs5ZgGg7Ftw/yk6fGO06WH3EScq6YB1mDTcaGlzy4FfkDacEQVwWfD9Ggxw30HiYgNbY88DwObetwQAhsb38=
+	t=1784579736; cv=none; b=PkSTVr3pUnbLcdnFrsqiCxIRNQ+aedUHt9jcqVk8ByR1nZM4Pcpzf1pcdpDS9MLy0enLn805BuoCo+LwiKqh4/tJf6xkysRXz8rlkJHPA9Sc4jyPi+BuR9gq37Xrj2gzyyrBfV1NteXlba7Tnc/WwVCYDpzbIwP7GqvRIiiZCGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784576727; c=relaxed/simple;
-	bh=frozKVuQVd8ZbwX/C61FHdCqlcwZaoKXyAlnvZZKPD0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=I1aOv3U6jJn9e2r1GIm+BOxU/Xw/bN0SqIiyg5BSyu8uIn0wXviJ7HZjgiUzSebnf/b/HQMVHCMJDJTuak2rbQkvFIxPFVhkSJE7jCi6mt4ixcbsN4ayx0Gekwxd4Ek8KGQiiM3dWxDTexuDw/OfvN5vNT2S85S9oONhtSKOZDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=GE1IXM2F; arc=none smtp.client-ip=95.215.58.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1784579736; c=relaxed/simple;
+	bh=AEIRTgpv3KiZzLgCI7Rlc0YF+p0PrirI6dYHcC7ObJI=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=tzlBQvGUIIeE7vA/6SC187H5D9rTEq8SsjN4kLVs6vmK6glJauRySIzmZLdVToLSR3fNATJadLxPbaGhlP50Cq7xwIl5o3C7tBNADUjx5bIQEqGhDFTc0xZki+NiclBdymXoEy91jUh5TAX/gMDRTnxZXWksvXpvCToBD8ONuKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NhgdfUo0; arc=none smtp.client-ip=209.85.128.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="GE1IXM2F"
-X-Forwarded-Encrypted: i=1; AHgh+RqvvRdttmZvlwtCS3ehKG/7FScYqUwRBrS+Rqn6cw+j68pZTHBndd0/OKBQdLfOLdAw4oauYmQ=@lists.linux.dev
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1784576723;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gnRgW07hzLRCxIKekWyNR2ruwTjgHHkQMx96GO7mN0k=;
-	b=GE1IXM2FFsUbMgD3tbSp12QPGPa+ZTt52q4TPHh4H3KkMFPV5L8TA9KFdHv+Lkc1cbnpcx
-	r0lAeqcAhQnUBN3sgTM9IxL+1FDHMQWYqtrATBG7UFXh6nRIv5AabWgX8WIsNBcsHxZE7q
-	ieGbRLCODet233WM9APisoWijzoC4YA=
-X-Gm-Message-State: AOJu0YxYzcA6ppGqBWoCC1Ys01w8Mp2AYj6vzuqqLo9cy/TC78zUP62a
-	zuPVdOgYdBTknJcWbns+uez7n73wIwpBUsxPr8qGy+kq+eAGzAJoN8fCRG83I7PvVONOySLVQf3
-	Yx68AbQ3qNcUTI4+JXJJ/5UJiz37Ts3yCNszdaTyi
-X-Received: by 2002:a05:622a:d0e:b0:51c:ca9:3d17 with SMTP id
- d75a77b69052e-52601f03537mr5544981cf.12.1784576711189; Mon, 20 Jul 2026
- 12:45:11 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NhgdfUo0"
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4955e865174so9682395e9.3
+        for <kvmarm@lists.linux.dev>; Mon, 20 Jul 2026 13:35:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1784579733; x=1785184533; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=LA6BVqbIhEwIMVMXHgwJu8nqjN0TgDEofdIQtGf4DJQ=;
+        b=NhgdfUo0n6tMYLZt8eZmICQ843Xg8+V8fNGSFPmICKJW+6fn7ybG9pRhXBXfKXEfOT
+         g++Mdb7lSYt+fr+CiyQJj4gpXQG8CKeCvKWhljy9uUmGh4Xn83BbMfsnmSD7DL9zis8X
+         BOPgiMgWMBPNE7pNuV5tkpcP3kjZkTMewhgXlBg5ewqmrnaaaOrCXQH5Li2rbcoCocnW
+         9lSnoH7oC5bx88gTjw6bBNvZTwjwzP7++f1g21vKTwQdo4MLtDyQx1EQJ4BiyqpsuXiO
+         Ancv+NNObUr9lkLq04kMDLjFBCskXqzB1PnWIwSHuli68OjThkZ3OsPeuRWtKzm2TeK6
+         J2IQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784579733; x=1785184533;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=LA6BVqbIhEwIMVMXHgwJu8nqjN0TgDEofdIQtGf4DJQ=;
+        b=HFeupQxDi1dUalLXbEueq2Q2rum7MlDenLLAuhY9n94aJQ8WpzGinnSVZFGN/9pSWI
+         GN0nMJ+HTRidv4hPRbBxLiWqWrLmX/OTe1WRc/oTsFdn5JrxgSTKONe4mM66KyN3ad4q
+         3g1siEQ6KZ4Kqq34lner1M/iiFfbJy1padsfZY6FdTCeaUuG3Mm65ZTcok+hRA3bpk6Z
+         J0s3J0j527UYDUZdSxTgmKhFpQCeZ6KAtMP+W40Cw2RGp8N1cawEY/lKyr2o8TLVYE5i
+         Uzu/szV2k9pPptjAuQUQYa8cd/NBrt60vxb6tgwfEVjwHYPshCnxPopjeDTlkvl9ZgQY
+         EEvA==
+X-Forwarded-Encrypted: i=1; AHgh+Rogm7KRjkuWPlPzriMU7L5sSUteP+yYUFFvMgQ05tB5DgG6xwMuTfoQdPcN9ONjgRKwW6lH0P0=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yzy669nNkLbl17RDMx5gN9GoUIkZliwPtziKYnG4wkMntm/gMNg
+	p7eHM8irAuTjQo10H2i0coQw99vr9a5D10eacqFuWivFjADEsRILjTispMr6b41a6//SGPMHvSj
+	KWCzCSpRXZKiU+g==
+X-Received: from wmpi31.prod.google.com ([2002:a05:600c:4b1f:b0:489:1b01:386f])
+ (user=smostafa job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:310e:b0:495:52dc:73a1 with SMTP id 5b1f17b1804b1-49552dc776bmr119110015e9.29.1784579732667;
+ Mon, 20 Jul 2026 13:35:32 -0700 (PDT)
+Date: Mon, 20 Jul 2026 20:35:29 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20260715105100.3178255-1-vdonnefort@google.com>
-In-Reply-To: <20260715105100.3178255-1-vdonnefort@google.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Mon, 20 Jul 2026 20:45:00 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTyVRn8BR7bLBo5m_k9m1VNv95y4h+WTJvz86FTf+=XeFg@mail.gmail.com>
-X-Gm-Features: AUfX_myO2U0cPSk1RjmpSUdu0_huarr-ty_DjO0s1lnxhyEnNkUc3-HgW4xg-JY
-Message-ID: <CA+EHjTyVRn8BR7bLBo5m_k9m1VNv95y4h+WTJvz86FTf+=XeFg@mail.gmail.com>
-Subject: Re: [PATCH v2] KVM: arm64: Fix hyp_trace clock disabling
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, 
-	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.55.0.229.g6434b31f56-goog
+Message-ID: <20260720203529.1276355-1-smostafa@google.com>
+Subject: [PATCH] KVM: arm64: Optimize protected mode and FWB
+From: Mostafa Saleh <smostafa@google.com>
+To: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org
+Cc: maz@kernel.org, oupton@kernel.org, seiden@linux.ibm.com, 
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	catalin.marinas@arm.com, will@kernel.org, vdonnefort@google.com, 
+	tabba@google.com, sebastianene@google.com, keirf@google.com, 
+	Mostafa Saleh <smostafa@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Migadu-Flow: FLOW_OUT
 
-Hi Vincent,
+KVM opportunistically enables FWB if supported by the system for guest
+VMs, which allows it to elude cache maintenance for data as they are
+forced to be cacheable from stage-2.
+In that case, __clean_dcache_guest_page() will immediately return.
+However in protected mode, before calling __clean_dcache_guest_page()
+it loops over the range and fix_map/unmap it, issuing TLB
+invalidations, dsb() and isb() unnecessarily.
 
-On Wed, 15 Jul 2026 at 11:51, Vincent Donnefort <vdonnefort@google.com> wrote:
->
-> Fix the disable path in hyp_trace_clock_enable(), which fell through to
-> re-initialize and reschedule the clock after cancelling the work. Return
-> early instead.
->
-> While at it, cleanup hyp_trace_clock::lock which is unused and
-> hyp_trace_clock::running which is redundant: the trace_remote framework
-> already serializes calls to the callback enable_tracing.
+This can be optimized by returning early if FWB is supported,
+kvm_pgtable_stage2_map() already issues dsb() and tlb invalidation
+functions issue dsb() for the unmap path.
 
-Although the cleanup and the fix are to the same commit, could this be
-split into the fix and the lock/running cleanup as a separate patch?
-Since b22888917fa41 is already in a released kernel, the fix will
-likely go to stable, and it'd be nice to keep that backport to just
-the behavioural change.
+Signed-off-by: Mostafa Saleh <smostafa@google.com>
+---
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Cheers,
-/fuad
+diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+index 4e329e39a695..6e9229106a25 100644
+--- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
++++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+@@ -261,6 +261,10 @@ static void __apply_guest_page(void *va, size_t size,
+ 
+ static void clean_dcache_guest_page(void *va, size_t size)
+ {
++	/* See __clean_dcache_guest_page() */
++	if (cpus_have_final_cap(ARM64_HAS_STAGE2_FWB))
++		return;
++
+ 	__apply_guest_page(va, size, __clean_dcache_guest_page);
+ }
+ 
+-- 
+2.55.0.229.g6434b31f56-goog
 
->
-> Fixes: b22888917fa4 ("KVM: arm64: Sync boot clock with the nVHE/pKVM hyp")
-> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
->
-> ---
->
-> v1 -> v2:
->   * Rollback hyp_trace_clock_enable() on __tracing_enable error (Sashiko)
->
-> v1: https://lore.kernel.org/all/alczBmnItMwq8xj4@google.com/
->
-> diff --git a/arch/arm64/kvm/hyp_trace.c b/arch/arm64/kvm/hyp_trace.c
-> index 2411b4c32932..9bfa368dd841 100644
-> --- a/arch/arm64/kvm/hyp_trace.c
-> +++ b/arch/arm64/kvm/hyp_trace.c
-> @@ -37,8 +37,6 @@ static struct hyp_trace_clock {
->         u32                     shift;
->         struct delayed_work     work;
->         struct completion       ready;
-> -       struct mutex            lock;
-> -       bool                    running;
->  } hyp_clock;
->
->  static void __hyp_clock_work(struct work_struct *work)
-> @@ -110,12 +108,9 @@ static void hyp_trace_clock_enable(struct hyp_trace_clock *hyp_clock, bool enabl
->  {
->         struct system_time_snapshot snap;
->
-> -       if (hyp_clock->running == enable)
-> -               return;
-> -
->         if (!enable) {
->                 cancel_delayed_work_sync(&hyp_clock->work);
-> -               hyp_clock->running = false;
-> +               return;
->         }
->
->         ktime_get_snapshot_id(CLOCK_BOOTTIME, &snap);
-> @@ -128,7 +123,6 @@ static void hyp_trace_clock_enable(struct hyp_trace_clock *hyp_clock, bool enabl
->         INIT_DELAYED_WORK(&hyp_clock->work, __hyp_clock_work);
->         schedule_delayed_work(&hyp_clock->work, msecs_to_jiffies(CLOCK_INIT_MS));
->         wait_for_completion(&hyp_clock->ready);
-> -       hyp_clock->running = true;
->  }
->
->  /* Access to this struct within the trace_remote_callbacks are protected by the trace_remote lock */
-> @@ -304,9 +298,15 @@ static void hyp_trace_unload(struct trace_buffer_desc *desc, void *priv)
->
->  static int hyp_trace_enable_tracing(bool enable, void *priv)
->  {
-> +       int ret;
-> +
->         hyp_trace_clock_enable(&hyp_clock, enable);
->
-> -       return kvm_call_hyp_nvhe(__tracing_enable, enable);
-> +       ret = kvm_call_hyp_nvhe(__tracing_enable, enable);
-> +       if (ret)
-> +               hyp_trace_clock_enable(&hyp_clock, !enable);
-> +
-> +       return ret;
->  }
->
->  static int hyp_trace_swap_reader_page(unsigned int cpu, void *priv)
->
-> base-commit: a13c140cc289c0b7b3770bce5b3ad42ab35074aa
-> --
-> 2.55.0.141.g00534a21ce-goog
->
