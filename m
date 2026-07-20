@@ -1,44 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5D06446079
-	for <kvmarm@lists.linux.dev>; Mon, 20 Jul 2026 17:26:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D20B2DC767
+	for <kvmarm@lists.linux.dev>; Mon, 20 Jul 2026 17:26:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784568369; cv=none; b=OmA3LXEoI25tX1u5rEyp5BHcmPcWpOTE2mnPKvBXVT8bBqOKuZVhqxtVNJG5X3Z+glvHiQPy762uHcn0b9P1stWOe8oQZbFrC87yTZrQ/w5buVo+dlqo6DaW+XgKa+iqosz/FHfZ1kUet21KfyKn6zv5wQOdsEMk4i7rRzwMkPQ=
+	t=1784568371; cv=none; b=uBqHBG7Kj0cO8ilDCrYTj+vIenK/O5llRpoJgL5Qafh3Y6eMerY4YY8wAn8/PiEFWnfnqUF13s3h0LIlj08Jm8Mq4wCJ7hoP8g7Yf/TQlbP+oeS2MjBoPpRZw5X+L/4z/vlBwg0kPtZdXoal5ye53zCx1g9IxgRkSBdESj2HFRo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784568369; c=relaxed/simple;
-	bh=t0PSH10NxTcMvHWO7tc9m6kQoEwNMn+oes/rcfq2m0k=;
+	s=arc-20240116; t=1784568371; c=relaxed/simple;
+	bh=jitLO3J2G+rOHn6QSujUQFlQ/Ni5oaNqpBkx0d4mF2o=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=f9veftcvu+c1HCUnK+/SaOzqUxzOpaIoa2RuGWg/GKepP87IQ3XnL8awQ4Got3olcJ9yctE829S3A3mF/vgV0FhNROnEi27SHB7C4M+I5XZuPhaCxj3pQHvW32k0e0PwguBMjpIIlrRPd48n6WfjdLqKt3Bxz5e5h3JGep1bCi4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lQypijig; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=Jkfk8OfvVYMLidRPW4y3wIe8+n+5/IX65UM3ED0U4hLEp7S8FIvF+e/oEFAmq69pR1miLGOkhzLWDrF9xGfdaPylMPdWqKauRyesIU9nEZSbgazYMz+fF9eDj8GnIUt8fEx4R1+7pWSunLFpm+jTlsG8Kl9Ub0NUzCVPYr8aTfc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=muUcm0YL; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lQypijig"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2DBB1F000E9;
-	Mon, 20 Jul 2026 17:25:59 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="muUcm0YL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C1311F00A3A;
+	Mon, 20 Jul 2026 17:26:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784568360;
-	bh=OVPpG9pm+Q9DamBiM1I4vjsCyM+y9aboVphNhY7VcJc=;
+	s=k20260515; t=1784568365;
+	bh=/ELN5yyeSjAvLqeKvuXZLpEoAFERkREAJ4XnyKcgHCk=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=lQypijigyWJIFl0X+vhg8HakwsDEWZOzx5DzvBQxPzSGf1SUtMgr2lIMVGoByhSjP
-	 1tW5C0ouxtLOSrPjklqv4hfXEFGPc5QqR6wEuNnPimPPMv2bYg+ck6Rp1x3U6Wmo98
-	 oZ+SWBv9KUF14vXBVCTZsWnXgNyE4AYXB/jaA0uOgV4fsVCs9qkjNcn9yGQotpSZHm
-	 jCdXBGN29L3LX3eGdaVh5xKq/raJs/GQbUd4yYTCCfyyp6RTgU4goCuLW9goTSYZGE
-	 0L6AA87OFRdu/GaiAl/VefO6Yk4aRRWkmaqw9fkgngEyN3fA9y8Svv40HxQBxgeaym
-	 8684x3bL5YIhA==
+	b=muUcm0YLzCSWrn8YaLGQsnTZ+9ZZokXPXCC2Loj9tg2+rFG1LbUHTsaFOcmrGpZVD
+	 zDL1gBbVJzwfuOxLB0aNoMaADKsMLVrNY1cjcomIm6yOUhqkrmo0AbZN09/K0Gv9xN
+	 eEHRa6oxGkkBojGbKitpXnNLI2suXfamdbVqt8VH8oGH0eVYEKFe2t0Ikr0lQYlbTL
+	 v0GUYHK74cNNiXw7kkwXEn2ezUiS4naC7jb9dCbsPGDyRvFyU/YyEN9+q0qohTPfjw
+	 yn4Q2D3z0dDdoiSuAyXkBDmUnskqJc/UTx4DKxvA7RILyOWbUQmggfz16GT6pVwv4k
+	 6QuQEPViyoIvQ==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v3 01/17] KVM: arm64: Add pkvm_private_va_range_pa
+Subject: Re: [PATCH v3 04/17] KVM: arm64: Add a heap allocator for the pKVM
+ hyp
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Vincent Donnefort" <vdonnefort@google.com>
 Cc: "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, "Marc
  Zyngier" <maz@kernel.org>
-In-Reply-To: <20260720171513.1415357-2-vdonnefort@google.com>
+In-Reply-To: <20260720171513.1415357-5-vdonnefort@google.com>
 References: <20260720171513.1415357-1-vdonnefort@google.com>
- <20260720171513.1415357-2-vdonnefort@google.com>
+ <20260720171513.1415357-5-vdonnefort@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 20 Jul 2026 17:25:59 +0000
-Message-Id: <20260720172559.B2DBB1F000E9@smtp.kernel.org>
+Date: Mon, 20 Jul 2026 17:26:05 +0000
+Message-Id: <20260720172605.8C1311F00A3A@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,50 +48,88 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [High] Incorrect physical address calculation for block mappings in pkvm_=
-private_va_range_pa()
+- [High] ABBA deadlock between `allocator->lock` and global component locks=
+ (`host_lock_component` / `hyp_lock_component`) during memory reclaim.
 --
 
---- Patch [1]: [PATCH v3 01/17] KVM: arm64: Add pkvm_private_va_range_pa ---
-commit 81aa726ac7516be8619c0cb2674493e48b6fca16
+--- Patch [4]: [PATCH v3 04/17] KVM: arm64: Add a heap allocator for the pK=
+VM hyp ---
+commit d447b5e9c6a4ffa49271c884ed8ffeb170f35542
 Author: Vincent Donnefort <vdonnefort@google.com>
+   =20
+KVM: arm64: Add a heap allocator for the pKVM hyp
 
-KVM: arm64: Add pkvm_private_va_range_pa
+This commit introduces a generic heap allocator for the pKVM hypervisor
+to manage VA-contiguous memory dynamically. It allows the hypervisor to
+allocate and free memory on demand, replacing static memory donations
+from the host. The allocator supports memory reclaim, topping up, and=20
+includes chunk metadata hashing for corruption detection.
 
-This commit introduces pkvm_private_va_range_pa() to resolve physical
-addresses for the pKVM private range by walking the hypervisor page-table.
-This prepares for the upcoming pKVM heap allocator.
+> diff --git a/arch/arm64/kvm/hyp/nvhe/alloc.c b/arch/arm64/kvm/hyp/nvhe/al=
+loc.c
+> new file mode 100644
+> index 0000000000000..32c923d83f78b
+> --- /dev/null
+> +++ b/arch/arm64/kvm/hyp/nvhe/alloc.c
 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/mm.c b/arch/arm64/kvm/hyp/nvhe/mm.c
-> --- a/arch/arm64/kvm/hyp/nvhe/mm.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/mm.c
 [ ... ]
-> +phys_addr_t pkvm_private_va_range_pa(void *va)
+
+> +static unsigned long hyp_allocator_drain_memcache(struct hyp_allocator *=
+allocator,
+> +						  struct kvm_hyp_memcache *host_mc,
+> +						  unsigned long target)
 > +{
-> +	kvm_pte_t pte =3D 0;
+> +	struct kvm_hyp_memcache *mc =3D &allocator->mc;
+> +	unsigned long drained =3D 0;
 > +
-> +	guard(hyp_spinlock)(&pkvm_pgd_lock);
-> +	WARN_ON(kvm_pgtable_get_leaf(&pkvm_pgtable, (u64)va, &pte, NULL));
-> +	WARN_ON(!kvm_pte_valid(pte));
+> +	while (target && mc->nr_pages) {
+> +		void *page =3D pop_hyp_memcache(mc, hyp_phys_to_virt);
 > +
-> +	return kvm_pte_to_phys(pte) + offset_in_page(va);
+> +		memset(page, 0, PAGE_SIZE);
+> +		kvm_flush_dcache_to_poc(page, PAGE_SIZE);
+> +		push_hyp_memcache(host_mc, page, hyp_virt_to_phys);
+> +		WARN_ON(__pkvm_hyp_donate_host(hyp_virt_to_pfn(page), 1));
+> +
+> +		target--;
+> +		drained++;
+> +	}
+> +
+> +	return drained;
+> +}
+> +
+> +static void hyp_allocator_reclaim(struct hyp_allocator *allocator, struc=
+t kvm_hyp_memcache *host_mc,
+> +				  unsigned long target)
+> +{
+> +	if (!target)
+> +		return;
+> +
+> +	guard(hyp_spinlock)(&allocator->lock);
+> +
+> +	target -=3D hyp_allocator_drain_memcache(allocator, host_mc, target);
 
 [Severity: High]
-Does this calculation handle block mappings correctly?
+Does this sequence create an ABBA deadlock?
 
-If the virtual address is mapped via a block descriptor (such as a 2MB
-large page), kvm_pte_to_phys(pte) returns the base physical address of
-the block. Adding offset_in_page(va) will only preserve the lowest 12
-bits, discarding the intermediate offset bits between the page size and
-the block size.
+In hyp_allocator_reclaim(), allocator->lock is held via the guard()
+before calling hyp_allocator_drain_memcache().
 
-Could this cause multiple virtual pages within the block mapping to
-incorrectly resolve to the same physical base page plus a small offset?
-Perhaps this should retrieve the mapping level from kvm_pgtable_get_leaf()
-and mask the virtual address with the corresponding granule size?
+hyp_allocator_drain_memcache() then calls __pkvm_hyp_donate_host(),
+which acquires the global component locks (host_lock_component() and
+hyp_lock_component()). This establishes a locking order of:
+allocator->lock -> component locks.
 
-> +}
+Since hyp_alloc() is intended to be a generic heap allocator called
+during hypervisor operations (such as VM or vCPU creation) where
+component locks are likely already held prior to the allocation, could a
+concurrent reclaim trigger a deadlock when it tries to acquire the
+component locks?
+
+> +	if (!target)
+> +		return;
+> +
+> +	do {
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260720171513.1415=
-357-1-vdonnefort@google.com?part=3D1
+357-1-vdonnefort@google.com?part=3D4
