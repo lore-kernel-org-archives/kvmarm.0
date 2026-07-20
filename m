@@ -1,125 +1,154 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29AE43ACEF6;
-	Mon, 20 Jul 2026 06:17:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C9502F28EA
+	for <kvmarm@lists.linux.dev>; Mon, 20 Jul 2026 08:35:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784528276; cv=none; b=UJJNsDCHxcVryOxKoQ5qrHSfwaZazF42+iWmwmXPXW2jprohtAhmd8DbRh+8ge/vbxaDC6Q+Q6bCZP2DV0gXt5YalK4veUPZ+67X2PZB8Z/Xf04Z4RxvaALo70xLkNJeax+GuCQklUBNzbrOkrMWzIo032h6tYNP9qgTUoA93EY=
+	t=1784536512; cv=none; b=tOX690lt4dl9OPc470G4F6g8yigapw7SkFoudYxc4zilYDslHtamOmCPNzF2LiW/wAsMOWPSczSJBGtJ74SuiG4oAGrsiHmWphhv1AH/kZJ37WWfaHVAWE3m+ZpL1XbRltuANlmG9Szl5hPxRcNYek1M+Vz94Uxw44mYUIx2S1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784528276; c=relaxed/simple;
-	bh=pflnMY2/S0a7j5lliNe2p/WCULVv2c+M2fZ52pTnogg=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=JKQv7gw6yjRiRspHAPltOUm7y7ahejOZ+J4725gZdLfc/KDAhNdWXI2jmDak1Tog6M3RpaK/CheGgu59PA2y3hqMMbWh8rlib/xRdaNO2LFhBgRtRlsEv0ra+VjxwTBlHlTzdjwY1X++JTADsWwNnF+G6NDzKFsAzohhasNqRSk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iDckIS2z; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784536512; c=relaxed/simple;
+	bh=Zd1wpy6j5eslq7JRXhCnn94i7JTqW6/xMDM1ttvsk3g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FFoJw1z9Wjbos7DtIJgoBz4GAj2TE6dbVwFx4FiSqji2YAnx1jTxWXx7/9OWG7qUUWsu1Iv+kkqg2DvBMG+e/C4BHmHiEEyuxkizN4g1CceC45OygYspoIZ2sTt6DjnNvWG0m5ARwJvvZDQ5BIIpkPiyc2x2VOtM5b3DD2gxggA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=VUn7VLZz; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iDckIS2z"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E86291F000E9;
-	Mon, 20 Jul 2026 06:17:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784528264;
-	bh=K0UynwdCv5WDm1BVlmikLW/Dj+dAPIIfg1V5Im2kFiU=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=iDckIS2zrx4DuvkuzGtu412bP5XfyM/S7yusMn1RyrdraIvl0lSYk1NZHprmt6lHi
-	 7Rqgdqx12NBFf0wbAO+qar2Pz6D2taRRlaRFXEiHjOcZCd47W09InPTs1N2vBDO4yx
-	 nUPQo6A3hF0pc02gFCwn/HrQfAbLXGmCt6LfNV/vwWeYNtEdoOuFQpTkkyafxwejtY
-	 /QAm1s0w1irGZ/AF6voSDjzerMAw28/elv9kzUkGlKGxPsoVsL+4rL8y8/soZqXpza
-	 fJfBG4W1Ya+fX2Oofz6tcJLKc4v8a7OUfYRsHwt0CHj89X6xAy7Hwq5u4ACdYDMB3t
-	 tepOey7ODA4AA==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v9 14/16] KVM: arm64: PMU: Implement fixed-counters-only
- emulation
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Akihiko Odaki" <odaki@rsg.ci.i.u-tokyo.ac.jp>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, kvm@vger.kernel.org, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260720-hybrid-v9-14-2b713ca1b5dc@rsg.ci.i.u-tokyo.ac.jp>
-References: <20260720-hybrid-v9-0-2b713ca1b5dc@rsg.ci.i.u-tokyo.ac.jp>
- <20260720-hybrid-v9-14-2b713ca1b5dc@rsg.ci.i.u-tokyo.ac.jp>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 20 Jul 2026 06:17:43 +0000
-Message-Id: <20260720061743.E86291F000E9@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="VUn7VLZz"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ABA102B;
+	Mon, 20 Jul 2026 01:35:05 -0700 (PDT)
+Received: from J2N7QTR9R3.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F01EE3F66F;
+	Mon, 20 Jul 2026 01:35:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1784536509; bh=Zd1wpy6j5eslq7JRXhCnn94i7JTqW6/xMDM1ttvsk3g=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=VUn7VLZzdIMhGN3GGLPkKrxXQfjuWBcPIW477yxizdTHNbmLa/OZf+x0wuxuItp02
+	 QNyX7iMqH/Pn3VO1oTNTKDwZgmsnJilYT38hOOR/cYKWtWg/Q1CVC2D8Jrx3xhmDak
+	 Btdy42sgXTdxHVr1o7vv5WzoU0Ldc0ZrIxc07c8A=
+Date: Mon, 20 Jul 2026 09:35:01 +0100
+From: Mark Rutland <mark.rutland@arm.com>
+To: Wei-Lin Chang <weilin.chang@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>, Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Dev Jain <dev.jain@arm.com>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	Sebastian Ene <sebastianene@google.com>,
+	Vincent Donnefort <vdonnefort@google.com>
+Subject: Re: [PATCH] KVM: arm64: ptdump: Flush the last region
+Message-ID: <al3dtUVPxBXY0AJP@J2N7QTR9R3.cambridge.arm.com>
+References: <20260717231233.2299068-1-weilin.chang@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260717231233.2299068-1-weilin.chang@arm.com>
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [Medium] State desynchronization in PMU virtualization due to retained st=
-ale perf_event.
---
+On Sat, Jul 18, 2026 at 12:12:33AM +0100, Wei-Lin Chang wrote:
+> Currently the stage-2 ptdump calls note_page() at each leaf entry visit.
+> This simply misses the output of the last region, because note_page()
+> only dumps output when it detects a change in level/prot, or when the
+> walk enters a next marker section. The last region in the guest IPA
+> space with the same level/prot is not dumped since there is no change
+> after it.
+> 
+> To dump the final region, manually issue a note_page() call with address
+> BIT(ia_bits) (end of guest IPA space) and level == -1 to trigger a level
+> change after the last region. Additionally treat level == -1 as a last
+> flushing note_page() call and avoid dumping the name of the next marker
+> for this case.
 
---- Patch [14]: [PATCH v9 14/16] KVM: arm64: PMU: Implement fixed-counters-=
-only emulation ---
-commit 8eabffaec38175a063281e21d7253117967c6ca4
-Author: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
+I think you can use note_page_flush() rather than doing that manually.
 
-KVM: arm64: PMU: Implement fixed-counters-only emulation
+> Fixes: 7c4f73548ed1 ("KVM: arm64: Register ptdump with debugfs on guest creation")
+> Reported-by: Sashiko AI <sashiko-bot@kernel.org>
+> Closes: https://lore.kernel.org/kvmarm/20260630122758.891011F00A3A@smtp.kernel.org/
+> Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
+> ---
+>  arch/arm64/kvm/ptdump.c | 8 +++++---
+>  arch/arm64/mm/ptdump.c  | 5 +++--
+>  2 files changed, 8 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
+> index c9140e22abcf..4096e4a92fae 100644
+> --- a/arch/arm64/kvm/ptdump.c
+> +++ b/arch/arm64/kvm/ptdump.c
+> @@ -155,11 +155,13 @@ static int kvm_ptdump_guest_show(struct seq_file *m, void *unused)
+>  		.seq		= m,
+>  	};
+>  
+> -	write_lock(&kvm->mmu_lock);
+> +	guard(write_lock)(&kvm->mmu_lock);
+>  	ret = kvm_pgtable_walk(mmu->pgt, 0, BIT(mmu->pgt->ia_bits), &walker);
+> -	write_unlock(&kvm->mmu_lock);
+> +	if (ret)
+> +		return ret;
+> +	note_page(&st->parser_state.ptdump, BIT(mmu->pgt->ia_bits), -1, 0);
 
-This patch adds internal state for emulating PMUv3 without programmable
-event counters. In fixed-counters-only mode, KVM tracks physical CPU
-migrations and requests PMU reloads so the host perf event for the cycle
-counter can be recreated on the new physical CPU's PMU. Uncovered CPUs are
-treated as unsupported and taint the kernel.
+This can be:
 
-> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> index 78611eaecca25..1ec09ef28467a 100644
-> --- a/arch/arm64/kvm/pmu-emul.c
-> +++ b/arch/arm64/kvm/pmu-emul.c
-[ ... ]
-> @@ -785,6 +791,32 @@ static void kvm_pmu_create_perf_event(struct kvm_pmc=
- *pmc)
->  	pmc->perf_event =3D event;
+	note_page_flush(&st->parser_state.ptdump);
+
+The level change alone should trigger the dump, so the address doesn't
+need to be at the end of the guest IPA space.
+
+Importantly, note_page_flush() will pass 0 as the address, which won't
+trigger the checks you try to suppress below.
+
+Please use note_page_flush() here, and drop the changes to
+arch/arm64/mm/ptdump.c.
+
+>  
+> -	return ret;
+> +	return 0;
 >  }
-> =20
-> +/**
-> + * kvm_pmu_create_perf_event - create a perf event for a counter
-> + * @pmc: Counter context
-> + */
-> +static void kvm_pmu_create_perf_event(struct kvm_pmc *pmc)
-> +{
-> +	struct kvm_vcpu *vcpu =3D kvm_pmc_to_vcpu(pmc);
-> +	struct arm_pmu *arm_pmu =3D vcpu->kvm->arch.arm_pmu;
-> +
-> +	if (kvm_pmu_fixed_counters_only(vcpu->kvm)) {
-> +		do {
-> +			arm_pmu =3D kvm_pmu_probe_armpmu(READ_ONCE(vcpu->cpu));
-> +
-> +			if (!arm_pmu) {
-> +				pr_warn_once("kvm: Unsupported PMU variation detected.\n");
-> +				add_taint(TAINT_CPU_OUT_OF_SPEC, LOCKDEP_STILL_OK);
-> +				return;
+>  
+>  static int kvm_ptdump_guest_open(struct inode *m, struct file *file)
+> diff --git a/arch/arm64/mm/ptdump.c b/arch/arm64/mm/ptdump.c
+> index ab9899ca1e5f..fed4e4407e0e 100644
+> --- a/arch/arm64/mm/ptdump.c
+> +++ b/arch/arm64/mm/ptdump.c
+> @@ -194,6 +194,7 @@ void note_page(struct ptdump_state *pt_st, unsigned long addr, int level,
+>  	struct ptdump_pg_state *st = container_of(pt_st, struct ptdump_pg_state, ptdump);
+>  	struct ptdump_pg_level *pg_level = st->pg_level;
+>  	static const char units[] = "KMGTPE";
+> +	bool flush = level == -1;
+>  	ptdesc_t prot = 0;
+>  
+>  	/* check if the current level has been folded dynamically */
+> @@ -234,7 +235,7 @@ void note_page(struct ptdump_state *pt_st, unsigned long addr, int level,
+>  				  pg_level[st->level].num);
+>  		pt_dump_seq_puts(st->seq, "\n");
+>  
+> -		if (addr >= st->marker[1].start_address) {
+> +		if (addr >= st->marker[1].start_address && !flush) {
+>  			st->marker++;
+>  			pt_dump_seq_printf(st->seq, "---[ %s ]---\n", st->marker->name);
+>  		}
 
-[Severity: Medium]
-Does this early return leave a stale perf_event attached to the PMC?
+If you use note_page_flush(), addr will be 0. As the final marker is at
+BIT(pgtable->ia_bits), this condition cannot fire.
 
-If a vCPU in fixed-counters-only mode migrates to a physical CPU without a
-supported PMU, and the guest attempts to reprogram the cycle counter's
-filter, kvm_pmu_create_perf_event() will exit here without stopping the old
-counter or replacing it.
+> @@ -244,7 +245,7 @@ void note_page(struct ptdump_state *pt_st, unsigned long addr, int level,
+>  		st->level = level;
+>  	}
+>  
+> -	if (addr >= st->marker[1].start_address) {
+> +	if (addr >= st->marker[1].start_address && !flush) {
+>  		st->marker++;
+>  		pt_dump_seq_printf(st->seq, "---[ %s ]---\n", st->marker->name);
+>  	}
 
-If the vCPU later migrates back to a supported CPU, kvm_vcpu_load_pmu() will
-trigger a KVM_REQ_RELOAD_PMU. When kvm_pmc_enable_perf_event() checks the
-PMC, it will find the old perf_event. Since that old event is valid for the
-now-current supported CPU, it will be re-enabled without recreating it.
+Likewise here.
 
-Can this lead to KVM silently discarding the configuration updates the guest
-made while on the unsupported CPU, resulting in incorrect performance
-monitoring statistics?
-
-> +			}
-> +
-> +			kvm_pmu_create_perf_event_with_pmu(pmc, arm_pmu);
-> +		} while (!cpumask_test_cpu(READ_ONCE(vcpu->cpu), &arm_pmu->supported_c=
-pus));
-> +	} else {
-> +		kvm_pmu_create_perf_event_with_pmu(pmc, arm_pmu);
-> +	}
-> +}
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260720-hybrid-v9-=
-0-2b713ca1b5dc@rsg.ci.i.u-tokyo.ac.jp?part=3D14
+Mark.
