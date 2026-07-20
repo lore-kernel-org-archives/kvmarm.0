@@ -1,143 +1,123 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C398417BF4
-	for <kvmarm@lists.linux.dev>; Mon, 20 Jul 2026 13:46:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B13363B2FDF
+	for <kvmarm@lists.linux.dev>; Mon, 20 Jul 2026 14:04:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784555190; cv=none; b=EpG9WSpn12GrVRUc+foDVvBp5PlZMINgCPWPmos66vrP8hRdbsD0z9YwmE36k3ymtZjTWDR/sPn3GGChfeOFBI3OmAyVMpGThOHWTJG7H5S4BEVWn1Dwks6390H3pEmMC3u1zg+Her9b6wxX/lxcHq3AL9OXLzRnsxGsAbSAWHo=
+	t=1784556253; cv=none; b=Q37KYmYkadel6xi4sUWtz1E0fpvZFwfc4V0M+Wa71gKponDTgo/D72O2x5oWC0svZB3iCqJ4ingtyV5qLryERRQz4S1bYaF0AmiXMBXPkEUp+UE/8je5tbMsqSsJttdIxzxYOBFMRy9z8kJuuoNO/qc0dmkMoCup9t7tKzfVc2I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784555190; c=relaxed/simple;
-	bh=SD2AzjNuKTBHYb+tlxYrvv0KFrXtIkocVzRV70q7GQ0=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=gA7CeuWq7TefDvhB2MDXPSzljF2/mjkcGSq/efih+eVD1guzDPWjn9isw1s/lq2kk4s3wdbqWwzHhfYbH3xnmbWKSUMo1Dbk9wGn3BNjUM3UwdFzCZCQB2e7dflpSbk1tvPTMHRJNvRQEC3X4nmJgCZ/NYzYtbuYDni2CGqwN+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I6tl0J3L; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784556253; c=relaxed/simple;
+	bh=v68rQyf67M4cdo8Cjdo49uXvdGqyQ+lF5cciiGtVKkw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=r48AU+cJxP2MPhLtb8PAkdnyPXq+0Fo8RkWFbuTurgxUcmrnPTryXsUoP0uo3nn4kv8905dh+nemYSFjSR71wvUr7hmQwZYchQMBeaBj03uO6iAIdc+zYA7SwRvkQ7XYuZVaD72v5DjdPbzpULSRpeDzs9RdxGYcl1V9Dnr6kcM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=l705GpzQ; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I6tl0J3L"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEB071F000E9;
-	Mon, 20 Jul 2026 13:46:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784555189;
-	bh=maxdV5RBiYNc8z1UZi7COYNzudGCSaXvXdiMl2NJnPI=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=I6tl0J3Ln+KrOFgfSxXzqKv2WZTD3tuuaw2rxiKyGgr5OmArx0NRm2TkrzRFYqIzM
-	 zjKN8UIelMyjqoBIzvSpiPI1wbwFYlWD8yZzJvIznUYipkg3a2A0W/sM1eOYeGOCul
-	 wwPTIPzv3Iaf003mz62LV76GC5mUq6N4jUCOBz6m/E7Ju2s2rMl+8PMdQynvuDmpCI
-	 dlG4xCYJg11S4K9c5hH2uHKKRwUJkU1BWx+uviCykbWNpnVA70WW8Z+v9YjWyQRM02
-	 s3uU6t5Uo+eaym43aXAeSkFbGtWF9OjLzHDibB8LRi0VM/Tjbj8RkLG1CvEtJhhBwg
-	 4R9+K+hswiEDw==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 2/5] KVM: arm64: Add a helper providing an inlined
- literal value for ICH_VTR_EL2
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Marc Zyngier" <maz@kernel.org>
-Cc: "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>
-In-Reply-To: <20260720132220.2143486-3-maz@kernel.org>
-References: <20260720132220.2143486-1-maz@kernel.org>
- <20260720132220.2143486-3-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 20 Jul 2026 13:46:28 +0000
-Message-Id: <20260720134628.BEB071F000E9@smtp.kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="l705GpzQ"
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-49555a0e68bso8703195e9.2
+        for <kvmarm@lists.linux.dev>; Mon, 20 Jul 2026 07:04:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1784556250; x=1785161050; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=9J5yxovoCdxAOMOeUh6Y+dQmCs/UPya27GLpD3HBdBQ=;
+        b=l705GpzQQFjoIfThsyhc0kDPZR3FFbem1WG0IfgAo8Ci4d5GQNVKeT9/i+2tR0rdrf
+         bFmp7ltNJetsjO4T8soypEQRxYE96nZHO7ej6YaoN6kcm2R3qwp6sdYXSWvatsbprj8z
+         S2RurNtiohlgXAD6G7sXn/5mGJ8LZl7ECm5W0/tyBXqO2+t9JTfj940xXA6rqxgCRlbt
+         i8VqmGdarBWjfAWue5Zb2vY780XB4ZAES7iUWd/WinmaiU1lqsQfXdnpXKCE4fe9Dhws
+         jAVRJTxdccXjHLFSo17/w8B6XCeRWMsaLB7SLpG14EbU1Wd8UZQRrnT9tHcFUmOkapbd
+         mIaQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784556250; x=1785161050;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=9J5yxovoCdxAOMOeUh6Y+dQmCs/UPya27GLpD3HBdBQ=;
+        b=QX58YLjXYUyYqdXRwcIs4IJGzjmPSiOPMgPjBwOG97R1U7L56fEIknat2PIDrAiztK
+         bJe278Pt19tX/O/yv/+wc7G95lL5uUt4O46SL1SDkswCqDjFFMWShTRELW6/odPlUiLF
+         I7q5TZWhodSANDXanspm8Pq5MhWlkOUOLCDyMH4vv8GCCEovOEq7cStRjLtUDpizJ8cV
+         aAc/aeaQgiUvG0tX3bpDGRtXG045VLLJqimjo8DJFRvjaGm6XTnBkpWs57aM4D5+LbdD
+         X9fa7I0LYkkn1/Bc/Ky6rKq7RdsOxikb/ZuVYmCVaNkxq7eK8turXVD/JA+nkYlCK5m8
+         1eKw==
+X-Forwarded-Encrypted: i=1; AHgh+RqaRBqbcZdk+YmUi87r3k2BZ7bG+hKGy/0t1E230s3uUenWTjxdba8ZmEB3EHJCIh44sr180JA=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxPYkVXB/s4lhVlfV9W8p0YuWMjPRNZRW0ZyfRH4on6Avrd5sLH
+	GL5cqtlUr2kNknguK3xIio/ioTayPxCe76RK9hVR/hCkmgDcI1A23H3+Ta5J47qN3A==
+X-Gm-Gg: AfdE7cnf95D2fc1XNSMHSR2AozGVeSPNHC2IS7Qy+vkUEYITzJYu1MBTGjq36UsLM7T
+	kweRj7cbEh03+gQ5aA4aBZEaWL2EtENDirfTYFlan4sqaLT6nmk8PvunTzhStGFssyStCe/3HtG
+	gZBQnpdezo80JOAonU8S7QZYoji7ilFMMz9r0cNH9Vw7D1/hJC+zDET/2X7keqOet3OXYj42C7u
+	vP6ukUSe079gopqLHLXzyClrEElulvgJgBcyeYjvZBZb1xREDl+wS2mduzV7jFsI/vQm2LvM5XX
+	CjIHN+J+Oq0r77CxJypPbUFDLTwuynPQYqhEZNHHTzXUx95ZGlWOIm/BG8z9LX3fkwXb58QJStv
+	41WpeylR5yXrqwP71zfUn855+RLyPlctORyNIq213G8oYd5AW7EWoDtBs40dlWbXwGBVXzVxbns
+	hIe7tTVdg7NbiLq1N7lzvAEf4gZCoHuTSFhd3Xn+OQuWW5DZbvX0g=
+X-Received: by 2002:a05:600c:1c16:b0:495:5022:71b9 with SMTP id 5b1f17b1804b1-495502272f2mr136915945e9.33.1784556249104;
+        Mon, 20 Jul 2026 07:04:09 -0700 (PDT)
+Received: from google.com (137.69.77.34.bc.googleusercontent.com. [34.77.69.137])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4954995b78dsm185090025e9.0.2026.07.20.07.04.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Jul 2026 07:04:08 -0700 (PDT)
+Date: Mon, 20 Jul 2026 15:04:03 +0100
+From: Vincent Donnefort <vdonnefort@google.com>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	kernel-team@android.com, qperret@google.com
+Subject: Re: [PATCH v2 18/18] KVM: arm64: Alloc simple_buffer_page using pKVM
+ hyp allocator
+Message-ID: <al4q05rBGvJzi3Vl@google.com>
+References: <20260706175415.2604046-1-vdonnefort@google.com>
+ <20260706175415.2604046-19-vdonnefort@google.com>
+ <CA+EHjTxRFSW=9fAYvikL2t48ykaiGp7O3Mg6ddXdtFZrmWWaGQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTxRFSW=9fAYvikL2t48ykaiGp7O3Mg6ddXdtFZrmWWaGQ@mail.gmail.com>
 
-Thank you for your contribution! Sashiko AI review found 2 potential issue(=
-s) to consider:
-- [High] The `kvm_patch_ich_vtr_el2()` helper fails to apply the `vgic_v3_b=
-roken_seis()` workaround mask to the `ICH_VTR_EL2` value.
-- [High] The `noinstr` function `kvm_patch_ich_vtr_el2()` calls out-of-line=
- instrumentable functions, which violates `.noinstr.text` safety rules.
---
+On Wed, Jul 15, 2026 at 04:07:05PM +0100, Fuad Tabba wrote:
+> On Mon, 6 Jul 2026 at 18:54, Vincent Donnefort <vdonnefort@google.com> wrote:
+> 
+> ...
+> 
+> > @@ -193,17 +211,8 @@ static bool hyp_trace_desc_is_valid(struct hyp_trace_desc *desc, size_t desc_siz
+> >                 if ((void *)rb_desc + struct_size(rb_desc, page_va, rb_desc->nr_page_va) > desc_end)
+> >                         return false;
+> >
+> > -               /* Overflow bpages backing memory? */
+> > -               if (nr_bpages < rb_desc->nr_page_va)
+> > -                       return false;
+> > -
+> > -               if (cpu >= hyp_nr_cpus)
+> > -                       return false;
+> > -
+> >                 if (cpu != rb_desc->cpu)
+> >                         return false;
+> 
+> Sashiko flagged this. Nothing here bounds nr_page_va from below, so
+> with nr_page_va == 0 on every CPU the bpage size sums to 0.
+> hyp_alloc() still hands back a chunk, but bpages_backing_size is
+> stored as 0, so when init_mm() fails on nr_page_va < 3 the free path
+> takes its if (!size) return and never frees it. The host can repeat
+> it. Would validating nr_page_va >= 3 here work?
 
---- Patch [2]: [PATCH 2/5] KVM: arm64: Add a helper providing an inlined li=
-teral value for ICH_VTR_EL2 ---
-commit aedd950f23aaa5667277a7a495b598168c06eb84
-Author: Marc Zyngier <maz@kernel.org>
+simple_ring_buffer_init_mm() already validates nr_page_va. And on error, we do
+seem to rollback properly and hyp_free().
 
-KVM: arm64: Add a helper providing an inlined literal value for ICH_VTR_EL2
+So I don't believe there's anything to do here.
 
-This commit adds an alternative patching callback to provide an inlined
-literal value for the ICH_VTR_EL2 system register. It computes the value
-at boot time and patches it into the relevant code locations.
-
-> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-> index 9e841e7afd4a7..ef62dd498f5cf 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v3.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
-> @@ -876,6 +876,57 @@ void noinstr kvm_compute_ich_hcr_trap_bits(struct al=
-t_instr *alt,
->  	*updptr =3D cpu_to_le32(insn);
->  }
-> =20
-> +void noinstr kvm_patch_ich_vtr_el2(struct alt_instr *alt,
-> +				   __le32 *origptr, __le32 *updptr,
-> +				   int nr_inst)
-> +{
-> +	struct arm_smccc_res res =3D {};
-> +	u32 insn, oinsn, rd, vtr;
-> +
-> +	/* No KVM? Nothing to do */
-> +	if (!is_hyp_mode_available())
-> +		return;
-> +
-> +	/* No v3 (or v3 compat)? Nothing to do either */
-> +	if (!this_cpu_has_cap(ARM64_HAS_GICV5_LEGACY) &&
-> +	    !this_cpu_has_cap(ARM64_HAS_GICV3_CPUIF))
-> +		return;
-
-[Severity: High]
-Is it safe to call out-of-line and instrumentable functions like
-this_cpu_has_cap() from a noinstr context?
-
-This violates the .noinstr.text safety rules and might expose the
-alternative patching sequence to ftrace, KASAN, and kprobes, potentially
-leading to recursive faults.
-
-[ ... ]
-
-> +	if (WARN_ON(res.a0 =3D=3D HVC_STUB_ERR))
-> +		return;
-
-[Severity: High]
-Could WARN_ON() also expand to out-of-line instrumentable trap or warning
-functions, further violating the noinstr constraints of
-kvm_patch_ich_vtr_el2()?
-
-> +
-> +	vtr =3D res.a1;
-> +
-> +	/* Compute target register */
-> +	oinsn =3D le32_to_cpu(*origptr);
-
-[Severity: High]
-Does this sequence miss the workaround mask for broken locally generated
-System Error Interrupts (SEI)?
-
-The code reads SYS_ICH_VTR_EL2 and directly bakes it into instructions
-without applying the vgic_v3_broken_seis() mask to clear the
-ICH_VTR_EL2_SEIS bit. Affected hardware might incorrectly advertise SEI
-support as a result.
-
-> +	rd =3D aarch64_insn_decode_register(AARCH64_INSN_REGTYPE_RD, oinsn);
-> +
-> +	/* movz rd, #(vtr & 0xffff) */
-> +	insn =3D aarch64_insn_gen_movewide(rd,
-> +					 (u16)vtr,
-> +					 0,
-> +					 AARCH64_INSN_VARIANT_64BIT,
-> +					 AARCH64_INSN_MOVEWIDE_ZERO);
-> +	*updptr++ =3D cpu_to_le32(insn);
-
-[Severity: High]
-Like this_cpu_has_cap() above, aarch64_insn_decode_register() and
-aarch64_insn_gen_movewide() are out-of-line C functions. Should these
-calls be avoided inside a noinstr patching callback to prevent recursive
-faulting during instruction patching?
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260720132220.2143=
-486-1-maz@kernel.org?part=3D2
+> 
+> I don't think the rest of Sashiko's note holds: the zero-size path
+> succeeds rather than hitting -ENOMEM. And it's only reachable from the
+> host kernel, not userspace.
+> 
+> Cheers,
+> /fuad
