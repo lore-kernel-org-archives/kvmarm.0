@@ -1,35 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 225AF3AF676
-	for <kvmarm@lists.linux.dev>; Mon, 20 Jul 2026 13:22:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 039C7427A06
+	for <kvmarm@lists.linux.dev>; Mon, 20 Jul 2026 13:22:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784553762; cv=none; b=Bdv/r19UvZth8K752BO9cPXigI5+yt8bZN5hiwi0fSWtdpZBGdXS24TTCeJ48WAo84unFVKSdpeYKFk4HKiOvmtHVy//84aORPPxDw5CsmFySL+wS4PmkvUoFbTnwJXWauOeTBEDwY1KAwO8hqsM3D1/tFxVuU3Gyg9PfJCI+X4=
+	t=1784553762; cv=none; b=L8QC1WVW78wM6Ofm+//+lvXVlqcd+yTTvUeHooF2OYyDScfrUCrk4pDIiYSmMGnjqpfkh6vUn5d2xvLgpbfRc0WiGYqcKKHZz552gZk7n1rGZS6yYvtXyyGHFOBGuYRvILfVxlEt8ezcFKNuc52CpUlM7wgtCQTwBH4ukXDDpFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1784553762; c=relaxed/simple;
-	bh=vmgkQ7EmOQWB0dZu70GcQAzgxMya34KamJywgLSqDzE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XMrigpFOPabRhzY/AYDUqqa6Y9yqVtzjl+/s8hg0IyukU289b707d8A5x8F5Gd+4DcbWk4iwbLB8+3yi/8iaH/FhMKmYWR8InRkbUlbbR/22ZgcqDhwdH6TWMviXEHkiEw8h7ILY7QaFwwPFLqdWUuB5tsFTB1JKl1WP66JfUWc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kwqi/3eR; arc=none smtp.client-ip=100.103.45.18
+	bh=NHbei9vW+obvB8TUDOTXkgu1xLFSn8jIjCk07uA9xD8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Y9kAYnKwAYeklSj38IJE6hFm80/pZjOWguWgzqaaZ8ffg2qOAeC+UAL/uKhWPg4fvE/eBF40u2CZHUh6FW2l626hq/+MR2m2CBvyo/vn1fUFN2YXNry6TZfDc8iQv9L/6kCOmqI1hmwAigtwk8PMilH3FBZEbI0v9gNdUDFe3BY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h86M0QBM; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kwqi/3eR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0DED1F000E9;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h86M0QBM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D61381F00A3E;
 	Mon, 20 Jul 2026 13:22:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1784553760;
-	bh=YYRiGgf2P+rtL76qHisSx9Ln84RXffHb3Zivhk5R26I=;
-	h=From:To:Cc:Subject:Date;
-	b=Kwqi/3eRhssMvgchl6+7F/4RBwNzHroWKT+A2hYz3nKMfW5d5YlBOZEnMfMaGQAeV
-	 lYzzscniQbeCYJpWumi1HVtBiy78qoTGoDI86qm0mFziOpwFtitvcwAFidjq4WcUvi
-	 lkwRSTjiIkecMRYm4LiApkk5kOzpF86ZCW2sbsQVU4xOBPC7Ky1AVhlfwh8GMdw5mN
-	 v1NB71LXg4LS5efxOBwH/yUZ6yCCm9oADYDf+HV1vlkRBh5PIU4etufqucWJifAYrv
-	 rTVVBc71gQvmIRKOi/W3Y3pO7t0FFo+kjYuJY808KlUHPL9bVHyeY+YsiQgREdvoKO
-	 Kd4t5nWdMycIQ==
+	bh=xkqMxQoVEiMfKZejeC5Qcqv1rK1w4sxhkFUEo2DhpNQ=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=h86M0QBMbxZoTUYFETmRBVhFHkniHBIzpxhjZ1RzZI2qo9w9jSnebLw62OKOHB/eS
+	 n/xEF0ZgvmAx9ua+Xch/Ap5OhmshPktoT78k3c7hxFbN5CInJ+CouUxr+K0DJIx3dT
+	 MV5J1Eqi3sERmA+8s5+5Kh60/XmQi1Zd8ycQdYX3NOYTcsFE0eAPAWAIL89Z+qxJOD
+	 yyQN0ecgFqJiQnOiw02oX9/ACe5Mj6uqEZOWa4X1Kd9TSxNor9aFjSc57w98txU5NE
+	 c9b5b1KZvT2nTBsRkCzEcucEgzqUP7YCVPG7f3BH/jL1sy/SYfJUqc/+ebHmg9AXWp
+	 gZB6UGUEZZ4mQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wlnx8-00000006oKK-1w9t;
+	id 1wlnx8-00000006oKK-3mdk;
 	Mon, 20 Jul 2026 13:22:38 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -39,10 +40,12 @@ Cc: Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oupton@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 0/5] KVM: arm64: Make ICH_VTR_EL2 accesses an inlined literal
-Date: Mon, 20 Jul 2026 14:22:14 +0100
-Message-ID: <20260720132220.2143486-1-maz@kernel.org>
+Subject: [PATCH 2/5] KVM: arm64: Add a helper providing an inlined literal value for ICH_VTR_EL2
+Date: Mon, 20 Jul 2026 14:22:16 +0100
+Message-ID: <20260720132220.2143486-3-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260720132220.2143486-1-maz@kernel.org>
+References: <20260720132220.2143486-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -55,53 +58,124 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-I did it again.
+We already have two ways to deal with ICH_VTR_EL2:
 
-I was looking at NV traces, and realised that we were trapping a whole
-lot of accesses to ICH_VTR_EL2. But ICH_VTR_EL2 really is a constant
-from a hypervisor perspective, and we usually cache this in memory, just
-like any other ID register.
+- directly read the system register
+- read a cached copy in the vgic global state
 
-We do have a variable for this in kvm_vgic_global_state, but we don't
-map this one at EL2 since 8aaf3f7dce746 ("KVM: arm64: Don't map
-'kvm_vgic_global_state' at EL2 with pKVM").
+Add a third way, in the form of an inlined literal value that will
+eventually replace all of the above. This literal value is computed
+at boot time, and patched in the relevant code locations.
 
-So what can we do? We can revert back to mapping the global state, but
-that's not a very good idea. Or we can be creative and turn the
-ICH_VTR_EL2 accesses into a runtime constant patched into the
-code. Since we already have a bunch of similar things for the GICv3
-traps, that's no big deal.
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kernel/image-vars.h |  1 +
+ arch/arm64/kvm/vgic/vgic-v3.c  | 51 ++++++++++++++++++++++++++++++++++
+ arch/arm64/kvm/vgic/vgic.h     | 17 ++++++++++++
+ 3 files changed, 69 insertions(+)
 
-And for consistency, let's kill kvm_vgic_global_state.ich_vtr_el2
-altogether, so that there is only a single efficient way to read
-ICH_VTR_EL2.
-
-As usual, this has a significant impact on deeply nested workloads, a
-solid 5% reduction in elapsed time for an L3 Linux guest running under
-nested KVM instances. I expect this to benefit KVM running under other
-hypervisors as well.
-
-Patches on top of -rc3.
-
-Marc Zyngier (5):
-  KVM: arm64: vgic-v3: Make vtr_to_* helpers use architectural field
-    symbols
-  KVM: arm64: Add a helper providing an inlined literal value for
-    ICH_VTR_EL2
-  KVM: arm64: Convert most ICH_VTR_EL2 accesses to inlined literal value
-  KVM: arm64: vgic-v3: Simplify initial GICv3 configuration sampling
-  KVM: arm64: vgic-v3: Kill kvm_vgic_global_state.ich_vtr_el2
-
- arch/arm64/kernel/image-vars.h   |  1 +
- arch/arm64/kvm/hyp/vgic-v3-sr.c  | 29 ++++++--------
- arch/arm64/kvm/nested.c          |  3 +-
- arch/arm64/kvm/vgic-sys-reg-v3.c |  8 ++--
- arch/arm64/kvm/vgic/vgic-v3.c    | 69 +++++++++++++++++++++++++++-----
- arch/arm64/kvm/vgic/vgic-v5.c    |  5 +--
- arch/arm64/kvm/vgic/vgic.h       | 39 +++++++++++++-----
- include/kvm/arm_vgic.h           |  2 -
- 8 files changed, 108 insertions(+), 48 deletions(-)
-
+diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
+index d4c7d45ae6bc8..459c33634ebd1 100644
+--- a/arch/arm64/kernel/image-vars.h
++++ b/arch/arm64/kernel/image-vars.h
+@@ -92,6 +92,7 @@ KVM_NVHE_ALIAS(spectre_bhb_patch_wa3);
+ KVM_NVHE_ALIAS(spectre_bhb_patch_clearbhb);
+ KVM_NVHE_ALIAS(alt_cb_patch_nops);
+ KVM_NVHE_ALIAS(kvm_compute_ich_hcr_trap_bits);
++KVM_NVHE_ALIAS(kvm_patch_ich_vtr_el2);
+ 
+ /* Global kernel state accessed by nVHE hyp code. */
+ KVM_NVHE_ALIAS(kvm_vgic_global_state);
+diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+index 9e841e7afd4a7..ef62dd498f5cf 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-v3.c
+@@ -876,6 +876,57 @@ void noinstr kvm_compute_ich_hcr_trap_bits(struct alt_instr *alt,
+ 	*updptr = cpu_to_le32(insn);
+ }
+ 
++void noinstr kvm_patch_ich_vtr_el2(struct alt_instr *alt,
++				   __le32 *origptr, __le32 *updptr,
++				   int nr_inst)
++{
++	struct arm_smccc_res res = {};
++	u32 insn, oinsn, rd, vtr;
++
++	/* No KVM? Nothing to do */
++	if (!is_hyp_mode_available())
++		return;
++
++	/* No v3 (or v3 compat)? Nothing to do either */
++	if (!this_cpu_has_cap(ARM64_HAS_GICV5_LEGACY) &&
++	    !this_cpu_has_cap(ARM64_HAS_GICV3_CPUIF))
++		return;
++
++	/*
++	 * At the point where this is called, we are guaranteed that if
++	 * we're running at EL1, then the EL2 stubs are still in place.
++	 */
++	if (is_kernel_in_hyp_mode())
++		res.a1 = read_sysreg_s(SYS_ICH_VTR_EL2);
++	else
++		arm_smccc_1_1_hvc(HVC_GET_ICH_VTR_EL2, &res);
++
++	if (WARN_ON(res.a0 == HVC_STUB_ERR))
++		return;
++
++	vtr = res.a1;
++
++	/* Compute target register */
++	oinsn = le32_to_cpu(*origptr);
++	rd = aarch64_insn_decode_register(AARCH64_INSN_REGTYPE_RD, oinsn);
++
++	/* movz rd, #(vtr & 0xffff) */
++	insn = aarch64_insn_gen_movewide(rd,
++					 (u16)vtr,
++					 0,
++					 AARCH64_INSN_VARIANT_64BIT,
++					 AARCH64_INSN_MOVEWIDE_ZERO);
++	*updptr++ = cpu_to_le32(insn);
++
++	/* movk rd, #((vtr >> 16) & 0xffff), lsl #16 */
++	insn = aarch64_insn_gen_movewide(rd,
++					 (u16)(vtr >> 16),
++					 16,
++					 AARCH64_INSN_VARIANT_64BIT,
++					 AARCH64_INSN_MOVEWIDE_KEEP);
++	*updptr++ = cpu_to_le32(insn);
++}
++
+ void vgic_v3_enable_cpuif_traps(void)
+ {
+ 	u64 traps = vgic_ich_hcr_trap_bits();
+diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
+index f45f7e3ec4d6e..4f65a210041ff 100644
+--- a/arch/arm64/kvm/vgic/vgic.h
++++ b/arch/arm64/kvm/vgic/vgic.h
+@@ -180,6 +180,23 @@ static inline u64 vgic_ich_hcr_trap_bits(void)
+ 	return hcr;
+ }
+ 
++void kvm_patch_ich_vtr_el2(struct alt_instr *alt,
++			   __le32 *origptr, __le32 *updptr, int nr_inst);
++
++static inline u64 vgic_ich_vtr(void)
++{
++	u64 vtr;
++
++	/* All non-RES0 bits are in the bottom 32bits */
++	asm volatile(ALTERNATIVE_CB("movz %0, #0\n"
++				    "movk %0, #0, lsl #16\n",
++				    ARM64_ALWAYS_SYSTEM,
++				    kvm_patch_ich_vtr_el2)
++		     : "=r" (vtr));
++
++	return vtr;
++}
++
+ /*
+  * This struct provides an intermediate representation of the fields contained
+  * in the GICH_VMCR and ICH_VMCR registers, such that code exporting the GIC
 -- 
 2.47.3
 
