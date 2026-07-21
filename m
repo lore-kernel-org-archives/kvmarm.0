@@ -1,109 +1,72 @@
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FE973976A7
-	for <kvmarm@lists.linux.dev>; Tue, 21 Jul 2026 08:56:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55EFD3C0A14
+	for <kvmarm@lists.linux.dev>; Tue, 21 Jul 2026 08:59:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784624213; cv=none; b=J1I+m3qj/pJooOhDVjU5FgrMY2zyubc1nHoSFJ+8JQVaz/ig0LOrtGHJPXr01nxkH52GTC4rVLGfyH7H2/41AnqzDDo/fZgWd/yp/S9YA8a5MQR//m3NSi1PeMrBwcbSxa7MdUbS3ssvoMNkY6DNBquwjuf7CTJxoR8lVvsC5sA=
+	t=1784624353; cv=none; b=WBY5QFGfUl2+N7u7gTyXQ+CH0v5Suye4MuFoQ7UKLOmT3FqSSnGW4X185WiLafB8jEsfvMZiJhwnGD5Li4vCjy+ZZfsy+Ca7bdbVfEBF5ea1FmsvYtb5cFfvjT5CRhsZb62qfYifcxKO45skf9kYaGGYE3m0ffQhv0mx4a63Tc0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784624213; c=relaxed/simple;
-	bh=H5Jo2NE294YKi2+iOps1WJzux6a9VrlLZFbf4tPEIXM=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=bCskzM6vog+wuMLHmCYwvTmy5YCtVyTKiwwGlUvpcO2LsVHtQRBzJBO54khBNcUV/FxX3ksRBmrFoMltn4G148RfqksMi98cETJHgHF9Kq+J6wArtTfSMkB6SiOvm07XdQPuUmonX1pQaujP9nTFc0/GUWcM7Cu3nxvmacX5wUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=a3fNUNqp; arc=none smtp.client-ip=209.85.221.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com
+	s=arc-20240116; t=1784624353; c=relaxed/simple;
+	bh=mIRBSkYT/knMMHjLf1iN250p2zinYiYJdGsXK4RAguA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iCYD+TsC7e+2auUY6qv5PpjqVdSB250q32PG40AfAIVMl4oZuJo7y16gLIO1MCIQoMVgCimg8BVY0jl3HpHaQzk2qHPQibaZK9lmA6JDlh3lCL/oqscebb30hYwrorYbSJoG2RnkbOTAq8VoiRGZ524G+dZLeAAtyRuefOmHr6E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=aVoW0tQc; arc=none smtp.client-ip=91.218.175.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="a3fNUNqp"
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-4740be00302so6715801f8f.2
-        for <kvmarm@lists.linux.dev>; Tue, 21 Jul 2026 01:56:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1784624210; x=1785229010; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=Z76iw/uyYgGfytOiOZ22580VeGLYiQlgTYWmVZJjXYY=;
-        b=a3fNUNqpholUjLibj3WhADPocBk/JX6tNoqQJ72ebgS7CuJzlZF4eYNEDBf0o01Vic
-         mq3Ha65hExpnvuMy1anr+cL1W1NnQomDQgsJoaY4d11eK6wpMj2YP+hoJflYBCq3xr6i
-         0TIZh3fQhbnf81lL9V1fpaogCwdLOdxw622MhgFX8gbdNE6wPiSZRVbSoQxD3myRwBcH
-         UkrAWu2fCQooIZCsdo0gfp8hJ4Yx7I0B5xPZc1hXT0nieogkkNoF/3wgpdKOCgrexCdH
-         6UIqMi313FMFBYF2DdFI/8pSHRzmBUGsTXg2Elz14Q2oxHyjbkxcZMoicD2sWaAguz2T
-         8/ng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784624210; x=1785229010;
-        h=content-type:cc:to:from:subject:message-id:mime-version:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=Z76iw/uyYgGfytOiOZ22580VeGLYiQlgTYWmVZJjXYY=;
-        b=OWKraW2y/Ql0ycinggGsE18VkCIu9+8KKHh2Oks7eNefQVykGf3nPTjXizhlDCRYCG
-         Ru5usXlqhMLEP00vHHdGW+O75vJB1Qwai+Fxf+j4RdYuZs3ZEnjCdm2yQdDJZdxDCISo
-         H1+OkF4vB9V/qIl2yVB/Vu9CqG6GIdVlxr9+v+aBWSzfKWf7GVwkbIQ1gH0V0Gs+0WGY
-         ufbwGwXAAjxEu9VG0Dff/tXNQXBFwOJA3yY4+axwtgcvN5c6N39HSMB8SQtRqorDS0SB
-         QeKEFOxzK+fUSYygWIsiqx+d7ckFIfP9SADFMBlsBtL5X0BD9usA9zEfHSrveIniD8R4
-         SbGQ==
-X-Forwarded-Encrypted: i=1; AHgh+RpDC50JzW/NTWP2MnVYMV+fTnOyUSu+H/EeMLV4bVllcLGoB+sxtC8S2E3NgVXjWheVXkwx1NM=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwxGK2KyevdTJvcoqjJwV/RL5aXdVyUs8f8+ihLONVIRYLgmZ5i
-	GyjLHN9TDyUkSAAuCTASI4v+J/CkfIdyo8ulM3egyNBccK1IqIT/TlTgoDSXvBxWcvEeAiJYX/E
-	+plqRTzLrl9HMoQ==
-X-Received: from wrtr5.prod.google.com ([2002:a5d:4e45:0:b0:47f:40f3:b18a])
- (user=smostafa job=prod-delivery.src-stubby-dispatcher) by
- 2002:a5d:5f51:0:b0:47b:5f25:7c59 with SMTP id ffacd0b85a97d-47f6231c5dcmr20981425f8f.38.1784624209952;
- Tue, 21 Jul 2026 01:56:49 -0700 (PDT)
-Date: Tue, 21 Jul 2026 08:56:45 +0000
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="aVoW0tQc"
+Date: Tue, 21 Jul 2026 10:58:08 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1784624345;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QTGegFWNBEQm0YUeGI6qH59Pph3lrL6+2+bz/GFsUb4=;
+	b=aVoW0tQcsQfcLNcGR0ONVznjbP11YRKKUWr/a3MyJBajXMrTu/kRfb9YXAXwjHE05257ow
+	ElrQB8lygx+eliUHBAbPC0wXzwd9L9LuvyxrRxTTEjvJLAqQVVYdr8k5LTwg9J4mp6okKi
+	ozoq1243jrYvUMf4Yss+XaXQ1ujmazI=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Colton Lewis <coltonlewis@google.com>
+Cc: pbonzini@redhat.com, alexandru.elisei@arm.com, eric.auger@redhat.com, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
+Subject: Re: [kvm-unit-tests PATCH] Makefile: efi: preserve .dynstr section
+ for LLVM objcopy compatibility
+Message-ID: <lxhagolfvr6w5h5xujrhq33pzx7hb6db5ihga46z6qn3dba4nx@q5b2fdclitqs>
+References: <20260716173315.2775989-1-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.55.0.229.g6434b31f56-goog
-Message-ID: <20260721085646.1660673-1-smostafa@google.com>
-Subject: [PATCH v2] KVM: arm64: Optimize protected mode and FWB
-From: Mostafa Saleh <smostafa@google.com>
-To: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org
-Cc: maz@kernel.org, oupton@kernel.org, seiden@linux.ibm.com, 
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	catalin.marinas@arm.com, will@kernel.org, vdonnefort@google.com, 
-	tabba@google.com, sebastianene@google.com, keirf@google.com, 
-	Mostafa Saleh <smostafa@google.com>, Fuad Tabba <fuad.tabba@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260716173315.2775989-1-coltonlewis@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-KVM opportunistically enables FWB if supported by the system for guest
-VMs, which allows it to elude cache maintenance for data as they are
-forced to be cacheable from stage-2.
-In that case, __clean_dcache_guest_page() will immediately return.
-However in protected mode, before calling __clean_dcache_guest_page()
-it loops over the range and fix_map/unmap it, issuing TLB
-invalidations, dsb() and isb() unnecessarily.
+On Thu, Jul 16, 2026 at 05:33:15PM +0000, Colton Lewis wrote:
+> When building EFI binaries with llvm-objcopy, keeping sections with
+> '-j .dynamic -j .dynsym' without '-j .dynstr' fails with:
+> 
+>   llvm-objcopy: error: 'arm/spinlock-test.so': section '.dynstr'
+>   cannot be removed because it is referenced by the section '.dynamic'
+> 
+> Include '.dynstr' in the list of preserved sections across
+> arm/Makefile.common, riscv/Makefile, and x86/Makefile.common so that
+> EFI binaries can be built cleanly using llvm-objcopy.
+> 
+> Assisted-by: Gemini:gemini-next
+> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+> ---
+>  arm/Makefile.common | 2 +-
+>  riscv/Makefile      | 2 +-
+>  x86/Makefile.common | 2 +-
+>  3 files changed, 3 insertions(+), 3 deletions(-)
+>
 
-This can be optimized by returning early if FWB is supported,
-kvm_pgtable_stage2_map() already issues dsb() and tlb invalidation
-functions issue dsb() for the unmap path.
+Pushed.
 
-Signed-off-by: Mostafa Saleh <smostafa@google.com>
-Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
----
- arch/arm64/kvm/hyp/nvhe/mem_protect.c | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index 4e329e39a695..049a09be2bbf 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -261,6 +261,13 @@ static void __apply_guest_page(void *va, size_t size,
- 
- static void clean_dcache_guest_page(void *va, size_t size)
- {
-+	/*
-+	 * Guest stage-2 uses FWB if available, making it safe to elide CMOs.
-+	 * In contrast, the host stage-2 never has FWB enabled.
-+	 */
-+	if (cpus_have_final_cap(ARM64_HAS_STAGE2_FWB))
-+		return;
-+
- 	__apply_guest_page(va, size, __clean_dcache_guest_page);
- }
- 
--- 
-2.55.0.229.g6434b31f56-goog
-
+Thanks,
+drew
