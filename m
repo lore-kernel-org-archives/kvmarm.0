@@ -1,137 +1,98 @@
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from devianza.investici.org (devianza.investici.org [198.167.222.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF7E1431E5D
-	for <kvmarm@lists.linux.dev>; Tue, 21 Jul 2026 10:19:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A96B2E7F25
+	for <kvmarm@lists.linux.dev>; Tue, 21 Jul 2026 10:50:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.167.222.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784629170; cv=none; b=FMjyUGRTB/v+dCmtwViSVHplj2Pr6KEFgs409d2csBqEO9vJTIkAGHvVdeGGfYnhnQutTyBlQoR8IaEhsdfNEedFwnpREmpFixcfvLY37vKrTWxVDKlYRwWiey1E5mXqn7K4YJ6HUmWvG9EEEJTOr7BhSQHRoZgCmgu5ubHlN4M=
+	t=1784631047; cv=none; b=bBtfWh3lVODnWKQ4qYWC51rA5A7SfGevWtXT9YuUs0z4JDWrU5XHRQx+q657sdA55HC3Yzh2K0udhkyplqwZ8Ivf3gXXywfiEjOPctxmpG1ig2kOIEU4pstbhNJ9kBSdAAOG09lrYMeXwaisNrhicGF/bJmwIgbufPE13TAucCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784629170; c=relaxed/simple;
-	bh=eSm5wrlga3AWz+thbSYRjW/00aUtEdcAAvw7zwTxUhA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uNRwWaJ963SCIiJjslq/cIdAOYH8Obk8iznh9UEnUrn3FCTFjbiTVdxE9XyQiLToGcHUSi6o0SgVjsRATdtG+wjXq78Ll1IveAEaohTjL7u7Luo8goH4EzlYhcTHRN6pztK0mrkhP7qXIuArI6j/LVkoIMKwonrxutRfFJaYE/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NmUMir5v; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1784631047; c=relaxed/simple;
+	bh=1weqDUXvSEwaPwCSGL/jlYmibzgQuWhROHW2zX7Px/M=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=rSu9fixb6WZI78kP412BPpQDnu3C9E3xS51Gf7aJV1hwLtj4NPp+zx4j9ZMpRPfvhdMtRe55qtIUDOm7RPzhl7vJdrD673s1TdQ+Uwk79YJGnhdvpUia2Evv3KXDwazCOQaY9RChh3s5HmwmMOq9ZzHOg9/+ZiZhabpgfl+WFKU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=grrlz.net; spf=pass smtp.mailfrom=grrlz.net; dkim=pass (1024-bit key) header.d=grrlz.net header.i=@grrlz.net header.b=N59Po1k+; arc=none smtp.client-ip=198.167.222.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=grrlz.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=grrlz.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NmUMir5v"
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-495509b08ebso120885e9.1
-        for <kvmarm@lists.linux.dev>; Tue, 21 Jul 2026 03:19:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1784629167; x=1785233967; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=7MJ40kT4710HmcEWSuZdjclOwHS9zhiVrIrryh8M1XY=;
-        b=NmUMir5vb2cJ3ydqtwCKEL+IQLxdfT26/CsYL8SwZRiUePaAQN6BkAg3cTPCCXh7se
-         LZRgTc3PsmKwDHPTXPFw+yZ0YBd+T/StpcQCEiDPNaRT7LW3mhWgAYWSFK/MUUUK0tGp
-         BjtVcClmljP9oYjn1pq5HchvjpDr8KaDWjSnJzLU8kDuO24ammHjRdLdOSBMy0+Ld60s
-         vlyyZN/+WAtYRqHKi7rwUQI+FDp8ARzn8uv+JD/DU08qcZvwjkdcOWqaINTYSqFasVUd
-         9aE+trGODvISi0hM49Fj59tGqrEcV1PTPpY3GhcmRXVdT+f745b6hWltys6GnWTlvOGy
-         qRbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784629167; x=1785233967;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=7MJ40kT4710HmcEWSuZdjclOwHS9zhiVrIrryh8M1XY=;
-        b=jUPlFoHiUFwL3sYhYtVH0qKyelDp/X3OAD5jJy6Spl2yTy69MscAEPUS4A9Yqxl8A2
-         er2b7P0iLzK68AUdF31unf15pNxQ3VZ/yHGizDAoDPRfDhGiSMGGiQSfxd7O0zADz48a
-         h3zwH6Kxfd5J57ePZyWHmvPzwVx6X46gXeFI90FVdIPTtPK0T3oyxNlqBHVAqfWitHOB
-         pLzUhzaM7UywRuvPdfN1RE7E2nQkPMP11aoKSrAJJVfNRb1ChND0zodeCSrWhpUuhPaV
-         OZsNJW5khFCQejaNbWXD3E5ePn52wxcuRS6EXtdwSHWvmndhJ9y83ln9nG7jntD3kT8i
-         p8IA==
-X-Forwarded-Encrypted: i=1; AHgh+RoFwrrqC7meE1cxeV4rIMW8Y2C4viA+ebeJ5CIIQNwxgplPAL0nysoH2EBnQMJF56tdm8TfE9M=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yyi9lldS1kDgDXRrcfnCDoaOLDP4xAnzDPdrocdOgYmOyuqY09w
-	n6tHk5Pn15S8CO8Aox5wlRrnyON/jb/R5NW84C7OV05O7D+Q5FIEYnCAlkCoCqsUOA==
-X-Gm-Gg: AfdE7ck7unlps9s1AC5QQBasb5WzHcAVVh1EJzBLOSmPZ6EiHm0CYwcCJldIvSRpp/p
-	9X88/7mJVNi4GhUTz585tKOScCeU4YeLxrxhUML5Rbl/gTXRwXkiNRnwjiINGZbM37sG8cDu8pY
-	upOFxKHndpuJzlmTO+GzwEQFxZPnk/UUUG6Eqa8fjs0oDoquL8/5eqVUrnbFudnatCRjWKUJf65
-	pFlXzTebclQ66Ng7otHXn3VrZj6PriyFOxULhfnQMRRNsQzboYG+xihqwcWHSJ0FoKhfeYecui9
-	amBNo3IIhma+CGBNgC3YvQsiWb4BztYCgYi7jFtcSGUB1ZiTPAoaBdhzPQsZBufrn8bmJNr7HaA
-	lSHf95SERBwNNQVWBCm1vCGKDMgutWW0KlZo3Y3rIG4xP5SCcCmbhftSLTjp40wDxn0pz2rWLhw
-	mESl3Vft+CAr9QMmiAbhhqxwpD7HtOhLn/P/xwAA==
-X-Received: by 2002:a05:600c:300b:b0:495:4747:548b with SMTP id 5b1f17b1804b1-495642ea594mr1062635e9.0.1784629166651;
-        Tue, 21 Jul 2026 03:19:26 -0700 (PDT)
-Received: from google.com (220.60.76.34.bc.googleusercontent.com. [34.76.60.220])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47f63ee926dsm35363290f8f.35.2026.07.21.03.19.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jul 2026 03:19:25 -0700 (PDT)
-Date: Tue, 21 Jul 2026 10:19:22 +0000
-From: Mostafa Saleh <smostafa@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, oupton@kernel.org,
-	seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org,
-	vdonnefort@google.com, tabba@google.com, sebastianene@google.com,
-	keirf@google.com, Fuad Tabba <fuad.tabba@linux.dev>
-Subject: Re: [PATCH v2] KVM: arm64: Optimize protected mode and FWB
-Message-ID: <al9HqhO6sp3FFbtQ@google.com>
-References: <20260721085646.1660673-1-smostafa@google.com>
- <86y0f4ejr4.wl-maz@kernel.org>
+	dkim=pass (1024-bit key) header.d=grrlz.net header.i=@grrlz.net header.b="N59Po1k+"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=grrlz.net;
+	s=stigmate; t=1784631033;
+	bh=tSeeoZJp2knuheF3VC8Cg0vSsJ06Oi4KKbvrXmMmHGA=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+	b=N59Po1k+rbpJAYub9rNYigwnjcVbFXA+fYg+xnw0gUwbD+VI8mImpa494f42lMBHR
+	 v1U82ZfSVnzcqitul7kMsQ1HbxoX77oYc0/JIo65IQ0vuJ0vt38i7Qe9KCmdCCOsaW
+	 mCqWvCBEOlQ8+iVDZ7G80jKwMTOZHUt6kDVCdYgg=
+Received: from mx2.investici.org (unknown [127.0.0.1])
+	by devianza.investici.org (Postfix) with ESMTP id 4h4DgY4WZRz6vPL;
+	Tue, 21 Jul 2026 10:50:33 +0000 (UTC)
+Received: by mx2.investici.org (Postfix) id 4h4DgY1HwPz4vyJ;
+	Tue, 21 Jul 2026 10:50:33 +0000 (UTC)
+Date: Tue, 21 Jul 2026 11:50:33 +0100
+From: Bradley Morgan <include@grrlz.net>
+To: Fuad Tabba <fuad.tabba@linux.dev>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oupton@kernel.org>
+CC: Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Shuah Khan <shuah@kernel.org>, Quentin Perret <qperret@google.com>,
+ Vincent Donnefort <vdonnefort@google.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>, Gavin Shan <gshan@redhat.com>,
+ Dev Jain <dev.jain@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ linux-kernel@vger.kernel.org
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v5_4/7=5D_KVM=3A_arm64=3A_Skip_p?=
+ =?US-ASCII?Q?KVM_stage-2_flush_when_FWB_is_enabled?=
+In-Reply-To: <20260717130317.1953574-5-fuad.tabba@linux.dev>
+References: <20260717130317.1953574-1-fuad.tabba@linux.dev> <20260717130317.1953574-5-fuad.tabba@linux.dev>
+Message-ID: <2ECE2480-4E56-4EE8-AE1F-36571463A930@grrlz.net>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86y0f4ejr4.wl-maz@kernel.org>
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jul 21, 2026 at 11:10:07AM +0100, Marc Zyngier wrote:
-> On Tue, 21 Jul 2026 09:56:45 +0100,
-> Mostafa Saleh <smostafa@google.com> wrote:
-> > 
-> > KVM opportunistically enables FWB if supported by the system for guest
-> > VMs, which allows it to elude cache maintenance for data as they are
-> > forced to be cacheable from stage-2.
-> > In that case, __clean_dcache_guest_page() will immediately return.
-> > However in protected mode, before calling __clean_dcache_guest_page()
-> > it loops over the range and fix_map/unmap it, issuing TLB
-> > invalidations, dsb() and isb() unnecessarily.
-> > 
-> > This can be optimized by returning early if FWB is supported,
-> > kvm_pgtable_stage2_map() already issues dsb() and tlb invalidation
-> > functions issue dsb() for the unmap path.
-> > 
-> > Signed-off-by: Mostafa Saleh <smostafa@google.com>
-> > Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
-> > ---
-> >  arch/arm64/kvm/hyp/nvhe/mem_protect.c | 7 +++++++
-> >  1 file changed, 7 insertions(+)
-> > 
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > index 4e329e39a695..049a09be2bbf 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > @@ -261,6 +261,13 @@ static void __apply_guest_page(void *va, size_t size,
-> >  
-> >  static void clean_dcache_guest_page(void *va, size_t size)
-> >  {
-> > +	/*
-> > +	 * Guest stage-2 uses FWB if available, making it safe to elide CMOs.
-> > +	 * In contrast, the host stage-2 never has FWB enabled.
-> 
-> Beeeeeeep!!! Since a373930ec9406 ("KVM: arm64: Switch pKVM host S2
-> over to KVM_PGTABLE_S2_AS_S1"), FWB is enabled everywhere when
-> available.
-> 
-> Not sure that changes anything, but the comment is factually wrong.
+On July 17, 2026 2:03:14 PM GMT+01:00, Fuad Tabba <fuad.tabba@linux.dev>
+wrote:
+>pkvm_pgtable_stage2_flush() cleans the D-cache for every mapping in the
+>range even on hardware with stage-2 Force Write-Back, where FWB keeps
+>guest memory coherent to the PoC and the maintenance is unnecessary. The
+>generic kvm_pgtable_stage2_flush() returns early in that case, but the
+>pKVM MMU does not, so it needlessly cleans the whole range on, e.g.,
+>every set/way trap.
+>
+>Return early when FWB is enabled, matching the generic walker.
+>
+>Fixes: e912efed485a ("KVM: arm64: Introduce the EL1 pKVM MMU")
+>Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 
-Ah, I see it uses KVM_PGTABLE_S2_AS_S1 in that case, that should not
-change the patch, I will need to update the comment.
+LGTM,
 
-Thanks,
-Mostafa
+Reviewed-by: Bradley Morgan <include@grrlz.net>
 
+>---
+> arch/arm64/kvm/pkvm.c | 4 ++++
+> 1 file changed, 4 insertions(+)
+>
+>diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+>index f70c601dcf4c..ba6570e37545 100644
+>--- a/arch/arm64/kvm/pkvm.c
+>+++ b/arch/arm64/kvm/pkvm.c
+>@@ -518,6 +518,10 @@ int pkvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size)
+> 	struct pkvm_mapping *mapping;
 > 
-> Thanks,
-> 
-> 	M.
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
+> 	lockdep_assert_held(&kvm->mmu_lock);
+>+
+>+	if (cpus_have_final_cap(ARM64_HAS_STAGE2_FWB))
+>+		return 0;
+>+
+> 	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping) {
+> 		if (!mapping->nc)
+> 			__clean_dcache_guest_page(pfn_to_kaddr(mapping->pfn),
+>
+
+Thanks!
