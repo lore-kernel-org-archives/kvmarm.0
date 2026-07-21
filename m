@@ -1,154 +1,134 @@
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+Received: from confino.investici.org (confino.investici.org [93.190.126.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1759582866
-	for <kvmarm@lists.linux.dev>; Tue, 21 Jul 2026 10:52:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EFA23A3E6F
+	for <kvmarm@lists.linux.dev>; Tue, 21 Jul 2026 11:19:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.190.126.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784631154; cv=none; b=VLoIPSd1kPTecMgicPFbU1gnj8J0n3o1bFW0BW7XoMxmy/aQnxe/LLtmk8u6+DnS/MPpc8hl7vYxrU+BmdLXcHNKOLkVcr/Md3h0qNGl5/JIzJwt2q3QoC2fSM7amVBlgNA7qbbWyitTu7BGtfDHQGk/m7fCOMVbD+O8RQm02tc=
+	t=1784632788; cv=none; b=vGCWvr2ceMvFpmctQfY9RXdn2UhjIXk/ZPHdvgG2NrQrR04qVf7BakL9x0a4pd5Aqx70YkUwC+9hwrZrU1KCsDSEZl23BZH4NjvOXlJeb97GyhcA/O2xrOVRLab9EyOgYzoeMzA0LfceZcVYUx3jpm+G8/v9fT4zWQ0TJ8b0OVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784631154; c=relaxed/simple;
-	bh=jZb+AH6CvociyFjei0lbIoOfTKMS44c3rrgpAak1+0I=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AuElsLr49hs/EpJQ8agnof2jTk2hGbaRfpikPly4zSJGNoyKDYKxDPxDZNAYK9BkwYCQ5fE+Vej3pM1mrz5iaK8mFv5zgMqR7uxBZF/NBjhQjKfiNd69S8LePYB7WkFTPfxKNH1gyk4TAYY4lGuDKDkBRhKr6AzPOEziJa2DGKY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xCSa3agi; arc=none smtp.client-ip=91.218.175.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1784632788; c=relaxed/simple;
+	bh=w6PkiP1flOl9ZsswQgZ+pIo7UKLiQkuPwSrZgNfhae0=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=jTFD65oW9GMb3tPS+//4w5Sp58X/yjoB9i9MXkjeKzbtSRSBk6/nJCBwib4AN/n/K45o2fNauZnv3FYUkLYQ/A4QLvdEm9dkTEXRaXZNBlVAbm3ChG8tbL9iy+nzG9oU0Ja/+BQ2AJ4icD2v0YH/lirDEwjqB+zgadXhzHUSMq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=grrlz.net; spf=pass smtp.mailfrom=grrlz.net; dkim=pass (1024-bit key) header.d=grrlz.net header.i=@grrlz.net header.b=gdm76/8K; arc=none smtp.client-ip=93.190.126.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=grrlz.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=grrlz.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xCSa3agi"
-X-Forwarded-Encrypted: i=1; AHgh+RomV8YPaMkUO5kUkuDSMUoNWDWPFMJJuQ2za6MugfSNIwCPThr+rHsR69Ea7lqtkMoPTqhkmtM=@lists.linux.dev
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1784631148;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qwxGjo3C3PaTbZ1upD/wKWCbmcm+Dks40hLiS0mMgj0=;
-	b=xCSa3agiFOnxctcvGKc07FCmHaL8ZUBMbhgz9xeL3c6WzOUbrl7caNkY/eAGYvNyoW4dPs
-	gs/ZniO+iG/D+9WEXaR5o/PCyh5tP0ARCP/GhfvBv098GkH7hf5ZLLRxXFuUCrqTqN1mEy
-	dFFvZHinDYwDHH7sBz69KQcEyDp+ksg=
-X-Gm-Message-State: AOJu0YwJcnHllHHXW6CHdfdvEy6tcuDceIyaQbmwWHGHrUEW9NbJOXL9
-	Jfm/1GpUDQEIzuZg+Z9lbssUvxa+1s2ed2w0/gv5aFYKtiu1nbAjAM0xCpNiS1vFIGQqXxnNDSz
-	Oz1XkaZ6BOFMfMyIZEcgTuO9WQAU/IsxcYwd8Ff9r
-X-Received: by 2002:a05:622a:2b47:b0:4ff:c0e7:be9c with SMTP id
- d75a77b69052e-525fcfa53f6mr13372511cf.0.1784631143501; Tue, 21 Jul 2026
- 03:52:23 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=grrlz.net header.i=@grrlz.net header.b="gdm76/8K"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=grrlz.net;
+	s=stigmate; t=1784632772;
+	bh=zittTEWM8rPILsPt3a58zZ7r/aXTvuUZ0lKQ8ayWgts=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+	b=gdm76/8KoI1JCXkGNvKnYWOKFHSjrT4epNsLd9UIPL2Xm+3p67qtzmq+xVfWh7xyw
+	 rmJKi8ThyCV/Dlp8SgniyY2lUFoUCRucRFafnD4dsI9EYdT0u//HFk4lepBQGueT8/
+	 Zvi3Ln4n59PQrpqhW7gK6smsB/KkEvDqQzvDgnTM=
+Received: from mx1.investici.org (unknown [127.0.0.1])
+	by confino.investici.org (Postfix) with ESMTP id 4h4FK04Bj6z10np;
+	Tue, 21 Jul 2026 11:19:32 +0000 (UTC)
+Received: by mx1.investici.org (Postfix) id 4h4FJz4qLyz10nB;
+	Tue, 21 Jul 2026 11:19:31 +0000 (UTC)
+Date: Tue, 21 Jul 2026 12:19:31 +0100
+From: Bradley Morgan <include@grrlz.net>
+To: Fuad Tabba <fuad.tabba@linux.dev>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oupton@kernel.org>
+CC: Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Shuah Khan <shuah@kernel.org>, Quentin Perret <qperret@google.com>,
+ Vincent Donnefort <vdonnefort@google.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>, Gavin Shan <gshan@redhat.com>,
+ Dev Jain <dev.jain@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ linux-kernel@vger.kernel.org
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v5_6/7=5D_KVM=3A_arm64=3A_Don=27t_ad?=
+ =?US-ASCII?Q?vertise_eager_page_splitting_under_pKVM?=
+In-Reply-To: <20260717130317.1953574-7-fuad.tabba@linux.dev>
+References: <20260717130317.1953574-1-fuad.tabba@linux.dev> <20260717130317.1953574-7-fuad.tabba@linux.dev>
+Message-ID: <C5D63651-E924-4297-9B4D-6E9DB04D64D8@grrlz.net>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260721100654.476582-1-alexandru.elisei@arm.com>
-In-Reply-To: <20260721100654.476582-1-alexandru.elisei@arm.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Tue, 21 Jul 2026 11:51:46 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTxE_nzEmos5SKso5GuwVD=xzdiVWwe_PweRugw0Ry9LCg@mail.gmail.com>
-X-Gm-Features: AUfX_mxoUdDr3Z0VPtcSLj2d9seKYTW01ZdyS0410ymZuRA_6deg14RYY6K9Jbo
-Message-ID: <CA+EHjTxE_nzEmos5SKso5GuwVD=xzdiVWwe_PweRugw0Ry9LCg@mail.gmail.com>
-Subject: Re: [PATCH v3] KVM: arm64: Reject guest_memfd memslots when the VM
- has MTE
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com, 
-	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	catalin.marinas@arm.com, will@kernel.org, steven.price@arm.com
-Content-Type: text/plain; charset="UTF-8"
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 8bit
 
-Hi Alex,
-
-...
-
+On July 17, 2026 2:03:16 PM GMT+01:00, Fuad Tabba <fuad.tabba@linux.dev>
+wrote:
+>Under pKVM the stage-2 walker resolves to pkvm_pgtable_stage2_split(), a
+>WARN_ON_ONCE(1) stub, yet KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE is still
+>enabled and reported for non-protected guests: the capability check keys
+>on the per-VM protected state while the walker dispatch keys on the
+>host-global mode. Enabling the cap and then dirty-logging the guest
+>reaches the stub, splatting a userspace-reachable WARN.
 >
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index a5f9ee92f43e..53547fac5e37 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -8414,6 +8414,11 @@ When this capability is enabled all memory in memslots must be mapped as
->  attempts to create a memslot with an invalid mmap will result in an
->  -EINVAL return.
+>Reject the capability, and stop reporting a chunk size and the
+>supported block sizes, for every VM once pKVM is enabled, keyed on the
+>host-global mode like the split dispatch. Gating only protected VMs
+>would leave the non-protected guests that reach the stub still able to
+>enable it. Userspace decides whether eager splitting is available from
+>the block-size bitmap (QEMU falls back to no eager splitting when it
+>reads 0), so leaving it advertised steers an explicit request into the
+>enable failure instead of the fallback.
 >
-> +``guest_memfd``, even though is an anonymous file, is incompatible with MTE.
-> +Attempting to create a memslot backed by ``guest_memfd`` when the MTE capability
-> +is enabled, or attempting to enable the MTE capability after ``guest_memfd``
-> +backed memslots have been created, will result in an error.
+>Fixes: e912efed485a ("KVM: arm64: Introduce the EL1 pKVM MMU")
+>Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 
-A few couple of smaller things first: "even though _it_ is an
-anonymous file". "guest_memfd backed memslots" could be hyphenated,
-and "will result in an error" could be "will result in an -EINVAL
-return" to match the paragraph above it.
+Do you think CC stable would be good? I do but sometimes I'm
+embarrassingly wrong
 
-On the wording itself, I would lean towards "not supported" rather
-than "incompatible". The gmem fault path currently doesn't handle MTE
-tags, but I don't think there's a fundamental reason this can't be
-changed in the future.
-
-With these fixed:
-Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
-
-Cheers,
-/fuad
-
-
->  When enabled the VMM may make use of the ``KVM_ARM_MTE_COPY_TAGS`` ioctl to
->  perform a bulk copy of tags to/from the guest.
+>---
+> arch/arm64/include/asm/kvm_pkvm.h | 3 +++
+> 1 file changed, 3 insertions(+)
 >
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 50adfff75be8..9a6c72a18672 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -149,14 +149,27 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
->                 set_bit(KVM_ARCH_FLAG_RETURN_NISV_IO_ABORT_TO_USER,
->                         &kvm->arch.flags);
->                 break;
-> -       case KVM_CAP_ARM_MTE:
-> -               mutex_lock(&kvm->lock);
-> -               if (system_supports_mte() && !kvm->created_vcpus) {
-> -                       r = 0;
-> -                       set_bit(KVM_ARCH_FLAG_MTE_ENABLED, &kvm->arch.flags);
-> +       case KVM_CAP_ARM_MTE: {
-> +               struct kvm_memory_slot *memslot;
-> +               int bkt;
-> +
-> +               guard(mutex)(&kvm->lock);
-> +               if (!system_supports_mte() || kvm->created_vcpus)
-> +                       break;
-> +
-> +               r = 0;
-> +               guard(mutex)(&kvm->slots_lock);
-> +               kvm_for_each_memslot(memslot, bkt, kvm_memslots(kvm)) {
-> +                       if (kvm_slot_has_gmem(memslot)) {
-> +                               r = -EINVAL;
-> +                               break;
-> +                       }
->                 }
-> -               mutex_unlock(&kvm->lock);
-> +               if (r == 0)
-> +                       set_bit(KVM_ARCH_FLAG_MTE_ENABLED, &kvm->arch.flags);
->                 break;
-> +
-> +       }
->         case KVM_CAP_ARM_SYSTEM_SUSPEND:
->                 r = 0;
->                 set_bit(KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED, &kvm->arch.flags);
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 6c941aaa10c6..2d95203386ba 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -2652,6 +2652,10 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
->         if (kvm_slot_has_gmem(new) && !kvm_memslot_is_gmem_only(new))
->                 return -EINVAL;
+>diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
+>index 57afb07d6b13..beea00e693a0 100644
+>--- a/arch/arm64/include/asm/kvm_pkvm.h
+>+++ b/arch/arm64/include/asm/kvm_pkvm.h
+>@@ -45,6 +45,9 @@ static inline bool kvm_pkvm_ext_allowed(struct kvm *kvm, long ext)
+> 		return true;
+> 	case KVM_CAP_ARM_MTE:
+> 		return false;
+>+	case KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE:
+>+	case KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES:
+>+		return false;
+
+
+Nit: KVM_CAP_ARM_MTE right above already returns false, fold the two
+new cases into that and drop the duplicate return. And please put a small
+comment saying eager splitting is unimplemented under pKVM (WARN
+stub), so nobody reads the list later and "fixes" it back, here's a
+example, feel free to bikeshed
+
+
+	case KVM_CAP_ARM_MTE:
+	/* eager splitting is unimplemented in pKVM, please don't refix this */
+	case KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE:
+	case KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES:
+		return false;
+	default:
+		return !kvm || !kvm_vm_is_protected(kvm);
+	}
+
+
+
+
+Killing the reporting too is right imo. Qemu reads a 0 block size
+bitmap and quietly falls back, an explicit enable eating EINVAL is the
+worse failure mode. Good.
+
+if u choose not to, it's ok, please add 
+
+Reviewed-by: Bradley Morgan
+<include@grrlz.net>
+
+
+> 	default:
+> 		return !kvm || !kvm_vm_is_protected(kvm);
+> 	}
 >
-> +       /* guest_memfd is incompatible with MTE. */
-> +       if (kvm_slot_has_gmem(new) && kvm_has_mte(kvm))
-> +               return -EINVAL;
-> +
->         hva = new->userspace_addr;
->         reg_end = hva + (new->npages << PAGE_SHIFT);
->
->
-> base-commit: 1590cf0329716306e948a8fc29f1d3ee87d3989f
-> --
-> 2.55.0
->
+
+Thanks!
