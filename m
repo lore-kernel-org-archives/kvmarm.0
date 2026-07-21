@@ -1,40 +1,44 @@
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55EFD3C0A14
-	for <kvmarm@lists.linux.dev>; Tue, 21 Jul 2026 08:59:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27DD83C37A9
+	for <kvmarm@lists.linux.dev>; Tue, 21 Jul 2026 09:10:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784624353; cv=none; b=WBY5QFGfUl2+N7u7gTyXQ+CH0v5Suye4MuFoQ7UKLOmT3FqSSnGW4X185WiLafB8jEsfvMZiJhwnGD5Li4vCjy+ZZfsy+Ca7bdbVfEBF5ea1FmsvYtb5cFfvjT5CRhsZb62qfYifcxKO45skf9kYaGGYE3m0ffQhv0mx4a63Tc0=
+	t=1784625051; cv=none; b=Rlq/vmhZ7g6w4XO2MLz4PSmxNA3rgHXoSJCmIpnNI5d+SzbfcKfL0DrMrUnJqW1zhgiFEzdkl03A5ykRm7F+VVc86uyFT1mYmvDkler++SzsO1lNXoiMU3q6ZJKPnYosPsyAVBR3h1oh5IqkBGNje96EONh1InhATBOlSBfv3ek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784624353; c=relaxed/simple;
-	bh=mIRBSkYT/knMMHjLf1iN250p2zinYiYJdGsXK4RAguA=;
+	s=arc-20240116; t=1784625051; c=relaxed/simple;
+	bh=J/TTouf1smFaZ0wJ/GLwH9QNxA9AZu7fNFGLM19UhfY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iCYD+TsC7e+2auUY6qv5PpjqVdSB250q32PG40AfAIVMl4oZuJo7y16gLIO1MCIQoMVgCimg8BVY0jl3HpHaQzk2qHPQibaZK9lmA6JDlh3lCL/oqscebb30hYwrorYbSJoG2RnkbOTAq8VoiRGZ524G+dZLeAAtyRuefOmHr6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=aVoW0tQc; arc=none smtp.client-ip=91.218.175.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	 Content-Type:Content-Disposition:In-Reply-To; b=b5W1WR1M4LoPRJ9D6hhWxroBxiOdiH8RJl/VJiPfaCEh452kwngSEG3OemWB7dL2feDasPTYrJi26A7boE4/EZtnf191dsJm97OjinSxemE7qvun4PE2Elx8KDLUdtSwvDYs7GXWKqCYadvNQwyg3sKGmKY3YOICc+pb6OHjzws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Kj0yFMLP; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="aVoW0tQc"
-Date: Tue, 21 Jul 2026 10:58:08 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1784624345;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QTGegFWNBEQm0YUeGI6qH59Pph3lrL6+2+bz/GFsUb4=;
-	b=aVoW0tQcsQfcLNcGR0ONVznjbP11YRKKUWr/a3MyJBajXMrTu/kRfb9YXAXwjHE05257ow
-	ElrQB8lygx+eliUHBAbPC0wXzwd9L9LuvyxrRxTTEjvJLAqQVVYdr8k5LTwg9J4mp6okKi
-	ozoq1243jrYvUMf4Yss+XaXQ1ujmazI=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Colton Lewis <coltonlewis@google.com>
-Cc: pbonzini@redhat.com, alexandru.elisei@arm.com, eric.auger@redhat.com, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
-Subject: Re: [kvm-unit-tests PATCH] Makefile: efi: preserve .dynstr section
- for LLVM objcopy compatibility
-Message-ID: <lxhagolfvr6w5h5xujrhq33pzx7hb6db5ihga46z6qn3dba4nx@q5b2fdclitqs>
-References: <20260716173315.2775989-1-coltonlewis@google.com>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Kj0yFMLP"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EE4971595;
+	Tue, 21 Jul 2026 02:10:43 -0700 (PDT)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4E9643F66F;
+	Tue, 21 Jul 2026 02:10:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1784625048; bh=J/TTouf1smFaZ0wJ/GLwH9QNxA9AZu7fNFGLM19UhfY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Kj0yFMLPYPXndUtCQvXAlYvq4RU/cOZHL44M5H8vsTft5co+1shTfNX7W37kujWnD
+	 NyBEr1jK/y901NxBVRHG7yRnwSfYyztbJGAJ26h5CoAhpJCSFGIc1ve4awJ8gHy2VZ
+	 lGS+l8zHYVzQ89zmHJR5LharzDNb6spmSclGNa0Y=
+Date: Tue, 21 Jul 2026 10:10:43 +0100
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: oupton@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	catalin.marinas@arm.com, will@kernel.org, steven.price@arm.com,
+	fuad.tabba@linux.dev
+Subject: Re: [PATCH v2] KVM: arm64: Reject guest_memfd memslots when the VM
+ has MTE
+Message-ID: <al83k-ijRGy10Qmp@raptor>
+References: <20260720130942.135033-1-alexandru.elisei@arm.com>
+ <864ihtfyue.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -43,30 +47,48 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260716173315.2775989-1-coltonlewis@google.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <864ihtfyue.wl-maz@kernel.org>
 
-On Thu, Jul 16, 2026 at 05:33:15PM +0000, Colton Lewis wrote:
-> When building EFI binaries with llvm-objcopy, keeping sections with
-> '-j .dynamic -j .dynsym' without '-j .dynstr' fails with:
-> 
->   llvm-objcopy: error: 'arm/spinlock-test.so': section '.dynstr'
->   cannot be removed because it is referenced by the section '.dynamic'
-> 
-> Include '.dynstr' in the list of preserved sections across
-> arm/Makefile.common, riscv/Makefile, and x86/Makefile.common so that
-> EFI binaries can be built cleanly using llvm-objcopy.
-> 
-> Assisted-by: Gemini:gemini-next
-> Signed-off-by: Colton Lewis <coltonlewis@google.com>
-> ---
->  arm/Makefile.common | 2 +-
->  riscv/Makefile      | 2 +-
->  x86/Makefile.common | 2 +-
->  3 files changed, 3 insertions(+), 3 deletions(-)
->
+Hi Marc,
 
-Pushed.
+On Mon, Jul 20, 2026 at 04:46:33PM +0100, Marc Zyngier wrote:
+> On Mon, 20 Jul 2026 14:09:42 +0100,
+> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> > 
+> > The user cannot use MTE on VMAs created by mapping a guest_memfd file,
+> > as arch_calc_vm_flag_bits() does not set VM_MTE_ALLOWED.
+> > 
+> > When creating a guest_memfd backed memslot,
+> > kvm_arch_prepare_memory_region() rejects the memslot if MTE is enabled for
+> > the VM and if guest_memfd has been mapped in a VMA that intersects the
+> > memslot.
+> > 
+> > However, the documentation for KVM_SET_USER_MEMORY_REGION2 explicitly
+> > states that the only condition for userspace_addr is for it to be a legal
+> > userspace address, but the mapping is not required to be valid nor
+> > populated at memslot creation.
+> > 
+> > If userspace sets userspace_addr to an address that hasn't been mapped, or
+> > if userspace_addr belongs to a VMA that isn't backed by the guest_memfd
+> > file, or if the VMA doesn't intersect the memslot, memslot creation is
+> > successful and KVM ends up with a VM with MTE and guest_memfd-backed
+> > memslots.
+> > 
+> > The same happens if the order is reversed: when userspace enables MTE, KVM
+> > does not check if memslots backed by guest_memfd are already present.
+> > 
+> > Fix both issues by rejecting guest_memfd-backed memslots when MTE is
+> > enabled, and by reject MTE when guest_memfd-backed memslots are already
+> > present.
+> > 
+> > Fixes: 32e200bd6e44 ("KVM: arm64: Enable support for guest_memfd backed memory")
+> > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> 
+> This looks reasonable to me, but you probably want to capture some of
+> that in the documentation one way or another, because this will leave
+> the amateur VMM author puzzled for a bit...
+
+Of course, will do that in v3.
 
 Thanks,
-drew
+Alex
