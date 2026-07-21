@@ -1,142 +1,134 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56B8834CFD3
-	for <kvmarm@lists.linux.dev>; Tue, 21 Jul 2026 15:03:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87D0246C4A5
+	for <kvmarm@lists.linux.dev>; Tue, 21 Jul 2026 15:42:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784646207; cv=none; b=SgTFL9fodtlQQwNEtCCgPEDM2lB4ANahnRLnLdxNnzg37sSB3JMEWusRI2RPoXmS3++LhIH2hmljhjrvfX3QVSiA6MdHy56wL3hSxpgOL6IrW1oSUkR3eppuBTDo5wxwQ84esoHOd/kLUqAn1mezcM8W6ammQG92tf5VWPrmd8Y=
+	t=1784648567; cv=none; b=RSvhy88zUeS2mRSTyy3VVlvOSnSOhO7BAFoRuxBt63l7y98KOnz5NtwBFd2Wdc2Lgpq9rSKfiCvuPgODPrUMhqaqQBNA4ZYQi+KRKKkQud2r8Euoq88vND9TkCIHpt0Ow/BuLg1MJq2N321s4mnYMCv07XJn56/7DBit2SI0vR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784646207; c=relaxed/simple;
-	bh=fF6pOV3Aqd0Fkv980PC1XUaAGPByA/Ga5SW4/I3I5SQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KuDjmi/wBknyZZYjRc/Y14//2D3gs9scPtQQIsgVlqK6+razCa737gxdOgOgkO4QB5PWb4Z6uIUgl7pW8FjpyAGIfElqbD1G2lqae9zmu/8Nkaf550A91SAdXdtk626GyzRP4kaWfjwlumQPr1xmPi1ngf2oGNw/UIysu0lZy1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MmAviGzM; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1784648567; c=relaxed/simple;
+	bh=dEg/xk5pG1vBiItxvEEZyeqvpuox2nryklNQjghqD3M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aVtAFa0HClHNPA+XpjOHnFHQ2LoHys2MHETcxiYRD5/9kmteFGWqkJ8sGX3E1y5qewAUeYQMb6DbG1aNV5ZE4OrZx0yLCW4ehRGASXOlx0c+/qAHiwZNsgpQ0cKd4f+k4h0LA2ILdV4TDR3VHNOtQJbgYpJk/NFguh3mnXvLSAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=U3AA/wH5; arc=none smtp.client-ip=95.215.58.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MmAviGzM"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1784646205;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="U3AA/wH5"
+X-Forwarded-Encrypted: i=1; AHgh+RrfyZuQ6e77lszY/GC3AJ5nN8E3IrTtk3gpg3sZKPNsBx5Fs0ZEiiHYB9tiTeANHet0E83ij4w=@lists.linux.dev
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1784648562;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=AljakpZ1zPJEZ1/BQ+JkJtG/8jB+hyqekVs37VGAoBE=;
-	b=MmAviGzM1LEHlQVRv5gmtDUs2X7Xmay7/SEwQOJpEEqJz59DMRX6U/igcW75m56I3rHEoy
-	jURSWVdYrtKjdABkq/nchP2Iu3YML3kfjP9szwevTL/xQj5Q+iskp7Ztu4FHFKyIqTEOaK
-	AjIM3rhEpXbZzoRIxarKABBcs/ER5eA=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-235-PJ6XrWrhPaOpR8ZPVISlzA-1; Tue, 21 Jul 2026 11:03:23 -0400
-X-MC-Unique: PJ6XrWrhPaOpR8ZPVISlzA-1
-X-Mimecast-MFC-AGG-ID: PJ6XrWrhPaOpR8ZPVISlzA_1784646203
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-47f83450a8eso335813f8f.0
-        for <kvmarm@lists.linux.dev>; Tue, 21 Jul 2026 08:03:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784646202; x=1785251002;
-        h=content-transfer-encoding:content-type:in-reply-to:from:references
-         :cc:to:content-language:subject:reply-to:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=AljakpZ1zPJEZ1/BQ+JkJtG/8jB+hyqekVs37VGAoBE=;
-        b=KjnrPedAGLgcutMnALtnJC8Dss0YqNl5RSgN0aZ/Ds5xvasUKJG8eGBtUOrV6MjJcO
-         Wkl3fEIXeSEX1i6pvHByJPZ6qeCIcnUxTfq4WbWUiSQED+c+31ENgFqF4Luk2UY5JCwI
-         AKOjbY2gT5teoi8rtAV6K4RTD6cT8KZdeLpEGEoblpJUxoYKcMVHijLg77rPpsj2RxOL
-         1ucAuCU7oAgow1DIUAjrlULB0fC2d9JfGsCLk/VLVTMiPqs28cVPL4sMGFud8kz0X2nI
-         CLYsA8TpvELUnVxnuhtZj3IGHM+NDGUWbRw2OuACkKN7le0S4CDzXJppc183K70l71OW
-         LvAA==
-X-Forwarded-Encrypted: i=1; AHgh+RpdqjZNEjs4oCC5Ign3M6foQX0TMSRywtRgq7CGxswT+iAgM9MYcQNp8srdzEIbNS4Xi2tw2Y8=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxyXcywZciTlKygz4MmBlw62ixl6EiSJGbPPKswTzDVe7Mk5Wqu
-	4mBeXtvX2XIkwGyLBofjuqg4xvXtQDxwn2TSfMP3TGudBlxh0h6vEVoOK5sONee9tVKDWn5tVRK
-	WcHm22MjRSV+EQb1LZSxwU6ejRvLrnNnZK9zKYBbNVMhLsjuhpDu1FRbaTw==
-X-Gm-Gg: AR+sD12guWeJ1dSwvlhQwI7AxnGcfyQKZ5VYMgVZpxLr2SnCwb0utP6YO/4xBIhghCt
-	D4xB5Cr+fXFJkJi6a64M9amOa96ml1a01gIDDoWUcN8LKQl29CvNTeY/v0lycXPCd4xHcp9agrf
-	HBZwkgYbX+RN76w4zssymwiC8LsMb7l9yUsFKwcHyXn5fH5yed7yHXGrrclvbr7KnOLvwKQKoTn
-	Jzm0ZhavOAIX4VUYRYrvge/enKT8uihSzC8n2XyPxaUw/Bi7t5UwzGLGArDgqQ2j+HN7FSQdGcL
-	v41RSz7D0/L95ukrQGLk/SLwYhYy2n66zrkb+TKNpVDVjEcDnD8Ph9JS2zLB8sLMGgcochtQqYx
-	CmbReYbabfM1R5s7DlgsnBGlp84fsf9IV2wTCK7qjFr0lKSAC
-X-Received: by 2002:a05:6000:26c5:b0:47f:6f89:7dae with SMTP id ffacd0b85a97d-47f6f8982e7mr16829481f8f.6.1784646202541;
-        Tue, 21 Jul 2026 08:03:22 -0700 (PDT)
-X-Received: by 2002:a05:6000:26c5:b0:47f:6f89:7dae with SMTP id ffacd0b85a97d-47f6f8982e7mr16829417f8f.6.1784646202167;
-        Tue, 21 Jul 2026 08:03:22 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47f63e519f4sm38082413f8f.14.2026.07.21.08.03.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Jul 2026 08:03:21 -0700 (PDT)
-Message-ID: <da8487e6-2253-43ef-967e-b4d3daf3808b@redhat.com>
-Date: Tue, 21 Jul 2026 17:03:19 +0200
+	bh=fWBKtHpQs7Mjv5sBBU83pNN7Nd/6AUX8CaJlXFspUiY=;
+	b=U3AA/wH5WZnLIBNlitthruHFWkjR6ddCZliEqBbSd9q64wY/ycGV3SR0hgl8YAVLoP8Le1
+	JUPioe0ib0hVmTmaWsy5CMTdjvBiGg4zE4B6HQ3OUHgKLu9LnIkS7lk88QGaCWihm5xNb7
+	786RtQDEsUgDXWWGOS02SVwqDb2QFTI=
+X-Gm-Message-State: AOJu0YwtdpuMwJFcgvhsNjBzmsSpF5iBHLm52FTyydirQ4Z8MLHT9NmY
+	0825gKdkEhQZxCf82Fm9ZxNvHgd8B+y7l5Ev0iT7rs3WfZKT7SSGBLZ6Wwb+suDCa2nsmTa0HtW
+	O5jsXgfL9SgfKhIWDnTGAhogs47Fl8Vq870cT81ML
+X-Received: by 2002:a05:622a:d0e:b0:51c:ca9:3d17 with SMTP id
+ d75a77b69052e-52601f03537mr16476711cf.12.1784648547786; Tue, 21 Jul 2026
+ 08:42:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: eric.auger@redhat.com
-Subject: Re: [RFC PATCH v3 05/19] target/arm/kvm: enable writable
- implementation ID registers
-To: Khushit Shah <khushit.shah@nutanix.com>, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, kvmarm@lists.linux.dev
-Cc: cohuck@redhat.com, peter.maydell@linaro.org,
- richard.henderson@linaro.org, maz@kernel.org, oliver.upton@linux.dev,
- berrange@redhat.com, abologna@redhat.com, jdenemar@redhat.com,
- gshan@redhat.com, skolothumtho@nvidia.com, sebott@redhat.com,
- armbru@redhat.com, philmd@linaro.org, yangjinqian1@huawei.com,
- shaju.abraham@nutanix.com, mark.caveayland@nutanix.com,
- prerna.saxena@nutanix.com
-References: <20260716213858.609699-1-khushit.shah@nutanix.com>
- <20260716213858.609699-6-khushit.shah@nutanix.com>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20260716213858.609699-6-khushit.shah@nutanix.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: IbYNanGJpxmD0CQnf_FgFk_EHQFEbkck80d5m8LVUkc_1784646203
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20260703154811.3355680-1-sascha.bischoff@arm.com> <20260703154811.3355680-37-sascha.bischoff@arm.com>
+In-Reply-To: <20260703154811.3355680-37-sascha.bischoff@arm.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Tue, 21 Jul 2026 16:42:00 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTybDSAgr44jXNFnssnYq_vVeuZ+1qORS8f4dtQgMzOZ5A@mail.gmail.com>
+X-Gm-Features: AUfX_mxjsFrqC8Gpjv6b_a6EYXug8lYIGCF5p9ytlWNhOuKnl9fC4c65x8uK9Mc
+Message-ID: <CA+EHjTybDSAgr44jXNFnssnYq_vVeuZ+1qORS8f4dtQgMzOZ5A@mail.gmail.com>
+Subject: Re: [PATCH v3 36/40] KVM: arm64: gic-v5: Implement save/restore
+ mechanisms for ISTs
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd <nd@arm.com>, 
+	"maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev" <oliver.upton@linux.dev>, Joey Gouly <Joey.Gouly@arm.com>, 
+	Suzuki Poulose <Suzuki.Poulose@arm.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>, 
+	"peter.maydell@linaro.org" <peter.maydell@linaro.org>, "lpieralisi@kernel.org" <lpieralisi@kernel.org>, 
+	Timothy Hayes <Timothy.Hayes@arm.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Migadu-Flow: FLOW_OUT
 
-Hi Khushit,
+Hi Sascha,
 
-On 7/16/26 11:38 PM, Khushit Shah wrote:
-> Enable KVM_CAP_ARM_WRITABLE_IMP_ID_REGS if the host kernel supports it.
-> This allows QEMU to write implementation-defined ID registers (MIDR,
-> REVIDR) so that named CPU models can present the correct values to the
-> guest instead of inheriting the host's identity.
-This is a subset of 
-[RFC PATCH RESEND 0/4] hw/arm/virt: Add support for Target
-Implementation CPUs
-https://lore.kernel.org/all/20250801074730.28329-1-shameerkolothum@gmail.com/
+Two things about the new KVM_DEV_ARM_VGIC_GRP_IST interface. Both are
+about the userspace ABI rather than the mechanism.
 
-and especially 1/4
+...
 
-Thanks
-
-Eric
->
-> Signed-off-by: Khushit Shah <khushit.shah@nutanix.com>
-> ---
->  target/arm/kvm.c | 7 +++++++
->  1 file changed, 7 insertions(+)
->
-> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-> index 76583db3f0..63b3727e05 100644
-> --- a/target/arm/kvm.c
-> +++ b/target/arm/kvm.c
-> @@ -741,6 +741,13 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->          }
->      }
->  
-> +    if (kvm_check_extension(s, KVM_CAP_ARM_WRITABLE_IMP_ID_REGS)) {
-> +        if (kvm_vm_enable_cap(s, KVM_CAP_ARM_WRITABLE_IMP_ID_REGS, 0)) {
-> +            error_report("Failed to enable "
-> +                         "KVM_CAP_ARM_WRITABLE_IMP_ID_REGS cap");
-> +        }
-> +    }
+> +int vgic_v5_save_spi_ist(struct kvm *kvm, struct kvm_device_attr *attr)
+> +{
+> +    u32 __user *uaddr = (u32 __user *)(unsigned long)attr->addr;
+...
+> +    for (unsigned int i = 0; i < kvm->arch.vgic.nr_spis; ++i) {
+...
+> +        __le32 *h_iste_addr = ist.base + i * ist.iste_size;
 > +
->      if (s->kvm_eager_split_size) {
->          uint32_t sizes;
->  
+> +        h_iste = READ_ONCE(*h_iste_addr);
+> +        ret = put_user(h_iste, uaddr);
+> +        if (ret)
+> +            return ret;
+> +
+> +        uaddr++;
+> +    }
 
+The kernel writes nr_spis * 4 bytes into attr->addr, but struct
+kvm_device_attr has no length field, so userspace has no way to
+declare how large its buffer is and the kernel has no way to check it.
+The size is implied by nr_spis, which userspace set earlier through
+KVM_DEV_ARM_VGIC_GRP_NR_IRQS, or never set, in which case it defaulted
+to 32.
+
+put_user() has no idea how large the caller's buffer is. It only fails
+if the address itself is not writable, so writes past the end of a
+short buffer land in whatever happens to be next, with no error
+reported. The documentation states the required size, but nothing
+enforces it.
+
+It is also the only variable length buffer in the VGICv5 interface.
+GRP_IRS_REGS is a __u64, USERSPACE_PPIS is a __u64[2], GRP_NR_IRQS is
+a __u32, and none of those can be got wrong.
+
+kvm_device_attr itself is fixed, so no length can be added there.
+Changing what addr points at is still possible while this is unmerged,
+but would not be afterwards. Would it make sense for addr to point at
+a small structure carrying an explicit size, so that the kernel can
+reject a mismatch?
+
+The second point is the LPI IST going into guest memory. I understand
+from the commit message that the shadowing is deliberate and that the
+guest has already allocated the storage, so this is about the
+interface rather than that decision.
+
+Saving the ISTs is a KVM_GET_DEVICE_ATTR, and it writes into guest
+memory. Several of the documented ordering constraints are enforced,
+with -EBUSY when the VGIC is not initialised or when a restore is
+attempted after the VM has run. This one cannot be, because it is
+about when the VMM serialises guest memory:
+
+> These two steps may be performed in either order. However, the guest memory
+> must be serialised after the ISTs have been saved, as saving the LPI IST writes
+> the IST state back into guest memory.
+
+A VMM that snapshots guest memory before saving the ISTs gets no
+error, and the IST contents simply never reach the destination. Live
+migration looks fine to me, since kvm_write_guest() marks the pages
+dirty and a later pass picks them up, but a stop and copy save done in
+the natural order would lose them silently.
+
+Was a userspace buffer considered for the LPI IST as well, the way the
+SPI IST already works? That would remove the ordering requirement
+entirely, and by my reading the worst case is 65536 entries at 32
+bits, so 256 KiB, given the 16 bit clamp on the guest's LPI ID bits.
+
+Cheers,
+/fuad
