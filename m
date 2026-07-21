@@ -1,46 +1,52 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51536400E17
-	for <kvmarm@lists.linux.dev>; Tue, 21 Jul 2026 18:24:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAD5A3DD870;
+	Tue, 21 Jul 2026 18:26:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784658249; cv=none; b=nELhgoVqsTXVMzKgr8+cQpRZkNRXDNRlTBKhdEs4tiwgkNu9r4ohJKiLcrZlctzYqcXeV3oT/dzx3Ko+T7RyxeyEkOkypfOXteRO0anHMwVioIFz3oHoU+eoSr/8b0LfDfgkLglkBeBoOVm36G2OGRZ+j7+eTK1sjSYDKwTD/Xg=
+	t=1784658391; cv=none; b=M5zQG5zVxvR7Zrnl1Gr/5O2+7T76+os8F4DEfspNFbf2HC7jkLu9eAWY+DM3vr1q9l0XSEtljMQPeGfyR86ofioemqOtGBiKD6kS5Cvt+z9auYhEg7DJT8d1JZon2caYIXYFQAmhltWJGlfmmZlyPk7C6VG8OFak8ztRFc0WJkI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784658249; c=relaxed/simple;
-	bh=xfTf0zGJKCI2+mijWRFjcWMSM51/OkEeZfadp5uGfNY=;
+	s=arc-20240116; t=1784658391; c=relaxed/simple;
+	bh=FNm5chTJVMPhUGhUi36rUMA8wLOlzFuIbdbaU489IE0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YyAAQcxAtek7KOGObnSfLgK08DXWfQthYxd1iGNg/eQecStgZ2vpculMOPTZh/ISHwylzjEBBu94fduykeq3EMtgq5hr+EY91XdbSN1McIC4a72Tt/KDRVlskLJxCDaMF7+7zfXZZO4xYOvw9N+zwjMGJUxr1kLEaxHimfMPVg0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TIxaR6Gj; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=GCMzYm+dqwhHCov27nZhd7DXsbYwnODxk1cWavODSzFlMtxkk+E/Ex475Uup+25LsKjOMhGIHqqDbbYEE11CgWQ2qj/sg8k6oH6rrG5+UXkrNUBdDMPhElWRYtokd1oZVM5bRqwNgo2BAm7lnB77qK6HJfsJ913KZfd5e5dlo2I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kjFng8c+; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TIxaR6Gj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB5AC1F000E9;
-	Tue, 21 Jul 2026 18:24:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kjFng8c+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 051AF1F00A3F;
+	Tue, 21 Jul 2026 18:26:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784658248;
-	bh=JYK1SVsB1MqYcJihkmBUZ/fXnWOSDpdPDihlH2cnXBg=;
+	s=k20260515; t=1784658389;
+	bh=k4VW3Zl4tM8OMhekRjLVwl1T8VLsGUrJuwlMfWx5k8o=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=TIxaR6GjtuMIXe+XSoWBc0o0bHsDMvHLj60PdpNjRrsphstpKb74XyvPmXW9pZUhd
-	 gUn2X+V3o41322doBxgr8Iw3HXktD9pm1voBo16Jw2VDi8uXSD8cp4qwnmBWp6xvtn
-	 Poxq+P/tQxTW+i9O5ekrvt2xx8IOosK4XCnqGEOyqn8aFkw8+bWdwbi4ZQvpUDY5U3
-	 pFg6ekqQcD9WJlTGCriVG3FPHFYvMB7OODA+56UVxZ+r7JllCA8En2ycjMbCTCZlR6
-	 4Pl14M1wxKU0SWU0nqJcTvGSbTQcYGu8JSeiiH9kv9iu/uub/EB5YwNl9f8+M3v/Oc
-	 I2XYaJkbHUuOw==
+	b=kjFng8c+xvne2cPnxtse0Hq0rrqrs24bVcFmakyTk1pzLZYgOeEuvfzKiLrrEOqYD
+	 RSJH9GITWED9B6WMRRzFISbdeGGj+tRAt+91cM9dnJ0OuJsItKumTQzE2JlrjHn3+6
+	 70gSPA6dKhlKckr7xiGNDyTVYd51+VAW371DA07gGdk6/RAcRUeRCIB+39mIM1wUEi
+	 1CmYxvkw+M6W0Z69u/BMg8lDrJyBCbk1O00Os2M3OVnJh18NVZT/9j8c2G/2dcT2IY
+	 wmEJUElK+RRAS/kQ+d9YDaTjD0cwUCjVMOyaVUMhjBvrP6NF0OmLIjgrWUOa0Qk1De
+	 MIhZQ/ULYij/g==
 From: Oliver Upton <oupton@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Marc Zyngier <maz@kernel.org>
+To: Marc Zyngier <maz@kernel.org>,
+	kvmarm@lists.linux.dev,
+	Fuad Tabba <fuad.tabba@linux.dev>
 Cc: Oliver Upton <oupton@kernel.org>,
-	Steffen Eiden <seiden@linux.ibm.com>,
 	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v2 0/6] KVM: arm64: Make ICH_VTR_EL2 accesses an inlined literal
-Date: Tue, 21 Jul 2026 11:24:04 -0700
-Message-ID: <178465820769.2066547.9255034363625874099.b4-ty@kernel.org>
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Sascha Bischoff <Sascha.Bischoff@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] KVM: arm64: Sync SCTLR_EL1 when injecting an exception into a pVM
+Date: Tue, 21 Jul 2026 11:26:26 -0700
+Message-ID: <178465838257.2067495.10864103489169140924.b4-ty@kernel.org>
 X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260721170754.3150521-1-maz@kernel.org>
-References: <20260721170754.3150521-1-maz@kernel.org>
+In-Reply-To: <20260721161624.3983041-1-fuad.tabba@linux.dev>
+References: <20260721161624.3983041-1-fuad.tabba@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -50,33 +56,21 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-On Tue, 21 Jul 2026 18:07:48 +0100, Marc Zyngier wrote:
-> I'm reposting this early as there were so many issues to the original
-> posting that I decided to deviate from my own rules... Bite me.
+On Tue, 21 Jul 2026 17:16:24 +0100, Fuad Tabba wrote:
+> When pKVM injects a synchronous exception into a protected guest,
+> enter_exception64() reads SCTLR_EL1 to set the new PSTATE's PAN and
+> SSBS bits. pKVM refreshes VBAR_EL1 from the live value before injecting
+> but not SCTLR_EL1, which is untrapped for protected guests, so a guest
+> that updates it and then traps takes the exception with stale PAN/SSBS.
 > 
-> This is the second version of this series I initially sent as [1],
-> which aims at removing the large number of traps that ICH_VTR_EL2
-> generates in NV environments, leading to pointless overheads.
+> Sync SCTLR_EL1 alongside VBAR_EL1.
 > 
 > [...]
 
-Sashiko seems to have a done a good job reviewing v1. This looks to be in
-decent shape now.
-
 Applied to next, thanks!
 
-[1/6] KVM: arm64: vgic-v3: Make vtr_to_* helpers use architectural field symbols
-      https://git.kernel.org/kvmarm/kvmarm/c/719e67103c5e
-[2/6] KVM: arm64: Move GICv3 broken SEIS implementation detection to a CPU errrata
-      https://git.kernel.org/kvmarm/kvmarm/c/27a263e1a0fa
-[3/6] KVM: arm64: Add a helper providing an inlined literal value for ICH_VTR_EL2
-      https://git.kernel.org/kvmarm/kvmarm/c/4edfdc8ddebd
-[4/6] KVM: arm64: Convert most ICH_VTR_EL2 accesses to inlined literal value
-      https://git.kernel.org/kvmarm/kvmarm/c/2bba3d2c6092
-[5/6] KVM: arm64: vgic-v3: Simplify initial GICv3 configuration sampling
-      https://git.kernel.org/kvmarm/kvmarm/c/bea608299d28
-[6/6] KVM: arm64: vgic-v3: Kill kvm_vgic_global_state.ich_vtr_el2
-      https://git.kernel.org/kvmarm/kvmarm/c/36d32222fcab
+[1/1] KVM: arm64: Sync SCTLR_EL1 when injecting an exception into a pVM
+      https://git.kernel.org/kvmarm/kvmarm/c/596289fe4836
 
 --
 Best,
