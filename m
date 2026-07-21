@@ -1,60 +1,56 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49CEA408618;
-	Tue, 21 Jul 2026 06:36:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7009941B366
+	for <kvmarm@lists.linux.dev>; Tue, 21 Jul 2026 06:52:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784615780; cv=none; b=fi8e+rb+iLjzQIfiKlcAtHnH1wAR+OVX3LzpK2+nDnq5F4750kRw2ngs0bvrcn6YnhAz2CqoZfuqXTk0vRvvaWGpkm5qIBTBa7hqlUSw8K6tNLYffGNeOPXLiqqA/jBlPSgFIuF+fKJebxZM/7a17WH/QD3YsKzvYRwcLd9/Noc=
+	t=1784616752; cv=none; b=Kb8k/J1wkpLqkbHFIq6qRDMCxrICNtRzqvRp6bDVblP/O+ICAStTF+3rhUmMslQmlNJxSG27bKnSrjRpvtacawFbAlsYv4ysYISbnS/Wp5fcnTe9BfMbENSvPdAo3P1cSRWJRc+affuCdq4wtjpsWtxsLnKFZCzQjFruAsmSAiQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784615780; c=relaxed/simple;
-	bh=5l42LDRJnFq8dbjzD646mHlG6oVnywqkxHR9Tm3fuMQ=;
+	s=arc-20240116; t=1784616752; c=relaxed/simple;
+	bh=knZxhkY+QKNx3P5OBXesbAHKoRHzoV6Fyt7x7wQgcTE=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NM8ZEv6WrWt86WU/7eyjtpkNA80yjH2UmcI5af8TrS2mSSsnEPz1d2Gx1OkRJar07LygcyrttDcV0LrPs/hUqovPh7YQaZO+AjxbfgKew23KR5a5GFuxHJucStOAMv5xoBzM7zI1JENQ1KlMYUHpVu40c4PJ2s0jDADbfZy0zQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VT0yrwGb; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=TK2jHUY4bLFMzb6a8knTXBeMQUueE5OwJuCJSWNSTp3W9dRX3v9w3XRa8odWo8XhyoVZHXdW+Ylu57CeT58AEQtFdnUJDGq0QLpNtWQwdWK/nAyuhQSz9pAZM47p32dFEiYZcAbtvCc6GRB6tQilGnMgOd/dywfxrJyJaeg0wFs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Mjn7NJH1; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VT0yrwGb"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC0911F000E9;
-	Tue, 21 Jul 2026 06:36:18 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Mjn7NJH1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43E181F000E9;
+	Tue, 21 Jul 2026 06:52:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784615778;
-	bh=+1sUiAy+mLnTuHHQsSuFfVJP7chwio/vnbCnT5Y2Sq8=;
+	s=k20260515; t=1784616751;
+	bh=ecPqk7dPmScIh6Av3W0D+6bpYM48TCqyyw+XursOn7w=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=VT0yrwGbDUGF/uAhJNPhPIhmtzWJk4TfI4evheyNFbSZD53+o2Ht36s+3F/BWmkgE
-	 iC0PviOvRY+vwE7VVaYHJKL18a3zpvgKH1uTBT23ZGF4pcioPZh8EXhAHV0SjXwe8S
-	 zk8cl/dROpi8tR6Av838NbcISLax4ZEEGvw/Q5N8pQ8fS4FrVdoeiGqQGjvXdKexO5
-	 K2E0g7C7Vlwpra8iKwpztQPDcmJQOVsji+wWn27Is+/noktoXc2V8YB9osCSGK94Aa
-	 FUgQ43FGjpIIJA4LfzGinwB4WWE6WpLGsKI3Zc+/Hao9Dbpfn7YfmUXnxRTvduAbkQ
-	 GLwUcVk/1tdLA==
+	b=Mjn7NJH1DoVyenPD36cyNInYRA2icOYNKmPRaBkUE/vN01rOF7J8Q3dmPKqCmhAho
+	 bHgeGehcddg79YLm3MHJE/bM9WSZei+cctH1qtTTyMPoWKVbpsnoePLsrNC2jhDUZ9
+	 k2jIvIrqfHGR7Esy//Gk1JjQMuqV5HfU/BBLa3AKITpd7be1j17lXfSYg1A9RpAs9H
+	 pFEoot4n0MmOAFcYsmPxJrYK6OdFxydIwH63P3a8oCgqo0OryUVYkasGrKArxpwy0/
+	 j4FV0PAiulOGKdeVljZ0biuBRk7MwiSlsH6ORwefsW+kVonnO6/aATgb3s3RIPYEXE
+	 6Jg1tFQoPDsww==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wm45Q-000000075IL-29sA;
-	Tue, 21 Jul 2026 06:36:16 +0000
-Date: Tue, 21 Jul 2026 07:36:16 +0100
-Message-ID: <8633xcg87z.wl-maz@kernel.org>
+	id 1wm4L7-000000075j7-1fSw;
+	Tue, 21 Jul 2026 06:52:29 +0000
+Date: Tue, 21 Jul 2026 07:52:28 +0100
+Message-ID: <861pcwg7gz.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Mostafa Saleh <smostafa@google.com>
-Cc: Oliver Upton <oupton@kernel.org>,
-	linux-kernel@vger.kernel.org,
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Vincent Donnefort <vdonnefort@google.com>,
+	oupton@kernel.org,
 	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	seiden@linux.ibm.com,
 	joey.gouly@arm.com,
+	seiden@linux.ibm.com,
 	suzuki.poulose@arm.com,
 	yuzenghui@huawei.com,
 	catalin.marinas@arm.com,
 	will@kernel.org,
-	vdonnefort@google.com,
-	tabba@google.com
-Subject: Re: [RFC PATCH 2/2] KVM: arm64: Support BBM level 3
-In-Reply-To: <CAFgf54r0xYwUGgPMY=1aTRzcqX7jKp545Jb+p_yFW=JwAX0E4g@mail.gmail.com>
-References: <20260717130901.2239134-1-smostafa@google.com>
-	<20260717130901.2239134-3-smostafa@google.com>
-	<alqW49CH7eViDpAZ@kernel.org>
-	<alvaEgJFJ5DaQaac@google.com>
-	<CAFgf54r0xYwUGgPMY=1aTRzcqX7jKp545Jb+p_yFW=JwAX0E4g@mail.gmail.com>
+	kernel-team@android.com
+Subject: Re: [PATCH v2] KVM: arm64: Fix hyp_trace clock disabling
+In-Reply-To: <CA+EHjTyVRn8BR7bLBo5m_k9m1VNv95y4h+WTJvz86FTf+=XeFg@mail.gmail.com>
+References: <20260715105100.3178255-1-vdonnefort@google.com>
+	<CA+EHjTyVRn8BR7bLBo5m_k9m1VNv95y4h+WTJvz86FTf+=XeFg@mail.gmail.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -64,111 +60,41 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: smostafa@google.com, oupton@kernel.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, vdonnefort@google.com, tabba@google.com
+X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, vdonnefort@google.com, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 20 Jul 2026 21:41:04 +0100,
-Mostafa Saleh <smostafa@google.com> wrote:
->=20
-> On Sat, Jul 18, 2026 at 8:55=E2=80=AFPM Mostafa Saleh <smostafa@google.co=
-m> wrote:
+On Mon, 20 Jul 2026 20:45:00 +0100,
+Fuad Tabba <fuad.tabba@linux.dev> wrote:
+> 
+> Hi Vincent,
+> 
+> On Wed, 15 Jul 2026 at 11:51, Vincent Donnefort <vdonnefort@google.com> wrote:
 > >
-> > Hi Oliver,
+> > Fix the disable path in hyp_trace_clock_enable(), which fell through to
+> > re-initialize and reschedule the clock after cancelling the work. Return
+> > early instead.
 > >
-> > On Fri, Jul 17, 2026 at 01:56:03PM -0700, Oliver Upton wrote:
-> > > Hi Mostafa,
-> > >
-> > > On Fri, Jul 17, 2026 at 01:09:00PM +0000, Mostafa Saleh wrote:
-> > > > If the system supports hardware Break-Before-Make (BBM) level 3, us=
-e it
-> > > > to replace stage-2 PTEs directly instead of falling back to the sof=
-tware
-> > > > break-before-make sequence.
-> > > >
-> > > > 1) Get a reference count on the containing table for the new PTE.
-> > > > 2) Atomically update the PTE with the new valid descriptor.
-> > > > 3) Invalidate the TLB for the old PTE.
-> > > > 4) Drop the reference count holding the old PTE.
-> > > >
-> > > > One interesting case, as BBML3 will update the PTE atomically, it
-> > > > can only know it raced with another core at the point of the cmpxchg
-> > > > failing, unlike the SW implementation which locks the PTE first.
-> > > > And as we must issue CMOs to the new mapped page before the update,
-> > > > that means with BBML3 racing cores will issue redundant CMOs,
-> > >
-> > > I'd rather we just predicate BBML3-style transformations on an
-> > > implementation having FEAT_S2FWB and DIC. You can definitely come alo=
-ng
-> > > later and enable it when using a stage-2 in an SMMU makes this
-> > > mandatory, possibly at the expense of some extra CMOs.
-> >
-> > Makes sense, I will do that in v2.
-> >
->=20
-> Looking into this, I see some existing inefficiencies (or maybe I do
-> not understand it well)
-> - pKVM still do some work for dcache with FWB I posted a patch for that:
-> https://lore.kernel.org/all/20260720203529.1276355-1-smostafa@google.com/
->=20
-> - KVM does not elide the icache maintainence with DIC, it seems we
-> should have something similar for the FWB check in
-> __clean_dcache_guest_page() as
->=20
-> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kv=
-m_mmu.h
-> index 6eae7e7e2a68..d0a4ae66b069 100644
-> --- a/arch/arm64/include/asm/kvm_mmu.h
-> +++ b/arch/arm64/include/asm/kvm_mmu.h
-> @@ -247,6 +247,9 @@ static inline size_t __invalidate_icache_max_range(vo=
-id)
->=20
->  static inline void __invalidate_icache_guest_page(void *va, size_t size)
->  {
-> +       if (cpus_have_final_cap(ARM64_HAS_CACHE_DIC))
-> +               return;
-> +
->         /*
->          * Blow the whole I-cache if it is aliasing (i.e. VIPT) or the
->          * invalidation range exceeds our arbitrary limit on invadations =
-by
->=20
-> or I am missing something?
+> > While at it, cleanup hyp_trace_clock::lock which is unused and
+> > hyp_trace_clock::running which is redundant: the trace_remote framework
+> > already serializes calls to the callback enable_tracing.
+> 
+> Although the cleanup and the fix are to the same commit, could this be
+> split into the fix and the lock/running cleanup as a separate patch?
+> Since b22888917fa41 is already in a released kernel, the fix will
+> likely go to stable, and it'd be nice to keep that backport to just
+> the behavioural change.
 
-The latter. The shortcuts are in the individual helpers.
-We have:
-
-	static __always_inline void icache_inval_all_pou(void)
-	{
-		if (alternative_has_cap_unlikely(ARM64_HAS_CACHE_DIC))
-			return;
-
-		asm("ic	ialluis");
-		dsb(ish);
-	}
-
-and
-
-	SYM_FUNC_START(icache_inval_pou)
-	alternative_if ARM64_HAS_CACHE_DIC
-        	isb
-        	ret
-	alternative_else_nop_endif
-
-        	invalidate_icache_by_line x0, x1, x2, x3
-	        ret
-	SYM_FUNC_END(icache_inval_pou)
-
-it's not completely obvious to me why we have an ISB in
-icache_inval_pou(), but at least the invalidation elision is already
-there.
+Not sure I get what you mean here. From what I can see, this patch
+fully applies to b22888917fa41. Given that this is the third version
+for something that trivial (two from Vincent, one from you), can we
+please agree on *something* quickly?
 
 Thanks,
 
 	M.
 
---=20
+-- 
 Without deviation from the norm, progress is not possible.
