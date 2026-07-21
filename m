@@ -1,47 +1,48 @@
-Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B89E946DFE6
-	for <kvmarm@lists.linux.dev>; Tue, 21 Jul 2026 16:16:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1267376A06
+	for <kvmarm@lists.linux.dev>; Tue, 21 Jul 2026 17:08:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784650597; cv=none; b=BHu97NJQqtZImrhnO3Qb7Ys1YNfPEMPmZ40QF0UjhBZex7ryE6l4DH2nUDAs0V/Mdf+zBxLZswljlOzSargjbpA/bionH6fQYfX8SLyJQ0hLR4E6UmJgMEh9mOauj+CF+MpoA57zRSbqtXBBUN7q29Dbx8jn+dF0NQQWZXnHRWw=
+	t=1784653688; cv=none; b=sYqUiumC7NHYpelF15pyChjZgFNIcMtmDFRswAGn2L2dBr/tPgp9Cfawa2xrN1bcHADVjWuII+/pvSdo59BdKq46C9ZfimF9ulaiboHyqIFHvL2yzS5KBJvNja50wkVzPZhRS0BzQ/ks9H6JfgUHy094f7RR9NdyvrOIK82WEvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784650597; c=relaxed/simple;
-	bh=YXT6mHKPZ0iP0KQL37ZrnzNk/pXN8owYCS1IkzbUAFc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qsNJjkNOE+H1yxMRr3vqjOok8Uy1fDwttSZ6DDDCtxVl30YO7a1iaXr0f5l9vEtS3HyhqFhAQ//uQRKwxr6Yj5WyxPygOAWKw+caAYj+5Q1m92YoXvXnKn96mTDo4Ff2WyMj29N+maP9bfX+Km+8xL/5acrT2qKF9Q8+L0lNVQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=krhs0h0y; arc=none smtp.client-ip=95.215.58.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1784653688; c=relaxed/simple;
+	bh=BSJjw28BHrNdyglSqv0O9vheTUWp+6PdUG7Ubmcelaw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TDlilv7Lsfo8gRWwpJZ115upmrD/K/At9O9o+1tzbu6cR+mO0dp2EUMzdgrNCL36hQ4NIS1dntckPc9g/G1sYJkzOL/eAQhfEi+POuRvJRRHc6snPWNFZrK/tU2kUDF5/BUo0XyiWQLJQleb+bVzaYrEZrmvXfMAsfXFj5SDlXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b1RMtAfb; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="krhs0h0y"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1784650592;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=JoSpYNH320RJAnts2pP5+Q3/u6oQENLYblI1/yJFWS4=;
-	b=krhs0h0yLC3Ie0R0Zf6VGGryPmFh9clqMEO5lAAo0l3Lnb9I11mLsRJsotld+n4SKWnmuR
-	iPxXWv3V8QwDupZdWwx+LE+O1e/HYPTk61yDM+0r1VH9Rxs2CDSAIdKI49aiNOgYI7LKBs
-	PRyUy+XJYmyapZqa2QBg2rAyra6wxsY=
-From: Fuad Tabba <fuad.tabba@linux.dev>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	kvmarm@lists.linux.dev
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b1RMtAfb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 574B61F00A3A;
+	Tue, 21 Jul 2026 17:08:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1784653686;
+	bh=H7XWeEuCN6rH5IyC1gkDtve0NaKkni2h3YomSvKG9wQ=;
+	h=From:To:Cc:Subject:Date;
+	b=b1RMtAfbk8W+IThhGs+jkNBSAmMCo1OnaSllxQPwuvHNuEDgxZHloU0v9Pyhmk1HR
+	 hS5EzXdRMFXdaymWz3pFlplhpOev71x9nn+gJbt6SV1dINOv5RiybJlTIVfd5n3iqt
+	 CxsnyYVsRaYWh4Umq5RDGyiHBIOQ2yx7fkyRZXvJOcq4ywIawyUU/CQTpr0aih3//2
+	 f5SNjlXy2JK3oXEc46woHRK8p+gyEOpiZBTpQ2CH5N703/dP73p4GaHCOzvDyY46Nn
+	 O4MNrIqN+trfHFMtXmxqZOcviPmeaSMYVmN7MLKUlPaA3d8PxIIXnzcIWHnYnHQH/X
+	 zcWvfLypdJMmA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wmDwq-00000007J9p-0mu5;
+	Tue, 21 Jul 2026 17:08:04 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org
+Cc: Steffen Eiden <seiden@linux.ibm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Sascha Bischoff <Sascha.Bischoff@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] KVM: arm64: Sync SCTLR_EL1 when injecting an exception into a pVM
-Date: Tue, 21 Jul 2026 17:16:24 +0100
-Message-Id: <20260721161624.3983041-1-fuad.tabba@linux.dev>
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH v2 0/6] KVM: arm64: Make ICH_VTR_EL2 accesses an inlined literal
+Date: Tue, 21 Jul 2026 18:07:48 +0100
+Message-ID: <20260721170754.3150521-1-maz@kernel.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -49,47 +50,65 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-When pKVM injects a synchronous exception into a protected guest,
-enter_exception64() reads SCTLR_EL1 to set the new PSTATE's PAN and
-SSBS bits. pKVM refreshes VBAR_EL1 from the live value before injecting
-but not SCTLR_EL1, which is untrapped for protected guests, so a guest
-that updates it and then traps takes the exception with stale PAN/SSBS.
+I'm reposting this early as there were so many issues to the original
+posting that I decided to deviate from my own rules... Bite me.
 
-Sync SCTLR_EL1 alongside VBAR_EL1.
+This is the second version of this series I initially sent as [1],
+which aims at removing the large number of traps that ICH_VTR_EL2
+generates in NV environments, leading to pointless overheads.
 
-Fixes: 798eb5978700 ("KVM: arm64: Sync protected guest VBAR_EL1 on injecting an undef exception")
-Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
----
-Changes since v1 [1]:
- - Rebased onto v7.2-rc4; no functional change.
+By moving from a sysreg access to a patched constant, running an L3
+workload with a a healthy amount of IO results in a 5% reduction of
+wall-clock time from a baseline without this series.
 
-[1] https://lore.kernel.org/all/20260612102347.914994-1-tabba@google.com/
+* From v1 [1]:
 
- arch/arm64/kvm/hyp/nvhe/sys_regs.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+  - Move the "broken SEIS" detection to an erratum, something it
+    should always have been, so that vgic_broken_seis() doesn't have
+    to use non-noinstr function calls (sashiko)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-index b1411fb541397..8758c68017765 100644
---- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-+++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-@@ -257,10 +257,11 @@ static void inject_sync64(struct kvm_vcpu *vcpu, u64 esr)
- 	*vcpu_cpsr(vcpu) = read_sysreg_el2(SYS_SPSR);
- 
- 	/*
--	 * Make sure we have the latest update to VBAR_EL1, as pKVM
--	 * handles traps very early, before sysregs are resync'ed
-+	 * Sync VBAR_EL1 and SCTLR_EL1, both read by enter_exception64(),
-+	 * as pKVM handles traps before sysregs are resync'ed.
- 	 */
- 	__vcpu_assign_sys_reg(vcpu, VBAR_EL1, read_sysreg_el1(SYS_VBAR));
-+	__vcpu_assign_sys_reg(vcpu, SCTLR_EL1, read_sysreg_el1(SYS_SCTLR));
- 
- 	kvm_pend_exception(vcpu, EXCEPT_AA64_EL1_SYNC);
- 
+  - Drop WARN_ON() in the patch function (sashiko)
 
-base-commit: 1590cf0329716306e948a8fc29f1d3ee87d3989f
+  - Switch from this_cpu_has_cap() to cpus_have_cap() (shashiko)
+
+  - Reorganise the patches so that some of the code movements are less
+    surprising to our favourite Artificial Idiot
+
+  - Simplify __vgic_v3_get_config() to only return the MMIO attribute
+    as a boolean, dropping all form of GICv5 support which made little
+    sense
+
+[1] https://lore.kernel.org/r/20260720132220.2143486-1-maz@kernel.org
+
+Marc Zyngier (6):
+  KVM: arm64: vgic-v3: Make vtr_to_* helpers use architectural field
+    symbols
+  KVM: arm64: Move GICv3 broken SEIS implementation detection to a CPU
+    errrata
+  KVM: arm64: Add a helper providing an inlined literal value for
+    ICH_VTR_EL2
+  KVM: arm64: Convert most ICH_VTR_EL2 accesses to inlined literal value
+  KVM: arm64: vgic-v3: Simplify initial GICv3 configuration sampling
+  KVM: arm64: vgic-v3: Kill kvm_vgic_global_state.ich_vtr_el2
+
+ arch/arm64/include/asm/kvm_asm.h |  2 +-
+ arch/arm64/kernel/cpu_errata.c   | 17 +++++-
+ arch/arm64/kernel/image-vars.h   |  1 +
+ arch/arm64/kvm/hyp/vgic-v3-sr.c  | 43 +++++----------
+ arch/arm64/kvm/nested.c          |  3 +-
+ arch/arm64/kvm/vgic-sys-reg-v3.c |  8 +--
+ arch/arm64/kvm/vgic/vgic-v3.c    | 93 +++++++++++++++++++++-----------
+ arch/arm64/kvm/vgic/vgic-v5.c    |  5 +-
+ arch/arm64/kvm/vgic/vgic.h       | 19 ++++++-
+ arch/arm64/tools/cpucaps         |  1 +
+ include/kvm/arm_vgic.h           |  2 -
+ 11 files changed, 118 insertions(+), 76 deletions(-)
+
 -- 
-2.39.5
+2.47.3
 
