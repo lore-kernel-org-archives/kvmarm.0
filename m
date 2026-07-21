@@ -1,176 +1,116 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B02D0451044
-	for <kvmarm@lists.linux.dev>; Tue, 21 Jul 2026 10:07:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37197466B79;
+	Tue, 21 Jul 2026 10:10:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784628436; cv=none; b=Wpy6g0+jHdHm6jiMsuZb7BDn5v4NqFQhLNY5Vpi6YwhNUoMk9xonaJfHeKLbkjY4iU3AuZi0vcixcFkpfL350R09LA3iYSpYXJBiUjO9Qubef7oB1FtMiIk1KT/0LcUcKhtTi1+Vfe00tAzSg4SFpQGu4jZFuZn6eBrsiMXmAHk=
+	t=1784628616; cv=none; b=RkMGDbPAZEQRvTjpHQ34bh27HrNDkgdcRrxmX4pZDPIeLnTeysJi1kFuBLl8owrkK+vua3siTIX4Q8auUTXChmoVg+jQmpHsNxRfnFVrenkD2oxrtggZn0hqDmwH931RSwTWSaa4KgfuQVdrQac0IJgNi3l1UHms8dturua+Y9Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784628436; c=relaxed/simple;
-	bh=4zGlk0rW9DfP19Sed1t9eRNlFKFCFg4fqpC6UX74BUI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=D7xB74muy0XmMe6KGzk5ff8OgshQcc74WMd/6q1HPcbd2q3oOQgPL2tNXevTFbirjFeGnkEUDN9NXealQeoveSkjmu0UsaZ96WOggydUZDxuhhONWIy07EZQzV9QML6s+786JJ1dPCKT1VArjEXtWTSQ4TXevSrAUz7zZp8QlXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=PA2iHI9r; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1784628616; c=relaxed/simple;
+	bh=9af8pJkZLGkqL5vZ9I9/VgZYqEsM1wFe5SSVOddR4Y0=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=V0dfYdPh9MdptseZ+3FgPmUm5mhKch7e4duNgg5rrmIjW2Qvgu7MuH7frTSK7kRrTJas4/ciLjq8/Lvy7zD1LXmRfzn9A/mJEyyIle/4tI/bLDY6zFDSVQaxgO465ysl4/Iir1H39jq4/gHqHJdUT3dwwXiJFS2iVeZuvECaMQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FaEL8nWE; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="PA2iHI9r"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 650DB152B;
-	Tue, 21 Jul 2026 03:07:07 -0700 (PDT)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 029373F86F;
-	Tue, 21 Jul 2026 03:07:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1784628431; bh=4zGlk0rW9DfP19Sed1t9eRNlFKFCFg4fqpC6UX74BUI=;
-	h=From:To:Cc:Subject:Date:From;
-	b=PA2iHI9ruKH6LhwqqHPg2qzY36yRcQgq5NxnIzfWqHY/+YbgGSztfgfPiWSHyjh03
-	 JBZ6W3gWdFrz1W/XH3rDkM6/dThMDTdb0JSZoVTKhNLK1kuT2WqMgq3H/E/zrsWLAr
-	 necS1oR/dHKeDn1/JQiWP36NZNg2pQIv5hNJtAG0=
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: maz@kernel.org,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FaEL8nWE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3CCC1F00A3D;
+	Tue, 21 Jul 2026 10:10:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1784628609;
+	bh=hahn6XSzy902fKG1P4kmxqNqlV/jNKxzeedAcmrHaus=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=FaEL8nWEGrFzE/bQMIY6hJDYdPut/3vfz+09zNAOZ4L1XhUeUkJJ1QInnnmZ6/JDp
+	 Hc3amOmBPptQCiocf3b/vpFMtsxT14ygjw4XnhtxiRmHm5GCFV6VBxoXyBbpKzq/sL
+	 qK+51dNhTar0XsFyNWJHlCuAN/t0wC75VjI2eqP8sWR6JwuwfWq5CwHJKBW2J96MUp
+	 IQF4d55ep5AGw5XOn3dOW4szm1DWhN7IYX9UAsO59waDFjgYrqQd/vWqpSAkv1r3Pk
+	 RtAhh+zT8pgZZZAS/hvV7ChjnPPE5Gr80cxnRTz4L24mFNpx73QvySB57IU3819Xvl
+	 MlLRqzwi6KBqg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wm7QN-00000007AKu-33ds;
+	Tue, 21 Jul 2026 10:10:07 +0000
+Date: Tue, 21 Jul 2026 11:10:07 +0100
+Message-ID: <86y0f4ejr4.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mostafa Saleh <smostafa@google.com>
+Cc: linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
 	oupton@kernel.org,
-	joey.gouly@arm.com,
 	seiden@linux.ibm.com,
+	joey.gouly@arm.com,
 	suzuki.poulose@arm.com,
 	yuzenghui@huawei.com,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
 	catalin.marinas@arm.com,
-	will@kernel.org
-Cc: steven.price@arm.com,
-	fuad.tabba@linux.dev
-Subject: [PATCH v3] KVM: arm64: Reject guest_memfd memslots when the VM has MTE
-Date: Tue, 21 Jul 2026 11:06:54 +0100
-Message-ID: <20260721100654.476582-1-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.55.0
+	will@kernel.org,
+	vdonnefort@google.com,
+	tabba@google.com,
+	sebastianene@google.com,
+	keirf@google.com,
+	Fuad Tabba <fuad.tabba@linux.dev>
+Subject: Re: [PATCH v2] KVM: arm64: Optimize protected mode and FWB
+In-Reply-To: <20260721085646.1660673-1-smostafa@google.com>
+References: <20260721085646.1660673-1-smostafa@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: smostafa@google.com, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oupton@kernel.org, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, vdonnefort@google.com, tabba@google.com, sebastianene@google.com, keirf@google.com, fuad.tabba@linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-The user cannot use MTE on VMAs created by mapping a guest_memfd file,
-as arch_calc_vm_flag_bits() does not set VM_MTE_ALLOWED.
+On Tue, 21 Jul 2026 09:56:45 +0100,
+Mostafa Saleh <smostafa@google.com> wrote:
+> 
+> KVM opportunistically enables FWB if supported by the system for guest
+> VMs, which allows it to elude cache maintenance for data as they are
+> forced to be cacheable from stage-2.
+> In that case, __clean_dcache_guest_page() will immediately return.
+> However in protected mode, before calling __clean_dcache_guest_page()
+> it loops over the range and fix_map/unmap it, issuing TLB
+> invalidations, dsb() and isb() unnecessarily.
+> 
+> This can be optimized by returning early if FWB is supported,
+> kvm_pgtable_stage2_map() already issues dsb() and tlb invalidation
+> functions issue dsb() for the unmap path.
+> 
+> Signed-off-by: Mostafa Saleh <smostafa@google.com>
+> Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
+> ---
+>  arch/arm64/kvm/hyp/nvhe/mem_protect.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> index 4e329e39a695..049a09be2bbf 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> @@ -261,6 +261,13 @@ static void __apply_guest_page(void *va, size_t size,
+>  
+>  static void clean_dcache_guest_page(void *va, size_t size)
+>  {
+> +	/*
+> +	 * Guest stage-2 uses FWB if available, making it safe to elide CMOs.
+> +	 * In contrast, the host stage-2 never has FWB enabled.
 
-When creating a guest_memfd backed memslot,
-kvm_arch_prepare_memory_region() rejects the memslot if MTE is enabled for
-the VM and if guest_memfd has been mapped in a VMA that intersects the
-memslot.
+Beeeeeeep!!! Since a373930ec9406 ("KVM: arm64: Switch pKVM host S2
+over to KVM_PGTABLE_S2_AS_S1"), FWB is enabled everywhere when
+available.
 
-However, the documentation for KVM_SET_USER_MEMORY_REGION2 explicitly
-states that the only condition for userspace_addr is for it to be a legal
-userspace address, but the mapping is not required to be valid nor
-populated at memslot creation.
+Not sure that changes anything, but the comment is factually wrong.
 
-If userspace sets userspace_addr to an address that hasn't been mapped, or
-if userspace_addr belongs to a VMA that isn't backed by the guest_memfd
-file, or if the VMA doesn't intersect the memslot, memslot creation is
-successful and KVM ends up with a VM with MTE and guest_memfd-backed
-memslots.
+Thanks,
 
-The same happens if the order is reversed: when userspace enables MTE, KVM
-does not check if memslots backed by guest_memfd are already present.
+	M.
 
-Fix both issues by rejecting guest_memfd-backed memslots when MTE is
-enabled, and by rejecting MTE when guest_memfd-backed memslots are already
-present.
-
-Fixes: 32e200bd6e44 ("KVM: arm64: Enable support for guest_memfd backed memory")
-Tested-by: Fuad Tabba <fuad.tabba@linux.dev>
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
-
-v2 can be found at [1].
-
-Changes in v3:
-
-* Documented that guest_memfd and MTE are incompatible (Marc).
-* Added the Tested-by tag from Fuad (thanks!), but I didn't pick up his
-Reviewed-by tag. Fuad added guest_memfd support to arm64, and the changes
-to the docs look like something that he might have an opinion about.
-
-Did similar testing as for v2, except now I actually remembered to enable
-lockdep in the host (duh).
-
-[1] https://lore.kernel.org/kvmarm/20260720130942.135033-1-alexandru.elisei@arm.com/
-
- Documentation/virt/kvm/api.rst |  5 +++++
- arch/arm64/kvm/arm.c           | 25 +++++++++++++++++++------
- arch/arm64/kvm/mmu.c           |  4 ++++
- 3 files changed, 28 insertions(+), 6 deletions(-)
-
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index a5f9ee92f43e..53547fac5e37 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -8414,6 +8414,11 @@ When this capability is enabled all memory in memslots must be mapped as
- attempts to create a memslot with an invalid mmap will result in an
- -EINVAL return.
- 
-+``guest_memfd``, even though is an anonymous file, is incompatible with MTE.
-+Attempting to create a memslot backed by ``guest_memfd`` when the MTE capability
-+is enabled, or attempting to enable the MTE capability after ``guest_memfd``
-+backed memslots have been created, will result in an error.
-+
- When enabled the VMM may make use of the ``KVM_ARM_MTE_COPY_TAGS`` ioctl to
- perform a bulk copy of tags to/from the guest.
- 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 50adfff75be8..9a6c72a18672 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -149,14 +149,27 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 		set_bit(KVM_ARCH_FLAG_RETURN_NISV_IO_ABORT_TO_USER,
- 			&kvm->arch.flags);
- 		break;
--	case KVM_CAP_ARM_MTE:
--		mutex_lock(&kvm->lock);
--		if (system_supports_mte() && !kvm->created_vcpus) {
--			r = 0;
--			set_bit(KVM_ARCH_FLAG_MTE_ENABLED, &kvm->arch.flags);
-+	case KVM_CAP_ARM_MTE: {
-+		struct kvm_memory_slot *memslot;
-+		int bkt;
-+
-+		guard(mutex)(&kvm->lock);
-+		if (!system_supports_mte() || kvm->created_vcpus)
-+			break;
-+
-+		r = 0;
-+		guard(mutex)(&kvm->slots_lock);
-+		kvm_for_each_memslot(memslot, bkt, kvm_memslots(kvm)) {
-+			if (kvm_slot_has_gmem(memslot)) {
-+				r = -EINVAL;
-+				break;
-+			}
- 		}
--		mutex_unlock(&kvm->lock);
-+		if (r == 0)
-+			set_bit(KVM_ARCH_FLAG_MTE_ENABLED, &kvm->arch.flags);
- 		break;
-+
-+	}
- 	case KVM_CAP_ARM_SYSTEM_SUSPEND:
- 		r = 0;
- 		set_bit(KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED, &kvm->arch.flags);
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 6c941aaa10c6..2d95203386ba 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -2652,6 +2652,10 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 	if (kvm_slot_has_gmem(new) && !kvm_memslot_is_gmem_only(new))
- 		return -EINVAL;
- 
-+	/* guest_memfd is incompatible with MTE. */
-+	if (kvm_slot_has_gmem(new) && kvm_has_mte(kvm))
-+		return -EINVAL;
-+
- 	hva = new->userspace_addr;
- 	reg_end = hva + (new->npages << PAGE_SHIFT);
- 
-
-base-commit: 1590cf0329716306e948a8fc29f1d3ee87d3989f
 -- 
-2.55.0
-
+Without deviation from the norm, progress is not possible.
