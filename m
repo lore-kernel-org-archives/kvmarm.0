@@ -1,49 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8555143B3E4;
-	Wed, 22 Jul 2026 09:11:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA9BD4921B7;
+	Wed, 22 Jul 2026 09:16:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784711475; cv=none; b=PAlu5capWx04GtETit/cUhZd6rPspSrZqQUJn5H5wRn+IR7YfWIVzgyCm3tDz9xQMV9IRf6dKWpd36UZadS3J7OlqN/vHEpZte9ttATUzoMvxjybIJ0Iuy1hK92ck3otQ9Pf6SlBZtty2Y1RiaRmTeAzSfO37RQKGg41H2P13CM=
+	t=1784711801; cv=none; b=nB5dqRqLEV5EbWZJEMN2yBJnHOVQH46ZCBrWLZ82FXcQvFvXYs9ap4/0T5qrFzQfZMDY40oMpgfaRCkjP1To7gVOYqHuN+r+I61tedwOfO4tFHCzyDNxmc4opvBea8uSAbUfPiVh7+HQhjr3EOo0b+KVg5dwrGIeEYP+hDHAOmI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784711475; c=relaxed/simple;
-	bh=AvUMNj99F5T1FZu9pmmZ3YfSZ7H8GSRMQ26im/gxltg=;
+	s=arc-20240116; t=1784711801; c=relaxed/simple;
+	bh=hBL4JdiQ9da5VNIlhJdlyFaMLAM5SImr/4Dqi5RamP0=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HykrS2kojUSmRTWCGXt4zZ7qw4xE3kSu2AMQGnIuRZplkpVgi3Y3TKBBv7IGGzKfgBwkzPfOYeX9AJw68b6C3MuCDFz7bfEYybZXE0CHCR21sl3Rygo2sk0ht3UIpFMJdmE0fMjyE3M9J+moFvEAqz2z0cQmWslbjSM+y2TGz7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YpgzXfTJ; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=H98DDLOG9H35CXcIiTft3LybnSpu1cxwSIJZjHPyQ41bU0XVQVgsxhfQLbCcM2V/TWTS/oYXmeNM9DgUA4eW2o4IWM8qqAiDw7mDk7NFKsP1NXWyd1t+R41mllsoXdl97uPs0JrR6cDjuFPfwIvaK/WcsxFNmBDYyFl1s9XjGCY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YQajkfa9; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YpgzXfTJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 337581F00A3A;
-	Wed, 22 Jul 2026 09:11:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YQajkfa9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A11D1F000E9;
+	Wed, 22 Jul 2026 09:16:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784711474;
-	bh=2S3TfhB9cIYevuw2glVwaSELRyzkS0UTsDLeUSSyZRk=;
+	s=k20260515; t=1784711796;
+	bh=hEH7kKvqt1/KHUTe1tqWiXTLezrqII4VElE0IVB2D/I=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=YpgzXfTJU48f9mjMsovdgKqbyYrP57JLh92NI4hscq8fPOWc8RACb6DnEgMCdG2K1
-	 IaAeJg4AOTum64VXVRU4rEv1NgByjyaRgxt8BcGa2yLhzckLkhdD9DnqOEV94ICqwG
-	 rCYnbaTavcmtakmHOiQqHGJSjomvDg2WAlJm1AFsv/cuVVlqPbifFRlXj42sehnPY/
-	 gPMvdbs1Sz2eyvEQZl4i+Re7yEr5vQU3dZtQvgXSdqrPRt9ysDnBULAYeBVJ6EbpKH
-	 43uNUr7mR9coWsZTKYVKNJ2XMsyu0oboO2geIqIStGrI6z7zFwAbC8+O+2+yA01B8I
-	 11Vs4HQZ16Nnw==
+	b=YQajkfa9J6f4vm6T9dSUnt+jyEYWab07/JuzVrW21g3thiAdqJHipDNVNxlLVxzFP
+	 9+leosh8NuAupnv4wGq+PL6qA85lvFLa+NJ/Lehq6O1YktaiYU9WfO2VmfFYE0xdia
+	 SKP5tAXWI13AvGWHKaMMNUZ+O72aVaauJJfto/VDaTkDXmU42cAWEi/E8Qg+CaglOV
+	 dPEyv4Hg9BAZ+F9uF0lOiGYCEIGYs+YStr1m+7RKitJlf69PXzFzI5BnzKHWh9RNVq
+	 1TcaqJHIikSwlOLImttPqjBZEZAwooQY0GhcWPaz44n0ZV3ix9CQMxXOFJhgxxC7JU
+	 vWTW3vPQgeF7Q==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wmSyt-00000007YI9-3xcb;
-	Wed, 22 Jul 2026 09:11:12 +0000
-Date: Wed, 22 Jul 2026 10:11:11 +0100
-Message-ID: <86h5lre6ds.wl-maz@kernel.org>
+	id 1wmT46-00000007YV5-2Gq5;
+	Wed, 22 Jul 2026 09:16:34 +0000
+Date: Wed, 22 Jul 2026 10:16:34 +0100
+Message-ID: <86fr1be64t.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: sashiko-reviews@lists.linux.dev
-Cc: "Oliver Upton" <oupton@kernel.org>,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH v3 20/28] KVM: arm64: Add sanitisation for NVHCR_EL2
-In-Reply-To: <20260722083803.C0BD11F000E9@smtp.kernel.org>
+Cc: kvm@vger.kernel.org,
+	"Oliver Upton" <oupton@kernel.org>,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v3 24/28] KVM: arm64: Engage NV3 ERET trap elision
+In-Reply-To: <20260722085035.0FAB71F000E9@smtp.kernel.org>
 References: <20260722074234.3330999-1-maz@kernel.org>
-	<20260722074234.3330999-21-maz@kernel.org>
-	<20260722083803.C0BD11F000E9@smtp.kernel.org>
+	<20260722074234.3330999-25-maz@kernel.org>
+	<20260722085035.0FAB71F000E9@smtp.kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -55,68 +55,100 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, oupton@kernel.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org
+X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, kvm@vger.kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 22 Jul 2026 09:38:03 +0100,
+On Wed, 22 Jul 2026 09:50:34 +0100,
 sashiko-bot@kernel.org wrote:
 > 
-> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> 
-> Pre-existing issues:
-> - [High] Subsystem rule violation: Numeric range loop over sparse `enum vcpu_sysreg`
+> Thank you for your contribution! Sashiko AI review found 2 potential issue(s) to consider:
+> - [High] NV3 ERET trap elision (HCRX_EL2_NVTGE) is evaluated statically at vCPU initialization, failing to reflect dynamic changes to HCR_EL2.E2H by the guest, resulting in a severe performance regression.
+> - [Low] Typographical error in the newly added comment for NV3.
 > --
 > 
-> --- Patch [20]: [PATCH v3 20/28] KVM: arm64: Add sanitisation for NVHCR_EL2 ---
-> commit b143c0689f4a9db3345ab50e6a712d0698ebaa75
+> --- Patch [24]: [PATCH v3 24/28] KVM: arm64: Engage NV3 ERET trap elision ---
+> commit c8d6c5654353c481c8b8e9e0a6741ae11cc31c69
 > Author: Marc Zyngier <maz@kernel.org>
 > 
-> KVM: arm64: Add sanitisation for NVHCR_EL2
+> KVM: arm64: Engage NV3 ERET trap elision
 > 
-> This commit adds sanitisation support for the NVHCR_EL2 register.
-> It mimics the format of HCR_EL2 but conditionally depends on FEAT_NV3
-> being present. If FEAT_NV3 is absent, it relies on standard VNCR data
-> transfers.
+> This patch enables ERET trap elision for L1 contexts on NV3 hardware by
+> setting HCRX_EL2.NVTGE, and adjusts the EL2 fast-path to bounce back to EL1
+> when NV3 and E2H are active, assuming the hardware handles the fast path.
 > 
+> > diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> > index c562d8171d5e1..b32870a5e1236 100644
+> > --- a/arch/arm64/include/asm/kvm_emulate.h
+> > +++ b/arch/arm64/include/asm/kvm_emulate.h
 > [ ... ]
-> 
-> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> > index 82be8bcb07035..34e63480886cd 100644
-> > --- a/arch/arm64/kvm/nested.c
-> > +++ b/arch/arm64/kvm/nested.c
-> > @@ -1828,6 +1828,10 @@ int kvm_init_nv_sysregs(struct kvm_vcpu *vcpu)
-> >  	resx = get_reg_fixed_bits(kvm, HCR_EL2);
-> >  	set_sysreg_masks(kvm, HCR_EL2, resx);
+> > @@ -706,6 +706,16 @@ static inline void vcpu_set_hcrx(struct kvm_vcpu *vcpu)
 > >  
-> > +	/* NVHCR_EL2 */
-> > +	resx = get_reg_fixed_bits(kvm, NVHCR_EL2);
-> > +	set_sysreg_masks(kvm, NVHCR_EL2, resx);
+> >  		if (kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_V))
+> >  			vcpu->arch.hcrx_el2 |= HCRX_EL2_EnASR;
 > > +
-> >  	/* HCRX_EL2 */
-> >  	resx = get_reg_fixed_bits(kvm, HCRX_EL2);
-> >  	set_sysreg_masks(kvm, HCRX_EL2, resx);
+> > +		/*
+> > +		 * NV3 is a host-specific extension, and we always use it
+> > +		 * when present and that the guest uses NV. It may be be
+> 
+> [Severity: Low]
+> This isn't a bug, but there is a typo (be be) in this comment.
+
+Fixed.
+
+> 
+> > +		 * hidden from the guest though.
+> > +		 */
+> > +		if (cpus_have_final_cap(ARM64_HAS_NV3) &&
+> > +		    vcpu_has_nv(vcpu) && vcpu_el2_e2h_is_set(vcpu)) {
+> > +			vcpu->arch.hcrx_el2 |= HCRX_EL2_NVTGE;
+> > +		}
 > 
 > [Severity: High]
-> This is a pre-existing issue, but later in kvm_init_nv_sysregs() there is
-> a loop over enum vcpu_sysreg:
-> 
-> 	for (enum vcpu_sysreg sr = __SANITISED_REG_START__; sr < NR_SYS_REGS; sr++)
-> 		__vcpu_rmw_sys_reg(vcpu, sr, |=, 0);
-> 
-> Does this numeric range loop iterate over unintended registers?
-> 
-> The KVM ARM64 subsystem guidelines state that enum vcpu_sysreg is sparsely
-> numbered by VNCR byte offsets. Using a < comparison and incrementing over a
-> numeric range touches register indices that happen to fall within the byte
-> span.
-> 
-> Could this silently drop or corrupt guest state by applying operations to
-> unrelated registers?
+> Does evaluating the dynamic guest state vcpu_el2_e2h_is_set() here work correctly
+> given this populates the static vcpu->arch.hcrx_el2 cache?
+>
+> If the guest hypervisor (L1) initializes and dynamically enables HCR_EL2.E2H
+> after KVM has already initialized the vCPU via kvm_calculate_traps(), this
+> HCRX_EL2_NVTGE bit won't be set because vcpu_set_hcrx() is not refreshed
+> dynamically.
 
-These are unallocated VNCR entries. we can do whatever we want with
-them, including scribbling Pi to the nth digit if there is enough
-space.
+vcpu_el2_e2h_is_set() is a fixed value. Always. It cannot change.
+
+> 
+> This causes the hardware to fail to engage trap elision, forcing the ERET
+> instruction to trap to EL2 where it encounters the new check below.
+> 
+> > diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> > index cbda9e087db39..4ed745bdde418 100644
+> > --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> > +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> > @@ -345,6 +345,10 @@ static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
+> >  	u64 esr = kvm_vcpu_get_esr(vcpu);
+> >  	u64 spsr, elr, mode;
+> >  
+> > +	/* With NV3, the fast path is handled in HW */
+> > +	if (cpus_have_final_cap(ARM64_HAS_NV3) && vcpu_el2_e2h_is_set(vcpu))
+> > +		return false;
+> > +
+> 
+> [Severity: High]
+> Will this unconditionally abort the fast path and force a severe performance
+> regression if the hardware trap elision wasn't engaged?
+
+As the comment says: we never get there if we're not *already* on the
+slow path. That's the spec. Read the spec.
+
+> 
+> Because the HCRX_EL2_NVTGE bit was evaluated statically in vcpu_set_hcrx()
+> and missed the guest's dynamic update, the ERET traps into this function.
+> 
+> kvm_hyp_handle_eret() evaluates the dynamic E2H state, correctly observes
+> that it is now set, and returns false under the incorrect assumption that
+> the hardware handled the fast path. This bounces the trap to the slow host
+> EL1 path, forcing a full, expensive context switch to emulate every L1 ERET.
+
+Yet another Artificial Idiot nonsense.
 
 	M.
 
