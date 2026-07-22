@@ -1,130 +1,357 @@
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3A061F4CB3
-	for <kvmarm@lists.linux.dev>; Wed, 22 Jul 2026 11:52:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13E5F38736F
+	for <kvmarm@lists.linux.dev>; Wed, 22 Jul 2026 12:05:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784721141; cv=none; b=QoaPXNVBzLwGChV5JLsgCdt3AJ79J2fCBJ0jyrLxabMYR87DXeIaAFnIo4Zh6nApHRBjWyNKdXuith/OVEodryyXhG3mFX7/1lqKLkK/LWuXRdiWBBHP0G/3r9E5p74yoPOPSNtM2s6N+XI4Z76I9j6kgKon0VZ9CZMFlqQEok0=
+	t=1784721952; cv=none; b=Dy2LwzTJbHTjOog1hHbkK5T7lVujjE7F6gXgTYlCKinoL0r0tjKG8vBh7NiusJpbEb2Wkme70tOGD/6bh/4/+KyP3uSvJmPlAWGLLkNXvyEEmVD9hgbLxvxtEM9LJH1hlqTol/wxUGMor8QVekWW3Jw5/wslWyi1HysN5cZHB+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784721141; c=relaxed/simple;
-	bh=hdAPbluOOCHMnr6b2tjeruX2akiUqzneuGvwHZGpWnw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rFhHlaVtvaoFpfMGuAsZnxRXTgeDRs6QO9LV54dompgtVdjXCvgnGWcyvwHKv+3DbBodCHpw4d1x1gys4R8VjdCp1wKQCwHJTNKFG1R6hKnEvY59mesJmLAoSUYmIFf1pqZc2Kr2gh9c7tq5t8hiSDuJN9ystbb0p+FdstQo/j0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=For3sVmn; arc=none smtp.client-ip=91.218.175.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1784721952; c=relaxed/simple;
+	bh=Cn955K8ocvlW6GYRaR76ESFuCYkDro/lnxTvFkRNkNg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kP/u3uf9qlD8bNkdz4wLRvmGrjfVQiYHTCFnzKANQ8+zERVsa3/1Jg5Iw6mm2Xwyad599YumwHR0GVKCHqujYDq0KsAsQsmc8iWAj3kLlB9K7RGgZbWsu/T/3sYH9b7jYinCHzYPg8rW6klJG+uibqW3hCxvtBEV5JRoeNizGE8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EgEjE/jm; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="For3sVmn"
-X-Forwarded-Encrypted: i=1; AHgh+RrNGJSSEL01CP6VffnL4zoOVtsF39/4V+tP10wYAqbGQWJ0XCh5RxpWzhByGCY11ckq5fzZlRA=@lists.linux.dev
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1784721136;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EgEjE/jm"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1784721949;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=yvrTKQMuH/eIiqrhZIkhsy/BDXpf6gi3fx2V0TPVyqE=;
-	b=For3sVmnjySi0O+ZSSX0/zCcmAPJY+Rjn74T9NM4vSYMCMlOBRdkLxRqi0Sub0Fs7nVZ0R
-	M/utwa6Vcw+hA8y1ZpFlGZ9Q3wI75Ba2PFQIWgUOAt3Zf78Ld58Vv+qTNMfJE1y7hwww7z
-	b8Ao01ILgpe4QDUL0/R+iCGvnc3mKGQ=
-X-Gm-Message-State: AOJu0Yy0jpOQTonjj4cVeAHfzrG1kP+boKgLvxTTd1dnDidHltZEwUq7
-	lPrmdOAFnOT31mYLyL/BT1oqWM7hVHT/ltok9N5RpAmPP8iNjTA8sbIIFnae+KEZfk/dOGTJZP4
-	EvdTcc0z0/luwaC7ASyCgqSyu1IiRWEMXO3NpdOwG
-X-Received: by 2002:ac8:5d14:0:b0:526:d7ae:8eb1 with SMTP id
- d75a77b69052e-527efb1cb7bmr7672571cf.21.1784721132970; Wed, 22 Jul 2026
- 04:52:12 -0700 (PDT)
+	bh=mHOKitnvR8mMXGDmyWVJC1XrCf1V4+Opcc0g+g8RGJI=;
+	b=EgEjE/jmZ87uYQ5f2QDPmGE+9gppDmANagPsBTKNGArtKf3I2L8n3/98Q9heQNcykNpwuG
+	F6MvT3+Ssi9w9QXrH1kUb+YKpBllYZyNIQJ93CKNCTgNSTrwo+WJTlocUVeUYLegT9UvIa
+	WzP8LF244Qvsoq2QEKMGqwg/kqDbDGo=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-79-U6fK5dFbNW651R4YXN2B4g-1; Wed, 22 Jul 2026 08:05:47 -0400
+X-MC-Unique: U6fK5dFbNW651R4YXN2B4g-1
+X-Mimecast-MFC-AGG-ID: U6fK5dFbNW651R4YXN2B4g_1784721946
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4955ce558d8so33905555e9.3
+        for <kvmarm@lists.linux.dev>; Wed, 22 Jul 2026 05:05:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784721946; x=1785326746;
+        h=content-transfer-encoding:content-type:in-reply-to:from:references
+         :cc:to:content-language:subject:reply-to:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=mHOKitnvR8mMXGDmyWVJC1XrCf1V4+Opcc0g+g8RGJI=;
+        b=RWkLG9YONkQFDBoDQMRrqop6vqhhSNuxEeCoDZrHIjm3kt1AmydZppA306upFzHCtL
+         auJIqX1z9X0+4pIyOV1zU6nGlIoj2UhBel7RAqW0Jdwpn/bKzrnTD0tYw00Psmu1GoEK
+         2IMzUhTTRbfKFtFB7jYCTWmYVSvrVo5Kxn2XbONhcI2//EAkDTGn7paq2E4FMdlGihF6
+         zNviyG42k6QmWlScres9D+k1t3gPzOhDCin+RTYxYfSPcfNQi2qm7pcH9T7hwt4yF3O9
+         prqs+1xZKof0RU9Rvvjc5kzsxxTf7eixjmZV8CRvMA0mzyJTwmQ/wPHG+PPUuUkXM17L
+         FQLg==
+X-Forwarded-Encrypted: i=1; AHgh+RogBLbDq6l6qJu5cXZtam4pbFJfdhvddq7TRkjYoco4JoG73NxDvhbuNrqImtFQ7p9WD6EtcLc=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwKlrs3rm6NaI3hPx+YyY12/burE1NAJfvipwbwnGuF9IDJ7tZV
+	W9gwAlLUuTgm/gUZGu4RG7R2vvbjJCtfax94wufPPQDsvyh2PAEJWzNYSFExCmj16vtFkpr4euc
+	MAUFQAi6PVS/1+kiH8cG4CtZIe1BsoLAvek8DIQdZQJrs2P4bE70l+Ta+pw==
+X-Gm-Gg: AR+sD11hC9IaiO2p6bKdyaJlZ1q0FlaDKkSPdqFitk+ctDf4Vyb++/Sfe5bxlpUvngn
+	xpcjGx1tIoEH3O3dxLaRqMSfvU3bAGtWA3bDpRxbe2suFhH50P4DdqQvy/UPIiLPwpd31SOMDbS
+	Aebow6wfaCkfj0Lb7T3zbU+ezedWceydGH4UWCrSDD4AFwnh5Gs7/TbUB8Pouf0o/2S5SsiVK4L
+	bG6aMs4mPQKsmfYfC6uehB9/dlFS1lEo7JhFq88UF/a3M1+d6+tdFBMRORGoA61YZiaBORxvG6F
+	CHR+gfLsEe0hD38miFZYTAVIKO7IlKFTTk4v5K6LTDtYqY2SVneyal/nCFEmgGNCLSIg/k3B5w3
+	fJAsBwdxl8Xl0T6a67zZuwRnk//+PDczMMol169+uzt7ELcu0
+X-Received: by 2002:a05:600c:4703:b0:495:4e89:3f30 with SMTP id 5b1f17b1804b1-4954e893f8cmr249486175e9.15.1784721946217;
+        Wed, 22 Jul 2026 05:05:46 -0700 (PDT)
+X-Received: by 2002:a05:600c:4703:b0:495:4e89:3f30 with SMTP id 5b1f17b1804b1-4954e893f8cmr249485465e9.15.1784721945717;
+        Wed, 22 Jul 2026 05:05:45 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-495653d38dbsm133424985e9.15.2026.07.22.05.05.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 22 Jul 2026 05:05:44 -0700 (PDT)
+Message-ID: <9fe4814a-5479-4180-9a61-7d2d5d2fbb92@redhat.com>
+Date: Wed, 22 Jul 2026 14:05:42 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260721085646.1660673-1-smostafa@google.com> <86y0f4ejr4.wl-maz@kernel.org>
- <al9HqhO6sp3FFbtQ@google.com>
-In-Reply-To: <al9HqhO6sp3FFbtQ@google.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Wed, 22 Jul 2026 12:51:35 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTwp6gQDjL5uE+aAJ04yRnPgvABgBaBWe44hyVSMXGQP9w@mail.gmail.com>
-X-Gm-Features: AUfX_myxGfq1s8jj6zkDmzja_7hOKzisg2DOisitMb1W1idiDZ-akaduHbBJtgw
-Message-ID: <CA+EHjTwp6gQDjL5uE+aAJ04yRnPgvABgBaBWe44hyVSMXGQP9w@mail.gmail.com>
-Subject: Re: [PATCH v2] KVM: arm64: Optimize protected mode and FWB
-To: Mostafa Saleh <smostafa@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, oupton@kernel.org, seiden@linux.ibm.com, 
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	catalin.marinas@arm.com, will@kernel.org, vdonnefort@google.com, 
-	sebastianene@google.com, keirf@google.com
-Content-Type: text/plain; charset="UTF-8"
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Reply-To: eric.auger@redhat.com
+Subject: Re: [RFC PATCH v3 08/19] target/arm/kvm: Handle writeback for special
+ ID register fields
+To: Khushit Shah <khushit.shah@nutanix.com>, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, kvmarm@lists.linux.dev
+Cc: cohuck@redhat.com, peter.maydell@linaro.org,
+ richard.henderson@linaro.org, maz@kernel.org, oliver.upton@linux.dev,
+ berrange@redhat.com, abologna@redhat.com, jdenemar@redhat.com,
+ gshan@redhat.com, skolothumtho@nvidia.com, sebott@redhat.com,
+ armbru@redhat.com, philmd@linaro.org, yangjinqian1@huawei.com,
+ shaju.abraham@nutanix.com, mark.caveayland@nutanix.com,
+ prerna.saxena@nutanix.com
+References: <20260716213858.609699-1-khushit.shah@nutanix.com>
+ <20260716213858.609699-9-khushit.shah@nutanix.com>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20260716213858.609699-9-khushit.shah@nutanix.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: S4IHpoDF5kSgHD51pmHh41jkhzcPhqib_arGWasx9mM_1784721946
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, 21 Jul 2026 at 11:19, Mostafa Saleh <smostafa@google.com> wrote:
+Hi Khushit,
+On 7/16/26 11:38 PM, Khushit Shah wrote:
+> Some fields should not be written back to KVM for various reasons:
+>  - ID_AA64PFR0_EL1.GIC / ID_PFR1_EL1.GIC are fabricated by KVM based on
+>    the gic-version property.
+so this is part of the overall handling of legacy composite options
+versus sysreg settings. To be the fact they both are consistent should
+be enforced upfront.
+>  - KVM does not allow writing 0 to ID_DFR0_EL1.CopDbg, which breaks
+>    booting an AArch64-only guest on a host that also supports AArch32.
+>  - ID_DFR0_EL1.PerfMon is populated by KVM even for AArch64-only guests
+>    but is not writable there.
+>  - MPIDR_EL1 is managed by KVM based on vCPU index.
+>  - Hold off writing back CLIDR_EL1 until we properly support exposing
+>    cache topology to a KVM guest.
+Sounds this deserves a prerequisite fix. I also have this hack in my
+series but this should be dealt with separately I think.
 >
-> On Tue, Jul 21, 2026 at 11:10:07AM +0100, Marc Zyngier wrote:
-> > On Tue, 21 Jul 2026 09:56:45 +0100,
-> > Mostafa Saleh <smostafa@google.com> wrote:
-> > >
-> > > KVM opportunistically enables FWB if supported by the system for guest
-> > > VMs, which allows it to elude cache maintenance for data as they are
-> > > forced to be cacheable from stage-2.
-> > > In that case, __clean_dcache_guest_page() will immediately return.
-> > > However in protected mode, before calling __clean_dcache_guest_page()
-> > > it loops over the range and fix_map/unmap it, issuing TLB
-> > > invalidations, dsb() and isb() unnecessarily.
-> > >
-> > > This can be optimized by returning early if FWB is supported,
-> > > kvm_pgtable_stage2_map() already issues dsb() and tlb invalidation
-> > > functions issue dsb() for the unmap path.
-> > >
-> > > Signed-off-by: Mostafa Saleh <smostafa@google.com>
-> > > Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
-> > > ---
-> > >  arch/arm64/kvm/hyp/nvhe/mem_protect.c | 7 +++++++
-> > >  1 file changed, 7 insertions(+)
-> > >
-> > > diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > > index 4e329e39a695..049a09be2bbf 100644
-> > > --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > > +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > > @@ -261,6 +261,13 @@ static void __apply_guest_page(void *va, size_t size,
-> > >
-> > >  static void clean_dcache_guest_page(void *va, size_t size)
-> > >  {
-> > > +   /*
-> > > +    * Guest stage-2 uses FWB if available, making it safe to elide CMOs.
-> > > +    * In contrast, the host stage-2 never has FWB enabled.
-> >
-> > Beeeeeeep!!! Since a373930ec9406 ("KVM: arm64: Switch pKVM host S2
-> > over to KVM_PGTABLE_S2_AS_S1"), FWB is enabled everywhere when
-> > available.
-> >
-> > Not sure that changes anything, but the comment is factually wrong.
+> Some registers such as DCZID_EL0 are not exposed through the KVM cpreg
+> list at all, but guest still sees the host value, we verify that vCPU's
+> ID regs values match the host value.
+why isn't it cpreg then? Shouldn't we add it instead?
 >
-> Ah, I see it uses KVM_PGTABLE_S2_AS_S1 in that case, that should not
-> change the patch, I will need to update the comment.
-
-Sorry, this confusing is partially my fault. The original comment in v1
-
->  /* See __clean_dcache_guest_page() */
-
-wasn't very clear to me, since I wasn't sure what I was looking for in
-__clean_dcache_guest_page(). Talking to Mostafa in person, he's
-referring to the comment _inside_ __clean_dcache_guest_page. I think
-the best fix is to rephase as
-
-+  /* See comment in __clean_dcache_guest_page() */
-
-This would save duplication and having to repeat the comment.
-
-Cheers,
-/fuad
-
-> Thanks,
-> Mostafa
+> To do this, refactor kvm_arm_writable_idregs_to_cpreg_list to
+> kvm_arm_write_idregs_to_cpregs_list, which operates per field and now
+> returns an error if a non-writable field mismatches with the host value.
 >
-> >
-> > Thanks,
-> >
-> >       M.
-> >
-> > --
-> > Without deviation from the norm, progress is not possible.
+> Signed-off-by: Khushit Shah <khushit.shah@nutanix.com>
+> ---
+>  target/arm/cpu-idregs.c |  19 +++++++
+>  target/arm/cpu-idregs.h |   4 ++
+>  target/arm/kvm.c        | 116 ++++++++++++++++++++++++++++++++++------
+>  target/arm/trace-events |   2 +-
+>  4 files changed, 125 insertions(+), 16 deletions(-)
+>
+> diff --git a/target/arm/cpu-idregs.c b/target/arm/cpu-idregs.c
+> index c41d0ab0c4..6fa02af0f3 100644
+> --- a/target/arm/cpu-idregs.c
+> +++ b/target/arm/cpu-idregs.c
+> @@ -7,6 +7,7 @@
+>   *  SPDX-License-Identifier: GPL-2.0-or-later
+>   */
+>  #include "qemu/osdep.h"
+> +#include "qemu/bitops.h"
+>  #include "qemu/error-report.h"
+>  #include "qapi/error.h"
+>  #include "cpu.h"
+> @@ -94,3 +95,21 @@ ARM64SysReg arm64_id_regs[NUM_ID_IDX] = {
+>  #include "cpu-idregs.h.inc"
+>  };
+>  
+> +uint64_t arm_get_field_mask(const ARM64SysRegField *field)
+> +{
+> +    return MAKE_64BIT_MASK(field->shift, field->length);
+> +}
+> +
+> +bool arm_field_is_writable(const ARM64SysRegField *field)
+> +{
+> +    uint64_t field_mask = arm_get_field_mask(field);
+> +
+> +    return (arm64_id_regs[field->index].writable_mask & field_mask)
+> +           == field_mask;
+> +}
+> +
+> +bool field_matches(const ARM64SysRegField *field, ARMIDRegisterIdx index,
+> +                   const char *name)
+> +{
+> +    return field->index == index && !strcmp(field->name, name);
+why do you need to check both index and name. Only checking index should
+be sufficient.
+> +}
+> diff --git a/target/arm/cpu-idregs.h b/target/arm/cpu-idregs.h
+> index 245f1c8103..d866bd9e0a 100644
+> --- a/target/arm/cpu-idregs.h
+> +++ b/target/arm/cpu-idregs.h
+> @@ -38,4 +38,8 @@ typedef struct ARM64SysReg {
+>   */
+>  extern ARM64SysReg arm64_id_regs[NUM_ID_IDX];
+>  
+> +uint64_t arm_get_field_mask(const ARM64SysRegField *field);
+> +bool arm_field_is_writable(const ARM64SysRegField *field);
+> +bool field_matches(const ARM64SysRegField *field, ARMIDRegisterIdx index,
+> +                   const char *name);
+>  #endif
+> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+> index 6974e5c551..c38b99cfce 100644
+> --- a/target/arm/kvm.c
+> +++ b/target/arm/kvm.c
+> @@ -951,6 +951,16 @@ static uint64_t *kvm_arm_get_cpreg_ptr(ARMCPU *cpu, uint64_t regidx)
+>      return &cpu->cpreg_values[res - cpu->cpreg_indexes];
+>  }
+>  
+> +/* Like kvm_arm_get_cpreg_ptr, but returns NULL if the register is not found. */
+> +static uint64_t *kvm_arm_find_cpreg_ptr(ARMCPU *cpu, uint64_t regidx)
+> +{
+> +    uint64_t *res;
+> +    res = bsearch(&regidx, cpu->cpreg_indexes, cpu->cpreg_array_len,
+> +                  sizeof(uint64_t), compare_u64);
+> +
+> +    return res ? &cpu->cpreg_values[res - cpu->cpreg_indexes] : NULL;
+> +}
+> +
+>  /**
+>   * kvm_arm_reg_syncs_via_cpreg_list:
+>   * @regidx: KVM register index
+> @@ -1252,32 +1262,105 @@ bool kvm_arm_cpu_post_load(ARMCPU *cpu)
+>      return true;
+>  }
+>  
+> +static bool arm_field_skip_writeback_always(const ARM64SysRegField *field)
+> +{
+> +    /*
+> +     * GIC is controlled by the gic-version property and fabricated by KVM
+> +     * when the vGIC device is created, so a named CPU model must not touch
+> +     * it. KVM also rejects writing 0 to ID_DFR0_EL1.CopDbg, which breaks
+> +     * booting a model that lacks AArch32 support on a host that supports
+> +     * it. MPIDR_EL1 is managed by KVM based on number of vCPUs, skip
+> +     * writing it back. Similarly, skip writing back CLIDR_EL1 till we
+> +     * properly support exposing cache for KVM guest.
+> +     */
+> +    return field_matches(field, ID_AA64PFR0_EL1_IDX, "GIC")
+> +        || field_matches(field, ID_PFR1_EL1_IDX, "GIC")
+> +        || field_matches(field, ID_DFR0_EL1_IDX, "CopDbg")
+> +        || field->index == MPIDR_EL1_IDX
+> +        || field->index == CLIDR_EL1_IDX;
+> +}
+> +
+> +static bool arm_field_skip_writeback_if_not_writable(const ARM64SysRegField *field)
+> +{
+> +    /*
+> +     * KVM populates ID_DFR0_EL1.PerfMon even for AArch64-only guests but
+> +     * does not expose it as writable there, so skip it when it is not
+> +     * writable.
+> +     */
+> +    return field_matches(field, ID_DFR0_EL1_IDX, "PerfMon");
+> +}
+> +
+>  /*
+> - * Copy writable ID regs from isar.idregs[] to cpreg_list
+> - * in case their value differs from the original init cpreg value
+> + * Copy writable ID reg fields from isar.idregs[] into the KVM cpreg list,
+> + * so the subsequent write_list_to_kvmstate() pushes them to KVM.
+> + * Only writable fields are copied; fields that must not be written back
+> + * (see arm_field_skip_writeback_*) are skipped.
+> + * Returns -1 if any vCPU's ID reg value differs from the host value and the
+> + * field is not writable.
+>   */
+> -static void kvm_arm_writable_idregs_to_cpreg_list(ARMCPU *cpu)
+> +static int kvm_arm_write_idregs_to_cpreg_list(ARMCPU *cpu)
+>  {
+>      for (int i = 0; i < NUM_ID_IDX; i++) {
+>          ARM64SysReg *sysregdesc = &arm64_id_regs[i];
+>          ARMSysRegs sysreg = id_register_sysreg[i];
+> -        uint64_t previous, new;
+> +        uint64_t writable_mask = sysregdesc->writable_mask;
+> +        uint64_t desired = cpu->isar.idregs[i];
+> +        uint64_t previous, updated;
+>          uint64_t *cpreg;
+>  
+> -        if (!sysregdesc->writable_mask) {
+> +        cpreg = kvm_arm_find_cpreg_ptr(cpu, idregs_sysreg_to_kvm_reg(sysreg));
+> +        /*
+> +         * Registers such as DCZID_EL0 are not exposed through the cpreg
+> +         * list and are therefore not writable. Use the host value
+> +         * snapshotted at probe time as the reference to check the vCPU ID
+> +         * regs have the same value.
+> +         */
+> +        previous = cpreg ? *cpreg : arm_host_cpu_features.isar.idregs[i];
+> +
+> +        if (previous == desired) {
+>              continue;
+>          }
+while at it you could also test all reserved fields here, RAZ, RES0/1
+and make sure host value complies with the description.
+>  
+> -        cpreg = kvm_arm_get_cpreg_ptr(cpu, idregs_sysreg_to_kvm_reg(sysreg));
+> -        previous = *cpreg;
+> -        new = cpu->isar.idregs[i];
+> +        for (int j = 0; j < sysregdesc->fields_count; j++) {
+> +            const ARM64SysRegField *field = &sysregdesc->fields[j];
+> +            uint64_t field_mask = arm_get_field_mask(field);
+> +            uint64_t prev_val = previous & field_mask;
+> +            uint64_t new_val = desired & field_mask;
+> +
+> +            if (prev_val == new_val) {
+> +                continue;
+> +            }
+> +
+> +            if (arm_field_skip_writeback_always(field) ||
+> +                (!arm_field_is_writable(field) &&
+> +                 arm_field_skip_writeback_if_not_writable(field))) {
+> +                /* Never write this field back; keep KVM's value. */
+> +                writable_mask &= ~field_mask;
+> +                continue;
+> +            }
+> +
+> +            if (!arm_field_is_writable(field)) {
+> +                error_report("%s.%s is not writable: host=0x%" PRIx64
+> +                             ", requested=0x%" PRIx64,
+> +                             sysregdesc->name, field->name,
+> +                             prev_val >> field->shift, new_val >> field->shift);
+> +                return -1;
+> +            }
+> +        }
+> +
+> +        if (!cpreg || !writable_mask) {
+> +            continue;
+> +        }
+>  
+> -        if (previous != new) {
+> -            *cpreg = new;
+> -            trace_kvm_arm_writable_idregs_to_cpreg_list(sysregdesc->name,
+> -                                                        previous, new);
+> -         }
+> +        updated = (previous & ~writable_mask) | (desired & writable_mask);
+> +        if (updated != previous) {
+> +            *cpreg = updated;
+> +            trace_kvm_arm_write_idregs_to_cpreg_list(sysregdesc->name,
+> +                                                        previous, updated);
+> +        }
+>      }
+> +
+> +    return 0;
+>  }
+>  
+>  void kvm_arm_reset_vcpu(ARMCPU *cpu)
+> @@ -2235,8 +2318,11 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>      if (ret) {
+>          return ret;
+>      }
+> -    /* overwrite writable ID regs with their updated property values */
+> -    kvm_arm_writable_idregs_to_cpreg_list(cpu);
+> +    /* overwrite ID reg fields with their updated property values */
+> +    ret = kvm_arm_write_idregs_to_cpreg_list(cpu);
+> +    if (ret) {
+> +        return ret;
+> +    }
+>      ret = write_list_to_kvmstate(cpu, KVM_PUT_FULL_STATE);
+>      if (!ret) {
+>          return -1;
+> diff --git a/target/arm/trace-events b/target/arm/trace-events
+> index f33b0d821d..f042ab59b8 100644
+> --- a/target/arm/trace-events
+> +++ b/target/arm/trace-events
+> @@ -14,7 +14,7 @@ arm_gt_update_irq(int timer, int irqstate) "gt_update_irq: timer %d irqstate %d"
+>  # kvm.c
+>  kvm_arm_fixup_msi_route(uint64_t iova, uint64_t gpa) "MSI iova = 0x%"PRIx64" is translated into 0x%"PRIx64
+>  get_host_cpu_idregs(const char *name, uint64_t value) "scratch vcpu host value for %s is 0x%"PRIx64
+> -kvm_arm_writable_idregs_to_cpreg_list(const char *name, uint64_t previous, uint64_t new) "%s overwrite default 0x%"PRIx64" with 0x%"PRIx64
+> +kvm_arm_write_idregs_to_cpreg_list(const char *name, uint64_t previous, uint64_t new) "%s overwrite default 0x%"PRIx64" with 0x%"PRIx64
+>  
+>  # cpu64.c
+>  get_sysreg_prop(const char *name, uint64_t value) "%s 0x%"PRIx64
+Thanks
+
+Eric
+
