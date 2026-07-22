@@ -1,152 +1,143 @@
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+Received: from pdx-out-007.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-007.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.34.181.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D9593E49F6
-	for <kvmarm@lists.linux.dev>; Wed, 22 Jul 2026 17:57:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0C80438FF5
+	for <kvmarm@lists.linux.dev>; Wed, 22 Jul 2026 20:27:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.34.181.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784743068; cv=none; b=AsiB1Y/iR4MlF4Kng6C7+fV99xH0qhV7Uw2qKuefYoybyehJjP1sAHkDGunPPYvodyvV+h6dEz+G1rhQT62HED2FM4hypQpwXJnUxuLWXKIwtMDKqewKPj3KEPzrpWfgPfIzagNTBpdIp119+n+afSe7TA3+BaEQBsV9pFDMKUI=
+	t=1784752044; cv=none; b=lj+IpWUPj9mo/VX3fBCR1f7r4LxSE7FtDMFn2AisL79U/kaBNp+UBd7AiIEG9K5CaIWx2r4Gzkt3DNzPdI09VusvR3l/0auCboWoJrp0FqLn/FG+gFr1oIZKFTFnJqhWLUR0Cq80VqbKCCNTiTEz0b4t7yUshZJzTK9gbnBktM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784743068; c=relaxed/simple;
-	bh=h5cZsGKWrMXzmekoRAj8WHyaGhT9z6Pr5c9d04J22pw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=R4lGx1eucXElcBeO3WNIf88j5p+OGPpCDfPUchXK4fKMn9n/Vy/YBFj0wojDzdXwtbdwIiAZeBhL9FDVFywX/J1Pg76j7b5pH2ubi/l64dFrzkhPXR+1VRyTeuyqeC7fxOmQRSytzqekvEgq9b/vlrrDTEHNYuWMp2w2+6KlpNQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pivhzrbc; arc=none smtp.client-ip=91.218.175.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1784752044; c=relaxed/simple;
+	bh=XpmnCyDIJBzMs6VGI8ZKugfCk3Um6Y22mdoXwUhpgjc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Cx5Ln+gy+ZGF2nxTElxWaMVmOwp0tL60GDhfvH1xiiKLHE9z9pVIfZSyO/tcBGDWC/GWms/L0FChdt4unC1XQdlSldqh2QEzgaTDvI8cQMXaA0Wky9b9bcUCqKbcapO/JV07/WlYl6+JngcIcxtpA6jiHRlyr6qQ54nOrFNzKLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=tBrkrIaW; arc=none smtp.client-ip=52.34.181.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pivhzrbc"
-X-Forwarded-Encrypted: i=1; AHgh+RpP1wUUTT3GsOXP7x8RM7WnkIckYi7Cum9V7OjrucU6mX7ft1s4Ih3SkduapJgulJKAzS9D6v4=@lists.linux.dev
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1784743063;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RNf+StBq+Xe+3jbYQBIhdsx2jh5oqIZIvT85TkHHRhA=;
-	b=pivhzrbcYHR6hhn0lQIUf/ORYdLKgmemiMBhtMQBtryyv9m6Mbh3YDhoyYT/JH7pg27XzX
-	jc41L6c6eocf39euig2Y/gyH/abnrCbtqIFedxKvqzpe4x7c7JMZ72RPyoug3UEChE2qNu
-	rqZLIFo6RmYfh9+hj41ldnu0CyVngCs=
-X-Gm-Message-State: AOJu0YxyjP9ZesXbq+lkvLcmJxeOkWNCZl5v8DrDV+3Kd5cnRi49+wKe
-	JYNO3ftTEFGBUpsGr239TzCGuKwVwNNu82FYmTJGZd2Upiphg33Lr/lIcYhsPWQvbtcRRjz5fbm
-	ZagCnmKQxAWnGJtrSUyvzEHkvEj7mEKXBdL4m1BoV
-X-Received: by 2002:a05:622a:a981:10b0:517:6dc0:698d with SMTP id
- d75a77b69052e-5283b8641f5mr863721cf.0.1784743059542; Wed, 22 Jul 2026
- 10:57:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="tBrkrIaW"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1784752043; x=1816288043;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=wu1rvS/0NtqSzL/yTwSllD7b6h2XEg4CeDcgPIqUCJ8=;
+  b=tBrkrIaWJa2BbILajvg7jStgcNYb9g7hluDrixrmFw0sP+qRCYAu45Md
+   ZpN8X4LoyLoM70qxx0QlbBHMI0xlR3WrZ6lcb8eg3ueik+TZ4XSyc3wmc
+   QCT9JSvRGtGxZlSpLvt+mc5L7f7CICgKvq6VNbns12c6O7/X7f60OhIvm
+   LfnbylVZck/NVvHFPRYFOHRqn5I3r6D/8NBkCdFC+zKZrjyGYcMHT3qff
+   br/iN0SDEWIMHBWPlXccG5Y79d7u4c+iVNdtVsW2m7yKPVFGXWDwK+gdi
+   C+cjj0uZV/2TImmOFZwEf/9TTjLGiW8LAeJt6UIQpGZynoZkxNpjW1knZ
+   g==;
+X-CSE-ConnectionGUID: /9kOpMd8QuKjjawR+ASmog==
+X-CSE-MsgGUID: Ix+wXZq9QRmXc4xYsHurFw==
+X-IronPort-AV: E=Sophos;i="6.25,179,1779148800"; 
+   d="scan'208";a="24168920"
+Received: from ip-10-5-9-48.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.9.48])
+  by internal-pdx-out-007.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jul 2026 20:27:23 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [205.251.233.104:8212]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.25.115:2525] with esmtp (Farcaster)
+ id 98f78049-842d-4f6a-b8e7-386b30f86096; Wed, 22 Jul 2026 20:27:22 +0000 (UTC)
+X-Farcaster-Flow-ID: 98f78049-842d-4f6a-b8e7-386b30f86096
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.43;
+ Wed, 22 Jul 2026 20:27:22 +0000
+Received: from dev-dsk-congkai-2a-df9e8fab.us-west-2.amazon.com
+ (172.23.251.204) by EX19D001UWA001.ant.amazon.com (10.13.138.214) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.43; Wed, 22 Jul 2026
+ 20:27:22 +0000
+From: Congkai Tan <congkai@amazon.com>
+To: Oliver Upton <oupton@kernel.org>, <kvmarm@lists.linux.dev>,
+	<linux-arm-kernel@lists.infradead.org>
+CC: Congkai Tan <congkai@amazon.com>, Marc Zyngier <maz@kernel.org>, "Joey
+ Gouly" <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, "Jonathan
+ Corbet" <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, "Haris
+ Okanovic" <harisokn@amazon.com>, Geoff Blake <blakgeof@amazon.com>,
+	"Stanislav Spassov" <stanspas@amazon.de>, <kvm@vger.kernel.org>,
+	<linux-doc@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: [PATCH v3 0/4] KVM: arm64: Expose PMMIR_EL1.SLOTS to guests
+Date: Wed, 22 Jul 2026 20:26:58 +0000
+Message-ID: <20260722202702.4165917-1-congkai@amazon.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260703154811.3355680-1-sascha.bischoff@arm.com>
- <20260703154811.3355680-37-sascha.bischoff@arm.com> <CA+EHjTybDSAgr44jXNFnssnYq_vVeuZ+1qORS8f4dtQgMzOZ5A@mail.gmail.com>
- <71dc44828b55c848ca7bc842cb13b34681617ac7.camel@arm.com>
-In-Reply-To: <71dc44828b55c848ca7bc842cb13b34681617ac7.camel@arm.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Wed, 22 Jul 2026 18:57:02 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTwMHxwpRLi0BEx5ykH+Nc1Oxja=6DYmdeS=3A3yzYYRzg@mail.gmail.com>
-X-Gm-Features: AUfX_mxTwAstkGjzWOdnvL1hFBOCWR33UqAdcJvL9E7YW2li2DEVUoBMCGBfKY8
-Message-ID: <CA+EHjTwMHxwpRLi0BEx5ykH+Nc1Oxja=6DYmdeS=3A3yzYYRzg@mail.gmail.com>
-Subject: Re: [PATCH v3 36/40] KVM: arm64: gic-v5: Implement save/restore
- mechanisms for ISTs
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Cc: "yuzenghui@huawei.com" <yuzenghui@huawei.com>, "lpieralisi@kernel.org" <lpieralisi@kernel.org>, 
-	Timothy Hayes <Timothy.Hayes@arm.com>, Suzuki Poulose <Suzuki.Poulose@arm.com>, nd <nd@arm.com>, 
-	"peter.maydell@linaro.org" <peter.maydell@linaro.org>, 
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, Joey Gouly <Joey.Gouly@arm.com>, 
-	"maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev" <oliver.upton@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D045UWC001.ant.amazon.com (10.13.139.223) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-Hi Sascha,
+Today when the perf tool runs in a guest on cores with PMUv3p4, it fails
+to parse the default metrics with "Failure to read '#slots'", since perf
+can only read 0 from sysfs caps/slots, which is backed by PMMIR_EL1.SLOTS
+that KVM traps as RAZ/WI.
 
-...
+Taking into account backward compatibility and heterogeneous systems, the
+exposure of PMMIR_EL1.SLOTS is gated behind a new vCPU feature flag:
 
-> I think that this is a great idea. It makes a lot more sense than
-> blindly trusting that the VMM has done the correct thing. With this,
-> KVM can validate that the VMM at least claims to have done what we'd
-> expect.
->
-> I guess you had something like this in mind?
->
->     struct kvm_vgic_v5_ist {
->         __u64 spi_ist_addr;
->         __u64 spi_ist_size;
->     };
->
-> Which then means that we can do:
->
->     struct kvm_vgic_v5_ist ist_attr;
->     size_t expected = kvm->arch.vgic.nr_spis * sizeof(__u32);
->
->     if (copy_from_user(&ist_attr, uaddr, sizeof(ist_attr)))
->         return -EFAULT;
->
->     if (ist_attr.spi_ist_size != expected)
->         return -EINVAL;
->
->     if (!ist_attr.spi_ist_addr)
->         return -EINVAL;
-...
+- Patch 1 exposes PMMIR_EL1.SLOTS of the selected PMU under the (as yet
+  unsettable) KVM_ARM_VCPU_PMU_V3_STRICT flag, and adds userspace get/set
+  for PMMIR_EL1 so that SLOTS can be reset to 0 for backward
+  compatibility.
+- Patch 2 stops masking STALL_SLOT* in PMCEID1 under the flag.
+- Patch 3 makes strict-mode userspace configure the number of event
+  counters via the KVM_ARM_VCPU_PMU_V3_SET_NR_COUNTERS attribute rather
+  than PMCR_EL0.N, whose meaning is context-dependent under NV.
+- Patch 4 adds the KVM_ARM_VCPU_PMU_V3_STRICT flag itself: when set, KVM
+  does not create a default PMU during vCPU init, and the VMM must select
+  one explicitly via KVM_ARM_VCPU_PMU_V3_SET_PMU before the first
+  KVM_RUN. This flips the gate on and can serve as an umbrella flag for
+  future PMUv3 UAPI changes.
 
-> When I originally designed this API, I was keen to re-use the guest
-> memory here so had quickly dismissed this approach. However, looking at
-> it again now, I think it makes a lot of sense, especially as we are
-> limiting the guest to 16-bits of ID space - this wasn't the case
-> originally which allowed the size of the ISTs to balloon significantly,
-> and hence it made more sense to re-use the guest's memory.
->
-> > That would remove the ordering requirement
-> > entirely, and by my reading the worst case is 65536 entries at 32
-> > bits, so 256 KiB, given the 16 bit clamp on the guest's LPI ID bits.
->
-> I am actually in favour of this approach. It removes the asymmetry
-> between the LPI and SPI ISTs on the save/restore path, and avoids the
-> explicit iteration over guest memory to save or restore the LPI IST.
->
-> With this, the proposed struct would become the following.
->
->     struct kvm_vgic_v5_ist {
->         __u64 spi_ist_addr;
->         __u64 spi_ist_size;
->         __u64 lpi_ist_addr;
->         __u64 lpi_ist_size;
->     };
->
-> The VMM would need to read the guest's IRS_IST_CFGR and IST_IST_BASER
-> to determine if the guest is using LPIs or not, and how many it needs
-> to provide storage for. If no LPIs are in use, then allow
-> lpi_ist_addr/lpi_ist_size to be 0, but otherwise the size must match.
->
-> Does this align with what you had in mind?
+When the flag is not set, behaviors are unchanged.
 
-Pretty much, yes. Folding the LPI IST in the same way is better than I
-expected. All __u64 also avoids implicit padding.
+v2: https://lore.kernel.org/r/20260702190421.420992-1-congkai@amazon.com
+v1: https://lore.kernel.org/r/20260601193954.2103455-1-congkai@amazon.com
 
-The LPI size is the one that matters. The SPI size is nr_spis * 4, and
-nr_spis is something the VMM set itself through GRP_NR_IRQS, so the
-two sides cannot disagree. The LPI size is derived from IST_CFGR
-instead, so that is the buffer where the kernel computing the expected
-size and rejecting a mismatch earns its keep. The entry is a fixed 4
-bytes either way, since only the architected 32-bit ISTE is exposed,
-so sizeof(__u32) is right.
+v2 -> v3 changes:
+ - Reordered so the KVM_ARM_VCPU_PMU_V3_STRICT flag / KVM_CAP exposure
+   comes last (now patch 4), after the flag-guarded behavior patches.
+ - Reworked on top of Oliver Upton's refinements (thanks!):
+   * Move the NULL-arm_pmu check into kvm_arm_pmu_v3_init() (returns
+     -ENXIO) instead of failing at the first KVM_RUN, and report zero
+     counters from kvm_arm_pmu_get_max_counters() before a PMU is set.
+   * Documentation and -ENXIO ordering notes for the PMU device
+     attributes (SET_PMU must precede INIT/FILTER).
+ - New patch (Oliver): ignore userspace writes to PMCR_EL0.N under the
+   strict flag and require the KVM_ARM_VCPU_PMU_V3_SET_NR_COUNTERS
+   attribute, since PMCR_EL0.N is context-dependent under NV.
+ - Advertise the KVM_CAP_ARM_PMU_V3_STRICT capability.
+ - Documentation fixes in api.rst (the flag Requires KVM_ARM_VCPU_PMU_V3).
 
-The main thing I would ask is that the checks be strict both ways,
-since turning silent acceptance into -EINVAL is really the point of
-the size field. Two cases: reject a non-zero lpi_ist_addr when the
-kernel has no LPI IST, not just allow 0 when it does; and on restore,
-reject rather than silently skip when the LPI IST is not configured
-yet, which as far as I can see makes an out-of-order restore, the IST
-buffer before IST_CFGR and IST_BASER, a no-op.
+Congkai Tan (3):
+  KVM: arm64: Expose PMMIR_EL1.SLOTS under strict PMUv3 UAPI
+  KVM: arm64: Advertise STALL_SLOT* in PMCEID1 under strict PMUv3 UAPI
+  KVM: arm64: Add KVM_ARM_VCPU_PMU_V3_STRICT vCPU feature
 
-Another thing your proposal cleanly resolves is the ordering point
-from my earlier mail. Once the LPI IST save writes the userspace
-buffer instead of guest memory, the requirement to serialise guest
-memory after saving the ISTs goes away, since the save no longer
-touches guest memory.
+Oliver Upton (1):
+  KVM: arm64: Ignore writes to PMCR_EL0.N when using strict UAPI
 
-Cheers,
-/fuad
+ Documentation/virt/kvm/api.rst                | 11 ++++
+ Documentation/virt/kvm/devices/vcpu.rst       | 11 +++-
+ arch/arm64/include/asm/kvm_host.h             |  5 +-
+ arch/arm64/include/uapi/asm/kvm.h             |  1 +
+ arch/arm64/kvm/arm.c                          | 19 ++++--
+ arch/arm64/kvm/pmu-emul.c                     | 54 ++++++++++++----
+ arch/arm64/kvm/sys_regs.c                     | 64 ++++++++++++++++++-
+ include/kvm/arm_pmu.h                         |  4 ++
+ include/uapi/linux/kvm.h                      |  1 +
+ .../selftests/kvm/arm64/get-reg-list.c        |  1 +
+ 10 files changed, 149 insertions(+), 22 deletions(-)
+
+
+base-commit: 8cdeaa50eae8dad34885515f62559ee83e7e8dda
+-- 
+2.50.1
+
