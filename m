@@ -1,89 +1,144 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BC643E44E5;
-	Wed, 22 Jul 2026 09:06:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 065BA30C60F;
+	Wed, 22 Jul 2026 09:08:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784711179; cv=none; b=bOFs2RmPXvROmGnKj5+LQDW8qJNjnL8uMiJzS/6SSzB9ejUwtG/OSWo9Y4Kv7EjUCzOmm4UDkZlT5kn+jXwsa3xeN3fyqCVB14KkzLQdQTI1JMnaa4dYtDQC/B+h8MxfhRjbSSPaRU+0AxZqw5nS7cjdofecqgZkRnzj2FZnVN4=
+	t=1784711309; cv=none; b=JF/LDG6dy1JuEmL+JMdTnlKGWAFPGmdaahABNQlZVWZpD8Bs+xzyBXu6MdlAXs8soKtWArLqTQilhnNFgFu0fHR1CrMlG97hAfNvwB1MyiZu7KVkGA8b6ugbllHZLIOqjwlunzLGLnhyQL6frMP2X0sQGfFW0BN4eKiJ1cqQzfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784711179; c=relaxed/simple;
-	bh=pMbc/v7WQcaHnbE1CUL5hBgYFmUulnK91551kw+XYrM=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=oALaraBTVgF9b0WT+AMYR4mzZNa2rqVUjar4CmU8r8r2tiGnwf3LByaa/i5xsSAxB+rxWGkXDVPuS4yLnXRbz59GCfwIUip6Z7XBBct2oOYIYJFy5gRGu4Kc+lidfW6V3PVvrlV+10aLkDhREF2wIMF16QSEWdKlM6MJAGvz6X8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EAdjLroI; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784711309; c=relaxed/simple;
+	bh=QYaQhD6zLRBBxuE4ZMPcFWxAURGe0Rl6jUSbMdmmHCA=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VPb+PlYK4dO3K3DxID0TEIYOP3ZSFXPyCGMg4yo/dUL/p5rorSygcavTx/ngO9gsW1/RIyp2pTIiGI0Eq73Tqh7qUAfysvWTBUJqvAW8/9pDocovIW98vJBZQvR8IFjbMaLCrLEXQ1Jvp6xg1JDkOS8Cq+/6DSxw9xcRYepMT28=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h0kacujz; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EAdjLroI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A14F51F000E9;
-	Wed, 22 Jul 2026 09:06:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h0kacujz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A15FF1F000E9;
+	Wed, 22 Jul 2026 09:08:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784711178;
-	bh=j5BNyyhLGz5yX47VsYdQ3Txq4Lg7743x0LzcxA3egRM=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=EAdjLroIditTfQGerUfFj1jZOp++H050+ZFCvPLthGjlIE22IUrXdaYG80YHf5XKa
-	 FBSeGIHHFebLekg2XdIaPCFG32IkVoDIkb8WyNyOSr1sIXWNZPwjHEfJQiE2OmNbKg
-	 4CQAGlNso3kXhUk7Cs89dAyxhlzwRhaM9VfLMEyUqrl5agM9k7wDNNwqanU/zPalmz
-	 G5gKx98DswBQKqgU6capcAn8prJSUDl/u61JZHPZtvag/gYxA0tY+1hRO9mOmgf7c5
-	 5suLXN0K7v5vPmYDyMfaLP/rgqlYwVbfEDNKFSuMSxijbEDpRufQKWFeG7Sr/UToXX
-	 0VVxm6jQV+cdA==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v3 27/28] KVM: arm64: Expose FEAT_NV3 to guests
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Marc Zyngier" <maz@kernel.org>
-Cc: "Oliver Upton" <oupton@kernel.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260722074234.3330999-28-maz@kernel.org>
+	s=k20260515; t=1784711307;
+	bh=nZ7L7tg6aIklyvYt5v1nGiVqcZeCgmW6hy/BN4iSq3k=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=h0kacujz9ZbA6CxjvtnkgVxVJk1oZJFVzCqK1grJHNqy8tX01fnUmZfg4Pd5+fcUZ
+	 OZNDcMxdv532iGcYPt0fJ3RayGr2plN+gz04PPFobRPDoeM//a6wEVtJD/CyipFHRc
+	 AMdJLp+qVlwnrMwrHh87pwj5ARXqEsfW9rtawwconMDNagIp50+gz4lXl0nXvXigLD
+	 hvEsZ6/eLQlOjFGj3uT7zLKapf6JPhVJid6qTmnkHv9Gs1ZjAkfvUKM9dmgCuMGbu2
+	 Eq1Lh0SM7/2QOqK89Ca0Rg5CTj/8WxNG5xjKzAF1/JP7XFw65LIjYSeX2skKXYo6aL
+	 zJplmiRBWIFkw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wmSwD-00000007YCh-49bi;
+	Wed, 22 Jul 2026 09:08:26 +0000
+Date: Wed, 22 Jul 2026 10:08:25 +0100
+Message-ID: <86ik67e6ie.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: sashiko-reviews@lists.linux.dev
+Cc: kvmarm@lists.linux.dev,
+	"Oliver Upton" <oupton@kernel.org>,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH v3 16/28] KVM: arm64: Split NV-specific exit fixups from the non-NV handling
+In-Reply-To: <20260722082303.B4E821F000E9@smtp.kernel.org>
 References: <20260722074234.3330999-1-maz@kernel.org>
- <20260722074234.3330999-28-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 22 Jul 2026 09:06:17 +0000
-Message-Id: <20260722090617.A14F51F000E9@smtp.kernel.org>
+	<20260722074234.3330999-17-maz@kernel.org>
+	<20260722082303.B4E821F000E9@smtp.kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev, oupton@kernel.org, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [Medium] The new system register NVHCR_EL2, which is exposed to userspace=
- when FEAT_NV3 is enabled, is not registered in the get-reg-list selftest.
---
+On Wed, 22 Jul 2026 09:23:03 +0100,
+sashiko-bot@kernel.org wrote:
+> 
+> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
+> - [High] Removing `inline` from `fixup_guest_exit()` and breaking out `fixup_nv_guest_exit()` exposes them to kprobes, which will cause a fatal host panic if probed.
+> --
+> 
+> --- Patch [16]: [PATCH v3 16/28] KVM: arm64: Split NV-specific exit fixups from the non-NV handling ---
+> commit 54c98942c16b88b656ffdb68540aac18e6fe4d3f
+> Author: Marc Zyngier <maz@kernel.org>
+> KVM: arm64: Split NV-specific exit fixups from the non-NV handling
+> 
+> This commit moves the nested virtualization (NV) handling of early fixups 
+> into its own helper function. This simplifies parsing and prepares the code
+> for further changes.
+> 
+> > diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> > index a8da40568a048..53af19212895d 100644
+> > --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> > +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> > @@ -539,18 +539,15 @@ static const exit_handler_fn hyp_exit_handlers[] = {
+> >  	[0x3F]				= kvm_hyp_handle_impdef,
+> >  };
+> >  
+> > -static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+> > +static void fixup_nv_guest_exit(struct kvm_vcpu *vcpu)
+> 
+> [Severity: High]
+> Does extracting this function without a NOKPROBE_SYMBOL() annotation expose
+> it to kprobes?
+> 
+> Since this executes on the VM exit path while the KVM hypervisor vectors are
+> still loaded, placing a kprobe here would trigger a BRK instruction that traps
+> to __kvm_hyp_vector. This cannot handle kprobes and would unconditionally
+> call hyp_panic(), crashing the host.
+> 
+> Should we add NOKPROBE_SYMBOL(fixup_nv_guest_exit) to prevent this?
 
---- Patch [27]: [PATCH v3 27/28] KVM: arm64: Expose FEAT_NV3 to guests ---
-commit 736b25683999a8114fb8bc21450f4b90835ba889
-Author: Marc Zyngier <maz@kernel.org>
+Maybe, but this is out of scope for this series.
 
-KVM: arm64: Expose FEAT_NV3 to guests
+> 
+> >  {
+> > -	synchronize_vcpu_pstate(vcpu);
+> > -
+> >  	/*
+> >  	 * If we were in HYP context on entry, adjust the PSTATE view
+> >  	 * so that the usual helpers work correctly. This enforces our
+> >  	 * invariant that the guest's HYP context status is preserved
+> >  	 * across a run.
+> >  	 */
+> > -	if (vcpu_has_nv(vcpu) &&
+> > -	    unlikely(host_data_test_flag(VCPU_IN_HYP_CONTEXT))) {
+> > +	if (unlikely(host_data_test_flag(VCPU_IN_HYP_CONTEXT))) {
+> 
+> [ ... ]
+> 
+> > @@ -567,8 +564,15 @@ static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+> >  	}
+> >  
+> >  	/* Apply extreme paranoia! */
+> > -	BUG_ON(vcpu_has_nv(vcpu) &&
+> > -	       !!host_data_test_flag(VCPU_IN_HYP_CONTEXT) != is_hyp_ctxt(vcpu));
+> > +	BUG_ON(!!host_data_test_flag(VCPU_IN_HYP_CONTEXT) != is_hyp_ctxt(vcpu));
+> > +}
+> > +
+> > +static bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+> 
+> [Severity: High]
+> By removing the inline keyword here, doesn't this also expose
+> fixup_guest_exit() to kprobes if the compiler chooses not to inline it?
 
-This commit further enables FEAT_NV3 by making it visible to NV guests.
+Marking something inline doesn't guarantee inlining either.
 
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -1739,7 +1739,9 @@ u64 limit_nv_id_reg(struct kvm *kvm, u32 reg, u64 v=
-al)
->  			val =3D 0;
->  		} else {
->  			val &=3D ID_AA64MMFR4_EL1_NV_frac;
-> -			if (cpus_have_final_cap(ARM64_HAS_NV2P1))
-> +			if (cpus_have_final_cap(ARM64_HAS_NV3))
-> +				val =3D ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64MMFR4_EL1, NV_frac, NV3);
+>
+> Should this function also receive a NOKPROBE_SYMBOL() annotation to avoid the
+> same host panic hazard?
 
-[Severity: Medium]
-By exposing FEAT_NV3 here, will new system registers like NVHCR_EL2 become
-visible to userspace on NV3-capable hardware? If so, does the get-reg-list
-selftest in tools/testing/selftests/kvm/arm64/get-reg-list.c need to be
-updated (e.g., adding them to el2_regs or using REG_FEAT) to prevent the
-test suite from failing when it discovers unaccounted registers?
+See above.
 
-> +			else if (cpus_have_final_cap(ARM64_HAS_NV2P1))
->  				val =3D ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64MMFR4_EL1, NV_frac, NV2P=
-1);
->  			else
->  				val =3D SYS_FIELD_PREP_ENUM(ID_AA64MMFR4_EL1, NV_frac, NV2_ONLY);
+	M.
 
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260722074234.3330=
-999-1-maz@kernel.org?part=3D27
+-- 
+Without deviation from the norm, progress is not possible.
