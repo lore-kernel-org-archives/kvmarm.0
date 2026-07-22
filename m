@@ -1,49 +1,50 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 555F04A2E17;
-	Wed, 22 Jul 2026 08:56:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06C70492180;
+	Wed, 22 Jul 2026 08:57:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784710577; cv=none; b=V0fT8AcCx3HidZep69FRmRZDv6tyAy/vibXWBTPKskvaehBjS+I2ESmdgSBKqNWyQRTZ2nSSYVZPNIrR1Chju8zUGb+bcBIANfPd6NjOScGjgg0LWjIhmkQfVtFer9I6d2KUvGAfFw3thpxw+t0aEXqXefZGeEkuXGokdnPgB9s=
+	t=1784710634; cv=none; b=jY3SsNTpwbRFYYRiSfSGWrectCVqk57kh9LDPv6gvMachz10BPc2JxTJNK5uFqiyCg9h0gbxV5muY6zL0a97FOeQoIf2tznwz9t5A+hdS/qeltebvtwjRN8JOv2RdPFLRHRrtl6qsAm9QezWI1RrxStM1VZbk7HzbmCqCCOosBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784710577; c=relaxed/simple;
-	bh=rcrfyqpNGrukPKg88+LQzZooIbive4rMslGwbA85WzU=;
+	s=arc-20240116; t=1784710634; c=relaxed/simple;
+	bh=wJjGOSy4z0/VpVzzpL0L3rLj7XoL958qQvaN+RhVpPg=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BdRi2naQM9/Rx9xHxlqyDhOJDauojktJypEg1PdxzCYsArFOAq3mzt7dfLu4tOZ3YJqZrpWro49Pxpcjr8UUNBaXW0eB65kZulBAO56eXYBVYBjRic9wVLx3YQ672y20JXICo0VHXosHpuZDXKk13z1YjoMg5swqC+1P0RDLhIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SpB6iz/b; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=OnkL6RC7MzTWKoowpEYtiXk436uSyKqB7IybjvByMna/enKQ98CUZhAr7x6uvUEKMeCyTDRMWeXxVBpX5knRuygKW4TUJ/TSY4oP4v0CAYUZuI2Yh3NU6DCKTjsmRUYBb+9M4RNgW0I3vCl2IipAI/ivGAF0EFDxSugzXfGhl/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oPiKKmYQ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SpB6iz/b"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 013051F00A3A;
-	Wed, 22 Jul 2026 08:56:16 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oPiKKmYQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42FD81F000E9;
+	Wed, 22 Jul 2026 08:57:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784710576;
-	bh=r237Jt6/4ENDQP60FkTI2rcn+0A+wG3lsl2rP1t7/io=;
+	s=k20260515; t=1784710632;
+	bh=+tFikxhq0OUB/4QWy+Qh3/Uls2ARH9KrY0CGYpzfLmo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=SpB6iz/b3lrrKUnb5q/5Z3xHnzqZLIdVG56jVM6ta3m6+oYHtWDrj6BZOSfAXiycQ
-	 GoymRwhqndSHlDmvu6+aNcVpDZit7RnNlFZIOvCgGlYjpfSuP/tUVgxrPB256IeTUW
-	 R+d9daW3Z2Jjhp58DCKawR9RI6wyUbkgA/NgZfJlw71YGlYhC+drAeThXPbIypMFUZ
-	 GLxygxhvI8X+nASgNV8h0Ez0v1TM1KdD7XOt5DfZeezYGVxchDJWQ78CbitZ1xLdIu
-	 8wUCdvMX6SJ4OUoVikXbjx3KZrfxHHvLF3UUZTGNz+isMOr/3c8d4yu6vCcVgsJHey
-	 KsvSl2N0l1Npg==
+	b=oPiKKmYQ/89jIa4ngLNs6FS6pGWfx+LhyJL9UGi9OJdPwiS2HrcO27jESNJBpXaLm
+	 dOq++EVTlCA5QIKKogWXBvybnQw9wGsPAEZPHAd8s31bF3mYf2+FjvV7KhQNelhv8M
+	 oaG/v9uJA7zutChfQQpiUwoWid8aXX4refKxzHX75k70pGxhlfe9Swteg8gERIxqHE
+	 If1NZL4yulzsS2TDm1e3njdw0+VFko1W8CASk80Oom/Uz4j84ZyKLIcvGWTUbhDIuq
+	 B9ht9LMfBm4+WMTZJZ1qDlS/Ao/DtuAMex01CJ2qXtG3bWxP1PlPEXcVGBiKRU1LmR
+	 paL37uekRZneQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wmSkP-00000007Xtp-3OW2;
-	Wed, 22 Jul 2026 08:56:13 +0000
-Date: Wed, 22 Jul 2026 09:56:13 +0100
-Message-ID: <86qzkve72q.wl-maz@kernel.org>
+	id 1wmSlK-00000007Xul-2KF5;
+	Wed, 22 Jul 2026 08:57:10 +0000
+Date: Wed, 22 Jul 2026 09:57:10 +0100
+Message-ID: <86pl0fe715.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: sashiko-reviews@lists.linux.dev
-Cc: kvm@vger.kernel.org,
-	"Oliver Upton" <oupton@kernel.org>,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v3 14/28] arm64: sysreg: Add HCRX_EL2 bits related to FEAT_NV3
-In-Reply-To: <20260722081154.E30171F000E9@smtp.kernel.org>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	"Oliver\
+ Upton" <oupton@kernel.org>
+Subject: Re: [PATCH v3 12/28] arm64: Add FEAT_NV2p1 detection
+In-Reply-To: <20260722081305.F28D91F000E9@smtp.kernel.org>
 References: <20260722074234.3330999-1-maz@kernel.org>
-	<20260722074234.3330999-15-maz@kernel.org>
-	<20260722081154.E30171F000E9@smtp.kernel.org>
+	<20260722074234.3330999-13-maz@kernel.org>
+	<20260722081305.F28D91F000E9@smtp.kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -55,19 +56,17 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, kvm@vger.kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev
+X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, oupton@kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 22 Jul 2026 09:11:54 +0100,
+On Wed, 22 Jul 2026 09:13:05 +0100,
 sashiko-bot@kernel.org wrote:
 > 
 > Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> - [High] A `.sysreg` declarative change alters the generated
-> `HCRX_EL2_RES0` mask by allocating new fields, but KVM's feature
-> maps were not updated, leading to semantic drift.
+> - [High] Missing isb() immediately after writing to control-plane system registers.
 
-https://lore.kernel.org/all/86tsq1oh8a.wl-maz@kernel.org/
+https://lore.kernel.org/all/86wluxokv5.wl-maz@kernel.org/
 
 	M.
 
