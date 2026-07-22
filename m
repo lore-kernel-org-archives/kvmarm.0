@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2DDB47143C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B280847143A;
 	Wed, 22 Jul 2026 07:42:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784706180; cv=none; b=pae4w2rQ6+FCjNtcAf03ur9yhV4aF8q98U2jSRryebKUH0lLtogJ0sfDl3WGnpJna40yfvwL4KJ9LiFXXZzlc8ekfyolRzW9eGKqsmJrn0lhVbd/ylAS/56MlSwPGAn4wq9Ov4zYF8E5WcisLZ7rlNUPwO6/Wm+XUYZYQ31olcg=
+	t=1784706180; cv=none; b=EWB9l/zcjl+Ex4uJ2+W75rGaMrN3EheVzh9Y8R8HoUUv8F5EMcL2dwyl98Y52D8Eb2/HNyArmh1K9wqgUTLbmkL1QJAipfKxKuSNbFgXCw4omBHmtykheZqzPw9e7vTZRP5MCAng2JcnLds1CBGXJ7LQneUUOCbMMv+oRgvlFow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1784706180; c=relaxed/simple;
-	bh=9NbUIFOuQGhPmdmTQ518VoxJ7RJNQ2KTV36YNQscAVY=;
+	bh=JZF1hmXV4cFDalm6HnT0iaROTVAoZE37X/FB0a36Uxw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Uoz20NtCjzIOROabRKtwixUNcQ31pSEGWKMzF6yZfaS9B62y2ujPnPAuZccYsdpRxZj8w7GwcO1JQ4q70TvYmBzc3VfAOfwCpZ5pQKSFolaSoVSo+pXE6iPK/MR59aqgHMMGfbHByjcuqcZa4ible22LlGyH9hxRYtU3wFteNkI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PAmcTda1; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=Q2zkFPz095rtvO5ckLLN/+hWzfzJZitLUTaiNIeN+BFWpvyhVlQRr8+lV38Lkz3Asx160p3MDbiW/6FhiGnkY1k7G4fvMDHwklDjP8aYQEMx3IqTlDBEYyZYNbV7tStCGA2IC6QUcTAx7ZJufUoa/f/XftYOWAwOrhEVV5GFCZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HO/E8mN1; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PAmcTda1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6068E1F000E9;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HO/E8mN1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 847D51F00A3D;
 	Wed, 22 Jul 2026 07:42:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1784706178;
-	bh=07dRYKXgRyU3x0X5on17tlJ7LESqf7TzRfpEcaCKSac=;
+	bh=AhyYZoRfqIfREPPS8CErWw/Y/QryBhe2Y1Mvp9CHj5Y=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=PAmcTda1WQ9W/sc+o91nL9LtHai/Dh4NdHfL4JRHGAXw5ZXq0eJtFXcjPRJUSPB3w
-	 TztnxH7GzFJtyC+XRw3XAUCrpf/NRLaAYHnHN1jXFAjYuEHKp0vZ0C+5ejmiw55di2
-	 OQY+t/E9hW+u5ARKb4wZsbzuOoFRPdA8e4OGfQaYEYyOvbkQWViI6M/vC+OGieXTMJ
-	 2LAGhBvdDi5tmVlLLbbBxaiZ97A2IBBruX675/NO4T1TP3NcFgPl79Xyvdjt53Co6c
-	 Y0rXEeNZLJWR4WU9ishl8/7IWpnTYfw/yZVOXwjOr2AiJoIGdg/GwNuK6l1W9i94eI
-	 3uHGsjvxgXCwA==
+	b=HO/E8mN117DnD5Deg+HgykdpZQ75cmy80vDQkILn8Slw7LPVsu/iRJmTrM6/qUZwx
+	 P+/yDR0pwJQJksplcW63bfFwFza1+sEaH3hl41khx6KXGrud/LwByQR/JVgexMzYDC
+	 eE6usvwN+uAQYRGdyz6RE1katSLlExYsBvdkjtxAqtHgRh20YZr64YECdQyDj9tGOQ
+	 gOoF3pUF/tT4zHktxEz4nVw2uMNrUep9bYvi1bJ/X2y5amI0cFXesa5bZABuPUYbs1
+	 O8q4NIaeclYVtgnz0+Is9PodekmuJhdzWUZS+hq4iix5BRmDZlsDPnQQlVgNQRKNoo
+	 gpVSqyalcfVOw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wmRbU-00000007VfN-2pd7;
+	id 1wmRbU-00000007VfN-3pHl;
 	Wed, 22 Jul 2026 07:42:56 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -43,9 +43,9 @@ Cc: Steffen Eiden <seiden@linux.ibm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Yao Yuan <yaoyuan@linux.alibaba.com>,
 	Wei-Lin Chang <weilin.chang@arm.com>
-Subject: [PATCH v3 11/28] KVM: arm64: Expose FEAT_NV2p1 to NV guests
-Date: Wed, 22 Jul 2026 08:42:17 +0100
-Message-ID: <20260722074234.3330999-12-maz@kernel.org>
+Subject: [PATCH v3 12/28] arm64: Add FEAT_NV2p1 detection
+Date: Wed, 22 Jul 2026 08:42:18 +0100
+Message-ID: <20260722074234.3330999-13-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260722074234.3330999-1-maz@kernel.org>
 References: <20260722074234.3330999-1-maz@kernel.org>
@@ -61,40 +61,31 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Since NV2p1 is reducing the number of traps, it is valuable to expose
-it to NV guests. Do so.
+Add the necessary NV2p1 probing to the cpufeature infrastructure.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/nested.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ arch/arm64/kernel/cpufeature.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index dfb96edbdc43c..35a1c42ad3f84 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -1728,7 +1728,7 @@ u64 limit_nv_id_reg(struct kvm *kvm, u32 reg, u64 val)
- 		 * You get EITHER
- 		 *
- 		 * - FEAT_VHE without FEAT_E2H0
--		 * - FEAT_NV limited to FEAT_NV2
-+		 * - FEAT_NV limited to FEAT_NV2(p1)
- 		 * - HCR_EL2.NV1 being RES0
- 		 *
- 		 * OR
-@@ -1740,7 +1740,11 @@ u64 limit_nv_id_reg(struct kvm *kvm, u32 reg, u64 val)
- 		if (test_bit(KVM_ARM_VCPU_HAS_EL2_E2H0, kvm->arch.vcpu_features)) {
- 			val = 0;
- 		} else {
--			val = SYS_FIELD_PREP_ENUM(ID_AA64MMFR4_EL1, NV_frac, NV2_ONLY);
-+			val &= ID_AA64MMFR4_EL1_NV_frac;
-+			if (cpus_have_final_cap(ARM64_HAS_NV2P1))
-+				val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64MMFR4_EL1, NV_frac, NV2P1);
-+			else
-+				val = SYS_FIELD_PREP_ENUM(ID_AA64MMFR4_EL1, NV_frac, NV2_ONLY);
- 			val |= SYS_FIELD_PREP_ENUM(ID_AA64MMFR4_EL1, E2H0, NI_NV1);
- 		}
- 		break;
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 9a22df0c5120f..c9c124b0ccc8e 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -2620,6 +2620,13 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 			{ /* Sentinel */ }
+ 		},
+ 	},
++	{
++		.desc = "FEAT_NV2p1",
++		.capability = ARM64_HAS_NV2P1,
++		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
++		.matches = has_cpuid_feature,
++		ARM64_CPUID_FIELDS(ID_AA64MMFR4_EL1, NV_frac, NV2P1)
++	},
+ 	{
+ 		.capability = ARM64_HAS_32BIT_EL0_DO_NOT_USE,
+ 		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
 -- 
 2.47.3
 
