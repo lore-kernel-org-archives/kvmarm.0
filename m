@@ -1,49 +1,71 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D10953BF694;
-	Wed, 22 Jul 2026 09:18:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C388540D565;
+	Wed, 22 Jul 2026 09:27:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784711930; cv=none; b=I/SLu6/y9w77Cm8fRTwXGCFzAvTWej39O0aHVL8MrJ6FyEfm21MGhLRVlrDk3hnTYRJdwNw9B4QJsKSLikglJBWFsgroWVd4POoxtTuQYW0wynSX87328N9Ks+BKNtqNEoqJBax2jFKIO2RmfF0g8YSNTGCtV8iySK2UYueof9g=
+	t=1784712469; cv=none; b=Hzsp1PH17r5FIXEcT0F9WsYmlV9MZQLMG0Bv9+azdIr1Bf/JCoIp8XRdFTDP6zW1sgCnROVcLJkrz6HRVxIXk2pOOGD7y4AyfFBHRrVo9laz8M+1zgiWTK3bqJjaiEHUyeAMO/fqFTFoJUGzUeRUgNj8RNFq6GUvTquSNpsIdNk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784711930; c=relaxed/simple;
-	bh=wQSwZqpHyrpu5MybR5oext09tkbEDJ6MQWKdPzYQsto=;
+	s=arc-20240116; t=1784712469; c=relaxed/simple;
+	bh=Mx7r2/SMwr97by1qxjSxW7aoIckxGANeAeNJ1Ot8gaE=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=o31ETuhiuDDuyTDCdjWLrGbfj2gV1DRPEb3R6hfdsUC9X2435yoXZkjtNqt7ge8i/ZE36lgChzJJGpNIIKmO0DU89QdlRjgPA1RudVkBPRu/tAejZFqdVG6aNgAFdaVP/mnlGuYCJIntuqc+p907iHwf4rXmhhGOHU/upccqOcE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PPK4s+Su; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=JUKQ5FSDlvL9e5EdOnqtnVnD4lVHs+ECQySRc7aGtBzMi1oQYdw6sXVK3oc3BYkMHWI5r6Awo7IBfMtDy+GXpgDH0b/ptEdqk20xDEalXbGnFgglQ19OJ9h6vfOWs725gXyDbW+s021I+b6ODBZv3ALltSmPay1fCXOXpdGZ1Cg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZZczb7cn; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PPK4s+Su"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70DD81F000E9;
-	Wed, 22 Jul 2026 09:18:49 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZZczb7cn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0FBD1F00A3D;
+	Wed, 22 Jul 2026 09:27:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784711929;
-	bh=JBQTTtSRC2ADxXNRwnGaARyBfLtPLZZFJXE5zDyD1uE=;
+	s=k20260515; t=1784712465;
+	bh=6rLVzkqTuW28t7Xy9m/mIBHPwAtbjdw7U4wk3FR9O6k=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=PPK4s+SuvTohTm7D6J3oGUFOn4dqOLZ/uwGnmE9dTt2Dle2780Uo6DU03WmZ06pp1
-	 aufPkU4a3gwnetKj1yq+D5upViJXwD3ThzjOlJJoD7v9fhb/Rzzbl0lfX46zT4MgUQ
-	 gqi0BSnxB+XbJrgH/7/eOvDrzGQuRshpWZ0xD62E+YWa5b+8eN5JX0FW1QwSHMOA4U
-	 Kh0GjEsJmdsqFq+8Hkjc+45li/Co6vOs1Fm0lSiQZy3WvxT2ZIHDiZI5LbRmuSQmdw
-	 js6kkFqjYtqQ27E35rBMrNOYBjpjQOK3ao5l+2cHFkrzijkWlMrHJHoB1auSN8oBRo
-	 nLnW1ZFrXeUug==
+	b=ZZczb7cn7HWVcnCRKvotdCu8jCxT5XRWclLr0CTpVX2vqxYJotLelHnBInvGbuYP4
+	 38tMLNHh9vOkHbH+RCCdv/6HEs+z6BI7Wsi93/rJ1BPpLD3s1Y3fludTpcm9P865J/
+	 G0fSCBA4k1Bzjt26QEF2Js2+5+/uRn6vyvRU6/H9HiSWH1VtXgammSHDRerwf4dHaZ
+	 rwacLypcErpw0SC3/bdLCvcN6ykJiluhx71sSi7lao2M/vAXIXbjQ5b5MwZVmhfpk5
+	 63AQDo5Cc/eIp+f52I1Gb1FvPmf4BcY+5p/PIoelAI2IflNMiUdQoqJjyV4dcYm8U4
+	 E6xTMm+Vu0k5A==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wmT6F-00000007YbY-2k59;
-	Wed, 22 Jul 2026 09:18:47 +0000
-Date: Wed, 22 Jul 2026 10:18:47 +0100
-Message-ID: <86ecgve614.wl-maz@kernel.org>
+	id 1wmTEt-00000007YqG-2ptG;
+	Wed, 22 Jul 2026 09:27:43 +0000
+Date: Wed, 22 Jul 2026 10:27:43 +0100
+Message-ID: <86cxwfe5m8.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: sashiko-reviews@lists.linux.dev
-Cc: "Oliver Upton" <oupton@kernel.org>,
+To: Kohei Enju <enju.kohei@fujitsu.com>
+Cc: Steven Price <steven.price@arm.com>,
 	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v3 27/28] KVM: arm64: Expose FEAT_NV3 to guests
-In-Reply-To: <20260722090617.A14F51F000E9@smtp.kernel.org>
-References: <20260722074234.3330999-1-maz@kernel.org>
-	<20260722074234.3330999-28-maz@kernel.org>
-	<20260722090617.A14F51F000E9@smtp.kernel.org>
+	kvmarm@lists.linux.dev,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+	Emi Kisanuki <fj0570is@fujitsu.com>,
+	Vishal Annapurve <vannapurve@google.com>,
+	WeiLin.Chang@arm.com,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>
+Subject: Re: [PATCH v15 12/37] KVM: arm64: CCA: Support the VGIC in realms
+In-Reply-To: <amB-opawGgF6jNHB@FCCLS0092175.localdomain>
+References: <20260715142841.80544-1-steven.price@arm.com>
+	<20260715142841.80544-13-steven.price@arm.com>
+	<amB-opawGgF6jNHB@FCCLS0092175.localdomain>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -55,47 +77,50 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, oupton@kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+X-SA-Exim-Rcpt-To: enju.kohei@fujitsu.com, steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com, aneesh.kumar@kernel.org, fj0570is@fujitsu.com, vannapurve@google.com, WeiLin.Chang@arm.com, lpieralisi@kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 22 Jul 2026 10:06:17 +0100,
-sashiko-bot@kernel.org wrote:
+On Wed, 22 Jul 2026 09:27:29 +0100,
+Kohei Enju <enju.kohei@fujitsu.com> wrote:
 > 
-> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> - [Medium] The new system register NVHCR_EL2, which is exposed to userspace when FEAT_NV3 is enabled, is not registered in the get-reg-list selftest.
-> --
+> On 07/15 15:28, Steven Price wrote:
+> > The RMM provides emulation of a VGIC to the realm guest. With RMM v2.0
+> > the registers are passed in the system registers so this works similar
+> > to a normal guest, but kvm_arch_vcpu_put() need reordering to early out,
+> > and realm guests don't support GICv2 even if the host does.
+> > 
+> > Signed-off-by: Steven Price <steven.price@arm.com>
 > 
-> --- Patch [27]: [PATCH v3 27/28] KVM: arm64: Expose FEAT_NV3 to guests ---
-> commit 736b25683999a8114fb8bc21450f4b90835ba889
-> Author: Marc Zyngier <maz@kernel.org>
+> Hi Steven,
 > 
-> KVM: arm64: Expose FEAT_NV3 to guests
-> 
-> This commit further enables FEAT_NV3 by making it visible to NV guests.
-> 
-> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> > --- a/arch/arm64/kvm/nested.c
-> > +++ b/arch/arm64/kvm/nested.c
-> > @@ -1739,7 +1739,9 @@ u64 limit_nv_id_reg(struct kvm *kvm, u32 reg, u64 val)
-> >  			val = 0;
-> >  		} else {
-> >  			val &= ID_AA64MMFR4_EL1_NV_frac;
-> > -			if (cpus_have_final_cap(ARM64_HAS_NV2P1))
-> > +			if (cpus_have_final_cap(ARM64_HAS_NV3))
-> > +				val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64MMFR4_EL1, NV_frac, NV3);
-> 
-> [Severity: Medium]
-> By exposing FEAT_NV3 here, will new system registers like NVHCR_EL2 become
-> visible to userspace on NV3-capable hardware? If so, does the get-reg-list
-> selftest in tools/testing/selftests/kvm/arm64/get-reg-list.c need to be
-> updated (e.g., adding them to el2_regs or using REG_FEAT) to prevent the
-> test suite from failing when it discovers unaccounted registers?
+> I've been testing this series and found that when the host CPU doesn't have
+> ARM64_HAS_ICH_HCR_EL2_TDIR this series doesn't work as expected.
 
-Indeed. And this only proves that this test is utterly pointless. It
-should compute the visibility of registers on its own, from first
-principles, instead of relying on someone updating it for one reason
-or another...
+What modern CPU doesn't support TDIR? The only CPUs I know of that are
+stuck in this mode are old ARMv8.0 CPUs, and anything else was fixed.
+
+> 
+> Since commit 2a28810cbb8b ("KVM: arm64: GICv3: Detect and work around the lack
+> of ICV_DIR_EL1 trapping"), when the host CPU doesn't support this feature, KVM
+> traps all GIC sysreg accesses in the common group. However, currently trap
+> handlers for ICC_{PMR,RPR,CTLR}_EL1 registers are missing [0]. So when Realm
+> guests try to access those registers, KVM traps them but just emits the warning
+> shown in [1], and Realm guests fail to boot.
+
+This isn't missing. This is handled by the early emulation in
+vgic-v3-sr.c, which of course CCA completely bypasses. Too bad.
+
+> 
+> As far as I can tell, the CCA requirements don't require the
+> ARM64_HAS_ICH_HCR_EL2_TDIR feature. If that's the case, this seems to be a
+> problem. Is there any workaround for this issue, or should we implement trap
+> handlers for those registers?
+
+No. Either you support TDIR, like any modern CPU, or you don't run
+CCA. I'm not adding yet another level of emulation for this.
+
+Thanks,
 
 	M.
 
