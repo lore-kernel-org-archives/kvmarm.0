@@ -1,294 +1,218 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C5DB213E89
-	for <kvmarm@lists.linux.dev>; Wed, 22 Jul 2026 13:09:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BE9F349CEF;
+	Wed, 22 Jul 2026 13:32:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784725792; cv=none; b=EVGy5pZrm/m3k/sBCyLFx/HxFiisAtWWeTUHRE7bcPk5LELG4vyVK0J+Tn76x/JHfdDodiS+K3HOGgyyUQJts/UtJdcr2/1k6hdtEBLVLveLnu4n50T3FER/Kaxg7hl80dkRQrC3AO3dcx67lhcNUUTI1ThcLMCneoYpqvUHyRw=
+	t=1784727123; cv=none; b=F37ydgVgLJxVNlsCzxkDj6AnT2PhiB59bqJT0r+oriH0q55iGPA31yyE1PxzokgmsVMmeS6UGvaNbssmTZHM/RRvwT17/VKyjHbl5COTjUJ4PlgVZH/mI7t2r7mu0lUZgR6DI3ohAfdEhfDjJLPC0p/YAphndnquCPbzecrx0Y0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784725792; c=relaxed/simple;
-	bh=Zg6U4aQM4UINML7yDa/DB8huf11vBh5Yf/JHAc9IN1I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GNpvhSbZjYwdlMLejDzmb9Cczn1hkj2zVNttqcOeF0jcB7j6MJoD9973jJyY8RbBbB4JuFObTJk64MIbx4pxJ7xjRH8jA7MI235Qcj1FbTFn5EbjxETEcF1dATm/U487fqJMzvXtBsBeJtJAWvrzStmJo03VvUKVoOBQjR3EqzI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=IV7YVlv+; arc=none smtp.client-ip=217.140.110.172
+	s=arc-20240116; t=1784727123; c=relaxed/simple;
+	bh=6AxZbM3+o8fEzuQd3zgOIISjc+Vr+68x4REjcsi72PY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MjYyiiG1tgFWVNa1FcWagm+B6Ara3wRUkrODM2byXhIo2BKvbhpvWyAsSD+oG3Ft90Z7Q+aTdjLX4QVNe5bSh3RMegE4jcbW5QtgbW2bskq1Wx4m+4LAJjRaswo2L6XrPl/3TH551z3uCuJ4xTJ++20eX36vhg2niMirK6NrYzY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=ZVW6ftl+; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="IV7YVlv+"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="ZVW6ftl+"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BDE0B1595;
-	Wed, 22 Jul 2026 06:09:36 -0700 (PDT)
-Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BDAD93F58B;
-	Wed, 22 Jul 2026 06:09:37 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 41F5B1595;
+	Wed, 22 Jul 2026 06:31:56 -0700 (PDT)
+Received: from [10.57.86.63] (unknown [10.57.86.63])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 040433F58B;
+	Wed, 22 Jul 2026 06:31:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1784725780; bh=Zg6U4aQM4UINML7yDa/DB8huf11vBh5Yf/JHAc9IN1I=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IV7YVlv+sr0FwB4OlMRnNfqOumZb0TVG2covLyQVfVmwkZjny4SY/FtNyclzaX9h8
-	 hdgttJ29sdYxx5ITqVKlyjUNGViTXXI9+5OB8wry0LQUoIzzsUygrhAHBaaWJ5/fq7
-	 uB5W7if/C/dF7ySoJn5DcQMcjGzhFoM/rPwVAGho=
-Date: Wed, 22 Jul 2026 14:09:27 +0100
-From: Wei-Lin Chang <weilin.chang@arm.com>
-To: Oliver Upton <oupton@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>, Fuad Tabba <tabba@google.com>, 
-	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Itaru Kitayama <itaru.kitayama@fujitsu.com>, Sebastian Ene <sebastianene@google.com>
-Subject: Re: [PATCH v4 2/6] KVM: arm64: nv: Avoid full shadow s2 unmap
-Message-ID: <ogr4kpysq5dzj6365nnk2cmmi2fe6rzcqvjsf2t4bhxrsuhc46@ukkdfwcbwahl>
-References: <20260714115926.2044757-1-weilin.chang@arm.com>
- <20260714115926.2044757-3-weilin.chang@arm.com>
- <aliCuX3ZIvxWlFE-@kernel.org>
- <upkq27f2mo3fy27ubkxxgfwkgn2oamnbxom2o6gce5ocfyauo5@6tfu3ppaw7o6>
- <alkSAyfhI4n_VAok@kernel.org>
+	t=1784727120; bh=6AxZbM3+o8fEzuQd3zgOIISjc+Vr+68x4REjcsi72PY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ZVW6ftl+NWzDeteskCjMo4aVNi1XQiZaplBWqUD6PO1uqdcf2vJvElv7Fu9S9IFcp
+	 LH7e1FbyjpMl6pVeztbeRHRFBFnMG4HoJcYxs/VL13MCByX5fjTlo9r2zB/re27opm
+	 M9hCclLQ1h6SwXoQnRJogmfM/3Jz6rRB/cwX3GHY=
+Message-ID: <b71e81ee-372c-4963-a1f7-bd301aee89cb@arm.com>
+Date: Wed, 22 Jul 2026 14:31:52 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alkSAyfhI4n_VAok@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v15 12/37] KVM: arm64: CCA: Support the VGIC in realms
+To: Kohei Enju <enju.kohei@fujitsu.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
+ Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
+ Lorenzo Pieralisi <lpieralisi@kernel.org>
+References: <20260715142841.80544-1-steven.price@arm.com>
+ <20260715142841.80544-13-steven.price@arm.com>
+ <amB-opawGgF6jNHB@FCCLS0092175.localdomain>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <amB-opawGgF6jNHB@FCCLS0092175.localdomain>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jul 16, 2026 at 10:16:51AM -0700, Oliver Upton wrote:
-> On Thu, Jul 16, 2026 at 05:14:46PM +0100, Wei-Lin Chang wrote:
-> > On Thu, Jul 16, 2026 at 12:05:29AM -0700, Oliver Upton wrote:
-> > > Hey,
-> > > 
-> > > On Tue, Jul 14, 2026 at 12:59:21PM +0100, Wei-Lin Chang wrote:
-> > > > +static bool valid_entry(unsigned long entry)
-> > > > +{
-> > > > +	WARN_ON(entry & VALID_ENTRY && entry & UNKNOWN_IPA);
-> > > > +	return entry & VALID_ENTRY;
-> > > > +}
-> > > > +
-> > > > +static bool unknown_ipa_entry(unsigned long entry)
-> > > > +{
-> > > > +	WARN_ON(entry & VALID_ENTRY && entry & UNKNOWN_IPA);
-> > > > +	return entry & UNKNOWN_IPA;
-> > > > +}
-> > > 
-> > > These should be WARN_ON_ONCE(), but I find the condition you're
-> > > asserting to be a bit confusing. An aliased reverse map entry is still a
-> > > valid entry, would you not set the valid bit?
-> > 
-> > Sorry, VALID_ENTRY might not be the best name for this flag. I used it
-> > to mean entries in the maple tree, that are not UNKNOWN_IPA, meaning the
-> > canonical IPA <-> nested IPA relation is one-to-one.
-> > 
-> > So by definition UNKNOWN_IPA and "VALID_ENTRY" should not be set at the
-> > same time. Unfortunately they can't be a single flag, as the stored
-> > address can be 0, this can make the whole value 0 when being stored if
-> > the single flag is also 0, effectively not doing the store.
-> > 
-> > Maybe it's better with just "KNOWN_IPA"?
+On 22/07/2026 09:27, Kohei Enju wrote:
+> On 07/15 15:28, Steven Price wrote:
+>> The RMM provides emulation of a VGIC to the realm guest. With RMM v2.0
+>> the registers are passed in the system registers so this works similar
+>> to a normal guest, but kvm_arch_vcpu_put() need reordering to early out,
+>> and realm guests don't support GICv2 even if the host does.
+>>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
 > 
-> Does anything break with:
+> Hi Steven,
+
+Hi Kohei,
+
+> I've been testing this series and found that when the host CPU doesn't have
+> ARM64_HAS_ICH_HCR_EL2_TDIR this series doesn't work as expected.
+
+Thanks for testing!
+
+> Since commit 2a28810cbb8b ("KVM: arm64: GICv3: Detect and work around the lack
+> of ICV_DIR_EL1 trapping"), when the host CPU doesn't support this feature, KVM
+> traps all GIC sysreg accesses in the common group. However, currently trap
+> handlers for ICC_{PMR,RPR,CTLR}_EL1 registers are missing [0]. So when Realm
+> guests try to access those registers, KVM traps them but just emits the warning
+> shown in [1], and Realm guests fail to boot.
 > 
-> state			{VALID, UNKNOWN}
-> 
-> invalid entry (NULL)	{0, 0}
-> valid IPA		{1, 0}
-> aliased IPA		{1, 1}
-> 
-> It's just the assertion that the bits are mutually exclusive that I find
-> confusing, agree that we need to have two bits of state.
+> As far as I can tell, the CCA requirements don't require the
+> ARM64_HAS_ICH_HCR_EL2_TDIR feature. If that's the case, this seems to be a
+> problem. Is there any workaround for this issue, or should we implement trap
+> handlers for those registers?
 
-This looks like a better way of representing state, thanks! I think
-"valid" now makes more sense.
+As Marc has already said in his reply, I'm really surprised you have a
+CPU which implements CCA but doesn't have ARM64_HAS_ICH_HCR_EL2_TDIR.
+Can you give some more details about the platform you are testing on?
 
-> 
-> > > 
-> > > > +void kvm_record_nested_revmap(gpa_t canonical_ipa, struct kvm_s2_mmu *mmu,
-> > > > +			      gpa_t nested_ipa, size_t map_size)
-> > > > +{
-> > > > +	struct maple_tree *revmap_mt = &mmu->nested_revmap_mt;
-> > > > +	gpa_t canonical_ipa_end;
-> > > > +	u64 entry, new_entry = 0;
-> > > > +
-> > > > +	lockdep_assert_held_read(&kvm_s2_mmu_to_kvm(mmu)->mmu_lock);
-> > > > +
-> > > > +	if (mmu->nested_revmap_broken)
-> > > > +		return;
-> > > > +
-> > > > +	if (WARN_ON(!IS_ALIGNED(canonical_ipa, map_size)))
-> > > > +		canonical_ipa = ALIGN_DOWN(canonical_ipa, map_size);
-> > > > +
-> > > > +	canonical_ipa_end = canonical_ipa + map_size - 1;
-> > > > +	MA_STATE(mas_rmap, revmap_mt, canonical_ipa, canonical_ipa_end);
-> > > > +
-> > > > +	mtree_lock(revmap_mt);
-> > > > +	entry = xa_to_value(mas_find(&mas_rmap, canonical_ipa_end));
-> > > > +
-> > > > +	if (entry) {
-> > > > +		/* parallel faults can be adding the same mapping */
-> > > > +		if (valid_entry(entry) &&
-> > > > +		    mas_rmap.index == canonical_ipa &&
-> > > > +		    mas_rmap.last == canonical_ipa_end &&
-> > > > +		    nested_ipa == (entry & ADDR_MASK))
-> > > > +			goto unlock;
-> > > > +		/*
-> > > > +		 * Create a "UNKNOWN_IPA" range that spans all the overlapping
-> > > > +		 * ranges and store it.
-> > > > +		 */
-> > > > +		while (entry && mas_rmap.index <= canonical_ipa_end) {
-> > > > +			canonical_ipa = min(mas_rmap.index, canonical_ipa);
-> > > > +			canonical_ipa_end = max(mas_rmap.last, canonical_ipa_end);
-> > > > +			entry = xa_to_value(mas_find(&mas_rmap, canonical_ipa_end));
-> > > > +		}
-> > > > +		new_entry |= UNKNOWN_IPA;
-> > > > +	} else {
-> > > > +		new_entry |= nested_ipa;
-> > > > +		new_entry |= VALID_ENTRY;
-> > > > +	}
-> > > > +
-> > > > +	mas_set_range(&mas_rmap, canonical_ipa, canonical_ipa_end);
-> > > > +	if (mas_store_gfp(&mas_rmap, xa_mk_value(new_entry),
-> > > > +			  GFP_NOWAIT | __GFP_ACCOUNT))
-> > > 
-> > > The general pattern for handling this situation would be to preallocate
-> > > nodes prior to acquiring the lock. If we can preallocate then we can
-> > > just outright refuse to create a shadow stage-2 mapping if the update to
-> > > the reverse map fails.
-> > 
-> > Preallocation was thought about, but it was found to be impractical in
-> > this case [*], mainly because we must hold the lock in order to know
-> > what range to store.
-> 
-> Could we perform an RCU-protected walk to predict the range we intend to
-> store and preallocate based off of that? And if we're not able to
-> preallocate from a sleepable context then bailing to userspace seems
-> appropriate.
+Ultimately there are two options here - either don't support CCA (so
+detect the lack of ARM64_HAS_ICH_HCR_EL2_TDIR and bail out early), or
+plumb in the trap handlers - as commit 2a28810cbb8b points out this
+isn't something we really want to support if we can avoid it.
 
-I agree it's much better if we can allocate from a sleepable context,
-however I see a few concerns in this case:
-
-1. It needs to happen before kvm_fault_lock(), where some of the fault
-   information is still unknown, mostly the THP adjustment is not done
-   yet.
-
-2. The nested kvm_s2_mmu array, which contain the maple trees, could be
-   freed without holding mmu_lock (kvm_vcpu_init_nested()).
-
-3. If we use RCU, we still can't preallocate with a sleepable flag
-   because we would be holding rcu_read_lock().
-
-4. Caching maple tree state while holding rcu_read_lock() and try
-   preallocating after dropping the lock would also not work, because
-   mas_preallocate() walks the tree therefore it must be protected from
-   tree writers. And also (2.).
-
-> 
-> > However, we can make this function return an error when storing to the
-> > maple tree fails, and just not do the shadow mapping. This ties the
-> > wellness of the maple tree to guest progress. For repeated failure I
-> > think of these possibilities:
-> > 
-> >  - The maple tree code is somehow broken that stores never succeed.
-> >  - We have so little available memory that maple tree stores don't
-> >    succeed.
-> > 
-> > These cause the guest fault repeatedly, but do we still care about the
-> > guest when these happen? Probably not for the OOM case, and it solves
-> > itself when the kernel gets back memory. For the first case I'm not so
-> > sure, and I might have missed some other important possibilities.
-> 
-> So there's two failure modes that we need to handle.
-> 
-> The most common case would be a race to update the maple tree, where the
-> preallocation we did outside of the MMU lock is insufficient for the actual
-> operation we perform. Typically in the event of a race we restart the faulting
-> instruction and re-attempt the fault. So long as you pass gfp=0 to the
-> store, you can reinterpret -ENOMEM as -EAGAIN and refault.
-> At that point, any non ENOMEM failure to store in the maple tree can be
-> treated as fatal for the VM, KVM_BUG_ON() and out to userspace.
-
-From the above, I don't think sleepable preallocation is feasible, at
-least without invasive changes. Even if we somehow solve problem 2.
-above, we'll probably need a new stateless preallocation API from the
-maple tree (to avoid walking the tree without any locks), or start using
-an external sleepable lock for the maple tree.
-
-With this information, would the current no preallocation approach be
-preferrable, or do we want to pursue sleepable preallocation anyway?
-
-> 
-> > > > +static void unmap_mmu_cipa_range(struct kvm_s2_mmu *mmu, gpa_t canonical_ipa,
-> > > > +				  size_t unmap_size, bool may_block)
-> > > > +{
-> > > > +	struct maple_tree *revmap_mt = &mmu->nested_revmap_mt;
-> > > > +	gpa_t canonical_ipa_end = canonical_ipa + unmap_size - 1;
-> > > > +	size_t entry_size;
-> > > > +	gpa_t next_addr;
-> > > > +	u64 entry;
-> > > > +	MA_STATE(mas_rmap, revmap_mt, canonical_ipa, canonical_ipa_end);
-> > > > +
-> > > > +	lockdep_assert_held_write(&kvm_s2_mmu_to_kvm(mmu)->mmu_lock);
-> > > > +
-> > > > +	if (mmu->nested_revmap_broken) {
-> > > > +		reset_revmap_and_unmap(mmu, may_block);
-> > > > +		return;
-> > > > +	}
-> > > > +
-> > > > +	if (!mmu->nested_stage2_enabled) {
-> > > > +		kvm_stage2_unmap_range(mmu, canonical_ipa, unmap_size, may_block);
-> > > > +		return;
-> > > > +	}
-> > > > +
-> > > > +	mtree_lock(revmap_mt);
-> > > > +	entry = xa_to_value(mas_find(&mas_rmap, canonical_ipa_end));
-> > > > +
-> > > > +	while (entry && mas_rmap.index <= canonical_ipa_end) {
-> > > > +		entry_size = mas_rmap.last - mas_rmap.index + 1;
-> > > > +		next_addr = mas_rmap.index + entry_size;
-> > > > +		/*
-> > > > +		 * Give up and invalidate this s2 mmu if the unmap range
-> > > > +		 * touches any UNKNOWN_IPA range.
-> > > > +		 */
-> > > > +		if (unknown_ipa_entry(entry)) {
-> > > > +			mtree_unlock(revmap_mt);
-> > > > +			reset_revmap_and_unmap(mmu, may_block);
-> > > > +			return;
-> > > > +		}
-> > > > +
-> > > > +		/*
-> > > > +		 * Ignore result, it is okay if a reverse mapping erase
-> > > > +		 * fails.
-> > > > +		 */
-> > > > +		mas_store_gfp(&mas_rmap, NULL, GFP_NOWAIT | __GFP_ACCOUNT);
-> > > 
-> > > I wonder if we can handle this a bit more gracefully.
-> > > 
-> > > Ideally we'd be able to place a search mark on the entry flagging it as
-> > > stale which could be used to avoid attempting to overinvalidate the
-> > > shadow stage-2.
-> > > 
-> > > Interestingly enough, Liam recently gave the suggestion [*] of storing
-> > > XA_ZERO_ENTRY for a similar use case where erasure happens in an atomic
-> > > context. We should be able to do the exact same thing here and push the
-> > > cleanup to the next insertion.
-> > 
-> > I see. Not saying I have a better idea, but this is relying on the fact
-> > that replacing an existing range with another value does not require
-> > memory allocation. I would say this is an obvious assumption and I don't
-> > see it becoming false in the future, but still it's an implementation
-> > detail and relying on it as a user feels strange...
-> > 
-> > What do you think?
-> 
-> I believe there's value in such an approach because it reduces the
-> likelihood of a false positive. Since we could be updating the maple
-> tree as part of reclaim I think it's safe to assume the system is under
-> some amount of memory pressure (and GFP_NOWAIT could fail). Although I
-> agree, it'd be good to document this behavior explicitly.
-
-Sure, this is doable.
+Hence I'm interested to know where this sits between "hacked up test
+system" and "production hardware". E.g. if this is an emulator it might
+be possible to just enable the CPU feature.
 
 Thanks,
-Wei-Lin Chang
+Steve
 
-> 
 > Thanks,
-> Oliver
+> Kohei
+> 
+> [0]
+> static const struct sys_reg_desc sys_reg_descs[] = {
+>     ...
+> 	{ SYS_DESC(SYS_ICC_PMR_EL1), undef_access },
+> 	{ SYS_DESC(SYS_ICC_RPR_EL1), undef_access },
+> 	{ SYS_DESC(SYS_ICC_CTLR_EL1), undef_access },
+> };
+> 
+> [1]
+> ------------[ cut here ]------------
+> Unexpected undefined exception injection to REC
+> WARNING: arch/arm64/kvm/inject_fault.c:330 at kvm_inject_undefined+0x100/0x148, CPU#1: kvm-vcpu-0/370
+> Modules linked in:
+> CPU: 1 UID: 0 PID: 370 Comm: kvm-vcpu-0 Not tainted 7.2.0-rc1-00096-gd6d40e6a3103 #161 PREEMPT(lazy)
+> [...]
+> Call trace:
+>  kvm_inject_undefined+0x100/0x148 (P)
+>  undef_access+0x18/0x30
+>  perform_access+0x54/0x1d0
+>  kvm_handle_sys_reg+0xfc/0x308
+>  rec_exit_sys_reg+0x34/0x168
+>  handle_rec_exit+0x12c/0x4c8
+>  kvm_arch_vcpu_ioctl_run+0x7a0/0x9a8
+>  kvm_vcpu_ioctl+0x180/0xb50
+>  __arm64_sys_ioctl+0xb4/0x118
+>  invoke_syscall.constprop.0+0xb8/0x120
+>  do_el0_svc+0x48/0xc8
+>  el0_svc+0x44/0x248
+>  el0t_64_sync_handler+0xa0/0xe8
+>  el0t_64_sync+0x198/0x1a0
+> ---[ end trace 0000000000000000 ]---
+>  [...]
+> 
+>> ---
+>> Changes from v12:
+>>  * GIC registers are now passed in the system registers rather than via
+>>    rec_entry/rec_exit which removes most of the changes.
+>> Changes from v11:
+>>  * Minor changes to align with the previous patches. Note that the VGIC
+>>    handling will change with RMM v2.0.
+>> Changes from v10:
+>>  * Make sure we sync the VGIC v4 state, and only populate valid lrs from
+>>    the list.
+>> Changes from v9:
+>>  * Copy gicv3_vmcr from the RMM at the same time as gicv3_hcr rather
+>>    than having to handle that as a special case.
+>> Changes from v8:
+>>  * Propagate gicv3_hcr to from the RMM.
+>> Changes from v5:
+>>  * Handle RMM providing fewer GIC LRs than the hardware supports.
+>> ---
+>>  arch/arm64/kvm/arm.c            | 11 ++++++++---
+>>  arch/arm64/kvm/vgic/vgic-init.c |  2 +-
+>>  2 files changed, 9 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+>> index 38fac98cd6a4..2959a1451232 100644
+>> --- a/arch/arm64/kvm/arm.c
+>> +++ b/arch/arm64/kvm/arm.c
+>> @@ -791,19 +791,24 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+>>  		kvm_call_hyp_nvhe(__pkvm_vcpu_put);
+>>  	}
+>>  
+>> +	kvm_timer_vcpu_put(vcpu);
+>> +	kvm_vgic_put(vcpu);
+>>  	kvm_vcpu_put_debug(vcpu);
+>> +
+>> +	vcpu->cpu = -1;
+>> +
+>> +	if (vcpu_is_rec(vcpu))
+>> +		return;
+>> +
+>>  	kvm_arch_vcpu_put_fp(vcpu);
+>>  	if (has_vhe())
+>>  		kvm_vcpu_put_vhe(vcpu);
+>> -	kvm_timer_vcpu_put(vcpu);
+>> -	kvm_vgic_put(vcpu);
+>>  	kvm_vcpu_pmu_restore_host(vcpu);
+>>  	if (vcpu_has_nv(vcpu))
+>>  		kvm_vcpu_put_hw_mmu(vcpu);
+>>  	kvm_arm_vmid_clear_active();
+>>  
+>>  	vcpu_clear_on_unsupported_cpu(vcpu);
+>> -	vcpu->cpu = -1;
+>>  }
+>>  
+>>  static void __kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu)
+>> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+>> index 907057881b26..fd77db35ef02 100644
+>> --- a/arch/arm64/kvm/vgic/vgic-init.c
+>> +++ b/arch/arm64/kvm/vgic/vgic-init.c
+>> @@ -81,7 +81,7 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
+>>  	 * the proper checks already.
+>>  	 */
+>>  	if (type == KVM_DEV_TYPE_ARM_VGIC_V2 &&
+>> -		!kvm_vgic_global_state.can_emulate_gicv2)
+>> +	    (!kvm_vgic_global_state.can_emulate_gicv2 || kvm_is_realm(kvm)))
+>>  		return -ENODEV;
+>>  
+>>  	/*
+>> -- 
+>> 2.43.0
+>>
+>>
+
