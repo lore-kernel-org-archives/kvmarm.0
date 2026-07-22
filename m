@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F30BA472547;
-	Wed, 22 Jul 2026 07:42:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 769F047043A;
+	Wed, 22 Jul 2026 07:42:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784706181; cv=none; b=vCizS6ZnUn8Uit30hLhDoSoDFdGDVRNPjJysAeGeEtXvHwQUvajcjo0aYmNFnvee1z/FWxJ0jBKHGinqL/zRcKpnA0KF4iW0nrMqKQQhW+4po06S/udB/Kwkgyrp2DgvG5zLmRD99TY/1Mj4zcezPF+v97DKe77tJaVtYxSwYxc=
+	t=1784706181; cv=none; b=ejyo3GoZvmPvW2IPp5RByQ1tsU7aR4xso9pb3AGx3239vfzI0r463oUSejQRw7GlhxbO9+3L4LM16HD+oR16q83N9d1GVAOWbKxZp3GWL4e/nv3YLM1jdsX6jbkv6cCA0/DRXyhiJ8mTfTEkaezstULUt3D1ZpbLZfm99//5YpQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1784706181; c=relaxed/simple;
-	bh=Zy278rRax54mrzMxjAGL/u8/EClB1XYWGsGocRgrokY=;
+	bh=JKWpO2aGs6TofEB7lS/zufW/A4iGavXEIGzsMdT1zsQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=E4OGgsU/nnbnRUhbh7KLvTtmJI5IIUvq8nvEvKa/z3XOU4/uFlJv28Pz286Vc0EPdWwGHY6Omuadgd6RIgbzvDQrtvxg4CSvK86U3Mh70H1GsMZBgD7VKyFI8lK06zvUHdRcV1bINtCPbBovGItWlskhmSm051/FzgazzdSmz6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JXWFxdUo; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=kErilhJok2eT5zL/qGGnWyzsnpX3P7xoMQ49REzirLOZpXRa/2jwj2VvsA92uoomxAkfD6g1fiLPtOyXudx2CBbHezNjbMorWbZphzoaT5OYAqzx35s3Fw3wqid/B1cDBZhyRhQvApYP9ftng7t+davJ7o1S4NmfMUbsO3bSrA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VaBIkWag; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JXWFxdUo"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD32E1F00A3E;
-	Wed, 22 Jul 2026 07:42:58 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VaBIkWag"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CA701F01559;
+	Wed, 22 Jul 2026 07:42:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784706178;
-	bh=ji8nSRKlAPdWEdBVe8ICSTMa6u+ah4ntK0FcnZBJE6c=;
+	s=k20260515; t=1784706179;
+	bh=iSyY+XJ+vex+b5WS1ha+pHt3rgbtzPLgz50hKTgc/ws=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=JXWFxdUoqLt5fcIV+FraJYXSEWtwLRWIjnQFxcTPufsFxJFpFiAGvs1SR4ru7Q8f4
-	 ItcFnb1IE81RB5HonqGoDjB4UtOJ99v29efraYLlOY71MvKSsyzvs6Oc9Oml+UX1oP
-	 nk3aNyTIBJeOVBTzSHm71hzKAxdykJQabE0QbYKYrnlO3EOE4CKN6aUg7lqKnLIxUT
-	 hHMZP+gOy6xasN16MYu/TqMfg05gcgDY1SPvEsX0BvDJ6LvTB4PkWhqpgSrEe3f7wD
-	 F9QsJ+Z0vcPMLA0Pk4ZRNS72WYGfleotbJ4b/DjeOjbBPxynnB+oSIwqXoBPLQu2YP
-	 kKsukxFsLD9eA==
+	b=VaBIkWagdi9jUKBkDpd3H+YV6GJ8iKY9o2YYPK0Wb+/Anedfmte6kjvi6TKpeQUhB
+	 M2E/M5v2DOJkwiwsi2VkqgTa91SCl0k8GLLBgNuVbJ9NZ9gaT6/MBRaXZ7LjEYvSRa
+	 8NnepteZpbCXCufJXpzrFHgbqTC/5Maw0CXaChfKf/8/OgP6kBI6RNmSpPymsE9qWD
+	 T3r5eVZpWiX+hVsgzVCpCq/4qAHTQu+RaWo3rF9Eui/zNr0n4lKg/rgJCZhD5lzry5
+	 Nxbdzga5SYSSCJ2/IdpSNhC8MAkex9QfUC47EYrOMzAkJupXKTlatKwMWAiopL1Bon
+	 09Jw+oSs0itEg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wmRbV-00000007VfN-0bUI;
+	id 1wmRbV-00000007VfN-1Z42;
 	Wed, 22 Jul 2026 07:42:57 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -43,9 +43,9 @@ Cc: Steffen Eiden <seiden@linux.ibm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Yao Yuan <yaoyuan@linux.alibaba.com>,
 	Wei-Lin Chang <weilin.chang@arm.com>
-Subject: [PATCH v3 13/28] arm64: sysreg: Add NVHCR_EL2 description as a mirror of HCR_EL2
-Date: Wed, 22 Jul 2026 08:42:19 +0100
-Message-ID: <20260722074234.3330999-14-maz@kernel.org>
+Subject: [PATCH v3 14/28] arm64: sysreg: Add HCRX_EL2 bits related to FEAT_NV3
+Date: Wed, 22 Jul 2026 08:42:20 +0100
+Message-ID: <20260722074234.3330999-15-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260722074234.3330999-1-maz@kernel.org>
 References: <20260722074234.3330999-1-maz@kernel.org>
@@ -61,31 +61,32 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-FEAT_NV3 introduces a new register that contains the HCR_EL2 value
-exposed to a NV guest. As such, it has the exact same layout as
-HCR_EL2.
-
-Describe NVHCR_EL2 as a mapping to HCR_EL2.
+FEAT_NV3 introduces 4 new HCRX_EL2 control bits. Describe them
+in the sysreg file.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/tools/sysreg | 3 +++
- 1 file changed, 3 insertions(+)
+ arch/arm64/tools/sysreg | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index 28755f70f0bf0..42839d2b15ae4 100644
+index 42839d2b15ae4..67d013b376a3c 100644
 --- a/arch/arm64/tools/sysreg
 +++ b/arch/arm64/tools/sysreg
-@@ -4266,6 +4266,9 @@ Field	1	E2TRE
- Field	0	E0HTRE
+@@ -4548,7 +4548,12 @@ Fields	ZCR_ELx
  EndSysreg
  
-+Sysreg	NVHCR_EL2	3	4	1	5	0
-+Mapping	HCR_EL2
-+EndSysreg
- 
- Sysreg HDFGRTR2_EL2	3	4	3	1	0
- Res0	63:25
+ Sysreg	HCRX_EL2	3	4	1	2	2
+-Res0	63:27
++Res0	63:35
++Field	34	NVnTTLBOS
++Field	33	NVnTTLBIS
++Field	32	NVnTTLB
++Res0	31:28
++Field	27	NVTGE
+ Field	26	SRMASKEn
+ Res0	25
+ Field	24	PACMEn
 -- 
 2.47.3
 
