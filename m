@@ -1,44 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFFB54C97;
-	Wed, 22 Jul 2026 08:32:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF61F42FCC9;
+	Wed, 22 Jul 2026 08:38:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784709174; cv=none; b=uUGzkXal5XnSbaAABIgbQa9BchzcVb+PrYNCdIXI7/LZdr9aH9Ay+w1+5Ex1G2dNMNwOhlalfC3wRWRVhsl5h3vESsptYq0N54yK5NqsRFLF5f2XmfgbbgAH4fQqXKi6lYFlj4PAi7pvRpASEhd9SqxvcwAgKtw/t13UylZPOg0=
+	t=1784709488; cv=none; b=lKz6FaPpUeuT9Tsm81xogX8vy21QVhDuLuNPLC7GevZtHiOuGbJXvKki5qbt3QP09/dDRLam8zwGCbi5qahZq7B+DmgrQbxMp7Fm9rMQ8WpW8fxdysi6ka+4bOcSTXGJj0PcaWtSQGZXg5G+m5H8NVTi5YuOiiogVcbZhKCJa0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784709174; c=relaxed/simple;
-	bh=sH809wSkYURPMlkYvqabuFBTR+xCwZRhfApQ5r6cb4w=;
+	s=arc-20240116; t=1784709488; c=relaxed/simple;
+	bh=8D0BxG4eaYm/ikiaqKAoB7Me6EP7g1RztoUF7Ip9cgs=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=g+9VRDJDjBvTI86FC2Rq/wxGmAFqOdCZl5vbAfuMF7XVPWMuYiEKHvVB0tiDPGEguCFXb1BbXRqgI8w12y6A8rl1EwGdrXM8nruZSOA7RVQ3O2bd0bxNcWUA5o40gmsUaHIXt1d60P0mkVO+IGizPX7CHjWJujtUj8IJnK1Fjq8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mTVF5/az; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=FUHlXYW0g04z48X9K0teqj5sOs5D0GXV7vJWly08NCcOiNgVfVCrVoM8qZUg0j0fwB++ZI4DFowIScuTlNi+Qke7SfHcbN+5JaHfbG9sXCTgdATACRJh7eo/o0w0FxV8iMfRzKyeEq3d66nBcmv6jwcooaPSZxc5ozB1KVR15ws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FtmaWn4a; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mTVF5/az"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F3351F000E9;
-	Wed, 22 Jul 2026 08:32:53 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FtmaWn4a"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0BD11F000E9;
+	Wed, 22 Jul 2026 08:38:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784709173;
-	bh=iEGPn/5CCt/KNZY7SptrV5aWQBYfYqXR6JoJu2HxlAw=;
+	s=k20260515; t=1784709484;
+	bh=do6Z/xLKRrnkGvua9CYbifedqBjEtJiAG/B7H9slZvM=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=mTVF5/azZw2zXLNWRN8TNRJZyonRrZ/oxcopogprruZmLcbhVKaiWPwi5ElUiqYhN
-	 Tuvbnj5+5DshdL0iXf/eIp3qU30cEEW8sP17bExB8IuWMFV1AbxxZSMfAW1hXRDqRP
-	 qelC0HZL82kTu0TNzCtaiWGGPK6wc5H11FHADynKP9SoukBP7gL/gfMP1HLRYy63dC
-	 QHXFt7oGFTzKqo7kHnmtL4NH82jh3dRgekzxcTGyXNJMHxc/kB/kzgVzg+fq521Tvy
-	 emsQoS5Jm8V0aSCadStU9m0jq6a5jKUS2VeSacAIFmZKOuEbcLma2P3xXf5tMRXkbU
-	 bZ4Ed77e/3pPQ==
+	b=FtmaWn4auZobQm2Xdcka9BK/bC9tdzggeulp3lna9vT3pNGImY5pIGd2jKmisAzdh
+	 8VB9DSyX6vH9bvVvo4OVPKV9hjCLSSqiHVFe8psrf2TAZnaE2IZY/J9K7nEGgR/FnY
+	 XJ6/Q4YTPxv9wJbfSpaloPtUO5kYVyBJBZjHxYJT18dDksTJz/MkMzo59oRDPBr6pf
+	 lkq3DSNtx1qDY/cUDEmbO052fJbgprAt38EZ4Rr6w0baIb2M5rzJbtJjZP603SeeQx
+	 HJKE5wHu1tiCtaAQSAnZN/ermvNygZKspByhDchDMKWJwYEsPbdMpl9XNG8Dyksz9T
+	 YO1Bm+zvPI8QA==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v3 11/28] KVM: arm64: Expose FEAT_NV2p1 to NV guests
+Subject: Re: [PATCH v3 20/28] KVM: arm64: Add sanitisation for NVHCR_EL2
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Marc Zyngier" <maz@kernel.org>
-Cc: kvm@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260722074234.3330999-12-maz@kernel.org>
+Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, kvm@vger.kernel.org
+In-Reply-To: <20260722074234.3330999-21-maz@kernel.org>
 References: <20260722074234.3330999-1-maz@kernel.org>
- <20260722074234.3330999-12-maz@kernel.org>
+ <20260722074234.3330999-21-maz@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 22 Jul 2026 08:32:52 +0000
-Message-Id: <20260722083253.1F3351F000E9@smtp.kernel.org>
+Date: Wed, 22 Jul 2026 08:38:03 +0000
+Message-Id: <20260722083803.C0BD11F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,57 +46,60 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [Medium] The ARM64_HAS_NV2P1 CPU feature capability is checked dynamicall=
-y to enable FEAT_NV2p1 logic in KVM, but the capability is never registered=
- in the kernel's CPU feature framework, rendering the new feature entirely =
-dead code.
+
+Pre-existing issues:
+- [High] Subsystem rule violation: Numeric range loop over sparse `enum vcp=
+u_sysreg`
 --
 
---- Patch [11]: [PATCH v3 11/28] KVM: arm64: Expose FEAT_NV2p1 to NV guests=
+--- Patch [20]: [PATCH v3 20/28] KVM: arm64: Add sanitisation for NVHCR_EL2=
  ---
-commit 2bb48d2c7459805b9d877b250f95afb9c6786a43
+commit b143c0689f4a9db3345ab50e6a712d0698ebaa75
 Author: Marc Zyngier <maz@kernel.org>
 
-KVM: arm64: Expose FEAT_NV2p1 to NV guests
+KVM: arm64: Add sanitisation for NVHCR_EL2
 
-This commit exposes the FEAT_NV2p1 feature to nested virtualization guests =
-by
-updating the ID_AA64MMFR4_EL1 register limits when the hardware capability =
-is
-present. This intends to reduce the number of traps for NV guests.
+This commit adds sanitisation support for the NVHCR_EL2 register.
+It mimics the format of HCR_EL2 but conditionally depends on FEAT_NV3
+being present. If FEAT_NV3 is absent, it relies on standard VNCR data
+transfers.
+
+[ ... ]
 
 > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index fb54f6dad995c..82be8bcb07035 100644
+> index 82be8bcb07035..34e63480886cd 100644
 > --- a/arch/arm64/kvm/nested.c
 > +++ b/arch/arm64/kvm/nested.c
-[ ... ]
-> @@ -1738,7 +1738,11 @@ u64 limit_nv_id_reg(struct kvm *kvm, u32 reg, u64 =
-val)
->  		if (test_bit(KVM_ARM_VCPU_HAS_EL2_E2H0, kvm->arch.vcpu_features)) {
->  			val =3D 0;
->  		} else {
-> -			val =3D SYS_FIELD_PREP_ENUM(ID_AA64MMFR4_EL1, NV_frac, NV2_ONLY);
-> +			val &=3D ID_AA64MMFR4_EL1_NV_frac;
-> +			if (cpus_have_final_cap(ARM64_HAS_NV2P1))
+> @@ -1828,6 +1828,10 @@ int kvm_init_nv_sysregs(struct kvm_vcpu *vcpu)
+>  	resx =3D get_reg_fixed_bits(kvm, HCR_EL2);
+>  	set_sysreg_masks(kvm, HCR_EL2, resx);
+> =20
+> +	/* NVHCR_EL2 */
+> +	resx =3D get_reg_fixed_bits(kvm, NVHCR_EL2);
+> +	set_sysreg_masks(kvm, NVHCR_EL2, resx);
+> +
+>  	/* HCRX_EL2 */
+>  	resx =3D get_reg_fixed_bits(kvm, HCRX_EL2);
+>  	set_sysreg_masks(kvm, HCRX_EL2, resx);
 
-[Severity: Medium]
-Is ARM64_HAS_NV2P1 registered in the kernel's CPU feature framework?
+[Severity: High]
+This is a pre-existing issue, but later in kvm_init_nv_sysregs() there is
+a loop over enum vcpu_sysreg:
 
-It appears that the ARM64_HAS_NV2P1 capability is missing from the
-arm64_features array in arch/arm64/kernel/cpufeature.c. Because it is not
-mapped to a hardware ID register field, this capability check in
-limit_nv_id_reg() will always evaluate to false.
+	for (enum vcpu_sysreg sr =3D __SANITISED_REG_START__; sr < NR_SYS_REGS; sr=
+++)
+		__vcpu_rmw_sys_reg(vcpu, sr, |=3D, 0);
 
-Does this render the newly added FEAT_NV2p1 support unreachable?
+Does this numeric range loop iterate over unintended registers?
 
-> +				val =3D ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64MMFR4_EL1, NV_frac, NV2P=
-1);
-> +			else
-> +				val =3D SYS_FIELD_PREP_ENUM(ID_AA64MMFR4_EL1, NV_frac, NV2_ONLY);
->  			val |=3D SYS_FIELD_PREP_ENUM(ID_AA64MMFR4_EL1, E2H0, NI_NV1);
->  		}
->  		break;
+The KVM ARM64 subsystem guidelines state that enum vcpu_sysreg is sparsely
+numbered by VNCR byte offsets. Using a < comparison and incrementing over a
+numeric range touches register indices that happen to fall within the byte
+span.
+
+Could this silently drop or corrupt guest state by applying operations to
+unrelated registers?
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260722074234.3330=
-999-1-maz@kernel.org?part=3D11
+999-1-maz@kernel.org?part=3D20
