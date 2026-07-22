@@ -1,89 +1,107 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 468A93E3C74;
-	Wed, 22 Jul 2026 08:57:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E51DF3B893F;
+	Wed, 22 Jul 2026 09:01:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784710667; cv=none; b=d7ivAcfwov+4m9QDI6nV2/uHmlvo/60VJg1Oix3e9ZE80Xh3bOlpSqxsq08KAGtjzaQHmwrXWseMtucjlZK/+BsfzVsSSFaFnNTF9t7FyhxAzIMF1UAC/LoMh/oSPfrXCoIFALNQZzQ+uQ/xHxxxNwo8MaTKpvPp30o5DJXMVLg=
+	t=1784710869; cv=none; b=KnFDS59oSbhTAVxHDODTf5kgYX86OyO1Kc6hstGxxxsfs8lvOGBw8no5bYk0hF1yNuSoxoBTKxZTwvHF0WLONhCidNMBujircwxxWsMWJYEE+QT6tn8fFH+hnXXaJD/eZ4eiYl/IZd+6IhbuetqRq/aPJbKsngHIc1uGGgP4RBY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784710667; c=relaxed/simple;
-	bh=dYrWsqi3jQXfS9NppbvOvoWrjISxFr0fMVK5iLVhDkQ=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=m2kORKrnRK6c3JdJAXYHbXaePu7bfbUOod5uPz3ohv1RH97gZiEU+4g0c7r+1X/yJHI3GxZYL+hvWfUWnNvCrpdZEWPuZaqlLXBtuT95uIk0hwRobWV0kJbnBg5XIXJ9PvjwzRel5qhExmR3ziL6k7baoYqEFgJCFtpxtK4SoFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F2k+NrNl; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784710869; c=relaxed/simple;
+	bh=sia0pWxdyOTzen9ICLGqD8LHSzWaRc57OQWh8I6lUXk=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=IcPezUHOb573xXXkDqGMOSxnRwR3tTr1IqNX3IVNkPA+Xvm0mehTHWpGNm4LnoCFn6+oyvyYjiXk0hT+iPMxAFSComMPrmurzgqe0DqjVS53RWQpc4ZX8miyAgqV8v7jrRljW/XO5EDKCCIRAbeJVkQ59Ocydq6O5Yfq2MluCow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Mv8beTWz; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F2k+NrNl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 911F01F000E9;
-	Wed, 22 Jul 2026 08:57:45 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Mv8beTWz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C4CE1F000E9;
+	Wed, 22 Jul 2026 09:01:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784710665;
-	bh=Lr0G7ubvpshMW+y1cFhAs6kS1pzY/Z/rnO465y+rg14=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=F2k+NrNlvug/HtGEhBZqiNeCHRExCUuGZ7qN9Ofxr1/c9hmFMsTOm0suXmUgSBC/4
-	 8Iq6A9ohku0+epAIu3oYBKo/bwZPjRD56V0fAKM/kdffUmYY5gFnm6uq9hoRcqT4Dm
-	 g0pe9m/Ju3gl/wPD3lS0/7K2m2Qpm07ewXqU0toDq8cpm2LY1xWMJl0cyHpboD+zCn
-	 EC89InzNbTxoGUybzvbwlXaUiHaZFxha+Q6u1ovEH4T3DLUL7g3LDwPb3GWjkH8B0j
-	 xE/1t9YVRDN4+5GzwDY17ylRnC4cniENs/NjbaMGcegBsjIlPODPYq0WBxmUO5zY7x
-	 htT7IGCQtjOkQ==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v3 25/28] KVM: arm64: Engage NV3 TLBI trap elision
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Marc Zyngier" <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>, kvm@vger.kernel.org
-In-Reply-To: <20260722074234.3330999-26-maz@kernel.org>
+	s=k20260515; t=1784710867;
+	bh=Mxvq17phTvOIz+F95XW32eAWCY41W57wVkFwPwUBYh4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=Mv8beTWz2LfpgGNIJMAFQJ4kB1xxMPKaX7zPN9y78nnh6CLeGJk9GLYwLW+HtpLJ1
+	 cjp/TOmTp9FEiwt6CkKnolf7aQbC4B3Jae2IyeC17X75fvRjS5IrR+S1nOv+qomedh
+	 icbmNAF2rc9z6Xths6L4ngxWWOKCWU48UTL+SoxRxLeLIHk2MIpwp/ejEgYLOSw4RF
+	 qeyVwmHfHIeSfFqDrUEpIkVUqFAHsqjH2jeAJMoKI4DvAUIKm9BhwR4aFGViPdB2mw
+	 rfH0OFgaruZGoYEzux4GriF5KlPHDxQBHh8mD3uqRJrG7ID3VitQe+wnljGJ0sbGKx
+	 BKJvViwPWKoUg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wmSp7-00000007Y1a-2OmI;
+	Wed, 22 Jul 2026 09:01:05 +0000
+Date: Wed, 22 Jul 2026 10:01:05 +0100
+Message-ID: <86o6fze6um.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: sashiko-reviews@lists.linux.dev
+Cc: kvm@vger.kernel.org,
+	"Oliver Upton" <oupton@kernel.org>,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v3 11/28] KVM: arm64: Expose FEAT_NV2p1 to NV guests
+In-Reply-To: <20260722083253.1F3351F000E9@smtp.kernel.org>
 References: <20260722074234.3330999-1-maz@kernel.org>
- <20260722074234.3330999-26-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 22 Jul 2026 08:57:45 +0000
-Message-Id: <20260722085745.911F01F000E9@smtp.kernel.org>
+	<20260722074234.3330999-12-maz@kernel.org>
+	<20260722083253.1F3351F000E9@smtp.kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, kvm@vger.kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [Low] Stray double semicolon creates an empty statement.
---
+On Wed, 22 Jul 2026 09:32:52 +0100,
+sashiko-bot@kernel.org wrote:
+> 
+> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
+> - [Medium] The ARM64_HAS_NV2P1 CPU feature capability is checked dynamically to enable FEAT_NV2p1 logic in KVM, but the capability is never registered in the kernel's CPU feature framework, rendering the new feature entirely dead code.
+> --
+> 
+> --- Patch [11]: [PATCH v3 11/28] KVM: arm64: Expose FEAT_NV2p1 to NV guests ---
+> commit 2bb48d2c7459805b9d877b250f95afb9c6786a43
+> Author: Marc Zyngier <maz@kernel.org>
+> 
+> KVM: arm64: Expose FEAT_NV2p1 to NV guests
+> 
+> This commit exposes the FEAT_NV2p1 feature to nested virtualization guests by
+> updating the ID_AA64MMFR4_EL1 register limits when the hardware capability is
+> present. This intends to reduce the number of traps for NV guests.
+> 
+> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> > index fb54f6dad995c..82be8bcb07035 100644
+> > --- a/arch/arm64/kvm/nested.c
+> > +++ b/arch/arm64/kvm/nested.c
+> [ ... ]
+> > @@ -1738,7 +1738,11 @@ u64 limit_nv_id_reg(struct kvm *kvm, u32 reg, u64 val)
+> >  		if (test_bit(KVM_ARM_VCPU_HAS_EL2_E2H0, kvm->arch.vcpu_features)) {
+> >  			val = 0;
+> >  		} else {
+> > -			val = SYS_FIELD_PREP_ENUM(ID_AA64MMFR4_EL1, NV_frac, NV2_ONLY);
+> > +			val &= ID_AA64MMFR4_EL1_NV_frac;
+> > +			if (cpus_have_final_cap(ARM64_HAS_NV2P1))
+> 
+> [Severity: Medium]
+> Is ARM64_HAS_NV2P1 registered in the kernel's CPU feature framework?
+> 
+> It appears that the ARM64_HAS_NV2P1 capability is missing from the
+> arm64_features array in arch/arm64/kernel/cpufeature.c. Because it is not
+> mapped to a hardware ID register field, this capability check in
+> limit_nv_id_reg() will always evaluate to false.
+> 
+> Does this render the newly added FEAT_NV2p1 support unreachable?
 
---- Patch [25]: [PATCH v3 25/28] KVM: arm64: Engage NV3 TLBI trap elision -=
---
-commit dabbb189ece66c0128f9610303e005d9bdd94252
-Author: Marc Zyngier <maz@kernel.org>
+See follow-up patch.
 
-KVM: arm64: Engage NV3 TLBI trap elision
+	M.
 
-This commit enables NV3 TLBI trap elision for guests that are not NV2 aware,
-relaxing the TLBI traps when only the guest's S1 translation is affected.
-
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/as=
-m/kvm_emulate.h
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-[ ... ]
-> @@ -715,6 +715,19 @@ static inline void vcpu_set_hcrx(struct kvm_vcpu *vc=
-pu)
-[ ... ]
-> +			if (!kvm_has_nv2(vcpu->kvm)) {
-> +				vcpu->arch.hcrx_el2 |=3D (HCRX_EL2_NVnTTLB   |
-> +							HCRX_EL2_NVnTTLBIS);
-> +
-> +				if (kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, OS))
-> +					vcpu->arch.hcrx_el2 |=3D HCRX_EL2_NVnTTLBOS;;
-
-[Severity: Low]
-This isn't a bug, but there's a stray double semicolon at the end of this
-statement.
-
-> +			}
->  		}
->  	}
->  }
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260722074234.3330=
-999-1-maz@kernel.org?part=3D25
+-- 
+Without deviation from the norm, progress is not possible.
