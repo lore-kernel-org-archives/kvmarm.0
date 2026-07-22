@@ -1,49 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94D1847B438;
-	Wed, 22 Jul 2026 09:04:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 001E1470134;
+	Wed, 22 Jul 2026 09:05:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784711086; cv=none; b=TZ5X7EIl/cCkq3OM21HUe4Qn/7Kse1oZ1tc4yui/BD3itNYtFpaAFp6tYG7jIsgd75IHsWKAoC+SbdZEq+MZQ79udTWN/95nGQRflhX5rmrpXVcnm/nFEW6KtIyOnXAKNTtwZQbEwyumfly2jLeZHy1Rpiq07bNC4WicfbDJRyc=
+	t=1784711115; cv=none; b=VhWGAekEFj6PJIln4AVBMV7i3MKBN6cNmuY3bSrQodHceXoADelyCK0N1qQq7Z04MlalKBQQn7pNZbTkqGjha6+UKu/9l8nLURkP2uQjSr5+G5C6gI9ZZFRIk08Mqri5dhBE15urN2rEp/mq048OuktUmXI6dEeBkOuH9C/mJ+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784711086; c=relaxed/simple;
-	bh=M0MedXmo5XLq3Y1vqC9m8XeVLV+jSzmWfRARfzTmi+M=;
+	s=arc-20240116; t=1784711115; c=relaxed/simple;
+	bh=g4EehAGhkaA7mxSFDPJMjHyXyAuNgWE3SoGDLRds2nk=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=r0st6OCGZQS9MYiSehZfUqupQQR1BLyLFViiMFrYoFw8V1fPjoR10gKHEVXZPZwMsYnhg4iayZYTCW0xWdA7MBhCFeeoNcJiocOs0f7M0mqN+AiRUMGOGhbcIbm3GU0H3g7r6F+E5AC1rYjnf7WdGiMIaiRYnt2bQLUS0gZTumg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g49M4ahT; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=YumDDByU70WcyZ+Tc6o7+SkjF91C93rZ1QgL09naLvdTY5I4Pn/GAw9ruIGh54aSHuVu/Vg/LpjyrNe50hbFQu7lQqAfTAjSrse6utdEYGML2MvvsJ5mr93/lEgz7VDFtrg3ldVxVXu4DE5PYE0iGRBRG7YF16OVXkEcFYybi8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z54zeUoP; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g49M4ahT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B0B11F00A3E;
-	Wed, 22 Jul 2026 09:04:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z54zeUoP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DF321F000E9;
+	Wed, 22 Jul 2026 09:05:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784711081;
-	bh=E6jdNeVFcYqqrD/Yp97Y4szgxYMU3Mj/TzqdOhncQmE=;
+	s=k20260515; t=1784711107;
+	bh=7+938SHrSkS/IMKvkGbn+TX1qb2GP9wvh5xjsmdmplM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=g49M4ahTqnfII4hfZI3+SrQaoRecyhu5eccd39flhYbsWnfYqx+zhHVWM9+MVnY9l
-	 DPtDoCNpbr4uMF9DM9In7zX9PFMw7OoCXvgLHAwwrWxJGYkMAPqpiU78L1H0t1SHgK
-	 Oua1rTNzS1aACISiuQCeGXqcL318TwiefzEETmpqiZRRft812iFETh3ylHmg9/vdKp
-	 g0yczRYkjWEWOKFph5JS+nC6E+PfdAABxIRA0Ezf9P2kkLdo+jI1ZRDS65EU5Xyjsk
-	 Dt4E4M8+VxvfdmO5b9r6ETO8HBlDvxVzno5Hxrt3uCG005ci5/Zue+JYRdtEuD55vw
-	 ZIs0zZylRSlPA==
+	b=Z54zeUoPETmC1o8MVkObgbqqh+kApHSJcXAzFi16lhSGEWkYPqV7mlPGXapq2Jzr7
+	 iJRU2i8sQ9uYXYVDyBb3TfvaMXWftF78bgekfnMO5Fpe6QAO2MP4ldyzMMpzvbzMLy
+	 f2ksv99KcFe0qMbxdmw25Yg6Nz/ueQYi+WcP16NdMJyqwrxIWkQKrRAom1Ixj4crEe
+	 2aDlqq3r2E9lBVKnjtaQ4WoEOqQ1xHidfIbQ08gRM+CfaAHgP4zBndZexdjrrXVy+y
+	 5JEv8NCZ0XtQzSk3mPwqVZZwDROkVus6u8k5ovCmXaMX2AWNvmE4lrgUfK8qScnnAa
+	 LLZDlDfXH56pA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wmSsZ-00000007Y5f-3Qf6;
-	Wed, 22 Jul 2026 09:04:39 +0000
-Date: Wed, 22 Jul 2026 10:04:39 +0100
-Message-ID: <86ldb3e6oo.wl-maz@kernel.org>
+	id 1wmSsz-00000007Y6T-1st4;
+	Wed, 22 Jul 2026 09:05:05 +0000
+Date: Wed, 22 Jul 2026 10:05:05 +0100
+Message-ID: <86jyqne6ny.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: sashiko-reviews@lists.linux.dev
-Cc: kvmarm@lists.linux.dev,
+Cc: kvm@vger.kernel.org,
 	"Oliver Upton" <oupton@kernel.org>,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH v3 25/28] KVM: arm64: Engage NV3 TLBI trap elision
-In-Reply-To: <20260722085745.911F01F000E9@smtp.kernel.org>
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v3 01/28] arm64: sysreg: Emit RESx/UNKN values for Mapping/Fields definitions
+In-Reply-To: <20260722075554.137B11F00A3A@smtp.kernel.org>
 References: <20260722074234.3330999-1-maz@kernel.org>
-	<20260722074234.3330999-26-maz@kernel.org>
-	<20260722085745.911F01F000E9@smtp.kernel.org>
+	<20260722074234.3330999-2-maz@kernel.org>
+	<20260722075554.137B11F00A3A@smtp.kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -55,46 +55,47 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev, oupton@kernel.org, kvm@vger.kernel.org
+X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, kvm@vger.kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 22 Jul 2026 09:57:45 +0100,
+On Wed, 22 Jul 2026 08:55:53 +0100,
 sashiko-bot@kernel.org wrote:
 > 
 > Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> - [Low] Stray double semicolon creates an empty statement.
+> - [Low] The updated comment explicitly claims '"Mapping" does emit the RESx/UNKN definitions', which misleadingly omits the fact that the 'Fields' qualifier also emits these definitions.
 > --
 > 
-> --- Patch [25]: [PATCH v3 25/28] KVM: arm64: Engage NV3 TLBI trap elision ---
-> commit dabbb189ece66c0128f9610303e005d9bdd94252
+> --- Patch [1]: [PATCH v3 01/28] arm64: sysreg: Emit RESx/UNKN values for Mapping/Fields definitions ---
+> commit ed28be9bab17b360a9e12769aa91d7ac6b649b8d
 > Author: Marc Zyngier <maz@kernel.org>
 > 
-> KVM: arm64: Engage NV3 TLBI trap elision
+> arm64: sysreg: Emit RESx/UNKN values for Mapping/Fields definitions
 > 
-> This commit enables NV3 TLBI trap elision for guests that are not NV2 aware,
-> relaxing the TLBI traps when only the guest's S1 translation is affected.
+> This commit relaxes the rule that skips emitting definitions for Mapping
+> and Fields qualifiers. It updates gen-sysreg.awk to emit RESx and UNKN
+> values for both of these qualifiers.
 > 
-> > diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> > --- a/arch/arm64/include/asm/kvm_emulate.h
-> > +++ b/arch/arm64/include/asm/kvm_emulate.h
-> [ ... ]
-> > @@ -715,6 +715,19 @@ static inline void vcpu_set_hcrx(struct kvm_vcpu *vcpu)
-> [ ... ]
-> > +			if (!kvm_has_nv2(vcpu->kvm)) {
-> > +				vcpu->arch.hcrx_el2 |= (HCRX_EL2_NVnTTLB   |
-> > +							HCRX_EL2_NVnTTLBIS);
-> > +
-> > +				if (kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, OS))
-> > +					vcpu->arch.hcrx_el2 |= HCRX_EL2_NVnTTLBOS;;
+> > diff --git a/arch/arm64/tools/gen-sysreg.awk b/arch/arm64/tools/gen-sysreg.awk
+> > index 86860ab672dc7..e099f7d3b2833 100755
+> > --- a/arch/arm64/tools/gen-sysreg.awk
+> > +++ b/arch/arm64/tools/gen-sysreg.awk
+> > @@ -228,7 +228,7 @@ $1 == "EndSysreg" && block_current() == "Sysreg" {
+> >  }
+> >  
+> >  # Currently this is effectivey a comment, in future we may want to emit
+> > -# defines for the fields.
+> > +# defines for the fields. "Mapping" does emit the RESx/UNKN definitions.
 > 
 > [Severity: Low]
-> This isn't a bug, but there's a stray double semicolon at the end of this
-> statement.
+> This isn't a bug, but does this comment incorrectly imply that only "Mapping"
+> emits the definitions? 
+> 
+> The condition on the next line applies identically to both "Fields" and
+> "Mapping", and the commit message notes that both qualifiers are being updated
+> to emit the RESx/UNKN values.
 
-I'll fix that.
-
-Thanks,
+Fixed.
 
 	M.
 
