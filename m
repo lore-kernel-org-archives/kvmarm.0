@@ -1,63 +1,67 @@
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com [209.85.221.70])
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com [209.85.128.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDACC3BB675
-	for <kvmarm@lists.linux.dev>; Thu, 23 Jul 2026 18:21:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5B5A3BB9F7
+	for <kvmarm@lists.linux.dev>; Thu, 23 Jul 2026 18:21:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784830916; cv=none; b=Mo56bBRwz3tDGyWs2ox+/WhbDydVmtCbttY+LqOFez8C+WE+ylMbxGJXmg3OnZlhqAtLDJZlazsE9f2mnkLXywux2LSIjzWIBr/kuhYmju4IO4k6cDpajF1F3a6phSOOAT54CR+36f+8Mjp4TrpKoFgliHkANr2KFikkSm/3RUI=
+	t=1784830919; cv=none; b=Pcp1jUbS6LbHtshjfmZvDtmYTl9Wq8ttCMEIX3zaa7VyBVt4IhtZtIRhuf+cuaXAIrlDMQ3BVUe65/z7KeAM1qqzP78afQGgWPdmILF7dFXzamcjYs2iCX8Km1OIyc2r51nq4p2U6pyFbYk+0HU14gMUsjX4Q1cqLuQB0fojXas=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784830916; c=relaxed/simple;
-	bh=Y8zPSkJhgEwpcGvfvuTG8GkMIhbfsd22DIIsBqUqPLk=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=URtOsm5GClwirbYAyW2WbeKqqH+z+5Hh/OBZAH18zbvlURfe7GsJvnXf6Feyi+svKl+prfFBsEviS4QapqeseRCyqKy3wIamDnOEI9OXwRcB62tIA+us7j3DlCduuBE7iSbGdrVyGEGzk43DLhb6ria/RFv89dyrwccxsni9PVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lEmE8pBl; arc=none smtp.client-ip=209.85.221.70
+	s=arc-20240116; t=1784830919; c=relaxed/simple;
+	bh=mMr1WmosQxXB2EcGfwJiQaiR9DVyE3hjJJoEXxfwmHY=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=u4HcFykyNnWcfx0Nbp5fDLV+gtJ/synpF9c+x4edvTfvfzpvWQcmuPo7sapu0BsSj5XVpm1C0VgFFjNKK3h8UL+i5qq9+jhZuek2T0Pii1BMOOffdCvPvQFpDyZQ4SoGTMaVavY75AvX1pvdfmqMDJs5rIhDtP4Vja/joX56tTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wd81SMAn; arc=none smtp.client-ip=209.85.128.71
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lEmE8pBl"
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-47d81cf0c4cso666571f8f.2
-        for <kvmarm@lists.linux.dev>; Thu, 23 Jul 2026 11:21:49 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wd81SMAn"
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-495474a5fbcso9819215e9.1
+        for <kvmarm@lists.linux.dev>; Thu, 23 Jul 2026 11:21:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1784830905; x=1785435705; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=8+lHjdE+3DloA2hsk7g0E45gyAxlw5fhHa47aoUOQ2E=;
-        b=lEmE8pBlGNOFRVNIFbjvhu0z8m47EgCJZADml66BguHtlDMH3GeX+hIyDWsLIDeQxQ
-         cHc7sXOn+d/KgW733zCv4mHX+3XXe31v4f3fQinMnyTHEBZMS9JjSDZaVkLW/OVMqQmG
-         0u0ilS/4M+4nAmsV4hguYIo9UwMOq85ko/Bvq8Z66xXVH59r7HaK/e7jhA5ZT7VfsQfM
-         6GLxgrIFPrHnugI6CEDXmtfeZ5gw/OnbQ0f9hr56UR4+p2nXqon3Ab/cJF/jH8XZzTDe
-         TJ3BwDjUiahoQ5EJuIEZ+OPSqmfwrpE5QrMdSyHItAaBmVi87+fE8roc3LZK+lsNNnfd
-         0M4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784830905; x=1785435705;
-        h=content-type:cc:to:from:subject:message-id:mime-version:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+        d=google.com; s=20251104; t=1784830908; x=1785435708; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=8+lHjdE+3DloA2hsk7g0E45gyAxlw5fhHa47aoUOQ2E=;
-        b=NEIxIQHPoGqSFAKKdGN7jZwyeoiq7QSw+/oGVv9+8qaekg1dTixR3MZx+zoyMidLJY
-         AMooj3vpYLOAGmATpLC+szDns1/99OtyBL7dEgKEAQ/UWGqh0vyJ6COCyvGd2cMe3wvg
-         Xl5VS9O18fFbPQuIh1k+hhaMHuCp2tCAdpoigcfZE3kArj6QnZNb+fVzOUUg7tLNW5Z/
-         ZlMs69v696auFuEi0HiPW4gPwe1/g1lqQ+QPE174qhlgu+E2wOMSOHELupKE3m8pP20c
-         owT/5vYrpsty+ASvekrOX1EsVOwxdWdV5kdiCsiUdpN7k22djlifZiQheAQLnstWHLxb
-         6pVA==
-X-Forwarded-Encrypted: i=1; AHgh+RrbszXiEcGg5Twqw4yf8QWJHRdRXRz50NP0VMGA9ha1OZ19rCSblxU3gx2TJXrqtXx//e997KI=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxZuy1FAzqqFlOjaowkfTRSWaxYiU2NTFJm9h2rD3yHM/6HWx3P
-	8CHsMeaXTtHai4VYPOWc6ihsOn5JCGRejT9MnGTwIAalKUTKlc0zJs2nY0kwtA0/K0ZIv0PBLS/
-	GivQcPJrVXeDw3w==
-X-Received: from wrbdv10.prod.google.com ([2002:a05:6000:d8a:b0:47f:501a:8813])
+        bh=9FpdytHdhxDISqer6403yWjEFqnIJW3e2H1iU7+f5M0=;
+        b=wd81SMAnolXBuZAIxcKsTJCPvvN7truMQQyu1T3EUdo1CB7Ca6C3FEmR9ICXELBf8M
+         jQRN6HgK9dbGhXnTUx+ssNwFOhtm482h5WJtHgLPV7ZkWSK28cIiCuocbVL5k9slKMid
+         AAMXF/wx4vyFhNyR85pVjx0PdlHVimn4wK2CslrPgaabXGAxLyyvpH9M+ORUJW/ZQXNv
+         1V4maBXM+ARCBw1ZRzP4BUgpmUx+sThYr92JewipdT269UXVURMhTbT+lMlzZDcJHcWD
+         bRixZAGHlLdCyeZbsMI8hcUSVYDBuQRgoxTOKOoJrGUFpazeTb+k/to3p+z5UNo/ZQMU
+         Lprw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784830908; x=1785435708;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=9FpdytHdhxDISqer6403yWjEFqnIJW3e2H1iU7+f5M0=;
+        b=oS/hAhoPoA0VdltuDMr5siVcr6aIM0ZqQO5mwO5LwJk9ajELvyU/28wnDBGJVzcxQO
+         QJY/MH1J+ntij9PlffecP10YfByxGzN4T3kyAEGHs5yn0to38mY7+Nqx1sSCLaGgg+PM
+         lHlpxwuLdLThiLGzLIe71S4w4L+NyV33PDtbaznmKTU0vuxkq8X0QW01MFOJOLjzXnFG
+         I1Gc3VkEp3Fr2lXAbCOo1RrYU6EWTBUR12iBr8Fyxu0PrmTScgJ1kb4OjNbNNafZOJKH
+         dx6TTlI4LivhDttPYApmphYtcw6sWIuvNqszf4H8Y/pqFM4fZdtOxciGIqHH7hf6Zran
+         /3wA==
+X-Forwarded-Encrypted: i=1; AHgh+Roc21iF+674uPeFZUx5W4nth3fIvhL0YccnkquJYU4oq/0dvYZy3L/9fjJQqlxWEegz/O7rU+k=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yy1LaK29Haf5KvZQJSY/OvXmoe4bhEx7P/N1ltjBPxOOeqlO28x
+	IjExM4d/LVdx45PBYs5NXHOKWYKLnUgow8vSOCuUlkfzaE1P6jQiqNcwGKOAWvjLtiEIqBR6iwo
+	LyhADUeUkNEqREA==
+X-Received: from wmbgw6.prod.google.com ([2002:a05:600c:8506:b0:495:4855:c65d])
  (user=smostafa job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6000:2011:b0:46f:7d90:8121 with SMTP id ffacd0b85a97d-47f8d71c689mr5489116f8f.14.1784830904536;
- Thu, 23 Jul 2026 11:21:44 -0700 (PDT)
-Date: Thu, 23 Jul 2026 18:21:38 +0000
+ 2002:a05:600c:21c3:b0:493:f6e6:ce2a with SMTP id 5b1f17b1804b1-49573cbe93emr35666835e9.2.1784830908237;
+ Thu, 23 Jul 2026 11:21:48 -0700 (PDT)
+Date: Thu, 23 Jul 2026 18:21:39 +0000
+In-Reply-To: <20260723182140.4025575-1-smostafa@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
+References: <20260723182140.4025575-1-smostafa@google.com>
 X-Mailer: git-send-email 2.55.0.229.g6434b31f56-goog
-Message-ID: <20260723182140.4025575-1-smostafa@google.com>
-Subject: [RFC PATCH v2 0/2] KVM: arm64: Add support for BBM level 3
+Message-ID: <20260723182140.4025575-2-smostafa@google.com>
+Subject: [RFC PATCH v2 1/2] KVM: arm64: Add stage2_clean_old_pte()
 From: Mostafa Saleh <smostafa@google.com>
 To: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
 	linux-arm-kernel@lists.infradead.org
@@ -68,105 +72,123 @@ Cc: maz@kernel.org, oupton@kernel.org, seiden@linux.ibm.com,
 	linu.cherian@arm.com, Mostafa Saleh <smostafa@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-This patch series adds support for BBM level 3 to KVM pgtable, it
-depends on [1]
+At the moment, the pgtable code rely on BBM in SW which looks like:
+Break: stage2_try_break_pte()
+	1) Break PTE and lock it
+	2) TLBI
+	3) Put the ref on the old PTE
 
-Changes from v1:
-https://lore.kernel.org/all/20260717130901.2239134-1-smostafa@google.com/
-- Limit BBML3 to systems with FWB and DIC and remove race check.
+Make: stage2_make_pte()
+	1) Get a ref on the new PTE
+	2) Install the new PTE
 
-Motivation
-==========
-I have been looking into this for the context of:
-- Page table sharing between the host CPU stage-2 and the SMMUv3 for
-  protected KVM.
-- Use the pagtable code to populate SMMUv3 stage-2 shadowed
-  page table [2]
+With BBML3, the sequence will look as
+	1) Get ref on the new PTE
+	2) Install new PTE
+	3) TLBI
+	4) Put the ref on the old PTE
 
-However, BBM level 3 is still useful for CPU only operations as it
-avoids intermediately breaking translation.
+Which requires moving step #2 #3 from the break function to the make
+function, although it is possible to do that for SW BBM also, that
+means the stage2_try_break_pte() did not fully break the PTE as it
+is referenced in TLBs, although that works it seems fragile.
 
-Design
-======
-Some of the conditions that BBM level 3 will be useful in (RWHZWS):
-1) A change to a PTE memory type, shareability, cacheability or OA
-2) Changing from block to table
-3) Changing from table to block
+Instead, move this logic to a new function stage2_clean_old_pte()
+so that can be called from BBML3.
 
-At the moment in the hyp page table code:
-- For #1) stage2_map_walker_try_leaf(): Replaces a leaf with another
-  one which does not match the same OA/perms/attrs.
+Signed-off-by: Mostafa Saleh <smostafa@google.com>
+---
+ arch/arm64/kvm/hyp/pgtable.c | 67 ++++++++++++++++++++----------------
+ 1 file changed, 37 insertions(+), 30 deletions(-)
 
-- For #2) Switch block to table is used from:
-  - kvm_pgtable_stage2_split(): Explicitly splitting a block (used
-    for dirty logging), where a block is replaced by a table with
-    the same attributes.
-  - stage2_map_walk_leaf(): Updating a mapping that is partially
-    part of an existing block.
-
-- #3) Does not exist in the code at the moment as coalescing is not
-  supported.
-
-The first patch is a preparation to be able to clean up the old pte
-for BBML3, the second patch adds the main logic.
-
-Initially, I encapsulated the full logic of BBM in one function,
-which was not readable, due to different ordering and dealing with
-CMO, TLBI.
-
-Instead, I kept the logic into 2 functions, where BBML3 is added in
-the make step.
-
-One interesting case, as BBML3 will update the PTE atomically, it
-can only know it raced with another core at the point of the cmpxchg
-failing, unlike the SW implementation which locks the PTE first.
-And as we must issue CMOs to the new mapped page before the update,
-that means with BBML3 racing cores will issue redundant CMOs, to
-avoid this, we limit the use of BBML3 to systems with FWB and DIC.
-
-Testing
-=======
-This was tested:
-- C1-Pro cores, unfortunately the version I have does not run
-  upstream, I backported the patches to Android kernel (6.18).
-
-- mainline(7.2-rc3) kernel on a Qualcomm X1 with a hacked cpufeature
-  as it does not support BBM, I did not see conflict aborts or TLB
-  corruption.
-
-I tested with VHE and protected (hvhe) modes, running VMs
-(and protected), and running some selftests, that might exercise and
-stress this path tools/testing/selftests/kvm:
-- demand_paging_test
-- memslot_perf_test
-- memslot_modification_stress_test
-- dirty_log_test
-
-Future work
-===========
-Some other changes that would be useful:
-- Eagerly install table on block split, we can now replace a block
-  with a fully populated table atomically when we unmap a partial
-  part of the block.
-
-- Use BBML3 in the hypervisor stage-1 with nvhe/protected mode to
-  improve preformance and reduce memory usage as now it is forced
-  to use leaf mappings.
-
-There is more to support page table sharing (such as dealing with
-TLB invalidation, coherency...), I submitted a talk to LPC to discuss
-this further.
-
-[1] https://lore.kernel.org/all/20260723044034.2983651-1-linu.cherian@arm.com/
-[2] https://lore.kernel.org/linux-iommu/20260715115906.2664882-1-smostafa@google.com/
-
-Mostafa Saleh (2):
-  KVM: arm64: Add stage2_clean_old_pte()
-  KVM: arm64: Support BBM level 3
-
- arch/arm64/kvm/hyp/pgtable.c | 123 +++++++++++++++++++++++++----------
- 1 file changed, 87 insertions(+), 36 deletions(-)
-
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index b74dd5ce1efd..d670da8882a5 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -810,39 +810,10 @@ static bool stage2_try_set_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_
+ 	return cmpxchg(ctx->ptep, ctx->old, new) == ctx->old;
+ }
+ 
+-/**
+- * stage2_try_break_pte() - Invalidates a pte according to the
+- *			    'break-before-make' requirements of the
+- *			    architecture.
+- *
+- * @ctx: context of the visited pte.
+- * @mmu: stage-2 mmu
+- *
+- * Returns: true if the pte was successfully broken.
+- *
+- * If the removed pte was valid, performs the necessary serialization and TLB
+- * invalidation for the old value. For counted ptes, drops the reference count
+- * on the containing table page.
+- */
+-static bool stage2_try_break_pte(const struct kvm_pgtable_visit_ctx *ctx,
++static void stage2_clean_old_pte(const struct kvm_pgtable_visit_ctx *ctx,
+ 				 struct kvm_s2_mmu *mmu)
+ {
+ 	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
+-	kvm_pte_t locked_pte;
+-
+-	if (stage2_pte_is_locked(ctx->old)) {
+-		/*
+-		 * Should never occur if this walker has exclusive access to the
+-		 * page tables.
+-		 */
+-		WARN_ON(!kvm_pgtable_walk_shared(ctx));
+-		return false;
+-	}
+-
+-	locked_pte = FIELD_PREP(KVM_INVALID_PTE_TYPE_MASK,
+-				KVM_INVALID_PTE_TYPE_LOCKED);
+-	if (!stage2_try_set_pte(ctx, locked_pte))
+-		return false;
+ 
+ 	if (!kvm_pgtable_walk_skip_bbm_tlbi(ctx)) {
+ 		/*
+@@ -862,6 +833,42 @@ static bool stage2_try_break_pte(const struct kvm_pgtable_visit_ctx *ctx,
+ 
+ 	if (stage2_pte_is_counted(ctx->old))
+ 		mm_ops->put_page(ctx->ptep);
++}
++
++/**
++ * stage2_try_break_pte() - Invalidates a pte according to the
++ *			    'break-before-make' requirements of the
++ *			    architecture.
++ *
++ * @ctx: context of the visited pte.
++ * @mmu: stage-2 mmu
++ *
++ * Returns: true if the pte was successfully broken.
++ *
++ * If the removed pte was valid, performs the necessary serialization and TLB
++ * invalidation for the old value. For counted ptes, drops the reference count
++ * on the containing table page.
++ */
++static bool stage2_try_break_pte(const struct kvm_pgtable_visit_ctx *ctx,
++				 struct kvm_s2_mmu *mmu)
++{
++	kvm_pte_t locked_pte;
++
++	if (stage2_pte_is_locked(ctx->old)) {
++		/*
++		 * Should never occur if this walker has exclusive access to the
++		 * page tables.
++		 */
++		WARN_ON(!kvm_pgtable_walk_shared(ctx));
++		return false;
++	}
++
++	locked_pte = FIELD_PREP(KVM_INVALID_PTE_TYPE_MASK,
++				KVM_INVALID_PTE_TYPE_LOCKED);
++	if (!stage2_try_set_pte(ctx, locked_pte))
++		return false;
++
++	stage2_clean_old_pte(ctx, mmu);
+ 
+ 	return true;
+ }
 -- 
 2.55.0.229.g6434b31f56-goog
 
