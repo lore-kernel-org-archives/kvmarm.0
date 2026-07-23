@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F3F24A33F2
-	for <kvmarm@lists.linux.dev>; Thu, 23 Jul 2026 16:11:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18D4D484237
+	for <kvmarm@lists.linux.dev>; Thu, 23 Jul 2026 16:11:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784823088; cv=none; b=WwkHjJhZjDLZITAWrotQYrZpZKqgCEiHmia6AdglWnl12XzLlo3ZfM4Zqp5TyUhynUz9ph+wWKi57WkbR/02GEYuEnWEvUbiob+CdCRhGCxPGq4kcXq+ES4YlDGYB4o8S057D6WcdAvQDPAiWh9Yor2yovVU67GieP5IIrH73RE=
+	t=1784823090; cv=none; b=LopwwJU9oD4Cv2LAZybGulimnasgSQ6Ns8SS3xBS7UEpl863LLKVrZVTvaxI26hDuzNks49qhLD4yjxCc6PvhT+nKSKtxLhTUsP1UryCU29QBy9Kc5bLGnTHG1PknoclWZ3+IuFj3Qg1slbPbV+ZTAKOxDMNOpzgOyIzB9c0hU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784823088; c=relaxed/simple;
-	bh=hUmfdPloO7s0Hx9WocnHwJ1q1wUcDysog6Jk3VO024Q=;
+	s=arc-20240116; t=1784823090; c=relaxed/simple;
+	bh=T3r4bWTwaBX3JLARqUj+GIjpQU0WmkYEJ0ruJpUNozc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sZCH4vP2eY9t8oPuYwfMumqKB2jnHY3bZW8xqHeQHCtJGK+zW9TvpcB4iAHZ/TzzA4i1wakcOvgcrJr530ls+WxBmxMjq8QNXpMCWgIIiWTqNTVDQVjMabWp1OY86tUQVVhBeqATQ/yUiFbL66KW+xG6QyD8rbOe0i7mgaDPxzw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oj34C3EP; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=cWiR+SW2AxxRZBrzdrPiKGa5RiejAl4oRd7xlE3jiUNq5FVeWwOKPM2VZyT2gvc8AoMTSASXAK6mLAhmTliUOdMsnGpDbhQGAXbM1ljNSVnIJtHkmxQ5NFCkCtHi9chkLR+hOtJaUjURd3g10RaMUJtIuuxvnJUL4r3bwKdhsnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BY5ndC9e; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oj34C3EP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBD541F00A3A;
-	Thu, 23 Jul 2026 16:11:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BY5ndC9e"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4E9B1F00A3A;
+	Thu, 23 Jul 2026 16:11:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784823087;
-	bh=Weyp/oLhKZLkacjeN1Ftw2HMrf7BTwE3TsZf9PvNHAQ=;
+	s=k20260515; t=1784823088;
+	bh=OUOMMMwQfpWkQuL5zRBMp7jRaM606M40dEn2DKXdTFA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=oj34C3EP08ZKjzQnPJu842SViTXjFZ4wZwO94E6yE9pq/0b/m7TY7D32jSflXGsph
-	 HCn6Sb/Ce3BwLgCJqcUIM71tpjeynpCxkU0k4CUNA6RySAi0REBEmXsLsRR489wLI8
-	 Wg/aOjDJ42/1LLM38t4KM4X6iDrFIk+njibI8Uae2dulMFiIWruI5dkWZW+QXcYSo4
-	 um35Eczjv1F0FgIh89afKna3ODWziZhG6VbnFqNGTBRWs4GRtuQFPCwt1+AShh8LyL
-	 8DWpOADHHXfSqr+/EVAXoUFVj+pqeovjm+1KfwGgWSwHqHEY6tSL/862yKJzoGaLjO
-	 MFJAjH+BWTrJA==
+	b=BY5ndC9e6eqpbogkfVicaynkK/X9u5jVfXDJ9lwTRKo0LQwFDTuqAjy7lkONiG/j9
+	 cbuoF8vT8/wFU5rZFeTF3xE+pt5RgEyD0/7PEBIg9dHzLqIrusA2ga5bzyiQKSrD4V
+	 iZ5/pJBHUpszfKZMvKrT80fk3LLlBT3yHTAUtTCloc3E46iaeR1BXm5SWN+GiQYWQ7
+	 u/7b2VOFq4vtOk6ll3IOQWqWWcjlq8UBBixLVKYLwuEsmLX2yF2DTffVpizXUVxCrx
+	 HvVeoZtKJ1GYzH9LCeEtG8RDAXQwtoXY9R1ZtUr2+Vw2JIXfMoyW/YW2vFfvTBaqpH
+	 Rt3YSh/blp1UA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wmw0y-0000000872z-1KXd;
-	Thu, 23 Jul 2026 16:11:16 +0000
+	id 1wmw11-00000008734-1ATM;
+	Thu, 23 Jul 2026 16:11:19 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: oupton@kernel.org,
 	kvmarm@lists.linux.dev,
@@ -45,12 +45,12 @@ Cc: joey.gouly@arm.com,
 	will@kernel.org,
 	kernel-team@android.com,
 	Fuad Tabba <fuad.tabba@linux.dev>
-Subject: Re: [PATCH v2 0/2] KVM: arm64: KVM: arm64: Fix potential leak in hyp_trace_buffer_alloc_bpages_backing
-Date: Thu, 23 Jul 2026 17:11:13 +0100
-Message-ID: <178482303775.3351010.17818493792689450146.b4-ty@b4>
+Subject: Re: [PATCH v2] KVM: arm64: Fix hyp_trace clock disabling
+Date: Thu, 23 Jul 2026 17:11:16 +0100
+Message-ID: <178482303773.3351010.6581445728887586605.b4-ty@b4>
 X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260710114819.2689386-1-vdonnefort@google.com>
-References: <20260710114819.2689386-1-vdonnefort@google.com>
+In-Reply-To: <20260715105100.3178255-1-vdonnefort@google.com>
+References: <20260715105100.3178255-1-vdonnefort@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -64,27 +64,21 @@ X-SA-Exim-Rcpt-To: oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@l
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 10 Jul 2026 12:48:17 +0100, Vincent Donnefort wrote:
-> This series provides two fixes for the nVHE/pKVM hyp trace remote buffer
-> allocation.
+On Wed, 15 Jul 2026 11:51:00 +0100, Vincent Donnefort wrote:
+> Fix the disable path in hyp_trace_clock_enable(), which fell through to
+> re-initialize and reschedule the clock after cancelling the work. Return
+> early instead.
 > 
-> Changelog:
-> 
-> v2:
->   - Added patch: "KVM: arm64: Fix hyp_trace_desc allocation size in
->     hyp_trace_load()"
->   - Collected Reviewed-by and Tested-by tags from Fuad Tabba for the
->     leak fix
->   - Do not set bpages_backing_* on __map_hyp() failure (Fuad)
+> While at it, cleanup hyp_trace_clock::lock which is unused and
+> hyp_trace_clock::running which is redundant: the trace_remote framework
+> already serializes calls to the callback enable_tracing.
 > 
 > [...]
 
 Applied to fixes, thanks!
 
-[1/2] KVM: arm64: Fix potential leak in hyp_trace_buffer_alloc_bpages_backing
-      commit: df7a9d376f7a388ecfacf8dfe0b5819ddfba6972
-[2/2] KVM: arm64: Fix hyp_trace_desc allocation size in hyp_trace_load()
-      commit: ca28278d10ec234592989ad370d58294b9d43e0f
+[1/1] KVM: arm64: Fix hyp_trace clock disabling
+      commit: bbece712cfc7f286b2908ac120dcf700279d87eb
 
 Cheers,
 
