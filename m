@@ -1,328 +1,394 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21ACC3128D9;
-	Thu, 23 Jul 2026 14:47:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA92342AF9F
+	for <kvmarm@lists.linux.dev>; Thu, 23 Jul 2026 14:55:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784818030; cv=none; b=bb4yAtQqGDiQMOODnveTj0+9S4mN0wLrbMwm9bDBASl+YiqJBNgBiEwmhMMtyvIaAqcNdOUJY1OAgr/FiOA841M4vJCA0R/7Yj8djaxxY8/ohFdfRvNAtgi9r7ATIIWSBbs0U2WlQkDdjKIVlS93wczm58AfAdwpr7yoDWU2Ybk=
+	t=1784818523; cv=none; b=Xk5aHCh9Dsu1hQQOVzYFJKTH5g8ZtOb0RfMW9z8dyJ7CdP1xZ7DEnr1lk9MH+3ZsDOIni+sKv9L161qPRewA7HoYQlapAIFyVuQuLPE/KLyj7zbMZ/v93EkUkoYKodln93QChIMK/KXPdLWFkbPwzYkjcHXOOFNE2/MLb53KdwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784818030; c=relaxed/simple;
-	bh=6Th78kG6gwLHh+IRkhYaCODZh+oGtao36ZDP9dLMl3Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EiYROh89n7C997uTKYbqwM+5MxgOOmyO9Pjv3AiE9k/KotsibTmd9EPvGMWlcClMB8P3Vl3dojBfGYs7WiJallf/WoZuKz2YrK7EG1/m/cvgm3BbbNn43QIr52Zd77fXmflZMtmVl3SzR8tCogXPHIJtQpzYSVYy/BTAAMXWW8c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=LxFG8WRR; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1784818523; c=relaxed/simple;
+	bh=4TkRZ03/RCn1g9ldy6eIdU2iGahtJdKjxFsbp6QTr68=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eqiOIwUDvo4AVuxRl3DXknfsb1xz1Eh5vfvpnZNVkHs5V+NN1hGGjFQlptrY7iXYF0UGTHGFCJlunFdEkRfjhiw5fyWdOJEM31uEIU5e+SaVqTl+sjhT9Z4HmpJmAix8P1Cl3ex7B6eoCQ1sLaB0rnzjy+wu2flDgyWfmfcV9U4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lMbFqyOq; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="LxFG8WRR"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D49B01477;
-	Thu, 23 Jul 2026 07:47:01 -0700 (PDT)
-Received: from [10.1.25.28] (e122027.cambridge.arm.com [10.1.25.28])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B40FC3F59E;
-	Thu, 23 Jul 2026 07:47:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1784818026; bh=6Th78kG6gwLHh+IRkhYaCODZh+oGtao36ZDP9dLMl3Y=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=LxFG8WRRK7c9iE7bu37AjLxt1a2HZyFcz184U5VNfybyqKKs4NJEuApklUjnLfzdO
-	 Abo+IkO4lwS7PIRGBwYDDYCIp0Q/0dVX6cc2WGgGTWfp8AQriPZBtjYyNvWg0bqpzA
-	 7KTe8igVy3yHQmAEl8oR5DcTVjve1JJmeqaINrr4=
-Message-ID: <1cd3327c-1eab-4022-9ab1-625ca8641e81@arm.com>
-Date: Thu, 23 Jul 2026 15:46:58 +0100
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lMbFqyOq"
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4954d5d814fso71965e9.0
+        for <kvmarm@lists.linux.dev>; Thu, 23 Jul 2026 07:55:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1784818515; x=1785423315; darn=lists.linux.dev;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=QWiE+gZupwsq77eqDfEJHNHYTUyi3IZVl5QUpf6vBbU=;
+        b=lMbFqyOqX7/Aj8iwIxsG2b1SbK0HNd46m2id8TnKUzA4ZE9rDU2iIyWXPxm0skUceo
+         BAT+D/j/cRTDWPk693RBn3p2Mn2sxKLRkpsXbs0LMKIH3WxRuYnXuap2Aq9wP+gTpF7e
+         x7/DrRekdPCro0GU30fNsiTRalNfJh7UT9D9/VfojFl1fTzS+yTpR4HIO+kBP6SRUMVJ
+         BVso6u83y0IBTB6gHung0axoLmLTmTXFqb7nnCnQ7+lOwVJLRvlNSHGIVNUxUFx0lzvz
+         +VpN3yr/kzAyPpJsF+YU+kmsvEExGT3kkIlZdR9ItYTnSYV8Ng7jibM0my78hEZUAtkr
+         DaGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784818515; x=1785423315;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=QWiE+gZupwsq77eqDfEJHNHYTUyi3IZVl5QUpf6vBbU=;
+        b=ImF2c86dX+Bamf/xquNSEksn4YLjyXRBFYrKFqR8Hvav4f9yDJV9DvkNg1zL9o3Ef8
+         NUOMCbwYyxxbhgwnviZhXUsRe3dJ5kgA55oGWc7nxx78Vm/rfw97aCcOOfjtMmYdYNSL
+         uuoLPf36GEILIZ0KFosJEl5c8xvDAoF4+efv23cJlGagFp+9cjw8N6W2gMnmFG3sMSgs
+         Z8sSHKg++0IfntQC/jnwK9owQ3cqSLcydZE8FbF9cdQnFOI/osOWLQsOvoTlKir93XMI
+         UnOhtjeDR7Ixx8t96vVJskpGJyVsgV0ck806u7x8M5u1x+w8y1FSIqRWnjPkRptA5YIK
+         ceFg==
+X-Forwarded-Encrypted: i=1; AHgh+RqB0bdS2DF5abYgk99PPvht08eUMy5Y79Gll8nOxpSRuchYVOVjUtrBvYfZwRTAFk/1HftG39I=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yx7qKjBWbhi6/fk0pZQF6niFCkU3nRXlPH43/abeCDqUGC5nus3
+	CPpOuB5hgUEfb/YIbWe/MMKmN2DZF+0XGw/2jx4qHUp7tUcllfWcLt6pRYAhohy2pg==
+X-Gm-Gg: AR+sD13khO3DAPxsMejXDxyu41F/QExraQIC04G8ljRu/QZPD6Ej16UQjEH7cGmi2V9
+	CnTXi1nPueLDKhgJfnZlC4A7err+Feu07zW9bKvZiuPaeJh/A9welWxpNtzXCerBG3yqidCxxYg
+	L0Yj+d/iXise8cqffO1bclqgzc8Boqj7iIreoWMZY7jlhr1meCNNNfG9cwhsXVkaHvU8hEB29EQ
+	01cQ6M3eAkfo+RgwLzUzmSV2Wp/gJJr+eMzGXn1i5v9zDA30wf+BpyHnlvIsQz6H5PtBQqyS86A
+	VsHglnH4bd9p4pSlth+FDenaxdS314IZMJpy8irHxKSLpx8tzWnkxWfYBS65bCctxzS5fAT9WET
+	Kr040bYd8lIlCf/YKQdE9OBzcuhEWdChYKh/7Ly4im7H6mfoYboA7I3Mm+Q4Zxh7vsPO/uweLwo
+	4jB+ZUucr7S/V3PIgxbEXODKBQEFuGjvePsCbjbbNNHJNiQqUizcC19Q==
+X-Received: by 2002:a7b:c015:0:b0:493:be38:fa5a with SMTP id 5b1f17b1804b1-495738b2043mr1461805e9.10.1784818514584;
+        Thu, 23 Jul 2026 07:55:14 -0700 (PDT)
+Received: from google.com (145.16.38.34.bc.googleusercontent.com. [34.38.16.145])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47f85c531basm15867179f8f.19.2026.07.23.07.55.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Jul 2026 07:55:13 -0700 (PDT)
+Date: Thu, 23 Jul 2026 14:55:08 +0000
+From: Sebastian Ene <sebastianene@google.com>
+To: Mostafa Saleh <smostafa@google.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, iommu@lists.linux.dev,
+	catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
+	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, joro@8bytes.org, jgg@ziepe.ca,
+	mark.rutland@arm.com, qperret@google.com, tabba@google.com,
+	vdonnefort@google.com, keirf@google.com
+Subject: Re: [PATCH v7 14/24] iommu/arm-smmu-v3-kvm: Shadow the command queue
+Message-ID: <amIrTPWg3eEhu2m7@google.com>
+References: <20260715115906.2664882-1-smostafa@google.com>
+ <20260715115906.2664882-15-smostafa@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v15 12/37] KVM: arm64: CCA: Support the VGIC in realms
-To: Kohei Enju <enju.kohei@fujitsu.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
- Lorenzo Pieralisi <lpieralisi@kernel.org>
-References: <20260715142841.80544-1-steven.price@arm.com>
- <20260715142841.80544-13-steven.price@arm.com>
- <amB-opawGgF6jNHB@FCCLS0092175.localdomain>
- <b71e81ee-372c-4963-a1f7-bd301aee89cb@arm.com>
- <amG3KHE4Tdd_Nvuz@FCCLS0092175.localdomain>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <amG3KHE4Tdd_Nvuz@FCCLS0092175.localdomain>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260715115906.2664882-15-smostafa@google.com>
 
-On 23/07/2026 07:56, Kohei Enju wrote:
-> On 07/22 14:31, Steven Price wrote:
->> On 22/07/2026 09:27, Kohei Enju wrote:
->>> On 07/15 15:28, Steven Price wrote:
->>>> The RMM provides emulation of a VGIC to the realm guest. With RMM v2.0
->>>> the registers are passed in the system registers so this works similar
->>>> to a normal guest, but kvm_arch_vcpu_put() need reordering to early out,
->>>> and realm guests don't support GICv2 even if the host does.
->>>>
->>>> Signed-off-by: Steven Price <steven.price@arm.com>
->>>
->>> Hi Steven,
->>
->> Hi Kohei,
->>
->>> I've been testing this series and found that when the host CPU doesn't have
->>> ARM64_HAS_ICH_HCR_EL2_TDIR this series doesn't work as expected.
->>
->> Thanks for testing!
->>
->>> Since commit 2a28810cbb8b ("KVM: arm64: GICv3: Detect and work around the lack
->>> of ICV_DIR_EL1 trapping"), when the host CPU doesn't support this feature, KVM
->>> traps all GIC sysreg accesses in the common group. However, currently trap
->>> handlers for ICC_{PMR,RPR,CTLR}_EL1 registers are missing [0]. So when Realm
->>> guests try to access those registers, KVM traps them but just emits the warning
->>> shown in [1], and Realm guests fail to boot.
->>>
->>> As far as I can tell, the CCA requirements don't require the
->>> ARM64_HAS_ICH_HCR_EL2_TDIR feature. If that's the case, this seems to be a
->>> problem. Is there any workaround for this issue, or should we implement trap
->>> handlers for those registers?
->>
->> As Marc has already said in his reply, I'm really surprised you have a
->> CPU which implements CCA but doesn't have ARM64_HAS_ICH_HCR_EL2_TDIR.
->> Can you give some more details about the platform you are testing on?
+On Wed, Jul 15, 2026 at 11:58:55AM +0000, Mostafa Saleh wrote:
+> At boot allocate a command queue per SMMU which is used as a shadow
+> by the hypervisor.
 > 
-> Thank you for taking a look, Steve.
+> The command queue size is 64K which is more than enough, as the
+> hypervisor would consume all the entries per a command queue prod
+> write, which means it can handle up to 4096 at a time.
 > 
-> Unfortunately, due to the company's policy, I can't share any details
-> about the platform I'm currently testing on. When the time is right,
-> I'll be happy to do so.
+> Then, the host command queue needs to be pinned in a shared state, so
+> it can't be donated to VMs, and avoid tricking the hypervisor into
+> accessing them. This is done each time the command queue is enabled,
+> and undone each time the command queue is disabled.
+> The hypervisor won’t access the host command queue when it is disabled
+> from the host.
 > 
->>
->> Ultimately there are two options here - either don't support CCA (so
->> detect the lack of ARM64_HAS_ICH_HCR_EL2_TDIR and bail out early), or
->> plumb in the trap handlers - as commit 2a28810cbb8b points out this
->> isn't something we really want to support if we can avoid it.
+> Signed-off-by: Mostafa Saleh <smostafa@google.com>
+> ---
+>  .../iommu/arm/arm-smmu-v3/arm-smmu-v3-kvm.c   |  25 ++++
+>  .../iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c  | 123 +++++++++++++++++-
+>  .../iommu/arm/arm-smmu-v3/pkvm/arm_smmu_v3.h  |   8 ++
+>  3 files changed, 155 insertions(+), 1 deletion(-)
 > 
-> Yes, the former makes perfect sense if there would be no systems that
-> supports CCA without TDIR. However, if such systems do exist, I'd be
-> interested in exploring the latter approach.
-> 
->>
->> Hence I'm interested to know where this sits between "hacked up test
->> system" and "production hardware". E.g. if this is an emulator it might
->> be possible to just enable the CPU feature.
-> 
-> Again, I can't share that right now, but I'd like to share more when the
-> time comes.
+> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-kvm.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-kvm.c
+> index 68b78ed933d4..81a4cd539415 100644
+> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-kvm.c
+> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-kvm.c
+> @@ -15,6 +15,8 @@
+>  #include "arm-smmu-v3.h"
+>  #include "pkvm/arm_smmu_v3.h"
+>  
+> +#define SMMU_KVM_CMDQ_ORDER				4
+> +
+>  extern struct pkvm_iommu_ops kvm_nvhe_sym(smmu_ops);
+>  
+>  static size_t				kvm_arm_smmu_count;
+> @@ -24,6 +26,15 @@ static size_t				kvm_arm_smmu_cur;
+>  static void kvm_arm_smmu_array_free(void)
+>  {
+>  	int order;
+> +	int i;
+> +
+> +	for (i = 0 ; i < kvm_arm_smmu_cur ; ++i) {
+> +		struct hyp_arm_smmu_v3_device *smmu = &kvm_arm_smmu_array[i];
+> +
+> +		if (smmu->cmdq.base_dma)
+> +			free_pages((unsigned long)phys_to_virt(smmu->cmdq.base_dma),
+> +				   SMMU_KVM_CMDQ_ORDER);
+> +	}
+>  
+>  	order = get_order(kvm_arm_smmu_count * sizeof(*kvm_arm_smmu_array));
+>  	free_pages((unsigned long)kvm_arm_smmu_array, order);
+> @@ -70,6 +81,7 @@ static int smmuv3_nesting_probe(struct platform_device *pdev)
+>  	struct hyp_arm_smmu_v3_device *smmu = &kvm_arm_smmu_array[kvm_arm_smmu_cur];
+>  	struct device *dev = &pdev->dev;
+>  	struct resource *res;
+> +	void *cmdq_base;
+>  
+>  	/* Only device tree, ACPI not supported. */
+>  	if (!dev->of_node)
+> @@ -92,6 +104,19 @@ static int smmuv3_nesting_probe(struct platform_device *pdev)
+>  		return -EINVAL;
+>  	}
+>  
+> +	/*
+> +	 * Allocate the shadow command queue, it doesn't have to be the same
+> +	 * size as the host.
+> +	 * Only populate base_dma and llq.max_n_shift, the hypervisor will init
+> +	 * the rest.
+> +	 */
+> +	cmdq_base = (void *)__get_free_pages(GFP_KERNEL | __GFP_ZERO, SMMU_KVM_CMDQ_ORDER);
+> +	if (!cmdq_base)
+> +		return -ENOMEM;
 
-Given Marc's response for now I'm not going to add support for this. 
-"When the time comes" we can revisit whether it makes sense to have 
-upstream support and what that might look like.
+Hi Mostafa,
 
-However, I did ask an AI tool to have a go at implementing this, and it 
-came up with the (very lightly tested) patch below. That might at least 
-give you something you can test. It doesn't meet Marc's request that it
-reuses the existing implementation, and it took the AI a few goes at
-getting something that "works" so I suspect it might have bugs - I
-haven't reviewed the code myself.
+Isn't this over-allocating when PAGE_SIZE > 4kB ? 
+
+> +
+> +	smmu->cmdq.base_dma = virt_to_phys(cmdq_base);
+> +	smmu->cmdq.llq.max_n_shift = SMMU_KVM_CMDQ_ORDER + PAGE_SHIFT - CMDQ_ENT_SZ_SHIFT;
+> +
+>  	if (of_dma_is_coherent(dev->of_node))
+>  		smmu->features |= ARM_SMMU_FEAT_COHERENCY;
+>  
+> diff --git a/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c
+> index af06c832fc6f..9f76f4e82341 100644
+> --- a/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c
+> +++ b/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c
+> @@ -11,7 +11,6 @@
+>  #include <nvhe/trap_handler.h>
+>  
+>  #include "arm_smmu_v3.h"
+> -#include "../arm-smmu-v3.h"
+>  
+>  size_t __ro_after_init kvm_hyp_arm_smmu_v3_count;
+>  struct hyp_arm_smmu_v3_device *kvm_hyp_arm_smmu_v3_smmus;
+> @@ -21,10 +20,68 @@ struct hyp_arm_smmu_v3_device *kvm_hyp_arm_smmu_v3_smmus;
+>  	     (smmu) != &kvm_hyp_arm_smmu_v3_smmus[kvm_hyp_arm_smmu_v3_count]; \
+>  	     (smmu)++)
+>  
+> +#define cmdq_size(cmdq)	((1 << ((cmdq)->llq.max_n_shift)) * CMDQ_ENT_DWORDS * 8)
+> +
+> +static bool is_cmdq_enabled(struct hyp_arm_smmu_v3_device *smmu)
+> +{
+> +	return FIELD_GET(CR0_CMDQEN, smmu->cr0);
+> +}
+> +
+> +/*
+> + * CMDQ, STE host copies are accessed by the hypervisor, we share them to
+> + * - Prevent the host from passing protected VM memory.
+> + * - Having them mapped in the hyp page table.
+> + */
+> +static int smmu_share_pages(phys_addr_t addr, size_t size)
+> +{
+> +	size_t nr_pages = PAGE_ALIGN(size + (addr & ~PAGE_MASK)) >> PAGE_SHIFT;
+> +	phys_addr_t base = addr & PAGE_MASK;
+> +	int i, ret;
+> +
+> +	for (i = 0 ; i < nr_pages ; ++i) {
+> +		if (__pkvm_host_share_hyp((base + i * PAGE_SIZE) >> PAGE_SHIFT)) {
+> +			while (i--)
+> +				__pkvm_host_unshare_hyp((base + i * PAGE_SIZE) >> PAGE_SHIFT);
+> +			return -EPERM;
+> +		}
+> +	}
+> +
+> +	ret = hyp_pin_shared_mem(hyp_phys_to_virt(base),
+> +				 hyp_phys_to_virt(base + nr_pages * PAGE_SIZE));
+> +	if (ret) {
+> +		for (i = 0 ; i < nr_pages ; ++i)
+> +			__pkvm_host_unshare_hyp((base + i * PAGE_SIZE) >> PAGE_SHIFT);
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+> +static int smmu_unshare_pages(phys_addr_t addr, size_t size)
+> +{
+> +	size_t nr_pages = PAGE_ALIGN(size + (addr & ~PAGE_MASK)) >> PAGE_SHIFT;
+> +	phys_addr_t base = addr & PAGE_MASK;
+> +	int i, ret;
+> +
+> +	hyp_unpin_shared_mem(hyp_phys_to_virt(base),
+> +			     hyp_phys_to_virt(base + nr_pages * PAGE_SIZE));
+> +
+> +	for (i = 0 ; i < nr_pages ; ++i) {
+> +		ret = __pkvm_host_unshare_hyp((base + i * PAGE_SIZE) >> PAGE_SHIFT);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>  /* Put the device in a state that can be probed by the host driver. */
+>  static void smmu_deinit_device(struct hyp_arm_smmu_v3_device *smmu)
+>  {
+>  	WARN_ON(__pkvm_hyp_donate_host_mmio(smmu->mmio_addr, smmu->mmio_size));
+> +
+> +	if (smmu->cmdq.base)
+> +		WARN_ON(__pkvm_hyp_donate_host(smmu->cmdq.base_dma >> PAGE_SHIFT,
+> +					       cmdq_size(&smmu->cmdq) >> PAGE_SHIFT));
+>  	smmu->base = NULL;
+>  }
+>  
+> @@ -75,6 +132,31 @@ static int smmu_probe(struct hyp_arm_smmu_v3_device *smmu)
+>  	return 0;
+>  }
+>  
+> +/*
+> + * The kernel part of the driver will allocate the shadow cmdq,
+> + * and zero it. This function only donates it.
+> + */
+> +static int smmu_init_cmdq(struct hyp_arm_smmu_v3_device *smmu)
+> +{
+> +	size_t cmdq_nr_pages = cmdq_size(&smmu->cmdq) >> PAGE_SHIFT;
+> +	int ret;
+> +
+> +	ret = __pkvm_host_donate_hyp(smmu->cmdq.base_dma >> PAGE_SHIFT, cmdq_nr_pages);
+> +	if (ret)
+> +		return ret;
+> +
+> +	smmu->cmdq.base = hyp_phys_to_virt(smmu->cmdq.base_dma);
+> +	smmu->cmdq.prod_reg = smmu->base + ARM_SMMU_CMDQ_PROD;
+> +	smmu->cmdq.cons_reg = smmu->base + ARM_SMMU_CMDQ_CONS;
+> +	smmu->cmdq.q_base = smmu->cmdq.base_dma |
+> +			    FIELD_PREP(Q_BASE_LOG2SIZE, smmu->cmdq.llq.max_n_shift);
+> +	smmu->cmdq.ent_dwords = CMDQ_ENT_DWORDS;
+> +	writel_relaxed(0, smmu->cmdq.prod_reg);
+> +	writel_relaxed(0, smmu->cmdq.cons_reg);
+> +	writeq_relaxed(smmu->cmdq.q_base, smmu->base + ARM_SMMU_CMDQ_BASE);
+
+do we need a dsb here ?
+
 
 Thanks,
-Steve
+Sebastian
 
-----8<----
-From 7aaaa5089c05f19bf00df2b651fa4bd7d738384c Mon Sep 17 00:00:00 2001
-From: Steven Price <steven.price@arm.com>
-Date: Thu, 23 Jul 2026 11:49:36 +0100
-Subject: [PATCH] KVM: arm64: CCA: Handle GICv3 CPU interface traps for realms
-
-On CPUs that lack ICH_HCR_EL2.TDIR, KVM works around the missing DIR
-trap by setting ICH_HCR_EL2.TC and trapping the GICv3 common CPU
-interface registers. Normal guests handle these traps in hyp via the
-VGIC CPU interface emulation, but realm guests exit through the RMM and
-reach KVM's host-side sysreg emulation instead.
-
-That path only handles ICC_DIR_EL1 and treats the rest of the trapped
-common group as undefined. A realm guest can therefore take an
-unexpected UNDEF when accessing registers such as ICC_PMR_EL1 or
-ICC_CTLR_EL1 on systems that require the TC workaround.
-
-Handle the GICv3 common CPU interface registers directly from the realm
-sysreg exit path. Reads are satisfied from the saved VGIC state and
-writes update the VGIC shadow state. For PMR and CTLR writes, also
-restore the VMCR/APR state to the live GIC CPU interface before
-re-entering the REC, matching the effect a direct guest sysreg write
-would have had.
-
-Signed-off-by: Steven Price <steven.price@arm.com>
----
- arch/arm64/kvm/rmi-exit.c | 119 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 119 insertions(+)
-
-diff --git a/arch/arm64/kvm/rmi-exit.c b/arch/arm64/kvm/rmi-exit.c
-index 78d9189fd5ca..0fad8e68d920 100644
---- a/arch/arm64/kvm/rmi-exit.c
-+++ b/arch/arm64/kvm/rmi-exit.c
-@@ -3,17 +3,25 @@
-  * Copyright (C) 2023-2026 ARM Ltd.
-  */
- 
-+#include <linux/bitfield.h>
-+#include <linux/irqchip/arm-gic-v3.h>
- #include <linux/kvm_host.h>
- #include <kvm/arm_hypercalls.h>
- #include <kvm/arm_psci.h>
- 
- #include <linux/arm-smccc-rmi.h>
- #include <asm/kvm_emulate.h>
-+#include <asm/kvm_hyp.h>
- #include <asm/kvm_rmi.h>
- #include <asm/kvm_mmu.h>
-+#include <asm/sysreg.h>
-+
-+#include "vgic/vgic.h"
- 
- typedef int (*exit_handler_fn)(struct kvm_vcpu *vcpu);
- 
-+#define GICV3_IDLE_PRIORITY	0xff
-+
- static int rec_exit_reason_notimpl(struct kvm_vcpu *vcpu)
- {
- 	vcpu_err(vcpu, "Unhandled exit reason from realm (ESR: %#llx)\n",
-@@ -48,6 +56,114 @@ static int rec_exit_sync_iabt(struct kvm_vcpu *vcpu)
- 	return -ENXIO;
- }
- 
-+static int rec_get_gicv3_bpr_min(void)
-+{
-+	return 8 - (FIELD_GET(ICH_VTR_EL2_PREbits,
-+			      kvm_vgic_global_state.ich_vtr_el2) + 1);
-+}
-+
-+static u8 rec_get_gicv3_active_priority(struct kvm_vcpu *vcpu)
-+{
-+	struct vgic_v3_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v3;
-+	u8 prio = 0;
-+
-+	for (int i = 0; i <= vgic_v3_max_apr_idx(vcpu); i++) {
-+		u32 val = cpuif->vgic_ap0r[i] | cpuif->vgic_ap1r[i];
-+
-+		if (!val) {
-+			prio += 32;
-+			continue;
-+		}
-+
-+		return (prio + __ffs(val)) << rec_get_gicv3_bpr_min();
-+	}
-+
-+	return GICV3_IDLE_PRIORITY;
-+}
-+
-+static void rec_restore_gicv3_vmcr_aprs(struct kvm_vcpu *vcpu)
-+{
-+	preempt_disable();
-+	kvm_call_hyp(__vgic_v3_restore_vmcr_aprs,
-+		     &vcpu->arch.vgic_cpu.vgic_v3);
-+	preempt_enable();
-+}
-+
-+/*
-+ * Realm exits are handled after the RMM has returned to the host, so use the
-+ * saved VGIC shadow state instead of the hyp-side live sysreg helpers.
-+ */
-+static bool rec_exit_gicv3_sys_reg(struct kvm_vcpu *vcpu, bool is_write)
-+{
-+	struct realm_rec *rec = &vcpu->arch.rec;
-+	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-+	struct vgic_vmcr vmcr;
-+	unsigned long esr = kvm_vcpu_get_esr(vcpu);
-+	int rt = kvm_vcpu_sys_get_rt(vcpu);
-+	u32 sysreg = esr_sys64_to_sysreg(esr);
-+	u64 val;
-+
-+	if (!kvm_has_gicv3(vcpu->kvm))
-+		return false;
-+
-+	vgic_get_vmcr(vcpu, &vmcr);
-+
-+	switch (sysreg) {
-+	case SYS_ICC_DIR_EL1:
-+		if (!is_write)
-+			return false;
-+
-+		vgic_v3_deactivate(vcpu, rec->run->exit.gprs[rt]);
-+		return true;
-+	case SYS_ICC_PMR_EL1:
-+		if (is_write) {
-+			vmcr.pmr = FIELD_GET(ICC_PMR_EL1_MASK,
-+					     rec->run->exit.gprs[rt]);
-+			vgic_set_vmcr(vcpu, &vmcr);
-+			rec_restore_gicv3_vmcr_aprs(vcpu);
-+		} else {
-+			rec->run->enter.gprs[rt] = FIELD_PREP(ICC_PMR_EL1_MASK,
-+							      vmcr.pmr);
-+		}
-+
-+		return true;
-+	case SYS_ICC_CTLR_EL1:
-+		if (is_write) {
-+			val = rec->run->exit.gprs[rt];
-+			vmcr.cbpr = FIELD_GET(ICC_CTLR_EL1_CBPR_MASK, val);
-+			vmcr.eoim = FIELD_GET(ICC_CTLR_EL1_EOImode_MASK, val);
-+			vgic_set_vmcr(vcpu, &vmcr);
-+			rec_restore_gicv3_vmcr_aprs(vcpu);
-+		} else {
-+			val  = FIELD_PREP(ICC_CTLR_EL1_PRI_BITS_MASK,
-+					  vgic_cpu->num_pri_bits - 1);
-+			val |= FIELD_PREP(ICC_CTLR_EL1_ID_BITS_MASK,
-+					  vgic_cpu->num_id_bits);
-+			val |= FIELD_PREP(ICC_CTLR_EL1_SEIS_MASK,
-+					  FIELD_GET(ICH_VTR_EL2_SEIS,
-+						    kvm_vgic_global_state.ich_vtr_el2));
-+			val |= FIELD_PREP(ICC_CTLR_EL1_A3V_MASK,
-+					  FIELD_GET(ICH_VTR_EL2_A3V,
-+						    kvm_vgic_global_state.ich_vtr_el2));
-+			val |= FIELD_PREP(ICC_CTLR_EL1_CBPR_MASK,
-+					  vmcr.cbpr);
-+			val |= FIELD_PREP(ICC_CTLR_EL1_EOImode_MASK,
-+					  vmcr.eoim);
-+			rec->run->enter.gprs[rt] = val;
-+		}
-+
-+		return true;
-+	case SYS_ICC_RPR_EL1:
-+		if (is_write)
-+			return false;
-+
-+		rec->run->enter.gprs[rt] = rec_get_gicv3_active_priority(vcpu);
-+		return true;
-+	default:
-+		return false;
-+	}
-+}
-+
- static int rec_exit_sys_reg(struct kvm_vcpu *vcpu)
- {
- 	struct realm_rec *rec = &vcpu->arch.rec;
-@@ -59,6 +175,9 @@ static int rec_exit_sys_reg(struct kvm_vcpu *vcpu)
- 	if (is_write)
- 		vcpu_set_reg(vcpu, rt, rec->run->exit.gprs[rt]);
- 
-+	if (rec_exit_gicv3_sys_reg(vcpu, is_write))
-+		return 1;
-+
- 	ret = kvm_handle_sys_reg(vcpu);
- 	if (!is_write)
- 		rec->run->enter.gprs[rt] = vcpu_get_reg(vcpu, rt);
--- 
-2.43.0
-
-
+> +	return 0;
+> +}
+> +
+>  static int smmu_init_device(struct hyp_arm_smmu_v3_device *smmu)
+>  {
+>  	unsigned long haddr;
+> @@ -94,7 +176,12 @@ static int smmu_init_device(struct hyp_arm_smmu_v3_device *smmu)
+>  	if (ret)
+>  		goto out_ret;
+>  
+> +	ret = smmu_init_cmdq(smmu);
+> +	if (ret)
+> +		goto out_ret;
+> +
+>  	return 0;
+> +
+>  out_ret:
+>  	smmu_deinit_device(smmu);
+>  	return ret;
+> @@ -134,6 +221,23 @@ static int smmu_init(void)
+>  	return ret;
+>  }
+>  
+> +static void smmu_emulate_cmdq_enable(struct hyp_arm_smmu_v3_device *smmu)
+> +{
+> +	u32 shift = smmu->cmdq_host.q_base & Q_BASE_LOG2SIZE;
+> +
+> +	smmu->cmdq_host.llq.max_n_shift = min(shift, 19);
+> +	smmu->cmdq_host.base_dma = smmu->cmdq_host.q_base & Q_BASE_ADDR_MASK;
+> +	smmu->cmdq_host.base_dma &= ~(cmdq_size(&smmu->cmdq_host) - 1);
+> +	WARN_ON(smmu_share_pages(smmu->cmdq_host.base_dma,
+> +				 cmdq_size(&smmu->cmdq_host)));
+> +}
+> +
+> +static void smmu_emulate_cmdq_disable(struct hyp_arm_smmu_v3_device *smmu)
+> +{
+> +	WARN_ON(smmu_unshare_pages(smmu->cmdq_host.base_dma,
+> +				   cmdq_size(&smmu->cmdq_host)));
+> +}
+> +
+>  static bool smmu_dabt_device(struct hyp_arm_smmu_v3_device *smmu,
+>  			     struct user_pt_regs *regs,
+>  			     u64 esr, u32 off)
+> @@ -160,6 +264,14 @@ static bool smmu_dabt_device(struct hyp_arm_smmu_v3_device *smmu,
+>  		break;
+>  	/* Passthrough the register access for bisectiblity, handled later */
+>  	case ARM_SMMU_CMDQ_BASE:
+> +		if (is_write) {
+> +			/* Not allowed by the architecture */
+> +			if (is_cmdq_enabled(smmu))
+> +				break;
+> +			smmu->cmdq_host.q_base = val;
+> +		}
+> +		mask = read_write;
+> +		break;
+>  	case ARM_SMMU_CMDQ_PROD:
+>  	case ARM_SMMU_CMDQ_CONS:
+>  	case ARM_SMMU_STRTAB_BASE:
+> @@ -170,6 +282,15 @@ static bool smmu_dabt_device(struct hyp_arm_smmu_v3_device *smmu,
+>  	case ARM_SMMU_CR0:
+>  		if (len != sizeof(u32))
+>  			break;
+> +		if (is_write) {
+> +			bool last_cmdq_en = is_cmdq_enabled(smmu);
+> +
+> +			smmu->cr0 = val;
+> +			if (!last_cmdq_en && is_cmdq_enabled(smmu))
+> +				smmu_emulate_cmdq_enable(smmu);
+> +			else if (last_cmdq_en && !is_cmdq_enabled(smmu))
+> +				smmu_emulate_cmdq_disable(smmu);
+> +		}
+>  		mask = read_write;
+>  		break;
+>  	case ARM_SMMU_CR1: {
+> diff --git a/drivers/iommu/arm/arm-smmu-v3/pkvm/arm_smmu_v3.h b/drivers/iommu/arm/arm-smmu-v3/pkvm/arm_smmu_v3.h
+> index 2bda6e03c96c..74a7f62d93eb 100644
+> --- a/drivers/iommu/arm/arm-smmu-v3/pkvm/arm_smmu_v3.h
+> +++ b/drivers/iommu/arm/arm-smmu-v3/pkvm/arm_smmu_v3.h
+> @@ -8,6 +8,8 @@
+>  #include <nvhe/spinlock.h>
+>  #endif
+>  
+> +#include "../arm-smmu-v3.h"
+> +
+>  /*
+>   * Parameters from the trusted host:
+>   * @mmio_addr		base address of the SMMU registers
+> @@ -22,6 +24,9 @@
+>   * @lock		Lock to protect SMMU emulation
+>   * @hw_lock		Lock to protect SMMU HW (as CMDQ)
+>  			Order smmu.lock => host_mmu.lock => smmu.hw_lock
+> + * @cmdq		CMDQ as observed by HW
+> + * @cmdq_host		Host view of the CMDQ, only q_base and llq used.
+> + * @cr0			Last value of CR0
+>   */
+>  struct hyp_arm_smmu_v3_device {
+>  	phys_addr_t		mmio_addr;
+> @@ -38,6 +43,9 @@ struct hyp_arm_smmu_v3_device {
+>  	u32			lock;
+>  	u32			hw_lock;
+>  #endif
+> +	struct arm_smmu_queue	cmdq;
+> +	struct arm_smmu_queue	cmdq_host;
+> +	u32			cr0;
+>  };
+>  
+>  extern size_t kvm_nvhe_sym(kvm_hyp_arm_smmu_v3_count);
+> -- 
+> 2.55.0.141.g00534a21ce-goog
+> 
