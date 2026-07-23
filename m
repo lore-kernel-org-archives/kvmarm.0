@@ -1,134 +1,115 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2883646D2C7
-	for <kvmarm@lists.linux.dev>; Thu, 23 Jul 2026 12:56:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E7364A13A4
+	for <kvmarm@lists.linux.dev>; Thu, 23 Jul 2026 12:58:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784811362; cv=none; b=cokec2t/G+E9cbyynodLdXurdxKj3x8JLAI1zbBLajSgwyMD7Y5VrgxTQkFqjbRhw+h8W/h60Kljy/cIkylkeya9ZtiX7N7Pls+qiIIzHJk6WXafH3FgBbZYgohej6s26PS4ZqjpoP3dpTfcOT4K5flviTJ6Yf/I0wFMXd4PJSI=
+	t=1784811499; cv=none; b=bQpDeANCtCJe2yKnYaaQa7Fx+8Z1daduaDGRyITKBT3n70W7ao9JpWkQtSqjHWZRrgva2ZdcD/EoOH/+3BVBMO0Nw1D6GLwupzs4lL/hrCTODOch/BQMyMdJKDqf6EytsusWdIdKg+aQVr+RSKAFsK7vBng67cw9wKWj+pij/Ss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784811362; c=relaxed/simple;
-	bh=bPNgILWcVVm5+M5LyfGoYM2GAfHnz6TIHvqUd9tdJko=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=S1BM+n1a6MoYVbZaMyEP6jL9sXGFaXhL9nYOB0wfPRp1KsmQjJ/t6bOifeEMqD71BYzQkPpS3kr0N2zp2YVadh4MNHtzy5zWtVisNT2TdyzNht/Xy0dzyQpyuGca+6Gd4RocyzNqQVKFHeAlKo/iOmqhVd7SILUHxQCdyv0wHec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=gtRLWC0V; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1784811499; c=relaxed/simple;
+	bh=tS3qt0hTqrRoA8Eare5/U/grQvdhUHhuH5FDy08Szas=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KowJ+ac5cfWZxBm6YjnIcs41SXqEO5/VtjFdIjZ5zCXwwVw2d4WO+gmVCZNHyeLnNBz0UQcSZcKrgnObONwywkPSiTUgwQKlaylMPenO2GLMmMZRgz6HbaaF4NjXjnUisPOx21jRhRzqZ/vv1ZvdCeUoPeOsaZERwML3zG6HNz8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=JCu95jwu; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="gtRLWC0V"
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66N9BnLV2593650;
-	Thu, 23 Jul 2026 12:55:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=aABlAU
-	6AgKvr71w/yfvj1unG9U7ehx/fcV3KPThj+5Y=; b=gtRLWC0VZmtjXq9FazeOnW
-	+pt2E6GuiPUyC8XK79FKA6UzeLMQ3Zcx0v6RcGtBq2t+M7yx/omgkNQuXGB1+ZZP
-	1VvjeLtGEmVFhjn7lm+LhpfG95+H0HZIIj6wU7DnMbIWAri70ioauykVzIAaw1ar
-	QbG8H1pjF+TPMHnAfvo2lzarZtaQ71RAxA0h4FxHqtzo+QgCQyPss+V/L76Odn5F
-	6RxZfrSESEGUoWF8R9Ow/1GfOp3kypyewGf6ESMh0fZegKYrh0wNfaVHeXFP6JzO
-	lOv8HBKl7sgq4dXbxiw+xuGu9yWyYGV93MegyM7dIZJmBTFarKE/uB1DonkXRf+Q
-	==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fg7917jf4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 23 Jul 2026 12:55:35 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 66NCnh4Y031797;
-	Thu, 23 Jul 2026 12:55:34 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4fgm6wc973-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 23 Jul 2026 12:55:34 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 66NCtQDm38339050
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 23 Jul 2026 12:55:26 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B39FD2004E;
-	Thu, 23 Jul 2026 12:55:26 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1C52C20043;
-	Thu, 23 Jul 2026 12:55:26 +0000 (GMT)
-Received: from [9.224.77.173] (unknown [9.224.77.173])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 23 Jul 2026 12:55:26 +0000 (GMT)
-Message-ID: <8703798a-ac03-4fb9-aa0d-4d9549e310d4@linux.ibm.com>
-Date: Thu, 23 Jul 2026 14:55:25 +0200
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="JCu95jwu"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C24621595;
+	Thu, 23 Jul 2026 05:58:12 -0700 (PDT)
+Received: from J2N7QTR9R3.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BF5C93F59E;
+	Thu, 23 Jul 2026 05:58:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1784811496; bh=tS3qt0hTqrRoA8Eare5/U/grQvdhUHhuH5FDy08Szas=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JCu95jwuHdwvgEvwvBRQDHTAQhAyscg4Z8nM8CbNlXkEBNN9gvC/tjSRPEY9AmFXQ
+	 YlOHo0P+NdKWLi4XGlyaQyNr57TtZJX3FgvYYRvRnaRCalGAv6LHFycsfnB6W1ne1S
+	 ROoF87dO/gNP+odtZMxPE972Iu4paqR7pLVdgbOc=
+Date: Thu, 23 Jul 2026 13:58:11 +0100
+From: Mark Rutland <mark.rutland@arm.com>
+To: Mark Brown <broonie@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
+	Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>,
+	Fuad Tabba <tabba@google.com>, Ben Horgan <ben.horgan@arm.com>,
+	Jean-Philippe Brucker <jpb@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Eric Auger <eric.auger@redhat.com>
+Subject: Re: [PATCH v13 02/32] arm64/fpsimd: Ensure all of ZCR_EL1 is
+ initialised from idle
+Message-ID: <amIP42yILYNsNk0e@J2N7QTR9R3.cambridge.arm.com>
+References: <20260720-kvm-arm64-sme-v13-0-d9abd3ffa245@kernel.org>
+ <20260720-kvm-arm64-sme-v13-2-d9abd3ffa245@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 00/27] KVM: s390: Introduce arm64 KVM
-To: Steffen Eiden <seiden@linux.ibm.com>, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org
-Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
-        Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@kernel.org>,
-        Friedrich Welter
- <fritz@linux.ibm.com>,
-        Gautam Gala <ggala@linux.ibm.com>,
-        Hariharan Mari <hari55@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Hendrik Brueckner <brueckner@linux.ibm.com>,
-        Ilya Leoshkevich <iii@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
-        Marc Zyngier <maz@kernel.org>, Nico Boehr <nrb@linux.ibm.com>,
-        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
-        Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Vasily Gorbik
- <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>
-References: <20260706085229.979525-1-seiden@linux.ibm.com>
-Content-Language: en-US
-From: Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <20260706085229.979525-1-seiden@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 64tLpuikP21pA_DvTyWJqLJUNsEfapWn
-X-Authority-Analysis: v=2.4 cv=V6RNF+ni c=1 sm=1 tr=0 ts=6a620f47 cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=U7nrCbtTmkRpXpFmAIza:22 a=CPxsEd0Gt-L8NNlc6woA:9
- a=QEXdDO2ut3YA:10
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzIzMDEyNSBTYWx0ZWRfX0qSI/yMXVsuz
- xMq/LSxZDtTMddhl7DN1psJ+AcAh+WqPAbbZwtK8MJlerH7F490CrUyP/3W5gzNef67qarCy+UT
- 7hJ7bVLd5A/fU7XHhk6v2aKi1h+t43w=
-X-Proofpoint-GUID: 64tLpuikP21pA_DvTyWJqLJUNsEfapWn
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzIzMDEyNSBTYWx0ZWRfX6dn6+/3PTIrx
- TtZocT5pUUlNA17Ttj6BWgf5nD54egU2uBzawZrao1RPEnPrHkOQ6DriKy8WpGcsjS5t66gEB9p
- z7OKjbpA74OJfrQ8Q/+OSOGrukBnA/tRxfqCOo2p8+9oDQ3ylmgj3lVq9B00/88ksrUc+5JuqMT
- 74v9gUQQSBmvgxQ4xZT4bHHcJji+fWmk1A4/j5x+0pOSjIH/ebs9EJHciKFeURlToymALQaQnNc
- otZrVmPDIJXhu/llnmqRTyuuVR11on7YK13hLif1miFNh6Ae8K4jRCWiYPvem+Gc0jgSHO0PWE2
- TxZpRWajFvjlJAYWC9cbfi5SqZ9wl0MuZz9IztJ8iuPMVpXMBdyMA0gsm4Xl0Lg5ov3Dj/39UQQ
- rtQVoA3ojSW8hEN+VmGPQfj0nO3ugg5/HSQcmKaD9PZSFIOi7rUTy8HZTRmHkzkHG//178R+sRn
- 0a4v4+pJzVVxdPkciwg==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-07-23_03,2026-07-22_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 adultscore=0 bulkscore=0 lowpriorityscore=0 clxscore=1015
- spamscore=0 impostorscore=0 phishscore=0 priorityscore=1501 suspectscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607230125
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260720-kvm-arm64-sme-v13-2-d9abd3ffa245@kernel.org>
 
-Am 06.07.26 um 10:52 schrieb Steffen Eiden:
+On Mon, Jul 20, 2026 at 12:07:29AM +0100, Mark Brown wrote:
+> At present when exiting from idle we do not fully reinitialise ZCR_EL1,
+> we update ZCR_EL1.LEN with a read/modify/write cycle when loading task
+> state but never set any of the other bits to an explicit value.  Since
+> currently they are all architecturally RES0 or RAZ/WI this is not a
+> practical issue but it may become one if further fields are defined in
+> the register so we should explicitly configure the whole register.
+>
+> Rename the existing sme_suspend_exit() (which handles this for SME) to
+> fpsimd_suspend_exit() and add set ZCR_EL1 to 0 there, if needed LEN will
+> be updated when loading task state.
+>
+> Signed-off-by: Mark Brown <broonie@kernel.org>
 
-> KVM/s390 reorganization (patches 12-17):
->    Prepare s390 for a second KVM module. Move existing s390 KVM code into
->    dedicated s390 and gmap subdirectories to make room for a second KVM
->    implementation. Refactor gmap to better integrate with the second KVM
->    implementation.
-In the interest of making this patch set smaller, I would be willing to take
-these mechanical things in kvms390->next. Needs some review and polish but
-should be straighforward enough.
+While this happens to work today, this is a more general architecture
+problem, and I think we should cc stable such that kernels will work
+reliably on future hardware.
+
+All stable kernels support SVE, so this needs to go as far back as
+v5.10.y.
+
+One minor comment below, but with that fixed up (and a CC stable):
+
+Acked-by: Mark Rutland <mark.rutland@arm.com>
+
+> +void fpsimd_suspend_exit(void)
+>  {
+>  	u64 smcr = 0;
+>  
+> -	if (!system_supports_sme())
+> -		return;
+> +	if (system_supports_sve())
+> +		write_sysreg_s(0, SYS_ZCR_EL1);
+>  
+> -	if (system_supports_fa64())
+> -		smcr |= SMCR_ELx_FA64;
+> -	if (system_supports_sme2())
+> -		smcr |= SMCR_ELx_EZT0;
+> +	if (system_supports_sme()) {
+
+We should move the 'smcr' variable into this block. That way it's scoped
+to where it matters.
+
+> +		if (system_supports_fa64())
+> +			smcr |= SMCR_ELx_FA64;
+> +		if (system_supports_sme2())
+> +			smcr |= SMCR_ELx_EZT0;
+>  
+> -	write_sysreg_s(smcr, SYS_SMCR_EL1);
+> -	write_sysreg_s(0, SYS_SMPRI_EL1);
+> +		write_sysreg_s(smcr, SYS_SMCR_EL1);
+> +		write_sysreg_s(0, SYS_SMPRI_EL1);
+> +	}
+>  }
+
+Mark.
