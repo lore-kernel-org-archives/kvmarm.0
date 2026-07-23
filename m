@@ -1,646 +1,233 @@
-Received: from esa3.hc1455-7.c3s2.iphmx.com (esa3.hc1455-7.c3s2.iphmx.com [207.54.90.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B7063DB30C;
-	Thu, 23 Jul 2026 07:13:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.54.90.49
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784790791; cv=none; b=HIANz0hnmf3SixE8r5srS6O7sTZwq3ReS5PvChYJtEs+hFkyyj8nfFhXgLRLW/QWpK/+hjHrX0mJB1b7EIzz6obAFMYu09DGGx6wh6pfusvdaz2GDq+p9RiHNv+3WPj+HIeN2xC2Un9R5hOlSy1dNWdKZERTCMfnz1gVtxGLk7M=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784790791; c=relaxed/simple;
-	bh=OgwyKQhwj2yrQ1N6utTVNUaILuENVpOQbCuwakLg6jc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Bj2Ydm6V+zuhlEikSP55e++pLpURIshDKcFHDue4x3aYgPbZ71IjxGnhjsGQ8Nun52uHg5yWMxHXvgTaNgYXJaaeUBHS5Jb+hCVaLV4lFTUsGdpD6vQS2BJ00SWJITOESIGw2SzOEtxYZmNo5fef/02fOIbg35iUQFtgl9e4ZZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=S60XL02I; arc=none smtp.client-ip=207.54.90.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46F393D6664
+	for <kvmarm@lists.linux.dev>; Thu, 23 Jul 2026 07:20:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.179
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784791225; cv=pass; b=KvOTyDyES8vbFggDplFRKnmCNlf4WKhsxtjTXxU6PPMLE+d0JXk+jg9rjEYOn3ESolRsPf3ObTGFvTotYtj5eotZimXBvXOspF8sbgQ8AbfRYeJaaHDa18fTAtRH+26h9GjxQCk+nXIgF2JUDWt9b2NAX81ng7Q1aVkVLWM5a4Y=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784791225; c=relaxed/simple;
+	bh=8DmSXLWf2+9X1b8CEhGYj908qYlSgRmvQ6hnyQMUh0Y=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dBSRZfqDDkt271r6m3wobDewjahhiawmM+QIUI41+X4cwybqE4Ze1fb1kDQXuBSsX1GK4XVmCOqJQ9CrrnafxvYsjuFv1HmcrFWSRmeItCr+pPPnKgi+sI1QlE0NF1kUhYmsA0gbJdq3zMqIJ6ZzxS+QbiDoJDUBBotthutqVIo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=k0xlx7rR; arc=pass smtp.client-ip=209.85.160.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="S60XL02I"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
-  t=1784790790; x=1816326790;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=OgwyKQhwj2yrQ1N6utTVNUaILuENVpOQbCuwakLg6jc=;
-  b=S60XL02IqTwM6upVjg7trHLACT3qGSb6Zh0s0avNMQFUFRP/kD7LDDWM
-   O4D6hcPLZ+4A7LH6Y1pKwLuo0sLkW5levOsgr/epOJ3U69ZqXScCh/I8+
-   fJieSEx6/oHWpk+8d1RYEJkxLpL0Jrf3mdCGWPGo2Utsx7wcO27Sg4yGm
-   OZqA8Bj/Jv8wD3u3jPT+B9JDsy3fbuvniy+xV1cG3Xry708PIEqzFKxY4
-   r8egX14viDOpU+9TfYbw1YTjt42Ksk/hs30vRQ18xQG8ojwi7KH0SbYxE
-   xpi2eqSiTf10ocvZ3EDyjuohKUp5PKL4NUQHm0HLfbdLhPVbI1sabfjA7
-   w==;
-X-CSE-ConnectionGUID: Sm/HdjHZT7aDkf4hJ9Vddw==
-X-CSE-MsgGUID: rNXI2uSeQ+ynsR6WMj5SQA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11854"; a="248261618"
-X-IronPort-AV: E=Sophos;i="6.25,180,1779116400"; 
-   d="scan'208";a="248261618"
-Received: from gmgwuk01.global.fujitsu.com ([172.187.114.235])
-  by esa3.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jul 2026 16:11:59 +0900
-Received: from az2uksmgm4.o.css.fujitsu.com (unknown [10.151.22.201])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by gmgwuk01.global.fujitsu.com (Postfix) with ESMTPS id 49FEC1C1C71C;
-	Thu, 23 Jul 2026 07:11:58 +0000 (UTC)
-Received: from az2nlsmom3.fujitsu.com (unknown [10.150.26.199])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by az2uksmgm4.o.css.fujitsu.com (Postfix) with ESMTPS id F0501140060C;
-	Thu, 23 Jul 2026 07:11:57 +0000 (UTC)
-Received: from FCCLS0092175.localdomain (unknown [10.10.80.137])
-	by az2nlsmom3.fujitsu.com (Postfix) with SMTP id 52A5F10001E0;
-	Thu, 23 Jul 2026 07:11:49 +0000 (UTC)
-Date: Thu, 23 Jul 2026 16:11:42 +0900
-From: Kohei Enju <enju.kohei@fujitsu.com>
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, 
-	James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, 
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev, 
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, Gavin Shan <gshan@redhat.com>, 
-	Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun <alpergun@google.com>, 
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>, 
-	Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com, Lorenzo Pieralisi <lpieralisi@kernel.org>
-Subject: Re: [PATCH 1/6] firmware: arm_rmm: Add SMC definitions for calling
- the RMM
-Message-ID: <amG9fqaK2CZMjTjq@FCCLS0092175.localdomain>
-References: <20260715142739.80398-1-steven.price@arm.com>
- <20260715142739.80398-2-steven.price@arm.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="k0xlx7rR"
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-51c10ed63c0so107961cf.1
+        for <kvmarm@lists.linux.dev>; Thu, 23 Jul 2026 00:20:21 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1784791219; cv=none;
+        d=google.com; s=arc-20260327;
+        b=br9wL6C6ThI/BID8GMYdFhJiUlVpB7nMfKqnUMBZqakllxOEfzE7BNH/XrZlr38RFo
+         T+XtnN+ZvNAHJ1wVD1pGr00v0PRvMwmdgJBicB/0PWu9ogaUL3P+hXqiOXcqGKcbgTro
+         zbvDXltCoqhuc5yHwrWXU3wZmYnrs1Iq6W9z7vUw1zUg2427szNySv3R7NWCfJSgS9Lj
+         9ZUGvdi1mm2VcClRA4ZV8SlCushNlxjLZTJe0ZUz4bvsSOI7IxNH0UKOMGg8CP4PiSpE
+         2R1B2fbm9e1t2R9YDLXw8S3CrG4pYOQfx8lnPLxmz0O9pzC5qX/94A7osW3354zSImN2
+         42rg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=87tY0XBF0Spy12g+WsA7Jvhj0xZPDxN4sdYFmxhScf0=;
+        fh=w6EAhuZbSC//pTp9i295sDQxZIlrKvikir0lh9fXdWE=;
+        b=W8ws9W5NCMCI6WycYPQLsgLIyt+nnkezQKksMVuazh/YBJhLJnZRgrDSJIM4QzCsXs
+         ++kesFYVvNIvCETqp9rAsz5xeYVCXm9C654yAlnZbZoFr+tZ3c4w61s7+bPAvfS+Z4+n
+         obRLXsXyZX2wyZxC8uudPqCtDnLp++FbPsRuFCcp2Adp75fRAhXQB4TjHM1UsMXyTzG+
+         31tHzEsHmvoXnQQ2hAXEx3ZtnfsPkLDeSgBrINAG5XxcEZtOzuoNbRzp3TIwsv9Hmv5x
+         y7bKbTBXXZNxTnzf/YvWaJrmA1ys8JaFo/UNRi4pVzG3q7IQgjIGQHY+xi9JQXeXtaAi
+         olrQ==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1784791219; x=1785396019; darn=lists.linux.dev;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=87tY0XBF0Spy12g+WsA7Jvhj0xZPDxN4sdYFmxhScf0=;
+        b=k0xlx7rRS4QS8louIB0/0UUWnRWCJps4Zpvvwj4czwb8uXXw5N/AhrJnI4H4plZt1Y
+         A7SvxQ9rkuDZdu3nKkbSdpu8wGGJA/9g4jpb/yTIqkSC2eSAJY6+Nyb+7VVTU9EOCvWG
+         r39f8sVORauSeG/V3f71ZK1J8vv71VZQJapp7wKajXiINQPQckBK8v8+Dfiar8pTVo10
+         qZArh9p5qDscYPXAmBx1I49d8rfasbXcG2RIJv3Isd22K94jqIcRuFRzS/qG/Zg8rba7
+         11C8cpyFPEWY8Xxv+VKmGTaBGUrO0Q6LfCfSiOI3/a+a99oF+tRJ8XBdTviDTPM3N225
+         4EFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784791219; x=1785396019;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=87tY0XBF0Spy12g+WsA7Jvhj0xZPDxN4sdYFmxhScf0=;
+        b=ppaZJnbCFO4VOrq3ffvfHlbfdN933JsRQ7JVLmUNTVmgMSBtYDS+wCUFuxkD8U4+2u
+         KR9sjYfhQULP2Uy70f4ZznpTJdJdSdqWqy3IDk18qHuHa/HYbltmTcie6jpHpKglfqob
+         HlPs8Jcs5csmR825eTSgQmpEAU9RZu8Sf29Lx2eUfwD8w3UL8xziuMBN48zNEF3Wjxi2
+         Sf2AjZfJMSWEny4hJEwgV473HisoWfmHEY9cmS1x1GGgi2L5K6Dmcrlp3Y6VC1DHNiFO
+         eSLixqO5xVtkn3tIX0QSlUOWpeGrauYi800IjjTlCfyb4kfo1+J2qKJcTFWE2uPrfGLs
+         E+zA==
+X-Forwarded-Encrypted: i=1; AHgh+Rpux/M02H2RvYvXj3oiK/ubb/O4llf/VVbwXKcfGhmiVFM3swZyvDCGVaTO7KIRQfQkNq1Np1Y=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yxb0Yty56ZW1QvcfdmG/vapQ04iPMPvcYUwqYmCys4sroqYEqjr
+	y5i5QyDtPUUnRzolmG82B2u6qma6LogdysxC2ka5IgUmGVuq1wLSgYaDzYJtePJC0VlLLA5p/ip
+	sEobpDg3vL6cHQ4KLIWc+8BSyIEV6g6D6HnTcKt5g0BcDm+690zSzLGpQUYo=
+X-Gm-Gg: AR+sD13tNpqI/IiEMVchjbkRRS2Ui/CCjDzs45TRlrdALjP5kKtQh+JV0YXd1UBOSWv
+	kTMqV0675uM26xgtMUFSD+DKxunfg1PhT/02+FJ+ai8Ph9WWsUwLJ1tXle15P9LjzUvMlABr/w7
+	21NjBzkHR5X/+mOmCgaSpQiSPKVwgLi0yKvycFlgO+ySxEQpmcGYrSOrP9NlYHjYiQYbV8l2V+g
+	0Cd0LvXE6emvPTr3NiI/8vDurn5nnGJ6aAPlbkpR1ThQcNGKRsZwPzHpTxmXA==
+X-Received: by 2002:a05:622a:9006:b0:51c:7a8b:c3ff with SMTP id
+ d75a77b69052e-5283bbeb11cmr7210611cf.24.1784791218948; Thu, 23 Jul 2026
+ 00:20:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260715142739.80398-2-steven.price@arm.com>
+References: <20260720171513.1415357-1-vdonnefort@google.com>
+In-Reply-To: <20260720171513.1415357-1-vdonnefort@google.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Thu, 23 Jul 2026 08:19:41 +0100
+X-Gm-Features: AUfX_myAcHFefmBWGcQK4TCfe3jKMad7iXPD1hE8cSakhsQCWUus-2VShzvp7rI
+Message-ID: <CA+EHjTzN-68kBkOGfOqdBnRHs8HRotDuQaPACYK_N4Vw8S4ehw@mail.gmail.com>
+Subject: Re: [PATCH v3 00/17] KVM: arm64: Introduce pKVM hypervisor heap allocator
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, 
+	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com, 
+	qperret@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 07/15 15:27, Steven Price wrote:
-> The RMM (Realm Management Monitor) provides functionality that can be
-> accessed by SMC calls from the host.
-> 
-> The SMC definitions are based on DEN0137[1] version 2.0-bet2
-> 
-> [1] https://developer.arm.com/documentation/den0137/2-0bet2/
-> 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> Changes since v14:
->  * Updated to RMM spec v2.0-bet2 but without the changes to move
->    metadata out of individual address range descriptors as this is
->    expected to be reverted in a future spec release.
-> Changes since v13:
->  * Updated to RMM spec v2.0-bet1
-> Changes since v12:
->  * Updated to RMM spec v2.0-bet0
-> Changes since v9:
->  * Corrected size of 'ripas_value' in struct rec_exit. The spec states
->    this is an 8-bit type with padding afterwards (rather than a u64).
-> Changes since v8:
->  * Added RMI_PERMITTED_GICV3_HCR_BITS to define which bits the RMM
->    permits to be modified.
-> Changes since v6:
->  * Renamed REC_ENTER_xxx defines to include 'FLAG' to make it obvious
->    these are flag values.
-> Changes since v5:
->  * Sorted the SMC #defines by value.
->  * Renamed SMI_RxI_CALL to SMI_RMI_CALL since the macro is only used for
->    RMI calls.
->  * Renamed REC_GIC_NUM_LRS to REC_MAX_GIC_NUM_LRS since the actual
->    number of available list registers could be lower.
->  * Provided a define for the reserved fields of FeatureRegister0.
->  * Fix inconsistent names for padding fields.
-> Changes since v4:
->  * Update to point to final released RMM spec.
->  * Minor rearrangements.
-> Changes since v3:
->  * Update to match RMM spec v1.0-rel0-rc1.
-> Changes since v2:
->  * Fix specification link.
->  * Rename rec_entry->rec_enter to match spec.
->  * Fix size of pmu_ovf_status to match spec.
-> ---
->  include/linux/arm-smccc-rmi.h | 499 ++++++++++++++++++++++++++++++++++
->  1 file changed, 499 insertions(+)
->  create mode 100644 include/linux/arm-smccc-rmi.h
-> 
-> diff --git a/include/linux/arm-smccc-rmi.h b/include/linux/arm-smccc-rmi.h
-> new file mode 100644
-> index 000000000000..c965e8867518
-> --- /dev/null
-> +++ b/include/linux/arm-smccc-rmi.h
-> @@ -0,0 +1,499 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * Copyright (C) 2023-2026 ARM Ltd.
-> + *
-> + * The values and structures in this file are from the Realm Management Monitor
-> + * specification (DEN0137) version 2.0-bet2:
-> + * https://developer.arm.com/documentation/den0137/2-0bet2/
-> + */
-> +
-> +#ifndef __LINUX_ARM_SMCCC_RMI_H_
-> +#define __LINUX_ARM_SMCCC_RMI_H_
-> +
-> +#include <linux/arm-smccc.h>
-> +#include <linux/bitfield.h>
-> +#include <linux/bits.h>
-> +#include <linux/build_bug.h>
-> +#include <linux/sizes.h>
-> +
-> +#include <asm/page.h>
-> +#include <asm/sysreg.h>
-> +
-> +#define SMC_RMI_CALL(func)				\
-> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,		\
-> +			   ARM_SMCCC_SMC_64,		\
-> +			   ARM_SMCCC_OWNER_STANDARD,	\
-> +			   (func))
-> +
-> +#define SMC_RMI_VERSION				SMC_RMI_CALL(0x0150)
-> +
-> +#define SMC_RMI_RTT_DATA_MAP_INIT		SMC_RMI_CALL(0x0153)
-> +
-> +#define SMC_RMI_REALM_ACTIVATE			SMC_RMI_CALL(0x0157)
-> +#define SMC_RMI_REALM_CREATE			SMC_RMI_CALL(0x0158)
-> +#define SMC_RMI_REALM_DESTROY			SMC_RMI_CALL(0x0159)
-> +#define SMC_RMI_REC_CREATE			SMC_RMI_CALL(0x015a)
-> +#define SMC_RMI_REC_DESTROY			SMC_RMI_CALL(0x015b)
-> +#define SMC_RMI_REC_ENTER			SMC_RMI_CALL(0x015c)
-> +#define SMC_RMI_RTT_CREATE			SMC_RMI_CALL(0x015d)
-> +#define SMC_RMI_RTT_DESTROY			SMC_RMI_CALL(0x015e)
-> +
-> +#define SMC_RMI_RTT_READ_ENTRY			SMC_RMI_CALL(0x0161)
-> +
-> +#define SMC_RMI_RTT_DEV_VALIDATE		SMC_RMI_CALL(0x0163)
-> +#define SMC_RMI_PSCI_COMPLETE			SMC_RMI_CALL(0x0164)
-> +#define SMC_RMI_FEATURES			SMC_RMI_CALL(0x0165)
-> +#define SMC_RMI_RTT_FOLD			SMC_RMI_CALL(0x0166)
-> +
-> +#define SMC_RMI_RTT_INIT_RIPAS			SMC_RMI_CALL(0x0168)
-> +#define SMC_RMI_RTT_SET_RIPAS			SMC_RMI_CALL(0x0169)
-> +#define SMC_RMI_VSMMU_CREATE			SMC_RMI_CALL(0x016a)
-> +#define SMC_RMI_VSMMU_DESTROY			SMC_RMI_CALL(0x016b)
-> +
-> +#define SMC_RMI_RMM_CONFIG_SET			SMC_RMI_CALL(0x016e)
-> +#define SMC_RMI_PSMMU_IRQ_NOTIFY		SMC_RMI_CALL(0x016f)
-> +#define SMC_RMI_ATTEST_PLAT_TOKEN_REFRESH	SMC_RMI_CALL(0x0170)
-> +
-> +#define SMC_RMI_PDEV_ABORT			SMC_RMI_CALL(0x0174)
-> +#define SMC_RMI_PDEV_COMMUNICATE		SMC_RMI_CALL(0x0175)
-> +#define SMC_RMI_PDEV_CREATE			SMC_RMI_CALL(0x0176)
-> +#define SMC_RMI_PDEV_DESTROY			SMC_RMI_CALL(0x0177)
-> +#define SMC_RMI_PDEV_GET_STATE			SMC_RMI_CALL(0x0178)
-> +
-> +#define SMC_RMI_PDEV_STREAM_KEY_REFRESH		SMC_RMI_CALL(0x017a)
-> +#define SMC_RMI_PDEV_SET_PUBKEY			SMC_RMI_CALL(0x017b)
-> +#define SMC_RMI_PDEV_STOP			SMC_RMI_CALL(0x017c)
-> +#define SMC_RMI_RTT_AUX_CREATE			SMC_RMI_CALL(0x017d)
-> +#define SMC_RMI_RTT_AUX_DESTROY			SMC_RMI_CALL(0x017e)
-> +#define SMC_RMI_RTT_AUX_FOLD			SMC_RMI_CALL(0x017f)
-> +
-> +#define SMC_RMI_VDEV_ABORT			SMC_RMI_CALL(0x0185)
-> +#define SMC_RMI_VDEV_COMMUNICATE		SMC_RMI_CALL(0x0186)
-> +#define SMC_RMI_VDEV_CREATE			SMC_RMI_CALL(0x0187)
-> +#define SMC_RMI_VDEV_DESTROY			SMC_RMI_CALL(0x0188)
-> +#define SMC_RMI_VDEV_GET_STATE			SMC_RMI_CALL(0x0189)
-> +#define SMC_RMI_VDEV_UNLOCK			SMC_RMI_CALL(0x018a)
-> +#define SMC_RMI_RTT_SET_S2AP			SMC_RMI_CALL(0x018b)
-> +
-> +#define SMC_RMI_VDEV_GET_INTERFACE_REPORT	SMC_RMI_CALL(0x01d0)
-> +#define SMC_RMI_VDEV_GET_MEASUREMENTS		SMC_RMI_CALL(0x01d1)
-> +#define SMC_RMI_VDEV_LOCK			SMC_RMI_CALL(0x01d2)
-> +#define SMC_RMI_VDEV_START			SMC_RMI_CALL(0x01d3)
-> +#define SMC_RMI_VDEV_P2P_BIND			SMC_RMI_CALL(0x01d4)
-> +#define SMC_RMI_VDEV_P2P_UNBIND			SMC_RMI_CALL(0x01d5)
-> +#define SMC_RMI_VSMMU_EVENT_HANDLE		SMC_RMI_CALL(0x01d6)
-> +#define SMC_RMI_PSMMU_ACTIVATE			SMC_RMI_CALL(0x01d7)
-> +#define SMC_RMI_PSMMU_DEACTIVATE		SMC_RMI_CALL(0x01d8)
-> +
-> +#define SMC_RMI_PSMMU_ST_L2_CREATE		SMC_RMI_CALL(0x01db)
-> +#define SMC_RMI_PSMMU_ST_L2_DESTROY		SMC_RMI_CALL(0x01dc)
-> +#define SMC_RMI_DPT_L0_CREATE			SMC_RMI_CALL(0x01dd)
-> +#define SMC_RMI_DPT_L0_DESTROY			SMC_RMI_CALL(0x01de)
-> +#define SMC_RMI_DPT_L1_CREATE			SMC_RMI_CALL(0x01df)
-> +#define SMC_RMI_DPT_L1_DESTROY			SMC_RMI_CALL(0x01e0)
-> +#define SMC_RMI_GRANULE_TRACKING_GET		SMC_RMI_CALL(0x01e1)
-> +
-> +#define SMC_RMI_GRANULE_TRACKING_SET		SMC_RMI_CALL(0x01e3)
-> +#define SMC_RMI_CMEM_ADD_PDEV			SMC_RMI_CALL(0x01e4)
-> +#define SMC_RMI_CMEM_CREATE			SMC_RMI_CALL(0x01e5)
-> +#define SMC_RMI_CMEM_DESTROY			SMC_RMI_CALL(0x01e6)
-> +#define SMC_RMI_CMEM_POPULATE			SMC_RMI_CALL(0x01e7)
-> +#define SMC_RMI_CMEM_REMOVE_PDEV		SMC_RMI_CALL(0x01e8)
-> +#define SMC_RMI_CMEM_START			SMC_RMI_CALL(0x01e9)
-> +#define SMC_RMI_CMEM_STOP			SMC_RMI_CALL(0x01ea)
-> +#define SMC_RMI_CMEM_UNPOPULATE			SMC_RMI_CALL(0x01eb)
-> +#define SMC_RMI_RMM_CONFIG_GET			SMC_RMI_CALL(0x01ec)
-> +#define SMC_RMI_PDEV_MEC_REFRESH		SMC_RMI_CALL(0x01ed)
-> +#define SMC_RMI_RMM_STATE_GET			SMC_RMI_CALL(0x01ee)
-> +
-> +#define SMC_RMI_PSMMU_EVENT_CONSUME		SMC_RMI_CALL(0x01f0)
-> +#define SMC_RMI_GRANULE_RANGE_DELEGATE		SMC_RMI_CALL(0x01f1)
-> +#define SMC_RMI_GRANULE_RANGE_UNDELEGATE	SMC_RMI_CALL(0x01f2)
-> +#define SMC_RMI_GPT_L1_CREATE			SMC_RMI_CALL(0x01f3)
-> +#define SMC_RMI_GPT_L1_DESTROY			SMC_RMI_CALL(0x01f4)
-> +#define SMC_RMI_RTT_DATA_MAP			SMC_RMI_CALL(0x01f5)
-> +#define SMC_RMI_RTT_DATA_UNMAP			SMC_RMI_CALL(0x01f6)
-> +#define SMC_RMI_RTT_DEV_MAP			SMC_RMI_CALL(0x01f7)
-> +#define SMC_RMI_RTT_DEV_UNMAP			SMC_RMI_CALL(0x01f8)
-> +#define SMC_RMI_RTT_ARCH_DEV_MAP		SMC_RMI_CALL(0x01f9)
-> +#define SMC_RMI_RTT_ARCH_DEV_UNMAP		SMC_RMI_CALL(0x01fa)
-> +#define SMC_RMI_RTT_UNPROT_MAP			SMC_RMI_CALL(0x01fb)
-> +#define SMC_RMI_RTT_UNPROT_UNMAP		SMC_RMI_CALL(0x01fc)
-> +#define SMC_RMI_RTT_AUX_PROT_MAP		SMC_RMI_CALL(0x01fd)
-> +#define SMC_RMI_RTT_AUX_PROT_UNMAP		SMC_RMI_CALL(0x01fe)
-> +#define SMC_RMI_RTT_AUX_UNPROT_MAP		SMC_RMI_CALL(0x01ff)
-> +#define SMC_RMI_RTT_AUX_UNPROT_UNMAP		SMC_RMI_CALL(0x0200)
-> +#define SMC_RMI_REALM_TERMINATE			SMC_RMI_CALL(0x0201)
-> +#define SMC_RMI_RMM_ACTIVATE			SMC_RMI_CALL(0x0202)
-> +#define SMC_RMI_OP_CONTINUE			SMC_RMI_CALL(0x0203)
-> +#define SMC_RMI_PDEV_STREAM_CONNECT		SMC_RMI_CALL(0x0204)
-> +#define SMC_RMI_PDEV_STREAM_DISCONNECT		SMC_RMI_CALL(0x0205)
-> +#define SMC_RMI_PDEV_STREAM_COMPLETE		SMC_RMI_CALL(0x0206)
-> +#define SMC_RMI_PDEV_STREAM_KEY_PURGE		SMC_RMI_CALL(0x0207)
-> +#define SMC_RMI_OP_MEM_DONATE			SMC_RMI_CALL(0x0208)
-> +#define SMC_RMI_OP_MEM_RECLAIM			SMC_RMI_CALL(0x0209)
-> +#define SMC_RMI_OP_CANCEL			SMC_RMI_CALL(0x020a)
-> +#define SMC_RMI_VSMMU_FEATURES			SMC_RMI_CALL(0x020b)
-> +#define SMC_RMI_VSMMU_CMD_GET			SMC_RMI_CALL(0x020c)
-> +#define SMC_RMI_VSMMU_CMD_COMPLETE		SMC_RMI_CALL(0x020d)
-> +#define SMC_RMI_PSMMU_INFO			SMC_RMI_CALL(0x020e)
-> +
-> +#define RMI_ABI_MAJOR_VERSION	2
-> +#define RMI_ABI_MINOR_VERSION	0
-> +
-> +#define RMI_ABI_VERSION_GET_MAJOR(version) ((version) >> 16)
-> +#define RMI_ABI_VERSION_GET_MINOR(version) ((version) & 0xFFFF)
-> +#define RMI_ABI_VERSION(major, minor)      (((major) << 16) | (minor))
-> +
-> +#define RMI_RETURN_STATUS_MASK		(0xFFUL)
-> +#define RMI_RETURN_INDEX_MASK		(0xFFUL << 8)
-> +#define RMI_RETURN_MEMREQ_MASK		(0x3UL << 8)
-> +#define RMI_RETURN_CAN_CANCEL_MASK	(0x1UL << 10)
-> +
-> +#define RMI_RETURN_STATUS(ret)		FIELD_GET(RMI_RETURN_STATUS_MASK, ret)
-> +#define RMI_RETURN_INDEX(ret)		FIELD_GET(RMI_RETURN_INDEX_MASK, ret)
-> +#define RMI_RETURN_MEMREQ(ret)		FIELD_GET(RMI_RETURN_MEMREQ_MASK, ret)
-> +#define RMI_RETURN_CAN_CANCEL(ret)	FIELD_GET(RMI_RETURN_CAN_CANCEL_MASK, ret)
-> +
-> +#define RMI_SUCCESS			0
-> +#define RMI_ERROR_INPUT			1
-> +#define RMI_ERROR_REALM			2
-> +#define RMI_ERROR_REC			3
-> +#define RMI_ERROR_RTT			4
-> +#define RMI_ERROR_NOT_SUPPORTED		5
-> +#define RMI_ERROR_DEVICE		6
-> +#define RMI_ERROR_RTT_AUX		7
-> +#define RMI_ERROR_PSMMU_ST		8
-> +#define RMI_ERROR_DPT			9
-> +#define RMI_BUSY			10
-> +#define RMI_ERROR_GLOBAL		11
-> +#define RMI_ERROR_TRACKING		12
-> +#define RMI_INCOMPLETE			13
-> +#define RMI_BLOCKED			14
-> +#define RMI_ERROR_GPT			15
-> +#define RMI_ERROR_GRANULE		16
-> +
-> +#define RMI_CONTINUE_KEEP_GOING		0
-> +#define RMI_CONTINUE_STOP		1
-> +
-> +#define RMI_OP_MEM_REQ_NONE		0
-> +#define RMI_OP_MEM_REQ_DONATE		1
-> +#define RMI_OP_MEM_REQ_RECLAIM		2
-> +
-> +#define RMI_DONATE_SIZE_MASK		3UL
-> +#define RMI_DONATE_COUNT_MASK		GENMASK(15, 2)
-> +#define RMI_DONATE_CONTIG_MASK		BIT(16)
-> +#define RMI_DONATE_STATE_MASK		BIT(17)
-> +
-> +#define RMI_DONATE_SIZE(req)		FIELD_GET(RMI_DONATE_SIZE_MASK, req)
-> +#define RMI_DONATE_COUNT(req)		FIELD_GET(RMI_DONATE_COUNT_MASK, req)
-> +#define RMI_DONATE_CONTIG(req)		FIELD_GET(RMI_DONATE_CONTIG_MASK, req)
-> +#define RMI_DONATE_STATE(req)		FIELD_GET(RMI_DONATE_STATE_MASK, req)
-> +
-> +#define RMI_OP_MEM_DELEGATED		0
-> +#define RMI_OP_MEM_UNDELEGATED		1
-> +
-> +#define RMI_ADDR_TYPE_NONE		0
-> +#define RMI_ADDR_TYPE_SINGLE		1
-> +#define RMI_ADDR_TYPE_LIST		2
-> +
-> +#define RMI_ADDR_RANGE_SIZE_MASK	GENMASK(1, 0)
-> +#define RMI_ADDR_RANGE_COUNT_MASK	GENMASK(PAGE_SHIFT - 1, 2)
-> +#define RMI_ADDR_RANGE_ADDR_MASK	(PAGE_MASK & GENMASK(51, 0))
-> +#define RMI_ADDR_RANGE_STATE_MASK	BIT(63)
-> +
-> +#define RMI_ADDR_RANGE_SIZE(ar)		(FIELD_GET(RMI_ADDR_RANGE_SIZE_MASK, \
-> +						   (ar)))
-> +#define RMI_ADDR_RANGE_COUNT(ar)	(FIELD_GET(RMI_ADDR_RANGE_COUNT_MASK, \
-> +						   (ar)))
-> +#define RMI_ADDR_RANGE_ADDR(ar)		((ar) & RMI_ADDR_RANGE_ADDR_MASK)
-> +#define RMI_ADDR_RANGE_STATE(ar)	(FIELD_GET(RMI_ADDR_RANGE_STATE_MASK, \
-> +						   (ar)))
-> +
-> +enum rmi_ripas {
-> +	RMI_EMPTY = 0,
-> +	RMI_RAM = 1,
-> +	RMI_DESTROYED = 2,
-> +	RMI_DEV = 3,
-> +};
-> +
-> +#define RMI_NO_MEASURE_CONTENT	0
-> +#define RMI_MEASURE_CONTENT	1
-> +
-> +#define RMI_FEATURE_REGISTER_0_S2SZ		GENMASK(7, 0)
-> +#define RMI_FEATURE_REGISTER_0_LPA2		BIT(8)
-> +#define RMI_FEATURE_REGISTER_0_SVE		BIT(9)
-> +#define RMI_FEATURE_REGISTER_0_SVE_VL		GENMASK(13, 10)
-> +#define RMI_FEATURE_REGISTER_0_NUM_BPS		GENMASK(19, 14)
-> +#define RMI_FEATURE_REGISTER_0_NUM_WPS		GENMASK(25, 20)
-> +#define RMI_FEATURE_REGISTER_0_PMU		BIT(26)
-> +#define RMI_FEATURE_REGISTER_0_PMU_NUM_CTRS	GENMASK(31, 27)
-> +
-> +#define RMI_FEATURE_REGISTER_1_RMI_GRAN_SZ_4KB	BIT(0)
-> +#define RMI_FEATURE_REGISTER_1_RMI_GRAN_SZ_16KB	BIT(1)
-> +#define RMI_FEATURE_REGISTER_1_RMI_GRAN_SZ_64KB	BIT(2)
-> +#define RMI_FEATURE_REGISTER_1_HASH_SHA_256	BIT(3)
-> +#define RMI_FEATURE_REGISTER_1_HASH_SHA_384	BIT(4)
-> +#define RMI_FEATURE_REGISTER_1_HASH_SHA_512	BIT(5)
-> +#define RMI_FEATURE_REGISTER_1_MAX_RECS_ORDER	GENMASK(9, 6)
-> +#define RMI_FEATURE_REGISTER_1_L0GPTSZ		GENMASK(13, 10)
-> +#define RMI_FEATURE_REGISTER_1_PPS		GENMASK(16, 14)
-> +
-> +#define RMI_FEATURE_REGISTER_2_DA		BIT(0)
-> +#define RMI_FEATURE_REGISTER_2_DA_COH		BIT(1)
-> +#define RMI_FEATURE_REGISTER_2_VSMMU		BIT(2)
-> +#define RMI_FEATURE_REGISTER_2_ATS		BIT(3)
-> +#define RMI_FEATURE_REGISTER_2_MAX_VDEVS_ORDER	GENMASK(7, 4)
-> +#define RMI_FEATURE_REGISTER_2_VDEV_KROU	BIT(8)
-> +#define RMI_FEATURE_REGISTER_2_NON_TEE_STREAM	BIT(9)
-> +#define RMI_FEATURE_REGISTER_2_P2P		BIT(10)
-> +#define RMI_FEATURE_REGISTER_2_CMEM_CXL		BIT(11)
-> +#define RMI_FEATURE_REGISTER_2_MAX_CMEM		GENMASK(19, 12)
-> +#define RMI_FEATURE_REGISTER_2_CMEM_TSE_REQ	BIT(20)
-> +
-> +#define RMI_FEATURE_REGISTER_3_MAX_NUM_AUX_PLANES	GENMASK(3, 0)
-> +#define RMI_FEATURE_REGISTER_3_RTT_PLANE		GENMASK(5, 4)
-> +#define RMI_FEATURE_REGISTER_3_RTT_S2AP_INDIRECT	BIT(6)
-> +
-> +#define RMI_FEATURE_REGISTER_4_MEC_COUNT		GENMASK(63, 0)
-> +
-> +#define RMI_MEM_CATEGORY_CONVENTIONAL		0
-> +#define RMI_MEM_CATEGORY_DEV_NCOH		1
-> +#define RMI_MEM_CATEGORY_DEV_COH		2
-> +
-> +#define RMI_TRACKING_RESERVED			0
-> +#define RMI_TRACKING_NONE			1
-> +#define RMI_TRACKING_FINE			2
-> +#define RMI_TRACKING_COARSE			3
-> +
-> +#define RMI_GRANULE_SIZE_4KB	0
-> +#define RMI_GRANULE_SIZE_16KB	1
-> +#define RMI_GRANULE_SIZE_64KB	2
-> +
-> +/*
-> + * Note many of these fields are smaller than u64 but all fields have u64
-> + * alignment, so use u64 to ensure correct alignment.
-> + */
-> +struct rmm_config {
-> +	union { /* 0x0 */
-> +		struct {
-> +			u64 tracking_region_size;
-> +			u64 rmi_granule_size;
-> +		};
-> +		u8 sizer[SZ_4K];
-> +	};
-> +};
-> +
-> +static_assert(sizeof(struct rmm_config) == SZ_4K);
-> +
-> +#define RMI_REALM_PARAM_FLAG_LPA2		BIT(0)
-> +#define RMI_REALM_PARAM_FLAG_SVE		BIT(1)
-> +#define RMI_REALM_PARAM_FLAG_PMU		BIT(2)
-> +#define RMI_REALM_PARAM_FLAG_DA			BIT(3)
-> +#define RMI_REALM_PARAM_FLAG_LFA_POLICY		GENMASK(6, 5)
-> +#define RMI_REALM_PARAM_FLAG_MEC_POLICY		GENMASK(8, 7)
-> +
-> +#define RMI_HASH_SHA_256			0
-> +#define RMI_HASH_SHA_512			1
-> +#define RMI_HASH_SHA_384			2
-> +
-> +struct realm_params {
-> +	union { /* 0x0 */
-> +		struct {
-> +			u64 flags0;
-> +			u64 s2sz;
-> +			u64 sve_vl;
-> +			u64 num_bps;
-> +			u64 num_wps;
-> +			u64 pmu_num_ctrs;
-> +			u64 hash_algo;
-> +			u64 num_aux_planes;
-> +		};
-> +		u8 padding0[0x400];
-> +	};
-> +	union { /* 0x400 */
-> +		struct {
-> +			u8 rpv[64];
-> +			u64 ats_plane;
-> +		};
-> +		u8 padding1[0x400];
-> +	};
-> +	union { /* 0x800 */
-> +		struct {
-> +			u64 padding;
-> +			u64 rtt_base;
-> +			s64 rtt_level_start;
-> +			u64 rtt_num_start;
-> +			u64 flags1;
-> +			u64 aux_rtt_base[3];
-> +		};
-> +		u8 padding2[0x800];
-> +	};
-> +};
-> +
-> +static_assert(sizeof(struct realm_params) == SZ_4K);
-> +
-> +/*
-> + * The number of GPRs (starting from X0) that are
-> + * configured by the host when a REC is created.
-> + */
-> +#define REC_CREATE_NR_GPRS		8
-> +
-> +#define REC_PARAMS_FLAG_RUNNABLE	BIT_ULL(0)
-> +
-> +struct rec_params {
-> +	union { /* 0x0 */
-> +		u64 flags;
-> +		u8 padding0[0x100];
-> +	};
-> +	union { /* 0x100 */
-> +		u64 mpidr;
-> +		u8 padding1[0x100];
-> +	};
-> +	union { /* 0x200 */
-> +		u64 pc;
-> +		u8 padding2[0x100];
-> +	};
-> +	union { /* 0x300 */
-> +		u64 gprs[REC_CREATE_NR_GPRS];
-> +		u8 padding3[0xd00];
-> +	};
-> +};
-> +
-> +static_assert(sizeof(struct rec_params) == SZ_4K);
-> +
-> +#define REC_ENTER_FLAG_EMULATED_MMIO	BIT(0)
-> +#define REC_ENTER_FLAG_INJECT_SEA	BIT(1)
-> +#define REC_ENTER_FLAG_TRAP_WFI		BIT(2)
-> +#define REC_ENTER_FLAG_TRAP_WFE		BIT(3)
-> +#define REC_ENTER_FLAG_RIPAS_RESPONSE	BIT(4)
-> +#define REC_ENTER_FLAG_S2AP_RESPONSE	BIT(5)
-> +#define REC_ENTER_FLAG_DEV_MEM_RESPONSE	BIT(6)
-> +#define REC_ENTER_FLAG_FORCE_P0		BIT(7)
-> +
-> +#define REC_RUN_GPRS			31
-> +#define REC_MAX_GIC_NUM_LRS		16
-> +
-> +#define RMI_PERMITTED_GICV3_HCR_BITS	(ICH_HCR_EL2_UIE |		\
-> +					 ICH_HCR_EL2_LRENPIE |		\
-> +					 ICH_HCR_EL2_NPIE |		\
-> +					 ICH_HCR_EL2_VGrp0EIE |		\
-> +					 ICH_HCR_EL2_VGrp0DIE |		\
-> +					 ICH_HCR_EL2_VGrp1EIE |		\
-> +					 ICH_HCR_EL2_VGrp1DIE |		\
-> +					 ICH_HCR_EL2_TDIR)
+Tested on QEMU: npVM/pVM boots, the in-hyp allocator selftest, and
+hyp-trace buffer load; allocator top-up path confirmed via the
+kvm_handle_pkvm_hyp_req tracepoint (HYP_ALLOC).
 
-nit:
-Is this a leftover from the RMM v1.0 support?
-It's unused now, and I don't think it'll be needed with the RMM v2.0
-interface.
+Tested-by: Fuad Tabba < fuad.tabba@linux.dev>
 
-> +
-> +struct rec_enter {
-> +	union { /* 0x000 */
-> +		u64 flags;
-> +		u8 padding0[0x200];
-> +	};
-> +	union { /* 0x200 */
-> +		u64 gprs[REC_RUN_GPRS];
-> +		u8 padding1[0x100];
-> +	};
-> +	u8 padding3[0x500];
-> +};
-> +
-> +static_assert(sizeof(struct rec_enter) == SZ_2K);
-> +
-> +#define RMI_EXIT_SYNC			0x00
-> +#define RMI_EXIT_IRQ			0x01
-> +#define RMI_EXIT_FIQ			0x02
-> +#define RMI_EXIT_PSCI			0x03
-> +#define RMI_EXIT_RIPAS_CHANGE		0x04
-> +#define RMI_EXIT_HOST_CALL		0x05
-> +#define RMI_EXIT_SERROR			0x06
-> +#define RMI_EXIT_S2AP_CHANGE		0x07
-> +#define RMI_EXIT_VDEV_VALIDATE_MAPPING	0x08
-> +#define RMI_EXIT_VSMMU_COMMAND		0x0a
-> +#define RMI_EXIT_VDEV_P2P_BINDING	0x0b
-> +
-> +struct rec_exit {
-> +	union { /* 0x000 */
-> +		u8 exit_reason;
-> +		u8 padding0[0x100];
-> +	};
-> +	union { /* 0x100 */
-> +		struct {
-> +			u64 esr;
-> +			u64 far;
-> +			u64 hpfar;
-> +			u64 rtt_tree;
-> +		};
-> +		u8 padding1[0x100];
-> +	};
-> +	union { /* 0x200 */
-> +		u64 gprs[REC_RUN_GPRS];
-> +		u8 padding2[0x100];
-> +	};
-> +	union { /* 0x300 */
-> +		u8 padding3[0x100];
-> +	};
-> +	union { /* 0x400 */
-> +		struct {
-> +			u64 cntp_ctl;
-> +			u64 cntp_cval;
-> +			u64 cntv_ctl;
-> +			u64 cntv_cval;
-> +		};
-> +		u8 padding4[0x100];
-> +	};
-> +	union { /* 0x500 */
-> +		struct {
-> +			u64 ripas_base;
-> +			u64 ripas_top;
-> +			u8 ripas_value;
-> +			u8 padding8[15];
-> +			u64 s2ap_base;
-> +			u64 s2ap_top;
-> +			u64 vdev_id_1;
-> +			u64 vdev_id_2;
-> +			u64 dev_mem_base;
-> +			u64 dev_mem_top;
-> +			u64 dev_mem_pa;
-> +		};
-> +		u8 padding5[0x100];
-> +	};
-> +	union { /* 0x600 */
-> +		struct {
-> +			u16 imm;
-> +			u16 padding9;
-> +			u64 plane;
-> +		};
-> +		u8 padding6[0x100];
-> +	};
-> +	union { /* 0x700 */
-> +		struct {
-> +			u8 pmu_ovf_status;
-> +			u8 padding10[15];
-> +			u64 vsmmu;
-> +		};
-> +		u8 padding7[0x100];
-> +	};
-> +};
-> +
-> +static_assert(sizeof(struct rec_exit) == SZ_2K);
-> +
-> +struct rec_run {
-> +	struct rec_enter enter;
-> +	struct rec_exit exit;
-> +};
-> +
-> +static_assert(sizeof(struct rec_run) == SZ_4K);
-> +
-> +/* RMI_RTT_UNPROT_MAP_FLAGS definitions */
-> +#define RMI_RTT_UNPROT_MAP_FLAGS_OADDR_TYPE	GENMASK(1, 0)
-> +#define RMI_RTT_UNPROT_MAP_FLAGS_LIST_COUNT	GENMASK(15, 2)
-> +#define RMI_RTT_UNPROT_MAP_FLAGS_MEMATTR	GENMASK(18, 16)
-> +#define RMI_RTT_UNPROT_MAP_FLAGS_S2AP		GENMASK(22, 19)
-> +
-> +/* RMI_RTT_DATA_MAP_FLAGS definitions */
-> +#define RMI_RTT_PROT_MAP_FLAGS_OADDR_TYPE	GENMASK(1, 0)
-> +#define RMI_RTT_PROT_MAP_FLAGS_LIST_COUNT	GENMASK(15, 2)
-> +
-> +/* S2AP Direct Encodings, used in RMI_RTT_UNPROT_MAP_FLAGS_S2AP */
-> +#define RMI_S2AP_DIRECT_WRITE			BIT(0)
-> +#define RMI_S2AP_DIRECT_READ			BIT(1)
-> +
-> +#endif /* __LINUX_ARM_SMCCC_RMI_H_ */
-> -- 
-> 2.43.0
-> 
-> 
+Cheers,
+/fuad
+
+On Mon, 20 Jul 2026 at 18:15, Vincent Donnefort <vdonnefort@google.com> wrote:
+>
+> pKVM historically lacked a dynamic memory allocator: all hypervisor-side
+> VM and VCPU structures had to be sized on the host, allocated as
+> contiguous pages and donated to the hypervisor.
+>
+> This design tightly coupled the hypervisor's memory footprint to
+> host-side constraints, complicated memory reclaim, and severely
+> restricted VM scalability.
+>
+> This patch series introduces a dynamically-mapped custom heap allocator
+> (hyp_allocator) to the pKVM hypervisor. The initial users are the
+> pkvm_hyp_vm and pkvm_hyp_vcpu structs, and the hypervisor tracing
+> metadata.
+>
+> In the near future, this heap allocator is expected to be leveraged to
+> support SVE in protected VMs and in the distant future, it will also
+> support dynamic device assignment.
+>
+> By moving to a hypervisor-managed dynamic allocator, we also allow
+> deduplicating the donation/reclaim path of EL2-private structures.
+>
+> The main building blocks for this series are:
+>
+> 1. pkvm_hyp_req:
+> ----------------
+> When the hypervisor heap allocator goes out of memory (-ENOMEM), it
+> suspends the hypercall, embeds a PKVM_HYP_REQ_HYP_ALLOC top-up request
+> into the SMCCC HVC return registers, and exits back to the host.
+>
+> This building block will also be useful for the future huge-mapping
+> support in protected guests, allowing EL2 to raise requests such as
+> block splitting back to the host.
+>
+> 2. hyp_allocator:
+> ----------------
+> This heap allocator manages a reserved VA space range, dynamically
+> mapping and unmapping physical pages on-demand to minimise the pKVM
+> hypervisor footprint. As memory is reclaimed and relinquished to the
+> host, unmapped holes are introduced within the VA space. To prevent
+> orphan mapped regions, neighboring unused chunks cannot be merged if
+> they are separated by an unmapped region.
+>
+> The allocator chunk metadata is stored directly into the VA space range.
+> To minimize metadata overhead, chunks only link to each other via a
+> relative 32-bit offset.
+>
+> A simple hardening of the metadata is added via a simple 32-bit hash.
+>
+> 3. shrinker:
+> ------------
+> As the heap allocator isn't reclaimed actively on VM or tracing
+> teardown, a shrinker is added to allow the host to reclaim unused memory
+> from the hypervisor when the host is under heavy memory pressure.
+>
+> v2 -> v3:
+>   - Remove unsafe WARN_ON(hyp_spin_is_locked(&pkvm_pgd_lock)) check in hyp_allocator_alloc() (Sashiko)
+>   - Modify MIN_ALLOC_SIZE to 16-bytes to comply with FPSIMD alignment requirements (Sashiko)
+>   - Allow hyp topup/reclaim HVCs pre-deprivilege
+>   - Add enum symbols to pkvm_hyp_req_handle event (Fuad)
+>   - Various clarification in commit descriptions (Fuad)
+>   - Restore unmap_donated_memory() for PGD on error path (Fuad)
+>   - Renamed __hyp_allocator_map -> pkvm_map_private_va_range (Fuad)
+>   - Collected Fuad's Reviewed-by tags
+>   - Rebased on 7.2-rc4
+>
+> v1 -> v2:
+>   - Rebased series on 7.2-rc2.
+>   - Use scope-based hyp_spinlock.
+>   - Fix best_missing/best_data_size priority in hyp_allocator_find_efficient_chunk() (Sashiko)
+>   - Fix missing free_hyp_memcache() in pkvm_hyp_topup() (Sashiko)
+>   - Fix unused selftest_init() warning when !CONFIG_NVHE_EL2_DEBUG (Sashiko)
+>   - Fix missing shrinker_free() in teardown_hyp_mode() (Sashiko)
+>
+> v1: https://lore.kernel.org/r/20260520152650.4107895-1-vdonnefort@google.com
+>
+> Vincent Donnefort (17):
+>   KVM: arm64: Add pkvm_private_va_range_pa
+>   KVM: arm64: Add pkvm_remove_mappings
+>   KVM: arm64: Add pkvm_map_private_va_range
+>   KVM: arm64: Add a heap allocator for the pKVM hyp
+>   KVM: arm64: Allow kvm_hyp_memcache usage outside of stage-2
+>   KVM: arm64: Add pkvm_hyp_req infrastructure
+>   KVM: arm64: Add PKVM_HYP_REQ_HYP_ALLOC request
+>   KVM: arm64: Add reclaim interface for the pKVM heap alloc
+>   KVM: arm64: Add selftests for the pKVM heap allocator
+>   KVM: arm64: Add a shrinker for pKVM
+>   KVM: arm64: Filter out non-kernel addresses in kern_hyp_va
+>   KVM: arm64: Move hyp_vm refcount into the structure
+>   KVM: arm64: Alloc pkvm_hyp_vm using pKVM heap allocator
+>   KVM: arm64: Alloc pkvm_hyp_vcpu using pKVM heap allocator
+>   KVM: arm64: Reject hyp trace descriptors with fewer CPUs than
+>     hyp_nr_cpus
+>   KVM: arm64: Reject hyp trace descriptors with fewer than 3 pages
+>   KVM: arm64: Alloc simple_buffer_page using pKVM hyp allocator
+>
+>  arch/arm64/include/asm/kvm_asm.h           |    4 +
+>  arch/arm64/include/asm/kvm_host.h          |   14 +-
+>  arch/arm64/include/asm/kvm_mmu.h           |    3 +
+>  arch/arm64/include/asm/kvm_pkvm.h          |  102 ++
+>  arch/arm64/kvm/arm.c                       |    2 +
+>  arch/arm64/kvm/hyp/hyp-constants.c         |    2 -
+>  arch/arm64/kvm/hyp/include/nvhe/alloc.h    |   24 +
+>  arch/arm64/kvm/hyp/include/nvhe/mm.h       |    3 +
+>  arch/arm64/kvm/hyp/include/nvhe/pkvm.h     |   19 +-
+>  arch/arm64/kvm/hyp/include/nvhe/spinlock.h |    4 +
+>  arch/arm64/kvm/hyp/nvhe/Makefile           |    2 +-
+>  arch/arm64/kvm/hyp/nvhe/alloc.c            | 1223 ++++++++++++++++++++
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c         |  124 +-
+>  arch/arm64/kvm/hyp/nvhe/mm.c               |   51 +
+>  arch/arm64/kvm/hyp/nvhe/pkvm.c             |  100 +-
+>  arch/arm64/kvm/hyp/nvhe/setup.c            |    6 +
+>  arch/arm64/kvm/hyp/nvhe/trace.c            |   70 +-
+>  arch/arm64/kvm/hyp_trace.c                 |   15 +-
+>  arch/arm64/kvm/mmu.c                       |    4 +-
+>  arch/arm64/kvm/pkvm.c                      |  159 ++-
+>  arch/arm64/kvm/trace_pkvm.h                |   45 +
+>  21 files changed, 1831 insertions(+), 145 deletions(-)
+>  create mode 100644 arch/arm64/kvm/hyp/include/nvhe/alloc.h
+>  create mode 100644 arch/arm64/kvm/hyp/nvhe/alloc.c
+>  create mode 100644 arch/arm64/kvm/trace_pkvm.h
+>
+>
+> base-commit: 1590cf0329716306e948a8fc29f1d3ee87d3989f
+> --
+> 2.55.0.229.g6434b31f56-goog
+>
