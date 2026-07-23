@@ -1,115 +1,124 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E7364A13A4
-	for <kvmarm@lists.linux.dev>; Thu, 23 Jul 2026 12:58:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784811499; cv=none; b=bQpDeANCtCJe2yKnYaaQa7Fx+8Z1daduaDGRyITKBT3n70W7ao9JpWkQtSqjHWZRrgva2ZdcD/EoOH/+3BVBMO0Nw1D6GLwupzs4lL/hrCTODOch/BQMyMdJKDqf6EytsusWdIdKg+aQVr+RSKAFsK7vBng67cw9wKWj+pij/Ss=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784811499; c=relaxed/simple;
-	bh=tS3qt0hTqrRoA8Eare5/U/grQvdhUHhuH5FDy08Szas=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KowJ+ac5cfWZxBm6YjnIcs41SXqEO5/VtjFdIjZ5zCXwwVw2d4WO+gmVCZNHyeLnNBz0UQcSZcKrgnObONwywkPSiTUgwQKlaylMPenO2GLMmMZRgz6HbaaF4NjXjnUisPOx21jRhRzqZ/vv1ZvdCeUoPeOsaZERwML3zG6HNz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=JCu95jwu; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDB9647DF98
+	for <kvmarm@lists.linux.dev>; Thu, 23 Jul 2026 13:19:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.169
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784812801; cv=pass; b=mOX5F+QSMunO+BuTyYNF3uCvqkfy2gGijUM0P37ZDOgJlGTymrzO5Yl1q6bfA7+iltf3irSUdNEW5V5Ah8unOifPqkMiHOvoE6LnpgLSR9eivc7GRAP7B3R9/2TnmI3EfmCD74R17FU1uK1PWyfBnaVRh16lEl78ZE1HH575lbk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784812801; c=relaxed/simple;
+	bh=TliwDTVDhNVYMLlvKnPAH9MFniu3SJT7BxwLxOX+7YI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DOIdEpWyt3Y0EqFMcxTifGaBsTj30ZFs4hNpEbVLCoEbjrzHmTnLis6jxxEm3thd1GX14MbmdmdkfqrvXMc1y79K2O4MVu2q4dx8esFkZqV1mGZX+ZBHtVHQSzfUyL19eHQ6D5rzcnhZrdKg3coSm2k/LUVEqEamLklExRKiL6A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Tgt4ejSI; arc=pass smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="JCu95jwu"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C24621595;
-	Thu, 23 Jul 2026 05:58:12 -0700 (PDT)
-Received: from J2N7QTR9R3.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BF5C93F59E;
-	Thu, 23 Jul 2026 05:58:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1784811496; bh=tS3qt0hTqrRoA8Eare5/U/grQvdhUHhuH5FDy08Szas=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JCu95jwuHdwvgEvwvBRQDHTAQhAyscg4Z8nM8CbNlXkEBNN9gvC/tjSRPEY9AmFXQ
-	 YlOHo0P+NdKWLi4XGlyaQyNr57TtZJX3FgvYYRvRnaRCalGAv6LHFycsfnB6W1ne1S
-	 ROoF87dO/gNP+odtZMxPE972Iu4paqR7pLVdgbOc=
-Date: Thu, 23 Jul 2026 13:58:11 +0100
-From: Mark Rutland <mark.rutland@arm.com>
-To: Mark Brown <broonie@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
-	Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>,
-	Fuad Tabba <tabba@google.com>, Ben Horgan <ben.horgan@arm.com>,
-	Jean-Philippe Brucker <jpb@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v13 02/32] arm64/fpsimd: Ensure all of ZCR_EL1 is
- initialised from idle
-Message-ID: <amIP42yILYNsNk0e@J2N7QTR9R3.cambridge.arm.com>
-References: <20260720-kvm-arm64-sme-v13-0-d9abd3ffa245@kernel.org>
- <20260720-kvm-arm64-sme-v13-2-d9abd3ffa245@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Tgt4ejSI"
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-51c01c79467so258651cf.0
+        for <kvmarm@lists.linux.dev>; Thu, 23 Jul 2026 06:19:54 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1784812791; cv=none;
+        d=google.com; s=arc-20260327;
+        b=IcIdQIBOBVfszH2MBxfMh6cRvmqobxGhr3L3J840vcHC7Siu81BEUEY74yLpLjB57M
+         5+qWe96a1/ygz3aWlHJvZU9dNNICoCpFOoyegWLsSfj1C8Qo6jROnrfqSVQhBKLEwatH
+         i5WkflOc0rzMvkj2LkSWpy7JKDZ1qEzqXqlIpEx0v3hRZfkrQV+ie51BL4eTPNCAH4R8
+         aFeA4hOrYBkHCEGBy6k5MkC0IyfWZ6Rskcelm4HsrXI+WDreua1jCbY1lKXIxaxu8l32
+         KFQEAXGlfWQ+7jzpcQjatit90hQnnQfkC+YWqi24SEssLCoXjweBfKOP/5KbEDTef1co
+         jDMw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=Jlz4RirT2ApEMmnQX3AOsLAbmiz2q30wOmfHPI3CAeM=;
+        fh=K53RjandeUdY4jAK0DnHncM495ldAvnF977RkfREYoE=;
+        b=e95pH/z043g/ppB2b2eMnlAaBiHQIJF+58VUdm2viz7vs0OTVMM7ngYQLAtVWMu3OL
+         9MfWG8Ksm+FV0r4eGghO71zVJJyOkx6cZRN1Et0vu+Mxl1ANVTFfbhhQh2Gp6gcYNXjo
+         v7lGDnnVAIT8xZZF8tn58YJsDi0Taza/ZLWSsAHm1xLrxF5Mc+fMNW1tEXb7SkAcWBNm
+         DvTwbuN1ffZr6vrMF3r8s1HJo3QUskLStS8Hk2NrPqvmFK56de4avDONQGGSM6DECzM+
+         FCCW4VZ9Rwr5b3wMJ30T/5KBKnJBR4FVeXAAfDHoBbPCOgOzRoIIfN486N54DeWcG4UT
+         KKhA==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1784812791; x=1785417591; darn=lists.linux.dev;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=Jlz4RirT2ApEMmnQX3AOsLAbmiz2q30wOmfHPI3CAeM=;
+        b=Tgt4ejSIiu15iXqI2YqFKrxtG1RAlDTkPvul1jqy4CHPc9bYwt9EL6gLwRqnZvZD5/
+         a2rAsmlePZkhaCcnSeF29TKSuq2TOTxFOt1gz+8U/ltdNETStSfxv+QKVLKZcXXRucNY
+         qsLafm3fsvhsKdqRjXFWjKf9QyKeJm6Cn1lknNOlO7o331S4S2XFEyGkKnjvybMBqt9Q
+         6PVzNFU9QiIMicwhEfI+l9K4cOX7xGYVLEdVAKJ2LtHuM9DULkcvCKpPf0/c8vM7E8Vm
+         3LUoUFXouCwirijsC//HON7EHMgALJb4PkvITSM7+WTwhdJGEgfnRRnbUHAYJLD/Sc+m
+         slFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784812791; x=1785417591;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=Jlz4RirT2ApEMmnQX3AOsLAbmiz2q30wOmfHPI3CAeM=;
+        b=BQMNH3H1Tk0SG/Ikg8lKj0g47GFXK/832byyBe/pnNgM9fDpmf/CYJHP6y+xLF89BP
+         V4HIb5r09YEQ/327am92GatB1z+L1++jkEx8pNNA2ELEzV1i9lpMuz9tvDQl/3CCpV58
+         9ehUpx1ECm+1Twd10CHWuMzhzJe63U/5vpDY2XBlWyqT5Bw6yh6HQ8JzzKFa4GAkPQp9
+         k2u54gm56gTiUc5v9ocbbV22faakkgkbkpMsxFpEdb9cs/Pm5FszHhiqqNk9Gm8ubbgw
+         gg+YpgZwkUPaPG1CzhEHgGRAdj1FwnOxyO2ay+XuzlkLuGZZZK8KZaZIbe2YW11dYsLM
+         hEMQ==
+X-Forwarded-Encrypted: i=1; AHgh+RrIa8HWJgdSCphZ0BS+6+uLttIFiU1RMVUm7ZGKSDsVwMXPw1SvlMK4gymoNBKGHfxZoPXcKig=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yz1cmPVf8vaqz3AQu1r7ZjIHKQyswvPQPNyF90TMNuWr9dn0RG7
+	Nj2a92SXPOM1T5X5Hy4vuv2ESPTFx3Brv5RhGVT/xAxg0HpVMTS97I2q+1LbW2s/BM1C2A10FI+
+	TUw08oVGkmaMNmQTWNSwvWczAq/vtPtgzxjrfl5Nf
+X-Gm-Gg: AR+sD11Wb6vBy+9X1u1HhXlyKIoEITSXSt/CTRSMjIHK5gYlzDOEJ725kQ8FP8nSZHa
+	oz3SvpT4UBkhnDOJghkegye4voWg0OKPFCplgkiGLzRDtKuAWQMtnvgiquaEbl8+yaPsNH8rne0
+	6rdOAlQVnyX4IArepb8lv2Zja4AfZr+c5uNeLn3bJpOMD61gX4HKjE+zeDk7Okd2TXlcD4+csCd
+	Rv6vu344xmvPM+x5g7yuGDG7kW/u70wqb2dZmExa8eLAEM0PS9qWwkhYsu5Ug==
+X-Received: by 2002:a05:622a:aa4d:20b0:517:38aa:c2b3 with SMTP id
+ d75a77b69052e-5283bb02792mr9778161cf.14.1784812790765; Thu, 23 Jul 2026
+ 06:19:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260720-kvm-arm64-sme-v13-2-d9abd3ffa245@kernel.org>
+References: <20260720171513.1415357-1-vdonnefort@google.com> <20260720171513.1415357-5-vdonnefort@google.com>
+In-Reply-To: <20260720171513.1415357-5-vdonnefort@google.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Thu, 23 Jul 2026 14:19:00 +0100
+X-Gm-Features: AUfX_mzXDP5kjyl7adkMau_slK5ytHRPwGWiWf56fyQqQaMq0ZgmYKXic-0afsY
+Message-ID: <CA+EHjTwZftoD=D2G_1S271CPTdYhCcRwQGHYzwVS4OMLzAx-HA@mail.gmail.com>
+Subject: Re: [PATCH v3 04/17] KVM: arm64: Add a heap allocator for the pKVM hyp
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, 
+	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com, 
+	qperret@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Jul 20, 2026 at 12:07:29AM +0100, Mark Brown wrote:
-> At present when exiting from idle we do not fully reinitialise ZCR_EL1,
-> we update ZCR_EL1.LEN with a read/modify/write cycle when loading task
-> state but never set any of the other bits to an explicit value.  Since
-> currently they are all architecturally RES0 or RAZ/WI this is not a
-> practical issue but it may become one if further fields are defined in
-> the register so we should explicitly configure the whole register.
->
-> Rename the existing sme_suspend_exit() (which handles this for SME) to
-> fpsimd_suspend_exit() and add set ZCR_EL1 to 0 there, if needed LEN will
-> be updated when loading task state.
->
-> Signed-off-by: Mark Brown <broonie@kernel.org>
+Hi Vincent,
 
-While this happens to work today, this is a more general architecture
-problem, and I think we should cc stable such that kernels will work
-reliably on future hardware.
+On Mon, 20 Jul 2026 at 18:15, Vincent Donnefort <vdonnefort@google.com> wrote:
 
-All stable kernels support SVE, so this needs to go as far back as
-v5.10.y.
+> +static unsigned long hyp_allocator_reclaimable(struct hyp_allocator *allocator)
+> +{
+> +       unsigned long reclaimable = 0;
+> +       struct chunk_hdr *chunk;
+> +
+> +       guard(hyp_spinlock)(&allocator->lock);
+> +
+> +       chunk = allocator->head;
+> +       while (chunk) {
+> +               reclaimable += hyp_allocator_chunk_reclaimable(allocator, chunk, NULL, NULL);
+> +               chunk = chunk_get_next(chunk);
+> +       }
 
-One minor comment below, but with that fixed up (and a CC stable):
+Sashiko raised this, again, confusingly in a different patch.
+hyp_allocator_reclaimable() counts only the per-chunk reclaimable
+pages, but hyp_allocator_reclaim() drains allocator->mc first, so the
+memcache pages are reclaimable yet not counted here. When mc holds the
+only free pages and there are no reclaimable chunks, this returns 0,
+pkvm_shrinker_count() reports SHRINK_EMPTY, and scan() is never called
+to free them. Should you add allocator->mc.nr_pages to the total?
 
-Acked-by: Mark Rutland <mark.rutland@arm.com>
-
-> +void fpsimd_suspend_exit(void)
->  {
->  	u64 smcr = 0;
->  
-> -	if (!system_supports_sme())
-> -		return;
-> +	if (system_supports_sve())
-> +		write_sysreg_s(0, SYS_ZCR_EL1);
->  
-> -	if (system_supports_fa64())
-> -		smcr |= SMCR_ELx_FA64;
-> -	if (system_supports_sme2())
-> -		smcr |= SMCR_ELx_EZT0;
-> +	if (system_supports_sme()) {
-
-We should move the 'smcr' variable into this block. That way it's scoped
-to where it matters.
-
-> +		if (system_supports_fa64())
-> +			smcr |= SMCR_ELx_FA64;
-> +		if (system_supports_sme2())
-> +			smcr |= SMCR_ELx_EZT0;
->  
-> -	write_sysreg_s(smcr, SYS_SMCR_EL1);
-> -	write_sysreg_s(0, SYS_SMPRI_EL1);
-> +		write_sysreg_s(smcr, SYS_SMCR_EL1);
-> +		write_sysreg_s(0, SYS_SMPRI_EL1);
-> +	}
->  }
-
-Mark.
+Cheers,
+/fuad
