@@ -1,115 +1,172 @@
-Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com [209.85.221.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA9E647CA80
-	for <kvmarm@lists.linux.dev>; Thu, 23 Jul 2026 16:30:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDACC3BB675
+	for <kvmarm@lists.linux.dev>; Thu, 23 Jul 2026 18:21:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784824230; cv=none; b=VlkbsNgMuMcnotnvjRHxMF9A6aL2uSYwx9h+NW0rIy6kgcF4ieVI22Ww2TLUl/1tlCuMFt/uMryY8dLBDg9PQNm+MlNp36Jcwcd12jQqY5YSU+am/a+ztynvQDItE95gel5jeypI6b79XS92txZ/jBKSf7HNy4iInxARMDbVgzQ=
+	t=1784830916; cv=none; b=Mo56bBRwz3tDGyWs2ox+/WhbDydVmtCbttY+LqOFez8C+WE+ylMbxGJXmg3OnZlhqAtLDJZlazsE9f2mnkLXywux2LSIjzWIBr/kuhYmju4IO4k6cDpajF1F3a6phSOOAT54CR+36f+8Mjp4TrpKoFgliHkANr2KFikkSm/3RUI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784824230; c=relaxed/simple;
-	bh=eqcqk9WLljubatE22m5POuO+n6ynnNiOo3dFq3scve4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aOZ6geLMrGKOLuz7DnmsNrZvCwqEu1mcTjby70sUXzZGIhQyo47qsB0tSWfm3Kn0m0FgbEwLyF+hRapGR0vCiWz+oa8JDATT9JpKHIFIwVG2cPJze91PvraYc7XC7ahA0Ykvc8EPwtxD5KH2i+0SU7SlRHo7jb8jLcxzJkxkS+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JgcnIApD; arc=none smtp.client-ip=95.215.58.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1784830916; c=relaxed/simple;
+	bh=Y8zPSkJhgEwpcGvfvuTG8GkMIhbfsd22DIIsBqUqPLk=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=URtOsm5GClwirbYAyW2WbeKqqH+z+5Hh/OBZAH18zbvlURfe7GsJvnXf6Feyi+svKl+prfFBsEviS4QapqeseRCyqKy3wIamDnOEI9OXwRcB62tIA+us7j3DlCduuBE7iSbGdrVyGEGzk43DLhb6ria/RFv89dyrwccxsni9PVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lEmE8pBl; arc=none smtp.client-ip=209.85.221.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JgcnIApD"
-X-Forwarded-Encrypted: i=1; AHgh+RrG7k7M1FtsDc263QwtZrffG7J91kyel1tgR7hKIvPpurMYBQOJX8gkfId0K4OntQv008K9cb4=@lists.linux.dev
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1784824225;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Gl83NMyq+s3gbl2Tp74bU9xdnH6nJ4JMTF1QkNTBKrk=;
-	b=JgcnIApDZnqO79gnVjbtV1+Rs6IMLqsM0hlb1pPabikalkjPx9mrtYkJKbAf07y/FzmMcZ
-	NX7EAtwLnNmCinntiOwxZX8j61t4H5kopZhDLeY91P20QXVckLY9wgQwUMtIGt9Y4vllwn
-	7lLvE8N3U5CYihFN8Txd/Ny9BuM5wm0=
-X-Gm-Message-State: AOJu0YwLum4MdSUy6YP7RBwOWiD89aNZkorgrgUEchew9xuFI8nOydTU
-	UUn6mMDeevbeMcgxJBTiBZoyOoUZ3mQnYkiGJo/fAZ1fNRDnSOjAR4+yuLe32VJj7gESnRHywJv
-	qLWRXQBWAYbbQmq/HjhLoeHmqv4igpEuetZNSaP3r
-X-Received: by 2002:a05:622a:134c:b0:516:3f51:81cb with SMTP id
- d75a77b69052e-5283d81a915mr9160761cf.13.1784824207475; Thu, 23 Jul 2026
- 09:30:07 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lEmE8pBl"
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-47d81cf0c4cso666571f8f.2
+        for <kvmarm@lists.linux.dev>; Thu, 23 Jul 2026 11:21:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1784830905; x=1785435705; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=8+lHjdE+3DloA2hsk7g0E45gyAxlw5fhHa47aoUOQ2E=;
+        b=lEmE8pBlGNOFRVNIFbjvhu0z8m47EgCJZADml66BguHtlDMH3GeX+hIyDWsLIDeQxQ
+         cHc7sXOn+d/KgW733zCv4mHX+3XXe31v4f3fQinMnyTHEBZMS9JjSDZaVkLW/OVMqQmG
+         0u0ilS/4M+4nAmsV4hguYIo9UwMOq85ko/Bvq8Z66xXVH59r7HaK/e7jhA5ZT7VfsQfM
+         6GLxgrIFPrHnugI6CEDXmtfeZ5gw/OnbQ0f9hr56UR4+p2nXqon3Ab/cJF/jH8XZzTDe
+         TJ3BwDjUiahoQ5EJuIEZ+OPSqmfwrpE5QrMdSyHItAaBmVi87+fE8roc3LZK+lsNNnfd
+         0M4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784830905; x=1785435705;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=8+lHjdE+3DloA2hsk7g0E45gyAxlw5fhHa47aoUOQ2E=;
+        b=NEIxIQHPoGqSFAKKdGN7jZwyeoiq7QSw+/oGVv9+8qaekg1dTixR3MZx+zoyMidLJY
+         AMooj3vpYLOAGmATpLC+szDns1/99OtyBL7dEgKEAQ/UWGqh0vyJ6COCyvGd2cMe3wvg
+         Xl5VS9O18fFbPQuIh1k+hhaMHuCp2tCAdpoigcfZE3kArj6QnZNb+fVzOUUg7tLNW5Z/
+         ZlMs69v696auFuEi0HiPW4gPwe1/g1lqQ+QPE174qhlgu+E2wOMSOHELupKE3m8pP20c
+         owT/5vYrpsty+ASvekrOX1EsVOwxdWdV5kdiCsiUdpN7k22djlifZiQheAQLnstWHLxb
+         6pVA==
+X-Forwarded-Encrypted: i=1; AHgh+RrbszXiEcGg5Twqw4yf8QWJHRdRXRz50NP0VMGA9ha1OZ19rCSblxU3gx2TJXrqtXx//e997KI=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxZuy1FAzqqFlOjaowkfTRSWaxYiU2NTFJm9h2rD3yHM/6HWx3P
+	8CHsMeaXTtHai4VYPOWc6ihsOn5JCGRejT9MnGTwIAalKUTKlc0zJs2nY0kwtA0/K0ZIv0PBLS/
+	GivQcPJrVXeDw3w==
+X-Received: from wrbdv10.prod.google.com ([2002:a05:6000:d8a:b0:47f:501a:8813])
+ (user=smostafa job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6000:2011:b0:46f:7d90:8121 with SMTP id ffacd0b85a97d-47f8d71c689mr5489116f8f.14.1784830904536;
+ Thu, 23 Jul 2026 11:21:44 -0700 (PDT)
+Date: Thu, 23 Jul 2026 18:21:38 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20260723162002.3848054-1-smostafa@google.com>
-In-Reply-To: <20260723162002.3848054-1-smostafa@google.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Thu, 23 Jul 2026 17:29:30 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTx0fU8uL0pop=faUv7PW9=8dS1CHbn0DdMQdHcCwxOefw@mail.gmail.com>
-X-Gm-Features: AUfX_mxA_nKRECz2-8RwfmQfgOzLkEwARqpAv0FN4JNQqX6QCq1Eo0mlzwuphto
-Message-ID: <CA+EHjTx0fU8uL0pop=faUv7PW9=8dS1CHbn0DdMQdHcCwxOefw@mail.gmail.com>
-Subject: Re: [PATCH v3] KVM: arm64: Optimize protected mode with FWB and DIC
-To: Mostafa Saleh <smostafa@google.com>
-Cc: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, maz@kernel.org, oupton@kernel.org, 
-	seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
-	vdonnefort@google.com, sebastianene@google.com, keirf@google.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.55.0.229.g6434b31f56-goog
+Message-ID: <20260723182140.4025575-1-smostafa@google.com>
+Subject: [RFC PATCH v2 0/2] KVM: arm64: Add support for BBM level 3
+From: Mostafa Saleh <smostafa@google.com>
+To: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org
+Cc: maz@kernel.org, oupton@kernel.org, seiden@linux.ibm.com, 
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	catalin.marinas@arm.com, will@kernel.org, vdonnefort@google.com, 
+	tabba@google.com, sebastianene@google.com, keirf@google.com, 
+	linu.cherian@arm.com, Mostafa Saleh <smostafa@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Migadu-Flow: FLOW_OUT
 
-On Thu, 23 Jul 2026 at 17:20, Mostafa Saleh <smostafa@google.com> wrote:
->
-> KVM opportunistically enables FWB if supported by the system for guest
-> VMs, which allows it to elude cache maintenance for data as they are
-> forced to be cacheable from stage-2.
-> In that case, __clean_dcache_guest_page() will immediately return.
-> However in protected mode, before calling __clean_dcache_guest_page()
-> it loops over the range and fix_map/unmap it, issuing TLB
-> invalidations, dsb() and isb() unnecessarily.
->
-> This can be optimized by returning early if FWB is supported,
-> kvm_pgtable_stage2_map() already issues dsb() and tlb invalidation
-> functions issue dsb() for the unmap path.
->
-> Similarly for DIC, we can omit the call in
-> invalidate_icache_guest_page()
->
-> No isb() needed as ERET is context synchronization event.
->
-> Signed-off-by: Mostafa Saleh <smostafa@google.com>
+This patch series adds support for BBM level 3 to KVM pgtable, it
+depends on [1]
 
-Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
+Changes from v1:
+https://lore.kernel.org/all/20260717130901.2239134-1-smostafa@google.com/
+- Limit BBML3 to systems with FWB and DIC and remove race check.
 
-Cheers,
-/fuad
+Motivation
+==========
+I have been looking into this for the context of:
+- Page table sharing between the host CPU stage-2 and the SMMUv3 for
+  protected KVM.
+- Use the pagtable code to populate SMMUv3 stage-2 shadowed
+  page table [2]
 
+However, BBM level 3 is still useful for CPU only operations as it
+avoids intermediately breaking translation.
 
-> ---
->  arch/arm64/kvm/hyp/nvhe/mem_protect.c | 7 +++++++
->  1 file changed, 7 insertions(+)
->
-> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> index 4e329e39a695..39aa8911f62c 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> @@ -261,11 +261,18 @@ static void __apply_guest_page(void *va, size_t size,
->
->  static void clean_dcache_guest_page(void *va, size_t size)
->  {
-> +       /* See comment in __clean_dcache_guest_page() */
-> +       if (cpus_have_final_cap(ARM64_HAS_STAGE2_FWB))
-> +               return;
-> +
->         __apply_guest_page(va, size, __clean_dcache_guest_page);
->  }
->
->  static void invalidate_icache_guest_page(void *va, size_t size)
->  {
-> +       if (alternative_has_cap_unlikely(ARM64_HAS_CACHE_DIC))
-> +               return;
-> +
->         __apply_guest_page(va, size, __invalidate_icache_guest_page);
->  }
->
-> --
-> 2.55.0.229.g6434b31f56-goog
->
+Design
+======
+Some of the conditions that BBM level 3 will be useful in (RWHZWS):
+1) A change to a PTE memory type, shareability, cacheability or OA
+2) Changing from block to table
+3) Changing from table to block
+
+At the moment in the hyp page table code:
+- For #1) stage2_map_walker_try_leaf(): Replaces a leaf with another
+  one which does not match the same OA/perms/attrs.
+
+- For #2) Switch block to table is used from:
+  - kvm_pgtable_stage2_split(): Explicitly splitting a block (used
+    for dirty logging), where a block is replaced by a table with
+    the same attributes.
+  - stage2_map_walk_leaf(): Updating a mapping that is partially
+    part of an existing block.
+
+- #3) Does not exist in the code at the moment as coalescing is not
+  supported.
+
+The first patch is a preparation to be able to clean up the old pte
+for BBML3, the second patch adds the main logic.
+
+Initially, I encapsulated the full logic of BBM in one function,
+which was not readable, due to different ordering and dealing with
+CMO, TLBI.
+
+Instead, I kept the logic into 2 functions, where BBML3 is added in
+the make step.
+
+One interesting case, as BBML3 will update the PTE atomically, it
+can only know it raced with another core at the point of the cmpxchg
+failing, unlike the SW implementation which locks the PTE first.
+And as we must issue CMOs to the new mapped page before the update,
+that means with BBML3 racing cores will issue redundant CMOs, to
+avoid this, we limit the use of BBML3 to systems with FWB and DIC.
+
+Testing
+=======
+This was tested:
+- C1-Pro cores, unfortunately the version I have does not run
+  upstream, I backported the patches to Android kernel (6.18).
+
+- mainline(7.2-rc3) kernel on a Qualcomm X1 with a hacked cpufeature
+  as it does not support BBM, I did not see conflict aborts or TLB
+  corruption.
+
+I tested with VHE and protected (hvhe) modes, running VMs
+(and protected), and running some selftests, that might exercise and
+stress this path tools/testing/selftests/kvm:
+- demand_paging_test
+- memslot_perf_test
+- memslot_modification_stress_test
+- dirty_log_test
+
+Future work
+===========
+Some other changes that would be useful:
+- Eagerly install table on block split, we can now replace a block
+  with a fully populated table atomically when we unmap a partial
+  part of the block.
+
+- Use BBML3 in the hypervisor stage-1 with nvhe/protected mode to
+  improve preformance and reduce memory usage as now it is forced
+  to use leaf mappings.
+
+There is more to support page table sharing (such as dealing with
+TLB invalidation, coherency...), I submitted a talk to LPC to discuss
+this further.
+
+[1] https://lore.kernel.org/all/20260723044034.2983651-1-linu.cherian@arm.com/
+[2] https://lore.kernel.org/linux-iommu/20260715115906.2664882-1-smostafa@google.com/
+
+Mostafa Saleh (2):
+  KVM: arm64: Add stage2_clean_old_pte()
+  KVM: arm64: Support BBM level 3
+
+ arch/arm64/kvm/hyp/pgtable.c | 123 +++++++++++++++++++++++++----------
+ 1 file changed, 87 insertions(+), 36 deletions(-)
+
+-- 
+2.55.0.229.g6434b31f56-goog
+
