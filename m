@@ -1,29 +1,29 @@
-Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11011056.outbound.protection.outlook.com [52.101.65.56])
+Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010057.outbound.protection.outlook.com [52.101.69.57])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80C3442587B
-	for <kvmarm@lists.linux.dev>; Fri, 24 Jul 2026 11:01:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BA5842BEAA
+	for <kvmarm@lists.linux.dev>; Fri, 24 Jul 2026 11:01:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.57
 ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784890903; cv=fail; b=p5A53Eo2jAHcZdHSTWJsVyPmzgkdHt/ApyjZOiv+R0P0zf2sO0pBA3PJ8wvahHG21IpS8ZcV+wpu1+kcoqKMfMt1eSuF+kVXalKjSQk+WjFmF63ws39tbrxqoi6550Oy3LhGXwfDApWh01cgRDy6poEMh4hRCDa3vZzpHnf4Esc=
+	t=1784890921; cv=fail; b=gwLB81gupmmhMTACqweKBTLFukGVXN1p0MBSbOv7qneu1qtbyL5OEMmxoIOMEbogiyXXwMA6mEpYNQlLQxnq2/DflWsslCl7+2uP0w2jqM3+T7Pf5aj/ZD1SGJJ6GRASEg4d/z7aMy4RmGsGotPhHc9rEtiRn0lZ958ImXBdSjY=
 ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784890903; c=relaxed/simple;
-	bh=qadU5gb7DS9be8vI+Jjiw11ZPTbDbs4N78j+aPyS7xM=;
+	s=arc-20240116; t=1784890921; c=relaxed/simple;
+	bh=ufPT+/eqNWBoWMN+FXOinK2hhh4KVMNShmCRbUI++1E=;
 	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=i9SqYwjYeyK0bmR7+jyU6ZnGoEZXPCyZc7ZL7GcojDMOjjhN0PkIA01bkDJKjZnvCHj+kzdstcymhxYb+Xe6HxbFWRw4CKHmizDpTaP1YnV9L6/B9hqHUjjRwSpJVWAbTvYs4PlHvJUV01gXc86mFdK4c7KN8gED6xVL13uHp3I=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Yjn/DsrU; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Yjn/DsrU; arc=fail smtp.client-ip=52.101.65.56
+	 Content-Type:MIME-Version; b=sd+t+w+ruuIpGIDQEj+xIOcREtnL/KZlFkCfDB5CvKEWBcFSKTVnOVPl/EMyUv3NSgcAKFTRUVVJWsH9WGSljisr/0vlkQ1CfhI5YR9wucKYQUPQmtOnAeUNo3QwLSVBsNmVzMbnbK8TA7j/gcv/Twn+e6/Eta+AyQ5iIDFauKo=
+ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=VduixGtO; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=VduixGtO; arc=fail smtp.client-ip=52.101.69.57
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Yjn/DsrU";
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Yjn/DsrU"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="VduixGtO";
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="VduixGtO"
 ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
- b=euyP183gvY6QMgqICc+7GwxiT5c/w5pM88T6Q27E1FZXXmYahuGIOZW+7C1fJwvHZMcInxYJlLePJ3cR9oxT10LAJss5H1kNHC0lzbFmyMuoAWsBkqk6RyCbGpKksNsnzUGb7NMrunQhH6E+otak2th2a75sZn5EUi6sULS9wCywAqm6JmBuWSYwi8kUzqsyGmT4G8wGYvFrnuiMREIESyt+ln1558S1YKSWnkbBVN4/TjAoSXf/W8RxModn8wLnMUnRN9v1QstXoAYNvqAtev+W7VSzDSMwRugUy645TyE36VON/Mo8YqTxosTyyFGxmFsAkU+M0c6manWMJvllDQ==
+ b=nu8ZT9KnO4FkH44eznx7gon+1aD3sq2uoP8gHNltxNns+HVj/wsdfKift8MgDtzujHiDmriU+qYIlB2GWHKUGh70oe7Db9DkPAqcqxY6tdDsgTWH/BNrKW0NZ4wzVE3YraEqTCj2W7KTN4U3xyGM4VEs77FqABictIaZb3/f/hCIAiBIBCY8soMJtqeyC1DPxeMGvPRcRr+bVQaY9ufUuCtt5gTudP6TJ+GL9WSpGQ2AdknjK44n9saAMFLFs7uAdF6QAX5BqMCXtxkpu+MoTQLRkTucvzerqVNLzSzVhQbQ1H+WLBjv6uCFSOwj0aYUBMilfYtRvF7022U4jGuj1g==
 ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=IWUJUnmRuQVH3vknlwE7JXHXsIy5Q3/SIgjWuHeg17E=;
- b=IUES8FqHO2E4VhkKhidM3Mh3vgHGNne2s/sjCMHtl3I4EqCH76vPME4GwaymcWsfFqJvHzldbRibR09McKVcxMrmD9NyHHPO1pkarG9cJ5c49naUkXSBHcw+i48W1xru6rHOrzjdPdqdBi5VU13H2t3bNEZCs5tHHvP2G2liwg12JAAc0SS0BEpjf0gc7DfUSTkMx24WO8PXTWKqqizqw32Sl81Oxd29ZxL/ELzttAPYrCeHCLV51RzQ43vXABAOZ+AvjWhbLAARGxJAyEp5C5IDDdmOLCS1cVNTrHs8Boj4Q3uZ4SzDZNA+TTFrEqzfSf7TAVgx7kGdr2TYDleJQg==
+ bh=AEfOXRbP5uoLOKITjEfJjqkGarBrPKObXHqdYSoIh04=;
+ b=bnC8uazWyBcVx6YmamHsmKAK515w8RpRY+EIY+5gq13j2AGJigS484FNwlvy21kNTmLQRr5O2sgPPhwUj5etA3xV5jBxEQ+LS+RB2BjHs+nrynUYqpjDMmy9E3G8/c2XMThRutMvCeyX7jCX5sMfUnYzZ/WeZHyVzGjqz5AsecZBpNPqKV4dLuRgjuZvRf1m2O/mfBaGjq5ADemqwWZ0vvAobdEvKcfMOVjqEmH88ZkkhUk00TJ35GZslVOxnYIY8NVpY9CImBvJW3WOcB3zDNghLdQ+lkIQKYwDYQn7ckC/hhltodkJdD5a1QMZzbw8cSvmgLnoIapkIrzhLNZYYA==
 ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
  4.158.2.129) smtp.rcpttodomain=lists.infradead.org smtp.mailfrom=arm.com;
  dmarc=pass (p=none sp=none pct=100) action=none header.from=arm.com;
@@ -32,18 +32,18 @@ ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
  dmarc=[1,1,header.from=arm.com])
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IWUJUnmRuQVH3vknlwE7JXHXsIy5Q3/SIgjWuHeg17E=;
- b=Yjn/DsrUWKOAIMppAoia72GQH/aLaXddkMxfNRWi+jAPni/yKKBge4UocPl1aI1JLX9EgYS/df3vRWbMszbhOv67t/CJPfETV2uG8AbzTXGj85iKnXTRBle9pk4tlM5/StnSM2pRU3GEAX9NeSmq/g091lQZOqzVkMgnrj8GR1g=
-Received: from AS4P189CA0032.EURP189.PROD.OUTLOOK.COM (2603:10a6:20b:5dd::18)
- by AMDPR08MB11367.eurprd08.prod.outlook.com (2603:10a6:20b:717::12) with
+ bh=AEfOXRbP5uoLOKITjEfJjqkGarBrPKObXHqdYSoIh04=;
+ b=VduixGtOLDDh7FJf4guPQpu4SoYCqoABdlsPbuFLvMfUAwXPm4D3dndYRd/DCkmayA6OEJVGCsOsaiiZAtbL6OT5+piOpHlkJ7sScJ08K+0Fw/RoulZid70CJ91Ish7yF7rV9vBgR2JwzthJoI0Ghqh12o7mf61nGXrz+g2JBxA=
+Received: from AS4P190CA0050.EURP190.PROD.OUTLOOK.COM (2603:10a6:20b:656::12)
+ by VE1PR08MB5840.eurprd08.prod.outlook.com (2603:10a6:800:1b2::14) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.245.11; Fri, 24 Jul
- 2026 11:01:34 +0000
-Received: from AM3PEPF0000A79A.eurprd04.prod.outlook.com
- (2603:10a6:20b:5dd:cafe::47) by AS4P189CA0032.outlook.office365.com
- (2603:10a6:20b:5dd::18) with Microsoft SMTP Server (version=TLS1_3,
+ 2026 11:01:51 +0000
+Received: from AMS0EPF00000193.eurprd05.prod.outlook.com
+ (2603:10a6:20b:656:cafe::90) by AS4P190CA0050.outlook.office365.com
+ (2603:10a6:20b:656::12) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.21.245.11 via Frontend Transport; Fri,
- 24 Jul 2026 11:01:34 +0000
+ 24 Jul 2026 11:01:51 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
  smtp.mailfrom=arm.com; dkim=pass (signature was verified)
  header.d=arm.com;dmarc=pass action=none header.from=arm.com;
@@ -51,32 +51,32 @@ Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
  4.158.2.129 as permitted sender) receiver=protection.outlook.com;
  client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
 Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
- AM3PEPF0000A79A.mail.protection.outlook.com (10.167.16.105) with Microsoft
+ AMS0EPF00000193.mail.protection.outlook.com (10.167.16.212) with Microsoft
  SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.21.270.5
- via Frontend Transport; Fri, 24 Jul 2026 11:01:34 +0000
+ via Frontend Transport; Fri, 24 Jul 2026 11:01:51 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=u1Mwqhprl5eiVqg3NzddnCxcl5H6NdTNSbMSUsRw9WVw7VZdtJsFn79JgeFXBv8nYBDMxlUxyhQd1wg0miyLJgDWyQdg0CaZ5AC7luhNsabVCGBcuyos7Y9MLlNmaSDXsVfXE32huhNWEnT3madKzHcKjaq3ILFAutSwbsKL5sotvHsxjXivHrox74rslPtLNhTamJGkagUDGwwNZeYdgCfOblCtu1AtxwDDWjGQfqOMZcNZgOdFbUhCxcWihfqy6yoJ7eL5SuokVnkz3VujbKJTV7cDkHhQQCTI3MjmFAvbotLZ0fu4VKUjqhbRu9K8hqZk6UGZp+Azu4bzqq+viQ==
+ b=ZTA0C+O7EJ+PFa55XoOtzaKGf7lSHvZqBZ7M0zyKViXcToYv0/tt7Om8vNFI2ow19yg7flFVCMZYhGsu0EkwNYCa66IOFHRioWu4REkdRdF681hMzKhi4BDMZR3U4kYw8bLjyqNf8SWnZzjGhny6CKKnv3JjH1bLaCYq6+M4l8oLuaZy4zMwJwONCrGhFI6uNXUZc8TA12VQI8sbPP+rS6Ar4WcOP59aDGSsJ/tOpQnxyk0VXmXcfGsyh3VOYU96pdNjdlduFWeIROWNbSo5Tb24jk+KxvmDH7P+zv86ta1UI0BRBsSin8pf0B16I43WiwbCxX/2xboc9bC65ZtYDg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=IWUJUnmRuQVH3vknlwE7JXHXsIy5Q3/SIgjWuHeg17E=;
- b=ILeZx3CDftf+UjykmInUjUGMREW2mm4ZRjPraUcR8JVZxlqxihC659YHzvr6Yfa3o52YrwO6Rd8TR3QkFKmCG09etVfTfAazHtYP8Wj9JXzK51FURhuNDkqmOV7myGc/R61f3HJV2D3KdU9DsOacGBnMRveR5At/VfQge9q0be2g+0E3qsUIpExoBSbhUddrCj1CHNafm3tBk/AveweC7kxOxFgFUG/0peuaYJqxvqES2F38Qna0LuraOHUL9FO+kSYcxcjElef6LjVb0SlwWdX8RNUBzl62TIgwZoazP+E9uuL57K3Uvtwr/nivflju3zhNyMv3wLKvQQA7OC+mzg==
+ bh=AEfOXRbP5uoLOKITjEfJjqkGarBrPKObXHqdYSoIh04=;
+ b=KzBLM1DIbVBGBtER02GeeLZy7MPrwVwc0vntYVP+4uY3mRsG1rK9ALGALbTtbA+wOMDm7ViSmQKfMjzkSMeMTTB5MjVfaDMbNb33Zq/DKCWO+rqHG2lXZgRJQ26e0zWFYPkpHqjyYITF4Wa7WUOJ8mEWVKbbEcok+OxjaS1gdtI2SpH/jiPErQ7Yy6zKzw9DQImOH0UuTYhxxdtcOzrM2F887kj/JFknCrUXZjfxlYZ3RnFoTyws1Met3WakHFe96qzJ2aXdu6337tfSMqCmHeS7W8lHPFIvbKFWbKqsSBZEl2hO8gsP3k3ndqW4XtJLRM7mbCpfEtytJsYiNhPMww==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
  header.d=arm.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IWUJUnmRuQVH3vknlwE7JXHXsIy5Q3/SIgjWuHeg17E=;
- b=Yjn/DsrUWKOAIMppAoia72GQH/aLaXddkMxfNRWi+jAPni/yKKBge4UocPl1aI1JLX9EgYS/df3vRWbMszbhOv67t/CJPfETV2uG8AbzTXGj85iKnXTRBle9pk4tlM5/StnSM2pRU3GEAX9NeSmq/g091lQZOqzVkMgnrj8GR1g=
+ bh=AEfOXRbP5uoLOKITjEfJjqkGarBrPKObXHqdYSoIh04=;
+ b=VduixGtOLDDh7FJf4guPQpu4SoYCqoABdlsPbuFLvMfUAwXPm4D3dndYRd/DCkmayA6OEJVGCsOsaiiZAtbL6OT5+piOpHlkJ7sScJ08K+0Fw/RoulZid70CJ91Ish7yF7rV9vBgR2JwzthJoI0Ghqh12o7mf61nGXrz+g2JBxA=
 Received: from DU0PR08MB8421.eurprd08.prod.outlook.com (2603:10a6:10:407::19)
  by AM8PR08MB5571.eurprd08.prod.outlook.com (2603:10a6:20b:1d0::24) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.245.11; Fri, 24 Jul
- 2026 11:00:32 +0000
+ 2026 11:00:48 +0000
 Received: from DU0PR08MB8421.eurprd08.prod.outlook.com
  ([fe80::2158:1cab:1d88:ba2e]) by DU0PR08MB8421.eurprd08.prod.outlook.com
  ([fe80::2158:1cab:1d88:ba2e%5]) with mapi id 15.21.0245.009; Fri, 24 Jul 2026
- 11:00:31 +0000
+ 11:00:47 +0000
 From: Sascha Bischoff <Sascha.Bischoff@arm.com>
 To: "linux-arm-kernel@lists.infradead.org"
 	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
@@ -88,11 +88,12 @@ CC: nd <nd@arm.com>, "maz@kernel.org" <maz@kernel.org>,
 	<peter.maydell@linaro.org>, "lpieralisi@kernel.org" <lpieralisi@kernel.org>,
 	Timothy Hayes <Timothy.Hayes@arm.com>, "fuad.tabba@linux.dev"
 	<fuad.tabba@linux.dev>
-Subject: [PATCH v4 47/48] KVM: selftests: Add VGICv5 LPI delivery tests
-Thread-Topic: [PATCH v4 47/48] KVM: selftests: Add VGICv5 LPI delivery tests
-Thread-Index: AQHdG1ulFmLsDa1l4UqNn7Nr/cwa1w==
-Date: Fri, 24 Jul 2026 11:00:31 +0000
-Message-ID: <20260724104819.1296803-48-sascha.bischoff@arm.com>
+Subject: [PATCH v4 48/48] KVM: selftests: Add VGICv5 IST save/restore coverage
+Thread-Topic: [PATCH v4 48/48] KVM: selftests: Add VGICv5 IST save/restore
+ coverage
+Thread-Index: AQHdG1uuYXL89DrePkC6d4r/Vizf/Q==
+Date: Fri, 24 Jul 2026 11:00:47 +0000
+Message-ID: <20260724104819.1296803-49-sascha.bischoff@arm.com>
 References: <20260724104819.1296803-1-sascha.bischoff@arm.com>
 In-Reply-To: <20260724104819.1296803-1-sascha.bischoff@arm.com>
 Accept-Language: en-GB, en-US
@@ -103,18 +104,18 @@ x-mailer: git-send-email 2.34.1
 Authentication-Results-Original: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=arm.com;
 x-ms-traffictypediagnostic:
-	DU0PR08MB8421:EE_|AM8PR08MB5571:EE_|AM3PEPF0000A79A:EE_|AMDPR08MB11367:EE_
-X-MS-Office365-Filtering-Correlation-Id: 917ede9d-d9f9-407c-da70-08dee972eccd
+	DU0PR08MB8421:EE_|AM8PR08MB5571:EE_|AMS0EPF00000193:EE_|VE1PR08MB5840:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5ef2251d-3821-4bcd-f037-08dee972f71c
 x-checkrecipientrouted: true
 nodisclaimer: true
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam-Untrusted:
- BCL:0;ARA:13230040|376014|1800799024|366016|23010399003|11063799006|3023799007|6133799003|56012099006|18002099003|22082099003|10067099003|38070700021;
+ BCL:0;ARA:13230040|376014|1800799024|366016|23010399003|5023799004|11063799006|6133799003|56012099006|18002099003|22082099003|10067099003|38070700021;
 X-Microsoft-Antispam-Message-Info-Original:
- xaCidjI8VTf3MX2cPCsq3xZo9MeIvfpxp8IUSJcmToUX6h5pksDyQuhHafIOIaNNKm4gI48dgFod+5uD90FCom0UJNIhHSiSsAHiA8SEa2hTIP9EyGjaCJ5oPskBUsuvBMtYDPOMt1ULEUHGTKnhtuej4A3GMukILy9FO3lJfUsZPlWMZzUk6Nj++etEZg/1CpYpAQ5nfu7ht0tP7yOs5Gx08XjdJB/gFIu5KhMMcgYwDyoQ5YWqiUCoEaY3yh+AZo3H9BUC+9FihZg7/7OuR+cjN+PFzuDzamUKfCYYqh+Y65b75CqMpYulDtQSqF7pIT0v6RsqGA8Nte8cSvzTyofZB4Ri1FBrTcRpjkkkjOrulRuv39gVSaupinPc5eWXa1A8pU26qMsJbk266xKoqYIl2Kq4JzhuDxalwe8uMgfevpIIFioSHSSwR9jyciOTKTk0yq72HgeRhF9m/NsV+pk9trxrWIj2BU17BGaQmdyX00Rkz3plR1fJdqYffu4HA+Tv5KHzjPOMArVmWaC2qXHc8IdTm1Iu5g1GdTrukVugbH/nh239CZVZZSOuTnykMYAIzfMNYIgQxEBnxtg4uVosxAIL32RN+GVWNm3G1JsBTDIdgF05noOHouJyWKZbw7jiUqth98AbvWKHWlkZtEHSiNAcEM/El336xrBACArZXdO26pLT8a+5LntE0/zSTVCYaT7Ump6d4r6Ayh2VELz+FlsKjDJRkCoIRECI1bw=
+ pWMMHSdcH3IlVen9rRLtlhnUOYLwY4xWH7tauZp4GJjZcLroI1Grzuw5iMehBLmUczNs1TtgO4lbNqhmd5GEBbsEBJnCf8d4RnJ+UPe26eQGd4/N/dkz/UXDYs5/XwSNZnu6bBRYrk46pagwOaU6Jt2nYOrStxJdWOamnqGSA2BB9M0YatbQtMlc69ag2EjWTb/v19H4Vj6z/l0UhCj9NrbYDiZQtYzLa6TrlLJ+Nwn6UvA/IJsHLw1ff5NIZ0IbwGWqcSuI94pwfbUSRg3baKOhhhP6dvIXtStXWhfwXUWo6rGowECk748ZEPGmsXcbShKxSUPaiICQZkIMDkze01MsNpV7xwnm/9pvynv4l2jsW+HaRRMEB2zY8167S2YvylQd5MeO+f1BqtVvQQg266Txk6D4R5Uo1TUTVaaIEHYVR5M27VGDyU7RbAMN0fVFeKdQn+v3cBEHtvlE24p7pnxVYhrubUVRz3GZ1xUHzPs6q7o70Hlfp6Zt0BhMkjOirtxqpoFTjkr3jGCMfvG3+QZOuAGoHyw9b94qkq774XPyTI6iIIjN+VA3qiuoGhSX4IQ/pWXxcq2JtYd931A1dNrrH8b87ef1/8m7G/Ygy1BKD226O6Q1P+IZlUift/WbKH6sXz4zzVtkTzGMI3F2k+0Gc54Fw6A5QCMR7+QStyXTTNfUZHCgPuocvXZalg8LVxg94P8S6Lrt2IVTK3uMhWugd3+KtKRqhKju5cNYZGA=
 X-Forefront-Antispam-Report-Untrusted:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU0PR08MB8421.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(23010399003)(11063799006)(3023799007)(6133799003)(56012099006)(18002099003)(22082099003)(10067099003)(38070700021);DIR:OUT;SFP:1101;
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU0PR08MB8421.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(23010399003)(5023799004)(11063799006)(6133799003)(56012099006)(18002099003)(22082099003)(10067099003)(38070700021);DIR:OUT;SFP:1101;
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
@@ -124,215 +125,242 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 X-Exchange-RoutingPolicyChecked:
- lef3V5oXfxo4FPoXGGFC+s+XO4m+tgEJ65UY+pQIAbuLg+s+oZEOkiRjBISytQtcPV7nQZ1nNnkHrZthMllkkZOiQDSA2B+JmUIZbvR4+jM/S6wA6LRl7+icTqyPXp8TxdqAdxAmNKzevxIYzXIeQszFukiWfv+YmrvECvTxXZpxHZ3p33wJkearqELWJXoLqVN7WtTZPgnhTnXn14egjNEwgNQSAe/z/V7dd9A0vAT7MQcrHa+/mhPAhvkj/eH/naxU1BD7/pomaMt+YLTjzdo5ISN9o2cXSu/vm/8ebKoQrVSgCSdkTtuYSRKyja9wjEIRo3nWo0GwGLPe5sE7ag==
+ kOlFoKiDfKVFC3cstb+Pn/0F9xikvEAsDjva0bnoZMrmX0aMMLgp4Q34t/bJ+U9qqCzWwp/lPoe3l/sEMeU5L8vXoK1JtkwYSVYCkBCkUkBJZgMNub8fs3OQlSK4/3vP2OXXo6alW6XBctr7N+r/hKAs3ZaA8CyJ1ySnDUq0q8hrgS952ZPimTkXyeHi1gXwdI1Rvm24PnhTvOQ2ZvIivyXHTzlka6yN4jNwvow3GbCVczLFgsTpoH9Vvk+qV/YRa4b8lTpil1rccktND1Be6qfiozVfeBBE3WJPjJEAqTN9N7PHBfGfLZHAHUXeSnFGh2XMUt1NrszZPtZ3aAxrOA==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8PR08MB5571
 X-EOPAttributedMessage: 0
 X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- AM3PEPF0000A79A.eurprd04.prod.outlook.com
+ AMS0EPF00000193.eurprd05.prod.outlook.com
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	a834b99a-4205-44e1-a3ae-08dee972c7af
+	b1cdb677-f8ec-42a7-dc29-08dee972d0ee
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|23010399003|82310400026|35042699022|14060799003|1800799024|36860700016|6133799003|56012099006|11063799006|10067099003|22082099003|18002099003|3023799007;
+	BCL:0;ARA:13230040|82310400026|23010399003|14060799003|36860700016|1800799024|376014|35042699022|6133799003|10067099003|11063799006|5023799004|56012099006|22082099003|18002099003;
 X-Microsoft-Antispam-Message-Info:
-	q19mRt1Tx1/87UoCTKnrofR1U3467bZoAV17u24sVclOFhkI01fmXUTT7sZhrphZn+Dbd0bIuf8ppi1jNdsiQenulNoTvZnkxQ34bLN+eFAO0HyFCEoo6IE/tHm8AevcpN41GR8kab+jMt7DZbvuRf+8t8cAONTlb9MbECEIp1Y9yHIfLQswPPDhgyU7h2cdSqPKN7XKOq8DmxJy1lJnJF6HqCuIVwKi/ZOb/ahT7MI+ztQZLXl1dw8sclGuJuS2362xfx+XOWmQ2JwrO65sOBIoqk/uFy2XO0aROoY1FZx5mXNcBDZ+3WldNi2/25IGqsYN/6QmFgxjqU/cKlNpWWx8BAJMqyYK57Tnish4epjtxlXOWhDb3kL5Vg47wdDwk7Riqf+HAcEVNPzTZP1Pk7KZmgZXhXAkMX+2F6EJjM4eyK7OnZJ+oKhnwJaR35h/Jj9fMRCekeflZCGi8mNcyeL2/BHYs8tN77p9+jglfo6TszeUWA81FCxVnG7VVUL9FrOSAufjregRv/mE8S1PtxBqfKt8qPUhWqGdkpQKmY8viRjxyQOzJzrsW7Y9lrPD7aAxCwtsqfyHxQPU7YDZcJrpRYbar4iQHyZYj63F1P4aT8H4had3fzFgPUYa4fHNZUQwH0bf6wkass9x90t3hNrC6Kc8Bf3s92EZIZyIzPPXydR3BmCrdQkE3axaxhbkkQsyzCtrHuwOfWIR2ZhBRg==
+	UUIKz1LZqMjZTCA3ACUyvtUT4ty2Cf75EtQW+W6snU3bUgv+BjD77EriaQf9nTVacRPj3OLHysIl+lo+QC4yAm59AAAU90syKHDMdp2uhJ6jYPSTcbOBb4dWFFPHms5tMiugVgtE8L4CL/dl7F6bGx0Zn9UK+/UmD+5JgOGPDAzceKj2Alkxaev1zK3/CvfGtgn+5qiPlRS1E/Lvt2U5VV4IflgKkqx/5XnXNqzGY6psrIwyEmYR1DWq+PsotdWPyY7qkSA7Hr5DgdbRTgWPBuAPC5LS+wLpeB78TQaUM8OplXIRgSVjHylXAxFG3mBSgD7TegvazPMUtfwB10CnN32zX7rbjdDpgiiTXXumBwMORoqj/4hp8w9zyL2jqmuztcgzTg8i0uGugWWD/rA2KSlCrXnZ9YuH6qSd0ICZtMuHaB0mU2pLCb3CdYpGvh7SLFp9Y3xc8ckElqjUEMuK1elBHMjoaxgvYMZ5Cd9cBRGKIAs+o3CODdkJWF4+HpnYlc40lcuSrI0UPm7K1X6PA3JyAj5y1Dhi2PyGDLW/bT7OTFmFmVrFL1cFnQ3zUQelTRXprDeDPy8uehXlEm+MyT6r4lR8wWFi3QOGalCot7+y8WLGT+t2kCYTyvvqVWRYCmG3KWhCr3ZF4+i7WhXPDbxEbvFIR1iY2L6KFMPsOOwjgGx4rwKE88HfIDTxgXDIq/0piczZfm+ALlMzfoy0QA==
 X-Forefront-Antispam-Report:
-	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(23010399003)(82310400026)(35042699022)(14060799003)(1800799024)(36860700016)(6133799003)(56012099006)(11063799006)(10067099003)(22082099003)(18002099003)(3023799007);DIR:OUT;SFP:1101;
+	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(23010399003)(14060799003)(36860700016)(1800799024)(376014)(35042699022)(6133799003)(10067099003)(11063799006)(5023799004)(56012099006)(22082099003)(18002099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	Nrip+P78FH+0jTn0ZZOd5A+009QsGFugC/D93R8YLclqpezXIFAs1xSVXz2JPa975C0ewN7myFyBDhpyR/UaPKZOSLnLbZiW9j5vEflYmM4JmeJkk6IpWU2G56bNXI4mVlU8gfBdkQs79QNjedIgdJhwSEPYJeeGu0msGnlG5VkgkpeAFdY6z+G/FIKcdVJl2t1y0kkBoeQFqwYX6YYRlDpb6yotwTAkunXALl9JRdpJ6kMy75fNwBXtuOGtSNTokvSPhLkl20Bi2/ly4VzNQaYf38WXX1lZIRxmMh/1Bg3ROoSBHNJDPQrcLWxqLTshQFJG9SjfbDSICNYF08yeyFuOlZSJwLHkA1zq6rNGIF2TqbLVt4O5/Wiv/31CFR4TptgBpVS8M4GEZ5SNjps7vLRJMvyGdL/LImmYwbkmAritEjXh0k4r6CDqV3pMLgmn
+	GTvI8BCaUMYn/3Prm2frtdZmSKXFyhvS3809JMzkjm/zJWHPdhxvR0c0NsfG5TRaCNq2EiMBbmJH9Q0mzL53zTV4Lepq5HHNJiSgjcZAxgOx9+KZvkejmy60sE1T5gK5WNFeBy0LbA4VfVV+tY7VgE/7XQ2nAXopRX2gA2F2ev7Os1+jDyOBcjS1WH6AaYjR+4FHYg7ymtontJ/nedbeyq5l10AyqsAKruYqIgF2bPCebRchRn9EPwEC/Sogzfubsm2/f+/ipFlaTF7h5uem3SP97o1InWviOC0pZLo84Bk7CEVbV8ToB3ClsNpwXKXqp/DBnt7pDdtN1x6wyfN28t73hrlhMr/YIKBbQlyPLPl7t9pCEgbIrJgFdkNxOte+fpRli3CA4XXs35RyDZQulkwUMZeWlFdlrXRHnDBk95CeRC2qdSVi1QR0iC5YubV5
 X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jul 2026 11:01:34.0608
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jul 2026 11:01:51.3623
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 917ede9d-d9f9-407c-da70-08dee972eccd
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5ef2251d-3821-4bcd-f037-08dee972f71c
 X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	AM3PEPF0000A79A.eurprd04.prod.outlook.com
+	AMS0EPF00000193.eurprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AMDPR08MB11367
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1PR08MB5840
 
-Add a two-VPE VGICv5 LPI delivery test. LPIs depend on an IST whose
-base is provided by the guest through IRS_IST_BASER (which triggers
-KVM to allocate and provide an LPI IST to the HW), so exercise the
-virtual IRS ID registers and IST base configuration path before
-checking interrupt delivery.
+Add end-to-end VGICv5 IST save/restore coverage. The earlier IST
+attribute test only checks API rejection cases; this test verifies that
+interrupt state saved from the ISTs can be restored into a fresh VM
+before first run and then consumed by the guest.
 
-Back the guest's LPI IST with a dedicated userspace memslot and unity
-map it into the guest at the same IPA and VA. This lets the guest
-provide that address to the emulated IRS via IRS_IST_BASER while the
-host test still allocates and owns the backing memory.
+Build a source VM that configures SPI and LPI enable, priority and
+affinity state from the guest. Inject selected SPIs from userspace, save
+the IRS register state, and save both the SPI and LPI IST images through
+KVM_DEV_ARM_VGIC_GRP_IST using userspace-provided buffers.
 
-Have VPE0 enable the IRS, derive a valid linear LPI IST configuration
-from the virtual IRS ID registers, provide the IST base through
-IRS_IST_BASER, configure one LPI for each VPE, and send an LPI to VPE1.
-VPE1 consumes it and replies with a second LPI, which VPE0 consumes
-before completing the test.
+Create a restore VM, verify that IST restore is rejected before the IRS
+state has been restored, restore the IRS registers, validate bad or
+missing LPI storage, and restore the saved SPI and LPI IST images. Before
+running any destination vCPU, save the ISTs again and compare the
+re-saved buffers against the original saved buffers so dropped serialized
+state fails independently of interrupt delivery.
+
+Finally run the restored guest and check pending and enabled SPI/LPI
+state across two VPEs, priority ordering via ICC_PCR_EL1, delivery of an
+interrupt that was pending but disabled at save time, and affinity for
+interrupts injected after restore.
 
 Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 ---
- tools/testing/selftests/kvm/arm64/vgic_v5.c   | 241 +++++++++++++++++-
- .../selftests/kvm/include/arm64/gic_v5.h      |  16 ++
- 2 files changed, 255 insertions(+), 2 deletions(-)
+ tools/testing/selftests/kvm/arm64/vgic_v5.c | 449 +++++++++++++++++++-
+ 1 file changed, 444 insertions(+), 5 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/arm64/vgic_v5.c b/tools/testing/se=
 lftests/kvm/arm64/vgic_v5.c
-index cec994a77c993..d022559005ada 100644
+index d022559005ada..05d8be8d75b51 100644
 --- a/tools/testing/selftests/kvm/arm64/vgic_v5.c
 +++ b/tools/testing/selftests/kvm/arm64/vgic_v5.c
-@@ -13,12 +13,18 @@
- #include "vgic.h"
-=20
- #define NR_VCPUS		1
-+#define VGIC_V5_LPI_NR_VCPUS	2
-+#define VGIC_V5_LPI_MEMSLOT	1
- #define VGIC_V5_NR_PRIVATE_IRQS	64
- #define VGIC_V5_DEFAULT_NR_SPIS	32
- #define VGIC_V5_MAX_NR_SPIS	BIT(16)
- #define VGIC_V5_TEST_NR_SPIS		64
- #define VGIC_V5_IRS_SIZE		0x20000
- #define VGIC_V5_IRS_WAIT_RETRIES	1000000
-+#define VGIC_V5_LPI_IST_BASE_GPA	(GICV5_IRS_CONFIG_BASE_GPA + VGIC_V5_IRS_=
-SIZE)
-+#define VGIC_V5_LPI_IST_SIZE		0x10000
-+#define LPI_TEST_TO_VPE1		0
-+#define LPI_TEST_TO_VPE0		1
+@@ -25,6 +25,14 @@
+ #define VGIC_V5_LPI_IST_SIZE		0x10000
+ #define LPI_TEST_TO_VPE1		0
+ #define LPI_TEST_TO_VPE0		1
++#define RESTORE_TEST_LPI_PENDING		0
++#define RESTORE_TEST_LPI_ENABLED		1
++#define RESTORE_TEST_SPI_PRIO_HIGH		0
++#define RESTORE_TEST_SPI_PRIO_LOW		1
++#define RESTORE_TEST_SPI_PENDING_DISABLED	2
++#define RESTORE_TEST_SPI_ENABLED		3
++#define VGIC_V5_IST_PRIO_HIGH		0x08
++#define VGIC_V5_IST_PRIO_LOW		0x10
 =20
  static u64 max_phys_size;
 =20
-@@ -32,6 +38,8 @@ struct vm_gic {
- #define GUEST_CMD_IRQ_DIEOI	11
- #define GUEST_CMD_IS_AWAKE	12
+@@ -40,6 +48,9 @@ struct vm_gic {
  #define GUEST_CMD_IS_READY	13
-+#define GUEST_CMD_LPI_SENT	14
-+#define GUEST_CMD_LPI_REPLIED	15
+ #define GUEST_CMD_LPI_SENT	14
+ #define GUEST_CMD_LPI_REPLIED	15
++#define GUEST_CMD_IST_SOURCE_READY	16
++#define GUEST_CMD_IST_SPI_INJECT_READY	17
++#define GUEST_CMD_IST_LPI_INJECT_READY	18
 =20
  static struct kvm_vgic_v5_ist vgic_v5_ist_attr(void *spi_ist, size_t spi_s=
 ize,
  					       void *lpi_ist, size_t lpi_size)
-@@ -46,11 +54,22 @@ static struct kvm_vgic_v5_ist vgic_v5_ist_attr(void *sp=
-i_ist, size_t spi_size,
-=20
+@@ -55,6 +66,7 @@ static struct kvm_vgic_v5_ist vgic_v5_ist_attr(void *spi_=
+ist, size_t spi_size,
  static u32 spi_line_expected;
  static bool spi_line_level_sensitive;
-+static bool lpi_ist_ready;
-+
-+static u64 gicv5_hwirq(u32 type, u32 intid)
-+{
-+	return FIELD_PREP(GICV5_HWIRQ_TYPE, type) |
-+	       FIELD_PREP(GICV5_HWIRQ_ID, intid);
-+}
-+
-+static u64 gicv5_lpi_hwirq(u32 lpi)
-+{
-+	return gicv5_hwirq(GICV5_HWIRQ_TYPE_LPI, lpi);
-+}
+ static bool lpi_ist_ready;
++static u32 ist_restore_irq_count[VGIC_V5_LPI_NR_VCPUS];
 =20
- static u64 gicv5_spi_hwirq(u32 spi)
+ static u64 gicv5_hwirq(u32 type, u32 intid)
  {
--	return FIELD_PREP(GICV5_HWIRQ_TYPE, GICV5_HWIRQ_TYPE_SPI) |
--	       FIELD_PREP(GICV5_HWIRQ_ID, spi);
-+	return gicv5_hwirq(GICV5_HWIRQ_TYPE_SPI, spi);
+@@ -86,6 +98,27 @@ static void gicv5_setup_and_enable_hwirq(u64 hwirq, u32 =
+target_vpe)
+ 	gic_insn(hwirq, CDEN);
  }
 =20
- static void gicv5_setup_and_enable_hwirq(u64 hwirq, u32 target_vpe)
-@@ -72,6 +91,18 @@ static void gicv5_enable_spi(u32 spi, u32 target_vpe)
- 	gicv5_setup_and_enable_hwirq(gicv5_spi_hwirq(spi), target_vpe);
- }
-=20
-+static void gicv5_enable_lpi(u32 lpi, u32 target_vpe)
++static void gicv5_set_hwirq_priority(u64 hwirq, u32 priority)
 +{
-+	gicv5_setup_and_enable_hwirq(gicv5_lpi_hwirq(lpi), target_vpe);
-+}
-+
-+static void gicv5_send_lpi(u32 lpi)
-+{
-+	u64 hwirq =3D gicv5_lpi_hwirq(lpi);
-+
-+	gic_insn(hwirq | GICV5_GIC_CDPEND_PENDING_MASK, CDPEND);
-+}
-+
- static void gicv5_wait_for_irs_idle(u32 reg, u32 idle)
- {
- 	int i;
-@@ -101,6 +132,52 @@ static void gicv5_configure_spi(u32 spi, bool level)
- 				GICV5_IRS_SPI_STATUSR_IDLE);
- }
-=20
-+static u32 gicv5_lpi_istsz(u32 idr2, u32 lpi_id_bits)
-+{
-+	if (!(idr2 & GICV5_IRS_IDR2_ISTMD))
-+		return GICV5_IRS_IST_CFGR_ISTSZ_4;
-+
-+	if (lpi_id_bits >=3D FIELD_GET(GICV5_IRS_IDR2_ISTMD_SZ, idr2))
-+		return GICV5_IRS_IST_CFGR_ISTSZ_16;
-+
-+	return GICV5_IRS_IST_CFGR_ISTSZ_8;
-+}
-+
-+static void gicv5_configure_lpi_ist(void)
-+{
-+	u32 idr2, min_lpi_id_bits, lpi_id_bits, id_bits, istsz;
 +	u64 val;
 +
-+	idr2 =3D readl(GICV5_IRS_CONFIG_BASE_GVA + GICV5_IRS_IDR2);
-+	GUEST_ASSERT(idr2 & GICV5_IRS_IDR2_LPI);
-+
-+	min_lpi_id_bits =3D FIELD_GET(GICV5_IRS_IDR2_MIN_LPI_ID_BITS, idr2);
-+	id_bits =3D FIELD_GET(GICV5_IRS_IDR2_ID_BITS, idr2);
-+	/* Default to 32 LPIs, unless the min requirement is higher */
-+	lpi_id_bits =3D max(5U, min_lpi_id_bits);
-+	GUEST_ASSERT(lpi_id_bits <=3D id_bits);
-+
-+	istsz =3D gicv5_lpi_istsz(idr2, lpi_id_bits);
-+	/*
-+	 * We allocate a fixed-size IST buffer on the host to avoid dynamic
-+	 * allocation from the guest. Make sure it fits the linear IST described
-+	 * by IDR2 before programming IRS_IST_BASER.
-+	 */
-+	GUEST_ASSERT((BIT_ULL(lpi_id_bits) << (istsz + 2)) <=3D VGIC_V5_LPI_IST_S=
-IZE);
-+
-+	val =3D FIELD_PREP(GICV5_IRS_IST_CFGR_LPI_ID_BITS, lpi_id_bits) |
-+	      FIELD_PREP(GICV5_IRS_IST_CFGR_ISTSZ, istsz);
-+	writel(val, GICV5_IRS_CONFIG_BASE_GVA + GICV5_IRS_IST_CFGR);
-+
-+	val =3D FIELD_PREP(GICV5_IRS_IST_BASER_ADDR_MASK,
-+			 VGIC_V5_LPI_IST_BASE_GPA >> GICV5_IRS_IST_BASER_ADDR_SHIFT);
-+	val |=3D GICV5_IRS_IST_BASER_VALID;
-+	writeq(val, GICV5_IRS_CONFIG_BASE_GVA + GICV5_IRS_IST_BASER);
-+
-+	GUEST_ASSERT_EQ(readl(GICV5_IRS_CONFIG_BASE_GVA + GICV5_IRS_IST_STATUSR),
-+			GICV5_IRS_IST_STATUSR_IDLE);
++	val =3D hwirq | FIELD_PREP(GICV5_GIC_CDPRI_PRIORITY_MASK, priority);
++	gic_insn(val, CDPRI);
 +}
 +
- static void gicv5_enable_irs(void)
++static void gicv5_set_hwirq_affinity(u64 hwirq, u32 target_vpe)
++{
++	u64 val;
++
++	val =3D hwirq | FIELD_PREP(GICV5_GIC_CDAFF_IAFFID_MASK, target_vpe);
++	gic_insn(val, CDAFF);
++}
++
++static void gicv5_enable_hwirq(u64 hwirq)
++{
++	gic_insn(hwirq, CDEN);
++}
++
+ static void gicv5_enable_spi(u32 spi, u32 target_vpe)
  {
- 	writel(GICV5_IRS_CR0_IRSEN,
-@@ -108,6 +185,12 @@ static void gicv5_enable_irs(void)
- 	gicv5_wait_for_irs_idle(GICV5_IRS_CR0, GICV5_IRS_CR0_IDLE);
+ 	gicv5_setup_and_enable_hwirq(gicv5_spi_hwirq(spi), target_vpe);
+@@ -191,6 +224,15 @@ static void gicv5_configure_test_lpis(void)
+ 	gicv5_enable_lpi(LPI_TEST_TO_VPE0, 0);
  }
 =20
-+static void gicv5_configure_test_lpis(void)
++static void gicv5_set_pcr(u32 priority)
 +{
-+	gicv5_enable_lpi(LPI_TEST_TO_VPE1, 1);
-+	gicv5_enable_lpi(LPI_TEST_TO_VPE0, 0);
++	u64 pcr;
++
++	pcr =3D FIELD_PREP(ICC_PCR_EL1_PRIORITY, priority);
++	write_sysreg_s(pcr, SYS_ICC_PCR_EL1);
++	isb();
 +}
 +
  static void guest_ppi_irq_handler(struct ex_regs *regs)
  {
  	bool valid;
-@@ -207,6 +290,67 @@ static void guest_spi_line_code(void)
+@@ -321,6 +363,11 @@ static void guest_lpi_irq_handler(struct ex_regs *regs=
+)
+ 	GUEST_DONE();
+ }
+=20
++static void guest_unexpected_irq_handler(struct ex_regs *regs)
++{
++	GUEST_FAIL("Unexpected IRQ");
++}
++
+ static void guest_lpi_code(void)
+ {
+ 	u32 vcpu_id =3D guest_get_vcpuid();
+@@ -351,6 +398,165 @@ static void guest_lpi_code(void)
  		wfi();
  }
 =20
-+static void guest_lpi_irq_handler(struct ex_regs *regs)
++static void restore_test_setup_hwirq(u64 hwirq, u32 target_vpe,
++				     u32 priority, bool enable)
++{
++	gicv5_set_hwirq_priority(hwirq, priority);
++	gicv5_set_hwirq_affinity(hwirq, target_vpe);
++
++	if (enable)
++		gicv5_enable_hwirq(hwirq);
++}
++
++/*
++ * The source VM configures SPI and LPI state for the IST save/restore tes=
+t.
++ * It leaves interrupts disabled, allowing userspace to save the state bef=
+ore
++ * the restore VM enables interrupts and checks delivery.
++ */
++static void guest_ist_source_code(void)
++{
++	local_irq_disable();
++
++	gicv5_enable_irs();
++	gicv5_configure_lpi_ist();
++
++	restore_test_setup_hwirq(gicv5_lpi_hwirq(RESTORE_TEST_LPI_PENDING),
++				 1, VGIC_V5_IST_PRIO_HIGH, true);
++	restore_test_setup_hwirq(gicv5_lpi_hwirq(RESTORE_TEST_LPI_ENABLED),
++				 1, VGIC_V5_IST_PRIO_HIGH, true);
++	restore_test_setup_hwirq(gicv5_spi_hwirq(RESTORE_TEST_SPI_PRIO_HIGH),
++				 0, VGIC_V5_IST_PRIO_HIGH, true);
++	restore_test_setup_hwirq(gicv5_spi_hwirq(RESTORE_TEST_SPI_PRIO_LOW),
++				 0, VGIC_V5_IST_PRIO_LOW, true);
++	restore_test_setup_hwirq(gicv5_spi_hwirq(RESTORE_TEST_SPI_ENABLED),
++				 0, VGIC_V5_IST_PRIO_HIGH, true);
++	restore_test_setup_hwirq(gicv5_spi_hwirq(RESTORE_TEST_SPI_PENDING_DISABLE=
+D),
++				 0, VGIC_V5_IST_PRIO_HIGH, false);
++
++	gicv5_send_lpi(RESTORE_TEST_LPI_PENDING);
++
++	GUEST_SYNC(GUEST_CMD_IST_SOURCE_READY);
++
++	while (1)
++		wfi();
++}
++
++/*
++ * This is the restore VM for the IST save/restore test. The IRS regs and =
+ISTs
++ * have been restored before this code runs. Based on which VPE is running=
+, a
++ * different set of interrupts is expected. We check that we get what we
++ * expected before terminating the test.
++ *
++ * The expected interrupts for VPE0 are:
++ * - High-priority SPI, pending and enabled before save.
++ * - Low-priority SPI, pending and enabled before save. This is only deliv=
+ered
++ *   after the guest lowers the masked priority via ICC_PCR_EL1.
++ * - SPI that was pending but disabled before save. This is only delivered
++ *   after the guest enables it after restore.
++ * - SPI that was enabled but not pending before save. Userspace injects t=
+his
++ *   after restore to check that the enable state and affinity were restor=
+ed.
++ *
++ * The expected interrupts for VPE1 are:
++ * - LPI that was pending and enabled before save.
++ * - LPI that was enabled but not pending before save. The guest injects t=
+his
++ *   after restore to check that the enable state and affinity were restor=
+ed.
++ */
++static void guest_ist_restore_irq_handler(struct ex_regs *regs)
 +{
 +	u32 vcpu_id =3D guest_get_vcpuid();
-+	u32 expected_lpi =3D vcpu_id ? LPI_TEST_TO_VPE1 : LPI_TEST_TO_VPE0;
-+	u64 expected_hwirq =3D gicv5_lpi_hwirq(expected_lpi);
-+	u32 hwirq;
++	u32 count =3D ist_restore_irq_count[vcpu_id];
++	u64 hwirq, expected_hwirq =3D 0;
 +	u64 ia;
 +
 +	ia =3D gicr_insn(CDIA);
@@ -343,46 +371,82 @@ IZE);
 +	isb();
 +
 +	hwirq =3D FIELD_GET(GICV5_GICR_CDIA_INTID, ia);
++
++	if (!vcpu_id) {
++		switch (count) {
++		case 0:
++			expected_hwirq =3D gicv5_spi_hwirq(RESTORE_TEST_SPI_PRIO_HIGH);
++			break;
++		case 1:
++			expected_hwirq =3D gicv5_spi_hwirq(RESTORE_TEST_SPI_PRIO_LOW);
++			break;
++		case 2:
++			expected_hwirq =3D gicv5_spi_hwirq(RESTORE_TEST_SPI_PENDING_DISABLED);
++			break;
++		case 3:
++			expected_hwirq =3D gicv5_spi_hwirq(RESTORE_TEST_SPI_ENABLED);
++			break;
++		default:
++			GUEST_FAIL("Unexpected VPE0 IST restore interrupt");
++		}
++	} else {
++		switch (count) {
++		case 0:
++			expected_hwirq =3D gicv5_lpi_hwirq(RESTORE_TEST_LPI_PENDING);
++			break;
++		case 1:
++			expected_hwirq =3D gicv5_lpi_hwirq(RESTORE_TEST_LPI_ENABLED);
++			break;
++		default:
++			GUEST_FAIL("Unexpected VPE1 IST restore interrupt");
++		}
++	}
++
 +	GUEST_ASSERT_EQ(hwirq, expected_hwirq);
 +
 +	gic_insn(hwirq, CDDI);
 +	gic_insn(0, CDEOI);
-+
-+	if (vcpu_id) {
-+		gicv5_send_lpi(LPI_TEST_TO_VPE0);
-+		GUEST_SYNC(GUEST_CMD_LPI_REPLIED);
-+		while (1)
-+			wfi();
-+	}
-+
-+	GUEST_DONE();
-+}
-+
-+static void guest_lpi_code(void)
-+{
-+	u32 vcpu_id =3D guest_get_vcpuid();
-+
-+	local_irq_disable();
++	ist_restore_irq_count[vcpu_id]++;
 +
 +	if (!vcpu_id) {
-+		gicv5_enable_irs();
-+		gicv5_configure_lpi_ist();
-+		gicv5_configure_test_lpis();
-+		WRITE_ONCE(lpi_ist_ready, true);
++		switch (count) {
++		case 0:
++			gicv5_set_pcr(VGIC_V5_IST_PRIO_LOW);
++			break;
++		case 1:
++			gicv5_enable_hwirq(
++				gicv5_spi_hwirq(RESTORE_TEST_SPI_PENDING_DISABLED));
++			break;
++		case 2:
++			GUEST_SYNC(GUEST_CMD_IST_SPI_INJECT_READY);
++			break;
++		case 3:
++			GUEST_DONE();
++		}
++	} else {
++		switch (count) {
++		case 0:
++			gicv5_send_lpi(RESTORE_TEST_LPI_ENABLED);
++			GUEST_SYNC(GUEST_CMD_IST_LPI_INJECT_READY);
++			break;
++		case 1:
++			GUEST_DONE();
++		}
 +	}
++}
 +
-+	/* Go bang if we run VCPU1 before VCPU0 */
-+	GUEST_ASSERT(READ_ONCE(lpi_ist_ready));
++static void guest_ist_restore_code(void)
++{
++	local_irq_disable();
 +
 +	gicv5_cpu_enable_interrupts();
-+	local_irq_enable();
++
++	if (!guest_get_vcpuid())
++		gicv5_set_pcr(VGIC_V5_IST_PRIO_HIGH);
 +
 +	GUEST_SYNC(GUEST_CMD_IS_READY);
 +
-+	if (!vcpu_id) {
-+		gicv5_send_lpi(LPI_TEST_TO_VPE1);
-+		GUEST_SYNC(GUEST_CMD_LPI_SENT);
-+	}
++	local_irq_enable();
 +
 +	while (1)
 +		wfi();
@@ -391,163 +455,319 @@ IZE);
  /* we don't want to assert on run execution, hence that helper */
  static int run_vcpu(struct kvm_vcpu *vcpu)
  {
-@@ -277,6 +421,48 @@ static void vgic_v5_spi_line_vm_create(struct vm_gic *=
+@@ -421,8 +627,10 @@ static void vgic_v5_spi_line_vm_create(struct vm_gic *=
 v,
+ 			    KVM_DEV_ARM_VGIC_CTRL_INIT, NULL);
+ }
+=20
+-static void vgic_v5_lpi_vm_create(struct vm_gic *v,
+-				  struct kvm_vcpu *vcpus[VGIC_V5_LPI_NR_VCPUS])
++static void vgic_v5_lpi_ist_vm_create(struct vm_gic *v,
++				      struct kvm_vcpu *vcpus[VGIC_V5_LPI_NR_VCPUS],
++				      void (*guest_code)(void),
++				      void (*irq_handler)(struct ex_regs *))
+ {
+ 	unsigned int nr_lpi_ist_pages;
+ 	u64 attr;
+@@ -433,13 +641,13 @@ static void vgic_v5_lpi_vm_create(struct vm_gic *v,
+ 	v->gic_fd =3D kvm_create_device(v->vm, v->gic_dev_type);
+=20
+ 	for (i =3D 0; i < VGIC_V5_LPI_NR_VCPUS; i++) {
+-		vcpus[i] =3D vm_vcpu_add(v->vm, i, guest_lpi_code);
++		vcpus[i] =3D vm_vcpu_add(v->vm, i, guest_code);
+ 		TEST_ASSERT(vcpus[i], "Failed to create vCPU");
+ 	}
+=20
+ 	vm_init_descriptor_tables(v->vm);
+ 	vm_install_exception_handler(v->vm, VECTOR_IRQ_CURRENT,
+-				     guest_lpi_irq_handler);
++				     irq_handler);
+=20
+ 	for (i =3D 0; i < VGIC_V5_LPI_NR_VCPUS; i++)
+ 		vcpu_init_descriptor_tables(vcpus[i]);
+@@ -455,7 +663,10 @@ static void vgic_v5_lpi_vm_create(struct vm_gic *v,
+ 				    VGIC_V5_LPI_IST_BASE_GPA,
+ 				    VGIC_V5_LPI_MEMSLOT,
+ 				    nr_lpi_ist_pages, 0);
+-	/* Map the IST at VA =3D=3D IPA so the guest can program the same BASER. =
+*/
++	/*
++	 * Map the IST at VA =3D=3D IPA so the guest can program the same BASER
++	 * address.
++	 */
+ 	virt_map(v->vm, VGIC_V5_LPI_IST_BASE_GPA,
+ 		 VGIC_V5_LPI_IST_BASE_GPA, nr_lpi_ist_pages);
+=20
+@@ -463,6 +674,21 @@ static void vgic_v5_lpi_vm_create(struct vm_gic *v,
  			    KVM_DEV_ARM_VGIC_CTRL_INIT, NULL);
  }
 =20
 +static void vgic_v5_lpi_vm_create(struct vm_gic *v,
 +				  struct kvm_vcpu *vcpus[VGIC_V5_LPI_NR_VCPUS])
 +{
-+	unsigned int nr_lpi_ist_pages;
-+	u64 attr;
-+	int i;
++	vgic_v5_lpi_ist_vm_create(v, vcpus, guest_lpi_code,
++				  guest_lpi_irq_handler);
++}
 +
-+	v->gic_dev_type =3D KVM_DEV_TYPE_ARM_VGIC_V5;
-+	v->vm =3D __vm_create(VM_SHAPE_DEFAULT, VGIC_V5_LPI_NR_VCPUS, 0);
-+	v->gic_fd =3D kvm_create_device(v->vm, v->gic_dev_type);
-+
-+	for (i =3D 0; i < VGIC_V5_LPI_NR_VCPUS; i++) {
-+		vcpus[i] =3D vm_vcpu_add(v->vm, i, guest_lpi_code);
-+		TEST_ASSERT(vcpus[i], "Failed to create vCPU");
-+	}
-+
-+	vm_init_descriptor_tables(v->vm);
-+	vm_install_exception_handler(v->vm, VECTOR_IRQ_CURRENT,
-+				     guest_lpi_irq_handler);
-+
-+	for (i =3D 0; i < VGIC_V5_LPI_NR_VCPUS; i++)
-+		vcpu_init_descriptor_tables(vcpus[i]);
-+
-+	attr =3D GICV5_IRS_CONFIG_BASE_GPA;
-+	kvm_device_attr_set(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
-+			    KVM_VGIC_V5_ADDR_TYPE_IRS, &attr);
-+	vgic_v5_map_irs(v->vm);
-+
-+	nr_lpi_ist_pages =3D vm_calc_num_guest_pages(v->vm->mode,
-+						   VGIC_V5_LPI_IST_SIZE);
-+	vm_userspace_mem_region_add(v->vm, VM_MEM_SRC_ANONYMOUS,
-+				    VGIC_V5_LPI_IST_BASE_GPA,
-+				    VGIC_V5_LPI_MEMSLOT,
-+				    nr_lpi_ist_pages, 0);
-+	/* Map the IST at VA =3D=3D IPA so the guest can program the same BASER. =
-*/
-+	virt_map(v->vm, VGIC_V5_LPI_IST_BASE_GPA,
-+		 VGIC_V5_LPI_IST_BASE_GPA, nr_lpi_ist_pages);
-+
-+	kvm_device_attr_set(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
-+			    KVM_DEV_ARM_VGIC_CTRL_INIT, NULL);
++static void vgic_v5_ist_restore_vm_create(struct vm_gic *v,
++					  struct kvm_vcpu *vcpus[VGIC_V5_LPI_NR_VCPUS],
++					  void (*guest_code)(void),
++					  void (*irq_handler)(struct ex_regs *))
++{
++	vgic_v5_lpi_ist_vm_create(v, vcpus, guest_code, irq_handler);
 +}
 +
  static void vgic_v5_run_spi_line_test(u32 nr_spis, u32 expected_spi,
  				      bool level_sensitive,
  				      bool lower_before_run)
-@@ -1179,6 +1365,54 @@ static void test_vgic_v5_spis(void)
- 	vgic_v5_run_spi_line_test(VGIC_V5_DEFAULT_NR_SPIS, 2, true, false);
+@@ -514,6 +740,15 @@ static void vgic_v5_run_spi_line_test(u32 nr_spis, u32=
+ expected_spi,
+ 	vm_gic_destroy(&v);
  }
 =20
-+static void test_vgic_v5_lpis(void)
++static void vgic_v5_expect_sync(struct kvm_vcpu *vcpu, u64 cmd,
++				const char *msg)
 +{
-+	struct kvm_vcpu *vcpus[VGIC_V5_LPI_NR_VCPUS];
 +	struct ucall uc;
-+	struct vm_gic v;
++
++	TEST_ASSERT(get_ucall(vcpu, &uc) =3D=3D UCALL_SYNC && uc.args[1] =3D=3D c=
+md,
++		    "%s", msg);
++}
++
+ struct vgic_region_attr {
+ 	u64 attr;
+ 	u64 size;
+@@ -639,6 +874,52 @@ static const struct vgic_sysreg_attr gic_v5_cpu_sysreg=
+s[] =3D {
+ 	SR(SYS_ICC_PCR_EL1),
+ };
+=20
++static void vgic_v5_save_irs_regs(struct vm_gic *v, u64 *regs)
++{
++	int ret, i;
++
++	for (i =3D 0; i < ARRAY_SIZE(gic_v5_irs_regs); i++) {
++		ret =3D __kvm_device_attr_get(v->gic_fd,
++					    KVM_DEV_ARM_VGIC_GRP_IRS_REGS,
++					    gic_v5_irs_regs[i].attr,
++					    &regs[i]);
++		TEST_ASSERT(!ret, "GICv5 IRS_REGS save failed for %s",
++			    gic_v5_irs_regs[i].name);
++	}
++}
++
++static void vgic_v5_restore_irs_regs(struct vm_gic *v, u64 *regs)
++{
++	int ret, i;
++
++	for (i =3D 0; i < ARRAY_SIZE(gic_v5_irs_regs); i++) {
++		ret =3D __kvm_device_attr_set(v->gic_fd,
++					    KVM_DEV_ARM_VGIC_GRP_IRS_REGS,
++					    gic_v5_irs_regs[i].attr,
++					    &regs[i]);
++		TEST_ASSERT(!ret, "GICv5 IRS_REGS restore failed for %s",
++			    gic_v5_irs_regs[i].name);
++	}
++}
++
++static u64 vgic_v5_saved_irs_reg(u64 *regs, u64 attr)
++{
++	for (int i =3D 0; i < ARRAY_SIZE(gic_v5_irs_regs); i++) {
++		if (gic_v5_irs_regs[i].attr =3D=3D attr)
++			return regs[i];
++	}
++
++	TEST_FAIL("GICv5 IRS register 0x%lx was not saved", attr);
++}
++
++static size_t vgic_v5_lpi_ist_state_size(u64 *irs_regs)
++{
++	u64 cfgr =3D vgic_v5_saved_irs_reg(irs_regs, GICV5_IRS_IST_CFGR);
++	u32 lpi_id_bits =3D FIELD_GET(GICV5_IRS_IST_CFGR_LPI_ID_BITS, cfgr);
++
++	return BIT(lpi_id_bits) * sizeof(__u32);
++}
++
+ static void test_vgic_v5_addr_attrs(void)
+ {
+ 	struct kvm_vcpu *vcpu;
+@@ -1413,6 +1694,161 @@ static void test_vgic_v5_lpis(void)
+ 	vm_gic_destroy(&v);
+ }
+=20
++static void test_vgic_v5_ist_save_restore(void)
++{
++	static u32 lpi_ist[VGIC_V5_LPI_IST_SIZE / sizeof(u32)];
++	static u32 lpi_ist_resave[VGIC_V5_LPI_IST_SIZE / sizeof(u32)];
++	static u32 spi_ist[VGIC_V5_DEFAULT_NR_SPIS];
++	static u32 spi_ist_resave[VGIC_V5_DEFAULT_NR_SPIS];
++	static u64 irs_regs[ARRAY_SIZE(gic_v5_irs_regs)];
++	struct kvm_vcpu *vcpus[VGIC_V5_LPI_NR_VCPUS];
++	struct kvm_vgic_v5_ist ist_attr;
++	struct vm_gic src, dst;
++	size_t lpi_ist_size;
 +	int ret;
 +
-+	lpi_ist_ready =3D false;
-+	vgic_v5_lpi_vm_create(&v, vcpus);
-+	sync_global_to_guest(v.vm, lpi_ist_ready);
++	memset(ist_restore_irq_count, 0, sizeof(ist_restore_irq_count));
 +
-+	/* VPE0 programs a linear LPI IST from the virtual IRS ID registers. */
++	vgic_v5_ist_restore_vm_create(&src, vcpus, guest_ist_source_code,
++				      guest_unexpected_irq_handler);
++
 +	ret =3D run_vcpu(vcpus[0]);
-+	TEST_ASSERT(!ret, "Failed to run GICv5 LPI vCPU0");
-+	TEST_ASSERT(get_ucall(vcpus[0], &uc) =3D=3D UCALL_SYNC &&
-+		    uc.args[1] =3D=3D GUEST_CMD_IS_READY,
-+		    "GICv5 LPI vCPU0 did not become ready");
++	TEST_ASSERT(!ret, "Failed to run GICv5 IST save source VM");
++	vgic_v5_expect_sync(vcpus[0], GUEST_CMD_IST_SOURCE_READY,
++			    "GICv5 IST source guest did not become ready");
 +
-+	/* VPE1 observes the IST and enables the LPIs it will receive/send. */
++	/*
++	 * The guest configured enable/priority/affinity state. Make selected
++	 * SPIs pending from userspace so the SPI IST save path sees them.
++	 */
++	vgic_v5_spi_line(src.vm, RESTORE_TEST_SPI_PRIO_HIGH, 1);
++	vgic_v5_spi_line(src.vm, RESTORE_TEST_SPI_PRIO_LOW, 1);
++	vgic_v5_spi_line(src.vm, RESTORE_TEST_SPI_PENDING_DISABLED, 1);
++
++	vgic_v5_save_irs_regs(&src, irs_regs);
++	lpi_ist_size =3D vgic_v5_lpi_ist_state_size(irs_regs);
++
++	/*
++	 * VCPU0 has configured the initial state. KVM must reject missing or
++	 * incorrectly sized LPI storage before accepting the complete IST image.
++	 */
++	ist_attr =3D vgic_v5_ist_attr(spi_ist, sizeof(spi_ist), NULL, 0);
++	ret =3D __kvm_device_attr_get(src.gic_fd, KVM_DEV_ARM_VGIC_GRP_IST,
++				    0, &ist_attr);
++	TEST_ASSERT(ret && errno =3D=3D EINVAL, "GICv5 IST save accepted missing =
+LPI buffer");
++
++	ist_attr =3D vgic_v5_ist_attr(spi_ist, sizeof(spi_ist), lpi_ist,
++					 lpi_ist_size - sizeof(__u32));
++	ret =3D __kvm_device_attr_get(src.gic_fd, KVM_DEV_ARM_VGIC_GRP_IST,
++				    0, &ist_attr);
++	TEST_ASSERT(ret && errno =3D=3D EINVAL, "GICv5 IST save accepted bad LPI =
+size");
++
++	ist_attr =3D vgic_v5_ist_attr(spi_ist, sizeof(spi_ist), lpi_ist,
++					 lpi_ist_size);
++	ret =3D __kvm_device_attr_get(src.gic_fd, KVM_DEV_ARM_VGIC_GRP_IST,
++				    0, &ist_attr);
++	TEST_ASSERT(!ret, "GICv5 IST save failed");
++
++	vm_gic_destroy(&src);
++
++	/* Create the guest that we are restoring state into */
++	memset(ist_restore_irq_count, 0, sizeof(ist_restore_irq_count));
++	vgic_v5_ist_restore_vm_create(&dst, vcpus, guest_ist_restore_code,
++				      guest_ist_restore_irq_handler);
++	sync_global_to_guest(dst.vm, ist_restore_irq_count);
++
++	ist_attr =3D vgic_v5_ist_attr(spi_ist, sizeof(spi_ist), lpi_ist,
++					 lpi_ist_size);
++	ret =3D __kvm_device_attr_set(dst.gic_fd, KVM_DEV_ARM_VGIC_GRP_IST,
++				    0, &ist_attr);
++	TEST_ASSERT(ret && errno =3D=3D EINVAL, "GICv5 IST restore before IRS sta=
+te");
++
++	vgic_v5_restore_irs_regs(&dst, irs_regs);
++
++	ist_attr =3D vgic_v5_ist_attr(spi_ist, sizeof(spi_ist), NULL, 0);
++	ret =3D __kvm_device_attr_set(dst.gic_fd, KVM_DEV_ARM_VGIC_GRP_IST,
++				    0, &ist_attr);
++	TEST_ASSERT(ret && errno =3D=3D EINVAL, "GICv5 IST restore accepted missi=
+ng LPI buffer");
++
++	ist_attr =3D vgic_v5_ist_attr(spi_ist, sizeof(spi_ist), lpi_ist,
++					 lpi_ist_size - sizeof(__u32));
++	ret =3D __kvm_device_attr_set(dst.gic_fd, KVM_DEV_ARM_VGIC_GRP_IST,
++				    0, &ist_attr);
++	TEST_ASSERT(ret && errno =3D=3D EINVAL, "GICv5 IST restore accepted bad L=
+PI size");
++
++	/* Restore the VMM-owned SPI and LPI IST images. */
++	ist_attr =3D vgic_v5_ist_attr(spi_ist, sizeof(spi_ist), lpi_ist,
++					 lpi_ist_size);
++	ret =3D __kvm_device_attr_set(dst.gic_fd, KVM_DEV_ARM_VGIC_GRP_IST,
++				    0, &ist_attr);
++	TEST_ASSERT(!ret, "GICv5 IST restore failed");
++
++	/*
++	 * Re-save the restored IST image before the destination VM runs, so a
++	 * dropped serialized field fails independently of later interrupt
++	 * delivery.
++	 */
++	ist_attr =3D vgic_v5_ist_attr(spi_ist_resave, sizeof(spi_ist_resave),
++				     lpi_ist_resave, lpi_ist_size);
++	ret =3D __kvm_device_attr_get(dst.gic_fd, KVM_DEV_ARM_VGIC_GRP_IST,
++				    0, &ist_attr);
++	TEST_ASSERT(!ret, "GICv5 IST re-save failed");
++	TEST_ASSERT(!memcmp(spi_ist, spi_ist_resave, sizeof(spi_ist)),
++		    "GICv5 SPI IST state changed across restore");
++	TEST_ASSERT(!memcmp(lpi_ist, lpi_ist_resave, lpi_ist_size),
++		    "GICv5 LPI IST state changed across restore");
++
++	/*
++	 * At this stage, the guest's IST state should match what was saved. Run
++	 * each vcpu once to let it enable interrupts, etc.
++	 */
++	ret =3D run_vcpu(vcpus[0]);
++	TEST_ASSERT(!ret, "Failed to run GICv5 IST restore vCPU0");
++	vgic_v5_expect_sync(vcpus[0], GUEST_CMD_IS_READY,
++			    "GICv5 IST restore vCPU0 did not become ready");
++
 +	ret =3D run_vcpu(vcpus[1]);
-+	TEST_ASSERT(!ret, "Failed to run GICv5 LPI vCPU1");
-+	TEST_ASSERT(get_ucall(vcpus[1], &uc) =3D=3D UCALL_SYNC &&
-+		    uc.args[1] =3D=3D GUEST_CMD_IS_READY,
-+		    "GICv5 LPI vCPU1 did not become ready");
++	TEST_ASSERT(!ret, "Failed to run GICv5 IST restore vCPU1");
++	vgic_v5_expect_sync(vcpus[1], GUEST_CMD_IS_READY,
++			    "GICv5 IST restore vCPU1 did not become ready");
 +
-+	/* VPE0 sends an LPI to VPE1. */
++	/*
++	 * VPE0 consumes two pending SPIs in restored priority order, then
++	 * enables a restored pending-but-disabled SPI.
++	 */
 +	ret =3D run_vcpu(vcpus[0]);
-+	TEST_ASSERT(!ret, "Failed to run GICv5 LPI vCPU0 sender");
-+	TEST_ASSERT(get_ucall(vcpus[0], &uc) =3D=3D UCALL_SYNC &&
-+		    uc.args[1] =3D=3D GUEST_CMD_LPI_SENT,
-+		    "GICv5 LPI vCPU0 did not send LPI");
++	TEST_ASSERT(!ret, "Failed to consume restored GICv5 SPIs");
++	vgic_v5_expect_sync(vcpus[0], GUEST_CMD_IST_SPI_INJECT_READY,
++			    "GICv5 IST restore vCPU0 did not consume restored SPIs");
 +
-+	/* VPE1 consumes the LPI and replies with another LPI. */
++	/*
++	 * This SPI was enabled before save, but not pending.  Inject it after
++	 * restore to prove enable, priority and affinity were restored.
++	 */
++	vgic_v5_spi_line(dst.vm, RESTORE_TEST_SPI_ENABLED, 1);
++
++	ret =3D run_vcpu(vcpus[0]);
++	TEST_ASSERT(!ret, "Failed to consume post-restore GICv5 SPI");
++	TEST_ASSERT(get_ucall(vcpus[0], NULL) =3D=3D UCALL_DONE,
++		    "GICv5 IST restore vCPU0 did not complete");
++
++	/*
++	 * VPE1 consumes a restored pending LPI, then pends another LPI that
++	 * was enabled before save but not pending.
++	 */
 +	ret =3D run_vcpu(vcpus[1]);
-+	TEST_ASSERT(!ret, "Failed to run GICv5 LPI vCPU1 receiver");
-+	TEST_ASSERT(get_ucall(vcpus[1], &uc) =3D=3D UCALL_SYNC &&
-+		    uc.args[1] =3D=3D GUEST_CMD_LPI_REPLIED,
-+		    "GICv5 LPI vCPU1 did not reply");
++	TEST_ASSERT(!ret, "Failed to consume restored GICv5 LPI");
++	vgic_v5_expect_sync(vcpus[1], GUEST_CMD_IST_LPI_INJECT_READY,
++			    "GICv5 IST restore vCPU1 did not consume restored LPI");
 +
-+	/* VPE0 consumes the reply LPI and ends the test. */
-+	ret =3D run_vcpu(vcpus[0]);
-+	TEST_ASSERT(!ret, "Failed to run GICv5 LPI vCPU0 receiver");
-+	TEST_ASSERT(get_ucall(vcpus[0], &uc) =3D=3D UCALL_DONE,
-+		    "GICv5 LPI vCPU0 did not complete");
++	ret =3D run_vcpu(vcpus[1]);
++	TEST_ASSERT(!ret, "Failed to consume post-restore GICv5 LPI");
++	TEST_ASSERT(get_ucall(vcpus[1], NULL) =3D=3D UCALL_DONE,
++		    "GICv5 IST restore vCPU1 did not complete");
 +
-+	vm_gic_destroy(&v);
++	vm_gic_destroy(&dst);
 +}
 +
  /*
   * Returns 0 if it's possible to create GIC device of a given type (V5).
   */
-@@ -1233,6 +1467,9 @@ void run_tests(u32 gic_dev_type)
+@@ -1470,6 +1906,9 @@ void run_tests(u32 gic_dev_type)
 =20
- 	pr_info("Test VGICv5 SPIs\n");
- 	test_vgic_v5_spis();
+ 	pr_info("Test VGICv5 LPIs\n");
+ 	test_vgic_v5_lpis();
 +
-+	pr_info("Test VGICv5 LPIs\n");
-+	test_vgic_v5_lpis();
++	pr_info("Test VGICv5 IST save/restore\n");
++	test_vgic_v5_ist_save_restore();
  }
 =20
  int main(int ac, char **av)
-diff --git a/tools/testing/selftests/kvm/include/arm64/gic_v5.h b/tools/tes=
-ting/selftests/kvm/include/arm64/gic_v5.h
-index 091d9dbd3c01d..2d455515563e0 100644
---- a/tools/testing/selftests/kvm/include/arm64/gic_v5.h
-+++ b/tools/testing/selftests/kvm/include/arm64/gic_v5.h
-@@ -80,6 +80,14 @@
-=20
- #define GICV5_IRS_IDR1_PRIORITY_BITS	GENMASK(22, 20)
-=20
-+#define GICV5_IRS_IDR2_ISTMD_SZ	GENMASK(19, 15)
-+#define GICV5_IRS_IDR2_ISTMD		BIT(14)
-+#define GICV5_IRS_IDR2_IST_L2SZ	GENMASK(13, 11)
-+#define GICV5_IRS_IDR2_IST_LEVELS	BIT(10)
-+#define GICV5_IRS_IDR2_MIN_LPI_ID_BITS	GENMASK(9, 6)
-+#define GICV5_IRS_IDR2_LPI		BIT(5)
-+#define GICV5_IRS_IDR2_ID_BITS		GENMASK(4, 0)
-+
- #define GICV5_IRS_CR0_IDLE		BIT(1)
- #define GICV5_IRS_CR0_IRSEN		BIT(0)
-=20
-@@ -94,6 +102,13 @@
- #define GICV5_IRS_IST_BASER_ADDR_MASK	GENMASK_ULL(55, 6)
- #define GICV5_IRS_IST_BASER_VALID	BIT_ULL(0)
- #define GICV5_IRS_IST_BASER_ADDR_SHIFT	6ULL
-+#define GICV5_IRS_IST_CFGR_STRUCTURE	BIT(16)
-+#define GICV5_IRS_IST_CFGR_ISTSZ	GENMASK(8, 7)
-+#define GICV5_IRS_IST_CFGR_L2SZ	GENMASK(6, 5)
-+#define GICV5_IRS_IST_CFGR_LPI_ID_BITS	GENMASK(4, 0)
-+#define GICV5_IRS_IST_CFGR_ISTSZ_4	0b00
-+#define GICV5_IRS_IST_CFGR_ISTSZ_8	0b01
-+#define GICV5_IRS_IST_CFGR_ISTSZ_16	0b10
-=20
- /*
-  * Definitions for GICv5 instructions for the Current Domain
-@@ -164,6 +179,7 @@
-=20
- #define GICV5_HWIRQ_TYPE		GENMASK_ULL(31, 29)
- #define GICV5_HWIRQ_ID			GENMASK_ULL(23, 0)
-+#define GICV5_HWIRQ_TYPE_LPI		0x2
- #define GICV5_HWIRQ_TYPE_SPI		0x3
-=20
- #define gicr_insn(insn)			read_sysreg_s(GICV5_OP_GICR_##insn)
 --=20
 2.34.1
