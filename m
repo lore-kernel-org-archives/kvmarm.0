@@ -1,135 +1,96 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A56D93CFF68
-	for <kvmarm@lists.linux.dev>; Fri, 24 Jul 2026 18:54:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com [209.85.215.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96B1044E04A
+	for <kvmarm@lists.linux.dev>; Fri, 24 Jul 2026 19:52:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784919298; cv=none; b=oQBWbM9KdAryrPvXlzG8qPrtFrLTs43u3O1BTogUcnsV+7Ith8AUoZy0PZ4Rnd+fXVEwdM9IToQKbyjiEOcosm6WAc2ECoJNxQFoe1pRK9c/ETuVwFH2rUDjUSJdQmi8jrCxmZaFHQ6SWxjhYNBLe1wRt6cAgL5vAVksULP0OWQ=
+	t=1784922742; cv=none; b=TkwGsRUWPnUgsZOmARPmHBXFWuPWAFHAOjP7rs6IU2z1GvS9+JuVTQjxcg66dYzuB05SjUXSFn7vSFJ+x3CtqBONKx/vENtdq5q9sq4eAF9llKr8pRiyYAj13Yate2/QyjcsH8RhQ08+FO9KhGWYTuDOd8N7ZjXiYAcHR0KciZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784919298; c=relaxed/simple;
-	bh=gSfRHphoobs3FjVjS72N5dOppPN+9Oy9JjWdfUQiYk4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Meqo3pUtl29ViBvdKtI6X5iuCBP60ZEiAdSS3CJVmV6tEcOdiEqmDxbW2RcsuQib5PoOk21EIGgQAE0DBAIE1YJlwAF4jWG77kM4z75b86FmZmkG4q/0B7AmRNeogRCXguvHEB3XQ00tYAyMGO+GljPS7UDTjhYYuNdmRuWN6v4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=QM5RKC8Q; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1784922742; c=relaxed/simple;
+	bh=A7EEfHCXDQhZbZc+7PwL7H/hPx0GPYjU++n5dKG0w1g=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=sQnUDhkfw7MPDniTspW/zCeKKBKNa3Mo43YkP16uIavZVVIINTVaoG21Os4oVaSqDjVBvxYFm8dLyPWulom4ZKKJsSe0s9zWH3/lBGRhlCZFcR4VSNQ8Y45FMlR714I4V2mxO30ViagMIWdL8Pqf792p5Ack1rXZuD8gV8Xmv/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VcM/1RcZ; arc=none smtp.client-ip=209.85.215.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="QM5RKC8Q"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C1B581684;
-	Fri, 24 Jul 2026 11:54:51 -0700 (PDT)
-Received: from workstation-e142269.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5144A3F66F;
-	Fri, 24 Jul 2026 11:54:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1784919295; bh=gSfRHphoobs3FjVjS72N5dOppPN+9Oy9JjWdfUQiYk4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=QM5RKC8Q7q4tqPKjgYKjRsAe2jI1PdkmQIBw7RbVKHBLKyYmVw4u6JC3c7a6W8tHv
-	 HF87AYKM3MGaAR23HBposi+OkYcSeemna1ANgGsrx39+1UeMKXOcGePa5yc5zIOaPT
-	 OdHgbGZah4bVcJiRL2J2PyCbxM5dW0CfnsbafQ4I=
-From: Wei-Lin Chang <weilin.chang@arm.com>
-To: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Cc: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	Dev Jain <dev.jain@arm.com>,
-	"David Hildenbrand (Arm)" <david@kernel.org>,
-	Matt Fleming <matt@codeblueprint.co.uk>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Sebastian Ene <sebastianene@google.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Wei-Lin Chang <weilin.chang@arm.com>,
-	Sashiko AI <sashiko-bot@kernel.org>
-Subject: [PATCH v2 2/2] KVM: arm64: ptdump: Flush the last region
-Date: Fri, 24 Jul 2026 19:54:31 +0100
-Message-ID: <20260724185431.2990395-3-weilin.chang@arm.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260724185431.2990395-1-weilin.chang@arm.com>
-References: <20260724185431.2990395-1-weilin.chang@arm.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VcM/1RcZ"
+Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-cb74d5db64eso823486a12.2
+        for <kvmarm@lists.linux.dev>; Fri, 24 Jul 2026 12:52:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1784922741; x=1785527541; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=UIrEUXeMwkKPn3AMJe5EPVmRwSj/wiphCk2WS28J/Pk=;
+        b=VcM/1RcZKhYOdyrZLHsfjA+jQr2/GEbByyrV5UCkUifj+LjR/tiHIWqJHJbChD3+vC
+         rzlJfqqM1bFdP0BKCG/QbpdG25/PGNOtVgIPp8LwZAl/DRhU4oakSnX5JCBR63PCxV9q
+         HoiXU1qjRHRxCeKDvzQvL8hwLJf8ahDoWMZYkxJdeHzxI4Mw0Z+yL/dCY8QPFDW/Zc5H
+         pvtkpfcJk/TVYbwWNYab1sETp0bLNyiuXp4Z5mp+mS7es2pYgZMKXQGKshUM06JQ4m+Q
+         CgSNzRKyS/HMLkHyHFJrpmkmM4MQ5QhxHHsMJGsGC+58CbLD5KpetsfOnQQapO1bGXBq
+         1KAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784922741; x=1785527541;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=UIrEUXeMwkKPn3AMJe5EPVmRwSj/wiphCk2WS28J/Pk=;
+        b=MgkMz+wPRmd9+Dbj9BtheyoA0r2GmEQPa0xzlkXj5uyoiLifu9YQjORIra5xDJX1rh
+         G1AWorv1JtERlxJw5S/2mD+0ZISrBoQjsT+HmDWobL5q+zM4l2Euey2Y1mAGR4YglffG
+         JPtTbA/RLnOeyZNAJEI9SjSwFFxTx59jmwzDOCRDhsuFrk4NlzNadSS3vucwUr8sVnyQ
+         EJ+iayqGl8D43UIEiKJT71hJ6gW+c9xcIzE1jaO/C9cFB4BaY320GAXol8MBf3v4SIMR
+         4eRMAIUGYt+lX5FdgxxWVoZhXObp3PygF3j7aqjcj0oLNKQAheFlo7uRNsTORmP33nSU
+         tDbg==
+X-Forwarded-Encrypted: i=1; AHgh+RqzVi7OtiIcqg99eUKtNvVFBE8Tvo5m3P9mNKpa6OL4Sb1/jQ8BXibCGr0IP0m5AIjJ9NNiYXY=@lists.linux.dev
+X-Gm-Message-State: AOJu0Ywz8g9RMSqa2bh1O7rgMvO9BaCjhLd+8a3i1whITZR85d4/T19F
+	AOajRaaMDcsPEzk1gDwFp/miNEHwAmCpUE95Gc6M1wXNd0qxQoNkzjc7eUE1QlnBnhtrIm5KbGd
+	8EN/H2Q==
+X-Received: from pgvf24.prod.google.com ([2002:a65:6298:0:b0:cbb:9724:6775])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:e0a2:b0:3bf:e2dc:bc85
+ with SMTP id adf61e73a8af0-3c44b1ca809mr9783772637.40.1784922740833; Fri, 24
+ Jul 2026 12:52:20 -0700 (PDT)
+Date: Fri, 24 Jul 2026 12:52:20 -0700
+In-Reply-To: <20260714160411.302386-1-alexandru.elisei@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20260714160411.302386-1-alexandru.elisei@arm.com>
+Message-ID: <amPCdAswlk24Xilf@google.com>
+Subject: Re: [PATCH v2] KVM: Ignore MMU notifiers for guest_memfd-only memslots
+From: Sean Christopherson <seanjc@google.com>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: pbonzini@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	maz@kernel.org, oupton@kernel.org, suzuki.poulose@arm.com, 
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	david.hildenbrand@arm.com, mark.rutland@arm.com, ackerleytng@google.com
+Content-Type: text/plain; charset="us-ascii"
 
-Currently the stage-2 ptdump calls note_page() at each leaf entry visit.
-This simply misses the output of the last region, because note_page()
-only dumps output when it detects a change in level/prot, or when the
-walk enters a next marker section. The last region in the guest IPA
-space with the same level/prot is not dumped since there is no change
-after it.
+On Tue, Jul 14, 2026, Alexandru Elisei wrote:
+> +	 * TODO: Skip gmem-only memslots on mmu_notifier events entirely, once
+> +	 * gfn_to_pfn_cache is also wired up to directly pull from guest_memfd.
 
-Call note_page_flush() to dump the final region. note_page_flush()
-expects ptdump_state.range[] to be initialized to the range of the
-address space, so also do that.
+So it turns out we need to solve a very related problem[*], thanks to commit
+b9220d32799a ("KVM: x86/xen: allow shared_info to be mapped by fixed HVA"),
+which as it says, allows populating gfn_to_pfn_cache directly with an HVA, i.e.
+without a memslot.
 
-Also change the second marker's start address to ULONG_MAX so we never
-cross it. This avoids dumping redundant marker names (which are NULL),
-and advancing beyond the end of the marker array.
+My not-yet-tested solution for that mess is to give gfn_to_pfn_cache its own
+invalidation sequence, at which point there shouldn't be a need to process
+gmem-only memslots just for gfn_to_pfn_cache, because it will already be equipped
+to handle memslot-less invalidation.
 
-Fixes: 7c4f73548ed1 ("KVM: arm64: Register ptdump with debugfs on guest creation")
-Reported-by: Sashiko AI <sashiko-bot@kernel.org>
-Closes: https://lore.kernel.org/kvmarm/20260630122758.891011F00A3A@smtp.kernel.org/
-Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
----
- arch/arm64/kvm/ptdump.c | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
+Given how simple this change *should* be, I'm going to put this patch on the
+backburner for now, and then assuming my proposed change actually works, I'll
+grab your original change (or more likely, re-post it as the last patch in the
+series weans gfn_to_pfn_cache off mmu_invalidate_seq).
 
-diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
-index c9140e22abcf..222577163d2b 100644
---- a/arch/arm64/kvm/ptdump.c
-+++ b/arch/arm64/kvm/ptdump.c
-@@ -130,7 +130,7 @@ static struct kvm_ptdump_guest_state *kvm_ptdump_parser_create(struct kvm_s2_mmu
- 	}
- 
- 	st->ipa_marker[0].name		= "Guest IPA";
--	st->ipa_marker[1].start_address = BIT(pgtable->ia_bits);
-+	st->ipa_marker[1].start_address = ULONG_MAX;
- 
- 	st->mmu				= mmu;
- 	return st;
-@@ -148,18 +148,26 @@ static int kvm_ptdump_guest_show(struct seq_file *m, void *unused)
- 		.flags	= KVM_PGTABLE_WALK_LEAF,
- 	};
- 
-+	guard(write_lock)(&kvm->mmu_lock);
- 	st->parser_state = (struct ptdump_pg_state) {
- 		.marker		= &st->ipa_marker[0],
- 		.level		= -1,
- 		.pg_level	= &st->level[0],
- 		.seq		= m,
-+		.ptdump		= {
-+			.range = (struct ptdump_range[]){
-+				{0, BIT(mmu->pgt->ia_bits)},
-+				{0, 0}
-+			}
-+		}
- 	};
- 
--	write_lock(&kvm->mmu_lock);
- 	ret = kvm_pgtable_walk(mmu->pgt, 0, BIT(mmu->pgt->ia_bits), &walker);
--	write_unlock(&kvm->mmu_lock);
-+	if (ret)
-+		return ret;
-+	note_page_flush(&st->parser_state.ptdump);
- 
--	return ret;
-+	return 0;
- }
- 
- static int kvm_ptdump_guest_open(struct inode *m, struct file *file)
--- 
-2.43.0
+It'll probably take me a few weeks to circle back to this, as I finally crawled
+out from underneath a pile of urgent and am just now getting back into review
+mode, but this is fairly high on my todo list, so with luck we might still squeeze
+this into 7.3.
 
+[*] https://lore.kernel.org/all/aj2hi-NcqUUCaoQF@google.com
