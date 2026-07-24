@@ -1,238 +1,164 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6FAB3B5850;
-	Fri, 24 Jul 2026 11:48:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98E4E35A3A4;
+	Fri, 24 Jul 2026 11:52:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784893718; cv=none; b=dExLzo8SYsulR1niQhV9NhZulnv45CXm6Z3NFXWqJm4ASzScQeRDeZyTUswV5vpH5fCjYmflll60V4DLVgk3YcMPDxHxjrDtaHxNIYXEPuB6hFZBJgOf/nUneva7X4tsBwHWH7OV4UrpULyk9A0QPFDmuJOgZuYELwb/KQwxrrk=
+	t=1784893931; cv=none; b=LPLTF+miibmawCGFTrAb3h/KGzc7u4eBx7xU/om9xYSuAO8qnqjbNnSeou7O8C83lLWYtYeHj9jPfW33rBdS71vjxQcYpCZgNwo0Upg7gF/W1IrUGXVTyzOnSVbj83+glfPJJxwsN4BxbmIyYdwnO6+wYmVkubizGr9nVd7BMYE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784893718; c=relaxed/simple;
-	bh=3Pf91BWCExraZepA+O71r1JEC/gZkvQ4xXsy2lb0wIg=;
+	s=arc-20240116; t=1784893931; c=relaxed/simple;
+	bh=H3KgN6U6g+7LL7Wvv7j2oIvyuHB06Ln2L3iwRGXREvE=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=dteaMyQn5HpJvxLR1AC58qdcjKQfwHm3H9rHgaQy2M5mB5lZLc2DsJxcOiPtNxwWzQjafU4V/9K5ydCV3wiTAmq3ltpwpT/K73OKfov8P2fXibgPfSTgBLSTgZwdqYAKYSMngOIAo3u6LqE2h8jKtyiv7KlN226RkCXt16INHIs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HgR0gXc/; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=MvJv35fEHrKXdDAKE2qrqcj6ZNIfosVyb2OakICgyUAsbBf7Sidw05rrTj0opRh1bU/e0DOB4wCm97/E1IRxF8T0RzXIe5tIpAX7A1iEVyyDJNVTx3MnjY1KSbPFZrA1DPMBYcI1KHwvAM9Pt9gETatFhW5CUpQXpO9cCsTU0y8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eDCYSPbZ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HgR0gXc/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E488C1F000E9;
-	Fri, 24 Jul 2026 11:48:36 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eDCYSPbZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0AFE1F000E9;
+	Fri, 24 Jul 2026 11:52:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784893717;
-	bh=nMUT8LIGgxsXBJtfKLSZw6BhaAXI1fyjwc0uckPxS3w=;
+	s=k20260515; t=1784893930;
+	bh=rQQG4umk+eRm/+94WpkDS0mhUy5z5julxZeCbc61ZgU=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=HgR0gXc/gNf4bak9eK/rAGpMxAQhZSV8ilPZYipK+7QthOSAfF3qSbHji4mW4mJzx
-	 QL5L0ajZ4YgvVxdvgZPJ4upMs2ZJuEZgwlTxOlBr4A/X2uH+kGkP9zuyFz8Axmgr8O
-	 U0Vt2ZcHy7vOeh0ny+MB6cKEL5J86MeZfr50R/8REEIh7mhxTD3Y7faMa+AmN08DXi
-	 2Qkl6rHLou0wcDxsN6IVoRuDD4P9hMomboT6uXNGZK2SQJbGTOoOtasDmf0RM1m9vo
-	 ZLLGQEH7EoFYqNZwRHuEeArNYM37DbxxfpQYgKJudFu0J6fdMNBGn9wRuS9oXCj15m
-	 b3J+JV2WqlokA==
+	b=eDCYSPbZ2/cIKSp42gz1U0d3HrXDKx6a2HJ9JM8tmhmZl3DVsiUz7eR1FNduFTrNX
+	 cBmA2r4iiRat+S7wwTwOHASGF8ZNtyoxGgl3y3xL0Jpsy+ZRWsLPqxfoBop8oKU6DA
+	 aTrOWiWjVkR7UmPsx/MJ3S/5MQA4MINI2cY6cfpwScIgIyqGNV+W3aPopGY2x5i+DO
+	 XP4R0wRd8HK7p72ikL4DUQwM9H55g/2zsr9BPfA+tG+DcIMVL2xz3SG1EnOEsrGF78
+	 qeCpwc7wQx5d/KREpIlmFIo8XZsHO5NnVnYP5YqNsT3S4kaw5go46C25ecIAJPFiOk
+	 nSvKZZslNHZ1w==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v4 27/48] KVM: arm64: gic-v5: Support SPI injection
+Subject: Re: [PATCH v4 30/48] KVM: arm64: gic-v5: Mask per-vcpu PPI state in
+ vgic_v5_finalize_ppi_state()
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Sascha Bischoff" <Sascha.Bischoff@arm.com>
-Cc: kvm@vger.kernel.org, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, "Oliver
- Upton" <oupton@kernel.org>
-In-Reply-To: <20260724104819.1296803-28-sascha.bischoff@arm.com>
+Cc: kvm@vger.kernel.org, "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev
+In-Reply-To: <20260724104819.1296803-31-sascha.bischoff@arm.com>
 References: <20260724104819.1296803-1-sascha.bischoff@arm.com>
- <20260724104819.1296803-28-sascha.bischoff@arm.com>
+ <20260724104819.1296803-31-sascha.bischoff@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 24 Jul 2026 11:48:36 +0000
-Message-Id: <20260724114836.E488C1F000E9@smtp.kernel.org>
+Date: Fri, 24 Jul 2026 11:52:09 +0000
+Message-Id: <20260724115209.F0AFE1F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 5 potential issue(=
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
 s) to consider:
 
 New issues:
-- [Critical] `vgic_v5_set_irq_pend` dereferences `vcpu->kvm` without checki=
-ng for NULL, causing a host kernel panic during SPI or LPI injection.
-- [High] GICv5 SPIs silently break `KVM_IRQFD_FLAG_RESAMPLE` because KVM by=
-passes AP list queueing and never observes guest EOIs.
-- [High] GICv5 SPI injection is broken for generic KVM callers because `vgi=
-c_get_irq` expects a GICv5-encoded INTID, but external callers pass raw INT=
-IDs.
+- [High] Restored active software-managed PPIs are not queued to the ap_lis=
+t, leading to lost interrupts on VM restore.
 
 Pre-existing issues:
-- [High] Pre-existing Spectre v1 vulnerability in `vgic_get_irq()` when han=
-dling GICv2/GICv3 SPIs. Speculative execution with `intid < VGIC_NR_PRIVATE=
-_IRQS` bypasses bounds checks and leads to negative indexing on the `spis` =
-array.
-- [High] Invalid GICv5 PPI IDs silently alias to PPI 0 (SGI 0) in `vgic_get=
-_vcpu_irq()` due to a missing architectural bounds check.
+- [High] Data race on the global `vgic_ppi_mask` when `SW_PPI` is not imple=
+mented in hardware, leading to guest state corruption.
 --
 
---- Patch [27]: [PATCH v4 27/48] KVM: arm64: gic-v5: Support SPI injection =
----
-commit 416f67edd52d537473f18e3ac4c5b905a4c03f05
+--- Patch [30]: [PATCH v4 30/48] KVM: arm64: gic-v5: Mask per-vcpu PPI stat=
+e in vgic_v5_finalize_ppi_state() ---
+commit 04a9407ed3605cc393d7dce45456f17c9e1fc2c3
 Author: Sascha Bischoff <Sascha.Bischoff@arm.com>
 
-KVM: arm64: gic-v5: Support SPI injection
+KVM: arm64: gic-v5: Mask per-vcpu PPI state in vgic_v5_finalize_ppi_state()
 
-GICv5 SPI lifecycle is handled by the GICv5 hardware once the pending
-state has been injected. This change adds support for injecting SPIs to
-the core VGIC code and GICv5 code.
+This commit reworks vgic_v5_finalize_ppi_state() to discover exposed PPIs a=
+nd
+mask non-exposed PPI state when VCPUs are first run. It clears state for
+non-exposed PPIs to ensure only the intended state is exposed to the guest
+after userspace restores the state.
 
 > diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-> index 7957b9da95e7c..04392b686c2e2 100644
+> index 04392b686c2e2..6af1264ed2371 100644
 > --- a/arch/arm64/kvm/vgic/vgic-v5.c
 > +++ b/arch/arm64/kvm/vgic/vgic-v5.c
-> @@ -1064,6 +1064,47 @@ void vgic_v5_flush_ppi_state(struct kvm_vcpu *vcpu)
-
 [ ... ]
-
-> +static bool vgic_v5_spi_queue_irq_unlock(struct kvm *kvm,
-> +					 struct vgic_irq *irq,
-> +					 unsigned long flags)
-> +	__releases(&irq->irq_lock)
-> +{
-> +	lockdep_assert_held(&irq->irq_lock);
-> +
-> +	raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
-> +	return true;
-> +}
-
-[Severity: High]
-Does skipping the AP list queueing here break KVM_IRQFD_FLAG_RESAMPLE?
-
-Since this function overrides the default queueing logic and prevents the S=
-PI
-from being added to the vCPU's AP list, the lifecycle becomes fully hardware
-managed.
-
-Because KVM won't fold the SPI state back, it seems we'll never observe gue=
-st
-EOIs, meaning kvm_notify_acked_irq() won't be called to trigger the resample
-eventfd.
-
-Could this lead to silently hanging devices if userspace (like QEMU virtio-=
-mmio
-or VFIO) attaches an eventfd using the resample flag?
-
-[ ... ]
-
-> +/* Set the pending state for GICv5 SPIs and LPIs */
-> +void vgic_v5_set_irq_pend(struct kvm_vcpu *vcpu, struct vgic_irq *irq)
-> +{
-> +	if (WARN_ON(__irq_is_ppi(KVM_DEV_TYPE_ARM_VGIC_V5, irq->intid)))
-> +		return;
-> +
-> +	kvm_call_hyp(__vgic_v5_vdpend, irq->intid, irq_is_pending(irq),
-> +		     vcpu->kvm->arch.vgic.gicv5_vm.vm_id);
-> +}
-
-[Severity: Critical]
-Is it possible for vcpu to be NULL here?
-
-If userspace configures the IRS and injects an SPI or unmapped LPI (e.g., v=
-ia
-KVM_IRQ_LINE) before any vCPUs are created, irq->target_vcpu could be NULL.
-
-This would unconditionally dereference vcpu->kvm, potentially causing a host
-kernel panic.
-
-Should we add a NULL check for vcpu before dereferencing it?
-
-> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-> index 023792c28fc5c..d571fafb07f32 100644
-> --- a/arch/arm64/kvm/vgic/vgic.c
-> +++ b/arch/arm64/kvm/vgic/vgic.c
-> @@ -86,19 +86,31 @@ static struct vgic_irq *vgic_get_lpi(struct kvm *kvm,=
- u32 intid)
->   */
->  struct vgic_irq *vgic_get_irq(struct kvm *kvm, u32 intid)
->  {
-> -	/* Non-private IRQs are not yet implemented for GICv5 */
-> -	if (vgic_is_v5(kvm))
-> -		return NULL;
-> +	enum kvm_device_type type =3D kvm->arch.vgic.vgic_model;
+> @@ -795,35 +796,65 @@ int vgic_v5_finalize_ppi_state(struct kvm *kvm)
+>  	guard(mutex)(&kvm->arch.config_lock);
 > =20
->  	/* SPIs */
-> -	if (intid >=3D VGIC_NR_PRIVATE_IRQS &&
-> -	    intid < (kvm->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS)) {
-> -		intid =3D array_index_nospec(intid, kvm->arch.vgic.nr_spis + VGIC_NR_P=
-RIVATE_IRQS);
-> -		return &kvm->arch.vgic.spis[intid - VGIC_NR_PRIVATE_IRQS];
-> +	if (__irq_is_spi(type, intid)) {
+>  	/*
+> -	 * If SW_PPI has been advertised, then we know we already
+> -	 * initialised the whole thing, and we can return early. Yes,
+> -	 * this is pretty hackish as far as state tracking goes...
+> +	 * Discover the set of PPIs that are exposed to the guest once per VM.
+> +	 * Once known, apply that mask to each VCPU's restored PPI state as the
+> +	 * VCPUs are first run.
+>  	 */
+> -	if (test_bit(GICV5_ARCH_PPI_SW_PPI, kvm->arch.vgic.gicv5_vm.vgic_ppi_ma=
+sk))
+> -		return 0;
+> -
+> -	/* The PPI state for all VCPUs should be the same. Pick the first. */
+> -	vcpu0 =3D kvm_get_vcpu(kvm, 0);
+> +	if (!test_bit(GICV5_ARCH_PPI_SW_PPI, kvm->arch.vgic.gicv5_vm.vgic_ppi_m=
+ask)) {
+> +		bitmap_zero(kvm->arch.vgic.gicv5_vm.vgic_ppi_mask,
+> +			    VGIC_V5_NR_PRIVATE_IRQS);
+> +		bitmap_zero(kvm->arch.vgic.gicv5_vm.vgic_ppi_hmr,
+> +			    VGIC_V5_NR_PRIVATE_IRQS);
 
 [Severity: High]
-Does this break SPI injection for generic KVM callers on GICv5?
+This is a pre-existing issue, but does this conditional in
+vgic_v5_finalize_ppi_state() create a data race on the global vgic_ppi_mask
+if the SW_PPI feature is not implemented in hardware?
 
-The __irq_is_spi() helper expects a GICv5-encoded INTID when type is
-KVM_DEV_TYPE_ARM_VGIC_V5.
+In a multi-VCPU VM booting on GICv5 hardware without the optional SW_PPI
+feature, when a subsequent VCPU runs for the first time, this test will
+evaluate to false because the bit was never set.
 
-However, standard in-kernel device emulations (like the PMU) and userspace
-injections via KVM_IRQ_LINE or irqfd pass raw integer INTIDs (e.g., 32).
+This seems to cause the global mask to be cleared via bitmap_zero() while
+earlier VCPUs might already be running in the guest. Could this lead to a
+transiently zeroed vgic_ppi_mask during sysreg accesses and silently dropped
+interrupts for emulated devices like timers?
 
-Without the GICv5 type bits, __irq_is_spi() will return false, causing the
-injection to abort with -EINVAL.
-
-> +		switch (type) {
-> +		case KVM_DEV_TYPE_ARM_VGIC_V5:
-> +			intid =3D vgic_v5_get_hwirq_id(intid);
 > +
-> +			if (intid >=3D kvm->arch.vgic.nr_spis)
-> +				return NULL;
-> +
-> +			intid =3D array_index_nospec(intid, kvm->arch.vgic.nr_spis);
-> +			return &kvm->arch.vgic.spis[intid];
-> +		default: {
-> +			u32 max_intid =3D kvm->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS;
-> +
-> +			if (intid < max_intid) {
-> +				intid =3D array_index_nospec(intid, max_intid);
-> +				return &kvm->arch.vgic.spis[intid - VGIC_NR_PRIVATE_IRQS];
-> +			}
+> +		for_each_set_bit(i, ppi_caps.impl_ppi_mask, VGIC_V5_NR_PRIVATE_IRQS) {
+[ ... ]
+> +	/* Also update the vgic_irqs */
+> +	for (i =3D 0; i < VGIC_V5_NR_PRIVATE_IRQS; i++) {
+> +		bool visible =3D test_bit(i, kvm->arch.vgic.gicv5_vm.vgic_ppi_mask);
+>  		const u32 intid =3D vgic_v5_make_ppi(i);
+>  		struct vgic_irq *irq;
+> =20
+> -		irq =3D vgic_get_vcpu_irq(vcpu0, intid);
+> +		irq =3D vgic_get_vcpu_irq(vcpu, intid);
+> =20
+> -		/* Expose PPIs with an owner or the SW_PPI, only */
+>  		scoped_guard(raw_spinlock_irqsave, &irq->irq_lock) {
+> -			if (irq->owner || i =3D=3D GICV5_ARCH_PPI_SW_PPI) {
+> -				__set_bit(i, kvm->arch.vgic.gicv5_vm.vgic_ppi_mask);
+> -				__assign_bit(i, kvm->arch.vgic.gicv5_vm.vgic_ppi_hmr,
+> -					     irq->config =3D=3D VGIC_CONFIG_LEVEL);
+> +			if (!visible) {
+> +				irq->enabled =3D false;
+> +				irq->active =3D false;
+> +				irq->pending_latch =3D false;
+> +				irq->line_level =3D false;
+> +			} else {
+> +				irq->enabled =3D test_bit(i, cpu_if->vgic_ppi_enabler);
+> +				irq->active =3D test_bit(i, cpu_if->vgic_ppi_activer);
+>  			}
+>  		}
 
 [Severity: High]
-This is a pre-existing issue, but does this speculative bounds checking log=
-ic
-have a Spectre v1 vulnerability?
+Is it safe to directly set irq->active here without queueing the interrupt?
 
-The array_index_nospec() clamp is applied to intid before subtracting
-VGIC_NR_PRIVATE_IRQS (32).
+When restoring a VM with active software-managed PPIs (like the PMU or time=
+rs),
+we mutate irq->active inside the lock in vgic_v5_finalize_ppi_state(), but =
+we
+don't seem to invoke the corresponding queueing machinery.
 
-If intid is speculatively less than 32, the check (intid < max_intid) will
-speculatively evaluate to true, and array_index_nospec will preserve the
-value.
+Without enqueuing the IRQ onto the VCPU's ap_list, won't this cause the
+interrupt to be invisible to the injection path and get lost on VM restore?
 
-Subtracting 32 then results in a negative index, allowing speculative
-out-of-bounds reads on the spis array.
-
-> +		}}
+> =20
+> -		vgic_put_irq(vcpu0->kvm, irq);
+> +		vgic_put_irq(kvm, irq);
 >  	}
-
-[Severity: High]
-This isn't a bug introduced by this patch, but looking at vgic_get_vcpu_irq=
-()
-just below this function, it appears there is a missing bounds check for GI=
-Cv5
-PPI IDs:
-
-struct vgic_irq *vgic_get_vcpu_irq(struct kvm_vcpu *vcpu, u32 intid)
-{
-    ...
-    if (__irq_is_sgi(type, intid) || __irq_is_ppi(type, intid)) {
-        switch (type) {
-        case KVM_DEV_TYPE_ARM_VGIC_V5:
-            intid =3D vgic_v5_get_hwirq_id(intid);
-            intid =3D array_index_nospec(intid, VGIC_V5_NR_PRIVATE_IRQS);
-            break;
-
-Unlike the SPI path, this extracts the hardware ID and directly applies
-array_index_nospec() without an explicit bounds check (e.g. checking if
-intid >=3D VGIC_V5_NR_PRIVATE_IRQS).
-
-Since __irq_is_ppi() only checks the GICv5 type bits and not the ID range, =
-an
-invalid out-of-bounds PPI ID will silently alias to index 0.
-
-Can this lead to silent corruption of SGI 0 state?
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260724104819.1296=
-803-1-sascha.bischoff@arm.com?part=3D27
+803-1-sascha.bischoff@arm.com?part=3D30
