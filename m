@@ -1,181 +1,104 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD8D93D4116
-	for <kvmarm@lists.linux.dev>; Fri, 24 Jul 2026 08:17:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCC8931AF24
+	for <kvmarm@lists.linux.dev>; Fri, 24 Jul 2026 08:40:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.112
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784881068; cv=none; b=I2EXj1O5wnZxkNkXIzVZfbBk55oyHYal6d5F2blzgci139J3J/iMVcZ8yS+ZFXpogWa8l4m10TkBQ4eyvNDCegCnrNrOHgcfJesUg1cXp8aFGz51GOXwOGlJhHToh0LR0CiFvpiCVESmRM1Lq42ucdGjyg5Osx1URMCHmRtRRik=
+	t=1784882446; cv=none; b=DLPwN8gxCCDY0yPoD03MK7iQTntBExLuZEfHE0qZkT7HbaYb4OxqwQdS2298HKnk3ZWw1o/PvjkNWDTaW87cSg3/Tp+RsXc7edb7LanpXZKVAXtvmPxLpn6AumQ4Q2pSGNgaxazDFGepHSWHZfjnIfO/VspHkWixNJj49XB3cb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784881068; c=relaxed/simple;
-	bh=elWNjQXtC8thy3ti0vlFZsZxvG3tpc6l8oAx685pjj4=;
+	s=arc-20240116; t=1784882446; c=relaxed/simple;
+	bh=P4MH6DtFxUb788hAKigozvp2fXBiU/xoanJ6KjnelOo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uGtDqLAE4Le624jMA5d+74NY6Hbq9bZcDhFaCaFrq+gwKHzslNJFcI5fy1dMcgbychysqr4R9vrneTPx4KNDfTzyeNbx9tZu+zA/dWIqBfHaIuqGFq0oYJhyaiSiUit/Wl1fuZ9DJ2gwsGeyS1EJWba7RAlV4esLkgU/IkcYgiA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LVRpaD34; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=TQL/GmMlcITh8IOxDbdL9xP7biBaKJVMC8fMtivzmaCGUJVqaJECHP1Kz0CLIdL0x+Y95lFPt7Le7CkCiQfeix4jfmrCQ85NdxCVzZy87wGX09HHr7ZmsZ4othoAXDGrktv6Nsh9x6/mlDPHgO6dFoO6ByrMZuQW0SQklxvUT5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=crJfkJCU; arc=none smtp.client-ip=115.124.30.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LVRpaD34"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4954d5d814fso21915e9.0
-        for <kvmarm@lists.linux.dev>; Fri, 24 Jul 2026 01:17:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1784881063; x=1785485863; darn=lists.linux.dev;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=Oa7Uf24Ye3cJcbIbf3Yse8wlIIcJzJaytnCT20m/GIQ=;
-        b=LVRpaD34cAKtrw2XD5l6NABHrlDun6xGAFosLkH9jQWPvy3S8PGEKvtS+3fLCl1XDs
-         8qIpJ59KNiZkuHEXbRJvhgpZq2c4A6rwT2bI7HJE4HPGswy7kigeubQ+ryqNb9YyFdpq
-         z7USDe4FpEDkxX1I2rwCowuVVqnArMyqEiJSaD+Cg/zxAlqz8+EEhlfndVq+1swIxQht
-         hFLdCc+1ojm/Ehr8MUHZfkOcCOEcVruK2nAqClggaQzqI6UDFxkZpqzrYRmZ5BET/N68
-         51oLrMAOgmsqMlUwWkKwqBUUMyt6W4CZKVWpI5CQNKfqfyBc20GejZWbU+/EpaquOSBd
-         PL5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784881063; x=1785485863;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=Oa7Uf24Ye3cJcbIbf3Yse8wlIIcJzJaytnCT20m/GIQ=;
-        b=RxucIe/PbYgUW5e1deg5NfF+HEsyP5ZDzG0ZTjS4Tl5gFtVj1lRUyF+VNmKvQ+3Wht
-         aVMedROnsH2GFfQGZJFN1N5gxPuocevfQuZqanrfsq/Bu8Rz1Bm8MhgH7lgHU6nrtoHE
-         2feJGSf1Yaa+qb97mqRV+j16q8M2gxpe0cSrKO4B/Wh6F2GjctdHwpGniUddQXAj+2nC
-         058iLXOVxTcC5/0Nbon3s4GEZ0g1Szf9uT3GFBIs0w1jGkPIJhrRcby+L56lpJCF4yEG
-         s/1D/vPYFRwk3SMUvDznrNfe1AbqqwseGCukQwx3BwVBlQke6YiXIbqFwovxjYbWZsPx
-         DQ/g==
-X-Forwarded-Encrypted: i=1; AHgh+RrBoAzkM0ixzZA6Q5WXpjRsjXXTA9glELS5+snuMf0yAiLjWLABgSop+1hmVetZoVGSnOJgTWs=@lists.linux.dev
-X-Gm-Message-State: AOJu0YylzSwfmbUNIgRLPiErU12o9EAhRoVdJaug3a/55XkCHSqvo6jz
-	pUMExPLtBBzKYVN/bBQADAH5to82d6zRivcdoS/+a7NR88S2Xl0g+L1Xv3VV69RkLQ==
-X-Gm-Gg: AR+sD11TqHJUu1ECwPpCIO9goL9XM8MjcKU2a3QWb7FYrAbpjQCfG7nDUkonnADLpAC
-	r48iyq2vE1VqDrQhWLdR1vLjiUMK4aAabIl/KxuwrMzdDvgL54PpdnMCLRG4eNqGnsmrsjNvPIy
-	euxyXaJynJw/MsLNwGr+arcST/BqDazGASZZSjL7M4fGWbPtQZF0hK1Tt0hvNA5LA0png5IhPxF
-	zLlwNg9sCZPJCDGWqFzOd4k/cUZ4FmPeDi3WImtfakCTytPN/RS9P/AkP6DKOGpvyDTIe44t2pR
-	oyGSFhAGD0s3BBBFPMMFrosLr4Xvs9S4CFGcTP/RuNs+Db6dGtWDlPwG1cRv0DlrWiUbqshQgVa
-	fiSpd7oK7R+Cq5bf2XnuzvpP52FpaIaZT2+Ws4/aQtODpGo552c0jAZA+mp+qVXpzItr0BHlJcE
-	GjqX2zMTrqSxeJbDY68zZu3FsWFjJDwHRNSQZ/vQ==
-X-Received: by 2002:a05:600c:2e96:b0:495:7a0b:3b4a with SMTP id 5b1f17b1804b1-4957d7907ccmr541285e9.7.1784881062421;
-        Fri, 24 Jul 2026 01:17:42 -0700 (PDT)
-Received: from google.com (220.60.76.34.bc.googleusercontent.com. [34.76.60.220])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4957af786e4sm50771715e9.8.2026.07.24.01.17.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Jul 2026 01:17:41 -0700 (PDT)
-Date: Fri, 24 Jul 2026 08:17:37 +0000
-From: Mostafa Saleh <smostafa@google.com>
-To: sashiko-reviews@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-	Oliver Upton <oupton@kernel.org>
-Subject: Re: [RFC PATCH v2 2/2] KVM: arm64: Support BBM level 3
-Message-ID: <amMfoWWEBI17jdIj@google.com>
-References: <20260723182140.4025575-1-smostafa@google.com>
- <20260723182140.4025575-3-smostafa@google.com>
- <20260723184346.CAE8F1F000E9@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="crJfkJCU"
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1784882440; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=ZF0iQLfzAvBUCWBc6u2tYLj3HbiOY3Ow4lnc9zCLabE=;
+	b=crJfkJCU1mk82tjdR/O3d5YqSVhzznXdN2ArVISZX9sOAxWmXkoRNjID1QIkE6n2eJV/pe6WNLbbs8lVwa2WxW4HcI6eRdnjA1t888th1k7i3WdbFjfKC0Jy3E2VqzkRGy2EcTXpe8ZmhDCNVZDzJwx+JCNDK42fbVDpah3WqMU=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R871e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037009110;MF=yaoyuan@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0X7ia0lT_1784882439;
+Received: from localhost(mailfrom:yaoyuan@linux.alibaba.com fp:SMTPD_---0X7ia0lT_1784882439 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Fri, 24 Jul 2026 16:40:39 +0800
+Date: Fri, 24 Jul 2026 16:40:38 +0800
+From: Yao Yuan <yaoyuan@linux.alibaba.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	kvm@vger.kernel.org, Steffen Eiden <seiden@linux.ibm.com>, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Wei-Lin Chang <weilin.chang@arm.com>
+Subject: Re: [PATCH v3 24/28] KVM: arm64: Engage NV3 ERET trap elision
+Message-ID: <n2ora3retqaoki3u5ovoqwvh4iqzsziqmybzxid7mylcoua2fc@xlhyqzhwh4cl>
+References: <20260722074234.3330999-1-maz@kernel.org>
+ <20260722074234.3330999-25-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260723184346.CAE8F1F000E9@smtp.kernel.org>
+In-Reply-To: <20260722074234.3330999-25-maz@kernel.org>
 
-On Thu, Jul 23, 2026 at 06:43:45PM +0000, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> 
-> Pre-existing issues:
-> - [High] Missing DSB between MTE tag stores and the stage-2 PTE update.
+On Wed, Jul 22, 2026 at 08:42:30AM +0800, Marc Zyngier wrote:
+> When running on NV3 HW, always engage ERET trap elision when running
+> the L1 context, as there is no benefit in not doing so.
+>
+> An L1 can itself engage trap elision by setting its own view of
+> HCRX_EL2.NVTGE==1, which will subsequently be honored.
+>
+> Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_emulate.h | 10 ++++++++++
+>  arch/arm64/kvm/hyp/vhe/switch.c      |  4 ++++
+>  2 files changed, 14 insertions(+)
+>
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index c562d8171d5e1..b32870a5e1236 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -706,6 +706,16 @@ static inline void vcpu_set_hcrx(struct kvm_vcpu *vcpu)
+>
+>  		if (kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_V))
+>  			vcpu->arch.hcrx_el2 |= HCRX_EL2_EnASR;
+> +
+> +		/*
+> +		 * NV3 is a host-specific extension, and we always use it
+> +		 * when present and that the guest uses NV. It may be be
+> +		 * hidden from the guest though.
+> +		 */
+> +		if (cpus_have_final_cap(ARM64_HAS_NV3) &&
+> +		    vcpu_has_nv(vcpu) && vcpu_el2_e2h_is_set(vcpu)) {
+> +			vcpu->arch.hcrx_el2 |= HCRX_EL2_NVTGE;
+> +		}
+>  	}
+>  }
+>  #endif /* __ARM64_KVM_EMULATE_H__ */
+> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> index cbda9e087db39..4ed745bdde418 100644
+> --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> @@ -345,6 +345,10 @@ static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
+>  	u64 esr = kvm_vcpu_get_esr(vcpu);
+>  	u64 spsr, elr, mode;
+>
+> +	/* With NV3, the fast path is handled in HW */
+> +	if (cpus_have_final_cap(ARM64_HAS_NV3) && vcpu_el2_e2h_is_set(vcpu))
+> +		return false;
+> +
+
+Reviewed-by: Yuan Yao <yaoyuan@linux.alibaba.com>
+
+>  	/*
+>  	 * Going through the whole put/load motions is a waste of time
+>  	 * if this is a VHE guest hypervisor returning to its own
 > --
-> 
-> --- Patch [2]: [RFC PATCH v2 2/2] KVM: arm64: Support BBM level 3 ---
-> commit be481f0e17bfc16626c7f5b1b8b652be3ec92909
-> Author: Mostafa Saleh <smostafa@google.com>
-> 
-> KVM: arm64: Support BBM level 3
-> 
-> If the system supports hardware Break-Before-Make (BBM) level 3, use it
-> to replace stage-2 PTEs directly. Otherwise, fall back to the software
-> BBM sequence.
-> 
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> > index 127b7f9541b16..5e16ed7e9b909 100644
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> 
-> [ ... ]
-> 
-> > @@ -873,16 +891,35 @@ static bool stage2_try_break_pte(const struct kvm_pgtable_visit_ctx *ctx,
-> >  	return true;
-> >  }
-> >  
-> > -static void stage2_make_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_t new)
-> > +static bool stage2_make_pte(const struct kvm_pgtable_visit_ctx *ctx, struct kvm_s2_mmu *mmu,
-> > +			    kvm_pte_t new)
-> >  {
-> >  	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
-> >  
-> > -	WARN_ON(!stage2_pte_is_locked(*ctx->ptep));
-> > -
-> >  	if (stage2_pte_is_counted(new))
-> >  		mm_ops->get_page(ctx->ptep);
-> >  
-> > +	if (stage2_use_bbml3() && kvm_pte_valid(ctx->old)) {
-> > +		/*
-> > +		 * Barrier is required because stage2_try_set_pte() uses
-> > +		 * WRITE_ONCE for non-shared walks, lacking release semantics
-> > +		 * used in the software BBM case.
-> > +		 */
-> > +		smp_wmb();
-> > +		if (!stage2_try_set_pte(ctx, new)) {
-> > +			/* Raced with another core. */
-> > +			if (stage2_pte_is_counted(new))
-> > +				mm_ops->put_page(ctx->ptep);
-> > +			return false;
-> > +		}
-> > +
-> > +		stage2_clean_old_pte(ctx, mmu);
-> > +		return true;
-> > +	}
-> > +
-> > +	WARN_ON(!stage2_pte_is_locked(*ctx->ptep));
-> >  	smp_store_release(ctx->ptep, new);
-> > +	return true;
-> >  }
-> 
-> [Severity: High]
-> This is a pre-existing issue, but does this sequence lack a required
-> synchronization barrier for MTE tag stores?
-> 
-> When KVM maps a page with MTE enabled, it clears the tags using STGM:
-> 
-> arch/arm64/kvm/mmu.c:kvm_s2_fault_map() {
->         ...
->         if (!perm_fault_granule && !s2vi->map_non_cacheable && kvm_has_mte(kvm))
->                 sanitise_mte_tags(kvm, pfn, mapping_size);
->         ...
-> }
-> 
-> The PTE is then updated here in stage2_make_pte(), which uses either
-> smp_wmb() + cmpxchg() (mapping to DMB ISHST + CASAL) for BBML3, or
-> smp_store_release() (mapping to STLR) for the software BBM case. Neither
-> of these provides the architecturally mandated DSB semantics required
-> after MTE tag stores.
-> 
-> Without a DSB between sanitise_mte_tags() and the stage-2 PTE update, is
-> it possible for the hardware page table walker to observe the new PTE
-> before the explicit tag stores are globally visible? Could this result in
-> the guest observing uninitialized MTE tags, leading to memory permission
-> corruption or spurious tag check faults?
-
-I do not know much about MTE, but AFAIU, STLR wouldn’t order against
-page table walks. So there is a window between the STGM and the DSB at
-the end of the map where another core can observe a valid PTE and not
-a the new tag. My guess we need a DSB at the end of
-sanitise_mte_tags()
-
-Thanks,
-Mostafa
-
-> 
-> -- 
-> Sashiko AI review · https://sashiko.dev/#/patchset/20260723182140.4025575-1-smostafa@google.com?part=2
+> 2.47.3
