@@ -1,360 +1,202 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A53D3411F9C;
-	Fri, 24 Jul 2026 12:02:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D9C43B7B96;
+	Fri, 24 Jul 2026 12:02:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784894562; cv=none; b=U2EO8sdwidD3+wfpd/O6zZvs5nSFU8YTA9sj1k0EPjqDnJP7TVbLQkuHHXdN7DoiOIKv9gNuxAE50vCNTUybCmz5YFjfbz4e49elbWa8T1E9u8C6MMZQpgoPe0DYuZXCS+37j2mtKrBArbcYbr4taNB5nloW6L6uQ+E+ZYQGlwA=
+	t=1784894562; cv=none; b=oivlyqdxauGsR10yY2pkm12OxWIAMsdelOA9xF+4RYLmcn32irx9xsnPquStQXixkGwQuxf+cXzQU/YZSngVVwJhmhycaqtIMQ0kE7/ITuKzb8cCRiglCJFJBnclVI1ZN/WE+HdUoEdPd4GqeTouW8eWGBFCELsI0CB9actt6Ew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1784894562; c=relaxed/simple;
-	bh=aNkgTPi9X3+8Qvg724hHI/wKIhDT/dTP0J9GY2Q2shA=;
+	bh=O5gmTOibvt2nNKJj6j0Ubey6GE3+PTwQTCWa3EyMqG4=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=iHQo3NIsyTlo1BRLw6xi38pLXwegA+5HabksLYnYQyF18HlGImgCmaTZ9jnf89FS8af9Xh0j8DN3cSEqdaHVuU1/fO47Xgvot/+FK0zXXz90jrn67GzljMTFx/ygyPCDl6cQy0Lf5mun9kIZ52ddOBCOnR+RMjj/lmFI8Xs/Xrw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iG4x7Kkw; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=VvUBEDVvRXG4U2n5Ow4TTfQ2jmVCh9d9ZFE7U8JTsONF7fYp8ndQ/zVIWb/j+So+FbfJdipIeQ8U7kl0FQo3dnAR1H2RtcU0/GOwQvLtDr45elaTVzSnPn7gwiMd/9wvH2xvh73izFpPO41SJ3cWntILyKndogOVW49VoaBUrXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kBfhbxlV; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iG4x7Kkw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CEB1B1F000E9;
-	Fri, 24 Jul 2026 12:02:39 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kBfhbxlV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C69B91F00A3E;
+	Fri, 24 Jul 2026 12:02:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784894560;
-	bh=XYU2P498Ax8YeDgTEHhvjeNOJsU1e9OjMZh7d4FiH+k=;
+	s=k20260515; t=1784894561;
+	bh=AJSF1yhOG4jes4R1S4BB9xsPMeuWF+VXXQgLrN+EQ0I=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=iG4x7Kkwp5GbZmBtL/X03g/UxKyCfXjg5SBWlZfswK2BtdiTclOIzypEVVTd1lIDX
-	 Uns0TvDZzosmOz8nWuKzkVK2W9IEcGxZs1vMGMmQje3lOPL652K1ZJbAPLPuL2AS1W
-	 cXCbmw0/iTXSMYGClHcViD7a6xh4jIQ8cRRBRXMyetRu1UoN8ayixh1A042x6OHXH5
-	 dqw0NOF0fF8D823ZXO8c0aonBIbmSQLSq8VYgQqj6Nnoy7XlX0MZZPwQ+gzy8fT1ut
-	 5+/+R75zUxQH/NcUbPRQJjdvaV9DzZ1m0qi84YzGQi1qXhxsg8IHd1642xXDm9LYjz
-	 hVWPLyJ0XFVpQ==
+	b=kBfhbxlVXH714+1MJdFF47NL2CqZ5UFhU9u3DgAUrGRVEfEGfv8yMp2NNkFtql1dV
+	 ACrBgbNYjqsBB3y/XeX/10oUYEt1MjVAyEtJLcSQj0GYnMW/ZbmEJUk/foih6OjLgx
+	 I2UrdsgQiRVAbm1aS+8hElKaBfraa2Kamg/W6IbuRkPxfilFPUbmBREbY2skCntQ6e
+	 EIpbI6AEjrA/afbmWcObZQ0HUQdlnm6BunfLIi5WpKGPUaNkb6ks+AMXUY8VOkUsAj
+	 C9f2I0qC21flB9+MYAp01F8O2Q1HmLFpBMRmWJolOJyAlOZh16kInpcu9cIF6MwL2q
+	 A5eQ5ITbKexfw==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v4 35/48] KVM: arm64: gic-v5: Implement save/restore
- mechanisms for ISTs
+Subject: Re: [PATCH v4 41/48] KVM: selftests: Add VGICv5 NR_IRQS attribute
+ tests
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Sascha Bischoff" <Sascha.Bischoff@arm.com>
-Cc: "Marc Zyngier" <maz@kernel.org>, kvm@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev
-In-Reply-To: <20260724104819.1296803-36-sascha.bischoff@arm.com>
+Cc: kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, kvm@vger.kernel.org
+In-Reply-To: <20260724104819.1296803-42-sascha.bischoff@arm.com>
 References: <20260724104819.1296803-1-sascha.bischoff@arm.com>
- <20260724104819.1296803-36-sascha.bischoff@arm.com>
+ <20260724104819.1296803-42-sascha.bischoff@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 24 Jul 2026 12:02:39 +0000
-Message-Id: <20260724120239.CEB1B1F000E9@smtp.kernel.org>
+Date: Fri, 24 Jul 2026 12:02:40 +0000
+Message-Id: <20260724120240.C69B91F00A3E@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 8 potential issue(=
+Thank you for your contribution! Sashiko AI review found 3 potential issue(=
 s) to consider:
-- [Critical] Retrieving `vcpu0` without verifying it exists leads to a NULL=
- pointer dereference.
-- [Critical] Inverted lock check with `kvm_trylock_all_vcpus` leaks vCPU lo=
-cks and runs lockless.
-- [High] Incomplete cleanup on IST restore failure leaves a dangling pointe=
-r in `vmi->h_lpi_ist`, leading to a double free.
-- [High] Missing validation of LPI INTIDs during IST restore allows userspa=
-ce to inject invalid INTIDs.
-- [High] SPI IST restore incorrectly uses the array index directly as the a=
-bsolute INTID, causing wrong interrupts to be injected.
-- [High] Quiescence check masks lost quiescence state and causes silent dat=
-a corruption.
-- [Medium] KVM_DEV_ARM_VGIC_GRP_IST unconditionally fails for VMs configure=
-d with 0 SPIs, breaking live migration.
-- [Medium] The failure path in `vgic_v5_irs_restore_ists` incorrectly issue=
-s a redundant `VMTE_MAKE_INVALID` command, risking a memory leak.
+- [Medium] The return value of `kvm_has_device_attr()` is silently ignored,=
+ rendering the attribute check ineffective.
+- [Medium] The test for exceeding the maximum supported SPI count uses an u=
+naligned value, failing to correctly verify the bounds check.
+- [Medium] The test meant to verify that `NR_IRQS` is immutable after the V=
+M has run is defeated by an explicit `CTRL_INIT` call.
 --
 
---- Patch [35]: [PATCH v4 35/48] KVM: arm64: gic-v5: Implement save/restore=
- mechanisms for ISTs ---
-commit 5c47453f1884c74d1478029039189ee4ba68421a
+--- Patch [41]: [PATCH v4 41/48] KVM: selftests: Add VGICv5 NR_IRQS attribu=
+te tests ---
+commit 4c2364c5e2833c1962977d2e2805cafe763b427d
 Author: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Subject: KVM: arm64: gic-v5: Implement save/restore mechanisms for ISTs
 
-This patch introduces save and restore mechanisms for GICv5 Interrupt State
-Tables (ISTs). It provides userspace migration storage for SPI and LPI
-buffers via KVM_DEV_ARM_VGIC_GRP_IST and ensures the VM is quiesced and
-validated during operations.
+KVM: selftests: Add VGICv5 NR_IRQS attribute tests
 
-> diff --git a/arch/arm64/kvm/vgic/vgic-v5-tables.c b/arch/arm64/kvm/vgic/v=
-gic-v5-tables.c
-> index 718410e8c9f3b..f220267266c29 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v5-tables.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v5-tables.c
+Add coverage for the VGICv5 NR_IRQS attribute. VGICv5 exposes a
+userspace-selectable SPI count, and KVM must reject values that cannot
+be represented by the virtual IRS or that would change the interrupt
+layout after it has been fixed.
+
+> diff --git a/tools/testing/selftests/kvm/arm64/vgic_v5.c b/tools/testing/=
+selftests/kvm/arm64/vgic_v5.c
+> index 51ea2fe7141ad..95d74f501ef09 100644
+> --- a/tools/testing/selftests/kvm/arm64/vgic_v5.c
+> +++ b/tools/testing/selftests/kvm/arm64/vgic_v5.c
 
 [ ... ]
 
-> @@ -1630,6 +1630,28 @@ static int vgic_v5_restore_linear_ist(struct kvm *=
-kvm,
->  				      const struct vgic_v5_ist_desc *ist,
->  				      u32 __user *uaddr, size_t nr_entries,
->  				      u32 intid_type)
+> @@ -125,60 +183,106 @@ static void test_vgic_v5_create(void)
+>  	vm_gic_destroy(&v);
+>  }
+> =20
+> -static void guest_irq_handler(struct ex_regs *regs)
+> +static void test_vgic_v5_nr_irqs_attrs(void)
 >  {
->  	__le32 h_iste;
->  	size_t index;
->  	int ret;
-> =20
->  	for (index =3D 0; index < nr_entries; index++) {
->  		void *h_iste_addr =3D ist->base + index * ist->iste_size;
-> =20
->  		ret =3D get_user(h_iste, uaddr);
->  		if (ret)
->  			return ret;
-> =20
->  		ret =3D vgic_v5_restore_ist_entry(kvm, ist, h_iste_addr,
->  					h_iste, index, intid_type);
-
-[Severity: High]
-Should the SPI base offset be added to the index here?
-
-When restoring SPIs, passing the raw array index as the intid will track and
-inject interrupts starting at 0. Since hardware SPIs start at INTID 32, does
-this incorrectly inject SGIs and PPIs instead of the intended SPIs?
-
->  		if (ret)
->  			return ret;
-> =20
->  		uaddr++;
->  	}
-> =20
->  	return 0;
->  }
-
-[ ... ]
-
-> @@ -1662,6 +1684,41 @@ static int vgic_v5_restore_two_level_ist(struct kv=
-m *kvm,
->  					 const struct vgic_v5_ist_desc *ist,
->  					 u32 __user *uaddr, u32 intid_type)
->  {
-
-[ ... ]
-
->  		for (h_l2_index =3D 0; h_l2_index < shape.l2_entries; h_l2_index++) {
->  			void *h_iste_addr =3D h_l2_ist_base +
->  					    h_l2_index * ist->iste_size;
->  			u32 intid =3D h_l1_index * shape.l2_entries + h_l2_index;
-> =20
->  			ret =3D get_user(h_iste, uaddr);
->  			if (ret)
->  				return ret;
-> =20
->  			ret =3D vgic_v5_restore_ist_entry(kvm, ist, h_iste_addr,
->  							h_iste, intid,
->  							intid_type);
-
-[Severity: High]
-Is there any validation missing for the generated LPI INTIDs?
-
-The iteration calculates intid starting from 0. If userspace sets pending
-bits for these lower indices, KVM would track them and inject them via the
-VDPEND instruction at EL2.
-
-Since valid LPI INTIDs must be >=3D 8192, could injecting lower IDs result =
-in
-architecturally unpredictable hardware behavior?
-
->  			if (ret)
->  				return ret;
-> =20
->  			uaddr++;
->  		}
->  	}
-> =20
->  	return 0;
->  }
-
-> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-> index 6af1264ed2371..153a8fcd4db7c 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v5.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
-
-[ ... ]
-
-> @@ -1301,6 +1301,292 @@ void vgic_v5_save_state(struct kvm_vcpu *vcpu)
->  	__vgic_v5_save_ppi_state(cpu_if);
->  	dsb(sy);
->  }
-> +
-> +static int vgic_v5_irs_status_is_quiesced(u32 statusr)
-> +{
-> +	if (statusr & GICV5_IRS_SAVE_VM_STATUSR_Q)
-> +		return 0;
-> +
-> +	return -EBUSY;
-> +}
-> +
-> +static int vgic_v5_irs_is_quiesced(u16 vm_id)
-> +{
-> +	u32 statusr;
+> -	bool valid;
+> -	u32 hwirq;
+> -	u64 ia;
+> -	static int count;
+> -
+> -	/*
+> -	 * We have pending interrupts. Should never actually enter WFI
+> -	 * here!
+> -	 */
+> -	wfi();
+> -	GUEST_SYNC(GUEST_CMD_IS_AWAKE);
+> -
+> -	ia =3D gicr_insn(CDIA);
+> -	valid =3D GICV5_GICR_CDIA_VALID(ia);
+> -
+> -	GUEST_SYNC(GUEST_CMD_IRQ_CDIA);
+> +	struct kvm_vcpu *vcpu;
+> +	struct vm_gic v;
+> +	uint64_t attr;
+> +	u32 nr_irqs;
 > +	int ret;
-> +
-> +	ret =3D vgic_v5_irs_save_vm_op(vm_id, false, &statusr);
-
-[Severity: High]
-Does this quiescence check potentially lose hardware state?
-
-By calling vgic_v5_irs_save_vm_op() with save=3Dfalse, it issues a SAVE_VMR
-command with Q=3D1 and S=3D0 (Quiesce but don't save).
-
-If the VM had unexpectedly unquiesced (e.g., interrupted by hardware),
-forcing it to quiesce without saving would destroy its modified internal
-state before it can be exported to userspace.
-
-> +	if (ret)
-> +		return ret;
-> +
-> +	return vgic_v5_irs_status_is_quiesced(statusr);
-> +}
-> +
-> +static int vgic_v5_copy_ist_attr(struct kvm_device_attr *attr,
-> +				 struct kvm_vgic_v5_ist *ist_attr)
-> +{
-> +	void __user *uaddr =3D (void __user *)(unsigned long)attr->addr;
-> +
-> +	if (!uaddr)
-> +		return -EINVAL;
-> +
-> +	if (copy_from_user(ist_attr, uaddr, sizeof(*ist_attr)))
-> +		return -EFAULT;
-> +
-> +	return 0;
-> +}
-> +
-> +static int vgic_v5_validate_ist_user_buffer(__u64 addr, __u64 size,
-> +					    size_t expected)
-> +{
-> +	if (!addr || size !=3D expected)
-> +		return -EINVAL;
+> =20
+> -	if (!valid)
+> -		return;
+> +	v.gic_dev_type =3D KVM_DEV_TYPE_ARM_VGIC_V5;
+> +	v.vm =3D __vm_create(VM_SHAPE_DEFAULT, NR_VCPUS, 0);
+> +	v.gic_fd =3D kvm_create_device(v.vm, v.gic_dev_type);
+> =20
+> -	gsb_ack();
+> -	isb();
+> +	/* Check existing group/attribute */
+> +	kvm_has_device_attr(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_NR_IRQS, 0);
 
 [Severity: Medium]
-Is there an issue here when restoring a VM configured with 0 SPIs?
+Is the return value of kvm_has_device_attr() intentionally ignored here?
 
-If userspace passes a size of 0 and an address of 0, the check if (!addr)
-will reject it with -EINVAL.
-
-If userspace passes a dummy non-zero address to bypass this, it fails later
-in vgic_v5_get_spi_ist_desc():
-
-arch/arm64/kvm/vgic/vgic-v5-tables.c:vgic_v5_get_spi_ist_desc() {
-    ...
-    if (!ist->base && userspace_buf)
-        return -ENOENT;
-    ...
-}
-
-Does this catch-22 prevent live migration for VMs without SPIs?
+If the attribute is missing, the test will proceed and fail on subsequent
+operations rather than cleanly skipping or reporting the missing attribute.
+Does this check need to be wrapped in a TEST_REQUIRE() or TEST_ASSERT()?
 
 > +
-> +	return 0;
-> +}
+> +	/* Before userspace sets NR_IRQS, no SPI count has been selected. */
+> +	nr_irqs =3D 0xbad;
 
 [ ... ]
 
-> +int vgic_v5_irs_save_ists(struct kvm *kvm, struct kvm_device_attr *attr)
-> +{
-> +	struct kvm_vgic_v5_ist ist_attr;
-> +	u16 vm_id =3D vgic_v5_vm_id(kvm);
-> +	u32 statusr;
-> +	int ret =3D 0;
+> +	/* Not a multiple of 32 */
+> +	nr_irqs =3D VGIC_V5_DEFAULT_NR_SPIS + 1;
+> +	ret =3D __kvm_device_attr_set(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_NR_IRQS,
+> +				    0, &nr_irqs);
+> +	TEST_ASSERT(ret && errno =3D=3D EINVAL, "GICv5 NR_IRQS not 32-aligned");
 > +
-> +	mutex_lock(&kvm->lock);
-> +
-> +	if (kvm_trylock_all_vcpus(kvm)) {
-> +		mutex_unlock(&kvm->lock);
-> +		return -EBUSY;
-> +	}
-
-[Severity: Critical]
-Is the return value of kvm_trylock_all_vcpus() handled correctly here?
-
-The function returns true on successful lock acquisition and false on
-failure. Returning -EBUSY when it is true means we leak the vCPU locks
-and hang the VM.
-
-Conversely, failing to acquire the locks lets us proceed lockless, and then
-unlocking unowned mutexes in the out_unlock path would cause issues.
-
-> +
-> +	mutex_lock(&kvm->arch.config_lock);
-
-[ ... ]
-
-> +static void vgic_v5_restore_cleanup(struct kvm *kvm,
-> +				    struct kvm_vcpu *vcpu,
-> +				    bool lpi_ist_allocated)
-> +{
-> +	/*
-> +	 * We are on the restore failure path, so we do a best-effort
-> +	 * cleanup. These commands might fail, but at this stage this is the
-> +	 * best we can realistically do.
-> +	 */
-> +	if (lpi_ist_allocated) {
-> +		if (!vgic_v5_send_command(vcpu, VMTE_MAKE_INVALID))
-> +			vgic_v5_lpi_ist_free(kvm);
-> +	}
-
-[Severity: High]
-Could this leave a dangling pointer behind?
-
-When vgic_v5_lpi_ist_free() is called on a failure path, it frees the memory
-but does not set vmi->h_lpi_ist to NULL. If a subsequent teardown happens in
-vgic_v5_vmte_release(), it might observe the populated pointer and attempt
-to free it again, causing a double-free.
+> +	/* Larger than KVM's supported VGICv5 SPI count */
+> +	nr_irqs =3D VGIC_V5_MAX_NR_SPIS + 1;
+> +	ret =3D __kvm_device_attr_set(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_NR_IRQS,
+> +				    0, &nr_irqs);
+> +	TEST_ASSERT(ret && errno =3D=3D EINVAL, "GICv5 NR_IRQS above maximum");
 
 [Severity: Medium]
-Are we risking a memory leak by issuing a redundant invalidate command?
+Will this check actually verify the maximum limit?
 
-If we reach the failure path from a point where the VMTE is already invalid,
-this function will issue VMTE_MAKE_INVALID again because the vmte_invalid
-state is not passed in. If the hardware driver returns an error when asked
-to invalidate an already-invalid VMTE, vgic_v5_send_command() will fail.
+Since VGIC_V5_MAX_NR_SPIS (65536) + 1 is 65537, which is not a multiple of
+32, the kernel will reject it with EINVAL due to the alignment constraint
+before it reaches the maximum SPI limit check.
 
-This would skip the vgic_v5_lpi_ist_free() call and permanently leak the LPI
-IST memory.
-
-> +
-> +	vgic_v5_send_command(vcpu, VMTE_MAKE_VALID);
-> +}
-> +
-> +int vgic_v5_irs_restore_ists(struct kvm *kvm, struct kvm_device_attr *at=
-tr)
-> +{
-> +	bool lpi_ist_allocated =3D false, vmte_invalid =3D false;
-> +	struct kvm_vcpu *vcpu0 =3D kvm_get_vcpu(kvm, 0);
-
-[Severity: Critical]
-What happens if userspace invokes this ioctl before creating any vCPUs?
-
-kvm_get_vcpu(kvm, 0) would return NULL. Later, this NULL vcpu0 is passed to
-vgic_v5_send_command(), which dereferences it inside vgic_v5_vpe_db().
-
-Should we verify vcpu0 exists before using it to prevent a potential NULL
-pointer dereference?
-
-> +	struct kvm_vgic_v5_ist ist_attr;
-> +	int ret =3D 0;
-> +
-> +	mutex_lock(&kvm->lock);
-> +
-> +	if (kvm_trylock_all_vcpus(kvm)) {
-> +		mutex_unlock(&kvm->lock);
-> +		return -EBUSY;
-> +	}
-
-[Severity: Critical]
-As noted in vgic_v5_irs_save_ists(), does this correctly handle the boolean
-return value of kvm_trylock_all_vcpus()? It looks like this behaves in the
-exact opposite way as intended, leaking locks on success and running
-lockless on failure.
+Should this test use VGIC_V5_MAX_NR_SPIS + 32 to ensure we test the upper
+bound check rather than triggering the alignment check again?
 
 > +
-> +	mutex_lock(&kvm->arch.config_lock);
-> +
-> +	if (!vgic_initialized(kvm)) {
+> +	/* Valid custom SPI count */
+> +	nr_irqs =3D VGIC_V5_DEFAULT_NR_SPIS * 2;
 
 [ ... ]
+
+> +	/* NR_IRQS must remain immutable after the VM has run. */
+> +	v.vm =3D __vm_create(VM_SHAPE_DEFAULT, NR_VCPUS, 0);
+> +	v.gic_fd =3D kvm_create_device(v.vm, v.gic_dev_type);
+> +	vcpu =3D vm_vcpu_add(v.vm, 0, guest_code);
+> =20
+> -	gic_insn(hwirq, CDDI);
+> -	gic_insn(0, CDEOI);
+> +	attr =3D GICV5_IRS_CONFIG_BASE_GPA;
+> +	kvm_device_attr_set(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> +			    KVM_VGIC_V5_ADDR_TYPE_IRS, &attr);
+> +	kvm_device_attr_set(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
+> +			    KVM_DEV_ARM_VGIC_CTRL_INIT, NULL);
+> =20
+> -	GUEST_SYNC(GUEST_CMD_IRQ_DIEOI);
+> +	ret =3D run_vcpu(vcpu);
+> +	TEST_ASSERT(!ret, "Failed to run GICv5 VM before NR_IRQS test");
+
+[Severity: Medium]
+Does this explicit KVM_DEV_ARM_VGIC_CTRL_INIT call defeat the purpose of
+testing if the attribute is immutable after the VM has run?
+
+The previous test block already verifies that an explicit INIT locks the
+NR_IRQS attribute. By calling it here before run_vcpu(), the subsequent
+__kvm_device_attr_set() will return EBUSY solely because of this explicit
+INIT, masking whether KVM_RUN actually implicitly locks the attribute as
+intended.
+
+> =20
+> -	if (++count >=3D 2)
+> -		GUEST_DONE();
+> +	nr_irqs =3D VGIC_V5_DEFAULT_NR_SPIS * 2;
+> +	ret =3D __kvm_device_attr_set(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_NR_IRQS,
+> +				    0, &nr_irqs);
+> +	TEST_ASSERT(ret && errno =3D=3D EBUSY, "GICv5 NR_IRQS set after run");
+> =20
+> -	/* Ask for the next interrupt to be injected */
+> -	GUEST_SYNC(GUEST_CMD_IS_READY);
+> -}
+> +	vm_gic_destroy(&v);
+>  }
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260724104819.1296=
-803-1-sascha.bischoff@arm.com?part=3D35
+803-1-sascha.bischoff@arm.com?part=3D41
