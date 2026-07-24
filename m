@@ -1,97 +1,123 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECC364334D5;
-	Fri, 24 Jul 2026 11:11:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CBE33D966A;
+	Fri, 24 Jul 2026 11:14:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784891495; cv=none; b=G3cLEHViX4s70Ei0fwAXlFNC0mOFlqaahhKiUCzLSzq3YlBbJ23EH84AIDirnQ9FX9EbU4CxHXfpHVFwfuAUgYscv5vL798dI+NKzi7FAYAlyr6sOgzXFkYktgoQ01rBlH9KDtg2PncPUe+rH3xli1ePHenJAtdQkEvxTNexjIY=
+	t=1784891648; cv=none; b=ZL7ejuRL3J8PTg355Didc7AN29cexdgpo3UCZQaxy6kGHRCAtjuMnrarlsarluQ7OQB1APLjliRyHRQTq/ASNxBjuOqRobAvEYV1YudtoRw+MVcz7GaiwkIRP1OmE8uKh6RT2JoZfTKSw8lsPjk5aGUGVxqaJWPFQiJKFx3UqVU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784891495; c=relaxed/simple;
-	bh=vUBLWCfyvt8WkHzVAw/0j/omZAvLwnAbsa4Eqm/OINw=;
+	s=arc-20240116; t=1784891648; c=relaxed/simple;
+	bh=pMRPCcjl9nneZtAle9i2qbjBVV/CatUiFvTpL/FRiZM=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=CEX4+2wpx2mh81WXQ4BS8diwlpC5UTc8Gxw69xzGam1GWptFe5b9U9LkxjAjt3UMZDlTrZoEaZI7bvyzGbuJNHj6sJzkeW7cVZq4mrtWc5fGPkCYkVH/YerJfYndXguna7APerrKciVuXT1gsvjxeQ06nbCUCn7zXEtjAzUxdbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UUZJkgzq; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=gjDfGvBAGKvKXH5tZbyFzyNU+fyP7CJeoDXenWfMFYlVHUnaYW8Xig2SfnBnTNFxc46yCn0r6QPxuQPHfYOnBGOZ05MKMyY7fVjwIY/rChxxDnL/T/ai8SNzavlBgQcKtmriLHIuW3oCLTvkZfx98GsQQGurW+EPMwaqzw0VXcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XG4txERN; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UUZJkgzq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B12E1F0429A;
-	Fri, 24 Jul 2026 11:11:33 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XG4txERN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63DD51F01833;
+	Fri, 24 Jul 2026 11:14:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784891493;
-	bh=Va/CNb0brfOOEkUNdkVxoZdEKCIJet0ZJX7rvBh73kg=;
+	s=k20260515; t=1784891646;
+	bh=Kbt6JMPp9cMJ8mDKiYO7rOrtIviIoXzOWUa/QOEQyJw=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=UUZJkgzqxjmhrs26AW5eLycW7aP34R+KR96QVU8dx/Bj59/AnfxU1ku/gZyPb4cuK
-	 G6COtJ7I7z3K0WkJb3TlLCVXQnw0AWab6kG5JA7ARM20RrA/OQ0MVyPnO2KzrVwTsn
-	 JRww8vIez80I3BHJJRDFtjb0SGnPGNKdz7RMJK6LUPmpWJAnD/582kt/LSa7wmgXyw
-	 1Y7HD3JPgtnpQXhNKsY6aEWfEmi3liHrX3749oC3k1FiBdSW6pWrXb2RXhKY5tvLuh
-	 R8oGdJc9+1S89JQY6en7BqkwUXTFo4uAIdyu6LFRT0uoNHp6lTudlcagsCeeulUF0a
-	 EIz5o8HBX+cYw==
+	b=XG4txERNdIEVt1QGeaGhd0Cwt/pV4LBEPmXZEITcOVMVBUbew0yVHSoCoay2jWRjH
+	 gcFJNCLzj9tw2b8JPO5nWWePGgDoJZ+gGYBMVvHtshrILWM+wqDPhNHvD2GPsj0Bnh
+	 X6NL6GDfDcEIgu8MQOEg0/EYjJpn5JKIwt2HJgrHw/Ji4NNBf4ohJW5rEEToB/7ymj
+	 6adVisnqgb3OAR76qZmfsfis+yYrJjkWhaLogbRrjyYRU3lErZQ4VUFNIn+oHtloYf
+	 8k/n5nrCJTemWiGP2/45wB0ckrESOzdeK3ZGNWLV5I+xm63A/XNTyoPF6Vr4nDG+oy
+	 qsLGNdGtkYoIw==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v4 08/48] KVM: arm64: gic-v5: Add VPE doorbell domain
+Subject: Re: [PATCH v4 06/48] arm64/sysreg: Update ICC_CR0_EL1 with LINK and
+ LINK_IDLE fields
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Sascha Bischoff" <Sascha.Bischoff@arm.com>
-Cc: "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, kvm@vger.kernel.org
-In-Reply-To: <20260724104819.1296803-9-sascha.bischoff@arm.com>
+Cc: kvm@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20260724104819.1296803-7-sascha.bischoff@arm.com>
 References: <20260724104819.1296803-1-sascha.bischoff@arm.com>
- <20260724104819.1296803-9-sascha.bischoff@arm.com>
+ <20260724104819.1296803-7-sascha.bischoff@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 24 Jul 2026 11:11:32 +0000
-Message-Id: <20260724111133.6B12E1F0429A@smtp.kernel.org>
+Date: Fri, 24 Jul 2026 11:14:04 +0000
+Message-Id: <20260724111405.63DD51F01833@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
 s) to consider:
-- [High] Allocated doorbell IRQs and their associated request handlers are =
-leaked during VM teardown, exhausting IRQ descriptors and triggering a kern=
-el warning.
+
+Pre-existing issues:
+- [High] Missing Context Synchronization Event (`isb()`) immediately follow=
+ing writes to `ICC_*_EL1` control registers.
+- [High] CONSTRAINED UNPREDICTABLE behavior risk in `GIC CDEOI` system inst=
+ruction encoding.
 --
 
---- Patch [8]: [PATCH v4 08/48] KVM: arm64: gic-v5: Add VPE doorbell domain=
- ---
-commit 3bd242f19027d5c3f4f9f1ea26d5e37b8f153bd4
+--- Patch [6]: [PATCH v4 06/48] arm64/sysreg: Update ICC_CR0_EL1 with LINK =
+and LINK_IDLE fields ---
+commit 5e4759df2a3d62aee0191d703caed6bd54abb692
 Author: Sascha Bischoff <Sascha.Bischoff@arm.com>
 
-KVM: arm64: gic-v5: Add VPE doorbell domain
+arm64/sysreg: Update ICC_CR0_EL1 with LINK and LINK_IDLE fields
 
-This commit adds support for a per-VM VPE doorbell irq domain in GICv5.
-It allocates one doorbell per VPE and stores the doorbell base in the VM's
-state for use with IRS commands and wakeups.
+These fields have been added to the architecture since this register
+was added to the generator, and were hence missing.
 
-> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-> index 3f7b132110114..ebd7c3ede975f 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v5.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
-
-[ ... ]
-
-> +static void vgic_v5_teardown_per_vm_domain(struct vgic_v5_vm *vm)
-> +{
-> +	if (!vm->domain)
-> +		return;
-> +
+> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+> index 7cb61aca3797f..03f5e1755a633 100644
+> --- a/arch/arm64/tools/sysreg
+> +++ b/arch/arm64/tools/sysreg
+> @@ -3736,7 +3736,9 @@ Sysreg	ICC_CR0_EL1	3	1	12	0	1
+>  Res0	63:39
+>  Field	38	PID
+>  Field	37:32	IPPT
+> -Res0	31:1
+> +Res0	31:3
+> +Field	2	LINK_IDLE
+> +Field	1	LINK
+>  Field	0	EN
+>  EndSysreg
 
 [Severity: High]
-Does this code leak the allocated doorbell IRQs and their request handlers?
+This is a pre-existing issue, but since this patch updates the ICC_CR0_EL1
+sysreg definitions, is it possible that context synchronization events are
+missing after writes to these control registers?
 
-During initialization, vgic_v5_create_per_vm_domain() allocates IRQs via
-irq_domain_alloc_irqs(), and vgic_v5_init() requests them via request_irq().
+For example, in drivers/irqchip/irq-gic-v5.c:gicv5_cpu_disable_interrupts(),
+SYS_ICC_CR0_EL1 is written without an immediate isb():
 
-Should free_irq() and irq_domain_free_irqs() be called before tearing down
-the domain? Removing a domain that still has allocated IRQs can trigger a
-warning in the core IRQ subsystem, and repeatedly creating and destroying
-VMs could eventually exhaust the IRQ descriptor space.
+drivers/irqchip/irq-gic-v5.c:gicv5_cpu_disable_interrupts() {
+	cr0 =3D FIELD_PREP(ICC_CR0_EL1_EN, 0);
+	write_sysreg_s(cr0, SYS_ICC_CR0_EL1);
+}
 
-> +	irq_domain_remove(vm->domain);
-> +	irq_domain_free_fwnode(vm->fwnode);
-> +	vm->domain =3D NULL;
-> +	vm->fwnode =3D NULL;
-> +}
+A similar pattern occurs in gicv5_cpu_enable_interrupts(), write_ppi_sysreg=
+_s(),
+and gicv5_ppi_priority_init() for registers like SYS_ICC_PCR_EL1,=20
+SYS_ICC_PPI_SPENDR0_EL1, and SYS_ICC_PPI_PRIORITYR0_EL1. Is there a risk of
+operating under a stale pipeline configuration if an ISB does not immediate=
+ly
+follow these writes?
+
+[Severity: High]
+This is a pre-existing issue, but while reviewing the GICv5 interactions,
+does the CDEOI instruction encoding rely on compiler constraints instead of
+hardcoding the required register?
+
+In drivers/irqchip/irq-gic-v5.c:gicv5_handle_irq(), the instruction is
+emitted using:
+
+drivers/irqchip/irq-gic-v5.c:gicv5_handle_irq() {
+	gic_insn(0, CDEOI);
+}
+
+If the compiler allocates a general-purpose register containing 0 instead of
+explicitly using XZR (register 31), could this lead to a misencoded system
+instruction and CONSTRAINED UNPREDICTABLE behavior?
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260724104819.1296=
-803-1-sascha.bischoff@arm.com?part=3D8
+803-1-sascha.bischoff@arm.com?part=3D6
