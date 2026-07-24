@@ -1,45 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3B16425898;
-	Fri, 24 Jul 2026 11:19:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08466424D53;
+	Fri, 24 Jul 2026 11:19:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784891964; cv=none; b=r2XdREL18ms3knJ3tLyt3m8eyAU/66yI6akChPQIMiQogrjjoUB3p4qxDMeHjb3G8Ss7PQ/ZFizBarR6VpcA/b6XFniWueLw8+JUiYa2XJV8C9Ssj/d7sHzsEhOZH8Sbt8iV6S+oW217eA4zv1+OGWBZGhZniRQqZ6muItaOUoE=
+	t=1784891965; cv=none; b=NS8PDhFi8XyFcnwcApE/cyQtZG8wZvUp1xsstr+VcDXwoAp39telVjdCLcXvumLjvFJASG8a8+1g1/AlUSVG23r+87tv/kR5DG8wqp/TpwzPMvTqmVcpnyTSL3jtmuZZM8sonVjqHQQ+IfGa+ZMrirYhUQmB5WQx50Z7vud8IjA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784891964; c=relaxed/simple;
-	bh=xJ+YuNqYAmZmS3p9ikPCkRNw9SFGFVdL0ZI9j/7UPIw=;
+	s=arc-20240116; t=1784891965; c=relaxed/simple;
+	bh=euq1urGE49AgXTMWK0Q0K3vK/Ft6Ymx5IhKXrN+dhAs=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=txRQrQ53q5MGVKdqDoBrN6LyYQc+bP5qfOOUuTttrWUpEjq9QjqECc/yFFN4jBCVO/nbUwcgsws8nCcbAWyZW4GsidJqTPr8A2iS2DYuEbq8VPbz+wrUMsfsJDyTxuDGl5tKwlMiN5ROlMmZuGEEOwVPR5+//RJsEIyf45ucHqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j1vvOa5t; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=czeUD8DJckZ7iPF45HJAli7xp4Cx9D+O+7kajG1aijA4piQhPTq8Bfvptze7NV0YyHOxQTuIPCzoLq828cvjR+JWMKly2NjG6TxYIJdiVJ0L9QA/BzFAvd81a8OiQIcHSf+iEqS6gRu7nRmEbubdzQmx014FMav3nHabZVZwd+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GhT7w+6f; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j1vvOa5t"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7EAB41F000E9;
-	Fri, 24 Jul 2026 11:19:19 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GhT7w+6f"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F63C1F00A3F;
+	Fri, 24 Jul 2026 11:19:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784891959;
-	bh=8jnr+9SFsZYNhXUUp+HnC6AUMHHgFJpnmBm18zYvji8=;
+	s=k20260515; t=1784891960;
+	bh=Ign6sz2zco1R13pmGuh7YFyOAPgoWPPvATyl33D5dCU=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=j1vvOa5tK8n5ySqgXigxG5hgsRV6tbG05Mn9Syf5IMw+cavs25EDFawEVuCnvk47D
-	 KY/NFYY1tDMljHIkbtrhcdOOF4wYM9oXEDR4lbNiG0vum+PZjFgty6xPEkCfHv98dI
-	 tUbOFn5isJynSZidxV/ATmyuAJ42eRI4F4e2ubs5xL6IST5NEyB1cfv7H9uSm0xUJT
-	 TKfuz5293rdiiEA1ioXxmZbwM2DHpr3jrnmTmpkVChXlIGKsP/YOoOeSnW9fDP82Uv
-	 Pe7K8WBU/ubGd58h6wTA+fKkvxEmFGU2RNIUFzaSjk45h7irEUrKknc+Ad6+h2J4F/
-	 WSwlh1YkHnvQA==
+	b=GhT7w+6fIKY8teyBRTaG+LHbb1i8GfFlTRwpz08leo0Zh+g4XkCOxSAQTXRi23qry
+	 8K1rjHA7yB2Ab4nhDbOgdulQ3qQ379tnhYjkid+2HYjBQn9hdEwt5B1Q1jVmhNPYqD
+	 5exqslYBCsO23G6Anopsw8eZyidOKC+2rmB25T/xi91xilDPKycMX4c7F4kTF0skhu
+	 clMhJaNg+WGssidaV1ONoLL7TA1fxUDi+5bz0BlQalU6q0wNqmy9AZAdx7a2qt/MEm
+	 EKi016ch93WLpzcunRwWn5pWLOEUQyNQCkjXUXU3ZeOZn7ayQleP2icmx+vmrWuaJ5
+	 l5FSsOZFso4Rw==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v4 07/48] KVM: arm64: gic-v5: Extract host IRS caps from
- IRS config frame
+Subject: Re: [PATCH v4 03/48] irqchip/gic-v5: Set up gic_kvm_info on ACPI
+ hosts
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Sascha Bischoff" <Sascha.Bischoff@arm.com>
-Cc: kvm@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260724104819.1296803-8-sascha.bischoff@arm.com>
+Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+In-Reply-To: <20260724104819.1296803-4-sascha.bischoff@arm.com>
 References: <20260724104819.1296803-1-sascha.bischoff@arm.com>
- <20260724104819.1296803-8-sascha.bischoff@arm.com>
+ <20260724104819.1296803-4-sascha.bischoff@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 24 Jul 2026 11:19:19 +0000
-Message-Id: <20260724111919.7EAB41F000E9@smtp.kernel.org>
+Date: Fri, 24 Jul 2026 11:19:20 +0000
+Message-Id: <20260724111920.6F63C1F00A3F@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,71 +47,77 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [Medium] Inconsistent handling of ID bit counts likely miscalculates `max=
-_vms` by a factor of 2.
+- [High] Failed ACPI GSI registration for maintenance IRQ due to missing GI=
+Cv5 hardware IRQ type encoding.
 --
 
---- Patch [7]: [PATCH v4 07/48] KVM: arm64: gic-v5: Extract host IRS caps f=
-rom IRS config frame ---
-commit 2b896f2ac90e022fb55d61f670ccdb056cff2664
+--- Patch [3]: [PATCH v4 03/48] irqchip/gic-v5: Set up gic_kvm_info on ACPI=
+ hosts ---
+commit 6d138977b1bc438c493851b44358f453400237da
 Author: Sascha Bischoff <Sascha.Bischoff@arm.com>
 
-KVM: arm64: gic-v5: Extract host IRS caps from IRS config frame
-   =20
-The host irqchip driver provides KVM with a pointer to an IRS's config
-frame. This commit extracts and stashes the VM and IST capabilities
-from IRS_IDR2, IRS_IDR3, and IRS_IDR4 into a capability structure.
+irqchip/gic-v5: Set up gic_kvm_info on ACPI hosts
 
-> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-> index d4789ff3e7402..3f7b132110114 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v5.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
+This commit adds ACPI support for setting up KVM host information on GICv5
+systems. It parses MADT GICC entries to retrieve the maintenance interrupt =
+and
+registers it as a GSI to be passed to KVM.
+
+> diff --git a/drivers/irqchip/irq-gic-v5.c b/drivers/irqchip/irq-gic-v5.c
+> --- a/drivers/irqchip/irq-gic-v5.c
+> +++ b/drivers/irqchip/irq-gic-v5.c
 [ ... ]
-> @@ -34,6 +35,45 @@ static void vgic_v5_get_implemented_ppis(void)
->  	__assign_bit(GICV5_ARCH_PPI_PMUIRQ, ppi_caps.impl_ppi_mask, system_supp=
-orts_pmuv3());
+> @@ -1162,11 +1164,100 @@ static void __init gic_of_setup_kvm_info(struct =
+device_node *node)
+[ ... ]
+> +static void __init gic_acpi_setup_kvm_info(void)
+> +{
+> +	unsigned int maint_irq =3D 0;
+> +	int irq;
+> +
+> +	if (!gic_acpi_collect_virt_info()) {
+> +		pr_warn("Unable to get hardware information used for virtualization\n"=
+);
+> +		return;
+> +	}
+> +
+> +	if (acpi_v5_kvm_info.maint_irq) {
+> +		irq =3D acpi_register_gsi(NULL, acpi_v5_kvm_info.maint_irq,
+> +					acpi_v5_kvm_info.maint_irq_mode,
+> +					ACPI_ACTIVE_HIGH);
+
+[Severity: High]
+Does this fail to register the maintenance IRQ?
+
+acpi_register_gsi() passes the raw maint_irq directly into fwspec.param[0].
+However, the GICv5 PPI domain select function expects the hardware IRQ type=
+ to
+be encoded in the upper bits:
+
+drivers/irqchip/irq-gic-v5.c:gicv5_irq_ppi_domain_select() {
+    ...
+    if (is_fwnode_irqchip(fwspec->fwnode))
+        hwirq_type =3D FIELD_GET(GICV5_HWIRQ_TYPE, fwspec->param[0]);
+
+    if (hwirq_type !=3D GICV5_HWIRQ_TYPE_PPI)
+        return 0;
+    ...
+}
+
+Because the raw MADT value doesn't have the GICV5_HWIRQ_TYPE_PPI bits set, =
+the
+mapping will be rejected. Should the GSI be encoded with the PPI type before
+calling acpi_register_gsi()?
+
+> +		if (irq > 0)
+> +			maint_irq =3D irq;
+> +		else
+> +			pr_warn("Failed to register GSI for GICv5 maintenance IRQ\n");
+> +	}
+> +
+> +	gic_setup_kvm_info(maint_irq);
 >  }
-> =20
-> +static u32 irs_readl_relaxed(const u32 reg_offset)
-> +{
-> +	return readl_relaxed(irs_caps.irs_base + reg_offset);
-> +}
-> +
-> +static void vgic_v5_irs_extract_vm_caps(const struct gic_kvm_info *info)
-> +{
-> +	u64 idr;
-> +
-[ ... ]
-> +	idr =3D irs_readl_relaxed(GICV5_IRS_IDR3);
-> +
-> +	irs_caps.max_vms =3D BIT(FIELD_GET(GICV5_IRS_IDR3_VM_ID_BITS, idr));
-
-[Severity: Medium]
-Should this have a + 1 applied to the field value, similar to how VPE_ID_BI=
-TS
-is handled below?=20
-
-GIC architecture ID bit fields canonically store the number of bits minus 1.
-If VM_ID_BITS follows the same pattern, omitting the + 1 will result in KVM
-calculating exactly half of the actual maximum number of VMs supported by t=
-he
-hardware, leading to premature resource exhaustion.
-
-> +	irs_caps.two_level_vmt_support =3D (idr & GICV5_IRS_IDR3_VMT_LEVELS);
-> +
-> +	if (idr & GICV5_IRS_IDR3_VMD)
-> +		irs_caps.vmd_size =3D BIT(FIELD_GET(GICV5_IRS_IDR3_VMD_SZ, idr));
-> +	else
-> +		irs_caps.vmd_size =3D 0;
-> +
-> +	idr =3D irs_readl_relaxed(GICV5_IRS_IDR4);
-> +
-> +	irs_caps.vped_size =3D BIT(FIELD_GET(GICV5_IRS_IDR4_VPED_SZ, idr));
-> +	/* Field stores VPE_ID_BITS - 1 */
-> +	irs_caps.max_vpes =3D BIT(FIELD_GET(GICV5_IRS_IDR4_VPE_ID_BITS, idr) + =
-1);
-> +}
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260724104819.1296=
-803-1-sascha.bischoff@arm.com?part=3D7
+803-1-sascha.bischoff@arm.com?part=3D3
