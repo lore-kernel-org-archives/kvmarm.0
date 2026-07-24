@@ -1,29 +1,29 @@
-Received: from AM0PR02CU008.outbound.protection.outlook.com (mail-westeuropeazon11013051.outbound.protection.outlook.com [52.101.72.51])
+Received: from GVXPR05CU001.outbound.protection.outlook.com (mail-swedencentralazon11013064.outbound.protection.outlook.com [52.101.83.64])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5009E426EB2
-	for <kvmarm@lists.linux.dev>; Fri, 24 Jul 2026 10:54:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.72.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8276342AFAA
+	for <kvmarm@lists.linux.dev>; Fri, 24 Jul 2026 10:54:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.83.64
 ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784890469; cv=fail; b=YrLOgCj+mhGbY402GwCTW4K1/R2SvsrazmLx+cBNuRhBhZfKU2CM/Yuq6aiktAdlnGH9TOn28SyMWErigbv2tmce4cXMmgHsMPEoYUq+AMcfnAyEKzFplUj+008BMi4pr8DQj/rnTGry0huCnSfMQEFSLjGfijNLctaucl+1kPQ=
+	t=1784890496; cv=fail; b=G7Zsvlc+/LsXr5FZhoLQjtrrdUP8+q+L2LK/EEHUqqExPxkOHI6AUmqHsTYPKs7RYE4FQqI176uQgTOYt6xsSRPzgQkOIfAYpiQBCWQeRvxkMi3vG5fqB/RFkwiTuLknUAiQdMSoEceDsLaZWKiagvFMLj7Br3OqAFWfxC0F6jE=
 ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784890469; c=relaxed/simple;
-	bh=cgLTExn/0dTE2MV3XP573SDzRp1xA9leFLgiPJ05S6Q=;
+	s=arc-20240116; t=1784890496; c=relaxed/simple;
+	bh=7nCaXxmeAL9FV9z1DSzX9wFqGre30MkU4g4kdjUcFvY=;
 	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=GDDA1FU2KLg6/k6y7cuIj2CDGwh0WlY5NLBSBHhc45LkMuJWkyEl8rbVb00bhzACCFc/a06mElZoi9yu9M4sYetWit9v5F4Hd1brKoEX+pWGgfdlxpApnJC1Zuf0+InN0itd2VEpg++wPNUphXZ/I6KEb8Pt41RoF9NfxxZdIp4=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Tzi1rNdg; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Tzi1rNdg; arc=fail smtp.client-ip=52.101.72.51
+	 Content-Type:MIME-Version; b=ChevvK9OWG7cEcyelw/OtkGGcvLMNKE0s2BQ+sweBa9P3OysEB9mq/T5cVWqiTu+ayBuJ9fEIh3en601My0s/3/64gIBbxsFORmVoJJeVSfrrXx97pk002relH3r5JI/4d1gxGGfTGseSO5gEtuRVIultoQ1FUO3Gqw2MZsiunY=
+ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=TmPei5Ud; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=TmPei5Ud; arc=fail smtp.client-ip=52.101.83.64
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Tzi1rNdg";
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Tzi1rNdg"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="TmPei5Ud";
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="TmPei5Ud"
 ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
- b=SSZv2WD+uaR80n7yHTQCrST63RCrF4n31O8Rx6EGViYNQAZUtCfgsz61Zx37j7kcgowoi8WS91aYyWtn9KNcYPCFoDYiiItRRJJvpMICIPReKLWcI5D7Cd7PStbqd9DbCuh4sqey1uljX6KHsR2BSvz5jQGBAXsqI7xUkPf7mikhzaaiCCQA7W2aBisgU/7NL1ujcH7RjM3rULvOMe4OEtCdcbbh+xSS/zIJ5gZq8vC8uQJyniRp4wiBZyxbdRHTEyp7BcElu1TgaqDZnLrPbecO+LEhTw1ZDN6m+a4Q/QvNjOFYMwiaQTQO0k4zKoGmzsTQ7HKjg6thAUlA8Y4+6g==
+ b=A3JAExIzADQDq6P6DwMWG+tc+VYi45cEMMjsBwTj3+li3u5s9QrY4RXm79YZxdOGUHt1s9zs0yvfADY0yzVYZCN61N5O0tJXI22YJ6OLX24Hzz1ZrZNmXV2slE7ZFbnCDI2BelXwL1RNd4N+J4VBlccUZaNoQlLpR3YagRZ/jUGm0D8aZV5jgLJdYaI7hlt0E2LnrzNY4BzQfp1Mxt/06vZgSQPR0asS2SHYqOGLw0depw/RU0BQlv8FfSrd5QglcdZQ3sWnDGkezfx6CqmWa3kKOZvHegq3x2/eUctbSK1tua4HFTSwDD3Ruqpvp3xPexwAuNOGGI+NVqO9ToE6IA==
 ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NmWbwSu1taDmixq/EgXIRwL12LNFUjMssL/NHJHTkvY=;
- b=sj7Fx5rjc338jjpvUFccQlOOs4yLgJiEVI+3d+IAuYOLAgnduvH8ES2HXJPcKSIZ+/KKazUNnOyVE7MrtbdiXm+xUuIQR18/fouuJu10gpJm0Wcy1VDLH+jvEIvULW0ocx485yY+YHfvLNoAlhsXQOiegyToOh1F1TpDQ1C0D+KhEYOf+nPUP9dkJFYavgNCfK1qaIFwj0ggs4VtM+d2qzKJlYRd96pwDl/NbSNbiJ61850eEx3gI41Ihxs1OoHoifM/+BPP7RpAA3McsZvU87HyRUzs4D+WFXwdJ/BS5RH66CuBzQW1nNnnDqkNqxYFm1ri66dVrggaMDXj7d4I/A==
+ bh=P8ifefOXAsbxiEjRghpEMkPNGW6iODkB9LW6/23IJCs=;
+ b=pJgzU5MTeiWVkBcp1Axq7S0yaKFKjTivaBbAnvWbSJBV6cvgBpgZfOW6l/qH5PFTyX5N9BC8/hPdDPYuF65V0KrpwsWMbeBIJA6SbOalzGS+o2Inna1zzFEf0uHoRxCv0U0kXf4H1XG2SBW8ktodNuzBin+6msSxOka9viTisVhEUqW9HVvfvN0EnuEx5+qy7lE6/sB8sFo/byQO+SsY08pXjwy0+o/0TxWlue6XPNRrIKulpd+R1VD42gS+10QOXau412K1UnzXI2f0IDHFbAeZX04bAtbuiCoobhQd3laUJzIuyT1AX6WuiYu5wRr7vsDG6KaSy+FNUn9+2ytEdQ==
 ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
  4.158.2.129) smtp.rcpttodomain=lists.infradead.org smtp.mailfrom=arm.com;
  dmarc=pass (p=none sp=none pct=100) action=none header.from=arm.com;
@@ -32,18 +32,18 @@ ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
  dmarc=[1,1,header.from=arm.com])
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NmWbwSu1taDmixq/EgXIRwL12LNFUjMssL/NHJHTkvY=;
- b=Tzi1rNdguEpUSFgjOw2jgdEUJfVpvoIhqe6mE5J7s2raKkeubkTL504fccIHoeFZQX/MkSgakG2NKh61n49nUaJ8kNnPImH4+Ilg0jXCLZ2K1jd2ut2A4oYr803iBs1Fx7a0jYSXlY4opE/M1OrCfqWCbnVvyWRCD9NgGh+hwJM=
-Received: from DU7P189CA0024.EURP189.PROD.OUTLOOK.COM (2603:10a6:10:552::11)
- by AM8PR08MB6386.eurprd08.prod.outlook.com (2603:10a6:20b:362::23) with
+ bh=P8ifefOXAsbxiEjRghpEMkPNGW6iODkB9LW6/23IJCs=;
+ b=TmPei5UdxKL+Yjo4K0OapEQVEVzg1TprcZBpNUf6b22SzPXb4GhccGBdhMklaBCnEcCdXT+G7QtiYPOH5ja7oyOSgTdYkQFAc+M7w4niuVmCXob1QJAKsbMNWD46hPUxbNc0DaL0SZ88yVh8Kcbg065+l/Mv8OHyvtr8Ucpi3bs=
+Received: from AS8P189CA0034.EURP189.PROD.OUTLOOK.COM (2603:10a6:20b:458::15)
+ by AS1PR08MB7451.eurprd08.prod.outlook.com (2603:10a6:20b:4dd::16) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.245.11; Fri, 24 Jul
- 2026 10:54:21 +0000
-Received: from DU6PEPF0000A7E4.eurprd02.prod.outlook.com
- (2603:10a6:10:552:cafe::5a) by DU7P189CA0024.outlook.office365.com
- (2603:10a6:10:552::11) with Microsoft SMTP Server (version=TLS1_3,
+ 2026 10:54:37 +0000
+Received: from AMS0EPF00000197.eurprd05.prod.outlook.com
+ (2603:10a6:20b:458:cafe::63) by AS8P189CA0034.outlook.office365.com
+ (2603:10a6:20b:458::15) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.21.245.11 via Frontend Transport; Fri,
- 24 Jul 2026 10:54:21 +0000
+ 24 Jul 2026 10:54:37 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
  smtp.mailfrom=arm.com; dkim=pass (signature was verified)
  header.d=arm.com;dmarc=pass action=none header.from=arm.com;
@@ -51,32 +51,32 @@ Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
  4.158.2.129 as permitted sender) receiver=protection.outlook.com;
  client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
 Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
- DU6PEPF0000A7E4.mail.protection.outlook.com (10.167.8.43) with Microsoft SMTP
- Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.21.270.5 via
- Frontend Transport; Fri, 24 Jul 2026 10:54:21 +0000
+ AMS0EPF00000197.mail.protection.outlook.com (10.167.16.219) with Microsoft
+ SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.21.270.5
+ via Frontend Transport; Fri, 24 Jul 2026 10:54:37 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=v2zvJdDngnPv5i8VixCgsmsisznX53Te0Ka+llNUpksDNe4tcbIlsFQX3jmcgMMtReKFcC1ZZIfI6hoaKPvVF+iFhCBu6iV6zbxMNGsAKDE8MPxshqpyEdA8WD0AfnCGq5W4DGLJ8Q0QKTxXy/knH8OsZJyl/4ugtxlbtAGxeqMC8luZG8EZJPedWzTJ6w4H2lfafCyWtt9hXNuzXwL8ACQzoCU3jvyV3SIEG7uXENelhdG4MaZqdI6JAZp4GGYnOjkjGrIzm6mD0e0e1xPq/MzIMxAZ/22WWoSF7v/xPqEXXBcyXmeqYEMxKVJrJrzOvEOnXb8Ujz8/zYl23I5SIA==
+ b=QpGP+pQZkMAtUQTYa4DgTdcvIrJX41n6Cdxm3niL+q8+0v1h20bfdwyuYLA3jhocvyWHLIK8RbTu/XQoxKS2Z3FNQn0JsbpL01F5M7kUwi6RD69CICVlHhjH2Kce9Qkx3Vz9UVBNfCbScMWZqy92n88qbfVFN9JIyaetSRKNKtEfFWfIb4WsAWI3ANucLLIYnyih4cljOy3X8Ldmg/ie1RQa8/ZH0XYlg6C04wlZsWyFmHCuKp16K+7gbjaZye0SeL+SE3qNXTc5bYSrHp6/Q7Gs7g48tfMuSkfRCTGraiOiTQUBlmRDHQoTl0uMsnX0QRDZi/jv8Kcb/aXDT5/RHg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NmWbwSu1taDmixq/EgXIRwL12LNFUjMssL/NHJHTkvY=;
- b=BD4pWTDJUWAJlhmXS9pB4VKpE5UHzyPf0y8EGEB7eg6IKaw3WF9poVIqzZtOW9nQ1aQgAUqV6t/kXkM5LqgezdFb2FqNxZxq/FG2SZ24dyUIpP7N/uv0LFbh7UQqXvH9Ense93bdcXjTGvSVPTRLYEWZ8GVbhriETfomJNO5XK5o4bGmmYk2Kq/BhMxW5vewyMezCufEs8PhfY8vKUc6nD5qsRmfjJMIlT8QpKcokgyV/h+ocpok9jDVB6TsCwkzMQfA6b07H+Lf5MQ2Wi0KKl3sYhXrqkUVkvWlCPBbllw+AUAV5W+Q1JlBYUm+kt0nh94Fj1mGQJkCgsZFw3vvjg==
+ bh=P8ifefOXAsbxiEjRghpEMkPNGW6iODkB9LW6/23IJCs=;
+ b=mydPoq74miWecSr5kZ+A0XGCoU9YYoI4AOkMCV3H8lNCLlT+EFQDPObJJrBSXOrDkJvgf3cqbcQRRNl06gm4eAbEJw40uw4QvgT3y7692fv3oezaEw2Hpnuq8ICaiYrlSGlzc/i8XEF2onKlIfiqWbiTds8ucCPg3BX6U+n+j8EKAiKEhEvKnecwRQ+plnoS5KP2lcuLYJablHVkVsVJ6WYoIKEbOyRbYAihJqnQg9BslRmuYhRtrnfXBGNJ8wDZVHVTGY7qG3HuByJFQoMffI4xvQs5I4paS4GdeKapXnbzz19LaRPeH64swaiH4ujKoPx1FL3GFMwYQaTpt4UW5Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
  header.d=arm.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NmWbwSu1taDmixq/EgXIRwL12LNFUjMssL/NHJHTkvY=;
- b=Tzi1rNdguEpUSFgjOw2jgdEUJfVpvoIhqe6mE5J7s2raKkeubkTL504fccIHoeFZQX/MkSgakG2NKh61n49nUaJ8kNnPImH4+Ilg0jXCLZ2K1jd2ut2A4oYr803iBs1Fx7a0jYSXlY4opE/M1OrCfqWCbnVvyWRCD9NgGh+hwJM=
+ bh=P8ifefOXAsbxiEjRghpEMkPNGW6iODkB9LW6/23IJCs=;
+ b=TmPei5UdxKL+Yjo4K0OapEQVEVzg1TprcZBpNUf6b22SzPXb4GhccGBdhMklaBCnEcCdXT+G7QtiYPOH5ja7oyOSgTdYkQFAc+M7w4niuVmCXob1QJAKsbMNWD46hPUxbNc0DaL0SZ88yVh8Kcbg065+l/Mv8OHyvtr8Ucpi3bs=
 Received: from DU0PR08MB8421.eurprd08.prod.outlook.com (2603:10a6:10:407::19)
- by DU5PR08MB10466.eurprd08.prod.outlook.com (2603:10a6:10:516::10) with
+ by DB9PR08MB7769.eurprd08.prod.outlook.com (2603:10a6:10:395::19) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.245.11; Fri, 24 Jul
- 2026 10:53:18 +0000
+ 2026 10:53:33 +0000
 Received: from DU0PR08MB8421.eurprd08.prod.outlook.com
  ([fe80::2158:1cab:1d88:ba2e]) by DU0PR08MB8421.eurprd08.prod.outlook.com
  ([fe80::2158:1cab:1d88:ba2e%5]) with mapi id 15.21.0245.009; Fri, 24 Jul 2026
- 10:53:18 +0000
+ 10:53:33 +0000
 From: Sascha Bischoff <Sascha.Bischoff@arm.com>
 To: "linux-arm-kernel@lists.infradead.org"
 	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
@@ -88,13 +88,13 @@ CC: nd <nd@arm.com>, "maz@kernel.org" <maz@kernel.org>,
 	<peter.maydell@linaro.org>, "lpieralisi@kernel.org" <lpieralisi@kernel.org>,
 	Timothy Hayes <Timothy.Hayes@arm.com>, "fuad.tabba@linux.dev"
 	<fuad.tabba@linux.dev>
-Subject: [PATCH v4 19/48] KVM: arm64: gic-v5: Add KVM_VGIC_V5_ADDR_TYPE_IRS to
- UAPI
-Thread-Topic: [PATCH v4 19/48] KVM: arm64: gic-v5: Add
- KVM_VGIC_V5_ADDR_TYPE_IRS to UAPI
-Thread-Index: AQHdG1qi9nc1ATSXo06CeaTJMPHkyQ==
-Date: Fri, 24 Jul 2026 10:53:18 +0000
-Message-ID: <20260724104819.1296803-20-sascha.bischoff@arm.com>
+Subject: [PATCH v4 20/48] KVM: arm64: gic-v5: Add GICv5 IRS IODEV and MMIO
+ emulation
+Thread-Topic: [PATCH v4 20/48] KVM: arm64: gic-v5: Add GICv5 IRS IODEV and
+ MMIO emulation
+Thread-Index: AQHdG1qr81fnqAQPDUuFIBDOFj3KQA==
+Date: Fri, 24 Jul 2026 10:53:33 +0000
+Message-ID: <20260724104819.1296803-21-sascha.bischoff@arm.com>
 References: <20260724104819.1296803-1-sascha.bischoff@arm.com>
 In-Reply-To: <20260724104819.1296803-1-sascha.bischoff@arm.com>
 Accept-Language: en-GB, en-US
@@ -105,18 +105,18 @@ x-mailer: git-send-email 2.34.1
 Authentication-Results-Original: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=arm.com;
 x-ms-traffictypediagnostic:
-	DU0PR08MB8421:EE_|DU5PR08MB10466:EE_|DU6PEPF0000A7E4:EE_|AM8PR08MB6386:EE_
-X-MS-Office365-Filtering-Correlation-Id: dbc60f97-9bb6-48a7-5519-08dee971eafc
+	DU0PR08MB8421:EE_|DB9PR08MB7769:EE_|AMS0EPF00000197:EE_|AS1PR08MB7451:EE_
+X-MS-Office365-Filtering-Correlation-Id: 74369904-2cba-4edf-4287-08dee971f437
 x-checkrecipientrouted: true
 nodisclaimer: true
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam-Untrusted:
- BCL:0;ARA:13230040|366016|1800799024|376014|23010399003|22082099003|18002099003|56012099006|11063799006|38070700021|6133799003|10067099003;
+ BCL:0;ARA:13230040|366016|1800799024|23010399003|376014|18002099003|22082099003|11063799006|56012099006|5023799004|38070700021|6133799003|10067099003;
 X-Microsoft-Antispam-Message-Info-Original:
- uM3arhWWdwcfVdDsFuc3O2rNiL0atTRSNzNujQ6QqTvd+NKro4B/m+EFDJHgCCTrUfzWwbxQOArfwyQqcOoJSkGCS5wZ5wHQ3cRBOcWYJF9pD1bAgNQHIouXZSubrDOSdXs0RQw9K+kuzzRnFDcV2Y7SjAC7GHi/vZAcdoqiirTsJF1tHyz3tn0C8Ya1piWtDUsmizKA+bwcDADj7XxKarj9P10Bj/YPRJL1vgK0znd7xWF54gqQyi4Q9pVIPeg4RBl8O9+LbgrrglNwnF18eGU4jNTPZI8mrqFY1UHX6gKpfRe1KL87D81gLO3a3HTwJ9PmqlFGvK2snt6iy0RHYrCc57G6X2iFRSih06D+ZsC7EaJNbLhF7X6BGIahSF+/9aCthVlxcLb2tk69aOLiMdwDU2P6YlFtgpbQtUdZMkxYsMTFCrE9fECRR/lOAGKSVWZuAUfUNxlnUDr7ZQ8mJW87NviGeLPgU1Z7eu5Gkupff4omu73OnFbgDc7JrYYdroB8sZqJcwMq2mA41P/8NqmRS05gU58EbLTHwEyO/AbxdJGdqIc/CQuXUTrXYEsgTxB7z7fuNBTny4Pm/7p6doEc9TYmjItmoqcD+z8OgONkQoJxi0TWQ0XogcIvV7NupxbH/KD5JntJ6x0VhrljZp9zN82SW4+ADUZk1ywV7fRMbx1pJTQrLytuxAb+j/bp7GFy6WSq3/3wV+UNHDClE28VTYgjzzgcicLWXB6XwM8=
+ r7UkY4LUW9LnYqPeZufCYotAZpqIybldIjQS393gdhC7hmaziLb8dCmH7rNuX8wkAR4N6/hlLOWhaoBkY6ikKbvxPgsRZ6h8/npve93/+5/zWjmK9ROojSHSnVifRHi4DTM1DGO43voN/L2+SMu9emhUgtR1uDX3qa+LBNJYSIU2m+u4yRsfzD2Dt6kpgke8VrSi/rkymppBh1phEIuAmGbWkJqTHR27WDZaTA/Ohow9UrUsnvjf95G9o7E9g9S3EZv/P6hZWvo8ES3G6IPA5YRdll6FT1b3OwuX3GgrQlSV0o6XFTGbZmaDAIRpCwincbHV6KCgNqzckkYi/rqKRwPsL92pJS25zQ7xf30iOD3Sw19fRxbaDbEEHUrFIc/d/dBIW5UKUhAYg0XA6pPA0QKWie1huC9YT+lxxcp1wd0AKP8sbjkYcYhYn5XWGLIkEEZhKHZXnasGtc7enSKtBroc6uHHeKGhVw3hNGebFMzm02vwdQIO/pW0r9UE3X9xHmJywPbSUhZ1hn480KZEEiy31jATafefaygoyVlJLr2T5ZLmtH6R3n/Q2OMucHXjl45QLaTvLGi3nLJEehQ5X1ub6xwcpeG571slNf8dZUkqeetGPhF63ck5y06cPjXoy15p3D7SCkPCQ0h0jgC0wqu55lOgXbRP1m6ke/Bz+PAAbHXNLav023oTriDSPsmYUO5EUci5IJWoVwRaXRjahNy0meqo3Xmwh6ZVwYbexDg=
 X-Forefront-Antispam-Report-Untrusted:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU0PR08MB8421.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(23010399003)(22082099003)(18002099003)(56012099006)(11063799006)(38070700021)(6133799003)(10067099003);DIR:OUT;SFP:1101;
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU0PR08MB8421.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(23010399003)(376014)(18002099003)(22082099003)(11063799006)(56012099006)(5023799004)(38070700021)(6133799003)(10067099003);DIR:OUT;SFP:1101;
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
@@ -126,84 +126,977 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 X-Exchange-RoutingPolicyChecked:
- TfK1Q0tI3MNFHGHu+jYwoeRz4GqdR3VFESu5M3J6MkYnRhSf4L+hVuzVSc0lfLyU16I4VC3eh0d+vkM99mz8IIbO6QbtVQnF/Tu5xPT3VYz8Q3Zh4ZSqyNI3pPrU9NpC1Tgqb32BxU53r6iIPaFZi9oCmQDwE1Ftmx57sWmTlbBYRJ9FfId8T/sf2JKRCH0jcVGTGYX8MTzIZ4W9lJVQ+5I+4LcEKJBhNXjJKMNXzbQ71AbQ8E5qJP9cL47Z7BFM+1NCxNLNyj9hl8aWx7MUsIIJ3C9IbzzQ2rH++3oo/ul78aQ/Sivl+dgA0obrPXm12/MojMVkkx1WT9mW0Twa3g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU5PR08MB10466
+ DNCQKdgfYLC12Uw3ZmO5VNk04ZU3LlN3zyr/9B5of5Btm1D+syYaSdn87Em+Gtf2jIcIo1uicy0BwjiT+KWNPr7YobA6f6HWTO+yc8YV9GE8WBTRM7a9dx+D9PGAGsQJYZ+RZ4WdmtGd2Qx/PpLpONqgboUsDmk4bWZfmIw+vUdN6SwmzOWHgE8u48x7ZrpeO4oMXVzHzkBpj6m0iAAMotU/s7OYm4Wfr6wu4xFppLDzQm+rPwhKwyvP9PYi6eKWMtXNRrwiiswjqcJ4Hj78G6zQvR9H+lziITz9dP6pZdrxeVtCO+JFAyss0EWhrhLJzC96nw9ICfa4iCNWL2jIzg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR08MB7769
 X-EOPAttributedMessage: 0
 X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- DU6PEPF0000A7E4.eurprd02.prod.outlook.com
+ AMS0EPF00000197.eurprd05.prod.outlook.com
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	5db59467-4b65-43ed-e4e6-08dee971c54c
+	70e5e582-89be-47eb-7d93-08dee971ce7b
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|14060799003|35042699022|23010399003|1800799024|36860700016|82310400026|376014|56012099006|10067099003|18002099003|22082099003|6133799003|11063799006;
+	BCL:0;ARA:13230040|35042699022|376014|82310400026|1800799024|14060799003|36860700016|23010399003|18002099003|22082099003|10067099003|5023799004|56012099006|11063799006|6133799003;
 X-Microsoft-Antispam-Message-Info:
-	BhqZLblNkNwn5z94fdEHgakJMClGJIAL+00UuyQ8kXBnow6AhlcX60baCr3PwbVHmIqz8SDyTIEg3HT6saR1JFVtjtw07iB4TIk6xbp0JfzgHt2SeXVG914dBUQxrkzycm1gaInGoJZRc/YFwp3PNmMdHdrdZp3Uw52J802KSt3xOKwp+nZhjDEOoisn/1HmzdydXnaxHuwGTnWkYy5q85GG/Llt6SfBXFHCux5JmlGv57B9dGRRq4bxCMlWi1HET5QoYtpsfK7nW1XqqoAySJmslA0Arh4dKA0WTpm3wd8gv77iZDIijG/Q6GfMeOTUOh+dnUo0n7cO1JyLe39nHAeK372PpnNu1M7uSyopk8DEE37ENc951tt6HrCBxo2AoUaGwJJoQtX5YR/9SFi1Lpou4/Y2XZbB19X/xO4z3SmXJEQXZWSa5Ajl81xGPqHDG+vVuj7bl/wPp8McdK7BceDzgwqqhvM8OEWltZZRt29DeoMltB+8CIwIUE/oq/vgYs32N0kGsJRlVUakJcgxtChq0uuOYIBe6YwjGG7icwmsUBdxZ1VZfPjmUwCYFzgKkTwOWKENonJiztYvYF7IlUP8qTWQQYhkJiCpu96ZhwLgEt27tc0rk3ypRlKZuebU9L62VDgWK0bX0f1nqMrIr7mM7kTMcOY3M2hCYzVUJgVan9s1XYo6eO4B2vWnIxsZGyDTJ9ExGx4veLzCmC8z5A==
+	tsg8uPk9wMyY3/ZkDlSz2F0YPMK+QsUbUgcZf1cF6pXJGb7+EC4j0NSevStUnnlg57temfp2M7Q7cI7k2thaWMDud1zuC6AlmlNoIOBLHMs0uwNEZKoNYZcnuayzD66WM1R0vj2Ll6KDeM3o5XIMrWuxbMBUSoK8Xu9OThRniDNNP9ZCYXjsk+ZSQCI5famO/Xw7TGRamz/c6OaKP+BfPZsmWKOT7CaRiHlIcKPY0drKMV9Td/glhTm6Uggpo0FNqB+NP/NWgkUSRPw+jZsAMNtocfbshzgoI+G/BTn7yLleql50LMfLc5YOV2VfvnKmMCXIPksyJyQIWNSG1mAmar02y5DEbiBjMV7iVei+d17ZpCz8Yudh65GG+9E92MHac9MIKlTJrXuJZ7fJikb/3P2WABwijuZ16u3yzEJCWwtBKJivxLsHJy6H5zxUtYZxUDgA0NTxKuq7hRpEncxC3Xk6V/uPJWqrF15eWVQZ+UsH7JyLa8E6ht2Vt2moKkmQqhzPdERQG8tbxmdzKNYWBNdXPQbXZC0pQbZmgh+vVo7f6rgWRnYqpJTl2eKjaHc0kGcmNzyXs4FouqlH+/MlS+n99f9MfXPp5BlSH4LJA361Jz1E/VnxBaU5GkYzgKDyPRKPiSuPpD/5Mf8xVx9Z5H4z8lq/UjOH41YptfuXLd58orULneF/fDniJ9dBFHhLKethB+0UBQF184OLw6QnkA==
 X-Forefront-Antispam-Report:
-	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(14060799003)(35042699022)(23010399003)(1800799024)(36860700016)(82310400026)(376014)(56012099006)(10067099003)(18002099003)(22082099003)(6133799003)(11063799006);DIR:OUT;SFP:1101;
+	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(35042699022)(376014)(82310400026)(1800799024)(14060799003)(36860700016)(23010399003)(18002099003)(22082099003)(10067099003)(5023799004)(56012099006)(11063799006)(6133799003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	R3TkkSpDtkGdpvFssuDN+Z8N5wzkE4NWeVN3SWR2bw1HZp5gcNkSeuqaFgKswT6o/vkr1umzFDDHDiU/WmIKVFKXqWR1I/COifGWKuMzte+5lkA+Pcoxn3l0RsgjlFF7vFL6DKZ6UfECmzo6+RXma7moNLM3HSIg2Mye6SjT0pAoTTWRkM3k/C04ji3I5W0BougHMpJs1jnsT8XJ1Ym3tdh+EJClu3gdwnSjuhtvwxe0rKtk2rfghBAebkmO2ShCjE5xz+KCymh97OEltMxGlCZkZ256uxCQ7z6zImbpKy7fytPIHTPW88V5R/SEBuhmG//i85M6FY191r+dqXaLD5nFdcVr2dm0hnPv7JP5y+zPBRFXbsX8Csom06OdmHXHOfvrtK7dCNO1pTFMZn78MV5FXkS/nlK0kO6gbud2Uy44CtjJz150WI2m2MFpyj54
+	QC1Ti0e3yHD01GuaTo1hn7/IuC29+DX+AiWySb8IU6W18XH9AYTq9PVg/Djj2/46YiN9Ekg/A6qrRtPYULE30/AOF/njKKIM3GiFobtE2BKx4YLfb4RtORGHJ+BnYuQdcuFN9zlhavyf9IAkfTQSOiduS5SMrBcE7aXduFlY1NVqwFO909YKZgHa5hoFOq/55vFpcnRWUgiALQohonYIz3yZBKZziauIOjfEFq/Xwtt5yb9x/u+rF/npXKR5Ij+tMPZK7sNT1wsGuuHJdZLDSU8SQh311NRkK2PmcgCpF6gkKZo51jWxdeEKtmN0McR7Ir2Lqqdpc7XLX9Yo/5qTGZVMrO/tQW+F9d/dXjefTcTdrmjhQvY4KMUU2PEO4foQrFuYCv0b5rTARAC+T2xGWC33QDTYQoMQS/3RH1Z+VR/D+0Ax+q8bMxY0EXsxxjkh
 X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jul 2026 10:54:21.5190
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jul 2026 10:54:37.0037
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: dbc60f97-9bb6-48a7-5519-08dee971eafc
+X-MS-Exchange-CrossTenant-Network-Message-Id: 74369904-2cba-4edf-4287-08dee971f437
 X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	DU6PEPF0000A7E4.eurprd02.prod.outlook.com
+	AMS0EPF00000197.eurprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8PR08MB6386
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS1PR08MB7451
 
-Define the UAPI address type used by userspace to describe the
-location of the emulated IRS in guest physical address space, together
-with the size reserved for that region.
+In order to properly support GICv5-based VMs in KVM, we need to
+emulate the CONFIG_FRAME for a virtual IRS. This emulation needs to
+handle all guest accesses to the MMIO region, and mimic the behaviour
+of a real IRS.
 
-As per the GICv5 specification, the IRS has one CONFIG_FRAME and
-optionally one SETLPI_FRAME per interrupt domain. Within a KVM VM we
-are only concerned with one interrupt domain. Each of these frames is
-64kB in size, so reserve 2x64kB of contiguous memory in the GPA space
-for a GICv5 IRS.
+Introduce an IODEV for the GICv5 IRS, and an associated init function
+that sets up the SPIs and initial state for the IRS. The MMIO
+emulation provides support for the guest to query the IRS_IDx
+registers, manipulate SPIs, configure ISTs, and so forth.
+
+The emulation tracks selector state across MMIO accesses. For example,
+a guest writes IRS_PE_SELR to select a PE by IAFFID. This is the VPE
+ID for a VM, but the guest does not know this. If the guest reads
+IRS_PE_STATUSR, KVM checks whether that IAFFID selects a valid VPE and
+sets the V bit accordingly. IRS_PE_CR0 is accepted as write-ignored,
+because KVM does not support 1-of-N routing.
+
+The same selector/status register model is exposed for SPIs too.
+
+When it comes to the LPI IST this also requires KVM to perform actions
+on behalf of the guest. When the emulated IRS_IST_BASER is written,
+KVM re-allocates the IST on the host, matching the guest's
+configuration (from the emulated IRS_IST_CFGR) where appropriate. This
+is then provided to the physical IRS via the VMTE. As far as the guest
+is concerned, the IST it allocated is being used by the hardware, but
+in reality the host IST is used instead.
+
+This change provides the IRS IODEV as a whole, but this is not plumbed
+into the rest of KVM yet.
 
 Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 ---
- arch/arm64/include/uapi/asm/kvm.h       | 5 +++++
- tools/arch/arm64/include/uapi/asm/kvm.h | 5 +++++
- 2 files changed, 10 insertions(+)
+ arch/arm64/include/asm/kvm_host.h    |   1 +
+ arch/arm64/kvm/Makefile              |   2 +-
+ arch/arm64/kvm/arm.c                 |   8 +
+ arch/arm64/kvm/vgic/vgic-irs-v5.c    | 756 +++++++++++++++++++++++++++
+ arch/arm64/kvm/vgic/vgic-v5-tables.c |  16 +
+ arch/arm64/kvm/vgic/vgic-v5-tables.h |   1 +
+ arch/arm64/kvm/vgic/vgic.h           |   2 +
+ include/kvm/arm_vgic.h               |   1 +
+ 8 files changed, 786 insertions(+), 1 deletion(-)
+ create mode 100644 arch/arm64/kvm/vgic/vgic-irs-v5.c
 
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/as=
-m/kvm.h
-index 1c13bfa2d38aa..d1b2ca317f586 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -97,6 +97,11 @@ struct kvm_regs {
- #define KVM_VGIC_V3_REDIST_SIZE		(2 * SZ_64K)
- #define KVM_VGIC_V3_ITS_SIZE		(2 * SZ_64K)
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm=
+_host.h
+index bae2c4f92ef5c..b04dcc9a73c28 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -55,6 +55,7 @@
+ #define KVM_REQ_GUEST_HYP_IRQ_PENDING	KVM_ARCH_REQ(9)
+ #define KVM_REQ_MAP_L1_VNCR_EL2		KVM_ARCH_REQ(10)
+ #define KVM_REQ_VGIC_PROCESS_UPDATE	KVM_ARCH_REQ(11)
++#define KVM_REQ_RELOAD_GICv5		KVM_ARCH_REQ(12)
 =20
-+/* Supported VGICv5 address types  */
-+#define KVM_VGIC_V5_ADDR_TYPE_IRS	6
-+
-+#define KVM_VGIC_V5_IRS_SIZE		(2 * SZ_64K)
-+
- #define KVM_ARM_VCPU_POWER_OFF		0 /* CPU is started in OFF state */
- #define KVM_ARM_VCPU_EL1_32BIT		1 /* CPU running a 32bit VM */
- #define KVM_ARM_VCPU_PSCI_0_2		2 /* CPU uses PSCI v0.2 */
-diff --git a/tools/arch/arm64/include/uapi/asm/kvm.h b/tools/arch/arm64/inc=
-lude/uapi/asm/kvm.h
-index 1c13bfa2d38aa..d1b2ca317f586 100644
---- a/tools/arch/arm64/include/uapi/asm/kvm.h
-+++ b/tools/arch/arm64/include/uapi/asm/kvm.h
-@@ -97,6 +97,11 @@ struct kvm_regs {
- #define KVM_VGIC_V3_REDIST_SIZE		(2 * SZ_64K)
- #define KVM_VGIC_V3_ITS_SIZE		(2 * SZ_64K)
+ #define KVM_DIRTY_LOG_MANUAL_CAPS   (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE |=
+ \
+ 				     KVM_DIRTY_LOG_INITIALLY_SET)
+diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+index 431de9b145ca1..92dda57c08766 100644
+--- a/arch/arm64/kvm/Makefile
++++ b/arch/arm64/kvm/Makefile
+@@ -24,7 +24,7 @@ kvm-y +=3D arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.=
+o \
+ 	 vgic/vgic-mmio.o vgic/vgic-mmio-v2.o \
+ 	 vgic/vgic-mmio-v3.o vgic/vgic-kvm-device.o \
+ 	 vgic/vgic-its.o vgic/vgic-debug.o vgic/vgic-v3-nested.o \
+-	 vgic/vgic-v5.o vgic/vgic-v5-tables.o
++	 vgic/vgic-v5.o vgic/vgic-v5-tables.o vgic/vgic-irs-v5.o
 =20
-+/* Supported VGICv5 address types  */
-+#define KVM_VGIC_V5_ADDR_TYPE_IRS	6
+ kvm-$(CONFIG_HW_PERF_EVENTS)  +=3D pmu-emul.o pmu.o
+ kvm-$(CONFIG_ARM64_PTR_AUTH)  +=3D pauth.o
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 50adfff75be82..e1b5cc1e01a6e 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1138,6 +1138,14 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu=
+)
+ 			preempt_enable();
+ 		}
+=20
++		if (kvm_check_request(KVM_REQ_RELOAD_GICv5, vcpu)) {
++			/* The IRS enable bit was changed */
++			preempt_disable();
++			vgic_v5_put(vcpu);
++			vgic_v5_load(vcpu);
++			preempt_enable();
++		}
 +
-+#define KVM_VGIC_V5_IRS_SIZE		(2 * SZ_64K)
+ 		if (kvm_check_request(KVM_REQ_RELOAD_PMU, vcpu))
+ 			kvm_vcpu_reload_pmu(vcpu);
+=20
+diff --git a/arch/arm64/kvm/vgic/vgic-irs-v5.c b/arch/arm64/kvm/vgic/vgic-i=
+rs-v5.c
+new file mode 100644
+index 0000000000000..da8914dd682fc
+--- /dev/null
++++ b/arch/arm64/kvm/vgic/vgic-irs-v5.c
+@@ -0,0 +1,756 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright (C) 2025 ARM Limited, All Rights Reserved.
++ */
++#include <linux/bitops.h>
++#include <linux/bsearch.h>
++#include <linux/interrupt.h>
++#include <linux/irq.h>
++#include <linux/kvm.h>
++#include <linux/kvm_host.h>
++#include <kvm/iodev.h>
++#include <kvm/arm_arch_timer.h>
++#include <kvm/arm_vgic.h>
 +
- #define KVM_ARM_VCPU_POWER_OFF		0 /* CPU is started in OFF state */
- #define KVM_ARM_VCPU_EL1_32BIT		1 /* CPU running a 32bit VM */
- #define KVM_ARM_VCPU_PSCI_0_2		2 /* CPU uses PSCI v0.2 */
++#include "vgic.h"
++#include "vgic-mmio.h"
++#include "vgic-v5-tables.h"
++
++#define irs_caps kvm_vgic_global_state.vgic_v5_irs_caps
++
++static struct vgic_dist *vgic_v5_get_vgic(struct kvm_vcpu *vcpu)
++{
++	return &vcpu->kvm->arch.vgic;
++}
++
++static struct vgic_v5_irs *vgic_v5_get_irs(struct kvm_vcpu *vcpu)
++{
++	return vcpu->kvm->arch.vgic.vgic_v5_irs_data;
++}
++
++static unsigned long vgic_v5_mmio_read_irs_misc(struct kvm_vcpu *vcpu,
++						gpa_t addr, unsigned int len)
++{
++	struct vgic_v5_irs *irs =3D vgic_v5_get_irs(vcpu);
++	const size_t offset =3D addr & (SZ_64K - 1);
++	struct kvm_vcpu *target_vcpu;
++	u8 vpe_id_bits;
++	u64 value =3D 0;
++
++	switch (offset) {
++	case GICV5_IRS_IDR0:
++		value =3D FIELD_PREP(GICV5_IRS_IDR0_INT_DOM, irs->idr0.domain);
++		value |=3D FIELD_PREP(GICV5_IRS_IDR0_PA_RANGE, irs->idr0.pa_range);
++		if (irs->idr0.virt)
++			value |=3D GICV5_IRS_IDR0_VIRT;
++		if (irs->idr0.setlpi)
++			value |=3D GICV5_IRS_IDR0_SETLPI;
++		if (irs->idr0.mec)
++			value |=3D GICV5_IRS_IDR0_MEC;
++		if (irs->idr0.mpam)
++			value |=3D GICV5_IRS_IDR0_MPAM;
++		if (irs->idr0.swe)
++			value |=3D GICV5_IRS_IDR0_SWE;
++		value |=3D FIELD_PREP(GICV5_IRS_IDR0_IRSID, irs->idr0.irs_id);
++		break;
++	case GICV5_IRS_IDR1:
++		value =3D FIELD_PREP(GICV5_IRS_IDR1_PE_CNT,
++				   atomic_read(&vcpu->kvm->online_vcpus));
++		/*
++		 * IRS_IDR1 encodes IAFFID_BITS as N - 1.
++		 */
++		vpe_id_bits =3D vgic_v5_vmte_vpe_id_bits(vcpu);
++		value |=3D FIELD_PREP(GICV5_IRS_IDR1_IAFFID_BITS, vpe_id_bits - 1);
++		value |=3D FIELD_PREP(GICV5_IRS_IDR1_PRIORITY_BITS, irs->idr1.priority_b=
+its);
++		break;
++	case GICV5_IRS_IDR2:
++		value =3D FIELD_PREP(GICV5_IRS_IDR2_ISTMD_SZ, irs->idr2.istmd_sz);
++		if (irs->idr2.istmd)
++			value |=3D GICV5_IRS_IDR2_ISTMD;
++		value |=3D FIELD_PREP(GICV5_IRS_IDR2_IST_L2SZ, irs->idr2.ist_l2sz);
++		if (irs->idr2.ist_levels)
++			value |=3D GICV5_IRS_IDR2_IST_LEVELS;
++		value |=3D FIELD_PREP(GICV5_IRS_IDR2_MIN_LPI_ID_BITS, irs->idr2.min_lpi_=
+id_bits);
++		value |=3D GICV5_IRS_IDR2_LPI;
++		value |=3D FIELD_PREP(GICV5_IRS_IDR2_ID_BITS, irs->idr2.id_bits);
++		break;
++	case GICV5_IRS_IDR5:
++		value =3D FIELD_PREP(GICV5_IRS_IDR5_SPI_RANGE, irs->idr5.spi_range);
++		break;
++	case GICV5_IRS_IDR6:
++		value =3D FIELD_PREP(GICV5_IRS_IDR6_SPI_IRS_RANGE, irs->idr6.spi_irs_ran=
+ge);
++		break;
++	case GICV5_IRS_IDR7:
++		value =3D FIELD_PREP(GICV5_IRS_IDR7_SPI_BASE, irs->idr7.spi_base);
++		break;
++	case GICV5_IRS_IIDR:
++		/* Revision, Variant, ProductID are implementation defined */
++		value =3D FIELD_PREP(GICV5_IRS_IIDR_PRODUCT_ID, PRODUCT_ID_KVM);
++		value |=3D FIELD_PREP(GICV5_IRS_IIDR_VARIANT, 0);
++		value |=3D FIELD_PREP(GICV5_IRS_IIDR_REVISION, 0);
++		value |=3D FIELD_PREP(GICV5_IRS_IIDR_IMPLEMENTER, IMPLEMENTER_ARM);
++		break;
++	case GICV5_IRS_AIDR:
++		value =3D FIELD_PREP(GICV5_IRS_AIDR_COMPONENT,
++				   GICV5_AIDR_COMPONENT_IRS);
++		value |=3D FIELD_PREP(GICV5_IRS_AIDR_ARCHMAJORREV,
++				    GICV5_AIDR_ARCH_MAJ_REV_V5);
++		value |=3D FIELD_PREP(GICV5_IRS_AIDR_ARCHMINORREV,
++				    GICV5_AIDR_ARCH_MIN_REV_V0);
++		break;
++	case GICV5_IRS_CR0:
++		/*
++		 * The IRS is ALWAYS idle as we handle things instantaneously
++		 * from a guest's viewpoint.
++		 */
++		value =3D GICV5_IRS_CR0_IDLE;
++		if (READ_ONCE(vcpu->kvm->arch.vgic.enabled))
++			value |=3D GICV5_IRS_CR0_IRSEN;
++		break;
++	case GICV5_IRS_CR1:
++		if (irs->cr1.vped_wa)
++			value |=3D GICV5_IRS_CR1_VPED_WA;
++		if (irs->cr1.vped_ra)
++			value |=3D GICV5_IRS_CR1_VPED_RA;
++		if (irs->cr1.vmd_wa)
++			value |=3D GICV5_IRS_CR1_VMD_WA;
++		if (irs->cr1.vmd_ra)
++			value |=3D GICV5_IRS_CR1_VMD_RA;
++		if (irs->cr1.vpet_ra)
++			value |=3D GICV5_IRS_CR1_VPET_RA;
++		if (irs->cr1.vmt_ra)
++			value |=3D GICV5_IRS_CR1_VMT_RA;
++		if (irs->cr1.ist_wa)
++			value |=3D GICV5_IRS_CR1_IST_WA;
++		if (irs->cr1.ist_ra)
++			value |=3D GICV5_IRS_CR1_IST_RA;
++		value |=3D FIELD_PREP(GICV5_IRS_CR1_IC, irs->cr1.ic);
++		value |=3D FIELD_PREP(GICV5_IRS_CR1_OC, irs->cr1.oc);
++		value |=3D FIELD_PREP(GICV5_IRS_CR1_SH, irs->cr1.sh);
++		break;
++	case GICV5_IRS_SYNC_STATUSR:
++		value =3D GICV5_IRS_SYNC_STATUSR_IDLE;
++		break;
++	case GICV5_IRS_PE_SELR:
++		value =3D FIELD_PREP(GICV5_IRS_PE_SELR_IAFFID, irs->pe_selr.iaffid);
++		break;
++	case GICV5_IRS_PE_STATUSR:
++		/* We assume that the PE is Online if present. Always IDLE too */
++		value =3D GICV5_IRS_PE_STATUSR_IDLE;
++
++		/* Set ONLINE and V if IAFFID selects a present PE */
++		if (kvm_get_vcpu_by_id(vcpu->kvm, irs->pe_selr.iaffid)) {
++			value |=3D GICV5_IRS_PE_STATUSR_ONLINE;
++			value |=3D GICV5_IRS_PE_STATUSR_V;
++		}
++		break;
++	case GICV5_IRS_PE_CR0:
++		/*
++		 * Make sure that we are doing something reasonable first.
++		 * Remember, the IAFFID is the same as the VPE_ID
++		 */
++		target_vcpu =3D kvm_get_vcpu_by_id(vcpu->kvm, irs->pe_selr.iaffid);
++		if (!target_vcpu) {
++			kvm_debug("Guest programmed invalid IAFFID (0x%x) into the IRS_PE_SELR\=
+n",
++				  irs->pe_selr.iaffid);
++			break;
++		}
++
++		value =3D GICV5_IRS_PE_CR0_DPS;
++		break;
++	default:
++		return 0;
++	}
++
++	return value;
++}
++
++static void vgic_v5_mmio_write_irs_misc(struct kvm_vcpu *vcpu, gpa_t addr,
++					unsigned int len, unsigned long val)
++{
++	struct vgic_v5_irs *irs =3D vgic_v5_get_irs(vcpu);
++	struct vgic_dist *vgic =3D vgic_v5_get_vgic(vcpu);
++	const size_t offset =3D addr & (SZ_64K - 1);
++
++	switch (offset) {
++	case GICV5_IRS_CR0:
++		mutex_lock(&vcpu->kvm->arch.config_lock);
++		WRITE_ONCE(vgic->enabled, !!(val & GICV5_IRS_CR0_IRSEN));
++		kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_RELOAD_GICv5);
++		mutex_unlock(&vcpu->kvm->arch.config_lock);
++
++		return;
++	case GICV5_IRS_CR1:
++		irs->cr1.sh =3D FIELD_GET(GICV5_IRS_CR1_SH, val);
++		irs->cr1.oc =3D FIELD_GET(GICV5_IRS_CR1_OC, val);
++		irs->cr1.ic =3D FIELD_GET(GICV5_IRS_CR1_IC, val);
++		irs->cr1.ist_ra =3D !!(val & GICV5_IRS_CR1_IST_RA);
++		irs->cr1.ist_wa =3D !!(val & GICV5_IRS_CR1_IST_WA);
++		irs->cr1.vmt_ra =3D !!(val & GICV5_IRS_CR1_VMT_RA);
++		irs->cr1.vpet_ra =3D !!(val & GICV5_IRS_CR1_VPET_RA);
++		irs->cr1.vmd_ra =3D !!(val & GICV5_IRS_CR1_VMD_RA);
++		irs->cr1.vmd_wa =3D !!(val & GICV5_IRS_CR1_VMD_WA);
++		irs->cr1.vped_ra =3D !!(val & GICV5_IRS_CR1_VPED_RA);
++		irs->cr1.vped_wa =3D !!(val & GICV5_IRS_CR1_VPED_WA);
++		return;
++	case GICV5_IRS_PE_SELR:
++		irs->pe_selr.iaffid =3D FIELD_GET(GICV5_IRS_PE_SELR_IAFFID, val);
++		return;
++	case GICV5_IRS_PE_CR0:
++		/*
++		 * We actually have nothing to do here as we don't support
++		 * 1-of-N routing. The only thing that the guest can correctly
++		 * write here is 0x1. However, there's no way to fault if it
++		 * writes something else. This is effectively a WI in our case,
++		 * but we keep it here for the purposes of documenting it.
++		 */
++		return;
++	default:
++		return;
++	}
++}
++
++static bool vgic_v5_is_spi_selr_valid(struct vgic_v5_irs *irs, u32 id)
++{
++	/* Invalid - we don't have any SPIs at all */
++	if (irs->idr5.spi_range =3D=3D 0)
++		return false;
++
++	/* Invalid - we don't have any on this IRS */
++	if (irs->idr6.spi_irs_range =3D=3D 0)
++		return false;
++
++	/* Invalid - ID is less than min */
++	if (id < irs->idr7.spi_base)
++		return false;
++
++	/* Invalid - ID is greater than max */
++	if (id >=3D (irs->idr7.spi_base + irs->idr6.spi_irs_range))
++		return false;
++
++	return true;
++}
++
++static unsigned long vgic_v5_mmio_read_irs_spi(struct kvm_vcpu *vcpu,
++					       gpa_t addr, unsigned int len)
++{
++	struct vgic_v5_irs *irs =3D vgic_v5_get_irs(vcpu);
++	const size_t offset =3D addr & (SZ_64K - 1);
++	struct vgic_irq *irq;
++	u64 value =3D 0;
++
++	switch (offset) {
++	case GICV5_IRS_SPI_SELR:
++		/* Return whatever was last written */
++		value =3D FIELD_PREP(GICV5_IRS_SPI_SELR_ID, READ_ONCE(irs->spi_selr.id))=
+;
++		break;
++	case GICV5_IRS_SPI_STATUSR:
++		/* We assume that we can always claim to be idle */
++		value =3D GICV5_IRS_SPI_STATUSR_IDLE;
++		if (vgic_v5_is_spi_selr_valid(irs, READ_ONCE(irs->spi_selr.id)))
++			value |=3D GICV5_IRS_SPI_STATUSR_V;
++		break;
++	case GICV5_IRS_SPI_DOMAINR:
++		value =3D FIELD_PREP(GICV5_IRS_SPI_DOMAINR_DOMAIN,
++				   GICV5_IRS_SPI_DOMAINR_DOMAIN_NON_SECURE);
++		break;
++	case GICV5_IRS_SPI_CFGR: {
++		u32 id =3D READ_ONCE(irs->spi_selr.id);
++
++		if (!vgic_v5_is_spi_selr_valid(irs, id)) {
++			/* Fault with IRS_SPI_SELR; return 0*/
++			value =3D 0;
++			break;
++		}
++
++		irq =3D vgic_get_irq(vcpu->kvm, vgic_v5_make_spi(id));
++		if (!irq) {
++			kvm_debug_ratelimited("Guest trying to access SPI not backed by KVM\n")=
+;
++			value =3D 0;
++			break;
++		}
++
++		scoped_guard(raw_spinlock_irqsave, &irq->irq_lock) {
++			if (irq->config =3D=3D VGIC_CONFIG_LEVEL)
++				value =3D GICV5_IRS_SPI_CFGR_TM;
++		}
++
++		vgic_put_irq(vcpu->kvm, irq);
++
++		break;
++	}
++	default:
++		return 0;
++	}
++
++	return value;
++}
++
++static void vgic_v5_mmio_write_irs_spi(struct kvm_vcpu *vcpu, gpa_t addr,
++				       unsigned int len, unsigned long val)
++{
++	struct vgic_v5_irs *irs =3D vgic_v5_get_irs(vcpu);
++	const size_t offset =3D addr & (SZ_64K - 1);
++	struct vgic_irq *irq;
++
++	switch (offset) {
++	case GICV5_IRS_SPI_SELR:
++		WRITE_ONCE(irs->spi_selr.id,
++			   FIELD_GET(GICV5_IRS_SPI_SELR_ID, val));
++		return;
++	case GICV5_IRS_SPI_CFGR: {
++		u32 id =3D READ_ONCE(irs->spi_selr.id);
++
++		if (!vgic_v5_is_spi_selr_valid(irs, id))
++			return;
++
++		/*
++		 * Find KVM's representation of the interrupt - we need to make
++		 * sure that KVM's view agrees with the guest's, else interrupt
++		 * injection won't work properly for level-triggered interrupts
++		 * (we fail to handle the clearing of the pending state if KVM
++		 * thinks that the interrupt is edge-triggered, which is the
++		 * default.)
++		 */
++		irq =3D vgic_get_irq(vcpu->kvm, vgic_v5_make_spi(id));
++		if (!irq)
++			return;
++
++		scoped_guard(raw_spinlock_irqsave, &irq->irq_lock) {
++			if (val & GICV5_IRS_SPI_CFGR_TM)
++				irq->config =3D VGIC_CONFIG_LEVEL;
++			else
++				irq->config =3D VGIC_CONFIG_EDGE;
++		}
++
++		vgic_put_irq(vcpu->kvm, irq);
++
++		return;
++	}
++	default:
++		return;
++	}
++}
++
++static bool vgic_v5_ist_cfgr_valid(struct vgic_v5_irs *irs)
++{
++	unsigned int expected_istsz;
++
++	if (irs->ist_cfgr.lpi_id_bits < irs->idr2.min_lpi_id_bits ||
++	    irs->ist_cfgr.lpi_id_bits > irs->idr2.id_bits)
++		return false;
++
++	if (!irs->idr2.istmd)
++		expected_istsz =3D GICV5_IRS_IST_CFGR_ISTSZ_4;
++	else if (irs->ist_cfgr.lpi_id_bits >=3D irs->idr2.istmd_sz)
++		expected_istsz =3D GICV5_IRS_IST_CFGR_ISTSZ_16;
++	else
++		expected_istsz =3D GICV5_IRS_IST_CFGR_ISTSZ_8;
++
++	if (irs->ist_cfgr.istsz !=3D expected_istsz)
++		return false;
++
++	if (irs->ist_cfgr.structure && !irs->idr2.ist_levels)
++		return false;
++
++	if (!irs->ist_cfgr.structure)
++		return true;
++
++	return irs->ist_cfgr.l2sz =3D=3D irs->idr2.ist_l2sz;
++}
++
++static unsigned long vgic_v5_mmio_read_irs_ist(struct kvm_vcpu *vcpu,
++					       gpa_t addr, unsigned int len)
++{
++	struct vgic_v5_irs *irs =3D vgic_v5_get_irs(vcpu);
++	const size_t offset =3D addr & (SZ_64K - 1);
++	u64 value =3D 0;
++
++	switch (offset) {
++	case GICV5_IRS_IST_STATUSR:
++		return GICV5_IRS_IST_STATUSR_IDLE;
++	case GICV5_IRS_IST_CFGR:
++		if (irs->ist_cfgr.structure)
++			value |=3D GICV5_IRS_IST_CFGR_STRUCTURE;
++		value |=3D FIELD_PREP(GICV5_IRS_IST_CFGR_ISTSZ, irs->ist_cfgr.istsz);
++		value |=3D FIELD_PREP(GICV5_IRS_IST_CFGR_L2SZ, irs->ist_cfgr.l2sz);
++		value |=3D FIELD_PREP(GICV5_IRS_IST_CFGR_LPI_ID_BITS, irs->ist_cfgr.lpi_=
+id_bits);
++		break;
++	case GICV5_IRS_IST_BASER:
++		value =3D FIELD_PREP(GICV5_IRS_IST_BASER_ADDR_MASK,
++				   irs->ist_baser.addr >> GICV5_IRS_IST_BASER_ADDR_SHIFT);
++		if (irs->ist_baser.valid)
++			value |=3D GICV5_IRS_IST_BASER_VALID;
++		break;
++	default:
++		return 0;
++	}
++
++	return value;
++}
++
++static void vgic_v5_mmio_write_irs_ist(struct kvm_vcpu *vcpu, gpa_t addr,
++				       unsigned int len, unsigned long val)
++{
++	struct vgic_v5_irs *irs =3D vgic_v5_get_irs(vcpu);
++	const size_t offset =3D addr & (SZ_64K - 1);
++	enum gicv5_vcpu_cmd cmd =3D LPI_VIST_MAKE_INVALID;
++
++	switch (offset) {
++	case GICV5_IRS_IST_CFGR:
++		scoped_guard(mutex, &vcpu->kvm->arch.config_lock) {
++			if (irs->ist_baser.valid)
++				return;
++
++			irs->ist_cfgr.lpi_id_bits =3D FIELD_GET(GICV5_IRS_IST_CFGR_LPI_ID_BITS,=
+ val);
++			irs->ist_cfgr.l2sz =3D FIELD_GET(GICV5_IRS_IST_CFGR_L2SZ, val);
++			irs->ist_cfgr.istsz =3D FIELD_GET(GICV5_IRS_IST_CFGR_ISTSZ, val);
++			irs->ist_cfgr.structure =3D !!(val & GICV5_IRS_IST_CFGR_STRUCTURE);
++		}
++		return;
++	case GICV5_IRS_IST_BASER: {
++		bool valid =3D !!(val & GICV5_IRS_IST_BASER_VALID);
++
++		guard(mutex)(&vcpu->kvm->arch.config_lock);
++
++		/* Valid -> Invalid */
++		if (irs->ist_baser.valid && !valid) {
++			/* Make the LPI IST invalid and then ... */
++			if (irq_set_vcpu_affinity(vgic_v5_vpe_db(vcpu), &cmd))
++				break;
++
++			/*
++			 * ... free the host IST if we successfully marked the
++			 * IST as invalid. Frankly, if we failed to make the
++			 * guest's IST as invalid, we're cooked because it means
++			 * that the IRS may still be using the memory that we
++			 * want to free. Hence, we leave it allocated and skip
++			 * the clearing of valid bit in the baser.
++			 */
++			if (vgic_v5_lpi_ist_free(vcpu->kvm))
++				break;
++		} else if (!irs->ist_baser.valid && valid) { /* Invalid -> Valid */
++			if (!vgic_v5_ist_cfgr_valid(irs)) {
++				kvm_err("Guest programmed invalid IRS_IST_CFGR\n");
++				break;
++			}
++
++			if (vgic_v5_lpi_ist_alloc(vcpu->kvm, irs->ist_cfgr.lpi_id_bits))
++				break;
++		}
++
++		/* Now that we've handled the edges, update the valid bit and addr */
++		irs->ist_baser.valid =3D !!(val & GICV5_IRS_IST_BASER_VALID);
++		irs->ist_baser.addr =3D FIELD_GET(GICV5_IRS_IST_BASER_ADDR_MASK, val)
++			<< GICV5_IRS_IST_BASER_ADDR_SHIFT;
++
++		return;
++	}
++	default:
++		return;
++	}
++}
++
++static const struct vgic_register_region vgic_v5_irs_registers[] =3D {
++	/*
++	 * This is the IRS_CONFIG_FRAME.
++	 */
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_IDR0, vgic_v5_mmio_read_irs_misc,
++				  vgic_mmio_write_wi, 4, VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_IDR1, vgic_v5_mmio_read_irs_misc,
++				  vgic_mmio_write_wi, 4, VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_IDR2, vgic_v5_mmio_read_irs_misc,
++				  vgic_mmio_write_wi, 4, VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_IDR3, vgic_mmio_read_raz,
++				  vgic_mmio_write_wi, 4, VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_IDR4, vgic_mmio_read_raz,
++				  vgic_mmio_write_wi, 4, VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_IDR5, vgic_v5_mmio_read_irs_misc,
++				  vgic_mmio_write_wi, 4, VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_IDR6, vgic_v5_mmio_read_irs_misc,
++				  vgic_mmio_write_wi, 4, VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_IDR7, vgic_v5_mmio_read_irs_misc,
++				  vgic_mmio_write_wi, 4, VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_IIDR, vgic_v5_mmio_read_irs_misc,
++				  vgic_mmio_write_wi, 4, VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_AIDR, vgic_v5_mmio_read_irs_misc,
++				  vgic_mmio_write_wi, 4, VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_CR0, vgic_v5_mmio_read_irs_misc,
++				  vgic_v5_mmio_write_irs_misc, 4,
++				  VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_CR1, vgic_v5_mmio_read_irs_misc,
++				  vgic_v5_mmio_write_irs_misc, 4,
++				  VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_SYNCR, vgic_mmio_read_raz,
++				  vgic_mmio_write_wi, 4,
++				  VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_SYNC_STATUSR,
++				  vgic_v5_mmio_read_irs_misc,
++				  vgic_mmio_write_wi, 4, VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_SPI_VMR, vgic_mmio_read_raz,
++				  vgic_mmio_write_wi, 8,
++				  VGIC_ACCESS_64bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_SPI_SELR, vgic_v5_mmio_read_irs_spi,
++				  vgic_v5_mmio_write_irs_spi, 4,
++				  VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_SPI_DOMAINR, vgic_v5_mmio_read_irs_sp=
+i,
++				  vgic_v5_mmio_write_irs_spi, 4,
++				  VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_SPI_RESAMPLER, vgic_mmio_read_raz,
++				  vgic_mmio_write_wi, 4,
++				  VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_SPI_CFGR, vgic_v5_mmio_read_irs_spi,
++				  vgic_v5_mmio_write_irs_spi, 4,
++				  VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_SPI_STATUSR,
++				  vgic_v5_mmio_read_irs_spi, vgic_mmio_write_wi,
++				  4, VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_PE_SELR, vgic_v5_mmio_read_irs_misc,
++				  vgic_v5_mmio_write_irs_misc, 4,
++				  VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_PE_STATUSR,
++				  vgic_v5_mmio_read_irs_misc,
++				  vgic_mmio_write_wi, 4, VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_PE_CR0, vgic_v5_mmio_read_irs_misc,
++				  vgic_v5_mmio_write_irs_misc, 4,
++				  VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_IST_BASER, vgic_v5_mmio_read_irs_ist,
++				  vgic_v5_mmio_write_irs_ist, 8,
++				  VGIC_ACCESS_64bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_IST_CFGR, vgic_v5_mmio_read_irs_ist,
++				  vgic_v5_mmio_write_irs_ist, 4,
++				  VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_IST_STATUSR,
++				  vgic_v5_mmio_read_irs_ist, vgic_mmio_write_wi,
++				  4, VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_MAP_L2_ISTR, vgic_mmio_read_raz,
++				  vgic_mmio_write_wi, 4, VGIC_ACCESS_32bit),
++
++	/*
++	 * The following registers are only for running VMs. They are not yet
++	 * supported as we don't currently support nested, so expose them as
++	 * read-as-zero/write-ignored.
++	 */
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_VMT_BASER, vgic_mmio_read_raz,
++				  vgic_mmio_write_wi, 8, VGIC_ACCESS_64bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_VMT_CFGR, vgic_mmio_read_raz,
++				  vgic_mmio_write_wi, 4, VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_VMT_STATUSR, vgic_mmio_read_raz,
++				  vgic_mmio_write_wi, 4, VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_VPE_SELR, vgic_mmio_read_raz,
++				  vgic_mmio_write_wi, 8, VGIC_ACCESS_64bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_VPE_DBR, vgic_mmio_read_raz,
++				  vgic_mmio_write_wi, 8, VGIC_ACCESS_64bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_VPE_HPPIR, vgic_mmio_read_raz,
++				  vgic_mmio_write_wi, 8, VGIC_ACCESS_64bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_VPE_CR0, vgic_mmio_read_raz,
++				  vgic_mmio_write_wi, 4, VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_VPE_STATUSR, vgic_mmio_read_raz,
++				  vgic_mmio_write_wi, 4, VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_VM_DBR, vgic_mmio_read_raz,
++				  vgic_mmio_write_wi, 8, VGIC_ACCESS_64bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_VM_SELR, vgic_mmio_read_raz,
++				  vgic_mmio_write_wi, 4, VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_VM_STATUSR, vgic_mmio_read_raz,
++				  vgic_mmio_write_wi, 4, VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_VMAP_L2_VMTR, vgic_mmio_read_raz,
++				  vgic_mmio_write_wi, 8, VGIC_ACCESS_64bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_VMAP_VMR, vgic_mmio_read_raz,
++				  vgic_mmio_write_wi, 8, VGIC_ACCESS_64bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_VMAP_VISTR, vgic_mmio_read_raz,
++				  vgic_mmio_write_wi, 8, VGIC_ACCESS_64bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_VMAP_L2_VISTR, vgic_mmio_read_raz,
++				  vgic_mmio_write_wi, 8, VGIC_ACCESS_64bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_VMAP_VPER, vgic_mmio_read_raz,
++				  vgic_mmio_write_wi, 8, VGIC_ACCESS_64bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_SAVE_VMR, vgic_mmio_read_raz,
++				  vgic_mmio_write_wi, 8, VGIC_ACCESS_64bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_SAVE_VM_STATUSR, vgic_mmio_read_raz,
++				  vgic_mmio_write_wi, 4, VGIC_ACCESS_32bit),
++
++	/* MEC, MPAM, SWERR - all unimplemented */
++
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_MEC_IDR, vgic_mmio_read_raz,
++				  vgic_mmio_write_wi, 4, VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_MEC_MECID_R, vgic_mmio_read_raz,
++				  vgic_mmio_write_wi, 4, VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_MPAM_IDR, vgic_mmio_read_raz,
++				  vgic_mmio_write_wi, 4, VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_MPAM_PARTID_R, vgic_mmio_read_raz,
++				  vgic_mmio_write_wi, 4, VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_SWERR_STATUSR, vgic_mmio_read_raz,
++				  vgic_mmio_write_wi, 8, VGIC_ACCESS_64bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_SWERR_SYNDROMER0,
++				  vgic_mmio_read_raz, vgic_mmio_write_wi, 8,
++				  VGIC_ACCESS_64bit),
++	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_SWERR_SYNDROMER1,
++				  vgic_mmio_read_raz, vgic_mmio_write_wi, 8,
++				  VGIC_ACCESS_64bit),
++};
++
++unsigned int vgic_v5_init_irs_iodev(struct vgic_io_device *dev)
++{
++	dev->regions =3D vgic_v5_irs_registers;
++	dev->nr_regions =3D ARRAY_SIZE(vgic_v5_irs_registers);
++
++	kvm_iodevice_init(&dev->dev, &kvm_io_gic_ops);
++
++	/* We represent both of the IRS frames back to back, so this is 128K */
++	return KVM_VGIC_V5_IRS_SIZE;
++}
++
++int vgic_v5_register_irs_iodev(struct kvm *kvm, gpa_t irs_base_address)
++{
++	struct vgic_io_device *io_device =3D &kvm->arch.vgic.vgic_v5_irs_data->io=
+dev;
++	unsigned int len;
++
++	/*
++	 * Design choice: Force MMIO region to be 64k aligned. Simplifies
++	 * pulling out registers.
++	 */
++	if (!IS_ALIGNED(irs_base_address, SZ_64K))
++		return -EINVAL;
++
++	len =3D vgic_v5_init_irs_iodev(io_device);
++
++	io_device->base_addr =3D irs_base_address;
++	io_device->iodev_type =3D IODEV_GICV5_IRS;
++	io_device->redist_vcpu =3D NULL;
++
++	return kvm_io_bus_register_dev(kvm, KVM_MMIO_BUS, irs_base_address, len,
++				       &io_device->dev);
++}
++
++/**
++ * kvm_vgic_v5_irs_init: initialize the IRS data structures
++ * @kvm: kvm struct pointer
++ * @nr_spis: number of spis, frozen by caller
++ */
++int kvm_vgic_v5_irs_init(struct kvm *kvm, unsigned int nr_spis)
++{
++	struct vgic_dist *dist =3D &kvm->arch.vgic;
++	struct vgic_v5_irs *irs =3D dist->vgic_v5_irs_data;
++	struct kvm_vcpu *vcpu0 =3D kvm_get_vcpu(kvm, 0);
++	size_t nr_spi_bits;
++	u64 mmfr0;
++	int ret, i;
++
++	/*
++	 * We (KVM) allocate an Interrupt State Table (IST) for SPIs. The
++	 * hardware mandates that lower 6 bits of the address are 0. Each ISTE
++	 * is 4 bytes in size (or larger if metadata storage is required), so 16
++	 * entries would be enough for alignment. Keep the minimum at 32 SPIs to
++	 * match KVM's vGICv3 minimum and the VGICv5 device API.
++	 */
++	if (nr_spis && nr_spis < VGIC_V5_DEFAULT_NR_SPIS)
++		nr_spis =3D VGIC_V5_DEFAULT_NR_SPIS;
++
++	if (nr_spis) {
++		dist->spis =3D kcalloc(nr_spis, sizeof(struct vgic_irq),
++				     GFP_KERNEL_ACCOUNT);
++		if (!dist->spis)
++			return -ENOMEM;
++
++		/*
++		 * In the following code we do not take the irq struct lock since
++		 * no other action on irq structs can happen while the VGIC is
++		 * not initialized yet.
++		 */
++		for (i =3D 0; i < nr_spis; i++) {
++			struct vgic_irq *irq =3D &dist->spis[i];
++
++			irq->intid =3D vgic_v5_make_spi(i);
++			INIT_LIST_HEAD(&irq->ap_list);
++			raw_spin_lock_init(&irq->irq_lock);
++			irq->vcpu =3D NULL;
++			irq->target_vcpu =3D vcpu0;
++			refcount_set(&irq->refcount, 0);
++			/*
++			 * The guest controls the enable state, and again it is
++			 * directly handled by the hardware. From our point of
++			 * view it is always enabled.
++			 */
++			irq->enabled =3D 1;
++		}
++
++		nr_spi_bits =3D fls(roundup_pow_of_two(nr_spis)) - 1;
++
++		ret =3D vgic_v5_spi_ist_alloc(kvm, nr_spi_bits);
++		if (ret) {
++			kfree(dist->spis);
++			dist->spis =3D NULL;
++			return ret;
++		}
++	}
++
++	/* Set sane initial state for the IRS MMIO registers */
++
++	irs->idr0.domain =3D GICV5_IRS_IDR0_INT_DOM_NON_SECURE;
++
++	mmfr0 =3D read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1);
++	irs->idr0.pa_range =3D cpuid_feature_extract_unsigned_field(mmfr0,
++								  ID_AA64MMFR0_EL1_PARANGE_SHIFT);
++
++	irs->idr0.virt =3D 0;
++	irs->idr0.setlpi =3D 0;
++	irs->idr0.mec =3D 0;
++	irs->idr0.mpam =3D 0;
++	irs->idr0.swe =3D 0;
++	irs->idr0.irs_id =3D 0;
++
++	irs->idr1.priority_bits =3D gicv5_global_data.irs_pri_bits - 1;
++
++	/*
++	 * Support 16-bits of ID space for the IRS. This should be sufficient
++	 * for most applications, and the CPUIF is guaranteed to have at least
++	 * 16-bits of ID space support (we actually present 16-bits there, even
++	 * if the hardware supports more). Warn if the hardware doesn't support
++	 * 16 bits, and use the smaller value. YMMV!
++	 *
++	 * As for the minimum number of ID bits, we match the hardware's
++	 * capability.
++	 */
++	if (irs_caps.ist_id_bits < 16)
++		pr_warn("Host IRS supports fewer than 16 ID bits for ISTs (%u)\n",
++			irs_caps.ist_id_bits);
++
++	irs->idr2.id_bits =3D min(16, irs_caps.ist_id_bits);
++	irs->idr2.min_lpi_id_bits =3D irs_caps.min_lpi_id_bits;
++
++	/* Only allow the guest to create Linear ISTs - simplifies Save/Restore *=
+/
++	irs->idr2.ist_levels =3D 0;
++	irs->idr2.ist_l2sz =3D GICV5_IRS_IST_CFGR_L2SZ_4K;
++	irs->idr2.istmd =3D 0;
++	irs->idr2.istmd_sz =3D 0;
++
++	/* We have a single IRS, only. All SPIs reside here! */
++	irs->idr5.spi_range =3D nr_spis;
++	irs->idr6.spi_irs_range =3D nr_spis;
++	irs->idr7.spi_base =3D 0;
++
++	irs->cr1.sh =3D 0;
++	irs->cr1.oc =3D 0;
++	irs->cr1.ic =3D 0;
++	irs->cr1.ist_ra =3D 0;
++	irs->cr1.ist_wa =3D 0;
++	irs->cr1.vmt_ra =3D 0;
++	irs->cr1.vpet_ra =3D 0;
++	irs->cr1.vmd_ra =3D 0;
++	irs->cr1.vmd_wa =3D 0;
++	irs->cr1.vped_ra =3D 0;
++	irs->cr1.vped_wa =3D 0;
++
++	irs->spi_selr.id =3D -1;
++
++	irs->pe_selr.iaffid =3D -1;
++
++	irs->ist_cfgr.lpi_id_bits =3D 0;
++	irs->ist_cfgr.l2sz =3D 0;
++	irs->ist_cfgr.istsz =3D 0;
++	irs->ist_cfgr.structure =3D 0;
++
++	irs->ist_baser.valid =3D 0;
++	irs->ist_baser.addr =3D 0;
++
++	return 0;
++}
+diff --git a/arch/arm64/kvm/vgic/vgic-v5-tables.c b/arch/arm64/kvm/vgic/vgi=
+c-v5-tables.c
+index d5e7923a03359..718410e8c9f3b 100644
+--- a/arch/arm64/kvm/vgic/vgic-v5-tables.c
++++ b/arch/arm64/kvm/vgic/vgic-v5-tables.c
+@@ -583,6 +583,22 @@ int vgic_v5_vmte_release(struct kvm *kvm)
+ 	return 0;
+ }
+=20
++/*
++ * Provide a way for the IRS MMIO emulation to correctly populate the numb=
+er of
++ * IAFFID bits (which correspond to our vpe_id_bits.
++ */
++u8 vgic_v5_vmte_vpe_id_bits(struct kvm_vcpu *vcpu)
++{
++	u32 vm_id =3D vgic_v5_vm_id(vcpu->kvm);
++	struct vgic_v5_vm_info *vmi;
++
++	vmi =3D xa_load(&vm_info, vm_id);
++	if (!vmi)
++		return 0;
++
++	return vmi->vpe_id_bits;
++}
++
+ /*
+  * Allocate a VPE descriptor and provide it to the hardware via the VPE Ta=
+ble.
+  */
+diff --git a/arch/arm64/kvm/vgic/vgic-v5-tables.h b/arch/arm64/kvm/vgic/vgi=
+c-v5-tables.h
+index 6b159a7e386cf..bc2fc5cb2c8d9 100644
+--- a/arch/arm64/kvm/vgic/vgic-v5-tables.h
++++ b/arch/arm64/kvm/vgic/vgic-v5-tables.h
+@@ -89,6 +89,7 @@ void vgic_v5_release_vm_id(struct kvm *kvm);
+=20
+ int vgic_v5_vmte_init(struct kvm *kvm);
+ int vgic_v5_vmte_release(struct kvm *kvm);
++u8 vgic_v5_vmte_vpe_id_bits(struct kvm_vcpu *vcpu);
+ int vgic_v5_vmte_alloc_vpe(struct kvm_vcpu *vcpu);
+ int vgic_v5_vmte_free_vpe(struct kvm_vcpu *vcpu);
+=20
+diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
+index f2f5fdc3211d7..282278e4a6c19 100644
+--- a/arch/arm64/kvm/vgic/vgic.h
++++ b/arch/arm64/kvm/vgic/vgic.h
+@@ -366,6 +366,7 @@ void vgic_debug_destroy(struct kvm *kvm);
+ int vgic_v5_probe(const struct gic_kvm_info *info);
+ void vgic_v5_reset(struct kvm_vcpu *vcpu);
+ int vgic_v5_init(struct kvm *kvm);
++int kvm_vgic_v5_irs_init(struct kvm *kvm, unsigned int nr_spis);
+ void vgic_v5_teardown(struct kvm *kvm);
+ int vgic_v5_map_resources(struct kvm *kvm);
+ void vgic_v5_set_ppi_ops(struct kvm_vcpu *vcpu, u32 vintid);
+@@ -378,6 +379,7 @@ void vgic_v5_set_vmcr(struct kvm_vcpu *vcpu, struct vgi=
+c_vmcr *vmcr);
+ void vgic_v5_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
+ void vgic_v5_restore_state(struct kvm_vcpu *vcpu);
+ void vgic_v5_save_state(struct kvm_vcpu *vcpu);
++int vgic_v5_register_irs_iodev(struct kvm *kvm, gpa_t irs_base_address);
+=20
+ #define for_each_visible_v5_ppi(__i, __k)		\
+ 	for_each_set_bit(__i, (__k)->arch.vgic.gicv5_vm.vgic_ppi_mask, VGIC_V5_NR=
+_PRIVATE_IRQS)
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 4d930a2651213..143e75743da86 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -40,6 +40,7 @@
+  * in KVM for now. At a future stage, this can be bumped up to 128, if req=
+uired.
+  */
+ #define VGIC_V5_NR_PRIVATE_IRQS	64
++#define VGIC_V5_DEFAULT_NR_SPIS	32
+=20
+ #define is_v5_type(t, i)	(FIELD_GET(GICV5_HWIRQ_TYPE, (i)) =3D=3D (t))
+=20
 --=20
 2.34.1
