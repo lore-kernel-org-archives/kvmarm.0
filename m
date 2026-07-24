@@ -1,44 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3C68427FAF;
-	Fri, 24 Jul 2026 11:39:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B456372EEC;
+	Fri, 24 Jul 2026 11:41:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784893180; cv=none; b=m2/JcI4t+plYUhTuPcB0MpYLBQBGKJzKyaWdIPnGvTvMEOpcqPDkCBn/dt2YNvo1tVb9QBj7X8TH4bEtKz+tGaV5INvrFAoSRp9DDpNU9ea6Vm90xpqTbOsEgVmzrezLMspUSwXKdRlkunKkFgHhAfGA5z0pg6EhzT7pZLBidQ0=
+	t=1784893269; cv=none; b=FG5RbumVu09EKodTAqSSPjUHMW+4dw6VzC2nHs4SZ2m7HZQn9oYlty0ctHQx+z0FMf8DdEICtXohdRmPTSO2bXmoc1n8IEwsD3LVqa3mQpGuVHq/R8g/8h0+Vxm7gphBdzwpyRiCl301ownB2L3aUUd9UWTwde7leJOBHrpoWks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784893180; c=relaxed/simple;
-	bh=0XEykLSLl2cDLJtHL8XXGmkKRiX0q6TH02c65z1zkow=;
+	s=arc-20240116; t=1784893269; c=relaxed/simple;
+	bh=pqiViVBACM9MgotgcmY+oSdjVk0wc8P/9c716bReasE=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=dAhu5H2NTG0nd8Yn7Ed6QgAASK5zwhLEZ4Rr2VZrHw5we4fKjZPwl+5Kh12Hkgve6/IeY8G2exr4VNHm15uWn/ZPXPaaiqan7ScRGcuxXgQtnDlwk0v8FI6EZbRbU58BuTTX2pinivBAi+tQRuNNUjnrusCVybBlQXcrWsLqY9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CBFRfaPN; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=aNfKkMHLkKopZgzMCS+BAXGNXqHoaX7i/HmxpxNCSzeSF8aYeOUcKXEXvconJVCpk9pFNC8PRL9BdeoeJNIpguWWNxEOLLUbpU18Po0EM68PsjbcIH+8/ReR0YTe51e50c53JmUZ6LADLckh/+XI3Bz+VtCV5uUX3N7lRKUwGYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SNEQ+4Wd; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CBFRfaPN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01D4A1F000E9;
-	Fri, 24 Jul 2026 11:39:32 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SNEQ+4Wd"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF0161F000E9;
+	Fri, 24 Jul 2026 11:41:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784893173;
-	bh=wkmGMRZs+HBCNAkrr8Kxji0vhL0lSdUIHtli4KbEcm8=;
+	s=k20260515; t=1784893261;
+	bh=bNjetqvIcV5XDAJADKa0adeOIkCAQYbhegw7n30LjcY=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=CBFRfaPNpXnPyTchEmVH5+W3nUQ5vYjsti+MxJDGSDJ8LS5hczWDEiVys06YTF7PN
-	 iZ3K/L1ZKnhm3I4hWa8R/Vc/YQ0zaj5315O2MP2y0QspL+FuxUusjsgSlOKCJ85qzf
-	 FXfAaZnwtLdOtsvCbqPo4+gclC2pdj4jWTNjZoIC7riF2rRf3KaO1qaDUEEdRfEa2h
-	 KjH7YTzvri4xwONIm6ptaW3iVsHqVsqbGIzfd4Puyf374I8MCgwer0DioFJQMrKkyh
-	 IllbYZyH1YDHd59XGhqHESFD9gskDwS3q/KwxY8ewhxT5EehQmlSuwvL3ziUv/2qsp
-	 KgjaAJKrRPgTg==
+	b=SNEQ+4Wdqz/cZfxiF9PcBDk0gevRsKRmM4WWebK2BmmNOYGvlPv72PMibkUBe5Dcf
+	 KbsYiyh+pzdBa3xtkodXpmirsBZ1+vEIrbK9d8g117X+jWU6g0S4ceZR91zU6yjz2t
+	 G6+LTkvYueAqqcwNUsLEYnUr+MOvFxv+N7cup4T2HWMWfSzo93XEReXwUjf1ymT+Ej
+	 DcK+FlunA3xTGu9t29vJM/evAhaW9B+9XyZr8nuXEifCm2tD2u4j/vlpzOsShTjsDI
+	 MMo7dEgNP0+jCnniXOFKVGRq5NonuVdFF4A0DcT7BffjaLyHhBivEVdFtv5Ivi7+8N
+	 Vd9nSprGyI0oA==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v4 26/48] KVM: arm64: gic: Introduce set_pending_state()
- to irq_op
+Subject: Re: [PATCH v4 23/48] KVM: arm64: gic-v5: Set IRICHPPIDIS based on
+ IRS enable state
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Sascha Bischoff" <Sascha.Bischoff@arm.com>
-Cc: kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, kvm@vger.kernel.org
-In-Reply-To: <20260724104819.1296803-27-sascha.bischoff@arm.com>
+Cc: "Oliver Upton" <oupton@kernel.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20260724104819.1296803-24-sascha.bischoff@arm.com>
 References: <20260724104819.1296803-1-sascha.bischoff@arm.com>
- <20260724104819.1296803-27-sascha.bischoff@arm.com>
+ <20260724104819.1296803-24-sascha.bischoff@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 24 Jul 2026 11:39:32 +0000
-Message-Id: <20260724113933.01D4A1F000E9@smtp.kernel.org>
+Date: Fri, 24 Jul 2026 11:41:00 +0000
+Message-Id: <20260724114100.EF0161F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,73 +48,84 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 2 potential issue(=
 s) to consider:
-- [High] Incomplete state mirroring: hardware pending state desynchronizes =
-from VGIC shadow state on guest MMIO/ITS writes.
-- [Medium] Userspace-reachable WARN_ON_ONCE when set_pending_state fails, c=
-ausing potential Denial of Service.
+- [High] Spurious VPE doorbells and infinite wakeup loops due to unpreserve=
+d IRICHPPIDIS state.
+- [Low] Missing READ_ONCE() on vgic.enabled causes a data race.
 --
 
---- Patch [26]: [PATCH v4 26/48] KVM: arm64: gic: Introduce set_pending_sta=
-te() to irq_op ---
-commit f6a8b8f38eb780090a64d051bdb9d419dcf75e26
+--- Patch [23]: [PATCH v4 23/48] KVM: arm64: gic-v5: Set IRICHPPIDIS based =
+on IRS enable state ---
+commit 40fbad6b3a2b1617d4bc4b16c3a6b176e7be5146
 Author: Sascha Bischoff <Sascha.Bischoff@arm.com>
 
-KVM: arm64: gic: Introduce set_pending_state() to irq_op
+KVM: arm64: gic-v5: Set IRICHPPIDIS based on IRS enable state
 
-This patch introduces a set_pending_state() function pointer to irq_ops.
-This allows the VGIC to communicate pending state directly to hardware for
-cases where hardware manages parts of the interrupt lifecycle, like GICv5.
-It wires this new callback into kvm_vgic_inject_irq().
-
-> The intent is for this to be used after the VGIC shadow
-> pending state has changed, allowing the backend to mirror the updated
-> state into hardware.
->
-> This new function is plumbed into kvm_vgic_inject_irq(), and is only
-> called if irq_ops are provided and this function pointer is explicitly
-> set.
-
-[Severity: High]
-If the intent is to mirror the state after the VGIC shadow pending state
-has changed, should this also be wired up for guest MMIO writes and ITS
-commands?
-
-For example, when a guest writes to ISPENDR or ICPENDR, the shadow state is
-updated in arch/arm64/kvm/vgic/vgic-mmio.c:__set_pending() and
-__clear_pending(), but set_pending_state() is not called.
-
-Similarly, in arch/arm64/kvm/vgic/vgic-its.c:vgic_its_cmd_handle_clear(),
-the ITS CLEAR command updates the LPI pending state without notifying the
+The GICv5 ICH_CONTEXTR_EL2 has the IRICHPPIDIS field, which allows the
+hypervisor to enable/disable the HPPI selection for SPIs and
+LPIs. This can be used to emulate the guest enabling/disabling the
+IRS. Therefore, make the state of this controlled by the IRS enable
+state. Thus, SPIs and LPIs can't be delivered to the guest, until it
+enables the emulated IRS, which matches the behaviour of the real
 hardware.
 
-Could this omission cause the hardware pending state to become desynchroniz=
-ed
-from the VGIC shadow state, leading to missed or spurious interrupts?
-
-> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-> index 169a8664322d0..023792c28fc5c 100644
-> --- a/arch/arm64/kvm/vgic/vgic.c
-> +++ b/arch/arm64/kvm/vgic/vgic.c
-> @@ -563,6 +563,9 @@ int kvm_vgic_inject_irq(struct kvm *kvm, struct kvm_v=
-cpu *vcpu,
->  	else
->  		irq->pending_latch =3D true;
+> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
+> index 4042d468431b1..7957b9da95e7c 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v5.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
+> @@ -1066,6 +1066,7 @@ void vgic_v5_flush_ppi_state(struct kvm_vcpu *vcpu)
 > =20
-> +	if (irq->ops && irq->ops->set_pending_state)
-> +		WARN_ON_ONCE(!irq->ops->set_pending_state(vcpu, irq));
+>  void vgic_v5_load(struct kvm_vcpu *vcpu)
+>  {
+> +	bool irichppidis =3D !vcpu->kvm->arch.vgic.enabled;
 
-[Severity: Medium]
-Can a guest or unprivileged host-userspace trigger this warning?
+[Severity: Low]
+Is a READ_ONCE() missing here?
 
-Since kvm_vgic_inject_irq() is reachable via userspace injection
-(e.g., KVM_IRQ_LINE) or guest actions, if an adversary can create
-conditions that cause set_pending_state() to fail, they could trigger
-this WARN_ON_ONCE. This would violate the KVM guideline against
-user-reachable warnings.
+The vgic.enabled flag is updated concurrently by the IRS MMIO handler using
+WRITE_ONCE(), so reading it locklessly here might trigger KCSAN data race
+warnings.
 
-Could this be replaced with a pr_warn_once() or handled by returning
-an error code?
+>  	struct vgic_v5_cpu_if *cpu_if =3D &vcpu->arch.vgic_cpu.vgic_v5;
+>  	u16 vm =3D vgic_v5_vm_id(vcpu->kvm);
+>  	u16 vpe =3D vgic_v5_vpe_id(vcpu);
+> @@ -1082,6 +1083,7 @@ void vgic_v5_load(struct kvm_vcpu *vcpu)
+>  	kvm_call_hyp(__vgic_v5_restore_vmcr_apr, cpu_if);
+> =20
+>  	cpu_if->vgic_contextr =3D FIELD_PREP(ICH_CONTEXTR_EL2_V, true) |
+> +				FIELD_PREP(ICH_CONTEXTR_EL2_IRICHPPIDIS, irichppidis) |
+
+[Severity: High]
+Will this IRICHPPIDIS state get lost when the VCPU enters WFI?
+
+When the guest executes WFI, KVM calls vgic_v5_put(). It currently clears
+vgic_contextr before setting the doorbell bits:
+
+void vgic_v5_put(struct kvm_vcpu *vcpu)
+{
+	...
+	cpu_if->vgic_contextr =3D 0;
+	if (vcpu_get_flag(vcpu, IN_WFI)) {
+		...
+		cpu_if->vgic_contextr =3D FIELD_PREP(ICH_CONTEXTR_EL2_DB, 1) |
+					FIELD_PREP(ICH_CONTEXTR_EL2_DBPM, dbpm);
+	...
+}
+
+If the guest disabled the IRS (so IRICHPPIDIS should be 1) and enters WFI
+while an SPI or LPI is pending, the hardware will see IRICHPPIDIS=3D0 and D=
+B=3D1.
+
+Could this cause the hardware to inadvertently evaluate the interrupt and f=
+ire
+the doorbell, waking the guest?
+
+If the guest then resumes from WFI, sees no pending interrupts, and executes
+WFI again, wouldn't this result in an infinite wakeup loop?
+
+>  				FIELD_PREP(ICH_CONTEXTR_EL2_VPE, vpe) |
+>  				FIELD_PREP(ICH_CONTEXTR_EL2_VM, vm);
+>
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260724104819.1296=
-803-1-sascha.bischoff@arm.com?part=3D26
+803-1-sascha.bischoff@arm.com?part=3D23
