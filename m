@@ -1,139 +1,119 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C0263E717A;
-	Fri, 24 Jul 2026 11:35:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3C68427FAF;
+	Fri, 24 Jul 2026 11:39:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784892902; cv=none; b=TwnR7gcPsaAaCH/zbUHSzKsFFwtI/Xlq4HsORTcc+hBweW7wLKwVtQtSHBudmaqhHAViDW5mNexhzTm2QRrcRsghMBxcAEjby9ZUt0efRgwxlwMwxYV2D0Ek2kgKVFkduDMhz84wYEGWtsBZe9Ty4IKFJmVjIQosVTz7HrrlwAs=
+	t=1784893180; cv=none; b=m2/JcI4t+plYUhTuPcB0MpYLBQBGKJzKyaWdIPnGvTvMEOpcqPDkCBn/dt2YNvo1tVb9QBj7X8TH4bEtKz+tGaV5INvrFAoSRp9DDpNU9ea6Vm90xpqTbOsEgVmzrezLMspUSwXKdRlkunKkFgHhAfGA5z0pg6EhzT7pZLBidQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784892902; c=relaxed/simple;
-	bh=zqQpL++2F2iy6oLhENzhIP28gtp01uVVdI93XCzndls=;
+	s=arc-20240116; t=1784893180; c=relaxed/simple;
+	bh=0XEykLSLl2cDLJtHL8XXGmkKRiX0q6TH02c65z1zkow=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=XCll6zTHiacNrwygtlqr0XBQg8P8RKYA85HylRhlATtZ7I4vgjNttR2ccwMV+28SVSGGQqBvZBMrRRfItc5skMxMzLk2P/EtPCkjna/FTJRAq4WP1gfV9ZGre4E9tFHl3msQK8qKVLyFf7vUbV+/sJThnobeusxqPPlV2z7jIpU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ikJdYR/Z; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=dAhu5H2NTG0nd8Yn7Ed6QgAASK5zwhLEZ4Rr2VZrHw5we4fKjZPwl+5Kh12Hkgve6/IeY8G2exr4VNHm15uWn/ZPXPaaiqan7ScRGcuxXgQtnDlwk0v8FI6EZbRbU58BuTTX2pinivBAi+tQRuNNUjnrusCVybBlQXcrWsLqY9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CBFRfaPN; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ikJdYR/Z"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5DD31F00A3A;
-	Fri, 24 Jul 2026 11:35:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CBFRfaPN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01D4A1F000E9;
+	Fri, 24 Jul 2026 11:39:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784892901;
-	bh=AlPG/peD2TIrVmbNjhCnkkKnpRaY1Xp54tQcNOKzhHs=;
+	s=k20260515; t=1784893173;
+	bh=wkmGMRZs+HBCNAkrr8Kxji0vhL0lSdUIHtli4KbEcm8=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=ikJdYR/ZYpJ0cKrCmdR8nlkzz41ydubpgkPhWTE8LupZiBlWTElzoO5jz0hOztrJR
-	 I124VZRnkavTZpbj56/PCcNgkVAngUY/NFu59T1Gnsbx1KqpL68OyYaAHuAjmzdS+d
-	 nZ8mtVlcumM/oz/v/iBWlNa+K8/ZGuhiER2UYyxRX6hIUifvoTgr3Ah1xUajHtmiBL
-	 MGE97Gz4p6LVaeRYVvBBqrwogdalJC3ioTUkvZwUSDE/elHBLCeBC2IyfIU0KQBloJ
-	 vDZ2pa1qRTSHQorJOfgICabWuCuZOj1GPDdYPWK3SlurUOKVwbAVv7e1AydUtczYwp
-	 O4myH59C8yPig==
+	b=CBFRfaPNpXnPyTchEmVH5+W3nUQ5vYjsti+MxJDGSDJ8LS5hczWDEiVys06YTF7PN
+	 iZ3K/L1ZKnhm3I4hWa8R/Vc/YQ0zaj5315O2MP2y0QspL+FuxUusjsgSlOKCJ85qzf
+	 FXfAaZnwtLdOtsvCbqPo4+gclC2pdj4jWTNjZoIC7riF2rRf3KaO1qaDUEEdRfEa2h
+	 KjH7YTzvri4xwONIm6ptaW3iVsHqVsqbGIzfd4Puyf374I8MCgwer0DioFJQMrKkyh
+	 IllbYZyH1YDHd59XGhqHESFD9gskDwS3q/KwxY8ewhxT5EehQmlSuwvL3ziUv/2qsp
+	 KgjaAJKrRPgTg==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v4 25/48] KVM: arm64: gic-v5: Add GIC VDPEND hyp call
+Subject: Re: [PATCH v4 26/48] KVM: arm64: gic: Introduce set_pending_state()
+ to irq_op
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Sascha Bischoff" <Sascha.Bischoff@arm.com>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260724104819.1296803-26-sascha.bischoff@arm.com>
+Cc: kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, kvm@vger.kernel.org
+In-Reply-To: <20260724104819.1296803-27-sascha.bischoff@arm.com>
 References: <20260724104819.1296803-1-sascha.bischoff@arm.com>
- <20260724104819.1296803-26-sascha.bischoff@arm.com>
+ <20260724104819.1296803-27-sascha.bischoff@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 24 Jul 2026 11:34:59 +0000
-Message-Id: <20260724113500.A5DD31F00A3A@smtp.kernel.org>
+Date: Fri, 24 Jul 2026 11:39:32 +0000
+Message-Id: <20260724113933.01D4A1F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
 s) to consider:
-- [Critical] Missing validation of the host-provided VMID allows the untrus=
-ted host to arbitrarily inject interrupts into protected VMs.
+- [High] Incomplete state mirroring: hardware pending state desynchronizes =
+from VGIC shadow state on guest MMIO/ITS writes.
+- [Medium] Userspace-reachable WARN_ON_ONCE when set_pending_state fails, c=
+ausing potential Denial of Service.
 --
 
---- Patch [25]: [PATCH v4 25/48] KVM: arm64: gic-v5: Add GIC VDPEND hyp cal=
-l ---
-commit c4db8b94f24a778070a5db75c24059095bae959b
+--- Patch [26]: [PATCH v4 26/48] KVM: arm64: gic: Introduce set_pending_sta=
+te() to irq_op ---
+commit f6a8b8f38eb780090a64d051bdb9d419dcf75e26
 Author: Sascha Bischoff <Sascha.Bischoff@arm.com>
 
-KVM: arm64: gic-v5: Add GIC VDPEND hyp call
+KVM: arm64: gic: Introduce set_pending_state() to irq_op
 
-This commit adds a hypercall to wrap the GIC VDPEND system instruction, all=
-owing
-the hypervisor to manage SPI and LPI pending states for VMs. This instructi=
-on is
-executable only from EL2 and provides a way to inject interrupts into guest=
-s.
+This patch introduces a set_pending_state() function pointer to irq_ops.
+This allows the VGIC to communicate pending state directly to hardware for
+cases where hardware manages parts of the interrupt lifecycle, like GICv5.
+It wires this new callback into kvm_vgic_inject_irq().
 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe=
-/hyp-main.c
-> index 09756f71df08e..8f9cc3cd422aa 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-[ ... ]
-> @@ -719,6 +719,15 @@ static void handle___vgic_v5_restore_vmcr_apr(struct=
- kvm_cpu_context *host_ctxt)
->  	__vgic_v5_restore_vmcr_apr(kern_hyp_va(cpu_if));
->  }
+> The intent is for this to be used after the VGIC shadow
+> pending state has changed, allowing the backend to mirror the updated
+> state into hardware.
+>
+> This new function is plumbed into kvm_vgic_inject_irq(), and is only
+> called if irq_ops are provided and this function pointer is explicitly
+> set.
+
+[Severity: High]
+If the intent is to mirror the state after the VGIC shadow pending state
+has changed, should this also be wired up for guest MMIO writes and ITS
+commands?
+
+For example, when a guest writes to ISPENDR or ICPENDR, the shadow state is
+updated in arch/arm64/kvm/vgic/vgic-mmio.c:__set_pending() and
+__clear_pending(), but set_pending_state() is not called.
+
+Similarly, in arch/arm64/kvm/vgic/vgic-its.c:vgic_its_cmd_handle_clear(),
+the ITS CLEAR command updates the LPI pending state without notifying the
+hardware.
+
+Could this omission cause the hardware pending state to become desynchroniz=
+ed
+from the VGIC shadow state, leading to missed or spurious interrupts?
+
+> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+> index 169a8664322d0..023792c28fc5c 100644
+> --- a/arch/arm64/kvm/vgic/vgic.c
+> +++ b/arch/arm64/kvm/vgic/vgic.c
+> @@ -563,6 +563,9 @@ int kvm_vgic_inject_irq(struct kvm *kvm, struct kvm_v=
+cpu *vcpu,
+>  	else
+>  		irq->pending_latch =3D true;
 > =20
-> +static void handle___vgic_v5_vdpend(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	DECLARE_REG(u32, intid, host_ctxt, 1);
-> +	DECLARE_REG(bool, pending, host_ctxt, 2);
-> +	DECLARE_REG(u16, vm, host_ctxt, 3);
-> +
-> +	__vgic_v5_vdpend(intid, pending, vm);
+> +	if (irq->ops && irq->ops->set_pending_state)
+> +		WARN_ON_ONCE(!irq->ops->set_pending_state(vcpu, irq));
 
-[Severity: Critical]
-Does this code introduce a regression by allowing an untrusted host to
-arbitrarily inject interrupts into protected VMs?
+[Severity: Medium]
+Can a guest or unprivileged host-userspace trigger this warning?
 
-The hypercall handler extracts the vm argument from the untrusted host cont=
-ext
-and acts on it without any validation against protected VM ownership.
+Since kvm_vgic_inject_irq() is reachable via userspace injection
+(e.g., KVM_IRQ_LINE) or guest actions, if an adversary can create
+conditions that cause set_pending_state() to fail, they could trigger
+this WARN_ON_ONCE. This would violate the KVM guideline against
+user-reachable warnings.
 
-Since this hypercall is directly reachable from the untrusted host under pK=
-VM,
-the host could supply the VMID of a protected guest in the vm parameter.
-
-> +}
-> +
->  typedef void (*hcall_t)(struct kvm_cpu_context *);
-> =20
->  #define HANDLE_FUNC(x)	[__KVM_HOST_SMCCC_FUNC_##x] =3D (hcall_t)handle_#=
-#x
-
-> diff --git a/arch/arm64/kvm/hyp/vgic-v5-sr.c b/arch/arm64/kvm/hyp/vgic-v5=
--sr.c
-> index 46992a6c2cacb..94746317ca79f 100644
-> --- a/arch/arm64/kvm/hyp/vgic-v5-sr.c
-> +++ b/arch/arm64/kvm/hyp/vgic-v5-sr.c
-[ ... ]
-> @@ -149,3 +149,13 @@ void __vgic_v5_restore_state(struct vgic_v5_cpu_if *=
-cpu_if)
->  {
->  	write_sysreg_s(cpu_if->vgic_icsr, SYS_ICC_ICSR_EL1);
->  }
-> +
-> +void __vgic_v5_vdpend(u32 intid, bool pending, u16 vm)
-> +{
-> +	u64 value;
-> +
-> +	value =3D intid & (GICV5_GIC_VDPEND_ID_MASK | GICV5_GIC_VDPEND_TYPE_MAS=
-K);
-> +	value |=3D FIELD_PREP(GICV5_GIC_VDPEND_PENDING_MASK, pending);
-> +	value |=3D FIELD_PREP(GICV5_GIC_VDPEND_VM_MASK, vm);
-> +	gic_insn(value, VDPEND);
-
-[Severity: Critical]
-Could the unvalidated vm parameter cause a regression by violating guest
-integrity and isolation here?
-
-The unvalidated vm parameter is packaged directly into the VDPEND system
-instruction, modifying the interrupt state of the targeted VM.
-
-> +}
+Could this be replaced with a pr_warn_once() or handled by returning
+an error code?
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260724104819.1296=
-803-1-sascha.bischoff@arm.com?part=3D25
+803-1-sascha.bischoff@arm.com?part=3D26
