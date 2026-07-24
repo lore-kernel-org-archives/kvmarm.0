@@ -1,159 +1,115 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B275241DDE0;
-	Fri, 24 Jul 2026 12:19:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73201355055;
+	Fri, 24 Jul 2026 12:19:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784895549; cv=none; b=fR4T2oDaQDPgrzMVho2KoDixAnT4e9MgCV4O6oUruPBAzB5xFLpN112o5JGr2iFbxJyOXHVA7Uj+PGBexQEs52Irzd8uzQ+2EfDkKb82J+w36SttE7dcZF4WLFOqHQE8JNA/bpZmyrmzERUpMioh9ZAK8X/v8vXHHFqSS3ht6SM=
+	t=1784895559; cv=none; b=iqPAKRVecpSxiMbVXbXnfJb4dPeaTGLaT6wEWlE8fWFdPSQiUi4Qtnq5xsNtgaJlt6fQrEHEoUORh5xLXM757wIabkVhHtLSeNLnukCIG35k6G3z2eLInuf82QPtqw7ItekX8m/a3o6KzvlGxODRigX4npnvoZBF1dPKA3d6Qks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784895549; c=relaxed/simple;
-	bh=1ogo+sE4LT097R5p91v99lyJwrFApLuOeXPI/NuU8+k=;
+	s=arc-20240116; t=1784895559; c=relaxed/simple;
+	bh=IwA2hn0lcj/wifJQHt3WaaLAlTWt9eYsOfuO8hHzqgI=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=NlWzGmF2tBHmlEmfL8LT8mA1qzyZOoCy7JPFeH49XNC/MLVJj75nl0LhFQyKgV4NrgMLcimpgvYDyfyYBr9ebNxnjUoaKfSk3xl81SZbBH0wIubYhVctGjqMLD55IKGoKP7du5TE1+q/ZA8XzNkKloO18Vyft0vIbKGWvXdtacA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m8z7qgJd; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=iuR9PhiylLL0MObE7RO6+kALetsfPdEJlaNpewWnWnXoRkcs1MKRXm29BOXiTBYmtBAe8+Ldd4Ui6Tckwl0imEGlXKRBKsJ4EdmFpAhjzv9sjRb4zY3CicDFDCehhKdpmeD707c25UzEioz59VRqox7cslpQ8lr4uKTgHBkhEu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BOA4Xhjt; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m8z7qgJd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC1D71F000E9;
-	Fri, 24 Jul 2026 12:19:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BOA4Xhjt"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6C241F000E9;
+	Fri, 24 Jul 2026 12:19:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784895547;
-	bh=yCSWVO3fg5/xgVI51v/QXz0dNn5lssACMVm5VFz5nQ4=;
+	s=k20260515; t=1784895558;
+	bh=wYi7Vdq3p+6Mwlt+PiWZy4MBrY6UMiI8c14pgvw4Mtw=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=m8z7qgJdY5Rbsussa4keEBJ34zCOu61/PfY/HHnK7yepzWvwYhPTuObkIjUrkca7O
-	 T1uAcBNL4cv+57URPFGNG1xV52Ig2/nL9fTPK0SJS97uYy+zP5oJ6OqCyrzMoacuCz
-	 yK9rZlqg8llBF+OMQDDWtN3+pm8xpWJWKwBvA+oAyYceuwD08RcVGWRnzTD54FQFma
-	 Elfcaqihym/dL1vXmVPwV/hZFRaUEj7kcwEX99obgEv4CUxRNlXUVPG0EHIekqKCI0
-	 mhn69feklSk/0aKgZqn2ANkl4b6oeSEKXRwycKmilN5T9uEwLK+uzr0tst3RxLYRRQ
-	 dCss2zlev/VeA==
+	b=BOA4XhjtBNwnCRmIfHWEAm+6/QAB4EzUrLN9PHRJUzy0eVmSjm5DFKItpJVBPTFnx
+	 n6vbL74S/D6mfxSeZVKHS81K0q9yTQe+5+eeoBkYSfNzAQatPvJU05PO4kxYMn1BpV
+	 WCdTbuSE2jE3ysjsXKq7U9P1xM+lCPXKTiWCvGwp4kVkeyhO+7xDdbxoZU+ptJ778B
+	 qxvt3PoyKuIjhC1U7sln0xSDBvdK+FLg/cuy7GY0jFpa3FMhs52yecpkGVixe/OKsJ
+	 ji3jzeGfa7nmWV5TO75Hu4sj+9G8X+4xl7+mzhqsCKm55FYuZaHVmoBSoioA5F+c/d
+	 Ch9rxQ62FV/FA==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v4 37/48] Documentation: KVM: Add
- KVM_DEV_ARM_VGIC_GRP_IRS_REGS to VGICv5 docs
+Subject: Re: [PATCH v4 29/48] KVM: arm64: gic-v5: Add GICv5 SPI injection to
+ irqfd
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Sascha Bischoff" <Sascha.Bischoff@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, "Oliver
- Upton" <oupton@kernel.org>
-In-Reply-To: <20260724104819.1296803-38-sascha.bischoff@arm.com>
+Cc: kvm@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20260724104819.1296803-30-sascha.bischoff@arm.com>
 References: <20260724104819.1296803-1-sascha.bischoff@arm.com>
- <20260724104819.1296803-38-sascha.bischoff@arm.com>
+ <20260724104819.1296803-30-sascha.bischoff@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 24 Jul 2026 12:19:06 +0000
-Message-Id: <20260724121906.BC1D71F000E9@smtp.kernel.org>
+Date: Fri, 24 Jul 2026 12:19:17 +0000
+Message-Id: <20260724121917.A6C241F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
 
-New issues:
-- [Low] The documentation for KVM_DEV_ARM_VGIC_GRP_IRS_REGS omits that writ=
-es will return -EBUSY if a VCPU has run.
-
 Pre-existing issues:
-- [High] SPI configuration (edge/level) is permanently lost during VM migra=
-tion because KVM ignores userspace writes to `GICV5_IRS_SPI_CFGR` and fails=
- to serialize the configuration into the Interrupt State Table (IST).
+- [High] GICv5 VMs configured with more than 988 SPIs will unconditionally =
+fail to initialize because the default IRQ routing setup generates routing =
+entries that exceed KVM_IRQCHIP_NUM_PINS.
 --
 
---- Patch [37]: [PATCH v4 37/48] Documentation: KVM: Add KVM_DEV_ARM_VGIC_G=
-RP_IRS_REGS to VGICv5 docs ---
-commit 6c9776f9e0496eb6c3e26fe3876764cc1148cc8a
+--- Patch [29]: [PATCH v4 29/48] KVM: arm64: gic-v5: Add GICv5 SPI injectio=
+n to irqfd ---
+commit a9da966fc7b449adaa92917185e2770d6d012f6f
 Author: Sascha Bischoff <Sascha.Bischoff@arm.com>
 
-Documentation: KVM: Add KVM_DEV_ARM_VGIC_GRP_IRS_REGS to VGICv5 docs
+KVM: arm64: gic-v5: Add GICv5 SPI injection to irqfd
+   =20
+Now that there is support for GICv5 SPIs in KVM, update
+vgic_irqfd_set_irq() to translate irqchip pins into GICv5 SPI IntIDs
+before injecting them.
 
-Document the KVM_DEV_ARM_VGIC_GRP_IRS_REGS attribute group used to
-read and write the virtual IRS's MMIO register state. This provides a
-GICv5-specific interface for state that is conceptually similar to the
-VGICv3 ITS register interface, but uses IRS terminology instead of ITS.
-
-> diff --git a/Documentation/virt/kvm/devices/arm-vgic-v5.rst b/Documentati=
-on/virt/kvm/devices/arm-vgic-v5.rst
-> index 50d8030e2c804..c411d2195c6a0 100644
-> --- a/Documentation/virt/kvm/devices/arm-vgic-v5.rst
-> +++ b/Documentation/virt/kvm/devices/arm-vgic-v5.rst
-> @@ -149,3 +149,41 @@ Groups:
+> diff --git a/arch/arm64/kvm/vgic/vgic-irqfd.c b/arch/arm64/kvm/vgic/vgic-=
+irqfd.c
+> index 19a1094536e6a..83e84151d7aa2 100644
+> --- a/arch/arm64/kvm/vgic/vgic-irqfd.c
+> +++ b/arch/arm64/kvm/vgic/vgic-irqfd.c
 
 [ ... ]
 
-> +      For registers without dedicated userspace accessors, getting or se=
-tting a
-> +      register uses the same emulated MMIO handlers as guest reads/write=
-s.
-> +      Dedicated userspace accessors may instead save or restore migratio=
-n state
-> +      without triggering guest-visible side effects. For example, restor=
-ing
-> +      IRS_IST_BASER only restores the emulated register state; any host =
-LPI IST
-> +      allocation based on the restored IRS_IST_CFGR and IRS_IST_BASER st=
-ate
-> +      happens when KVM_DEV_ARM_VGIC_GRP_IST is restored.
-
+> @@ -52,8 +57,8 @@ int kvm_set_routing_entry(struct kvm *kvm,
+>  		e->set =3D vgic_irqfd_set_irq;
+>  		e->irqchip.irqchip =3D ue->u.irqchip.irqchip;
+>  		e->irqchip.pin =3D ue->u.irqchip.pin;
+> -		if ((e->irqchip.pin >=3D KVM_IRQCHIP_NUM_PINS) ||
+> -		    (e->irqchip.irqchip >=3D KVM_NR_IRQCHIPS))
+> +		if (e->irqchip.pin >=3D KVM_IRQCHIP_NUM_PINS ||
+> +		    e->irqchip.irqchip >=3D KVM_NR_IRQCHIPS)
 [Severity: High]
-This is a pre-existing issue, but does VM migration permanently lose the
-edge/level configuration for all SPIs because of how GICV5_IRS_SPI_CFGR is
-handled?
+This isn't a bug introduced by this patch, but does this check cause VM
+initialization to fail if a GICv5 VM is configured with more than 988 SPIs?
 
-The userspace write accessor explicitly ignores writes to the SPI
-configuration register, making manual restoration impossible:
+When userspace configures a VM with nr_spis > 988,
+kvm_vgic_setup_default_irq_routing() attempts to set up a 1:1 default routi=
+ng
+for all SPIs:
 
-arch/arm64/kvm/vgic/vgic-irs-v5.c:vgic_v5_mmio_uaccess_write_irs() {
-    ...
-	case GICV5_IRS_SPI_CFGR:
-		break;
-    ...
-}
-
-Additionally, the IST is copied to userspace directly from hardware memory
-without synthesizing KVM's software-tracked irq->config into the HM bit:
-
-arch/arm64/kvm/vgic/vgic-v5-tables.c:vgic_v5_save_linear_ist() {
-    ...
-		h_iste =3D READ_ONCE(*h_iste_addr);
-		ret =3D put_user(h_iste, uaddr);
-    ...
-}
-
-Since the configuration is lost during the IST save and cannot be restored
-via GICV5_IRS_SPI_CFGR, are level-triggered interrupts restored incorrectly
-as edge-triggered?
-
-> +
-> +  Errors:
-> +
-> +    =3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +    -ENXIO   Offset does not correspond to any supported register
-> +    -EFAULT  Invalid user pointer for attr->addr
-> +    -EINVAL  Offset is not 32-bit aligned for 32-bit MMIO registers, not
-> +             64-bit aligned for 64-bit registers, or the supplied regist=
-er
-> +             value is not compatible with the configured VGICv5 IRS state
-> +    -EBUSY   VGIC is not initialized, or one or more VCPUs are running
-> +    =3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-[Severity: Low]
-Does this error description miss the case where a VCPU has already run?
-
-Looking at vgic_v5_attr_regs_access() in arch/arm64/kvm/vgic/vgic-kvm-devic=
-e.c:
-
-	if (is_write && vgic_v5_vm_has_run_once(dev->kvm)) {
-		ret =3D -EBUSY;
-		goto out;
+arch/arm64/kvm/vgic/vgic-irqfd.c:kvm_vgic_setup_default_irq_routing() {
+	for (i =3D 0; i < nr; i++) {
+		entries[i].gsi =3D i;
+		entries[i].type =3D KVM_IRQ_ROUTING_IRQCHIP;
+		entries[i].u.irqchip.irqchip =3D 0;
+		entries[i].u.irqchip.pin =3D i;
 	}
+	ret =3D kvm_set_irq_routing(kvm, entries, nr, 0);
+	...
+}
 
-Should the documentation also mention that writes are rejected with -EBUSY
-if attempted after a VCPU has run?
+Because kvm_set_routing_entry() caps e->irqchip.pin at KVM_IRQCHIP_NUM_PINS
+(which is 988), any entries beyond 988 will be rejected here with -EINVAL,
+causing VM initialization to abort.
+
+>  			goto out;
+>  		break;
+>  	case KVM_IRQ_ROUTING_MSI:
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260724104819.1296=
-803-1-sascha.bischoff@arm.com?part=3D37
+803-1-sascha.bischoff@arm.com?part=3D29
