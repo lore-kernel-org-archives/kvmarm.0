@@ -1,45 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B456372EEC;
-	Fri, 24 Jul 2026 11:41:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D49E842587B;
+	Fri, 24 Jul 2026 11:41:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784893269; cv=none; b=FG5RbumVu09EKodTAqSSPjUHMW+4dw6VzC2nHs4SZ2m7HZQn9oYlty0ctHQx+z0FMf8DdEICtXohdRmPTSO2bXmoc1n8IEwsD3LVqa3mQpGuVHq/R8g/8h0+Vxm7gphBdzwpyRiCl301ownB2L3aUUd9UWTwde7leJOBHrpoWks=
+	t=1784893285; cv=none; b=AWzOIhmhy4Evtzul2oOqq+x8zJ9xHIu1L23LOT56xRTD9ugLqe9uXzFgudlCxBbfdnV/mMFZvF6w74I2fYLr1ZbEWTdh0UufNbirYP+RPa8/QJxz048VCCojAWhiKiyOO59NXS9z4B7ginXVHx5J6jbj6lVoA8t3OGsvOqkdVVM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784893269; c=relaxed/simple;
-	bh=pqiViVBACM9MgotgcmY+oSdjVk0wc8P/9c716bReasE=;
+	s=arc-20240116; t=1784893285; c=relaxed/simple;
+	bh=8hjDFeciKTyP9qssE+xz39l7zwKLYhlYyEppoq1QKYE=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=aNfKkMHLkKopZgzMCS+BAXGNXqHoaX7i/HmxpxNCSzeSF8aYeOUcKXEXvconJVCpk9pFNC8PRL9BdeoeJNIpguWWNxEOLLUbpU18Po0EM68PsjbcIH+8/ReR0YTe51e50c53JmUZ6LADLckh/+XI3Bz+VtCV5uUX3N7lRKUwGYY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SNEQ+4Wd; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=G/9Ej1q2RZlnS+HzYGPRiloK0E96vBnzF4Wn4ACc8b14jwKBPQAvZr5n5LvsDfgfWJ+vBlGcDAUpnRo+GtfnyJKRaFXNub5vKqHM80jNje4waD3wS/pluERh5lpKGCbIyiBhuweIDkmxLU8gr2m/Hhr2yAY12F1p84l1QdU88S0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k2LnP0ev; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SNEQ+4Wd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF0161F000E9;
-	Fri, 24 Jul 2026 11:41:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k2LnP0ev"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E44D51F000E9;
+	Fri, 24 Jul 2026 11:41:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784893261;
-	bh=bNjetqvIcV5XDAJADKa0adeOIkCAQYbhegw7n30LjcY=;
+	s=k20260515; t=1784893272;
+	bh=X7PSfCisyjnVL4iscriT4x24TnT9ldxwOj3yveQEkRI=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=SNEQ+4Wdqz/cZfxiF9PcBDk0gevRsKRmM4WWebK2BmmNOYGvlPv72PMibkUBe5Dcf
-	 KbsYiyh+pzdBa3xtkodXpmirsBZ1+vEIrbK9d8g117X+jWU6g0S4ceZR91zU6yjz2t
-	 G6+LTkvYueAqqcwNUsLEYnUr+MOvFxv+N7cup4T2HWMWfSzo93XEReXwUjf1ymT+Ej
-	 DcK+FlunA3xTGu9t29vJM/evAhaW9B+9XyZr8nuXEifCm2tD2u4j/vlpzOsShTjsDI
-	 MMo7dEgNP0+jCnniXOFKVGRq5NonuVdFF4A0DcT7BffjaLyHhBivEVdFtv5Ivi7+8N
-	 Vd9nSprGyI0oA==
+	b=k2LnP0evwJFgsushPFD+opmOeoRy6f4m1O5TnbQWnL322x6Du7/Q8y3TOPLAyD25g
+	 hhcvDq82U77MTzuG27wtwbaz7lKonxkdT1eqAUEF+i80RiaigX/OKt3LcBRnFAAv4f
+	 iKPGdreJqg1HxolABPzznJcCdcuDv1gazEOx9lHGFMtdA8MkD0U8y3QZxs0YTH4HLs
+	 SIgF6n+BCefQgLdx4T2B7vGt6vLJbZH9p5YGwsoBUZEVSrbiu2jaoclbpS3yiIvISO
+	 ayBkgc1b/dANO1CsbIGFFJxGl1Vo0F+3uFZAdJzogfEerTAxD+ekL6tCqdfsFjpurT
+	 eYQ3CWV5nO49g==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v4 23/48] KVM: arm64: gic-v5: Set IRICHPPIDIS based on
- IRS enable state
+Subject: Re: [PATCH v4 16/48] KVM: arm64: gic-v5: Request doorbells when
+ VPEs enter WFI
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Sascha Bischoff" <Sascha.Bischoff@arm.com>
-Cc: "Oliver Upton" <oupton@kernel.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, "Marc
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, "Marc
  Zyngier" <maz@kernel.org>
-In-Reply-To: <20260724104819.1296803-24-sascha.bischoff@arm.com>
+In-Reply-To: <20260724104819.1296803-17-sascha.bischoff@arm.com>
 References: <20260724104819.1296803-1-sascha.bischoff@arm.com>
- <20260724104819.1296803-24-sascha.bischoff@arm.com>
+ <20260724104819.1296803-17-sascha.bischoff@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 24 Jul 2026 11:41:00 +0000
-Message-Id: <20260724114100.EF0161F000E9@smtp.kernel.org>
+Date: Fri, 24 Jul 2026 11:41:11 +0000
+Message-Id: <20260724114111.E44D51F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,84 +48,99 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 2 potential issue(=
 s) to consider:
-- [High] Spurious VPE doorbells and infinite wakeup loops due to unpreserve=
-d IRICHPPIDIS state.
-- [Low] Missing READ_ONCE() on vgic.enabled causes a data race.
+- [High] Stale `db_fired` state causes an infinite loop bypassing WFI sleep=
+, pegging the host CPU to 100%.
+- [High] Incorrect GICv5 doorbell priority mask (DBPM) calculation drops pr=
+eempting interrupts and vNMIs.
 --
 
---- Patch [23]: [PATCH v4 23/48] KVM: arm64: gic-v5: Set IRICHPPIDIS based =
-on IRS enable state ---
-commit 40fbad6b3a2b1617d4bc4b16c3a6b176e7be5146
+--- Patch [16]: [PATCH v4 16/48] KVM: arm64: gic-v5: Request doorbells when=
+ VPEs enter WFI ---
+commit 4c69e1e71f915cfc6ba78559fe449983dee20dd6
 Author: Sascha Bischoff <Sascha.Bischoff@arm.com>
 
-KVM: arm64: gic-v5: Set IRICHPPIDIS based on IRS enable state
+KVM: arm64: gic-v5: Request doorbells when VPEs enter WFI
 
-The GICv5 ICH_CONTEXTR_EL2 has the IRICHPPIDIS field, which allows the
-hypervisor to enable/disable the HPPI selection for SPIs and
-LPIs. This can be used to emulate the guest enabling/disabling the
-IRS. Therefore, make the state of this controlled by the IRS enable
-state. Thus, SPIs and LPIs can't be delivered to the guest, until it
-enables the emulated IRS, which matches the behaviour of the real
-hardware.
+This commit requests a GICv5 VPE doorbell when a vcpu enters WFI, allowing=
+=20
+KVM to be notified when an SPI or LPI becomes pending. It also calculates=20
+a doorbell priority mask (DBPM) from the virtual priority state to avoid=20
+waking the guest for masked interrupts.
 
 > diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-> index 4042d468431b1..7957b9da95e7c 100644
 > --- a/arch/arm64/kvm/vgic/vgic-v5.c
 > +++ b/arch/arm64/kvm/vgic/vgic-v5.c
-> @@ -1066,6 +1066,7 @@ void vgic_v5_flush_ppi_state(struct kvm_vcpu *vcpu)
-> =20
->  void vgic_v5_load(struct kvm_vcpu *vcpu)
->  {
-> +	bool irichppidis =3D !vcpu->kvm->arch.vgic.enabled;
-
-[Severity: Low]
-Is a READ_ONCE() missing here?
-
-The vgic.enabled flag is updated concurrently by the IRS MMIO handler using
-WRITE_ONCE(), so reading it locklessly here might trigger KCSAN data race
-warnings.
-
->  	struct vgic_v5_cpu_if *cpu_if =3D &vcpu->arch.vgic_cpu.vgic_v5;
->  	u16 vm =3D vgic_v5_vm_id(vcpu->kvm);
->  	u16 vpe =3D vgic_v5_vpe_id(vcpu);
-> @@ -1082,6 +1083,7 @@ void vgic_v5_load(struct kvm_vcpu *vcpu)
->  	kvm_call_hyp(__vgic_v5_restore_vmcr_apr, cpu_if);
-> =20
->  	cpu_if->vgic_contextr =3D FIELD_PREP(ICH_CONTEXTR_EL2_V, true) |
-> +				FIELD_PREP(ICH_CONTEXTR_EL2_IRICHPPIDIS, irichppidis) |
+[ ... ]
+> +		/*
+> +		 * Request a doorbell *unless* the priority is 0, indicating
+> +		 * that no interrupt can wake the CPU up.
+> +		 */
+> +		if (priority_mask) {
 
 [Severity: High]
-Will this IRICHPPIDIS state get lost when the VCPU enters WFI?
+Does skipping the doorbell request when the priority is 0 break vNMI wakeup=
+s?
 
-When the guest executes WFI, KVM calls vgic_v5_put(). It currently clears
-vgic_contextr before setting the doorbell bits:
+Architectural semantics dictate that vNMIs have superpriority and must wake
+a vCPU even when the running priority is 0.
 
-void vgic_v5_put(struct kvm_vcpu *vcpu)
-{
-	...
-	cpu_if->vgic_contextr =3D 0;
-	if (vcpu_get_flag(vcpu, IN_WFI)) {
-		...
-		cpu_if->vgic_contextr =3D FIELD_PREP(ICH_CONTEXTR_EL2_DB, 1) |
-					FIELD_PREP(ICH_CONTEXTR_EL2_DBPM, dbpm);
-	...
-}
+> +			int db_irq =3D vgic_v5_vpe_db(vcpu);
+> +			struct irq_data *d =3D irq_get_irq_data(db_irq);
+> +			const struct cpumask *aff =3D irq_data_get_effective_affinity_mask(d);
+> +			int cpu =3D smp_processor_id();
+> +
+> +			dbpm =3D priority_mask - 1;
 
-If the guest disabled the IRS (so IRICHPPIDIS should be 1) and enters WFI
-while an SPI or LPI is pending, the hardware will see IRICHPPIDIS=3D0 and D=
-B=3D1.
+[Severity: High]
+Does subtracting 1 from the priority mask drop valid preempting interrupts?
 
-Could this cause the hardware to inadvertently evaluate the interrupt and f=
-ire
-the doorbell, waking the guest?
+The hardware doorbell condition triggers when the pending priority is less
+than the threshold. If the highest active priority is 5, the vCPU should
+be woken by any interrupt with a priority less than 5, for example, 4.
 
-If the guest then resumes from WFI, sees no pending interrupts, and executes
-WFI again, wouldn't this result in an infinite wakeup loop?
+If the priority mask is 5, this code sets the DBPM to 4. The hardware
+condition then becomes priority < 4. An interrupt with priority 4 will
+not signal the doorbell, despite having a higher priority than the active
+interrupt, causing missed wakeups and guest hangs.
 
->  				FIELD_PREP(ICH_CONTEXTR_EL2_VPE, vpe) |
->  				FIELD_PREP(ICH_CONTEXTR_EL2_VM, vm);
->
+> +			cpu_if->vgic_contextr =3D FIELD_PREP(ICH_CONTEXTR_EL2_DB, 1) |
+> +						FIELD_PREP(ICH_CONTEXTR_EL2_DBPM, dbpm);
+[ ... ]
+> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+> --- a/arch/arm64/kvm/vgic/vgic.c
+> +++ b/arch/arm64/kvm/vgic/vgic.c
+[ ... ]
+> @@ -1227,8 +1227,12 @@ int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcp=
+u)
+>  	unsigned long flags;
+>  	struct vgic_vmcr vmcr;
+> =20
+> -	if (vgic_is_v5(vcpu->kvm))
+> +	if (vgic_is_v5(vcpu->kvm)) {
+> +		if (READ_ONCE(vcpu->arch.vgic_cpu.vgic_v5.gicv5_vpe.db_fired))
+> +			return true;
+
+[Severity: High]
+Can a stale db_fired state cause an infinite loop bypassing WFI sleep?
+
+The db_fired flag is cleared only in __vgic_v5_make_non_resident(), which
+executes during schedule-out.
+
+If a doorbell fires, db_fired becomes true and the vCPU wakes up to enter
+the guest. When the vCPU subsequently re-enters WFI without a schedule-out,
+kvm_vcpu_block() evaluates kvm_vgic_vcpu_pending_irq(). Because db_fired
+remains true, this instantly returns without sleeping.
+
+This leaves the vCPU in an infinite loop returning from WFI and pegging
+the host CPU at 100% until a host timer tick forces preemption.
+
+> +
+>  		return vgic_v5_has_pending_ppi(vcpu);
+> +	}
+> =20
+>  	if (!vcpu->kvm->arch.vgic.enabled)
+>  		return false;
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260724104819.1296=
-803-1-sascha.bischoff@arm.com?part=3D23
+803-1-sascha.bischoff@arm.com?part=3D16
