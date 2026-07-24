@@ -1,124 +1,130 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BF573E8684;
-	Fri, 24 Jul 2026 11:21:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2228E42CAFB;
+	Fri, 24 Jul 2026 11:21:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784892093; cv=none; b=k0Idz3owJKxqMkwClfK1Fh07AZWVcV0k8aMyntXOUARi5RfKHXJgwjBBB4XCUAULrjeml2tErsCHyuDDhndVWbGz8pqB9cwSuMuHfKoDIH0+IPIpUdngj6gCRVjQDHuLJ2jzE3nA6GDRH1bMWHWWEjPywqEKdNU3VLtl/Lt3c0M=
+	t=1784892121; cv=none; b=uOuD3WLlfkjcbX+b+0mfEgDXx+E0zUJD2/x/VnFLtAet5U/6OT4MWvWrGKKS8+Gw6Jhbz4uvM+0wE42VlQAHppjkbO8wKR4KQL2SHfYqjW/2ErEJzBsF+i0c5gghPFkJbqfjL0JhPTMTruuvASqiLeBa55wV//SArVcFXrl+sas=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784892093; c=relaxed/simple;
-	bh=2CoWUN0uhqE625SUIXnAn7bS5/D5MZm8BdcNxq17plE=;
+	s=arc-20240116; t=1784892121; c=relaxed/simple;
+	bh=1/ySReOPAManLrylI9eMebL09M893L7KrEL5W1MF0tU=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=aTkA4P5b01ioJd5Q5+BjdG8tvFlUba+xG7K65Q7ki23Zo7z7bC1ELz78mc6Usn6zPbs1Z2c/rj9Bx8gnmZPTrZR3I7FsBsj3T4isgq3NYU7+GFS8HRXgEQF6YmoO9bqPRlXEyjGDWMmDv6e0+zOn1psES2vAQIxN3HQDN47rFtg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MuxDQvq+; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=S1AuRXWigiK11kwte27HV+HluMyuAyV85nmFac4ukvKFgH2miNzVY0qeP2WawtexEJyD8j/c1YNomTr9tnk4oHFKl8lwA24Uxx1iiN7ub8mg6d9oGWb0mR9EfAsmVtv1emVLykrB690Kn7mXEigyaFU1cTLHGjUDtYgfNZZ+uCI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l3XKA4GY; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MuxDQvq+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A0D81F000E9;
-	Fri, 24 Jul 2026 11:21:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l3XKA4GY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DE1A1F000E9;
+	Fri, 24 Jul 2026 11:21:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784892088;
-	bh=Nhyv8WU8sjX9mZaIHSe7KvYWqbzeWDOrV3b06bGUqaY=;
+	s=k20260515; t=1784892119;
+	bh=kAdDgXxG1mLjASTG8IOPpVrvhZipAflTYytabH43EAo=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=MuxDQvq+nO6nbwRdjtiDodKTXWEflp6xsyW2hhJWRxb+mlN55EFO9wEXpKibCE49I
-	 nyBCmKE1lWnJySpx6qWXbDtaxkjyLWG7k0Nc2nv6H0FO0o3rHBgKriDVfNS9LG70kD
-	 aLWAhlWbnAHKtn/V6GDXnYGIFeIAX5ET7lqNDnetsJOCWsQMQ4QJ5NSuggsoTN00UT
-	 lx6bBT4aWrR5H8LyrghJB/X56Kt0A7mtK7VbRA+bFEN/ptwSvNW8k6Jj+5Pl/z5St5
-	 nvRYE+DH3qI+obrz3T2m4Ad7jiSrVKjbd9UzNGxr6OW3omfIndTEWGr2w/Ben0YUPS
-	 dQVW8UAiA0WCg==
+	b=l3XKA4GYHHt0zmKo2chCsk2Ysg4yvjee2Z/jBeySTmAiI3fhdGeMgecjerkv/7uaY
+	 cPTsDAsC/RAxE+1STr1V7ie8oU1gsWJM/XnUngQM65b+OLa8PNwLXF0l+aVAE5Qx6R
+	 MIS1avdVJ7MyhgJNgeeB5on//uZM+eNGH3yujSrqWW2eg+XDwV4IKsZVVLlKlVGNaf
+	 RYLt/uor57Rb8AJ5m4lC4D3oMftCzMjlsXRORyibiCfjscpc9Ck4OQjqp3GRQnV593
+	 59TjRBcafGUV+mhJ2GDoxT2u48FePT4jHH4iNRqNInCh1E3RWwJM/xIhlgXrKy79pA
+	 3c5u5R7FUsnJg==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v4 01/48] irqchip/gic-v5: Allow KVM setup without a
- maintenance IRQ
+Subject: Re: [PATCH v4 13/48] KVM: arm64: gic-v5: Implement VPE IRS MMIO Ops
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Sascha Bischoff" <Sascha.Bischoff@arm.com>
-Cc: kvm@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, "Marc
+Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, kvm@vger.kernel.org, "Marc
  Zyngier" <maz@kernel.org>
-In-Reply-To: <20260724104819.1296803-2-sascha.bischoff@arm.com>
+In-Reply-To: <20260724104819.1296803-14-sascha.bischoff@arm.com>
 References: <20260724104819.1296803-1-sascha.bischoff@arm.com>
- <20260724104819.1296803-2-sascha.bischoff@arm.com>
+ <20260724104819.1296803-14-sascha.bischoff@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 24 Jul 2026 11:21:27 +0000
-Message-Id: <20260724112128.3A0D81F000E9@smtp.kernel.org>
+Date: Fri, 24 Jul 2026 11:21:58 +0000
+Message-Id: <20260724112159.4DE1A1F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
 s) to consider:
-- [Medium] Exposing a latent memory leak of `gic_kvm_info` in KVM's initial=
-ization error path when a required maintenance IRQ is absent on GICv5 legac=
-y-capable systems.
+- [High] Missing REQ_DB (Request Doorbell) flag when configuring the VPE do=
+orbell, contradicting the explicit intent to force doorbell generation.
+- [High] Missing VPE engine idle check at the beginning of `vgic_v5_irs_set=
+_up_vpe`, risking command corruption if the engine is busy.
 --
 
---- Patch [1]: [PATCH v4 01/48] irqchip/gic-v5: Allow KVM setup without a m=
-aintenance IRQ ---
-commit 4a1c6e5108caaddf8c492f48ac4cb4568ab60c52
+--- Patch [13]: [PATCH v4 13/48] KVM: arm64: gic-v5: Implement VPE IRS MMIO=
+ Ops ---
+commit 92182082105efc7200f554f8b53732d80e3ea711
 Author: Sascha Bischoff <Sascha.Bischoff@arm.com>
 
-irqchip/gic-v5: Allow KVM setup without a maintenance IRQ
+KVM: arm64: gic-v5: Implement VPE IRS MMIO Ops
 
-This commit modifies the GICv5 initialization to no longer reject KVM setup
-solely due to a missing maintenance interrupt. Instead, it delegates this
-validation to KVM by passing a specific configuration flag based on legacy
-support capabilities.
+This commit introduces interfaces to validate and configure VPEs via the
+host's IRS. It extends the existing doorbell-based commands by adding
+VPE_MAKE_VALID.
 
-> diff --git a/drivers/irqchip/irq-gic-v5.c b/drivers/irqchip/irq-gic-v5.c
-> index e9d1795235a66..c04523a438cee 100644
-> --- a/drivers/irqchip/irq-gic-v5.c
-> +++ b/drivers/irqchip/irq-gic-v5.c
-> @@ -1143,10 +1143,18 @@ static void __init gic_of_setup_kvm_info(struct d=
-evice_node *node)
->  	/* GIC Virtual CPU interface maintenance interrupt */
->  	gic_v5_kvm_info.no_maint_irq_mask =3D false;
->  	gic_v5_kvm_info.maint_irq =3D irq_of_parse_and_map(node, 0);
-> -	if (!gic_v5_kvm_info.maint_irq) {
-> -		pr_warn("cannot find GICv5 virtual CPU interface maintenance interrupt=
-\n");
-> -		return;
-> -	}
-> +
-> +	/*
-> +	 * We require an MI if we have legacy support, but don't, otherwise.
-> +	 * Given that there's an existing flag to convey that an MI isn't
-> +	 * needed, we (ab)use it to tell KVM that the MI isn't needed if we
-> +	 * don't support legacy.
-> +	 *
-> +	 * The check for ARM64_HAS_GICV5_LEGACY explicitly doesn't use
-> +	 * cpus_have_final_cap() here as we run too early.
-> +	 */
-> +	if (!cpus_have_cap(ARM64_HAS_GICV5_LEGACY) && !gic_v5_kvm_info.maint_ir=
-q)
-> +		gic_v5_kvm_info.no_maint_irq_mask =3D true;
-> =20
->  	vgic_set_kvm_info(&gic_v5_kvm_info);
+> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
+> index 21252bd11d96f..826c2284a1453 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v5.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
 
-[Severity: Medium]
-By removing the early return here, does this expose a memory leak in KVM's
-initialization error path?
+[ ... ]
 
-If a system has ARM64_HAS_GICV5_LEGACY support but the maintenance interrupt
-is missing, we now pass no_maint_irq_mask =3D false and maint_irq =3D 0 to
-vgic_set_kvm_info() in drivers/irqchip/irq-gic-v5.c:gic_of_setup_kvm_info().
-
-When this configuration reaches KVM:
-
-arch/arm64/kvm/vgic/vgic-init.c:kvm_vgic_hyp_init() {
-    ...
-    if (has_mask && !gic_kvm_info->maint_irq) {
-        kvm_err("No vgic maintenance irq\n");
-        return -ENXIO;
-    }
-    ...
-}
-
-It looks like kvm_vgic_hyp_init() returns -ENXIO without freeing the
-dynamically allocated gic_kvm_info structure, causing a memory leak.
-
+> @@ -333,10 +345,73 @@ static int vgic_v5_irs_set_vist_invalid(u16 vm_id, =
+bool spi_ist)
+>  	return __vgic_v5_irs_update_vist_validity(vm_id, spi_ist, true);
 >  }
+> =20
+> +static int vgic_v5_irs_set_up_vpe(u16 vm_id, u16 vpe_id,
+> +				  irq_hw_number_t db_hwirq)
+> +{
+> +	u64 vmap_vper, dbr, selr;
+> +	u32 statusr, cr0;
+> +	int ret;
+> +
+> +	guard(raw_spinlock_irqsave)(&global_irs_lock);
+> +
+> +	/* Make sure that we are idle to begin with */
+> +	ret =3D vgic_v5_irs_wait_for_vm_op();
+> +	if (ret)
+> +		return ret;
+
+[Severity: High]
+Does this code also need to verify that the VPE engine is idle?
+
+If a previous operation timed out and returned an error, the function
+could exit early and leave the hardware engine busy. When called again
+for the next VPE, the VM engine check above would pass, but writing to
+GICV5_IRS_VPE_SELR below could corrupt the command if the VPE engine is
+still busy.
+
+> +
+> +	/* Mark the VPE as valid */
+> +	vmap_vper =3D FIELD_PREP(GICV5_IRS_VMAP_VPER_VPE_ID, vpe_id) |
+> +		    FIELD_PREP(GICV5_IRS_VMAP_VPER_VM_ID, vm_id) |
+> +		    GICV5_IRS_VMAP_VPER_M;
+> +	irs_writeq_relaxed(vmap_vper, GICV5_IRS_VMAP_VPER);
+
+[ ... ]
+
+> +	/*
+> +	 * The VPE has not yet run. Therefore, make sure that all interrupts
+> +	 * will generate a doorbell.
+> +	 */
+> +	dbr =3D FIELD_PREP(GICV5_IRS_VPE_DBR_INTID, db_hwirq) |
+> +	      GICV5_IRS_VPE_DBR_DBV;
+> +	irs_writeq_relaxed(dbr, GICV5_IRS_VPE_DBR);
+
+[Severity: High]
+Is the GICV5_IRS_VPE_DBR_REQ_DB flag missing here?
+
+The comment explicitly states the intent is to ensure all interrupts will
+generate a doorbell. Without the request doorbell flag, could the GIC hardw=
+are
+fail to generate doorbells for interrupts that become pending before the VPE
+first runs?
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260724104819.1296=
-803-1-sascha.bischoff@arm.com?part=3D1
+803-1-sascha.bischoff@arm.com?part=3D13
