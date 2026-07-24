@@ -1,126 +1,137 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75E2835E1AE
-	for <kvmarm@lists.linux.dev>; Fri, 24 Jul 2026 15:16:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from esa5.hc1455-7.c3s2.iphmx.com (esa5.hc1455-7.c3s2.iphmx.com [68.232.139.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C04C5464D;
+	Fri, 24 Jul 2026 15:38:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.139.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784906184; cv=none; b=NA96Lyw/Ps7XbszMSdbeCMVCcV8wRVB8raEPZEIey/PSH98jxAYGDzlVvxSH+nFP5/LBFY/+5nAjzyfmOoM/HtvW2OhijdD4sekC+/EgYJJ7Lx43Y/vsJsj00gyu0pJ481A9G5TvWSoPo/WY6bwtGMpGhwM7SqVpa1OjRPuisw0=
+	t=1784907513; cv=none; b=Ma5qCJaamEpDzMqWUh1d36m2aQrwIWlt2NOIdFLin/nu5qcxyMI2yn96Mk1SxiA+1W5hLXinmxjR6lGNq27TeK9wO3tFcU7XgTddNImXrwpUO08EN2U38/i2IiNw8UfOvZvFTASBXrmn836HOJPlopT1zeebqx921MnRrNYKLPQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784906184; c=relaxed/simple;
-	bh=rKKnjZ1tIKtzJ6HBpjgLc0Ck9asCrea4HP6d5oTMlaE=;
+	s=arc-20240116; t=1784907513; c=relaxed/simple;
+	bh=STe3l81ZzYWmrYt3MRzUBujSbUlThRL6gf8a/dbofg4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uhXTBd7rlSgbdtfgWojWXBuHS1cXHtXKHsnihrfHBxDnTwYV+2tVbvmZx1jZqH2gswAgPoqnmm4pt0yULlqKiqoEml+xVeQ16JeASC2Q/BXKfKjvNfx/qRPzQDixLJFCiBESoFAXhS4+VxddkLdapB7HwZlEXRmUsI5xd5qsipY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=gf3AIoOd; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=MAwk6zdp8nGuo1bKvJnS+6XJSX+VaC3cntOQR850gB5UqSkrRQtnW8I+SlDKOEhfmKnHAB/wXIrtHZ5CDJlKSBy/AK9Rs/yoXnjkVQm4ej3KsHaFT5N4m8imLgENWwWT4jrcOFCMeyKHLHFMEFWxKJLfUh58uqYebZuWMMxKRU8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=l2SKkJSB; arc=none smtp.client-ip=68.232.139.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="gf3AIoOd"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0FF661477;
-	Fri, 24 Jul 2026 08:16:17 -0700 (PDT)
-Received: from J2N7QTR9R3 (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 575F73F59E;
-	Fri, 24 Jul 2026 08:16:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1784906181; bh=rKKnjZ1tIKtzJ6HBpjgLc0Ck9asCrea4HP6d5oTMlaE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gf3AIoOdSgamjrSz8hHhDZKsUxu/dPE6rojytFhMlLNhMsaKk9o5MxNShE2E6XIxI
-	 tcbXXxM6RsEEIQxsdv0tHTlswHgO3YdYm3jnFrpON/Cb0/Iqgu7obS+gT/ysP/ay/7
-	 FlJmYEC+lZ9Cbn2OxpdtuBok6Nn9BerpTCPKwdzA=
-Date: Fri, 24 Jul 2026 16:16:11 +0100
-From: Mark Rutland <mark.rutland@arm.com>
-To: Mark Brown <broonie@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
-	Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>,
-	Fuad Tabba <tabba@google.com>, Ben Horgan <ben.horgan@arm.com>,
-	Jean-Philippe Brucker <jpb@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v13 02/32] arm64/fpsimd: Ensure all of ZCR_EL1 is
- initialised from idle
-Message-ID: <amOBu-SfzZM7M5Oh@J2N7QTR9R3>
-References: <20260720-kvm-arm64-sme-v13-0-d9abd3ffa245@kernel.org>
- <20260720-kvm-arm64-sme-v13-2-d9abd3ffa245@kernel.org>
- <amIP42yILYNsNk0e@J2N7QTR9R3.cambridge.arm.com>
+	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="l2SKkJSB"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
+  t=1784907512; x=1816443512;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=STe3l81ZzYWmrYt3MRzUBujSbUlThRL6gf8a/dbofg4=;
+  b=l2SKkJSB+Z/B1F3Vxu+jZj4/Y6xE7+zlRV5rXiqZzZRj9AbI1VNaNPDK
+   9CDK0TDLULBtwhe510KRCuTTqyp1l2lq9ZqpRUF1fm+L0SH2iC538+etZ
+   nJ3cjLDl+cTODsVNRS68/xtyH90KV0rF0SzwAFFk78xT0aDVr0SDWIVne
+   rRQTKAAvYjXcO/i7nQft5Zbb8O6LMidZm2ULGkAVv8rSa0TK/T7Dv470t
+   JCm81rtqns8brg2Pdf1fC5k4Qns44P7yuvmCJCO8oJkgTn5THr8CzC7du
+   jM1JajH1Ar2kLqiDCtQAhpGcghwuE8gfgdlwmnHN4EGZyYY5WuAx0CHDZ
+   Q==;
+X-CSE-ConnectionGUID: 7OkvkYffQqCetytVEms42Q==
+X-CSE-MsgGUID: eGcAdFcOS0GZ5eH3nXvAlA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11854"; a="246657630"
+X-IronPort-AV: E=Sophos;i="6.25,182,1779116400"; 
+   d="scan'208";a="246657630"
+Received: from gmgwnl01.global.fujitsu.com ([52.143.17.124])
+  by esa5.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jul 2026 00:38:24 +0900
+Received: from az2nlsmgm1.o.css.fujitsu.com (unknown [10.150.26.203])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by gmgwnl01.global.fujitsu.com (Postfix) with ESMTPS id E8F8A42A312;
+	Fri, 24 Jul 2026 15:38:23 +0000 (UTC)
+Received: from az2uksmom2.o.css.fujitsu.com (unknown [10.151.22.203])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by az2nlsmgm1.o.css.fujitsu.com (Postfix) with ESMTPS id A01F7C09353;
+	Fri, 24 Jul 2026 15:38:23 +0000 (UTC)
+Received: from FCCLS0092175.localdomain (unknown [10.9.54.178])
+	by az2uksmom2.o.css.fujitsu.com (Postfix) with ESMTP id CCF811400248;
+	Fri, 24 Jul 2026 15:38:17 +0000 (UTC)
+Date: Sat, 25 Jul 2026 00:38:10 +0900
+From: Kohei Enju <enju.kohei@fujitsu.com>
+To: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, cgroups@vger.kernel.org, linux-coco@lists.linux.dev, 
+	Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Tejun Heo <tj@kernel.org>, 
+	Johannes Weiner <hannes@cmpxchg.org>, Steven Price <steven.price@arm.com>
+Subject: Re: [RFC PATCH v1 2/2] cgroup/misc: Add support for Arm CCA MECIDs
+Message-ID: <amOCt4r72ge-Iw5h@FCCLS0092175.localdomain>
+References: <20260724094120.166536-1-enju.kohei@fujitsu.com>
+ <20260724094120.166536-3-enju.kohei@fujitsu.com>
+ <amNfGkkI5OIBqpmZ@localhost.localdomain>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <amIP42yILYNsNk0e@J2N7QTR9R3.cambridge.arm.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <amNfGkkI5OIBqpmZ@localhost.localdomain>
 
-On Thu, Jul 23, 2026 at 01:58:11PM +0100, Mark Rutland wrote:
-> On Mon, Jul 20, 2026 at 12:07:29AM +0100, Mark Brown wrote:
-> > At present when exiting from idle we do not fully reinitialise ZCR_EL1,
-> > we update ZCR_EL1.LEN with a read/modify/write cycle when loading task
-> > state but never set any of the other bits to an explicit value.  Since
-> > currently they are all architecturally RES0 or RAZ/WI this is not a
-> > practical issue but it may become one if further fields are defined in
-> > the register so we should explicitly configure the whole register.
-> >
-> > Rename the existing sme_suspend_exit() (which handles this for SME) to
-> > fpsimd_suspend_exit() and add set ZCR_EL1 to 0 there, if needed LEN will
-> > be updated when loading task state.
-> >
-> > Signed-off-by: Mark Brown <broonie@kernel.org>
+On 07/24 14:52, Michal Koutný wrote:
+> Hello Kohei.
 > 
-> While this happens to work today, this is a more general architecture
-> problem, and I think we should cc stable such that kernels will work
-> reliably on future hardware.
+> On Fri, Jul 24, 2026 at 06:40:56PM +0900, Kohei Enju <enju.kohei@fujitsu.com> wrote:
+> > Arm CCA MECIDs are limited platform resources. Add a misc cgroup
+> > resource to allow the system administrator to account for and limit
+> > their use.
+> > 
+> > The cca_mec resource represents the number of Realm VMs using the
+> > private MEC policy. Each such Realm consumes one MECID. Charge the
+> > resource when the Realm is created, and uncharge it when the Realm is
+> > successfully destroyed.
+> > 
+> > Realms using the shared MEC policy don't consume this resource.
+> > 
+> > Signed-off-by: Kohei Enju <enju.kohei@fujitsu.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_rmi.h |  2 ++
+> >  arch/arm64/kvm/rmi.c             | 44 +++++++++++++++++++++++++++++++-
+> >  drivers/firmware/arm_rmm/rmi.c   |  4 +++
 > 
-> All stable kernels support SVE, so this needs to go as far back as
-> v5.10.y.
+> (mainly for this)
+> >  include/linux/misc_cgroup.h      |  4 +++
+> >  kernel/cgroup/misc.c             |  4 +++
+> >  5 files changed, 57 insertions(+), 1 deletion(-)
 > 
-> One minor comment below, but with that fixed up (and a CC stable):
-> 
-> Acked-by: Mark Rutland <mark.rutland@arm.com>
+> Conditional
+> Acked-by: Michal Koutný <mkoutny@suse.com>
+> (it makes sense along the other arches' miscresurces)
 
-Sorry, having looked at some of the later patches I think this isn't
-quite right even with those changes, as we wouldn't have necessary
-context synchronization in all cases.
+Hi Michal,
+Thank you for taking a look.
 
-I'll need to dig a bit more to come up with a more concrete solution.
+> 
+> Why? I see this [1] (or followup) needs to be added first.
 
-Mark.
+Yes, [1] should be added first.
+As also stated in the coverletter, the following series is anothor
+dependency, because this RFC series is on top of those other series.
+https://lore.kernel.org/all/20260715142841.80544-1-steven.price@arm.com/
 
-> > +void fpsimd_suspend_exit(void)
-> >  {
-> >  	u64 smcr = 0;
-> >  
-> > -	if (!system_supports_sme())
-> > -		return;
-> > +	if (system_supports_sve())
-> > +		write_sysreg_s(0, SYS_ZCR_EL1);
-> >  
-> > -	if (system_supports_fa64())
-> > -		smcr |= SMCR_ELx_FA64;
-> > -	if (system_supports_sme2())
-> > -		smcr |= SMCR_ELx_EZT0;
-> > +	if (system_supports_sme()) {
+The [1] series is a dependency of the one above, and I didn't mention it
+explicitly in the cover letter. My bad.
+
+My intention was to get feedback on this RFC series about the
+architecture and the basic design until those dependent series are
+merged, after which I will send this series as non-RFC.
+
+Thanks,
+Kohei
+
 > 
-> We should move the 'smcr' variable into this block. That way it's scoped
-> to where it matters.
+> Thanks,
+> Michal
 > 
-> > +		if (system_supports_fa64())
-> > +			smcr |= SMCR_ELx_FA64;
-> > +		if (system_supports_sme2())
-> > +			smcr |= SMCR_ELx_EZT0;
-> >  
-> > -	write_sysreg_s(smcr, SYS_SMCR_EL1);
-> > -	write_sysreg_s(0, SYS_SMPRI_EL1);
-> > +		write_sysreg_s(smcr, SYS_SMCR_EL1);
-> > +		write_sysreg_s(0, SYS_SMPRI_EL1);
-> > +	}
-> >  }
-> 
-> Mark.
-> 
+> [1] https://lore.kernel.org/r/20260715142739.80398-4-steven.price@arm.com/
+
+
