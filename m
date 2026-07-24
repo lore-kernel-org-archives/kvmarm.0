@@ -1,45 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EEA7345ED9;
-	Fri, 24 Jul 2026 12:05:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0747F404BDA;
+	Fri, 24 Jul 2026 12:06:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784894754; cv=none; b=JnQ4V6p/Ei4+3OqTzao9fnmS5c51rHnf97t8nXWaRN04ukiS048PIR9DNkt4F8ysSaO95XKv983qq0Klgqyzz836ZajR63uDvj/EL9wU9m2a+hGSBqTarQLMQSBpIhdXNWfsKAGTfS43w/AsDpCwesDsy/2nuxcmQIxlh6Qr7Lk=
+	t=1784894790; cv=none; b=T8IlPdA1oqDMb/W6iFkW5qKbU/GYXDBd7f8MTr6xJbpsFegKKMYPxTeGeXb92WzCwL98PP4PPN5T+q0mTSd/qR82CvUToWwvyA7MWm+Z5vg+xOrtrKKBuuxGI09/vzqUGjmlH72wbiQKDfnot2Uuh71iOFbSTPoT/u9tcFDpiFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784894754; c=relaxed/simple;
-	bh=NGyvXZ+G/DWsaeLLfakO/DEcr7jcwzc7uyTW88mAtsI=;
+	s=arc-20240116; t=1784894790; c=relaxed/simple;
+	bh=cEv72i/m2aAgTLXo9SKTH+S2yRtxoUcAemnL/PMI9EY=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=nRzqyeM2P1iJcv/Ns8x7IT75pkvxx281YZvDGJ8pPCQO/yd1YQfldYJgo/5yMqUKitPBzbT+4BEtM9mfgMQRtstwPd87BNIL15OCQK5Yacoa/OAtEhm5Tt+o17IcDs196yVItC1LNQWG0Kqr1Li81Y3utmgX3LRqdaO00NclQPU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V377GNWp; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=SA4sqIIV264Wom6J07MGI3TEeVt+1nV89S91GxhnjfKTd6GSZYlVnb9FF8maJHwGXYuifwtE8DYECM4gPsqFh9abryJ5DFkpj/MjfGBFFQi7GPewJF+mXt6o5yCOPPpVpl9m2vmVtSZOQ0QUUoxqiG5eRE/GyTBQxnkmTx8IWNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NXdu1+yj; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V377GNWp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CDA11F000E9;
-	Fri, 24 Jul 2026 12:05:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NXdu1+yj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FF181F000E9;
+	Fri, 24 Jul 2026 12:06:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784894752;
-	bh=mgDtalFkhK6ExeQlrPOTxMbWYYLk/80ALR1aaPpcMTU=;
+	s=k20260515; t=1784894788;
+	bh=FEY/ClQEfDscOyJJYeNo9OTXv7C64uTiQGIl6P9sKRY=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=V377GNWprMBBIeyAqt3SCLzqV3mkaz0GBL12YWoffVEi4EpBmBKiAjnGi7D3wVFrh
-	 eyW64oK0zyPFintLeqPUHcjTQITKKeW+RrWpKlnESJgp6QHJVLHJ966JkhrtsMxIxm
-	 TNNxVv8KMpd8RSguGjLs+6SzjJZWF/Tm/9/DV3CFiOZp/FOwIljgIPMLcCJhuYpdv9
-	 UGHe6udmi1Bgmg32KS8xcPbzK8BsgnxJTvaR52PP7UGLAjya7JhshEczafZlIHCzQW
-	 Q5z6hDusWEySkYpOa0qN73Cp2ToP2Fh4sLSOu50H/KHZB0i+dkreBXtxMBXCvw5VP1
-	 A812gWCRxBtZA==
+	b=NXdu1+yjhY1OOdThsVvpq/3NnAZor2Ka3EvRkrb84M7NWSFfZh+BO3iRJt8Qynpi3
+	 bpG3pJXwGOT+LwPiHP59wuxdMpIpgfolx71HsPxtASPJSVxjPRlV+sL+VFd5YjVB5V
+	 1G0iZpeojg8kemT0K/oZlCWJKEXH1bfcyQQNJJFh+cAYjZ58peJAp8DTBCz6fXWBVF
+	 6RWS08asMbPHf6gEUt8RDX8eQoH5cbzQjvDS2+GZJomR3+mhx91RUvPuCcv3n9idiz
+	 PbEZkPn8sBcKYEaI13Fx4bXaaYrqm3Mhn+EL7uvEXPbYOntwcS9eU0//zwBNkI6oPH
+	 JZclJw3quT1ng==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v4 32/48] KVM: arm64: gic-v5: Handle userspace accesses
- to IRS MMIO region
+Subject: Re: [PATCH v4 42/48] KVM: selftests: Add VGICv5 IRS_REGS attribute
+ tests
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Sascha Bischoff" <Sascha.Bischoff@arm.com>
-Cc: "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, "Marc
- Zyngier" <maz@kernel.org>, kvm@vger.kernel.org
-In-Reply-To: <20260724104819.1296803-33-sascha.bischoff@arm.com>
+Cc: "Oliver Upton" <oupton@kernel.org>, kvm@vger.kernel.org, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev
+In-Reply-To: <20260724104819.1296803-43-sascha.bischoff@arm.com>
 References: <20260724104819.1296803-1-sascha.bischoff@arm.com>
- <20260724104819.1296803-33-sascha.bischoff@arm.com>
+ <20260724104819.1296803-43-sascha.bischoff@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 24 Jul 2026 12:05:51 +0000
-Message-Id: <20260724120552.6CDA11F000E9@smtp.kernel.org>
+Date: Fri, 24 Jul 2026 12:06:27 +0000
+Message-Id: <20260724120628.5FF181F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,128 +47,105 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 3 potential issue(=
 s) to consider:
-- [High] Userspace writes to `GICV5_IRS_SPI_CFGR` are silently ignored with=
-out validation, breaking restoration of SPI configurations across live migr=
-ations.
-- [Medium] The 64-bit registers GICV5_IRS_IST_BASER and GICV5_IRS_SPI_VMR l=
-ack support for 32-bit guest MMIO accesses, violating the GIC architecture.
-- [Medium] KVM_HAS_DEVICE_ATTR for KVM_DEV_ARM_VGIC_GRP_IRS_REGS incorrectl=
-y fails with -EINVAL if VCPU 0 is not yet created, breaking feature enumera=
-tion.
+- [Medium] Using a `u64` variable for 32-bit KVM device attributes causes t=
+est logic failures on Big-Endian architectures.
+- [Medium] `IST_BASER` is configured to point to the VGIC MMIO region inste=
+ad of guest RAM.
+- [Medium] Spurious test failure on hardware supporting 8 priority bits.
 --
 
---- Patch [32]: [PATCH v4 32/48] KVM: arm64: gic-v5: Handle userspace acces=
-ses to IRS MMIO region ---
-commit 9b79670b7941a4c70c01c7a66f84cbfecafe7755
+--- Patch [42]: [PATCH v4 42/48] KVM: selftests: Add VGICv5 IRS_REGS attrib=
+ute tests ---
+commit 7457ae5ec0d03e64cfdb7419437558dc7acaf9df
 Author: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Subject: KVM: selftests: Add VGICv5 IRS_REGS attribute tests
 
-KVM: arm64: gic-v5: Handle userspace accesses to IRS MMIO region
+Add coverage for the VGICv5 IRS_REGS attribute group. Migration needs a
+userspace-visible view of the virtual IRS register state, but KVM must
+only expose valid registers and must reject state that cannot be restored
+safely.
 
-As part of saving and restoring state of a GICv5-based system, userspace is
-required to save/restore the IRS MMIO registers. Provide accessors to read
-and write the IRS MMIO state. Where possible, the existing access mechanisms
-are used, but for some registers the access is handled a bit differently as
-they have wider effects.
-
-> diff --git a/arch/arm64/kvm/vgic/vgic-irs-v5.c b/arch/arm64/kvm/vgic/vgic=
--irs-v5.c
-> --- a/arch/arm64/kvm/vgic/vgic-irs-v5.c
-> +++ b/arch/arm64/kvm/vgic/vgic-irs-v5.c
+> diff --git a/tools/testing/selftests/kvm/arm64/vgic_v5.c b/tools/testing/=
+selftests/kvm/arm64/vgic_v5.c
+> --- a/tools/testing/selftests/kvm/arm64/vgic_v5.c
+> +++ b/tools/testing/selftests/kvm/arm64/vgic_v5.c
 
 [ ... ]
 
-> @@ -455,84 +584,217 @@ static void vgic_v5_mmio_write_irs_ist(struct kvm_=
-vcpu *vcpu, gpa_t addr,
->  	case GICV5_IRS_CR0:
->  		vgic->enabled =3D !!(val & GICV5_IRS_CR0_IRSEN);
->  		break;
-> +	case GICV5_IRS_SPI_CFGR:
-> +		break;
-
-[Severity: High]
-Does this silently ignore userspace writes to restore SPI configurations?
-
-The commit message mentions blocking userspace from setting anything that
-doesn't match what has been set already. However, the uaccess write handler
-here just executes a break and returns 0 without validating the write or
-applying any updates.
-
-Could this cause SPI configurations (like edge vs level triggered) to be lo=
-st
-during VM migration, permanently leaving restored SPIs in their default sta=
-te?
-
-> +	case GICV5_IRS_IIDR:
-> +		fallthrough;
-> +	case GICV5_IRS_AIDR:
-> +		break;
->  	default:
-> -		return;
-> +		return -EINVAL;
->  	}
-> +
-> +	return 0;
->  }
+> +static void test_vgic_v5_irs_regs_attrs(void)
+> +{
 
 [ ... ]
 
-> @@ -494,35 +673,50 @@ static const struct vgic_register_region vgic_v5_ir=
-s_registers[] =3D {
-> -	REGISTER_DESC_WITH_LENGTH(GICV5_IRS_IST_BASER, vgic_v5_mmio_read_irs_is=
-t,
-> -				  vgic_v5_mmio_write_irs_ist, 8,
-> -				  VGIC_ACCESS_64bit),
-> +	REGISTER_DESC_WITH_LENGTH_UACCESS(GICV5_IRS_IST_BASER,
-> +					  vgic_v5_mmio_read_irs_ist,
-> +					  vgic_v5_mmio_write_irs_ist, NULL,
-> +					  vgic_v5_mmio_uaccess_write_irs, 8,
-> +					  VGIC_ACCESS_64bit),
+> +	ret =3D __kvm_device_attr_get(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_IRS_REGS,
+> +				    GICV5_IRS_IDR1, &val);
+> +	TEST_ASSERT(!ret, "GICv5 IRS_REGS get IDR1 failed");
+> +	val |=3D FIELD_PREP(GICV5_IRS_IDR1_PRIORITY_BITS, 0x7);
+> +	ret =3D __kvm_device_attr_set(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_IRS_REGS,
+> +				    GICV5_IRS_IDR1, &val);
+> +	TEST_ASSERT(ret && errno =3D=3D EINVAL, "GICv5 IRS_REGS accepted bad ID=
+R1");
 
 [Severity: Medium]
-Should these 64-bit registers support 32-bit MMIO accesses?
+Will this assertion falsely fail on hardware that supports 8 priority bits?
 
-The region descriptor specifies only VGIC_ACCESS_64bit. The GIC architecture
-mandates that 64-bit registers must also support 32-bit accesses, so valid
-32-bit guest reads or writes might be improperly rejected.
-
-Additionally, if 32-bit accesses were permitted, would the write handler in
-vgic_v5_mmio_write_irs_ist() improperly clobber the upper 32 bits? It
-appears to lack the update_64bit_reg() wrapper used elsewhere in KVM to
-handle partial writes safely.
+The architecture allows up to 8 priority bits, which encodes as 0x7. If the
+test runs on a host whose hardware legitimately supports this configuration,
+KVM will likely accept the write instead of returning -EINVAL, causing a
+spurious test failure.
 
 [ ... ]
 
-> diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/=
-vgic-kvm-device.c
-> --- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
-> +++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-
-[ ... ]
-
-> @@ -786,6 +786,9 @@ int vgic_v5_parse_attr(struct kvm_device *dev, struct=
- kvm_device_attr *attr,
->  		mpidr_reg =3D VGIC_TO_MPIDR(vgic_mpidr);
->  		reg_attr->vcpu =3D kvm_mpidr_to_vcpu(dev->kvm, mpidr_reg);
->  		break;
-> +	case KVM_DEV_ARM_VGIC_GRP_IRS_REGS:
-> +		reg_attr->vcpu =3D kvm_get_vcpu(dev->kvm, 0);
-> +		break;
->  	default:
->  		return -EINVAL;
->  	}
+> +	ret =3D __kvm_device_attr_get(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_IRS_REGS,
+> +				    GICV5_IRS_IDR5, &val);
+> +	TEST_ASSERT(!ret, "GICv5 IRS_REGS get IDR5 failed");
+> +	val++;
+> +	ret =3D __kvm_device_attr_set(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_IRS_REGS,
+> +				    GICV5_IRS_IDR5, &val);
+> +	TEST_ASSERT(ret && errno =3D=3D EINVAL, "GICv5 IRS_REGS accepted bad ID=
+R5");
 
 [Severity: Medium]
-Does this break KVM_HAS_DEVICE_ATTR feature enumeration before VCPUs are
-created?
+Could this cause spurious test failures on Big-Endian architectures?
 
-If a VMM queries KVM_HAS_DEVICE_ATTR for KVM_DEV_ARM_VGIC_GRP_IRS_REGS
-immediately after creating the VGIC device, kvm_get_vcpu(dev->kvm, 0) will
-return NULL.
+KVM reads and writes 32-bit attributes to the upper 32 bits of a u64 buffer
+on BE systems. The val++ operation increments the lower 32 bits, leaving
+the actual 32-bit attribute value in the upper 32 bits untouched. When
+this is written back, KVM might legitimately accept the unchanged value,
+causing this assertion to fail.
 
-Because vgic_v5_parse_attr() returns -EINVAL when reg_attr->vcpu is NULL,
-this causes feature probing to yield false negatives. As IRS registers are
-VM-wide features, can we avoid this dependency on VCPU 0 during enumeration?
+[ ... ]
+
+> +	/* Status registers read as idle through userspace accessors. */
+> +	ret =3D __kvm_device_attr_get(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_IRS_REGS,
+> +				    GICV5_IRS_SYNC_STATUSR, &val);
+> +	TEST_ASSERT(!ret && val =3D=3D GICV5_IRS_SYNC_STATUSR_IDLE,
+> +		    "GICv5 IRS_REGS SYNC_STATUSR is not idle");
+
+[ ... ]
+
+> +	/* Userspace restore of IST_BASER updates state without allocating ISTs=
+. */
+> +	val =3D FIELD_PREP(GICV5_IRS_IST_BASER_ADDR_MASK,
+> +			 GICV5_IRS_CONFIG_BASE_GPA >> GICV5_IRS_IST_BASER_ADDR_SHIFT);
+> +	val |=3D GICV5_IRS_IST_BASER_VALID;
+> +	ret =3D __kvm_device_attr_set(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_IRS_REGS,
+> +				    GICV5_IRS_IST_BASER, &val);
+> +	TEST_ASSERT(!ret, "GICv5 IRS_REGS failed to restore IST_BASER");
+
+[Severity: Medium]
+Is it intentional to configure the Interrupt Status Table to overlap with t=
+he
+VGIC's own MMIO region here?
+
+GICV5_IRS_CONFIG_BASE_GPA is the base address of the IRS MMIO region, but
+the IST should typically reside in standard guest RAM (such as
+VGIC_V5_LPI_IST_BASE_GPA). If KVM adds validation in the future to ensure
+IST_BASER points to a valid memory slot instead of an MMIO region, could
+this configuration be rejected and break the test?
+
+[ ... ]
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260724104819.1296=
-803-1-sascha.bischoff@arm.com?part=3D32
+803-1-sascha.bischoff@arm.com?part=3D42
