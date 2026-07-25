@@ -1,42 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6FDB3812F1;
-	Sat, 25 Jul 2026 09:05:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61929361974;
+	Sat, 25 Jul 2026 09:17:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784970322; cv=none; b=VDgu7SR6t3p1oAi1blUtmwkDKrkgq5jcqQxoRWlWLnHBbeL575YdtiPUJC3DVrRdHwDXWWlHmm2JQCQ+ejfwNztDHmMsYqrEu68luvRVjYxKIOLlJeI/5GT7nsve0eVpVc/dd28YFJ5VUsNKDloYuMKJz1yEfM9BmY04aC3GoRw=
+	t=1784971050; cv=none; b=gHrEWGnvZ9bqDGF9TNvDsXoQ5vDWnjZ53TtbTnZObaB7cTukRNPYVmgUu/u+W6hCgZPWfz05oPk6CCtHnGg87jwTsrsDGqyuweLoBZERE/9POIg1ukgY2CCy9rpTEfN9HdM0fTP9m4NYXpcMlDqCZnjwScj0ZLwmEmKlVfBkjn8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784970322; c=relaxed/simple;
-	bh=oEjp2dRvyi4yMABsS9CPbwc96sF8ApqK5TxUFOs5jZg=;
+	s=arc-20240116; t=1784971050; c=relaxed/simple;
+	bh=x64Tn6Eh3wfwWzbGF/zXQhHaDkY5d5nUgmTiqYgf0iQ=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cNVQzlkHtNdbMJot8YYctzzdR94tA4AVDa6xjyrS2OuAO7/N7/j9cLtODB4Vt16dQLeazy8UpKCkVML7rPhTvpnQPc+bizESSZBs04rGmfb3/ttfyaG4CMlD8KdXZto9Pq59SAM38M7huRzRL4jjCsg3oCsVtoQlnrYWsMUx6+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TGlIJicW; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=CjX4vkG2Do/OPD3CjIXulbfX8ce3J5cSvrRiE4n+njZN66FcsIloXtfToUYiwA/uOlaBMq5HDmgGBpOS4MriKmPGwKkQxrRXpJqiUc/M2/CvCWvTd4KAMLMYW75J0HRPxntpNvMnpsLPtxE5YUgG+1vFRvzzsXHMI32Ex+C4D1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FSQXM20B; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TGlIJicW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61BB71F000E9;
-	Sat, 25 Jul 2026 09:05:21 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FSQXM20B"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0ED811F000E9;
+	Sat, 25 Jul 2026 09:17:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784970321;
-	bh=/ZTWXbadlr43YLSlfrFSiwBYpiEvCpyY8jaHgKQxgEM=;
+	s=k20260515; t=1784971049;
+	bh=Vh/xpYGAMTsnukxrSu3ySPCgyA8weaVUNnmp0dXafII=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=TGlIJicWh376tX6fmEEgr/sa76Sp31gib1yctmYNnJlWc6OdhO9bAGcgXTBDLB2u/
-	 MYxlDhy35SPZ4mYOswhTmCBcwg7PdgWxPykD2M9NOrg0nBd3/FUBKSkmwJQO3jqdIz
-	 M6PZ0mCjBrS+Pgt+PxZ6LoBm9FLgrPIX2rvd4wxYH+zdcVXAOhyoqbdX6yLJ61WMzB
-	 UPq05VEfrugTMo6Hy+VLw85byjvym6iZPuj1bPzrG7ca2IKUn+F79QaiurFI5jm+VB
-	 ApfQrbuwtBIO7h7L3pHkTg20manKE0dsCKN85dQZiA1pBVBkLyYzcsuYS8nxnW2Kn1
-	 eB6UbMorMvSwQ==
+	b=FSQXM20B15glEW5mgUczNxDy/cLnmv0WvPNdBerRlgp+6tzRYnekDKFQBCUJHWtUu
+	 hGDcna+qYqZWuh1cJg/xw405LEiO8S/Lwcl0vUf8vTOxwhnDaqGH1ldUXF6tpp5woo
+	 bKU8U9K3idYaU6uvZTIL/53T+UMLiDcDzgpWNIVfmjpqQphrYp+fYUJi37XSW/8XU/
+	 uX78ARfPAcYCZKIGjE8EsmECZMjQpmF0tE6p7jNT/NwEbWZMjBnNQOaJ0MND6lpMEI
+	 SF13dMJKBaGeJdUiesHO00LSKV3tJcJqR4tezqdUiBWf5gcfwOM+Kjibtoc0cIeNki
+	 X/8eOOON3TzAA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wnYJr-00000008iRl-0d2l;
-	Sat, 25 Jul 2026 09:05:19 +0000
-Date: Sat, 25 Jul 2026 10:06:42 +0100
-Message-ID: <877bmjqvz1.wl-maz@kernel.org>
+	id 1wnYVa-00000008icS-3GRL;
+	Sat, 25 Jul 2026 09:17:26 +0000
+Date: Sat, 25 Jul 2026 10:18:50 +0100
+Message-ID: <875x23qvet.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Sascha Bischoff <Sascha.Bischoff@arm.com>,
-    Lorenzo Pieralisi <lpieralisi@kernel.org>
+	Lorenzo Pieralisi <lpieralisi@kernel.org>
 Cc: "linux-arm-kernel@lists.infradead.org"
 	<linux-arm-kernel@lists.infradead.org>,
 	"kvmarm@lists.linux.dev"
@@ -54,9 +54,10 @@ Cc: "linux-arm-kernel@lists.infradead.org"
 	"fuad.tabba@linux.dev"
 	<fuad.tabba@linux.dev>
 Subject: Re: [PATCH v4 02/48] irqchip/gic-v5: Provide OF IRS config frame attrs to KVM
-In-Reply-To: <20260724104819.1296803-3-sascha.bischoff@arm.com>
+In-Reply-To: <877bmjqvz1.wl-maz@kernel.org>
 References: <20260724104819.1296803-1-sascha.bischoff@arm.com>
 	<20260724104819.1296803-3-sascha.bischoff@arm.com>
+	<877bmjqvz1.wl-maz@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -67,38 +68,42 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
 X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, lpieralisi@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, Timothy.Hayes@arm.com, fuad.tabba@linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 24 Jul 2026 11:48:56 +0100,
-Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
->=20
-> KVM needs to interact with the host IRS in order to, for example, make
-> VMs or VPEs valid. There are two potential approaches here. Either the
-> host irqchip driver can provide an interface, or KVM can interact
-> directly with the host IRS. The latter of these two is chosen as the
-> set of MMIO registers that KVM needs to interact with is orthogonal to
-> the set used by the host irqchip driver (with the exception of some of
-> the read-only IRS_IDRx registers).
->=20
-> Pass KVM a pointer to an IRS config frame - the config frame belonging
-> to ANY IRS is fine as long as one IRS's config frame is used
-> consistently - in struct gic_kvm_info. Additionally, include a flag
-> telling KVM whether the IRS is coherent or non-coherent in order to
-> make sure that KVM can do the correct cache state management, if
-> required.
->=20
-> Only OF (Device Tree) is supported with this change. ACPI is not.
+On Sat, 25 Jul 2026 10:06:42 +0100,
+Marc Zyngier <maz@kernel.org> wrote:
+> 
+> On Fri, 24 Jul 2026 11:48:56 +0100,
+> Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
+> > 
+> > KVM needs to interact with the host IRS in order to, for example, make
+> > VMs or VPEs valid. There are two potential approaches here. Either the
+> > host irqchip driver can provide an interface, or KVM can interact
+> > directly with the host IRS. The latter of these two is chosen as the
+> > set of MMIO registers that KVM needs to interact with is orthogonal to
+> > the set used by the host irqchip driver (with the exception of some of
+> > the read-only IRS_IDRx registers).
+> > 
+> > Pass KVM a pointer to an IRS config frame - the config frame belonging
+> > to ANY IRS is fine as long as one IRS's config frame is used
+> > consistently - in struct gic_kvm_info. Additionally, include a flag
+> > telling KVM whether the IRS is coherent or non-coherent in order to
+> > make sure that KVM can do the correct cache state management, if
+> > required.
+> > 
+> > Only OF (Device Tree) is supported with this change. ACPI is not.
+> 
+> From what I can see, the ACPI support has completely ignored the KVM
+> setup. This would need to be addressed quickly.
+> 
+> Lorenzo, what's the status of ACPI support?
 
-=46rom what I can see, the ACPI support has completely ignored the KVM
-setup. This would need to be addressed quickly.
-
-Lorenzo, what's the status of ACPI support?
+Bah, that was the followup patch. Ignore me.
 
 	M.
 
---=20
+-- 
 Jazz isn't dead. It just smells funny.
