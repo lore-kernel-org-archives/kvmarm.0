@@ -1,50 +1,62 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0D193128A3;
-	Sat, 25 Jul 2026 10:08:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0AEF3EB0EC;
+	Sat, 25 Jul 2026 10:38:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784974131; cv=none; b=AK4lRIUoezShFW7Qvwe2mEWvAOPinnACDGBh9v9SxSLCIkomQ2rIo8aqKDJWNLqP6ak5y0PMJR9vBqbzYUVyv5IJspwI/ygU4pWt5o9xIlFxQNeNVBTSo5hs8ZaCz5gZnE+GR854FDHQ1USIhlmGMvA85uDXCRRk2Jq+HZ0AivY=
+	t=1784975927; cv=none; b=G5+Qzelm/AfHkbEYX0kHcxY+immrMmxLDZl+OlnaEGwg61jr9CaR+e1VVl1vwOFDD7KA4TcXh02wqj529EYU5VwFX0PLhshAdEIe6S02HYY7sAXDruQtfnbylVx6TKmrqTbpekWzkKa5bnZR36H0eVUEXyXHbjVtVV+ut4krDHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784974131; c=relaxed/simple;
-	bh=DNo7YYiksm5xQgyxKtSkHLThO3DpWNYsXp3qguT9n10=;
+	s=arc-20240116; t=1784975927; c=relaxed/simple;
+	bh=EmoHgRNVtGeR8FsLhgkNOEuQ7bBm2VXM0FSDfDTyBNQ=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=O4XQWBFqOd84Ayo2DRVWVjkPWFxuHib6BFKrSRMqOeuMDLRWme/eLEzDVZgYjV8vpjLZd92Zsm5sJ4BwYZwBtUlqvImNkh90w6gynhYUnXydnxluAYq/LqgM8hoESxfKXO8DN9P6bPJbF5Ek+fXhgeK/iEHX/alj0hsi1wPjJnY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l/iUzCqm; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=ipW2U8Fti62fsiyckvGvzI+OtFySrlao+eziz2IrL7ClAhuvEd1VJSlmWkJI6x1HqCpqjwCDQG5GMWHLIzcwtWaQ7ssbbbXDQgdJf6i3hkV60q4J4R7rchYf8/4+fxdzX3OabjB65jhI/o6wWxU4lAlXAu60kEcsB7p4rtN9/K4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LfYJBfq5; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l/iUzCqm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50DC21F000E9;
-	Sat, 25 Jul 2026 10:08:50 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LfYJBfq5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 301AC1F000E9;
+	Sat, 25 Jul 2026 10:38:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784974130;
-	bh=hbbCxrJpdE1rZ8FisrKyokswVjUeaAjwPhFCCGTVdb0=;
+	s=k20260515; t=1784975923;
+	bh=P/rV3Xc/Rj8wi7a9RpAm+SM4aBkX4hWCDZQpIFJYUiI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=l/iUzCqmgi7W2s8UhG5d5VMsH3Mi1xqPK29+qogUOVH7jfAtew+zYEjqB4laMn0UB
-	 fXfcSG0R0uU+9TTpsWGyYVY949+VZtH+Hxx4k9vxUwatsfuA9Y2venNAml3geaFCnr
-	 y8R67FnlgsQnIgnRbl3r8fP2XComJv1UT319ByuEXoTFuNdY+b8YfLW/AKheFgvkfZ
-	 CVA62Jt9jHBvUu4TARiQdX0dSAST6IciM/FXB40XC0yZW3AaHBIlzQZD6cIpPdHdxh
-	 kML8gemyoMv9b9wu6ra1YvvJMJT+yYeBm+eslX3/t+jvKoI5U1azlW4nOniWNv9KAP
-	 gwMhJs6E1S3uQ==
+	b=LfYJBfq5Hqp6QoBEubgNl0qhJIfJGmpubqeouQvitWDLR383XeSK78MnnsulqwLzu
+	 0PMtW6z7s/IeaP5OgIWnyVgZZ8neUM9vII3HhOaZOHoGCA3GTjQcptHm9gbiJwWbEm
+	 6aTbfVObVfodG0khbzZ+o0ClZYuUX2kbr8F7MhYUbkaf/hIgOUmb5ii4vKm2cKhAVK
+	 pRZyy0U/D0KOEUbJbjlbbTaN/Jc6rbKmDTwXL01S9AKxGfDPB3sNpO1yZ3zsAl3/bt
+	 9D4ZvwNmpK+wgegbQWRsx8bahYaOiffotvzWLl++DEENtmLJpI5brf/H1i+/bFhPBW
+	 OuzjKR9C4NHGA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wnZJI-00000008jE7-2OL5;
-	Sat, 25 Jul 2026 10:08:48 +0000
-Date: Sat, 25 Jul 2026 11:10:12 +0100
-Message-ID: <871pcrqt17.wl-maz@kernel.org>
+	id 1wnZmD-00000008jX8-0dqw;
+	Sat, 25 Jul 2026 10:38:41 +0000
+Date: Sat, 25 Jul 2026 11:40:04 +0100
+Message-ID: <87zezfpd2z.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: sashiko-reviews@lists.linux.dev
-Cc: "Sascha Bischoff" <Sascha.Bischoff@arm.com>,
-	kvm@vger.kernel.org,
-	"Oliver Upton" <oupton@kernel.org>,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4 06/48] arm64/sysreg: Update ICC_CR0_EL1 with LINK and LINK_IDLE fields
-In-Reply-To: <20260724111405.63DD51F01833@smtp.kernel.org>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	nd <nd@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Joey Gouly
+	<Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org"
+	<peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	Timothy Hayes <Timothy.Hayes@arm.com>,
+	"fuad.tabba@linux.dev"
+	<fuad.tabba@linux.dev>
+Subject: Re: [PATCH v4 07/48] KVM: arm64: gic-v5: Extract host IRS caps from IRS config frame
+In-Reply-To: <20260724104819.1296803-8-sascha.bischoff@arm.com>
 References: <20260724104819.1296803-1-sascha.bischoff@arm.com>
-	<20260724104819.1296803-7-sascha.bischoff@arm.com>
-	<20260724111405.63DD51F01833@smtp.kernel.org>
+	<20260724104819.1296803-8-sascha.bischoff@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -56,41 +68,98 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, Sascha.Bischoff@arm.com, kvm@vger.kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev
+X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com, fuad.tabba@linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 24 Jul 2026 12:14:04 +0100,
-sashiko-bot@kernel.org wrote:
+On Fri, 24 Jul 2026 11:50:13 +0100,
+Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 > 
-> Thank you for your contribution! Sashiko AI review found 2 potential issue(s) to consider:
+> The host irqchip driver provides KVM with a pointer to an IRS's config
+> frame, which allows KVM to directly interact with the host's IRS. The
+> MMIO registers in the config frame are used to configure VMs (in
+> addition to them being used by the host). The IRS's config frame also
+> includes a set of ID registers which describe the capabilities that
+> the IRS has.
 > 
-> Pre-existing issues:
-> - [High] Missing Context Synchronization Event (`isb()`) immediately following writes to `ICC_*_EL1` control registers.
-> - [High] CONSTRAINED UNPREDICTABLE behavior risk in `GIC CDEOI` system instruction encoding.
-> --
+> Stash the pointer to the config frame, and extract the VM capabilities
+> (from IRS_IDR3 & IRS_IDR4), as well as the IST
+> capabilities/requirements (IRS_IDR2) from the IRS.
+> 
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+> ---
+>  arch/arm64/kvm/vgic/vgic-v5.c | 46 +++++++++++++++++++++++++++++++++--
+>  include/kvm/arm_vgic.h        | 26 ++++++++++++++++++++
+>  2 files changed, 70 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
+> index d4789ff3e7402..3f7b132110114 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v5.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
+> @@ -11,6 +11,7 @@
+>  #include "vgic.h"
+>  
+>  #define ppi_caps	kvm_vgic_global_state.vgic_v5_ppi_caps
+> +#define irs_caps	kvm_vgic_global_state.vgic_v5_irs_caps
+>  
+>  /*
+>   * Not all PPIs are guaranteed to be implemented for GICv5. Deterermine which
+> @@ -34,6 +35,45 @@ static void vgic_v5_get_implemented_ppis(void)
+>  	__assign_bit(GICV5_ARCH_PPI_PMUIRQ, ppi_caps.impl_ppi_mask, system_supports_pmuv3());
+>  }
+>  
+> +static u32 irs_readl_relaxed(const u32 reg_offset)
+> +{
+> +	return readl_relaxed(irs_caps.irs_base + reg_offset);
+> +}
+> +
+> +static void vgic_v5_irs_extract_vm_caps(const struct gic_kvm_info *info)
+> +{
+> +	u64 idr;
+> +
+> +	irs_caps.irs_base = info->gicv5_irs.base;
+> +	irs_caps.non_coherent = info->gicv5_irs.non_coherent;
+> +
+> +	idr = irs_readl_relaxed(GICV5_IRS_IDR2);
+> +
+> +	/* We skip the LPI field as it only applies to physical LPIs */
+> +	irs_caps.ist_id_bits = FIELD_GET(GICV5_IRS_IDR2_ID_BITS, idr);
+> +	irs_caps.min_lpi_id_bits = FIELD_GET(GICV5_IRS_IDR2_MIN_LPI_ID_BITS, idr);
+> +	irs_caps.ist_levels = (idr & GICV5_IRS_IDR2_IST_LEVELS);
+> +	irs_caps.ist_l2sz = FIELD_GET(GICV5_IRS_IDR2_IST_L2SZ, idr);
+> +	irs_caps.istmd = (idr & GICV5_IRS_IDR2_ISTMD);
+> +	irs_caps.istmd_sz = FIELD_GET(GICV5_IRS_IDR2_ISTMD_SZ, idr);
+> +
+> +	idr = irs_readl_relaxed(GICV5_IRS_IDR3);
+> +
+> +	irs_caps.max_vms = BIT(FIELD_GET(GICV5_IRS_IDR3_VM_ID_BITS, idr));
+> +	irs_caps.two_level_vmt_support = (idr & GICV5_IRS_IDR3_VMT_LEVELS);
+> +
+> +	if (idr & GICV5_IRS_IDR3_VMD)
+> +		irs_caps.vmd_size = BIT(FIELD_GET(GICV5_IRS_IDR3_VMD_SZ, idr));
+> +	else
+> +		irs_caps.vmd_size = 0;
+> +
+> +	idr = irs_readl_relaxed(GICV5_IRS_IDR4);
+> +
+> +	irs_caps.vped_size = BIT(FIELD_GET(GICV5_IRS_IDR4_VPED_SZ, idr));
+> +	/* Field stores VPE_ID_BITS - 1 */
+> +	irs_caps.max_vpes = BIT(FIELD_GET(GICV5_IRS_IDR4_VPE_ID_BITS, idr) + 1);
 
-[...]
+Not a big deal, but I'm a bit over this split of ID regs in individual
+fields. It looks appealing at first, but ends-up being problematic.
 
->
-> [Severity: High]
-> This is a pre-existing issue, but while reviewing the GICv5 interactions,
-> does the CDEOI instruction encoding rely on compiler constraints instead of
-> hardcoding the required register?
-> 
-> In drivers/irqchip/irq-gic-v5.c:gicv5_handle_irq(), the instruction is
-> emitted using:
-> 
-> drivers/irqchip/irq-gic-v5.c:gicv5_handle_irq() {
-> 	gic_insn(0, CDEOI);
-> }
-> 
-> If the compiler allocates a general-purpose register containing 0 instead of
-> explicitly using XZR (register 31), could this lead to a misencoded system
-> instruction and CONSTRAINED UNPREDICTABLE behavior?
+The reason for this is that EL2 doesn't map kvm_vgic_global_state,
+which will eventually force pKVM to either duplicate the structure, or
+access the ID reg directly (the latter resulting in traps under NV).
 
-and I thought AI was good at digging a bit deeper... What a nonsense
-(see write_sysreg_s()).
+My preference would be to only cache the raw ID reg values, and have
+inline accessors for the individual fields. Once this is in place, we
+can patch the ID reg values in the code directly, ICH_VTR_EL2-style.
+
+Anyway, something to think about.
+
+Thanks,
 
 	M.
 
