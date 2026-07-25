@@ -1,49 +1,50 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E43CB331203;
-	Sat, 25 Jul 2026 10:06:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0D193128A3;
+	Sat, 25 Jul 2026 10:08:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784974004; cv=none; b=CgYJmcN9BqhCy9pklK+y76hWaOSz4kNn/0orz6jLnRu4YdJX5edZjwF3sDDr5nXlCB3EvyM3GZympjgtKfdhBdcfN83L+eWNOM1FBL7V99zF3PqxJMBeEaaDR77eLOFkAy9grDb1wKBzOXSvyY/Bl2ZGkPawtquA4ayJr1315ts=
+	t=1784974131; cv=none; b=AK4lRIUoezShFW7Qvwe2mEWvAOPinnACDGBh9v9SxSLCIkomQ2rIo8aqKDJWNLqP6ak5y0PMJR9vBqbzYUVyv5IJspwI/ygU4pWt5o9xIlFxQNeNVBTSo5hs8ZaCz5gZnE+GR854FDHQ1USIhlmGMvA85uDXCRRk2Jq+HZ0AivY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784974004; c=relaxed/simple;
-	bh=XBEZNNMBpozb8Jvp0vJo6/Kw+9C2HHI4aF9GJUELexA=;
+	s=arc-20240116; t=1784974131; c=relaxed/simple;
+	bh=DNo7YYiksm5xQgyxKtSkHLThO3DpWNYsXp3qguT9n10=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sR6A8SJAcg/baeLZiJw2Y8e0BqyQUTDIfXgfWXHRdyzKP5mxtK/96/C0bd6/kMelBj8rgm07y+97dgVAg9NI6YlDMG0x7ITbimqY0ZmExufOsRfNe9uT6Exbg5enSPCuP8pIPpoqV2H3dTCagyGXk+vSPghfVDRSW1eJYXMrkb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z01H/2Pn; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=O4XQWBFqOd84Ayo2DRVWVjkPWFxuHib6BFKrSRMqOeuMDLRWme/eLEzDVZgYjV8vpjLZd92Zsm5sJ4BwYZwBtUlqvImNkh90w6gynhYUnXydnxluAYq/LqgM8hoESxfKXO8DN9P6bPJbF5Ek+fXhgeK/iEHX/alj0hsi1wPjJnY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l/iUzCqm; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z01H/2Pn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 324771F000E9;
-	Sat, 25 Jul 2026 10:06:42 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l/iUzCqm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50DC21F000E9;
+	Sat, 25 Jul 2026 10:08:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784974002;
-	bh=OeZeYXXVdXRoU3CQiNKgt0hhBi4QmRAA6beAvcRVwVw=;
+	s=k20260515; t=1784974130;
+	bh=hbbCxrJpdE1rZ8FisrKyokswVjUeaAjwPhFCCGTVdb0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=Z01H/2PnnNt6xZZgPO7Vl537h57sxQzAnfhZOsJS3aoy7f34C5RrOel3MHn2syvxt
-	 Ku5qPP4dKOwqoeZ18ooilmxe/KM6+gEgcpRteFyJRMPpimTLcWe3oCFScNMYIHMgXG
-	 S0mntHk/a6CfH+ICy+jpVhDnQ1GS594EmWBKT3ZuDR1JMjhf/d1aZW6Y0OdDS3/A+M
-	 8CWDW/K8U1Z6tKJWTNSgm1JIEmn7bxAFw81n0iBBGcFKoNIIdI1ahn8ZOQ+nm02Mj8
-	 ohAZUDqz8V3lu3/6npBGLojLrhZzVw6hSVs2GSzrGIFv0c0WBNJXaKcw4g5FPdCcrk
-	 cXI6zORjXvanw==
+	b=l/iUzCqmgi7W2s8UhG5d5VMsH3Mi1xqPK29+qogUOVH7jfAtew+zYEjqB4laMn0UB
+	 fXfcSG0R0uU+9TTpsWGyYVY949+VZtH+Hxx4k9vxUwatsfuA9Y2venNAml3geaFCnr
+	 y8R67FnlgsQnIgnRbl3r8fP2XComJv1UT319ByuEXoTFuNdY+b8YfLW/AKheFgvkfZ
+	 CVA62Jt9jHBvUu4TARiQdX0dSAST6IciM/FXB40XC0yZW3AaHBIlzQZD6cIpPdHdxh
+	 kML8gemyoMv9b9wu6ra1YvvJMJT+yYeBm+eslX3/t+jvKoI5U1azlW4nOniWNv9KAP
+	 gwMhJs6E1S3uQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wnZHE-00000008jCl-0wUe;
-	Sat, 25 Jul 2026 10:06:40 +0000
-Date: Sat, 25 Jul 2026 11:08:03 +0100
-Message-ID: <8733x7qt4s.wl-maz@kernel.org>
+	id 1wnZJI-00000008jE7-2OL5;
+	Sat, 25 Jul 2026 10:08:48 +0000
+Date: Sat, 25 Jul 2026 11:10:12 +0100
+Message-ID: <871pcrqt17.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: "Sascha Bischoff" <Sascha.Bischoff@arm.com>,sashiko-reviews@lists.linux.dev
-Cc: 	"Oliver Upton" <oupton@kernel.org>,
+To: sashiko-reviews@lists.linux.dev
+Cc: "Sascha Bischoff" <Sascha.Bischoff@arm.com>,
 	kvm@vger.kernel.org,
+	"Oliver Upton" <oupton@kernel.org>,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4 03/48] irqchip/gic-v5: Set up gic_kvm_info on ACPI hosts
-In-Reply-To: <20260724111920.6F63C1F00A3F@smtp.kernel.org>
+Subject: Re: [PATCH v4 06/48] arm64/sysreg: Update ICC_CR0_EL1 with LINK and LINK_IDLE fields
+In-Reply-To: <20260724111405.63DD51F01833@smtp.kernel.org>
 References: <20260724104819.1296803-1-sascha.bischoff@arm.com>
-	<20260724104819.1296803-4-sascha.bischoff@arm.com>
-	<20260724111920.6F63C1F00A3F@smtp.kernel.org>
+	<20260724104819.1296803-7-sascha.bischoff@arm.com>
+	<20260724111405.63DD51F01833@smtp.kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -55,44 +56,41 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, sashiko-reviews@lists.linux.dev, oupton@kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, Sascha.Bischoff@arm.com, kvm@vger.kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 24 Jul 2026 12:19:20 +0100,
+On Fri, 24 Jul 2026 12:14:04 +0100,
 sashiko-bot@kernel.org wrote:
 > 
-> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> - [High] Failed ACPI GSI registration for maintenance IRQ due to missing GICv5 hardware IRQ type encoding.
+> Thank you for your contribution! Sashiko AI review found 2 potential issue(s) to consider:
+> 
+> Pre-existing issues:
+> - [High] Missing Context Synchronization Event (`isb()`) immediately following writes to `ICC_*_EL1` control registers.
+> - [High] CONSTRAINED UNPREDICTABLE behavior risk in `GIC CDEOI` system instruction encoding.
 > --
 
 [...]
 
+>
 > [Severity: High]
-> Does this fail to register the maintenance IRQ?
+> This is a pre-existing issue, but while reviewing the GICv5 interactions,
+> does the CDEOI instruction encoding rely on compiler constraints instead of
+> hardcoding the required register?
 > 
-> acpi_register_gsi() passes the raw maint_irq directly into fwspec.param[0].
-> However, the GICv5 PPI domain select function expects the hardware IRQ type to
-> be encoded in the upper bits:
+> In drivers/irqchip/irq-gic-v5.c:gicv5_handle_irq(), the instruction is
+> emitted using:
 > 
-> drivers/irqchip/irq-gic-v5.c:gicv5_irq_ppi_domain_select() {
->     ...
->     if (is_fwnode_irqchip(fwspec->fwnode))
->         hwirq_type = FIELD_GET(GICV5_HWIRQ_TYPE, fwspec->param[0]);
-> 
->     if (hwirq_type != GICV5_HWIRQ_TYPE_PPI)
->         return 0;
->     ...
+> drivers/irqchip/irq-gic-v5.c:gicv5_handle_irq() {
+> 	gic_insn(0, CDEOI);
 > }
 > 
-> Because the raw MADT value doesn't have the GICV5_HWIRQ_TYPE_PPI bits set, the
-> mapping will be rejected. Should the GSI be encoded with the PPI type before
-> calling acpi_register_gsi()?
+> If the compiler allocates a general-purpose register containing 0 instead of
+> explicitly using XZR (register 31), could this lead to a misencoded system
+> instruction and CONSTRAINED UNPREDICTABLE behavior?
 
-Where is this coming from? I can't even find any public documentation
-for ACPI GICv5 support...
-
-Sascha?
+and I thought AI was good at digging a bit deeper... What a nonsense
+(see write_sysreg_s()).
 
 	M.
 
