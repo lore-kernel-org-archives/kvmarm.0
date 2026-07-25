@@ -1,62 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0740D2475CF;
-	Sat, 25 Jul 2026 09:33:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E43CB331203;
+	Sat, 25 Jul 2026 10:06:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784972034; cv=none; b=MYmloonKxv3HfR/SyRWA4aTlEi8i2shYk2NiepZz92mS6KOgGD7IkTyc21hXrNJOLeCS5GHjrIJwEsnEOdJT4orIh88zIQ1bhiBaLCYjKeuhMyeyWD5dNxeCw6BQW4Lho+UglOyBFLJAIM9MKRrjtjAmoYP4Z5/Wj4zA3EIqI6Y=
+	t=1784974004; cv=none; b=CgYJmcN9BqhCy9pklK+y76hWaOSz4kNn/0orz6jLnRu4YdJX5edZjwF3sDDr5nXlCB3EvyM3GZympjgtKfdhBdcfN83L+eWNOM1FBL7V99zF3PqxJMBeEaaDR77eLOFkAy9grDb1wKBzOXSvyY/Bl2ZGkPawtquA4ayJr1315ts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784972034; c=relaxed/simple;
-	bh=KPQoW+Iwgke7RX5zPgT4wJsHZqx2hDgxztKHqc9ytAs=;
+	s=arc-20240116; t=1784974004; c=relaxed/simple;
+	bh=XBEZNNMBpozb8Jvp0vJo6/Kw+9C2HHI4aF9GJUELexA=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MeWzwR0jlusYHpkJvb0NICMXlhkZfJFcPUIzdCpxbQXd2GScLXTDVRzzk/XigOMshnyKTVP9n+/wOBWv/fnvzwjSq6zzzhq4vdei8gGz+kPtFZ4DCM7Hrf98PEQ604A4G6INw0wVeS1hLh1fVDaAownEBKCpt8BYl/DC38O+XQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cp2RCB1q; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=sR6A8SJAcg/baeLZiJw2Y8e0BqyQUTDIfXgfWXHRdyzKP5mxtK/96/C0bd6/kMelBj8rgm07y+97dgVAg9NI6YlDMG0x7ITbimqY0ZmExufOsRfNe9uT6Exbg5enSPCuP8pIPpoqV2H3dTCagyGXk+vSPghfVDRSW1eJYXMrkb4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z01H/2Pn; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cp2RCB1q"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F7131F000E9;
-	Sat, 25 Jul 2026 09:33:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z01H/2Pn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 324771F000E9;
+	Sat, 25 Jul 2026 10:06:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784972032;
-	bh=REtGA2PvzGNebKio8QSNRU6bk/XkU8dTLJl11/Xh50w=;
+	s=k20260515; t=1784974002;
+	bh=OeZeYXXVdXRoU3CQiNKgt0hhBi4QmRAA6beAvcRVwVw=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=cp2RCB1qOwbqcK7VkB94KV+thboHk4m4gmN5zfvfVissVc53AXJW9lblqTGUC7o76
-	 yaLPrsyQhWL2yoqE3en+tOYjOLqUZREc3pZfbLMW9XL9OOLuhywloZTkq0W/l8kxr+
-	 1b0sKwOpEmB/iqGjrDE/EE4kBNVtckwzxGQj7oZKFAUEgvEOFFHh3a6MCBNQQ/sKGQ
-	 1Z8X19SAJS8L/ORlz6k3gkrMIDvTuyNi09g0sNmp+GmPwUQU1CyGGmCbgoeD4qBlMC
-	 fTSNCerbXUkJuMG0/5Qwq+lVUB6+V3N+LhVDYqTEh1Jck0TeRmeJVRXpSQ4MheNTRv
-	 5ckEc8FvrQaMg==
+	b=Z01H/2PnnNt6xZZgPO7Vl537h57sxQzAnfhZOsJS3aoy7f34C5RrOel3MHn2syvxt
+	 Ku5qPP4dKOwqoeZ18ooilmxe/KM6+gEgcpRteFyJRMPpimTLcWe3oCFScNMYIHMgXG
+	 S0mntHk/a6CfH+ICy+jpVhDnQ1GS594EmWBKT3ZuDR1JMjhf/d1aZW6Y0OdDS3/A+M
+	 8CWDW/K8U1Z6tKJWTNSgm1JIEmn7bxAFw81n0iBBGcFKoNIIdI1ahn8ZOQ+nm02Mj8
+	 ohAZUDqz8V3lu3/6npBGLojLrhZzVw6hSVs2GSzrGIFv0c0WBNJXaKcw4g5FPdCcrk
+	 cXI6zORjXvanw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wnYlS-00000008ioi-1izz;
-	Sat, 25 Jul 2026 09:33:50 +0000
-Date: Sat, 25 Jul 2026 10:35:13 +0100
-Message-ID: <874ihnquni.wl-maz@kernel.org>
+	id 1wnZHE-00000008jCl-0wUe;
+	Sat, 25 Jul 2026 10:06:40 +0000
+Date: Sat, 25 Jul 2026 11:08:03 +0100
+Message-ID: <8733x7qt4s.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Cc: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	nd <nd@arm.com>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	Joey Gouly
-	<Joey.Gouly@arm.com>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org"
-	<peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	Timothy Hayes <Timothy.Hayes@arm.com>,
-	"fuad.tabba@linux.dev"
-	<fuad.tabba@linux.dev>
+To: "Sascha Bischoff" <Sascha.Bischoff@arm.com>,sashiko-reviews@lists.linux.dev
+Cc: 	"Oliver Upton" <oupton@kernel.org>,
+	kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev
 Subject: Re: [PATCH v4 03/48] irqchip/gic-v5: Set up gic_kvm_info on ACPI hosts
-In-Reply-To: <20260724104819.1296803-4-sascha.bischoff@arm.com>
+In-Reply-To: <20260724111920.6F63C1F00A3F@smtp.kernel.org>
 References: <20260724104819.1296803-1-sascha.bischoff@arm.com>
 	<20260724104819.1296803-4-sascha.bischoff@arm.com>
+	<20260724111920.6F63C1F00A3F@smtp.kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -68,198 +55,44 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com, fuad.tabba@linux.dev
+X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, sashiko-reviews@lists.linux.dev, oupton@kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 24 Jul 2026 11:49:11 +0100,
-Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
+On Fri, 24 Jul 2026 12:19:20 +0100,
+sashiko-bot@kernel.org wrote:
 > 
-> Device-tree based GICv5 probing already passes the IRS details and
-> maintenance interrupt to KVM, but the ACPI path only initialises the
-> irqchip and installs the ACPI IRQ model. As a result, KVM never sees
-> the GICv5 host information required to probe the vGIC on ACPI systems.
+> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
+> - [High] Failed ACPI GSI registration for maintenance IRQ due to missing GICv5 hardware IRQ type encoding.
+> --
+
+[...]
+
+> [Severity: High]
+> Does this fail to register the maintenance IRQ?
 > 
-> Add the ACPI equivalent of the DT KVM setup. Parse the MADT GICC
-> entries for the maintenance interrupt, require all relevant entries to
-> agree, register the interrupt as a GICv5 PPI-encoded GSI, and pass the
-> resulting IRQ together with the IRS base and coherency information to
-> KVM. Native GICv5 does not require a maintenance interrupt unless the
-> legacy GICv3-compatible CPU interface is present, so preserve the
-> existing no-maintenance-IRQ handling for that case.
+> acpi_register_gsi() passes the raw maint_irq directly into fwspec.param[0].
+> However, the GICv5 PPI domain select function expects the hardware IRQ type to
+> be encoded in the upper bits:
 > 
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-> ---
->  drivers/irqchip/irq-gic-v5.c | 100 +++++++++++++++++++++++++++++++++--
->  1 file changed, 96 insertions(+), 4 deletions(-)
+> drivers/irqchip/irq-gic-v5.c:gicv5_irq_ppi_domain_select() {
+>     ...
+>     if (is_fwnode_irqchip(fwspec->fwnode))
+>         hwirq_type = FIELD_GET(GICV5_HWIRQ_TYPE, fwspec->param[0]);
 > 
-> diff --git a/drivers/irqchip/irq-gic-v5.c b/drivers/irqchip/irq-gic-v5.c
-> index e7a7aedcfaf78..0d90675fb319b 100644
-> --- a/drivers/irqchip/irq-gic-v5.c
-> +++ b/drivers/irqchip/irq-gic-v5.c
-> @@ -1126,7 +1126,7 @@ static void gicv5_set_cpuif_idbits(void)
->  #ifdef CONFIG_KVM
->  static struct gic_kvm_info gic_v5_kvm_info __initdata;
->  
-> -static void __init gic_of_setup_kvm_info(struct device_node *node)
-> +static void __init gic_setup_kvm_info(unsigned int maint_irq)
->  {
->  	struct gicv5_irs_chip_data *irs_data = gicv5_irs_get_chip_data();
->  
-> @@ -1137,17 +1137,19 @@ static void __init gic_of_setup_kvm_info(struct device_node *node)
->  	 */
->  	if (!gicv5_global_data.virt_capable) {
->  		pr_info("GIC implementation is not virtualization capable\n");
-> -		return;
-> +		goto out_dispose_maint_irq;
->  	}
->  
-> -	gic_v5_kvm_info.type = GIC_V5;
-> +	if (WARN_ON(!irs_data))
-> +		goto out_dispose_maint_irq;
->  
-> +	gic_v5_kvm_info.type = GIC_V5;
->  	gic_v5_kvm_info.gicv5_irs.base = irs_data->irs_base;
->  	gic_v5_kvm_info.gicv5_irs.non_coherent = !!(irs_data->flags & IRS_FLAGS_NON_COHERENT);
->  
->  	/* GIC Virtual CPU interface maintenance interrupt */
->  	gic_v5_kvm_info.no_maint_irq_mask = false;
-> -	gic_v5_kvm_info.maint_irq = irq_of_parse_and_map(node, 0);
-> +	gic_v5_kvm_info.maint_irq = maint_irq;
->  
->  	/*
->  	 * We require an MI if we have legacy support, but don't, otherwise.
-> @@ -1162,11 +1164,100 @@ static void __init gic_of_setup_kvm_info(struct device_node *node)
->  		gic_v5_kvm_info.no_maint_irq_mask = true;
->  
->  	vgic_set_kvm_info(&gic_v5_kvm_info);
-> +	return;
-> +
-> +out_dispose_maint_irq:
-> +	irq_dispose_mapping(maint_irq);
-> +}
-> +
-> +static void __init gic_of_setup_kvm_info(struct device_node *node)
-> +{
-> +	/* GIC Virtual CPU interface maintenance interrupt */
-> +	gic_setup_kvm_info(irq_of_parse_and_map(node, 0));
-> +}
-> +
-> +#ifdef CONFIG_ACPI
-> +struct gicv5_acpi_kvm_info {
-> +	u32 maint_irq;
-> +	int maint_irq_mode;
-> +};
-> +
-> +static struct gicv5_acpi_kvm_info acpi_v5_kvm_info __initdata;
-> +
-> +static int __init gic_acpi_parse_virt_madt_gicc(union acpi_subtable_headers *header,
-> +						const unsigned long end)
-> +{
-> +	struct acpi_madt_generic_interrupt *gicc =
-> +		(struct acpi_madt_generic_interrupt *)header;
-> +	static int first_madt = true;
-> +	int maint_irq_mode;
-> +
-> +	if (!(gicc->flags &
-> +	      (ACPI_MADT_ENABLED | ACPI_MADT_GICC_ONLINE_CAPABLE)))
-> +		return 0;
-> +
-> +	maint_irq_mode = (gicc->flags & ACPI_MADT_VGIC_IRQ_MODE) ?
-> +			 ACPI_EDGE_SENSITIVE : ACPI_LEVEL_SENSITIVE;
-> +
+>     if (hwirq_type != GICV5_HWIRQ_TYPE_PPI)
+>         return 0;
+>     ...
+> }
+> 
+> Because the raw MADT value doesn't have the GICV5_HWIRQ_TYPE_PPI bits set, the
+> mapping will be rejected. Should the GSI be encoded with the PPI type before
+> calling acpi_register_gsi()?
 
-This looks wrong, as the MI cannot be edge-triggered. This is
-cargo-culted from the GICv3 code, which is just as buggy (I'll go and
-clean it up).
+Where is this coming from? I can't even find any public documentation
+for ACPI GICv5 support...
 
-This should simply be ignored, and the existence of the field shows
-how little understanding of the architecture the ACPI zealots have.
-
-> +	if (first_madt) {
-> +		first_madt = false;
-> +
-> +		acpi_v5_kvm_info.maint_irq = gicc->vgic_interrupt;
-> +		acpi_v5_kvm_info.maint_irq_mode = maint_irq_mode;
-> +		return 0;
-> +	}
-> +
-> +	/* The maintenance interrupt must be the same for every GICC entry. */
-> +	if (acpi_v5_kvm_info.maint_irq != gicc->vgic_interrupt ||
-> +	    acpi_v5_kvm_info.maint_irq_mode != maint_irq_mode)
-> +		return -EINVAL;
-
-Similarly, this second check should be dropped. We're not in the
-business of validating ACPI tables. Print a FW_BUG warning if you
-want, but that's all that needs doing, and we don't need to screw the
-user over the FW's brokenness.
-
-> +
-> +	return 0;
-> +}
-> +
-> +static bool __init gic_acpi_collect_virt_info(void)
-> +{
-> +	int count;
-> +
-> +	count = acpi_table_parse_madt(ACPI_MADT_TYPE_GENERIC_INTERRUPT,
-> +				      gic_acpi_parse_virt_madt_gicc, 0);
-> +
-> +	return count > 0;
-> +}
-> +
-> +static void __init gic_acpi_setup_kvm_info(void)
-> +{
-> +	unsigned int maint_irq = 0;
-> +	int irq;
-> +
-> +	if (!gic_acpi_collect_virt_info()) {
-> +		pr_warn("Unable to get hardware information used for virtualization\n");
-> +		return;
-> +	}
-> +
-> +	if (acpi_v5_kvm_info.maint_irq) {
-> +		irq = acpi_register_gsi(NULL, acpi_v5_kvm_info.maint_irq,
-> +					acpi_v5_kvm_info.maint_irq_mode,
-> +					ACPI_ACTIVE_HIGH);
-
-Just hardcode the trigger mode here.
-
-> +		if (irq > 0)
-> +			maint_irq = irq;
-> +		else
-> +			pr_warn("Failed to register GSI for GICv5 maintenance IRQ\n");
-> +	}
-> +
-> +	gic_setup_kvm_info(maint_irq);
->  }
-> +#endif
-
-nit: add '// CONFIG_ACPI' here, for consistency.
-
->  #else
->  static inline void __init gic_of_setup_kvm_info(struct device_node *node)
->  {
->  }
-> +
-> +#ifdef CONFIG_ACPI
-> +static inline void __init gic_acpi_setup_kvm_info(void)
-> +{
-> +}
-> +#endif
->  #endif // CONFIG_KVM
->  
->  static int __init gicv5_init_common(struct fwnode_handle *parent_domain)
-> @@ -1265,6 +1356,7 @@ static int __init gic_acpi_init(union acpi_subtable_headers *header, const unsig
->  		goto out_irs;
->  
->  	acpi_set_irq_model(ACPI_IRQ_MODEL_GIC_V5, gic_v5_get_gsi_domain_id);
-> +	gic_acpi_setup_kvm_info();
->  
->  	return 0;
->  
-
-Thanks,
+Sascha?
 
 	M.
 
