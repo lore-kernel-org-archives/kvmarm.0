@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0AEF3EB0EC;
-	Sat, 25 Jul 2026 10:38:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 970924908B1;
+	Sat, 25 Jul 2026 10:55:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784975927; cv=none; b=G5+Qzelm/AfHkbEYX0kHcxY+immrMmxLDZl+OlnaEGwg61jr9CaR+e1VVl1vwOFDD7KA4TcXh02wqj529EYU5VwFX0PLhshAdEIe6S02HYY7sAXDruQtfnbylVx6TKmrqTbpekWzkKa5bnZR36H0eVUEXyXHbjVtVV+ut4krDHM=
+	t=1784976934; cv=none; b=aX2k0OP2IjNSI2nSXJ1UCFd+6fC904t0y82SWuN45m2sHA/REv3LU2l3aOtJ5j/5EJz8OEI4bUWO+ennZStOMArkO0LjB0yuBfg/FhwUq9D9NQew64RcnJZuVW6Nv0k26wMjwjo5s2ZWfXiJgjWBhXB/3zu3gJfTvV+Ck2DO0kE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784975927; c=relaxed/simple;
-	bh=EmoHgRNVtGeR8FsLhgkNOEuQ7bBm2VXM0FSDfDTyBNQ=;
+	s=arc-20240116; t=1784976934; c=relaxed/simple;
+	bh=D26oi3f/PENUvQVwKnp8I0Rv5V3lL1BEy8AMDXaeIyM=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ipW2U8Fti62fsiyckvGvzI+OtFySrlao+eziz2IrL7ClAhuvEd1VJSlmWkJI6x1HqCpqjwCDQG5GMWHLIzcwtWaQ7ssbbbXDQgdJf6i3hkV60q4J4R7rchYf8/4+fxdzX3OabjB65jhI/o6wWxU4lAlXAu60kEcsB7p4rtN9/K4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LfYJBfq5; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=rPruzeVQ3ZuM/o0spZjok0+q7U5bwjHn3ZeohIQx3SqZ8ACH9ZZOkKy6jcGiJUnqh1iTXk1UBgk5DSVo/HEdozwhfCDF6cHbM2dreilFNdoegH8YOuiq330CWImRYs+Nm9+Xw+tT4vVobpjHqk0UMOu7p4KUrLUpa6LlPRDzqpo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KlaGZ0u8; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LfYJBfq5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 301AC1F000E9;
-	Sat, 25 Jul 2026 10:38:43 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KlaGZ0u8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B5011F000E9;
+	Sat, 25 Jul 2026 10:55:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784975923;
-	bh=P/rV3Xc/Rj8wi7a9RpAm+SM4aBkX4hWCDZQpIFJYUiI=;
+	s=k20260515; t=1784976933;
+	bh=WT1zS4IkkV1ijgz/+8b1+SlrW2TMfyxdIz/8ijsRm9o=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=LfYJBfq5Hqp6QoBEubgNl0qhJIfJGmpubqeouQvitWDLR383XeSK78MnnsulqwLzu
-	 0PMtW6z7s/IeaP5OgIWnyVgZZ8neUM9vII3HhOaZOHoGCA3GTjQcptHm9gbiJwWbEm
-	 6aTbfVObVfodG0khbzZ+o0ClZYuUX2kbr8F7MhYUbkaf/hIgOUmb5ii4vKm2cKhAVK
-	 pRZyy0U/D0KOEUbJbjlbbTaN/Jc6rbKmDTwXL01S9AKxGfDPB3sNpO1yZ3zsAl3/bt
-	 9D4ZvwNmpK+wgegbQWRsx8bahYaOiffotvzWLl++DEENtmLJpI5brf/H1i+/bFhPBW
-	 OuzjKR9C4NHGA==
+	b=KlaGZ0u89b/QfBpNORtzDvU5HO20q22lYAUfdROITHbWIIVEYFq41JJAg/dwm59ua
+	 0zq6n9bOHmyf96LTHgBgUE9EBo5BO4U/ANEZS3tiI5YO5mwKnaoF+UshdoJTbeVDO8
+	 /6+9v+rKz7Mc0jjUq6fwK0h0DZzAEQMFXBajsAzx5emPkEHPfLKQGMCK4S9eCVTm0X
+	 XotJ7/zYw+GNQ3U+lYzjVXR1VYNme0ZPi1W1q/eEW+EptzsNYFP2qmMFnYg727/loY
+	 /LHC9dhfRe1UYNLfNa6L/8v9ANjsg/onW+8G9LCfqIqiuMLnjq/M3NJGn0djhNQCvV
+	 CNBGuN3vyb8OQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wnZmD-00000008jX8-0dqw;
-	Sat, 25 Jul 2026 10:38:41 +0000
-Date: Sat, 25 Jul 2026 11:40:04 +0100
-Message-ID: <87zezfpd2z.wl-maz@kernel.org>
+	id 1wna2U-00000008ji7-3GYw;
+	Sat, 25 Jul 2026 10:55:30 +0000
+Date: Sat, 25 Jul 2026 11:56:54 +0100
+Message-ID: <87y0ezpcax.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Sascha Bischoff <Sascha.Bischoff@arm.com>
 Cc: "linux-arm-kernel@lists.infradead.org"
@@ -53,10 +53,10 @@ Cc: "linux-arm-kernel@lists.infradead.org"
 	Timothy Hayes <Timothy.Hayes@arm.com>,
 	"fuad.tabba@linux.dev"
 	<fuad.tabba@linux.dev>
-Subject: Re: [PATCH v4 07/48] KVM: arm64: gic-v5: Extract host IRS caps from IRS config frame
-In-Reply-To: <20260724104819.1296803-8-sascha.bischoff@arm.com>
+Subject: Re: [PATCH v4 08/48] KVM: arm64: gic-v5: Add VPE doorbell domain
+In-Reply-To: <20260724104819.1296803-9-sascha.bischoff@arm.com>
 References: <20260724104819.1296803-1-sascha.bischoff@arm.com>
-	<20260724104819.1296803-8-sascha.bischoff@arm.com>
+	<20260724104819.1296803-9-sascha.bischoff@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -72,92 +72,305 @@ X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 24 Jul 2026 11:50:13 +0100,
+On Fri, 24 Jul 2026 11:50:28 +0100,
 Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 > 
-> The host irqchip driver provides KVM with a pointer to an IRS's config
-> frame, which allows KVM to directly interact with the host's IRS. The
-> MMIO registers in the config frame are used to configure VMs (in
-> addition to them being used by the host). The IRS's config frame also
-> includes a set of ID registers which describe the capabilities that
-> the IRS has.
+> VPE doorbells allow the GICv5 hardware to notify KVM when an SPI or LPI
+> can be signalled to a non-resident VPE. This provides the mechanism used
+> to wake blocked vcpus once the hardware determines that the interrupt is
+> eligible to be delivered.
 > 
-> Stash the pointer to the config frame, and extract the VM capabilities
-> (from IRS_IDR3 & IRS_IDR4), as well as the IST
-> capabilities/requirements (IRS_IDR2) from the IRS.
+> Add support for a per-VM VPE doorbell irq domain. The domain is created
+> under the GICv5 LPI domain, with one doorbell allocated per VPE. Store
+> the allocated doorbell base in the VM's GICv5 state so that later
+> patches can request per-vcpu doorbell IRQs and use them for IRS
+> commands and wakeups.
+> 
+> Add the per-VPE doorbell state to the GICv5 CPU interface state. The
+> doorbell IRQ number is populated when the IRQs are requested, and the
+> db_fired state is used by later patches once doorbell delivery is wired
+> up.
 > 
 > Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 > ---
->  arch/arm64/kvm/vgic/vgic-v5.c | 46 +++++++++++++++++++++++++++++++++--
->  include/kvm/arm_vgic.h        | 26 ++++++++++++++++++++
->  2 files changed, 70 insertions(+), 2 deletions(-)
+>  arch/arm64/kvm/vgic/vgic-init.c    |  18 ++--
+>  arch/arm64/kvm/vgic/vgic-v5.c      | 139 +++++++++++++++++++++++++++++
+>  arch/arm64/kvm/vgic/vgic.h         |   1 +
+>  include/kvm/arm_vgic.h             |   4 +
+>  include/linux/irqchip/arm-gic-v5.h |   2 +
+>  5 files changed, 158 insertions(+), 6 deletions(-)
 > 
+> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+> index 907057881b26a..625d352756fcf 100644
+> --- a/arch/arm64/kvm/vgic/vgic-init.c
+> +++ b/arch/arm64/kvm/vgic/vgic-init.c
+> @@ -492,16 +492,22 @@ static void kvm_vgic_dist_destroy(struct kvm *kvm)
+>  	dist->nr_spis = 0;
+>  	dist->vgic_dist_base = VGIC_ADDR_UNDEF;
+>  
+> -	if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
+> +	switch (dist->vgic_model) {
+> +	case KVM_DEV_TYPE_ARM_VGIC_V2:
+> +		dist->vgic_cpu_base = VGIC_ADDR_UNDEF;
+> +		break;
+> +	case KVM_DEV_TYPE_ARM_VGIC_V3:
+>  		list_for_each_entry_safe(rdreg, next, &dist->rd_regions, list)
+>  			vgic_v3_free_redist_region(kvm, rdreg);
+>  		INIT_LIST_HEAD(&dist->rd_regions);
+> -	} else {
+> -		dist->vgic_cpu_base = VGIC_ADDR_UNDEF;
+> -	}
+>  
+> -	if (vgic_supports_direct_irqs(kvm))
+> -		vgic_v4_teardown(kvm);
+> +		if (vgic_supports_direct_irqs(kvm))
+> +			vgic_v4_teardown(kvm);
+> +		break;
+> +	case KVM_DEV_TYPE_ARM_VGIC_V5:
+> +		vgic_v5_teardown(kvm);
+> +		break;
+> +	}
+>  
+>  	xa_destroy(&dist->lpi_xa);
+>  }
 > diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-> index d4789ff3e7402..3f7b132110114 100644
+> index 3f7b132110114..ebd7c3ede975f 100644
 > --- a/arch/arm64/kvm/vgic/vgic-v5.c
 > +++ b/arch/arm64/kvm/vgic/vgic-v5.c
-> @@ -11,6 +11,7 @@
+> @@ -7,6 +7,7 @@
+>  
+>  #include <linux/bitops.h>
+>  #include <linux/irqchip/arm-vgic-info.h>
+> +#include <linux/irqdomain.h>
+>  
 >  #include "vgic.h"
 >  
->  #define ppi_caps	kvm_vgic_global_state.vgic_v5_ppi_caps
-> +#define irs_caps	kvm_vgic_global_state.vgic_v5_irs_caps
->  
->  /*
->   * Not all PPIs are guaranteed to be implemented for GICv5. Deterermine which
-> @@ -34,6 +35,45 @@ static void vgic_v5_get_implemented_ppis(void)
->  	__assign_bit(GICV5_ARCH_PPI_PMUIRQ, ppi_caps.impl_ppi_mask, system_supports_pmuv3());
+> @@ -152,6 +153,134 @@ int vgic_v5_probe(const struct gic_kvm_info *info)
+>  	return 0;
 >  }
 >  
-> +static u32 irs_readl_relaxed(const u32 reg_offset)
+> +/*
+> + * This set of irq_chip functions is specific for doorbells.
+> + */
+> +static const struct irq_chip vgic_v5_db_irq_chip = {
+> +	.name = "GICv5-DB",
+> +	.irq_mask = irq_chip_mask_parent,
+> +	.irq_unmask = irq_chip_unmask_parent,
+> +	.irq_eoi = irq_chip_eoi_parent,
+> +	.irq_set_affinity = irq_chip_set_affinity_parent,
+> +	.irq_get_irqchip_state = irq_chip_get_parent_state,
+> +	.irq_set_irqchip_state = irq_chip_set_parent_state,
+> +	.flags = IRQCHIP_SET_TYPE_MASKED | IRQCHIP_SKIP_SET_WAKE |
+> +		 IRQCHIP_MASK_ON_SUSPEND,
+> +};
+> +
+> +static void vgic_v5_irq_db_domain_free(struct irq_domain *domain,
+> +				       unsigned int virq, unsigned int nr_irqs)
 > +{
-> +	return readl_relaxed(irs_caps.irs_base + reg_offset);
+> +	int i;
+> +
+> +	for (i = 0; i < nr_irqs; i++) {
+> +		struct irq_data *d = irq_domain_get_irq_data(domain, virq + i);
+> +
+> +		irq_set_handler(virq + i, NULL);
+> +		irq_domain_reset_irq_data(d);
+> +	}
+> +
+> +	irq_domain_free_irqs_parent(domain, virq, nr_irqs);
 > +}
 > +
-> +static void vgic_v5_irs_extract_vm_caps(const struct gic_kvm_info *info)
+> +static int vgic_v5_irq_db_domain_alloc(struct irq_domain *domain,
+> +				       unsigned int virq, unsigned int nr_irqs,
+> +				       void *arg)
 > +{
-> +	u64 idr;
+> +	const struct irq_chip *chip = &vgic_v5_db_irq_chip;
+> +	struct vgic_v5_vm *vm = arg;
+> +	struct irq_data *irqd;
+> +	int ret;
 > +
-> +	irs_caps.irs_base = info->gicv5_irs.base;
-> +	irs_caps.non_coherent = info->gicv5_irs.non_coherent;
-> +
-> +	idr = irs_readl_relaxed(GICV5_IRS_IDR2);
-> +
-> +	/* We skip the LPI field as it only applies to physical LPIs */
-> +	irs_caps.ist_id_bits = FIELD_GET(GICV5_IRS_IDR2_ID_BITS, idr);
-> +	irs_caps.min_lpi_id_bits = FIELD_GET(GICV5_IRS_IDR2_MIN_LPI_ID_BITS, idr);
-> +	irs_caps.ist_levels = (idr & GICV5_IRS_IDR2_IST_LEVELS);
-> +	irs_caps.ist_l2sz = FIELD_GET(GICV5_IRS_IDR2_IST_L2SZ, idr);
-> +	irs_caps.istmd = (idr & GICV5_IRS_IDR2_ISTMD);
-> +	irs_caps.istmd_sz = FIELD_GET(GICV5_IRS_IDR2_ISTMD_SZ, idr);
-> +
-> +	idr = irs_readl_relaxed(GICV5_IRS_IDR3);
-> +
-> +	irs_caps.max_vms = BIT(FIELD_GET(GICV5_IRS_IDR3_VM_ID_BITS, idr));
-> +	irs_caps.two_level_vmt_support = (idr & GICV5_IRS_IDR3_VMT_LEVELS);
-> +
-> +	if (idr & GICV5_IRS_IDR3_VMD)
-> +		irs_caps.vmd_size = BIT(FIELD_GET(GICV5_IRS_IDR3_VMD_SZ, idr));
-> +	else
-> +		irs_caps.vmd_size = 0;
-> +
-> +	idr = irs_readl_relaxed(GICV5_IRS_IDR4);
-> +
-> +	irs_caps.vped_size = BIT(FIELD_GET(GICV5_IRS_IDR4_VPED_SZ, idr));
-> +	/* Field stores VPE_ID_BITS - 1 */
-> +	irs_caps.max_vpes = BIT(FIELD_GET(GICV5_IRS_IDR4_VPE_ID_BITS, idr) + 1);
+> +	if (!vm) {
+> +		kvm_err("invalid parameter for doorbell irq allocation\n");
+> +		return -EINVAL;
+> +	}
 
-Not a big deal, but I'm a bit over this split of ID regs in individual
-fields. It looks appealing at first, but ends-up being problematic.
+How can this happen?
 
-The reason for this is that EL2 doesn't map kvm_vgic_global_state,
-which will eventually force pKVM to either duplicate the structure, or
-access the ID reg directly (the latter resulting in traps under NV).
+> +
+> +	ret = irq_domain_alloc_irqs_parent(domain, virq, nr_irqs, NULL);
+> +	if (ret)
+> +		return ret;
+> +
+> +	for (int i = 0; i < nr_irqs; i++) {
+> +		irq_domain_set_hwirq_and_chip(domain, virq + i, i, chip,
+> +					      domain->host_data);
+> +		irqd = irq_desc_get_irq_data(irq_to_desc(virq + i));
+> +		irqd_set_single_target(irqd);
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static const struct irq_domain_ops vgic_v5_irq_db_domain_ops = {
+> +	.alloc = vgic_v5_irq_db_domain_alloc,
+> +	.free = vgic_v5_irq_db_domain_free,
+> +};
+> +
+> +static int vgic_v5_create_per_vm_domain(struct kvm *kvm)
+> +{
+> +	struct vgic_v5_vm *vm = &kvm->arch.vgic.gicv5_vm;
+> +	int nr_vcpus = atomic_read(&kvm->online_vcpus);
+> +	int id = task_pid_nr(current);
+> +	int ret, db_virq = 0;
+> +
+> +	if (!gicv5_global_data.lpi_domain) {
+> +		kvm_err("LPI domain uninitialized, can't set up KVM Doorbells\n");
+> +		return -ENODEV;
+> +	}
 
-My preference would be to only cache the raw ID reg values, and have
-inline accessors for the individual fields. Once this is in place, we
-can patch the ID reg values in the code directly, ICH_VTR_EL2-style.
+Surely we should fail KVM's initialisation if we don't have the LPI
+domain, rather than checking this at the point of creating the
+doorbells. I can't imagine how we'd run on GICv5 without LPIs
+anyway...
 
-Anyway, something to think about.
+> +
+> +	vm->fwnode = irq_domain_alloc_named_id_fwnode("GICv5-vpe-db", id);
+> +	if (!vm->fwnode)
+> +		return -ENOMEM;
+> +
+> +	/*
+> +	 * KVM per-VM VPE DB domain; child of LPI domain; only ever handles
+> +	 * doorbells. We know how many doorbells we have, and therefore we
+> +	 * create a linear domain.
+
+The linear domain thing is an irqdomain implementation detail. We
+don't need to capture this here.
+
+> +	 */
+> +	vm->domain = irq_domain_create_hierarchy(gicv5_global_data.lpi_domain,
+> +						 0, nr_vcpus, vm->fwnode,
+> +						 &vgic_v5_irq_db_domain_ops, vm);
+> +	if (!vm->domain) {
+> +		ret = -ENOMEM;
+> +		goto err;
+> +	}
+> +
+> +	db_virq = irq_domain_alloc_irqs(vm->domain, nr_vcpus, NUMA_NO_NODE, vm);
+> +	if (db_virq <= 0) {
+> +		ret = db_virq;
+> +		goto err;
+> +	}
+> +
+> +	kvm->arch.vgic.gicv5_vm.vpe_db_base = db_virq;
+> +
+> +	return 0;
+> +
+> +err:
+> +	if (db_virq > 0)
+> +		irq_domain_free_irqs(db_virq, nr_vcpus);
+> +	if (vm->domain)
+> +		irq_domain_remove(vm->domain);
+> +	if (vm->fwnode)
+> +		irq_domain_free_fwnode(vm->fwnode);
+> +
+> +	kvm->arch.vgic.gicv5_vm.vpe_db_base = 0;
+> +	vm->domain = NULL;
+> +	vm->fwnode = NULL;
+> +
+> +	return ret;
+> +}
+> +
+> +static void vgic_v5_teardown_per_vm_domain(struct vgic_v5_vm *vm)
+> +{
+> +	if (!vm->domain)
+> +		return;
+> +
+> +	irq_domain_remove(vm->domain);
+> +	irq_domain_free_fwnode(vm->fwnode);
+> +	vm->domain = NULL;
+> +	vm->fwnode = NULL;
+> +}
+> +
+>  void vgic_v5_reset(struct kvm_vcpu *vcpu)
+>  {
+>  	/*
+> @@ -167,10 +296,16 @@ void vgic_v5_reset(struct kvm_vcpu *vcpu)
+>  	vcpu->arch.vgic_cpu.num_pri_bits = 5;
+>  }
+>  
+> +void vgic_v5_teardown(struct kvm *kvm)
+> +{
+> +	vgic_v5_teardown_per_vm_domain(&kvm->arch.vgic.gicv5_vm);
+> +}
+
+Since this is a global symbol, I'd like to make sure this is never
+called concurrently with anything related. Could you please add
+
+	lockdep_assert_held(&kvm->arch.config_lock);
+
+here?
+
+> +
+>  int vgic_v5_init(struct kvm *kvm)
+>  {
+>  	struct kvm_vcpu *vcpu;
+>  	unsigned long idx;
+> +	int ret;
+
+and here?
+
+>  
+>  	if (vgic_initialized(kvm))
+>  		return 0;
+> @@ -182,6 +317,10 @@ int vgic_v5_init(struct kvm *kvm)
+>  		}
+>  	}
+>  
+> +	ret = vgic_v5_create_per_vm_domain(kvm);
+> +	if (ret)
+> +		return ret;
+> +
+>  	/* We only allow userspace to drive the SW_PPI, if it is implemented. */
+>  	bitmap_zero(kvm->arch.vgic.gicv5_vm.userspace_ppis,
+>  		    VGIC_V5_NR_PRIVATE_IRQS);
+> diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
+> index f45f7e3ec4d6e..f2f5fdc3211d7 100644
+> --- a/arch/arm64/kvm/vgic/vgic.h
+> +++ b/arch/arm64/kvm/vgic/vgic.h
+> @@ -366,6 +366,7 @@ void vgic_debug_destroy(struct kvm *kvm);
+>  int vgic_v5_probe(const struct gic_kvm_info *info);
+>  void vgic_v5_reset(struct kvm_vcpu *vcpu);
+>  int vgic_v5_init(struct kvm *kvm);
+> +void vgic_v5_teardown(struct kvm *kvm);
+>  int vgic_v5_map_resources(struct kvm *kvm);
+>  void vgic_v5_set_ppi_ops(struct kvm_vcpu *vcpu, u32 vintid);
+>  bool vgic_v5_has_pending_ppi(struct kvm_vcpu *vcpu);
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index 8d65a18fefb80..bff2b7c896d55 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -392,6 +392,10 @@ struct vgic_v5_vm {
+>  	 * convenient way to do that).
+>  	 */
+>  	DECLARE_BITMAP(vgic_ppi_hmr, VGIC_V5_NR_PRIVATE_IRQS);
+> +
+> +	struct fwnode_handle	*fwnode;
+> +	struct irq_domain	*domain;
+> +	int			vpe_db_base;
+>  };
+>  
+>  struct vgic_dist {
+> diff --git a/include/linux/irqchip/arm-gic-v5.h b/include/linux/irqchip/arm-gic-v5.h
+> index 83cfcd056b250..21c8a69f99bb6 100644
+> --- a/include/linux/irqchip/arm-gic-v5.h
+> +++ b/include/linux/irqchip/arm-gic-v5.h
+> @@ -613,6 +613,8 @@ void gicv5_irs_syncr(void);
+>  
+>  /* Embedded in kvm.arch */
+>  struct gicv5_vpe {
+> +	int			db;
+> +	bool			db_fired;
+>  	bool			resident;
+>  };
 
 Thanks,
 
