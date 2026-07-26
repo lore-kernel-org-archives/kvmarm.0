@@ -1,73 +1,73 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 398C02D0C62
-	for <kvmarm@lists.linux.dev>; Sun, 26 Jul 2026 13:34:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99FF92868AB
+	for <kvmarm@lists.linux.dev>; Sun, 26 Jul 2026 13:57:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785072879; cv=none; b=hjejZW1e4QEQbcwlrop6hqsv2L1pkLBMyNRgYtKfGjiWdOZtotJJ/K2f/mrOKBos19MSsRTBNLBdPN0l6stbcPuL940bJojS5cmYHmjlpdlkKKMHaGicvd6h2JhQcTjE8XXnZMPD8R5I42prkkYidTTcbRShc5hZcJ/zGxw6rGo=
+	t=1785074228; cv=none; b=ayQcYKYxPkbMlqkqcXH9wUQk2GlYvRP3erLIgVv18rb7FkZJdMH4aSS9MxtAQvcJdYw3nVqnPWo2z+dvjjfanj4budxrC3S8pqKv1l8VRo7peV5QpurbZ9ryPfQv8kL3bfnpyAZMw3jYbBz6ObPeCzprftXDBIMxtwaks9toHxE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785072879; c=relaxed/simple;
-	bh=uAxWro1LWuNoP/oi+Fk1H04GQewoKmhEflyVkzL8pj8=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=SefYQ1aeSMGFm/S2+MYPY/RSz35Ei+ZPDvJ5ICTFBxqhulq7WrECKdfCRtfQLG0AABdJPVwPDSSfw4VfcLygjkuupTLE8kBMLJBiGAMjbw5nREta0hSPDgAqJcYqZGRGzNW2i3AtMtDwfW3HflaB1hIQA9OPFZYEnjr6ERSxgIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=N8uOeTS8; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1785074228; c=relaxed/simple;
+	bh=qGjKvN1C+HfQuk1JL6M9RA5PWsMmbZZ89Kgx3/ADCAw=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=Da5GmSM4HtbuHzzxdtMhN2LUu2LqeYcskIh9/IesC5JX8nFjMLDOTcKK4/cXnGPeozNiQus9gUHoPVYre6VCc8zqe3BTeOz+rc9eWp4wdbklKAlf/I4NFWi1iuspNxXMg89KoYiZXtAtQGFyGm4Nk/e03aJN5KxSQkZaD4OR4r8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=glVHfroe; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N8uOeTS8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="glVHfroe"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1785072876;
+	s=mimecast20190719; t=1785074225;
 	h=from:from:reply-to:reply-to:subject:subject:date:date:
 	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
 	 content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+ndIDNx/XWo57F2qOFIBY/S7J+ZAldG16dMk/9EFoRc=;
-	b=N8uOeTS8KCT3efcGwCTe8Gy1XeXqV63FXSna5b2HcN8hjjmTYdFvF0vABMtPOtdtJ+EFPs
-	waOIxdTutmtbrt7eA9jCpbcrG0nyaatmu+ouUh7E3rYQynQtXhYt4xG2+uikV3sQIvo3Qm
-	MAaXFrMG2072LDcSgKTbqN9HmczP8jA=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=LTDKPT3VQAV53tCUW7gPrXEyb5gqnxN4RZCXgIUNRUk=;
+	b=glVHfroew7CVYHq+rpwu7y5CS+y2HwuQIziRZ5TGC30Lnyesdd2nDLZRLBV3O6i4TZ2Lg0
+	0eGXHZk9IAotBTyKVhWMYZbfOCDikLl1bnIQvS3ROCKi+Uos9UhjK8ja+Kl5wDZL7oP0zm
+	2XD0tGCwqGnhY4L5Tr0lVRzkj7EG7iA=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-478-e4uKw_ZBNoq3XUOYi4XCiA-1; Sun, 26 Jul 2026 09:34:34 -0400
-X-MC-Unique: e4uKw_ZBNoq3XUOYi4XCiA-1
-X-Mimecast-MFC-AGG-ID: e4uKw_ZBNoq3XUOYi4XCiA_1785072874
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4955ecd8a10so18339365e9.3
-        for <kvmarm@lists.linux.dev>; Sun, 26 Jul 2026 06:34:34 -0700 (PDT)
+ us-mta-520-tDbiS2knNaCvT2ryFsRCGA-1; Sun, 26 Jul 2026 09:57:04 -0400
+X-MC-Unique: tDbiS2knNaCvT2ryFsRCGA-1
+X-Mimecast-MFC-AGG-ID: tDbiS2knNaCvT2ryFsRCGA_1785074223
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-496b4cc049fso9586535e9.1
+        for <kvmarm@lists.linux.dev>; Sun, 26 Jul 2026 06:57:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785072873; x=1785677673;
-        h=content-transfer-encoding:content-type:in-reply-to:content-language
-         :references:cc:to:reply-to:subject:from:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=+ndIDNx/XWo57F2qOFIBY/S7J+ZAldG16dMk/9EFoRc=;
-        b=NMASNj1BCta+Mml+6vsiMVn/BHFChGHKOASI40rnJqJGwy9EfCDFcHdPv/iRFwqPeT
-         B+r+4WcjqlnvRT9aGASCnitufXGr6hwwroFpYb48fZJ47t9gsUx2Q1RXQS7plsJ19qQ5
-         usD4JoXXCvSd4UMVkwZ6YAfI9RryTFozKOXoxf4+TQOXw1hiDjvIHUftJ80/nibVyPqR
-         s79qMqio9v92XWJlegzKv8/6IC/SZS2iMfIqHlxPdjCl7ISsEJBddZaymcNTJE2EyN15
-         Km2yDXcyL4wmFi4SAHDheJeLOjHCvlhBuGAAqxS2dh6h76gjcFihIXIjG27mcnIpNmrg
-         NAlg==
-X-Forwarded-Encrypted: i=1; AHgh+RpMxzfbZdTEqGT7rTlReLyRVWsVtyx2NiSSAkcDhs0MxNV14UY5wUcuuLQNu/AMqpIq6ueeTKc=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwYa+79gmiUZApBzNaL9BmJvTcFdvN/vcJAYR+MPw5fRW308qTY
-	SJ3KL5d8rE45NK5PGReKyPekskgybiN3c+uggvMiT8SheQxrermyT9fypbYfcatwuZlPQKuOkRG
-	5lDZnFGhH9euWOcF6/7Y6xewXhuCOwVhRTevSl6Q28bmBANty7twTj6EPrw==
-X-Gm-Gg: AR+sD10+wB+a6tFcVUeNVSqIbvYIng6UitJhJon2fmHhIhx2DiZAiBm2zoQJGPvw1Zm
-	m1JAtVZVdM7NPJjjFj//y9A0OYmoJTSzdX3uOVGUZQoZi/boVJj0arq32WxW+hP9oo+2fIQjtZ4
-	tPKIPcmimi/eG0fJMx4UBVZABUCB7xuThoEJVqYikv+XZeUUbOMSX5c2nKTn3ejV2nSFW2ipTQe
-	TpZJ21UKf2eEdym7PqPKmZPdAmnnxJgiPeX3BEBcAzUTHa7fZ3/xw2rfhI+/3eMCt7NxvqMSzqH
-	hnl8SlGUH1kCnaNn82b/ea6JD/04n8qbvMjqFwcLkV8j7bGxuB6RJHPVe1n4YHWtwW7Un/zxvFe
-	26OlRDCuHpiOXjQ04Tp4t/PyQfytALvlJOdE=
-X-Received: by 2002:a05:600c:3b17:b0:495:5b02:23a8 with SMTP id 5b1f17b1804b1-496b570f00dmr76726185e9.34.1785072873459;
-        Sun, 26 Jul 2026 06:34:33 -0700 (PDT)
-X-Received: by 2002:a05:600c:3b17:b0:495:5b02:23a8 with SMTP id 5b1f17b1804b1-496b570f00dmr76725605e9.34.1785072872971;
-        Sun, 26 Jul 2026 06:34:32 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1785074223; x=1785679023;
+        h=content-transfer-encoding:content-type:in-reply-to:references
+         :reply-to:cc:to:from:content-language:subject:user-agent
+         :mime-version:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=LTDKPT3VQAV53tCUW7gPrXEyb5gqnxN4RZCXgIUNRUk=;
+        b=ntEChIaJK/zBLi5klbh5l0bqVD3w7Sjr5YqzW6giHcJM4RfQS9ovSJoYlacsLiR+6M
+         zzI9W3nOehijcyi5UPSt13RE2H6ce6zgi0R3qQ8glKQEjKUo7BiZ7D5mbzMB5MfmvRkQ
+         1cJWtU7kqDg1SYAXt7vxtjAfKlEKkm5f4/Mn6hwTefjenRaugFFehSw+GAebXJHd8sOC
+         CqUGxohoK0/Fl2AgLCiQpL0mPQZgRAL8XzAc2xCRE0brxjIokLTOsJ77FzwF4xya464m
+         NyxPxodc+Q1rbuhA6pHv4Fx3BzW5JUte1D0boQquW7m3J4CFWgLIaXo6YISOdnt2XVeb
+         dfZA==
+X-Forwarded-Encrypted: i=1; AHgh+Rqse39+uRAnw+hR/oUONu4MsF9N3qyj4+GpHSCshAz1t6qq6PSJQ6qhdh1huh0aQmvFEXX4+IM=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yzlw9qnVy7b9NZzuwI2tXuICAIjGrIacC2nMJ6VZewBFAA9/APF
+	F5J9ghIj12VuZY2mE5jj/Z9JMx0ckqNMXpt/8U1a3knPDSiDojq08NFiFg+ooDx3gc4lkfwUdym
+	v02ueDWhEKDreHGhahIuO+aUckmGkfb56iRMgaVgDAP4ZEvH3ui40MeOi4Q==
+X-Gm-Gg: AR+sD1391ygRKBLxT6JKxSjJu89opPGxzT0UAYIviUXsuMcPP/hEm6oLeO1ThQwaaUn
+	Zhrl/15YZ/875o5NIf6DfXiEewbtrPgA9yJ5RWojpNvDdFSmSnUGU30DLs8gXUjR3J58r8cmXdj
+	4QoceqOLLXvo8W7F8XmaAMSixi6jTQALByZu03hXX8VW4cQFWxscOQ/AoVF88ykCz4OEaH6XvJH
+	uZTXGScvZq1Iu6mS9FYSS/7ws3JYKqXIetCdWniHglS4Ek5oXT4H+SRMTWxqLIL8m7zEGyU4xbG
+	yvT+iNEvsPBlAcAvz45oGaRYODw7N6g/xzUpLeDwUlWxKavNzx/6vgwXGXhxsH9xolkAQeg0hBi
+	1XoZZPMyZFzuUPfYSLDpKSx8BRdxjVpzICMY=
+X-Received: by 2002:a05:600c:4704:b0:495:6022:5a23 with SMTP id 5b1f17b1804b1-496b5c92ebfmr63134595e9.19.1785074222586;
+        Sun, 26 Jul 2026 06:57:02 -0700 (PDT)
+X-Received: by 2002:a05:600c:4704:b0:495:6022:5a23 with SMTP id 5b1f17b1804b1-496b5c92ebfmr63134215e9.19.1785074222111;
+        Sun, 26 Jul 2026 06:57:02 -0700 (PDT)
 Received: from [192.168.3.191] (228.246.150.77.rev.sfr.net. [77.150.246.228])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47f85c531basm43542454f8f.19.2026.07.26.06.34.30
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-496b4858e28sm153279405e9.2.2026.07.26.06.56.58
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 26 Jul 2026 06:34:32 -0700 (PDT)
-Message-ID: <4f07607b-b21a-4a5c-8daa-6aec5e288353@redhat.com>
-Date: Sun, 26 Jul 2026 15:34:28 +0200
+        Sun, 26 Jul 2026 06:57:01 -0700 (PDT)
+Message-ID: <a842eeb4-801c-4d42-825e-b5ecf581da31@redhat.com>
+Date: Sun, 26 Jul 2026 15:56:57 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -75,10 +75,9 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v3 08/19] target/arm/kvm: Handle writeback for special
+ ID register fields
 From: Eric Auger <eric.auger@redhat.com>
-Subject: Re: [RFC PATCH v3 09/19] target/arm: Add named cpu model infra +
- graviton3 named model
-Reply-To: eric.auger@redhat.com
 To: Khushit Shah <khushit.shah@nutanix.com>, qemu-devel@nongnu.org,
  qemu-arm@nongnu.org, kvmarm@lists.linux.dev
 Cc: cohuck@redhat.com, peter.maydell@linaro.org,
@@ -88,498 +87,281 @@ Cc: cohuck@redhat.com, peter.maydell@linaro.org,
  armbru@redhat.com, philmd@linaro.org, yangjinqian1@huawei.com,
  shaju.abraham@nutanix.com, mark.caveayland@nutanix.com,
  prerna.saxena@nutanix.com
+Reply-To: eric.auger@redhat.com, eric.auger@redhat.com
 References: <20260716213858.609699-1-khushit.shah@nutanix.com>
- <20260716213858.609699-10-khushit.shah@nutanix.com>
-In-Reply-To: <20260716213858.609699-10-khushit.shah@nutanix.com>
+ <20260716213858.609699-9-khushit.shah@nutanix.com>
+ <9fe4814a-5479-4180-9a61-7d2d5d2fbb92@redhat.com>
+In-Reply-To: <9fe4814a-5479-4180-9a61-7d2d5d2fbb92@redhat.com>
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: kisuEbIFGn_D_l4Tmti57AwtZc6Iqcp0WMcSWaWOh7s_1785072874
+X-Mimecast-MFC-PROC-ID: pptGPxCXYOLS4Kjzm3aMms-4XxH_FZilefVOCHAVebE_1785074223
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Hi Khushit,
 
-On 7/16/26 11:38 PM, Khushit Shah wrote:
-> From: Shaju Abraham <shaju.abraham@nutanix.com>
->
-> Introduce a small named-CPU-model layer on top of the field-backed
-> property infrastructure. Each model is a flat table of (name, value)
-> overrides and a parent pointer. At instance-init, the parent chain is
-> walked root-first and every level's properties are applied via QOM,
-> so a child entry overrides its ancestors for the same name.
->
-> For example, the graviton3-v1 named model hierarchy is:
-> non-zero-defaults-v1    Known non-zero default ID regs field values
->   arm-v8_4-a-v1       ARMv8.4-A architectural mandate
->     neoverse-v1-v1    Neoverse V1
->       graviton3-v1    AWS Graviton3
->
-> non-zero-defaults-v1:
->    Field that should be populated with some non zero value by default.
-following which specification? This is not clear to me. Is that layer
-really meaningful? Shouldn't we start with the next one?
->
-> arm-v8_4-a-v1:
->   Only features mandated by the ARM ARM.
->
-> neoverse-v1-v1:
->   Reference manual derived feature values for the reference core.
->   Values differ from TRM values based on what was exposed to the guest
->   with -cpu host.
->
-> graviton3-v1:
->   SoC integration choices (crypto pin, cache hints, PAuth alg).
->
-> The model values are figured out from ID register dump visible to
-> QEMU with -cpu host on Graviton3 machine.
->
-> Model realization:
-> 1. Zero out ID regs array.
-> 2. Add all properties to the CPU Object
-> 3. arm_realize_model_chain: Walk the parent chain from root first and
->                             apply all the properties.
->
-> Co-authored-by: Shaju Abraham <shaju.abraham@nutanix.com>
-> Signed-off-by: Khushit Shah <khushit.shah@nutanix.com>
-> ---
->  hw/arm/virt.c               |   5 +
->  target/arm/arm-cpu-models.c | 336 ++++++++++++++++++++++++++++++++++++
->  target/arm/arm-cpu-models.h |  35 ++++
->  target/arm/meson.build      |   7 +-
->  4 files changed, 381 insertions(+), 2 deletions(-)
->  create mode 100644 target/arm/arm-cpu-models.c
->  create mode 100644 target/arm/arm-cpu-models.h
->
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index fe19030886..34e56dc1f1 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -3812,6 +3812,11 @@ static GPtrArray *virt_get_valid_cpu_types(const MachineState *ms)
->              g_ptr_array_add(vct, g_strdup(ARM_CPU_TYPE_NAME("host")));
->          }
->      }
-> +    if (kvm_enabled() && target_aarch64()) {
-> +        g_ptr_array_add(vct, g_strdup(ARM_CPU_TYPE_NAME("arm-v8_4-a-v1")));
-> +        g_ptr_array_add(vct, g_strdup(ARM_CPU_TYPE_NAME("neoverse-v1-v1")));
-> +        g_ptr_array_add(vct, g_strdup(ARM_CPU_TYPE_NAME("graviton3-v1")));
-> +    }
->      g_ptr_array_add(vct, g_strdup(ARM_CPU_TYPE_NAME("max"))); return vct; diff --git a/target/arm/arm-cpu-models.c
-> b/target/arm/arm-cpu-models.c new file mode 100644 index
-> 0000000000..747e0df010 --- /dev/null +++ b/target/arm/arm-cpu-models.c
-> @@ -0,0 +1,336 @@ +/* + * ARM named CPU model definitions. + * + *
-> Each model is defined as an array of MODEL_PROP macro, listing only +
-> * the properties that DIFFER from the parent model. + * + * At
-> realisation the parent chain is walked root-first and + * every
-> level's props are applied via QOM, so the leaf's values + * naturally
-> override its ancestors. + * + * Hierarchy: + * + *
-> non-zero-defaults-v1 Known non-zero default ID reg field values + *
-> arm-v8_4-a-v1 ARMv8.4-A architectural mandate + * neoverse-v1-v1
-> Neoverse V1 (TRM 102649) + * graviton3-v1 AWS Graviton3 + * + *
-> SPDX-License-Identifier: GPL-2.0-or-later + */ + +#include "qemu/osdep.h"
-> +#include "qapi/error.h"
-> +#include "qemu/error-report.h"
-> +#include "system/kvm.h"
-> +#include "cpu.h"
-> +#include "internals.h"
-> +#include "kvm_arm.h"
-> +#include "arm-cpu-models.h"
-> +#include "cpu-idregs.h"
-> +
-> +#define MODEL_PROP_FIELD_STR  str
-> +#define MODEL_PROP_FIELD_BOOL b
-> +#define MODEL_PROP_FIELD_NUM  num
-> +
-> +#define MODEL_PROP(_name, _type, _value) \
-> +    { .name = (_name), .type = ARM_MODEL_PROP_##_type, \
-> +      .u.MODEL_PROP_FIELD_##_type = (_value) }
-> +
-> +#define MODEL_PROP_END  { .name = NULL }
 
-Regarding settings somehow we end up with something that is quite
-similar to TCG CPU
-definitions like in
-aarch64_neoverse_n1_initfn(). To me this is in general more readable
-because we use name fields instead of putting the full reg value.
-This does not prevent us from adding comments along settings to make
-this more readable and explicit.
-> +
-> +/*
-> + * These fields should be populated with some non-zero default values.
-> + */
-> +static const ArmModelPropValue non_zero_defaults_v1_props[] = {
-> +    /* ID_AA64PFR0_EL1 */
-> +    MODEL_PROP("SYSREG_ID_AA64PFR0_EL1_EL0", NUM, 0b0001),
-> +    MODEL_PROP("SYSREG_ID_AA64PFR0_EL1_EL1", NUM, 0b0001),
-> +    MODEL_PROP("SYSREG_ID_AA64PFR0_EL1_FP", NUM, 0b1111),
-> +    MODEL_PROP("SYSREG_ID_AA64PFR0_EL1_AdvSIMD", NUM, 0b1111),
-> +
-> +    /* ID_AA64PFR1_EL1 */
-> +    MODEL_PROP("SYSREG_ID_AA64PFR1_EL1_MTE_frac", NUM, 0b1111),
-so I still believe we want a wrapper that transparently either sets a
-prop if the field happens to be writable or simply performs checks
-against the host if the prop is not available.
-> +
-> +    /* ID_AA64MMFR0_EL1 */
-> +    MODEL_PROP("SYSREG_ID_AA64MMFR0_EL1_TGran64", NUM, 0b1111),
-> +    MODEL_PROP("SYSREG_ID_AA64MMFR0_EL1_TGran4", NUM, 0b1111),
-> +    MODEL_PROP("SYSREG_ID_AA64MMFR0_EL1_TGran16_2", NUM, 0b0001),
-> +    MODEL_PROP("SYSREG_ID_AA64MMFR0_EL1_TGran64_2", NUM, 0b0001),
-> +    MODEL_PROP("SYSREG_ID_AA64MMFR0_EL1_TGran4_2", NUM, 0b0001),
-> +
-> +    /* ID_AA64DFR0_EL1 */
-> +    MODEL_PROP("SYSREG_ID_AA64DFR0_EL1_DebugVer", NUM, 0x6),
-> +    MODEL_PROP("SYSREG_ID_AA64DFR0_EL1_DoubleLock", NUM, 0b1111),
-> +
-> +    /* CTR_EL0 */
-> +    MODEL_PROP("SYSREG_CTR_EL0_L1Ip", NUM, 0b10),
-> +    MODEL_PROP("SYSREG_CTR_EL0_RES1_31", NUM, 1),
-> +
-> +    /* ID_AA64MMFR4_EL1 */
-> +    MODEL_PROP("SYSREG_ID_AA64MMFR4_EL1_E2H0", NUM, 0b1111),
-> +
-> +    MODEL_PROP_END,
-> +};
-
-To ease the review I would suggest to put a dump of all id regs of a
-leaf model in the commit description. It is less error prone that
-understanding the various overrides.
-I would suggest to have separate patches for each model too.
-
-So you said a leaf model shall have explicit values for each field,
-including non writable ones. The code does not check that. How do we
-make sure we are not missing settings?
-
-> +
-> +static const ArmModelPropValue armv8_4_a_v1_props[] = {
-> +    MODEL_PROP("SYSREG_ID_AA64ISAR0_EL1_CRC32", NUM, 1),
-> +    MODEL_PROP("SYSREG_ID_AA64ISAR0_EL1_Atomic", NUM, 2),
-> +    MODEL_PROP("SYSREG_ID_AA64MMFR1_EL1_HPDS", NUM, 1),
-> +    MODEL_PROP("SYSREG_ID_AA64MMFR1_EL1_LO", NUM, 1),
-> +
-> +    MODEL_PROP("SYSREG_ID_AA64ISAR1_EL1_DPB", NUM, 1),
-> +
-> +    MODEL_PROP("SYSREG_ID_AA64PFR0_EL1_RAS", NUM, 1),
-> +    MODEL_PROP("SYSREG_ID_AA64PFR1_EL1_RAS_frac", NUM, 0),
-> +
-> +    MODEL_PROP("SYSREG_ID_AA64MMFR1_EL1_PAN", NUM, 2),
-> +    MODEL_PROP("SYSREG_ID_AA64MMFR2_EL1_UAO", NUM, 1),
-> +    MODEL_PROP("SYSREG_ID_AA64MMFR2_EL1_CnP", NUM, 1),
-> +    MODEL_PROP("SYSREG_ID_AA64MMFR2_EL1_IESB", NUM, 1),
-> +
-> +    MODEL_PROP("SYSREG_ID_AA64PFR0_EL1_DIT", NUM, 1),
-> +    MODEL_PROP("SYSREG_ID_AA64DFR0_EL1_DebugVer", NUM, 9),
-> +    MODEL_PROP("SYSREG_ID_AA64DFR0_EL1_PMUVer", NUM, 5),
-> +    MODEL_PROP("SYSREG_ID_AA64ISAR0_EL1_TS", NUM, 1),
-> +    MODEL_PROP("SYSREG_ID_AA64ISAR1_EL1_LRCPC", NUM, 2),
-> +    MODEL_PROP("SYSREG_ID_AA64MMFR2_EL1_AT", NUM, 1),
-> +    MODEL_PROP("SYSREG_ID_AA64MMFR2_EL1_IDS", NUM, 1),
-> +    /* KVM zeroes out these field when MTE is not enabled. */
-> +    MODEL_PROP("SYSREG_ID_AA64PFR1_EL1_MTE_frac", NUM, 0),
-> +    MODEL_PROP_END,
-> +};
-> +
-> +static const ArmModelPropValue neoverse_v1_v1_props[] = {
-> +    MODEL_PROP("SYSREG_MIDR_EL1_Implementer", NUM, 0x41),
-> +    MODEL_PROP("SYSREG_MIDR_EL1_Variant", NUM, 0x1),
-> +    MODEL_PROP("SYSREG_MIDR_EL1_Architecture", NUM, 0xF),
-> +    MODEL_PROP("SYSREG_MIDR_EL1_PartNum", NUM, 0xD40),
-> +    MODEL_PROP("SYSREG_MIDR_EL1_Revision", NUM, 0x1),
-> +
-> +    MODEL_PROP("SYSREG_ID_AA64DFR0_EL1_BRPs", NUM, 0x5),
-> +    MODEL_PROP("SYSREG_ID_AA64DFR0_EL1_WRPs", NUM, 0x3),
-> +    MODEL_PROP("SYSREG_ID_AA64DFR0_EL1_CTX_CMPs", NUM, 0x1),
-> +    MODEL_PROP("SYSREG_ID_AA64DFR0_EL1_DoubleLock", NUM, 0xF),
-> +
-> +    MODEL_PROP("SYSREG_ID_AA64ISAR0_EL1_RDM", NUM, 1),
-> +    MODEL_PROP("SYSREG_ID_AA64ISAR0_EL1_DP", NUM, 1),
-> +    MODEL_PROP("SYSREG_ID_AA64ISAR0_EL1_FHM", NUM, 1),
-> +
-> +    MODEL_PROP("SYSREG_ID_AA64ISAR1_EL1_DPB", NUM, 2),
-> +    MODEL_PROP("SYSREG_ID_AA64ISAR1_EL1_JSCVT", NUM, 1),
-> +    MODEL_PROP("SYSREG_ID_AA64ISAR1_EL1_FCMA", NUM, 1),
-> +    MODEL_PROP("SYSREG_ID_AA64ISAR1_EL1_BF16", NUM, 1),
-> +    MODEL_PROP("SYSREG_ID_AA64ISAR1_EL1_DGH", NUM, 1),
-> +    MODEL_PROP("SYSREG_ID_AA64ISAR1_EL1_I8MM", NUM, 1),
-> +
-> +    MODEL_PROP("SYSREG_ID_AA64PFR0_EL1_FP", NUM, 1),
-> +    MODEL_PROP("SYSREG_ID_AA64PFR0_EL1_AdvSIMD", NUM, 1),
-> +
-> +    MODEL_PROP("SYSREG_ID_AA64PFR0_EL1_RAS", NUM, 2),
-> +    MODEL_PROP("SYSREG_ID_AA64PFR1_EL1_RAS_frac", NUM, 0),
-> +
-> +    MODEL_PROP("SYSREG_ID_AA64PFR0_EL1_CSV2", NUM, 1),
-> +    MODEL_PROP("SYSREG_ID_AA64PFR1_EL1_CSV2_frac", NUM, 0),
-> +
-> +    MODEL_PROP("SYSREG_ID_AA64PFR0_EL1_CSV3", NUM, 1),
-> +
-> +    MODEL_PROP("SYSREG_ID_AA64PFR1_EL1_SSBS", NUM, 2),
-> +
-> +    MODEL_PROP("SYSREG_ID_AA64MMFR0_EL1_PARange", NUM, 5),
-> +    MODEL_PROP("SYSREG_ID_AA64MMFR0_EL1_ASIDBits", NUM, 2),
-> +    MODEL_PROP("SYSREG_ID_AA64MMFR0_EL1_BigEnd", NUM, 1),
-> +    MODEL_PROP("SYSREG_ID_AA64MMFR0_EL1_SNSMem", NUM, 1),
-> +    MODEL_PROP("SYSREG_ID_AA64MMFR0_EL1_TGran4", NUM, 0),
-> +    MODEL_PROP("SYSREG_ID_AA64MMFR0_EL1_TGran16", NUM, 1),
-> +    MODEL_PROP("SYSREG_ID_AA64MMFR0_EL1_TGran64", NUM, 0),
-> +    MODEL_PROP("SYSREG_ID_AA64MMFR0_EL1_TGran4_2", NUM, 0),
-> +    MODEL_PROP("SYSREG_ID_AA64MMFR0_EL1_TGran16_2", NUM, 0),
-> +    MODEL_PROP("SYSREG_ID_AA64MMFR0_EL1_TGran64_2", NUM, 0),
-> +    MODEL_PROP("SYSREG_ID_AA64MMFR1_EL1_HAFDBS", NUM, 2),
-> +    MODEL_PROP("SYSREG_ID_AA64MMFR1_EL1_VMIDBits", NUM, 2),
-> +    MODEL_PROP("SYSREG_ID_AA64MMFR1_EL1_VH", NUM, 1),
-> +    MODEL_PROP("SYSREG_ID_AA64MMFR1_EL1_HPDS", NUM, 2),
-> +    MODEL_PROP("SYSREG_ID_AA64MMFR1_EL1_XNX", NUM, 1),
-> +    MODEL_PROP("SYSREG_ID_AA64MMFR1_EL1_SpecSEI", NUM, 0),
-> +
-> +    MODEL_PROP("SYSREG_ID_AA64MMFR2_EL1_FWB", NUM, 1),
-> +    MODEL_PROP("SYSREG_ID_AA64MMFR2_EL1_BBM", NUM, 2),
-> +    MODEL_PROP("SYSREG_ID_AA64MMFR2_EL1_EVT", NUM, 2),
-> +
-> +    MODEL_PROP("SYSREG_ID_AA64MMFR4_EL1_E2H0", NUM, 0),
-> +
-> +    MODEL_PROP("SYSREG_CTR_EL0_IminLine", NUM, 4),
-> +    MODEL_PROP("SYSREG_CTR_EL0_L1Ip", NUM, 3),
-> +    MODEL_PROP("SYSREG_CTR_EL0_DminLine", NUM, 4),
-> +    MODEL_PROP("SYSREG_CTR_EL0_ERG", NUM, 4),
-> +    MODEL_PROP("SYSREG_CTR_EL0_CWG", NUM, 4),
-> +
-> +    MODEL_PROP("SYSREG_DCZID_EL0_BS", NUM, 0x4),
-> +
-> +    /* pauth */
-> +    MODEL_PROP("SYSREG_ID_AA64ISAR1_EL1_APA", NUM, 3),
-> +    MODEL_PROP("SYSREG_ID_AA64ISAR1_EL1_GPA", NUM, 1),
-> +
-> +    /* sve */
-> +    MODEL_PROP("SYSREG_ID_AA64PFR0_EL1_SVE", NUM, 1),
-> +    MODEL_PROP("SYSREG_ID_AA64ZFR0_EL1_BF16", NUM, 1),
-> +    MODEL_PROP("SYSREG_ID_AA64ZFR0_EL1_I8MM", NUM, 1),
-> +    MODEL_PROP("sve128", BOOL, true),
-> +
-> +    MODEL_PROP_END,
-> +};
-> +
-> +static const ArmModelPropValue graviton3_v1_props[] = {
-> +    MODEL_PROP("SYSREG_ID_AA64ISAR0_EL1_AES", NUM, 2),
-> +    MODEL_PROP("SYSREG_ID_AA64ISAR0_EL1_SHA1", NUM, 1),
-> +    MODEL_PROP("SYSREG_ID_AA64ISAR0_EL1_SHA2", NUM, 2),
-> +    MODEL_PROP("SYSREG_ID_AA64ISAR0_EL1_SHA3", NUM, 1),
-> +    MODEL_PROP("SYSREG_ID_AA64ISAR0_EL1_SM3", NUM, 1),
-> +    MODEL_PROP("SYSREG_ID_AA64ISAR0_EL1_SM4", NUM, 1),
-> +    MODEL_PROP("SYSREG_ID_AA64ISAR0_EL1_RNDR", NUM, 1),
-> +
-> +    MODEL_PROP("SYSREG_CTR_EL0_IDC", NUM, 1),
-> +    MODEL_PROP("SYSREG_CTR_EL0_DIC", NUM, 1),
-> +
-> +    MODEL_PROP("SYSREG_REVIDR_EL1_VAL", NUM, 1),
-> +
-> +    MODEL_PROP_END,
-> +};
-> +
-> +static const ArmNamedCpuModel arm_cpu_models[] = {
-> +    {
-> +        .name   = "non-zero-defaults-v1",
-> +        .parent = NULL,
-> +        .props  = non_zero_defaults_v1_props,
-> +    },
-> +    {
-> +        .name   = "arm-v8_4-a-v1",
-> +        .parent = "non-zero-defaults-v1",
-> +        .props  = armv8_4_a_v1_props,
-> +    },
-> +    {
-> +        .name   = "neoverse-v1-v1",
-> +        .parent = "arm-v8_4-a-v1",
-> +        .props  = neoverse_v1_v1_props,
-> +    },
-> +    {
-> +        .name   = "graviton3-v1",
-> +        .parent = "neoverse-v1-v1",
-> +        .props  = graviton3_v1_props,
-> +    },
-> +};
-> +
-> +static ARMCPUInfo arm_named_cpu_infos[ARRAY_SIZE(arm_cpu_models)];
-> +const ArmNamedCpuModel *arm_find_model(const char *name)
-> +{
-> +    size_t i;
-> +    for (i = 0; i < ARRAY_SIZE(arm_cpu_models); i++) {
-> +        if (g_str_equal(arm_cpu_models[i].name, name)) {
-> +            return &arm_cpu_models[i];
-> +        }
-> +    }
-> +    return NULL;
-> +}
-> +
-> +static void arm_apply_model_props(Object *obj, const ArmModelPropValue *props,
-> +                                  Error **errp)
-> +{
-> +    const ArmModelPropValue *pv;
-> +    ERRP_GUARD();
-> +
-> +    for (pv = props; pv->name; pv++) {
-> +        switch (pv->type) {
-> +        case ARM_MODEL_PROP_BOOL:
-> +            object_property_set_bool(obj, pv->name, pv->u.b, errp);
-> +            break;
-> +        case ARM_MODEL_PROP_NUM:
-> +            object_property_set_uint(obj, pv->name, pv->u.num, errp);
-> +            break;
-> +        default:
-> +            g_assert_not_reached();
-> +        }
-> +        if (*errp) {
-> +            error_prepend(errp, "property '%s': ", pv->name);
-> +            return;
-> +        }
-> +    }
-> +}
-> +
-> +static void arm_realize_model_chain(Object *obj, const ArmNamedCpuModel *model,
-> +                                    Error **errp)
-> +{
-> +    const ArmNamedCpuModel *cur, *parent;
-> +    const ArmNamedCpuModel *chain[ARRAY_SIZE(arm_cpu_models)];
-> +    size_t depth = 0;
-> +    for (cur = model; cur; ) {
-> +        if (depth >= ARRAY_SIZE(chain)) {
-> +            error_setg(errp, "model '%s': parent chain too deep "
-> +                       "(possible cycle)", model->name);
-> +            return;
-> +        }
-> +        chain[depth++] = cur;
-> +
-> +        if (!cur->parent) {
-> +            break;
-> +        }
-> +        parent = arm_find_model(cur->parent);
-> +        if (!parent) {
-> +            error_setg(errp, "model '%s': unknown parent '%s'",
-> +                       cur->name, cur->parent);
-> +            return;
-> +        }
-> +        cur = parent;
-> +    }
-> +
-> +    while (depth--) {
-> +        arm_apply_model_props(obj, chain[depth]->props, errp);
-> +        if (*errp) {
-> +            return;
-> +        }
-> +    }
-> +}
-> +
-> +static void arm_named_cpu_initfn(Object *obj)
-> +{
-> +    ARMCPU *cpu = ARM_CPU(obj);
-> +    ARMCPUClass *acc = ARM_CPU_GET_CLASS(obj);
-> +    const ArmNamedCpuModel *model = arm_find_model(acc->info->name);
-> +    if (!model) {
-> +        error_report("'%s' CPU model entry not found)",
-> +                     acc->info->name);
-> +        return;
-> +    }
-> +
-> +    if (!kvm_enabled()) {
-> +        error_report("'%s' CPU model requires KVM (-accel kvm)",
-> +                     acc->info->name);
-> +        return;
-> +    }
-> +
-> +    kvm_arm_set_cpu_features_from_host(cpu);
-> +    if (!arm_feature(&cpu->env, ARM_FEATURE_AARCH64)) {
-> +        return;
-> +    }
-> +
-> +    /* 1. Reset ID regs to 0 */
-> +    memset(cpu->isar.idregs, 0, sizeof(cpu->isar.idregs));
-> +
-> +    /* 2. Add sveNNNN and SYSREG_ properties */
-> +    aarch64_add_sve_properties(obj);
-> +    aarch64_add_idregs_properties(obj);
-> +
-> +    /* 3. Realize the model chain. */
-> +    arm_realize_model_chain(obj, model, &error_abort);
-> +}
-> +
-> +void arm_register_named_cpu_models(void)
-> +{
-> +    size_t i;
-> +    for (i = 0; i < ARRAY_SIZE(arm_cpu_models); i++) {
-> +        arm_named_cpu_infos[i].name = arm_cpu_models[i].name;
-> +        arm_named_cpu_infos[i].initfn = arm_named_cpu_initfn;
-> +        arm_cpu_register(&arm_named_cpu_infos[i]);
-> +    }
-> +}
-> +
-> +type_init(arm_register_named_cpu_models)
-> diff --git a/target/arm/arm-cpu-models.h b/target/arm/arm-cpu-models.h
-> new file mode 100644
-> index 0000000000..ac4e510499
-> --- /dev/null
-> +++ b/target/arm/arm-cpu-models.h
-> @@ -0,0 +1,35 @@
-> +/* SPDX-License-Identifier: GPL-2.0-or-later */
-> +/*
-> + * ARM named CPU model definitions - public API.
-> + */
-> +#ifndef ARM_CPU_MODELS_H
-> +#define ARM_CPU_MODELS_H
-> +
-> +#include "qapi/error.h"
-> +#include "qom/object.h"
-> +
-> +typedef enum ArmModelPropType {
-> +    ARM_MODEL_PROP_BOOL,
-> +    ARM_MODEL_PROP_NUM,
-> +} ArmModelPropType;
-> +
-> +typedef struct ArmModelPropValue {
-> +    const char     *name;
-> +    ArmModelPropType type;
-> +    union {
-> +        bool            b;
-> +        uint64_t        num;
-> +    } u;
-> +} ArmModelPropValue;
-> +
-> +typedef struct ArmNamedCpuModel {
-> +    const char              *name;
-> +    const char              *parent;
-> +    const ArmModelPropValue *props;
-> +} ArmNamedCpuModel;
-> +
-> +void arm_register_named_cpu_models(void);
-> +
-> +const ArmNamedCpuModel *arm_find_model(const char *name);
-> +
-> +#endif /* ARM_CPU_MODELS_H */
-> diff --git a/target/arm/meson.build b/target/arm/meson.build
-> index 64d1ec63ab..72eed1bcc6 100644
-> --- a/target/arm/meson.build
-> +++ b/target/arm/meson.build
-> @@ -10,7 +10,7 @@ arm_user_ss.add(files('gdbstub.c'))
->  
->  arm_ss.add(when: 'TARGET_AARCH64', if_true: files(
->    'cpu64.c',
-> -  'gdbstub64.c'
-> +  'gdbstub64.c',
->  ))
->  
->  arm_common_ss.add(files(
-> @@ -21,7 +21,10 @@ arm_common_system_ss.add(files(
->    'arm-qmp-cmds.c',
->    'cpu-idregs.c',
->  ))
-> -arm_system_ss.add(when: 'CONFIG_KVM', if_true: files('hyp_gdbstub.c', 'kvm.c'))
-> +arm_system_ss.add(when: 'TARGET_AARCH64', if_true: files('arm-cpu-models.c'))
-> +arm_system_ss.add(when: 'CONFIG_KVM',
-> +                  if_true: files('hyp_gdbstub.c',
-> +                                 'kvm.c'))
->  arm_system_ss.add(when: 'CONFIG_HVF', if_true: files('hyp_gdbstub.c'))
->  
->  arm_user_ss.add(files('cpu.c'))
-Thanks
+On 7/22/26 2:05 PM, Eric Auger wrote:
+> Hi Khushit,
+> On 7/16/26 11:38 PM, Khushit Shah wrote:
+>> Some fields should not be written back to KVM for various reasons:
+>>  - ID_AA64PFR0_EL1.GIC / ID_PFR1_EL1.GIC are fabricated by KVM based on
+>>    the gic-version property.
+> so this is part of the overall handling of legacy composite options
+> versus sysreg settings. To be the fact they both are consistent should
+> be enforced upfront.
+>>  - KVM does not allow writing 0 to ID_DFR0_EL1.CopDbg, which breaks
+>>    booting an AArch64-only guest on a host that also supports AArch32.
+>>  - ID_DFR0_EL1.PerfMon is populated by KVM even for AArch64-only guests
+>>    but is not writable there.
+>>  - MPIDR_EL1 is managed by KVM based on vCPU index.
+>>  - Hold off writing back CLIDR_EL1 until we properly support exposing
+>>    cache topology to a KVM guest.
+> Sounds this deserves a prerequisite fix. I also have this hack in my
+> series but this should be dealt with separately I think.
+>>
+>> Some registers such as DCZID_EL0 are not exposed through the KVM cpreg
+>> list at all, but guest still sees the host value, we verify that vCPU's
+>> ID regs values match the host value.
+> why isn't it cpreg then? Shouldn't we add it instead?
+>>
+>> To do this, refactor kvm_arm_writable_idregs_to_cpreg_list to
+>> kvm_arm_write_idregs_to_cpregs_list, which operates per field and now
+>> returns an error if a non-writable field mismatches with the host value.
+>>
+>> Signed-off-by: Khushit Shah <khushit.shah@nutanix.com>
+>> ---
+>>  target/arm/cpu-idregs.c |  19 +++++++
+>>  target/arm/cpu-idregs.h |   4 ++
+>>  target/arm/kvm.c        | 116 ++++++++++++++++++++++++++++++++++------
+>>  target/arm/trace-events |   2 +-
+>>  4 files changed, 125 insertions(+), 16 deletions(-)
+>>
+>> diff --git a/target/arm/cpu-idregs.c b/target/arm/cpu-idregs.c
+>> index c41d0ab0c4..6fa02af0f3 100644
+>> --- a/target/arm/cpu-idregs.c
+>> +++ b/target/arm/cpu-idregs.c
+>> @@ -7,6 +7,7 @@
+>>   *  SPDX-License-Identifier: GPL-2.0-or-later
+>>   */
+>>  #include "qemu/osdep.h"
+>> +#include "qemu/bitops.h"
+>>  #include "qemu/error-report.h"
+>>  #include "qapi/error.h"
+>>  #include "cpu.h"
+>> @@ -94,3 +95,21 @@ ARM64SysReg arm64_id_regs[NUM_ID_IDX] = {
+>>  #include "cpu-idregs.h.inc"
+>>  };
+>>  
+>> +uint64_t arm_get_field_mask(const ARM64SysRegField *field)
+>> +{
+>> +    return MAKE_64BIT_MASK(field->shift, field->length);
+>> +}
+>> +
+>> +bool arm_field_is_writable(const ARM64SysRegField *field)
+>> +{
+>> +    uint64_t field_mask = arm_get_field_mask(field);
+>> +
+>> +    return (arm64_id_regs[field->index].writable_mask & field_mask)
+>> +           == field_mask;
+>> +}
+>> +
+>> +bool field_matches(const ARM64SysRegField *field, ARMIDRegisterIdx index,
+>> +                   const char *name)
+>> +{
+>> +    return field->index == index && !strcmp(field->name, name);
+> why do you need to check both index and name. Only checking index should
+> be sufficient.
+forget this, index refers to the reg while name corresponds to the field
+name. Thought name was the prop name ...
 
 Eric
+
+
+>> +}
+>> diff --git a/target/arm/cpu-idregs.h b/target/arm/cpu-idregs.h
+>> index 245f1c8103..d866bd9e0a 100644
+>> --- a/target/arm/cpu-idregs.h
+>> +++ b/target/arm/cpu-idregs.h
+>> @@ -38,4 +38,8 @@ typedef struct ARM64SysReg {
+>>   */
+>>  extern ARM64SysReg arm64_id_regs[NUM_ID_IDX];
+>>  
+>> +uint64_t arm_get_field_mask(const ARM64SysRegField *field);
+>> +bool arm_field_is_writable(const ARM64SysRegField *field);
+>> +bool field_matches(const ARM64SysRegField *field, ARMIDRegisterIdx index,
+>> +                   const char *name);
+>>  #endif
+>> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+>> index 6974e5c551..c38b99cfce 100644
+>> --- a/target/arm/kvm.c
+>> +++ b/target/arm/kvm.c
+>> @@ -951,6 +951,16 @@ static uint64_t *kvm_arm_get_cpreg_ptr(ARMCPU *cpu, uint64_t regidx)
+>>      return &cpu->cpreg_values[res - cpu->cpreg_indexes];
+>>  }
+>>  
+>> +/* Like kvm_arm_get_cpreg_ptr, but returns NULL if the register is not found. */
+>> +static uint64_t *kvm_arm_find_cpreg_ptr(ARMCPU *cpu, uint64_t regidx)
+>> +{
+>> +    uint64_t *res;
+>> +    res = bsearch(&regidx, cpu->cpreg_indexes, cpu->cpreg_array_len,
+>> +                  sizeof(uint64_t), compare_u64);
+>> +
+>> +    return res ? &cpu->cpreg_values[res - cpu->cpreg_indexes] : NULL;
+>> +}
+>> +
+>>  /**
+>>   * kvm_arm_reg_syncs_via_cpreg_list:
+>>   * @regidx: KVM register index
+>> @@ -1252,32 +1262,105 @@ bool kvm_arm_cpu_post_load(ARMCPU *cpu)
+>>      return true;
+>>  }
+>>  
+>> +static bool arm_field_skip_writeback_always(const ARM64SysRegField *field)
+>> +{
+>> +    /*
+>> +     * GIC is controlled by the gic-version property and fabricated by KVM
+>> +     * when the vGIC device is created, so a named CPU model must not touch
+>> +     * it. KVM also rejects writing 0 to ID_DFR0_EL1.CopDbg, which breaks
+>> +     * booting a model that lacks AArch32 support on a host that supports
+>> +     * it. MPIDR_EL1 is managed by KVM based on number of vCPUs, skip
+>> +     * writing it back. Similarly, skip writing back CLIDR_EL1 till we
+>> +     * properly support exposing cache for KVM guest.
+>> +     */
+>> +    return field_matches(field, ID_AA64PFR0_EL1_IDX, "GIC")
+>> +        || field_matches(field, ID_PFR1_EL1_IDX, "GIC")
+>> +        || field_matches(field, ID_DFR0_EL1_IDX, "CopDbg")
+>> +        || field->index == MPIDR_EL1_IDX
+>> +        || field->index == CLIDR_EL1_IDX;
+>> +}
+>> +
+>> +static bool arm_field_skip_writeback_if_not_writable(const ARM64SysRegField *field)
+>> +{
+>> +    /*
+>> +     * KVM populates ID_DFR0_EL1.PerfMon even for AArch64-only guests but
+>> +     * does not expose it as writable there, so skip it when it is not
+>> +     * writable.
+>> +     */
+>> +    return field_matches(field, ID_DFR0_EL1_IDX, "PerfMon");
+>> +}
+>> +
+>>  /*
+>> - * Copy writable ID regs from isar.idregs[] to cpreg_list
+>> - * in case their value differs from the original init cpreg value
+>> + * Copy writable ID reg fields from isar.idregs[] into the KVM cpreg list,
+>> + * so the subsequent write_list_to_kvmstate() pushes them to KVM.
+>> + * Only writable fields are copied; fields that must not be written back
+>> + * (see arm_field_skip_writeback_*) are skipped.
+>> + * Returns -1 if any vCPU's ID reg value differs from the host value and the
+>> + * field is not writable.
+>>   */
+>> -static void kvm_arm_writable_idregs_to_cpreg_list(ARMCPU *cpu)
+>> +static int kvm_arm_write_idregs_to_cpreg_list(ARMCPU *cpu)
+>>  {
+>>      for (int i = 0; i < NUM_ID_IDX; i++) {
+>>          ARM64SysReg *sysregdesc = &arm64_id_regs[i];
+>>          ARMSysRegs sysreg = id_register_sysreg[i];
+>> -        uint64_t previous, new;
+>> +        uint64_t writable_mask = sysregdesc->writable_mask;
+>> +        uint64_t desired = cpu->isar.idregs[i];
+>> +        uint64_t previous, updated;
+>>          uint64_t *cpreg;
+>>  
+>> -        if (!sysregdesc->writable_mask) {
+>> +        cpreg = kvm_arm_find_cpreg_ptr(cpu, idregs_sysreg_to_kvm_reg(sysreg));
+>> +        /*
+>> +         * Registers such as DCZID_EL0 are not exposed through the cpreg
+>> +         * list and are therefore not writable. Use the host value
+>> +         * snapshotted at probe time as the reference to check the vCPU ID
+>> +         * regs have the same value.
+>> +         */
+>> +        previous = cpreg ? *cpreg : arm_host_cpu_features.isar.idregs[i];
+>> +
+>> +        if (previous == desired) {
+>>              continue;
+>>          }
+> while at it you could also test all reserved fields here, RAZ, RES0/1
+> and make sure host value complies with the description.
+>>  
+>> -        cpreg = kvm_arm_get_cpreg_ptr(cpu, idregs_sysreg_to_kvm_reg(sysreg));
+>> -        previous = *cpreg;
+>> -        new = cpu->isar.idregs[i];
+>> +        for (int j = 0; j < sysregdesc->fields_count; j++) {
+>> +            const ARM64SysRegField *field = &sysregdesc->fields[j];
+>> +            uint64_t field_mask = arm_get_field_mask(field);
+>> +            uint64_t prev_val = previous & field_mask;
+>> +            uint64_t new_val = desired & field_mask;
+>> +
+>> +            if (prev_val == new_val) {
+>> +                continue;
+>> +            }
+>> +
+>> +            if (arm_field_skip_writeback_always(field) ||
+>> +                (!arm_field_is_writable(field) &&
+>> +                 arm_field_skip_writeback_if_not_writable(field))) {
+>> +                /* Never write this field back; keep KVM's value. */
+>> +                writable_mask &= ~field_mask;
+>> +                continue;
+>> +            }
+>> +
+>> +            if (!arm_field_is_writable(field)) {
+>> +                error_report("%s.%s is not writable: host=0x%" PRIx64
+>> +                             ", requested=0x%" PRIx64,
+>> +                             sysregdesc->name, field->name,
+>> +                             prev_val >> field->shift, new_val >> field->shift);
+>> +                return -1;
+>> +            }
+>> +        }
+>> +
+>> +        if (!cpreg || !writable_mask) {
+>> +            continue;
+>> +        }
+>>  
+>> -        if (previous != new) {
+>> -            *cpreg = new;
+>> -            trace_kvm_arm_writable_idregs_to_cpreg_list(sysregdesc->name,
+>> -                                                        previous, new);
+>> -         }
+>> +        updated = (previous & ~writable_mask) | (desired & writable_mask);
+>> +        if (updated != previous) {
+>> +            *cpreg = updated;
+>> +            trace_kvm_arm_write_idregs_to_cpreg_list(sysregdesc->name,
+>> +                                                        previous, updated);
+>> +        }
+>>      }
+>> +
+>> +    return 0;
+>>  }
+>>  
+>>  void kvm_arm_reset_vcpu(ARMCPU *cpu)
+>> @@ -2235,8 +2318,11 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>>      if (ret) {
+>>          return ret;
+>>      }
+>> -    /* overwrite writable ID regs with their updated property values */
+>> -    kvm_arm_writable_idregs_to_cpreg_list(cpu);
+>> +    /* overwrite ID reg fields with their updated property values */
+>> +    ret = kvm_arm_write_idregs_to_cpreg_list(cpu);
+>> +    if (ret) {
+>> +        return ret;
+>> +    }
+>>      ret = write_list_to_kvmstate(cpu, KVM_PUT_FULL_STATE);
+>>      if (!ret) {
+>>          return -1;
+>> diff --git a/target/arm/trace-events b/target/arm/trace-events
+>> index f33b0d821d..f042ab59b8 100644
+>> --- a/target/arm/trace-events
+>> +++ b/target/arm/trace-events
+>> @@ -14,7 +14,7 @@ arm_gt_update_irq(int timer, int irqstate) "gt_update_irq: timer %d irqstate %d"
+>>  # kvm.c
+>>  kvm_arm_fixup_msi_route(uint64_t iova, uint64_t gpa) "MSI iova = 0x%"PRIx64" is translated into 0x%"PRIx64
+>>  get_host_cpu_idregs(const char *name, uint64_t value) "scratch vcpu host value for %s is 0x%"PRIx64
+>> -kvm_arm_writable_idregs_to_cpreg_list(const char *name, uint64_t previous, uint64_t new) "%s overwrite default 0x%"PRIx64" with 0x%"PRIx64
+>> +kvm_arm_write_idregs_to_cpreg_list(const char *name, uint64_t previous, uint64_t new) "%s overwrite default 0x%"PRIx64" with 0x%"PRIx64
+>>  
+>>  # cpu64.c
+>>  get_sysreg_prop(const char *name, uint64_t value) "%s 0x%"PRIx64
+> Thanks
+> 
+> Eric
 
