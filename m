@@ -1,73 +1,73 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D0A11F419A
-	for <kvmarm@lists.linux.dev>; Sun, 26 Jul 2026 13:14:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 398C02D0C62
+	for <kvmarm@lists.linux.dev>; Sun, 26 Jul 2026 13:34:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785071692; cv=none; b=PfHI8BFZkAOdTJcgbnhiYubTASzLvyBfyR4brekqrn3BF3Pb3dZoas+IxcMqcmQNzeP9Rej1847IFZMHN5V4qHmlDrihG1fNKYX0XV0NrjfRShC3KbdG3f+V3U9lF+2jMBtUCucr5O8TNEA9WA3ZkMJ2/yots/k2sCxD8phSP4M=
+	t=1785072879; cv=none; b=hjejZW1e4QEQbcwlrop6hqsv2L1pkLBMyNRgYtKfGjiWdOZtotJJ/K2f/mrOKBos19MSsRTBNLBdPN0l6stbcPuL940bJojS5cmYHmjlpdlkKKMHaGicvd6h2JhQcTjE8XXnZMPD8R5I42prkkYidTTcbRShc5hZcJ/zGxw6rGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785071692; c=relaxed/simple;
-	bh=215SwSQCB6vFp16KMAcjG+851DwW3DPR/pr/xslGB2Y=;
+	s=arc-20240116; t=1785072879; c=relaxed/simple;
+	bh=uAxWro1LWuNoP/oi+Fk1H04GQewoKmhEflyVkzL8pj8=;
 	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=HZtT96kpmeBPx7yb7KfFpV+8I603cpUfqcKpAtDFPr7ghqkdJMxlFEXb5kQFtjw76Y5YRS7VZOlwtuvBPsZTe1915zUJ4Ugy7PEr5yGoQSujM3z2oWBvvqB4XD13V2pPwqV3ggRECdAIt1c3TabDri/l/r/qJ90e+Kh3dCBQUBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MyCvPPYa; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=SefYQ1aeSMGFm/S2+MYPY/RSz35Ei+ZPDvJ5ICTFBxqhulq7WrECKdfCRtfQLG0AABdJPVwPDSSfw4VfcLygjkuupTLE8kBMLJBiGAMjbw5nREta0hSPDgAqJcYqZGRGzNW2i3AtMtDwfW3HflaB1hIQA9OPFZYEnjr6ERSxgIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=N8uOeTS8; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MyCvPPYa"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N8uOeTS8"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1785071689;
+	s=mimecast20190719; t=1785072876;
 	h=from:from:reply-to:reply-to:subject:subject:date:date:
 	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
 	 content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=57Is4TmUMhYuHlpgAA6pDIwAzMvVbSCfWT1HeltVyws=;
-	b=MyCvPPYaEcAungDeiziiWq1MpckMpHjC3c+7yECX9WG7Vyc0HP4Dnu+iR4i4GTdwS2Nj3y
-	u2XRMZ/V7cBYKaASOyoz0ja/+nuTb8jm1+lKpklbHTSzxeQI7uaaP5BJPuEYA7Nam3Hb+O
-	ZDlYZa0oAcJ0P+4KKriv4P8ischJ0Sg=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=+ndIDNx/XWo57F2qOFIBY/S7J+ZAldG16dMk/9EFoRc=;
+	b=N8uOeTS8KCT3efcGwCTe8Gy1XeXqV63FXSna5b2HcN8hjjmTYdFvF0vABMtPOtdtJ+EFPs
+	waOIxdTutmtbrt7eA9jCpbcrG0nyaatmu+ouUh7E3rYQynQtXhYt4xG2+uikV3sQIvo3Qm
+	MAaXFrMG2072LDcSgKTbqN9HmczP8jA=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-438-lKQ3ZfbrPUGLkDt9QmaIBw-1; Sun, 26 Jul 2026 09:14:48 -0400
-X-MC-Unique: lKQ3ZfbrPUGLkDt9QmaIBw-1
-X-Mimecast-MFC-AGG-ID: lKQ3ZfbrPUGLkDt9QmaIBw_1785071687
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4955d314945so12987535e9.0
-        for <kvmarm@lists.linux.dev>; Sun, 26 Jul 2026 06:14:47 -0700 (PDT)
+ us-mta-478-e4uKw_ZBNoq3XUOYi4XCiA-1; Sun, 26 Jul 2026 09:34:34 -0400
+X-MC-Unique: e4uKw_ZBNoq3XUOYi4XCiA-1
+X-Mimecast-MFC-AGG-ID: e4uKw_ZBNoq3XUOYi4XCiA_1785072874
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4955ecd8a10so18339365e9.3
+        for <kvmarm@lists.linux.dev>; Sun, 26 Jul 2026 06:34:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785071687; x=1785676487;
-        h=content-transfer-encoding:content-type:in-reply-to:fcc
-         :content-language:references:cc:to:reply-to:subject:from:user-agent
-         :mime-version:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=57Is4TmUMhYuHlpgAA6pDIwAzMvVbSCfWT1HeltVyws=;
-        b=WEWhpKPRbcc9VH5yWenWpyxATYxoQiCeO6dpzyDeiJPLtq7KJJLGrbmUvdh7v2IOGf
-         GIkYFqraD7hAQ0RiFdZT54Bb1YXM+7jKgKrZjyCU3SzPcSU0w4UPbcTNCUn3nUpakY4A
-         WHxmAo0u9NCONwll5pxxLUGbAM+YBv+pR+ajcrmZrBGXUcO3/PXhnYi7yh2simoSPKuS
-         WtmfOvWo+ah5EIhH8/Wv9GJalFc+sUnHdvhFA6/SqRTJg/kCStLZ9SPnGKGC7ETSwA9d
-         a+FoCZ4kdangDaSKQKP9pgU0gehEOpjaKtmJysnw3pU0Aa8JpsujHmDpVTS20mX9GaND
-         0s+A==
-X-Forwarded-Encrypted: i=1; AHgh+RqHCzcLWUE6kBhsbiZnvdbllhVjU5gGu8onTpIVT2DgkrbRmkYFAO+zKisXveuD5tHh8hukCeE=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzIdOoY7/YIdC78cVX+VDBsQlCW9VLJoPRB3/jHA6RigtbsQNqv
-	88eywq2g9LtGIDFDyU+0sQnYSIRD4lEpdlow2RFKFG9hRZbpm/Agc9TFCHy9U+hMmkX1RuuWQ38
-	AG09ox39OCgFgdTcVT28xEttgrQlaz1yU4d5PR/2iV4VUTSl8Wu9gq9Ymdg==
-X-Gm-Gg: AR+sD11U14MmqfQxOvYYEgB6t9V1X9S2QTjm+eyOtMO53Vby86+tnHXvu/DGEvm158G
-	b8I0h8EZu5VhQPTeTSpkee33UJ2Gt2JPFoFQegLq/HuTgHRVByQubwe4ctv0PaaGy0nCRhZFxoo
-	qnc2VYwI/YirYR5YfQTmAQJw5lzqPgiNk35GD+urL5DtslTFXjyaElKMQRVWBeOrxAtdTprHozS
-	MUc9MelGw9fNcN1UGv9xwIYkSYTSVBIR8GBzI8iahFISlkvGH4E2N9ZSDzboxl6Rj2BIOdPDZtm
-	UEHPnX9SmSW8HxJRO5QDJ0AZ9XOo6gnmUxef7eaUIoyVSkC56Oy7he2zWKeV8zuUADrItM0gkgm
-	WsjzcMqd82Lcd8b8EguFTkbz34uhtsbaCvcA=
-X-Received: by 2002:a05:600c:5487:b0:495:503f:cf9a with SMTP id 5b1f17b1804b1-496b57170aamr59060105e9.9.1785071686624;
-        Sun, 26 Jul 2026 06:14:46 -0700 (PDT)
-X-Received: by 2002:a05:600c:5487:b0:495:503f:cf9a with SMTP id 5b1f17b1804b1-496b57170aamr59059735e9.9.1785071686163;
-        Sun, 26 Jul 2026 06:14:46 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1785072873; x=1785677673;
+        h=content-transfer-encoding:content-type:in-reply-to:content-language
+         :references:cc:to:reply-to:subject:from:user-agent:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=+ndIDNx/XWo57F2qOFIBY/S7J+ZAldG16dMk/9EFoRc=;
+        b=NMASNj1BCta+Mml+6vsiMVn/BHFChGHKOASI40rnJqJGwy9EfCDFcHdPv/iRFwqPeT
+         B+r+4WcjqlnvRT9aGASCnitufXGr6hwwroFpYb48fZJ47t9gsUx2Q1RXQS7plsJ19qQ5
+         usD4JoXXCvSd4UMVkwZ6YAfI9RryTFozKOXoxf4+TQOXw1hiDjvIHUftJ80/nibVyPqR
+         s79qMqio9v92XWJlegzKv8/6IC/SZS2iMfIqHlxPdjCl7ISsEJBddZaymcNTJE2EyN15
+         Km2yDXcyL4wmFi4SAHDheJeLOjHCvlhBuGAAqxS2dh6h76gjcFihIXIjG27mcnIpNmrg
+         NAlg==
+X-Forwarded-Encrypted: i=1; AHgh+RpMxzfbZdTEqGT7rTlReLyRVWsVtyx2NiSSAkcDhs0MxNV14UY5wUcuuLQNu/AMqpIq6ueeTKc=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwYa+79gmiUZApBzNaL9BmJvTcFdvN/vcJAYR+MPw5fRW308qTY
+	SJ3KL5d8rE45NK5PGReKyPekskgybiN3c+uggvMiT8SheQxrermyT9fypbYfcatwuZlPQKuOkRG
+	5lDZnFGhH9euWOcF6/7Y6xewXhuCOwVhRTevSl6Q28bmBANty7twTj6EPrw==
+X-Gm-Gg: AR+sD10+wB+a6tFcVUeNVSqIbvYIng6UitJhJon2fmHhIhx2DiZAiBm2zoQJGPvw1Zm
+	m1JAtVZVdM7NPJjjFj//y9A0OYmoJTSzdX3uOVGUZQoZi/boVJj0arq32WxW+hP9oo+2fIQjtZ4
+	tPKIPcmimi/eG0fJMx4UBVZABUCB7xuThoEJVqYikv+XZeUUbOMSX5c2nKTn3ejV2nSFW2ipTQe
+	TpZJ21UKf2eEdym7PqPKmZPdAmnnxJgiPeX3BEBcAzUTHa7fZ3/xw2rfhI+/3eMCt7NxvqMSzqH
+	hnl8SlGUH1kCnaNn82b/ea6JD/04n8qbvMjqFwcLkV8j7bGxuB6RJHPVe1n4YHWtwW7Un/zxvFe
+	26OlRDCuHpiOXjQ04Tp4t/PyQfytALvlJOdE=
+X-Received: by 2002:a05:600c:3b17:b0:495:5b02:23a8 with SMTP id 5b1f17b1804b1-496b570f00dmr76726185e9.34.1785072873459;
+        Sun, 26 Jul 2026 06:34:33 -0700 (PDT)
+X-Received: by 2002:a05:600c:3b17:b0:495:5b02:23a8 with SMTP id 5b1f17b1804b1-496b570f00dmr76725605e9.34.1785072872971;
+        Sun, 26 Jul 2026 06:34:32 -0700 (PDT)
 Received: from [192.168.3.191] (228.246.150.77.rev.sfr.net. [77.150.246.228])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-496b388d5b4sm111903755e9.3.2026.07.26.06.14.42
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47f85c531basm43542454f8f.19.2026.07.26.06.34.30
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 26 Jul 2026 06:14:45 -0700 (PDT)
-Message-ID: <4de4ae81-d71e-4d23-b855-9b3360cf4eac@redhat.com>
-Date: Sun, 26 Jul 2026 15:14:41 +0200
+        Sun, 26 Jul 2026 06:34:32 -0700 (PDT)
+Message-ID: <4f07607b-b21a-4a5c-8daa-6aec5e288353@redhat.com>
+Date: Sun, 26 Jul 2026 15:34:28 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -90,13 +90,9 @@ Cc: cohuck@redhat.com, peter.maydell@linaro.org,
  prerna.saxena@nutanix.com
 References: <20260716213858.609699-1-khushit.shah@nutanix.com>
  <20260716213858.609699-10-khushit.shah@nutanix.com>
-X-Mozilla-Draft-Info: internal/draft; vcard=0; receipt=0; DSN=0; uuencode=0;
- attachmentreminder=0; deliveryformat=1
-X-Identity-Key: id2
-Fcc: imap://eauger%40redhat.com@imap.gmail.com/[Gmail]/Sent Mail
 In-Reply-To: <20260716213858.609699-10-khushit.shah@nutanix.com>
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: niCWTQPm26PcpHoz5MBknfquRbPB-k7Z4AD5RNU1tUE_1785071687
+X-Mimecast-MFC-PROC-ID: kisuEbIFGn_D_l4Tmti57AwtZc6Iqcp0WMcSWaWOh7s_1785072874
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8
@@ -121,6 +117,8 @@ On 7/16/26 11:38 PM, Khushit Shah wrote:
 >
 > non-zero-defaults-v1:
 >    Field that should be populated with some non zero value by default.
+following which specification? This is not clear to me. Is that layer
+really meaningful? Shouldn't we start with the next one?
 >
 > arm-v8_4-a-v1:
 >   Only features mandated by the ARM ARM.
@@ -197,6 +195,14 @@ On 7/16/26 11:38 PM, Khushit Shah wrote:
 > +      .u.MODEL_PROP_FIELD_##_type = (_value) }
 > +
 > +#define MODEL_PROP_END  { .name = NULL }
+
+Regarding settings somehow we end up with something that is quite
+similar to TCG CPU
+definitions like in
+aarch64_neoverse_n1_initfn(). To me this is in general more readable
+because we use name fields instead of putting the full reg value.
+This does not prevent us from adding comments along settings to make
+this more readable and explicit.
 > +
 > +/*
 > + * These fields should be populated with some non-zero default values.
@@ -207,12 +213,6 @@ On 7/16/26 11:38 PM, Khushit Shah wrote:
 > +    MODEL_PROP("SYSREG_ID_AA64PFR0_EL1_EL1", NUM, 0b0001),
 > +    MODEL_PROP("SYSREG_ID_AA64PFR0_EL1_FP", NUM, 0b1111),
 > +    MODEL_PROP("SYSREG_ID_AA64PFR0_EL1_AdvSIMD", NUM, 0b1111),
-somehow we end up with something that is quite similar to TCG CPU
-definitions like in
-aarch64_neoverse_n1_initfn(). To me this is in general more readable
-because we use name fields instead of putting the full reg value.
-This does not prevent us from adding comments along settings to make
-this more readable and explicit.
 > +
 > +    /* ID_AA64PFR1_EL1 */
 > +    MODEL_PROP("SYSREG_ID_AA64PFR1_EL1_MTE_frac", NUM, 0b1111),
@@ -242,9 +242,13 @@ against the host if the prop is not available.
 > +};
 
 To ease the review I would suggest to put a dump of all id regs of a
-leaf modelin the commit description. It is less error prone that
+leaf model in the commit description. It is less error prone that
 understanding the various overrides.
 I would suggest to have separate patches for each model too.
+
+So you said a leaf model shall have explicit values for each field,
+including non writable ones. The code does not check that. How do we
+make sure we are not missing settings?
 
 > +
 > +static const ArmModelPropValue armv8_4_a_v1_props[] = {
