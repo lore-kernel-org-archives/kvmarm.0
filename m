@@ -1,123 +1,101 @@
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D081421257
-	for <kvmarm@lists.linux.dev>; Mon, 27 Jul 2026 16:39:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.182
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785170388; cv=pass; b=ihsSY6Y3rJtyggQ7xhv4YqFgI6QrCG6/z+wBt/NPcG4GGppFcrjWGFGJ/XfwN/rUlYexOytwuxlgrhleMNVFm/816tEzwk7KvdfE5np37S3styMsDK2e9s9vQipJPIU7m9ZGt1Nzw4caajQ9EkYnItSI9nfAA3t5BbY9L103y1M=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785170388; c=relaxed/simple;
-	bh=LUBbrdfwesGlRHcWDHljUgGTGcVHOswwt3y/veuVbZY=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8231B42A795
+	for <kvmarm@lists.linux.dev>; Mon, 27 Jul 2026 17:56:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1785174984; cv=none; b=onxHksOf4rWqC77BaNh391UihGnjlSf3F51cPbq6vJDPjYy8ispr+g+utmfeCLdjhYqAUpomLpsxBCuhcdIxhu8Ra1NcUzOVdzs4mHkPoo3aZ+q4x1fFDw9xZyE2TCOPKB4p3Q6Dg2hoUIapq94glIAPGvP6WDLI0eD9vA7dYv0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1785174984; c=relaxed/simple;
+	bh=Ex8x1lzItkotrSguV1hcxps0zOMQZ7AhAhf2rSjxacA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=M5mVvIb+2cZyuWcNvcgT9vl7TPO7CeIH2LUNJX2KZ+Mwk7qFz7XHNRxwOrCoviPVSEsnyZDdcRdMtLQFZRydD0eb++PRUZIRJlK6H9t6OSf4X3wlXdQEnfxa1pKR/t5QFuDXoFPtlyZWxraX2T//8yPXTjDScYcFyKzVLLfmZ3E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=G163/HsE; arc=pass smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	 To:Cc:Content-Type; b=TQVj7nmaR1YCgiyzpkcwFjmxclaeO6pRTbZ9uRN6DeHEWosl9C/He1RkbE0JOX6giuP42DnMo4PjKpSs6Scuj0jcgECf3HcBMMvKa/dntPn+hXxUVlaJ/szHOY0ZmXS+R9+yZ8FsfwCfvDd4GX1M8bkjNyL+jOv0OtWsh+ig2Zc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Gg1wlNTk; arc=none smtp.client-ip=91.218.175.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="G163/HsE"
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-51c10e86e52so440151cf.1
-        for <kvmarm@lists.linux.dev>; Mon, 27 Jul 2026 09:39:47 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1785170386; cv=none;
-        d=google.com; s=arc-20260327;
-        b=fGPzi9QT+Z37Ul5TJUOI/JKy70GaKqV3x/tvLTRS63na7dgGLU+DqHAr++fKa2xyN6
-         6izAEMvdUpVPu3YHmnk4blCkm2t+7j4HeNGvn+exkhGiIK5zdTZ+IcD0bcMuc8haKMu/
-         4MlXZwuS5wN9BZVN2HQiESAIW7fXzr8oCeHAjOuHlqn9VvnwiOFlmb2y5J8oFAWBHVnb
-         iT798MRXKg9mj+jLXoViJw/E+IeWHLFZQwQR4QPad8toi5DLphKgiGxqT0EwttJiisDs
-         8gNUWvCoufdAa69Nikt1aDrXHTp7nqusgWwXkDuLfAQYKTVjZ8E8E3uHFm3+KSQ5gjgV
-         otuA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=LUBbrdfwesGlRHcWDHljUgGTGcVHOswwt3y/veuVbZY=;
-        fh=5Xlq1LyLl9EUv/r7vL6OQ2/XJGyjY2YX09peAQdTKoU=;
-        b=STu6rlWMh58nSgJvYyKRk5dAW+VshhAqCZyI8Ky0BoTbNoiqyWfpXwvFIfJ/GXQjHB
-         ivR+zxPFccBnPbUXu9878yJFq6qzsTZhA6N2cHW/OBwaqLYl+llqDRHGYCd93Sk7upIJ
-         8xl3f9sovHZuq2cJpUY7a6zCHCvGgqgxQixJZqAjpYtg8eWLVjBlcB6FbNR4wye897Rd
-         nipgu/+c2TyJJJM3RDvEbN0FHSEoh22wdM5jgCG7PIsr/9qfGbcWg54XH0qXiWp7mLby
-         ycY0rHnBS+/aRJVIXzKZMMwAIkrD+r5B0qLu8Qb2tNfMuPzNjz2SH6NcmvL5BepMQT6t
-         LoMA==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1785170386; x=1785775186; darn=lists.linux.dev;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=LUBbrdfwesGlRHcWDHljUgGTGcVHOswwt3y/veuVbZY=;
-        b=G163/HsENEP4OvfHxYEy69ObmsYFuu84l3NHZeYsKNSJwfrNMCnIY5PWYQjlXQe9DZ
-         CvSeuEryvbS3EB5kjo0b4Uflll1mHfa1dB6zpBzU0KB87NYNFm/HrYE4ikQOIztSt15P
-         BCbRS7r/LUxPKK+Vc1QqWM7BUW+LYmWVQlESkKtMK786hXfYDEVlGn93X8HIitAfkSR6
-         xlpqVvr1HOU1GXzOP7dJ6zjBNaHsI/AaJxKxNxz4gFHPlwq4kl0PZJQmKeCu4vMV+bxB
-         feewMbDgBN5t6CFfe7aW+N080wxZ4WoJ6C96+Vx0iJSqfu1AeHXntG6V/rsmCi4VNGB7
-         1G3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785170386; x=1785775186;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=LUBbrdfwesGlRHcWDHljUgGTGcVHOswwt3y/veuVbZY=;
-        b=eUgOxSSaBffAZmyeokn0zvfVFw1UR0B3D3TpoENsQmB2/cC9KSStv/zp4rxPMD+lUL
-         l2s7sC7FCJgrh9y1+YpVgXdPBZGC/dfREwHVuRzZDFWKqlZrVPbPlmd/R9kmICpMXoUF
-         MpvgLRklOUrpg0xoSs+GLpNOFyd/I/zsScMz9OK8Ndu/SpFerMhMm6HOPcuRmNbfbfnR
-         evGHTbFnPDLVwNn7vPeFhQkbIQhM4D7TP/Ee5CEMpQhfAM7r1hl0eVo7KfAG9B7ivbZC
-         4YRPXKM8hGde+r4Y8EYtwfpDK6vHvY4wN8l7hEUWnQcdqOmgSH3S9Fhh/2sL/6gFZMbc
-         Ok3A==
-X-Forwarded-Encrypted: i=1; AHgh+Ro4RZamLAU8Qn7kpe3f9VUXv2h2E1vp+jBtCSLE6IlXmwT5Jdu0RN4vc+5CDsPcj8eOtly49rw=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxCHRft9HT++Vome27T6ElUcSNfKiWOepOtTnGALdaeWPWAubty
-	cZMfJc1yrURT0t1IP8D3hF16LOOzfieKInTOpJJezHk0vZ915LofJQX/WCbPcL1cm5XReAAIqAL
-	sgDTx7MIVuGF989xVu3TPsOexygxYzL4rRx0qRGl+TyJsdGB+rUfjzvHIUfc=
-X-Gm-Gg: AR+sD12R4fbzBQPg3y1E/QsYsEQfAxC0ApsfMLvaECXP05z5KEAQMVo+Qu27IlyyrpF
-	T687yoA/6ITRklSNiiJWW4SKtOv9Z5CQGfHC/zFRtRHeIvihFkaO06QJ+nYCZXWIDcSFxeuOwRm
-	lVoH0xwixDjnx7dbMId5KfdPRKqMykUB+XdTY8jCYrPs08q0zH7RtYGoTcqgCz9xMQ2IOHzdem4
-	tZWhbCmM9l4g+KhnztpMgE4BoTX64whcrwng1rhpVF+xQ0uYGQ9ABtQ+ZLNm2xpoyi7nJ2i
-X-Received: by 2002:a05:622a:901c:b0:51c:ae6:a57 with SMTP id
- d75a77b69052e-529a76e10b3mr34531831cf.11.1785170385186; Mon, 27 Jul 2026
- 09:39:45 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Gg1wlNTk"
+X-Forwarded-Encrypted: i=1; AHgh+RoI5VM3RyD2gSboxitQJpxY60b6tZTx3Bhr+7HzuUDZiPWJqIyFqtJ9yIwEWoKvut2XgFiAinA=@lists.linux.dev
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1785174972;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=V61MtFHN1V5mcLJHu7tV/IoRmZFZoC5zGlPSgF5EIbk=;
+	b=Gg1wlNTkwungITHcqmIzA2VE+1KpjnYaq01s/8hizhjC81wABugC6dXBV76C0vYXheGax2
+	Gf1wtv6DoS33WPuYK7uDvM9WOBXB8XG1YMsl/jpuHS+L7zP2aQrT9mwk6XggnKNeouJEtA
+	PHTwdf539/DgBWEOwV2toXCRliIRgCk=
+X-Gm-Message-State: AOJu0YwxkjQvV5fLfzpXHK6HyPQYn5H/w/XoNfai+RWUQoKwVEFgTY4d
+	44fwV9VUnWEDTSt6fSOpKEJ68ELu2v8cSUUsGYtkDXABjDlRqk5lMQ7eae3v0NAn3zn+T0pzHFa
+	zLCEiH3mCs/BwQYY3bxkc5Q1rWAFkFhz4q0MILAu3
+X-Received: by 2002:a05:622a:9c4:20b0:517:5e32:2d14 with SMTP id
+ d75a77b69052e-529a5e726b4mr37748591cf.10.1785174970207; Mon, 27 Jul 2026
+ 10:56:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260724104819.1296803-1-sascha.bischoff@arm.com>
- <20260724104819.1296803-11-sascha.bischoff@arm.com> <20260724112240.4FD981F000E9@smtp.kernel.org>
-In-Reply-To: <20260724112240.4FD981F000E9@smtp.kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Mon, 27 Jul 2026 17:39:08 +0100
-X-Gm-Features: AUfX_mzw5Yr2AUqO8uAEYXPzPNlrBJYH8jNQa3p7XPPYeAO9kSA3O-KglVf42h8
-Message-ID: <CA+EHjTz0byw1LJDnqJGsPgOYz-pwyyY_u5S_44CbKGAfKnQkgQ@mail.gmail.com>
+References: <20260724104819.1296803-1-sascha.bischoff@arm.com> <20260724104819.1296803-11-sascha.bischoff@arm.com>
+In-Reply-To: <20260724104819.1296803-11-sascha.bischoff@arm.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Mon, 27 Jul 2026 18:55:33 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTz+msYV6L0ydQR7Qw6LA8ASucpkumAqxrO36KUhvRDW2A@mail.gmail.com>
+X-Gm-Features: AUfX_mzT1lQqmfncb9Af7oKyhTBxEtHB6P2oZDlB1iOpMSGOvof6H3RE6t1v3sE
+Message-ID: <CA+EHjTz+msYV6L0ydQR7Qw6LA8ASucpkumAqxrO36KUhvRDW2A@mail.gmail.com>
 Subject: Re: [PATCH v4 10/48] KVM: arm64: gic-v5: Introduce guest IST alloc
  and management
-To: sashiko-reviews@lists.linux.dev
-Cc: Sascha Bischoff <Sascha.Bischoff@arm.com>, Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd <nd@arm.com>, 
+	"maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev" <oliver.upton@linux.dev>, Joey Gouly <Joey.Gouly@arm.com>, 
+	Suzuki Poulose <Suzuki.Poulose@arm.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>, 
+	"peter.maydell@linaro.org" <peter.maydell@linaro.org>, "lpieralisi@kernel.org" <lpieralisi@kernel.org>, 
+	Timothy Hayes <Timothy.Hayes@arm.com>
 Content-Type: text/plain; charset="UTF-8"
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, 24 Jul 2026 at 12:29, <sashiko-bot@kernel.org> wrote:
+Hi Sascha,
+
+On Fri, 24 Jul 2026 at 11:52, Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 ...
-> - [High] Missing `GICV5_VMTEL2E_IST_VALID` bit leaves IST configurations invalid.
+> +static int vgic_v5_alloc_linear_ist(struct kvm *kvm, bool spi_ist,
+> +                                   unsigned int id_bits, unsigned int istsz)
+> +{
+> +       const size_t n = id_bits + 1 + istsz;
+...
+> +       l1sz = BIT(n + 1);
+> +       ist = kzalloc(l1sz, GFP_KERNEL_ACCOUNT);
+...
+> +static int vgic_v5_alloc_l1_ist(struct kvm *kvm, unsigned int id_bits,
+> +                               unsigned int istsz, unsigned int l2sz)
+> +{
+> +       const size_t n =  max(5, id_bits - ((10 - istsz) + (2 * l2sz)) + 3 - 1);
+> +       u32 vm_id = vgic_v5_vm_id(kvm);
+> +       const u32 l1_size = BIT(n + 1);
 
-Replying to this one because I was reading about this today, and
-thought it was tricky. This is a false positive (will teach
-Sashiko/review-prompts about the GICv5 once this series goes in).
+I think the linear path might be missing the floor that this one
+applies. The host driver keeps it on its own linear path too:
+`gicv5_irs_init_ist_linear()` uses `n = max(5, lpi_id_bits + 1 +
+istsz)`.
 
-I do not think this one holds, and I would not apply it.
+Without the floor the allocation is under 64 bytes whenever `id_bits +
+1 + istsz < 5`, and `vgic_v5_ist_istsz()` gives an `istsz` of 0 on a
+host without metadata support. `ARCH_KMALLOC_MINALIGN` is 8 on arm64,
+so a 4 to 32 byte allocation is not necessarily 64-byte aligned, and
+`vgic_v5_vmte_assign_ist()` rejects that against
+`GICV5_VMTEL2E_IST_ADDR`. It depends on where the slab places the
+allocation, so it is intermittent rather than reliable.
 
-The IRS writes that bit itself. `vgic_v5_vmte_assign_ist()` populates
-the IST section and then issues `SPI_VIST_MAKE_VALID` /
-`LPI_VIST_MAKE_VALID`, which is the `IRS_VMAP_VISTR` write, and the
-IRS sets the section's valid bit in response to it (from the spec).
-Software setting that bit itself in an L2 entry belonging to a valid
-VM is UNPREDICTABLE.
+The rejection also logs with an unratelimited `kvm_err()`, on a path
+the guest can drive repeatedly.
 
-KVM makes the VM valid before it ever assigns an IST, in
-`vgic_v5_init()`, so it is always on that path. There is a separate
-case where software does write the bit, when the L2 entry is populated
-before the VM becomes valid, but that is not the sequence here.
-
-Same reasoning applies to the level 1 VM table entry, where the IRS
-sets `L1_VMTE.VALID` in response to `IRS_VMAP_L2_VMTR`.
+This needs the host IRS to report a `MIN_LPI_ID_BITS` low enough to
+reach it, since `vgic_v5_ist_cfgr_valid()` rejects an `lpi_id_bits`
+below `irs->idr2.min_lpi_id_bits`.
 
 Cheers,
 /fuad
