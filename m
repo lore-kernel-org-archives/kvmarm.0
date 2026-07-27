@@ -1,541 +1,192 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25D503F8EB9;
-	Mon, 27 Jul 2026 15:01:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C5FF379ECD
+	for <kvmarm@lists.linux.dev>; Mon, 27 Jul 2026 16:26:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785164503; cv=none; b=DOQ+PASIEdzXr7sSqiDfzOn4TgSKn/rZyODwWukfRJ1l6JMVySESantLhMelHUtNG5roEPbxnHNWv4lXppj+RfoNxoeCF0tMu3MSSTAzfliISGSCQJq/wKBHYScv0OziFTmmwim19agmZYVpf7AhhhhggWV2+GUrclKfiXBWW9g=
+	t=1785169577; cv=none; b=YW4NtUyTxghSxPcq+/pI2DNhuQn+xpdgwfwZEIgqEz5+Fy+h0axXJ0IA43Vuy/v5MRpeALkgOWMERGIfNFzMSh5JKC5ysqOih5rR70o8C+d4apXlyqGVuZ7xOKsqTGY/FqV1oW6l20PYUO6sQcH5tI5wegsq0f9YuUwmszenHig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785164503; c=relaxed/simple;
-	bh=iIP7h/ZQU1m6fwNOXTLafcLCzumyJSUI6UC3vtNiAU8=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Aw4MbC/EZDvxR5N8qiN+SCBwIc6gb+QTGvTq98p+iD1FXe3bWC/+cNBmdFgXbSm9GWmYNx3F925kALz6Rr21WF84d/hvGkfiOFZJj4kcXbaHFZpiC//ugWHOjtJl4kJokEhVGukysUrwOrl4ognzjij6OGg/QtnOdhU6qFtsHpo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NMR7km/e; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1785169577; c=relaxed/simple;
+	bh=Z3A9rUSX1s0cyq/IHb1vYqt9l1lfzKrXOO+iVbuV+Qs=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=PJ45ISrnqsYH+rk9oRykEerPFjctaD8H2avsfcL+u/VB40QlYwVZCZqIv6xiReZbUxw6wUDyuVI+rFYhn7B5bfgsbZfZiLtRmS639tuF4ydFKR9zquR9O5BK1brtnPnk78xAaGMV0Pz8r06frfypkb6GO7U87GKiLjA/DaPOTBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pl9DLzuH; arc=none smtp.client-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NMR7km/e"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 557E81F000E9;
-	Mon, 27 Jul 2026 15:01:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785164500;
-	bh=otQSBXXUSUQAH7kU20rpT4Di3kKgypl8P0guYSgGZKg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=NMR7km/e9KCijb6XWWoiuwZobt8eOTHmamEBjsxLoWYHrLatHYdqiUOqE4oBcocUM
-	 NkpWWmFgKTGvIcXSIcCuTM43CtswBy8SIgb/mvLcpGrcntHg5prmIPI7nLSl6JtLvc
-	 kRep0T//+xjeueHiqPJ9wAccxmKJCEA2SntwT2ThDTnFUsWWZmPKUKnceh7+Cxu2Jm
-	 aF1bZhkV5kkcb8XsYPR14mw/Y9h6tSCFkp7xu6TnPlZH2zBGke356iqu58zT6zHZev
-	 rnwxb15z864Rvcqs30SCspmGyfes3Gvg+LAoD/zJGjPPFXiLTOD2qc1O+vt6qaQRrK
-	 NrcEvG7s9Q9mQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1woMpl-00000009Iv3-3BeV;
-	Mon, 27 Jul 2026 15:01:37 +0000
-Date: Mon, 27 Jul 2026 16:01:37 +0100
-Message-ID: <86zezccw8e.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
-	Emi Kisanuki <fj0570is@fujitsu.com>,
-	Vishal Annapurve <vannapurve@google.com>,
-	WeiLin.Chang@arm.com,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>
-Subject: Re: [PATCH v15 14/37] KVM: arm64: CCA: Handle realm enter/exit
-In-Reply-To: <20260715142841.80544-15-steven.price@arm.com>
-References: <20260715142841.80544-1-steven.price@arm.com>
-	<20260715142841.80544-15-steven.price@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pl9DLzuH"
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-381c51fde6bso3228286a91.2
+        for <kvmarm@lists.linux.dev>; Mon, 27 Jul 2026 09:26:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1785169575; x=1785774375; darn=lists.linux.dev;
+        h=content-disposition:content-type:mime-version:message-id:subject:cc
+         :to:from:date:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=DgrRLhpZSK6Izvy9wC/OSvwPYaLpWx3DeYUDgz9uc04=;
+        b=pl9DLzuH/fPzJQLNSe3QBglS36MPfsJ9+AZXKKBE/vKZ5Pk6iFUKdrkMROjYnG1g8u
+         WiG7DOApu5nO9oa7JBER3wsW3Ro8v7fL6kPx1H1LICJcUKTtkPhihjpDaFhtMU/3QV8Y
+         tIPWeP0zzGWc42KMQoWbBt/SR6QTkBBl/+W2xIY2g6468wDpXWrLZjOZYIUac8okYty/
+         26UIZ4bzPIFS6DrVUEOYtd5j6D1AC/j6BD4YqtiVpRRkUrXLaCJyn35qjMEWMhMO+kBT
+         3RzFtAhyZTsLeqk/lCKmAsIEKf+mIqdDDzcSnDOCNsvouyveomFbnG24jr0PoBU+nWKK
+         3PhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785169575; x=1785774375;
+        h=content-disposition:content-type:mime-version:message-id:subject:cc
+         :to:from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=DgrRLhpZSK6Izvy9wC/OSvwPYaLpWx3DeYUDgz9uc04=;
+        b=tOIQtDmzhMCS2oRqUJ6pO+KQzwnAfFb32ye3L9I2mH0tSpIOIjB0EfYJ2V0teDilp0
+         rMTxnFy7BzsD+pC1yFzyxfHzCOhS6+gdQ/QdByFunZFD+fQuzU7z7XAbiKoxSGNrHBvq
+         /8dFVJFskcq0NKiqAdHCXvzCENA2Y91QhbsQK3DLciNFNNZxBcBdYQWp/OWQpm+FQpEK
+         hlD0G4Kv/dSb8JUFnrPmN8yjPRbENwiZXjsjO2r/1BFEZyGOauhO5B9kyu0dLT1UCFx1
+         TDUd2hkfn9m/pw+J+gRxraA1A9T06yVwwo2/tpl34b9EAjOapBSiohDMlPBlXZF59/sn
+         MCyg==
+X-Forwarded-Encrypted: i=1; AHgh+RogEesn8fYaA7iucHhDO07EJbCXnnbLCKs0uXL/IZbDwMtPK4DTKIdwBA64NUoLYeJKuutF+pQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzdGGdugnMKpZyCRCQvMHcdahKa2VRmlTHtU8EY1Uy+d85zKRnC
+	0eew2ay13/uC7eQX88i3JzdielADgXX9aGwy79Nxq4o3iootwnq24zPf
+X-Gm-Gg: AR+sD130TXOo1Vb3CtPBRHyJI2RvADDRWDlSLlH4AmC03tJ3lZrCPmwDBV3Z6Akv6da
+	hDPSDWxHinD09emc5vynop4DTvY/gkDT3XYL+iU462kH0vpz4ttYVrJvZoaF0FFG0KmvCpR6x2N
+	SKh2/70ACmBTY97NDQldGfbZ9I7WbEW7uRprHYTiUTHaLcLqS7AmUVZp4KsJwSnTKzXYHrYxsBF
+	fRpQLWihtLrs0Mh6liROfM1zdryOJkqslfHyDDOMzC6PitUIupC+S+qi+d3c9jqNBnz4qzsEj9s
+	8zX3Ao1NY8NdOCGG6In63f3bBsi0VsEagv0qKX2G4q7HR+09YZ8kgU+qR706aFMR3fqmg6PLQj8
+	dCTLrRRRLr2oeh0CjmgNGha/2p1bdQyC7j6/6TNVfLk1OIWiVveruZGAtaZ8XC+E7C7jG73UfNN
+	LCpIVfLIm14gjRTNmxXZqt6w==
+X-Received: by 2002:a17:90b:390c:b0:37f:eafd:3505 with SMTP id 98e67ed59e1d1-38f293cf360mr8125929a91.6.1785169575425;
+        Mon, 27 Jul 2026 09:26:15 -0700 (PDT)
+Received: from v4bel ([58.123.110.97])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-38f64117003sm81826a91.6.2026.07.27.09.26.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Jul 2026 09:26:14 -0700 (PDT)
+Date: Tue, 28 Jul 2026 01:26:11 +0900
+From: Hyunwoo Kim <imv4bel@gmail.com>
+To: maz@kernel.org, oupton@kernel.org, tabba@google.com, joey.gouly@arm.com,
+	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	imv4bel@gmail.com
+Subject: [PATCH] KVM: arm64: nv: Don't skip VNCR invalidation when the TLB
+ size is unknown
+Message-ID: <ameGoxbn2wzBq2kL@v4bel>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com, aneesh.kumar@kernel.org, fj0570is@fujitsu.com, vannapurve@google.com, WeiLin.Chang@arm.com, lpieralisi@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On Wed, 15 Jul 2026 15:28:16 +0100,
-Steven Price <steven.price@arm.com> wrote:
-> 
-> Entering a realm is done using a SMC call to the RMM. On exit the
-> exit-codes need to be handled slightly differently to the normal KVM
-> path so define our own functions for realm enter/exit and hook them
-> in if the guest is a realm guest.
+ttl_to_size() returns 0 when no size is defined for the (granule, level)
+pair. That is the case for level 0 with 4kB pages, and for levels 0 and 1
+with 16kB and 64kB pages. For a VNCR pseudo-TLB this happens when the
+guest runs with SCTLR_EL2.M cleared, because __kvm_translate_va() returns
+success with wr->level left at S1_MMU_DISABLED, and that s8 value becomes
+level 1 as it goes through the u8 parameter of pgshift_level_to_ttl(). The
+size is then 0 if the guest has TCR_EL2.TG0 set to 16kB or 64kB.
 
-What is so different that you need to reinvent the wheel?
+kvm_invalidate_vncr_ipa() and invalidate_vncr_va() feed that 0 straight
+into the range computation. When the size is 0 the alignment mask is 0 as
+well, both ends of the range collapse to 0, and the first comparison, the
+one that decides there is no overlap, is always true. As a result the
+pseudo-TLB is skipped whatever range the caller asks for, including the
+full IPA range passed by kvm_nested_s2_wp() and kvm_nested_s2_unmap().
 
-> 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> ---
-> Changes since v13:
->  * The RMM is now required to provide an ESR value with the correct
->    information to emulate MMIO, so we no longer need to hardcode 0s in
->    rec_exit_sys_reg().
->  * The PSCI changes mean that there is a potential race when turning on
->    a VCPU which can cause a RMI_ERROR_REC return. Exit to user space
->    with -EAGAIN in this case.
-> Changes since v12:
->  * Call guest_state_{enter,exit}_irqoff() around rmi_rec_enter().
->  * Add handling of the IRQ exception case where IRQs need to be briefly
->    enabled before exiting guest timing.
-> Changes since v8:
->  * Introduce kvm_rec_pre_enter() called before entering an atomic
->    section to handle operations that might require memory allocation
->    (specifically completing a RIPAS change introduced in a later patch).
->  * Updates to align with upstream changes to hpfar_el2 which now (ab)uses
->    HPFAR_EL2_NS as a valid flag.
->  * Fix exit reason when racing with PSCI shutdown to return
->    KVM_EXIT_SHUTDOWN rather than KVM_EXIT_UNKNOWN.
-> Changes since v7:
->  * A return of 0 from kvm_handle_sys_reg() doesn't mean the register has
->    been read (although that can never happen in the current code). Tidy
->    up the condition to handle any future refactoring.
-> Changes since v6:
->  * Use vcpu_err() rather than pr_err/kvm_err when there is an associated
->    vcpu to the error.
->  * Return -EFAULT for KVM_EXIT_MEMORY_FAULT as per the documentation for
->    this exit type.
->  * Split code handling a RIPAS change triggered by the guest to the
->    following patch.
-> Changes since v5:
->  * For a RIPAS_CHANGE request from the guest perform the actual RIPAS
->    change on next entry rather than immediately on the exit. This allows
->    the VMM to 'reject' a RIPAS change by refusing to continue
->    scheduling.
-> Changes since v4:
->  * Rename handle_rme_exit() to handle_rec_exit()
->  * Move the loop to copy registers into the REC enter structure from the
->    to rec_exit_handlers callbacks to kvm_rec_enter(). This fixes a bug
->    where the handler exits to user space and user space wants to modify
->    the GPRS.
->  * Some code rearrangement in rec_exit_ripas_change().
-> Changes since v2:
->  * realm_set_ipa_state() now provides an output parameter for the
->    top_iap that was changed. Use this to signal the VMM with the correct
->    range that has been transitioned.
->  * Adapt to previous patch changes.
-> ---
->  arch/arm64/include/asm/kvm_rmi.h |   4 +
->  arch/arm64/kvm/Makefile          |   2 +-
->  arch/arm64/kvm/arm.c             |  25 ++++-
->  arch/arm64/kvm/rmi-exit.c        | 182 +++++++++++++++++++++++++++++++
->  arch/arm64/kvm/rmi.c             |  42 +++++++
->  5 files changed, 249 insertions(+), 6 deletions(-)
->  create mode 100644 arch/arm64/kvm/rmi-exit.c
-> 
-> diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
-> index ccd09d55c69f..b1e4cf0f6803 100644
-> --- a/arch/arm64/include/asm/kvm_rmi.h
-> +++ b/arch/arm64/include/asm/kvm_rmi.h
-> @@ -100,6 +100,10 @@ void kvm_destroy_realm(struct kvm *kvm);
->  int kvm_realm_teardown_stage2(struct kvm *kvm);
->  void kvm_destroy_rec(struct kvm_vcpu *vcpu);
->  
-> +int kvm_rec_enter(struct kvm_vcpu *vcpu);
-> +int kvm_rec_pre_enter(struct kvm_vcpu *vcpu);
-> +int handle_rec_exit(struct kvm_vcpu *vcpu, int rec_run_status);
-> +
->  static inline bool kvm_realm_is_private_address(struct realm *realm,
->  						unsigned long addr)
->  {
-> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-> index ed3cf30eb06e..4a2d52fdb6a2 100644
-> --- a/arch/arm64/kvm/Makefile
-> +++ b/arch/arm64/kvm/Makefile
-> @@ -16,7 +16,7 @@ CFLAGS_handle_exit.o += -Wno-override-init
->  kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
->  	 inject_fault.o va_layout.o handle_exit.o config.o \
->  	 guest.o debug.o reset.o sys_regs.o stacktrace.o \
-> -	 vgic-sys-reg-v3.o fpsimd.o pkvm.o rmi.o \
-> +	 vgic-sys-reg-v3.o fpsimd.o pkvm.o rmi.o rmi-exit.o \
->  	 arch_timer.o trng.o vmid.o emulate-nested.o nested.o at.o \
->  	 vgic/vgic.o vgic/vgic-init.o \
->  	 vgic/vgic-irqfd.o vgic/vgic-v2.o \
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 2959a1451232..534d33b7c67a 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -1341,6 +1341,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->  		if (ret > 0)
->  			ret = check_vcpu_requests(vcpu);
->  
-> +		if (ret > 0 && vcpu_is_rec(vcpu))
-> +			ret = kvm_rec_pre_enter(vcpu);
-> +
+kvm_nested_s2_unmap() is called from kvm_unmap_gfn_range(). A guest that
+meets the above conditions therefore keeps its VNCR fixmap mapping across
+an MMU notifier that reclaims the page, and still holds a writable EL2
+alias of that page once it has been freed and reallocated for something
+else.
 
-What needs to be done at this stage? Why isn't this handled as a
-request? Or similarly to an MMIO return?
+compute_tlb_inval_range() and compute_s1_tlbi_range() already treat a size
+of 0 as "no size information" and fall back to a conservative value. Apply
+the same principle here, folding the range computation into a helper that
+reports an overlap when the size is unknown. This also removes the
+computation that was duplicated between the two functions. The result of
+the test is unchanged for a non-zero size.
 
->  		/*
->  		 * Preparing the interrupts to be injected also
->  		 * involves poking the GIC, which must be done in a
-> @@ -1388,7 +1391,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->  		trace_kvm_entry(*vcpu_pc(vcpu));
->  		guest_timing_enter_irqoff();
->  
-> -		ret = kvm_arm_vcpu_enter_exit(vcpu);
-> +		if (vcpu_is_rec(vcpu))
-> +			ret = kvm_rec_enter(vcpu);
-> +		else
-> +			ret = kvm_arm_vcpu_enter_exit(vcpu);
+Fixes: ebb2d8fd81b8 ("KVM: arm64: nv: Fix incorrect VNCR invalidation range calculation")
+Cc: stable@vger.kernel.org
+Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
+---
+ arch/arm64/kvm/nested.c | 39 ++++++++++++++++++++-------------------
+ 1 file changed, 20 insertions(+), 19 deletions(-)
 
-This either sidesteps all the RCU EQS, context management and co, or
-duplicates it. Either way, that's no good.
->  
->  		vcpu->mode = OUTSIDE_GUEST_MODE;
->  		vcpu->stat.exits++;
-> @@ -1434,7 +1440,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->  		 * context synchronization event) is necessary to ensure that
->  		 * pending interrupts are taken.
->  		 */
-> -		if (ARM_EXCEPTION_CODE(ret) == ARM_EXCEPTION_IRQ) {
-> +		if ((!vcpu_is_rec(vcpu) && ARM_EXCEPTION_CODE(ret) == ARM_EXCEPTION_IRQ) ||
-> +		    (vcpu_is_rec(vcpu) && vcpu->arch.rec.run->exit.exit_reason == RMI_EXIT_IRQ)) {
-
-No. Please adapt the CCA code so that what it returns has the exact
-same format as the non-CCA code, having the vcpu state placed where it
-matters.
-
->  			local_irq_enable();
->  			isb();
->  			local_irq_disable();
-> @@ -1446,8 +1453,13 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->  
->  		trace_kvm_exit(ret, kvm_vcpu_trap_get_class(vcpu), *vcpu_pc(vcpu));
->  
-> -		/* Exit types that need handling before we can be preempted */
-> -		handle_exit_early(vcpu, ret);
-> +		if (!vcpu_is_rec(vcpu)) {
-> +			/*
-> +			 * Exit types that need handling before we can be
-> +			 * preempted
-> +			 */
-> +			handle_exit_early(vcpu, ret);
-> +		}
-
-Same thing.
-
->  
->  		kvm_nested_sync_hwstate(vcpu);
->  
-> @@ -1472,7 +1484,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->  			ret = ARM_EXCEPTION_IL;
->  		}
->  
-> -		ret = handle_exit(vcpu, ret);
-> +		if (vcpu_is_rec(vcpu))
-> +			ret = handle_rec_exit(vcpu, ret);
-> +		else
-> +			ret = handle_exit(vcpu, ret);
-
-And same thing here as well.
-
->  	}
->  
->  	if (unlikely(!irqchip_in_kernel(vcpu->kvm)))
-> diff --git a/arch/arm64/kvm/rmi-exit.c b/arch/arm64/kvm/rmi-exit.c
-> new file mode 100644
-> index 000000000000..973250563d7b
-> --- /dev/null
-> +++ b/arch/arm64/kvm/rmi-exit.c
-> @@ -0,0 +1,182 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright (C) 2023-2026 ARM Ltd.
-> + */
-> +
-> +#include <linux/kvm_host.h>
-> +#include <kvm/arm_hypercalls.h>
-> +#include <kvm/arm_psci.h>
-> +
-> +#include <linux/arm-smccc-rmi.h>
-> +#include <asm/kvm_emulate.h>
-> +#include <asm/kvm_rmi.h>
-> +#include <asm/kvm_mmu.h>
-> +
-> +typedef int (*exit_handler_fn)(struct kvm_vcpu *vcpu);
-> +
-> +static int rec_exit_reason_notimpl(struct kvm_vcpu *vcpu)
-> +{
-> +	vcpu_err(vcpu, "Unhandled exit reason from realm (ESR: %#llx)\n",
-> +		 kvm_vcpu_get_esr(vcpu));
-> +	return -ENXIO;
-> +}
-
-This should mark the VM dead.
-
-> +
-> +static int rec_exit_sync_dabt(struct kvm_vcpu *vcpu)
-> +{
-> +	return kvm_handle_guest_abort(vcpu);
-> +}
-> +
-> +static int rec_exit_sync_iabt(struct kvm_vcpu *vcpu)
-> +{
-> +	vcpu_err(vcpu, "Unhandled instruction abort (ESR: %#llx).\n",
-> +		 kvm_vcpu_get_esr(vcpu));
-> +	return -ENXIO;
-> +}
-
-If you can't handle it, why do you specify a handler? isn't the
-default handler enough?
-
-> +
-> +static int rec_exit_sys_reg(struct kvm_vcpu *vcpu)
-> +{
-> +	struct realm_rec *rec = &vcpu->arch.rec;
-> +	unsigned long esr = kvm_vcpu_get_esr(vcpu);
-> +	int rt = kvm_vcpu_sys_get_rt(vcpu);
-> +	bool is_write = (esr & ESR_ELx_SYS64_ISS_DIR_MASK) == ESR_ELx_SYS64_ISS_DIR_WRITE;
-> +	int ret;
-> +
-> +	if (is_write)
-> +		vcpu_set_reg(vcpu, rt, rec->run->exit.gprs[rt]);
-> +
-> +	ret = kvm_handle_sys_reg(vcpu);
-> +	if (!is_write)
-> +		rec->run->enter.gprs[rt] = vcpu_get_reg(vcpu, rt);
-> +
-> +	return ret;
-> +}
-> +
-> +static exit_handler_fn rec_exit_handlers[] = {
-> +	[0 ... ESR_ELx_EC_MAX]	= rec_exit_reason_notimpl,
-> +	[ESR_ELx_EC_SYS64]	= rec_exit_sys_reg,
-> +	[ESR_ELx_EC_DABT_LOW]	= rec_exit_sync_dabt,
-> +	[ESR_ELx_EC_IABT_LOW]	= rec_exit_sync_iabt
-> +};
-
-Frankly, none of that should exist. You should simply populate the
-state in the vcpu, and let the normal handlers run.
-
-> +
-> +static int rec_exit_psci(struct kvm_vcpu *vcpu)
-> +{
-> +	struct realm_rec *rec = &vcpu->arch.rec;
-> +	int i;
-> +
-> +	for (i = 0; i < REC_RUN_GPRS; i++)
-> +		vcpu_set_reg(vcpu, i, rec->run->exit.gprs[i]);
-> +
-> +	return kvm_smccc_call_handler(vcpu);
-> +}
-> +
-> +static int rec_exit_ripas_change(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm *kvm = vcpu->kvm;
-> +	struct realm *realm = &kvm->arch.realm;
-> +	struct realm_rec *rec = &vcpu->arch.rec;
-> +	unsigned long base = rec->run->exit.ripas_base;
-> +	unsigned long top = rec->run->exit.ripas_top;
-> +	unsigned long ripas = rec->run->exit.ripas_value;
-> +
-> +	if (!kvm_realm_is_private_address(realm, base) ||
-> +	    !kvm_realm_is_private_address(realm, top - 1)) {
-> +		vcpu_err(vcpu, "Invalid RIPAS_CHANGE for %#lx - %#lx, ripas: %#lx\n",
-> +			 base, top, ripas);
-> +		/* Set RMI_REJECT bit */
-> +		rec->run->enter.flags = REC_ENTER_FLAG_RIPAS_RESPONSE;
-> +		return -EINVAL;
-> +	}
-> +
-> +	/* Exit to VMM, the actual RIPAS change is done on next entry */
-> +	kvm_prepare_memory_fault_exit(vcpu, base, top - base, false, false,
-> +				      ripas == RMI_RAM);
-> +
-> +	/*
-> +	 * KVM_EXIT_MEMORY_FAULT requires an return code of -EFAULT, see the
-> +	 * API documentation
-> +	 */
-> +	return -EFAULT;
-> +}
-> +
-> +static void update_arch_timer_irq_lines(struct kvm_vcpu *vcpu)
-> +{
-> +	struct realm_rec *rec = &vcpu->arch.rec;
-> +
-> +	__vcpu_assign_sys_reg(vcpu, CNTV_CTL_EL0, rec->run->exit.cntv_ctl);
-> +	__vcpu_assign_sys_reg(vcpu, CNTV_CVAL_EL0, rec->run->exit.cntv_cval);
-> +	__vcpu_assign_sys_reg(vcpu, CNTP_CTL_EL0, rec->run->exit.cntp_ctl);
-> +	__vcpu_assign_sys_reg(vcpu, CNTP_CVAL_EL0, rec->run->exit.cntp_cval);
-> +
-> +	kvm_realm_timers_update(vcpu);
-
-Why is that saved to memory? The expectations are that the HW timers
-are live when the guest state is loaded.
-
-> +}
-> +
-> +/*
-> + * Return > 0 to return to guest, < 0 on error, 0 (and set exit_reason) on
-> + * proper exit to userspace.
-> + */
-> +int handle_rec_exit(struct kvm_vcpu *vcpu, int rec_run_ret)
-> +{
-> +	struct realm_rec *rec = &vcpu->arch.rec;
-> +	u8 esr_ec = ESR_ELx_EC(rec->run->exit.esr);
-> +	unsigned long status, index;
-> +
-> +	status = RMI_RETURN_STATUS(rec_run_ret);
-> +	index = RMI_RETURN_INDEX(rec_run_ret);
-> +
-> +	/*
-> +	 * If a PSCI_SYSTEM_OFF request raced with a vcpu executing, we might
-> +	 * see the following status code and index indicating an attempt to run
-> +	 * a REC when the RD state is SYSTEM_OFF.  In this case, we just need to
-> +	 * return to user space which can deal with the system event or will try
-> +	 * to run the KVM VCPU again, at which point we will no longer attempt
-> +	 * to enter the Realm because we will have a sleep request pending on
-> +	 * the VCPU as a result of KVM's PSCI handling.
-> +	 */
-> +	if (status == RMI_ERROR_REALM) {
-> +		vcpu->run->exit_reason = KVM_EXIT_SHUTDOWN;
-> +		return 0;
-> +	}
-> +
-> +	/*
-> +	 * If a VCPU has been turned on, but the REC state hasn't been updated
-> +	 * we may experience RMI_ERROR_REC. Exit to the userspace with -EAGAIN
-> +	 * for a retry.
-> +	 */
-> +	if (status == RMI_ERROR_REC)
-> +		return -EAGAIN;
-> +	if (rec_run_ret)
-> +		return -ENXIO;
-> +
-> +	vcpu->arch.fault.esr_el2 = rec->run->exit.esr;
-> +	vcpu->arch.fault.far_el2 = rec->run->exit.far;
-> +	/* HPFAR_EL2 is only valid for RMI_EXIT_SYNC */
-> +	vcpu->arch.fault.hpfar_el2 = 0;
-> +
-> +	update_arch_timer_irq_lines(vcpu);
-> +
-> +	/* Reset the emulation flags for the next run of the REC */
-> +	rec->run->enter.flags = 0;
-> +
-> +	switch (rec->run->exit.exit_reason) {
-> +	case RMI_EXIT_SYNC:
-> +		/*
-> +		 * HPFAR_EL2_NS is hijacked to indicate a valid HPFAR value,
-> +		 * see __get_fault_info()
-> +		 */
-> +		vcpu->arch.fault.hpfar_el2 = rec->run->exit.hpfar | HPFAR_EL2_NS;
-> +		return rec_exit_handlers[esr_ec](vcpu);
-> +	case RMI_EXIT_IRQ:
-> +	case RMI_EXIT_FIQ:
-> +	case RMI_EXIT_SERROR:
-> +		return 1;
-> +	case RMI_EXIT_PSCI:
-> +		return rec_exit_psci(vcpu);
-> +	case RMI_EXIT_RIPAS_CHANGE:
-> +		return rec_exit_ripas_change(vcpu);
-> +	}
-> +
-> +	kvm_pr_unimpl("Unsupported exit reason: %u\n",
-> +		      rec->run->exit.exit_reason);
-> +	vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
-> +	return 0;
-> +}
-
--ETOOMUCHCODE. Please rework this so that this is modelled after the
- existing KVM code. Extra handling (such as the other RMI_EXIT*
- reasons) can be treated as if they were an HVC call from the guest.
-
-> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
-> index aa97ad5fd7e9..430b82c02d15 100644
-> --- a/arch/arm64/kvm/rmi.c
-> +++ b/arch/arm64/kvm/rmi.c
-> @@ -203,6 +203,48 @@ int kvm_realm_teardown_stage2(struct kvm *kvm)
->  	return realm_destroy_rtts(kvm);
->  }
->  
-> +/*
-> + * kvm_rec_pre_enter - Complete operations before entering a REC
-> + *
-> + * Some operations require work to be completed before entering a realm. That
-> + * work may require memory allocation so cannot be done in the kvm_rec_enter()
-> + * call.
-> + *
-> + * Return: 1 if we should enter the guest
-> + *	   0 if we should exit to userspace
-> + *	   < 0 if we should exit to userspace, where the return value indicates
-> + *	   an error
-> + */
-> +int kvm_rec_pre_enter(struct kvm_vcpu *vcpu)
-> +{
-> +	struct realm_rec *rec = &vcpu->arch.rec;
-> +
-> +	if (kvm_realm_state(vcpu->kvm) != REALM_STATE_ACTIVE)
-> +		return -EINVAL;
-
-Do you really need to check for this in the run loop?
-
-> +
-> +	switch (rec->run->exit.exit_reason) {
-> +	case RMI_EXIT_HOST_CALL:
-> +		for (int i = 0; i < REC_RUN_GPRS; i++)
-> +			rec->run->enter.gprs[i] = vcpu_get_reg(vcpu, i);
-> +		break;
-
-If this only happens on returning to the guest from a host call, this
-definitely can be done as a request.
-
-> +	}
-> +
-> +	return 1;
-> +}
-> +
-> +int noinstr kvm_rec_enter(struct kvm_vcpu *vcpu)
-> +{
-> +	struct realm_rec *rec = &vcpu->arch.rec;
-> +	int ret;
-> +
-> +	guest_state_enter_irqoff();
-> +	ret = rmi_rec_enter(virt_to_phys(rec->rec_page),
-> +			    virt_to_phys(rec->run));
-
-Why don't you keep the PAs around instead? This should be merged into
-kvm_arm_vcpu_enter_exit().
-
-
-> +	guest_state_exit_irqoff();
-> +
-> +	return ret;
-> +}
-> +
->  static int __maybe_unused kvm_create_rec(struct kvm_vcpu *vcpu)
->  {
->  	struct user_pt_regs *vcpu_regs = vcpu_gp_regs(vcpu);
-
-Thanks,
-
-	M.
-
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index dfb96edbdc43c6..3ac8789b458f39 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -985,6 +985,21 @@ static void invalidate_vncr(struct vncr_tlb *vt)
+ 		clear_fixmap(vncr_fixmap(vt->cpu));
+ }
+ 
++static bool vncr_tlb_intersects(struct vncr_tlb *vt, u64 addr,
++				u64 start, u64 end)
++{
++	u64 size, tlb_start, tlb_end;
++
++	size = ttl_to_size(pgshift_level_to_ttl(vt->wi.pgshift, vt->wr.level));
++	if (!size)
++		return true;
++
++	tlb_start = addr & ~(size - 1);
++	tlb_end = tlb_start + size;
++
++	return !(tlb_end <= start || tlb_start >= end);
++}
++
+ /*
+  * VNCR TLB invalidation occurs from MMU notifiers or TLBI instructions, and
+  * either can race against a vcpu not being onlined yet (no pseudo-TLB
+@@ -1008,14 +1023,7 @@ static void kvm_invalidate_vncr_ipa(struct kvm *kvm, u64 start, u64 end)
+ 		return;
+ 
+ 	kvm_for_each_vncr_tlb(i, vcpu, vt, kvm) {
+-		u64 ipa_start, ipa_end, ipa_size;
+-
+-		ipa_size = ttl_to_size(pgshift_level_to_ttl(vt->wi.pgshift,
+-							    vt->wr.level));
+-		ipa_start = vt->wr.pa & ~(ipa_size - 1);
+-		ipa_end = ipa_start + ipa_size;
+-
+-		if (ipa_end <= start || ipa_start >= end)
++		if (!vncr_tlb_intersects(vt, vt->wr.pa, start, end))
+ 			continue;
+ 
+ 		invalidate_vncr(vt);
+@@ -1045,28 +1053,21 @@ static void invalidate_vncr_va(struct kvm *kvm,
+ 	lockdep_assert_held_write(&kvm->mmu_lock);
+ 
+ 	kvm_for_each_vncr_tlb(i, vcpu, vt, kvm) {
+-		u64 va_start, va_end, va_size;
+-
+-		va_size = ttl_to_size(pgshift_level_to_ttl(vt->wi.pgshift,
+-							   vt->wr.level));
+-		va_start = vt->gva & ~(va_size - 1);
+-		va_end = va_start + va_size;
+-
+ 		switch (scope->type) {
+ 		case TLBI_ALL:
+ 			break;
+ 
+ 		case TLBI_VA:
+-			if (va_end <= scope->va ||
+-			    va_start >= (scope->va + scope->size))
++			if (!vncr_tlb_intersects(vt, vt->gva, scope->va,
++						 scope->va + scope->size))
+ 				continue;
+ 			if (vt->wr.nG && vt->wr.asid != scope->asid)
+ 				continue;
+ 			break;
+ 
+ 		case TLBI_VAA:
+-			if (va_end <= scope->va ||
+-			    va_start >= (scope->va + scope->size))
++			if (!vncr_tlb_intersects(vt, vt->gva, scope->va,
++						 scope->va + scope->size))
+ 				continue;
+ 			break;
+ 
 -- 
-Without deviation from the norm, progress is not possible.
+2.43.0
+
