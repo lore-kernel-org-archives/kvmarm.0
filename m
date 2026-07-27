@@ -1,402 +1,410 @@
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46F783F86F8
-	for <kvmarm@lists.linux.dev>; Mon, 27 Jul 2026 11:04:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A3673FA5CE
+	for <kvmarm@lists.linux.dev>; Mon, 27 Jul 2026 11:11:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785150263; cv=none; b=DZViR5RskUh1FEoI4LLpAlO6E3WOiKkVSVcYVQMYTuzNAGferza1qCWsj8sVUss+BQ8S559jhlVKC5KEe844XwOqKDqpdV6w3LyWMZtil3u8AvMUygBmkcv2a10ogWzfWk3EHskA0Bgl2HKknlgvZ1jzEajTqepKVmPzD2HgKWQ=
+	t=1785150680; cv=none; b=pEsdnXRJomgIYskgFHRa4tmdxfeW6HYCROf/bEbLIG5qBSQPRUmccrqmOKt6JD9QNzpe4Em11lbPjUY+VGm0Ken2zKMINONIkw34M8pQIP14slBBr42++TnD3cN65RqEpuEWCIvlSgMYaccAghuYpgE8w8Fn8QjXEjhC/o6INyc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785150263; c=relaxed/simple;
-	bh=zatUq8xJHUqH++J1UZPNwFpyaWEJMdbBJNxH4Uzd7BQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lV/7CcHc+KJLbemI/7bWB5xlW+UqcFJPPOULJ/6QevXaxU1kT/oGCdxuBWruCwSeqBIqkcOMC0q8vDb/2l3Q7E3YSbeU6WAWT2uCpe49cZ2RXKvB7kvv0Gs3Qy3OQGQgf0btuBQBu0HafgL+nOYEGBtCldZBmW6lI5+IG5BViDk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=bcMjtdBV; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1785150680; c=relaxed/simple;
+	bh=DVYIRT5CnFGgz13+W9Ujakfd2/8RVKXgzZbl38sw+Uw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mMktYM5fB3IGPKelTEjwccQw3BCD36uaTSBZApDg26UEzq8jpermb3K0DjWKymFHVfjqszb/D6jqMfMGzScDXN6bw+K0xjWm3t47Axc2Y7mfGHn04Jl+R53RKSdrHlYoeYG2s+yTLpTgvno+L1DTlqYw8qSNU2FIHAuInC/RlUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QR9FLMH7; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bcMjtdBV"
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4921eed3fa2so17755145e9.0
-        for <kvmarm@lists.linux.dev>; Mon, 27 Jul 2026 04:04:21 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QR9FLMH7"
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-c1691e4ec40so338862966b.3
+        for <kvmarm@lists.linux.dev>; Mon, 27 Jul 2026 04:11:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1785150259; x=1785755059; darn=lists.linux.dev;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=7nC3HrqDGZF7AOgHUOZz0pFaqYcIiLme0buP14VJS2k=;
-        b=bcMjtdBVGf5YJR2E5PEmLb+MbO2BArVoqE7KBRFG3YyFDrsysKkBgujLobG94ejM24
-         HmDwHzD69NEESb7N5DARsfeoTMI9FJ+R4X6HjrNuS7JXV5tr/sVNytebT6T4ctsCW+dc
-         4APjaHyMd1+78QaAm/FUaTVEkuEp5TqyleHtc1LEgHbEFYf+7GZD+D0IYm0BkAXtk2aJ
-         2R2a+t6bKNZb7G42iu4ZmD/bYJh/eYA9QGDNA3+qMn5QsKZTXeRh0B+dtBKc7xqjc7bC
-         h4nc5AP42Ch+Ga5Ns2VLa1f9QPZmfHBlIRE8yq6/awfVEU/aCLR2g4qNhhvVrlRoeG2B
-         P4ow==
+        d=google.com; s=20251104; t=1785150676; x=1785755476; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=rIRh8rLxbYh0lNXtq2f3kgP4YXDt3QK8yefpI/5/BFA=;
+        b=QR9FLMH7/m3YVGDyBMzAYcdupGRRssaXNDdpjbAS8X/gl1fDqs9D0gXqUXSKZckEvW
+         wWcfUtJKr8NLQDoj6Ku5j9iFdxXDEeNkA+xiadXTNnQeKnvioRoUGVUtgu5oJl7sT/oV
+         wlrviPsCUmdm5QUxTOfpYovAqmy9EKDLGnLQzaDvIM8cT0ucoSg/2g37lEXGnw0oRMS/
+         EjyixjOf7AXlKu0NjZZmf6NbmbJ86UAAEhUHemrNsrGYdp7+b+6tHohOFwDokP0aY/FC
+         0IbHwo6HVlNa5hFGIwmj/3BbZlamLg+uxZMNXwNyBrKm2Ywg0Ahq2f6bhsnk3nsBTprs
+         yU/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785150259; x=1785755059;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=7nC3HrqDGZF7AOgHUOZz0pFaqYcIiLme0buP14VJS2k=;
-        b=PzI85l5Ym4mWHflAhEm/JftcuersZQpAN1xX/YaTiebEoG8apHI3sqaQYmLp2jUe3m
-         tcDTLZOAo0389ppzzoZOhSNGKD+ftN//Mh53Lr+Rtxx2Zx6TM2hmnhS7J+X0SAs8eB6A
-         CmcrFly1PgfKJjoLy6fCMcheRHGouEO35ru6bK1LH0jKZOG5TvTzX3wn2AgK3hGr8S/n
-         BreA4N/kSqLe0UOQYO5Mf14tm2lf01h27+51sngXFN/j6vx1hphwpPfixVrYuwfjpQW/
-         8bFE5DRRoeMSCRTWNOclcAP/mNYFlDMr4Y3TDBfH9agxjf3gr1oTelyuVsX82odyso2/
-         Ds/A==
-X-Forwarded-Encrypted: i=1; AHgh+RqZ+LM07wwPrsP/SARgr+QaT8P+XWjQby05ENOVVbchnuYWcSdxeF+vtOzExHG1UYKXXMlOyPw=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzSHOutD2GB+Z2DHBrcV3QDd/FGobMzjqGf0I9do1kccLM+uSPs
-	AhfKRX3TGCilsMv5Q+RcFL/Sl+clH48zCw7rZt19ePy7z3xTX2PCwgIiXjiCktnxih0=
-X-Gm-Gg: AR+sD13O28d0ZjIlGPokJUUNOUea6/IrkYFCvopq6F2mE/k9nKNsC0q1drfoTbxi/S+
-	N1I9CKmA3JEVvAw7HT4PpuUIEKHS63HZRvQdIi224aCJYZEaBeG7UxVbOl07xcCL4g1yUL1NTcm
-	KIHUNQhfUv7xhk2ItMe/5OeCpIoLi+n+GIX+iOoiDiCPRBPG/yb2fBC7nrH7sQCODbc2G1f8JYC
-	DM+LOx63792QOTrqYFat6UQwdOZHNKj6RLZcyhqeMAAXxbx2aBCA0FOB2rjmSjMu2ywVTTSMw+m
-	6J3FfI9HcIu1isuTE2ohdhOnybP9GbRQQfEdkzC/1D3Ou+U1snVgm68xwtpYsy166cXpQaB8Nlg
-	H8Lky5L4fNeB+Rd4VXNulcvAaJYSKf3WQJwd5GCrOWBTquAXqIzrnwtGYIrwGUacfvINiOBzhkO
-	ivhd0OGvHp+44EWsGXng==
-X-Received: by 2002:a05:600c:3113:b0:493:c8f7:3631 with SMTP id 5b1f17b1804b1-496b570dacdmr94916415e9.22.1785150259287;
-        Mon, 27 Jul 2026 04:04:19 -0700 (PDT)
-Received: from [192.168.1.3] ([37.18.141.193])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-496b4f5f9f8sm212127145e9.9.2026.07.27.04.04.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Jul 2026 04:04:18 -0700 (PDT)
-Message-ID: <2941da1a-b0b4-47a6-b57c-b28703dc0454@linaro.org>
-Date: Mon, 27 Jul 2026 12:04:17 +0100
+        d=1e100.net; s=20251104; t=1785150676; x=1785755476;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=rIRh8rLxbYh0lNXtq2f3kgP4YXDt3QK8yefpI/5/BFA=;
+        b=TxXLYejEbkuW6OMa4PzZlCQytMrc2qOIuEeuVTdke9TDx6Ndwp5bZdUrP4YkEs7169
+         oqVY4KIKWQBA0IPoDXL7FxLPsvbXFcBGKjyuo7a0j9TW1EXHIe5rZIN/Wh2cqVETt7EQ
+         q+H6l6d+JoN7NFPg+he+kWPe3prsiWA0dTufNA/zV/yy6ozx9CJk4MvoBsPiw/xy6Lb7
+         vKLnWErGcflf1aJmlpDyRFr0uc6hjbuMF40are19V9WpRGI8V6vTnfqKz31fABFtVm6Z
+         Moehx4agY04SF9IrctZWfufUatGY76+5oIRiwK8+iR40fJC23JStvLH3viPgCE7fkvhu
+         0BfQ==
+X-Forwarded-Encrypted: i=1; AHgh+Rpj/oDci9agLSjanFyK3YRAGzbKBF6FanRjqoZHMtmjv0ZfdMNE1eJL1YND9E8lUUv9V7BMZeg=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxRf8fypUkKI1dxoFxbosQs+tPQxNOHx2j5xiTbk1yuH3AXMVOs
+	Z5HBoLu8MKI+rjmviBlYjfAeWcyR05bpMoJ/FWqD2y5z3mtH2KcsbvGpaM+2bPwySA==
+X-Gm-Gg: AR+sD10774JHh+YbrS7gsGLZznHkeTt5+zxjnKD1Ur1Am/MLuFW+UzYad55P3Kgdl8U
+	PUSgKMNp/V6whdxeB/LJxzSGpluxDjadK4+aTLTh73JX1znkxk5Y3Z98x1fQyiH2f0u4z/wlrV/
+	RqDpkMRXv89T6SW1fxs+Me4I2sIFkdFf8rs7uTYMqdczSLozmAel8yyP3Mt/ecLkCPsuxgzLRry
+	ApTAK9i3m4ugo+pJZJvZxvlDWJXNX5CRKKowhIYxAF1TlYLP4AX8pRItDSRwJr25NXGjrUlZt2Z
+	uW0xz8lVQE5ynjCwHUYHpc+BmnMwexomqd+69KyuRIY4RGIb3Bmk8PI+X4dnnsp1JqMBSJU+Om4
+	Ey5Uc+mXlYpqPQDpKY6LdlorDCqPBK2lxszBVcW9bi7sM7p3PTfVNxxd1MhYSf/8K2Dj0Z10lNH
+	dYEjKtI2mWwrpEcuSKzvEx28cnkhIbwopNOE9KForVFv539w==
+X-Received: by 2002:a17:907:c0a:b0:c16:9f61:854b with SMTP id a640c23a62f3a-c1f1f153f26mr394532266b.42.1785150675763;
+        Mon, 27 Jul 2026 04:11:15 -0700 (PDT)
+Received: from google.com (135.91.155.104.bc.googleusercontent.com. [104.155.91.135])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c1c32af45ecsm611801266b.28.2026.07.27.04.11.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Jul 2026 04:11:14 -0700 (PDT)
+Date: Mon, 27 Jul 2026 12:11:10 +0100
+From: Vincent Donnefort <vdonnefort@google.com>
+To: Jack Thomson <jackabt.amazon@gmail.com>
+Cc: maz@kernel.org, oupton@kernel.org, pbonzini@redhat.com,
+	joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org,
+	shuah@kernel.org, corbet@lwn.net, vladimir.murzin@arm.com,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org,
+	isaku.yamahata@intel.com, Jack Thomson <jackabt@amazon.com>
+Subject: Re: [PATCH v5 2/5] KVM: arm64: Add pre_fault_memory implementation
+Message-ID: <amc8zlGxegNKHxIY@google.com>
+References: <20260612162354.73378-1-jackabt.amazon@gmail.com>
+ <20260612162354.73378-3-jackabt.amazon@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 00/21] ARM64 PMU Partitioning
-To: Colton Lewis <coltonlewis@google.com>
-Cc: kvm@vger.kernel.org, alexandru.elisei@arm.com, pbonzini@redhat.com,
- corbet@lwn.net, linux@armlinux.org.uk, catalin.marinas@arm.com,
- will@kernel.org, maz@kernel.org, oliver.upton@linux.dev, mizhang@google.com,
- joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
- mark.rutland@arm.com, shuah@kernel.org, gankulkarni@os.amperecomputing.com,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <gsnt33x95sra.fsf@coltonlewis-kvm.c.googlers.com>
-Content-Language: en-US
-From: James Clark <james.clark@linaro.org>
-In-Reply-To: <gsnt33x95sra.fsf@coltonlewis-kvm.c.googlers.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260612162354.73378-3-jackabt.amazon@gmail.com>
 
+Hi,
 
+On Fri, Jun 12, 2026 at 05:23:50PM +0100, Jack Thomson wrote:
+> From: Jack Thomson <jackabt@amazon.com>
+> 
+> Add arm64 support for KVM_PRE_FAULT_MEMORY by synthesizing a read data
+> abort and routing it through the existing stage-2 fault handlers. Treat
+> the requested GPA as an IPA in the userspace-owned VM's memslot space
+> and always target the canonical stage-2, even if the vCPU last ran with
+> a nested/shadow MMU selected.
+> 
+> If the vCPU last ran in a nested context, switch to the canonical
+> stage-2 with the vCPU put/load helpers so VMID, VNCR and shadow-MMU
+> refcount state stay consistent. Leave the switch in place for the ioctl;
+> vcpu_put() at ioctl exit drops the hw_mmu and the next vcpu_load()
+> reselects the correct MMU from vCPU state.
+> 
+> Check existing mappings with a shared page-table walk under the MMU read
+> lock, and use the resulting walk level when constructing the synthetic
+> fault. Report poisoned pages through the ioctl return path with
+> -EHWPOISON instead of also queueing SIGBUS, and use the installed
+> mapping size to advance the prefault range.
+> 
+> Advertise KVM_CAP_PRE_FAULT_MEMORY on arm64. Protected VMs remain
+> unsupported: pKVM filters the capability, and the ioctl returns
+> -EOPNOTSUPP if invoked anyway.
+> 
+> Signed-off-by: Jack Thomson <jackabt@amazon.com>
+> ---
+>  Documentation/virt/kvm/api.rst |  18 +++-
+>  arch/arm64/kvm/Kconfig         |   1 +
+>  arch/arm64/kvm/arm.c           |   1 +
+>  arch/arm64/kvm/mmu.c           | 162 +++++++++++++++++++++++++++++++++
+>  4 files changed, 178 insertions(+), 4 deletions(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 52bbbb553ce1..657e05656fa6 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -6462,7 +6462,7 @@ See KVM_SET_USER_MEMORY_REGION2 for additional details.
+>  ---------------------------
+>  
+>  :Capability: KVM_CAP_PRE_FAULT_MEMORY
+> -:Architectures: none
+> +:Architectures: x86, arm64
+>  :Type: vcpu ioctl
+>  :Parameters: struct kvm_pre_fault_memory (in/out)
+>  :Returns: 0 if at least one page is processed, < 0 on error
+> @@ -6470,11 +6470,14 @@ See KVM_SET_USER_MEMORY_REGION2 for additional details.
+>  Errors:
+>  
+>    ========== ===============================================================
+> +  EAGAIN     A memslot update raced with the ioctl before any page was
+> +             processed.
+>    EINVAL     The specified `gpa` and `size` were invalid (e.g. not
+>               page aligned, causes an overflow, or size is zero).
+>    ENOENT     The specified `gpa` is outside defined memslots.
+>    EINTR      An unmasked signal is pending and no page was processed.
+>    EFAULT     The parameter address was invalid.
+> +  EHWPOISON  A poisoned host page was encountered.
+>    EOPNOTSUPP Mapping memory for a GPA is unsupported by the
+>               hypervisor, and/or for the current vCPU state/mode.
+>    EIO        unexpected error conditions (also causes a WARN)
+> @@ -6494,7 +6497,14 @@ Errors:
+>  KVM_PRE_FAULT_MEMORY populates KVM's stage-2 page tables used to map memory
+>  for the current vCPU state.  KVM maps memory as if the vCPU generated a
+>  stage-2 read page fault, e.g. faults in memory as needed, but doesn't break
+> -CoW.  However, KVM does not mark any newly created stage-2 PTE as Accessed.
+> +CoW.  However, on x86, KVM does not mark any newly created stage-2 PTE as
+> +Accessed.  On arm64, newly created stage-2 PTEs are marked Accessed.
+> +
+> +On arm64, `gpa` is interpreted as an IPA in the userspace-owned VM's
+> +memslot address space.  If the vCPU most recently ran a nested guest, KVM
+> +still targets the VM's canonical stage-2, and does not interpret `gpa` as
+> +a nested guest IPA or target the nested/shadow stage-2 selected by the
+> +vCPU's last run state.
+>  
+>  In the case of confidential VM types where there is an initial set up of
+>  private guest memory before the guest is 'finalized'/measured, this ioctl
+> @@ -6507,9 +6517,9 @@ case, the ioctl can be called in parallel.
+>  
+>  When the ioctl returns, the input values are updated to point to the
+>  remaining range.  If `size` > 0 on return, the caller can just issue
+> -the ioctl again with the same `struct kvm_map_memory` argument.
+> +the ioctl again with the same `struct kvm_pre_fault_memory` argument.
+>  
+> -Shadow page tables cannot support this ioctl because they
+> +On x86, shadow page tables cannot support this ioctl because they
+>  are indexed by virtual address or nested guest physical address.
+>  Calling this ioctl when the guest is using shadow page tables (for
+>  example because it is running a nested guest with nested page tables)
+> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> index 449154f9a485..6b89262e8ba7 100644
+> --- a/arch/arm64/kvm/Kconfig
+> +++ b/arch/arm64/kvm/Kconfig
+> @@ -24,6 +24,7 @@ menuconfig KVM
+>  	select HAVE_KVM_CPU_RELAX_INTERCEPT
+>  	select KVM_MMIO
+>  	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
+> +	select KVM_GENERIC_PRE_FAULT_MEMORY
+>  	select VIRT_XFER_TO_GUEST_WORK
+>  	select KVM_VFIO
+>  	select HAVE_KVM_DIRTY_RING_ACQ_REL
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 9453321ef8c6..dcb92bee13af 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -392,6 +392,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  	case KVM_CAP_COUNTER_OFFSET:
+>  	case KVM_CAP_ARM_WRITABLE_IMP_ID_REGS:
+>  	case KVM_CAP_ARM_SEA_TO_USER:
+> +	case KVM_CAP_PRE_FAULT_MEMORY:
+>  		r = 1;
+>  		break;
+>  	case KVM_CAP_SET_GUEST_DEBUG2:
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index c720f07cb82e..4bf048bbcf8b 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1571,6 +1571,8 @@ struct kvm_s2_fault_desc {
+>  	struct kvm_s2_trans	*nested;
+>  	struct kvm_memory_slot	*memslot;
+>  	unsigned long		hva;
+> +	unsigned long		*page_size;
 
-On 23/07/2026 9:57 pm, Colton Lewis wrote:
-> James Clark <james.clark@linaro.org> writes:
-> 
->> On 22/07/2026 12:03 am, Colton Lewis wrote:
->>> Hi James, thanks for the review.
-> 
->>> James Clark <james.clark@linaro.org> writes:
->>>> Hi Colton,
-> 
->>>> The existence of the parameter makes sense, but can't the default be
->>>> arm_pmuv3.reserved_host_counters=0 instead of -1 (partition disabled)?
-> 
->>> How would you interpret reserved_host_counters=0? Because that would
->>> express that the host should have zero counters and the guest gets them
->>> all. I remember in early versions of this series last year I did use 0
->>> as the default but reviewers asked for a way to express the scenario of
->>> of zero counters for the host.
-> 
-> 
->> I think I would interpret it as it is now. Can't the host still use them
->> until the guest does and then they only get squeezed if there is a
->> collision? That doesn't sound too bad to me. And if a host wants
->> reserved counters they can set a positive number.
-> 
-> Yeah that makes sense. I was thinking in an old headspace when it was
-> just a static reservation instead of changing when a guest is loaded.
-> 
->> Is reserved_host_counters==max_counters equivalent to -1? And there's no
->> overview in the cover letter or documentation about how it interacts
->> with the dynamic guest counter reservations. A bit more detail or a few
->> paragraphs in one place would help users, maybe with examples so they
->> don't have to piece together all the commit messages to work it out.
-> 
-> It's not equivalent since we need a case where the guest only has access
-> to the fixed-purpose counters like the dedicated cycle
-> counter. reserved_host_counters specifies the number of general purpose
-> counters.
-> 
-> I'll document the operation more clearly. In the future please feel free
-> to email me to ask if you are confused about something.
-> 
->>>> It's still a bit fiddly having to do two things to make it work, and
->>>> there's no documentation about what the defaults or other prerequisites
->>>> are. IMO it's not even trivial to work out that you need to prefix it
->>>> with "arm_pmuv3.", which documentation would improve.
-> 
->>> It is fiddly, which is why the more I think about it the more I'd rather
->>> ditch the kernel cmdline entirely and leave it up to KVM. That's the
->>> most flexible approach. There isn't a good way to change the cmdline
->>> after boot. Trying to make it writeable via sysfs runs into the problem
->>> of when is it safe to apply the change.
-> 
->>> I thought it was commonly understood module parameters need to be
->>> prefixed by the module name, but I can add better documentation to that
->>> effect.
-> 
-> 
-> 
->> People just want it written out fully somewhere so they can copy paste
->> it. Kernel developers might be able to piece it together, but not
->> everyone will.
-> 
-> This is the KVM mailing list. Kernel developers are the primary
-> audience, but I will make reasonable efforts to include others in the
-> future.
-> 
+It looks a bit odd in that struct.
 
-I'm more thinking of the users of this after it gets merged, rather than 
-just for the review.
+Also, transparent_hugepage_adjust() modifies pfn and gfn. So perhaps it'd be
+better to introduce a struct kvm_s2_fault_mapping that can be used to get what
+has actually been mapped in kvm_s2_fault_map()?
 
->>>> Testing the whole set I ran into a few issues:
-> 
->>>> This warn is hit when there is some kind of interaction with 
->>>> sleeping. I
->>>> tried to bisect it but it only appears on the last commit when the
->>>> option to enable partitioning is added.
-> 
->>>>     /*
->>>>      * ARM pmu always has to reprogram the period, so ignore
->>>>      * PERF_EF_RELOAD, see the comment below.
->>>>      */
->>>>     if (flags & PERF_EF_RELOAD)
->>>>         WARN_ON_ONCE(!(hwc->state & PERF_HES_UPTODATE));
-> 
->>>> Steps to reproduce:
-> 
->>>> Host (arm_pmuv3.reserved_host_counters=0):
->>>>    $ sudo perf stat -C 2 -e \
->>>>      'branches,branches,branches,branches,branches,branches'
->>>>    $ sudo taskset --cpu-list 2 ./lkvm run --kernel \
->>>>      /boot/vmlinux-7.1.0-rc7+ -m 1024 -c 1 --pmu
-> 
->>>> Guest:
->>>>    $ sleep 1
-> 
->>>>     WARNING: drivers/perf/arm_pmu.c:302 at 
->>>> cpu_pm_pmu_notify+0x278/0x2c0,
->>>> CPU#2: swapper/2/0
->>>>      Call trace:
->>>>     cpu_pm_pmu_notify+0x278/0x2c0 (P)
->>>>     notifier_call_chain+0x84/0x1d0
->>>>     raw_notifier_call_chain+0x24/0x38
->>>>     cpu_pm_exit+0x34/0x68
->>>>     acpi_processor_ffh_lpi_enter+0x40/0x78
->>>>     acpi_idle_lpi_enter+0x54/0x78
->>>>     cpuidle_enter_state+0xb4/0x248
->>>>     cpuidle_enter+0x44/0x68
->>>>     do_idle+0x21c/0x300
->>>>     cpu_startup_entry+0x40/0x50
->>>>     secondary_start_kernel+0x120/0x150
->>>>     __secondary_switched+0xc0/0xc8
-> 
-> 
->>> I'll attempt to reproduce that. I've never seen it myself but I've
->>> mainly been using QEMU for my testing.
-> 
-> 
->> The newest Arm FVP should have cpuidle enabled if you boot it with ACPI,
->> but I hit this on a Radxa Orion O6 board.
-> 
-> Noted. Thanks.
-> 
-> 
->>>> When running the guest on a single CPU I get different counts for the
->>>> same event for a single process, although this never happens on a host.
->>>> I think there might even be some Perf tests which expect them to be the
->>>> same, and this doesn't depend on whether any events are running on the
->>>> host or not. Not sure if you ran all the Perf selftests in a guest or
->>>> not?
-> 
->>> I'll investigate but I'm not sure perf is intended to guarantee
->>> that. perf stat just runs the event counters but may not write or read
->>> them at exactly the same time.
-> 
-> 
->> Is that true? The perf core calls perf_pmu_disable() when a process is
->> scheduled out before reading the count of each event of that process in
->> an inner loop. The perf_pmu_disable() clears PMCR_EL0.E which freezes
->> all of the counters so they can be read out in a consistent state.
-> 
->> It's important that they're all stopped at the same time because
->> counters might be used in metrics as ratios of each other. So I think
->> it's deliberately designed that way and appears to not be working in a
->> guest now.
-> 
-> By default I think perf assumes events can be measured independently, If
-> you want to guarantee events are scheduled together to avoid measurement
-> skew you need to make sure the events are grouped.
-> 
-> The common way to do that is with {} around the event list:
-> 
-> perf stat -e {branches,branches}
-> 
-> Please see if that resolves the issue.
-> 
+> +	bool			prefault;
+>  };
+>  
+>  static int gmem_abort(const struct kvm_s2_fault_desc *s2fd)
+> @@ -1882,6 +1884,13 @@ static int kvm_s2_fault_pin_pfn(const struct kvm_s2_fault_desc *s2fd,
+>  				      &s2vi->map_writable, &s2vi->page);
+>  	if (unlikely(is_error_noslot_pfn(s2vi->pfn))) {
+>  		if (s2vi->pfn == KVM_PFN_ERR_HWPOISON) {
+> +			/*
+> +			 * When prefaulting, report the poison via -EHWPOISON
+> +			 * only; don't also queue a SIGBUS as the run path
+> +			 * does for the faulting vCPU thread.
+> +			 */
+> +			if (s2fd->prefault)
+> +				return -EHWPOISON;
+>  			kvm_send_hwpoison_signal(s2fd->hva, __ffs(s2vi->vma_pagesize));
+>  			return 0;
+>  		}
+> @@ -2053,6 +2062,9 @@ static int kvm_s2_fault_map(const struct kvm_s2_fault_desc *s2fd,
+>  	kvm_release_faultin_page(kvm, s2vi->page, !!ret, writable);
+>  	kvm_fault_unlock(kvm);
+>  
+> +	if (s2fd->page_size && !ret)
+> +		*s2fd->page_size = mapping_size;
+> +
+>  	/*
+>  	 * Mark the page dirty only if the fault is handled successfully,
+>  	 * making sure we adjust the canonical IPA if the mapping size has
+> @@ -2757,3 +2769,153 @@ void kvm_toggle_cache(struct kvm_vcpu *vcpu, bool was_enabled)
+>  
+>  	trace_kvm_toggle_cache(*vcpu_pc(vcpu), was_enabled, now_enabled);
+>  }
+> +
+> +/*
+> + * Prefaulting always targets the canonical stage-2.  If the vCPU last ran
+> + * in a nested context, swap in the canonical MMU via the vCPU put/load
+> + * helpers so that preemption, VMID, VNCR fixmap and shadow-MMU refcount
+> + * state stay consistent.
+> + *
+> + * The swap is deliberately not undone: nothing runs in between the
+> + * per-page invocations of kvm_arch_vcpu_pre_fault_memory() except the
+> + * generic prefault loop, and the vcpu_put() at ioctl exit discards
+> + * vcpu->arch.hw_mmu anyway (see kvm_vcpu_put_hw_mmu()), so the next
+> + * vcpu_load() re-derives the correct MMU from the vCPU's context.  If the
+> + * prefault task is preempted in the meantime, kvm_vcpu_put_hw_mmu()
+> + * keeps the canonical MMU in place for the reload.  Leaving the swap in
+> + * place also bounds the cost to at most one put/load pair per ioctl,
+> + * rather than two pairs per prefaulted page.
+> + */
+> +static void kvm_pre_fault_load_canonical_mmu(struct kvm_vcpu *vcpu)
+> +{
+> +	if (!vcpu_has_nv(vcpu) || vcpu->arch.hw_mmu == &vcpu->kvm->arch.mmu)
+> +		return;
+> +
+> +	preempt_disable();
+> +	kvm_arch_vcpu_put(vcpu);
+> +	vcpu->arch.hw_mmu = &vcpu->kvm->arch.mmu;
+> +	kvm_arch_vcpu_load(vcpu, smp_processor_id());
+> +	preempt_enable();
+> +}
+> +
+> +long kvm_arch_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
+> +				    struct kvm_pre_fault_memory *range)
+> +{
+> +	struct kvm_vcpu_fault_info *fault_info = &vcpu->arch.fault;
+> +	struct kvm_vcpu_fault_info fault_backup = *fault_info;
+> +	s8 walk_level = KVM_PGTABLE_LAST_LEVEL;
+> +	unsigned long page_size = PAGE_SIZE;
+> +	struct kvm_memory_slot *memslot;
+> +	phys_addr_t gpa = range->gpa;
+> +	struct kvm_pgtable *pgt;
+> +	phys_addr_t end;
+> +	kvm_pte_t pte;
+> +	hva_t hva;
+> +	gfn_t gfn;
+> +	long ret;
+> +
+> +	if (vcpu_is_protected(vcpu))
+> +		return -EOPNOTSUPP;
 
-Groups only change how the events are scheduled, not how the driver 
-starts or stops multiple events running on the same PMU (grouped or 
-ungrouped). In my repro I had less events than counters in HW, so they 
-will always be scheduled at the same time regardless of grouping.
+It could just call pkvm_mem_abort() when the VM is protected?
 
-I did notice something extra though, you have to first open some amount 
-of counters, and then open more than that. Then the second time the ones 
-with different counts will be however many were opened first time, as if 
-some state has stuck.
+> +
+> +	/*
+> +	 * Interpret range->gpa in the userspace-owned VM's IPA space, not in
+> +	 * any nested guest IPA space that may have been active on the vCPU's
+> +	 * last run.  Always target the canonical stage-2.
+> +	 */
+> +	kvm_pre_fault_load_canonical_mmu(vcpu);
+> +
+> +	if (gpa >= kvm_phys_size(vcpu->arch.hw_mmu)) {
+> +		ret = -ENOENT;
+> +		goto out;
+> +	}
+> +
+> +	gfn = gpa_to_gfn(gpa);
+> +	memslot = gfn_to_memslot(vcpu->kvm, gfn);
+> +	if (!memslot) {
+> +		ret = -ENOENT;
+> +		goto out;
+> +	}
+> +
+> +	/*
+> +	 * A racing memslot deletion or move installs an invalid slot before
+> +	 * zapping stage-2.  Ask userspace to retry once the update settles.
+> +	 */
+> +	if (memslot->flags & KVM_MEMSLOT_INVALID) {
+> +		ret = -EAGAIN;
+> +		goto out;
+> +	}
+> +
+> +	/*
+> +	 * pKVM stage-2 mappings aren't directly walkable from the host; let
+> +	 * the fault path handle both new and existing mappings.
+> +	 */
 
-For example if I open two counters then 6, the first two always have 
-different counts the second time:
+pKVM has a host interval-tree where we keep track of what has been mapped and at
+what level. This tree is also protected with the mmu_lock.
 
-   $ perf stat -e branches,branches true
-
-   Performance counter stats for 'true':
-
-             106129      branches 
-
-             106129      branches 
-
-
-
-   $ perf stat -e 
-'{branches,branches,branches,branches,branches,branches}' true
-
-   Performance counter stats for 'true':
-
-             117013      branches 
-
-             117013      branches 
-
-             110364      branches 
-
-             110364      branches 
-
-             110364      branches 
-
-             110364      branches
-
-
-After opening 6 again a third time they'll all have the same counts.
-
->>>> I'm not sure if the exception level filtering isn't working or there is
->>>> something wrong with freezing. Doesn't the host PMU driver need to
->>>> freeze with HPME? I see it's still doing it with PMCR_EL0.E which
->>>> freezes the guest's counters now doesn't it?
-> 
->>> HPME only has any effect while HPMN is programmed to a value different
->>> than the number of counters on the system. That is only true in a guest
->>> context. As I understand it, that means HPME has no effect anywhere the
->>> host driver needs to freeze counters since that happens in host context.
-> 
-> 
->> Oh yeah that makes sense, I didn't think about that. I'm not sure if my
->> other idea about exception level filtering being responsible makes sense
->> either.
-> 
-> I'll check that too.
-> 
->>> Maybe HPMN stays programmed during interrupt handling though. I'll
->>> confirm.
-> 
-> 
->>>> Host (arm_pmuv3.reserved_host_counters=0):
->>>>    $ sudo taskset --cpu-list 2 ./lkvm run --kernel \
->>>>      /boot/vmlinux-7.1.0-rc7+ -m 1024 -c 1 --pmu
-> 
->>>> Guest:
->>>>    $ perf stat -e branches,branches true
-> 
->>>>     Performance counter stats for 'true':
-> 
->>>>               167963      branches
-> 
->>>>               160925      branches
-> 
-> 
->>>>    $ perf stat -e branches,branches,branches,branches,branches true
-> 
->>>>     Performance counter stats for 'true':
-> 
->>>>               164425      branches
-> 
->>>>               164425      branches
-> 
->>>>               164425      branches
-> 
->>>>               157743      branches
-> 
->>>>               157743      branches
+> +	if (!is_protected_kvm_enabled()) {
+> +		pgt = vcpu->arch.hw_mmu->pgt;
+> +		scoped_guard(read_lock, &vcpu->kvm->mmu_lock) {
+> +			ret = kvm_pgtable_get_leaf(pgt, gpa, &pte, &walk_level,
+> +						   KVM_PGTABLE_WALK_SHARED);
+> +		}
+> +		if (ret)
+> +			goto out;
+> +
+> +		if (kvm_pte_valid(pte)) {
+> +			page_size = kvm_granule_size(walk_level);
+> +			if (!(pte & KVM_PTE_LEAF_ATTR_LO_S2_AF))
+> +				handle_access_fault(vcpu, gpa);
+> +			goto out_success;
+> +		}
+> +	}
+> +
+> +	/*
+> +	 * Synthesize a read translation fault for the canonical IPA, at the
+> +	 * level where the stage-2 walk currently ends (the last level under
+> +	 * pKVM, where stage-2 isn't walkable from the host).
+> +	 */
+> +	fault_info->esr_el2 = (ESR_ELx_EC_DABT_LOW << ESR_ELx_EC_SHIFT) |
+> +		ESR_ELx_IL | ESR_ELx_FSC_FAULT_L(walk_level);
+> +	fault_info->hpfar_el2 = HPFAR_EL2_NS |
+> +		FIELD_PREP(HPFAR_EL2_FIPA, gpa >> 12);
+> +
+> +	struct kvm_s2_fault_desc s2fd = {
+> +		.vcpu		= vcpu,
+> +		.fault_ipa	= gpa,
+> +		.nested		= NULL,
+> +		.memslot	= memslot,
+> +		.page_size	= &page_size,
+> +		.prefault	= true,
+> +	};
+> +
+> +	/*
+> +	 * As in the run path, -EAGAIN from the abort handlers is treated as
+> +	 * progress: either a parallel fault installed the mapping, or a racing
+> +	 * invalidation is in flight and the next access will refault.
+> +	 */
+> +	if (kvm_slot_has_gmem(memslot)) {
+> +		ret = gmem_abort(&s2fd);
+> +	} else {
+> +		hva = gfn_to_hva_memslot_prot(memslot, gfn, NULL);
+> +		if (kvm_is_error_hva(hva)) {
+> +			ret = -EFAULT;
+> +			goto out;
+> +		}
+> +
+> +		s2fd.hva = hva;
+> +		ret = user_mem_abort(&s2fd);
+> +	}
+> +
+> +	if (ret < 0)
+> +		goto out;
+> +
+> +out_success:
+> +	end = ALIGN_DOWN(gpa, page_size) + page_size;
+> +	ret = min_t(u64, range->size, end - gpa);
+> +out:
+> +	/*
+> +	 * Restore the synthetic fault state so a subsequent KVM_RUN does not
+> +	 * observe it. kvm_handle_mmio_return() runs before guest entry can
+> +	 * refresh fault.esr_el2 from hardware, so leaving the synthetic ESR
+> +	 * in place would corrupt the completion of a pending MMIO exit.
+> +	 */
+> +	*fault_info = fault_backup;
+> +	return ret;
+> +}
+> -- 
+> 2.43.0
 > 
 > 
->>>> When running the guest on two CPUs I just get zeros. Do the kvm
->>>> selftests not catch this? Or is it something to do with my setup:
-> 
->>> KVM selftests definitely don't catch it. I'll see if I can reproduce.
-> 
->>> Since the problem happens with 2 CPUs I wonder if something is
->>> triggering the lazy context swap behavior so the counter values aren't
->>> being moved to the 2nd CPU correctly.
-> 
-> 
->> If that was the case I would have expected it to be intermittent, or you
->> would get a partial count if the second CPU started from 0, but not
->> zeros every where every time. Let me know if I can run any more tests.
-> 
-> I'll let you know if I think of something.
-> 
->>>> Host (arm_pmuv3.reserved_host_counters=0):
->>>>    $ sudo taskset --cpu-list 2-3 ./lkvm run --kernel \
->>>>      /boot/vmlinux-7.1.0-rc7+ -m 1024 -c 1 --pmu
-> 
->>>> Guest:
->>>>    $ perf stat -e branches,branches true
-> 
->>>>    Performance counter stats for 'true':
-> 
->>>>                    0      branches
-> 
->>>>                    0      branches
-> 
->>>> I also noticed I get the "squeezed" warning printed after launching the
->>>> guest but not using Perf. This comment implies that not using counters
->>>> makes it a nop:
-> 
->>>>        /*
->>>>      * If we aren't guest-owned then we know the guest isn't using
->>>>      * the PMU anyway, so no need to bother with the swap.
->>>>      */
->>>>     if (vcpu->arch.pmu.access != VCPU_PMU_ACCESS_GUEST_OWNED)
->>>>         return;
-> 
->>>> But maybe linux is touching them in a way that makes them guest owned,
->>>> even on probe? Or is the guest/host ownership tracking not working, I
->>>> didn't look too hard.
-> 
->>> Maybe. I'll check. The guest is also running its own PMU driver that
->>> might trigger guest ownership on initialization since ownership is
->>> determined by which registers the guest touches.
-> 
-> 
->> It doesn't enable any counters though does it, even if it touches some
->> of the registers to probe? Should that result in squeezing out host
->> counters? Maybe it's more complicated to implement, but right now it
->> seems like there is some complexity without much benefit as 90% of hosts
->> are going to probe the counters just to see what's there but not use 
->> them.
-> 
-> As far as I'm aware the driver probe shouldn't shouldn't enable any
-> counters or trigger squeezing. I'll narrow the conditions that trigger
-> guest ownership.
-> 
-> My first suspect is the guest driver probe is triggering guest ownership
-> by reading PMCR_EL0, which I agree should be changed to avoid that.
-
