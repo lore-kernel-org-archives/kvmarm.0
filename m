@@ -1,225 +1,191 @@
-Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 157A841686D
-	for <kvmarm@lists.linux.dev>; Tue, 28 Jul 2026 08:49:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 101FB3C457A
+	for <kvmarm@lists.linux.dev>; Tue, 28 Jul 2026 09:45:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785228587; cv=none; b=nQzzT5NbIptGqvs+PnBb/8auc5N4SsDALdCKNpvTdNC8o7XYG8+qTA011hsMC4Lu4qF1uj/+ARK4TFrjWT0Ew0334zicsqbJHuFAnnkZhuv2RkjYMBOvwiyh9BEqstHB1MAhyP5t4GPTnz+8h1rAP28JfW68GKWa+w9MBoakrm4=
+	t=1785231937; cv=none; b=Qe4BMngo5nSLaWvNSsAxPiksuKjaVt4RbdUIf8zvUvgouYtSMihXnnZ5L/T6DWRiX4NAlSUx6HbgXXgaxB8KaZGT+9imfSXzlfej/pH7ue7P9+8aRAUlS4HV81Z1Obc6xA0jDm1PyFa+J25cgAKyudOYCmH5PJlN4Gvt0o3n7LM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785228587; c=relaxed/simple;
-	bh=NTGx2Idbrhs6+Lg/sS48XT8ik9eSVpc7VVLCmYHiyHg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=nGpenlJdQk5W7ea6WcxEiPsVjacMyNoJv3sa/79adBdBOyl5T89eJs0uKeSNpCisnTHEwobIQSZoI1n32hnnS35x+QQrhvEbitPn5Sn+iHI0+fBOagsA40Ak9DJJ6UbVJ6A4LDS9GcuhrUDDL6/Lg56VrvUAeEQYEs9n6GTzNLs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=VhWll1UA; arc=none smtp.client-ip=113.46.200.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1785231937; c=relaxed/simple;
+	bh=4ncCwLHbd0y5QmKrVWBk/lqxfcoLzBZt8Gojr8StP2M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZAwF7fQGHLmFp5xBWOSZiLFH/oHJN1fd4PBi32kE7BHHK48731figglNP7WjTRxmgcjVJDF3KZajKzajb/08mq4P/LPCby9POs5imBMfhpa/KYtR+1hBEPVkX5snimqtMo/JW4svQdBpbiO5JfDLZQ2WVdyrdD5AGZKJzY0bxmA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nR4NU9Y+; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="VhWll1UA"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=tM9KvTvYNxgKTJQYOm/eLnzfU+IxZ3yBMLPoqd43Ca4=;
-	b=VhWll1UAXXlaqNtPQcthjAy5pUa6tgVbelOoSCTnDdEdldFUU9T28EWzdYdDkrDxrLk7IVEzf
-	x3hvQHuBM5lpCAlB+pVWE41TEEPCrdzFIXzwixkjWuBvEaR3ztjB1N7exD6LT3ooi26fUn3nOqE
-	nYdohiMb2HXtR6csD31lsYk=
-Received: from mail.maildlp.com (unknown [172.19.162.197])
-	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4h8TRm5MDzz12LDF;
-	Tue, 28 Jul 2026 16:40:04 +0800 (CST)
-Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
-	by mail.maildlp.com (Postfix) with ESMTPS id 31C2540579;
-	Tue, 28 Jul 2026 16:49:35 +0800 (CST)
-Received: from [10.67.120.103] (10.67.120.103) by
- kwepemr100010.china.huawei.com (7.202.195.125) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Tue, 28 Jul 2026 16:49:30 +0800
-Message-ID: <fdb4576e-d729-432e-9fab-928ffe6b1a7c@huawei.com>
-Date: Tue, 28 Jul 2026 16:49:30 +0800
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nR4NU9Y+"
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-698b78c05b0so6686a12.1
+        for <kvmarm@lists.linux.dev>; Tue, 28 Jul 2026 02:45:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1785231934; x=1785836734; darn=lists.linux.dev;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=f86kYd5ZgAbyf9BSKP0yMuigLiXeU1iriKpHpan/dmc=;
+        b=nR4NU9Y+BD6YXjUhwKXxj9tEs1oQnnITK5IcyYlVx6duCF2BX497BwxXtlUEVMOYIO
+         QuGxMcAA247KuU5g1Rk2PvXGiLxR5W/ZhsgnRwuQuzxaICKCNXLCB5Qz7lMvDDHEjqz8
+         K7SeoWqRx1j8vaAZODUFuvu8bSJ8VDd4zBJ2f7hvVCqk1PMETQvhDt+EnvNQMvmeig+8
+         +6MVB3qSFc4Klot9q+RW1q8Z2PQCEzMPNUUMiqydpMuUHqzKgrA2EzwQoK6XmJHmOQBw
+         eYKDC/kVccL3L/XBUxWA7c2E/GRPpV5gFQL8kM9Un+cLRs/GLSEdGdNVpUq7L1CEsPss
+         D47Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785231934; x=1785836734;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=f86kYd5ZgAbyf9BSKP0yMuigLiXeU1iriKpHpan/dmc=;
+        b=CjXWQjKcX9q+AYNDO525LqmwNszTOx6GoPKnHq4gqp6m8QBEcO3oGu9Cs2/OrOszBU
+         f2LXdzItZD0vmqeJE02jI5Tkr3fcfLPabY1OG11sLoGNRGdFcWHE4oAzFDIzWQFnFmWZ
+         s3GMRPsfrrInErzVlXWdzOhuDymL7DBXftzsYzXwxNWlDVK3vrv+tH8XhFlDTp79c5Xv
+         kfneXLqdrTwVYhgdm1MKvBFEPp44qX+BxGSKKfg4MRF1YGuCQ3qBt2Dqt678DGJUIzhd
+         J0j2Bhhc9b6uxjFbcVx7I5So3bFFhvvqUBP3pDIHKQJjTYJj78Z1eZMmoNCLHelFZXlB
+         7ePg==
+X-Forwarded-Encrypted: i=1; AHgh+RpUgmMDQb4UBd93CjIAqlqJtlegddPfmUxFCd3NVUdp/XdZeBGJXACuWzo0eCSJc4Xxikpb1lU=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwqHEQfiJdgU5U8yaP0g6KORsqZbAatzjXD5qOx/OxsXUqu+g5G
+	xlwMPCXBstORs7TF2IuTCb4yvJCwh3eTx2D4nSw6gennDuXn3a12v9DSiF+6/I+gEw==
+X-Gm-Gg: AR+sD12L9RqDNWX3rrFme+mSUJRtUhuttulgJedzy3MJPuJZfdViAj+Ta9NU4pAY79H
+	gVTsgrs/IIfhlCLd6pJ4Aq1GWq4r6DFSRMJu00XEtrnfRXVuLBryRfwcgWSJZFfnusHZhVJWbw5
+	hHrO0yh+NcU/bnbzvfDmu5uh2Vo76YmfJT+v1Ld6ycTWvl6Y60N7NiTSXSj+z6xew6dKazLlD9j
+	m91YeQ9xe6XsOIYcmWxG6TK+cn2QtJwgJ7IoT0d75WaUqwLHETZBOvUDm8B8XqDAfhxFrZZrvuo
+	BCEWdOxcOyhiqyLZGsp7UPQZfBEbWqEYXrNDSsnNTQlUxn1WwOl6SCJLXJHIQKMvK1jERExB8cD
+	L6HFCJeIP8arcOMhyvzocdbemu2QfV4xnHiYVoUCW2RbfnMZsMgnZnVvRdIfPAqxGwNCLGz0wuq
+	QQCal+e5sdnvc5njPeete6ZI0eRPouV0UHn7TSWGqDPxQ=
+X-Received: by 2002:a05:6402:a153:b0:69f:d4ca:3c8c with SMTP id 4fb4d7f45d1cf-69fd4ca41d5mr127144a12.6.1785231933541;
+        Tue, 28 Jul 2026 02:45:33 -0700 (PDT)
+Received: from google.com (250.192.189.35.bc.googleusercontent.com. [35.189.192.250])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c1c32ac7eacsm746420066b.17.2026.07.28.02.45.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Jul 2026 02:45:32 -0700 (PDT)
+Date: Tue, 28 Jul 2026 09:45:28 +0000
+From: Mostafa Saleh <smostafa@google.com>
+To: Jing Zhang <jingzhangos@google.com>
+Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Mingwei Zhang <mizhang@google.com>,
+	David Matlack <dmatlack@google.com>
+Subject: Re: [RFC] KVM: Proposed uAPI for querying GSI and irqbypass status
+Message-ID: <amh6OLH38hsO7ZWj@google.com>
+References: <20260717162658.2833515-1-jingzhangos@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 3/6] KVM: arm64: Add auto DBM support for hardware
- dirty tracking
-To: Leonardo Bras <leo.bras@arm.com>
-CC: Oliver Upton <oupton@kernel.org>, <maz@kernel.org>,
-	<catalin.marinas@arm.com>, <will@kernel.org>, <yuzenghui@huawei.com>,
-	<wangzhou1@hisilicon.com>, <yangjinqian1@huawei.com>,
-	<caijian11@h-partners.com>, <liuyonglong@huawei.com>, <yezhenyu2@huawei.com>,
-	<yubihong@huawei.com>, <linuxarm@huawei.com>, <joey.gouly@arm.com>,
-	<kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-	<seiden@linux.ibm.com>, <suzuki.poulose@arm.com>
-References: <20260709104026.2612599-1-zhengtian10@huawei.com>
- <20260709104026.2612599-4-zhengtian10@huawei.com>
- <aliKo7dTZzKcWHzI@kernel.org>
- <0943eb14-9ffb-4dbb-9219-060e97bca2a7@huawei.com>
- <alpIfIOFfrudBzD5@LeoBrasDK>
-From: Tian Zheng <zhengtian10@huawei.com>
-In-Reply-To: <alpIfIOFfrudBzD5@LeoBrasDK>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
- kwepemr100010.china.huawei.com (7.202.195.125)
+In-Reply-To: <20260717162658.2833515-1-jingzhangos@google.com>
 
+Hi Jing,
 
+On Fri, Jul 17, 2026 at 09:26:57AM -0700, Jing Zhang wrote:
+> This RFC proposes a new KVM uAPI to allow a VMM to programmatically
+> query the status of a GSI, with a particular focus on determining
+> the success or failure of Irqbypass.
+> 
+> 
+> 1. Motivation
+> 
+> The primary motivation for this uAPI is to bridge the operational gap
+> between the VMM and KVM at the kernel level regarding interrupt
+> virtualization status:
+> 
+> * KVM (Kernel) holds the precise, live runtime status of each GSI (such
+>   as whether Irqbypass is active, pending, or has encountered a setup
+>   error). However, it completely lacks the high-level semantic details
+>   of those GSIs—it does not understand which logical function or
+>   physical hardware device they represent.
+> 
+> * The VMM (Userspace) possesses the complete context of the guest's
+>   interrupt topology. It knows exactly which GSI belongs to which
+>   passthrough or emulated device because it orchestrated the setup.
+>   Yet, the VMM has no stable, programmatic way to query the actual
+>   runtime execution status of these GSIs once passed to the kernel.
+> 
+> Currently, diagnosing when a high-performance interrupt path falls
+> back to software mediation is highly problematic:
+> 
+> * While some architectures (like ARM64) expose virtual ITS states via
+>   debugfs, this implementation is highly architecture-specific and
+>   fragile.
+> 
+> * debugfs is not a stable API, is prone to breaking changes across
+>   kernel versions, and is entirely unsuitable for programmatic
+>   production monitoring and fleet-wide observability.
+> 
+> This is not an ARM-specific problem; it is a general, cross-architecture
+> limitation within KVM's Irqbypass and interrupt routing subsystem.
+> By introducing an architecture-neutral uAPI, we allow the VMM to
+> marry its topological knowledge with KVM's live execution state.
+> 
 
-On 7/17/2026 11:21 PM, Leonardo Bras wrote:
-> On Fri, Jul 17, 2026 at 11:58:06AM +0800, Tian Zheng wrote:
->>
->> On 7/16/2026 3:39 PM, Oliver Upton wrote:
->>> Hi Tian,
->>>
->>> On Thu, Jul 09, 2026 at 06:40:23PM +0800, Tian Zheng wrote:
->>>> -	if (prot & KVM_PGTABLE_PROT_W)
->>>> +	if (prot & KVM_PGTABLE_PROT_W) {
->>>>    		set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
->>>>
->>>> +		/*
->>>> +		 * No DEVICE filter needed here: relax_perms is only called
->>>> +		 * on FSC_PERM faults. Device pages always get full RW from
->>>> +		 * initial mapping and are never write-protected during
->>>> +		 * migration, so they never trigger a permission fault.
->>>> +		 */
->>>> +		if (pgt->flags & KVM_PGTABLE_S2_DBM)
->>>> +			set |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
->>>> +	} else {
->>>> +		/*
->>>> +		 * Clear DBM on W→RO downgrade to prevent hardware from
->>>> +		 * silently upgrading RO+DBM back to W+dirty, which would
->>>> +		 * bypass KVM's write tracking and cause data corruption.
->>>> +		 */
->>>> +		clr |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
->>>> +	}
->>>> +
->>> This block makes it pretty evident that the DBM bit really *is* the
->>> write permission bit. I'd much rather we introduce the concept of dirty
->>> state to the page table library and migrate the abstract write
->>> permission to the DBM field, even if we don't have FEAT_HAFDBS.
->>>
-> 
-> Ohh, that's an amazing idea!
-> 
->   
->>> That way everything 'just works' from outside the page-table library:
->>> write-protecting hugepages would have the effect of clearing DBM and we
->>> can separately reap dirty state from page descriptors.
->>>
->>> If/when the architecture forces FEAT_S2PIE upon us we will need to make
->>> this change anyway since dirty state management is unconditional and
->>> handled separately from the actual permissions.
->>>
->>> Thanks,
->>> Oliver
->>
->> Hi Oliver,
->>
->> Thanks again for your insightful review. Following your suggestion, I've
->>
->> reworked the design around a unified three-state model that works regardless
->>
->> of whether FEAT_HAFDBS is implemented:
->>
->> **State table**
->> State               | DBM    | S2AP[1] | Without HTTU            | With  HTTU  (HAFDBS)
->> Non-writable   (N)  |  0     |    0    | write -> fault, inject  | write -> fault, inject
->> Writable-clean (C)  |  1     |    0    | write -> fault, sw C->D | write -> hw C->D, no fault, HDBSS logs
->> Writable-dirty (D)  |  1     |    1    | writable, no fault      | writable, no fault
->>
-> 
-> Yeah, that's how the table works with HAFDBS/HDBSS/HACDBS.
-> 
->> **Proposed changes**
->> 1. Remove KVM_PGTABLE_S2_DBM from enum kvm_pgtable_stage2_flags
->>
->> — VTCR_EL2.{HD,HDBSS,HA} enablement in kvm_arm_enable_hdbss_global()
->>
->> already keys off kvm->arch.enable_hdbss / system_supports_hdbss().
->>
-> 
-> We may need a system_support_hdbss() for the actual hdbss routines, though.
+I am trying to understand the benefit of introducing an new uAPI for
+this. I have been using irqbypass with arm64, and I would debug
+performance problems solely based on /proc/interrutps.
 
-Yes, and sorry for the unclear phrasing. What I meant is:
+On the host side you see a vector per interrupt and a new vector per
+vcpu for the doorbell interrupt in case the vcpu was not scheduled.
 
-Setting DBM unconditionally is safe because hardware only interprets it 
-when VTCR_EL2.HD is set. That only happens in 
-kvm_arm_enable_hdbss_global() after checking both 
-system_supports_hdbss() and migration state.
+Based on that I can tell if irqbypass was active or not, and in case
+I have /proc/interrupts from the guest, I can get a percentage of
+the fallback software path per-VM.
+
+A uAPI will not give much extra info, see my comment below.
+
+[...]
 
 > 
 > 
->> 2. stage2_set_prot_attr() — set DBM unconditionally on writable pages:
->> ```
->> if (prot & KVM_PGTABLE_PROT_W) {
->>      attr |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
->>      /* Writable-dirty: DBM=1 conveys write intent, S2AP[1]=1 marks dirty */
->>      attr |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
->> }
->> ```
->>
->> 3. kvm_pgtable_stage2_relax_perms() — drop the else branch entirely:
->> ```
->> if (prot & KVM_PGTABLE_PROT_W) {
->>      set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
->>      /* Non-writable -> Writable-dirty: restore both write intent and dirty state */
->>      set |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
+> /* To be included in <linux/kvm.h> */
 > 
-> In the future, depending on the setup of HDBSS/splitting, we may want to
-> change this behavior. But for software only, it looks nice.
+> /*
+>  * KVM_GET_GSI_STATE: Get the status of a specific GSI.
+>  *
+>  * The user passes a pointer to struct kvm_gsi_state. The kernel fills in
+>  * the status flags, performance counters, and the architecture-specific
+>  * union members directly.
+>  */
 > 
->> }
->> /* no else: callers passing !W (e.g. exec faults) must not touch DBM */
->> ```
->>
->> 4. kvm_pgtable_stage2_wrprotect() — unchanged: it only clears S2AP1 (D->C).
->>
->> DBM is preserved so HDBSS re-arms next round.
->>   ```
->> int kvm_pgtable_stage2_wrprotect(struct kvm_pgtable *pgt, u64 addr, u64
->> size)
->> {
->>     /* Writable-dirty -> Writable-clean: clear dirty state (S2AP_W),
->>     * preserve write intent (DBM) so HDBSS re-arms for next write.
->>      */
->>      return stage2_update_leaf_attrs(pgt, addr, size, 0,
->>                           KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W,
->>                           NULL, NULL,
->>                           KVM_PGTABLE_WALK_IGNORE_EAGAIN);
->> }
->> ```
->>
->> **One clarification**
->> In the three-state model above, wrprotect() clears S2AP[1] but preserves DBM
->> (D->C).
->>
->> This allows HDBSS to re-arm on the next write. If we instead cleared DBM as
->> well (->N),
->>
->> HDBSS would be permanently disabled on that page and we'd lose the benefit
->> of hardware
->>
->> dirty tracking.
->>
->>
->> So my understanding is:
->>
->> wrprotect() (dirty tracking): D->C — clears S2AP[1], preserves DBM
->>
->> mkreadonly() (true RO, future): ->N — clears both S2AP[1] and DBM
->>
->> Does this match what you had in mind?
->>
->> Looking forward to your thoughts.
->>
->> Thanks,
->> Tian
->>
->>
->   
-> Thanks!
-> Leo
+> /* Generic flags indicating high-level status */
 > 
+> /*
+>  * The GSI's route is theoretically compatible with hardware bypass
+>  * on this host (e.g. is an MSI route and GICv4/VT-d is present).
+>  */
+> #define KVM_GSI_STATE_FLAG_BYPASSABLE      (1 << 0)
+> 
+> /* An IRQFD is currently active and bound to this GSI */
+> #define KVM_GSI_STATE_FLAG_HAS_IRQFD       (1 << 1)
+> 
+> /* The irqbypass path is fully enabled and active in hardware */
+> #define KVM_GSI_STATE_FLAG_BYPASS_ACTIVE   (1 << 2)
+> 
+> /* Example architecture-specific failure reasons for ARM64 */
+> #define KVM_ARM_GSI_FAILURE_REASON_NONE             0
+> #define KVM_ARM_GSI_FAILURE_REASON_NO_ITS           1 /* No ITS/GICv4 support */
+> #define KVM_ARM_GSI_FAILURE_REASON_NO_MSI_ADDR      2 /* MSI address unset */
+> #define KVM_ARM_GSI_FAILURE_REASON_GIC_HW_REJECT    3 /* GIC rejected map */
+> #define KVM_ARM_GSI_FAILURE_REASON_INVALID_STATE    4 /* Guest state block */
+> 
+> struct kvm_gsi_state {
+>     __u32 gsi;              /* IN: The GSI to query */
+>     __u32 flags;            /* OUT: High-level status flags */
+>     __u64 counter_success;  /* OUT: Generic counter for successful bypass */
+
+I do not think that is possible on arm64, the host does not know
+about the interrupts directly injected to the guest, so it can not
+maitain such a counter.
+
+Thanks,
+Mostafa
 
