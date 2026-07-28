@@ -1,44 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C9F8431A40;
-	Tue, 28 Jul 2026 12:21:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DEC4431487;
+	Tue, 28 Jul 2026 12:22:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785241290; cv=none; b=mhGzLiMx5X1nat2Q5lCdojI8ikbN95JEqEGJu59l/Z3Dzb6csuQIMo4xUUNFib8uqJyJWz8pookVGme8xYoZNj/vtXh6Dwao+bji7se93WWtnDqtaQFGyl/dZW3EFXvHtm82PYIoqOr+uCa3hZfOglCWo9N/RA/1TBUBh247SSI=
+	t=1785241367; cv=none; b=f3mQVnnwfOnY+8jGRbjKL5uJtCuozaPVAE35dMOU9721shwLauYwu3ijxPw7XEAcMONh2W7ungBfXDIgHEMhf/HwD/nldMD9AnLwD6AV38tcoAl5xHTjSWAy7aSzY/qol6qENaO3Xs6mNPhY6nmdTLnAH06grJ3y5+OSRmkHnOs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785241290; c=relaxed/simple;
-	bh=lHIdQIeqxEaS80L+vB3/GpZlv/2XR+BEUSzTO48vec4=;
+	s=arc-20240116; t=1785241367; c=relaxed/simple;
+	bh=dEnloA7E5jTUYnZnh7xblpGM92rAmq0drWYR9wUSXDg=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=btHKE6vm+gphEnbPem/inoOzR181SHQeXwZiWYSSroGG4BhFldGtmCs0ylIJgl53mPbmD8h/CW/hdcbsae8dS45DHmxT4ROOcao6+TYdpdAMiYE716srhsynyc4BJtUEmxwodEx127huxq31ZdlnVrcvFbnvor+uMS0duTISNWc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X7gq4nh0; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=kX/pkwLyYSniVhyyuXHvQAvkBjeLD5NmT9cxGk3eJUozjZbZQ/5OPuOgtcmt1cIOYyp41aR0yy7x2mjrkdsRpuNJpulmwyp+ZheZwfUb4vYcKqw513yIU4luXtGdVA9YgRFDomDYVtpLVwxAvHJkKoP0S0iay80alX9alRviWDc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oP6bB53R; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X7gq4nh0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0E831F000E9;
-	Tue, 28 Jul 2026 12:21:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oP6bB53R"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA83D1F000E9;
+	Tue, 28 Jul 2026 12:22:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785241289;
-	bh=dJv/NZJ3ohlFKpJ5fUKWxUtwHbYNHaVnYnWKzedXwjI=;
+	s=k20260515; t=1785241366;
+	bh=xST1UwT13aVIR2+zyzBZOokfH3DdRIIO5yz4+VqFFFI=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=X7gq4nh0NjiKpCwc8/gZ3jHbQnArcpQSrKdLXTqqKa88XxgW4Gx2NOrI3fvjDMLff
-	 gfS1C4YNBwo7q2Zl3BceWFMjhosNGsrKQnBUUXXiCjnNCiwBhLe8wvXcfw6oSZ66NJ
-	 8z1YqWdI010GRnEQG/HUWlqzX7avnPqqrlu+LSvRUBVIuhuIZP0cQYwaJRNQUlVxf7
-	 HTwaJmkm0DM2TLiYRwpqEXhOpMHCGFt+yQBD3c1iae4/SXyI27nmnuATCAGG41wXWG
-	 NYIoP4NcxRPyQJOhxGVYy0OVjHpZxR042koeV7BUK+k/1QoTn8k/aILcXxQAupD575
-	 Y6OpPvqof2cKA==
+	b=oP6bB53RbC8lLQq4mPdB7ODyQjxL7sVJERQ3BC33Qr6Von4mSkcQiDnWfzbJP0d6s
+	 fk/V0iNsSSNXyhVJ2Ctm0W62Mau+gR18phRXTbuzvB3JEx+4owTDyOlZ3O3lrU2jGB
+	 cpZhQklgXIiWtwdc2wEtehqXP/OmEy0koAMB3dF7Cm53uWXp654nPQy6dw3ZYKmoRV
+	 injq0tI5n1eZWqq5mO5Cvi5ZFLBd1W/LF89clMTbLidU1jWbKfL3ia4ChlrL2WVBiJ
+	 aHqbqDToj+ygj/sGBLbfNfY6wzPn3aio9OMLsNq2i9NRzTxYrNhoiLlS5LtHsn/H6n
+	 +Q/0NAjuJcqvA==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v4 09/11] docs: liveupdate: Add documentation for VM and
- guest_memfd preservation
+Subject: Re: [PATCH v4 01/11] liveupdate: Add LIVEUPDATE_GUEST_MEMFD config
+ option
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Tarun Sahu" <tarunsahu@google.com>
-Cc: kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, kvm@vger.kernel.org
-In-Reply-To: <20260728121138.1103610-10-tarunsahu@google.com>
+Cc: kvm@vger.kernel.org, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, "Oliver
+ Upton" <oupton@kernel.org>
+In-Reply-To: <20260728121138.1103610-2-tarunsahu@google.com>
 References: <20260728121138.1103610-1-tarunsahu@google.com>
- <20260728121138.1103610-10-tarunsahu@google.com>
+ <20260728121138.1103610-2-tarunsahu@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 28 Jul 2026 12:21:28 +0000
-Message-Id: <20260728122128.D0E831F000E9@smtp.kernel.org>
+Date: Tue, 28 Jul 2026 12:22:45 +0000
+Message-Id: <20260728122245.AA83D1F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,76 +48,59 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [Low] Mismatched kernel-doc section titles cause Sphinx build warnings an=
-d missing documentation.
+- [Medium] The patch introduces the `LIVEUPDATE_GUEST_MEMFD` Kconfig option=
+ claiming to enable a new feature, but there is no actual implementation pr=
+ovided.
 --
 
---- Patch [9]: [PATCH v4 09/11] docs: liveupdate: Add documentation for VM =
-and guest_memfd preservation ---
-commit a930d2f58a9edc06bdcfd10fb383e97d7fe3996c
+--- Patch [1]: [PATCH v4 01/11] liveupdate: Add LIVEUPDATE_GUEST_MEMFD conf=
+ig option ---
+commit e0c3fde657d56c548cd9a7467d2143f0f42c5242
 Author: Tarun Sahu <tarunsahu@google.com>
 
-docs: liveupdate: Add documentation for VM and guest_memfd preservation
-   =20
-Add Documentation/liveupdate/vmm.rst detailing VMM requirements, scope,
-ordering constraints, and kernel-doc inclusions for KVM VM and
-guest_memfd preservation via Live Update Orchestrator (LUO).
+liveupdate: Add LIVEUPDATE_GUEST_MEMFD config option
 
-> diff --git a/Documentation/liveupdate/vmm.rst b/Documentation/liveupdate/=
-vmm.rst
-> new file mode 100644
-> index 0000000000000..b8e8fb2b63c21
-> --- /dev/null
-> +++ b/Documentation/liveupdate/vmm.rst
-> @@ -0,0 +1,107 @@
-> +.. SPDX-License-Identifier: GPL-2.0-or-later
+This commit introduces the LIVEUPDATE_GUEST_MEMFD Kconfig option, which aims
+to enable live update support for KVM guest_memfd files.
+
+> diff --git a/kernel/liveupdate/Kconfig b/kernel/liveupdate/Kconfig
+> index 1a8513f16ef7c..0bbc4037192e9 100644
+> --- a/kernel/liveupdate/Kconfig
+> +++ b/kernel/liveupdate/Kconfig
+> @@ -88,4 +88,19 @@ config LIVEUPDATE_MEMFD
+> =20
+>  	  If unsure, say N.
+> =20
+> +config LIVEUPDATE_GUEST_MEMFD
+> +	bool "Live update support for guest_memfd"
+> +	depends on LIVEUPDATE
+> +	depends on KVM_GUEST_MEMFD
+> +	default LIVEUPDATE
+
+[Severity: Medium]
+Is the implementation for this feature missing from this patch?
+
+The commit message notes that this patch enables live update support for KVM
+guest_memfd files, but the newly added LIVEUPDATE_GUEST_MEMFD symbol appears
+to be unreferenced in the tree. Since there are no Makefiles, C files, or
+preprocessor checks that use it, this currently acts as dead code.
+
+Could the implementation be missing, or was this intended to be introduced =
+as
+part of a larger series where the symbol is used in a subsequent patch?
+
+> +	help
+> +	  Enable live update support for KVM guest_memfd files. This allows
+> +	  preserving VM Memory backed by guest_memfd file across kernel live
+> +	  updates.
 > +
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D
-> +VM & Guest_Memfd Preservation
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D
+> +	  This can only be used for the guest_memfd that are fully-shared
+> +	  and pre-faulted.
 > +
-> +.. kernel-doc:: virt/kvm/kvm_luo.c
-> +   :doc: KVM VM Preservation via LUO
+> +	  If unsure, say N.
 > +
-> +.. kernel-doc:: virt/kvm/guest_memfd_luo.c
-> +   :doc: Guest_Memfd Preservation via LUO
-
-[Severity: Low]
-Does this section title exactly match the DOC: title in
-virt/kvm/guest_memfd_luo.c?
-
-If the source file uses "Guestmemfd Preservation via LUO" without the
-underscore, this directive will fail to find the documentation and generate=
- a
-Sphinx build warning.
-
-[ ... ]
-
-> +VM & Guest_Memfd Preservation ABI
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +
-> +.. kernel-doc:: include/linux/kho/abi/kvm.h
-> +   :doc: DOC: guest_memfd Live Update ABI
-
-[Severity: Low]
-Does this section title match the actual title in include/linux/kho/abi/kvm=
-.h?
-
-If the source file uses "KVM and guest_memfd Live Update ABI", this mismatch
-will cause empty sections in the generated documentation.
-
-Also, should the literal "DOC: " prefix be omitted here? The directive
-typically only expects the text that follows the prefix.
-
-> +
-> +.. kernel-doc:: include/linux/kho/abi/kvm.h
-> +   :internal:
-> +
-> +See Also
+>  endmenu
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260728121138.1103=
-610-1-tarunsahu@google.com?part=3D9
+610-1-tarunsahu@google.com?part=3D1
