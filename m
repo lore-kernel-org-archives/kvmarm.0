@@ -1,112 +1,123 @@
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C0E742FCDB
-	for <kvmarm@lists.linux.dev>; Tue, 28 Jul 2026 12:15:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC8B4431A31;
+	Tue, 28 Jul 2026 12:20:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785240941; cv=none; b=FCMk3YhPe4CtzOWlcRZ1L0U7DeoVGSX/eBPcR7+NtmF2D+LMv3cUtSiwNEgagVUHItBlnVr2jWei24WC88PvHFvPXOyUlif5l0jOAV6bUPu96TNdjQS/PudMjwud51z3zwGueTgDr2UDFtg2QsIdAjgOlp+JZ/KHsHvk7WHVfsQ=
+	t=1785241228; cv=none; b=OP6+XLRHUn4ih57BkoqzkRVEqmYXkasqu6q34Do49HUvj5iK5VWjwukQpunsqnrfCiRkZ/IZo4Umv38uctWa/Dr1/Z8Aw7jkT83Phcw07aj8qfyXIMZf96Lp/Ay9HFpcPgrML4cEVCvtHwAWYk/0LZrVaIJ6igEHgSY8y36WOzM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785240941; c=relaxed/simple;
-	bh=5/Zq+DC7f6K6qWr3zNbMncY7gLwLeSoUByIua2yOhX0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ApwuAtPIRdwHSpDvzB+IkI+rpU/jVxYE+0QqZVq+fj2cw3uxTmLYLEzQVFynthuEZWDuST2TmpR2hHdkZ6RntS2cCTkN1TE05YStqznjNdr9gAEmGp3zKSYqrwtyzE58enoYM3ab2Btp7Ddk3X8dMpSkzpZOeQfCRI9iDno8HBc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Sz0XoOiZ; arc=none smtp.client-ip=91.218.175.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1785241228; c=relaxed/simple;
+	bh=qrJGDGydwRyZX6aDSWexShL+iG9o4DIwtROBQz9lKGs=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=glanaooG+uIbEbPibdbYpRCC3aLGtuscfJ3SaROFCTBB4LeMucnLCOUQVMK9+U8DUB2d/LhGHBhLWKumGVv1yNEFScv7mnETyYs8OZS7se3oci7J6v1Grn3YuyKe4W95uHIsuBkd/+ztS4UfktW5jWqPcigl0r/xl0JwDvZ0vXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZMmUiDtl; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Sz0XoOiZ"
-X-Forwarded-Encrypted: i=1; AHgh+RqCK7V6i7iVpFZumVNAYBC5iRnFAd7bl61rKQmtiqIPzDsxVb7il/vMf8PhdlI0g94Y0gQz+XM=@lists.linux.dev
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1785240937;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dqyI5qm9zqPJIYbY9/rovdcA7+lWay7/Ez/wVrDixbU=;
-	b=Sz0XoOiZ4CR3YhI2fVek9u5knQHoYfYY9NdiL47seEYJe0Z7+hZjlFGiwuGfY1JiYnUm9a
-	bPrlNPTovuS+D9pwC5FZUNKbabTMkRK+EiWbeHMpJbWWJXRHC7qYpSm9tdrllHDT8gppIr
-	/z6DzeNCOUauXUeAE9+D/1yn3syvs/k=
-X-Gm-Message-State: AOJu0YxljQADLy+6NDaoXLu63Jl1ghaIBL4T9cU5+n6NkwDxUs0T5TL6
-	yhptNyB0aOnTgs1D0f3Res65lhExqZX64JN7q/KTrIBwwtvGgP3y1fwGS1atQEHcG5tI0yiL1bf
-	zQ/LyVVzmuyllDMlH2ZSSgv5Quaqi4UG4RtcQA0VL
-X-Received: by 2002:a05:622a:a989:20b0:517:5d71:84e5 with SMTP id
- d75a77b69052e-529a766c096mr8268821cf.5.1785240933905; Tue, 28 Jul 2026
- 05:15:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZMmUiDtl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3E831F000E9;
+	Tue, 28 Jul 2026 12:20:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785241227;
+	bh=UkhhBMDtVVEdjIADkdXBk9vaoGMo1F4zNJMDAeNd/lI=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=ZMmUiDtlTOyIj0nWXHdZRr6lrjwFvq1UxMzL1ib3SJ4tK1unRmTlKwcPVBSZSbAQ1
+	 GodlpxKRIwmOqNJVSRB22IStA3qhd42F67ousDprIWo/OeB+rfIayLQZbxdD3GRY4F
+	 44BTK7d7KBbWTpVVxvvkUKUEM6GJoW2yRuaNF13J9Uj4MFMB1I6q4P4OOzdQ//ZeCC
+	 ldBOUbSwrqBdIT2PAQnYk9LQi5PapsPFqwSaoJeCecd/7Z+Y1ARMdKHv4MwEK6U4Ma
+	 MO5Ct+ZQwXUK9xGUFmKiSvDY1kFYfd3zYQJSBrBl6G8UNmkDyjp+xbQUc+FY93pojd
+	 B65X7+03EvrDA==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v4 07/11] KVM: guest_memfd: Add support for freezing
+ mappings
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Tarun Sahu" <tarunsahu@google.com>
+Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+In-Reply-To: <20260728121138.1103610-8-tarunsahu@google.com>
+References: <20260728121138.1103610-1-tarunsahu@google.com>
+ <20260728121138.1103610-8-tarunsahu@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 28 Jul 2026 12:20:26 +0000
+Message-Id: <20260728122026.E3E831F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20260724104819.1296803-1-sascha.bischoff@arm.com>
- <20260724104819.1296803-4-sascha.bischoff@arm.com> <20260724111920.6F63C1F00A3F@smtp.kernel.org>
- <8733x7qt4s.wl-maz@kernel.org>
-In-Reply-To: <8733x7qt4s.wl-maz@kernel.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Tue, 28 Jul 2026 13:14:57 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTzTZ9MzcvDOGY0jRPbPM55s6dU0tZK1B_7ZJVEh2YBEBw@mail.gmail.com>
-X-Gm-Features: AUfX_mwjwHyKXUcKuiFTWhSNn5WStIe_YCAOA9nyB_9-g6nziv2Dg2gtq14xsRw
-Message-ID: <CA+EHjTzTZ9MzcvDOGY0jRPbPM55s6dU0tZK1B_7ZJVEh2YBEBw@mail.gmail.com>
-Subject: Re: [PATCH v4 03/48] irqchip/gic-v5: Set up gic_kvm_info on ACPI hosts
-To: Marc Zyngier <maz@kernel.org>
-Cc: Sascha Bischoff <Sascha.Bischoff@arm.com>, sashiko-reviews@lists.linux.dev, 
-	Oliver Upton <oupton@kernel.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-X-Migadu-Flow: FLOW_OUT
 
-On Sat, 25 Jul 2026 at 11:06, Marc Zyngier <maz@kernel.org> wrote:
->
-> On Fri, 24 Jul 2026 12:19:20 +0100,
-> sashiko-bot@kernel.org wrote:
-> >
-> > Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> > - [High] Failed ACPI GSI registration for maintenance IRQ due to missing GICv5 hardware IRQ type encoding.
-> > --
->
-> [...]
->
-> > [Severity: High]
-> > Does this fail to register the maintenance IRQ?
-> >
-> > acpi_register_gsi() passes the raw maint_irq directly into fwspec.param[0].
-> > However, the GICv5 PPI domain select function expects the hardware IRQ type to
-> > be encoded in the upper bits:
-> >
-> > drivers/irqchip/irq-gic-v5.c:gicv5_irq_ppi_domain_select() {
-> >     ...
-> >     if (is_fwnode_irqchip(fwspec->fwnode))
-> >         hwirq_type = FIELD_GET(GICV5_HWIRQ_TYPE, fwspec->param[0]);
-> >
-> >     if (hwirq_type != GICV5_HWIRQ_TYPE_PPI)
-> >         return 0;
-> >     ...
-> > }
-> >
-> > Because the raw MADT value doesn't have the GICV5_HWIRQ_TYPE_PPI bits set, the
-> > mapping will be rejected. Should the GSI be encoded with the PPI type before
-> > calling acpi_register_gsi()?
->
-> Where is this coming from? I can't even find any public documentation
-> for ACPI GICv5 support...
->
-> Sascha?
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [High] Holding the global `kvm_gmem_freeze_srcu` read lock during unbound=
+ed `fallocate` operations allows an unprivileged tenant to block `kvm_gmem_=
+freeze()` indefinitely for other VMs.
+--
 
-I mentioned this reviewing another one of the patches in this series
-[1]; I was planing to update the review-prompts once this series is
-merged. That said, I am considering starting now, with the existing
-GICv5 code and spec, but not include any of the code that is in _this_
-series as part of the prompts until this series is merged. That might
-be better, since it would make reviewing the next respin easier.
+--- Patch [7]: [PATCH v4 07/11] KVM: guest_memfd: Add support for freezing =
+mappings ---
+commit de8f141a41c06197ca510e03554977beeeb4fcdf
+Author: Tarun Sahu <tarunsahu@google.com>
 
-Cheers,
-/fuad
+KVM: guest_memfd: Add support for freezing mappings
 
-[1] https://lore.kernel.org/all/CA+EHjTz0byw1LJDnqJGsPgOYz-pwyyY_u5S_44CbKGAfKnQkgQ@mail.gmail.com/
+This commit introduces kvm_gmem_freeze() to freeze a guest_memfd inode's
+mapping to prevent fallocate and page fault allocations during preservation.
+It uses a global SRCU to synchronize freeze state checkers without incurring
+per-fault locking overhead or per-CPU memory exhaustion.
 
->
->         M.
->
-> --
-> Jazz isn't dead. It just smells funny.
->
+> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> index fe1adc9ba48d1..a4d9d348e4d16 100644
+> --- a/virt/kvm/guest_memfd.c
+> +++ b/virt/kvm/guest_memfd.c
+[ ... ]
+> @@ -273,16 +284,30 @@ static long kvm_gmem_allocate(struct inode *inode, =
+loff_t offset, loff_t len)
+>  static long kvm_gmem_fallocate(struct file *file, int mode, loff_t offse=
+t,
+>  			       loff_t len)
+>  {
+> +	struct inode *inode =3D file_inode(file);
+>  	int ret;
+> +	int idx;
+> =20
+> -	if (!(mode & FALLOC_FL_KEEP_SIZE))
+> -		return -EOPNOTSUPP;
+> +	idx =3D srcu_read_lock(&kvm_gmem_freeze_srcu);
+> +	if (kvm_gmem_is_frozen(inode)) {
+> +		srcu_read_unlock(&kvm_gmem_freeze_srcu, idx);
+> +		return -EPERM;
+> +	}
+[ ... ]
+>  	if (mode & FALLOC_FL_PUNCH_HOLE)
+>  		ret =3D kvm_gmem_punch_hole(file_inode(file), offset, len);
+>  	else
+>  		ret =3D kvm_gmem_allocate(file_inode(file), offset, len);
+> =20
+>  	if (!ret)
+>  		file_modified(file);
+> +
+> +out:
+> +	srcu_read_unlock(&kvm_gmem_freeze_srcu, idx);
+>  	return ret;
+>  }
+
+[Severity: High]
+Does this code allow an unprivileged tenant to stall the system by holding =
+the
+global kvm_gmem_freeze_srcu read lock across unbounded fallocate operations?
+
+If a tenant requests a massive hole punch or allocation, kvm_gmem_fallocate=
+()
+holds the read lock for the entire duration of kvm_gmem_punch_hole() or
+kvm_gmem_allocate().
+
+If another VM triggers kvm_gmem_freeze(..., true) during this time, it will
+block in synchronize_srcu(&kvm_gmem_freeze_srcu) until the massive operation
+completes.
+
+Could this lead to a cross-tenant denial of service where one VM blocks live
+updates and preservation operations for all other VMs on the same hyperviso=
+r?
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260728121138.1103=
+610-1-tarunsahu@google.com?part=3D7
