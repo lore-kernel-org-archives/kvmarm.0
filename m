@@ -1,303 +1,120 @@
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com [209.85.218.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D24F847ECD8
-	for <kvmarm@lists.linux.dev>; Wed, 29 Jul 2026 12:13:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59B463D1707
+	for <kvmarm@lists.linux.dev>; Wed, 29 Jul 2026 12:23:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785327234; cv=none; b=BhhO0SuuU1/s177NIGWeShRzdT8FF6P7GCF8zyqhLim7vJdzr9QM0ZRV4k41+/q5+cD9BHBl2TtQhwAT6VtD0HWtEWa7x2rXUiGndrsQi7ZLG0UvVQQkZy8vjtUs3t61ajtWPxEborv6rMwNx3I055J1JqAQwiLtydJQNuruKfA=
+	t=1785327791; cv=none; b=rYM5x5nMseWr9lcZv7k2xWQlNk9RhSYN3J/dPI49dPZg30sJT9RvOew7FDfaiz3901vuFJmKN8t4meDLhfm61cUCy0JYP5nGBOBkQfh1gdF+fC0YZJko6If8z7RohP9IgmFbGujDDqFKrdA+9zWBqML5OTN+Q+jlHAdH9OSQjj8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785327234; c=relaxed/simple;
-	bh=77hq13VK/L4ffHj3n97i3bGO0isGHkXXwe3+Lt3FlK8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=cA4aIou+KFSYleDq4TbzJ68AJgQXsQA9P/Rf/y0ZjF0On8DLGAibLPkBB0wU0lzt5pvrIAhqDXFJn8IvJMH15SDUo5JACHlAYoTOpaBpMxJgsv+bwcygkdNvHDZkfJSnOA68xH1w6LJbMSLaTbhE8waHE9+P0p60R2AXrLgGR0U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jNGWykfe; arc=none smtp.client-ip=209.85.218.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com
+	s=arc-20240116; t=1785327791; c=relaxed/simple;
+	bh=PJgHfzt8UWikp5xOZvYYWSJRfLTdHUp9uPqlMnlCH0A=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=dv3u0GS0IxpbqhhH9z2OCUc89gn7zaKsyGyKWyFFP3sxTVQhevYP4uUdDG2wZ1sjWVf68px4UM98MPAUxVpiurf/l/tCe3WwVQOAk1TTBPspvwwmiEs5qK4BeH+hElT017cl6PYn7je7/z/fyzcb0DDARjTkIZzGzWFYlIDJYeg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=argET+de; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jNGWykfe"
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-c1c25c44d15so110805166b.1
-        for <kvmarm@lists.linux.dev>; Wed, 29 Jul 2026 05:13:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1785327229; x=1785932029; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=p06tmEqCmuR7vgGiUUXccyUpu5ULn3Qw0OUPDBKfaJ8=;
-        b=jNGWykfe6TRs8kWnkrnfbaLSqmpG4hPQh08kvZum6RLZv45IrHulrxTfxzsGKZxOd2
-         BsYI4HNjD73ExqXDF15T6oXCE73pSJT5XMYVwnBK/HnbWnQI53UISelieo8TWJ2etYBC
-         Pg6gmIgJ7wa0MQfXzZUAL83eRVYPaaxBrpmS92e50UttybW1ByQOgZocv0h1E3n9Oqv/
-         fKZ9upB0YPNkvsjyFHUgJhR5Qa+R4Op7Q2qg8KIkm8DVs3yjww43nJfsNKihN5KmUImZ
-         NWUF1V20O1sjXTe4KQwdmElf3pwRtBiNwMLr3npaMJGfDb/y8AEtkvWPU3NthZ7IHjxu
-         nRCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785327229; x=1785932029;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=p06tmEqCmuR7vgGiUUXccyUpu5ULn3Qw0OUPDBKfaJ8=;
-        b=GRLJ99DWrRY4Vp6MOV04Ijl1S57cfY7mnNS7BJ/qH3rIjidGNos8VWGQMhKh+zEsLQ
-         JTJ7tys+RURoNuZgUilw0SockHxl9aslg1SLjUuic0xoUzjWl9nAsYV/MizWGRghKyOU
-         HR92rOnn0GjLYrzULTgnsFGERsuMjrrskGkALe8+r3VuVxzccJ8/fIpyxOYzT9b/7azq
-         N0bKk/puX3vjCy92UnHTCdWon0z+jP/0oo3WS/jDtzjozPGwiwXnO2wyfmsYJuk+jFuB
-         cD9rmK3K9HdtfloMT5+p6YZ5pza2Azhjg/7H8s45PQWXUBMdGzkssPUYjIN8LCcrJQ+p
-         6XjQ==
-X-Forwarded-Encrypted: i=1; AHgh+Rqapr3J64hw+JPB/gIT909lRKppsjFbCyzeLQA4LoIpB27SjqvMnOhiTdBBKaEFJISo8fe4UCk=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yze6fOYpVNYOOUUKT9WfyPJfQE2C8f3XEuVF9JwW+rowLC+Fbsy
-	qvD216tka5bbJl4FxgSWS7kwzdPtJ+gaomuO0FbeIFXzP5FDFB9OFvsI+Zr20S7JqJ/xSCSqn4h
-	iN+U9O1Zp3ayl5WVo9K7TDBocHkX0bQ==
-X-Received: from ejbgr25.prod.google.com ([2002:a17:906:e2d9:b0:c01:db91:5d49])
- (user=sebastianene job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:907:fd18:b0:c15:cd7c:fcf0 with SMTP id a640c23a62f3a-c1f71e93eeamr320466266b.1.1785327229138;
- Wed, 29 Jul 2026 05:13:49 -0700 (PDT)
-Date: Wed, 29 Jul 2026 12:13:07 +0000
-In-Reply-To: <20260729121306.1519473-2-sebastianene@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="argET+de"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AEA5F1F000E9;
+	Wed, 29 Jul 2026 12:23:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785327790;
+	bh=ZoVxzIiQQ5bii0qp3ngJpmkdeW6WZ9zj9RRmZnA37o0=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=argET+de2azwKfyQpM1UCVd480mtPaoR1jgvFsSw+Bh3nsJhjLGdo95gHsAKMZtsz
+	 BW1EtGAWZpkDRMNoUuwON+kHOlj0Ryu83pT/bFtT7D3Yt8qSrotQN/NAYEMkoUAeR5
+	 eTQ4UuMn1ti5FPOoIrMJ4lwJJ83+nUtpdTP04Dkr2aIutrMASDxrgAM99Kpd750G29
+	 HpXSzSrPO18ZFQsrIE7JZA8IS0tlp0HzlczvyKEA3LUXfMi8MyjmQY6Ri8vrIbJ7fb
+	 7gkuR4/Tq/BH7jHncVqXJ8r2kV1QO+JS0NAblqmkJdLYEKAXxt6p6FpUi4Yw70YJ9M
+	 wdqIVyfUYq3JA==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v8 4/7] KVM: arm64: Support FFA_NOTIFICATION_SET in host
+ handler
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Sebastian Ene" <sebastianene@google.com>
+Cc: "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>
+In-Reply-To: <20260729121306.1519473-6-sebastianene@google.com>
+References: <20260729121306.1519473-2-sebastianene@google.com>
+ <20260729121306.1519473-6-sebastianene@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 29 Jul 2026 12:23:09 +0000
+Message-Id: <20260729122309.AEA5F1F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20260729121306.1519473-2-sebastianene@google.com>
-X-Mailer: git-send-email 2.55.0.487.gaf234c4eb3-goog
-Message-ID: <20260729121306.1519473-9-sebastianene@google.com>
-Subject: [PATCH v8 7/7] KVM: arm64: Enforce strict SBZ checks in the FF-A proxy
-From: Sebastian Ene <sebastianene@google.com>
-To: catalin.marinas@arm.com, maz@kernel.org, oupton@kernel.org, 
-	fuad.tabba@linux.dev, will@kernel.org
-Cc: joey.gouly@arm.com, korneld@google.com, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	android-kvm@google.com, mrigendra.chaubey@gmail.com, perlarsen@google.com, 
-	sebastianene@google.com, suzuki.poulose@arm.com, vdonnefort@google.com, 
-	yuzenghui@huawei.com
-Content-Type: text/plain; charset="UTF-8"
 
-Introduce a helper method ffa_check_unused_args_sbz to enforce strict
-arguments checking when the hypervisor acts as a relayer between the
-host and Trustzone.
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+s) to consider:
+- [Medium] The `FFA_NOTIFICATION_SET` handler incorrectly uses `GENMASK(15,=
+ 2)` to validate the `flags` parameter, failing to check the upper 16 bits.
+- [Medium] `do_ffa_notif_set` fails to validate that unused SMC arguments a=
+re zero (SBZ) before proxying the call to EL3.
+--
 
-Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
-Acked-by: Will Deacon <will@kernel.org>
-Signed-off-by: Sebastian Ene <sebastianene@google.com>
----
- arch/arm64/kvm/hyp/nvhe/ffa.c | 96 ++++++++++++++++++++++++++++++++++-
- 1 file changed, 95 insertions(+), 1 deletion(-)
+--- Patch [4]: [PATCH v8 4/7] KVM: arm64: Support FFA_NOTIFICATION_SET in h=
+ost handler ---
+commit baa4efd6afc2d0d38d7b2978ab35d6925fbb388e
+Author: Sebastian Ene <sebastianene@google.com>
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-index 712811e89435..334f8a28d942 100644
---- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-+++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-@@ -74,6 +74,21 @@ static u32 hyp_ffa_version;
- static bool has_version_negotiated;
- static hyp_spinlock_t version_lock;
- 
-+static bool ffa_check_unused_args_sbz(struct kvm_cpu_context *ctxt, int first_reg)
-+{
-+	DECLARE_REG(u32, func_id, ctxt, 0);
-+	int reg, end_reg = 7;
-+
-+	if (hyp_ffa_version >= FFA_VERSION_1_2 && ARM_SMCCC_IS_64(func_id))
-+		end_reg = 17;
-+	for (reg = first_reg; reg <= end_reg; reg++) {
-+		if (cpu_reg(ctxt, reg))
-+			return true;
-+	}
-+
-+	return false;
-+}
-+
- static void ffa_to_smccc_error(struct arm_smccc_1_2_regs *res, u64 ffa_errno)
- {
- 	*res = (struct arm_smccc_1_2_regs) {
-@@ -242,6 +257,11 @@ static void do_ffa_rxtx_map(struct arm_smccc_1_2_regs *res,
- 	int ret = 0;
- 	void *rx_virt, *tx_virt;
- 
-+	if (ffa_check_unused_args_sbz(ctxt, 4)) {
-+		ret = FFA_RET_INVALID_PARAMETERS;
-+		goto out;
-+	}
-+
- 	if (npages != (KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE) / FFA_PAGE_SIZE) {
- 		ret = FFA_RET_INVALID_PARAMETERS;
- 		goto out;
-@@ -318,6 +338,11 @@ static void do_ffa_rxtx_unmap(struct arm_smccc_1_2_regs *res,
- 	DECLARE_REG(u32, id, ctxt, 1);
- 	int ret = 0;
- 
-+	if (ffa_check_unused_args_sbz(ctxt, 2)) {
-+		ret = FFA_RET_INVALID_PARAMETERS;
-+		goto out;
-+	}
-+
- 	if (id != HOST_FFA_ID) {
- 		ret = FFA_RET_INVALID_PARAMETERS;
- 		goto out;
-@@ -424,6 +449,11 @@ static void do_ffa_mem_frag_tx(struct arm_smccc_1_2_regs *res,
- 	int ret = FFA_RET_INVALID_PARAMETERS;
- 	u32 nr_ranges;
- 
-+	if (ffa_check_unused_args_sbz(ctxt, 5)) {
-+		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-+		return;
-+	}
-+
- 	if (fraglen > KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE)
- 		goto out;
- 
-@@ -485,6 +515,11 @@ static void __do_ffa_mem_xfer(const u64 func_id,
- 	u32 offset, nr_ranges, checked_offset;
- 	int ret = 0;
- 
-+	if (ffa_check_unused_args_sbz(ctxt, 5)) {
-+		ret = FFA_RET_INVALID_PARAMETERS;
-+		goto out;
-+	}
-+
- 	if (addr_mbz || npages_mbz || fraglen > len ||
- 	    fraglen > KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE) {
- 		ret = FFA_RET_INVALID_PARAMETERS;
-@@ -584,6 +619,11 @@ static void do_ffa_mem_reclaim(struct arm_smccc_1_2_regs *res,
- 	int ret = 0;
- 	u64 handle;
- 
-+	if (ffa_check_unused_args_sbz(ctxt, 4)) {
-+		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-+		return;
-+	}
-+
- 	handle = PACK_HANDLE(handle_lo, handle_hi);
- 
- 	hyp_spin_lock(&host_buffers.lock);
-@@ -764,6 +804,11 @@ static void do_ffa_version(struct arm_smccc_1_2_regs *res,
- {
- 	DECLARE_REG(u32, ffa_req_version, ctxt, 1);
- 
-+	if (ffa_check_unused_args_sbz(ctxt, 2)) {
-+		res->a0 = FFA_RET_NOT_SUPPORTED;
-+		return;
-+	}
-+
- 	if (FFA_MAJOR_VERSION(ffa_req_version) != 1) {
- 		res->a0 = FFA_RET_NOT_SUPPORTED;
- 		return;
-@@ -813,6 +858,11 @@ static void do_ffa_part_get(struct arm_smccc_1_2_regs *res,
- 	DECLARE_REG(u32, flags, ctxt, 5);
- 	u32 count, partition_sz, copy_sz;
- 
-+	if (ffa_check_unused_args_sbz(ctxt, 6)) {
-+		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-+		return;
-+	}
-+
- 	hyp_spin_lock(&host_buffers.lock);
- 	if (!host_buffers.rx) {
- 		ffa_to_smccc_res(res, FFA_RET_BUSY);
-@@ -860,9 +910,15 @@ static void do_ffa_part_get(struct arm_smccc_1_2_regs *res,
- static void do_ffa_notif_bitmap(struct arm_smccc_1_2_regs *res,
- 				struct kvm_cpu_context *ctxt)
- {
-+	DECLARE_REG(u32, func_id, ctxt, 0);
- 	DECLARE_REG(u32, vmid, ctxt, 1);
- 	struct arm_smccc_1_2_regs *args;
- 
-+	if (ffa_check_unused_args_sbz(ctxt, func_id == FFA_NOTIFICATION_BITMAP_CREATE ? 3 : 2)) {
-+		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-+		return;
-+	}
-+
- 	if (vmid != HOST_FFA_ID) {
- 		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
- 		return;
-@@ -879,6 +935,11 @@ static void do_ffa_notif_bind(struct arm_smccc_1_2_regs *res,
- 	DECLARE_REG(u32, flags, ctxt, 2);
- 	struct arm_smccc_1_2_regs *args;
- 
-+	if (ffa_check_unused_args_sbz(ctxt, 5)) {
-+		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-+		return;
-+	}
-+
- 	if (FIELD_GET(FFA_NOTIF_RECEIVER_ENDP_MASK, endp_id) != HOST_FFA_ID) {
- 		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
- 		return;
-@@ -900,7 +961,7 @@ static void do_ffa_notif_unbind(struct arm_smccc_1_2_regs *res,
- 	DECLARE_REG(u32, reserved, ctxt, 2);
- 	struct arm_smccc_1_2_regs *args;
- 
--	if (reserved) {
-+	if (ffa_check_unused_args_sbz(ctxt, 5) || reserved) {
- 		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
- 		return;
- 	}
-@@ -926,6 +987,11 @@ static void do_ffa_notif_set(struct arm_smccc_1_2_regs *res,
- 		return;
- 	}
- 
-+	if (ffa_check_unused_args_sbz(ctxt, 5)) {
-+		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-+		return;
-+	}
-+
- 	if (flags & GENMASK(15, 2)) {
- 		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
- 		return;
-@@ -947,6 +1013,11 @@ static void do_ffa_notif_get(struct arm_smccc_1_2_regs *res,
- 		return;
- 	}
- 
-+	if (ffa_check_unused_args_sbz(ctxt, 3)) {
-+		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-+		return;
-+	}
-+
- 	if (flags & GENMASK(31, 4)) {
- 		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
- 		return;
-@@ -956,6 +1027,20 @@ static void do_ffa_notif_get(struct arm_smccc_1_2_regs *res,
- 	hyp_smccc_1_2_smc(args, res);
- }
- 
-+static void do_ffa_notif_info_get(struct arm_smccc_1_2_regs *res,
-+				  struct kvm_cpu_context *ctxt)
-+{
-+	struct arm_smccc_1_2_regs *args;
-+
-+	if (ffa_check_unused_args_sbz(ctxt, 1)) {
-+		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-+		return;
-+	}
-+
-+	args = (void *)&ctxt->regs.regs[0];
-+	hyp_smccc_1_2_smc(args, res);
-+}
-+
- bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
- {
- 	struct arm_smccc_1_2_regs res;
-@@ -984,6 +1069,11 @@ bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
- 
- 	switch (func_id) {
- 	case FFA_FEATURES:
-+		if (ffa_check_unused_args_sbz(host_ctxt, 3)) {
-+			ffa_to_smccc_res(&res, FFA_RET_INVALID_PARAMETERS);
-+			goto out_handled;
-+		}
-+
- 		if (!do_ffa_features(&res, host_ctxt))
- 			return false;
- 		goto out_handled;
-@@ -1030,6 +1120,10 @@ bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
- 	case FFA_NOTIFICATION_GET:
- 		do_ffa_notif_get(&res, host_ctxt);
- 		goto out_handled;
-+	case FFA_NOTIFICATION_INFO_GET:
-+	case FFA_FN64_NOTIFICATION_INFO_GET:
-+		do_ffa_notif_info_get(&res, host_ctxt);
-+		goto out_handled;
- 	}
- 
- 	if (ffa_call_supported(func_id))
--- 
-2.55.0.487.gaf234c4eb3-goog
+KVM: arm64: Support FFA_NOTIFICATION_SET in host handler
 
+This patch allows FF-A notification SET messages to be proxied from the
+pKVM hypervisor to Trustzone and verifies the arguments.
+
+> diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> index d52d7c4d5e7f5..2bb16aa414f9f 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
+
+[ ... ]
+
+> @@ -917,6 +917,27 @@ static void do_ffa_notif_unbind(struct arm_smccc_1_2=
+_regs *res,
+>  	hyp_smccc_1_2_smc(args, res);
+>  }
+> =20
+> +static void do_ffa_notif_set(struct arm_smccc_1_2_regs *res,
+> +			     struct kvm_cpu_context *ctxt)
+> +{
+> +	DECLARE_REG(u32, endp_id, ctxt, 1);
+> +	DECLARE_REG(u32, flags, ctxt, 2);
+> +	struct arm_smccc_1_2_regs *args;
+> +
+> +	if (FIELD_GET(FFA_NOTIF_SENDER_ENDP_MASK, endp_id) !=3D HOST_FFA_ID) {
+> +		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
+> +		return;
+> +	}
+> +
+> +	if (flags & GENMASK(15, 2)) {
+
+[Severity: Medium]
+Does this mask adequately validate the upper bits of the flags parameter?
+
+Because GENMASK(15, 2) is used, bits 31:16 of the flags parameter passed in
+W2 are left unvalidated. If an untrusted host issues the hypercall with
+non-zero values in these upper 16 bits, they will be forwarded directly to =
+EL3.
+
+> +		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
+> +		return;
+> +	}
+> +
+> +	args =3D (void *)&ctxt->regs.regs[0];
+
+[Severity: Medium]
+Should this function validate that unused SMC arguments are zero before
+proxying the call to EL3?=20
+
+Other handlers in this file call ffa_check_unused_args_sbz() to enforce this
+behavior. Without that check, if the untrusted host passes arbitrary data in
+unused registers, that data will be forwarded verbatim to the Secure Payload
+Manager, potentially providing a fuzzing channel against EL3.
+
+> +	hyp_smccc_1_2_smc(args, res);
+> +}
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260729121306.1519=
+473-2-sebastianene@google.com?part=3D4
