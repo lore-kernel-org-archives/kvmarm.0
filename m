@@ -1,187 +1,177 @@
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87E56476CE0
-	for <kvmarm@lists.linux.dev>; Wed, 29 Jul 2026 13:47:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C635548D89C
+	for <kvmarm@lists.linux.dev>; Wed, 29 Jul 2026 13:52:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785332851; cv=none; b=HAlsVbYUiRRUnxuGZmQKQqbLinFgc88WZJK6ZtFE0pHZoN66zNRbYNIec3MYFJshXTJ4YmLFgeW3sgt4xMJ2kOezBVYchHqhBl55MLrLOcnQmvP4S84xoBZvMii5rgmJNghFE4QDwzJ8DAaiYgcIlK6AFOs9WFOjbzIfyb+PrTY=
+	t=1785333166; cv=none; b=QuDGvpGZ/fvZjllDvlgO9CK0PI8oq0Bn95tMv83ofzE41StZUZ/wZ9u8ez1wb7obRPLxCkdiBVwDltsFBEdx2S5ikVDqzXmOw7z0BQOTDXzAxBV4uVJv1z9uJw7yt8+lcUmUd09zAYtX6eMGYsE1TOIYtgt3HAnZH3rscHWxEQQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785332851; c=relaxed/simple;
-	bh=uLPT3qPDw6PyRFoDxxyAxWqaBZfCeUSz64TubquYANA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dvLguJW6zmtXaWOfmKh5TbGjetllJEYKRkIB7Ilv0t9ubkV7KT77+tXmG65RDIgRNrP0e+xL4iTOx/V6mPsZK96vYPHNyPdZFpHs3FMF/B+TP8cMRj0reBiAtDDgpVOEA+x++IPcn+3pb5lUd9QnsI4E2FWHv1LLI3xqDaEkEJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=L9vWnNe+; arc=none smtp.client-ip=91.218.175.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1785333166; c=relaxed/simple;
+	bh=bIn3BoKAiPM5c2kEvhjsM3SOvgUjn8PGLLyEVBKJzk8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=r13z407BAYkYFrA7LPR1ZrvTihH0vpPSJDN387bYXJiEOwuVCddQIA9I0xedD1apDqrv66o4v+jYHVUmzkKIb5ht/b41dirlYH52lZQFvVTXOh3AOC0DYlu1HJBr47uCkBSumWedA8fn0FGCAxR/FYB6k8BSRqfLWjdpWqGxsrI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=MwUG11p+; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="L9vWnNe+"
-X-Gm-Message-State: AOJu0Yx/8U7UsMbgKl7L4aISa/L6QiFRnRxeHd1FysCdYOnuLxznllVZ
-	XYffR8xtlTBycn59nAszwW+fkOmFy1rx77Y4Y9JdxZsMNcVG01tOcqhh8nAYgu2ywFEsYiSCFeg
-	P6PSEVwsEWTy2QnsluOyMebkeCDlX65b0PhB10uxV
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1785332847;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ObLTe4j5+GIry/KA4AvGwNTy0S0bPjoV/ugF789jLJM=;
-	b=L9vWnNe+y8B5xlalYAyoXI/VSKkNLVe9GtpAhLwSsbmdkWrkTygKRSM+cs6kxzD5Z7DtTH
-	EPTuJTo0rMfZ27Xztd7Ivle/+HZotUUvMI9F3pN/BCG6fPh09avdu8DlIvvIrc1UgKbocY
-	l6BF7GbTYo8NzUHrA0E9KIBd1W9LlHs=
-X-Received: by 2002:a05:622a:514a:b0:51c:935d:8d74 with SMTP id
- d75a77b69052e-52b2cc85692mr9349041cf.9.1785332844512; Wed, 29 Jul 2026
- 06:47:24 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="MwUG11p+"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E160F165C;
+	Wed, 29 Jul 2026 06:52:34 -0700 (PDT)
+Received: from e143914.arm.com (e143914.arm.com [10.2.213.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5AD193F86F;
+	Wed, 29 Jul 2026 06:52:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1785333159; bh=bIn3BoKAiPM5c2kEvhjsM3SOvgUjn8PGLLyEVBKJzk8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MwUG11p+Auh3CdMpQkUXULpzkUfAYF4bdSD1pHi22trMt022PNZnZ09tbJCGmboZM
+	 id5XdrjLFq67IB6MvI9OSSNaUfZ6qT3khYNguFao/WE8obd/s09D0unHK1KTYzs2uh
+	 od5ks4+ggIGBvW0AOKpWiYVAV6r24hz9gekvuYVc=
+Date: Wed, 29 Jul 2026 14:52:30 +0100
+From: Joey Gouly <joey.gouly@arm.com>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Quentin Perret <qperret@google.com>,
+	Sebastian Ene <sebastianene@google.com>,
+	Hyunwoo Kim <imv4bel@gmail.com>, Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH v7 2/8] KVM: arm64: Make vcpu_{read,write}_sys_reg
+ available to HYP code
+Message-ID: <amoFnupIKfDEzN0F@e143914.arm.com>
+References: <20260729131823.2021516-1-fuad.tabba@linux.dev>
+ <20260729131823.2021516-3-fuad.tabba@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260729131823.2021516-1-fuad.tabba@linux.dev>
- <20260729131823.2021516-9-fuad.tabba@linux.dev> <20260729133600.ABD741F000E9@smtp.kernel.org>
-In-Reply-To: <20260729133600.ABD741F000E9@smtp.kernel.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Wed, 29 Jul 2026 14:46:47 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTxCuAgBdRkACw26=F2-k98BrDxzwaLyhyT5uGN+-4-ZKQ@mail.gmail.com>
-X-Gm-Features: AUfX_mw-VKzX9ky4UGdBykDDFy1qEMOQhp9w5ae93rayF3NMCo2lEeXnhpzdnA4
-Message-ID: <CA+EHjTxCuAgBdRkACw26=F2-k98BrDxzwaLyhyT5uGN+-4-ZKQ@mail.gmail.com>
-Subject: Re: [PATCH v7 8/8] KVM: arm64: Implement lazy vCPU state sync for
- non-protected guests
-To: sashiko-reviews@lists.linux.dev
-Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>, 
-	Marc Zyngier <maz@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260729131823.2021516-3-fuad.tabba@linux.dev>
 
-On Wed, 29 Jul 2026 at 14:36, <sashiko-bot@kernel.org> wrote:
->
-> Thank you for your contribution! Sashiko AI review found 2 potential issu=
-e(s) to consider:
-> - [High] Missing HCR_EL2 state synchronization breaks virtual SError inje=
-ction, causing an infinite exception loop.
-> - [High] Lazy state sync fails to flush context after KVM_REQ_VCPU_RESET,=
- causing vCPU resets (e.g., PSCI CPU_ON) to be ignored.
+On Wed, Jul 29, 2026 at 02:18:17PM +0100, Fuad Tabba wrote:
+> The vcpu_{read,write}_sys_reg() accessors abstract where a system
+> register lives, but their VHE implementation cannot be linked into the
+> nVHE hypervisor, so exception.c open-codes has_vhe() wrappers instead.
+> 
+> Redirect the accessors to the raw context accessors for nVHE hyp builds,
+> where registers are always in memory, and drop the local wrappers. This
+> lets hyp code reuse helpers built on the canonical accessors.
+> 
+> No functional change intended.
+> 
+> Suggested-by: Marc Zyngier <maz@kernel.org>
+> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+> ---
+>  arch/arm64/include/asm/kvm_emulate.h |  6 +++++
+>  arch/arm64/kvm/hyp/exception.c       | 34 ++++++++--------------------
+>  2 files changed, 15 insertions(+), 25 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index 5bf3d7e1d92c7..fb4062b3ce55a 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -506,6 +506,12 @@ static inline unsigned long kvm_vcpu_get_mpidr_aff(struct kvm_vcpu *vcpu)
+>  	return __vcpu_sys_reg(vcpu, MPIDR_EL1) & MPIDR_HWID_BITMASK;
+>  }
+>  
+> +/* In nVHE hyp code, registers are always in memory: use the raw accessors. */
+> +#if defined(__KVM_NVHE_HYPERVISOR__)
+> +#define vcpu_read_sys_reg(v, r)		__vcpu_sys_reg(v, r)
+> +#define vcpu_write_sys_reg(v, x, r)	__vcpu_assign_sys_reg(v, r, x)
+> +#endif
+> +
 
-I think this covers it:
+Does this make sense in arch/arm64/include/asm/kvm_host.h instead? Next
+to the definitions of __vcpu_sys_reg() etc.
 
-https://lore.kernel.org/all/CA+EHjTxiyUSJqRcadSCOmR+tELSsBiGaTYH9xxXh-g-xyu=
-HZdA@mail.gmail.com/
+Thanks,
+Joey
 
-/fuad
-
-> --
->
-> --- Patch [8]: [PATCH v7 8/8] KVM: arm64: Implement lazy vCPU state sync =
-for non-protected guests ---
-> commit 80df5c4ca2cca0a1726813fa129b353353482892
-> Author: Fuad Tabba <fuad.tabba@linux.dev>
->
-> KVM: arm64: Implement lazy vCPU state sync for non-protected guests
->
-> This commit optimizes world switches for non-protected guests by deferrin=
-g
-> the copy of the vCPU register context between the host and hypervisor.
-> State is now only synced on entry if marked dirty, and on exit only when
-> explicitly needed by the host.
->
-> > diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.=
-c
-> > --- a/arch/arm64/kvm/handle_exit.c
-> > +++ b/arch/arm64/kvm/handle_exit.c
-> > @@ -486,9 +486,32 @@ int handle_exit(struct kvm_vcpu *vcpu, int excepti=
-on_index)
-> >       }
-> >  }
-> >
-> > +static void handle_exit_pkvm_state(struct kvm_vcpu *vcpu, int exceptio=
-n_index)
-> > +{
-> > +     int exception_code =3D ARM_EXCEPTION_CODE(exception_index);
-> > +
-> > +     if (!is_protected_kvm_enabled() || kvm_vm_is_protected(vcpu->kvm)=
-)
-> > +             return;
-> > +
-> > +     /*
-> > +      * Sync the context back when the host will read (trap) or write
-> > +      * (SError) it. Preempt-off here, so the loaded hyp vCPU is stabl=
-e.
-> > +      */
-> > +     if (exception_code =3D=3D ARM_EXCEPTION_TRAP ||
-> > +         exception_code =3D=3D ARM_EXCEPTION_EL1_SERROR ||
-> > +         ARM_SERROR_PENDING(exception_index)) {
-> > +             kvm_call_hyp_nvhe(__pkvm_vcpu_sync_state);
-> > +             vcpu_set_flag(vcpu, PKVM_HOST_STATE_DIRTY);
-> > +     } else {
-> > +             vcpu_clear_flag(vcpu, PKVM_HOST_STATE_DIRTY);
->
-> [Severity: High]
-> Is it possible for KVM_REQ_VCPU_RESET updates to be ignored due to this
-> cleared flag?
->
-> If a secondary vCPU is powered on (for example, via PSCI CPU_ON), it
-> receives KVM_REQ_VCPU_RESET and gets kicked, leading to an exit with an
-> IRQ. Since that exit takes this else branch and clears the dirty flag,
-> and the reset request is processed afterward in kvm_vcpu_check_requests()
-> which modifies the host-side vCPU context, wouldn't flush_hyp_vcpu() skip
-> syncing this updated reset state because the flag remains cleared?
->
-> This could result in the target vCPU resuming with its pre-IRQ stale
-> context, eventually overwriting the new reset state on the next exit.
->
-> > +     }
-> > +}
-> > +
->
-> [ ... ]
->
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nv=
-he/hyp-main.c
-> > --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> > @@ -203,9 +255,16 @@ static void sync_hyp_vcpu(struct pkvm_hyp_vcpu *hy=
-p_vcpu)
-> >       fpsimd_sve_sync(&hyp_vcpu->vcpu);
-> >       sync_debug_state(hyp_vcpu);
-> >
-> > -     host_vcpu->arch.ctxt            =3D hyp_vcpu->vcpu.arch.ctxt;
-> > -
-> > -     host_vcpu->arch.hcr_el2         =3D hyp_vcpu->vcpu.arch.hcr_el2;
->
-> [Severity: High]
-> Does removing this HCR_EL2 assignment break virtual SError injection and
-> cause an infinite exception loop?
->
-> When the host injects a virtual SError into a non-protected guest under
-> pKVM by setting HCR_VSE in the host-side vcpu->arch.hcr_el2, the hardware
-> automatically clears the VSE bit in the physical HCR_EL2 register once th=
-e
-> guest takes the exception.
->
-> Without syncing this hardware-cleared state back to the host here, the
-> host's HCR_VSE bit remains set. On the next entry, flush_hyp_vcpu() will
-> repeatedly re-inject the stale HCR_VSE bit from the host into the hyp vCP=
-U,
-> locking up the guest.
->
-> > +     if (pkvm_hyp_vcpu_is_protected(hyp_vcpu)) {
-> > +             host_vcpu->arch.ctxt =3D hyp_vcpu->vcpu.arch.ctxt;
-> > +     } else {
-> > +             /*
-> > +              * PC feeds trace_kvm_exit(), PSTATE.SS the host software=
--step
-> > +              * machine, and both run before the next on-demand ctxt s=
-ync.
-> > +              */
-> > +             host_vcpu->arch.ctxt.regs.pc =3D hyp_vcpu->vcpu.arch.ctxt=
-.regs.pc;
-> > +             host_vcpu->arch.ctxt.regs.pstate =3D hyp_vcpu->vcpu.arch.=
-ctxt.regs.pstate;
-> > +     }
->
-> --
-> Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260729131823.20=
-21516-1-fuad.tabba@linux.dev?part=3D8
+>  static inline void kvm_vcpu_set_be(struct kvm_vcpu *vcpu)
+>  {
+>  	if (vcpu_mode_is_32bit(vcpu)) {
+> diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
+> index bef40ddb16dbc..754e2dc1df54a 100644
+> --- a/arch/arm64/kvm/hyp/exception.c
+> +++ b/arch/arm64/kvm/hyp/exception.c
+> @@ -20,22 +20,6 @@
+>  #error Hypervisor code only!
+>  #endif
+>  
+> -static inline u64 __vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
+> -{
+> -	if (has_vhe())
+> -		return vcpu_read_sys_reg(vcpu, reg);
+> -
+> -	return __vcpu_sys_reg(vcpu, reg);
+> -}
+> -
+> -static inline void __vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
+> -{
+> -	if (has_vhe())
+> -		vcpu_write_sys_reg(vcpu, val, reg);
+> -	else
+> -		__vcpu_assign_sys_reg(vcpu, reg, val);
+> -}
+> -
+>  static void __vcpu_write_spsr(struct kvm_vcpu *vcpu, unsigned long target_mode,
+>  			      u64 val)
+>  {
+> @@ -101,14 +85,14 @@ static void enter_exception64(struct kvm_vcpu *vcpu, unsigned long target_mode,
+>  
+>  	switch (target_mode) {
+>  	case PSR_MODE_EL1h:
+> -		vbar = __vcpu_read_sys_reg(vcpu, VBAR_EL1);
+> -		sctlr = __vcpu_read_sys_reg(vcpu, SCTLR_EL1);
+> -		__vcpu_write_sys_reg(vcpu, *vcpu_pc(vcpu), ELR_EL1);
+> +		vbar = vcpu_read_sys_reg(vcpu, VBAR_EL1);
+> +		sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL1);
+> +		vcpu_write_sys_reg(vcpu, *vcpu_pc(vcpu), ELR_EL1);
+>  		break;
+>  	case PSR_MODE_EL2h:
+> -		vbar = __vcpu_read_sys_reg(vcpu, VBAR_EL2);
+> -		sctlr = __vcpu_read_sys_reg(vcpu, SCTLR_EL2);
+> -		__vcpu_write_sys_reg(vcpu, *vcpu_pc(vcpu), ELR_EL2);
+> +		vbar = vcpu_read_sys_reg(vcpu, VBAR_EL2);
+> +		sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL2);
+> +		vcpu_write_sys_reg(vcpu, *vcpu_pc(vcpu), ELR_EL2);
+>  		break;
+>  	default:
+>  		/* Don't do that */
+> @@ -185,7 +169,7 @@ static void enter_exception64(struct kvm_vcpu *vcpu, unsigned long target_mode,
+>   */
+>  static unsigned long get_except32_cpsr(struct kvm_vcpu *vcpu, u32 mode)
+>  {
+> -	u32 sctlr = __vcpu_read_sys_reg(vcpu, SCTLR_EL1);
+> +	u32 sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL1);
+>  	unsigned long old, new;
+>  
+>  	old = *vcpu_cpsr(vcpu);
+> @@ -281,7 +265,7 @@ static void enter_exception32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
+>  {
+>  	unsigned long spsr = *vcpu_cpsr(vcpu);
+>  	bool is_thumb = (spsr & PSR_AA32_T_BIT);
+> -	u32 sctlr = __vcpu_read_sys_reg(vcpu, SCTLR_EL1);
+> +	u32 sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL1);
+>  	u32 return_address;
+>  
+>  	*vcpu_cpsr(vcpu) = get_except32_cpsr(vcpu, mode);
+> @@ -305,7 +289,7 @@ static void enter_exception32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
+>  	if (sctlr & (1 << 13))
+>  		vect_offset += 0xffff0000;
+>  	else /* always have security exceptions */
+> -		vect_offset += __vcpu_read_sys_reg(vcpu, VBAR_EL1);
+> +		vect_offset += vcpu_read_sys_reg(vcpu, VBAR_EL1);
+>  
+>  	*vcpu_pc(vcpu) = vect_offset;
+>  }
+> -- 
+> 2.39.5
+> 
