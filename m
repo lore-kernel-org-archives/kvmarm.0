@@ -1,207 +1,335 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E41763AFD1E;
-	Wed, 29 Jul 2026 10:55:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 931F34499B6;
+	Wed, 29 Jul 2026 10:57:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785322543; cv=none; b=JtrEuOkoWvzCTE3xn5gFfF3UH+v1zGStMw6JCfPcCd3vxirXL+EnaPYlf+H3u5GZ+8IhKUVMPnx6deSizDOsOqoU9aSvkqkLxNukwcp+U7k4CKje3LX9W1ZrEP10cAK2LZLIYaabYUWTlbpg7auuccMYT4PEBs8eQD8dq8zdiGE=
+	t=1785322676; cv=none; b=rUxuzKdK8wpEVm9bgtMAH7tXFeod7ZLnjHG/5hUpV7sB7vVhx9MIqUF1Vs8N71B7w2j7gUaBkNLHvmxnw2Qh6yNOO8DAagDJMqui4mxmni5Hfy5xniehHpW4xK6mwM6MBFREIsxNFnC0l2u0a2MkMK9W959rv20S54AVj4LbOUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785322543; c=relaxed/simple;
-	bh=SAFcae7IVBpwz6W8X0rbdw0EFsgtNfVjmvq+L0HyXps=;
+	s=arc-20240116; t=1785322676; c=relaxed/simple;
+	bh=2cSlau8piPW7Urm2i4Qif9M+ci7RwPbWHX27xkSf1Eg=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=jmxacza3eQfxFIi/KfxLv2hzMUJZ/zjAYrz36hcFfJ0+IT7qN6rlou9B/0rSXkhxDn/YStQt1Vg5UZlUVLN2JNuE2cRGndRpxvYLCcJ2MYbsokyMOgvJ8ViM7CC+2Ywho+b5XcvD/ZI39ZuUNuB1+Bid8ciw2Dq+stwTc9ckfVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EVnScmXP; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=cEGeg+Wc+IlPdNWV7JFCCbjC/XdFyKOYLPHEfTu+0oowlIQftRRZ+7mkB68EP6PfURtRbCgYOFOQpWC4UTkmpHpjaxCuHk0HCaLzmyYSuACpYCS4c+k71kZ1ZlLgFyiViozxPaEF73w1VsZhLYU1KUqWSUNxyZ331Hlqb6AGF5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F0onnFrs; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EVnScmXP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FECC1F00A3A;
-	Wed, 29 Jul 2026 10:55:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F0onnFrs"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1E6B1F000E9;
+	Wed, 29 Jul 2026 10:57:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785322541;
-	bh=qA2+NQKO0v6ZcVbODPyG2Vag2Qn9H+ENfa9BnZ0jrSE=;
+	s=k20260515; t=1785322674;
+	bh=YLWCf3VPcZLr0Qq+rn4J2+ur27EFB2i4tMnH8bGiz1U=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=EVnScmXPjqTvY7KqRFhs5d7EhrkvgmOCLEAArorDxeW13kgn/7ZW3XBoFGs2Y7OjB
-	 I0AK040SHzoTKPzmdxs2SYGsLQDbgGaz20mtrjwo8AvHkozeBwSxkv9hj4wW//yea7
-	 4cZFFDRUTrHwFHtY92TKicjJ8y2Y9pzq4SaVAImIQdzxUujTR1IvQ0QDg2DT2uHSJ6
-	 8A2nSDB4AFG/Yw64GGp2hjR18/exdOkNSXOrMqAAom3A+eA9/YcranSGDdn3zoRDJ5
-	 dp1LuBciH1j3F6/d69DZWk/SrMhngdylsvjo8J+cE8WOAVmy50Juba2I2/z3anSKDt
-	 XT5FyZEK7TyDw==
+	b=F0onnFrsceGeWp0YfoKHK5it7kVAn+moJdMMDekpy77e/kaam1wRUgIhAIbZbqIta
+	 kS6o7V4JZf+ZRSB4CE5FmCoD+wOM3ZvPfYPO8ajcUD2QZrTfBCq3/Jn0WyrPeRdDSM
+	 T3mUcrzSpKsqOyI4uVYHdelfByzO1W01BhqaMDucZZHJdZdU8BPlL2pa4qJvjX2+ke
+	 UhoHamv+Qqh3sitxxPPizO9XYLxayzBvWiVd+r2eeGI+pKfWTtQBz3Fdlryl+8/4Io
+	 qUMc1n4q9wFIiubuFLat10JHvkwhFNDsutVzpjT6wnBjdRMQ/oIp76xumFivXmx09A
+	 07/vWknMD+xFQ==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v3 01/11] KVM: arm64: HDBSS bits
+Subject: Re: [PATCH v3 04/11] KVM: arm64: dirty_bit: Add base FEAT_HACDBS
+ cleaning routine
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Leonardo Bras" <leo.bras@arm.com>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260729104548.3439958-2-leo.bras@arm.com>
+Cc: kvm@vger.kernel.org, "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev
+In-Reply-To: <20260729104548.3439958-5-leo.bras@arm.com>
 References: <20260729104548.3439958-1-leo.bras@arm.com>
- <20260729104548.3439958-2-leo.bras@arm.com>
+ <20260729104548.3439958-5-leo.bras@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 29 Jul 2026 10:55:40 +0000
-Message-Id: <20260729105541.3FECC1F00A3A@smtp.kernel.org>
+Date: Wed, 29 Jul 2026 10:57:53 +0000
+Message-Id: <20260729105753.B1E6B1F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 6 potential issue(=
+Thank you for your contribution! Sashiko AI review found 8 potential issue(=
 s) to consider:
-- [High] The patch is explicitly marked by the author as a test hack that s=
-hould not be merged upstream.
-- [High] Hardware Dirty Bit Management (DBM) is not cleared when write-prot=
-ecting pages, allowing guests to bypass software write-protection (such as =
-userfaultfd-wp or software dirty logging).
-- [Medium] Left shifting a negative signed integer is undefined behavior in=
- C.
-- [Medium] The hardcoded split_page_chunk_size is excessively large, causin=
-g massive memory allocations under the mmu_lock.
-- [Low] HDBSS entry macros are defined in a `.c` file instead of a header f=
-ile, making them inaccessible to other subsystems.
-- [Low] Typo in the parameter name of `has_vhe_hdbss`.
+- [Critical] `hacdbs_sched_in` restores a potentially stale VMID from `save=
+.vttbr_el2`, leading to cross-VM memory corruption.
+- [High] Direct EL2 system register accesses from host code without a VHE c=
+heck causes kernel panics on nVHE systems.
+- [High] Writes to control-plane system registers are batched and not immed=
+iately followed by an `isb()` barrier.
+- [High] Missing synchronization barrier (`DSB`) before changing the transl=
+ation context after disabling the HACDBS asynchronous engine.
+- [High] The hardware polling loop in `dirty_bit_clear` lacks a timeout or =
+signal check, risking an unkillable task hang.
+- [Medium] Using `virt_to_phys()` on a dynamic buffer array which could be =
+non-contiguous (e.g. allocated with vmalloc).
+- [Medium] The commit message explicitly asserts the code runs with preempt=
+ion disabled, but the implementation explicitly enables preemption.
+- [Low] Left-shift of a negative integer in macro definition.
 --
 
---- Patch [1]: [PATCH v3 01/11] KVM: arm64: HDBSS bits ---
-commit 125f04d66539bf05e0255567036409a407e48004
+--- Patch [4]: [PATCH v3 04/11] KVM: arm64: dirty_bit: Add base FEAT_HACDBS=
+ cleaning routine ---
+commit b837f416f1871772a3bac546015e6fcac9c7accb
 Author: Leonardo Bras <leo.bras@arm.com>
-Subject: KVM: arm64: HDBSS bits
 
-A brief summary:
-This commit introduces preliminary support for the Hardware Dirty state
-tracking structure (HDBSS) feature on ARM64. It adds CPU feature detection,
-sets the DBM stage-2 page table flag when write protection is relaxed, and
-configures eager page splitting chunk sizes for testing purposes.
+KVM: arm64: dirty_bit: Add base FEAT_HACDBS cleaning routine
 
-> I added them here in order to fulfill the dependencies and be able to
-> easily build and test this patchset, but this particular patch should *no=
-t*
-> be merged upstream.
+Introduce the basic cleaning routine that is going to be used for both
+dirty-bitmap and dirty-ring routines. It sets the required registers with
+the input buffer, and wait for HACDBS to finish.
 
-[Severity: High]
-Since this is explicitly marked as a test hack meant only for local building
-and testing, should this patch be dropped from the series before it gets
-merged upstream?
+> It is ran with preemption disabled, as a task being scheduled in could
+> change the translation registers used by HACDBS and end up corrupting the
+> current dirty-bit tracking and the sched-in task's S2 pagetables.
 
-[ ... ]
+[Severity: Medium]
+The commit message asserts that the code runs with preemption disabled, but
+looking at dirty_bit_clear(), preemption is explicitly enabled immediately
+after registering the notifier:
 
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeatur=
-e.c
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -2131,6 +2131,11 @@ static bool hvhe_possible(const struct arm64_cpu_c=
-apabilities *entry,
->  	return arm64_test_sw_feature_override(ARM64_SW_FEATURE_OVERRIDE_HVHE);
->  }
-> =20
-> +static bool has_vhe_hdbss(const struct arm64_cpu_capabilities *entry, in=
-t cope)
-                                                                           =
-  ^^^^
-[Severity: Low]
-Is this intended to be named scope? The standard convention for capability
-matching functions in cpufeature.c uses scope for this parameter.
+dirty_bit_clear() {
+    preempt_disable();
+    preempt_notifier_register(&save.notifier);
+    preempt_enable();
+}
 
-[ ... ]
+Is this description accurate, or does the implementation contradict the
+commit message's synchronization premise?
 
 > diff --git a/arch/arm64/kvm/dirty_bit.c b/arch/arm64/kvm/dirty_bit.c
-> new file mode 100644
-> --- /dev/null
+> index 32fe938d6bf70..33826bbd16d91 100644
+> --- a/arch/arm64/kvm/dirty_bit.c
 > +++ b/arch/arm64/kvm/dirty_bit.c
-> @@ -0,0 +1,16 @@
-[ ... ]
-> +#include <asm/kvm_dirty_bit.h>
-> +
-> +/* HDBSS entry field definitions */
-> +#define HDBSS_ENTRY_VALID BIT(0)
-> +#define HDBSS_ENTRY_TTWL_SHIFT (1)
-> +#define HDBSS_ENTRY_TTWL_MASK (GENMASK(3, 1))
-> +#define HDBSS_ENTRY_TTWL(x) \
-> +	(((x) << HDBSS_ENTRY_TTWL_SHIFT) & HDBSS_ENTRY_TTWL_MASK)
-> +#define HDBSS_ENTRY_TTWL_RESV HDBSS_ENTRY_TTWL(-4)
+> @@ -5,6 +5,7 @@
+>   */
+> =20
+>  #include <asm/kvm_dirty_bit.h>
+> +#include <asm/kvm_mmu.h>
+> =20
+>  /* HDBSS entry field definitions */
+>  #define HDBSS_ENTRY_VALID BIT(0)
+> @@ -14,3 +15,178 @@
+>  	(((x) << HDBSS_ENTRY_TTWL_SHIFT) & HDBSS_ENTRY_TTWL_MASK)
+>  #define HDBSS_ENTRY_TTWL_RESV HDBSS_ENTRY_TTWL(-4)
 
 [Severity: Low]
-Because these HDBSS entry macros are defined directly in the .c file rather
-than in the newly created header arch/arm64/include/asm/kvm_dirty_bit.h, th=
-ey
-are inaccessible to other subsystems. Should they be moved to the header fi=
-le
-so dependent patches can use them?
-
-[Severity: Medium]
-Will HDBSS_ENTRY_TTWL_RESV trigger undefined behavior here? The macro expan=
-ds
-to ((-4) << 1), and left shifting a negative signed integer is undefined
-behavior in C (prior to C23), which can lead to shift-out-of-bounds splats
-at runtime.
-
-> +#define HDBSS_ENTRY_IPA GENMASK_ULL(55, 12)
+Does this code trigger undefined behavior by left-shifting a negative
+signed integer (-4) via the HDBSS_ENTRY_TTWL macro?
 
 [ ... ]
 
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -1367,9 +1371,13 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgta=
-ble *pgt, u64 addr,
->  	if (prot & KVM_PGTABLE_PROT_R)
->  		set |=3D KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R;
-> =20
-> -	if (prot & KVM_PGTABLE_PROT_W)
-> +	if (prot & KVM_PGTABLE_PROT_W) {
->  		set |=3D KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
-> =20
-> +		if (pgt->flags & KVM_PGTABLE_S2_DBM)
-> +			set |=3D KVM_PTE_LEAF_ATTR_HI_S2_DBM;
-> +	}
+> +static void hacdbs_start(u64 *hw_entries, int size)
+> +{
+> +	u64 br;
+> +	/* Each entry is 8 bytes */
+> +	int size_b =3D size * sizeof(hw_entries[0]);
+> +	int size_p2 =3D max(roundup_pow_of_two(size_b), PAGE_SIZE);
 > +
+> +	/* If not using the full size of the array, put a stop entry at the end=
+ */
+> +	if (size_b < size_p2)
+> +		hw_entries[size] =3D HDBSS_ENTRY_VALID | HDBSS_ENTRY_TTWL_RESV;
+> +
+> +	sysreg_clear_set_s(SYS_HACDBSCONS_EL2,
+> +			   HACDBSCONS_EL2_ERR_REASON | HACDBSCONS_EL2_INDEX, 0);
 
 [Severity: High]
-Does kvm_pgtable_stage2_wrprotect() also need to be updated to clear the DBM
-bit?=20
+Can this sequence leave the CPU executing with architecturally undefined
+pipeline state?
 
-Currently, kvm_pgtable_stage2_wrprotect() clears the=20
-KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W bit to trap writes, but if=20
-KVM_PTE_LEAF_ATTR_HI_S2_DBM is left set, the hardware will autonomously upd=
-ate=20
-the PTE to allow writes without generating a permission fault. Could this=20
-allow guests to bypass software write-protection mechanisms like=20
-userfaultfd-wp or KVM software dirty page logging?
+In hacdbs_start(), the write to the control-plane system register
+SYS_HACDBSCONS_EL2 is followed by pointer arithmetic and a dsb() rather
+than an isb() as the very next instruction.
 
->  	if (prot & KVM_PGTABLE_PROT_X) {
->  		ret =3D stage2_set_xn_attr(prot, &xn);
->  		if (ret)
+> +
+> +	br =3D (virt_to_phys(hw_entries) & HACDBSBR_EL2_BADDR_MASK) |
+> +	     FIELD_PREP(HACDBSBR_EL2_SZ, ilog2(size_p2) - 12) |
+> +	     FIELD_PREP(HACDBSBR_EL2_EN, 1);
+
+[Severity: Medium]
+Will this return an invalid physical address if hw_entries is allocated via
+vmalloc() or kvmalloc()?
+
+Using virt_to_phys() on a dynamic buffer array assumes it resides in the
+physically contiguous linear map, which could lead to hardware DMA targeting
+the wrong physical memory pages.
+
+> +
+> +	/* All writes to the array have to complete before starting */
+> +	dsb(ishst);
+> +
+> +	write_sysreg_s(br, SYS_HACDBSBR_EL2);
+
+[Severity: High]
+Does this code cause a kernel panic on nVHE systems?
+
+In hacdbs_start(), directly writing to the EL2 system register
+SYS_HACDBSBR_EL2 from the KVM host kernel executing at EL1 without a
+has_vhe() guard will trigger an immediate Undefined Instruction trap.
+
+> +	isb();
+> +}
 
 [ ... ]
 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1027,8 +1027,12 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kv=
-m_s2_mmu *mmu, unsigned long t
->  	for_each_possible_cpu(cpu)
->  		*per_cpu_ptr(mmu->last_vcpu_ran, cpu) =3D -1;
-> =20
-> -	 /* The eager page splitting is disabled by default */
-> -	mmu->split_page_chunk_size =3D KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
-> +	 /* The eager page splitting is disabled by default if system has no HD=
-BSS */
-> +	if (system_supports_hdbss())
-> +		mmu->split_page_chunk_size =3D 256 * 1024 * PAGE_SIZE;
-
-[Severity: Medium]
-Is this hardcoded split_page_chunk_size excessively large? This evaluates to
-1GB on 4KB page systems and 16GB on 64KB page systems. When splitting this
-chunk, kvm_mmu_topup_memory_cache might attempt to allocate a massive amount
-of page tables under the mmu_lock. Could this cause severe latency spikes or
-allocation failures under memory pressure?
-
-> +	else
-> +		mmu->split_page_chunk_size =3D KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
+> +static void hacdbs_sched_in(struct preempt_notifier *notifier, int cpu)
+> +{
+> +	struct hacdbs_sched_save *save =3D container_of(notifier,
+> +						      struct hacdbs_sched_save,
+> +						      notifier);
 > +
->  	mmu->split_page_cache.gfp_zero =3D __GFP_ZERO;
-> =20
->  	mmu->pgd_phys =3D __pa(pgt->pgd);
+> +	write_sysreg_s(save->save.vtcr_el2, SYS_VTCR_EL2);
+> +	write_sysreg_s(save->save.vttbr_el2, SYS_VTTBR_EL2);
+
+[Severity: High]
+Could this direct EL2 register access cause a panic on nVHE systems?
+
+Similar to hacdbs_start(), hacdbs_sched_in() accesses SYS_VTCR_EL2 and
+SYS_VTTBR_EL2 from EL1 without a VHE check.
+
+[Severity: High]
+Is a synchronization barrier missing here?
+
+In hacdbs_sched_in(), the write to SYS_VTCR_EL2 is immediately followed by a
+write to SYS_VTTBR_EL2 rather than an isb(), meaning subsequent instructions
+may observe undefined pipeline state.
+
+[Severity: Critical]
+Can this restore a stale VMID and cause cross-VM memory corruption?
+
+hacdbs_sched_in() restores the cached save.vttbr_el2 (which contains the
+VMID). Since this is a generic host thread, if KVM's VMID allocator rolls
+over while the task sleeps, the VMID could be reassigned.
+
+This could cause the HACDBS engine to operate on another VM's memory.
+
+> +	isb();
+> +
+> +	if (save->save.hcr_vm_set) {
+> +		sysreg_clear_set_hcr(0, HCR_EL2_VM);
+> +		isb();
+> +	}
+> +
+> +	write_sysreg_s(save->save.hacdbscons_el2, SYS_HACDBSCONS_EL2);
+> +	write_sysreg_s(save->save.hacdbsbr_el2, SYS_HACDBSBR_EL2);
+
+[Severity: High]
+Does this sequence lack an immediate isb() after writing SYS_HACDBSCONS_EL2,
+allowing the CPU to execute the SYS_HACDBSBR_EL2 write with undefined
+pipeline state?
+
+> +	isb();
+> +}
+> +
+> +static void hacdbs_sched_out(struct preempt_notifier *notifier,
+> +			     struct task_struct *next)
+> +{
+> +	struct hacdbs_sched_save *save =3D container_of(notifier,
+> +						      struct hacdbs_sched_save,
+> +						      notifier);
+> +
+> +	if (read_sysreg_s(SYS_HACDBSBR_EL2) & HACDBSBR_EL2_EN) {
+> +		save->save.hacdbsbr_el2 =3D HACDBSBR_EL2_EN;
+> +		sysreg_clear_set_s(SYS_HACDBSBR_EL2, HACDBSBR_EL2_EN, 0);
+> +		isb();
+> +	} else {
+> +		save->save.hacdbsbr_el2 =3D 0;
+> +	}
+> +
+> +	save->save.hacdbscons_el2 =3D read_sysreg_s(SYS_HACDBSCONS_EL2);
+> +	save->save.hacdbsbr_el2 |=3D read_sysreg_s(SYS_HACDBSBR_EL2);
+> +	save->save.vttbr_el2 =3D read_sysreg_s(SYS_VTTBR_EL2);
+
+[Severity: Critical]
+Is it safe to cache the VTTBR (including the VMID) into task-local memory
+here in hacdbs_sched_out()?
+
+As mentioned for hacdbs_sched_in(), if a VMID rollover occurs while this
+task is preempted, the cached VMID becomes stale.
+
+> +	save->save.vtcr_el2 =3D read_sysreg_s(SYS_VTCR_EL2);
+> +
+> +	if (read_sysreg_s(SYS_HCR_EL2) & HCR_EL2_VM) {
+> +		sysreg_clear_set_hcr(HCR_EL2_VM, 0);
+
+[Severity: High]
+Does this code change the translation regime (clearing HCR_EL2_VM) without
+a preceding dsb()?
+
+The engine was disabled earlier in hacdbs_sched_out() (by clearing
+HACDBSBR_EL2_EN), but without a dsb(), the asynchronous engine might not be
+definitively halted before the translation context changes.
+
+> +		isb();
+> +		save->save.hcr_vm_set =3D true;
+> +	} else {
+> +		save->save.hcr_vm_set =3D false;
+> +	}
+> +}
+
+[ ... ]
+
+> +static int dirty_bit_clear(struct kvm *kvm, u64 *hw_entries, int size)
+> +{
+> +	int ret;
+> +	u64 cons;
+> +	struct hacdbs_sched_save save;
+> +
+> +	preempt_notifier_init(&save.notifier, &hacdbs_preempt_ops);
+> +	preempt_disable();
+> +	preempt_notifier_register(&save.notifier);
+> +	preempt_enable();
+> +
+> +	__load_stage2(&kvm->arch.mmu);
+> +	sysreg_clear_set_hcr(0, HCR_EL2_VM);
+> +	isb();
+> +
+> +	hacdbs_start(hw_entries, size);
+> +
+> +	do {
+> +		cons =3D read_sysreg_s(SYS_HACDBSCONS_EL2);
+> +		if (FIELD_GET(HACDBSCONS_EL2_ERR_REASON, cons))
+> +			break;
+> +
+> +		if (FIELD_GET(HACDBSCONS_EL2_INDEX, cons) >=3D size)
+> +			break;
+> +
+> +		udelay(1);
+> +	} while (true);
+
+[Severity: High]
+Could this continuous hardware polling loop hang the CPU permanently?
+
+In dirty_bit_clear(), this loop waits for the hardware engine to finish, but
+it lacks a timeout mechanism, bounded retry, or a fatal_signal_pending()
+check.
+
+> +
+> +	ret =3D hacdbs_stop(size);
+> +
+> +	sysreg_clear_set_hcr(HCR_EL2_VM, 0);
+
+[Severity: High]
+Can this translation regime change lead to speculative execution or out of
+context memory accesses?
+
+In dirty_bit_clear(), hacdbs_stop() clears the enable bit, but clearing
+HCR_EL2_VM immediately after lacks an intervening dsb() to ensure the
+hardware engine is definitively halted.
+
+> +	isb();
+> +
+> +	/*
+> +	 * No DSB is needed here, as kvm_flush_remote_tlbs_memslot() that happe=
+ns
+> +	 * later in generic dirty-cleaning code already performs a DSB before
+> +	 * doing the TLBI.
+> +	 */
+> +
+> +	preempt_disable();
+> +	preempt_notifier_unregister(&save.notifier);
+> +	preempt_enable();
+> +
+> +	return ret;
+> +}
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260729104548.3439=
-958-1-leo.bras@arm.com?part=3D1
+958-1-leo.bras@arm.com?part=3D4
