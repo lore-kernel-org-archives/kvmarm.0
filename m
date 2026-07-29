@@ -1,101 +1,273 @@
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com [209.85.210.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2E514C8FF3
-	for <kvmarm@lists.linux.dev>; Wed, 29 Jul 2026 18:18:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF0083AAF5C
+	for <kvmarm@lists.linux.dev>; Wed, 29 Jul 2026 19:07:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785349141; cv=none; b=patPi8xi0O822Y+vtixM5vtfleDk+YP8lb5vf0n2oUmXU7MHIjLuOLO4LhbfNlImktyAR95ZNW9CTUUwbtLqVQeRQYt/or/2oEBFri4SLAkoCvOTddtS/OY6DcPgBPoQfo54X3LtGtFPVkaoAD8SOlynRX7Q/OCJqEfzsER4WSA=
+	t=1785352058; cv=none; b=PB1JZqw0nu7tEtu1DR/8rNilGXoTVJaBjcE6EW8NxJH4yMKOjDHToVuOi+Gk+ZM3pWGUMlFvlSBRLobY71gY2/pcSi4bd4ST5Ar0pkWsDTpRGP7UCU+jjcxO4atRPprsKoKL2Cik/sLm9hSuezPPcqxvdHfxK3fSpubUkaJnLT8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785349141; c=relaxed/simple;
-	bh=gXvDQmDnVr6OE7oYWu88IugIvt9fOy8iiTsQetL+410=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RZoXr6ZC/fe1InorLbfgCOsDG8+ZjNXYIbRBNpsdz9iEI7DnkUxLYkr5NSixB0xohB/1EyDIgwTk+qTBOjdHwy8z1umoWbrAb+/0QxigyIjjRg9dX3Z/9zgcdsV/0Yo8x/vLPhkzC8RS0RtKdxlCVVi9P/0zDHMqVuRyTNUfKNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pPQmixlx; arc=none smtp.client-ip=91.218.175.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1785352058; c=relaxed/simple;
+	bh=LKYqShh5kW9f4WPAvBmBeOlwPHlAX562WP4sa2zLm6U=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=OEC1DKVfUNlcOgrrh0sugRPR1meHDvNYiFqtViCzVq9i6ZCYQ47fOyb7dqg+v23QE0MJ44827zfNdtVBDswNy9jcTiUrzayzzixD0+12LGbixaHsBjj1o0hTDQK2in/TbLBBgZm/elJ9+5mHoNE/RzVMBr9d2ZSFY+1TQAhIm0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EO1tB6Do; arc=none smtp.client-ip=209.85.210.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pPQmixlx"
-X-Forwarded-Encrypted: i=1; AHgh+RqWtZxosuiJODzaWpV6CWuvp5ZftTFz9rX6AwFFxSpzZ2EkuSFQsm+IWLD7u/Ap9Pr5F2nOnxY=@lists.linux.dev
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1785349129;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lQfSKZP/hCCmm/JkjqLE4pUKx2XQfDJnU0jPCvkwDAU=;
-	b=pPQmixlxGe2xnK+XA/QTgbZaphp4ZoyB/5q9vccZAfa1cPvRzaQ0cXzLHG7/JMxjYRzQZP
-	tB8TVzuvag0w9ax2k86MDEiyBurRutumQSQ1lBLts5ER0fTP8H8yOIoav5pkwyNv1AR+e+
-	JEyOagrUiHEsOClVoh6o8uUZF9eAjNc=
-X-Gm-Message-State: AOJu0YxpenJHLutY2eM/M0CgV26prvH4q365vV4Sp11/SW3P19oL8T0v
-	e0uWpDjqArmbpytaR9gDwR/rsSxqSZeqWSMDZvGot5gF8LytAawTzuP3nNs4nEarcvtbsfvRRNh
-	/tLk4bG463xUj6PJWJiz5dGqfN7r0fNMfbnvqj9IS
-X-Received: by 2002:a05:622a:684a:20b0:528:3186:5781 with SMTP id
- d75a77b69052e-52b35089f0cmr4050731cf.6.1785349127162; Wed, 29 Jul 2026
- 11:18:47 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EO1tB6Do"
+Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-84e3d575d6eso2338958b3a.3
+        for <kvmarm@lists.linux.dev>; Wed, 29 Jul 2026 12:07:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1785352056; x=1785956856; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=2b3fQxiZ8vmEMZ/LriNEMYs2OUmWmCeVFavLD+6FbmM=;
+        b=EO1tB6DoMC+Ub0lKzc2CigA1bgktpauymnXbRByhFFc7WxMy0w13ckmkDjKTc5RW19
+         zZ1ouySvg35bEQ5rQ9HxprS+r4oHSDFRBW67zJPajEh0umcKicxLjKRTX6AH0FGk5sAc
+         oPPMNqLq32R/Q7bs0o1v8aSgqsbAME7xHzup+Lt7mBfQgDMrdY9eFgdl9FhVTmjrp09G
+         /4iCsFTZ2Fw1n7JKqcpqDOjEZaMA0jS1h33xhq18PuXHkZlxRaAM+tKsa8vobJllEfrt
+         50b7G1chf9AlWIDVnO56MvWW51vxrpgOpLgndZ653vSAh/a8rKHeZzNAzxO4+44Ashsl
+         MkYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785352056; x=1785956856;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=2b3fQxiZ8vmEMZ/LriNEMYs2OUmWmCeVFavLD+6FbmM=;
+        b=ohWKy54zCKH8g+EKK49ovegnjTE7C+CL6xQn1DRImDr5d3ZFC51nmIkHA2Ap86a7Ed
+         VN41hcmI+10hz/fy8wlAwAfPTC5m7R8bEvtS8uhPOzqT89hl1squswTiNsWqB+71CS1m
+         323uogXsgDLBvEWxIqvuN8jL6LXtG4yVEn4oEELydGWQuP+u349LeF904ChSpeIHAZS/
+         qQw+WlORj2ITX2w0aPXU06JGJhPvZXLXsikSL9Mi/eNvbYh3aI7VlV12rjwgp67GDx4h
+         G4L5e7AUfKcTDYVU56bhfJtfC/zZk45pM2PZjHPCEtg64pjeB9o4kQ3XAwWr8PXlpZ2u
+         82mA==
+X-Forwarded-Encrypted: i=1; AHgh+RqjI5cmbxQywtQmD5GgfItaoMQ9tcBnmY3ccQH6x6fGFWxG8IdSc1PZhJlTpyb5N8dyqJ/4XWE=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxSmXYmuWNntkEfI6/hfp9sFWi1ofZUpwRAKXvPbpaLDSGOM29m
+	2Zj0vpc5JxkxUG4N/xDFoguOJYlcHBkNCxcT/mF7BhE4ijAl9VjEjhRYPRtFsEQDNxU9avqT/XD
+	9LDw/uA==
+X-Received: from pfblc11.prod.google.com ([2002:a05:6a00:4f4b:b0:84a:894f:23e6])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:391d:b0:848:56d4:3288
+ with SMTP id d2e1a72fcca58-84eb9e86fccmr34880b3a.4.1785352055899; Wed, 29 Jul
+ 2026 12:07:35 -0700 (PDT)
+Date: Wed, 29 Jul 2026 12:07:35 -0700
+In-Reply-To: <20260331194202.1722082-9-vipinsh@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20260720-hybrid-v9-0-2b713ca1b5dc@rsg.ci.i.u-tokyo.ac.jp> <20260720-hybrid-v9-14-2b713ca1b5dc@rsg.ci.i.u-tokyo.ac.jp>
-In-Reply-To: <20260720-hybrid-v9-14-2b713ca1b5dc@rsg.ci.i.u-tokyo.ac.jp>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Wed, 29 Jul 2026 19:18:00 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTx0zNQ_yPCz38vGYpBssshE4b3KWaoUxjzuerGgzB=JSQ@mail.gmail.com>
-X-Gm-Features: AUfX_mxyRATQUT7wjn046sqG_VDzxdGritkO_zqsOb5Kz7zkeUPamYRcZ06tFIY
-Message-ID: <CA+EHjTx0zNQ_yPCz38vGYpBssshE4b3KWaoUxjzuerGgzB=JSQ@mail.gmail.com>
-Subject: Re: [PATCH v9 14/16] KVM: arm64: PMU: Implement fixed-counters-only emulation
-To: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Kees Cook <kees@kernel.org>, 
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>, 
-	Shuah Khan <skhan@linuxfoundation.org>, Yury Norov <yury.norov@gmail.com>, 
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>, Steffen Eiden <seiden@linux.ibm.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org, 
-	devel@daynix.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <20260331194202.1722082-1-vipinsh@google.com> <20260331194202.1722082-9-vipinsh@google.com>
+Message-ID: <ampPd9szwRoGKwds@google.com>
+Subject: Re: [PATCH v4 8/9] KVM: selftests: Add rule to generate default tests
+ for KVM selftests runner
+From: Sean Christopherson <seanjc@google.com>
+To: Vipin Sharma <vipinsh@google.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org, 
+	pbonzini@redhat.com, borntraeger@linux.ibm.com, frankja@linux.ibm.com, 
+	imbrenda@linux.ibm.com, anup@brainfault.org, atish.patra@linux.dev, 
+	zhaotianrui@loongson.cn, maobibo@loongson.cn, chenhuacai@kernel.org, 
+	maz@kernel.org, oliver.upton@linux.dev, ajones@ventanamicro.com
+Content-Type: text/plain; charset="us-ascii"
 
-Hi Akihiko,
+On Tue, Mar 31, 2026, Vipin Sharma wrote:
+> Add 'tests_install' rule in the Makefile.kvm to auto generate default
+> testcases for KVM selftests runner. Preserve the hierarchy of test
+> executables for autogenerated files. Remove these testcases on
+> invocation of 'make clean'.
+> 
+> Autogeneration of default test files allows runner to execute default
+> testcases easily. These default testcases don't need to be checked in as
+> they are just executing the test without any command line options.
+> 
+> Signed-off-by: Vipin Sharma <vipinsh@google.com>
+> ---
+>  tools/testing/selftests/kvm/.gitignore   |  1 +
+>  tools/testing/selftests/kvm/Makefile.kvm | 26 +++++++++++++++++++++++-
+>  2 files changed, 26 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+> index 95af97b1ff9e..548d435bde2f 100644
+> --- a/tools/testing/selftests/kvm/.gitignore
+> +++ b/tools/testing/selftests/kvm/.gitignore
+> @@ -7,6 +7,7 @@
+>  !*.S
+>  !*.sh
+>  !*.test
+> +default.test
+>  !.gitignore
+>  !config
+>  !settings
+> diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+> index 6471fa214a9f..fb9439cb5f3d 100644
+> --- a/tools/testing/selftests/kvm/Makefile.kvm
+> +++ b/tools/testing/selftests/kvm/Makefile.kvm
+> @@ -1,7 +1,7 @@
+>  # SPDX-License-Identifier: GPL-2.0-only
+>  include ../../../build/Build.include
+>  
+> -all:
+> +all: tests_install
+>  
+>  LIBKVM += lib/assert.c
+>  LIBKVM += lib/elf.c
+> @@ -330,11 +330,15 @@ $(SPLIT_TEST_GEN_PROGS): $(OUTPUT)/%: $(OUTPUT)/%.o $(OUTPUT)/$(ARCH)/%.o
+>  $(SPLIT_TEST_GEN_OBJ): $(OUTPUT)/$(ARCH)/%.o: $(ARCH)/%.c
+>  	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
+>  
+> +# Default testcases for KVM selftests runner will be generated in this directory.
+> +DEFAULT_TESTCASES = testcases_default_gen
 
-On Mon, 20 Jul 2026 at 06:39, Akihiko Odaki
-<odaki@rsg.ci.i.u-tokyo.ac.jp> wrote:
-...
+That's a cumbersome name.  It was also written by Yoda :-) How about default_testcases?
 
-> +/**
-> + * kvm_pmu_create_perf_event - create a perf event for a counter
-> + * @pmc: Counter context
-> + */
-> +static void kvm_pmu_create_perf_event(struct kvm_pmc *pmc)
-> +{
-> +       struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
-> +       struct arm_pmu *arm_pmu = vcpu->kvm->arch.arm_pmu;
 > +
-> +       if (kvm_pmu_fixed_counters_only(vcpu->kvm)) {
-> +               do {
-> +                       arm_pmu = kvm_pmu_probe_armpmu(READ_ONCE(vcpu->cpu));
+>  EXTRA_CLEAN += $(GEN_HDRS) \
+>  	       $(LIBKVM_OBJS) \
+>  	       $(SPLIT_TEST_GEN_OBJ) \
+>  	       $(TEST_DEP_FILES) \
+>  	       $(TEST_GEN_OBJ) \
+> +	       $(OUTPUT)/$(DEFAULT_TESTCASES) \
+>  	       cscope.*
+>  
+>  $(LIBKVM_C_OBJ): $(OUTPUT)/%.o: %.c $(GEN_HDRS)
+> @@ -363,3 +367,23 @@ cscope:
+>  	find . -name '*.c' \
+>  		-exec realpath --relative-base=$(PWD) {} \;) | sort -u > cscope.files
+>  	cscope -b
 > +
-> +                       if (!arm_pmu) {
-> +                               pr_warn_once("kvm: Unsupported PMU variation detected.\n");
-> +                               add_taint(TAINT_CPU_OUT_OF_SPEC, LOCKDEP_STILL_OK);
-> +                               return;
-> +                       }
+> +# Generate runner testcases in DEFAULT_TESTCASES directory.
+> +# $(OUTPUT) is either CWD or specified in the make command.
+> +tests_install: list_progs = $(patsubst $(OUTPUT)/%,%,$(TEST_GEN_PROGS))
+> +tests_install:
 
-Sashiko flagged that this can leave the perf event out of sync with
-the sysreg, which looks plausible: on a pCPU with no registered pPMU
-this returns without recreating the event, so a guest event-type
-change there updates the sysreg but not the event, and after migrating
-back to a pCPU the original pPMU covers, kvm_pmc_enable_perf_event()
-re-enables the stale event instead of recreating it.
+This is very much *not* an install.  In fact, install is broken, because the
+runner isn't added to TEST_FILES.
 
-I know you treat the no-pPMU case as out of spec, but the dropped
-update lands once the vCPU is back on a normal pCPU. Is this intended?
+Another issue with install is that it flattens the directory structures, i.e.
+drops the $ARCH/ subdirectories.  That causes issues for the default.test testcases
+due to them using partially qualified paths.
 
-Cheers,
-/fuad
+And coming back to this with fresh eyes, I don't love generating the testcases
+for the "normal" build.  It necessitates adding default.test to .gitignore,
+effectively requires copying the runner to the output directory, and is pure
+noise for folks that don't want to utilize the runner.
+
+Rather than generate testcases for the default build, what if we make this 100%
+opt-in, and take a hard dependency on install?  That should obviate the need for
+ignoring default.test, because if someone is silly enough to install testcases
+in the source tree, they get to deal with the noise.
+
+And we can commit to having the default testcases provide completely unqualified
+paths, so that the Just Work with the flattened output.  If someone wants to run
+with an unflattened tree, then we should update the runner itself to handle
+multiple paths, a la the actual PATH variable.
+
+The other nice thing is that we can make the runner opt-in, without requiring the
+user to run multiple make commands, by chaining testcases => install => all.  If
+we try to generate testcases as an optional step to the normal build, then we'll
+end up being able to run install without having generated the testcases, which
+is "fine", but probably not what we want for people that are trying to use the
+runner.
+
+The obvious downside is that it requires doing an install to get the default
+testcases, but IMO that's an acceptable tradeoff.
+
+> +	$(foreach tc, $(TEST_PROGS), \
+> +		$(shell mkdir -p $(OUTPUT)/$(DEFAULT_TESTCASES)/$(patsubst %.sh,%,$(tc))))
+> +	$(foreach tc, $(TEST_PROGS), \
+> +		$(shell echo $(tc) > $(patsubst %.sh,$(OUTPUT)/$(DEFAULT_TESTCASES)/%/default.test,$(tc))))
+> +
+> +	$(foreach tc, $(list_progs), \
+> +		$(shell mkdir -p $(OUTPUT)/$(DEFAULT_TESTCASES)/$(tc)))
+> +	$(foreach tc, $(list_progs), \
+> +		$(shell echo $(tc) > $(patsubst %,$(OUTPUT)/$(DEFAULT_TESTCASES)/%/default.test,$(tc))))
+> +
+> +	@if [ ! -d $(OUTPUT)/runner ]; then             \
+
+This is very wrong, as this will fail to pick up any changes made to the runner.
+
+All in all, this as fixup?
+
+diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+index 83aa2fe01bac..91d2b21d396f 100644
+--- a/tools/testing/selftests/kvm/.gitignore
++++ b/tools/testing/selftests/kvm/.gitignore
+@@ -8,7 +8,6 @@
+ !*.S
+ !*.sh
+ !*.test
+-default.test
+ !.gitignore
+ !config
+ !settings
+diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+index c5821d495ea6..fc9dc41fdbeb 100644
+--- a/tools/testing/selftests/kvm/Makefile.kvm
++++ b/tools/testing/selftests/kvm/Makefile.kvm
+@@ -1,8 +1,6 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ include ../../../build/Build.include
+ 
+-all: tests_install
+-
+ LIBKVM += lib/assert.c
+ LIBKVM += lib/elf.c
+ LIBKVM += lib/guest_modes.c
+@@ -347,15 +345,13 @@ $(SPLIT_TEST_GEN_PROGS): $(OUTPUT)/%: $(OUTPUT)/%.o $(OUTPUT)/$(ARCH)/%.o
+ $(SPLIT_TEST_GEN_OBJ): $(OUTPUT)/$(ARCH)/%.o: $(ARCH)/%.c
+        $(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
+ 
+-# Default testcases for KVM selftests runner will be generated in this directory.
+-DEFAULT_TESTCASES = testcases_default_gen
++TEST_FILES := $(selfdir)/kvm/runner
+ 
+ EXTRA_CLEAN += $(GEN_HDRS) \
+               $(LIBKVM_OBJS) \
+               $(SPLIT_TEST_GEN_OBJ) \
+               $(TEST_DEP_FILES) \
+               $(TEST_GEN_OBJ) \
+-              $(OUTPUT)/$(DEFAULT_TESTCASES) \
+               cscope.*
+ 
+ $(LIBKVM_C_OBJ): $(OUTPUT)/%.o: %.c $(GEN_HDRS)
+@@ -386,21 +382,18 @@ cscope:
+        cscope -b
+ 
+ # Generate runner testcases in DEFAULT_TESTCASES directory.
+-# $(OUTPUT) is either CWD or specified in the make command.
+-tests_install: list_progs = $(patsubst $(OUTPUT)/%,%,$(TEST_GEN_PROGS))
+-tests_install:
+-       $(foreach tc, $(TEST_PROGS), \
+-               $(shell mkdir -p $(OUTPUT)/$(DEFAULT_TESTCASES)/$(patsubst %.sh,%,$(tc))))
+-       $(foreach tc, $(TEST_PROGS), \
+-               $(shell echo $(tc) > $(patsubst %.sh,$(OUTPUT)/$(DEFAULT_TESTCASES)/%/default.test,$(tc))))
++DEFAULT_TESTCASES = default_testcases
++
++testcases: list_progs = $(notdir $(patsubst $(OUTPUT)/%,%,$(TEST_GEN_PROGS)))
++testcases: install
++       $(foreach tc, $(notdir $(TEST_PROGS)), \
++               $(shell mkdir -p $(INSTALL_PATH)/$(DEFAULT_TESTCASES)/$(notdir $(patsubst %.sh,%,$(tc)))))
++       $(foreach tc, $(notdir $(TEST_PROGS)), \
++               $(shell echo $(tc) > $(patsubst %.sh,$(INSTALL_PATH)/$(DEFAULT_TESTCASES)/%/default.test,$(tc))))
+ 
+        $(foreach tc, $(list_progs), \
+-               $(shell mkdir -p $(OUTPUT)/$(DEFAULT_TESTCASES)/$(tc)))
++               $(shell mkdir -p $(INSTALL_PATH)/$(DEFAULT_TESTCASES)/$(tc)))
+        $(foreach tc, $(list_progs), \
+-               $(shell echo $(tc) > $(patsubst %,$(OUTPUT)/$(DEFAULT_TESTCASES)/%/default.test,$(tc))))
+-
+-       @if [ ! -d $(OUTPUT)/runner ]; then             \
+-               cp -r $(selfdir)/kvm/runner $(OUTPUT);  \
+-       fi
++               $(shell echo $(tc) > $(patsubst %,$(INSTALL_PATH)/$(DEFAULT_TESTCASES)/%/default.test,$(tc))))
+ 
+        @:
+
+> +		cp -r $(selfdir)/kvm/runner $(OUTPUT);  \
+> +	fi
+> +
+> +	@:
+> -- 
+> 2.53.0.1118.gaef5881109-goog
+> 
