@@ -1,53 +1,52 @@
-Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
+Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE629411A01
-	for <kvmarm@lists.linux.dev>; Wed, 29 Jul 2026 16:25:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FD004119FA
+	for <kvmarm@lists.linux.dev>; Wed, 29 Jul 2026 16:34:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785342343; cv=none; b=sIaZ9o4Vk0xFmmQvX6SHz4i5EzO9IiFKxAKHvblncYPWSvDIhyJMGJeeDnJfIACTAF8/IYpFvByR0ZJX0T88nk/6LGk1VL4c7v1FwD3Dx1VMDBUWapitxYgxvVh2X/ufs6imqHGpJy9CA5rdSpyRbE7BX/2y6qHJCF3WBw0TMRM=
+	t=1785342870; cv=none; b=qdpsYROgUPC0+EOk/qOon3RZayLzooOLhbnrWymTeT09REeQxDkemFjBGiGKKRnC4XrDc0RZI2sOGM6qLTB4l+Z+Tn4xFbmZ4dhw0tWMI9GF3+RoROKcWXprdqJ8UYojcN8x3R9UWhICKBHWRpWg/o5kzEv4n3KFujOzlb7akrE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785342343; c=relaxed/simple;
-	bh=1+R3U4GhR4LxVdqvm8mxsj7zocrKAwppHZHtKcHPL1Q=;
+	s=arc-20240116; t=1785342870; c=relaxed/simple;
+	bh=xVCMaAYRMoA+7JRlPIAe/kKzeo1xh9J+66pWGwEUyFU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bJ+2lfsbIKJt6k7SIlcf/l5w7K+yVbrOLpvkxzsAUo0ang9rvMrIWaXQQij1jM3zTYjIJwFv8zMX5mDOa3/lLwBMObdEPlrvM5q0umUYSLqS2TNG8JZdJMqyyUKJIioissDDPsWP46MSe/iXFA2twP3bsN9gaNob7DJ1p1m1nAE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vv2FnLfm; arc=none smtp.client-ip=91.218.175.189
+	 To:Cc:Content-Type; b=b19siAHlZo0YwHY7J4r2R+5TfjDcZFF7MaNU63Ynh5pr5SA9EVgzcQRBR5U+i4SyPJmbpDuJcVuVe2vgSjVC++kI6NUTyyz6u3v71QxKkk9Az8QqRVQ+r9+yxEv8kecM4o/e2bolPhUQYBB3Ep8HB9a1KKshU20Ukk4KQLfo2Pw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FCD0X156; arc=none smtp.client-ip=91.218.175.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vv2FnLfm"
-X-Forwarded-Encrypted: i=1; AHgh+Rqiao4Y1f/OYf7jhlQc8+2J4R254zclY5ebCUdlqHHSFWytF1gPK8TH/XKEcudfOOSZcd6nsVY=@lists.linux.dev
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FCD0X156"
+X-Forwarded-Encrypted: i=1; AHgh+Rrq7Q9kTwLi8KTkpxiKKq/oM0Vkx+Girn20HYxSZft5FJS8mwXEC8h/s1e8uY056cZxAQnfGcc=@lists.linux.dev
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1785342336;
+	t=1785342866;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=I7xKPnebnrnj3oQ7O4pCZSku+N29w0+f4UqiJMIJTas=;
-	b=vv2FnLfmLDyOce7g8ci1RgklLPqYG66T6+VqQH2r7FjS0b4Ql2dp3XwA1eCDs7Kkmpn03b
-	FF7Eqn7kgZFtrxR3Afmh/n3A7Vu0e9DWj1o3UoW40P7mS0PDpu1oUp1e8yYbmf1pO5f2As
-	UqmFe2S535SfKHig1Aj6rxF+Fn7OKVM=
-X-Gm-Message-State: AOJu0YzoWf2zubXuDnTYF44NaJQrNLO6+h77kod6uiYt/lFeplsm2ujK
-	2cIdNI77TS0qnqcRz8VlnSCSQBkvNY968kiG2zX2r5NLZTGL2RnNcncGPh09FhgcNROph5r83G4
-	w+7QCAlQ5jUV3xjDElDJxi18dUHfXSN6zBDNMOlg4
-X-Received: by 2002:a05:622a:411b:b0:51c:6b7:d3de with SMTP id
- d75a77b69052e-52b350e5b35mr1825161cf.5.1785342329701; Wed, 29 Jul 2026
- 09:25:29 -0700 (PDT)
+	bh=CDwMDWK74FGPCQksjJUhT5TIKVqDAVbip9kxaBkjJBk=;
+	b=FCD0X156GxRSdy69AnwFVrpQDC1KNPrXkd46HJDtpVePqSGwZGeJ8A9yO0j/fVfMXYNTWB
+	7BGHwji+UFesA/kehnFbNYOvMxzTkMU/BE8t6N2qyiufAr/VNfkZwA4fYbGdWu3kUXdFF8
+	CEli92GDWYJLgIrb/VFE+vtcp+sMsPo=
+X-Gm-Message-State: AOJu0YyGJCPo6gIq7QkdAdnAr5BZ90Hh+hEwGYXIYyol4JBVRiY9KYiY
+	Ors5o1+HDjuQy59PMU9HoZOySYmQwRY8k57tDSx/hKmYkj4vMe5D4PjJY7dEOHO9UmdsMJVh74e
+	8KWDu/rhDpgJ5BbCiPoQhAntVnMy+dACHeN9PxWIM
+X-Received: by 2002:a05:622a:2b49:b0:51c:ca9:3d15 with SMTP id
+ d75a77b69052e-52b3500260fmr2216081cf.12.1785342860083; Wed, 29 Jul 2026
+ 09:34:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260720-hybrid-v9-0-2b713ca1b5dc@rsg.ci.i.u-tokyo.ac.jp> <20260720-hybrid-v9-9-2b713ca1b5dc@rsg.ci.i.u-tokyo.ac.jp>
-In-Reply-To: <20260720-hybrid-v9-9-2b713ca1b5dc@rsg.ci.i.u-tokyo.ac.jp>
+References: <20260720-hybrid-v9-0-2b713ca1b5dc@rsg.ci.i.u-tokyo.ac.jp> <20260720-hybrid-v9-10-2b713ca1b5dc@rsg.ci.i.u-tokyo.ac.jp>
+In-Reply-To: <20260720-hybrid-v9-10-2b713ca1b5dc@rsg.ci.i.u-tokyo.ac.jp>
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Wed, 29 Jul 2026 17:24:00 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTy1O=Hnw16vKL813sCpjBV7j61jr+BU+9G6dvVePNSwAA@mail.gmail.com>
-X-Gm-Features: AUfX_myMVHKAsG5Q9-sL8f-xMHSuN9ptYr1gLGLLFeAl95SgQeRj9hCI0TZ8ETs
-Message-ID: <CA+EHjTy1O=Hnw16vKL813sCpjBV7j61jr+BU+9G6dvVePNSwAA@mail.gmail.com>
-Subject: Re: [PATCH v9 09/16] arm64: errata: Require Apple IMPDEF PMUv3 traps
- on all CPUs
+Date: Wed, 29 Jul 2026 17:33:00 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTzuaMDJm8BPf1sA9DiSDvtyn=C1Z2LrOLYc228XKJzF2w@mail.gmail.com>
+X-Gm-Features: AUfX_mzDDgEy7qPOSuwHqBOjPkT5QQo0kZIP1lcw0jJbpzlF7P6EqmFVAn2Xz68
+Message-ID: <CA+EHjTzuaMDJm8BPf1sA9DiSDvtyn=C1Z2LrOLYc228XKJzF2w@mail.gmail.com>
+Subject: Re: [PATCH v9 10/16] KVM: arm64: Don't clear vcpu->cpu in kvm_arch_vcpu_put()
 To: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
 Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
 	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
@@ -66,24 +65,21 @@ X-Migadu-Flow: FLOW_OUT
 On Mon, 20 Jul 2026 at 06:39, Akihiko Odaki
 <odaki@rsg.ci.i.u-tokyo.ac.jp> wrote:
 >
-> KVM relies on ARM64_WORKAROUND_PMUV3_IMPDEF_TRAPS as a system-wide
-> precondition for PMUv3 emulation on affected Apple CPUs. A local CPU
-> erratum is too weak for that: once the workaround is enabled, a late CPU
-> that misses it may still be onlined.
+> From: Oliver Upton <oupton@kernel.org>
 >
-> Make the workaround an all-early-CPU capability instead. The matcher is
-> still local because it depends on MIDR_EL1, but the capability is only
-> advertised if all early CPUs match. A late CPU that misses an advertised
-> capability is therefore rejected.
+> commit e9b152cb957c ("arm/arm64: kvm: Set vcpu->cpu to -1 on vcpu_put")
+> reset vcpu->cpu in order for the VGIC to determine if there was any vCPU
+> running at the time of access. The VGIC has gone through an entire
+> rewrite since then, and with commit 7d450e282171 ("KVM: arm/arm64:
+> vgic-new: Add userland access to VGIC dist registers") the user
+> accessors just grab all vCPU mutexes instead.
 >
-> Although kept in the errata capability table, this capability describes
-> optional trap support rather than a workaround required for safe CPU
-> operation. A late CPU may therefore match it when the system does not.
-> KVM treats an IMPDEF PMU as unimplemented unless the capability was
-> finalized system-wide, so the additional trap support remains unused.
+> Drop this remaining vestige such that kvm_arch_vcpu_load() can properly
+> detect a CPU migration. While at it, rework kvm_reset_vcpu() to do a
+> much more pedantic check that the provided vCPU is actually what's
+> running on the present CPU.
 >
-> Fixes: bed9b8ec8c71 ("KVM: arm64: Advertise PMUv3 if IMPDEF traps are present")
-> Assisted-by: Codex:gpt-5.5
+> Signed-off-by: Oliver Upton <oupton@kernel.org>
 > Signed-off-by: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
 
 Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
@@ -91,25 +87,65 @@ Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
 Cheers,
 /fuad
 
-
-
 > ---
->  arch/arm64/kernel/cpu_errata.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  arch/arm64/kvm/arm.c   |  1 -
+>  arch/arm64/kvm/reset.c | 16 +++++++++++-----
+>  2 files changed, 11 insertions(+), 6 deletions(-)
 >
-> diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
-> index 1995e1198648..a5ae628204a1 100644
-> --- a/arch/arm64/kernel/cpu_errata.c
-> +++ b/arch/arm64/kernel/cpu_errata.c
-> @@ -1005,7 +1005,7 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
->         {
->                 .desc = "Apple IMPDEF PMUv3 Traps",
->                 .capability = ARM64_WORKAROUND_PMUV3_IMPDEF_TRAPS,
-> -               .type = ARM64_CPUCAP_LOCAL_CPU_ERRATUM,
-> +               .type = ARM64_CPUCAP_EARLY_LOCAL_CPU_FEATURE,
->                 .matches = has_impdef_pmuv3,
->                 .cpu_enable = cpu_enable_impdef_pmuv3_traps,
->         },
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index a06ea39f57b1..72ce79ce4d5e 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -749,7 +749,6 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+>         kvm_arm_vmid_clear_active();
+>
+>         vcpu_clear_on_unsupported_cpu(vcpu);
+> -       vcpu->cpu = -1;
+>  }
+>
+>  static void __kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu)
+> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> index b963fd975aac..6bfb21f00444 100644
+> --- a/arch/arm64/kvm/reset.c
+> +++ b/arch/arm64/kvm/reset.c
+> @@ -190,7 +190,8 @@ static void kvm_vcpu_reset_sve(struct kvm_vcpu *vcpu)
+>  void kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+>  {
+>         struct vcpu_reset_state reset_state;
+> -       bool loaded;
+> +       struct kvm_vcpu *running;
+> +       bool loaded = false;
+>         u32 pstate;
+>
+>         spin_lock(&vcpu->arch.mp_state_lock);
+> @@ -198,10 +199,16 @@ void kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+>         vcpu->arch.reset_state.reset = false;
+>         spin_unlock(&vcpu->arch.mp_state_lock);
+>
+> -       preempt_disable();
+> -       loaded = (vcpu->cpu != -1);
+> -       if (loaded)
+> +       guard(preempt)();
+> +
+> +       running = kvm_get_running_vcpu();
+> +       if (running) {
+> +               if (KVM_BUG_ON(running != vcpu, vcpu->kvm))
+> +                       return;
+> +
+> +               loaded = true;
+>                 kvm_arch_vcpu_put(vcpu);
+> +       }
+>
+>         if (!kvm_arm_vcpu_sve_finalized(vcpu)) {
+>                 if (vcpu_has_feature(vcpu, KVM_ARM_VCPU_SVE))
+> @@ -269,7 +276,6 @@ void kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+>
+>         if (loaded)
+>                 kvm_arch_vcpu_load(vcpu, smp_processor_id());
+> -       preempt_enable();
+>  }
+>
+>  u32 kvm_get_pa_bits(struct kvm *kvm)
 >
 > --
 > 2.55.0
