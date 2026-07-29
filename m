@@ -1,206 +1,207 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06BD946EC6D;
-	Wed, 29 Jul 2026 10:47:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E41763AFD1E;
+	Wed, 29 Jul 2026 10:55:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785322034; cv=none; b=NqrfUFGiQn/d+ugfHfqi9YR65AyqYvVLgnWFKKNB3FXOfwp9Nr84ksG+YyYL/E3+BvqWb25dBhaofDbh1YEd1pecp7qBSzUDqIxrwKkUgq7qGgqxQJSb7v+ngyy8Ea65SZgZY94Y10veYI9CoL+3W1nNUepDFI+/0JtHRgErJWM=
+	t=1785322543; cv=none; b=JtrEuOkoWvzCTE3xn5gFfF3UH+v1zGStMw6JCfPcCd3vxirXL+EnaPYlf+H3u5GZ+8IhKUVMPnx6deSizDOsOqoU9aSvkqkLxNukwcp+U7k4CKje3LX9W1ZrEP10cAK2LZLIYaabYUWTlbpg7auuccMYT4PEBs8eQD8dq8zdiGE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785322034; c=relaxed/simple;
-	bh=5VaYd+Kc1ISM/tP6HGmRXCrgxAtNh+AtZ1rbjw9GISE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fm4Vqu/kPv/li1hFSwlaRjjN7fggTuHsaKxaRZpqj/chSQl1NskjSaK0ZVPgiH5Ve9HRtm1yZjpn3A093+xPD61I5+I2Q/SnsU+3Hmp99XKpYcEBSoEmZNVeMKr7a1iGSP2uoKuIE7IAGTrIVgoUrHq5pAs4P5ukwuSeDhILYJc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=JkYXGEdx; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1785322543; c=relaxed/simple;
+	bh=SAFcae7IVBpwz6W8X0rbdw0EFsgtNfVjmvq+L0HyXps=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=jmxacza3eQfxFIi/KfxLv2hzMUJZ/zjAYrz36hcFfJ0+IT7qN6rlou9B/0rSXkhxDn/YStQt1Vg5UZlUVLN2JNuE2cRGndRpxvYLCcJ2MYbsokyMOgvJ8ViM7CC+2Ywho+b5XcvD/ZI39ZuUNuB1+Bid8ciw2Dq+stwTc9ckfVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EVnScmXP; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="JkYXGEdx"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5925C168F;
-	Wed, 29 Jul 2026 03:47:07 -0700 (PDT)
-Received: from [10.57.87.210] (unknown [10.57.87.210])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 768863F86F;
-	Wed, 29 Jul 2026 03:47:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1785322031; bh=5VaYd+Kc1ISM/tP6HGmRXCrgxAtNh+AtZ1rbjw9GISE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=JkYXGEdxZ2UuUIOBoJpG7QvdrgMaqvXu2dIP7QokFuk7DD+oyJW4qvlbVBEUGOm4Z
-	 3wQhhDUzxjsLFwx5XsEneUCcOE+Iv+9PlwvkE4p18AAt95ZuhE3KJHfJRks+32l2nY
-	 PdOLe0NMFvSoCL7elkz2CPZ1/lX82kZ+tZ3o9Aec=
-Message-ID: <dff2eee7-09cf-4f85-8dec-c7c243f3ba0f@arm.com>
-Date: Wed, 29 Jul 2026 11:47:03 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EVnScmXP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FECC1F00A3A;
+	Wed, 29 Jul 2026 10:55:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785322541;
+	bh=qA2+NQKO0v6ZcVbODPyG2Vag2Qn9H+ENfa9BnZ0jrSE=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=EVnScmXPjqTvY7KqRFhs5d7EhrkvgmOCLEAArorDxeW13kgn/7ZW3XBoFGs2Y7OjB
+	 I0AK040SHzoTKPzmdxs2SYGsLQDbgGaz20mtrjwo8AvHkozeBwSxkv9hj4wW//yea7
+	 4cZFFDRUTrHwFHtY92TKicjJ8y2Y9pzq4SaVAImIQdzxUujTR1IvQ0QDg2DT2uHSJ6
+	 8A2nSDB4AFG/Yw64GGp2hjR18/exdOkNSXOrMqAAom3A+eA9/YcranSGDdn3zoRDJ5
+	 dp1LuBciH1j3F6/d69DZWk/SrMhngdylsvjo8J+cE8WOAVmy50Juba2I2/z3anSKDt
+	 XT5FyZEK7TyDw==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v3 01/11] KVM: arm64: HDBSS bits
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Leonardo Bras" <leo.bras@arm.com>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20260729104548.3439958-2-leo.bras@arm.com>
+References: <20260729104548.3439958-1-leo.bras@arm.com>
+ <20260729104548.3439958-2-leo.bras@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 29 Jul 2026 10:55:40 +0000
+Message-Id: <20260729105541.3FECC1F00A3A@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v15 13/37] KVM: arm64: CCA: Support timers in realm RECs
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
- Lorenzo Pieralisi <lpieralisi@kernel.org>
-References: <20260715142841.80544-1-steven.price@arm.com>
- <20260715142841.80544-14-steven.price@arm.com> <861pcoeqk5.wl-maz@kernel.org>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <861pcoeqk5.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
-On 27/07/2026 10:21, Marc Zyngier wrote:
-> On Wed, 15 Jul 2026 15:28:15 +0100,
-> Steven Price <steven.price@arm.com> wrote:
->>
->> The RMM keeps track of the timer while the realm REC is running, but on
->> exit to the normal world KVM is responsible for handling the timers.
->>
->> A later patch adds the support for propagating the timer values from the
->> exit data structure and calling kvm_realm_timers_update().
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->> Changes since v14:
->>  * Special case in kvm_timer_vcpu_load()/kvm_timer_vcpu_put() the timer
->>    handling.
->> Changes since v12:
->>  * Adapt to upstream changes.
->> Changes since v11:
->>  * Drop the kvm_is_realm() check from timer_set_offset(). We already
->>    ensure that the offset is 0 when calling the function.
->> Changes since v10:
->>  * KVM_CAP_COUNTER_OFFSET is now already hidden by a previous patch.
->> Changes since v9:
->>  * No need to move the call to kvm_timer_unblocking() in
->>    kvm_timer_vcpu_load().
->> Changes since v7:
->>  * Hide KVM_CAP_COUNTER_OFFSET for realm guests.
->> ---
->>  arch/arm64/kvm/arch_timer.c  | 38 +++++++++++++++++++++++++++++++++---
->>  include/kvm/arm_arch_timer.h |  2 ++
->>  2 files changed, 37 insertions(+), 3 deletions(-)
->>
->> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
->> index 4155fe89b58a..fdd68f1f5b7b 100644
->> --- a/arch/arm64/kvm/arch_timer.c
->> +++ b/arch/arm64/kvm/arch_timer.c
->> @@ -482,6 +482,20 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
->>  			    timer_ctx);
->>  }
->>  
->> +void kvm_realm_timers_update(struct kvm_vcpu *vcpu)
->> +{
->> +	struct arch_timer_cpu *arch_timer = &vcpu->arch.timer_cpu;
->> +	int i;
->> +
->> +	for (i = 0; i < NR_KVM_EL0_TIMERS; i++) {
->> +		struct arch_timer_context *timer = &arch_timer->timers[i];
->> +		bool status = timer_get_ctl(timer) & ARCH_TIMER_CTRL_IT_STAT;
->> +		bool level = kvm_timer_enabled(timer) && status;
->> +
->> +		kvm_timer_update_irq(vcpu, level, timer);
->> +	}
->> +}
->> +
-> 
-> Why do we need this? What is so special about CCA that it cannot use
-> the existing timer flow?
+Thank you for your contribution! Sashiko AI review found 6 potential issue(=
+s) to consider:
+- [High] The patch is explicitly marked by the author as a test hack that s=
+hould not be merged upstream.
+- [High] Hardware Dirty Bit Management (DBM) is not cleared when write-prot=
+ecting pages, allowing guests to bypass software write-protection (such as =
+userfaultfd-wp or software dirty logging).
+- [Medium] Left shifting a negative signed integer is undefined behavior in=
+ C.
+- [Medium] The hardcoded split_page_chunk_size is excessively large, causin=
+g massive memory allocations under the mmu_lock.
+- [Low] HDBSS entry macros are defined in a `.c` file instead of a header f=
+ile, making them inaccessible to other subsystems.
+- [Low] Typo in the parameter name of `has_vhe_hdbss`.
+--
 
-CCA is a little special because the timer context is owned by the RMM
-while the realm is executing. It's the RMM which actually loads/saves
-the timer registers not KVM.
+--- Patch [1]: [PATCH v3 01/11] KVM: arm64: HDBSS bits ---
+commit 125f04d66539bf05e0255567036409a407e48004
+Author: Leonardo Bras <leo.bras@arm.com>
+Subject: KVM: arm64: HDBSS bits
 
-The RMM returns some of the timer state on every exit, and the host is
-responsible for updating the interrupt status (as the host controls the
-GIC emulation).
+A brief summary:
+This commit introduces preliminary support for the Hardware Dirty state
+tracking structure (HDBSS) feature on ARM64. It adds CPU feature detection,
+sets the DBM stage-2 page table flag when write protection is relaxed, and
+configures eager page splitting chunk sizes for testing purposes.
 
->>  /* Only called for a fully emulated timer */
->>  static void timer_emulate(struct arch_timer_context *ctx)
->>  {
->> @@ -888,6 +902,11 @@ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
->>  	if (unlikely(!timer->enabled))
->>  		return;
->>  
->> +	if (vcpu_is_rec(vcpu)) {
->> +		kvm_timer_unblocking(vcpu);
->> +		return;
->> +	}
->> +
->>  	get_timer_map(vcpu, &map);
->>  
->>  	if (static_branch_likely(&has_gic_active_state)) {
->> @@ -923,6 +942,12 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
->>  	if (unlikely(!timer->enabled))
->>  		return;
->>  
->> +	if (vcpu_is_rec(vcpu)) {
->> +		if (kvm_vcpu_is_blocking(vcpu))
->> +			kvm_timer_blocking(vcpu);
->> +		return;
->> +	}
->> +
->>  	get_timer_map(vcpu, &map);
->>  
->>  	timer_save_state(map.direct_vtimer);
->> @@ -1073,7 +1098,7 @@ static void timer_context_init(struct kvm_vcpu *vcpu, int timerid)
->>  
->>  	ctxt->timer_id = timerid;
->>  
->> -	if (!kvm_vm_is_protected(vcpu->kvm)) {
->> +	if (!kvm_vm_is_protected(vcpu->kvm) && !vcpu_is_rec(vcpu)) {
->>  		if (timerid == TIMER_VTIMER)
->>  			ctxt->offset.vm_offset = &kvm->arch.timer_data.voffset;
->>  		else
->> @@ -1104,7 +1129,7 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
->>  		timer_context_init(vcpu, i);
->>  
->>  	/* Synchronize offsets across timers of a VM if not already provided */
->> -	if (!vcpu_is_protected(vcpu) &&
->> +	if (!vcpu_is_protected(vcpu) && !vcpu_is_rec(vcpu) &&
->>  	    !test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm->arch.flags)) {
->>  		timer_set_offset(vcpu_vtimer(vcpu), kvm_phys_timer_read());
->>  		timer_set_offset(vcpu_ptimer(vcpu), 0);
->> @@ -1600,6 +1625,13 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
->>  		return -EINVAL;
->>  	}
->>  
->> +	/*
->> +	 * We don't use mapped IRQs for Realms because the RMI doesn't allow
->> +	 * us setting the LR.HW bit in the VGIC.
->> +	 */
->> +	if (vcpu_is_rec(vcpu))
->> +		return 0;
->> +
-> 
-> If you can't set the HW bit, then use the existing infrastructure for
-> similarly challenged systems. But I find this restriction hard to
-> swallow. What is so special about the HW bit?
+> I added them here in order to fulfill the dependencies and be able to
+> easily build and test this patchset, but this particular patch should *no=
+t*
+> be merged upstream.
 
-The spec provides this justification for not being able to set the bit:
+[Severity: High]
+Since this is explicitly marked as a test hack meant only for local building
+and testing, should this patch be dropped from the series before it gets
+merged upstream?
 
-XDMSDZ: The GICv3 architecture states that, if HW == '1' then the
-virtual interrupt must be linked to a physical interrupt whose state is
-Active, otherwise behavior is undefined. The RMM is unable to validate
-that invariant, so it imposes the constraint that HW == '0'.
+[ ... ]
 
-> As it stands, I don't think this is acceptable, and I really want to
-> know why you need to special-case the timer code.
+> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeatur=
+e.c
+> --- a/arch/arm64/kernel/cpufeature.c
+> +++ b/arch/arm64/kernel/cpufeature.c
+> @@ -2131,6 +2131,11 @@ static bool hvhe_possible(const struct arm64_cpu_c=
+apabilities *entry,
+>  	return arm64_test_sw_feature_override(ARM64_SW_FEATURE_OVERRIDE_HVHE);
+>  }
+> =20
+> +static bool has_vhe_hdbss(const struct arm64_cpu_capabilities *entry, in=
+t cope)
+                                                                           =
+  ^^^^
+[Severity: Low]
+Is this intended to be named scope? The standard convention for capability
+matching functions in cpufeature.c uses scope for this parameter.
 
-You're right, there's no need for this early return. Instead I should be
-able to implement an 'ops' for the realm guests which returns the
-VGIC_IRQ_SW_RESAMPLE flag.
+[ ... ]
 
-Thanks,
-Steve
+> diff --git a/arch/arm64/kvm/dirty_bit.c b/arch/arm64/kvm/dirty_bit.c
+> new file mode 100644
+> --- /dev/null
+> +++ b/arch/arm64/kvm/dirty_bit.c
+> @@ -0,0 +1,16 @@
+[ ... ]
+> +#include <asm/kvm_dirty_bit.h>
+> +
+> +/* HDBSS entry field definitions */
+> +#define HDBSS_ENTRY_VALID BIT(0)
+> +#define HDBSS_ENTRY_TTWL_SHIFT (1)
+> +#define HDBSS_ENTRY_TTWL_MASK (GENMASK(3, 1))
+> +#define HDBSS_ENTRY_TTWL(x) \
+> +	(((x) << HDBSS_ENTRY_TTWL_SHIFT) & HDBSS_ENTRY_TTWL_MASK)
+> +#define HDBSS_ENTRY_TTWL_RESV HDBSS_ENTRY_TTWL(-4)
+
+[Severity: Low]
+Because these HDBSS entry macros are defined directly in the .c file rather
+than in the newly created header arch/arm64/include/asm/kvm_dirty_bit.h, th=
+ey
+are inaccessible to other subsystems. Should they be moved to the header fi=
+le
+so dependent patches can use them?
+
+[Severity: Medium]
+Will HDBSS_ENTRY_TTWL_RESV trigger undefined behavior here? The macro expan=
+ds
+to ((-4) << 1), and left shifting a negative signed integer is undefined
+behavior in C (prior to C23), which can lead to shift-out-of-bounds splats
+at runtime.
+
+> +#define HDBSS_ENTRY_IPA GENMASK_ULL(55, 12)
+
+[ ... ]
+
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -1367,9 +1371,13 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgta=
+ble *pgt, u64 addr,
+>  	if (prot & KVM_PGTABLE_PROT_R)
+>  		set |=3D KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R;
+> =20
+> -	if (prot & KVM_PGTABLE_PROT_W)
+> +	if (prot & KVM_PGTABLE_PROT_W) {
+>  		set |=3D KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
+> =20
+> +		if (pgt->flags & KVM_PGTABLE_S2_DBM)
+> +			set |=3D KVM_PTE_LEAF_ATTR_HI_S2_DBM;
+> +	}
+> +
+
+[Severity: High]
+Does kvm_pgtable_stage2_wrprotect() also need to be updated to clear the DBM
+bit?=20
+
+Currently, kvm_pgtable_stage2_wrprotect() clears the=20
+KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W bit to trap writes, but if=20
+KVM_PTE_LEAF_ATTR_HI_S2_DBM is left set, the hardware will autonomously upd=
+ate=20
+the PTE to allow writes without generating a permission fault. Could this=20
+allow guests to bypass software write-protection mechanisms like=20
+userfaultfd-wp or KVM software dirty page logging?
+
+>  	if (prot & KVM_PGTABLE_PROT_X) {
+>  		ret =3D stage2_set_xn_attr(prot, &xn);
+>  		if (ret)
+
+[ ... ]
+
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1027,8 +1027,12 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kv=
+m_s2_mmu *mmu, unsigned long t
+>  	for_each_possible_cpu(cpu)
+>  		*per_cpu_ptr(mmu->last_vcpu_ran, cpu) =3D -1;
+> =20
+> -	 /* The eager page splitting is disabled by default */
+> -	mmu->split_page_chunk_size =3D KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
+> +	 /* The eager page splitting is disabled by default if system has no HD=
+BSS */
+> +	if (system_supports_hdbss())
+> +		mmu->split_page_chunk_size =3D 256 * 1024 * PAGE_SIZE;
+
+[Severity: Medium]
+Is this hardcoded split_page_chunk_size excessively large? This evaluates to
+1GB on 4KB page systems and 16GB on 64KB page systems. When splitting this
+chunk, kvm_mmu_topup_memory_cache might attempt to allocate a massive amount
+of page tables under the mmu_lock. Could this cause severe latency spikes or
+allocation failures under memory pressure?
+
+> +	else
+> +		mmu->split_page_chunk_size =3D KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
+> +
+>  	mmu->split_page_cache.gfp_zero =3D __GFP_ZERO;
+> =20
+>  	mmu->pgd_phys =3D __pa(pgt->pgd);
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260729104548.3439=
+958-1-leo.bras@arm.com?part=3D1
