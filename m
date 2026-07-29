@@ -1,335 +1,165 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 931F34499B6;
-	Wed, 29 Jul 2026 10:57:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5BC745D5C7;
+	Wed, 29 Jul 2026 10:58:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785322676; cv=none; b=rUxuzKdK8wpEVm9bgtMAH7tXFeod7ZLnjHG/5hUpV7sB7vVhx9MIqUF1Vs8N71B7w2j7gUaBkNLHvmxnw2Qh6yNOO8DAagDJMqui4mxmni5Hfy5xniehHpW4xK6mwM6MBFREIsxNFnC0l2u0a2MkMK9W959rv20S54AVj4LbOUc=
+	t=1785322706; cv=none; b=eOLRDDe2pOEzGXeEihpAC7m+J/c0OdU3jQs/W66yQItkXx0ORkA1FBRPnPhaprui75trDLjSOSTvfm8X8HFTQQzijBx16TvRAbzolnceWy7/Vh1q81/M4FHeu60h+ntUEOSnOwbSRb9R0yCrhpbdZG+EcCimNB5501Vbrh4qoQM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785322676; c=relaxed/simple;
-	bh=2cSlau8piPW7Urm2i4Qif9M+ci7RwPbWHX27xkSf1Eg=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=cEGeg+Wc+IlPdNWV7JFCCbjC/XdFyKOYLPHEfTu+0oowlIQftRRZ+7mkB68EP6PfURtRbCgYOFOQpWC4UTkmpHpjaxCuHk0HCaLzmyYSuACpYCS4c+k71kZ1ZlLgFyiViozxPaEF73w1VsZhLYU1KUqWSUNxyZ331Hlqb6AGF5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F0onnFrs; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1785322706; c=relaxed/simple;
+	bh=cA/TyjNainImWoZ1WgoIbtVzLcV/x03gUiUjuYc+ZpQ=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=R3LwA5kigFIweOwF+sNWzgN6eJS5UQGi7eW5dVKj6QyKm/2u0ZiajwmrCUjBZsvsJ6ypjEq5ddbjlupYC2z6a2VB72MJd6yPe07ea+sfmzU2gnZQ/7Be9GkjVZhdqySU5azmT49HvdFtxknmDsF97AEgwMZemeqC+l3QvPUGedE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eIXHdDcy; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F0onnFrs"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1E6B1F000E9;
-	Wed, 29 Jul 2026 10:57:53 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eIXHdDcy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A42181F00A3A;
+	Wed, 29 Jul 2026 10:58:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785322674;
-	bh=YLWCf3VPcZLr0Qq+rn4J2+ur27EFB2i4tMnH8bGiz1U=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=F0onnFrsceGeWp0YfoKHK5it7kVAn+moJdMMDekpy77e/kaam1wRUgIhAIbZbqIta
-	 kS6o7V4JZf+ZRSB4CE5FmCoD+wOM3ZvPfYPO8ajcUD2QZrTfBCq3/Jn0WyrPeRdDSM
-	 T3mUcrzSpKsqOyI4uVYHdelfByzO1W01BhqaMDucZZHJdZdU8BPlL2pa4qJvjX2+ke
-	 UhoHamv+Qqh3sitxxPPizO9XYLxayzBvWiVd+r2eeGI+pKfWTtQBz3Fdlryl+8/4Io
-	 qUMc1n4q9wFIiubuFLat10JHvkwhFNDsutVzpjT6wnBjdRMQ/oIp76xumFivXmx09A
-	 07/vWknMD+xFQ==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v3 04/11] KVM: arm64: dirty_bit: Add base FEAT_HACDBS
- cleaning routine
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Leonardo Bras" <leo.bras@arm.com>
-Cc: kvm@vger.kernel.org, "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev
-In-Reply-To: <20260729104548.3439958-5-leo.bras@arm.com>
-References: <20260729104548.3439958-1-leo.bras@arm.com>
- <20260729104548.3439958-5-leo.bras@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 29 Jul 2026 10:57:53 +0000
-Message-Id: <20260729105753.B1E6B1F000E9@smtp.kernel.org>
+	s=k20260515; t=1785322704;
+	bh=VyFx2U/VszxvRM92qAy54Y4oL0XsKZy0mURmPScFf8w=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=eIXHdDcyltbN2unLeeeA8hK4cDT8x9vCiL57PIRrPd8uu0RllQdrFCsSPV9xq0JOz
+	 2td1zXirKskj7jqLT9/fBwWgLbd0FrsgX120H9v5OdS4JJDGZmc4bFfpUgVWfrcw0j
+	 fa2k7XiTnH2vqPviyLvVAv8n9Wo1xlFJHxdVLNICu3jeIV8jOuN1kY0T+21mllbYuc
+	 kukncjy49nsuNQkxKeSsqYklKJ731WbThmJOBWxKh20tLBkr7NvhdclaFB8YH0WHwF
+	 5HaZgBKQ4P5WgNGbk4ZRjrfM2y/EQcEraqYxDWPap85WhD0TVWsxMJ8oVBD+VHEVNe
+	 8i4uxTOESTYWA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wp1zS-0000000A4TC-1yAO;
+	Wed, 29 Jul 2026 10:58:22 +0000
+Date: Wed, 29 Jul 2026 11:58:21 +0100
+Message-ID: <86qzkmcbaq.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu
+ <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>,
+	"Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>,
+	Emi Kisanuki <fj0570is@fujitsu.com>,
+	Vishal Annapurve <vannapurve@google.com>,
+	WeiLin.Chang@arm.com,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>
+Subject: Re: [PATCH v15 13/37] KVM: arm64: CCA: Support timers in realm RECs
+In-Reply-To: <dff2eee7-09cf-4f85-8dec-c7c243f3ba0f@arm.com>
+References: <20260715142841.80544-1-steven.price@arm.com>
+	<20260715142841.80544-14-steven.price@arm.com>
+	<861pcoeqk5.wl-maz@kernel.org>
+	<dff2eee7-09cf-4f85-8dec-c7c243f3ba0f@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com, aneesh.kumar@kernel.org, fj0570is@fujitsu.com, vannapurve@google.com, WeiLin.Chang@arm.com, lpieralisi@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Thank you for your contribution! Sashiko AI review found 8 potential issue(=
-s) to consider:
-- [Critical] `hacdbs_sched_in` restores a potentially stale VMID from `save=
-.vttbr_el2`, leading to cross-VM memory corruption.
-- [High] Direct EL2 system register accesses from host code without a VHE c=
-heck causes kernel panics on nVHE systems.
-- [High] Writes to control-plane system registers are batched and not immed=
-iately followed by an `isb()` barrier.
-- [High] Missing synchronization barrier (`DSB`) before changing the transl=
-ation context after disabling the HACDBS asynchronous engine.
-- [High] The hardware polling loop in `dirty_bit_clear` lacks a timeout or =
-signal check, risking an unkillable task hang.
-- [Medium] Using `virt_to_phys()` on a dynamic buffer array which could be =
-non-contiguous (e.g. allocated with vmalloc).
-- [Medium] The commit message explicitly asserts the code runs with preempt=
-ion disabled, but the implementation explicitly enables preemption.
-- [Low] Left-shift of a negative integer in macro definition.
---
+On Wed, 29 Jul 2026 11:47:03 +0100,
+Steven Price <steven.price@arm.com> wrote:
+> 
+> On 27/07/2026 10:21, Marc Zyngier wrote:
+> > On Wed, 15 Jul 2026 15:28:15 +0100,
+> > Steven Price <steven.price@arm.com> wrote:
+> >>
+> >> The RMM keeps track of the timer while the realm REC is running, but on
+> >> exit to the normal world KVM is responsible for handling the timers.
+> >>
+> >> A later patch adds the support for propagating the timer values from the
+> >> exit data structure and calling kvm_realm_timers_update().
+> >>
+> >> Signed-off-by: Steven Price <steven.price@arm.com>
+> >> ---
+> >> Changes since v14:
+> >>  * Special case in kvm_timer_vcpu_load()/kvm_timer_vcpu_put() the timer
+> >>    handling.
+> >> Changes since v12:
+> >>  * Adapt to upstream changes.
+> >> Changes since v11:
+> >>  * Drop the kvm_is_realm() check from timer_set_offset(). We already
+> >>    ensure that the offset is 0 when calling the function.
+> >> Changes since v10:
+> >>  * KVM_CAP_COUNTER_OFFSET is now already hidden by a previous patch.
+> >> Changes since v9:
+> >>  * No need to move the call to kvm_timer_unblocking() in
+> >>    kvm_timer_vcpu_load().
+> >> Changes since v7:
+> >>  * Hide KVM_CAP_COUNTER_OFFSET for realm guests.
+> >> ---
+> >>  arch/arm64/kvm/arch_timer.c  | 38 +++++++++++++++++++++++++++++++++---
+> >>  include/kvm/arm_arch_timer.h |  2 ++
+> >>  2 files changed, 37 insertions(+), 3 deletions(-)
+> >>
+> >> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> >> index 4155fe89b58a..fdd68f1f5b7b 100644
+> >> --- a/arch/arm64/kvm/arch_timer.c
+> >> +++ b/arch/arm64/kvm/arch_timer.c
+> >> @@ -482,6 +482,20 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
+> >>  			    timer_ctx);
+> >>  }
+> >>  
+> >> +void kvm_realm_timers_update(struct kvm_vcpu *vcpu)
+> >> +{
+> >> +	struct arch_timer_cpu *arch_timer = &vcpu->arch.timer_cpu;
+> >> +	int i;
+> >> +
+> >> +	for (i = 0; i < NR_KVM_EL0_TIMERS; i++) {
+> >> +		struct arch_timer_context *timer = &arch_timer->timers[i];
+> >> +		bool status = timer_get_ctl(timer) & ARCH_TIMER_CTRL_IT_STAT;
+> >> +		bool level = kvm_timer_enabled(timer) && status;
+> >> +
+> >> +		kvm_timer_update_irq(vcpu, level, timer);
+> >> +	}
+> >> +}
+> >> +
+> > 
+> > Why do we need this? What is so special about CCA that it cannot use
+> > the existing timer flow?
+> 
+> CCA is a little special because the timer context is owned by the RMM
+> while the realm is executing. It's the RMM which actually loads/saves
+> the timer registers not KVM.
+> 
+> The RMM returns some of the timer state on every exit, and the host is
+> responsible for updating the interrupt status (as the host controls the
+> GIC emulation).
 
---- Patch [4]: [PATCH v3 04/11] KVM: arm64: dirty_bit: Add base FEAT_HACDBS=
- cleaning routine ---
-commit b837f416f1871772a3bac546015e6fcac9c7accb
-Author: Leonardo Bras <leo.bras@arm.com>
+But KVM relies on the timers being live when the vcpu is loaded. So
+the first port of call should be for CCA to adapt to KVM, and not the
+other way around.
 
-KVM: arm64: dirty_bit: Add base FEAT_HACDBS cleaning routine
+You can always make sure that the timers are in the registers at the
+point where you reach the KVM code.
 
-Introduce the basic cleaning routine that is going to be used for both
-dirty-bitmap and dirty-ring routines. It sets the required registers with
-the input buffer, and wait for HACDBS to finish.
+	M.
 
-> It is ran with preemption disabled, as a task being scheduled in could
-> change the translation registers used by HACDBS and end up corrupting the
-> current dirty-bit tracking and the sched-in task's S2 pagetables.
-
-[Severity: Medium]
-The commit message asserts that the code runs with preemption disabled, but
-looking at dirty_bit_clear(), preemption is explicitly enabled immediately
-after registering the notifier:
-
-dirty_bit_clear() {
-    preempt_disable();
-    preempt_notifier_register(&save.notifier);
-    preempt_enable();
-}
-
-Is this description accurate, or does the implementation contradict the
-commit message's synchronization premise?
-
-> diff --git a/arch/arm64/kvm/dirty_bit.c b/arch/arm64/kvm/dirty_bit.c
-> index 32fe938d6bf70..33826bbd16d91 100644
-> --- a/arch/arm64/kvm/dirty_bit.c
-> +++ b/arch/arm64/kvm/dirty_bit.c
-> @@ -5,6 +5,7 @@
->   */
-> =20
->  #include <asm/kvm_dirty_bit.h>
-> +#include <asm/kvm_mmu.h>
-> =20
->  /* HDBSS entry field definitions */
->  #define HDBSS_ENTRY_VALID BIT(0)
-> @@ -14,3 +15,178 @@
->  	(((x) << HDBSS_ENTRY_TTWL_SHIFT) & HDBSS_ENTRY_TTWL_MASK)
->  #define HDBSS_ENTRY_TTWL_RESV HDBSS_ENTRY_TTWL(-4)
-
-[Severity: Low]
-Does this code trigger undefined behavior by left-shifting a negative
-signed integer (-4) via the HDBSS_ENTRY_TTWL macro?
-
-[ ... ]
-
-> +static void hacdbs_start(u64 *hw_entries, int size)
-> +{
-> +	u64 br;
-> +	/* Each entry is 8 bytes */
-> +	int size_b =3D size * sizeof(hw_entries[0]);
-> +	int size_p2 =3D max(roundup_pow_of_two(size_b), PAGE_SIZE);
-> +
-> +	/* If not using the full size of the array, put a stop entry at the end=
- */
-> +	if (size_b < size_p2)
-> +		hw_entries[size] =3D HDBSS_ENTRY_VALID | HDBSS_ENTRY_TTWL_RESV;
-> +
-> +	sysreg_clear_set_s(SYS_HACDBSCONS_EL2,
-> +			   HACDBSCONS_EL2_ERR_REASON | HACDBSCONS_EL2_INDEX, 0);
-
-[Severity: High]
-Can this sequence leave the CPU executing with architecturally undefined
-pipeline state?
-
-In hacdbs_start(), the write to the control-plane system register
-SYS_HACDBSCONS_EL2 is followed by pointer arithmetic and a dsb() rather
-than an isb() as the very next instruction.
-
-> +
-> +	br =3D (virt_to_phys(hw_entries) & HACDBSBR_EL2_BADDR_MASK) |
-> +	     FIELD_PREP(HACDBSBR_EL2_SZ, ilog2(size_p2) - 12) |
-> +	     FIELD_PREP(HACDBSBR_EL2_EN, 1);
-
-[Severity: Medium]
-Will this return an invalid physical address if hw_entries is allocated via
-vmalloc() or kvmalloc()?
-
-Using virt_to_phys() on a dynamic buffer array assumes it resides in the
-physically contiguous linear map, which could lead to hardware DMA targeting
-the wrong physical memory pages.
-
-> +
-> +	/* All writes to the array have to complete before starting */
-> +	dsb(ishst);
-> +
-> +	write_sysreg_s(br, SYS_HACDBSBR_EL2);
-
-[Severity: High]
-Does this code cause a kernel panic on nVHE systems?
-
-In hacdbs_start(), directly writing to the EL2 system register
-SYS_HACDBSBR_EL2 from the KVM host kernel executing at EL1 without a
-has_vhe() guard will trigger an immediate Undefined Instruction trap.
-
-> +	isb();
-> +}
-
-[ ... ]
-
-> +static void hacdbs_sched_in(struct preempt_notifier *notifier, int cpu)
-> +{
-> +	struct hacdbs_sched_save *save =3D container_of(notifier,
-> +						      struct hacdbs_sched_save,
-> +						      notifier);
-> +
-> +	write_sysreg_s(save->save.vtcr_el2, SYS_VTCR_EL2);
-> +	write_sysreg_s(save->save.vttbr_el2, SYS_VTTBR_EL2);
-
-[Severity: High]
-Could this direct EL2 register access cause a panic on nVHE systems?
-
-Similar to hacdbs_start(), hacdbs_sched_in() accesses SYS_VTCR_EL2 and
-SYS_VTTBR_EL2 from EL1 without a VHE check.
-
-[Severity: High]
-Is a synchronization barrier missing here?
-
-In hacdbs_sched_in(), the write to SYS_VTCR_EL2 is immediately followed by a
-write to SYS_VTTBR_EL2 rather than an isb(), meaning subsequent instructions
-may observe undefined pipeline state.
-
-[Severity: Critical]
-Can this restore a stale VMID and cause cross-VM memory corruption?
-
-hacdbs_sched_in() restores the cached save.vttbr_el2 (which contains the
-VMID). Since this is a generic host thread, if KVM's VMID allocator rolls
-over while the task sleeps, the VMID could be reassigned.
-
-This could cause the HACDBS engine to operate on another VM's memory.
-
-> +	isb();
-> +
-> +	if (save->save.hcr_vm_set) {
-> +		sysreg_clear_set_hcr(0, HCR_EL2_VM);
-> +		isb();
-> +	}
-> +
-> +	write_sysreg_s(save->save.hacdbscons_el2, SYS_HACDBSCONS_EL2);
-> +	write_sysreg_s(save->save.hacdbsbr_el2, SYS_HACDBSBR_EL2);
-
-[Severity: High]
-Does this sequence lack an immediate isb() after writing SYS_HACDBSCONS_EL2,
-allowing the CPU to execute the SYS_HACDBSBR_EL2 write with undefined
-pipeline state?
-
-> +	isb();
-> +}
-> +
-> +static void hacdbs_sched_out(struct preempt_notifier *notifier,
-> +			     struct task_struct *next)
-> +{
-> +	struct hacdbs_sched_save *save =3D container_of(notifier,
-> +						      struct hacdbs_sched_save,
-> +						      notifier);
-> +
-> +	if (read_sysreg_s(SYS_HACDBSBR_EL2) & HACDBSBR_EL2_EN) {
-> +		save->save.hacdbsbr_el2 =3D HACDBSBR_EL2_EN;
-> +		sysreg_clear_set_s(SYS_HACDBSBR_EL2, HACDBSBR_EL2_EN, 0);
-> +		isb();
-> +	} else {
-> +		save->save.hacdbsbr_el2 =3D 0;
-> +	}
-> +
-> +	save->save.hacdbscons_el2 =3D read_sysreg_s(SYS_HACDBSCONS_EL2);
-> +	save->save.hacdbsbr_el2 |=3D read_sysreg_s(SYS_HACDBSBR_EL2);
-> +	save->save.vttbr_el2 =3D read_sysreg_s(SYS_VTTBR_EL2);
-
-[Severity: Critical]
-Is it safe to cache the VTTBR (including the VMID) into task-local memory
-here in hacdbs_sched_out()?
-
-As mentioned for hacdbs_sched_in(), if a VMID rollover occurs while this
-task is preempted, the cached VMID becomes stale.
-
-> +	save->save.vtcr_el2 =3D read_sysreg_s(SYS_VTCR_EL2);
-> +
-> +	if (read_sysreg_s(SYS_HCR_EL2) & HCR_EL2_VM) {
-> +		sysreg_clear_set_hcr(HCR_EL2_VM, 0);
-
-[Severity: High]
-Does this code change the translation regime (clearing HCR_EL2_VM) without
-a preceding dsb()?
-
-The engine was disabled earlier in hacdbs_sched_out() (by clearing
-HACDBSBR_EL2_EN), but without a dsb(), the asynchronous engine might not be
-definitively halted before the translation context changes.
-
-> +		isb();
-> +		save->save.hcr_vm_set =3D true;
-> +	} else {
-> +		save->save.hcr_vm_set =3D false;
-> +	}
-> +}
-
-[ ... ]
-
-> +static int dirty_bit_clear(struct kvm *kvm, u64 *hw_entries, int size)
-> +{
-> +	int ret;
-> +	u64 cons;
-> +	struct hacdbs_sched_save save;
-> +
-> +	preempt_notifier_init(&save.notifier, &hacdbs_preempt_ops);
-> +	preempt_disable();
-> +	preempt_notifier_register(&save.notifier);
-> +	preempt_enable();
-> +
-> +	__load_stage2(&kvm->arch.mmu);
-> +	sysreg_clear_set_hcr(0, HCR_EL2_VM);
-> +	isb();
-> +
-> +	hacdbs_start(hw_entries, size);
-> +
-> +	do {
-> +		cons =3D read_sysreg_s(SYS_HACDBSCONS_EL2);
-> +		if (FIELD_GET(HACDBSCONS_EL2_ERR_REASON, cons))
-> +			break;
-> +
-> +		if (FIELD_GET(HACDBSCONS_EL2_INDEX, cons) >=3D size)
-> +			break;
-> +
-> +		udelay(1);
-> +	} while (true);
-
-[Severity: High]
-Could this continuous hardware polling loop hang the CPU permanently?
-
-In dirty_bit_clear(), this loop waits for the hardware engine to finish, but
-it lacks a timeout mechanism, bounded retry, or a fatal_signal_pending()
-check.
-
-> +
-> +	ret =3D hacdbs_stop(size);
-> +
-> +	sysreg_clear_set_hcr(HCR_EL2_VM, 0);
-
-[Severity: High]
-Can this translation regime change lead to speculative execution or out of
-context memory accesses?
-
-In dirty_bit_clear(), hacdbs_stop() clears the enable bit, but clearing
-HCR_EL2_VM immediately after lacks an intervening dsb() to ensure the
-hardware engine is definitively halted.
-
-> +	isb();
-> +
-> +	/*
-> +	 * No DSB is needed here, as kvm_flush_remote_tlbs_memslot() that happe=
-ns
-> +	 * later in generic dirty-cleaning code already performs a DSB before
-> +	 * doing the TLBI.
-> +	 */
-> +
-> +	preempt_disable();
-> +	preempt_notifier_unregister(&save.notifier);
-> +	preempt_enable();
-> +
-> +	return ret;
-> +}
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260729104548.3439=
-958-1-leo.bras@arm.com?part=3D4
+-- 
+Without deviation from the norm, progress is not possible.
