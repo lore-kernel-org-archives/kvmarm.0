@@ -1,142 +1,170 @@
-Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 500493B0591
-	for <kvmarm@lists.linux.dev>; Wed, 29 Jul 2026 15:12:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 642D6367287
+	for <kvmarm@lists.linux.dev>; Wed, 29 Jul 2026 15:17:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785337940; cv=none; b=jcBFyLwkZhIm56UO23Evgf3GjLf3cWRbKmF4isVQKZPPf/241+Ho9wZ+V2jcc05v4MIMwt/IlWczJzxXkszE48iysMNHAMBbwOjgya63mV5f++S3ue4b8kpJDP3pGZ7IxrXqXoM1Ne1kkuqhYJLfUQOorbAQsURR5o6w6J5VpRQ=
+	t=1785338226; cv=none; b=tt2V8aZWp246xZq8WsNJSaPf+nvkS18l0FmvQzhz+14BcgVQtnfg7oUsE9zHqsIXg1FVWBzkRHmccvy7UJGgqhpmGumXowYEUH+ZiIfEjOOuo0HwYMwBLpTlKx5E2SUBrGLsTyD+pjsOfkYM+o8dZwsqXqucSFvJCOCoeF2KZqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785337940; c=relaxed/simple;
-	bh=OcqSaTeLFBw/37oYMtNHG50Md6M29m6rUY9fQn9TwYo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EnjCBVSh53uwhlajHAsme9jMUjvkaAzGKKS5CNr/fGg+3IdlvgE8wYeKsxdnPLFZpwtexG59C5DxCCf4PHYGfUQNiK0WAtXfE3muHw9RIft19lheavSkmMK2Cf9qDliAFbNbT3N0hhcVjefQ60QnB/e8EEsuIenizSBIwnHr47Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=C0x1vkOq; arc=none smtp.client-ip=95.215.58.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1785338226; c=relaxed/simple;
+	bh=l2KGUYqW0UfMsHtQ5m9chnamEWLhEe2YPIHzEgOQPTU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=g8/8fA6kdt9nAteh7heQ4ors8IH54ujc9uT9zfB2i1awnSPCxfnkFZ6ZOErgYQBY3Bc0DPu2XslImnG2IPctmCeJCcbgm2MCEgNzEnmdAq/7DSugodCwqD5f2TM2Y3VK7SSYd6xpAILzCT74uWyaH2UklEYEhGMYfjKi7sGAGbQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=IrINi992; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="C0x1vkOq"
-X-Forwarded-Encrypted: i=1; AHgh+RoQ9ClixyFv+AMvwDkqo+HpULURN5vPNCAFoWC47OPXS0mn9x7Kn90o1p/436492v8hM1WOeZI=@lists.linux.dev
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1785337935;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GZkD05VF0k87b16ZMBfeT0j3aww6dW2ILKTzqN3+UtU=;
-	b=C0x1vkOqnVKaiWqG8/K+aQHdUN0QgDl4Ql5KKLy1rgyzrHgUn+Hw1y28S7ZYn1t0hXGA3h
-	Bu8ckepFtWA7OYADTn7152Jug4YiLsp9swBoT/eZ8Sv8v/n4RYuC+RtwCUg5QSuC3cHK2w
-	aQuWkmnaK3P2j+cVq9SbgbTGCsNcNpM=
-X-Gm-Message-State: AOJu0YxP4X1QVRS2TGZTlwTZqr1Wm/qBVcgGiWAVYG3767A9QXsLD+Rz
-	XQu1gB3EGrPkTJELOuj7pYK3HbeWJ3GLA86Zq1+1G+Bu1Bu1TS47Pdi0GVxVg3291nFlSZMN2Tu
-	MABF6xKxHIaGp/WFGlg4gjeVP+rFFLCCUWdbmf7BM
-X-Received: by 2002:ac8:7e8e:0:b0:51b:ff0a:2048 with SMTP id
- d75a77b69052e-52b350e5e9dmr111891cf.3.1785337931850; Wed, 29 Jul 2026
- 08:12:11 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="IrINi992"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B2E1F1684;
+	Wed, 29 Jul 2026 08:16:59 -0700 (PDT)
+Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6EF353F763;
+	Wed, 29 Jul 2026 08:17:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1785338223; bh=l2KGUYqW0UfMsHtQ5m9chnamEWLhEe2YPIHzEgOQPTU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=IrINi992JDxSzObZPgC2ZDiKIaq2Ox0SRSnnKuPayaGAptDRrqk8polkETNxgIuak
+	 FOERoGq28jGE5o+lVefw5575Rfo4gGYd9xQM8A2Kqyu2xeZ+jCAPr5Na5udLniJI7d
+	 PdufV4u2/yaZhZJFt8sLnk9iWysGOLEJeygwvTIo=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Tian Zheng <zhengtian10@huawei.com>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	maz@kernel.org,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	yuzenghui@huawei.com,
+	wangzhou1@hisilicon.com,
+	yangjinqian1@huawei.com,
+	caijian11@h-partners.com,
+	liuyonglong@huawei.com,
+	yezhenyu2@huawei.com,
+	yubihong@huawei.com,
+	linuxarm@huawei.com,
+	joey.gouly@arm.com,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com
+Subject: Re: [PATCH v4 3/6] KVM: arm64: Add auto DBM support for hardware dirty tracking
+Date: Wed, 29 Jul 2026 16:16:51 +0100
+Message-ID: <amoZY8uGLf1PEpjK@LeoBrasDK>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <96516762-f004-4c2a-a9c6-6fbad49ad6ae@huawei.com>
+References: <20260709104026.2612599-1-zhengtian10@huawei.com> <20260709104026.2612599-4-zhengtian10@huawei.com> <aliKo7dTZzKcWHzI@kernel.org> <0943eb14-9ffb-4dbb-9219-060e97bca2a7@huawei.com> <alpIfIOFfrudBzD5@LeoBrasDK> <al4bYajWE-v6wofu@LeoBrasDK> <96516762-f004-4c2a-a9c6-6fbad49ad6ae@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260720-hybrid-v9-0-2b713ca1b5dc@rsg.ci.i.u-tokyo.ac.jp> <20260720-hybrid-v9-1-2b713ca1b5dc@rsg.ci.i.u-tokyo.ac.jp>
-In-Reply-To: <20260720-hybrid-v9-1-2b713ca1b5dc@rsg.ci.i.u-tokyo.ac.jp>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Wed, 29 Jul 2026 16:11:34 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTxy6f2EPhtOkHju39hGi91ZM5heu5ZA0upmmDxBq2GstQ@mail.gmail.com>
-X-Gm-Features: AUfX_myxJfjxAZR1tFLm51zrI58rRpwUPxuAUzGX7sj7-3UdzYo6Sjg9A4wrAHA
-Message-ID: <CA+EHjTxy6f2EPhtOkHju39hGi91ZM5heu5ZA0upmmDxBq2GstQ@mail.gmail.com>
-Subject: Re: [PATCH v9 01/16] KVM: arm64: Serialize repeated vCPU initialization
-To: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Kees Cook <kees@kernel.org>, 
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>, 
-	Shuah Khan <skhan@linuxfoundation.org>, Yury Norov <yury.norov@gmail.com>, 
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>, Steffen Eiden <seiden@linux.ibm.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org, 
-	devel@daynix.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-On Mon, 20 Jul 2026 at 06:39, Akihiko Odaki
-<odaki@rsg.ci.i.u-tokyo.ac.jp> wrote:
->
-> The initial KVM_ARM_VCPU_INIT path holds config_lock while resetting the
-> vCPU, but repeated initialization of an existing vCPU does not. As a
-> result, reset_mdcr() can race with VM-wide PMU configuration and
-> overwrite MDCR_EL2 with a stale counter count.
->
-> Take config_lock around the repeated-init checks and reset. The vCPU
-> ioctl already holds vcpu->mutex, matching the established lock ordering.
->
-> Fixes: c8823e51b534 ("KVM: arm64: Fix MDCR_EL2.HPMN reset value")
-> Closes: https://sashiko.dev/#/patchset/20260710-hybrid-v8-0-621409f3a592@rsg.ci.i.u-tokyo.ac.jp?part=1
-> Assisted-by: Codex:gpt-5.6-sol
-> Signed-off-by: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
+On Wed, Jul 29, 2026 at 04:51:59PM +0800, Tian Zheng wrote:
+> 
+> 
+> On 7/20/2026 8:58 PM, Leonardo Bras wrote:
+> > On Fri, Jul 17, 2026 at 04:21:32PM +0100, Leonardo Bras wrote:
+> > > On Fri, Jul 17, 2026 at 11:58:06AM +0800, Tian Zheng wrote:
+> > > > 
+> > > > On 7/16/2026 3:39 PM, Oliver Upton wrote:
+> > > > > Hi Tian,
+> > > > > 
+> > > > > On Thu, Jul 09, 2026 at 06:40:23PM +0800, Tian Zheng wrote:
+> > > > > > -	if (prot & KVM_PGTABLE_PROT_W)
+> > > > > > +	if (prot & KVM_PGTABLE_PROT_W) {
+> > > > > >    		set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
+> > > > > > 
+> > > > > > +		/*
+> > > > > > +		 * No DEVICE filter needed here: relax_perms is only called
+> > > > > > +		 * on FSC_PERM faults. Device pages always get full RW from
+> > > > > > +		 * initial mapping and are never write-protected during
+> > > > > > +		 * migration, so they never trigger a permission fault.
+> > > > > > +		 */
+> > > > > > +		if (pgt->flags & KVM_PGTABLE_S2_DBM)
+> > > > > > +			set |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
+> > > > > > +	} else {
+> > > > > > +		/*
+> > > > > > +		 * Clear DBM on W→RO downgrade to prevent hardware from
+> > > > > > +		 * silently upgrading RO+DBM back to W+dirty, which would
+> > > > > > +		 * bypass KVM's write tracking and cause data corruption.
+> > > > > > +		 */
+> > > > > > +		clr |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
+> > > > > > +	}
+> > > > > > +
+> > > > > This block makes it pretty evident that the DBM bit really *is* the
+> > > > > write permission bit. I'd much rather we introduce the concept of dirty
+> > > > > state to the page table library and migrate the abstract write
+> > > > > permission to the DBM field, even if we don't have FEAT_HAFDBS.
+> > > > > 
+> > > 
+> > > Ohh, that's an amazing idea!
+> > 
+> > Thinking about that again...
+> > If we adopt the encoding with DBM being the write-permission bit, and all
+> > PTEs have it since the start, how can we have lazy-splitting happening?
+> > 
+> > Only way I think of is removing both DBM and S2_S2AP_W bit from writable
+> > PTEs during dirty-track enable, and re-adding them during the first write
+> > fault. If we don't remove the DBM bit, systems with HDBSS would just dirty
+> > it by hardware, without causing a fault.
+> > 
+> > DBM=0 would need to happen only in the first write-protect (only on
+> > lazy-splitting). All other write-protecting would just clean the S2_S2AP_W
+> > bit, as everything is already split.
+> > 
+> > Is that what was intended?
+> > 
+> > Thanks!
+> > Leo
+> > 
+> Hi Leo,
+> 
+> I think the cleanest way to handle this is to simply avoid setting DBM
+> on block mappings. If we only set DBM on page-level PTEs, then block
+> mappings will naturally stay DBM=0 and trigger a write fault on first
+> access — exactly what we need for lazy splitting.
+> 
+> When the fault occurs, the block gets split into page-level PTEs, and at
+> that point we can set DBM=1 on the resulting leaf entries. This way:
+> 
+> 1. Lazy split works naturally (fault -> split -> set DBM=1)
+> 
+> 2. No need to clear DBM globally at dirty-track enable
+> 
+> 3. No special handling for block mappings
+> 
+> So I think global DBM is still viable — we just need to filter out block
+> mappings when setting the DBM bit. That way the lazy split path is preserved
+> without extra complexity.
 
-Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
+Hi Tian,
 
-Cheers,
-/fuad
+Humm, but would not that be contrary to what Oliver suggested: changing the 
+encoding from the PTE for all entries?
 
-> ---
->  arch/arm64/kvm/arm.c | 15 +++++++--------
->  1 file changed, 7 insertions(+), 8 deletions(-)
->
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 50adfff75be8..a06ea39f57b1 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -1652,29 +1652,26 @@ static int __kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
->  {
->         unsigned long features = init->features[0];
->         struct kvm *kvm = vcpu->kvm;
-> -       int ret = -EINVAL;
-> +       int ret;
->
-> -       mutex_lock(&kvm->arch.config_lock);
-> +       lockdep_assert_held(&kvm->arch.config_lock);
->
->         if (test_bit(KVM_ARCH_FLAG_VCPU_FEATURES_CONFIGURED, &kvm->arch.flags) &&
->             kvm_vcpu_init_changed(vcpu, init))
-> -               goto out_unlock;
-> +               return -EINVAL;
->
->         bitmap_copy(kvm->arch.vcpu_features, &features, KVM_VCPU_MAX_FEATURES);
->
->         ret = kvm_setup_vcpu(vcpu);
->         if (ret)
-> -               goto out_unlock;
-> +               return ret;
->
->         /* Now we know what it is, we can reset it. */
->         kvm_reset_vcpu(vcpu);
->
->         set_bit(KVM_ARCH_FLAG_VCPU_FEATURES_CONFIGURED, &kvm->arch.flags);
->         vcpu_set_flag(vcpu, VCPU_INITIALIZED);
-> -       ret = 0;
-> -out_unlock:
-> -       mutex_unlock(&kvm->arch.config_lock);
-> -       return ret;
-> +       return 0;
->  }
->
->  static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
-> @@ -1690,6 +1687,8 @@ static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
->         if (ret)
->                 return ret;
->
-> +       guard(mutex)(&vcpu->kvm->arch.config_lock);
-> +
->         if (!kvm_vcpu_initialized(vcpu))
->                 return __kvm_vcpu_set_target(vcpu, init);
->
->
-> --
-> 2.55.0
->
->
+(Like, if the PTE is writable, it has to have DBM set)
+
+IIUC what you said, on first faulting of the page in the VM:
+- If the entry is a page (level-3 leaf) and writable, add DBM
+- If it's a block entry (leaf but not a level-3), don't add DBM
+
+So after we enable dirty-logging:
+- a level-3 entry would not fault, using HDBSS, and
+- a block entry would fault, do the splitting, and add DBM to level-3 
+  entries during the split.
+
+If I got that correct, that would be clean indeed.
+
+But then we would have a different encoding for block entries and page 
+entries. In page entries, DBM could be used to say if the page is writable, 
+but on block entries one would have to look at the 'dirty-bit'.
+
+Would that be ok?
+
+Thanks!
+Leo
