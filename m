@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AF0B449B39
-	for <kvmarm@lists.linux.dev>; Wed, 29 Jul 2026 10:46:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80C212E6CCD
+	for <kvmarm@lists.linux.dev>; Wed, 29 Jul 2026 10:46:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785321983; cv=none; b=d2RIKEzAWve/NWuz13uh5q/RcquTjRDQMwAimN13HgvLGL6VZ6Mxz2H8SabVhDjMmIzV0TZlGleTmxEXfH8rL3xSfIJAD1febIVPC0svnsHbiFd6SmhWh3z+2TmtOTzmaz19tzIlbZavHQ5dN3ottbbPK/FFg1/sCMkLdvEQr+0=
+	t=1785321988; cv=none; b=qWJEagodnr03+jHMlW0h4i552s0q2QCc/QW1I4gJqooQ6nEhQ1+IWQLMe7XwVOcuBy57Vy+r72AQfPFnj5JYJmd0ALXLOUtLoIQVz+waMgLHizOXLEcYGaxBTsM2PKYISk2gWLOrIZMXHk9JxpepxnWIT7idf/cW/ZpL01IlsMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785321983; c=relaxed/simple;
-	bh=ww+ujFwrxHSFwXIewOfjab1xcMut8ZTXhS1FDEYJSMo=;
+	s=arc-20240116; t=1785321988; c=relaxed/simple;
+	bh=29KJvYtZhLDWSDN98h2HJ49voDEmV5ePH1jVPl+9zog=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kqsN6eicyZ2K9GkOSh7bBgBd9Ltn7FJIUL8JtEINpWg5fsMU+IP74DBFBvbiLlBiZ9SXC3CGh784L2pdEQyasB5haeiDjsERz3E2JrwGrlatMwxfKelycpLpf40Rd9roa1uCFQ40Mi8NC/WXbHz5/3hwvBuf42V7pCd4v+PE8w8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=KZGW5U1u; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=oLcCyoBDFfz1iB21RmczCj0Jcr+HYXKYgL9zPTb9wZjJrvKGriyxgizYAxAq+UWxxREHtD9XfZle/5r/3sNvkUpUp84ML/g6gSldBWh3UZl01LXdzg1ykpQauXmr2dBd1Wug8iqN9pnxXYdZ0uR5iYaAX2X1BmvDgay33w3ZAaY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=u8i/Gl88; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="KZGW5U1u"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="u8i/Gl88"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 79A851688;
-	Wed, 29 Jul 2026 03:46:17 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B3A7B1688;
+	Wed, 29 Jul 2026 03:46:22 -0700 (PDT)
 Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B64913F66F;
-	Wed, 29 Jul 2026 03:46:16 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EED7E3F66F;
+	Wed, 29 Jul 2026 03:46:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1785321981; bh=ww+ujFwrxHSFwXIewOfjab1xcMut8ZTXhS1FDEYJSMo=;
+	t=1785321986; bh=29KJvYtZhLDWSDN98h2HJ49voDEmV5ePH1jVPl+9zog=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=KZGW5U1ubRa1YyujGLMAU0dSNRq6m8qPugyQEoHm9CdaOrrY+DG2k2NeNrx0tmvWz
-	 ZncJ1VHLFeChxN8dpqa2dMNdaVF6WWdJ3vdF6FUmQ0F64ztxWealuV+1JEH0vFHElX
-	 AYMX4CGmExkI6d3V1xgf+8mf28dXL8qbyzpGsIYw=
+	b=u8i/Gl88D07lb5k4+Cgxsdi0M/R14ubYZK1UxBLc5XTDNRvyCulTwXzwdBsPzh9WO
+	 7ZH4JnZC6Ysq/2yUDhZs1cX1HtLhTGA601OLFUb29zcdxUec/kSYiH3dMkBWcNqh8a
+	 U6EdzPt7lGEEwYIFlD2OoNNWx71k9YDdo91OVYiA=
 From: Leonardo Bras <leo.bras@arm.com>
 To: Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
@@ -58,9 +58,9 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org
-Subject: [PATCH v3 02/11] arm64/cpufeature: Add system-wide FEAT_HACDBS detection
-Date: Wed, 29 Jul 2026 11:45:37 +0100
-Message-ID: <20260729104548.3439958-3-leo.bras@arm.com>
+Subject: [PATCH v3 03/11] arm64/sysreg: Add HACDBS consumer and base registers
+Date: Wed, 29 Jul 2026 11:45:38 +0100
+Message-ID: <20260729104548.3439958-4-leo.bras@arm.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260729104548.3439958-1-leo.bras@arm.com>
 References: <20260729104548.3439958-1-leo.bras@arm.com>
@@ -70,130 +70,74 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4237; i=leo.bras@arm.com; h=from:subject; bh=ww+ujFwrxHSFwXIewOfjab1xcMut8ZTXhS1FDEYJSMo=; b=owGbwMvMwCX2pizjszvTwvWMp9WSGLIyb17tP/vkrsAsq+5/H29u33BvuszavVXrI/0NfEMXz dgTIaES3VHKwiDGxSArpsgi+2j+Kp7vUzKOXPmxAGYOKxPIEAYuTgGYyMwCRoam66cvXNrCnFn9 WXzxp28G/T/ubTX+WxHlUX1pcztLUdYNRoYVrvwK3KFFi9XL05jPLZswbW5MwXTruPoZf/5WrFM Ta+cBAA==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1258; i=leo.bras@arm.com; h=from:subject; bh=29KJvYtZhLDWSDN98h2HJ49voDEmV5ePH1jVPl+9zog=; b=owGbwMvMwCX2pizjszvTwvWMp9WSGLIyb16ds/nkne4E/xide58mbtsRFRztXPs0rnV78f6D3 U/cc55adJSyMIhxMciKKbLIPpq/iuf7lIwjV34sgJnDygQyhIGLUwAmsiaKkWHl1b2y+czBz16f rqoT3TL/UOqDNa0bDf77etk76hxkY1di+F+cHSHeYBz0X40tUqhealZivuAUpS1nzJImiXzN2nU /lRcA
 X-Developer-Key: i=leo.bras@arm.com; a=openpgp; fpr=36E6C95AE0F111CC5B6F4D2E688C33F8A0C5B0C5
 Content-Transfer-Encoding: 8bit
 
-FEAT_HACDBS will only be used for dirty-bit cleaning if it is detected in
-all running cpus.
+They will be used on a later commit to make use of the FEAT_HACDBS
+mechanism if available.
 
 Signed-off-by: Leonardo Bras <leo.bras@arm.com>
+Reviewed-by: Mark Brown <broonie@kernel.org>
 ---
- arch/arm64/include/asm/cpufeature.h | 5 +++++
- arch/arm64/kernel/cpufeature.c      | 8 ++++++++
- arch/arm64/tools/cpucaps            | 1 +
- 3 files changed, 14 insertions(+)
+ arch/arm64/tools/sysreg | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
 
-diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-index bdfab086fd94..620ae4cddb76 100644
---- a/arch/arm64/include/asm/cpufeature.h
-+++ b/arch/arm64/include/asm/cpufeature.h
-@@ -861,20 +861,25 @@ static inline bool system_supports_gcs(void)
- static inline bool system_supports_haft(void)
- {
- 	return cpus_have_final_cap(ARM64_HAFT);
- }
+diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+index 7cb61aca3797..50ec9751b44d 100644
+--- a/arch/arm64/tools/sysreg
++++ b/arch/arm64/tools/sysreg
+@@ -4627,20 +4627,50 @@ EndEnum
+ Enum	9:8	IRGN0
+ 	0b00	NC
+ 	0b01	WBWA
+ 	0b10	WT
+ 	0b11	WBnWA
+ EndEnum
+ Field	7:6	SL0
+ Field	5:0	T0SZ
+ EndSysreg
  
- static inline bool system_supports_hdbss(void)
- {
- 	return cpus_have_final_cap(ARM64_HAS_HDBSS);
- }
- 
-+static inline bool system_supports_hacdbs(void)
-+{
-+	return cpus_have_final_cap(ARM64_HACDBS);
-+}
++Sysreg	HACDBSBR_EL2	3	4	2	3	4
++Res0	63:56
++Field	55:12	BADDR
++Field	11	EN
++Res0	10:4
++UnsignedEnum	3:0	SZ
++	0b0000	4K
++	0b0001	8K
++	0b0010	16K
++	0b0011	32K
++	0b0100	64K
++	0b0101	128K
++	0b0110	256K
++	0b0111	512K
++	0b1000	1M
++	0b1001	2M
++EndEnum
++EndSysreg
 +
- static __always_inline bool system_supports_mpam(void)
- {
- 	return alternative_has_cap_unlikely(ARM64_MPAM);
- }
++Sysreg	HACDBSCONS_EL2	3	4	2	3	5
++UnsignedEnum	63:62	ERR_REASON
++	0b00	NOF
++	0b01	STRUCTF
++	0b10	IPAF
++	0b11	IPAHACF
++EndEnum
++Res0	61:19
++Field	18:0	INDEX
++EndSysreg
++
+ Sysreg	GCSCR_EL2	3	4	2	5	0
+ Fields	GCSCR_ELx
+ EndSysreg
  
- static __always_inline bool system_supports_mpam_hcr(void)
- {
- 	return alternative_has_cap_unlikely(ARM64_MPAM_HCR);
- }
+ Sysreg	GCSPR_EL2	3	4	2	5	1
+ Fields	GCSPR_ELx
+ EndSysreg
  
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index aa327eebaf1c..62f56bbd0a65 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -516,20 +516,21 @@ static const struct arm64_ftr_bits ftr_id_aa64mmfr3[] = {
- 		       FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64MMFR3_EL1_S1POE_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64MMFR3_EL1_S1PIE_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR3_EL1_SCTLRX_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64MMFR3_EL1_TCRX_SHIFT, 4, 0),
- 	ARM64_FTR_END,
- };
- 
- static const struct arm64_ftr_bits ftr_id_aa64mmfr4[] = {
- 	S_ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR4_EL1_E2H0_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR4_EL1_NV_frac_SHIFT, 4, 0),
-+	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR4_EL1_HACDBS_SHIFT, 4, 0),
- 	ARM64_FTR_END,
- };
- 
- static const struct arm64_ftr_bits ftr_ctr[] = {
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_EXACT, 31, 1, 1), /* RES1 */
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, CTR_EL0_DIC_SHIFT, 1, 1),
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, CTR_EL0_IDC_SHIFT, 1, 1),
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_HIGHER_OR_ZERO_SAFE, CTR_EL0_CWG_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_HIGHER_OR_ZERO_SAFE, CTR_EL0_ERG_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, CTR_EL0_DminLine_SHIFT, 4, 1),
-@@ -2764,20 +2765,27 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 	{
- 		.desc = "Hardware dirty bit management",
- 		.type = ARM64_CPUCAP_WEAK_LOCAL_CPU_FEATURE,
- 		.capability = ARM64_HW_DBM,
- 		.matches = has_hw_dbm,
- 		.cpu_enable = cpu_enable_hw_dbm,
- 		.cpus = &dbm_cpus,
- 		ARM64_CPUID_FIELDS(ID_AA64MMFR1_EL1, HAFDBS, DBM)
- 	},
- #endif
-+	{
-+		.desc = "Hardware dirty bit Cleaning",
-+		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-+		.capability = ARM64_HACDBS,
-+		.matches = has_cpuid_feature,
-+		ARM64_CPUID_FIELDS(ID_AA64MMFR4_EL1, HACDBS, IMP)
-+	},
- #ifdef CONFIG_ARM64_HAFT
- 	{
- 		.desc = "Hardware managed Access Flag for Table Descriptors",
- 		/*
- 		 * Contrary to the page/block access flag, the table access flag
- 		 * cannot be emulated in software (no access fault will occur).
- 		 * Therefore this should be used only if it's supported system
- 		 * wide.
- 		 */
- 		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
-index a87706c9d160..bd2c0bb98da6 100644
---- a/arch/arm64/tools/cpucaps
-+++ b/arch/arm64/tools/cpucaps
-@@ -65,20 +65,21 @@ HAS_STAGE2_FWB
- HAS_TCR2
- HAS_TIDCP1
- HAS_TLB_RANGE
- HAS_VA52
- HAS_VIRT_HOST_EXTN
- HAS_WFXT
- HAS_XNX
- HAS_HDBSS
- HAFT
- HW_DBM
-+HACDBS
- KVM_HVHE
- KVM_PROTECTED_MODE
- MISMATCHED_CACHE_TYPE
- MPAM
- MPAM_HCR
- MTE
- MTE_ASYMM
- MTE_FAR
- MTE_STORE_ONLY
- SME
+ Sysreg	HDBSSBR_EL2	3	4	2	3	2
+ Res0	63:56
 -- 
 2.55.0
 
