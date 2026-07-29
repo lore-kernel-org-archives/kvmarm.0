@@ -1,312 +1,175 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ECFF4772BD;
-	Wed, 29 Jul 2026 11:47:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com [209.85.128.71])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2C8F3BBFDD
+	for <kvmarm@lists.linux.dev>; Wed, 29 Jul 2026 12:13:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785325668; cv=none; b=qhiFSRJ+pOD91nlk1u3VSLkaN1rNWPXy7R2lPpSqW5XnRVfklQYTY4S7jLWzgLF1VdZcfi5UCWnerQeUBjHhnaMqJ1i7DEHIGo3U3NXuHc0mvQBK6kRMajvSPn2Lyx636l4ETCra6hddedEIUuOTHPa1ubZnTYvLi9tJ6DirBqI=
+	t=1785327212; cv=none; b=g8iv8e3GapFMMJJsiAjpx6j90u3VGByKgy8LeSOmg5pcMflQeH/v0Mk2JBd4nQKauQgdTD+xUAldSIhdCjOESMtvAE2HyK0Sw2au1uaIoOaGfrI4QQA/ECdCPTZQw12+JY83BRlbngQym0Fp9dqK2pk3HDNM4mCNgygVaKQS9Gk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785325668; c=relaxed/simple;
-	bh=HkMBCAbmrFXEE9kGoDxmwgXunRUkZppUwPpF/BM2mLc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bUvF+cV2y20TPqRArRtbFZXhC64y+fOwIsTGdpUZyq6Q05xBMuXvDuyBnzXigXSwmjAx3pSgWO7cR984YdQujQhgCH1TJsBzIpehp2gJwbgR+xwrXRQlr/F7IaJcJUO3ubBOg6qmrc0FvjjQMc94FiChXyPhAmUk4OarSmIa34U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=foOyvk/Y; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1785327212; c=relaxed/simple;
+	bh=FJKTe7w5oX4sNy96KRtCt95pc41IKsrn54ZS4gFoGX0=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=K8ymOdxN/kDZavGQyKd/MKZnc/9T8aVBOnlI8JKxWAWgMKbTyv7wbPqfZAG7r9idFQkl2bwGCiG2mTMiMGLuxgLCKNyXK2ZL9iO24P7g/Y5lV59CCslv/cHVz6MjpMHLSXrGNgjx6GrciadWSzOYwg71w9x1jStV7PF9F4z6wTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=g6AEz/hs; arc=none smtp.client-ip=209.85.128.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="foOyvk/Y"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C8E451688;
-	Wed, 29 Jul 2026 04:47:38 -0700 (PDT)
-Received: from [10.57.41.95] (unknown [10.57.41.95])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4D41B3F86F;
-	Wed, 29 Jul 2026 04:47:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1785325662; bh=HkMBCAbmrFXEE9kGoDxmwgXunRUkZppUwPpF/BM2mLc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=foOyvk/YD/P95lT4XBdQFEDSgKrdW1PrQdmQte8+Y35jd52iLmQuPsHa0I04DfSf3
-	 yi4Fav4yfIXUVnjQe94RgJknoDy3rZA2Z/wsaxmWL4A2FqTGl0Ss7YDQefTBxG7Pko
-	 FN0P5I3VJuZsYk/v0ht6CwjWiMuM25bgL1xmchfo=
-Message-ID: <46d78aa2-cacb-4efd-ae62-3026f5fe9b3f@arm.com>
-Date: Wed, 29 Jul 2026 12:47:38 +0100
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g6AEz/hs"
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-495529a93f9so8274825e9.3
+        for <kvmarm@lists.linux.dev>; Wed, 29 Jul 2026 05:13:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1785327209; x=1785932009; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=BAmImkqu1SFwL8NSZDIz5I9w1IjXZHC7hoAV+KdJnaA=;
+        b=g6AEz/hspms3loUtnmW09D8DfzjlPQh9CXTOx8CC1UPKQNS8E3xUTTgqR2xV3y7eoc
+         NGRgzxQGIG+4/stxgdgqd+6u6AUH8DF2DD44FROfYp5eaq1EegmPb2y+7rBJQsJCreSD
+         Ti7ewhBXBSwKKGA0oEFEKBdEkAbyQmJeGUdkXBXRof8qnSou8qSUGI5+0UJYx2NJWPvh
+         sLWzUPXdGrSiChELGftby2aIgcEJCaFOtgAFbGkY+2FJc98g6t5IAzVBQLTTa7pkJlMC
+         /BUAzSG1LnhpyivlKmhBwUeTYyf2gGdVN4TfEq/LAdR396FX9SgEpbwW4nVuKZow1eE2
+         M0hQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785327209; x=1785932009;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=BAmImkqu1SFwL8NSZDIz5I9w1IjXZHC7hoAV+KdJnaA=;
+        b=C2LtdTPxEzAggJJlfSsnbXk3B/OJEDl02HQ/UzWyCdEUrLkdSgJx+yabNFir+1oSAC
+         haIc2L4vkNOPI+90BhETzGwpSIiHdNeX/5/kciC49gFWamkcHYuJ475QF4LtsdbGJDsg
+         U83C7YOOfSDgrWyflLhUuObd5vbX0pwV1/By5/aafMRoMIF2JJj/xGjGKIpa21cLUjcH
+         a2sTrViw2Rd5/O8O/0n0tzsmifrOGT82yBhj/33KETg7iro8nbAWdUC37ygovsczqFya
+         qUgK6dlbqFuV8rFRO5qo7PYerMuitOUDgnn450/X3MhqWSbEI68ZFX5YHf6Gy+C1IYGT
+         xTDA==
+X-Forwarded-Encrypted: i=1; AHgh+Rq1HYQ2eCilsNqfontbdvy5wIlmJROAsZYHn+1P4W84HhULeJm9bwkYnucXwy/EOuiT/6UGdCc=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yw0K6E4wlTutwsgzG5IhG0H9C0v+Rmz/VJXjvRVBwUdcsq5PyIp
+	mN5VufxlltYG/KKWT4/ZMkbLEKRjFf8Nd8bJ8nZPaTPVx7TnD2kvYe2duTtZHq4bDDTlnjaeOyw
+	yrGWyAAAkoPF4pqIMEZzFHI8cB33TdQ==
+X-Received: from wmbjj19.prod.google.com ([2002:a05:600c:6a13:b0:495:54c7:8c97])
+ (user=sebastianene job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:4eca:b0:493:e460:1f6 with SMTP id 5b1f17b1804b1-496c60ba34amr69095735e9.0.1785327208512;
+ Wed, 29 Jul 2026 05:13:28 -0700 (PDT)
+Date: Wed, 29 Jul 2026 12:13:00 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v1 1/2] KVM: arm64: CCA: Add support for configuring
- the Realm MEC policy
-Content-Language: en-GB
-To: Kohei Enju <enju.kohei@fujitsu.com>,
- linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev, cgroups@vger.kernel.org, linux-coco@lists.linux.dev,
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Joey Gouly <joey.gouly@arm.com>,
- Steffen Eiden <seiden@linux.ibm.com>, Zenghui Yu <yuzenghui@huawei.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
- =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
- Steven Price <steven.price@arm.com>
-References: <20260724094120.166536-1-enju.kohei@fujitsu.com>
- <20260724094120.166536-2-enju.kohei@fujitsu.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20260724094120.166536-2-enju.kohei@fujitsu.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.55.0.487.gaf234c4eb3-goog
+Message-ID: <20260729121306.1519473-2-sebastianene@google.com>
+Subject: [PATCH v8 0/7] KVM: arm64: Forward FFA_NOTIFICATION* calls to TrustZone
+From: Sebastian Ene <sebastianene@google.com>
+To: catalin.marinas@arm.com, maz@kernel.org, oupton@kernel.org, 
+	fuad.tabba@linux.dev, will@kernel.org
+Cc: joey.gouly@arm.com, korneld@google.com, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	android-kvm@google.com, mrigendra.chaubey@gmail.com, perlarsen@google.com, 
+	sebastianene@google.com, suzuki.poulose@arm.com, vdonnefort@google.com, 
+	yuzenghui@huawei.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hello
+Remove the FFA_NOTIFICATION* calls from the blocklist used by the pKVM
+FF-A proxy. This restriction was preventing the use of asynchronous
+signaling mechanisms defined by the Arm FF-A specification to
+communicate with the secure services.
+While these calls are markes as optional, there is no reason why the
+hypervisor proxy would block them because:
 
-Thanks for sending the patch. Please find my comments inline below.
+1. Host is the Sole Non-Secure Endpoint: The Host operates as the
+   only Non-Secure VM ID (VM ID 0) recognized by the Secure World.
+   Because all forwarded notifications are inherently attributed to
+   the Host by the SPMC, there is no risk of VM ID spoofing
+   originating from the Normal World.
 
+2. No Memory Pointers or Addresses: The FFA_NOTIFICATION_* ABIs
+   operate strictly via register-based parameters, passing only
+   VM IDs, VCPU IDs, flags, and bitmaps. Because these calls do
+   not contain memory addresses, offsets, or pointers, forwarding
+   them doesn't pose a risk of memory-based confused deputy attack
+   (e.g., tricking the SPMC into overwriting protected memory).
 
-On 24/07/2026 10:40, Kohei Enju wrote:
-> Introduce the KVM_ARM_RMI_CONFIG ioctl to allow userspace to configure
-> Realm VM parameters before the Realm is created.
+The pKVM proxy behaves as a relayer and it doesn't currently have its
+own FF-A ID(only the host has the ID 0). The behavior of the setup
+flow is covered by the spec in the: '10.9 Notification support without
+a Hypervisor'.
 
-This approach is something we tried in the past. Another option is to
-add these as kvm_device_attr for the KVM VM, under a new group, e.g.,
-KVM_ARM_VM_RMI_CTRL and add the following attributes :
+While at it, enforce the MBZ/SBZ fields defined by the spec to prevent
+odd behavior when a new version starts making use of the reserved
+registers.
 
-KVM_ARM_VM_RMI_CTRL_RPV 		-> Realm Personalization Value
-KVM_ARM_VM_RMI_CTRL_MEASUREMENT_ALGO	-> Measuerment algo
-KVM_ARM_VM_RMI_CTRL_MEC_PRIVATE		-> Private MEC Policy. By default to 
-shared ?
+---
+v8:
+- rebased on 7.2-rc3
+- no other changes
 
+Changes in v7:
+- rebased on 7.2-rc1
+- collected the Ack from Will
+- check for major version as well when doing the SBZ/MBZ enforcement
 
-Marc, Oliver, thoughts ?
+Changes in v6:
+- applied Will's feedback and re-ordered the patch series so that we
+  apply the MBZ enforcement at the end of the series
+- update ffa_check_unused_args_sbz so that we take into account the FF-A
+  version because the spec changed the list of unused parameter registers
+  for 64-bit SMCs from v1.1 to v1.2
 
-Cheers
-Suzuki
+Changes in v5:
+- handle 32-bit smc variants correctly when doing the MBZ enforcement
+- add check for FFA_FEATURES
+- handle missing FFA_FN64_NOTIFICATION_INFO_GET
+- collected the Review tags from Vincent, thank you 
 
-> 
-> Currently, ARM_RMI_CFG_MEC_POLICY is the only supported configuration
-> item. Its value can be ARM_RMI_MEC_POLICY_SHARED or
-> ARM_RMI_MEC_POLICY_PRIVATE. Reject the private policy if the platform
-> does not support private MECs.
-> 
-> If userspace does not explicitly configure the MEC policy,
-> ARM_RMI_MEC_POLICY_SHARED is used by default.
+Changes in v4:
+- previous series(v3) had serious issues with the patch number and it
+  appeared like it used a mixed bag from v2 as well. Resend this to
+  restore the correct order of the patches.
+- fix strict check in ffa_check_unused_args_sbz and make it "<= 17"
+- check the receiver endpoint Id in
+  FFA_NOTIFICATION_BIND/FFA_NOTIFICATION_UNBIND instead of the sender
+- use hyp_smccc_1_2_smc all along 
+- check the receiver endpoit Id when doing FFA_NOTIFICATION_GET  
 
+Changes in v3:
+- applied Will's suggestion to use the introduced method
+  ffa_check_unused_args_sbz for existing calls and added a new
+patch in the beggining of the series to do this.
+- merged the handling of
+  FFA_NOTIFICATION_BITMAP_CREATE/FFA_NOTIFICATION_BITMAP_DESTROY into
+one patch as Vincent suggested and create one handler for both.
 
+Changes in v2:
+- enforce the MBZ/SBZ fields
+- split the calls into separate patches
+- rebase on 7.1-rc7
 
-> 
-> Signed-off-by: Kohei Enju <enju.kohei@fujitsu.com>
-> ---
->   Documentation/virt/kvm/api.rst   | 29 +++++++++++++++++++++++++++++
->   arch/arm64/include/asm/kvm_rmi.h |  4 ++++
->   arch/arm64/kvm/arm.c             |  9 +++++++++
->   arch/arm64/kvm/rmi.c             | 29 +++++++++++++++++++++++++++++
->   drivers/firmware/arm_rmm/rmi.c   |  8 ++++++--
->   include/linux/arm-rmi-cmds.h     |  1 +
->   include/uapi/linux/kvm.h         | 17 +++++++++++++++++
->   7 files changed, 95 insertions(+), 2 deletions(-)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 85bec9b4f021..e1c660e5eb34 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -6690,6 +6690,35 @@ populated data is hashed and added to the guest's Realm Initial Measurement
->   (RIM) stored by the RMM. This can then be retrieved by the guest (using the RSI
->   interface) to present to an attestation server.
->   
-> +4.147 KVM_ARM_RMI_CONFIG
-> +------------------------
-> +
-> +:Capability: KVM_CAP_ARM_RMI
-> +:Architectures: arm64
-> +:Type: vm ioctl
-> +:Parameters: struct kvm_arm_rmi_config (in)
-> +:Returns: 0 on success, < 0 on error
-> +
-> +::
-> +
-> +  struct kvm_arm_rmi_config {
-> +       __u32 cfg;
-> +       union {
-> +               /* cfg == ARM_RMI_CFG_MEC_POLICY */
-> +               __u8 mec_policy;
-> +
-> +               /* Fix the size of the union */
-> +               __u8 reserved[256];
-> +       };
-> +  };
-> +
-> +Configures parameters of a Realm VM before the Realm is created.
-> +
-> +Currently, `ARM_RMI_CFG_MEC_POLICY` is the only supported configuration item.
-> +`mec_policy` must be either `ARM_RMI_MEC_POLICY_SHARED` or
-> +`ARM_RMI_MEC_POLICY_PRIVATE`. `ARM_RMI_MEC_POLICY_PRIVATE` is not supported if
-> +no private MEC is available on the platform.
-> +
->   .. _kvm_run:
->   
->   5. The kvm_run structure
-> diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
-> index 420e99fca07e..721033b132e1 100644
-> --- a/arch/arm64/include/asm/kvm_rmi.h
-> +++ b/arch/arm64/include/asm/kvm_rmi.h
-> @@ -60,6 +60,7 @@ enum realm_state {
->    * @ia_bits: Number of valid Input Address bits in the IPA
->    * @stage2_unmapped: The Realm stage-2 mappings have been removed
->    * @rtts_destroyed: The non-root RTTs have been torn down
-> + * @mec_policy: MEC policy for the Realm VM
->    */
->   struct realm {
->   	void *rd;
-> @@ -76,6 +77,7 @@ struct realm {
->   	unsigned int ia_bits;
->   	bool stage2_unmapped;
->   	bool rtts_destroyed;
-> +	unsigned int mec_policy;
->   };
->   
->   /**
-> @@ -115,6 +117,8 @@ struct kvm_arm_rmi_populate;
->   
->   int kvm_arm_rmi_populate(struct kvm *kvm,
->   			 struct kvm_arm_rmi_populate *arg);
-> +struct kvm_arm_rmi_config;
-> +int kvm_arm_rmi_config(struct kvm *kvm, struct kvm_arm_rmi_config *arg);
->   void kvm_realm_unmap_range(struct kvm *kvm,
->   			   unsigned long ipa,
->   			   unsigned long size,
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 3862db30779f..17302ba2844c 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -2169,6 +2169,15 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
->   			return -EFAULT;
->   		return ret;
->   	}
-> +	case KVM_ARM_RMI_CONFIG: {
-> +		struct kvm_arm_rmi_config cfg;
-> +
-> +		if (!kvm_is_realm(kvm))
-> +			return -ENXIO;
-> +		if (copy_from_user(&cfg, argp, sizeof(cfg)))
-> +			return -EFAULT;
-> +		return kvm_arm_rmi_config(kvm, &cfg);
-> +	}
->   	default:
->   		return -EINVAL;
->   	}
-> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
-> index 06cc85fb5092..629dea5e8c47 100644
-> --- a/arch/arm64/kvm/rmi.c
-> +++ b/arch/arm64/kvm/rmi.c
-> @@ -572,6 +572,9 @@ static int realm_create_rd(struct kvm *kvm)
->   	if (kvm_lpa2_is_enabled())
->   		params->flags0 |= RMI_REALM_PARAM_FLAG_LPA2;
->   
-> +	params->flags0 |= FIELD_PREP(RMI_REALM_PARAM_FLAG_MEC_POLICY,
-> +				     realm->mec_policy);
-> +
->   	r = realm_init_sve_param(kvm, params);
->   	if (r)
->   		goto out_undelegate_tables;
-> @@ -1155,6 +1158,30 @@ int kvm_arm_rmi_populate(struct kvm *kvm,
->   	return ret;
->   }
->   
-> +int kvm_arm_rmi_config(struct kvm *kvm, struct kvm_arm_rmi_config *cfg)
-> +{
-> +	guard(mutex)(&kvm->arch.config_lock);
-> +
-> +	if (kvm_realm_state(kvm) != REALM_STATE_NONE)
-> +		return -EBUSY;
-> +
-> +	switch (cfg->cfg) {
-> +	case ARM_RMI_CFG_MEC_POLICY:
-> +		if (cfg->mec_policy != ARM_RMI_MEC_POLICY_SHARED &&
-> +		    cfg->mec_policy != ARM_RMI_MEC_POLICY_PRIVATE)
-> +			return -EINVAL;
-> +
-> +		if (cfg->mec_policy == ARM_RMI_MEC_POLICY_PRIVATE &&
-> +		    rmi_mec_count() == 0)
-> +			return -EOPNOTSUPP;
-> +
-> +		kvm->arch.realm.mec_policy = cfg->mec_policy;
-> +		return 0;
-> +	default:
-> +		return -EINVAL;
-> +	}
-> +}
-> +
->   static void kvm_complete_ripas_change(struct kvm_vcpu *vcpu)
->   {
->   	struct kvm *kvm = vcpu->kvm;
-> @@ -1474,6 +1501,8 @@ int kvm_init_realm(struct kvm *kvm)
->   {
->   	struct realm *realm = &kvm->arch.realm;
->   
-> +	realm->mec_policy = ARM_RMI_MEC_POLICY_SHARED;
-> +
->   	realm->params = (void *)get_zeroed_page(GFP_KERNEL_ACCOUNT);
->   	realm->sro = kmalloc_obj(*realm->sro);
->   	if (!realm->params || !realm->sro) {
-> diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/arm_rmm/rmi.c
-> index d0c083bdf251..e9632c35e7db 100644
-> --- a/drivers/firmware/arm_rmm/rmi.c
-> +++ b/drivers/firmware/arm_rmm/rmi.c
-> @@ -14,8 +14,7 @@
->   
->   static bool arm64_rmi_is_available;
->   
-> -/* Currently only the first 2 registers are used by Linux */
-> -#define RMI_FEAT_REG_COUNT	2
-> +#define RMI_FEAT_REG_COUNT	5
->   static __ro_after_init unsigned long rmi_feat_reg_cache[RMI_FEAT_REG_COUNT];
->   
->   unsigned long rmi_feat_reg(unsigned long id)
-> @@ -27,6 +26,11 @@ unsigned long rmi_feat_reg(unsigned long id)
->   }
->   EXPORT_SYMBOL_GPL(rmi_feat_reg);
->   
-> +u64 rmi_mec_count(void)
-> +{
-> +	return u64_get_bits(rmi_feat_reg(4), RMI_FEATURE_REGISTER_4_MEC_COUNT);
-> +}
-> +
->   int rmi_delegate_range(phys_addr_t phys,
->   		       unsigned long size,
->   		       phys_addr_t *out_phys)
-> diff --git a/include/linux/arm-rmi-cmds.h b/include/linux/arm-rmi-cmds.h
-> index 138983ab4e3c..5236600421c6 100644
-> --- a/include/linux/arm-rmi-cmds.h
-> +++ b/include/linux/arm-rmi-cmds.h
-> @@ -28,6 +28,7 @@ struct rmi_sro_state {
->   };
->   
->   unsigned long rmi_feat_reg(unsigned long id);
-> +u64 rmi_mec_count(void);
->   
->   int rmi_delegate_range(phys_addr_t phys, unsigned long size,
->   		       phys_addr_t *out_phys);
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index adee3936d6ae..46e62327957c 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1704,4 +1704,21 @@ struct kvm_arm_rmi_populate {
->   	__u32 reserved;
->   };
->   
-> +#define KVM_ARM_RMI_CONFIG     _IOW(KVMIO, 0xd8, struct kvm_arm_rmi_config)
-> +
-> +#define ARM_RMI_CFG_MEC_POLICY		0
-> +#define ARM_RMI_MEC_POLICY_SHARED	0
-> +#define ARM_RMI_MEC_POLICY_PRIVATE	1
-> +
-> +struct kvm_arm_rmi_config {
-> +	__u32 cfg;
-> +	union {
-> +		/* cfg == ARM_RMI_CFG_MEC_POLICY */
-> +		__u8 mec_policy;
-> +
-> +		/* Reserve space for future configuration payloads. */
-> +		__u8 reserved[256];
-> +	};
-> +};
-> +
->   #endif /* __LINUX_KVM_H */
+v7:
+https://lore.kernel.org/all/20260629093558.2425257-1-sebastianene@google.com/
+v6:
+https://lore.kernel.org/all/20260626074545.433234-1-sebastianene@google.com/
+v5:
+https://lore.kernel.org/all/20260623115354.632361-1-sebastianene@google.com/
+v4:
+https://lore.kernel.org/all/20260616154149.2763214-1-sebastianene@google.com/
+v3:
+https://lore.kernel.org/all/20260616105417.2578670-1-sebastianene@google.com/
+v2:
+https://lore.kernel.org/all/20260608165549.1479409-1-sebastianene@google.com/
+v1:
+https://lore.kernel.org/all/20260501114447.2389222-2-sebastianene@google.com/
+
+Sebastian Ene (7):
+  KVM: arm64: Forward FFA_NOTIFICATION_BITMAP calls to Trustzone
+  KVM: arm64: Support FFA_NOTIFICATION_BIND in host handler
+  KVM: arm64: Support FFA_NOTIFICATION_UNBIND in host handler
+  KVM: arm64: Support FFA_NOTIFICATION_SET in host handler
+  KVM: arm64: Support FFA_NOTIFICATION_GET in host handler
+  KVM: arm64: Support FFA_NOTIFICATION_INFO_GET in host handler
+  KVM: arm64: Enforce strict SBZ checks in the FF-A proxy
+
+ arch/arm64/kvm/hyp/nvhe/ffa.c | 220 ++++++++++++++++++++++++++++++++--
+ 1 file changed, 212 insertions(+), 8 deletions(-)
+
+-- 
+2.55.0.487.gaf234c4eb3-goog
 
