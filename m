@@ -1,148 +1,143 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from canpmsgout01.his.huawei.com (canpmsgout01.his.huawei.com [113.46.200.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A75AB2DA749;
-	Wed, 29 Jul 2026 03:42:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53C9F423A9B
+	for <kvmarm@lists.linux.dev>; Wed, 29 Jul 2026 08:52:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785296535; cv=none; b=c9HnoQztm8ErWkmnyv5Gb1VH3PYz1m/kQYbfGdhp/AcyY+6Hc/bUzQKeiAdqt6BDvR4wa5U7u5TszcMibRvaH5Ha/9Z2VLLR+rpBXCrirKPZGRDqAcHPwAS1TmriaCBU8SEpZMfGRqqr7MrceOZsITZLdqUARHCRBLT3QdijLY0=
+	t=1785315134; cv=none; b=YCe2KWGWpJJy5LqICx/73+DdeBcTRXh6TOj+Ulgx6sNhKkMpEnFYdggneCZmC7u3Q5Kez7cnRetfM1uvWSqMXNnnq8AmFfmyppwoCY6piEaa4tH3Bdls7KhESvfNseoCoKAjjrwNxKksPKLFbaw1vdabKC9LEwVNOwq0FSvvV34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785296535; c=relaxed/simple;
-	bh=8wwVpJ9g/7h3n+EsWis/QJ70zqtw1SfxQS3ZZq3GzlM=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=bi/QXboydwJvQeHZfke/1RPWg9XTz5d5qHbPq48zVR6UhUld4oLF9l1jVvl5GdjnZ39Fk3bhSPDEKD9uoBlgKKdQZZdkn67VkoRRBA43w0xSQ9eShDmW4GrRIxeqrTIcy1mlJid/fTpsgR5+111v2VE5UfG/kS4rozwpVA9yxXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z2FaCuma; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1785315134; c=relaxed/simple;
+	bh=pQ92s1dsJXbO1L084ER++vm8HZLfiXrippuYCfmyohw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=o0K0xWtYkTQXDFdOnUFU+YNZH6grKaNzZpzBjGKTSXWUX13QXahyvjxCdoyvWiVN7TQMnHMMLqImItWhBhwCsntygHpBGXbGtyB520VMaxwxlR6d9QrfZq0wgiHPtEMbnfZ9RDVMSSkVTiI2RY2tyjWnbuP9e1hfY3BXd1343B4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=Fi3t5e1+; arc=none smtp.client-ip=113.46.200.216
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z2FaCuma"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0940A1F000E9;
-	Wed, 29 Jul 2026 03:42:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785296534;
-	bh=2JTo64uYd/0VmuRvQLaI7/q1+/xIenMBQsQYLKsuNoU=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=Z2FaCuma1YJYFbXIYDiYZ7c69smSW1u1A6StTX91gyTnrCNfTJYWPxn8wncdVO/eZ
-	 xAN2FPmFv0Fx9bvZd+giOY8Xm0/T4hzcFy6R1c6K+EC2jyyZLuC802d6/iPQYoPjAa
-	 XPLZ++cgqDyAU3IvSHhPSV/WSRHaxsDbcmaKU6Eq2blh0vIlETDQz63navRdHKTjgJ
-	 hjymCIIfn1pxtAmr80zXeKsij/OVud9hCiBUiQ6VeQP/W4F1CYuJUEpVv56afft0g9
-	 Iv4HTNt29yMin4keN1/yPTD3EY+GdKRYh/EWuchQUjvSrV0TvNVFTZSfFvyQ+vXe2O
-	 HDtG2/+qj1l0A==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH] arm64: errata: Add NXP iMX8QM workaround for A53 cache
- coherency issue
-Reply-To: sashiko-reviews@lists.linux.dev
-To: =?utf-8?b?UGVuZyBGYW4gKE9TUyk=?= <peng.fan@oss.nxp.com>
-Cc: Frank.Li@kernel.org, "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, imx@lists.linux.dev, kvmarm@lists.linux.dev
-In-Reply-To: <20260729-imx8qm-cache-coherency-v1-1-c9864e280437@nxp.com>
-References: <20260729-imx8qm-cache-coherency-v1-1-c9864e280437@nxp.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 29 Jul 2026 03:42:13 +0000
-Message-Id: <20260729034214.0940A1F000E9@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="Fi3t5e1+"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=QPRGoo1D4Xw+SnYlljs3qul9NrnGRmxeCI+oa2x6cZ4=;
+	b=Fi3t5e1+OI7bmwazxV2U9+2ZkXeAg9WLy+4JXRviv/rIWOWCFJtWjh0aQQtfYPFt2qYmYP34V
+	CjWuXdKpD6OQR7F9A4GJEM9wDrpk4GSbYuTtQnFFIgWT76Qr334KuIOxIb/T4lKDFWRY9BZUH5m
+	Mw++ag529lCX5BdwAg98K0k=
+Received: from mail.maildlp.com (unknown [172.19.162.144])
+	by canpmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4h95S653Rnz1T4Fq;
+	Wed, 29 Jul 2026 16:42:30 +0800 (CST)
+Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
+	by mail.maildlp.com (Postfix) with ESMTPS id 2E1144056D;
+	Wed, 29 Jul 2026 16:52:01 +0800 (CST)
+Received: from [10.67.120.103] (10.67.120.103) by
+ kwepemr100010.china.huawei.com (7.202.195.125) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.36; Wed, 29 Jul 2026 16:52:00 +0800
+Message-ID: <96516762-f004-4c2a-a9c6-6fbad49ad6ae@huawei.com>
+Date: Wed, 29 Jul 2026 16:51:59 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 3/6] KVM: arm64: Add auto DBM support for hardware
+ dirty tracking
+To: Leonardo Bras <leo.bras@arm.com>
+CC: Oliver Upton <oupton@kernel.org>, <maz@kernel.org>,
+	<catalin.marinas@arm.com>, <will@kernel.org>, <yuzenghui@huawei.com>,
+	<wangzhou1@hisilicon.com>, <yangjinqian1@huawei.com>,
+	<caijian11@h-partners.com>, <liuyonglong@huawei.com>, <yezhenyu2@huawei.com>,
+	<yubihong@huawei.com>, <linuxarm@huawei.com>, <joey.gouly@arm.com>,
+	<kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	<seiden@linux.ibm.com>, <suzuki.poulose@arm.com>
+References: <20260709104026.2612599-1-zhengtian10@huawei.com>
+ <20260709104026.2612599-4-zhengtian10@huawei.com>
+ <aliKo7dTZzKcWHzI@kernel.org>
+ <0943eb14-9ffb-4dbb-9219-060e97bca2a7@huawei.com>
+ <alpIfIOFfrudBzD5@LeoBrasDK> <al4bYajWE-v6wofu@LeoBrasDK>
+From: Tian Zheng <zhengtian10@huawei.com>
+In-Reply-To: <al4bYajWE-v6wofu@LeoBrasDK>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
+ kwepemr100010.china.huawei.com (7.202.195.125)
 
-Thank you for your contribution! Sashiko AI review found 2 potential issue(=
-s) to consider:
-- [High] Unconditional upgrade of local TLB flushes to global broadcast (`v=
-malle1is`), resulting in unsynchronized broadcast DVM messages.
-- [High] The workaround for user-space IC IVAU silently swallows faults for=
- invalid or kernel addresses.
---
 
---- Patch [1]: [PATCH] arm64: errata: Add NXP iMX8QM workaround for A53 cac=
-he coherency issue ---
-commit 2862fd74023d9e9e12c6a2745e844dc84b6cf1f7
-Author: Peng Fan <peng.fan@nxp.com>
 
-arm64: errata: Add NXP iMX8QM workaround for A53 cache coherency issue
+On 7/20/2026 8:58 PM, Leonardo Bras wrote:
+> On Fri, Jul 17, 2026 at 04:21:32PM +0100, Leonardo Bras wrote:
+>> On Fri, Jul 17, 2026 at 11:58:06AM +0800, Tian Zheng wrote:
+>>>
+>>> On 7/16/2026 3:39 PM, Oliver Upton wrote:
+>>>> Hi Tian,
+>>>>
+>>>> On Thu, Jul 09, 2026 at 06:40:23PM +0800, Tian Zheng wrote:
+>>>>> -	if (prot & KVM_PGTABLE_PROT_W)
+>>>>> +	if (prot & KVM_PGTABLE_PROT_W) {
+>>>>>    		set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
+>>>>>
+>>>>> +		/*
+>>>>> +		 * No DEVICE filter needed here: relax_perms is only called
+>>>>> +		 * on FSC_PERM faults. Device pages always get full RW from
+>>>>> +		 * initial mapping and are never write-protected during
+>>>>> +		 * migration, so they never trigger a permission fault.
+>>>>> +		 */
+>>>>> +		if (pgt->flags & KVM_PGTABLE_S2_DBM)
+>>>>> +			set |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
+>>>>> +	} else {
+>>>>> +		/*
+>>>>> +		 * Clear DBM on W→RO downgrade to prevent hardware from
+>>>>> +		 * silently upgrading RO+DBM back to W+dirty, which would
+>>>>> +		 * bypass KVM's write tracking and cause data corruption.
+>>>>> +		 */
+>>>>> +		clr |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
+>>>>> +	}
+>>>>> +
+>>>> This block makes it pretty evident that the DBM bit really *is* the
+>>>> write permission bit. I'd much rather we introduce the concept of dirty
+>>>> state to the page table library and migrate the abstract write
+>>>> permission to the DBM field, even if we don't have FEAT_HAFDBS.
+>>>>
+>>
+>> Ohh, that's an amazing idea!
+> 
+> Thinking about that again...
+> If we adopt the encoding with DBM being the write-permission bit, and all
+> PTEs have it since the start, how can we have lazy-splitting happening?
+> 
+> Only way I think of is removing both DBM and S2_S2AP_W bit from writable
+> PTEs during dirty-track enable, and re-adding them during the first write
+> fault. If we don't remove the DBM bit, systems with HDBSS would just dirty
+> it by hardware, without causing a fault.
+> 
+> DBM=0 would need to happen only in the first write-protect (only on
+> lazy-splitting). All other write-protecting would just clean the S2_S2AP_W
+> bit, as everything is already split.
+> 
+> Is that what was intended?
+> 
+> Thanks!
+> Leo
+> 
+Hi Leo,
 
-According to NXP errata document IMX8_1N94W, the i.MX8QuadMax SoC suffers
-from a cache coherency issue (ERR050104). The workaround includes downgradi=
-ng
-targeted TLBI operations to broadcast-all variants, upgrading IC IVAU to
-IC IALLUIS, and disabling KVM.
+I think the cleanest way to handle this is to simply avoid setting DBM
+on block mappings. If we only set DBM on page-level PTEs, then block
+mappings will naturally stay DBM=0 and trigger a write fault on first
+access — exactly what we need for lazy splitting.
 
-Link: https://lore.kernel.org/all/20230420112952.28340-1-iivanov@suse.de/
+When the fault occurs, the block gets split into page-level PTEs, and at
+that point we can set DBM=1 on the resulting leaf entries. This way:
 
-> diff --git a/arch/arm64/include/asm/tlbflush.h b/arch/arm64/include/asm/t=
-lbflush.h
-> index 14a78ac0f8009..87843e602127e 100644
-> --- a/arch/arm64/include/asm/tlbflush.h
-> +++ b/arch/arm64/include/asm/tlbflush.h
-[ ... ]
-> @@ -580,23 +584,27 @@ static __always_inline void __do_flush_tlb_range(st=
-ruct vm_area_struct *vma,
-> =20
->  	asid =3D ASID(mm);
-> =20
-> -	switch (flags & (TLBF_NOWALKCACHE | TLBF_NOBROADCAST)) {
-> -	case TLBF_NONE:
-> -		__flush_s1_tlb_range_op(vae1is, start, pages, stride,
-> -					asid, tlb_level);
-> -		break;
-[ ... ]
-> +	if (alternative_has_cap_unlikely(ARM64_WORKAROUND_NXP_ERR050104)) {
-> +		__tlbi(vmalle1is);
+1. Lazy split works naturally (fault -> split -> set DBM=1)
 
-[Severity: High]
-Does this code inadvertently break the synchronization for local TLB flushe=
-s?
-When __do_flush_tlb_range() is called with the TLBF_NOBROADCAST flag (such
-as from flush_tlb_fix_spurious_fault()), this block unconditionally upgrades
-the local flush to a global broadcast (__tlbi(vmalle1is)).
+2. No need to clear DBM globally at dirty-track enable
 
-However, later in the same function, if TLBF_NOBROADCAST is set, the code
-synchronizes the operation using dsb(nsh) instead of dsb(ish). Emitting an
-inner-shareable broadcast TLB instruction but only waiting for local
-completion violates the hardware contract and can overwhelm the system
-interconnect with DVM messages that are never waited for.
+3. No special handling for block mappings
 
-Should local flushes be upgraded to the local vmalle1 instead, or should
-the synchronization be upgraded to dsb(ish)?
-
-> +	} else {
-> +		switch (flags & (TLBF_NOWALKCACHE | TLBF_NOBROADCAST)) {
-> +		case TLBF_NONE:
-[ ... ]
-> diff --git a/arch/arm64/kernel/traps.c b/arch/arm64/kernel/traps.c
-> index 9142820160698..beb658a007d59 100644
-> --- a/arch/arm64/kernel/traps.c
-> +++ b/arch/arm64/kernel/traps.c
-> @@ -585,6 +585,12 @@ static void user_cache_maint_handler(unsigned long e=
-sr, struct pt_regs *regs)
->  		__user_cache_maint("dc civac", address, ret);
->  		break;
->  	case ESR_ELx_SYS64_ISS_CRM_IC_IVAU:	/* IC IVAU */
-> +		if (cpus_have_final_cap(ARM64_WORKAROUND_NXP_ERR050104)) {
-> +			/* ERR050104: upgrade IC IVAU to IC IALLUIS */
-> +			asm volatile("ic ialluis");
-> +			ret =3D 0;
-> +			break;
-> +		}
-
-[Severity: High]
-Will this silently swallow faults if user space passes an invalid or kernel
-pointer?
-
-Normally, __user_cache_maint() checks if the address is >=3D TASK_SIZE_MAX =
-and
-sets -EFAULT, which correctly triggers a SIGSEGV for the offending user-spa=
-ce
-application.=20
-
-Because this workaround executes the ic ialluis instruction and returns suc=
-cess
-(ret =3D 0) unconditionally, it bypasses the address validation entirely. C=
-an we
-preserve the TASK_SIZE_MAX check so that buggy or malicious programs aren't
-silently ignored?
-
->  		__user_cache_maint("ic ivau", address, ret);
->  		break;
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260729-imx8qm-cac=
-he-coherency-v1-1-c9864e280437@nxp.com?part=3D1
+So I think global DBM is still viable — we just need to filter out block 
+mappings when setting the DBM bit. That way the lazy split path is 
+preserved without extra complexity.
