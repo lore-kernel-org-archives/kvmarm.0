@@ -1,196 +1,373 @@
-Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com [209.85.215.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A9003B3896
-	for <kvmarm@lists.linux.dev>; Wed, 29 Jul 2026 19:39:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4220C3AB286
+	for <kvmarm@lists.linux.dev>; Wed, 29 Jul 2026 19:46:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785353950; cv=none; b=jyW6U4gCOM65zMRB0gLwlGBRfJVIFGrjV7FSGhAI+2/T0Mxr5Pws89kBvGma3t7UVx1RzuAb7rW9AUurdQDUvnAE3IZ/faUKqhlEfVDXX+AeJ/yMOUQFS+ioRwaW3yfrAuADGIx2ZvDj/pFQgxO+z/0XOZGUx56kBrzLbioyJcg=
+	t=1785354393; cv=none; b=YMDmZq0h/NPR2tcFEkxpDur5KnRz/M8voIrZ2nTNA4E9QesYed4mE7VgNyWv3wPeyeIebunN16B2Id/mOVFUdkP5i7vKbtUuVxEjgpoUFOYBNO/FSrgAawm7Q3rffR/X/OrkPbK3LXj7J0b5yDB4z8OKh/BrWoE30B2jAwkBFr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785353950; c=relaxed/simple;
-	bh=uVsZg6LSMAWkJMOfgWmCb9JZEYXDTnvaEFxeC1Jcino=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=glpneX1AHX5EEugt8gK/qG6y3FnM8luYNpOue0uL0+Vxc41vYKBjKHsrS3EGEkfFMiwGbSmMyrpC41CMTJKUoqpgHTPUq50Lt+RHoNdbeyLV17KV2851r7Zs9he4K9gL6O1M4jQR2YB9TsSO40XKj26gYhJvWrYDiin7MnOYu2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bdCFsHD9; arc=none smtp.client-ip=209.85.215.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1785354393; c=relaxed/simple;
+	bh=MTsW4DPZPh15sIO/nZBnNM4EnhVhCyLOHMDWXXit5kI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YghOxTM/KW0g9EtYKci8kiQKO/8DW2sbo2q0RyuxF3Cf0Xu+V21LJJiJN131HkqtCGIyoXPUc02sDnQRay6QJb4GUHK4v6+5Q5ryt+O9v2qte6SRjwquQjwQ5gh9xN6iaHIwIXpAG3HJgqNruFbAhuEp+OZCEptZQkR+ze3tAo8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NCtNlzdm; arc=none smtp.client-ip=91.218.175.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bdCFsHD9"
-Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-cb11535e6a1so1056856a12.0
-        for <kvmarm@lists.linux.dev>; Wed, 29 Jul 2026 12:39:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1785353947; x=1785958747; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=yz+Y4cDmmkJFalPabDMm+ynUXO0OUxXd4k3RBua3jcw=;
-        b=bdCFsHD9fpcBWe56q5YqusZwuHxPbZbyAYo06DExj5ykzBQGAxYvrDyMdzu9Rc9ChV
-         C2mLv/YQ74bo6/0mABNaLZzeu1dP8LAJLoHSaubUheTPknxErx1euTmoLqMAwfZA0u8c
-         gVu5Iq3IFaBCoPLILbE/WkkUxKujoNQd3LOjwGwwZ9F0mUV9Tz6acH1WXCJHZfNNN99w
-         D/W8WHRaAnmOM7Td0fM0KkW6Q+Ve5A8/B8EdhBPrhmhV/e5EgQviyBJU2MHOrW9eU/Ac
-         4FR8EyBIAAyyAmwKv9knPb4ak9pg90Fvhs0X/xA17H4TPSDjuC53Xi+qvFiCqfJ+rO2L
-         bb0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785353947; x=1785958747;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=yz+Y4cDmmkJFalPabDMm+ynUXO0OUxXd4k3RBua3jcw=;
-        b=Gy277lXrj19iLrCvjwR+1c90baYUWmC3NLkTh/EZ1KXTA+jfT+Q5Czm5XTK9HU5Eo7
-         7PkDU4p6l7LHo5Pjnm/jk1JSTDOggnBwBwog1KPw8+Zl2B+LX/6rgsAO8Xq4jwxGfsrE
-         poejmmcQp6Yx9ySeNP2uRAcuQv0kT/EC7CKFEIomtWwMbiGnTT3M4yYWHLK1rQ5v1+j/
-         1dMy0+Kfr537bas5X7mEl4DBka4lOmJNiQU0kz9hJYYXjkUF8iizH9KBx4GPT/mP2+Ka
-         6BFAc+tVpkaPXu20PwJ0bQno/EuXlAXHyQy3bQo+Gs3ZV9r3RxgE3fDY3yLLwdglYn1V
-         mKFg==
-X-Forwarded-Encrypted: i=1; AHgh+RpfTHE8jW3rfYwOP7Z2Cf3tLapN2btMgJ7cSQ3ibgmg2qkEW4gN2mo926l7fHmYHbaZdLmErBg=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwU6UcOL7epkYpDbIGwhlv6OvJxOGnvqFr3D3en4gZ3rPc/u/L0
-	m3t55QDsMUB9paLRemK/vVRyQ//nq6S2YfOememYKDo8kgrBLiVrHT9JQMmR+et58AAaU8zSxrw
-	Y3VeObA==
-X-Received: from pjbcn20.prod.google.com ([2002:a17:90a:f094:b0:38e:6163:aa2b])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:37c7:b0:37f:f4ae:5f25
- with SMTP id 98e67ed59e1d1-38f99253d52mr179898a91.20.1785353947403; Wed, 29
- Jul 2026 12:39:07 -0700 (PDT)
-Date: Wed, 29 Jul 2026 12:39:06 -0700
-In-Reply-To: <20260331194202.1722082-4-vipinsh@google.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NCtNlzdm"
+X-Forwarded-Encrypted: i=1; AHgh+RrCQcYQrkNg3v0CThUlFNgkLmTnyvC10M2nDnsDTCIghC7fe3DUghsW1vmS66/g3CNM0ZsK8Uk=@lists.linux.dev
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1785354386;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=m7NYxbVQukXWkUZPHzw13nh5/XBlWOt6m2oUVluhMlA=;
+	b=NCtNlzdmhftlkTDwtpLz9CqjXGWtc2IpCHBnhQhU+8/PZE6YAuYGXEzNcdM69U628tD+PS
+	steD/dlYv4PDniHz5M1zcCJ6POdgM5Q46alQ5buT176CkywC5qjyrhVHbpvdkcZ5NCiY98
+	9OLo0Ws/+oSP7oYyHzUZ9mG03GJmvFo=
+X-Gm-Message-State: AOJu0Yz68dyc51xqDfHu/2KgmHSSM1GLkhrkLNEnq+QSZhMh1nRx9EE1
+	a3kyLMFYjTNMp/flWhTuimCfopvkJzoYg4+F30Z0jHfBZBwx/x3j1wdN+dpLxfbG+L71R7Qon4b
+	F61F33LZf1ZVT6/EmTVyYZJzSYIjHjkItTP3Tpl4r
+X-Received: by 2002:a05:622a:5145:b0:4ff:c0e7:be9c with SMTP id
+ d75a77b69052e-52b3741055amr1691401cf.0.1785354377611; Wed, 29 Jul 2026
+ 12:46:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20260331194202.1722082-1-vipinsh@google.com> <20260331194202.1722082-4-vipinsh@google.com>
-Message-ID: <ampW2iHhp6EA21I5@google.com>
-Subject: Re: [PATCH v4 3/9] KVM: selftests: Add timeout option in selftests runner
-From: Sean Christopherson <seanjc@google.com>
-To: Vipin Sharma <vipinsh@google.com>, t@google.com
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org, 
-	pbonzini@redhat.com, borntraeger@linux.ibm.com, frankja@linux.ibm.com, 
-	imbrenda@linux.ibm.com, anup@brainfault.org, atish.patra@linux.dev, 
-	zhaotianrui@loongson.cn, maobibo@loongson.cn, chenhuacai@kernel.org, 
-	maz@kernel.org, oliver.upton@linux.dev, ajones@ventanamicro.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20260720-hybrid-v9-0-2b713ca1b5dc@rsg.ci.i.u-tokyo.ac.jp> <20260720-hybrid-v9-16-2b713ca1b5dc@rsg.ci.i.u-tokyo.ac.jp>
+In-Reply-To: <20260720-hybrid-v9-16-2b713ca1b5dc@rsg.ci.i.u-tokyo.ac.jp>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Wed, 29 Jul 2026 20:45:00 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTyTOCyZRRsGj3hbzk6H=ZPZTfTCYQpv+o0MpcoLAXS95A@mail.gmail.com>
+X-Gm-Features: AUfX_mz5uV-Ty8nXNE0Bq2AH3IvUn36RDUN3WfgUMxDQ01Xo6HoyBjFL8QvNB8Y
+Message-ID: <CA+EHjTyTOCyZRRsGj3hbzk6H=ZPZTfTCYQpv+o0MpcoLAXS95A@mail.gmail.com>
+Subject: Re: [PATCH v9 16/16] KVM: arm64: selftests: Test PMU_V3_FIXED_COUNTERS_ONLY
+To: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Kees Cook <kees@kernel.org>, 
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>, 
+	Shuah Khan <skhan@linuxfoundation.org>, Yury Norov <yury.norov@gmail.com>, 
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>, Steffen Eiden <seiden@linux.ibm.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org, 
+	devel@daynix.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Mar 31, 2026, Vipin Sharma wrote:
-> Add a command line argument in KVM selftest runner to limit amount of
-> time (seconds) given to a test for execution. Kill the test if it
-> exceeds the given timeout. Define a new SelftestStatus.TIMED_OUT to
-> denote a selftest final result. Add terminal color for status messages
-> of timed out tests.
-> 
-> Set the default value of 120 seconds for all tests.
-> 
-> Signed-off-by: Vipin Sharma <vipinsh@google.com>
+On Mon, 20 Jul 2026 at 06:39, Akihiko Odaki
+<odaki@rsg.ci.i.u-tokyo.ac.jp> wrote:
+>
+> Assert the following:
+> - FIXED_COUNTERS_ONLY is unset at initialization.
+> - FIXED_COUNTERS_ONLY can be set.
+> - Setting an event filter when FIXED_COUNTERS_ONLY has already been set
+>   results in EBUSY.
+> - Setting FIXED_COUNTERS_ONLY when an event filter has already been set
+>   results in EBUSY.
+> - Setting FIXED_COUNTERS_ONLY when a VCPU has already run results in
+>   EBUSY.
+>
+> Run the existing PMU and MDCR_EL2 tests in fixed-only mode. Verify that
+> enabling the mode preserves the userspace MDCR_EL2 value until a
+> subsequent KVM_ARM_VCPU_INIT resets HPMN to zero.
+>
+> Assisted-by: Codex:gpt-5.5
+> Signed-off-by: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
+
+Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
+
+Cheers,
+/fuad
+
+
 > ---
->  .../testing/selftests/kvm/runner/__main__.py  |  9 +++++-
->  .../testing/selftests/kvm/runner/selftest.py  | 29 ++++++++++++-------
->  .../selftests/kvm/runner/test_runner.py       |  2 +-
->  3 files changed, 27 insertions(+), 13 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/runner/__main__.py b/tools/testing/selftests/kvm/runner/__main__.py
-> index 9b6c78e69c64..82c543d11c34 100644
-> --- a/tools/testing/selftests/kvm/runner/__main__.py
-> +++ b/tools/testing/selftests/kvm/runner/__main__.py
-> @@ -37,6 +37,11 @@ def cli():
->                          default=".",
->                          help="Finds the test executables in the given path. Default is the current directory.")
->  
-> +    parser.add_argument("--timeout",
-> +                        default=120,
-> +                        type=int,
-> +                        help="Timeout, in seconds, before runner kills the running test. (Default: 120 seconds)")
+>  .../selftests/kvm/arm64/vpmu_counter_access.c      | 166 +++++++++++++++++----
+>  1 file changed, 137 insertions(+), 29 deletions(-)
+>
+> diff --git a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
+> index 73f04e4c6ca3..b5f8ce8d3451 100644
+> --- a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
+> +++ b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
+> @@ -411,12 +411,7 @@ static void create_vpmu_vm(void *guest_code)
+>  {
+>         struct kvm_vcpu_init init;
+>         u8 pmuver, ec;
+> -       u64 dfr0, irq = 23;
+> -       struct kvm_device_attr irq_attr = {
+> -               .group = KVM_ARM_VCPU_PMU_V3_CTRL,
+> -               .attr = KVM_ARM_VCPU_PMU_V3_IRQ,
+> -               .addr = (u64)&irq,
+> -       };
+> +       u64 dfr0;
+>
+>         /* The test creates the vpmu_vm multiple times. Ensure a clean state */
+>         memset(&vpmu_vm, 0, sizeof(vpmu_vm));
+> @@ -442,8 +437,6 @@ static void create_vpmu_vm(void *guest_code)
+>         TEST_ASSERT(pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF &&
+>                     pmuver >= ID_AA64DFR0_EL1_PMUVer_IMP,
+>                     "Unexpected PMUVER (0x%x) on the vCPU with PMUv3", pmuver);
+> -
+> -       vcpu_ioctl(vpmu_vm.vcpu, KVM_SET_DEVICE_ATTR, &irq_attr);
+>  }
+>
+>  static void destroy_vpmu_vm(void)
+> @@ -494,13 +487,22 @@ static void set_nr_counters(struct kvm_vcpu *vcpu,
+>  }
+>
+>  static void test_create_vpmu_vm_with_nr_counters(unsigned int nr_counters,
+> +                                                bool fixed_counters_only,
+>                                                  bool expect_fail)
+>  {
+>         struct kvm_vcpu *vcpu;
+> +       u64 irq = 23;
+>
+>         create_vpmu_vm(guest_code);
+>         vcpu = vpmu_vm.vcpu;
+>
+> +       if (fixed_counters_only)
+> +               vcpu_device_attr_set(vcpu, KVM_ARM_VCPU_PMU_V3_CTRL,
+> +                                    KVM_ARM_VCPU_PMU_V3_FIXED_COUNTERS_ONLY, NULL);
 > +
->      return parser.parse_args()
->  
->  
-> @@ -44,6 +49,7 @@ def setup_logging():
->      class TerminalColorFormatter(logging.Formatter):
->          reset = "\033[0m"
->          red_bold = "\033[31;1m"
-> +        red = "\033[31;1m"
->          green = "\033[32m"
->          yellow = "\033[33m"
->          blue = "\033[34m"
-> @@ -52,7 +58,8 @@ def setup_logging():
->              SelftestStatus.PASSED: green,
->              SelftestStatus.NO_RUN: blue,
->              SelftestStatus.SKIPPED: yellow,
-> -            SelftestStatus.FAILED: red_bold
-> +            SelftestStatus.FAILED: red_bold,
-> +            SelftestStatus.TIMED_OUT: red
-
-Responding here because it's easier to see...
-
-In my experience, uniquely identifying segfaults can be super helpful, e.g. (with
-the stderr/stdout changes too).
-
-diff --git a/tools/testing/selftests/kvm/runner/__main__.py b/tools/testing/selftests/kvm/runner/__main__.py
-index 13f4cbea1fa7..93ce46e25caf 100644
---- a/tools/testing/selftests/kvm/runner/__main__.py
-+++ b/tools/testing/selftests/kvm/runner/__main__.py
-@@ -122,6 +122,7 @@ def setup_logging(args):
-             SelftestStatus.NO_RUN: blue,
-             SelftestStatus.SKIPPED: yellow,
-             SelftestStatus.FAILED: red_bold,
-+            SelftestStatus.SEGFAULT: red_bold,
-             SelftestStatus.TIMED_OUT: red
-         }
- 
-diff --git a/tools/testing/selftests/kvm/runner/selftest.py b/tools/testing/selftests/kvm/runner/selftest.py
-index 76c3e6d463ee..9ccdeef62a3e 100644
---- a/tools/testing/selftests/kvm/runner/selftest.py
-+++ b/tools/testing/selftests/kvm/runner/selftest.py
-@@ -18,7 +18,8 @@ class SelftestStatus(enum.IntEnum):
-     NO_RUN = 22
-     SKIPPED = 23
-     FAILED = 24
--    TIMED_OUT = 25
-+    SEGFAULT = 25
-+    TIMED_OUT = 26
- 
-     def __str__(self):
-         return str.__str__(self.name)
-@@ -63,6 +64,8 @@ class Selftest:
-                 self.status = SelftestStatus.PASSED
-             elif proc.returncode == 4:
-                 self.status = SelftestStatus.SKIPPED
-+            elif proc.returncode == 139:
-+                self.state = SelftestStatus.SEGFAULT
-             else:
-                 self.status = SelftestStatus.FAILED
-         except subprocess.TimeoutExpired as e:
-diff --git a/tools/testing/selftests/kvm/runner/test_runner.py b/tools/testing/selftests/kvm/runner/test_runner.py
-index 66a3c3711a8a..f06965c68520 100644
---- a/tools/testing/selftests/kvm/runner/test_runner.py
-+++ b/tools/testing/selftests/kvm/runner/test_runner.py
-@@ -21,6 +21,7 @@ class TestRunner:
-         self.print_stds = {
-             SelftestStatus.PASSED: args.print_passed,
-             SelftestStatus.FAILED: args.print_failed,
-+            SelftestStatus.SEGFAULT: args.print_failed,
-             SelftestStatus.SKIPPED: args.print_skipped,
-             SelftestStatus.TIMED_OUT: args.print_timed_out,
-             SelftestStatus.NO_RUN: args.print_no_run
-@@ -38,6 +39,7 @@ class TestRunner:
-         print(f"\r\033[1mTotal: {self.tests_ran}/{len(self.tests)}" \
-                 f"\033[32;1m Passed: {self.status[SelftestStatus.PASSED]}" \
-                 f"\033[31;1m Failed: {self.status[SelftestStatus.FAILED]}" \
-+                f"\033[31;1m Segfaults: {self.status[SelftestStatus.SEGFAULT]}" \
-                 f"\033[33;1m Skipped: {self.status[SelftestStatus.SKIPPED]}"\
-                 f"\033[91;1m Timed Out: {self.status[SelftestStatus.TIMED_OUT]}"\
-                 f"\033[34;1m No Run: {self.status[SelftestStatus.NO_RUN]}\033[0m",
-@@ -47,10 +49,14 @@ class TestRunner:
-         print_level = self.print_stds.get(test_result.status, "full")
- 
-         print("\033[2K", end="\r", flush=True)
--        if (print_level == "full" or print_level == "stdout"):
-+        if (print_level == "full"):
-             logger.info("*** stdout ***\n" + test_result.stdout)
--        if (print_level == "full" or print_level == "stderr"):
-             logger.info("*** stderr ***\n" + test_result.stderr)
-+        elif (print_level == "stdout"):
-+            logger.info(test_result.stdout)
-+        elif (print_level == "stderr"):
-+            logger.info(test_result.stderr)
-+
-         if (print_level != "off"):
-             logger.log(test_result.status, f"[{test_result.status.name}] {test_result.test_path}")
+> +       vcpu_device_attr_set(vcpu, KVM_ARM_VCPU_PMU_V3_CTRL,
+> +                            KVM_ARM_VCPU_PMU_V3_IRQ, &irq);
+> +
+>         set_nr_counters(vcpu, nr_counters, expect_fail);
+>
+>         vcpu_device_attr_set(vcpu, KVM_ARM_VCPU_PMU_V3_CTRL, KVM_ARM_VCPU_PMU_V3_INIT, NULL);
+> @@ -510,15 +512,15 @@ static void test_create_vpmu_vm_with_nr_counters(unsigned int nr_counters,
+>   * Create a guest with one vCPU, set the PMCR_EL0.N for the vCPU to @pmcr_n,
+>   * and run the test.
+>   */
+> -static void run_access_test(u64 pmcr_n)
+> +static void run_access_test(u64 pmcr_n, bool fixed_counters_only)
+>  {
+>         u64 sp;
+>         struct kvm_vcpu *vcpu;
+>         struct kvm_vcpu_init init;
+>
+> -       pr_debug("Test with pmcr_n %lu\n", pmcr_n);
+> +       pr_debug("Test with pmcr_n %lu, fixed_counters_only %d\n", pmcr_n, fixed_counters_only);
+>
+> -       test_create_vpmu_vm_with_nr_counters(pmcr_n, false);
+> +       test_create_vpmu_vm_with_nr_counters(pmcr_n, fixed_counters_only, false);
+>         vcpu = vpmu_vm.vcpu;
+>
+>         /* Save the initial sp to restore them later to run the guest again */
+> @@ -552,14 +554,14 @@ static struct pmreg_sets validity_check_reg_sets[] = {
+>   * Create a VM, and check if KVM handles the userspace accesses of
+>   * the PMU register sets in @validity_check_reg_sets[] correctly.
+>   */
+> -static void run_pmregs_validity_test(u64 pmcr_n)
+> +static void run_pmregs_validity_test(u64 pmcr_n, bool fixed_counters_only)
+>  {
+>         int i;
+>         struct kvm_vcpu *vcpu;
+>         u64 set_reg_id, clr_reg_id, reg_val;
+>         u64 valid_counters_mask, max_counters_mask;
+>
+> -       test_create_vpmu_vm_with_nr_counters(pmcr_n, false);
+> +       test_create_vpmu_vm_with_nr_counters(pmcr_n, fixed_counters_only, false);
+>         vcpu = vpmu_vm.vcpu;
+>
+>         valid_counters_mask = get_counters_mask(pmcr_n);
+> @@ -604,13 +606,15 @@ static void run_pmregs_validity_test(u64 pmcr_n)
+>         destroy_vpmu_vm();
+>  }
+>
+> -static void run_mdcr_el2_validity_test(u64 pmcr_n)
+> +static void run_mdcr_el2_validity_test(u64 pmcr_n, bool fixed_counters_only)
+>  {
+>         struct kvm_vcpu_init init;
+>         struct kvm_vcpu *vcpu;
+>         u64 expected_mdcr, mdcr;
+> +       u64 irq = 23;
+>
+> -       pr_debug("MDCR_EL2 test with pmcr_n %lu\n", pmcr_n);
+> +       pr_debug("MDCR_EL2 test with pmcr_n %lu, fixed_counters_only %d\n",
+> +                pmcr_n, fixed_counters_only);
+>
+>         create_vpmu_vm(guest_code);
+>         if (!vm_supports_el2(vpmu_vm.vm)) {
+> @@ -631,6 +635,16 @@ static void run_mdcr_el2_validity_test(u64 pmcr_n)
+>                     "MDCR_EL2 was not properly updated after HPMN write (expected 0x%lx, got 0x%lx)",
+>                     expected_mdcr, mdcr);
+>
+> +       if (fixed_counters_only) {
+> +               vcpu_device_attr_set(vcpu, KVM_ARM_VCPU_PMU_V3_CTRL,
+> +                                    KVM_ARM_VCPU_PMU_V3_FIXED_COUNTERS_ONLY, NULL);
+> +
+> +               mdcr = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_MDCR_EL2));
+> +               TEST_ASSERT(mdcr == expected_mdcr,
+> +                           "MDCR_EL2 changed after PMU_V3_FIXED_COUNTERS_ONLY (expected 0x%lx, got 0x%lx)",
+> +                           expected_mdcr, mdcr);
+> +       }
+> +
+>         set_nr_counters(vcpu, pmcr_n, false);
+>
+>         mdcr = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_MDCR_EL2));
+> @@ -638,6 +652,9 @@ static void run_mdcr_el2_validity_test(u64 pmcr_n)
+>                     "MDCR_EL2 changed after PMU_V3_SET_NR_COUNTERS (expected 0x%lx, got 0x%lx)",
+>                     expected_mdcr, mdcr);
+>
+> +       vcpu_device_attr_set(vcpu, KVM_ARM_VCPU_PMU_V3_CTRL,
+> +                            KVM_ARM_VCPU_PMU_V3_IRQ, &irq);
+> +
+>         vcpu_device_attr_set(vcpu, KVM_ARM_VCPU_PMU_V3_CTRL,
+>                              KVM_ARM_VCPU_PMU_V3_INIT, NULL);
+>
+> @@ -672,11 +689,11 @@ static void run_mdcr_el2_validity_test(u64 pmcr_n)
+>   * the vCPU to @pmcr_n, which is larger than the host value.
+>   * The attempt should fail as @pmcr_n is too big to set for the vCPU.
+>   */
+> -static void run_error_test(u64 pmcr_n)
+> +static void run_error_test(u64 pmcr_n, bool fixed_counters_only)
+>  {
+>         pr_debug("Error test with pmcr_n %lu (larger than the host)\n", pmcr_n);
+>
+> -       test_create_vpmu_vm_with_nr_counters(pmcr_n, true);
+> +       test_create_vpmu_vm_with_nr_counters(pmcr_n, fixed_counters_only, true);
+>         destroy_vpmu_vm();
+>  }
+>
+> @@ -737,25 +754,116 @@ static void test_set_nr_counters_after_vcpu_run(void)
+>         kvm_vm_free(vm);
+>  }
+>
+> -int main(void)
+> +static void test_config(u64 pmcr_n, bool fixed_counters_only)
+> +{
+> +       u64 i;
+> +
+> +       for (i = 0; i <= pmcr_n; i++) {
+> +               run_access_test(i, fixed_counters_only);
+> +               run_pmregs_validity_test(i, fixed_counters_only);
+> +               run_mdcr_el2_validity_test(i, fixed_counters_only);
+> +       }
+> +
+> +       for (i = pmcr_n + 1; i < ARMV8_PMU_MAX_COUNTERS; i++)
+> +               run_error_test(i, fixed_counters_only);
+> +}
+> +
+> +static void test_fixed_counters_only(void)
+>  {
+> -       u64 i, pmcr_n;
+> +       struct kvm_pmu_event_filter filter = { .nevents = 0 };
+> +       struct kvm_vm *vm;
+> +       struct kvm_vcpu *running_vcpu;
+> +       struct kvm_vcpu *stopped_vcpu;
+> +       struct kvm_vcpu_init init;
+> +       int ret;
+> +       u64 irq = 23;
+> +
+> +       create_vpmu_vm(guest_code);
+> +       ret = __vcpu_has_device_attr(vpmu_vm.vcpu, KVM_ARM_VCPU_PMU_V3_CTRL,
+> +                                    KVM_ARM_VCPU_PMU_V3_FIXED_COUNTERS_ONLY);
+> +       if (ret) {
+> +               TEST_ASSERT(ret == -1 && errno == ENXIO,
+> +                           KVM_IOCTL_ERROR(KVM_HAS_DEVICE_ATTR, ret));
+> +               destroy_vpmu_vm();
+> +               return;
+> +       }
+> +
+> +       /* Assert that FIXED_COUNTERS_ONLY is unset at initialization. */
+> +       ret = __vcpu_device_attr_get(vpmu_vm.vcpu, KVM_ARM_VCPU_PMU_V3_CTRL,
+> +                                    KVM_ARM_VCPU_PMU_V3_FIXED_COUNTERS_ONLY, NULL);
+> +       TEST_ASSERT(ret == -1 && errno == ENXIO,
+> +                   KVM_IOCTL_ERROR(KVM_GET_DEVICE_ATTR, ret));
+> +
+> +       /* Assert that setting FIXED_COUNTERS_ONLY succeeds. */
+> +       vcpu_device_attr_set(vpmu_vm.vcpu, KVM_ARM_VCPU_PMU_V3_CTRL,
+> +                            KVM_ARM_VCPU_PMU_V3_FIXED_COUNTERS_ONLY, NULL);
+> +
+> +       /* Assert that FIXED_COUNTERS_ONLY is set. */
+> +       vcpu_device_attr_get(vpmu_vm.vcpu, KVM_ARM_VCPU_PMU_V3_CTRL,
+> +                            KVM_ARM_VCPU_PMU_V3_FIXED_COUNTERS_ONLY, NULL);
+> +
+> +       /*
+> +        * Setting an event filter when FIXED_COUNTERS_ONLY has already been set
+> +        * results in EBUSY.
+> +        */
+> +       ret = __vcpu_device_attr_set(vpmu_vm.vcpu, KVM_ARM_VCPU_PMU_V3_CTRL,
+> +                                    KVM_ARM_VCPU_PMU_V3_FILTER, &filter);
+> +       TEST_ASSERT(ret == -1 && errno == EBUSY,
+> +                   KVM_IOCTL_ERROR(KVM_SET_DEVICE_ATTR, ret));
+> +
+> +       destroy_vpmu_vm();
+> +
+> +       create_vpmu_vm(guest_code);
+> +
+> +       /*
+> +        * Assert that setting FIXED_COUNTERS_ONLY when an event filter has
+> +        * already been set results in EBUSY.
+> +        */
+> +       vcpu_device_attr_set(vpmu_vm.vcpu, KVM_ARM_VCPU_PMU_V3_CTRL,
+> +                            KVM_ARM_VCPU_PMU_V3_FILTER, &filter);
+> +
+> +       ret = __vcpu_device_attr_set(vpmu_vm.vcpu, KVM_ARM_VCPU_PMU_V3_CTRL,
+> +                                    KVM_ARM_VCPU_PMU_V3_FIXED_COUNTERS_ONLY, NULL);
+> +       TEST_ASSERT(ret == -1 && errno == EBUSY,
+> +                   KVM_IOCTL_ERROR(KVM_SET_DEVICE_ATTR, ret));
+> +
+> +       destroy_vpmu_vm();
+> +
+> +       /*
+> +        * Assert that setting FIXED_COUNTERS_ONLY when a VCPU has already run
+> +        * results in EBUSY.
+> +        */
+> +       vm = vm_create(2);
+> +       vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init);
+> +       init.features[0] |= (1 << KVM_ARM_VCPU_PMU_V3);
+> +       running_vcpu = aarch64_vcpu_add(vm, 0, &init, guest_code_done);
+> +       stopped_vcpu = aarch64_vcpu_add(vm, 1, &init, guest_code_done);
+> +       kvm_arch_vm_finalize_vcpus(vm);
+> +       vcpu_device_attr_set(running_vcpu, KVM_ARM_VCPU_PMU_V3_CTRL,
+> +                            KVM_ARM_VCPU_PMU_V3_IRQ, &irq);
+> +       vcpu_device_attr_set(running_vcpu, KVM_ARM_VCPU_PMU_V3_CTRL,
+> +                            KVM_ARM_VCPU_PMU_V3_INIT, NULL);
+> +       vcpu_run(running_vcpu);
+> +
+> +       ret = __vcpu_device_attr_set(stopped_vcpu, KVM_ARM_VCPU_PMU_V3_CTRL,
+> +                                    KVM_ARM_VCPU_PMU_V3_FIXED_COUNTERS_ONLY, NULL);
+> +       TEST_ASSERT(ret == -1 && errno == EBUSY,
+> +                   KVM_IOCTL_ERROR(KVM_SET_DEVICE_ATTR, ret));
+> +
+> +       kvm_vm_free(vm);
+> +
+> +       test_config(0, true);
+> +}
+>
+> +int main(void)
+> +{
+>         TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_PMU_V3));
+>         TEST_REQUIRE(kvm_supports_vgic_v3());
+>         TEST_REQUIRE(kvm_supports_nr_counters_attr());
+>
+>         test_set_nr_counters_after_vcpu_run();
+> -
+> -       pmcr_n = get_pmcr_n_limit();
+> -       for (i = 0; i <= pmcr_n; i++) {
+> -               run_access_test(i);
+> -               run_pmregs_validity_test(i);
+> -               run_mdcr_el2_validity_test(i);
+> -       }
+> -
+> -       for (i = pmcr_n + 1; i < ARMV8_PMU_MAX_COUNTERS; i++)
+> -               run_error_test(i);
+> +       test_config(get_pmcr_n_limit(), false);
+> +       test_fixed_counters_only();
+>
+>         return 0;
+>  }
+>
+> --
+> 2.55.0
+>
+>
