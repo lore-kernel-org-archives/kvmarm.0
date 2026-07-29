@@ -1,122 +1,145 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CAA34570EE;
-	Wed, 29 Jul 2026 11:08:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85A8547140C;
+	Wed, 29 Jul 2026 11:14:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785323336; cv=none; b=Ddw3rXU1bg5EttC0CLvo9B3Db6GjkfFIrejqW5ZjFhmgcnRvQ3rH+jfS0oAlhk4T9V73i4JZ/BWgS1ziLJrFkZ7TztV0ZOAyFXtkVeoB7zEZqWp0F7i/Y+gLndaxMK9kLWBpMvZEN6F4kb/seAv+yJ3sV9nVmJZnXbJiYyM2hUA=
+	t=1785323710; cv=none; b=YmvNXt/nU1vS4GynaYF3LN1g6+GGeC92q/Bk6Ov2sKzSPi5gspNoEjJkq9akSwZAtYW+SH3S1LDPgXEM+RnLaTkTj//CALVpGJpOjV8PAaqb1kGQqALMnCIt8hmpQQw7rsG8rEqruxw4z8wXO+Pwc68MqIlHKY0kYrz8+vtDewA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785323336; c=relaxed/simple;
-	bh=WsBB2fJ0g6xkP5QNn6rYrqJIAmkolyD6LzqYwWBdFPE=;
+	s=arc-20240116; t=1785323710; c=relaxed/simple;
+	bh=F1+KmFyfJ9/PpEfXPqt6sOe6PRC+SXghIewP5cEMzxs=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=i7x55dXThNwNqg8cEQlnUa2rLdXaiXfnffcanZaNod7fdsZwjbiDsABdArbbBgHx//pjDsl6LGBKFo9FqEhgppH40aw3IJJKY+pUvpOEHGtSN4dBbXbQBd6eI99/GMGUyrAKlOKJPMsfpHRDOdUKN+nXZO8QOayw+U5szt/dTq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jYC33EAJ; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=ogVAtqsykLIUvTNnYcgBaojAMTZuU+8aRUpRu2WFWsLLRJArCssSkKDYcrIeHF9OrfNnOyapXkvo3K/5L8o7j1jj5uuTzZ7hvfIr6kIkjYNsd2B336UR9xg63f4YUYgJIy1SYIQqvAFprEP3McqAwMf9Yy8ywF501gaBqcv8Ly4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XVSRNii+; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jYC33EAJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACFC31F000E9;
-	Wed, 29 Jul 2026 11:08:54 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XVSRNii+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB5EE1F00A3D;
+	Wed, 29 Jul 2026 11:14:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785323335;
-	bh=1E/IOmJhpU2BpQ7aoq5kfvtFwML8C52qc0I0D3sPGrg=;
+	s=k20260515; t=1785323692;
+	bh=tKvnyUlNglSuRC/NCqoBklSPll76aDe3LA+8HeghdP8=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=jYC33EAJxYKfwH2xOcHF7wjjYl6u9St/2IlUl87zG1ttabayO0tStS2vO9VL9RCLt
-	 p9AtEmJRoXjaNrT1myLW2GNifYFw5UlbLhrFbwikq7bMIbFBIdyyt2v+oPNWVMoPCS
-	 enE3+PrbzEyG5JYupW3Fs4RnR5HONvTdMcGBdjd+sV0ejwP5OWuNViUmznpyG8bAb8
-	 6cmtiN5hU/ZJlYIPD02bfkCltJ1MPfQBEB93SdUYqBx1ZJYvrXazzcdXJqQ+cj/MiI
-	 Q5qvzXGxn20ok39996YV9+JVjex6uX38qZliqOykBfrDdvAAf8ZSvuGW4d0RedNpye
-	 xUmIi81XvLF5A==
+	b=XVSRNii+wS9HmDlxh9oSyuTzskyW+gRBo3sWe49V690UaMGD99EWgMc7sDmaFEAeq
+	 yLPTFyN312vLfz0kDbYVzKuJlgw8dTNziq7ORYTiPAef3fZHTtydruyCGPeyh/1yO7
+	 uRwK4ySB94shavYCLjcaCNKEh7LWrlC712ft4EPX+oiDW50Qtd8/QhQgA5lLTO6ofB
+	 k1UY8NR1je6BGEvGGqBSj+6ZzauOXGHxKt6D2XeWANur4p9Mx62K6s+5np2xprz3g4
+	 SXmV3aGjgbWL4xSO5gQ0njRTpMsiXtN47Al8eL8qx8h5bHyZolWiZTIAJRxXccz8bb
+	 jPaSot1Hez1Xg==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v3 07/11] KVM: arm64: Dirty-bitmap: avoid splitting
- previously split blocks
+Subject: Re: [PATCH v3 09/11] kvm/dirty_ring: Add arch-generic interface for
+ hw-accelerated dirty-ring cleaning
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Leonardo Bras" <leo.bras@arm.com>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, "Marc Zyngier" <maz@kernel.org>, "Oliver
- Upton" <oupton@kernel.org>
-In-Reply-To: <20260729104548.3439958-8-leo.bras@arm.com>
+Cc: "Oliver Upton" <oupton@kernel.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20260729104548.3439958-10-leo.bras@arm.com>
 References: <20260729104548.3439958-1-leo.bras@arm.com>
- <20260729104548.3439958-8-leo.bras@arm.com>
+ <20260729104548.3439958-10-leo.bras@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 29 Jul 2026 11:08:54 +0000
-Message-Id: <20260729110854.ACFC31F000E9@smtp.kernel.org>
+Date: Wed, 29 Jul 2026 11:14:51 +0000
+Message-Id: <20260729111451.EB5EE1F00A3D@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+Thank you for your contribution! Sashiko AI review found 3 potential issue(=
 s) to consider:
-- [High] Dropping `mmu_lock` during eager page splitting creates a race win=
-dow that can permanently lose hardware-managed dirty bits (FEAT_HAFDBS), le=
-ading to silent guest data corruption during live migration.
+- [Low] The monolithic `#ifndef CONFIG_HAVE_KVM_HW_DIRTY_BIT` guard causes =
+a build failure for architectures that implement only one of the hardware-a=
+ccelerated dirty logging hooks.
+- [Low] The undocumented API contract of `kvm_arch_dirty_ring_clear` silent=
+ly shifts the responsibility of updating KVM dirty ring state to the archit=
+ecture hook.
+- [Low] Missing forward declaration for `struct kvm_dirty_ring` in `include=
+/linux/kvm_dirty_bit.h`.
 --
 
---- Patch [7]: [PATCH v3 07/11] KVM: arm64: Dirty-bitmap: avoid splitting p=
-reviously split blocks ---
-commit fb963a566e307a780c669718446f8bf7c2c6ef94
+--- Patch [9]: [PATCH v3 09/11] kvm/dirty_ring: Add arch-generic interface =
+for hw-accelerated dirty-ring cleaning ---
+commit 54695fde1ebfc7f27e678570e500f9d9eb6ecff5
 Author: Leonardo Bras <leo.bras@arm.com>
 
-KVM: arm64: Dirty-bitmap: avoid splitting previously split blocks
+kvm/dirty_ring: Add arch-generic interface for hw-accelerated dirty-ring cl=
+eaning
 
-If previous dirty-clean already split a block, then avoid calling the
-split helper on that block again.
+Introduce kvm_arch_dirty_ring_clear() to allow architecture-specific
+hardware-accelerated dirty-ring routines. The call is added to
+kvm_dirty_ring_reset() and falls back to a software version if not
+implemented or if an error is detected.
 
-> diff --git a/arch/arm64/kvm/dirty_bit.c b/arch/arm64/kvm/dirty_bit.c
-> index 5a6266205295e..d7e624f9b6308 100644
-> --- a/arch/arm64/kvm/dirty_bit.c
-> +++ b/arch/arm64/kvm/dirty_bit.c
-> @@ -295,10 +296,15 @@ int __kvm_arch_dirty_log_clear(struct kvm *kvm,
+> diff --git a/include/linux/kvm_dirty_bit.h b/include/linux/kvm_dirty_bit.h
+> index fa4f6b67b6235..8492979d694e7 100644
+> --- a/include/linux/kvm_dirty_bit.h
+> +++ b/include/linux/kvm_dirty_bit.h
+> @@ -18,6 +18,13 @@ static inline int kvm_arch_dirty_log_clear(struct kvm =
+*kvm,
+>  	return -ENXIO;
+>  }
 > =20
->  		offset =3D base_gfn + i * BITS_PER_LONG;
-> =20
-> -		if (kvm_dirty_log_manual_protect_and_init_set(kvm))
-> -			kvm_mmu_split_huge_pages(kvm,
-> -						 gfn_to_gpa(offset + __ffs(mask)),
-> -						 gfn_to_gpa(offset + __fls(mask) + 1));
-> +		if (kvm_dirty_log_manual_protect_and_init_set(kvm)) {
-> +			gpa_t split_start =3D gfn_to_gpa(offset + __ffs(mask));
-> +			gpa_t split_end =3D  gfn_to_gpa(offset + __fls(mask) + 1);
+> +static inline int kvm_arch_dirty_ring_clear(struct kvm *kvm,
+> +					    struct kvm_dirty_ring *ring,
+
+[Severity: Low]
+Does this struct need a forward declaration?
+
+If this header is included before include/linux/kvm_dirty_ring.h, might this
+cause a compiler warning for struct kvm_dirty_ring being declared inside a
+parameter list?
+
+> +					    int *nr_entries_reset)
+> +{
+> +	return -ENXIO;
+> +}
 > +
-> +			if (split_end > last_split) {
-> +				kvm_mmu_split_huge_pages(kvm, split_start, split_end);
+>  #else /* CONFIG_HAVE_KVM_HW_DIRTY_BIT */
 
-[Severity: High]
-Can this sequence lose dirty state due to a race with hardware dirty bit
-management?
+[Severity: Low]
+Could this monolithic config guard cause a build failure if an architecture
+enables CONFIG_HAVE_KVM_HW_DIRTY_BIT to provide kvm_arch_dirty_log_clear(),
+but does not implement kvm_arch_dirty_ring_clear()?
 
-In __kvm_arch_dirty_log_clear(), the software dirty_bitmap for the target p=
-ages
-is fetched and cleared before reaching this point.
+Because the fallback for kvm_arch_dirty_ring_clear() is excluded when the
+config is enabled, omitting it in the arch-specific header would leave it
+undeclared.
 
-When kvm_mmu_split_huge_pages() is called, it can temporarily drop
-kvm->mmu_lock to allocate memory.
-
-During this unlocked window, a vCPU could locklessly write to the page. With
-FEAT_HAFDBS enabled, the hardware automatically sets the PTE dirty bit with=
-out
-trapping to KVM.
-
-After the lock is reacquired, the loop proceeds to dirty_bit_clear(), which
-unconditionally clears the hardware PTE dirty bit (via FEAT_HACDBS).
-
-Because the software bitmap was already cleared and the hardware state is w=
-iped
-without feeding the dirty state back, could a write during the unlocked win=
-dow
-be permanently lost if userspace reads the page data before the clear opera=
-tion?
-The next KVM_GET_DIRTY_LOG would not see it.
-
-> +				last_split =3D ALIGN_DOWN(split_end - 1, PMD_SIZE) + PMD_SIZE;
-> +			}
-> +		}
 > =20
->  		do {
->  			idx =3D mask_to_hdbss(&mask, hw_entries, offset, ttwl, idx, entries_s=
-z);
+>  #include <asm/kvm_dirty_bit.h>
+> diff --git a/virt/kvm/dirty_ring.c b/virt/kvm/dirty_ring.c
+> index 807c45fb1fc7b..3fa62894f3d24 100644
+> --- a/virt/kvm/dirty_ring.c
+> +++ b/virt/kvm/dirty_ring.c
+
+[ ... ]
+
+> @@ -133,6 +134,9 @@ int kvm_dirty_ring_reset(struct kvm *kvm, struct kvm_=
+dirty_ring *ring,
+>  	 */
+>  	lockdep_assert_held(&kvm->slots_lock);
+> =20
+> +	if (kvm_arch_dirty_ring_clear(kvm, ring, nr_entries_reset) >=3D 0)
+> +		goto out;
+> +
+
+[Severity: Low]
+Does this bypass implicitly require the arch-specific hook to manually upda=
+te
+the internal state of the dirty ring?
+
+If an architecture implements kvm_arch_dirty_ring_clear() and returns succe=
+ss,
+this goto skips the generic software loop. The arch hook would need to
+manually increment ring->reset_index, update *nr_entries_reset, and call
+kvm_dirty_gfn_set_invalid() for each processed entry to avoid corrupting the
+ring state. Is this API contract expected to be documented here?
+
+>  	while (likely((*nr_entries_reset) < INT_MAX)) {
+>  		if (signal_pending(current))
+>  			return -EINTR;
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260729104548.3439=
-958-1-leo.bras@arm.com?part=3D7
+958-1-leo.bras@arm.com?part=3D9
