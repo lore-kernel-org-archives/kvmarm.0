@@ -1,52 +1,52 @@
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
+Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FD004119FA
-	for <kvmarm@lists.linux.dev>; Wed, 29 Jul 2026 16:34:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E0E04D8DB6
+	for <kvmarm@lists.linux.dev>; Wed, 29 Jul 2026 16:40:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785342870; cv=none; b=qdpsYROgUPC0+EOk/qOon3RZayLzooOLhbnrWymTeT09REeQxDkemFjBGiGKKRnC4XrDc0RZI2sOGM6qLTB4l+Z+Tn4xFbmZ4dhw0tWMI9GF3+RoROKcWXprdqJ8UYojcN8x3R9UWhICKBHWRpWg/o5kzEv4n3KFujOzlb7akrE=
+	t=1785343230; cv=none; b=tq2Pa5M0cTTqs/ChF7ZyFvx6sXbhK+kc9qwmk/38el/j24dxXfw/x7b/jbHi0PLXrdI2byIhr2lIh8UiycAWn7zEyAA2qRZk7ltAnMsyt+AOKwmOcfO6LMmgRJaR0wLmalhZTlqAKAvGvCF8KTnOivaE0w+m7q756Cmc+hIJ77Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785342870; c=relaxed/simple;
-	bh=xVCMaAYRMoA+7JRlPIAe/kKzeo1xh9J+66pWGwEUyFU=;
+	s=arc-20240116; t=1785343230; c=relaxed/simple;
+	bh=P1CBFuFn5URk4XkWKPaomxNCNRYuE86ueT9NGJQmOPY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=b19siAHlZo0YwHY7J4r2R+5TfjDcZFF7MaNU63Ynh5pr5SA9EVgzcQRBR5U+i4SyPJmbpDuJcVuVe2vgSjVC++kI6NUTyyz6u3v71QxKkk9Az8QqRVQ+r9+yxEv8kecM4o/e2bolPhUQYBB3Ep8HB9a1KKshU20Ukk4KQLfo2Pw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FCD0X156; arc=none smtp.client-ip=91.218.175.173
+	 To:Cc:Content-Type; b=fu0ZDx4ss7oEhVvu+KYbjcaYHsT3bPOgkm45c9GrSo2bkxMAUvRg9UixTTKRJng45+Pb0vi/O21UhR07T+ypsBgF7CWvCnjXcufFzv7wpvxbdJgVdJuZYGABc/B2vgVVdbAOjkJ+H/fnCWhxdrKWI4Fsr7JG5PZlQZBSNvA1kUs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Zq1rRjpD; arc=none smtp.client-ip=95.215.58.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FCD0X156"
-X-Forwarded-Encrypted: i=1; AHgh+Rrq7Q9kTwLi8KTkpxiKKq/oM0Vkx+Girn20HYxSZft5FJS8mwXEC8h/s1e8uY056cZxAQnfGcc=@lists.linux.dev
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Zq1rRjpD"
+X-Forwarded-Encrypted: i=1; AHgh+RrOiEjAoJbpbX3axXODYBDzgkePym3rAAcZzWSxOdjL2K4BQaG+tibgFDe93ybxPSpY1CTCOdk=@lists.linux.dev
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1785342866;
+	t=1785343219;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=CDwMDWK74FGPCQksjJUhT5TIKVqDAVbip9kxaBkjJBk=;
-	b=FCD0X156GxRSdy69AnwFVrpQDC1KNPrXkd46HJDtpVePqSGwZGeJ8A9yO0j/fVfMXYNTWB
-	7BGHwji+UFesA/kehnFbNYOvMxzTkMU/BE8t6N2qyiufAr/VNfkZwA4fYbGdWu3kUXdFF8
-	CEli92GDWYJLgIrb/VFE+vtcp+sMsPo=
-X-Gm-Message-State: AOJu0YyGJCPo6gIq7QkdAdnAr5BZ90Hh+hEwGYXIYyol4JBVRiY9KYiY
-	Ors5o1+HDjuQy59PMU9HoZOySYmQwRY8k57tDSx/hKmYkj4vMe5D4PjJY7dEOHO9UmdsMJVh74e
-	8KWDu/rhDpgJ5BbCiPoQhAntVnMy+dACHeN9PxWIM
-X-Received: by 2002:a05:622a:2b49:b0:51c:ca9:3d15 with SMTP id
- d75a77b69052e-52b3500260fmr2216081cf.12.1785342860083; Wed, 29 Jul 2026
- 09:34:20 -0700 (PDT)
+	bh=hTKtf9y0sAvMzfV5x7XnlOJ9LjJuEUBlqCkfsXA/OVA=;
+	b=Zq1rRjpDx4VAdDopygYy0kkOPhOXEyI2x4pHKmFgBQNI8vRHu8Ntou/sXK8ofH+qjMiceW
+	OLYiJTI3PpxCbmzpc5q6HuPMPWBY4bclELPJeIfsdfae/toxeOhgcp/UWa+Vr+40eBOZr1
+	lpkEXAMLP601QIcAIfav0Sd3S60CwWg=
+X-Gm-Message-State: AOJu0Yxwx6R2lx0EENSkoP2VH3pbSUY7S1hSh376oCIaEEHI2KXGMsAP
+	/Omm22u8+tM/JObaipFvPULNy4KGr4zXw7HUkxXnXT0v4n+s2MCklZmVtSar3xrdqwk/Pz8Wdyd
+	/wmK/h3cK+mU20xc2Q5PFocKBlriTDaVXoXwdhh65
+X-Received: by 2002:a05:622a:c4:b0:517:5ac7:332e with SMTP id
+ d75a77b69052e-52b34fbe0femr1827251cf.6.1785343198660; Wed, 29 Jul 2026
+ 09:39:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260720-hybrid-v9-0-2b713ca1b5dc@rsg.ci.i.u-tokyo.ac.jp> <20260720-hybrid-v9-10-2b713ca1b5dc@rsg.ci.i.u-tokyo.ac.jp>
-In-Reply-To: <20260720-hybrid-v9-10-2b713ca1b5dc@rsg.ci.i.u-tokyo.ac.jp>
+References: <20260720-hybrid-v9-0-2b713ca1b5dc@rsg.ci.i.u-tokyo.ac.jp> <20260720-hybrid-v9-11-2b713ca1b5dc@rsg.ci.i.u-tokyo.ac.jp>
+In-Reply-To: <20260720-hybrid-v9-11-2b713ca1b5dc@rsg.ci.i.u-tokyo.ac.jp>
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Wed, 29 Jul 2026 17:33:00 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTzuaMDJm8BPf1sA9DiSDvtyn=C1Z2LrOLYc228XKJzF2w@mail.gmail.com>
-X-Gm-Features: AUfX_mzDDgEy7qPOSuwHqBOjPkT5QQo0kZIP1lcw0jJbpzlF7P6EqmFVAn2Xz68
-Message-ID: <CA+EHjTzuaMDJm8BPf1sA9DiSDvtyn=C1Z2LrOLYc228XKJzF2w@mail.gmail.com>
-Subject: Re: [PATCH v9 10/16] KVM: arm64: Don't clear vcpu->cpu in kvm_arch_vcpu_put()
+Date: Wed, 29 Jul 2026 17:39:00 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTyY3PnJLHBVWCx1Mjy09a+AztByawZxcSSVtBUfzObC_A@mail.gmail.com>
+X-Gm-Features: AUfX_myAfVdxJqe8mBkarWtUgPMModQPrWR0zonAtg_LmKu_beXtJUxWvL2MWRA
+Message-ID: <CA+EHjTyY3PnJLHBVWCx1Mjy09a+AztByawZxcSSVtBUfzObC_A@mail.gmail.com>
+Subject: Re: [PATCH v9 11/16] KVM: arm64: PMU: Protect the list of PMUs with RCU
 To: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
 Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
 	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
@@ -65,21 +65,10 @@ X-Migadu-Flow: FLOW_OUT
 On Mon, 20 Jul 2026 at 06:39, Akihiko Odaki
 <odaki@rsg.ci.i.u-tokyo.ac.jp> wrote:
 >
-> From: Oliver Upton <oupton@kernel.org>
+> Convert the list of PMUs to a RCU-protected list that has primitives to
+> avoid read-side contention.
 >
-> commit e9b152cb957c ("arm/arm64: kvm: Set vcpu->cpu to -1 on vcpu_put")
-> reset vcpu->cpu in order for the VGIC to determine if there was any vCPU
-> running at the time of access. The VGIC has gone through an entire
-> rewrite since then, and with commit 7d450e282171 ("KVM: arm/arm64:
-> vgic-new: Add userland access to VGIC dist registers") the user
-> accessors just grab all vCPU mutexes instead.
->
-> Drop this remaining vestige such that kvm_arch_vcpu_load() can properly
-> detect a CPU migration. While at it, rework kvm_reset_vcpu() to do a
-> much more pedantic check that the provided vCPU is actually what's
-> running on the present CPU.
->
-> Signed-off-by: Oliver Upton <oupton@kernel.org>
+> Assisted-by: Codex:gpt-5.5
 > Signed-off-by: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
 
 Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
@@ -87,65 +76,92 @@ Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
 Cheers,
 /fuad
 
+
 > ---
->  arch/arm64/kvm/arm.c   |  1 -
->  arch/arm64/kvm/reset.c | 16 +++++++++++-----
->  2 files changed, 11 insertions(+), 6 deletions(-)
+>  arch/arm64/kvm/pmu-emul.c | 18 ++++++++++--------
+>  1 file changed, 10 insertions(+), 8 deletions(-)
 >
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index a06ea39f57b1..72ce79ce4d5e 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -749,7 +749,6 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->         kvm_arm_vmid_clear_active();
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index 9ac5f307ea31..c5c505b6fc61 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -7,9 +7,9 @@
+>  #include <linux/cpu.h>
+>  #include <linux/kvm.h>
+>  #include <linux/kvm_host.h>
+> -#include <linux/list.h>
+>  #include <linux/perf_event.h>
+>  #include <linux/perf/arm_pmu.h>
+> +#include <linux/rculist.h>
+>  #include <linux/uaccess.h>
+>  #include <asm/kvm_emulate.h>
+>  #include <kvm/arm_pmu.h>
+> @@ -20,6 +20,10 @@
+>  #define MDCR_EL2_PMU_RECREATE_MASK     (MDCR_EL2_HPMN | MDCR_EL2_HPMD | \
+>                                          MDCR_EL2_HLP)
 >
->         vcpu_clear_on_unsupported_cpu(vcpu);
-> -       vcpu->cpu = -1;
->  }
+> +/*
+> + * arm_pmus is append-only. kvm_supports_guest_pmuv3() feeds persistent
+> + * VM state, so a true result must remain valid after the check.
+> + */
+>  static LIST_HEAD(arm_pmus);
+>  static DEFINE_MUTEX(arm_pmus_lock);
 >
->  static void __kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu)
-> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-> index b963fd975aac..6bfb21f00444 100644
-> --- a/arch/arm64/kvm/reset.c
-> +++ b/arch/arm64/kvm/reset.c
-> @@ -190,7 +190,8 @@ static void kvm_vcpu_reset_sve(struct kvm_vcpu *vcpu)
->  void kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+> @@ -29,7 +33,6 @@ static bool kvm_pmu_counter_is_enabled(struct kvm_pmc *pmc);
+>
+>  bool kvm_supports_guest_pmuv3(void)
 >  {
->         struct vcpu_reset_state reset_state;
-> -       bool loaded;
-> +       struct kvm_vcpu *running;
-> +       bool loaded = false;
->         u32 pstate;
->
->         spin_lock(&vcpu->arch.mp_state_lock);
-> @@ -198,10 +199,16 @@ void kvm_reset_vcpu(struct kvm_vcpu *vcpu)
->         vcpu->arch.reset_state.reset = false;
->         spin_unlock(&vcpu->arch.mp_state_lock);
->
-> -       preempt_disable();
-> -       loaded = (vcpu->cpu != -1);
-> -       if (loaded)
-> +       guard(preempt)();
-> +
-> +       running = kvm_get_running_vcpu();
-> +       if (running) {
-> +               if (KVM_BUG_ON(running != vcpu, vcpu->kvm))
-> +                       return;
-> +
-> +               loaded = true;
->                 kvm_arch_vcpu_put(vcpu);
-> +       }
->
->         if (!kvm_arm_vcpu_sve_finalized(vcpu)) {
->                 if (vcpu_has_feature(vcpu, KVM_ARM_VCPU_SVE))
-> @@ -269,7 +276,6 @@ void kvm_reset_vcpu(struct kvm_vcpu *vcpu)
->
->         if (loaded)
->                 kvm_arch_vcpu_load(vcpu, smp_processor_id());
-> -       preempt_enable();
+> -       guard(mutex)(&arm_pmus_lock);
+>         return !list_empty(&arm_pmus);
 >  }
 >
->  u32 kvm_get_pa_bits(struct kvm *kvm)
+> @@ -807,7 +810,7 @@ void kvm_host_pmu_init(struct arm_pmu *pmu)
+>                 return;
+>
+>         entry->arm_pmu = pmu;
+> -       list_add_tail(&entry->entry, &arm_pmus);
+> +       list_add_tail_rcu(&entry->entry, &arm_pmus);
+>  }
+>
+>  static struct arm_pmu *kvm_pmu_probe_armpmu(void)
+> @@ -816,7 +819,7 @@ static struct arm_pmu *kvm_pmu_probe_armpmu(void)
+>         struct arm_pmu *pmu;
+>         int cpu;
+>
+> -       guard(mutex)(&arm_pmus_lock);
+> +       guard(rcu)();
+>
+>         /*
+>          * It is safe to use a stale cpu to iterate the list of PMUs so long as
+> @@ -836,7 +839,7 @@ static struct arm_pmu *kvm_pmu_probe_armpmu(void)
+>          * carried here.
+>          */
+>         cpu = raw_smp_processor_id();
+> -       list_for_each_entry(entry, &arm_pmus, entry) {
+> +       list_for_each_entry_rcu(entry, &arm_pmus, entry) {
+>                 pmu = entry->arm_pmu;
+>
+>                 if (cpumask_test_cpu(cpu, &pmu->supported_cpus))
+> @@ -1088,9 +1091,9 @@ static int kvm_arm_pmu_v3_set_pmu(struct kvm_vcpu *vcpu, int pmu_id)
+>         int ret = -ENXIO;
+>
+>         lockdep_assert_held(&kvm->arch.config_lock);
+> -       mutex_lock(&arm_pmus_lock);
+> +       guard(rcu)();
+>
+> -       list_for_each_entry(entry, &arm_pmus, entry) {
+> +       list_for_each_entry_rcu(entry, &arm_pmus, entry) {
+>                 arm_pmu = entry->arm_pmu;
+>                 if (arm_pmu->pmu.type == pmu_id) {
+>                         if (kvm_vm_has_ran_once(kvm) ||
+> @@ -1106,7 +1109,6 @@ static int kvm_arm_pmu_v3_set_pmu(struct kvm_vcpu *vcpu, int pmu_id)
+>                 }
+>         }
+>
+> -       mutex_unlock(&arm_pmus_lock);
+>         return ret;
+>  }
+>
 >
 > --
 > 2.55.0
