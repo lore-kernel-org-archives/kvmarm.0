@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ECF53590A9
-	for <kvmarm@lists.linux.dev>; Wed, 29 Jul 2026 10:46:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C706A449B3E
+	for <kvmarm@lists.linux.dev>; Wed, 29 Jul 2026 10:46:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785321994; cv=none; b=Qh4m3jgGp4lkdLGKqZ9TluZyoONWGjMJV3G3vkUhdICmF5l6TolITAKhPjy4jWOknr4i5eAch4aGzwuA8hfSsBTjJ1pT5j5ooh/L7luTK1jEfUOytoQMu7UJQ5R7O2i4bIrxRKHL+dPzJanD57AqYEtTookpU74n/9kS703kV5k=
+	t=1785321999; cv=none; b=jAIp2vb6yvK5/3IKoHdgtxuReCLq+79Qsfc4vihMMBeA8JFPPi2RQMvZ5tJU0GzlUceWeOpc3jRPPUQMAFTLSso9S0XZuoA3f7B7CS7lVcDk7o7Z/Oisa4v3sIcAiGNO2ZfJdZQfwZyoeiSd3H4m9K0miLTcT+DrSiHD11+0m7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785321994; c=relaxed/simple;
-	bh=krw/sfsyDoIbNATh5zn2IBbCLe/1TBp6iVLQC6rR4tw=;
+	s=arc-20240116; t=1785321999; c=relaxed/simple;
+	bh=eX91rPZ3hV+bCYq2WjnKREl4obSvgm79CWXZz7+fmFg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=heS4mtLBKHtKh0lsRunLJfqxdM3HQA9K92G9lfAnzSAXkdt92O47lrAelpDmgsNR+PCtLWt9XFfgVg4BnG4ve8SC57e06HzYJriwrnVOlkScvblcZNKbTTvxPzN1/UbJKLkUPAcQbbK9Vi2bVFOiexdeHjCWbOZiBdtb1wiM1gg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=gZ4THYRe; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=bVAE75qq0hQKfD2CJo/Kaqbf0mBA+6nlqKi1EOsmp+/sASd+Jk5jNHT3UwlYoJAOaaHUtWYwUP+yzXt3RwUV+e1IXoyS5Fa+gZ7NUoiqEf68WkR00aI9/wMGYKZmHJRstMPYNgV7atx0y0IQZRNdrED6Ytf8SYKaVSYm0cgDJEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=tN1gXyT9; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="gZ4THYRe"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="tN1gXyT9"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EC9101688;
-	Wed, 29 Jul 2026 03:46:27 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 290AD1688;
+	Wed, 29 Jul 2026 03:46:33 -0700 (PDT)
 Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3156D3F66F;
-	Wed, 29 Jul 2026 03:46:27 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6704B3F66F;
+	Wed, 29 Jul 2026 03:46:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1785321992; bh=krw/sfsyDoIbNATh5zn2IBbCLe/1TBp6iVLQC6rR4tw=;
+	t=1785321997; bh=eX91rPZ3hV+bCYq2WjnKREl4obSvgm79CWXZz7+fmFg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=gZ4THYReWjkQIfO3/0NY3KVdRivTSev+Kcw/dT8DqtRgdnF3+EN3suJYqCX8B9pAG
-	 uDMd2YD0+rj6uMBFa9itsOJBmIZo9u99CZlL8/43KgGmFmcm5aWMZ0YY1OB2Z2PHqi
-	 Pi0yG5fAxK/tVArBCLTIScPCEKKlsmxZCVZgqyw8=
+	b=tN1gXyT9nuj9StpiRjvILLcXdE26m27KZ3lf2mBNJEQ5NWtspLpGy00PtSSUFbcvS
+	 Ob3bewfXrTQypr3PGO9q7XuEcZRY3CEQTFZwsL8h8/jB0gYsZJvrSZZX0kv8wRqpGP
+	 k7ON2dhUd6HFEPI3+xFdE4AeTOw5SiwzGRX+nn58=
 From: Leonardo Bras <leo.bras@arm.com>
 To: Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
@@ -58,9 +58,9 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org
-Subject: [PATCH v3 04/11] KVM: arm64: dirty_bit: Add base FEAT_HACDBS cleaning routine
-Date: Wed, 29 Jul 2026 11:45:39 +0100
-Message-ID: <20260729104548.3439958-5-leo.bras@arm.com>
+Subject: [PATCH v3 05/11] kvm: Add arch-generic interface for hw-accelerated dirty-bitmap cleaning
+Date: Wed, 29 Jul 2026 11:45:40 +0100
+Message-ID: <20260729104548.3439958-6-leo.bras@arm.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260729104548.3439958-1-leo.bras@arm.com>
 References: <20260729104548.3439958-1-leo.bras@arm.com>
@@ -70,223 +70,216 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5998; i=leo.bras@arm.com; h=from:subject; bh=krw/sfsyDoIbNATh5zn2IBbCLe/1TBp6iVLQC6rR4tw=; b=owGbwMvMwCX2pizjszvTwvWMp9WSGLIyb1779VlZ0/PL3GsH51xqnsj08b74xSWliRMfJC1Tz eiK7dyc0VHKwiDGxSArpsgi+2j+Kp7vUzKOXPmxAGYOKxPIEAYuTgGYyP1tDH+FtxwxNOHbeGaX 7k5FXVnXiOnaVpOCd5wuvhPpyGapduw2wz+TD3+Knj7WZlD6svwQY8ADJ3mR1DS31O0VJYwdbkt 37GcDAA==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=6039; i=leo.bras@arm.com; h=from:subject; bh=eX91rPZ3hV+bCYq2WjnKREl4obSvgm79CWXZz7+fmFg=; b=owGbwMvMwCX2pizjszvTwvWMp9WSGLIyb15zztm3ozBmbZwr2ynNpNmFd1W+ztwopbq2L/jCk wtP3x3n7yhlYRDjYpAVU2SRfTR/Fc/3KRlHrvxYADOHlQlkCAMXpwBMpPURwz9zvaxDbLL3dhgX 9q9Ycl95S/DbCsaexkeXhA8q/N3Pd/4SI8NxDsk76wQPvNHznxOl+vl3rfJBg4pFi84518gkd8e 8XcIAAA==
 X-Developer-Key: i=leo.bras@arm.com; a=openpgp; fpr=36E6C95AE0F111CC5B6F4D2E688C33F8A0C5B0C5
 Content-Transfer-Encoding: 8bit
 
-Introduce the basic cleaning routine that is going to be used for both
-dirty-bitmap and dirty-ring routines.
+Introduce kvm_arch_dirty_log_clear() that allow implementation of
+arch-specific hardware-accelerated dirty-log routines.
 
-It sets the required registers with the input buffer, and wait for
-HACDBS to finish, which means either the task is done, or there was some
-error during processing.
+A call to that is added on both kvm_get_dirty_log_protect() and
+kvm_clear_dirty_log_protect() and will fall back to software version if
+not implemented, or any error was detected in the arch-specific routine.
 
-It is ran with preemption disabled, as a task being scheduled in could
-change the translation registers used by HACDBS and end up corrupting the
-current dirty-bit tracking and the sched-in task's S2 pagetables.
+For an arch to implement this function, it's required to provide an
+asm/kvm_dirty_bit.h and have CONFIG_HAVE_KVM_HW_DIRTY_BIT=y on building.
+
+If the arch does not implement it, and thus lack above config, the
+introduced snippet is expected to be compiled-out and have zero impact at
+runtime.
 
 Signed-off-by: Leonardo Bras <leo.bras@arm.com>
 ---
- arch/arm64/kvm/dirty_bit.c | 176 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 176 insertions(+)
+ include/linux/kvm_dirty_bit.h | 27 +++++++++++++++++++++++++++
+ virt/kvm/kvm_main.c           | 13 ++++++++++++-
+ virt/kvm/Kconfig              |  3 +++
+ 3 files changed, 42 insertions(+), 1 deletion(-)
+ create mode 100644 include/linux/kvm_dirty_bit.h
 
-diff --git a/arch/arm64/kvm/dirty_bit.c b/arch/arm64/kvm/dirty_bit.c
-index 32fe938d6bf7..33826bbd16d9 100644
---- a/arch/arm64/kvm/dirty_bit.c
-+++ b/arch/arm64/kvm/dirty_bit.c
-@@ -1,16 +1,192 @@
- // SPDX-License-Identifier: GPL-2.0-only
- /*
-  * Copyright (C) 2026 ARM Ltd.
-  * Author: Leonardo Bras <leo.bras@arm.com>
-  */
- 
- #include <asm/kvm_dirty_bit.h>
-+#include <asm/kvm_mmu.h>
- 
- /* HDBSS entry field definitions */
- #define HDBSS_ENTRY_VALID BIT(0)
- #define HDBSS_ENTRY_TTWL_SHIFT (1)
- #define HDBSS_ENTRY_TTWL_MASK (GENMASK(3, 1))
- #define HDBSS_ENTRY_TTWL(x) \
- 	(((x) << HDBSS_ENTRY_TTWL_SHIFT) & HDBSS_ENTRY_TTWL_MASK)
- #define HDBSS_ENTRY_TTWL_RESV HDBSS_ENTRY_TTWL(-4)
- #define HDBSS_ENTRY_IPA GENMASK_ULL(55, 12)
-+
-+struct hacdbs_save {
-+	u64 hacdbsbr_el2;
-+	u64 hacdbscons_el2;
-+	u64 vttbr_el2;
-+	u64 vtcr_el2;
-+	bool hcr_vm_set;
-+};
-+
-+struct hacdbs_sched_save {
-+	struct preempt_notifier notifier;
-+	struct hacdbs_save save;
-+};
-+
-+static int hacdbs_last_entry(int size)
-+{
-+	u64 cons = read_sysreg_s(SYS_HACDBSCONS_EL2);
-+	int index = FIELD_GET(HACDBSCONS_EL2_INDEX, cons);
-+
-+	switch (FIELD_GET(HACDBSCONS_EL2_ERR_REASON, cons)) {
-+	case HACDBSCONS_EL2_ERR_REASON_NOF:
-+		return size;
-+	case HACDBSCONS_EL2_ERR_REASON_IPAHACF:
-+		/* When size not a power of two >= 4k, exit with reserved TTLW */
-+		if (index >= size)
-+			return size;
-+
-+		fallthrough;
-+	default:
-+		/* In case of error, INDEX should point the faulty entry */
-+		return index;
-+	}
-+}
-+
-+static void hacdbs_start(u64 *hw_entries, int size)
-+{
-+	u64 br;
-+	/* Each entry is 8 bytes */
-+	int size_b = size * sizeof(hw_entries[0]);
-+	int size_p2 = max(roundup_pow_of_two(size_b), PAGE_SIZE);
-+
-+	/* If not using the full size of the array, put a stop entry at the end */
-+	if (size_b < size_p2)
-+		hw_entries[size] = HDBSS_ENTRY_VALID | HDBSS_ENTRY_TTWL_RESV;
-+
-+	sysreg_clear_set_s(SYS_HACDBSCONS_EL2,
-+			   HACDBSCONS_EL2_ERR_REASON | HACDBSCONS_EL2_INDEX, 0);
-+
-+	br = (virt_to_phys(hw_entries) & HACDBSBR_EL2_BADDR_MASK) |
-+	     FIELD_PREP(HACDBSBR_EL2_SZ, ilog2(size_p2) - 12) |
-+	     FIELD_PREP(HACDBSBR_EL2_EN, 1);
-+
-+	/* All writes to the array have to complete before starting */
-+	dsb(ishst);
-+
-+	write_sysreg_s(br, SYS_HACDBSBR_EL2);
-+	isb();
-+}
-+
-+static int hacdbs_stop(int size)
-+{
-+	int idx;
-+
-+	write_sysreg_s(0, SYS_HACDBSBR_EL2);
-+	isb();
-+
-+	idx = hacdbs_last_entry(size);
-+
-+	return idx;
-+}
-+
-+static void hacdbs_sched_in(struct preempt_notifier *notifier, int cpu)
-+{
-+	struct hacdbs_sched_save *save = container_of(notifier,
-+						      struct hacdbs_sched_save,
-+						      notifier);
-+
-+	write_sysreg_s(save->save.vtcr_el2, SYS_VTCR_EL2);
-+	write_sysreg_s(save->save.vttbr_el2, SYS_VTTBR_EL2);
-+	isb();
-+
-+	if (save->save.hcr_vm_set) {
-+		sysreg_clear_set_hcr(0, HCR_EL2_VM);
-+		isb();
-+	}
-+
-+	write_sysreg_s(save->save.hacdbscons_el2, SYS_HACDBSCONS_EL2);
-+	write_sysreg_s(save->save.hacdbsbr_el2, SYS_HACDBSBR_EL2);
-+	isb();
-+}
-+
-+static void hacdbs_sched_out(struct preempt_notifier *notifier,
-+			     struct task_struct *next)
-+{
-+	struct hacdbs_sched_save *save = container_of(notifier,
-+						      struct hacdbs_sched_save,
-+						      notifier);
-+
-+	if (read_sysreg_s(SYS_HACDBSBR_EL2) & HACDBSBR_EL2_EN) {
-+		save->save.hacdbsbr_el2 = HACDBSBR_EL2_EN;
-+		sysreg_clear_set_s(SYS_HACDBSBR_EL2, HACDBSBR_EL2_EN, 0);
-+		isb();
-+	} else {
-+		save->save.hacdbsbr_el2 = 0;
-+	}
-+
-+	save->save.hacdbscons_el2 = read_sysreg_s(SYS_HACDBSCONS_EL2);
-+	save->save.hacdbsbr_el2 |= read_sysreg_s(SYS_HACDBSBR_EL2);
-+	save->save.vttbr_el2 = read_sysreg_s(SYS_VTTBR_EL2);
-+	save->save.vtcr_el2 = read_sysreg_s(SYS_VTCR_EL2);
-+
-+	if (read_sysreg_s(SYS_HCR_EL2) & HCR_EL2_VM) {
-+		sysreg_clear_set_hcr(HCR_EL2_VM, 0);
-+		isb();
-+		save->save.hcr_vm_set = true;
-+	} else {
-+		save->save.hcr_vm_set = false;
-+	}
-+}
-+
-+static struct preempt_ops hacdbs_preempt_ops = {
-+	.sched_in = hacdbs_sched_in,
-+	.sched_out = hacdbs_sched_out,
-+};
-+
+diff --git a/include/linux/kvm_dirty_bit.h b/include/linux/kvm_dirty_bit.h
+new file mode 100644
+index 000000000000..fa4f6b67b623
+--- /dev/null
++++ b/include/linux/kvm_dirty_bit.h
+@@ -0,0 +1,27 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
 +/*
-+ * Clears dirty-bits for an array of pages (hw_entries) using HACDBS
-+ * Returns the number of items cleaned from the array. If returns value < size,
-+ *	there was an error in the processing.
++ * Copyright (C) 2026 ARM Ltd.
++ * Author: Leonardo Bras <leo.bras@arm.com>
 + */
-+static int dirty_bit_clear(struct kvm *kvm, u64 *hw_entries, int size)
++
++#ifndef __KVM_DIRTY_BIT_H__
++#define __KVM_DIRTY_BIT_H__
++
++#ifndef CONFIG_HAVE_KVM_HW_DIRTY_BIT
++
++static inline int kvm_arch_dirty_log_clear(struct kvm *kvm,
++					   struct kvm_memory_slot *memslot,
++					   struct kvm_clear_dirty_log *log,
++					   unsigned long *bitmap,
++					   bool *flush)
 +{
-+	int ret;
-+	u64 cons;
-+	struct hacdbs_sched_save save;
-+
-+	preempt_notifier_init(&save.notifier, &hacdbs_preempt_ops);
-+	preempt_disable();
-+	preempt_notifier_register(&save.notifier);
-+	preempt_enable();
-+
-+	__load_stage2(&kvm->arch.mmu);
-+	sysreg_clear_set_hcr(0, HCR_EL2_VM);
-+	isb();
-+
-+	hacdbs_start(hw_entries, size);
-+
-+	do {
-+		cons = read_sysreg_s(SYS_HACDBSCONS_EL2);
-+		if (FIELD_GET(HACDBSCONS_EL2_ERR_REASON, cons))
-+			break;
-+
-+		if (FIELD_GET(HACDBSCONS_EL2_INDEX, cons) >= size)
-+			break;
-+
-+		udelay(1);
-+	} while (true);
-+
-+	ret = hacdbs_stop(size);
-+
-+	sysreg_clear_set_hcr(HCR_EL2_VM, 0);
-+	isb();
-+
-+	/*
-+	 * No DSB is needed here, as kvm_flush_remote_tlbs_memslot() that happens
-+	 * later in generic dirty-cleaning code already performs a DSB before
-+	 * doing the TLBI.
-+	 */
-+
-+	preempt_disable();
-+	preempt_notifier_unregister(&save.notifier);
-+	preempt_enable();
-+
-+	return ret;
++	return -ENXIO;
 +}
++
++#else /* CONFIG_HAVE_KVM_HW_DIRTY_BIT */
++
++#include <asm/kvm_dirty_bit.h>
++
++#endif /* CONFIG_HAVE_KVM_HW_DIRTY_BIT */
++
++#endif /* __KVM_DIRTY_BIT_H__ */
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 45e784462ec6..7a13ef69b6e3 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -58,20 +58,21 @@
+ #include "async_pf.h"
+ #include "kvm_mm.h"
+ #include "vfio.h"
+ 
+ #include <trace/events/ipi.h>
+ 
+ #define CREATE_TRACE_POINTS
+ #include <trace/events/kvm.h>
+ 
+ #include <linux/kvm_dirty_ring.h>
++#include <linux/kvm_dirty_bit.h>
+ 
+ 
+ /* Worst case buffer size needed for holding an integer. */
+ #define ITOA_MAX_LEN 12
+ 
+ MODULE_AUTHOR("Qumranet");
+ MODULE_DESCRIPTION("Kernel-based Virtual Machine (KVM) Hypervisor");
+ MODULE_LICENSE("GPL");
+ 
+ /* Architectures should define their poll value according to the halt latency */
+@@ -2255,39 +2256,44 @@ static int kvm_get_dirty_log_protect(struct kvm *kvm, struct kvm_dirty_log *log)
+ 		 * is some code duplication between this function and
+ 		 * kvm_get_dirty_log, but hopefully all architecture
+ 		 * transition to kvm_get_dirty_log_protect and kvm_get_dirty_log
+ 		 * can be eliminated.
+ 		 */
+ 		dirty_bitmap_buffer = dirty_bitmap;
+ 	} else {
+ 		dirty_bitmap_buffer = kvm_second_dirty_bitmap(memslot);
+ 		memset(dirty_bitmap_buffer, 0, n);
+ 
++		if (kvm_arch_dirty_log_clear(kvm, memslot, NULL,
++					     dirty_bitmap_buffer, &flush) >= 0)
++			goto out;
++
+ 		KVM_MMU_LOCK(kvm);
+ 		for (i = 0; i < n / sizeof(long); i++) {
+ 			unsigned long mask;
+ 			gfn_t offset;
+ 
+ 			if (!dirty_bitmap[i])
+ 				continue;
+ 
+ 			flush = true;
+ 			mask = xchg(&dirty_bitmap[i], 0);
+ 			dirty_bitmap_buffer[i] = mask;
+ 
+ 			offset = i * BITS_PER_LONG;
+ 			kvm_arch_mmu_enable_log_dirty_pt_masked(kvm, memslot,
+ 								offset, mask);
+ 		}
+ 		KVM_MMU_UNLOCK(kvm);
+ 	}
+ 
++out:
+ 	if (flush)
+ 		kvm_flush_remote_tlbs_memslot(kvm, memslot);
+ 
+ 	if (copy_to_user(log->dirty_bitmap, dirty_bitmap_buffer, n))
+ 		return -EFAULT;
+ 	return 0;
+ }
+ 
+ 
+ /**
+@@ -2366,45 +2372,50 @@ static int kvm_clear_dirty_log_protect(struct kvm *kvm,
+ 	    (log->num_pages < memslot->npages - log->first_page && (log->num_pages & 63)))
+ 	    return -EINVAL;
+ 
+ 	kvm_arch_sync_dirty_log(kvm, memslot);
+ 
+ 	flush = false;
+ 	dirty_bitmap_buffer = kvm_second_dirty_bitmap(memslot);
+ 	if (copy_from_user(dirty_bitmap_buffer, log->dirty_bitmap, n))
+ 		return -EFAULT;
+ 
++	if (kvm_arch_dirty_log_clear(kvm, memslot, log, dirty_bitmap_buffer,
++				     &flush) >= 0)
++		goto out;
++
+ 	KVM_MMU_LOCK(kvm);
+ 	for (offset = log->first_page, i = offset / BITS_PER_LONG,
+ 		 n = DIV_ROUND_UP(log->num_pages, BITS_PER_LONG); n--;
+ 	     i++, offset += BITS_PER_LONG) {
+ 		unsigned long mask = *dirty_bitmap_buffer++;
+ 		atomic_long_t *p = (atomic_long_t *) &dirty_bitmap[i];
+ 		if (!mask)
+ 			continue;
+ 
+ 		mask &= atomic_long_fetch_andnot(mask, p);
+ 
+ 		/*
+ 		 * mask contains the bits that really have been cleared.  This
+ 		 * never includes any bits beyond the length of the memslot (if
+ 		 * the length is not aligned to 64 pages), therefore it is not
+ 		 * a problem if userspace sets them in log->dirty_bitmap.
+ 		*/
+ 		if (mask) {
+ 			flush = true;
++
+ 			kvm_arch_mmu_enable_log_dirty_pt_masked(kvm, memslot,
+ 								offset, mask);
+ 		}
+ 	}
+ 	KVM_MMU_UNLOCK(kvm);
+-
++out:
+ 	if (flush)
+ 		kvm_flush_remote_tlbs_memslot(kvm, memslot);
+ 
+ 	return 0;
+ }
+ 
+ static int kvm_vm_ioctl_clear_dirty_log(struct kvm *kvm,
+ 					struct kvm_clear_dirty_log *log)
+ {
+ 	int r;
+diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+index 794976b88c6f..f8757b5b84b3 100644
+--- a/virt/kvm/Kconfig
++++ b/virt/kvm/Kconfig
+@@ -13,20 +13,23 @@ config HAVE_KVM_PFNCACHE
+ 
+ config HAVE_KVM_IRQCHIP
+        bool
+ 
+ config HAVE_KVM_IRQ_ROUTING
+        bool
+ 
+ config HAVE_KVM_DIRTY_RING
+        bool
+ 
++config HAVE_KVM_HW_DIRTY_BIT
++       bool
++
+ # Only strongly ordered architectures can select this, as it doesn't
+ # put any explicit constraint on userspace ordering. They can also
+ # select the _ACQ_REL version.
+ config HAVE_KVM_DIRTY_RING_TSO
+        bool
+        select HAVE_KVM_DIRTY_RING
+        depends on X86
+ 
+ # Weakly ordered architectures can only select this, advertising
+ # to userspace the additional ordering requirements.
 -- 
 2.55.0
 
