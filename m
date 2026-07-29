@@ -1,118 +1,158 @@
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8626B48EBE8
-	for <kvmarm@lists.linux.dev>; Wed, 29 Jul 2026 13:34:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 727C848D889
+	for <kvmarm@lists.linux.dev>; Wed, 29 Jul 2026 13:36:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785332078; cv=none; b=GtCUKOCtgB+I5E0i8NVci7x4wmNW5eaYH8PTuy11VoM+jK1EDdP9N4EU/zWu2RZ6WFHa4g7fIs6aSYV4EPE+D/u/ohCzSmmcl3QDeKthbsR9XurOVUbFb4oLkwMuScTrpie/DLk5Fso2Gu5LKVnRNwSi9pvEzI0WiDrYyFm+XP0=
+	t=1785332166; cv=none; b=VMiycK3mXuiA/wPbVbwZeB9uJstR9ErMHP/8E4lQfzG4tqHFnARqqo0+EfQNqgcrvKZLQGxS9zWt63dJxHK9V8h/8Us2SxNPtxZlxSi8UavtCTiNlSN+vutYCq0/njeT9Bzbqt4qr95mDWM2+No1gwqBERDSRhTzq7ui3DlAgys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785332078; c=relaxed/simple;
-	bh=th4hZKzg+ZvNX3vxWSicPLBYvZeuXaCwq1TOAX6BJ/I=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RDHTERCdgSNfhJM1wrFt+tlpGfzK+4rTGs0nOcqXO1eZvYoYQgIqCuliy1OI0q0uORPpdeZIiiuWnS6r1juSBxD83RpaPtzN/nr3L/H9d89BwK2TPLH+K70/ys9dfU+9BJw4Hhuh66i67H2AeetmVIY3UqNMk2/GfF9/bh+oG18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=EfEiL57T; arc=none smtp.client-ip=91.218.175.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1785332166; c=relaxed/simple;
+	bh=GiZG2esfvlNhFns5MrJGN6yUnJUvKnxLR89MSrmvoaA=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=Vv9VWlpmm6nUEnkx7sgDlSswsTEg7HbomqFfJAZ+cfAWlq++gCEd9tAxDOSPHROaZgOzKnuMHHhZwpBW6oyQkJHMsLhfuO4L89XexFgHLQZHJEdjz6BaBptda3hlzkRyb9wVx1iqNxERrwwRYUmvubELFuF7tTXMKs3ZtYor9Xc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VpShLxfM; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="EfEiL57T"
-X-Gm-Message-State: AOJu0YxFzOp+LepYEeSJrff9IVQhOaBuEGqeohoCVn3cPkeKwDnh38VM
-	L/3unjwJ+LnAJEyc62j1rsBwQ2qF6flh+JavxfDahLmrkEQb7uxDXccyorczYC4OEZxBKuOGFeL
-	zrc+bgU2IM0jV8kUa+2WnfXOcuhvz05ejeD93q/yD
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1785332069;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jNw0oLXC06WVAdDTxys3cThOgITa6WTIg6WIyFuBM4E=;
-	b=EfEiL57T//STyi2VtuVLkpbGvgobh4iTlwBD3VxEa6oiIMY3iawYdXJLeT9dPYYcP+8k5g
-	fda/jEprF4IVNAj/YElkP+IWBrR6mnTgMyA/7Rv4ov54UZ6/SmivWHIudHivaMHmQ5G9gd
-	upJl7hYM/F3D6IbWQMJ03/RmkmolKtA=
-X-Received: by 2002:a05:622a:5597:b0:528:3186:5799 with SMTP id
- d75a77b69052e-52b2b3daf85mr11629451cf.10.1785332056716; Wed, 29 Jul 2026
- 06:34:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VpShLxfM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABD741F000E9;
+	Wed, 29 Jul 2026 13:36:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785332161;
+	bh=jGA8A0nJ7e1VZ64i3nWVOM7u+u6pjWJXo5ER+jnu9nU=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=VpShLxfMHeDSZvcN+P0JzyjwyjM/QDQeHQ7HSMrPfTrfruYmHCuk2wisU2oWoLzBl
+	 vbNGIvBui0rSdWocpfb6ZdVn5Fet+3LCQaSNolFL89LK68c2UpIeckGamVTXtq5Ekd
+	 Pe/5WY+042LzA40UuwUXRq2XAVJYWB1+/OFE3TlT75xiEEH+TtTHKs1QXVTeu6OpCt
+	 aicMBibbOd1Hs7k98O5onJv/EfOk85qNf853RAOhr2Gk2bPal+h8Ugh10St7Nk3PEp
+	 25MlICgqTXWlKDVOj5BrE5b15GhvSNjhc3Xttxds612wffdYI9Im9M2zS64T+3V20+
+	 xfH6rFHHZZeuw==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v7 8/8] KVM: arm64: Implement lazy vCPU state sync for
+ non-protected guests
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Fuad Tabba" <fuad.tabba@linux.dev>
+Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20260729131823.2021516-9-fuad.tabba@linux.dev>
+References: <20260729131823.2021516-1-fuad.tabba@linux.dev>
+ <20260729131823.2021516-9-fuad.tabba@linux.dev>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 29 Jul 2026 13:36:00 +0000
+Message-Id: <20260729133600.ABD741F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20260729131823.2021516-1-fuad.tabba@linux.dev>
- <20260729131823.2021516-5-fuad.tabba@linux.dev> <20260729133136.50EFA1F00A3D@smtp.kernel.org>
-In-Reply-To: <20260729133136.50EFA1F00A3D@smtp.kernel.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Wed, 29 Jul 2026 14:33:40 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTw8zvPuMMefpGCMFnDRNawVkc_+XdW8pDxj40g=AFQ_sg@mail.gmail.com>
-X-Gm-Features: AUfX_mxLLmBZkNGVYqvd3CLjf6J6a3kAMI39-B55sRILmCBhxKw48HHM8UmVVDM
-Message-ID: <CA+EHjTw8zvPuMMefpGCMFnDRNawVkc_+XdW8pDxj40g=AFQ_sg@mail.gmail.com>
-Subject: Re: [PATCH v7 4/8] KVM: arm64: Move PSCI helper functions to a shared header
-To: sashiko-reviews@lists.linux.dev
-Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>, 
-	Marc Zyngier <maz@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Migadu-Flow: FLOW_OUT
 
-On Wed, 29 Jul 2026 at 14:31, <sashiko-bot@kernel.org> wrote:
->
-> Thank you for your contribution! Sashiko AI review found 1 potential issu=
-e(s) to consider:
-> - [Low] Missing header dependencies in include/kvm/arm_psci.h
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+s) to consider:
+- [High] Missing HCR_EL2 state synchronization breaks virtual SError inject=
+ion, causing an infinite exception loop.
+- [High] Lazy state sync fails to flush context after KVM_REQ_VCPU_RESET, c=
+ausing vCPU resets (e.g., PSCI CPU_ON) to be ignored.
+--
 
-nope:
+--- Patch [8]: [PATCH v7 8/8] KVM: arm64: Implement lazy vCPU state sync fo=
+r non-protected guests ---
+commit 80df5c4ca2cca0a1726813fa129b353353482892
+Author: Fuad Tabba <fuad.tabba@linux.dev>
 
-https://lore.kernel.org/all/CA+EHjTwpB2fmoYGfkP5RVZcB4sgbVPQ0=3DQR5dyUJnpQ_=
-VQa+pA@mail.gmail.com/
+KVM: arm64: Implement lazy vCPU state sync for non-protected guests
 
-/fuad
+This commit optimizes world switches for non-protected guests by deferring
+the copy of the vCPU register context between the host and hypervisor.
+State is now only synced on entry if marked dirty, and on exit only when
+explicitly needed by the host.
 
-> --
->
-> --- Patch [4]: [PATCH v7 4/8] KVM: arm64: Move PSCI helper functions to a=
- shared header ---
-> commit 4d648c3ac7ab8549b7dcf7d52de4756db87e329c
-> Author: Fuad Tabba <fuad.tabba@linux.dev>
->
-> KVM: arm64: Move PSCI helper functions to a shared header
->
-> This commit moves several PSCI helper functions from psci.c to the shared
-> include/kvm/arm_psci.h header. This makes them available for upcoming
-> protected-guest PSCI calls at EL2.
->
-> > diff --git a/include/kvm/arm_psci.h b/include/kvm/arm_psci.h
-> > index cbaec804eb839..f86a006d67136 100644
-> > --- a/include/kvm/arm_psci.h
-> > +++ b/include/kvm/arm_psci.h
->
-> [ ... ]
->
-> > +/* Narrow the PSCI register arguments (r1 to r3) to 32 bits. */
-> > +static inline void kvm_psci_narrow_to_32bit(struct kvm_vcpu *vcpu)
-> > +{
-> > +     int i;
-> > +
-> > +     /*
-> > +      * Zero the input registers' upper 32 bits. They will be fully
-> > +      * zeroed on exit, so we're fine changing them in place.
-> > +      */
-> > +     for (i =3D 1; i < 4; i++)
-> > +             vcpu_set_reg(vcpu, i, lower_32_bits(vcpu_get_reg(vcpu, i)=
-));
-> > +}
->
-> [Severity: Low]
-> Does this header need to include additional dependencies to remain
-> self-contained?
->
-> This inline function uses vcpu_set_reg() and vcpu_get_reg(), which are de=
-fined
-> in <asm/kvm_emulate.h>, as well as lower_32_bits() from <linux/wordpart.h=
->.
-> If a new C file includes <kvm/arm_psci.h> without first including those
-> dependencies, it looks like it could trigger a build failure.
->
-> --
-> Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260729131823.20=
-21516-1-fuad.tabba@linux.dev?part=3D4
+> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> --- a/arch/arm64/kvm/handle_exit.c
+> +++ b/arch/arm64/kvm/handle_exit.c
+> @@ -486,9 +486,32 @@ int handle_exit(struct kvm_vcpu *vcpu, int exception=
+_index)
+>  	}
+>  }
+> =20
+> +static void handle_exit_pkvm_state(struct kvm_vcpu *vcpu, int exception_=
+index)
+> +{
+> +	int exception_code =3D ARM_EXCEPTION_CODE(exception_index);
+> +
+> +	if (!is_protected_kvm_enabled() || kvm_vm_is_protected(vcpu->kvm))
+> +		return;
+> +
+> +	/*
+> +	 * Sync the context back when the host will read (trap) or write
+> +	 * (SError) it. Preempt-off here, so the loaded hyp vCPU is stable.
+> +	 */
+> +	if (exception_code =3D=3D ARM_EXCEPTION_TRAP ||
+> +	    exception_code =3D=3D ARM_EXCEPTION_EL1_SERROR ||
+> +	    ARM_SERROR_PENDING(exception_index)) {
+> +		kvm_call_hyp_nvhe(__pkvm_vcpu_sync_state);
+> +		vcpu_set_flag(vcpu, PKVM_HOST_STATE_DIRTY);
+> +	} else {
+> +		vcpu_clear_flag(vcpu, PKVM_HOST_STATE_DIRTY);
+
+[Severity: High]
+Is it possible for KVM_REQ_VCPU_RESET updates to be ignored due to this
+cleared flag?
+
+If a secondary vCPU is powered on (for example, via PSCI CPU_ON), it
+receives KVM_REQ_VCPU_RESET and gets kicked, leading to an exit with an
+IRQ. Since that exit takes this else branch and clears the dirty flag,
+and the reset request is processed afterward in kvm_vcpu_check_requests()
+which modifies the host-side vCPU context, wouldn't flush_hyp_vcpu() skip
+syncing this updated reset state because the flag remains cleared?
+
+This could result in the target vCPU resuming with its pre-IRQ stale
+context, eventually overwriting the new reset state on the next exit.
+
+> +	}
+> +}
+> +
+
+[ ... ]
+
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe=
+/hyp-main.c
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> @@ -203,9 +255,16 @@ static void sync_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_=
+vcpu)
+>  	fpsimd_sve_sync(&hyp_vcpu->vcpu);
+>  	sync_debug_state(hyp_vcpu);
+> =20
+> -	host_vcpu->arch.ctxt		=3D hyp_vcpu->vcpu.arch.ctxt;
+> -
+> -	host_vcpu->arch.hcr_el2		=3D hyp_vcpu->vcpu.arch.hcr_el2;
+
+[Severity: High]
+Does removing this HCR_EL2 assignment break virtual SError injection and
+cause an infinite exception loop?
+
+When the host injects a virtual SError into a non-protected guest under
+pKVM by setting HCR_VSE in the host-side vcpu->arch.hcr_el2, the hardware
+automatically clears the VSE bit in the physical HCR_EL2 register once the
+guest takes the exception.
+
+Without syncing this hardware-cleared state back to the host here, the
+host's HCR_VSE bit remains set. On the next entry, flush_hyp_vcpu() will
+repeatedly re-inject the stale HCR_VSE bit from the host into the hyp vCPU,
+locking up the guest.
+
+> +	if (pkvm_hyp_vcpu_is_protected(hyp_vcpu)) {
+> +		host_vcpu->arch.ctxt =3D hyp_vcpu->vcpu.arch.ctxt;
+> +	} else {
+> +		/*
+> +		 * PC feeds trace_kvm_exit(), PSTATE.SS the host software-step
+> +		 * machine, and both run before the next on-demand ctxt sync.
+> +		 */
+> +		host_vcpu->arch.ctxt.regs.pc =3D hyp_vcpu->vcpu.arch.ctxt.regs.pc;
+> +		host_vcpu->arch.ctxt.regs.pstate =3D hyp_vcpu->vcpu.arch.ctxt.regs.pst=
+ate;
+> +	}
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260729131823.2021=
+516-1-fuad.tabba@linux.dev?part=3D8
