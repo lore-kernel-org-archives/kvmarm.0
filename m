@@ -1,58 +1,51 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B2A542E00A;
-	Thu, 30 Jul 2026 12:40:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FD8F43846C;
+	Thu, 30 Jul 2026 13:40:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785415201; cv=none; b=B2INS+BNfGwa9NFCaiTYr1EQN5H3zweLymE7zmPvwbIkCaXVQx1/ewrMbctKS5BXJ9pGAYMIiTzN9IiWFBIiHAONaApLIm2bbU4buDliKI8XiedRE3FF4p46wHEy2pFU5cdmkJiExpMH3MzyxPNu++UuwaEHxtV8p4e1MoHcVtU=
+	t=1785418802; cv=none; b=KP2kvcY9cuQw6kap2YBrSg874cbTs19jEENUtjJ0umVNdvBp1OJMMpPexEtaUD4a6suP8y2q3+4TH8c4bVKLVT/iaM/yMXhsMfmCqpikiYBAr73VqQy8LYgEHsX6NMRnnuzBgPCfZ4LaDx7Mnncj3697Qy7iKZSw/hJVNGgjlss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785415201; c=relaxed/simple;
-	bh=YqOKDmF9/H9jh4NntpuxPDa3eeApiYIE1miaTdp4/HM=;
+	s=arc-20240116; t=1785418802; c=relaxed/simple;
+	bh=S+k1k0fRNbxqwmvAZnyBTPG7LuRFMSqvnSxW0D/ZHY4=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JjJ4Wmrqi4H94BuQFp90EUnD1qAkfhS6lmSjC+GVAeajbq8jzMD8Q9S/dU7UFsw5+gEDQPn0+BSM5UxMNSQ2Q0CFM86Syxcf0fBScnvOAAQxeN48i1FhrEMJtDeFVC59KJUn/Ja3RLDoo/85dJmJipZOlVDXd/y6C9677FdZ1LE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LdKV0UX9; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=u5FG1HjvXDK9IMnxG6+Kjh4wqbNKEBhmI6IPAqBMdkaaKIqL/ttxeQJI3m9QZBjoW9cnrdT8LSrEhtrBewvzctA4DJWOgG5Q/Vk5JVqL5i8q5xKpVq0evy1p3tICNaHSKrD689jZURuj9CTDwFBhUlkcLRYGcPp540qmVd0m2QU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TF/gjU1P; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LdKV0UX9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 750551F000E9;
-	Thu, 30 Jul 2026 12:40:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TF/gjU1P"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7F531F000E9;
+	Thu, 30 Jul 2026 13:40:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785415200;
-	bh=ylBp3ID7LGMPxx9g2HOSILblRK6WLP/WK8iYeAR7QiU=;
+	s=k20260515; t=1785418800;
+	bh=CcWkhZ8w+K45IMXyGbvqAYSZz9IRowVkBzgpTkkrMJE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=LdKV0UX9bNSTpp24GeRMDpcBAg6s2yEDz5n+vTHl4dsXmoxN0mtKB6u8SM4i3SUQK
-	 F+ZX/uf2pwzfh+DR5UMvWv0Z7Kd9gJJ+TsJ5Tl83T+wY1ui9uDzDMUJMXqBsUiNneC
-	 AW6gz5hhjtg6G4uR7yfTJN0EAbOji8QBjIeQwaaYb4zXiOT2dTotWlOGXxtzBj5gRj
-	 AGHc1cpbyl/sVs7JmfyNdK3qc1A1UDIwcSitY4rXfwKpERcs5JhTkhJjquXj7aTUwB
-	 WS5iPmR1Fwh+ykoMmaAww/F1QknOuKt5Pe8mOjUJs2DJk9mQM3VgMJsqn4yO3tTcQ/
-	 VjI6muE/VhgLw==
+	b=TF/gjU1PcFVmYGhx/3aLEDfGBqcCuzmC89cJSXAiYpBtdnawszepSKCEQMHAJaFsu
+	 prbqGH5AuspIt/1I54kDfDbqpgYSG/bXJ2HaTERmS8uYa1tEQ6PJ+YoTxKUHLa4QHT
+	 eSPx3My+IO8z7RzRe2iIntiTym0L6UKQ4n0efaddimW+Ajbd2s0/JrTytg/y2oNqPW
+	 jtxBrLfqtaNaEs7eWyN5ZlShWfwovV391u8vs6bu4W8Mby3CDSJzoBNGC9T+tOnbQN
+	 HgOz/yENXW98oEGf7igBrjWWDjiSv7HAdCN/sH+ZN5E6zEXm9m018KegLOGd1jZKl7
+	 ypVN9xXUR4jJg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wpQ3K-0000000AWkz-2GkT;
-	Thu, 30 Jul 2026 12:39:58 +0000
-Date: Thu, 30 Jul 2026 13:39:58 +0100
-Message-ID: <86ik5wd529.wl-maz@kernel.org>
+	id 1wpQzO-0000000AY9r-29b5;
+	Thu, 30 Jul 2026 13:39:58 +0000
+Date: Thu, 30 Jul 2026 14:39:58 +0100
+Message-ID: <86h5lgd2a9.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Mostafa Saleh <smostafa@google.com>
-Cc: linux-kernel@vger.kernel.org,
+To: sashiko-reviews@lists.linux.dev
+Cc: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	oupton@kernel.org,
-	seiden@linux.ibm.com,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	vdonnefort@google.com,
-	tabba@google.com,
-	sebastianene@google.com,
-	keirf@google.com
-Subject: Re: [PATCH v3] KVM: arm64: Optimize protected mode with FWB and DIC
-In-Reply-To: <20260723162002.3848054-1-smostafa@google.com>
-References: <20260723162002.3848054-1-smostafa@google.com>
+	"Oliver\
+ Upton" <oupton@kernel.org>
+Subject: Re: [PATCH v4 03/29] KVM: arm64: Merge guest's HCRX_EL2 using NV_HCRX_GUEST_EXCLUDE
+In-Reply-To: <86o6fodhya.wl-maz@kernel.org>
+References: <20260730071022.296811-1-maz@kernel.org>
+	<20260730071022.296811-4-maz@kernel.org>
+	<20260730072930.85DB21F000E9@smtp.kernel.org>
+	<86o6fodhya.wl-maz@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -64,35 +57,59 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: smostafa@google.com, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oupton@kernel.org, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, vdonnefort@google.com, tabba@google.com, sebastianene@google.com, keirf@google.com
+X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev, oupton@kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 23 Jul 2026 17:20:02 +0100,
-Mostafa Saleh <smostafa@google.com> wrote:
+On Thu, 30 Jul 2026 09:01:33 +0100,
+Marc Zyngier <maz@kernel.org> wrote:
 > 
-> KVM opportunistically enables FWB if supported by the system for guest
-> VMs, which allows it to elude cache maintenance for data as they are
-> forced to be cacheable from stage-2.
-> In that case, __clean_dcache_guest_page() will immediately return.
-> However in protected mode, before calling __clean_dcache_guest_page()
-> it loops over the range and fix_map/unmap it, issuing TLB
-> invalidations, dsb() and isb() unnecessarily.
-> 
-> This can be optimized by returning early if FWB is supported,
-> kvm_pgtable_stage2_map() already issues dsb() and tlb invalidation
-> functions issue dsb() for the unmap path.
-> 
-> Similarly for DIC, we can omit the call in
-> invalidate_icache_guest_page()
-> 
-> No isb() needed as ERET is context synchronization event.
-> 
-> Signed-off-by: Mostafa Saleh <smostafa@google.com>
+>
+> Furthermore, trapping non-matching CPUs is a guest decision, and L0 is
+> not in charge of deciding this. However, what is missing is the
+> redirection of the exception to L1 when it fires.
 
-Acked-by: Marc Zyngier <maz@kernel.org>
+I've changed my tune on this.
+
+Flipping between L0 and L1 to fixup the brokenness of the architecture
+is not great, because the vcpu could have migrated in the interval
+and, and be subjected to another similar exception. This results in
+forward-progress issues on top of the obvious performance overhead.
+
+I'll add something like this, either as a separate patch or as a fixup
+if I have to respin the series.
 
 	M.
+
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 7b27296c94607..5311a0dd16af7 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -330,7 +330,7 @@ static inline void __deactivate_traps_mpam(void)
+  * Just like for HCR_EL2, we can't let the guest mess with some of the
+  * basics we rely on in HCRX_EL2. However, the major difference is that
+  * HCRX_EL2 only affects EL1, and never EL2 (sudden outburst of sanity, I
+- * guess). So it is always the guest inflicting it on its own guestx.
++ * guess). So it is always the guest inflicting it on its own guest.
+  *
+  * Things we don't want to let the guest control are:
+  *
+@@ -339,10 +339,14 @@ static inline void __deactivate_traps_mpam(void)
+  * - PTTWI: Similarly, it is for us to decide whether Reduced Coherency for
+  *   the PTW is a thing. It really isn't.
+  *
++ * - MCE2: FEAT_MOPS generated exceptions for Option-{A,B} interoperability
++ *   are always handled on the host and not forwarded to a guest hypervisor
++ *   in order to give the (poor) illusion of a homogeneous system.
++ *
+  * - EnIDCP128: We don't allow IMPDEF sysregs -- full stop.
+  */
+ #define NV_HCRX_GUEST_EXCLUDE	(HCRX_EL2_TMEA	    | HCRX_EL2_PTTWI | \
+-				 HCRX_EL2_EnIDCP128)
++				 HCRX_EL2_MCE2	    | HCRX_EL2_EnIDCP128)
+ 
+ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
+ {
 
 -- 
 Without deviation from the norm, progress is not possible.
