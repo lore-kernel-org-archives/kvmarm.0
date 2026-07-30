@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 936363B8135;
-	Thu, 30 Jul 2026 07:11:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 303A93BB10B;
+	Thu, 30 Jul 2026 07:11:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785395465; cv=none; b=GSHUJIMKo+YZ1+4krTEryUCZWiM3VpdvcyGtB+5l7pNRCZ6PnqpQIWFKvkdjsr00zjBixTHn5rzKjp8KOZB6hSCaBJtKc4ZkxWXrRIO4GWhDCg9sRoMREJD+sHk+00w6yIAmLZUiv3ThQSbaQQaDYJSr4I3diUL9wslTz6LisTU=
+	t=1785395466; cv=none; b=N3B5sxMSZqzKJunyJiVMIVLemR3DB/NM0nWmVe7bOoH3fTpdUlvKLWEtzqxoqVpePE5PEr7IqAIERyjMdX8i7scC1ITRQfaSsJ9K+JQZ+ux2mFW0s8SdDjFeGUCngVOvHhSMetkhtd20h+xdRzQrB9tFBnvQdOtkeUJibGZIDOY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785395465; c=relaxed/simple;
-	bh=Z1iqt8FuBsxB2iEqvV8T0TL0zx66/KdGOpRA+ZHatCg=;
+	s=arc-20240116; t=1785395466; c=relaxed/simple;
+	bh=Ctm60o0xAufdR3O8pdvaLg0AXjj7b4MUSwEs8kEpTXs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZMSp+WgPdw3u4ZJQ9/YGAz1VrIpJzo+NJtHg9ooEFCmk/6cmL1tkQZ+vMWILXOZZ6rKNgwk73yc7ByTQJimuuVr39NH0aiacSc29SHHuCPuzi6et2IlCD8lFGleRNKW/zB5B0R8pdJZzzcUBALqbsP9IEYgkSu/FLPi9OnmxeUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a/s2fqW8; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=tRcdt0D/2Cbl482fd7QUeP/mPRUQeJ56VQcWV21QnxI9o0ngcILsW8F24pXYCQIh/ix1FxxUCz9O8NzgCWQAN2T2/Nb0apdx420ab0I1+jXKm2iUTlviuayYBSKMxM/LQ4qEVck2PbHEvfCFtn/EtKOTQqxPXneJMakus3C+mwQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SSBp+4jp; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a/s2fqW8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4D041F01562;
-	Thu, 30 Jul 2026 07:10:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SSBp+4jp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDF7E1F01564;
+	Thu, 30 Jul 2026 07:10:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785395452;
-	bh=2eYyet/VFfIhBqni7FV440APhMlnHCkir6INX8Tdx58=;
+	s=k20260515; t=1785395453;
+	bh=JAhWhZje9gmOpJhtyVPvANp/6kcIKzyOvMGnE5qE5Xw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=a/s2fqW8m3armEZqYn0elguayUEoWshuZi4WK3KnUhncowT0IHZRfzJsfLrH+T0O0
-	 Szv3u5rgInHvBsMUwrmWJtsMgwVaO2b3RC4cs3eBWdpwC4eX8lir9uHCW9uL9DUTk4
-	 npwTqQtJmtSfruDDMr0f/t7JdH7FTv2k4dxvNiQksnbdeFOKrcr0rxR+8X6LtUQnFp
-	 F6xrwAba9HnQU4JamlL+zr7EABx/gz98i4C1JOrrVJ1mHZmGODW2Mj3bTOBg7Yy+aZ
-	 YXIus07NgYJTXOhn52oumYjiSgnnzxmrOErAc8RAqqC2QDupm4LYy4ser6mn9VZ2tF
-	 s9Dr+K1F5tRew==
+	b=SSBp+4jpb1EWcn9BcacpjFcmc1dj4Xz9sU0xd3TFoPMuQ2q7JoQ9UFGMAUVLVBbjc
+	 vB9atIHrq9B0r3IkwkeKbdOay1V7ujcU1dMMYiLMGaOAJhNBCIj/g+44AATLU7OgBg
+	 yp6vfMFShyv5XhOCxiQxd0HqvWkKyYC2M+CGC3HDDsUc31+fFN48uSmNiPGV+Q+1er
+	 I6Vri6GULZk8Q19PS7YHzDEl6SGIQGHErpm1lJqFvaQMkH9L/0dSIE+XKp70o+/ON8
+	 F2WMVE0VZz5zOazzZ/s0ZZTPCmdjeNzHr4YzYEWqQPy+DV9M/SmGXi921pRdu6QyBZ
+	 gt2o0gGzImG2A==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wpKup-0000000AOpW-0q89;
-	Thu, 30 Jul 2026 07:10:51 +0000
+	id 1wpKuq-0000000AOpW-18cG;
+	Thu, 30 Jul 2026 07:10:52 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -44,9 +44,9 @@ Cc: Steffen Eiden <seiden@linux.ibm.com>,
 	Yao Yuan <yaoyuan@linux.alibaba.com>,
 	Wei-Lin Chang <weilin.chang@arm.com>,
 	Vladimir Murzin <vladimir.murzin@arm.com>
-Subject: [PATCH v4 13/29] arm64: sysreg: Add NVHCR_EL2 description as a mirror of HCR_EL2
-Date: Thu, 30 Jul 2026 08:10:06 +0100
-Message-ID: <20260730071022.296811-14-maz@kernel.org>
+Subject: [PATCH v4 18/29] KVM: arm64: Add kvm_has_nv{2,3}() predicates
+Date: Thu, 30 Jul 2026 08:10:11 +0100
+Message-ID: <20260730071022.296811-19-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260730071022.296811-1-maz@kernel.org>
 References: <20260730071022.296811-1-maz@kernel.org>
@@ -62,32 +62,48 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-FEAT_NV3 introduces a new register that contains the HCR_EL2 value
-exposed to a NV guest. As such, it has the exact same layout as
-HCR_EL2.
+Add a new set of predicates indicating whether VM is capable of
+NV2, NV3, and is in a nested NV3 context.
 
-Describe NVHCR_EL2 as a mapping to HCR_EL2.
+This is going to become useful as we start dealing with a mix of
+behaviours (NV2, NV3, NV2 on NV3...).
 
 Reviewed-by: Yuan Yao <yaoyuan@linux.alibaba.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/tools/sysreg | 3 +++
- 1 file changed, 3 insertions(+)
+ arch/arm64/include/asm/kvm_emulate.h | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index 28755f70f0bf0..42839d2b15ae4 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -4266,6 +4266,9 @@ Field	1	E2TRE
- Field	0	E0HTRE
- EndSysreg
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 9831166695186..bdb7dfaa271cd 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -266,6 +266,25 @@ static inline bool vserror_state_is_nested(struct kvm_vcpu *vcpu)
+ 	       (__vcpu_sys_reg(vcpu, HCRX_EL2) & HCRX_EL2_TMEA);
+ }
  
-+Sysreg	NVHCR_EL2	3	4	1	5	0
-+Mapping	HCR_EL2
-+EndSysreg
- 
- Sysreg HDFGRTR2_EL2	3	4	3	1	0
- Res0	63:25
++static inline bool kvm_has_nv2(struct kvm *kvm)
++{
++	return (cpus_have_final_cap(ARM64_HAS_NESTED_VIRT) &&
++		kvm_has_feat(kvm, ID_AA64MMFR4_EL1, NV_frac, NV2_ONLY));
++}
++
++static inline bool kvm_has_nv3(struct kvm *kvm)
++{
++	return (cpus_have_final_cap(ARM64_HAS_NV3) &&
++		kvm_has_feat(kvm, ID_AA64MMFR4_EL1, NV_frac, NV3));
++}
++
++static inline bool is_nested_nv3_ctxt(struct kvm_vcpu *vcpu)
++{
++	return (has_vhe() && kvm_has_nv3(vcpu->kvm) && is_nested_ctxt(vcpu) &&
++		(__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_EL2_NV) &&
++		(__vcpu_sys_reg(vcpu, HCRX_EL2) & HCRX_EL2_NVTGE));
++}
++
+ /*
+  * The layout of SPSR for an AArch32 state is different when observed from an
+  * AArch64 SPSR_ELx or an AArch32 SPSR_*. This function generates the AArch32
 -- 
 2.47.3
 
