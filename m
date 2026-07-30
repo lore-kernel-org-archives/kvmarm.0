@@ -1,127 +1,177 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7654233F8AA
-	for <kvmarm@lists.linux.dev>; Thu, 30 Jul 2026 10:23:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1474142D76D;
+	Thu, 30 Jul 2026 12:37:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785407028; cv=none; b=Hoemwc1q2wAg5vsggtAFBnWkOFYVFdOT6XJpxOkNafe/nwneWgbKOkiZJy6enPzND9vrrl95loFz6TjBg7zKzidy+c62EqDSjUdfX5BvO0M8+Z6KNHXKYSZbK6oPOCk4Fz8ddXaOnz2MGQQRNk5LpPD724/vHYhsZIaALpuisKQ=
+	t=1785415074; cv=none; b=uwiamG9i1jwwYLhPwOcXyvSnKoj+aj5B7DyjQaJz0BthJWiUkLg3vXenQwuiVP+PMnx7JA9dwSogz3zfl7IIflph2l5O2dZY9uuGRCwtdqceXArLTHnmcqBgqHZSY6SkZsWM8jWPCvocMFESR+/G8rk6sxCSjgFlKDHNgoQMF9w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785407028; c=relaxed/simple;
-	bh=uH4MR0Zg/NqoAeMyBzzpHF9m5BvkJlfRvuhGQocyqtI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uBg2Ft6Z8vZ0I2qGroGWJmj2nI/undhIBPIgNdO3VqvIgIM7Dj9o37hcWsCrPg2MKpJ/pkghzDoE5qgwwf0oNVJlfPROI4EywUxM7iVXOVxmPEfb/G3SS91c0thq2gtvrx3Wh/tvOfYr/mnHouwLiRojRdAZsZ1NBehPiY8SrOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=mCO9sUzh; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1785415074; c=relaxed/simple;
+	bh=+gOhQU+HqsQXu1xm5sitfaK+73QrZY77na7SaJsgGdg=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cqktddQNeMrfToyKTfJyPcE/+MxnM0WE4IL0KIzZV1zzClTjWP3WD/Wy5nun9piwQ7vY4jWdKeMFdfDpe5PfyYPVeRbGIB8XoQjVYAUpfgBYRU1rPLIPSi4As0uaBgnKcwPdeb6SyIqWxXDfXs70dDmPhm58T4GlXxVJZ2Sfj0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dwp4fcp+; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="mCO9sUzh"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CC3D01688;
-	Thu, 30 Jul 2026 03:23:41 -0700 (PDT)
-Received: from J2N7QTR9R3.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5281C3F86F;
-	Thu, 30 Jul 2026 03:23:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1785407025; bh=uH4MR0Zg/NqoAeMyBzzpHF9m5BvkJlfRvuhGQocyqtI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mCO9sUzhXc9haZg1Qh0zm54Xivj09WSrUfF6UjjIxzLY50xh5kVrMAMUYaj/bFryo
-	 XNvD7U3kyHyxD1YE4NriBO0KT1NdXv3fJRU+o0YklQLBII5K7Y15AQXiwr6ksXhne7
-	 QjQ1OlmuHkisD+t2uSD9v8Y2uGny5nuAJ/2hTX7c=
-Date: Thu, 30 Jul 2026 11:23:34 +0100
-From: Mark Rutland <mark.rutland@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, Steffen Eiden <seiden@linux.ibm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
-	Yao Yuan <yaoyuan@linux.alibaba.com>,
-	Wei-Lin Chang <weilin.chang@arm.com>,
-	Vladimir Murzin <vladimir.murzin@arm.com>
-Subject: Re: [PATCH v4 01/29] arm64: sysreg: Emit RESx/UNKN values for
- Mapping/Fields definitions
-Message-ID: <amsmJo0gsaj5DAJd@J2N7QTR9R3.cambridge.arm.com>
-References: <20260730071022.296811-1-maz@kernel.org>
- <20260730071022.296811-2-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dwp4fcp+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDC2E1F000E9;
+	Thu, 30 Jul 2026 12:37:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785415072;
+	bh=tIKRYxDOzycznw1bjlolv+a92AaCEXcgQ9UteZvvq6E=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=dwp4fcp+9aFcM75nQWBHQTQytB3W+EUnrwq6DO7RapJNdyAkZuRacZkPGao1KYWQz
+	 nxq0+gXzhRutd+9XXOp0biFyYO4sKUle1qaBZkAspRjytAgA4ZPLQKY6qmcJNY2uK9
+	 wLps541DxE4Hotc6HD2hslBM00x9JaIC9uuLM3ArPA/TkOyAHFzFUi+cxnE/1ybgvU
+	 Mbnnk5RAWyiqXaH8uwnu6rzSHzYCV6q/xnLxq4IpguX7CjqT/FbuhrZ57biyxzbZb0
+	 qVVJMgcfEQv5DQ0fdZyM8XeYBeYHhjAe69eRg1pUbutd73jyJFUqf/jzjODGgCDqJr
+	 qPva0JaIHWVnA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wpQ1G-0000000AWgo-1Tqr;
+	Thu, 30 Jul 2026 12:37:50 +0000
+Date: Thu, 30 Jul 2026 13:37:49 +0100
+Message-ID: <86jyqcd55u.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: oupton@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	rostedt@goodmis.org,
+	mhiramat@kernel.org,
+	alexandru.elisei@arm.com,
+	vdonnefort@google.com,
+	joey.gouly@arm.com,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	qperret@google.com,
+	ardb@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org,
+	tabba@google.com
+Subject: Re: [PATCH v1 09/11] KVM: arm64: Type-check hypercall arguments at the caller
+In-Reply-To: <20260720161343.1367007-10-fuad.tabba@linux.dev>
+References: <20260720161343.1367007-1-fuad.tabba@linux.dev>
+	<20260720161343.1367007-10-fuad.tabba@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260730071022.296811-2-maz@kernel.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, rostedt@goodmis.org, mhiramat@kernel.org, alexandru.elisei@arm.com, vdonnefort@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, qperret@google.com, ardb@kernel.org, linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, tabba@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, Jul 30, 2026 at 08:09:54AM +0100, Marc Zyngier wrote:
-> The sysreg file is using the Mapping or Fields qualifiers to indicate
-> that a given encoding is only a mapping to a particular register (or
-> an instance of a more generic register definition).
+On Mon, 20 Jul 2026 17:13:41 +0100,
+Fuad Tabba <fuad.tabba@linux.dev> wrote:
 > 
-> As a result, we don't output any definition, and instead expect
-> the canonical definitions to be used.
+> kvm_call_hyp_nvhe() reduces its target to an SMCCC function number, so
+> the compiler never sees a callable: arguments that are wrong in number,
+> type or order are silently marshalled into registers. The kvm_call_hyp()
+> wrappers only catch this on the VHE branch, and the pKVM-only hypercalls
+> have no such branch.
 > 
-> This works rather well for individual fields, but creates problems
-> for macros that refer to more generic classes of bits such as RESx.
+> Declare each hypercall's signature once in kvm_hcall.h and generate a
+> typed stub from it, in the mold of the syscall wrappers. Make
+> kvm_call_hyp_nvhe() resolve to the stub so every caller is checked
+> against the declared signature; a stale or mistyped call now fails to
+> compile. The stubs inline to the same SMCCC call the untyped macro used
+> to make: the compiled callers are unchanged, apart from hypercall
+> returns now being tested at their declared width.
 > 
-> Relax the above rule by emitting the RESx and UNKN values for Mapping
-> and Fields qualifiers as well.
-
-It might be worth stating a bit more explicitly, something like:
-
-  Emit RESx and UNKN values for Mapping and Fields qualifiers as well,
-  defining these in terms of the RESx and UNKN values for the canonical
-  Sysreg or SysregFields definition.
-
-  For example, the following defintion:
-
-  | Sysreg FOO ...
-  | Fields BAR
-  | EndSysreg
-  
-  ... will generate:
-  
-  | #define FOO_RES0	(BAR_RES0)
-  | #define FOO_RES1	(BAR_RES1)
-  | #define FOO_RES0	(BAR_UNKN)
-
-Regardless of the above, the patch looks reasonable to me, so:
-
-Acked-by: Mark Rutland <mark.rutland@arm.com>
-
-Mark.
-
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> The stage-2 protection arguments are declared u64 rather than
+> enum kvm_pgtable_prot, as kvm_pgtable.h includes linux/kvm_host.h and
+> the enum cannot be completed here.
+> 
+> Assisted-by: Antigravity:gemini-3.1-pro
+> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 > ---
->  arch/arm64/tools/gen-sysreg.awk | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+>  arch/arm64/include/asm/kvm_hcall.h | 165 ++++++++++++++++++++++++++++-
+>  arch/arm64/kvm/hyp_trace.c         |   2 +-
+>  2 files changed, 165 insertions(+), 2 deletions(-)
 > 
-> diff --git a/arch/arm64/tools/gen-sysreg.awk b/arch/arm64/tools/gen-sysreg.awk
-> index 86860ab672dc7..53844f5c5e525 100755
-> --- a/arch/arm64/tools/gen-sysreg.awk
-> +++ b/arch/arm64/tools/gen-sysreg.awk
-> @@ -228,7 +228,7 @@ $1 == "EndSysreg" && block_current() == "Sysreg" {
->  }
+> diff --git a/arch/arm64/include/asm/kvm_hcall.h b/arch/arm64/include/asm/kvm_hcall.h
+> index d925b2c28a3d8..51bfd14748464 100644
+> --- a/arch/arm64/include/asm/kvm_hcall.h
+> +++ b/arch/arm64/include/asm/kvm_hcall.h
+> @@ -16,12 +16,35 @@
 >  
->  # Currently this is effectivey a comment, in future we may want to emit
-> -# defines for the fields.
-> +# defines for the fields. We do emit RESx and UNKN values in any case.
->  ($1 == "Fields" || $1 == "Mapping") && block_current() == "Sysreg" {
->  	expect_fields(2)
+>  #include <asm/barrier.h>
+>  #include <asm/kvm_asm.h>
+> +#include <asm/spectre.h>
+>  #include <asm/virt.h>
 >  
-> @@ -239,9 +239,9 @@ $1 == "EndSysreg" && block_current() == "Sysreg" {
->  	print ""
+>  typedef u16 pkvm_handle_t;
 >  
->  	next_bit = -1
-> -	res0 = null
-> -	res1 = null
-> -	unkn = null
-> +	res0 = $2 "_RES0"
-> +	res1 = $2 "_RES1"
-> +	unkn = $2 "_UNKN"
+> +struct kvm;
+> +struct kvm_s2_mmu;
+> +struct kvm_vcpu;
+> +struct vgic_v3_cpu_if;
+> +struct vgic_v5_cpu_if;
+> +
+> +/*
+> + * Hypercall signatures are declared as (type, name) argument pairs.
+> + * __KVM_HCALL_MAP() applies a macro to each pair, in the mold of __MAP()
+> + * in <linux/syscalls.h>.
+> + */
+> +#define __KVM_HCALL_MAP1(m, t, a, ...) m(t, a)
+> +#define __KVM_HCALL_MAP2(m, t, a, ...) m(t, a), __KVM_HCALL_MAP1(m, __VA_ARGS__)
+> +#define __KVM_HCALL_MAP3(m, t, a, ...) m(t, a), __KVM_HCALL_MAP2(m, __VA_ARGS__)
+> +#define __KVM_HCALL_MAP4(m, t, a, ...) m(t, a), __KVM_HCALL_MAP3(m, __VA_ARGS__)
+> +#define __KVM_HCALL_MAP5(m, t, a, ...) m(t, a), __KVM_HCALL_MAP4(m, __VA_ARGS__)
+> +#define __KVM_HCALL_MAP6(m, t, a, ...) m(t, a), __KVM_HCALL_MAP5(m, __VA_ARGS__)
+> +#define __KVM_HCALL_MAP(n, ...) __KVM_HCALL_MAP##n(__VA_ARGS__)
+> +
+> +#define __KVM_HCALL_DECL(t, a)	t a
+> +#define __KVM_HCALL_ARGS(t, a)	a
+> +
+>  #ifndef __KVM_NVHE_HYPERVISOR__
+> -#define kvm_call_hyp_nvhe(f, ...)					\
+> +#define __kvm_call_hyp_nvhe(f, ...)					\
+>  	({								\
+>  		struct arm_smccc_res res;				\
+>  									\
+> @@ -33,6 +56,43 @@ typedef u16 pkvm_handle_t;
+>  		res.a1;							\
+>  	})
 >  
->  	next
->  }
-> -- 
-> 2.47.3
-> 
-> 
+> +/*
+> + * Generate a typed stub for each declared hypercall. kvm_call_hyp_nvhe()
+> + * resolves to the stub, so a call with the wrong argument count or types
+> + * fails to compile instead of being silently truncated to an SMCCC function
+> + * number and a pile of registers. The stub inlines to the same SMCCC call
+> + * the untyped macro used to make.
+> + */
+> +#define DECLARE_KVM_HOST_HCALL(ret, name, x, ...)			\
+> +	static __always_inline						\
+> +	ret nvhe_hvc_##name(__KVM_HCALL_MAP(x, __KVM_HCALL_DECL, __VA_ARGS__)) \
+> +	{								\
+> +		return (ret)__kvm_call_hyp_nvhe(name,			\
+> +			__KVM_HCALL_MAP(x, __KVM_HCALL_ARGS, __VA_ARGS__)); \
+> +	}
+
+One thing I find absolutely horrible is to have to specify the number
+of parameters here. It is already bad to have to comma-separate
+everything, but having to count them is too hard for me ;-).
+
+We already have facilities to count the number of parameters to a
+macro (see the COUNT_ARGS macro). You could make use of it all over
+the place.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
