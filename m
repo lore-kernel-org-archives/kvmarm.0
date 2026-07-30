@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E5993BB677;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 233023BB9ED;
 	Thu, 30 Jul 2026 07:11:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785395468; cv=none; b=jpcF1YeOQ39yab2qFmiGkMRM+ORhx3XhT2v2wM+SvLhKbZd2UCtoGRp8vLh496PgfCGn4uGdGzTYDTJe3OpFOcaff/GqoE4H79rFCHG9naPmhExn5uzq7yXSChvC1w1yyOR0zckedobR5QtfKM1sTr0UckoUUgBL+rdCrwpQaDs=
+	t=1785395470; cv=none; b=l/zPgTo1G4jfQXuUYV2YMpX3lVGNQRJMUXUbRvOL8SnwaEFh7c5LDMJbn5NQsJmLiANIBkof3V0a4B8A0/C0UYe/EaItfIh39tJVDyjxHxn5USB2eWQhAfYt+TlKNFzbkknVOIJSTs+LPST1+PnBw7YpTItCtpzWmtTowBVcgmA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785395468; c=relaxed/simple;
-	bh=NvkFdgKIy8ciN/Cv7barntvGtX8548DcLXqDksuvLMs=;
+	s=arc-20240116; t=1785395470; c=relaxed/simple;
+	bh=af7UFh4yanCmm6j9ys+YBUa6Cc2KU9a8i/o2CeL7z4Y=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KEe8ZBzCN/VgeFRUodwXx/3pwfXoVAQxOcP9340pbpbw6UeswTxjnP33rrImmxM0USSDWfuWD0QsfqXDrZcfqptfSWxiyRcz2xaFkgaG8U/B1vOaUAB6KPHGiO7szBfDlI/UPvR9EBTkX1oGvJPbtl1FgM0pqLZhklWO8mFIvIY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cVmZBCmU; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=ulEVJhXjQzu8jZmwjmdPyR2xqFoH7q31BMjGH4oDTRb6DezgpqAiHEq0n4za4uIW3mvP8aMjZ15E9VH3kpISziT+drB8juuwBObKZzf+Lysmvb0DskR0TXJ7079CRMpT1Q6dqFwxsMto14OZCuUDSP/99fLHkr7clJ0tWA6FC+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eNsntE6c; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cVmZBCmU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DD3B1F0156E;
-	Thu, 30 Jul 2026 07:10:54 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eNsntE6c"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 391211F0155B;
+	Thu, 30 Jul 2026 07:10:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785395454;
-	bh=t3OsRNm/LgtUUKlEl5oqCab/dsqCViWJfNpDdHuMMXg=;
+	s=k20260515; t=1785395455;
+	bh=iphw/trZbQgKuaLseXe8o8FXlhLchtJlvFzyolbcN1U=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=cVmZBCmUJyByq+vMpbE3Ed7SRenb4HH6PVoFAZtlZruAYXaPtHxDzq5Q0TkBHubHx
-	 p/ImGx8fXMT9M0gTK+DvC4uAOZRskYKPLoKWtk0hrL6nHJ0VdVqpmIK2Nc6G1lEjM8
-	 /8xTg6JC6k/TLEzHJRseQ5x3ghkG1884E5Fz1Bb2XKZeIyMQ8i5ICKTVwE+6fATMR+
-	 FxilQPSpHCHi6v/5v4jOez53FxNv8TBz0L3RmlLyOJJLXDE21YuEoNO4eowlAcDA/N
-	 imi8G+nnbEZ951aIhgBLt6aZccv5/SIvNHyTUD0i9LBecHSONNrvKbQ5qj0egX2yrM
-	 v1ChdLlsYprpA==
+	b=eNsntE6cJcGyj56BJgdyOCjZzmZoi1R0PuaWlWqd/5Oa5TZvCHYDo/fGndmHfzbgF
+	 162aGnCZrLLduG/QDL6GWZkfrFqK/CX6ZZ3IC9MHykt068Mbg6Nfq6WNMTVmPsl+wS
+	 A9z/txwh3MV3nh4MMdHPEEH8zOzmDyOT471tcN2T4eLh2QLWU5U8HJ/3GhCGC/vDZ+
+	 TcJBXFrySwD7YOC0JZvr0Uy3MUfA++tCiyb+4fmi7J4E+p3b6M5paFQg6Rkvh1K6F1
+	 77KL2EmMntoT06VDJ4fjNwt28ZDKhejpxtMYm5LUO1Cd6zaQy5gND+jIV8dUNxwGex
+	 BPrx3jOZRCquw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wpKuq-0000000AOpW-2xHU;
-	Thu, 30 Jul 2026 07:10:52 +0000
+	id 1wpKur-0000000AOpW-2S4K;
+	Thu, 30 Jul 2026 07:10:53 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -44,9 +44,9 @@ Cc: Steffen Eiden <seiden@linux.ibm.com>,
 	Yao Yuan <yaoyuan@linux.alibaba.com>,
 	Wei-Lin Chang <weilin.chang@arm.com>,
 	Vladimir Murzin <vladimir.murzin@arm.com>
-Subject: [PATCH v4 20/29] KVM: arm64: Add sanitisation for NVHCR_EL2
-Date: Thu, 30 Jul 2026 08:10:13 +0100
-Message-ID: <20260730071022.296811-21-maz@kernel.org>
+Subject: [PATCH v4 24/29] KVM: arm64: Engage NV3 ERET trap elision
+Date: Thu, 30 Jul 2026 08:10:17 +0100
+Message-ID: <20260730071022.296811-25-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260730071022.296811-1-maz@kernel.org>
 References: <20260730071022.296811-1-maz@kernel.org>
@@ -62,76 +62,55 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Just like any other VNCR-based register, NVHCR_EL2 requires some
-level of sanitisation. Being specified as a live copy of HCR_EL2,
-it adopts the exact same format, but depends on FEAT_NV3 instead.
+When running on NV3 HW, always engage ERET trap elision when running
+the L1 context, as there is no benefit in not doing so.
 
-A subtle aspect is that we only want to apply the sanitisation if
-FEAT_NV3 is actually present, as the VNCR location is otherwise
-used to back accesses to HCR_EL2.
+An L1 can itself engage trap elision by setting its own view of
+HCRX_EL2.NVTGE==1, which will subsequently be honored.
 
-Reviewed-by: Yuan Yao <yaoyuan@linux.alibaba.com>
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/config.c | 15 +++++++++++++++
- arch/arm64/kvm/nested.c |  4 ++++
- 2 files changed, 19 insertions(+)
+ arch/arm64/include/asm/kvm_emulate.h | 10 ++++++++++
+ arch/arm64/kvm/hyp/vhe/switch.c      |  4 ++++
+ 2 files changed, 14 insertions(+)
 
-diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-index 467f57eb8e6bb..1053676551aff 100644
---- a/arch/arm64/kvm/config.c
-+++ b/arch/arm64/kvm/config.c
-@@ -1019,6 +1019,9 @@ static const struct reg_bits_to_feat_map hcr_feat_map[] = {
- static const DECLARE_FEAT_MAP(hcr_desc, HCR_EL2,
- 			      hcr_feat_map, FEAT_AA64EL2);
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index bdb7dfaa271cd..ee340d3294478 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -705,6 +705,16 @@ static inline void vcpu_set_hcrx(struct kvm_vcpu *vcpu)
  
-+static const DECLARE_FEAT_MAP(nvhcr_desc, NVHCR_EL2,
-+			      hcr_feat_map, FEAT_NV3);
+ 		if (kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_V))
+ 			vcpu->arch.hcrx_el2 |= HCRX_EL2_EnASR;
 +
- static const struct reg_bits_to_feat_map sctlr2_feat_map[] = {
- 	NEEDS_FEAT(SCTLR2_EL1_NMEA	|
- 		   SCTLR2_EL1_EASE,
-@@ -1393,6 +1396,7 @@ void __init check_feature_map(void)
- 	check_reg_desc(&hdfgwtr2_desc);
- 	check_reg_desc(&hcrx_desc);
- 	check_reg_desc(&hcr_desc);
-+	check_reg_desc(&nvhcr_desc);
- 	check_reg_desc(&sctlr2_desc);
- 	check_reg_desc(&tcr2_el2_desc);
- 	check_reg_desc(&sctlr_el1_desc);
-@@ -1592,6 +1596,17 @@ struct resx get_reg_fixed_bits(struct kvm *kvm, enum vcpu_sysreg reg)
- 	case HCR_EL2:
- 		resx = compute_reg_resx_bits(kvm, &hcr_desc, 0, 0);
- 		break;
-+	case NVHCR_EL2:
 +		/*
-+		 * Only apply sanitisation if we do have FEAT_NV3.
-+		 * Otherwise, the register aliases with HCR_EL2 in VNCR,
-+		 * and we're better off relying on data transfers between
-+		 * NVHCR_EL2 and HCR_EL2 to sanitise things.
++		 * NV3 is a host-specific extension, and we always use
++		 * it when present and that the guest uses NV. It may
++		 * be hidden from the guest though.
 +		 */
-+		resx = (kvm_has_nv3(kvm) ?
-+			compute_reg_resx_bits(kvm, &nvhcr_desc, 0, 0) :
-+			(typeof(resx)){});
-+		break;
- 	case SCTLR2_EL1:
- 	case SCTLR2_EL2:
- 		resx = compute_reg_resx_bits(kvm, &sctlr2_desc, 0, 0);
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 35a1c42ad3f84..f646894fec9a9 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -1830,6 +1830,10 @@ int kvm_init_nv_sysregs(struct kvm_vcpu *vcpu)
- 	resx = get_reg_fixed_bits(kvm, HCR_EL2);
- 	set_sysreg_masks(kvm, HCR_EL2, resx);
++		if (cpus_have_final_cap(ARM64_HAS_NV3) &&
++		    vcpu_has_nv(vcpu) && vcpu_el2_e2h_is_set(vcpu)) {
++			vcpu->arch.hcrx_el2 |= HCRX_EL2_NVTGE;
++		}
+ 	}
+ }
+ #endif /* __ARM64_KVM_EMULATE_H__ */
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index cbda9e087db39..4ed745bdde418 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -345,6 +345,10 @@ static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 	u64 esr = kvm_vcpu_get_esr(vcpu);
+ 	u64 spsr, elr, mode;
  
-+	/* NVHCR_EL2 */
-+	resx = get_reg_fixed_bits(kvm, NVHCR_EL2);
-+	set_sysreg_masks(kvm, NVHCR_EL2, resx);
++	/* With NV3, the fast path is handled in HW */
++	if (cpus_have_final_cap(ARM64_HAS_NV3) && vcpu_el2_e2h_is_set(vcpu))
++		return false;
 +
- 	/* HCRX_EL2 */
- 	resx = get_reg_fixed_bits(kvm, HCRX_EL2);
- 	set_sysreg_masks(kvm, HCRX_EL2, resx);
+ 	/*
+ 	 * Going through the whole put/load motions is a waste of time
+ 	 * if this is a VHE guest hypervisor returning to its own
 -- 
 2.47.3
 
