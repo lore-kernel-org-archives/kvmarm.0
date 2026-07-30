@@ -1,203 +1,148 @@
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com [209.85.216.71])
+Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com [209.85.215.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C1F3379EC8
-	for <kvmarm@lists.linux.dev>; Thu, 30 Jul 2026 18:38:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3E0731E838
+	for <kvmarm@lists.linux.dev>; Thu, 30 Jul 2026 19:19:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785436695; cv=none; b=Cfd8WHlZFcghLAXkxwd4J5hpRUOo5E8ZBKnLFJTrB+UWWec76BowAE9LPerIagFB+PuijfHQasqSU6s/Q+VLkYKbXovG4StaFvlmt55PVYs/t26xQ3ir/DtcO6QBa57adz/oZeLYOPtzFPlhgykXa47wzmavQ/mf/tt/OPZRUKY=
+	t=1785439153; cv=none; b=dQv2GuNLVTtJiJe6jaB7deXDqAKd4AwSYAuKHmbLYyW5iwXIxy6QziOkvZ8b6iXCnE3fZqPWbyN5Bk+HRjpszqYEwfmCkZmbuZadRtWiAo1do8zoYWr+13o1vpU7O5hPu/Um9Xxp12VO3JsWeqU6kLK6FJknfKkNDj1DeYFtp1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785436695; c=relaxed/simple;
-	bh=MclfqqAOvRhjdUnW4KUPI/0nCU2GrBKsXkAWYdFV3iA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=TFYhx/eMGzxRbFPcOqrP1n1N7Ur0AO/e4KUCsd2so9r8RXVO/KrRR4BjTyIrAIPFGhLezVcN3A9CyjMvGpJegCMb1cl7kFMJIAl/FwQl9jwLXVefQJSDKNp0CC+LCNEwOv5i74XOyVThCM4a02QZVXd8cmCb9Sy9I/y3fa9a4Ns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IzhcJDbc; arc=none smtp.client-ip=209.85.216.71
+	s=arc-20240116; t=1785439153; c=relaxed/simple;
+	bh=vJI6IRp585rLpVefO/o6CIA9NTunPTJN6oA97uyDbvM=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=YAoRUcK7LaTA0LGvsjoYmVUmQRMU2ZWM/rVrzji9hKLNra29LF9AXORMZaFTrDUXb92sAgL+QoIk5FV/t0OOmQjbgSD8BRUv1gvkvKFV8Mo//MCa3agpBEKHw4LRVPrgol35rR1t3uf/eBncyJpdBXEMbuD58fGoS5Ok/zDud/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JMWn++t3; arc=none smtp.client-ip=209.85.215.200
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IzhcJDbc"
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-388b404eaa4so236437a91.0
-        for <kvmarm@lists.linux.dev>; Thu, 30 Jul 2026 11:38:04 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JMWn++t3"
+Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-cb7d6ba548eso151091a12.1
+        for <kvmarm@lists.linux.dev>; Thu, 30 Jul 2026 12:19:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1785436680; x=1786041480; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=/bpb7rVnMP2yhSUFeRPzDa/SCZEbyHiuIMPgM8gQi/g=;
-        b=IzhcJDbchmvaL7HWPxVWDcT7yalFN0RHPknTQJTIytyeQpUvFlkxU7vYyFmRYbjRlg
-         qPzP+W/sv9M4R5C+EJrGiEQQVupUu/5zHd3Abnwd+XEl3aETHo963XdEcsuUpL4tv4BK
-         ucjYNcbtdWZKfxUXqzUJTrlJ8SanTTGgfHGXje4XMaXIXQqDGPbg9cx/Q0cbJmVQMLZj
-         U5gUVDH0bVJYOC1djq52U8P6b/Nl8TtSkJCJvxRgkfdOYz4no8l9VmspaKGpyIc2Vbh7
-         yfq5hZqN9J2cduTqMwxg4+43Tx1RMSZ/dhPam5MVuJyaP1TS6o49cmNDQCBrEOn1M4L8
-         EvMg==
+        d=google.com; s=20251104; t=1785439150; x=1786043950; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
+         :reply-to:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=8xSibPGaP79RuMf+7+dDUpouwIkheHJF/igrm5r11hc=;
+        b=JMWn++t3yUruX4voNR4eqlFxARY2ob2SYTcm852b7mCA8c1U9/ngBbjP4PIcBr9bFP
+         qLqWzBQKNfaG56bAB+0JTiqd58nHrDIzC+E5deDE5i53SmnMsw+X7i2r5lyTauiu7DM7
+         DcPp6xK33T15Xyww+q2MSp2ix1eASfKvOXHayqSJT1WivgNn6tqSTCcgI7gHBiKQ7UIa
+         aXi3YVmn7dBA0iYtCL/5cxb1YcMdZgAc0QKwzyePIrb6pn8wOo43c794C+t6sWpzJ5q4
+         9mdvEcCz49NEroi3F7V+pKrM1jjf68kA/Fc4GnDMQ8cHAGyi+xW/JIwtt3WbpkeJqgxF
+         KT6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785436680; x=1786041480;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=/bpb7rVnMP2yhSUFeRPzDa/SCZEbyHiuIMPgM8gQi/g=;
-        b=eHub/ek/U7vgfJS5IgZETMSMJ0e+CoMK2uWyV78WWYp46hsKTqY2LDWa1usq9foLUu
-         wflVFzy3C9TFAkVLCxhhg8YAsikXYXC+rytmBkmLi4dYhwwLXjlHtdtAKvpjPRe6SFE3
-         kelSgtHECiUVCsimNf4JbaQFt1a7g+2lo43mMu5nuw9RckRHWr2Ef4TDZUtbETr8DQZB
-         JO+5laxcaj//0T9OCP2yPHB0vrgjaifphqWdk9mjMPUHVkLq8YeCV64WIMMEEazFkCS6
-         ZpsJ3zNzxjZSaDnV6ymbk+r9+QxbG3L4uMEnGcF7ktBX1TxQSIofSZHYmMwi/oRz2IKf
-         Nd8Q==
-X-Forwarded-Encrypted: i=1; AHgh+RqpsQLj23+xeTxoHPIKG2KnX5JRftoRgUvqeL3bzZWDU9dVCzlAqtCOWnU+k+51JJyJ6MUu/yA=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyHHXj20JsjIeoEIu3QJd5UU5kUnVFnYO5LYIySPYLJvb7fdQ6L
-	6thR4uk0WyPjvxxtwIr2VD2WD2Pi9zlVzRbLt1/2FCmPQeHf4PM9EuEriRrbX8fZzWuk1ixlQwo
-	iUo1g6Q==
-X-Received: from pjon4.prod.google.com ([2002:a17:90a:9284:b0:381:127b:2e24])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:c884:b0:381:3b5d:30f4
- with SMTP id 98e67ed59e1d1-38f9bd51be4mr3217997a91.1.1785436679924; Thu, 30
- Jul 2026 11:37:59 -0700 (PDT)
-Date: Thu, 30 Jul 2026 11:37:59 -0700
-In-Reply-To: <073cfbe1-0a27-015b-c688-53c186100fa1@redhat.com>
+        d=1e100.net; s=20251104; t=1785439150; x=1786043950;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
+         :reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=8xSibPGaP79RuMf+7+dDUpouwIkheHJF/igrm5r11hc=;
+        b=Tbpdlv5TSHqw+IcTlvxs07TTNvBVfNobAT8JLw3eAWgWBhy4AGNQXrm3JrnvVSvn0l
+         aukO9qk6C9dSQijAXpoSFt/CRAaKKoU6K1m5/LaoKZ4qJFBTfKPbYZmk8CvWH83KGUzS
+         svG1AKSgRpLk5ZDPO1szfAHKojJvnmN6ntHuwKnljYyVKb4O96f7Q+0+TzpnU2MdfonE
+         7fYxpvVdTMrjEMlwu2ASzugoj00LiTUyMOEloSDQR/TwNzYG9s24lBznfD8ZyfSEGZJ2
+         2PXFWijyvY0P7LRA/HQNKqKquV7/1apx5s51wO54fIhbiIqiF6Lkg0w/Lt+GCfXmZPkM
+         4VGA==
+X-Forwarded-Encrypted: i=1; AHgh+RpOY6POuPa4ppPc5NtkMDKm7xyQ322RFnsVaLEkGq+WoY6gVHep+xojcXy4oerKKNfC1Ucba2I=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yx4wcTbItRD9GNPavjIi0lrR08W6ZHZSqQC67ecKwtD1ps7FCeZ
+	emR0ZQMUbHPnMF6E9TH33rxEgPhGcDcJn3TVo5GabKqjHIWjnunihnd8fO6dhSFvNCxL4I2Noaw
+	aZHLYKg==
+X-Received: from pggi13.prod.google.com ([2002:a63:cd0d:0:b0:c85:db34:d7a])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:117:b0:3c0:9c1a:8939
+ with SMTP id adf61e73a8af0-3c90d6ce7e8mr1439109637.65.1785439149929; Thu, 30
+ Jul 2026 12:19:09 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Thu, 30 Jul 2026 12:18:59 -0700
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20260504112808.21276-1-sebott@redhat.com> <7575a845-a542-4b16-b512-aec3126f97f3@linux.dev>
- <335f21e5-493d-012d-b07c-2e48cc2b9aeb@redhat.com> <a6ccc7a8-488b-4454-81b1-f29dd875845c@linux.dev>
- <073cfbe1-0a27-015b-c688-53c186100fa1@redhat.com>
-Message-ID: <amuaB-dZ2s3lI8NU@google.com>
-Subject: Re: [PATCH] KVM: selftests: fix steal_time for arm64 with host page
- size > 4K
+X-Mailer: git-send-email 2.55.0.508.g3f0d502094-goog
+Message-ID: <20260730191908.2084803-1-seanjc@google.com>
+Subject: [PATCH 0/9] KVM: selftests: Add more syscall wrappers, fix hardware_disable_test
 From: Sean Christopherson <seanjc@google.com>
-To: Sebastian Ott <sebott@redhat.com>
-Cc: Zenghui Yu <zenghui.yu@linux.dev>, Jiakai Xu <xujiakai2025@iscas.ac.cn>, 
-	Shuah Khan <shuah@kernel.org>, Andrew Jones <andrew.jones@oss.qualcomm.com>, 
-	Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	kvmarm@lists.linux.dev, Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oupton@kernel.org>
-Content-Type: text/plain; charset="us-ascii"
+To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oupton@kernel.org>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
+	Sean Christopherson <seanjc@google.com>
+Cc: Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	David Hildenbrand <david@kernel.org>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Jun 29, 2026, Sebastian Ott wrote:
-> On Sun, 28 Jun 2026, Zenghui Yu wrote:
-> 
-> > On 6/22/26 10:14 PM, Sebastian Ott wrote:
-> > > 
-> > > Fix the following failure when running with 16K host page size:
-> > > ==== Test Assertion Failure ====
-> > >   lib/kvm_util.c:991: vm_adjust_num_guest_pages(vm->mode, npages) == npages
-> > >   pid=873 tid=873 errno=0 - Success
-> > >      1  0x0000000000405a27: vm_mem_add at kvm_util.c:991
-> > >      2  0x000000000040241f: check_steal_time_uapi at steal_time.c:223 (discriminator 7)
-> > >      3   (inlined by) main at steal_time.c:539 (discriminator 7)
-> > >      4  0x00007fff8b57af3b: ?? ??:0
-> > >      5  0x00007fff8b57b007: ?? ??:0
-> > >      6  0x0000000000402b6f: _start at ??:?
-> > >   Number of guest pages is not compatible with the host. Try npages=4
-> > > 
-> > > Fixes: fc240715fc50 ("KVM: selftests: arm64: Fix steal_time test after UAPI refactoring")
-> > > Reported-by: Zenghui Yu <zenghui.yu@linux.dev>
-> > > Link: https://lore.kernel.org/kvmarm/7575a845-a542-4b16-b512-aec3126f97f3@linux.dev/T/#u
-> > > Signed-off-by: Sebastian Ott <sebott@redhat.com>
-> > > ---
-> > >  tools/testing/selftests/kvm/steal_time.c | 6 ++++--
-> > >  1 file changed, 4 insertions(+), 2 deletions(-)
-> > > 
-> > > diff --git a/tools/testing/selftests/kvm/steal_time.c b/tools/testing/selftests/kvm/steal_time.c
-> > > index 76fcdd1fd3cb..cdb81f3ee4b2 100644
-> > > --- a/tools/testing/selftests/kvm/steal_time.c
-> > > +++ b/tools/testing/selftests/kvm/steal_time.c
-> > > @@ -208,6 +208,7 @@ static void check_steal_time_uapi(void)
-> > >  {
-> > >      struct kvm_vm *vm;
-> > >      struct kvm_vcpu *vcpu;
-> > > +    unsigned int gpages;
-> > >      u64 st_ipa;
-> > >      int ret;
-> > > 
-> > > @@ -220,8 +221,9 @@ static void check_steal_time_uapi(void)
-> > >      };
-> > > 
-> > >      vcpu_ioctl(vcpu, KVM_HAS_DEVICE_ATTR, &dev);
-> > > -    vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, ST_GPA_BASE, 1, 1, 0);
-> > > -    virt_map(vm, ST_GPA_BASE, ST_GPA_BASE, 1);
-> > > +    gpages = vm_calc_num_guest_pages(VM_MODE_DEFAULT, 1);
-> > 
-> > Would vm_calc_num_guest_pages(VM_MODE_DEFAULT, STEAL_TIME_SIZE) be better
-> > to describe the number of pages we want to add?
-> 
-> Hm, I don't think we care. This is just for the uapi checker - the vm/vcpu
-> doesn't even run..
+Buried in the middle of this is a fix for the hardware_disable_test where
+it can end up with a runtime of multiple minutes on preemptible kernels due
+to blindly pinning 68 spinning tasks to pCPUs 0-4, which is "mildly"
+problematic if the parent is also affined to those CPUs (or the scheduler
+keeps trying to run the parent on those CPUs for whatever reason).
 
-Even though we don't truly care, we can "fix" that and dedup code at the same
-time.  E.g.
+After wasting almost half a day bisecting the kernel to the auto-enablement
+of PREEMPT_LAZY, I got fed up with the test and went scorched earth on it,
+to try and clean up its many warts.
 
-diff --git a/tools/testing/selftests/kvm/steal_time.c b/tools/testing/selftests/kvm/steal_time.c
-index bc3c62b72c58..c0256d4c4b09 100644
---- a/tools/testing/selftests/kvm/steal_time.c
-+++ b/tools/testing/selftests/kvm/steal_time.c
-@@ -27,6 +27,9 @@
- static void *st_gva[NR_VCPUS];
- static u64 guest_stolen_time[NR_VCPUS];
- 
-+static struct kvm_vm *vm_create_steal_time(u32 nr_vcpus, void *guest_code,
-+                                          struct kvm_vcpu *vcpus[]);
-+
- #if defined(__x86_64__)
- 
- /* steal_time must have 64-byte alignment */
-@@ -210,17 +213,14 @@ static void check_steal_time_uapi(void)
-        u64 st_ipa;
-        int ret;
- 
--       vm = vm_create_with_one_vcpu(&vcpu, NULL);
--
-        struct kvm_device_attr dev = {
-                .group = KVM_ARM_VCPU_PVTIME_CTRL,
-                .attr = KVM_ARM_VCPU_PVTIME_IPA,
-                .addr = (u64)&st_ipa,
-        };
- 
-+       vm = vm_create_steal_time(1, NULL, &vcpu);
-        vcpu_ioctl(vcpu, KVM_HAS_DEVICE_ATTR, &dev);
--       vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, ST_GPA_BASE, 1, 1, 0);
--       virt_map(vm, ST_GPA_BASE, ST_GPA_BASE, 1);
- 
-        st_ipa = (ulong)ST_GPA_BASE | 1;
-        ret = __vcpu_ioctl(vcpu, KVM_SET_DEVICE_ATTR, &dev);
-@@ -500,13 +500,26 @@ static void run_vcpu(struct kvm_vcpu *vcpu)
-        }
- }
- 
-+static struct kvm_vm *vm_create_steal_time(u32 nr_vcpus, void *guest_code,
-+                                          struct kvm_vcpu *vcpus[])
-+{
-+       unsigned int gpages;
-+       struct kvm_vm *vm;
-+
-+       vm = vm_create_with_vcpus(NR_VCPUS, guest_code, vcpus);
-+       gpages = vm_calc_num_guest_pages(VM_MODE_DEFAULT, STEAL_TIME_SIZE * nr_vcpus);
-+       vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, ST_GPA_BASE, 1, gpages, 0);
-+       virt_map(vm, ST_GPA_BASE, ST_GPA_BASE, gpages);
-+
-+       return vm;
-+}
-+
- int main(int ac, char **av)
- {
-        struct kvm_vcpu *vcpus[NR_VCPUS];
-        struct kvm_vm *vm;
-        pthread_t thread;
-        cpu_set_t cpuset;
--       unsigned int gpages;
-        long stolen_time;
-        long run_delay;
-        bool verbose;
-@@ -518,10 +531,7 @@ int main(int ac, char **av)
-        cpu = pin_self_to_any_cpu();
- 
-        /* Create a VM and an identity mapped memslot for the steal time structure */
--       vm = vm_create_with_vcpus(NR_VCPUS, guest_code, vcpus);
--       gpages = vm_calc_num_guest_pages(VM_MODE_DEFAULT, STEAL_TIME_SIZE * NR_VCPUS);
--       vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, ST_GPA_BASE, 1, gpages, 0);
--       virt_map(vm, ST_GPA_BASE, ST_GPA_BASE, gpages);
-+       vm = vm_create_steal_time(NR_VCPUS, guest_code, vcpus);
- 
-        ksft_print_header();
-        TEST_REQUIRE(is_steal_time_supported(vcpus[0]));
+The vast, vast majority of the changes are adding kvm_xxx() syscall wrappers
+so that tests don't need to manually assert that a syscall succeeds (the
+hardware disable test had some ugly equivalents).
+
+Note, this somewhat unfortunately applies on top of the bad-in-hindsight
+"irq_test" branch in kvm-x86, as I didn't want to re-invent the "pick a
+random CPU from a cpuset" functionality.  Luckily, AFAICT none of the nearly
+tree-wide changes conflict with anything else that's in-flight in other
+KVM arch trees, so I'm planning on smashing the "I'm Feeling Lucky" button
+on this and throwing it on top of the irq_test (though I'll rename the branch
+so it's not completely ridiculous).
+
+Tested on x86 and arm64, compile tested on other architectures.
+
+Sean Christopherson (9):
+  KVM: selftests: Return the target CPU from pin_task_to_random_cpu()
+  KVM: selftests: Extract picking of random CPU from cpu_set_t to
+    separate API
+  KVM: selftests: Affine child tasks to other pCPUs in hardware disable
+    test
+  KVM: selftests: Drop unreachable, dead code from hardware disable test
+  KVM: selftests: Add KVM syscall wrapper for pthread_create()
+  KVM: selftests: Add KVM syscall wrappers for pthread_{cancel,join}()
+  KVM: selftests: Add helper APIs to cancel+join pthreads
+  KVM: selftests: Add KVM syscall wrappers for
+    pthread_{g,s}etaffinity_np()
+  KVM: selftests: Clean up global constants in hardware disable test
+
+ tools/testing/selftests/kvm/arch_timer.c      |  18 ++--
+ tools/testing/selftests/kvm/arm64/vgic_irq.c  |  14 +--
+ .../selftests/kvm/arm64/vgic_lpi_stress.c     |   8 +-
+ tools/testing/selftests/kvm/dirty_log_test.c  |   4 +-
+ .../selftests/kvm/hardware_disable_test.c     | 101 ++++++++----------
+ .../selftests/kvm/include/kvm_syscalls.h      |  47 ++++++++
+ .../testing/selftests/kvm/include/kvm_util.h  |  11 +-
+ tools/testing/selftests/kvm/irq_test.c        |   4 +-
+ tools/testing/selftests/kvm/irqfd_test.c      |   4 +-
+ .../selftests/kvm/kvm_page_table_test.c       |   6 +-
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  10 +-
+ tools/testing/selftests/kvm/lib/memstress.c   |   4 +-
+ .../selftests/kvm/lib/userfaultfd_util.c      |   7 +-
+ .../testing/selftests/kvm/memslot_perf_test.c |   4 +-
+ tools/testing/selftests/kvm/mmu_stress_test.c |   4 +-
+ .../selftests/kvm/pre_fault_memory_test.c     |   4 +-
+ tools/testing/selftests/kvm/rseq_test.c       |   6 +-
+ tools/testing/selftests/kvm/s390/memop.c      |   4 +-
+ .../selftests/kvm/set_memory_region_test.c    |   6 +-
+ tools/testing/selftests/kvm/steal_time.c      |   6 +-
+ tools/testing/selftests/kvm/x86/hyperv_ipi.c  |  32 ++----
+ .../selftests/kvm/x86/hyperv_tlb_flush.c      |  30 +-----
+ .../kvm/x86/private_mem_conversions_test.c    |   4 +-
+ .../kvm/x86/private_mem_kvm_exits_test.c      |   7 +-
+ .../selftests/kvm/x86/recalc_apic_map_test.c  |   5 +-
+ .../selftests/kvm/x86/sev_migrate_tests.c     |   4 +-
+ .../selftests/kvm/x86/sync_regs_test.c        |   5 +-
+ .../selftests/kvm/x86/tsc_scaling_sync.c      |   4 +-
+ .../selftests/kvm/x86/xapic_ipi_test.c        |  31 +-----
+ .../selftests/kvm/x86/xen_shinfo_test.c       |  10 +-
+ 30 files changed, 179 insertions(+), 225 deletions(-)
+
+
+base-commit: 3c7d7f908d574277a845423ec32250a8d8df44c8
+-- 
+2.55.0.508.g3f0d502094-goog
 
