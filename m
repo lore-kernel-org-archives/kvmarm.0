@@ -1,115 +1,133 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18C8E38237D;
-	Thu, 30 Jul 2026 07:56:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEBE01DFFD;
+	Thu, 30 Jul 2026 07:58:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785398192; cv=none; b=qU5lOPNFuXsqlkkHf4f/y8we0ljDHO47fcRXmsNLFpooq3Jn+VNTWJoq3FnUwI5/pRorbLXD8Btq9oXSacAcIyhe1MT5nV+ymL5xOVZNaPdAhGobx+Z0EVdSOEYH97xbMFHbU5WnCpGnNegMfjCtXykeCIzGKx1n6Y/u8OPy2ZQ=
+	t=1785398329; cv=none; b=nrWPWY53jJDBw/l9d4Vv9trrsYF3MNP+afzWTADUW+lFZHgO6sorWo5MbTVg7JaZUEe29Kej1F29JSaDPqMejokrkfaXYwj9FgSFzYFRqhe/tCHu2kbw+SuQMreI1XFgUPYLnk8qOpz5tWi2CkFAyMFNPWAPRnNiKfZfLvcaG8Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785398192; c=relaxed/simple;
-	bh=9FoyOW7yHv91bKQO6x05Lj+9TPSIr1RiUQ2DkEy0GqU=;
+	s=arc-20240116; t=1785398329; c=relaxed/simple;
+	bh=pPjUGrqSKKnR0ntNbXoVvZiEmbEIZKF2CaKkWWCpgMs=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=EPO7wC7EL4HDlNEuwwE6nivF03FphBGJ+YAgwZV2N3hw/O8QWgzh6U8RiQtbK3PR81edu+/iQf/C2HHfXUIhRdXbifp/vcZSyh883JZ0eXrCYOdkpG4M+aPNj6QidyzofYlaw8dHhH3TZl/c3cy0/vFhDnqoN+pduldf2fm/Vx0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FmxOpNiA; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=GBnL+/v/DfOTwjkTwZfKQe0pQSE57mEYbNtYrkamf9HdkD8JrtxA8o1+RkwUN3CvEduzD1gTlY/R04c0u11r5q7tzvzfpOrAFapyZDzfiSNBSrvHTcvswz0RzTb2kcCbTT+04zSdMiV36UTvG37hyUn8UWC+E/EUsEKEToSxfI0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mV+TwV28; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FmxOpNiA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4776F1F000E9;
-	Thu, 30 Jul 2026 07:56:30 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mV+TwV28"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0EF311F000E9;
+	Thu, 30 Jul 2026 07:58:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785398190;
-	bh=LnuZvqzBzLjXQC/qKZ7AP5i2XM+zxtzfpC6+zbwYhAU=;
+	s=k20260515; t=1785398328;
+	bh=Y8U1eJiaACO+CExTkMPE6RD//AHCyIx6QkeOunFBeAQ=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=FmxOpNiAEmZLHqZ8xJ58qpT5KUhC0+TLYCGMBwkJqBE8lNCMw6AdyMKJv0Cbp+wPy
-	 Budme5gA7f4JlBImtdDe3X2kcCfbpyHy+Nljau/EEWtTz4dPyOP0xBA3358MjJQ6WY
-	 qkKiTlS0KthcSXo9xdXJiwNKkgRizJh2CDUKxAKtAEQKM7OAB39wyYMal+lIlRQ4JI
-	 dfiWC9iqiCprDWXE07KuNxUHpctzzYg9BCUuYRCrhEUrGK3hA40d4TXsr77EQjz86t
-	 jNOHVIu8KjfA6d3lyF/ydkLlUK57qvGiduGL9ABhNpVIxuJHRloWhr4IjIr2IU23o/
-	 267HJ75arwBVg==
+	b=mV+TwV28NWpFXco2WUu8xv0SgtwsxncCBEGiIpX+/3z//38nwnF8GuwHZcJugV1Hi
+	 +wCaCHibFOmgJvXWp4tMFq0IfMoZJo1u2WUt56i/u3bLhtkMHuh22HuE0vrEblpvPm
+	 /z3Zu9CS/RwmDIYP2u3HaPHjJAofHlrdO/2QhDnR5iD1hfTTt7Djq1y9gt5f1+ctzy
+	 uNIgjV9thnIsQIhSRRyFLUdccRl1JQJqqCuPaExzgMyPGAvrMi3GDX0gN5vLh2zadx
+	 +uNHJ14hpUUBP+O+NwnUAxDy418oj5jnbXmHdXP11JAysN8PHN/V4DTknGpvu4UEvO
+	 tVeiKCcx6Bhgg==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v4 09/29] KVM: arm64: Relax CPTR_EL2 handling when
- FEAT_NV2p1 is present
+Subject: Re: [PATCH v4 21/29] KVM: arm64: Add NVHCR_EL2 handling to the
+ sysreg array
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Marc Zyngier" <maz@kernel.org>
-Cc: "Marc Zyngier" <maz@kernel.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, "Oliver
- Upton" <oupton@kernel.org>
-In-Reply-To: <20260730071022.296811-10-maz@kernel.org>
+Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+In-Reply-To: <20260730071022.296811-22-maz@kernel.org>
 References: <20260730071022.296811-1-maz@kernel.org>
- <20260730071022.296811-10-maz@kernel.org>
+ <20260730071022.296811-22-maz@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 30 Jul 2026 07:56:29 +0000
-Message-Id: <20260730075630.4776F1F000E9@smtp.kernel.org>
+Date: Thu, 30 Jul 2026 07:58:47 +0000
+Message-Id: <20260730075848.0EF311F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
 s) to consider:
-- [High] Userspace modifications to CPTR_EL2 via KVM_SET_ONE_REG are silent=
-ly lost on systems with FEAT_NV2p1.
+- [High] Inverted context logic for NVHCR_EL2 in locate_register() incorrec=
+tly maps the register to an unmanaged hardware CPU register.
+- [High] Missing explicit Context Synchronization Event (ISB) after writing=
+ to the architectural control-plane system register NVHCR_EL2.
 --
 
---- Patch [9]: [PATCH v4 09/29] KVM: arm64: Relax CPTR_EL2 handling when FE=
-AT_NV2p1 is present ---
-commit 0ba038cc87ef366635c1e40d5069280819355ee7
+--- Patch [21]: [PATCH v4 21/29] KVM: arm64: Add NVHCR_EL2 handling to the =
+sysreg array ---
+commit aea2461c165a3a2d9e5915b4946e1ec44773006d
 Author: Marc Zyngier <maz@kernel.org>
-KVM: arm64: Relax CPTR_EL2 handling when FEAT_NV2p1 is present
+Subject: KVM: arm64: Add NVHCR_EL2 handling to the sysreg array
 
-This patch updates the handling of CPTR_EL2 accesses when FEAT_NV2P1 is
-present, preventing trapping via CPACR_EL1 and directly context switching
-CPACR_EL1 in NV contexts instead.
+This commit exposes NVHCR_EL2 to userspace and treats direct access as UNDE=
+F=20
+to catch exception routing bugs. It also updates generic accessors to handle
+the register's location.
 
-> diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/=
-sysreg-sr.c
-> index be685b63e8cf2..6f0f046e4ca4e 100644
-> --- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-> +++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-> @@ -42,10 +42,12 @@ static void __sysreg_save_vel2_state(struct kvm_vcpu =
-*vcpu)
->  		u64 val;
-> =20
->  		/*
-> -		 * We don't save CPTR_EL2, as accesses to CPACR_EL1
-> -		 * are always trapped, ensuring that the in-memory
-> -		 * copy is always up-to-date. A small blessing...
-> +		 * Without FEAT_NV2p1, we don't save CPTR_EL2, as accesses
-> +		 * to CPACR_EL1 are always trapped, ensuring that the
-> +		 * in-memory copy is always up-to-date. A small blessing...
->  		 */
-> +		if (cpus_have_final_cap(ARM64_HAS_NV2P1))
-> +			__vcpu_assign_sys_reg(vcpu, CPTR_EL2, read_sysreg_el1(SYS_CPACR));
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 9439c5b2b1fe8..0aeb2e736fde3 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -221,6 +221,20 @@ static void locate_register(const struct kvm_vcpu *v=
+cpu, enum vcpu_sysreg reg,
+>  		if (is_hyp_ctxt(vcpu) && vcpu_el2_e2h_is_set(vcpu))
+>  			loc->loc =3D SR_LOC_SPECIAL;
+>  		break;
+> +	case NVHCR_EL2:
+> +		/*
+> +		 * Yes, NVHCR_EL2 maps to itself when loaded in nested
+> +		 * context. If you feel like the architecture is double
+> +		 * backing on itself upside down, you're not alone.
+> +		 */
+> +		WARN_ON_ONCE(!kvm_has_nv3(vcpu->kvm));
+> +		if (is_hyp_ctxt(vcpu)) {
+> +			loc->loc =3D SR_LOC_MEMORY;
+> +		} else {
+> +			loc->loc =3D SR_LOC_LOADED | SR_LOC_MAPPED;
+> +			loc->map_reg =3D NVHCR_EL2;
+> +		}
+> +		break;
 
 [Severity: High]
-Will this silently overwrite userspace modifications to CPTR_EL2 during
-vcpu_put()?
+Does this invert the context logic for NVHCR_EL2?=20
 
-When userspace calls KVM_SET_ONE_REG for CPTR_EL2, the ioctl is wrapped in
-vcpu_load() and vcpu_put(). vcpu_load() loads the old memory state into the
-physical CPU.=20
+If !is_hyp_ctxt(vcpu) (meaning the vCPU is running a nested guest), this ma=
+ps=20
+the register to an unmanaged hardware CPU register rather than the guest's=
+=20
+VNCR memory array.=20
 
-Then, because CPTR_EL2 lacks a custom .set_user handler,
-kvm_sys_reg_set_user() falls back to updating the in-memory array:
+Since KVM doesn't save or restore the physical SYS_NVHCR_EL2 register on=20
+context switches, could this cause KVM_SET_ONE_REG to lose the guest's=20
+NVHCR_EL2 state, and KVM_GET_ONE_REG to leak uninitialized host physical=20
+register state?
 
-    if (r->set_user) {
-        ret =3D (r->set_user)(vcpu, r, val);
-    } else {
-        __vcpu_assign_sys_reg(vcpu, r->reg, val);
-        ret =3D 0;
-    }
+[ ... ]
 
-This updates the in-memory array, but not the physical hardware register.
+> @@ -298,6 +313,7 @@ static void write_sr_to_cpu(enum vcpu_sysreg reg, u64=
+ val)
+>  	case DACR32_EL2:	write_sysreg_s(val, SYS_DACR32_EL2);	break;
+>  	case IFSR32_EL2:	write_sysreg_s(val, SYS_IFSR32_EL2);	break;
+>  	case DBGVCR32_EL2:	write_sysreg_s(val, SYS_DBGVCR32_EL2);	break;
+> +	case NVHCR_EL2:		write_sysreg_s(val, SYS_NVHCR_EL2);	break;
 
-When vcpu_put() is called, this newly added code in
-__sysreg_save_vel2_state() reads the stale old value from the physical
-hardware register and overwrites the newly set in-memory value, silently
-destroying the userspace modification.
+[Severity: High]
+Is an explicit context synchronization event (isb) required here after writ=
+ing=20
+to NVHCR_EL2?=20
 
-Could a custom .set_user handler be needed for CPTR_EL2 to ensure the
-physical CPU register is updated when modified by userspace?
+The write_sysreg_s macro modifies a control-plane system register but is=20
+followed immediately by a branch (break), skipping the architectural=20
+requirement of having an isb as the very next instruction.=20
+
+Could this leave the CPU pipeline operating in an architecturally undefined=
+=20
+state when userspace calls KVM_SET_ONE_REG?
+
+>  	default:		WARN_ON_ONCE(1);
+>  	}
+>  }
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260730071022.2968=
-11-1-maz@kernel.org?part=3D9
+11-1-maz@kernel.org?part=3D21
