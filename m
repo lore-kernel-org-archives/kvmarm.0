@@ -1,123 +1,73 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3CC5394793;
-	Thu, 30 Jul 2026 07:40:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AB5A33A6E9;
+	Thu, 30 Jul 2026 07:48:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785397207; cv=none; b=Uv8fpGPsi6QEEykZfOVZV/KelAE8tbKRkIK0vfZo5u1pN0XlJIFTtBlhbkFp7X7st35nNtkWB45GPLoEDyRfU+ECeuerFG01fmswUQMCczF14uCIVDsUrZPPQfjdJkBG4HNhwhMk/0uVCts4XnfuxWelo4L3PbliNOYWOXxxMyE=
+	t=1785397705; cv=none; b=E8h+8GotqJzLsY64t+1VlLmh53HxRcH3DtKxJ48fagfgoLPY/AgEyTNFwHYCgs6/b3MAVI7gJ6Gyp4lRSQQF1CsQExXzgALactXp0GRpEghTwXDjqzMEnX0/cqCkU6YZdpNVhegtMeROQ/NXQKMa/F4ltxxe52OJNUQzr5WsaKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785397207; c=relaxed/simple;
-	bh=UqmIo035RLB5GZ2eONbUIzEfvxJ+WIFGLMXLB39gFew=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=JMTwCGwouuWe1Zlh7LCVQd9Ef23sWCmkCFz4OJBNLrPIU4C/JtMtunE7MOSe6xUuOvzcBbwwKiR7j0Lo7JqhTZ+AMEaQxc5Z6jsaEpnEG54bgbiLPM4xjBWFK3trYUJEmA7oGT94e4UCL1BZUcGhe+uLHgAL8SuEeG+LHgCSy8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QAtrAh8o; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1785397705; c=relaxed/simple;
+	bh=FsenuTaz/BFderDKHsgfa4o9Sr20Q65dASpKlc2LKXY=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Xu6+lVdCI5MnFniQb8OSsqDCq5EG7c7HMcWx6wIZEhPNLL57yjNkKDnOwUmjyDKMQap6xBa1prCzt7m/SiCCBHvrkBqbxF8KZ0ih5C18M60jZ9wKE7PaZZzgnGetUnn68rFebqUtQBJX3mW4sAGNsq7fBK4xOv8nV09SFKcYRMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PzxP+QNA; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QAtrAh8o"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07CE71F000E9;
-	Thu, 30 Jul 2026 07:40:05 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PzxP+QNA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A50BD1F000E9;
+	Thu, 30 Jul 2026 07:48:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785397206;
-	bh=tHRwLzYCAfinQxpL1fk/S7vX/ShxAQIz6+RCQwOARvw=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=QAtrAh8osIXklayJm8If92O49sU/v+RarMqGqAjIbnIhWmhPtFLB3kdanWhxBDmEV
-	 oxRW4BPk2HxKuneftpVBh+2R4NEa7pBDo7CVGMxy0k+lBp9TNLzc7xbR+OaDst2hRX
-	 LWkGvvdlz9Z/4vez+/6saF02lvUZndeGrFuBic4TjG2d8cv03m3KyUIM2p+qjtYSzE
-	 DId5KbJMEFvMn97AuFsRbgenZcnjCaZJcciqoRcekSzj3eEvuW14KerTdlTrJhQQ/w
-	 bvqsI7Ax4au1H/IC8fdCE/PtbZXLziOdJ28gTaxx8EbJoGYV/S70lGMuUkZOAsSS+Q
-	 2/VvlYwFqAQgw==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v4 14/29] arm64: sysreg: Add HCRX_EL2 bits related to
- FEAT_NV3
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Marc Zyngier" <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, kvm@vger.kernel.org, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260730071022.296811-15-maz@kernel.org>
+	s=k20260515; t=1785397703;
+	bh=qOQlhF4huR1pkFA8sB/XUChT+M4qAMQuuGlhdgNtNv8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=PzxP+QNAUlM+nGSwqxo8OwWhSLh41PsM4LN9QnHDDTYDVKGprUB7RBi10crow+Cxd
+	 t7LaT0DU9f6bhyb+mZI0/bdtGaILOEHvFENjPsecVE0IpxoupdrRRjgwQOiDWZPZ1x
+	 VbY+xdQJMyc1aQRTQ4B5GeisYm4QJSmNGuKXNYI2oaWACD8D5Z4NH9WFBb8YxhZu9t
+	 +JAfjJZhNCpXLdwckl7isRtpal83nJM+g5r37eG7pQPQq6Dqti//ebsnvSrNEXB3MJ
+	 bkM/gujhrWP/bGg/N8zJHqQCuwcsTKYNEB+ErXdagO5z2WeKlm5I6kWwFwnWaKdZET
+	 Xl4RjNyctnP1w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wpLV7-0000000APud-3d9k;
+	Thu, 30 Jul 2026 07:48:21 +0000
+Date: Thu, 30 Jul 2026 08:48:21 +0100
+Message-ID: <86pl04dika.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: sashiko-reviews@lists.linux.dev
+Cc: kvmarm@lists.linux.dev,
+	"Oliver Upton" <oupton@kernel.org>,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH v4 14/29] arm64: sysreg: Add HCRX_EL2 bits related to FEAT_NV3
+In-Reply-To: <20260730074006.07CE71F000E9@smtp.kernel.org>
 References: <20260730071022.296811-1-maz@kernel.org>
- <20260730071022.296811-15-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 30 Jul 2026 07:40:05 +0000
-Message-Id: <20260730074006.07CE71F000E9@smtp.kernel.org>
+	<20260730071022.296811-15-maz@kernel.org>
+	<20260730074006.07CE71F000E9@smtp.kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev, oupton@kernel.org, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [High] Adding new HCRX_EL2 fields (NVnTTLBOS, NVnTTLBIS, NVnTTLB, NVTGE) =
-to the sysreg file silently removes them from the auto-generated HCRX_EL2_R=
-ES0 mask, but KVM's feature map was not updated to handle them. This semant=
-ic drift breaks KVM validation and allows guests to inject unvirtualized CP=
-U features into the host.
---
+On Thu, 30 Jul 2026 08:40:05 +0100,
+sashiko-bot@kernel.org wrote:
+> 
+> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
+> - [High] Adding new HCRX_EL2 fields (NVnTTLBOS, NVnTTLBIS, NVnTTLB, NVTGE) to the sysreg file silently removes them from the auto-generated HCRX_EL2_RES0 mask, but KVM's feature map was not updated to handle them. This semantic drift breaks KVM validation and allows guests to inject unvirtualized CPU features into the host.
 
---- Patch [14]: [PATCH v4 14/29] arm64: sysreg: Add HCRX_EL2 bits related t=
-o FEAT_NV3 ---
-commit 98082153874cf6a7ea1e64f1536725fa89404dc8
-Author: Marc Zyngier <maz@kernel.org>
+"semantic drift" my arse. You're a stuck record.
 
-arm64: sysreg: Add HCRX_EL2 bits related to FEAT_NV3
-   =20
-FEAT_NV3 introduces 4 new HCRX_EL2 control bits. Describe them
-in the sysreg file.
+	M.
 
-> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> index 42839d2b15ae4..67d013b376a3c 100644
-> --- a/arch/arm64/tools/sysreg
-> +++ b/arch/arm64/tools/sysreg
-> @@ -4548,7 +4548,12 @@ Fields	ZCR_ELx
->  EndSysreg
-> =20
->  Sysreg	HCRX_EL2	3	4	1	2	2
-> -Res0	63:27
-> +Res0	63:35
-> +Field	34	NVnTTLBOS
-> +Field	33	NVnTTLBIS
-> +Field	32	NVnTTLB
-> +Res0	31:28
-> +Field	27	NVTGE
-
-[Severity: High]
-By changing these bits from Res0 to Field, they are silently removed from t=
-he
-auto-generated HCRX_EL2_RES0 mask. Does this cause KVM's boot-time validati=
-on
-loop to fail?
-
-In arch/arm64/kvm/config.c, check_feat_map() asserts that all non-RES0 bits
-are accounted for. Since hcrx_feat_map is not updated with NEEDS_FEAT()
-mappings for these new fields, it seems this will unconditionally trigger an
-error on boot:
-
-arch/arm64/kvm/config.c:check_feat_map() {
-    ...
-    if (mask !=3D ~resx)
-        kvm_err("Undefined %s behaviour, bits %016llx\n",
-                str, mask ^ ~resx);
-    ...
-}
-
-Furthermore, without these bits being tracked in KVM's feature map, can a
-nested guest set them in its virtual HCRX_EL2 register?
-
-If the guest writes these bits, it appears they could bypass filtering duri=
-ng
-guest entry and be written directly into the physical CPU register:
-
-arch/arm64/kvm/hyp/include/hyp/switch.h:__activate_traps_common() {
-    ...
-    hcrx |=3D (val & ~NV_HCRX_GUEST_EXCLUDE);
-    hcrx &=3D ~(~val & ~NV_HCRX_GUEST_EXCLUDE);
-    ...
-}
-
-Could this allow an untrusted guest to misconfigure unvirtualized hardware
-state?
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260730071022.2968=
-11-1-maz@kernel.org?part=3D14
+-- 
+Without deviation from the norm, progress is not possible.
