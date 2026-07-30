@@ -1,43 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5268420010A;
-	Thu, 30 Jul 2026 08:09:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D822218EBA;
+	Thu, 30 Jul 2026 08:12:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785398949; cv=none; b=kN2FB2KRwR+0fqvrYkxOVyQaxQGUUfubowMcLxi9K+4NE00hDz0+yoqwKjwq8UzvIsRXF70q1O9KL4K8Gn2i+t/DMzB+h9s4xnC5qwLN6B5MG5wYp7BEChjsAO5VxPDEmkblNPNVeX3LhIA8G3JYOGUKcw/fn2GkaWn+YYjO19w=
+	t=1785399142; cv=none; b=K/QQajlnbuyHveu/h/NDpJ60GSf6MPzN2DTIrrL5jtgkNyXMDOvD+C6KfK8dLkMWUXmwbvN2MKjy1LeHCO1nGk6qiyE8tf1UK2v4TkPmSIJuy+HzvUfx4739Iab8nZBZFwnqR/ZLugm8Fc0gP6WH7HA2QYPUhXEkhYV8VIklhsc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785398949; c=relaxed/simple;
-	bh=vbIJ6wHYstVYO4F4ITYKUPTTa/6B1jeuMt4mwdgv/7A=;
+	s=arc-20240116; t=1785399142; c=relaxed/simple;
+	bh=+DJEii80HDI2j5X1S2dZsqOy7kKVF7UNKa5BccaSIe4=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=eEMNBMPNdFshwPp0SYULztbU/0is7iIIw3I1O0ARcIOjqdVSBrdLH4dmllDzEpULKC7PBTj7RiYFkD2QdAgskGQf3t0W318eyIyzOuLOfj6RgRj013kRVSq5dl7Wod+1Zz/tIAc1N5SuEmvYz354QUyEwDaNyrCjG6ir3gQfvKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=evT0eGRx; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=VZSkBVmOps+T3xfqd0LZNOrZ7bChES+YaH80ULvwHH+TMD1NiX3DqjytmvE4r87D1P4AFH0bMw3i0GMGf3ybFQrfnpCmcj3cl0ZQK0MS1ClAAVfZbyp/VA7ZrXcuK7B+Lnura8bbnzF+ohdAPRG78d4cCiHVbmv1ehyF+gWvG9E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a5lzAGPF; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="evT0eGRx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 820331F000E9;
-	Thu, 30 Jul 2026 08:09:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a5lzAGPF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C490A1F00A3A;
+	Thu, 30 Jul 2026 08:12:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785398947;
-	bh=Z2hWtmEZLNmHY8PiP5RS6rKpQO5SmncyO60fVnqaCks=;
+	s=k20260515; t=1785399141;
+	bh=RN8hQRSRK9YNOZUOY6bK/8BtpFk4WFPrIkGWyHimyXY=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=evT0eGRxdY5FEnnP0PGvBHBM/CnWAvySFbQ95MB/V2ofDOt2Cej3R0aBZag20ZB8z
-	 SXjZh9rZHbTIQw0UVCNRlkDYULjYjga268j2/bye1eNA1yn+gchGZGmYnm2Fd5MJtT
-	 td5WaKrf9SboLshIJmcXRLfQVqgiixL5PLGUUJYRG7U32xAp52UVZHxMXPLo57DMTE
-	 TZq0HP4uUUdzCotzohtcBCbnxvZjGGnBySXzPjDX3NUPdLu68BSxcs+f/qMF4QiLIQ
-	 raNG3djot2MWRed1+Qs9C66fFn0JRNF5ITuGQDM1wJX0uGTTpCrdLfsZBUxQwVhOmJ
-	 6JMLktZlCsoag==
+	b=a5lzAGPF71E0SPbQN1N1ZMDyTlPcbhr4PzDGGc/zry+aoeJ3Xv8KjNHWTTGIrpMpM
+	 fKcnwxiYSzVn2qM+ldOM+v0Yk0BPEPKUTpnOMn48p4m088VTkjsmaI56BoMxBU7upu
+	 gqMT+ozHywR6+viTJVon28cB95gUdMDDvB2aMYMZ0sC+iG5C8DjKyYzIMlmIoxERq0
+	 A68imnLm+D2GZwWpfLBMupH1c6FiA+SP6Z4CDXflVMroOqtiqFEnx4xj/oE/KzpPgN
+	 Ehlv/exr62JRNH6myJpIJZsVypRrFyVDGVlVhdH1ES8v69r76NNKeSY4wRN6aOlBVm
+	 Yh6Wtt9uIUu3Q==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v4 11/29] KVM: arm64: Expose FEAT_NV2p1 to NV guests
+Subject: Re: [PATCH v4 22/29] KVM: arm64: Add routing for NVHCR_EL2 trap
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Marc Zyngier" <maz@kernel.org>
-Cc: "Marc Zyngier" <maz@kernel.org>, kvm@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev
-In-Reply-To: <20260730071022.296811-12-maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, kvm@vger.kernel.org, "Oliver
+ Upton" <oupton@kernel.org>
+In-Reply-To: <20260730071022.296811-23-maz@kernel.org>
 References: <20260730071022.296811-1-maz@kernel.org>
- <20260730071022.296811-12-maz@kernel.org>
+ <20260730071022.296811-23-maz@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 30 Jul 2026 08:09:06 +0000
-Message-Id: <20260730080907.820331F000E9@smtp.kernel.org>
+Date: Thu, 30 Jul 2026 08:12:20 +0000
+Message-Id: <20260730081220.C490A1F00A3A@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -46,56 +47,64 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [High] Missing context synchronization event (`isb()`) after writing to a=
- control-plane system register (`CNTKCTL_EL1` / `CNTHCTL_EL2`).
+- [High] The evaluation of HCRX_EL2.NVTGE ignores its architectural depende=
+ncy on HCR_EL2.E2H, leading to incorrect trap routing for non-VHE guest hyp=
+ervisors.
 --
 
---- Patch [11]: [PATCH v4 11/29] KVM: arm64: Expose FEAT_NV2p1 to NV guests=
+--- Patch [22]: [PATCH v4 22/29] KVM: arm64: Add routing for NVHCR_EL2 trap=
  ---
-commit 5b82c2dde5c66c45b12e75de220aab8518c99896
+commit 007c598e0e2ba89316901f92f901362aec3f3a5b
 Author: Marc Zyngier <maz@kernel.org>
 
-KVM: arm64: Expose FEAT_NV2p1 to NV guests
+KVM: arm64: Add routing for NVHCR_EL2 trap
+   =20
+This commit describes the exception routing tables for NVHCR_EL2 accesses
+from EL1, taking them to EL2 when HCRX_EL2.NVTGE=3D=3D0 and HCR_EL2.NV=3D=
+=3D1.
 
-This commit exposes FEAT_NV2p1 to nested virtualization guests. By reducing
-the number of traps and updating timer configurations, it brings valuable
-performance improvements to NV guests.
+> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nes=
+ted.c
+> index a6d1a265841f2..ffe307f222e66 100644
+> --- a/arch/arm64/kvm/emulate-nested.c
+> +++ b/arch/arm64/kvm/emulate-nested.c
 
-> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-> index 4155fe89b58a1..db60facad9f3c 100644
-> --- a/arch/arm64/kvm/arch_timer.c
-> +++ b/arch/arm64/kvm/arch_timer.c
-> @@ -876,8 +876,14 @@ static void timer_set_traps(struct kvm_vcpu *vcpu, s=
-truct timer_map *map)
->  	assign_clear_set_bit(tvt02, CNTHCTL_EL1NVVCT, clr, set);
->  	assign_clear_set_bit(tpt02, CNTHCTL_EL1NVPCT, clr, set);
-> =20
-> -	/* This only happens on VHE, so use the CNTHCTL_EL2 accessor. */
-> -	sysreg_clear_set(cnthctl_el2, clr, set);
-> +	/*
-> +	 * This only happens on VHE, so use the CNTHCTL_EL2 accessor, unless
-> +	 * we are sure CNTKCTL_EL1 is completely stateful with FEAT_NV2p1.
-> +	 */
-> +	if (!cpus_have_final_cap(ARM64_HAS_NV2P1))
-> +		sysreg_clear_set(cnthctl_el2, clr, set);
-> +	else
-> +		sysreg_clear_set(cntkctl_el1, clr, set);
+[ ... ]
+
+> @@ -588,6 +590,15 @@ static enum trap_behaviour check_mdcr_hpmn(struct kv=
+m_vcpu *vcpu)
+>  	return BEHAVE_HANDLE_LOCALLY;
 >  }
+> =20
+> +static enum trap_behaviour check_hcr_nv_hcrx_nnvtge(struct kvm_vcpu *vcp=
+u)
+> +{
+> +	if ((__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_EL2_NV) &&
+> +	    !(__vcpu_sys_reg(vcpu, HCRX_EL2) & HCRX_EL2_NVTGE))
 
 [Severity: High]
-Does this write to a control-plane system register require an isb() before
-returning?
+According to the ARM Architecture Reference Manual, the HCRX_EL2.NVTGE bit
+behaves as 0 for all purposes other than reading the value of the bit when
+HCR_EL2.E2H is 0.
 
-The ARM64 architecture generally requires an isb() as the very next
-instruction after writing to control-plane registers like cnthctl_el2
-and cntkctl_el1 to ensure subsequent instructions do not execute with
-a stale configuration.
+Does this raw check of HCRX_EL2_NVTGE need to account for the HCR_EL2.E2H
+dependency?
 
-Because sysreg_clear_set() expands to a hardware write without an isb(),
-timer_set_traps() returns immediately after the write. Could the CPU execute
-subsequent instructions in the caller with stale pipeline state before a
-context synchronization event occurs?
+If a non-VHE guest hypervisor sets HCR_EL2.E2H =3D 0, HCR_EL2.NV =3D 1, and
+HCRX_EL2.NVTGE =3D 1 (which is architecturally valid), it appears KVM might
+falsely conclude the trap shouldn't be forwarded. It would then handle it
+locally in L0, which injects an UNDEF exception into the L2 guest.
+
+There appears to be a similar pattern in is_nested_nv3_ctxt() in=20
+arch/arm64/include/asm/kvm_emulate.h where the raw NVTGE bit is evaluated
+without factoring in the E2H dependency.
+
+> +		return BEHAVE_FORWARD_RW;
+> +
+> +	return BEHAVE_HANDLE_LOCALLY;
+> +}
+> +
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260730071022.2968=
-11-1-maz@kernel.org?part=3D11
+11-1-maz@kernel.org?part=3D22
