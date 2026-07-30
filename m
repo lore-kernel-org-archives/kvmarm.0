@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1C4739EF05;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE8583B9D96;
 	Thu, 30 Jul 2026 07:10:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785395461; cv=none; b=VXhzbJuRyOua12wRjl4HIjRUo/H3VnKwnNx62FfvrpE/sWsmfKLs/0IbDU+RRHFCeS/IWG5cnVdu5t81/dOlc/3OaHAsXvTi+vOYd88AHaBLpyE/2HJiq/6+7Em/Wf+SnTMk/iYpXA6jS9nF3vmsfX57Ejbt/uIWQyPL+qGwZlQ=
+	t=1785395461; cv=none; b=nuh7Wraja+4qy91fNhC/QaKWnzxKMvqhedwj1D8T9YW57mIGSvZEPwhoSYVl6geUinaqUAxZR6vr3/jhBFvIs7D3zXc1WnACO0kj1pov2JdR5aphvWIJo4pYoqbizKecvRdsHKhqbNewobhMK8Kvr2A8iUbUBS6ckHX8EcADTCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1785395461; c=relaxed/simple;
-	bh=E92GD4p3gX7XN+ukjTVmDB/pJ98hKkE/aeNbkjXvc2Q=;
+	bh=SEvD3URA+Glwh5OyaIiOOIT8bjqwmBtVkDQKkVbONYM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Lxg9lyNGG6gs7mx6pPkcxRiGdTqVgDHiDPWWmR0YV2hHSxScQTg31n/Hi4hR5UZCM+zi49ZA1r5JYWjxIZUmotJmwLg/Qc3ph3v9OgIJCzTZf4HjwJQu4mmCl5qm3vuHrZXaQt4YZr+fdf0vCaNaC4+OIxctF2P77uYfwgEwPvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XD9MLmlr; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=NPnfT2/f5wWJqyPyMjZ+JDZMBSD60FE9eivBRfhm8NQ0s/moJ3VUzAWn4KrVcnfLWH9mehJ8anTzqYwUESsmDZDEZO2yuNVsrpUcP6tN0yWMk2M+FolI6YT8MOSYvZkRBbgnw/duWvT/P8zkHuYJNnF6vlEEgAe4cnz6cy2aIoc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oo7Ls81E; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XD9MLmlr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FE711F01559;
-	Thu, 30 Jul 2026 07:10:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oo7Ls81E"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC48A1F00ADB;
+	Thu, 30 Jul 2026 07:10:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785395452;
-	bh=z8cY/iQXo/TDFoSsAUyRfzYopAfoD86sWfH2T0S03zo=;
+	s=k20260515; t=1785395451;
+	bh=QDe8YvYJlu1JYh0yp9syTuhzrxaVjIvimEEjOf5rRHI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=XD9MLmlrVBZfdEOH9WMwmVH22u80Nl/6Mc1d1APYi+25nu4m3SAdlCSq5EIgeLPa3
-	 SGcO9eek20QV0zB5m2kK8C9jKF0IPY5NAQPqu5klNs7gD+2eS1prYlhznrqqXpAauL
-	 vs5HIoh9leskeR2ZFYOw2m3nYu4Qk0yXIYYZwkn6KIg8TOhs0GUl7fAiC59f9kptvj
-	 BRJVuqozGjBlYDMqrEUOTJW9Sj+WWC+cwvmbeg7/6aTCoHdSAjeHfovl50qRCmgpE6
-	 9moqO8QCwhiiUv51wJaHiuzvhAPEMw3IHkx3ePshhny6IpaLENvuLP7Bnx+R1WdavR
-	 jf6ITrwCZcjKg==
+	b=oo7Ls81E2VZ5IXdXmm0UMEQLx+VGMT8bfl2tOYvgogY8OGoM6GBYiWNqPC1ttohlt
+	 uZk1/8qGdj/VtLxiO8JMF+DouT+cdS8OZC/Gvj3d9g3MCfnKDzkscrn7E59IolAKk3
+	 ttPY+h6KMOhfg+gAZ8Is7vX3nrJs51xlyxwlv/IQKB+DPniCW+4gdJQ4l6NBpyvGfj
+	 JqWHcsQig2qrpkbbzhxTKKcCzuNTLXv7uGX1kBCcC31E5tVHfbnDfngMbVbyOHS4lb
+	 QeVvcuP7ScAd5sfTQOvD0z4Cl40hA2Ve5WIpuH3ZnnWWX/d0aZxE6H+XoYieZXpcTr
+	 OOYA2sJxPw8QA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wpKuo-0000000AOpW-47OR;
-	Thu, 30 Jul 2026 07:10:51 +0000
+	id 1wpKuo-0000000AOpW-0Igh;
+	Thu, 30 Jul 2026 07:10:50 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -44,9 +44,9 @@ Cc: Steffen Eiden <seiden@linux.ibm.com>,
 	Yao Yuan <yaoyuan@linux.alibaba.com>,
 	Wei-Lin Chang <weilin.chang@arm.com>,
 	Vladimir Murzin <vladimir.murzin@arm.com>
-Subject: [PATCH v4 12/29] arm64: Add FEAT_NV2p1 detection
-Date: Thu, 30 Jul 2026 08:10:05 +0100
-Message-ID: <20260730071022.296811-13-maz@kernel.org>
+Subject: [PATCH v4 08/29] arm64: Add ARM64_HAS_NV2P1 capability
+Date: Thu, 30 Jul 2026 08:10:01 +0100
+Message-ID: <20260730071022.296811-9-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260730071022.296811-1-maz@kernel.org>
 References: <20260730071022.296811-1-maz@kernel.org>
@@ -62,32 +62,26 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Add the necessary NV2p1 probing to the cpufeature infrastructure.
+As we're about to deal with FEAT_NV2P1, add a new capability that
+will be used to key any support for it.
 
-Reviewed-by: Yuan Yao <yaoyuan@linux.alibaba.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kernel/cpufeature.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ arch/arm64/tools/cpucaps | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 9a22df0c5120f..c9c124b0ccc8e 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -2620,6 +2620,13 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 			{ /* Sentinel */ }
- 		},
- 	},
-+	{
-+		.desc = "FEAT_NV2p1",
-+		.capability = ARM64_HAS_NV2P1,
-+		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-+		.matches = has_cpuid_feature,
-+		ARM64_CPUID_FIELDS(ID_AA64MMFR4_EL1, NV_frac, NV2P1)
-+	},
- 	{
- 		.capability = ARM64_HAS_32BIT_EL0_DO_NOT_USE,
- 		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
+diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+index 9b85a84f6fd49..242dc211d8efa 100644
+--- a/arch/arm64/tools/cpucaps
++++ b/arch/arm64/tools/cpucaps
+@@ -51,6 +51,7 @@ HAS_LS64_V
+ HAS_LSUI
+ HAS_MOPS
+ HAS_NESTED_VIRT
++HAS_NV2P1
+ HAS_BBML2_NOABORT
+ HAS_PAN
+ HAS_PMUV3
 -- 
 2.47.3
 
