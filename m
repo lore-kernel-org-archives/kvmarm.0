@@ -1,44 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A0E2443311;
-	Thu, 30 Jul 2026 19:30:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49C7144AB64;
+	Thu, 30 Jul 2026 19:30:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785439837; cv=none; b=tPZbxhiBfqIFKgx8Q/SO+Z7h20neVJALyiQxMnQZ/AX90iwNINi4XfwePJ335V97hp5C73Yu8b+wZhIu0obv/nuu3FaO/zP0RG4cGzDfY2yCkP588nmA5qikFnTaCmEHmXsrRQoPQJV63erFbyudQi9Gzpit0vKAxREWFasj3dg=
+	t=1785439850; cv=none; b=ew07X7//iY0kktCSXgCmf7YZzfQW58pqCvu0i7gJSZmfdiM370bzUvJoS4Z8MlsqmE5wp3yckmvIE0uArie0E4HETDVZ0TUueyRKTsTPeC2jWKhncsqSiIo2VU+Grbm3pgKtyML4iL8xO3ZNr51JdQGdQ/yXn+LwWWISWMTK37E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785439837; c=relaxed/simple;
-	bh=DaCjTmbL6p7di5d++oNrL8Ofz30+foNSGfxXkphRMEA=;
+	s=arc-20240116; t=1785439850; c=relaxed/simple;
+	bh=8VRZ39JjW+LnTnhUyTEBevaTR9oofWRnqiZVVL0QE+E=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=n7Xp3UNkwnm51MSE2i6TYGI3VONYZhyWTgjRiTK9njlMR/qbqR61qCzd1YAqEIR20UhofEyFalcim3j1EKpcGKJdGHKNTQ9GQDujUbZBS6s/b6ZNjmKgFexfvPQE5RYworME/NUmkT4fyuSxyD/T0fHH0DzbjhnpHqvIx3s1lBE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DhSzjzxx; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=fxVnbP5ViWhQNeDVZKPkDg2Utc/8impyEdfIVqjVTj5JMo//5WZIPiOJgCvnu7mzbZ8i4U1YXZW2o7VpBpGwR+w9k3PtJE0C/jjA09t3VkSVxzS2n0XTyAkPCx74mpZesnf3ewW5VpcZwc4dryQ17WMtEdeSE6xqHSIvPFFgf/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HyLg9Wnf; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DhSzjzxx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFEDF1F000E9;
-	Thu, 30 Jul 2026 19:30:35 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HyLg9Wnf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E7461F000E9;
+	Thu, 30 Jul 2026 19:30:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785439836;
-	bh=82TlRvTtX2bDRajBQGT1fcOoiBLPeCWS47hSoXkFqwo=;
+	s=k20260515; t=1785439847;
+	bh=ox5sZGQ//BQnwB1WVHF9fNTVmApRVXCe/kQVAmkGFIs=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=DhSzjzxxWp3Dkeg9s49dKJpjksD2BPR6al5nmQDSS8XuCmuUbMtCOkEMo3xwuW1+k
-	 1mhMM4vHfT62j6s2RcO1cTpuhRmBzneBgQvc1iJvBaWGbNvkzrre4igUs8WDT8nxdu
-	 ahfIQ8Z7ZpnUKXiFwx43nFDwiQ2jefnIEUd0eDXUwbs2eo/CtzygASdLHEucB/ud0w
-	 /Ki/mdcWYK9XfLqDuFVHKddA3eOdgxgAzYn9wCc1eBOb+B7k115wzZOP0w7pEpniZ4
-	 O9tG/Xid7I1KQScH3H5qDHxcqYcW+BD2zzckMDWexJlV/ku3Aqvdk8i9zadoZmSGbb
-	 Fyct6xkvguiUQ==
+	b=HyLg9Wnf7Id0QAA9EITRpPdZClIeCJo5RQvoa2V22GwcUBVdSf23eJ9db3tbFVYwu
+	 DopRFydVzX48gcv3CxpuM4Q8oajX8WlgSfkceV1t09o8vyHN8srS0WkYUfVDvzF0TZ
+	 oYPRUNx89Ct00yE/MIF0nWo1ajRki6e/fVTVHt9k8WL/uYh442AcqZVHvZB53CaqFA
+	 FxSH30CXXaSNhFKPw7gzFnHlM3ziFsWRNKkMbjvtDc3hc/dKhkwr4+MFpq7lE7n0SO
+	 r86yu7S/YXmDa4Q1IzDQzbq92Sbo+tPz7eCtgi+GQuEZmlZ6n9ML02+5wZVkNTP9g0
+	 dS4naurTreJ8w==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 4/9] KVM: selftests: Drop unreachable, dead code from
- hardware disable test
+Subject: Re: [PATCH 5/9] KVM: selftests: Add KVM syscall wrapper for
+ pthread_create()
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Sean Christopherson" <seanjc@google.com>
-Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-In-Reply-To: <20260730191908.2084803-5-seanjc@google.com>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, "Marc Zyngier" <maz@kernel.org>, "Oliver
+ Upton" <oupton@kernel.org>
+In-Reply-To: <20260730191908.2084803-6-seanjc@google.com>
 References: <20260730191908.2084803-1-seanjc@google.com>
- <20260730191908.2084803-5-seanjc@google.com>
+ <20260730191908.2084803-6-seanjc@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 30 Jul 2026 19:30:35 +0000
-Message-Id: <20260730193035.CFEDF1F000E9@smtp.kernel.org>
+Date: Thu, 30 Jul 2026 19:30:46 +0000
+Message-Id: <20260730193047.3E7461F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,56 +48,61 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [Medium] Replacing a blocking `pthread_join` with an infinite busy-wait l=
-oop (`while (1);`) in the child process unnecessarily burns CPU and causes =
-scheduler contention with the parent process.
+- [Low] Misleading error reporting when pthread_create fails due to relianc=
+e on errno.
 --
 
---- Patch [4]: [PATCH 4/9] KVM: selftests: Drop unreachable, dead code from=
- hardware disable test ---
-commit 80b1aa13e14f4a3f65225bf79adc03a7a8eda318
+--- Patch [5]: [PATCH 5/9] KVM: selftests: Add KVM syscall wrapper for pthr=
+ead_create() ---
+commit c5c266b1e7b797f8b82c5a3cecf097ba6720b060
 Author: Sean Christopherson <seanjc@google.com>
 
-KVM: selftests: Drop unreachable, dead code from hardware disable test
+KVM: selftests: Add KVM syscall wrapper for pthread_create()
 
-This commit removes unreachable code from the hardware disable test to redu=
-ce
-noise and simplify the test logic. It refactors thread creation and replaces
-a blocking wait with a busy loop in the child process.
+This commit adds a KVM wrapper for pthread_create() to eliminate manual
+success assertions in selftests. It replaces direct calls to pthread_create=
+()
+with kvm_pthread_create() across multiple test files.
 
-> diff --git a/tools/testing/selftests/kvm/hardware_disable_test.c b/tools/=
-testing/selftests/kvm/hardware_disable_test.c
-> index 1bcbd13e99947..e08aef94382f3 100644
-> --- a/tools/testing/selftests/kvm/hardware_disable_test.c
-> +++ b/tools/testing/selftests/kvm/hardware_disable_test.c
+> diff --git a/tools/testing/selftests/kvm/include/kvm_syscalls.h b/tools/t=
+esting/selftests/kvm/include/kvm_syscalls.h
+> --- a/tools/testing/selftests/kvm/include/kvm_syscalls.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_syscalls.h
 
 [ ... ]
 
-> @@ -96,21 +84,19 @@ static void run_test(u32 run)
-[ ... ]
->  	pr_debug("%s: [%d] all threads launched\n", __func__, run);
->  	sem_post(sem);
-> -	for (i =3D 0; i < VCPU_NUM; ++i)
-> -		check_join(threads[i], &b);
-> -	/* Should not be reached */
-> -	TEST_ASSERT(false, "%s: [%d] child escaped the ninja", __func__, run);
+> @@ -96,6 +97,10 @@ __KVM_SYSCALL_DEFINE(ftruncate, 2, unsigned int, fd, o=
+ff_t, length);
+>  __KVM_SYSCALL_DEFINE(madvise, 3, void *, addr, size_t, length, int, advi=
+ce);
+>  __KVM_SYSCALL_DEFINE(sched_getaffinity, 3, pid_t, pid, size_t, cpusetsiz=
+e, cpu_set_t *, mask);
+> =20
+> +typedef void *(*pthread_fn_t)(void *);
+> +__KVM_SYSCALL_DEFINE(pthread_create, 4, pthread_t *, thread,
+> +		     const pthread_attr_t *, attr, pthread_fn_t, fn, void *, arg);
+
+[Severity: Low]
+Does this lead to misleading error messages on failure?
+
+The __KVM_SYSCALL_DEFINE macro seems to assume the wrapped function sets er=
+rno
+on failure, which gets printed when the test asserts via __KVM_SYSCALL_ERRO=
+R.=20
+However, pthread_create() returns its error code directly rather than setti=
+ng
+errno.=20
+
+If thread creation fails, it looks like the test framework might print a
+misleading message containing "errno: 0 (Success)" alongside the actual
+non-zero return code. Should this use a different wrapper or assert strategy
+that handles direct error returns?
+
 > +
-> +	/* Wait for the parent to SIGKILL this child. */
-> +	while (1);
-
-[Severity: Medium]
-Since the child and parent share the same CPU affinity, will this busy spin
-loop cause unnecessary scheduler contention with the parent process when the
-parent's timer fires?
-
-Because the processes are pinned to a single CPU core, spinning in this loop
-burns CPU cycles and forces the parent to contend with the spinning child f=
-or
-CPU time.
-
-Would it be better to use a blocking wait like pause() or sleep() here to
-reduce scheduler latency and avoid 100% CPU utilization?
+>  #define kvm_free_fd(fd)		\
+>  do {				\
+>  	kvm_close(fd);		\
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260730191908.2084=
-803-1-seanjc@google.com?part=3D4
+803-1-seanjc@google.com?part=3D5
