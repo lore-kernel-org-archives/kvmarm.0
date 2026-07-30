@@ -1,98 +1,108 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 823B71F3B85;
-	Thu, 30 Jul 2026 14:11:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61F7743E487;
+	Thu, 30 Jul 2026 14:32:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785420686; cv=none; b=ELwABMLKltVASgmpvdtXc2Q8Hawn7al7ETkSmpRkSeMzrU+qtI7SA3aUPNgi8tHnq3uHjjFWXpHUNdvEglRmSc7sENKFeF38BSI4QLA5YDdUBLORNQBobHk5wyPX5/MU4tKZMBkz8PiXw32NqmNMUpsbGveodWACsf6rvff0uwQ=
+	t=1785421954; cv=none; b=UqGncMjpRI6C01T32jUZKWtGzdkQ0UGd+Z2KOZoG3OCxKpqeH+p4ZOEMHcGyGQFwEonce0Bo87V2zu8/diNYi2RyrdpZ3URmxI52lkI0gjdMtcS0DryPyCIQcJb0MQicsugbrRiI6+UxWtI0foJvQ89Q40wUnQPRpLUTA8fVj9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785420686; c=relaxed/simple;
-	bh=a6J37B2pZblj/ORx0/wORmIZxx13s4E4W+XFjZwszaA=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=n4ku7hCQ6QXQwXuGnvIFqS+0BsKr+MBz2wGHHCQlmi0A+jI/ZQdnLgaS4QDYu+AM67a2unSOGDrr8vX/qyry0rJstsAzHQvQRvEAVlqCZPC/6TEbO/Ms9jUUHASPWsxX8sEPBmNP9iuUOSa/IIy3B1AowkJKP9IUoMfA6a4gUCw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=USYgR3qT; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1785421954; c=relaxed/simple;
+	bh=H0j+ak7P6FxYM9YHOv0hMbYlD0vT/TA0Lb1Hxf9kcEc=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nh1Kfl0j7GnPDiD3zi+O5wgN/WekZ8zXALtOUwXN15zbj14JfnbEdiyhl97c2q5GvzL2GF8Qv2wVh0lYu6+dkW2O2KT9kpU87V6UebvL/lK2djzDgZ4jIb6KG52mL0N/x0o2CQlS9T5RKRd7FCTSs5mRI6u226wrDsgNVllk+WI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oLd2ar1Y; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="USYgR3qT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 162E31F000E9;
-	Thu, 30 Jul 2026 14:11:25 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oLd2ar1Y"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 371001F000E9;
+	Thu, 30 Jul 2026 14:32:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785420685;
-	bh=RLwPaWczutbFZz2l0hdfV/DG/T5MQRjMTbKarsnrv7E=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=USYgR3qTwwj+osOWOMs61kEQZZEtzDR+vSbtKDdrvQf3JRYTiZFwuYKZ82YUZt4sT
-	 WN9ByPYJPrawXndcP+AedYZg91n8PMFwZ5Zbqa0XOmLGPeBikX9SL8F4flXeu8FkTO
-	 wCuKpwKLV4/q8LdhOSJPVbD0N3qBOkVbrXMDcPklyblqsSHOG7Su11zF5oVv2ekh4m
-	 3q9MHYNRWcJPK5B9YdwtU6xezvHxJd7jcsIPm2Me454TMD0pVtUhA23kczvqjDIOi5
-	 lC8x6IWxHYaKFCpWe1GXbgpokbfPtQuBZnXG5MnQrqSkhLfmcdB+AYpLCWKbLjEl7R
-	 jENI5B9Vzne/g==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2] arm64: errata: Add NXP iMX8QM workaround for A53
- cache coherency issue
-Reply-To: sashiko-reviews@lists.linux.dev
-To: =?utf-8?b?UGVuZyBGYW4gKE9TUyk=?= <peng.fan@oss.nxp.com>
-Cc: imx@lists.linux.dev, Frank.Li@kernel.org, "Marc Zyngier" <maz@kernel.org>, "Oliver
- Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev
+	s=k20260515; t=1785421953;
+	bh=t+KqEaNzWqHCuOVTuY3+paIJQew4PZqcIQjocemxxEY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=oLd2ar1YcANx/v39ZEOsHMAKeGJB37F1/02y/fKFmJ6XQYsWJdJh9tl/mGC9hGmBG
+	 SWrgSy5TXEs4Kgok3N+WgWUcN1eI6dSkX1bWjltlH2r66ZZD/e6aBUr6uNRyQqY/oQ
+	 Np0BqiQci2IABAX0leuggEDVcqujNtD1S52Dl3YpcMF2rORw8V34saJNQMBHbg8eDI
+	 5S7wLwE+uoiuXmFFhLltufzbWe7imIaCSITX88M9JEeaVCKjOei+3DOop4FBgvKMsv
+	 /PwOMP5isyDWvXb0etseoPc9Pqd7GHCvDbj/4uWJwwvwNkyPM4+GFckF4IujuAkYJO
+	 +glDaZ48d75DQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wpRoE-0000000AZFl-2oEA;
+	Thu, 30 Jul 2026 14:32:30 +0000
+Date: Thu, 30 Jul 2026 15:32:30 +0100
+Message-ID: <86ecgkczup.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: "Peng Fan (OSS)" <peng.fan@oss.nxp.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	"Ivan T. Ivanov" <iivanov@suse.de>,
+	Francesco Dolcini <francesco@dolcini.it>,
+	Frank Li <frank.li@nxp.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	imx@lists.linux.dev,
+	Peng Fan <peng.fan@nxp.com>
+Subject: Re: [PATCH v2] arm64: errata: Add NXP iMX8QM workaround for A53 cache coherency issue
 In-Reply-To: <20260730-imx8qm-cache-coherency-v2-1-5651aeb1af16@nxp.com>
 References: <20260730-imx8qm-cache-coherency-v2-1-5651aeb1af16@nxp.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 30 Jul 2026 14:11:24 +0000
-Message-Id: <20260730141125.162E31F000E9@smtp.kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: peng.fan@oss.nxp.com, catalin.marinas@arm.com, will@kernel.org, corbet@lwn.net, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, iivanov@suse.de, francesco@dolcini.it, frank.li@nxp.com, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, imx@lists.linux.dev, peng.fan@nxp.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
+On Thu, 30 Jul 2026 14:53:02 +0100,
+"Peng Fan (OSS)" <peng.fan@oss.nxp.com> wrote:
+> 
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 9a6c72a18672..734ccd7ec056 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -3032,6 +3032,11 @@ static __init int kvm_arm_init(void)
+>  
+>  	in_hyp_mode = is_kernel_in_hyp_mode();
+>  
+> +	if (cpus_have_final_cap(ARM64_WORKAROUND_NXP_ERR050104)) {
+> +		kvm_info("KVM not supported on NXP iMX8QM (ERR050104)\n");
+> +		return -ENODEV;
+> +	}
+> +
+>  	if (cpus_have_final_cap(ARM64_WORKAROUND_DEVICE_LOAD_ACQUIRE) ||
+>  	    cpus_have_final_cap(ARM64_WORKAROUND_1508412))
+>  		kvm_info("Guests without required CPU erratum workarounds can deadlock system!\n" \
 
-Pre-existing issues:
-- [High] Missing Context Synchronization Event (CSE) after writing to `SCTL=
-R_EL1`.
---
+I really dislike this sort of hacks in the KVM code.
 
---- Patch [1]: [PATCH v2] arm64: errata: Add NXP iMX8QM workaround for A53 =
-cache coherency issue ---
-commit 174c9667365c79e4a6011c183eeb84b1ff94a880
-Author: Peng Fan <peng.fan@nxp.com>
+Instead, please find a way to set 'kvm_mode' to KVM_MODE_NONE from
+your erratum handler, and KVM will gracefully disable itself, as if
+that was passed on the command line.
 
-arm64: errata: Add NXP iMX8QM workaround for A53 cache coherency issue
+It shouldn't be too hard to do.
 
-This commit adds a workaround for the NXP i.MX8QuadMax SoC cache coherency
-issue (ERR050104). It upgrades targeted TLBI and IC IVAU operations to
-broadcast-all variants via static keys and alternatives, and disables KVM
-support for the affected hardware.
+Thanks,
 
-Link: https://lore.kernel.org/all/20230420112952.28340-1-iivanov@suse.de/
+	M.
 
-> diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errat=
-a.c
-> index 5db8f0619e4bc..1866eeec27cab 100644
-> --- a/arch/arm64/kernel/cpu_errata.c
-> +++ b/arch/arm64/kernel/cpu_errata.c
-
-[ ... ]
-
-> @@ -200,6 +201,16 @@ cpu_enable_cache_maint_trap(const struct arm64_cpu_c=
-apabilities *__unused)
->  	sysreg_clear_set(sctlr_el1, SCTLR_EL1_UCI, 0);
-
-[Severity: High]
-This is a pre-existing issue, but does this write to SCTLR_EL1 require an
-immediate isb() barrier before returning?
-
-Writing to a control-plane system register like SCTLR_EL1 in
-cpu_enable_cache_maint_trap() without an immediate Context Synchronization
-Event (CSE) violates architectural invariants. Returning without an isb()
-leaves the CPU pipeline in an undefined state, which could lead to spurious
-exceptions or boot-time hangs on affected platforms.
-
->  }
-
-[ ... ]
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260730-imx8qm-cac=
-he-coherency-v2-1-5651aeb1af16@nxp.com?part=3D1
+-- 
+Without deviation from the norm, progress is not possible.
