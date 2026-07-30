@@ -1,106 +1,132 @@
-Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5816390CB7
-	for <kvmarm@lists.linux.dev>; Thu, 30 Jul 2026 06:52:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50F9E3B71A2;
+	Thu, 30 Jul 2026 07:10:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785394371; cv=none; b=g3QeF8KWD2Iqwwu8xxOw9OjQQWdyDdt2mtfxgWE/0/Lii6cpZNjFQu5qP4fvNd9olJaYggHTM9lGTHj71CbmnnUjo0ebRR3hGdhu8qJ/JpWuOhmnxgzaFoMmzEsKKoMyzssYc+zOdc1xowphnMC5pLAMlwjOQUS02pVU32Cvlqo=
+	t=1785395456; cv=none; b=q1OHdzIpCzfbxf1nTrJoUlXSpGb1U9obI5zKD07EOukp0puClLjkNTyc1+WjAMAjRXruuJaUYQh2a1ZzyA1ErJWmr0CF/Wz26Wu5ompKRMcclFzeF1oWxV2tZfmiUvQg2pY0O886La0NJfno6u69lo6Y9ym/+9YoFcE/MwQbMaw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785394371; c=relaxed/simple;
-	bh=Pbj0P+gU8va8jJCrhk4MN1M1pVJoePTsLFgY9CKEP0E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Piu8j9RmvgAiGGUhCqn1OumOMs/YP5mj+nYrL9eiDY5KRpFj6hMAL/0maarWioPDp6G5uckyqBaA4GjD9ContB5prf2E6kBaSRkBsnAWWt6uHDpJks/ujy1LIRNbfYA1zY2DadKH5BRHgABPI+RA4tOkKXT0k/5JXFBKNYvNQPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CYKlEiPW; arc=none smtp.client-ip=91.218.175.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1785395456; c=relaxed/simple;
+	bh=1oI0ojKzOYyrYr2Czs3TgbpYBucGl/eqJ0RhaXxMA7c=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Syzkr6RjhKaP2KfcDuheHUn5rUH5TNBgWx1IkpEdYvEoy6BrwOGy2ON0jBD+QttpBMA03/2UGNmNGir5vBkxXxBa0GnfH7fBQMmNi26ztnhpWF9JUFkqlLmaGPO/fm1X5EqIZcy+JbsrsjnMjyeoN18NN6Dv0873rA+K7VnvoZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KI7TK0Ix; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CYKlEiPW"
-X-Forwarded-Encrypted: i=1; AHgh+RpOBv3RJoAZNRL0QeDdiNxRIPPEvpji/Qb+q0qmzxQIPKd/0dS9MIKHACnJkt4TBONZyAqOJtE=@lists.linux.dev
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1785394365;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Pbj0P+gU8va8jJCrhk4MN1M1pVJoePTsLFgY9CKEP0E=;
-	b=CYKlEiPWcokrwV+krrct1DTU08idAnVEjv3ESmpziOHJZQe/rIH1UCE+sdGhBl3SP/MC4z
-	lIEUib7O9VDxududJ2z2CQCxfcx/eyOIzaCLqmpp7SBcH2GXzF1pDwpvkWyXORLxRae+dJ
-	85PdemrAEnW5VHezR7d7TZyjbXhQdW8=
-X-Gm-Message-State: AOJu0Yy5inZgvtXKgT6Iwx3zFAB2svJrd6w1LIlSSeuA118l+1geKgE+
-	3vPGFzCUcDbofTZ9RUdAi5tUdTFSMZfOfkGIHMhNK9Ep0QDmjop9onQv79arZIxYiNaJOIX8rxf
-	+RtKNrZyqyGW7pLRovSsyi9MkQ7i5KQ6k0VOmajGu
-X-Received: by 2002:a05:622a:1f18:b0:528:38d6:71b4 with SMTP id
- d75a77b69052e-52b39484e98mr9124391cf.11.1785394358893; Wed, 29 Jul 2026
- 23:52:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KI7TK0Ix"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B2311F00A3F;
+	Thu, 30 Jul 2026 07:10:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785395450;
+	bh=L8kxiEOu8cCrGY0sX3QNEyS9vCZ9rmhBCDv3n6ZxaDU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=KI7TK0IxLnXHXXZ1jHvbnbiwpJ5LGTxheHJ1YdlucfUlutNVRdc5Eg2g74gUuPf2P
+	 7IIAVs/+K5gsXtcAXRVLmS9mSC3T1h4kBbd6aK2ElpS3GbV0om2qb3HWLSxAfNi7La
+	 P0X7B4uxpowSy1siH27Yk4qLPkX4Kh9sJt/yZa4yoHgS50XoVZm5P9eXbJZLbRY/bn
+	 Xruc85PWcZ/pq9WKkXDqxDAud9FHEBfIg6zNFrtpzq43JA27PjcP3KmfCsHjjBWIx9
+	 YyuIjueB3XTcpIHO8+9WuwC7tAZv3WoAfCMBtEz8+iiuZbiUHnWehZFECBePtP3GKs
+	 aOaO8AHE/J4OQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wpKum-0000000AOpW-37fK;
+	Thu, 30 Jul 2026 07:10:48 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org
+Cc: Steffen Eiden <seiden@linux.ibm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Yao Yuan <yaoyuan@linux.alibaba.com>,
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	Vladimir Murzin <vladimir.murzin@arm.com>
+Subject: [PATCH v4 02/29] arm64: Update ID_AA64MMFR4_EL1 description to 2026-03 JSON release
+Date: Thu, 30 Jul 2026 08:09:55 +0100
+Message-ID: <20260730071022.296811-3-maz@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260730071022.296811-1-maz@kernel.org>
+References: <20260730071022.296811-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260720-hybrid-v9-0-2b713ca1b5dc@rsg.ci.i.u-tokyo.ac.jp>
- <20260720-hybrid-v9-14-2b713ca1b5dc@rsg.ci.i.u-tokyo.ac.jp>
- <CA+EHjTx0zNQ_yPCz38vGYpBssshE4b3KWaoUxjzuerGgzB=JSQ@mail.gmail.com> <e023d791-38c3-47b4-9b09-3420fe78d9ea@rsg.ci.i.u-tokyo.ac.jp>
-In-Reply-To: <e023d791-38c3-47b4-9b09-3420fe78d9ea@rsg.ci.i.u-tokyo.ac.jp>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Thu, 30 Jul 2026 07:52:01 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTxAH-eW4soxjbSJi8DwbH-yRXE-jJ9s02nEZ7kVXxxWMQ@mail.gmail.com>
-X-Gm-Features: AUfX_my8ZWlfDB9plrXG5PWElkl5pTmNLk-LtsIhDb0mp2MLaqYsxid4gcfDy1k
-Message-ID: <CA+EHjTxAH-eW4soxjbSJi8DwbH-yRXE-jJ9s02nEZ7kVXxxWMQ@mail.gmail.com>
-Subject: Re: [PATCH v9 14/16] KVM: arm64: PMU: Implement fixed-counters-only emulation
-To: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Kees Cook <kees@kernel.org>, 
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>, 
-	Shuah Khan <skhan@linuxfoundation.org>, Yury Norov <yury.norov@gmail.com>, 
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>, Steffen Eiden <seiden@linux.ibm.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org, 
-	devel@daynix.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, yaoyuan@linux.alibaba.com, weilin.chang@arm.com, vladimir.murzin@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Akihiko,
+ID_AA64MMFR4_EL1 has gained a few fields and enum values in the past
+few months, so resync its definition with the 2026-03 JSON release.
 
-On Thu, 30 Jul 2026 at 07:36, Akihiko Odaki
-<odaki@rsg.ci.i.u-tokyo.ac.jp> wrote:
-...
-> > Sashiko flagged that this can leave the perf event out of sync with
-> > the sysreg, which looks plausible: on a pCPU with no registered pPMU
-> > this returns without recreating the event, so a guest event-type
-> > change there updates the sysreg but not the event, and after migrating
-> > back to a pCPU the original pPMU covers, kvm_pmc_enable_perf_event()
-> > re-enables the stale event instead of recreating it.
-> >
-> > I know you treat the no-pPMU case as out of spec, but the dropped
-> > update lands once the vCPU is back on a normal pCPU. Is this intended?
->
-> "[PATCH v9 06/16] KVM: arm64: PMU: Recreate events after MDCR_EL2
-> changes" calls kvm_pmu_stop_counter() in kvm_vcpu_reload_pmu(), so it
-> does not matter whether this function calls kvm_pmu_stop_counter().
->
-> The other changes that require recreating the event are currently not
-> handled at all as Sashiko complains [1]. I'll fix that as done in
-> MDCR_EL2 setters in the next version.
->
-> That said, I do not intend to add any extra complexity to provide any
-> guarantee for a system with unsupported PMU variation except that the
-> user can notice and react to that (i.e., the taint is reported and no
-> oops happens due to NULL dereference). The patch message is somewhat
-> misleading in this aspect so I'm going to fix that in the next version.
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/tools/sysreg | 32 ++++++++++++++++++++++++++++----
+ 1 file changed, 28 insertions(+), 4 deletions(-)
 
-I see, yes, fixing the changelog would help.
+diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+index 7cb61aca3797f..3171c87eb2447 100644
+--- a/arch/arm64/tools/sysreg
++++ b/arch/arm64/tools/sysreg
+@@ -2386,17 +2386,40 @@ EndEnum
+ EndSysreg
+ 
+ Sysreg	ID_AA64MMFR4_EL1	3	0	0	7	4
+-Res0	63:48
+-UnsignedEnum	47:44	SRMASK
++UnsignedEnum	63:60	MTEFGT
++	0b0000	NI
++	0b0001	IMP
++EndEnum
++UnsignedEnum	59:56	SCRX
++	0b0000	NI
++	0b0001	IMP
++EndEnum
++UnsignedEnum	55:52	TEV
++	0b0000	NI
++	0b0001	IMP
++EndEnum
++UnsignedEnum	51:48	TPS
++	0b0000	VAL_0000
++	0b0001	VAL_0001
++	0b0010	VAL_0010
++EndEnum
++UnsignedEnum	47:44	SRMASK
++	0b0000	NI
++	0b0001	IMP
++	0b0010	SRMASK2
++EndEnum
++UnsignedEnum	43:40	TLBID
+ 	0b0000	NI
+ 	0b0001	IMP
+ EndEnum
+-Res0	43:40
+ UnsignedEnum	39:36	E3DSE
+ 	0b0000	NI
+ 	0b0001	IMP
+ EndEnum
+-Res0	35:32
++UnsignedEnum	35:32	EAESR
++	0b0000	NI
++	0b0001	IMP
++EndEnum
+ UnsignedEnum	31:28	RMEGDI
+ 	0b0000	NI
+ 	0b0001	IMP
+@@ -2410,6 +2433,7 @@ UnsignedEnum	23:20	NV_frac
+ 	0b0000	NV_NV2
+ 	0b0001	NV2_ONLY
+ 	0b0010	NV2P1
++	0b0011	NV3
+ EndEnum
+ UnsignedEnum	19:16	FGWTE3
+ 	0b0000	NI
+-- 
+2.47.3
 
-Thanks,
-/fuad
-
->
-> [1]
-> https://sashiko.dev/#/patchset/20260720-hybrid-v9-0-2b713ca1b5dc@rsg.ci.i.u-tokyo.ac.jp?part=6
->
-> Regards,
-> Akihiko Odaki
