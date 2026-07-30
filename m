@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10F853BADB3;
-	Thu, 30 Jul 2026 07:11:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2078F3BB9EB;
+	Thu, 30 Jul 2026 07:11:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785395468; cv=none; b=pFk67ls3fxX7DhoU2G/AWgqMbT6vFvqIlV52i9akCC6PpgUtsnNDpE4jVprVLMp96aEgPZFgNeoXYL8Ws4mS7DnE1sa/UYY+GOg5Qg+5mfH17p/LIQ/6R8xqpSJiAAiR0vdueMvweeR/fGiYr2w1JENK5zFHwhQnT7lGtgcL+og=
+	t=1785395468; cv=none; b=ZJI1fNg/uVjCgQIEQaea7cluaV2e8rnhHT03rg5hklr6GZvWShEzNasTklcSohZKyQmqmocyO41f2zGWANPxL+PuxsBREJgj+Q9ux2JwV040apAM+9M+qTJ7VSbZu8GfX26um6befYH7kGOqc/P7EGNeVAPngAhj7NOkvl82uiQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1785395468; c=relaxed/simple;
-	bh=rUcyN6uAGe1vOQ9GUqQn+mE1kPx8Ir0yEVvo3/IzGYc=;
+	bh=1a6g0FUNYjctw5B94xyjRpZGAbx7YJm1TxMbIoRmB4Y=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EA4hA21SJL05SbICP4Xd1H0bp5FPZ8qOvOFPjefG/62IZMXO2VGGS+0yD41cMXIM8S4kPzvGJhdLQrzKldbaFe3bHF+agIziWB6+xavVBHKpJHAqHghdhiRWboUGGZ4c2XTibiNdcFi0kHyfvWy0mmFhMJ3IEllaw6EE/liA7RU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n4V4bVAh; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=Zi9Le9RO/phed7QvpWgoagkAlQ7uw2ejdNFIFfLXo1zc0xk1DpdSaKbAD3ULeWIK52chwWe/yWscVKy8lR3MyISC+P2prakMfhIweqlv2eK9VWehdl8GnblJJc2RdlH6MjG13alCbrbSXNhKJZD4xP4pXNtCYNWvvj/JDYwpyg8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B4EI8Mgt; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n4V4bVAh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 529381F01563;
-	Thu, 30 Jul 2026 07:10:53 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B4EI8Mgt"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFC4F1F01573;
+	Thu, 30 Jul 2026 07:10:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785395453;
-	bh=xoiK/RNeZLIkLzyKO8ly8OA0RZ+EXunPBVOADEEok6o=;
+	s=k20260515; t=1785395454;
+	bh=xvfRoiVVXMz5ozRg++qNQ5fER4Qs3LDX4/NpXBs7HWc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=n4V4bVAh6mS4qkI/+7dmo7LyHb+juTfPiSvUYwNyBc6I10tT7DAq7hGvwYlMbvwmf
-	 IlWHefKhLzJ3wWGJ8+lXbkRcWtg0ETp/U8d7ikQypfjCFtIpOX+daZyS3PgxqIS4uc
-	 k2UCN1wf7GaQXd6lovqP2y5aH/4q3BNAD5McPWhH7D+bEFuGWP3FiC0Cfy93Uoqbn/
-	 JaR0Xt4O2UEwwluhD/+3J4fmr1h6BBBdXISKjsKxE8c4CtFmBbjK5olnAv0gm/bWvu
-	 vtLFwIOEfFCeQAz5S1B0RqPik8PEI+bI28utrPK/uR9fjse0WL5D7EjH0frxWFIEHa
-	 SI3mdDGAtTvSA==
+	b=B4EI8MgtwgNFmzLk66mckYalz5k0UsVHZg/+KnxJYfcmTb4ILMzkrM3+TZRgQ/QW5
+	 zDZ6V7yHI87IT7t6gww1ww6aADHGLnrLRLajQrGF37qS26Pv0D3+f+IxEi/YR+ENG/
+	 bqA4C7C0kyV0LB9Y1Ff45QvHhpLOB2wkxvfLpFJ5Pcfj3LOImw9colz/s6CkPXaYH2
+	 h8QlWkAHPaxSpinohrV3sTLwFoE4g6WZSi/CkjolMVlGkoNEGVXCRICOjDmnjfaGDu
+	 +9Qd8um1XFrUOPdDq5NlWuiNdZ3vt8LK0O1VNsS1RjUVCAAqO3ZWX6VhoxSS/S/pi9
+	 zAU5kek6UUrYQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wpKup-0000000AOpW-2m7a;
-	Thu, 30 Jul 2026 07:10:51 +0000
+	id 1wpKur-0000000AOpW-0YI6;
+	Thu, 30 Jul 2026 07:10:53 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -44,9 +44,9 @@ Cc: Steffen Eiden <seiden@linux.ibm.com>,
 	Yao Yuan <yaoyuan@linux.alibaba.com>,
 	Wei-Lin Chang <weilin.chang@arm.com>,
 	Vladimir Murzin <vladimir.murzin@arm.com>
-Subject: [PATCH v4 15/29] arm64: Add ARM64_HAS_NV3 capability
-Date: Thu, 30 Jul 2026 08:10:08 +0100
-Message-ID: <20260730071022.296811-16-maz@kernel.org>
+Subject: [PATCH v4 22/29] KVM: arm64: Add routing for NVHCR_EL2 trap
+Date: Thu, 30 Jul 2026 08:10:15 +0100
+Message-ID: <20260730071022.296811-23-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260730071022.296811-1-maz@kernel.org>
 References: <20260730071022.296811-1-maz@kernel.org>
@@ -62,26 +62,59 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-As a bunch of KVM code is going to depend on FEAT_NV3 being detected
-on the host, add a new capability that will describe it.
+NVHCR_EL2 accesses from EL1 are taken to EL2 when HCRX_EL2.NVTGE==0
+and HCR_EL2.NV==1. Describe this in the exception routing tables.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/tools/cpucaps | 1 +
- 1 file changed, 1 insertion(+)
+ arch/arm64/kvm/emulate-nested.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
-index 242dc211d8efa..7e0414509e89a 100644
---- a/arch/arm64/tools/cpucaps
-+++ b/arch/arm64/tools/cpucaps
-@@ -52,6 +52,7 @@ HAS_LSUI
- HAS_MOPS
- HAS_NESTED_VIRT
- HAS_NV2P1
-+HAS_NV3
- HAS_BBML2_NOABORT
- HAS_PAN
- HAS_PMUV3
+diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+index b7f3d86a94031..625604019fb32 100644
+--- a/arch/arm64/kvm/emulate-nested.c
++++ b/arch/arm64/kvm/emulate-nested.c
+@@ -136,6 +136,8 @@ enum cgt_group_id {
+ 	CGT_CPTR_TTA,
+ 	CGT_MDCR_HPMN,
+ 
++	CGT_HCR_NV_HCRX_nNVTGE,
++
+ 	/* Must be last */
+ 	__NR_CGT_GROUP_IDS__
+ };
+@@ -588,6 +590,15 @@ static enum trap_behaviour check_mdcr_hpmn(struct kvm_vcpu *vcpu)
+ 	return BEHAVE_HANDLE_LOCALLY;
+ }
+ 
++static enum trap_behaviour check_hcr_nv_hcrx_nnvtge(struct kvm_vcpu *vcpu)
++{
++	if ((__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_EL2_NV) &&
++	    !(__vcpu_sys_reg(vcpu, HCRX_EL2) & HCRX_EL2_NVTGE))
++		return BEHAVE_FORWARD_RW;
++
++	return BEHAVE_HANDLE_LOCALLY;
++}
++
+ #define CCC(id, fn)				\
+ 	[id - __COMPLEX_CONDITIONS__] = fn
+ 
+@@ -598,6 +609,7 @@ static const complex_condition_check ccc[] = {
+ 	CCC(CGT_CNTHCTL_EL1NVVCT, check_cnthctl_el1nvvct),
+ 	CCC(CGT_CPTR_TTA, check_cptr_tta),
+ 	CCC(CGT_MDCR_HPMN, check_mdcr_hpmn),
++	CCC(CGT_HCR_NV_HCRX_nNVTGE, check_hcr_nv_hcrx_nnvtge),
+ };
+ 
+ /*
+@@ -853,6 +865,7 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
+ 	SR_TRAP(SYS_SCTLR2_EL2,		CGT_HCR_NV),
+ 	SR_RANGE_TRAP(SYS_HCR_EL2,
+ 		      SYS_HCRX_EL2,	CGT_HCR_NV),
++	SR_TRAP(SYS_NVHCR_EL2,		CGT_HCR_NV_HCRX_nNVTGE),
+ 	SR_TRAP(SYS_SMPRIMAP_EL2,	CGT_HCR_NV),
+ 	SR_TRAP(SYS_SMCR_EL2,		CGT_HCR_NV),
+ 	SR_RANGE_TRAP(SYS_TTBR0_EL2,
 -- 
 2.47.3
 
