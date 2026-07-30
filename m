@@ -1,63 +1,58 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1474142D76D;
-	Thu, 30 Jul 2026 12:37:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B2A542E00A;
+	Thu, 30 Jul 2026 12:40:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785415074; cv=none; b=uwiamG9i1jwwYLhPwOcXyvSnKoj+aj5B7DyjQaJz0BthJWiUkLg3vXenQwuiVP+PMnx7JA9dwSogz3zfl7IIflph2l5O2dZY9uuGRCwtdqceXArLTHnmcqBgqHZSY6SkZsWM8jWPCvocMFESR+/G8rk6sxCSjgFlKDHNgoQMF9w=
+	t=1785415201; cv=none; b=B2INS+BNfGwa9NFCaiTYr1EQN5H3zweLymE7zmPvwbIkCaXVQx1/ewrMbctKS5BXJ9pGAYMIiTzN9IiWFBIiHAONaApLIm2bbU4buDliKI8XiedRE3FF4p46wHEy2pFU5cdmkJiExpMH3MzyxPNu++UuwaEHxtV8p4e1MoHcVtU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785415074; c=relaxed/simple;
-	bh=+gOhQU+HqsQXu1xm5sitfaK+73QrZY77na7SaJsgGdg=;
+	s=arc-20240116; t=1785415201; c=relaxed/simple;
+	bh=YqOKDmF9/H9jh4NntpuxPDa3eeApiYIE1miaTdp4/HM=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cqktddQNeMrfToyKTfJyPcE/+MxnM0WE4IL0KIzZV1zzClTjWP3WD/Wy5nun9piwQ7vY4jWdKeMFdfDpe5PfyYPVeRbGIB8XoQjVYAUpfgBYRU1rPLIPSi4As0uaBgnKcwPdeb6SyIqWxXDfXs70dDmPhm58T4GlXxVJZ2Sfj0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dwp4fcp+; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=JjJ4Wmrqi4H94BuQFp90EUnD1qAkfhS6lmSjC+GVAeajbq8jzMD8Q9S/dU7UFsw5+gEDQPn0+BSM5UxMNSQ2Q0CFM86Syxcf0fBScnvOAAQxeN48i1FhrEMJtDeFVC59KJUn/Ja3RLDoo/85dJmJipZOlVDXd/y6C9677FdZ1LE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LdKV0UX9; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dwp4fcp+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDC2E1F000E9;
-	Thu, 30 Jul 2026 12:37:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LdKV0UX9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 750551F000E9;
+	Thu, 30 Jul 2026 12:40:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785415072;
-	bh=tIKRYxDOzycznw1bjlolv+a92AaCEXcgQ9UteZvvq6E=;
+	s=k20260515; t=1785415200;
+	bh=ylBp3ID7LGMPxx9g2HOSILblRK6WLP/WK8iYeAR7QiU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=dwp4fcp+9aFcM75nQWBHQTQytB3W+EUnrwq6DO7RapJNdyAkZuRacZkPGao1KYWQz
-	 nxq0+gXzhRutd+9XXOp0biFyYO4sKUle1qaBZkAspRjytAgA4ZPLQKY6qmcJNY2uK9
-	 wLps541DxE4Hotc6HD2hslBM00x9JaIC9uuLM3ArPA/TkOyAHFzFUi+cxnE/1ybgvU
-	 Mbnnk5RAWyiqXaH8uwnu6rzSHzYCV6q/xnLxq4IpguX7CjqT/FbuhrZ57biyxzbZb0
-	 qVVJMgcfEQv5DQ0fdZyM8XeYBeYHhjAe69eRg1pUbutd73jyJFUqf/jzjODGgCDqJr
-	 qPva0JaIHWVnA==
+	b=LdKV0UX9bNSTpp24GeRMDpcBAg6s2yEDz5n+vTHl4dsXmoxN0mtKB6u8SM4i3SUQK
+	 F+ZX/uf2pwzfh+DR5UMvWv0Z7Kd9gJJ+TsJ5Tl83T+wY1ui9uDzDMUJMXqBsUiNneC
+	 AW6gz5hhjtg6G4uR7yfTJN0EAbOji8QBjIeQwaaYb4zXiOT2dTotWlOGXxtzBj5gRj
+	 AGHc1cpbyl/sVs7JmfyNdK3qc1A1UDIwcSitY4rXfwKpERcs5JhTkhJjquXj7aTUwB
+	 WS5iPmR1Fwh+ykoMmaAww/F1QknOuKt5Pe8mOjUJs2DJk9mQM3VgMJsqn4yO3tTcQ/
+	 VjI6muE/VhgLw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wpQ1G-0000000AWgo-1Tqr;
-	Thu, 30 Jul 2026 12:37:50 +0000
-Date: Thu, 30 Jul 2026 13:37:49 +0100
-Message-ID: <86jyqcd55u.wl-maz@kernel.org>
+	id 1wpQ3K-0000000AWkz-2GkT;
+	Thu, 30 Jul 2026 12:39:58 +0000
+Date: Thu, 30 Jul 2026 13:39:58 +0100
+Message-ID: <86ik5wd529.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: oupton@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
+To: Mostafa Saleh <smostafa@google.com>
+Cc: linux-kernel@vger.kernel.org,
 	kvmarm@lists.linux.dev,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	rostedt@goodmis.org,
-	mhiramat@kernel.org,
-	alexandru.elisei@arm.com,
-	vdonnefort@google.com,
-	joey.gouly@arm.com,
+	linux-arm-kernel@lists.infradead.org,
+	oupton@kernel.org,
 	seiden@linux.ibm.com,
+	joey.gouly@arm.com,
 	suzuki.poulose@arm.com,
 	yuzenghui@huawei.com,
-	qperret@google.com,
-	ardb@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	tabba@google.com
-Subject: Re: [PATCH v1 09/11] KVM: arm64: Type-check hypercall arguments at the caller
-In-Reply-To: <20260720161343.1367007-10-fuad.tabba@linux.dev>
-References: <20260720161343.1367007-1-fuad.tabba@linux.dev>
-	<20260720161343.1367007-10-fuad.tabba@linux.dev>
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	vdonnefort@google.com,
+	tabba@google.com,
+	sebastianene@google.com,
+	keirf@google.com
+Subject: Re: [PATCH v3] KVM: arm64: Optimize protected mode with FWB and DIC
+In-Reply-To: <20260723162002.3848054-1-smostafa@google.com>
+References: <20260723162002.3848054-1-smostafa@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -69,107 +64,33 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, rostedt@goodmis.org, mhiramat@kernel.org, alexandru.elisei@arm.com, vdonnefort@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, qperret@google.com, ardb@kernel.org, linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, tabba@google.com
+X-SA-Exim-Rcpt-To: smostafa@google.com, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oupton@kernel.org, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, vdonnefort@google.com, tabba@google.com, sebastianene@google.com, keirf@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 20 Jul 2026 17:13:41 +0100,
-Fuad Tabba <fuad.tabba@linux.dev> wrote:
+On Thu, 23 Jul 2026 17:20:02 +0100,
+Mostafa Saleh <smostafa@google.com> wrote:
 > 
-> kvm_call_hyp_nvhe() reduces its target to an SMCCC function number, so
-> the compiler never sees a callable: arguments that are wrong in number,
-> type or order are silently marshalled into registers. The kvm_call_hyp()
-> wrappers only catch this on the VHE branch, and the pKVM-only hypercalls
-> have no such branch.
+> KVM opportunistically enables FWB if supported by the system for guest
+> VMs, which allows it to elude cache maintenance for data as they are
+> forced to be cacheable from stage-2.
+> In that case, __clean_dcache_guest_page() will immediately return.
+> However in protected mode, before calling __clean_dcache_guest_page()
+> it loops over the range and fix_map/unmap it, issuing TLB
+> invalidations, dsb() and isb() unnecessarily.
 > 
-> Declare each hypercall's signature once in kvm_hcall.h and generate a
-> typed stub from it, in the mold of the syscall wrappers. Make
-> kvm_call_hyp_nvhe() resolve to the stub so every caller is checked
-> against the declared signature; a stale or mistyped call now fails to
-> compile. The stubs inline to the same SMCCC call the untyped macro used
-> to make: the compiled callers are unchanged, apart from hypercall
-> returns now being tested at their declared width.
+> This can be optimized by returning early if FWB is supported,
+> kvm_pgtable_stage2_map() already issues dsb() and tlb invalidation
+> functions issue dsb() for the unmap path.
 > 
-> The stage-2 protection arguments are declared u64 rather than
-> enum kvm_pgtable_prot, as kvm_pgtable.h includes linux/kvm_host.h and
-> the enum cannot be completed here.
+> Similarly for DIC, we can omit the call in
+> invalidate_icache_guest_page()
 > 
-> Assisted-by: Antigravity:gemini-3.1-pro
-> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
-> ---
->  arch/arm64/include/asm/kvm_hcall.h | 165 ++++++++++++++++++++++++++++-
->  arch/arm64/kvm/hyp_trace.c         |   2 +-
->  2 files changed, 165 insertions(+), 2 deletions(-)
+> No isb() needed as ERET is context synchronization event.
 > 
-> diff --git a/arch/arm64/include/asm/kvm_hcall.h b/arch/arm64/include/asm/kvm_hcall.h
-> index d925b2c28a3d8..51bfd14748464 100644
-> --- a/arch/arm64/include/asm/kvm_hcall.h
-> +++ b/arch/arm64/include/asm/kvm_hcall.h
-> @@ -16,12 +16,35 @@
->  
->  #include <asm/barrier.h>
->  #include <asm/kvm_asm.h>
-> +#include <asm/spectre.h>
->  #include <asm/virt.h>
->  
->  typedef u16 pkvm_handle_t;
->  
-> +struct kvm;
-> +struct kvm_s2_mmu;
-> +struct kvm_vcpu;
-> +struct vgic_v3_cpu_if;
-> +struct vgic_v5_cpu_if;
-> +
-> +/*
-> + * Hypercall signatures are declared as (type, name) argument pairs.
-> + * __KVM_HCALL_MAP() applies a macro to each pair, in the mold of __MAP()
-> + * in <linux/syscalls.h>.
-> + */
-> +#define __KVM_HCALL_MAP1(m, t, a, ...) m(t, a)
-> +#define __KVM_HCALL_MAP2(m, t, a, ...) m(t, a), __KVM_HCALL_MAP1(m, __VA_ARGS__)
-> +#define __KVM_HCALL_MAP3(m, t, a, ...) m(t, a), __KVM_HCALL_MAP2(m, __VA_ARGS__)
-> +#define __KVM_HCALL_MAP4(m, t, a, ...) m(t, a), __KVM_HCALL_MAP3(m, __VA_ARGS__)
-> +#define __KVM_HCALL_MAP5(m, t, a, ...) m(t, a), __KVM_HCALL_MAP4(m, __VA_ARGS__)
-> +#define __KVM_HCALL_MAP6(m, t, a, ...) m(t, a), __KVM_HCALL_MAP5(m, __VA_ARGS__)
-> +#define __KVM_HCALL_MAP(n, ...) __KVM_HCALL_MAP##n(__VA_ARGS__)
-> +
-> +#define __KVM_HCALL_DECL(t, a)	t a
-> +#define __KVM_HCALL_ARGS(t, a)	a
-> +
->  #ifndef __KVM_NVHE_HYPERVISOR__
-> -#define kvm_call_hyp_nvhe(f, ...)					\
-> +#define __kvm_call_hyp_nvhe(f, ...)					\
->  	({								\
->  		struct arm_smccc_res res;				\
->  									\
-> @@ -33,6 +56,43 @@ typedef u16 pkvm_handle_t;
->  		res.a1;							\
->  	})
->  
-> +/*
-> + * Generate a typed stub for each declared hypercall. kvm_call_hyp_nvhe()
-> + * resolves to the stub, so a call with the wrong argument count or types
-> + * fails to compile instead of being silently truncated to an SMCCC function
-> + * number and a pile of registers. The stub inlines to the same SMCCC call
-> + * the untyped macro used to make.
-> + */
-> +#define DECLARE_KVM_HOST_HCALL(ret, name, x, ...)			\
-> +	static __always_inline						\
-> +	ret nvhe_hvc_##name(__KVM_HCALL_MAP(x, __KVM_HCALL_DECL, __VA_ARGS__)) \
-> +	{								\
-> +		return (ret)__kvm_call_hyp_nvhe(name,			\
-> +			__KVM_HCALL_MAP(x, __KVM_HCALL_ARGS, __VA_ARGS__)); \
-> +	}
+> Signed-off-by: Mostafa Saleh <smostafa@google.com>
 
-One thing I find absolutely horrible is to have to specify the number
-of parameters here. It is already bad to have to comma-separate
-everything, but having to count them is too hard for me ;-).
-
-We already have facilities to count the number of parameters to a
-macro (see the COUNT_ARGS macro). You could make use of it all over
-the place.
-
-Thanks,
+Acked-by: Marc Zyngier <maz@kernel.org>
 
 	M.
 
