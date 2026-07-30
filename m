@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 401613B8BC1;
-	Thu, 30 Jul 2026 07:10:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB4803B47F7;
+	Thu, 30 Jul 2026 07:10:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785395458; cv=none; b=ObAv9EvqiG71wNajab7240lulnMan/AW85YM/cu6nbwGh7mt4mxiAT5DfpZIqZzYuCxi8/v+Ax1OV6GMv+IpkwOKfdy3KLiTodxaJtg3cr2bqqMon5FcXZEcVZ+XZPGmFeHzOv0s+C8TvYA0oTn02tWKsICaLfO/zCJMNqqTIYM=
+	t=1785395461; cv=none; b=lcd0eTsuMfWlZGBs/9NmAh35g7TuDRv84LghQJAoVFO1wGbSFAJ0NzL4BJZigfoUqihfiwHXNb7gLHahoSkpIW+Rwoi2w5+V2+30Vl5t7dQqpyQWcRhAzVQo5X9AB9lNOHuo1PzzuqICJfE5O/ZLfOxzJ8Sl4FkiYVY7oe7mDyA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785395458; c=relaxed/simple;
-	bh=mTOEGmhZ7jOufvcxtJKFGGp2qApnl576+Q9IYSG9vnE=;
+	s=arc-20240116; t=1785395461; c=relaxed/simple;
+	bh=frXsTw0CZJSHp9d6YujsQpbV1DBLRXcmPcWyoGbJmcs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fEuTUG7aLKn+0asazuW7bhcKyfzuQx3sZtA7WxL1xaSJUMsZXAbeXEC8RG1Dv41tUNFvWo83SyRoD0oM8ZqPvXgPkdRKjHK3NBHBwi+9H6cqSV0NtsZs/uqSVrqyU1viiOLclPtBuKVgROLfk9URXVL71cp+P9jCJVKEW+VkYls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tw5ZMHFW; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=IDDMCd2OASISD8Ien+6mBFT/lfqfHwTYqnY0vkY3IsRR/P27pLJRiuy1gfr7Jf1oZWfaGZI6WnT5KlFbL8SGWkajw8IqKETjafKNjk47r+krfvS1OUlTTdEMe2LOSWg/m5KzCTj0hxa55dUBgobh5iBgHbY2ryGoCovF9sEJU/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GC5jL5Yv; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tw5ZMHFW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB44D1F00AC4;
-	Thu, 30 Jul 2026 07:10:50 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GC5jL5Yv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B21C1F00ACF;
+	Thu, 30 Jul 2026 07:10:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785395450;
-	bh=NUB9M22I6lR5cIA4XgQ8HOaVa6MjFO6+CCyfQOO+5Dc=;
+	s=k20260515; t=1785395451;
+	bh=G9+ykDGTeX7ssPXU6PioVfASuLM5szFW8JhODOwghig=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=Tw5ZMHFW1SWWwHPPH3IdUNNRVNGPNwP6UzSy3zG229gTihsUh+UGlHLqbH7RU3xVW
-	 DP3O5GjpBxmi3L59vscjwvZD9XinbPkHKvkdCuNkNvZd1U/2+LHHuA0GjXaS5M6zjU
-	 FWsBRwRAzlUvos+nJuHQzKL49daNhfSNYqjK8NZJ8pWOqmA+ZRba/ec+xn1/d6DY3S
-	 sCLbNNBqyuKIA86Fa3Nl4Xup2ExMCle6dpU55iUwHg1zPZh4YJtTYJEnZjP0k7ilx9
-	 I56lZboGQ/p3C4XN4GeY+5RTzG36hX683i4Da85LZntxgT3W1IFf9MfhVuZGYLi9Xv
-	 07W9bji2T1NTQ==
+	b=GC5jL5Yvk3BBNxpeTcyUiE43rRWpQGTSSZXneAYATTMu78kPRAkabECkPXFd/hZJg
+	 XbNkATTY/QzRuwSZbY/CElX45F2sd7igxN2sKrl6jAoH/6cFFGo22lW0IiQVK7L7ak
+	 d0ZO7pk3/ceq9ovY8X54Qr33YMBXyOgj4sOVmt9Gx/P8NWxZ8qNb7wpI5RgAQjZeYX
+	 oulSL2Fyk5L8kFMCAIGXt9s+sZmwaIQ8L+4Mf9XJuDKFfO9ng/YMWr5E6Sisa5OoQo
+	 WjYE7Hae8/EhMDj2+uA5xwCO7gTCcYXWcEtazsQH7cnVur3D4UJuC5s2Wz4xGsb9Ng
+	 1I9D+etpVw71A==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wpKum-0000000AOpW-46bi;
+	id 1wpKun-0000000AOpW-3bIa;
 	Thu, 30 Jul 2026 07:10:49 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -44,9 +44,9 @@ Cc: Steffen Eiden <seiden@linux.ibm.com>,
 	Yao Yuan <yaoyuan@linux.alibaba.com>,
 	Wei-Lin Chang <weilin.chang@arm.com>,
 	Vladimir Murzin <vladimir.murzin@arm.com>
-Subject: [PATCH v4 03/29] KVM: arm64: Merge guest's HCRX_EL2 using NV_HCRX_GUEST_EXCLUDE
-Date: Thu, 30 Jul 2026 08:09:56 +0100
-Message-ID: <20260730071022.296811-4-maz@kernel.org>
+Subject: [PATCH v4 07/29] KVM: arm64: Don't evaluate HCR_EL2.NV nor HFGITR_EL2.ERET on ERET fast path
+Date: Thu, 30 Jul 2026 08:10:00 +0100
+Message-ID: <20260730071022.296811-8-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260730071022.296811-1-maz@kernel.org>
 References: <20260730071022.296811-1-maz@kernel.org>
@@ -62,66 +62,48 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-The way we merge the guest-provided HCRX_EL2 value with the host's
-is bonkers. We try to make it look like the FGT registers by using
-positive and negative polarities for traps, but most of these bits
-are not strictly about trapping, as they actively change the way
-some architectural state is managed.
+We currently avoid using the ERET fast path if the guest has HCR_EL2.NV
+set. This is an odd check, as NV doesn't mean much if HCR_EL2.TGE==1.
 
-It would be far better to deal with these bits like we do for
-HCR_EL2, by enumerating the list of bits we don't allow the guest
-to override. This is simplified by the fact that HCRX_EL2 only
-affects EL1, and not EL2.
+Similarly, evaluating HFGITR_EL2.ERET makes little sense, as
+this only applies to the nested context, while the ERET fast-path
+is purely for the benefit of L1.
 
-Re-jig the HCRX_EL2 handling with a macro that list the bits excluded
-from the merge (TMEA, PTTWI, EnIDCP128).
+Replace these bizarre checks with is_nested_ctxt() which makes a lot
+more sense: if we are running an L2, the ERET trap must go to L1.
 
+Fixes: dd0717a998f77 ("KVM: arm64: nv: Fast-track 'InHost' exception returns")
 Reviewed-by: Yuan Yao <yaoyuan@linux.alibaba.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/include/hyp/switch.h | 22 ++++++++++++++++++++--
- 1 file changed, 20 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/hyp/vhe/switch.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 4bf624a49591d..8e5f492f39086 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -325,6 +325,24 @@ static inline void __deactivate_traps_mpam(void)
- 		write_sysreg_s(MPAMHCR_HOST_FLAGS, SYS_MPAMHCR_EL2);
- }
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index bbe9cebd3d9d5..684cebf23aa0e 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -344,13 +344,15 @@ static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 	 * if this is a VHE guest hypervisor returning to its own
+ 	 * userspace, or the hypervisor performing a local exception
+ 	 * return. No need to save/restore registers, no need to
+-	 * switch S2 MMU. Just do the canonical ERET.
++	 * switch S2 MMU. Just do the canonical ERET unless we are in
++	 * nested context.
+ 	 *
+-	 * Unless the trap has to be forwarded further down the line,
+-	 * of course...
++	 * Note that this is made possible because KVM itself never traps
++	 * ERET when running an L2. The consequence is that any ERET trap is
++	 * the result of HCR_EL2 or HFGITR_EL2 programming by L1 for its own
++	 * guest, and the exception must be forwarded to L1.
+ 	 */
+-	if ((__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_NV) ||
+-	    (__vcpu_sys_reg(vcpu, HFGITR_EL2) & HFGITR_EL2_ERET))
++	if (is_nested_ctxt(vcpu))
+ 		return false;
  
-+/*
-+ * Just like for HCR_EL2, we can't let the guest mess with some of the
-+ * basics we rely on in HCRX_EL2. However, the major difference is that
-+ * HCRX_EL2 only affects EL1, and never EL2 (sudden outburst of sanity, I
-+ * guess). So it is always the guest inflicting it on its own guestx.
-+ *
-+ * Things we don't want to let the guest control are:
-+ *
-+ * - TMEA: That's for us to decide how an SEA is routed, not the guest.
-+ *
-+ * - PTTWI: Similarly, it is for us to decide whether Reduced Coherency for
-+ *   the PTW is a thing. It really isn't.
-+ *
-+ * - EnIDCP128: We don't allow IMPDEF sysregs -- full stop.
-+ */
-+#define NV_HCRX_GUEST_EXCLUDE	(HCRX_EL2_TMEA	    | HCRX_EL2_PTTWI | \
-+				 HCRX_EL2_EnIDCP128)
-+
- static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_cpu_context *hctxt = host_data_ptr(host_ctxt);
-@@ -350,8 +368,8 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
- 		u64 hcrx = vcpu->arch.hcrx_el2;
- 		if (is_nested_ctxt(vcpu)) {
- 			u64 val = __vcpu_sys_reg(vcpu, HCRX_EL2);
--			hcrx |= val & __HCRX_EL2_MASK;
--			hcrx &= ~(~val & __HCRX_EL2_nMASK);
-+			hcrx |= (val & ~NV_HCRX_GUEST_EXCLUDE);
-+			hcrx &= ~(~val & ~NV_HCRX_GUEST_EXCLUDE);
- 		}
- 
- 		ctxt_sys_reg(hctxt, HCRX_EL2) = read_sysreg_s(SYS_HCRX_EL2);
+ 	spsr = read_sysreg_el1(SYS_SPSR);
 -- 
 2.47.3
 
