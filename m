@@ -1,138 +1,127 @@
-Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com [209.85.214.198])
+Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com [209.85.214.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D99E44682F
-	for <kvmarm@lists.linux.dev>; Fri, 31 Jul 2026 16:03:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 565C144BC9A
+	for <kvmarm@lists.linux.dev>; Fri, 31 Jul 2026 16:15:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785513796; cv=none; b=gX/pl1EYbmnjroRjaLyTOBZQzF/0HKDA+ZQpPthcqeVd+HoU+xDuCV1egh3wNgjAnibKCLQXFxyTqbPSsYxwkePWd84V+qkZCPr+pM6YRCi/QnkLvMFDrQhn76k0Qk5Yo0fBB/7aZ2+v29Qm2BUGHfEV+muTKnqdxsTjEVqk2F0=
+	t=1785514561; cv=none; b=R/6QKvnle99473fiWhQFX7w6gPieRw8PWEMfDGSHkqVQ5FesOfxkP1CMWBG9DyVfXlbZHqbpww7xBcBHGrLlPVKWQJx123yXRiXKcY9MMuSCGifoLXUDLpLSHxAN6oqZ5DUJENcHeStOHyc575j/N4gFP6ehNT6M0+7bRQnQqsE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785513796; c=relaxed/simple;
-	bh=u9Davee5jFiswlNbcoaGtA170sZ3bUH0duryUAj/cpQ=;
+	s=arc-20240116; t=1785514561; c=relaxed/simple;
+	bh=/6OQz+DQUsZXcPRJ4R2zsd2kat4n8VozoJNKylE8h7k=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=H4iZcaaCG6PSwIkvbKazZQmMFP1SSULauYac7Ck0U4p8V+wb9sR+yDkRtW0bJr4yezX6AMZHbm9fzTMxxLBkHvabtht5SeVIUWH5ipDeB4v0e+8e2roZI57uQ99jBhKEiOQFjbQkjp3ks8nFeR28UGely89rsDgeiVig1DSjIOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TOv9HNF7; arc=none smtp.client-ip=209.85.214.198
+	 To:Cc:Content-Type; b=AKAiNC7M2Ef1SdbrE0OgDxd9YB9B/NSIRPPz2pMEHtyW0V/ltfskJX6ifxpYDWrKFv09m4y61KNFLOfR7X7t85kvPlyaXzpBh9THwqAnKJKz6UN9eT53FisdLyRS1hQZNhQJgPoV4itvETai5fJABx89LfO55ag+Zg2i/DABt8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JQu/+g0Y; arc=none smtp.client-ip=209.85.214.199
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TOv9HNF7"
-Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-2cf6acd760cso12911825ad.3
-        for <kvmarm@lists.linux.dev>; Fri, 31 Jul 2026 09:03:14 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JQu/+g0Y"
+Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-2cee894b3d8so20480655ad.2
+        for <kvmarm@lists.linux.dev>; Fri, 31 Jul 2026 09:15:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1785513794; x=1786118594; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1785514552; x=1786119352; darn=lists.linux.dev;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=LEYbd8TAWmmMUBeZ9IrKbK+p5wVI9/TTz658UxtH1do=;
-        b=TOv9HNF7dsJO3YSQB6U49qerzifMncPsKLChYOkJFossmlvhvueyPuJGS36X+nGkf3
-         VCz/gqxDhhbjY+LuuqG3QzbfabhWOGKLtMVor+j9iVbuEkNuhcUdGPTQx4AfdFKzvV7R
-         t/BkZ4LvGQOVb9P4y9Jeu/qIyFGFxbC8IkAC8n/Bhsu21ZJF6kMHXcKvflzH7oFqScWW
-         j9AGZpVYH7c6oFgSQXLBz9ovH47SNoyYT26Gr37rVC3czreU/bpT5P9LXHUEdJnnzcEp
-         MJM+INu91ZdaFBIb4VnFU9+kjfUUgCvxmNNvtS+yRzBtUAx0BjfEZUThaZDB5x9SRlX7
-         2voQ==
+        bh=9ytOyVvVUp1+iOjUCBAJJ+Zr5Yli10sJrrWCx9PaxhI=;
+        b=JQu/+g0YYZFOc8E+7c4qYLtTr2PNP+T1VD1vNi/wz9U9FLshz8v1rxXjm8PNlxuv8M
+         a8bXcCrEVZv3WXrnZ0GwRoy+EgU2YkxdvGX2CvKZsM6EMlmaZajh1IANpBMKZSez/kH2
+         XrxQQYAShEianRF3AgwUA937vu9t7Ji7CPGzMvXoNinEsuTuaQp9vA6nPFmYrLSt6zx2
+         uX1rvKm15zI8+2jCjTiZ0soXGIYwIV6GhgeslKOtIaCg41p2bQWMbMpxvZ4lL2bf3kzv
+         rs34ZMdmpHwfAQbtXrSH7ycTQsiXU/lqGV/rgpqo8JKFAfIhDOYeHF5bpHgcKAqnEJDS
+         JVxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785513794; x=1786118594;
+        d=1e100.net; s=20251104; t=1785514552; x=1786119352;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=LEYbd8TAWmmMUBeZ9IrKbK+p5wVI9/TTz658UxtH1do=;
-        b=gIXNfehHrtJ94jVB/V+4l59TKlQo99v5afKGWN34Dbok6097UieYlaiDWhWUB7l/Xx
-         5u6ZLwa/9CFEF5wZi3SUOwnCYwFiorIgwpmKMZL84kYvxdqnuRLkjIgKQduhC9x+jjSA
-         730l8NzZ7JavdY+e60bRn01FXi9jKWDgU9LSlDalUfl5671ryGmZ5GILVCBURpe0jVd5
-         4fIA3XpHCfET/RJDXpSKyrzBu3+hhgZkYih1qc/ZkKEjT20A8zObpW5vTFdM/rzCaPvs
-         X0ViV+igJXm3y2J6SrW5KstFJauX1Pekc77kFinkLdzKBkSQBpquQclUGja4YYzRb6kk
-         zWEg==
-X-Gm-Message-State: AOJu0Ywj+WLzP8dmYvtSA6uAF3tfXG6zpMnTF7Rzq8flnsDzZWqraNH3
-	dqGUPsQ2eqOJ38r/GExbyq5jVKRWHRKljoHPH0BuOrVhMQwP0zD5+Gn+iBZ6pgP4Bu65R9Uq+Y7
-	REXiwlQ==
-X-Received: from plhz17.prod.google.com ([2002:a17:902:d9d1:b0:2ce:ab97:2844])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:184d:b0:2cc:a853:1311
- with SMTP id d9443c01a7336-2d05247edd2mr4778715ad.47.1785513793428; Fri, 31
- Jul 2026 09:03:13 -0700 (PDT)
-Date: Fri, 31 Jul 2026 09:03:12 -0700
-In-Reply-To: <amzFnPEikFTHhW9X@google.com>
+        bh=9ytOyVvVUp1+iOjUCBAJJ+Zr5Yli10sJrrWCx9PaxhI=;
+        b=AU0KiWaRoIvbiProgFsYZhMnfnGEGiuK3L/jCgc8qNgfFgyPtxJV5aObBBisNk0zjU
+         g+NsV0SCdwaC2VO/TzuROBNG3TxcoYNHWJ6NNMLo2Tzr7V1fIdZ4vUdWHHMGy65N1WPr
+         NTjU4Bg8VT1o9l0b1APvMC3smxCK9mySaZNTzDcAvans61avl/WI7vDvbF4iyj16s7pp
+         7Y9oSHRbFQSo2mIDb+mpVXIyEbV3SppXxJSYmnCPxKh0191AMhWSHrZZH1KSbAtt/84/
+         U2qFJ77/YK4f/XSZ72TUdP/TqZ62yD/tFcK06Kabq1bx8sfZrlKNUgsLyIE8G6TXOGtn
+         AcUw==
+X-Forwarded-Encrypted: i=1; AHgh+RqEeNECCd1j7mYgQFhJi0YUHbu7INfIMOjA4u7I4+TSh58dcTmAZA+/EvIVlckCM7GkFLbB+es=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yxji5TZO7NByKEb82l9ftQU9kh+eDkCm5dkopW9IFJ61mTJfwbo
+	qdAF49T8kZLGsakk5pKGFs7LxcTAwEiIFCNngHkNq4T5Pw0KXOil3WDqbGbwXkvbuKnQiAWCMzF
+	HMZHFgQ==
+X-Received: from plbjg5.prod.google.com ([2002:a17:903:26c5:b0:2d0:40fa:a53d])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2410:b0:2d0:4021:bb62
+ with SMTP id d9443c01a7336-2d0521bcc4dmr5824855ad.16.1785514552447; Fri, 31
+ Jul 2026 09:15:52 -0700 (PDT)
+Date: Fri, 31 Jul 2026 09:15:51 -0700
+In-Reply-To: <20260731145435.1016137-B-seiden@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20260730191908.2084803-1-seanjc@google.com> <20260730191908.2084803-4-seanjc@google.com>
- <20260730193350.60B801F000E9@smtp.kernel.org> <amzFnPEikFTHhW9X@google.com>
-Message-ID: <amzHQKmGxFf3aeYp@google.com>
-Subject: Re: [PATCH 3/9] KVM: selftests: Affine child tasks to other pCPUs in
- hardware disable test
+References: <20260731130902.654679-1-seiden@linux.ibm.com> <20260731130902.654679-2-seiden@linux.ibm.com>
+ <20260731145435.1016137-B-seiden@linux.ibm.com>
+Message-ID: <amzKNzYWD1ngXdOZ@google.com>
+Subject: Re: [PATCH v5 01/31] vfio: Use file-based reference counting for KVM
 From: Sean Christopherson <seanjc@google.com>
-To: sashiko-reviews@lists.linux.dev
-Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>, 
-	Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org
+To: Steffen Eiden <seiden@linux.ibm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	linux-s390@vger.kernel.org, Alexander Gordeev <agordeev@linux.ibm.com>, 
+	Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, David Hildenbrand <david@kernel.org>, 
+	Friedrich Welter <fritz@linux.ibm.com>, Fuad Tabba <tabba@google.com>, 
+	Gautam Gala <ggala@linux.ibm.com>, Hariharan Mari <hari55@linux.ibm.com>, 
+	Heiko Carstens <hca@linux.ibm.com>, Hendrik Brueckner <brueckner@linux.ibm.com>, 
+	Ilya Leoshkevich <iii@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Joey Gouly <joey.gouly@arm.com>, Marc Zyngier <maz@kernel.org>, Nico Boehr <nrb@linux.ibm.com>, 
+	Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>, Oliver Upton <oupton@kernel.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Sven Schnelle <svens@linux.ibm.com>, Ulrich Weigand <Ulrich.Weigand@de.ibm.com>, 
+	Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>
 Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Jul 31, 2026, Sean Christopherson wrote:
-> On Thu, Jul 30, 2026, sashiko-bot@kernel.org wrote:
-> > > diff --git a/tools/testing/selftests/kvm/hardware_disable_test.c b/tools/testing/selftests/kvm/hardware_disable_test.c
-> > > index 3147f5c97e943..1bcbd13e99947 100644
-> > > --- a/tools/testing/selftests/kvm/hardware_disable_test.c
-> > > +++ b/tools/testing/selftests/kvm/hardware_disable_test.c
-> > [ ... ]
-> > > @@ -84,16 +85,11 @@ static void run_test(u32 run)
-> > [ ... ]
-> > >  		check_create_thread(&threads[i], NULL, run_vcpu, vcpu);
-> > > -		check_set_affinity(threads[i], &cpu_set);
-> > > +		check_set_affinity(threads[i], &child_cpu_set);
-> > >  
-> > >  		for (j = 0; j < SLEEPING_THREAD_NUM; ++j) {
-> > >  			check_create_thread(&throw_away, NULL, sleeping_thread,
-> > >  					    (void *)NULL);
-> > > -			check_set_affinity(throw_away, &cpu_set);
-> > > +			check_set_affinity(throw_away, &child_cpu_set);
-> > >  		}
-> > >  	}
-> > [ ... ]
-> > > @@ -147,12 +143,30 @@ void wait_for_child_setup(pid_t pid)
-> > [ ... ]
-> > > +static void setup_child_cpu_set(void)
-> > > +{
-> > > +	int cpu;
-> > > +
-> > > +	kvm_sched_getaffinity(0, sizeof(child_cpu_set), &child_cpu_set);
-> > > +
-> > > +	if (CPU_COUNT(&child_cpu_set) < 2)
-> > > +		return;
-> > > +
-> > > +	cpu = pin_task_to_random_cpu(pthread_self(), &child_cpu_set);
-> > > +	CPU_CLR(cpu, &child_cpu_set);
-> > > +
-> > > +	while (CPU_COUNT(&child_cpu_set) > VCPU_NUM)
-> > > +		CPU_CLR(kvm_pick_random_cpu(&child_cpu_set), &child_cpu_set);
-> > > +}
+On Fri, Jul 31, 2026, Steffen Eiden wrote:
+> On Fri, Jul 31, 2026 at 03:08:29PM +0200, Steffen Eiden wrote:
+> > Replace manual module reference counting with file-based reference
+> > counting for KVM integration. Previously, VFIO used symbol_get() to
+> > obtain function pointers for kvm_get_kvm_safe() and kvm_put_kvm(),
+> > then manually tracked module references through these symbols. This
+> > approach required storing the put_kvm function pointer in each device
+> > and carefully managing symbol references.
 > > 
-> > [Severity: Medium]
-> > Since setup_child_cpu_set() pins the parent thread to a single random CPU
-> > prior to spawning children, won't the newly created threads in run_test()
-> > inherit this single-CPU affinity upon creation?
+> > Pass struct file pointers instead of struct kvm pointers throughout the
+> > VFIO-KVM interface. This leverages the kernel's existing file reference
+> > counting mechanism via get_file_active() and fput(), eliminating the
+> > need for manual module reference tracking. The file->private_data field
+> > provides access to the underlying struct kvm when needed.
 > > 
-> > Because check_create_thread() spawns the threads before their affinity is
-> > explicitly updated to child_cpu_set, they might immediately begin executing
-> > on the exact same CPU as the parent.
+> > This simplifies the code and removes all remaining externally exported
+> > symbols for KVM, paving the path for a second concurrent KVM module.
+> > 
+> > Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+> > Suggested-by: Sean Christopherson <seanjc@google.com>
+> > Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
+> > ---
+> >  arch/x86/include/asm/kvm_page_track.h |  8 ++---
+> >  arch/x86/kvm/Makefile                 |  3 --
+> >  arch/x86/kvm/mmu/page_track.c         | 16 +++++----
+> >  drivers/s390/crypto/vfio_ap_ops.c     | 24 ++++++++++---
+> >  drivers/vfio/group.c                  |  2 +-
+> >  drivers/vfio/pci/vfio_pci_zdev.c      |  7 +++-
+> >  drivers/vfio/vfio.h                   | 10 +++---
+> >  drivers/vfio/vfio_main.c              | 49 ++++++---------------------
+> >  include/linux/kvm_host.h              |  2 ++
+> >  include/linux/vfio.h                  |  4 +--
+> >  virt/kvm/kvm_main.c                   | 23 ++++++++++---
+> >  virt/kvm/vfio.c                       |  8 ++---
+> >  12 files changed, 81 insertions(+), 75 deletions(-)
 > 
-> Yeah, I was trying to avoid this since pthread_attr_setaffinity_np() is only
-> available with __USE_GNU.
-> 
-> > Could this result in the child threads starving the parent on that single CPU
-> > before the parent gets a chance to execute check_set_affinity()? This seems
-> > like it might heavily delay the migration and trigger the same CPU contention
-> > that this patch aims to fix.
-> 
-> After far too much testing, the problem isn't direct CPU contention, AFAICT it's
-> due to incurring cross-node NUMA penalties, and presumably scheduler contention
-> when the pool of possible CPUs to run on is huge.
-> 
-> I tried a bunch of fancy approaches, e.g. making parent, child, and grandchildren
-> all mutually exclusive, and while the fanciness can provide marginal benefits when
-> pthread_attr_setaffinity_np() isn't available, all that really matters is that the
-> worker threads get affined before they start doing work.
+> @sean: This is based on your draft in https://lore.kernel.org/all/adkFk3ZN4HJtpLA3@google.com/
+> do you want another/more attribution? 
 
-Oh, and I also ruled out wakeup latency, i.e. this isn't the same underlying cause
-that prompted 0297cdc12a87 ("KVM: selftests: Add option to rseq test to override
-/dev/cpu_dma_latency").
+No preference.  Do whatever feels right to you, you'll know better than me how
+much of the final code came from me.  If you want to give me a Co-developed-by,
+here's my:
+
+  Signed-off-by: Sean Christopherson <seanjc@google.com>
