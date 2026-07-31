@@ -1,64 +1,68 @@
-Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com [209.85.210.198])
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com [209.85.216.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2E553E7650
-	for <kvmarm@lists.linux.dev>; Fri, 31 Jul 2026 17:06:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2365449B0A
+	for <kvmarm@lists.linux.dev>; Fri, 31 Jul 2026 17:06:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785517585; cv=none; b=jq4J/ewhRdmzL0pL4difwCJ70AC2YTpqQRtSbz4QzCwpiK7pqF3HmIF+cBwymj0YFPNx/FjFfttk5obvtg93QhSyV+6GvNCA62S5LaYZkhJEc+8YMDrAxX2iI/peBlpc7gdaiZY2hE8gbY8iGurih2gelzwIYOuwGsOol/tBI1s=
+	t=1785517586; cv=none; b=dh3Ivv1IXMgKJ/2Z1oaryY8sdaaY668AgezBNBeAkmQQ5qo3bb2m/MHfc7vZlPXKVV03yIp1JAvVfNwkhc0XcHffhDgnd00KknycJ2QStTfIf7HSz+cR70GDIlq8cZt/S0+fipIpCLAlGbVeLDhVyBU0bQ81WTxX5xM3FkovOfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785517585; c=relaxed/simple;
-	bh=nEjhnWX7wFIEXfQd0Z7Xme3WK41LDz7Nd3rZndNnYmc=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=rhMHFH6Y9V14hv7rLqgODK8Fj33D8t+lqFpmmO4DBZ2glW3DFY8AsnzHwk7ShFWW9H8Y4ZO6eclKP4BNBOLoVyjgewqiQYMW1mW/zAZgfUMwldGMA/yU+DAWvehdyJkKDnjue3xcLucRX2ZIlLoKuWDCyezxclnuWVeOG7NSbGs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tQfUATC/; arc=none smtp.client-ip=209.85.210.198
+	s=arc-20240116; t=1785517586; c=relaxed/simple;
+	bh=jIqegcMSdQEr3CCSBl7CEcF3KSy6gnzkLIXn/FjtTSY=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=NcczFZObr3nUNkjFODr1O/z0iqgjEbvlK1ZVWjDyXPH5182kN+2U5dRQ/5n7kRWAuVnTf2DAthuxvgqzDpRJE1upLH+VBjUqd42lb6hEIPoH0SJXGOyA0L9ZvpCmsc4E6oKMyDWlGFNz43TTBRImvtSAytGZzS3FnWHCTHq8u5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MsRsPun5; arc=none smtp.client-ip=209.85.216.72
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tQfUATC/"
-Received: by mail-pf1-f198.google.com with SMTP id d2e1a72fcca58-8488ac68185so3115494b3a.2
-        for <kvmarm@lists.linux.dev>; Fri, 31 Jul 2026 10:06:23 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MsRsPun5"
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-38e7ff7b375so1349766a91.1
+        for <kvmarm@lists.linux.dev>; Fri, 31 Jul 2026 10:06:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1785517583; x=1786122383; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:mime-version:date
-         :reply-to:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=Q8RSdN/Kl64q03cYx/swNDtgv70+5W1HreJ2G2qg/Nc=;
-        b=tQfUATC/+PJISo1imxARPOLLNWTEwbVnKlZ/4CYBDFPikse+lzD+tc+u7NfOCdBQ/B
-         DAlBGgHC4fa4wt3myzNt6PKaPyQXu7BGVDcu9urIDcpoIypoOTYNC0Xbt2bReZwF6pNe
-         bLDyCH7fzAPdHv4KJVqnBb6mYVMEhJbHSv9dEABpID/seAeun4c8KnZNpls4JhKoAnAy
-         vwa9VfC+aeWPWAv5VwHR/bLBhywsZ+Eu47fArTfe+xxlcd34+TbBM2hadswcGH/zL30V
-         U2KPRd9MY2RCZ/KZBssiFDMVEw6WJF2bCg4oNth1p0RwOj7N78FZ5HiXlAtUJUZbfjJ0
-         7F9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785517583; x=1786122383;
-        h=content-type:cc:to:from:subject:message-id:mime-version:date
-         :reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=google.com; s=20251104; t=1785517584; x=1786122384; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:reply-to:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=Q8RSdN/Kl64q03cYx/swNDtgv70+5W1HreJ2G2qg/Nc=;
-        b=iYTEa3+7+hBpa2GtHuliENV7OfXyCcGAlX0d2UnItZs3m8XqRgGuOXOMjss0v0euTF
-         +mMPYgw4Q8qyCftl2Ho7E7CZWA9g/5gTI/H2Myx1L0f1d5/jwlom+ZFnfhojy+b5kT4J
-         J7zgtR+T0rdsgL0pZEjfk36djzFryeL6+qxP/g37ZGCaDLwBQSwJ5EWybA7SpQf5aL4N
-         Z+1OvrgrgMLG05pc7Z3Vp7RbU1bRdII4pPI7+ckKoi18/ExSI0gbC5+2GjNywz+Jei/H
-         BpeAAKP6+vx4ZCsHv7xZlqOC4gMLOnpu4tyzDrncKHBob0U7VXuOlhAbwzz7GtQkvdLk
-         qn0g==
-X-Forwarded-Encrypted: i=1; AHgh+Rplspajz5jXufkkFNtWFk18jqjBMmDv8yKvF+mHS2bOyf6d7ZuIdGv6QxyMNg1oTpDXVOTtPmY=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwJtqs39QohZZ/bnJcPGN0pVs7beMZLAehaY7bOhS92P6Y0S4pQ
-	PVSfN5W0dcrSHftn1dxewvSPLaiei8i47SLwiyCYiMQtOE62Dvb4MkB8o86p1EKiQF01Y5uYj9b
-	Ever2HQ==
-X-Received: from pfnw22.prod.google.com ([2002:aa7:8596:0:b0:848:2cfd:8fa1])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:856:b0:845:c8f9:6ce0
- with SMTP id d2e1a72fcca58-84ee485a40bmr400854b3a.21.1785517582786; Fri, 31
- Jul 2026 10:06:22 -0700 (PDT)
+        bh=I1vB8uido3pB5A8nVpiV1ZvPN5oqRESsQC5EjXRdj5A=;
+        b=MsRsPun5r+31n4MEE5OC2a2TjeT/PwKI6NQkOO5lXYFmGZQxpOPgj1ADecWlcoaM49
+         MD43Z+23JEmi63wnEIHyjAoiU6eGrAamppnhi6+Uz/L9xLrm9uVciCh7lQHvU6B/tjKE
+         juP2o0kgs6agzJEuOghMPEaAVHTxCoQPiMw5FoIGHeaFmD6y7T+cfZwbaxPY9XHZLNaF
+         4y4lAyZv/tWAumUQpu0CODNSk5JP3IMEbJhsVtd8R4MHyWt7AeHC64Pc7v/1PPW5B7t6
+         AtLHsrSSoQm4TYTfIVTKJqX24yYZcf3sdbb5pC8tGG/R3MII9aeaXDTcz/M6Qg8QAGxO
+         Pxuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785517584; x=1786122384;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:reply-to:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=I1vB8uido3pB5A8nVpiV1ZvPN5oqRESsQC5EjXRdj5A=;
+        b=YTaDtjUfv3DVBZL70QKQ9OhrSdy5TqPETmPAGTu32YToSee8cHs1ypk/mq8V6kcyQ0
+         +0hFUgDJqRuPmeh0nHlkZPXjxPj5YiDaEBDpt1XL5la6WOKwk+FOR3/VKkqHDfV6zmj3
+         H/Xbt99fpgdG+sG+xFnQeTMJvhEAZeyebi+TsxggDFjvCRV04cxiaxvleG9NhH7gNegq
+         eeNcXohysp91HfOc31wsCP/9od6JxHB5kRJj+8b46J2Hin6/k+bSDIZpH27q4iiz5Ql8
+         J5h4qhCG9CBztRjNHAlLSaCOfrSBD9eZ5CMTBU49drh/z3H9S7lezzWkbHscqdr9yE+c
+         +MMw==
+X-Forwarded-Encrypted: i=1; AHgh+RoKwzFFqynhzWiaid1hOF2JQaBaHTvptPSY0S3pUy0uAQNo2ejdKe66GxzxGH2YTa8AL/HJw7Y=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwVxJ2XvPmHPNBzQ7SVrcxY92b44lqMfEeMeSBd7L/6XcsdCgxo
+	0QhCRqjztqAxKP2o+dYYZfUTteZkSMyCAF0qAWAmyvIErtMBkHA7mpOdxkvT2vPglhIpTVHYliT
+	X7dg3aQ==
+X-Received: from pjso10.prod.google.com ([2002:a17:90a:c08a:b0:381:171e:961c])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:280a:b0:37f:c28a:de61
+ with SMTP id 98e67ed59e1d1-38fbc45521dmr583105a91.17.1785517584041; Fri, 31
+ Jul 2026 10:06:24 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 31 Jul 2026 10:06:07 -0700
+Date: Fri, 31 Jul 2026 10:06:08 -0700
+In-Reply-To: <20260731170619.2620845-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
+References: <20260731170619.2620845-1-seanjc@google.com>
 X-Mailer: git-send-email 2.55.0.508.g3f0d502094-goog
-Message-ID: <20260731170619.2620845-1-seanjc@google.com>
-Subject: [PATCH v2 00/12] KVM: selftests: Add more syscall wrappers, fix hardware_disable_test
+Message-ID: <20260731170619.2620845-2-seanjc@google.com>
+Subject: [PATCH v2 01/12] KVM: selftests: Add a KVM syscall wrapper for sched_setaffinity()
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oupton@kernel.org>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
@@ -71,79 +75,53 @@ Cc: Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>,
 	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Buried in the middle of this is a fix for the hardware_disable_test where
-it can end up with a runtime of multiple minutes when running a preemptible
-kernels on a large NUMA system.  Turns out my analysis/guess in v1 was wrong;
-the problem isn't direct CPU contention, it's that letting the workers do any
-amount of "real" work on any CPUs leads to pthread_create() slowdowns from
-the perspective of the caller.
+Add and use a KVM wrapper for sched_setaffinity() so that selftests don't
+need to manually assert that the syscall succeeded.
 
-The vast, vast majority of the changes are adding kvm_xxx() syscall wrappers
-so that tests don't need to manually assert that a syscall succeeds (the
-hardware disable test had some ugly equivalents).
+No functional change intended.
 
-As with v1, I'm planning on taking this through kvm-x86.
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ tools/testing/selftests/kvm/include/kvm_syscalls.h | 1 +
+ tools/testing/selftests/kvm/rseq_test.c            | 6 ++----
+ 2 files changed, 3 insertions(+), 4 deletions(-)
 
-v2:
- - pause() the child after creating workers so as not to busy loop, and to
-   maintain equivalent functionality. [Sashiko]
- - Don't bother pinning the parent of immediate child, and instead focus on
-   affining workers to their CPUs asap.
-
-v1: https://lore.kernel.org/all/20260730191908.2084803-1-seanjc@google.com
-
-Sean Christopherson (12):
-  KVM: selftests: Add a KVM syscall wrapper for sched_setaffinity()
-  KVM: selftests: Set threads CPU affinity before doing work in hardware
-    disable test
-  KVM: selftests: Pre-set threads affinity in hardware disable test when
-    possible
-  KVM: selftests: Return the target CPU from pin_task_to_random_cpu()
-  KVM: selftests: Extract picking of random CPU from cpu_set_t to
-    separate API
-  KVM: selftests: Affine threads to random CPUs in hardware disable test
-  KVM: selftests: Drop unreachable, dead code from hardware disable test
-  KVM: selftests: Add KVM syscall wrapper for pthread_create()
-  KVM: selftests: Add KVM syscall wrappers for pthread_{cancel,join}()
-  KVM: selftests: Add helper APIs to cancel+join pthreads
-  KVM: selftests: Add KVM syscall wrappers for
-    pthread_{g,s}etaffinity_np()
-  KVM: selftests: Clean up global constants in hardware disable test
-
- tools/testing/selftests/kvm/arch_timer.c      |  18 +--
- tools/testing/selftests/kvm/arm64/vgic_irq.c  |  14 +--
- .../selftests/kvm/arm64/vgic_lpi_stress.c     |   8 +-
- tools/testing/selftests/kvm/dirty_log_test.c  |   4 +-
- .../selftests/kvm/hardware_disable_test.c     | 103 ++++++++----------
- .../selftests/kvm/include/kvm_syscalls.h      |  48 ++++++++
- .../testing/selftests/kvm/include/kvm_util.h  |  11 +-
- tools/testing/selftests/kvm/irq_test.c        |   4 +-
- tools/testing/selftests/kvm/irqfd_test.c      |   4 +-
- .../selftests/kvm/kvm_page_table_test.c       |   6 +-
- tools/testing/selftests/kvm/lib/kvm_util.c    |  10 +-
- tools/testing/selftests/kvm/lib/memstress.c   |   4 +-
- .../selftests/kvm/lib/userfaultfd_util.c      |   7 +-
- .../testing/selftests/kvm/memslot_perf_test.c |   4 +-
- tools/testing/selftests/kvm/mmu_stress_test.c |   4 +-
- .../selftests/kvm/pre_fault_memory_test.c     |   4 +-
- tools/testing/selftests/kvm/rseq_test.c       |  12 +-
- tools/testing/selftests/kvm/s390/memop.c      |   4 +-
- .../selftests/kvm/set_memory_region_test.c    |   6 +-
- tools/testing/selftests/kvm/steal_time.c      |   6 +-
- tools/testing/selftests/kvm/x86/hyperv_ipi.c  |  32 +-----
- .../selftests/kvm/x86/hyperv_tlb_flush.c      |  30 +----
- .../kvm/x86/private_mem_conversions_test.c    |   4 +-
- .../kvm/x86/private_mem_kvm_exits_test.c      |   7 +-
- .../selftests/kvm/x86/recalc_apic_map_test.c  |   5 +-
- .../selftests/kvm/x86/sev_migrate_tests.c     |   4 +-
- .../selftests/kvm/x86/sync_regs_test.c        |   5 +-
- .../selftests/kvm/x86/tsc_scaling_sync.c      |   4 +-
- .../selftests/kvm/x86/xapic_ipi_test.c        |  31 +-----
- .../selftests/kvm/x86/xen_shinfo_test.c       |  10 +-
- 30 files changed, 183 insertions(+), 230 deletions(-)
-
-
-base-commit: 3c7d7f908d574277a845423ec32250a8d8df44c8
+diff --git a/tools/testing/selftests/kvm/include/kvm_syscalls.h b/tools/testing/selftests/kvm/include/kvm_syscalls.h
+index 5dae6143ddb0..01dca99009c2 100644
+--- a/tools/testing/selftests/kvm/include/kvm_syscalls.h
++++ b/tools/testing/selftests/kvm/include/kvm_syscalls.h
+@@ -95,6 +95,7 @@ __KVM_SYSCALL_DEFINE(fallocate, 4, int, fd, int, mode, loff_t, offset, loff_t, l
+ __KVM_SYSCALL_DEFINE(ftruncate, 2, unsigned int, fd, off_t, length);
+ __KVM_SYSCALL_DEFINE(madvise, 3, void *, addr, size_t, length, int, advice);
+ __KVM_SYSCALL_DEFINE(sched_getaffinity, 3, pid_t, pid, size_t, cpusetsize, cpu_set_t *, mask);
++__KVM_SYSCALL_DEFINE(sched_setaffinity, 3, pid_t, pid, size_t, cpusetsize, cpu_set_t *, mask);
+ 
+ #define kvm_free_fd(fd)		\
+ do {				\
+diff --git a/tools/testing/selftests/kvm/rseq_test.c b/tools/testing/selftests/kvm/rseq_test.c
+index 557e393c223b..edcaf0fbe20c 100644
+--- a/tools/testing/selftests/kvm/rseq_test.c
++++ b/tools/testing/selftests/kvm/rseq_test.c
+@@ -75,7 +75,7 @@ static void *migration_worker(void *__rseq_tid)
+ {
+ 	pid_t rseq_tid = (pid_t)(unsigned long)__rseq_tid;
+ 	cpu_set_t allowed_mask;
+-	int r, i, cpu;
++	int i, cpu;
+ 
+ 	CPU_ZERO(&allowed_mask);
+ 
+@@ -96,9 +96,7 @@ static void *migration_worker(void *__rseq_tid)
+ 		 * stable, i.e. while changing affinity is in-progress.
+ 		 */
+ 		smp_wmb();
+-		r = sched_setaffinity(rseq_tid, sizeof(allowed_mask), &allowed_mask);
+-		TEST_ASSERT(!r, "sched_setaffinity failed, errno = %d (%s)",
+-			    errno, strerror(errno));
++		kvm_sched_setaffinity(rseq_tid, sizeof(allowed_mask), &allowed_mask);
+ 		smp_wmb();
+ 		atomic_inc(&seq_cnt);
+ 
 -- 
 2.55.0.508.g3f0d502094-goog
 
