@@ -1,44 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 205F142DA55
-	for <kvmarm@lists.linux.dev>; Fri, 31 Jul 2026 15:04:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C4F03033E3
+	for <kvmarm@lists.linux.dev>; Fri, 31 Jul 2026 15:06:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785510267; cv=none; b=md+Ur+dBNhdYpeFCmaxxR+UzPN4QMV4b6bSQKOAzYax0zcKqXt3K7IMJ1No1c/IcOejjV3nBi2lo/I/+QUTaPHW7t7S72p+RpmuoJKa1Opc4ezNkJMgWV2ssrzEmzyzwRu3WcIMexVDfzs4u7WTlOcj0rcloYb2T8KbmzmzlUYM=
+	t=1785510404; cv=none; b=j6bxoJq7StEMUEK7GLFmnWCCQbnwLTSVm0/KYECvqa9H5FKeRPHHfO+ggAF2VqSnAF7dddXQl0N/4H35xpiDdW3M0yAugppHsKxGK5sYGsf+RtHBXncToHjja5h6oEpe2+6wHJLBWLe37tnEZa4/YU6AZvRhuJyyJCscq6Leeu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785510267; c=relaxed/simple;
-	bh=PfaeGriOJVsPAnuKURjvzdIeg5vyj0XAcld4PXnM8kc=;
+	s=arc-20240116; t=1785510404; c=relaxed/simple;
+	bh=MydWr/9ulZaUMjrqXaz3RfupII/Omyz/aEvcEMyB2wE=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=tsVdbCsF9xJ9KymenHlCPRWsGMIqr2pfcJkra+xmlabpJQDRwQRtQOek2pKbJbMaqcqI8ATaZSIAWJ5MliMdHUps8zHQyYoqMUD3oq5UbSp5CgJr//o07xIGT0JTdCgreu5LwNNSWXEEXZpfnkoTfaEAVRail8CfO8yJdYE/CpA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bNaEybyG; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=eNc+X06RD3+5GAvwq/BiZ03o2XyfuEtaXQHrI4yBe3tsuiqITO4Tyl2lfiZi8vbb+Qg7aH/dCN0qr/FGND6Q4c0fQ6RoAq6p9UHNJ5s0gFwthfvsXlB3+NjN13IQbQXolRA4hvZCaUa01CwglRez/50cE34WrXEkU8Zxze1KlmA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j8qRocDP; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bNaEybyG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 858E31F00A3A;
-	Fri, 31 Jul 2026 15:04:25 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j8qRocDP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1D231F000E9;
+	Fri, 31 Jul 2026 15:06:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785510265;
-	bh=68lut/4oVpNfi3C4Z7FQr1mpSqRXyw5A/qlkUDAlm9E=;
+	s=k20260515; t=1785510403;
+	bh=n5HxEPJHg8Og0E/KXy/iMY7Exgtt44WyaHsAGH9etBo=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=bNaEybyGXjAR58raSga+fviO/rOthmstev7RvPASmrSJ5W+Rtwx5oasWt7EIKRYJ4
-	 TkQu+Qc068Pb1D8DCBCmLf1Msxj9EFeGpsQf6K4edWBCrI2CrqZajTor7UbtAZpScW
-	 zilbBJXXVfvOW8JiiU8wfJwU4ldJXwGX6fk9JI54HE56e6SW5INmsG1I2jI1atTkl3
-	 gI3hBRMvLxKpanBIYyzpdHBxtnaQdwWZkyosEAI8Krdte6BB8Ia6yA4guX9zeY/v5N
-	 ajn8LGYpClQi8hpaXHCwZImSJb1Dinj00T9oJnnvrXLRCXkWYXFP86MTZ6Q+odBLlW
-	 uZLqSbICatpcA==
+	b=j8qRocDPNGcZiAyfrmH4ZlLkQ/4v6znj9vOkFtMoAZv1n7ljIgzhdu2gLo3IPoU06
+	 UbGC7sp4L73RUsEXOmkNS4AHLmoX3K2v85wQ/uV2KVuWdW6xc+u4fbdCJYydHHzSqR
+	 QJ1ORrNd7hyYX7AguYQ29YGJyjt62jGTY4J7ckrqczuivHYWBKt++L6VRiP+7V5dkw
+	 uMq45IL6Ag8VqunFCVywqVdcTedU2BcuDfzFOAsdDY7nI6ZoBMZ0jOe4QxrgUxZMpO
+	 B67EXziiwgLuYzQ6MOmD5OevZtFUO7/CZ+5paVIN9jtJC/VaITc1EkyEADDdKrtIva
+	 DZTnuVaJ7/K1g==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v4 14/17] KVM: arm64: Alloc pkvm_hyp_vcpu using pKVM
- heap allocator
+Subject: Re: [PATCH v4 13/17] KVM: arm64: Alloc pkvm_hyp_vm using pKVM heap
+ allocator
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Vincent Donnefort" <vdonnefort@google.com>
-Cc: "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev
-In-Reply-To: <20260731143541.956291-15-vdonnefort@google.com>
+Cc: kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>
+In-Reply-To: <20260731143541.956291-14-vdonnefort@google.com>
 References: <20260731143541.956291-1-vdonnefort@google.com>
- <20260731143541.956291-15-vdonnefort@google.com>
+ <20260731143541.956291-14-vdonnefort@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 31 Jul 2026 15:04:25 +0000
-Message-Id: <20260731150425.858E31F00A3A@smtp.kernel.org>
+Date: Fri, 31 Jul 2026 15:06:42 +0000
+Message-Id: <20260731150642.E1D231F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,90 +47,77 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [High] The dynamic allocation of the hypervisor vCPU and VM state structu=
-res via the pKVM heap allocator bypasses memory cgroup (kmemcg) accounting,=
- allowing an unprivileged userspace process to bypass memcg limits.
+- [High] Memory allocated for the hypervisor heap is not accounted to the m=
+emcg of the container creating the VM, creating a memory limit bypass. Prio=
+r to this patch, `hyp_vm` was allocated on the host using `GFP_KERNEL_ACCOU=
+NT`, correctly attributing the memory to the calling process's memcg. With =
+the shift to EL2 dynamic allocation via `hyp_alloc()`, when the heap requir=
+es more memory, EL2 requests a top-up from the host via `PKVM_HYP_REQ_HYP_A=
+LLOC`. The host handles this in `pkvm_hyp_topup()` by creating a temporary =
+memcache and initializing it with `init_hyp_memcache(&mc)`. However, `init_=
+hyp_memcache()` zeroes the memcache flags, meaning `HYP_MEMCACHE_ACCOUNT_KM=
+EMCG` is not set. Consequently, when `topup_hyp_memcache()` allocates host =
+pages, `hyp_mc_alloc_fn()` falls back to `GFP_KERNEL` instead of `GFP_KERNE=
+L_ACCOUNT`. This hides the hypervisor heap allocations from memcg limits, a=
+llowing a container to exhaust host memory by creating VMs with maximum vCP=
+Us without being charged.
 --
 
---- Patch [14]: [PATCH v4 14/17] KVM: arm64: Alloc pkvm_hyp_vcpu using pKVM=
- heap allocator ---
-commit b0e52464780692d209150dd491713c25a5d1c1c0
+--- Patch [13]: [PATCH v4 13/17] KVM: arm64: Alloc pkvm_hyp_vm using pKVM h=
+eap allocator ---
+commit 3a3fbdf527ba4d3c04e2e5d3272e58f6042e8822
 Author: Vincent Donnefort <vdonnefort@google.com>
 
-KVM: arm64: Alloc pkvm_hyp_vcpu using pKVM heap allocator
+KVM: arm64: Alloc pkvm_hyp_vm using pKVM heap allocator
    =20
-Transition the allocation of the hypervisor vCPU state structure (pkvm_hyp_=
-vcpu)
-from the host to the hypervisor using the new pKVM heap allocator. The host=
- now
-uses the pkvm_call_hyp_req wrapper to handle top-up requests if the hypervi=
-sor
-runs out of heap memory.
+This commit transitions the allocation of the hypervisor VM state structure
+(pkvm_hyp_vm) to the pKVM heap allocator at EL2. The host now uses
+pkvm_call_hyp_req() to invoke __pkvm_init_vm, handling any EL2 heap top-up
+requests dynamically instead of donating pre-allocated host memory.
 
 > diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-> index a9b85ad37787a..3b29b3f43ffa5 100644
+> index bfbb1266491d1..a9b85ad37787a 100644
 > --- a/arch/arm64/kvm/pkvm.c
 > +++ b/arch/arm64/kvm/pkvm.c
 
 [ ... ]
 
-> @@ -153,28 +153,19 @@ static void __pkvm_destroy_hyp_vm(struct kvm *kvm)
+> @@ -209,28 +209,15 @@ static int __pkvm_create_hyp_vm(struct kvm *kvm)
+>  	if (!pgd)
+>  		return -ENOMEM;
 > =20
->  	kvm->arch.pkvm.handle =3D 0;
->  	kvm->arch.pkvm.is_created =3D false;
-> -	free_hyp_memcache(&kvm->arch.pkvm.teardown_mc);
->  	free_hyp_memcache(&kvm->arch.pkvm.stage2_teardown_mc);
->  }
-> =20
->  static int __pkvm_create_hyp_vcpu(struct kvm_vcpu *vcpu)
->  {
-> -	size_t hyp_vcpu_sz =3D PAGE_ALIGN(PKVM_HYP_VCPU_SIZE);
->  	pkvm_handle_t handle =3D vcpu->kvm->arch.pkvm.handle;
-> -	void *hyp_vcpu;
->  	int ret;
-> =20
->  	init_hyp_stage2_memcache(&vcpu->arch.pkvm_memcache);
-> =20
-> -	hyp_vcpu =3D alloc_pages_exact(hyp_vcpu_sz, GFP_KERNEL_ACCOUNT);
-> -	if (!hyp_vcpu)
-> -		return -ENOMEM;
+> -	/* Allocate memory to donate to hyp for vm and vcpu pointers. */
+> -	hyp_vm_sz =3D PAGE_ALIGN(size_add(PKVM_HYP_VM_SIZE,
+> -					size_mul(sizeof(void *),
+> -						 kvm->created_vcpus)));
+> -	hyp_vm =3D alloc_pages_exact(hyp_vm_sz, GFP_KERNEL_ACCOUNT);
+> -	if (!hyp_vm) {
+> -		ret =3D -ENOMEM;
+> -		goto free_pgd;
+> -	}
 > -
-> -	ret =3D kvm_call_hyp_nvhe(__pkvm_init_vcpu, handle, vcpu, hyp_vcpu);
-> +	ret =3D pkvm_call_hyp_req(__pkvm_init_vcpu, handle, vcpu);
+> -	/* Donate the VM memory to hyp and let hyp initialize it. */
+> -	ret =3D kvm_call_hyp_nvhe(__pkvm_init_vm, kvm, hyp_vm, pgd);
+> +	ret =3D pkvm_call_hyp_req(__pkvm_init_vm, kvm, pgd);
+
 [Severity: High]
-Does this change unintentionally drop memory cgroup (kmemcg) accounting for
-the vCPU state structure?
+Does this new allocation path lose the memcg accounting for the hyp_vm
+structure?
 
-Previously, this structure was allocated with GFP_KERNEL_ACCOUNT. By switch=
-ing
-to pkvm_call_hyp_req() and relying on the EL2 heap top-up mechanism, it app=
-ears
-the accounting is bypassed. When the top-up path calls pkvm_hyp_topup(), it=
- uses
-init_hyp_memcache() which lacks the HYP_MEMCACHE_ACCOUNT_KMEMCG flag. This
-causes the host allocation in hyp_mc_alloc_fn() to fall back to GFP_KERNEL
-instead of GFP_KERNEL_ACCOUNT.
+Previously, hyp_vm was allocated on the host using GFP_KERNEL_ACCOUNT, which
+correctly attributed the memory to the calling process's memcg.
 
-Could this allow an unprivileged userspace process to bypass memcg limits by
-repeatedly creating VMs and vCPUs, leading to a host out-of-memory conditio=
-n?
+With the shift to EL2 dynamic allocation, when the heap requires more memor=
+y,
+EL2 requests a top-up via PKVM_HYP_REQ_HYP_ALLOC. When the host handles this
+in pkvm_hyp_topup(), it creates a temporary memcache using
+init_hyp_memcache(), which leaves the HYP_MEMCACHE_ACCOUNT_KMEMCG flag
+cleared.
 
-While a previous commit noted that heap donations cannot be accounted for a
-specific VM because they are shared and recycled, active VM and vCPU struct=
-ures
-remain in use for the lifetime of the VM and cannot be reclaimed by the new=
- pKVM
-shrinker. This might allow a malicious tenant to systematically exhaust host
-memory.
-
->  	if (!ret)
->  		vcpu_set_flag(vcpu, VCPU_PKVM_FINALIZED);
-> -	else
-> -		free_pages_exact(hyp_vcpu, hyp_vcpu_sz);
-> =20
->  	return ret;
->  }
+Because of this, when topup_hyp_memcache() allocates host pages,
+hyp_mc_alloc_fn() falls back to GFP_KERNEL instead of GFP_KERNEL_ACCOUNT.
+This hides the hypervisor heap allocations from memcg limits.
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260731143541.9562=
-91-1-vdonnefort@google.com?part=3D14
+91-1-vdonnefort@google.com?part=3D13
