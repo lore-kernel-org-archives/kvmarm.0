@@ -1,146 +1,136 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60609368299
-	for <kvmarm@lists.linux.dev>; Fri, 31 Jul 2026 15:03:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 205F142DA55
+	for <kvmarm@lists.linux.dev>; Fri, 31 Jul 2026 15:04:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785510189; cv=none; b=GIBVS1ulSDC1hiDcerJ7GDyCMKe43OnWQ4zuXqY6XJwnSf5H3SWjVOr6UafUUVMoPNyqzoOBMRnq36laQ1lvPWho24kc3+wUv8w4hnPSDPWb+uhAtyeoQnq7ktN2uzlg6IMZ9HHUgH1e6z/U8SefqQRqWuf0tqAXWy3MXTFzFlM=
+	t=1785510267; cv=none; b=md+Ur+dBNhdYpeFCmaxxR+UzPN4QMV4b6bSQKOAzYax0zcKqXt3K7IMJ1No1c/IcOejjV3nBi2lo/I/+QUTaPHW7t7S72p+RpmuoJKa1Opc4ezNkJMgWV2ssrzEmzyzwRu3WcIMexVDfzs4u7WTlOcj0rcloYb2T8KbmzmzlUYM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785510189; c=relaxed/simple;
-	bh=wkeBixyhVNYNVDFbkNkDflDqhinWDKQBwQ7Z5bePJRs=;
+	s=arc-20240116; t=1785510267; c=relaxed/simple;
+	bh=PfaeGriOJVsPAnuKURjvzdIeg5vyj0XAcld4PXnM8kc=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=mejodv2Yd7Ozu8mlSt3APrEn70Lo0f4YoZbrWY2QzixgGf5x4/dtkWH53iZ4Sp7oW3GaHQaXxbZc02wPnIQODpH1B3FSCKNdmaE/S4SLtLIJOVUgdfxu0i8AXDOX2IQZRS9Gu/b6C68+zJRygKIucE31V5cV2Cwb+rYVh1x6Bo8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oM/IIsDR; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=tsVdbCsF9xJ9KymenHlCPRWsGMIqr2pfcJkra+xmlabpJQDRwQRtQOek2pKbJbMaqcqI8ATaZSIAWJ5MliMdHUps8zHQyYoqMUD3oq5UbSp5CgJr//o07xIGT0JTdCgreu5LwNNSWXEEXZpfnkoTfaEAVRail8CfO8yJdYE/CpA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bNaEybyG; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oM/IIsDR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB95E1F000E9;
-	Fri, 31 Jul 2026 15:03:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bNaEybyG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 858E31F00A3A;
+	Fri, 31 Jul 2026 15:04:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785510187;
-	bh=drRJG6ds69O9LwV6v3ykfptHYlXD3AOi/zrzDj3LKBI=;
+	s=k20260515; t=1785510265;
+	bh=68lut/4oVpNfi3C4Z7FQr1mpSqRXyw5A/qlkUDAlm9E=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=oM/IIsDRo9DntuOBBXMJuP+Gus4ClkO6nBSlBGa38RdeIvDU6ZfQWIbqH0tD5hpAq
-	 gMDfbJVvAe6lFJe7yUNUDdKcUBCQtD+LlHzc6RD4K75ULEfM+Mr+5FGMjg8j/wu8iF
-	 0Fhe1vyR7YJj4PKkpWI8vV5S44dEEd5+NVcrNIIzC7fCklFFJqGy93QIelxxvyKVhQ
-	 rrxxF0YarU2zwx/1+uS4HUVUYDzFeDqAfHLOfHLVvFnOiD0fryqyMs0e68mf0rtBO9
-	 Rdc0aV3KlFuoq5TmFuFS9Bko73ymeoltcE4jkByYp9JNuobm4txzi96/0xEIXR2fgh
-	 qOQoQ5iclUD6w==
+	b=bNaEybyGXjAR58raSga+fviO/rOthmstev7RvPASmrSJ5W+Rtwx5oasWt7EIKRYJ4
+	 TkQu+Qc068Pb1D8DCBCmLf1Msxj9EFeGpsQf6K4edWBCrI2CrqZajTor7UbtAZpScW
+	 zilbBJXXVfvOW8JiiU8wfJwU4ldJXwGX6fk9JI54HE56e6SW5INmsG1I2jI1atTkl3
+	 gI3hBRMvLxKpanBIYyzpdHBxtnaQdwWZkyosEAI8Krdte6BB8Ia6yA4guX9zeY/v5N
+	 ajn8LGYpClQi8hpaXHCwZImSJb1Dinj00T9oJnnvrXLRCXkWYXFP86MTZ6Q+odBLlW
+	 uZLqSbICatpcA==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v4 09/17] KVM: arm64: Add selftests for the pKVM heap
- allocator
+Subject: Re: [PATCH v4 14/17] KVM: arm64: Alloc pkvm_hyp_vcpu using pKVM
+ heap allocator
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Vincent Donnefort" <vdonnefort@google.com>
-Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev
-In-Reply-To: <20260731143541.956291-10-vdonnefort@google.com>
+Cc: "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev
+In-Reply-To: <20260731143541.956291-15-vdonnefort@google.com>
 References: <20260731143541.956291-1-vdonnefort@google.com>
- <20260731143541.956291-10-vdonnefort@google.com>
+ <20260731143541.956291-15-vdonnefort@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 31 Jul 2026 15:03:07 +0000
-Message-Id: <20260731150307.AB95E1F000E9@smtp.kernel.org>
+Date: Fri, 31 Jul 2026 15:04:25 +0000
+Message-Id: <20260731150425.858E31F00A3A@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 3 potential issue(=
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [High] The pKVM hyp allocator fails to map backing memory for chunks appe=
-nded to a previous chunk that does not explicitly track the unmapped bounda=
-ry, leading to a fatal EL2 data abort.
-- [Medium] The `__pkvm_hyp_alloc_selftest` hypercall is placed in the alway=
-s-on band instead of the init-only band, violating hypervisor lifecycle rul=
-es.
-- [Medium] Physical pages temporarily held in the local `host_mc` memcache =
-are permanently leaked if an assertion fails during the selftest.
+- [High] The dynamic allocation of the hypervisor vCPU and VM state structu=
+res via the pKVM heap allocator bypasses memory cgroup (kmemcg) accounting,=
+ allowing an unprivileged userspace process to bypass memcg limits.
 --
 
---- Patch [9]: [PATCH v4 09/17] KVM: arm64: Add selftests for the pKVM heap=
- allocator ---
-commit 68a0bf1c1fb29e6fed5c0a59e15840d4a948bd3e
+--- Patch [14]: [PATCH v4 14/17] KVM: arm64: Alloc pkvm_hyp_vcpu using pKVM=
+ heap allocator ---
+commit b0e52464780692d209150dd491713c25a5d1c1c0
 Author: Vincent Donnefort <vdonnefort@google.com>
 
-KVM: arm64: Add selftests for the pKVM heap allocator
+KVM: arm64: Alloc pkvm_hyp_vcpu using pKVM heap allocator
+   =20
+Transition the allocation of the hypervisor vCPU state structure (pkvm_hyp_=
+vcpu)
+from the host to the hypervisor using the new pKVM heap allocator. The host=
+ now
+uses the pkvm_call_hyp_req wrapper to handle top-up requests if the hypervi=
+sor
+runs out of heap memory.
 
-Introduce a comprehensive runtime selftest for the pKVM hypervisor heap
-allocator, executed during init when CONFIG_NVHE_EL2_DEBUG is enabled.
+> diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+> index a9b85ad37787a..3b29b3f43ffa5 100644
+> --- a/arch/arm64/kvm/pkvm.c
+> +++ b/arch/arm64/kvm/pkvm.c
 
-> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kv=
-m_asm.h
-> index 0c3126179704f..08466f608d1f5 100644
-> --- a/arch/arm64/include/asm/kvm_asm.h
-> +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -92,6 +92,7 @@ enum __kvm_host_smccc_func {
->  	__KVM_HOST_SMCCC_FUNC___pkvm_hyp_topup,
->  	__KVM_HOST_SMCCC_FUNC___pkvm_hyp_reclaim,
->  	__KVM_HOST_SMCCC_FUNC___pkvm_hyp_reclaimable,
-> +	__KVM_HOST_SMCCC_FUNC___pkvm_hyp_alloc_selftest,
+[ ... ]
+
+> @@ -153,28 +153,19 @@ static void __pkvm_destroy_hyp_vm(struct kvm *kvm)
 > =20
->  	MARKER(__KVM_HOST_SMCCC_FUNC_PKVM_ONLY),
-
-[Severity: Medium]
-Is __pkvm_hyp_alloc_selftest placed in the correct hypercall ID band here?
-
-Placing it before the PKVM_ONLY marker puts the hypercall in the always-on
-band rather than the init-only band. Since this is an initialization test
-meant to run before pKVM finalization, should it be placed in the init-only
-band to ensure it is not exposed to the untrusted host kernel
-post-deprivilege?
-
-[ ... ]
-
-> diff --git a/arch/arm64/kvm/hyp/nvhe/alloc.c b/arch/arm64/kvm/hyp/nvhe/al=
-loc.c
-> index af4ab53784f7f..de636fdf976bf 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/alloc.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/alloc.c
-[ ... ]
-> +	/* Test reclaiming */
-> +	if (addr1 !=3D selftest_alloc(0))
-> +		return -EINVAL;
-> +	if (addr2 !=3D selftest_alloc(PAGE_SIZE * 2))
-> +		return -EINVAL;
-> +	addr3 =3D selftest_alloc(0);
-> +	addr4 =3D selftest_alloc(PAGE_SIZE);
-
+>  	kvm->arch.pkvm.handle =3D 0;
+>  	kvm->arch.pkvm.is_created =3D false;
+> -	free_hyp_memcache(&kvm->arch.pkvm.teardown_mc);
+>  	free_hyp_memcache(&kvm->arch.pkvm.stage2_teardown_mc);
+>  }
+> =20
+>  static int __pkvm_create_hyp_vcpu(struct kvm_vcpu *vcpu)
+>  {
+> -	size_t hyp_vcpu_sz =3D PAGE_ALIGN(PKVM_HYP_VCPU_SIZE);
+>  	pkvm_handle_t handle =3D vcpu->kvm->arch.pkvm.handle;
+> -	void *hyp_vcpu;
+>  	int ret;
+> =20
+>  	init_hyp_stage2_memcache(&vcpu->arch.pkvm_memcache);
+> =20
+> -	hyp_vcpu =3D alloc_pages_exact(hyp_vcpu_sz, GFP_KERNEL_ACCOUNT);
+> -	if (!hyp_vcpu)
+> -		return -ENOMEM;
+> -
+> -	ret =3D kvm_call_hyp_nvhe(__pkvm_init_vcpu, handle, vcpu, hyp_vcpu);
+> +	ret =3D pkvm_call_hyp_req(__pkvm_init_vcpu, handle, vcpu);
 [Severity: High]
-Does allocating addr4 here trigger a data abort due to unmapped memory?
+Does this change unintentionally drop memory cgroup (kmemcg) accounting for
+the vCPU state structure?
 
-When appending a new chunk, hyp_allocator_map() uses chunk_unmapped(prev) to
-find the unmapped boundary. If the previous chunk (addr3) does not track it
-(which occurs when the boundary is held by an earlier chunk), it returns 0
-and skips mapping.
+Previously, this structure was allocated with GFP_KERNEL_ACCOUNT. By switch=
+ing
+to pkvm_call_hyp_req() and relying on the EL2 heap top-up mechanism, it app=
+ears
+the accounting is bypassed. When the top-up path calls pkvm_hyp_topup(), it=
+ uses
+init_hyp_memcache() which lacks the HYP_MEMCACHE_ACCOUNT_KMEMCG flag. This
+causes the host allocation in hyp_mc_alloc_fn() to fall back to GFP_KERNEL
+instead of GFP_KERNEL_ACCOUNT.
 
-Because addr4 is allocated after addr3, it crosses the actual unmapped
-boundary without mapping new pages. This leaves the new region unmapped,
-which leads to a fatal EL2 data abort when the hypervisor initializes and
-accesses the memory.
+Could this allow an unprivileged userspace process to bypass memcg limits by
+repeatedly creating VMs and vCPUs, leading to a host out-of-memory conditio=
+n?
 
-[ ... ]
-> +
-> +	/* Test punching a hole in the middle of a free chunk ... */
-> +	selftest_free(addr2);
-> +	hyp_allocator_reclaim(allocator, &host_mc, SELFTEST_MAX_PAGES);
-> +	if (host_mc.nr_pages !=3D SELFTEST_MAX_PAGES - 2)
-> +		return -EINVAL;
-> +
-> +	if (selftest_alloc(PAGE_SIZE))
-> +		return -EINVAL;
-> +	if (selftest_errno() !=3D -ENOMEM)
-> +		return -EINVAL;
+While a previous commit noted that heap donations cannot be accounted for a
+specific VM because they are shared and recycled, active VM and vCPU struct=
+ures
+remain in use for the lifetime of the VM and cannot be reclaimed by the new=
+ pKVM
+shrinker. This might allow a malicious tenant to systematically exhaust host
+memory.
 
-[Severity: Medium]
-Do these error paths leak the physical pages currently held in host_mc?
-
-The hyp_allocator_selftest() function temporarily stores reclaimed physical
-pages in the local host_mc memcache stack variable. If any of these
-subsequent assertions fail, the function returns -EINVAL directly without
-draining host_mc or returning the pages to the host, resulting in a permane=
-nt
-memory leak.
+>  	if (!ret)
+>  		vcpu_set_flag(vcpu, VCPU_PKVM_FINALIZED);
+> -	else
+> -		free_pages_exact(hyp_vcpu, hyp_vcpu_sz);
+> =20
+>  	return ret;
+>  }
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260731143541.9562=
-91-1-vdonnefort@google.com?part=3D9
+91-1-vdonnefort@google.com?part=3D14
