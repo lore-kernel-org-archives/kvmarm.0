@@ -1,45 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 544104499B8;
-	Fri, 31 Jul 2026 17:18:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B31C33A1D02;
+	Fri, 31 Jul 2026 17:20:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785518290; cv=none; b=BXJVyiREhRKPSj7AATsbxVikzgaQN9rhY5Oco5BoB0LaL8nrWBH3860nFINv98U1CP42ANMUxujcVOGKDGYj7ki6XFRZSf8jCB6uluJG34jbMuC9QuiSiifdzXbWGXLjHQnhK5az3TZCCnJ1hNALDlsWBvb8AMpfCE4RyxbuiOI=
+	t=1785518412; cv=none; b=UEsWY/KVYtMZgQoPRCklGvruX4JKVvV34aIRKZOF0vWWwPZw0Fdc08P0h7VV/gaLCgI0i8aNdjTj6SFfrvNAHGX22eXpJl5lJJ/YDS8BiGntgrckMy0kJ/QiplXt1x05uVl+zrSiOPVWz/n4c4hXC4O5rlfvIavNAFwqmBXeuyA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785518290; c=relaxed/simple;
-	bh=08s9E6ka3dFOAJcXYZ5mzc7bo8l76a3hNsjYgpcE6Yc=;
+	s=arc-20240116; t=1785518412; c=relaxed/simple;
+	bh=56EQ3wY0w5NW8FUm5LrKM07hS0VFaj6hZt8OTHEB7uM=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=CzkT2s+7qfuGL/OtZtJVuHyKfY1RTOIikCAL+oeDG57c5qizBM2qxXHTWvWgg2XSym9Zk9xKE8gb6DdMHuoLxOzr+gnDFqgPcR1rAO3JKJQlQg/JJdckDWMB2z8mA6Lszm0+EnuCMrtrzNAkhwTXNvOAR1QfELu057CrO9/F3Mo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GkfUQsVD; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=mJmm668BSWHPwfCfzMB/J4mehGYIl22JP0mQG5OH2aVLBNBF7H8jJMG6R3CJI7xzSOFFCCW5FcGljx+ErNJEpWnOiCQQEq/Ewl+BK7RZhd8jh5QFcP5K2Lpb1G8iFdrbUZXqvlSIzSYIGz7EWmlrYC83yCo2UhJrsa0PYave3+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mni4y9Nl; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GkfUQsVD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A51731F00AC4;
-	Fri, 31 Jul 2026 17:18:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mni4y9Nl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 419501F00AC4;
+	Fri, 31 Jul 2026 17:20:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785518289;
-	bh=BFR3+HDgiAMrK9bfd6XM2NF4MmQluEWmZ+rtRVJs8Jo=;
+	s=k20260515; t=1785518411;
+	bh=Miy1Oqk30qBKPYaAcQLu77bS5G8/M3dvs2FXN1XXZB8=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=GkfUQsVDCcteWJ/BrkoxeP8h51GMQnIG0CF/u+FcT0cvVQ0AGig09Fk4LkWfa6DK9
-	 aaHDpJ+arWkF/pT9ZOv0MspUOSXy4g6DijfAjNrD+0ScsaQCvtzaXSu09lcIYhagPn
-	 QYmorE6/0A3+X+mzOYsMoyArqEMd4xa4SV1R6q9jHMu7WBqr6IneI5BXNW8O7CiTLo
-	 0dnLBLvZHcNPmw/v3PsPHUOze4lB/0FQgDS+XfS9FbqScaJTjq/EWlsxy8HxzGc8oi
-	 nJDWhhD0YmC+VgCIkZPGR3dYMYT0CMHgbjEw+LWs2cnw01EKgHXV4ZID/Je+rBeR1P
-	 jyzT7o98LI0vg==
+	b=mni4y9Nl80QyhN0WjmQgWIHfg+7rJ1S73GpjbllIi6tjUlM4TlsS+H73gKUJKwGBg
+	 JU9LspEsWUaEMsce+rMchl7Te79bbOWYJL1ijL+wU33DuUMimD/DVXMRpbNMaR4ac2
+	 gnWFGMDWrvsZa0qNSyOqQCXVszyAO8zyjpcWh5tXcRVxEAlKj23uKjZNq28x/ZdKGI
+	 Frs7SjcWw5M7Javsh/a5YTrzCwwVK/VaRQ9bUUfpyaE5VQXr4TtEQAzJCUDE5KZJRn
+	 ig+xrQl4bOBHEhTfGjIo4LuoY0G9/BYyw22XvxuUE58QpZd5uMn3ZJsyv9xtOX+mlu
+	 yK+K4ofmP8fjQ==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2 09/12] KVM: selftests: Add KVM syscall wrappers for
- pthread_{cancel,join}()
+Subject: Re: [PATCH v2 08/12] KVM: selftests: Add KVM syscall wrapper for
+ pthread_create()
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Sean Christopherson" <seanjc@google.com>
-Cc: "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, kvm@vger.kernel.org, "Oliver
+Cc: kvm@vger.kernel.org, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, "Oliver
  Upton" <oupton@kernel.org>
-In-Reply-To: <20260731170619.2620845-10-seanjc@google.com>
+In-Reply-To: <20260731170619.2620845-9-seanjc@google.com>
 References: <20260731170619.2620845-1-seanjc@google.com>
- <20260731170619.2620845-10-seanjc@google.com>
+ <20260731170619.2620845-9-seanjc@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 31 Jul 2026 17:18:08 +0000
-Message-Id: <20260731171808.A51731F00AC4@smtp.kernel.org>
+Date: Fri, 31 Jul 2026 17:20:10 +0000
+Message-Id: <20260731172011.419501F00AC4@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,52 +48,56 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [Medium] The `kvm_pthread_join` and `kvm_pthread_cancel` wrappers are def=
-ined using the `__KVM_SYSCALL_DEFINE` macro, which incorrectly assumes the =
-wrapped function sets the thread-local `errno` variable on failure.
+- [Low] Using `__KVM_SYSCALL_DEFINE` to wrap `pthread_create` results in mi=
+sleading error messages on failure, as it logs `errno` instead of the retur=
+ned error code.
 --
 
---- Patch [9]: [PATCH v2 09/12] KVM: selftests: Add KVM syscall wrappers fo=
-r pthread_{cancel,join}() ---
-commit b9978e67ef4ca95fc0d3b87b0d80bdb48e623a21
+--- Patch [8]: [PATCH v2 08/12] KVM: selftests: Add KVM syscall wrapper for=
+ pthread_create() ---
+commit dca849bcf7bfa248030e1f22bebefccde9e01db3
 Author: Sean Christopherson <seanjc@google.com>
 
-KVM: selftests: Add KVM syscall wrappers for pthread_{cancel,join}()
+KVM: selftests: Add KVM syscall wrapper for pthread_create()
 
-This commit adds kvm_pthread_join() and kvm_pthread_cancel() wrappers to
-KVM selftests. These wrappers automatically assert that the underlying pthr=
-ead
-functions succeed, removing the need for manual error checking across multi=
-ple
-tests.
+This commit adds a wrapper for the pthread_create() syscall to the KVM
+selftests. It replaces manual error checking across the selftests with the
+new wrapper which automatically asserts success.
 
+[ ... ]
 > diff --git a/tools/testing/selftests/kvm/include/kvm_syscalls.h b/tools/t=
 esting/selftests/kvm/include/kvm_syscalls.h
-> index e75be83787798..d6c18e13b9c8b 100644
+> index 01dca99009c2f..e75be83787798 100644
 > --- a/tools/testing/selftests/kvm/include/kvm_syscalls.h
 > +++ b/tools/testing/selftests/kvm/include/kvm_syscalls.h
-> @@ -101,6 +101,8 @@ __KVM_SYSCALL_DEFINE(sched_setaffinity, 3, pid_t, pid=
-, size_t, cpusetsize, cpu_s
->  typedef void *(*pthread_fn_t)(void *);
->  __KVM_SYSCALL_DEFINE(pthread_create, 4, pthread_t *, thread,
->  		     const pthread_attr_t *, attr, pthread_fn_t, fn, void *, arg);
-> +__KVM_SYSCALL_DEFINE(pthread_join, 2, pthread_t, thread, void **, thread=
-_return);
-> +__KVM_SYSCALL_DEFINE(pthread_cancel, 1, pthread_t, thread);
+[ ... ]
+> @@ -97,6 +98,10 @@ __KVM_SYSCALL_DEFINE(madvise, 3, void *, addr, size_t,=
+ length, int, advice);
+>  __KVM_SYSCALL_DEFINE(sched_getaffinity, 3, pid_t, pid, size_t, cpusetsiz=
+e, cpu_set_t *, mask);
+>  __KVM_SYSCALL_DEFINE(sched_setaffinity, 3, pid_t, pid, size_t, cpusetsiz=
+e, cpu_set_t *, mask);
+> =20
+> +typedef void *(*pthread_fn_t)(void *);
+> +__KVM_SYSCALL_DEFINE(pthread_create, 4, pthread_t *, thread,
+> +		     const pthread_attr_t *, attr, pthread_fn_t, fn, void *, arg);
+> +
 
-[Severity: Medium]
-Will this produce misleading error messages on test failures?
+[Severity: Low]
+Does this wrapper format the error message correctly on failure?
 
-Pthread functions like pthread_join and pthread_cancel return their error
-codes directly and do not set the thread-local errno variable.
+The __KVM_SYSCALL_DEFINE macro uses __KVM_SYSCALL_ERROR to format the error
+string, which reads errno and uses strerror(errno).
 
-Since these wrappers use the __KVM_SYSCALL_DEFINE macro, if the underlying
-pthread function fails, the __KVM_SYSCALL_ERROR macro will format the
-error message using the stale errno instead of the returned error code. This
-could result in test assertions printing an incorrect errno (e.g., "Success=
-")
-rather than the actual error string.
+However, POSIX specifies that pthread_create returns the error code directly
+and does not set errno.
+
+If pthread_create fails, wouldn't this print a stale errno, or print "Succe=
+ss"
+if errno happened to be zero, rather than reporting the actual returned err=
+or
+code?
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260731170619.2620=
-845-1-seanjc@google.com?part=3D9
+845-1-seanjc@google.com?part=3D8
