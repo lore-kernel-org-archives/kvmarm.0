@@ -1,139 +1,163 @@
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B003E3BF694
-	for <kvmarm@lists.linux.dev>; Fri, 31 Jul 2026 08:05:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CBB5390C85;
+	Fri, 31 Jul 2026 08:23:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785485125; cv=none; b=qSVoHjCBT5RBojUVyaBSPwRlVb1DVpoADOl6WxJqI8yqwAypVJFSyPZxxwCYTrmkrGjslDb4cpteDoXmHrEIx8LoKKEhv6s75usuN84pscs6gc0NP/6bolKR6NVdmmGcksVDtqzyTbVKJyfgnUqn4Vm7XpT748gnFoExtxKIzzc=
+	t=1785486228; cv=none; b=cvKf3Crr33/fRnvvyPl/iPxzuKCrTEJMcRWQjm4Y3u8gRADu908fF8o6yKiaEGy4R4/4+G4XF8H9lDZJXA5UzPHAR3GgWMhFnwkivuOjZKpTMKRksdH9gJtZQbAoK4108eXGM9wGVUriLcgCzGI0WzzEqaf2O4bXrjV7LW9Un/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785485125; c=relaxed/simple;
-	bh=tBCCqlmZxn5OI2IhWZPZlmoTQkgcFX26oqBWaCvzdoQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GEfDEl55h5Sl2Ufou/BFVoOMOcURsnUAt31ci4ycf2e/OXMpUtYtUX0x0KoLUa4EjPdiiVtRZThtShHGym3DEP647FUkPuD+dkfXRpFG9/S4f2I8XpJQd76TrCj1wtZADyb6tGxqF7U+kXvmtV2p0k/pU0JqjmKE4K0j9hCHO0o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=od+kVw/I; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1785486228; c=relaxed/simple;
+	bh=u0XzHzHKgDIelDozkivhOpPafuYkC2zE7UgSQ/lkDiY=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iEJ1y7jusPKQB70reXbDE5OKgsvNj2JM8zNRUgfDs7EOh7E0KYbchYU/3Rs72jrW27iza/9x+xoGoPQeJEhIaSQH76Pq6e1gEftytfy0xc03t5ojBVqHaZ5A675ziespRjja0/lJB4vBkBMkKCLLLfdg0hXWWdwDcfjIX4wTaMM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BDZLs4f9; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="od+kVw/I"
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-697bd21fdc2so1169312a12.1
-        for <kvmarm@lists.linux.dev>; Fri, 31 Jul 2026 01:05:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1785485122; x=1786089922; darn=lists.linux.dev;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=tREC8DWAl11F8/UnxzNAwFRNYfjo+IaeEh5kckOuNAE=;
-        b=od+kVw/Iw72Z4vv5R4JLJj353wox7OoeJKsYv5ISz90I/dly4oj6xvlEjg8WSFVMhx
-         sT+nfgRNxHgypxxXGAP9BYWJ60zkA/AHcw+WlASfMCzp4eUDsb7sTQgPI7nb0iHckWvI
-         LzDxut9etIXYM0Wc4by7mAnK8cOgxkSoLd2RF/FJgEzN3H7mwqRzhUl5OKDJ5grJGqs5
-         FzYGl5W/iCkEcoljEKTR/wgUDG1xhrSYFGTIhjkWv2XFi0g3OuO4v7xXcJFFJ8MTTSy6
-         YuUKUFlfTvvwOYZc0tKMhB8TAU5llTytf4ETRydgewToMXjaJoxJ5I9gN1Bd13kvKqMN
-         Pbcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785485122; x=1786089922;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=tREC8DWAl11F8/UnxzNAwFRNYfjo+IaeEh5kckOuNAE=;
-        b=Dun19/C4090pVTT5WtK0nSC9kPO3xeqMKSKL1iL5idIUwXA6evBltaBBlsNTgFi+9j
-         Qravk05Q0Orxel/+UE0cX9FS0utG/VcTqUK8e5Tf0Gq53ybD3Lho9y4PMR8U+EM5vLtO
-         5v5FVVDXzvshL7/x1JLzVLgqn4knPoXCXEepD/EWvrhBTu4/GGTr6f+uT/9949DZgvbR
-         nus42PiIt2CgkKVnHVh8SYb/twYY/3XxjR71MXOIfFHfCe1Dfm+0/WbK1Olijm9on1JN
-         oKn8IpPDJVJ4NYXgR3bdX2r0Jb+DAtSx//wA9DN7wwDuq9pTqZsMyeX0bjXDijuEP8C2
-         8FDQ==
-X-Forwarded-Encrypted: i=1; AHgh+RoS56x478UOVX/i5j63Kr48D2zf3+hpVV4vQoboTqTmVHQgM2BziIxbewwq3Xv4nJ649N+Pk/g=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yy7fmhFnKZIuIa66McAU+ZQuWFXi4skciQFfvC68VNfb3Vep2lS
-	YFhHjDTZQPVXq8XKd/7HGhgAars84Hut8/NWctq/G0as0QXEEHn4OeaJT66s8oQHmw==
-X-Gm-Gg: AR+sD13WipF+MD4JGCzIq0ZdBhlyR7Hk0UFgpSNOivRp4npgrBmYAYb458iu+5tCiEz
-	11N6Ub/fULshOY1IbrGh/YBuYyRkuWE7XtqwirBH6w8/bh1/WCC5ZfSYiu7/WZjX2U1e85jMLfg
-	06WgCf1BSkj8Ez7lEDSgYKYc3rtwrbOfUvprEZBWHOA0yFauv7nyuHMTG5dInAbyDMTDbnDMWS4
-	9te6GliNrQoCDfXx/Z78nuQgHZp657H6mKm9NpxZc6o49AflX3lvKlKXKDE9RZ4wQKFu2eVxOpI
-	bnqBk6zwvlHqWRJKCny6JzUSvXjJtMxSCbbJ2Q0wlxmuc74JemZ72ZEHJY34Y0JaJc+09qgw53B
-	K2q88BsfI2qQVOk2hMh0mjPSyYEkNaIhBexo+2dg6yPh5fawpScQiItzXkQz40zy+irMJEoL+NU
-	4GNcWv2m0VnhNjt4/iPd6ixXcNWoSJTcC4AVUcdTagF6MN1Wz67x5mbc1NkRlHNe0zVnvX/08Kr
-	7wJlaRM7udK/ZAjDgYkico1EpVa8qiT
-X-Received: by 2002:a17:907:d08e:b0:c16:2d90:68d9 with SMTP id a640c23a62f3a-c1fd26e8036mr51597866b.56.1785485120934;
-        Fri, 31 Jul 2026 01:05:20 -0700 (PDT)
-Received: from google.com (135.91.155.104.bc.googleusercontent.com. [104.155.91.135])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c1fd3cc3ea1sm54322866b.26.2026.07.31.01.05.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 31 Jul 2026 01:05:19 -0700 (PDT)
-Date: Fri, 31 Jul 2026 09:05:16 +0100
-From: Vincent Donnefort <vdonnefort@google.com>
-To: sashiko-reviews@lists.linux.dev
-Cc: Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev,
-	Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v3 01/17] KVM: arm64: Add pkvm_private_va_range_pa
-Message-ID: <amxXPMVAMExpVEU8@google.com>
-References: <20260720171513.1415357-1-vdonnefort@google.com>
- <20260720171513.1415357-2-vdonnefort@google.com>
- <20260720172559.B2DBB1F000E9@smtp.kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BDZLs4f9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAB191F000E9;
+	Fri, 31 Jul 2026 08:23:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785486226;
+	bh=RSdWbM+abWi+vwG5OznmwW0QSMQjk5ndwXEpSTWN+KM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=BDZLs4f90qFg00VaiR414IWSmjBA/tfDMZ7hFoqwE+Sj5M4WRsZFTGtLVaN/wnprk
+	 UhJ/Ig+dK5zUJ2CX49ZL8gSE31xIEkZamFjhvWbR2o6XoCuKkDhxBiQ6YjM4iiH85P
+	 oobABKfRW+S6oyf4RZkYaJEpEp/GgYgOVOUL+hySNhPhtZq+iR1ggc6qPcsbzvUClM
+	 ehNLQUpo5xY3K9N7wQ4yfMFCeVQXSdYXN6QywpZpuaiS9v/qwDbQEEkEi2vVS1HOPq
+	 XJS3TdtPrE9PEzP8PpBJzvwsSPMloy2+ZDr/gsr4u+xQtFWrXEU2fpoNlo09x3Zo2V
+	 0pWZ7mGIIywQg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wpiWu-0000000Aqb9-1kkY;
+	Fri, 31 Jul 2026 08:23:44 +0000
+Date: Fri, 31 Jul 2026 09:23:43 +0100
+Message-ID: <86cxw3d0ts.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oupton@kernel.org>
+Cc: Fuad Tabba <fuad.tabba@linux.dev>,
+	sashiko-reviews@lists.linux.dev,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v5 3/7] KVM: arm64: Top up stage-2 memcache for dirty logging faults
+In-Reply-To: <amxKgJ1cCHO97trp@kernel.org>
+References: <20260717130317.1953574-1-fuad.tabba@linux.dev>
+	<20260717130317.1953574-4-fuad.tabba@linux.dev>
+	<20260717131537.71F531F000E9@smtp.kernel.org>
+	<CA+EHjTzZxa7Yb2GJhbJdtnTgGoiPTmSAotWTF7S7acq6M_trwg@mail.gmail.com>
+	<87cxwkr8k0.wl-maz@kernel.org>
+	<amxKgJ1cCHO97trp@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260720172559.B2DBB1F000E9@smtp.kernel.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@kernel.org, fuad.tabba@linux.dev, sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, Jul 20, 2026 at 05:25:59PM +0000, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> - [High] Incorrect physical address calculation for block mappings in pkvm_private_va_range_pa()
-> --
+On Fri, 31 Jul 2026 08:10:56 +0100,
+Oliver Upton <oupton@kernel.org> wrote:
 > 
-> --- Patch [1]: [PATCH v3 01/17] KVM: arm64: Add pkvm_private_va_range_pa ---
-> commit 81aa726ac7516be8619c0cb2674493e48b6fca16
-> Author: Vincent Donnefort <vdonnefort@google.com>
+> Hey,
 > 
-> KVM: arm64: Add pkvm_private_va_range_pa
+> Sorry for the latency, stumbled upon this as I was looking for stuff to
+> grab for 7.3...
 > 
-> This commit introduces pkvm_private_va_range_pa() to resolve physical
-> addresses for the pKVM private range by walking the hypervisor page-table.
-> This prepares for the upcoming pKVM heap allocator.
+> On Sat, Jul 18, 2026 at 09:44:31AM +0100, Marc Zyngier wrote:
+> > On Fri, 17 Jul 2026 15:17:00 +0100,
+> > Fuad Tabba <fuad.tabba@linux.dev> wrote:
+> > > 
+> > > On Fri, 17 Jul 2026 at 14:15, <sashiko-bot@kernel.org> wrote:
+> > > >
+> > > > Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
+> > > >
+> > > > Pre-existing issues:
+> > > > - [High] A malicious nested (L1) guest can crash the KVM host via a Break-Before-Make (BBM) violation that triggers a BUG_ON() due to an empty memory cache during a permission fault.
+> > > 
+> > > From my understanding of NV code, this looks like a real issue. I
+> > > don't think it changes this patch, though: this one only widens the
+> > > top-up for the dirty-logging case, and the path you describe is a
+> > > non-logging permission fault. So, it would be a separate fix, a top up
+> > > for nested permission faults too, the same way we already do for pKVM?
+> > > 
+> > >         if (!perm_fault || memslot_is_logging(s2fd->memslot) ||
+> > >             is_protected_kvm_enabled() || s2fd->nested) {
+> > > 
+> > > If that's right, I'll send a separate fix later. Marc, what do you think?
+> > 
+> > I don't think this is correct. Yes, this papers over the guest being
+> > buggy, but i don't think that's what we should really do.
+> > 
+> > Doing the same thing (changing the output size without a TLBI) on real
+> > HW would result in a permission fault being signalled to EL2, and we
+> > should model our SW MMU the same way.
 > 
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/mm.c b/arch/arm64/kvm/hyp/nvhe/mm.c
-> > --- a/arch/arm64/kvm/hyp/nvhe/mm.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/mm.c
-> [ ... ]
-> > +phys_addr_t pkvm_private_va_range_pa(void *va)
-> > +{
-> > +	kvm_pte_t pte = 0;
-> > +
-> > +	guard(hyp_spinlock)(&pkvm_pgd_lock);
-> > +	WARN_ON(kvm_pgtable_get_leaf(&pkvm_pgtable, (u64)va, &pte, NULL));
-> > +	WARN_ON(!kvm_pte_valid(pte));
-> > +
-> > +	return kvm_pte_to_phys(pte) + offset_in_page(va);
-> 
-> [Severity: High]
-> Does this calculation handle block mappings correctly?
+> FEAT_BBML3 shifts responsibility onto the implementation to reconcile
+> multihit due to mapping granularity changes. A hypervisor could choose
+> to do eager page splitting at the beginning of dirty logging and elide
+> TLBIs.
 
-There's no risk to step into a block mapping with the users of that function.
+Sure. We just don't advertise BBML3. and I'm not even sure we always
+can emulate it.
 
-I could WARN_ON() though...
+> 
+> > I think the latent bug here is the way we always walk L1's S2 on S2
+> > fault, irrespective of the fault type, and that feels wrong. This is
+> > ignoring the fact that we already have a TLB (the shadow S2) for this
+> > mapping, and rewalk anyway. Since we now find valid permissions, we
+> > take it at face value and try to install this new translation (which
+> > could point to a different OA, and even bigger problem).
+> > 
+> > So ideally we'd simply tell the guest to bugger off, but we need to
+> > solve a few problems first:
+> > 
+> > - some permission faults are caused by the host rather than the guest
+> >   (dirty logging, HAFDBS), and we need to treat those specially.
+> > 
+> > - we need to rebuild an ESR based on the content of our TLB, not L1's
+> >   S2, which is not always easy to obtain (we have some limited TTL
+> >   caching in the shadow S2, but that's not always reliable).
+> > 
+> > All of this strongly intersects with Wei-Lin's reverse map, and
+> > Oliver's HAFDBS support.
+> > 
+> > Oliver?
+> 
+> Hmm, I'm more of the mind that we should just keep the memcache topped
+> up for any fault because clearly the prediction has gotten out of sync
+> with what happens later down the line. We're bound to screw it up again.
+> 
+> Generating faults solely based on the TLB seems to be at odds with
+> supporting FEAT_ETS* in the shadow stage-2 and practically means we
+> need to re-walk for most stage-2 aborts anyway. And as you point out, I
+> need to do this for HAFDBS dirty state updates.
+> 
+> BBML3 and ETS2/3 aren't terribly high priority but I'd rather not paper
+> over a rather straightforward KVM bug by making design decisions that
+> limit our feature set for nested.
 
-> 
-> If the virtual address is mapped via a block descriptor (such as a 2MB
-> large page), kvm_pte_to_phys(pte) returns the base physical address of
-> the block. Adding offset_in_page(va) will only preserve the lowest 12
-> bits, discarding the intermediate offset bits between the page size and
-> the block size.
-> 
-> Could this cause multiple virtual pages within the block mapping to
-> incorrectly resolve to the same physical base page plus a small offset?
-> Perhaps this should retrieve the mapping level from kvm_pgtable_get_leaf()
-> and mask the virtual address with the corresponding granule size?
-> 
-> > +}
-> 
-> -- 
-> Sashiko AI review · https://sashiko.dev/#/patchset/20260720171513.1415357-1-vdonnefort@google.com?part=1
+My problem here is not the top-up of the memcache, but the fact that
+the OA may have changed in L1's S2. This potentially result in an
+inconsistent S2, and in the future a wonky reverse map. So I'm not
+advocating we paper over anything. It's exactly the opposite.
+
+As for future features, I don't think they should take priority over
+correctness, and taking the guest S2 at face value is incorrect.
+
+If you want to hide this from the guest, fine. But that probably means
+that we need to detect this situation, and nuke part (or all) of the
+shadow S2 as a consequence. Today, we're just going to mess things up.
+
+Thanks,
+
+	M.
 
 -- 
--- 
-Vincent
+Without deviation from the norm, progress is not possible.
