@@ -1,33 +1,33 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33674403AF8;
-	Fri, 31 Jul 2026 10:47:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54CB93D4127;
+	Fri, 31 Jul 2026 10:59:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785494835; cv=none; b=V7lQ8mkva50qmpMDLKJLZjNtDD6zpc6ATSgipb4A106SHRmDoqaqsLBx5yzG+8kSd0jwe9tF6aoQ6AWdI975QIZetb0mpZl+1OUGYE42YKtAUlKnMT5uvs4U10M+qhUiVIUCEeWsQjaeYoIV1QAEbScjWch3eD7b5eD4+hd+o8U=
+	t=1785495555; cv=none; b=ocXEYnLNmTOHcJk0zXa+Ade4apALP3viANns88OT/MZHGds+kuoxot6xB/f+P4l7xatbXa++7L1rDGxoa0uUy52IiyY82BldqCCZa7yD0ClcVLp0HWNdJzQZPMOgvXUsFumNsGf6Qth2HTe2nQ5ZlF1XCTP/5eu4Km1WWNKGXpM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785494835; c=relaxed/simple;
-	bh=xnQDXFr6x9WSg7RzzF32+vNJKDwAKWafEf9u1c2+2A8=;
+	s=arc-20240116; t=1785495555; c=relaxed/simple;
+	bh=K7B/JzewX4QxlTmtVeIzesbPDrCCGlVQ5xaSmXkC5Uc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iWS5NZRcgt6nKen1+vUFG7pkdJLijaJd6naAIDJN8VPFrdZyCpzcSOiT5OZFXOcKt9NmRLEAQqoJWcAnVYxvVEzKCvpDobnK7Vx88Yn2GxlcKhi6F1Y7PSXrwBFjTncHuHnCxBwnVEaXTAMElt+wcUJ1CWkXzLgXhwxNDhAGXPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=U0I5ymXy; arc=none smtp.client-ip=217.140.110.172
+	 In-Reply-To:Content-Type; b=Yhq/C2omvVtQFVBLWeBaEjopAeW7efVlQM+86ksVNCHyEggj1Ag5hJe3PkVE3HNfo+TSlI7gsMJ+HMWdJe44/j6AZL/hmKY5DEF6jnt6d7pLt7C0RQ8aFg18LoCLsXgZz271pbi1OLDy522hTR3n0Nc1bEuD+umn7Kus0o9t5ZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=XIsE4Ln4; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="U0I5ymXy"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="XIsE4Ln4"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 430B9165C;
-	Fri, 31 Jul 2026 03:46:59 -0700 (PDT)
-Received: from [10.57.41.95] (unknown [10.57.41.95])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7DDAA3F86F;
-	Fri, 31 Jul 2026 03:46:59 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 07DC7165C;
+	Fri, 31 Jul 2026 03:59:06 -0700 (PDT)
+Received: from [10.57.87.104] (unknown [10.57.87.104])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 363B03F86F;
+	Fri, 31 Jul 2026 03:59:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1785494823; bh=xnQDXFr6x9WSg7RzzF32+vNJKDwAKWafEf9u1c2+2A8=;
+	t=1785495550; bh=K7B/JzewX4QxlTmtVeIzesbPDrCCGlVQ5xaSmXkC5Uc=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=U0I5ymXyAcvtBhfwzLJP6OiqaHKPHoEJ+/G9qjCJbs8UU44IG9uFNYAdplwIDZZtU
-	 1OJ/kllaVrv5Zu+K9RZ9Xg9DUesQAMGg1DxH8SXy8m9QPuj0n7NW4QFfC1m0zY2zKW
-	 Jw/X8cGnlds8C47/dOOL8fUyWBrnTBCNaEwMiRTY=
-Message-ID: <54805b15-c3cd-4dfd-ad50-fdaa460d4f5f@arm.com>
-Date: Fri, 31 Jul 2026 11:46:57 +0100
+	b=XIsE4Ln4QXKjKS4MIFd4UibV+jyI6v7qV4OX0UwKKVr/Fdf7bz5e3qxSY6Vl2Sm2k
+	 VCzLkADNp5hx8VMwPSnvG/WroklZNsHuW3E1nd+8G6YysO/efon4qf3+Prnsjhzgbo
+	 oIDHqG1YWrlehgIy1R0i1s2yBxc5UGcp2R6AqS48=
+Message-ID: <a3db6519-f76a-433c-8c21-3286a038c584@arm.com>
+Date: Fri, 31 Jul 2026 11:59:03 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -35,260 +35,279 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/6] firmware: arm_rmm: Check for RMI support at init
+Subject: Re: [RFC PATCH v1 1/2] KVM: arm64: CCA: Add support for configuring
+ the Realm MEC policy
+To: Kohei Enju <enju.kohei@fujitsu.com>,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev, cgroups@vger.kernel.org, linux-coco@lists.linux.dev
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+ Steffen Eiden <seiden@linux.ibm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, Tejun Heo <tj@kernel.org>,
+ Johannes Weiner <hannes@cmpxchg.org>, =?UTF-8?Q?Michal_Koutn=C3=BD?=
+ <mkoutny@suse.com>
+References: <20260724094120.166536-1-enju.kohei@fujitsu.com>
+ <20260724094120.166536-2-enju.kohei@fujitsu.com>
+From: Steven Price <steven.price@arm.com>
 Content-Language: en-GB
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
- Lorenzo Pieralisi <lpieralisi@kernel.org>
-References: <20260715142739.80398-1-steven.price@arm.com>
- <20260715142739.80398-4-steven.price@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20260715142739.80398-4-steven.price@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <20260724094120.166536-2-enju.kohei@fujitsu.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 15/07/2026 15:27, Steven Price wrote:
-> Query the RMI version number and check if it is a compatible version.
-> The first two feature registers are read and exposed for future code to
-> use.
+Hi Kohei,
+
+Thanks for posting this - it looks good to me, but as Suzuki says it
+would be good to get some maintainer feedback. One bug I spotted below.
+
+On 24/07/2026 10:40, Kohei Enju wrote:
+> Introduce the KVM_ARM_RMI_CONFIG ioctl to allow userspace to configure
+> Realm VM parameters before the Realm is created.
 > 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> v15:
->   * The code is moved again, this time into the 'firmware' directory.
-> v14:
->   * This moves the basic RMI setup into the 'kernel' directory. This is
->     because RMI will be used for some features outside of KVM so should
->     be available even if KVM isn't compiled in.
-> ---
->   arch/arm64/Kconfig                |   1 +
->   arch/arm64/kernel/cpufeature.c    |   1 +
->   drivers/firmware/Kconfig          |   1 +
->   drivers/firmware/Makefile         |   1 +
->   drivers/firmware/arm_rmm/Kconfig  |  22 +++++++
->   drivers/firmware/arm_rmm/Makefile |   2 +
->   drivers/firmware/arm_rmm/rmi.c    | 100 ++++++++++++++++++++++++++++++
->   7 files changed, 128 insertions(+)
->   create mode 100644 drivers/firmware/arm_rmm/Kconfig
->   create mode 100644 drivers/firmware/arm_rmm/Makefile
->   create mode 100644 drivers/firmware/arm_rmm/rmi.c
+> Currently, ARM_RMI_CFG_MEC_POLICY is the only supported configuration
+> item. Its value can be ARM_RMI_MEC_POLICY_SHARED or
+> ARM_RMI_MEC_POLICY_PRIVATE. Reject the private policy if the platform
+> does not support private MECs.
 > 
-> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-> index b3afe0688919..0f1956edf130 100644
-> --- a/arch/arm64/Kconfig
-> +++ b/arch/arm64/Kconfig
-> @@ -38,6 +38,7 @@ config ARM64
->   	select ARCH_HAS_MEMBARRIER_SYNC_CORE
->   	select ARCH_HAS_MEM_ENCRYPT
->   	select ARCH_SUPPORTS_MSEAL_SYSTEM_MAPPINGS
-> +	select ARCH_SUPPORTS_RMM
->   	select ARCH_HAS_NMI_SAFE_THIS_CPU_OPS
->   	select ARCH_HAS_NON_OVERLAPPING_ADDRESS_SPACE
->   	select ARCH_HAS_NONLEAF_PMD_YOUNG if ARM64_HAFT
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index 9a22df0c5120..4ae63c89cda9 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -293,6 +293,7 @@ static const struct arm64_ftr_bits ftr_id_aa64isar3[] = {
->   static const struct arm64_ftr_bits ftr_id_aa64pfr0[] = {
->   	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_CSV3_SHIFT, 4, 0),
->   	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_CSV2_SHIFT, 4, 0),
-> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_RME_SHIFT, 4, 0),
->   	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_DIT_SHIFT, 4, 0),
->   	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_AMU_SHIFT, 4, 0),
->   	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_MPAM_SHIFT, 4, 0),
-> diff --git a/drivers/firmware/Kconfig b/drivers/firmware/Kconfig
-> index 12dc70254842..55542879fbb8 100644
-> --- a/drivers/firmware/Kconfig
-> +++ b/drivers/firmware/Kconfig
-> @@ -301,5 +301,6 @@ source "drivers/firmware/samsung/Kconfig"
->   source "drivers/firmware/smccc/Kconfig"
->   source "drivers/firmware/tegra/Kconfig"
->   source "drivers/firmware/xilinx/Kconfig"
-> +source "drivers/firmware/arm_rmm/Kconfig"
->   
->   endmenu
-> diff --git a/drivers/firmware/Makefile b/drivers/firmware/Makefile
-> index 4ddec2820c96..07e8ca1789b4 100644
-> --- a/drivers/firmware/Makefile
-> +++ b/drivers/firmware/Makefile
-> @@ -38,3 +38,4 @@ obj-y				+= samsung/
->   obj-y				+= smccc/
->   obj-y				+= tegra/
->   obj-y				+= xilinx/
-> +obj-y				+= arm_rmm/
-> diff --git a/drivers/firmware/arm_rmm/Kconfig b/drivers/firmware/arm_rmm/Kconfig
-> new file mode 100644
-> index 000000000000..d224a72cca90
-> --- /dev/null
-> +++ b/drivers/firmware/arm_rmm/Kconfig
-> @@ -0,0 +1,22 @@
+> If userspace does not explicitly configure the MEC policy,
+> ARM_RMI_MEC_POLICY_SHARED is used by default.
+> 
+> Signed-off-by: Kohei Enju <enju.kohei@fujitsu.com>
+> ---
+>  Documentation/virt/kvm/api.rst   | 29 +++++++++++++++++++++++++++++
+>  arch/arm64/include/asm/kvm_rmi.h |  4 ++++
+>  arch/arm64/kvm/arm.c             |  9 +++++++++
+>  arch/arm64/kvm/rmi.c             | 29 +++++++++++++++++++++++++++++
+>  drivers/firmware/arm_rmm/rmi.c   |  8 ++++++--
+>  include/linux/arm-rmi-cmds.h     |  1 +
+>  include/uapi/linux/kvm.h         | 17 +++++++++++++++++
+>  7 files changed, 95 insertions(+), 2 deletions(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 85bec9b4f021..e1c660e5eb34 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -6690,6 +6690,35 @@ populated data is hashed and added to the guest's Realm Initial Measurement
+>  (RIM) stored by the RMM. This can then be retrieved by the guest (using the RSI
+>  interface) to present to an attestation server.
+>  
+> +4.147 KVM_ARM_RMI_CONFIG
+> +------------------------
 > +
-> +config ARCH_SUPPORTS_RMM
-> +	bool
+> +:Capability: KVM_CAP_ARM_RMI
+> +:Architectures: arm64
+> +:Type: vm ioctl
+> +:Parameters: struct kvm_arm_rmi_config (in)
+> +:Returns: 0 on success, < 0 on error
 > +
-> +config ARM_RMM
-> +	bool "Realm Management Monitor (RMM) Support"
-> +	depends on ARCH_SUPPORTS_RMM
-> +	default y
-> +	help
-> +	  Support the Realm Management Monitor (RMM) on Arm systems that
-> +	  implement the Realm Management Extension (RME), as defined by the
-> +	  Arm Confidential Compute Architecture.
+> +::
 > +
-> +	  The RMM runs in the Realm world and provides the Realm Management
-
-minor nit:
-	  The RMM runs at EL2 in the Realm world ...
-		OR
-	  The RMM runs at R-EL2 ...
-
-
-> +	  Interface (RMI) used by a Normal World host to create, manage and run
-> +	  protected virtual machines called Realms. This option builds the
-
-           The RMM could also act as a TSM, as defined by the PCIe TDISP
-	  and can manage the PCI IDE setup for securing the PCIe links.
-
-for covering the IDE setup case, which could exist withou the Realm VM
-support.
-
-Rest looks good to me.
-
-Suzuki
-
-
-
-> +	  host-side RMI support used by KVM to detect a compatible RMM,
-> +	  configure it, manage delegated memory and enable Realm guests.
+> +  struct kvm_arm_rmi_config {
+> +       __u32 cfg;
+> +       union {
+> +               /* cfg == ARM_RMI_CFG_MEC_POLICY */
+> +               __u8 mec_policy;
 > +
-> +	  Selecting this option does not by itself make Realm guests available:
-> +	  the system must also provide RME-capable hardware and firmware with a
-> +	  compatible RMM implementation.
-> diff --git a/drivers/firmware/arm_rmm/Makefile b/drivers/firmware/arm_rmm/Makefile
-> new file mode 100644
-> index 000000000000..51aef5cc04b0
-> --- /dev/null
-> +++ b/drivers/firmware/arm_rmm/Makefile
-> @@ -0,0 +1,2 @@
+> +               /* Fix the size of the union */
+> +               __u8 reserved[256];
+> +       };
+> +  };
 > +
-> +obj-$(CONFIG_ARM_RMM)	= rmi.o
-> diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/arm_rmm/rmi.c
-> new file mode 100644
-> index 000000000000..c4850976544f
-> --- /dev/null
-> +++ b/drivers/firmware/arm_rmm/rmi.c
-> @@ -0,0 +1,100 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright (C) 2023-2026 ARM Ltd.
-> + */
+> +Configures parameters of a Realm VM before the Realm is created.
 > +
-> +#include <linux/cpufeature.h>
-> +#include <linux/memblock.h>
-> +#include <linux/arm-rmi-cmds.h>
-> +#include <linux/slab.h>
+> +Currently, `ARM_RMI_CFG_MEC_POLICY` is the only supported configuration item.
+> +`mec_policy` must be either `ARM_RMI_MEC_POLICY_SHARED` or
+> +`ARM_RMI_MEC_POLICY_PRIVATE`. `ARM_RMI_MEC_POLICY_PRIVATE` is not supported if
+> +no private MEC is available on the platform.
 > +
-> +#include <asm/memory.h>
-> +#include <asm/pgtable-hwdef.h>
+>  .. _kvm_run:
+>  
+>  5. The kvm_run structure
+> diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
+> index 420e99fca07e..721033b132e1 100644
+> --- a/arch/arm64/include/asm/kvm_rmi.h
+> +++ b/arch/arm64/include/asm/kvm_rmi.h
+> @@ -60,6 +60,7 @@ enum realm_state {
+>   * @ia_bits: Number of valid Input Address bits in the IPA
+>   * @stage2_unmapped: The Realm stage-2 mappings have been removed
+>   * @rtts_destroyed: The non-root RTTs have been torn down
+> + * @mec_policy: MEC policy for the Realm VM
+>   */
+>  struct realm {
+>  	void *rd;
+> @@ -76,6 +77,7 @@ struct realm {
+>  	unsigned int ia_bits;
+>  	bool stage2_unmapped;
+>  	bool rtts_destroyed;
+> +	unsigned int mec_policy;
+>  };
+>  
+>  /**
+> @@ -115,6 +117,8 @@ struct kvm_arm_rmi_populate;
+>  
+>  int kvm_arm_rmi_populate(struct kvm *kvm,
+>  			 struct kvm_arm_rmi_populate *arg);
+> +struct kvm_arm_rmi_config;
+> +int kvm_arm_rmi_config(struct kvm *kvm, struct kvm_arm_rmi_config *arg);
+>  void kvm_realm_unmap_range(struct kvm *kvm,
+>  			   unsigned long ipa,
+>  			   unsigned long size,
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 3862db30779f..17302ba2844c 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -2169,6 +2169,15 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
+>  			return -EFAULT;
+>  		return ret;
+>  	}
+> +	case KVM_ARM_RMI_CONFIG: {
+> +		struct kvm_arm_rmi_config cfg;
 > +
-> +/* Currently only the first 2 registers are used by Linux */
-> +#define RMI_FEAT_REG_COUNT	2
-> +static __ro_after_init unsigned long rmi_feat_reg_cache[RMI_FEAT_REG_COUNT];
-> +
-> +unsigned long rmi_feat_reg(unsigned long id)
-> +{
-> +	if (WARN_ON(id >= RMI_FEAT_REG_COUNT))
-> +		return 0;
-> +
-> +	return rmi_feat_reg_cache[id];
-> +}
-> +
-> +static int rmi_check_version(void)
-> +{
-> +	struct arm_smccc_res res;
-> +	unsigned short version_major, version_minor;
-> +	unsigned long host_version = RMI_ABI_VERSION(RMI_ABI_MAJOR_VERSION,
-> +						     RMI_ABI_MINOR_VERSION);
-> +	unsigned long aa64pfr0 = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
-> +
-> +	/* If RME isn't supported, then RMI can't be */
-> +	if (cpuid_feature_extract_unsigned_field(aa64pfr0, ID_AA64PFR0_EL1_RME_SHIFT) == 0)
-> +		return -ENXIO;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_VERSION, host_version, &res);
-> +
-> +	if (res.a0 == SMCCC_RET_NOT_SUPPORTED)
-> +		return -ENXIO;
-> +
-> +	version_major = RMI_ABI_VERSION_GET_MAJOR(res.a1);
-> +	version_minor = RMI_ABI_VERSION_GET_MINOR(res.a1);
-> +
-> +	if (res.a0 != RMI_SUCCESS) {
-> +		unsigned short high_version_major, high_version_minor;
-> +
-> +		high_version_major = RMI_ABI_VERSION_GET_MAJOR(res.a2);
-> +		high_version_minor = RMI_ABI_VERSION_GET_MINOR(res.a2);
-> +
-> +		pr_err("Unsupported RMI ABI (v%d.%d - v%d.%d) we want v%d.%d\n",
-> +		       version_major, version_minor,
-> +		       high_version_major, high_version_minor,
-> +		       RMI_ABI_MAJOR_VERSION,
-> +		       RMI_ABI_MINOR_VERSION);
-> +		return -ENXIO;
+> +		if (!kvm_is_realm(kvm))
+> +			return -ENXIO;
+> +		if (copy_from_user(&cfg, argp, sizeof(cfg)))
+> +			return -EFAULT;
+> +		return kvm_arm_rmi_config(kvm, &cfg);
 > +	}
+>  	default:
+>  		return -EINVAL;
+>  	}
+> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
+> index 06cc85fb5092..629dea5e8c47 100644
+> --- a/arch/arm64/kvm/rmi.c
+> +++ b/arch/arm64/kvm/rmi.c
+> @@ -572,6 +572,9 @@ static int realm_create_rd(struct kvm *kvm)
+>  	if (kvm_lpa2_is_enabled())
+>  		params->flags0 |= RMI_REALM_PARAM_FLAG_LPA2;
+>  
+> +	params->flags0 |= FIELD_PREP(RMI_REALM_PARAM_FLAG_MEC_POLICY,
+> +				     realm->mec_policy);
 > +
-> +	pr_info("RMI ABI version %d.%d\n", version_major, version_minor);
-> +
-> +	return 0;
-> +}
-> +
-> +static int rmi_read_features(void)
+
+Not your bug, but I realised this could cause problems. If the attempt
+to create fails (perhaps due to the second patch and the cgroup charge
+failing) and the VMM then reconfigures the MEC_POLICY then flags0
+doesn't get reset. Technically that applies to a couple of other flags,
+but here (with the following patch) this becomes a way of bypassing the
+cgroups policy.
+
+I'll fix this by allocating realm->params directly in realm_create_rd()
+so that it always starts off zeroed (and removing the redundant member
+of the struct). I think in a previous version of the series the params
+was built piecemeal, but that's not true anymore.
+
+The upshot is you don't need to do anything - it's my bug and I'll fix
+it in the next version ;)
+
+Thanks,
+Steve
+
+>  	r = realm_init_sve_param(kvm, params);
+>  	if (r)
+>  		goto out_undelegate_tables;
+> @@ -1155,6 +1158,30 @@ int kvm_arm_rmi_populate(struct kvm *kvm,
+>  	return ret;
+>  }
+>  
+> +int kvm_arm_rmi_config(struct kvm *kvm, struct kvm_arm_rmi_config *cfg)
 > +{
-> +	/*
-> +	 * Since we've negotiated a compatible version these feature registers
-> +	 * should always be available
-> +	 */
-> +	for (int i = 0; i < RMI_FEAT_REG_COUNT; i++) {
-> +		if (WARN_ON(rmi_features(i, &rmi_feat_reg_cache[i])))
+> +	guard(mutex)(&kvm->arch.config_lock);
+> +
+> +	if (kvm_realm_state(kvm) != REALM_STATE_NONE)
+> +		return -EBUSY;
+> +
+> +	switch (cfg->cfg) {
+> +	case ARM_RMI_CFG_MEC_POLICY:
+> +		if (cfg->mec_policy != ARM_RMI_MEC_POLICY_SHARED &&
+> +		    cfg->mec_policy != ARM_RMI_MEC_POLICY_PRIVATE)
 > +			return -EINVAL;
+> +
+> +		if (cfg->mec_policy == ARM_RMI_MEC_POLICY_PRIVATE &&
+> +		    rmi_mec_count() == 0)
+> +			return -EOPNOTSUPP;
+> +
+> +		kvm->arch.realm.mec_policy = cfg->mec_policy;
+> +		return 0;
+> +	default:
+> +		return -EINVAL;
 > +	}
-> +
-> +	return 0;
 > +}
 > +
-> +static int __init arm64_init_rmi(void)
+>  static void kvm_complete_ripas_change(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm *kvm = vcpu->kvm;
+> @@ -1474,6 +1501,8 @@ int kvm_init_realm(struct kvm *kvm)
+>  {
+>  	struct realm *realm = &kvm->arch.realm;
+>  
+> +	realm->mec_policy = ARM_RMI_MEC_POLICY_SHARED;
+> +
+>  	realm->params = (void *)get_zeroed_page(GFP_KERNEL_ACCOUNT);
+>  	realm->sro = kmalloc_obj(*realm->sro);
+>  	if (!realm->params || !realm->sro) {
+> diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/arm_rmm/rmi.c
+> index d0c083bdf251..e9632c35e7db 100644
+> --- a/drivers/firmware/arm_rmm/rmi.c
+> +++ b/drivers/firmware/arm_rmm/rmi.c
+> @@ -14,8 +14,7 @@
+>  
+>  static bool arm64_rmi_is_available;
+>  
+> -/* Currently only the first 2 registers are used by Linux */
+> -#define RMI_FEAT_REG_COUNT	2
+> +#define RMI_FEAT_REG_COUNT	5
+>  static __ro_after_init unsigned long rmi_feat_reg_cache[RMI_FEAT_REG_COUNT];
+>  
+>  unsigned long rmi_feat_reg(unsigned long id)
+> @@ -27,6 +26,11 @@ unsigned long rmi_feat_reg(unsigned long id)
+>  }
+>  EXPORT_SYMBOL_GPL(rmi_feat_reg);
+>  
+> +u64 rmi_mec_count(void)
 > +{
-> +	int ret;
-> +
-> +	/* Continue without realm support if we can't agree on a version */
-> +	ret = rmi_check_version();
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret = rmi_read_features();
-> +	if (ret)
-> +		return ret;
-> +
-> +	return 0;
+> +	return u64_get_bits(rmi_feat_reg(4), RMI_FEATURE_REGISTER_4_MEC_COUNT);
 > +}
 > +
-> +/*
-> + * Note arm64_init_rmi() must be called before kvm_init_rmi() otherwise KVM
-> + * will not support realm guests. subsys_initcall() is called before
-> + * module_init() (used for KVM) so this is OK.
-> + */
-> +subsys_initcall(arm64_init_rmi);
+>  int rmi_delegate_range(phys_addr_t phys,
+>  		       unsigned long size,
+>  		       phys_addr_t *out_phys)
+> diff --git a/include/linux/arm-rmi-cmds.h b/include/linux/arm-rmi-cmds.h
+> index 138983ab4e3c..5236600421c6 100644
+> --- a/include/linux/arm-rmi-cmds.h
+> +++ b/include/linux/arm-rmi-cmds.h
+> @@ -28,6 +28,7 @@ struct rmi_sro_state {
+>  };
+>  
+>  unsigned long rmi_feat_reg(unsigned long id);
+> +u64 rmi_mec_count(void);
+>  
+>  int rmi_delegate_range(phys_addr_t phys, unsigned long size,
+>  		       phys_addr_t *out_phys);
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index adee3936d6ae..46e62327957c 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1704,4 +1704,21 @@ struct kvm_arm_rmi_populate {
+>  	__u32 reserved;
+>  };
+>  
+> +#define KVM_ARM_RMI_CONFIG     _IOW(KVMIO, 0xd8, struct kvm_arm_rmi_config)
+> +
+> +#define ARM_RMI_CFG_MEC_POLICY		0
+> +#define ARM_RMI_MEC_POLICY_SHARED	0
+> +#define ARM_RMI_MEC_POLICY_PRIVATE	1
+> +
+> +struct kvm_arm_rmi_config {
+> +	__u32 cfg;
+> +	union {
+> +		/* cfg == ARM_RMI_CFG_MEC_POLICY */
+> +		__u8 mec_policy;
+> +
+> +		/* Reserve space for future configuration payloads. */
+> +		__u8 reserved[256];
+> +	};
+> +};
+> +
+>  #endif /* __LINUX_KVM_H */
 
