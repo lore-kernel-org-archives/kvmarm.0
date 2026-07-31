@@ -1,144 +1,141 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 694713DEAE3;
-	Fri, 31 Jul 2026 13:21:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B8E83FCB2C;
+	Fri, 31 Jul 2026 13:26:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785504095; cv=none; b=mhLil6l5AeJw/wA07osmmdhgwJhSwRNEoML9OVNksZLnjSuZI3pl21UV49ge2W5LOz/xUKT2LNYS0Vzato9yTWBUm69OoiIDeFkd7Wx5hXuvWeF/e5hCgMhJ+YcTXVhJ/Es3ecyS0GvRwOoY1v7L4iT+K3GIwl8TSAxBg2YvRco=
+	t=1785504385; cv=none; b=jCZjuBW4aXmYsCmMKdBmHV7G8im1CZfU6apWc5rYPV2YZ7AaKUiy9GWQ618PowpKXL5WEE8kW29nmCusysMKvcpet9zZHM7GcY6dt38BeHN2Ul7jU8vQXaZmrArKeePcTLYPaz1NMYvyrtLaMPFU3bjzRwjLZ97SvWaXrSTQP/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785504095; c=relaxed/simple;
-	bh=a8R607Zd+Ysh0+DvB4Rv3NkQEdHP55J1eTeMHHcWJhg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HI6I+5yQtKY5NQLuez5bYJdreh/pVj6aByehbH7J+ZkDFcPE7sZMN5kjnJyjeI/8tPjmRqYs9Nfi4iVvwPYjNE0unhfY9E/W1DQKUXasPXaNM/LRJnw7+if6bP0cwZ2WikQ8S18kD7c4z2saia/IweBUJNswxeufn5LncDbKlMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=YytOMRlT; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1785504385; c=relaxed/simple;
+	bh=aJ6Ims8eNBrjMp81dEwP8lY1ukvhwWCzV8AostD9/hM=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=gdwsgefbq2qLnv0tZPgmua/8RI6o3jSHvCZCtv0IVnRbzgq4HKLfnenJYgonWaG8rOwbA5Xwc3Mqr9pPe4hK3XnOmxyK2YLuIyHny1M0eCkypxELnLqBGpuGuw0ZJ45w332r7VZsiLyt2ObwV16Gqdb3dn8Pr0jCb/eM07aBAbA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fcbMku4+; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="YytOMRlT"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A3FDA204C;
-	Fri, 31 Jul 2026 06:21:27 -0700 (PDT)
-Received: from [10.57.41.95] (unknown [10.57.41.95])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B00293F7B4;
-	Fri, 31 Jul 2026 06:21:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1785504091; bh=a8R607Zd+Ysh0+DvB4Rv3NkQEdHP55J1eTeMHHcWJhg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=YytOMRlTwKYJZD2iEI7Yt++9iYWq34vkrxAyM2SHO0tciXiAdnkeGSTlPpqisIix4
-	 rvsFviTayww6pLlFab1ELBOENLakfHh6A90OYDhojK1ph6Fj3je8EeB+/Z4767DF46
-	 8lhqhiwIP4NMJkV9/nUUEyxwzUmXI9eSxWfmqpDk=
-Message-ID: <d383d34e-f38d-4bd1-8221-09f5f0c7df7f@arm.com>
-Date: Fri, 31 Jul 2026 14:21:27 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fcbMku4+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A2D41F000E9;
+	Fri, 31 Jul 2026 13:26:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785504384;
+	bh=58ZumfEHd4/+SXBO/aDdnPUe7NRJCpb/JjpgZXyVTNs=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=fcbMku4+Hym/U/RarpjjwCiMqdm+LxfgxYXdUBMbpfV/qBmx0QTTaqC7iaM8N38HA
+	 GryLeTXRe9y/q/NDbHLIEQH/0J5CtpwN/Me8VqoGrKeVsSTx7LJTyJzY6trxXLqMI8
+	 0nR38PzSPs7WUvp7PPsZvqtlyOikT4BxhdjVclZgKQP/djJjsd30x3XVQaZi0DJVab
+	 00KG+xik3vZL9DDKXZW2VT0/TBEB5Cqb1BcqoAGl6MFJiYEeHmxbotbgVBdk/iunkP
+	 mrJZNPel6/GMc1f1O6OveG8V4qocuaqpyh4mDphS963gdwzWu13rnsqy5nsXVOXMl0
+	 ILptBQ0RQqn5w==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v5 02/31] KVM: Make device name configurable
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Steffen Eiden" <seiden@linux.ibm.com>
+Cc: "Marc Zyngier" <maz@kernel.org>, kvm@vger.kernel.org, "Heiko Carstens" <hca@linux.ibm.com>, "Vasily
+ Gorbik" <gor@linux.ibm.com>, linux-s390@vger.kernel.org, "Alexander Gordeev" <agordeev@linux.ibm.com>, kvmarm@lists.linux.dev, "Oliver
+ Upton" <oupton@kernel.org>
+In-Reply-To: <20260731130902.654679-3-seiden@linux.ibm.com>
+References: <20260731130902.654679-1-seiden@linux.ibm.com>
+ <20260731130902.654679-3-seiden@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 31 Jul 2026 13:26:23 +0000
+Message-Id: <20260731132624.0A2D41F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/6] firmware: arm_rmm: Configure the RMM with the host's
- page size
-Content-Language: en-GB
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
- Lorenzo Pieralisi <lpieralisi@kernel.org>
-References: <20260715142739.80398-1-steven.price@arm.com>
- <20260715142739.80398-5-steven.price@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20260715142739.80398-5-steven.price@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 
-On 15/07/2026 15:27, Steven Price wrote:
-> RMM v2.0 brings the ability to set the RMM's granule size. Check the
-> feature registers and configure the RMM so that it matches the host's
-> page size. This means that operations can be done with a granularity
-> equal to PAGE_SIZE.
-> 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> Changes since v14:
->   * Move the implementation into drivers/firmware/arm_rmm.
-> Changes since v13:
->   * Moved out of KVM.
-> ---
->   drivers/firmware/arm_rmm/rmi.c | 43 ++++++++++++++++++++++++++++++++++
->   1 file changed, 43 insertions(+)
-> 
-> diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/arm_rmm/rmi.c
-> index c4850976544f..e7ab4a7df3ca 100644
-> --- a/drivers/firmware/arm_rmm/rmi.c
-> +++ b/drivers/firmware/arm_rmm/rmi.c
-> @@ -76,6 +76,45 @@ static int rmi_read_features(void)
->   	return 0;
->   }
->   
-> +static int rmi_configure(void)
-> +{
-> +	unsigned long ret;
-> +	struct rmm_config *config __free(free_page) = (struct rmm_config *)get_zeroed_page(GFP_KERNEL);
-> +
-> +	if (!config)
-> +		return -ENOMEM;
-> +
-> +	switch (PAGE_SIZE) {
-> +	case SZ_4K:
-> +		config->rmi_granule_size = RMI_GRANULE_SIZE_4KB;
-> +		break;
-> +	case SZ_16K:
-> +		config->rmi_granule_size = RMI_GRANULE_SIZE_16KB;
-> +		break;
-> +	case SZ_64K:
-> +		config->rmi_granule_size = RMI_GRANULE_SIZE_64KB;
-> +		break;
-> +	default:
-> +		BUILD_BUG();
-> +	}
-> +
-> +	/*
-> +	 * For now we set the tracking_region_size to 0 which is the only option
-> +	 * for 4KB PAGE_SIZE (1GB for 4KB PAGE_SIZE, 32MB/512MB for 16KB/64KB).
-> +	 * TODO: Support other tracking sizes via Kconfig option for other
-> +	 * PAGE_SIZES
-> +	 */
-> +	config->tracking_region_size = 0;
-> +
-> +	ret = rmi_rmm_config_set(virt_to_phys(config));
-> +	if (ret) {
-> +		pr_err("RMM config set failed\n");
-> +		return -EINVAL;
-> +	}
-> +
-> +	return 0;
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+s) to consider:
+- [Medium] Memory allocated for `kvm_dev.name` is leaked if the subsequent =
+`cache_name` allocation fails.
+- [Medium] Mixing `goto`-based error handling and `__free()` scope-based cl=
+eanup within the same function.
+--
+
+--- Patch [2]: [PATCH v5 02/31] KVM: Make device name configurable ---
+commit bb225c1b3b23a0088c5fdee909b0a0007a39479e
+Author: Steffen Eiden <seiden@linux.ibm.com>
+
+KVM: Make device name configurable
+
+This commit allows KVM implementations to choose alternative device names.
+This is especially useful for architectures providing multiple KVM
+implementations simultaneously.
+
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 994cb40cf2efe..18eb3d5d04f4c 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+
+[ ... ]
+
+> @@ -6491,23 +6490,39 @@ void kvm_unregister_perf_callbacks(void)
+>  }
+>  #endif
+> =20
+> -int kvm_init(unsigned vcpu_size, unsigned vcpu_align, struct module *mod=
+ule)
+> +int kvm_init(unsigned int vcpu_size, unsigned int vcpu_align, struct mod=
+ule *module)
+>  {
+> +	return kvm_init_with_dev(vcpu_size, vcpu_align, module, "kvm", KVM_MINO=
+R);
 > +}
 > +
->   static int __init arm64_init_rmi(void)
->   {
->   	int ret;
-> @@ -89,6 +128,10 @@ static int __init arm64_init_rmi(void)
->   	if (ret)
->   		return ret;
->   
-> +	ret = rmi_configure();
-> +	if (ret)
-> +		return ret;
+> +int kvm_init_with_dev(unsigned int vcpu_size, unsigned int vcpu_align,
+> +		      struct module *module, const char *dev_name, int minor)
+> +{
+> +	char *cache_name __free(kfree) =3D NULL;
+>  	int r;
+>  	int cpu;
+> =20
+> +	kvm_dev.minor =3D minor;
+> +	kvm_dev.name =3D kstrdup_const(dev_name, GFP_KERNEL);
+> +	if (!kvm_dev.name)
+> +		return -ENOMEM;
 > +
+>  	/* A kmem cache lets us meet the alignment requirements of fx_save. */
+>  	if (!vcpu_align)
+>  		vcpu_align =3D __alignof__(struct kvm_vcpu);
+> +	cache_name =3D kasprintf(GFP_KERNEL, "%s_vcpu", dev_name);
+> +	if (!cache_name)
+> +		return -ENOMEM;
 
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+[Severity: Medium]
+Does this direct return leak kvm_dev.name?
 
+The kvm_dev.name pointer is allocated via kstrdup_const() just above. If
+kasprintf() fails, this path returns -ENOMEM directly instead of jumping
+to the err_dev_name label to free the previously allocated memory.
 
->   	return 0;
->   }
->   
+>  	kvm_vcpu_cache =3D
+> -		kmem_cache_create_usercopy("kvm_vcpu", vcpu_size, vcpu_align,
+> +		kmem_cache_create_usercopy(cache_name, vcpu_size, vcpu_align,
+>  					   SLAB_ACCOUNT,
+>  					   offsetof(struct kvm_vcpu, arch),
+>  					   offsetofend(struct kvm_vcpu, stats_id)
+>  					   - offsetof(struct kvm_vcpu, arch),
+>  					   NULL);
+> +	r =3D -ENOMEM;
+>  	if (!kvm_vcpu_cache)
+> -		return -ENOMEM;
+> +		goto err_dev_name;
 
+[Severity: Medium]
+Is it intended to mix scope-based cleanup with goto error labels here?
+
+The kvm_init_with_dev() function declares cache_name using __free(kfree):
+
+    char *cache_name __free(kfree) =3D NULL;
+
+But it also uses traditional goto-based error unwinding throughout the rest
+of the function, such as the goto err_dev_name seen here. The cleanup
+subsystem guidelines require that functions either convert all resources to
+scope-based cleanup or use goto labels exclusively. Mixing them in the same
+function can lead to confusing ownership semantics.
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260731130902.6546=
+79-1-seiden@linux.ibm.com?part=3D2
