@@ -1,125 +1,144 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A035D3C10A8;
-	Fri, 31 Jul 2026 13:21:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 694713DEAE3;
+	Fri, 31 Jul 2026 13:21:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785504083; cv=none; b=kGOWnOJf5h5CUi0yCJ09x61zef8h7u515YR5oAz7bebyBIcyPyqM0XjmCOQqnSfsXckGFtT60YSrtZDg3qi3h5w/4TeMDopShbp80GjCWUd075cSnf4ya5aW+0a8a1nfwaGcAoK6TDkiaKK9umnEi1MI+OIJwAHnMfI9HTAUh3c=
+	t=1785504095; cv=none; b=mhLil6l5AeJw/wA07osmmdhgwJhSwRNEoML9OVNksZLnjSuZI3pl21UV49ge2W5LOz/xUKT2LNYS0Vzato9yTWBUm69OoiIDeFkd7Wx5hXuvWeF/e5hCgMhJ+YcTXVhJ/Es3ecyS0GvRwOoY1v7L4iT+K3GIwl8TSAxBg2YvRco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785504083; c=relaxed/simple;
-	bh=TePFkCGrB2yrInvdRswDl5cpJpRiD28XpybbjGBrYWg=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=WtTepJEEypTTGAW0qmw5ET8elljA8FhdQNtupWRxnCNe4NJKi/4mahWYvSE0GMO0U0OKPy3KW/DpTXeQf0w5fA08Vz8z5OsDdIwbhoOofsxXpB6UMQnHWjpzGc3gRIRSUl/6glnqZreaVOVYMTJUYj30MKXe6dDQnfCUBR5uqOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bE/NfVim; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1785504095; c=relaxed/simple;
+	bh=a8R607Zd+Ysh0+DvB4Rv3NkQEdHP55J1eTeMHHcWJhg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HI6I+5yQtKY5NQLuez5bYJdreh/pVj6aByehbH7J+ZkDFcPE7sZMN5kjnJyjeI/8tPjmRqYs9Nfi4iVvwPYjNE0unhfY9E/W1DQKUXasPXaNM/LRJnw7+if6bP0cwZ2WikQ8S18kD7c4z2saia/IweBUJNswxeufn5LncDbKlMU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=YytOMRlT; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bE/NfVim"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A41A41F000E9;
-	Fri, 31 Jul 2026 13:21:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785504082;
-	bh=bWFhxMpBpbzSuifJUU13lzqr4MTmfZiOVWLZOPmNaBo=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=bE/NfVimF0R2DWVssTdKC5oFy7v9YAIpdnymKsNP3vHpYYsGRLo/XWchi6if9+yhJ
-	 xyBy+OMHuWMAKmHT9zGotGup/TaHeJOLUdIxBTU3QJlIe9S54o8MuJ6fyXxhw8DkVs
-	 scTuv+FZBy0BcgBn/lrGajwkyHcSkNPao/1J/VYBaVGbif+eYiJMosCo4LfoB9urFH
-	 TjCFaknjz9eNZfcTdHk3sXrB0m8nxRSc4I+UQubulGBS3pImk8XD3+QrOQnJ02I8gn
-	 uL4AIe8VzgBAC3jf+HbLDxuAqklMZHhfOqlOzqXDjy1VMNGxTH9DDoxWn4z8LWmavz
-	 fW41wud4wL2Uw==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v5 05/31] arm64: ptrace: Use constants for compat
- register numbers
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Steffen Eiden" <seiden@linux.ibm.com>
-Cc: "Oliver Upton" <oupton@kernel.org>, linux-s390@vger.kernel.org, kvmarm@lists.linux.dev, "Vasily
- Gorbik" <gor@linux.ibm.com>, "Alexander Gordeev" <agordeev@linux.ibm.com>, "Marc
- Zyngier" <maz@kernel.org>, "Heiko Carstens" <hca@linux.ibm.com>, kvm@vger.kernel.org
-In-Reply-To: <20260731130902.654679-6-seiden@linux.ibm.com>
-References: <20260731130902.654679-1-seiden@linux.ibm.com>
- <20260731130902.654679-6-seiden@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 31 Jul 2026 13:21:21 +0000
-Message-Id: <20260731132121.A41A41F000E9@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="YytOMRlT"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A3FDA204C;
+	Fri, 31 Jul 2026 06:21:27 -0700 (PDT)
+Received: from [10.57.41.95] (unknown [10.57.41.95])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B00293F7B4;
+	Fri, 31 Jul 2026 06:21:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1785504091; bh=a8R607Zd+Ysh0+DvB4Rv3NkQEdHP55J1eTeMHHcWJhg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=YytOMRlTwKYJZD2iEI7Yt++9iYWq34vkrxAyM2SHO0tciXiAdnkeGSTlPpqisIix4
+	 rvsFviTayww6pLlFab1ELBOENLakfHh6A90OYDhojK1ph6Fj3je8EeB+/Z4767DF46
+	 8lhqhiwIP4NMJkV9/nUUEyxwzUmXI9eSxWfmqpDk=
+Message-ID: <d383d34e-f38d-4bd1-8221-09f5f0c7df7f@arm.com>
+Date: Fri, 31 Jul 2026 14:21:27 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 4/6] firmware: arm_rmm: Configure the RMM with the host's
+ page size
+Content-Language: en-GB
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
+ Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
+ Lorenzo Pieralisi <lpieralisi@kernel.org>
+References: <20260715142739.80398-1-steven.price@arm.com>
+ <20260715142739.80398-5-steven.price@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20260715142739.80398-5-steven.price@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Thank you for your contribution! Sashiko AI review found 2 potential issue(=
-s) to consider:
-- [Low] Build breakage due to undeclared identifier `__compat_lr_ab` in mac=
-ro expansion.
-- [Low] Inconsistent enum naming for FIQ registers (`_fi` instead of `_fiq`=
-).
---
-
---- Patch [5]: [PATCH v5 05/31] arm64: ptrace: Use constants for compat reg=
-ister numbers ---
-commit 6ee1891b95815ce41b1528d3c9d07b5939a2f802
-Author: Steffen Eiden <seiden@linux.ibm.com>
-
-arm64: ptrace: Use constants for compat register numbers
-
-This commit defines an enum for the register numbers used in mapping between
-AArch32 and AArch64 registers. It updates the compat macros to use these
-new enum values instead of hardcoded numbers.
-
-> diff --git a/arch/arm64/include/asm/ptrace.h b/arch/arm64/include/asm/ptr=
-ace.h
-> index 39582511ad72f..6f5b79ee1f3f5 100644
-> --- a/arch/arm64/include/asm/ptrace.h
-> +++ b/arch/arm64/include/asm/ptrace.h
-> @@ -104,26 +104,48 @@
->  #define COMPAT_USER_SZ	296
-> =20
->  /* Architecturally defined mapping between AArch32 and AArch64 registers=
- */
-> +enum {
-> +	__compat_fp	=3D 11,
-[ ... ]
-> +	__compat_r8_fiq	=3D 24,
-> +	__compat_r9_fiq	=3D 25,
-> +	__compat_r10_fi	=3D 26,
-> +	__compat_r11_fi	=3D 27,
-> +	__compat_r12_fi	=3D 28,
-
-[Severity: Low]
-This isn't a bug, but could the naming be made consistent here? The enum
-variants for r8 and r9 use the _fiq suffix (e.g., __compat_r8_fiq), while
-r10, r11, and r12 are truncated to _fi.
-
-> +	__compat_sp_fiq	=3D 29,
-> +	__compat_lr_fiq	=3D 30,
-> +};
+On 15/07/2026 15:27, Steven Price wrote:
+> RMM v2.0 brings the ability to set the RMM's granule size. Check the
+> feature registers and configure the RMM so that it matches the host's
+> page size. This means that operations can be done with a granularity
+> equal to PAGE_SIZE.
+> 
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+> Changes since v14:
+>   * Move the implementation into drivers/firmware/arm_rmm.
+> Changes since v13:
+>   * Moved out of KVM.
+> ---
+>   drivers/firmware/arm_rmm/rmi.c | 43 ++++++++++++++++++++++++++++++++++
+>   1 file changed, 43 insertions(+)
+> 
+> diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/arm_rmm/rmi.c
+> index c4850976544f..e7ab4a7df3ca 100644
+> --- a/drivers/firmware/arm_rmm/rmi.c
+> +++ b/drivers/firmware/arm_rmm/rmi.c
+> @@ -76,6 +76,45 @@ static int rmi_read_features(void)
+>   	return 0;
+>   }
+>   
+> +static int rmi_configure(void)
+> +{
+> +	unsigned long ret;
+> +	struct rmm_config *config __free(free_page) = (struct rmm_config *)get_zeroed_page(GFP_KERNEL);
 > +
->  #define compat_usr(x)	regs[(x)]
-[ ... ]
-> -#define compat_sp_svc	regs[19]
-> -#define compat_lr_abt	regs[20]
-> +#define compat_sp_svc	regs[__compat_sp_svc]
-> +#define compat_lr_abt	regs[__compat_lr_ab]
+> +	if (!config)
+> +		return -ENOMEM;
+> +
+> +	switch (PAGE_SIZE) {
+> +	case SZ_4K:
+> +		config->rmi_granule_size = RMI_GRANULE_SIZE_4KB;
+> +		break;
+> +	case SZ_16K:
+> +		config->rmi_granule_size = RMI_GRANULE_SIZE_16KB;
+> +		break;
+> +	case SZ_64K:
+> +		config->rmi_granule_size = RMI_GRANULE_SIZE_64KB;
+> +		break;
+> +	default:
+> +		BUILD_BUG();
+> +	}
+> +
+> +	/*
+> +	 * For now we set the tracking_region_size to 0 which is the only option
+> +	 * for 4KB PAGE_SIZE (1GB for 4KB PAGE_SIZE, 32MB/512MB for 16KB/64KB).
+> +	 * TODO: Support other tracking sizes via Kconfig option for other
+> +	 * PAGE_SIZES
+> +	 */
+> +	config->tracking_region_size = 0;
+> +
+> +	ret = rmi_rmm_config_set(virt_to_phys(config));
+> +	if (ret) {
+> +		pr_err("RMM config set failed\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>   static int __init arm64_init_rmi(void)
+>   {
+>   	int ret;
+> @@ -89,6 +128,10 @@ static int __init arm64_init_rmi(void)
+>   	if (ret)
+>   		return ret;
+>   
+> +	ret = rmi_configure();
+> +	if (ret)
+> +		return ret;
+> +
 
-[Severity: Low]
-Does this cause a build failure? The enum value is defined as __compat_lr_a=
-bt
-above, but this macro attempts to use the undeclared __compat_lr_ab identif=
-ier.
-Code using this macro, such as enter_exception32() in
-arch/arm64/kvm/hyp/exception.c, will fail to compile.
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 
-> +#define compat_sp_abt	regs[__compat_sp_abt]
-> +#define compat_lr_und	regs[__compat_lr_und]
-> +#define compat_sp_und	regs[__compat_sp_und]
-> +#define compat_r8_fiq	regs[__compat_r8_fiq]
-> +#define compat_r9_fiq	regs[__compat_r9_fiq]
-> +#define compat_r10_fiq	regs[__compat_r10_fi]
-> +#define compat_r11_fiq	regs[__compat_r11_fi]
-> +#define compat_r12_fiq	regs[__compat_r12_fi]
-> +#define compat_sp_fiq	regs[__compat_sp_fiq]
-> +#define compat_lr_fiq	regs[__compat_lr_fiq]
 
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260731130902.6546=
-79-1-seiden@linux.ibm.com?part=3D5
+>   	return 0;
+>   }
+>   
+
