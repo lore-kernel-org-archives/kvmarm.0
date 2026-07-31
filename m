@@ -1,125 +1,112 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com [209.85.210.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFAFD3D5645
-	for <kvmarm@lists.linux.dev>; Fri, 31 Jul 2026 12:58:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A69F7200110
+	for <kvmarm@lists.linux.dev>; Fri, 31 Jul 2026 13:00:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785502727; cv=none; b=FahvXPfcyYPWV8guYSteb55h6Q1GGE/zw0DgS4NFQ1sxvB/rQzw2RYNCYrndvnwFiAkqlDwGgDt+Yz+rrkctXjtD+thb+Yt9pVROt+EN/CDKdt5V+X/RKYVVa3m7NZqIP6Fkf3KtS1w4LAT3A6aF7qsi7a5mSv0Z7P1eVP/k/V4=
+	t=1785502830; cv=none; b=gwIY5zOjjui7SQQZ88oj+Zd+WEeQ8/fKxv1pPKITkQcOrj/yWTXYcq8YKh3YOvaswlu/6+1egY9pLb/qoywLEJzoaMAdeEdqhqIvqDvqp6ia0Is99rEkBzo6TAqxPc68lq/GIbBTdd0pjt2ayHbie+G9nNA7zFLaxP6OPHQeG2k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785502727; c=relaxed/simple;
-	bh=8813yvnyDeriAi/z4rMYKeWBdX1+P9XLAnQLEMypPu8=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=WHIqmDNdPIdTv2UrRscRERn7ePuq1+VPZa20tiYu8LvvZaQATbbnhwWpZF3eDPSaqg6WJ3KhX7+5JGTedoilXDLNDGMr23EYLQ3TUau4hdPb8NfWvKjAMjlemdsfOTGmUbQ+x8oCQWV6ocRviuOhe0WN6PBvfgjdM1nracT9GXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XbreZBbC; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1785502830; c=relaxed/simple;
+	bh=gP0NW1Gj2B2BTBK8qEpzwW+mSr4iWHeoSNmWkG0WWDg=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Fa/K/p4PNe08vsj/UujqELpvlQ+dZ4kVdwHvb/7iINddQ8TtdL9keoHyTSvCED+QvoUfiuA2PkjRSofBkC3OE89xbs5qDGI7/ycJAzgyQ4A8H6Q19nGrRpHcDjjQEgDahjQ0l+KirO6nG0UAk0fHyefEvvUuBA2LudtNzrOANjM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fll3LKvQ; arc=none smtp.client-ip=209.85.210.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XbreZBbC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8949D1F000E9;
-	Fri, 31 Jul 2026 12:58:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785502725;
-	bh=1eAgOG23kG2hwbKt5TUHtXw6/msMGxn35aOjjgI058Y=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=XbreZBbCMx1UkSES7bPi98gQvgA1CghPjwKIbtKXxtTDREIrvw5u5pW71i+9bSQiv
-	 VEgRwVLyn83V08H9QX/T7ZiGBUIVyjZ8PEVbt1o7wj0/0UNeNhazJa2fBSXkMU1XBA
-	 b2hJA+IRIo5QbRP/SEYO5uf+hNuPkJZZ5pUVrvcgy4f9CaBJlXp8SbpQEaD3KJaNWO
-	 X3N1a1+w7WcG7fAxyeQxqtuMH8kXkrP5m6QcFuIpzjU21isOMR0BjRZmvc3NGyatWf
-	 HMc+ukBG/gfT8o/iouE0xQeXorj8ck59xiIAmBDh764ayaj5dT84IjX6e000eHBL5W
-	 ruB+4+fY8XtwA==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v17 07/14] KVM: arm64: Forward GCS exceptions to nested
- guests
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Mark Brown" <broonie@kernel.org>
-Cc: "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260731-arm64-gcs-v17-7-5e39ca01b14e@kernel.org>
-References: <20260731-arm64-gcs-v17-0-5e39ca01b14e@kernel.org>
- <20260731-arm64-gcs-v17-7-5e39ca01b14e@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 31 Jul 2026 12:58:41 +0000
-Message-Id: <20260731125842.8949D1F000E9@smtp.kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fll3LKvQ"
+Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-84e1da97175so1565824b3a.0
+        for <kvmarm@lists.linux.dev>; Fri, 31 Jul 2026 06:00:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1785502829; x=1786107629; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=XFQU8iH1zNafQF+sd3fwpkuxE9NFiGxCV4Yz8a5shVE=;
+        b=fll3LKvQTJ0fodDirLbC1eqz5phoYjrtrX11rppekExK7GXyAyI4F+wN79/GcQZrUT
+         dvIMw+Lvfgw/NENzN6WE4rYNAwhXelLmdu/NhgFc6S7QH++c10k5DYjReaJI9UzThP9q
+         HS3WYpDCOhpOj7gYJFiaHkv0As+tiegBIDXQhI8vidwGOquNlRj0YUxnocQTTEwMMpCv
+         d13if/tK4E+7Ocoy7fX0WG7a+3n4MElJh8wU/OphwhXeDu3tW+OM7Gyb7ZbnORQzEurh
+         hVpxDVSY4jYPW3Wo9ChZ+o8q5aJ3iqjv3GWB2b2apNz590Fcc+hAgIGwKMEUzllQnhwJ
+         C8eg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785502829; x=1786107629;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=XFQU8iH1zNafQF+sd3fwpkuxE9NFiGxCV4Yz8a5shVE=;
+        b=JxX/Q4AGjiD9FWjDFAi2B+Ad/5AnaTx/W5VTjubAy+qAkDuFTg9bj6H18Cv5IITgi6
+         nI8ofsmyqhFuin9dWhvIoM8NF8loFgsMncITYZvZp0Er1UFiCZEKquKtUEBtfQcAwAFf
+         wTLP/EVSXDdy+3mOs15rfgokZuLOgKXOEb7gXaxDDXQY81QTfxzh2jPOpNb1p2arVg+S
+         qSKBneVRjY+jW4OxrRAbZudBRxgc76K6jx8OjciEOMQ8nwI7S7D49g3k33kGeFnpu894
+         VTMRs6Au5Ghu89KBgg54Z+dhseCNx2DCfSBK3GBGbLK+r85DMZ+7dAyt5+lWITD+FJQ1
+         ijvw==
+X-Forwarded-Encrypted: i=1; AHgh+Rom90XPwn1BgTHTlzmMd1OW/yMAQKJjuvqVjrfnjb+ruplhpICC0sncAkHviZaFS7Ba2gC2rdA=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyzefqQ5bheMb3gO5xFtZXP2u84Z082hko0ENBkfBuMkqv5wt3M
+	dJzg1jGHEXf1511+M9+JZBt5KJCwWx7B33bwn5vPJKD6lcBCK5ctk7mEuIpBpcJ6tJZU/LO4gjj
+	H/2KyKw==
+X-Received: from pgbfq12.prod.google.com ([2002:a05:6a02:298c:b0:c8b:2706:11a7])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:301a:b0:847:99bb:b6d8
+ with SMTP id d2e1a72fcca58-84ed6ec0944mr1900997b3a.26.1785502827606; Fri, 31
+ Jul 2026 06:00:27 -0700 (PDT)
+Date: Fri, 31 Jul 2026 06:00:26 -0700
+In-Reply-To: <20260730193035.CFEDF1F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+Mime-Version: 1.0
+References: <20260730191908.2084803-1-seanjc@google.com> <20260730191908.2084803-5-seanjc@google.com>
+ <20260730193035.CFEDF1F000E9@smtp.kernel.org>
+Message-ID: <amycahxKDq0cO0ri@google.com>
+Subject: Re: [PATCH 4/9] KVM: selftests: Drop unreachable, dead code from
+ hardware disable test
+From: Sean Christopherson <seanjc@google.com>
+To: sashiko-reviews@lists.linux.dev
+Cc: Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="us-ascii"
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [High] GCS data check exceptions from the L1 hypervisor context incorrect=
-ly trigger a host-side WARN_ON_ONCE and an UNDEFINED exception injection in=
-stead of being forwarded.
---
+On Thu, Jul 30, 2026, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
+> > diff --git a/tools/testing/selftests/kvm/hardware_disable_test.c b/tools/testing/selftests/kvm/hardware_disable_test.c
+> > index 1bcbd13e99947..e08aef94382f3 100644
+> > --- a/tools/testing/selftests/kvm/hardware_disable_test.c
+> > +++ b/tools/testing/selftests/kvm/hardware_disable_test.c
+> 
+> [ ... ]
+> 
+> > @@ -96,21 +84,19 @@ static void run_test(u32 run)
+> [ ... ]
+> >  	pr_debug("%s: [%d] all threads launched\n", __func__, run);
+> >  	sem_post(sem);
+> > -	for (i = 0; i < VCPU_NUM; ++i)
+> > -		check_join(threads[i], &b);
+> > -	/* Should not be reached */
+> > -	TEST_ASSERT(false, "%s: [%d] child escaped the ninja", __func__, run);
+> > +
+> > +	/* Wait for the parent to SIGKILL this child. */
+> > +	while (1);
+> 
+> [Severity: Medium]
+> Since the child and parent share the same CPU affinity, will this busy spin
+> loop cause unnecessary scheduler contention with the parent process when the
+> parent's timer fires?
 
---- Patch [7]: [PATCH v17 07/14] KVM: arm64: Forward GCS exceptions to nest=
-ed guests ---
-commit c532b4ba16abdf3ea91375bafb69e02b935e5151
-Author: Mark Brown <broonie@kernel.org>
+Doesn't seem like it?  Or rather, any contention between the parent and the
+immediate child doesn't seem to matter.
 
-KVM: arm64: Forward GCS exceptions to nested guests
+> Because the processes are pinned to a single CPU core, spinning in this loop
+> burns CPU cycles and forces the parent to contend with the spinning child for
+> CPU time.
 
-This commit adds handling to forward GCS exceptions to the hypervisor
-when a nested guest has HFGITR_EL2.nGCSSTR_EL1 clear or for a GCS data
-check exception in an L2 guest.
+Yep.
 
-> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-> index 54aedf93c78b6..9db3508917937 100644
-> --- a/arch/arm64/kvm/handle_exit.c
-> +++ b/arch/arm64/kvm/handle_exit.c
-[ ... ]
-> +/*
-> + * We might get GCS exceptions that need to be forwarded to the
-> + * hypervisor when a nested guest has HFGITR_EL2.nGCSSTR_EL1 clear, or
-> + * for a GCS data check exception for a L2 guest.
-> + */
->  static int kvm_handle_gcs(struct kvm_vcpu *vcpu)
->  {
-> -	/* We don't expect GCS, so treat it with contempt */
-> -	if (kvm_has_feat(vcpu->kvm, ID_AA64PFR1_EL1, GCS, IMP))
-> -		WARN_ON_ONCE(1);
-> +	if (!kvm_has_gcs(vcpu->kvm)) {
-> +		kvm_inject_undefined(vcpu);
-> +		return 1;
-> +	}
-> =20
-> +	if (is_nested_ctxt(vcpu)) {
+> Would it be better to use a blocking wait like pause() or sleep() here to
+> reduce scheduler latency and avoid 100% CPU utilization?
 
-[Severity: High]
-Does is_nested_ctxt() incorrectly filter out the L1 hypervisor context?
-
-If a VHE L1 hypervisor (or its L1 host userspace) executes a GCS instruction
-that generates a GCS data check exception, the hardware targets EL1. Due to
-HCR_EL2.NV =3D 1, this is redirected to L0 KVM.
-
-Since is_nested_ctxt(vcpu) returns false for L1 hypervisor contexts
-(because is_hyp_ctxt(vcpu) is true), this check will fail and fall through
-to injecting an UNDEFINED exception.
-
-Should this use vcpu_has_nv(vcpu) instead to ensure exceptions from both L1
-and L2 contexts are properly forwarded to the virtual EL2?
-
-> +		kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
-> +		return 1;
-> +	}
-> +
-> +	WARN_ON_ONCE(1);
-
-[Severity: High]
-Is it possible for an unprivileged L1 userspace process using GCS to trigger
-this WARN_ON_ONCE?
-
-Since the is_nested_ctxt() check above falls through for L1 contexts, a
-legitimate GCS fault in L1 (such as mismatching a return address on the sha=
-dow
-stack) could reach this warning. This would allow an L1 guest to trigger a
-host-side kernel warning (kernel log DoS) and crash the L1 VM.
-
->  	kvm_inject_undefined(vcpu);
->  	return 1;
->  }
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260731-arm64-gcs-=
-v17-0-5e39ca01b14e@kernel.org?part=3D7
+Yeah, it makes sense to throw pause() in here, if only to maintain equivalent
+functionality.  Because that's effectively what pthread_join() will do since the
+grandchildren never exit.
