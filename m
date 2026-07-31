@@ -1,35 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74ED042EEDA;
-	Fri, 31 Jul 2026 12:38:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A241C430CDD;
+	Fri, 31 Jul 2026 12:38:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785501490; cv=none; b=PS7Ursp4IBQoJzuGpFYddDb+4aLtuWueTEPaEOaiWbUg0SDOeLeJmAORctWHkE9gSsgHAmq3uF7vHDwe7ulm4qzCw2tc6Cy1fJ39HhA7nIHDsUd3HCSOaqDOog1QYo3+yjIrTRdHaufJCL1JeYygEO94xQVM3Q2Xz1ptymMA7Sk=
+	t=1785501494; cv=none; b=C6Ui1PGl8Nhi55z9A7p2yPOXN33KHj68JI1k/wKeBmh5/ji8MqmU0K50HM5HLS6dt2Q8E57YAtizta6qTPOweogWk26Z0qM5F7xV1nb5IbOVeWCmDNjuBEOTRt7bGNqvCIe9qQO0oDBdo+10tEGNryIpQy3JAfiwD4PAShwUJXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785501490; c=relaxed/simple;
-	bh=kq5inm4XLV9y3q0emrqMvgSlwP7yu7PrdQSzkYGOWPo=;
+	s=arc-20240116; t=1785501494; c=relaxed/simple;
+	bh=sIWieTk4WURR6tewmd4CqdDOGodIh/nx0/zJZ1rNZT8=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=nkYaYc/l4PjkAPexgmKvjCgXIPZnCqNCI71IYb+NVY829FhKRSKrinr+mbhbNYM5A31787+ZLrD2ZrRkWEkYzPkCJrgME09KUV567b2Zwk4G96+xNl+uv6WzHRPZvWzyzYZ6iNOdJ5OxqsWG/F5aQT2+jzzuPB2FRm6D0ZsY9BY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SRPLBaAA; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=NhdxiZrnkZjRM6lXRMysrjvcQGJdq7H23ywSGXwplH1Rgp/Dk4L4dj0QXDPH/WgVLwKa8Imgff9XZCO0bVSVFJDzkWHxpp5rpH88GmZvi29tE1LmXcYHIaC/sbknzl69Fq6I4G2lHZWd+5YUQQDX2ancz36MDFOqZTIH72LGIk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JeYNRGyE; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SRPLBaAA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A50F1F00A3A;
-	Fri, 31 Jul 2026 12:38:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JeYNRGyE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 853FD1F000E9;
+	Fri, 31 Jul 2026 12:38:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785501489;
-	bh=nW2uwG3VWmqTYBYq5oWNcIeaMFqReX/mfTA7yT0Lz8Q=;
+	s=k20260515; t=1785501492;
+	bh=0g4KetOtT1QniGH3lYu0d4Ii94UczTzbZTbGp4YhhKU=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=SRPLBaAA3VTtgRW2r2ldajLvKJ1MqweSLObW+8SvAdiDBbwyzEyphKahzpYPlgzts
-	 EM4MBTsTokwdnKbLGOwDg2jWcN2JnyB6jfnk5GrZqqBZvt7FGpfdsLSiBdB+RN7Qnw
-	 75+PTNjpvA3udyFIdfJk2x2L08T4PaAMVN1er8zaceSGa7RuK/rLXfcdws2zY8UD2u
-	 gLF87UwJVV8dwz24auHQOFm1OgP+UG2Y8c4c5P6Xn4/d5MlbCt5LCmiOlPgyjopqCh
-	 4ZwfXjPytHIdQpy1W9pd0mEJJr2xvuuva/WBZQpmE/fPu20B28US6j3z4PPZgCDB2Z
-	 +plpGy8Lsnyvg==
+	b=JeYNRGyEnp4+xjNnQ75cqtOVWup5lp3mmztbuAeY5NTn2fT5LYYl2MXGu4wc+NDRS
+	 OgUF/0lZGjcn964piGcb++uAnj0z9wa7kzCuHvhbEI8Bw4kmjS9QAXLvkpfZDXB8S1
+	 q7MdpsLQAbU6RIHCZmv3NX6nNZxS4NdOu7GQPpclVkacpc4NsjP5fkQGsEzIi+oHLB
+	 i1p8P3KRK1+BtSV66iY9dhbXQxfv1RZ/shJbovBUO1IGlrkosHIHv7A1YgTLNi7N88
+	 FzgEqzhkpf0f3nJROh6igvSXpm6GrDn4CqREMyTmIu98VqhwkxwDeJHIe4oqJmgP0v
+	 t9svLG+KyRW8Q==
 From: Mark Brown <broonie@kernel.org>
-Date: Fri, 31 Jul 2026 13:25:50 +0100
-Subject: [PATCH v17 12/14] KVM: selftests: arm64: Only restore SPSR_EL1 and
- ELR_EL1 if they change
+Date: Fri, 31 Jul 2026 13:25:51 +0100
+Subject: [PATCH v17 13/14] tools: Synchronise the kernel esr.h
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -38,7 +37,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260731-arm64-gcs-v17-12-5e39ca01b14e@kernel.org>
+Message-Id: <20260731-arm64-gcs-v17-13-5e39ca01b14e@kernel.org>
 References: <20260731-arm64-gcs-v17-0-5e39ca01b14e@kernel.org>
 In-Reply-To: <20260731-arm64-gcs-v17-0-5e39ca01b14e@kernel.org>
 To: Catalin Marinas <catalin.marinas@arm.com>, 
@@ -51,57 +50,224 @@ Cc: Peter Maydell <peter.maydell@linaro.org>,
  kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, 
  linux-kernel@vger.kernel.org, Mark Brown <broonie@kernel.org>
 X-Mailer: b4 0.16-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1508; i=broonie@kernel.org;
- h=from:subject:message-id; bh=kq5inm4XLV9y3q0emrqMvgSlwP7yu7PrdQSzkYGOWPo=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBqbJcFnjMOtw0swGPvnW50uvGG391F/yvmA0jXd
- uYSZMtYsCyJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCamyXBQAKCRAk1otyXVSH
- 0KFLB/4uy9NGwVVvwOBSQZyKtFNFQX2//3ZKfNQgttRdsvPdI10IaDENOqulUF2MxEqFqgVf3JC
- /8PQWi4p1Zr3MDg+nKfn3ZrmpSH10j2p906EBhrfLW7YA8LSGevK8ZT46DB6dQk0BHtsocmSRDi
- awOh6BkKwDM/U9VCXmqbVnu/iJL+6twpknBh9tMgIVgxWO96Be49G0oCPX5wKL0EGQP8ZaRYVKK
- sZPWpGlYZwEBEV1JDfTpJNFuDxp3Ew9/tSvtFJYRCiw80tsVfTsKTnM2yjQ37hfS9SixsGYVZCq
- KoS7TvAbEC7IkPALaVpLnA1yi/II1gukqnCROOHkmajaEqlw
+X-Developer-Signature: v=1; a=openpgp-sha256; l=7181; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=sIWieTk4WURR6tewmd4CqdDOGodIh/nx0/zJZ1rNZT8=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBqbJcFK0doVCzmsbyTI2b3ZTcA65mFiN/v6jz+0
+ DIP49S14YuJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCamyXBQAKCRAk1otyXVSH
+ 0EkfB/9d+clnM6ndC6qhwu9viBCHB984f7eRNstw8/y/P9qusC2WKzX0TIo3SbHxnbVDaoazKht
+ PpNTyFoZ9Igni6RIpKd9tPsmoRZYr6a8RuSRFa18ozvz79D2S0vMrMfo66mWaBblO/Qoy9K30Td
+ ZYeBbB/RPNOTOesfLWpghmdXQna7QfqowVummVuVogSuBXEOEGhPhUm3A8d4xiMX4F6jNzkkWQL
+ Q2N9BgY78YnMOSbsqRH/IB8R+2f1l4jvRd1b1USWZxcodTkfg9mzLGycXwDVCLWa2lOQ7iNbr/u
+ rvRboTqCQs3f+8GGDVkbZRFL3HIgCqlRu7IDlSmiKz4z/GTC
 X-Developer-Key: i=broonie@kernel.org; a=openpgp;
  fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-When EXLOCK is enabled for ELx writes to SPSR_ELx and ELR_ELx generate
-GCS exceptions. Currently the selftest helpers unconditionally reload the
-saved values for these registers regardless of if the handler didn't change
-them. This gets in the way of EXLOCK testing, making it hard to generate
-contexts which will generate an invalid ERET since we never get as far as
-doing an exception return while EXLOCK is enabled.
-
-In order to facilitate testing of nested virtualisation emulation of EXLOCK
-change our reloads into read/modify/write cycles, suppressing the writes
-when they would not change the value in the register.
+To pick up definitions for GCS.
 
 Signed-off-by: Mark Brown <broonie@kernel.org>
 ---
- tools/testing/selftests/kvm/lib/arm64/handlers.S | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ tools/arch/arm64/include/asm/esr.h | 113 +++++++++++++++++++++++++++++++++----
+ 1 file changed, 102 insertions(+), 11 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/lib/arm64/handlers.S b/tools/testing/selftests/kvm/lib/arm64/handlers.S
-index 0e443eadfac6..367c22d61cba 100644
---- a/tools/testing/selftests/kvm/lib/arm64/handlers.S
-+++ b/tools/testing/selftests/kvm/lib/arm64/handlers.S
-@@ -33,8 +33,18 @@
+diff --git a/tools/arch/arm64/include/asm/esr.h b/tools/arch/arm64/include/asm/esr.h
+index f3c6403e5ef2..24c6ebe3fd41 100644
+--- a/tools/arch/arm64/include/asm/esr.h
++++ b/tools/arch/arm64/include/asm/esr.h
+@@ -19,7 +19,8 @@
+ #define ESR_ELx_EC_FP_ASIMD	UL(0x07)
+ #define ESR_ELx_EC_CP10_ID	UL(0x08)	/* EL2 only */
+ #define ESR_ELx_EC_PAC		UL(0x09)	/* EL2 and above */
+-/* Unallocated EC: 0x0A - 0x0B */
++#define ESR_ELx_EC_OTHER	UL(0x0A)
++/* Unallocated EC: 0x0B */
+ #define ESR_ELx_EC_CP14_64	UL(0x0C)
+ #define ESR_ELx_EC_BTI		UL(0x0D)
+ #define ESR_ELx_EC_ILL		UL(0x0E)
+@@ -50,7 +51,8 @@
+ #define ESR_ELx_EC_FP_EXC32	UL(0x28)
+ /* Unallocated EC: 0x29 - 0x2B */
+ #define ESR_ELx_EC_FP_EXC64	UL(0x2C)
+-/* Unallocated EC: 0x2D - 0x2E */
++#define ESR_ELx_EC_GCS		UL(0x2D)
++/* Unallocated EC:  0x2E */
+ #define ESR_ELx_EC_SERROR	UL(0x2F)
+ #define ESR_ELx_EC_BREAKPT_LOW	UL(0x30)
+ #define ESR_ELx_EC_BREAKPT_CUR	UL(0x31)
+@@ -97,6 +99,8 @@
+ #define ESR_ELx_AET_CE		(UL(6) << ESR_ELx_AET_SHIFT)
  
- .macro restore_registers
- 	ldp	x1, x2, [sp, #16 * 16] /* PC, PSTATE */
+ /* Shared ISS field definitions for Data/Instruction aborts */
++#define ESR_ELx_VNCR_SHIFT	(13)
++#define ESR_ELx_VNCR		(UL(1) << ESR_ELx_VNCR_SHIFT)
+ #define ESR_ELx_SET_SHIFT	(11)
+ #define ESR_ELx_SET_MASK	(UL(3) << ESR_ELx_SET_SHIFT)
+ #define ESR_ELx_FnV_SHIFT	(10)
+@@ -119,6 +123,16 @@
+ #define ESR_ELx_FSC_SEA_TTW(n)	(0x14 + (n))
+ #define ESR_ELx_FSC_SECC	(0x18)
+ #define ESR_ELx_FSC_SECC_TTW(n)	(0x1c + (n))
++#define ESR_ELx_FSC_EXCL_ATOMIC	(0x35)
++#define ESR_ELx_FSC_ADDRSZ	(0x00)
 +
-+	/* Suppress redundant writes to support GCS exception lock testing */
-+	mrs	x3, elr_el1
-+	cmp	x1, x3
-+	beq	.Lskip_elr_\@
- 	msr	elr_el1, x1
-+.Lskip_elr_\@:
-+	mrs	x3, spsr_el1
-+	cmp	x2, x3
-+	beq	.Lskip_spsr_\@
- 	msr	spsr_el1, x2
-+.Lskip_spsr_\@:
++/*
++ * Annoyingly, the negative levels for Address size faults aren't laid out
++ * contiguously (or in the desired order)
++ */
++#define ESR_ELx_FSC_ADDRSZ_nL(n)	((n) == -1 ? 0x25 : 0x2C)
++#define ESR_ELx_FSC_ADDRSZ_L(n)		((n) < 0 ? ESR_ELx_FSC_ADDRSZ_nL(n) : \
++						   (ESR_ELx_FSC_ADDRSZ + (n)))
  
- 	/* sp is not restored */
- 	ldp	x30, xzr, [sp, #16 * 15] /* x30, SP */
+ /* Status codes for individual page table levels */
+ #define ESR_ELx_FSC_ACCESS_L(n)	(ESR_ELx_FSC_ACCESS + (n))
+@@ -141,12 +155,12 @@
+ #define ESR_ELx_SF 		(UL(1) << ESR_ELx_SF_SHIFT)
+ #define ESR_ELx_AR_SHIFT	(14)
+ #define ESR_ELx_AR 		(UL(1) << ESR_ELx_AR_SHIFT)
+-#define ESR_ELx_VNCR_SHIFT	(13)
+-#define ESR_ELx_VNCR		(UL(1) << ESR_ELx_VNCR_SHIFT)
+ #define ESR_ELx_CM_SHIFT	(8)
+ #define ESR_ELx_CM 		(UL(1) << ESR_ELx_CM_SHIFT)
+ 
+ /* ISS2 field definitions for Data Aborts */
++#define ESR_ELx_HDBSSF_SHIFT	(11)
++#define ESR_ELx_HDBSSF		(UL(1) << ESR_ELx_HDBSSF_SHIFT)
+ #define ESR_ELx_TnD_SHIFT	(10)
+ #define ESR_ELx_TnD 		(UL(1) << ESR_ELx_TnD_SHIFT)
+ #define ESR_ELx_TagAccess_SHIFT	(9)
+@@ -161,8 +175,6 @@
+ #define ESR_ELx_Xs_MASK		(GENMASK_ULL(4, 0))
+ 
+ /* ISS field definitions for exceptions taken in to Hyp */
+-#define ESR_ELx_FSC_ADDRSZ	(0x00)
+-#define ESR_ELx_FSC_ADDRSZ_L(n)	(ESR_ELx_FSC_ADDRSZ + (n))
+ #define ESR_ELx_CV		(UL(1) << 24)
+ #define ESR_ELx_COND_SHIFT	(20)
+ #define ESR_ELx_COND_MASK	(UL(0xF) << ESR_ELx_COND_SHIFT)
+@@ -174,6 +186,13 @@
+ #define ESR_ELx_WFx_ISS_WFE	(UL(1) << 0)
+ #define ESR_ELx_xVC_IMM_MASK	((UL(1) << 16) - 1)
+ 
++/* ISS definitions for LD64B/ST64B/{T,P}SBCSYNC instructions */
++#define ESR_ELx_ISS_OTHER_ST64BV	(0)
++#define ESR_ELx_ISS_OTHER_ST64BV0	(1)
++#define ESR_ELx_ISS_OTHER_LDST64B	(2)
++#define ESR_ELx_ISS_OTHER_TSBCSYNC	(3)
++#define ESR_ELx_ISS_OTHER_PSBCSYNC	(4)
++
+ #define DISR_EL1_IDS		(UL(1) << 24)
+ /*
+  * DISR_EL1 and ESR_ELx share the bottom 13 bits, but the RES0 bits may mean
+@@ -371,12 +390,14 @@
+ /*
+  * ISS values for SME traps
+  */
++#define ESR_ELx_SME_ISS_SMTC_MASK		GENMASK(2, 0)
++#define ESR_ELx_SME_ISS_SMTC(esr)		((esr) & ESR_ELx_SME_ISS_SMTC_MASK)
+ 
+-#define ESR_ELx_SME_ISS_SME_DISABLED	0
+-#define ESR_ELx_SME_ISS_ILL		1
+-#define ESR_ELx_SME_ISS_SM_DISABLED	2
+-#define ESR_ELx_SME_ISS_ZA_DISABLED	3
+-#define ESR_ELx_SME_ISS_ZT_DISABLED	4
++#define ESR_ELx_SME_ISS_SMTC_SME_DISABLED	0
++#define ESR_ELx_SME_ISS_SMTC_ILL		1
++#define ESR_ELx_SME_ISS_SMTC_SM_DISABLED	2
++#define ESR_ELx_SME_ISS_SMTC_ZA_DISABLED	3
++#define ESR_ELx_SME_ISS_SMTC_ZT_DISABLED	4
+ 
+ /* ISS field definitions for MOPS exceptions */
+ #define ESR_ELx_MOPS_ISS_MEM_INST	(UL(1) << 24)
+@@ -387,6 +408,31 @@
+ #define ESR_ELx_MOPS_ISS_SRCREG(esr)	(((esr) & (UL(0x1f) << 5)) >> 5)
+ #define ESR_ELx_MOPS_ISS_SIZEREG(esr)	(((esr) & (UL(0x1f) << 0)) >> 0)
+ 
++/* ISS field definitions for GCS */
++#define ESR_ELx_ExType_SHIFT	(20)
++#define ESR_ELx_ExType_MASK		GENMASK(23, 20)
++#define ESR_ELx_Raddr_SHIFT		(10)
++#define ESR_ELx_Raddr_MASK		GENMASK(14, 10)
++#define ESR_ELx_Rn_SHIFT		(5)
++#define ESR_ELx_Rn_MASK			GENMASK(9, 5)
++#define ESR_ELx_Rvalue_SHIFT		5
++#define ESR_ELx_Rvalue_MASK		GENMASK(9, 5)
++#define ESR_ELx_IT_SHIFT		(0)
++#define ESR_ELx_IT_MASK			GENMASK(4, 0)
++
++#define ESR_ELx_ExType_DATA_CHECK	0
++#define ESR_ELx_ExType_EXLOCK		1
++#define ESR_ELx_ExType_STR		2
++
++#define ESR_ELx_IT_RET			0
++#define ESR_ELx_IT_GCSPOPM		1
++#define ESR_ELx_IT_RET_KEYA		2
++#define ESR_ELx_IT_RET_KEYB		3
++#define ESR_ELx_IT_GCSSS1		4
++#define ESR_ELx_IT_GCSSS2		5
++#define ESR_ELx_IT_GCSPOPCX		6
++#define ESR_ELx_IT_GCSPOPX		7
++
+ #ifndef __ASSEMBLER__
+ #include <asm/types.h>
+ 
+@@ -408,6 +454,11 @@ static inline bool esr_is_cfi_brk(unsigned long esr)
+ 	       (esr_brk_comment(esr) & ~CFI_BRK_IMM_MASK) == CFI_BRK_IMM_BASE;
+ }
+ 
++static inline bool esr_is_ubsan_brk(unsigned long esr)
++{
++	return (esr_brk_comment(esr) & ~UBSAN_BRK_MASK) == UBSAN_BRK_IMM;
++}
++
+ static inline bool esr_fsc_is_translation_fault(unsigned long esr)
+ {
+ 	esr = esr & ESR_ELx_FSC;
+@@ -439,6 +490,46 @@ static inline bool esr_fsc_is_access_flag_fault(unsigned long esr)
+ 	       (esr == ESR_ELx_FSC_ACCESS_L(0));
+ }
+ 
++static inline bool esr_fsc_is_excl_atomic_fault(unsigned long esr)
++{
++	esr = esr & ESR_ELx_FSC;
++
++	return esr == ESR_ELx_FSC_EXCL_ATOMIC;
++}
++
++static inline bool esr_fsc_is_addr_sz_fault(unsigned long esr)
++{
++	esr &= ESR_ELx_FSC;
++
++	return (esr == ESR_ELx_FSC_ADDRSZ_L(3))	||
++	       (esr == ESR_ELx_FSC_ADDRSZ_L(2))	||
++	       (esr == ESR_ELx_FSC_ADDRSZ_L(1)) ||
++	       (esr == ESR_ELx_FSC_ADDRSZ_L(0))	||
++	       (esr == ESR_ELx_FSC_ADDRSZ_L(-1));
++}
++
++static inline bool esr_fsc_is_sea_ttw(unsigned long esr)
++{
++	esr = esr & ESR_ELx_FSC;
++
++	return (esr == ESR_ELx_FSC_SEA_TTW(3)) ||
++	       (esr == ESR_ELx_FSC_SEA_TTW(2)) ||
++	       (esr == ESR_ELx_FSC_SEA_TTW(1)) ||
++	       (esr == ESR_ELx_FSC_SEA_TTW(0)) ||
++	       (esr == ESR_ELx_FSC_SEA_TTW(-1));
++}
++
++static inline bool esr_fsc_is_secc_ttw(unsigned long esr)
++{
++	esr = esr & ESR_ELx_FSC;
++
++	return (esr == ESR_ELx_FSC_SECC_TTW(3)) ||
++	       (esr == ESR_ELx_FSC_SECC_TTW(2)) ||
++	       (esr == ESR_ELx_FSC_SECC_TTW(1)) ||
++	       (esr == ESR_ELx_FSC_SECC_TTW(0)) ||
++	       (esr == ESR_ELx_FSC_SECC_TTW(-1));
++}
++
+ /* Indicate whether ESR.EC==0x1A is for an ERETAx instruction */
+ static inline bool esr_iss_is_eretax(unsigned long esr)
+ {
 
 -- 
 2.47.3
