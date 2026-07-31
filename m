@@ -1,115 +1,90 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 498833783C5;
-	Fri, 31 Jul 2026 20:11:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E34F489880;
+	Fri, 31 Jul 2026 20:46:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785528703; cv=none; b=Y2mxMYkMGwT3pYsaRN2sLMpf799sW0f/B9S+CNvPYg86s/jkdpgC11b63hmNvVtMQI41GuUrJKEzlEDANPBO73RZ6Yhd681oqkTg9cOSIWD7QHfNi9OZ6eH19PDHQk0VRYoR/hZiIThkMU+mVCndrpiqOowDqbHV4skBXr6wd4E=
+	t=1785530793; cv=none; b=nTqbVHwxhT9xllrV/U0tRdty+0WSs52BKVWJTf5HQmrX5zTBTtNSuaHfxxpCYRVu3olr6StSbsiJTEIF7+0PSganXRJqJNhZIjmJ4hVsdyHrKFAw4wB00PB4kOfavZ0Y71Oy14MoDkDK4GgHVtmfJco1nmkg442jmejc46emocY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785528703; c=relaxed/simple;
-	bh=2TOOrMG3BDCQ965Fh6fB0DJfBAYrTT7cm9wx8TCeDwg=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=cgZc9l0yvY8e9pE6abl2J5nWJj6+SLmNWhVkCWRcf1pUgqVd+l9YtvZOLhVTajYlTccfcdYYgSDEr43/K7rQvZuGGTG9TZYv0h0bGntl7U/WHOXXWcIAwgd/I0nm4uTE+mYSP5qezfqBufMt+bU0v6+9DQEuwlGr9+VDbHS7iHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RzjpH1FP; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1785530793; c=relaxed/simple;
+	bh=PdJJXOt98kzJz4gtUFAIu6dqJF4USgdFMdWL3Slu3eA=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=kYXKJczHuwEnjMB8n8orrUSlWpB7H3JEJNIug5C+HUZ8GgXKId4Q64iGWj3BN8UDADHbklUEq6SuWmt/Ia9wPKVJPlUFifCqiSlRIy7KhAo7kJ++elKwR6cbtj+1b71HwZPEfinDUocEAMRlVd6P5opxo1T3quiicqGisEhiy78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RhT89E5u; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RzjpH1FP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5AF0C1F00AC4;
-	Fri, 31 Jul 2026 20:11:40 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RhT89E5u"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A7BC1F00AC4;
+	Fri, 31 Jul 2026 20:46:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785528701;
-	bh=212dNqAYyuDALpdVKIYLVZtbY6/IY6Q7Nvevmsxznaw=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=RzjpH1FPDLC+UuXVzPw1A159uBdVbOJdm8mmsgVD0RoPug4BCSkguLiDGDZPhUESj
-	 8zoDmxS5vxzDseKOvJ8NT7n5YpxXSoW+AroLDuftASuQD4cOby7GamqOgCM3bIzof2
-	 NVNrbRcuweaEh0CA1T2Sbl4QUhh1XTxHo2wD2zWWxgg/ejKT/aS4h5iEM5dltWat7M
-	 JmVlbgdyt5hmQfDS3lJLgdmT+y6olwc7gBFgZgUCzC0Un8K/Xh7CXuM/O+iJwY8SS3
-	 kkkQjlDqbXrHHKglbrxVjZD43DRDnzV6CbTatKPN+L1XmgQftb6Q+oQ8r8AS3mkemp
-	 tntF8SGpIkPoQ==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v3 03/12] KVM: selftests: Pre-set threads affinity in
- hardware disable test when possible
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Sean Christopherson" <seanjc@google.com>
-Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, kvm@vger.kernel.org
-In-Reply-To: <20260731195612.2697986-4-seanjc@google.com>
-References: <20260731195612.2697986-1-seanjc@google.com>
- <20260731195612.2697986-4-seanjc@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 31 Jul 2026 20:11:39 +0000
-Message-Id: <20260731201140.5AF0C1F00AC4@smtp.kernel.org>
+	s=k20260515; t=1785530792;
+	bh=6yW61SMZr04gIIPBlCEQvBwEJCF0yd/ErxiSOHKrD2E=;
+	h=From:Subject:Date:To:Cc;
+	b=RhT89E5uH9wfvNQkQCaD3r7jsXJWIYCgk07+k8KUc3rvJLcAMedqZmsPc2s/JSeBB
+	 lWlQoQdqkrI1Fyw3gS6/y8msYqNVbf6bCIXPSUGMS6OdGSrf0BSfoTDIAY17HoAQSe
+	 UVlXiY4TCB7d2pP40Li9MruFvaMHkaURwRU/EQqA/JjQAdqPCvgnH9RBoxZgTePe3l
+	 21tFIpLArR7bhFBoewm3mQ2qg+jMahg/L0YUb3WYg/y8Gp3JT7k4vREvVhgzg0mFuL
+	 SbWTZ3XKe5n8SAEWVAMpq2ZvRiwvVr1PrjtOW7e9YxZAOiwOuKUFZD2bJdMlfBzXET
+	 /Zpv6cNpxINvw==
+From: Mark Brown <broonie@kernel.org>
+Subject: [PATCH 0/2] KVM: arm64: ID register finalisation fixes
+Date: Fri, 31 Jul 2026 21:44:44 +0100
+Message-Id: <20260731-kvm-arm64-idreg-final-v1-0-3de2a5616dc6@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAD0JbWoC/yXMQQ6CMBCF4auQWTMJNqVVr0JYtGXAUalkisSEc
+ HcLLL+8vH+FRMKU4F6sILRw4k/MuJQFhIeLAyF32aAqZSqrbvhaRnQyGp0HoQF7ju6N1gYftPF
+ 1fXWQv5NQz7+j27Sn09c/Kcx7DLbtDzVMynl5AAAA
+X-Change-ID: 20260729-kvm-arm64-idreg-final-77cbc46b558a
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+ Fuad Tabba <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>, 
+ Steffen Eiden <seiden@linux.ibm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Zenghui Yu <yuzenghui@huawei.com>, 
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, 
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+ linux-kernel@vger.kernel.org, Mark Brown <broonie@kernel.org>
+X-Mailer: b4 0.16-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1001; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=PdJJXOt98kzJz4gtUFAIu6dqJF4USgdFMdWL3Slu3eA=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBqbQmjpvTPrvJBcFud78RS/97Dw9ezyY2aHz2fO
+ Vv/3qRYOuiJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCam0JowAKCRAk1otyXVSH
+ 0I/FB/96JM8c0/VQoss2cShl+HCAfsRCd7T1f+E29p24JbAVPFrCvcvRUnSTfw4i9JqfjX3Go7b
+ J7IL+afUmtjwtAqvQAvogbCc0TE0GLNHou6Wg0mjq/6u1ecVxS5kkFHRv1LwluJsvIhuniVS8F8
+ XyHrDFvZpV8eVEf6Pprg4oYXskgDvi/hDo08A4w6fUoRR99Rn1mheh7FNvAlS5k1ldq3sn3LATN
+ VTajkc+O6YrEo9WaHYCNnvvWPuhaU4boMlStqXsfdtc34Jj1JqXbAAoZkcx02TLBv8zePXcs88p
+ O+fg2BNdYOapB+aE8ulcVcmHs72ulkDvo3wHopZmNKXOXkWk
+X-Developer-Key: i=broonie@kernel.org; a=openpgp;
+ fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [Low] The fallback logic for setting thread CPU affinity is guarded by `#=
-ifndef _GNU_SOURCE`, which is always false because KVM selftests unconditio=
-nally define `_GNU_SOURCE`. This renders the fallback dead code and breaks =
-builds on non-glibc systems.
---
+While looking at some feature enablement I noticed that there are some
+scenarios where we can end up with an inconsistently configured vCPU due
+to finalizing configuration based on ID registers before we have blocked
+writes to the ID registers. This series aims to clean up these issues.
 
---- Patch [3]: [PATCH v3 03/12] KVM: selftests: Pre-set threads affinity in=
- hardware disable test when possible ---
-commit 242db3bb38cdcdb7592d9d34951b2c689c2c39b5
-Author: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
+Mark Brown (2):
+      KVM: arm64: Finalize guest-wide sysregs prior to per-vCPU sysregs
+      KVM: arm64: Block ID register changes after we rely on the values
 
-KVM: selftests: Pre-set threads affinity in hardware disable test when poss=
-ible
+ arch/arm64/include/asm/kvm_host.h |  8 ++++++
+ arch/arm64/kvm/arm.c              |  2 +-
+ arch/arm64/kvm/sys_regs.c         | 53 +++++++++++++++++++++++++--------------
+ arch/arm64/kvm/sys_regs.h         |  2 +-
+ arch/arm64/kvm/vgic/vgic-init.c   |  6 ++---
+ 5 files changed, 46 insertions(+), 25 deletions(-)
+---
+base-commit: f5098b6bae761e346ebcd9da7f95622c04733cff
+change-id: 20260729-kvm-arm64-idreg-final-77cbc46b558a
 
-This commit pre-sets thread affinity using pthread_attr_setaffinity_np to
-reduce pthread creation latency on large NUMA systems. It attempts to add a
-fallback using kvm_sched_setaffinity when _GNU_SOURCE is not defined.
+Best regards,
+--  
+Mark Brown <broonie@kernel.org>
 
-> diff --git a/tools/testing/selftests/kvm/hardware_disable_test.c b/tools/=
-testing/selftests/kvm/hardware_disable_test.c
-> index f088b4af3ccc7..b4edeadfa3f45 100644
-> --- a/tools/testing/selftests/kvm/hardware_disable_test.c
-> +++ b/tools/testing/selftests/kvm/hardware_disable_test.c
-> @@ -36,7 +36,9 @@ static void *run_vcpu(void *arg)
->  	struct kvm_vcpu *vcpu =3D arg;
->  	struct kvm_run *run =3D vcpu->run;
-> =20
-> +#ifndef _GNU_SOURCE
->  	kvm_sched_setaffinity(0, sizeof(cpu_set_t), &threads_cpu_set);
-> +#endif
-
-[Severity: Low]
-Since the KVM selftests build system unconditionally defines _GNU_SOURCE,
-will this fallback code ever be reached?
-
-[ ... ]
-
-> @@ -80,22 +84,28 @@ static inline void check_join(pthread_t thread, void =
-**retval)
->  static void run_test(u32 run)
->  {
->  	struct kvm_vcpu *vcpu;
-> +	pthread_attr_t attr;
->  	struct kvm_vm *vm;
->  	pthread_t threads[VCPU_NUM];
->  	pthread_t throw_away;
->  	void *b;
->  	u32 i, j;
-> =20
-> +	TEST_ASSERT_EQ(pthread_attr_init(&attr), 0);
-> +#ifdef _GNU_SOURCE
-> +	TEST_ASSERT_EQ(pthread_attr_setaffinity_np(&attr, sizeof(cpu_set_t), &t=
-hreads_cpu_set), 0);
-> +#endif
-
-[Severity: Low]
-Could this break the build on systems using alternative libc implementations
-like musl?
-
-If _GNU_SOURCE is unconditionally defined by the Makefile but the libc
-doesn't provide pthread_attr_setaffinity_np, this might result in a
-compilation error rather than using the intended fallback.
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260731195612.2697=
-986-1-seanjc@google.com?part=3D3
