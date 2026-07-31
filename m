@@ -1,123 +1,90 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C4F03033E3
-	for <kvmarm@lists.linux.dev>; Fri, 31 Jul 2026 15:06:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 140DC439F94;
+	Fri, 31 Jul 2026 15:26:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785510404; cv=none; b=j6bxoJq7StEMUEK7GLFmnWCCQbnwLTSVm0/KYECvqa9H5FKeRPHHfO+ggAF2VqSnAF7dddXQl0N/4H35xpiDdW3M0yAugppHsKxGK5sYGsf+RtHBXncToHjja5h6oEpe2+6wHJLBWLe37tnEZa4/YU6AZvRhuJyyJCscq6Leeu4=
+	t=1785511579; cv=none; b=o4mSCV+U7rc2d8Nm6dW6Tgf35Vt2JPViwcRgx1sYbuFFWFo+F5DEqaT2EQkVwPzMkDL84yEEl9E7rQdD1sbEoCflAVnPZmkkIFt7E3JDKNqPYOfLcfCguEKTvSNKzpVd4JtZtgvwVA0cwFKtAhTqEOzLweiBD3oHmZ+4QgFj2vM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785510404; c=relaxed/simple;
-	bh=MydWr/9ulZaUMjrqXaz3RfupII/Omyz/aEvcEMyB2wE=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=eNc+X06RD3+5GAvwq/BiZ03o2XyfuEtaXQHrI4yBe3tsuiqITO4Tyl2lfiZi8vbb+Qg7aH/dCN0qr/FGND6Q4c0fQ6RoAq6p9UHNJ5s0gFwthfvsXlB3+NjN13IQbQXolRA4hvZCaUa01CwglRez/50cE34WrXEkU8Zxze1KlmA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j8qRocDP; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1785511579; c=relaxed/simple;
+	bh=rgLjxUjNCOG/yZS3/F1cSvxy+hMAauTMwJ4Htm++otE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bjXlEDVShPNFQvNG8uvfWy/mtxO/uYzL0nfrHmzU9WdfDt3MVOLLvzu2v212qLvNZMQksTL/LAG10JR5UUKKkqThdq/pkxuiCriM9gzZh/s/stLhMzJFkmzZfIZ2qlR8GU6SSm2qHjkwZELGc/tLF6/0HNmmWIUwN6DZnNGbGEM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mN6wMkFy; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j8qRocDP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1D231F000E9;
-	Fri, 31 Jul 2026 15:06:42 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mN6wMkFy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F025D1F000E9;
+	Fri, 31 Jul 2026 15:26:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785510403;
-	bh=n5HxEPJHg8Og0E/KXy/iMY7Exgtt44WyaHsAGH9etBo=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=j8qRocDPNGcZiAyfrmH4ZlLkQ/4v6znj9vOkFtMoAZv1n7ljIgzhdu2gLo3IPoU06
-	 UbGC7sp4L73RUsEXOmkNS4AHLmoX3K2v85wQ/uV2KVuWdW6xc+u4fbdCJYydHHzSqR
-	 QJ1ORrNd7hyYX7AguYQ29YGJyjt62jGTY4J7ckrqczuivHYWBKt++L6VRiP+7V5dkw
-	 uMq45IL6Ag8VqunFCVywqVdcTedU2BcuDfzFOAsdDY7nI6ZoBMZ0jOe4QxrgUxZMpO
-	 B67EXziiwgLuYzQ6MOmD5OevZtFUO7/CZ+5paVIN9jtJC/VaITc1EkyEADDdKrtIva
-	 DZTnuVaJ7/K1g==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v4 13/17] KVM: arm64: Alloc pkvm_hyp_vm using pKVM heap
- allocator
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Vincent Donnefort" <vdonnefort@google.com>
-Cc: kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>
-In-Reply-To: <20260731143541.956291-14-vdonnefort@google.com>
-References: <20260731143541.956291-1-vdonnefort@google.com>
- <20260731143541.956291-14-vdonnefort@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 31 Jul 2026 15:06:42 +0000
-Message-Id: <20260731150642.E1D231F000E9@smtp.kernel.org>
+	s=k20260515; t=1785511576;
+	bh=rgLjxUjNCOG/yZS3/F1cSvxy+hMAauTMwJ4Htm++otE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=mN6wMkFykMHHLty86efwRSLhzGCxqqgEMJVYkDppQdNUYnnhMi+4G7mbPD8/ci1KX
+	 2P/S6l7zhCOLEWYkyrRoCHJ3GKCfrPdLSExBIHE2nWabGBmviIYjFgdBJj5mBzw9jK
+	 Ar/DP1LFqd7mUV0lNnj754r6G+Zj+fl2S5pPI461tDUcNhZWWq5aMxXtQ1MsXdq0hg
+	 LiRyHQm0E8SDulKiUP1euQth1w/yWsplAUmtIvBUMb3DNaDUnxCLRhk94opPNaYVkH
+	 XaaupodCtV6oZzJ2V14t0zAb20MZq1tK1OcdzU+stH0LXSMgwXaXPO2WQoWAqQc0Y8
+	 W4d3BZ0/zhH8g==
+Date: Fri, 31 Jul 2026 16:26:13 +0100
+From: Mark Brown <broonie@kernel.org>
+To: sashiko-reviews@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+	Oliver Upton <oupton@kernel.org>
+Subject: Re: [PATCH v17 03/14] KVM: arm64: Manage GCS access and registers
+ for guests
+Message-ID: <36d6d5c1-4db1-4b6f-a49a-8181a233a07a@sirena.org.uk>
+References: <20260731-arm64-gcs-v17-0-5e39ca01b14e@kernel.org>
+ <20260731-arm64-gcs-v17-3-5e39ca01b14e@kernel.org>
+ <20260731125604.CF4B31F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="MgGWOou14h2mwOt0"
+Content-Disposition: inline
+In-Reply-To: <20260731125604.CF4B31F000E9@smtp.kernel.org>
+X-Cookie: No shirt, no shoes, no service.
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [High] Memory allocated for the hypervisor heap is not accounted to the m=
-emcg of the container creating the VM, creating a memory limit bypass. Prio=
-r to this patch, `hyp_vm` was allocated on the host using `GFP_KERNEL_ACCOU=
-NT`, correctly attributing the memory to the calling process's memcg. With =
-the shift to EL2 dynamic allocation via `hyp_alloc()`, when the heap requir=
-es more memory, EL2 requests a top-up from the host via `PKVM_HYP_REQ_HYP_A=
-LLOC`. The host handles this in `pkvm_hyp_topup()` by creating a temporary =
-memcache and initializing it with `init_hyp_memcache(&mc)`. However, `init_=
-hyp_memcache()` zeroes the memcache flags, meaning `HYP_MEMCACHE_ACCOUNT_KM=
-EMCG` is not set. Consequently, when `topup_hyp_memcache()` allocates host =
-pages, `hyp_mc_alloc_fn()` falls back to `GFP_KERNEL` instead of `GFP_KERNE=
-L_ACCOUNT`. This hides the hypervisor heap allocations from memcg limits, a=
-llowing a container to exhaust host memory by creating VMs with maximum vCP=
-Us without being charged.
---
 
---- Patch [13]: [PATCH v4 13/17] KVM: arm64: Alloc pkvm_hyp_vm using pKVM h=
-eap allocator ---
-commit 3a3fbdf527ba4d3c04e2e5d3272e58f6042e8822
-Author: Vincent Donnefort <vdonnefort@google.com>
+--MgGWOou14h2mwOt0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-KVM: arm64: Alloc pkvm_hyp_vm using pKVM heap allocator
-   =20
-This commit transitions the allocation of the hypervisor VM state structure
-(pkvm_hyp_vm) to the pKVM heap allocator at EL2. The host now uses
-pkvm_call_hyp_req() to invoke __pkvm_init_vm, handling any EL2 heap top-up
-requests dynamically instead of donating pre-allocated host memory.
+On Fri, Jul 31, 2026 at 12:56:04PM +0000, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 3 potential issue(s) to consider:
+> - [High] GCS register context switch routines are incorrectly nested inside independent CPU feature checks (S1PIE and TCR2/TCRX), causing state corruption.
 
-> diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-> index bfbb1266491d1..a9b85ad37787a 100644
-> --- a/arch/arm64/kvm/pkvm.c
-> +++ b/arch/arm64/kvm/pkvm.c
+This was specifically requested by Marc on prior versions as GCS
+architecturally depends on these features and it may improve code
+generation.
 
-[ ... ]
+> Is the GCS feature bit still explicitly masked out of the ID_AA64PFR1_EL1
+> register limit?
 
-> @@ -209,28 +209,15 @@ static int __pkvm_create_hyp_vm(struct kvm *kvm)
->  	if (!pgd)
->  		return -ENOMEM;
-> =20
-> -	/* Allocate memory to donate to hyp for vm and vcpu pointers. */
-> -	hyp_vm_sz =3D PAGE_ALIGN(size_add(PKVM_HYP_VM_SIZE,
-> -					size_mul(sizeof(void *),
-> -						 kvm->created_vcpus)));
-> -	hyp_vm =3D alloc_pages_exact(hyp_vm_sz, GFP_KERNEL_ACCOUNT);
-> -	if (!hyp_vm) {
-> -		ret =3D -ENOMEM;
-> -		goto free_pgd;
-> -	}
-> -
-> -	/* Donate the VM memory to hyp and let hyp initialize it. */
-> -	ret =3D kvm_call_hyp_nvhe(__pkvm_init_vm, kvm, hyp_vm, pgd);
-> +	ret =3D pkvm_call_hyp_req(__pkvm_init_vm, kvm, pgd);
+> Looking at sanitise_id_aa64pfr1_el1() in arch/arm64/kvm/sys_regs.c, it appears
+> the GCS bit is unconditionally cleared. If so, when the VMM tries to enable
+> GCS via KVM_SET_ONE_REG, arm64_check_features() will validate against a limit
+> of 0 and reject it with -E2BIG, making it impossible to expose GCS to guests.
 
-[Severity: High]
-Does this new allocation path lose the memcg accounting for the hyp_vm
-structure?
+This change is in the following enablement patch.
 
-Previously, hyp_vm was allocated on the host using GFP_KERNEL_ACCOUNT, which
-correctly attributed the memory to the calling process's memcg.
+--MgGWOou14h2mwOt0
+Content-Type: application/pgp-signature; name="signature.asc"
 
-With the shift to EL2 dynamic allocation, when the heap requires more memor=
-y,
-EL2 requests a top-up via PKVM_HYP_REQ_HYP_ALLOC. When the host handles this
-in pkvm_hyp_topup(), it creates a temporary memcache using
-init_hyp_memcache(), which leaves the HYP_MEMCACHE_ACCOUNT_KMEMCG flag
-cleared.
+-----BEGIN PGP SIGNATURE-----
 
-Because of this, when topup_hyp_memcache() allocates host pages,
-hyp_mc_alloc_fn() falls back to GFP_KERNEL instead of GFP_KERNEL_ACCOUNT.
-This hides the hypervisor heap allocations from memcg limits.
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmpsvpQACgkQJNaLcl1U
+h9D4DQf/RZLYi1M2kH9mqhRQuQZZsMuP6/nM+q2GwXMKIiYqekuu9cGnSbzj5em+
+98EMlgO6DCzrO8dgby25rqrXF64D2NTJzsltMi3c3GKUaBEt/z2Ud8x72zSFSHpA
+99NX2+rDIO5Lh5qXdWZAk+iyjuhRmn8acI7AITHqanoYBl63p0Us/6qFKX6uCzu3
+gMJImEZh9FEfiMidHlfdMO6Hp0Xa7AmyQBNRlrFPkCm36lEyWKmAPBE5iyFsuCPs
+vgSahIirRrgpTpPFh2r2q6gLNNC4bhDwG7Ptm+Eetxtv6KuQHc3sqgevbi7zfisf
+/V2p8awwVaRg1gyB+VU7/FU1PUBuGg==
+=R1lN
+-----END PGP SIGNATURE-----
 
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260731143541.9562=
-91-1-vdonnefort@google.com?part=3D13
+--MgGWOou14h2mwOt0--
