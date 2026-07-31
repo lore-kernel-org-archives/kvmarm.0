@@ -1,313 +1,287 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54CB93D4127;
-	Fri, 31 Jul 2026 10:59:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3B2F3E95B3;
+	Fri, 31 Jul 2026 12:37:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785495555; cv=none; b=ocXEYnLNmTOHcJk0zXa+Ade4apALP3viANns88OT/MZHGds+kuoxot6xB/f+P4l7xatbXa++7L1rDGxoa0uUy52IiyY82BldqCCZa7yD0ClcVLp0HWNdJzQZPMOgvXUsFumNsGf6Qth2HTe2nQ5ZlF1XCTP/5eu4Km1WWNKGXpM=
+	t=1785501454; cv=none; b=aRa6EXG24FnfjbyExu48Vkqi5MTo/QKXdhuj9SVtdiZgT0xRpEGN7OXCxCfP31yDuWv+18Wns4MWGwjMuHUp1sSEMHolcBQS9Ng9fXmqUVB9xXYRJcmWFKsggigWi6hTuN8qOhNiB0u6kQNTn7N62Ua3uYaSdTTy/8wwm8kouQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785495555; c=relaxed/simple;
-	bh=K7B/JzewX4QxlTmtVeIzesbPDrCCGlVQ5xaSmXkC5Uc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Yhq/C2omvVtQFVBLWeBaEjopAeW7efVlQM+86ksVNCHyEggj1Ag5hJe3PkVE3HNfo+TSlI7gsMJ+HMWdJe44/j6AZL/hmKY5DEF6jnt6d7pLt7C0RQ8aFg18LoCLsXgZz271pbi1OLDy522hTR3n0Nc1bEuD+umn7Kus0o9t5ZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=XIsE4Ln4; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1785501454; c=relaxed/simple;
+	bh=rU/IHBPS6E37VuQfMB0fWgnkjM5zY0A4UawzDcU+Uhs=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=AsXrqtpGUXkHXlUQJFEMQK6khNqPiA8YSdDtBOl2N6HhAAHQT5l+lP+iw+SlGPPIftCeWN79CTXx3gpa6xA0odIyaMIInuN3QJLbfG+TJl2IssByig0LVZsMPLcOSLQnat3tOTzdTR+0RxPSLTvfQHgdVQ4Bg8lyEWCK7uflx/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j2CvPnGC; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="XIsE4Ln4"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 07DC7165C;
-	Fri, 31 Jul 2026 03:59:06 -0700 (PDT)
-Received: from [10.57.87.104] (unknown [10.57.87.104])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 363B03F86F;
-	Fri, 31 Jul 2026 03:59:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1785495550; bh=K7B/JzewX4QxlTmtVeIzesbPDrCCGlVQ5xaSmXkC5Uc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=XIsE4Ln4QXKjKS4MIFd4UibV+jyI6v7qV4OX0UwKKVr/Fdf7bz5e3qxSY6Vl2Sm2k
-	 VCzLkADNp5hx8VMwPSnvG/WroklZNsHuW3E1nd+8G6YysO/efon4qf3+Prnsjhzgbo
-	 oIDHqG1YWrlehgIy1R0i1s2yBxc5UGcp2R6AqS48=
-Message-ID: <a3db6519-f76a-433c-8c21-3286a038c584@arm.com>
-Date: Fri, 31 Jul 2026 11:59:03 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j2CvPnGC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C40A01F00A3A;
+	Fri, 31 Jul 2026 12:37:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785501450;
+	bh=OgdCVvwMBfX5rSeE52zboqAMHLylON4PY1/yeADLJTo=;
+	h=From:Subject:Date:To:Cc;
+	b=j2CvPnGC7Y02+8tQA+9A1bx2rF+K4O5qe0TM7+BNRssJScIwfIp5M7KUUMQUR/zb8
+	 OH1DVaUUiRoYzbrFVQyEywl49fLHPeL8svu/zt2xEqgVkERor9CvQXssQH/7QEHnNE
+	 qbO0Msa6PgmN/iFpNoZQqQf3i2CSD2eUxhuQM/Ggl2y1OjI33+Oz7+dIfgz2fZlabw
+	 Lqt5Ful/GoqGwHIFp3ybzPfhSS2OBx/+M/S9Mv04F7moeKS239pd4GtIRA3md3K4Ti
+	 x4jnGxjZ1wmDgaVvUxEwnD6ISzNXHGS3cRZPFGsUrutxfX3+MFK+T4gEHYQ2btUJl0
+	 TU8l9muaIadKQ==
+From: Mark Brown <broonie@kernel.org>
+Subject: [PATCH v17 00/14] KVM: arm64: Provide guest support for GCS
+Date: Fri, 31 Jul 2026 13:25:38 +0100
+Message-Id: <20260731-arm64-gcs-v17-0-5e39ca01b14e@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v1 1/2] KVM: arm64: CCA: Add support for configuring
- the Realm MEC policy
-To: Kohei Enju <enju.kohei@fujitsu.com>,
- linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev, cgroups@vger.kernel.org, linux-coco@lists.linux.dev
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
- Steffen Eiden <seiden@linux.ibm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will@kernel.org>, Tejun Heo <tj@kernel.org>,
- Johannes Weiner <hannes@cmpxchg.org>, =?UTF-8?Q?Michal_Koutn=C3=BD?=
- <mkoutny@suse.com>
-References: <20260724094120.166536-1-enju.kohei@fujitsu.com>
- <20260724094120.166536-2-enju.kohei@fujitsu.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <20260724094120.166536-2-enju.kohei@fujitsu.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAEKUbGoC/23TS27cMAwG4KsEXtcFSVGvrnqPIgs9qBmjzUxgB
+ 0aDYO5eKUVnZKjwyoI/SSR/f0ybrIts07enj2mVfdmW66W+oP3yNKVzuJxkXnJdmAhIQX3msL4
+ Ynk9pm0UhhgjZWfJT/T6GTea4hks6N/H28tpWX1cpy+/PI3481/fzsr1d1/fPE3dsq3/3tmi6v
+ XecYY5FG1u8ijGY7z9lvcivr9f1NLVtduoocU+p0pwoYWZOJHGgqqMKe6oqTTkXX7yD7N1A+UE
+ d2J5ypcalElS9Mhg/UN1Rop7qSr0UdJizUcQDNXeKAL6nplLrROssIXDOA7UPisdTbaUEmNipm
+ K3VA3X/KAMdBr+71iZfJFlrrJIyUP+ghnRPfaVQjGI2ProCA0V4WAeH6SC0HnsvFDOhh3GyiB0
+ +lostUYzRoWcrKY71IvX40GZsmWKqFVfMyoQR30PFdUbHa7dUEVG0rv4rIjJi7vGhX9hypWugI
+ GUDnv5T8z1Yul4bDrglS4tSnAO66MZkoXlgj8eGtWwZVlq0JGXz8eTb7fYH1ERA8D0EAAA=
+X-Change-ID: 20230303-arm64-gcs-e311ab0d8729
+To: Catalin Marinas <catalin.marinas@arm.com>, 
+ Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+ Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Shuah Khan <shuah@kernel.org>, Fuad Tabba <tabba@google.com>, 
+ Oliver Upton <oupton@kernel.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, 
+ linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
+ kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Mark Brown <broonie@kernel.org>, 
+ Thiago Jung Bauermann <thiago.bauermann@linaro.org>
+X-Mailer: b4 0.16-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=10001; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=rU/IHBPS6E37VuQfMB0fWgnkjM5zY0A4UawzDcU+Uhs=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBqbJb7H0Ojsu3XSRFgBW9y2gTJI6jOJ+Lol072y
+ p2L9BqWF9qJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCamyW+wAKCRAk1otyXVSH
+ 0BT6B/9GjtJVOFWYxDxR0w9LUKMVYfKyb+Y26SlIUwvDgPshyYbTprSEpd7vyitppNDpWO/Ql0U
+ vC08g0/VKnAjTDXkJNY/F4t2vNJPSamXxBCWC333GZcTTH7tm2ny4djH4IL7+pKgQjf/PrDuYTC
+ pVslguRwPtWDyfZO0otozmnLY3njyXca1xyPbAtVusIEbW9ZAbNl3L6B9/814CXaqhgz7raMfdw
+ kbfClSsRZ6c3eA7WOpCAbknA9xNqRMExZX3YlOc9xKtqL/1GbCTJUQGWeRvkyUr7L2XHc1aavIB
+ i2CSEcTZY6jXusoCw/b+/NIhhqKg4Ko9S78EfO6Vp/F9fJW4
+X-Developer-Key: i=broonie@kernel.org; a=openpgp;
+ fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-Hi Kohei,
+The arm64 Guarded Control Stack (GCS) feature provides support for
+hardware protected stacks of return addresses, intended to provide
+hardening against return oriented programming (ROP) attacks and to make
+it easier to gather call stacks for applications such as profiling.
 
-Thanks for posting this - it looks good to me, but as Suzuki says it
-would be good to get some maintainer feedback. One bug I spotted below.
+When GCS is active a secondary stack called the Guarded Control Stack is
+maintained, protected with a memory attribute which means that it can
+only be written with specific GCS operations.  The current GCS pointer
+can not be directly written to by userspace.  When a BL is executed the
+value stored in LR is also pushed onto the GCS, and when a RET is
+executed the top of the GCS is popped and compared to LR with a fault
+being raised if the values do not match.  GCS operations may only be
+performed on GCS pages, a data abort is generated if they are not.
 
-On 24/07/2026 10:40, Kohei Enju wrote:
-> Introduce the KVM_ARM_RMI_CONFIG ioctl to allow userspace to configure
-> Realm VM parameters before the Realm is created.
-> 
-> Currently, ARM_RMI_CFG_MEC_POLICY is the only supported configuration
-> item. Its value can be ARM_RMI_MEC_POLICY_SHARED or
-> ARM_RMI_MEC_POLICY_PRIVATE. Reject the private policy if the platform
-> does not support private MECs.
-> 
-> If userspace does not explicitly configure the MEC policy,
-> ARM_RMI_MEC_POLICY_SHARED is used by default.
-> 
-> Signed-off-by: Kohei Enju <enju.kohei@fujitsu.com>
-> ---
->  Documentation/virt/kvm/api.rst   | 29 +++++++++++++++++++++++++++++
->  arch/arm64/include/asm/kvm_rmi.h |  4 ++++
->  arch/arm64/kvm/arm.c             |  9 +++++++++
->  arch/arm64/kvm/rmi.c             | 29 +++++++++++++++++++++++++++++
->  drivers/firmware/arm_rmm/rmi.c   |  8 ++++++--
->  include/linux/arm-rmi-cmds.h     |  1 +
->  include/uapi/linux/kvm.h         | 17 +++++++++++++++++
->  7 files changed, 95 insertions(+), 2 deletions(-)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 85bec9b4f021..e1c660e5eb34 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -6690,6 +6690,35 @@ populated data is hashed and added to the guest's Realm Initial Measurement
->  (RIM) stored by the RMM. This can then be retrieved by the guest (using the RSI
->  interface) to present to an attestation server.
->  
-> +4.147 KVM_ARM_RMI_CONFIG
-> +------------------------
-> +
-> +:Capability: KVM_CAP_ARM_RMI
-> +:Architectures: arm64
-> +:Type: vm ioctl
-> +:Parameters: struct kvm_arm_rmi_config (in)
-> +:Returns: 0 on success, < 0 on error
-> +
-> +::
-> +
-> +  struct kvm_arm_rmi_config {
-> +       __u32 cfg;
-> +       union {
-> +               /* cfg == ARM_RMI_CFG_MEC_POLICY */
-> +               __u8 mec_policy;
-> +
-> +               /* Fix the size of the union */
-> +               __u8 reserved[256];
-> +       };
-> +  };
-> +
-> +Configures parameters of a Realm VM before the Realm is created.
-> +
-> +Currently, `ARM_RMI_CFG_MEC_POLICY` is the only supported configuration item.
-> +`mec_policy` must be either `ARM_RMI_MEC_POLICY_SHARED` or
-> +`ARM_RMI_MEC_POLICY_PRIVATE`. `ARM_RMI_MEC_POLICY_PRIVATE` is not supported if
-> +no private MEC is available on the platform.
-> +
->  .. _kvm_run:
->  
->  5. The kvm_run structure
-> diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
-> index 420e99fca07e..721033b132e1 100644
-> --- a/arch/arm64/include/asm/kvm_rmi.h
-> +++ b/arch/arm64/include/asm/kvm_rmi.h
-> @@ -60,6 +60,7 @@ enum realm_state {
->   * @ia_bits: Number of valid Input Address bits in the IPA
->   * @stage2_unmapped: The Realm stage-2 mappings have been removed
->   * @rtts_destroyed: The non-root RTTs have been torn down
-> + * @mec_policy: MEC policy for the Realm VM
->   */
->  struct realm {
->  	void *rd;
-> @@ -76,6 +77,7 @@ struct realm {
->  	unsigned int ia_bits;
->  	bool stage2_unmapped;
->  	bool rtts_destroyed;
-> +	unsigned int mec_policy;
->  };
->  
->  /**
-> @@ -115,6 +117,8 @@ struct kvm_arm_rmi_populate;
->  
->  int kvm_arm_rmi_populate(struct kvm *kvm,
->  			 struct kvm_arm_rmi_populate *arg);
-> +struct kvm_arm_rmi_config;
-> +int kvm_arm_rmi_config(struct kvm *kvm, struct kvm_arm_rmi_config *arg);
->  void kvm_realm_unmap_range(struct kvm *kvm,
->  			   unsigned long ipa,
->  			   unsigned long size,
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 3862db30779f..17302ba2844c 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -2169,6 +2169,15 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
->  			return -EFAULT;
->  		return ret;
->  	}
-> +	case KVM_ARM_RMI_CONFIG: {
-> +		struct kvm_arm_rmi_config cfg;
-> +
-> +		if (!kvm_is_realm(kvm))
-> +			return -ENXIO;
-> +		if (copy_from_user(&cfg, argp, sizeof(cfg)))
-> +			return -EFAULT;
-> +		return kvm_arm_rmi_config(kvm, &cfg);
-> +	}
->  	default:
->  		return -EINVAL;
->  	}
-> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
-> index 06cc85fb5092..629dea5e8c47 100644
-> --- a/arch/arm64/kvm/rmi.c
-> +++ b/arch/arm64/kvm/rmi.c
-> @@ -572,6 +572,9 @@ static int realm_create_rd(struct kvm *kvm)
->  	if (kvm_lpa2_is_enabled())
->  		params->flags0 |= RMI_REALM_PARAM_FLAG_LPA2;
->  
-> +	params->flags0 |= FIELD_PREP(RMI_REALM_PARAM_FLAG_MEC_POLICY,
-> +				     realm->mec_policy);
-> +
+The combination of hardware enforcement and lack of extra instructions
+in the function entry and exit paths should result in something which
+has less overhead and is more difficult to attack than a purely software
+implementation like clang's shadow stacks.
 
-Not your bug, but I realised this could cause problems. If the attempt
-to create fails (perhaps due to the second patch and the cgroup charge
-failing) and the VMM then reconfigures the MEC_POLICY then flags0
-doesn't get reset. Technically that applies to a couple of other flags,
-but here (with the following patch) this becomes a way of bypassing the
-cgroups policy.
+This series implements support for managing GCS for KVM guests.
 
-I'll fix this by allocating realm->params directly in realm_create_rd()
-so that it always starts off zeroed (and removing the redundant member
-of the struct). I think in a previous version of the series the params
-was built piecemeal, but that's not true anymore.
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
+Changes in v17:
+- Rebase onto v7.2-rc4.
+- Fix mapping of HFGITR_EL2.nGCSEPP.
+- Implement a test for NV emulation around EXLOCK.
+- Fix NV exception emulation issues.
+- Add GCS[PC]R_EL1 to locate_direct_register().
+- Add barriers.
+- Add ID_AA64PFR1_EL1.GCS to set_id_regs.
+- Comment updates.
+- Link to v16: https://lore.kernel.org/r/20250912-arm64-gcs-v16-0-6435e5ec37db@kernel.org
 
-The upshot is you don't need to do anything - it's my bug and I'll fix
-it in the next version ;)
+Changes in v16:
+- Rebase onto v6.17-rc3.
+- Also expose the feature to nested guests.
+- Implement emulation of EXLOCK when returning from nested guests.
+- Rename enter_exception_gcs() to compute_exlock().
+- Move all ID_AA64PFR1_EL1 handling to the final kernel patch.
+- Drop unneeded forwarding of GCS exceptions.
+- Commit and cover message updates.
+- Link to v15: https://lore.kernel.org/r/20250820-arm64-gcs-v15-0-5e334da18b84@kernel.org
 
-Thanks,
-Steve
+Changes in v15:
+- Rebase onto v6.17-rc1.
+- Link to v14: https://lore.kernel.org/r/20241005-arm64-gcs-v14-0-59060cd6092b@kernel.org
 
->  	r = realm_init_sve_param(kvm, params);
->  	if (r)
->  		goto out_undelegate_tables;
-> @@ -1155,6 +1158,30 @@ int kvm_arm_rmi_populate(struct kvm *kvm,
->  	return ret;
->  }
->  
-> +int kvm_arm_rmi_config(struct kvm *kvm, struct kvm_arm_rmi_config *cfg)
-> +{
-> +	guard(mutex)(&kvm->arch.config_lock);
-> +
-> +	if (kvm_realm_state(kvm) != REALM_STATE_NONE)
-> +		return -EBUSY;
-> +
-> +	switch (cfg->cfg) {
-> +	case ARM_RMI_CFG_MEC_POLICY:
-> +		if (cfg->mec_policy != ARM_RMI_MEC_POLICY_SHARED &&
-> +		    cfg->mec_policy != ARM_RMI_MEC_POLICY_PRIVATE)
-> +			return -EINVAL;
-> +
-> +		if (cfg->mec_policy == ARM_RMI_MEC_POLICY_PRIVATE &&
-> +		    rmi_mec_count() == 0)
-> +			return -EOPNOTSUPP;
-> +
-> +		kvm->arch.realm.mec_policy = cfg->mec_policy;
-> +		return 0;
-> +	default:
-> +		return -EINVAL;
-> +	}
-> +}
-> +
->  static void kvm_complete_ripas_change(struct kvm_vcpu *vcpu)
->  {
->  	struct kvm *kvm = vcpu->kvm;
-> @@ -1474,6 +1501,8 @@ int kvm_init_realm(struct kvm *kvm)
->  {
->  	struct realm *realm = &kvm->arch.realm;
->  
-> +	realm->mec_policy = ARM_RMI_MEC_POLICY_SHARED;
-> +
->  	realm->params = (void *)get_zeroed_page(GFP_KERNEL_ACCOUNT);
->  	realm->sro = kmalloc_obj(*realm->sro);
->  	if (!realm->params || !realm->sro) {
-> diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/arm_rmm/rmi.c
-> index d0c083bdf251..e9632c35e7db 100644
-> --- a/drivers/firmware/arm_rmm/rmi.c
-> +++ b/drivers/firmware/arm_rmm/rmi.c
-> @@ -14,8 +14,7 @@
->  
->  static bool arm64_rmi_is_available;
->  
-> -/* Currently only the first 2 registers are used by Linux */
-> -#define RMI_FEAT_REG_COUNT	2
-> +#define RMI_FEAT_REG_COUNT	5
->  static __ro_after_init unsigned long rmi_feat_reg_cache[RMI_FEAT_REG_COUNT];
->  
->  unsigned long rmi_feat_reg(unsigned long id)
-> @@ -27,6 +26,11 @@ unsigned long rmi_feat_reg(unsigned long id)
->  }
->  EXPORT_SYMBOL_GPL(rmi_feat_reg);
->  
-> +u64 rmi_mec_count(void)
-> +{
-> +	return u64_get_bits(rmi_feat_reg(4), RMI_FEATURE_REGISTER_4_MEC_COUNT);
-> +}
-> +
->  int rmi_delegate_range(phys_addr_t phys,
->  		       unsigned long size,
->  		       phys_addr_t *out_phys)
-> diff --git a/include/linux/arm-rmi-cmds.h b/include/linux/arm-rmi-cmds.h
-> index 138983ab4e3c..5236600421c6 100644
-> --- a/include/linux/arm-rmi-cmds.h
-> +++ b/include/linux/arm-rmi-cmds.h
-> @@ -28,6 +28,7 @@ struct rmi_sro_state {
->  };
->  
->  unsigned long rmi_feat_reg(unsigned long id);
-> +u64 rmi_mec_count(void);
->  
->  int rmi_delegate_range(phys_addr_t phys, unsigned long size,
->  		       phys_addr_t *out_phys);
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index adee3936d6ae..46e62327957c 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1704,4 +1704,21 @@ struct kvm_arm_rmi_populate {
->  	__u32 reserved;
->  };
->  
-> +#define KVM_ARM_RMI_CONFIG     _IOW(KVMIO, 0xd8, struct kvm_arm_rmi_config)
-> +
-> +#define ARM_RMI_CFG_MEC_POLICY		0
-> +#define ARM_RMI_MEC_POLICY_SHARED	0
-> +#define ARM_RMI_MEC_POLICY_PRIVATE	1
-> +
-> +struct kvm_arm_rmi_config {
-> +	__u32 cfg;
-> +	union {
-> +		/* cfg == ARM_RMI_CFG_MEC_POLICY */
-> +		__u8 mec_policy;
-> +
-> +		/* Reserve space for future configuration payloads. */
-> +		__u8 reserved[256];
-> +	};
-> +};
-> +
->  #endif /* __LINUX_KVM_H */
+Changes in v14:
+- Rebase onto arm64/for-next/gcs which includes all the non-KVM support.
+- Manage the fine grained traps for GCS instructions.
+- Manage PSTATE.EXLOCK when delivering exceptions to KVM guests.
+- Link to v13: https://lore.kernel.org/r/20241001-arm64-gcs-v13-0-222b78d87eee@kernel.org
+
+Changes in v13:
+- Rebase onto v6.12-rc1.
+- Allocate VM_HIGH_ARCH_6 since protection keys used all the existing
+  bits.
+- Implement mm_release() and free transparently allocated GCSs there.
+- Use bit 32 of AT_HWCAP for GCS due to AT_HWCAP2 being filled.
+- Since we now only set GCSCRE0_EL1 on change ensure that it is
+  initialised with GCSPR_EL0 accessible to EL0.
+- Fix OOM handling on thread copy.
+- Link to v12: https://lore.kernel.org/r/20240829-arm64-gcs-v12-0-42fec947436a@kernel.org
+
+Changes in v12:
+- Clarify and simplify the signal handling code so we work with the
+  register state.
+- When checking for write aborts to shadow stack pages ensure the fault
+  is a data abort.
+- Depend on !UPROBES.
+- Comment cleanups.
+- Link to v11: https://lore.kernel.org/r/20240822-arm64-gcs-v11-0-41b81947ecb5@kernel.org
+
+Changes in v11:
+- Remove the dependency on the addition of clone3() support for shadow
+  stacks, rebasing onto v6.11-rc3.
+- Make ID_AA64PFR1_EL1.GCS writeable in KVM.
+- Hide GCS registers when GCS is not enabled for KVM guests.
+- Require HCRX_EL2.GCSEn if booting at EL1.
+- Require that GCSCR_EL1 and GCSCRE0_EL1 be initialised regardless of
+  if we boot at EL2 or EL1.
+- Remove some stray use of bit 63 in signal cap tokens.
+- Warn if we see a GCS with VM_SHARED.
+- Remove rdundant check for VM_WRITE in fault handling.
+- Cleanups and clarifications in the ABI document.
+- Clean up and improve documentation of some sync placement.
+- Only set the EL0 GCS mode if it's actually changed.
+- Various minor fixes and tweaks.
+- Link to v10: https://lore.kernel.org/r/20240801-arm64-gcs-v10-0-699e2bd2190b@kernel.org
+
+Changes in v10:
+- Fix issues with THP.
+- Tighten up requirements for initialising GCSCR*.
+- Only generate GCS signal frames for threads using GCS.
+- Only context switch EL1 GCS registers if S1PIE is enabled.
+- Move context switch of GCSCRE0_EL1 to EL0 context switch.
+- Make GCS registers unconditionally visible to userspace.
+- Use FHU infrastructure.
+- Don't change writability of ID_AA64PFR1_EL1 for KVM.
+- Remove unused arguments from alloc_gcs().
+- Typo fixes.
+- Link to v9: https://lore.kernel.org/r/20240625-arm64-gcs-v9-0-0f634469b8f0@kernel.org
+
+Changes in v9:
+- Rebase onto v6.10-rc3.
+- Restructure and clarify memory management fault handling.
+- Fix up basic-gcs for the latest clone3() changes.
+- Convert to newly merged KVM ID register based feature configuration.
+- Fixes for NV traps.
+- Link to v8: https://lore.kernel.org/r/20240203-arm64-gcs-v8-0-c9fec77673ef@kernel.org
+
+Changes in v8:
+- Invalidate signal cap token on stack when consuming.
+- Typo and other trivial fixes.
+- Don't try to use process_vm_write() on GCS, it intentionally does not
+  work.
+- Fix leak of thread GCSs.
+- Rebase onto latest clone3() series.
+- Link to v7: https://lore.kernel.org/r/20231122-arm64-gcs-v7-0-201c483bd775@kernel.org
+
+Changes in v7:
+- Rebase onto v6.7-rc2 via the clone3() patch series.
+- Change the token used to cap the stack during signal handling to be
+  compatible with GCSPOPM.
+- Fix flags for new page types.
+- Fold in support for clone3().
+- Replace copy_to_user_gcs() with put_user_gcs().
+- Link to v6: https://lore.kernel.org/r/20231009-arm64-gcs-v6-0-78e55deaa4dd@kernel.org
+
+Changes in v6:
+- Rebase onto v6.6-rc3.
+- Add some more gcsb_dsync() barriers following spec clarifications.
+- Due to ongoing discussion around clone()/clone3() I've not updated
+  anything there, the behaviour is the same as on previous versions.
+- Link to v5: https://lore.kernel.org/r/20230822-arm64-gcs-v5-0-9ef181dd6324@kernel.org
+
+Changes in v5:
+- Don't map any permissions for user GCSs, we always use EL0 accessors
+  or use a separate mapping of the page.
+- Reduce the standard size of the GCS to RLIMIT_STACK/2.
+- Enforce a PAGE_SIZE alignment requirement on map_shadow_stack().
+- Clarifications and fixes to documentation.
+- More tests.
+- Link to v4: https://lore.kernel.org/r/20230807-arm64-gcs-v4-0-68cfa37f9069@kernel.org
+
+Changes in v4:
+- Implement flags for map_shadow_stack() allowing the cap and end of
+  stack marker to be enabled independently or not at all.
+- Relax size and alignment requirements for map_shadow_stack().
+- Add more blurb explaining the advantages of hardware enforcement.
+- Link to v3: https://lore.kernel.org/r/20230731-arm64-gcs-v3-0-cddf9f980d98@kernel.org
+
+Changes in v3:
+- Rebase onto v6.5-rc4.
+- Add a GCS barrier on context switch.
+- Add a GCS stress test.
+- Link to v2: https://lore.kernel.org/r/20230724-arm64-gcs-v2-0-dc2c1d44c2eb@kernel.org
+
+Changes in v2:
+- Rebase onto v6.5-rc3.
+- Rework prctl() interface to allow each bit to be locked independently.
+- map_shadow_stack() now places the cap token based on the size
+  requested by the caller not the actual space allocated.
+- Mode changes other than enable via ptrace are now supported.
+- Expand test coverage.
+- Various smaller fixes and adjustments.
+- Link to v1: https://lore.kernel.org/r/20230716-arm64-gcs-v1-0-bf567f93bba6@kernel.org
+
+---
+Mark Brown (14):
+      arm64/gcs: Ensure FGTs for EL1 GCS instructions are disabled
+      KVM: arm64: Fix FGT mapping for HFGITR_EL2.nGCSEPP
+      KVM: arm64: Manage GCS access and registers for guests
+      KVM: arm64: Ensure GCS memory effects are visible
+      KVM: arm64: Set PSTATE.EXLOCK when entering an exception
+      KVM: arm64: Validate GCS exception lock when emulating ERET
+      KVM: arm64: Forward GCS exceptions to nested guests
+      KVM: arm64: Enforce EXLOCK for SPSR and ELR
+      KVM: arm64: Allow GCS to be enabled for guests
+      KVM: selftests: arm64: Add GCS registers to get-reg-list
+      KVM: selftests: arm64: Add GCS to set_id_regs
+      KVM: selftests: arm64: Only restore SPSR_EL1 and ELR_EL1 if they change
+      tools: Synchronise the kernel esr.h
+      KVM: selftests: arm64: Add GCS EXLOCK exception emulation test
+
+ arch/arm64/include/asm/el2_setup.h                 |   5 +
+ arch/arm64/include/asm/kvm_emulate.h               |  11 +
+ arch/arm64/include/asm/kvm_host.h                  |  14 +
+ arch/arm64/include/asm/kvm_nested.h                |  39 +++
+ arch/arm64/include/asm/vncr_mapping.h              |   2 +
+ arch/arm64/include/uapi/asm/ptrace.h               |   1 +
+ arch/arm64/kvm/emulate-nested.c                    |   7 +-
+ arch/arm64/kvm/handle_exit.c                       |  18 +-
+ arch/arm64/kvm/hyp/exception.c                     |  37 +++
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h         |  31 ++
+ arch/arm64/kvm/hyp/nvhe/switch.c                   |  13 +
+ arch/arm64/kvm/hyp/vhe/switch.c                    |   4 +
+ arch/arm64/kvm/hyp/vhe/sysreg-sr.c                 |  24 ++
+ arch/arm64/kvm/nested.c                            |   3 +-
+ arch/arm64/kvm/sys_regs.c                          |  83 ++++-
+ tools/arch/arm64/include/asm/esr.h                 | 113 ++++++-
+ tools/testing/selftests/kvm/Makefile.kvm           |   1 +
+ tools/testing/selftests/kvm/arm64/gcs_exceptions.c | 346 +++++++++++++++++++++
+ tools/testing/selftests/kvm/arm64/get-reg-list.c   |  12 +
+ tools/testing/selftests/kvm/arm64/set_id_regs.c    |   1 +
+ tools/testing/selftests/kvm/lib/arm64/handlers.S   |  10 +
+ 21 files changed, 751 insertions(+), 24 deletions(-)
+---
+base-commit: 1590cf0329716306e948a8fc29f1d3ee87d3989f
+change-id: 20230303-arm64-gcs-e311ab0d8729
+
+Best regards,
+--  
+Mark Brown <broonie@kernel.org>
 
