@@ -1,239 +1,122 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4086D42C50C
-	for <kvmarm@lists.linux.dev>; Fri, 31 Jul 2026 14:51:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BDC93E317B
+	for <kvmarm@lists.linux.dev>; Fri, 31 Jul 2026 14:51:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785509465; cv=none; b=aGveh7g+WCZsRYHq4BymfyNVrdjsKP7bWBFp72lmRHbvqciumDCABodumBOMfqd9F4i1w28/Ey1J5oq7u0Fvsup+NqRf1P1at1O+JmmuKQEOc/2J4z46/o4jYynVzpaujp7oRZ+/L3UIgfmAmwmbDrgthTbkg8tfU2vnMg0rEbA=
+	t=1785509471; cv=none; b=LHr5E3PNLIw23EiebWWVRweqo9RHdLw3uWWWgorb0X4n/H1VGsCLyIkCVeAEkBZvOpXdxLbbdcM97fiLCFnfgtvjbLeVXjfZFR+Byp71YvbtKW7Difu6gjibKSHL75KYMeS84n+EaJpgJwU5FwpiN+fPQZwtFXhLLLAbKnX9+fQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785509465; c=relaxed/simple;
-	bh=Zu0ekwT05lUBF79pmY7OZ4tjlK3oi3BVRF1lRM0GcBw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EIKcrQN+XuoSGUyx4/vOqBAF9GHno9ac/3OgEFNB8AGEqNXKxKJ0phdEyW/Zji2Y9/f6kWai31WJfVT629k85UzsEQah01BpHwBjRymXDqnJzbzQhDYuTZrHtTa0H/P+n3oCGQNtIHvrQVkH2P6hTrs9rhVzCc47qJTtvw5rRJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=O0y4XFBT; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1785509471; c=relaxed/simple;
+	bh=C5thwXXlxg02JSTc4/DulIUGtQ3qt1KQRtqxk1GuPVA=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=hG7iteH6SLnQ+ZezluAMiBQzvbcgQCosHUff5feb+6FB/2DIbQkPx8PqB0vmCElicGdRAzlh+eKQUUZlemBAh5s9T+1k6ETUnV7ijuauLPXcSDIlvL8lAMsKpySJuiekdrNIHrNvPRTQEc/xCUm7tTCIo2QkLze2H+rKnCMqqpE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y4VVceIg; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="O0y4XFBT"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66VBmU7k1732345;
-	Fri, 31 Jul 2026 14:50:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=msTjt9ovCp55/jv8JM3tfyLpDda2Mq
-	yxxIJoFmTCS0c=; b=O0y4XFBTSOTWjmfF2QuOike5JQuCsE9Uk3K7+73bmVXfMe
-	idzBI4VETcYBr/GfUYTT6L6sHwTfth7W8agVwU+JMlgOvZSl31WDeeze2GcYVjXC
-	ha/27e3HxJaRt6FSxDld+vn1cCnKltvcj29zkTv9+WzTNenHrTbO/JwlOP+C58hB
-	q7wMyDHqn/5MJcaI9iarxSej8gskVhlrbj65xThDB55PYlieWHxESbNw2oYi0Mox
-	oSycIrWq0jy3/YN6cuiJWupKUSjSBsnDPiSu9Q7tjJYUUBg1yupCttoRZmdMuodI
-	5TKY/cq1yloLlZRdZGa8v2KLUDsIoyncUf4d2d2w==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fmuw7wkc3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 31 Jul 2026 14:50:50 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 66VEfHHl024198;
-	Fri, 31 Jul 2026 14:50:49 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4fn9pgr57y-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 31 Jul 2026 14:50:48 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 66VEog3i17826200
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 31 Jul 2026 14:50:42 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E2BAB20043;
-	Fri, 31 Jul 2026 14:50:41 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E4A5D2004B;
-	Fri, 31 Jul 2026 14:50:40 +0000 (GMT)
-Received: from osiris (unknown [9.111.39.121])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Fri, 31 Jul 2026 14:50:40 +0000 (GMT)
-Date: Fri, 31 Jul 2026 16:50:39 +0200
-From: Steffen Eiden <seiden@linux.ibm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, Alexander Gordeev <agordeev@linux.ibm.com>,
-        Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@kernel.org>,
-        Friedrich Welter <fritz@linux.ibm.com>, Fuad Tabba <tabba@google.com>,
-        Gautam Gala <ggala@linux.ibm.com>,
-        Hariharan Mari <hari55@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Hendrik Brueckner <brueckner@linux.ibm.com>,
-        Ilya Leoshkevich <iii@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
-        Nico Boehr <nrb@linux.ibm.com>,
-        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
-        Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v5 06/31] arm64/sysreg: Convert SPSR_ELx to automatic
- register generation
-Message-ID: <20260731145039.1016137-A-seiden@linux.ibm.com>
-References: <20260731130902.654679-1-seiden@linux.ibm.com>
- <20260731130902.654679-7-seiden@linux.ibm.com>
- <86bjbnckge.wl-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y4VVceIg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B2D71F000E9;
+	Fri, 31 Jul 2026 14:51:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785509469;
+	bh=VtsFakcy7DTYWYlvA8L1Rkr6gG3dA7UVyHy/xUZF5i0=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=Y4VVceIgYbTedq2Ed4eX1THoFCb5uU9uX4zFbu6h+sUqcX87SBdkc+ihMZC0VHid+
+	 5LRpiTmbq9FizhLRUD8gfF3NzAD/Hk2itSZFHytUDhlzmfdbxgksYcygeELaGG6ppY
+	 mxS5tajwNBUUleUDWWSrpZ4yAZp6qI8sy7gni18daoObFdvYt/TK6w5LccAMM9zq4L
+	 9ad9UbrbHmFsVXRyDj4H2NeVcK04I92mr2qiJp9J8u3p0DNEqjgxiO91SOX+CKH3d9
+	 RY+qxa3FUIC7+67R0rrsSscS9083bBacCOpug6XPChJWtEf/b7Wr2B/CCJckd58vR2
+	 suD06e2TcL4wA==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v4 05/17] KVM: arm64: Allow kvm_hyp_memcache usage
+ outside of stage-2
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Vincent Donnefort" <vdonnefort@google.com>
+Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20260731143541.956291-6-vdonnefort@google.com>
+References: <20260731143541.956291-1-vdonnefort@google.com>
+ <20260731143541.956291-6-vdonnefort@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 31 Jul 2026 14:51:08 +0000
+Message-Id: <20260731145109.4B2D71F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86bjbnckge.wl-maz@kernel.org>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-GUID: vfPmpKOMLhAfiWmTk8SICmYmFgUzRJeL
-X-Proofpoint-ORIG-GUID: 7dSkOPs6jV62dQ5msdvicZhLLQ6hkmSC
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzMxMDExMyBTYWx0ZWRfX/zzVQqF7gPiR
- 2WETnBc7I2gDjPTDVBD8zUbin5HavD3mjFLxs0+F/VZaZAnEhb92if+tXXfD2XY8jU87s/Fgl9j
- Y0fSvvsrgxg3vPlEb1Tr00UOFKzBgP4bqLEu5lXOrU4k2V17fC3vsQuaR17Shj/a18nEStMQx9o
- q6kGldh7Wdkjh1mzj28F2mxjtF5KDHqElF1e+jGE6XZJTA+UyiwKJsem9A9jZGyRLAuUhxphpEo
- l55mm3oF41YWJuL1tPSUkutbQhRiAiVdcWp+z0eYR5Cwe8ZGf7D+Cmat8jTNQgaf8s0db7Fm2yN
- dEJJkemCouWZ3rwsMQG/WhknteyewD2AYuXHlCacLcS9sXY23NZb0KlZNu2BrDVPqeC8QMNv2XK
- o6PhTQJTWQvAp2jn8Gc25jAFXTNwQ0lppTMHxOlww8dfh3Sz7GBjBpuZ1xbIHmVe4m+nEOh9TvF
- OFogZb+lRfOkUdgNzyg==
-X-Authority-Analysis: v=2.4 cv=SKFykuvH c=1 sm=1 tr=0 ts=6a6cb64a cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=kj9zAlcOel0A:10 a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=VnNF1IyMAAAA:8
- a=20fFOLQ9k4DZ6xVQLREA:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzMxMDExMyBTYWx0ZWRfXyIt6Pe3/YoLx
- OyclkoRVaTDoTkevi9+MoD2L5phRQYcisNLA8tDkqPtI0kO01F8/3MQ8EXyUDvBSCduhScdnuFF
- cmQQuITycm1WzIIghIVadacARNktt0M=
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-07-31_04,2026-07-30_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 malwarescore=0 clxscore=1015 adultscore=0
- lowpriorityscore=0 bulkscore=0 impostorscore=0 phishscore=0 spamscore=0
- suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
- definitions=main-2607310113
 
-On Fri, Jul 31, 2026 at 03:17:21PM +0100, Marc Zyngier wrote:
-> On Fri, 31 Jul 2026 14:08:34 +0100,
-> Steffen Eiden <seiden@linux.ibm.com> wrote:
-> > 
-> > Convert SPSR_EL{1, 2, 12} to automatic register generation as per
-> > DDIO616 2026-06. No functional change.
-> >
-> > Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
-> > ---
-> >  arch/arm64/include/asm/sysreg.h |  3 --
-> >  arch/arm64/tools/sysreg         | 72 +++++++++++++++++++++++++++++++++
-> >  2 files changed, 72 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> > index 4bfdac9401bd..1aa601c95188 100644
-> > --- a/arch/arm64/include/asm/sysreg.h
-> > +++ b/arch/arm64/include/asm/sysreg.h
-> > @@ -295,7 +295,6 @@
-> >  #define SYS_APGAKEYLO_EL1		sys_reg(3, 0, 2, 3, 0)
-> >  #define SYS_APGAKEYHI_EL1		sys_reg(3, 0, 2, 3, 1)
-> >  
-> > -#define SYS_SPSR_EL1			sys_reg(3, 0, 4, 0, 0)
-> >  #define SYS_ELR_EL1			sys_reg(3, 0, 4, 0, 1)
-> >  
-> >  #define SYS_ICC_PMR_EL1			sys_reg(3, 0, 4, 6, 0)
-> > @@ -518,7 +517,6 @@
-> >  #define SYS_VTTBR_EL2			sys_reg(3, 4, 2, 1, 0)
-> >  
-> >  #define SYS_HAFGRTR_EL2			sys_reg(3, 4, 3, 1, 6)
-> > -#define SYS_SPSR_EL2			sys_reg(3, 4, 4, 0, 0)
-> >  #define SYS_ELR_EL2			sys_reg(3, 4, 4, 0, 1)
-> >  #define SYS_SP_EL1			sys_reg(3, 4, 4, 1, 0)
-> >  #define SYS_SPSR_irq			sys_reg(3, 4, 4, 3, 0)
-> > @@ -604,7 +602,6 @@
-> >  #define SYS_BRBCR_EL12			sys_reg(2, 5, 9, 0, 0)
-> >  #define SYS_TTBR0_EL12			sys_reg(3, 5, 2, 0, 0)
-> >  #define SYS_TTBR1_EL12			sys_reg(3, 5, 2, 0, 1)
-> > -#define SYS_SPSR_EL12			sys_reg(3, 5, 4, 0, 0)
-> >  #define SYS_ELR_EL12			sys_reg(3, 5, 4, 0, 1)
-> >  #define SYS_AFSR0_EL12			sys_reg(3, 5, 5, 1, 0)
-> >  #define SYS_AFSR1_EL12			sys_reg(3, 5, 5, 1, 1)
-> > diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> > index 7cb61aca3797..2a4b94e8c62f 100644
-> > --- a/arch/arm64/tools/sysreg
-> > +++ b/arch/arm64/tools/sysreg
-> > @@ -401,6 +401,78 @@ Res0	3:1
-> >  Field	0	SO
-> >  EndSysreg
-> >  
-> > +Sysreg	SPSR_EL1	3	0	4	0	0
-> > +Res0	63:37
-> > +Field	36	UNIJ
-> > +Res0	35:34
-> > +Field	33	PPEND
-> > +Res0	32
-> > +Field	31	N
-> > +Field	30	Z
-> > +Field	29	C
-> > +Field	28	V
-> > +Field	27	Q
-> > +Field	26:25	IT01
-> > +Field	24	DIT
-> > +Field	23	SSBS
-> > +Field	22	PAN
-> > +Field	21	SS
-> > +Field	20	IL
-> > +Field	19:16	GE
-> > +Field	15:10	IT27
-> 
-> I'm sorry, but this is complete nonsense. It looks like you have
-> lifted the AArch32 version of the definition, and not the AArch64 view
-> (which really is what matters here).
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
 
-dang. Yes, I successfully confused myself here. You are absoultely right
-I accidentlially picked the AArch32 variant. I will fix this with the
-next round.
+Pre-existing issues:
+- [High] In pKVM, `user_mem_abort()` skips memcache topup during permission=
+ faults, leading to a NULL pointer dereference in `pkvm_pgtable_stage2_map(=
+)` if the fault triggers a THP block mapping upgrade.
+--
 
-> 
-> > +Field	9	E
-> > +Field	8	A
-> > +Field	7	I
-> > +Field	6	F
-> > +Field	5	T
-> > +Field	4	M4
-> > +Enum	3:0	M
-> 
-> I don't think you should split the M field as such. The AArch32
-> encoding uses bit 4, and should be described.
+--- Patch [5]: [PATCH v4 05/17] KVM: arm64: Allow kvm_hyp_memcache usage ou=
+tside of stage-2 ---
+commit 005835cc03d158de34bf975706ada05a2388636e
+Author: Vincent Donnefort <vdonnefort@google.com>
 
-Ok. I copied the defenitions directly from the arm architecure and it
-differntiated between the frist 3 bits of M and the 4th. (for 32 and 64
-bit). I will merge it.
+KVM: arm64: Allow kvm_hyp_memcache usage outside of stage-2
 
-> 
-> > +	0b0000	EL0
-> > +	0b0100	EL1t
-> > +	0b0101	EL1h
-> > +	0b1000	EL1tnv
-> > +	0b1001	EL1hnv
-> 
-> Please do *not* invent names. These are EL2t/EL2h, and cannot be
-> anything else.
+This commit introduces init_hyp_memcache() and init_hyp_stage2_memcache()
+to initialize generic and stage-2 specific memcaches. It modifies the
+allocator to use GFP_KERNEL_ACCOUNT conditionally based on the new KMEMCG
+flag.
 
-will change.
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 6c941aaa10c63..1e37f2f56c680 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+[ ... ]
+> @@ -1160,8 +1160,10 @@ static void *hyp_mc_alloc_fn(void *mc)
+>  {
+>  	struct kvm_hyp_memcache *memcache =3D mc;
+>  	void *addr;
+> +	gfp_t gfp;
+> =20
+> -	addr =3D (void *)__get_free_page(GFP_KERNEL_ACCOUNT);
+> +	gfp =3D memcache->flags & HYP_MEMCACHE_ACCOUNT_KMEMCG ? GFP_KERNEL_ACCO=
+UNT : GFP_KERNEL;
+> +	addr =3D (void *)__get_free_page(gfp);
 
+[Severity: High]
+This is a pre-existing issue, but while reviewing these memcache changes,
+I noticed a potential NULL pointer dereference related to the memcache topup
+logic across user_mem_abort() and pkvm_pgtable_stage2_map().
 
-thanks. 
+In arch/arm64/kvm/mmu.c:user_mem_abort(), topup_mmu_memcache() is skipped
+during a permission fault:
 
-	Steffen
-> 
-> 	M.
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
+	memcache =3D get_mmu_memcache(s2fd->vcpu);
+	if (!perm_fault || (memslot_is_logging(s2fd->memslot) &&
+			    kvm_is_write_fault(s2fd->vcpu))) {
+		ret =3D topup_mmu_memcache(s2fd->vcpu, memcache);
+		if (ret)
+			return ret;
+	}
+
+If transparent_hugepage_adjust() then detects a THP and upgrades the mapping
+to PMD_SIZE, pkvm_pgtable_stage2_map() will be called to install the block
+mapping.
+
+Since the memcache wasn't topped up, cache->mapping is NULL, and this code
+subsequently dereferences it in arch/arm64/kvm/pkvm.c:pkvm_pgtable_stage2_m=
+ap():
+
+	swap(mapping, cache->mapping);
+	mapping->gfn =3D gfn;
+
+Could a guest trigger this by forcing a permission fault on a page that
+khugepaged has collapsed into a THP, leading to a host kernel panic?
+
+>  	if (addr && memcache->flags & HYP_MEMCACHE_ACCOUNT_STAGE2)
+>  		kvm_account_pgtable_pages(addr, 1);
+>
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260731143541.9562=
+91-1-vdonnefort@google.com?part=3D5
