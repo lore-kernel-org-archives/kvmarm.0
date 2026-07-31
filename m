@@ -1,164 +1,214 @@
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa6.hc1455-7.c3s2.iphmx.com (esa6.hc1455-7.c3s2.iphmx.com [68.232.139.139])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF9483D9035
-	for <kvmarm@lists.linux.dev>; Thu, 30 Jul 2026 22:46:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.216.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785451586; cv=pass; b=Tun1ZTlnJ9nU46Rj7Vx6Xo7oeERLff23Tdb/l3HdalHkQiEOCRtX9BjXsWSDY385KpK+xUgwvXkZleN+bN9Rd9OkrEWJFjlL2yCC3T016y5mu5GGBJz24l4vMhky/fD+F0wQLod2hkVonvew860UDuZYa7wu9SkDYqGbzLfjMLY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785451586; c=relaxed/simple;
-	bh=W7DZ+f0MeQTnq04NgpGqANM3Cz0BYewhjBpaHxc9ELk=;
-	h=From:In-Reply-To:References:MIME-Version:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bC3VO3T5Hv/1ZjlQ4a+tVlRfrbPMyiReeAS5K3wIH5+agqHLSxWmb7HNT+gkdB4KDehayQumMkRLVf2ZsE1TBVQm47XTFgVG3qySHDYXpIgB0E7Iy63s3pMejdBBHuENXGY7UmQPYD9sE0f2GrlzmTg2TcaOn5AFWS68FJBogU4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qNJ6X5wZ; arc=pass smtp.client-ip=209.85.216.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67CD82BE65B;
+	Fri, 31 Jul 2026 00:57:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.139.139
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1785459448; cv=none; b=RymxlsFI2WW3m+mzOhoD2pvxG5qoHcAAmW8nLGueojsPsBM7+UaNh4MG4/4rOb9rsbBS+l/JxA9lNaO/s0XxKitWn+++bsIrXu7dMppU8IdbmzttAc6jnSDhqjniQupOAzBjs5bRdr+Yb0tsvfS0wo1KFYj8JpwRDExkYqpOaXg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1785459448; c=relaxed/simple;
+	bh=CldFfWlOgnf4zC1U/6YI+wfPKxwfum0uI/0Ov2QKXAc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jx33zKOMDqLe7ABfawYKFX/WLxTUXw4TaF2BgpHlhlC0PN+fcrTH/PnhztVDFy/RxuM13e7c7MKG9Y/oFGVwNHnRzcEMbl7PxwTVtv0sbPAm+SpbHR4CMl8B3ulYy1h/Cv39tiMVH11gE6oTNN5DsC3+qd8+7nHTlsD6v0ZWqOI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=i2KnV56X; arc=none smtp.client-ip=68.232.139.139
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qNJ6X5wZ"
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-38dd55ad76cso194313a91.1
-        for <kvmarm@lists.linux.dev>; Thu, 30 Jul 2026 15:46:24 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1785451584; cv=none;
-        d=google.com; s=arc-20260327;
-        b=VBx/mAKkrnFUjkaPWEw6HCW5qTibpAfk5nOalTETxkpr6TDsehNeGDC3lUgf0hKlzM
-         XydUthkOJ54LdpEEEaCx+zHaSAf9zXJWSL/cgCgJL6NNGa6jw59DmcNbHmorsPfalUmT
-         dv+vkmJolEFFcxTJiZWJDv5I+WExsMW6Pqf95wEu8/LugF+SXBBgGfty+3mAYK4RT5SO
-         Tl8uGI5lm4qbEomCdNMyb6PKGDIr4/kTASk9ao1aoFliZdRqa1OoGsMfdKSL8iYNUOlL
-         c1SCWUnhBKrqjPE7ZI0dYpp9ojUsAuepq7QwgBccl3coB6BgqBXftB72zyNS9zWNUbth
-         OY7A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
-         :from:dkim-signature;
-        bh=W7DZ+f0MeQTnq04NgpGqANM3Cz0BYewhjBpaHxc9ELk=;
-        fh=pkm6R9eGK3PBP/Zo+nuLlR3lnMF2d6PI/Bmu68lyb+s=;
-        b=hVUJ3Osq6S10Mnb8ztwcAtkbrd2LuSdiye/zS3VRE+zJQCRqtnW2dBbEp3L0iYRNhP
-         hBb86qRp6m4X+3aw3v5u2VhoZjBi4KwTRaPRJcFPnw4S5xtvhkyi6WIHtHBw7qBzsCue
-         xxv5dTFzntVbqSjToqu3d1sbYn3DFDNHvTETdYtHZ7EQOyaQmy9RCCGfeATCC5S7DmZJ
-         M0EWahZPC9mInsTGNEW1KdZEwR4qVfm5MCK4MlBzVwGgxcu8kwXLQP09Clbc+ltlLjN2
-         fcehJoQNFcjlRicfLNtjRxsmXjslCnhKQOCmN+DAl9jxGQ1l6ST370K0jOSNK+7XtS8p
-         b63Q==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1785451584; x=1786056384; darn=lists.linux.dev;
-        h=content-type:cc:to:subject:message-id:date:mime-version:references
-         :in-reply-to:from:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=W7DZ+f0MeQTnq04NgpGqANM3Cz0BYewhjBpaHxc9ELk=;
-        b=qNJ6X5wZsuvNNK3fJrEoWwcbd+sbzxgm8l+vxvYy4tQm64iqEUoK9CnbFDCMj0+9jR
-         TPD1HPwtSYFlIRGTUeTR2cNxbch2ce/4EWjiFFaNLv0zX78pAXIqYgPr/9K1PGxKOEFq
-         301l/vgPrW0SlpQLN+K8pV2/3bmupfzI8CaUht6YHMEEkOthr/LtHqvezRYzoIqdsBUZ
-         AnfGdv8xPOFaiCNh0AY6R4UeXlQDdnikBw8AnuULAop3tHJUm5x+biob/t0FQRhaPt2+
-         4v5bM0k70B+C68XvQg8ZuouPDlPq+9gbekqDpmoMmFO6rMCjo49dG1/q1x+olqWmNhO8
-         vMzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785451584; x=1786056384;
-        h=content-type:cc:to:subject:message-id:date:mime-version:references
-         :in-reply-to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=W7DZ+f0MeQTnq04NgpGqANM3Cz0BYewhjBpaHxc9ELk=;
-        b=Sl4GQoITPq6fzrLCDYCusNzBZHTV8vpPGfyaLfJmXlbYLj3ix6T4L5ksxxri9lX0U6
-         YMAFTOepq09S7GhBKXPx2zz6pqcPRki/9alGjCoqaZ8Pj5g38OvCzzrprJCppmNVIjfL
-         GzDmvCHoHfRBzlpD0ZusnEu0aUVT4LBJ3wQfZgmF2hi2Cs2ccT4i7UrORToOJmEvED/D
-         YWiHMxG9h/rV6Ng4k8yuYSY/nfm2uFRyOcCXRMJehcokphfe5JA0EhTWeQdatcv37J2C
-         TERukVzYzDYivqR2hMSm1B/mcSYDF6OerICf2VyJANo+2hCvz8NctyFwMJvAa5uU+/3P
-         IUGw==
-X-Forwarded-Encrypted: i=1; AHgh+RqvqYoKpfKHz9D31VqLXMzPiEkjGI+BEOUNsAdgHE2be7Tuhs5LyBGYAaoff/ZC1V4LN8GpzLQ=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yw79UB0qjmLFwb85wgDJ3MYF4IsRBnV5246sRfAQQhp8ptFROrb
-	gsbAQEKP2+inGnoLjxEmuTgRLWzFUrfEorHTmkrrrkbV6NsLeAUCqnghhsbE07boRgsaoqUdQi+
-	NL2mHn2N78K9ef7OaiHweijFb9PdqCI4ttW20QllO
-X-Gm-Gg: AR+sD10K+FJmfTiRRo9KTahyUiV9m+DEyfPfZnudZTUJwpMNBhBnQNvXLbdMBREoXUR
-	YS/Bb5LgJLkxvr71QqUpW3tkVE0w/SLjAFueoPxEKIevnCpLss3+95WZFdOvZRqPNQuTu9MRwqK
-	tmRCdhYvHKPE8+CITBLplEdN/QXWJtdEglWHJbNs1m9b+sm50VQ+ldwjD9GXvUarD3cge9+bZHj
-	EBxz1AS8yXeyVGhsa00V9fFQodVp+R6lRVoUEdIF8j/+WKxhhuV9HM1NqKHHJzsT3NVRbCqzLI7
-	yd6PuXkDkvXKxqtzSMTeEH9wd/8Nn7Rihe5rh+sk/+ZXhn7rawqWb2mJKcSwKq/4676L21gjyv7
-	mqOMuP0VZqfXYyHwERpCVNBwM5GH1FmqWMjiFCTmhTMraSg==
-X-Received: by 2002:a17:90b:2f06:b0:36b:b903:994 with SMTP id
- 98e67ed59e1d1-38fa68500b7mr1838360a91.4.1785451583701; Thu, 30 Jul 2026
- 15:46:23 -0700 (PDT)
-Received: from 176938342045 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 30 Jul 2026 15:46:22 -0700
-Received: from 176938342045 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 30 Jul 2026 15:46:22 -0700
-From: Ackerley Tng <ackerleytng@google.com>
-In-Reply-To: <afEwWZksU0Fw61oT@plex>
-References: <afEwWZksU0Fw61oT@plex>
+	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="i2KnV56X"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
+  t=1785459446; x=1816995446;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=CldFfWlOgnf4zC1U/6YI+wfPKxwfum0uI/0Ov2QKXAc=;
+  b=i2KnV56XY1qJt9l6Y4iwi7fidmYNBobdKG3ureq6Q45cFfAWTWj5PEfF
+   O0VWS5bIXX8OVLnTiFv09QKGdJ/A6io1RRogKrsU1OX/W4laIS9chUymC
+   ccMVWRZqnlh/scRywUMa2eFFN+rVLWFrQdVqUXvOjUmVz9/q+Fpwpcxda
+   gzWRPsuClrqRK28lPnvqhNKa6RaPTZZqm2G5N4ZmoKh830li/YCvTnCpW
+   sCuoXuQrH73CIZPxZBUJYZzVKOxwWYszdxlz9qWmT4LMgvM+STSUr6AdB
+   Un6wjA82RayC2Fc/2eN3w2/RwA/ZRok2cOgTxovLAvc9sBeN6w/HVC7jv
+   Q==;
+X-CSE-ConnectionGUID: c8OJpFjwSD2XIQ9PBKnJrg==
+X-CSE-MsgGUID: T/oEe5hDRY+oEmejBYoxdA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11860"; a="252750413"
+X-IronPort-AV: E=Sophos;i="6.25,195,1779116400"; 
+   d="scan'208";a="252750413"
+Received: from gmgwuk01.global.fujitsu.com ([172.187.114.235])
+  by esa6.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2026 09:57:18 +0900
+Received: from az2uksmgm3.o.css.fujitsu.com (unknown [10.151.22.200])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by gmgwuk01.global.fujitsu.com (Postfix) with ESMTPS id D0B4C1C01698;
+	Fri, 31 Jul 2026 00:57:18 +0000 (UTC)
+Received: from az2nlsmom2.o.css.fujitsu.com (unknown [10.150.26.200])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by az2uksmgm3.o.css.fujitsu.com (Postfix) with ESMTPS id 882ADC2BABA;
+	Fri, 31 Jul 2026 00:57:18 +0000 (UTC)
+Received: from FCCLS0092175.localdomain (unknown [10.9.24.243])
+	by az2nlsmom2.o.css.fujitsu.com (Postfix) with SMTP id 21DD11800D71;
+	Fri, 31 Jul 2026 00:57:08 +0000 (UTC)
+Date: Fri, 31 Jul 2026 09:57:06 +0900
+From: Kohei Enju <enju.kohei@fujitsu.com>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, Catalin Marinas <catalin.marinas@arm.com>, 
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, 
+	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev, 
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, Gavin Shan <gshan@redhat.com>, 
+	Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun <alpergun@google.com>, 
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>, 
+	Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com, Lorenzo Pieralisi <lpieralisi@kernel.org>
+Subject: Re: [PATCH v15 14/37] KVM: arm64: CCA: Handle realm enter/exit
+Message-ID: <amvx9kxuc6FTkJC4@FCCLS0092175.localdomain>
+References: <20260715142841.80544-1-steven.price@arm.com>
+ <20260715142841.80544-15-steven.price@arm.com>
+ <amcOp7tpRCkI29vt@FCCLS0092175.localdomain>
+ <08599315-2dd3-4602-a902-09b197265b44@arm.com>
+ <763eb5db-e9af-4b3a-b05b-746700cf0304@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Date: Thu, 30 Jul 2026 15:46:22 -0700
-X-Gm-Features: AUfX_mztKVf-vmsid_VHO9yf9OChzZkQAo084zzlpI1FA8C_xfqYz8r7z-LEAo8
-Message-ID: <CAEvNRgE8YHXVZLTQQYZJrJvnrW+WUfpGUn2XpxpkDRj1Zwi4Cw@mail.gmail.com>
-Subject: Re: [RFC] proposal: KVM: Orphaned VMs: The Caretaker approach for
- Live Update
-To: Pasha Tatashin <pasha.tatashin@soleen.com>, linux-kernel@vger.kernel.org, 
-	kexec@lists.infradead.org, kvm@vger.kernel.org, linux-mm@kvack.org, 
-	kvmarm@lists.linux.dev
-Cc: rppt@kernel.org, graf@amazon.com, pratyush@kernel.org, pbonzini@redhat.com, 
-	seanjc@google.com, maz@kernel.org, oupton@kernel.org, dwmw2@infradead.org, 
-	alex.williamson@redhat.com, kevin.tian@intel.com, rientjes@google.com, 
-	Tycho.Andersen@amd.com, anthony.yznaga@oracle.com, baolu.lu@linux.intel.com, 
-	david@kernel.org, dmatlack@google.com, mheyne@amazon.de, jgowans@amazon.com, 
-	jgg@nvidia.com, pankaj.gupta.linux@gmail.com, kpraveen.lkml@gmail.com, 
-	vipinsh@google.com, vannapurve@google.com, corbet@lwn.net, 
-	loeser@linux.microsoft.com, tglx@kernel.org, mingo@redhat.com, bp@alien8.de, 
-	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, 
-	roman.gushchin@linux.dev, akpm@linux-foundation.org, pjt@google.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <763eb5db-e9af-4b3a-b05b-746700cf0304@arm.com>
 
-Pasha Tatashin <pasha.tatashin@soleen.com> writes:
+On 07/30 15:57, Suzuki K Poulose wrote:
+> On 30/07/2026 14:58, Steven Price wrote:
+> > On 27/07/2026 09:14, Kohei Enju wrote:
+> > > Hi Steven, I have a comment about rec_exit_sys_reg() below.
+> > > 
+> > > On 07/15 15:28, Steven Price wrote:
+> > > > Entering a realm is done using a SMC call to the RMM. On exit the
+> > > > exit-codes need to be handled slightly differently to the normal KVM
+> > > > path so define our own functions for realm enter/exit and hook them
+> > > > in if the guest is a realm guest.
+> > > > 
+> > > > Signed-off-by: Steven Price <steven.price@arm.com>
+> > > > Reviewed-by: Gavin Shan <gshan@redhat.com>
+> > > > ---
+> > > > Changes since v13:
+> > > >   * The RMM is now required to provide an ESR value with the correct
+> > > >     information to emulate MMIO, so we no longer need to hardcode 0s in
+> > > >     rec_exit_sys_reg().
+> > > >   * The PSCI changes mean that there is a potential race when turning on
+> > > >     a VCPU which can cause a RMI_ERROR_REC return. Exit to user space
+> > > >     with -EAGAIN in this case.
+> > > > Changes since v12:
+> > > >   * Call guest_state_{enter,exit}_irqoff() around rmi_rec_enter().
+> > > >   * Add handling of the IRQ exception case where IRQs need to be briefly
+> > > >     enabled before exiting guest timing.
+> > > > Changes since v8:
+> > > >   * Introduce kvm_rec_pre_enter() called before entering an atomic
+> > > >     section to handle operations that might require memory allocation
+> > > >     (specifically completing a RIPAS change introduced in a later patch).
+> > > >   * Updates to align with upstream changes to hpfar_el2 which now (ab)uses
+> > > >     HPFAR_EL2_NS as a valid flag.
+> > > >   * Fix exit reason when racing with PSCI shutdown to return
+> > > >     KVM_EXIT_SHUTDOWN rather than KVM_EXIT_UNKNOWN.
+> > > > Changes since v7:
+> > > >   * A return of 0 from kvm_handle_sys_reg() doesn't mean the register has
+> > > >     been read (although that can never happen in the current code). Tidy
+> > > >     up the condition to handle any future refactoring.
+> > > > Changes since v6:
+> > > >   * Use vcpu_err() rather than pr_err/kvm_err when there is an associated
+> > > >     vcpu to the error.
+> > > >   * Return -EFAULT for KVM_EXIT_MEMORY_FAULT as per the documentation for
+> > > >     this exit type.
+> > > >   * Split code handling a RIPAS change triggered by the guest to the
+> > > >     following patch.
+> > > > Changes since v5:
+> > > >   * For a RIPAS_CHANGE request from the guest perform the actual RIPAS
+> > > >     change on next entry rather than immediately on the exit. This allows
+> > > >     the VMM to 'reject' a RIPAS change by refusing to continue
+> > > >     scheduling.
+> > > > Changes since v4:
+> > > >   * Rename handle_rme_exit() to handle_rec_exit()
+> > > >   * Move the loop to copy registers into the REC enter structure from the
+> > > >     to rec_exit_handlers callbacks to kvm_rec_enter(). This fixes a bug
+> > > >     where the handler exits to user space and user space wants to modify
+> > > >     the GPRS.
+> > > >   * Some code rearrangement in rec_exit_ripas_change().
+> > > > Changes since v2:
+> > > >   * realm_set_ipa_state() now provides an output parameter for the
+> > > >     top_iap that was changed. Use this to signal the VMM with the correct
+> > > >     range that has been transitioned.
+> > > >   * Adapt to previous patch changes.
+> > > > ---
+> > > > 
+> > > > [...]
+> > > > 
+> > > > +static int rec_exit_sys_reg(struct kvm_vcpu *vcpu)
+> > > > +{
+> > > > +	struct realm_rec *rec = &vcpu->arch.rec;
+> > > > +	unsigned long esr = kvm_vcpu_get_esr(vcpu);
+> > > > +	int rt = kvm_vcpu_sys_get_rt(vcpu);
+> > > > +	bool is_write = (esr & ESR_ELx_SYS64_ISS_DIR_MASK) == ESR_ELx_SYS64_ISS_DIR_WRITE;
+> > > > +	int ret;
+> > > > +
+> > > > +	if (is_write)
+> > > > +		vcpu_set_reg(vcpu, rt, rec->run->exit.gprs[rt]);
+> > > 
+> > > When rt is 31 (XZR), does exit.gprs[rt] trigger an out-of-bounds read
+> > > since REC_RUN_GPRS is 31? Although the padding after the gprs means this
+> > > OOB may not cause any practical issue, would it make sense to skip the
+> > > access when rt is 31?
+> > > 
+> 
+> RMM mandates that the ESR_ELx.ISS.RT == 0 on an exit due to System register
+> access. See "A4.3.4.4 REC exit due to System register access"
+> 
+> So this shouldn't be a problem, but doesn't hurt to defend the host
+> against a malicious RMM ?
 
->
-> [...snip...]
->
-> The Caretaker
-> =============
->
-> The Caretaker is a specialized, identity-mapped bare-metal executable
-> attached to each vCPU. While it is installed during the initial VM setup
-> and remains permanently enabled as an interpose layer between the Guest
-> and KVM, it is the key architectural feature required for a VM to be
-> orphaned. By providing an execution environment independent of the host
-> OS, the Caretaker enables the guest workload to safely survive the host
-> lifecycle transition.
->
-> During normal VM operation, the Caretaker acts as a fast-path shim: it
-> forwards standard VM Exits down to the backing KVM kernel module and
-> handles certain exits autonomously. However, during the "Management Gap"
-> (when no host OS is active and standard KVM handlers are offline), the
-> Caretaker enters a standalone mode to ensure continuous guest execution
-> without host intervention.
->
+Ah, I missed that requirement. The changelog and the old RMM
+implementation led me to mistakenly assume tat Rt could be non-zero.
 
-I think this might already be explained in different ways by the other
-commenters.
+Then special-casing Rt == 31 doesn't really make sense. So keeping the
+code as it is seems fine to me:)
 
-I guess the main question I have is, if the Caretaker could indeed take
-over caretaking during a "Management Gap", then we're adding code to
-tell KVM what to do to handle some VM exits.
+Thanks,
+Kohei
 
-In that case, it would be awesome to have that functionality provided by
-KVM in the first place, to avoid some number of kernel exits to the
-userspace VMM.
-
-> While this proposal focuses on its critical role in minimally disruptive
-> Live Update, the Caretaker is fundamentally designed as an extensible
-> primitive.
-
-If the Caretaker can/needs to be extended, then on the other extreme,
-the entirety of the userspace VMM's functionality could go into the
-caretaker, and perhaps that's another direction to go, where maybe LUO
-could keep some slice of userspace alive? (then the VM is no longer
-orphaned)
-
-> Its architecture allows it to be leveraged for a variety of
-> other advanced virtualization use cases, such as running custom
-> lightweight hypervisors or completely offloading virtualization duties
-> to an accelerator card.
->
->
-> [...snip...]
->
+> 
+> Suzuki
+> 
+> 
+> 
+> > > if (is_write && rt != 31)
+> > >      vcpu_set_reg(vcpu, rt, rec->run->exit.gprs[rt]);
+> > 
+> > Very true - as you say in practise this isn't a big issue because
+> > vcpu_set_reg() is a no-op, so it's just a read of padding. But
+> > definitely worth fixing.
+> > 
+> > > > +
+> > > > +	ret = kvm_handle_sys_reg(vcpu);
+> > > > +	if (!is_write)
+> > > > +		rec->run->enter.gprs[rt] = vcpu_get_reg(vcpu, rt);
+> > > 
+> > > The same applies here:
+> > > 
+> > > if (!is_write && rt != 31)
+> > >      rec->run->enter.gprs[rt] = vcpu_get_reg(vcpu, rt);
+> > 
+> > And the same here - a zero written into the padding.
+> > 
+> > Thanks for the review!
+> > 
+> > Steve
+> > 
+> > > > +
+> > > > +	return ret;
+> > > > +}
+> > 
+> 
