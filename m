@@ -1,277 +1,128 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEF591F12FB;
-	Sat,  1 Aug 2026 14:47:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B2473093A6
+	for <kvmarm@lists.linux.dev>; Sat,  1 Aug 2026 15:37:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785595655; cv=none; b=dK6JX9k//vAqiroMeq1qAp0ZG7B1Q9kpBE4TUUKE4yb/1FZzm1y4jz0kJqRrGUSzcTzuZ3WbTFgjSRzRuYtRadG0+TgOKvLSs8qxP+4Ltrv33AAsJSpD9JByel0A0/670cRD0TwphHTYKKtvX/ybOamLUcJ1Iwf9GkIaAPW4BDk=
+	t=1785598662; cv=none; b=OwzBCKrS9+P+aBDyU0maWf59nBW95Oxe1v3vdgg0ORhumnFSHRh/o/EMLwy7zT+wJ1MBkiarLegAFP3QgdP3TmSzDlaYU4EBvGpvM0tVl60v8tHD57vc0MdvOYt191BXWznT2DbMFTdmIw6BVPt2Azww3qalmzPJql6+N8r+HFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785595655; c=relaxed/simple;
-	bh=o2+j2Rvh/QB6ntGMNwz5Wbk1ogYuJkbFbfRG5fv9QmA=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CM2TnceaKRWjSVdd1d8GHrnwEiQIiieYx5b+M+sJmCkU86Xiw1fsRw3MBhuSSwVMPrVOQZZpo0SRD7t7qqnO8f+naE311H0pM337pDYC7kTj6Xgz2eKXB11d7n4KXTYRwESnHBUDAeqcaB+TB0bj1ZcJ5PFDTt/HP5imseWJHWQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YzF1Gh8M; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1785598662; c=relaxed/simple;
+	bh=HJIn6ArNToUyryFG1+tm+1I7IC6zVMv0l1gSzPCFxrg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=BXcZgSTpeQhWs1Kh1iAx57KEz+MtXdY41n/cQXda/3NY0RXaULO5r8IwBUOeLzwLyjaBL58wAtiYKOuTuOyHbKA61gEtEH126zc3bBgSmV+LnohO2TDtCPykwswLXi6v453w+BG6HXeDkL9HLCgsgByzO17wTNALk9o/Ue4iSWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z7Rk1zrF; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YzF1Gh8M"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BF111F00AC4;
-	Sat,  1 Aug 2026 14:47:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785595653;
-	bh=uj1pnahAMTGeHyW3FVCbLY4C6FmO5B3E/ZqEDKSJPzs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=YzF1Gh8MOrQHeY31wio6OmitevT2fwCTE9aiENbsEzFyl8QkjNbmFi1RsN4J9KC1f
-	 C2EYHC/tCJFrP3Df809v9YvQWmb3BuSz8oGlXaeFYMHgtje+knhXZd2GRPKVkxi4+3
-	 a0ZIMGNVU9sujTz9oiU5fMCHXn7rTUqKyV4thdU9D4XIwkJHIiZUg88U+vFMw62q3f
-	 NObijq7KDgyIFF8F2tT2Fa1BWzF3c6Xlwep2KRP1UIjYbT4w39JvMxGmAMwPU8e5aw
-	 lJkhgdBhXEnf3EYxMcENxbNH/AD1Ic1Ry9ZIb6Xd+yDKbV3d0XIA55yEjOSRVZoMFp
-	 3NRQD0XyZnp6Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wqAzr-0000000BHgX-2KFc;
-	Sat, 01 Aug 2026 14:47:31 +0000
-Date: Sat, 01 Aug 2026 15:51:43 +0100
-Message-ID: <87o6flq4g0.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: sashiko-reviews@lists.linux.dev
-Cc: "Oliver Upton" <oupton@kernel.org>,
-	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH 5/6] KVM: arm64: Couple VNCR fixmap clearing and CPU number invalidation
-In-Reply-To: <20260801130237.0FD8F1F00ACA@smtp.kernel.org>
-References: <20260801124818.366274-1-maz@kernel.org>
-	<20260801124818.366274-6-maz@kernel.org>
-	<20260801130237.0FD8F1F00ACA@smtp.kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z7Rk1zrF"
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-49555a0e68bso3198995e9.2
+        for <kvmarm@lists.linux.dev>; Sat, 01 Aug 2026 08:37:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1785598659; x=1786203459; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=u7Hwn0xlTzxIN2uBpUzcPzgILfRygUZswZJisr8yQeU=;
+        b=Z7Rk1zrFtfiDqGEziDxWNMAO+T9AgV4uF54jNXx+3ddOTWvqaoZXO1wrh4616dELjE
+         7484RCdn/1TTJzrk49GDv7aHCcK86w1nKUb6K5/Z10+cqzTi8fBsF65rrYt3FKvVGkPJ
+         j6yk/8Mh0DXAotGSvDq5ArCepoLW0yaYwVl1Cy2nHuQ+5u68oDDpmKDBmwPg+7kHJFU7
+         BMOUYw9MFHfD0BLNEnf6IVlr7QHn5GZfjX/RlRwgQ2vNuBGiSOinu8fkxYsFmUsAgFlu
+         vvgVZiOWIvx2mNEF6JcgT7ItS3x8PSM5ib8YstX0ynIU8g+27D0oSneGghdEyhlwLAlj
+         TTdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785598659; x=1786203459;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=u7Hwn0xlTzxIN2uBpUzcPzgILfRygUZswZJisr8yQeU=;
+        b=VLQ/cum535ejjBjYh7M/ILV3SlVd0Id74j0OfjazUrEfpRQMgs5slFwdufSBm+USsM
+         aGeuvdof1jZ789LqLgROuoHsNq6MbLucngR/t5cVpoetJgJabJJw6kMpxUOtgsD9LFzN
+         Q+gyYY/qTHLitvb6fiS7lvEpqnx8KXyYvPjXaSpLDFKbh0WtO4dhtTkM641G2k+qd2SS
+         /nHQ9ysRB5pA/BZPKVeCKvUK4rU7e2yYDXR4wcz5N3ZS3b6RdWvXhmkrk6rWp+Y1uUW1
+         ARsLfOh6TuRf3//nM0GjF7Ooxjtl/fmwF9pmdnvz3Cu3ZFR0gPYcjKW9EGP67B+scAtS
+         WgzQ==
+X-Forwarded-Encrypted: i=1; AHgh+RqMhHxuyMDV236Z1gn/S28qHm8q6UK1Z2Zad79BkjGfDMrqv+MyBNMwfi7mWzdH059aoqGqYAU=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzdzIdUSNkyyuDDa/1Cy6z6leXKWpmLJTr6zARc7zxklhHG3KfN
+	bYXIj+LnxBsMrrGQ9qXLNYO0/Xw7UdRaXBl6SheMXZViFSSk7XhQ5LVJ
+X-Gm-Gg: AR+sD11uU3F8MJROjXBy7WqK/rMi2hFwslfimg4qyOt5OxfCVWAalIchArO/vR0azBU
+	Sf/oNb8+O67UkcWO+fwr+UU9ECJdDN0Akx++tL1qb0fN+LKnDxVKaMoWVid170rS1VG9SwbrGsB
+	e94jz74pSZQuX2QQt8nAbLkq6tFAfRMzcxVTxhSs9ruxnYqOgZW56C2QNSEbJM/2BUjYlbTCbcE
+	FYKvJiKSF9YRc42gphg0JII/3O1FTFdm94MEY2469xMj33+r0cOmCw0UWfondf7hXs1I51zVUXp
+	k4X0KAsWxRcTmNJD5vPBnNGnApUtZR048JfsPTyphDKvj/0PQUwNA/8KFoNwfRoFnha1wQV2046
+	Q0oRmpLWMdjKmrxXT1lbSxb69QIXyY1VCdXYuDLKmabnZyG3coScHcZE7DEHsrGM66h1zhcLl9i
+	d1nKaQbXhUp955ox1xQJa6yaPp4R5BpR85X0MSnu4cQEon7RM53VqLx3DqLD98TgAp56dDvIH5j
+	T3A9tjfYhV+mBuArftq+OLtkhhsv+cs6Af4y7k6jXfz7y0LP3HVSt8qJfoXacUVTWY9hyWq78QM
+	biM2OKl/jRcuP6bqVgTZ9/cDXA==
+X-Received: by 2002:a05:600c:871a:b0:498:952:e276 with SMTP id 5b1f17b1804b1-4980c66c991mr73253905e9.8.1785598658895;
+        Sat, 01 Aug 2026 08:37:38 -0700 (PDT)
+Received: from localhost.localdomain (dynamic-095-114-005-130.95.114.pool.telefonica.de. [95.114.5.130])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49807b67529sm65115055e9.8.2026.08.01.08.37.37
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Sat, 01 Aug 2026 08:37:38 -0700 (PDT)
+From: Karl Mehltretter <kmehltretter@gmail.com>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>
+Cc: Karl Mehltretter <kmehltretter@gmail.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Andre Przywara <andre.przywara@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: arm64: Preserve AArch32 CP64 registers on rejected reads
+Date: Sat,  1 Aug 2026 17:36:16 +0200
+Message-Id: <20260801153616.71960-1-kmehltretter@gmail.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, oupton@kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Sat, 01 Aug 2026 14:02:36 +0100,
-sashiko-bot@kernel.org wrote:
-> 
-> Thank you for your contribution! Sashiko AI review found 3 potential issue(s) to consider:
-> 
-> New issues:
-> - [Critical] By modifying `invalidate_vncr()` to call the new `unmap_l1_vncr()` helper, this patch asynchronously sets `vt->cpu = -1` when invalidating a remote vCPU's VNCR TLB. However, the host CPU's `L1_VNCR_MAPPED` flag remains set on the remote CPU. When the remote vCPU is eventually scheduled out and executes the lockless `this_cpu_reset_vncr_fixmap()`, it observes `L1_VNCR_MAPPED` is true but finds `vt->cpu` has been changed to `-1`. This triggers a deterministic host kernel panic via `BUG_ON(vcpu->arch.vncr_tlb->cpu != smp_processor_id())`. A guest can trivially exploit this by issuing a TLBI from one vCPU while another is running.
-> 
-> Pre-existing issues:
-> - [Critical] In `kvm_map_l1_vncr()`, `vt->cpu` is unconditionally set to `smp_processor_id()`. If the mapping has no read permissions (`prot == PAGE_NONE`), the function returns without mapping the fixmap or setting the `L1_VNCR_MAPPED` flag. When the vCPU is scheduled out, `this_cpu_reset_vncr_fixmap()` checks `L1_VNCR_MAPPED` and returns early, failing to reset `vt->cpu` to `-1`. This leaves a stale CPU ID in `vt->cpu`. If the host later invalidates this vCPU's VNCR TLB, `invalidate_vncr()` reads the stale CPU ID and maliciously clears the fixmap for that CPU. If another vCPU is running on that CPU and using the fixmap slot, its VNCR mapping is unexpectedly destroyed, leading to a host Data Abort kernel panic when accessed. This problem wasn't introduced by this patch, but remains a critical vulnerability.
-> - [Critical] A Time-of-Check to Time-of-Use (TOCTOU) race exists on `vt->cpu` between `invalidate_vncr()` and the lockless `this_cpu_reset_vncr_fixmap()`. `invalidate_vncr()` executes `if (vt->cpu != -1)` and then calls `unmap_l1_vncr()`, which evaluates `vncr_fixmap(vt->cpu)`. Because `this_cpu_reset_vncr_fixmap()` is called from `kvm_arch_vcpu_put` without holding `kvm->mmu_lock`, it can run concurrently on the target vCPU's host CPU and set `vt->cpu = -1` exactly between the check and the use. `unmap_l1_vncr()` then evaluates `vncr_fixmap(-1)`, triggering `BUG_ON(__c >= NR_CPUS)` and panicking the host. This problem wasn't introduced by this patch, but remains a critical vulnerability.
-> --
-> 
-> --- Patch [5]: [PATCH 5/6] KVM: arm64: Couple VNCR fixmap clearing and CPU number invalidation ---
-> commit 9f716e0407bd9a5d530b0e1d1e94c5434eaeedb6
-> Author: Marc Zyngier <maz@kernel.org>
-> 
-> KVM: arm64: Couple VNCR fixmap clearing and CPU number invalidation
-> 
-> A mapped VNCR translation must indicate which CPU it is resident.
-> Unmapping such a translation must make this CPU number -1. Couple the unmap
-> and the setting to -1 in a helper, so that we are always sure they are done
-> together.
-> 
-> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> > index 69a4652f39336..8d5b0208ad728 100644
-> > --- a/arch/arm64/kvm/nested.c
-> > +++ b/arch/arm64/kvm/nested.c
-> 
-> [ ... ]
-> 
-> > @@ -895,6 +895,12 @@ void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu)
-> >  	}
-> >  }
-> >  
-> > +static void unmap_l1_vncr(struct vncr_tlb *vt)
-> > +{
-> > +	clear_fixmap(vncr_fixmap(vt->cpu));
-> > +	vt->cpu = -1;
-> > +}
-> > +
-> >  static void this_cpu_reset_vncr_fixmap(struct kvm_vcpu *vcpu)
-> >  {
-> >  	if (!host_data_test_flag(L1_VNCR_MAPPED))
-> >  		return;
-> 
-> [Severity: Critical]
-> This is a pre-existing issue, but can a stale CPU ID be left in vt->cpu if 
-> we return early here?
-> 
-> In kvm_map_l1_vncr(), vt->cpu is unconditionally set to smp_processor_id().
-> If the mapping has no read permissions (prot == PAGE_NONE), the function
-> returns without mapping the fixmap or setting the L1_VNCR_MAPPED flag.
-> 
-> When the vCPU is later scheduled out, this_cpu_reset_vncr_fixmap() returns
-> early at this check because L1_VNCR_MAPPED is unset, failing to reset
-> vt->cpu to -1.
-> 
-> If the host later invalidates this vCPU's VNCR TLB, invalidate_vncr() reads
-> the stale CPU ID and maliciously clears the fixmap for that CPU. If another
+kvm_handle_cp_64() only seeds params.regval for writes. If a CP64 read is
+decoded but rejected, emulate_cp() still returns handled and the caller
+writes params.regval back to Rt/Rt2.
 
-Maliciously?
+This can happen for write-only GIC SGI registers and for rejected PMU
+counter reads. In both cases KVM injects an UNDEF into the guest, so the
+MRRC destination registers must remain unchanged.
 
-> vCPU is running on that CPU and using the fixmap slot, its VNCR mapping is
-> unexpectedly destroyed, leading to a host Data Abort when accessed.
+Instead, the uninitialised regval is copied into the guest registers. With
+stack auto-initialisation this is a deterministic zero or pattern value.
+With CONFIG_INIT_STACK_NONE it may be stale host stack data.
 
-It is always possible to unmap an VNCR at any point and to handle the
-corresponding abort. That's what a TLBI from another CPU does.
+Match kvm_handle_cp_32() and kvm_handle_sys_reg() by seeding regval from
+the destination registers before emulation.
 
-So no, not a bug. The *real* bug is to not correctly handle WO/NONE
-permissions, which will have to wait until we have S1POE support in
-the kernel.
+Fixes: 6d52f35af10c ("arm64: KVM: add SGI generation register emulation")
+Assisted-by: Claude:claude-opus-5
+Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
+---
+Runtime tested on a Raspberry Pi 400 with a minimal KVM harness running
+an AArch32 guest. On the unpatched 6.1.21-v8+ vendor kernel, the PMCCNTR
+MRRC test took UNDEF with r0=0x00000001/r1=0x00000000 instead of the
+guest's sentinel values. With this patch on v7.2-rc3-278-g38436106b2f5,
+the same test preserved r0=0x12345678/r1=0x9abcdef0.
 
-> 
-> >  	BUG_ON(vcpu->arch.vncr_tlb->cpu != smp_processor_id());
-> >  	BUG_ON(is_hyp_ctxt(vcpu));
-> >  
-> > -	clear_fixmap(vncr_fixmap(vcpu->arch.vncr_tlb->cpu));
-> > -	vcpu->arch.vncr_tlb->cpu = -1;
-> > +	unmap_l1_vncr(vcpu->arch.vncr_tlb);
-> >  	host_data_clear_flag(L1_VNCR_MAPPED);
-> >  }
-> >  
-> > @@ -997,7 +1002,7 @@ static void invalidate_vncr(struct vncr_tlb *vt)
-> >  {
-> >  	vt->valid = false;
-> >  	if (vt->cpu != -1)
-> 
-> [Severity: Critical]
-> This is a pre-existing issue, but does this check have a time-of-check to
-> time-of-use race?
-> 
-> In invalidate_vncr(), we check if vt->cpu != -1 and then call
-> unmap_l1_vncr(vt), which evaluates vncr_fixmap(vt->cpu) internally.
-> 
-> Because this_cpu_reset_vncr_fixmap() is called from kvm_arch_vcpu_put()
-> without holding kvm->mmu_lock, it can run concurrently on the target vCPU's
-> host CPU and set vt->cpu = -1 exactly between the check and the use.
-
-This looks indeed like a disaster waiting to happen. I think upgrading
-this to an atomic variable should do it, as below.
-
-> 
-> If that happens, unmap_l1_vncr() evaluates vncr_fixmap(-1), which triggers
-> BUG_ON(__c >= NR_CPUS) and panics the host.
-> 
-> > -		clear_fixmap(vncr_fixmap(vt->cpu));
-> > +		unmap_l1_vncr(vt);
-> 
-> [Severity: Critical]
-> Can this trigger a BUG_ON() when a remote vCPU is scheduled out?
-> 
-> By modifying invalidate_vncr() to call unmap_l1_vncr(), this path now
-> asynchronously sets vt->cpu = -1 when invalidating a remote vCPU's
-> VNCR TLB. However, the host CPU's L1_VNCR_MAPPED flag remains set on
-> the remote CPU.
-> 
-> When the remote vCPU is eventually scheduled out, it will execute the
-> lockless this_cpu_reset_vncr_fixmap():
-> 
->     if (!host_data_test_flag(L1_VNCR_MAPPED))
->         return;
-> 
->     BUG_ON(vcpu->arch.vncr_tlb->cpu != smp_processor_id());
-> 
-> Since L1_VNCR_MAPPED is still true, the code reaches the BUG_ON(), but
-> vt->cpu has been changed to -1, which deterministicly panics the host
-> kernel. A guest could trivially trigger this by issuing a TLBI from one
-> vCPU while another is running.
-
-Yup, that BUG_ON() needs to go for the same reason as above. I'm
-adding the stuff below (untested).
-
-	M.
-
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 1e3fd98f6589b..be9d233dffac6 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -27,7 +27,7 @@ struct vncr_tlb {
- 	bool			hpa_writable;
- 
- 	/* -1 when not mapped on a CPU */
--	int			cpu;
-+	atomic_t		cpu;
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -4860,11 +4860,11 @@
+ 	/*
+ 	 * Make a 64-bit value out of Rt and Rt2. As we use the same trap
+ 	 * backends between AArch32 and AArch64, we get away with it.
++	 *
++	 * This also makes rejected reads preserve Rt/Rt2.
+ 	 */
+-	if (params.is_write) {
+-		params.regval = vcpu_get_reg(vcpu, Rt) & 0xffffffff;
+-		params.regval |= vcpu_get_reg(vcpu, Rt2) << 32;
+-	}
++	params.regval = vcpu_get_reg(vcpu, Rt) & 0xffffffff;
++	params.regval |= vcpu_get_reg(vcpu, Rt2) << 32;
  
  	/*
- 	 * true if the TLB is valid. Can only be changed with the
-@@ -895,10 +895,17 @@ void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu)
- 	}
- }
- 
-+/*
-+ * Unmapping an L1 VNCR can happen concurrently without holding the mmu lock
-+ * (vcpu_put() vs TLBI handling). the atomic_xchg below ensures that only
-+ * CPU set -1 while getting a valid CPU number back.
-+ */
- static void unmap_l1_vncr(struct vncr_tlb *vt)
- {
--	clear_fixmap(vncr_fixmap(vt->cpu));
--	vt->cpu = -1;
-+	int cpu = atomic_xchg_relaxed(&vt->cpu, -1);
-+
-+	if (cpu != -1)
-+		clear_fixmap(vncr_fixmap(cpu));
- }
- 
- static void this_cpu_reset_vncr_fixmap(struct kvm_vcpu *vcpu)
-@@ -906,7 +913,6 @@ static void this_cpu_reset_vncr_fixmap(struct kvm_vcpu *vcpu)
- 	if (!host_data_test_flag(L1_VNCR_MAPPED))
- 		return;
- 
--	BUG_ON(vcpu->arch.vncr_tlb->cpu != smp_processor_id());
- 	BUG_ON(is_hyp_ctxt(vcpu));
- 
- 	unmap_l1_vncr(vcpu->arch.vncr_tlb);
-@@ -1003,8 +1009,7 @@ static void invalidate_vncr(struct kvm *kvm, struct vncr_tlb *vt)
- 	BUG_ON(!vt->valid);
- 	vt->valid = false;
- 	atomic_dec(&kvm->arch.vncr_tlb_count);
--	if (vt->cpu != -1)
--		unmap_l1_vncr(vt);
-+	unmap_l1_vncr(vt);
- }
- 
- static bool vncr_tlb_intersects(struct vncr_tlb *vt, u64 addr,
-@@ -1468,7 +1473,7 @@ static int kvm_translate_vncr(struct kvm_vcpu *vcpu, bool *is_gmem)
- 		vt->hpa = pfn << PAGE_SHIFT;
- 		vt->hpa_writable = writable;
- 		vt->valid = true;
--		vt->cpu = -1;
-+		atomic_set(&vt->cpu, -1);
- 
- 		atomic_inc(&vcpu->kvm->arch.vncr_tlb_count);
- 
-@@ -1600,7 +1605,7 @@ static void kvm_map_l1_vncr(struct kvm_vcpu *vcpu)
- 	if (vt->wr.nG && get_asid_by_regime(vcpu, TR_EL20) != vt->wr.asid)
- 		return;
- 
--	vt->cpu = smp_processor_id();
-+	atomic_set(&vt->cpu, smp_processor_id());
- 
- 	if (vt->hpa_writable && vt->wr.pw && vt->wr.pr)
- 		prot = PAGE_KERNEL;
-@@ -1616,7 +1621,7 @@ static void kvm_map_l1_vncr(struct kvm_vcpu *vcpu)
- 	 * FIXME: WO doesn't work at all, need POE support in the kernel.
- 	 */
- 	if (pgprot_val(prot) != pgprot_val(PAGE_NONE)) {
--		__set_fixmap(vncr_fixmap(vt->cpu), vt->hpa, prot);
-+		__set_fixmap(vncr_fixmap(atomic_read(&vt->cpu)), vt->hpa, prot);
- 		host_data_set_flag(L1_VNCR_MAPPED);
- 	}
- }
-
+ 	 * If the table contains a handler, handle the
 -- 
-Jazz isn't dead. It just smells funny.
+2.51.0
