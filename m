@@ -1,121 +1,177 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99AD71A38F9;
-	Sat,  1 Aug 2026 13:03:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1779B48987E;
+	Sat,  1 Aug 2026 13:04:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785589419; cv=none; b=egoRh2C3KbSglamDSlVMz+UCikqEdaxWRCqJ8B0tEiDCLY7pP7VY8O/frRAyHRHbOQh6TQgzuDB7MchBqv6eu4YsX2ZHOkBAFEaU+iR7cl3FGb+1P6eE2W6DkogfA6biWmXf4L1UwLg4euzG30GOfsJq0jVQvnh4pZl5bgX2YFQ=
+	t=1785589496; cv=none; b=SsyJvEo731n4yB8/AnWUqdfTlPMptc3wiVLGfwZeLoH1yPf6Kqy6VVorHc9KzgO+3/zhug3Xu2TfVOA69EuJzN7/zuNoO/UaRoCz4eZxWDfmEJBfn6J566G7o0sgz2YBzGqaKgx8BIVpLxXrV31rJd8yjfj6+LEn2WY+mFjQQSo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785589419; c=relaxed/simple;
-	bh=uajvz+X5N2Ziw7d4Hh1KIyX3AVfGYDHzCeFrVroqE5k=;
+	s=arc-20240116; t=1785589496; c=relaxed/simple;
+	bh=QDSobYaFNB+LTZfIP2XhkTTQNd0oBaXQUBz15SpTzR8=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=dew0s61F4Xv2x1wo7O+hZ4ryovxq9JcWCdbLPFiLi6CwoCVwcA9VgZVLwqfEYoRZw242zmZgDduBgaihI2JC7Q7HYJVSA1edJ0K5/AU+9yA+4tPWquSVxqeoLXelTK052EOjODETqPLRnI5e1pASJyTjbCYx6fMtlRSOzqHDdKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IstBHYVR; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=d4EdCIqO1w8AQI86jM9BB6EfeLIkTbHrYAxO4SEBPfi51JnBRjYi/Z+Z2f0OywKaeLXu27gmCawHxn7oqZxEIzf4w2mL9xaZXe4OTQVByyqK9ebMcq+o8s1QYYKVsGs3xlrK2snbrGbJKojL+5Jasmo3mBS38ToEj2QioN32DQ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f4e2hUlE; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IstBHYVR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB2BA1F00AC4;
-	Sat,  1 Aug 2026 13:03:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f4e2hUlE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D9F11F00AC4;
+	Sat,  1 Aug 2026 13:04:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785589418;
-	bh=dcQ8q1DIC26P1aByNPIfx6FMjt1Vne8oCBgTvjpu9J8=;
+	s=k20260515; t=1785589494;
+	bh=AfxE/12yI14QEgsNJxYP3yxweqYsFFxRxPcTDSeDpu4=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=IstBHYVRGwyTPnK4WLh5T6jAqC0sbOY8j/snuReeWG4OaRyl4J+31T9+IZnLN6XZ9
-	 vIc12tIZstWZuJEFJDVdQbpzc+EQq6a2esOxaeoQe8sWRchcG8MOO8jBrkoNdouTlS
-	 i65XrPnYeg2n/pln1T7VWR43eV56RnWjjkXVKdE0puB/BWUuyxCfQGx+BytreMHNPy
-	 eYzpPoQ0nxFCcJgEU4NMxrm8+dSVi2uloocKV5a6wwzq1EFJbYjaxH0l/OOkK4PYhT
-	 Mph1GPZMfT6RsBOvn5F2mWCJXEBXGdng5fd3qzb3QlWNuriyxUQy67c9R/9RIiyKGv
-	 7qMgvlDCfStZQ==
+	b=f4e2hUlEOMGi0XCPxyZK+Hobqgko2lbWyclC8367jn+90xDKRXTzN2/SbIXullTfn
+	 s/bw8zDHQSjwBU388kurjOUkjmpfTbOWf9HjsAbVR/a1mXE59ZRFGwI8ekpCsOWwdC
+	 JWAuF+Fc5YPGZQAf2v2r3elRE/XTgIqWbyMcxddM63+/wESeqFj/5oFPYLsVubfwOp
+	 jRiAW90gL47sg2z1QhvYvpV/XyWrJLni5fUQddbvxGCVcgHSsvl3/gRTaUMi78NQYJ
+	 n/d3V/J4HqjQA//Jd4XLHaJanXQn1u4PUWod6zOvCSD08M2LPYvMTKzn9uQcTexREF
+	 p9fc0GCxp1AkQ==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 4/6] KVM: arm64: Correctly handle end of VA space TLBI
- invalidation
+Subject: Re: [PATCH 6/6] KVM: arm64: Add VNCR TLB tracking again
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Marc Zyngier" <maz@kernel.org>
-Cc: "Oliver Upton" <oupton@kernel.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260801124818.366274-5-maz@kernel.org>
+Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+In-Reply-To: <20260801124818.366274-7-maz@kernel.org>
 References: <20260801124818.366274-1-maz@kernel.org>
- <20260801124818.366274-5-maz@kernel.org>
+ <20260801124818.366274-7-maz@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 01 Aug 2026 13:03:37 +0000
-Message-Id: <20260801130337.EB2BA1F00AC4@smtp.kernel.org>
+Date: Sat, 01 Aug 2026 13:04:53 +0000
+Message-Id: <20260801130454.5D9F11F00AC4@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+Thank you for your contribution! Sashiko AI review found 3 potential issue(=
 s) to consider:
 
 Pre-existing issues:
-- [High] Missing sign-extension in `decode_range_tlbi()` breaks Stage-1 ran=
-ge TLB invalidations (e.g., `TLBI RVAE1`) for TTBR1 addresses.
+- [Critical] Cross-CPU invalidation of VNCR TLBs (e.g., via MMU notifiers) =
+clears the fixmap and resets `vt->cpu` but fails to clear the per-CPU `L1_V=
+NCR_MAPPED` flag on the CPU where the vCPU is running. When the vCPU is sub=
+sequently scheduled out, `this_cpu_reset_vncr_fixmap()` checks the local fl=
+ag, finds it set, and hits a `BUG_ON` because `vt->cpu` is `-1`. This allow=
+s unprivileged host userspace to panic the host kernel.
+- [High] The fast-path check in `kvm_hyp_handle_tlbi_el2()` skips VNCR TLB =
+invalidation for EL2 TLBI instructions when `E2H` or `TGE` is 0, leaving st=
+ale translations in the software VNCR TLB.
+- [High] A TOCTOU race exists between lockless guest page table walks and g=
+uest TLBI intercepts, allowing stale VNCR translations to survive invalidat=
+ion.
 --
 
---- Patch [4]: [PATCH 4/6] KVM: arm64: Correctly handle end of VA space TLB=
-I invalidation ---
-commit 33057eee0c17792f671722b92173b4f67ff0fde6
+--- Patch [6]: [PATCH 6/6] KVM: arm64: Add VNCR TLB tracking again ---
+commit bde680578e8485472440ba4858d93cb92173897d
 Author: Marc Zyngier <maz@kernel.org>
+Date:   Sat Aug 1 12:48:18 2026 +0000
 
-KVM: arm64: Correctly handle end of VA space TLBI invalidation
+    KVM: arm64: Add VNCR TLB tracking again
+   =20
+    This patch re-introduces VNCR TLB tracking to force EL2 S1 TLBI handling
+    onto the slow path when valid VNCR TLBs exist. It uses a VM-wide atomic
+    counter to track the presence of valid VNCR TLBs, updating it under the
+    MMU lock.
 
-This patch corrects the overlap check for TLB invalidations by modifying the
-comparison logic to be inclusive rather than exclusive. This fixes an issue
-where the invalidation would fail if the range ended exactly at the boundar=
-y of
-the TTBR1 VA space due to address rollover.
-
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 711c0d0ff8339..69a4652f39336 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-
-[ ... ]
-
-> @@ -1060,28 +1064,19 @@ static void invalidate_vncr_va(struct kvm *kvm,
->  	lockdep_assert_held_write(&kvm->mmu_lock);
+> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/swi=
+tch.c
+> index c09b1d411c584..eb59549ec2172 100644
+> --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> @@ -424,10 +424,11 @@ static bool kvm_hyp_handle_tlbi_el2(struct kvm_vcpu=
+ *vcpu, u64 *exit_code)
+>  		return false;
 > =20
->  	kvm_for_each_vncr_tlb(i, vcpu, vt, kvm) {
-[ ... ]
->  		switch (scope->type) {
->  		case TLBI_ALL:
->  			break;
-> =20
->  		case TLBI_VA:
-> -			if (va_end <=3D scope->va ||
-> -			    va_start >=3D (scope->va + scope->size))
-> +			if (!vncr_tlb_intersects(vt, vt->gva, scope->va, scope->size))
+>  	/*
+> -	 * If we have to check for any VNCR mapping being invalidated,
+> +	 * If we have to check for any VNCR TLB being invalidated,
+>  	 * go back to the slow path for further processing.
+>  	 */
+> -	if (vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu))
+> +	if (vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu) &&
+> +	    atomic_read(&vcpu->kvm->arch.vncr_tlb_count))
+>  		return false;
 
 [Severity: High]
-This is a pre-existing issue, but does scope->va fail to match TTBR1 addres=
-ses
-because it is not properly sign-extended?
+This isn't a bug introduced by this patch, but does this check skip VNCR TLB
+invalidation for EL2 TLBI instructions when the guest is in nVHE mode?
 
-Looking at compute_s1_tlbi_range() which populates scope->va using
-decode_range_tlbi(val, &scope->size, &scope->asid), the base address is
-extracted in arch/arm64/include/asm/kvm_nested.h:
+If a guest running with E2H=3D0 changes its EL2 page tables for the VNCR_EL2
+mapping and issues an EL2 TLBI, this condition evaluates to false.
 
-	base =3D (val & GENMASK(36, 0)) << shift;
+The fast-path will return true, skipping the slow path that would normally
+handle the invalidation. Could this leave stale translations in the software
+VNCR TLB?
 
-Because this shifts the bits without sign-extending them to 64 bits, TTBR1
-addresses are zero-extended. When vncr_tlb_intersects() compares this posit=
-ive
-scope_start against a correctly sign-extended, negative vt->gva (mapped to
-tlb_start), the unsigned comparison (tlb_start > scope_end) evaluates to tr=
-ue.
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 8d5b0208ad728..2a7dd9f9fb597 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+[ ... ]
+> @@ -998,9 +999,11 @@ u16 get_asid_by_regime(struct kvm_vcpu *vcpu, enum t=
+rans_regime regime)
+>  	return asid;
+>  }
+> =20
+> -static void invalidate_vncr(struct vncr_tlb *vt)
+> +static void invalidate_vncr(struct kvm *kvm, struct vncr_tlb *vt)
+>  {
+> +	BUG_ON(!vt->valid);
+>  	vt->valid =3D false;
+> +	atomic_dec(&kvm->arch.vncr_tlb_count);
+>  	if (vt->cpu !=3D -1)
+>  		unmap_l1_vncr(vt);
+>  }
 
-Could this cause Stage-1 range TLB invalidations (like TLBI RVAE1) to silen=
-tly
-fail for kernel space addresses, leaving stale translations in the nested
-guest's TLB?
+[Severity: Critical]
+This is a pre-existing issue, but does this cross-CPU invalidation path lea=
+ve
+the per-CPU L1_VNCR_MAPPED flag set locally?
 
->  				continue;
->  			if (vt->wr.nG && vt->wr.asid !=3D scope->asid)
->  				continue;
->  			break;
+If an MMU notifier on CPU B calls kvm_invalidate_vncr_ipa() which reaches
+invalidate_vncr(), unmap_l1_vncr() will clear the fixmap and set vt->cpu =
+=3D -1.
+
+When CPU A (which was running the vCPU) exits the guest and calls
+this_cpu_reset_vncr_fixmap(), won't it see its local L1_VNCR_MAPPED flag st=
+ill
+set and trigger BUG_ON(vcpu->arch.vncr_tlb->cpu !=3D smp_processor_id()) be=
+cause
+vt->cpu is now -1?
+
+[ ... ]
+> @@ -1460,6 +1471,8 @@ static int kvm_translate_vncr(struct kvm_vcpu *vcpu=
+, bool *is_gmem)
+>  		vt->valid =3D true;
+>  		vt->cpu =3D -1;
+> =20
+> +		atomic_inc(&vcpu->kvm->arch.vncr_tlb_count);
+> +
+>  		kvm_make_request(KVM_REQ_MAP_L1_VNCR_EL2, vcpu);
+>  		kvm_release_faultin_page(vcpu->kvm, page, false, vt->wr.pw && vt->hpa_=
+writable);
+>  	}
+
+[Severity: High]
+This is a pre-existing issue, but is there a time-of-check to time-of-use r=
+ace
+between the lockless guest page table walk and guest TLBI intercepts here?
+
+CPU1 locklessly resolves the guest virtual address via __kvm_translate_va()
+earlier in kvm_translate_vncr().
+
+Before CPU1 acquires the mmu_lock and increments vncr_tlb_count, CPU2 could
+modify the guest page table and issue a TLBI.
+
+The TLBI on CPU2 would see vncr_tlb_count =3D=3D 0 (or vt->valid =3D=3D fal=
+se) and
+complete. CPU1 would then acquire mmu_lock, pass the mmu_invalidate_retry()
+check (which only tracks host MMU notifiers), and install the stale
+translation.
+
+Could this result in caching a stale VNCR mapping?
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260801124818.3662=
-74-1-maz@kernel.org?part=3D4
+74-1-maz@kernel.org?part=3D6
