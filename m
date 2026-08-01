@@ -1,49 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D06BC1429D;
-	Sat,  1 Aug 2026 13:16:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7F4225B091;
+	Sat,  1 Aug 2026 13:36:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785590180; cv=none; b=WQBJOB3xB67iXkWyICpC/d7AE7NuDDO/W582XgTO99pPrDi82PECU9WJVZ3oQ6ZBEc42CKJIVXx8UhY4YK0XdzRJ9fkLoJhT0MaJa/PWwexIWmdWSTWbny+kuCRVHo9pyAxRFGpliI4rsDDCGT+fT8H9Pt2PqdXZtxhbviAM+sw=
+	t=1785591408; cv=none; b=AgtxQRs5vU7cjjsh4mpopSX/zx30OjE4esmGLWkulIU7aq8gaMhk+TjD6fsgs6aTdISHucN+BhDb1twjVZQRuznuM8DgM1X2yeoIaOdwlhzMEhQW0Abt5Mvi/nhVwaH7rb/MMBGXqC7wehceNmONXyXRr7eC6t0jdMpXIsnQxBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785590180; c=relaxed/simple;
-	bh=qCSEeD5n3cuWaxDnrXiYpShYWvnvED2SCnqLlQtV3Jw=;
+	s=arc-20240116; t=1785591408; c=relaxed/simple;
+	bh=4lKE/JPr11JJMVfr6ze6B58tQIRtPBSCcs0d1AhqCas=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eRHDe+KEJkPDm5dEVMSLV4V1dMDNFwYuDwvkPdGYxlhDyRTN+2h18JOMb/8og9cE0b6YnoWBDqEAGqU613jNqxCzR5JYYT6HYXLd6hp1HGimp1EjTLz7/T8ygrEUD2NLkbhpAoowJYV/gH/4ztPE0iLeK4eLiKsDzlVtD5mbD48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G4IdOtQ8; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=SxXuKilBPfYCmNG9GyRV5ZCnPykATAsod6sSVt5aPrMRJP2b1QESVd+0X6xrlz6sioliaxhk5R/CsUOydmAuI5hAq10pNiqZtfSDm7Mx3Wi3eYHQwV4DSKqciZhvFo40uLKKfkGkgzZTrb6/z+3PA+M+/VBKPLj66GtgqkFNOfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZIL7mpol; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G4IdOtQ8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78D861F00AC4;
-	Sat,  1 Aug 2026 13:16:19 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZIL7mpol"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B52F61F00AC4;
+	Sat,  1 Aug 2026 13:36:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785590179;
-	bh=NW3KbXmM+8mhFWBml3VwpJO0A61GZsDe1/g0c+WV+u8=;
+	s=k20260515; t=1785591407;
+	bh=92dPf4qeonlx2miTfxvE81cldvTp+iKhucxLs3AX8kY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=G4IdOtQ8OC26jC8+Ehw/aS10xjb6d4Ih7jSDkerrVoNBXneIliS1BW2b6OTubOiyi
-	 lQy/WCjOHluLLkOgAFnKXzBjrZZsE7UeMbr2ys9Ab/KNX9AgfHNc11VbXcgvxCRjwM
-	 dCC6rm+520xO0OdSclSE8NbFzOHGzaVfqs584VdCndBPFdwfrI/nRgILGKmofFW7TS
-	 gsvjNc6guYPOE187Q4qNlPOIoZD61cE2rRrfxIfGsSOCufJgYvK15NhUc3ZbVe69HU
-	 hrO0or2gIOkKf+QWup8V39ZDmPiyAR5DzXX7p4QMkTWROLlAf/Sr+ffcz/4qyl6NEe
-	 EWK2LQb1pdATA==
+	b=ZIL7mpolIQDGuznVf5TXeM1+vhycp08kSHiXlbHnBWr6ajm4tCdZJhTsX2A1DG2dc
+	 ASBv/EypboYl7zFOAzijjCBsWQCht3ZMKzmYpHBxwtzXJGyWDk2LcvVPRXNJnI+AJN
+	 bnYUXl/JHyx0g26WGZWTrBXzufjDMLATKwEjbjt+M5nZfYbgCNBMDLyvZGvOU8LNxt
+	 xI4YXU5qRYEJ5uDuiBaCQNIXjc5c+9KhDKhycaNCo1ot2cNiZOXOebdazfqoNTyWOi
+	 oFlMRXATzLkJ7kvxOHjrgTmvMGs9dmWq0YoFzRB1SmEdfKoQrcOtHKBNiG+RiPwzAs
+	 JJE/n2qnoIC1g==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wq9ZZ-0000000BGp1-3BR5;
-	Sat, 01 Aug 2026 13:16:17 +0000
-Date: Sat, 01 Aug 2026 14:20:29 +0100
-Message-ID: <87qzkiou3m.wl-maz@kernel.org>
+	id 1wq9tN-0000000BGvn-45wp;
+	Sat, 01 Aug 2026 13:36:46 +0000
+Date: Sat, 01 Aug 2026 14:40:57 +0100
+Message-ID: <87pl02ot5i.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: sashiko-reviews@lists.linux.dev
-Cc: kvmarm@lists.linux.dev,
-	"Oliver Upton" <oupton@kernel.org>,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH 2/6] KVM: arm64: Handle negative S1 walk levels in VNCR TLB size evaluation
-In-Reply-To: <20260801130236.376BD1F00AC4@smtp.kernel.org>
+Cc: "Oliver Upton" <oupton@kernel.org>,
+	kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH 4/6] KVM: arm64: Correctly handle end of VA space TLBI invalidation
+In-Reply-To: <20260801130337.EB2BA1F00AC4@smtp.kernel.org>
 References: <20260801124818.366274-1-maz@kernel.org>
-	<20260801124818.366274-3-maz@kernel.org>
-	<20260801130236.376BD1F00AC4@smtp.kernel.org>
+	<20260801124818.366274-5-maz@kernel.org>
+	<20260801130337.EB2BA1F00AC4@smtp.kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -55,79 +55,36 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev, oupton@kernel.org, kvm@vger.kernel.org
+X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, oupton@kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sat, 01 Aug 2026 14:02:35 +0100,
+On Sat, 01 Aug 2026 14:03:37 +0100,
 sashiko-bot@kernel.org wrote:
 > 
 > Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
 > 
 > Pre-existing issues:
-> - [High] Stage-1 huge block mappings (e.g., 4TB, 64GB) are incorrectly truncated to 1GB due to a 32-bit return type and a hardcoded fallback, leading to under-invalidation of the VNCR software cache.
-> --
-> 
-> --- Patch [2]: [PATCH 2/6] KVM: arm64: Handle negative S1 walk levels in VNCR TLB size evaluation ---
-> commit 55a3817e6985fb11462e68c9b396c2d3ee056461
-> Author: Marc Zyngier <maz@kernel.org>
-> 
-> KVM: arm64: Handle negative S1 walk levels in VNCR TLB size evaluation
-> 
-> This patch fixes a bug where negative Stage-1 mapping levels (used to indicate
-> S1_MMU_DISABLED) were mishandled by pgshift_level_to_ttl(), leading to an
-> invalidation size of 0. It introduces __ttl_to_size() and ensures ttl_to_size()
-> always falls back to SZ_1G when no valid TTL size is found.
-> 
-> Link: https://lore.kernel.org/r/ameGoxbn2wzBq2kL@v4bel
-> 
-> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> > index 983ba0adaf4e6..b026d160f253d 100644
-> > --- a/arch/arm64/kvm/nested.c
-> > +++ b/arch/arm64/kvm/nested.c
-> 
-> [ ... ]
-> 
-> > @@ -506,7 +506,7 @@ int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
-> >  	return ret;
-> >  }
-> >  
-> > -static unsigned int ttl_to_size(u8 ttl)
-> > +static unsigned int __ttl_to_size(u8 ttl)
-> 
-> [Severity: High]
-> This is a pre-existing issue, but does this unsigned int return type cause
-> huge block mapping sizes to be incorrectly truncated?
-> 
-> Since __ttl_to_size() and ttl_to_size() return a 32-bit unsigned int, they
-> cannot represent sizes 4GB or larger (like 4TB for 64K granule Level 1, or
-> 64GB for 16K granule Level 1).
+> - [High] Missing sign-extension in `decode_range_tlbi()` breaks
+> - Stage-1 range TLB invalidations (e.g., `TLBI RVAE1`) for TTBR1
+> - addresses.
 
-Which is adequate since we don't support these sizes.
+Yup, that's yet another bug. I'll queue this:
 
-> 
-> > @@ -562,10 +562,22 @@ static unsigned int ttl_to_size(u8 ttl)
-> >  	return max_size;
-> >  }
-> >  
-> > -static u8 pgshift_level_to_ttl(u16 shift, u8 level)
-> > +static unsigned int ttl_to_size(u8 ttl)
-> > +{
-> > +	return __ttl_to_size(ttl) ?: SZ_1G;
-> > +}
-> 
-> If a nested L1 guest maps its VNCR page in such a huge block using 52-bit
-> VAs and later issues a TLBI with a VA far from the VNCR page VA, KVM will
-> calculate a severely undersized invalidation window. Because the true size
-> overflows unsigned int (or evaluates to 0), the fallback restricts it to 1GB.
-> 
-> This could leave KVM using a stale IPA, potentially corrupting nested guest
-> state by writing into unmapped or reassigned guest physical memory.
-> 
-> Should these size calculation functions be returning an unsigned long or u64
-> instead?
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index cc48817a5bf7a..f1ce0d9fd50ef 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -290,6 +290,7 @@ static inline u64 decode_range_tlbi(u64 val, u64 *range, u16 *asid)
+ 	}
+ 
+ 	base	= (val & GENMASK(36, 0)) << shift;
++	base	= (u64)sign_extend64(base, 48);
+ 
+ 	if (asid)
+ 		*asid = FIELD_GET(TLBIR_ASID_MASK, val);
 
-No, we don't support LVA/LVA2 for nested guests.
+Thanks,
 
 	M.
 
