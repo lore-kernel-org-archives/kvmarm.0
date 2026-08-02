@@ -1,228 +1,145 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B2BC337105;
-	Sat,  1 Aug 2026 16:57:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2FC837F8CB
+	for <kvmarm@lists.linux.dev>; Sun,  2 Aug 2026 11:27:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785603423; cv=none; b=AmqYPaqox68DwDdsO3rZ4wjNBbTCWx21ILJIu/umgs3wKIp02oBNQsSTcrfVA+6xpVQa+wbSa46SCA3i4cG4FOx1a2QrXyLmHFzeI0+xh1SXQQ31Rtylg4gGPYvOXQxKMo/a+h718u89ev0hJPFu3OEfD7AEUb/YYWmrOXTbMqA=
+	t=1785670026; cv=none; b=MJlBiE1geJESrSwiftp9CvlZCMY1arVpTsbNyJfp7yNOjupzAv+kdTgc2BhCuyx0f75r4jT/JwJWuiv8Jvg2NP+THcaq9wrOvhCs8MVxpNh4m6hSfHhH3GyPeawtgTQDWXSMIGg9IMc9SlnDPc7PgRV2uufO2FG/l1LYQDnczKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785603423; c=relaxed/simple;
-	bh=d+TTclD9SIWbHf6DvU0ahaB+5z46g21wSuI7omCyHnI=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PcvEDon9avTYcWYy+3W+qGsODMStyozWhbG6+yEVNHbDzzQAbRZsQFask7FR8X0eTfC0oTxFKw/1mWc5uvSXwAWk3B5Nw78usgHQFuEu1DV3uGDqLrhQ7inUPWpGlyM06t92UkCOrEW4yGgh0VOctAEUe7fG2YVq70VeZy4KKck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R4hUTV4Q; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1785670026; c=relaxed/simple;
+	bh=nF7coVV2kHVyCGtcpiZP2E1d/ovYal2Im5xsbDTZzxA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lnj3e25es7ds1KImc9kbChyoEJ4MYQiMDIA9lArAvcj1BQxt+E9NDNzullCvkm7s40EVBou+5pinwwYYmsea3kLRdSukVbNDRy8eUHjSxlTz0rnu55Awc0H8eUuxoDqLIKxz95MgBKan/Kq19DohBz/Dxsxjtdh3MFuXPVGmkPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qUCD4pA6; arc=none smtp.client-ip=95.215.58.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R4hUTV4Q"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7B881F00AC4;
-	Sat,  1 Aug 2026 16:57:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785603421;
-	bh=Kymd9GnLiiGDQY+sNKBHnxcjsiopYfYgyw9JAcg7YHo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=R4hUTV4QkfKl4gG77/QK4xfDNOLysOJurfAk8cJpNagHA0RQVosZ2jHg8Q1KeopJa
-	 IFVmdrWFRe5u4aNO3LLEim2GEb/7CWVULZoy02WBfH2OJBN+qUV4Tp+Q/Zg9oP6XoQ
-	 EhK6MDxxM4YpiFLiFFm7LmX8KRZ2aXdHZRx7Vcc1dUwt95Y1whzkM1rjTvt2uAXKgZ
-	 0nlt1H9RbiST06UTE4gci0Gvpv0l2PlnXrt3J/yXtK8D/OONg9BCqvUtquE9HDWUz3
-	 MjEK7lVr5PWt24re08hGEKx9qzPwBrVNSoK0U71zdeatt8bg4seTeQBt86GqoJOyAs
-	 hjAu+7aZbf6+g==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wqD19-0000000BIv9-3CMg;
-	Sat, 01 Aug 2026 16:56:59 +0000
-Date: Sat, 01 Aug 2026 18:01:11 +0100
-Message-ID: <87mrv5pyg8.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: sashiko-reviews@lists.linux.dev
-Cc: "Oliver Upton" <oupton@kernel.org>,
-	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH 6/6] KVM: arm64: Add VNCR TLB tracking again
-In-Reply-To: <20260801130454.5D9F11F00AC4@smtp.kernel.org>
-References: <20260801124818.366274-1-maz@kernel.org>
-	<20260801124818.366274-7-maz@kernel.org>
-	<20260801130454.5D9F11F00AC4@smtp.kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qUCD4pA6"
+X-Forwarded-Encrypted: i=1; AHgh+Rq2UjM2cNWOwQWb+2qMwFFf9djxH0lxUI9d0rW/CnTUa+WkEX00Mn5vCqiWzCnMpLcOM0RZZOI=@lists.linux.dev
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1785670021;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=H8+9qFQ09vt18LEHf6NmsyCgwHmScAV6wHk8xYDd+6c=;
+	b=qUCD4pA6a34sbaS+dohJ3cRuytOSqbwoqhCDJ9pojWTXzasQQOwbEeVWsguVFnkEWMLlTK
+	QIY+20aMJz6KFSnr8gT4IVMrRcsV3dI4Nbd9cwMMnVCIcDGXPJYK4pbglAkgiK1AJ5/zE3
+	GA2Pwos/SvCj2pyckJS7vlGhHb2gC90=
+X-Gm-Message-State: AOJu0Yx3Gs3A4CkE5/jAhwqv06cNfgBDl++jEoCLoG1xON7bOq+xfgsk
+	1S9fQ7Zpv4hQbKYYY16T/sLOFTRhPKoeDnoxzz6ubik/T3mUaSuQ2VTnhnbCKjCHMyMxeDioP3A
+	gA98DhDXHTi1YqkD8k4aZgGmeE8mr07qKZZojEiil
+X-Received: by 2002:ac8:5f95:0:b0:50f:b69a:f4a8 with SMTP id
+ d75a77b69052e-52b5b095101mr19009831cf.7.1785670017506; Sun, 02 Aug 2026
+ 04:26:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, oupton@kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20260731182231.1277064-1-vdonnefort@google.com> <20260731183852.5817F1F00ACA@smtp.kernel.org>
+In-Reply-To: <20260731183852.5817F1F00ACA@smtp.kernel.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Sun, 2 Aug 2026 12:26:20 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTyTjhXLaAA217h9RFXk1HdLPTaAOmQvsij1hyU8Ehigvw@mail.gmail.com>
+X-Gm-Features: AUfX_mws5aimaFrj6-svB_5aXuUUDzOjsp4VZrEhfA9Zo7Vb8CZNTXEiHRApe_s
+Message-ID: <CA+EHjTyTjhXLaAA217h9RFXk1HdLPTaAOmQvsij1hyU8Ehigvw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: arm64: Drop %pB on nVHE panic when stage-2 is active
+To: sashiko-reviews@lists.linux.dev
+Cc: Vincent Donnefort <vdonnefort@google.com>, Oliver Upton <oupton@kernel.org>, 
+	Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Migadu-Flow: FLOW_OUT
 
-On Sat, 01 Aug 2026 14:04:53 +0100,
-sashiko-bot@kernel.org wrote:
-> 
-> Thank you for your contribution! Sashiko AI review found 3 potential issue(s) to consider:
-> 
+On Fri, 31 Jul 2026 at 19:39, <sashiko-bot@kernel.org> wrote:
+>
+> Thank you for your contribution! Sashiko AI review found 1 potential issu=
+e(s) to consider:
+>
 > Pre-existing issues:
-> - [Critical] Cross-CPU invalidation of VNCR TLBs (e.g., via MMU notifiers) clears the fixmap and resets `vt->cpu` but fails to clear the per-CPU `L1_VNCR_MAPPED` flag on the CPU where the vCPU is running. When the vCPU is subsequently scheduled out, `this_cpu_reset_vncr_fixmap()` checks the local flag, finds it set, and hits a `BUG_ON` because `vt->cpu` is `-1`. This allows unprivileged host userspace to panic the host kernel.
-> - [High] The fast-path check in `kvm_hyp_handle_tlbi_el2()` skips VNCR TLB invalidation for EL2 TLBI instructions when `E2H` or `TGE` is 0, leaving stale translations in the software VNCR TLB.
-> - [High] A TOCTOU race exists between lockless guest page table walks and guest TLBI intercepts, allowing stale VNCR translations to survive invalidation.
+> - [High] The patch fixes a stage-2 fault deadlock in `print_nvhe_hyp_pani=
+c()` by removing the `%pB` modifier, but misses `kvm_nvhe_dump_backtrace_en=
+try()` and `dump_kernel_instr()` which both access lazily-mapped host memor=
+y later in the exact same panic path, causing the same deadlock.
+
+I don't think either deadlocks. dump_kernel_instr() reads hyp .text,
+which is kept RO-mapped in the host stage-2 for panic inspection
+(fix_host_ownership_walker(), PAGE_HYP_EXEC ->
+host_stage2_idmap_locked(..., PROT_R)), so no fault.
+kvm_nvhe_dump_backtrace_entry()'s %pB runs only under
+CONFIG_PKVM_STACKTRACE, which depends on PKVM_DISABLE_STAGE2_ON_PANIC,
+and that path disables the host stage-2 on panic anyway; otherwise
+it's the stub, and non-protected has no host stage-2. kallsyms was the
+only lazily-mapped access, so I think this is complete.
+
+/fuad
+
 > --
-> 
-> --- Patch [6]: [PATCH 6/6] KVM: arm64: Add VNCR TLB tracking again ---
-> commit bde680578e8485472440ba4858d93cb92173897d
-> Author: Marc Zyngier <maz@kernel.org>
-> Date:   Sat Aug 1 12:48:18 2026 +0000
-> 
->     KVM: arm64: Add VNCR TLB tracking again
->     
->     This patch re-introduces VNCR TLB tracking to force EL2 S1 TLBI handling
->     onto the slow path when valid VNCR TLBs exist. It uses a VM-wide atomic
->     counter to track the presence of valid VNCR TLBs, updating it under the
->     MMU lock.
-> 
-> > diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-> > index c09b1d411c584..eb59549ec2172 100644
-> > --- a/arch/arm64/kvm/hyp/vhe/switch.c
-> > +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-> > @@ -424,10 +424,11 @@ static bool kvm_hyp_handle_tlbi_el2(struct kvm_vcpu *vcpu, u64 *exit_code)
-> >  		return false;
-> >  
-> >  	/*
-> > -	 * If we have to check for any VNCR mapping being invalidated,
-> > +	 * If we have to check for any VNCR TLB being invalidated,
-> >  	 * go back to the slow path for further processing.
-> >  	 */
-> > -	if (vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu))
-> > +	if (vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu) &&
-> > +	    atomic_read(&vcpu->kvm->arch.vncr_tlb_count))
-> >  		return false;
-> 
-> [Severity: High]
-> This isn't a bug introduced by this patch, but does this check skip VNCR TLB
-> invalidation for EL2 TLBI instructions when the guest is in nVHE
-> mode?
-
-nVHE and NV are mutually exclusive in KVM.
-
-[...]
-
-> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> > index 8d5b0208ad728..2a7dd9f9fb597 100644
-> > --- a/arch/arm64/kvm/nested.c
-> > +++ b/arch/arm64/kvm/nested.c
-> [ ... ]
-> > @@ -998,9 +999,11 @@ u16 get_asid_by_regime(struct kvm_vcpu *vcpu, enum trans_regime regime)
-> >  	return asid;
-> >  }
-> >  
-> > -static void invalidate_vncr(struct vncr_tlb *vt)
-> > +static void invalidate_vncr(struct kvm *kvm, struct vncr_tlb *vt)
+>
+> --- Patch [1]: [PATCH] KVM: arm64: Drop %pB on nVHE panic when stage-2 is=
+ active ---
+> commit cbd94a7b340a7dc4be01336a040cb8c3d9690ab4
+> Author: Vincent Donnefort <vdonnefort@google.com>
+>
+> KVM: arm64: Drop %pB on nVHE panic when stage-2 is active
+>
+> This commit removes the %pB format specifier from print_nvhe_hyp_panic()
+> when running in protected KVM mode without stage-2 panic disabling. This
+> prevents a deadlock caused by a stage-2 fault when accessing unmapped
+> kallsyms memory while the host stage-2 lock is held.
+>
+> > diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.=
+c
+> > index 54aedf93c78b6..2e1951c215ae8 100644
+> > --- a/arch/arm64/kvm/handle_exit.c
+> > +++ b/arch/arm64/kvm/handle_exit.c
+> > @@ -509,8 +509,12 @@ void handle_exit_early(struct kvm_vcpu *vcpu, int =
+exception_index)
+> >
+> >  static void print_nvhe_hyp_panic(const char *name, u64 panic_addr)
 > >  {
-> > +	BUG_ON(!vt->valid);
-> >  	vt->valid = false;
-> > +	atomic_dec(&kvm->arch.vncr_tlb_count);
-> >  	if (vt->cpu != -1)
-> >  		unmap_l1_vncr(vt);
+> > -     kvm_err("nVHE hyp %s at: [<%016llx>] %pB!\n", name, panic_addr,
+> > -             (void *)(panic_addr + kaslr_offset()));
+> > +     /* Kallsyms might not be mapped in the host stage-2 */
+> > +     if (is_protected_kvm_enabled() && !IS_ENABLED(CONFIG_PKVM_DISABLE=
+_STAGE2_ON_PANIC))
+> > +             kvm_err("nVHE hyp %s at: %016llx!\n", name, panic_addr);
+> > +     else
+> > +             kvm_err("nVHE hyp %s at: [<%016llx>] %pB!\n", name, panic=
+_addr,
+> > +                     (void *)(panic_addr + kaslr_offset()));
 > >  }
-> 
-> [Severity: Critical]
-> This is a pre-existing issue, but does this cross-CPU invalidation path leave
-> the per-CPU L1_VNCR_MAPPED flag set locally?
-> 
-> If an MMU notifier on CPU B calls kvm_invalidate_vncr_ipa() which reaches
-> invalidate_vncr(), unmap_l1_vncr() will clear the fixmap and set vt->cpu = -1.
-> 
-> When CPU A (which was running the vCPU) exits the guest and calls
-> this_cpu_reset_vncr_fixmap(), won't it see its local L1_VNCR_MAPPED flag still
-> set and trigger BUG_ON(vcpu->arch.vncr_tlb->cpu != smp_processor_id()) because
-> vt->cpu is now -1?
-
-Addressed in my reply to the comment on the previous patch.
-
-> 
-> [ ... ]
-> > @@ -1460,6 +1471,8 @@ static int kvm_translate_vncr(struct kvm_vcpu *vcpu, bool *is_gmem)
-> >  		vt->valid = true;
-> >  		vt->cpu = -1;
-> >  
-> > +		atomic_inc(&vcpu->kvm->arch.vncr_tlb_count);
-> > +
-> >  		kvm_make_request(KVM_REQ_MAP_L1_VNCR_EL2, vcpu);
-> >  		kvm_release_faultin_page(vcpu->kvm, page, false, vt->wr.pw && vt->hpa_writable);
-> >  	}
-> 
+>
 > [Severity: High]
-> This is a pre-existing issue, but is there a time-of-check to time-of-use race
-> between the lockless guest page table walk and guest TLBI intercepts here?
-> 
-> CPU1 locklessly resolves the guest virtual address via __kvm_translate_va()
-> earlier in kvm_translate_vncr().
-> 
-> Before CPU1 acquires the mmu_lock and increments vncr_tlb_count, CPU2 could
-> modify the guest page table and issue a TLBI.
-> 
-> The TLBI on CPU2 would see vncr_tlb_count == 0 (or vt->valid == false) and
-> complete. CPU1 would then acquire mmu_lock, pass the mmu_invalidate_retry()
-> check (which only tracks host MMU notifiers), and install the stale
-> translation.
-> 
-> Could this result in caching a stale VNCR mapping?
-
-Yup. That's definitely another problem.
-
-I think we need something that like the mmu notifier retry
-mechanism. We can hoist the increment of vcpu_tlb_count to the
-beginning of the translation process, sample a counter, and recheck
-this counter once we've acquired the mmu lock.
-
-I wonder if we can actually use the exact same counter outside of the
-MMU notifiers, bumping it up from the TLBI VA code... Something like
-the untested hack below.
-
-	M.
-
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index dfdd1b4abb839..73c7bd4223f13 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -1010,6 +1010,8 @@ static void invalidate_vncr(struct kvm *kvm, struct vncr_tlb *vt)
- 	vt->valid = false;
- 	atomic_dec(&kvm->arch.vncr_tlb_count);
- 	unmap_l1_vncr(vt);
-+	kvm->mmu_invalidate_seq++;
-+	smp_wmb();
- }
- 
- static bool vncr_tlb_intersects(struct vncr_tlb *vt, u64 addr,
-@@ -1475,8 +1477,6 @@ static int kvm_translate_vncr(struct kvm_vcpu *vcpu, bool *is_gmem)
- 		vt->valid = true;
- 		atomic_set(&vt->cpu, -1);
- 
--		atomic_inc(&vcpu->kvm->arch.vncr_tlb_count);
--
- 		kvm_make_request(KVM_REQ_MAP_L1_VNCR_EL2, vcpu);
- 		kvm_release_faultin_page(vcpu->kvm, page, false, vt->wr.pw && vt->hpa_writable);
- 	}
-@@ -1530,7 +1530,17 @@ int kvm_handle_vncr_abort(struct kvm_vcpu *vcpu)
- 		return -EIO;
- 	}
- 
-+	/*
-+	 * Speculatively increment the TLB count to make sure concurrent
-+	 * TLBIs will take the slow path, and will interact with the retry
-+	 * mechanism. Drop it again on error.
-+	 */
-+	atomic_inc(&vcpu->kvm->arch.vncr_tlb_count);
-+
- 	ret = kvm_translate_vncr(vcpu, &is_gmem);
-+	if (ret)
-+		atomic_dec(&vcpu->kvm->arch.vncr_tlb_count);
-+
- 	switch (ret) {
- 	case -EAGAIN:
- 		/* Let's try again... */
-
--- 
-Jazz isn't dead. It just smells funny.
+> This is a pre-existing issue, but does this same deadlock still trigger
+> later in the panic path?
+>
+> While this fixes the memory access in print_nvhe_hyp_panic(), the handler
+> nvhe_hyp_panic_handler() subsequently calls kvm_nvhe_dump_backtrace() and
+> dump_kernel_instr().
+>
+> In arch/arm64/kvm/stacktrace.c:kvm_nvhe_dump_backtrace_entry(), there is
+> another use of %pB:
+>
+>         kvm_err(" [<%016lx>] %pB\n", where, (void *)(where + kaslr_offset=
+()));
+>
+> Additionally, nvhe_hyp_panic_handler() calls dump_kernel_instr() which al=
+so
+> reads the faulting instruction directly from memory in
+> arch/arm64/kernel/traps.c:
+>
+>         bad =3D aarch64_insn_read(&((u32 *)kaddr)[i], &val);
+>
+> Will both of these also access lazily-mapped host stage-2 memory, trigger
+> a stage-2 data abort, and deadlock when trying to re-acquire host_mmu.loc=
+k?
+>
+> --
+> Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260731182231.12=
+77064-1-vdonnefort@google.com?part=3D1
+>
