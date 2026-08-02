@@ -1,107 +1,150 @@
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23A3D3AEB35
-	for <kvmarm@lists.linux.dev>; Sun,  2 Aug 2026 11:32:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5760D369D59;
+	Sun,  2 Aug 2026 11:53:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785670382; cv=none; b=FcIbbVqjfQxqUoUzh967gD15YcdEDyyLDV7EJRQIvfgXFg/hBc6oq6BnVX5uXMKy5NMEwq0DQ7RFCvkvxGd6LkU6hN1BSKRzuu5mw18yHBT/CzTnqSQcbrAPRbCV+3tusSR+nDQmeWFKYKuilS6wJBt+i7FenyFPtckAXy/mTpc=
+	t=1785671605; cv=none; b=rPHi5t84+e818++ad/9QpHZERBjLhsMW63eEAACfQMCgOoAv5IQ7c/iZDY2qHosr/c13qPjMnJIwblPpvEM6+YzG0t22p2flYc36qkeoi+a44LsJ03lHKbR1DoPv/t/zzSy1HWaeEu4haQtTmIiUFWF6aZyhn/bWPxe6wdWursw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785670382; c=relaxed/simple;
-	bh=6x8vPLAdn355tmP/ANDI2S4PH+v3cK2MaXG10kriN10=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KfVRRqiRATBXd4YeqNF54R1rV1FyIPOq6+kkaJGgi+jCtrK76LkHHz90vWpkmJE0GANomVu23TWvOWKPVl8HcxsrEZkJUSbpYapv/m8K0fO6RVp+rsnCAOy8l/WqnAVYCh7qD7lV3+vYH79zGPG6ioj/R0K9zi0DCTCJbhzmA94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JaUE+JdH; arc=none smtp.client-ip=95.215.58.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1785671605; c=relaxed/simple;
+	bh=p+O5Jp/7cPIaCKXEDb07vL/TBlrPv7W/E1F9vWUTsZE=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sFHfRBD7mfZ6F/gRlUXQIUIncGA8jVl0xDZ4Vj8ygAfJEpUfPuQanJbL25wj0C9s3EpYtwcRKjLDlnP0zhSmfyGF9KLsiabswecREYPOA3r7ARkp/Ke0pJTlXn07olBdiXOBEBcVLV2Z+VU96AmtdvTw59LInxSSvi6u0PNJ9VY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QsY+YTEL; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JaUE+JdH"
-X-Forwarded-Encrypted: i=1; AHgh+RqIrQa0+21EDo4SgmLWfvMfQKE59WfKjK2+MBeB+hl3MULspa3e0cl2UVqAQ/3bVqeWFwmcvNQ=@lists.linux.dev
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1785670362;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=563oNXUIkeVMeBvn7KJOWvs/zhYBpCRLhQXu0aHBhw8=;
-	b=JaUE+JdHFP7MaVGI98pPRHgqUT4piafvGqmnLAegteTR/SGJNy5mQlCSVEKk/Xyj6EdjUX
-	D+3HCGtvYkUWlBJZ1KYJEJTx+B3hYGZsRbb8Zs04F474fvgPjx4WFEeevYyGsNxC1xtJeF
-	FT1NQgqenx3S/244RNEasc66F+uNqko=
-X-Gm-Message-State: AOJu0YwFOhvph4qyXP+mY3efkvceOVvsyL10lgAawNjg8aD2uKMAZnZm
-	D+mB1acHSgT1uCD/Ee4gHG7/c+HyoxKVZyYJzxkOQVHA5qmZGr3w9gRuP4pTSdM24vX9M5ujSQT
-	AxHLkIDnLosG9yUExya1MCvMztel++7vR7+MXtlkh
-X-Received: by 2002:ac8:580e:0:b0:517:5d71:84e5 with SMTP id
- d75a77b69052e-52b5b0b0160mr17986791cf.5.1785670353005; Sun, 02 Aug 2026
- 04:32:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QsY+YTEL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBC271F000E9;
+	Sun,  2 Aug 2026 11:53:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785671603;
+	bh=qG8el77ac5B/pcNIohLMU22cDEqP6jWhheMGhqwN4Fo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=QsY+YTELaoPvjJFP2u0KZw7KP6sjEf2w5+gW00Iw6Pqa0KNtIShRdrdxLkWFLBpE+
+	 f1tjdIGCAfoM3OkQtds7QM7g+oYs/h9IuD0IT8rvhvgKERY2tRAadwPt4IEKQnf4Zt
+	 bVjReKadb/9TZTtaguEyuAlb+OtszlTRt7q3oOhsgT3LLyfFWM6UhzvJSqaezrv9ed
+	 T73yw8Ulqm1Xzls0qoG3JnM5AGuFaOzZTr3Mxt+ETvdq5ERn4voDbHv2A9U5tFVRlh
+	 9CpsSlN86gRtytwCBocizVKUk5Gszr34WdLpE5KFAnNL08UrEAsS70Z4ED8YM7YHsG
+	 OsxuigYZEugXA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wqUkr-0000000BRRN-1DNS;
+	Sun, 02 Aug 2026 11:53:21 +0000
+Date: Sun, 02 Aug 2026 12:53:22 +0100
+Message-ID: <87ldaopwlp.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Karl Mehltretter <kmehltretter@gmail.com>
+Cc: Oliver Upton <oupton@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Andre Przywara <andre.przywara@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: Preserve AArch32 CP64 registers on rejected reads
+In-Reply-To: <20260801153616.71960-1-kmehltretter@gmail.com>
+References: <20260801153616.71960-1-kmehltretter@gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20260731182231.1277064-1-vdonnefort@google.com>
-In-Reply-To: <20260731182231.1277064-1-vdonnefort@google.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Sun, 2 Aug 2026 12:31:55 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTxwJ+e4nOuVE3nuMJxRk62fDhY-GVDjO6HLGzGmUVj5Qg@mail.gmail.com>
-X-Gm-Features: AUfX_mzYz28lGkU5fFeVKuoX3O7CJ-5QBWq0Fe673Jb9b-5t2OiaUr7qhE-dcTs
-Message-ID: <CA+EHjTxwJ+e4nOuVE3nuMJxRk62fDhY-GVDjO6HLGzGmUVj5Qg@mail.gmail.com>
-Subject: Re: [PATCH] KVM: arm64: Drop %pB on nVHE panic when stage-2 is active
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, 
-	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com, 
-	qperret@google.com
-Content-Type: text/plain; charset="UTF-8"
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kmehltretter@gmail.com, oupton@kernel.org, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, andre.przywara@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 31 Jul 2026 at 19:22, Vincent Donnefort <vdonnefort@google.com> wrote:
->
-> Currently, the host stage-2 is lazily mapped. kallsyms, accessed with
-> the modifier %pB is therefore potentially unmapped. If the hyp panic
-> occured with the host stage-2 lock taken, a dead lock will occur.
->
-> Fixes: 6ccf9cb557bd ("KVM: arm64: Symbolize the nVHE HYP addresses")
-> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
->
-> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-> index 54aedf93c78b..2e1951c215ae 100644
-> --- a/arch/arm64/kvm/handle_exit.c
-> +++ b/arch/arm64/kvm/handle_exit.c
-> @@ -509,8 +509,12 @@ void handle_exit_early(struct kvm_vcpu *vcpu, int exception_index)
->
->  static void print_nvhe_hyp_panic(const char *name, u64 panic_addr)
->  {
-> -       kvm_err("nVHE hyp %s at: [<%016llx>] %pB!\n", name, panic_addr,
-> -               (void *)(panic_addr + kaslr_offset()));
-> +       /* Kallsyms might not be mapped in the host stage-2 */
-> +       if (is_protected_kvm_enabled() && !IS_ENABLED(CONFIG_PKVM_DISABLE_STAGE2_ON_PANIC))
+On Sat, 01 Aug 2026 16:36:16 +0100,
+Karl Mehltretter <kmehltretter@gmail.com> wrote:
+> 
+> kvm_handle_cp_64() only seeds params.regval for writes. If a CP64 read is
+> decoded but rejected, emulate_cp() still returns handled and the caller
 
-nit: this is the negation of the find_bug() guard a few lines up (not
-visible here), so could the two could share a helper?
+s/rejected/UNDEFs/
 
-> +               kvm_err("nVHE hyp %s at: %016llx!\n", name, panic_addr);
-> +       else
-> +               kvm_err("nVHE hyp %s at: [<%016llx>] %pB!\n", name, panic_addr,
-> +                       (void *)(panic_addr + kaslr_offset()));
->  }
+> writes params.regval back to Rt/Rt2.
+> 
+> This can happen for write-only GIC SGI registers
 
-Tested on a pKVM host with CONFIG_PKVM_DISABLE_STAGE2_ON_PANIC=n:
-triggered an nVHE hyp panic and confirmed the new branch is taken and
-the panic reports cleanly. The later dump_kernel_instr() is fine too,
-it reads hyp text, which stays RO-mapped in the host stage-2 for
-inspection, so no fault.
+Can it? I know we have some code handling this case, but this was for
+a (long gone) userspace harness driving this code. On any HW, reading
+from WO registers directly results in an UNDEF, without SW
+involvement.  Same thing for RO vs writes.
 
-Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
-Tested-by: Fuad Tabba < fuad.tabba@linux.dev>
+If you know of any case contradicting this statement, please let me
+know.
 
-Cheers,
-/fuad
+> and for rejected PMU counter reads. In both cases KVM injects an
+
+s/rejected PMU counter reads/read accesses generating an UNDEF/
+
+> UNDEF into the guest, so the MRRC destination registers must remain
+> unchanged.
+
+s/destination registers/GPRs/
+
 >
->  static void kvm_nvhe_report_cfi_failure(u64 panic_addr)
->
-> base-commit: f5098b6bae761e346ebcd9da7f95622c04733cff
-> --
-> 2.55.0.508.g3f0d502094-goog
->
+> Instead, the uninitialised regval is copied into the guest registers. With
+> stack auto-initialisation this is a deterministic zero or pattern value.
+> With CONFIG_INIT_STACK_NONE it may be stale host stack data.
+> 
+> Match kvm_handle_cp_32() and kvm_handle_sys_reg() by seeding regval from
+> the destination registers before emulation.
+> 
+> Fixes: 6d52f35af10c ("arm64: KVM: add SGI generation register emulation")
+
+This has nothing to do with the handling of a particular register, and
+it has *always* been wrong. The correct tag appears to be:
+
+Fixes: 62a89c44954f0 ("arm64: KVM: 32bit handling of coprocessor traps")
+
+> Assisted-by: Claude:claude-opus-5
+> Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
+> ---
+> Runtime tested on a Raspberry Pi 400 with a minimal KVM harness running
+> an AArch32 guest. On the unpatched 6.1.21-v8+ vendor kernel, the PMCCNTR
+> MRRC test took UNDEF with r0=0x00000001/r1=0x00000000 instead of the
+> guest's sentinel values. With this patch on v7.2-rc3-278-g38436106b2f5,
+> the same test preserved r0=0x12345678/r1=0x9abcdef0.
+> 
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -4860,11 +4860,11 @@
+>  	/*
+>  	 * Make a 64-bit value out of Rt and Rt2. As we use the same trap
+>  	 * backends between AArch32 and AArch64, we get away with it.
+> +	 *
+> +	 * This also makes rejected reads preserve Rt/Rt2.
+
+There is no such thing as "rejected reads" in the architecture (we
+only use this word for userspace accesses, not guests). Also, I don't
+think this deserves a comment as it aligns the logic with the rest of
+the sysreg handling code.
+
+>  	 */
+> -	if (params.is_write) {
+> -		params.regval = vcpu_get_reg(vcpu, Rt) & 0xffffffff;
+> -		params.regval |= vcpu_get_reg(vcpu, Rt2) << 32;
+> -	}
+> +	params.regval = vcpu_get_reg(vcpu, Rt) & 0xffffffff;
+> +	params.regval |= vcpu_get_reg(vcpu, Rt2) << 32;
+>  
+>  	/*
+>  	 * If the table contains a handler, handle the
+
+Other than the nitpicks above, this looks OK to me.
+
+Thanks,
+
+	M.
+
+-- 
+Jazz isn't dead. It just smells funny.
