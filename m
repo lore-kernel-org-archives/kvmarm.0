@@ -1,35 +1,44 @@
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ADE23B774B
-	for <kvmarm@lists.linux.dev>; Sun,  2 Aug 2026 15:08:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 758313932EA;
+	Sun,  2 Aug 2026 15:55:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785683337; cv=none; b=laQRsRmccAdY00/BFrVF/zatcgv+fUtucSZaZZ6viGr1mejLhgfq0dckQl20z0WcU7SJ6L2navJ2lnaDlZ1mfBNCyuCCTh/SsKTdNQEBYGmSLl4VsDFS1Nmmh479YCmtWbrPpiVkQYK4Hy15zFf3g9fnfq8az3mhcKtayMwyjR4=
+	t=1785686123; cv=none; b=G7cMeyxDRC4po4QJK48JyMAinTON3CEYS6UgN2MTIH7dZUcOFDHMooeZitR5eSCugwgy3vlJtvhj7u/6ggArbVdfpPO60lVzEchrnT74+UKz3TUCHyfAqTX6PtwrC6ZqdiQ701zlzI3U9Rj4ZRuQXFauFDngRgj5XL1BskE/YCE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785683337; c=relaxed/simple;
-	bh=FLLmXGagEOlYSTN9NzFDSiVZQufg9oxohGb0jewo8S8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rC6s/+ltNJCxsCZ6kHTX1ISW5mNGNK5yDucaK16GWy0GUxmkjFfxgfbabn3TNbRM51fxF0UWvgBRU07rOJzRj3rLc8v3IZ+6PChBSOPss25kdM1HrLMFCJhN6ANycdQZFoNNXZ4MOMU9uzxKYIH7k1XLyNj3ckXX6bJmWMSw9ZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=gMKSneXP; arc=none smtp.client-ip=91.218.175.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1785686123; c=relaxed/simple;
+	bh=qt2EYFITGr67nfW1GZRtTcJUhTZzABRUhuy6g6rW1ro=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZgOaUzVrYrodMaboRktHKjwa+dJNAWxRsf09izs+tc09IJpU8XVxW4HcYQa5TbzjDUfL6UzihQhcN4ZjogV1RglcwgEWFpPSpMO+h43vyun5Xh72zZ8HM9wKsh8yPXOW2ZLncOeykmIFhbRMhHMvqvHMFK4eVdvoEvzcd2NJawc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QTJSGIHm; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="gMKSneXP"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1785683329;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=UHMm2Z1OTcyZHwDxnaYxeN3t4Vh1LnM+EKpoEcU3r9c=;
-	b=gMKSneXPJFyeWLDYzxirNzasdTlr+W9DcufRPbjyJf1BfLd/u1/KeSM/pbKdNb3SA9gXYe
-	W7NNh/2uQ4M0PsIYWE4gfoHErIm4C8IDArTrzSgAjN8YSdQEPOULsPYYpKeZjSlemCpj5N
-	/TwGZzBRaAYdkao9EDGLC+gG/Cb04aQ=
-From: Fuad Tabba <fuad.tabba@linux.dev>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	kvmarm@lists.linux.dev
-Cc: stable@vger.kernel.org,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QTJSGIHm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CA671F000E9;
+	Sun,  2 Aug 2026 15:55:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785686122;
+	bh=zZ5H4eB7tZXCdSU5j4A/pThsIBip2dyKmzd/naErbyA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=QTJSGIHmp7t1+XbvOwcW5t/LX7ZO577yRk3bxj7ro25XuEmNLeqdShjaajNmowTUB
+	 SJ/Mj3qy5G1PCtbsrw51ofWncwpwCfCqcFIxdHYQ3SXCwPo9CFuYptPQxhzcpRh64I
+	 zYjWVgFXhIPf6aR0Wwr/t+NqQUwji5YlP1gmfKCUa8uyKlKn+/qXpa+HTkXUSDG3kk
+	 e1rFZtj4Sh6oOHUqxl1RhGuy7wxH0PIhGA3IFaxLXvVpQBPZCpPhNBF7NPdXUW9xzc
+	 OP+1+iLrzaJMmo7k66kGl6knzV16Atdt2884VS3RQYSK4wQUwcGxQdNY2yuekRJeIc
+	 q6q6iSFUaEIPA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wqYX1-0000000BUNX-2Ni4;
+	Sun, 02 Aug 2026 15:55:19 +0000
+Date: Sun, 02 Aug 2026 16:55:20 +0100
+Message-ID: <87jyq8plef.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Oliver Upton <oupton@kernel.org>,
+	kvmarm@lists.linux.dev,
+	stable@vger.kernel.org,
 	Sascha Bischoff <Sascha.Bischoff@arm.com>,
 	Jonathan Cameron <jic23@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
@@ -41,48 +50,60 @@ Cc: stable@vger.kernel.org,
 	Fuad Tabba <tabba@google.com>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v1] KVM: arm64: vgic: Reset in_kernel on private IRQ allocation failure
-Date: Sun,  2 Aug 2026 16:08:45 +0100
-Message-Id: <20260802150845.3485757-1-fuad.tabba@linux.dev>
+Subject: Re: [PATCH v1] KVM: arm64: vgic: Reset in_kernel on private IRQ allocation failure
+In-Reply-To: <20260802150845.3485757-1-fuad.tabba@linux.dev>
+References: <20260802150845.3485757-1-fuad.tabba@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, kvmarm@lists.linux.dev, stable@vger.kernel.org, Sascha.Bischoff@arm.com, jic23@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, seiden@linux.ibm.com, catalin.marinas@arm.com, will@kernel.org, tabba@google.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-kvm_vgic_create() sets vgic.in_kernel before allocating the per-vCPU
-private IRQs, but the allocation-failure path resets only vgic_model and
-leaves in_kernel set. As irqchip_in_kernel() is !!in_kernel, the VM is
-left with an in-kernel irqchip but no model, and the -EEXIST guard at the
-top of kvm_vgic_create() rejects every retry, so userspace cannot recover
-from a transient -ENOMEM.
+On Sun, 02 Aug 2026 16:08:45 +0100,
+Fuad Tabba <fuad.tabba@linux.dev> wrote:
+> 
+> kvm_vgic_create() sets vgic.in_kernel before allocating the per-vCPU
+> private IRQs, but the allocation-failure path resets only vgic_model and
+> leaves in_kernel set. As irqchip_in_kernel() is !!in_kernel, the VM is
+> left with an in-kernel irqchip but no model, and the -EEXIST guard at the
+> top of kvm_vgic_create() rejects every retry, so userspace cannot recover
+> from a transient -ENOMEM.
+> 
+> Reset in_kernel alongside vgic_model on the failure path.
+> 
+> Fixes: 9435c1e1431003 ("KVM: arm64: gic: Set vgic_model before initing private IRQs")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+> ---
+>  arch/arm64/kvm/vgic/vgic-init.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+> index 907057881b26a..fdac6e24762da 100644
+> --- a/arch/arm64/kvm/vgic/vgic-init.c
+> +++ b/arch/arm64/kvm/vgic/vgic-init.c
+> @@ -176,6 +176,7 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
+>  		}
+>  
+>  		kvm->arch.vgic.vgic_model = 0;
+> +		kvm->arch.vgic.in_kernel = false;
+>  		goto out_unlock;
+>  	}
+>  
+> 
 
-Reset in_kernel alongside vgic_model on the failure path.
+Acked-by: Marc Zyngier <maz@kernel.org>
 
-Fixes: 9435c1e1431003 ("KVM: arm64: gic: Set vgic_model before initing private IRQs")
-Cc: stable@vger.kernel.org
-Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
----
- arch/arm64/kvm/vgic/vgic-init.c | 1 +
- 1 file changed, 1 insertion(+)
+	M.
 
-diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-index 907057881b26a..fdac6e24762da 100644
---- a/arch/arm64/kvm/vgic/vgic-init.c
-+++ b/arch/arm64/kvm/vgic/vgic-init.c
-@@ -176,6 +176,7 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
- 		}
- 
- 		kvm->arch.vgic.vgic_model = 0;
-+		kvm->arch.vgic.in_kernel = false;
- 		goto out_unlock;
- 	}
- 
-
-base-commit: f5098b6bae761e346ebcd9da7f95622c04733cff
 -- 
-2.39.5
-
+Jazz isn't dead. It just smells funny.
