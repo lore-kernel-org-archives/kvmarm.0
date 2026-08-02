@@ -1,150 +1,88 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5760D369D59;
-	Sun,  2 Aug 2026 11:53:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ADE23B774B
+	for <kvmarm@lists.linux.dev>; Sun,  2 Aug 2026 15:08:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785671605; cv=none; b=rPHi5t84+e818++ad/9QpHZERBjLhsMW63eEAACfQMCgOoAv5IQ7c/iZDY2qHosr/c13qPjMnJIwblPpvEM6+YzG0t22p2flYc36qkeoi+a44LsJ03lHKbR1DoPv/t/zzSy1HWaeEu4haQtTmIiUFWF6aZyhn/bWPxe6wdWursw=
+	t=1785683337; cv=none; b=laQRsRmccAdY00/BFrVF/zatcgv+fUtucSZaZZ6viGr1mejLhgfq0dckQl20z0WcU7SJ6L2navJ2lnaDlZ1mfBNCyuCCTh/SsKTdNQEBYGmSLl4VsDFS1Nmmh479YCmtWbrPpiVkQYK4Hy15zFf3g9fnfq8az3mhcKtayMwyjR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785671605; c=relaxed/simple;
-	bh=p+O5Jp/7cPIaCKXEDb07vL/TBlrPv7W/E1F9vWUTsZE=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sFHfRBD7mfZ6F/gRlUXQIUIncGA8jVl0xDZ4Vj8ygAfJEpUfPuQanJbL25wj0C9s3EpYtwcRKjLDlnP0zhSmfyGF9KLsiabswecREYPOA3r7ARkp/Ke0pJTlXn07olBdiXOBEBcVLV2Z+VU96AmtdvTw59LInxSSvi6u0PNJ9VY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QsY+YTEL; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1785683337; c=relaxed/simple;
+	bh=FLLmXGagEOlYSTN9NzFDSiVZQufg9oxohGb0jewo8S8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rC6s/+ltNJCxsCZ6kHTX1ISW5mNGNK5yDucaK16GWy0GUxmkjFfxgfbabn3TNbRM51fxF0UWvgBRU07rOJzRj3rLc8v3IZ+6PChBSOPss25kdM1HrLMFCJhN6ANycdQZFoNNXZ4MOMU9uzxKYIH7k1XLyNj3ckXX6bJmWMSw9ZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=gMKSneXP; arc=none smtp.client-ip=91.218.175.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QsY+YTEL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBC271F000E9;
-	Sun,  2 Aug 2026 11:53:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785671603;
-	bh=qG8el77ac5B/pcNIohLMU22cDEqP6jWhheMGhqwN4Fo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=QsY+YTELaoPvjJFP2u0KZw7KP6sjEf2w5+gW00Iw6Pqa0KNtIShRdrdxLkWFLBpE+
-	 f1tjdIGCAfoM3OkQtds7QM7g+oYs/h9IuD0IT8rvhvgKERY2tRAadwPt4IEKQnf4Zt
-	 bVjReKadb/9TZTtaguEyuAlb+OtszlTRt7q3oOhsgT3LLyfFWM6UhzvJSqaezrv9ed
-	 T73yw8Ulqm1Xzls0qoG3JnM5AGuFaOzZTr3Mxt+ETvdq5ERn4voDbHv2A9U5tFVRlh
-	 9CpsSlN86gRtytwCBocizVKUk5Gszr34WdLpE5KFAnNL08UrEAsS70Z4ED8YM7YHsG
-	 OsxuigYZEugXA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wqUkr-0000000BRRN-1DNS;
-	Sun, 02 Aug 2026 11:53:21 +0000
-Date: Sun, 02 Aug 2026 12:53:22 +0100
-Message-ID: <87ldaopwlp.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Karl Mehltretter <kmehltretter@gmail.com>
-Cc: Oliver Upton <oupton@kernel.org>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="gMKSneXP"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1785683329;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=UHMm2Z1OTcyZHwDxnaYxeN3t4Vh1LnM+EKpoEcU3r9c=;
+	b=gMKSneXPJFyeWLDYzxirNzasdTlr+W9DcufRPbjyJf1BfLd/u1/KeSM/pbKdNb3SA9gXYe
+	W7NNh/2uQ4M0PsIYWE4gfoHErIm4C8IDArTrzSgAjN8YSdQEPOULsPYYpKeZjSlemCpj5N
+	/TwGZzBRaAYdkao9EDGLC+gG/Cb04aQ=
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	kvmarm@lists.linux.dev
+Cc: stable@vger.kernel.org,
+	Sascha Bischoff <Sascha.Bischoff@arm.com>,
+	Jonathan Cameron <jic23@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
-	Andre Przywara <andre.przywara@arm.com>,
+	Fuad Tabba <tabba@google.com>,
 	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: Preserve AArch32 CP64 registers on rejected reads
-In-Reply-To: <20260801153616.71960-1-kmehltretter@gmail.com>
-References: <20260801153616.71960-1-kmehltretter@gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+Subject: [PATCH v1] KVM: arm64: vgic: Reset in_kernel on private IRQ allocation failure
+Date: Sun,  2 Aug 2026 16:08:45 +0100
+Message-Id: <20260802150845.3485757-1-fuad.tabba@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kmehltretter@gmail.com, oupton@kernel.org, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, andre.przywara@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Sat, 01 Aug 2026 16:36:16 +0100,
-Karl Mehltretter <kmehltretter@gmail.com> wrote:
-> 
-> kvm_handle_cp_64() only seeds params.regval for writes. If a CP64 read is
-> decoded but rejected, emulate_cp() still returns handled and the caller
+kvm_vgic_create() sets vgic.in_kernel before allocating the per-vCPU
+private IRQs, but the allocation-failure path resets only vgic_model and
+leaves in_kernel set. As irqchip_in_kernel() is !!in_kernel, the VM is
+left with an in-kernel irqchip but no model, and the -EEXIST guard at the
+top of kvm_vgic_create() rejects every retry, so userspace cannot recover
+from a transient -ENOMEM.
 
-s/rejected/UNDEFs/
+Reset in_kernel alongside vgic_model on the failure path.
 
-> writes params.regval back to Rt/Rt2.
-> 
-> This can happen for write-only GIC SGI registers
+Fixes: 9435c1e1431003 ("KVM: arm64: gic: Set vgic_model before initing private IRQs")
+Cc: stable@vger.kernel.org
+Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+---
+ arch/arm64/kvm/vgic/vgic-init.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Can it? I know we have some code handling this case, but this was for
-a (long gone) userspace harness driving this code. On any HW, reading
-from WO registers directly results in an UNDEF, without SW
-involvement.  Same thing for RO vs writes.
+diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+index 907057881b26a..fdac6e24762da 100644
+--- a/arch/arm64/kvm/vgic/vgic-init.c
++++ b/arch/arm64/kvm/vgic/vgic-init.c
+@@ -176,6 +176,7 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
+ 		}
+ 
+ 		kvm->arch.vgic.vgic_model = 0;
++		kvm->arch.vgic.in_kernel = false;
+ 		goto out_unlock;
+ 	}
+ 
 
-If you know of any case contradicting this statement, please let me
-know.
-
-> and for rejected PMU counter reads. In both cases KVM injects an
-
-s/rejected PMU counter reads/read accesses generating an UNDEF/
-
-> UNDEF into the guest, so the MRRC destination registers must remain
-> unchanged.
-
-s/destination registers/GPRs/
-
->
-> Instead, the uninitialised regval is copied into the guest registers. With
-> stack auto-initialisation this is a deterministic zero or pattern value.
-> With CONFIG_INIT_STACK_NONE it may be stale host stack data.
-> 
-> Match kvm_handle_cp_32() and kvm_handle_sys_reg() by seeding regval from
-> the destination registers before emulation.
-> 
-> Fixes: 6d52f35af10c ("arm64: KVM: add SGI generation register emulation")
-
-This has nothing to do with the handling of a particular register, and
-it has *always* been wrong. The correct tag appears to be:
-
-Fixes: 62a89c44954f0 ("arm64: KVM: 32bit handling of coprocessor traps")
-
-> Assisted-by: Claude:claude-opus-5
-> Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
-> ---
-> Runtime tested on a Raspberry Pi 400 with a minimal KVM harness running
-> an AArch32 guest. On the unpatched 6.1.21-v8+ vendor kernel, the PMCCNTR
-> MRRC test took UNDEF with r0=0x00000001/r1=0x00000000 instead of the
-> guest's sentinel values. With this patch on v7.2-rc3-278-g38436106b2f5,
-> the same test preserved r0=0x12345678/r1=0x9abcdef0.
-> 
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -4860,11 +4860,11 @@
->  	/*
->  	 * Make a 64-bit value out of Rt and Rt2. As we use the same trap
->  	 * backends between AArch32 and AArch64, we get away with it.
-> +	 *
-> +	 * This also makes rejected reads preserve Rt/Rt2.
-
-There is no such thing as "rejected reads" in the architecture (we
-only use this word for userspace accesses, not guests). Also, I don't
-think this deserves a comment as it aligns the logic with the rest of
-the sysreg handling code.
-
->  	 */
-> -	if (params.is_write) {
-> -		params.regval = vcpu_get_reg(vcpu, Rt) & 0xffffffff;
-> -		params.regval |= vcpu_get_reg(vcpu, Rt2) << 32;
-> -	}
-> +	params.regval = vcpu_get_reg(vcpu, Rt) & 0xffffffff;
-> +	params.regval |= vcpu_get_reg(vcpu, Rt2) << 32;
->  
->  	/*
->  	 * If the table contains a handler, handle the
-
-Other than the nitpicks above, this looks OK to me.
-
-Thanks,
-
-	M.
-
+base-commit: f5098b6bae761e346ebcd9da7f95622c04733cff
 -- 
-Jazz isn't dead. It just smells funny.
+2.39.5
+
