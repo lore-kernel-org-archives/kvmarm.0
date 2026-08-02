@@ -1,109 +1,147 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 758313932EA;
-	Sun,  2 Aug 2026 15:55:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785686123; cv=none; b=G7cMeyxDRC4po4QJK48JyMAinTON3CEYS6UgN2MTIH7dZUcOFDHMooeZitR5eSCugwgy3vlJtvhj7u/6ggArbVdfpPO60lVzEchrnT74+UKz3TUCHyfAqTX6PtwrC6ZqdiQ701zlzI3U9Rj4ZRuQXFauFDngRgj5XL1BskE/YCE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785686123; c=relaxed/simple;
-	bh=qt2EYFITGr67nfW1GZRtTcJUhTZzABRUhuy6g6rW1ro=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZgOaUzVrYrodMaboRktHKjwa+dJNAWxRsf09izs+tc09IJpU8XVxW4HcYQa5TbzjDUfL6UzihQhcN4ZjogV1RglcwgEWFpPSpMO+h43vyun5Xh72zZ8HM9wKsh8yPXOW2ZLncOeykmIFhbRMhHMvqvHMFK4eVdvoEvzcd2NJawc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QTJSGIHm; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D76AB2F3C19
+	for <kvmarm@lists.linux.dev>; Sun,  2 Aug 2026 17:14:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.182
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1785690858; cv=pass; b=fjdrfVIKBDgMAAPgr9cF5qEN+UBKY6UaeZ/BKVV+Cu3eFF1Rd6JFRCG5Y68UCy75FpCj9SEgIIjNrQA2n1iP1Pcjmp6nrhMn1td25Dp/njmcB8bA5+pgnR4FD6BPb1karRqlH5SJHo42uhYQWPGP2ANAan28ErPqYByw9DEh7iY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1785690858; c=relaxed/simple;
+	bh=N2zyrxlsrzbBS4ipiL123ByJSRIJ5EIJvd6lzBD9ems=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=glo2Q/+9U03gyrlFFQMNLIYj1LspqFuiKFITydJa5ilhOLN62VKYfnk+UB5DF5gmfQk1M4xbN/VRHc6x7pAJy80Swo9R3DUOT7SwcUjBlWPMBaXt00uogBrZuTpY032Eo/IXX+Ac64S8xCtfHizKlvlgpiHpg3vo8TbS7u6ITvA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bBCH1PZz; arc=pass smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QTJSGIHm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CA671F000E9;
-	Sun,  2 Aug 2026 15:55:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785686122;
-	bh=zZ5H4eB7tZXCdSU5j4A/pThsIBip2dyKmzd/naErbyA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=QTJSGIHmp7t1+XbvOwcW5t/LX7ZO577yRk3bxj7ro25XuEmNLeqdShjaajNmowTUB
-	 SJ/Mj3qy5G1PCtbsrw51ofWncwpwCfCqcFIxdHYQ3SXCwPo9CFuYptPQxhzcpRh64I
-	 zYjWVgFXhIPf6aR0Wwr/t+NqQUwji5YlP1gmfKCUa8uyKlKn+/qXpa+HTkXUSDG3kk
-	 e1rFZtj4Sh6oOHUqxl1RhGuy7wxH0PIhGA3IFaxLXvVpQBPZCpPhNBF7NPdXUW9xzc
-	 OP+1+iLrzaJMmo7k66kGl6knzV16Atdt2884VS3RQYSK4wQUwcGxQdNY2yuekRJeIc
-	 q6q6iSFUaEIPA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wqYX1-0000000BUNX-2Ni4;
-	Sun, 02 Aug 2026 15:55:19 +0000
-Date: Sun, 02 Aug 2026 16:55:20 +0100
-Message-ID: <87jyq8plef.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Oliver Upton <oupton@kernel.org>,
-	kvmarm@lists.linux.dev,
-	stable@vger.kernel.org,
-	Sascha Bischoff <Sascha.Bischoff@arm.com>,
-	Jonathan Cameron <jic23@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Fuad Tabba <tabba@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1] KVM: arm64: vgic: Reset in_kernel on private IRQ allocation failure
-In-Reply-To: <20260802150845.3485757-1-fuad.tabba@linux.dev>
-References: <20260802150845.3485757-1-fuad.tabba@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bBCH1PZz"
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-51c15a5b265so242091cf.0
+        for <kvmarm@lists.linux.dev>; Sun, 02 Aug 2026 10:14:16 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1785690856; cv=none;
+        d=google.com; s=arc-20260327;
+        b=f5mRIHW5hKG6ogtNz/8izqLgEjUZc0OxJbofxe6S+6SZF06hkr57kMxberK3kk15V3
+         tvf3ccaWgxBY54LQocRQ/cjA5Dt4+R/3GOVjB5BIDxmAaDPY7w6QBN/QJ34LwDC3r05B
+         GVSMRf/jtmuO/ZscFQ84juvbJrLcg/keFPTpibgH0z8d5Cn6PdxddmZhLtxjiX6f2dxg
+         KZPNDeBPQ2Ar6sQbTjmbvdyX6p5NePOU3OB9konDsyo3fciTPn+e9ESwIkZfsL5VQiDU
+         zbDiW3p/xFbhWWtk9o4fp8M1yxs8MN3yogR5gRS4EHeEaqzEZToOkhNf0ZsJe1Y0jx4O
+         2ZTg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=ayuvivxfWK6wLmGHo3e/3r7UFNU/ARSNtwtuFILdC94=;
+        fh=DQGXn2kahNVYKi1VhBXjEtKNQrPuzWi1RE2dJETb768=;
+        b=WTUO3qdyXQRgNkiYOPZZonfwf2aealBaXE2RHEY1SJFbTXY0y1bRoUMondiktZS0un
+         CdUlo40ORalpbnaNfeC0KF/MMfbr3TA49MD/F5d7pKb/y9bZFqhfS1zVuIfmJqEHZYO1
+         neFaB/a0gds8SfLQfQ9PkEQVW+2vScfs3y+frcqYaCpUO3r8OQvzhFVLB5nbpWPgbSkh
+         kmw18ZHTQeTRjfBhI2f5JIYAFs05wWgb13GlzHA+SjDN1ReThrrUl9hnuFCMTcIK2hqw
+         JbiirBB3Al1nIy4l1uPnC/mdg9i413o9rZuWj6j4ErieFDRs2RSLs+QnSLa5pPOs3lUv
+         C2Lg==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1785690856; x=1786295656; darn=lists.linux.dev;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=ayuvivxfWK6wLmGHo3e/3r7UFNU/ARSNtwtuFILdC94=;
+        b=bBCH1PZzergYK7zlpo6iEOvJTiBKq/eV29GKhGDNj5gs/nCywSeV6ak7jyIk/7pjRW
+         W6DCO2QdQBdmu49IVCXNf8nQm25XGitRtTB2FnsJgsTdJImUVapLdGBDxTKMAhCoPylL
+         IYWdia5OzmoXEoSV2o++UboIETJQmZmjKpdkYPPPtfIvTvOlgTgdWG0rf6lVL7+EHWhJ
+         xmjuGPZsiSSkaf9YEANsH3iRrozgkJyowDDU3V3qarEXjMeycFCdDv/PF4U4B/MOt/6s
+         5P4LzMNre9L2bZioYeIrToEy1K6KeTUg1KniA9GWVtKe/q3nfo9MDdpnW1nG3Mp+xYYx
+         S4Ww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785690856; x=1786295656;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=ayuvivxfWK6wLmGHo3e/3r7UFNU/ARSNtwtuFILdC94=;
+        b=dZ3xecFoXrnFwM4yENvFVJ0lvrtugjNqT6J5RNffeEeffQtiZtwNRCtc5oddHVk9le
+         mQmKKdN2HfNNl219uxy+sncBb5BElKIbWXNaIJi/5Omcq3CsXgKzvp3ZINVbIpDw/jg/
+         zYIj84MvO4djM3PFEQKJgBooymMc6zGwlilWxNc0ne8pHQrJZkj9XwWwTR6i2WTEGuyK
+         JQy1DlX93e+iI4do7uLWi/vw4VMJ/f21dHZCCxZjTQj1ktpSmBO+oY98riADP+9ffLCo
+         0RoCdRxfYJ3pYkQGRfSEzNIEVmI6kYiVISbR11t6ukvZHhz7vbLlSmqBYDZIEKRNhzgF
+         0tQQ==
+X-Forwarded-Encrypted: i=1; AHgh+RqeYRkpV1yP/ry03beY38OzWfsk6w7AkilBYSGp+t5FEavdsAH0ZwcBxtRX2VY6F/KXyG/wtJ8=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwMDvDU/Zo+//lZxajmzOh8+hRmiAfcI3az7CGHfhEkXEG14jQe
+	Fz+aVnycpQ0+MAt9BkKGEuIrT2ztRcgduZvKcVPU/5LAEdBv7IG57iIMTbewp9AfJmv2Uiugpk1
+	tnEYnhqfeSKQT6nm2ojh5ZQySdKX0OYB+JQeW4zS7
+X-Gm-Gg: AR+sD12AAuF+fVdNHUcgkxZSGlXdu/wXCIOTXdDwP9Q/vHwJCmW8ku0/CGJleM4xwEC
+	gc6jNLTs53z14Vxpn20t1F8b6dEQyBb9+Uk2+C8wvsl0Y4al5yggksZg3gKDRix8xz45pTiPQOK
+	tVCfMjxHsx8Caqa0BqyDKaNepK3n2pTNH3gmAsG7NhBkhqgeIyH2mI9fL6npjoIK0a5b6520/PY
+	nncTHeqG1WAPy1NSqBbbyb8/q5SbbAzkp1WjCuujAW1F71Tc+neWpDqN98AOIK1fCGpMm0m+1e0
+	wtVO0NUNOCjKPl+yhOJ+PR5pqc7FTCWIElDxuD3ocFTs
+X-Received: by 2002:a05:622a:306:b0:50e:5eba:cadd with SMTP id
+ d75a77b69052e-52b598d2377mr25182951cf.2.1785690855240; Sun, 02 Aug 2026
+ 10:14:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, kvmarm@lists.linux.dev, stable@vger.kernel.org, Sascha.Bischoff@arm.com, jic23@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, seiden@linux.ibm.com, catalin.marinas@arm.com, will@kernel.org, tabba@google.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20260731-kvm-arm64-idreg-final-v1-0-3de2a5616dc6@kernel.org> <20260731-kvm-arm64-idreg-final-v1-2-3de2a5616dc6@kernel.org>
+In-Reply-To: <20260731-kvm-arm64-idreg-final-v1-2-3de2a5616dc6@kernel.org>
+From: Fuad Tabba <tabba@google.com>
+Date: Sun, 2 Aug 2026 18:13:38 +0100
+X-Gm-Features: AUfX_mwoTQF8U_Aj2r-8-_EcZtVNirbPZIAEGO6l1nd6I3aMRbsfn0JxvhrYexY
+Message-ID: <CA+EHjTxoAwkUJ1Tyu5700hZBFtc1HpCt14-8Gh2O5qA_NpnaFQ@mail.gmail.com>
+Subject: Re: [PATCH 2/2] KVM: arm64: Block ID register changes after we rely
+ on the values
+To: Mark Brown <broonie@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Peter Maydell <peter.maydell@linaro.org>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Sun, 02 Aug 2026 16:08:45 +0100,
-Fuad Tabba <fuad.tabba@linux.dev> wrote:
-> 
-> kvm_vgic_create() sets vgic.in_kernel before allocating the per-vCPU
-> private IRQs, but the allocation-failure path resets only vgic_model and
-> leaves in_kernel set. As irqchip_in_kernel() is !!in_kernel, the VM is
-> left with an in-kernel irqchip but no model, and the -EEXIST guard at the
-> top of kvm_vgic_create() rejects every retry, so userspace cannot recover
-> from a transient -ENOMEM.
-> 
-> Reset in_kernel alongside vgic_model on the failure path.
-> 
-> Fixes: 9435c1e1431003 ("KVM: arm64: gic: Set vgic_model before initing private IRQs")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
-> ---
->  arch/arm64/kvm/vgic/vgic-init.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-> index 907057881b26a..fdac6e24762da 100644
-> --- a/arch/arm64/kvm/vgic/vgic-init.c
-> +++ b/arch/arm64/kvm/vgic/vgic-init.c
-> @@ -176,6 +176,7 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
->  		}
->  
->  		kvm->arch.vgic.vgic_model = 0;
-> +		kvm->arch.vgic.in_kernel = false;
->  		goto out_unlock;
->  	}
->  
-> 
+Hi Mark,
 
-Acked-by: Marc Zyngier <maz@kernel.org>
+On Fri, 31 Jul 2026 at 21:46, Mark Brown <broonie@kernel.org> wrote:
+...
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 958d7ef78785..3b423db56d3c 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -2427,9 +2427,10 @@ static int set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+>
+>         /*
+>          * Once the VM has started the ID registers are immutable. Reject any
+> -        * write that does not match the final register value.
+> +        * write that does not match the final register value once we have
+> +        * got far enough into first running the VM to use the values.
+>          */
+> -       if (kvm_vm_has_ran_once(vcpu->kvm)) {
+> +       if (vcpu_id_regs_final(vcpu)) {
+>                 if (val != read_id_reg(vcpu, rd))
+>                         ret = -EBUSY;
+...
+> @@ -5811,6 +5812,8 @@ static int kvm_vm_finalize_sys_regs(struct kvm *kvm)
+>                 kvm_vgic_finalize_idregs(kvm);
+>         }
+>
+> +       set_bit(KVM_ARCH_FLAG_ID_REGS_FINAL, &kvm->arch.flags);
+> +
+>         return 0;
+>  }
+>
 
-	M.
+The flag fixes this. One consistency point: set_id_reg() and
+set_imp_id_reg() now gate on the new flag, but
+kvm_vm_finalize_sys_regs() still returns early on
+kvm_vm_has_ran_once(), and so does the KVM_BUG_ON() in
+kvm_set_vm_id_reg(). Could both move to kvm_id_regs_final(), so one
+predicate expresses the invariant? If so I think they would need to
+move together, since on a retried first run kvm_vm_finalize_sys_regs()
+re-runs and re-writes the ID regs via kvm_set_vm_id_reg(), so
+switching only the BUG_ON would trip it.
 
--- 
-Jazz isn't dead. It just smells funny.
+Separately, would a selftest for that failed-run path be worth adding,
+checking that KVM_SET_ONE_REG on an ID reg and KVM_CREATE_DEVICE both
+return -EBUSY?
+
+Cheers,
+/fuad
