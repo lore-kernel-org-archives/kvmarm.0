@@ -1,152 +1,259 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 282901A304A
-	for <kvmarm@lists.linux.dev>; Mon,  3 Aug 2026 13:32:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F19DF40F753;
+	Mon,  3 Aug 2026 13:44:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785763993; cv=none; b=rW2YkrxD2cT6FdwDcLl+8BJcgYUCVq6Kow3n1Uw955BmGSrprvlMtVK0DoEl0VdQ5lpMenbIID16x81vIFhykH4AAafsL80lIq8SEkcaVi9IA7iQldJGkpV3SaJdtIklaMHHKN0vxlzX68WMdLhLO3/DO5cutQSV7HZm4EwNvv8=
+	t=1785764661; cv=none; b=iji9SbflUPbYnJaCLe5bmSL4y05lWFMh4pD2qUrS8DP9Ufwq+Z8MtXN2Qi+eTqCkD/AJjRqBCPGqGGpuhFvwVPLNhpm0E0r0qzchjl145UM1lLnFFwcgbZWgkKlw5fOQFV16npJawulwFm0cYIeBvtuvH3Jbg2bTbDu90S1Mso8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785763993; c=relaxed/simple;
-	bh=q5mneNeamB2J+C8EVoJLnrjp8hDOhwN7vv4k2AICaBU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IJWtpMzuWGt6+jgcLEVMmPRgjcNKvlJmhHL7kC8lpXuFcIxeE1UyC62GgNUKUl3u/4628msiiLBKh4RuDpmmWQJ045NhgRQvuCxUqC6JOIrGKk0wCYdE2TB5cYkuMHQpGf4ehouiFo138Sl2MtpWOTpGiXU/cSy6Ian3QCDdaXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Q48/7xCh; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1785764661; c=relaxed/simple;
+	bh=7gDW+1efL7RasAqDrD/fMjJ3ytid+vo61xlhqQvvQxY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=MNVHZw+vuuMWu+1aBnEzcKroVEy3NEjFSjch/stU1gNLIFU2fPB5AZ4Y/VjfusKXqSjAJ5oaAcW/1OiCn17emYBMMIRh7fRMjyBMHbJO25i3SjlWeCtYLXDuk6YVCzj3oQ7VUhnwrijpcZ9hNnGamZ4066zGIbCTNrPSmJO++so=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=JzYmqgjX; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Q48/7xCh"
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 673CHvFT1938136;
-	Mon, 3 Aug 2026 13:32:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=vBVOCs
-	zs17sNVvCWerYuN3XW9+QBWp+ZW7e+3XNz5rA=; b=Q48/7xChOjDiNXTHxlyc/R
-	qUBvznBL8zi89tmvxBjUH6u9UH1m9HcJVm+usk96T8e1L03J3oXbjsQsz8C5Q99B
-	p+OjgakZUAMODnxCgYcLf1Ezv98ae7qAWjc9Lj3JqMTRulFc/kkWC9YgPYxpnhaV
-	yF9ap1tmP/AljjgCgd/LnpJYQDGvYZCn2k0VEMJaMMltDpUMTCFDfuG2Ivbbrguo
-	kY0BNygyKVHqwaE5CX8ZOIgQUdrJhqYUkTA3OOyCXow7NoNS/QD6lHYgHVzGBryL
-	8G2W2vh02ZvvM8eEt7sPRtogrVKe+cX6bkMHgr2pL2C+tkt/ncPTOYv/3ZkutkIg
-	==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fs67hgy19-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 03 Aug 2026 13:32:40 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 673DT3gO013018;
-	Mon, 3 Aug 2026 13:32:40 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4fsugvwmue-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 03 Aug 2026 13:32:39 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 673DWZ4R15860118
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 3 Aug 2026 13:32:35 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id CB50F2004F;
-	Mon,  3 Aug 2026 13:32:35 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 649C42005A;
-	Mon,  3 Aug 2026 13:32:35 +0000 (GMT)
-Received: from [9.224.77.173] (unknown [9.224.77.173])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  3 Aug 2026 13:32:35 +0000 (GMT)
-Message-ID: <4a86eeaa-d98e-49f5-ba73-e9e5ce08537a@linux.ibm.com>
-Date: Mon, 3 Aug 2026 15:32:34 +0200
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="JzYmqgjX"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1BC95143D;
+	Mon,  3 Aug 2026 06:44:14 -0700 (PDT)
+Received: from e122027.cambridge.arm.com (e122027.cambridge.arm.com [10.1.25.28])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0FC3E3F66F;
+	Mon,  3 Aug 2026 06:44:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1785764658; bh=7gDW+1efL7RasAqDrD/fMjJ3ytid+vo61xlhqQvvQxY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=JzYmqgjX4z3WBvr551f3ponsOq2UHT+MJAzIJbxuW9HArmH9jX63DI9MDTXt8+TSn
+	 B4UAqam71tvGl3zyKAkzuGjrWNxGBXgGxn0H9Bc6pP2ZJ7lsmUxPt0uzXsXciYaeUJ
+	 /IiKlSXoxqNGznnI6sZddBn7leHog3gPYcWDPESM=
+From: Steven Price <steven.price@arm.com>
+To: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Cc: Steven Price <steven.price@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+	Emi Kisanuki <fj0570is@fujitsu.com>,
+	Vishal Annapurve <vannapurve@google.com>,
+	WeiLin.Chang@arm.com,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>
+Subject: [PATCH v16 00/45] arm64: Support for Arm CCA in KVM
+Date: Mon,  3 Aug 2026 14:43:16 +0100
+Message-ID: <20260803134403.80630-1-steven.price@arm.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 14/31] KVM: s390: Move s390 kvm code into a
- subdirectory
-To: Steffen Eiden <seiden@linux.ibm.com>, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org
-Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
-        Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@kernel.org>,
-        Friedrich Welter
- <fritz@linux.ibm.com>, Fuad Tabba <tabba@google.com>,
-        Gautam Gala <ggala@linux.ibm.com>,
-        Hariharan Mari <hari55@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Hendrik Brueckner <brueckner@linux.ibm.com>,
-        Ilya Leoshkevich <iii@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
-        Marc Zyngier <maz@kernel.org>, Nico Boehr <nrb@linux.ibm.com>,
-        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
-        Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Vasily Gorbik
- <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>
-References: <20260731130902.654679-1-seiden@linux.ibm.com>
- <20260731130902.654679-15-seiden@linux.ibm.com>
-Content-Language: en-US
-From: Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <20260731130902.654679-15-seiden@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODAzMDExOSBTYWx0ZWRfX+j8qegV4qjMM
- xYlyTIqzaIO6x78iHrlsCuWTKvHWXnZS/rJYU6YBC3QovDbOC1kiCRCvukSRiVb4QMeaT+auK3i
- yK69FddGaiXru2oxiQYx64Nempa2TYg=
-X-Authority-Analysis: v=2.4 cv=I7VVgtgg c=1 sm=1 tr=0 ts=6a709879 cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=IkcTkHD0fZMA:10 a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=Y2IxJ9c9Rs8Kov3niI8_:22 a=hThuo8U3hQNg24NIM8QA:9
- a=QEXdDO2ut3YA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODAzMDExOSBTYWx0ZWRfX4Pf/ru7Kw2VP
- xz/RTDct+UwFZXBCTkYE48VrSgQ3SEcm6VHMbPEPnySQTQOzvVCaas7YoGSI0FwOaEFyb/h6Cl6
- LiFI4RatQutAJSDemR+eig6/thkWDWyf1TZURRpcfzKNGCIDWx1s3mIVOuPamjvQNzUXLxoSQ1O
- a0vI3tMGZfS3wluwxO1efa3zFUQZnz7pTOZHqXN0Aqex5WxeoU/Bc36wPlmq7akvVr3jtEN+Xyc
- amMazytRDZD5ZUvJICkj8rydFPiXzdwvFKZ69qLj1L7a3eV/FkyvsfhL1PkW3xcA0ofjl83/Tgc
- LwNu8Dy57atacSv2b+bim218QUpGUF8c8Rx8MVH+dXhIwMmXE8i7xdOnJXO1uc8AMyAx4lN09zg
- Ois7cabgH794RmCejhzDitDeW6Y52D/9z7i4mofvak8s7DPKY4bEM7QRj0ALAimoen1beKuOJ0w
- vowYTmk7vWLxuygOjzw==
-X-Proofpoint-ORIG-GUID: q8AI2RP4HgIDMmjG9eGtYT2Bg22EPBXZ
-X-Proofpoint-GUID: M1SibF4bDBtMrIF7hzWznmxtKgmi1OQ_
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-08-03_03,2026-07-30_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 impostorscore=0 clxscore=1015 priorityscore=1501 suspectscore=0
- malwarescore=0 adultscore=0 lowpriorityscore=0 phishscore=0 spamscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2608030119
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
+This series adds support for running protected VMs using KVM under the
+Arm Confidential Compute Architecture (CCA), including the firmware
+support needed to communicate with the Realm Management Monitor (RMM).
 
-> --- a/arch/s390/kvm/Makefile
-> +++ b/arch/s390/kvm/s390/Makefile
-> @@ -1,15 +1,14 @@
->   # SPDX-License-Identifier: GPL-2.0
-> -# Makefile for kernel virtual machines on s390
-> -#
-> -# Copyright IBM Corp. 2008
->   
-> +KVM := ../../../../virt/kvm
->   include $(srctree)/virt/kvm/Makefile.kvm
-> +include $(srctree)/arch/s390/kvm/gmap/Makefile
->   
-> -ccflags-y := -I$(src)
-> +ccflags-y := -I$(src) -I$(srctree)/arch/s390/kvm/gmap
->   
->   kvm-y += s390.o intercept.o interrupt.o priv.o sigp.o
->   kvm-y += diag.o gaccess.o guestdbg.o vsie.o pv.o
-> -kvm-y += dat.o gmap.o faultin.o
->   
->   kvm-$(CONFIG_VFIO_PCI_ZDEV_KVM) += pci.o
-> +
-unrelated whitespace change.
->   obj-$(CONFIG_KVM) += kvm.o
+For v15 the series was split into a 6-patch generic firmware/RMM series
+and a 37-patch KVM series. The two parts are combined again for v16, as
+requested to allow the complete stack to be tested by Sashiko as a
+single series.
+
+The first six patches add the generic firmware layer for talking to the
+RMM, as specified by version 2.0-bet2 of the RMM specification[0]. They
+provide the RMI definitions and wrappers, discover and configure the
+RMM, implement Stateful RMI Operations (SROs), and ensure that the RMM
+has GPT entries for host memory. The remaining patches add the KVM
+support needed to create, populate and run Realm VMs.
+
+Note that RMM v2.0 Beta 3 specification should be published soon. The
+changes introduced in that are minor and I expect this series to be
+largely compatible with the new spec.
+
+The RMM v2.0 specification introduces SROs, which allow the RMM to
+complete an operation over several SMC calls while requesting or
+returning memory to the host. This allows interrupts to be handled in
+the middle of an operation and lets the RMM dynamically allocate memory
+for internal tracking purposes. For example, RMI_REC_CREATE no longer
+needs auxiliary granules to be provided up front, and can instead
+request memory during the operation.
+
+The main changes since v15 are:
+
+ * Recombine the firmware/RMM and KVM portions into one series. The
+   Realm-specific RMI wrappers remain separate from the generic
+   firmware wrappers, in a new KVM patch.
+
+ * Rewrite Realm entry and exit handling to fit into the generic KVM
+   run loop. Work which cannot be performed in the entry path is now
+   completed through KVM requests, and MMIO, PSCI, RIPAS changes and
+   host calls are adapted to the new flow.
+
+ * Rewrite Realm timer support to use KVM's IRQ-ops infrastructure and
+   software resampling.
+
+ * Improve SRO cancellation and error handling. Ensure a cancelled
+   operation isn't treated as successful, wrapper return values can carry
+   negative Linux errors as well as RMI return values, and those errors
+   are propagated through the KVM users.
+
+ * Check that the RMM supports the host page size before configuring it,
+   and exclude firmware-reserved NOMAP memory when creating GPT entries.
+
+ * Expand the KVM_ARM_RMI_POPULATE documentation to make clear that Arm
+   CCA cannot preserve memory contents during an in-place
+   shared-to-private conversion.
+
+ * Allocate Realm parameters only while creating the Realm descriptor.
+
+ * Document the encoding of the arm64 VM types and require
+   ICH_HCR_EL2.TDIR before advertising or creating Realm VMs.
+
+This series is based on the guest_memfd in-place conversion v9 tree[1],
+which is itself based on kvm-x86/next. It is also available as a git
+repository:
+
+https://gitlab.arm.com/linux-arm/linux-cca cca-host/v16
+
+Work in progress changes for kvmtool are available from the git
+repository below:
+
+https://gitlab.arm.com/linux-arm/kvmtool-cca cca/v13
+
+The TF-RMM branch used for testing this series is available here:
+
+https://git.trustedfirmware.org/TF-RMM/tf-rmm.git topics/rmm-v2.0-poc_3
+
+There is a kvm-unit-test branch updated to support the attestation used
+in RMM v2.0 available here:
+
+https://gitlab.arm.com/linux-arm/kvm-unit-tests-cca cca/v4
+
+[0] https://developer.arm.com/documentation/den0137/2-0bet2/
+One bet2 change, which moves metadata out of the individual address
+range descriptors, has intentionally not been implemented because that
+part of the specification is expected to be reverted.
+
+[1] https://github.com/googleprodkernel/linux-cc/commits/guest_memfd-inplace-conversion-v9
+
+Jean-Philippe Brucker (6):
+  KVM: arm64: CCA: Propagate breakpoint and watchpoint counts to
+    userspace
+  KVM: arm64: CCA: Set breakpoint parameters through SET_ONE_REG
+  KVM: arm64: CCA: Propagate max SVE vector length from the RMM
+  KVM: arm64: CCA: Configure max SVE vector length for a Realm
+  KVM: arm64: CCA: Provide register list for unfinalized RECs
+  KVM: arm64: CCA: Provide an accurate register list
+
+Joey Gouly (2):
+  KVM: arm64: CCA: Allow userspace to inject aborts
+  KVM: arm64: CCA: Support RSI_HOST_CALL
+
+Steven Price (34):
+  firmware: arm_rmm: Add SMC definitions for calling the RMM
+  firmware: arm_rmm: Add wrappers for direct RMI calls
+  firmware: arm_rmm: Check for RMI support at init
+  firmware: arm_rmm: Configure the RMM with the host's page size
+  firmware: arm_rmm: Add support for SRO
+  firmware: arm_rmm: Ensure the RMM has GPT entries for memory
+  arm64: mm: Handle Granule Protection Faults (GPFs)
+  KVM: arm64: Avoid including linux/kvm_host.h in kvm_pgtable.h
+  KVM: arm64: CCA: Add wrappers for realm related RMIs
+  KVM: arm64: CCA: Check for RMI support at KVM init
+  KVM: arm64: CCA: Check for LPA2 support
+  KVM: arm64: CCA: Define the user ABI
+  KVM: arm64: CCA: Add basic infrastructure for creating a realm
+  KVM: arm64: CCA: Allow passing the machine type in KVM creation
+  KVM: arm64: CCA: Tear down RTTs
+  KVM: arm64: CCA: Allocate and free RECs to match vCPUs
+  KVM: arm64: CCA: Support the VGIC in realms
+  KVM: arm64: CCA: Support timers in realm RECs
+  KVM: arm64: CCA: Handle realm enter/exit
+  KVM: arm64: CCA: Handle RMI_EXIT_RIPAS_CHANGE
+  KVM: arm64: CCA: Handle realm MMIO emulation
+  KVM: arm64: Expose support for private memory
+  KVM: arm64: CCA: Create the realm descriptor
+  KVM: arm64: CCA: Activate realms on first vCPU run
+  KVM: arm64: CCA: Allow populating initial contents
+  KVM: arm64: CCA: Set RIPAS of initial memslots
+  KVM: arm64: CCA: Support runtime faulting of memory
+  KVM: arm64: CCA: Handle realm vCPU load
+  KVM: arm64: CCA: Validate register access for Realm VMs
+  KVM: arm64: CCA: Handle Realm PSCI requests
+  KVM: arm64: WARN on injected undef exceptions
+  KVM: arm64: CCA: Prevent Device mappings for realms
+  KVM: arm64: CCA: Require ICH_HCR_EL2.TDIR for realms
+  KVM: arm64: CCA: Enable realms to be created
+
+Suzuki K Poulose (3):
+  KVM: arm64: Include kvm_emulate.h in kvm/arm_psci.h
+  KVM: arm64: CCA: Don't expose unsupported capabilities for realm
+    guests
+  KVM: arm64: CCA: Allow checking SVE on VM instance
+
+ Documentation/virt/kvm/api.rst       |   70 +-
+ arch/arm64/Kconfig                   |    1 +
+ arch/arm64/include/asm/kvm_asm.h     |    2 +
+ arch/arm64/include/asm/kvm_emulate.h |   37 +
+ arch/arm64/include/asm/kvm_host.h    |   12 +-
+ arch/arm64/include/asm/kvm_pgtable.h |    6 +-
+ arch/arm64/include/asm/kvm_pkvm.h    |    2 +-
+ arch/arm64/include/asm/kvm_rmi.h     |  139 +++
+ arch/arm64/include/asm/rmi_cmds.h    |  465 ++++++++
+ arch/arm64/include/asm/virt.h        |    1 +
+ arch/arm64/kernel/cpufeature.c       |    1 +
+ arch/arm64/kvm/Kconfig               |    2 +
+ arch/arm64/kvm/Makefile              |    2 +-
+ arch/arm64/kvm/arch_timer.c          |   34 +-
+ arch/arm64/kvm/arm.c                 |  139 ++-
+ arch/arm64/kvm/guest.c               |   93 +-
+ arch/arm64/kvm/handle_exit.c         |   14 +
+ arch/arm64/kvm/hyp/pgtable.c         |    1 +
+ arch/arm64/kvm/hypercalls.c          |    4 +-
+ arch/arm64/kvm/inject_fault.c        |    5 +-
+ arch/arm64/kvm/mmio.c                |   16 +-
+ arch/arm64/kvm/mmu.c                 |  144 ++-
+ arch/arm64/kvm/reset.c               |   13 +-
+ arch/arm64/kvm/rmi-exit.c            |  178 +++
+ arch/arm64/kvm/rmi.c                 | 1561 ++++++++++++++++++++++++++
+ arch/arm64/kvm/sys_regs.c            |   47 +-
+ arch/arm64/kvm/vgic/vgic-init.c      |    2 +-
+ arch/arm64/mm/fault.c                |   28 +-
+ drivers/firmware/Kconfig             |    1 +
+ drivers/firmware/Makefile            |    1 +
+ drivers/firmware/arm_rmm/Kconfig     |   26 +
+ drivers/firmware/arm_rmm/Makefile    |    2 +
+ drivers/firmware/arm_rmm/rmi.c       |  776 +++++++++++++
+ include/kvm/arm_psci.h               |    2 +
+ include/linux/arm-rmi-cmds.h         |  201 ++++
+ include/linux/arm-smccc-rmi.h        |  493 ++++++++
+ include/uapi/linux/kvm.h             |   20 +-
+ 37 files changed, 4446 insertions(+), 95 deletions(-)
+ create mode 100644 arch/arm64/include/asm/kvm_rmi.h
+ create mode 100644 arch/arm64/include/asm/rmi_cmds.h
+ create mode 100644 arch/arm64/kvm/rmi-exit.c
+ create mode 100644 arch/arm64/kvm/rmi.c
+ create mode 100644 drivers/firmware/arm_rmm/Kconfig
+ create mode 100644 drivers/firmware/arm_rmm/Makefile
+ create mode 100644 drivers/firmware/arm_rmm/rmi.c
+ create mode 100644 include/linux/arm-rmi-cmds.h
+ create mode 100644 include/linux/arm-smccc-rmi.h
+
+-- 
+2.43.0
 
