@@ -1,265 +1,245 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 840AC33FE33
-	for <kvmarm@lists.linux.dev>; Mon,  3 Aug 2026 16:35:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37FC038399C;
+	Mon,  3 Aug 2026 16:38:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785774905; cv=none; b=IleodXroVth7FISHyVtOQ/gAfVOe8LhZuHpp0jfTXayMQsFYG6y+WzlbqU5RlB46Pw1qP2yXZpaoPKNbnDpL1Y8cdiP2htCVveqhdIHVi5Os4QdpUP7DHJjip3WXpS42HvaV1bXZrkrw10Ctl3eMmo/OsH+SQuGL1BDdpeCToF4=
+	t=1785775126; cv=none; b=M8fB3i5VPdaX0DPitk92plTL9XgKVEwWExK7ot8rJaAe3xsZ8paFNkeZIHxUq8+y5ySE7va34kbu07PkjfmNA3lmvlRSURYR48kWO1jKKpo6mE1EU1HjAKjgZCHGJjRMw3DbRlwrye94dmAyIhAsthjhIxz8foMtfZYP9ks69gM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785774905; c=relaxed/simple;
-	bh=ecDpO0EC0DhEv8k8eO4w99EUiapz8pVlfOswK2HsBfM=;
+	s=arc-20240116; t=1785775126; c=relaxed/simple;
+	bh=AmCcD4dR0zVYogWPFJ/bGl+yWYPUBbEZ63FxXrJpkQA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=C3TT/oWOPPLg0ReRvXG1U4fZF0y2TVgzSuD4XHN1LF1uQFrJZ4hYv9PAk/vfTnVWm8JtZp3cYGZYwT5whlX48D237KjeSiVCiQVxtJ3Iw4wnEz+Eh1XK+UubFa63u8xyNpf8UARS6UPUYXfFCEJey5tFspJV+tfKiQHh56SseOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=eH5X/Awz; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version:Content-Type:Content-Disposition; b=QmDghXUQkGB81YV0PzdOKIcx1nzrUdnBbRjXLJyYxO9N11+bMbnKx2uL/M+tKld7j/85AZQV+/5GzTwKi44M6lKmlkzq3hfl+yHbgheGbUEftZu3RmxwMr5JyFuU/UoakdpzvWGhiq7CSqlzNO6UVF0Qipj7waGZQk8duW1c32U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=hdUXt1yU; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="eH5X/Awz"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="hdUXt1yU"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B4DF0143D;
-	Mon,  3 Aug 2026 09:34:58 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 93779143D;
+	Mon,  3 Aug 2026 09:38:39 -0700 (PDT)
 Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 590CD3F86F;
-	Mon,  3 Aug 2026 09:35:00 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A01023F86F;
+	Mon,  3 Aug 2026 09:38:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1785774902; bh=ecDpO0EC0DhEv8k8eO4w99EUiapz8pVlfOswK2HsBfM=;
+	t=1785775123; bh=AmCcD4dR0zVYogWPFJ/bGl+yWYPUBbEZ63FxXrJpkQA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=eH5X/AwzmnWDAVoTRxt7bzqYab9aPkGvEjat7lb4PmnMc3DE9oEdB6ccric/toElF
-	 nVKu4eZ9c8wMMRpH8eKXimwzzzwXg/eU0Yhmddx6pmbclmkU4yaCzlZtfogMExcGVm
-	 9MwTYY18FYzqO7KKj7baQFQJfG/0BJ8rBuTpDdmE=
+	b=hdUXt1yUWJXklQWVEiMjiWwV8+587ycQsTv4tA3oKPQs1rG13U/n6gUIEoYRYNaxN
+	 Zi8Nf4Wek3M3hJ2fUGU9f4NPTwLz1260dEc/rkw9WgF0JuiJXF1lmTlm4ocKGGJKEE
+	 WOfEVkCVFyLlM+WeKvEi+v+sKENifLXNpl9YO+YY=
 From: Leonardo Bras <leo.bras@arm.com>
-To: Tian Zheng <zhengtian10@huawei.com>
+To: sashiko-reviews@lists.linux.dev
 Cc: Leonardo Bras <leo.bras@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	maz@kernel.org,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	yuzenghui@huawei.com,
-	wangzhou1@hisilicon.com,
-	yangjinqian1@huawei.com,
-	caijian11@h-partners.com,
-	liuyonglong@huawei.com,
-	yezhenyu2@huawei.com,
-	yubihong@huawei.com,
-	linuxarm@huawei.com,
-	joey.gouly@arm.com,
-	kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	seiden@linux.ibm.com,
-	suzuki.poulose@arm.com
-Subject: Re: [PATCH v4 3/6] KVM: arm64: Add auto DBM support for hardware dirty tracking
-Date: Mon,  3 Aug 2026 17:34:58 +0100
-Message-ID: <anDDMh4exsZB-3NS@LeoBrasDK>
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v3 11/11] KVM: arm64: Enable KVM_HW_DIRTY_BIT
+Date: Mon,  3 Aug 2026 17:38:40 +0100
+Message-ID: <anDEEJIfwbHmMi1X@LeoBrasDK>
 X-Mailer: git-send-email 2.55.0
-In-Reply-To: <anDCno9HdVI5UAls@LeoBrasDK>
-References: <0943eb14-9ffb-4dbb-9219-060e97bca2a7@huawei.com> <alpIfIOFfrudBzD5@LeoBrasDK> <al4bYajWE-v6wofu@LeoBrasDK> <96516762-f004-4c2a-a9c6-6fbad49ad6ae@huawei.com> <amoZY8uGLf1PEpjK@LeoBrasDK> <8e36e2c8-587f-4228-ab13-d6783927a281@huawei.com> <45d76d0d-48e9-46a6-b1f9-691f840eba46@huawei.com> <anBrvILpcSFhW7Wg@LeoBrasDK> <95f1ebd4-be04-4684-be68-388f752a1379@huawei.com> <anDCno9HdVI5UAls@LeoBrasDK>
+In-Reply-To: <20260729112918.C51721F000E9@smtp.kernel.org>
+References: <20260729104548.3439958-1-leo.bras@arm.com> <20260729104548.3439958-12-leo.bras@arm.com> <20260729112918.C51721F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 
-On Mon, Aug 03, 2026 at 05:32:30PM +0100, Leonardo Bras wrote:
-> On Mon, Aug 03, 2026 at 09:57:46PM +0800, Tian Zheng wrote:
-> > 
-> > 
-> > On 8/3/2026 6:21 PM, Leonardo Bras wrote:
-> > > On Mon, Aug 03, 2026 at 12:04:24PM +0800, Tian Zheng wrote:
-> > > > 
-> > > > 
-> > > > On 8/3/2026 9:33 AM, Tian Zheng wrote:
-> > > > > > > > > > > 09, 2026 at 06:40:23PM +0800, Tian Zheng wrote:
-> > > > > > > > > > > > -    if (prot & KVM_PGTABLE_PROT_W)
-> > > > > > > > > > > > +    if (prot & KVM_PGTABLE_PROT_W) {
-> > > > > > > > > > > >              set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
-> > > > > > > > > > > > 
-> > > > > > > > > > > > +        /*
-> > > > > > > > > > > > +         * No DEVICE filter needed here:
-> > > > > > > > > > > > relax_perms is only called
-> > > > > > > > > > > > +         * on FSC_PERM faults. Device pages
-> > > > > > > > > > > > always get full RW from
-> > > > > > > > > > > > +         * initial mapping and are never write-protected during
-> > > > > > > > > > > > +         * migration, so they never trigger a permission fault.
-> > > > > > > > > > > > +         */
-> > > > > > > > > > > > +        if (pgt->flags & KVM_PGTABLE_S2_DBM)
-> > > > > > > > > > > > +            set |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
-> > > > > > > > > > > > +    } else {
-> > > > > > > > > > > > +        /*
-> > > > > > > > > > > > +         * Clear DBM on W→RO downgrade to prevent hardware from
-> > > > > > > > > > > > +         * silently upgrading RO+DBM back to W+dirty, which would
-> > > > > > > > > > > > +         * bypass KVM's write tracking and cause data corruption.
-> > > > > > > > > > > > +         */
-> > > > > > > > > > > > +        clr |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
-> > > > > > > > > > > > +    }
-> > > > > > > > > > > > +
-> > > > > > > > > > > This block makes it pretty evident that the DBM bit really *is* the
-> > > > > > > > > > > write permission bit. I'd much rather we
-> > > > > > > > > > > introduce the concept of dirty
-> > > > > > > > > > > state to the page table library and migrate the abstract write
-> > > > > > > > > > > permission to the DBM field, even if we don't have FEAT_HAFDBS.
-> > > > > > > > > > > 
-> > > > > > > > > 
-> > > > > > > > > Ohh, that's an amazing idea!
-> > > > > > > > 
-> > > > > > > > Thinking about that again...
-> > > > > > > > If we adopt the encoding with DBM being the write-permission
-> > > > > > > > bit, and all
-> > > > > > > > PTEs have it since the start, how can we have lazy-splitting happening?
-> > > > > > > > 
-> > > > > > > > Only way I think of is removing both DBM and S2_S2AP_W bit
-> > > > > > > > from writable
-> > > > > > > > PTEs during dirty-track enable, and re-adding them during
-> > > > > > > > the first write
-> > > > > > > > fault. If we don't remove the DBM bit, systems with HDBSS
-> > > > > > > > would just dirty
-> > > > > > > > it by hardware, without causing a fault.
-> > > > > > > > 
-> > > > > > > > DBM=0 would need to happen only in the first write-protect (only on
-> > > > > > > > lazy-splitting). All other write-protecting would just clean
-> > > > > > > > the S2_S2AP_W
-> > > > > > > > bit, as everything is already split.
-> > > > > > > > 
-> > > > > > > > Is that what was intended?
-> > > > > > > > 
-> > > > > > > > Thanks!
-> > > > > > > > Leo
-> > > > > > > > 
-> > > > > > > Hi Leo,
-> > > > > > > 
-> > > > > > > I think the cleanest way to handle this is to simply avoid setting DBM
-> > > > > > > on block mappings. If we only set DBM on page-level PTEs, then block
-> > > > > > > mappings will naturally stay DBM=0 and trigger a write fault on first
-> > > > > > > access — exactly what we need for lazy splitting.
-> > > > > > > 
-> > > > > > > When the fault occurs, the block gets split into page-level PTEs, and at
-> > > > > > > that point we can set DBM=1 on the resulting leaf entries. This way:
-> > > > > > > 
-> > > > > > > 1. Lazy split works naturally (fault -> split -> set DBM=1)
-> > > > > > > 
-> > > > > > > 2. No need to clear DBM globally at dirty-track enable
-> > > > > > > 
-> > > > > > > 3. No special handling for block mappings
-> > > > > > > 
-> > > > > > > So I think global DBM is still viable — we just need to filter out block
-> > > > > > > mappings when setting the DBM bit. That way the lazy split path
-> > > > > > > is preserved
-> > > > > > > without extra complexity.
-> > > > > > 
-> > > > > > Hi Tian,
-> > > > > > 
-> > > > > > Humm, but would not that be contrary to what Oliver suggested:
-> > > > > > changing the
-> > > > > > encoding from the PTE for all entries?
-> > > > > > 
-> > > > > > (Like, if the PTE is writable, it has to have DBM set)
-> > > > > > 
-> > > > > > IIUC what you said, on first faulting of the page in the VM:
-> > > > > > - If the entry is a page (level-3 leaf) and writable, add DBM
-> > > > > > - If it's a block entry (leaf but not a level-3), don't add DBM
-> > > > > > 
-> > > > > > So after we enable dirty-logging:
-> > > > > > - a level-3 entry would not fault, using HDBSS, and
-> > > > > > - a block entry would fault, do the splitting, and add DBM to level-3
-> > > > > >     entries during the split.
-> > > > > > 
-> > > > > > If I got that correct, that would be clean indeed.
-> > > > > > 
-> > > > > > But then we would have a different encoding for block entries and page
-> > > > > > entries. In page entries, DBM could be used to say if the page is
-> > > > > > writable,
-> > > > > > but on block entries one would have to look at the 'dirty-bit'.
-> > > > > > 
-> > > > > > Would that be ok?
-> > > > > > 
-> > > > > > Thanks!
-> > > > > > Leo
-> > > > > > 
-> > > > > Hi Leo,
-> > > > > 
-> > > > > My initial concern was that clearing all DBM bits at the start of
-> > > > > migration would be too expensive, so I thought distinguishing between
-> > > > > level-3 entries and block entries would be better.
-> > > > > 
-> > > 
-> > > I think we expect it to be expensive, but since we already clean the
-> > > dirty-bit (ro/rw) bit, we can have both happening in the same write :)
-> > > 
-> > > (since we only mark the DBM bit when we fault the memory on lazy-splitting,
-> > > we are expecting to have the same amount of writes to pagetable as we have
-> > > before HDBSS, both on faulting and 1st iteration cleaning)
-> > > 
-> > Hi, Leo
-> > 
-> > Actually, I have thought about this approach too, but if we clear DBM in
-> > kvm_pgtable_stage2_wrprotect(), then during the first round of
-> > migration, we will fault and release RO -> W, and then add DBM.
+On Wed, Jul 29, 2026 at 11:29:18AM +0000, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 4 potential issue(s) to consider:
+> - [Critical] Direct accesses to EL2 system registers from EL1 cause host panics on nVHE and pKVM configurations.
+> - [High] Writes to control-plane system registers are missing immediate `isb()` synchronization instructions.
+> - [High] Unbounded hardware polling loop with preemption disabled.
+> - [Medium] Preempt notifier is registered within an atomic section where preemption is inherently disabled.
+> --
 > 
-> Yeah, that's only for lazy-splitting, though.
+> --- Patch [11]: [PATCH v3 11/11] KVM: arm64: Enable KVM_HW_DIRTY_BIT ---
+> commit 9dec1efff0823ef68d8ee166e3fa545263373c0f
+> Author: Leonardo Bras <leo.bras@arm.com>
 > 
-> >
-> > But next time, when we migrate the dirty pages in round two, we will run
-> > kvm_pgtable_stage2_wrprotect() again, which will clear DBM again. And
-> > finally, HDBSS will be useless during migration.
+> KVM: arm64: Enable KVM_HW_DIRTY_BIT
+>     
+> Set the corresponding bit to enable hardware accelerated dirty-bitmap and
+> dirty-ring cleaning for arm64. Actually using acceleration depends on the
+> cpus enabling FEAT_HACDBS as well as the pre-requisite features for it,
+> such as FEAT_HDBSS and FEAT_HAFDBS.
 > 
-> Right, on lazy splitting, we have to clean the DBM bit on the  
-> write-protect only if it's a block entry (hugepage). 
+> > diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> > index 449154f9a4852..3264d8ca093e3 100644
+> > --- a/arch/arm64/kvm/Kconfig
+> > +++ b/arch/arm64/kvm/Kconfig
+> > @@ -34,6 +34,7 @@ menuconfig KVM
+> >  	select HAVE_KVM_IRQ_BYPASS
+> >  	select HAVE_KVM_READONLY_MEM
+> >  	select HAVE_KVM_VCPU_RUN_PID_CHANGE
+> > +	select HAVE_KVM_HW_DIRTY_BIT
+> >  	select SCHED_INFO
+> >  	select GUEST_PERF_EVENTS if PERF_EVENTS
+> >  	select KVM_GUEST_MEMFD
+> > diff --git a/arch/arm64/kvm/dirty_bit.c b/arch/arm64/kvm/dirty_bit.c
+> > new file mode 100644
+> > index 0000000000000..ca9cfefe0893b
+> > --- /dev/null
+> > +++ b/arch/arm64/kvm/dirty_bit.c
+> > @@ -0,0 +1,438 @@
+> [ ... ]
+> > +static void hacdbs_start(u64 *hw_entries, int size)
+> > +{
+> > +	u64 br;
+> > +	/* Each entry is 8 bytes */
+> > +	int size_b = size * sizeof(hw_entries[0]);
+> > +	int size_p2 = max(roundup_pow_of_two(size_b), PAGE_SIZE);
+> > +
+> > +	/* If not using the full size of the array, put a stop entry at the end */
+> > +	if (size_b < size_p2)
+> > +		hw_entries[size] = HDBSS_ENTRY_VALID | HDBSS_ENTRY_TTWL_RESV;
+> > +
+> > +	sysreg_clear_set_s(SYS_HACDBSCONS_EL2,
+> > +			   HACDBSCONS_EL2_ERR_REASON | HACDBSCONS_EL2_INDEX, 0);
 > 
-> Once it faults for the first time, it will lazy-split, and we don't need to 
-> clean the DBM bit.
-> 
-> > 
-> > > 
-> > > > > However, I ran a quick test on a 400GB VM (4 vCPUs), and the overhead
-> > > > > turned out to be around 30ns — which I think is acceptable.
-> > > > 
-> > > > Just a quick correction — I misstated the unit in my previous email. The
-> > > > overhead for clearing DBM on the 400GB VM (4 vCPUs) was around 32 µs, not 30
-> > > > ns.
-> > > > 
-> > > 
-> > > Oh, that seems more likely :)
-> > > 
-> > > Question: is tha above amount of memory initially in Level-1 blocks,
-> > > level-2 blocks or level-3 pages? (aka: were you using explicit/transparent
-> > > hugepages?)
-> > > 
-> > 
-> > I'm using transparent hugepages. However, if we were to use level-3 stage-2
-> > pages with -mem-prealloc enabled in QEMU, I believe the time cost would be
-> > extremely high — potentially out of our control.
-> > 
-> 
-> Yeah, that's the issue.
-> For this not to explode like this, we need to mark as RO only when the 
-> entries are blocks AND we are doing lazy splitting.
-> 
-> We have:
-> Mode	DBM	Dirty bit
-> RO	0	X
-> WC	1	0
-> WD	1	1
-> 
-> On write-protect:
-> - Lazy splitting + block entry (hugepage, level 2-) -> RO
-> - Otherwise					    -> WC
-> 
-> On first fault, the block entry will be lazy-splitten, and we can set DBM=1 
-> in every new page.
+> [Severity: Critical]
+> Can this code cause a host panic on nVHE and pKVM configurations?
 
-Meaning we set WD on the page that got actually written to, and register it 
-in the dirty log (bitmap or ring), and the remaining pages are set to WC.
+It's VHE only
 
- 
-> That way we guarantee that we are not faulting level-3 pages unecessarily, 
-> nor need to go through the whole tree setting DBM=1 or DBM=0 on level-3 
-> pages.
 > 
-> How does that sound?
+> The code directly attempts to read and write EL2 registers, which triggers
+> a synchronous undefined exception at EL1. Since kvm_arch_dirty_clear_enabled()
+> only checks for system_supports_hacdbs() and does not enforce has_vhe(),
+> could an unprivileged userspace application reliably crash the host by
+> triggering this on non-VHE hardware?
 > 
-> Thanks!
-> Leo
+> [Severity: High]
+> Does this code allow the CPU pipeline to observe architecturally undefined
+> state? 
+> 
+> The ARM64 subsystem rules require an isb() as the very next instruction
+> following a control-plane sysreg write. Here, SYS_HACDBSCONS_EL2 is modified
+> but several instructions and variable assignments occur before an isb() is
+> reached.
+
+Already commented on a early patch.
+
+> 
+> > +
+> > +	br = (virt_to_phys(hw_entries) & HACDBSBR_EL2_BADDR_MASK) |
+> > +	     FIELD_PREP(HACDBSBR_EL2_SZ, ilog2(size_p2) - 12) |
+> > +	     FIELD_PREP(HACDBSBR_EL2_EN, 1);
+> > +
+> > +	/* All writes to the array have to complete before starting */
+> > +	dsb(ishst);
+> > +
+> > +	write_sysreg_s(br, SYS_HACDBSBR_EL2);
+> > +	isb();
+> > +}
+> [ ... ]
+> > +static void hacdbs_sched_in(struct preempt_notifier *notifier, int cpu)
+> > +{
+> > +	struct hacdbs_sched_save *save = container_of(notifier,
+> > +						      struct hacdbs_sched_save,
+> > +						      notifier);
+> > +
+> > +	write_sysreg_s(save->save.vtcr_el2, SYS_VTCR_EL2);
+> > +	write_sysreg_s(save->save.vttbr_el2, SYS_VTTBR_EL2);
+> > +	isb();
+> 
+> [Severity: High]
+> Can this missing synchronization lead to unpredictable execution?
+> 
+> The ARM64 subsystem rules require an isb() as the very next instruction
+> following a control-plane sysreg write, but SYS_VTCR_EL2 is written followed
+> by SYS_VTTBR_EL2 before the isb() is issued.
+> 
+
+iden
+
+> > +
+> > +	if (save->save.hcr_vm_set) {
+> > +		sysreg_clear_set_hcr(0, HCR_EL2_VM);
+> > +		isb();
+> > +	}
+> > +
+> > +	write_sysreg_s(save->save.hacdbscons_el2, SYS_HACDBSCONS_EL2);
+> > +	write_sysreg_s(save->save.hacdbsbr_el2, SYS_HACDBSBR_EL2);
+> > +	isb();
+> 
+> [Severity: High]
+> Is another isb() required here?
+> 
+> SYS_HACDBSCONS_EL2 is written followed by SYS_HACDBSBR_EL2 without
+> an intervening isb(). Does this sequence allow the CPU pipeline to observe
+> stale configurations?
+> 
+
+iden
+
+> > +}
+> [ ... ]
+> > +static int dirty_bit_clear(struct kvm *kvm, u64 *hw_entries, int size)
+> > +{
+> > +	int ret;
+> > +	u64 cons;
+> > +	struct hacdbs_sched_save save;
+> > +
+> > +	preempt_notifier_init(&save.notifier, &hacdbs_preempt_ops);
+> > +	preempt_disable();
+> > +	preempt_notifier_register(&save.notifier);
+> > +	preempt_enable();
+> 
+> [Severity: Medium]
+> Are these preempt notifiers effectively dead code on standard kernels?
+> 
+> The calling functions (__kvm_arch_dirty_log_clear and
+> __kvm_arch_dirty_ring_clear) acquire write_lock(&kvm->mmu_lock) before
+> this code runs.
+> 
+> Since the mmu_lock rwlock already disables preemption, this region cannot be
+> preempted. If the hardware cleaning takes a long time, won't the thread
+> stall rather than cleanly context switching?
+> 
+
+iden
+
+> > +
+> > +	__load_stage2(&kvm->arch.mmu);
+> > +	sysreg_clear_set_hcr(0, HCR_EL2_VM);
+> > +	isb();
+> 
+> [Severity: Critical]
+> Does this code also trigger a synchronous undefined exception at EL1?
+> 
+> Directly attempting to access EL2 registers from EL1 causes traps on non-VHE
+> hardware.
+> 
+
+iden
+
+> > +
+> > +	hacdbs_start(hw_entries, size);
+> > +
+> > +	do {
+> > +		cons = read_sysreg_s(SYS_HACDBSCONS_EL2);
+> > +		if (FIELD_GET(HACDBSCONS_EL2_ERR_REASON, cons))
+> > +			break;
+> > +
+> > +		if (FIELD_GET(HACDBSCONS_EL2_INDEX, cons) >= size)
+> > +			break;
+> > +
+> > +		udelay(1);
+> > +	} while (true);
+> 
+> [Severity: High]
+> Could this unbounded polling loop cause a hard lockup?
+> 
+> Since this runs under write_lock(&kvm->mmu_lock) with preemption disabled,
+> if the hardware accelerator hangs, takes unusually long, or fails to set an
+> error reason, the CPU will stall indefinitely. Should there be a timeout or
+> fallback mechanism here?
+
+iden
+
+Leo
