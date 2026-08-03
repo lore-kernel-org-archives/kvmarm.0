@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F4015409604;
-	Mon,  3 Aug 2026 11:27:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08F2A372046;
+	Mon,  3 Aug 2026 12:29:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785756460; cv=none; b=mN6yBQbxMz2yix1wHcAqrdU2wbksO9sW1JpDDqYqaWVpyu/bY2WVt5rLCntv0kx5+YdtiprNcxN+8MxT2S81snT4x7kvKjjNVlvVyZ/K62fbiwLqj2bDxLQd2DWJw7YHob+rcZ3AvqLTjFE8xRmSdWaIZHo3mvbT9sq4aqo4Wwk=
+	t=1785760145; cv=none; b=XmdDKKL2q1GqGZ5qMFWNhrbFBn/fNA44DHUE7FVawkkrZ4G9hgllNxYE1BfD0vP557ILqVu4j4UZkcE91p5/Oz/zw1ow/x++5NpmdxP39cYhp/2uADXYTqKzly+0yX3qz8df9dZ/NbnWf3gOLMTO5HvvlM2oxWcR7LWds783gXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785756460; c=relaxed/simple;
-	bh=Lef4IQuLjnebR5p/FsvALUdCAtneo6dIdEQCYmWVXZU=;
+	s=arc-20240116; t=1785760145; c=relaxed/simple;
+	bh=OoL1As3dEZH4IFoCMmqEOhBx7078X8VfvoTX/lO8FMY=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VEu/mQYxjPstCMnBOpJfgeswrQ2+GuYSGtAJmLhJcSsBdOqqXd4/OP2HYo9ohwEyvHjHfeshqUVnc0f7r8B3qWjJWyFECqAgfG4JBrbHfV1LQZLQ2e+Kbd4aWEc7YYgpGipvv/3iiJdrN0e5I7nTtXUIWx4SsYn0Y/zTkgYvPJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LD+9R/xv; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=nd1pFCVsBBbBtq8EHcIWpOzSX72NBeq+7BoeXVjIAUcbUXOmzSjSE51oEYLO73R4IFcLBf/X06Hl5l4LQ8ak0t2r6cDvgSuvKtRIUf0S5+6rS3W9LEI5mt48fFjYVhU+e2li7un6ezH1e+sQd16AKGww+fQ631AzYrGPAXJbrbQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K2u5WNve; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LD+9R/xv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AD5C1F00A3A;
-	Mon,  3 Aug 2026 11:27:38 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K2u5WNve"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9EE001F000E9;
+	Mon,  3 Aug 2026 12:29:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785756458;
-	bh=/i3CPF5W25MD9Vez/azH6CCKyA9iHKYO0QYhYx2P/Sk=;
+	s=k20260515; t=1785760143;
+	bh=d0JxQ8lHSv0NhahRmDmv7DHjVItDMVG5WIkT3vPSZ4Y=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=LD+9R/xv3NSQsat4RjeNlGLbJ1uKDtgjUp+Y/VOu4UnzZ2ojY1qwtPJGndSzD7x8K
-	 lJO2raJWfeqkFwlIIirZsXoc4yVV8HGN3aru11ybyaQETHdaNFkrpzObjJ8hpleKRR
-	 sLqkS/prEff9LFafonsANPFwmLCSyBgOUxrwJbNlQGXGBn51zNPsMJQTinGYEwGW3w
-	 /M93kGzHttMFUxc6+H1QENcytzFLQ+5Mo4ZVzD4rS/i2/X5Zh/0utKRzqfD602lPD9
-	 IYpaPZ3j+Fkp6szxuj6hRSuUaYcWkZH7oLVnzA28McYZZ9gcJeyKVPafXl23m/pmIx
-	 fL6aooRlu+2Eg==
+	b=K2u5WNveD3tarc9m99nLHttoafzVZJMWXeZ1mKL9CXbB+AeI9MsFnx6xyQypxH1bv
+	 qPxC1XHer0BhzjNjHvwV19I/TWMPd2oWmuetuVVShhvWay3zLLwtOqs11Pg0B4xzBK
+	 VQTS2rO4ssP7ieC6Nf6PDSs6DVIo/HmEH516Z9uyLPzQ47ZhWpsxdF3zygghVx3tnq
+	 gFI/u/+Gz5VY48ZlXfC9+oKyn5t3RnUuPPH3Kdk7TuKza8YZKrOTtP5JKUp0LDXHy8
+	 xHzE9C+Mo0UH1x68foO+/wP81EgN6hPEEVjnIUtShDNdA55CxFqOH3hDeyCi2x2tdM
+	 RqVrw7yDI6bIQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wqqpU-0000000BjIT-1j2Y;
-	Mon, 03 Aug 2026 11:27:36 +0000
-Date: Mon, 03 Aug 2026 12:27:35 +0100
-Message-ID: <864ihbcul4.wl-maz@kernel.org>
+	id 1wqrmv-0000000BkPQ-1W3i;
+	Mon, 03 Aug 2026 12:29:01 +0000
+Date: Mon, 03 Aug 2026 13:29:00 +0100
+Message-ID: <8633wvcrqr.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Steven Price <steven.price@arm.com>
 Cc: kvm@vger.kernel.org,
@@ -60,10 +60,10 @@ Cc: kvm@vger.kernel.org,
 	Vishal Annapurve <vannapurve@google.com>,
 	WeiLin.Chang@arm.com,
 	Lorenzo Pieralisi <lpieralisi@kernel.org>
-Subject: Re: [PATCH v15 16/37] KVM: arm64: CCA: Handle realm MMIO emulation
-In-Reply-To: <20260715142841.80544-17-steven.price@arm.com>
+Subject: Re: [PATCH v15 19/37] KVM: arm64: CCA: Activate realms on first vCPU run
+In-Reply-To: <20260715142841.80544-20-steven.price@arm.com>
 References: <20260715142841.80544-1-steven.price@arm.com>
-	<20260715142841.80544-17-steven.price@arm.com>
+	<20260715142841.80544-20-steven.price@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -79,104 +79,135 @@ X-SA-Exim-Rcpt-To: steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 15 Jul 2026 15:28:18 +0100,
+On Wed, 15 Jul 2026 15:28:21 +0100,
 Steven Price <steven.price@arm.com> wrote:
 > 
-> MMIO emulation for a realm cannot be done directly with the VM's
-> registers as they are protected from the host. However, for emulatable
-> data aborts, the RMM uses GPRS[0] to provide the read/written value.
-> We can transfer this from/to the equivalent VCPU's register entry and
-> then depend on the generic MMIO handling code in KVM.
-> 
-> For a MMIO read, the value is placed in the shared RecExit structure
-> during kvm_handle_mmio_return() rather than in the VCPU's register
-> entry.
+> Use kvm_arch_vcpu_run_pid_change() to check if this is the first time
+> the realm guest has run. If this is the first run then activate the
+> realm.
 > 
 > Signed-off-by: Steven Price <steven.price@arm.com>
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> ---
-> Changes since v7:
->  * New comment for rec_exit_sync_dabt() explaining the call to
->    vcpu_set_reg().
-> Changes since v5:
->  * Inject SEA to the guest is an emulatable MMIO access triggers a data
->    abort.
->  * kvm_handle_mmio_return() - disable kvm_incr_pc() for a REC (as the PC
->    isn't under the host's control) and move the REC_ENTER_EMULATED_MMIO
->    flag setting to this location (as that tells the RMM to skip the
->    instruction).
-> ---
->  arch/arm64/kvm/inject_fault.c |  4 +++-
->  arch/arm64/kvm/mmio.c         | 16 ++++++++++++----
->  arch/arm64/kvm/rmi-exit.c     | 15 +++++++++++++++
->  3 files changed, 30 insertions(+), 5 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-> index 89982bd3345f..6492397b73d7 100644
-> --- a/arch/arm64/kvm/inject_fault.c
-> +++ b/arch/arm64/kvm/inject_fault.c
-> @@ -228,7 +228,9 @@ static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt, u32 addr)
+> ---
+> Changes since v12:
+>  * Fix commit message
+>  * Change realm_state checks to be >= REALM_STATE_ACTIVE to avoid a dead
+>    guest being revived by kvm_activate_realm().
+> ---
+>  arch/arm64/include/asm/kvm_rmi.h |  1 +
+>  arch/arm64/kvm/arm.c             |  6 +++++
+>  arch/arm64/kvm/rmi.c             | 45 ++++++++++++++++++++++++++++++--
+>  3 files changed, 50 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
+> index 5461c49bea4d..5cb99c187202 100644
+> --- a/arch/arm64/include/asm/kvm_rmi.h
+> +++ b/arch/arm64/include/asm/kvm_rmi.h
+> @@ -96,6 +96,7 @@ void kvm_init_rmi(void);
+>  u32 kvm_rmm_ipa_limit(void);
 >  
->  static void __kvm_inject_sea(struct kvm_vcpu *vcpu, bool iabt, u64 addr)
->  {
-> -	if (vcpu_el1_is_32bit(vcpu))
-> +	if (unlikely(vcpu_is_rec(vcpu)))
-> +		vcpu->arch.rec.run->enter.flags |= REC_ENTER_FLAG_INJECT_SEA;
-> +	else if (vcpu_el1_is_32bit(vcpu))
->  		inject_abt32(vcpu, iabt, addr);
->  	else
->  		inject_abt64(vcpu, iabt, addr);
-
-Why don't you let inject_dabt64() do its job and reconcile the REC
-stuff at run time?
-
-> diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
-> index e2285ed8c91d..a8c125205695 100644
-> --- a/arch/arm64/kvm/mmio.c
-> +++ b/arch/arm64/kvm/mmio.c
-> @@ -6,6 +6,7 @@
->  
->  #include <linux/kvm_host.h>
->  #include <asm/kvm_emulate.h>
-> +#include <linux/arm-smccc-rmi.h>
->  #include <trace/events/kvm.h>
->  
->  #include "trace.h"
-> @@ -138,14 +139,21 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu)
->  		trace_kvm_mmio(KVM_TRACE_MMIO_READ, len, run->mmio.phys_addr,
->  			       &data);
->  		data = vcpu_data_host_to_guest(vcpu, data, len);
-> -		vcpu_set_reg(vcpu, kvm_vcpu_dabt_get_rd(vcpu), data);
-> +
-> +		if (vcpu_is_rec(vcpu))
-> +			vcpu->arch.rec.run->enter.gprs[0] = data;
-> +		else
-> +			vcpu_set_reg(vcpu, kvm_vcpu_dabt_get_rd(vcpu), data);
-
-This is yet another example of things I do not want to see. KVM works
-on the GPRs described in the vcpu structure. And that's it.
-
-So let the ESR information be correct for CCA, the data being written
-back to x0, and once you're ready to enter the guest again, copy
-whatever you need into the CCA data structure.
-
-But not any of this stuff.
-
+>  int kvm_init_realm(struct kvm *kvm);
+> +int kvm_activate_realm(struct kvm *kvm);
+>  void kvm_destroy_realm(struct kvm *kvm);
+>  int kvm_realm_teardown_stage2(struct kvm *kvm);
+>  void kvm_destroy_rec(struct kvm_vcpu *vcpu);
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 534d33b7c67a..df33322b8fea 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1034,6 +1034,12 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
+>  			return ret;
 >  	}
 >  
->  	/*
->  	 * The MMIO instruction is emulated and should not be re-executed
->  	 * in the guest.
->  	 */
-> -	kvm_incr_pc(vcpu);
-> +	if (vcpu_is_rec(vcpu))
-> +		vcpu->arch.rec.run->enter.flags |= REC_ENTER_FLAG_EMULATED_MMIO;
-> +	else
-> +		kvm_incr_pc(vcpu);
+> +	if (kvm_is_realm(vcpu->kvm)) {
+> +		ret = kvm_activate_realm(kvm);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +
+>  	mutex_lock(&kvm->arch.config_lock);
+>  	set_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &kvm->arch.flags);
+>  	mutex_unlock(&kvm->arch.config_lock);
+> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
+> index 94776a9262c9..53b5b18f2275 100644
+> --- a/arch/arm64/kvm/rmi.c
+> +++ b/arch/arm64/kvm/rmi.c
+> @@ -687,7 +687,7 @@ static int realm_set_ipa_state(struct kvm_vcpu *vcpu,
+>  	return ret;
+>  }
+>  
+> -static int __maybe_unused realm_ensure_created(struct kvm *kvm)
+> +static int realm_ensure_created(struct kvm *kvm)
+>  {
+>  	lockdep_assert_held(&kvm->arch.config_lock);
+>  
+> @@ -793,7 +793,7 @@ int noinstr kvm_rec_enter(struct kvm_vcpu *vcpu)
+>  	return ret;
+>  }
+>  
+> -static int __maybe_unused kvm_create_rec(struct kvm_vcpu *vcpu)
+> +static int kvm_create_rec(struct kvm_vcpu *vcpu)
+>  {
+>  	struct user_pt_regs *vcpu_regs = vcpu_gp_regs(vcpu);
+>  	unsigned long mpidr = kvm_vcpu_get_mpidr_aff(vcpu);
+> @@ -893,6 +893,47 @@ void kvm_destroy_rec(struct kvm_vcpu *vcpu)
+>  	rec->rec_page = NULL;
+>  }
+>  
+> +int kvm_activate_realm(struct kvm *kvm)
+> +{
+> +	struct realm *realm = &kvm->arch.realm;
+> +	struct kvm_vcpu *vcpu;
+> +	unsigned long i;
+> +	int ret;
+> +
+> +	if (kvm_realm_state(kvm) >= REALM_STATE_ACTIVE)
+> +		return 0;
+> +
+> +	if (!irqchip_in_kernel(kvm)) {
+> +		/* Userspace irqchip not yet supported with realms */
+> +		return -EOPNOTSUPP;
+> +	}
 
-Same thing. kvm_incr_pc() sets a flag. Use that to reconcile the state
-with CCA.
+This could race with the irqchip being created on another CPU. Also,
+an irqchip being in kernel doesn't mean it is ready, and I suspect
+you also need to check that it has been initialised.
+
+> +
+> +	guard(mutex)(&kvm->arch.config_lock);
+> +	/* Check again with the lock held */
+> +	if (kvm_realm_state(kvm) >= REALM_STATE_ACTIVE)
+> +		return 0;
+> +
+> +	ret = realm_ensure_created(kvm);
+> +	if (ret)
+> +		return ret;
+> +
+> +	/* Mark state as dead in case we fail */
+> +	kvm_set_realm_state(kvm, REALM_STATE_DEAD);
+> +
+> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+> +		ret = kvm_create_rec(vcpu);
+> +		if (ret)
+> +			return ret;
+> +	}
+
+If the realm is dead, shouldn't the KVM view of death apply as well?
+
+> +
+> +	ret = rmi_realm_activate(virt_to_phys(realm->rd));
+> +	if (ret)
+> +		return -ENXIO;
+> +
+> +	kvm_set_realm_state(kvm, REALM_STATE_ACTIVE);
+> +	return 0;
+> +}
+> +
+>  void kvm_destroy_realm(struct kvm *kvm)
+>  {
+>  	struct realm *realm = &kvm->arch.realm;
+
+Thanks,
 
 	M.
 
