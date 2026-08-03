@@ -1,209 +1,135 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74C87379974
-	for <kvmarm@lists.linux.dev>; Mon,  3 Aug 2026 10:54:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2186C367F48
+	for <kvmarm@lists.linux.dev>; Mon,  3 Aug 2026 10:54:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785754453; cv=none; b=d8TZF3JuSN4qX6Z65Jj8+sbAB5vnsOqLVBh5Pccee3VFs5+khYIKe1yGVOVqrEkRx4bREtXDvaRM+WjhR3pbayG7awawkaxVDRR+9TMVm1jaoArMpZ+MTxWuO8YkeMcvOX34x9JEnRyJ1sJUAMlEl7Pem/wg35wxBCHlRyFaH5k=
+	t=1785754470; cv=none; b=A01eZe5//i4upBpn2n5MDjseNE5/DA2kmvYlOD7Z14zw6OstkNE66YBwINdqlhivv7Vi0QkeyA2I8tFNjE/vskc1Jd+593nKQbrdSMYYkhdt1rxMz0LgSmAy7QCKc3jlj+Uz8b/0SS4itJ0hTbbZJWc/veOE0ktKq5CCRMfmAE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785754453; c=relaxed/simple;
-	bh=xMq2WOEN+zd77HTmxVmSeQHoLDN52GWaAU287ZTlEhA=;
+	s=arc-20240116; t=1785754470; c=relaxed/simple;
+	bh=t9eTWG1ZW2dInn7dSVtAL3kH6KM5d9S3JaHrk5yzR2s=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=qeBi6GZfWZabT5getTdpCfTr0uHt55q7Jnvsqpgkw4FyWpTdtkilz0xr41yE3cXPEly7ZrIYTl3gh8FT2MnItgsebd+es7gfpt4GBkQz56lNMKKiYpQLdCFi6ivhKK9dgo6vtVbRJI1wttOZOk5N3CQiXj25/np/VL8IHbY/7a4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yj21qfMf; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=jysn/suPYzYJKgCdsgoXfXKhoxYDVSOjkDWjcO5AT7aLVdYGJD5PQZMnLRF8Re52le2rJ8ma5H+PMyMKkgHqkYBpqZOMfEMvVLGkyPk2yS6ElTaTlZ+yXKQAaAUmX79rYxPcF0OIfplixl5fIaJtrkUtBWupTd12+d+AC1wj530=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EBv1uL39; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yj21qfMf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6ACE1F000E9;
-	Mon,  3 Aug 2026 10:54:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EBv1uL39"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76EEF1F000E9;
+	Mon,  3 Aug 2026 10:54:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785754452;
-	bh=vyEZFStJ8EMM6La9BF89UCGPyOj4lkogcDlrCekIs88=;
+	s=k20260515; t=1785754468;
+	bh=VB+eifxzgyb8j9z78sXIuGCGtW7Z5BOKhx+U4s1J0yc=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=Yj21qfMfe7ghCbchKoKoZMLam6ck9mkLqB2ABNXymUp3mR5u5nnoSYGCqHJFRydoP
-	 qKDQBWfdxryHtGs+mpS14Yo/UoEKPLo1UeLoSJB4WLCLFOWUtby7Rfz2RYV+xfyC8e
-	 FhMnQW5prdEK8eFbkYjgzTIFbRKHGH4/ZxJtgicjAxeGDs2Fcj6XICL1yCrp9BCWRx
-	 CEl0b5sCuC3P5YRtFWrCmazVU0zGAnuXzufEPr2qaQ9o2mc4aUZ5GUBs9Ze/fF+2cd
-	 ij2PHldc9i0XEp+k5pGsMk+t+1hgK58VxpzGLPgVikV1B7b5l2NMtIEYubuLrhev8x
-	 MpL2HYYVObcuA==
+	b=EBv1uL39MLZ0VFRhdEv/2hUgqGnbfp8LR45OWknMAo6xgOxMamhL3n4rqmaqwJeja
+	 orflKDskjnDkEond0gD5LoKNjKK8NnFP8fol6pSo0Ovfmp6jXddmf5Dxywy1Mn+xvi
+	 YlJqEdw1s5d3+zb2y7Sd1iMP+hspOV77SFWPf4gTGV/gQCyyESUeeKFg//MjVG+sRr
+	 YGSUNOK7NHeIvdcWnr8WPTdi0MR/Pb9k/g1bsqp5QC4s0Ktt5tO52t/Npy9KlHVja8
+	 FnPaZx8Ue4WQiPKt6Dlp77ksVte/StG2PWzFThzaXKkqwDYY7gerWxggeXjocdonum
+	 YREt95vkmqVlw==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 18/20] KVM: arm64: Add PKVM_HYP_REQ_SPLIT
+Subject: Re: [PATCH 16/20] KVM: arm64: Add __pkvm_host_split_guest HVC
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Vincent Donnefort" <vdonnefort@google.com>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260803100904.3563942-19-vdonnefort@google.com>
+Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev
+In-Reply-To: <20260803100904.3563942-17-vdonnefort@google.com>
 References: <20260803100904.3563942-1-vdonnefort@google.com>
- <20260803100904.3563942-19-vdonnefort@google.com>
+ <20260803100904.3563942-17-vdonnefort@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 03 Aug 2026 10:54:11 +0000
-Message-Id: <20260803105411.B6ACE1F000E9@smtp.kernel.org>
+Date: Mon, 03 Aug 2026 10:54:27 +0000
+Message-Id: <20260803105428.76EEF1F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 5 potential issue(=
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
 s) to consider:
-- [Critical] Time-of-Check to Time-of-Use (TOCTOU) race in `__pkvm_pgtable_=
-stage2_split` due to missing MMU notifier retry protocol.
-- [Critical] Using `pin_user_pages()` introduces a `FOLL_PIN` counting bias=
- that causes massive memory leaks during KVM teardown.
-- [High] Memory cgroup accounting bypass when allocating spare `pkvm_mappin=
-g` structures.
-- [Medium] Splitting read-only guest mappings is incorrectly forbidden by r=
-equiring write access.
-- [Low] `__pkvm_pgtable_stage2_split()` mixes `goto`-based error handling w=
-ith scope-based `__free(kfree)` cleanup.
+- [High] Failed guest stage-2 page table splits leave the host stage-2 owne=
+rship metadata permanently split, causing subsequent split attempts to fail=
+ with -EINVAL.
+- [High] Incorrect WARN_ON() semantics in host_stage2_split_gfn_meta() turn=
+s a recoverable memory allocation failure into a fatal EL2 panic.
 --
 
---- Patch [18]: [PATCH 18/20] KVM: arm64: Add PKVM_HYP_REQ_SPLIT ---
-commit eb20478193ba08806cd19923ba4b65163db37c40
+--- Patch [16]: [PATCH 16/20] KVM: arm64: Add __pkvm_host_split_guest HVC -=
+--
+commit 76334f00eacfa593f4125057892101e13067d2e0
 Author: Vincent Donnefort <vdonnefort@google.com>
 
-KVM: arm64: Add PKVM_HYP_REQ_SPLIT
+KVM: arm64: Add __pkvm_host_split_guest HVC
 
-This commit introduces a new pKVM hypervisor request, PKVM_HYP_REQ_SPLIT,
-enabling the hypervisor to request the host to split stage-2 huge mappings.
-This ensures synchronous splitting of both the guest stage-2 page tables
-and the host's pkvm_mappings red-black tree, preventing concurrent
-teardowns from observing inconsistent page sizes.
+This HVC allows the host to break an existing block in a protected VM. This
+will later allow the guest to share a sub-region of an existing
+huge-mapping with the host.
 
-> diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-> index 379bdc2b258a6..089b77cf2f6a9 100644
-> --- a/arch/arm64/kvm/pkvm.c
-> +++ b/arch/arm64/kvm/pkvm.c
-
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/n=
+vhe/mem_protect.c
+> index e16dde4c5f4b9..71ebd1856cb0c 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
 [ ... ]
-
-> +static int pkvm_mapping_alloc_spares(struct list_head *head, u64 nr_spar=
-es)
-> +{
-> +	struct pkvm_mapping *m;
+> @@ -660,14 +658,49 @@ static int host_stage2_decode_gfn_meta(kvm_pte_t pt=
+e, struct pkvm_hyp_vm **vm,
+[ ... ]
+> +	end =3D phys + size;
+> +	while (phys < end) {
+> +		u64 meta =3D host_stage2_encode_gfn_meta(vm, gfn);
+> +		kvm_pte_t annotation =3D FIELD_PREP(KVM_HOST_DONATION_PTE_OWNER_MASK, =
+PKVM_ID_GUEST) |
+> +				       FIELD_PREP(KVM_HOST_DONATION_PTE_EXTRA_MASK, meta);
 > +
-> +	while (nr_spares--) {
-> +		m =3D kzalloc_obj(*m);
+> +		ret =3D host_stage2_try(kvm_pgtable_stage2_annotate, &host_mmu.pgt,
+> +				      phys, PAGE_SIZE, &host_s2_pool,
+> +				      KVM_HOST_INVALID_PTE_TYPE_DONATION, annotation);
+> +		if (WARN_ON(ret))
 
 [Severity: High]
-Does this bypass memory cgroup limits?
+Can a memory allocation failure here trigger a fatal EL2 panic?
 
-This allocation uses kzalloc_obj() which defaults to GFP_KERNEL without
-the __GFP_ACCOUNT flag.
+Since WARN_ON() at EL2 expands to a fatal BRK instruction with no "warn and
+continue" semantics, an -ENOMEM from host_stage2_try() will cause a hypervi=
+sor
+panic rather than taking the error path.
 
-Because each PMD split allocates 511 structures, a guest could repeatedly
-trigger splits across its memory footprint.
-
-Can this allow the guest to consume large amounts of uncharged host memory,
-potentially leading to host memory exhaustion?
-
-> +		if (!m) {
-> +			pkvm_mapping_free_spares(head);
-> +			return -ENOMEM;
-> +		}
+> +			return ret;
 > +
-> +		list_add(&m->list, head);
-> +	}
+> +		phys +=3D PAGE_SIZE;
+> +		gfn++;
+>  	}
+> =20
+> -	*gfn =3D FIELD_GET(KVM_HOST_PTE_OWNER_GUEST_GFN_MASK, meta);
+>  	return 0;
+>  }
+[ ... ]
+> @@ -1748,6 +1788,39 @@ int __pkvm_host_mkyoung_guest(u64 gfn, struct pkvm=
+_hyp_vcpu *vcpu)
+[ ... ]
+> +	ret =3D host_stage2_split_gfn_meta(phys, ipa, size, vm);
+> +	if (ret)
+> +		goto unlock;
 > +
-> +	return 0;
+> +	ret =3D kvm_pgtable_stage2_split(&vm->pgt, ipa, size, mc);
+
+[Severity: High]
+Does this leave the host stage-2 ownership metadata permanently split if
+kvm_pgtable_stage2_split() fails?
+
+If the guest split fails (e.g., due to memory exhaustion returning -ENOMEM
+or -EAGAIN), the error is returned immediately without reverting the host
+stage-2 modifications made by host_stage2_split_gfn_meta(). This could cause
+subsequent split attempts for this block to fail with -EINVAL due to the
+desynchronized state.
+
+> +
+> +unlock:
+> +	guest_unlock_component(vm);
+> +	host_unlock_component();
+> +
+> +	return ret;
 > +}
-
-[ ... ]
-
-> +static int __pkvm_pgtable_stage2_split(struct kvm_vcpu *vcpu, phys_addr_=
-t ipa, u64 size)
-> +{
-> +	struct kvm_hyp_memcache *mc =3D &vcpu->arch.pkvm_memcache;
-> +	struct kvm_pgtable *pgt =3D vcpu->arch.hw_mmu->pgt;
-> +	struct page **pages __free(kfree) =3D NULL;
-
-[Severity: Low]
-Is it safe to mix scope-based cleanup with goto error handling in this
-function?
-
-The pages array is declared with __free(kfree), but the function uses goto
-labels like goto unlock_srcu and goto unlock_mmu for unwinding locks and
-freeing the spares list.
-
-The kernel cleanup guidelines note that functions should use either
-scope-based cleanup for all resources or goto labels for all resources,
-but not mix them, as it creates confusing ownership semantics.
-
-> +	struct mm_struct *mm =3D current->mm;
-> +	struct kvm_memory_slot *memslot;
-
-[ ... ]
-
-> +	idx =3D srcu_read_lock(&kvm->srcu);
-> +	memslot =3D gfn_to_memslot(kvm, gfn);
-> +	hva =3D gfn_to_hva_memslot_prot(memslot, gfn, &writable);
-> +	if (kvm_is_error_hva(hva) || !writable) {
-
-[Severity: Medium]
-Should read-only mappings be allowed to split?
-
-This explicitly checks that the memslot is writable and fails with -EFAULT
-otherwise. It also passes FOLL_WRITE to pin_user_pages() later on.
-
-However, splitting a huge page block into smaller PTEs changes the mapping
-granularity without modifying the underlying memory contents.
-
-Does requiring write access prevent the hypervisor from splitting read-only
-stage-2 block mappings, such as guest ROMs?
-
-> +		ret =3D -EFAULT;
-> +		goto unlock_srcu;
-> +	}
-> +
-> +	mmap_read_lock(mm);
-> +	ret =3D pin_user_pages(hva, nr_pages, FOLL_HWPOISON | FOLL_LONGTERM | F=
-OLL_WRITE, pages);
-
-[Severity: Critical]
-Does using pin_user_pages() here cause a permanent memory leak during KVM
-teardown?
-
-Calling pin_user_pages() adds a GUP_PIN_COUNTING_BIAS to the page refcount.
-However, normal KVM stage-2 teardown drops references using standard
-put_page() semantics which only subtracts one from the refcount.
-
-When the VM is destroyed, will these tail pages retain phantom references
-and be permanently leaked?
-
-> +	mmap_read_unlock(mm);
-> +	if (ret !=3D nr_pages) {
-> +		if (ret > 0)
-> +			unpin_user_pages(pages, ret);
-> +		ret =3D -EFAULT;
-> +		goto unlock_srcu;
-> +	}
-> +
-> +	write_lock(&kvm->mmu_lock);
-> +	mapping =3D pkvm_mapping_iter_first(&pgt->pkvm_mappings, ipa, ipa + siz=
-e - 1);
-
-[Severity: Critical]
-Is there a Time-of-Check to Time-of-Use race here since the MMU
-notifier retry protocol is missing?
-
-The resolution of the HVA to PFNs via pin_user_pages() happens outside
-kvm->mmu_lock. A concurrent host MMU invalidation could unmap the region
-and remove the pkvm_mapping, and a subsequent guest fault could establish
-a new huge page mapping at the same IPA.
-
-When this thread acquires kvm->mmu_lock, it finds the new mapping in the
-tree and proceeds to split it using the PFNs derived from the old mapping.
-
-Without capturing kvm->mmu_invalidate_seq before GUP and checking
-mmu_invalidate_retry() under the lock, can this lead to a refcount
-underflow on the new huge page and a permanent leak of the old pages?
-
-> +	if (!pkvm_mapping_can_split(mapping)) {
-> +		ret =3D -EINVAL;
-> +		goto unlock_mmu;
-> +	}
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260803100904.3563=
-942-1-vdonnefort@google.com?part=3D18
+942-1-vdonnefort@google.com?part=3D16
