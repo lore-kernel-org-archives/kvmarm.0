@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5A8033CE88;
-	Mon,  3 Aug 2026 11:09:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F4015409604;
+	Mon,  3 Aug 2026 11:27:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785755352; cv=none; b=PhCdR70o719Q4hl7OLiIFzGV23E4m15BDp4YV81gdaqH7MZ0eIWpX9WpM1O4cODJ1nzyF1t2FiyI0uYsp0V5kU2qE3aZRZ1GWCUvktmOza2GYsIyyHI/3gSFeidVU+tOGmMAjIu9likIhW6cgGI1HqpSZmjJcHA5AL5g2PkNVGA=
+	t=1785756460; cv=none; b=mN6yBQbxMz2yix1wHcAqrdU2wbksO9sW1JpDDqYqaWVpyu/bY2WVt5rLCntv0kx5+YdtiprNcxN+8MxT2S81snT4x7kvKjjNVlvVyZ/K62fbiwLqj2bDxLQd2DWJw7YHob+rcZ3AvqLTjFE8xRmSdWaIZHo3mvbT9sq4aqo4Wwk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785755352; c=relaxed/simple;
-	bh=OJcsICDRY+CinBo36U4IsQPkASDJjVzzFRHNfsgflHE=;
+	s=arc-20240116; t=1785756460; c=relaxed/simple;
+	bh=Lef4IQuLjnebR5p/FsvALUdCAtneo6dIdEQCYmWVXZU=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VVBsYy1agasxgL82Q4tcl+MKtuH9XFNRTMarFzegbZ2pFXAgoWrehrJOmxJTGiZtzwKwESB44SwxUkRDobTbITOE5YnoP284X9m82cC/T/OLWmMaNMcnGOAOVHvWPfYTkjomY12eTy+CGnshOQNnj9QfIdCRgv5dahdcSFI1LPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o1mbL4ei; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=VEu/mQYxjPstCMnBOpJfgeswrQ2+GuYSGtAJmLhJcSsBdOqqXd4/OP2HYo9ohwEyvHjHfeshqUVnc0f7r8B3qWjJWyFECqAgfG4JBrbHfV1LQZLQ2e+Kbd4aWEc7YYgpGipvv/3iiJdrN0e5I7nTtXUIWx4SsYn0Y/zTkgYvPJQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LD+9R/xv; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o1mbL4ei"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDC241F000E9;
-	Mon,  3 Aug 2026 11:09:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LD+9R/xv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AD5C1F00A3A;
+	Mon,  3 Aug 2026 11:27:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785755350;
-	bh=mMVTN/10T8H4LBQ9FAgnWWBLcKEifKWIV8qlFsXTsEQ=;
+	s=k20260515; t=1785756458;
+	bh=/i3CPF5W25MD9Vez/azH6CCKyA9iHKYO0QYhYx2P/Sk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=o1mbL4eideF0EuPtv8xjBjmNnnNf6QudqwYH+T+Oc7TrLiZytw4FyrSayHSYBt/Pc
-	 F6OfVaiHEvf29w1U4+NLfxQnXfSbooCXYU6IAz+qfDrPxE3GaH/YaSPzzC5jU1Jp22
-	 oeW/l4LQdfnXF/LE/qHJcrKm9pJEjQovjNpflv6YkrtCqurA3fX7j2A7zoLturznk/
-	 rgHc33JX3PlsXsvrPWB5IdOzcIUD06YB0HBf/phur4AOwLCwQ4khoiPyo+17lYHjRQ
-	 9RrDWSVIMvXx1KjymdLVpzbtMj8EXwISoNzsuLbmIeMfhZQP4VKn2+q1NSiJBzjH9a
-	 hsOdAup7l+R6w==
+	b=LD+9R/xv3NSQsat4RjeNlGLbJ1uKDtgjUp+Y/VOu4UnzZ2ojY1qwtPJGndSzD7x8K
+	 lJO2raJWfeqkFwlIIirZsXoc4yVV8HGN3aru11ybyaQETHdaNFkrpzObjJ8hpleKRR
+	 sLqkS/prEff9LFafonsANPFwmLCSyBgOUxrwJbNlQGXGBn51zNPsMJQTinGYEwGW3w
+	 /M93kGzHttMFUxc6+H1QENcytzFLQ+5Mo4ZVzD4rS/i2/X5Zh/0utKRzqfD602lPD9
+	 IYpaPZ3j+Fkp6szxuj6hRSuUaYcWkZH7oLVnzA28McYZZ9gcJeyKVPafXl23m/pmIx
+	 fL6aooRlu+2Eg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wqqXc-0000000Bj1I-0wpa;
-	Mon, 03 Aug 2026 11:09:08 +0000
-Date: Mon, 03 Aug 2026 12:09:07 +0100
-Message-ID: <865x1rcvfw.wl-maz@kernel.org>
+	id 1wqqpU-0000000BjIT-1j2Y;
+	Mon, 03 Aug 2026 11:27:36 +0000
+Date: Mon, 03 Aug 2026 12:27:35 +0100
+Message-ID: <864ihbcul4.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Steven Price <steven.price@arm.com>
 Cc: kvm@vger.kernel.org,
@@ -60,10 +60,10 @@ Cc: kvm@vger.kernel.org,
 	Vishal Annapurve <vannapurve@google.com>,
 	WeiLin.Chang@arm.com,
 	Lorenzo Pieralisi <lpieralisi@kernel.org>
-Subject: Re: [PATCH v15 15/37] KVM: arm64: CCA: Handle RMI_EXIT_RIPAS_CHANGE
-In-Reply-To: <20260715142841.80544-16-steven.price@arm.com>
+Subject: Re: [PATCH v15 16/37] KVM: arm64: CCA: Handle realm MMIO emulation
+In-Reply-To: <20260715142841.80544-17-steven.price@arm.com>
 References: <20260715142841.80544-1-steven.price@arm.com>
-	<20260715142841.80544-16-steven.price@arm.com>
+	<20260715142841.80544-17-steven.price@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -79,112 +79,104 @@ X-SA-Exim-Rcpt-To: steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 15 Jul 2026 15:28:17 +0100,
+On Wed, 15 Jul 2026 15:28:18 +0100,
 Steven Price <steven.price@arm.com> wrote:
 > 
-> The guest can request that a region of its protected address space is
-> switched between RIPAS_RAM and RIPAS_EMPTY (and back) using
-> RSI_IPA_STATE_SET. This causes a guest exit with the
-> RMI_EXIT_RIPAS_CHANGE code. We treat this as a request to convert a
-> protected region to unprotected (or back), exiting to the VMM to make
-> the necessary changes to the guest_memfd and memslot mappings. On the
-> next entry the RIPAS changes are committed by making RMI_RTT_SET_RIPAS
-> calls.
+> MMIO emulation for a realm cannot be done directly with the VM's
+> registers as they are protected from the host. However, for emulatable
+> data aborts, the RMM uses GPRS[0] to provide the read/written value.
+> We can transfer this from/to the equivalent VCPU's register entry and
+> then depend on the generic MMIO handling code in KVM.
 > 
-> The VMM may wish to reject the RIPAS change requested by the guest. For
-> now it can only do this by no longer scheduling the VCPU as we don't
-> currently have a usecase for returning that rejection to the guest, but
-> by postponing the RMI_RTT_SET_RIPAS changes to entry we leave the door
-> open for adding a new ioctl in the future for this purpose.
+> For a MMIO read, the value is placed in the shared RecExit structure
+> during kvm_handle_mmio_return() rather than in the VCPU's register
+> entry.
 > 
 > Signed-off-by: Steven Price <steven.price@arm.com>
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 > ---
-> Changes since v14:
->  * Use addition rather than bitwise OR for adding the shared_bit in
->    realm_unmap_shared_range(), this handles the case where the region
->    includes the last address (which means 'end' already has the bit
->    set).
-> Changes since v13:
->  * Switch to the new RMI_RTT_UNPROT_UNMAP range-based API.
->  * Drop ugly hack for RMM bug which errored when the RIPAS was already
->    set to the desired value.
-> Changes since v12:
->  * Switch to the new RMM v2.0 RMI_RTT_DATA_UNMAP which can unmap an
->    address range.
-> Changes since v11:
->  * Combine the "Allow VMM to set RIPAS" patch into this one to avoid
->    adding functions before they are used.
->  * Drop the CAP for setting RIPAS and adapt to changes from previous
->    patches.
-> Changes since v10:
->  * Add comment explaining the assignment of rec->run->exit.ripas_base in
->    kvm_complete_ripas_change().
-> Changes since v8:
->  * Make use of ripas_change() from a previous patch to implement
->    realm_set_ipa_state().
->  * Update exit.ripas_base after a RIPAS change so that, if instead of
->    entering the guest we exit to user space, we don't attempt to repeat
->    the RIPAS change (triggering an error from the RMM).
 > Changes since v7:
->  * Rework the loop in realm_set_ipa_state() to make it clear when the
->    'next' output value of rmi_rtt_set_ripas() is used.
-> New patch for v7: The code was previously split awkwardly between two
-> other patches.
+>  * New comment for rec_exit_sync_dabt() explaining the call to
+>    vcpu_set_reg().
+> Changes since v5:
+>  * Inject SEA to the guest is an emulatable MMIO access triggers a data
+>    abort.
+>  * kvm_handle_mmio_return() - disable kvm_incr_pc() for a REC (as the PC
+>    isn't under the host's control) and move the REC_ENTER_EMULATED_MMIO
+>    flag setting to this location (as that tells the RMM to skip the
+>    instruction).
 > ---
->  arch/arm64/include/asm/kvm_rmi.h |   6 +
->  arch/arm64/kvm/mmu.c             |   8 +-
->  arch/arm64/kvm/rmi.c             | 457 +++++++++++++++++++++++++++++++
->  3 files changed, 468 insertions(+), 3 deletions(-)
+>  arch/arm64/kvm/inject_fault.c |  4 +++-
+>  arch/arm64/kvm/mmio.c         | 16 ++++++++++++----
+>  arch/arm64/kvm/rmi-exit.c     | 15 +++++++++++++++
+>  3 files changed, 30 insertions(+), 5 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
-> index b1e4cf0f6803..5461c49bea4d 100644
-> --- a/arch/arm64/include/asm/kvm_rmi.h
-> +++ b/arch/arm64/include/asm/kvm_rmi.h
-> @@ -104,6 +104,12 @@ int kvm_rec_enter(struct kvm_vcpu *vcpu);
->  int kvm_rec_pre_enter(struct kvm_vcpu *vcpu);
->  int handle_rec_exit(struct kvm_vcpu *vcpu, int rec_run_status);
+> diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+> index 89982bd3345f..6492397b73d7 100644
+> --- a/arch/arm64/kvm/inject_fault.c
+> +++ b/arch/arm64/kvm/inject_fault.c
+> @@ -228,7 +228,9 @@ static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt, u32 addr)
 >  
-> +void kvm_realm_unmap_range(struct kvm *kvm,
-> +			   unsigned long ipa,
-> +			   unsigned long size,
-> +			   bool unmap_private,
-> +			   bool may_block);
+>  static void __kvm_inject_sea(struct kvm_vcpu *vcpu, bool iabt, u64 addr)
+>  {
+> -	if (vcpu_el1_is_32bit(vcpu))
+> +	if (unlikely(vcpu_is_rec(vcpu)))
+> +		vcpu->arch.rec.run->enter.flags |= REC_ENTER_FLAG_INJECT_SEA;
+> +	else if (vcpu_el1_is_32bit(vcpu))
+>  		inject_abt32(vcpu, iabt, addr);
+>  	else
+>  		inject_abt64(vcpu, iabt, addr);
+
+Why don't you let inject_dabt64() do its job and reconcile the REC
+stuff at run time?
+
+> diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
+> index e2285ed8c91d..a8c125205695 100644
+> --- a/arch/arm64/kvm/mmio.c
+> +++ b/arch/arm64/kvm/mmio.c
+> @@ -6,6 +6,7 @@
+>  
+>  #include <linux/kvm_host.h>
+>  #include <asm/kvm_emulate.h>
+> +#include <linux/arm-smccc-rmi.h>
+>  #include <trace/events/kvm.h>
+>  
+>  #include "trace.h"
+> @@ -138,14 +139,21 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu)
+>  		trace_kvm_mmio(KVM_TRACE_MMIO_READ, len, run->mmio.phys_addr,
+>  			       &data);
+>  		data = vcpu_data_host_to_guest(vcpu, data, len);
+> -		vcpu_set_reg(vcpu, kvm_vcpu_dabt_get_rd(vcpu), data);
 > +
->  static inline bool kvm_realm_is_private_address(struct realm *realm,
->  						unsigned long addr)
->  {
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index cd06881c1497..dcc2ab08d0e4 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -319,6 +319,7 @@ static void invalidate_icache_guest_page(void *va, size_t size)
->   * @start: The intermediate physical base address of the range to unmap
->   * @size:  The size of the area to unmap
->   * @may_block: Whether or not we are permitted to block
-> + * @only_shared: If true then protected mappings should not be unmapped
->   *
+> +		if (vcpu_is_rec(vcpu))
+> +			vcpu->arch.rec.run->enter.gprs[0] = data;
+> +		else
+> +			vcpu_set_reg(vcpu, kvm_vcpu_dabt_get_rd(vcpu), data);
 
-I don't understand the need for this additional argument. Given that
-CCA imposes that shared and private are in non-overlapping ranges, why
-is it necessary to introduce this at the core of the S2 management
-code?
+This is yet another example of things I do not want to see. KVM works
+on the GPRs described in the vcpu structure. And that's it.
 
-I'd expect that the CCA code could simply work out what range it needs
-to run on and keep the API intact.
+So let the ESR information be correct for CCA, the data being written
+back to x0, and once you're ready to enter the guest again, copy
+whatever you need into the CCA data structure.
 
->   * Clear a range of stage-2 mappings, lowering the various ref-counts.  Must
->   * be called while holding mmu_lock (unless for freeing the stage2 pgd before
-> @@ -326,7 +327,7 @@ static void invalidate_icache_guest_page(void *va, size_t size)
->   * with things behind our backs.
->   */
->  static void __unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64 size,
-> -				 bool may_block)
-> +				 bool may_block, bool only_shared)
->  {
->  	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
->  	phys_addr_t end = start + size;
+But not any of this stuff.
 
-So what is the *actual* change?
+>  	}
+>  
+>  	/*
+>  	 * The MMIO instruction is emulated and should not be re-executed
+>  	 * in the guest.
+>  	 */
+> -	kvm_incr_pc(vcpu);
+> +	if (vcpu_is_rec(vcpu))
+> +		vcpu->arch.rec.run->enter.flags |= REC_ENTER_FLAG_EMULATED_MMIO;
+> +	else
+> +		kvm_incr_pc(vcpu);
+
+Same thing. kvm_incr_pc() sets a flag. Use that to reconcile the state
+with CCA.
 
 	M.
 
