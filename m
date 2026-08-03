@@ -1,479 +1,200 @@
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2246640B0FC
-	for <kvmarm@lists.linux.dev>; Mon,  3 Aug 2026 12:43:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 252E340DB37;
+	Mon,  3 Aug 2026 13:14:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785761021; cv=none; b=oiRz91gDL+ucyckvTnk16px0O2BwDZ6kxNaK1TunZX0hY1FEOoGKpJxBXNOA7c0j7bc24CO4ASqoaQ3ua5VyhquXqKSOtI7XzXmqgrF01fSyAbK5gX3YCR8nIxNXfYMk37VZHo+uNn4+2HGFBUDGDB6FitEi6xoih00A1h7Xo7k=
+	t=1785762853; cv=none; b=DVT3grr5iwmgx56ijMYN2DZT1D2YyQ5NUjAPIHi7QGIs5wl8Mn49rHMmXCkkpzWDMxf56LeOQBJN8RtVocW8MtyMRYPMw/AQg2qNeHzSyz82PnwxhT9gVIj6hPdu4rQt7cdFmrCzry8inEeKSrhEjNzkJkhbsrsI57KrfXp6fLQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785761021; c=relaxed/simple;
-	bh=7ILijJdXtqQa2Kbu9QgR1NHjUSeKgId76bWfAeZB5R8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=th3RZIv2ftYIn4DoccA1aQvuZ63hZo6JqnU5pTnxbT9jSr5ACLm7r2F30+Qqfq+f1LQKNHt1Pghww0K6eVHVjLGgFa1JFiF1AI2pHxel+N86eA2JjLlVy9cQSDgU0SrhMG1wE0FrJspe3BZu0I2IiPc0zvs7fJw48h3WKJX/RMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IM2bJR3K; arc=none smtp.client-ip=91.218.175.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1785762853; c=relaxed/simple;
+	bh=wbJugdrkkqPiqfydhiI0PX1m4h32ed2mGP/FAOZPy+E=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=tvdCFPjVPxEm3q7JTDtCpYJl8hBxlnIh0UXBf8hT+Qm3YRtSJlRNCLG5l9t1Tjv82oh2W0dMNiIj+wdzY5/6NjA9qFR/5S8xGjIYvxWxkFzFljI3RQboGDMRSB/G46j2I3BBMQb1bVhqDRmNt1AGxILwYO93N/YK9teih3UoQFs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=SACgf6wL; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IM2bJR3K"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1785761016;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Q0rqVXntntPGNtRhW7boCS4de5223r2PVD+Op+TiuUo=;
-	b=IM2bJR3K2lCEgntYhrvI/GFbu+ZxQcmX8fQUb5XVT2+OfYOPwLzvaCtmnvyLCA+aPIekpy
-	m5w0llo4isyLaffnxmvFVhoIF+C+ydsEG8X/BnK59E9Y1oE9ssoT0qaZQDtGonQm8jNIHQ
-	X4ZvozcfaRmjHdA1CBUPj7+RrX/icH0=
-From: Fuad Tabba <fuad.tabba@linux.dev>
-To: maz@kernel.org,
-	oupton@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Cc: catalin.marinas@arm.com,
-	will@kernel.org,
-	rostedt@goodmis.org,
-	mhiramat@kernel.org,
-	alexandru.elisei@arm.com,
-	vdonnefort@google.com,
-	joey.gouly@arm.com,
-	seiden@linux.ibm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	qperret@google.com,
-	ardb@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	tabba@google.com,
-	fuad.tabba@linux.dev
-Subject: [PATCH v2 11/11] KVM: arm64: Tag host-VA hypercall parameters __kern
-Date: Mon,  3 Aug 2026 13:42:20 +0100
-Message-Id: <20260803124220.332248-12-fuad.tabba@linux.dev>
-In-Reply-To: <20260803124220.332248-1-fuad.tabba@linux.dev>
-References: <20260803124220.332248-1-fuad.tabba@linux.dev>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="SACgf6wL"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 57D8A143D;
+	Mon,  3 Aug 2026 06:13:57 -0700 (PDT)
+Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 67C0A3F66F;
+	Mon,  3 Aug 2026 06:14:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1785762841; bh=wbJugdrkkqPiqfydhiI0PX1m4h32ed2mGP/FAOZPy+E=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=SACgf6wLE/+pYkMxKbE3zND4EXSOGuvgw7/dAyYc0CcfUYKrHhVEc2b/KYWrx5Q4P
+	 IhaRWhyRXtxn5Ryt6Vr35r78WXzqUSsu/Alc+b35jb7V6rvc2jm1oFU1p1WyjGrTZq
+	 CU0ZKjC1KsEyoFy/S1keGyCoPIXj9YaMW8KtU7ak=
+From: Leonardo Bras <leo.bras@arm.com>
+To: sashiko-reviews@lists.linux.dev
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	Oliver Upton <oupton@kernel.org>,
+	Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v3 01/11] KVM: arm64: HDBSS bits
+Date: Mon,  3 Aug 2026 14:13:52 +0100
+Message-ID: <anCUEAKj-AUHWoo3@LeoBrasDK>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260729105541.3FECC1F00A3A@smtp.kernel.org>
+References: <20260729104548.3439958-1-leo.bras@arm.com> <20260729104548.3439958-2-leo.bras@arm.com> <20260729105541.3FECC1F00A3A@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-The nVHE hypervisor takes host virtual addresses as hypercall arguments
-and translates each with kern_hyp_va() before use. Nothing marks them as
-host-owned, so dereferencing one untranslated at EL2 - a recurring bug
-class - is invisible to the compiler.
+On Wed, Jul 29, 2026 at 10:55:40AM +0000, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 6 potential issue(s) to consider:
+> - [High] The patch is explicitly marked by the author as a test hack that should not be merged upstream.
+> - [High] Hardware Dirty Bit Management (DBM) is not cleared when write-protecting pages, allowing guests to bypass software write-protection (such as userfaultfd-wp or software dirty logging).
+> - [Medium] Left shifting a negative signed integer is undefined behavior in C.
+> - [Medium] The hardcoded split_page_chunk_size is excessively large, causing massive memory allocations under the mmu_lock.
+> - [Low] HDBSS entry macros are defined in a `.c` file instead of a header file, making them inaccessible to other subsystems.
+> - [Low] Typo in the parameter name of `has_vhe_hdbss`.
+> --
+> 
+> --- Patch [1]: [PATCH v3 01/11] KVM: arm64: HDBSS bits ---
+> commit 125f04d66539bf05e0255567036409a407e48004
+> Author: Leonardo Bras <leo.bras@arm.com>
+> Subject: KVM: arm64: HDBSS bits
+> 
+> A brief summary:
+> This commit introduces preliminary support for the Hardware Dirty state
+> tracking structure (HDBSS) feature on ARM64. It adds CPU feature detection,
+> sets the DBM stage-2 page table flag when write protection is relaxed, and
+> configures eager page splitting chunk sizes for testing purposes.
+> 
+> > I added them here in order to fulfill the dependencies and be able to
+> > easily build and test this patchset, but this particular patch should *not*
+> > be merged upstream.
+> 
+> [Severity: High]
+> Since this is explicitly marked as a test hack meant only for local building
+> and testing, should this patch be dropped from the series before it gets
+> merged upstream?
+> 
+> [ ... ]
+> 
+> > diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> > --- a/arch/arm64/kernel/cpufeature.c
+> > +++ b/arch/arm64/kernel/cpufeature.c
+> > @@ -2131,6 +2131,11 @@ static bool hvhe_possible(const struct arm64_cpu_capabilities *entry,
+> >  	return arm64_test_sw_feature_override(ARM64_SW_FEATURE_OVERRIDE_HVHE);
+> >  }
+> >  
+> > +static bool has_vhe_hdbss(const struct arm64_cpu_capabilities *entry, int cope)
+>                                                                              ^^^^
+> [Severity: Low]
+> Is this intended to be named scope? The standard convention for capability
+> matching functions in cpufeature.c uses scope for this parameter.
+> 
+> [ ... ]
+> 
+> > diff --git a/arch/arm64/kvm/dirty_bit.c b/arch/arm64/kvm/dirty_bit.c
+> > new file mode 100644
+> > --- /dev/null
+> > +++ b/arch/arm64/kvm/dirty_bit.c
+> > @@ -0,0 +1,16 @@
+> [ ... ]
+> > +#include <asm/kvm_dirty_bit.h>
+> > +
+> > +/* HDBSS entry field definitions */
+> > +#define HDBSS_ENTRY_VALID BIT(0)
+> > +#define HDBSS_ENTRY_TTWL_SHIFT (1)
+> > +#define HDBSS_ENTRY_TTWL_MASK (GENMASK(3, 1))
+> > +#define HDBSS_ENTRY_TTWL(x) \
+> > +	(((x) << HDBSS_ENTRY_TTWL_SHIFT) & HDBSS_ENTRY_TTWL_MASK)
+> > +#define HDBSS_ENTRY_TTWL_RESV HDBSS_ENTRY_TTWL(-4)
+> 
+> [Severity: Low]
+> Because these HDBSS entry macros are defined directly in the .c file rather
+> than in the newly created header arch/arm64/include/asm/kvm_dirty_bit.h, they
+> are inaccessible to other subsystems. Should they be moved to the header file
+> so dependent patches can use them?
+> 
+> [Severity: Medium]
+> Will HDBSS_ENTRY_TTWL_RESV trigger undefined behavior here? The macro expands
+> to ((-4) << 1), and left shifting a negative signed integer is undefined
+> behavior in C (prior to C23), which can lead to shift-out-of-bounds splats
+> at runtime.
+> 
+> > +#define HDBSS_ENTRY_IPA GENMASK_ULL(55, 12)
+> 
+> [ ... ]
+> 
+> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> > --- a/arch/arm64/kvm/hyp/pgtable.c
+> > +++ b/arch/arm64/kvm/hyp/pgtable.c
+> > @@ -1367,9 +1371,13 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
+> >  	if (prot & KVM_PGTABLE_PROT_R)
+> >  		set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R;
+> >  
+> > -	if (prot & KVM_PGTABLE_PROT_W)
+> > +	if (prot & KVM_PGTABLE_PROT_W) {
+> >  		set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
+> >  
+> > +		if (pgt->flags & KVM_PGTABLE_S2_DBM)
+> > +			set |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
+> > +	}
+> > +
+> 
+> [Severity: High]
+> Does kvm_pgtable_stage2_wrprotect() also need to be updated to clear the DBM
+> bit? 
+> 
+> Currently, kvm_pgtable_stage2_wrprotect() clears the 
+> KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W bit to trap writes, but if 
+> KVM_PTE_LEAF_ATTR_HI_S2_DBM is left set, the hardware will autonomously update 
+> the PTE to allow writes without generating a permission fault. Could this 
+> allow guests to bypass software write-protection mechanisms like 
+> userfaultfd-wp or KVM software dirty page logging?
+> 
+> >  	if (prot & KVM_PGTABLE_PROT_X) {
+> >  		ret = stage2_set_xn_attr(prot, &xn);
+> >  		if (ret)
+> 
+> [ ... ]
+> 
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -1027,8 +1027,12 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
+> >  	for_each_possible_cpu(cpu)
+> >  		*per_cpu_ptr(mmu->last_vcpu_ran, cpu) = -1;
+> >  
+> > -	 /* The eager page splitting is disabled by default */
+> > -	mmu->split_page_chunk_size = KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
+> > +	 /* The eager page splitting is disabled by default if system has no HDBSS */
+> > +	if (system_supports_hdbss())
+> > +		mmu->split_page_chunk_size = 256 * 1024 * PAGE_SIZE;
+> 
+> [Severity: Medium]
+> Is this hardcoded split_page_chunk_size excessively large? This evaluates to
+> 1GB on 4KB page systems and 16GB on 64KB page systems. When splitting this
+> chunk, kvm_mmu_topup_memory_cache might attempt to allocate a massive amount
+> of page tables under the mmu_lock. Could this cause severe latency spikes or
+> allocation failures under memory pressure?
+> 
+> > +	else
+> > +		mmu->split_page_chunk_size = KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
+> > +
+> >  	mmu->split_page_cache.gfp_zero = __GFP_ZERO;
+> >  
+> >  	mmu->pgd_phys = __pa(pgt->pgd);
+> 
+> -- 
+> Sashiko AI review · https://sashiko.dev/#/patchset/20260729104548.3439958-1-leo.bras@arm.com?part=1
 
-Add a __kern sparse address space, active only for EL2 code, and tag the
-host-VA parameters in the hypercall declarations. kern_hyp_va_host() is
-the only sanctioned unwrap: it translates the address, preserves the
-pointee type (stripped of qualifiers, as with the percpu accessors) and
-drops the tag with a __force cast, so an untranslated host VA fails
-sparse. The tag flows from the shared declaration into the generated
-handler and on into the donated-memory and tracing-descriptor helpers,
-so a handler cannot extract a host VA without it. Host code sees plain
-pointers, and the tag is checker-only: no code is generated.
+As previously mentioned, this first patch is just for placing basic 
+infrastructure for testing the speedup caused by HACDBS. Of course there 
+are a lot of incomplete stuff around, because this does not replace the 
+actual patchset.
 
-Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
----
- arch/arm64/include/asm/kvm_hcall.h      | 43 ++++++++++++-------
- arch/arm64/include/asm/kvm_mmu.h        | 10 +++++
- arch/arm64/kvm/hyp/include/nvhe/pkvm.h  |  6 ++-
- arch/arm64/kvm/hyp/include/nvhe/trace.h |  5 ++-
- arch/arm64/kvm/hyp/nvhe/hyp-main.c      | 57 +++++++++++++------------
- arch/arm64/kvm/hyp/nvhe/pkvm.c          | 11 ++---
- arch/arm64/kvm/hyp/nvhe/trace.c         |  4 +-
- 7 files changed, 82 insertions(+), 54 deletions(-)
-
-diff --git a/arch/arm64/include/asm/kvm_hcall.h b/arch/arm64/include/asm/kvm_hcall.h
-index 39374bae4bea4..3958396a83345 100644
---- a/arch/arm64/include/asm/kvm_hcall.h
-+++ b/arch/arm64/include/asm/kvm_hcall.h
-@@ -28,6 +28,18 @@ struct kvm_vcpu;
- struct vgic_v3_cpu_if;
- struct vgic_v5_cpu_if;
- 
-+/*
-+ * A host VA carried by a hypercall argument. At EL2 such a pointer must not
-+ * be dereferenced until it is translated with kern_hyp_va_host(); sparse
-+ * flags any use that skips the translation. The tag describes the EL2 view
-+ * only: the host dereferences its own VAs freely.
-+ */
-+#if defined(__KVM_NVHE_HYPERVISOR__) && defined(__CHECKER__)
-+#define __kern	__attribute__((noderef, address_space(__kern)))
-+#else
-+#define __kern
-+#endif
-+
- /*
-  * Hypercall signatures are declared as (type, name) argument pairs.
-  * __KVM_HCALL_MAP() applies a macro to each pair, in the mold of __MAP()
-@@ -160,24 +172,24 @@ DECLARE_KVM_HOST_HCALL0(int, __pkvm_prot_finalize)
- 
- /* Hypercalls that are always available and common to [nh]VHE/pKVM. */
- DECLARE_KVM_HOST_HCALL_VOID(__kvm_adjust_pc,
--	struct kvm_vcpu *, vcpu)
-+	struct kvm_vcpu __kern *, vcpu)
- DECLARE_KVM_HOST_HCALL(int, __kvm_vcpu_run,
--	struct kvm_vcpu *, vcpu)
-+	struct kvm_vcpu __kern *, vcpu)
- DECLARE_KVM_HOST_HCALL0_VOID(__kvm_flush_vm_context)
- DECLARE_KVM_HOST_HCALL_VOID(__kvm_tlb_flush_vmid_ipa,
--	struct kvm_s2_mmu *, mmu, phys_addr_t, ipa, int, level)
-+	struct kvm_s2_mmu __kern *, mmu, phys_addr_t, ipa, int, level)
- DECLARE_KVM_HOST_HCALL_VOID(__kvm_tlb_flush_vmid_ipa_nsh,
--	struct kvm_s2_mmu *, mmu, phys_addr_t, ipa, int, level)
-+	struct kvm_s2_mmu __kern *, mmu, phys_addr_t, ipa, int, level)
- DECLARE_KVM_HOST_HCALL_VOID(__kvm_tlb_flush_vmid,
--	struct kvm_s2_mmu *, mmu)
-+	struct kvm_s2_mmu __kern *, mmu)
- DECLARE_KVM_HOST_HCALL_VOID(__kvm_tlb_flush_vmid_range,
--	struct kvm_s2_mmu *, mmu, phys_addr_t, start, unsigned long, pages)
-+	struct kvm_s2_mmu __kern *, mmu, phys_addr_t, start, unsigned long, pages)
- DECLARE_KVM_HOST_HCALL_VOID(__kvm_flush_cpu_context,
--	struct kvm_s2_mmu *, mmu)
-+	struct kvm_s2_mmu __kern *, mmu)
- DECLARE_KVM_HOST_HCALL_VOID(__kvm_timer_set_cntvoff,
- 	u64, cntvoff)
- DECLARE_KVM_HOST_HCALL(int, __tracing_load,
--	void *, desc_hva, size_t, desc_size)
-+	void __kern *, desc_hva, size_t, desc_size)
- DECLARE_KVM_HOST_HCALL0_VOID(__tracing_unload)
- DECLARE_KVM_HOST_HCALL(int, __tracing_enable,
- 	bool, enable)
-@@ -192,13 +204,13 @@ DECLARE_KVM_HOST_HCALL(int, __tracing_enable_event,
- DECLARE_KVM_HOST_HCALL_VOID(__tracing_write_event,
- 	u64, id)
- DECLARE_KVM_HOST_HCALL_VOID(__vgic_v3_save_aprs,
--	struct vgic_v3_cpu_if *, cpu_if)
-+	struct vgic_v3_cpu_if __kern *, cpu_if)
- DECLARE_KVM_HOST_HCALL_VOID(__vgic_v3_restore_vmcr_aprs,
--	struct vgic_v3_cpu_if *, cpu_if)
-+	struct vgic_v3_cpu_if __kern *, cpu_if)
- DECLARE_KVM_HOST_HCALL_VOID(__vgic_v5_save_apr,
--	struct vgic_v5_cpu_if *, cpu_if)
-+	struct vgic_v5_cpu_if __kern *, cpu_if)
- DECLARE_KVM_HOST_HCALL_VOID(__vgic_v5_restore_vmcr_apr,
--	struct vgic_v5_cpu_if *, cpu_if)
-+	struct vgic_v5_cpu_if __kern *, cpu_if)
- 
- /* Hypercalls that are available only when pKVM has finalised. */
- DECLARE_KVM_HOST_HCALL(int, __pkvm_host_share_hyp,
-@@ -223,10 +235,11 @@ DECLARE_KVM_HOST_HCALL0(int, __pkvm_reserve_vm)
- DECLARE_KVM_HOST_HCALL_VOID(__pkvm_unreserve_vm,
- 	pkvm_handle_t, handle)
- DECLARE_KVM_HOST_HCALL(int, __pkvm_init_vm,
--	struct kvm *, host_kvm, void *, vm_hva, void *, pgd_hva)
-+	struct kvm __kern *, host_kvm, void __kern *, vm_hva,
-+	void __kern *, pgd_hva)
- DECLARE_KVM_HOST_HCALL(int, __pkvm_init_vcpu,
--	pkvm_handle_t, handle, struct kvm_vcpu *, host_vcpu,
--	void *, vcpu_hva)
-+	pkvm_handle_t, handle, struct kvm_vcpu __kern *, host_vcpu,
-+	void __kern *, vcpu_hva)
- DECLARE_KVM_HOST_HCALL0(int, __pkvm_vcpu_in_poison_fault)
- DECLARE_KVM_HOST_HCALL(int, __pkvm_force_reclaim_guest_page,
- 	phys_addr_t, phys)
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 6eae7e7e2a684..57f65257bb56d 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -7,6 +7,8 @@
- #ifndef __ARM64_KVM_MMU_H__
- #define __ARM64_KVM_MMU_H__
- 
-+#include <linux/compiler.h>
-+
- #include <asm/page.h>
- #include <asm/memory.h>
- #include <asm/mmu.h>
-@@ -140,6 +142,14 @@ static __always_inline unsigned long __kern_hyp_va(unsigned long v)
- 
- #define kern_hyp_va(v) 	((typeof(v))(__kern_hyp_va((unsigned long)(v))))
- 
-+/*
-+ * Translate a __kern-tagged host VA, dropping the tag: the only sanctioned
-+ * unwrap. Translation only, no ownership or bounds validation; the result
-+ * carries the pointee type stripped of the tag and of any cv-qualifiers.
-+ */
-+#define kern_hyp_va_host(v)						\
-+	((TYPEOF_UNQUAL(*(v)) *)__kern_hyp_va((unsigned long)(__force void *)(v)))
-+
- extern u32 __hyp_va_bits;
- 
- /*
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-index 2643a1a819668..c1171451e1be7 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-@@ -7,6 +7,7 @@
- #ifndef __ARM64_KVM_NVHE_PKVM_H__
- #define __ARM64_KVM_NVHE_PKVM_H__
- 
-+#include <asm/kvm_hcall.h>
- #include <asm/kvm_pkvm.h>
- 
- #include <nvhe/gfp.h>
-@@ -69,9 +70,10 @@ void pkvm_hyp_vm_table_init(void *tbl);
- 
- int __pkvm_reserve_vm(void);
- void __pkvm_unreserve_vm(pkvm_handle_t handle);
--int __pkvm_init_vm(struct kvm *host_kvm, void *vm_hva, void *pgd_hva);
-+int __pkvm_init_vm(struct kvm *host_kvm, void __kern *vm_hva,
-+		   void __kern *pgd_hva);
- int __pkvm_init_vcpu(pkvm_handle_t handle, struct kvm_vcpu *host_vcpu,
--		     void *vcpu_hva);
-+		     void __kern *vcpu_hva);
- 
- int __pkvm_reclaim_dying_guest_page(pkvm_handle_t handle, u64 gfn);
- int __pkvm_start_teardown_vm(pkvm_handle_t handle);
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/trace.h b/arch/arm64/kvm/hyp/include/nvhe/trace.h
-index 4aa36fd76b9e2..c2db9f70ea265 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/trace.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/trace.h
-@@ -4,6 +4,7 @@
- 
- #include <linux/trace_remote_event.h>
- 
-+#include <asm/kvm_hcall.h>
- #include <asm/kvm_hyptrace.h>
- 
- static inline pid_t __tracing_get_vcpu_pid(struct kvm_cpu_context *host_ctxt)
-@@ -46,7 +47,7 @@ static inline pid_t __tracing_get_vcpu_pid(struct kvm_cpu_context *host_ctxt)
- void *tracing_reserve_entry(unsigned long length);
- void tracing_commit_entry(void);
- 
--int __tracing_load(void *desc_va, size_t desc_size);
-+int __tracing_load(void __kern *desc_va, size_t desc_size);
- void __tracing_unload(void);
- int __tracing_enable(bool enable);
- int __tracing_swap_reader(unsigned int cpu);
-@@ -59,7 +60,7 @@ static inline void tracing_commit_entry(void) { }
- #define HYP_EVENT(__name, __proto, __struct, __assign, __printk)      \
- 	static inline void trace_##__name(__proto) {}
- 
--static inline int __tracing_load(void *desc_va, size_t desc_size) { return -ENODEV; }
-+static inline int __tracing_load(void __kern *desc_va, size_t desc_size) { return -ENODEV; }
- static inline void __tracing_unload(void) { }
- static inline int __tracing_enable(bool enable) { return -ENODEV; }
- static inline int __tracing_swap_reader(unsigned int cpu) { return -ENODEV; }
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 6986ce55fd9ef..f8ea1661b3166 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -270,7 +270,7 @@ DEFINE_KVM_HOST_HCALL0_VOID(__pkvm_vcpu_put)
- }
- 
- DEFINE_KVM_HOST_HCALL(int, __kvm_vcpu_run,
--	struct kvm_vcpu *, host_vcpu)
-+	struct kvm_vcpu __kern *, host_vcpu)
- {
- 	int ret;
- 
-@@ -295,7 +295,7 @@ DEFINE_KVM_HOST_HCALL(int, __kvm_vcpu_run,
- 
- 		sync_hyp_vcpu(hyp_vcpu);
- 	} else {
--		struct kvm_vcpu *vcpu = kern_hyp_va(host_vcpu);
-+		struct kvm_vcpu *vcpu = kern_hyp_va_host(host_vcpu);
- 
- 		/* The host is fully trusted, run its vCPU directly. */
- 		fpsimd_lazy_switch_to_guest(vcpu);
-@@ -422,9 +422,9 @@ DEFINE_KVM_HOST_HCALL(int, __pkvm_host_mkyoung_guest,
- }
- 
- DEFINE_KVM_HOST_HCALL_VOID(__kvm_adjust_pc,
--	struct kvm_vcpu *, vcpu)
-+	struct kvm_vcpu __kern *, vcpu)
- {
--	__kvm_adjust_pc(kern_hyp_va(vcpu));
-+	__kvm_adjust_pc(kern_hyp_va_host(vcpu));
- }
- 
- DEFINE_KVM_HOST_HCALL0_VOID(__kvm_flush_vm_context)
-@@ -433,27 +433,27 @@ DEFINE_KVM_HOST_HCALL0_VOID(__kvm_flush_vm_context)
- }
- 
- DEFINE_KVM_HOST_HCALL_VOID(__kvm_tlb_flush_vmid_ipa,
--	struct kvm_s2_mmu *, mmu, phys_addr_t, ipa, int, level)
-+	struct kvm_s2_mmu __kern *, mmu, phys_addr_t, ipa, int, level)
- {
--	__kvm_tlb_flush_vmid_ipa(kern_hyp_va(mmu), ipa, level);
-+	__kvm_tlb_flush_vmid_ipa(kern_hyp_va_host(mmu), ipa, level);
- }
- 
- DEFINE_KVM_HOST_HCALL_VOID(__kvm_tlb_flush_vmid_ipa_nsh,
--	struct kvm_s2_mmu *, mmu, phys_addr_t, ipa, int, level)
-+	struct kvm_s2_mmu __kern *, mmu, phys_addr_t, ipa, int, level)
- {
--	__kvm_tlb_flush_vmid_ipa_nsh(kern_hyp_va(mmu), ipa, level);
-+	__kvm_tlb_flush_vmid_ipa_nsh(kern_hyp_va_host(mmu), ipa, level);
- }
- 
- DEFINE_KVM_HOST_HCALL_VOID(__kvm_tlb_flush_vmid_range,
--	struct kvm_s2_mmu *, mmu, phys_addr_t, start, unsigned long, pages)
-+	struct kvm_s2_mmu __kern *, mmu, phys_addr_t, start, unsigned long, pages)
- {
--	__kvm_tlb_flush_vmid_range(kern_hyp_va(mmu), start, pages);
-+	__kvm_tlb_flush_vmid_range(kern_hyp_va_host(mmu), start, pages);
- }
- 
- DEFINE_KVM_HOST_HCALL_VOID(__kvm_tlb_flush_vmid,
--	struct kvm_s2_mmu *, mmu)
-+	struct kvm_s2_mmu __kern *, mmu)
- {
--	__kvm_tlb_flush_vmid(kern_hyp_va(mmu));
-+	__kvm_tlb_flush_vmid(kern_hyp_va_host(mmu));
- }
- 
- DEFINE_KVM_HOST_HCALL_VOID(__pkvm_tlb_flush_vmid,
-@@ -469,9 +469,9 @@ DEFINE_KVM_HOST_HCALL_VOID(__pkvm_tlb_flush_vmid,
- }
- 
- DEFINE_KVM_HOST_HCALL_VOID(__kvm_flush_cpu_context,
--	struct kvm_s2_mmu *, mmu)
-+	struct kvm_s2_mmu __kern *, mmu)
- {
--	__kvm_flush_cpu_context(kern_hyp_va(mmu));
-+	__kvm_flush_cpu_context(kern_hyp_va_host(mmu));
- }
- 
- DEFINE_KVM_HOST_HCALL_VOID(__kvm_timer_set_cntvoff,
-@@ -500,15 +500,15 @@ DEFINE_KVM_HOST_HCALL0_VOID(__vgic_v3_init_lrs)
- }
- 
- DEFINE_KVM_HOST_HCALL_VOID(__vgic_v3_save_aprs,
--	struct vgic_v3_cpu_if *, cpu_if)
-+	struct vgic_v3_cpu_if __kern *, cpu_if)
- {
--	__vgic_v3_save_aprs(kern_hyp_va(cpu_if));
-+	__vgic_v3_save_aprs(kern_hyp_va_host(cpu_if));
- }
- 
- DEFINE_KVM_HOST_HCALL_VOID(__vgic_v3_restore_vmcr_aprs,
--	struct vgic_v3_cpu_if *, cpu_if)
-+	struct vgic_v3_cpu_if __kern *, cpu_if)
- {
--	__vgic_v3_restore_vmcr_aprs(kern_hyp_va(cpu_if));
-+	__vgic_v3_restore_vmcr_aprs(kern_hyp_va_host(cpu_if));
- }
- 
- DEFINE_KVM_HOST_HCALL(int, __pkvm_init,
-@@ -580,16 +580,17 @@ DEFINE_KVM_HOST_HCALL_VOID(__pkvm_unreserve_vm,
- }
- 
- DEFINE_KVM_HOST_HCALL(int, __pkvm_init_vm,
--	struct kvm *, host_kvm, void *, vm_hva, void *, pgd_hva)
-+	struct kvm __kern *, host_kvm, void __kern *, vm_hva,
-+	void __kern *, pgd_hva)
- {
--	return __pkvm_init_vm(kern_hyp_va(host_kvm), vm_hva, pgd_hva);
-+	return __pkvm_init_vm(kern_hyp_va_host(host_kvm), vm_hva, pgd_hva);
- }
- 
- DEFINE_KVM_HOST_HCALL(int, __pkvm_init_vcpu,
--	pkvm_handle_t, handle, struct kvm_vcpu *, host_vcpu,
--	void *, vcpu_hva)
-+	pkvm_handle_t, handle, struct kvm_vcpu __kern *, host_vcpu,
-+	void __kern *, vcpu_hva)
- {
--	return __pkvm_init_vcpu(handle, kern_hyp_va(host_vcpu), vcpu_hva);
-+	return __pkvm_init_vcpu(handle, kern_hyp_va_host(host_vcpu), vcpu_hva);
- }
- 
- DEFINE_KVM_HOST_HCALL0(int, __pkvm_vcpu_in_poison_fault)
-@@ -624,7 +625,7 @@ DEFINE_KVM_HOST_HCALL(int, __pkvm_finalize_teardown_vm,
- }
- 
- DEFINE_KVM_HOST_HCALL(int, __tracing_load,
--	void *, desc_hva, size_t, desc_size)
-+	void __kern *, desc_hva, size_t, desc_size)
- {
- 	return __tracing_load(desc_hva, desc_size);
- }
-@@ -671,15 +672,15 @@ DEFINE_KVM_HOST_HCALL_VOID(__tracing_write_event,
- }
- 
- DEFINE_KVM_HOST_HCALL_VOID(__vgic_v5_save_apr,
--	struct vgic_v5_cpu_if *, cpu_if)
-+	struct vgic_v5_cpu_if __kern *, cpu_if)
- {
--	__vgic_v5_save_apr(kern_hyp_va(cpu_if));
-+	__vgic_v5_save_apr(kern_hyp_va_host(cpu_if));
- }
- 
- DEFINE_KVM_HOST_HCALL_VOID(__vgic_v5_restore_vmcr_apr,
--	struct vgic_v5_cpu_if *, cpu_if)
-+	struct vgic_v5_cpu_if __kern *, cpu_if)
- {
--	__vgic_v5_restore_vmcr_apr(kern_hyp_va(cpu_if));
-+	__vgic_v5_restore_vmcr_apr(kern_hyp_va_host(cpu_if));
- }
- 
- typedef void (*hcall_t)(struct kvm_cpu_context *);
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index 205c52535c887..9c33d983058a3 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -644,9 +644,9 @@ static size_t pkvm_get_hyp_vm_size(unsigned int nr_vcpus)
- 		size_mul(sizeof(struct pkvm_hyp_vcpu *), nr_vcpus));
- }
- 
--static void *map_donated_memory_noclear(void *host_va, size_t size)
-+static void *map_donated_memory_noclear(void __kern *host_va, size_t size)
- {
--	void *va = kern_hyp_va(host_va);
-+	void *va = kern_hyp_va_host(host_va);
- 
- 	if (!PAGE_ALIGNED(va))
- 		return NULL;
-@@ -658,7 +658,7 @@ static void *map_donated_memory_noclear(void *host_va, size_t size)
- 	return va;
- }
- 
--static void *map_donated_memory(void *host_va, size_t size)
-+static void *map_donated_memory(void __kern *host_va, size_t size)
- {
- 	void *va = map_donated_memory_noclear(host_va, size);
- 
-@@ -805,7 +805,8 @@ void teardown_selftest_vm(void)
-  *
-  * Return 0 success, negative error code on failure.
-  */
--int __pkvm_init_vm(struct kvm *host_kvm, void *vm_hva, void *pgd_hva)
-+int __pkvm_init_vm(struct kvm *host_kvm, void __kern *vm_hva,
-+		   void __kern *pgd_hva)
- {
- 	struct pkvm_hyp_vm *hyp_vm = NULL;
- 	size_t vm_size, pgd_size;
-@@ -896,7 +897,7 @@ static int register_hyp_vcpu(struct pkvm_hyp_vm *hyp_vm,
- }
- 
- int __pkvm_init_vcpu(pkvm_handle_t handle, struct kvm_vcpu *host_vcpu,
--		     void *vcpu_hva)
-+		     void __kern *vcpu_hva)
- {
- 	struct pkvm_hyp_vcpu *hyp_vcpu;
- 	struct pkvm_hyp_vm *hyp_vm;
-diff --git a/arch/arm64/kvm/hyp/nvhe/trace.c b/arch/arm64/kvm/hyp/nvhe/trace.c
-index 97203ddd3cf45..4410006321a99 100644
---- a/arch/arm64/kvm/hyp/nvhe/trace.c
-+++ b/arch/arm64/kvm/hyp/nvhe/trace.c
-@@ -206,9 +206,9 @@ static bool hyp_trace_desc_is_valid(struct hyp_trace_desc *desc, size_t desc_siz
- 	return true;
- }
- 
--int __tracing_load(void *desc_hva, size_t desc_size)
-+int __tracing_load(void __kern *desc_hva, size_t desc_size)
- {
--	struct hyp_trace_desc *desc = kern_hyp_va(desc_hva);
-+	struct hyp_trace_desc *desc = kern_hyp_va_host(desc_hva);
- 	int ret;
- 
- 	ret = __admit_host_mem(desc, desc_size);
--- 
-2.39.5
-
+Thanks
+Leo
