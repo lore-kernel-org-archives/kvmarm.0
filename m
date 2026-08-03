@@ -1,92 +1,149 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA5FD399358;
-	Mon,  3 Aug 2026 06:32:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1D703859CE
+	for <kvmarm@lists.linux.dev>; Mon,  3 Aug 2026 08:14:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785738753; cv=none; b=qV7YF4xC5aVAeGVzPPEUfue7QBJhsCkMrJOalTpgfqxxrp3RbAD7i9G/RnGfLHsJwQWDhfKIT2DQCqqb26Gt6u02bdffPRNHW39FZDur1/XQokm0jFRvd+BKDamhhj6xc5UMKQ32i6EGyXuHOrPz6i6wWbX5vuhhj8BN+M4lbFM=
+	t=1785744869; cv=none; b=sG0/D7wm51vP0wNRyYUMqphqO6QTBo6Gip51iOvitVEwAUlpjNseNFSpSX8cEgweJod1GJl2L+SxdQbZ0mBivbl3FHKIBsgnNHgB8zoHe0LhGh8GlaYB4NOp9ux6DyN/97ZqFXn2BDhjXQAnO2Ldr+B+xYZQeqnM0Q1kyKMrqqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785738753; c=relaxed/simple;
-	bh=AivFDgsImnQT2d9ji2onUVZdA4gMm4SR03L87lUtdtc=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ozxpUP213BU8wusZ3IGBrTjFxsLGR3pdDxlUrpQq/K+yRjwI2Ol8OzHgmY80VT6iokgSlMi2JPMS7UaG6YD/O5Hd3IHgcFro/Iula+QKaRB6mu66eZi6FxhcRXs2MqaPZF36i5OL0GoJuk+MISoFRvSguLFQmFY0T2kJDSU503E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GecmZTou; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1785744869; c=relaxed/simple;
+	bh=6qc+33s9f83CSEwVmaONo+G8XS+KA2zRe0t9i1NJPwA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SJa8nzhTaQQM7t03j4Q36Tjuf4kT/o0CcxIB2yhasZ+hMYBXbnFJ9djtNlc7s1bKiQn0qhMty0ZL8Qp5cxjKpZIhsdjozl/YvhGd66DzWJ/6rXd1iYfNGfFYuOFuuQdBHmrND6sHSNsK6EjEvlTtjMYOlJluuQE4y28fWsf8BPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=lQpdWURw; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GecmZTou"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C7331F000E9;
-	Mon,  3 Aug 2026 06:32:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785738752;
-	bh=Q003pFrnrktZyIZY/xviIClVkpqPmqmMLUU3EH/6sTA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=GecmZTouXbNJeH6at4INrHU73sASbBN9fUZHY5eGaKOpuhu9O6CXMrSiDQOpLIKYq
-	 G3zJ1ZMkspyesaGvCcz/VAwPqFGbgYivQ9Ci56a3yF6pAwUw8G5GIePLtNY2TiXruQ
-	 PCy+PW1m50jIFhTYMCTEPs+hEng/9iBt6/8VWdHq7rb0VRQ025f513OVbpa8NFnm2E
-	 fvKgs7YiCqD37X/FIb/6JixPr193kZIoZ065Jmiv2Dn7MAqtTzt7g3MMdiPSiR7XAO
-	 SSBmd+EeWXC+mWy3RBUu04dM5vjPWCVCB30xcgtsoAfhMgRf0acKC6UnU9NJDkiu3u
-	 sUwctTt1mmwIA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wqmDu-0000000BdF4-0PwR;
-	Mon, 03 Aug 2026 06:32:30 +0000
-Date: Mon, 03 Aug 2026 07:32:29 +0100
-Message-ID: <868q6nd88y.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Karl Mehltretter <kmehltretter@gmail.com>
-Cc: Oliver Upton <oupton@kernel.org>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Andre Przywara <andre.przywara@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] KVM: arm64: Preserve GPRs for AArch32 CP64 reads generating an UNDEF
-In-Reply-To: <20260802182222.2239-1-kmehltretter@gmail.com>
-References: <20260802182222.2239-1-kmehltretter@gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="lQpdWURw"
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 672Mpp8I281400;
+	Mon, 3 Aug 2026 08:14:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=10XOIX
+	OWNp9y4DxsjXyZqT4Kv+AKJ+NZ2FXRcTGwml0=; b=lQpdWURwyc0brA61CmD1FD
+	LvZnLOmHPmjN3k6IKI8uQEQIXdn+ZvoQAiWfvtzqM6anDxn0QRYe2cDZKq/igqKm
+	KMFryQ1H0GSrQAWq++wLRWdCsbwrojPAYlzHYB4WoR8P8hBpzOQc2cBgDsOSJatI
+	F3s77Cj1B8qJ6LfBUA5PPxWPn3xkO5UbP+NN0VsZ3uftyatIiobFWBxrhg2xTrkC
+	HV+rQjl43FzYatTK95qqbmu1oE50JxvXTRVCXaxcM0vv9Lsa48yWNqw8F8rKOLu0
+	6GnBO6SRTkHpad1QpogVg/847n7sYHGpBNOBQQn/vwcCQYqV9K4aWsdLa+aFoS4A
+	==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fs67hfmk8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 03 Aug 2026 08:14:10 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 6738BOAd013898;
+	Mon, 3 Aug 2026 08:14:09 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4fsu4qck0g-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 03 Aug 2026 08:14:09 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6738E5bb27591148
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 3 Aug 2026 08:14:05 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8757120040;
+	Mon,  3 Aug 2026 08:14:05 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1DE6F20043;
+	Mon,  3 Aug 2026 08:14:05 +0000 (GMT)
+Received: from [9.224.77.173] (unknown [9.224.77.173])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  3 Aug 2026 08:14:04 +0000 (GMT)
+Message-ID: <143e8639-9936-4925-ad23-4e9a0aac9629@linux.ibm.com>
+Date: Mon, 3 Aug 2026 10:14:04 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kmehltretter@gmail.com, oupton@kernel.org, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, andre.przywara@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 13/31] KVM: s390: Prepare moving KVM/s390 to
+ arch/s390/kvm/s390
+To: Steffen Eiden <seiden@linux.ibm.com>, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org
+Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
+        Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@kernel.org>,
+        Friedrich Welter
+ <fritz@linux.ibm.com>, Fuad Tabba <tabba@google.com>,
+        Gautam Gala <ggala@linux.ibm.com>,
+        Hariharan Mari <hari55@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Hendrik Brueckner <brueckner@linux.ibm.com>,
+        Ilya Leoshkevich <iii@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
+        Marc Zyngier <maz@kernel.org>, Nico Boehr <nrb@linux.ibm.com>,
+        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
+        Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Vasily Gorbik
+ <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>
+References: <20260731130902.654679-1-seiden@linux.ibm.com>
+ <20260731130902.654679-14-seiden@linux.ibm.com>
+Content-Language: en-US
+From: Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <20260731130902.654679-14-seiden@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-Spam-Info: AW1haW4tMjYwODAzMDA2OCBTYWx0ZWRfX30hDQTpH8BzN
+ Mz7ZiHbo5J6caYaBQ4SFjdDXZ4T1C6Tylc8FsYeJvSYQF7AIrV0N8QGjVPy/ggzyqQA2uZ9QNgB
+ WQBXGqIIE0CYJUVQnWqFvdy05z3A+Ec=
+X-Authority-Analysis: v=2.4 cv=I7VVgtgg c=1 sm=1 tr=0 ts=6a704dd2 cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+ a=IkcTkHD0fZMA:10 a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=Y2IxJ9c9Rs8Kov3niI8_:22 a=DErWZNkAGuNjIuNGA6IA:9
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODAzMDA2OCBTYWx0ZWRfXzdAhX5kEZcaZ
+ O5+yZV3p8eVBFZ58IKEGh8MaO1J9apG1jTFEQbMJHeq40RfacAwGTqRteUJWP9224HxJrGAdNt6
+ SCy3tCWqN2kisaSIwKJd3MVLLx90YJHqww6TuT+5DV0S6GFMsNm5gWmR6kI5hs3625LaQI7ujfO
+ VAVXrPg9Fr6pH8VgjadrwWOtVVTmGvOcXPu9d9e1IHt++kfBpRUtplLmcV4uyZ4fgGsk18meTvM
+ FbLM0KmyiKOmomJDNRkvUggKD9JPoCHPVz/7rGHpe/r9CxrcGNWN1MIDL0aEBsKe0Dmo/NEM22A
+ Ja/g9VkZbxW9r6s+eAoM5Em3XsMW90IpNE0on3eQaTF7WyO5n5RzzYNAjZWcIeKBVMRI62LEsEr
+ vGu+BgUGr9xnoHSd3OUQLf3ONWu3+Eut2udo4npnSG58bXhgVN1E8D7mTadcp1ZGmO70taFV92R
+ CnXZMA1kcUlbTl6eSJQ==
+X-Proofpoint-ORIG-GUID: QMk5RO98HClPNqqpLrqibkj0W0rVBisV
+X-Proofpoint-GUID: Y1q7vD3lGqq1y6v7WS7yp9zeGfAx617K
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-08-02_06,2026-07-30_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 impostorscore=0 clxscore=1015 priorityscore=1501 suspectscore=0
+ malwarescore=0 adultscore=0 lowpriorityscore=0 phishscore=0 spamscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2608030068
 
-On Sun, 02 Aug 2026 19:22:22 +0100,
-Karl Mehltretter <kmehltretter@gmail.com> wrote:
+Am 31.07.26 um 15:08 schrieb Steffen Eiden:
+> Lay the groundwork for moving the native KVM/s390 to s390/kvm/s390 to
+> allow for a second KVM module. Move all the kvm_host definitions to
+> _s390 postfixed headers. Prepare local header include guards for a new
+> location. Move gamp related tracing into a separate file. While at it,
+> rename the main KVM/s390 files from s390-kvm.{c,h} to just s390.{c,h} to
+> match the naming scheme of other architectures. Cleanup the KVM/s390
+> makefile.
 > 
-> kvm_handle_cp_64() only seeds params.regval for writes. If a CP64 read is
-> decoded but UNDEFs, emulate_cp() still returns handled and the caller
-> writes params.regval back to Rt/Rt2.
-> 
-> This can happen for PMU counter read accesses generating an UNDEF. KVM
-> injects the exception into the guest, so the MRRC GPRs must remain
-> unchanged.
-> 
-> Instead, the uninitialised regval is copied into the guest GPRs. With stack
-> auto-initialisation this is a deterministic zero or pattern value. With
-> CONFIG_INIT_STACK_NONE it may be stale host stack data.
-> 
-> Match kvm_handle_cp_32() and kvm_handle_sys_reg() by seeding regval from
-> the GPRs before emulation.
-> 
-> Fixes: 62a89c44954f0 ("arm64: KVM: 32bit handling of coprocessor traps")
-> Assisted-by: Claude:claude-opus-5
-> Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
+> No functional change.
 
-Reviewed-by: Marc Zyngier <maz@kernel.org>
+Would it be possible to split every single semantic change into one a separate patch?
 
-	M.
+1. kvm-s390.[ch] -> s390.[ch]
+2. kvm_host definitions
 
--- 
-Without deviation from the norm, progress is not possible.
+maybe also
+3. gmap-trace change
+
+That would make the patch easier to consume.
+We can also handle that in a separate patch series (with the other s390only changes).
+
