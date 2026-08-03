@@ -1,206 +1,125 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA87C415F1F;
-	Mon,  3 Aug 2026 15:18:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B353F411FAD;
+	Mon,  3 Aug 2026 15:20:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785770306; cv=none; b=QelX2Jrj68tQ4c7hEhIjxRDuUF6kVhQj1z3by1nv/S6uA1PyXj3R+orERlA3Q3IwbajuwS4sFhgs/H4GEje36XK22nKexOTbFr1ToiycJKcDSUAYN/giFnhVfHIxgp9KvX5iyB12hhwcmS60WJcI8Pn4ESN74cuVNE2yY5xmsmo=
+	t=1785770416; cv=none; b=A9NF3H2X+1HWSo5v8Cd1dVHqu4hmryJrB+jU1Z1if0tDNqwfH1Rg2qNuJMpcbYwssrGGNlt42AbQ8YzxyXYKDrpgvW8rnbp3e7r+F32LYr8VnL8rFlMRfk+HU5xG502GiZiZ9Ju8gmtBOvyfEsR/laWzHQTDYAT/UmISKncMUec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785770306; c=relaxed/simple;
-	bh=a5G5LMPPyNBg/dAf4FAYnm9izzvFgYrpS6qSIas4tHA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hSzZA/CjFZr5PV93lavOQZbfrJi21CNEaH7AMftfEy8aR59llgOWt32t424fiB3SmU9aCFw1RmlxGi/1bF067K6G+XEYKwydSuJT4XtG9dp30CJyP4IRLhaCrB01FFbx9iC7djjtiSRiTpsu4Vpt1eiwaZChh4wGqfzrdjUwxZs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=P/EjJyab; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1785770416; c=relaxed/simple;
+	bh=3IWeXMwyS4HtvaY/KGH1OweS4Kq47UTC9wCGR2EfgsA=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gwcbJgu+3294qFRyVgJ7GHv3eiuAUbd0T+OHw8T8vted9xEl2NROTRpQP/Uxa7UsvmkTAN8WrrunMqNcQCg84vOWtlcs/S/T8i3j1stslgC8GOaenEBroAbxgMY5XJlXiigBYZMbJomPRoRyDrLiMXhN3ryptvpm+9byEcLilww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WmQLveCm; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="P/EjJyab"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 42554143D;
-	Mon,  3 Aug 2026 08:18:19 -0700 (PDT)
-Received: from [10.1.25.28] (e122027.cambridge.arm.com [10.1.25.28])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8F7343F66F;
-	Mon,  3 Aug 2026 08:18:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1785770303; bh=a5G5LMPPyNBg/dAf4FAYnm9izzvFgYrpS6qSIas4tHA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=P/EjJyabE9lK32euTx1Wi9058FfNuSTH0MKFDFNkN+UG8A8xu4flKej/XWEImcgKK
-	 gUmWZDMAAlZyiQqrXlUaBmnNnsFkclTihe0Qx9fOzWmpPYsPFeOYYcsmMBJPuq5Q3E
-	 YxIzxM++5YQhYrS+i1gT99OSEKDffNCIVgT7C+dk=
-Message-ID: <bb5ed17a-532f-4b05-8e8c-cbda3cb0433f@arm.com>
-Date: Mon, 3 Aug 2026 16:18:14 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WmQLveCm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3AB511F000E9;
+	Mon,  3 Aug 2026 15:20:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785770415;
+	bh=fwfYVcIPxmzhgd0/KBM26G5bKxixOKmeRXSWWaWtDFM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=WmQLveCm5dfZ/zJ44l+0lGdVy2U4xZlccyuCkMC6imFtJ2N+N3uSRdq5byTF/PsCy
+	 um0f5CrMXpGXyC+A4j1ekce9dtCgVs+jqwZksIcZoAdZIT5aL0MWyY1vHqaOnKLt9Z
+	 hD7fxNY0VJ/9cbCZEQK2NL8wgIYX3Vnd/PLfwqH+GN0OymI8U5qmDNHqPPy6VApAjd
+	 jFqxknqV19kQtr1wkjZLz4/sXwAlZvzURzf5yNobfca2lrgwPFtuuXapy20Gn7noJr
+	 OyPseKQjoyivyio4M8SpFYamj1LoQT6uaWDVYR18fKMB4mA8fDP+yUe6YmdQMy42MI
+	 hBdrF7vyLIwjQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wquSb-0000000BpPL-01n2;
+	Mon, 03 Aug 2026 15:20:13 +0000
+Date: Mon, 03 Aug 2026 16:20:12 +0100
+Message-ID: <86wlu7b58z.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu
+ <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>,
+	"Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>,
+	Emi Kisanuki <fj0570is@fujitsu.com>,
+	Vishal Annapurve <vannapurve@google.com>,
+	WeiLin.Chang@arm.com,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>
+Subject: Re: [PATCH v16 00/45] arm64: Support for Arm CCA in KVM
+In-Reply-To: <57225daf-4319-406a-8328-e32835e8a980@arm.com>
+References: <20260803134403.80630-1-steven.price@arm.com>
+	<86y0enb64s.wl-maz@kernel.org>
+	<57225daf-4319-406a-8328-e32835e8a980@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v15 19/37] KVM: arm64: CCA: Activate realms on first vCPU
- run
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
- Lorenzo Pieralisi <lpieralisi@kernel.org>
-References: <20260715142841.80544-1-steven.price@arm.com>
- <20260715142841.80544-20-steven.price@arm.com> <8633wvcrqr.wl-maz@kernel.org>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <8633wvcrqr.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com, aneesh.kumar@kernel.org, fj0570is@fujitsu.com, vannapurve@google.com, WeiLin.Chang@arm.com, lpieralisi@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 03/08/2026 13:29, Marc Zyngier wrote:
-> On Wed, 15 Jul 2026 15:28:21 +0100,
-> Steven Price <steven.price@arm.com> wrote:
->>
->> Use kvm_arch_vcpu_run_pid_change() to check if this is the first time
->> the realm guest has run. If this is the first run then activate the
->> realm.
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->>
->> ---
->> Changes since v12:
->>  * Fix commit message
->>  * Change realm_state checks to be >= REALM_STATE_ACTIVE to avoid a dead
->>    guest being revived by kvm_activate_realm().
->> ---
->>  arch/arm64/include/asm/kvm_rmi.h |  1 +
->>  arch/arm64/kvm/arm.c             |  6 +++++
->>  arch/arm64/kvm/rmi.c             | 45 ++++++++++++++++++++++++++++++--
->>  3 files changed, 50 insertions(+), 2 deletions(-)
->>
->> diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
->> index 5461c49bea4d..5cb99c187202 100644
->> --- a/arch/arm64/include/asm/kvm_rmi.h
->> +++ b/arch/arm64/include/asm/kvm_rmi.h
->> @@ -96,6 +96,7 @@ void kvm_init_rmi(void);
->>  u32 kvm_rmm_ipa_limit(void);
->>  
->>  int kvm_init_realm(struct kvm *kvm);
->> +int kvm_activate_realm(struct kvm *kvm);
->>  void kvm_destroy_realm(struct kvm *kvm);
->>  int kvm_realm_teardown_stage2(struct kvm *kvm);
->>  void kvm_destroy_rec(struct kvm_vcpu *vcpu);
->> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> index 534d33b7c67a..df33322b8fea 100644
->> --- a/arch/arm64/kvm/arm.c
->> +++ b/arch/arm64/kvm/arm.c
->> @@ -1034,6 +1034,12 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
->>  			return ret;
->>  	}
->>  
->> +	if (kvm_is_realm(vcpu->kvm)) {
->> +		ret = kvm_activate_realm(kvm);
->> +		if (ret)
->> +			return ret;
->> +	}
->> +
->>  	mutex_lock(&kvm->arch.config_lock);
->>  	set_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &kvm->arch.flags);
->>  	mutex_unlock(&kvm->arch.config_lock);
->> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
->> index 94776a9262c9..53b5b18f2275 100644
->> --- a/arch/arm64/kvm/rmi.c
->> +++ b/arch/arm64/kvm/rmi.c
->> @@ -687,7 +687,7 @@ static int realm_set_ipa_state(struct kvm_vcpu *vcpu,
->>  	return ret;
->>  }
->>  
->> -static int __maybe_unused realm_ensure_created(struct kvm *kvm)
->> +static int realm_ensure_created(struct kvm *kvm)
->>  {
->>  	lockdep_assert_held(&kvm->arch.config_lock);
->>  
->> @@ -793,7 +793,7 @@ int noinstr kvm_rec_enter(struct kvm_vcpu *vcpu)
->>  	return ret;
->>  }
->>  
->> -static int __maybe_unused kvm_create_rec(struct kvm_vcpu *vcpu)
->> +static int kvm_create_rec(struct kvm_vcpu *vcpu)
->>  {
->>  	struct user_pt_regs *vcpu_regs = vcpu_gp_regs(vcpu);
->>  	unsigned long mpidr = kvm_vcpu_get_mpidr_aff(vcpu);
->> @@ -893,6 +893,47 @@ void kvm_destroy_rec(struct kvm_vcpu *vcpu)
->>  	rec->rec_page = NULL;
->>  }
->>  
->> +int kvm_activate_realm(struct kvm *kvm)
->> +{
->> +	struct realm *realm = &kvm->arch.realm;
->> +	struct kvm_vcpu *vcpu;
->> +	unsigned long i;
->> +	int ret;
->> +
->> +	if (kvm_realm_state(kvm) >= REALM_STATE_ACTIVE)
->> +		return 0;
->> +
->> +	if (!irqchip_in_kernel(kvm)) {
->> +		/* Userspace irqchip not yet supported with realms */
->> +		return -EOPNOTSUPP;
->> +	}
+On Mon, 03 Aug 2026 16:06:24 +0100,
+Steven Price <steven.price@arm.com> wrote:
 > 
-> This could race with the irqchip being created on another CPU. Also,
-> an irqchip being in kernel doesn't mean it is ready, and I suspect
-> you also need to check that it has been initialised.
-
-Good point - moving the config_lock up and checking vgic_initialized()
-makes sense.
-
->> +
->> +	guard(mutex)(&kvm->arch.config_lock);
->> +	/* Check again with the lock held */
->> +	if (kvm_realm_state(kvm) >= REALM_STATE_ACTIVE)
->> +		return 0;
->> +
->> +	ret = realm_ensure_created(kvm);
->> +	if (ret)
->> +		return ret;
->> +
->> +	/* Mark state as dead in case we fail */
->> +	kvm_set_realm_state(kvm, REALM_STATE_DEAD);
->> +
->> +	kvm_for_each_vcpu(i, vcpu, kvm) {
->> +		ret = kvm_create_rec(vcpu);
->> +		if (ret)
->> +			return ret;
->> +	}
+> On 03/08/2026 16:01, Marc Zyngier wrote:
+> > On Mon, 03 Aug 2026 14:43:16 +0100,
+> > Steven Price <steven.price@arm.com> wrote:
+> >>
+> >> This series is based on the guest_memfd in-place conversion v9 tree[1],
+> >> which is itself based on kvm-x86/next. It is also available as a git
+> >> repository:
+> > 
+> > Well done. Series on top of another random series, based on a random
+> > tree. Unusable. Have you realised there are reasons why we (KVM/arm64)
+> > ask people to base their series on a *released* tag from Linus' tree?
+> > This means that Sashiko cannot, once again, provide any feedback on
+> > this series, as it fails to apply.
+> > 
+> > Just to avoid any ambiguity: Sashiko reviews, as annoying as they are,
+> > are not optional. They are very much mandatory, and I wish I could
+> > turn back the clocks to run it on my own code...
+> > 
+> > Running it on your own is not enough, because *I* want to see what the
+> > tool finds. Not to mention that non-Gemini runs of sashiko are much
+> > less interesting (unsurprisingly).
 > 
-> If the realm is dead, shouldn't the KVM view of death apply as well?
+> Sorry, but I'm not sure what you expect me to do - clearly I want to
+> base my changes on top of the guest_memfd series which is being worked
+> on and not just ignore that work. So I've based my changes on top of the
+> tree that Ackerley published.
 
-Indeed that would be a good improvement. I'll change these error paths
-to include a kvm_vm_dead() call.
+But that completely ignores the way the KVM/arm64 tree is managed. If
+you base a series on a bunch of unmerged patches, how do you expect
+people to do a sensible job at reviewing it? Now I need to ingest
+another pile of random patches just to review this set?
 
-Thanks,
-Steve
+Not happening, sorry.
 
->> +
->> +	ret = rmi_realm_activate(virt_to_phys(realm->rd));
->> +	if (ret)
->> +		return -ENXIO;
->> +
->> +	kvm_set_realm_state(kvm, REALM_STATE_ACTIVE);
->> +	return 0;
->> +}
->> +
->>  void kvm_destroy_realm(struct kvm *kvm)
->>  {
->>  	struct realm *realm = &kvm->arch.realm;
-> 
-> Thanks,
-> 
-> 	M.
-> 
+	M.
 
+-- 
+Without deviation from the norm, progress is not possible.
