@@ -1,225 +1,206 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 345DB3E5A20;
-	Mon,  3 Aug 2026 15:16:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA87C415F1F;
+	Mon,  3 Aug 2026 15:18:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785770184; cv=none; b=korWvWwEa3q4zhcVpkh6dX2OaQPMkQn8W08r/H0PudGHt65U7SMl+ZUxZuxuh6Akmgu87CaxbQgD6iz0hlcIqb3USjNu+1fMTwlni8HIgN7ZZnKNWDzz6Hdcpc2Xqpj+rDE+b7YIo0+K9usjBFgVlD8fF+rVwP4cxGZE7qlO0Pg=
+	t=1785770306; cv=none; b=QelX2Jrj68tQ4c7hEhIjxRDuUF6kVhQj1z3by1nv/S6uA1PyXj3R+orERlA3Q3IwbajuwS4sFhgs/H4GEje36XK22nKexOTbFr1ToiycJKcDSUAYN/giFnhVfHIxgp9KvX5iyB12hhwcmS60WJcI8Pn4ESN74cuVNE2yY5xmsmo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785770184; c=relaxed/simple;
-	bh=QPzeVFZmTcpN5j8r7Op2BujUO3JAuEXqZv9yIZcf7x8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=KhhdeC2r5jnfGDzy1CGJAsNyDWQhYzbg5KFpgJWycbJRDEE4CDOHkSIM2oDj8jQvpqh4UceAGFqHOcB/VMveShCQHs30c1NA1QUlhLFTGQix9BSY8ytXfuMa0pJxLYxuxFtNsdzu9IzLRt/jrSRZhzSx/R29vkxAyOanrKug6U0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=gSnhFMU2; arc=none smtp.client-ip=217.140.110.172
+	s=arc-20240116; t=1785770306; c=relaxed/simple;
+	bh=a5G5LMPPyNBg/dAf4FAYnm9izzvFgYrpS6qSIas4tHA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hSzZA/CjFZr5PV93lavOQZbfrJi21CNEaH7AMftfEy8aR59llgOWt32t424fiB3SmU9aCFw1RmlxGi/1bF067K6G+XEYKwydSuJT4XtG9dp30CJyP4IRLhaCrB01FFbx9iC7djjtiSRiTpsu4Vpt1eiwaZChh4wGqfzrdjUwxZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=P/EjJyab; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="gSnhFMU2"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="P/EjJyab"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 92FFE143D;
-	Mon,  3 Aug 2026 08:16:17 -0700 (PDT)
-Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A1B7C3F66F;
-	Mon,  3 Aug 2026 08:16:20 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 42554143D;
+	Mon,  3 Aug 2026 08:18:19 -0700 (PDT)
+Received: from [10.1.25.28] (e122027.cambridge.arm.com [10.1.25.28])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8F7343F66F;
+	Mon,  3 Aug 2026 08:18:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1785770181; bh=QPzeVFZmTcpN5j8r7Op2BujUO3JAuEXqZv9yIZcf7x8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=gSnhFMU2bW9E/8YC5JxHcRwwTKvqrwkP4+wt0wXgEwpY/gcOSSYjXRMRjdwcU+Qaa
-	 Xx8LGK89Rf1aD/jUzFYrqziDv575PrwvBcvUsehXWJrtDWLLGO8PPZWAKsYrGuUK0W
-	 nSJNhPJQ9JaFb58kGFG8+C/Yn2fH5BHNHquwyPcQ=
-From: Leonardo Bras <leo.bras@arm.com>
-To: sashiko-reviews@lists.linux.dev
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	kvmarm@lists.linux.dev,
-	Oliver Upton <oupton@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH v3 05/11] kvm: Add arch-generic interface for hw-accelerated dirty-bitmap cleaning
-Date: Mon,  3 Aug 2026 16:16:18 +0100
-Message-ID: <anCwwnBpnetj53Dt@LeoBrasDK>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260729110015.372101F00A3A@smtp.kernel.org>
-References: <20260729104548.3439958-1-leo.bras@arm.com> <20260729104548.3439958-6-leo.bras@arm.com> <20260729110015.372101F00A3A@smtp.kernel.org>
+	t=1785770303; bh=a5G5LMPPyNBg/dAf4FAYnm9izzvFgYrpS6qSIas4tHA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=P/EjJyabE9lK32euTx1Wi9058FfNuSTH0MKFDFNkN+UG8A8xu4flKej/XWEImcgKK
+	 gUmWZDMAAlZyiQqrXlUaBmnNnsFkclTihe0Qx9fOzWmpPYsPFeOYYcsmMBJPuq5Q3E
+	 YxIzxM++5YQhYrS+i1gT99OSEKDffNCIVgT7C+dk=
+Message-ID: <bb5ed17a-532f-4b05-8e8c-cbda3cb0433f@arm.com>
+Date: Mon, 3 Aug 2026 16:18:14 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v15 19/37] KVM: arm64: CCA: Activate realms on first vCPU
+ run
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
+ Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
+ Lorenzo Pieralisi <lpieralisi@kernel.org>
+References: <20260715142841.80544-1-steven.price@arm.com>
+ <20260715142841.80544-20-steven.price@arm.com> <8633wvcrqr.wl-maz@kernel.org>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <8633wvcrqr.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jul 29, 2026 at 11:00:14AM +0000, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 4 potential issue(s) to consider:
-> - [Critical] Successful hardware dirty log extraction completely bypasses the generic software dirty bitmap, dropping internally-dirtied pages.
-> - [Critical] Hardware dirty bits are completely ignored when `KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2` is enabled.
-> - [High] Fallback software loop clobbers partial hardware dirty log output and leaks garbage data if `kvm_arch_dirty_log_clear()` fails.
-> - [Medium] The `kvm_arch_dirty_log_clear` API overloads two distinct behaviors based on an undocumented `NULL` parameter, risking a NULL pointer dereference in arch implementations.
-> --
+On 03/08/2026 13:29, Marc Zyngier wrote:
+> On Wed, 15 Jul 2026 15:28:21 +0100,
+> Steven Price <steven.price@arm.com> wrote:
+>>
+>> Use kvm_arch_vcpu_run_pid_change() to check if this is the first time
+>> the realm guest has run. If this is the first run then activate the
+>> realm.
+>>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>>
+>> ---
+>> Changes since v12:
+>>  * Fix commit message
+>>  * Change realm_state checks to be >= REALM_STATE_ACTIVE to avoid a dead
+>>    guest being revived by kvm_activate_realm().
+>> ---
+>>  arch/arm64/include/asm/kvm_rmi.h |  1 +
+>>  arch/arm64/kvm/arm.c             |  6 +++++
+>>  arch/arm64/kvm/rmi.c             | 45 ++++++++++++++++++++++++++++++--
+>>  3 files changed, 50 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
+>> index 5461c49bea4d..5cb99c187202 100644
+>> --- a/arch/arm64/include/asm/kvm_rmi.h
+>> +++ b/arch/arm64/include/asm/kvm_rmi.h
+>> @@ -96,6 +96,7 @@ void kvm_init_rmi(void);
+>>  u32 kvm_rmm_ipa_limit(void);
+>>  
+>>  int kvm_init_realm(struct kvm *kvm);
+>> +int kvm_activate_realm(struct kvm *kvm);
+>>  void kvm_destroy_realm(struct kvm *kvm);
+>>  int kvm_realm_teardown_stage2(struct kvm *kvm);
+>>  void kvm_destroy_rec(struct kvm_vcpu *vcpu);
+>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+>> index 534d33b7c67a..df33322b8fea 100644
+>> --- a/arch/arm64/kvm/arm.c
+>> +++ b/arch/arm64/kvm/arm.c
+>> @@ -1034,6 +1034,12 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
+>>  			return ret;
+>>  	}
+>>  
+>> +	if (kvm_is_realm(vcpu->kvm)) {
+>> +		ret = kvm_activate_realm(kvm);
+>> +		if (ret)
+>> +			return ret;
+>> +	}
+>> +
+>>  	mutex_lock(&kvm->arch.config_lock);
+>>  	set_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &kvm->arch.flags);
+>>  	mutex_unlock(&kvm->arch.config_lock);
+>> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
+>> index 94776a9262c9..53b5b18f2275 100644
+>> --- a/arch/arm64/kvm/rmi.c
+>> +++ b/arch/arm64/kvm/rmi.c
+>> @@ -687,7 +687,7 @@ static int realm_set_ipa_state(struct kvm_vcpu *vcpu,
+>>  	return ret;
+>>  }
+>>  
+>> -static int __maybe_unused realm_ensure_created(struct kvm *kvm)
+>> +static int realm_ensure_created(struct kvm *kvm)
+>>  {
+>>  	lockdep_assert_held(&kvm->arch.config_lock);
+>>  
+>> @@ -793,7 +793,7 @@ int noinstr kvm_rec_enter(struct kvm_vcpu *vcpu)
+>>  	return ret;
+>>  }
+>>  
+>> -static int __maybe_unused kvm_create_rec(struct kvm_vcpu *vcpu)
+>> +static int kvm_create_rec(struct kvm_vcpu *vcpu)
+>>  {
+>>  	struct user_pt_regs *vcpu_regs = vcpu_gp_regs(vcpu);
+>>  	unsigned long mpidr = kvm_vcpu_get_mpidr_aff(vcpu);
+>> @@ -893,6 +893,47 @@ void kvm_destroy_rec(struct kvm_vcpu *vcpu)
+>>  	rec->rec_page = NULL;
+>>  }
+>>  
+>> +int kvm_activate_realm(struct kvm *kvm)
+>> +{
+>> +	struct realm *realm = &kvm->arch.realm;
+>> +	struct kvm_vcpu *vcpu;
+>> +	unsigned long i;
+>> +	int ret;
+>> +
+>> +	if (kvm_realm_state(kvm) >= REALM_STATE_ACTIVE)
+>> +		return 0;
+>> +
+>> +	if (!irqchip_in_kernel(kvm)) {
+>> +		/* Userspace irqchip not yet supported with realms */
+>> +		return -EOPNOTSUPP;
+>> +	}
 > 
-> --- Patch [5]: [PATCH v3 05/11] kvm: Add arch-generic interface for hw-accelerated dirty-bitmap cleaning ---
-> commit 4c5b443921b3fcc7c6b76fa46a7c11e8755ad50f
-> Author: Leonardo Bras <leo.bras@arm.com>
-> 
-> kvm: Add arch-generic interface for hw-accelerated dirty-bitmap cleaning
-> 
-> This patch introduces kvm_arch_dirty_log_clear() to allow architectures
-> to implement hardware-accelerated dirty-bitmap clearing. It adds hooks in
-> both kvm_get_dirty_log_protect() and kvm_clear_dirty_log_protect() to try
-> the hardware implementation first, falling back to the software loop if it
-> fails or is unimplemented.
-> 
-> > diff --git a/include/linux/kvm_dirty_bit.h b/include/linux/kvm_dirty_bit.h
-> > new file mode 100644
-> > index 0000000000000..fa4f6b67b6235
-> > --- /dev/null
-> > +++ b/include/linux/kvm_dirty_bit.h
-> 
-> [ ... ]
-> 
-> > +static inline int kvm_arch_dirty_log_clear(struct kvm *kvm,
-> > +					   struct kvm_memory_slot *memslot,
-> > +					   struct kvm_clear_dirty_log *log,
-> > +					   unsigned long *bitmap,
-> > +					   bool *flush)
-> 
-> [Severity: Medium]
-> The signature here strongly implies the log parameter is a valid clear
-> operation struct. However, when this is called from
-> kvm_get_dirty_log_protect(), NULL is passed for the log parameter.
-> 
-> Could this establish an undocumented API contract where new arch
-> implementations blindly dereference the log pointer and cause a host
-> kernel panic?
+> This could race with the irqchip being created on another CPU. Also,
+> an irqchip being in kernel doesn't mean it is ready, and I suspect
+> you also need to check that it has been initialised.
 
-Well, there are 2 users of this functions, and one uses a NULL variable, so 
-I don't think anyone will implement something that blingly deferences the 
-log pointer.
+Good point - moving the config_lock up and checking vgic_initialized()
+makes sense.
 
-In any case, I am open to fixing this. How should I add that information?
-(Just a comment is enough?)
+>> +
+>> +	guard(mutex)(&kvm->arch.config_lock);
+>> +	/* Check again with the lock held */
+>> +	if (kvm_realm_state(kvm) >= REALM_STATE_ACTIVE)
+>> +		return 0;
+>> +
+>> +	ret = realm_ensure_created(kvm);
+>> +	if (ret)
+>> +		return ret;
+>> +
+>> +	/* Mark state as dead in case we fail */
+>> +	kvm_set_realm_state(kvm, REALM_STATE_DEAD);
+>> +
+>> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+>> +		ret = kvm_create_rec(vcpu);
+>> +		if (ret)
+>> +			return ret;
+>> +	}
+> 
+> If the realm is dead, shouldn't the KVM view of death apply as well?
 
-> 
-> > +{
-> > +	return -ENXIO;
-> > +}
-> 
-> [ ... ]
-> 
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index 45e784462ec6e..7a13ef69b6e3e 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> 
-> [ ... ]
-> 
-> > @@ -2262,6 +2263,10 @@ static int kvm_get_dirty_log_protect(struct kvm *kvm, struct kvm_dirty_log *log)
-> >  		dirty_bitmap_buffer = kvm_second_dirty_bitmap(memslot);
-> >  		memset(dirty_bitmap_buffer, 0, n);
-> >  
-> > +		if (kvm_arch_dirty_log_clear(kvm, memslot, NULL,
-> > +					     dirty_bitmap_buffer, &flush) >= 0)
-> 
-> [Severity: Critical]
-> Since this hardware clear is invoked inside the else block of the
-> if (kvm->manual_dirty_log_protect) check, are hardware dirty bits
-> completely ignored when manual protection is enabled?
-> 
-> Modern VMMs often enable manual dirty log protection by default. Will
-> skipping the hardware tracking here result in userspace only receiving
-> the software dirty bitmap, potentially causing silent memory corruption
-> on the destination after a live migration?
-> 
+Indeed that would be a good improvement. I'll change these error paths
+to include a kvm_vm_dead() call.
 
-To skip it, kvm_arch_dirty_log_clear() should return a positive (or zero) 
-value, meaning any error (ret < 0) will cause it to run the software 
-cleaning. If the arch-specific routine skips cleaning and return >=0, then 
-it's an implementation bug. 
+Thanks,
+Steve
 
-> [Severity: Medium]
-> This is the call site passing NULL for the log parameter.
+>> +
+>> +	ret = rmi_realm_activate(virt_to_phys(realm->rd));
+>> +	if (ret)
+>> +		return -ENXIO;
+>> +
+>> +	kvm_set_realm_state(kvm, REALM_STATE_ACTIVE);
+>> +	return 0;
+>> +}
+>> +
+>>  void kvm_destroy_realm(struct kvm *kvm)
+>>  {
+>>  	struct realm *realm = &kvm->arch.realm;
 > 
-> As mentioned above, does this pose a risk of NULL pointer dereferences
-> for architectural implementations expecting a valid
-> struct kvm_clear_dirty_log pointer?
-
-See previous discussion above.
-
+> Thanks,
 > 
-> > +			goto out;
-> > +
-> 
-> [Severity: Critical]
-> If kvm_arch_dirty_log_clear() succeeds, this goto out bypasses the generic
-> software dirty bitmap processing loop completely.
+> 	M.
 > 
 
-Yeah, that's what the arch-specific version is about.
-
-> Does this mean KVM's internally-dirtied pages, such as those from MMIO
-> emulation or virtual timers marked via mark_page_dirty(), are silently
-> dropped from the dirty log?
-
-No, as those are also cleaned as long as they hit the dirty-log (bitmap).
-
-> 
-> [Severity: High]
-> If the arch-specific hardware routine fails partway through and returns
-> an error code, could it leave partial hardware bits in dirty_bitmap_buffer?
-
-It could. That's a implementation decision: should it return all bits and 
-clean all using software, or continue where arch-specific version stopped?
-
-> 
-> If it falls through to the software loop, the software loop might overwrite
-> hardware bits with software bits (if the software bit is 1) and preserve
-> garbage hardware bits (if the software bit is 0). Should
-> dirty_bitmap_buffer be cleared on failure?
-> 
-
-Depending on the fallback strategy, it should be restored to initial state, 
-not cleared.
-
-
-> >  		KVM_MMU_LOCK(kvm);
-> >  		for (i = 0; i < n / sizeof(long); i++) {
-> >  			unsigned long mask;
-> 
-> [ ... ]
-> 
-> > @@ -2373,6 +2379,10 @@ static int kvm_clear_dirty_log_protect(struct kvm *kvm,
-> >  	if (copy_from_user(dirty_bitmap_buffer, log->dirty_bitmap, n))
-> >  		return -EFAULT;
-> >  
-> > +	if (kvm_arch_dirty_log_clear(kvm, memslot, log, dirty_bitmap_buffer,
-> > +				     &flush) >= 0)
-> 
-> [Severity: High]
-> If the arch hook modifies dirty_bitmap_buffer before failing and
-> returning an error, does it corrupt the mask used by the fallback
-> clear loop?
-> 
-> The fallback software loop uses dirty_bitmap_buffer to decide which bits
-> to clear. If it contains garbage from a failed hardware clear, could this
-> cause the wrong pages to be cleared?
-
-That's the arch-version responsibility to not put garbage in the buffer, 
-and restore it depending on their strategy.
-
-> 
-> > +		goto out;
-> > +
-> 
-> [Severity: Critical]
-> Similar to the GET path, this goto out bypasses the loop that clears bits
-> in memslot->dirty_bitmap using atomic_long_fetch_andnot().
-> 
-> If the hardware clear succeeds, will the software bits remain set
-> indefinitely since they are bypassed from being cleared from KVM's
-> internal tracking?
-
-Again, it will write-protect all the pages pointed by the dirty-log, which 
-is exactly what the sw routine does.
-
-Thanks!
-Leo
