@@ -1,34 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B44CD21C16A;
-	Mon,  3 Aug 2026 22:54:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 099CD346A14;
+	Mon,  3 Aug 2026 22:54:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785797684; cv=none; b=prMy4QL1KwnpMYkZHXkNPELd0zgBaMEOiyig8aAEhDD3QSz2/IDZzK3zRRMx+oazCmhHydcCUWvjso8In6MLwe9M6tNmxFSwH5t3frg3FzNWSmofTB6DnK4mqXZhNozakgFthS+BcOEIyvOIiTayVE1RucQJnYmnWq5dsLIpPOI=
+	t=1785797688; cv=none; b=tMyctcbCtOvprpUN6CGep8AasVRHN0Admol8+xPdDNB3aV41TApmLcfta3YYYgi+rr+ZeN6/e2EgUCrVdLdOunhbeDwxnUZnnAp2B6J05S5FezrlQ1Qu7IXHJ3Ka+dnoUhxso6LLcFmHXM/yOVtbVuBrICoXEKtqcFWNPXWwGqg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785797684; c=relaxed/simple;
-	bh=V4qHD6wmZpYcTYENc2vY0BXAauqtQOOFlUChMEa50ew=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=WuPE5MmQCZJapXB3sdiVPrVzuNmNei1fj3yQDpOCJ66NJXCxvDOprO8zgexvgBeKhgjxXT3Fk8gce1w7sLwr10Ivr7zv8iwViOqBboIwOYKOj+mP+YSttXfTVMth8JKjBVNqQQtcc34zHzGlJS7gUrzfAorpAcHU2PqS2c1ACd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S0xaIsmk; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1785797688; c=relaxed/simple;
+	bh=sAoUaDyMQALfN+ONy0lnwC2Oo/ld3+Elyc6NDljIQe8=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=NMFvd5pUOk5di1rmkoTd7GZOUXOMF5jE1VO1o6/FnnO0JV/EhTCjezcPT+9IBlOxC5KfZ1zEBwdsjq2V0MAI4U1pLRlS9ZxKF+gu2gChuFHVCqGUOwt8p9PsKvqjsrQw8MPB6fdASSuAstbiY9GxpPwYuRpQfboey6MyoaD2/5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O84fkuXO; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S0xaIsmk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E408B1F000E9;
-	Mon,  3 Aug 2026 22:54:40 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O84fkuXO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08B4A1F00A3A;
+	Mon,  3 Aug 2026 22:54:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785797683;
-	bh=BEW95Jao0151ROBkWIkQ/c3IVqod1+b1uzS5PXnlhQs=;
-	h=From:Subject:Date:To:Cc;
-	b=S0xaIsmkwE9+7yCcnSMQJWK3J7F0OFInFjkXFlV+P+ty4SKfWRu9i7HDhapYLa6d6
-	 vRWdDaocM0jmLWzWtEAB862KxgBmcvRsEvemV0QUeizbiJkIR6+/o9KFs+uhiqe5n9
-	 mCQZvOJQC+078BPfo/cmmHKGefu9a3ZDbMo067PjMBQwXkjRcWiNM6WPG02b9pXVY6
-	 AP55PhwnsUz/pMfHOD05FkOfcO1JY+WPOSpKUqpaEG23gXbGRMECP6T21xFP9T3UZJ
-	 QnMOLMA5qGqKTIuspcItXv+1WeaQEdeB1PoCqwtIMSqFppxL384RfQEdnRR6erC3qF
-	 WJNzdKpSeQUEQ==
+	s=k20260515; t=1785797686;
+	bh=N7URY0/P+czEc9oAhoLdople5LjdnyrNihUG3Il3dJU=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc;
+	b=O84fkuXOxY6TXMPZ24Sg1WO8Zi8nCA8JBnIaEy/fX5mthdhfpi17+9YDnhtTTBiPs
+	 bPSvWxomV6vA2cq0NcH1XX1k8W0JIytLNNK4btb+DqVx1ygNGXXRBND9m8zGaJJfDC
+	 I7zJHJh5ROErWqUKTKs81wM0LbW/tzcrbJ4XMKT5mW6LUX8pNQs7VOWLYCl4Wgfqc+
+	 OR2Ad8zUXb0JLSrTM8aB0saNq3n3kEY45NNzItmeCr4qaiKaft17onaIyOUJDd2G4V
+	 Uc1GoQjzcab+HWrJgjEatQq7D0+kTO7LbBPb+CKDLiTus44otbCrHVF0jyk0eBT6v/
+	 VcUC4oXXPmgTw==
 From: Mark Brown <broonie@kernel.org>
-Subject: [PATCH v2 0/2] KVM: arm64: ID register finalisation fixes
-Date: Mon, 03 Aug 2026 23:53:52 +0100
-Message-Id: <20260803-kvm-arm64-idreg-final-v2-0-d7d7e4efc640@kernel.org>
+Date: Mon, 03 Aug 2026 23:53:53 +0100
+Subject: [PATCH v2 1/2] KVM: arm64: Finalize guest-wide sysregs prior to
+ per-vCPU sysregs
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -37,11 +38,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAAAccWoC/3WNTQ6CMBBGr0JmbQ0tUNSV9zAsShmgAq2ZYqMh3
- N2Cbl2+fD9vAY9k0MMlWYAwGG+cjSAOCehe2Q6ZaSKDSIVMS3FmQ5iYoknmMSDsWGusGllZ6lr
- nsi6Kk4K4fRC25rX/3qov+2d9Rz1vZ1ujN3529N7FgW+9nyPjfxyBs5RlDQpVSC4bLa8DksXx6
- KiDal3XDwurGW/NAAAA
-X-Change-ID: 20260729-kvm-arm64-idreg-final-77cbc46b558a
+Message-Id: <20260803-kvm-arm64-idreg-final-v2-1-d7d7e4efc640@kernel.org>
+References: <20260803-kvm-arm64-idreg-final-v2-0-d7d7e4efc640@kernel.org>
+In-Reply-To: <20260803-kvm-arm64-idreg-final-v2-0-d7d7e4efc640@kernel.org>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
  Fuad Tabba <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>, 
  Steffen Eiden <seiden@linux.ibm.com>, 
@@ -52,46 +51,130 @@ Cc: Peter Maydell <peter.maydell@linaro.org>,
  linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
  linux-kernel@vger.kernel.org, Mark Brown <broonie@kernel.org>
 X-Mailer: b4 0.16-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1254; i=broonie@kernel.org;
- h=from:subject:message-id; bh=V4qHD6wmZpYcTYENc2vY0BXAauqtQOOFlUChMEa50ew=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBqcRwu+9cjYoT+wsVjiSdM9k9zLaEiXyPB7wQbW
- h4C6otVi+SJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCanEcLgAKCRAk1otyXVSH
- 0GQKB/9JXGkNVh2kHc2ud+7IKZzXysC2frp1oeRF51FTY7Uw2yhaXEYIOvTGwXRPuMA1Yr80peS
- msZ4MU51slV8qN0Vuo38Uz6zmX5+FZtAle/WTnQYhi8HhI2icVVe14FzgKgqA5EtGogNWJO+vMU
- P5NuJNOjnM8vO+jYZhvqHjrWS0FtB5pZ57Z/3P6I3qpwkuo1jJdZHHCzzBp2bY6Y2Cgw4QJlJW3
- /NM6oC6xs2KciSP/d1eG1ftIDlpWd6A0TOKLOMgBOb8v/1CV62YjvHuFTP63WESQNSLstBQW3Fk
- OlQaCNc2Eoe5bxRG+slGHIQCC9meMndC2LZBzUhIuV/QT9yR
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3763; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=sAoUaDyMQALfN+ONy0lnwC2Oo/ld3+Elyc6NDljIQe8=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBqcRwvUJynXVIM5O1RycH+Ylg8WLTohID4H4fi+
+ 3Ln8w7HQ4qJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCanEcLwAKCRAk1otyXVSH
+ 0BuVB/9S2BjXFd/O02snAJx79z8SKdwb1oJtk6oHFq2JRPvhXqPhkKeL0ru0C71ALIfPZn6LlIO
+ cNRGitOxqnMpQfuI7M/dKhcmIlMLPZifCebPLqEOxBiDgC6tzEkpUYJ3gT+76XqI3c9t9nJMJKo
+ b6ui6BzSNmJq9YN1/L9BmE3PTTrTO1GYSIlDOq6pwBz7yjLIw5F8mD5GOmV5tc8GXqjgvrAbpOC
+ z0gS6HEcVJ6HPbhxS2wrHtnYeOSUhT4ZrLYhKc3ws2dyXipP943dT+I7oArn5aBVG0m7ofHQfT2
+ SJ6/Viw3QOgHqehC0y0fupD5y7zh4fY3oscJbheyQogn+ZTs
 X-Developer-Key: i=broonie@kernel.org; a=openpgp;
  fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-While looking at some feature enablement I noticed that there are some
-scenarios where we can end up with an inconsistently configured vCPU due
-to finalizing configuration based on ID registers before we have blocked
-writes to the ID registers. This series aims to clean up these issues.
+In commit d82d09d5ba4b ("KVM: arm64: Don't skip per-vcpu NV
+initialisation") the NV register sanitisation was moved earlier in
+kvm_finalize_sys_regs() so that it runs for each vCPU rather than only
+once per guest. This means that for the first vCPU it runs prior to vGIC
+finalization, but the vGIC finalization updates the ID registers which
+the NV initialization uses so we may end up with a mismatch. For
+example, HFGRTR_EL2.ICC_IGRPENn_EL1 depends on GICv3 being enabled in
+ID_AA64PFR0_EL1.GIC so may be mistakenly marked or not marked as RES0.
 
+Split the initialization which runs once per guest into a separate
+function and run that before the per-vCPU initialisation for NV,
+renaming the per-vCPU function to make it clear that it does per-vCPU
+setup.
+
+Fixes: d82d09d5ba4b ("KVM: arm64: Don't skip per-vcpu NV initialisation")
 Signed-off-by: Mark Brown <broonie@kernel.org>
 ---
-Changes in v2:
-- Also replace the kvm_vm_has_ran_once() usage in kvm_set_vm_id_rg() and
-  kvm_vm_finalize_sys_regs() with kvm_id_regs_final().
-- Link to v1: https://patch.msgid.link/20260731-kvm-arm64-idreg-final-v1-0-3de2a5616dc6@kernel.org
+ arch/arm64/kvm/arm.c      |  2 +-
+ arch/arm64/kvm/sys_regs.c | 40 ++++++++++++++++++++++++++--------------
+ arch/arm64/kvm/sys_regs.h |  2 +-
+ 3 files changed, 28 insertions(+), 16 deletions(-)
 
----
-Mark Brown (2):
-      KVM: arm64: Finalize guest-wide sysregs prior to per-vCPU sysregs
-      KVM: arm64: Block ID register changes after we rely on the values
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 50adfff75be8..2b75e1d5ca8d 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -931,7 +931,7 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
+ 			return ret;
+ 	}
+ 
+-	ret = kvm_finalize_sys_regs(vcpu);
++	ret = kvm_vcpu_finalize_sys_regs(vcpu);
+ 	if (ret)
+ 		return ret;
+ 
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 5d5c579d4579..958d7ef78785 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -5755,25 +5755,14 @@ void kvm_calculate_traps(struct kvm_vcpu *vcpu)
+ }
+ 
+ /*
+- * Perform last adjustments to the ID registers that are implied by the
++ * Do system register finalization that is shared by the whole guest. This
++ * includes last adjustments to the ID registers that are implied by the
+  * configuration outside of the ID regs themselves, as well as any
+  * initialisation that directly depend on these ID registers (such as
+  * RES0/RES1 behaviours). This is not the place to configure traps though.
+- *
+- * Because this can be called once per CPU, changes must be idempotent.
+  */
+-int kvm_finalize_sys_regs(struct kvm_vcpu *vcpu)
++static int kvm_vm_finalize_sys_regs(struct kvm *kvm)
+ {
+-	struct kvm *kvm = vcpu->kvm;
+-
+-	guard(mutex)(&kvm->arch.config_lock);
+-
+-	if (vcpu_has_nv(vcpu)) {
+-		int ret = kvm_init_nv_sysregs(vcpu);
+-		if (ret)
+-			return ret;
+-	}
+-
+ 	if (kvm_vm_has_ran_once(kvm))
+ 		return 0;
+ 
+@@ -5825,6 +5814,29 @@ int kvm_finalize_sys_regs(struct kvm_vcpu *vcpu)
+ 	return 0;
+ }
+ 
++/*
++ * Because this can be called once per CPU, changes must be idempotent.
++ */
++int kvm_vcpu_finalize_sys_regs(struct kvm_vcpu *vcpu)
++{
++	struct kvm *kvm = vcpu->kvm;
++	int ret;
++
++	guard(mutex)(&kvm->arch.config_lock);
++
++	ret = kvm_vm_finalize_sys_regs(kvm);
++	if (ret)
++		return ret;
++
++	if (vcpu_has_nv(vcpu)) {
++		ret = kvm_init_nv_sysregs(vcpu);
++		if (ret)
++			return ret;
++	}
++
++	return 0;
++}
++
+ int __init kvm_sys_reg_table_init(void)
+ {
+ 	const struct sys_reg_desc *gicv3_regs;
+diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
+index 2a983664220c..402c5774d916 100644
+--- a/arch/arm64/kvm/sys_regs.h
++++ b/arch/arm64/kvm/sys_regs.h
+@@ -235,7 +235,7 @@ int kvm_sys_reg_set_user(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg,
+ 
+ bool triage_sysreg_trap(struct kvm_vcpu *vcpu, int *sr_index);
+ 
+-int kvm_finalize_sys_regs(struct kvm_vcpu *vcpu);
++int kvm_vcpu_finalize_sys_regs(struct kvm_vcpu *vcpu);
+ 
+ #define AA32(_x)	.aarch32_map = AA32_##_x
+ #define Op0(_x) 	.Op0 = _x
 
- arch/arm64/include/asm/kvm_host.h |  8 ++++++
- arch/arm64/kvm/arm.c              |  2 +-
- arch/arm64/kvm/sys_regs.c         | 57 ++++++++++++++++++++++++---------------
- arch/arm64/kvm/sys_regs.h         |  2 +-
- arch/arm64/kvm/vgic/vgic-init.c   |  6 ++---
- 5 files changed, 48 insertions(+), 27 deletions(-)
----
-base-commit: f5098b6bae761e346ebcd9da7f95622c04733cff
-change-id: 20260729-kvm-arm64-idreg-final-77cbc46b558a
-
-Best regards,
---  
-Mark Brown <broonie@kernel.org>
+-- 
+2.47.3
 
