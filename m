@@ -1,215 +1,91 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08F2A372046;
-	Mon,  3 Aug 2026 12:29:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 162EB32AAA0
+	for <kvmarm@lists.linux.dev>; Mon,  3 Aug 2026 12:42:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785760145; cv=none; b=XmdDKKL2q1GqGZ5qMFWNhrbFBn/fNA44DHUE7FVawkkrZ4G9hgllNxYE1BfD0vP557ILqVu4j4UZkcE91p5/Oz/zw1ow/x++5NpmdxP39cYhp/2uADXYTqKzly+0yX3qz8df9dZ/NbnWf3gOLMTO5HvvlM2oxWcR7LWds783gXM=
+	t=1785760955; cv=none; b=ebXNh+yJiGQEr/njM4a7Jz7Co6cAxnKpncuu7eQzeK0J2Ua6WM1F6SBRWRbk3vVCwOMpxuewQ+ZVeaw+hIgNY35rkCpuvTXaGA/oFegDhNK+XemfklyjEv67fqyY8kkq7rrXhO0O+oKTdBzeZeRlQLOCZYQvl6lBmmf6XvRtHLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785760145; c=relaxed/simple;
-	bh=OoL1As3dEZH4IFoCMmqEOhBx7078X8VfvoTX/lO8FMY=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nd1pFCVsBBbBtq8EHcIWpOzSX72NBeq+7BoeXVjIAUcbUXOmzSjSE51oEYLO73R4IFcLBf/X06Hl5l4LQ8ak0t2r6cDvgSuvKtRIUf0S5+6rS3W9LEI5mt48fFjYVhU+e2li7un6ezH1e+sQd16AKGww+fQ631AzYrGPAXJbrbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K2u5WNve; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1785760955; c=relaxed/simple;
+	bh=/iCvHcbpKF86s8mUijJ9mtfUoT/0j522f9t+I2F3pQY=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=pgOp4ewM3+l6lDZltupPTiJfk/a3c3x1HveyZxWzzdAG4LNegLA8G3UYmGjKPgGXvgurZOVtv4dh6LURMESMtH8OqFgyWBtd5JdJJy/IwmCFBYonPXVzEw8BY2Vi4RLGWxcW68n/kMl5gpaZU2GjB2zStWr3wZdBHfibM/63DwQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=nv1sXr73; arc=none smtp.client-ip=91.218.175.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K2u5WNve"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9EE001F000E9;
-	Mon,  3 Aug 2026 12:29:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785760143;
-	bh=d0JxQ8lHSv0NhahRmDmv7DHjVItDMVG5WIkT3vPSZ4Y=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=K2u5WNveD3tarc9m99nLHttoafzVZJMWXeZ1mKL9CXbB+AeI9MsFnx6xyQypxH1bv
-	 qPxC1XHer0BhzjNjHvwV19I/TWMPd2oWmuetuVVShhvWay3zLLwtOqs11Pg0B4xzBK
-	 VQTS2rO4ssP7ieC6Nf6PDSs6DVIo/HmEH516Z9uyLPzQ47ZhWpsxdF3zygghVx3tnq
-	 gFI/u/+Gz5VY48ZlXfC9+oKyn5t3RnUuPPH3Kdk7TuKza8YZKrOTtP5JKUp0LDXHy8
-	 xHzE9C+Mo0UH1x68foO+/wP81EgN6hPEEVjnIUtShDNdA55CxFqOH3hDeyCi2x2tdM
-	 RqVrw7yDI6bIQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wqrmv-0000000BkPQ-1W3i;
-	Mon, 03 Aug 2026 12:29:01 +0000
-Date: Mon, 03 Aug 2026 13:29:00 +0100
-Message-ID: <8633wvcrqr.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="nv1sXr73"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1785760951;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bVKtopwMrqzEnOyVedKGwt1g22ev9g5F8tMkWzZJze8=;
+	b=nv1sXr73B89awbKPZkmi8w6iiuTkHiV6qBC96Bqef22ErCzkvNaTiaWHZRxq+A3UC+/29v
+	wLkDtFrKl4t1Srl7LCdrgb4f9uZNQuHyDC9fzst/xRHLcgrjlQujELaOfTM/Tb46n5Zz3Y
+	36yGJ+M1qi4XRNQl7Xx5uZAuJGnFdVo=
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: maz@kernel.org,
+	oupton@kernel.org,
 	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Cc: catalin.marinas@arm.com,
+	will@kernel.org,
+	rostedt@goodmis.org,
+	mhiramat@kernel.org,
+	alexandru.elisei@arm.com,
+	vdonnefort@google.com,
+	joey.gouly@arm.com,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	qperret@google.com,
+	ardb@kernel.org,
 	linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
-	Emi Kisanuki <fj0570is@fujitsu.com>,
-	Vishal Annapurve <vannapurve@google.com>,
-	WeiLin.Chang@arm.com,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>
-Subject: Re: [PATCH v15 19/37] KVM: arm64: CCA: Activate realms on first vCPU run
-In-Reply-To: <20260715142841.80544-20-steven.price@arm.com>
-References: <20260715142841.80544-1-steven.price@arm.com>
-	<20260715142841.80544-20-steven.price@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	linux-trace-kernel@vger.kernel.org,
+	tabba@google.com,
+	fuad.tabba@linux.dev
+Subject: [PATCH v2 01/11] tracing: Include linux/types.h in trace_remote_event.h
+Date: Mon,  3 Aug 2026 13:42:10 +0100
+Message-Id: <20260803124220.332248-2-fuad.tabba@linux.dev>
+In-Reply-To: <20260803124220.332248-1-fuad.tabba@linux.dev>
+References: <20260803124220.332248-1-fuad.tabba@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com, aneesh.kumar@kernel.org, fj0570is@fujitsu.com, vannapurve@google.com, WeiLin.Chang@arm.com, lpieralisi@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, 15 Jul 2026 15:28:21 +0100,
-Steven Price <steven.price@arm.com> wrote:
-> 
-> Use kvm_arch_vcpu_run_pid_change() to check if this is the first time
-> the realm guest has run. If this is the first run then activate the
-> realm.
-> 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> 
-> ---
-> Changes since v12:
->  * Fix commit message
->  * Change realm_state checks to be >= REALM_STATE_ACTIVE to avoid a dead
->    guest being revived by kvm_activate_realm().
-> ---
->  arch/arm64/include/asm/kvm_rmi.h |  1 +
->  arch/arm64/kvm/arm.c             |  6 +++++
->  arch/arm64/kvm/rmi.c             | 45 ++++++++++++++++++++++++++++++--
->  3 files changed, 50 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
-> index 5461c49bea4d..5cb99c187202 100644
-> --- a/arch/arm64/include/asm/kvm_rmi.h
-> +++ b/arch/arm64/include/asm/kvm_rmi.h
-> @@ -96,6 +96,7 @@ void kvm_init_rmi(void);
->  u32 kvm_rmm_ipa_limit(void);
->  
->  int kvm_init_realm(struct kvm *kvm);
-> +int kvm_activate_realm(struct kvm *kvm);
->  void kvm_destroy_realm(struct kvm *kvm);
->  int kvm_realm_teardown_stage2(struct kvm *kvm);
->  void kvm_destroy_rec(struct kvm_vcpu *vcpu);
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 534d33b7c67a..df33322b8fea 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -1034,6 +1034,12 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
->  			return ret;
->  	}
->  
-> +	if (kvm_is_realm(vcpu->kvm)) {
-> +		ret = kvm_activate_realm(kvm);
-> +		if (ret)
-> +			return ret;
-> +	}
-> +
->  	mutex_lock(&kvm->arch.config_lock);
->  	set_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &kvm->arch.flags);
->  	mutex_unlock(&kvm->arch.config_lock);
-> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
-> index 94776a9262c9..53b5b18f2275 100644
-> --- a/arch/arm64/kvm/rmi.c
-> +++ b/arch/arm64/kvm/rmi.c
-> @@ -687,7 +687,7 @@ static int realm_set_ipa_state(struct kvm_vcpu *vcpu,
->  	return ret;
->  }
->  
-> -static int __maybe_unused realm_ensure_created(struct kvm *kvm)
-> +static int realm_ensure_created(struct kvm *kvm)
->  {
->  	lockdep_assert_held(&kvm->arch.config_lock);
->  
-> @@ -793,7 +793,7 @@ int noinstr kvm_rec_enter(struct kvm_vcpu *vcpu)
->  	return ret;
->  }
->  
-> -static int __maybe_unused kvm_create_rec(struct kvm_vcpu *vcpu)
-> +static int kvm_create_rec(struct kvm_vcpu *vcpu)
->  {
->  	struct user_pt_regs *vcpu_regs = vcpu_gp_regs(vcpu);
->  	unsigned long mpidr = kvm_vcpu_get_mpidr_aff(vcpu);
-> @@ -893,6 +893,47 @@ void kvm_destroy_rec(struct kvm_vcpu *vcpu)
->  	rec->rec_page = NULL;
->  }
->  
-> +int kvm_activate_realm(struct kvm *kvm)
-> +{
-> +	struct realm *realm = &kvm->arch.realm;
-> +	struct kvm_vcpu *vcpu;
-> +	unsigned long i;
-> +	int ret;
-> +
-> +	if (kvm_realm_state(kvm) >= REALM_STATE_ACTIVE)
-> +		return 0;
-> +
-> +	if (!irqchip_in_kernel(kvm)) {
-> +		/* Userspace irqchip not yet supported with realms */
-> +		return -EOPNOTSUPP;
-> +	}
+trace_remote_event.h uses bool without including linux/types.h, so a
+translation unit that includes it ahead of anything else that pulls
+types.h in fails to build, as with nvhe/trace.h at EL2.
 
-This could race with the irqchip being created on another CPU. Also,
-an irqchip being in kernel doesn't mean it is ready, and I suspect
-you also need to check that it has been initialised.
+Fixes: 072529158e60 ("tracing: Add events to trace remotes")
+Acked-by: Steven Rostedt <rostedt@goodmis.org>
+Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+---
+ include/linux/trace_remote_event.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-> +
-> +	guard(mutex)(&kvm->arch.config_lock);
-> +	/* Check again with the lock held */
-> +	if (kvm_realm_state(kvm) >= REALM_STATE_ACTIVE)
-> +		return 0;
-> +
-> +	ret = realm_ensure_created(kvm);
-> +	if (ret)
-> +		return ret;
-> +
-> +	/* Mark state as dead in case we fail */
-> +	kvm_set_realm_state(kvm, REALM_STATE_DEAD);
-> +
-> +	kvm_for_each_vcpu(i, vcpu, kvm) {
-> +		ret = kvm_create_rec(vcpu);
-> +		if (ret)
-> +			return ret;
-> +	}
-
-If the realm is dead, shouldn't the KVM view of death apply as well?
-
-> +
-> +	ret = rmi_realm_activate(virt_to_phys(realm->rd));
-> +	if (ret)
-> +		return -ENXIO;
-> +
-> +	kvm_set_realm_state(kvm, REALM_STATE_ACTIVE);
-> +	return 0;
-> +}
-> +
->  void kvm_destroy_realm(struct kvm *kvm)
->  {
->  	struct realm *realm = &kvm->arch.realm;
-
-Thanks,
-
-	M.
-
+diff --git a/include/linux/trace_remote_event.h b/include/linux/trace_remote_event.h
+index c8ae1e1f5e721..e4cc2d4497bcf 100644
+--- a/include/linux/trace_remote_event.h
++++ b/include/linux/trace_remote_event.h
+@@ -3,6 +3,8 @@
+ #ifndef _LINUX_TRACE_REMOTE_EVENTS_H
+ #define _LINUX_TRACE_REMOTE_EVENTS_H
+ 
++#include <linux/types.h>
++
+ struct trace_remote;
+ struct trace_event_fields;
+ struct trace_seq;
 -- 
-Without deviation from the norm, progress is not possible.
+2.39.5
+
