@@ -1,35 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04D7C37DAD5;
-	Mon,  3 Aug 2026 23:14:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 892613815E3;
+	Mon,  3 Aug 2026 23:14:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785798852; cv=none; b=SfWY+DX0gE4g0XVBgxIAqs0diPpBkVfLQR9SHgDIRi4Pprx+Hs4HTdurC/iGCZo6i511KbeNc4u6qbu6Ja34GWYiWfygEDAHOf5mDh7/4Fa19jg9waAehJKuNxt/X9/yVERgEU5zzIq7EUl5cgx+JhvpXEW13TMWkwucQzHtdIU=
+	t=1785798854; cv=none; b=hC0jqSHpIv7mh3zIR5pMRD8OSS7VUJrfG8yest2S4gMaKd3j4tdZwH54byoVfSSEncE+r+URafdtIAJT4nDCxMH4hZ1eWsx9F4NqyZ+RV30U6U0cajxf8u4DXOuyD0z6jgI0Nl8aPf95SPBIA8KWABn5V68+/BjtGyhuZtYaU70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785798852; c=relaxed/simple;
-	bh=fG68MfhkwRfSg1W6YX0cbN8/yZcNS3S2f4yLKb+2+CU=;
+	s=arc-20240116; t=1785798854; c=relaxed/simple;
+	bh=dYXTcrQgfnk8FxnmgXg6ADstB4n1DYUswquMHXPAUUY=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=hFSq7VMm4/VyUKAOwX8jIODRQA3vizpSg+ee2/uFtWKDaVfGrdXRD+twakjyz0FE4df9KktEAPdaAxeik3rkdRmeMknTTJgtuaGxQixZFB4GWvUa1MxwcYH5uxmO7V2NcAwA3ZmZfeO54faDfBZrSTqgN2n4PmncJj+CExap2iw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AfNuvcWS; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=dhfWGS+scKEWuQLCm7u7vQnUe1jEtg9YCKAI6s/nN78RZpsoOOcD5I+x0Ke6vu0Ke3yX/p9VbtweudTk8TUGegdvBacs1jWl37nyohlZHgliTOGPAadSPBumwEYIzLxl8R34lFv/zW7sgulyuK0BOaMhMfiRM+3J/fmoD8Z8cxQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ioiICQYp; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AfNuvcWS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78DBD1F00A3E;
-	Mon,  3 Aug 2026 23:14:04 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ioiICQYp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8CD21F000E9;
+	Mon,  3 Aug 2026 23:14:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785798847;
-	bh=fiugukty1Mn9VBap85XV+9U6g61CkNYwrAZccCYiZGU=;
+	s=k20260515; t=1785798850;
+	bh=zoyq8Inen+VAWRiWz/um6XRtPFDfayF6DG7fxVMTx/o=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=AfNuvcWSdk4R6apsQH2JnDApmuBXbQg6asNwcqTyVS7BqpbXagvh7NbqDS307MA7x
-	 saoi64x4R1NGCFNK/bZbbIRg4oGJ9RCFMq5i1TCSGa2y6jmiPL1y90Lelj06uca1JX
-	 0XkbsIRH7OR6Dj/sTcxBOCYPw5qsW2kOQ3X1VnxelCsxwEsdrxW/pSwUHMmByExxuz
-	 kmcNvs3TYj7nHn/0lxvaPGzOAD8vVbAb7vJfOk0QlNkXHzmbZ8lM4AW6mmRbSsqaLO
-	 6zX7R1A2RjDc5vUvT9Rrf1I00Xn5bn6JaxfuQu02c0V+CBvcRk3xswBJULmi5MvFD3
-	 5Pk2dKFtwEqvA==
+	b=ioiICQYpyvdsUZNRXOM2rAHl31xYTBontCQMRP1yN9JruPVThooXeBQk7z8eIUCAI
+	 7/+jEOxzE4Fz1RBngaY78EZAzTSRnVFRHt8h8duZ9OhXvb0iwP7914dmcKcSYGoEMc
+	 ERLskkc+RJZ806KHNeYi8WG7PMayK8YN3nxg7CnT9Q6P3qy7C4gsdjPskFFjLH2vw9
+	 SJdHRAWKa44LSpkBAZ5AQ1hD3ts88rsye4nSHns8KDhbWYudKSmw7SauajTQNcpMJL
+	 Y9O7/RKVv5WA6hjY43EaVJAN9zsIvJ3jsxoiRx2w/Xpa4BejHSAdAy13lYhhIa8T7B
+	 my83Ioy9JtFiQ==
 From: Mark Brown <broonie@kernel.org>
-Date: Mon, 03 Aug 2026 23:56:52 +0100
-Subject: [PATCH v18 07/14] KVM: arm64: Forward GCS exceptions to nested
- guests
+Date: Mon, 03 Aug 2026 23:56:53 +0100
+Subject: [PATCH v18 08/14] KVM: arm64: Enforce EXLOCK for SPSR and ELR
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -38,7 +37,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260803-arm64-gcs-v18-7-fd8c40f5ad88@kernel.org>
+Message-Id: <20260803-arm64-gcs-v18-8-fd8c40f5ad88@kernel.org>
 References: <20260803-arm64-gcs-v18-0-fd8c40f5ad88@kernel.org>
 In-Reply-To: <20260803-arm64-gcs-v18-0-fd8c40f5ad88@kernel.org>
 To: Catalin Marinas <catalin.marinas@arm.com>, 
@@ -51,58 +50,116 @@ Cc: Peter Maydell <peter.maydell@linaro.org>,
  kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, 
  linux-kernel@vger.kernel.org, Mark Brown <broonie@kernel.org>
 X-Mailer: b4 0.16-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1286; i=broonie@kernel.org;
- h=from:subject:message-id; bh=fG68MfhkwRfSg1W6YX0cbN8/yZcNS3S2f4yLKb+2+CU=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBqcSCfDFrrJu6EBWatsQlkDL5fLdxzD6q+uZ194
- xEX8/bZYV+JATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCanEgnwAKCRAk1otyXVSH
- 0P4eB/9zHfXUwqA3slkhU8zpWiO6oeFu2MR+OB2dN1p5kY4ZG138rVq10mYyWQU8QNQ6v1G0jpW
- In9wLKEM2acaBUUiCKckWBNkOJOlCGrneiptUyFmVfn5pmNv6S+KztRxd3gnCJODMFvftwMTFh6
- FJ3CsmvV5hPa1G1Z5/KttX1zHQ/qsbBPkeNgmfmt1iAzurlgrSIKreSMTByopRgvu56croTYSik
- FBMaDy/0JcX9R9KdFmT+fV99wDcVF8BDhzFO5Zmz9I9bOuIxMQfmfEh2+0xULOvImlxQb/oPIw0
- r05PfCDqy41xH/3wlnenzd6JxGRRauMN+CmPtGqR5toa2jxc
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3010; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=dYXTcrQgfnk8FxnmgXg6ADstB4n1DYUswquMHXPAUUY=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBqcSCgZxL3vnMN/fdXvvlTWz7G2jUymHEbk80nG
+ VGlBh/oOo6JATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCanEgoAAKCRAk1otyXVSH
+ 0AfCB/994WaXrj0FxhuZLpXWKMkoWnuJzBwOu2c5GkJcdKi3+WqEe94KqUqJGMq4L5LsrGGmj66
+ rmOQoLZ7n/Zfe2AHNiEi6BLNDwlRcMm94pcaJmWXD7wjOVlyrGm3aLKmXQNNwpaP9CmkQ/ePZM7
+ VHJaLWib1K/WYDMhmycFJW041eFXVFYEnOzTWKycKJYb9gXPleLX8LOv4XMSsfTy835sOftUaa4
+ OIItrP8OYOANc6y7xMDxiL9rtH7CcaF7NOAqfmu9OEpnxBHJkq9KwqRkSEy37covX0WebB/PZUV
+ eOaePDOxENwfTA5E+MxHnJm/hlh+mVzEV7/XSBItTbxYJLvB
 X-Developer-Key: i=broonie@kernel.org; a=openpgp;
  fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-For nested guests where HFGITR_EL2.nGCSSTR_EL1 is clear or when there are
-L2 GCS data check exceptions we need to forward the exception to the guest.
-Add handling to do so.
+As per I_CFFNS and the pseudocode for the SPSR_ELx and ELR_ELx registers
+a GCS exception with ExType 1 is generated for attempts to write to
+those registers when both GCSCR_ELx.EXLOCKEN and PSTATE.EXLOCK are set.
+Ensure that this is enforced for guests if access to these registers
+from the guest is handled by the hypervisor.
 
 Signed-off-by: Mark Brown <broonie@kernel.org>
 ---
- arch/arm64/kvm/handle_exit.c | 18 +++++++++++++++---
- 1 file changed, 15 insertions(+), 3 deletions(-)
+ arch/arm64/include/asm/kvm_emulate.h |  8 +++++++
+ arch/arm64/kvm/sys_regs.c            | 42 ++++++++++++++++++++++++++++++++----
+ 2 files changed, 46 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 54aedf93c78b..63dcc4a0e69a 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -304,12 +304,24 @@ static int handle_svc(struct kvm_vcpu *vcpu)
- 	return 1;
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index ee774c3b8dcd..bc012c86fcd6 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -81,6 +81,14 @@ int kvm_inject_nested_irq(struct kvm_vcpu *vcpu);
+ int kvm_inject_nested_sea(struct kvm_vcpu *vcpu, bool iabt, u64 addr);
+ int kvm_inject_nested_serror(struct kvm_vcpu *vcpu, u64 esr);
+ 
++static inline void kvm_inject_exlock(struct kvm_vcpu *vcpu)
++{
++	u64 esr = FIELD_PREP(ESR_ELx_EC_MASK, ESR_ELx_EC_GCS) | ESR_ELx_IL |
++		  FIELD_PREP(ESR_ELx_ExType_MASK, ESR_ELx_ExType_EXLOCK);
++
++	kvm_inject_sync(vcpu, esr);
++}
++
+ static inline void kvm_inject_nested_sve_trap(struct kvm_vcpu *vcpu)
+ {
+ 	u64 esr = FIELD_PREP(ESR_ELx_EC_MASK, ESR_ELx_EC_SVE) |
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index d18ada283809..387c14a33524 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2782,14 +2782,42 @@ static bool access_sp_el1(struct kvm_vcpu *vcpu,
+ 	return true;
  }
  
-+/*
-+ * We might get GCS exceptions that need to be forwarded to the
-+ * hypervisor when a nested guest has HFGITR_EL2.nGCSSTR_EL1 clear, or
-+ * for a GCS data check exception for a L2 guest.
-+ */
- static int kvm_handle_gcs(struct kvm_vcpu *vcpu)
++static inline bool sysregs_exlocked(struct kvm_vcpu *vcpu)
++{
++	u64 gcscr;
++
++	if (!kvm_has_gcs(vcpu->kvm))
++		return false;
++
++	if (!(vcpu->arch.ctxt.regs.pstate & PSR_EXLOCK_BIT))
++		return false;
++
++	/*
++	 * Note that the EXLOCKEN for the running EL is checked
++	 * regardless of the register written to.
++	 */
++	if (is_hyp_ctxt(vcpu))
++		gcscr = vcpu_read_sys_reg(vcpu, GCSCR_EL2);
++	else
++		gcscr = vcpu_read_sys_reg(vcpu, GCSCR_EL1);
++
++	return gcscr & GCSCR_ELx_EXLOCKEN;
++}
++
+ static bool access_elr(struct kvm_vcpu *vcpu,
+ 		       struct sys_reg_params *p,
+ 		       const struct sys_reg_desc *r)
  {
--	/* We don't expect GCS, so treat it with contempt */
--	if (kvm_has_feat(vcpu->kvm, ID_AA64PFR1_EL1, GCS, IMP))
--		WARN_ON_ONCE(1);
-+	if (!kvm_has_gcs(vcpu->kvm)) {
-+		kvm_inject_undefined(vcpu);
-+		return 1;
+-	if (p->is_write)
++	if (p->is_write) {
++		if (sysregs_exlocked(vcpu)) {
++			kvm_inject_exlock(vcpu);
++			return false;
++		}
++
+ 		vcpu_write_sys_reg(vcpu, p->regval, ELR_EL1);
+-	else
++	} else {
+ 		p->regval = vcpu_read_sys_reg(vcpu, ELR_EL1);
 +	}
  
-+	if (vcpu_has_nv(vcpu)) {
-+		kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
-+		return 1;
-+	}
+ 	return true;
+ }
+@@ -2798,10 +2826,16 @@ static bool access_spsr(struct kvm_vcpu *vcpu,
+ 			struct sys_reg_params *p,
+ 			const struct sys_reg_desc *r)
+ {
+-	if (p->is_write)
++	if (p->is_write) {
++		if (sysregs_exlocked(vcpu)) {
++			kvm_inject_exlock(vcpu);
++			return false;
++		}
 +
-+	WARN_ON_ONCE(1);
- 	kvm_inject_undefined(vcpu);
- 	return 1;
+ 		__vcpu_assign_sys_reg(vcpu, SPSR_EL1, p->regval);
+-	else
++	} else {
+ 		p->regval = __vcpu_sys_reg(vcpu, SPSR_EL1);
++	}
+ 
+ 	return true;
  }
 
 -- 
