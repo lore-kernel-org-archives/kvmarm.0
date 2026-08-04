@@ -1,43 +1,43 @@
-Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
+Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD039194C98
-	for <kvmarm@lists.linux.dev>; Tue,  4 Aug 2026 03:34:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 759D948986E
+	for <kvmarm@lists.linux.dev>; Tue,  4 Aug 2026 03:47:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785814472; cv=none; b=AXcnBLnjsKBHAAWtsez91CIi2R50ka5sh1sv6O15f+4X5ttoNv1yPQsZ5E9IS2STCKq6TGM18T6uOSAwo4vSLOIsBN56hieYvXmUTCoQO/YGcxYEnfG/49tV3j+klJnLUjj2QAkTCrrEd0dJMtGImA15+wcw5o4bDzzOozGkY3Q=
+	t=1785815228; cv=none; b=PdxNpgAKXuRxoOw6DmEzFhRWXFgk9RBtXFAJXa0t/svZsoVKHjOJqVwq1pyOjpDG1a/o7v1BJRs4dqFtFGTUEGIURY7neu6R/nVivSjODRVDrrt+QiMNR7oeTljBHck4vBhLB1g/A/GzAKIxIAmU9eMAnIqcvZ3v7IDIa6L9MME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785814472; c=relaxed/simple;
-	bh=TZzW/PJMPDU1jXSTqByWg76Kcq5EsBAxg6JD2M28RHg=;
+	s=arc-20240116; t=1785815228; c=relaxed/simple;
+	bh=MpNAUrNQ6mrcpoJ6eyqy8Ugz4dZpRH+hXtNtbHGIFXE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GloOTOOwjKKcp1YCWuSn0g+EVCVfL5C6a4bSbdzng4JjWmTmEGYFzfrgfcsygDfJrFjIpm+olTj6WL82MjbaoW/9qIRN9m0YS55v1xv9RinYHpvuOvACRIQia1VV7vsr1Lf3IO3uSqMMYlWfbInU8BxdxomWqFAJFtnoUNZ1ZFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=CDTpmPiL; arc=none smtp.client-ip=115.124.30.132
+	 Content-Type:Content-Disposition:In-Reply-To; b=DjWE1qhB+818kjJGEVbHFtiSarkJgZZbdB3VCcAa51Y0L3vtCvswGQAIciXQHUllo+6LOotDZS1YLdpps0Bm2xJxRkNzXFZws8ejpcClmjM6x6xc6Z3dIAcXB1WPp3Gy1pxVlfr5eteWS9mVhbJzCUZaFNkaoWHNziY5RvxBLrY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=BveHJmsR; arc=none smtp.client-ip=115.124.30.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="CDTpmPiL"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="BveHJmsR"
 DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=linux.alibaba.com; s=default;
-	t=1785814466; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=TTOKzgHuD3KRtjS03wNmLdJVCRW00bEzm0RyWyZwqBI=;
-	b=CDTpmPiLHmKqq3jOZmSIsQHNezWD+IUN9i59bdtI0AAgKPB94yMKIBN6Sd4Gz7xPbMGoCx4CY0quQp4N4JPrHGHFRRvGgLalJib8aC9x6aOa8OpuDqaDIP7dQlXK15G6VPMPMZ9pDTJ4POcRJue7ELyHFmOraYC6R3SLQrjZIXk=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045098064;MF=yaoyuan@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0X8MUQlp_1785814464;
-Received: from localhost(mailfrom:yaoyuan@linux.alibaba.com fp:SMTPD_---0X8MUQlp_1785814464 cluster:ay36)
+	t=1785815215; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=VjSgLvpVkLAlpt0h3TqURSDDPzFkTT5uHnKOEmZFvx0=;
+	b=BveHJmsRyAwech8UWwWsPPySw3ynwY1Vy0+4I9YrwzEyIl2Bho7qMouX5tJtQHjY3MBzge9mQ5WepS7UrHAP3XTS6t8hUuwUUXVfu+1WbkrZmVb6EdRLWbBaVtSR15QfI/8wwhlu2QCZFDkl4KLKiwCOyRQ4KNNLhPZJ26N1HgM=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033032089153;MF=yaoyuan@linux.alibaba.com;NM=1;PH=DS;RN=11;SR=0;TI=SMTPD_---0X8MUVM._1785815214;
+Received: from localhost(mailfrom:yaoyuan@linux.alibaba.com fp:SMTPD_---0X8MUVM._1785815214 cluster:ay36)
           by smtp.aliyun-inc.com;
-          Tue, 04 Aug 2026 11:34:25 +0800
-Date: Tue, 4 Aug 2026 11:34:24 +0800
+          Tue, 04 Aug 2026 11:46:54 +0800
+Date: Tue, 4 Aug 2026 11:46:52 +0800
 From: Yao Yuan <yaoyuan@linux.alibaba.com>
 To: Marc Zyngier <maz@kernel.org>
 Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
 	linux-arm-kernel@lists.infradead.org, Steffen Eiden <seiden@linux.ibm.com>, 
 	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
 	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Hyunwoo Kim <imv4bel@gmail.com>
-Subject: Re: [PATCH 5/6] KVM: arm64: Couple VNCR fixmap clearing and CPU
- number invalidation
-Message-ID: <wlcvwmmsu3ryj3zytcnx5xhmuhjbgofqsaw5o54qwbdwc3n7ca@wj5n4swgeokb>
+	Hyunwoo Kim <imv4bel@gmail.com>, stable@vger.kernel.org
+Subject: Re: [PATCH 4/6] KVM: arm64: Correctly handle end of VA space TLBI
+ invalidation
+Message-ID: <bebthvofsp6rdtj7da7rtqgsdi6sjoq5dmodqzpi445r3msyoh@fd4pndoqqmix>
 References: <20260801124818.366274-1-maz@kernel.org>
- <20260801124818.366274-6-maz@kernel.org>
+ <20260801124818.366274-5-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -46,59 +46,113 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260801124818.366274-6-maz@kernel.org>
+In-Reply-To: <20260801124818.366274-5-maz@kernel.org>
 
-On Sat, Aug 01, 2026 at 01:48:17PM +0800, Marc Zyngier wrote:
-> A mapped VNCR translation must indicate which CPU it is resident.
-> Unmapping such a translation must make this CPU number -1.
+On Sat, Aug 01, 2026 at 01:48:16PM +0800, Marc Zyngier wrote:
+> Our TLB invalidation by VA code is based on comparing two ranges,
+> one defined by the TLB, and one defined by the TLBI instruction.
 >
-> Couple the unmap and the setting to -1 in a helper, so that we
-> are always sure they are done together.
+> Each range is defined by a start and a size. However, the way the
+> comparison is done doesn't account for address rollover, as it
+> compares an address with (base + size). This works nicely until
+> this expression represent the last page/block in the TTBR1 VA space,
+> as the result is a big fat 0. And a failed TLB invalidation.
 >
+> Rewrite the comparison in a way that is immune to the address
+> rollover (making the end address inclusive instead of exclusive),
+> and move this into a common helper that is used by both VA and IPA
+> invalidations, as suggested by Hyunwoo Kim (although the IPA version
+> didn't suffer from this particular problem, obviously).
+>
+> Fixes: 4ffa72ad8f37e ("KVM: arm64: nv: Add S1 TLB invalidation primitive for VNCR_EL2")
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Cc: stable@vger.kernel.org
 > ---
->  arch/arm64/kvm/nested.c | 11 ++++++++---
->  1 file changed, 8 insertions(+), 3 deletions(-)
+>  arch/arm64/kvm/nested.c | 43 ++++++++++++++++++-----------------------
+>  1 file changed, 19 insertions(+), 24 deletions(-)
 >
 > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 47d61d3cf053c..84915e2cff604 100644
+> index d7dba02dc84fe..47d61d3cf053c 100644
 > --- a/arch/arm64/kvm/nested.c
 > +++ b/arch/arm64/kvm/nested.c
-> @@ -894,6 +894,12 @@ void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu)
->  	}
+> @@ -999,6 +999,20 @@ static void invalidate_vncr(struct vncr_tlb *vt)
+>  		clear_fixmap(vncr_fixmap(vt->cpu));
 >  }
 >
-> +static void unmap_l1_vncr(struct vncr_tlb *vt)
+> +static bool vncr_tlb_intersects(struct vncr_tlb *vt, u64 addr,
+> +				u64 scope_start, u64 scope_size)
 > +{
-> +	clear_fixmap(vncr_fixmap(vt->cpu));
-> +	vt->cpu = -1;
-> +}
+> +	u64 tlb_size, tlb_start, tlb_end, scope_end;
 > +
->  static void this_cpu_reset_vncr_fixmap(struct kvm_vcpu *vcpu)
->  {
->  	if (!host_data_test_flag(L1_VNCR_MAPPED))
-> @@ -902,8 +908,7 @@ static void this_cpu_reset_vncr_fixmap(struct kvm_vcpu *vcpu)
->  	BUG_ON(vcpu->arch.vncr_tlb->cpu != smp_processor_id());
->  	BUG_ON(is_hyp_ctxt(vcpu));
->
-> -	clear_fixmap(vncr_fixmap(vcpu->arch.vncr_tlb->cpu));
-> -	vcpu->arch.vncr_tlb->cpu = -1;
-> +	unmap_l1_vncr(vcpu->arch.vncr_tlb);
->  	host_data_clear_flag(L1_VNCR_MAPPED);
->  }
->
-> @@ -996,7 +1001,7 @@ static void invalidate_vncr(struct vncr_tlb *vt)
->  {
->  	vt->valid = false;
->  	if (vt->cpu != -1)
-> -		clear_fixmap(vncr_fixmap(vt->cpu));
-> +		unmap_l1_vncr(vt);
+> +	tlb_size = ttl_to_size(pgshift_level_to_ttl(vt->wi.pgshift, vt->wr.level));
+> +
+> +	tlb_start = addr & ~(tlb_size - 1);
+> +	tlb_end = tlb_start + tlb_size - 1;
+> +	scope_end = scope_start + scope_size - 1;
+> +
+> +	return !(tlb_end < scope_start || tlb_start > scope_end);
 
 Reviewed-by: Yuan Yao <yaoyuan@linux.alibaba.com>
 
+> +}
+> +
+>  /*
+>   * VNCR TLB invalidation occurs from MMU notifiers or TLBI instructions, and
+>   * either can race against a vcpu not being onlined yet (no pseudo-TLB
+> @@ -1021,19 +1035,9 @@ static void kvm_invalidate_vncr_ipa(struct kvm *kvm, u64 start, u64 end)
+>  	if (!kvm_has_feat(kvm, ID_AA64MMFR4_EL1, NV_frac, NV2_ONLY))
+>  		return;
+>
+> -	kvm_for_each_vncr_tlb(i, vcpu, vt, kvm) {
+> -		u64 ipa_start, ipa_end, ipa_size;
+> -
+> -		ipa_size = ttl_to_size(pgshift_level_to_ttl(vt->wi.pgshift,
+> -							    vt->wr.level));
+> -		ipa_start = vt->wr.pa & ~(ipa_size - 1);
+> -		ipa_end = ipa_start + ipa_size;
+> -
+> -		if (ipa_end <= start || ipa_start >= end)
+> -			continue;
+> -
+> -		invalidate_vncr(vt);
+> -	}
+> +	kvm_for_each_vncr_tlb(i, vcpu, vt, kvm)
+> +		if (vncr_tlb_intersects(vt, vt->wr.pa, start, end - start))
+> +			invalidate_vncr(vt);
 >  }
 >
->  static bool vncr_tlb_intersects(struct vncr_tlb *vt, u64 addr,
+>  struct s1e2_tlbi_scope {
+> @@ -1059,28 +1063,19 @@ static void invalidate_vncr_va(struct kvm *kvm,
+>  	lockdep_assert_held_write(&kvm->mmu_lock);
+>
+>  	kvm_for_each_vncr_tlb(i, vcpu, vt, kvm) {
+> -		u64 va_start, va_end, va_size;
+> -
+> -		va_size = ttl_to_size(pgshift_level_to_ttl(vt->wi.pgshift,
+> -							   vt->wr.level));
+> -		va_start = vt->gva & ~(va_size - 1);
+> -		va_end = va_start + va_size;
+> -
+>  		switch (scope->type) {
+>  		case TLBI_ALL:
+>  			break;
+>
+>  		case TLBI_VA:
+> -			if (va_end <= scope->va ||
+> -			    va_start >= (scope->va + scope->size))
+> +			if (!vncr_tlb_intersects(vt, vt->gva, scope->va, scope->size))
+>  				continue;
+>  			if (vt->wr.nG && vt->wr.asid != scope->asid)
+>  				continue;
+>  			break;
+>
+>  		case TLBI_VAA:
+> -			if (va_end <= scope->va ||
+> -			    va_start >= (scope->va + scope->size))
+> +			if (!vncr_tlb_intersects(vt, vt->gva, scope->va, scope->size))
+>  				continue;
+>  			break;
+>
 > --
 > 2.47.3
 >
