@@ -1,106 +1,131 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 603594195DA
-	for <kvmarm@lists.linux.dev>; Tue,  4 Aug 2026 06:51:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 568A53EC81F
+	for <kvmarm@lists.linux.dev>; Tue,  4 Aug 2026 08:02:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785826302; cv=none; b=H9tOO8Wv4uRZLdmsdwBmYekUlaSEopHhBavWycK7eDHpaPdrkXIH6DHpaU7tzrkhqrBihRpTLX4ongGct65ra7sRF7rBRjjhSsl1/XoNCWCvvB/ZxVdOPDeCKHi4J12BHRDjznOqaFdD3AnsSw/QJLlEDf3Yw3n+cuvgGCPe0VA=
+	t=1785830576; cv=none; b=StpOtjxP9Khp3W45wjdiZZMfZEZwTMTk61J3PocKO1cJQzKzdVubUnjcvIwRXIPy8S7Je2ms/a/yqp+SdQC5qUbWBSnhqHxNrzJ5BoV+vKniWaNywlbdAdbW6EgUD13fUTnOz17qxeEyYObTcSq3j5cnFYxhVgrdTGclu/waGpg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785826302; c=relaxed/simple;
-	bh=U0TxdDEw/LAz1B7Pea3opMV+CJl+moS22Um0L+03GGA=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=hW0f+WeS8KCJx5F2l9Y8zHFo7hXAMgJykU/KGcN5d8L8hb6u+ZhSwRbOt6yYYVBTpi8X5QU3hQaItz0aOhhsbVhqHDboDbb2ZrXKH3Mj4wRqydkYc/k3I4Yx8Lp+RDaL8288ZY9oSh04fHTrBG1lYPnrXLIS0V+8x84+hxG9CNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=M10v1VTb; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1785830576; c=relaxed/simple;
+	bh=EQwpD9w+Fp8H0yPzgecdz37R/SGJuffqN5H/3wFsO+4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=usJw+Nr1B2N/aPJ30ZRJxAAvWr5IaPmGxDNC+41zUBtgu/o+emQ9QuEbh35mv24g5SHAST+1ZnHEB0VJBHcF0EK160g9f8HmIf1AgyFSPNgKoIM6dg0+azpX2k9bwCr+eT0TOeDOa2rPGKhmEqxeofJhzrHDd9OlR8vz48+rXXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jv6986fS; arc=none smtp.client-ip=91.218.175.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M10v1VTb"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1785826300;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jv6986fS"
+X-Forwarded-Encrypted: i=1; AHgh+Rou8SnToCvK1qrVAQB8lq8OcPoW9BJsSvig13Qx4DB4PF0E5ocezd1epwAyZeWSPqkE/LREGHQ=@lists.linux.dev
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1785830570;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=qvuUynhwJ6vmk6JmexBa8fUitav45tNUKh63gEre9Hk=;
-	b=M10v1VTbUpLnIm03ZWps8UB4jXSE8sevjRFZLT8PjpbgjLxO5CkWpoRRc7s6EDewUGs72X
-	p3nuYYsyFyN9aYkxwC3/7+cBMBFY5QJdH/zjGDvdHyFhHeeosmqc7Y8qZUfWtwB+OY19fa
-	NtVZOmYC1KkIDrsODSga5k7pB2ixtoc=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-177-zwZISMpYNv6NtVLFfprXbw-1; Tue,
- 04 Aug 2026 02:51:25 -0400
-X-MC-Unique: zwZISMpYNv6NtVLFfprXbw-1
-X-Mimecast-MFC-AGG-ID: zwZISMpYNv6NtVLFfprXbw_1785826283
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0243719560B5;
-	Tue,  4 Aug 2026 06:51:23 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.44.22.7])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4EBCB180044F;
-	Tue,  4 Aug 2026 06:51:22 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id E317621E6920; Tue, 04 Aug 2026 08:51:19 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Khushit Shah <khushit.shah@nutanix.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,  "qemu-arm@nongnu.org"
- <qemu-arm@nongnu.org>,  "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-  "eric.auger@redhat.com" <eric.auger@redhat.com>,  "cohuck@redhat.com"
- <cohuck@redhat.com>,  "peter.maydell@linaro.org"
- <peter.maydell@linaro.org>,  "richard.henderson@linaro.org"
- <richard.henderson@linaro.org>,  "maz@kernel.org" <maz@kernel.org>,
-  "oliver.upton@linux.dev" <oliver.upton@linux.dev>,  "berrange@redhat.com"
- <berrange@redhat.com>,  "abologna@redhat.com" <abologna@redhat.com>,
-  "jdenemar@redhat.com" <jdenemar@redhat.com>,  "gshan@redhat.com"
- <gshan@redhat.com>,  "skolothumtho@nvidia.com" <skolothumtho@nvidia.com>,
-  "sebott@redhat.com" <sebott@redhat.com>,  "philmd@linaro.org"
- <philmd@linaro.org>,  "yangjinqian1@huawei.com" <yangjinqian1@huawei.com>,
-  Shaju Abraham <shaju.abraham@nutanix.com>,  Mark Cave-Ayland
- <mark.caveayland@nutanix.com>,  Prerna Saxena <prerna.saxena@nutanix.com>
-Subject: Re: [RFC PATCH v3 16/19] qmp: add query-cpu-props-info command
-In-Reply-To: <FDD5760F-94E6-46F4-AC62-AB0DC98322FD@nutanix.com> (Khushit
-	Shah's message of "Tue, 4 Aug 2026 06:30:22 +0000")
-References: <20260716213858.609699-1-khushit.shah@nutanix.com>
-	<20260716213858.609699-17-khushit.shah@nutanix.com>
-	<87y0f5u78t.fsf@pond.sub.org>
-	<6AA3BD42-9596-476B-9F64-AB09372821B9@nutanix.com>
-	<87tspa5skn.fsf@pond.sub.org>
-	<FD805FA0-9323-450C-9D79-319C0883F05E@nutanix.com>
-	<FDD5760F-94E6-46F4-AC62-AB0DC98322FD@nutanix.com>
-Date: Tue, 04 Aug 2026 08:51:19 +0200
-Message-ID: <8733wu5qfs.fsf@pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	bh=DOqewZ17+UXgtO2g1c37YHAxSsuB+qHLrfqx0/I97UQ=;
+	b=jv6986fSoYYNYQsjyBVrl2fpccEva3F1Qjc+1CFXb5LnMyfxQdHLHZFgjufPP8NfvMlB3X
+	+poMhxX5J5BmTEViSGlAUz8YMfsJHjMqTQDTMB5q8mW8ZqWk24+HhXUYY3yk4XDSKScBli
+	yMVBbadK+gF5HuI1GZ88ECBIAt4acx4=
+X-Gm-Message-State: AOJu0YyW0xkUxtTm1W/TzvH1BfNCUmksGpaa+NNlphuQcqEt84lYc4b1
+	fu6aNFfAIDOfpMhZREpQ8es8yQ99qGlf2bNnmrOLowfuzn6hoNvfSizBov7Iqn/15m7ouzhf1r3
+	11QHDLb1agUXR5IUQL2bpM6+uuC6n9EqVyvGDelMq
+X-Received: by 2002:a05:622a:858c:b0:52b:4ec6:52ba with SMTP id
+ d75a77b69052e-52cd4e7f28dmr9889511cf.6.1785830543921; Tue, 04 Aug 2026
+ 01:02:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
-X-Mimecast-MFC-PROC-ID: gAUz6qFN7IEigj1GCT5wgWUMnGiTGt0FMTCkqKwic-U_1785826283
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
+References: <20260803-kvm-arm64-idreg-final-v2-0-d7d7e4efc640@kernel.org>
+ <20260803-kvm-arm64-idreg-final-v2-1-d7d7e4efc640@kernel.org> <20260803231200.D62F81F000E9@smtp.kernel.org>
+In-Reply-To: <20260803231200.D62F81F000E9@smtp.kernel.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Tue, 4 Aug 2026 09:01:47 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTwm7DkwV=TNmA6dKmu3mxrO-C4qsX-FZjfpY-iA3fF1=w@mail.gmail.com>
+X-Gm-Features: AUfX_mzyHcsb7KkkOIEpAmtex-UJ_yU5dFw1NywMOAKwqdmBPASMUkpyECWVU14
+Message-ID: <CA+EHjTwm7DkwV=TNmA6dKmu3mxrO-C4qsX-FZjfpY-iA3fF1=w@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] KVM: arm64: Finalize guest-wide sysregs prior to
+ per-vCPU sysregs
+To: sashiko-reviews@lists.linux.dev
+Cc: Mark Brown <broonie@kernel.org>, kvmarm@lists.linux.dev, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Migadu-Flow: FLOW_OUT
 
-Khushit Shah <khushit.shah@nutanix.com> writes:
-
-[...]
-
-> Stub file was missing on arm user builds. 
+On Tue, 4 Aug 2026 at 00:13, <sashiko-bot@kernel.org> wrote:
 >
-> I have fixed this on the private branch if you want to take a look.
+> Thank you for your contribution! Sashiko AI review found 1 potential issu=
+e(s) to consider:
+>
+> Pre-existing issues:
+> - [High] Numeric range comparison over sparse `enum vcpu_sysreg` covers u=
+nintended registers.
 
-I'm willing to pull an update to v3, assuming it's a small fix.
+False positive. The gaps are real, but the loop body is a
+value-preserving no-op on them and stays in bounds, so there is
+nothing to touch.
 
-> I also understand if you want to wait for proper v4 with the fix.
-
-Eventually.
-
-> Again, sorry for this, should have checked all configs before
-> sending the patch.
-
-Mistakes happen, and then we learn from them :)
-
-[...]
-
+/fuad
+> --
+>
+> --- Patch [1]: [PATCH v2 1/2] KVM: arm64: Finalize guest-wide sysregs pri=
+or to per-vCPU sysregs ---
+> commit d51df44c26211dddcc71c5fe7798bb6cbbc7e67e
+> Author: Mark Brown <broonie@kernel.org>
+>
+> KVM: arm64: Finalize guest-wide sysregs prior to per-vCPU sysregs
+>
+> This commit splits the sysreg initialization into a per-VM and a per-vCPU
+> function to ensure that guest-wide settings are finalized before per-vCPU
+> NV initialization runs.
+>
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index 5d5c579d45790..958d7ef78785f 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> [ ... ]
+> > @@ -5825,6 +5814,29 @@ int kvm_finalize_sys_regs(struct kvm_vcpu *vcpu)
+> [ ... ]
+> > +int kvm_vcpu_finalize_sys_regs(struct kvm_vcpu *vcpu)
+> > +{
+> [ ... ]
+> > +     if (vcpu_has_nv(vcpu)) {
+> > +             ret =3D kvm_init_nv_sysregs(vcpu);
+>
+> [Severity: High]
+> This isn't a bug introduced by this patch, but does the initialization in
+> kvm_init_nv_sysregs() touch unintended registers by iterating over the
+> sparse vcpu_sysreg enumeration?
+>
+> Looking at the loop at the end of kvm_init_nv_sysregs() in
+> arch/arm64/kvm/nested.c:
+>
+>     for (enum vcpu_sysreg sr =3D __SANITISED_REG_START__; sr < NR_SYS_REG=
+S; sr++)
+>         __vcpu_rmw_sys_reg(vcpu, sr, |=3D, 0);
+>
+> Because VNCR-mapped entries are numbered by their VNCR-page byte offset
+> rather than declaration order, iterating using a numeric range comparison
+> over the enum covers unassigned gaps and other registers that happen to f=
+all
+> in that byte span.
+>
+> Could this loop inadvertently corrupt or desync guest state by treating
+> offsets as sequential enum entries?
+>
+> > +             if (ret)
+> > +                     return ret;
+> > +     }
+> > +
+> > +     return 0;
+> > +}
+>
+> --
+> Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260803-kvm-arm6=
+4-idreg-final-v2-0-d7d7e4efc640@kernel.org?part=3D1
+>
