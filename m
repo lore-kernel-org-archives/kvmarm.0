@@ -1,206 +1,431 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F95E456DFA
-	for <kvmarm@lists.linux.dev>; Tue,  4 Aug 2026 14:50:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EF7C4611C2;
+	Tue,  4 Aug 2026 14:56:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785855019; cv=none; b=bynkN+19y0T824ln6R8Tg9ReLVRHeCIhsd76gKDFu5hVcl/wvVm19gu6zwx5ON64JV3eb/QohQkXE+zXVJslkYs1VVf8CoV58ZZLhToJTc7YE3N812MsoCqfdyv4EkauZf2jVrxJIVK2mgURjybawxsNnU1r/GADAxskL7eiTMY=
+	t=1785855415; cv=none; b=mXkCFx7dEYUxLRZMFVcSZnC4l+Ho8KRAv4OutBLd1XjOfqHfvgenu6+JtYoD/uj5X7yjVWLRRS8CoVmnduU5AqgUDpkXYHYrYrnlqNOcFAlykC2RXm6Bq90/nAXrtpKv9Obh5kVqmRaFWdWTPrVB27EdmVU+SbC44CMn7wCSHJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785855019; c=relaxed/simple;
-	bh=kQAS1jsNR9gHB+FBM7fPWKSqywBPXmRqtaUfOLkCkrY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fC75TQrQ/iWjz8aXuC+nd1WjpDvKj9KBhq2tWaQDdZk1UlDOb1fqxkLdHuxrUI4GNzJSygBJj8dUILYjQ8dxYPGPmd2Odm+nZAT1LHzn9cGiZbgT+gkVktI2yWAdtgXbQU1J+sb4xHQHfeEgdlKh17vnGwA/jFNMOO+Z95N+EoA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DjozL+US; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1785855415; c=relaxed/simple;
+	bh=qVSL8vtXftSTAA/i69MW/c/nDb/9msu78BwEfvZxPZc=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EjTE8qfqHomNWIMHtkxIZ92zV+hcQuCaTPcu/VnB2izSyGj1iTs2pN5aSSOFGf62luyaOfzc8zh8QUbdJ/m08n8LMUVDcXa6BQG2M603NhSDb2zNxdgZ6TWRoz1AcS5iy+2p3dHPnzDBib/MZZNXzuILfrV3czMb7kLpOmgJjr8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l9B+Z1Kz; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DjozL+US"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-495509b08ebso46875e9.1
-        for <kvmarm@lists.linux.dev>; Tue, 04 Aug 2026 07:50:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1785855015; x=1786459815; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=aoiYuPF6Lxrjv4D/1nx7DDBtlGVMorYZQ8pdqOx51TA=;
-        b=DjozL+USiAFju7/ysT7BNMLYpupTZ/ILl7D0M+OVuUGwTTiOpw34O+J1PU6c9j64ZJ
-         XzHI1FmJUVSoGRguN91X3OtLesX7PcSaOWniIQIY0LKNNOsxFadof4CchAb26p8A/mqt
-         uE3szc2ssut8ZN1GRVdQQKJOE0venVrIEfW9i8VHsTJEUoiNECArKO5IV8Lv+Kx5JQ+U
-         HZe/sUgHoddcehKiMXoymFXGlC+f9lSHkModSIyU7RKjhX6/V44tnQ1iFPTT8hmhszbz
-         oICdzngeaLbFB617U1Zs6TVtFRYz5ViMI0WDiKcuMkzhf2Tvxe43gGgXVBjkxk/+El3r
-         OjCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785855015; x=1786459815;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=aoiYuPF6Lxrjv4D/1nx7DDBtlGVMorYZQ8pdqOx51TA=;
-        b=QEG0YYz0tvowS2zLa7NrkWrlz1nWamgInIaATKsr2Ih/oiQRmzDteXxotuEcHyx9WX
-         9cXWHYtTM8mztFPMTbLGZ06FoMxOesmoErc8u81cJBZdev6VDbFSxm36oORKJGfqGp9g
-         YlfKKuc6fyjU1Aw6SOmY5+/+qNf931r53TeWv4sFe357EeTd9g/Vrq0NCizJVpS0enuB
-         FlaY8B6Nc1pPd24GXgrcGmQopi9VlV/pVrgtnEudThOH0ctXwL7O+cTfPfOmDoUtH/Is
-         2p62/UUVTOWCYCPLE07IlDYqcZXKc9SitvkZYQK0ovlb+0bAA2NDKY8OY6lBxuQSf6SB
-         2eUA==
-X-Forwarded-Encrypted: i=1; AHgh+Rrn9h+bj/+rtrSmLn2pz0+rURLQc7JeeOq1yLO9S6leP4lUs2wK8vlx9WpdPoFauq0+htVG07Y=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yxqmf3U7kazJ6fpJ3HdLbGR9/+Kim8Mh6ueqDT+g4Mdo1gsrh8V
-	mCHmogiLJfhDtEg023zZRmzm4iQJGoVWPq6lypJ300dc0hevrCG9D61ovixp22HUPQ==
-X-Gm-Gg: AR+sD111aW9hs0vMA16PG2kkFj/lgvBnG7S8kKZOu9qINiP1DhwjL69lr3BcQ6tyhMO
-	I8v8++DRPek84AkRN8LoPU17jHt9hN57i3oXJHita8Zehu+kGlg6K4zDfPjO4aMfL/fravYFs0m
-	vPR+gq5/iGXG3dyLbBcn2zIuCFMetR3OHxQJt2ND5mB3vBAjuzAiQrdvEbytZ9kKksI9K/qabWE
-	I8I1IAenfs4Xo/ij0q8P8u0Nq68ZL+eC36XyXjuJ0UZ1uBStIuLSdOrn0jOoPNOXUMtXWOQngOX
-	J6nv9Uvez/T8n5bCcxi8Vb8+3jLqjc+lyBo2oX+KlJxiuc7mL7NNIagkkootO8NbrZe5LpZOE3J
-	l7DUBlZ4UB54VU2voL9TNsOUeaEU7/rIbQGUsAXaWAN6g49NA2uGIWnMXpAP0u7HpS8P+bXuWNK
-	3sbaE7j8VSdIkupItC90PewlPp2zkVWxT/y5XWEnUO2w1DmyewCeOBbDDVB0DNMZ9TRkL+z2ww6
-	hNzZUuIb9K9U5yxnUfmhK0PehDhe3oE
-X-Received: by 2002:a05:600c:230c:b0:495:3ffd:5e39 with SMTP id 5b1f17b1804b1-4994dc85254mr145915e9.3.1785855014652;
-        Tue, 04 Aug 2026 07:50:14 -0700 (PDT)
-Received: from google.com (63.235.189.35.bc.googleusercontent.com. [35.189.235.63])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47fec232d74sm181843f8f.17.2026.08.04.07.50.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Aug 2026 07:50:14 -0700 (PDT)
-Date: Tue, 4 Aug 2026 14:50:10 +0000
-From: Sebastian Ene <sebastianene@google.com>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: alexandru.elisei@arm.com, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	android-kvm@google.com, catalin.marinas@arm.com,
-	dbrazdil@google.com, joey.gouly@arm.com, kees@kernel.org,
-	mark.rutland@arm.com, maz@kernel.org, oupton@kernel.org,
-	perlarsen@google.com, qperret@google.com, rananta@google.com,
-	smostafa@google.com, suzuki.poulose@arm.com, tabba@google.com,
-	tglx@kernel.org, bgrzesik@google.com, will@kernel.org,
-	yuzenghui@huawei.com
-Subject: Re: [PATCH 02/14] KVM: arm64: Track host-unmapped MMIO regions in a
- static array
-Message-ID: <anH8IuRrbQV67Q4C@google.com>
-References: <20260310124933.830025-1-sebastianene@google.com>
- <20260310124933.830025-3-sebastianene@google.com>
- <acJrldyUBXgbvWw4@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l9B+Z1Kz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D7461F000E9;
+	Tue,  4 Aug 2026 14:56:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785855410;
+	bh=C1q48fQrYL7bJsKSF0hEi2xAduvpJCaR3EYBVGWzrIY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=l9B+Z1Kz0XA3yc2Yd6vQp8S6JsbWgRYeyDE+5IDcQjpEtJ4/UEHvEvq8JX8TBtlfG
+	 gJaqolVMmsRHPYy8E2XOx7SmzEqvuruHUj13hIoRlFnyqnGVby9vBy86s+cnx9jizY
+	 T6UIwzgjLMiaAAN2WE3iamAOuOPPMeeayu14bxl9vBMde9j/bGrV9Po94MiC5GVljx
+	 Pj1bU7TAx8ra/3oBCMYsgLgJPX//6LNTlh6rMXPvVFqI8Wl43Jf0eG9gmWSLFC87td
+	 xVt2JksHULyYO4gngOB0+EaUAE3/fFoESUG0HTkHoLnCpE3ThG5QDFbJv0ib9j+5DD
+	 7UbRo6KK2znxg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wrGZU-0000000CFnx-0dok;
+	Tue, 04 Aug 2026 14:56:48 +0000
+Date: Tue, 04 Aug 2026 15:56:47 +0100
+Message-ID: <86jyq6aq8g.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Karl Mehltretter <kmehltretter@gmail.com>
+Cc: Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org, grayhat@foxmail.com
+Subject: Re: [PATCH 1/2] KVM: arm64: nv: Allocate the shadow S2 MMUs individually
+In-Reply-To: <86mrv2arf2.wl-maz@kernel.org>
+References: <20260803224405.41468-1-kmehltretter@gmail.com>
+	<86mrv2arf2.wl-maz@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <acJrldyUBXgbvWw4@google.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kmehltretter@gmail.com, oupton@kernel.org, tabba@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, stable@vger.kernel.org, grayhat@foxmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Mar 24, 2026 at 10:46:45AM +0000, Vincent Donnefort wrote:
-> On Tue, Mar 10, 2026 at 12:49:21PM +0000, Sebastian Ene wrote:
-> > Introduce a registry to track protected MMIO regions that are unmapped
-> > from the host stage-2 page tables. These regions are stored in a
-> > fixed-size array and their ownership is donated to the hypervisor during
-> > initialization to ensure host-exclusion and persistent tracking.
+[+ Shen, who privately reported this with a 7 hour lead...]
+
+On Tue, 04 Aug 2026 15:31:13 +0100,
+Marc Zyngier <maz@kernel.org> wrote:
+> 
+> On Mon, 03 Aug 2026 23:44:04 +0100,
+> Karl Mehltretter <kmehltretter@gmail.com> wrote:
 > > 
-> > Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> > A vCPU in L2 caches its shadow S2 MMU in vcpu->arch.hw_mmu.
+> > kvm_vcpu_init_nested() can grow kvm->arch.nested_mmus while initialising
+> > another vCPU: it copies the MMUs, publishes the new allocation, and frees
+> > the old one.  It updates pgt->mmu back-pointers, but not hw_mmu, leaving
+> > the first vCPU with a pointer to freed memory.  hw_mmu cannot be fixed up
+> > the same way: a running vCPU reads it without holding mmu_lock.  Copying
+> > also duplicates the MMU's refcount, leaving the live copy permanently
+> > elevated.
+> > 
+> > KASAN reports this as a slab-use-after-free in kvm_handle_guest_abort().
+> > 
+> > Make nested_mmus a pointer table and allocate each MMU separately.
+> > Growing the table now moves only pointer entries, preserving cached
+> > hw_mmu pointers, pgt->mmu back-pointers, and each MMU's refcount.  Fully
+> > initialise new MMUs before publishing the table and its size under
+> > mmu_lock.
+> > 
+> > The old failure path passed uninitialised entries to
+> > kvm_free_stage2_pgd(), which needs mmu->arch.  Use an allocation helper
+> > that returns only fully initialised MMUs, so error cleanup frees only
+> > completed objects; kvm_init_stage2_mmu() unwinds a failed initialisation.
+> 
+> I like the approach, but this is making things a bit more complicated
+> than they should really be IMO.
+> 
+> >
+> > Fixes: 4f128f8e1aaa ("KVM: arm64: nv: Support multiple nested Stage-2 mmu structures")
+> > Cc: stable@vger.kernel.org
+> > Assisted-by: Claude:claude-fable-5
+> > Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
 > > ---
-> >  arch/arm64/include/asm/kvm_pkvm.h     | 10 ++++++++++
-> >  arch/arm64/kvm/hyp/nvhe/mem_protect.c |  3 +++
-> >  arch/arm64/kvm/hyp/nvhe/setup.c       | 25 +++++++++++++++++++++++++
-> >  3 files changed, 38 insertions(+)
 > > 
-> > diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
-> > index 757076ad4ec9..48ec7d519399 100644
-> > --- a/arch/arm64/include/asm/kvm_pkvm.h
-> > +++ b/arch/arm64/include/asm/kvm_pkvm.h
-> > @@ -17,6 +17,16 @@
+> > Tested on an arm64 KASAN kernel under QEMU TCG with EL2 emulation
+> > (-machine virt,virtualization=on -cpu max, kvm-arm.mode=nested): the
+> > selftest in patch 2 reports the slab-use-after-free without this patch
+> > and passes with it.
+> > 
+> >  arch/arm64/include/asm/kvm_host.h |  6 +-
+> >  arch/arm64/kvm/nested.c           | 92 +++++++++++++++++++++----------
+> >  2 files changed, 67 insertions(+), 31 deletions(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index bae2c4f92ef5..f587b01039f9 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -319,10 +319,10 @@ struct kvm_arch {
+> >  	u64 fgu[__NR_FGT_GROUP_IDS__];
 > >  
-> >  #define HYP_MEMBLOCK_REGIONS 128
+> >  	/*
+> > -	 * Stage 2 paging state for VMs with nested S2 using a virtual
+> > -	 * VMID.
+> > +	 * Stage 2 paging state for VMs with nested S2 using a virtual VMID.
+> > +	 * MMUs are individually allocated to keep their addresses stable.
+> >  	 */
+> > -	struct kvm_s2_mmu *nested_mmus;
+> > +	struct kvm_s2_mmu **nested_mmus;
+> >  	size_t nested_mmus_size;
+> >  	int nested_mmus_next;
 > >  
-> > +#define PKVM_PROTECTED_REGS_NUM	8
-> > +
-> > +struct pkvm_protected_reg {
-> > +	u64 start_pfn; 
-> > +	size_t num_pages; 
-> 
-> nit: "u64 pfn, u64 nr_pages" to align with everywhere else.
-
-Ack,
-
-> 
-> > +};
-> > +
-> > +extern struct pkvm_protected_reg kvm_nvhe_sym(pkvm_protected_regs)[];
-> > +extern unsigned int kvm_nvhe_sym(num_protected_reg);
-> > +
-> >  int pkvm_init_host_vm(struct kvm *kvm);
-> >  int pkvm_create_hyp_vm(struct kvm *kvm);
-> >  bool pkvm_hyp_vm_is_created(struct kvm *kvm);
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > index 0808367c52e5..7c125836b533 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > @@ -23,6 +23,9 @@
+> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> > index dfb96edbdc43..af804a5ddca7 100644
+> > --- a/arch/arm64/kvm/nested.c
+> > +++ b/arch/arm64/kvm/nested.c
+> > @@ -5,6 +5,7 @@
+> >   */
 > >  
-> >  struct host_mmu host_mmu;
+> >  #include <linux/bitfield.h>
+> > +#include <linux/err.h>
+> >  #include <linux/kvm.h>
+> >  #include <linux/kvm_host.h>
 > >  
-> > +struct pkvm_protected_reg pkvm_protected_regs[PKVM_PROTECTED_REGS_NUM];
-> > +unsigned int num_protected_reg;
-> > +
-> >  static struct hyp_pool host_s2_pool;
-> >  
-> >  static DEFINE_PER_CPU(struct pkvm_hyp_vm *, __current_vm);
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-> > index 90bd014e952f..ad5b96085e1b 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/setup.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-> > @@ -284,6 +284,27 @@ static int fix_hyp_pgtable_refcnt(void)
-> >  				&walker);
+> > @@ -66,11 +67,36 @@ static int init_nested_s2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
+> >  	return kvm_init_stage2_mmu(kvm, mmu, kvm_get_pa_bits(kvm));
 > >  }
 > >  
-> > +static int unmap_protected_regions(void)
+> > +static struct kvm_s2_mmu *alloc_nested_s2_mmu(struct kvm *kvm)
 > > +{
-> > +	struct pkvm_protected_reg *reg;
-> > +	int i, ret, j = 0;
+> > +	struct kvm_s2_mmu *mmu;
+> > +	int ret;
 > > +
-> > +	for (i = 0; i < num_protected_reg; i++) {
-> > +		reg = &pkvm_protected_regs[i];
-> > +		for (j = 0; j < reg->num_pages; j++) {
-> > +			ret = __pkvm_host_donate_hyp_mmio(reg->start_pfn + j);
-> 
-> If this is to make this static at boot, we don't even need __pkvm_host_donate_hyp_mmio()
-> 
-> We can just map the region early enough in the hypervisor pkvm_create_mappings()
-> in recreate_hyp_mappings() and then let fix_host_ownership() do the host
-> stage2 unmapping.
-
-
-I looked at this and tried to implement it this way as you suggest because it is more
-elegant but then I realized that `fix_host_ownership_walker` doesn't do
-well with MMIO (it returns -EINVAL).
-
-> 
-> > +			if (ret)
-> > +				goto err_setup;
-> > +		}
+> > +	mmu = kzalloc_obj(*mmu, GFP_KERNEL_ACCOUNT);
+> > +	if (!mmu)
+> > +		return ERR_PTR(-ENOMEM);
+> > +
+> > +	ret = init_nested_s2_mmu(kvm, mmu);
+> > +	if (ret) {
+> > +		/* kvm_init_stage2_mmu() frees its internal allocations on error */
+> > +		kfree(mmu);
+> > +		return ERR_PTR(ret);
 > > +	}
 > > +
-> > +	return 0;
-> > +err_setup:
-> > +	for (j = j - 1; j >= 0; j--)
-> > +		__pkvm_hyp_donate_host_mmio(reg->start_pfn + j);
-> > +	return ret;
+> > +	return mmu;
 > > +}
 > > +
-> >  void __noreturn __pkvm_init_finalise(void)
-> >  {
-> >  	struct kvm_cpu_context *host_ctxt = host_data_ptr(host_ctxt);
-> > @@ -324,6 +345,10 @@ void __noreturn __pkvm_init_finalise(void)
-> >  	if (ret)
-> >  		goto out;
-> >  
-> > +	ret = unmap_protected_regions();
-> > +	if (ret)
-> > +		goto out;
+> > +static void free_nested_s2_mmu(struct kvm_s2_mmu *mmu)
+> > +{
+> > +	kvm_free_stage2_pgd(mmu);
+> > +	kfree(mmu);
+> > +}
 > > +
-> >  	ret = hyp_ffa_init(ffa_proxy_pages);
-> >  	if (ret)
-> >  		goto out;
-> > -- 
-> > 2.53.0.473.g4a7958ca14-goog
-> > 
+> >  int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
+> >  {
+> >  	struct kvm *kvm = vcpu->kvm;
+> > -	struct kvm_s2_mmu *tmp;
+> > -	int num_mmus, ret = 0;
+> > +	struct kvm_s2_mmu **tmp;
+> > +	int i, num_mmus, ret = 0;
+> >  
+> >  	if (test_bit(KVM_ARM_VCPU_HAS_EL2_E2H0, kvm->arch.vcpu_features) &&
+> >  	    !cpus_have_final_cap(ARM64_HAS_HCR_NV1))
+> > @@ -96,38 +122,48 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
+> >  		if (!tmp)
+> >  			return -ENOMEM;
+> >  
+> > +		/*
+> > +		 * Populate new slots before publishing: table walkers hold
+> > +		 * mmu_lock and iterate up to nested_mmus_size.
+> > +		 */
+> > +		for (i = kvm->arch.nested_mmus_size; i < num_mmus; i++) {
+> > +			struct kvm_s2_mmu *mmu = alloc_nested_s2_mmu(kvm);
+> > +
+> > +			if (IS_ERR(mmu)) {
+> > +				ret = PTR_ERR(mmu);
+> > +				break;
+> > +			}
+> > +
+> > +			tmp[i] = mmu;
+> > +		}
+> 
+> You now are allocating each s2_mmu individually. But you know you want
+> at most S2_MMU_PER_VCPU structures, and not any extra ones. So you
+> could allocate one block for the current vcpu, and let the next guy
+> allocate its own quota.
+> 
+> The other thing is that reallocating the pointer array isn't great. It
+> adds complexity, and makes everything more fragile than it should be.
+> 
+> See the hack below that seems to work OK.
+> 
+> 	M.
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 81d359ac7af14..65a1305c4a749 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -321,7 +321,7 @@ struct kvm_arch {
+>  	 * Stage 2 paging state for VMs with nested S2 using a virtual
+>  	 * VMID.
+>  	 */
+> -	struct kvm_s2_mmu *nested_mmus;
+> +	struct kvm_s2_mmu **nested_mmus;
+>  	size_t nested_mmus_size;
+>  	int nested_mmus_next;
+>  
+> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+> index 012d711034d17..d21be647ac571 100644
+> --- a/arch/arm64/include/asm/kvm_nested.h
+> +++ b/arch/arm64/include/asm/kvm_nested.h
+> @@ -66,7 +66,7 @@ static inline u64 translate_ttbr0_el2_to_ttbr0_el1(u64 ttbr0)
+>  
+>  extern bool forward_smc_trap(struct kvm_vcpu *vcpu);
+>  extern bool forward_debug_exception(struct kvm_vcpu *vcpu);
+> -extern void kvm_init_nested(struct kvm *kvm);
+> +extern int kvm_init_nested(struct kvm *kvm);
+>  extern int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu);
+>  extern void kvm_init_nested_s2_mmu(struct kvm_s2_mmu *mmu);
+>  extern struct kvm_s2_mmu *lookup_s2_mmu(struct kvm_vcpu *vcpu);
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 9a6c72a186727..ae27ccc37b330 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -236,7 +236,9 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>  	mutex_unlock(&kvm->lock);
+>  #endif
+>  
+> -	kvm_init_nested(kvm);
+> +	ret = kvm_init_nested(kvm);
+> +	if (ret)
+> +		return ret;
+>  
+>  	ret = kvm_share_hyp(kvm, kvm + 1);
+>  	if (ret)
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index dfb96edbdc43c..e7a066a41b552 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -44,11 +44,15 @@ struct vncr_tlb {
+>   */
+>  #define S2_MMU_PER_VCPU		2
+>  
+> -void kvm_init_nested(struct kvm *kvm)
+> +int kvm_init_nested(struct kvm *kvm)
+>  {
+> -	kvm->arch.nested_mmus = NULL;
+> +	kvm->arch.nested_mmus = kvmalloc_array(KVM_MAX_VCPUS * S2_MMU_PER_VCPU,
+> +					       sizeof(struct s2_mmu *),
+> +					       GFP_KERNEL_ACCOUNT);
+>  	kvm->arch.nested_mmus_size = 0;
+>  	atomic_set(&kvm->arch.vncr_map_count, 0);
+> +
+> +	return kvm->arch.nested_mmus ? 0 : -ENOMEM;
+>  }
+>  
+>  static int init_nested_s2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
+> @@ -69,8 +73,7 @@ static int init_nested_s2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
+>  int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm *kvm = vcpu->kvm;
+> -	struct kvm_s2_mmu *tmp;
+> -	int num_mmus, ret = 0;
+> +	int num_mmus;
+>  
+>  	if (test_bit(KVM_ARM_VCPU_HAS_EL2_E2H0, kvm->arch.vcpu_features) &&
+>  	    !cpus_have_final_cap(ARM64_HAS_HCR_NV1))
+> @@ -92,42 +95,34 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
+>  	num_mmus = atomic_read(&kvm->online_vcpus) * S2_MMU_PER_VCPU;
+>  
+>  	if (num_mmus > kvm->arch.nested_mmus_size) {
+> -		tmp = kvcalloc(num_mmus, sizeof(*tmp), GFP_KERNEL_ACCOUNT);
+> +		struct kvm_s2_mmu *tmp;
+> +		int ret = 0;
+> +
+> +		tmp = kvcalloc(S2_MMU_PER_VCPU, sizeof(*tmp), GFP_KERNEL_ACCOUNT);
+>  		if (!tmp)
+>  			return -ENOMEM;
+>  
+> -		write_lock(&kvm->mmu_lock);
+> +		for (int i = 0; !ret && i < S2_MMU_PER_VCPU; i++)
+> +			ret = init_nested_s2_mmu(kvm, &tmp[i]);
+>  
+> -		if (kvm->arch.nested_mmus_size) {
+> -			memcpy(tmp, kvm->arch.nested_mmus,
+> -			       size_mul(sizeof(*tmp), kvm->arch.nested_mmus_size));
+> +		if (ret) {
+> +			for (int i = 0; i < S2_MMU_PER_VCPU; i++)
+> +				kvm_free_stage2_pgd(&tmp[i]);
+>  
+> -			for (int i = 0; i < kvm->arch.nested_mmus_size; i++)
+> -				tmp[i].pgt->mmu = &tmp[i];
+> +			kvfree(tmp);
+> +			free_page((unsigned long)vcpu->arch.ctxt.vncr_array);
+> +			vcpu->arch.ctxt.vncr_array = NULL;
+> +			return ret;
+>  		}
+> +		
+> +		guard(write_lock)(&kvm->mmu_lock);
+>  
+> -		swap(kvm->arch.nested_mmus, tmp);
+> +		for (int i = 0; i < S2_MMU_PER_VCPU; i++)
+> +			kvm->arch.nested_mmus[i + kvm->arch.nested_mmus_size] = &tmp[i];
+>  
+> -		write_unlock(&kvm->mmu_lock);
+> -
+> -		kvfree(tmp);
+> +		kvm->arch.nested_mmus_size += S2_MMU_PER_VCPU;
+>  	}
+>  
+> -	for (int i = kvm->arch.nested_mmus_size; !ret && i < num_mmus; i++)
+> -		ret = init_nested_s2_mmu(kvm, &kvm->arch.nested_mmus[i]);
+> -
+> -	if (ret) {
+> -		for (int i = kvm->arch.nested_mmus_size; i < num_mmus; i++)
+> -			kvm_free_stage2_pgd(&kvm->arch.nested_mmus[i]);
+> -
+> -		free_page((unsigned long)vcpu->arch.ctxt.vncr_array);
+> -		vcpu->arch.ctxt.vncr_array = NULL;
+> -
+> -		return ret;
+> -	}
+> -
+> -	kvm->arch.nested_mmus_size = num_mmus;
+> -
+>  	return 0;
+>  }
+>  
+> @@ -725,7 +720,7 @@ void kvm_s2_mmu_iterate_by_vmid(struct kvm *kvm, u16 vmid,
+>  	write_lock(&kvm->mmu_lock);
+>  
+>  	for (int i = 0; i < kvm->arch.nested_mmus_size; i++) {
+> -		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+> +		struct kvm_s2_mmu *mmu = kvm->arch.nested_mmus[i];
+>  
+>  		if (!kvm_s2_mmu_valid(mmu))
+>  			continue;
+> @@ -767,7 +762,7 @@ struct kvm_s2_mmu *lookup_s2_mmu(struct kvm_vcpu *vcpu)
+>  	 *   if S2 translation is disabled.
+>  	 */
+>  	for (int i = 0; i < kvm->arch.nested_mmus_size; i++) {
+> -		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+> +		struct kvm_s2_mmu *mmu = kvm->arch.nested_mmus[i];
+>  
+>  		if (!kvm_s2_mmu_valid(mmu))
+>  			continue;
+> @@ -806,7 +801,7 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
+>  	for (i = kvm->arch.nested_mmus_next;
+>  	     i < (kvm->arch.nested_mmus_size + kvm->arch.nested_mmus_next);
+>  	     i++) {
+> -		s2_mmu = &kvm->arch.nested_mmus[i % kvm->arch.nested_mmus_size];
+> +		s2_mmu = kvm->arch.nested_mmus[i % kvm->arch.nested_mmus_size];
+>  
+>  		if (atomic_read(&s2_mmu->refcnt) == 0)
+>  			break;
+> @@ -1223,7 +1218,7 @@ void kvm_nested_s2_wp(struct kvm *kvm)
+>  		return;
+>  
+>  	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
+> -		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+> +		struct kvm_s2_mmu *mmu = kvm->arch.nested_mmus[i];
+>  
+>  		if (kvm_s2_mmu_valid(mmu))
+>  			kvm_stage2_wp_range(mmu, 0, kvm_phys_size(mmu));
+> @@ -1242,7 +1237,7 @@ void kvm_nested_s2_unmap(struct kvm *kvm, bool may_block)
+>  		return;
+>  
+>  	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
+> -		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+> +		struct kvm_s2_mmu *mmu = kvm->arch.nested_mmus[i];
+>  
+>  		if (kvm_s2_mmu_valid(mmu))
+>  			kvm_stage2_unmap_range(mmu, 0, kvm_phys_size(mmu), may_block);
+> @@ -1261,7 +1256,7 @@ void kvm_nested_s2_flush(struct kvm *kvm)
+>  		return;
+>  
+>  	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
+> -		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+> +		struct kvm_s2_mmu *mmu = kvm->arch.nested_mmus[i];
+>  
+>  		if (kvm_s2_mmu_valid(mmu))
+>  			kvm_stage2_flush_range(mmu, 0, kvm_phys_size(mmu));
+> @@ -1270,13 +1265,14 @@ void kvm_nested_s2_flush(struct kvm *kvm)
+>  
+>  void kvm_arch_flush_shadow_all(struct kvm *kvm)
+>  {
+> -	int i;
+> -
+> -	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
+> -		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+> +	for (int i = kvm->arch.nested_mmus_size - 1; i >= 0; i--) {
+> +		struct kvm_s2_mmu *mmu = kvm->arch.nested_mmus[i];
+>  
+>  		if (!WARN_ON(atomic_read(&mmu->refcnt)))
+>  			kvm_free_stage2_pgd(mmu);
+> +
+> +		if ((i % S2_MMU_PER_VCPU) == 0)
+> +			kvfree(mmu);
+>  	}
+>  	kvfree(kvm->arch.nested_mmus);
+>  	kvm->arch.nested_mmus = NULL;
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
 
-Thanks Sebastian
+-- 
+Without deviation from the norm, progress is not possible.
