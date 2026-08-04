@@ -1,32 +1,32 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B02D745C6FC
-	for <kvmarm@lists.linux.dev>; Tue,  4 Aug 2026 11:03:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE4A143933F
+	for <kvmarm@lists.linux.dev>; Tue,  4 Aug 2026 11:10:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785841421; cv=none; b=NBawrqqVXUR63cbfPM4BQ4QFj6K+gpzU6Moe0i49JyNn+ELgKqFYr2Jdk+sYWRAHGpTx1avt3FfFzfHwy+Ja/df7ycnTP+gKhJSPP5FbWw1IxSkXVkTJVAm3d7168yGjsbfEiyk5JehDoaBJp/Ujqjru1Y9ns9UbDJmiL2s3hq0=
+	t=1785841807; cv=none; b=A8ubHHgVl+u1EltK+sArFXAo5EttjfWmFv0M9ZK5Ay3b2GTVKpDajb2Asm1VxTgSQKK97rTZlXw+9P36xAvwuhIxYeT8oKhvagTm7puTsIGHQ1u9wc/Hsi67ExKsE4oKnN83HiZPQ81G9OUzM0amWXCCGtAKxUCWUq+Cd3GVkEg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785841421; c=relaxed/simple;
-	bh=SgwKNbrHwnJpm25FFSsLsZaT69eqYUN0KvJYoY0Fzy4=;
+	s=arc-20240116; t=1785841807; c=relaxed/simple;
+	bh=b6Ze859gC7l30dPLruPru3YqgKlfkIEHUkYWKtb4HJM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L6uD6dNr3S6dGGurSN8v3icdnoCRE9jLeKGPJDZQK9id5nhwTzcOrpFNPrkjpmY21l8Q3/lCzou0ouC14Aa954bJIbMlHneOJTO72CeYAe904AJjoKMqOastiX9SkuYeiLWDKZV9QwLUnNaFsE3yyE1272s3zr7/Gx9bR52Abrc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=qRebEx96; arc=none smtp.client-ip=217.140.110.172
+	 Content-Type:Content-Disposition:In-Reply-To; b=gk6cLVQyfwS9Cgt32l1tNxy/DEnx6ihGMiVTwRl1NNngyP/MJBta6xu8tNPHYnlRjwPNHtfQYqiqp+nmo5g5Em4nhO6bA2G8jAfC5ddekbouByCD4YJH1Iqg6KWMoriEgbZxA9UYvv3MWYC0lVM4Hmy5pUlM+PPEf+3++XkBOFA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=TOMy610+; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="qRebEx96"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="TOMy610+"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F07FC1476;
-	Tue,  4 Aug 2026 04:03:33 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9174D1476;
+	Tue,  4 Aug 2026 04:09:57 -0700 (PDT)
 Received: from e143914.arm.com (e143914.arm.com [10.2.213.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B24D73F86F;
-	Tue,  4 Aug 2026 04:03:36 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 823313F86F;
+	Tue,  4 Aug 2026 04:09:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1785841418; bh=SgwKNbrHwnJpm25FFSsLsZaT69eqYUN0KvJYoY0Fzy4=;
+	t=1785841801; bh=b6Ze859gC7l30dPLruPru3YqgKlfkIEHUkYWKtb4HJM=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qRebEx96D8hhZCIoA1J28U6rLx5SB6DovYNS+PGVRnflpvzd65/a14xsPAviWomTg
-	 m+JySxGpMSekcX0g44GbqzPVSHg1CgkOwOUI5G019CiP0/HYCBSUyygMagnb+BsAu2
-	 +fInVuN8xI1q5hlpZ/nmcfU+AO4uXhTNpmmGD4lA=
-Date: Tue, 4 Aug 2026 12:03:31 +0100
+	b=TOMy610+Vqt6+m+Hvu3l+Z6VbEUC1b7NtZkN3G+hqPSqoLvZRkltTHX4M5VnQLzzU
+	 QPEjODrCqA6gjaCYBdGW4OAzmBx4bDVRL2EDYGVbHQNN5aFdqpC65aJ0aYQMi4MBdq
+	 pFOeqhLUkeCYG0HExALdBtwGVla6iYzJrvZuzvMQ=
+Date: Tue, 4 Aug 2026 12:09:56 +0100
 From: Joey Gouly <joey.gouly@arm.com>
 To: Marc Zyngier <maz@kernel.org>
 Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
@@ -37,7 +37,7 @@ Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
 	Hyunwoo Kim <imv4bel@gmail.com>, stable@vger.kernel.org
 Subject: Re: [PATCH 3/6] KVM: arm64: Consider SCTLR_EL2.M when mapping the L1
  VNCR page
-Message-ID: <anHHA9Fj3be5ndmB@e143914.arm.com>
+Message-ID: <anHIhHS6INKZLnrZ@e143914.arm.com>
 References: <20260801124818.366274-1-maz@kernel.org>
  <20260801124818.366274-4-maz@kernel.org>
 Precedence: bulk
@@ -50,9 +50,7 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20260801124818.366274-4-maz@kernel.org>
 
-Hi Marc,
-
-Two small comments/suggestions.
+Another thing I forgot..
 
 On Sat, Aug 01, 2026 at 01:48:15PM +0100, Marc Zyngier wrote:
 > We record a VNCR TLB even when SCTLR_EL2.M is 0 in order to make
@@ -71,13 +69,6 @@ On Sat, Aug 01, 2026 at 01:48:15PM +0100, Marc Zyngier wrote:
 > Instead, use the fact that the S1 MMU being off at the point of
 > translation is cached in our TLB, and simply ignore it if it
 > doesn't match the current MMU state.
-
-Could you expand/change this a little, something like:
-	
-	Instead, use the fact that the S1 MMU being off at the point of
-	translation is cached in our VNCR TLB, and if it doesn't match
-	the current MMU state, leave the VNCR unmapped.
-
 > 
 > Fixes: 2a359e072596f ("KVM: arm64: nv: Handle mapping of VNCR_EL2 at EL2")
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
@@ -137,18 +128,8 @@ Could you expand/change this a little, something like:
 > +	if (!(vcpu_read_sys_reg(vcpu, SCTLR_EL2) & SCTLR_ELx_M) != s1_mmu_disabled(&vt->wr))
 > +		return;
 
-A comment here would also be useful for future archaeology (also current
-reading since the !( .. != ) code is confusing).
-
-Or maybe:
-
-	bool mmu_disabled_sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL2) & SCTLR_ELx_M) == 0;
-	if (mmu_disabled_sctlr != s1_mmu_disabled(&vt->wr)) 
-
-> +
->  	if (read_vncr_el2(vcpu) != vt->gva)
->  		return;
->  
+Another thing, should we set valid=false? (Haven't really looked into
+what that implies..)
 
 Thanks,
 Joey
