@@ -1,82 +1,155 @@
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F34944582D4
-	for <kvmarm@lists.linux.dev>; Tue,  4 Aug 2026 08:50:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3307C43BDAC;
+	Tue,  4 Aug 2026 08:57:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785833460; cv=none; b=COlOVUdzjbmhwhgrrH3HH6ZxvLA4f78eUFASRMhTauZIeW9SMU3SvC20UtGZ+XKtyEUcBXTHUcVuzrRF6MoF8UEHill73x0Ri3eEqUzRrEWUkP0g+SzG5Fpp3d7rtMFZxTJZMOB8n2EBtrVgmWaE6fOI1w4HZVB+CMk/rlcl0/M=
+	t=1785833834; cv=none; b=i9Xq/2Wj0sXCXMRb46DbE7494Sr5Is+fSczGagxSJx9a1bgc33KZm4GdB/QOS6RLhMUkx41EIOd6I8zn4RENBCMDvL1o41Is6zJaIWG/Ek7V4cwgrakyEUJRJl/+xLbT0vPmrH6OtZwk8WruXhW0GHpxc4QzpVP+QIWyOzEWFcw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785833460; c=relaxed/simple;
-	bh=dizy8BMrb1EtFWw195sX+m69N2yVavalVSh186iyFhA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WRdB4VGvH9AxtnwXfHIzT7SX+aeQRjdaAns9v8m4RB53fzjpQt0qA3sNHkLKH0XNeBXvLjMDQuwFgqGCKbBUCbtoPyrPP0eqaBzzJAOsVGEQv3xLLyC5pt0KnAKQnVv5yMtL7wuGOhNKt8uUOb+wHufv0r1x3nAIrUN/wl3AB7w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uZBcMf8p; arc=none smtp.client-ip=91.218.175.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1785833834; c=relaxed/simple;
+	bh=EWmgbJlVXftcAZw8ONc8X9BQ1H09O3p9MgB5FgvLadc=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=jiipUW5ugDI008w0jlvAziF/EPyAC9ueH0HE/1ciom9OVgGQM/fL8xSSl1wF9SkA83JDhfLdEgr1K0McQ8cZ0jvWJ+z2vu2YpAWgAfMArbc+37+GZMKlcPCDfM2wg56rvnFbOlrgRPPnwljb19KLWpdI6zni2Vr6dDnGldehUHI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UT90DsPz; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uZBcMf8p"
-X-Forwarded-Encrypted: i=1; AHgh+RrSuePhi6Zs0MH9msElP+ZNR172VHhRYsHB5Bdhh6JlJiGxWJ7XWwR4OKUDA1z7oehh6IUGDKc=@lists.linux.dev
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1785833455;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LEo++tWNX66vRUCbHgrcE/DoABgbXtbHvpdUx5myUAQ=;
-	b=uZBcMf8pxB7aonO73GvtKwM+XOpDHWQz7Xk8UeDlTUbJwvKHTwaYnaBNw/1KNRQHXYHlLO
-	h0Ayityk3JJmn3/Y0NB7dEvNyU8w1n0zagRd+S30XdzGfyVqTcwSa3Ipm14/CSV9U7gQJG
-	9YBoEOIs4HuwrR/a7QJOw4nEgTLkO9M=
-X-Gm-Message-State: AOJu0Yz+z8rPZaVmFjH+MRTAz4rJauz2cG04h32UnfzLXqEQst3NPbMI
-	SJe46Ql6Q0h4MnMVTHu3hvCehTAgyCMY2YRuKM39icxWqI3+eUStOm3g9tigqrE4E7fXj5+ilAs
-	C8QVnoWl5c99NWX+nloNdF80L9duciVSofDJBLdg8
-X-Received: by 2002:a05:622a:1649:b0:528:38d6:71b4 with SMTP id
- d75a77b69052e-52cd5150f2cmr10989531cf.11.1785833444348; Tue, 04 Aug 2026
- 01:50:44 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UT90DsPz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28E3A1F000E9;
+	Tue,  4 Aug 2026 08:57:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785833832;
+	bh=xxS0NRBY3i0kZcuHxe0V5BgtVYZZ3/0KR07GPgwzac4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date;
+	b=UT90DsPzrSuia1XzFFet3nOueTooswWOFwwvIVVUp4i31U91QcZdNkPS7wDN44WfZ
+	 5SW8BtiDJsI6Fx9pak/IUmX5Z2J+CsBdP8wwjY3f2mQUM4eQIABFyJaXxGJhayR1gn
+	 U5R+0MEmOP50TZcTUR7p1eCgQVGCvP9a8smRHHuChY1zUBlFlrNOJSODIP4Z9/TPfi
+	 uBn3/pDxKsMyP6756Kk1ACB4f53ti49Pq6U7ezDbTVRR4O1TOTd6/BFPY6zByPR6tj
+	 IFWmH0hMFRtARMPxU/r8zriH6wy2JEQQcyViZK2NO2uukW7vthHJI/O6clzH5elLoU
+	 7Nyp9EMGnWMEA==
+X-Mailer: emacs 30.2 (via feedmail 11-beta-1 I)
+From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Cc: Steven Price <steven.price@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>,
+	Emi Kisanuki <fj0570is@fujitsu.com>,
+	Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>
+Subject: Re: [PATCH v16 21/45] KVM: arm64: CCA: Handle realm enter/exit
+In-Reply-To: <20260803134403.80630-22-steven.price@arm.com>
+References: <20260803134403.80630-1-steven.price@arm.com>
+ <20260803134403.80630-22-steven.price@arm.com>
+Date: Tue, 04 Aug 2026 14:27:03 +0530
+Message-ID: <yq5a5x1q461s.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260803124220.332248-1-fuad.tabba@linux.dev> <20260803124220.332248-11-fuad.tabba@linux.dev>
- <86qzkfaxp9.wl-maz@kernel.org> <CA+EHjTw1=xCPugZrmQ3nj1ddvCZ=vcZT3=KO_FMHB1USUTu7kA@mail.gmail.com>
- <86pkzyb7bn.wl-maz@kernel.org>
-In-Reply-To: <86pkzyb7bn.wl-maz@kernel.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Tue, 4 Aug 2026 09:50:07 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTyY+8-Cv1=dHg=4fbmOjtvA6+aY4yqV5uY2ev=uGJHEKQ@mail.gmail.com>
-X-Gm-Features: AUfX_mxuF3k7WlOHdukcbNyPC8gFg_R9mHxire5WFqvzPcz3vuSQrFTruIYyFdQ
-Message-ID: <CA+EHjTyY+8-Cv1=dHg=4fbmOjtvA6+aY4yqV5uY2ev=uGJHEKQ@mail.gmail.com>
-Subject: Re: [PATCH v2 10/11] KVM: arm64: nVHE: Check hypercall handlers
- against the declared ABI
-To: Marc Zyngier <maz@kernel.org>
-Cc: oupton@kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, 
-	rostedt@goodmis.org, mhiramat@kernel.org, alexandru.elisei@arm.com, 
-	vdonnefort@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, qperret@google.com, 
-	ardb@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain
 
-Hi Marc,
+Steven Price <steven.price@arm.com> writes:
 
-On Tue, 4 Aug 2026 at 09:47, Marc Zyngier <maz@kernel.org> wrote:
-> > I'm happy to respin with both of these, or would you like to fold them in?
->
-> Oliver is in charge of 7.3, so I'll let him reply on this.
+> +	switch (rec->run->exit.exit_reason) {
+> +	case RMI_EXIT_SYNC:
+> +		/*
+> +		 * HPFAR_EL2_NS is hijacked to indicate a valid HPFAR value,
+> +		 * see __get_fault_info()
+> +		 */
+> +		vcpu->arch.fault.hpfar_el2 = rec->run->exit.hpfar | HPFAR_EL2_NS;
+> +		rec_exit_sync(vcpu);
+> +		return ARM_EXCEPTION_TRAP;
+> +	case RMI_EXIT_IRQ:
+> +	case RMI_EXIT_FIQ:
+> +		return ARM_EXCEPTION_IRQ;
+> +	case RMI_EXIT_SERROR:
+> +		return ARM_EXCEPTION_EL1_SERROR;
+> +	case RMI_EXIT_PSCI:
+> +		rec_exit_hvc(vcpu);
+> +		kvm_make_request(KVM_REQ_RMI, vcpu);
+> +		return ARM_EXCEPTION_TRAP;
+> +	case RMI_EXIT_RIPAS_CHANGE:
+> +		rec_exit_hvc(vcpu);
+> +		return ARM_EXCEPTION_TRAP;
+> +	}
 
-I'll respin in that case, make life easier for Oliver, since he
-doesn't have them applied and they do conflict slightly with patch 11.
+Should we handle RMI_EXIT_RIPAS_CHANGE differently? Currently, the call path is:
 
-Cheers,
-/fuad
+kvm_rec_exit()
+-> RMI_EXIT_RIPAS_CHANGE
+-> handle_hvc()
+-> kvm_rec_handle_hvc()
+-> kvm_prepare_memory_fault_exit()
 
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+Could we instead treat RMI_EXIT_RIPAS_CHANGE as a special case and avoid
+redirecting it through handle_hvc()? The completion part of the RIPAS
+change could still be handled by kvm_rec_handle_request().
+
+
+-bool kvm_rec_handle_hvc(struct kvm_vcpu *vcpu, int *ret)
++static int rec_exit_ripas_change(struct kvm_vcpu *vcpu)
+ {
+-	struct realm_rec *rec;
++	struct realm_rec *rec = &vcpu->arch.rec;
+ 	struct realm *realm;
+ 	unsigned long base;
+ 	unsigned long ripas;
+ 	unsigned long top;
+ 
+-	if (!vcpu_is_rec(vcpu))
+-		return false;
+-
+-	rec = &vcpu->arch.rec;
+-	if (rec->run->exit.exit_reason != RMI_EXIT_RIPAS_CHANGE)
+-		return false;
+-
+ 	realm = &vcpu->kvm->arch.realm;
+ 	base = rec->run->exit.ripas_base;
+ 	top = rec->run->exit.ripas_top;
+@@ -89,8 +83,7 @@ bool kvm_rec_handle_hvc(struct kvm_vcpu *vcpu, int *ret)
+ 			 base, top, ripas);
+ 		/* Set RMI_REJECT bit */
+ 		rec->run->enter.flags = REC_ENTER_FLAG_RIPAS_RESPONSE;
+-		*ret = -EINVAL;
+-		return true;
++		return -EINVAL;
+ 	}
+ 
+ 	/* Exit to VMM, the actual RIPAS change is done on next entry */
+@@ -102,8 +95,7 @@ bool kvm_rec_handle_hvc(struct kvm_vcpu *vcpu, int *ret)
+ 	 * KVM_EXIT_MEMORY_FAULT requires a return code of -EFAULT, see the
+ 	 * API documentation
+ 	 */
+-	*ret = -EFAULT;
+-	return true;
++	return -EFAULT;
+ }
+ 
+ int kvm_rec_exit(struct kvm_vcpu *vcpu, int rec_run_ret)
+@@ -169,8 +161,7 @@ int kvm_rec_exit(struct kvm_vcpu *vcpu, int rec_run_ret)
+ 		kvm_make_request(KVM_REQ_RMI, vcpu);
+ 		return ARM_EXCEPTION_TRAP;
+ 	case RMI_EXIT_RIPAS_CHANGE:
+-		rec_exit_hvc(vcpu);
+-		return ARM_EXCEPTION_TRAP;
++		return rec_exit_ripas_change(vcpu);
+ 	}
+ 
+ 	return rec_exit_fatal(vcpu, "Unsupported Realm exit reason",
+
+-aneesh
