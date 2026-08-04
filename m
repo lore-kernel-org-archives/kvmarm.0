@@ -1,324 +1,221 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08D4043933F
-	for <kvmarm@lists.linux.dev>; Tue,  4 Aug 2026 11:10:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from out-160.mta1.migadu.com (out-160.mta1.migadu.com [95.215.58.160])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7808730C174
+	for <kvmarm@lists.linux.dev>; Tue,  4 Aug 2026 11:23:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.160
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785841834; cv=none; b=B6mX6pe2giyHbZjywe9SPCJGfQ6PBop3gld6JB/sFbvN7NPav/XFE5NsLThLfBiujjLG2fWKS1YrZLLjZS8KJn5b8FG67tLlh96tnZBSuFV7H+GhWkFxxeuWJ31hqvOccvemdYue0Nf+UvIp1M5MEpzJE1J8zKRwpMQHVV4IE+g=
+	t=1785842633; cv=none; b=JfgeYI9muaSXcbLejpdrvMyXzP5fU45VXUZT9mQXtbFz9ZbhYbI6Ls2BpHMz0THw4/1aG0c7WpMXu4SEfN6pBJ67PBiMPaxqF6cN6XyDvvh4JIFMvt0CgrqjIoUyxAScgOx5Yr8j1vPEO83gRnQm9SDZsemGH0af1QjNQRnWkgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785841834; c=relaxed/simple;
-	bh=NHhJK2GZkZ6Y3Eu4wvHloJfnZ9V+irFQ5Bozhf+eAWk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=DxX2IAD0o/ajdSBzqAm+J2kpuDGQiq+HVAsi446pNoc7HA+bK5BUOcRNdCtncuiKiqnqrJSJ7cLLwzN37KyPVpVp/ooSh4eMXw7OYJX8FQy9w/PugpaTpZDraV7+boJ7HwAd8k+R9g9mO7nHVfy7YGq/V361G9MqpeEMPwHJOWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=P9KgA+qW; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1785842633; c=relaxed/simple;
+	bh=lJJoVSRiLEjz2YAZEXncou1nmQy1T2SeJUG69m++C2Y=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=KzsmY9/PX74JIFX9LdRg3VOACLk59Mlf1kfcPvfRz2dRnzYUhf9aX5QxoC6rt78b+D+m/c3n1/ekxI3A4S4pBEJY0aVmm0wqj/2HQKud2kPzZARKkHFodG7WEgrT7ZqwL0UGynLO3mxq8jx6XNwk5G8+AI+qmdmDc3humk8DQv8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mFaN+4Jv; arc=none smtp.client-ip=95.215.58.160
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="P9KgA+qW"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2FF251476;
-	Tue,  4 Aug 2026 04:10:27 -0700 (PDT)
-Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 20B393F86F;
-	Tue,  4 Aug 2026 04:10:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1785841831; bh=NHhJK2GZkZ6Y3Eu4wvHloJfnZ9V+irFQ5Bozhf+eAWk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=P9KgA+qWC4Yi5WBz2uwkiit9tjV0uC03QxdRKgY7h3ObwpTx9+LYlj6YMbj0+4J8k
-	 cMbe+vVEneA2rRcRfgOqA0GC6Sqw3jD406CzoRQw6hCPhc8LrOFpUyyxgTOotRMpsa
-	 gQE+oO4botg2jye0r+BiieYtAlvF/kqzyQj15XZI=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Tian Zheng <zhengtian10@huawei.com>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	maz@kernel.org,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	yuzenghui@huawei.com,
-	wangzhou1@hisilicon.com,
-	yangjinqian1@huawei.com,
-	caijian11@h-partners.com,
-	liuyonglong@huawei.com,
-	yezhenyu2@huawei.com,
-	yubihong@huawei.com,
-	linuxarm@huawei.com,
-	joey.gouly@arm.com,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mFaN+4Jv"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1785842628;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=A6MV3T54jpp6pfa17f4P4YF6liSBRRpPBO9a2ATS4OQ=;
+	b=mFaN+4JvKjSt50Gd0rfBo+esdoDIOyEYlLsi+PNeHONIvBKPQHIMQEZX2xPNt0TYq6OJ7u
+	3zBf1TflXe2CYA3dpI71hfmyZxCZGAFxK71fNlh02VpYindYZkQxJf0zIbiGQyrbBNPCu0
+	VD44g+xuaumHr2y8Q3bOAYmsbXtSbpw=
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: maz@kernel.org,
+	oupton@kernel.org,
 	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Cc: catalin.marinas@arm.com,
+	will@kernel.org,
+	rostedt@goodmis.org,
+	mhiramat@kernel.org,
+	alexandru.elisei@arm.com,
+	vdonnefort@google.com,
+	joey.gouly@arm.com,
 	seiden@linux.ibm.com,
-	suzuki.poulose@arm.com
-Subject: Re: [PATCH v4 3/6] KVM: arm64: Add auto DBM support for hardware dirty tracking
-Date: Tue,  4 Aug 2026 12:10:25 +0100
-Message-ID: <anHIa5PDnF7r9EA4@LeoBrasDK>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <2070002d-94aa-4a5b-8df1-e8e0f0fd265c@huawei.com>
-References: <alpIfIOFfrudBzD5@LeoBrasDK> <al4bYajWE-v6wofu@LeoBrasDK> <96516762-f004-4c2a-a9c6-6fbad49ad6ae@huawei.com> <amoZY8uGLf1PEpjK@LeoBrasDK> <8e36e2c8-587f-4228-ab13-d6783927a281@huawei.com> <45d76d0d-48e9-46a6-b1f9-691f840eba46@huawei.com> <anBrvILpcSFhW7Wg@LeoBrasDK> <95f1ebd4-be04-4684-be68-388f752a1379@huawei.com> <anDCno9HdVI5UAls@LeoBrasDK> <2070002d-94aa-4a5b-8df1-e8e0f0fd265c@huawei.com>
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	qperret@google.com,
+	ardb@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org,
+	tabba@google.com,
+	fuad.tabba@linux.dev
+Subject: [PATCH v3 00/11] KVM: arm64: Restore type-checking across the host/hyp hypercall boundary
+Date: Tue,  4 Aug 2026 12:23:06 +0100
+Message-Id: <20260804112317.1937387-1-fuad.tabba@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Aug 04, 2026 at 12:54:16PM +0800, Tian Zheng wrote:
-> 
-> 
-> On 8/4/2026 12:32 AM, Leonardo Bras wrote:
-> > On Mon, Aug 03, 2026 at 09:57:46PM +0800, Tian Zheng wrote:
-> > > 
-> > > 
-> > > On 8/3/2026 6:21 PM, Leonardo Bras wrote:
-> > > > On Mon, Aug 03, 2026 at 12:04:24PM +0800, Tian Zheng wrote:
-> > > > > 
-> > > > > 
-> > > > > On 8/3/2026 9:33 AM, Tian Zheng wrote:
-> > > > > > > > > > > > 09, 2026 at 06:40:23PM +0800, Tian Zheng wrote:
-> > > > > > > > > > > > > -    if (prot & KVM_PGTABLE_PROT_W)
-> > > > > > > > > > > > > +    if (prot & KVM_PGTABLE_PROT_W) {
-> > > > > > > > > > > > >               set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
-> > > > > > > > > > > > > 
-> > > > > > > > > > > > > +        /*
-> > > > > > > > > > > > > +         * No DEVICE filter needed here:
-> > > > > > > > > > > > > relax_perms is only called
-> > > > > > > > > > > > > +         * on FSC_PERM faults. Device pages
-> > > > > > > > > > > > > always get full RW from
-> > > > > > > > > > > > > +         * initial mapping and are never write-protected during
-> > > > > > > > > > > > > +         * migration, so they never trigger a permission fault.
-> > > > > > > > > > > > > +         */
-> > > > > > > > > > > > > +        if (pgt->flags & KVM_PGTABLE_S2_DBM)
-> > > > > > > > > > > > > +            set |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
-> > > > > > > > > > > > > +    } else {
-> > > > > > > > > > > > > +        /*
-> > > > > > > > > > > > > +         * Clear DBM on W→RO downgrade to prevent hardware from
-> > > > > > > > > > > > > +         * silently upgrading RO+DBM back to W+dirty, which would
-> > > > > > > > > > > > > +         * bypass KVM's write tracking and cause data corruption.
-> > > > > > > > > > > > > +         */
-> > > > > > > > > > > > > +        clr |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
-> > > > > > > > > > > > > +    }
-> > > > > > > > > > > > > +
-> > > > > > > > > > > > This block makes it pretty evident that the DBM bit really *is* the
-> > > > > > > > > > > > write permission bit. I'd much rather we
-> > > > > > > > > > > > introduce the concept of dirty
-> > > > > > > > > > > > state to the page table library and migrate the abstract write
-> > > > > > > > > > > > permission to the DBM field, even if we don't have FEAT_HAFDBS.
-> > > > > > > > > > > > 
-> > > > > > > > > > 
-> > > > > > > > > > Ohh, that's an amazing idea!
-> > > > > > > > > 
-> > > > > > > > > Thinking about that again...
-> > > > > > > > > If we adopt the encoding with DBM being the write-permission
-> > > > > > > > > bit, and all
-> > > > > > > > > PTEs have it since the start, how can we have lazy-splitting happening?
-> > > > > > > > > 
-> > > > > > > > > Only way I think of is removing both DBM and S2_S2AP_W bit
-> > > > > > > > > from writable
-> > > > > > > > > PTEs during dirty-track enable, and re-adding them during
-> > > > > > > > > the first write
-> > > > > > > > > fault. If we don't remove the DBM bit, systems with HDBSS
-> > > > > > > > > would just dirty
-> > > > > > > > > it by hardware, without causing a fault.
-> > > > > > > > > 
-> > > > > > > > > DBM=0 would need to happen only in the first write-protect (only on
-> > > > > > > > > lazy-splitting). All other write-protecting would just clean
-> > > > > > > > > the S2_S2AP_W
-> > > > > > > > > bit, as everything is already split.
-> > > > > > > > > 
-> > > > > > > > > Is that what was intended?
-> > > > > > > > > 
-> > > > > > > > > Thanks!
-> > > > > > > > > Leo
-> > > > > > > > > 
-> > > > > > > > Hi Leo,
-> > > > > > > > 
-> > > > > > > > I think the cleanest way to handle this is to simply avoid setting DBM
-> > > > > > > > on block mappings. If we only set DBM on page-level PTEs, then block
-> > > > > > > > mappings will naturally stay DBM=0 and trigger a write fault on first
-> > > > > > > > access — exactly what we need for lazy splitting.
-> > > > > > > > 
-> > > > > > > > When the fault occurs, the block gets split into page-level PTEs, and at
-> > > > > > > > that point we can set DBM=1 on the resulting leaf entries. This way:
-> > > > > > > > 
-> > > > > > > > 1. Lazy split works naturally (fault -> split -> set DBM=1)
-> > > > > > > > 
-> > > > > > > > 2. No need to clear DBM globally at dirty-track enable
-> > > > > > > > 
-> > > > > > > > 3. No special handling for block mappings
-> > > > > > > > 
-> > > > > > > > So I think global DBM is still viable — we just need to filter out block
-> > > > > > > > mappings when setting the DBM bit. That way the lazy split path
-> > > > > > > > is preserved
-> > > > > > > > without extra complexity.
-> > > > > > > 
-> > > > > > > Hi Tian,
-> > > > > > > 
-> > > > > > > Humm, but would not that be contrary to what Oliver suggested:
-> > > > > > > changing the
-> > > > > > > encoding from the PTE for all entries?
-> > > > > > > 
-> > > > > > > (Like, if the PTE is writable, it has to have DBM set)
-> > > > > > > 
-> > > > > > > IIUC what you said, on first faulting of the page in the VM:
-> > > > > > > - If the entry is a page (level-3 leaf) and writable, add DBM
-> > > > > > > - If it's a block entry (leaf but not a level-3), don't add DBM
-> > > > > > > 
-> > > > > > > So after we enable dirty-logging:
-> > > > > > > - a level-3 entry would not fault, using HDBSS, and
-> > > > > > > - a block entry would fault, do the splitting, and add DBM to level-3
-> > > > > > >      entries during the split.
-> > > > > > > 
-> > > > > > > If I got that correct, that would be clean indeed.
-> > > > > > > 
-> > > > > > > But then we would have a different encoding for block entries and page
-> > > > > > > entries. In page entries, DBM could be used to say if the page is
-> > > > > > > writable,
-> > > > > > > but on block entries one would have to look at the 'dirty-bit'.
-> > > > > > > 
-> > > > > > > Would that be ok?
-> > > > > > > 
-> > > > > > > Thanks!
-> > > > > > > Leo
-> > > > > > > 
-> > > > > > Hi Leo,
-> > > > > > 
-> > > > > > My initial concern was that clearing all DBM bits at the start of
-> > > > > > migration would be too expensive, so I thought distinguishing between
-> > > > > > level-3 entries and block entries would be better.
-> > > > > > 
-> > > > 
-> > > > I think we expect it to be expensive, but since we already clean the
-> > > > dirty-bit (ro/rw) bit, we can have both happening in the same write :)
-> > > > 
-> > > > (since we only mark the DBM bit when we fault the memory on lazy-splitting,
-> > > > we are expecting to have the same amount of writes to pagetable as we have
-> > > > before HDBSS, both on faulting and 1st iteration cleaning)
-> > > > 
-> > > Hi, Leo
-> > > 
-> > > Actually, I have thought about this approach too, but if we clear DBM in
-> > > kvm_pgtable_stage2_wrprotect(), then during the first round of
-> > > migration, we will fault and release RO -> W, and then add DBM.
-> > 
-> > Yeah, that's only for lazy-splitting, though.
-> > 
-> > > 
-> > > But next time, when we migrate the dirty pages in round two, we will run
-> > > kvm_pgtable_stage2_wrprotect() again, which will clear DBM again. And
-> > > finally, HDBSS will be useless during migration.
-> > 
-> > Right, on lazy splitting, we have to clean the DBM bit on the
-> > write-protect only if it's a block entry (hugepage).
-> > 
-> > Once it faults for the first time, it will lazy-split, and we don't need to
-> > clean the DBM bit.
-> > 
-> > > 
-> > > > 
-> > > > > > However, I ran a quick test on a 400GB VM (4 vCPUs), and the overhead
-> > > > > > turned out to be around 30ns — which I think is acceptable.
-> > > > > 
-> > > > > Just a quick correction — I misstated the unit in my previous email. The
-> > > > > overhead for clearing DBM on the 400GB VM (4 vCPUs) was around 32 µs, not 30
-> > > > > ns.
-> > > > > 
-> > > > 
-> > > > Oh, that seems more likely :)
-> > > > 
-> > > > Question: is tha above amount of memory initially in Level-1 blocks,
-> > > > level-2 blocks or level-3 pages? (aka: were you using explicit/transparent
-> > > > hugepages?)
-> > > > 
-> > > 
-> > > I'm using transparent hugepages. However, if we were to use level-3 stage-2
-> > > pages with -mem-prealloc enabled in QEMU, I believe the time cost would be
-> > > extremely high — potentially out of our control.
-> > > 
-> > 
-> > Yeah, that's the issue.
-> > For this not to explode like this, we need to mark as RO only when the
-> > entries are blocks AND we are doing lazy splitting.
-> > 
-> > We have:
-> > Mode	DBM	Dirty bit
-> > RO	0	X
-> > WC	1	0
-> > WD	1	1
-> > 
-> > On write-protect:
-> > - Lazy splitting + block entry (hugepage, level 2-) -> RO
-> > - Otherwise					    -> WC
-> > 
-> > On first fault, the block entry will be lazy-splitten, and we can set DBM=1
-> > in every new page.
-> > 
-> > That way we guarantee that we are not faulting level-3 pages unecessarily,
-> > nor need to go through the whole tree setting DBM=1 or DBM=0 on level-3
-> > pages.
-> > 
-> > How does that sound?
-> > 
-> > Thanks!
-> > Leo
-> > 
+Hi folks,
 
-> 
-> Hi Leo,
-> 
-> I've also been thinking about this approach: clear
-> KVM_PTE_LEAF_ATTR_HI_S2_DBM when kvm_pgtable_stage2_wrprotect() calls
-> stage2_update_leaf_attrs(). And we can check whether a page is a block
-> page during the page walk, right?
+This is based on rc6, but in case it is easier to take on kvmarm/next
+(320840b34af2a), the same series applied there is at [1]. It passes the
+same checks: bisectable, sparse clean, npVM and pVM boot.
 
-Hi Tian,
-That was what I was thinking :)
+Patches 1-8 are identical. pkvm-7.3 reworked three of the handlers the
+series converts, so 9-11 deviate. Patch 9 also declares
+__pkvm_vcpu_sync_state, without which its caller has no generated stub.
+Patch 10 converts that handler too, and folds the two
+get_host_hyp_vcpus() macros into one function. Patch 11 moves the
+kern_hyp_va_host() unwrap out of __get_host_hyp_vcpus() to its callers,
+since container_of() casts through void * and drops the address space.
 
-> 
-> So we can check the page level in the walker callback
-> stage2_attr_walker(), filter there, clear DBM for block pages and
-> preserve DBM on level-3 pages. Something like this:
-> 
-> ```
-> pte &= ~data->attr_clr;      // wrprotect: clears S2AP_W only
-> pte |= data->attr_set;
-> if (ctx->level < KVM_PGTABLE_LAST_LEVEL) 
+Changes since v2 [2]:
+  - Dropped the *_VOID() macro variants. void is spelled as the return
+    type in the declaration and the definition, and the handler's
+    return-register store dispatches on a per-type table instead. The
+    table entry is pasted from the return type, so it has to be a
+    single word: __pkvm_create_private_mapping is spelled ulong on
+    both sides of the boundary. (Marc)
 
-Only on lazy splitting, right? 
+The SMCCC conversion of the host/hyp interface reduced every hypercall
+to a function number and a pile of registers: kvm_call_hyp_nvhe() never
+shows the compiler a callable, so the caller's arguments and the
+handler's DECLARE_REG() casts can disagree in type, count or order
+without a diagnostic. Reviewing a fix for exactly that class of bug,
+Marc wrote [3]:
 
-Or maybe we get the DBM bit on during eager splitting...
+  "we lost all form of type-checking when everything was hastily
+   converted to SMCCC to avoid function pointers. Somehow, I feel that
+   the cure was worse than the disease.
 
->     pte &= ~KVM_PTE_LEAF_ATTR_HI_S2_DBM;  // strip DBM from blocks
-> ```
-> 
-> My only concern is whether this breaks Oliver's model of treating DBM as
-> the write permission bit 
+   I wish we'd reintroduce some form of compile-time checks, maybe by
+   having generated stubs?"
 
-That was my point in my previous message, we are not breaking Oliver's 
-model. IIUC in the new model/encoding, we have:
+and sketched the shape he preferred [4]: a generated nvhe_hvc_##f()
+stub that does the type-checking, driven by "some form of declarative
+IDL", with "both the caller and callee stubs ... totally generated".
 
-Mode	DBM	Dirty bit
-RO	0	X
-WC	1	0
-WD	1	1
+This series implements that, in plain preprocessor macros rather
+than an external generator, in the mold of the syscall wrappers.
+Each hypercall's signature is declared once, in kvm_hcall.h:
+kvm_call_hyp_nvhe() resolves to a typed nvhe_hvc_##f() stub
+generated from the declaration, and the hyp-main.c handlers
+unmarshal their arguments through glue that is type-checked
+against the same declaration. A mistyped or stale call, or a
+handler that drifts from its caller, now fails to compile. On top
+of that shared declaration, host-VA parameters gain a __kern
+sparse address space, so dereferencing one at EL2 without
+kern_hyp_va_host() translation is flagged by sparse. The address
+space is KVM-private and lives with the interface it annotates
+rather than in compiler_types.h, like x86's __seg_gs in asm/percpu.h.
+The deeper instances of that bug class, host VAs reached through
+struct fields after the boundary, are follow-up work.
 
-Let's not think about individual bits for now:
-Blocks (hugepages) are marked RO, pages are marked WC
+The declarations do not also generate the function-number enum or the
+dispatch table. The enum carries the availability-band markers that
+decide when each hypercall becomes reachable, and its base entry is
+consumed from assembly, so generating it would hide the banding. The
+remaining duplication cannot drift silently: a name mismatch between
+declaration, caller and handler fails to compile, and a missing
+dispatch-table entry is rejected at run time as
+SMCCC_RET_NOT_SUPPORTED.
 
-We do that so the blocks can be faulted, split and the resulting pages can 
-be marked WC. (except the page written to, which gets WD)
+Along the way it turned out "make C=2" has never checked the nVHE
+objects at all: the custom %.nvhe.o rule reuses rule_cc_o_c, which
+only hooks the checker for C=1, and that only on a rebuild. Patches
+2-5 fix the hook and the handful of pre-existing sparse warnings it
+flushes out, so the checker lands clean. The libfdt objects under
+arch/arm64/kernel/pi/ have the same gap through the same rule, so
+patch 6 gives them the same one-line fix; it touches arm64 core
+rather than KVM, so it can go through either tree. Patch 1 is
+adjacent: trace_remote_event.h is not self-contained (it uses bool
+without including linux/types.h), which the nVHE include order had
+been silently working around; it can go through the tracing tree
+instead if preferred.
 
-That means we are following the new encoding, but deciding to WC/RO 
-depending on the context. For dirty-logging both can be used to mark a page 
-that is not dirty, so we should be fine.
+The first six patches do not depend on the type-checking work (the
+tracing-header fix, the sparse cleanups, and the two C=2 hook fixes),
+so they could be taken on their own, ahead of the rest of the series
+if that is easier.
 
-> — though DBM will be set back to 1 once the
-> block is split into level-3 pages. So the inconsistency is temporary.
+The series is structured as follows:
 
-No inconsistency for now :)
+  01:     Make trace_remote_event.h self-contained.
+  02-04:  Fix the pre-existing sparse warnings in the nVHE code.
+  05:     Run the source checker on nVHE objects under C=2.
+  06:     Same for the libfdt objects under arch/arm64/kernel/pi/.
+  07:     Pass the host-VA hypercall arguments as pointers at EL2.
+  08:     Move the dispatch macros to a new kvm_hcall.h.
+  09:     Declare the hypercall signatures, type-check the callers.
+  10:     Generate the handler unmarshalling, type-check the handlers.
+  11:     Tag host-VA parameters __kern for sparse.
 
-What do you think?
+The generated code is unchanged, checked by comparing the disassembly
+of every KVM object, function by function, against the base: the
+callers are identical apart from hypercall returns now being tested at
+their declared width and the stage-2 TLB-flush level argument now
+being sign-extended as it is loaded (an s8 passed as an int), and the
+handlers are instruction-for-instruction identical apart from
+flush_hyp_vcpu()/sync_hyp_vcpu() being inlined into their only
+caller. The extra argument that prompted the thread, a
+mistyped or reordered argument, and a handler that disagrees with its
+declaration all now fail to compile. checkpatch complains about the
+__KVM_HCALL_MAP() machinery, the (type, name) pair syntax and the
+generated signature typedefs, as it does about __MAP() in the syscall
+wrappers; the idiom cannot be parenthesized, and the typedef is what
+checks the handler against the declaration. Enforcing the
+__kern tag needs sparse v0.6.5-rc1 or later for __typeof_unqual__,
+as all sparse checking on current kernels does; no stable sparse
+release has it yet, so build from sparse.git (checker-valid.sh skips
+the check, with a warning, on anything older).
 
-Thanks!
-Leo
+Based on Linux 7.2-rc6 (075b74841bd00).
+
+Cheers,
+/fuad
+
+[1] https://android-kvm.googlesource.com/linux/+/refs/heads/tabba/pkvm-hostva-kvmarm-next
+[2] https://lore.kernel.org/all/20260803124220.332248-1-fuad.tabba@linux.dev/
+[3] https://lore.kernel.org/all/86zf7po2n3.wl-maz@kernel.org/
+[4] https://lore.kernel.org/all/86wm2tnsd8.wl-maz@kernel.org/
+
+Fuad Tabba (11):
+  tracing: Include linux/types.h in trace_remote_event.h
+  KVM: arm64: nVHE: Share the stacktrace per-CPU declarations with EL2
+  KVM: arm64: nVHE: Declare the hyp event IDs before defining them
+  KVM: arm64: nVHE: Use NULL to reset the trace buffer backing pointer
+  KVM: arm64: nVHE: Run the source checker under C=2
+  arm64: pi: Run the source checker on the libfdt objects under C=2
+  KVM: arm64: nVHE: Pass host VA arguments as pointers
+  KVM: arm64: Move the host hypercall interface to its own header
+  KVM: arm64: Type-check hypercall arguments at the caller
+  KVM: arm64: nVHE: Check hypercall handlers against the declared ABI
+  KVM: arm64: Tag host-VA hypercall parameters __kern
+
+ arch/arm64/include/asm/kvm_hcall.h       | 240 +++++++++++++
+ arch/arm64/include/asm/kvm_host.h        |  48 +--
+ arch/arm64/include/asm/kvm_mmu.h         |  10 +
+ arch/arm64/include/asm/stacktrace/nvhe.h |  10 +-
+ arch/arm64/kernel/pi/Makefile            |   1 +
+ arch/arm64/kvm/hyp/include/nvhe/pkvm.h   |   7 +-
+ arch/arm64/kvm/hyp/include/nvhe/trace.h  |   5 +-
+ arch/arm64/kvm/hyp/nvhe/Makefile         |   1 +
+ arch/arm64/kvm/hyp/nvhe/events.c         |   2 +
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c       | 433 +++++++++++------------
+ arch/arm64/kvm/hyp/nvhe/pkvm.c           |  12 +-
+ arch/arm64/kvm/hyp/nvhe/stacktrace.c     |   3 +-
+ arch/arm64/kvm/hyp/nvhe/trace.c          |   6 +-
+ arch/arm64/kvm/hyp_trace.c               |   2 +-
+ arch/arm64/kvm/stacktrace.c              |   3 -
+ include/linux/trace_remote_event.h       |   2 +
+ 16 files changed, 481 insertions(+), 304 deletions(-)
+ create mode 100644 arch/arm64/include/asm/kvm_hcall.h
+
+
+base-commit: 075b74841bd0065a3bda3440873c747938e69b68
+-- 
+2.39.5
+
