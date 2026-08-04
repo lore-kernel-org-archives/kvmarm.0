@@ -1,144 +1,92 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E71EE33A6F1;
-	Tue,  4 Aug 2026 12:16:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8650035C6B9
+	for <kvmarm@lists.linux.dev>; Tue,  4 Aug 2026 12:22:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785845771; cv=none; b=s2rGgFVqXo7a9ixXNaAA7FcXRUeOBgOvlf4fDcWzVQ5eL6yQlJ09kr7z8/y06M26u6GCCHV1tvWPhNj0uMltKouvYrORsgBMJI3yUsMU3kEZdkOFjM4Pf+sIgKxbSHMtdl3nVZ+leMiV8aXinjXy1P3LLvgUkAU3MzNdHbU/0Ow=
+	t=1785846125; cv=none; b=g7ufOl8p1M6slLEjberDwv1ztYfrnUQGI7MekvFbtD3QMzL0mT5P7HgX9CkAXNcCHphemqz00MmHEORxYU+SG1ZkRku6mV5cTCZISAwwdzwdQxT30D4yLNQ7StvbT4W+SUV5M4UrBiNiuaopdnEnrX9yQDngU7+pxvr/ShCnGio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785845771; c=relaxed/simple;
-	bh=bcAMhZTiy49tEojqvYK5r5G3B51T0weL1dSTwGIlZwY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PJy26C3b+4UgPc6jjXDDnmrfkr68TPsLqotrRBiS9LxuoDXy5Owc0SSLcxD+XnhYoYg3kV/68bMCXqgEVIp7FlSE6Zcbv42BPxR4LxKLs8QwfBw+4rZpuFLrUfsbhAj+ajtk6S7gGC9T6/caCQND7EX8rurg8d76hoswfzqWd2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=c6UEwA1t; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1785846125; c=relaxed/simple;
+	bh=K1XdpXzCqeMfT3gx1+GfQWAVnbTVzSRrQini9XusnHU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HbHHXSFgggijitt6KOiTEztBvFISG7Ssx5lTMZhVrGQyt22EGa97y3VFD04IztX0gjplL3+hLXFAnNTeOqtYw2y6kE0EV2NkRfuR9HIKoy2fmror90A5PygvmjOSfnfuPrFMUc+j9hHGtItz9xnXttieHIRGFGdaybRXQnvXZ24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CpC6BOIX; arc=none smtp.client-ip=91.218.175.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="c6UEwA1t"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EF8851476;
-	Tue,  4 Aug 2026 05:16:03 -0700 (PDT)
-Received: from [10.57.44.180] (unknown [10.57.44.180])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E55483F66F;
-	Tue,  4 Aug 2026 05:16:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1785845768; bh=bcAMhZTiy49tEojqvYK5r5G3B51T0weL1dSTwGIlZwY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=c6UEwA1tfFd2CmIo6fSWGXXuYEzA2q181oOLDQYEGFGK+6ReJcnh1HF8CmR55UEwS
-	 4KYLjtJBdGc+eGUnk52Cn0Ek0phGnFAEbNgF42/95p8y/PHexLLabxa6ezN6urQQx8
-	 oo4Cl+2TiqW9TB+qhDx/Li/qJmx1beTxD+VNJIHc=
-Message-ID: <c1f0aad2-33cb-4dab-b54d-d09998fed36e@arm.com>
-Date: Tue, 4 Aug 2026 13:16:00 +0100
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CpC6BOIX"
+X-Forwarded-Encrypted: i=1; AHgh+RqdI+JtYgY1+ozz7xYo+CxJIjRTpZ7vnzKjgwTAU3Nu3M9p13EguBUDM1rbT3GsBs/fubeBEjQ=@lists.linux.dev
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1785846121;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=K1XdpXzCqeMfT3gx1+GfQWAVnbTVzSRrQini9XusnHU=;
+	b=CpC6BOIX+6Kdqrp5RhgsQqTPpl5cRQ4HowlS1wzmnxQofBYqHrTMiXBykcRz1yOwmjbdPu
+	PHh2LBBq3yA7E7SoLJFkJsjQhLoU35aRIk34vAZv9w4YudcZoXQXrArXWQQZ+iDzBMyhFk
+	sFk6l0FFyjAStgBKat5rQe/9ws/CT6A=
+X-Gm-Message-State: AOJu0YxMEBYjYVbu1QWXGPGk5gVpAxilMwZFgVzhKqJctIKoJ79sncAE
+	x06+rGzNsTI6dVT/IZoT0uzf/KobOTNxcNW6ph1aPohmvqpQ6rnMZXeeBDPXZwVI7omCDkvEVIi
+	UdKzRp+u3mKpQt4MydCXy2IcN7dCdWiB03g8fQj3x
+X-Received: by 2002:a05:622a:8349:b0:51b:ff0a:2048 with SMTP id
+ d75a77b69052e-52ce3f3c749mr201921cf.3.1785846085744; Tue, 04 Aug 2026
+ 05:21:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v16 17/45] KVM: arm64: CCA: Tear down RTTs
-Content-Language: en-GB
-To: Alper Gun <alpergun@google.com>, Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
- Emi Kisanuki <fj0570is@fujitsu.com>, Vishal Annapurve
- <vannapurve@google.com>, WeiLin.Chang@arm.com,
- Lorenzo Pieralisi <lpieralisi@kernel.org>
-References: <20260803134403.80630-1-steven.price@arm.com>
- <20260803134403.80630-18-steven.price@arm.com>
- <CABpDEun3NPr7Na85pmOvdfYQ1DB-2nCcocsyDESXM15bzJU1og@mail.gmail.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <CABpDEun3NPr7Na85pmOvdfYQ1DB-2nCcocsyDESXM15bzJU1og@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20260715142841.80544-1-steven.price@arm.com> <20260715142841.80544-16-steven.price@arm.com>
+ <865x1rcvfw.wl-maz@kernel.org> <f971d029-84d9-4c66-9875-36fa8f1a2a1b@arm.com>
+ <86zez3b6ps.wl-maz@kernel.org> <7beafe29-0c5e-418b-8797-190f1850b18a@arm.com>
+In-Reply-To: <7beafe29-0c5e-418b-8797-190f1850b18a@arm.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Tue, 4 Aug 2026 13:20:48 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTx751071VhZPf6ABaZngTqOdPG+_aVLCTct_G_ksfYviA@mail.gmail.com>
+X-Gm-Features: AUfX_mxGnxORLKO8iAowkYu9tpNhSCXZ535sQNq-ffLHKfhzkRZPZxsKS-feAzQ
+Message-ID: <CA+EHjTx751071VhZPf6ABaZngTqOdPG+_aVLCTct_G_ksfYviA@mail.gmail.com>
+Subject: Re: [PATCH v15 15/37] KVM: arm64: CCA: Handle RMI_EXIT_RIPAS_CHANGE
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>, Steven Price <steven.price@arm.com>, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
+	Christoffer Dall <christoffer.dall@arm.com>, linux-coco@lists.linux.dev, 
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, Gavin Shan <gshan@redhat.com>, 
+	Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun <alpergun@google.com>, 
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>, 
+	Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com, 
+	Lorenzo Pieralisi <lpieralisi@kernel.org>, Quentin Perret <qperret@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Migadu-Flow: FLOW_OUT
 
-Hi there
+Hi Suzuki,
 
-On 03/08/2026 23:29, Alper Gun wrote:
-> On Mon, Aug 3, 2026 at 6:45 AM Steven Price <steven.price@arm.com> wrote:
->> [...]
->> +static void realm_unmap_stage2(struct kvm *kvm)
->> +{
->> +       struct realm *realm = &kvm->arch.realm;
->> +
->> +       lockdep_assert_held(&kvm->arch.config_lock);
->> +
->> +       if (realm->stage2_unmapped)
->> +               return;
->> +
->> +       write_lock(&kvm->mmu_lock);
->> +       kvm_stage2_unmap_range(&kvm->arch.mmu, 0,
->> +                              BIT(realm->ia_bits - 1), true);
->> +       write_unlock(&kvm->mmu_lock);
->> +
->> +       realm->stage2_unmapped = true;
->> +}
->> +
->> +int kvm_realm_teardown_stage2(struct kvm *kvm)
->> +{
->> +       lockdep_assert_held(&kvm->arch.config_lock);
->> +
->> +       realm_unmap_stage2(kvm);
->> +       return realm_destroy_rtts(kvm);
->> +}
-> 
-> Hi Steven,
-> 
-> I noticed a warning in dmesg when destroying a realm:
-> 
->    [  158.533495] Call trace:
->    [  158.535927]  kvm_destroy_realm+0x208/0x218
->    [  158.540356]  kvm_arch_destroy_vm+0xc8/0xd8
->    [  158.544439]  kvm_put_kvm+0x324/0x4b0
->    [  158.548002]  kvm_vm_stats_release+0x1c/0x38
++ Quentin (who's on leave, but for when he gets back)
 
-Thanks for the report and the detailed analysis.
+On Mon, 3 Aug 2026 at 16:30, Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+...
+> > I.e don't hack into the API. Use the information you already have to
+> > decide whether you need to use the existing API at all.
+> >
+> > If that cannot be done for whatever reason, then you need to indirect
+> > the call with a set of operations that leave the existing code
+> > untouched.
+>
+> Please let us know if you think we need to explore this ^ ?
 
-> 
-> I traced this and found the following:
-> 
-> At this point, calling realm_destroy_rtts() may fail destroying the RTTs
-> because RECs are still active and the Realm is not terminated, but the
-> walk finishes and still sets realm->rtts_destroyed = true.
-> 
-> Later, kvm_destroy_realm() calls rmi_realm_terminate() and then calls
-> realm_destroy_rtts(kvm) again. But because realm->rtts_destroyed is already
-> set to true, it exits early without tearing down the RTTs.
-> 
-> Consequently, rmi_realm_destroy() is invoked while the RTT tables still
-> exist in RMM, which fails and triggers WARN_ON(rmi_realm_destroy).
-> 
-> The fix I used was to remove realm_destroy_rtts() from
-> kvm_realm_teardown_stage2():
-> --- a/arch/arm64/kvm/rmi.c
-> +++ b/arch/arm64/kvm/rmi.c
-> @@ -434,7 +434,7 @@ int kvm_realm_teardown_stage2(struct kvm *kvm)
->    lockdep_assert_held(&kvm->arch.config_lock);
-> 
->    realm_unmap_stage2(kvm);
-> - return realm_destroy_rtts(kvm);
-> + return 0;
->   }
-> 
-> I think we don't need RTT destruction here as it will be handled cleanly in
-> kvm_destroy_realm() later.
+FWIW, pKVM already has this kind of indirection: in protected mode,
+the kvm_pgtable_stage2_* calls in mmu.c dispatch to the
+pkvm_pgtable_stage2_* wrappers through KVM_PGT_FN(), and the callers
+don't branch. It is global today because pKVM owns the whole host, but
+a per-VM version would let the CCA backend handle the filter and the
+IPA aliasing internally, keeping __unmap_stage2_range()'s signature
+intact. That should work for pKVM as well.
 
-That sounds sensible to me, I will take a look and fix it locally for 
-the next version.
-
-
-Thanks
-Suzuki
-
-> 
-> Thanks,
-> Alper
-
+Cheers,
+/fuad
