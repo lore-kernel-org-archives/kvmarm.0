@@ -1,333 +1,296 @@
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+Received: from canpmsgout09.his.huawei.com (canpmsgout09.his.huawei.com [113.46.200.224])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9337723BCF7
-	for <kvmarm@lists.linux.dev>; Tue,  4 Aug 2026 04:13:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABF6623395C
+	for <kvmarm@lists.linux.dev>; Tue,  4 Aug 2026 04:54:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.224
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785816835; cv=none; b=seixDVG9tE1FAzCoAL8bjirskazUmvJYBN8vUusVgesvHzuvjc3eXuueLkIxYVamG/f9gW5hXwr+tPb3LSNtfKOa+kNvMc04coB1oCU/tw9UNLvBtpleiep1dQ8fju0Dmk9/xfKWx4ZdWZFkcuBhGV6mp0XayVgSrmD8h2qh3mk=
+	t=1785819273; cv=none; b=BBsIFFNoMVfq7Srh0EpcS6bBD++N8AnqNBXSeuNi0uj/PbazmMQ0gX2APTOMd2YLbVkS+VPdzwt7ZmZ8XhRiBho4ClK4scuSz2muGlbg/VJ98m8vVYC1xsPATQtsIQHFZvNR4KtYQ1Igp3i9o+Z2UFaPx6bZlTeO1+jWqBlaMOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785816835; c=relaxed/simple;
-	bh=NTcBDqSOqZyDofNkPrY+Dk7jMKpsJG+qzzXqSRDINI8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=loN7VZRewMR9dzGw/MkpbxavjxEzggLgRwKSE8PUoyr278r8ds6qQzXBO6fyrU2UrCtPLWmKRNlMR545/XuuJQPLBN+lVx7kbNSmj4zfWKopVdHaQ3F4BsVpeadldDzHpNfwTAuDMuDNXIsz5ljsX2blwSwW2HjjKRK3G+2GWs8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=avLl6gr4; arc=none smtp.client-ip=91.218.175.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1785819273; c=relaxed/simple;
+	bh=q4i37Mp1h/ApZBLDJMoc5Ip8ZuaIWbsZmYh8kmdLvo0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=d7mVRmzYziQqXyt/tWA4F89R830lusqPiaG2nmFsOLE99Xcz/Oc0fmNAkITXAHJWTzB7nIOJy0GSlGI/OXFMO77HUGpWVo4Eu990exExK5wvGYJFz2M9/VPJXu8bOXNJtvnCKIf6Iev3C/cuKXUAARZo9GH92GmqL8zMq1q1UMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=eiL8211t; arc=none smtp.client-ip=113.46.200.224
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="avLl6gr4"
-X-Forwarded-Encrypted: i=1; AHgh+RrwuJGNqP+3EmyKtTNsM5QfYs127xsTvFCOjSeSaAMLTYvJpYOkbQ3bRvyKxs+Z5zjDSFBm5ok=@lists.linux.dev
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1785782132;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TverFBSwY7MtpYT35sNPQk4g4Kr+oiSA90dPP0U4w/M=;
-	b=avLl6gr4kdIGIZ7QMMy4mQjlIlyYkOHB/w0dXR2adj4/ed0k7u71jVYj8mwhRD4CLV87TU
-	bvPjeRYRnQd5SK31khXCfGi/S2XzUhZ+6lrQB+HjcRT58A3cvwxm5Ii+Ey+EmTxbonicFg
-	732Wnj0MXtZLLmUCpwRFH/5vTH1cpX0=
-X-Gm-Message-State: AOJu0YwsCcCNyVHmyo/uOo5CaCocsHxl9oFv2O+Jov9Pl5C4KhW3gV8Y
-	TGv2KSMmp55rat7zA7kmbypgnqQZmEITLw0wCTI9MKeY4maJk3t/BRCKx3Ym0J2bXgm/zog0//Y
-	jiDp4qXmg0O5LuANhc5tbpvBo2QFW7+uqYvcekbeF
-X-Received: by 2002:a05:622a:5914:b0:517:5e32:2d14 with SMTP id
- d75a77b69052e-52cd4fbbf92mr1330831cf.10.1785782130203; Mon, 03 Aug 2026
- 11:35:30 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="eiL8211t"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=wHLWv1eLDUUJbnHUwLyRisJw5DZtYmidA42ix7gLJNE=;
+	b=eiL8211tflckw7TgpgBXnWXe9FMq8T38fmdJcrBysDaJ3Mrf2HRq+5LAUYvx8u0PgEGpdGLk5
+	IXY+wu9DgJmdTNxcUm+6NXUQ3PcjV2bd+fEptB34C784k2qONJD4irkMF5ay1+gkKW/i/39SQcz
+	iXrxwYWqn9KcRoI3wZHWrx0=
+Received: from mail.maildlp.com (unknown [172.19.163.15])
+	by canpmsgout09.his.huawei.com (SkyGuard) with ESMTPS id 4hDgv50MHSz1cyPG;
+	Tue,  4 Aug 2026 12:44:49 +0800 (CST)
+Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
+	by mail.maildlp.com (Postfix) with ESMTPS id 3A37440586;
+	Tue,  4 Aug 2026 12:54:18 +0800 (CST)
+Received: from [10.67.120.103] (10.67.120.103) by
+ kwepemr100010.china.huawei.com (7.202.195.125) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.36; Tue, 4 Aug 2026 12:54:17 +0800
+Message-ID: <2070002d-94aa-4a5b-8df1-e8e0f0fd265c@huawei.com>
+Date: Tue, 4 Aug 2026 12:54:16 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260803124220.332248-1-fuad.tabba@linux.dev> <20260803124220.332248-11-fuad.tabba@linux.dev>
- <86qzkfaxp9.wl-maz@kernel.org>
-In-Reply-To: <86qzkfaxp9.wl-maz@kernel.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Mon, 3 Aug 2026 19:34:52 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTw1=xCPugZrmQ3nj1ddvCZ=vcZT3=KO_FMHB1USUTu7kA@mail.gmail.com>
-X-Gm-Features: AUfX_mzt1I-nWoB71I22HAPLuIRo3_4lIfQ2cr-FZF11IecwevWTzcB4PKY0l4U
-Message-ID: <CA+EHjTw1=xCPugZrmQ3nj1ddvCZ=vcZT3=KO_FMHB1USUTu7kA@mail.gmail.com>
-Subject: Re: [PATCH v2 10/11] KVM: arm64: nVHE: Check hypercall handlers
- against the declared ABI
-To: Marc Zyngier <maz@kernel.org>
-Cc: oupton@kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, 
-	rostedt@goodmis.org, mhiramat@kernel.org, alexandru.elisei@arm.com, 
-	vdonnefort@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, qperret@google.com, 
-	ardb@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Migadu-Flow: FLOW_OUT
-
-On Mon, 3 Aug 2026 at 19:03, Marc Zyngier <maz@kernel.org> wrote:
-...
->
-> I've also dropped this with the following hacks. The set_cpu_reg()
-> stuff isn't brilliant, and requires a single word type. But I find the
-> overall scheme less invasive.
->
-> WDYT?
-
-Works, and hyp-main.nvhe.o comes out byte identical. I did look for a
-way to dispatch on void without the type table, but _Generic doesn't
-take an incomplete type and __builtin_choose_expr type-checks both
-arms on gcc and clang, so I don't think there's a better option.
-
-One nit: the declaration in kvm_hcall.h still says "unsigned long"
-while the definition now says "ulong". Could we make both ulong?
-
-I'm happy to respin with both of these, or would you like to fold them in?
-
-Cheers,
-/fuad
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 3/6] KVM: arm64: Add auto DBM support for hardware
+ dirty tracking
+To: Leonardo Bras <leo.bras@arm.com>
+CC: Oliver Upton <oupton@kernel.org>, <maz@kernel.org>,
+	<catalin.marinas@arm.com>, <will@kernel.org>, <yuzenghui@huawei.com>,
+	<wangzhou1@hisilicon.com>, <yangjinqian1@huawei.com>,
+	<caijian11@h-partners.com>, <liuyonglong@huawei.com>, <yezhenyu2@huawei.com>,
+	<yubihong@huawei.com>, <linuxarm@huawei.com>, <joey.gouly@arm.com>,
+	<kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	<seiden@linux.ibm.com>, <suzuki.poulose@arm.com>
+References: <aliKo7dTZzKcWHzI@kernel.org>
+ <0943eb14-9ffb-4dbb-9219-060e97bca2a7@huawei.com>
+ <alpIfIOFfrudBzD5@LeoBrasDK> <al4bYajWE-v6wofu@LeoBrasDK>
+ <96516762-f004-4c2a-a9c6-6fbad49ad6ae@huawei.com>
+ <amoZY8uGLf1PEpjK@LeoBrasDK>
+ <8e36e2c8-587f-4228-ab13-d6783927a281@huawei.com>
+ <45d76d0d-48e9-46a6-b1f9-691f840eba46@huawei.com>
+ <anBrvILpcSFhW7Wg@LeoBrasDK>
+ <95f1ebd4-be04-4684-be68-388f752a1379@huawei.com>
+ <anDCno9HdVI5UAls@LeoBrasDK>
+From: Tian Zheng <zhengtian10@huawei.com>
+In-Reply-To: <anDCno9HdVI5UAls@LeoBrasDK>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
+ kwepemr100010.china.huawei.com (7.202.195.125)
 
 
 
+On 8/4/2026 12:32 AM, Leonardo Bras wrote:
+> On Mon, Aug 03, 2026 at 09:57:46PM +0800, Tian Zheng wrote:
+>>
+>>
+>> On 8/3/2026 6:21 PM, Leonardo Bras wrote:
+>>> On Mon, Aug 03, 2026 at 12:04:24PM +0800, Tian Zheng wrote:
+>>>>
+>>>>
+>>>> On 8/3/2026 9:33 AM, Tian Zheng wrote:
+>>>>>>>>>>> 09, 2026 at 06:40:23PM +0800, Tian Zheng wrote:
+>>>>>>>>>>>> -    if (prot & KVM_PGTABLE_PROT_W)
+>>>>>>>>>>>> +    if (prot & KVM_PGTABLE_PROT_W) {
+>>>>>>>>>>>>               set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
+>>>>>>>>>>>>
+>>>>>>>>>>>> +        /*
+>>>>>>>>>>>> +         * No DEVICE filter needed here:
+>>>>>>>>>>>> relax_perms is only called
+>>>>>>>>>>>> +         * on FSC_PERM faults. Device pages
+>>>>>>>>>>>> always get full RW from
+>>>>>>>>>>>> +         * initial mapping and are never write-protected during
+>>>>>>>>>>>> +         * migration, so they never trigger a permission fault.
+>>>>>>>>>>>> +         */
+>>>>>>>>>>>> +        if (pgt->flags & KVM_PGTABLE_S2_DBM)
+>>>>>>>>>>>> +            set |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
+>>>>>>>>>>>> +    } else {
+>>>>>>>>>>>> +        /*
+>>>>>>>>>>>> +         * Clear DBM on W→RO downgrade to prevent hardware from
+>>>>>>>>>>>> +         * silently upgrading RO+DBM back to W+dirty, which would
+>>>>>>>>>>>> +         * bypass KVM's write tracking and cause data corruption.
+>>>>>>>>>>>> +         */
+>>>>>>>>>>>> +        clr |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
+>>>>>>>>>>>> +    }
+>>>>>>>>>>>> +
+>>>>>>>>>>> This block makes it pretty evident that the DBM bit really *is* the
+>>>>>>>>>>> write permission bit. I'd much rather we
+>>>>>>>>>>> introduce the concept of dirty
+>>>>>>>>>>> state to the page table library and migrate the abstract write
+>>>>>>>>>>> permission to the DBM field, even if we don't have FEAT_HAFDBS.
+>>>>>>>>>>>
+>>>>>>>>>
+>>>>>>>>> Ohh, that's an amazing idea!
+>>>>>>>>
+>>>>>>>> Thinking about that again...
+>>>>>>>> If we adopt the encoding with DBM being the write-permission
+>>>>>>>> bit, and all
+>>>>>>>> PTEs have it since the start, how can we have lazy-splitting happening?
+>>>>>>>>
+>>>>>>>> Only way I think of is removing both DBM and S2_S2AP_W bit
+>>>>>>>> from writable
+>>>>>>>> PTEs during dirty-track enable, and re-adding them during
+>>>>>>>> the first write
+>>>>>>>> fault. If we don't remove the DBM bit, systems with HDBSS
+>>>>>>>> would just dirty
+>>>>>>>> it by hardware, without causing a fault.
+>>>>>>>>
+>>>>>>>> DBM=0 would need to happen only in the first write-protect (only on
+>>>>>>>> lazy-splitting). All other write-protecting would just clean
+>>>>>>>> the S2_S2AP_W
+>>>>>>>> bit, as everything is already split.
+>>>>>>>>
+>>>>>>>> Is that what was intended?
+>>>>>>>>
+>>>>>>>> Thanks!
+>>>>>>>> Leo
+>>>>>>>>
+>>>>>>> Hi Leo,
+>>>>>>>
+>>>>>>> I think the cleanest way to handle this is to simply avoid setting DBM
+>>>>>>> on block mappings. If we only set DBM on page-level PTEs, then block
+>>>>>>> mappings will naturally stay DBM=0 and trigger a write fault on first
+>>>>>>> access — exactly what we need for lazy splitting.
+>>>>>>>
+>>>>>>> When the fault occurs, the block gets split into page-level PTEs, and at
+>>>>>>> that point we can set DBM=1 on the resulting leaf entries. This way:
+>>>>>>>
+>>>>>>> 1. Lazy split works naturally (fault -> split -> set DBM=1)
+>>>>>>>
+>>>>>>> 2. No need to clear DBM globally at dirty-track enable
+>>>>>>>
+>>>>>>> 3. No special handling for block mappings
+>>>>>>>
+>>>>>>> So I think global DBM is still viable — we just need to filter out block
+>>>>>>> mappings when setting the DBM bit. That way the lazy split path
+>>>>>>> is preserved
+>>>>>>> without extra complexity.
+>>>>>>
+>>>>>> Hi Tian,
+>>>>>>
+>>>>>> Humm, but would not that be contrary to what Oliver suggested:
+>>>>>> changing the
+>>>>>> encoding from the PTE for all entries?
+>>>>>>
+>>>>>> (Like, if the PTE is writable, it has to have DBM set)
+>>>>>>
+>>>>>> IIUC what you said, on first faulting of the page in the VM:
+>>>>>> - If the entry is a page (level-3 leaf) and writable, add DBM
+>>>>>> - If it's a block entry (leaf but not a level-3), don't add DBM
+>>>>>>
+>>>>>> So after we enable dirty-logging:
+>>>>>> - a level-3 entry would not fault, using HDBSS, and
+>>>>>> - a block entry would fault, do the splitting, and add DBM to level-3
+>>>>>>      entries during the split.
+>>>>>>
+>>>>>> If I got that correct, that would be clean indeed.
+>>>>>>
+>>>>>> But then we would have a different encoding for block entries and page
+>>>>>> entries. In page entries, DBM could be used to say if the page is
+>>>>>> writable,
+>>>>>> but on block entries one would have to look at the 'dirty-bit'.
+>>>>>>
+>>>>>> Would that be ok?
+>>>>>>
+>>>>>> Thanks!
+>>>>>> Leo
+>>>>>>
+>>>>> Hi Leo,
+>>>>>
+>>>>> My initial concern was that clearing all DBM bits at the start of
+>>>>> migration would be too expensive, so I thought distinguishing between
+>>>>> level-3 entries and block entries would be better.
+>>>>>
+>>>
+>>> I think we expect it to be expensive, but since we already clean the
+>>> dirty-bit (ro/rw) bit, we can have both happening in the same write :)
+>>>
+>>> (since we only mark the DBM bit when we fault the memory on lazy-splitting,
+>>> we are expecting to have the same amount of writes to pagetable as we have
+>>> before HDBSS, both on faulting and 1st iteration cleaning)
+>>>
+>> Hi, Leo
+>>
+>> Actually, I have thought about this approach too, but if we clear DBM in
+>> kvm_pgtable_stage2_wrprotect(), then during the first round of
+>> migration, we will fault and release RO -> W, and then add DBM.
+> 
+> Yeah, that's only for lazy-splitting, though.
+> 
+>>
+>> But next time, when we migrate the dirty pages in round two, we will run
+>> kvm_pgtable_stage2_wrprotect() again, which will clear DBM again. And
+>> finally, HDBSS will be useless during migration.
+> 
+> Right, on lazy splitting, we have to clean the DBM bit on the
+> write-protect only if it's a block entry (hugepage).
+> 
+> Once it faults for the first time, it will lazy-split, and we don't need to
+> clean the DBM bit.
+> 
+>>
+>>>
+>>>>> However, I ran a quick test on a 400GB VM (4 vCPUs), and the overhead
+>>>>> turned out to be around 30ns — which I think is acceptable.
+>>>>
+>>>> Just a quick correction — I misstated the unit in my previous email. The
+>>>> overhead for clearing DBM on the 400GB VM (4 vCPUs) was around 32 µs, not 30
+>>>> ns.
+>>>>
+>>>
+>>> Oh, that seems more likely :)
+>>>
+>>> Question: is tha above amount of memory initially in Level-1 blocks,
+>>> level-2 blocks or level-3 pages? (aka: were you using explicit/transparent
+>>> hugepages?)
+>>>
+>>
+>> I'm using transparent hugepages. However, if we were to use level-3 stage-2
+>> pages with -mem-prealloc enabled in QEMU, I believe the time cost would be
+>> extremely high — potentially out of our control.
+>>
+> 
+> Yeah, that's the issue.
+> For this not to explode like this, we need to mark as RO only when the
+> entries are blocks AND we are doing lazy splitting.
+> 
+> We have:
+> Mode	DBM	Dirty bit
+> RO	0	X
+> WC	1	0
+> WD	1	1
+> 
+> On write-protect:
+> - Lazy splitting + block entry (hugepage, level 2-) -> RO
+> - Otherwise					    -> WC
+> 
+> On first fault, the block entry will be lazy-splitten, and we can set DBM=1
+> in every new page.
+> 
+> That way we guarantee that we are not faulting level-3 pages unecessarily,
+> nor need to go through the whole tree setting DBM=1 or DBM=0 on level-3
+> pages.
+> 
+> How does that sound?
+> 
+> Thanks!
+> Leo
+> 
 
->
->         M.
->
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> index f8ea1661b3166..0d5fa6432461d 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -39,6 +39,12 @@ DEFINE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
->                 ,, cpu_reg(host_ctxt, 3),, cpu_reg(host_ctxt, 4)        \
->                 ,, cpu_reg(host_ctxt, 5),, cpu_reg(host_ctxt, 6))
->
-> +#define set_cpu_reg_ulong(ctxt, r, v)  { cpu_reg(ctxt, r) = v; }
-> +#define set_cpu_reg_u64(ctxt, r, v)    { cpu_reg(ctxt, r) = v; }
-> +#define set_cpu_reg_int(ctxt, r, v)    { cpu_reg(ctxt, r) = v; }
-> +#define set_cpu_reg_void(ctxt, r, v)   { v; }
-> +#define set_cpu_reg(ctxt, r, t, v)     set_cpu_reg_##t(ctxt, r, v)
-> +
->  #define DEFINE_KVM_HOST_HCALL(ret, name, ...)                          \
->         static kvm_host_hcall_sig_##name __do_##name;                   \
->         static __always_inline                                          \
-> @@ -48,39 +54,18 @@ DEFINE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
->         }                                                               \
->         static void handle_##name(struct kvm_cpu_context *host_ctxt)    \
->         {                                                               \
-> -               cpu_reg(host_ctxt, 1) = __se_##name(KVM_HOST_HCALL_REGS(__VA_ARGS__)); \
-> +               set_cpu_reg(host_ctxt, 1, ret, __se_##name(KVM_HOST_HCALL_REGS(__VA_ARGS__))); \
->         }                                                               \
->         static ret __do_##name(__KVM_HCALL_MAP(__KVM_HCALL_DECL, __VA_ARGS__))
->
-> -#define DEFINE_KVM_HOST_HCALL_VOID(name, ...)                          \
-> -       static kvm_host_hcall_sig_##name __do_##name;                   \
-> -       static __always_inline                                          \
-> -       void __se_##name(__KVM_HCALL_MAP(__KVM_HCALL_LONG, __VA_ARGS__)) \
-> -       {                                                               \
-> -               __do_##name(__KVM_HCALL_MAP(__KVM_HCALL_CAST, __VA_ARGS__)); \
-> -       }                                                               \
-> -       static void handle_##name(struct kvm_cpu_context *host_ctxt)    \
-> -       {                                                               \
-> -               __se_##name(KVM_HOST_HCALL_REGS(__VA_ARGS__));          \
-> -       }                                                               \
-> -       static void __do_##name(__KVM_HCALL_MAP(__KVM_HCALL_DECL, __VA_ARGS__))
-> -
->  #define DEFINE_KVM_HOST_HCALL0(ret, name)                              \
->         static kvm_host_hcall_sig_##name __do_##name;                   \
->         static void handle_##name(struct kvm_cpu_context *host_ctxt)    \
->         {                                                               \
-> -               cpu_reg(host_ctxt, 1) = __do_##name();                  \
-> +               set_cpu_reg(host_ctxt, 1, ret, __do_##name());          \
->         }                                                               \
->         static ret __do_##name(void)
->
-> -#define DEFINE_KVM_HOST_HCALL0_VOID(name)                              \
-> -       static kvm_host_hcall_sig_##name __do_##name;                   \
-> -       static void handle_##name(struct kvm_cpu_context *host_ctxt)    \
-> -       {                                                               \
-> -               __do_##name();                                          \
-> -       }                                                               \
-> -       static void __do_##name(void)
-> -
->  /* Number of implemented GICv3 LRs. Used by flush_hyp_vcpu(). */
->  unsigned int hyp_gicv3_nr_lr;
->
-> @@ -242,7 +227,7 @@ static void sync_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
->                 host_cpu_if->vgic_lr[i] = hyp_cpu_if->vgic_lr[i];
->  }
->
-> -DEFINE_KVM_HOST_HCALL_VOID(__pkvm_vcpu_load,
-> +DEFINE_KVM_HOST_HCALL(void, __pkvm_vcpu_load,
->         pkvm_handle_t, handle, unsigned int, vcpu_idx, u64, hcr_el2)
->  {
->         struct pkvm_hyp_vcpu *hyp_vcpu;
-> @@ -261,7 +246,7 @@ DEFINE_KVM_HOST_HCALL_VOID(__pkvm_vcpu_load,
->         }
->  }
->
-> -DEFINE_KVM_HOST_HCALL0_VOID(__pkvm_vcpu_put)
-> +DEFINE_KVM_HOST_HCALL0(void, __pkvm_vcpu_put)
->  {
->         struct pkvm_hyp_vcpu *hyp_vcpu = pkvm_get_loaded_hyp_vcpu();
->
-> @@ -421,42 +406,42 @@ DEFINE_KVM_HOST_HCALL(int, __pkvm_host_mkyoung_guest,
->         return __pkvm_host_mkyoung_guest(gfn, hyp_vcpu);
->  }
->
-> -DEFINE_KVM_HOST_HCALL_VOID(__kvm_adjust_pc,
-> +DEFINE_KVM_HOST_HCALL(void, __kvm_adjust_pc,
->         struct kvm_vcpu __kern *, vcpu)
->  {
->         __kvm_adjust_pc(kern_hyp_va_host(vcpu));
->  }
->
-> -DEFINE_KVM_HOST_HCALL0_VOID(__kvm_flush_vm_context)
-> +DEFINE_KVM_HOST_HCALL0(void, __kvm_flush_vm_context)
->  {
->         __kvm_flush_vm_context();
->  }
->
-> -DEFINE_KVM_HOST_HCALL_VOID(__kvm_tlb_flush_vmid_ipa,
-> +DEFINE_KVM_HOST_HCALL(void, __kvm_tlb_flush_vmid_ipa,
->         struct kvm_s2_mmu __kern *, mmu, phys_addr_t, ipa, int, level)
->  {
->         __kvm_tlb_flush_vmid_ipa(kern_hyp_va_host(mmu), ipa, level);
->  }
->
-> -DEFINE_KVM_HOST_HCALL_VOID(__kvm_tlb_flush_vmid_ipa_nsh,
-> +DEFINE_KVM_HOST_HCALL(void, __kvm_tlb_flush_vmid_ipa_nsh,
->         struct kvm_s2_mmu __kern *, mmu, phys_addr_t, ipa, int, level)
->  {
->         __kvm_tlb_flush_vmid_ipa_nsh(kern_hyp_va_host(mmu), ipa, level);
->  }
->
-> -DEFINE_KVM_HOST_HCALL_VOID(__kvm_tlb_flush_vmid_range,
-> +DEFINE_KVM_HOST_HCALL(void, __kvm_tlb_flush_vmid_range,
->         struct kvm_s2_mmu __kern *, mmu, phys_addr_t, start, unsigned long, pages)
->  {
->         __kvm_tlb_flush_vmid_range(kern_hyp_va_host(mmu), start, pages);
->  }
->
-> -DEFINE_KVM_HOST_HCALL_VOID(__kvm_tlb_flush_vmid,
-> +DEFINE_KVM_HOST_HCALL(void, __kvm_tlb_flush_vmid,
->         struct kvm_s2_mmu __kern *, mmu)
->  {
->         __kvm_tlb_flush_vmid(kern_hyp_va_host(mmu));
->  }
->
-> -DEFINE_KVM_HOST_HCALL_VOID(__pkvm_tlb_flush_vmid,
-> +DEFINE_KVM_HOST_HCALL(void, __pkvm_tlb_flush_vmid,
->         pkvm_handle_t, handle)
->  {
->         struct pkvm_hyp_vm *hyp_vm = get_np_pkvm_hyp_vm(handle);
-> @@ -468,19 +453,19 @@ DEFINE_KVM_HOST_HCALL_VOID(__pkvm_tlb_flush_vmid,
->         put_pkvm_hyp_vm(hyp_vm);
->  }
->
-> -DEFINE_KVM_HOST_HCALL_VOID(__kvm_flush_cpu_context,
-> +DEFINE_KVM_HOST_HCALL(void, __kvm_flush_cpu_context,
->         struct kvm_s2_mmu __kern *, mmu)
->  {
->         __kvm_flush_cpu_context(kern_hyp_va_host(mmu));
->  }
->
-> -DEFINE_KVM_HOST_HCALL_VOID(__kvm_timer_set_cntvoff,
-> +DEFINE_KVM_HOST_HCALL(void, __kvm_timer_set_cntvoff,
->         u64, cntvoff)
->  {
->         __kvm_timer_set_cntvoff(cntvoff);
->  }
->
-> -DEFINE_KVM_HOST_HCALL0_VOID(__kvm_enable_ssbs)
-> +DEFINE_KVM_HOST_HCALL0(void, __kvm_enable_ssbs)
->  {
->         u64 tmp;
->
-> @@ -494,18 +479,18 @@ DEFINE_KVM_HOST_HCALL0(u64, __vgic_v3_get_gic_config)
->         return __vgic_v3_get_gic_config();
->  }
->
-> -DEFINE_KVM_HOST_HCALL0_VOID(__vgic_v3_init_lrs)
-> +DEFINE_KVM_HOST_HCALL0(void, __vgic_v3_init_lrs)
->  {
->         __vgic_v3_init_lrs();
->  }
->
-> -DEFINE_KVM_HOST_HCALL_VOID(__vgic_v3_save_aprs,
-> +DEFINE_KVM_HOST_HCALL(void, __vgic_v3_save_aprs,
->         struct vgic_v3_cpu_if __kern *, cpu_if)
->  {
->         __vgic_v3_save_aprs(kern_hyp_va_host(cpu_if));
->  }
->
-> -DEFINE_KVM_HOST_HCALL_VOID(__vgic_v3_restore_vmcr_aprs,
-> +DEFINE_KVM_HOST_HCALL(void, __vgic_v3_restore_vmcr_aprs,
->         struct vgic_v3_cpu_if __kern *, cpu_if)
->  {
->         __vgic_v3_restore_vmcr_aprs(kern_hyp_va_host(cpu_if));
-> @@ -541,7 +526,7 @@ DEFINE_KVM_HOST_HCALL(int, __pkvm_host_unshare_hyp,
->         return __pkvm_host_unshare_hyp(pfn);
->  }
->
-> -DEFINE_KVM_HOST_HCALL(unsigned long, __pkvm_create_private_mapping,
-> +DEFINE_KVM_HOST_HCALL(ulong, __pkvm_create_private_mapping,
->         phys_addr_t, phys, size_t, size, u64, prot)
->  {
->         /*
-> @@ -554,7 +539,7 @@ DEFINE_KVM_HOST_HCALL(unsigned long, __pkvm_create_private_mapping,
->          * Instead pass the allocation address as the return value (or return
->          * ERR_PTR() on failure).
->          */
-> -       unsigned long haddr;
-> +       ulong haddr;
->         int err = __pkvm_create_private_mapping(phys, size, prot, &haddr);
->
->         if (err)
-> @@ -573,7 +558,7 @@ DEFINE_KVM_HOST_HCALL0(int, __pkvm_reserve_vm)
->         return __pkvm_reserve_vm();
->  }
->
-> -DEFINE_KVM_HOST_HCALL_VOID(__pkvm_unreserve_vm,
-> +DEFINE_KVM_HOST_HCALL(void, __pkvm_unreserve_vm,
->         pkvm_handle_t, handle)
->  {
->         __pkvm_unreserve_vm(handle);
-> @@ -630,7 +615,7 @@ DEFINE_KVM_HOST_HCALL(int, __tracing_load,
->         return __tracing_load(desc_hva, desc_size);
->  }
->
-> -DEFINE_KVM_HOST_HCALL0_VOID(__tracing_unload)
-> +DEFINE_KVM_HOST_HCALL0(void, __tracing_unload)
->  {
->         __tracing_unload();
->  }
-> @@ -647,7 +632,7 @@ DEFINE_KVM_HOST_HCALL(int, __tracing_swap_reader,
->         return __tracing_swap_reader(cpu);
->  }
->
-> -DEFINE_KVM_HOST_HCALL_VOID(__tracing_update_clock,
-> +DEFINE_KVM_HOST_HCALL(void, __tracing_update_clock,
->         u32, mult, u32, shift, u64, epoch_ns, u64, epoch_cyc)
->  {
->         __tracing_update_clock(mult, shift, epoch_ns, epoch_cyc);
-> @@ -665,19 +650,19 @@ DEFINE_KVM_HOST_HCALL(int, __tracing_enable_event,
->         return __tracing_enable_event(id, enable);
->  }
->
-> -DEFINE_KVM_HOST_HCALL_VOID(__tracing_write_event,
-> +DEFINE_KVM_HOST_HCALL(void, __tracing_write_event,
->         u64, id)
->  {
->         trace_selftest(id);
->  }
->
-> -DEFINE_KVM_HOST_HCALL_VOID(__vgic_v5_save_apr,
-> +DEFINE_KVM_HOST_HCALL(void, __vgic_v5_save_apr,
->         struct vgic_v5_cpu_if __kern *, cpu_if)
->  {
->         __vgic_v5_save_apr(kern_hyp_va_host(cpu_if));
->  }
->
-> -DEFINE_KVM_HOST_HCALL_VOID(__vgic_v5_restore_vmcr_apr,
-> +DEFINE_KVM_HOST_HCALL(void, __vgic_v5_restore_vmcr_apr,
->         struct vgic_v5_cpu_if __kern *, cpu_if)
->  {
->         __vgic_v5_restore_vmcr_apr(kern_hyp_va_host(cpu_if));
->
-> --
-> Without deviation from the norm, progress is not possible.
+Hi Leo,
+
+I've also been thinking about this approach: clear
+KVM_PTE_LEAF_ATTR_HI_S2_DBM when kvm_pgtable_stage2_wrprotect() calls
+stage2_update_leaf_attrs(). And we can check whether a page is a block
+page during the page walk, right?
+
+So we can check the page level in the walker callback
+stage2_attr_walker(), filter there, clear DBM for block pages and
+preserve DBM on level-3 pages. Something like this:
+
+```
+pte &= ~data->attr_clr;      // wrprotect: clears S2AP_W only
+pte |= data->attr_set;
+if (ctx->level < KVM_PGTABLE_LAST_LEVEL)
+     pte &= ~KVM_PTE_LEAF_ATTR_HI_S2_DBM;  // strip DBM from blocks
+```
+
+My only concern is whether this breaks Oliver's model of treating DBM as
+the write permission bit — though DBM will be set back to 1 once the
+block is split into level-3 pages. So the inconsistency is temporary.
+But if you think this is acceptable, I'll go with this approach in the
+next version.
+
+What do you think?
