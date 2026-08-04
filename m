@@ -1,83 +1,136 @@
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFE0145FFD1
-	for <kvmarm@lists.linux.dev>; Tue,  4 Aug 2026 17:56:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 660193E1D1D;
+	Tue,  4 Aug 2026 18:14:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785866164; cv=none; b=dKgidhNpP/aNcCAgMWr5T4FF593Mai3xiP7kCG4A1LrnWAZALjzhBK20P2VjxCIn3DTmsr7CNg7Tqm6jkFlV60vRSBVQs9ZVYa+MCu5C0oJQSeBI5DW2vLHrRquPE31v1VsPqBKTJx66gIGa6nfd1vtDqJIQxIfe46t8PWzoC6o=
+	t=1785867250; cv=none; b=XN0IVrHhB+jrcFaayyhA0fg8coSUV/NL27nWeRjUKqiRZR0G6nj0fmy7d/PIYI5ZjyRVzP1UuOgt9LkVOIMwOxHKd/G7p3bstA/rXaAkxf04i9Hv44us6c1zQwHLk3VAHSiAO8YL8WOto9RSK/BpxWwWCbActVraR6J2E0NuPkA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785866164; c=relaxed/simple;
-	bh=dLGzC+zLz6I8etI/1JXJDRBgaBzh0MkWAL3seshbA6s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DFGSa9CURsNCp42vjL2zMI4zs+g7CsSZ8LKZ8VURKpooZeqi/OvRCML8c4n4/UBm8p55izPzSzfuAys8ckU/KJUhdAVh6zrVejs7HTY2i5n1VtmPaEXpd33jm3t7cFp+0QE1INWGVeK/VJ68sHPzrQHsIzlC1XjKfiUSP4GlvYA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CB2d3TSw; arc=none smtp.client-ip=91.218.175.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1785867250; c=relaxed/simple;
+	bh=WlhS6lemzfBtCuPI1fuXiH5h4OKvETijPqqs003W/fQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XvA+NEla+LVRIXZUY3PdW5A6/YTHWG6tmb5gC3U+sa8XpX98IXGNRev1FvRo2D3i+Vi/gBa4QTogRahQnGvR08d9uLmNSFbNXiJiRqpz9daWrjUFL0nut8rVVSIQOvRbtCYg4zI2Ra0jUtAWfR5bsT+4NyyTaVxSYhK6qeVWsCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GP9Jyq3I; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CB2d3TSw"
-X-Forwarded-Encrypted: i=1; AHgh+RoDsfjdkKyGfuAn7+RxhTl7eMQlVym0A2ZwApzRov4U6LiBleMUAi/0sTv6awR2Ct2wWvgtwHE=@lists.linux.dev
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1785866160;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=F/Vf4JqZOlRdkDX86iTvbq09jgwXW+/RtBV9DIZvhmE=;
-	b=CB2d3TSw+Qy8niUthFfxGP7miRtC+/yegC4jVyZD7Nx+LRMTFZeyh0AF79DPuUX/5Wj+e3
-	dqbwzfabHxMt6oOL2re0mAWjK7Bac9NHsXfJQmQVtQaiLyLEuUewAv6eyIzULObApLZ23Q
-	ZPTNMg8Zgehcxz5qHOGQgzm1uVbx1HY=
-X-Gm-Message-State: AOJu0YyyqoePywraqD08eXVhdLZ5pXYf9jA3h/CmzS6eLQVqhoVeGlqV
-	E5bUZS2JcRgDDhQJSJk0XVwalauObeSyDDRkWAiUBdd234so8+LAFU0e+PCiKArLh1tM03S+VBx
-	xdKInKftGYwbu+GyeS3YrKcI22qcDUMkIgbCCurK3
-X-Received: by 2002:ac8:6903:0:b0:517:5e32:2d14 with SMTP id
- d75a77b69052e-52ce6b25dcamr686141cf.10.1785866120314; Tue, 04 Aug 2026
- 10:55:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GP9Jyq3I"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EC901F000E9;
+	Tue,  4 Aug 2026 18:14:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785867249;
+	bh=0lCZ7G6SNgZFbJUMgnsW3ETwHXQ8DNYKJ1VAQ7wa5jA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=GP9Jyq3ImlxUyG5PYNCsX/FdyquDUqNk1pngO/aod7TeAvCCFRAJewoSsxhDux2X5
+	 4HCBbcRJOWV0OOJEPztylPgD4K7AD2jcWRA1bmN8Xg5iv30oK/ycci2550YdctZS+/
+	 ISj/4x+YVRyV8sUFDBhHGqO9tTDn8tWBIu2lBd7wd2u6sZTmyakyFarei0drXYxtFU
+	 rhh79sTCrtpeih4TFD14i6oPOTPlYK9jB8mviph4j3sOSWVrH6Hupc0LLcv8H+7daL
+	 Iq8DNV7dYbIbWbyntGnw1fD/xVDh0tf2qOoFxsn6E0x6VPn3j9oVE/jWizoX+in5VT
+	 qe5RJHpat9bZQ==
+Date: Tue, 4 Aug 2026 19:14:03 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: selftests: Check ID regs are immutable after
+ a failed run
+Message-ID: <7e660a4c-af62-4751-a8cf-49151054f0df@sirena.org.uk>
+References: <20260804092421.1728880-1-fuad.tabba@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260804092421.1728880-1-fuad.tabba@linux.dev> <599f665d-7474-4f17-a044-cc92b03d02aa@sirena.org.uk>
-In-Reply-To: <599f665d-7474-4f17-a044-cc92b03d02aa@sirena.org.uk>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Tue, 4 Aug 2026 18:54:43 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTzHSJnZ7YpJCVCvsHrvS0WtFmOEHUPST_+A9_0i7MXkow@mail.gmail.com>
-X-Gm-Features: AUfX_mw54sYeUiJsXvDxqF1B0irs3Zmjh1gV7CnF488RmUDI8wbKkK8_cW6kwgw
-Message-ID: <CA+EHjTzHSJnZ7YpJCVCvsHrvS0WtFmOEHUPST_+A9_0i7MXkow@mail.gmail.com>
-Subject: Re: [PATCH] KVM: arm64: selftests: Check ID regs are immutable after
- a failed run
-To: Mark Brown <broonie@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Peter Maydell <peter.maydell@linaro.org>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Migadu-Flow: FLOW_OUT
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="UnkPqelfwiKSm0sl"
+Content-Disposition: inline
+In-Reply-To: <20260804092421.1728880-1-fuad.tabba@linux.dev>
+X-Cookie: QOTD:
 
-On Tue, 4 Aug 2026 at 17:14, Mark Brown <broonie@kernel.org> wrote:
->
-> On Tue, Aug 04, 2026 at 10:24:21AM +0100, Fuad Tabba wrote:
-> > Add a set_id_regs case covering ID register immutability when a vCPU's
-> > first KVM_RUN fails after finalization but before
-> > KVM_ARCH_FLAG_HAS_RAN_ONCE is set. The test provokes such a failure with
-> > a PMUv3-enabled vCPU whose PMU is left uninitialized, then checks that
-> > KVM_SET_ONE_REG on an ID register and KVM_CREATE_DEVICE for a vGIC are
-> > both rejected with -EBUSY.
->
-> > +     for (int i = 0; i < ARRAY_SIZE(test_regs) && !found; i++) {
-> > +             const struct reg_ftr_bits *ftr_bits = test_regs[i].ftr_bits;
-> > +
-> > +             reg = KVM_ARM64_SYS_REG(test_regs[i].reg);
-> > +             val = vcpu_get_reg(vcpu, reg);
->
-> If we're doing a focused test for the specific issue there's the VM ID
-> registers as well as the general ID registers and adding an irqchip.
 
-Sure, I'll expand it and send something out tomorrow.
+--UnkPqelfwiKSm0sl
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Cheers,
-/fuad
+On Tue, Aug 04, 2026 at 10:24:21AM +0100, Fuad Tabba wrote:
+> Add a set_id_regs case covering ID register immutability when a vCPU's
+> first KVM_RUN fails after finalization but before
+
+A couple of other things - there's plenty of other examples of these
+problems in set_id_regs, I've got a series which I think mostly cleans
+it up:
+
+   https://patch.msgid.link/20260719-kvm-arm64-set-id-regs-aarch64-v6-0-724287f5f108@kernel.org
+
+but probably best not to make the issue worse.
+
+> +	if (!found) {
+> +		ksft_test_result_skip("%s (no immutable ID reg field to test)\n",
+> +				      __func__);
+> +		kvm_vm_free(vm);
+> +		return;
+> +	}
+
+All test result reports for a given test should use the same string when
+reporting so that automation can figure out that results for a given
+test from different runs correspond to each other.  It's better to print
+a diagnostic message, then the ksft_test_result_() with the result for
+the framework.
+
+> +	TEST_ASSERT(r < 0 && errno == EBUSY,
+> +		    "ID reg write after failed first run: r=%d errno=%d",
+> +		    r, errno);
+> +	TEST_ASSERT_EQ(vcpu_get_reg(vcpu, reg), val);
+
+> +	kvm_vm_free(vm);
+> +	ksft_test_result_pass("%s\n", __func__);
+
+Mixing TEST_ASSERT() and ksft_test_result_ in the same test program also
+interacts really poorly with automation, TEST_ASSERT() just kills the
+entire program so no result is reported for the actual failing test and
+any tests the program would attempt to run afterwards also vanish from
+the results.  If the test program is using the kselftest framework to
+report tests as this one is it should report the results via kselftest
+framework.  A better pattern would be something like:
+
+	if (r < 0 && errno == EBUSY) {
+		ksft_print_msg("ID reg write after failed first run: r=%d errno=%d",
+				r, errno);
+		pass = false;
+		goto out;
+	}
+
+...
+
+ out:
+	kvm_vm_free(vm);
+	ksft_test_result(pass, "%s\n", __func__);
+
+TEST_ASSERT() is a good fit for tests that are just one test case per
+program, then it plays nicely with tooling since the tooling just
+tracking the executable result and any output is diagnostic logging.
+
+--UnkPqelfwiKSm0sl
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmpyK+sACgkQJNaLcl1U
+h9BLFQf+M2EJkmtPKxPvAE1jYWYzT7FBTecWzsvhmXOcvfDOFM3DC9Mx06mhp3Xf
+/8vRfb8xclnvXnepYxm43kzZCF8sfg7j7RHsumvyawkQe67rfgmKWr2XFuwgLIwi
+Bs8qUQKvwH+6oN0HdRpCY7N2WXkvjmOHQeOb5AAM6QVnHIqk8xBaR4OpwCWeLmlF
+IAk84krdI6Uns7W+2dhZwNFKNQGmV67595izCLGjPEZ79L1kNip1UfdaztYcgFPf
+LczVv4t11khhG/KxYBnDIQHx4Fj0ph+iur2sNXP/ZRgt/wqEbSzj3FBr4pYMXWZm
+pw+b7DT9DUuuBopgQmk/NbNAg096tA==
+=SVXk
+-----END PGP SIGNATURE-----
+
+--UnkPqelfwiKSm0sl--
