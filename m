@@ -1,126 +1,206 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 291F63ED3C9;
-	Tue,  4 Aug 2026 14:44:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F95E456DFA
+	for <kvmarm@lists.linux.dev>; Tue,  4 Aug 2026 14:50:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785854681; cv=none; b=c/Q+ZXqIvT7VH0nh7syfs2FRTLOvc2bhqkJ+S1JespEuMxXP3rwyuWRnDDHy1sb9tROWs8zvLyW4e3i08NDeSszN8pwE0fQdYQVm5q40DTYRwMayiY3Km796bFIw25jkXoz91/Rl6J5jpIf4GIIAvPD3L6K1LEo8aqqpKuiLv/4=
+	t=1785855019; cv=none; b=bynkN+19y0T824ln6R8Tg9ReLVRHeCIhsd76gKDFu5hVcl/wvVm19gu6zwx5ON64JV3eb/QohQkXE+zXVJslkYs1VVf8CoV58ZZLhToJTc7YE3N812MsoCqfdyv4EkauZf2jVrxJIVK2mgURjybawxsNnU1r/GADAxskL7eiTMY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785854681; c=relaxed/simple;
-	bh=FCEaBQlDRUm6dYO31Sm2WtF5WhrmLg76I6xWT8Sy9u8=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BJs6Nm1ovbixAzb61dUe09z+m5lOv3ulINDX+vEK37l67CDT0S7BX8Qyf7RSCaaMw581Kr2DmBNS5YQ7VxH2cMqHPHJIWNw8pbLXTU0VqO51EnoKSqjaWj13g2t9IK9Bwk/G0xX8b6TKGGGIRKirzXcW5gELadI0gK1iUvNjIp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aByPNJbb; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1785855019; c=relaxed/simple;
+	bh=kQAS1jsNR9gHB+FBM7fPWKSqywBPXmRqtaUfOLkCkrY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fC75TQrQ/iWjz8aXuC+nd1WjpDvKj9KBhq2tWaQDdZk1UlDOb1fqxkLdHuxrUI4GNzJSygBJj8dUILYjQ8dxYPGPmd2Odm+nZAT1LHzn9cGiZbgT+gkVktI2yWAdtgXbQU1J+sb4xHQHfeEgdlKh17vnGwA/jFNMOO+Z95N+EoA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DjozL+US; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aByPNJbb"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE5D41F000E9;
-	Tue,  4 Aug 2026 14:44:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785854679;
-	bh=aZ8CvjTsE8imig+joKU5SQ3EWoaGRndjO4SfRE71EXM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=aByPNJbbjlQ57OPBmEl8tJNjWE3LtGyGGF4aZBkdplun7csv9BKs4dRrYmdhKBYSe
-	 TggmkPB8+7WHmXzFr7Bg+vxLadqT/keWhiSLB72UTErsJe1SQzaS8OFc/40nSt+RJq
-	 7GO7Tdw7BEpH0cIdWugqErMXWn5aE2wtRr7ogLFkjq0wjY1qbCzwP45hf4GFE9SVri
-	 HNBz420P0E0eo7+v3hTrjywcmA3Mt88KUROBncPZiL2gGwznHgBpYpuqyryB16DFQh
-	 JkbkOoJByf+quO6BbHh196/3uAcjVbuKwQ8oGH7w+EBrZdkPUYPHPcm8BrWtU5EY3k
-	 JTIB9tLgGObFg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wrGNh-0000000CFYa-0bPg;
-	Tue, 04 Aug 2026 14:44:37 +0000
-Date: Tue, 04 Aug 2026 15:44:36 +0100
-Message-ID: <86ldamaqsr.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Karl Mehltretter <kmehltretter@gmail.com>
-Cc: Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <tabba@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH 2/2] KVM: arm64: selftests: Add a nested S2 MMU realloc test
-In-Reply-To: <20260803224405.41468-2-kmehltretter@gmail.com>
-References: <20260803224405.41468-1-kmehltretter@gmail.com>
-	<20260803224405.41468-2-kmehltretter@gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DjozL+US"
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-495509b08ebso46875e9.1
+        for <kvmarm@lists.linux.dev>; Tue, 04 Aug 2026 07:50:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1785855015; x=1786459815; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=aoiYuPF6Lxrjv4D/1nx7DDBtlGVMorYZQ8pdqOx51TA=;
+        b=DjozL+USiAFju7/ysT7BNMLYpupTZ/ILl7D0M+OVuUGwTTiOpw34O+J1PU6c9j64ZJ
+         XzHI1FmJUVSoGRguN91X3OtLesX7PcSaOWniIQIY0LKNNOsxFadof4CchAb26p8A/mqt
+         uE3szc2ssut8ZN1GRVdQQKJOE0venVrIEfW9i8VHsTJEUoiNECArKO5IV8Lv+Kx5JQ+U
+         HZe/sUgHoddcehKiMXoymFXGlC+f9lSHkModSIyU7RKjhX6/V44tnQ1iFPTT8hmhszbz
+         oICdzngeaLbFB617U1Zs6TVtFRYz5ViMI0WDiKcuMkzhf2Tvxe43gGgXVBjkxk/+El3r
+         OjCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785855015; x=1786459815;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=aoiYuPF6Lxrjv4D/1nx7DDBtlGVMorYZQ8pdqOx51TA=;
+        b=QEG0YYz0tvowS2zLa7NrkWrlz1nWamgInIaATKsr2Ih/oiQRmzDteXxotuEcHyx9WX
+         9cXWHYtTM8mztFPMTbLGZ06FoMxOesmoErc8u81cJBZdev6VDbFSxm36oORKJGfqGp9g
+         YlfKKuc6fyjU1Aw6SOmY5+/+qNf931r53TeWv4sFe357EeTd9g/Vrq0NCizJVpS0enuB
+         FlaY8B6Nc1pPd24GXgrcGmQopi9VlV/pVrgtnEudThOH0ctXwL7O+cTfPfOmDoUtH/Is
+         2p62/UUVTOWCYCPLE07IlDYqcZXKc9SitvkZYQK0ovlb+0bAA2NDKY8OY6lBxuQSf6SB
+         2eUA==
+X-Forwarded-Encrypted: i=1; AHgh+Rrn9h+bj/+rtrSmLn2pz0+rURLQc7JeeOq1yLO9S6leP4lUs2wK8vlx9WpdPoFauq0+htVG07Y=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yxqmf3U7kazJ6fpJ3HdLbGR9/+Kim8Mh6ueqDT+g4Mdo1gsrh8V
+	mCHmogiLJfhDtEg023zZRmzm4iQJGoVWPq6lypJ300dc0hevrCG9D61ovixp22HUPQ==
+X-Gm-Gg: AR+sD111aW9hs0vMA16PG2kkFj/lgvBnG7S8kKZOu9qINiP1DhwjL69lr3BcQ6tyhMO
+	I8v8++DRPek84AkRN8LoPU17jHt9hN57i3oXJHita8Zehu+kGlg6K4zDfPjO4aMfL/fravYFs0m
+	vPR+gq5/iGXG3dyLbBcn2zIuCFMetR3OHxQJt2ND5mB3vBAjuzAiQrdvEbytZ9kKksI9K/qabWE
+	I8I1IAenfs4Xo/ij0q8P8u0Nq68ZL+eC36XyXjuJ0UZ1uBStIuLSdOrn0jOoPNOXUMtXWOQngOX
+	J6nv9Uvez/T8n5bCcxi8Vb8+3jLqjc+lyBo2oX+KlJxiuc7mL7NNIagkkootO8NbrZe5LpZOE3J
+	l7DUBlZ4UB54VU2voL9TNsOUeaEU7/rIbQGUsAXaWAN6g49NA2uGIWnMXpAP0u7HpS8P+bXuWNK
+	3sbaE7j8VSdIkupItC90PewlPp2zkVWxT/y5XWEnUO2w1DmyewCeOBbDDVB0DNMZ9TRkL+z2ww6
+	hNzZUuIb9K9U5yxnUfmhK0PehDhe3oE
+X-Received: by 2002:a05:600c:230c:b0:495:3ffd:5e39 with SMTP id 5b1f17b1804b1-4994dc85254mr145915e9.3.1785855014652;
+        Tue, 04 Aug 2026 07:50:14 -0700 (PDT)
+Received: from google.com (63.235.189.35.bc.googleusercontent.com. [35.189.235.63])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47fec232d74sm181843f8f.17.2026.08.04.07.50.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Aug 2026 07:50:14 -0700 (PDT)
+Date: Tue, 4 Aug 2026 14:50:10 +0000
+From: Sebastian Ene <sebastianene@google.com>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: alexandru.elisei@arm.com, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	android-kvm@google.com, catalin.marinas@arm.com,
+	dbrazdil@google.com, joey.gouly@arm.com, kees@kernel.org,
+	mark.rutland@arm.com, maz@kernel.org, oupton@kernel.org,
+	perlarsen@google.com, qperret@google.com, rananta@google.com,
+	smostafa@google.com, suzuki.poulose@arm.com, tabba@google.com,
+	tglx@kernel.org, bgrzesik@google.com, will@kernel.org,
+	yuzenghui@huawei.com
+Subject: Re: [PATCH 02/14] KVM: arm64: Track host-unmapped MMIO regions in a
+ static array
+Message-ID: <anH8IuRrbQV67Q4C@google.com>
+References: <20260310124933.830025-1-sebastianene@google.com>
+ <20260310124933.830025-3-sebastianene@google.com>
+ <acJrldyUBXgbvWw4@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kmehltretter@gmail.com, oupton@kernel.org, tabba@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, pbonzini@redhat.com, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <acJrldyUBXgbvWw4@google.com>
 
-On Mon, 03 Aug 2026 23:44:05 +0100,
-Karl Mehltretter <kmehltretter@gmail.com> wrote:
+On Tue, Mar 24, 2026 at 10:46:45AM +0000, Vincent Donnefort wrote:
+> On Tue, Mar 10, 2026 at 12:49:21PM +0000, Sebastian Ene wrote:
+> > Introduce a registry to track protected MMIO regions that are unmapped
+> > from the host stage-2 page tables. These regions are stored in a
+> > fixed-size array and their ownership is donated to the hypervisor during
+> > initialization to ensure host-exclusion and persistent tracking.
+> > 
+> > Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_pkvm.h     | 10 ++++++++++
+> >  arch/arm64/kvm/hyp/nvhe/mem_protect.c |  3 +++
+> >  arch/arm64/kvm/hyp/nvhe/setup.c       | 25 +++++++++++++++++++++++++
+> >  3 files changed, 38 insertions(+)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
+> > index 757076ad4ec9..48ec7d519399 100644
+> > --- a/arch/arm64/include/asm/kvm_pkvm.h
+> > +++ b/arch/arm64/include/asm/kvm_pkvm.h
+> > @@ -17,6 +17,16 @@
+> >  
+> >  #define HYP_MEMBLOCK_REGIONS 128
+> >  
+> > +#define PKVM_PROTECTED_REGS_NUM	8
+> > +
+> > +struct pkvm_protected_reg {
+> > +	u64 start_pfn; 
+> > +	size_t num_pages; 
 > 
-> Add a regression test for a stale vcpu->arch.hw_mmu reference when
-> initialising a vCPU grows the nested S2 MMU table.
-> 
-> The test drives vCPU0 into L2 through a minimal L1 stage-2 identity map,
-> pins it to a second pCPU where it spins in L2, and then initialises
-> vCPU1.  That initialisation grows the nested MMU table while vCPU0 still
-> holds one of its entries; keeping vCPU0 on a pCPU of its own means the
-> reference stays live without relying on hw_mmu being retained across a
-> schedule-out.  vCPU0 is then released and has to run to completion.
-> 
-> Creating vCPU1 up front is what allows the in-kernel VGIC to be used:
-> kvm_arch_vcpu_precreate() refuses KVM_CREATE_VCPU once the VGIC has been
-> initialised, which the test does before its first KVM_RUN.  Creation on
-> its own increments online_vcpus, so deferring vCPU1's KVM_ARM_VCPU_INIT
-> until vCPU0 is in L2 still grows the table.
-> 
-> With KASAN enabled, an unfixed kernel reports a slab-use-after-free in
-> kvm_handle_guest_abort(); with the fix it completes cleanly.
+> nit: "u64 pfn, u64 nr_pages" to align with everywhere else.
 
-The problem is that we can't mandate selftests to rely on KASAN on the
-host. Selftests are there to verify that we match the architecture
-requirements.
-
-If anything, this is a nice hack to demonstrate the problem (and yes,
-it fires here).
+Ack,
 
 > 
-> Assisted-by: Claude:claude-fable-5
-> Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
-> ---
+> > +};
+> > +
+> > +extern struct pkvm_protected_reg kvm_nvhe_sym(pkvm_protected_regs)[];
+> > +extern unsigned int kvm_nvhe_sym(num_protected_reg);
+> > +
+> >  int pkvm_init_host_vm(struct kvm *kvm);
+> >  int pkvm_create_hyp_vm(struct kvm *kvm);
+> >  bool pkvm_hyp_vm_is_created(struct kvm *kvm);
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> > index 0808367c52e5..7c125836b533 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> > @@ -23,6 +23,9 @@
+> >  
+> >  struct host_mmu host_mmu;
+> >  
+> > +struct pkvm_protected_reg pkvm_protected_regs[PKVM_PROTECTED_REGS_NUM];
+> > +unsigned int num_protected_reg;
+> > +
+> >  static struct hyp_pool host_s2_pool;
+> >  
+> >  static DEFINE_PER_CPU(struct pkvm_hyp_vm *, __current_vm);
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+> > index 90bd014e952f..ad5b96085e1b 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/setup.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+> > @@ -284,6 +284,27 @@ static int fix_hyp_pgtable_refcnt(void)
+> >  				&walker);
+> >  }
+> >  
+> > +static int unmap_protected_regions(void)
+> > +{
+> > +	struct pkvm_protected_reg *reg;
+> > +	int i, ret, j = 0;
+> > +
+> > +	for (i = 0; i < num_protected_reg; i++) {
+> > +		reg = &pkvm_protected_regs[i];
+> > +		for (j = 0; j < reg->num_pages; j++) {
+> > +			ret = __pkvm_host_donate_hyp_mmio(reg->start_pfn + j);
 > 
-> The test requires nested virtualization and two pCPUs.  Under QEMU TCG
-> it takes ~233s, exceeding the 120s timeout in
-> tools/testing/selftests/kvm/settings; psci_test takes ~167s in the same
-> boot, so emulating the second vCPU is the dominant cost.
+> If this is to make this static at boot, we don't even need __pkvm_host_donate_hyp_mmio()
+> 
+> We can just map the region early enough in the hypervisor pkvm_create_mappings()
+> in recreate_hyp_mappings() and then let fix_host_ownership() do the host
+> stage2 unmapping.
 
-# time /host/home/maz/nested_mmu_realloc_test 
-Random seed: 0x6b8b4567
-Running control thread on pCPU 0, vCPU thread on pCPU 1
-vCPU0 is running in L2; initializing vCPU1 to grow the table
-vCPU1 initialized; releasing vCPU0
-vCPU0 resumed after nested MMU resize
 
-real	0m0.161s
-user	0m0.007s
-sys	0m0.109s
+I looked at this and tried to implement it this way as you suggest because it is more
+elegant but then I realized that `fix_host_ownership_walker` doesn't do
+well with MMIO (it returns -EINVAL).
 
-This is with KVM running as an L1 already...
+> 
+> > +			if (ret)
+> > +				goto err_setup;
+> > +		}
+> > +	}
+> > +
+> > +	return 0;
+> > +err_setup:
+> > +	for (j = j - 1; j >= 0; j--)
+> > +		__pkvm_hyp_donate_host_mmio(reg->start_pfn + j);
+> > +	return ret;
+> > +}
+> > +
+> >  void __noreturn __pkvm_init_finalise(void)
+> >  {
+> >  	struct kvm_cpu_context *host_ctxt = host_data_ptr(host_ctxt);
+> > @@ -324,6 +345,10 @@ void __noreturn __pkvm_init_finalise(void)
+> >  	if (ret)
+> >  		goto out;
+> >  
+> > +	ret = unmap_protected_regions();
+> > +	if (ret)
+> > +		goto out;
+> > +
+> >  	ret = hyp_ffa_init(ffa_proxy_pages);
+> >  	if (ret)
+> >  		goto out;
+> > -- 
+> > 2.53.0.473.g4a7958ca14-goog
+> > 
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Thanks Sebastian
