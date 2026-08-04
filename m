@@ -1,176 +1,230 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B4F130D40B;
-	Tue,  4 Aug 2026 15:16:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F2A941D633
+	for <kvmarm@lists.linux.dev>; Tue,  4 Aug 2026 15:22:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785856586; cv=none; b=Y/VVyU6TCCqhKVBnjackkU4OBi0deeguhb4AMTLlrTCqnobwGb0XRDi2pvct6jNGGZScXmGaKbtgqzX8b8SNkWIbdnROX7hTef5R9Gj0C/D0Eg4T5xm3EUbOfe83NaD3WZTdG9l1VIri4n51H8pAWNE9pDwD9uBF+ozisYAafQs=
+	t=1785856983; cv=none; b=DUfzj0z2e2oRVjQWlNjnwJI2vecNyEdpLzfMVw8dr3/rf9yeUVcKpudg1y1wQCq3RqCgr+hGSFPUcPYf9q7qNvLmDvJV1SQLNP7KKHk9dxvq+Nt/gNO7MD6zOzwLzsylMgTfllFw6C/8VO9w5xSizM2bKb0hCAgBjWrAjjlwsEg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785856586; c=relaxed/simple;
-	bh=XW4UhJwwZ32w6A5v+gluvdHrownap3EA5jXPN8zoYa4=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=r6Om5m/sy5b+227qpp0reWs6YIyqcYebSrYE3wNIkgcVylF7BbFkQDXDGWWkNym+neGOwps7fTwvv1ZBiVDBkcfZoHpP3IYa3DZomdREeypZjLUDnMZbbWaYa12vC1/KgLwYGzhickYhkN1iEsM8b1igshpqAyRolAlQZacW+Jo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GLZl8Pc9; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1785856983; c=relaxed/simple;
+	bh=ARPOQ+c6UDtO7LhU3svWeAQohZ9g6PrIcJqv4Q8q4tM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QlJCP26ViLHyvNURPbHkv7BLaXaOFoxHW5xG+s+GJE5P5lcXxAkoNJTLMHGPPPiaBaX8hyxTXFe+S66vsjc75WsbHtu20JzYOmLcErB44loOS3vokIoi0m2NKuNwnjywp/YnUpSbrPdmEc+AkzUf1z2mMxg0VJNbHMnQYkGwb9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CTSHcsf3; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GLZl8Pc9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 705751F000E9;
-	Tue,  4 Aug 2026 15:16:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785856585;
-	bh=5bKVEcNFiFbLr1dxAdp9i5MeCT8J5gRCnSlut5TctaM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=GLZl8Pc9AsSkRLZYTRt8E99d8OlNZ7RgOVfHiYonOUdCEovyjx1lDjeV7JfrL3csI
-	 9wNQbKgovsfbtpsxo/IpKu1HfUDeWUWS6YieZn4r68x+j2aEpbSGWlO/uxaSf2sk3g
-	 VExXrqYkzICC3Xe+VEmzHc93BYv/yzXAGpmMbGHM9+ZBmB1gx0Ovp3SeW61a5Kn0qA
-	 OK/Kk9/4x2Vp7yjsApHxkdw/W2Esg/bMBSbgyrzqQoIn2RWwktzfbqXfUDOVtUiIui
-	 yIrDDbg/zP7OK+jkSvAmtN1M4ofLmypu8evk6/huXxlxevQrno29XpTcLeiUH+JiFw
-	 NRteEAT0I6Gwg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wrGsR-0000000CGKT-2XG5;
-	Tue, 04 Aug 2026 15:16:23 +0000
-Date: Tue, 04 Aug 2026 16:16:23 +0100
-Message-ID: <86h5l9c3w8.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Hyunwoo Kim <imv4bel@gmail.com>,
-	stable@vger.kernel.org
-Subject: Re: [PATCH 3/6] KVM: arm64: Consider SCTLR_EL2.M when mapping the L1 VNCR page
-In-Reply-To: <anHHA9Fj3be5ndmB@e143914.arm.com>
-References: <20260801124818.366274-1-maz@kernel.org>
-	<20260801124818.366274-4-maz@kernel.org>
-	<anHHA9Fj3be5ndmB@e143914.arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CTSHcsf3"
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-495509b08ebso49155e9.1
+        for <kvmarm@lists.linux.dev>; Tue, 04 Aug 2026 08:22:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1785856978; x=1786461778; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=57eVHha9yn05PRoBRgBz6lC7HiDLbzFyMEEXKt7qjx0=;
+        b=CTSHcsf3CxaW0Skpcf+ra095rHF5mircUsCDnQP5tKHvDa4LE46Xp2trPcUmu0ylKp
+         /uG1BNbj12RnmTtjqH9biPi8t6/fJ7Ks+utODtv/wQPyel83We7wMtleJ2xD7JJDPH1q
+         3DOPz4Q92k/n4YVD1dSJo0ccIqNJ++eb5HrAi49UqHLTegP/A92x3JrCI9ZBKO0r+ZQl
+         QMV7GsA5CoXOiRJOWcDdLawdXhN1u7HGx845bQ3dvUItCVcpke6Ms5zW+ywIbMzrTLyn
+         O/oYfoye5bV7KjOWjNTS5sZFgzIcNVYp9pkcUBL0aqULha/kYYRVIxEaCTgrzz7vpMp4
+         aewA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785856978; x=1786461778;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=57eVHha9yn05PRoBRgBz6lC7HiDLbzFyMEEXKt7qjx0=;
+        b=cKvZEMX8mqr+il9KKDCsXEkhpXReKigXKnRDjX1ndtXVoH3iTHKQbhWKekx6crufIa
+         pWm3YrzyY9syj3PO4KGXvdzlT7UgoJe/mLVEsGDJuS5WZ6ujWxua01d0d8hH+hTvblXf
+         vDgMRmIxu+crr012UR5Iy+OyKY2GkuQYspKKAEjAxN+PAN9eQdaYuDl/MLzHlBIi7YIo
+         0/I2izmsKHzfBXxtUh/XU8X3d6ojPRAnCPS10RKQe9hXGKG2HFEiu2hGTqxtr04BpgaY
+         WUgNVdGC0MDsn6a20x99RHQZhorJINja2Ce1jWi/tJ2R0rWP0t0ibMOQQPkRrL8tW1G8
+         53bw==
+X-Forwarded-Encrypted: i=1; AHgh+Ro3gU8KsLO9KddjUk+HpKDfNgOPs2O9h2j5ytLqherF0g36z6hgzmQDjiAlZTv9fLzAbYb0Xw8=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzNW9uF/knj+A82uu/w1PbyvZPKaw6glSpRlXgGFb5+jwmE37j6
+	cnbljyWmF3Y4cWamF0i8mKP/rth1/z72GHng9ciMFPx1ATuP8gtcTWJNdobPH8W7Ug==
+X-Gm-Gg: AR+sD13nUMBe5Iqw0Yp9zhD1a78wRb4oOosWB6uOsNbD1h+7Sjd7AF7HyG8iyavZ4+N
+	TK2r3rsOEf3dfk3OHYh5DkHuxtg7A1oKnfZTLmUVmEThy6ygjqG8N4wh8I8BY/q2x7sqQV9NAq2
+	uTujWrfjoaED4ZDI3acNMPQt9XRe4ip0Md5sxlkiqpRaPQOn/tMoqLxXGhaHRmPVblLYSETBdRT
+	370WRfqqx9svQ8nmvEWyOz21rgEn2mRZF2b8ZqrJNYEAss4rbjxGJxaZPW9gUIJUKvjNdV03fJk
+	a0/FDEmwIyUp3OoXpFT3IfQk6UbthzHlsZKVowJ5bmdlcxzp+jvoB/Uk9sfAfnC3iNnd2crrVNv
+	FMCGjOZmnhABnMVTtMgyYDIks/glCWrX/LHjPPMBIMWGGvjIOImq4nF003W4Tt74Uuabos9JOxX
+	4UzuT5BFDLfTe392NVOuHty5vwd0C122KFWolHC6bM+fFcjWzcMKkm4mPLTlj9sxJYyka8q4aw0
+	xeX32r+dBpQwyik55V3lL9REK1ZtFlo
+X-Received: by 2002:a05:600c:4987:b0:495:51b1:3b7c with SMTP id 5b1f17b1804b1-4994a3818b8mr1298075e9.8.1785856977525;
+        Tue, 04 Aug 2026 08:22:57 -0700 (PDT)
+Received: from google.com (63.235.189.35.bc.googleusercontent.com. [35.189.235.63])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49949fcb0c5sm87206685e9.4.2026.08.04.08.22.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Aug 2026 08:22:56 -0700 (PDT)
+Date: Tue, 4 Aug 2026 15:22:52 +0000
+From: Sebastian Ene <sebastianene@google.com>
+To: Fuad Tabba <tabba@google.com>
+Cc: alexandru.elisei@arm.com, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	android-kvm@google.com, catalin.marinas@arm.com,
+	dbrazdil@google.com, joey.gouly@arm.com, kees@kernel.org,
+	mark.rutland@arm.com, maz@kernel.org, oupton@kernel.org,
+	perlarsen@google.com, qperret@google.com, rananta@google.com,
+	smostafa@google.com, suzuki.poulose@arm.com, tglx@kernel.org,
+	vdonnefort@google.com, bgrzesik@google.com, will@kernel.org,
+	yuzenghui@huawei.com
+Subject: Re: [PATCH 02/14] KVM: arm64: Track host-unmapped MMIO regions in a
+ static array
+Message-ID: <anIDzEogJepLfIOc@google.com>
+References: <20260310124933.830025-1-sebastianene@google.com>
+ <20260310124933.830025-3-sebastianene@google.com>
+ <CA+EHjTwDkgF5GV-k_VZ_nXbmUmwrAXaQJ5sFsk2tgr8LL3j4DA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, seiden@linux.ibm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, imv4bel@gmail.com, stable@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTwDkgF5GV-k_VZ_nXbmUmwrAXaQJ5sFsk2tgr8LL3j4DA@mail.gmail.com>
 
-On Tue, 04 Aug 2026 12:03:31 +0100,
-Joey Gouly <joey.gouly@arm.com> wrote:
+On Thu, Mar 12, 2026 at 07:05:16PM +0000, Fuad Tabba wrote:
+> Hi Sebastian,
 > 
-> Hi Marc,
+> On Tue, 10 Mar 2026 at 12:49, Sebastian Ene <sebastianene@google.com> wrote:
+> >
+> > Introduce a registry to track protected MMIO regions that are unmapped
+> > from the host stage-2 page tables. These regions are stored in a
+> > fixed-size array and their ownership is donated to the hypervisor during
+> > initialization to ensure host-exclusion and persistent tracking.
+> >
+> > Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_pkvm.h     | 10 ++++++++++
+> >  arch/arm64/kvm/hyp/nvhe/mem_protect.c |  3 +++
+> >  arch/arm64/kvm/hyp/nvhe/setup.c       | 25 +++++++++++++++++++++++++
+> >  3 files changed, 38 insertions(+)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
+> > index 757076ad4ec9..48ec7d519399 100644
+> > --- a/arch/arm64/include/asm/kvm_pkvm.h
+> > +++ b/arch/arm64/include/asm/kvm_pkvm.h
+> > @@ -17,6 +17,16 @@
+> >
+> >  #define HYP_MEMBLOCK_REGIONS 128
+> >
+> > +#define PKVM_PROTECTED_REGS_NUM        8
+> > +
+> > +struct pkvm_protected_reg {
+> > +       u64 start_pfn;
+> > +       size_t num_pages;
+> > +};
+> > +
+> > +extern struct pkvm_protected_reg kvm_nvhe_sym(pkvm_protected_regs)[];
+> > +extern unsigned int kvm_nvhe_sym(num_protected_reg);
+> > +
+> >  int pkvm_init_host_vm(struct kvm *kvm);
+> >  int pkvm_create_hyp_vm(struct kvm *kvm);
+> >  bool pkvm_hyp_vm_is_created(struct kvm *kvm);
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> > index 0808367c52e5..7c125836b533 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> > @@ -23,6 +23,9 @@
+> >
+> >  struct host_mmu host_mmu;
+> >
+> > +struct pkvm_protected_reg pkvm_protected_regs[PKVM_PROTECTED_REGS_NUM];
+> > +unsigned int num_protected_reg;
+> > +
+> >  static struct hyp_pool host_s2_pool;
+> >
+> >  static DEFINE_PER_CPU(struct pkvm_hyp_vm *, __current_vm);
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+> > index 90bd014e952f..ad5b96085e1b 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/setup.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+> > @@ -284,6 +284,27 @@ static int fix_hyp_pgtable_refcnt(void)
+> >                                 &walker);
+> >  }
+> >
+> > +static int unmap_protected_regions(void)
 > 
-> Two small comments/suggestions.
+> I think the name of this function is confusing. It's not really
+> unmapping, it's donating the regions to hyp. Maybe
+> donate_protected_regions() or claim_protected_mmio_regions to reflect
+> that we are doing an ownership transfer?
+
+I renamed it to donate_protected_mmio_regions to make it more clear in
+regards to what it does. 
+
 > 
-> On Sat, Aug 01, 2026 at 01:48:15PM +0100, Marc Zyngier wrote:
-> > We record a VNCR TLB even when SCTLR_EL2.M is 0 in order to make
-> > our life easier. But this is not something that the architecture
-> > anticipate.
-> > 
-> > As a consequence, a hypervisor is free to set VNCR_EL2 to
-> > some PA when SCTLR_EL2.M==0, use it to run a guest which indirectly
-> > accesses the VNCR page, then eventually set SCTLR_EL2.M==1 with
-> > the same VA. Yes, this is odd, but apparently legal.
-> > 
-> > A common trick in HW is to invalidate the TLBs on SCTLR_ELx.M being
-> > flipped. But doing this is a not a good idea for us (we'd need to
-> > trap SCTLR accesses), and wouldn't scale as we nest deeper.
-> > 
-> > Instead, use the fact that the S1 MMU being off at the point of
-> > translation is cached in our TLB, and simply ignore it if it
-> > doesn't match the current MMU state.
+> > +{
+> > +       struct pkvm_protected_reg *reg;
+> > +       int i, ret, j = 0;
 > 
-> Could you expand/change this a little, something like:
-> 	
-> 	Instead, use the fact that the S1 MMU being off at the point of
-> 	translation is cached in our VNCR TLB, and if it doesn't match
-> 	the current MMU state, leave the VNCR unmapped.
+> Please don't interleave the iterators with ret. Moreover, you can
+> define ret inside the loop below. Also, you don't need to initialze j.
+> 
+> > +
+> > +       for (i = 0; i < num_protected_reg; i++) {
+> > +               reg = &pkvm_protected_regs[i];
+> > +               for (j = 0; j < reg->num_pages; j++) {
+> > +                       ret = __pkvm_host_donate_hyp_mmio(reg->start_pfn + j);
+> > +                       if (ret)
+> > +                               goto err_setup;
+> > +               }
+> > +       }
+> > +
+> > +       return 0;
+> > +err_setup:
+> > +       for (j = j - 1; j >= 0; j--)
+> > +               __pkvm_hyp_donate_host_mmio(reg->start_pfn + j);
+> 
+> This rolls back the regions only for the latest `i` iteration, not all
+> the `i` iterations.
 >
 
-Yup, that reads better. Thanks.
+I re-wrote this bit since the last version of the
+__pkvm_host_donate_hyp_mmio accepts a size as well.
 
-> > 
-> > Fixes: 2a359e072596f ("KVM: arm64: nv: Handle mapping of VNCR_EL2 at EL2")
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > Cc: stable@vger.kernel.org
-> > ---
-> >  arch/arm64/include/asm/kvm_nested.h | 7 +++++++
-> >  arch/arm64/kvm/at.c                 | 2 --
-> >  arch/arm64/kvm/nested.c             | 3 +++
-> >  3 files changed, 10 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-> > index 012d711034d17..cc48817a5bf7a 100644
-> > --- a/arch/arm64/include/asm/kvm_nested.h
-> > +++ b/arch/arm64/include/asm/kvm_nested.h
-> > @@ -388,6 +388,8 @@ struct s1_walk_result {
-> >  	bool	failed;
-> >  };
-> >  
-> > +#define S1_MMU_DISABLED		(-127)
-> > +
-> >  static inline void fail_s1_walk(struct s1_walk_result *wr, u8 fst, bool s1ptw)
-> >  {
-> >  	wr->fst		= fst;
-> > @@ -396,6 +398,11 @@ static inline void fail_s1_walk(struct s1_walk_result *wr, u8 fst, bool s1ptw)
-> >  	wr->failed	= true;
-> >  }
-> >  
-> > +static inline bool s1_mmu_disabled(struct s1_walk_result *wr)
-> > +{
-> > +	return wr->level == S1_MMU_DISABLED;
+> How about (not tested):
+> 
+> +    err_setup:
+> +       while (j--)
+> +           __pkvm_hyp_donate_host_mmio(reg->start_pfn + j);
+> +
+> +       while (i--) {
+> +           reg = &pkvm_protected_regs[i];
+> +           for (j = reg->num_pages - 1; j >= 0; j--)
+> +               __pkvm_hyp_donate_host_mmio(reg->start_pfn + j);
+> +       }
+> 
+> Thanks,
+> /fuad
+> 
+
+Cheers,
+Sebastian
+
+> 
+> > +       return ret;
 > > +}
 > > +
-> >  int __kvm_translate_va(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
-> >  		       struct s1_walk_result *wr, u64 va);
-> >  int __kvm_find_s1_desc_level(struct kvm_vcpu *vcpu, u64 va, u64 ipa,
-> > diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-> > index 640f2dc00a8ba..0926426b87989 100644
-> > --- a/arch/arm64/kvm/at.c
-> > +++ b/arch/arm64/kvm/at.c
-> > @@ -11,8 +11,6 @@
-> >  #include <asm/kvm_mmu.h>
-> >  #include <asm/lsui.h>
-> >  
-> > -#define S1_MMU_DISABLED		(-127)
-> > -
-> >  static int get_ia_size(struct s1_walk_info *wi)
+> >  void __noreturn __pkvm_init_finalise(void)
 > >  {
-> >  	return 64 - wi->txsz;
-> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> > index 035cda256e2a5..d7dba02dc84fe 100644
-> > --- a/arch/arm64/kvm/nested.c
-> > +++ b/arch/arm64/kvm/nested.c
-> > @@ -1578,6 +1578,9 @@ static void kvm_map_l1_vncr(struct kvm_vcpu *vcpu)
-> >  	if (!vt->valid)
-> >  		return;
-> >  
-> > +	if (!(vcpu_read_sys_reg(vcpu, SCTLR_EL2) & SCTLR_ELx_M) != s1_mmu_disabled(&vt->wr))
-> > +		return;
-> 
-> A comment here would also be useful for future archaeology (also current
-> reading since the !( .. != ) code is confusing).
-> 
-> Or maybe:
-> 
-> 	bool mmu_disabled_sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL2) & SCTLR_ELx_M) == 0;
-> 	if (mmu_disabled_sctlr != s1_mmu_disabled(&vt->wr)) 
-
-And maybe using positive logic? I'll see what I can do.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+> >         struct kvm_cpu_context *host_ctxt = host_data_ptr(host_ctxt);
+> > @@ -324,6 +345,10 @@ void __noreturn __pkvm_init_finalise(void)
+> >         if (ret)
+> >                 goto out;
+> >
+> > +       ret = unmap_protected_regions();
+> > +       if (ret)
+> > +               goto out;
+> > +
+> >         ret = hyp_ffa_init(ffa_proxy_pages);
+> >         if (ret)
+> >                 goto out;
+> > --
+> > 2.53.0.473.g4a7958ca14-goog
+> >
