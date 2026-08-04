@@ -1,128 +1,110 @@
-Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com [209.85.167.200])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0832541E6DA
-	for <kvmarm@lists.linux.dev>; Tue,  4 Aug 2026 21:25:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EADAF3A9D80
+	for <kvmarm@lists.linux.dev>; Tue,  4 Aug 2026 21:54:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785878730; cv=none; b=YCbmUlTJjpayMSFAkLoprFPdtSfV9x2f/t9ovt28sxQTMpkyjfF1dQ1S40E5dLv/4m+ImGWfUBNn6a1ZCgnZyQ2ngC/XsbutKZakySI3kfOyfbmqPPm4UoBAQ6vSeRlwFtPlhT+r37CYOBDNKD1o3QurCKeVf6OpK7gTPelC95w=
+	t=1785880475; cv=none; b=hmyE/iLt0eU3olliSNl4jRCuffNS6fIy7bUMTEYn7QRrOFmvRDPXI5jpqroFf1dIL8YbqTNxc9mNjnZmubxNUviQLh6xLZHP3aNcPpEIrfeVnIPmh38FGQsOwKrUfSQK6Bpn5xowdRAvbDuJ+Ropr/RB02gL50DdsTSRvImH7Cs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785878730; c=relaxed/simple;
-	bh=huPoN5bucRUnQLu5sCfSPLzeR3X2OREye170NNUzpZQ=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=o1aBbrvNBvV9nbFkzF/3VU2nMdji6NqJT4FLpylkj0vV0IyTUFMCBdIhU4kISGBUS5J5HeuSlccyLQYhRLxY6O5vDo00C0fbw6Zro+5WFf+YnLjNldLfuFW+ScRrbCw/jhWU0nt8lmI4P6wqwh1WFtWFJRiBY2RCdcF92+Dr3zo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=a22T/zG6; arc=none smtp.client-ip=209.85.167.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+	s=arc-20240116; t=1785880475; c=relaxed/simple;
+	bh=IuHu+i8ykBGDsG06yppIdROtaxj37qLU5bgE3hYFvEk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Gy2L9Mg6SEIZRhYqI3qv1RrLx1z/cFWHpavjmXBbrjzVxIYyBgMF55U8gDZXH7oEPfjRxVM97bK2gbaf/DT7BwQHsoyrMymHzWMPpK98vk/Cr7C0h5USTrDX6YWOyULesDbF06qucS28yfaeIfxkVfKILvDpoXZq6XIJjMLEqLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jqRlzXn+; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="a22T/zG6"
-Received: by mail-oi1-f200.google.com with SMTP id 5614622812f47-4ab8b646492so402580b6e.0
-        for <kvmarm@lists.linux.dev>; Tue, 04 Aug 2026 14:25:28 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jqRlzXn+"
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4953e04ef16so2526715e9.2
+        for <kvmarm@lists.linux.dev>; Tue, 04 Aug 2026 14:54:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1785878728; x=1786483528; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=OoNJERa7N+ihiUvZZhE29iP6C+dCF84EVkVoe6Oj4kU=;
-        b=a22T/zG6lYM2exui2AHV4vfsmZ42/Qb4dvNvDeR2UbZhf0GdiotyvZVQpb74g8fQhC
-         9c4HXX78tUW9cXgAw/u5WVTxVWtlU234nNPSM9ewEzQFKsP6tDX/q7g1E67swql+Nnhw
-         gUtIn9gBNcYKHFIb0JJLUq3+XHW+f9pMJYbXOiIn1dNLQf83Yw40x3scEI6pw260Ww/F
-         IaCuRB0F/ET/IH0m630FyXm1Ru88yvt5keu4H8xqRP8CuzhBgvsB8QeJwAVbKX93bZEz
-         F20/bqtAVsvFtz2XK29lgEk8nmhvQspGvny9jN9iGqpIlAUg6zvlIy03M540LFntT7ts
-         zwQQ==
+        d=gmail.com; s=20251104; t=1785880472; x=1786485272; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=9zdxL7pbRtsTEV8EC4r/5IgaNc8hBDEJjb1U6nqESgU=;
+        b=jqRlzXn+Jgt/Q5ZeAmpNqT7D+0melZELw1b2w0F2eCay9yeiqzu6pdITs22dJXM7mB
+         BVxqhuPniLN3iQuqv1Jf7f8HYEGJYOp9zR2xOKn9rYcNiCQzGWerfZ5ZOJRlZ5FGov8a
+         c1KuZcUJISqLygnlSx397ynONffyTV/n7aV/Kw4s9G5VlW8ZsjzkWzMrjN0I9jkEpU7u
+         vewC7GnAB1lbEV5S4AFtpi/WP8oZTFnWC7X0OfULNiumybeqpGgnuDkamVd0C/90Pqoo
+         YLM0XGqN0zBuxe2Tm3wazoQPPvjurD3J7lzBSfgLiwztAzhzfOq9KufTXxkjz0BrVpZq
+         qQmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785878728; x=1786483528;
-        h=content-type:cc:to:from:subject:message-id:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+        d=1e100.net; s=20251104; t=1785880472; x=1786485272;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=OoNJERa7N+ihiUvZZhE29iP6C+dCF84EVkVoe6Oj4kU=;
-        b=Me+EmQ0PCzGtBY6pb7xvSB5wWPCHDCV9j7dGj4czUHEb7KWPo/M6a80tTJxSmyOvg+
-         G9LrfRpITNQow8AtXWIujyGDGdTNikiQ7hJvZlf7EgzQx3iXZRpxpTSqRxaMbH3Kp6rL
-         kS1uX5lilzqmTOGF7DyKejvt4ltiPwssq39sYSt96ozPfTRoltVvoP+LWG5w83oOAgXx
-         iDGzVQaV9akitI+JXsVcaaawjFSKcmS8wPa5Otkdm/lB1EyAE6r2cIWid10xL3pVE86J
-         1AlIMh14ULIFnOmigmKk4gQGBYHwsggVnEv98NSxdnwkVg8mIPus4qVXxqGJ5pCMQNv2
-         yNnQ==
-X-Forwarded-Encrypted: i=1; AHgh+RpttykgFYFD93zuP36NfX9GZWH297V/Km3G5pqjKn2+b7u0FXMlUdc1ghvkAZ1YNclp3DY/Dds=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yz4E0nVRGcrGq6vNYAQ8IomChDthcSdjZJFLkeqQL8hLCOv4gdN
-	2G1GrWlsmGV+wIZpLLpIryIE3Qr7fnFa7i37hOShurzCR713g01gIs3jyl/GUaeDoFcND/AvIcE
-	K3GqIZ9L59n/1zR2NFogeftFyEw==
-X-Received: from iobmp17-n2.prod.google.com ([2002:a05:6602:a2d1:20b0:9ab:7c1:c30a])
- (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6808:3986:b0:495:f85b:d08f with SMTP id 5614622812f47-4afadfd7dc5mr1041308b6e.18.1785878727621;
- Tue, 04 Aug 2026 14:25:27 -0700 (PDT)
-Date: Tue, 04 Aug 2026 21:25:27 +0000
-In-Reply-To: <b8b1fbe4-fb73-418a-b43d-086894d31ce8@arm.com> (message from
- Robin Murphy on Tue, 28 Jul 2026 16:07:44 +0100)
+        bh=9zdxL7pbRtsTEV8EC4r/5IgaNc8hBDEJjb1U6nqESgU=;
+        b=EObkblhGmFWa0stp1wwNXGfhCSoa62u1uIQs+avSzjDLr6yf9hZ03OAjkeMmj1gZYj
+         Nwln+glm9FXNZglg/3yfQKNdzZueuz3kNU9FiTNxmKuJslnRQjELgnqEoWZ++7rpiQgj
+         p7zIeGNWGH1d9HkUqxcE2jU5uf8g+bTNGW1ZGe/hIUQA62Sm0nl9OKlaXtZdgCl9SCo7
+         MrAW0tA5vf4TTI3qhPEg7NZ49LLtfdpBGruA8ZsFSZ68sgT/TQaYe81P6ytzwMsjZQ8b
+         iy52Z9QDCv5klNf70CDRDOlrTfO/SpoK0TL2IhGH2mOAdTnTIH9n9L+lwtfMNyE5+DET
+         EAZA==
+X-Forwarded-Encrypted: i=1; AHgh+Rrg35apePr1mqxA2mSzBOQLYRFJPpYQri2JchwrVQ/ZprnM6s+9iLTG8I6wTvvG3IDVYQIP5RQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yy32rz/ptkNsgypW7bX7YScIAghldmmqqM+u+OArFmIMsTnatg4
+	fkNOvn4ZCfjrvRR2iOsDQnq/G0eCqzBFju1BQXx5ndqm1svUbI5/6Op7
+X-Gm-Gg: AR+sD13XjLZ/AL74QN83V54CGzMjD2+1xZCf4Qcdd5wLJE8io1jRQHwjer0l7S0m2yN
+	dXVV+mF7gl4ebEmV5AMvSTFL3AZzUzcbzUUXJz/TQHbwRrfungdwoS6z5mFIE2c7vEXrrYvSZ4E
+	zt5ez+Rwld6kDekbhoFHjdPyAd5QS1UEkcgv6yjhV+5dn2ED4ucIB0gUTDUzXM5GpapOyMQK78O
+	fAkFs64nr2Wp/QQl99LcL6XaWrijpFr1IYHqHULmKGnIkqMx42caXMnglz4Ia6upM0UCH6u7wae
+	NbxgM31Wf1mcQQXTj2ylPhNEFRE1yVPcJycWOVxzHeg5aSRt3do8UIjqZK2od9x4NDTxEHVGgPQ
+	d70yOnRSy7MIwptj33J+/nCopwLtIBFCn4T+gB9zdpYqSO8fQ9hCQdwbeGlYylWP3JYWH1rbewF
+	fvfa0iiz16uFJGuXYasePXzko1vma4Nvmgc9A3BNYSVlkxNMnksweCtDIPOY+DuI7MWvfbD7fuf
+	SrnZtMxrSlOkdzIdQvKn9LznjzOQKQuTnAqcFMrL1DCXyJfh3ukQbUqdkW3+AzK8bxtAD4pjHfk
+	9/3EmZxFaXi7CMuvET9OgWm7nktW6MG5A9EMgakvzloOv+Ga/mhLYB+V9WysaFS1J73EKIBX+bt
+	tsb3yFw==
+X-Received: by 2002:a05:600c:3589:b0:493:c845:bc20 with SMTP id 5b1f17b1804b1-4994e79ab0emr15048195e9.4.1785880471944;
+        Tue, 04 Aug 2026 14:54:31 -0700 (PDT)
+Received: from MacBook-Pro-von-Karl.localdomain (dynamic-2a02-3100-a48b-1c01-1c76-d8bb-0f26-1c8f.310.pool.telefonica.de. [2a02:3100:a48b:1c01:1c76:d8bb:f26:1c8f])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4994e980559sm10979265e9.2.2026.08.04.14.54.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Aug 2026 14:54:31 -0700 (PDT)
+Date: Tue, 4 Aug 2026 23:54:30 +0200
+From: Karl Mehltretter <kmehltretter@gmail.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oupton@kernel.org>, Fuad Tabba <tabba@google.com>, 
+	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org, grayhat@foxmail.com
+Subject: Re: [PATCH 1/2] KVM: arm64: nv: Allocate the shadow S2 MMUs
+ individually
+Message-ID: <anJcUNlnNmP-mKWH@gmail.com>
+References: <20260803224405.41468-1-kmehltretter@gmail.com>
+ <86mrv2arf2.wl-maz@kernel.org>
+ <86jyq6aq8g.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-Message-ID: <gsntpkzxvarc.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH 05/21] perf: arm_pmuv3: Check cntr_mask before using pmccntr
-From: Colton Lewis <coltonlewis@google.com>
-To: Robin Murphy <robin.murphy@arm.com>
-Cc: kvm@vger.kernel.org, alexandru.elisei@arm.com, pbonzini@redhat.com, 
-	corbet@lwn.net, linux@armlinux.org.uk, catalin.marinas@arm.com, 
-	will@kernel.org, maz@kernel.org, oliver.upton@linux.dev, mizhang@google.com, 
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	mark.rutland@arm.com, shuah@kernel.org, gankulkarni@os.amperecomputing.com, 
-	james.clark@linaro.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86jyq6aq8g.wl-maz@kernel.org>
 
-Hi Robin, thanks for the review
+On Tue, Aug 04, 2026 at 03:56:47PM +0100, Marc Zyngier wrote:
+> > The other thing is that reallocating the pointer array isn't great. It
+> > adds complexity, and makes everything more fragile than it should be.
+> > 
+> > See the hack below that seems to work OK.
+> > 
 
-Robin Murphy <robin.murphy@arm.com> writes:
+Your draft is indeed a bit simpler.
 
-> On 12/06/2026 8:28 pm, Colton Lewis wrote:
->> Check cntr_mask before using pmccntr to ensure it's available. With a
->> partitioned PMU, there may be instances where pmccntr is being used by
->> the guest and will be absent from cntr_mask.
+Should I send a cleaned-up version as v2?
 
->> Signed-off-by: Colton Lewis <coltonlewis@google.com>
->> ---
->>    drivers/perf/arm_pmuv3.c | 3 ++-
->>    1 file changed, 2 insertions(+), 1 deletion(-)
+I would allocate the table on the first call to kvm_vcpu_init_nested()
+and not in kvm_init_nested(), so it cannot leak if VM creation
+fails. 
 
->> diff --git a/drivers/perf/arm_pmuv3.c b/drivers/perf/arm_pmuv3.c
->> index 1cceb1f614515..17bb1cfdc271c 100644
->> --- a/drivers/perf/arm_pmuv3.c
->> +++ b/drivers/perf/arm_pmuv3.c
->> @@ -1028,7 +1028,8 @@ static int armv8pmu_get_event_idx(struct  
->> pmu_hw_events *cpuc,
+There's another issue in the current code: the ptdump debugfs file
+keeps the raw mmu pointer as its private data. I would add that to the
+commit message.
 
->>    	/* Always prefer to place a cycle counter into the cycle counter. */
->>    	if (armv8pmu_can_use_pmccntr(cpuc, event)) {
-
-> Something smells wrong here - we can use PMCCNTR but we can't?
-
->> -		if (!test_and_set_bit(ARMV8_PMU_CYCLE_IDX, cpuc->used_mask))
->> +		if (test_bit(ARMV8_PMU_CYCLE_IDX, cpu_pmu->cntr_mask) &&
-
-> ...i.e. this test would seem to belong in the helper function.
->> +		    !test_and_set_bit(ARMV8_PMU_CYCLE_IDX, cpuc->used_mask))
->>    			return ARMV8_PMU_CYCLE_IDX;
->>    		else if (armv8pmu_event_is_64bit(event) &&
->>    			   armv8pmu_event_want_user_access(event) &&
-
-> Plus it also doesn't make much sense to fall through to the "we _could_
-> accommodate this event if only PMCCNTR was free" case here if we know
-> PMCCNTR can never be free because it's not even available.
-
-I agree it would be a good idea to refactor these if statements.
-
-Probably something like:
-
-/* tests moved to `armv8pmu_can_use_pmccntr` */
-if (armv8pmu_can_use_pmccntr()) {
-	set_bit(ARMV8_PMU_CYCLE_IDX, cpu_pmu->used_mask);
-         return ARMV8_PMU_CYCLE_IDX;
-}
-
-if (armv8pmu_event_is_64bit(event) &&
-     armv8pmu_event_want_user_access(event) &&
-     !armv8pmu_has_long_event(cpu_pmu))
-	return -EAGAIN;
+Thanks,
+Karl
