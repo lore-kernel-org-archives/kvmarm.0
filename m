@@ -1,100 +1,165 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 786BC44AB79;
-	Tue,  4 Aug 2026 14:59:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1025030D40B;
+	Tue,  4 Aug 2026 15:16:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785855566; cv=none; b=mcGGPuX3buKyvIOpwPZZt/yV+8WbiZkEpWvcZZXzGBRGm9eLmouq0QDi0ZFQ9YLTIRFDNjhtvftgc/ySy6KAeYwcXOVY4KVZmaTNjyVKduowaL+0MUdM+o0f3xNLFqG8RcRdCGBMKye3WfSaa5eDiiPSEafejXBi8hd+wWSONy4=
+	t=1785856566; cv=none; b=YZZP5tgEWAYfgw9x4D9T0iF9iOILPz45TcnEZgesxi0T6Uvk90cf1qBz1EgyrDho87/DV1Wnh5fBmE1YpCaKHEb6UPIrCb4QJbHmtfLsRxI7EZKGkBgZ6q1F9+1ukVNPjk11nZvR4s9onAWSJcnZDYZcDUg4P5+gFSQO0UTeTvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785855566; c=relaxed/simple;
-	bh=jM2dy1jPgBL1qNkC+4PhadiOipaYVgTdH7ArBTEfwHI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=m/lx9/MWTa0KXN+cJjGU7CagY8HQqcKJsTNk9MLRNQCI8wX2J/HJC9I9PT64wrUIT5yZD+rzPUQFRBZETiJTj6nyiuE2xDspSHsX01ZRkZWOMvlt2yUzUBV3J+8D0fWrPuAbFIifq3845wQI179BRlkEjI9yHRKvsdkz8u0AUT0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=nNVIav5D; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1785856566; c=relaxed/simple;
+	bh=/BHuaHt5d+Zle4n4t1PFaIiQekCwHpfZciAES6Xkzhw=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ioQcs2TvdjodT57V5jv/zhxSIv7Hxa0m8GhP1A6B1mmlL4rhXj8zixhnvQEWbGK6Ijlia4NL5epLDSN8EwvKRjlBZunKwDhO7ssqcc/aA7+HjgkV9LKmGaJV7ZcIgylJplj6xCVI1Ius9gnQ0gdCIhiXr8gRQGKf6TLwmaTkIYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HRufI+Em; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="nNVIav5D"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4B3051476;
-	Tue,  4 Aug 2026 07:59:14 -0700 (PDT)
-Received: from [10.57.44.180] (unknown [10.57.44.180])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 06CB13F86F;
-	Tue,  4 Aug 2026 07:59:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1785855558; bh=jM2dy1jPgBL1qNkC+4PhadiOipaYVgTdH7ArBTEfwHI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=nNVIav5DEDiR2UTAwZM5v9LaRsiCTiyK80xUupzMVosPgD9BCL2T19cYcc2SLIQkD
-	 F6G5qSTE3K+VwIaJKkkSRpA3BmRaw0+ntT60xn2CrJQKCdID7Jf37/T+d6cyelnsmX
-	 4Nn1Gl7QvaAe8Bt/JHbT+GCpb9GQOmJqQYeUPljA=
-Message-ID: <039f66ef-85bc-49e0-9843-4b102c94ba76@arm.com>
-Date: Tue, 4 Aug 2026 15:59:11 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HRufI+Em"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89E0B1F000E9;
+	Tue,  4 Aug 2026 15:16:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785856564;
+	bh=ftTsgcVpNbKCmx0FJnA+PSQP6EmU4JeV42lZlsrS4B0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=HRufI+Emv/LZbJmWN1om8HUrS3Vvz6U/9Y3SL83gqQvWGcxXXpzb6wSdZkqQXL5Lg
+	 bL1xUE/uyaKmnqYu2ifr9UFgMqW9fhGIUNR8nCst2kP+4eKzBYlbMOL1Tj0ZvoeXji
+	 RDRbjoP6/Iqa6Qw5kEAb90eihNF1YChONzouTFrEtMgGkpeqXEzZhTTidD1QOdAvKN
+	 hdhxCIJQTr2XBiU99pO0NfDOmSqNuOfEK5fGMEeffo57m/X8nNf8/ls8fEH4FqHUMF
+	 mLZTd34ThEHML72RnYQUEkp8VOMFqDQuYqRc84U0QWsz/kPfnKzpBJz++gl2hmbuLX
+	 cX+iKdUQas5/A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wrGs6-0000000CGJt-1b0o;
+	Tue, 04 Aug 2026 15:16:02 +0000
+Date: Tue, 04 Aug 2026 16:16:02 +0100
+Message-ID: <86ik5pc3wt.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Hyunwoo Kim <imv4bel@gmail.com>,
+	stable@vger.kernel.org
+Subject: Re: [PATCH 3/6] KVM: arm64: Consider SCTLR_EL2.M when mapping the L1 VNCR page
+In-Reply-To: <anHIhHS6INKZLnrZ@e143914.arm.com>
+References: <20260801124818.366274-1-maz@kernel.org>
+	<20260801124818.366274-4-maz@kernel.org>
+	<anHIhHS6INKZLnrZ@e143914.arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v16 11/45] KVM: arm64: CCA: Check for RMI support at KVM
- init
-Content-Language: en-GB
-To: Fuad Tabba <fuad.tabba@linux.dev>, Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
- Lorenzo Pieralisi <lpieralisi@kernel.org>
-References: <20260803134403.80630-1-steven.price@arm.com>
- <20260803134403.80630-12-steven.price@arm.com>
- <CA+EHjTwoKj+c-ZS7W4fCAMYWSgrc+15QWBxu_sE-PMECr+8zpA@mail.gmail.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <CA+EHjTwoKj+c-ZS7W4fCAMYWSgrc+15QWBxu_sE-PMECr+8zpA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, seiden@linux.ibm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, imv4bel@gmail.com, stable@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 04/08/2026 15:55, Fuad Tabba wrote:
-> Hi Steven,
+On Tue, 04 Aug 2026 12:09:56 +0100,
+Joey Gouly <joey.gouly@arm.com> wrote:
 > 
-> On Mon, 3 Aug 2026 at 14:45, Steven Price <steven.price@arm.com> wrote:
-> ...
->> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->> index bae2c4f92ef5..1a5e15040111 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -27,6 +27,7 @@
->>   #include <asm/fpsimd.h>
->>   #include <asm/kvm.h>
->>   #include <asm/kvm_asm.h>
->> +#include <asm/kvm_rmi.h>
->>   #include <asm/vncr_mapping.h>
->>
->>   #define __KVM_HAVE_ARCH_INTC_INITIALIZED
->> @@ -424,6 +425,9 @@ struct kvm_arch {
->>          /* Nested virtualization info */
->>          struct dentry *debugfs_nv_dentry;
->>   #endif
->> +
->> +       bool is_realm;
->> +       struct realm realm;
->>   };
+> Another thing I forgot..
 > 
-> Marc suggested at v10 making the pKVM and CCA state here a union,
-> given the two are exclusive, and I believe you acked it [1]. Was there
-> an issue with it, or did it just get lost across the respins?
+> On Sat, Aug 01, 2026 at 01:48:15PM +0100, Marc Zyngier wrote:
+> > We record a VNCR TLB even when SCTLR_EL2.M is 0 in order to make
+> > our life easier. But this is not something that the architecture
+> > anticipate.
+> > 
+> > As a consequence, a hypervisor is free to set VNCR_EL2 to
+> > some PA when SCTLR_EL2.M==0, use it to run a guest which indirectly
+> > accesses the VNCR page, then eventually set SCTLR_EL2.M==1 with
+> > the same VA. Yes, this is odd, but apparently legal.
+> > 
+> > A common trick in HW is to invalidate the TLBs on SCTLR_ELx.M being
+> > flipped. But doing this is a not a good idea for us (we'd need to
+> > trap SCTLR accesses), and wouldn't scale as we nest deeper.
+> > 
+> > Instead, use the fact that the S1 MMU being off at the point of
+> > translation is cached in our TLB, and simply ignore it if it
+> > doesn't match the current MMU state.
+> > 
+> > Fixes: 2a359e072596f ("KVM: arm64: nv: Handle mapping of VNCR_EL2 at EL2")
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > Cc: stable@vger.kernel.org
+> > ---
+> >  arch/arm64/include/asm/kvm_nested.h | 7 +++++++
+> >  arch/arm64/kvm/at.c                 | 2 --
+> >  arch/arm64/kvm/nested.c             | 3 +++
+> >  3 files changed, 10 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+> > index 012d711034d17..cc48817a5bf7a 100644
+> > --- a/arch/arm64/include/asm/kvm_nested.h
+> > +++ b/arch/arm64/include/asm/kvm_nested.h
+> > @@ -388,6 +388,8 @@ struct s1_walk_result {
+> >  	bool	failed;
+> >  };
+> >  
+> > +#define S1_MMU_DISABLED		(-127)
+> > +
+> >  static inline void fail_s1_walk(struct s1_walk_result *wr, u8 fst, bool s1ptw)
+> >  {
+> >  	wr->fst		= fst;
+> > @@ -396,6 +398,11 @@ static inline void fail_s1_walk(struct s1_walk_result *wr, u8 fst, bool s1ptw)
+> >  	wr->failed	= true;
+> >  }
+> >  
+> > +static inline bool s1_mmu_disabled(struct s1_walk_result *wr)
+> > +{
+> > +	return wr->level == S1_MMU_DISABLED;
+> > +}
+> > +
+> >  int __kvm_translate_va(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+> >  		       struct s1_walk_result *wr, u64 va);
+> >  int __kvm_find_s1_desc_level(struct kvm_vcpu *vcpu, u64 va, u64 ipa,
+> > diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+> > index 640f2dc00a8ba..0926426b87989 100644
+> > --- a/arch/arm64/kvm/at.c
+> > +++ b/arch/arm64/kvm/at.c
+> > @@ -11,8 +11,6 @@
+> >  #include <asm/kvm_mmu.h>
+> >  #include <asm/lsui.h>
+> >  
+> > -#define S1_MMU_DISABLED		(-127)
+> > -
+> >  static int get_ia_size(struct s1_walk_info *wi)
+> >  {
+> >  	return 64 - wi->txsz;
+> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> > index 035cda256e2a5..d7dba02dc84fe 100644
+> > --- a/arch/arm64/kvm/nested.c
+> > +++ b/arch/arm64/kvm/nested.c
+> > @@ -1578,6 +1578,9 @@ static void kvm_map_l1_vncr(struct kvm_vcpu *vcpu)
+> >  	if (!vt->valid)
+> >  		return;
+> >  
+> > +	if (!(vcpu_read_sys_reg(vcpu, SCTLR_EL2) & SCTLR_ELx_M) != s1_mmu_disabled(&vt->wr))
+> > +		return;
+> 
+> Another thing, should we set valid=false? (Haven't really looked into
+> what that implies..)
 
-Most likely lost in the respins. Will pick this up.
+No. The TLB itself is still valid. We just haven't hit it. Which is
+why we don't map the page in the fixmap, and wait until we take the
+fault. When (and if) it happens, we can invalidate it, rewalk, and
+establish the new TLB.
 
-Thanks for spotting.
+At this stage, this doesn't bring much. But if one day we need to
+cache multiple translations, we will want this exact flow.
 
-Cheers
-Suzuki
+HTH,
 
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
