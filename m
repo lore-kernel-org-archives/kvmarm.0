@@ -1,40 +1,40 @@
-Received: from canpmsgout08.his.huawei.com (canpmsgout08.his.huawei.com [113.46.200.223])
+Received: from canpmsgout07.his.huawei.com (canpmsgout07.his.huawei.com [113.46.200.222])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9311E36B903
-	for <kvmarm@lists.linux.dev>; Wed,  5 Aug 2026 03:41:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.223
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4A2236B903
+	for <kvmarm@lists.linux.dev>; Wed,  5 Aug 2026 03:43:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.222
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785901321; cv=none; b=isvSjP4IutajeFd4zQJS16frbj8zr6UH6I40h6lxKMgPTYMS4jd1M5xZ+N4GzZXmPTJpnc+hAuHrfynOMjX0LvPIo1K9HgF9wq9jR5/5IJ1HWrHQoHIe7WLRT/qAoQIVI0voR8oeDJrpfyMyBXw5dzmUt3pMt/MavmBuGrH72aw=
+	t=1785901424; cv=none; b=m0TUam//ehhZTDRRwLr77UoMt2Vras+9Bban1S4e6SAywF5cM4asv8/2T3qjQJASRGjzoOhrlo8JpwQ7iYg1+oMQfQhJbOKn8Z3JMwo4BbTV4iKVwCUo1/t4rYcQ2w8n1OPMWn4SxHtUMuRFG9BoDjSHH7mC3ih7kbqWOhdVK48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785901321; c=relaxed/simple;
-	bh=IvDI0fdGxG6j2zgSWDVLuJ2Ct6rweHmu1xeCJIHnO2o=;
+	s=arc-20240116; t=1785901424; c=relaxed/simple;
+	bh=mBRchRs0PYgF+cUGmDFYH9n+P/+UJnfB1IiQ5lSW7W8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=E2RUgA9bCARRleVDwt0jPt6L5iPT1Tvlx+jcjwTnvsf4Xmqr0OlkKejBa5ojLOUeJ7yaVa4rHPI0TL+4D+ysqZ5styVIYSr5vMX/apIMJK4eXSTgTntGQva7RVY2KVLfFE/VT37Xmcorn/NQzePuDD5zUw/H0vl8fhmTEFjUBdY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=MliSnTGq; arc=none smtp.client-ip=113.46.200.223
+	 In-Reply-To:Content-Type; b=kkA6+J+iqSyTLT4FTKHO3JJ+Cab86qzVNYyAiwqB2wMkPRoYmt7rou/jlFSbEw30v2s8x0JNp/94hQumVPrGXJ0EOh6uzNC5lQND7InLZ5llsTOO9XYzrdf2Lc+SEE+P+NZ5wTQ7mHEpaYm+aamzj7qYlv1FgIEI/BVpE7WpFMg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=m/eLKphe; arc=none smtp.client-ip=113.46.200.222
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="MliSnTGq"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="m/eLKphe"
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=PBiIVDJP/I4xoZ8eeeuxXne41kApHBPJ1tiSt0js/C0=;
-	b=MliSnTGqFXXG2EciqyXtjVH2mxQYLv66ZKoJetM/Vi7AGn3PDx7OirI9ZO/9f0B6XFXdHglK/
-	9n62fQ4Hv/clD9LrAUoLTk1pG/KxoeB4H4kFn12A8wbWJirEJDFW+dS9cN58d0wKssTcoG8KuXj
-	H4zrhbcf1cyV90bSHpWZem8=
-Received: from mail.maildlp.com (unknown [172.19.163.214])
-	by canpmsgout08.his.huawei.com (SkyGuard) with ESMTPS id 4hFGF160kfzmVWY;
-	Wed,  5 Aug 2026 11:32:21 +0800 (CST)
+	bh=B3lSrMpocDV/Hvep88z36Dgthq0eziOupD1/vUR+w/A=;
+	b=m/eLKphe0U0vdf134ra5FOXe/Jdx1SdB1VrNfeMXmz90/Cr9j09gSN/YbpqKLP3HFt1XUe99f
+	pbkE9eQb3ekisjALdFrXvyV6mRMMdOeegaLcL4JGFDKbG1CoScMBS4Qmt5wbplmmD0QEK6zlySO
+	gVDyzmzcDl9p6kDJ/wTQ8UI=
+Received: from mail.maildlp.com (unknown [172.19.163.127])
+	by canpmsgout07.his.huawei.com (SkyGuard) with ESMTPS id 4hFGGw6rGDzLlTg;
+	Wed,  5 Aug 2026 11:34:00 +0800 (CST)
 Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
-	by mail.maildlp.com (Postfix) with ESMTPS id 399434057C;
-	Wed,  5 Aug 2026 11:41:53 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 2BCA840572;
+	Wed,  5 Aug 2026 11:43:32 +0800 (CST)
 Received: from [10.67.120.103] (10.67.120.103) by
  kwepemr100010.china.huawei.com (7.202.195.125) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Wed, 5 Aug 2026 11:41:52 +0800
-Message-ID: <3808f469-5403-4f2e-85f0-8c6ca13068bd@huawei.com>
-Date: Wed, 5 Aug 2026 11:41:51 +0800
+ 15.2.1544.36; Wed, 5 Aug 2026 11:43:31 +0800
+Message-ID: <fe06c78d-1422-4ac2-86a8-6d78f37e866b@huawei.com>
+Date: Wed, 5 Aug 2026 11:43:30 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -297,22 +297,7 @@ On 8/4/2026 7:10 PM, Leonardo Bras wrote:
 > Only on lazy splitting, right?
 > 
 > Or maybe we get the DBM bit on during eager splitting...
-
-Hi, Leo
-
-No, it works for both. Whether eager or lazy split, wrprotect always 
-runs before split, so the block DBM is cleared first.
-
-For eager split: wrprotect clears W (W=1->W=0) and strips DBM from the 
-block. Then the block is split into level-3 pages, but since W=0 and DBM 
-depends on W, DBM stays 0. DBM is only set back to 1 during the first 
-write fault (relax_perms: W=0->W=1, which also sets DBM=1).
-
-I think this is safe for both modes. But if you think we should only do 
-this for lazy split, let me know.
-
-Thanks!
-Tian>
+> 
 >>      pte &= ~KVM_PTE_LEAF_ATTR_HI_S2_DBM;  // strip DBM from blocks
 >> ```
 >>
@@ -347,4 +332,8 @@ Tian>
 > Thanks!
 > Leo
 > 
+Right, totally agree.
+
+Thanks!
+Tian
 
