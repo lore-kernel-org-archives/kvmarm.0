@@ -1,178 +1,127 @@
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4598240B0F4
-	for <kvmarm@lists.linux.dev>; Wed,  5 Aug 2026 10:09:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57214409624
+	for <kvmarm@lists.linux.dev>; Wed,  5 Aug 2026 10:49:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785924554; cv=none; b=X/D2XMzYxLp9hIX5uCSzy+GSQXUyVD68T7C8Lk9ueo23OCPljvusI+VJ961r1iLjF/FpZCWkEa2MtPXL2m4n5xPnyIJibLBdrcVVsN0SftoTr0ETH3Grz6CtaiqNo2JrhFztzyXydsNaU57djSTMserNtOqlBDlAYcgP1bb6tWY=
+	t=1785926986; cv=none; b=i2XYsCAAw88WnoYLC96Ml/Ft2u7z+K2vGk8CNyMvO0M4246KqkDfwgDCTEForblwojrWVGGXDgJZPaLl54WDcq0ecc+2FRF9foom0j5Svpn9yKCY/HKd7562Pv2cfmgAB2FZIb6p0j8J7YkIw37Oiexmz2b2TiuqrrxhYF7AXyY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785924554; c=relaxed/simple;
-	bh=M2jF0Jt2bDRZzymZQmRY6Uui16djwBoVWK1VjhYmc30=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=a4npNz8ugBgV6r3vkpMBLTlYToNLgMqFRVGLL+mYuXzIq51qL4oAdqhwNgiRj7b2ZV60enIWBCLqoGBUn4TVyh2N47wdqBT9Nw0DHOmrmWKmf9Jk1ypbE/dnETO9YGZEDXp0k0h86Sw2bon2oZ2kDGxsnYHsSNhFnkXScWO1b2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=yVdPzpag; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1785926986; c=relaxed/simple;
+	bh=HJgrN+baPIB54fPh+3N6hGUBcXC6EBE5fl+F6gyH+mM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bW134S3jlT+66/mfFt1K2a3Lsqn+8Z/s3nJQwjicGO77uhu5QttBHmSDCw+BnDIRf3i2XrnAgGuKgl3E+6RDMsJzS1innB7oWbGry22T5wizlffsUrIi6OUuoyGEbE5b+FgKJodn8T68S2Q5dHoxrVmfw9f9RZVHZMoYptptkxA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=UxqSlKb4; arc=none smtp.client-ip=91.218.175.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yVdPzpag"
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-47f7027ca11so503988f8f.3
-        for <kvmarm@lists.linux.dev>; Wed, 05 Aug 2026 03:09:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1785924550; x=1786529350; darn=lists.linux.dev;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=XrcStaMXdkE1hM0cDDyjF0ywdDXESAjsr6s/h+tclqU=;
-        b=yVdPzpagdfqL1hxjVby2nr6ivYIxNNwBJttS5Hz30Y55Qm6QI9HqsTMfI5aidbcXUl
-         420QKVaCiAfavrV4EEOqMaH2rCn/t5NeLq5O30e6PGiLNTUcLUuTy/d20K1478MdFgyk
-         KTCpLD2kwvJBKLyRv1HB7WQZOnnZgI5R8VEngfS/zKoQBg9C99vyqMkkn/yPzdxq5q57
-         EhrOeUNZ+ixfpavdT1rLCHMDT4qMRZMjXl0VlDWa/XrfaTHgcYCe5IwxEHZyHg7sz80/
-         WI0AFNfj8G1H1R6UFzpbUUKmmsBiuqZPYX9pkUj0fcZehsy4EEiUwblnDEFm/OrLLxR2
-         ooMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785924550; x=1786529350;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=XrcStaMXdkE1hM0cDDyjF0ywdDXESAjsr6s/h+tclqU=;
-        b=Wi/ipXukMmwyBQLFfMwbUpyKJGbtRw5lG2EYgFH33RGnsaxyOhnXjwC1d8ii7Yy06X
-         8onE1a2FydTM8gW08hsYi3/0ldz6gheJAwvfXDi9rVs3Des2HSG4htZOnbKu+puYXKKQ
-         1oGXv/AWQALQI7+jI+Y/uZVt77gqEa7pWvX6f6TM3vGTwjyDK35YXCA9fzqDXM6quWcY
-         FblIOlVFieLVQdkRHa+qtluFX99vqHo4JMRk/TZAfypqzGcAcHLSEb0kGKpl065ii5CP
-         5RimehAMHJ8E2SFqraqHKlTN9rIAl1gpNXrAxel8U+s6KtR0sKo4h9oPMIrRv5R3ke+B
-         nKWQ==
-X-Forwarded-Encrypted: i=1; AHgh+Rp58gmPyG5lnKRWb7ZsA4bYJfn1p4d0SsCz0XK8CQrVjiMbvwgCFxZPqJIvakOYUfDHYY9UB4M=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxQYfATj4UnQJ/1ZneQMvNv7c+YKz0mzm/pT9248JZUy7wI7bAh
-	VzkAsmEH/BHf4UtQl8OAA7skXYiyhl4m/Ho/TaGSv3tdlBoiOYDsZ/jD3wT1mhPahUo=
-X-Gm-Gg: AR+sD13CoW5cy/GLo2XG1IADWnYxz8iVfdoWWQsnvBLHZyRh57axUe7jrQfIFmSwydz
-	J080OpIBBZVAniRG1oiQ6xRfE5xlKoS8xLIC3g9aK8H4rpVdOF1ZQmhQqBsZcxgbLw2t0vsVntw
-	pi5bzueze85fil/egJ+vTLRaILObwuNHmisRaDDtrUpK0phZqYwyeVnDcdpqmSiEGMEFI07oVo1
-	GzH2SFszAn67WIYPT2rAkbP0AdLmEf5E5+DLORmBaZIx3H9McPMh9jCJJTj/p6xFQCZ/U1fhOxJ
-	yEuEgTzodWTIsLg/kdgIKRsEct6a/ElXsxqb6u/bMzelMVYHMPoDLSQreAcZjA9iNrdAvNW5hvN
-	GpSN8CXHOcyXwZqCSPX/NRDI2REoMvd38nJAdagMtyQdIgbFK+HGplzp235LYbfcKl3kisDw8hB
-	UnlQfvD/LXCOPT75jOUiZtNED9mcq/0jh5dLFBGYc3331BWWBoNFaXBm8L2sH0NbUOZ4U=
-X-Received: by 2002:a5d:5291:0:b0:47f:d072:87d7 with SMTP id ffacd0b85a97d-47fec4f663fmr7081483f8f.9.1785924550297;
-        Wed, 05 Aug 2026 03:09:10 -0700 (PDT)
-Received: from [192.168.1.3] ([37.18.141.193])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47febfda0cbsm7427247f8f.6.2026.08.05.03.09.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 05 Aug 2026 03:09:09 -0700 (PDT)
-Message-ID: <ebb8a1b7-d5c8-4be0-af64-1496a7fd29d0@linaro.org>
-Date: Wed, 5 Aug 2026 11:09:08 +0100
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UxqSlKb4"
+X-Forwarded-Encrypted: i=1; AHgh+RohbSiDa14yBd96Ubodg2ujcDmgckVUy6vLY/Lnf+dAKDfQHWGDQNUeGQmJ3U54Xhnp4fuNF6A=@lists.linux.dev
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1785926982;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Oz73Vxs80Yl5zg+diatiLy3lqHxN3wXu0wim3VnpUzU=;
+	b=UxqSlKb4VE8M41K0kwCD8eCZrBfpRzMMFiPNp3CvPilZ2efJerPivUJLZ8TKd9kFMgGQ8W
+	JnFbqJ2Cj8+P0sDiS70AF55FhtM7muvO0Vvk/pbt7eQzg2b6Fv4jGbAf+LW7ObIAs/gYUW
+	5DMXfIpbBUMYqPpI1vhTFEefoYtMZGk=
+X-Gm-Message-State: AOJu0YxAFSDMel3/ZkjIuRblsspmgsCb155nvQI/DsvDxVe8wiA0Fr6n
+	dnoFlTp2rTf78JgnlL5jYAr52rwnXfpVRAkGbywF0c5iC/cHLpZxVa8VxUT59ZCcFQTyLNJY0Tm
+	r6iktAifW65DJQF4wqKydhjwQw+hwHObT7uMlFJvU
+X-Received: by 2002:a05:622a:9018:b0:517:5ac7:332e with SMTP id
+ d75a77b69052e-52ce6ac5642mr19867781cf.6.1785926966008; Wed, 05 Aug 2026
+ 03:49:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 00/21] ARM64 PMU Partitioning
-To: Colton Lewis <coltonlewis@google.com>
-Cc: kvm@vger.kernel.org, alexandru.elisei@arm.com, pbonzini@redhat.com,
- corbet@lwn.net, linux@armlinux.org.uk, catalin.marinas@arm.com,
- will@kernel.org, maz@kernel.org, oliver.upton@linux.dev, mizhang@google.com,
- joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
- mark.rutland@arm.com, shuah@kernel.org, gankulkarni@os.amperecomputing.com,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <gsntse4tvbn2.fsf@coltonlewis-kvm.c.googlers.com>
-Content-Language: en-US
-From: James Clark <james.clark@linaro.org>
-In-Reply-To: <gsntse4tvbn2.fsf@coltonlewis-kvm.c.googlers.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20260805093828.3626610-1-fuad.tabba@linux.dev>
+ <20260805093828.3626610-4-fuad.tabba@linux.dev> <20260805095501.8E1461F000E9@smtp.kernel.org>
+In-Reply-To: <20260805095501.8E1461F000E9@smtp.kernel.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Wed, 5 Aug 2026 11:49:00 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTxuYLBwNsDnZd4B_jYWBDvGxXMWSDKPiMqjJjdCMYySaw@mail.gmail.com>
+X-Gm-Features: AUfX_mzBMj9eSkHC0H-S_h_bqwmtqKM3Q89lGFKzHUk77W8cW2q1jAr85vg7aj8
+Message-ID: <CA+EHjTxuYLBwNsDnZd4B_jYWBDvGxXMWSDKPiMqjJjdCMYySaw@mail.gmail.com>
+Subject: Re: [PATCH 3/3] KVM: arm64: vgic-its: Don't write past the end of the
+ collection table
+To: sashiko-reviews@lists.linux.dev
+Cc: Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Migadu-Flow: FLOW_OUT
 
+Sashiko my good LLM friend,
 
+On Wed, 5 Aug 2026 at 10:55, <sashiko-bot@kernel.org> wrote:
+...
+> > diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-=
+its.c
+> > index ed281fbf008b9..c709fc5e17cda 100644
+> > --- a/arch/arm64/kvm/vgic/vgic-its.c
+> > +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> > @@ -2540,6 +2540,9 @@ static int vgic_its_save_collection_table(struct =
+vgic_its *its)
+> >       max_size =3D GITS_BASER_NR_PAGES(baser) * SZ_64K;
+> >
+> >       list_for_each_entry(collection, &its->collection_list, coll_list)=
+ {
+> > +             if (filled =3D=3D max_size)
+> > +                     return -EINVAL;
+> > +
+> >               ret =3D vgic_its_save_cte(its, collection, gpa);
+>
+> [Severity: Medium]
+> This is a pre-existing issue, but does this code save collections with ID=
+s
+> that exceed the current GITS_BASER size?
+>
+> If a guest maps a collection with a large ID, and then shrinks the table =
+size
+> in GITS_BASER while keeping VALID=3D1, the collection list isn't freed. S=
+ince
+> the total number of mapped collections might still be small enough to pas=
+s the
+> filled =3D=3D max_size check, it appears the collection with the large ID=
+ will
+> be successfully saved here.
+>
+> On the destination side, when vgic_its_restore_cte() reads this entry, it
+> calls vgic_its_check_id() which checks the ID against the shrunken bounda=
+ries,
+> returning -EINVAL and failing the migration.
 
-On 04/08/2026 10:06 pm, Colton Lewis wrote:
-> James Clark <james.clark@linaro.org> writes:
-> 
->> On 23/07/2026 9:57 pm, Colton Lewis wrote:
->>> James Clark <james.clark@linaro.org> writes:
->>>>>> When running the guest on a single CPU I get different counts for the
->>>>>> same event for a single process, although this never happens on a 
->>>>>> host.
->>>>>> I think there might even be some Perf tests which expect them to 
->>>>>> be the
->>>>>> same, and this doesn't depend on whether any events are running on 
->>>>>> the
->>>>>> host or not. Not sure if you ran all the Perf selftests in a guest or
->>>>>> not?
-> 
->>>>> I'll investigate but I'm not sure perf is intended to guarantee
->>>>> that. perf stat just runs the event counters but may not write or read
->>>>> them at exactly the same time.
-> 
-> 
->>>> Is that true? The perf core calls perf_pmu_disable() when a process is
->>>> scheduled out before reading the count of each event of that process in
->>>> an inner loop. The perf_pmu_disable() clears PMCR_EL0.E which freezes
->>>> all of the counters so they can be read out in a consistent state.
-> 
->>>> It's important that they're all stopped at the same time because
->>>> counters might be used in metrics as ratios of each other. So I think
->>>> it's deliberately designed that way and appears to not be working in a
->>>> guest now.
-> 
->>> By default I think perf assumes events can be measured independently, If
->>> you want to guarantee events are scheduled together to avoid measurement
->>> skew you need to make sure the events are grouped.
-> 
->>> The common way to do that is with {} around the event list:
-> 
->>> perf stat -e {branches,branches}
-> 
->>> Please see if that resolves the issue.
-> 
-> 
->> Groups only change how the events are scheduled, not how the driver
->> starts or stops multiple events running on the same PMU (grouped or
->> ungrouped). In my repro I had less events than counters in HW, so they
->> will always be scheduled at the same time regardless of grouping.
-> 
->> I did notice something extra though, you have to first open some amount
->> of counters, and then open more than that. Then the second time the ones
->> with different counts will be however many were opened first time, as if
->> some state has stuck.
-> 
->> For example if I open two counters then 6, the first two always have
->> different counts the second time:
-> 
->>     $ perf stat -e branches,branches true
-> 
->>     Performance counter stats for 'true':
-> 
->>               106129      branches
-> 
->>               106129      branches
-> 
-> 
-> 
->>     $ perf stat -e
->> '{branches,branches,branches,branches,branches,branches}' true
-> 
->>     Performance counter stats for 'true':
-> 
->>               117013      branches
-> 
->>               117013      branches
-> 
->>               110364      branches
-> 
->>               110364      branches
-> 
->>               110364      branches
-> 
->>               110364      branches
-> 
-> 
->> After opening 6 again a third time they'll all have the same counts.
-> 
-> Interesting. Thanks. To clarify, is this happening in the host or VM?
+You're right, vgic_its_check_id() validates the collection ID against
+both the 16-bit maximum and the current table capacity, so it's the
+better check here:
 
-This is in the VM
++        if (!vgic_its_check_id(its, baser, collection->collection_id, NULL=
+))
++            return -EINVAL;
 
+This also bounds the walk, and the filled =3D=3D max_size check can go.
+I'll switch to it in the respin.
+
+Cheers,
+/fuad
+
+>
+> Should this path also validate the collection ID against the current tabl=
+e
+> size, similar to how vgic_its_save_device_tables() uses vgic_its_check_id=
+()?
+>
+> >               if (ret)
+> >                       return ret;
+> >               gpa +=3D cte_esz;
+> >               filled +=3D cte_esz;
+> >       }
+>
+> --
+> Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260805093828.36=
+26610-1-fuad.tabba@linux.dev?part=3D3
