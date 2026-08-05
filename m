@@ -1,115 +1,151 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25A123E1205
-	for <kvmarm@lists.linux.dev>; Wed,  5 Aug 2026 06:58:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ED9E3AA4E0;
+	Wed,  5 Aug 2026 07:32:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785913105; cv=none; b=c7+CXU3U4y1UlF9OSBUIu+CgHBOiWU9Bak+fxqfcxqaO+W76aJ6QN/7te1Vd65TNAVgUGHXvCm2aeGhPFhdBE4JujsTsCYequceQXPk/+D6EtCsReZNBMknDArn5CKC10MpS0YTBFs4AMM1keMxVfdnBAahwDesTEY+Z/v+A+BU=
+	t=1785915153; cv=none; b=sFgJyxJexdqmnGuOlfF5JP427Dfw2LMPeZfKGyW+kfhfVBFhPSJPobzDX+5VZgWfvIJbxraoHfwN9gOlRkTDzTzrD+JkMwvKCO/bKnH9anbyCKzL+LBraPK2kTllF4XD1lInqDzmAl+b/EQfi0Ry0DPPevgE2A4fTV5r7EfPrxM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785913105; c=relaxed/simple;
-	bh=c0Glx7MMA1Z7Xc3V0ziMaF/kXbNUncpcxqT3DQaUhVU=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=fYyac9brBTNHGSNEdnAT80PxcXQwL3mdfE65qKb5qF0oLGkdOxKncOkKEjG4rkbi9qG4xjHcSFD88fyLKsyQfewZHAZL1a/2I9eWsfEYKmhVIUyY1fEoRQBbaX4nB8kZR5ey9EktDNvC7LFXhh7C6l/5MmQrxbMw3o2X94zNi7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eWD6SXQx; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1785915153; c=relaxed/simple;
+	bh=e/edK18iGwrGI3is8JT2xxd4IFU/3bP5IVZj0CBsU7E=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ccIi+A99nFWAbTJyJ1wBgP2d5gNAa7gsGw4G84K+wSZBYPQ/nABMYAtPyA006912jYSdigtPS3SNKq0jYhR8XSEV0/GjDpvmdfDsEJQmAFdx1o7o0OqkHsQcmN6gJLaX51pffqqgpGgXS4Be8pzL7x36kCusbGM2mpE1CwGZW5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AJJaA9T5; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eWD6SXQx"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1785913101;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DsV1CxCP2DFQNpD5SLyy63ooITBk+do3PIxT7xrCLRQ=;
-	b=eWD6SXQxAuIDUYuAchpaT6iSQkSkCWeNbFyWHV02ld6PQV30fk6wqbQUQK6JPx6AdMsZ6h
-	y0VjqhuWAhu7inbspR3r/rIdj2yxWX0TiFvau7KOnCZCpL2lqAGvrJy5Gn4TKdKzpMQRAv
-	qd+HmDLX9g21OkNb0iGFzQWhRET97BU=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-479-00q7SxgkMlijPMDT01eICg-1; Wed,
- 05 Aug 2026 02:58:18 -0400
-X-MC-Unique: 00q7SxgkMlijPMDT01eICg-1
-X-Mimecast-MFC-AGG-ID: 00q7SxgkMlijPMDT01eICg_1785913096
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6DCA719560AE;
-	Wed,  5 Aug 2026 06:58:15 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.44.22.7])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DC4EB180049F;
-	Wed,  5 Aug 2026 06:58:14 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 547E221E6920; Wed, 05 Aug 2026 08:58:12 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Khushit Shah <khushit.shah@nutanix.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,  "qemu-arm@nongnu.org"
- <qemu-arm@nongnu.org>,  "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-  "eric.auger@redhat.com" <eric.auger@redhat.com>,  "cohuck@redhat.com"
- <cohuck@redhat.com>,  "peter.maydell@linaro.org"
- <peter.maydell@linaro.org>,  "richard.henderson@linaro.org"
- <richard.henderson@linaro.org>,  "maz@kernel.org" <maz@kernel.org>,
-  "oliver.upton@linux.dev" <oliver.upton@linux.dev>,  "berrange@redhat.com"
- <berrange@redhat.com>,  "abologna@redhat.com" <abologna@redhat.com>,
-  "jdenemar@redhat.com" <jdenemar@redhat.com>,  "gshan@redhat.com"
- <gshan@redhat.com>,  "skolothumtho@nvidia.com" <skolothumtho@nvidia.com>,
-  "sebott@redhat.com" <sebott@redhat.com>,  "philmd@linaro.org"
- <philmd@linaro.org>,  "yangjinqian1@huawei.com" <yangjinqian1@huawei.com>,
-  Shaju Abraham <shaju.abraham@nutanix.com>,  Mark Cave-Ayland
- <mark.caveayland@nutanix.com>,  Prerna Saxena <prerna.saxena@nutanix.com>
-Subject: Re: [RFC PATCH v3 16/19] qmp: add query-cpu-props-info command
-In-Reply-To: <08DA9B28-D5BD-4EC3-8182-FEE212F0C2A0@nutanix.com> (Khushit
-	Shah's message of "Wed, 5 Aug 2026 06:48:20 +0000")
-References: <20260716213858.609699-1-khushit.shah@nutanix.com>
-	<20260716213858.609699-17-khushit.shah@nutanix.com>
-	<87y0f5u78t.fsf@pond.sub.org>
-	<6AA3BD42-9596-476B-9F64-AB09372821B9@nutanix.com>
-	<87tspa5skn.fsf@pond.sub.org>
-	<FD805FA0-9323-450C-9D79-319C0883F05E@nutanix.com>
-	<FDD5760F-94E6-46F4-AC62-AB0DC98322FD@nutanix.com>
-	<8733wu5qfs.fsf@pond.sub.org>
-	<08DA9B28-D5BD-4EC3-8182-FEE212F0C2A0@nutanix.com>
-Date: Wed, 05 Aug 2026 08:58:12 +0200
-Message-ID: <871pcd12bf.fsf@pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AJJaA9T5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A6D91F000E9;
+	Wed,  5 Aug 2026 07:32:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785915152;
+	bh=4gwj0kFUhwuS98ircZVc44GpqB+5fy9yUkWQ55U7j40=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=AJJaA9T5tFKel4SLkebN3gx+nsuoveBPZ42YEDRckt7z5kruBLv1cdm23oYFWUo5S
+	 2+0Uy2veLD2U0WtemOp5DFT8pOeKwMnYh7BfGDSHPFK6RD0dqCa+j8bfHG0k4sUI15
+	 APjHr9sxzCjMFbJnmXLX+Cy4cajxnSR6QLQXbSZyd8QNc2Wu3QyuGRHuxH+DT2vWUi
+	 PDLuTIFKK+UrX5hi4PA44H90RVHvhmJexgou2NK1zNvaE4o0wdp43YQ7Okb3YV5jC1
+	 P2OIor9K3oxs5BK8xht++hYBWLCkk3S9xo6QCLtvmvfiubshhWNZ/+gPb9B0BTkmjr
+	 N4JsiYxAy70eA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wrW73-0000000CUuY-39dd;
+	Wed, 05 Aug 2026 07:32:29 +0000
+Date: Wed, 05 Aug 2026 08:32:29 +0100
+Message-ID: <86ecgdaupe.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Karl Mehltretter <kmehltretter@gmail.com>
+Cc: Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	grayhat@foxmail.com
+Subject: Re: [PATCH 1/2] KVM: arm64: nv: Allocate the shadow S2 MMUs individually
+In-Reply-To: <anJcUNlnNmP-mKWH@gmail.com>
+References: <20260803224405.41468-1-kmehltretter@gmail.com>
+	<86mrv2arf2.wl-maz@kernel.org>
+	<86jyq6aq8g.wl-maz@kernel.org>
+	<anJcUNlnNmP-mKWH@gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
-X-Mimecast-MFC-PROC-ID: nmKwqUxOB3DSLA3NW_2hDcB4vQ88P-krSIyBdFeSGN0_1785913096
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kmehltretter@gmail.com, oupton@kernel.org, tabba@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, stable@vger.kernel.org, grayhat@foxmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Khushit Shah <khushit.shah@nutanix.com> writes:
+On Tue, 04 Aug 2026 22:54:30 +0100,
+Karl Mehltretter <kmehltretter@gmail.com> wrote:
+> 
+> On Tue, Aug 04, 2026 at 03:56:47PM +0100, Marc Zyngier wrote:
+> > > The other thing is that reallocating the pointer array isn't great. It
+> > > adds complexity, and makes everything more fragile than it should be.
+> > > 
+> > > See the hack below that seems to work OK.
+> > > 
+> 
+> Your draft is indeed a bit simpler.
+> 
+> Should I send a cleaned-up version as v2?
 
->> On 4 Aug 2026, at 12:21=E2=80=AFPM, Markus Armbruster <armbru@redhat.com=
-> wrote:
->>=20
->> !-------------------------------------------------------------------|
->>  CAUTION: External Email
->>=20
->> |-------------------------------------------------------------------!
->>=20
->> Khushit Shah <khushit.shah@nutanix.com> writes:
->>=20
->> [...]
->>=20
->>> Stub file was missing on arm user builds.=20
->>>=20
->>> I have fixed this on the private branch if you want to take a look.
->>=20
->> I'm willing to pull an update to v3, assuming it's a small fix.
->
-> It is a small fix :)
+Yes, please.
 
-Please tell me what to pull.  When you're ready, of course.
+> 
+> I would allocate the table on the first call to kvm_vcpu_init_nested()
+> and not in kvm_init_nested(), so it cannot leak if VM creation
+> fails.
 
-[...]
+I'd rather keep it on the VM creation path. This is VM-wide data, by
+definition, and given that its size doesn't depend on the number of
+vcpus anymore (we allocate the maximum once and for all), it is right
+where it belongs. See the untested hack below for the freeing on error.
 
+> There's another issue in the current code: the ptdump debugfs file
+> keeps the raw mmu pointer as its private data. I would add that to the
+> commit message.
+
+Why is that a problem? With this approach, the mmu pointers are always
+expected to be valid, irrespective of the allocation pattern, and we
+only publish pointers to the dumper when the S2_mmu is actively being
+used.
+
+We're about to rip out the NV ptdump anyway as it has many other
+problems, but I'd like to understand what you see that I don't.
+
+Thanks,
+
+	M.
+
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 9e42e92dbc7b1..e883e45382fb2 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -223,10 +223,6 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ 	mutex_unlock(&kvm->lock);
+ #endif
+ 
+-	ret = kvm_init_nested(kvm);
+-	if (ret)
+-		return ret;
+-
+ 	ret = kvm_share_hyp(kvm, kvm + 1);
+ 	if (ret)
+ 		return ret;
+@@ -241,6 +237,10 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ 	if (ret)
+ 		goto err_free_cpumask;
+ 
++	ret = kvm_init_nested(kvm);
++	if (ret)
++		goto err_uninit_mmu;
++
+ 	if (is_protected_kvm_enabled()) {
+ 		/*
+ 		 * If any failures occur after this is successful, make sure to
+@@ -269,6 +269,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ 
+ err_uninit_mmu:
+ 	kvm_uninit_stage2_mmu(kvm);
++	kvfree(kvm->arch.nested_mmus);
+ err_free_cpumask:
+ 	free_cpumask_var(kvm->arch.supported_cpus);
+ err_unshare_kvm:
+
+-- 
+Without deviation from the norm, progress is not possible.
