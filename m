@@ -1,44 +1,83 @@
-Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B41F3E3C55
-	for <kvmarm@lists.linux.dev>; Wed,  5 Aug 2026 09:48:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F08F440EBB0
+	for <kvmarm@lists.linux.dev>; Wed,  5 Aug 2026 09:52:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785923293; cv=none; b=TI60/q6enTqH0qar4BuRUU/Rgv02/3mNvcC2zp4/GRhHnaIXQrhp9G6xU5OzmhoVU4DkJ9cvWPJXoHg13lH5qk9yT8MpO8HDYlPdzZBgK+H83elcMIq6FV2tcewIEPu94VU8U4pw1ChwIfTsrNvvLYyIvxabe6eK8rkrabiGsP4=
+	t=1785923567; cv=none; b=OZq3haoRSZLay+Z5krg5OHnVxT8SpsFLZnFQcP6X80j4fnlKjPsXy9OFP+lWqQEek/zsKFjOx6U2wQukcBGwS0Uwe8N6FnpgYmmz/kvBzwMqY3AlrSGCnkokwmzV/wipHBHddbD1goJKkD58Kw1Yo8qalk81nGn4fgkbb8hlGNo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785923293; c=relaxed/simple;
-	bh=CVfxZrZ5huEz9sWFUaYHx7H8oC8g6MtMzrFqIFwcjgI=;
+	s=arc-20240116; t=1785923567; c=relaxed/simple;
+	bh=jOzaT9rukaXdROnS3UTz7jsbWEW4GdzKbyqUUbWLAcM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Bdirn5oyZ+YYegMTB/d6RbxyLqYpu+XwwywG999korG7wiib4AImWCiMS4GlVWHAeguNM9owdGmvIgICTY6t8UOVRAic/YxpLs+Ies+Iy14A2pUDOQMowfoCPas78hcifCAMQZRpHYiXbnEFGSHyavgOA7NJ7f0X5Pu12JzM1e0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=j/cpIwPE; arc=none smtp.client-ip=115.124.30.113
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=Bxs4Q4O46t9D5p3l/dLzUFM9krsGfYnqlcwkr4LmvP6XRTgORd9TPANbOQqpKeq+6SZgQjIwfMFGDOOrxDyFshIw/3TDz6R5GiSJ6zRGOKoIPrizQEQyRaCXW7V3cXEgPER3O/vG3nNFfIoLLzoxfEngMokx/GwGnAjyRcMJtrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ceSVutw5; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="j/cpIwPE"
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1785923286; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=jeqp+GWZYrC7CG++av88Z1rhW3KrVbOyZV3jpxeJENk=;
-	b=j/cpIwPE6ZqHkgRSTVka8LRFVpq3l2TXaiADmbNRjXcCduVqgy4cYnX5rhE+e9z2zGWpQozpXZTyJo7IECH6ei7yrahUn8FzCc7vvMONvGhLQ3bNY9iTvZo9vf9w9BUJf3f/uaGIpjW1CqWXU0KiFa1iVfem2CkXRrt6ov3FzRU=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R211e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam011083073210;MF=yaoyuan@linux.alibaba.com;NM=1;PH=DS;RN=15;SR=0;TI=SMTPD_---0X8Qm5AG_1785923285;
-Received: from localhost(mailfrom:yaoyuan@linux.alibaba.com fp:SMTPD_---0X8Qm5AG_1785923285 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Wed, 05 Aug 2026 17:48:05 +0800
-Date: Wed, 5 Aug 2026 17:48:04 +0800
-From: Yao Yuan <yaoyuan@linux.alibaba.com>
-To: Mark Brown <broonie@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Shuah Khan <shuah@kernel.org>, Fuad Tabba <tabba@google.com>, 
-	Oliver Upton <oupton@kernel.org>, Peter Maydell <peter.maydell@linaro.org>, 
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v18 03/14] KVM: arm64: Manage GCS access and registers
- for guests
-Message-ID: <enhoyivbkdaacgyazubgfzftt34xjemtrybvgpuqvr4czjtbhm@7qvrce5lmdyw>
-References: <20260803-arm64-gcs-v18-0-fd8c40f5ad88@kernel.org>
- <20260803-arm64-gcs-v18-3-fd8c40f5ad88@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ceSVutw5"
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4994d67d260so35045e9.1
+        for <kvmarm@lists.linux.dev>; Wed, 05 Aug 2026 02:52:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1785923563; x=1786528363; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=1uBOsoS/PbVTyBqO9ehWQ4MdxFkJS8vIp8kt3+czyyg=;
+        b=ceSVutw5VYWTZBJuX0TeAGFCFjDEKWw3NJdwgT7sgRIwuAOHYhd4n3yaRNVgRQEiKs
+         4i4/OdouW7xgoEB3cN/NzuVIKRWGdqcg0yTlgc+69O2lvNyz4s6Fe9BDe0ptLj4ASWRh
+         xwnHI68ZMSEhDzT0Bco6g2UqUw7MSVqHJFhYWOHCv0V90G5lTnY1E6F/ZB5aTLbOUGZl
+         oaB1scMsU5eUC4QFn3ZG3A3r2FCV+cB+LA+FT1pUZLQSvDda0wtmpDONn3q0da7DNZZq
+         R505kKQlw8Bye8tbhsRoqqcG6AXVk5RKAkx/MeQL5EVL1irYfZePT/UtQd5PmvgLK3QX
+         ++Zw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785923563; x=1786528363;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=1uBOsoS/PbVTyBqO9ehWQ4MdxFkJS8vIp8kt3+czyyg=;
+        b=oBiSM+jIUx1eryX6QR43UKErAiKy5C4C0ozsUSNuCIoVO5nhB60wJHiNWQZCQJYFTe
+         8v3w0ML0Ko5x6oHZ1629RT1RQP/auxeLdkkAUgeeMyn2UzNp7hIGJimXmQRppOHkVbEI
+         H6l/B7aOoM+yTAGjzWj1f2VEFt8ByHcbTxtjUqoThzf4sehcP/n8Bw5NSESU+sayCL9k
+         oxyaEoncCVRFA1cv6Limu6Xwb6LY46Pz05ruamCe3P6+XmeQx/LFmfso4AufN/s98nxm
+         9+xbOzzzc1UUzkjm7NoJXIWP1uZC2kzwiCzkHsdtGra3T0jkE8CeEyWbuOq/bUlUHGrV
+         Hchg==
+X-Forwarded-Encrypted: i=1; AHgh+RpzMymYJifi93N3Hpe8IJY95QIgIVoWNDR17FxdZWIU4Fds9mbKxXvQ5O/UNzdLhlvCcJYcqo0=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxSN1jdqMAkpXa1wPS+bVq9LajbhurRGIDICFxikujrGiUxoUce
+	pbwy/N2DHU8PcRTm3pBXQ92ji0e7IeFomSQ1Im+j8ZJ7O1v0hLwmkfbmmMHKtiQ2hg==
+X-Gm-Gg: AR+sD12BXzLHfm/Dgu8uQ3LYBNIU79NulWx9c/29YE2omE7VU67LFYtixNzRTALDwLR
+	MQx8qvTlCW20VHCs5CZnf+8bI791w9iftRQ365jigPO1Nu/sievSerfQtR4k1JYPv6IRik5+IIL
+	4YjdSsu67Rw2vdrKVpY6IZ+J8G27/i79z+NFF68jIvXWqFvQw7qbJTMo884YprpCjYJNXp8I3Jl
+	dJlQTIpQq1hD4yMRhETmygJokzhrE+yEhmIAdcBUUPeg7L4M1+yOcQH4y3iiJi1uxmgiVJkdids
+	XLGc6MRQKs1QdmewytidQahHNxeobqeLmAG20mVwjx3ejL6Tiay4Sf3hpvPLu/todOyWKlZUBZ1
+	UiCcIReoPLA+2MKEI3Bv3sq8yrP/vlinWniWNkxNS4KBgEnfITjtonSrebAboI2I+ydsXbTsuw3
+	CvgIHLum29V8kowkaaPhm1PfStgFPc6+/w64NC7y8tnCNsB4eJmUfp2yfa0d5Yq1VwqsK8MkhsI
+	blLvhqN4Yspn8J0mmpV7FK8rAKCY3jN
+X-Received: by 2002:a7b:cb93:0:b0:490:b2ae:44ca with SMTP id 5b1f17b1804b1-4994f114900mr802195e9.5.1785923562831;
+        Wed, 05 Aug 2026 02:52:42 -0700 (PDT)
+Received: from google.com (63.235.189.35.bc.googleusercontent.com. [35.189.235.63])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47fec249a5fsm7282244f8f.33.2026.08.05.02.52.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Aug 2026 02:52:42 -0700 (PDT)
+Date: Wed, 5 Aug 2026 09:52:38 +0000
+From: Sebastian Ene <sebastianene@google.com>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: alexandru.elisei@arm.com, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	android-kvm@google.com, catalin.marinas@arm.com,
+	dbrazdil@google.com, joey.gouly@arm.com, kees@kernel.org,
+	mark.rutland@arm.com, maz@kernel.org, oupton@kernel.org,
+	perlarsen@google.com, qperret@google.com, rananta@google.com,
+	smostafa@google.com, suzuki.poulose@arm.com, tabba@google.com,
+	tglx@kernel.org, bgrzesik@google.com, will@kernel.org,
+	yuzenghui@huawei.com
+Subject: Re: [PATCH 03/14] KVM: arm64: Support host MMIO trap handlers for
+ unmapped devices
+Message-ID: <anMH5hHxEMxh6spO@google.com>
+References: <20260310124933.830025-1-sebastianene@google.com>
+ <20260310124933.830025-4-sebastianene@google.com>
+ <acJukVJzZJEoPEyE@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,248 +86,152 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260803-arm64-gcs-v18-3-fd8c40f5ad88@kernel.org>
+In-Reply-To: <acJukVJzZJEoPEyE@google.com>
 
-On Mon, Aug 03, 2026 at 11:56:48PM +0800, Mark Brown wrote:
-> GCS introduces a number of system registers, on systems with GCS we need
-> to context switch them and expose them to VMMs to allow guests to use
-> GCS.
->
-> In order to allow guests to use GCS we also need to configure
-> HCRX_EL2.GCSEn, if this is not set GCS instructions will be noops and
-> CHKFEAT will report GCS as disabled.
->
-> Signed-off-by: Mark Brown <broonie@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_emulate.h       |  3 +++
->  arch/arm64/include/asm/kvm_host.h          | 14 ++++++++++
->  arch/arm64/include/asm/vncr_mapping.h      |  2 ++
->  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 31 ++++++++++++++++++++++
->  arch/arm64/kvm/hyp/vhe/sysreg-sr.c         | 10 +++++++
->  arch/arm64/kvm/sys_regs.c                  | 42 ++++++++++++++++++++++++++++++
->  6 files changed, 102 insertions(+)
-...
-> --- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> @@ -17,6 +17,7 @@
->  #include <asm/kvm_mmu.h>
->
->  static inline bool ctxt_has_s1poe(struct kvm_cpu_context *ctxt);
-> +static inline bool ctxt_has_gcs(struct kvm_cpu_context *ctxt);
->
->  static inline struct kvm_vcpu *ctxt_to_vcpu(struct kvm_cpu_context *ctxt)
->  {
-> @@ -67,6 +68,11 @@ static inline void __sysreg_save_user_state(struct kvm_cpu_context *ctxt)
->  {
->  	ctxt_sys_reg(ctxt, TPIDR_EL0)	= read_sysreg(tpidr_el0);
->  	ctxt_sys_reg(ctxt, TPIDRRO_EL0)	= read_sysreg(tpidrro_el0);
-> +
-> +	if (ctxt_has_gcs(ctxt)) {
-> +		ctxt_sys_reg(ctxt, GCSPR_EL0) = read_sysreg_s(SYS_GCSPR_EL0);
-> +		ctxt_sys_reg(ctxt, GCSCRE0_EL1)	= read_sysreg_s(SYS_GCSCRE0_EL1);
-> +	}
->  }
->
->  static inline bool ctxt_has_mte(struct kvm_cpu_context *ctxt)
-> @@ -131,6 +137,17 @@ static inline bool ctxt_has_sctlr2(struct kvm_cpu_context *ctxt)
->  	return kvm_has_sctlr2(kern_hyp_va(vcpu->kvm));
->  }
->
-> +static inline bool ctxt_has_gcs(struct kvm_cpu_context *ctxt)
-> +{
-> +	struct kvm_vcpu *vcpu;
-> +
-> +	if (!cpus_have_final_cap(ARM64_HAS_GCS))
-> +		return false;
-> +
-> +	vcpu = ctxt_to_vcpu(ctxt);
-> +	return kvm_has_feat(kern_hyp_va(vcpu->kvm), ID_AA64PFR1_EL1, GCS, IMP);
-> +}
-> +
->  static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
->  {
->  	ctxt_sys_reg(ctxt, SCTLR_EL1)	= read_sysreg_el1(SYS_SCTLR);
-> @@ -144,6 +161,10 @@ static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
->  		if (ctxt_has_s1pie(ctxt)) {
->  			ctxt_sys_reg(ctxt, PIR_EL1)	= read_sysreg_el1(SYS_PIR);
->  			ctxt_sys_reg(ctxt, PIRE0_EL1)	= read_sysreg_el1(SYS_PIRE0);
-> +			if (ctxt_has_gcs(ctxt)) {
-> +				ctxt_sys_reg(ctxt, GCSPR_EL1)	= read_sysreg_el1(SYS_GCSPR);
-> +				ctxt_sys_reg(ctxt, GCSCR_EL1)	= read_sysreg_el1(SYS_GCSCR);
-> +			}
->  		}
->
->  		if (ctxt_has_s1poe(ctxt))
-> @@ -206,6 +227,11 @@ static inline void __sysreg_restore_user_state(struct kvm_cpu_context *ctxt)
->  {
->  	write_sysreg(ctxt_sys_reg(ctxt, TPIDR_EL0),	tpidr_el0);
->  	write_sysreg(ctxt_sys_reg(ctxt, TPIDRRO_EL0),	tpidrro_el0);
-> +	if (ctxt_has_gcs(ctxt)) {
-> +		write_sysreg_s(ctxt_sys_reg(ctxt, GCSPR_EL0), SYS_GCSPR_EL0);
-> +		write_sysreg_s(ctxt_sys_reg(ctxt, GCSCRE0_EL1),
-> +			       SYS_GCSCRE0_EL1);
-> +	}
->  }
->
->  static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt,
-> @@ -239,6 +265,11 @@ static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt,
->  		if (ctxt_has_s1pie(ctxt)) {
->  			write_sysreg_el1(ctxt_sys_reg(ctxt, PIR_EL1),	SYS_PIR);
->  			write_sysreg_el1(ctxt_sys_reg(ctxt, PIRE0_EL1),	SYS_PIRE0);
-> +
-> +			if (ctxt_has_gcs(ctxt)) {
-> +				write_sysreg_el1(ctxt_sys_reg(ctxt, GCSPR_EL1),	SYS_GCSPR);
-> +				write_sysreg_el1(ctxt_sys_reg(ctxt, GCSCR_EL1),	SYS_GCSCR);
-> +			}
->  		}
->
->  		if (ctxt_has_s1poe(ctxt))
-> diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-> index be685b63e8cf..2431c18f5792 100644
-> --- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-> +++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-> @@ -61,6 +61,9 @@ static void __sysreg_save_vel2_state(struct kvm_vcpu *vcpu)
->
->  			if (ctxt_has_s1poe(&vcpu->arch.ctxt))
->  				__vcpu_assign_sys_reg(vcpu, POR_EL2, read_sysreg_el1(SYS_POR));
-> +
-> +			if (ctxt_has_gcs(&vcpu->arch.ctxt))
-> +				__vcpu_assign_sys_reg(vcpu, GCSCR_EL2, read_sysreg_el1(SYS_GCSCR));
->  		}
->
->  		/*
-> @@ -77,6 +80,8 @@ static void __sysreg_save_vel2_state(struct kvm_vcpu *vcpu)
->  	__vcpu_assign_sys_reg(vcpu, SP_EL2,	 read_sysreg(sp_el1));
->  	__vcpu_assign_sys_reg(vcpu, ELR_EL2,	 read_sysreg_el1(SYS_ELR));
->  	__vcpu_assign_sys_reg(vcpu, SPSR_EL2,	 read_sysreg_el1(SYS_SPSR));
-> +	if (ctxt_has_gcs(&vcpu->arch.ctxt))
-> +		__vcpu_assign_sys_reg(vcpu, GCSPR_EL2, read_sysreg_el1(SYS_GCSPR));
->
->  	if (ctxt_has_sctlr2(&vcpu->arch.ctxt))
->  		__vcpu_assign_sys_reg(vcpu, SCTLR2_EL2, read_sysreg_el1(SYS_SCTLR2));
-> @@ -133,6 +138,11 @@ static void __sysreg_restore_vel2_state(struct kvm_vcpu *vcpu)
->
->  		if (ctxt_has_s1poe(&vcpu->arch.ctxt))
->  			write_sysreg_el1(__vcpu_sys_reg(vcpu, POR_EL2), SYS_POR);
-> +
-> +		if (ctxt_has_gcs(&vcpu->arch.ctxt)) {
-> +			write_sysreg_el1(__vcpu_sys_reg(vcpu, GCSCR_EL2), SYS_GCSCR);
-> +			write_sysreg_el1(__vcpu_sys_reg(vcpu, GCSPR_EL2), SYS_GCSPR);
-> +		}
+On Tue, Mar 24, 2026 at 10:59:29AM +0000, Vincent Donnefort wrote:
+> On Tue, Mar 10, 2026 at 12:49:22PM +0000, Sebastian Ene wrote:
+> > Introduce a mechanism to register callbacks for MMIO accesses to regions
+> > unmapped from the host Stage-2 page tables.
+> > 
+> > This infrastructure allows the hypervisor to intercept host accesses to
+> > protected or emulated devices. When a Stage-2 fault occurs on a
+> > registered device region, the hypervisor will invoke the associated
+> > callback to emulate the access.
+> > 
+> > Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_arm.h      |  3 ++
+> >  arch/arm64/include/asm/kvm_pkvm.h     |  6 ++++
+> >  arch/arm64/kvm/hyp/nvhe/mem_protect.c | 41 +++++++++++++++++++++++++++
+> >  arch/arm64/kvm/hyp/nvhe/setup.c       |  3 ++
+> >  4 files changed, 53 insertions(+)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> > index 3f9233b5a130..8fe1e80ab3f4 100644
+> > --- a/arch/arm64/include/asm/kvm_arm.h
+> > +++ b/arch/arm64/include/asm/kvm_arm.h
+> > @@ -304,6 +304,9 @@
+> >  
+> >  /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
+> >  #define HPFAR_MASK	(~UL(0xf))
+> > +
+> > +#define FAR_MASK	GENMASK_ULL(11, 0)
+> > +
+> >  /*
+> >   * We have
+> >   *	PAR	[PA_Shift - 1	: 12] = PA	[PA_Shift - 1 : 12]
+> > diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
+> > index 48ec7d519399..5321ced2f50a 100644
+> > --- a/arch/arm64/include/asm/kvm_pkvm.h
+> > +++ b/arch/arm64/include/asm/kvm_pkvm.h
+> > @@ -19,9 +19,15 @@
+> >  
+> >  #define PKVM_PROTECTED_REGS_NUM	8
+> >  
+> > +struct pkvm_protected_reg;
+> > +
+> > +typedef void (pkvm_emulate_handler)(struct pkvm_protected_reg *region, u64 offset, bool write,
+> > +				    u64 *reg, u8 reg_size);
+> > +
+> >  struct pkvm_protected_reg {
+> >  	u64 start_pfn;
+> >  	size_t num_pages;
+> > +	pkvm_emulate_handler *cb;
+> >  };
+> >  
+> >  extern struct pkvm_protected_reg kvm_nvhe_sym(pkvm_protected_regs)[];
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> > index 7c125836b533..f405d2fbd88f 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> > @@ -13,6 +13,7 @@
+> >  #include <asm/stage2_pgtable.h>
+> >  
+> >  #include <hyp/fault.h>
+> > +#include <hyp/adjust_pc.h>
+> >  
+> >  #include <nvhe/gfp.h>
+> >  #include <nvhe/memory.h>
+> > @@ -608,6 +609,41 @@ static int host_stage2_idmap(u64 addr)
+> >  	return ret;
+> >  }
+> >  
+> > +static bool handle_host_mmio_trap(struct kvm_cpu_context *host_ctxt, u64 esr, u64 addr)
+> > +{
+> > +	u64 offset, reg_value = 0, start, end;
+> > +	u8 reg_size, reg_index;
+> > +	bool write;
+> > +	int i;
+> > +
+> > +	for (i = 0; i < num_protected_reg; i++) {
+> 
+> This is potentially slow for a fast path. As this is an array, we could sort it
+> and do a binary search, just like find_mem_range?
 
-Hi Mark,
+Yes we can do that but there are not too many fields in the array(8
+atm.)  and we only enter in this when we trap MMIO (because we check for
+!addr_is_memory(..))
 
-Looks the s1pie checking for GCS vEL2 context switch is
-necessary yet IIUC, KVM does vEL2 context switch for nested
-L1's EL2, it should follow same rule as non-nested L1's EL1
-context switch.
+Thanks,
+Sebastian
 
->  	}
->
->  	write_sysreg_el1(__vcpu_sys_reg(vcpu, ESR_EL2),		SYS_ESR);
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 5d5c579d4579..d18ada283809 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -109,6 +109,10 @@ static enum sr_loc_attr locate_direct_register(const struct kvm_vcpu *vcpu,
->  	case PIR_EL1:
->  	case PIRE0_EL1:
->  	case POR_EL1:
-> +	case GCSCRE0_EL1:
-> +	case GCSPR_EL0:
-> +	case GCSCR_EL1:
-> +	case GCSPR_EL1:
->  	case ESR_EL1:
->  	case AFSR0_EL1:
->  	case AFSR1_EL1:
-> @@ -200,6 +204,8 @@ static void locate_register(const struct kvm_vcpu *vcpu, enum vcpu_sysreg reg,
->  		MAPPED_EL2_SYSREG(PIR_EL2,     PIR_EL1,     NULL	     );
->  		MAPPED_EL2_SYSREG(PIRE0_EL2,   PIRE0_EL1,   NULL	     );
->  		MAPPED_EL2_SYSREG(POR_EL2,     POR_EL1,     NULL	     );
-> +		MAPPED_EL2_SYSREG(GCSCR_EL2,   GCSCR_EL1,   NULL             );
-> +		MAPPED_EL2_SYSREG(GCSPR_EL2,   GCSPR_EL1,   NULL             );
->  		MAPPED_EL2_SYSREG(AMAIR_EL2,   AMAIR_EL1,   NULL	     );
->  		MAPPED_EL2_SYSREG(ELR_EL2,     ELR_EL1,	    NULL	     );
->  		MAPPED_EL2_SYSREG(SPSR_EL2,    SPSR_EL1,    NULL	     );
-> @@ -228,6 +234,10 @@ static u64 read_sr_from_cpu(enum vcpu_sysreg reg)
->  	case TCR2_EL1:		val = read_sysreg_s(SYS_TCR2_EL12);	break;
->  	case PIR_EL1:		val = read_sysreg_s(SYS_PIR_EL12);	break;
->  	case PIRE0_EL1:		val = read_sysreg_s(SYS_PIRE0_EL12);	break;
-> +	case GCSPR_EL0:		val = read_sysreg_s(SYS_GCSPR_EL0);	break;
-> +	case GCSCRE0_EL1:	val = read_sysreg_s(SYS_GCSCRE0_EL1);	break;
-> +	case GCSCR_EL1:		val = read_sysreg_s(SYS_GCSCR_EL12);	break;
-> +	case GCSPR_EL1:		val = read_sysreg_s(SYS_GCSPR_EL12);	break;
->  	case POR_EL1:		val = read_sysreg_s(SYS_POR_EL12);	break;
->  	case ESR_EL1:		val = read_sysreg_s(SYS_ESR_EL12);	break;
->  	case AFSR0_EL1:		val = read_sysreg_s(SYS_AFSR0_EL12);	break;
-> @@ -267,6 +277,10 @@ static void write_sr_to_cpu(enum vcpu_sysreg reg, u64 val)
->  	case PIR_EL1:		write_sysreg_s(val, SYS_PIR_EL12);	break;
->  	case PIRE0_EL1:		write_sysreg_s(val, SYS_PIRE0_EL12);	break;
->  	case POR_EL1:		write_sysreg_s(val, SYS_POR_EL12);	break;
-> +	case GCSCRE0_EL1:	write_sysreg_s(val, SYS_GCSCRE0_EL1);	break;
-> +	case GCSPR_EL0:		write_sysreg_s(val, SYS_GCSPR_EL0);	break;
-> +	case GCSCR_EL1:		write_sysreg_s(val, SYS_GCSCR_EL12);	break;
-> +	case GCSPR_EL1:		write_sysreg_s(val, SYS_GCSPR_EL12);	break;
->  	case ESR_EL1:		write_sysreg_s(val, SYS_ESR_EL12);	break;
->  	case AFSR0_EL1:		write_sysreg_s(val, SYS_AFSR0_EL12);	break;
->  	case AFSR1_EL1:		write_sysreg_s(val, SYS_AFSR1_EL12);	break;
-> @@ -2995,6 +3009,21 @@ static unsigned int cnthv_visibility(const struct kvm_vcpu *vcpu,
->  	return REG_HIDDEN;
->  }
->
-> +static unsigned int gcs_visibility(const struct kvm_vcpu *vcpu,
-> +				   const struct sys_reg_desc *r)
-> +{
-> +	if (kvm_has_gcs(vcpu->kvm))
-> +		return 0;
-> +
-> +	return REG_HIDDEN;
-> +}
-> +
-> +static unsigned int gcs_el2_visibility(const struct kvm_vcpu *vcpu,
-> +				       const struct sys_reg_desc *rd)
-> +{
-> +	return __el2_visibility(vcpu, rd, gcs_visibility);
-> +}
-> +
->  static bool access_mdcr(struct kvm_vcpu *vcpu,
->  			struct sys_reg_params *p,
->  			const struct sys_reg_desc *r)
-> @@ -3399,6 +3428,13 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	PTRAUTH_KEY(APDB),
->  	PTRAUTH_KEY(APGA),
->
-> +	{ SYS_DESC(SYS_GCSCR_EL1), NULL, reset_val, GCSCR_EL1, 0,
-> +	  .visibility = gcs_visibility },
-> +	{ SYS_DESC(SYS_GCSPR_EL1), NULL, reset_unknown, GCSPR_EL1,
-> +	  .visibility = gcs_visibility },
-> +	{ SYS_DESC(SYS_GCSCRE0_EL1), NULL, reset_val, GCSCRE0_EL1, 0,
-> +	  .visibility = gcs_visibility },
-> +
->  	{ SYS_DESC(SYS_SPSR_EL1), access_spsr},
->  	{ SYS_DESC(SYS_ELR_EL1), access_elr},
->
-> @@ -3523,6 +3559,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  		    CTR_EL0_DminLine_MASK |
->  		    CTR_EL0_L1Ip_MASK |
->  		    CTR_EL0_IminLine_MASK),
-> +	{ SYS_DESC(SYS_GCSPR_EL0), NULL, reset_unknown, GCSPR_EL0,
-> +	  .visibility = gcs_visibility },
->  	{ SYS_DESC(SYS_SVCR), undef_access, reset_val, SVCR, 0, .visibility = sme_visibility  },
->  	{ SYS_DESC(SYS_FPMR), undef_access, reset_val, FPMR, 0, .visibility = fp8_visibility },
->
-> @@ -3764,6 +3802,10 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	EL2_REG_FILTERED(VNCR_EL2, bad_vncr_trap, reset_val, 0,
->  			 vncr_el2_visibility),
->
-> +	EL2_REG_FILTERED(GCSCR_EL2, access_rw, reset_val, 0,
-> +			 gcs_el2_visibility),
-> +	EL2_REG_FILTERED(GCSPR_EL2, access_rw, reset_val, 0,
-> +			 gcs_el2_visibility),
->  	{ SYS_DESC(SYS_DACR32_EL2), undef_access, reset_unknown, DACR32_EL2 },
->  	EL2_REG_VNCR_FILT(HDFGRTR2_EL2, fgt2_visibility),
->  	EL2_REG_VNCR_FILT(HDFGWTR2_EL2, fgt2_visibility),
->
-> --
-> 2.47.3
->
+> 
+> > +		start = pkvm_protected_regs[i].start_pfn << PAGE_SHIFT;
+> > +		end = start + (pkvm_protected_regs[i].num_pages << PAGE_SHIFT);
+> > +
+> > +		if (start > addr || addr > end)
+> > +			continue;
+> > +
+> > +		reg_size = BIT((esr & ESR_ELx_SAS) >> ESR_ELx_SAS_SHIFT);
+> > +		reg_index = (esr & ESR_ELx_SRT_MASK) >> ESR_ELx_SRT_SHIFT;
+> > +		write = (esr & ESR_ELx_WNR) == ESR_ELx_WNR;
+> > +		offset = addr - start;
+> > +
+> > +		if (write)
+> > +			reg_value = host_ctxt->regs.regs[reg_index];
+> > +
+> > +		pkvm_protected_regs[i].cb(&pkvm_protected_regs[i], offset, write,
+> > +					  &reg_value, reg_size);
+> > +
+> > +		if (!write)
+> > +			host_ctxt->regs.regs[reg_index] = reg_value;
+> > +
+> > +		kvm_skip_host_instr();
+> > +		return true;
+> > +	}
+> > +
+> > +	return false;
+> > +}
+> > +
+> >  void handle_host_mem_abort(struct kvm_cpu_context *host_ctxt)
+> >  {
+> >  	struct kvm_vcpu_fault_info fault;
+> > @@ -630,6 +666,11 @@ void handle_host_mem_abort(struct kvm_cpu_context *host_ctxt)
+> >  	 */
+> >  	BUG_ON(!(fault.hpfar_el2 & HPFAR_EL2_NS));
+> >  	addr = FIELD_GET(HPFAR_EL2_FIPA, fault.hpfar_el2) << 12;
+> > +	addr |= fault.far_el2 & FAR_MASK;
+> > +
+> > +	if (ESR_ELx_EC(esr) == ESR_ELx_EC_DABT_LOW && !addr_is_memory(addr) &&
+> > +	    handle_host_mmio_trap(host_ctxt, esr, addr))
+> > +		return;
+> >  
+> >  	ret = host_stage2_idmap(addr);
+> >  	BUG_ON(ret && ret != -EAGAIN);
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+> > index ad5b96085e1b..f91dfebe9980 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/setup.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+> > @@ -296,6 +296,9 @@ static int unmap_protected_regions(void)
+> >  			if (ret)
+> >  				goto err_setup;
+> >  		}
+> > +
+> > +		if (reg->cb)
+> > +			reg->cb = kern_hyp_va(reg->cb);
+> >  	}
+> >  
+> >  	return 0;
+> > -- 
+> > 2.53.0.473.g4a7958ca14-goog
+> > 
