@@ -1,123 +1,97 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F24013E49F1;
-	Wed,  5 Aug 2026 08:47:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB95F3F86E2
+	for <kvmarm@lists.linux.dev>; Wed,  5 Aug 2026 09:38:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785919636; cv=none; b=UaZgwesnjHMb+vq3SIvS5YZrDV1FSuV+MHSKkhb65L0Zbcgo4kGgBDxz5+2tD11n0r1pOVNiIXDgfazW03nnxi8GS4qyltxz2p7+a+2Fs19BUD+1ktAQpm8BImSskNphMBl8EjW+ZLdEDlpIWx5X690rNgqy5xwRyojG3Nuowms=
+	t=1785922732; cv=none; b=rpvBhbbUPB7EIIQqfq+IehaGeWuJZvCaB9iFsc+03lzSoz9JJk27/vtiTAAtfWA9GSvo8Vc3aNxZ2sE/LrK3DCxu2uNpuRbEzeDWdVqHbD4m55/1GhZ0/0zHDaACxkTe+hxMv+bl+INylo2fYEZU2r+z2eIRnWQr4U/1NFfbVU0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785919636; c=relaxed/simple;
-	bh=NCefE1mO1GlvWUkeAoReVC10N2F/jCGs0rCOQGw2TpU=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qaduHyWtvuBRAOmSEDrK/nuwT+UeF4tcXNdBZZ2V6ABQ1zXQ13CKqFUU5joRJPmhvgWSuhtvG8iKGo/2oq0HPTaxm6gg2J0Ec5bqRab/Ii/xfs43+GorS5GZlCletxa2WtfaZ+xiPHPippGowzLfCplmIylZNzixwQayJmMGqnk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mLJl/Bok; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1785922732; c=relaxed/simple;
+	bh=lTX9zw8nIo79IE+8hZKxtjCT2p3ZrPIQ/UhGZtPRTYs=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=ajdCj2/QVff4I8++qKBCI2s81zpGJf6Izg3PP/muFPAdAP15kofRQJFRZrVTKyWLnS6Kw9GjSxbB7kkPJCaTFpj5gQYceRT5zWMX/lAQColDi2jgQxtTdy+C31JMn6LpFgNpnCKFOmmh4sMsTNWpIngnyvqh3QxaQ7AootWVuts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Xd/dFTOE; arc=none smtp.client-ip=91.218.175.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mLJl/Bok"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 714721F000E9;
-	Wed,  5 Aug 2026 08:47:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785919634;
-	bh=kszMkcQKqrIYgW/Oo0EZOBH4I8hWpCPVD1GaXYgTgbg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=mLJl/BokC8Mo53uR+QWaVydHsO6EXtOh06TDIVqz3tZirYkI2kZ0XrZ+19FdkM3wm
-	 d7HWfNeF+4UMGMGz9UZteAlSvRRnWZzeqRyxSyqq6wWn4tJdRfAeek88Yf63oJ6sbR
-	 TfUaPxDN4NLSahez5SjUo80Uc5rE/vAyTAR2PvTWdQe3aCEyzBBS7KX1hhDG/nhXsc
-	 oY3shvzY0qZDZj2eHBiAzU/Nx7RmGfE0abAFOr6DUatPCZzXUnTJyGF0eLtCpIFQE4
-	 SHx++8Kr/ojSi8BZKfPixbsQ770UCSKncjr9xcZGNqzsIjMXHJF/bZJcBwa7A9yGKc
-	 OYW3RQ799aKcg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wrXHM-0000000CWRv-0CXA;
-	Wed, 05 Aug 2026 08:47:12 +0000
-Date: Wed, 05 Aug 2026 09:47:11 +0100
-Message-ID: <86cxvxar8w.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Jing Zhang <jingzhangos@google.com>,Mostafa Saleh <smostafa@google.com>
-Cc: 	KVM <kvm@vger.kernel.org>,
-	KVMARM <kvmarm@lists.linux.dev>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Xd/dFTOE"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1785922727;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jvgbJlPCnE4f10jQC8pND6XdEzFjAYm1Jvqvul33sH8=;
+	b=Xd/dFTOEJlqSxLRJtBna6CdPBBlF7rsbLMwYtyQjYIPfgMyDo/kJ3LTNzioNNL2Z3V85um
+	sR9lUD0GQyq75c+7GI0q4jwAoWt/gSPMce2BXc2RZ9nhNAnDsfIM8mAXVPQsz3dWyL3x5P
+	cZg8SfWE9OnAxkPJjLDQWtZVdsOJ8+Q=
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Mingwei Zhang <mizhang@google.com>,
-	David Matlack <dmatlack@google.com>
-Subject: Re: [RFC] KVM: Proposed uAPI for querying GSI and irqbypass status
-In-Reply-To: <anLz0HJ9CKuRbTPh@google.com>
-References: <20260717162658.2833515-1-jingzhangos@google.com>
-	<amh6OLH38hsO7ZWj@google.com>
-	<CAAdAUtjrnNe1Kn2_Fqtjy6igEEca-6Zd=SSbncswZtnA5FngPA@mail.gmail.com>
-	<anLz0HJ9CKuRbTPh@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Will Deacon <will@kernel.org>,
+	Sascha Bischoff <sascha.bischoff@arm.com>,
+	Sebastian Ene <sebastianene@google.com>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 1/3] KVM: arm64: vgic-its: Don't dereference a NULL collection on ITT save
+Date: Wed,  5 Aug 2026 10:38:26 +0100
+Message-Id: <20260805093828.3626610-2-fuad.tabba@linux.dev>
+In-Reply-To: <20260805093828.3626610-1-fuad.tabba@linux.dev>
+References: <20260805093828.3626610-1-fuad.tabba@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: jingzhangos@google.com, smostafa@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, pbonzini@redhat.com, seanjc@google.com, mizhang@google.com, dmatlack@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, 05 Aug 2026 09:26:56 +0100,
-Mostafa Saleh <smostafa@google.com> wrote:
-> 
-> Hi Jing,
-> 
-> On Fri, Jul 31, 2026 at 10:26:26AM -0700, Jing Zhang wrote:
+MAPC with V=0 drops ite->collection but leaves the ITE on the device's
+ITT list, and vgic_its_save_ite() dereferences it unconditionally. A
+guest that issues MAPD, MAPTI and then MAPC(V=0) therefore oopses the
+host when the VMM issues KVM_DEV_ARM_ITS_SAVE_TABLES to migrate it.
+That sequence is UNPREDICTABLE per the architecture, but KVM already
+handles the resulting state in the translate, MOVI and DISCARD paths.
 
-[drop the LLM generated stuff]
+Save a zeroed entry, which vgic_its_restore_ite() reads back as
+invalid. Skipping the ITE instead would leave the ITT slot holding
+whatever is in guest memory, and restore rejects an entry naming a
+collection the restored collection table does not have.
 
-> > While interfaces in debugfs are fantastic for manual, retroactive
-> > debugging on a developer workstation, they are not Dependable for
-> > fleet-wide observability. This RFC aims to provide a proactive
-> > monitoring solution that aligns KVM with production operational
-> > requirements across architectures (both ARM and x86).
-> > 
-> > Would love to hear your thoughts on this perspective.
-> 
-> I agree that debugfs is not suitable for that purpose.
-> 
-> My main concerns are:
-> 1- Why is /proc/interrupts not enough, it should show whether the
-> interrupts are going through the host (not bypassed) and it should
-> show when the host get a doorbell if the vCPU was not resident.
+Fixes: eff484e0298da ("KVM: arm64: vgic-its: ITT save and restore")
+Cc: stable@vger.kernel.org
+Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+---
+ arch/arm64/kvm/vgic/vgic-its.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-This.
-
-Also, there is a very long standing ask to represent the output of
-/proc/interrupts as a structured set, retrieved through a generic
-kernel interface. I.e. *not* something KVM specific. Everybody asks,
-nobody does. As usual.
-
-And if you are interested in things being "Dependable for fleet-wide
-observability" (I *love* the LLM-generated jargon), there is no way
-you can make sense of what the guest sees without looking at the full
-picture, i.e. the full machine.
-
-> 2- Technical feasibility on arm64. Since the host does not have
-> visibility into interrupts directly injected into the guest, it
-> cannot accurately maintain the proposed counters vgic_its_vlpis_hw.
-
-And GICv5 is going to make things even less observable, as only
-doorbells fire on the host. My take is that for these, a PMU-type
-interface is better suited.
-
-But in general, a KVM-specific for something that is a system-wide
-problem is IMO the wrong approach. You may want to put tglx in that
-loop and see what he has to say.
-
-Thanks,
-
-	M.
-
+diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+index 36ab3e4929154..ed281fbf008b9 100644
+--- a/arch/arm64/kvm/vgic/vgic-its.c
++++ b/arch/arm64/kvm/vgic/vgic-its.c
+@@ -2119,6 +2119,14 @@ static int vgic_its_save_ite(struct vgic_its *its, struct its_device *dev,
+ 	u32 next_offset;
+ 	u64 val;
+ 
++	/*
++	 * MAPC with V=0 keeps the ITEs mapped but drops their collection,
++	 * and with it the ICID. Save a zeroed entry, which the restore path
++	 * reads back as invalid.
++	 */
++	if (!ite->collection)
++		return vgic_its_write_entry_lock(its, gpa, 0ULL, ite);
++
+ 	next_offset = compute_next_eventid_offset(&dev->itt_head, ite);
+ 	val = ((u64)next_offset << KVM_ITS_ITE_NEXT_SHIFT) |
+ 	       ((u64)ite->irq->intid << KVM_ITS_ITE_PINTID_SHIFT) |
 -- 
-Without deviation from the norm, progress is not possible.
+2.39.5
+
