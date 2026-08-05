@@ -1,143 +1,117 @@
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com [209.85.210.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A58B9481233
-	for <kvmarm@lists.linux.dev>; Wed,  5 Aug 2026 16:02:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.214.174
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785945767; cv=pass; b=e8lUsiK/tt9n6sXRiBeufarHgM9aOcWRZmQgywlFRA+7WBGiBh6U7NQMG5GvOSsw5FUhfXO7wMwJmZuQw2QzacSRNYH51UQkRea5WSRMUNq65NZ0Oq+09eSh509Ax2wpqo08CUFCPuJkMoipua4e3UZ2oZsayeZPehKIg3oCqJI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785945767; c=relaxed/simple;
-	bh=urqjPATeIdTfgUOdfXyZZ1lXjN9fdXK4VUOiuTSdems=;
-	h=From:In-Reply-To:References:MIME-Version:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bJKy+R7kjB21Tb4XcWQZdmlb+rtV4nJpMntHvjRjKmS/EubhRyNKGnlWfxOBZ37wHX9MwGOStWXs+zHnprh/eERtE76iHI0GRVqAnop6JPB1Pw1KXFGXDrcLBjUU6IOEAAFFJhFj+6AsNlO0GqzLAXtagl9bwIGtt+U6wdJ0d7g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OFbZjep+; arc=pass smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F16A147127A
+	for <kvmarm@lists.linux.dev>; Wed,  5 Aug 2026 16:51:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.200
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1785948711; cv=none; b=eJfN5sj+jiJfDc+8bKIN0OTOK9R61FWkR5aIS/Tou9owPF7P3Mdrur16T3Zr1vXmUWHbw791qwQU9bWh1C+J9jc/n1unFQYK5uSPI/SVqf18OAmgIqRQyn7SUb8gnJTGqhtBNIDV5tekLebDTC6eh3/Le+S/zueuIlw7+oF4FmE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1785948711; c=relaxed/simple;
+	bh=icvrJSGpdYUNnT9Ydyn8XbeMIq0CEpuZVgm64o2M0J8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=PeRqGRFGMxe94O8MBtR6LjuB+w1TRzg90NBZTgCSMYora0mfAEObeBtj9pbyrGpG/Z1+0PLvbud+6nJxmzhp0IcuSq/P94ENI4NJmUnbCC7vYXpMF6DIZ1QjeAQdJ5jJlYQwBm0hvwwwW6j0a1sstvwseYv6TGu6mRSq6JfCYeE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=O1GREuj6; arc=none smtp.client-ip=209.85.210.200
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OFbZjep+"
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2ceb096e675so15987315ad.0
-        for <kvmarm@lists.linux.dev>; Wed, 05 Aug 2026 09:02:42 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1785945761; cv=none;
-        d=google.com; s=arc-20260327;
-        b=GuHqKaoCeRMApurxH8E5kzvJSsKLykykzYuauu4J0M8QGFdq1ilSMpqDpoH0CVheNc
-         oI0kmnlFSvZDlWi0VhVE8U2UEGS8y/BghfagNhxmUrxzG34JdwK391AIq5fFsQ7HyawI
-         3FcEn2504dJNY6yD6ZAMxUbkwws08mXVmkCmNnLwmdEylDyAUEvhLwA63Y1OkadNp0tg
-         IyODhUYte1rgGQBidmW7O1E7EKM2qu9CjY5J20RLcyhmwSqeXrmxJR7q58brj+Qa5f+q
-         XOc+QKrMCqe+oKq1FCQZxfML4tL6qiKsXwZRNY2zcFLf8q0k9aTfJCyHuYfFBcR3AJ3g
-         11aw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
-         :from:dkim-signature;
-        bh=dDxVaJA0qLhUpRmzRVBWfrwvszjITp7kHu2WvQfbt0A=;
-        fh=LJPIkf5jqO6lriwZ+PpRUtRJSJKAJalxMojVH63FfR8=;
-        b=JRrjnW9Who89VOhNDIHIQOesjR3j1vZI/e52fEN1lEvA1B8HEckVsNEInIesCebiTi
-         vKdPiaCZybvwYkir5si749MdxgTJu5iwcMsLbG+JeKyoxq/3zjcZvbwtxUjxwHlBjbH8
-         4Vgd/Kw2bTOZknGKzLXvi2zeX+OjGaQm6L4Mkk2LPFTuJ0QtVh13VKjx6gqK0Bs4HQXN
-         fA/E4j1lwlq6IymNPeVrDRdB9btzBEEl3jUndr1PlPKH0rJYzRZKoAKx55AkMlxQ86H/
-         wuE9b05RHOmiRnA48i0CI80dIsgXO56xiCa620+71XGCtabpEqUfOvjwuiZe0E0xs58g
-         KfQQ==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="O1GREuj6"
+Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-84a3514f912so1977361b3a.3
+        for <kvmarm@lists.linux.dev>; Wed, 05 Aug 2026 09:51:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1785945761; x=1786550561; darn=lists.linux.dev;
-        h=content-type:cc:to:subject:message-id:date:mime-version:references
-         :in-reply-to:from:from:to:cc:subject:date:message-id:reply-to
+        d=google.com; s=20251104; t=1785948709; x=1786553509; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=dDxVaJA0qLhUpRmzRVBWfrwvszjITp7kHu2WvQfbt0A=;
-        b=OFbZjep+cS1htugwUXpD0pmSl5wJUInB5Nmetet7B7pB6eJSH94fKBrEEy5/jJD+tf
-         PZXTVciMF/x9T5AE+SNEQxics/96AoOGcHnnGni8nQ5PYtd4x3Uiag7B0a6rYzjAn6yE
-         QhKVOg6oh9M00sj3f3jX7YXVw+9hmCen7BarDR7PlJ175GuBeahBg2XRCN3UBf4ut2uT
-         D4OA621LvFYqauIpu6r27ybkGoizs9Bac2tAcWnexEcqSJBBw2xXVg2V+BOueSgXOiTn
-         x91JtLs6MO5IGQV4Sa9+qcDtUHU6AeZdAeCzfFcXdZXpSxBWUfockg3fp4N5sWHrzTyC
-         G4Qw==
+        bh=jrqhku8KyxeiISShmwJpJXHc7/raRYshoO3CpoShleo=;
+        b=O1GREuj6QTbZGfIY2WrcnUl8by/6Klfq2BLcPV068uoZZYVHhlbQAk+351q++K7aa9
+         pgrDegZSC8qCG6RNz6rH5y97HLCc/ySRZJxjyhkbMlyCsl7rY14+QM60MzzXpY/vmYyL
+         KGtaqM4xMaG2y/tOKo9m++FX697ebYSWWQ9jvq11MVsccm4k1UMLoUr9ybA97aZd29wJ
+         H7bece5/46HIeXrj1TMfl9j3nkgsnAn7MeNvBi3i9lb41HL8syB46BeuN3TzB/CrePGK
+         CfpY/BZev5dvIaLRrYQdHj4WH71rlrlDKD7IaDZktFoo2l2Rv2DuyYAVNPKO4jEvyHYQ
+         RZ3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785945761; x=1786550561;
-        h=content-type:cc:to:subject:message-id:date:mime-version:references
-         :in-reply-to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1785948709; x=1786553509;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=dDxVaJA0qLhUpRmzRVBWfrwvszjITp7kHu2WvQfbt0A=;
-        b=AKmWw9KxFkviK+oYyq6CwZV6x6TiE2JJ0eu24eHcFkk+4sPEYbxntDqFSGoP3Pu4JN
-         e8M0PrlY+o/UkvzxiCMH/68CcVqkQF05HliNET55h4GRymoJB1bFUjQL9zNjLANnFmuX
-         GsgS/55WiX/jlT3f56slMsW8kzUvYQG6VqxpQCSjaO4VdmeRf2FuDqeIobk+n/uZI9qb
-         GAoT7GIugxKjDOlUGHx3iJiL2wD9INp5yH4rfdfcOiz38uXgc0NAKPNKZkZUyCS6JZ43
-         CaZHhjTaVnAmffzvlhgS3xOnb0tqboe23UZoCm0JHrnkTprFuCFS3W0vYG3oaXxILgsn
-         arbQ==
-X-Forwarded-Encrypted: i=1; AHgh+RqJTlUJRMgZOdMHDIXSTrb9+dxGrcQNwGCyzDKS5kG4maTzs7TJ9F/86ymGPIaDrSYbVVDzdKw=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yxy6nlbKTO7iZIapsGMD893+R6uPGc0BFvmnTzfTc0FZZoussdK
-	yxvxv2l2aGHzXRe/vlOxwMDyB+9uDantPAp1CIMCrInv82uTiRsT0cwbJ2yxIIgxrkxGPERoThr
-	vyKl+WfXRZQFkOj+KDNUeKJahk9IHju6SmW4AfQDt
-X-Gm-Gg: AR+sD13o5pctLRjq7Qom1Tfo3JpfSLQDeQ3o5wg+SYdyOGIuU+taClXLKKqzTOxiPa8
-	6UQB3o8NY52G0giIrZT3AOQaIETD0Iy0hq5h81rBX1D4QPkPx9dr2WNQl9QAfOtzu7D0Z7bpHgs
-	c26eT5GWnJhKCQi42wgXp3BibtWd+Sa0Modn9F8gSZesDeq5fN5igH1Hn7Q/f5Yp/tYmYibDcD7
-	BpVSUq/mOtbIJA3m2e7dWREkyG/4y2jjG7o4U8cuXk1UxoET+CQslQOlu/PMGfOSWo7wIDR7CLx
-	bUgsc4fcBM+k54ha42+itblnIBfKyvJJwbZ/lsrvrgTIymHEj0IGRnpfWTCQI0Ng/GiinKinTV4
-	Zg7eFiFmh4JH/kmHy9b3u8LcoEnMtJnf9Ah4=
-X-Received: by 2002:a17:90a:dfcf:b0:38e:9045:babe with SMTP id
- 98e67ed59e1d1-3903c5589ecmr8554536a91.7.1785945758439; Wed, 05 Aug 2026
- 09:02:38 -0700 (PDT)
-Received: from 176938342045 named unknown by gmailapi.google.com with
- HTTPREST; Wed, 5 Aug 2026 09:02:37 -0700
-Received: from 176938342045 named unknown by gmailapi.google.com with
- HTTPREST; Wed, 5 Aug 2026 09:02:37 -0700
-From: Ackerley Tng <ackerleytng@google.com>
-In-Reply-To: <20260803134403.80630-25-steven.price@arm.com>
-References: <20260803134403.80630-1-steven.price@arm.com> <20260803134403.80630-25-steven.price@arm.com>
+        bh=jrqhku8KyxeiISShmwJpJXHc7/raRYshoO3CpoShleo=;
+        b=l577czTcB+x/VPnhoFmWSyaLIulfsGPeUaYJ1tJJPcj7tmLcuNVgZeM2ZfWzORV4e+
+         S/j3jeMJO8yViDyJs5ptfxhlvCCqmxhOBgky6tERsFyvsVGMZQ4jihboe13GMdBqIk0k
+         ye5V37MM+KIJXDIMfVkLOpo/CD4sBtdHnNW7KygtLxG8t/RS/Axoqwii6fJ56Cba1CD4
+         mZFGAzGuazf7EWpk2x0Z3pHBePU+tt5Ukw2ol3hwN6R3U6SP4uo9pjVlxG1xQTh45mSI
+         t+djQeaONaby+4VE7CdJIzYNa+zzId58SBoTCB0QudGx6rXmBk/M1Zy9df+9DZ1jx7VX
+         Mqmg==
+X-Forwarded-Encrypted: i=1; AHgh+RqMdJWI+NijtUL9rp2IPrPfgyUHUp16bLHnWemV7qhaw7iwGfME85EitjAa7LfZ//x3R81a0cE=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yww/h9/J/o6FWPxh6zlRlDN7Rl4h+DwYYPC2X9QMGREy7iRL1oE
+	k9vuc4mvOq2goRwWr38Js0uE8v34fTchXSj6clq0CSeTdo2yy6eb79E88fjgw1u69/1DqKhWbFK
+	LOjqrCQ==
+X-Received: from pghr18.prod.google.com ([2002:a63:e512:0:b0:c92:dd1e:dc3c])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:99b:b0:848:76c4:fba9
+ with SMTP id d2e1a72fcca58-84f2dff77c0mr8958464b3a.7.1785948708769; Wed, 05
+ Aug 2026 09:51:48 -0700 (PDT)
+Date: Wed,  5 Aug 2026 09:46:10 -0700
+In-Reply-To: <20260731195612.2697986-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Date: Wed, 5 Aug 2026 09:02:37 -0700
-X-Gm-Features: AUfX_mzwYvzVqQkuKFkuAOMZ9a38FvddXqwH3nl4jjle1d5YB5Md9uRdePzF8HY
-Message-ID: <CAEvNRgE5O4FcNQDHwh+DWsHH7gLs3qzm+L4ZQ9FHkt=WoTV2Hw@mail.gmail.com>
-Subject: Re: [PATCH v16 24/45] KVM: arm64: Expose support for private memory
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, 
-	Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>, 
-	Oliver Upton <oliver.upton@linux.dev>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, 
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev, 
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, Gavin Shan <gshan@redhat.com>, 
-	Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun <alpergun@google.com>, 
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>, 
-	Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com, 
-	Lorenzo Pieralisi <lpieralisi@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+References: <20260731195612.2697986-1-seanjc@google.com>
+X-Mailer: git-send-email 2.55.0.571.g244d577d93-goog
+Message-ID: <178594833919.3639358.12902044577496582719.b4-ty@google.com>
+Subject: Re: [PATCH v3 00/12] KVM: selftests: Add more syscall wrappers, fix hardware_disable_test
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc: Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	David Hildenbrand <david@kernel.org>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
 
-Steven Price <steven.price@arm.com> writes:
+On Fri, 31 Jul 2026 12:56:00 -0700, Sean Christopherson wrote:
+> Third time's a charm.  Sorry for the spam.
+> 
+> Buried in the middle of this is a fix for the hardware_disable_test where
+> it can end up with a runtime of multiple minutes when running a preemptible
+> kernels on a large NUMA system.  Turns out my analysis/guess in v1 was wrong;
+> the problem isn't direct CPU contention, it's that letting the workers do any
+> amount of "real" work on any CPUs leads to pthread_create() slowdowns from
+> the perspective of the caller.
+> 
+> [...]
 
-> Select KVM_GENERIC_MEMORY_ATTRIBUTES and provide the necessary support
-> functions.
->
-> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> Changes since v14:
->  * Switch to guest_memfd in-place memory conversion and drop support
->    for KVM_VM_MEMORY_ATTRIBUTES.
->
-> [...snip...]
->
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 15d42d1993bb..146c52f867c0 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -1510,6 +1510,8 @@ struct kvm *kvm_arch_alloc_vm(void);
->
->  #define vcpu_is_protected(vcpu)		kvm_vm_is_protected((vcpu)->kvm)
->
-> +#define kvm_arch_has_private_mem(kvm) ((kvm)->arch.is_realm)
-> +
+Applied to kvm-x86 selftests2, thanks!
 
-Perhaps related to Fuad's question about pKVM and CCA state: would
-conditioning this on is_realm mess up pKVM?
+[01/12] KVM: selftests: Add a KVM syscall wrapper for sched_setaffinity()
+        https://github.com/kvm-x86/linux/commit/f766bf3d0ac8
+[02/12] KVM: selftests: Set threads CPU affinity before doing work in hardware disable test
+        https://github.com/kvm-x86/linux/commit/2887da61c42d
+[03/12] KVM: selftests: Pre-set threads affinity in hardware disable test when possible
+        https://github.com/kvm-x86/linux/commit/496779b54943
+[04/12] KVM: selftests: Return the target CPU from pin_task_to_random_cpu()
+        https://github.com/kvm-x86/linux/commit/8de0e85f654e
+[05/12] KVM: selftests: Extract picking of random CPU from cpu_set_t to separate API
+        https://github.com/kvm-x86/linux/commit/d58cc7bbc5a0
+[06/12] KVM: selftests: Affine threads to random CPUs in hardware disable test
+        https://github.com/kvm-x86/linux/commit/563416ea9ae4
+[07/12] KVM: selftests: Drop unreachable, dead code from hardware disable test
+        https://github.com/kvm-x86/linux/commit/bb0e7d84c4be
+[08/12] KVM: selftests: Add KVM syscall wrapper for pthread_create()
+        https://github.com/kvm-x86/linux/commit/5171573ce7cb
+[09/12] KVM: selftests: Add KVM syscall wrappers for pthread_{cancel,join}()
+        https://github.com/kvm-x86/linux/commit/bc9143135bf3
+[10/12] KVM: selftests: Add helper APIs to cancel+join pthreads
+        https://github.com/kvm-x86/linux/commit/939b20e5f35e
+[11/12] KVM: selftests: Add KVM syscall wrappers for pthread_{g,s}etaffinity_np()
+        https://github.com/kvm-x86/linux/commit/83b5065f3e1c
+[12/12] KVM: selftests: Clean up global constants in hardware disable test
+        https://github.com/kvm-x86/linux/commit/1039496ae75d
 
->  int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature);
->  bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
->
-> --
-> 2.43.0
+--
+https://github.com/kvm-x86/linux/tree/next
