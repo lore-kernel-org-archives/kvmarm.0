@@ -1,32 +1,30 @@
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB95F3F86E2
-	for <kvmarm@lists.linux.dev>; Wed,  5 Aug 2026 09:38:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 705833EE1E3
+	for <kvmarm@lists.linux.dev>; Wed,  5 Aug 2026 09:38:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785922732; cv=none; b=rpvBhbbUPB7EIIQqfq+IehaGeWuJZvCaB9iFsc+03lzSoz9JJk27/vtiTAAtfWA9GSvo8Vc3aNxZ2sE/LrK3DCxu2uNpuRbEzeDWdVqHbD4m55/1GhZ0/0zHDaACxkTe+hxMv+bl+INylo2fYEZU2r+z2eIRnWQr4U/1NFfbVU0=
+	t=1785922734; cv=none; b=kNuKf0Ov38QqUoE5kKNsKLlXGIGjnRFpo3sjo1w/Wy1jxj4dUtcQ50qFO1bJzJhF+lCNg24TprCk8wtx5MNoZnQJl2KBPxesZ+Hud/VMJ4oh58W8fgO7pHHAquP3PMVbIyqxeSBDXHYg90uX8/vzIoRm+w409gM6+gq6tceqwtg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785922732; c=relaxed/simple;
-	bh=lTX9zw8nIo79IE+8hZKxtjCT2p3ZrPIQ/UhGZtPRTYs=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ajdCj2/QVff4I8++qKBCI2s81zpGJf6Izg3PP/muFPAdAP15kofRQJFRZrVTKyWLnS6Kw9GjSxbB7kkPJCaTFpj5gQYceRT5zWMX/lAQColDi2jgQxtTdy+C31JMn6LpFgNpnCKFOmmh4sMsTNWpIngnyvqh3QxaQ7AootWVuts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Xd/dFTOE; arc=none smtp.client-ip=91.218.175.172
+	s=arc-20240116; t=1785922734; c=relaxed/simple;
+	bh=w5am5ByVaHiJqioMFlR2jniAuFfv2vXAEGIyG/UIheg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ieyH83m7pLQe4w/nls+6vDN0l74vbrSjHbuVX3Zx6WnYeTLdK1r//UUcM3bg/UmC5UT0hxir5tzVrLl66qLm9ZiECKJUTOPzIzkzSwwZ1KqK9z3yPenXFSFrpVJXT6wvcA1GDdpRFhsxwNFaQ4KOQOpXxtTuyoJWyvJm4knDBzc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tfOMAQdc; arc=none smtp.client-ip=91.218.175.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Xd/dFTOE"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tfOMAQdc"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1785922727;
+	t=1785922725;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jvgbJlPCnE4f10jQC8pND6XdEzFjAYm1Jvqvul33sH8=;
-	b=Xd/dFTOEJlqSxLRJtBna6CdPBBlF7rsbLMwYtyQjYIPfgMyDo/kJ3LTNzioNNL2Z3V85um
-	sR9lUD0GQyq75c+7GI0q4jwAoWt/gSPMce2BXc2RZ9nhNAnDsfIM8mAXVPQsz3dWyL3x5P
-	cZg8SfWE9OnAxkPJjLDQWtZVdsOJ8+Q=
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=XA6uf0vdp8ORAw6TXnT7k194lRleDVJK9cishIOZQWw=;
+	b=tfOMAQdcMAp+kwN52T099XsJCEIwqGyaubYGQJI3nJug/ZIvnEdlj9Ew39ZD8Min4I1Y2x
+	P/iccTt1D69eUcYPcDyhwKa4cwDC9wakk9dMpXYzGF4aRNFc2IEhshkG5uD6AMZrd+RYGN
+	DJT/p+XuuDeus5tnAmHA8xT3DRfEJr0=
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oupton@kernel.org>
@@ -40,11 +38,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/3] KVM: arm64: vgic-its: Don't dereference a NULL collection on ITT save
-Date: Wed,  5 Aug 2026 10:38:26 +0100
-Message-Id: <20260805093828.3626610-2-fuad.tabba@linux.dev>
-In-Reply-To: <20260805093828.3626610-1-fuad.tabba@linux.dev>
-References: <20260805093828.3626610-1-fuad.tabba@linux.dev>
+Subject: [PATCH 0/3] KVM: arm64: vgic: Fixes for ITS table save and init retry
+Date: Wed,  5 Aug 2026 10:38:25 +0100
+Message-Id: <20260805093828.3626610-1-fuad.tabba@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -54,44 +50,53 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-MAPC with V=0 drops ite->collection but leaves the ITE on the device's
-ITT list, and vgic_its_save_ite() dereferences it unconditionally. A
-guest that issues MAPD, MAPTI and then MAPC(V=0) therefore oopses the
-host when the VMM issues KVM_DEV_ARM_ITS_SAVE_TABLES to migrate it.
-That sequence is UNPREDICTABLE per the architecture, but KVM already
-handles the resulting state in the translate, MOVI and DISCARD paths.
+Hi folks,
 
-Save a zeroed entry, which vgic_its_restore_ite() reads back as
-invalid. Skipping the ITE instead would leave the ITT slot holding
-whatever is in guest memory, and restore rejects an entry naming a
-collection the restored collection table does not have.
+Three unrelated vgic fixes.
 
-Fixes: eff484e0298da ("KVM: arm64: vgic-its: ITT save and restore")
-Cc: stable@vger.kernel.org
-Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
----
- arch/arm64/kvm/vgic/vgic-its.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+These came out of reviewing the GIC-related postings on the list lately,
+from Sebastian's ITS hardening series [1] to Sascha's GICv5 IRS series
+[2]. These three are from the ITS table save paths and vgic init. Stare
+into the GIC long enough and it stares back!
 
-diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index 36ab3e4929154..ed281fbf008b9 100644
---- a/arch/arm64/kvm/vgic/vgic-its.c
-+++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -2119,6 +2119,14 @@ static int vgic_its_save_ite(struct vgic_its *its, struct its_device *dev,
- 	u32 next_offset;
- 	u64 val;
- 
-+	/*
-+	 * MAPC with V=0 keeps the ITEs mapped but drops their collection,
-+	 * and with it the ICID. Save a zeroed entry, which the restore path
-+	 * reads back as invalid.
-+	 */
-+	if (!ite->collection)
-+		return vgic_its_write_entry_lock(its, gpa, 0ULL, ite);
-+
- 	next_offset = compute_next_eventid_offset(&dev->itt_head, ite);
- 	val = ((u64)next_offset << KVM_ITS_ITE_NEXT_SHIFT) |
- 	       ((u64)ite->irq->intid << KVM_ITS_ITE_PINTID_SHIFT) |
+The first is the one that matters the most. A guest that issues MAPD,
+MAPTI and then MAPC(V=0) leaves an ITE mapped with no collection, and
+the next KVM_DEV_ARM_ITS_SAVE_TABLES from the VMM oopses the host. That
+is three ITS commands and an ordinary migration save, with no race and
+no allocation failure.
+
+The other two are weaker and come after it. The init fix stops the SPI
+array leaking when userspace retries KVM_DEV_ARM_VGIC_CTRL_INIT after a
+failure. The collection table fix bounds a walk that a guest can drive
+past the end of the table KVM computed, which stays inside guest
+memory, so the guest only corrupts itself. Its error code is a
+judgement call, and the commit message says which one and why.
+
+The first and the last are reproduced, each with a selftest that fails
+on an unfixed kernel and passes on a fixed one. Those are not part of
+this series, happy to post them separately if they are worth having.
+The init leak needs an observed allocation failure rather than a crash,
+so there is no reproducer for it.
+
+Based on Linux 7.2-rc6 (075b74841bd00).
+
+Cheers,
+/fuad
+
+[1] https://lore.kernel.org/all/20260310124933.830025-1-sebastianene@google.com/
+[2] https://lore.kernel.org/all/20260724104819.1296803-1-sascha.bischoff@arm.com/
+
+Fuad Tabba (3):
+  KVM: arm64: vgic-its: Don't dereference a NULL collection on ITT save
+  KVM: arm64: vgic: Don't leak the SPI array when init is retried
+  KVM: arm64: vgic-its: Don't write past the end of the collection table
+
+ arch/arm64/kvm/vgic/vgic-init.c |  3 +++
+ arch/arm64/kvm/vgic/vgic-its.c  | 11 +++++++++++
+ 2 files changed, 14 insertions(+)
+
+
+base-commit: 075b74841bd0065a3bda3440873c747938e69b68
 -- 
 2.39.5
 
