@@ -1,70 +1,43 @@
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 047393E9F60
-	for <kvmarm@lists.linux.dev>; Wed,  5 Aug 2026 08:27:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F24013E49F1;
+	Wed,  5 Aug 2026 08:47:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785918425; cv=none; b=r2VP+A7GNGpbPOEJT/8e5J8VCcI9uj6NJZzArV1Fhy7XKCuwUMb/YyOBaCynRClRoKEsfqJKqpLKyoAbv85tVSUhH1YuFNYoD3ww+8RbmrlC0kaEL/eI5AcKGmvPVKliNGET9SGUrnoJ7LSUUuVMxnBtz3DWvLLsK5QUhILRyxI=
+	t=1785919636; cv=none; b=UaZgwesnjHMb+vq3SIvS5YZrDV1FSuV+MHSKkhb65L0Zbcgo4kGgBDxz5+2tD11n0r1pOVNiIXDgfazW03nnxi8GS4qyltxz2p7+a+2Fs19BUD+1ktAQpm8BImSskNphMBl8EjW+ZLdEDlpIWx5X690rNgqy5xwRyojG3Nuowms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785918425; c=relaxed/simple;
-	bh=r2iJ28zYk63X6K0TBeBbii5OI3M1jSQLNrYEf9Y8Fww=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PgnwxNI9expLa5SwKWfy7ZovFsS/BErb4BjgL+WMCjX4NMeQ+jsmlff0oMDERBvEuFmdpx2WDc+85+JOIh73uK2ZAcN9poAP2Hphc5rW3NkiTJ2jmdCP+o4IVKPZL1iGQIxCoIs1v28bKKKBiXAmjYwbTo+YtJYZ/I5DNztYWzI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TdHA8Vmf; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1785919636; c=relaxed/simple;
+	bh=NCefE1mO1GlvWUkeAoReVC10N2F/jCGs0rCOQGw2TpU=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qaduHyWtvuBRAOmSEDrK/nuwT+UeF4tcXNdBZZ2V6ABQ1zXQ13CKqFUU5joRJPmhvgWSuhtvG8iKGo/2oq0HPTaxm6gg2J0Ec5bqRab/Ii/xfs43+GorS5GZlCletxa2WtfaZ+xiPHPippGowzLfCplmIylZNzixwQayJmMGqnk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mLJl/Bok; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TdHA8Vmf"
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-6a17c7c3c6eso2825a12.1
-        for <kvmarm@lists.linux.dev>; Wed, 05 Aug 2026 01:27:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1785918422; x=1786523222; darn=lists.linux.dev;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=egT60UKSOw/b/gAZU/oi1OqDuFs+D8oVvC9scYdRjL8=;
-        b=TdHA8VmfxANlQlZILfm9vPmxzv8+V5GuRFO77xn5YhdzsIKagD+uzdeVPBHLY+FHTi
-         zHOMjiBVX3CWEhduhMUd8H5Qaccomz+sHos2BWSbSAM9+jhx753pX8NUiHGYVeb41fd+
-         k0QcwKR4X+HyIcYStnsmF0Yp2exz7rVhk75Neuw5fR2iyG689iKJ8U/+vM/AsqWU+p53
-         o7msZJ06fB3q76RJefUlEzNftAU4cjXNp0iSlisIuC2haGBbNhnKRdJDQ8VAOB1gkRRe
-         CI5yYMjV6YHNz8sBXvs3ZAfxRHPYib39tLsMX0ey4Jm07MlHSvEtkNPpliWVxHzZ+x7U
-         6UbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785918422; x=1786523222;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=egT60UKSOw/b/gAZU/oi1OqDuFs+D8oVvC9scYdRjL8=;
-        b=b+nEOu6pjot24LwyPm0SbNocO5s1Whwxh3VX5cskzWseWDZyd+WZNO4bQjGPnO1z0W
-         O/ckGRjxIClQypZeUz3wJDp3ifX+eLEjhEJhN4Gp97OmarqnXGwW6uU2/KzNCY+ZXMMB
-         CE7rK4AOjb6I/7gA4D6nfs9lJJhQUYojdz+F8GQM5LW/vDFj0K+JCbeo9UUkwF381f+k
-         50QYnWAeJ3RqqtXNCKiv9dY54A6PU0IhhuasrXiJ7euaaJJkvDSHtEwHeAxkXOJH3oyC
-         4T7VpkhLktO11MxuJzA0RE5EmDs/nbeSt5nhjcu0VWZCIidx30trFRue/E004mRKNYM4
-         xyqg==
-X-Forwarded-Encrypted: i=1; AHgh+Rr4FNeSWP7lVf1wYDIa+2TgwnM2JX11Q3sbAHtbRyXehnMgQYRsJWYkxSUQe27WzU28LcKdet0=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwnrZuuosngSnIArWmYXKgCsEl5z8ehkbRTnj6Fe24PaWjlDCb/
-	RCPV52WS//8u0Uns6TkvSc2aXyNFcAG/VFEqmL3++SGPm+yhd7G87Wq0eobu52Xh2Q==
-X-Gm-Gg: AR+sD114qk2Lv6albpbNCPhapJg50tibCxo++iwt+u3MvKPawEyohuCRTu2V1P3eo78
-	9OlLPQv/51mf4VCt2n7EDH2MyaRWBdIFsRXuyP4/ErqYGRJGICmGn9D4Eco9gykjEO9W6csB3QK
-	g5pS83t45HcnojHaGPeLshY+e/FLW2cJN3xJHFecnsUMvo0q61TeT7/7ExNcpRRs+ysZxaTHRiy
-	t9oe/y2ED0oW/l5V3ngCpkrVtQBO4vX0aFdBLU9oj5Rz+EnOdPtM70yhhzqUsxCLDzXcByiII5M
-	XBZjkrvjtySGHcTR+WoNYoXYipquJS85NjkmFqONXXiYD3CidKpJo9pAMSWhgLuO3eMUVfDMakV
-	EeDmMOoCHQOGvucO7rqgXtOmQ+GI5GxrEjwXrfjMRpmspUhv69VaSMiTlfNZSB01bNMpp8wr6e4
-	6i1iU1DhcNuQSI1Gj54z4qY6rIEeea5IHskpfmFyIxxgia52Dyz6KKZibxZc6E4Ce4ZRJCJm3vs
-	UlvA9/zt0B+2QPpOmCOr73XfqPjPNwQ6VEtRQVDhg==
-X-Received: by 2002:aa7:df13:0:b0:698:ac70:31b9 with SMTP id 4fb4d7f45d1cf-6a16c4ee884mr28633a12.5.1785918421404;
-        Wed, 05 Aug 2026 01:27:01 -0700 (PDT)
-Received: from google.com (250.192.189.35.bc.googleusercontent.com. [35.189.192.250])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6a17bf29168sm571383a12.23.2026.08.05.01.27.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Aug 2026 01:27:00 -0700 (PDT)
-Date: Wed, 5 Aug 2026 08:26:56 +0000
-From: Mostafa Saleh <smostafa@google.com>
-To: Jing Zhang <jingzhangos@google.com>
-Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
-	Marc Zyngier <maz@kernel.org>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mLJl/Bok"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 714721F000E9;
+	Wed,  5 Aug 2026 08:47:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785919634;
+	bh=kszMkcQKqrIYgW/Oo0EZOBH4I8hWpCPVD1GaXYgTgbg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=mLJl/BokC8Mo53uR+QWaVydHsO6EXtOh06TDIVqz3tZirYkI2kZ0XrZ+19FdkM3wm
+	 d7HWfNeF+4UMGMGz9UZteAlSvRRnWZzeqRyxSyqq6wWn4tJdRfAeek88Yf63oJ6sbR
+	 TfUaPxDN4NLSahez5SjUo80Uc5rE/vAyTAR2PvTWdQe3aCEyzBBS7KX1hhDG/nhXsc
+	 oY3shvzY0qZDZj2eHBiAzU/Nx7RmGfE0abAFOr6DUatPCZzXUnTJyGF0eLtCpIFQE4
+	 SHx++8Kr/ojSi8BZKfPixbsQ770UCSKncjr9xcZGNqzsIjMXHJF/bZJcBwa7A9yGKc
+	 OYW3RQ799aKcg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wrXHM-0000000CWRv-0CXA;
+	Wed, 05 Aug 2026 08:47:12 +0000
+Date: Wed, 05 Aug 2026 09:47:11 +0100
+Message-ID: <86cxvxar8w.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Jing Zhang <jingzhangos@google.com>,Mostafa Saleh <smostafa@google.com>
+Cc: 	KVM <kvm@vger.kernel.org>,
+	KVMARM <kvmarm@lists.linux.dev>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
@@ -74,119 +47,77 @@ Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
 	Mingwei Zhang <mizhang@google.com>,
 	David Matlack <dmatlack@google.com>
 Subject: Re: [RFC] KVM: Proposed uAPI for querying GSI and irqbypass status
-Message-ID: <anLz0HJ9CKuRbTPh@google.com>
+In-Reply-To: <anLz0HJ9CKuRbTPh@google.com>
 References: <20260717162658.2833515-1-jingzhangos@google.com>
- <amh6OLH38hsO7ZWj@google.com>
- <CAAdAUtjrnNe1Kn2_Fqtjy6igEEca-6Zd=SSbncswZtnA5FngPA@mail.gmail.com>
+	<amh6OLH38hsO7ZWj@google.com>
+	<CAAdAUtjrnNe1Kn2_Fqtjy6igEEca-6Zd=SSbncswZtnA5FngPA@mail.gmail.com>
+	<anLz0HJ9CKuRbTPh@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAAdAUtjrnNe1Kn2_Fqtjy6igEEca-6Zd=SSbncswZtnA5FngPA@mail.gmail.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: jingzhangos@google.com, smostafa@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, pbonzini@redhat.com, seanjc@google.com, mizhang@google.com, dmatlack@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Jing,
-
-On Fri, Jul 31, 2026 at 10:26:26AM -0700, Jing Zhang wrote:
-> On Tue, Jul 28, 2026 at 2:45 AM Mostafa Saleh <smostafa@google.com> wrote:
-> >
-> > Hi Jing,
-> >
-> > On Fri, Jul 17, 2026 at 09:26:57AM -0700, Jing Zhang wrote:
-> > > This RFC proposes a new KVM uAPI to allow a VMM to programmatically
-> > > query the status of a GSI, with a particular focus on determining
-> > > the success or failure of Irqbypass.
-> > >
-> > >
-> > > 1. Motivation
-> > >
-> > > The primary motivation for this uAPI is to bridge the operational gap
-
-[...]
-
-> > > /* The irqbypass path is fully enabled and active in hardware */
-> > > #define KVM_GSI_STATE_FLAG_BYPASS_ACTIVE   (1 << 2)
-> > >
-> > > /* Example architecture-specific failure reasons for ARM64 */
-> > > #define KVM_ARM_GSI_FAILURE_REASON_NONE             0
-> > > #define KVM_ARM_GSI_FAILURE_REASON_NO_ITS           1 /* No ITS/GICv4 support */
-> > > #define KVM_ARM_GSI_FAILURE_REASON_NO_MSI_ADDR      2 /* MSI address unset */
-> > > #define KVM_ARM_GSI_FAILURE_REASON_GIC_HW_REJECT    3 /* GIC rejected map */
-> > > #define KVM_ARM_GSI_FAILURE_REASON_INVALID_STATE    4 /* Guest state block */
-> > >
-> > > struct kvm_gsi_state {
-> > >     __u32 gsi;              /* IN: The GSI to query */
-> > >     __u32 flags;            /* OUT: High-level status flags */
-> > >     __u64 counter_success;  /* OUT: Generic counter for successful bypass */
-> >
-> > I do not think that is possible on arm64, the host does not know
-> > about the interrupts directly injected to the guest, so it can not
-> > maitain such a counter.
-> >
-> > Thanks,
-> > Mostafa
-> >
+On Wed, 05 Aug 2026 09:26:56 +0100,
+Mostafa Saleh <smostafa@google.com> wrote:
 > 
-> Hi Mostafa,
+> Hi Jing,
 > 
-> Thank you for taking the time to review this RFC and for your valuable feedback.
-> 
-> To clarify the primary motivation here: the goal of this new uAPI is
-> to enable programmatic, stable, and fine-grained monitoring of
-> interrupt bypass status in production environments, where existing
-> mechanisms like debugfs are simply not viable.
-> 
-> Here are a few key reasons why we believe a dedicated uAPI/ioctl is
-> necessary rather than relying on debugfs:
-> 1. Production Hardening and Access Restrictions: In many hardened
-> production or cloud environments, debugfs is completely disabled
-> (CONFIG_DEBUG_FS=n), unmounted, or heavily restricted due to security
-> and performance overhead concerns. Relying on it means the Virtual
-> Machine Monitor (VMM) loses all visibility into interrupt performance
-> regressions in the very environment where monitoring matters most.
-> 2. Lack of ABI Stability: As you know, debugfs makes no ABI stability
-> guarantees. Its output format can change between kernel versions
-> without notice. Basing production monitoring and telemetry pipelines
-> on scraping debugfs is fragile and prone to breaking during kernel
-> upgrades.
-> 3. Programmatic Efficiency: Scraping and parsing text files from
-> userspace is inefficient for high-frequency or fleet-wide monitoring.
-> A binary ioctl interface (KVM_GET_GSI_STATE) provides a lightweight,
-> deterministic, and highly scalable way for the VMM to query state on
-> demand.
-> 4. Marrying Topology with Live State: KVM holds the runtime status of
-> the bypass, but only userspace (the VMM) understands the full topology
-> (i.e., which GSI belongs to which passthrough device). This uAPI
-> allows the VMM to programmatically marry its topological knowledge
-> with KVM's live execution state without relying on side-band manual
-> debugging tools.
-> 
-> While interfaces in debugfs are fantastic for manual, retroactive
-> debugging on a developer workstation, they are not Dependable for
-> fleet-wide observability. This RFC aims to provide a proactive
-> monitoring solution that aligns KVM with production operational
-> requirements across architectures (both ARM and x86).
-> 
-> Would love to hear your thoughts on this perspective.
+> On Fri, Jul 31, 2026 at 10:26:26AM -0700, Jing Zhang wrote:
 
-I agree that debugfs is not suitable for that purpose.
+[drop the LLM generated stuff]
 
-My main concerns are:
-1- Why is /proc/interrupts not enough, it should show whether the
-interrupts are going through the host (not bypassed) and it should
-show when the host get a doorbell if the vCPU was not resident.
+> > While interfaces in debugfs are fantastic for manual, retroactive
+> > debugging on a developer workstation, they are not Dependable for
+> > fleet-wide observability. This RFC aims to provide a proactive
+> > monitoring solution that aligns KVM with production operational
+> > requirements across architectures (both ARM and x86).
+> > 
+> > Would love to hear your thoughts on this perspective.
+> 
+> I agree that debugfs is not suitable for that purpose.
+> 
+> My main concerns are:
+> 1- Why is /proc/interrupts not enough, it should show whether the
+> interrupts are going through the host (not bypassed) and it should
+> show when the host get a doorbell if the vCPU was not resident.
 
-2- Technical feasibility on arm64. Since the host does not have
-visibility into interrupts directly injected into the guest, it
-cannot accurately maintain the proposed counters vgic_its_vlpis_hw.
+This.
+
+Also, there is a very long standing ask to represent the output of
+/proc/interrupts as a structured set, retrieved through a generic
+kernel interface. I.e. *not* something KVM specific. Everybody asks,
+nobody does. As usual.
+
+And if you are interested in things being "Dependable for fleet-wide
+observability" (I *love* the LLM-generated jargon), there is no way
+you can make sense of what the guest sees without looking at the full
+picture, i.e. the full machine.
+
+> 2- Technical feasibility on arm64. Since the host does not have
+> visibility into interrupts directly injected into the guest, it
+> cannot accurately maintain the proposed counters vgic_its_vlpis_hw.
+
+And GICv5 is going to make things even less observable, as only
+doorbells fire on the host. My take is that for these, a PMU-type
+interface is better suited.
+
+But in general, a KVM-specific for something that is a system-wide
+problem is IMO the wrong approach. You may want to put tglx in that
+loop and see what he has to say.
 
 Thanks,
-Mostafa
 
-> 
-> Thanks,
-> Jing
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
