@@ -1,137 +1,111 @@
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A54051465B4
-	for <kvmarm@lists.linux.dev>; Thu,  6 Aug 2026 10:29:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 692C2448399
+	for <kvmarm@lists.linux.dev>; Thu,  6 Aug 2026 10:30:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786012165; cv=none; b=euQn68Fic6R0h4lM3WWq2WOuJxJuibdqrPNg2dzvoToMDUMYFHIMQ9uJ/gNfJejLaCoAAifSs2MeL5j2UaOmZLiTt+3TA80av5aLGxwwwsywBn4m7pmyLv2tBVXzt7q05sLGSFC+WBgz05IUTiGvqKWz6NU7WgK6EQFl34y4l9g=
+	t=1786012236; cv=none; b=BE4w7J6HI5qOfZMUqDm3dvojEIxHdgL6CvRO9WHmhb5MIl8BGmBNX+UKEs3W8qs+GexEznvfGjf01Ugih2Tl5emCNrk2lzFlOekhFaPQfB0Am7gP/FbysxefMGoe91hwrDyTQ5lDieFsM9ChqAOrKSfCR5N23r75n5ABLCuOSb8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786012165; c=relaxed/simple;
-	bh=NvBICakGyQH9sHFyfR7Q9JnnLoE+3m+jSLiUuDst1rU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RkHRBtKUx6aPfSLL8BhNRwiK66LOyt0PKk7RTKhtzqHyjN1Sf7djWfgxkxT2OtUUuENQDQ4Z4zbD7WLU/yYm36cORI7/YDYpN6UOlMMMnpzDaFogP7h3uwrg6DDp2weVXosR59v9cZvJ3+J3O5BE7gZUiccayKZXj6uvgWwFYsI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Sa7UUMFI; arc=none smtp.client-ip=91.218.175.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1786012236; c=relaxed/simple;
+	bh=oAv50T8xwff7UHt0lxGZW6rlXPJ54zctMsKzlERzAgw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OEhHktlMavALqkrlHRw5JgZ7QLbjTb4zQ12CyoWSgmHZkB4e1EG3dIy/nsELZ9mDuqhuIK6L3SVfBBFaxj3wwfya5w4JlJYCY8LbUYPvEhegxMHxfb6shLn5CSa150gHbvGljbb9jkImEpYH3ezJZYrmXomlg5Ivty+UbSkd3h0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=x454Pjnm; arc=none smtp.client-ip=115.124.30.119
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Sa7UUMFI"
-X-Gm-Message-State: AOJu0YwTe/pjckVxaO5BfYxB9i6r0u5QocqEl9ziN+oFmbjYN62G98ki
-	2XK4nPaAMEQ7g44U3W6OGPg2+C38KSJQ1nzEnvcDzmqw+bTuikpWw3kNkSa527rmOXD34dhCPcH
-	YOCXFzrrpI4lXfvmAuBHBB5jy9yvKuZmp88e7H06f
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1786012160;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6gyHIAEcc7EYTchvF4v8OZJwBj28xxsDIlJxCAeS0PE=;
-	b=Sa7UUMFIOTkKW+in+m3hRHB8nAcqiT53+wjZh2dwHjmBNcTsjcjHiUSrOfdJk+iL4olHnv
-	MWWv2QV/REDFQ9G0uLoqWRTDbLOpwAif+dLSexTHZTJNLl6yy8ssWQvxpS+wg21pAOXpwq
-	1C+RJYegJr5sR7gm1YL+POr0j1SvJrE=
-X-Received: by 2002:ac8:7d51:0:b0:50e:5eba:cadd with SMTP id
- d75a77b69052e-52cfbdba534mr16532461cf.2.1786012140284; Thu, 06 Aug 2026
- 03:29:00 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="x454Pjnm"
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1786012229; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=Eq6flyfzd4bdwnbjtjvmyFpLtE3ryk+Zs3DvD7iNvRQ=;
+	b=x454PjnmHUTRBCSFmULHgVgyi3jJWH8oAI3WU1p8Wg2BESIjW5kUT15O6m2jYokhcX2JwRKXWyBCe6OU71U8smf5NZgcEROZEstFw4TfrRj/smjhW1kFHJmjEHKJeX/gODlvnmU+SlXQbKWaUS5RJdOHP0LqSHYMRE2vLdkMds4=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037033178;MF=yaoyuan@linux.alibaba.com;NM=1;PH=DS;RN=15;SR=0;TI=SMTPD_---0X8TiMfa_1786012228;
+Received: from localhost(mailfrom:yaoyuan@linux.alibaba.com fp:SMTPD_---0X8TiMfa_1786012228 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Thu, 06 Aug 2026 18:30:29 +0800
+Date: Thu, 6 Aug 2026 18:30:28 +0800
+From: Yao Yuan <yaoyuan@linux.alibaba.com>
+To: Mark Brown <broonie@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Shuah Khan <shuah@kernel.org>, Fuad Tabba <tabba@google.com>, 
+	Oliver Upton <oupton@kernel.org>, Peter Maydell <peter.maydell@linaro.org>, 
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v18 05/14] KVM: arm64: Set PSTATE.EXLOCK when entering an
+ exception
+Message-ID: <cftn7d77lbuaby6hkkkxvcryl2ktnpkbda75dmnqhy2k7gcb6m@f7sy5flqka5d>
+References: <20260803-arm64-gcs-v18-0-fd8c40f5ad88@kernel.org>
+ <20260803-arm64-gcs-v18-5-fd8c40f5ad88@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260806100256.371164-1-fuad.tabba@linux.dev> <20260806100256.371164-4-fuad.tabba@linux.dev>
- <20260806101600.207261F000E9@smtp.kernel.org>
-In-Reply-To: <20260806101600.207261F000E9@smtp.kernel.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Thu, 6 Aug 2026 11:28:23 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTxNyzw_t++nF66zocB2de5ZKwtAN4M9jj69VU457OEMFA@mail.gmail.com>
-X-Gm-Features: AUfX_myF3cUgFTKnFOFo1bCqRsxQ978TfYpZmRtSvsYce4mJ1A2qgiTqTisJreM
-Message-ID: <CA+EHjTxNyzw_t++nF66zocB2de5ZKwtAN4M9jj69VU457OEMFA@mail.gmail.com>
-Subject: Re: [PATCH v1 3/4] KVM: arm64: vgic: Do not access the GICv5 CPU
- interface from EL1
-To: sashiko-reviews@lists.linux.dev
-Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>, 
-	Marc Zyngier <maz@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260803-arm64-gcs-v18-5-fd8c40f5ad88@kernel.org>
 
-On Thu, 6 Aug 2026 at 11:16, <sashiko-bot@kernel.org> wrote:
->
-> Thank you for your contribution! Sashiko AI review found 1 potential issu=
-e(s) to consider:
->
-> Pre-existing issues:
-> - [High] Missing Context Synchronization Event (CSE) after writing to SYS=
-_ICC_ICSR_EL1.
+On Mon, Aug 03, 2026 at 11:56:50PM +0800, Mark Brown wrote:
+> As per DDI 0487 R_WTXBY we need to manage PSTATE.EXLOCK when entering an
+> exception, when the exception is entered from a lower EL the bit is cleared
+> while if entering from the same EL it is set to GCSCR_ELx.EXLOCKEN.
+> Implement this behaviour in enter_exception64().
+...
+> +static unsigned long compute_exlock(struct kvm_vcpu *vcpu,
+> +				    unsigned long mode,
+> +				    unsigned long target_mode)
+> +{
+> +	u64 gcscr;
+> +
+> +	if (!kvm_has_gcs(kern_hyp_va(vcpu->kvm)))
+> +		return 0;
+> +
+> +	/* GCS can't be enabled for 32 bit */
+> +	if (mode & PSR_MODE32_BIT)
+> +		return 0;
+> +
+> +	/* When taking an exception to a higher EL EXLOCK is cleared. */
+> +	if ((mode | PSR_MODE_THREAD_BIT) != target_mode)
+> +		return 0;
 
-This runs on the guest-entry path, and the ERET into the guest is a
-context synchronization event.
+Reviewed-by: Yuan Yao <yaoyuan@linux.alibaba.com>
 
-I really thought we've covered this in the review-prompts, I'll look
-into this later...
-/fuad
-
-> --
+> +
+> +	/*
+> +	 * When taking an exception to the same EL EXLOCK is set to
+> +	 * the effective value of GCSR_ELx.EXLOCKEN.
+> +	 */
+> +	if (is_hyp_ctxt(vcpu))
+> +		gcscr = __vcpu_read_sys_reg(vcpu, GCSCR_EL2);
+> +	else
+> +		gcscr = __vcpu_read_sys_reg(vcpu, GCSCR_EL1);
+> +
+> +	if (gcscr & GCSCR_ELx_EXLOCKEN)
+> +		return PSR_EXLOCK_BIT;
+> +
+> +	return 0;
+> +}
+> +
+>  /*
+>   * This performs the exception entry at a given EL (@target_mode), stashing PC
+>   * and PSTATE into ELR and SPSR respectively, and compute the new PC/PSTATE.
+> @@ -154,6 +186,11 @@ static void enter_exception64(struct kvm_vcpu *vcpu, unsigned long target_mode,
+>  	// PSTATE.BTYPE is set to zero upon any exception to AArch64
+>  	// See ARM DDI 0487E.a, pages D1-2293 to D1-2294.
 >
-> --- Patch [3]: [PATCH v1 3/4] KVM: arm64: vgic: Do not access the GICv5 C=
-PU interface from EL1 ---
-> commit 5b0cdbb37754741e9006b6abdf408b239ed6b887
-> Author: Fuad Tabba <fuad.tabba@linux.dev>
->
-> KVM: arm64: vgic: Do not access the GICv5 CPU interface from EL1
->
-> This commit fixes an issue where the GICv5 CPU interface was incorrectly
-> accessed from EL1 on systems without FEAT_GCIE_LEGACY. It restricts GICv5
-> access to VHE, similar to the existing GICv3 handling.
->
-> > diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-> > index 74bace10a22ed..df58c0042ed63 100644
-> > --- a/arch/arm64/kvm/vgic/vgic.c
-> > +++ b/arch/arm64/kvm/vgic/vgic.c
-> > @@ -1042,11 +1042,15 @@ static void vgic_flush_lr_state(struct kvm_vcpu=
- *vcpu)
-> >  static inline bool can_access_vgic_from_kernel(void)
-> >  {
-> >       /*
-> > -      * GICv2 can always be accessed from the kernel because it is
-> > -      * memory-mapped, and VHE systems can access GICv3 EL2 system
-> > -      * registers.
-> > +      * GICv3 and GICv5 drive the CPU interface through EL2 system
-> > +      * registers, so only VHE reaches them from the kernel. GICv2 is
-> > +      * memory-mapped and always reachable.
-> >        */
-> > -     return !static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif=
-) || has_vhe();
-> > +     if (kvm_vgic_global_state.type =3D=3D VGIC_V5 ||
-> > +         static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
-> > +             return has_vhe();
-> > +
-> > +     return true;
-> >  }
->
-> While reviewing the GICv5 access paths related to this change, I noticed =
-a
-> related issue in the GICv5 context restore path:
->
-> arch/arm64/kvm/hyp/vgic-v5-sr.c:__vgic_v5_restore_state() {
->     write_sysreg_s(cpu_if->vgic_icsr, SYS_ICC_ICSR_EL1);
-> }
->
-> [Severity: High]
-> This isn't a bug introduced by this patch, but does this write to
-> SYS_ICC_ICSR_EL1 require a subsequent isb() instruction?
->
-> According to the ARM64 KVM architectural rules, any write to an ICC_*_EL1
-> register (excluding ICC_PMR_EL1) must be immediately followed by an isb()
-> as the very next instruction.
->
-> Because __vgic_v5_restore_state() writes to SYS_ICC_ICSR_EL1 and then
-> returns, the caller will execute subsequent instructions without a Contex=
-t
-> Synchronization Event. Could this leave the CPU operating with an
-> architecturally undefined pipeline state during the vCPU switch?
+> +	// PSTATE.EXLOCK is set to 0 upon any exception to a higher
+> +	// EL, or to GCSCR_ELx.EXLOCKEN for an exception to the same
+> +	// exception level.  See ARM DDI 0487 R_WTXBY.
+> +	new |= compute_exlock(vcpu, mode, target_mode);
+> +
+>  	new |= PSR_D_BIT;
+>  	new |= PSR_A_BIT;
+>  	new |= PSR_I_BIT;
 >
 > --
-> Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260806100256.37=
-1164-1-fuad.tabba@linux.dev?part=3D3
+> 2.47.3
+>
