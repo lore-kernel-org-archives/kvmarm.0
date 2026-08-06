@@ -1,161 +1,126 @@
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com [209.85.128.71])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82BB8376463
-	for <kvmarm@lists.linux.dev>; Thu,  6 Aug 2026 15:01:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 000A7390218
+	for <kvmarm@lists.linux.dev>; Thu,  6 Aug 2026 15:31:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786028479; cv=none; b=UXR0yp9Ze6fe/PWdiqc5OuxXnR2EE5Sebgo8FGg3kNEVhwHVupwFX8mIARyS6K8qNmsY88MxaR0odDMnQISVGZdMF9S6NjpI+9NHLCvuzvitV2A3p05OJQuXh5BZcJF9UAdaVu1MK1cF72FUnmUZaA3C/ZargTOcrr4ERjMATiQ=
+	t=1786030297; cv=none; b=ZeUxwgo/2tKaLC4B32T/wd7urWqTM2pdh9s75E4dj8vzoKh/i3OJsx+ZPuroXzY3gY6y4LLRagzuQC1zt/PGqMMW8wTEi/nNcKK0KxuEm1P/RSvEOpv1OaO2Af+U/x7avCVIIwlbwsQsvua5EnE5EjynsgFkfPaKY3FqDPggG7s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786028479; c=relaxed/simple;
-	bh=7IGVnmtezJzz+vG1Zjjgm7GLlt3laMJth5Gf0zoVmlI=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=k6NboG0LHGutwu63eeF4tJ2NgghhJ5QydNLtKNdtktCqd/XRInD+fnqiatYFwvDG5RgJQruznPZLj03mijBnY6cKyqFEHqchaZ1f5n01c+tbuCkiHQZ01gUDHi/xcoEOfo1lid2dlDDzTLa1hzzbahyWvwRPbGUCml6R+n0x6M0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bRFLIKuE; arc=none smtp.client-ip=209.85.128.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com
+	s=arc-20240116; t=1786030297; c=relaxed/simple;
+	bh=59BoZEWvzjZH9smtNe2wm+ZXBC4pJ7y7R4IUojiDnM0=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=ueHxbhaoDwUBNbtatOUFqqZhuoYv6sXSNfq7CM8efXFEBloRnD90kBlBBcIfJVRFhEgYCGrQhlYKhlRrYPhN4lF4SwafL/cbPiN02wk5pWi+SUrsJn0uiKlf5cgsr3bTk/9zQtgumzMz6bkLCBg5+vn6ynSYFidnSUcAQ7Ve1v4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=enlTbWOq; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bRFLIKuE"
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4954dcd6131so19315035e9.3
-        for <kvmarm@lists.linux.dev>; Thu, 06 Aug 2026 08:01:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1786028476; x=1786633276; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=P8/Uc5RoXpFVHkZ1epqzt9nXXbG81Fj6PP6hKjU9EoQ=;
-        b=bRFLIKuEk4+1/TzBWlTGB1RRmoBbgcYpExd8rwo2/Oy3dlf02bf1fEh+k6BpDK0tiA
-         jTTO+uoUQZWs1aHEw0liW+m6RVANC2V9FLTpEcxZ55uZofRtQ1XbNIOAjizkEgg1yvYo
-         RvDawkqwivAnRhqmzMMKBuHr1atBa1WDB+GX/+EU2Au1eSEqvK+Xn2G93M2sHRBGSyKp
-         zwC9gJdUAGkSuAYO6kalVbt03hsmWv654y8nkfimvkecf7NV0TNO5Ut7HbecVgnn06fC
-         4hqGdbX0JnprlrSKHwDFHwTiVrr4c0RUwANzCBButWfB7SxLf2r48Lxf5AZs1vFDv6yc
-         YLBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786028476; x=1786633276;
-        h=content-type:cc:to:from:subject:message-id:mime-version:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=P8/Uc5RoXpFVHkZ1epqzt9nXXbG81Fj6PP6hKjU9EoQ=;
-        b=b3k4YupQuW4jhAqYIlewO50YqyFsJVmgQkj8ONqbV0KEIKOTdChLxndQQbSUQoeFg8
-         mwR3hiiCVq3icCucZ+j5enxDYkuLlQzqRFmEsPGvQlDAm2cZNj0U4ZIbA/9w4cWjcQaz
-         yEFkiFVd1E8CP/aEPuGKRWJ/4ZIE1OVKskHMNh2JkSyPRCQstav5Yuuw96b5j7Th7rec
-         9BxDAssb02xGmqgNOUgYvOdgqaUUhpiT1zKJiP/4azN3nmn6grP5/cYUqjdjpR6FIwwG
-         1ood3JsL87wqi6CjEi+BUPL9ut4Z5y16QCWQAqcgR1GK4mxbKwwsxVKxoQ5Fsl/lh3Ey
-         lItw==
-X-Forwarded-Encrypted: i=1; AHgh+Ro/PF934wnAGqbeJ4HNiCWVlFWuZHFizKcXHvG0L65gSnrMMcEzLFJmi6bGuCiD4PYTXnRLm6M=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxN+9E/bN0uX/pvT95VgMJG6Tukqva/BvUmqKU8abDv2e9Fv7tq
-	2yrfJMayxKGQodr9Xxhd4Ys2qvh+JTc3GKsrtv1MegqCymMr3E2OVQE41EHihceG/g0NxIehXOK
-	vlTlHLN5m2CBf8w==
-X-Received: from wmok17.prod.google.com ([2002:a05:600c:4791:b0:495:5b2e:3824])
- (user=smostafa job=prod-delivery.src-stubby-dispatcher) by
- 2002:a7b:cc0b:0:b0:496:cb48:5eb8 with SMTP id 5b1f17b1804b1-49959e38ecamr25064705e9.15.1786028475423;
- Thu, 06 Aug 2026 08:01:15 -0700 (PDT)
-Date: Thu,  6 Aug 2026 15:01:05 +0000
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="enlTbWOq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02E851F000E9;
+	Thu,  6 Aug 2026 15:31:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1786030295;
+	bh=EJDcZ6emdtPfgb7FvyVBubOepJ2plBbWFS413YeU4aU=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=enlTbWOqeQoB9tKkXk+Q5WQL3ximWZ34a30U344UzeK31g01kfTap5k01L/OsPfQr
+	 Z0qZZYjSbuanvQIkptofzt0DZNmenb7LIp53CO1p0uO4t876g6SDedlzKlHpVp8+L8
+	 cMZg2gWBn+KRrprII4WX/z4CTzGpwZa4hQxzLgg6r5+NTh86rQeKL5ScrE4pmJX2i0
+	 ocq0Ew4ec11DP9VKRHk+1YSEkDGSqkvMVA6hIFspsDXCjuqn9guopBxMLooD1NGul/
+	 l4acJjUujv1wZjnhf4F/jsbs90spp7YHiQkrgJZxQSayDSy4d1rp/QWSWlct29RS0E
+	 35FhZq1vr1s3Q==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH] KVM: arm64: Fix hvhe and broken CNTVOFF_EL2
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Mostafa Saleh" <smostafa@google.com>
+Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20260806150105.4010701-1-smostafa@google.com>
+References: <20260806150105.4010701-1-smostafa@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 06 Aug 2026 15:31:34 +0000
+Message-Id: <20260806153135.02E851F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.55.0.654.g21b8a5bc05-goog
-Message-ID: <20260806150105.4010701-1-smostafa@google.com>
-Subject: [PATCH] KVM: arm64: Fix hvhe and broken CNTVOFF_EL2
-From: Mostafa Saleh <smostafa@google.com>
-To: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org
-Cc: maz@kernel.org, oupton@kernel.org, seiden@linux.ibm.com, 
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	catalin.marinas@arm.com, will@kernel.org, vdonnefort@google.com, 
-	tabba@google.com, sebastianene@google.com, keirf@google.com, 
-	Mostafa Saleh <smostafa@google.com>
-Content-Type: text/plain; charset="UTF-8"
 
-When running on a setup affected with broken CNTVOFF_EL2
-(has_broken_cntvoff())
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+s) to consider:
 
-Booting with VHE or protected mode(nvhe) (id_aa64mmfr1.vh=0
-and arm64_sw.hvhe=0) works fine.
+New issues:
+- [High] Virtual timer traps are inadvertently disabled for non-protected g=
+uests under pKVM on hardware with broken CNTVOFF_EL2, breaking their config=
+ured timer offsets.
 
-However launching a protected VM with protected hvhe mode panics the
-guest kernel:
+Pre-existing issues:
+- [High] `__timer_enable_traps()` uses the global `is_protected_kvm_enabled=
+()` check and an unsynced `poffset`, unconditionally disabling physical tim=
+er traps for non-protected VMs under pKVM.
+--
 
-[    0.000000] Internal error: Oops - Undefined instruction: 0000000000000000 [#1]  SMP
-[    0.000000] Modules linked in:
-[    0.000000] CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Not tainted 7.2.0-rc3-g05f75bd71e0e-dirty #29 PREEMPT
-[    0.000000] Hardware name: linux,dummy-virt (DT)
-[    0.000000] pstate: 000003c5 (nzcv DAIF -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-[    0.000000] pc : arch_timer_shutdown_virt+0x4/0x1c
-[    0.000000] lr : arch_timer_starting_cpu+0x1c4/0x2d4
-[    0.000000] sp : ffffa6bd9a193c00
-[    0.000000] x29: ffffa6bd9a193c20 x28: ffffa6bd9a1bcf88 x27: 0000000000000000
-[    0.000000] x26: ffff00001be70dd8 x25: ffffa6bd99d85000 x24: ffffa6bd99d85ee4
-[    0.000000] x23: ffffa6bd99d85000 x22: ffffa6bd9a1499c0 x21: ffffa6bd9a1ab900
-[    0.000000] x20: 00ffffffffffffff x19: ffff00001be8b600 x18: 000000000000028c
-[    0.000000] x17: 00000000510f0010 x16: 00000000510f0010 x15: 00000000500f0000
-[    0.000000] x14: 0000000000000000 x13: 0000000000000000 x12: 0000000000000018
-[    0.000000] x11: ffffa6bd9a8ac000 x10: 0000000000f0000f x9 : ffffffffffffffff
-[    0.000000] x8 : ffffa6bd98822e18 x7 : 0070752d65746174 x6 : 00111ff76e007261
-[    0.000000] x5 : ffffa6bd9ad68078 x4 : 0000000000000000 x3 : ffffa6bd98822a0c
-[    0.000000] x2 : 0000000000000073 x1 : 0000000000000001 x0 : ffff00001be8b600
-[    0.000000] Call trace:
-[    0.000000]  arch_timer_shutdown_virt+0x4/0x1c (P)
-[    0.000000]  cpuhp_invoke_callback+0x11c/0x280
-[    0.000000]  cpuhp_issue_call+0x1e8/0x224
-[    0.000000]  __cpuhp_setup_state_cpuslocked+0x1d8/0x2b8
-[    0.000000]  __cpuhp_setup_state+0x50/0x74
-[    0.000000]  arch_timer_register+0xc0/0x148
-[    0.000000]  arch_timer_of_init+0x148/0x170
-[    0.000000]  timer_probe+0x74/0x124
-[    0.000000]  time_init+0x18/0x58
-[    0.000000]  start_kernel+0x1c0/0x3ac
-[    0.000000]  __primary_switched+0x88/0x90
-[    0.000000] Code: c80b7d2a 35ffffab 17ffffeb d503245f (d53be328)
+--- Patch [1]: [PATCH] KVM: arm64: Fix hvhe and broken CNTVOFF_EL2 ---
+commit d5e405a74fba9d73744f97970471012a4473ce3c
+Author: Mostafa Saleh <smostafa@google.com>
+Subject: KVM: arm64: Fix hvhe and broken CNTVOFF_EL2
 
-And for non protected VMs seems to hang or progress really slowly.
+The commit fixes a guest kernel panic when launching a protected VM with
+protected hvhe mode on hardware with a broken CNTVOFF_EL2. It achieves
+this by conditionally enabling virtual timer traps only when the guest
+actually has a non-zero virtual timer offset.
 
-The workaround avoids setting non-zero CNTVOFF_EL2 and trapping the
-virtual counter to emulate the offset.
-In the VHE path (timer_set_traps()), traps are only enabled when the
-guest actually has a non-zero virtual timer offset.
-However, __timer_enable_traps() in hyp/nvhe/timer-sr.c unconditionally
-set CNTHCTL_EL1TVT and CNTHCTL_EL1TVCT whenever has_broken_cntvoff()
-was true.
+> diff --git a/arch/arm64/kvm/hyp/nvhe/timer-sr.c b/arch/arm64/kvm/hyp/nvhe=
+/timer-sr.c
+> index ff176f4ce7deb..98b6e37ee8fa4 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/timer-sr.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/timer-sr.c
+[ ... ]
 
-Which causes 2 issues:
-1) Protected VMs: kvm_handle_pvm_sysreg() does not find "cntv_ctl_el0"
-in pvm_sys_reg_descs and injects undefined instruction exceptions.
+[Severity: High]
+This is a pre-existing issue, but does the physical timer trap logic earlier
+in __timer_enable_traps() improperly grant all guests under pKVM access to
+the physical timer?
 
-2) non-protected guests are trapped all the time even with offset of
-zero.
+Looking at the physical timer access check in this function:
 
-Fix this by adding a check in __timer_enable_traps() similar to the one in
-timer_set_traps()
+	if (is_protected_kvm_enabled() ||
+	    !kern_hyp_va(vcpu->kvm)->arch.timer_data.poffset)
+		set |=3D CNTHCTL_EL1PCTEN;
 
-Fixes: 0bc9a9e85fcf ("KVM: arm64: Work around x1e's CNTVOFF_EL2 bogosity")
-Signed-off-by: Mostafa Saleh <smostafa@google.com>
----
- arch/arm64/kvm/hyp/nvhe/timer-sr.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+The is_protected_kvm_enabled() static key reflects host pKVM support and
+applies to all guests. Additionally, the fallback poffset check evaluates to
+true under pKVM because the EL2-private hyp_vm->kvm is never populated with
+the host's poffset during init_pkvm_hyp_vm().
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/timer-sr.c b/arch/arm64/kvm/hyp/nvhe/timer-sr.c
-index ff176f4ce7de..98b6e37ee8fa 100644
---- a/arch/arm64/kvm/hyp/nvhe/timer-sr.c
-+++ b/arch/arm64/kvm/hyp/nvhe/timer-sr.c
-@@ -10,6 +10,7 @@
- 
- #include <asm/kvm_hyp.h>
- #include <asm/kvm_mmu.h>
-+#include <hyp/switch.h>
- 
- void __kvm_timer_set_cntvoff(u64 cntvoff)
- {
-@@ -63,7 +64,7 @@ void __timer_enable_traps(struct kvm_vcpu *vcpu)
- 	 * Trap the virtual counter/timer if we have a broken cntvoff
- 	 * implementation.
- 	 */
--	if (has_broken_cntvoff())
-+	if (has_broken_cntvoff() && hyp_timer_get_offset(vcpu_vtimer(vcpu)))
- 		set |= CNTHCTL_EL1TVT | CNTHCTL_EL1TVCT;
- 
- 	sysreg_clear_set(cnthctl_el2, clr, set);
--- 
-2.55.0.654.g21b8a5bc05-goog
+Can this cause non-protected VMs on older hardware without CNTPOFF_EL2 to
+bypass physical timer offset emulation and read the raw physical timer
+directly?
 
+> @@ -63,7 +64,7 @@ void __timer_enable_traps(struct kvm_vcpu *vcpu)
+>  	 * Trap the virtual counter/timer if we have a broken cntvoff
+>  	 * implementation.
+>  	 */
+> -	if (has_broken_cntvoff())
+> +	if (has_broken_cntvoff() && hyp_timer_get_offset(vcpu_vtimer(vcpu)))
+
+[Severity: High]
+Could this condition inadvertently disable virtual timer traps for
+non-protected guests under pKVM?
+
+The new check evaluates hyp_timer_get_offset(vcpu_vtimer(vcpu)). However,
+under pKVM (nVHE), the EL2-private pkvm_hyp_vcpu structure's timer_cpu state
+is never synchronized from the host vCPU during init_pkvm_hyp_vcpu() or
+flush_hyp_vcpu().
+
+Since ctxt->offset.vm_offset remains NULL, hyp_timer_get_offset() will
+unconditionally return 0. Will this allow any non-protected guest with a
+configured virtual timer offset to bypass the trap and incorrectly observe =
+an
+offset of 0?
+
+>  		set |=3D CNTHCTL_EL1TVT | CNTHCTL_EL1TVCT;
+> =20
+>  	sysreg_clear_set(cnthctl_el2, clr, set);
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260806150105.4010=
+701-1-smostafa@google.com?part=3D1
