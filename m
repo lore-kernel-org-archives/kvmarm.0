@@ -1,202 +1,96 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B03744156C9;
-	Thu,  6 Aug 2026 08:42:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from out-173.mta1.migadu.com (mta1.migadu.com [37.59.57.117])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8443E40EB90
+	for <kvmarm@lists.linux.dev>; Thu,  6 Aug 2026 08:45:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.59.57.117
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786005763; cv=none; b=q0LaiIDXr/dzazcLDbr2aTZ6yUj5LshHrco1Tk0u7Jur4QMPtIUkELY0P5EjlcHhQImQ1jbVaugAr8yasfkcWtLCI1d+jnWQl+V1ZhYxyaNnCk1GSo+DOstW+T2tgwBBRQqnnsUm5f5Bo2LHZFWmXc5ZOZ7l8/dlE3o5JFuicpI=
+	t=1786005918; cv=none; b=rNjdMkj7vH1OwgNc1udvyfuhviM21E6qQD138/WV/ssY22tLUcjk4JrpJA9LetqcilQFgw25Pw+F8ZEhm02FgGDWPFLqONgsATJAOG1V1G6IHE+RHwLBA7bhstpuhRk/8f6gJ7ylIQ6L2uA9QAEpqs0sIGnyprxLLsN2hhB7BFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786005763; c=relaxed/simple;
-	bh=83n8BDtca7EQ88qdbSJ2gpj0nr/DMadQjUZ4VfwaO44=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AtbNMl3NTqgEHGL/hyb/BTkdft67aeLkOyp80mNAgvtL54DpczzZcTBmIvL9VN3Ey1z84iHik3gA9/TNm7A48cSYr4bLKJSYUFb6A0HESR/TDDyDlD/i+xFKFi1HHIZdOtgpXHIlzbrm4nBxH86nZrUlzVBXUxW6VPN4BjcBz+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=sjOrRNgU; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1786005918; c=relaxed/simple;
+	bh=h6ooHdgjRZHBBwOsjyP2A+6c2LHkGT/fTYtdR1Ur6o0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AmEcoBCBoWHZU7bRZDAOlKvFbtyc/WM0YIcIDXUCbnRCyfrL1OxVA8MG3Y8MUrNIoO+vA7v0dfX8LguBDnIz26H539kW3a+qPmL5snmWJxbnjxE2Kd5DmToeuVgYQA9ytEfV318T8YG+SXwqB/FxreweNPW+IQ3uT4PyKMp/+2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vZdC259o; arc=none smtp.client-ip=37.59.57.117
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="sjOrRNgU"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 01D3416F2;
-	Thu,  6 Aug 2026 01:42:37 -0700 (PDT)
-Received: from [10.57.44.180] (unknown [10.57.44.180])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9F4E33F632;
-	Thu,  6 Aug 2026 01:42:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1786005761; bh=83n8BDtca7EQ88qdbSJ2gpj0nr/DMadQjUZ4VfwaO44=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=sjOrRNgUN88fiAM3TDTEbTO1yg7wwti4XXHueQck1WbKnYrcUhpdIFGu41LIcuwC3
-	 7KmTRbbVN2X3flXHvUe48ckBB1uwP2b41Q5aLZI9x9sF7MTnD2tJ48ggcbX/F5beez
-	 noWb7zNYsZ1fQdtzPJ/9OtOeGn/Mmd1+f1YKPVwo=
-Message-ID: <9dabf79b-92e6-4bd3-9fd6-15c4ff5e9ef6@arm.com>
-Date: Thu, 6 Aug 2026 09:42:36 +0100
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vZdC259o"
+X-Forwarded-Encrypted: i=1; AHgh+RqAtXGiqfVG6vKBk2Tp7bd8RTS3KujiBoX24fp1PgIQVSJB/Sv4UFeofwpJwBD5tQelc4lAQX4=@lists.linux.dev
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1786005914;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2ePEtl2m67fNMAuLJ9Afbk/hABXEN6patEcXoPge2F0=;
+	b=vZdC259oML1yL+CG0shbSd3PZPfO2v9j+qww5hkVw/bdmyE1ehpdx3igSUH1nnSYZkyIKI
+	8hrveTfwzW3mX+7+z/nxcyuyXmx9vpNSV7CNJwVPpY5cO6VOFz0EC5HsHhYluBNlpPc+Jp
+	jpXyiyYOvqsCBBLTqElNqtg2Hu8ZzNw=
+X-Gm-Message-State: AOJu0YxazupQ7MKZ4Ikh1IC4OQ676JEslDoZk70wp7GhkOlL8wQ4HtHN
+	cGBE6wYPmaSRNTwVu251AvT2KS1OoFkT3ypK/w7d/7hVTdLt4WCP4vufkCcZd8ADYSnmEjylqGy
+	BUPBQAnnhVeN/9F1OOZDT2FtZJjjXq3EQakGiUk4t
+X-Received: by 2002:a05:622a:4885:b0:516:3f51:81cb with SMTP id
+ d75a77b69052e-52cfea4c54fmr11135181cf.13.1786005891634; Thu, 06 Aug 2026
+ 01:44:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v16 22/45] KVM: arm64: CCA: Handle RMI_EXIT_RIPAS_CHANGE
-Content-Language: en-GB
-To: Ackerley Tng <ackerleytng@google.com>, Steven Price
- <steven.price@arm.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
- Lorenzo Pieralisi <lpieralisi@kernel.org>
-References: <20260803134403.80630-1-steven.price@arm.com>
- <20260803134403.80630-23-steven.price@arm.com>
- <CAEvNRgH+HWHgf26XDHN6aMLYjRh4M8okntBfjDFCBreXRXL=TA@mail.gmail.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <CAEvNRgH+HWHgf26XDHN6aMLYjRh4M8okntBfjDFCBreXRXL=TA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20260804112317.1937387-1-fuad.tabba@linux.dev>
+ <20260804112317.1937387-2-fuad.tabba@linux.dev> <20260805165432.0118a513@gandalf.local.home>
+In-Reply-To: <20260805165432.0118a513@gandalf.local.home>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Thu, 6 Aug 2026 09:43:00 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTxZ1tBfau4eK-nOdqig1xwngzsq8YyHtiE-iAMkZpSF8g@mail.gmail.com>
+X-Gm-Features: AUfX_mx7LtwidANKMNRCu_ciAI4sGIOLaBR410JmLmjAj3CDd42EszWO5YDN5aw
+Message-ID: <CA+EHjTxZ1tBfau4eK-nOdqig1xwngzsq8YyHtiE-iAMkZpSF8g@mail.gmail.com>
+Subject: Re: [PATCH v3 01/11] tracing: Include linux/types.h in trace_remote_event.h
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: maz@kernel.org, oupton@kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, 
+	mhiramat@kernel.org, alexandru.elisei@arm.com, vdonnefort@google.com, 
+	joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, qperret@google.com, ardb@kernel.org, 
+	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Migadu-Flow: FLOW_OUT
 
-On 05/08/2026 16:59, Ackerley Tng wrote:
-> Steven Price <steven.price@arm.com> writes:
-> 
->> The guest can request that a region of its protected address space is
->> switched between RIPAS_RAM and RIPAS_EMPTY (and back) using
->> RSI_IPA_STATE_SET. This causes a guest exit with the
->> RMI_EXIT_RIPAS_CHANGE code. We treat this as a request to convert a
->> protected region to unprotected (or back), exiting to the VMM to make
->> the necessary changes to the guest_memfd and memslot mappings. On the
->> next entry the RIPAS changes are committed by making RMI_RTT_SET_RIPAS
->> calls.
->>
->> The VMM may wish to reject the RIPAS change requested by the guest. For
->> now it can only do this by no longer scheduling the VCPU as we don't
->> currently have a usecase for returning that rejection to the guest, but
->> by postponing the RMI_RTT_SET_RIPAS changes to entry we leave the door
->> open for adding a new ioctl in the future for this purpose.
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->> Changes since v15:
->>   * Propagate negative error returns.
->> Changes since v14:
->>   * Use addition rather than bitwise OR for adding the shared_bit in
->>     realm_unmap_shared_range(), this handles the case where the region
->>     includes the last address (which means 'end' already has the bit
->>     set).
->> Changes since v13:
->>   * Switch to the new RMI_RTT_UNPROT_UNMAP range-based API.
->>   * Drop ugly hack for RMM bug which errored when the RIPAS was already
->>     set to the desired value.
->> Changes since v12:
->>   * Switch to the new RMM v2.0 RMI_RTT_DATA_UNMAP which can unmap an
->>     address range.
->> Changes since v11:
->>   * Combine the "Allow VMM to set RIPAS" patch into this one to avoid
->>     adding functions before they are used.
->>   * Drop the CAP for setting RIPAS and adapt to changes from previous
->>     patches.
->> Changes since v10:
->>   * Add comment explaining the assignment of rec->run->exit.ripas_base in
->>     kvm_complete_ripas_change().
->> Changes since v8:
->>   * Make use of ripas_change() from a previous patch to implement
->>     realm_set_ipa_state().
->>   * Update exit.ripas_base after a RIPAS change so that, if instead of
->>     entering the guest we exit to user space, we don't attempt to repeat
->>     the RIPAS change (triggering an error from the RMM).
->> Changes since v7:
->>   * Rework the loop in realm_set_ipa_state() to make it clear when the
->>     'next' output value of rmi_rtt_set_ripas() is used.
->> New patch for v7: The code was previously split awkwardly between two
->> other patches.
->> ---
->>   arch/arm64/include/asm/kvm_rmi.h |   6 +
->>   arch/arm64/kvm/mmu.c             |   8 +-
->>   arch/arm64/kvm/rmi.c             | 473 +++++++++++++++++++++++++++++++
->>   3 files changed, 484 insertions(+), 3 deletions(-)
->>
->> diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
->> index 1e5026039458..751659a48be3 100644
->> --- a/arch/arm64/include/asm/kvm_rmi.h
->> +++ b/arch/arm64/include/asm/kvm_rmi.h
->> @@ -107,6 +107,12 @@ int kvm_rec_exit(struct kvm_vcpu *vcpu, int rec_run_status);
->>   int kvm_rec_handle_request(struct kvm_vcpu *vcpu);
->>   bool kvm_rec_handle_hvc(struct kvm_vcpu *vcpu, int *ret);
->>
->> +void kvm_realm_unmap_range(struct kvm *kvm,
->> +			   unsigned long ipa,
->> +			   unsigned long size,
->> +			   bool unmap_private,
->> +			   bool may_block);
->> +
->>   static inline bool kvm_realm_is_private_address(struct realm *realm,
->>   						unsigned long addr)
->>   {
-> 
-> Coming here from guest_memfd, would like to look more closely at the
-> conversions-related stuff, and learn more about ARM CCA in the process :)
-> 
->> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
->> index cd06881c1497..dcc2ab08d0e4 100644
->> --- a/arch/arm64/kvm/mmu.c
->> +++ b/arch/arm64/kvm/mmu.c
->> @@ -319,6 +319,7 @@ static void invalidate_icache_guest_page(void *va, size_t size)
->>    * @start: The intermediate physical base address of the range to unmap
->>    * @size:  The size of the area to unmap
->>    * @may_block: Whether or not we are permitted to block
->> + * @only_shared: If true then protected mappings should not be unmapped
->>    *
->>    * Clear a range of stage-2 mappings, lowering the various ref-counts.  Must
->>    * be called while holding mmu_lock (unless for freeing the stage2 pgd before
->> @@ -326,7 +327,7 @@ static void invalidate_icache_guest_page(void *va, size_t size)
->>    * with things behind our backs.
->>    */
->>   static void __unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64 size,
->> -				 bool may_block)
->> +				 bool may_block, bool only_shared)
->>   {
-> 
-> Why convert attr_filter to a boolean, why not pass the filter through? I
-> think that might allow all the 3 states - unmapping private, unmapping
-> shared, and unmapping both. (Assuming unmapping none == not even calling
-> this function).
+Thanks Steve,
 
-You're absolutely right, we should use the attr_filter as it is if we go
-down this route (like I alluded to in [1]) . I think this was really
-from the original Guest memfd support (without inplace conversion).
+On Wed, 5 Aug 2026 at 21:53, Steven Rostedt <rostedt@goodmis.org> wrote:
+...
+> > --- a/include/linux/trace_remote_event.h
+> > +++ b/include/linux/trace_remote_event.h
+> > @@ -3,6 +3,8 @@
+> >  #ifndef _LINUX_TRACE_REMOTE_EVENTS_H
+> >  #define _LINUX_TRACE_REMOTE_EVENTS_H
+> >
+> > +#include <linux/types.h>
+> > +
+> >  struct trace_remote;
+> >  struct trace_event_fields;
+> >  struct trace_seq;
+>
+> My ack still stands, but I wonder if we should just not use the include and
+> instead s/bool/_Bool/ ?
 
-> 
-> Also, perhaps it's better to add this parameter to
-> __unmap_stage2_range() together with the patch that uses the only_shared
-> information :)
+I'd prefer to keep the include, if you don't mind.
 
-> 
-> I see that in [1] not changing __unmap_stage2_range() was going to be
-> explored, did that work out?
+As far as I can tell, apart from the typedef itself, the only headers
+built into the kernel that use _Bool as a type are a uapi one and
+arch/um's user.h when it's built for the host, neither of which has
+bool available, plus what looks like a leftover in bcache_ondisk.h
+from when it was uapi.
 
-I haven't got to it yet, I will be taking a look at this.
+The include also covers whatever field gets added next.
 
-Cheers
-Suzuki
+Happy to switch if you'd still prefer _Bool.
 
-> 
-> [1] https://lore.kernel.org/all/3b8d49be-f031-4134-bd20-a8c51632f4ad@arm.com/
-> 
->>   	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
->>   	phys_addr_t end = start + size;
->> @@ -343,7 +344,7 @@ void kvm_stage2_unmap_range(struct kvm_s2_mmu *mmu, phys_addr_t start,
->>   	if (kvm_vm_is_protected(kvm_s2_mmu_to_kvm(mmu)))
->>   		return;
->>
->> -	__unmap_stage2_range(mmu, start, size, may_block);
->> +	__unmap_stage2_range(mmu, start, size, may_block, false);
->>   }
->>
->>
->> [...snip...]
->>
+Cheers,
+/fuad
 
+>
+> -- Steve
