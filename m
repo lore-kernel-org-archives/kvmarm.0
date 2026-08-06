@@ -1,187 +1,168 @@
-Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E97D42A15C
-	for <kvmarm@lists.linux.dev>; Thu,  6 Aug 2026 10:41:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7933847045E;
+	Thu,  6 Aug 2026 11:51:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786012910; cv=none; b=qYRd8ApaGmLtbFnK24rUKvb4AYqNB3Z2Px3zlgIHx5AbLSiL8QtICw2MmpkfY1GVRLjKvLbuq7uC/XGyYggxvf8VLVE6a8Dlv4/zxsNjKsPPVbKNiOWAELUAEM+4IqPflw5rQu/O+kg41icfpXwojzEqgm0azq+aQJGUegTm3Jo=
+	t=1786017120; cv=none; b=Kn+BkDfHf+qpX6lEe2xtiL3ynV0FUE/AVgJv4a8pNNH88lW+7MG/8J7aSfut6Oglhjog2PwqgJlqjBgfft7goDGYWehRRoc/PB5E3jgCthqMsxPhVtOnANtgKNorFrIag5axwudDUIvXRJdGOKCO9MhfO96AIBqwrbxokV0H0+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786012910; c=relaxed/simple;
-	bh=yEGD7nqbp+CMW/yxhvfHzzaAgx6rkkvvBeARHNQ6i8A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KrHpMzvhYR56qu3jd+snjfFw91PRISfIw5MT48+e1yQ00ly7tdI8SpSzHKD3/JzcaJOuBhZW03wCKPomGm+by82TgcOjMmuVgp1NQkbtmw+hjsCZn8wVjLzBVhtmmVgbX5rhGu/QuTviB8djC6aucUS51YOW10h76nc/CpID2zA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RKjBID3Z; arc=none smtp.client-ip=95.215.58.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1786017120; c=relaxed/simple;
+	bh=Ddk2sLblFuCqgN3kLGjE4/tWjTxEOHE3xF2n+TVGTuI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kW0GRXQXGvHKorl2L4kAHoL1BHAEMiDWYmDOrIToGd8+KaAHPW+wSvrFW0KrctjKLtp8qErqCaFxuC58wETRxpCSDobzYsj1M6I6dW58bo2c+1vQ6Lbik+Jgo98FSKuehrE96XCgfsy0m63cQWfSiJF+y2+MR8DK7janBOGPj4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lULLnO+N; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RKjBID3Z"
-X-Gm-Message-State: AOJu0YyVIoJGbJ/ZUaiLdrsvwjGZCc38f5O61S1+GP/ncxjeurCVY4t9
-	jbko9de2GM4YrWLQPlmGERIrCE72s2fUzLBnebBcOyZhIZ5bVXIZi3fhCwqRwINpd8tgUQ4gUT0
-	aJ0tV9i1DfShzaB+YZ/rMhEDbI9bsZPWnXWjngBKw
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1786012906;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=z1qJaH8qe3xOuKMLMRx9tLtyzADdhPNGWrKECtyXTAw=;
-	b=RKjBID3Z8uXQpDZX9fKTiH3JxXv/lm20YQG+tPBYW6N/xVXhem1d2b/bd7XN6Xfhu7waIR
-	7FxKW2fpMdfqX5q2yPhzUkZi6iA3crugPCsCCrg3DV4MCZ0YDfo/HT521RoDSG5YEz/m8N
-	PMWYm4Kqm8bjTBaBaZODBZRt/7SLcoU=
-X-Received: by 2002:a05:622a:2589:b0:51c:935d:8d74 with SMTP id
- d75a77b69052e-52cfea276f5mr5700541cf.9.1786012885009; Thu, 06 Aug 2026
- 03:41:25 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lULLnO+N"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 565B81F000E9;
+	Thu,  6 Aug 2026 11:51:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1786017119;
+	bh=YDyQxw7kEcv8fafHZJCSFp9fBd0EX8yupcZ1eKpGNog=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=lULLnO+NrGAd8vuq+7byWmI35SX/ua1DfIjgavu3OB9gS8EllukpkdeLDcjChbvPM
+	 eQOp2x2rolMuDwM3xnoQWfGevQt4+scBtYsMEhETs687jPqSO8lf66DoaCHld0JKlH
+	 DPTi9d7y7NobGYayHlwpDqvR1T+hJwC92MrqtZch88K4B47GwE7Q7H5YDEAafEjg9t
+	 YBUVBH9imnyG/4V06WIN5qSXcDCiM/yC+HpuZ16/jtwg/BKw6udYEniGH6ygOiONcU
+	 edktd/UhqL7I3c+A/pfSHgAPqF5AXQoUvmOKcxv3fWD3psYrhJGum+ZWIwDVwwDaE6
+	 ilk3doCuWeVnQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wrwdh-0000000CwaY-1nA3;
+	Thu, 06 Aug 2026 11:51:57 +0000
+Date: Thu, 06 Aug 2026 12:51:57 +0100
+Message-ID: <868q6jbh5u.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: sashiko-reviews@lists.linux.dev
+Cc: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	"Oliver\
+ Upton" <oupton@kernel.org>
+Subject: Re: [PATCH v2 4/8] KVM: arm64: Correctly handle end of VA space TLBI invalidation
+In-Reply-To: <20260806093030.863F31F000E9@smtp.kernel.org>
+References: <20260806091026.620700-1-maz@kernel.org>
+	<20260806091026.620700-5-maz@kernel.org>
+	<20260806093030.863F31F000E9@smtp.kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20260806100256.371164-1-fuad.tabba@linux.dev> <20260806100256.371164-2-fuad.tabba@linux.dev>
- <20260806103207.013201F000E9@smtp.kernel.org>
-In-Reply-To: <20260806103207.013201F000E9@smtp.kernel.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Thu, 6 Aug 2026 11:40:48 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTzAqGbjVvPSz0nKZzTmH33tJxi2htegrAzRNSjENPcmBw@mail.gmail.com>
-X-Gm-Features: AUfX_mwjA9imTqbgbCmw7CTjZO9uYjppMiugnM-BRCF57kpEMD-0F264YSmLgfc
-Message-ID: <CA+EHjTzAqGbjVvPSz0nKZzTmH33tJxi2htegrAzRNSjENPcmBw@mail.gmail.com>
-Subject: Re: [PATCH v1 1/4] KVM: arm64: Validate the host-provided vgic model
- in pKVM
-To: sashiko-reviews@lists.linux.dev
-Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>, 
-	Marc Zyngier <maz@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev, oupton@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 6 Aug 2026 at 11:32, <sashiko-bot@kernel.org> wrote:
->
-> Thank you for your contribution! Sashiko AI review found 2 potential issu=
-e(s) to consider:
->
+On Thu, 06 Aug 2026 10:30:29 +0100,
+sashiko-bot@kernel.org wrote:
+> 
+> Thank you for your contribution! Sashiko AI review found 2 potential issue(s) to consider:
+> 
 > Pre-existing issues:
-> - [Critical] Unconditional copy of the host's mdcr_el2 to the protected V=
-M's mdcr_el2 allows the host to reconfigure the guest's secure trap environ=
-ment.
-
-Coming soon in the second pKVM series.
-
-> - [Medium] The patch fails to sanitize the explicit `__vgic_v5_save_apr` =
-and `__vgic_v5_restore_vmcr_apr` hypercalls, allowing a malicious host to s=
-till panic the hypervisor on GICv3 machines.
-
-Patch 2 of this series fixes it.
-
-/fuad
-
+> - [High] Range TLBI instructions for Stage-1 TTBR1 addresses silently fail to invalidate VNCR entries because the base address is not sign-extended.
+> - [High] The `tlbi_va_s1_to_va` macro and `read_vncr_el2` sign-extend from bit 48, which corrupts 52-bit Virtual Addresses (LVA).
 > --
->
-> --- Patch [1]: [PATCH v1 1/4] KVM: arm64: Validate the host-provided vgic=
- model in pKVM ---
-> commit 3364f007874647c1650c3fc747633d9c5c9b87de
-> Author: Fuad Tabba <fuad.tabba@linux.dev>
->
-> KVM: arm64: Validate the host-provided vgic model in pKVM
->
-> This commit validates the host-provided vgic_model during initialization
-> of a protected VM, ensuring only GICv2 and GICv3 models are permitted.
-> This prevents a malicious host from causing a hypervisor panic by setting
-> the model to GICv5 on a GICv3 machine.
->
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/p=
-kvm.c
-> > index 24d6f164129ac..59bb15efdca42 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> > @@ -340,13 +340,25 @@ static void pkvm_init_features_from_host(struct p=
-kvm_hyp_vm *hyp_vm, const struc
-> >  {
->
+> 
+> --- Patch [4]: [PATCH v2 4/8] KVM: arm64: Correctly handle end of VA space TLBI invalidation ---
+> commit 0f00ac726029153c77159941056d984a8dc753cf
+> Author: Marc Zyngier <maz@kernel.org>
+> Subject: KVM: arm64: Correctly handle end of VA space TLBI invalidation
+> 
+> This commit fixes an issue with TLB invalidation by VA where address rollover
+> at the end of the TTBR1 VA space caused invalidations to fail. It introduces
+> a common helper, vncr_tlb_intersects(), which uses inclusive end addresses
+> to prevent this issue for both VA and IPA invalidations.
+> 
+> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> > index 939813aebaafa..67cc5b6d80705 100644
+> > --- a/arch/arm64/kvm/nested.c
+> > +++ b/arch/arm64/kvm/nested.c
+> > @@ -1000,6 +1000,20 @@ static void invalidate_vncr(struct vncr_tlb *vt)
 > [ ... ]
->
-> > -     /* Preserve the vgic model so that GICv3 emulation works */
-> > -     hyp_vm->kvm.arch.vgic.vgic_model =3D host_kvm->arch.vgic.vgic_mod=
-el;
-> > +     /*
-> > +      * Preserve the vgic model for GICv3 emulation, but only what pKV=
-M can
-> > +      * run: the GICv5 world switch touches registers UNDEFINED at EL2
-> > +      * without FEAT_GCIE. 0 is not a valid kvm_device_type: "no vgic"=
-.
-> > +      */
-> > +     switch (vgic_model) {
-> > +     case KVM_DEV_TYPE_ARM_VGIC_V2:
-> > +     case KVM_DEV_TYPE_ARM_VGIC_V3:
-> > +             break;
-> > +     default:
-> > +             vgic_model =3D 0;
-> > +     }
-> > +     hyp_vm->kvm.arch.vgic.vgic_model =3D vgic_model;
->
-> [Severity: Medium]
-> This is a pre-existing issue, but does this validation fully prevent a
-> malicious host from triggering a GICv5 panic?
->
-> Even with the model restricted here, the explicit GICv5 hypercalls
-> remain unconditionally exposed in the always-on band:
->
-> arch/arm64/kvm/hyp/nvhe/hyp-main.c:
-> static void handle___vgic_v5_save_apr(struct kvm_cpu_context *host_ctxt)
-> {
->         DECLARE_REG(struct vgic_v5_cpu_if *, cpu_if, host_ctxt, 1);
->
->         __vgic_v5_save_apr(kern_hyp_va(cpu_if));
+> > +static bool vncr_tlb_intersects(struct vncr_tlb *vt, u64 addr,
+> > +				u64 scope_start, u64 scope_size)
+> > +{
+> > +	u64 tlb_size, tlb_start, tlb_end, scope_end;
+> > +
+> > +	tlb_size = ttl_to_size(pgshift_level_to_ttl(vt->wi.pgshift, vt->wr.level));
+> > +
+> > +	tlb_start = addr & ~(tlb_size - 1);
+> > +	tlb_end = tlb_start + tlb_size - 1;
+> > +	scope_end = scope_start + scope_size - 1;
+> > +
+> > +	return !(tlb_end < scope_start || tlb_start > scope_end);
+> 
+> [Severity: High]
+> This is a pre-existing issue, but could this intersection check fail for
+> Stage-1 TTBR1 Range TLBIs due to a missing sign extension?
+> 
+> When a guest issues a Range TLBI for a TTBR1 virtual address,
+> decode_range_tlbi() zero-extends the base address:
+> 
+> arch/arm64/include/asm/kvm_nested.h:decode_range_tlbi() {
+>     ...
+>     base = (val & GENMASK(36, 0)) << shift;
+>     ...
 > }
->
-> static void handle___vgic_v5_restore_vmcr_apr(struct kvm_cpu_context *hos=
-t_ctxt)
-> {
->         DECLARE_REG(struct vgic_v5_cpu_if *, cpu_if, host_ctxt, 1);
->
->         __vgic_v5_restore_vmcr_apr(kern_hyp_va(cpu_if));
-> }
->
-> Can a compromised host still bypass this vgic_model sanitization by
-> directly executing the HVC instruction for
-> __KVM_HOST_SMCCC_FUNC___vgic_v5_save_apr or __vgic_v5_restore_vmcr_apr?
->
-> If these directly access GICv5 registers, wouldn't this still trigger an
-> UNDEFINED exception on machines without FEAT_GCIE?
->
-> >       /* No restrictions for non-protected VMs. */
-> >       if (!kvm_vm_is_protected(kvm)) {
->
+> 
+> In compute_s1_tlbi_range(), this is directly assigned to scope->va.
+> 
+> Since scope->va is passed as scope_start here and is zero-extended (a large
+> positive unsigned number), won't it fail to intersect with vt->gva, which
+> is sign-extended (a negative number for TTBR1)?
+
+This is patch #6.
+
+> 
+> > +}
+> > +
+> >  /*
+> >   * VNCR TLB invalidation occurs from MMU notifiers or TLBI instructions, and
+> >   * either can race against a vcpu not being onlined yet (no pseudo-TLB
 > [ ... ]
->
-> Additionally, while reviewing the protected guest state handling, I notic=
-ed
-> another potential issue in the hypervisor main loop:
->
-> arch/arm64/kvm/hyp/nvhe/hyp-main.c:flush_hyp_vcpu() {
->         ...
->         /* __hyp_running_vcpu must be NULL in a guest context. */
->         hyp_vcpu->vcpu.arch.ctxt.__hyp_running_vcpu =3D NULL;
->
->         hyp_vcpu->vcpu.arch.mdcr_el2    =3D host_vcpu->arch.mdcr_el2;
->         /*
->          * HCR_EL2.VSE is host-owned (a pending virtual SError to inject)=
-, not a
->         ...
+> > @@ -1060,28 +1064,19 @@ static void invalidate_vncr_va(struct kvm *kvm,
+> >  	lockdep_assert_held_write(&kvm->mmu_lock);
+> >  
+> >  	kvm_for_each_vncr_tlb(i, vcpu, vt, kvm) {
+> >  		switch (scope->type) {
+> >  		case TLBI_ALL:
+> >  			break;
+> >  
+> >  		case TLBI_VA:
+> > -			if (va_end <= scope->va ||
+> > -			    va_start >= (scope->va + scope->size))
+> > +			if (!vncr_tlb_intersects(vt, vt->gva, scope->va, scope->size))
+> 
+> [Severity: High]
+> This isn't a bug introduced by this patch, but does KVM incorrectly truncate
+> 52-bit Virtual Addresses (LVA) to 48 bits when constructing these VAs?
+> 
+> The tlbi_va_s1_to_va() macro and read_vncr_el2() both hardcode a 48-bit sign
+> extension:
+> 
+> arch/arm64/kvm/nested.c:read_vncr_el2() {
+>     ...
+>     return (u64)sign_extend64(__vcpu_sys_reg(vcpu, VNCR_EL2), 48);
 > }
->
-> [Severity: Critical]
-> This isn't a bug introduced by this patch, but does this unconditional
-> assignment allow the untrusted host to clobber the securely initialized
-> MDCR_EL2 configuration of protected guests on every VCPU entry?
->
-> Since flush_hyp_vcpu() overwrites the hyp vCPU's mdcr_el2 with the
-> host-controlled host_vcpu->arch.mdcr_el2, could a compromised host use
-> this to reconfigure the performance monitor (TPM) and debug (TDA/TDE)
-> trap environment of a protected guest?
->
-> --
-> Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260806100256.37=
-1164-1-fuad.tabba@linux.dev?part=3D1
->
+> 
+> If a guest uses 52-bit VAs (FEAT_LVA) and places the VNCR page at a TTBR1
+> address where bit 48 is 0, wouldn't the upper bits (49-63) be zero-extended
+> instead of sign-extended?
+> 
+> This seems like it would corrupt the VA into a TTBR0 address, and Range TLBIs
+> (which preserve bits up to 53 in decode_range_tlbi) would fail to intersect
+> with the corrupted 48-bit vt->gva.
+
+That'd be a bug if we had support for LVA. We don't.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
