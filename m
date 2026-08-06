@@ -1,96 +1,148 @@
-Received: from out-173.mta1.migadu.com (mta1.migadu.com [37.59.57.117])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8443E40EB90
-	for <kvmarm@lists.linux.dev>; Thu,  6 Aug 2026 08:45:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.59.57.117
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A49EB413786;
+	Thu,  6 Aug 2026 09:10:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786005918; cv=none; b=rNjdMkj7vH1OwgNc1udvyfuhviM21E6qQD138/WV/ssY22tLUcjk4JrpJA9LetqcilQFgw25Pw+F8ZEhm02FgGDWPFLqONgsATJAOG1V1G6IHE+RHwLBA7bhstpuhRk/8f6gJ7ylIQ6L2uA9QAEpqs0sIGnyprxLLsN2hhB7BFY=
+	t=1786007436; cv=none; b=iCuyo6o1oi36h1OPCJi5vWykGtL3Ug5OYHRRl8xGAyEFn4d0LOErM0enfDDLjSXbcnn1C8tCREfwNTqGAfxG0RTe0e8tck3j1dU2IHNdm42kLCSxlbVisLXi+k5kVUfPcM0PoG5/mzzBekUZFnzbNhoZr4FXORkQXRB0qJkyXBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786005918; c=relaxed/simple;
-	bh=h6ooHdgjRZHBBwOsjyP2A+6c2LHkGT/fTYtdR1Ur6o0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AmEcoBCBoWHZU7bRZDAOlKvFbtyc/WM0YIcIDXUCbnRCyfrL1OxVA8MG3Y8MUrNIoO+vA7v0dfX8LguBDnIz26H539kW3a+qPmL5snmWJxbnjxE2Kd5DmToeuVgYQA9ytEfV318T8YG+SXwqB/FxreweNPW+IQ3uT4PyKMp/+2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vZdC259o; arc=none smtp.client-ip=37.59.57.117
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1786007436; c=relaxed/simple;
+	bh=8+zqllbEdqgMqzkU1SVo6YBPkX0Z0ssx7JhH/BTKah8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sTH4UqZgvliwwOD/qC5Cv6MMubHNu2EbripV9vwkVwhdPDRts4defLVsLq4m3tMHhYWjx6xnqBIlOu2mdiGn/KnhA4WgJRPhww/odJ2Ukb/Ej2TZfr6n4nsBNdb6BaW0wrvuE1JQnDWfTLDgpQp7aobPzcnARRlko/PUKku8Gkc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bjZ38nMP; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vZdC259o"
-X-Forwarded-Encrypted: i=1; AHgh+RqAtXGiqfVG6vKBk2Tp7bd8RTS3KujiBoX24fp1PgIQVSJB/Sv4UFeofwpJwBD5tQelc4lAQX4=@lists.linux.dev
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1786005914;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2ePEtl2m67fNMAuLJ9Afbk/hABXEN6patEcXoPge2F0=;
-	b=vZdC259oML1yL+CG0shbSd3PZPfO2v9j+qww5hkVw/bdmyE1ehpdx3igSUH1nnSYZkyIKI
-	8hrveTfwzW3mX+7+z/nxcyuyXmx9vpNSV7CNJwVPpY5cO6VOFz0EC5HsHhYluBNlpPc+Jp
-	jpXyiyYOvqsCBBLTqElNqtg2Hu8ZzNw=
-X-Gm-Message-State: AOJu0YxazupQ7MKZ4Ikh1IC4OQ676JEslDoZk70wp7GhkOlL8wQ4HtHN
-	cGBE6wYPmaSRNTwVu251AvT2KS1OoFkT3ypK/w7d/7hVTdLt4WCP4vufkCcZd8ADYSnmEjylqGy
-	BUPBQAnnhVeN/9F1OOZDT2FtZJjjXq3EQakGiUk4t
-X-Received: by 2002:a05:622a:4885:b0:516:3f51:81cb with SMTP id
- d75a77b69052e-52cfea4c54fmr11135181cf.13.1786005891634; Thu, 06 Aug 2026
- 01:44:51 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bjZ38nMP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 439701F00A3A;
+	Thu,  6 Aug 2026 09:10:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1786007434;
+	bh=ekP/15RiyRS1mHmgBngaG2DUHSQ1RkRl7k1DMWmUVvw=;
+	h=From:To:Cc:Subject:Date;
+	b=bjZ38nMPTWrRhP6qJYO2Hngk6a4aWbndg06pLlj//9Vspo1l+N1sSW7/y7hE3LRcu
+	 5yMXQjQzrOBznd3tREJQpbzJT7P9pttE9dUiJha6dUX7ewR95Ct2UtKN0boP4JJYe/
+	 il6zgqwFi4Cka4rLo1p/FHHkPSPSLliduSiawurp5nXy0dMKxq9epFET7y6emN6dD8
+	 r+2ffw62KVUr75sR6hh1vdpAMAFzjY0dttZ+hs7Ul2Ibib3otWnddNAmzYCcyP2RQK
+	 hvGpM/IbCkZP73tDmyQjzWc7qEmznlNHqqBaK2uiuAPDGJOPfzURhBknpf9ZNEkgVL
+	 Wy/EtXgINcohw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wru7T-0000000CtHi-2I6S;
+	Thu, 06 Aug 2026 09:10:31 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Cc: Steffen Eiden <seiden@linux.ibm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Hyunwoo Kim <imv4bel@gmail.com>,
+	Yao Yuan <yaoyuan@linux.alibaba.com>,
+	ljs@kernel.org
+Subject: [PATCH v2 0/8] KVM: arm64: VNCR TLB invalidation fixes
+Date: Thu,  6 Aug 2026 10:10:18 +0100
+Message-ID: <20260806091026.620700-1-maz@kernel.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260804112317.1937387-1-fuad.tabba@linux.dev>
- <20260804112317.1937387-2-fuad.tabba@linux.dev> <20260805165432.0118a513@gandalf.local.home>
-In-Reply-To: <20260805165432.0118a513@gandalf.local.home>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Thu, 6 Aug 2026 09:43:00 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTxZ1tBfau4eK-nOdqig1xwngzsq8YyHtiE-iAMkZpSF8g@mail.gmail.com>
-X-Gm-Features: AUfX_mx7LtwidANKMNRCu_ciAI4sGIOLaBR410JmLmjAj3CDd42EszWO5YDN5aw
-Message-ID: <CA+EHjTxZ1tBfau4eK-nOdqig1xwngzsq8YyHtiE-iAMkZpSF8g@mail.gmail.com>
-Subject: Re: [PATCH v3 01/11] tracing: Include linux/types.h in trace_remote_event.h
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: maz@kernel.org, oupton@kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, 
-	mhiramat@kernel.org, alexandru.elisei@arm.com, vdonnefort@google.com, 
-	joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, qperret@google.com, ardb@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, fuad.tabba@linux.dev, imv4bel@gmail.com, yaoyuan@linux.alibaba.com, ljs@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Thanks Steve,
+Prompted by a patch [0] from Hyunwoo Kim which was addressing a pretty
+annoying corner case, I spent some time looking at what was wrong in
+our VNCR TLBI code. And there was a few things to say about it...
 
-On Wed, 5 Aug 2026 at 21:53, Steven Rostedt <rostedt@goodmis.org> wrote:
-...
-> > --- a/include/linux/trace_remote_event.h
-> > +++ b/include/linux/trace_remote_event.h
-> > @@ -3,6 +3,8 @@
-> >  #ifndef _LINUX_TRACE_REMOTE_EVENTS_H
-> >  #define _LINUX_TRACE_REMOTE_EVENTS_H
-> >
-> > +#include <linux/types.h>
-> > +
-> >  struct trace_remote;
-> >  struct trace_event_fields;
-> >  struct trace_seq;
->
-> My ack still stands, but I wonder if we should just not use the include and
-> instead s/bool/_Bool/ ?
+- The TLB tracking to get into the slow path is wrong. It tracks what
+  is mapped, but not the established TLBs. Kind of annoying.
 
-I'd prefer to keep the include, if you don't mind.
+- Handling IPA invalidation when the TLB was established with the S1
+  MMU disabled is failing for a number of reasons. This is the bug
+  that Hyunwoo Kim found, but I decided to address it at its root
+  rather than just fixing the symptoms.
 
-As far as I can tell, apart from the typedef itself, the only headers
-built into the kernel that use _Bool as a type are a uapi one and
-arch/um's user.h when it's built for the host, neither of which has
-bool available, plus what looks like a leftover in bcache_ondisk.h
-from when it was uapi.
+- Deciding to run with a VNCR TLB doesn't take the state of
+  SCTLR_EL2.M into account. Yes, it is a special sort of sport to run
+  a hypervisor with its MMU disabled...
 
-The include also covers whatever field gets added next.
+- TLB invalidation by VA targeting the last page/block of TTBR1_EL2 is
+  dropped on the floor, because I cannot count. This was amusing. Not.
 
-Happy to switch if you'd still prefer _Bool.
+Additionally, Sashiko kindly provided some extra horrors to look at:
 
-Cheers,
-/fuad
+- A missing sign extension for range invalidation results in the wrong
+  VA range being considered.
 
->
-> -- Steve
+- TLBI doesn't participate in the general MMU invalidation retry
+  machinery, meaning that VNCR faults and TLBIs race in an
+  uncontrolled way.
+
+- TLBI and vcpu_put() can race badly, leading to a TOCTOU pattern
+  which results in either a BUG_ON() or a call to vncr_fixmap(-1).
+
+I have fixes for each of these issues, all stable candidates.
+
+On top of that, I have a patch reintroducing the tracking that the
+first patch removes, this time in a way that is actually functional.
+Or at least I think it is...
+
+I'd like to thank Hyunwoo Kim for their initial patch and for
+providing a reproducer that helped me finding these issues by running
+it at multiple levels of nesting.
+
+It is now too late for 7.2, so let's try to make this 7.3 material
+(hence the early repost).
+
+* From v1 [1]
+
+  - Added sign extension to range invalidation (Sashiko)
+
+  - Use mmu_invalidate_seq to resolve fault vs TLBI races (Sashiko)
+
+  - Speculatively bump the TLB refcount on fault to make sure the TLBI
+    takes the slow path when we are going for a S1 walk
+
+  - Clarify the check for the TLB matching for the S1 MMU state
+
+  - Extra sanitisation added on the S2 invalidation path
+
+  - Applied RBs from Yao Yuan to the patches that didn't change, with
+    thanks.
+    
+[0] https://lore.kernel.org/r/ameGoxbn2wzBq2kL@v4bel
+[1] https://lore.kernel.org/r/20260801124818.366274-1-maz@kernel.org
+
+Marc Zyngier (8):
+  KVM: arm64: Remove VM-wide VNCR mapping counter
+  KVM: arm64: Handle negative S1 walk levels in VNCR TLB size evaluation
+  KVM: arm64: Consider SCTLR_EL2.M when mapping the L1 VNCR page
+  KVM: arm64: Correctly handle end of VA space TLBI invalidation
+  KVM: arm64: Handle VNCR TLB invalidation race with vcpu_put() VNCR
+    unmapping
+  KVM: arm64: Sign-extend VA for range-based TLBI invalidation
+  KVM: arm64: Make VNCR invalidation participate in MMU invalidation
+    retry
+  KVM: arm64: Add VNCR TLB tracking again
+
+ arch/arm64/include/asm/kvm_host.h   |   4 +-
+ arch/arm64/include/asm/kvm_nested.h |  14 +++
+ arch/arm64/kvm/at.c                 |   2 -
+ arch/arm64/kvm/hyp/vhe/switch.c     |  10 +-
+ arch/arm64/kvm/nested.c             | 173 +++++++++++++++++++---------
+ arch/arm64/kvm/sys_regs.c           |  11 ++
+ 6 files changed, 155 insertions(+), 59 deletions(-)
+
+-- 
+2.47.3
+
