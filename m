@@ -1,113 +1,81 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from relay.hostedemail.com (smtprelay0013.hostedemail.com [216.40.44.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E53947277C;
-	Thu,  6 Aug 2026 11:54:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C3E547A87E
+	for <kvmarm@lists.linux.dev>; Thu,  6 Aug 2026 12:19:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786017270; cv=none; b=kF7Ooavud05Ux5Ia4/lswK4QMDVf5KrUA+taNpxl/g+s9Bm9w2tcJYCWxyPsAFyFqRCTE9aYssz6VSJtr29ES3ZsX88Exw6UrkpxaKSElsnry7mTwfnfdbY787zpiVyZoFOf5SbP5XNq3IYcRYHz+unIlx4jv7OsDQj8HF2NSYI=
+	t=1786018800; cv=none; b=VWS/NUfr3s2JzZr5WrKmBpuyDRKQWn/l4AalK1dqRPYM2awiTjkYIoZ+YxGBMGLdeXiH0xzBY0+x8KEL4Da++GEoVk3J96peRQzVz42LfCQ1kyyZ8HHugggFZtNVCvkvcZ+xxsTvGXbT6vEKoKPDGxrqRkjstq6WEPpWPsbAac0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786017270; c=relaxed/simple;
-	bh=tUjltdGNUCuuTO6mZEJ6dIrEbKM9BGEhKNJLNYQyZe0=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pcLvoh9VCgrMvtAFXz+Yu9CNECBkOSCmip2gA/dT6sORrJYatVqPRcGekiMlB7NPGpon39ctwk7inhg9k0BD999uPd/XBym21HFd/aE6NJxlewaPOl/Kx0YCha1oLgeeQSXHMyZPu/Acl3iVZaH3cioiYaX7lujXVmTPJwHl3Sg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XXRxPohz; arc=none smtp.client-ip=100.103.45.18
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XXRxPohz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FCAC1F000E9;
-	Thu,  6 Aug 2026 11:54:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786017269;
-	bh=Yllfnt8G0ssXpgimC9rEoN1keyuJ11edo+mCKKLdbTQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=XXRxPohzF6NZPJXvyTsqENa03bnV6nSMIHhWm0ZjNfFrECGtNgaBQgXi+u6lvhqau
-	 h0N0q1sHjMZM4ecPFSiIKQibPQILOlBLRLSTnOJ0N17nIwJlx/WicGSQu5sjMBoPPb
-	 bdAp3lhiKtE2a53QD8siz06qK+6qQGz+Rik/gWrfPCoP2wzpVMwzmUro+dE/dc7uIu
-	 jA4LRn6yLJDuQ/CoHhSCa1N79UGhVsM35SGkZu33ab/E6cDRN78FETSUH7pTBOR/YP
-	 0gxyIm+5n47AxjW7EzFm0v5lkxK9et6A7Lpk1GmnJQR3u5/B2C+7dEJYg3eUy9vZJc
-	 eShr6c8zBBSfg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wrwg7-0000000Cwf4-0eJa;
-	Thu, 06 Aug 2026 11:54:27 +0000
-Date: Thu, 06 Aug 2026 12:54:26 +0100
-Message-ID: <865x1nbh1p.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: sashiko-reviews@lists.linux.dev
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	"Oliver\
- Upton" <oupton@kernel.org>
-Subject: Re: [PATCH v2 8/8] KVM: arm64: Add VNCR TLB tracking again
-In-Reply-To: <20260806093552.C9F4B1F00A3A@smtp.kernel.org>
-References: <20260806091026.620700-1-maz@kernel.org>
-	<20260806091026.620700-9-maz@kernel.org>
-	<20260806093552.C9F4B1F00A3A@smtp.kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1786018800; c=relaxed/simple;
+	bh=IL82bkQoogT0tIzedkG7o6bS3g1xKVlq3ylx4i0lUVo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RDhNVzPM6m8UTH5z2fqEE3wpDdK93rWhPK4FlatbkJGf2OzBEd9bQCYaw0HAuNvk8qz0eDfmqhw5PSzu4x21PqAnArp4vbxSkNXx5t6GiYOFSbFR++vaLex6mTy1fEuio/xIFIwjmU2m+4VA9lnMMHPRNnNb+OwmOYPv1NSCRtw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org; spf=pass smtp.mailfrom=goodmis.org; arc=none smtp.client-ip=216.40.44.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=goodmis.org
+Received: from omf13.hostedemail.com (lb01a-stub [10.200.18.249])
+	by unirelay05.hostedemail.com (Postfix) with ESMTP id 06F4F4071F;
+	Thu,  6 Aug 2026 12:19:55 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: rostedt@goodmis.org) by omf13.hostedemail.com (Postfix) with ESMTPA id 8425720010;
+	Thu,  6 Aug 2026 12:19:52 +0000 (UTC)
+Date: Thu, 6 Aug 2026 08:19:52 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: maz@kernel.org, oupton@kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org,
+ mhiramat@kernel.org, alexandru.elisei@arm.com, vdonnefort@google.com,
+ joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com,
+ yuzenghui@huawei.com, qperret@google.com, ardb@kernel.org,
+ linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 01/11] tracing: Include linux/types.h in
+ trace_remote_event.h
+Message-ID: <20260806081952.5cbd8170@gandalf.local.home>
+In-Reply-To: <CA+EHjTxZ1tBfau4eK-nOdqig1xwngzsq8YyHtiE-iAMkZpSF8g@mail.gmail.com>
+References: <20260804112317.1937387-1-fuad.tabba@linux.dev>
+	<20260804112317.1937387-2-fuad.tabba@linux.dev>
+	<20260805165432.0118a513@gandalf.local.home>
+	<CA+EHjTxZ1tBfau4eK-nOdqig1xwngzsq8YyHtiE-iAMkZpSF8g@mail.gmail.com>
+X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, oupton@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Server: rspamout01
+X-Rspamd-Queue-Id: 8425720010
+X-Stat-Signature: r86qiecciymy1dxrye8d3wyxeubaweq4
+X-Session-Marker: 726F737465647440676F6F646D69732E6F7267
+X-Session-ID: U2FsdGVkX19xrAhumewMEU9bfBTbxDXmAHqbmaYBTcE=
+X-HE-Tag: 1786018792-901548
+X-HE-Meta: U2FsdGVkX195zuqn6+P/oJUmDDmBsGeDk/Dol51GDMslSARahWNz568H6AtS7EGsXujFR5EgnerJAA1FLcRtHPbxXpVUqLywGSkHQCrLp5MMyOzhfpBJktvO9poZuZIuc2bqlmAIxIsHu6m1BBV10K+mDygWR0Q72fcRl0tfpITuQ6ol0J6Uq1wof/YO35DXnmCeVAZfY2ACGKSPARPQ5q6a4D5JodKbU9zOfAXLY6igoorxNrttkORPBbra1VvJ6+fyPYWKHprBf7RlDIqX1WHxGhaue79t/6UsjyUwbZcuAYGowA4DC0/RtB1xeIJp
 
-On Thu, 06 Aug 2026 10:35:52 +0100,
-sashiko-bot@kernel.org wrote:
-> 
-> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> 
-> Pre-existing issues:
-> - [High] The fast-path TLBI handler incorrectly skips the slow path for native EL2 TLBI instructions when E2H or TGE is clear, bypassing software VNCR TLB invalidation and leaving stale mappings.
-> --
-> 
-> --- Patch [8]: [PATCH v2 8/8] KVM: arm64: Add VNCR TLB tracking again ---
-> commit 65741607ee5db3e8d57cf0e1773bb1031e83a3ee
-> Author: Marc Zyngier <maz@kernel.org>
-> 
-> KVM: arm64: Add VNCR TLB tracking again
-> 
-> This commit introduces a VM-wide counter to track valid VNCR TLBs. It aims
-> to improve performance by taking the TLBI slow path only when there are
-> active VNCR TLBs that need invalidation.
-> 
-> > diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-> > --- a/arch/arm64/kvm/hyp/vhe/switch.c
-> > +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-> [ ... ]
-> > @@ -424,10 +424,15 @@ static bool kvm_hyp_handle_tlbi_el2(struct kvm_vcpu *vcpu, u64 *exit_code)
-> >  		return false;
-> >  
-> >  	/*
-> > -	 * If we have to check for any VNCR mapping being invalidated,
-> > -	 * go back to the slow path for further processing.
-> > +	 * If we have to check for any VNCR TLB being invalidated, go back
-> > +	 * to the slow path for further processing.
-> > +	 *
-> > +	 * The synchronisation betweem TLBI and walk is provided by the
-> > +	 * speculative increment of the TLB counter on walk, and the
-> > +	 * invalidation counter. Yes, this is fiddly.
-> >  	 */
-> > -	if (vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu))
-> > +	if (vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu) &&
-> > +	    atomic_read(&vcpu->kvm->arch.vncr_tlb_count))
-> >  		return false;
-> 
-> [Severity: High]
-> This is a pre-existing issue, but does this condition incorrectly skip the
-> slow path for native EL2 TLBI instructions when E2H or TGE is clear?
+On Thu, 6 Aug 2026 09:43:00 +0100
+Fuad Tabba <fuad.tabba@linux.dev> wrote:
 
-See answer to the patch #1 review.
+> > My ack still stands, but I wonder if we should just not use the include and
+> > instead s/bool/_Bool/ ?  
+> 
+> I'd prefer to keep the include, if you don't mind.
+> 
+> As far as I can tell, apart from the typedef itself, the only headers
+> built into the kernel that use _Bool as a type are a uapi one and
+> arch/um's user.h when it's built for the host, neither of which has
+> bool available, plus what looks like a leftover in bcache_ondisk.h
+> from when it was uapi.
+> 
+> The include also covers whatever field gets added next.
+> 
+> Happy to switch if you'd still prefer _Bool.
 
-	M.
+The reason I suggested this is because I'm not sure how much we want to add
+Linux headers to files built for the hypervisor.
 
--- 
-Without deviation from the norm, progress is not possible.
+If Vincent is good with adding this, then so am I.
+
+But I rather have him give an ack before we do.
+
+-- Steve
