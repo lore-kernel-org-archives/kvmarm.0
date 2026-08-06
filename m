@@ -1,183 +1,193 @@
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com [209.85.216.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 047EC30E0F2
-	for <kvmarm@lists.linux.dev>; Thu,  6 Aug 2026 21:46:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.70
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD5CE4248C4
+	for <kvmarm@lists.linux.dev>; Thu,  6 Aug 2026 21:54:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786052785; cv=none; b=XIVASopjgDiHWC4oteCD/gRopzqASs17UqomRD6+VR7ZBC+RdGPNLa1ULbaEe+DnDKnk1WZBoEaNjNzEB5lTx78M/XsnIXX6nUxt7zUcePQKZTmk8Jps9e5dNS4EJC+RBJW9gXmYQ7cGtI82d2itnecstNgPX0EJUqTYfgpPMJ4=
+	t=1786053259; cv=none; b=S7nqOoFVr4a5sOEO4U3QzAwIOEs6/UNJONSm00OIcgfROUNPvjATCHoap/Hpwthv1Hvnh4Sf9bTT9HExRQtaw1aFhYMnW1YicQmxN1gWXs7GjjHMl/zIBH9jz5c5k3WFkFe/90C1VZNqt+Ya+oDs7qn8FSNZuW6WXXD/wPLMmco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786052785; c=relaxed/simple;
-	bh=R5IlNYT9grSWMNRUE5eHnlj/fSWDkT4pmhLM0SsMSl0=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=s7G/XbcSklORkFw8kLylw2g8LS9G3YY4y4QAY2eUVfHAFAkOwS7LEdbeANblJF3fCXK2DzgvkhJCvJZdfDVSeCExmIUqrhSHG1I/r1e1EasNS0yUMVUdphIV1F+xWh1MU8Xt9PMYL7Blah0rGfxM3b+JY53Ma08ZkrFDMsdCQ5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JJtW7vBI; arc=none smtp.client-ip=209.85.216.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1786053259; c=relaxed/simple;
+	bh=OBhp8bb+qL85UhoATxzxbQJNiuhv+HIrFounOJ7gTx4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bU0KCoubObskI7o174rxpY/Pf0cd7FYdj7yvmtNAkrx+dZyQoD2Gu8j+hodHagd3Wlc++XgzQcxTeDOWOm2+S+p4dVQNHqTEcl5fQCA/Z3X71pQtFDK3X7NYGshXCx7Si8vy6SmrpTfT3KGNh2mt9xQB+KAfTg3Bqaz/20zKOO4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=bKY13eBR; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JJtW7vBI"
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-38ce7fabf76so4254151a91.2
-        for <kvmarm@lists.linux.dev>; Thu, 06 Aug 2026 14:46:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1786052783; x=1786657583; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:mime-version:date
-         :reply-to:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=shGHIfLMy0zOulR4PSpJjZWPNrTU67gcyn62KwrDxcg=;
-        b=JJtW7vBIC6exKzs0HlnGzhJXboZJPalKm7wgZucWmEHbxJ70uFmgqMiM50EHEEuE6L
-         I9lreW6VNLHBMU3v5uVqrBzd8COTdMIl62PpylqmNWYw3/qCRNT+t3Y5ZYxCoHITsTuM
-         i0Jf2UAmn7ahd9R/tKrfNRaYZrzG8z+KxnNcgGdBBMIc9C2YGMk2fecq2y+dkXVmw/IU
-         8H2fg5NwocwddudBIK3xcZlvbyfiG3aDXg3Hq3ypmtOhPAjmnM6aqrYK0jwl9hQD5iWZ
-         Na9t571SgFH4K+t7XFLXBdMsMVtcKaGdQzYU3h/yCuKVgIdOBfypBWmCgqpFrV7NFcdi
-         EGTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786052783; x=1786657583;
-        h=content-type:cc:to:from:subject:message-id:mime-version:date
-         :reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=shGHIfLMy0zOulR4PSpJjZWPNrTU67gcyn62KwrDxcg=;
-        b=FbDy9uRfGSUwTn+KnaFIr5VF8ua4p1YFkoZMZzWP9EiaVyj9ADfeEFs6/AOyJoYAOy
-         vs8STjHI9amMFl6xQB5RVwr3s1FQh9NblOvFTEZYXzJWfOx3CsKllpLwW+Y2YYuWKBYk
-         SjDXMaBxq9ciZHOeJzgdyoL8AAaMlf4J6vMNuf9iapwh+409ceLXzV3RuGvM/2icyQ5l
-         WCnnWtC/pX0DSs4Ziwa1bVJv8MSaplM/mbZsIHd7duQqo5GWmoCRvwbfGZXwSx04HK8Q
-         4jXXdN2Yq/rWY2hWr0Ow/ZDmGqZCEteAv2kejkLoly3HtYRi0xps+6pH7WIXYMOyg2on
-         hYnA==
-X-Forwarded-Encrypted: i=1; AHgh+RrOCmOR4FdHQNJ7FDoOsq6Hx9gi4iOv/1k9jtKS1pvRCjHA+adCIJ3tbcSABMjg9his0AV5wUI=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxKl37PQCUex1EmcJxxn3VLlpUHBRm1QQRXLrxM+/V/4jrSmnx0
-	ShskEdUpsYqMtuj8wmtgMItzFfP8a/uVLNZMMTYl38EIK2Cmye2+O6TyrQ73Md4EAcueTf0bWGH
-	51v3jyw==
-X-Received: from pjup19.prod.google.com ([2002:a17:90a:d313:b0:38d:efe5:1502])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4fc9:b0:38e:740f:9764
- with SMTP id 98e67ed59e1d1-3903c5f6477mr18528170a91.18.1786052782928; Thu, 06
- Aug 2026 14:46:22 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu,  6 Aug 2026 14:46:18 -0700
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="bKY13eBR"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 177B7153B;
+	Thu,  6 Aug 2026 14:54:12 -0700 (PDT)
+Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 608D53F632;
+	Thu,  6 Aug 2026 14:54:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1786053256; bh=OBhp8bb+qL85UhoATxzxbQJNiuhv+HIrFounOJ7gTx4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bKY13eBRtkqyCtj2CSBdQuFzfC+3x5lVjWPuIs6qS6U5e6YREM2ek5wB6Kvsql50U
+	 zxUSRGsVJfouTJv7BoS8HdFs9teQ1KTMSAVdboIfr6pyt3veTAr9LLoe2mKoKDrDU4
+	 L7KzvqLPYfgDNa1iV7Z8R/NQkKardxRUaecNbo5A=
+Date: Thu, 6 Aug 2026 22:54:03 +0100
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: Karl Mehltretter <kmehltretter@gmail.com>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>
+Cc: Fuad Tabba <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org, grayhat@foxmail.com
+Subject: Re: [PATCH v3] KVM: arm64: nv: Keep the shadow S2 MMUs at fixed
+ addresses
+Message-ID: <d5svhw3jkjnkucohx2ntwhphemgbtfcmjt2zoyyw6svz56zfrh@z2ziydov5ras>
+References: <20260806192451.10169-1-kmehltretter@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.55.0.679.g6767b8d81c-goog
-Message-ID: <20260806214618.82180-1-seanjc@google.com>
-Subject: [PATCH] KVM: Never clear KVM_REQ_VM_DEAD from a vCPU's requests
-From: Sean Christopherson <seanjc@google.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260806192451.10169-1-kmehltretter@gmail.com>
 
-Use kvm_test_request() instead of kvm_check_request() when querying
-KVM_REQ_VM_DEAD, i.e. don't clear KVM_REQ_VM_DEAD, as the entire purpose
-of KVM_REQ_VM_DEAD is to prevent the vCPU from enterring the guest ever
-again, even if userspace insists on redoing KVM_RUN.
+On Thu, Aug 06, 2026 at 09:24:51PM +0200, Karl Mehltretter wrote:
+> kvm_vcpu_init_nested() can grow kvm->arch.nested_mmus while initialising
+> another vCPU: it copies the MMUs, publishes the new allocation, and frees
+> the old one. It updates pgt->mmu back-pointers, but not hw_mmu, leaving
+> already-running vCPUs with pointers to freed memory. hw_mmu cannot be
+> fixed up the same way: a running vCPU reads it without holding mmu_lock.
+> The nested S2 ptdump file's debugfs private data is also affected, as it
+> points into the freed array.
+> 
+> KASAN reports an access through the stale hw_mmu pointer as a
+> slab-use-after-free in kvm_handle_guest_abort().
+> 
+> Turn nested_mmus into a pointer table allocated once for the maximum
+> number of vCPUs during VM creation. Allocate the MMUs separately as
+> vCPUs are initialised and append their pointers to that table. The MMU
+> objects never move, so cached hw_mmu pointers, pgt->mmu back-pointers,
+> and ptdump private data remain valid.
+> 
+> Two issues in the old implementation are also fixed:
+> 
+> - The old failure path passed uninitialised MMUs to
+>   kvm_free_stage2_pgd(), which derives kvm from mmu->arch and can
+>   therefore dereference an invalid pointer. Only call
+>   kvm_free_stage2_pgd() for initialised MMUs.
+> - Previously, initialisation of the new MMUs was not ordered before
+>   publication of nested_mmus_size. Fix this by taking mmu_lock when
+>   increasing nested_mmus_size.
+> 
+> Fixes: 4f128f8e1aaa ("KVM: arm64: nv: Support multiple nested Stage-2 mmu structures")
+> Cc: stable@vger.kernel.org
+> Suggested-by: Marc Zyngier <maz@kernel.org>
+> Assisted-by: Claude:claude-fable-5
+> Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
 
-Ensuring KVM_REQ_VM_DEAD is never cleared will allow relaxing KVM's rule
-that ioctls can't be invoked on dead VMs, to only disallow ioctls if the
-VM is bugged, i.e. if KVM hit a KVM_BUG_ON().
+[...]
 
-Opportunistically add compile-time assertions to guard against clearing
-KVM_REQ_VM_DEAD through the standard APIs.
+>  int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm *kvm = vcpu->kvm;
+> -	struct kvm_s2_mmu *tmp;
+> -	int num_mmus, ret = 0;
+> +	struct kvm_s2_mmu *mmu;
+> +	int num_mmus, ret = 0, i;
+>  
+>  	if (test_bit(KVM_ARM_VCPU_HAS_EL2_E2H0, kvm->arch.vcpu_features) &&
+>  	    !cpus_have_final_cap(ARM64_HAS_HCR_NV1))
+> @@ -91,42 +104,38 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
+>  	 */
+>  	num_mmus = atomic_read(&kvm->online_vcpus) * S2_MMU_PER_VCPU;
+>  
+> -	if (num_mmus > kvm->arch.nested_mmus_size) {
+> -		tmp = kvcalloc(num_mmus, sizeof(*tmp), GFP_KERNEL_ACCOUNT);
+> -		if (!tmp)
+> -			return -ENOMEM;
+> -
+> -		write_lock(&kvm->mmu_lock);
+> +	if (num_mmus <= kvm->arch.nested_mmus_size)
+> +		return 0;
+>  
+> -		if (kvm->arch.nested_mmus_size) {
+> -			memcpy(tmp, kvm->arch.nested_mmus,
+> -			       size_mul(sizeof(*tmp), kvm->arch.nested_mmus_size));
+> +	lockdep_assert_held(&kvm->arch.config_lock);
+>  
+> -			for (int i = 0; i < kvm->arch.nested_mmus_size; i++)
+> -				tmp[i].pgt->mmu = &tmp[i];
+> +	for (i = 0; i < S2_MMU_PER_VCPU; i++) {
+> +		mmu = kzalloc_obj(*mmu, GFP_KERNEL_ACCOUNT);
+> +		if (!mmu) {
+> +			ret = -ENOMEM;
+> +			break;
+>  		}
+>  
+> -		swap(kvm->arch.nested_mmus, tmp);
+> -
+> -		write_unlock(&kvm->mmu_lock);
+> +		ret = init_nested_s2_mmu(kvm, mmu);
+> +		if (ret) {
+> +			kfree(mmu);
+> +			free_page((unsigned long)vcpu->arch.ctxt.vncr_array);
+> +			vcpu->arch.ctxt.vncr_array = NULL;
+> +			break;
+> +		}
+>  
+> -		kvfree(tmp);
+> +		kvm->arch.nested_mmus[kvm->arch.nested_mmus_size + i] = mmu;
+>  	}
+>  
+> -	for (int i = kvm->arch.nested_mmus_size; !ret && i < num_mmus; i++)
+> -		ret = init_nested_s2_mmu(kvm, &kvm->arch.nested_mmus[i]);
+> -
+>  	if (ret) {
+> -		for (int i = kvm->arch.nested_mmus_size; i < num_mmus; i++)
+> -			kvm_free_stage2_pgd(&kvm->arch.nested_mmus[i]);
+> -
+> -		free_page((unsigned long)vcpu->arch.ctxt.vncr_array);
+> -		vcpu->arch.ctxt.vncr_array = NULL;
+> +		while (i--)
+> +			free_nested_s2_mmu(kvm->arch.nested_mmus[kvm->arch.nested_mmus_size + i]);
+>  
+>  		return ret;
+>  	}
+>  
+> -	kvm->arch.nested_mmus_size = num_mmus;
+> +	guard(write_lock)(&kvm->mmu_lock);
+> +	kvm->arch.nested_mmus_size += S2_MMU_PER_VCPU;
+>  
+>  	return 0;
+>  }
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
+Hey sorry for nitpicking once more, I actually like v2 more, as this
+version splits the error handling to two places. Marc's implementation
+[1] is also good, but that requires a twist in kvm_arch_flush_shadow_all().
+So I'd personally go with v2 (+my suggestions for it :)), but also fine if
+others have other opinions.
 
-This was previously posted as part of a series to add an ioctl to allow
-userspace to terminate a TDX VM.  I'm posting it separately because it fixes
-a very real flaw, although the flaw is probably benign in practice?  I don't
-want to find out though, i.e. I don't want to wait to get this merged.
+I also think the comment in kvm_vcpu_init_nested() is worth adjusting
+slightly, too.
 
-This came back on my radar when fixing a bug in x86's pre-fault code, and
-looking at that code made it pretty clear that clearing KVM_REQ_VM_DEAD could
-make a bad situation worse.
+Thanks,
+Wei-Lin Chang
 
- arch/arm64/kvm/arm.c     | 2 +-
- arch/x86/kvm/mmu/mmu.c   | 2 +-
- arch/x86/kvm/vmx/tdx.c   | 2 +-
- arch/x86/kvm/x86.c       | 2 +-
- include/linux/kvm_host.h | 9 +++++++--
- 5 files changed, 11 insertions(+), 6 deletions(-)
+[1]: https://lore.kernel.org/kvmarm/86mrv2arf2.wl-maz@kernel.org/
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 50adfff75be8..a56ead423897 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1108,7 +1108,7 @@ static int kvm_vcpu_suspend(struct kvm_vcpu *vcpu)
- static int check_vcpu_requests(struct kvm_vcpu *vcpu)
- {
- 	if (kvm_request_pending(vcpu)) {
--		if (kvm_check_request(KVM_REQ_VM_DEAD, vcpu))
-+		if (kvm_test_request(KVM_REQ_VM_DEAD, vcpu))
- 			return -EIO;
- 
- 		if (kvm_check_request(KVM_REQ_SLEEP, vcpu))
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index c519e8e8d646..ec34caa06b6a 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -5033,7 +5033,7 @@ static int kvm_tdp_page_prefault(struct kvm_vcpu *vcpu, gpa_t gpa,
- 		if (signal_pending(current))
- 			return -EINTR;
- 
--		if (kvm_check_request(KVM_REQ_VM_DEAD, vcpu))
-+		if (kvm_test_request(KVM_REQ_VM_DEAD, vcpu))
- 			return -EIO;
- 
- 		cond_resched();
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index b272c20586a7..6c842e9191a5 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -1995,7 +1995,7 @@ static int tdx_handle_ept_violation(struct kvm_vcpu *vcpu)
- 		if (kvm_vcpu_has_events(vcpu) || signal_pending(current))
- 			break;
- 
--		if (kvm_check_request(KVM_REQ_VM_DEAD, vcpu)) {
-+		if (kvm_test_request(KVM_REQ_VM_DEAD, vcpu)) {
- 			ret = -EIO;
- 			break;
- 		}
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index d94b59140c45..0af4b4a95c2d 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -8060,7 +8060,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 	bool req_immediate_exit = false;
- 
- 	if (kvm_request_pending(vcpu)) {
--		if (kvm_check_request(KVM_REQ_VM_DEAD, vcpu)) {
-+		if (kvm_test_request(KVM_REQ_VM_DEAD, vcpu)) {
- 			r = -EIO;
- 			goto out;
- 		}
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 03bfc92864b6..cf7fe835c4ad 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -2324,13 +2324,18 @@ static inline bool kvm_test_request(int req, struct kvm_vcpu *vcpu)
- 	return test_bit(req & KVM_REQUEST_MASK, (void *)&vcpu->requests);
- }
- 
--static inline void kvm_clear_request(int req, struct kvm_vcpu *vcpu)
-+static __always_inline void kvm_clear_request(int req, struct kvm_vcpu *vcpu)
- {
-+	BUILD_BUG_ON(req == KVM_REQ_VM_DEAD);
-+
- 	clear_bit(req & KVM_REQUEST_MASK, (void *)&vcpu->requests);
- }
- 
--static inline bool kvm_check_request(int req, struct kvm_vcpu *vcpu)
-+static __always_inline bool kvm_check_request(int req, struct kvm_vcpu *vcpu)
- {
-+	/* Once a VM is dead, it needs to stay dead. */
-+	BUILD_BUG_ON(req == KVM_REQ_VM_DEAD);
-+
- 	if (kvm_test_request(req, vcpu)) {
- 		kvm_clear_request(req, vcpu);
- 
+[...]
 
-base-commit: a806d364ef288a6443a1337820ea8410a7ccc6b3
--- 
-2.55.0.679.g6767b8d81c-goog
-
+> @@ -1273,10 +1282,10 @@ void kvm_arch_flush_shadow_all(struct kvm *kvm)
+>  	int i;
+>  
+>  	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
+> -		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+> +		struct kvm_s2_mmu *mmu = kvm->arch.nested_mmus[i];
+>  
+>  		if (!WARN_ON(atomic_read(&mmu->refcnt)))
+> -			kvm_free_stage2_pgd(mmu);
+> +			free_nested_s2_mmu(mmu);
+>  	}
+>  	kvfree(kvm->arch.nested_mmus);
+>  	kvm->arch.nested_mmus = NULL;
+> -- 
+> 2.39.5 (Apple Git-154)
+> 
