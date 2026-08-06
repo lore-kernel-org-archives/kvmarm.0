@@ -1,114 +1,122 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87B343ED3B3;
-	Thu,  6 Aug 2026 09:35:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DB32438004;
+	Thu,  6 Aug 2026 09:52:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786008954; cv=none; b=TV+vsxjS5qMo+Wj9DE/iAwe4KIUqx/k+adxWg+r4dk0eGWkLQx17uinokAX/r+ncZOtfASXWuwIFfVzYPUZsUQOmYoqYdVsGQLM2rCExFn+7k8qdyRRyrG/LcmC3d4kqNDG+fls4Iyeg/yE9mH5RiBUcfvNdr5mABVmh9bPY4IM=
+	t=1786009946; cv=none; b=lJQy6lfYSM+rfT8geWPjbC5VIHwRFjeNQ/USlKnUx7joNfFtvNCp42QkfMdjQ9h//7Nfj153Zf05bTTZ9ZIuMjxpQTmSxITR68zUdaEcEfLz0xxjEH8J4CTiZLt5nvqmNzAgCxrnSCLdTkh3DB8BISHh3BcoTm2Ywtdh9McEkRw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786008954; c=relaxed/simple;
-	bh=KbwxlGICKFXhHrYvbv54R8rJFBMxY0dH5agXYHQbRGc=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=mG+gBu9oXVJuwZfnDYmxAY9jOCeXO2MYGrt4dv+m+4m/hthnDFuaUnBg2Facb7XIM+ejBfehaKfAJbFsJF5hbYAIrBImmFEKbyoBy04bpqlwByMHXuDmYjj3MOh0NYNKKudrfhYvv0Rts/F1CEQLrefdOc94DmTVw30K89Fo+Bg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A377F1om; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786009946; c=relaxed/simple;
+	bh=wfOtogsiDhdgFl5X25Hmcqc7cHMVFzmxiJMPo7wbrk8=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=H/e8IDYGXz0ILj1T0d8hWWQ/ZXQryOOw9a9PbVG9QW+xiBw8IxrQUSGt/MYx6yha4zIaAbTCFtjwgAZyHhCHoqartjIRFDVrpckTgxmwTnZoqTuuG+FRY401T71uwmR4CvjbmmrFpqGi/RxBiY5Qm7WgJ2htWTH5MVljGv/t2Z8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bu2g3P7Y; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A377F1om"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9F4B1F00A3A;
-	Thu,  6 Aug 2026 09:35:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bu2g3P7Y"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB1351F00A3A;
+	Thu,  6 Aug 2026 09:52:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786008953;
-	bh=6XrKrsZiqomYZfhCqpUHERezyM0DCfcB71KnYkpRsE8=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=A377F1omUPUOI9j5MGHi6HzZVSsiOujuLHkltaUzMp/zzA7zqv038wBiYfIpTD7UT
-	 W7RNBKe7GajcHUcqtSNpU1XMuPt5G1cpM4+pOHJjs6lBrTrltbN+WD7dH5jDOJVCtG
-	 IHag1/RATS4/oywPBGXDbhOJ4xDv7IBgse+Oa+K4Ms0ec5dT4L6KfDzmGmtM0PuIym
-	 aXy1rEK9Cb2u8Pfq7fj+qhkKcXpQV3sOgbBb7bPFOM6YusLSFlRJDy7U2NYdfYNoGt
-	 u6njQ+vr/USD22HfEie1A6xuNhs7La2iMrMu0TaIOBLixoYVGuAwVYMtjc0eIDeFMF
-	 XshcmfWnHDDZw==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2 8/8] KVM: arm64: Add VNCR TLB tracking again
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Marc Zyngier" <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, "Marc Zyngier" <maz@kernel.org>, "Oliver
- Upton" <oupton@kernel.org>
-In-Reply-To: <20260806091026.620700-9-maz@kernel.org>
+	s=k20260515; t=1786009944;
+	bh=yy/PBymCnUnAsLNJv5RqBWp45lwidiqpkJnTenKI7GE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=Bu2g3P7YeC/Cw9wNhPftVtqXbNKoevmqRtZZbh2Cdi5mjmCTu5DR5dsLgGB8BNtFj
+	 8LQ7K0WVs/4/Rsg3NSEa1O8dYlxqbjC9o+bD9UxH2zikEdFjq6VpspvN63vrydf3d9
+	 vqN+L0QEyRm4BrkN6X+QqKmbnK6IzjG5KQ9U+JwTDzQS2lG7PBNe1mp98VCER7AVSc
+	 3z6x5PuAIqELx4TYjCP/75MV3L25yJ1ts+4kWF3OA1fjsG98D1Z/BqnOZu6GJkzGxD
+	 TimvPqGCM1Rh5uMLz9RVZeZ5SW4420N9dNUVCQO7RROU73nwIlSu6Iu4emvNY/mtFD
+	 Kj/JiKdIcplOQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wruly-0000000CuNp-2k16;
+	Thu, 06 Aug 2026 09:52:22 +0000
+Date: Thu, 06 Aug 2026 10:52:22 +0100
+Message-ID: <86a4qzbmp5.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: sashiko-reviews@lists.linux.dev
+Cc: "Oliver Upton" <oupton@kernel.org>,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH v2 5/8] KVM: arm64: Handle VNCR TLB invalidation race with vcpu_put() VNCR unmapping
+In-Reply-To: <20260806092540.501541F000E9@smtp.kernel.org>
 References: <20260806091026.620700-1-maz@kernel.org>
- <20260806091026.620700-9-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 06 Aug 2026 09:35:52 +0000
-Message-Id: <20260806093552.C9F4B1F00A3A@smtp.kernel.org>
+	<20260806091026.620700-6-maz@kernel.org>
+	<20260806092540.501541F000E9@smtp.kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, oupton@kernel.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
+On Thu, 06 Aug 2026 10:25:39 +0100,
+sashiko-bot@kernel.org wrote:
+> 
+> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
+> 
+> Pre-existing issues:
+> - [High] Acquiring `mmu_lock` with preemption disabled causes a sleep-in-atomic bug on PREEMPT_RT kernels.
+> --
+> 
+> --- Patch [5]: [PATCH v2 5/8] KVM: arm64: Handle VNCR TLB invalidation race with vcpu_put() VNCR unmapping ---
+> commit 7a7c469ac4158e77c3548a526ab62a924ed75161
+> Author: Marc Zyngier <maz@kernel.org>
+> 
+> KVM: arm64: Handle VNCR TLB invalidation race with vcpu_put() VNCR unmapping
+> 
+> This patch addresses a race condition between VNCR TLB invalidation and VNCR
+> unmapping during vcpu_put(). It introduces an atomic exchange for resetting
+> the cpu tracking field and a common function for unmapping, ensuring these
+> operations happen atomically. This closes the TOCTOU race and prevents
+> concurrent mapping faults.
+> 
+> Link: https://lore.kernel.org/r/20260801130237.0FD8F1F00ACA@smtp.kernel.org
+> 
+> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> > index 67cc5b6d80705..05f0e7e89e982 100644
+> > --- a/arch/arm64/kvm/nested.c
+> > +++ b/arch/arm64/kvm/nested.c
+> 
+> [ ... ]
+> 
+> > @@ -1584,8 +1607,6 @@ static void kvm_map_l1_vncr(struct kvm_vcpu *vcpu)
+> 
+> [Severity: High]
+> This is a pre-existing issue, but does acquiring mmu_lock inside a
+> preemption-disabled region here cause a sleep-in-atomic bug on RT kernels?
+> 
+> Looking at kvm_map_l1_vncr() from the context, it starts with:
+> 
+> static void kvm_map_l1_vncr(struct kvm_vcpu *vcpu)
+> {
+>         struct vncr_tlb *vt = vcpu->arch.vncr_tlb;
+>         pgprot_t prot;
+> 
+>         guard(preempt)();
+>         guard(read_lock)(&vcpu->kvm->mmu_lock);
+> 
+> Since read_lock() is implemented as an RT-mutex on PREEMPT_RT and can block,
+> could this sequence trigger a scheduling-while-atomic panic if the lock is
+> contended?
 
-Pre-existing issues:
-- [High] The fast-path TLBI handler incorrectly skips the slow path for nat=
-ive EL2 TLBI instructions when E2H or TGE is clear, bypassing software VNCR=
- TLB invalidation and leaving stale mappings.
---
+I think we need to understand what that means for the state of the
+fixmap if we get preempted at this point.
 
---- Patch [8]: [PATCH v2 8/8] KVM: arm64: Add VNCR TLB tracking again ---
-commit 65741607ee5db3e8d57cf0e1773bb1031e83a3ee
-Author: Marc Zyngier <maz@kernel.org>
+I think it is OK as long as the read_lock itself disables preemption
+but this is sketchy. In any case, RT+NV is not something I wish to
+think about right now.
 
-KVM: arm64: Add VNCR TLB tracking again
+	M.
 
-This commit introduces a VM-wide counter to track valid VNCR TLBs. It aims
-to improve performance by taking the TLBI slow path only when there are
-active VNCR TLBs that need invalidation.
-
-> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/swi=
-tch.c
-> --- a/arch/arm64/kvm/hyp/vhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-[ ... ]
-> @@ -424,10 +424,15 @@ static bool kvm_hyp_handle_tlbi_el2(struct kvm_vcpu=
- *vcpu, u64 *exit_code)
->  		return false;
-> =20
->  	/*
-> -	 * If we have to check for any VNCR mapping being invalidated,
-> -	 * go back to the slow path for further processing.
-> +	 * If we have to check for any VNCR TLB being invalidated, go back
-> +	 * to the slow path for further processing.
-> +	 *
-> +	 * The synchronisation betweem TLBI and walk is provided by the
-> +	 * speculative increment of the TLB counter on walk, and the
-> +	 * invalidation counter. Yes, this is fiddly.
->  	 */
-> -	if (vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu))
-> +	if (vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu) &&
-> +	    atomic_read(&vcpu->kvm->arch.vncr_tlb_count))
->  		return false;
-
-[Severity: High]
-This is a pre-existing issue, but does this condition incorrectly skip the
-slow path for native EL2 TLBI instructions when E2H or TGE is clear?
-
-If a nested hypervisor running in nVHE mode (E2H=3D0) or temporarily cleari=
-ng
-TGE executes an S1E2 TLBI instruction, kvm_hyp_handle_tlbi_el2() will execu=
-te
-the hardware TLBI. However, since the fallback check requires both E2H and =
-TGE
-to be set, it evaluates to false. This returns true and bypasses the softwa=
-re
-VNCR TLB invalidation.
-
-Should the check instead read atomic_read(&vcpu->kvm->arch.vncr_tlb_count)
-unconditionally for any successful EL2 S1 TLBI so that stale software VNCR
-mappings aren't left behind?
-
-> =20
->  	__kvm_skip_instr(vcpu);
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260806091026.6207=
-00-1-maz@kernel.org?part=3D8
+-- 
+Without deviation from the norm, progress is not possible.
