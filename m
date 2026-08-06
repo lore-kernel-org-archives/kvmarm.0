@@ -1,122 +1,104 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DB32438004;
-	Thu,  6 Aug 2026 09:52:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A5F73D5229
+	for <kvmarm@lists.linux.dev>; Thu,  6 Aug 2026 10:03:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786009946; cv=none; b=lJQy6lfYSM+rfT8geWPjbC5VIHwRFjeNQ/USlKnUx7joNfFtvNCp42QkfMdjQ9h//7Nfj153Zf05bTTZ9ZIuMjxpQTmSxITR68zUdaEcEfLz0xxjEH8J4CTiZLt5nvqmNzAgCxrnSCLdTkh3DB8BISHh3BcoTm2Ywtdh9McEkRw=
+	t=1786010633; cv=none; b=MLZRMyGrdrhM+pa8LpOVJGIK8caL4nl33DIzMLBTvL3wK5+y3KZXgWTSnxGkwX/deplyoZaJuBFv4Re8V37RhQvTrT0lHH7YUtOGHCHtkzVKmWQdHvG6/p/m8Ge67dW1PW2G5P6MjCtiNUACylW7tMN/DGt9ysJ6oqLy1gaclAQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786009946; c=relaxed/simple;
-	bh=wfOtogsiDhdgFl5X25Hmcqc7cHMVFzmxiJMPo7wbrk8=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=H/e8IDYGXz0ILj1T0d8hWWQ/ZXQryOOw9a9PbVG9QW+xiBw8IxrQUSGt/MYx6yha4zIaAbTCFtjwgAZyHhCHoqartjIRFDVrpckTgxmwTnZoqTuuG+FRY401T71uwmR4CvjbmmrFpqGi/RxBiY5Qm7WgJ2htWTH5MVljGv/t2Z8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bu2g3P7Y; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786010633; c=relaxed/simple;
+	bh=KYoGU+OGRT1b3u/3rPF3W7y1lsPkKfvdYF3xaIRH2LE=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=nbfy+i1Wa461evYDnAk8FCuhj3nCcvWcdIos0ckzNpf4aL+jQG7ZHUz2QepjjHxSr1QaAlFork6W59jTnK5+rE9aV1IjNphoCq0pG9sOCDoC8JsM0CMv59wUE6CFvUlcYBDFPRvo0eX0S8pq2mvnnNSetAbGR4xUBZ6dO8jsIpI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Ty5O7BPe; arc=none smtp.client-ip=95.215.58.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bu2g3P7Y"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB1351F00A3A;
-	Thu,  6 Aug 2026 09:52:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786009944;
-	bh=yy/PBymCnUnAsLNJv5RqBWp45lwidiqpkJnTenKI7GE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=Bu2g3P7YeC/Cw9wNhPftVtqXbNKoevmqRtZZbh2Cdi5mjmCTu5DR5dsLgGB8BNtFj
-	 8LQ7K0WVs/4/Rsg3NSEa1O8dYlxqbjC9o+bD9UxH2zikEdFjq6VpspvN63vrydf3d9
-	 vqN+L0QEyRm4BrkN6X+QqKmbnK6IzjG5KQ9U+JwTDzQS2lG7PBNe1mp98VCER7AVSc
-	 3z6x5PuAIqELx4TYjCP/75MV3L25yJ1ts+4kWF3OA1fjsG98D1Z/BqnOZu6GJkzGxD
-	 TimvPqGCM1Rh5uMLz9RVZeZ5SW4420N9dNUVCQO7RROU73nwIlSu6Iu4emvNY/mtFD
-	 Kj/JiKdIcplOQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wruly-0000000CuNp-2k16;
-	Thu, 06 Aug 2026 09:52:22 +0000
-Date: Thu, 06 Aug 2026 10:52:22 +0100
-Message-ID: <86a4qzbmp5.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: sashiko-reviews@lists.linux.dev
-Cc: "Oliver Upton" <oupton@kernel.org>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ty5O7BPe"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1786010627;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MWi0NI9m0cyCHv/YKcE74ooCGwGwg2XY1zvoMF0Rkgs=;
+	b=Ty5O7BPeeLVaIMGJXZp3xJGEA2mnwh1wjVXmlLzlgjj2LEBj8CpEOEdsgWEGQA42Cgf4sj
+	CT531aboWPk63SaGlPDGkRBcWRek2DwgQE1mx1KHu32gBQF1Ay1QCy7IQY8+IAS0jTIKPR
+	yOGYyINxpEkeLq1fsQqSfGFc7snBLZ0=
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH v2 5/8] KVM: arm64: Handle VNCR TLB invalidation race with vcpu_put() VNCR unmapping
-In-Reply-To: <20260806092540.501541F000E9@smtp.kernel.org>
-References: <20260806091026.620700-1-maz@kernel.org>
-	<20260806091026.620700-6-maz@kernel.org>
-	<20260806092540.501541F000E9@smtp.kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	linux-kernel@vger.kernel.org
+Cc: Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Sascha Bischoff <Sascha.Bischoff@arm.com>
+Subject: [PATCH v1 1/4] KVM: arm64: Validate the host-provided vgic model in pKVM
+Date: Thu,  6 Aug 2026 11:02:53 +0100
+Message-Id: <20260806100256.371164-2-fuad.tabba@linux.dev>
+In-Reply-To: <20260806100256.371164-1-fuad.tabba@linux.dev>
+References: <20260806100256.371164-1-fuad.tabba@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, oupton@kernel.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, 06 Aug 2026 10:25:39 +0100,
-sashiko-bot@kernel.org wrote:
-> 
-> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> 
-> Pre-existing issues:
-> - [High] Acquiring `mmu_lock` with preemption disabled causes a sleep-in-atomic bug on PREEMPT_RT kernels.
-> --
-> 
-> --- Patch [5]: [PATCH v2 5/8] KVM: arm64: Handle VNCR TLB invalidation race with vcpu_put() VNCR unmapping ---
-> commit 7a7c469ac4158e77c3548a526ab62a924ed75161
-> Author: Marc Zyngier <maz@kernel.org>
-> 
-> KVM: arm64: Handle VNCR TLB invalidation race with vcpu_put() VNCR unmapping
-> 
-> This patch addresses a race condition between VNCR TLB invalidation and VNCR
-> unmapping during vcpu_put(). It introduces an atomic exchange for resetting
-> the cpu tracking field and a common function for unmapping, ensuring these
-> operations happen atomically. This closes the TOCTOU race and prevents
-> concurrent mapping faults.
-> 
-> Link: https://lore.kernel.org/r/20260801130237.0FD8F1F00ACA@smtp.kernel.org
-> 
-> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> > index 67cc5b6d80705..05f0e7e89e982 100644
-> > --- a/arch/arm64/kvm/nested.c
-> > +++ b/arch/arm64/kvm/nested.c
-> 
-> [ ... ]
-> 
-> > @@ -1584,8 +1607,6 @@ static void kvm_map_l1_vncr(struct kvm_vcpu *vcpu)
-> 
-> [Severity: High]
-> This is a pre-existing issue, but does acquiring mmu_lock inside a
-> preemption-disabled region here cause a sleep-in-atomic bug on RT kernels?
-> 
-> Looking at kvm_map_l1_vncr() from the context, it starts with:
-> 
-> static void kvm_map_l1_vncr(struct kvm_vcpu *vcpu)
-> {
->         struct vncr_tlb *vt = vcpu->arch.vncr_tlb;
->         pgprot_t prot;
-> 
->         guard(preempt)();
->         guard(read_lock)(&vcpu->kvm->mmu_lock);
-> 
-> Since read_lock() is implemented as an RT-mutex on PREEMPT_RT and can block,
-> could this sequence trigger a scheduling-while-atomic panic if the lock is
-> contended?
+EL2 copies vgic_model from the host's struct kvm unchecked, and the nVHE
+world switch dispatches on it with no cpucap guard. A host writing
+KVM_DEV_TYPE_ARM_VGIC_V5 makes EL2 access GICv5 CPU interface registers,
+which are UNDEFINED without FEAT_GCIE and panic the hypervisor on any
+GICv3 machine.
 
-I think we need to understand what that means for the state of the
-fixmap if we get preempted at this point.
+Accept only the models pKVM can run, forcing anything else to 0.
 
-I think it is OK as long as the read_lock itself disables preemption
-but this is sketchy. In any case, RT+NV is not something I wish to
-think about right now.
+Fixes: 9b8e3d4ca0e73 ("KVM: arm64: gic-v5: Implement GICv5 load/put and save/restore")
+Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+---
+ arch/arm64/kvm/hyp/nvhe/pkvm.c | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
 
-	M.
-
+diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+index 24d6f164129ac..59bb15efdca42 100644
+--- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
++++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+@@ -340,13 +340,25 @@ static void pkvm_init_features_from_host(struct pkvm_hyp_vm *hyp_vm, const struc
+ {
+ 	struct kvm *kvm = &hyp_vm->kvm;
+ 	unsigned long host_arch_flags = READ_ONCE(host_kvm->arch.flags);
++	u32 vgic_model = READ_ONCE(host_kvm->arch.vgic.vgic_model);
+ 	DECLARE_BITMAP(allowed_features, KVM_VCPU_MAX_FEATURES);
+ 
+ 	/* CTR_EL0 is always under host control, even for protected VMs. */
+ 	hyp_vm->kvm.arch.ctr_el0 = host_kvm->arch.ctr_el0;
+ 
+-	/* Preserve the vgic model so that GICv3 emulation works */
+-	hyp_vm->kvm.arch.vgic.vgic_model = host_kvm->arch.vgic.vgic_model;
++	/*
++	 * Preserve the vgic model for GICv3 emulation, but only what pKVM can
++	 * run: the GICv5 world switch touches registers UNDEFINED at EL2
++	 * without FEAT_GCIE. 0 is not a valid kvm_device_type: "no vgic".
++	 */
++	switch (vgic_model) {
++	case KVM_DEV_TYPE_ARM_VGIC_V2:
++	case KVM_DEV_TYPE_ARM_VGIC_V3:
++		break;
++	default:
++		vgic_model = 0;
++	}
++	hyp_vm->kvm.arch.vgic.vgic_model = vgic_model;
+ 
+ 	/* No restrictions for non-protected VMs. */
+ 	if (!kvm_vm_is_protected(kvm)) {
 -- 
-Without deviation from the norm, progress is not possible.
+2.39.5
+
