@@ -1,36 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A49EB413786;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4B024229D0;
 	Thu,  6 Aug 2026 09:10:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786007436; cv=none; b=iCuyo6o1oi36h1OPCJi5vWykGtL3Ug5OYHRRl8xGAyEFn4d0LOErM0enfDDLjSXbcnn1C8tCREfwNTqGAfxG0RTe0e8tck3j1dU2IHNdm42kLCSxlbVisLXi+k5kVUfPcM0PoG5/mzzBekUZFnzbNhoZr4FXORkQXRB0qJkyXBo=
+	t=1786007436; cv=none; b=iv4XFQOFpA+hIIOGPvnl4aqFPxT++7YI2FgSgn6ba91YpCqbvnlfJ7WdZMHJB4sdMKiBdFxj5WhnywsxHFRxFZXOd5rWSwYf9TztmTRy9j9FQriwYkbV9tGh3eBRF8ZPZuh83C/AwO9MD+MzIb2bn4PtY6/f2UAszR5tKHyDuXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1786007436; c=relaxed/simple;
-	bh=8+zqllbEdqgMqzkU1SVo6YBPkX0Z0ssx7JhH/BTKah8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sTH4UqZgvliwwOD/qC5Cv6MMubHNu2EbripV9vwkVwhdPDRts4defLVsLq4m3tMHhYWjx6xnqBIlOu2mdiGn/KnhA4WgJRPhww/odJ2Ukb/Ej2TZfr6n4nsBNdb6BaW0wrvuE1JQnDWfTLDgpQp7aobPzcnARRlko/PUKku8Gkc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bjZ38nMP; arc=none smtp.client-ip=100.103.45.18
+	bh=UKJi7F6Ti2WX/mFEgYxUB+ZxN2Uzlw5SDNU2jlgxLsI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=fXumik4NmJxzVbWM3f1MSFlIg4EyaoPXGikJbltzHSS1xjfQdvihDFmscwxHlRqE09ciSrE2x4Ub8H2I/WWvi1ioXjXevSTokVYK/SiR0j4DMO52cPRZqzvnm0qflIr9XBlc6O9tDy0V0j7jocEa7LDcR6vXV84BcWIL/AuV2sY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hrlYiL6A; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bjZ38nMP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 439701F00A3A;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hrlYiL6A"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7047D1F01559;
 	Thu,  6 Aug 2026 09:10:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1786007434;
-	bh=ekP/15RiyRS1mHmgBngaG2DUHSQ1RkRl7k1DMWmUVvw=;
-	h=From:To:Cc:Subject:Date;
-	b=bjZ38nMPTWrRhP6qJYO2Hngk6a4aWbndg06pLlj//9Vspo1l+N1sSW7/y7hE3LRcu
-	 5yMXQjQzrOBznd3tREJQpbzJT7P9pttE9dUiJha6dUX7ewR95Ct2UtKN0boP4JJYe/
-	 il6zgqwFi4Cka4rLo1p/FHHkPSPSLliduSiawurp5nXy0dMKxq9epFET7y6emN6dD8
-	 r+2ffw62KVUr75sR6hh1vdpAMAFzjY0dttZ+hs7Ul2Ibib3otWnddNAmzYCcyP2RQK
-	 hvGpM/IbCkZP73tDmyQjzWc7qEmznlNHqqBaK2uiuAPDGJOPfzURhBknpf9ZNEkgVL
-	 Wy/EtXgINcohw==
+	bh=gQ8zq70y0787azP95WYE6ddYaI5CvHh9/VpExmEvz+w=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=hrlYiL6AUHSwVsGrZy5BQKpHYGfFiVMP+eiN1kClFvgN7Hy2nKce9wuEa5tJDtsDQ
+	 xNxbyoL+N0ycBsX4at6VXk9WEnX6CMrKjrIL1FRn8vLrpm0HIdTgK52fvnsE82/3bN
+	 q79LKl4awvIPHZCILgwY34u8eqgpE4ODq44vrQmVx/z5RMrbFV+a0GMYJNELSCG0Lk
+	 jC1eQ6qH6pPNij5jKlFAW31JGGFp79LxMSqh/9ngbWVovbxNgtE6t0CdaVBaAscljO
+	 jJDD7R9QoewanwYAcoDcIv4epE+s9loQdE8lRSM0LbC0xh6eLx5soNvMsADZ7zR1rg
+	 cd57302UT8qNw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wru7T-0000000CtHi-2I6S;
-	Thu, 06 Aug 2026 09:10:31 +0000
+	id 1wru7U-0000000CtHi-2vCZ;
+	Thu, 06 Aug 2026 09:10:32 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -43,11 +44,14 @@ Cc: Steffen Eiden <seiden@linux.ibm.com>,
 	Fuad Tabba <fuad.tabba@linux.dev>,
 	Hyunwoo Kim <imv4bel@gmail.com>,
 	Yao Yuan <yaoyuan@linux.alibaba.com>,
-	ljs@kernel.org
-Subject: [PATCH v2 0/8] KVM: arm64: VNCR TLB invalidation fixes
-Date: Thu,  6 Aug 2026 10:10:18 +0100
-Message-ID: <20260806091026.620700-1-maz@kernel.org>
+	ljs@kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH v2 4/8] KVM: arm64: Correctly handle end of VA space TLBI invalidation
+Date: Thu,  6 Aug 2026 10:10:22 +0100
+Message-ID: <20260806091026.620700-5-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260806091026.620700-1-maz@kernel.org>
+References: <20260806091026.620700-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -56,93 +60,112 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, fuad.tabba@linux.dev, imv4bel@gmail.com, yaoyuan@linux.alibaba.com, ljs@kernel.org
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, fuad.tabba@linux.dev, imv4bel@gmail.com, yaoyuan@linux.alibaba.com, ljs@kernel.org, stable@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Prompted by a patch [0] from Hyunwoo Kim which was addressing a pretty
-annoying corner case, I spent some time looking at what was wrong in
-our VNCR TLBI code. And there was a few things to say about it...
+Our TLB invalidation by VA code is based on comparing two ranges,
+one defined by the TLB, and one defined by the TLBI instruction.
 
-- The TLB tracking to get into the slow path is wrong. It tracks what
-  is mapped, but not the established TLBs. Kind of annoying.
+Each range is defined by a start and a size. However, the way the
+comparison is done doesn't account for address rollover, as it
+compares an address with (base + size). This works nicely until
+this expression represent the last page/block in the TTBR1 VA space,
+as the result is a big fat 0. And a failed TLB invalidation.
 
-- Handling IPA invalidation when the TLB was established with the S1
-  MMU disabled is failing for a number of reasons. This is the bug
-  that Hyunwoo Kim found, but I decided to address it at its root
-  rather than just fixing the symptoms.
+Rewrite the comparison in a way that is immune to the address
+rollover (making the end address inclusive instead of exclusive),
+and move this into a common helper that is used by both VA and IPA
+invalidations, as suggested by Hyunwoo Kim (although the IPA version
+didn't suffer from this particular problem, obviously).
 
-- Deciding to run with a VNCR TLB doesn't take the state of
-  SCTLR_EL2.M into account. Yes, it is a special sort of sport to run
-  a hypervisor with its MMU disabled...
+Fixes: 4ffa72ad8f37e ("KVM: arm64: nv: Add S1 TLB invalidation primitive for VNCR_EL2")
+Reviewed-by: Yuan Yao <yaoyuan@linux.alibaba.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Cc: stable@vger.kernel.org
+---
+ arch/arm64/kvm/nested.c | 43 ++++++++++++++++++-----------------------
+ 1 file changed, 19 insertions(+), 24 deletions(-)
 
-- TLB invalidation by VA targeting the last page/block of TTBR1_EL2 is
-  dropped on the floor, because I cannot count. This was amusing. Not.
-
-Additionally, Sashiko kindly provided some extra horrors to look at:
-
-- A missing sign extension for range invalidation results in the wrong
-  VA range being considered.
-
-- TLBI doesn't participate in the general MMU invalidation retry
-  machinery, meaning that VNCR faults and TLBIs race in an
-  uncontrolled way.
-
-- TLBI and vcpu_put() can race badly, leading to a TOCTOU pattern
-  which results in either a BUG_ON() or a call to vncr_fixmap(-1).
-
-I have fixes for each of these issues, all stable candidates.
-
-On top of that, I have a patch reintroducing the tracking that the
-first patch removes, this time in a way that is actually functional.
-Or at least I think it is...
-
-I'd like to thank Hyunwoo Kim for their initial patch and for
-providing a reproducer that helped me finding these issues by running
-it at multiple levels of nesting.
-
-It is now too late for 7.2, so let's try to make this 7.3 material
-(hence the early repost).
-
-* From v1 [1]
-
-  - Added sign extension to range invalidation (Sashiko)
-
-  - Use mmu_invalidate_seq to resolve fault vs TLBI races (Sashiko)
-
-  - Speculatively bump the TLB refcount on fault to make sure the TLBI
-    takes the slow path when we are going for a S1 walk
-
-  - Clarify the check for the TLB matching for the S1 MMU state
-
-  - Extra sanitisation added on the S2 invalidation path
-
-  - Applied RBs from Yao Yuan to the patches that didn't change, with
-    thanks.
-    
-[0] https://lore.kernel.org/r/ameGoxbn2wzBq2kL@v4bel
-[1] https://lore.kernel.org/r/20260801124818.366274-1-maz@kernel.org
-
-Marc Zyngier (8):
-  KVM: arm64: Remove VM-wide VNCR mapping counter
-  KVM: arm64: Handle negative S1 walk levels in VNCR TLB size evaluation
-  KVM: arm64: Consider SCTLR_EL2.M when mapping the L1 VNCR page
-  KVM: arm64: Correctly handle end of VA space TLBI invalidation
-  KVM: arm64: Handle VNCR TLB invalidation race with vcpu_put() VNCR
-    unmapping
-  KVM: arm64: Sign-extend VA for range-based TLBI invalidation
-  KVM: arm64: Make VNCR invalidation participate in MMU invalidation
-    retry
-  KVM: arm64: Add VNCR TLB tracking again
-
- arch/arm64/include/asm/kvm_host.h   |   4 +-
- arch/arm64/include/asm/kvm_nested.h |  14 +++
- arch/arm64/kvm/at.c                 |   2 -
- arch/arm64/kvm/hyp/vhe/switch.c     |  10 +-
- arch/arm64/kvm/nested.c             | 173 +++++++++++++++++++---------
- arch/arm64/kvm/sys_regs.c           |  11 ++
- 6 files changed, 155 insertions(+), 59 deletions(-)
-
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 27bc7ee4b3382..8a602d074dbb4 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -999,6 +999,20 @@ static void invalidate_vncr(struct vncr_tlb *vt)
+ 		clear_fixmap(vncr_fixmap(vt->cpu));
+ }
+ 
++static bool vncr_tlb_intersects(struct vncr_tlb *vt, u64 addr,
++				u64 scope_start, u64 scope_size)
++{
++	u64 tlb_size, tlb_start, tlb_end, scope_end;
++
++	tlb_size = ttl_to_size(pgshift_level_to_ttl(vt->wi.pgshift, vt->wr.level));
++
++	tlb_start = addr & ~(tlb_size - 1);
++	tlb_end = tlb_start + tlb_size - 1;
++	scope_end = scope_start + scope_size - 1;
++
++	return !(tlb_end < scope_start || tlb_start > scope_end);
++}
++
+ /*
+  * VNCR TLB invalidation occurs from MMU notifiers or TLBI instructions, and
+  * either can race against a vcpu not being onlined yet (no pseudo-TLB
+@@ -1021,19 +1035,9 @@ static void kvm_invalidate_vncr_ipa(struct kvm *kvm, u64 start, u64 end)
+ 	if (!kvm_has_feat(kvm, ID_AA64MMFR4_EL1, NV_frac, NV2_ONLY))
+ 		return;
+ 
+-	kvm_for_each_vncr_tlb(i, vcpu, vt, kvm) {
+-		u64 ipa_start, ipa_end, ipa_size;
+-
+-		ipa_size = ttl_to_size(pgshift_level_to_ttl(vt->wi.pgshift,
+-							    vt->wr.level));
+-		ipa_start = vt->wr.pa & ~(ipa_size - 1);
+-		ipa_end = ipa_start + ipa_size;
+-
+-		if (ipa_end <= start || ipa_start >= end)
+-			continue;
+-
+-		invalidate_vncr(vt);
+-	}
++	kvm_for_each_vncr_tlb(i, vcpu, vt, kvm)
++		if (vncr_tlb_intersects(vt, vt->wr.pa, start, end - start))
++			invalidate_vncr(vt);
+ }
+ 
+ struct s1e2_tlbi_scope {
+@@ -1059,28 +1063,19 @@ static void invalidate_vncr_va(struct kvm *kvm,
+ 	lockdep_assert_held_write(&kvm->mmu_lock);
+ 
+ 	kvm_for_each_vncr_tlb(i, vcpu, vt, kvm) {
+-		u64 va_start, va_end, va_size;
+-
+-		va_size = ttl_to_size(pgshift_level_to_ttl(vt->wi.pgshift,
+-							   vt->wr.level));
+-		va_start = vt->gva & ~(va_size - 1);
+-		va_end = va_start + va_size;
+-
+ 		switch (scope->type) {
+ 		case TLBI_ALL:
+ 			break;
+ 
+ 		case TLBI_VA:
+-			if (va_end <= scope->va ||
+-			    va_start >= (scope->va + scope->size))
++			if (!vncr_tlb_intersects(vt, vt->gva, scope->va, scope->size))
+ 				continue;
+ 			if (vt->wr.nG && vt->wr.asid != scope->asid)
+ 				continue;
+ 			break;
+ 
+ 		case TLBI_VAA:
+-			if (va_end <= scope->va ||
+-			    va_start >= (scope->va + scope->size))
++			if (!vncr_tlb_intersects(vt, vt->gva, scope->va, scope->size))
+ 				continue;
+ 			break;
+ 
 -- 
 2.47.3
 
