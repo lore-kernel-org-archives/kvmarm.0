@@ -1,112 +1,79 @@
-Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com [209.85.215.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 144C83AA9D8
-	for <kvmarm@lists.linux.dev>; Thu,  6 Aug 2026 01:14:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C24433859E9;
+	Thu,  6 Aug 2026 04:43:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785978858; cv=none; b=espwIKDCP+9tBghix5J7YGbR0HXNNN7WjWP7JK9BxBUAnWfAIlmq0PUyYjBmgtl4K4DX2R7watYez4yjRFHExmcD2Ny0IeVZUEH4GRlDtXvza3LDg4B67NsCcWxW6PQDbwJQcV3pk04Bvf2DIRVqrrMul5EeDKPcFaQHuWtGu7o=
+	t=1785991392; cv=none; b=U4oWK6XhgCHAgUNIjfRbOn3AIayfhAq5aEyIZ2raXq4IaF+IQ2FBHHQfr0vQLghm29jFSIYBDPHqK9IkiUpKxY90ANRqLLqedVuc5Lcbv65Ij8x1dDXxDIOmT09TaCJRTq798I6rmnkno4Q9iuMXFCKa3puiKFkEC0eTo5f6ZMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785978858; c=relaxed/simple;
-	bh=FnURd9znNvpM1kqH7h6q11jvcJIcgM8HdPz6ZSRX88c=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=sBSTktgeJoJd/LChvAqsOJ4O1mnEXCu8Vihx9TxirX8wKngjSAbnK6jZUDILrKfUV81lXya1YqKTETF1Dn+swEWJ5oSCL7ei0OmMDmgd+HMpN3+VVj4+nAvbGQfsZTM3v4QihJuImMJd6WHuJrFyFqg+zlwt1Rs3ynV7ypxuZbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tboHgdPE; arc=none smtp.client-ip=209.85.215.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1785991392; c=relaxed/simple;
+	bh=rad9tPjK5xL8zCcJUV+tMq9GGs3okrFDeFJl0dJp0iw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=S0QH2+Xwfj1VDBHw5QSjYPYUOVre+k/rB4o/PjI2rDAqEA7WUfb65RJ/52ccOgdnK5T/L5Ya7ONjhLEIAlNDBVb9FOC9bZobS2pj8d9efjTTr1fYrsl2xbGOQzBglUBYDRGo4CI17eI8iIshp0ZVyNjAg9PnUEhuey1FJsdbQuo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C8WZ96F5; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tboHgdPE"
-Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-ca7c1e22995so2373330a12.3
-        for <kvmarm@lists.linux.dev>; Wed, 05 Aug 2026 18:14:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1785978855; x=1786583655; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=EllBK4pohN2CB4+9rC08wwxbJTVXkdymq5nTAYfElqk=;
-        b=tboHgdPEs+Z2Em47CsAbftP0I2c7gddGzC2qVP5BfTNERRd5FOQpnt2Tcw/F7bu8e6
-         YyaL35PUq9u+eDrPQulXb9HeYJSKDQ096Hh4/t9fn8WjnsWHHuvl2Qu0W9nz3uZXk9vc
-         S5OrvRyEBiESoAimTJ0YgrIkE1SJagDls7fo/ewBU8mTr0n5VgC6uWzbOSz/cQTOTVcb
-         sUORAG/FpgX3Nz6tcjtggRbw4Fl3044HuZwuab12+UZRsB5vlGqyHoQuq7D0fkbINP3Y
-         jpUU/+46mJ9NOHFvATu5hMpmYS7tiaAFg+9zCn8gWLOZY/GsR2ytsqdHfOeQGbexZgEd
-         Ov1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785978855; x=1786583655;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=EllBK4pohN2CB4+9rC08wwxbJTVXkdymq5nTAYfElqk=;
-        b=K83y2dTci6Vmzx3YRq6DSP1nejfs/TGNRorSQwIBXQdVthVnkOkHepH+IDSqcFAtwR
-         PNxkyw9VfDbbFP58yXu+xHquTT02YS5PVqO1Me/SUYZyqZ5Vyd48Dk3h+mOciVc9np/z
-         /DA2X9kETM36LPTn6uxTrK1wKoofq/i4Qe5blMcVB6+27fh6/rodPrOUQI1jsDsdmic1
-         L6svSHcuqeFZoUN7/kbelGvFWXFCrrk/ASAplFFRgxBWZJIxFJzkBUpOyzmHQjmtR362
-         HXwLuWOTWCIHMdBD+ghfJFrzwmCBLrp+hNtiT0Kr+nxtlggnU5FqPteVzzUdM8yslzIA
-         TMPg==
-X-Forwarded-Encrypted: i=1; AHgh+Rpo2ijdW8Vppp4pJDusvMw5RdeQalBqD6xghd+eC6E9fy0gx4aGGzCj1LWGjMRY3jHsOzc35D0=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzajOe9ooKkkJypBccPl2e9Sn8k4JDRsBmO6SKy/IOdfVNLjxYx
-	cahckPGl6/jjTk5y4u3hqd5uVXZwpZNwIPDNWOFUWfarg1QA3cmIf4XntjSsfZK0jlvdB4X1EgV
-	4Yg2vOA==
-X-Received: from pfbi27-n2.prod.google.com ([2002:a05:6a00:a51b:20b0:84e:99ac:46cc])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:c93:b0:84a:29a7:f650
- with SMTP id d2e1a72fcca58-84f2de6ab12mr11213223b3a.0.1785978855213; Wed, 05
- Aug 2026 18:14:15 -0700 (PDT)
-Date: Wed, 5 Aug 2026 18:14:14 -0700
-In-Reply-To: <CAEvNRgGDhcu2LUqhwVtGJSUo4uXQHrGOYRDaM2qzPTO4LX=jKQ@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C8WZ96F5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 297D71F00A3A;
+	Thu,  6 Aug 2026 04:43:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785991391;
+	bh=4SVxBCorFWnwDAuAecXmW1rPgG8B8npbUR3574wL1DE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=C8WZ96F5i/eogrhOVIrrB+nQUrCTef7IwXFM+DwBzsVBrp60Syip/QwKNOlf2Bsuc
+	 KDKfq+OmfJQs8ps7Is1NxOtxu57OVphU0FVT3JGqUNomcrF9opEwTr+7isWZwyhmE3
+	 ckIXShRJLj5DKD3S/en55L4sjLJ55/bcvQusw9HLe+HQoqZ0m9MdFNJd64uLXz3tlt
+	 0+f7CIXkeD82WO/0uBwduwoVB5YAGvKszlmdE53BEfYbodUEXxJbpLuYKNcyHYHInF
+	 k+ELTE6bOam1d0Loz5RP/BOvSRwroZGXyN8dDJFJ3ohG8ApMixA2ebMn6z80WZQ18+
+	 T8RazoXxNRouQ==
+Date: Wed, 5 Aug 2026 21:43:09 -0700
+From: Oliver Upton <oupton@kernel.org>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>,
+	Sascha Bischoff <sascha.bischoff@arm.com>,
+	Sebastian Ene <sebastianene@google.com>, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/3] KVM: arm64: vgic-its: Don't dereference a NULL
+ collection on ITT save
+Message-ID: <anQQ3dcbk72N1g1a@kernel.org>
+References: <20260805093828.3626610-1-fuad.tabba@linux.dev>
+ <20260805093828.3626610-2-fuad.tabba@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20260728121138.1103610-1-tarunsahu@google.com>
- <20260728121138.1103610-4-tarunsahu@google.com> <20260728122655.17C791F00A3A@smtp.kernel.org>
- <CAEvNRgGDhcu2LUqhwVtGJSUo4uXQHrGOYRDaM2qzPTO4LX=jKQ@mail.gmail.com>
-Message-ID: <anPf5lLNZ5OtwXor@google.com>
-Subject: Re: [PATCH v4 03/11] KVM: Export kvm_uevent_notify_vm_create()
-From: Sean Christopherson <seanjc@google.com>
-To: Ackerley Tng <ackerleytng@google.com>
-Cc: sashiko-reviews@lists.linux.dev, Tarun Sahu <tarunsahu@google.com>, 
-	kvm@vger.kernel.org, kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>, 
-	Marc Zyngier <maz@kernel.org>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260805093828.3626610-2-fuad.tabba@linux.dev>
 
-On Thu, Jul 30, 2026, Ackerley Tng wrote:
-> sashiko-bot@kernel.org writes:
-> > --- Patch [3]: [PATCH v4 03/11] KVM: Export kvm_uevent_notify_vm_create() ---
-> > commit 5e642ea16f0d267e622a352de60bfe397ecf79df
-> > Author: Tarun Sahu <tarunsahu@google.com>
-> >
-> > KVM: Export kvm_uevent_notify_vm_create()
-> >
-> > This commit exposes the kvm_uevent_notify_vm_create function to allow
-> > triggering KVM event notifications during VM creation.
-> >
-> > [ ... ]
-> >
-> >> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> >> --- a/virt/kvm/kvm_main.c
-> >> +++ b/virt/kvm/kvm_main.c
-> >> @@ -6348,6 +6348,11 @@ static void kvm_uevent_notify_change(unsigned int type, struct kvm *kvm)
-> >>  	kfree(env);
-> >>  }
-> >>
-> >> +void kvm_uevent_notify_vm_create(struct kvm *kvm)
-> >> +{
-> >> +	kvm_uevent_notify_change(KVM_EVENT_CREATE_VM, kvm);
-> >> +}
-> >
-> > [Severity: Low]
-> > The commit message mentions exporting this function, but is it missing an
-> > EXPORT_SYMBOL_GPL or EXPORT_SYMBOL_FOR_KVM_INTERNAL declaration?
-> >
-> > Without the macro, won't dynamically loaded architecture-specific modules
-> > like kvm-intel.ko hit undefined symbol linking errors when they try to
-> > call it?
-> 
-> I'm not 100% sure about the use of EXPORT_SYMBOL... here but usually I
-> compile kvm as a module to try and catch these types of linking
-> issues. Maybe Sean will have a better method/explanation for this.
+Hi Fuad,
 
-The issue is the shortlog, not the code.  The intent is to make the function
-globally visible, not to truly export it (the eventual usage is code that's
-linked into kvm.ko, i.e. doesn't need an export).
+Thanks for fixing this.
+
+On Wed, Aug 05, 2026 at 10:38:26AM +0100, Fuad Tabba wrote:
+> @@ -2119,6 +2119,14 @@ static int vgic_its_save_ite(struct vgic_its *its, struct its_device *dev,
+>  	u32 next_offset;
+>  	u64 val;
+>  
+> +	/*
+> +	 * MAPC with V=0 keeps the ITEs mapped but drops their collection,
+> +	 * and with it the ICID. Save a zeroed entry, which the restore path
+> +	 * reads back as invalid.
+> +	 */
+> +	if (!ite->collection)
+> +		return vgic_its_write_entry_lock(its, gpa, 0ULL, ite);
+> +
+
+Writing a zero entry results in a suboptimal scan on the target,
+compute_next_eventid_offset() should just skip ITEs that are known
+invalid. Or better yet, we should just make the ITS emulation consistent
+with the migration behavior and delete ITEs when their corresponding
+collection is deleted. As you note, this is UNPRED after all :)
+
+Thanks,
+Oliver
