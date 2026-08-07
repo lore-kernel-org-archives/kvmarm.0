@@ -1,297 +1,132 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B0E83EEAE5;
-	Fri,  7 Aug 2026 10:50:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21C4E4314A6
+	for <kvmarm@lists.linux.dev>; Fri,  7 Aug 2026 10:55:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786099852; cv=none; b=uO4pvtJPucicg1ZiilmfwbQpuid/A2mCu4Do43WIdVw2vgQu0z7So+TTTdUHmQzg5OllHvyOaj2u+qbj4JHea8N/U1Ws9l528NowZ+ndyu/7HJasDVLT56OQJ0wktC7gX0Js8knIqGysvCU0HCLVcHPh09YQCtLw6l9jfOB3h8E=
+	t=1786100160; cv=none; b=fuMH/EREXUjj0Ok+20/Xo89T3NsiiLjVsglU0bZri64uvhVFNKKeFoeiZig/I0xsm7NH805Vt65eHuJ3DhnlJtAoe/2HH9FqggpEoEroWK6BucRG7b4/Jm6+CZRDfBmu+zwJ8nkoaTgxErqAon6ES2AJ1K+rUAKkevGTOYZBkYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786099852; c=relaxed/simple;
-	bh=v+iKA4FaEpoEguX2MU8Hx3LoqMHN/oqVZAk6INfrDSM=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=adLF8d2gj8EeRP/tiaXojd0dItq3LiwSU00Nr4xARhTMMSkOgJC2D81R3yHq0jAsRFDivJaIhTiJNyxKfXpaHYUeM4tMz+7x7Rd8A68sFq7XNeghUF3rQraoqgC7xQk2LlneChbtzvy3AW6kEdzcAWlZq6LJm8ii6rbAEjuFEkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jkWJGB/Q; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786100160; c=relaxed/simple;
+	bh=yYLy53MjRAkdqvx55kptFN+hi/XqzxTCaElLscgdbA4=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=V0tc1WYkpFsJGCs9DCJiSUJzUK7yDC9qnc5QxWOhQn2olAszIWlL/768ojydWpT6p97HxC5J4fQ7DcfCVvZ6Zkvk93cCupJxsI5ARlq/yAo4rLcFtUZ1qOmE8DmVnmKzMZij4EVr4QtF+9BZgdtcTC8ZD6u/veQ+JBZXdl7c+p8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VdODDgEx; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jkWJGB/Q"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F6D51F000E9;
-	Fri,  7 Aug 2026 10:50:49 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VdODDgEx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73D701F000E9;
+	Fri,  7 Aug 2026 10:55:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786099849;
-	bh=Pd0s9piMGyu/sHPznoK/hZaSez88bzUEjJRw/4axIaQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=jkWJGB/QyoWY2FJjrUcXY0n2eNt5bbZzzg2lj86rIdB5SjJevNHwXZQEEek+xDuNx
-	 z20KAPd8iMF6t8UpH0NJcd9XMHyoQyMC1Twp8Ae/vny4tVGgwIA4j2/GXR5O2KlpAV
-	 eUgC2sj0NB79wyLiYedfQm4vBgfy8NL2cxa0arjPIZDpgWAStKvpCHX5oW9eSJy9Mi
-	 bUjy7ijVR+2RpJ+CzB0eusTpJivmO7ejm3OquhB5tQV0Tcmlam8+TU6tZ43QCRmUug
-	 1ZgXcCyWjLIHwejjyg1XvurAlUo6qMQvayHF0hZ4i1X6wdgDt3fkmGolHOPMEJY4CI
-	 NcjSbHCm6ADRQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wsIA3-0000000DJp8-1Skx;
-	Fri, 07 Aug 2026 10:50:47 +0000
-Date: Fri, 07 Aug 2026 11:50:46 +0100
-Message-ID: <86zeyy9pbt.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mostafa Saleh <smostafa@google.com>
-Cc: linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	oupton@kernel.org,
-	seiden@linux.ibm.com,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	vdonnefort@google.com,
-	tabba@google.com,
-	sebastianene@google.com,
-	keirf@google.com
-Subject: Re: [PATCH] KVM: arm64: Fix hvhe and broken CNTVOFF_EL2
-In-Reply-To: <20260806150105.4010701-1-smostafa@google.com>
-References: <20260806150105.4010701-1-smostafa@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20260515; t=1786100158;
+	bh=ngqp4nRAttx2b+P2gus0ty8d2qcikqYKkrNllluqntw=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=VdODDgExu1gg/JgPElwQS+Cvih1UonENtmSAnyIke8/49qt7v5eUKR5ktl9NAxqUC
+	 ivpayKWAsbJlk5CTZ8FKsMSN1YsG68YDKey2xXeHy00lu9KuTT+AhaiEREqFBXrDnF
+	 zcv6rtCg8duKqhKApF3cKsxZ1+QuXGPvpH7GacWdtjnzfS+kJsAh2qOlgCyUJpaMX9
+	 R+kiJDRW1lzVpFih02xEViDNRczREjBaSQQQVWoj7xrp4we9WgKYVZ8UgVPlST2D4j
+	 iKKTRGRhkVygskSLfBWq/3KsHqwCIXIQy5pSzGWM42R6oEB7CRVbpc3wUYdf+RwwiJ
+	 3WyH9DEFmh+Fw==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v2 2/4] KVM: arm64: vgic: Don't leak the SPI array when
+ init is retried
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Fuad Tabba" <fuad.tabba@linux.dev>
+Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20260807104102.2410744-3-fuad.tabba@linux.dev>
+References: <20260807104102.2410744-1-fuad.tabba@linux.dev>
+ <20260807104102.2410744-3-fuad.tabba@linux.dev>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 07 Aug 2026 10:55:57 +0000
+Message-Id: <20260807105558.73D701F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: smostafa@google.com, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oupton@kernel.org, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, vdonnefort@google.com, tabba@google.com, sebastianene@google.com, keirf@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 06 Aug 2026 16:01:05 +0100,
-Mostafa Saleh <smostafa@google.com> wrote:
->=20
-> When running on a setup affected with broken CNTVOFF_EL2
-> (has_broken_cntvoff())
->=20
-> Booting with VHE or protected mode(nvhe) (id_aa64mmfr1.vh=3D0
-> and arm64_sw.hvhe=3D0) works fine.
->=20
-> However launching a protected VM with protected hvhe mode panics the
-> guest kernel:
->=20
-> [    0.000000] Internal error: Oops - Undefined instruction: 000000000000=
-0000 [#1]  SMP
-> [    0.000000] Modules linked in:
-> [    0.000000] CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Not tainted 7.2.0-rc3=
--g05f75bd71e0e-dirty #29 PREEMPT
-> [    0.000000] Hardware name: linux,dummy-virt (DT)
-> [    0.000000] pstate: 000003c5 (nzcv DAIF -PAN -UAO -TCO -DIT -SSBS BTYP=
-E=3D--)
-> [    0.000000] pc : arch_timer_shutdown_virt+0x4/0x1c
-> [    0.000000] lr : arch_timer_starting_cpu+0x1c4/0x2d4
-> [    0.000000] sp : ffffa6bd9a193c00
-> [    0.000000] x29: ffffa6bd9a193c20 x28: ffffa6bd9a1bcf88 x27: 000000000=
-0000000
-> [    0.000000] x26: ffff00001be70dd8 x25: ffffa6bd99d85000 x24: ffffa6bd9=
-9d85ee4
-> [    0.000000] x23: ffffa6bd99d85000 x22: ffffa6bd9a1499c0 x21: ffffa6bd9=
-a1ab900
-> [    0.000000] x20: 00ffffffffffffff x19: ffff00001be8b600 x18: 000000000=
-000028c
-> [    0.000000] x17: 00000000510f0010 x16: 00000000510f0010 x15: 000000005=
-00f0000
-> [    0.000000] x14: 0000000000000000 x13: 0000000000000000 x12: 000000000=
-0000018
-> [    0.000000] x11: ffffa6bd9a8ac000 x10: 0000000000f0000f x9 : fffffffff=
-fffffff
-> [    0.000000] x8 : ffffa6bd98822e18 x7 : 0070752d65746174 x6 : 00111ff76=
-e007261
-> [    0.000000] x5 : ffffa6bd9ad68078 x4 : 0000000000000000 x3 : ffffa6bd9=
-8822a0c
-> [    0.000000] x2 : 0000000000000073 x1 : 0000000000000001 x0 : ffff00001=
-be8b600
-> [    0.000000] Call trace:
-> [    0.000000]  arch_timer_shutdown_virt+0x4/0x1c (P)
-> [    0.000000]  cpuhp_invoke_callback+0x11c/0x280
-> [    0.000000]  cpuhp_issue_call+0x1e8/0x224
-> [    0.000000]  __cpuhp_setup_state_cpuslocked+0x1d8/0x2b8
-> [    0.000000]  __cpuhp_setup_state+0x50/0x74
-> [    0.000000]  arch_timer_register+0xc0/0x148
-> [    0.000000]  arch_timer_of_init+0x148/0x170
-> [    0.000000]  timer_probe+0x74/0x124
-> [    0.000000]  time_init+0x18/0x58
-> [    0.000000]  start_kernel+0x1c0/0x3ac
-> [    0.000000]  __primary_switched+0x88/0x90
-> [    0.000000] Code: c80b7d2a 35ffffab 17ffffeb d503245f (d53be328)
->=20
-> And for non protected VMs seems to hang or progress really slowly.
->=20
-> The workaround avoids setting non-zero CNTVOFF_EL2 and trapping the
-> virtual counter to emulate the offset.
-> In the VHE path (timer_set_traps()), traps are only enabled when the
-> guest actually has a non-zero virtual timer offset.
-> However, __timer_enable_traps() in hyp/nvhe/timer-sr.c unconditionally
-> set CNTHCTL_EL1TVT and CNTHCTL_EL1TVCT whenever has_broken_cntvoff()
-> was true.
->=20
-> Which causes 2 issues:
-> 1) Protected VMs: kvm_handle_pvm_sysreg() does not find "cntv_ctl_el0"
-> in pvm_sys_reg_descs and injects undefined instruction exceptions.
->=20
-> 2) non-protected guests are trapped all the time even with offset of
-> zero.
->=20
-> Fix this by adding a check in __timer_enable_traps() similar to the one in
-> timer_set_traps()
->=20
-> Fixes: 0bc9a9e85fcf ("KVM: arm64: Work around x1e's CNTVOFF_EL2 bogosity")
-> Signed-off-by: Mostafa Saleh <smostafa@google.com>
-> ---
->  arch/arm64/kvm/hyp/nvhe/timer-sr.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->=20
-> diff --git a/arch/arm64/kvm/hyp/nvhe/timer-sr.c b/arch/arm64/kvm/hyp/nvhe=
-/timer-sr.c
-> index ff176f4ce7de..98b6e37ee8fa 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/timer-sr.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/timer-sr.c
-> @@ -10,6 +10,7 @@
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+
+Pre-existing issues:
+- [High] If `vgic_init()` fails after `vgic_v4_init()` succeeds, the VPE ar=
+ray is left allocated but `vgic_initialized` remains false. Userspace can t=
+hen create additional VCPUs and retry `vgic_init()`. The second `vgic_v4_in=
+it()` returns early because the VPE array is already allocated, leaving the=
+ new VCPUs without initialized VPE IRQs. When a new VCPU runs, `vgic_v4_loa=
+d()` calls `irq_set_affinity()` with an uninitialized IRQ (0), which fails =
+and triggers a host `WARN_ON`, causing a host-side denial of service.
+--
+
+--- Patch [2]: [PATCH v2 2/4] KVM: arm64: vgic: Don't leak the SPI array wh=
+en init is retried ---
+commit 11b9c8f9971b11e30ffc049a56071fafe4c7df73
+Author: Fuad Tabba <fuad.tabba@linux.dev>
+
+KVM: arm64: vgic: Don't leak the SPI array when init is retried
+
+This patch fixes a memory leak where up to 960 struct vgic_irq could be lea=
+ked
+if kvm_vgic_setup_default_irq_routing() fails and userspace retries
+KVM_DEV_ARM_VGIC_CTRL_INIT. It resolves this by returning early from
+kvm_vgic_dist_init() if dist->spis is already allocated.
+
+> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-i=
+nit.c
+> index 907057881b26a..d4cf143f3ae6b 100644
+> --- a/arch/arm64/kvm/vgic/vgic-init.c
+> +++ b/arch/arm64/kvm/vgic/vgic-init.c
+> @@ -210,6 +210,9 @@ static int kvm_vgic_dist_init(struct kvm *kvm, unsign=
+ed int nr_spis)
+>  	struct kvm_vcpu *vcpu0 =3D kvm_get_vcpu(kvm, 0);
+>  	int i;
 > =20
->  #include <asm/kvm_hyp.h>
->  #include <asm/kvm_mmu.h>
-> +#include <hyp/switch.h>
+> +	if (dist->spis)
+> +		return 0;
+> +
 
-I'd rather not include this. It drags too many things, and is solely
-expected to be included from switch.c (both implementations).
+[Severity: High]
+This is a pre-existing issue, but since the commit message mentions mirrori=
+ng
+the early return behavior of vgic_v4_init(), does that original function
+have a stale state bug on retry?
 
-You could use the hack below as a prefix to this change.
+If vgic_init() fails after vgic_v4_init() successfully allocates
+dist->its_vm.vpes, vgic_initialized remains false. If userspace then creates
+an additional vCPU and retries KVM_DEV_ARM_VGIC_CTRL_INIT, vgic_v4_init()
+returns early on the second attempt without allocating a VPE for the newly
+created vCPU.
 
-> =20
->  void __kvm_timer_set_cntvoff(u64 cntvoff)
->  {
-> @@ -63,7 +64,7 @@ void __timer_enable_traps(struct kvm_vcpu *vcpu)
->  	 * Trap the virtual counter/timer if we have a broken cntvoff
->  	 * implementation.
->  	 */
-> -	if (has_broken_cntvoff())
-> +	if (has_broken_cntvoff() && hyp_timer_get_offset(vcpu_vtimer(vcpu)))
->  		set |=3D CNTHCTL_EL1TVT | CNTHCTL_EL1TVCT;
-> =20
->  	sysreg_clear_set(cnthctl_el2, clr, set);
+When the new vCPU runs, vgic_v3_load() unconditionally calls vgic_v4_load().
+Because the VPE was never properly initialized for this new vCPU,
+vgic_v4_load() passes an uninitialized vpe->irq (0) to irq_set_affinity():
 
-I don't immediately see why a non-protected guest is so slow with
-hVHE, irrespective of the offset. Even if we go back to the host for
-the emulation, this should be usable.
+arch/arm64/kvm/vgic/vgic-v4.c:vgic_v4_load() {
+        ...
+        err =3D irq_set_affinity(vpe->irq, cpumask_of(smp_processor_id()));
+        ...
+}
 
-Could you describe what actually happens? Do you also see the issue
-with pure hVHE (without protected)?
+This fails with -EINVAL and triggers a WARN_ON in vgic_v3_load():
 
-Thanks,
+arch/arm64/kvm/vgic/vgic-v3.c:vgic_v3_load() {
+        ...
+        WARN_ON(vgic_v4_load(vcpu));
+        ...
+}
 
-	M.
+Could an unprivileged VMM repeatedly trigger this host WARN_ON by
+deliberately failing the first initialization and adding a vCPU before
+retrying?
 
-=46rom a7ec0d7f23d86b028164328f33a7114fa6aad2c3 Mon Sep 17 00:00:00 2001
-From: Marc Zyngier <maz@kernel.org>
-Date: Fri, 7 Aug 2026 11:36:48 +0100
-Subject: [PATCH] KVM: arm64: Make timer_get_offset() work in all contexts
+Is this something that should be addressed alongside or before this leak fi=
+x?
 
-We currently have two implementations of get_timer offset(), one
-in arm_arch_timer.h, and another one in switch.h.
-
-These two only differ by a pair of kern_hyp_va(), which seems a
-pretty weak reason to open-code it.
-
-Turn this function into a macro to avoid the include dependency hell
-on kern_hyp_va(), and make it work correctly in all contexts.
-
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/hyp/include/hyp/switch.h | 15 +----------
- include/kvm/arm_arch_timer.h            | 34 +++++++++++++++----------
- 2 files changed, 22 insertions(+), 27 deletions(-)
-
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/i=
-nclude/hyp/switch.h
-index 4bf624a49591d..2aceda749641c 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -706,22 +706,9 @@ static inline bool handle_tx2_tvm(struct kvm_vcpu *vcp=
-u)
- 	return true;
- }
-=20
--/* Open-coded version of timer_get_offset() to allow for kern_hyp_va() */
--static inline u64 hyp_timer_get_offset(struct arch_timer_context *ctxt)
--{
--	u64 offset =3D 0;
--
--	if (ctxt->offset.vm_offset)
--		offset +=3D *kern_hyp_va(ctxt->offset.vm_offset);
--	if (ctxt->offset.vcpu_offset)
--		offset +=3D *kern_hyp_va(ctxt->offset.vcpu_offset);
--
--	return offset;
--}
--
- static inline u64 compute_counter_value(struct arch_timer_context *ctxt)
- {
--	return arch_timer_read_cntpct_el0() - hyp_timer_get_offset(ctxt);
-+	return arch_timer_read_cntpct_el0() - timer_get_offset(ctxt);
- }
-=20
- static bool kvm_handle_cntxct(struct kvm_vcpu *vcpu)
-diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-index 15a4f97f81051..bc6f2fdd7ad33 100644
---- a/include/kvm/arm_arch_timer.h
-+++ b/include/kvm/arm_arch_timer.h
-@@ -162,20 +162,28 @@ static inline bool has_cntpoff(void)
- 	return (has_vhe() && cpus_have_final_cap(ARM64_HAS_ECV_CNTPOFF));
- }
-=20
--static inline u64 timer_get_offset(struct arch_timer_context *ctxt)
--{
--	u64 offset =3D 0;
-+#ifdef __KVM_NVHE_HYPERVISOR__
-+#define KERN_HYP_VA(x)		kern_hyp_va(x)
-+#else
-+#define KERN_HYP_VA(x)		x
-+#endif
-=20
--	if (!ctxt)
--		return 0;
--
--	if (ctxt->offset.vm_offset)
--		offset +=3D *ctxt->offset.vm_offset;
--	if (ctxt->offset.vcpu_offset)
--		offset +=3D *ctxt->offset.vcpu_offset;
--
--	return offset;
--}
-+#define timer_get_offset(ctxt)						\
-+	({								\
-+		struct arch_timer_context *__ctxt =3D (ctxt);		\
-+		u64 off =3D 0;						\
-+									\
-+		if (__ctxt) {						\
-+			struct arch_timer_offset *ato =3D &__ctxt->offset;\
-+									\
-+			if (ato->vm_offset)				\
-+				off +=3D *KERN_HYP_VA(ato->vm_offset);	\
-+			if (ato->vcpu_offset)				\
-+				off +=3D *KERN_HYP_VA(ato->vcpu_offset);	\
-+		}							\
-+									\
-+		off;							\
-+	})
-=20
- static inline void timer_set_offset(struct arch_timer_context *ctxt, u64 o=
-ffset)
- {
---=20
-2.47.3
-
+>  	dist->active_spis =3D (atomic_t)ATOMIC_INIT(0);
+>  	dist->spis =3D kzalloc_objs(struct vgic_irq, nr_spis, GFP_KERNEL_ACCOUN=
+T);
 
 --=20
-Without deviation from the norm, progress is not possible.
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260807104102.2410=
+744-1-fuad.tabba@linux.dev?part=3D2
