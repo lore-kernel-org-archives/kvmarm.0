@@ -1,179 +1,93 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2C774B04AC;
-	Fri,  7 Aug 2026 16:48:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2C4837FF68;
+	Fri,  7 Aug 2026 16:52:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786121304; cv=none; b=FwF8XbzdrhejuD5PgDYaCeboJTMYDAU77tg6iMXqzriXcr+U5NMXICTv3nc3WwtnPlCLCBIhngAWDskppCy4dSjVIaqco3wAPddpga83ZJSUp4JtBKbTnxY6QTQ6ETu25KmZ+5rvp4l8TvrPjg64NSO5mEpcyMtRsOK6WkpjOIU=
+	t=1786121570; cv=none; b=SmOYOgsFl1LCRdGfBdSsRFXOHS8bFQFwSbWxHTo55eNoX1Gve/qDoWhm9t5YZkUzY4VVmIW1+2OGGlusaJQVaW2Vlze6+B+ff6UJD8Zd51ufFWpj5JrtW5jTmkRYWt++APQpnwRZrpp/S8uaghgoCdp6MIMrQX7YFKGIpH1jNHA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786121304; c=relaxed/simple;
-	bh=OZGCueMEQz7ZfN31r/EDPQ6qwjd4+ZD91LHHnQBbV1k=;
+	s=arc-20240116; t=1786121570; c=relaxed/simple;
+	bh=m1Lrigw36CXsM5Jgst+loU0naiCW4ioLnVPV8fDQFIU=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=pdnbTpfTFL1/1l2wuem/sNKStsNc9Ej8uSXB6QB5DQhaOmCqoHB6gFxlgM15I/jm4hJ7UOAkltFDzq0xcGbqLHZ9lyj65r8OXJyRKSduzi7SZK4dcsc4ldipokLqJ9+5ac+W3MHtNMHd21k1DBCKNti9l749Eu3zYazY5XvbfoE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C9lU59Lx; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=Hjo9VJlb2pZPMgob9ULDIqRlyzRnmOK26CTdC7cDx4X7VJsfNuRxUrSXaKi/2+HvbbXKMJoD9o3xf+Y10Ad+T+8rVn5+RDI+f34y/mMNiN/abAI+BxqktyX20L1+XT9zFWnQdhgcjtlAQnhcgQGjQDlot1ULlmpEc5KmcyPbIvY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Me+wLhnU; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C9lU59Lx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE59D1F000E9;
-	Fri,  7 Aug 2026 16:48:20 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Me+wLhnU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 701EE1F000E9;
+	Fri,  7 Aug 2026 16:52:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786121301;
-	bh=rPGQaj//E8w7+S155f0B6nBDe5TIiVGBXJMoPKddpGw=;
+	s=k20260515; t=1786121569;
+	bh=18sgdS/ICGLtHq/FN1oCpWttdaCWU5mPGOIRpYxz0mQ=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=C9lU59LxCGKetRHVwC38vnjQJo3Sa57/uOVSEBHYlXGIYemPQClMmLQfZ5BZpphiI
-	 Z5CL2Y+hp1i1NKQGzWoPGarh0sN6tGuu+SyZAIOXvpjTfl2mSQfa5dQb0nJioDesm6
-	 i/Od0Un+Qbg6VGd3qtzw0wLF8rAVeG75wt17I2woxXpxAr9HwzM+cFCKaCdIPIlagr
-	 b0EU/uHRpS3KoNO8tyUEzh3tCgiCe4OLSSodqGUOTosrVJSKxlJWsXkEw6hfPuz78b
-	 OPz/L73L9R24HVJoD/CScsWCCGFoPCGLDtp3ZQTit+8cAY/G8PXVcV+ACfUBA/4dNq
-	 MmI22ydoz+TWQ==
+	b=Me+wLhnUkDRwxhvhV6gGU8pjPw1mPspFujXqYi2B2JBxVnFtxWfGAQBK/hJ5l06uO
+	 Jol8Y0VkI/KthjApIFVpZiXoyI4XX168L8LelS/jC/pB0wdt8mNQepde+1CWFW8zJ6
+	 keCzhAG0UWjNFAHXoNKseOb1p3POP7OUBvFaXzZJextHXmu78VzxYJrFl1d+lIAe7c
+	 82QNvf2EDJnPkS1RSsD5ynhsb5e/c8bLFh6Z/HkwlmzVJuxsWbNOEeWSwyHE8UKLBZ
+	 g5kQMsvZQoRla+C1XPOzXEfOQuONPGBpd+g27yrUDMNu9cLSKYXmY67DybL56W0FX0
+	 W8Ax7c+inGRCg==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v5 35/49] KVM: arm64: gic-v5: Implement save/restore
- mechanisms for ISTs
+Subject: Re: [PATCH v5 37/49] Documentation: KVM: Add
+ KVM_DEV_ARM_VGIC_GRP_IRS_REGS to VGICv5 docs
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Sascha Bischoff" <Sascha.Bischoff@arm.com>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, kvm@vger.kernel.org, "Marc
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, "Marc
  Zyngier" <maz@kernel.org>
-In-Reply-To: <20260807111159.429128-36-sascha.bischoff@arm.com>
+In-Reply-To: <20260807111159.429128-38-sascha.bischoff@arm.com>
 References: <20260807111159.429128-1-sascha.bischoff@arm.com>
- <20260807111159.429128-36-sascha.bischoff@arm.com>
+ <20260807111159.429128-38-sascha.bischoff@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Aug 2026 16:48:19 +0000
-Message-Id: <20260807164820.DE59D1F000E9@smtp.kernel.org>
+Date: Fri, 07 Aug 2026 16:52:49 +0000
+Message-Id: <20260807165249.701EE1F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 3 potential issue(=
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [High] Restoration of GICv5 IRS registers and IST state unconditionally f=
-ails before the VM runs.
-- [High] Missing memory barrier between DMA memory reads and MMIO writes in=
- IST save paths allows hardware to corrupt IST state.
-- [Medium] Early returns in `vgic_v5_vmte_release` leak VM memory structure=
-s if IST freeing fails.
+- [Low] Missing indentation for the KVM_DEV_ARM_VGIC_GRP_IRS_REGS group bre=
+aks the document's list structure.
 --
 
---- Patch [35]: [PATCH v5 35/49] KVM: arm64: gic-v5: Implement save/restore=
- mechanisms for ISTs ---
-commit 32376ab3f3a6714615e18eef70c631afa3b5cd05
+--- Patch [37]: [PATCH v5 37/49] Documentation: KVM: Add KVM_DEV_ARM_VGIC_G=
+RP_IRS_REGS to VGICv5 docs ---
+commit e5dffc46ed9c5cdaecdbb49991374d8f99bfa132
 Author: Sascha Bischoff <Sascha.Bischoff@arm.com>
 
-KVM: arm64: gic-v5: Implement save/restore mechanisms for ISTs
+Documentation: KVM: Add KVM_DEV_ARM_VGIC_GRP_IRS_REGS to VGICv5 docs
 
-This patch adds support for saving and restoring GICv5 Interrupt State Tabl=
-es
-(ISTs) during virtual machine migration. It introduces interfaces to export
-the internal SPI and LPI IST states to userspace and inject pending
-interrupts upon restoration. The state is checked for hardware quiescence
-during the save operation.
+This commit documents the KVM_DEV_ARM_VGIC_GRP_IRS_REGS attribute group used
+to read and write the virtual IRS's MMIO register state. It provides a
+GICv5-specific interface using IRS terminology.
 
-> diff --git a/arch/arm64/kvm/vgic/vgic-irs-v5.c b/arch/arm64/kvm/vgic/vgic=
--irs-v5.c
-> --- a/arch/arm64/kvm/vgic/vgic-irs-v5.c
-> +++ b/arch/arm64/kvm/vgic/vgic-irs-v5.c
-[ ... ]
-> @@ -646,13 +661,23 @@ static int vgic_v5_mmio_uaccess_write_irs(struct kv=
-m_vcpu *vcpu, gpa_t addr,
->  			return -EINVAL;
->  		break;
->  	case GICV5_IRS_IST_BASER:
-> -		if (irs_data->ist_baser.valid &&
-> -		    !vgic_v5_ist_baser_matches(irs_data, val))
-> +		ret =3D vgic_v5_lpi_ist_exists(vcpu->kvm);
-> +		if (ret < 0)
-> +			return ret;
-
-[Severity: High]
-Is this check going to unconditionally fail during live migration?
-
-Userspace typically restores registers before the first KVM_RUN. However,
-vgic_v5_lpi_ist_exists() requires the vmi structure to be present in the
-vm_info XArray, which is only allocated in vgic_v5_vmte_init() (triggered by
-the first KVM_RUN).
-
-Will this cause -ENXIO to be returned when restoring GICV5_IRS_IST_BASER?
-
-[ ... ]
-> diff --git a/arch/arm64/kvm/vgic/vgic-v5-tables.c b/arch/arm64/kvm/vgic/v=
-gic-v5-tables.c
-> --- a/arch/arm64/kvm/vgic/vgic-v5-tables.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v5-tables.c
-[ ... ]
-> @@ -604,6 +662,9 @@ int vgic_v5_vmte_release(struct kvm *kvm)
->  	if (!vmi)
->  		goto no_vmi;
-> =20
-> +	/* Unlikely, but possible. Avoid leaking the memory. */
-> +	vgic_v5_drain_pending_irqs(kvm, vmi, false);
+> diff --git a/Documentation/virt/kvm/devices/arm-vgic-v5.rst b/Documentati=
+on/virt/kvm/devices/arm-vgic-v5.rst
+> index 7e41d6699538f..6dd3ff555ba02 100644
+> --- a/Documentation/virt/kvm/devices/arm-vgic-v5.rst
+> +++ b/Documentation/virt/kvm/devices/arm-vgic-v5.rst
+> @@ -149,3 +149,50 @@ Groups:
+>      -EBUSY   VCPU is running, or write attempted after a VCPU has run
+>      -EINVAL  Invalid mpidr or register value supplied
+>      =3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 > +
->  	/* If we have an LPI IST, free it */
->  	if (vmi->h_lpi_ist) {
->  		ret =3D vgic_v5_lpi_ist_free(kvm);
-
-[Severity: Medium]
-Does returning early from vgic_v5_vmte_release() cause a memory leak?
-
-If vgic_v5_lpi_ist_free() or vgic_v5_spi_ist_free() fails, the function
-returns immediately without freeing vmi->vped_base, vmi->vpet_base,
-vmi->vmd_base, and the vmi structure itself.
-
-Should these teardown paths make a best-effort attempt to free the remaining
-resources rather than aborting?
-
-[ ... ]
-> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-> --- a/arch/arm64/kvm/vgic/vgic-v5.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
-[ ... ]
-> @@ -1267,3 +1300,292 @@ void vgic_v5_save_state(struct kvm_vcpu *vcpu)
-[ ... ]
-> +	/* Save the SPI IST to the userspace buffer. */
-> +	ret =3D vgic_v5_save_spi_ist(kvm, &ist_attr);
-> +	if (ret)
-> +		goto out_unlock;
 > +
-> +	ret =3D vgic_v5_irs_is_quiesced(vm_id);
+> +KVM_DEV_ARM_VGIC_GRP_IRS_REGS
 
-[Severity: High]
-Can the hardware corrupt the IST state during the read loop?
+[Severity: Low]
+This isn't a bug, but does this group name need to be indented by two space=
+s?
 
-The vgic_v5_save_spi_ist() function reads from DMA memory. It is immediately
-followed by a call to vgic_v5_irs_is_quiesced(), which uses writeq_relaxed()
-to issue an MMIO write.
+Being flush left breaks the list structure under the "Groups:" section. This
+will cause the entry to be rendered as a top-level paragraph rather than a
+list item in the generated HTML documentation.
 
-Since raw_spin_lock_irqsave() only provides an ACQUIRE barrier, is there
-anything preventing the CPU from reordering the relaxed MMIO write before
-the DMA reads complete? If reordered, the hardware could break quiescence a=
-nd
-modify the ISTs concurrently, while the software mistakenly concludes the VM
-remained quiesced.
-
-Would adding a dma_rmb() or rmb() ensure the DMA reads complete before
-checking the hardware status?
-
-[ ... ]
-> +int vgic_v5_irs_restore_ists(struct kvm *kvm, struct kvm_device_attr *at=
-tr)
-> +{
-[ ... ]
-> +	ret =3D vgic_v5_lpi_ist_exists(kvm);
-> +	if (ret) {
-> +		if (ret > 0)
-> +			ret =3D -EBUSY;
-> +		goto out_unlock;
-> +	}
-
-[Severity: High]
-Does this have the same migration failure as vgic_v5_mmio_uaccess_write_irs=
-()?
-
-Since vmi hasn't been allocated by the first KVM_RUN yet,
-vgic_v5_lpi_ist_exists() will return -ENXIO, causing the restoration to
-fail unconditionally.
+> +    Attributes:
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260807111159.4291=
-28-1-sascha.bischoff@arm.com?part=3D35
+28-1-sascha.bischoff@arm.com?part=3D37
