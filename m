@@ -1,132 +1,219 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21C4E4314A6
-	for <kvmarm@lists.linux.dev>; Fri,  7 Aug 2026 10:55:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A98E52D249B;
+	Fri,  7 Aug 2026 10:58:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786100160; cv=none; b=fuMH/EREXUjj0Ok+20/Xo89T3NsiiLjVsglU0bZri64uvhVFNKKeFoeiZig/I0xsm7NH805Vt65eHuJ3DhnlJtAoe/2HH9FqggpEoEroWK6BucRG7b4/Jm6+CZRDfBmu+zwJ8nkoaTgxErqAon6ES2AJ1K+rUAKkevGTOYZBkYw=
+	t=1786100341; cv=none; b=QUncMwt+2lvA8DQlh1zSR7OjYsDEA2dO8POr6tIebzzRW6U6k/AhMD1RRaj0TRkuyhKLVxNX9O3E+ADfJs09oZ68qC+K2E1mHhjTBSDI4FZzbNn6NHApPCI/vNrvDMoDBVOmvyEHlLRb76o3cnvO0xGsfjsZVxCAQRCDICTorFM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786100160; c=relaxed/simple;
-	bh=yYLy53MjRAkdqvx55kptFN+hi/XqzxTCaElLscgdbA4=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=V0tc1WYkpFsJGCs9DCJiSUJzUK7yDC9qnc5QxWOhQn2olAszIWlL/768ojydWpT6p97HxC5J4fQ7DcfCVvZ6Zkvk93cCupJxsI5ARlq/yAo4rLcFtUZ1qOmE8DmVnmKzMZij4EVr4QtF+9BZgdtcTC8ZD6u/veQ+JBZXdl7c+p8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VdODDgEx; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786100341; c=relaxed/simple;
+	bh=uuFrFlTnxR2oRESNj+PEN7bA9/kaSqszCUAy8op7WaA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XGH7q3jzHwlU0ycMZMfwju4cB4U4pGYleskDzDszlhnXwhVsDrt4XuzSSMhu0X9MZI4v66Wsyqa2f3Cz7HscD3hcZRUK87cDtvsyUb4i/Xw8+FyJpckUUshlVus5wOEruwuRx5WwJcA6nW+qlodGgcn9hgNtuupFxunvqqxAOMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Fw4XtpBk; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VdODDgEx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73D701F000E9;
-	Fri,  7 Aug 2026 10:55:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786100158;
-	bh=ngqp4nRAttx2b+P2gus0ty8d2qcikqYKkrNllluqntw=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=VdODDgExu1gg/JgPElwQS+Cvih1UonENtmSAnyIke8/49qt7v5eUKR5ktl9NAxqUC
-	 ivpayKWAsbJlk5CTZ8FKsMSN1YsG68YDKey2xXeHy00lu9KuTT+AhaiEREqFBXrDnF
-	 zcv6rtCg8duKqhKApF3cKsxZ1+QuXGPvpH7GacWdtjnzfS+kJsAh2qOlgCyUJpaMX9
-	 R+kiJDRW1lzVpFih02xEViDNRczREjBaSQQQVWoj7xrp4we9WgKYVZ8UgVPlST2D4j
-	 iKKTRGRhkVygskSLfBWq/3KsHqwCIXIQy5pSzGWM42R6oEB7CRVbpc3wUYdf+RwwiJ
-	 3WyH9DEFmh+Fw==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2 2/4] KVM: arm64: vgic: Don't leak the SPI array when
- init is retried
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Fuad Tabba" <fuad.tabba@linux.dev>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260807104102.2410744-3-fuad.tabba@linux.dev>
-References: <20260807104102.2410744-1-fuad.tabba@linux.dev>
- <20260807104102.2410744-3-fuad.tabba@linux.dev>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Aug 2026 10:55:57 +0000
-Message-Id: <20260807105558.73D701F000E9@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Fw4XtpBk"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0F9161516;
+	Fri,  7 Aug 2026 03:58:55 -0700 (PDT)
+Received: from [10.57.40.157] (unknown [10.57.40.157])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 696D93F9A2;
+	Fri,  7 Aug 2026 03:58:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1786100339; bh=uuFrFlTnxR2oRESNj+PEN7bA9/kaSqszCUAy8op7WaA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Fw4XtpBkfkE+rClcmwHAo5bM2jngfqXmIKz5nRrbXwqkxFWonBtCZyjh5ySsiYO5P
+	 3K+Db6dyLygBF4SXRrevtbXTze2H9PA/sTzd7JGyW1vMiQgjj6DC9JamLCDvyoXPYO
+	 50379CxKlYns2w2zd6EOAKlggDYuL8Y78ejrmMl4=
+Message-ID: <7ff49972-a9bf-4d99-9088-3d5e1eaa1608@arm.com>
+Date: Fri, 7 Aug 2026 11:58:53 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v16 27/45] KVM: arm64: CCA: Allow populating initial
+ contents
+Content-Language: en-GB
+To: Ackerley Tng <ackerleytng@google.com>, Steven Price
+ <steven.price@arm.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
+ Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
+ Lorenzo Pieralisi <lpieralisi@kernel.org>, rick.p.edgecombe@intel.com,
+ yan.y.zhao@intel.com
+References: <20260803134403.80630-1-steven.price@arm.com>
+ <20260803134403.80630-28-steven.price@arm.com>
+ <CAEvNRgHF-30EwJEprM466+Ag7GSuJWrzMGNAw7kCvXyT7YVucg@mail.gmail.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <CAEvNRgHF-30EwJEprM466+Ag7GSuJWrzMGNAw7kCvXyT7YVucg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
+On 06/08/2026 23:43, Ackerley Tng wrote:
+> Steven Price <steven.price@arm.com> writes:
+> 
+>> The VMM needs to populate the realm with some data before starting (e.g.
+>> a kernel and initrd). This is measured by the RMM and used as part of
+>> the attestation later on.
+>>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
 
-Pre-existing issues:
-- [High] If `vgic_init()` fails after `vgic_v4_init()` succeeds, the VPE ar=
-ray is left allocated but `vgic_initialized` remains false. Userspace can t=
-hen create additional VCPUs and retry `vgic_init()`. The second `vgic_v4_in=
-it()` returns early because the VPE array is already allocated, leaving the=
- new VCPUs without initialized VPE IRQs. When a new VCPU runs, `vgic_v4_loa=
-d()` calls `irq_set_affinity()` with an uninitialized IRQ (0), which fails =
-and triggers a host `WARN_ON`, causing a host-side denial of service.
---
+...
 
---- Patch [2]: [PATCH v2 2/4] KVM: arm64: vgic: Don't leak the SPI array wh=
-en init is retried ---
-commit 11b9c8f9971b11e30ffc049a56071fafe4c7df73
-Author: Fuad Tabba <fuad.tabba@linux.dev>
+>> +static int realm_data_map_init(struct kvm *kvm, unsigned long ipa,
+>> +			       kvm_pfn_t dst_pfn, kvm_pfn_t src_pfn,
+>> +			       unsigned long flags)
+>> +{
+>> +	struct realm *realm = &kvm->arch.realm;
+>> +	phys_addr_t rd = virt_to_phys(realm->rd);
+>> +	phys_addr_t dst_phys, src_phys;
+>> +	long ret;
+>> +
+>> +	lockdep_assert_held(&kvm->slots_lock);
+>> +	lockdep_assert_held(&kvm->arch.config_lock);
+>> +
+>> +	dst_phys = __pfn_to_phys(dst_pfn);
+>> +	src_phys = __pfn_to_phys(src_pfn);
+>> +
+>> +	if (rmi_delegate_page(dst_phys))
+>> +		return -ENXIO;
+>> +
+>> +retry:
+>> +	ret = rmi_rtt_data_map_init(rd, dst_phys, ipa, src_phys, flags);
+>> +	if (ret >= 0 && RMI_RETURN_STATUS(ret) == RMI_ERROR_RTT) {
+>> +		/* Create missing RTTs and retry */
+>> +		int level = RMI_RETURN_INDEX(ret);
+>> +
+>> +		KVM_BUG_ON(level >= KVM_PGTABLE_LAST_LEVEL, kvm);
+>> +
+>> +		ret = realm_create_rtt_levels(realm, ipa, level,
+>> +					      level + 1, NULL);
+>> +		if (!ret)
+>> +			goto retry;
+>> +	}
+>> +
+>> +	if (ret && WARN_ON(rmi_undelegate_page(dst_phys))) {
+>> +		/* Leak the page if the undelegate fails */
+>> +		get_page(pfn_to_page(dst_pfn));
+> 
+> Is there some way to avoid taking a reference on the page? This would
+> interfere with conversions. There was a similar discussion for TDX as
+> well [1].
 
-KVM: arm64: vgic: Don't leak the SPI array when init is retried
+Unfortunately, no. The page was transferred to the Realm world (with
+rmi_delegate_page() above the retry: ). If we fail to bring it back,
+that page is still in the Realm PAS and any access to it by the normal
+world would result in a GPF and eventually bring down the system
+if it happens from the kernel.
 
-This patch fixes a memory leak where up to 960 struct vgic_irq could be lea=
-ked
-if kvm_vgic_setup_default_irq_routing() fails and userspace retries
-KVM_DEV_ARM_VGIC_CTRL_INIT. It resolves this by returning early from
-kvm_vgic_dist_init() if dist->spis is already allocated.
+We don't expect that undelegate to fail. The granule_delegate()
+should fail if the page was already in use by the RMM for some
+purpose (e.g., already mapped at the IPA, because VMM issued
+DATA_MAP_INIT twice. Even with the relaxation coming in the
+RMM, we will mandate that the "populate" cases will request
+strict conditions for granule delegate).
 
-> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-i=
-nit.c
-> index 907057881b26a..d4cf143f3ae6b 100644
-> --- a/arch/arm64/kvm/vgic/vgic-init.c
-> +++ b/arch/arm64/kvm/vgic/vgic-init.c
-> @@ -210,6 +210,9 @@ static int kvm_vgic_dist_init(struct kvm *kvm, unsign=
-ed int nr_spis)
->  	struct kvm_vcpu *vcpu0 =3D kvm_get_vcpu(kvm, 0);
->  	int i;
-> =20
-> +	if (dist->spis)
-> +		return 0;
-> +
+Please note that this is NOT the "unmap" failure, but it is
+"Bring the page back to the NS world" failure that causes
+the WARN_ON and the leaking.
 
-[Severity: High]
-This is a pre-existing issue, but since the commit message mentions mirrori=
-ng
-the early return behavior of vgic_v4_init(), does that original function
-have a stale state bug on retry?
+> 
+> TDX originally incremented folio refounts for these:
+> 
+> + when mapping folios into the Secure EPTs. This one was easier to agree
+>    to remove, since TDX can trust guest_memfd to keep pages around on
+>    behalf of the guest.
+> + To indicate unmapping failure (IIUC this is the same situation as
+>    above). This interferes with conversions.
+>      + An alternative discussed was to mark these pages as HWPOISON, but
+>        that was eventually rejected as adding unnecessary complexity to
+>        make TDX special for code paths that only occur on kernel
+>        bugs. (In TDX's case the unmap failures would probably only be for
+>        kernel bugs.)
+>      + I later worked a bit more on memory failure for guest_memfd
+>        HugeTLB and found that because we will need to restructure huge
+>        pages for conversions, using the HWPOISON flag would be hard to
+>        handle. For TDX since the conclusion was not to use a HWPOISON
+>        flag to indicate unmap failures anyway, this turned out to be a
+>        non-issue. Nobody wanted to use the HWPOISON flag. (I hope you
+>        won't need to either)
+> 
+> So for TDX, on an unmap failure we do a KVM_BUG_ON() and mark the VM as
+> dead, and do nothing about the page, it still gets returned to the
+> system as if nothing happened.
+> 
+> Here's my understanding of why this is okay for TDX (Rick and Yan, could
+> you please help me here):
+> 
+> + For unmap failures, the page remains in TDX's Physical Address
+>    Metadata Table (PAMT), and the page is still assigned to some TD.
+> + If the page was assigned to some other TD, it would be blocked, since
+>    the PAMT shows it as already assigned.
+> + If the page was used by something completely unrelated to TDX, then in
+>    the TDX model the host is free to write and read pages. Nothing goes
+>    bad until the TD tries to use that same page, but that TD would never
+>    use the page again, that TD is already dead and the HKID for the TD
+>    was leaked.
 
-If vgic_init() fails after vgic_v4_init() successfully allocates
-dist->its_vm.vpes, vgic_initialized remains false. If userspace then creates
-an additional vCPU and retries KVM_DEV_ARM_VGIC_CTRL_INIT, vgic_v4_init()
-returns early on the second attempt without allocating a VPE for the newly
-created vCPU.
+This is not true for CCA. Like I said above, touching the page in Realm
+PAS is going to be disastrous for the Host.
 
-When the new vCPU runs, vgic_v3_load() unconditionally calls vgic_v4_load().
-Because the VPE was never properly initialized for this new vCPU,
-vgic_v4_load() passes an uninitialized vpe->irq (0) to irq_set_affinity():
 
-arch/arm64/kvm/vgic/vgic-v4.c:vgic_v4_load() {
-        ...
-        err =3D irq_set_affinity(vpe->irq, cpumask_of(smp_processor_id()));
-        ...
-}
+> 
+> [1] https://lore.kernel.org/all/diqz34bolnta.fsf@ackerleytng-ctop.c.googlers.com/
+> 
+>> +	}
+>> +
+>> +	return ret <= 0 ? ret : -ENXIO;
+>> +}
+>> +
+>> +static int populate_region_cb(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn,
+>> +			      struct page *src_page, void *opaque)
+>> +{
+>> +	unsigned long data_flags = *(unsigned long *)opaque;
+>> +	phys_addr_t ipa = gfn_to_gpa(gfn);
+>> +
+>> +	return realm_data_map_init(kvm, ipa, pfn, page_to_pfn(src_page),
+>> +				   data_flags);
+>> +}
+>> +
+>> +static long populate_region(struct kvm *kvm,
+>> +			    gfn_t base_gfn,
+>> +			    unsigned long pages,
+>> +			    u64 uaddr,
+>> +			    unsigned long data_flags)
+>> +{
+>> +	long ret = 0;
+>> +
+>> +	lockdep_assert_held(&kvm->slots_lock);
+>> +	lockdep_assert_held(&kvm->arch.config_lock);
+>> +
+>> +	if (!uaddr)
+>> +		return -EINVAL;
+>> +
+> 
+> Why not check for !uaddr together with the other checks in
+> kvm_arm_rmi_populate?
 
-This fails with -EINVAL and triggers a WARN_ON in vgic_v3_load():
+Yep, we could move it there.
 
-arch/arm64/kvm/vgic/vgic-v3.c:vgic_v3_load() {
-        ...
-        WARN_ON(vgic_v4_load(vcpu));
-        ...
-}
+> 
+> Also would it be okay to inline populate_region into
+> kvm_arm_rmi_populate below?
 
-Could an unprivileged VMM repeatedly trigger this host WARN_ON by
-deliberately failing the first initialization and adding a vCPU before
-retrying?
+Ack.
 
-Is this something that should be addressed alongside or before this leak fi=
-x?
-
->  	dist->active_spis =3D (atomic_t)ATOMIC_INIT(0);
->  	dist->spis =3D kzalloc_objs(struct vgic_irq, nr_spis, GFP_KERNEL_ACCOUN=
-T);
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260807104102.2410=
-744-1-fuad.tabba@linux.dev?part=3D2
+Suzuki
