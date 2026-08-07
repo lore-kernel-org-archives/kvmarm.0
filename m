@@ -1,278 +1,131 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DB0939EF25
-	for <kvmarm@lists.linux.dev>; Fri,  7 Aug 2026 17:04:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 984BA38D3ED
+	for <kvmarm@lists.linux.dev>; Fri,  7 Aug 2026 17:08:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786122254; cv=none; b=Iw8gQQ2k3sgGG+OD5KMqekQU5+dEgn80Ce7E+WS1SXsyvMRb38U4yCN3pQLA0rromxtAHyvvYElJXvlC/H62hqEYknzVYeoS96TX0hkk+SelEHjxQnwaOQOId3pCET5/8rQDNxt/luNZ0sSz9RSca1xs7uDI1WK/pFgpsonByHg=
+	t=1786122504; cv=none; b=bysHnxGeK1n51zrQzz8dUMr7Em9qJCKuRsLIkRxGvRoglWFDYVS0XlurzeqYKxD2OZ2HPDiE8unyHgK3rnjjp75VUwxTzGVHsErT0kgsqwoj1vPvjdJ9ASlz3DuRlOWTfYqaEN9BgsyQFbwStn+qZMwQGGP4Fo3cLqPJVR1GauY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786122254; c=relaxed/simple;
-	bh=9AmUUo2XdPo4q6I1Y8IaPfKjNUjh7EIPRdpg3kwxS3s=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=Yei+6x6Cd4SE2crt3XLwowzIB8X3fJXC6SWAN6azWlP7ToJs1kCwJ0Q4QITjBmnLSHH7w84g1v1+bkXbmLDHLwVbCj1tx6UsKIPLyvz30QsyRDVVHy9slUxZoaOjciQt0FP5ZDSHPEumi2wg/FAtivvM0tpbCHC8U4n7Zk0aL/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=opEJFw0J; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786122504; c=relaxed/simple;
+	bh=PEyv/ZNi02HaucwD0lzLJLCQOah9Kpc2cmwW88odXGA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oQD1Y5jChvP4HkdjJsNIG+ltd8ea+L3cncQyHL8J6zCgsVYHLR2FfbMMaG1HhNpEQelrJVVj3HvY+kxDolN4NzLOylFOHtVmmL8r+p22oTKpZDO2INv+sEKo+N3FF08kkfb3Sk152l9/Q55l7K9j7tVgCYr6iV0o4VEIhwt911k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QkFssbW3; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="opEJFw0J"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A52651F000E9;
-	Fri,  7 Aug 2026 17:04:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786122252;
-	bh=LzICne6zOonoa8OVZhxs3/AUv2v2lZMHN21SYtn7eDE=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=opEJFw0JTon4WDPB0vpRyD4FUC6H6fDDMTzbo4WEpNVs1nZVph00l6o/eCEgrBZA+
-	 DGEC/2yKk0epUe/ziFaGGRjNk9ybuOEs9lC8WlFUBuoLeyqMGCwuv6yKJOalNbwYpP
-	 pR/Rx7k975GRzw7s9l4VE7whnYL1X++jyqMPvwnRv3ogJd7XT44ypaiThOXG1yQTiI
-	 GGoNVhd1JLElZhSVjVQ86aICR7zK2j71WXAWBM8l8CCLZsyWkHtFeryC9+eLR61Pj/
-	 ZLBur3BLWbILaGPSCAcVFO06w3QK9FjGMa7eaH6T2ahnAj++LfMqiTrtK9WLumOdbS
-	 Mj6lUQ1WVj70A==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2 09/13] KVM: arm64: Trap & emulate the ITS MAPC
- command
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Sebastian Ene" <sebastianene@google.com>
-Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev
-In-Reply-To: <20260807164322.2970811-11-sebastianene@google.com>
-References: <20260807164322.2970811-2-sebastianene@google.com>
- <20260807164322.2970811-11-sebastianene@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Aug 2026 17:04:12 +0000
-Message-Id: <20260807170412.A52651F000E9@smtp.kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QkFssbW3"
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4955de8797cso25660385e9.3
+        for <kvmarm@lists.linux.dev>; Fri, 07 Aug 2026 10:08:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1786122501; x=1786727301; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=iaOeMTZOYIaS16knxOG50vS1TNGyqbn7Zjc+qZ37u3k=;
+        b=QkFssbW3S/mLgUXGqTFfBfIz0MdRIX9U6ndLYVXHVXw7RctxcPNqXBkP9VBMr3AMOO
+         qqgSQQd52AL2ZBFl0eQrx5VC/eBRBuOI75OxAi4CecWCBm8tPhNrJIuZCVAUnNTOb9hi
+         uTG9NIfTHxKHxmEGnHD/gK6y5HIO4goq9DC83W6ZGGcvPqRNQc63BtnVM5N3x25Swxig
+         RYystAV8MG7xRc0m6tPYbZXwmCg+sPzFHYj0ECAk+jflkdWu8FCFqweRKkK+81Rgzwf3
+         L+jwdmzohlrRqcum9u622squ6ThsAwL1bRh21G4JeWiTWeko1q7T/3zjISTqggnojy6D
+         l4QA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786122501; x=1786727301;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=iaOeMTZOYIaS16knxOG50vS1TNGyqbn7Zjc+qZ37u3k=;
+        b=mIxKxB54pnuEoKyJWVZCEvi4l4dTOQDEX3Pg978XcrsbKOGQqkLaWMNnjYUZILDEKP
+         CqLMjLdsX14k0Z1eJY6YJq7+4lRprSomfWfIqT810Y7budeaAaZ/2Evd2D7H7LKUsVfv
+         xPYxgSs2aVwVBY03LMsJa4tmuKlknt6Mm0zirrH9QbI56QU6xyYVV/CvHiovZ1uTWPDI
+         GYBbYI9N43HiY8lh0RdTnZwfnuBeJAtwMitxQF+iBrLDXkFsRjn7khSjB1nhMzf3ty37
+         TXs8plI7UdtfEP0uaqFZSqujxKve8fqGmkIEOJVCnTYEXOzc79XEl+oGK7OAjRSG3zrp
+         RbUA==
+X-Forwarded-Encrypted: i=1; AHgh+RpX+ptLIYBO1Qx+PuE1OVXccp3Inw8NxHE8Dvf5gG+ZDFuhzsfPo45cJ91bX+OjZEaCkG7HE+U=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yw3DtW238zdawaIn75yNvYympWf/Ak+nbY4aDChT6jJK4ozQZiT
+	fwiLBagwJkWb6jzDhoNJgdfvB/moC+/FBC2nbxzJ3fFpWZKV+BtvwvrmgCy4mceG
+X-Gm-Gg: AR+sD123X7Z5LKQLq9JEtt/8qx1EFIhGO5HpUR3LRQqjVyEpd77e+R5y2j6n6p54VLr
+	s7VcsYCVDqOSttiN5f5xm/QrxweCDxhLMqUzsUmLlbNBQeA/zEEI35npeYiZEz+9BWCEbB7f28r
+	mAMUfb0cR/zTDut0wrBeMARfkA0t8yB3NWK/S3Oh7WpT3DKwJLlFFbpNNN2Dud390gOgPtfcQ7j
+	Ytjl0EM3qTgcY9UU+7bNqPBDJi9xP1WK4NhJr3WbwBmWZAcsDdTL4lmosmPoZqn93X9ZISAjEgR
+	LThXTl2aJ6a8jADNM/VUQtS3nBgLBoWcEDxE/Hn3AZQnkvUq1ozfWxNQqLW7UoYVBsXaO382r5t
+	vjzK0xItSfwlMo0pA/ADCo44beLdHVkA6DrVuylu3hGkFPQejePESJ40Q3ENSeG03CGixuk2bb9
+	7Cv6gNINJ7r43GtD3jZjAYL9Skqn8e1rrQ5d+qUotFHjYs7I7bZLns1TJSptSTIKvWewhpFX4pe
+	O/fIyPRPbJEIWFOVlBgdWqLWhLjuHayElBgtOevRbJU6a1oDGqF7qf41ySJiKR5RZq+EXU5fijF
+	8XJDClB+JUofDwm5+AyTRJ51tfN8PUUTcYcfI6XAc6zC0/4aacdn/Q6UgQReVfNxJQ2VThUPO1/
+	jaXNdfv8JrnLspd78hj4=
+X-Received: by 2002:a05:600c:b85:b0:496:c93d:e2f with SMTP id 5b1f17b1804b1-4995e0dff0amr73285775e9.15.1786122500534;
+        Fri, 07 Aug 2026 10:08:20 -0700 (PDT)
+Received: from MacBook-Pro-von-Karl.localdomain (dynamic-2a02-3100-b105-e101-a437-493a-4de9-ee3e.310.pool.telefonica.de. [2a02:3100:b105:e101:a437:493a:4de9:ee3e])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4995ea27ef0sm60747585e9.9.2026.08.07.10.08.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Aug 2026 10:08:19 -0700 (PDT)
+Date: Fri, 7 Aug 2026 19:08:17 +0200
+From: Karl Mehltretter <kmehltretter@gmail.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oupton@kernel.org>, Fuad Tabba <tabba@google.com>, 
+	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
+Subject: Re: [PATCH 1/2] KVM: arm64: nv: Allocate the shadow S2 MMUs
+ individually
+Message-ID: <anYNTW2e3HalTqTk@gmail.com>
+References: <20260803224405.41468-1-kmehltretter@gmail.com>
+ <86mrv2arf2.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86mrv2arf2.wl-maz@kernel.org>
 
-Thank you for your contribution! Sashiko AI review found 7 potential issue(=
-s) to consider:
-- [Critical] Double-fetch of host-shared memory allows bypassing EL2 physic=
-al page ownership verification.
-- [Critical] `process_its_mapd` lacks alignment validation for `itt_addr`, =
-allowing the physical ITS to access host-controlled memory.
-- [Critical] `check_table_update` lacks alignment validation for the L2 tab=
-le base address, leading to a desynchronization between donated pages and h=
-ardware ITS accesses.
-- [High] `process_its_mapc` fails to validate the `RDBase` (Target Address)=
- field in the MAPC command, allowing the host to corrupt memory.
-- [High] Rollback logic in `check_table_update` is unreachable, causing lea=
-ked page donations on ITS command submission failure.
-- [High] `process_its_mapc` unconditionally checks the Collection table, br=
-eaking ITS command processing if the hardware implements internal collectio=
-ns.
-- [High] Updates to the shadow L1 table in `check_table_update` are not flu=
-shed to the Point of Coherency.
---
+On Tue, Aug 04, 2026 at 03:31:13PM +0100, Marc Zyngier wrote:
+> See the hack below that seems to work OK.
+> 
 
---- Patch [9]: [PATCH v2 09/13] KVM: arm64: Trap & emulate the ITS MAPC com=
-mand ---
-commit 6bcf78893239baf62c5e67a46e844a52707cefb5
-Author: Sebastian Ene <sebastianene@google.com>
+Hi Marc,
 
-KVM: arm64: Trap & emulate the ITS MAPC command
+Since error handling has come up again, I should clarify why
+v2 did not use this sketch verbatim.
 
-This patch parses the MAPC command to verify if any updates to the shadow
-collection table are needed. It adds the process_its_mapc handler and wires
-it into the main process_cmd switch statement.
+> -	kvm_init_nested(kvm);
+> +	ret = kvm_init_nested(kvm);
+> +	if (ret)
+> +		return ret;
+>  
+>  	ret = kvm_share_hyp(kvm, kvm + 1);
+>  	if (ret)
 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/its_emulate.c b/arch/arm64/kvm/hyp/n=
-vhe/its_emulate.c
-> index 071a08d3602d7..5629e2a070df5 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/its_emulate.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/its_emulate.c
-> @@ -332,6 +332,13 @@ static int process_its_mapd(struct its_priv_state *i=
-ts, struct its_cmd_block *cm
->  	return track_pfn(its, device_id, itt_pfn, num_pages, remove);
->  }
-> =20
-> +static int process_its_mapc(struct its_priv_state *its, struct its_cmd_b=
-lock *cmd, bool rollback)
-> +{
-> +	u32 icid =3D cmd->raw_cmd[2] & GENMASK(15, 0);
-> +
+Once kvm_init_nested() has allocated the pointer table, failure in
+kvm_share_hyp() or any subsequent VM initialisation step leaks that
+table.
 
-[Severity: High]
-Does this handler need to extract and validate the Target Address from
-cmd->raw_cmd[2]?
+v2 therefore calls kvm_init_nested() after the earlier initialisation
+steps have succeeded and frees the table if a later step in
+kvm_arch_init_vm() fails.
 
-If the physical ITS uses Physical Target Addresses (GITS_TYPER.PTA =3D=3D 1=
-), the
-RDBase field in the MAPC command specifies the physical address of the targ=
-et
-Redistributor.=20
+> +		for (int i = 0; !ret && i < S2_MMU_PER_VCPU; i++)
+> +			ret = init_nested_s2_mmu(kvm, &tmp[i]);
 
-Since this field appears to be ignored here, could a malicious host provide=
- an
-arbitrary hypervisor or guest physical address? When the ITS hardware
-processes an interrupt for this collection, it might perform a write to the
-unvalidated physical address, bypassing SMMU stage-2 protections and
-corrupting isolated memory.
+> +		if (ret) {
+> +			for (int i = 0; i < S2_MMU_PER_VCPU; i++)
+> +				kvm_free_stage2_pgd(&tmp[i]);
 
-> +	return check_table_update(its, icid, GITS_BASER_TYPE_COLLECTION, rollba=
-ck);
-> +}
+This cleanup includes the entry whose initialisation failed and any
+entries whose initialisation was never attempted. An uninitialised
+entry has no valid mmu->arch, but kvm_free_stage2_pgd() immediately
+derives kvm from mmu->arch before checking mmu->pgt. It can therefore
+dereference an invalid pointer.
 
-[Severity: High]
-Does this code break ITS command processing if the hardware implements
-internal collections?
+This is why v2 tracks successfully initialised MMUs and frees only
+those entries.
 
-According to the GICv3 architecture, if the ITS supports internal hardware
-collections (GITS_TYPER.HCC > 0), the GITS_BASER register for the Collection
-table is optional. If not implemented, get_table_from_snapshot() in
-check_table_update() would legitimately return NULL, which causes an
--EINVAL return.
-
-This error would propagate to cwriter_write(), which immediately returns
-without advancing its->cmd_offset. The MAPC command would be permanently
-rejected and the host ITS queue could stall.
-
-[Severity: Critical]
-Is there a double-fetch risk when reading from the host-shared snapshot tab=
-le
-in check_table_update() called here?
-
-Looking at check_table_update(), EL2 reads the host-controlled L1 table ent=
-ry
-via a bare pointer dereference:
-
-arch/arm64/kvm/hyp/nvhe/its_emulate.c:check_table_update() {
-    ...
-    new_entry =3D snapshot_table[new_entry_index];
-    prev_entry =3D original_table[new_entry_index];
-    ...
-}
-
-Since READ_ONCE() is not used, could the compiler satisfy multiple uses of
-new_entry by reloading it from host memory? If the compiler emits multiple
-load instructions, a host could race to overwrite the entry after it has be=
-en
-verified and the PFN donated, but before it is written to the hypervisor's
-original_table.=20
-
-This could allow the host to install an unverified PFN into the hardware IT=
-S,
-potentially leading to arbitrary memory corruption by the ITS.
-
-[Severity: High]
-Can the rollback logic in check_table_update() actually be reached?
-
-When an ITS command fails to submit to hardware, KVM attempts to revert the
-state by calling process_cmd() with rollback=3Dtrue, which calls into
-check_table_update().=20
-
-However, during the initial forward pass, original_table[new_entry_index]
-was already updated to match the VALID bit of new_entry.
-
-arch/arm64/kvm/hyp/nvhe/its_emulate.c:check_table_update() {
-    ...
-    if (!((new_entry ^ prev_entry) & GITS_BASER_VALID))
-        return 0;
-
-    if (rollback)
-        new_entry =3D new_entry ^ GITS_BASER_VALID;
-    ...
-}
-
-During rollback, wouldn't the early return condition evaluate to true
-since the VALID bits now match? The function would return 0 immediately,
-and the intended rollback logic is never reached, permanently leaving the
-Level 2 table page donated to the hypervisor.
-
-[Severity: Critical]
-Does check_table_update() lack alignment validation for the L2 table base
-address?
-
-When the hypervisor donates the host's L2 table memory, it derives the PFN
-using hyp_phys_to_pfn(new_entry & PHYS_MASK), but does not appear to valida=
-te
-its alignment against the table page size (table->psz):
-
-arch/arm64/kvm/hyp/nvhe/its_emulate.c:check_table_update() {
-    ...
-    if (new_entry & GITS_BASER_VALID)
-        ret =3D __pkvm_host_donate_hyp(hyp_phys_to_pfn(new_entry & PHYS_MAS=
-K),
-                                     table->psz >> PAGE_SHIFT);
-    ...
-}
-
-If the host provides an unaligned address, KVM would donate pages starting
-exactly at the unaligned PFN. However, the physical ITS hardware masks the
-address to its strictly aligned boundary.=20
-
-Could the ITS hardware then access pages preceding the KVM-donated range?
-Since these preceding pages would still be owned by host EL1, this could al=
-low
-the host to directly read or modify active L2 table entries and bypass pKVM
-isolation.
-
-[Severity: High]
-Do the updates to the shadow L1 table in check_table_update() need to be
-flushed to the Point of Coherency?
-
-When the new L1 entry is written to the shadow table:
-
-arch/arm64/kvm/hyp/nvhe/its_emulate.c:check_table_update() {
-    ...
-    original_table[new_entry_index] =3D new_entry;
-    return 0;
-}
-
-This update does not seem to be flushed. If the physical ITS is not cache
-coherent with the CPUs (indicated by its->needs_flush), the hardware ITS
-might fetch the stale L1 entry directly from RAM.=20
-
-Does this require a gic_flush_dcache_to_poc() on the modified shadow table
-entry to ensure the hardware ITS sees the updated pointer to the L2 table?
-
-> +
->  static int process_cmd(struct its_priv_state *its, struct its_cmd_block =
-*cmd,
->  		       bool rollback)
->  {
-> @@ -342,6 +349,10 @@ static int process_cmd(struct its_priv_state *its, s=
-truct its_cmd_block *cmd,
->  	case GITS_CMD_MAPD:
->  		ret =3D process_its_mapd(its, cmd, rollback);
->  		break;
-
-[Severity: Critical]
-Does process_its_mapd() validate the architectural alignment of itt_addr?
-
-Looking at the implementation of process_its_mapd() called here:
-
-arch/arm64/kvm/hyp/nvhe/its_emulate.c:process_its_mapd() {
-    ...
-    phys_addr_t itt_addr =3D cmd->raw_cmd[2] & GENMASK(51, 8);
-    ...
-    itt_pfn =3D hyp_phys_to_pfn(itt_addr);
-    num_pages =3D get_num_itt_pages(its, size);
-    ...
-}
-
-itt_addr is converted to a PFN by shifting right by PAGE_SHIFT. The GIC
-architecture only requires itt_addr to be 256-byte aligned.
-
-If a host provides a sub-page aligned itt_addr near a page boundary, KVM
-calculates num_pages and tracks those pages starting from the truncated PFN.
-However, the physical ITS will access size bytes starting at the unaligned
-itt_addr, potentially spilling into the next page.=20
-
-If this next page is not pinned and remains owned by host EL1, could the ho=
-st
-donate it to a guest, allowing either to read or modify active ITEs and byp=
-ass
-memory isolation?
-
-> +
-> +	case GITS_CMD_MAPC:
-> +		ret =3D process_its_mapc(its, cmd, rollback);
-> +		break;
->  	default:
->  		/* Passthrough everything for now */
->  		break;
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260807164322.2970=
-811-2-sebastianene@google.com?part=3D9
+Thanks,
+Karl
