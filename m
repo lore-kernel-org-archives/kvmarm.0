@@ -1,81 +1,41 @@
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF01922A4E9
-	for <kvmarm@lists.linux.dev>; Fri,  7 Aug 2026 01:13:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3712738DC7E
+	for <kvmarm@lists.linux.dev>; Fri,  7 Aug 2026 01:37:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786065204; cv=none; b=gYhhKHrGyezFT6IlhQlcoSCIYJG5rvkA3IGxEBug0Fh20uBVamfD3j3Mc4AQjIpElSNPkwFgxseUQ4CILOTF1F+RlXTfop17LjbczX0tdiTwO8pVzYokzdunxmcAEJRqrPz/o9Ys4kJJfaSOochJJ/qKFe9ijHKsu28PDtv63c4=
+	t=1786066648; cv=none; b=EDv+5mqzT4px60U/RxJTsx6cWnPrdKlRkwQw4h+HVs2ziI08AjGj97wiR0noIqt64LmRZZRAvqQ0cSBqvpa3R+JRiPx10JhHEUtt7qV5W5nvNEQTP1AcSMcd9IFsqXV4EDb90UMxXThzqgq6FcoLy4+vT22YidTspRY614wWPr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786065204; c=relaxed/simple;
-	bh=SIIgJPGFhz5hNnkc11W1Z33TkabJ2YrobQTf7snc4jY=;
+	s=arc-20240116; t=1786066648; c=relaxed/simple;
+	bh=nzBnOubumnkOLFZKTZYxCBB0e2qDdrPIXCzhhrN5oeg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=clA/lm0kQkYk8K59dv7cE7fAMGzDv6ZCimpQQKYegTzSjAS2+6H/DBbL1HXARoxtA772/TtM637gTFMuI0vGmN1pj2K/G8aeVQsD/F995s3Rr6J369lvob9lXWq2oDOPRtoeDdKjfsfPw73hJIp2Xi/6Hm8Rb0WfvRFtE5m9zVE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bAH3teYR; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=cxFsy4k09U6hWZqHbZYz79UJscIyC/eBozPN6z78ND9hjuJyqarF9eCaBCwZ71hYtUsj9lZBJ5kCMSDBLR/9PhvDIKVXjj/BMibiZ4zhwMwQcu6rUAftDVeb5aFRk6UZM7MF0T0/cb58L+QwSt/xPq9ipdrdjmaRteGZiiQPO3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=aQvAQD7R; arc=none smtp.client-ip=115.124.30.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bAH3teYR"
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4995b0343c1so4208595e9.3
-        for <kvmarm@lists.linux.dev>; Thu, 06 Aug 2026 18:13:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1786065201; x=1786670001; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=JhTAK8kd+tCRfVOm3LmowAQ3BoIBHWxZmJ5DLNOQvkM=;
-        b=bAH3teYRr08z5BGG0Tagv3J8KqUWClLfZ1gm0SY8WQiEc4KxhuI3ol1+YLC4kgBqW5
-         JhovqmPtyHB7H9eQipKzCIiAe+WV7OGiXMLGGlzkT0VRJfU8p8sKxNTXhMKbh0g2TjN2
-         dU/yOWKzuwC92MIwYlEYt0uD7Q7m9pDwFwTiPn9KBjUcN7bZ4mFJIkYZjbAdHUsu/UXt
-         DyLkTT1R3T4Dk9M4tOZEzPpE+G1ylYvo0dCyDFM0onO/RUua9BZRwvdUycQjF3r4rQIY
-         ly38ATN627X0D8K+8nid2EVubaz2qgTxD4zb364g9n38tqU8jZN09/68vgHQH/Zu2R2y
-         nW/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786065201; x=1786670001;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=JhTAK8kd+tCRfVOm3LmowAQ3BoIBHWxZmJ5DLNOQvkM=;
-        b=je2DRzUpq2XJdy5KBJzNup5ft+G023s90Ob5h04FMqukoBgPGdHsfoh43juwCkEsDi
-         JMDjXc9hodOOIduCvhMsh53j3tlJg6IW7co0FjnkMzDxSTtjq5x4l+RD5OsSuud0wDpe
-         dGO2CEHoasV/I5JCMJJz99YK/x3JKd7d8gEmpTAOpDyYiNQITCLg7IDJxrfoHxrCsgRV
-         O6Bux9K4pwJ7tPSz4ViUtBfRUnOOO0TyBkWSAIMhfDL4syMppYC6TvdfGwOsHc3WMHY7
-         q6mthhH3dtFSOKQqXe/bzAOP2n0nJLnDB6np9h1kq34rC0SDXs3tMm+WXPo01eB/8gRv
-         HYbg==
-X-Forwarded-Encrypted: i=1; AHgh+Rq0zG1HKgAb8UJwGXmnf40LdCAdrWrSbOJA6RyZ2QpCbBsTQsuP2HV6otqOoXEBtGjXeXj+dzc=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxW1K+CgwaQzB+hPdepmp4v49v2Md5vokbglZV5eXtr8DLzxG93
-	YnUwXhybK0QDQR5iOAIpNjrRyMMO1wAacJq2NPiLLN8B25HSw9nUB+3y
-X-Gm-Gg: AR+sD13a2582QEh78QW2MFSCeMiGgK+pvBwP6tQrvrsFvLh8OOUmtJWO//Je5obI0Hq
-	9ddXBmJGFGtz61usbDAVamqipr0lr+vO+V7pj3WNhRzbyH5P13C/KtgzigUNG++1bpl0ELof4oS
-	YPa0yyqcE+xPv0h/0ix9kqywHJv/2dKfTMNCb0rk1Znflo8qO5ejiz1AzhbgZqK25ME1lH1wMD0
-	mc434EW8MMuVGrfXd8CQ3fm1OkZb81V+jiipbN+XCPjFkIpKP3kR2URixdcmZe14n7XJ/yD6UWM
-	g0Sqjpd4sjvqwo8+Bvb0b6WlHn298IkYO5+VkZLB0Tbq3YweOCfraI/kdCS1ueUUoW5H7CcfQgY
-	0bjHp22hJJIASLkTVxfJNOw4AvmvGbOYCG/OoLbaYYkHCoexModPSBLKvfxIbM5jJP9UkfR3A7n
-	Qg9ovNx5dSzy865d0zill9wBLcIsuJn2zjfZye6MDqctifki1W9onb2/jHBEQYeibOGjxwxA99q
-	bLk5iwqqQueBhRMMzkbgXhCnzBsyHSPo06FKH+P+0Ree/cKp7OYT6M1g/1xJMl2JuxoUMT74TzF
-	uCB8y9ozLsXFUN67LKQDn/zpVrgeGA6mEfa49hBx2KW43K9BEnWK16ZuFlgdmLpNF5GW+su2EV4
-	r7CzcH1E=
-X-Received: by 2002:a05:600c:1f96:b0:496:c249:dd9a with SMTP id 5b1f17b1804b1-4994e71364fmr228063365e9.3.1786065200908;
-        Thu, 06 Aug 2026 18:13:20 -0700 (PDT)
-Received: from unknown748F3CBA5068 (dynamic-2a02-3100-adf9-2301-8c14-6be6-a9e6-a2d4.310.pool.telefonica.de. [2a02:3100:adf9:2301:8c14:6be6:a9e6:a2d4])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4995c8bcca6sm13771385e9.4.2026.08.06.18.13.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Aug 2026 18:13:20 -0700 (PDT)
-Date: Fri, 7 Aug 2026 03:13:17 +0200
-From: Karl Mehltretter <kmehltretter@gmail.com>
-To: Wei-Lin Chang <weilin.chang@arm.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Fuad Tabba <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org, grayhat@foxmail.com
-Subject: Re: [PATCH v3] KVM: arm64: nv: Keep the shadow S2 MMUs at fixed
- addresses
-Message-ID: <anUt9gd8HIwaj9jf@gmail.com>
-References: <20260806192451.10169-1-kmehltretter@gmail.com>
- <d5svhw3jkjnkucohx2ntwhphemgbtfcmjt2zoyyw6svz56zfrh@z2ziydov5ras>
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="aQvAQD7R"
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1786066629; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=JGKYpm3NtQnK1t7E2NOgTePh2Nswpahf23hIRl2lOT4=;
+	b=aQvAQD7RuZ8kb/qmvFB4Llit9Y0WgZIW3pnH8F4AFxKLgch0I2mNWfYskxPIYYuhws6HbKxtwjZ36rbOSdjyVYvbqOB6k2cBIwmKTcN7bZqCcIm2PpZ8yi0N5MLGsKl7JLLstVPop5haFpPUirFfVFm7+JNS3SpqJ7o4x0YNxfM=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R901e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045098064;MF=yaoyuan@linux.alibaba.com;NM=1;PH=DS;RN=16;SR=0;TI=SMTPD_---0X8VGXri_1786066627;
+Received: from localhost(mailfrom:yaoyuan@linux.alibaba.com fp:SMTPD_---0X8VGXri_1786066627 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Fri, 07 Aug 2026 09:37:08 +0800
+Date: Fri, 7 Aug 2026 09:37:06 +0800
+From: Yao Yuan <yaoyuan@linux.alibaba.com>
+To: Mostafa Saleh <smostafa@google.com>
+Cc: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, maz@kernel.org, oupton@kernel.org, seiden@linux.ibm.com, 
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	catalin.marinas@arm.com, will@kernel.org, vdonnefort@google.com, tabba@google.com, 
+	sebastianene@google.com, keirf@google.com
+Subject: Re: [PATCH] KVM: arm64: Fix hvhe and broken CNTVOFF_EL2
+Message-ID: <gm2w76lflkw67xc4io2ornvfugvijbwotzvwmmefsfcqvrasgp@qkybjxr6lukr>
+References: <20260806150105.4010701-1-smostafa@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -84,39 +44,76 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d5svhw3jkjnkucohx2ntwhphemgbtfcmjt2zoyyw6svz56zfrh@z2ziydov5ras>
+In-Reply-To: <20260806150105.4010701-1-smostafa@google.com>
 
-On Thu, Aug 06, 2026 at 10:54:03PM +0100, Wei-Lin Chang wrote:
-> 
-> Hey sorry for nitpicking once more, I actually like v2 more, as this
-> version splits the error handling to two places. Marc's implementation
-> [1] is also good, but that requires a twist in kvm_arch_flush_shadow_all().
-> So I'd personally go with v2 (+my suggestions for it :)), but also fine if
-> others have other opinions.
-> 
-> I also think the comment in kvm_vcpu_init_nested() is worth adjusting
-> slightly, too.
-> 
+On Thu, Aug 06, 2026 at 03:01:05PM +0800, Mostafa Saleh wrote:
+> When running on a setup affected with broken CNTVOFF_EL2
+> (has_broken_cntvoff())
+>
+> Booting with VHE or protected mode(nvhe) (id_aa64mmfr1.vh=0
+> and arm64_sw.hvhe=0) works fine.
+>
+> However launching a protected VM with protected hvhe mode panics the
+> guest kernel:
 
-No worries, thanks for taking another look.
+...
 
-I was following the guidance in include/linux/cleanup.h:
+> And for non protected VMs seems to hang or progress really slowly.
+>
+> The workaround avoids setting non-zero CNTVOFF_EL2 and trapping the
+> virtual counter to emulate the offset.
+> In the VHE path (timer_set_traps()), traps are only enabled when the
+> guest actually has a non-zero virtual timer offset.
+> However, __timer_enable_traps() in hyp/nvhe/timer-sr.c unconditionally
+> set CNTHCTL_EL1TVT and CNTHCTL_EL1TVCT whenever has_broken_cntvoff()
+> was true.
+>
+> Which causes 2 issues:
+> 1) Protected VMs: kvm_handle_pvm_sysreg() does not find "cntv_ctl_el0"
+> in pvm_sys_reg_descs and injects undefined instruction exceptions.
+>
+> 2) non-protected guests are trapped all the time even with offset of
+> zero.
+>
+> Fix this by adding a check in __timer_enable_traps() similar to the one in
+> timer_set_traps()
 
-  the expectation is that usage of "goto" and cleanup helpers is never
-  mixed in the same function.
+Hi Saleh,
 
-But maybe keeping goto is better. I'll wait a bit for others
-to comment.
+May more fix is needed for case that guest real have virtual
+offset, due to no cntv_ctl_el0 handler there. For current
+fix for virtual offset is zero:
 
-For the comment, I propose replacing the current text with:
+Reviewed-by: Yuan Yao <yaoyuan@linux.alibaba.com>
 
-	/*
-	 * If allocating an MMU object fails, keep the VNCR page alive so
-	 * that userspace can retry vCPU initialisation without affecting
-	 * the VM.
-	 */
-
-Is that the adjustment you had in mind?
-
-Thanks,
-Karl
+>
+> Fixes: 0bc9a9e85fcf ("KVM: arm64: Work around x1e's CNTVOFF_EL2 bogosity")
+> Signed-off-by: Mostafa Saleh <smostafa@google.com>
+> ---
+>  arch/arm64/kvm/hyp/nvhe/timer-sr.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/arm64/kvm/hyp/nvhe/timer-sr.c b/arch/arm64/kvm/hyp/nvhe/timer-sr.c
+> index ff176f4ce7de..98b6e37ee8fa 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/timer-sr.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/timer-sr.c
+> @@ -10,6 +10,7 @@
+>
+>  #include <asm/kvm_hyp.h>
+>  #include <asm/kvm_mmu.h>
+> +#include <hyp/switch.h>
+>
+>  void __kvm_timer_set_cntvoff(u64 cntvoff)
+>  {
+> @@ -63,7 +64,7 @@ void __timer_enable_traps(struct kvm_vcpu *vcpu)
+>  	 * Trap the virtual counter/timer if we have a broken cntvoff
+>  	 * implementation.
+>  	 */
+> -	if (has_broken_cntvoff())
+> +	if (has_broken_cntvoff() && hyp_timer_get_offset(vcpu_vtimer(vcpu)))
+>  		set |= CNTHCTL_EL1TVT | CNTHCTL_EL1TVCT;
+>
+>  	sysreg_clear_set(cnthctl_el2, clr, set);
+> --
+> 2.55.0.654.g21b8a5bc05-goog
+>
