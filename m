@@ -1,170 +1,100 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74464314A95;
-	Fri,  7 Aug 2026 14:52:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69F1B4746CF;
+	Fri,  7 Aug 2026 15:04:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786114380; cv=none; b=jsSwFRq3G/6p2A1EwjriT7P9p0vHwtX0Op4+XVIAaD84M+OzJD/+tM+TIOamffPLntW+8d3ZRUjaHn/SwH/iYPsOzt9VsjgqNvL7pfl4ubIPqrahiX7qCWo92+ftZXYzHrfGH0s+zI75LeoXuFngLYVDh3ecF3oXM/1Jx8OSUFs=
+	t=1786115072; cv=none; b=BmrOz8V1lQkKJcIwWDOQV3ClwfV7lhbgLQyEcZm8BF25q3y7wRhZYpqphzKpsn7kcN56Y4MNhugcRUEyAwqRx6iDlEagO7T+QIb1+i3ww3i7pw6Pt/0QPibY72vjoJSW11pQbvxf0In6E3qkDqle3suuZyJdiKExu/eGtZZzSrI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786114380; c=relaxed/simple;
-	bh=HbS9WX2rdHfW3UAsc+PiZLcb2+G6+1LYWhnDiMB9kfs=;
+	s=arc-20240116; t=1786115072; c=relaxed/simple;
+	bh=XZE9BARKpKFZg2IMmsCIniaMo8/ibzzaSgfT+yUqVII=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=iGpRHjDhw8AxEU19TEBJ+Xn9bLH1b0E/hwRDJf2Qffz/M1GDfvo3sTlu/2d7eH12H9fUAZcvanb/Vr/jNZ1dC9f9dcHU1t1T+TwQQr2JYn8MOLJQ6MKpqq6dvCIW6e5GiuDhmd3dd3SFZPDu/xaGPnkn0RQILoYD4Lw+Jc8AaCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yu+zKdxl; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=WrWCc/SrYSOgjOBBVE4pTVAtxT4aFLpSv7JkS4iM7GMYbKf0jjKUPBzqWWyahEOdPixpkPRWpk5jXxrLIqFenZalk+GuzC8SYCsiMzIqWU30oN1juHC+95afoGMCiSDEzkSwPdvC99uG8FJYSl1kSZjeWLIBFroHutxJAgWSPpI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QQRpATmE; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yu+zKdxl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC71A1F000E9;
-	Fri,  7 Aug 2026 14:52:58 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QQRpATmE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 261E51F00A3E;
+	Fri,  7 Aug 2026 15:04:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786114379;
-	bh=MpjMOa0rpZa0pOs3MVrxoZGJH+58bFuZR4So0VqS34Y=;
+	s=k20260515; t=1786115061;
+	bh=z4ICCEIxcyvaGkvmVKOfgQez8GKHPxHtCj9jW0TWkTc=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=Yu+zKdxlVmlocbJU2p05zAiRb+JNFDpa8tKsidmeqw2jsIZ1AJw1z8+gRJtx6bk9r
-	 59vIA8+dPbbg7UQAPOCcqAMB6gSz30IUz83TixCApR83wB701CNoWHPt5xtbzwzlGN
-	 aetlfyTD10LYZqlJMFJtIVyRlbik61RpesPRPmrHU2gPdxfUCXFpuouQCrjnzPPfQV
-	 6AuxqPtjCcCVKc6D/9yYfs5iA0CDUzUofKDmKzdFbCu7zDN4LeSMl5GPSG0naSDCyE
-	 10XI4oegvEJyqO4sCgnnCzWGJuD58f+HnkI+h+E1aNnznkRz9UkJbk77sV3Gidrina
-	 jVNdFkAmW6Z9A==
+	b=QQRpATmEmFGQRuCqTHeAUh/i6TvcOudlE4Gjrlae9L0jjh7fE7XwnqbhXS4xNJGm1
+	 j+bdI9betbOB3IwSyxSPCeJkX6RCAdDjXWf8qshuy2G6vNDdJE1KhatlWmL53xJmcq
+	 yWHxt2gpCUMHAl6B8tLpGW3KvoIrlVgaUvRf/ALkZ0mewwB1Ov3aio3m1VnqLs56bI
+	 monBWnHVTELydv5CyVK1swX+zfSlThRFSn8qY72/rIStX8ArNFBJnhl1fz+lJlCC1r
+	 QtDCyxVTYrku+XUnDRlJY0tF+UT5Lgc+t1Zpj2+EFCAIlAzsOU6NPCKI0lw9gb6oJo
+	 vmrVpjM/N9EzA==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v5 22/49] KVM: arm64: gic-v5: Register the IRS IODEV
+Subject: Re: [PATCH v5 24/49] KVM: arm64: selftests: Update vGICv5 selftest
+ to set IRS address
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Sascha Bischoff" <Sascha.Bischoff@arm.com>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>, kvm@vger.kernel.org
-In-Reply-To: <20260807111159.429128-23-sascha.bischoff@arm.com>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20260807111159.429128-25-sascha.bischoff@arm.com>
 References: <20260807111159.429128-1-sascha.bischoff@arm.com>
- <20260807111159.429128-23-sascha.bischoff@arm.com>
+ <20260807111159.429128-25-sascha.bischoff@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Aug 2026 14:52:58 +0000
-Message-Id: <20260807145258.AC71A1F000E9@smtp.kernel.org>
+Date: Fri, 07 Aug 2026 15:04:20 +0000
+Message-Id: <20260807150421.261E51F00A3E@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [High] GICv5 SPI injection via IRQFD and KVM_IRQ_ROUTING_IRQCHIP is broke=
-n due to missing UAPI INTID translation and incomplete vgic_get_irq() suppo=
-rt.
-- [High] PMU IRQ configuration is broken for GICv5 VMs due to missing UAPI =
-INTID translation.
+- [Medium] The selftest unconditionally sets the newly introduced `KVM_VGIC=
+_V5_ADDR_TYPE_IRS` device attribute, which will assert and fail on older ke=
+rnels that support GICv5 but lack this new UAPI.
 --
 
---- Patch [22]: [PATCH v5 22/49] KVM: arm64: gic-v5: Register the IRS IODEV=
- ---
-commit 1f7c421def2656a75d9f4c6c3c9bc8b90309dbb8
+--- Patch [24]: [PATCH v5 24/49] KVM: arm64: selftests: Update vGICv5 selft=
+est to set IRS address ---
+commit ea26c5c169753d8ee7936265dd3dd56864a96817
 Author: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Subject: KVM: arm64: gic-v5: Register the IRS IODEV
 
-This commit registers the GICv5 IRS IODEV during vgic_map_resources. It
-also exposes the IRS address configuration to userspace and allows setting
-the number of SPIs handled by the GICv5 implementation.
+KVM: arm64: selftests: Update vGICv5 selftest to set IRS address
 
-> diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/=
-vgic-kvm-device.c
-> index 90be99443df3b..8c2c6886af4e3 100644
-> --- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
-> +++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+This commit updates the vGICv5 selftest to configure the IRS address
+before initializing the VGIC. Setting this address is now mandatory for
+running a GICv5 VM, as resources cannot be mapped without it.
 
-[ ... ]
-
-> @@ -224,31 +232,48 @@ static int vgic_set_common_attr(struct kvm_device *=
-dev,
+> diff --git a/tools/testing/selftests/kvm/arm64/vgic_v5.c b/tools/testing/=
+selftests/kvm/arm64/vgic_v5.c
+> --- a/tools/testing/selftests/kvm/arm64/vgic_v5.c
+> +++ b/tools/testing/selftests/kvm/arm64/vgic_v5.c
 
 [ ... ]
 
-> +		} else {
-> +			/*
-> +			 * GICv5 reports a number of SPIs, not a total number of
-> +			 * interrupts. Require a multiple of 32 SPIs.
-> +			 */
-> +			if (val < VGIC_V5_DEFAULT_NR_SPIS ||
-> +			    val > VGIC_V5_MAX_NR_SPIS ||
-> +			    (val & 31))
-> +				return -EINVAL;
-> +
-> +			mutex_lock(&dev->kvm->arch.config_lock);
-> +			if (vgic_initialized(dev->kvm) || dev->kvm->arch.vgic.nr_spis)
-> +				ret =3D -EBUSY;
-> +			else
-> +				dev->kvm->arch.vgic.nr_spis =3D val;
-> +			mutex_unlock(&dev->kvm->arch.config_lock);
-> +		}
+> @@ -116,6 +117,11 @@ static void test_vgic_v5_ppis(u32 gic_dev_type)
+>  	for (i =3D 0; i < NR_VCPUS; i++)
+>  		vcpu_init_descriptor_tables(vcpus[i]);
 > =20
->  		return ret;
->  	}
+> +	/* Set the address of the IRS before initialising the GIC */
+> +	attr =3D GICV5_IRS_CONFIG_BASE_GPA;
+> +	kvm_device_attr_set(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> +			    KVM_VGIC_V5_ADDR_TYPE_IRS, &attr);
 
-[Severity: High]
-Does this leave PMU IRQ configuration broken for GICv5 VMs?
+[Severity: Medium]
+Will this cause the selftest to fail when run against older kernels that
+support GICv5 but lack the new KVM_VGIC_V5_ADDR_TYPE_IRS attribute?
 
-Since the UAPI INTID lacks the GICv5 internal hardware type bits, the
-PMU configuration fails unconditionally during validation. When userspace
-configures the PMU IRQ using the KVM_ARM_VCPU_PMU_V3_IRQ attribute (passing
-a standard PPI), the check fails:
+Because kvm_device_attr_set() asserts on failure, running this test against
+an older kernel might abort the test suite entirely rather than gracefully
+skipping it.
 
-arch/arm64/kvm/pmu-emul.c:kvm_arm_pmu_v3_set_attr() {
-    ...
-    if (!(irq_is_ppi(vcpu->kvm, irq) || irq_is_spi(vcpu->kvm, irq)))
-        return -EINVAL;
-    ...
-}
+Should this code use __kvm_has_device_attr() to check for the presence of
+KVM_VGIC_V5_ADDR_TYPE_IRS before setting it, or gracefully handle the error
+if it is missing?
 
-Because irq_is_ppi() and irq_is_spi() require the GICV5_HWIRQ_TYPE bits
-that are missing from the raw integer, will this cause PMU setup to fail
-with -EINVAL for GICv5 VMs?
-
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index 59c6e6e766166..e03e820e43ff0 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -31,7 +31,12 @@
->  #define VGIC_MAX_SPI		1019
->  #define VGIC_MAX_RESERVED	1023
->  #define VGIC_MIN_LPI		8192
-> -#define KVM_IRQCHIP_NUM_PINS	(1020 - 32)
-> +
-> +/*
-> + * The common IRQ routing table must accommodate all GIC types. GICv2 and
-> + * GICv3 need 988 pins, while GICv5 needs 1024 pins.
-> + */
-> +#define KVM_IRQCHIP_NUM_PINS	1024
-
-[Severity: High]
-Does expanding the IRQ routing table to 1024 pins expose a gap in GICv5
-SPI injection support?
-
-While this expands the pins for GICv5, the underlying injection mechanisms
-do not translate the UAPI INTID. For example, in vgic_irqfd_set_irq():
-
-arch/arm64/kvm/vgic/vgic-irqfd.c:vgic_irqfd_set_irq() {
-    ...
-    unsigned int spi_id =3D e->irqchip.pin + VGIC_NR_PRIVATE_IRQS;
-    ...
-    if (!vgic_valid_spi(kvm, spi_id))
-        return -EINVAL;
-    ...
-}
-
-This calculates spi_id without the required GICV5_HWIRQ_TYPE_SPI bits,
-causing vgic_valid_spi() to fail for GICv5.
-
-Additionally, vgic_get_irq() hardcodes a NULL return for GICv5 SPIs,
-which blocks injection entirely:
-
-arch/arm64/kvm/vgic/vgic.c:vgic_get_irq() {
-    ...
-    if (vgic_is_v5(kvm))
-        return NULL;
-    ...
-}
-
-Will this prevent guests using device pass-through or virtio devices
-that rely on SPIs from receiving interrupts via irqfd/eventfd?
+>  	kvm_device_attr_set(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
+>  			    KVM_DEV_ARM_VGIC_CTRL_INIT, NULL);
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260807111159.4291=
-28-1-sascha.bischoff@arm.com?part=3D22
+28-1-sascha.bischoff@arm.com?part=3D24
