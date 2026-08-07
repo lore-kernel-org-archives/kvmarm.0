@@ -1,127 +1,331 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3CB52D12ED;
-	Fri,  7 Aug 2026 15:23:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D653246EC60
+	for <kvmarm@lists.linux.dev>; Fri,  7 Aug 2026 15:27:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786116203; cv=none; b=NcwD2YOTBRCcr0ZcO9uuqUfKdqujUpmQDRSmUTjqUn1dv7YXl1X3f1xJHWRz08lUXW7ynkX/lYpoAXcvepx5vMQL0LZqjuwTONlRvnSWFCrdQWT8jJVRYXT30Y6ypi5+/b8WdwDWHmP1cFaHTtstylSBPrNZ8Hs6D6qJ2U9+3DE=
+	t=1786116458; cv=none; b=e64r3VCAmaBPZfl1v2vqkF+QNP1vi/uxSeMDZJquagJU+i7BSDJhL4SyRgwfIxiuZlMN3DuAlGChWgzc/K+MAAfyYjrd0uORw8s1P2RF7ztS0ifIL0JFJxRE6jCh+2mnrdKbSwV0Dv5bfoj7qRheE6pgEDaGbya+aejrzN0bkDw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786116203; c=relaxed/simple;
-	bh=iUjRlGxqAfYWQ0lt+0/CnxJ8mHAHS+muqmBKAC00qQQ=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=qiYkMpwYitBfwqI2nmHL7VfIfORC+xSRp4L3u8a7Wlr55t2GDqs2mklwPB5hDEfioEROPYga5ypznkFPSWTVDFFFuajmqeTYHZ5epXJxMO6bOqo8I2xbPTLlKrSUEH6ejJFtxlduZe5oSOxGQJpveRC5mU+DbtVdQYR0up12wis=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=la3kYiid; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786116458; c=relaxed/simple;
+	bh=7MyKzC0rWs3PkIm6fjcshUyz/i7oJAXec3HrhTPaz4s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gIaXFTrn/+0Alq70quLMUhT5jIzXdtz3wWeAVfaAGx05M5I8hjlHXbPPY3q0CILXxNfWn6i5ZoVTuOlq4kgiuyFmO2WIwzlNYKhxxDB5fBR0i7cVQf25K4XI7Oghph8eZkDY5U2Cos0aMmJ2w7/srZI/2Jw31IRntTT+qZ58dfU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Xj3tWlrk; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="la3kYiid"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E5061F000E9;
-	Fri,  7 Aug 2026 15:23:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786116202;
-	bh=+BsYEP45AmJZZjZf+8yWu6DGNmsLYDC9IbdVjgNQeSo=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=la3kYiidhvmor4PBQTZ12rTWOyoQrZz/Tv/vKqpJrG3qkfVPMekIjqNkP3qs06VlT
-	 v4bHDifRr7MTnD3Ul65KeN4XewmDHIWwKzAKueyQLU9I9wyHikvUjJL96UghRL4Y0Z
-	 mzVZevD51C387vDePgEqS9HZjbdzk0T8t77Z75f54SbWwmEVgx1vhHCEmXUuUh9pjk
-	 +Wj+IEcBaIDXuHBi3vOy/tePKgHBQHopxiuvjPQ/oiAGbDLvYvdaIJy5RbYBzYpf2x
-	 +tcCpoo4uUtWg/qOj4jdkArlRzDevHMG1NszscCGHnZtgms2GgFSHZXSRavAcNOx4z
-	 FFeNWujtN1giw==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v5 27/49] KVM: arm64: gic-v5: Support SPI injection
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Sascha Bischoff" <Sascha.Bischoff@arm.com>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>, kvm@vger.kernel.org
-In-Reply-To: <20260807111159.429128-28-sascha.bischoff@arm.com>
-References: <20260807111159.429128-1-sascha.bischoff@arm.com>
- <20260807111159.429128-28-sascha.bischoff@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Aug 2026 15:23:21 +0000
-Message-Id: <20260807152322.3E5061F000E9@smtp.kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Xj3tWlrk"
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-6a17c7c3c6eso10318a12.1
+        for <kvmarm@lists.linux.dev>; Fri, 07 Aug 2026 08:27:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1786116455; x=1786721255; darn=lists.linux.dev;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=kRRGQ8YPUxChghesyKo/Ao+VKKmI85UeyDmpYQWLsKY=;
+        b=Xj3tWlrkIrBg/gApV5s2fwWmwhzztttTixwFKn13OMgnSPEkv4zanXVy//NvI1x+nI
+         EGNxmRdyIzSqQ1SXWnmV8PbY0EUygvbeQRqwSjp2s7L4rhEasDE0NIAgWmHlxcYvt+oQ
+         L42S2MV7XuybVHXXj+LrNt94cIQx2+9TpYaETrg8E3K69I+WfXYVUPGB9G8bGm4ueklG
+         2xlCBtV7SGO7vvvgrab3iK9GyJX6JzpL0D0lnRlykfkph8PLLYpd9ITew3pB+TUfee+y
+         3lWqFuJC36JzSBGDxMCZ/f2Ri/cM/aqj74kFyOOpR3NqkRsaEZO6gq5FJe0ArkdHcZG8
+         I4gQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786116455; x=1786721255;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=kRRGQ8YPUxChghesyKo/Ao+VKKmI85UeyDmpYQWLsKY=;
+        b=qX7kQn3stszdQkUC5wGkDmHNqnazHLGahG4NPFfH5Q+/+oxbWDAnDvwhMrfnI6Yny0
+         yNithFwR8jul0v0P9+fWJtT4ds45Z7H/3u3cgQpHyWwfX5zRLy9DVaRD5cwAY3y0p0N1
+         YU9wBkSkLOUPUAf+b6RDv+AaXKaDeByewcB8YJlUQb66vLZ4UvIrbSc7v4S7MzetkCTI
+         BPwhyjHc/hZsLRY4AgPj2qRvnOfBrqWAlISrFSmq8BabM3nQW3vBZXIJkSzgnPw27V26
+         z9ddbmChd4+wM97Ox8CUgzreoBkT7hlv+6/BMAxB8V4yMhjRZVNivNl1IT7BHJTxsEL/
+         uTNA==
+X-Forwarded-Encrypted: i=1; AHgh+RptdEZnA5PHNnQQ1bApsMzzWMQJ4stEpEGFm0Kd4doURrfmPrRjBR2ObTOsowJZugtwTwy86AU=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxbuBfBn3qsc7Ylw4qk7r47yIjmiUrhtjejqzgPKRaOJHcBfkTG
+	Za9VTSiMHnBulp2iim24S2KhD0eIBiaXAmy8gIDXGosw7sLraTYCLN3NR/zvF766Vw==
+X-Gm-Gg: AR+sD103Eqvh4grUf2COCww9afCyzDcftX4O5M6NYJf12ypBD55pmV9G/6+kTpX4WGM
+	0y6NPJtP+lhvxFyYSuwrN/1yv5LqmnUCtbY3RQKop8/0IaCLfvMusQW7FfozqOmKcxxRbUCNAeU
+	4rEOxbS1w4r8YNKtuQefsW1FYgKIG2q0Yn1Xs9IxC2bUZ1KAcGtN7NuRDnO6azF2IXG7lwMMDzr
+	UNUc/TePoTfmZBws0+DG6CPc2DGPFr+YnxItn9VWkpeUdGi9GlSjc3XygzHvKHR3SdoIIRMY6WC
+	dsbwzaR1pZpF0Xxx/lkFquJQ9ssLZ6NfJ1iychk2fMOlELVBm8fl114ynHw/dBuJzQszq0Z4bgv
+	a3ZcHQyTVoKKZ8rkd4nKo2YsB7oFMGm0y5yAYZnokA/wfvEvhHhoyq71GFAtNnWjITXW+JEn/Yy
+	vSIWxk2E0BdPKJfN7o1ELYKWJiMiX6oWUwMyX1A1f0leG1quD02FST61DZijiVWpplsTV9tt46+
+	z1fy4TemYX2jnJTx5VkWTS5huaBgQ==
+X-Received: by 2002:a05:6402:21cd:b0:69f:d9cd:ec41 with SMTP id 4fb4d7f45d1cf-6a1d9edad2amr102227a12.6.1786116452123;
+        Fri, 07 Aug 2026 08:27:32 -0700 (PDT)
+Received: from google.com (250.192.189.35.bc.googleusercontent.com. [35.189.192.250])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6a1e7cab27asm698938a12.8.2026.08.07.08.27.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Aug 2026 08:27:31 -0700 (PDT)
+Date: Fri, 7 Aug 2026 15:27:23 +0000
+From: Mostafa Saleh <smostafa@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, oupton@kernel.org,
+	seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org,
+	vdonnefort@google.com, tabba@google.com, sebastianene@google.com,
+	keirf@google.com
+Subject: Re: [PATCH] KVM: arm64: Fix hvhe and broken CNTVOFF_EL2
+Message-ID: <anX5WyOim2Q7SL3P@google.com>
+References: <20260806150105.4010701-1-smostafa@google.com>
+ <86zeyy9pbt.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <86zeyy9pbt.wl-maz@kernel.org>
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
+On Fri, Aug 07, 2026 at 11:50:46AM +0100, Marc Zyngier wrote:
+> On Thu, 06 Aug 2026 16:01:05 +0100,
+> Mostafa Saleh <smostafa@google.com> wrote:
+> > 
+> > When running on a setup affected with broken CNTVOFF_EL2
+> > (has_broken_cntvoff())
+> > 
+> > Booting with VHE or protected mode(nvhe) (id_aa64mmfr1.vh=0
+> > and arm64_sw.hvhe=0) works fine.
+> > 
+> > However launching a protected VM with protected hvhe mode panics the
+> > guest kernel:
+> > 
+> > [    0.000000] Internal error: Oops - Undefined instruction: 0000000000000000 [#1]  SMP
+> > [    0.000000] Modules linked in:
+> > [    0.000000] CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Not tainted 7.2.0-rc3-g05f75bd71e0e-dirty #29 PREEMPT
+> > [    0.000000] Hardware name: linux,dummy-virt (DT)
+> > [    0.000000] pstate: 000003c5 (nzcv DAIF -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+> > [    0.000000] pc : arch_timer_shutdown_virt+0x4/0x1c
+> > [    0.000000] lr : arch_timer_starting_cpu+0x1c4/0x2d4
+> > [    0.000000] sp : ffffa6bd9a193c00
+> > [    0.000000] x29: ffffa6bd9a193c20 x28: ffffa6bd9a1bcf88 x27: 0000000000000000
+> > [    0.000000] x26: ffff00001be70dd8 x25: ffffa6bd99d85000 x24: ffffa6bd99d85ee4
+> > [    0.000000] x23: ffffa6bd99d85000 x22: ffffa6bd9a1499c0 x21: ffffa6bd9a1ab900
+> > [    0.000000] x20: 00ffffffffffffff x19: ffff00001be8b600 x18: 000000000000028c
+> > [    0.000000] x17: 00000000510f0010 x16: 00000000510f0010 x15: 00000000500f0000
+> > [    0.000000] x14: 0000000000000000 x13: 0000000000000000 x12: 0000000000000018
+> > [    0.000000] x11: ffffa6bd9a8ac000 x10: 0000000000f0000f x9 : ffffffffffffffff
+> > [    0.000000] x8 : ffffa6bd98822e18 x7 : 0070752d65746174 x6 : 00111ff76e007261
+> > [    0.000000] x5 : ffffa6bd9ad68078 x4 : 0000000000000000 x3 : ffffa6bd98822a0c
+> > [    0.000000] x2 : 0000000000000073 x1 : 0000000000000001 x0 : ffff00001be8b600
+> > [    0.000000] Call trace:
+> > [    0.000000]  arch_timer_shutdown_virt+0x4/0x1c (P)
+> > [    0.000000]  cpuhp_invoke_callback+0x11c/0x280
+> > [    0.000000]  cpuhp_issue_call+0x1e8/0x224
+> > [    0.000000]  __cpuhp_setup_state_cpuslocked+0x1d8/0x2b8
+> > [    0.000000]  __cpuhp_setup_state+0x50/0x74
+> > [    0.000000]  arch_timer_register+0xc0/0x148
+> > [    0.000000]  arch_timer_of_init+0x148/0x170
+> > [    0.000000]  timer_probe+0x74/0x124
+> > [    0.000000]  time_init+0x18/0x58
+> > [    0.000000]  start_kernel+0x1c0/0x3ac
+> > [    0.000000]  __primary_switched+0x88/0x90
+> > [    0.000000] Code: c80b7d2a 35ffffab 17ffffeb d503245f (d53be328)
+> > 
+> > And for non protected VMs seems to hang or progress really slowly.
+> > 
+> > The workaround avoids setting non-zero CNTVOFF_EL2 and trapping the
+> > virtual counter to emulate the offset.
+> > In the VHE path (timer_set_traps()), traps are only enabled when the
+> > guest actually has a non-zero virtual timer offset.
+> > However, __timer_enable_traps() in hyp/nvhe/timer-sr.c unconditionally
+> > set CNTHCTL_EL1TVT and CNTHCTL_EL1TVCT whenever has_broken_cntvoff()
+> > was true.
+> > 
+> > Which causes 2 issues:
+> > 1) Protected VMs: kvm_handle_pvm_sysreg() does not find "cntv_ctl_el0"
+> > in pvm_sys_reg_descs and injects undefined instruction exceptions.
+> > 
+> > 2) non-protected guests are trapped all the time even with offset of
+> > zero.
+> > 
+> > Fix this by adding a check in __timer_enable_traps() similar to the one in
+> > timer_set_traps()
+> > 
+> > Fixes: 0bc9a9e85fcf ("KVM: arm64: Work around x1e's CNTVOFF_EL2 bogosity")
+> > Signed-off-by: Mostafa Saleh <smostafa@google.com>
+> > ---
+> >  arch/arm64/kvm/hyp/nvhe/timer-sr.c | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/timer-sr.c b/arch/arm64/kvm/hyp/nvhe/timer-sr.c
+> > index ff176f4ce7de..98b6e37ee8fa 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/timer-sr.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/timer-sr.c
+> > @@ -10,6 +10,7 @@
+> >  
+> >  #include <asm/kvm_hyp.h>
+> >  #include <asm/kvm_mmu.h>
+> > +#include <hyp/switch.h>
+> 
+> I'd rather not include this. It drags too many things, and is solely
+> expected to be included from switch.c (both implementations).
+> 
+> You could use the hack below as a prefix to this change.
+> 
 
-Pre-existing issues:
-- [High] Spectre v1 gadget in `vgic_get_irq` for GICv2/GICv3 SPIs due to im=
-proper use of `array_index_nospec`.
---
+I see, I will add your patch as a prefix and respin another version.
 
---- Patch [27]: [PATCH v5 27/49] KVM: arm64: gic-v5: Support SPI injection =
----
-commit 33e91ef5257fc1901a945d6c3b84eddc64cc9e09
-Author: Sascha Bischoff <Sascha.Bischoff@arm.com>
+> >  
+> >  void __kvm_timer_set_cntvoff(u64 cntvoff)
+> >  {
+> > @@ -63,7 +64,7 @@ void __timer_enable_traps(struct kvm_vcpu *vcpu)
+> >  	 * Trap the virtual counter/timer if we have a broken cntvoff
+> >  	 * implementation.
+> >  	 */
+> > -	if (has_broken_cntvoff())
+> > +	if (has_broken_cntvoff() && hyp_timer_get_offset(vcpu_vtimer(vcpu)))
+> >  		set |= CNTHCTL_EL1TVT | CNTHCTL_EL1TVCT;
+> >  
+> >  	sysreg_clear_set(cnthctl_el2, clr, set);
+> 
+> I don't immediately see why a non-protected guest is so slow with
+> hVHE, irrespective of the offset. Even if we go back to the host for
+> the emulation, this should be usable.
+> 
+> Could you describe what actually happens? Do you also see the issue
+> with pure hVHE (without protected)?
 
-KVM: arm64: gic-v5: Support SPI injection
+I haven't checked with pure hvhe, I do not have access to the HW at
+the moment, but I can repro both the pVM panic and non-protected hang
+on Qemu by stubbing “has_broken_cntvoff()” which indicates it’s a
+software issue.
 
-This commit adds support for injecting GICv5 SPIs to the core VGIC code.
-It updates vgic_get_irq() to allow GICv5 SPI lookups by ID and introduces
-specific irq_ops for handling their pending state without AP list queueing.
+I looked more into this and I think I get it, which is the same bug
+Sashiko reported here:
 
-> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-> index 023792c28fc5c..d571fafb07f32 100644
-> --- a/arch/arm64/kvm/vgic/vgic.c
-> +++ b/arch/arm64/kvm/vgic/vgic.c
+The kernel sets the offset when a non-protected VM is started at
+kvm_timer_vcpu_init() based on the current timer value.
 
-[ ... ]
+When hypervisor emulates the timer it reads in kvm_handle_cntxct() =>
+compute_counter_value() which sets offset of zero (that's a bug)
+and the guest reads the raw counter value.
 
-> @@ -86,19 +86,31 @@ static struct vgic_irq *vgic_get_lpi(struct kvm *kvm,=
- u32 intid)
->   */
->  struct vgic_irq *vgic_get_irq(struct kvm *kvm, u32 intid)
+However, I see the guest using CVAL (likely for tick or events), which
+is handled by the host and not the hypervisor, and the host will use
+the true offset in that case which is not zero, which makes the VM
+events fire way later.
+
+Adding some traces in timer_restore_state() I can confirm the massive
+CVAL diff from the current virtual timer.
+
+I have a fix already for this that fixes the hang without this patch,
+I will send it along the respin shortly.
+
+Thanks,
+Mostafa
+
+
+
+> 
+> Thanks,
+> 
+> 	M.
+> 
+> From a7ec0d7f23d86b028164328f33a7114fa6aad2c3 Mon Sep 17 00:00:00 2001
+> From: Marc Zyngier <maz@kernel.org>
+> Date: Fri, 7 Aug 2026 11:36:48 +0100
+> Subject: [PATCH] KVM: arm64: Make timer_get_offset() work in all contexts
+> 
+> We currently have two implementations of get_timer offset(), one
+> in arm_arch_timer.h, and another one in switch.h.
+> 
+> These two only differ by a pair of kern_hyp_va(), which seems a
+> pretty weak reason to open-code it.
+> 
+> Turn this function into a macro to avoid the include dependency hell
+> on kern_hyp_va(), and make it work correctly in all contexts.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/hyp/include/hyp/switch.h | 15 +----------
+>  include/kvm/arm_arch_timer.h            | 34 +++++++++++++++----------
+>  2 files changed, 22 insertions(+), 27 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index 4bf624a49591d..2aceda749641c 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -706,22 +706,9 @@ static inline bool handle_tx2_tvm(struct kvm_vcpu *vcpu)
+>  	return true;
+>  }
+>  
+> -/* Open-coded version of timer_get_offset() to allow for kern_hyp_va() */
+> -static inline u64 hyp_timer_get_offset(struct arch_timer_context *ctxt)
+> -{
+> -	u64 offset = 0;
+> -
+> -	if (ctxt->offset.vm_offset)
+> -		offset += *kern_hyp_va(ctxt->offset.vm_offset);
+> -	if (ctxt->offset.vcpu_offset)
+> -		offset += *kern_hyp_va(ctxt->offset.vcpu_offset);
+> -
+> -	return offset;
+> -}
+> -
+>  static inline u64 compute_counter_value(struct arch_timer_context *ctxt)
 >  {
-> -	/* Non-private IRQs are not yet implemented for GICv5 */
-> -	if (vgic_is_v5(kvm))
-> -		return NULL;
-> +	enum kvm_device_type type =3D kvm->arch.vgic.vgic_model;
-> =20
->  	/* SPIs */
-> -	if (intid >=3D VGIC_NR_PRIVATE_IRQS &&
-> -	    intid < (kvm->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS)) {
-> -		intid =3D array_index_nospec(intid, kvm->arch.vgic.nr_spis + VGIC_NR_P=
-RIVATE_IRQS);
-> -		return &kvm->arch.vgic.spis[intid - VGIC_NR_PRIVATE_IRQS];
-> +	if (__irq_is_spi(type, intid)) {
-> +		switch (type) {
-
-[ ... ]
-
-> +		default: {
-> +			u32 max_intid =3D kvm->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS;
-> +
-> +			if (intid < max_intid) {
-> +				intid =3D array_index_nospec(intid, max_intid);
-> +				return &kvm->arch.vgic.spis[intid - VGIC_NR_PRIVATE_IRQS];
-
-[Severity: High]
-This is a pre-existing issue, but does this array_index_nospec() usage leave
-the kernel open to speculative out-of-bounds reads?
-
-Since array_index_nospec() only bounds the upper limit, if a guest or
-userspace ioctl triggers this path speculatively with an intid less than
-VGIC_NR_PRIVATE_IRQS (e.g., 0 to 31), the value is passed through unchanged.
-
-When the code then subtracts VGIC_NR_PRIVATE_IRQS, it underflows to a
-negative index, allowing speculative access to the memory immediately
-preceding the spis array. Additionally, if the CPU speculatively bypasses
-the bounds check with a large intid, array_index_nospec() clamps it to 0,
-which again underflows when the subtraction occurs.
-
-Should the array_index_nospec() instead be applied to the computed array
-index after the subtraction?
-
-> +			}
-> +		}}
->  	}
-> =20
->  	/* LPIs */
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260807111159.4291=
-28-1-sascha.bischoff@arm.com?part=3D27
+> -	return arch_timer_read_cntpct_el0() - hyp_timer_get_offset(ctxt);
+> +	return arch_timer_read_cntpct_el0() - timer_get_offset(ctxt);
+>  }
+>  
+>  static bool kvm_handle_cntxct(struct kvm_vcpu *vcpu)
+> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+> index 15a4f97f81051..bc6f2fdd7ad33 100644
+> --- a/include/kvm/arm_arch_timer.h
+> +++ b/include/kvm/arm_arch_timer.h
+> @@ -162,20 +162,28 @@ static inline bool has_cntpoff(void)
+>  	return (has_vhe() && cpus_have_final_cap(ARM64_HAS_ECV_CNTPOFF));
+>  }
+>  
+> -static inline u64 timer_get_offset(struct arch_timer_context *ctxt)
+> -{
+> -	u64 offset = 0;
+> +#ifdef __KVM_NVHE_HYPERVISOR__
+> +#define KERN_HYP_VA(x)		kern_hyp_va(x)
+> +#else
+> +#define KERN_HYP_VA(x)		x
+> +#endif
+>  
+> -	if (!ctxt)
+> -		return 0;
+> -
+> -	if (ctxt->offset.vm_offset)
+> -		offset += *ctxt->offset.vm_offset;
+> -	if (ctxt->offset.vcpu_offset)
+> -		offset += *ctxt->offset.vcpu_offset;
+> -
+> -	return offset;
+> -}
+> +#define timer_get_offset(ctxt)						\
+> +	({								\
+> +		struct arch_timer_context *__ctxt = (ctxt);		\
+> +		u64 off = 0;						\
+> +									\
+> +		if (__ctxt) {						\
+> +			struct arch_timer_offset *ato = &__ctxt->offset;\
+> +									\
+> +			if (ato->vm_offset)				\
+> +				off += *KERN_HYP_VA(ato->vm_offset);	\
+> +			if (ato->vcpu_offset)				\
+> +				off += *KERN_HYP_VA(ato->vcpu_offset);	\
+> +		}							\
+> +									\
+> +		off;							\
+> +	})
+>  
+>  static inline void timer_set_offset(struct arch_timer_context *ctxt, u64 offset)
+>  {
+> -- 
+> 2.47.3
+> 
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
