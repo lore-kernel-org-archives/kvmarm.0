@@ -1,29 +1,29 @@
-Received: from MRWPR03CU001.outbound.protection.outlook.com (mail-francesouthazon11011016.outbound.protection.outlook.com [40.107.130.16])
+Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010050.outbound.protection.outlook.com [52.101.69.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE5863DFC6D
-	for <kvmarm@lists.linux.dev>; Fri,  7 Aug 2026 11:20:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.130.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABE8234B669
+	for <kvmarm@lists.linux.dev>; Fri,  7 Aug 2026 11:20:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.50
 ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786101622; cv=fail; b=Pn1VFniRm9XnYYoscKEw012jqccStDZpZPWj+WZMqpPfSUjo9Fx1vD4daPeaFESduXqybPyaHoj7FVU98zm8tRDyHrT0MkPtWfG8a35zUfnGSM8tqzVTy0RJRJ2jZ6Pkjoz6NEoJkefh4iokZWCyoPYaqxPYBNpCx8fv6iKXH4Q=
+	t=1786101658; cv=fail; b=COwJef90x6Tf1KKP66v4rDtYAazqsHI9A1uMAZjEqZIcsoXB7O9X6s1LC9e3c2ak47964gJ8/CyMutq+XxoR/vHRplc9SeCAr9XG07LLlCrBI3UPW/TZSEc4H6y0ypuWhGwxbLVeSLLuQPolISpO7j0bJue7mqYzuSLxf0Jpri0=
 ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786101622; c=relaxed/simple;
-	bh=AhCN3qUolk3eT/M44KStVFUwFK2lsy8jHAU/5vG1xzQ=;
+	s=arc-20240116; t=1786101658; c=relaxed/simple;
+	bh=NLMbws0p7hyDFjICKDEmwidgeEC169eWn+uVAXQztAQ=;
 	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=R/bGYF7DNsEvV2LQmI9p9CfBRtNgLdgruKBkRtf+jU480OvHPC/dBjdPygbkHP5zZJMAgtEjPXrpcLyOd2d0AUEEHv7QOSNkawSPOMiSxwnrxln73Ox5NfFuGvPdayfMaioUvFL5J/GqFYWs2mn3TT1ylrjrzve5y1GIWI0f1y0=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=L8Nznec8; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=L8Nznec8; arc=fail smtp.client-ip=40.107.130.16
+	 Content-Type:MIME-Version; b=OEDpKJeoeR30gVQKOOgf5zcwfVyONy4ft4Ng9aT80ix3n1dLUQa8Razc3FJ07qFuxK4pI2GNMpWIxg/65tUv4eYXUW5gfbfqkW25NKVWHgCJw02hznvUYb1FtrCELMhqGrflc3RXL/SKXJfUEXccCpX+o8h+y2JL/pX1q7CLJ90=
+ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=YX9aDAsh; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=YX9aDAsh; arc=fail smtp.client-ip=52.101.69.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="L8Nznec8";
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="L8Nznec8"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="YX9aDAsh";
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="YX9aDAsh"
 ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
- b=X4eZghwNK5a3+9op5yjUJkI5TvNbp55v52Wy0h3jCjnKotUn/GgeszlanPQqxoSQMjTwtvRV3SnDgElJEMR7H+UY0jgAiA18kmdaGvJbFndffVCgXKXehrSwZ05bU5dj5E72nFYdMZNn6yhE6hDOpkVKVnW6QluEUKlkM2MFN7d7WlEXddHk6bIdMNDvf54ws+xZPfL5k/fcczRCUQif/0fR375sb/o3IYd92jw76yYw4J5M/DpeBYgck6jBykUMRgN2slvSkQPR7OmCs5YYJ4u8fCINupTRYMUGf/twYPLcTFkCs62Y90Y8r6oMAIMP0t1yhOQeJ6MY13fMzJIBUA==
+ b=eWS0R031L+QKF56ujuDYI3KoCN4S+qCOsB0G5gC3hdYsJzMUM8dLauTLXwmXLBRy5oHRsHqe/wpxxJb0FYCXnaARNWsGklMViskMW/D86J6A+tmfhqaOglE1YFaxk/yVEazHpZV2539/pK24rYmGr7kYOVRtswBihYhEwy5fECP/Xxn2hvL7t7TswJg6Jo8G0IiAMo4iwWz46dVyeHH4ch5Wfs19h7Idveh2e+yA4cxHpol1TBI6WrdqBX8wN/Ofc1DzJktWHjV69hPGdGbth7JeKRCjL7sqtKa/BNG21E1+HSNlhLNvEwVUU8IImLgb9dpeGG6946BeKmDYzoLI2g==
 ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kBkWtniJGFnoVd+7lxjPoyDP0ZVwaps0oJAIbzoSbkc=;
- b=fku9RjzrSMUUjmfyLIyKMayHyomG8lwzMaIfymln4lD3R8jItmHfwpKpIVUlz72WVFjrl0dwJALUIh8wkbD65ulqcM0pAnrx74b7jyg54LO+f7V8W5pO3109wjaI39nPZHbemZ2uEfhYnyvw9pnJrQfbf8MFv04JiDJ+0e/si8QHyrIbtMcS7EZkMuos0Sk/kjVV4GLB48b2mB89umIiRhwBTw8ZPcPvqxznINSNacq6k27hOHWi/L3RIFrbODOtr8nz/rcMszhzrMyfawRTveAD/e5MzIIWYo+v35dppw14rkd+CwAgHnnMtsJWSp6qOiLf2LmYFBdaBVRZbuIZmA==
+ bh=Sow7ZLB5qtyxMof6CPcmdIY5mN4IB0T0K9JZQ5Oa5ug=;
+ b=NAOmDK+HDfKXRDzE33/2wo48F77z2980+FrHTNB8utJcomUqRDRMhjS0/wI0sxt2ilGCt+bC75j0sTdee/hfELKWVMfycrt0kr6MbgFT5qY09DG/ZWVj8GDEn5QrARdpug2DdHubKqDmkQMK/nlHCDP9bNTe2ig/J763U7bglyhk+oAw1xzyCyItE3miJyVvsIJrGbbYsvdwnwk9JNZ70Js1QRYgQp0Q+x4zKcVVXxZFuSx0eSYqEZ1viutmxl2bzq9J+WNCoNcgXyl4NrCjbKgDKbU3mr4uqll6wYzM5Odco1ORfUYdl+sI+bHf8dgswUQuwJ3xBXjliRaFtvmA0A==
 ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
  4.158.2.129) smtp.rcpttodomain=lists.infradead.org smtp.mailfrom=arm.com;
  dmarc=pass (p=none sp=none pct=100) action=none header.from=arm.com;
@@ -32,18 +32,18 @@ ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
  dmarc=[1,1,header.from=arm.com])
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kBkWtniJGFnoVd+7lxjPoyDP0ZVwaps0oJAIbzoSbkc=;
- b=L8Nznec8haQqRTCxwLoQqWDD2BbB7K+9LGdxzFSHuUDqLMBcDoAJSq+Ok9SKZ3t+3KASVvlDrVbgWDNzXDFozaR9M3qAntZ0YhKXCPT+Zm5e8KuQwIeH4lgC7He8KM5j8WEwAazWBiLirZUJM8PC2sye0rRfHAz8UfQSn08/Lng=
-Received: from AM0PR10CA0052.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:20b:150::32)
- by DU4PR08MB11812.eurprd08.prod.outlook.com (2603:10a6:10:644::11) with
+ bh=Sow7ZLB5qtyxMof6CPcmdIY5mN4IB0T0K9JZQ5Oa5ug=;
+ b=YX9aDAshXuWvTv1IaftEPgQbvL1DVn+tzmva7ZIBPSeAFvV3dwQB2Q0j4H7SzLespYtN4l33JneHjGwdWgfJYUKOfK3IRvYy74svpzzo8dxld1v0+St+2+X/uDtcVdQzbn597GVnnPAxk6STjYdzIjQMUWMZ5S6aSMX8s6UivIs=
+Received: from DB9PR05CA0012.eurprd05.prod.outlook.com (2603:10a6:10:1da::17)
+ by AS8PR08MB7888.eurprd08.prod.outlook.com (2603:10a6:20b:52f::13) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.292.21; Fri, 7 Aug
- 2026 11:20:17 +0000
-Received: from AMS0EPF000001A5.eurprd05.prod.outlook.com
- (2603:10a6:20b:150:cafe::7e) by AM0PR10CA0052.outlook.office365.com
- (2603:10a6:20b:150::32) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.292.23; Fri, 7 Aug
+ 2026 11:20:47 +0000
+Received: from DB1PEPF000509F0.eurprd03.prod.outlook.com
+ (2603:10a6:10:1da:cafe::a0) by DB9PR05CA0012.outlook.office365.com
+ (2603:10a6:10:1da::17) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.21.292.23 via Frontend Transport; Fri, 7
- Aug 2026 11:20:17 +0000
+ Aug 2026 11:20:47 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
  smtp.mailfrom=arm.com; dkim=pass (signature was verified)
  header.d=arm.com;dmarc=pass action=none header.from=arm.com;
@@ -51,32 +51,32 @@ Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
  4.158.2.129 as permitted sender) receiver=protection.outlook.com;
  client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
 Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
- AMS0EPF000001A5.mail.protection.outlook.com (10.167.16.232) with Microsoft
- SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.21.315.6
- via Frontend Transport; Fri, 7 Aug 2026 11:20:16 +0000
+ DB1PEPF000509F0.mail.protection.outlook.com (10.167.242.74) with Microsoft
+ SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.21.292.8
+ via Frontend Transport; Fri, 7 Aug 2026 11:20:47 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=vkRGg54V4tFrpyg1X5YH9Ryr8IlWlyITg1hxJK2dVC3pxhTdCmOZ6GJGoTSX8xDXeKlkrEmz+PBP7WGG4VJi1CDIf6WqOHvfXvC9+oPecB+/eDmTIWH4LBFpHz1J5zq1Y4B8DskboGxGmwaeD+0h4xpHhIw3y0E4aG/XDQaiZP24QeAZr8xmph848gLCn6JB52QH1C/QQ1SFeIeADNffutSmc32iNLTR4VW1/HyscTo5z+REWa5xMX9pQd93ec8BmVU7PsFl/L/46n7DrbJ43V6eFx4UFf5F5r44wmppMQhLLBI+NIwSOiN+58/aWW8Zt5giAFkEtSRAlM3C1Ls8dw==
+ b=sRD7UGAdnO2EhbHCoQYBGiw0WYYe3tzre+zDxNJ+9W1LmUtQjbrabKAY3XvL8OrNCRD+H3mHP6YfXfSD8YcxzWDgO8NHWB9t2unFZVWI0tyqgdoZAb0VtXRjiNN1EckoxOpY8Tn5r7SQMlVXJDUnq3DkgPDQFvaib9aXkSypGUqGyi+rwrDMkVnNk1p9Dg2DyakPpLPU+/fB+HetNdoUDYJF9L6MQAwbikPkz/1nRUujZNz3HuOZ/5P9WeZwdsiNvjFfptjwo2y97bNAaByWQrmGzWpfbxJhin7bDxd+h9tMecnQCszt/EMkaezan4Kgd4c1Y/k+vcLJPCVaHIJUIg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kBkWtniJGFnoVd+7lxjPoyDP0ZVwaps0oJAIbzoSbkc=;
- b=HqRQ7UBFU6OGmqsCUthGZGiWIeYB+GZ7Eeqw0ThCoyVT3x9yTle9aRVdIZVvuclYLbmYRWoMq91Is+zgEQzjbuanCnL2UKuK+ktqiCgZQJlloMFMbLJ8gqa32mZ80Wpwpr1cVdvtyqatF1rkSHMHtvAvnsOdd0jhFDemFQO1+hRNMG0LMcegVcwAwi32yZqIfg5pEHqro4OY7ZAWQSadesUoUt4okZaW61ayrhif9hYl3qdJz8dTub2kCeChaZqju4XDo/QfEmHJa190hr+IabQ9sV+Ar8iPDW7KLzN0vRSFkND04ObsA+v4BVZWKDUaqa+bXJ1GmLN1Ifj+0RfUhA==
+ bh=Sow7ZLB5qtyxMof6CPcmdIY5mN4IB0T0K9JZQ5Oa5ug=;
+ b=u2mRinI8N98toCTsNer3kKIIuGAdkZOtKGk9Lqkaq09R2d9EBLE8qDT4ycbvCHRxwNcvay7bcKDONQ6NFFkuQinYM8DlZPgPHQ4RlqQwOwC+89RGNJLKpVp2brZ5a2+xS3Z5C44njxBaVILQcGI76hXUhlbWbvgUwOPnxVY3Vn3nS5FOo3mVwtokeflRc6XRKp1uCsHXMoJcCFN3jPING3hlduPrdIU1pKyHrL3szxmc762fZngcfmW7Q+Rw5R+cvB1H86/so8GI83HawRPxBOfnr5hUm6phmCiHDZtDdpkUQkNBnS3+IxnZjmRDrcvig555jGQLbhY173YZKcU2Kw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
  header.d=arm.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kBkWtniJGFnoVd+7lxjPoyDP0ZVwaps0oJAIbzoSbkc=;
- b=L8Nznec8haQqRTCxwLoQqWDD2BbB7K+9LGdxzFSHuUDqLMBcDoAJSq+Ok9SKZ3t+3KASVvlDrVbgWDNzXDFozaR9M3qAntZ0YhKXCPT+Zm5e8KuQwIeH4lgC7He8KM5j8WEwAazWBiLirZUJM8PC2sye0rRfHAz8UfQSn08/Lng=
+ bh=Sow7ZLB5qtyxMof6CPcmdIY5mN4IB0T0K9JZQ5Oa5ug=;
+ b=YX9aDAshXuWvTv1IaftEPgQbvL1DVn+tzmva7ZIBPSeAFvV3dwQB2Q0j4H7SzLespYtN4l33JneHjGwdWgfJYUKOfK3IRvYy74svpzzo8dxld1v0+St+2+X/uDtcVdQzbn597GVnnPAxk6STjYdzIjQMUWMZ5S6aSMX8s6UivIs=
 Received: from GV1PR08MB8428.eurprd08.prod.outlook.com (2603:10a6:150:81::5)
  by GV2PR08MB8725.eurprd08.prod.outlook.com (2603:10a6:150:b4::20) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.292.23; Fri, 7 Aug
- 2026 11:19:43 +0000
+ 2026 11:20:14 +0000
 Received: from GV1PR08MB8428.eurprd08.prod.outlook.com
  ([fe80::9b97:c973:3308:5ba7]) by GV1PR08MB8428.eurprd08.prod.outlook.com
  ([fe80::9b97:c973:3308:5ba7%5]) with mapi id 15.21.0292.018; Fri, 7 Aug 2026
- 11:19:43 +0000
+ 11:20:14 +0000
 From: Sascha Bischoff <Sascha.Bischoff@arm.com>
 To: "linux-arm-kernel@lists.infradead.org"
 	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
@@ -88,12 +88,13 @@ CC: nd <nd@arm.com>, "maz@kernel.org" <maz@kernel.org>,
 	<peter.maydell@linaro.org>, "lpieralisi@kernel.org" <lpieralisi@kernel.org>,
 	Timothy Hayes <Timothy.Hayes@arm.com>, "fuad.tabba@linux.dev"
 	<fuad.tabba@linux.dev>
-Subject: [PATCH v5 14/49] KVM: arm64: gic-v5: Set up VMTEs and VPE doorbells
-Thread-Topic: [PATCH v5 14/49] KVM: arm64: gic-v5: Set up VMTEs and VPE
- doorbells
-Thread-Index: AQHdJl6lx9MNaBreRUOkFnaJF1gqlA==
-Date: Fri, 7 Aug 2026 11:19:43 +0000
-Message-ID: <20260807111159.429128-15-sascha.bischoff@arm.com>
+Subject: [PATCH v5 15/49] KVM: arm64: gic-v5: Add resident/non-resident hyp
+ calls
+Thread-Topic: [PATCH v5 15/49] KVM: arm64: gic-v5: Add resident/non-resident
+ hyp calls
+Thread-Index: AQHdJl63VEcs5wG2l0iE5ni4Fweu+Q==
+Date: Fri, 7 Aug 2026 11:20:14 +0000
+Message-ID: <20260807111159.429128-16-sascha.bischoff@arm.com>
 References: <20260807111159.429128-1-sascha.bischoff@arm.com>
 In-Reply-To: <20260807111159.429128-1-sascha.bischoff@arm.com>
 Accept-Language: en-GB, en-US
@@ -104,18 +105,18 @@ x-mailer: git-send-email 2.34.1
 Authentication-Results-Original: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=arm.com;
 x-ms-traffictypediagnostic:
-	GV1PR08MB8428:EE_|GV2PR08MB8725:EE_|AMS0EPF000001A5:EE_|DU4PR08MB11812:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5ebdd8bc-ed56-41c5-8707-08def475dbe3
+	GV1PR08MB8428:EE_|GV2PR08MB8725:EE_|DB1PEPF000509F0:EE_|AS8PR08MB7888:EE_
+X-MS-Office365-Filtering-Correlation-Id: a3893db0-b327-494f-1d9d-08def475ee14
 x-checkrecipientrouted: true
 nodisclaimer: true
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam-Untrusted:
- BCL:0;ARA:13230040|376014|23010399003|366016|1800799024|38070700021|6133799003|10067099003|11063799006|5023799004|56012099006|22082099003|18002099003|3023799007;
+ BCL:0;ARA:13230040|376014|23010399003|366016|1800799024|38070700021|10067099003|11063799006|56012099006|22082099003|18002099003;
 X-Microsoft-Antispam-Message-Info-Original:
- /MDaDbnxDJq1Z1+3W/icaguPmKq4J6iZ7IMS2mpEZwqfnfhXfN2Jmn2wYHKgSZ4vbc3rsB5IqQRS7zzCMSpq25KL4jJ6k9ZSwg1MZ5QuBKrVPhSRLwuhsbt2LXQMB585IEsN8i2EMTtkcYqnICZTejawUhyA+ntfccocLqgXvgP7P79zUGfNX9YaORKSmhgnLztxLeF+3T/99F1C20olAe0Xft2yNwSOQEh5VR/hJfNpsUAjfOmTbUsUvnuIQWL6ok2iKh0fD+PMK777PqEd1S8lS457r4OmjhvUVCkQtp+HEx+q/tssFblXBymF7cRwSRvagmOV2BNFDrF3vsrfkhT1hIVdo/PcN9mXoM2lSU5q+L5P0cjCXRx/rxn7/dX+nvyNaj2ANB/oonE4lyRCllAqZ5o+QB0hkTeZXx5+5QlRgX+jUksB1Wj1ZZTmxDsfNY0eJjrgUVysMaqQuMx/l0ed5jHTKim1gvWY4J1FTzO7aYCjFSuaS8xs/6TTaJl0HwYQl7FjVk67gpocEOmw7p6CJcvgyLihK9ge8tcronMNet/5hiXQEAp0kjqYsqB6932gyY3TxD4RkUnmu0oKt36d0qW38gBbdVtg4heECWKk61KeVuB7ZJDty1ZkvGhf38/QMA1zImKD4PmcR5NE2BtiFOkyTldC6v2YwIh+B9yG87rNJFu6+JbqmgfCPH5IUlbvtfh1eqsopfzLOIIaCtMWCMVODzyMMhE9vVE3u9M=
+ Oyo6NsMaNKFK5UTgdsfVylXlKpdFJ3lVwutsiafqfaXxWbt4tq+ph4oaamvL1prNtcsxL1SFpEp9W/Bia++07ttWS2udB5xiwFuXWSl3IQTJF6b0o4e5XOhE0yDw/cgejqz6XUZMXtbzcuRrptOdQ6lvsHHKaoHhmtTSBSkhINnvwMEpE39oju+MmENytgACP9Q3wwOaqlhRjV1QlVatY3KiMlJN3TA8dphy9kfP3KeZFEGCPMK3zAxWdmTkLTjUIh/EYHww88MkzffKm+krKbK2VjKw0mqmwHpm8sIn0PSoqQaewbIlL7A58Kl8jrm3kGi2sEL8uLhksZT+40v49UIc0DNJTSwi1nU5AcYTZ+fTxRfC0I5ktave6YQX64moB8CHFEmILoEY/uzUNMFOkRERoQgGLObgKok9SsXi1pnUk72xdTMsLxPZ2q5CvW4fBVoON4PTzhKQERpBRCBdx4rJ80zp1B3ApqDBPlhcTAN2PsrsEzwUvsWyzlaIrduKben/zU9M8CnXbLZJO8hARXAHx/vzNEcGpoH8ypVjwllB2OkDyoesz0cPApo2D7v+15AC6MytpuYNdEOflZgSIzSxY1B+vn/6vDo7UefvzhDlhBUdBXrnEEQUzUVd3/zM7U2T2ZGH94Iptu8BzUU6kFwIPH7F8o+FNBNzZ+ovwMteWZW0eRm+FmK1pPPKv9ULAyYgjOyxoAmoRp3qGYNVibkahxQ0dl60f3KeGT0wzN0=
 X-Forefront-Antispam-Report-Untrusted:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1PR08MB8428.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(23010399003)(366016)(1800799024)(38070700021)(6133799003)(10067099003)(11063799006)(5023799004)(56012099006)(22082099003)(18002099003)(3023799007);DIR:OUT;SFP:1101;
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1PR08MB8428.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(23010399003)(366016)(1800799024)(38070700021)(10067099003)(11063799006)(56012099006)(22082099003)(18002099003);DIR:OUT;SFP:1101;
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
@@ -125,432 +126,237 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 X-Exchange-RoutingPolicyChecked:
- OsS8c2UpYM4PcKPefqQKTKce+xypLDc/PYG9HEclxf3NGXMn54SzHTW/h2Au/v0MfViX+rr0xeuu+aKHp7uT8FSTK4MHKBq6sbm7DocOvWJvtp5lDpvBQyLuQ19MZYeJ2VmybLEcUqZDchMpZADJC4sABSmcPM8rj9L0Oic8+F7kb9UkwKw1bVR77hX3vI54n3dDlfKyVzZJ0mdmebz5BmwxUHVbBY0YC1LzZfD8XJ7S1Mc63E2++rPaVXyIpG0gDWag980oL7IKMBqrc5oYPVBa9kcpJImmjcB7P1TTe+/VsHSK8/89dSOjNb8KwusiUNtmEPmlnEliqwQykUYx1w==
+ r5iJMuu1J/aPjNgFC2gsiPddDa28A09dTdGEETQ5lNipwBGJGlPg0bn7YexsUje0SSMDBWf3xO42167T+CLFdMii5Wx4yjYPwCt0ZOKV+H/Aed1o64EZEXK41wrwRzSuXYBqgPgavJRPWB0DYjt7qk2niHWM+iCxm3eZ2empF5NLYT1ASlEKTzuSy/PE/4bESrA6ePU0oTnDyodGOmcjX+Lfb2BNve3Op4YmvGuK/S+ypMMf/i11PRzmvnq8ps+PiJxOvAbah05UN+D05czLleUOkP8TayYk7K/9xx+15pNKFXj1sK/VvA8CBPz7HUiDZJQWVLPtgzs6CLeicb5j8w==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV2PR08MB8725
 X-EOPAttributedMessage: 0
 X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- AMS0EPF000001A5.eurprd05.prod.outlook.com
+ DB1PEPF000509F0.eurprd03.prod.outlook.com
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	d1f243c7-6e50-4108-3dcf-08def475c817
+	c6ff9d82-acc9-4fd8-4ff2-08def475da47
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|35042699022|36860700016|376014|23010399003|14060799003|82310400026|56012099006|18002099003|22082099003|3023799007|6133799003|10067099003|11063799006|5023799004;
+	BCL:0;ARA:13230040|14060799003|23010399003|82310400026|35042699022|1800799024|36860700016|376014|22082099003|18002099003|56012099006|11063799006|10067099003;
 X-Microsoft-Antispam-Message-Info:
-	uslNyISB73qGWCWGiD45S99R4L6GiRyx1hGkBFRHlIil5im1ZGqW+mieHHIteG39jFvfAaDFYN1lxyPNJ1t/W8mSU68Tku/LkODmyyJwtF+9ZRGCd97FD9IbZiHoSOVkaABrQXHyVJbn0DwBYIQes3LfGa8ij4u/mlX8/XCN3qx+aOfbgMQHg1rucHhMpmKO1GucXw/dBtLqbF7scsIJGelRpyr6gjIddJsaFIYX8FYIjo+faZLmbV4uN2AbOdB/Pda+75gqZiF4usr2e3UxKjshhjIIkzpLLfgHZ4IOXbZKaOCXcr5vyoZ3ouGMDzTamSkLfiN8BcehC2DakpFBTp5SI09XODTqB2IWMHAWSebbnXrWqrz/adbcMtOA4Nbg05Y+/CRmD6SWvBlbB7Ekzqj/aHizOX5/xOOp9YoIdPoaxZAVV7n0A4a8uXMcjgPA98gtMZ1JnCB29oSO47Fpx+msEALfmBlN+nCcn/gQDbjkSCOnEUE9DyHQodJTgFJ5SK92M6ZbbcbwNytpSXLjiDs6i3Fe48vmv4GjQBjagwlGoVtDLF8Kp8Thd6UrO1k3bdoTaXFf5qRL02mo2iNUsbZoW9B4bOPf8+yRFJKOKT7fTgFNLiqFNF9q0y8jubkyLRjeOlwd1T5abKOGhQQOk0OrJ/qGpHdTt6s3hehLY9CAI7H1b0WUbnn0NfbI4qxjfs0yv9qr3SLYGKQR0Ln15g==
+	YDd2Y7T7QRsdVS5TYyAxMvz2VeDzGvzUhWnwVyH+e6JEPl81AQ0q5sWRV1bpVqfnMUVGDrtCbnDOnG4yWBg284K26DeWZWjOm0AabrQSdiPNFuj14nUBiFA0yLt0sjwNfxvQsEr18I7KltD31PS9c4ItaNkjVIAn8w6+6NUFWcUaQmE601SKZNVEOEtx4e9/6uoWlbTKMZUTxk9bHQh8Crs354e19XUAXifXat/sFP2eqG7yExaiE69ehURU/2aBhvXXHTDyOX/pGoqW2VaSwEAVnCuM9qbXFZf1JBPzbtoh93/aQqaq3D4UgPwNhqnulgRlnb+J5hxXhcvlM4E53DA7JI3hHY29+BgXccneME2KYIg9Vd/Ec8gIKv0TIy4iZuFJZnWnfAWfV0+TYrzB/WyatlKNrFZsiSZv9id1KEJKdgyuL/2cR+bz24iCdJ6qFkLYy+lBn9A4uGLIGR5ksY5v2V75bGyV+ToGmFiQwpDCz3oQjmShAuHMdoy06x2x4+xYsF7osgF8j8tAzcw6VgpYLD7VHcgn41xoPIEsgLeRbtACudAIXPbDnfIEuXzOcf3GZGKC8oCllGGpFofiTn1eo01NCrFrggW63LRW3F85LKPG1YPEYqlrUB0dvBBo6adKfZrM/NaxPIUjW0FTAIJcOBl82QrX9FGgeQwhkWbJZJrpzGkxDC0iZ28NWI9A8BIVN8Wj/R5AL7YrollGhA==
 X-Forefront-Antispam-Report:
-	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(35042699022)(36860700016)(376014)(23010399003)(14060799003)(82310400026)(56012099006)(18002099003)(22082099003)(3023799007)(6133799003)(10067099003)(11063799006)(5023799004);DIR:OUT;SFP:1101;
+	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(14060799003)(23010399003)(82310400026)(35042699022)(1800799024)(36860700016)(376014)(22082099003)(18002099003)(56012099006)(11063799006)(10067099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	7B1UjowUq95MzC16z0cPWrTmgQgUqzG1PunAzrEo2Do7YkWL2OscCZICznSkTPaSykJEw84+2fDQFaN6eW2iS3l8yrLH6E2K7YsogoaxwQlytDzFKmokUrV/8N2Fd9wNRFd2Bjpzpo0FK265oxHVSKXfji7l7P+uOBOUiqeqTTM7ILCti9TJ+tafroJNeclJhOA/aCzxO0uToEPbG3Dlq4XIWKscUFYzXUh1iTTy/priNj8xwPIPco8jaeujdJ+6jLyHLf9PWCbpqDF2jwPbp/xHT2k+IBwhSc1UOwNJxKQYjUG6mN4kLgLxxZYozLRogpmxPU3rBk6GF1LtDaAO7jFpFezahsl++sgd69LrCU5HheXPtMH4RQttFI14GwrYrc3/X7jXuvOdaRwPGV3ZZywuVQCIsH3fPO9Ny+WfIJeEJYvRS15EbRDHVNFGt/ZO
+	DmAa7w7vUNQZTN7nDfMpC9RAza1DWKeR9/YHcUPoG3TCxnA1e/O4jHEbTu0Y4EpLaF4iviWI0lUVq/ur3TCsy/rJ86bjv4LRaCs2kiWmHe3xCpq23OzN0e/93MpPcq4KLYhxtNT4e7uHeJ/pKlM/R2/JXOKY9IeYmxy5mjeDmCApT3fJ6J1CZwHgIqsd5BMj5WNb+KD3O5HdoArvtJfLo8+M8ty7hIep7WXajsWym8yHPzHrLX9vQoUz6NvfAXa6gyM8P4YHT4wpd5obO4G65E4Z2CsrLIKYCDfncSFVxbHg84t2eb3NtaYh9JQh8kj8LKp+94DlmSYwLK6AcwAAqSj7xiyqv3vUp34brn+BMscNBRYd0Q3IElHp2KDJYC2VUkiFL82hVU01w6CA9SY9KRMBm/I4rX/BqTK1RjI2Viq16XTo79IHU9Jbmeb3CiG+
 X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Aug 2026 11:20:16.9539
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Aug 2026 11:20:47.4726
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5ebdd8bc-ed56-41c5-8707-08def475dbe3
+X-MS-Exchange-CrossTenant-Network-Message-Id: a3893db0-b327-494f-1d9d-08def475ee14
 X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	AMS0EPF000001A5.eurprd05.prod.outlook.com
+	DB1PEPF000509F0.eurprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU4PR08MB11812
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR08MB7888
 
-A GICv5 VM needs a VM table entry before it can use SPIs and LPIs,
-which are backed by the host IRS. The VM table itself is created at
-probe time, but each VM still needs to claim and populate one VMTE
-before it can use those interrupts.
+GICv5 introduces the concept of VPE residency - a VPE can be either
+resident or non-resident. When the VPE is resident, the IRS is allowed
+to select interrupts that target that VPE (or the VM) as the HPPI
+(Highest Priority Pending Interrupt). As the IRS handles both SPIs and
+LPIs, these will only be picked as the IRS's HPPI when a VPE is
+resident.
 
-VPE doorbells are allocated from the host LPI irq domain. Without that
-domain, KVM cannot issue IRS commands or receive doorbell wakeups.
-Fail the GICv5 KVM probe if the host driver did not create an LPI
-domain.
+A GICv5 VPE is made resident by writing ICH_CONTEXTR_EL2 with
+ICH_CONTEXTR_EL2.V set, together with valid VM and VPE IDs. This
+informs the IRS that a specific VPE is running, and that it can begin
+HPPI selection for that VPE. Making a VPE non-resident (by making the
+ICH_CONTEXTR_EL2 invalid) informs the IRS that the VPE is no longer
+running, and it stops HPPI selection for it.
 
-Allocate a VM ID during vgic_v5_init(). The VM ID is also the index
-into the VM table, so allocating it selects the VMTE slot that will be
-used for the lifetime of the VM.
+This change introduces two new hyp calls - one to make a VPE resident
+and its counterpart to make a VPE non-resident. As part of making a
+VPE resident, the resulting ICH_CONTEXTR_EL2.F bit is checked to catch
+residency faults. Such a fault indicates a broken VM/VPE setup, so
+warn and mark the VM dead.
 
-Create a per-VM VPE doorbell irq domain, allocate one doorbell
-interrupt per vCPU, request the interrupts, and keep the doorbell IRQ
-number in the vCPU's GICv5 state. The doorbell handler marks the VPE
-doorbell as fired, raises KVM_REQ_IRQ_PENDING, and kicks the target
-vCPU so that KVM can re-evaluate pending interrupt state.
+Both of these new hypercalls are explicitly no-ops with pKVM as we
+currently don't support the combination of GICv5 and pKVM.
 
-The doorbell domain indexes its interrupts using the dense vcpu_idx,
-while GICv5 uses the userspace-provided vcpu_id as the VPE ID. Store a
-backpointer to the VM and use it to resolve the vCPU before issuing
-VPE-specific IRS commands. This preserves the userspace VPE ID when
-vCPU IDs are sparse.
-
-With the VM ID and doorbells in place, initialise the VMTE backing
-state, including the VM descriptor, VPE table, and preallocated VPED
-storage. The doorbells have to exist before making the VMTE valid, as
-they provide the IRQ-side conduit used by the IRS commands. Make the
-VMTE valid via the IRS, then populate the VPETE for each vCPU.
-
-Add vgic_v5_teardown() to unwind the state in the reverse order. Make
-the VMTE invalid, clear the per-vCPU VPETEs, release the VMTE backing
-state, free the doorbell IRQs and irq domain, and finally release the
-VM ID so that the VMTE slot can be reused by a later VM. If hardware
-invalidation or VMTE release fails, still free the software doorbells
-and domain, but keep the VM ID allocated so that the VMTE slot is not
-reused while hardware-visible state may remain.
-
-On init failure, call the same teardown path so that partially created
-state is unwound consistently.
-
-As part of resetting vCPUs, mark them as valid in the VM's VPE table.
-This informs the IRS that a specific VPE may be made resident. Without
-this, the IRS will treat the VPE as invalid.
-
-Also introduce vgic_v5_send_command(), a wrapper around the VPE
-doorbells. It takes a struct kvm_vcpu pointer and the command to run,
-and invokes the function bound to that command through the vCPU's
-doorbell.
+Furthermore, this change extends vgic_v5_load() and vgic_v5_put() to
+make the VPEs resident and non-resident, respectively. Hence, the VPE
+is considered resident for the entire load-to-put interval.
 
 Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 ---
- arch/arm64/kvm/vgic/vgic-v5.c | 228 +++++++++++++++++++++++++++++-----
- include/kvm/arm_vgic.h        |   2 +
- 2 files changed, 197 insertions(+), 33 deletions(-)
+ arch/arm64/include/asm/kvm_asm.h   |  2 ++
+ arch/arm64/include/asm/kvm_hyp.h   |  2 ++
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c | 22 ++++++++++++++++++++++
+ arch/arm64/kvm/hyp/vgic-v5-sr.c    | 26 ++++++++++++++++++++++++++
+ arch/arm64/kvm/vgic/vgic-v5.c      | 16 ++++++++++++++--
+ include/kvm/arm_vgic.h             |  3 +++
+ 6 files changed, 69 insertions(+), 2 deletions(-)
 
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_=
+asm.h
+index 043495f7fc78b..d9ff9c2999aa7 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -87,6 +87,8 @@ enum __kvm_host_smccc_func {
+ 	__KVM_HOST_SMCCC_FUNC___tracing_write_event,
+ 	__KVM_HOST_SMCCC_FUNC___vgic_v3_save_aprs,
+ 	__KVM_HOST_SMCCC_FUNC___vgic_v3_restore_vmcr_aprs,
++	__KVM_HOST_SMCCC_FUNC___vgic_v5_make_resident,
++	__KVM_HOST_SMCCC_FUNC___vgic_v5_make_non_resident,
+ 	__KVM_HOST_SMCCC_FUNC___vgic_v5_save_apr,
+ 	__KVM_HOST_SMCCC_FUNC___vgic_v5_restore_vmcr_apr,
+=20
+diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_=
+hyp.h
+index 4974492744cc8..8fcbbff719cce 100644
+--- a/arch/arm64/include/asm/kvm_hyp.h
++++ b/arch/arm64/include/asm/kvm_hyp.h
+@@ -88,6 +88,8 @@ void __vgic_v3_restore_vmcr_aprs(struct vgic_v3_cpu_if *c=
+pu_if);
+ int __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu);
+=20
+ /* GICv5 */
++void __vgic_v5_make_resident(struct vgic_v5_cpu_if *cpu_if);
++void __vgic_v5_make_non_resident(struct vgic_v5_cpu_if *cpu_if);
+ void __vgic_v5_save_apr(struct vgic_v5_cpu_if *cpu_if);
+ void __vgic_v5_restore_vmcr_apr(struct vgic_v5_cpu_if *cpu_if);
+ /* No hypercalls for the following */
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/h=
+yp-main.c
+index d3df96ed8ba42..7fdcc6bb6f594 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+@@ -691,6 +691,26 @@ static void handle___tracing_write_event(struct kvm_cp=
+u_context *host_ctxt)
+ 	trace_selftest(id);
+ }
+=20
++static void handle___vgic_v5_make_resident(struct kvm_cpu_context *host_ct=
+xt)
++{
++	DECLARE_REG(struct vgic_v5_cpu_if *, cpu_if, host_ctxt, 1);
++
++	if (unlikely(is_protected_kvm_enabled()))
++		return;
++
++	__vgic_v5_make_resident(kern_hyp_va(cpu_if));
++}
++
++static void handle___vgic_v5_make_non_resident(struct kvm_cpu_context *hos=
+t_ctxt)
++{
++	DECLARE_REG(struct vgic_v5_cpu_if *, cpu_if, host_ctxt, 1);
++
++	if (unlikely(is_protected_kvm_enabled()))
++		return;
++
++	__vgic_v5_make_non_resident(kern_hyp_va(cpu_if));
++}
++
+ static void handle___vgic_v5_save_apr(struct kvm_cpu_context *host_ctxt)
+ {
+ 	DECLARE_REG(struct vgic_v5_cpu_if *, cpu_if, host_ctxt, 1);
+@@ -738,6 +758,8 @@ static const hcall_t host_hcall[] =3D {
+ 	HANDLE_FUNC(__tracing_write_event),
+ 	HANDLE_FUNC(__vgic_v3_save_aprs),
+ 	HANDLE_FUNC(__vgic_v3_restore_vmcr_aprs),
++	HANDLE_FUNC(__vgic_v5_make_resident),
++	HANDLE_FUNC(__vgic_v5_make_non_resident),
+ 	HANDLE_FUNC(__vgic_v5_save_apr),
+ 	HANDLE_FUNC(__vgic_v5_restore_vmcr_apr),
+=20
+diff --git a/arch/arm64/kvm/hyp/vgic-v5-sr.c b/arch/arm64/kvm/hyp/vgic-v5-s=
+r.c
+index 6d69dfe89a96c..f064045a31aee 100644
+--- a/arch/arm64/kvm/hyp/vgic-v5-sr.c
++++ b/arch/arm64/kvm/hyp/vgic-v5-sr.c
+@@ -7,6 +7,32 @@
+=20
+ #include <asm/kvm_hyp.h>
+=20
++void __vgic_v5_make_resident(struct vgic_v5_cpu_if *cpu_if)
++{
++	write_sysreg_s(cpu_if->vgic_contextr, SYS_ICH_CONTEXTR_EL2);
++	isb();
++
++	/* Catch any faults */
++	cpu_if->vgic_contextr =3D read_sysreg_s(SYS_ICH_CONTEXTR_EL2);
++	if (!!FIELD_GET(ICH_CONTEXTR_EL2_F, cpu_if->vgic_contextr))
++		return;
++
++	cpu_if->gicv5_vpe.resident =3D true;
++}
++
++void __vgic_v5_make_non_resident(struct vgic_v5_cpu_if *cpu_if)
++{
++	/*
++	 * Make as non-resident before actually making non-resident. Avoids race
++	 * with doorbell arriving.
++	 */
++	cpu_if->gicv5_vpe.resident =3D false;
++	dsb(st);
++
++	write_sysreg_s(cpu_if->vgic_contextr, SYS_ICH_CONTEXTR_EL2);
++	isb();
++}
++
+ void __vgic_v5_save_apr(struct vgic_v5_cpu_if *cpu_if)
+ {
+ 	cpu_if->vgic_apr =3D read_sysreg_s(SYS_ICH_APR_EL2);
 diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-index 2121f67d3b59c..f15a8309d7a93 100644
+index f15a8309d7a93..c36ae9e07ae26 100644
 --- a/arch/arm64/kvm/vgic/vgic-v5.c
 +++ b/arch/arm64/kvm/vgic/vgic-v5.c
-@@ -100,6 +100,11 @@ int vgic_v5_probe(const struct gic_kvm_info *info)
- 		goto skip_v5;
- 	}
+@@ -1058,6 +1058,8 @@ void vgic_v5_flush_ppi_state(struct kvm_vcpu *vcpu)
+ void vgic_v5_load(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_v5_cpu_if *cpu_if =3D &vcpu->arch.vgic_cpu.vgic_v5;
++	u16 vm =3D vgic_v5_vm_id(vcpu->kvm);
++	u16 vpe =3D vgic_v5_vpe_id(vcpu);
 =20
-+	if (!gicv5_global_data.lpi_domain) {
-+		kvm_err("GICv5 LPI domain unavailable\n");
-+		return -ENODEV;
-+	}
+ 	/*
+ 	 * On the WFI path, vgic_load is called a second time. The first is when
+@@ -1070,7 +1072,15 @@ void vgic_v5_load(struct kvm_vcpu *vcpu)
+=20
+ 	kvm_call_hyp(__vgic_v5_restore_vmcr_apr, cpu_if);
+=20
+-	cpu_if->gicv5_vpe.resident =3D true;
++	cpu_if->vgic_contextr =3D FIELD_PREP(ICH_CONTEXTR_EL2_V, true) |
++				FIELD_PREP(ICH_CONTEXTR_EL2_VPE, vpe) |
++				FIELD_PREP(ICH_CONTEXTR_EL2_VM, vm);
 +
- 	vgic_v5_irs_cache_id_regs(info);
- 	vgic_v5_get_implemented_ppis();
-=20
-@@ -384,12 +389,35 @@ static int vgic_v5_irs_set_up_vpe(u16 vm_id, u16 vpe_=
-id,
- 	return 0;
++	kvm_call_hyp(__vgic_v5_make_resident, cpu_if);
++
++	/* Failed to make the VPE resident? Bang! */
++	if (WARN_ON(!!FIELD_GET(ICH_CONTEXTR_EL2_F, cpu_if->vgic_contextr)))
++		kvm_vm_dead(vcpu->kvm);
  }
 =20
-+static irqreturn_t db_handler(int irq, void *data)
-+{
-+	struct kvm_vcpu *vcpu =3D data;
-+
-+	WRITE_ONCE(vcpu->arch.vgic_cpu.vgic_v5.gicv5_vpe.db_fired, true);
-+
-+	kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
-+	kvm_vcpu_kick(vcpu);
-+
-+	return IRQ_HANDLED;
-+}
-+
-+static int vgic_v5_send_command(struct kvm_vcpu *vcpu, enum gicv5_vcpu_cmd=
- cmd)
-+{
-+	int irq =3D vgic_v5_vpe_db(vcpu);
-+
-+	if (!irq)
-+		return -ENXIO;
-+
-+	return irq_set_vcpu_affinity(irq, &cmd);
-+}
-+
- static int vgic_v5_db_set_vcpu_affinity(struct irq_data *data, void *vcpu_=
-info)
- {
- 	struct vgic_v5_vm *vm =3D data->domain->host_data;
- 	enum gicv5_vcpu_cmd *cmd =3D vcpu_info;
--	/* Our VPE ID is the index within the doorbell domain */
--	u16 vpe_id =3D data->hwirq;
-+	unsigned int vcpu_idx =3D data->hwirq;
-+	struct kvm_vcpu *vcpu;
-+	u16 vpe_id;
+ void vgic_v5_put(struct kvm_vcpu *vcpu)
+@@ -1088,7 +1098,9 @@ void vgic_v5_put(struct kvm_vcpu *vcpu)
 =20
- 	guard(raw_spinlock_irqsave)(&vgic_v5_irs_lock);
+ 	kvm_call_hyp(__vgic_v5_save_apr, cpu_if);
 =20
-@@ -401,6 +429,17 @@ static int vgic_v5_db_set_vcpu_affinity(struct irq_dat=
-a *data, void *vcpu_info)
- 	case VMTE_MAKE_INVALID:
- 		return vgic_v5_irs_set_vm_invalid(vm->vm_id);
- 	case VPE_MAKE_VALID:
-+		/*
-+		 * The index in the doorbell domain aligns with our flat
-+		 * vcpu_idx index. However, we need the actual VPE ID, which
-+		 * means we first need to resolve the actual vcpu.
-+		 */
-+		vcpu =3D kvm_get_vcpu(vm->kvm, vcpu_idx);
-+		if (!vcpu)
-+			return -EINVAL;
+-	cpu_if->gicv5_vpe.resident =3D false;
++	cpu_if->vgic_contextr =3D 0;
 +
-+		vpe_id =3D vgic_v5_vpe_id(vcpu);
-+
- 		/*
- 		 * We need the actual LPI ID which lives in the top-most parent
- 		 * domain. This hwirq won't include the type (LPI) but that's
-@@ -456,15 +495,9 @@ static int vgic_v5_irq_db_domain_alloc(struct irq_doma=
-in *domain,
- 				       void *arg)
- {
- 	const struct irq_chip *chip =3D &vgic_v5_db_irq_chip;
--	struct vgic_v5_vm *vm =3D arg;
- 	struct irq_data *irqd;
- 	int ret;
++	kvm_call_hyp(__vgic_v5_make_non_resident, cpu_if);
 =20
--	if (!vm) {
--		kvm_err("invalid parameter for doorbell irq allocation\n");
--		return -EINVAL;
--	}
--
- 	ret =3D irq_domain_alloc_irqs_parent(domain, virq, nr_irqs, NULL);
- 	if (ret)
- 		return ret;
-@@ -491,20 +524,10 @@ static int vgic_v5_create_per_vm_domain(struct kvm *k=
-vm)
- 	int id =3D task_pid_nr(current);
- 	int ret, db_virq =3D 0;
-=20
--	if (!gicv5_global_data.lpi_domain) {
--		kvm_err("LPI domain uninitialized, can't set up KVM Doorbells\n");
--		return -ENODEV;
--	}
--
- 	vm->fwnode =3D irq_domain_alloc_named_id_fwnode("GICv5-vpe-db", id);
- 	if (!vm->fwnode)
- 		return -ENOMEM;
-=20
--	/*
--	 * KVM per-VM VPE DB domain; child of LPI domain; only ever handles
--	 * doorbells. We know how many doorbells we have, and therefore we
--	 * create a linear domain.
--	 */
- 	vm->domain =3D irq_domain_create_hierarchy(gicv5_global_data.lpi_domain,
- 						 0, nr_vcpus, vm->fwnode,
- 						 &vgic_v5_irq_db_domain_ops, vm);
-@@ -543,11 +566,6 @@ static void vgic_v5_teardown_per_vm_domain(struct vgic=
-_v5_vm *vm)
- 	if (!vm->domain)
- 		return;
-=20
--	if (vm->vpe_db_base) {
--		irq_domain_free_irqs(vm->vpe_db_base, vm->domain->revmap_size);
--		vm->vpe_db_base =3D 0;
--	}
--
- 	irq_domain_remove(vm->domain);
- 	irq_domain_free_fwnode(vm->fwnode);
- 	vm->domain =3D NULL;
-@@ -567,33 +585,121 @@ void vgic_v5_reset(struct kvm_vcpu *vcpu)
- 	 * CPUIF (but potentially fewer in the IRS).
- 	 */
- 	vcpu->arch.vgic_cpu.num_pri_bits =3D 5;
-+
-+	/* Make the VPE valid in the VPET */
-+	if (WARN_ON(vgic_v5_send_command(vcpu, VPE_MAKE_VALID)))
-+		return;
-+}
-+
-+static void vgic_v5_free_doorbells(struct kvm *kvm, unsigned int nr_dbs)
-+{
-+	struct vgic_v5_vm *vm =3D &kvm->arch.vgic.gicv5_vm;
-+	struct kvm_vcpu *vcpu;
-+	unsigned long i;
-+	int db;
-+
-+	for (i =3D 0; i < nr_dbs; i++) {
-+		vcpu =3D kvm_get_vcpu(kvm, i);
-+		db =3D vgic_v5_vpe_db(vcpu);
-+		if (!db)
-+			continue;
-+
-+		free_irq(db, vcpu);
-+		vcpu->arch.vgic_cpu.vgic_v5.gicv5_vpe.db =3D 0;
-+	}
-+
-+	if (vm->vpe_db_base) {
-+		irq_domain_free_irqs(vm->vpe_db_base,
-+				     atomic_read(&kvm->online_vcpus));
-+		vm->vpe_db_base =3D 0;
-+	}
- }
-=20
- void vgic_v5_teardown(struct kvm *kvm)
- {
-+	struct vgic_dist *dist =3D &kvm->arch.vgic;
-+	struct kvm_vcpu *vcpu, *vcpu0;
-+	bool release_vm_id =3D true;
-+	unsigned long i;
-+	int rc;
-+
-+	lockdep_assert_held(&kvm->arch.config_lock);
-+
-+	/*
-+	 * If the VM's ID isn't valid, then we either failed init very early or
-+	 * we've been called a second time. Nothing to do here in either case.
-+	 */
-+	if (kvm->arch.vgic.gicv5_vm.vm_id =3D=3D VGIC_V5_VM_ID_INVAL)
-+		return;
-+
-+	if (kvm->arch.vgic.gicv5_vm.vmte_allocated) {
-+		/* Make the VM invalid  */
-+		vcpu0 =3D kvm_get_vcpu(kvm, 0);
-+		rc =3D vgic_v5_send_command(vcpu0, VMTE_MAKE_INVALID);
-+		if (rc) {
-+			kvm_err("could not make VMTE invalid\n");
-+			release_vm_id =3D false;
-+			goto out_free_doorbells;
-+		}
-+
-+		kvm_for_each_vcpu(i, vcpu, kvm) {
-+			if (vgic_v5_vmte_free_vpe(vcpu)) {
-+				kvm_err("Failed to free VPE\n");
-+				release_vm_id =3D false;
-+			}
-+		}
-+
-+		if (vgic_v5_vmte_release(kvm)) {
-+			kvm_err("Failed to release VM 0x%x\n", dist->gicv5_vm.vm_id);
-+			release_vm_id =3D false;
-+		}
-+	}
-+
-+out_free_doorbells:
-+	vgic_v5_free_doorbells(kvm, atomic_read(&kvm->online_vcpus));
- 	vgic_v5_teardown_per_vm_domain(&kvm->arch.vgic.gicv5_vm);
-+
-+	/*
-+	 * We only release the VM ID itself if we didn't fail earlier. It does
-+	 * mean that we might lose the VM ID (and associated VMTE, etc), but
-+	 * given that we've failed to tear them down correctly there's no way to
-+	 * safely reuse them. The VM ID allocating IDA will make sure we don't
-+	 * accidentally reuse this partially torn down state.
-+	 */
-+	if (release_vm_id)
-+		vgic_v5_release_vm_id(kvm);
- }
-=20
-+/*
-+ * Claim and populate a VMTE (optionally making a new L2 VMT valid), creat=
-e VPE
-+ * doorbells, allocate VPET and populate for each VPE.
-+ *
-+ * Note: We do need to put the cart before the horse here. The VPE doorbel=
-ls are
-+ * our conduit for communication with the IRS, which means we need to have=
- those
-+ * before making the VMTE valid.
-+ *
-+ * On failure, we clean up in the teardown path (vgic_v5_teardown()).
-+ */
- int vgic_v5_init(struct kvm *kvm)
- {
--	struct kvm_vcpu *vcpu;
--	unsigned long idx;
--	int ret;
-+	struct kvm_vcpu *vcpu, *vcpu0;
-+	int nr_vcpus, ret =3D 0;
-+	unsigned int db_virq;
-+	unsigned long i;
-=20
--	if (vgic_initialized(kvm))
--		return 0;
-+	lockdep_assert_held(&kvm->arch.config_lock);
-+
-+	nr_vcpus =3D atomic_read(&kvm->online_vcpus);
-+	if (nr_vcpus =3D=3D 0)
-+		return -ENODEV;
-=20
--	kvm_for_each_vcpu(idx, vcpu, kvm) {
-+	kvm_for_each_vcpu(i, vcpu, kvm) {
- 		if (vcpu_has_nv(vcpu)) {
- 			kvm_err("Nested GICv5 VMs are currently unsupported\n");
- 			return -EINVAL;
- 		}
- 	}
-=20
--	ret =3D vgic_v5_create_per_vm_domain(kvm);
--	if (ret)
--		return ret;
--
- 	/* We only allow userspace to drive the SW_PPI, if it is implemented. */
- 	bitmap_zero(kvm->arch.vgic.gicv5_vm.userspace_ppis,
- 		    VGIC_V5_NR_PRIVATE_IRQS);
-@@ -602,7 +708,63 @@ int vgic_v5_init(struct kvm *kvm)
- 		   kvm->arch.vgic.gicv5_vm.userspace_ppis,
- 		   ppi_caps.impl_ppi_mask, VGIC_V5_NR_PRIVATE_IRQS);
-=20
-+	ret =3D vgic_v5_allocate_vm_id(kvm);
-+	if (ret)
-+		return ret;
-+
-+	/*
-+	 * Stash a backpointer to struct kvm. It is required to resolve the VPE
-+	 * ID from the doorbell index, which matches the flat vcpu_idx and not
-+	 * the vcpu_id.
-+	 */
-+	kvm->arch.vgic.gicv5_vm.kvm =3D kvm;
-+
-+	ret =3D vgic_v5_create_per_vm_domain(kvm);
-+	if (ret)
-+		goto err;
-+
-+	db_virq =3D kvm->arch.vgic.gicv5_vm.vpe_db_base;
-+	kvm_for_each_vcpu(i, vcpu, kvm) {
-+		ret =3D request_irq(db_virq + i, db_handler, 0, "vcpu", vcpu);
-+		if (ret)
-+			goto err;
-+
-+		/* Stash it with the VCPU for easy retrieval */
-+		vcpu->arch.vgic_cpu.vgic_v5.gicv5_vpe.db =3D db_virq + i;
-+	}
-+
-+	/* Populate VMTE (with VPET and VM descriptor) */
-+	ret =3D vgic_v5_vmte_init(kvm);
-+	if (ret)
-+		goto err;
-+
-+	/* We pick the first vcpu to make the VMTE valid - any would do */
-+	vcpu0 =3D kvm_get_vcpu(kvm, 0);
-+	ret =3D vgic_v5_send_command(vcpu0, VMTE_MAKE_VALID);
-+	if (ret)
-+		goto err;
-+
-+	/* Populate the VPETE for each VPE. */
-+	kvm_for_each_vcpu(i, vcpu, kvm) {
-+		ret =3D vgic_v5_vmte_alloc_vpe(vcpu);
-+		if (ret)
-+			goto err;
-+	}
-+
- 	return 0;
-+
-+err:
-+	/*
-+	 * Explicitly tear everything down on failure. The teardown function is
-+	 * written to handle any partial state we might have, so we don't need
-+	 * to do any clean-up first. Teardown will be called a second time on VM
-+	 * destruction, but that's fine - it is better to leave things in a
-+	 * clean state now, and doubly so because userspace could actually go
-+	 * and retry init.
-+	 */
-+	vgic_v5_teardown(kvm);
-+
-+	return ret;
- }
-=20
- int vgic_v5_map_resources(struct kvm *kvm)
+ 	/* The shadow priority is only updated on entering WFI */
+ 	if (vcpu_get_flag(vcpu, IN_WFI))
 diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 6d0cc38efa673..7fece54ff0925 100644
+index 7fece54ff0925..9d509cb90ab22 100644
 --- a/include/kvm/arm_vgic.h
 +++ b/include/kvm/arm_vgic.h
-@@ -371,6 +371,8 @@ struct vgic_redist_region {
- #define VGIC_V5_VM_ID_INVAL		(-1)
+@@ -525,6 +525,9 @@ struct vgic_v5_cpu_if {
+ 	 */
+ 	u64	vgic_icsr;
 =20
- struct vgic_v5_vm {
-+	struct kvm		*kvm;
++	/* The contextr used to make VPEs resident and non-resident */
++	u64	vgic_contextr;
 +
- 	/*
- 	 * We only expose a subset of PPIs to the guest. This subset is a
- 	 * combination of the PPIs that are actually implemented and what we
+ 	struct gicv5_vpe gicv5_vpe;
+ };
+=20
 --=20
 2.34.1
