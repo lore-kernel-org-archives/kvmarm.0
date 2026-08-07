@@ -1,138 +1,164 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52DDC472F6B;
-	Fri,  7 Aug 2026 12:27:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77A03377A94;
+	Fri,  7 Aug 2026 12:45:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786105656; cv=none; b=h2rw8Q6OrJMoz0eONSIubJI2dHMZjkkZtfAuefvj6FNMDQMOOWDtNO9sMb3sHVIAWl03OnIiTDZx4t3G171z6pZr/1giqaku8meQUiMKaqWiWRoeNcRyvRm6l++L1z6AtfKZ2uoBRkSL1hgHMkxxzTHfk3NwsVmXPzAPojjhicU=
+	t=1786106725; cv=none; b=US5NP7zUxFz8aLLfoIAmfOOfZZ7mrEfgiO3ifh77JEtEnq3OmNG9U66d51u1UgYrLwQ6GlmcAUEnZhBL7x2IcVvjcihELqUENEyZKrtTSq2MKnS3IIb7H9Nxq7FkCLYbz9qVeYGQmoEBpVnSjuJ9D2vigrmuez1U+PZOn2m+lT4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786105656; c=relaxed/simple;
-	bh=milNRTV9JuCttVXWjmpscNc0sJYd92uIWtAF8wTtPJg=;
+	s=arc-20240116; t=1786106725; c=relaxed/simple;
+	bh=z3MWH8FQ+VqnWZCXz9/GG62IWk2tLpg3iEwYrR67Ei0=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=QR3Ay6i6JqNvww+xXlR3dnqtUO1cx+nlPoFyd5ehUBOFkfqWW2Z9mnNYSgIW/TTG9W0Ji8UsRvl8OM1kch9JF5glBfKtv+VR/Zh/VOz5ycBdL00865HZ+3SEv6QOrfaRSTA7QUIEe/AnP0m4NaSjtLXi5/wRj/lMdrLihP52m1g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CF0a1fJT; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=b/6MqChTLAmYPmor/C7xphZOfze2otOfkAOnHO+AZjz270GWh9T/TqAGRdHx1tQ9LVArY/Ftq+xfHvF7OCbYvMs2LfsNP47duGI+Sor2q6vYn+t2wKhTObfjLUEP36Q4sqNJiosAZZpliPpkWQ0sBwNdgXYW4Fle0aUtyMexdzI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ecdMOHM0; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CF0a1fJT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B87211F00AC4;
-	Fri,  7 Aug 2026 12:27:19 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ecdMOHM0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED85C1F000E9;
+	Fri,  7 Aug 2026 12:45:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786105640;
-	bh=ZqqDOsGhnf8PDPJOo5mSEGVCyRUbERg+aniOkAgTNPM=;
+	s=k20260515; t=1786106707;
+	bh=djE3xSiyAN63rSUMhMcgfW7trxnIPRyisecoCvXluok=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=CF0a1fJTKkXcJJKsxEqaC23Dpl9V6EWrwQDsHO+sLvy9SqiHQi3Lle/417a7x8o4s
-	 ZLfvIcd10Xm/h5sAgI6LIJrsJLchBOaP3yg6c+LJq36S4WF8fLUTe1r7eZSAn2bRnT
-	 PKJw8khgJ1yCRN7rfqT3+jVIAXL7fnztEOJXaWahMnIKdmnarRZYJcW2Xoksm4Rykr
-	 S1z/nW3SteOSQY0Ysn7ScEn0+f0VHnbii7qx3dSu4vjagj8okP4FwgzNm6YU+IIKrR
-	 NbLCq/8LZMjBmbu5E/iVAErYylAwThJtEJP7qTio2bYqzdGqqL0N8jPfKhg42bfTmb
-	 H3AzGrEMCqKHA==
+	b=ecdMOHM0mcCNvw5YFZlxnBNABguGenZi9L70r4Y8ey34mnHClXGnG5ei/WMyi5bLi
+	 OefFFlUzkN4zq00+U1tbSnBx9aH4Nhx7651wzkNed5JhtMESHJXP9e1d5BBJDgWvIV
+	 IEsIiKY7ZID3LET5qii8DDevEpvLP9ZRvqfva9riGsJQOTUZtktabZAR2rXJvCK5m3
+	 0+D8pzhDO43kzkVY9X/uhN/LxUvEx3cNgf3I8a6/5puozkc4xi+/f7B2iSK1FejxXO
+	 rFDFyAV5EjJETakloeaHOsJHGjYXMS8X2sQ0owCx3lokXwmu3PzIQpu2zp1v3uNfTC
+	 OL6M1cjd5O1Fw==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v5 07/49] KVM: arm64: gic-v5: Cache host IRS ID
- registers
+Subject: Re: [PATCH v5 08/49] KVM: arm64: gic-v5: Add VPE doorbell domain
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Sascha Bischoff" <Sascha.Bischoff@arm.com>
 Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, kvm@vger.kernel.org, "Marc
  Zyngier" <maz@kernel.org>
-In-Reply-To: <20260807111159.429128-8-sascha.bischoff@arm.com>
+In-Reply-To: <20260807111159.429128-9-sascha.bischoff@arm.com>
 References: <20260807111159.429128-1-sascha.bischoff@arm.com>
- <20260807111159.429128-8-sascha.bischoff@arm.com>
+ <20260807111159.429128-9-sascha.bischoff@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Aug 2026 12:27:19 +0000
-Message-Id: <20260807122719.B87211F00AC4@smtp.kernel.org>
+Date: Fri, 07 Aug 2026 12:45:06 +0000
+Message-Id: <20260807124506.ED85C1F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+Thank you for your contribution! Sashiko AI review found 4 potential issue(=
 s) to consider:
-- [High] The hardware-based limit for maximum vCPUs is silently clobbered b=
-y a hardcoded maximum in the GICv3 legacy fallback path.
-- [Medium] The return type of `vgic_v5_irs_vped_size()` is `u16`, which wil=
-l silently truncate descriptor sizes of 64KB or larger to 0.
+- [High] Resource leak of GICv5 VPE doorbell domain and fwnode on VGIC init=
+ialization retry.
+- [High] TOCTOU race between `KVM_CREATE_VCPU` and `KVM_DEV_ARM_VGIC_CTRL_I=
+NIT` leads to undersized doorbell domain allocation.
+- [Medium] Fwnode ID collision for VMs created by the same userspace thread.
+- [Low] Unreachable dead code in doorbell domain error handling path.
 --
 
---- Patch [7]: [PATCH v5 07/49] KVM: arm64: gic-v5: Cache host IRS ID regis=
-ters ---
-commit d81802dd59faf96c570bb509e00ac335dada7904
+--- Patch [8]: [PATCH v5 08/49] KVM: arm64: gic-v5: Add VPE doorbell domain=
+ ---
+commit 087989feef3777beedf75a01512da5b9e331b6fa
 Author: Sascha Bischoff <Sascha.Bischoff@arm.com>
+KVM: arm64: gic-v5: Add VPE doorbell domain
 
-KVM: arm64: gic-v5: Cache host IRS ID registers
-   =20
-This commit caches the GICv5 IRS ID registers to configure virtual-machine
-resources based on hardware capabilities rather than extracting individual
-fields. It limits the maximum number of vCPUs using the VPE capacity from
-the cached IRS_IDR4 register while retaining KVM's upper bound.
+This commit adds support for a per-VM VPE doorbell irq domain for GICv5.
+It creates the domain under the GICv5 LPI domain with one doorbell allocated
+per VPE, and stores the state for later IRS commands and wakeups.
 
-> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-> index d4789ff3e7402..41ca2098ecb73 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v5.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
-
+diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
+index 41ca2098ecb73..752329fc3d566 100644
+--- a/arch/arm64/kvm/vgic/vgic-v5.c
++++ b/arch/arm64/kvm/vgic/vgic-v5.c
 [ ... ]
-
-> @@ -61,10 +77,12 @@ int vgic_v5_probe(const struct gic_kvm_info *info)
->  		goto skip_v5;
->  	}
-> =20
-> -	kvm_vgic_global_state.max_gic_vcpus =3D VGIC_V5_MAX_CPUS;
-> -
-> +	vgic_v5_irs_cache_id_regs(info);
->  	vgic_v5_get_implemented_ppis();
-> =20
-> +	kvm_vgic_global_state.max_gic_vcpus =3D min(vgic_v5_irs_max_vpes(&irs_c=
-aps),
-> +						  VGIC_V5_MAX_CPUS);
-> +
+> +static int vgic_v5_create_per_vm_domain(struct kvm *kvm)
+> +{
+> +	struct vgic_v5_vm *vm =3D &kvm->arch.vgic.gicv5_vm;
+> +	int nr_vcpus =3D atomic_read(&kvm->online_vcpus);
 
 [Severity: High]
-Does the GICv3 legacy fallback path under the skip_v5 label in vgic_v5_prob=
-e()
-overwrite this dynamically computed hardware limit?
+Can a race condition here lead to an undersized doorbell domain allocation?
 
-If the max_gic_vcpus limit is later expanded by a static value (like
-VGIC_V3_MAX_CPUS via a max() assignment), could it permit userspace to crea=
-te
-more vCPUs for a GICv5 VM than the hardware IRS actually supports (for exam=
-ple,
-allowing 512 vCPUs even if the hardware restricts it to 16 VPEs)?
+If a userspace thread calls the initialization ioctl, it checks for concurr=
+ent
+VCPU creation, but this check is performed locklessly with respect to the
+kvm->lock held during VCPU creation.
 
->  	ret =3D kvm_register_vgic_device(KVM_DEV_TYPE_ARM_VGIC_V5);
->  	if (ret) {
->  		kvm_err("Cannot register GICv5 KVM device.\n");
+Concurrently, a second thread could create a VCPU, which takes kvm->lock and
+increments created_vcpus. Since initialization hasn't completed yet, VCPU
+creation is allowed to proceed.
 
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index fe49fb56dc3c9..c6f0ab69f7a2e 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
+When the first thread reaches this point, it allocates exactly the number
+of online VCPUs at this moment. As the second thread completes and incremen=
+ts
+online_vcpus, the VM now has more VCPUs than allocated doorbell IRQs, which
+can lead to out-of-bounds IRQ array access later.
 
-[ ... ]
-
-> @@ -630,6 +646,65 @@ int vgic_v4_load(struct kvm_vcpu *vcpu);
->  void vgic_v4_commit(struct kvm_vcpu *vcpu);
->  int vgic_v4_put(struct kvm_vcpu *vcpu);
-> =20
-
-[ ... ]
-
-> +static inline u16 vgic_v5_irs_vped_size(const struct vgic_v5_irs_caps *c=
-aps)
-> +{
-> +	return BIT(FIELD_GET(GICV5_IRS_IDR4_VPED_SZ, caps->idr4));
-> +}
+> +	int id =3D task_pid_nr(current);
+> +	int ret, db_virq =3D 0;
 > +
+> +	if (!gicv5_global_data.lpi_domain) {
+> +		kvm_err("LPI domain uninitialized, can't set up KVM Doorbells\n");
+> +		return -ENODEV;
+> +	}
+> +
+> +	vm->fwnode =3D irq_domain_alloc_named_id_fwnode("GICv5-vpe-db", id);
+
+[Severity: High]
+Can this leak the GICv5 VPE doorbell domain and fwnode if initialization
+is retried?
+
+If the initialization fails later in the setup process (for example, if
+kvm_vgic_setup_default_irq_routing() fails in vgic_init()), the VGIC state
+remains uninitialized.
+
+If userspace then retries the initialization, this function is called again
+and unconditionally allocates a new fwnode and IRQ domain, overwriting
+the previous pointers without freeing them.
+
 
 [Severity: Medium]
-If a hardware implementation reports a size parameter of 16 or greater
-(indicating 64KB or more), will the BIT() operation in vgic_v5_irs_vped_siz=
-e()
-result in 65536 and silently truncate to 0 when cast to the u16 return type?
+Could using the thread ID here cause fwnode naming collisions?
 
-Could this zero-byte size calculation lead to 0-byte allocations or infinite
-loops in dependent resource sizing?
+Since task_pid_nr(current) is used as the ID for the fwnode name, a single
+VMM thread sequentially creating multiple KVM VMs will cause them to share
+the exact same fwnode name.
+
+When the IRQ domain is registered, this duplicate name causes debugfs
+directory creation failures due to the directory already being present.
+
+Would it be more reliable to use the VM's unique vm_id instead?
+
+> +	if (!vm->fwnode)
+> +		return -ENOMEM;
+[ ... ]
+> +	db_virq =3D irq_domain_alloc_irqs(vm->domain, nr_vcpus, NUMA_NO_NODE, v=
+m);
+> +	if (db_virq <=3D 0) {
+> +		ret =3D db_virq;
+> +		goto err;
+> +	}
+> +
+> +	kvm->arch.vgic.gicv5_vm.vpe_db_base =3D db_virq;
+> +
+> +	return 0;
+> +
+> +err:
+> +	if (db_virq > 0)
+
+[Severity: Low]
+Is this error cleanup path unreachable?
+
+The only branch that jumps to the err label after modifying db_virq
+explicitly checks that db_virq is less than or equal to 0.
+
+Because db_virq can never be strictly positive at this label, the
+irq_domain_free_irqs() block will never be executed.
+
+> +		irq_domain_free_irqs(db_virq, nr_vcpus);
+> +	if (vm->domain)
+> +		irq_domain_remove(vm->domain);
+[ ... ]
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260807111159.4291=
-28-1-sascha.bischoff@arm.com?part=3D7
+28-1-sascha.bischoff@arm.com?part=3D8
