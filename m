@@ -1,236 +1,322 @@
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com [209.85.128.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E65C847CA71
-	for <kvmarm@lists.linux.dev>; Fri,  7 Aug 2026 16:43:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 080E722579E;
+	Fri,  7 Aug 2026 16:45:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786121045; cv=none; b=d9VZE5Ksa2zmDV/q0YZ537WtPfIP3ym2mhLNdzo+oQIkGFfUq9stZHzSfV9dw4zw2zfsHfN25bqbbf99rHvhOf8mkc+Q7jzzo0ZVa8CFEN9dOsLiuosRiD8DBwtKLHQamouk1aNiwxh9YUYNYLe8Ut0yjOPFUBCdZ69UojQInxg=
+	t=1786121137; cv=none; b=gUrWS52pt40J1lYYfrD6aK/F6b70ZHnOLJeuuGIVm7AkqGulyamB/5jliNv5VI+i2oxrfGxLgQCrQw8wb6EmdUi+gUQbhRLwkAcwdLFRlKPderzf9iqORc85NcI/+hqSWM7eP6Pec4M2FWB98+DmX2TvwO4UEaZLNavD3N0/pbo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786121045; c=relaxed/simple;
-	bh=dG75R9t60p8la9dDfP9piGZZE5hhgOort9SadpwYw1Y=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=O721vY5XXM1H95T3W2KQxYUKiyndBC794x8XeInDFNEFNcvt0gffK6l+B4b6B/s7VgeNuYR/+xXc6VxNwg03BNFyWtYuq79E3D6SLzsd2brXnXFLE7ByGiBVqQgVVs9GXF5rtGPtUFOgMxTBP4HSiIyf6GvCPgn+QAjT6WI8BRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MdCmZsUi; arc=none smtp.client-ip=209.85.128.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com
+	s=arc-20240116; t=1786121137; c=relaxed/simple;
+	bh=h1VQHoplqQMgAwEpvb/Kq7J94fLiCxUe+L9VVOgVzdU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DT4mJaMqYgMtK36WlXp3GJTWiCfIyPyeJEGoevKYe1/MLYX374BBYeGzmdnjcpwTHX4Fp4GtJvjNjhaNqL3EdSUIMt7Juc3aFh4XFQ4C/ybrLvUBiGeR20YiYA1PgSWr2ZdGTaW9iry3libmku5su5kTmwXedxd1jDVD2Hrc1Mk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IV7kG4vb; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MdCmZsUi"
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-495474a5fbcso31230155e9.1
-        for <kvmarm@lists.linux.dev>; Fri, 07 Aug 2026 09:43:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1786121037; x=1786725837; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=qlULfceAkSyqJh1I9C7h7VPnh2+5JOHQToDbI7j6Lxc=;
-        b=MdCmZsUi+Rz7DK6cyfUflU27tEssj8X0se7vMaqlR66EzrUeIcQwoMr44oxRzJmloS
-         UvlqbAndPuBpJIP16AzzPz0HjKVPu2Hfttrp5vZO+Q9lNR6y0PYbO/qu/HGgSH8TTnpb
-         kvTkx+6ckr4BuFLpg7/fZ6CEMdLBA4bignVkaIOpd57G5JDUdVmZNtIPBbaD8UnWOYbg
-         F9MHe1wjd7sDqnkTe8TC4d07fvbY+6VnAqIYnR0mS3GK1zze0SNKyrulaaBGURanhnvA
-         +TNRD1yQxaPq3p1MZMGNmrhDgzDXMoM9gJc80MgPlcCFeSRUNEkFwWROmDUcEwkgsR+/
-         rDqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786121037; x=1786725837;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=qlULfceAkSyqJh1I9C7h7VPnh2+5JOHQToDbI7j6Lxc=;
-        b=Nqe25BAVETUP6DqpIR2FTIHklF2rQgqzCpZkfUDsYvURtuRAMzFXHFEOYDMuxdp7WS
-         ODr11M3eE6moNxXAKOcegmMpHXtThmKmqolOCn9KBc+FOKClx8V//PT3tay0rtWuqaGY
-         VVyAuSma6zscTtOWeqUOTSDnvoCbeh/7EBY+bmpcQe55O/eOG0nXTkblPuDK7rGyhweF
-         SStGlKfzYKOz4ZofgmuQDvKdEKISJhwFikSv2EBsFpwx1Lf+AmhVzhTUtyRGJ4XlLNoo
-         qmQ/d2VOtw+s4C4YKbtcs+aeixr4l1NzPilKklZ0wXtqz2wplCn9ck+jC1StyJPyCA3A
-         IOjg==
-X-Gm-Message-State: AOJu0Yx/8ZKSWkTpDnW5gcjJjr6J9YfjzP2rK92XeuOX+GddMNbN9zTo
-	vADa7MkcLHJroKbaG8hQR241TX3iz6c9kw6ROIx2V2xq4t15dBm9CbtAQAXWuQIEV1mCKhuaqoh
-	YU4nY/6yRtz1r+A5ur8IWmd2ODLN/uA==
-X-Received: from wmbjx23.prod.google.com ([2002:a05:600c:5797:b0:495:58ee:fab7])
- (user=sebastianene job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:3b01:b0:495:641a:bd3f with SMTP id 5b1f17b1804b1-4996199a076mr13517025e9.13.1786121037301;
- Fri, 07 Aug 2026 09:43:57 -0700 (PDT)
-Date: Fri,  7 Aug 2026 16:43:23 +0000
-In-Reply-To: <20260807164322.2970811-2-sebastianene@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IV7kG4vb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B49671F000E9;
+	Fri,  7 Aug 2026 16:45:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1786121135;
+	bh=pZqskBmPMRbqfd4JABF4XAccPI8j5P/YcYvdWmJ5r7I=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=IV7kG4vb8BIyQDmdvU+TqD72rD2J7ywbgW0lMSRwx+wygPFbFr0oVvlaChtXTaQ0u
+	 mlhFK4TaA6ftE39/nejr4296WPLUnAhhhMRLFPCRcN4WKrSbgG4wx83MB4T93CYBg0
+	 DncRc6eCS10VCxPoSPXWDV0YCabDWzp+ctLEmbqAOKkVSgN66FIg0ahv5Do/HrvcLD
+	 F2/VGlg228Ogg105vlef+/vL8xniAxrzw0dEYCLhvDwMuT13zmvLD8QAR8UBmd02V+
+	 DDMtL+T4K6ygsn9Bdbn5RhYCqB8d7hKCeGT55b9Yd+bC6pZMZdCfOxo3Fexzkv70WQ
+	 AjdmTLP1KxJUw==
+Date: Fri, 7 Aug 2026 17:45:17 +0100
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, Steffen Eiden <seiden@linux.ibm.com>, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Fuad Tabba <fuad.tabba@linux.dev>, Hyunwoo Kim <imv4bel@gmail.com>, 
+	Yao Yuan <yaoyuan@linux.alibaba.com>, stable@vger.kernel.org
+Subject: Re: [PATCH v2 1/8] KVM: arm64: Remove VM-wide VNCR mapping counter
+Message-ID: <anXmBQRdORVwl6Rp@lucifer>
+References: <20260806091026.620700-1-maz@kernel.org>
+ <20260806091026.620700-2-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20260807164322.2970811-2-sebastianene@google.com>
-X-Mailer: git-send-email 2.55.0.654.g21b8a5bc05-goog
-Message-ID: <20260807164322.2970811-15-sebastianene@google.com>
-Subject: [PATCH v2 13/13] KVM: arm64: Implement HVC interface for ITS
- emulation setup
-From: Sebastian Ene <sebastianene@google.com>
-To: catalin.marinas@arm.com, fuad.tabba@linux.dev, joey.gouly@arm.com, 
-	mark.rutland@arm.com, maz@kernel.org, oupton@kernel.org, rananta@google.com, 
-	Sascha.Bischoff@arm.com, suzuki.poulose@arm.com, will@kernel.org
-Cc: kvmarm@lists.linux.dev, android-kvm@google.com, bgrzesik@google.com, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	nathan@kernel.org, perlarsen@google.com, sebastianene@google.com, 
-	seiden@linux.ibm.com, smostafa@google.com, tglx@kernel.org, 
-	vdonnefort@google.com, vladimir.murzin@arm.com, yuzenghui@huawei.com, 
-	zenghui.yu@linux.dev
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260806091026.620700-2-maz@kernel.org>
 
-Introduce a new HVC to allow the host to trigger the ITS emulation
-setup. Use the introduced API in the GIC ITS driver to call the driver
-to lock the ITS before pKVM finalize and to prepare for emulation setup.
-On the return path from the pKVM finalize, call into the driver to
-release the ITS locks which performs a switch in the driver to use a
-different command queue and a different set of level-1 indirect tables.
-Allocate memory that will be used by the emulation to track the internal
-state and send the snapshot state from the driver.
-Replace the initial "trap-and-forward" MMIO handler with a full-featured
-emulation handler.
+Bear with me being verbose here, as this is both nascent review + learning
+:)
 
-Signed-off-by: Sebastian Ene <sebastianene@google.com>
----
- arch/arm64/include/asm/kvm_asm.h      |  1 +
- arch/arm64/include/asm/kvm_pkvm.h     |  4 ++--
- arch/arm64/kvm/hyp/nvhe/hyp-main.c    | 16 ++++++++++++++++
- arch/arm64/kvm/hyp/nvhe/its_emulate.c |  4 ++--
- arch/arm64/kvm/pkvm.c                 | 26 ++++++++++++++++++++++++--
- 5 files changed, 45 insertions(+), 6 deletions(-)
+On Thu, Aug 06, 2026 at 10:10:19AM +0100, Marc Zyngier wrote:
+> The global VNCR mapping counter is used to decide whether an L1
+> provided VNCR page is mapped in L0 on any CPU at the point of
+> dealing with a TLB invalidation. It is incremented when a mapping
+> is made in the fixmap, and decremented when unmapped.
+>
+> As it turns out, this tracking has several flaws:
+>
+> - we are trying to invalidate TLBs, and the mapping is only an
+>   opportunistic consequence of the TLB. Checking this counter to
+>   decide whether a TLB needs to be invalidated may result in missed
+>   invalidations.
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 043495f7fc78..fcb2871b8a86 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -114,6 +114,7 @@ enum __kvm_host_smccc_func {
- 	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_load,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_put,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_tlb_flush_vmid,
-+	__KVM_HOST_SMCCC_FUNC___pkvm_its_emulate_setup,
- 
- 	MARKER(__KVM_HOST_SMCCC_FUNC_MAX)
- };
-diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
-index 78597210a53c..cc89e2bde468 100644
---- a/arch/arm64/include/asm/kvm_pkvm.h
-+++ b/arch/arm64/include/asm/kvm_pkvm.h
-@@ -32,8 +32,8 @@ struct pkvm_protected_reg {
- 
- extern struct pkvm_protected_reg kvm_nvhe_sym(pkvm_protected_regs)[];
- extern unsigned int kvm_nvhe_sym(num_protected_reg);
--extern void kvm_nvhe_sym(its_emulate_forward_req)(struct pkvm_protected_reg *region, u64 offset,
--						  bool write, u64 *reg, u8 reg_size);
-+extern void kvm_nvhe_sym(pkvm_its_emulate_handler)(struct pkvm_protected_reg *region, u64 offset,
-+						   bool write, u64 *reg, u8 reg_size);
- 
- int pkvm_init_host_vm(struct kvm *kvm, unsigned long type);
- int pkvm_create_hyp_vm(struct kvm *kvm);
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index d3df96ed8ba4..ad57b2076eee 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -16,6 +16,7 @@
- #include <asm/kvm_mmu.h>
- 
- #include <nvhe/ffa.h>
-+#include <nvhe/its_emulate.h>
- #include <nvhe/mem_protect.h>
- #include <nvhe/mm.h>
- #include <nvhe/pkvm.h>
-@@ -705,6 +706,20 @@ static void handle___vgic_v5_restore_vmcr_apr(struct kvm_cpu_context *host_ctxt)
- 	__vgic_v5_restore_vmcr_apr(kern_hyp_va(cpu_if));
- }
- 
-+static void handle___pkvm_its_emulate_setup(struct kvm_cpu_context *host_ctxt)
-+{
-+	DECLARE_REG(phys_addr_t, dev_addr, host_ctxt, 1);
-+	DECLARE_REG(struct its_host_state *, host_state, host_ctxt, 2);
-+	DECLARE_REG(void *, priv_state, host_ctxt, 3);
-+	DECLARE_REG(size_t, priv_state_num_pages, host_ctxt, 4);
-+
-+	if (!is_protected_kvm_enabled())
-+		return;
-+
-+	cpu_reg(host_ctxt, 1) = pkvm_its_emulate_setup(dev_addr, host_state, priv_state,
-+						       priv_state_num_pages);
-+}
-+
- typedef void (*hcall_t)(struct kvm_cpu_context *);
- 
- #define HANDLE_FUNC(x)	[__KVM_HOST_SMCCC_FUNC_##x] = (hcall_t)handle_##x
-@@ -762,6 +777,7 @@ static const hcall_t host_hcall[] = {
- 	HANDLE_FUNC(__pkvm_vcpu_load),
- 	HANDLE_FUNC(__pkvm_vcpu_put),
- 	HANDLE_FUNC(__pkvm_tlb_flush_vmid),
-+	HANDLE_FUNC(__pkvm_its_emulate_setup),
- };
- 
- static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
-diff --git a/arch/arm64/kvm/hyp/nvhe/its_emulate.c b/arch/arm64/kvm/hyp/nvhe/its_emulate.c
-index 82dc60dcde68..8c8acaee4d2b 100644
---- a/arch/arm64/kvm/hyp/nvhe/its_emulate.c
-+++ b/arch/arm64/kvm/hyp/nvhe/its_emulate.c
-@@ -6,8 +6,8 @@
- 
- #include <linux/irqchip/arm-gic-v3.h>
- 
--void its_emulate_forward_req(struct pkvm_protected_reg *region, u64 offset, bool write, u64 *reg,
--			     u8 reg_size)
-+static void its_emulate_forward_req(struct pkvm_protected_reg *region, u64 offset, bool write,
-+				    u64 *reg, u8 reg_size)
- {
- 	void __iomem *addr = __hyp_va(PFN_PHYS(region->pfn) + offset);
- 
-diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index 4bfffbedac4c..a9ceb9ffe6a4 100644
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -71,7 +71,7 @@ static int __init register_its_emulated_region(void)
- 		 */
- 		kvm_nvhe_sym(pkvm_protected_regs)[i].pfn = PHYS_PFN(res.start);
- 		kvm_nvhe_sym(pkvm_protected_regs)[i].cb =
--			lm_alias(&kvm_nvhe_sym(its_emulate_forward_req));
-+			lm_alias(&kvm_nvhe_sym(pkvm_its_emulate_handler));
- 		kvm_nvhe_sym(pkvm_protected_regs)[i].nr_pages =
- 			PFN_DOWN(min_t(u64, resource_size(&res), PAGE_ALIGN_DOWN(GITS_TRANSLATER)));
- 
-@@ -312,8 +312,28 @@ static void __init _kvm_host_prot_finalize(void *arg)
- 		WRITE_ONCE(*err, -EINVAL);
- }
- 
-+#define ITS_PAGES	(2UL)
-+
-+static int pkvm_init_its_emulation(phys_addr_t dev_addr, struct its_host_state *host)
-+{
-+	size_t priv_state_sz = ITS_PAGES << PAGE_SHIFT;
-+	void *priv_state;
-+	int ret;
-+
-+	priv_state = alloc_pages_exact(priv_state_sz, GFP_ATOMIC);
-+	if (!priv_state)
-+		return -ENOMEM;
-+
-+	ret = kvm_call_hyp_nvhe(__pkvm_its_emulate_setup, dev_addr, host, priv_state, ITS_PAGES);
-+	if (ret)
-+		free_pages_exact(priv_state, priv_state_sz);
-+
-+	return ret;
-+}
-+
- static int __init pkvm_drop_host_privileges(void)
- {
-+	unsigned long its_flags;
- 	int ret = 0;
- 
- 	/*
-@@ -321,8 +341,10 @@ static int __init pkvm_drop_host_privileges(void)
- 	 * once the host stage 2 is installed.
- 	 */
- 	static_branch_enable(&kvm_protected_mode_initialized);
-+
-+	its_emulate_acquire_locks(&its_flags);
- 	on_each_cpu(_kvm_host_prot_finalize, &ret, 1);
--	return ret;
-+	return its_emulate_release_locks(ret, &its_flags, pkvm_init_its_emulation);
- }
- 
- static int __init finalize_pkvm(void)
--- 
-2.55.0.654.g21b8a5bc05-goog
+Is it largely the self-invalidation mentioned below or are there other cases?
 
+>
+> - an L1 vcpu invalidating its own TLB (a very likely case) will not
+>   succeed in invalidating the VNCR pseudo TLB because that page is
+>   not mapped in L0 at this stage.
+
+Ahh yes this is pretty compelling then!
+
+>
+> Given that this tracking fails at delivering the minimum guarantees
+> that are required and is only a performance optimisation, remove it
+> completely.
+>
+> Fixes: 4ffa72ad8f37e ("KVM: arm64: nv: Add S1 TLB invalidation primitive for VNCR_EL2")
+> Reviewed-by: Yuan Yao <yaoyuan@linux.alibaba.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+
+The change LGTM, it neatly removes the described mechanism which is well
+evidenced.
+
+Comments below that are largely me talking out loud as I learn things :)
+
+Acked-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+
+> Cc: stable@vger.kernel.org
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 3 ---
+>  arch/arm64/kvm/hyp/vhe/switch.c   | 3 +--
+>  arch/arm64/kvm/nested.c           | 3 ---
+>  3 files changed, 1 insertion(+), 8 deletions(-)
+>
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index bae2c4f92ef5c..ac16f96c878d6 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -411,9 +411,6 @@ struct kvm_arch {
+>  	/* Masks for VNCR-backed and general EL2 sysregs */
+>  	struct kvm_sysreg_masks	*sysreg_masks;
+>
+> -	/* Count the number of VNCR_EL2 currently mapped */
+> -	atomic_t vncr_map_count;
+> -
+>  	/*
+>  	 * For an untrusted host VM, 'pkvm.handle' is used to lookup
+>  	 * the associated pKVM instance in the hypervisor.
+> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> index bbe9cebd3d9d5..c09b1d411c584 100644
+> --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> @@ -427,8 +427,7 @@ static bool kvm_hyp_handle_tlbi_el2(struct kvm_vcpu *vcpu, u64 *exit_code)
+>  	 * If we have to check for any VNCR mapping being invalidated,
+>  	 * go back to the slow path for further processing.
+>  	 */
+> -	if (vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu) &&
+> -	    atomic_read(&vcpu->kvm->arch.vncr_map_count))
+> +	if (vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu))
+>  		return false;
+
+So this seems to be the crux of it - seems to be 'is there any possibility that
+we will need to check for VNCR mappings being invalidated?'
+
+Checks:
+
+* vcpu_el2_e2h_is_set() - is the guest host kernel (?)'s hcr_el2.e2h
+  enabled? From what I gather hcr_el2.e2h is what allows sysreg_EL1 ->
+  sysreg_EL2 for the host kernel to allow unmodified kernels to run in EL2.
+
+  IOW - is the guest host kernel VHE?
+
+* vcpu_el2_tge_is_set() - Similarly tests for the hcr_el2.tge bit - and this
+  seems to be is 'EL1 -> EL2 redirection on?' - IOW - is this a kernel running
+  in EL2?
+
+Actually I see in is_hyp_ctxt():
+
+	 * We are in a hypervisor context if the vcpu mode is EL2 or
+	 * E2H and TGE bits are set. The latter means we are in the user space
+	 * of the VHE kernel. ARMv8.1 ARM describes this as 'InHost'
+
+So I _think_ the combination of the two is checking to see if you're the L0
+kernel that _could_ send TLBi's that need to be handled?
+
+Previously it seemed the logic was 'if there are no VNCR mappings present then
+we can optimise by short-circuiting the rest of the processing in
+kvm_hyp_handle_sysreg_vhe()'.
+
+It seems that the hardware TLBi has been processed by now so it's actually more
+like - there's still work to be done maintaining the software TLB and that's
+done elsewhere.
+
+As:
+
+static bool kvm_hyp_handle_sysreg_vhe(struct kvm_vcpu *vcpu, u64 *exit_code)
+{
+	if (kvm_hyp_handle_tlbi_el2(vcpu, exit_code)) 	<- return ->true
+		return true;
+
+	if (kvm_hyp_handle_timer(vcpu, exit_code)) 	<- this was a TLBi ->false
+		return true;
+
+	if (kvm_hyp_handle_cpacr_el1(vcpu, exit_code)) 	<- this was a TLBi ->false
+		return true;
+
+	if (kvm_hyp_handle_zcr_el2(vcpu, exit_code))	<- this was a TLBi ->false
+		return true;
+
+	return kvm_hyp_handle_sysreg(vcpu, exit_code);	<- this was a TLBi ->false
+}
+
+And
+
+static const exit_handler_fn hyp_exit_handlers[] = {
+	...
+	[ESR_ELx_EC_SYS64]		= kvm_hyp_handle_sysreg_vhe,
+	...
+};
+
+And:
+
+static inline bool kvm_hyp_handle_exit(struct kvm_vcpu *vcpu, u64 *exit_code,
+				       const exit_handler_fn *handlers)
+{
+	exit_handler_fn fn = handlers[kvm_vcpu_trap_get_class(vcpu)]; <- kvm_hyp_handle_sysreg_vhe()
+	if (fn)
+		return fn(vcpu, exit_code);
+
+	return false;
+}
+
+Annnd:
+
+/*
+ * Return true when we were able to fixup the guest exit and should return to
+ * the guest, false when we should restore the host state and return to the
+ * main run loop.
+ */
+static inline bool __fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code,
+				      const exit_handler_fn *handlers)
+{
+	...
+	/* Check if there's an exit handler and allow it to handle the exit. */
+	if (kvm_hyp_handle_exit(vcpu, exit_code, handlers))
+		goto guest;
+exit:
+	/* Return to the host kernel and handle the exit */
+	return false;
+	...
+}
+
+Finally in __kvm_vcpu_run_vhe():
+
+	do {
+		/* Jump in the fire! */
+
+(Good track ;)
+
+		exit_code = __guest_enter(vcpu);
+
+		/* And we're baaack! */
+	} while (fixup_guest_exit(vcpu, &exit_code));
+
+(With fixup_guest_exit() ultimately calling __fixup_guest_exit().)
+
+And fixup_guest_exit() will return false, meaning the guest isn't
+re-entered and instead you go back to the full fat slow path:
+
+int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+{
+	...
+		ret = kvm_arm_vcpu_enter_exit(vcpu); <-- does all the above just returned.
+	...
+		ret = handle_exit(vcpu, ret);
+}
+
+Then there's some more stuff in this fuller fat handle_exit() path:
+
+int handle_exit(struct kvm_vcpu *vcpu, int exception_index)
+{
+	...
+	switch (exception_index) {
+	...
+	case ARM_EXCEPTION_TRAP:
+		return handle_trap_exceptions(vcpu);
+	...
+	}
+}
+
+Which then calls kvm_get_exit_handler() which ultimately gets
+handle_tlbi_el2() and calls kvm_handle_s1e2_tlbi() in turn and then
+invalidate_vncr_va():
+
+static void invalidate_vncr_va(struct kvm *kvm,
+			       struct s1e2_tlbi_scope *scope)
+{
+	...
+	kvm_for_each_vncr_tlb(i, vcpu, vt, kvm) {
+		...
+		invalidate_vncr(vt);
+	}
+}
+
+And:
+
+static void invalidate_vncr(struct vncr_tlb *vt)
+{
+	vt->valid = false;
+	if (vt->cpu != -1)
+		clear_fixmap(vncr_fixmap(vt->cpu));
+}
+
+Where you are ultimately clearing the fixmap and setting the
+vncr_tlb->valid to false.
+
+I think this is all vaguely sane :)
+
+>
+>  	__kvm_skip_instr(vcpu);
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index dfb96edbdc43c..f3c75954cf36c 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -48,7 +48,6 @@ void kvm_init_nested(struct kvm *kvm)
+>  {
+>  	kvm->arch.nested_mmus = NULL;
+>  	kvm->arch.nested_mmus_size = 0;
+> -	atomic_set(&kvm->arch.vncr_map_count, 0);
+>  }
+>
+>  static int init_nested_s2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
+> @@ -890,7 +889,6 @@ static void this_cpu_reset_vncr_fixmap(struct kvm_vcpu *vcpu)
+>  	clear_fixmap(vncr_fixmap(vcpu->arch.vncr_tlb->cpu));
+>  	vcpu->arch.vncr_tlb->cpu = -1;
+>  	host_data_clear_flag(L1_VNCR_MAPPED);
+> -	atomic_dec(&vcpu->kvm->arch.vncr_map_count);
+>  }
+>
+>  void kvm_vcpu_put_hw_mmu(struct kvm_vcpu *vcpu)
+> @@ -1592,7 +1590,6 @@ static void kvm_map_l1_vncr(struct kvm_vcpu *vcpu)
+>  	if (pgprot_val(prot) != pgprot_val(PAGE_NONE)) {
+>  		__set_fixmap(vncr_fixmap(vt->cpu), vt->hpa, prot);
+>  		host_data_set_flag(L1_VNCR_MAPPED);
+> -		atomic_inc(&vcpu->kvm->arch.vncr_map_count);
+>  	}
+>  }
+
+And it looks like you got all the places that manipulated this :)
+
+>
+> --
+> 2.47.3
+>
+
+--
+Cheers, Lorenzo
