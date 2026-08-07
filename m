@@ -1,44 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09CE4280331;
-	Fri,  7 Aug 2026 16:20:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0852737AA9F;
+	Fri,  7 Aug 2026 16:27:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786119655; cv=none; b=C7OY9NLH4uAJz/1CUlD8iWVztH8W4oGKue7BD2BW9F8dd4/ygN41o26PSUuyvty0OITUHjaRjNHYwj7onxJ/VIt6yP0iAcKbH6d08zeo0OdZV4LoMm2icc3z1oPekPlxYnWE6paKkqG5vQRH56dCPfWZJMbeDRReB0joeZ5mo4M=
+	t=1786120075; cv=none; b=eJ2JnBcKS1HTnlTkAEll5vW3B7DotNLVjBl2WsSqe0Mb0r0OXOcak9HPIBJMJ7BhWFwsr9N8/pGRys4MQcX5a3US9gSE/4g777zZeUQvsIm49dUMBtpGXTtCCRQ67QnRGTwyZbuwpbmKN4G1TzNJBn7B3G9KA6yaVgdFtk1rY00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786119655; c=relaxed/simple;
-	bh=5Kq0D1VDgc/aeeEYkKiaKCkpRQ5bwuPl5hs+zY6tL/Q=;
+	s=arc-20240116; t=1786120075; c=relaxed/simple;
+	bh=aTdVNjEp1j9zrZ6lhwdmYKSppcT148SPHXrxEbI02AI=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=seSxNVYWCbhmuQ/IyNqYEcd3bUxbcDv06kJdjDu4DVSwI12egPv2p8N13vIFRZhg1/LzT9HeVXkirDin5obZae6Mo6nMjsU9iGBwMabqGOJnDKONlJSbArNgj13ZxFrpcAbC7HVUXQu9bFwC8U+GsDNhjwQetmMv5oeBSxrhO6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mtvC5wQZ; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=qdnKhkP4xRrKTOluMUUSTfPHjaNzfAqgEfMBP1KvLVw/t+emXqN4Tn90kEM/77Cj+/e917zH6xl/I6Tv/e5aoh+Iw3MH6MsEKomNqWL2MfNXuu5EtiVkuNMFmneBxxlLRhcF1j1zoTIsG8JvtRxRdaJgpVBbxeZOMfEhUn60uaA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fmk7E1qa; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mtvC5wQZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3AEC71F000E9;
-	Fri,  7 Aug 2026 16:20:53 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fmk7E1qa"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C64C1F000E9;
+	Fri,  7 Aug 2026 16:27:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786119653;
-	bh=5pMFsqQTHcQ+Rn9idFvDXGrE+yz2Oj3OwvnHW54vSWY=;
+	s=k20260515; t=1786120073;
+	bh=Pih278byRYTqLFEVMr33W90FAamwFlAjjpu+imhSVug=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=mtvC5wQZNmYssl/an8V+StmM3QW+waxkxShkolOw+JL2wRTArb96FxvIMq9Mp52zq
-	 HCIkBTZUtLf/YTdHGl01a4mgUu/XSOx3PTl2Xm0BPygPLM7lkfLbOgeiECbEWp8xcs
-	 KVLsUSCw3JrUDhm/N8EXxda0d/Uuilm4k4s+VxbSGtHEI7NsOJcBDovgLR/YSrXscU
-	 24rGES7Gocr3s8caTRP0OeYhTbiRFEputonf8UQAxQ8vcJ5LFRHQKsXIdurixA42Qh
-	 eUpq/M+unGrppO8lptPCUL9sW2OZVyWP0vbnXG8WAIYPesvaHXAHzjHIbix9usZtaJ
-	 Um/F3IbnoVJLw==
+	b=Fmk7E1qatcmjTG7yXRU+KvfQ1sQ+OrgNHjeU4F1JDHuBAgeD6X4MApKIqNTc+eC3P
+	 qdnOW/8yZJDG9DqrsvqE1sEryPIMOUFZhaf7Hj5wRqG63qwEIY0/UV4Bs0VrDQFg8f
+	 tDXk3y02Hozfr24SCq7dEBUa6k/4ckIbfbYJZVbHsDhJgmPotA37SZexl4nNbfQK1n
+	 CwqjXXuEW4cvJwmUleG9RbQV9xAr+eTX1XUdoV9tfIzVMjR0I9WuIDVangZtKZ/tA1
+	 aWLyR91LlXlAAA+hUQNDz4yP6toN8miStFoaFUbO3QmnX+gMbRnUHCHxcieb/Zw0LK
+	 1pF4QIQia6FLg==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v5 32/49] KVM: arm64: gic-v5: Handle userspace accesses
- to IRS MMIO region
+Subject: Re: [PATCH v5 31/49] KVM: arm64: gic-v5: Add GICv5 EL1 sysreg
+ userspace accessors
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Sascha Bischoff" <Sascha.Bischoff@arm.com>
-Cc: kvm@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev
-In-Reply-To: <20260807111159.429128-33-sascha.bischoff@arm.com>
+Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, kvm@vger.kernel.org, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20260807111159.429128-32-sascha.bischoff@arm.com>
 References: <20260807111159.429128-1-sascha.bischoff@arm.com>
- <20260807111159.429128-33-sascha.bischoff@arm.com>
+ <20260807111159.429128-32-sascha.bischoff@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Aug 2026 16:20:52 +0000
-Message-Id: <20260807162053.3AEC71F000E9@smtp.kernel.org>
+Date: Fri, 07 Aug 2026 16:27:52 +0000
+Message-Id: <20260807162753.3C64C1F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,89 +48,74 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [High] Userspace can inject an inconsistent state by setting IRS_IST_BASE=
-R.valid=3D1 without allocating a host IST, leading to a CONSTRAINED UNPREDI=
-CTABLE hardware state if the guest subsequently clears the valid bit.
+- [High] The `gic_v5_icc_reg_descs` array is not sorted by sysreg encoding,=
+ which will cause KVM module initialization to fail.
 --
 
---- Patch [32]: [PATCH v5 32/49] KVM: arm64: gic-v5: Handle userspace acces=
-ses to IRS MMIO region ---
-commit 24ee880222eb3e4ff06c9b27b1d655da134efd7a
+--- Patch [31]: [PATCH v5 31/49] KVM: arm64: gic-v5: Add GICv5 EL1 sysreg u=
+serspace accessors ---
+commit fc4bd92f943a451cf5400e9e01e75819d02ae623
 Author: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Date:   Fri Aug 7 11:28:54 2026 +0000
 
-KVM: arm64: gic-v5: Handle userspace accesses to IRS MMIO region
-   =20
-As part of saving and restoring the state of a GICv5-based system,
-userspace must save and restore the IRS MMIO registers. These include
-important information such as the guest IST configuration, and KVM
-must present consistent state to the guest after migration.
+KVM: arm64: gic-v5: Add GICv5 EL1 sysreg userspace accessors
 
-> diff --git a/arch/arm64/kvm/vgic/vgic-irs-v5.c b/arch/arm64/kvm/vgic/vgic=
--irs-v5.c
-> index 095046c7959fa..212066b8d7ed5 100644
-> --- a/arch/arm64/kvm/vgic/vgic-irs-v5.c
-> +++ b/arch/arm64/kvm/vgic/vgic-irs-v5.c
+This commit adds functions to handle userspace reads and writes of the GICv5
+EL1 system registers to support VM migration. It wires these accessors into
+KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS and enforces that register state can only
+be written before a vCPU has run.
+
+> diff --git a/arch/arm64/kvm/vgic-sys-reg-v5.c b/arch/arm64/kvm/vgic-sys-r=
+eg-v5.c
+> new file mode 100644
+> index 0000000000000..6b255eacbf60d
+> --- /dev/null
+> +++ b/arch/arm64/kvm/vgic-sys-reg-v5.c
+
 [ ... ]
-> +static int vgic_v5_mmio_uaccess_write_irs(struct kvm_vcpu *vcpu, gpa_t a=
-ddr,
-> +					  unsigned int len, unsigned long val)
-> +{
-> +	struct vgic_dist *vgic =3D &vcpu->kvm->arch.vgic;
-> +	struct vgic_v5_irs *irs_data =3D vgic->vgic_v5_irs_data;
-> +	size_t offset =3D addr & (SZ_64K - 1);
-> =20
-> -		/* The address cannot be changed while the IST is valid. */
-> -		if (irs->ist_baser.valid && valid)
-> -			return;
-> +	/*
-> +	 * The following registers are ONLY settable via uaccesses. The guest
-> +	 * cannot write them!
-> +	 */
-> =20
-> -		/* Valid -> Invalid */
-> -		if (irs->ist_baser.valid && !valid) {
-> -			/* Make the LPI IST invalid and then ... */
-> -			if (irq_set_vcpu_affinity(vgic_v5_vpe_db(vcpu), &cmd))
-> -				break;
-> +	switch (offset) {
+
+> +static const struct sys_reg_desc gic_v5_icc_reg_descs[] =3D {
+> +	{ SYS_DESC(SYS_ICC_ICSR_EL1),
+> +	  .set_user =3D set_gic_icsr, .get_user =3D get_gic_icsr, },
+> +	{ SYS_DESC(SYS_ICC_PPI_ENABLER0_EL1),
+> +	  .set_user =3D set_gic_ppi_enabler, .get_user =3D get_gic_ppi_enabler,=
+ },
+> +	{ SYS_DESC(SYS_ICC_PPI_ENABLER1_EL1),
+> +	  .set_user =3D set_gic_ppi_enabler, .get_user =3D get_gic_ppi_enabler,=
+ },
+
 [ ... ]
-> +	case GICV5_IRS_IST_BASER:
-> +		if (irs_data->ist_baser.valid &&
-> +		    !vgic_v5_ist_baser_matches(irs_data, val))
-> +			return -EINVAL;
-> +
-> +		vgic_v5_update_irs_ist_baser(irs_data, val);
-> +		break;
+
+> +	{ SYS_DESC(SYS_ICC_PPI_PRIORITYR14_EL1),
+> +	  .set_user =3D set_gic_ppi_priorityr, .get_user =3D get_gic_ppi_priori=
+tyr, },
+> +	{ SYS_DESC(SYS_ICC_PPI_PRIORITYR15_EL1),
+> +	  .set_user =3D set_gic_ppi_priorityr, .get_user =3D get_gic_ppi_priori=
+tyr, },
+> +	{ SYS_DESC(SYS_ICC_APR_EL1),
+> +	  .set_user =3D set_gic_apr, .get_user =3D get_gic_apr, },
+> +	{ SYS_DESC(SYS_ICC_CR0_EL1),
+> +	  .set_user =3D set_gic_cr0, .get_user =3D get_gic_cr0, },
+> +	{ SYS_DESC(SYS_ICC_PCR_EL1),
+> +	  .set_user =3D set_gic_pcr, .get_user =3D get_gic_pcr, },
+> +};
 
 [Severity: High]
-Does this allow userspace to inject an inconsistent state?
+Will this cause KVM module initialization to fail?
 
-If userspace sets the valid bit of GICV5_IRS_IST_BASER to 1 via
-vgic_v5_mmio_uaccess_write_irs() but does not actually allocate a host LPI =
-IST
-(by omitting the KVM_DEV_ARM_VGIC_GRP_IST ioctl), the VM can still be start=
-ed.
+During load, check_sysreg_table() verifies that the sys_reg_desc arrays are
+strictly sorted by their sysreg encoding (Op0, Op1, CRn, CRm, Op2). If they
+are out of order, check_sysreg_table() returns false and causes the init to
+fail with -EINVAL.
 
-When the guest subsequently clears the valid bit, KVM's MMIO handler:
+Here, SYS_ICC_APR_EL1, SYS_ICC_CR0_EL1, and SYS_ICC_PCR_EL1 (which all have
+CRm=3D0) are placed at the end of the array after SYS_ICC_PPI_PRIORITYR15_E=
+L1
+(which has CRm=3D9). Additionally, SYS_ICC_ICSR_EL1 is placed at the very
+beginning of the array.
 
-vgic_v5_write_irs_ist_baser() {
-    ...
-    if (irs->ist_baser.valid && !valid) {
-        /* Make the LPI IST invalid and then ... */
-        rc =3D irq_set_vcpu_affinity(vgic_v5_vpe_db(vcpu), &cmd);
-
-detects a Valid -> Invalid transition and issues the LPI_VIST_MAKE_INVALID
-command. This sends an unmap command to the hardware for a VIST that was ne=
-ver
-mapped.
-
-Since this results in CONSTRAINED UNPREDICTABLE hardware behavior, should K=
-VM
-reject uaccess writes that set the valid bit without a backing IST, or perh=
-aps
-verify IST presence before issuing the unmap command?
+Does this array need to be reordered strictly by encoding so the validation
+checks pass and the binary searches work correctly?
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260807111159.4291=
-28-1-sascha.bischoff@arm.com?part=3D32
+28-1-sascha.bischoff@arm.com?part=3D31
