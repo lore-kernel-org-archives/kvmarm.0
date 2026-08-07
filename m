@@ -1,44 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E3593655C4;
-	Fri,  7 Aug 2026 17:39:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 777CDE54B;
+	Fri,  7 Aug 2026 17:50:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786124371; cv=none; b=h2cCneZQ3GpTB/WvIXvhdVY5i2ihrYzs3k9LLJdNvpEgpb0NZo9CrK/k6+eH3wJLeCn2qRtiebRUQ8EgtWqoC2dgKTOIJlt+is/3YiZCVbamBQZ6S5q+4G+I6Zu/4DamuGfLFSC3WfTQei1DXT4aiZZ4w3hELZRrLD1fDT1PM08=
+	t=1786125015; cv=none; b=PN2D2NED06+NB0X96YO3IqFHquTeyuupToK1s/bkQnTP2iFfBl6kCgBHce93fujErod0Akyeu3qE8VI14eWjxCg7lYUHhzNq/qnr0eiLKzzoaQGxhGzp1vcrqNXEDXztQF7BNEBROLaywujLIsQKDPjnaZOUzOaxyswtiuUeR4k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786124371; c=relaxed/simple;
-	bh=Sijy8JmW1OlL8il3uSNyN7lipFJrlmOJM7IC7JOTOQg=;
+	s=arc-20240116; t=1786125015; c=relaxed/simple;
+	bh=zSV6oXNfGbD/JzkJuzI6FRRLRjhgAv5gSV9ZZk0NnCM=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=gc8Zq1TRi7kADIwOUHeWEEIhiM0noMOAuV88T16W8fc9UoyNMrH9JKo9BTwrTiYv1jAZPtqSPVlaFFnifz+giMXGpncsG44R+kAHRibZQnF5coxtdq919TTKDpqULrqbpn/L01SNtKS4okUpFgFk5yBkcC/6RjJv6hAdEr/Zph8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EhoNKmWW; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=YwfSfmS/1pNgBNBrOln8htM2YqoyB29qvXKM1oMT+HNnwlMkRMrMsJ51QANwdeTwzTzUrldV45NYG42aA+fdEYvNAhn3of45t0SdjHgDkJ8BBuTORCBMYA2sPAu+LLgAFNHcHlJ+UwQupbZVwZGKE5N1wNn+jwkGI0VOqaJVt+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IGfVmh5U; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EhoNKmWW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F6731F000E9;
-	Fri,  7 Aug 2026 17:39:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IGfVmh5U"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7FC71F000E9;
+	Fri,  7 Aug 2026 17:50:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786124368;
-	bh=c+Wh046HJBoVOeqBhvYXxbJ6fF+5wfp9zmC/A6Mgoow=;
+	s=k20260515; t=1786125014;
+	bh=ybrTXnzvrwJBryS+JumQ/iM90ZGiwhM/VqCp0YR9wHg=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=EhoNKmWW330A4feZ6Wl/h6vLqJiMYjyfgZgFl5jSkWgzVMLhd7AafBpWotHrjRj4M
-	 XnyvRffhmzYSgfLtKWIdWmDRVGNwZeGFD+tZ5K5o4B0dcCn/yNSlQOFAySTlgHoatN
-	 pSG4P6HL3ieQc5dzSbBAptpHONwnPfADfzGszp8F3sv5jRhEytFfek61+lq1iclyCz
-	 8NolrWawLM2NpLb2akK2dxuaTL6wbU1zUOUU6t7tsaZXAIsDC4kmqlSOUT7GX75jWu
-	 kC8K4jjQOmhQ+VEasycWw5mP+IIkmlllxzzR+pZ65keVsRH2r0adkrfC8nRxzDvLAV
-	 mQRWTWDaC4c7Q==
+	b=IGfVmh5UkeTIe6DMxuqWzFufhgbET9a9fdru7rhgRd4eZx3f2Yt7EQGOrJC9bbDc+
+	 CP2UdD8GwTGDYdEB30ynX+jUBTJ0V5Xy2GxLuI3vV992iRdLPXC14DbJBuJ1aYz0kU
+	 7CKZFsvCibppLBKrQbXInKGDeF291oQLLZyKaWijR/HtLwji5PgWRo5+E+Xw6A8tUL
+	 QZFE8hnviwO+ATfZPoRY7ihjpbNugUosC7C2voFv6daVew36r+p7TrHfCurGLISTeq
+	 5anSxQXjXaysgDKdvh9v33/vam47eljBwp4WdJevwVlbs/WBqWwZba3timVqrgVoWN
+	 0fR23PcSATMVg==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v5 47/49] KVM: selftests: Add VGICv5 LPI delivery tests
+Subject: Re: [PATCH v5 48/49] KVM: selftests: Add VGICv5 IST save/restore
+ coverage
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Sascha Bischoff" <Sascha.Bischoff@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, "Oliver
- Upton" <oupton@kernel.org>
-In-Reply-To: <20260807111159.429128-48-sascha.bischoff@arm.com>
+Cc: "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+In-Reply-To: <20260807111159.429128-49-sascha.bischoff@arm.com>
 References: <20260807111159.429128-1-sascha.bischoff@arm.com>
- <20260807111159.429128-48-sascha.bischoff@arm.com>
+ <20260807111159.429128-49-sascha.bischoff@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Aug 2026 17:39:27 +0000
-Message-Id: <20260807173928.3F6731F000E9@smtp.kernel.org>
+Date: Fri, 07 Aug 2026 17:50:13 +0000
+Message-Id: <20260807175013.D7FC71F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,79 +47,64 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [Medium] The system instruction GIC CDEOI requires the fixed register XZR=
-, but is emitted using a compiler constraint which may select a general-pur=
-pose register.
+
+Pre-existing issues:
+- [High] Missing Context Synchronization Event (ISB) after control-plane sy=
+stem register writes.
 --
 
---- Patch [47]: [PATCH v5 47/49] KVM: selftests: Add VGICv5 LPI delivery te=
-sts ---
-commit 1dca3130863c08b0c3a19e09294df6edd1534a20
+--- Patch [48]: [PATCH v5 48/49] KVM: selftests: Add VGICv5 IST save/restor=
+e coverage ---
+commit 3f2c979e78365e70421bcaaf39f350d8b4a83086
 Author: Sascha Bischoff <Sascha.Bischoff@arm.com>
 
-KVM: selftests: Add VGICv5 LPI delivery tests
+KVM: selftests: Add VGICv5 IST save/restore coverage
 
-Add a two-VPE VGICv5 LPI delivery test. Exercise the virtual IRS ID
-registers and IST base configuration path before checking interrupt
-delivery.
+Add end-to-end VGICv5 IST save/restore coverage. The test verifies that
+interrupt state saved from the ISTs can be restored into a fresh VM before
+first run and then consumed by the guest.
 
 > diff --git a/tools/testing/selftests/kvm/arm64/vgic_v5.c b/tools/testing/=
 selftests/kvm/arm64/vgic_v5.c
-> index 23fbd2db50c43..71bda5661c74e 100644
+> index 71bda5661c74e..47e147bc14b87 100644
 > --- a/tools/testing/selftests/kvm/arm64/vgic_v5.c
 > +++ b/tools/testing/selftests/kvm/arm64/vgic_v5.c
-
 [ ... ]
-
-> @@ -209,6 +298,67 @@ static void guest_spi_line_code(void)
->  		wfi();
->  }
-> =20
-> +static void guest_lpi_irq_handler(struct ex_regs *regs)
+> @@ -359,6 +406,165 @@ static void guest_lpi_code(void)
+[ ... ]
+> +static void guest_ist_restore_code(void)
 > +{
-> +	u32 vcpu_id =3D guest_get_vcpuid();
-> +	u32 expected_lpi =3D vcpu_id ? LPI_TEST_TO_VPE1 : LPI_TEST_TO_VPE0;
-> +	u64 expected_hwirq =3D gicv5_lpi_hwirq(expected_lpi);
-> +	u32 hwirq;
-> +	u64 ia;
+> +	local_irq_disable();
 > +
-> +	ia =3D gicr_insn(CDIA);
-> +	if (!GICV5_GICR_CDIA_VALID(ia))
-> +		return;
+> +	gicv5_cpu_enable_interrupts();
 > +
-> +	gsb_ack();
-> +	isb();
-> +
-> +	hwirq =3D FIELD_GET(GICV5_GICR_CDIA_INTID, ia);
-> +	GUEST_ASSERT_EQ(hwirq, expected_hwirq);
-> +
-> +	gic_insn(hwirq, CDDI);
-> +	gic_insn(0, CDEOI);
+> +	if (!guest_get_vcpuid())
 
-[Severity: Medium]
-Will this lead to misencoded instructions?
+[Severity: High]
+This is a pre-existing issue, but should gicv5_cpu_enable_interrupts()
+issue an isb() before it returns?
 
-The system instruction GIC CDEOI requires the fixed register XZR, but is
-emitted using the gic_insn() macro which expands to write_sysreg_s() using a
-compiler constraint instead of a hardcoded register.
+Looking at the implementation of gicv5_cpu_enable_interrupts() in both the
+host kernel driver (drivers/irqchip/irq-gic-v5.c) and the selftest helper
+(tools/testing/selftests/kvm/include/arm64/gic_v5.h), it writes to control
+plane system registers like SYS_ICC_CR0_EL1 without an explicit context
+synchronization event.
 
-If the compiler selects a general-purpose register other than XZR, this cou=
-ld
-result in CONSTRAINED UNPREDICTABLE behavior. Should this instruction use an
-inline assembly block that explicitly hardcodes the exact register in the
-instruction string?
+In this new test code, we perform a conditional branch based on
+guest_get_vcpuid() immediately after returning from the function. Without an
+isb(), could this conditional instruction be executed against an
+architecturally undefined pipeline state?
 
+> +		gicv5_set_pcr(VGIC_V5_IST_PRIO_HIGH);
 > +
-> +	if (vcpu_id) {
-> +		gicv5_send_lpi(LPI_TEST_TO_VPE0);
-> +		GUEST_SYNC(GUEST_CMD_LPI_REPLIED);
-> +		while (1)
-> +			wfi();
-> +	}
+> +	GUEST_SYNC(GUEST_CMD_IS_READY);
 > +
-> +	GUEST_DONE();
+> +	local_irq_enable();
+> +
+> +	while (1)
+> +		wfi();
 > +}
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260807111159.4291=
-28-1-sascha.bischoff@arm.com?part=3D47
+28-1-sascha.bischoff@arm.com?part=3D48
