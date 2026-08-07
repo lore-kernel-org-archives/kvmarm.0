@@ -1,134 +1,202 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2100369D5B;
-	Fri,  7 Aug 2026 17:12:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A8FE33688A
+	for <kvmarm@lists.linux.dev>; Fri,  7 Aug 2026 17:17:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786122762; cv=none; b=BGAcis0uFPgAnMUMFX1HS8WdM/m/g2ZG7LPh8Ht1t1OphTJn2qMVmTl7e0mEhFEOe8PGa7nb01EvsWEpkpmE3LpchjHBoJvCMi+SykiYCXOqLZ0eWzpHrlilJpoEz2XkNABeE60FHQflpd3Up6TpwbepcaAH7+Lqf9Erwldqxrs=
+	t=1786123027; cv=none; b=nWZzV2gYO4+61YvS3LrFrnPSW5KX7Dzz/QaJnafEQWwks36nWiJHtrtr6GHMty7wCkun29vh34I2GHfI6XzoN0EnO5r33qt743TZVqucaDeBRlJHL07RupdopjjMaEkmK1m9JPQhTPqiJUHp8UnnbjyJWuxoYs9l0oYPFI8jOzM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786122762; c=relaxed/simple;
-	bh=Je6kucAvuRmMA2FG/1ZWu9BLQWBPR0lsm5GVfwHbs58=;
+	s=arc-20240116; t=1786123027; c=relaxed/simple;
+	bh=8hU4iklGM5Qf4s4y9hB4kX6uRvPTpGjFPTyIUVWKrHc=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=ouGQ9W3JhpEz7GeMJgZUvDRR8k/0IxPdhC1eJf9Rga1LP4jfrCr0drPbkK/SxJl9u3JkIC6fwDgTP+x9judSaE2yUMjTLYX9aOlR/xFv1IXaLa/ssJHPAx0cNGUFEjZERXu4zgS8IGCEgYx5DinEO66U6wvbG+sFQVdb6UJ6LSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T6dVYAiW; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=mjxcGMIOKaB6o17LzQBFSVJs2Rmz5isufZ9ouZKoJdnalJ28b6gF7Ykp1u9JtO4jBsw0bgIWLOycCYyWIdmsKBrwx8vIXZKTmzc/QMFF//rM+KSP9utNHx5hjl2MrGWdxxHYAXsl2jjnMm4rTw2PVD/0h1YOyrqk5Ciz4DfRlXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hRY8O6F9; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T6dVYAiW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33F011F00ADB;
-	Fri,  7 Aug 2026 17:12:40 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hRY8O6F9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4B501F000E9;
+	Fri,  7 Aug 2026 17:17:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786122760;
-	bh=HrLNBkC6c3ogSlCR3T2iNQiLVntPKSHXkVgSybJhEoU=;
+	s=k20260515; t=1786123026;
+	bh=/d75zqd3UXPS8pTe6p3uaaBCjRJm7C4IKPanVrhi3XY=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=T6dVYAiWbCVPPlhRSrhV4dD/FFiswulxKWvbEYi4R7XBVNUtTvFU9XzOcoqQ7V9M9
-	 iPNnilgsqO9+D750kXs3d3ZILmYp+SN5BG05/6agD2MgO4tuDvCgb/ZBD2cO03rhOJ
-	 L5xAZLAZLEU8i4VzFpVZROkti9BLNb1M0ul65sjjm+DoMKlbNOZzO05JIyU8red4Zr
-	 4OR67U2gQUp7PZilmBk5b2vAwKW6YuyfN11xFx7GI2Bd2FQaqD/phNeLAZinAlrNLQ
-	 zcl1jmym0+GcL7USvjxhewL5DXj7vUjun3t6+yH0jqgvcagdIqpI3tMc5RZP1t6cUa
-	 au7gc81klEmHA==
+	b=hRY8O6F9sw8X9jxlwFBJGRVq5cCINfKT+OowLq3S5ARr3VuFwpd5cBum2gvdoaLZj
+	 1AwInzY25m/z50KVh4iOJgVlZ6c7MaRgma85movY+8s/ElS5IJ/IkawkX43mpsWA4E
+	 J37cPvUCl9u7k1zz44ZRfb8cc5L4Uye0qJgzEHF+QOMxdjpKZCoEcnj3Ugw1YEl1Fl
+	 r0odEsaMSzEHixaT4OLd/rASILYtLj1Qfp++i/7XtrXo6AIvdNWzDY+6NcTTnve4Ix
+	 OdN/tSFBknxzjgoxjVNwu2d5TPRV1MIkfMpSH1SFNIzYNo/AoK2lzQzepTRCOlqk83
+	 VhPaHPPKy/o/Q==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v5 41/49] KVM: selftests: Add VGICv5 NR_IRQS attribute
- tests
+Subject: Re: [PATCH v2 13/13] KVM: arm64: Implement HVC interface for ITS
+ emulation setup
 Reply-To: sashiko-reviews@lists.linux.dev
-To: "Sascha Bischoff" <Sascha.Bischoff@arm.com>
-Cc: "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, kvm@vger.kernel.org, "Oliver
- Upton" <oupton@kernel.org>
-In-Reply-To: <20260807111159.429128-42-sascha.bischoff@arm.com>
-References: <20260807111159.429128-1-sascha.bischoff@arm.com>
- <20260807111159.429128-42-sascha.bischoff@arm.com>
+To: "Sebastian Ene" <sebastianene@google.com>
+Cc: "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>
+In-Reply-To: <20260807164322.2970811-15-sebastianene@google.com>
+References: <20260807164322.2970811-2-sebastianene@google.com>
+ <20260807164322.2970811-15-sebastianene@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Aug 2026 17:12:39 +0000
-Message-Id: <20260807171240.33F011F00ADB@smtp.kernel.org>
+Date: Fri, 07 Aug 2026 17:17:05 +0000
+Message-Id: <20260807171705.B4B501F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+Thank you for your contribution! Sashiko AI review found 5 potential issue(=
 s) to consider:
-- [Low] The file-level macro `VGIC_V5_MAX_NR_SPIS` contradicts the actual m=
-aximum SPI count hardcoded in the test logic and KVM implementation.
+- [Critical] The `psz` (page size) field read from the untrusted `host_stat=
+e` is not validated, allowing a malicious host to bypass ownership transfer=
+ of Level 2 ITS tables.
+- [High] Calling `on_each_cpu()` with local interrupts disabled causes a sy=
+stem-wide deadlock and triggers a kernel warning.
+- [High] Allocating memory via `alloc_pages_exact(..., GFP_ATOMIC)` while h=
+olding a `raw_spin_lock` violates locking hierarchy and PREEMPT_RT constrai=
+nts.
+- [High] The error path in `pkvm_its_emulate_setup()` rolls back the `priv_=
+state` donation using a hardcoded size of 1 page instead of `priv_num_pages=
+`, leaking hypervisor memory.
+- [High] An error rollback loop in `pkvm_setup_its_shadow_cmdq()` uses an u=
+nsigned 64-bit integer, resulting in an infinite loop.
 --
 
---- Patch [41]: [PATCH v5 41/49] KVM: selftests: Add VGICv5 NR_IRQS attribu=
-te tests ---
-commit da8da00920607df68a148cd61772ea241d9a820f
-Author: Sascha Bischoff <Sascha.Bischoff@arm.com>
+--- Patch [13]: [PATCH v2 13/13] KVM: arm64: Implement HVC interface for IT=
+S emulation setup ---
+commit b5e04e3693da3938b3ebc14d5487e70eddc3c941
+Author: Sebastian Ene <sebastianene@google.com>
 
-KVM: selftests: Add VGICv5 NR_IRQS attribute tests
+KVM: arm64: Implement HVC interface for ITS emulation setup
 
-This commit adds coverage for the VGICv5 NR_IRQS attribute. It verifies
-that KVM rejects values outside the supported range, non-32-aligned counts,
-and attempts to change the count after initialization.
+This patch introduces a new HVC to allow the host to trigger the ITS emulat=
+ion
+setup. It uses the API in the GIC ITS driver to lock the ITS before pKVM
+finalize, switches to a different command queue, and allocates memory to tr=
+ack
+internal state. The initial MMIO handler is replaced with a full-featured
+emulation handler.
 
-> diff --git a/tools/testing/selftests/kvm/arm64/vgic_v5.c b/tools/testing/=
-selftests/kvm/arm64/vgic_v5.c
-> index 51ea2fe7141ad..f4c0d2c003bb4 100644
-> --- a/tools/testing/selftests/kvm/arm64/vgic_v5.c
-> +++ b/tools/testing/selftests/kvm/arm64/vgic_v5.c
-> @@ -13,6 +13,8 @@
->  #include "vgic.h"
+> diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+> index 5e80da18f3120..9cd562349f249 100644
+> --- a/arch/arm64/kvm/pkvm.c
+> +++ b/arch/arm64/kvm/pkvm.c
+[ ... ]
+> @@ -312,8 +312,28 @@ static void __init _kvm_host_prot_finalize(void *arg)
+[ ... ]
+> +static int pkvm_init_its_emulation(phys_addr_t dev_addr, struct its_host=
+_state *host)
+> +{
+> +	size_t priv_state_sz =3D ITS_PAGES << PAGE_SHIFT;
+> +	void *priv_state;
+> +	int ret;
+> +
+> +	priv_state =3D alloc_pages_exact(priv_state_sz, GFP_ATOMIC);
+
+[Severity: High]
+Does this allocation violate locking hierarchy constraints?
+
+This function is invoked as a callback from its_emulate_release_locks() in
+drivers/irqchip/irq-gic-v3-its.c, which iterates over ITS nodes and calls t=
+his
+while holding both its_lock and the per-node its->lock raw spinlocks.
+
+On PREEMPT_RT kernels, internal page allocator spinlocks are sleeping
+rt_mutexes. Furthermore, GFP_ATOMIC contains __GFP_KSWAPD_RECLAIM, which can
+wake kswapd and acquire scheduler runqueue locks while holding a true raw
+spinlock.
+
+> +	if (!priv_state)
+> +		return -ENOMEM;
+[ ... ]
+>  static int __init pkvm_drop_host_privileges(void)
+>  {
+> +	unsigned long its_flags;
+>  	int ret =3D 0;
 > =20
->  #define NR_VCPUS		1
-> +#define VGIC_V5_DEFAULT_NR_SPIS	32
-> +#define VGIC_V5_MAX_NR_SPIS	BIT(16)
+>  	/*
+> @@ -321,8 +341,10 @@ static int __init pkvm_drop_host_privileges(void)
+>  	 * once the host stage 2 is installed.
+>  	 */
+>  	static_branch_enable(&kvm_protected_mode_initialized);
+> +
+> +	its_emulate_acquire_locks(&its_flags);
+>  	on_each_cpu(_kvm_host_prot_finalize, &ret, 1);
 
-[Severity: Low]
-This isn't a bug, but this macro defines the maximum as 65536, whereas the
-commit message correctly mentions a "1024-SPI maximum".
+[Severity: High]
+Can this sequence cause a system-wide deadlock?
+
+its_emulate_acquire_locks() explicitly disables local hardware interrupts v=
+ia
+raw_spin_lock_irqsave(). Immediately after, on_each_cpu() is called, which
+relies on smp_call_function_many() to broadcast an IPI and synchronously wa=
+it
+for completion.
+
+Waiting for an IPI while local IRQs are disabled is an AB-BA deadlock
+scenario.
+
+> -	return ret;
+> +	return its_emulate_release_locks(ret, &its_flags, pkvm_init_its_emulati=
+on);
+>  }
 
 [ ... ]
 
-> @@ -125,60 +184,92 @@ static void test_vgic_v5_create(void)
->  	vm_gic_destroy(&v);
->  }
-> =20
-> -static void guest_irq_handler(struct ex_regs *regs)
-> +static void test_vgic_v5_nr_irqs_attrs(void)
->  {
-> -	bool valid;
-> -	u32 hwirq;
-> -	u64 ia;
-> -	static int count;
-> -
-> -	/*
-> -	 * We have pending interrupts. Should never actually enter WFI
-> -	 * here!
-> -	 */
-> -	wfi();
-> -	GUEST_SYNC(GUEST_CMD_IS_AWAKE);
-> -
-> -	ia =3D gicr_insn(CDIA);
-> -	valid =3D GICV5_GICR_CDIA_VALID(ia);
-> -
-> -	GUEST_SYNC(GUEST_CMD_IRQ_CDIA);
-> -
-> -	if (!valid)
-> -		return;
-> -
-> -	gsb_ack();
-> -	isb();
-> -
-> -	hwirq =3D FIELD_GET(GICV5_GICR_CDIA_INTID, ia);
-> -
-> -	gic_insn(hwirq, CDDI);
-> -	gic_insn(0, CDEOI);
-> +	const u32 max_nr_spis =3D BIT(10);
+For the items identified in arch/arm64/kvm/hyp/nvhe/its_emulate.c, the
+following observations were made based on the underlying emulation setup:
 
-[Severity: Low]
-Does VGIC_V5_MAX_NR_SPIS go completely unused in favor of this local
-max_nr_spis variable?
+arch/arm64/kvm/hyp/nvhe/its_emulate.c:pkvm_setup_its_shadow_cmdq() {
+    ...
+    for (i =3D i - 1; i >=3D 0; i--)
+        __pkvm_host_unshare_hyp(start_pfn + i);
+}
 
-Should VGIC_V5_MAX_NR_SPIS be defined as BIT(10) and used here instead to
-avoid having two contradictory limits?
+[Severity: High]
+Can this error rollback trigger an infinite loop?
 
-> +	struct kvm_vcpu *vcpu;
-> +	struct vm_gic v;
-> +	u32 nr_irqs;
-> +	int ret;
+If the loop counter i is declared as an unsigned 64-bit integer, the condit=
+ion
+i >=3D 0 is universally true. When i wraps around to 0xFFFFFFFFFFFFFFFF, it=
+ will
+continually execute out-of-bounds __pkvm_host_unshare_hyp() calls instead of
+terminating.
+
+
+arch/arm64/kvm/hyp/nvhe/its_emulate.c:pkvm_host_unmap_last_level() {
+    ...
+    ret =3D __pkvm_host_donate_hyp(hyp_phys_to_pfn(table_addr), psz >> PAGE=
+_SHIFT);
+}
+
+[Severity: Critical]
+Does this bypass pKVM isolation guarantees by trusting the host-provided pa=
+ge
+size?
+
+The psz field appears to be read directly from the untrusted host_state
+without validation. If a malicious host sets psz to a value strictly less t=
+han
+PAGE_SIZE (e.g., 0), psz >> PAGE_SHIFT evaluates to 0. The donation will
+silently succeed without actually transferring page ownership, allowing the
+host to retain ownership and concurrently modify the tables.
+
+
+arch/arm64/kvm/hyp/nvhe/its_emulate.c:pkvm_its_emulate_setup() {
+    ...
+err_with_priv:
+    WARN_ON(__pkvm_hyp_donate_host(hyp_virt_to_pfn(priv_state), 1));
+}
+
+[Severity: High]
+Does this error path leak hypervisor memory?
+
+The setup successfully donates priv_num_pages from the host to EL2, but if a
+subsequent operation fails, this rollback hardcodes 1 instead of using
+priv_num_pages. If priv_num_pages is 2 for ITS setup, the remaining pages a=
+re
+permanently left in the HYP-owned state.
 
 --=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260807111159.4291=
-28-1-sascha.bischoff@arm.com?part=3D41
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260807164322.2970=
+811-2-sebastianene@google.com?part=3D13
