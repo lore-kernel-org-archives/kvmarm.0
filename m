@@ -1,56 +1,55 @@
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com [209.85.128.72])
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com [209.85.218.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 887A34746AB
-	for <kvmarm@lists.linux.dev>; Fri,  7 Aug 2026 16:43:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1D564756C1
+	for <kvmarm@lists.linux.dev>; Fri,  7 Aug 2026 16:43:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786121026; cv=none; b=tiQO6SSet00YTx0ML+tgr3br9OPyHPK3QQZEsmOmP3EO9u6JnMWWv1Q2hIVyj/xbBh9cUxDt5TlEejFpLW/JHYrMUCubJZTym2MdtUKqXZ3X3v6Ug+1F+5CQ2jTSlAVn3p78Bmjyn6taaf492xj9bKh+ukJAOMh1mvnpuItqMNM=
+	t=1786121028; cv=none; b=XhCXkZEL176NX+LIY+SaZRXHaWxa1ICtKZk5tHYhGPxhlcWlzkmRxG17tN3XdOPPLIzuH2v448h/pTgqJlw2chuA9z5L5+0bV3OlasilyaZ07fbvFY70pRkF17HJ6pPtT15oNro6GJmyG+YcStkUIlz22kHRdFyXqM6F9wtO83g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786121026; c=relaxed/simple;
-	bh=/+oBPRPor12nAw5j501NP9Ed7vddxDnJfcm2D2u6JbQ=;
+	s=arc-20240116; t=1786121028; c=relaxed/simple;
+	bh=XILxJKy12TWaQHFCLBTQsYLQR5jF/oISDfaILeGY1YQ=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=GpfxZpavWSr7nrcHdxpOfSS2naGlpdSOIjUtXiyO7FSU5xpebWUXv+QFH7pJnHxz+HVQbo/0pR3yZlL3HyDkGJOyrQkP1/eJIfxweNcwO1Vf0xSGWn8pv82+osYlDaX66tZl18ZyL4g1M528kMFBzA1VoGNcyod7/pkNY5xckxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dg2Pwv7c; arc=none smtp.client-ip=209.85.128.72
+	 To:Cc:Content-Type; b=k4GQaww5MQ728t3qTcPjhTsc6H2NUCWNsiwtM3i4chYe+6Vx0eO/0jFDEa1jnm6bePDsLJZRXf6mDTCy0WhPQBsQ58U49uGI7WYdORtMecPMzrDxGVW9HFioiWxsg80kOISgt4pry+L3jgELrSGgTfL9s4ww+5fgjIldUIv/L5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TIr/tNyZ; arc=none smtp.client-ip=209.85.218.70
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dg2Pwv7c"
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-49561facb1dso21895325e9.3
-        for <kvmarm@lists.linux.dev>; Fri, 07 Aug 2026 09:43:44 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TIr/tNyZ"
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-c15ddb61f13so290347066b.0
+        for <kvmarm@lists.linux.dev>; Fri, 07 Aug 2026 09:43:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1786121023; x=1786725823; darn=lists.linux.dev;
-        h=content-transfer-encoding:content-type:cc:to:from:subject
-         :message-id:references:mime-version:in-reply-to:date:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=DRnRzIglH4bre6fymvnhTQIWpGXgBbzyHJfeoNchwKg=;
-        b=dg2Pwv7c/2xXzpG8hdtqxwGa4tLImLESimkbBGXr1g8MqhP1gvMqfNOLvJT6Vzl90q
-         a27yaLhI/IW7cWk0yB/pTjLSBHhhcHz0G/dVL+tt4Okc9BhBPspLF7G6u8woEyf8Qeb8
-         pY+K1PaajcgH5/zvqoOuZbJCKYsLDrsMWMgEcBeQXfAVvS4GMWLsnbbIwN2XrokKBcEh
-         xjlxfb5xmfi8eopIgBXiCVyONhaMN54TH31hIl7ZWF7FUKEjswD9rPVLdhg65npTq88u
-         PktJfvETrsTKZyLOOwVkvURa2fhBrvUy1GN75PBkWbwY+DIw2GwF6Hdr4EEXesfj698F
-         BDKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786121023; x=1786725823;
-        h=content-transfer-encoding:content-type:cc:to:from:subject
-         :message-id:references:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+        d=google.com; s=20251104; t=1786121024; x=1786725824; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=DRnRzIglH4bre6fymvnhTQIWpGXgBbzyHJfeoNchwKg=;
-        b=f55pzjN/98OFqBBXrmc1Md+FD8YzwZJkAHVVlFI+Rl/cYg6oWjXmEo4wKoU3hn2adD
-         1AE9F9sycMC6PSdPOWan93OX45VyI/duMFybptUfSjgm5It08ix2MLP1PZeKXDdo5Shk
-         BoKeOkaVTsI/bGFSEh2bthxPO3C5AbJXVKKhCT5Td2yeSyhvv/RAOR4qcokc5XoAIWR9
-         sKF4Q7kgyDolMQGvDmic4YYMOVPflKmSVxT+HY/dMxtYra0NtzyhmKx/IFCHg5l8NZEW
-         YWaFEFL5JZz1h1DIJAl+0T6z4XtaYNyv+ZFTDXhJlAUJXaSuzVGBg7mDJgTZK7CaNjMb
-         qUow==
-X-Gm-Message-State: AOJu0YwM0BMq4/If7wDsxEPZZfgByW97scaTnLGxgwDEKepP0ikX3gPc
-	nGofrxcYTMndTIRz7RPCtRYPABD1k5fkJX4jeTfrKiENNFFUUani3agFDfxZA/E0SMeEzqsDt6S
-	JjOKyVXQaidvfZvT9btsC2tbxjGSqNQ==
-X-Received: from wmbhu19.prod.google.com ([2002:a05:600c:a293:b0:493:f83f:e304])
+        bh=ubeHaXbMbCOzTTinYD2VelpFhUrhVALfoKhm+KzrKis=;
+        b=TIr/tNyZvFJkB7ieThxfGzvcn3D8FrHZchA7LvpWWK5LnvKy/RZQE+Zq+Huz4GjrXd
+         aOWD2wYM3h4Xi1Ld5QIOKsIPxr2eqM0B8V1HhnQ7Qpz5AbJzpmja7knOtw5LuL/ct4XT
+         AdVl2io/3UXBtVz9fqXXLCCWp64OaDrB7zkHMp9YNVgz3QzNUezJK9cWqBPRV4/gT+tc
+         WDWeFnihYixNA5uNdNWUmMXfZ7hYjWF7yUzMvNZOsLXQLUZBL+ostuaCRudeZVkxQb70
+         OHgZn/xEOo1dve1xAt0G+wPogssCjakSo1cSejDCdS/uG5k99Cfy7TDASUxzU9MptZc+
+         p1IQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786121024; x=1786725824;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=ubeHaXbMbCOzTTinYD2VelpFhUrhVALfoKhm+KzrKis=;
+        b=MzOjCHvbR1zdZ24W5iISxmMs1juE0hUJx/tZsdyneqwF7n7jQqJvGBV7K3uiUgYPj9
+         vkD8NFsnYJN8dCWilrYvpl+6c8WTyM8o3jR/XLb82Y1vzp3Q5SZm0GFeoqw6xbQ+cieF
+         u8d/oH2zOIf0vGXFJ9ix7i909c6610H5W9eGfDoiz5/qTn5WUo0RyhmKyGrnajSR8XOH
+         KOgG3U6/Eg8e9PL+yoKgMauOq7uRSedZ+0+Ruwok7AfJ/Pmewi2KIZI4Iw3QgkOyJqfI
+         XlMLuPGw/tbX1pAw4aaAxjaZDyz2rR79+4KVdc2WdzvCmgz4mI5UtY9T0rXTx4HG3UgY
+         E3Pw==
+X-Gm-Message-State: AOJu0YxYRJbznl99pcu7gHKW6Te4xUl25Ep7P99/dRsh4/OZBA2R9nzB
+	P4p7oQRgNqNex17zcMmL764wP4LQncnpRbnygbnVrriaD6pWyk/nyhiE6efl6gFr4QQs/xn2VXL
+	At1oBSDLEtaAyFk44HGkp0Wf5mK4vpA==
+X-Received: from ejfv7.prod.google.com ([2002:a17:906:3bc7:b0:c12:8ea1:b062])
  (user=sebastianene job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:c297:b0:494:596e:e8c4 with SMTP id 5b1f17b1804b1-4994e7d3395mr238197545e9.17.1786121022494;
- Fri, 07 Aug 2026 09:43:42 -0700 (PDT)
-Date: Fri,  7 Aug 2026 16:43:13 +0000
+ 2002:a17:907:1b24:b0:c12:8b1c:454f with SMTP id a640c23a62f3a-c2039c0264bmr1298937866b.2.1786121023739;
+ Fri, 07 Aug 2026 09:43:43 -0700 (PDT)
+Date: Fri,  7 Aug 2026 16:43:14 +0000
 In-Reply-To: <20260807164322.2970811-2-sebastianene@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -60,9 +59,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20260807164322.2970811-2-sebastianene@google.com>
 X-Mailer: git-send-email 2.55.0.654.g21b8a5bc05-goog
-Message-ID: <20260807164322.2970811-5-sebastianene@google.com>
-Subject: [PATCH v2 03/13] KVM: arm64: Support host MMIO trap handlers for
- unmapped devices
+Message-ID: <20260807164322.2970811-6-sebastianene@google.com>
+Subject: [PATCH v2 04/13] KVM: Parse the device tree and register the ITS
+ region with pKVM
 From: Sebastian Ene <sebastianene@google.com>
 To: catalin.marinas@arm.com, fuad.tabba@linux.dev, joey.gouly@arm.com, 
 	mark.rutland@arm.com, maz@kernel.org, oupton@kernel.org, rananta@google.com, 
@@ -74,153 +73,173 @@ Cc: kvmarm@lists.linux.dev, android-kvm@google.com, bgrzesik@google.com,
 	vdonnefort@google.com, vladimir.murzin@arm.com, yuzenghui@huawei.com, 
 	zenghui.yu@linux.dev
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hook a handler to the host mem abort so that the hypervisor can
-intercept host accesses to unmapped memory regions.
-When a Stage-2 fault occurs on a registered device region, the
-hypervisor will look if there is any registered function that
-can handle the access. On the back of this, mediate host accesses
-to devices and emulate them in pKVM.
+Identify the ITS base address from the device tree and store it in the
+pkvm_protected_regs array so that it will be unmapped from the host
+address space.
+Register a callback to forward all the MMIO requests to the device to
+prevent breaking ITS functionality in this patch. The patch by itself
+shouldn't break any existing functionality even though all the accesses
+from the gic-ITS driver are now mediated inside pKVM.
 
 Signed-off-by: Sebastian Ene <sebastianene@google.com>
-Signed-off-by: Bart=C5=82omiej Grzesik <bgrzesik@google.com>
 ---
- arch/arm64/include/asm/kvm_arm.h      |  2 ++
- arch/arm64/include/asm/kvm_pkvm.h     |  4 +++
- arch/arm64/kvm/hyp/nvhe/mem_protect.c | 49 +++++++++++++++++++++++++++
- arch/arm64/kvm/hyp/nvhe/setup.c       |  3 ++
- 4 files changed, 58 insertions(+)
+ arch/arm64/include/asm/kvm_pkvm.h     |  2 ++
+ arch/arm64/kvm/hyp/nvhe/Makefile      |  3 +-
+ arch/arm64/kvm/hyp/nvhe/its_emulate.c | 37 +++++++++++++++++++
+ arch/arm64/kvm/pkvm.c                 | 52 +++++++++++++++++++++++++++
+ 4 files changed, 93 insertions(+), 1 deletion(-)
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/its_emulate.c
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_=
-arm.h
-index 3f9233b5a130..6360c90f9855 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -304,6 +304,8 @@
-=20
- /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
- #define HPFAR_MASK	(~UL(0xf))
-+#define FAR_MASK	GENMASK_ULL(11, 0)
-+
- /*
-  * We have
-  *	PAR	[PA_Shift - 1	: 12] =3D PA	[PA_Shift - 1 : 12]
-diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm=
-_pkvm.h
-index ab26bec079d6..0a471564be00 100644
+diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
+index 0a471564be00..370225f0e72c 100644
 --- a/arch/arm64/include/asm/kvm_pkvm.h
 +++ b/arch/arm64/include/asm/kvm_pkvm.h
-@@ -20,9 +20,13 @@
- /* The maximum number of hypervisor protected regions from the host */
- #define PKVM_PROTECTED_REGS_NUM	8
-=20
-+struct pkvm_protected_reg;
-+typedef void(pkvm_emulate_handler)(struct pkvm_protected_reg *region, u64 =
-offset,
-+				   bool write, u64 *reg, u8 reg_size);
- struct pkvm_protected_reg {
- 	u64 pfn;
- 	u64 nr_pages;
-+	pkvm_emulate_handler *cb;
- };
-=20
+@@ -31,6 +31,8 @@ struct pkvm_protected_reg {
+ 
  extern struct pkvm_protected_reg kvm_nvhe_sym(pkvm_protected_regs)[];
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvh=
-e/mem_protect.c
-index 500c18c2fd48..7e978e0c44b9 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -14,6 +14,7 @@
- #include <asm/stage2_pgtable.h>
-=20
- #include <hyp/fault.h>
-+#include <hyp/adjust_pc.h>
-=20
- #include <nvhe/arm-smccc.h>
- #include <nvhe/gfp.h>
-@@ -752,6 +753,50 @@ static void host_inject_mem_abort(struct kvm_cpu_conte=
-xt *host_ctxt)
- 	inject_host_exception(esr);
- }
-=20
-+static bool handle_host_mmio_trap(struct kvm_cpu_context *host_ctxt, u64 e=
-sr, u64 addr)
+ extern unsigned int kvm_nvhe_sym(num_protected_reg);
++extern void kvm_nvhe_sym(its_emulate_forward_req)(struct pkvm_protected_reg *region, u64 offset,
++						  bool write, u64 *reg, u8 reg_size);
+ 
+ int pkvm_init_host_vm(struct kvm *kvm, unsigned long type);
+ int pkvm_create_hyp_vm(struct kvm *kvm);
+diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
+index f57450ebcb49..70fbca325852 100644
+--- a/arch/arm64/kvm/hyp/nvhe/Makefile
++++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+@@ -24,7 +24,8 @@ CFLAGS_switch.nvhe.o += -Wno-override-init
+ 
+ hyp-obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o \
+ 	 hyp-main.o hyp-smp.o psci-relay.o early_alloc.o page_alloc.o \
+-	 cache.o setup.o mm.o mem_protect.o sys_regs.o pkvm.o stacktrace.o ffa.o
++	 cache.o setup.o mm.o mem_protect.o sys_regs.o pkvm.o stacktrace.o ffa.o \
++	 its_emulate.o
+ hyp-obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
+ 	 ../hyp-entry.o ../exception.o ../pgtable.o ../vgic-v5-sr.o
+ hyp-obj-y += ../../../kernel/smccc-call.o
+diff --git a/arch/arm64/kvm/hyp/nvhe/its_emulate.c b/arch/arm64/kvm/hyp/nvhe/its_emulate.c
+new file mode 100644
+index 000000000000..63a42f520ed2
+--- /dev/null
++++ b/arch/arm64/kvm/hyp/nvhe/its_emulate.c
+@@ -0,0 +1,37 @@
++// SPDX-License-Identifier: GPL-2.0-only
++
++#include <asm/kvm_pkvm.h>
++#include <nvhe/mem_protect.h>
++
++void its_emulate_forward_req(struct pkvm_protected_reg *region, u64 offset, bool write, u64 *reg,
++			     u8 reg_size)
 +{
-+	u64 offset, reg_value =3D 0, start, end;
-+	u8 reg_size, reg_index;
-+	bool write;
-+	int i;
++	void __iomem *addr = __hyp_va(PFN_PHYS(region->pfn) + offset);
 +
-+	for (i =3D 0; i < num_protected_reg; i++) {
-+		if (!pkvm_protected_regs[i].pfn || !pkvm_protected_regs[i].nr_pages ||
-+		    !pkvm_protected_regs[i].cb)
-+			continue;
++	switch (reg_size) {
++	case 1:
++		if (!write)
++			*reg = readb_relaxed(addr);
++		else
++			writeb_relaxed(*reg, addr);
++		break;
++	case 2:
++		if (!write)
++			*reg = readw_relaxed(addr);
++		else
++			writew_relaxed(*reg, addr);
++		break;
++	case 4:
++		if (!write)
++			*reg = readl_relaxed(addr);
++		else
++			writel_relaxed(*reg, addr);
++		break;
++	case 8:
++		if (!write)
++			*reg = readq_relaxed(addr);
++		else
++			writeq_relaxed(*reg, addr);
++		break;
++	}
++}
+diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+index 428723b1b0f5..4bfffbedac4c 100644
+--- a/arch/arm64/kvm/pkvm.c
++++ b/arch/arm64/kvm/pkvm.c
+@@ -9,8 +9,13 @@
+ #include <linux/kmemleak.h>
+ #include <linux/kvm_host.h>
+ #include <asm/kvm_mmu.h>
++#include <asm/kvm_pkvm.h>
+ #include <linux/memblock.h>
+ #include <linux/mutex.h>
++#include <linux/of_address.h>
++#include <linux/of_reserved_mem.h>
++#include <linux/platform_device.h>
++#include <linux/irqchip/arm-gic-v3.h>
+ 
+ #include <asm/kvm_pkvm.h>
+ 
+@@ -39,6 +44,47 @@ static int __init register_memblock_regions(void)
+ 	return 0;
+ }
+ 
++static int __init register_its_emulated_region(void)
++{
++	struct device_node *np;
++	struct resource res;
++	int i = 0;
++	int ret;
 +
-+		start =3D PFN_PHYS(pkvm_protected_regs[i].pfn);
-+		end =3D start + PFN_PHYS(pkvm_protected_regs[i].nr_pages);
-+		reg_size =3D BIT((esr & ESR_ELx_SAS) >> ESR_ELx_SAS_SHIFT);
++	for_each_compatible_node(np, NULL, "arm,gic-v3-its") {
++		ret = of_address_to_resource(np, 0, &res);
++		if (ret)
++			goto out_fail;
 +
-+		if (start > addr || addr + reg_size > end)
-+			continue;
++		if (i >= PKVM_PROTECTED_REGS_NUM) {
++			kvm_err("Out of protected region slots\n");
++			ret = -ENOSPC;
++			goto out_fail;
++		}
 +
-+		reg_index =3D (esr & ESR_ELx_SRT_MASK) >> ESR_ELx_SRT_SHIFT;
-+		write =3D (esr & ESR_ELx_WNR) =3D=3D ESR_ELx_WNR;
-+		offset =3D addr - start;
++		/*
++		 * Note: don't unmap the entire animal from the host because devices need
++		 * to be able to access GITS_TRANSLATER to raise MSIs. If the
++		 * page where GITS_TRANSLATER is given to HYP, devices won't be
++		 * able to map it in their IOMMU when the IOMMU is managed by
++		 * pKVM.
++		 */
++		kvm_nvhe_sym(pkvm_protected_regs)[i].pfn = PHYS_PFN(res.start);
++		kvm_nvhe_sym(pkvm_protected_regs)[i].cb =
++			lm_alias(&kvm_nvhe_sym(its_emulate_forward_req));
++		kvm_nvhe_sym(pkvm_protected_regs)[i].nr_pages =
++			PFN_DOWN(min_t(u64, resource_size(&res), PAGE_ALIGN_DOWN(GITS_TRANSLATER)));
 +
-+		if (write && reg_index !=3D 31)
-+			reg_value =3D host_ctxt->regs.regs[reg_index];
-+
-+		pkvm_protected_regs[i].cb(&pkvm_protected_regs[i], offset, write,
-+					  &reg_value, reg_size);
-+
-+		if (!write && reg_index !=3D 31)
-+			host_ctxt->regs.regs[reg_index] =3D reg_value;
-+
-+		kvm_skip_host_instr();
-+		return true;
++		i++;
 +	}
 +
-+	return false;
++	kvm_nvhe_sym(num_protected_reg) = i;
++	return 0;
++out_fail:
++	of_node_put(np);
++	return ret;
 +}
 +
-+static bool is_dabt(u64 esr)
-+{
-+	return (ESR_ELx_EC(esr) =3D=3D ESR_ELx_EC_DABT_LOW) && (esr & ESR_ELx_ISV=
-);
-+}
-+
- void handle_host_mem_abort(struct kvm_cpu_context *host_ctxt)
+ void __init kvm_hyp_reserve(void)
  {
- 	struct kvm_vcpu_fault_info fault;
-@@ -774,6 +819,10 @@ void handle_host_mem_abort(struct kvm_cpu_context *hos=
-t_ctxt)
- 	BUG_ON(!(fault.hpfar_el2 & HPFAR_EL2_NS));
- 	addr =3D FIELD_GET(HPFAR_EL2_FIPA, fault.hpfar_el2) << 12;
-=20
-+	if (is_dabt(esr) && !addr_is_memory(addr) &&
-+	    handle_host_mmio_trap(host_ctxt, esr, addr | (fault.far_el2 & FAR_MAS=
-K)))
-+		return;
-+
- 	switch (host_stage2_idmap(addr)) {
- 	case -EPERM:
- 		host_inject_mem_abort(host_ctxt);
-diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setu=
-p.c
-index 64c0290da888..4395595b7f7e 100644
---- a/arch/arm64/kvm/hyp/nvhe/setup.c
-+++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-@@ -294,6 +294,9 @@ static int donate_protected_mmio_regions(void)
- 						  pkvm_protected_regs[i].nr_pages << PAGE_SHIFT);
- 		if (ret)
- 			goto err_setup;
-+
-+		if (pkvm_protected_regs[i].cb)
-+			pkvm_protected_regs[i].cb =3D kern_hyp_va(pkvm_protected_regs[i].cb);
+ 	u64 hyp_mem_pages = 0;
+@@ -57,6 +103,12 @@ void __init kvm_hyp_reserve(void)
+ 		return;
  	}
-=20
- 	return 0;
---=20
+ 
++	ret = register_its_emulated_region();
++	if (ret) {
++		kvm_err("Failed to register ITS region %d\n", ret);
++		return;
++	}
++
+ 	hyp_mem_pages += hyp_s1_pgtable_pages();
+ 	hyp_mem_pages += host_s2_pgtable_pages();
+ 	hyp_mem_pages += hyp_vm_table_pages();
+-- 
 2.55.0.654.g21b8a5bc05-goog
 
