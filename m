@@ -1,108 +1,135 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 723A0318ECD;
-	Fri,  7 Aug 2026 15:58:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09CE4280331;
+	Fri,  7 Aug 2026 16:20:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786118282; cv=none; b=ZdISF+31NgVesm98zk6hOOlJcuzu0CTzDbxmNp6VPllA8hbkl3WhzG3VriHAnPVTcR7rXvnXDeW/zxuMn+mWZMQCRcLHIqy6Hbcz9HfOpjTvQWqoU20n20FtXZC4TRqw83MmGZOVKhLT7xmdYaR/rkElMZeJPybrxXonCsAwvME=
+	t=1786119655; cv=none; b=C7OY9NLH4uAJz/1CUlD8iWVztH8W4oGKue7BD2BW9F8dd4/ygN41o26PSUuyvty0OITUHjaRjNHYwj7onxJ/VIt6yP0iAcKbH6d08zeo0OdZV4LoMm2icc3z1oPekPlxYnWE6paKkqG5vQRH56dCPfWZJMbeDRReB0joeZ5mo4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786118282; c=relaxed/simple;
-	bh=yOdMXiznmWMdNlH7BcMN3yp+3ovM4HFNUQAl72cgHW0=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=p0J21wVAlHkMCENqwEMpMbIAg3VpWlLX7t+b2DNc7aGlW0V8OqRDYbuv3bzr57htANdiqXuOmDNEoGvFZQ0vp2+Fh2bJQCC6nEKpQrTSLUjRS3r2gYaTEXN9EqFi7Q+ySd3gwU4WwSZgpd2pPcMjwVL37QD/6/Pmuzf4Z29up74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J6UKsoGK; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786119655; c=relaxed/simple;
+	bh=5Kq0D1VDgc/aeeEYkKiaKCkpRQ5bwuPl5hs+zY6tL/Q=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=seSxNVYWCbhmuQ/IyNqYEcd3bUxbcDv06kJdjDu4DVSwI12egPv2p8N13vIFRZhg1/LzT9HeVXkirDin5obZae6Mo6nMjsU9iGBwMabqGOJnDKONlJSbArNgj13ZxFrpcAbC7HVUXQu9bFwC8U+GsDNhjwQetmMv5oeBSxrhO6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mtvC5wQZ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J6UKsoGK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5825A1F000E9;
-	Fri,  7 Aug 2026 15:58:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mtvC5wQZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3AEC71F000E9;
+	Fri,  7 Aug 2026 16:20:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786118281;
-	bh=H9yHLZZwqi/1FJ13kcoLlPaPvDMFshF3bFHXxJWeoYM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=J6UKsoGKstA84e+c0qs2R8K8N6MYLVo/ma7x4zN2iCPT0xIVTkXTn7d5DDlEqKSqL
-	 898E/l+cR+vrnVfMVH6cWzxqBfoqmI2qiit3MJsn7v25MZinPp7rviMjOAMlii78RB
-	 p2ktstzxZtkQ6JDgrPIIiX73CF7hKSrDP30EDaP+emO0xAFn4E/D1Sk0r60jFso426
-	 80W6Q5yv5+tZy3A8bdrEgiCQzS1ImfhMHLXRilO95VuOhsV8HezLgMDMdNK/ccOkeZ
-	 1VOuMbcEAUtYgA7Sy9eaL/XRIvHROaOSgqvopvTOH8nPEfNRYhXe5UXgAuW44GB+6d
-	 3VCpsJf6feIig==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wsMxL-0000000DRIq-153k;
-	Fri, 07 Aug 2026 15:57:59 +0000
-Date: Fri, 07 Aug 2026 16:59:21 +0100
-Message-ID: <87fr0pq5uu.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: sashiko-reviews@lists.linux.dev,
-	kvmarm@lists.linux.dev,
-	Oliver Upton <oupton@kernel.org>
-Subject: Re: [PATCH v2 2/4] KVM: arm64: vgic: Don't leak the SPI array when init is retried
-In-Reply-To: <CA+EHjTwVKkAwWUeMrF_m2-35kyhESqAezOKJy-Pj=vA3qE5Bjw@mail.gmail.com>
-References: <20260807104102.2410744-1-fuad.tabba@linux.dev>
-	<20260807104102.2410744-3-fuad.tabba@linux.dev>
-	<20260807105558.73D701F000E9@smtp.kernel.org>
-	<CA+EHjTwVKkAwWUeMrF_m2-35kyhESqAezOKJy-Pj=vA3qE5Bjw@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20260515; t=1786119653;
+	bh=5pMFsqQTHcQ+Rn9idFvDXGrE+yz2Oj3OwvnHW54vSWY=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=mtvC5wQZNmYssl/an8V+StmM3QW+waxkxShkolOw+JL2wRTArb96FxvIMq9Mp52zq
+	 HCIkBTZUtLf/YTdHGl01a4mgUu/XSOx3PTl2Xm0BPygPLM7lkfLbOgeiECbEWp8xcs
+	 KVLsUSCw3JrUDhm/N8EXxda0d/Uuilm4k4s+VxbSGtHEI7NsOJcBDovgLR/YSrXscU
+	 24rGES7Gocr3s8caTRP0OeYhTbiRFEputonf8UQAxQ8vcJ5LFRHQKsXIdurixA42Qh
+	 eUpq/M+unGrppO8lptPCUL9sW2OZVyWP0vbnXG8WAIYPesvaHXAHzjHIbix9usZtaJ
+	 Um/F3IbnoVJLw==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v5 32/49] KVM: arm64: gic-v5: Handle userspace accesses
+ to IRS MMIO region
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Sascha Bischoff" <Sascha.Bischoff@arm.com>
+Cc: kvm@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev
+In-Reply-To: <20260807111159.429128-33-sascha.bischoff@arm.com>
+References: <20260807111159.429128-1-sascha.bischoff@arm.com>
+ <20260807111159.429128-33-sascha.bischoff@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 07 Aug 2026 16:20:52 +0000
+Message-Id: <20260807162053.3AEC71F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev, oupton@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 07 Aug 2026 13:15:52 +0100,
-Fuad Tabba <fuad.tabba@linux.dev> wrote:
-> 
-> On Fri, 7 Aug 2026 at 11:56, <sashiko-bot@kernel.org> wrote:
-> >
-> > Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> 
-> No, thank _you_ Sashiko!
-> 
-> >
-> > Pre-existing issues:
-> > - [High] If `vgic_init()` fails after `vgic_v4_init()` succeeds, the VPE array is left allocated but `vgic_initialized` remains false. Userspace can then create additional VCPUs and retry `vgic_init()`. The second `vgic_v4_init()` returns early because the VPE array is already allocated, leaving the new VCPUs without initialized VPE IRQs.
-> ...
-> > When a new VCPU runs, `vgic_v4_load()` calls `irq_set_affinity()` with an uninitialized IRQ (0), which fails and triggers a host `WARN_ON`, causing a host-side denial of service.
-> 
-> This is a separate fix. But you're right about the state.
-> kvm_arch_vcpu_precreate() only refuses vCPUs once vgic_initialized()
-> is true, so the retry admits one the VPE array does not cover.
-> 
-> I don't think a VMM can drive it. kvm_vgic_setup_default_irq_routing()
-> is the only failure after vgic_v4_init(), and it builds its own
-> routing entries, so nothing short of a real -ENOMEM fails it.
-> 
-> The fix I have in mind keeps vgic_v4_init() idempotent, as this patch
-> is: return early only while the vCPU count is unchanged, rebuild when
-> it grew. That needs its_free_vcpu_irqs() to clear vm->domain and
-> vm->fwnode first, which it does not today, so its_alloc_vcpu_irqs()
-> can reach its error path with a domain it has already removed.
-> 
-> Let me think about it some more and I'll send something once others
-> have had a chance to digest this as well.
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [High] Userspace can inject an inconsistent state by setting IRS_IST_BASE=
+R.valid=3D1 without allocating a host IST, leading to a CONSTRAINED UNPREDI=
+CTABLE hardware state if the guest subsequently clears the valid bit.
+--
 
-I don't think we should grow anything opportunistically.
+--- Patch [32]: [PATCH v5 32/49] KVM: arm64: gic-v5: Handle userspace acces=
+ses to IRS MMIO region ---
+commit 24ee880222eb3e4ff06c9b27b1d655da134efd7a
+Author: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Date:   Fri Aug 7 11:28:54 2026 +0000
 
-The GICv4 code expects the number of vcpus to be fixed when first
-initialised, and if we must fail it one way or another, then
-everything should be torn down and reinitialised from scratch.
+KVM: arm64: gic-v5: Handle userspace accesses to IRS MMIO region
+   =20
+As part of saving and restoring the state of a GICv5-based system,
+userspace must save and restore the IRS MMIO registers. These include
+important information such as the guest IST configuration, and KVM
+must present consistent state to the guest after migration.
 
-I really don't want to have to think about the intermediate state.
+> diff --git a/arch/arm64/kvm/vgic/vgic-irs-v5.c b/arch/arm64/kvm/vgic/vgic=
+-irs-v5.c
+> index 095046c7959fa..212066b8d7ed5 100644
+> --- a/arch/arm64/kvm/vgic/vgic-irs-v5.c
+> +++ b/arch/arm64/kvm/vgic/vgic-irs-v5.c
+[ ... ]
+> +static int vgic_v5_mmio_uaccess_write_irs(struct kvm_vcpu *vcpu, gpa_t a=
+ddr,
+> +					  unsigned int len, unsigned long val)
+> +{
+> +	struct vgic_dist *vgic =3D &vcpu->kvm->arch.vgic;
+> +	struct vgic_v5_irs *irs_data =3D vgic->vgic_v5_irs_data;
+> +	size_t offset =3D addr & (SZ_64K - 1);
+> =20
+> -		/* The address cannot be changed while the IST is valid. */
+> -		if (irs->ist_baser.valid && valid)
+> -			return;
+> +	/*
+> +	 * The following registers are ONLY settable via uaccesses. The guest
+> +	 * cannot write them!
+> +	 */
+> =20
+> -		/* Valid -> Invalid */
+> -		if (irs->ist_baser.valid && !valid) {
+> -			/* Make the LPI IST invalid and then ... */
+> -			if (irq_set_vcpu_affinity(vgic_v5_vpe_db(vcpu), &cmd))
+> -				break;
+> +	switch (offset) {
+[ ... ]
+> +	case GICV5_IRS_IST_BASER:
+> +		if (irs_data->ist_baser.valid &&
+> +		    !vgic_v5_ist_baser_matches(irs_data, val))
+> +			return -EINVAL;
+> +
+> +		vgic_v5_update_irs_ist_baser(irs_data, val);
+> +		break;
 
-Thanks,
+[Severity: High]
+Does this allow userspace to inject an inconsistent state?
 
-	M.
+If userspace sets the valid bit of GICV5_IRS_IST_BASER to 1 via
+vgic_v5_mmio_uaccess_write_irs() but does not actually allocate a host LPI =
+IST
+(by omitting the KVM_DEV_ARM_VGIC_GRP_IST ioctl), the VM can still be start=
+ed.
 
--- 
-Jazz isn't dead. It just smells funny.
+When the guest subsequently clears the valid bit, KVM's MMIO handler:
+
+vgic_v5_write_irs_ist_baser() {
+    ...
+    if (irs->ist_baser.valid && !valid) {
+        /* Make the LPI IST invalid and then ... */
+        rc =3D irq_set_vcpu_affinity(vgic_v5_vpe_db(vcpu), &cmd);
+
+detects a Valid -> Invalid transition and issues the LPI_VIST_MAKE_INVALID
+command. This sends an unmap command to the hardware for a VIST that was ne=
+ver
+mapped.
+
+Since this results in CONSTRAINED UNPREDICTABLE hardware behavior, should K=
+VM
+reject uaccess writes that set the valid bit without a backing IST, or perh=
+aps
+verify IST presence before issuing the unmap command?
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260807111159.4291=
+28-1-sascha.bischoff@arm.com?part=3D32
