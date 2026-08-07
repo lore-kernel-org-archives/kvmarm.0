@@ -1,105 +1,119 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 444DB44238F;
-	Fri,  7 Aug 2026 15:40:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE2CE3F4125;
+	Fri,  7 Aug 2026 15:42:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786117253; cv=none; b=IaynoqQUP1/2eHA8xpBrgTc+3yZRh0wLn9kmjO5bwtAbm6RiybxT+1zQJfPU/yhwoxUsFFUUS06dWpgw6rP5L13zO7gVs24Gp1V7RRwtg63oD1au6U0B1wKAefy/0rdpyed2y40jOKgpvv6zZpvtH1egbMNfV7zJfQSaJ/jDjz8=
+	t=1786117349; cv=none; b=nfLgUS/h11D50nodAhpyrccIdF+g7atx9g7RDjKPdqAiwUZVerDMZEKPcKARZD8CRuMcNKeCIWNIgbRRDM/dss9o1rnozDI1Squ+pbFxjcoKDS/yBqIT3TetiQS61dkS4jgVMf3tRKJ6VPSOgAIL2FPnEaacEiOQwnT0g+1HjFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786117253; c=relaxed/simple;
-	bh=7AdcladOUuufGKAW0RBtCmWhmPfSY9HBg6pAPrEhpn0=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=TNSXjVi1818hHb95QmFA+cJrq/IPrRqYYWZvp2GG+W2rJqM9U4XddKlsftv5QW5RRRR2D6+lZLuAJXiC1v2i966NGi0FXfiqcxUQpwaI7mzsRH0DmXl2ooIAwoWwkyvqSwYYzBzjqtoIRR0gCMDLO5MtBaR1qZYIZHP1k+eTNoY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k+kuBTlv; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786117349; c=relaxed/simple;
+	bh=rCEqMV+uPIsth9n1E1JQC2j8NZuXu4XTM3VkXsyPAZI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TV0+dAl7+djp5Ttf85ZveIHUTmRD3etrdwuodnCUhfe0cigg9x8ent2xhg2/8BlptETz6DhcbRSGwiDm9rHunwrGNmN/Zyff23ASiXeXLa6ZvJfrEo4chm4yWp+LquUa7c5aQYFEfxgNw8bmIF8WAeBj8Cyv5aqZVF+5Kl/ki2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fbKUZSLA; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k+kuBTlv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77F6D1F00A3A;
-	Fri,  7 Aug 2026 15:40:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fbKUZSLA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B2781F00A3A;
+	Fri,  7 Aug 2026 15:42:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786117252;
-	bh=pRmuZQ9zsRRoghB/wUrhs6870q+CDFz6segbG/VwhwA=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=k+kuBTlvgAGJ6vkXbEHH3WHdauZOoTyrJBW3Ps93bmVgVY1OI91bBS3BRhvAIle9R
-	 bP2JyjGl2GKca6VEAbZYR6Gkm7jo0SVMyXmPKgzRynXaWIPPF2LPPtY/qJzPNdTwBO
-	 yqwXsDwebd7sc6h34R1y/pWnuMFliTlTofzwi+5CFzY88mpJrCSKgvl1erm8doZ0qW
-	 iBMKFgfJLTX98+dRhucO4zZDhV69KR/wjnP/Ku/HurJXT96q10+MkMI4nhuo0vucvN
-	 I1FP1vqzf43upVgrNLzdGsPZwOl50Z/MlMfbh06/D7hLwSOsJjaOL45UVcMBCEh8rV
-	 ZvdISNmlv3GQQ==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v5 29/49] KVM: arm64: gic-v5: Add GICv5 SPI injection to
- irqfd
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Sascha Bischoff" <Sascha.Bischoff@arm.com>
-Cc: kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, kvm@vger.kernel.org, "Oliver
- Upton" <oupton@kernel.org>
-In-Reply-To: <20260807111159.429128-30-sascha.bischoff@arm.com>
-References: <20260807111159.429128-1-sascha.bischoff@arm.com>
- <20260807111159.429128-30-sascha.bischoff@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Aug 2026 15:40:50 +0000
-Message-Id: <20260807154051.77F6D1F00A3A@smtp.kernel.org>
+	s=k20260515; t=1786117348;
+	bh=E582xZDvt+4gsNcuth6hcv6sLRoTSurZWsRQ5mdDTfE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=fbKUZSLAEE+K/4fea2CIPBaXkUycKN/2PNjz2wULzKmBffAptjyRqGSYjgA/88OQe
+	 jpMHpaoffMQKgdFT21SSYdbKvrtRUZ2fnyAjlBEWkPvvRb2cj22qlwvaFwCSv/Ljtk
+	 U2XiAytFEKYCBDzxmlOR0KoTjYBpRgOGAQcxP0k8EezCGms6eF1+eI3GfpCPcMRAnh
+	 iDDsZdP2WZu5T8CYTWYTTtLoiYt6eq2x3BP5VU07vwDNiFpxHGQ9KMbbMbGWnnJrq2
+	 nQELkZ+bkhoV1Or0mQDWSTgTipkgII/CVNIDPuMbAVVn3DgPqMKuxuFpQybw1kBOdx
+	 Fc+B6mMV9gsRA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wsMiI-0000000DR3X-18fk;
+	Fri, 07 Aug 2026 15:42:26 +0000
+Date: Fri, 07 Aug 2026 16:43:47 +0100
+Message-ID: <87h5l6os0c.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Karl Mehltretter <kmehltretter@gmail.com>
+Cc: Wei-Lin Chang <weilin.chang@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	grayhat@foxmail.com
+Subject: Re: [PATCH v3] KVM: arm64: nv: Keep the shadow S2 MMUs at fixed addresses
+In-Reply-To: <anUt9gd8HIwaj9jf@gmail.com>
+References: <20260806192451.10169-1-kmehltretter@gmail.com>
+	<d5svhw3jkjnkucohx2ntwhphemgbtfcmjt2zoyyw6svz56zfrh@z2ziydov5ras>
+	<anUt9gd8HIwaj9jf@gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kmehltretter@gmail.com, weilin.chang@arm.com, oupton@kernel.org, tabba@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, stable@vger.kernel.org, grayhat@foxmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [High] GICv5 SPI injection via irqfd breaks KVM_IRQFD_FLAG_RESAMPLE becau=
-se KVM never observes the guest's EOI.
---
+On Fri, 07 Aug 2026 02:13:17 +0100,
+Karl Mehltretter <kmehltretter@gmail.com> wrote:
+> 
+> On Thu, Aug 06, 2026 at 10:54:03PM +0100, Wei-Lin Chang wrote:
+> > 
+> > Hey sorry for nitpicking once more, I actually like v2 more, as this
+> > version splits the error handling to two places. Marc's implementation
+> > [1] is also good, but that requires a twist in kvm_arch_flush_shadow_all().
+> > So I'd personally go with v2 (+my suggestions for it :)), but also fine if
+> > others have other opinions.
+> > 
+> > I also think the comment in kvm_vcpu_init_nested() is worth adjusting
+> > slightly, too.
+> > 
+> 
+> No worries, thanks for taking another look.
+> 
+> I was following the guidance in include/linux/cleanup.h:
+> 
+>   the expectation is that usage of "goto" and cleanup helpers is never
+>   mixed in the same function.
+> 
+> But maybe keeping goto is better. I'll wait a bit for others
+> to comment.
 
---- Patch [29]: [PATCH v5 29/49] KVM: arm64: gic-v5: Add GICv5 SPI injectio=
-n to irqfd ---
-commit a0b6c4d036693f8696b21a848670f40de7bc34b7
-Author: Sascha Bischoff <Sascha.Bischoff@arm.com>
+The version I proposed in response to your first version had no goto,
+and trivial error handling. Can we *please* stop the bike shedding and
+settle on the simplest possible fix? Or *any* fix at all?
 
-KVM: arm64: gic-v5: Add GICv5 SPI injection to irqfd
+> 
+> For the comment, I propose replacing the current text with:
+> 
+> 	/*
+> 	 * If allocating an MMU object fails, keep the VNCR page alive so
+> 	 * that userspace can retry vCPU initialisation without affecting
+> 	 * the VM.
+> 	 */
+> 
+> Is that the adjustment you had in mind?
 
-This commit updates vgic_irqfd_set_irq() to translate irqchip pins into
-GICv5 SPI IntIDs before injection. It also validates the IRQCHIP route pins
-against the GIC model, supporting up to 1024 SPI pins when using GICv5.
+I don't think we need to change any comment. If anything, it should be
+deleted altogether. This is a security fix, not a literary exercise.
 
-> diff --git a/arch/arm64/kvm/vgic/vgic-irqfd.c b/arch/arm64/kvm/vgic/vgic-=
-irqfd.c
-> index 19a1094536e6a..ee1a1b214f03c 100644
-> --- a/arch/arm64/kvm/vgic/vgic-irqfd.c
-> +++ b/arch/arm64/kvm/vgic/vgic-irqfd.c
-> @@ -19,9 +19,14 @@ static int vgic_irqfd_set_irq(struct kvm_kernel_irq_ro=
-uting_entry *e,
->  			struct kvm *kvm, int irq_source_id,
->  			int level, bool line_status)
->  {
-> -	unsigned int spi_id =3D e->irqchip.pin + VGIC_NR_PRIVATE_IRQS;
-> +	unsigned int spi_id;
->  	int ret;
-> =20
-> +	if (kvm->arch.vgic.vgic_model =3D=3D KVM_DEV_TYPE_ARM_VGIC_V5)
-> +		spi_id =3D vgic_v5_make_spi(e->irqchip.pin);
+	M.
 
-[Severity: High]
-Does enabling irqfd injection for GICv5 SPIs here break the
-KVM_IRQFD_FLAG_RESAMPLE contract?
-
-If userspace configures an irqfd with KVM_IRQFD_FLAG_RESAMPLE for a
-GICv5 SPI, KVM injects the interrupt into the hardware Virtual Domain,
-and the guest's EOI is handled directly by the GICv5 hardware.
-
-Since KVM does not track the in-flight state of GICv5 SPIs via List
-Registers, does the EOI fail to trap to the hypervisor?
-
-Without KVM observing the guest's EOI, it seems KVM will never call
-kvm_notify_acked_irq() and the resampler eventfd will never be signaled.
-
-Could this cause passthrough devices using level-triggered interrupts mapped
-to GICv5 SPIs to silently hang after the first interrupt because the
-physical interrupt is never unmasked?
-
-[ ... ]
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260807111159.4291=
-28-1-sascha.bischoff@arm.com?part=3D29
+-- 
+Jazz isn't dead. It just smells funny.
