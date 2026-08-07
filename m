@@ -1,229 +1,150 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC6EC4734C5;
-	Fri,  7 Aug 2026 13:13:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15D4E34E766;
+	Fri,  7 Aug 2026 13:30:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786108410; cv=none; b=kzeYPnWT92ii92vwsWhGOH79LHFJAnhpefrDsP39AFhKK94kTcrahiWO+l4AUBL0UkSPol+5C6fKxQgTh2ZimWRHMDCoy6ym0XXRckZIaF2TLlRmOybpukyE1j9JfERCGkOSQsDEgz1t5RAfsO3SsHq9UaBUZ29T9L34ECFLUMg=
+	t=1786109458; cv=none; b=TzcmnKnnka+ruHTL23l98vJjCY+HdaZRcRNj+GjGxocWliTSYLW2gY0r3U+/xU2+lDp+IUU1B638XH2B4COYKGTqJRDWntrolZBR9dH25f38JigIpsatPCQXdThqQSMa3+5GMz00jpRO1a0pByiJeNN59eER7Q6xl5RvDqX2qL8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786108410; c=relaxed/simple;
-	bh=ABKfoMGHYY2A3zwIioqvBrECwauWhaNUA24Fw74y5qk=;
+	s=arc-20240116; t=1786109458; c=relaxed/simple;
+	bh=TXyta2+4BaAyfM8RWGg3omSc2y8TLfbvfye/HSEKj1k=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=f3LM57c6cYwaVeKkZvJb8OAudTF9Y2A2SV6gXEv6p3Tn3A6i1SUrJVW2sm2pZG72Xd3tQM0Gd8LzKpST5r2ayjUY69hF1oWHPq8p4N0HcyMoxtOEcN/fpGB15SNYrNTiXlw+/Fk4trW2RGLTbRXs26VN3CMh4EQk6zZBMaUGIk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bLZ7blmQ; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=JBVh1nN0mI4yAJyAvPIEXdMzXsS51nAYSAOatGox83+nDo1R+VI7emPRGCfpkx7AiZhd95UtQmTEUGnihgDUtJ0ZBBX/DT66ipW28nRw1z0KWdIT2Ri21No1rJOrrAArxhLpWdFY+dDU0RRU6P9BWOd9KTo4qDo0RxywrZsQJN4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nNjUWx6b; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bLZ7blmQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B7401F01559;
-	Fri,  7 Aug 2026 13:13:20 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nNjUWx6b"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15D381F000E9;
+	Fri,  7 Aug 2026 13:30:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786108400;
-	bh=RW7CrKTWFtA3nwTA78/d7gEtgW+9ytCXxzOkrIZTYIU=;
+	s=k20260515; t=1786109451;
+	bh=sAEBCx1gkKh+x5pzSOLdbjMt5YDw2Mdgaus8pqrXb7Q=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=bLZ7blmQ//JDSVFwXnJoiSZ5rlC0JO4lhsIzn7IkQhD9C/3nHHECPC8AhYpMJekcc
-	 cNl4vZQpWvtWl1bV6roazw7NOrlfet90R82qJkJQ+YfHBB3rb3V7/+95UJL2Pk6gkF
-	 XAl39w59JBXKQBYmK4aBEoaQfhF47f6ZlwZ0u+7ZDPfJpmL2kjE5RKNMdDFVTPUGan
-	 F2Wvh9/6/E7NS8u0Hp20rrDdlMLyy69exs8kkE/zhRzTJkYyY1e2nGgB41J7Nr1Jbp
-	 BtVcr6XUA8w74Z0khmMSMS3JWB/tesgoj+qofpC3b8YScVPv+vylP/Is8UC2u8m5cN
-	 q4pOc9gznGKbA==
+	b=nNjUWx6b/MlnHb2khGc1bbw49Ck8q9DcKznSAEX+McA5UuwjtkC+woMKfIJF3bljl
+	 5Rb7A+oaGd28cUf05HWwd7k/49Hrh30ytuDD56gzrCrkEfv+lgHSbLn0Q7BeV2AFNp
+	 fvvYWZzzxnwBrNoI9sqsPAZOn+HEue40Yf+8Fn1UIVl3DKIGuAV4ZMK241igMhFJp7
+	 r/AqakK2+Wh5U6ylWSaS7WxvDZG/Fa10+QDhy2L0/ZF5JQVYNVA443IWujx/U7UwoK
+	 YYw0fhrI7bMBXCQxYUW91qwBoONHKIG8uVUTwz/tc6kcezAsbdElsM0dVs2Xv9kd0t
+	 hFWU09NCpkT5A==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v5 11/49] KVM: arm64: gic-v5: Implement VMT/vIST IRS
- MMIO Ops
+Subject: Re: [PATCH v5 12/49] KVM: arm64: gic-v5: Keep GICv5 vCPU limit
+ model-specific
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Sascha Bischoff" <Sascha.Bischoff@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, "Oliver
- Upton" <oupton@kernel.org>
-In-Reply-To: <20260807111159.429128-12-sascha.bischoff@arm.com>
+Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+In-Reply-To: <20260807111159.429128-13-sascha.bischoff@arm.com>
 References: <20260807111159.429128-1-sascha.bischoff@arm.com>
- <20260807111159.429128-12-sascha.bischoff@arm.com>
+ <20260807111159.429128-13-sascha.bischoff@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Aug 2026 13:13:19 +0000
-Message-Id: <20260807131320.7B7401F01559@smtp.kernel.org>
+Date: Fri, 07 Aug 2026 13:30:49 +0000
+Message-Id: <20260807133051.15D381F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 5 potential issue(=
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [High] Unconditional NULL pointer dereference in `vgic_v5_alloc_l2_vmt` w=
-hen the VM has zero vCPUs.
-- [High] Hardware Use-After-Free (UAF) when IST validation times out.
-- [High] GICv5 probe permanently aborts on kexec if the previous kernel lef=
-t the VMT_BASER register valid.
-- [High] Missing bounds check on `max_vpe_id` allows userspace to program o=
-ut-of-bounds `vpe_id_bits` into hardware.
-- [Low] Mixing goto-based error handling with scoped_guard() violates the c=
-leanup subsystem guidelines.
+
+Pre-existing issues:
+- [High] kvm_vgic_create() fails to validate that previously created VCPUs =
+have IDs within the newly selected VGIC model's limits (for GICv2 and GICv3=
+), leading to undefined behavior in GICv2 SGI routing.
 --
 
---- Patch [11]: [PATCH v5 11/49] KVM: arm64: gic-v5: Implement VMT/vIST IRS=
- MMIO Ops ---
-commit 47ef012a3a648a37c053cce44ccc9973a562fddf
+--- Patch [12]: [PATCH v5 12/49] KVM: arm64: gic-v5: Keep GICv5 vCPU limit =
+model-specific ---
+commit 42bacf6540695fc12a35eee006d5382303176971
 Author: Sascha Bischoff <Sascha.Bischoff@arm.com>
 
-KVM: arm64: gic-v5: Implement VMT/vIST IRS MMIO Ops
-   =20
-This commit adds support for making GICv5 VM and IST tables valid via
-the IRS MMIO interface. It introduces functions to interact with IRS
-hardware and manage VM/IST validity.
+KVM: arm64: gic-v5: Keep GICv5 vCPU limit model-specific
 
-> diff --git a/arch/arm64/kvm/vgic/vgic-v5-tables.c b/arch/arm64/kvm/vgic/v=
-gic-v5-tables.c
-> --- a/arch/arm64/kvm/vgic/vgic-v5-tables.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v5-tables.c
+This patch separates the IRS-derived vCPU limit for GICv5 from the generic
+KVM maximum limit. It adds validation to reject GICv5 device creation if
+existing VCPU IDs exceed the GICv5 model-specific limit.
+
+> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-i=
+nit.c
+> index 079a57c2b18f6..8e1e844ed6e93 100644
+> --- a/arch/arm64/kvm/vgic/vgic-init.c
+> +++ b/arch/arm64/kvm/vgic/vgic-init.c
+
 [ ... ]
-> @@ -785,8 +793,16 @@ static int vgic_v5_vmte_assign_ist(struct kvm *kvm, =
-phys_addr_t ist_base,
->  	/* Finally, mark the entry as valid */
->  	cmd =3D spi_ist ? SPI_VIST_MAKE_VALID : LPI_VIST_MAKE_VALID;
->  	ret =3D irq_set_vcpu_affinity(vgic_v5_vpe_db(vcpu0), &cmd);
 
-[Severity: High]
-Can this result in a null pointer dereference if the VM has zero vCPUs?
-
-The vcpu0 pointer is retrieved via kvm_get_vcpu(kvm, 0), which can return
-null if kvm->online_vcpus =3D=3D 0. Unconditionally passing vcpu0 to
-vgic_v5_vpe_db() here, and similarly in vgic_v5_alloc_l2_vmt(), seems like
-it could trigger a host crash if invoked by KVM initialization ioctls before
-any vCPUs are created.
-
-> +	if (ret) {
-> +		scoped_guard(raw_spinlock_irqsave, &vgic_v5_irs_lock) {
-> +			WRITE_ONCE(vmte->val[section], 0ULL);
-> +			vgic_v5_clean_inval(vmte, sizeof(*vmte));
-> +		}
+> @@ -129,13 +129,34 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
+>  	}
+>  	ret =3D 0;
 > =20
-> -	return ret;
-> +		return ret;
-
-[Severity: High]
-Could this lead to a hardware use-after-free if the validation command times
-out?
-   =20
-If the MMIO command sent in vgic_v5_vmte_assign_ist() times out, it returns
-an error here. Callers like vgic_v5_spi_ist_alloc() and
-vgic_v5_lpi_ist_alloc() will react by freeing the IST memory:
-
-arch/arm64/kvm/vgic/vgic-v5-tables.c:vgic_v5_spi_ist_alloc() {
-    ...
-    if (ret) {
-        vgic_v5_free_allocated_spi_ist(kvm);
-        return ret;
-    }
-    ...
-}
-   =20
-Since there is no SPI_VIST_MAKE_INVALID command, freeing this memory while
-the hardware is still processing the command (or caching the memory pointer)
-might corrupt host memory. Should KVM intentionally leak the memory on
-timeout instead?
-
-> +	}
+> -	if (type =3D=3D KVM_DEV_TYPE_ARM_VGIC_V2)
+> +	switch (type) {
+> +	case KVM_DEV_TYPE_ARM_VGIC_V2:
+>  		kvm->max_vcpus =3D VGIC_V2_MAX_CPUS;
+> -	else if (type =3D=3D KVM_DEV_TYPE_ARM_VGIC_V3)
+> +		break;
+> +	case KVM_DEV_TYPE_ARM_VGIC_V3:
+>  		kvm->max_vcpus =3D VGIC_V3_MAX_CPUS;
+> -	else if (type =3D=3D KVM_DEV_TYPE_ARM_VGIC_V5)
+> -		kvm->max_vcpus =3D min(VGIC_V5_MAX_CPUS,
+> -				     kvm_vgic_global_state.max_gic_vcpus);
+> +		break;
+> +	case KVM_DEV_TYPE_ARM_VGIC_V5:
+> +		kvm->max_vcpus =3D kvm_vgic_global_state.max_gicv5_vcpus;
 > +
-> +	return 0;
->  }
-> =20
->  /*
-> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-> --- a/arch/arm64/kvm/vgic/vgic-v5.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
-[ ... ]
-> @@ -83,13 +102,52 @@ int vgic_v5_probe(const struct gic_kvm_info *info)
->  	vgic_v5_irs_cache_id_regs(info);
->  	vgic_v5_get_implemented_ppis();
-> =20
-[ ... ]
-> +	ret =3D vgic_v5_irs_assign_vmt(vgic_v5_irs_two_level_vmt_support(&irs_c=
-aps),
-> +				     ilog2(vgic_v5_irs_max_vms(&irs_caps)),
-> +				     vgic_v5_get_vmt_base());
-> +	if (ret) {
-> +		kvm_err("Failed to assign the GICv5 VM tables to the IRS; no GICv5 sup=
-port\n");
-> +		if (!vgic_v5_irs_clear_vmt())
-> +			vgic_v5_vmt_free();
-> +		return -ENODEV;
+> +		/*
+> +		 * We use the userspace-allocated vcpu_id as the index into the
+> +		 * GICv5 VPE table. This ensures that userspace's view and the
+> +		 * guest's view of IAFFIDs remains consistent - GICv5's virtual
+> +		 * IAFFID is the VPE ID in that VM's VPET.
+> +		 *
+> +		 * Reject vGICv5 creation if we have already got any vCPUs that
+> +		 * we cannot back with a GICv5 VPE in the VPET.
+> +		 */
+> +		kvm_for_each_vcpu(i, vcpu, kvm) {
+> +			if (vcpu->vcpu_id >=3D kvm->max_vcpus) {
+> +				ret =3D -E2BIG;
+> +				goto out_unlock;
+> +			}
+> +		}
+> +
+> +		break;
 > +	}
 
 [Severity: High]
-Will this permanently abort the GICv5 probe across kexec?
+This is a pre-existing issue, but does restricting this validation loop to=
+=20
+only GICv5 leave the older models vulnerable to an out-of-bounds vcpu_id?
 
-If booting via kexec while a VM was running in the previous kernel, the
-hardware VMT_BASER register retains its valid state. When this occurs,
-vgic_v5_irs_assign_vmt() unconditionally returns -EBUSY:
+If userspace creates a VCPU with a large ID (for example, 500) before creat=
+ing=20
+the VGIC device, it succeeds because the pre-VGIC limit defaults to the=20
+maximum supported by the system. If userspace then selects a GICv2 device,=
+=20
+kvm_vgic_create() drops max_vcpus to 8.=20
 
-arch/arm64/kvm/vgic/vgic-v5.c:vgic_v5_irs_assign_vmt() {
+Because the vcpu_id check above is inside the GICv5 switch block, we skip=20
+validating the existing VCPUs against the new GICv2 limit.
+
+When configuring private IRQs later during initialization,=20
+vgic_setup_private_irq() does this:
+
+arch/arm64/kvm/vgic/vgic-init.c:vgic_setup_private_irq() {
     ...
-    vmt_baser =3D irs_readq_relaxed(GICV5_IRS_VMT_BASER);
-    if (!!FIELD_GET(GICV5_IRS_VMT_BASER_VALID, vmt_baser))
-        return -EBUSY;
-    ...
-}
-
-This error path clears the stale state using vgic_v5_irs_clear_vmt(), but
-then returns -ENODEV. Should the probe retry the assignment instead of
-failing entirely?
-
-[ ... ]
-
-While reviewing the VM table setup, I also noticed a few potential regressi=
-ons
-in vgic_v5_vmte_init():
-
-arch/arm64/kvm/vgic/vgic-v5-tables.c:vgic_v5_vmte_init() {
-    ...
-    kvm_for_each_vcpu(i, vcpu, kvm) {
-        u16 vpe_id =3D vgic_v5_vpe_id(vcpu);
-        if (vpe_id > max_vpe_id)
-            max_vpe_id =3D vpe_id;
-    }
-
-    nr_cpus =3D max(2UL, roundup_pow_of_two(max_vpe_id + 1));
-    vmi->vpe_id_bits =3D fls(nr_cpus) - 1;
-    ...
-    tmp |=3D FIELD_PREP(GICV5_VMTEL2E_VPE_ID_BITS, vmi->vpe_id_bits);
-    vmte_val1 =3D tmp;
+    irq->targets =3D BIT(vcpu->vcpu_id);
     ...
 }
 
-[Severity: High]
-Is there a missing bounds check on max_vpe_id here?
+Evaluating BIT(500) shifts a 64-bit integer by 500, which results in undefi=
+ned
+behavior in the kernel. A similar shift happens for SGI routing in=20
+vgic_mmio_write_sgir().
 
-The function verifies the total number of online vCPUs against hardware
-limits, but calculates the hardware configuration based on the maximum spar=
-se
-vcpu_id. Since KVM allows sparse IDs up to KVM_MAX_VCPU_IDS, an unprivileged
-userspace could create a single vCPU with a large ID.
-
-This allows calculating an oversized vpe_id_bits and writing it directly to
-the VMTE, exposing a configuration to the hardware that exceeds its support=
-ed
-capabilities. Should max_vpe_id be checked against vmt_info->max_vpes?
-
-Additionally, in the same function:
-
-arch/arm64/kvm/vgic/vgic-v5-tables.c:vgic_v5_vmte_init() {
-    ...
-    scoped_guard(raw_spinlock_irqsave, &vgic_v5_irs_lock) {
-        WRITE_ONCE(vmte->val[0], cpu_to_le64(vmte_val0));
-        ...
-    }
-    ...
-out_fail:
-    kfree(vmd);
-    ...
-}
-
-[Severity: Low]
-Does this mix goto-based error handling with scoped_guard()?
-
-According to the cleanup subsystem guidelines, if a function uses guard() or
-scoped_guard(), all resources should be converted to scope-based cleanup,
-avoiding mixed usage with goto-based cleanup labels.
+Should this validation loop be moved outside the switch statement so it run=
+s=20
+for all VGIC models and prevents these out-of-bounds shifts across the boar=
+d?
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260807111159.4291=
-28-1-sascha.bischoff@arm.com?part=3D11
+28-1-sascha.bischoff@arm.com?part=3D12
