@@ -1,145 +1,121 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 695492F1FDF;
-	Fri,  7 Aug 2026 14:17:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A549238238D
+	for <kvmarm@lists.linux.dev>; Fri,  7 Aug 2026 14:22:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786112233; cv=none; b=Y9DpMI0yPqk+Kh1hrohCmi4zjpp5tU+Nt4h46xyGmHdPgVgoU9fz93kMRE9QxXIbkytcY5n4r7zK88oC65XwQIJqGinIa6R/A16CjF/ZPnuSzx/oj4S5SmP0qL0Sv8cupkeF6LmF1aUAUVEX6DXemAFxWmkjSsh2EzY/nDdd9js=
+	t=1786112578; cv=none; b=aPgdmle5489bhfxr9CelHhVCecYG+FglBNKm2lYUOfkPzMT0Kg/fZfJzfjdsK4kcdu7hMR0zuN+TLgIiRS/3ah9TOyvc/8EulEiVUwh3H6Cb/jq6ZZSi/NCRdT1CAq/kJYYPr4tzyl36IZR+E5WvdqSf1U+p/zVeLUKXWSjBuMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786112233; c=relaxed/simple;
-	bh=XDeRwMr/Z+mnZAZl+VL6JCojG8uOz3rB5iaNkL+R28M=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=H+iDfY7nL7kFGLlkMCrchDCmu1jVj2gw50H4xQUlBNkyLvvm+zZZLOwwVCwFtoJf5P3g5mA6Kj4gqn3dL0FynuDpWzJR7VjwJd18D4xIVEhmNh5PKSHw3KDxoAroHQkz68DEyJvTO6CJ8eEenaZlFCacV1Arbs1q8PfRFAp5ClA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fz+n4Nol; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786112578; c=relaxed/simple;
+	bh=r9kab6txueHD+ZYfKgqlHdXTySwAoOlw+inr3Z5s1SU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cB8JbI0wLbsnNZ81eaT1skpRkCQWwe4q3zpCaVJeBSY2p71vpjUEV0V/vuCw2x2zQ/Omi1Pe23h5jHV+/PEi4LOlVFcIH/fISaFMTkW2VbVLsCwAZRglBgQYc4B9qyHJJDdDxazQ+waE4tOE4FiY+nfTwRGPFmva/YyY4GHmvm4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=qJs8kBaD; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fz+n4Nol"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4925A1F000E9;
-	Fri,  7 Aug 2026 14:17:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786112229;
-	bh=NkCVI9sbm0zg72yQOQ9pIeFu6F31jlko3bKb8CUSgII=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=Fz+n4NollQ0lYROaEx3dWLKokG7aJddz7Fx74tMAv4RioluAYgxMkZdiCC0MdUmtC
-	 tDF5eY/WvZFUpeczYdcbDNPA01izeaNW9pHmpn8gkNzU4nlVhCDfDdVZaQPlCmZkQ6
-	 9a3OuN+PO8xeBDBayCU54IMyhvjxrcneU/0sNOlIE1JP57RT0Q6AB2iq1iY57WpfgK
-	 wxSk58zLm5Uf2CMS9j58qgY1WcB73UxIZ44WDzH1kjbtQKqxgxMSUFYBXIYrC5YfLu
-	 5ywZY/DK9DdJhDUmDiP75tjmvFuXmfOm11aXZX3yow1c0hJjCxKkbqSGuwM2rIdb6t
-	 K9TVa25IV8i7A==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v5 16/49] KVM: arm64: gic-v5: Request doorbells when
- VPEs enter WFI
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Sascha Bischoff" <Sascha.Bischoff@arm.com>
-Cc: kvm@vger.kernel.org, "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev
-In-Reply-To: <20260807111159.429128-17-sascha.bischoff@arm.com>
-References: <20260807111159.429128-1-sascha.bischoff@arm.com>
- <20260807111159.429128-17-sascha.bischoff@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Aug 2026 14:17:08 +0000
-Message-Id: <20260807141709.4925A1F000E9@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="qJs8kBaD"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B3F841516;
+	Fri,  7 Aug 2026 07:22:51 -0700 (PDT)
+Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 234DA3F9A2;
+	Fri,  7 Aug 2026 07:22:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1786112575; bh=r9kab6txueHD+ZYfKgqlHdXTySwAoOlw+inr3Z5s1SU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qJs8kBaDFR6MWXa+CS6fHTFVvNkkQHTJgpAr4AUK2RDB/CA9G+9dyjIhXQe94nNKQ
+	 mNUDX8eweNIxD9im8vzt8gH36N/IzgEemCIijw4EFGjtlYADmbuNfvZ0uy10bmXK80
+	 tY6yTq1cVpgR+G9I99+L+KENdTXVESVAbGikcOmQ=
+Date: Fri, 7 Aug 2026 15:22:23 +0100
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: Will Deacon <will@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Anshuman Khandual <anshuman.khandual@arm.com>, Ryan Roberts <ryan.roberts@arm.com>, Dev Jain <dev.jain@arm.com>, 
+	"David Hildenbrand (Arm)" <david@kernel.org>, Matt Fleming <matt@codeblueprint.co.uk>, 
+	Ard Biesheuvel <ardb@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Sebastian Ene <sebastianene@google.com>, Vincent Donnefort <vdonnefort@google.com>
+Subject: Re: [PATCH v2 1/2] arm64: ptdump: Make note_page_flush() range aware
+Message-ID: <6psvlhoi727cullfgafzjjtih24setwhm3pfbyeakliytw6ft7@lfk3to4l7huv>
+References: <20260724185431.2990395-1-weilin.chang@arm.com>
+ <20260724185431.2990395-2-weilin.chang@arm.com>
+ <anXFo-igVdqrCogQ@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <anXFo-igVdqrCogQ@willie-the-truck>
 
-Thank you for your contribution! Sashiko AI review found 3 potential issue(=
-s) to consider:
-- [High] ABBA deadlock between `rq_lock` and `desc->lock` in `vgic_v5_put` =
-via `irq_set_affinity`.
-- [High] Stale `db_fired` state causes infinite VMEXIT loops upon subsequen=
-t WFIs.
-- [High] Guest-reachable WARN_ON due to host-side `irq_set_affinity` failur=
-es.
---
+Hi Will,
 
---- Patch [16]: [PATCH v5 16/49] KVM: arm64: gic-v5: Request doorbells when=
- VPEs enter WFI ---
-commit c40948b426a64dc48dae28e60304e7f29600ab3c
-Author: Sascha Bischoff <Sascha.Bischoff@arm.com>
+On Fri, Aug 07, 2026 at 12:46:43PM +0100, Will Deacon wrote:
+> On Fri, Jul 24, 2026 at 07:54:30PM +0100, Wei-Lin Chang wrote:
+> > note_page_flush() calls note_page() with addr == 0 and level == -1 to
+> > dump the last row of a ptdump. addr == 0 (1 << 64 wrapped around)
+> > renders a huge region with enormous size for address spaces with
+> > IA bits < 64. For example the stage-2 page tables and the EFI runtime
+> > page table.
+> > 
+> > More importantly, the last region of the address space and everything
+> > after the address space up to 1 << 64 are merged into one row of
+> > output. If the last region within the address space is valid, it will
+> > appear to remain valid up to 1 << 64 with the same attributes.
+> > 
+> > Currently only the EFI runtime ptdump is affected by this, but KVM will
+> > soon fix its stage-2 ptdump by using note_page_flush(). Here is an
+> > example of an EFI runtime ptdump (last row):
+> > 
+> > 0x0000008000000000-0x0000000000000000   17179868672G PGD
+> > 
+> > With this patch:
+> > 
+> > 0x0000008000000000-0x0001000000000000      261632G PGD
+> > 
+> > To fix this, use ptdump_state.range[] to figure out where the address
+> > space ends, and call note_page() with that.
+> > 
+> > Fixes: 9d80448ac92b ("efi/arm64: Add debugfs node to dump UEFI runtime page tables")
+> > Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
+> > ---
+> >  arch/arm64/mm/ptdump.c | 17 ++++++++++++++++-
+> >  1 file changed, 16 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/arm64/mm/ptdump.c b/arch/arm64/mm/ptdump.c
+> > index 1c20144700d7..5b34060ceb96 100644
+> > --- a/arch/arm64/mm/ptdump.c
+> > +++ b/arch/arm64/mm/ptdump.c
+> > @@ -278,9 +278,24 @@ void note_page_pgd(struct ptdump_state *pt_st, unsigned long addr, pgd_t pgd)
+> >  
+> >  void note_page_flush(struct ptdump_state *pt_st)
+> >  {
+> > +	const struct ptdump_range *range = pt_st->range;
+> > +	unsigned long end = 0;
+> >  	pte_t pte_zero = {0};
+> >  
+> > -	note_page(pt_st, 0, -1, pte_val(pte_zero));
+> > +	while (range->start != range->end) {
+> > +		end = range->end;
+> > +		range++;
+> > +	}
+> 
+> This seems to be duplicating some of what the core code does already in
+> ptdump_walk_pgd(). Can we retrieve the information we need from the
+> containing 'struct ptdump_pg_state' structure instead of recomputing
+> the address?
 
-KVM: arm64: gic-v5: Request doorbells when VPEs enter WFI
+I can add a member end_address in ptdump_pg_state, and initialize it
+with the last range->end when users initialize ptdump_pg_state
+(ptdump_walk() and ptdump_check_wx()). Is that what you had in mind?
 
-When a GICv5 VPE is made non-resident as part of the vcpu entering
-WFI, request a VPE doorbell so that KVM can be notified when a
-suitable SPI or LPI becomes pending for that VPE.
+Thanks,
+Wei-Lin Chang
 
-> diff --git a/arch/arm64/kvm/hyp/vgic-v5-sr.c b/arch/arm64/kvm/hyp/vgic-v5=
--sr.c
-> --- a/arch/arm64/kvm/hyp/vgic-v5-sr.c
-> +++ b/arch/arm64/kvm/hyp/vgic-v5-sr.c
-> @@ -22,6 +22,15 @@ void __vgic_v5_make_resident(struct vgic_v5_cpu_if *cp=
-u_if)
-> =20
->  void __vgic_v5_make_non_resident(struct vgic_v5_cpu_if *cpu_if)
->  {
-> +	/*
-> +	 * Clear the db_fired state to ensure that we're ready for the next
-> +	 * doorbell when it is requested. If a doorbell firing caused us to
-> +	 * enter the guest, then we've already consumed that state at this
-> +	 * point, so this is safe to clear. Use WRITE_ONCE() to ensure we're not
-> +	 * racing with the doorbell firing and setting the state true again.
-> +	 */
-> +	WRITE_ONCE(cpu_if->gicv5_vpe.db_fired, false);
-
-[Severity: High]
-Will this state management regression leave the db_fired state stale for
-back-to-back WFIs?
-
-Since __vgic_v5_make_non_resident() is called from vgic_v5_put(), which is
-invoked upon host preemption or user exit (but not standard guest re-entry
-after kvm_vcpu_block), db_fired appears to remain true when the guest resum=
-es.
-
-If the guest executes WFI again, kvm_vcpu_check_block() checks
-kvm_vgic_vcpu_pending_irq() in arch/arm64/kvm/vgic/vgic.c and observes
-db_fired is still true, which causes it to instantly abort blocking. This
-could result in the guest continuously spinning in VMEXITs.
-
-> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-> --- a/arch/arm64/kvm/vgic/vgic-v5.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
-[ ... ]
-> @@ -1099,6 +1099,46 @@ void vgic_v5_put(struct kvm_vcpu *vcpu)
-[ ... ]
-> +			/*
-> +			 * Make the doorbell affine to this CPU, if it isn't
-> +			 * already. Actively check the cpumask first as it is
-> +			 * cheaper than changing the affinity every time.
-> +			 */
-> +			if (!cpumask_test_cpu(cpu, aff))
-> +				WARN_ON(irq_set_affinity(db_irq, cpumask_of(cpu)));
-
-[Severity: High]
-Does this introduce an ABBA deadlock regression between rq_lock and desc->l=
-ock?
-
-When a guest vCPU thread is preempted or enters WFI, the host scheduler's
-__schedule() holds the runqueue lock (rq_lock) while calling
-prepare_task_switch(). This triggers the sched_out preempt notifier, taking
-us through kvm_sched_out() -> kvm_arch_vcpu_put() -> kvm_vgic_put() and
-finally to vgic_v5_put().
-
-Inside vgic_v5_put(), irq_set_affinity() acquires the hardware interrupt
-descriptor lock (desc->lock). Taking desc->lock while already holding
-rq_lock violates the locking hierarchy where desc->lock must be acquired
-before rq_lock.
-
-[Severity: High]
-Can a guest trigger this WARN_ON regression to cause a host denial of servi=
-ce?
-
-Calls to irq_set_affinity() can legitimately fail and return negative error
-codes due to hardware constraints (such as ITS socket-crossing limitations)
-or resource exhaustion.
-
-Since the guest controls when it executes WFI, it can reliably trigger this
-WARN_ON if the host scheduler places it on a restricted CPU. If panic_on_wa=
-rn
-is enabled, this allows the guest to crash the host.
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260807111159.4291=
-28-1-sascha.bischoff@arm.com?part=3D16
+> 
+> Will
