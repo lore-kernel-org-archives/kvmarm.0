@@ -1,55 +1,56 @@
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com [209.85.218.70])
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com [209.85.128.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1D564756C1
-	for <kvmarm@lists.linux.dev>; Fri,  7 Aug 2026 16:43:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05B104766BC
+	for <kvmarm@lists.linux.dev>; Fri,  7 Aug 2026 16:43:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786121028; cv=none; b=XhCXkZEL176NX+LIY+SaZRXHaWxa1ICtKZk5tHYhGPxhlcWlzkmRxG17tN3XdOPPLIzuH2v448h/pTgqJlw2chuA9z5L5+0bV3OlasilyaZ07fbvFY70pRkF17HJ6pPtT15oNro6GJmyG+YcStkUIlz22kHRdFyXqM6F9wtO83g=
+	t=1786121029; cv=none; b=jRpEe4DLNWMoY0Ohi8KsPnwNmG5kXhJlDQu5vPa/xFoMEsY4lp8PgxFgEiXvxN/S9cfyVtuOaOThK9ZcjP7MrbLDN86Wj2fnBaeRj8Hr8DtwvPOdt/ogdf/sv3T6Vm5c0jv7diXmMxfeiM+lNQh85bsvVFEGqLL9Aftk4gvwVzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786121028; c=relaxed/simple;
-	bh=XILxJKy12TWaQHFCLBTQsYLQR5jF/oISDfaILeGY1YQ=;
+	s=arc-20240116; t=1786121029; c=relaxed/simple;
+	bh=yGBjsaJ9hgV8fJYzvxdhdFeS0ETWRMPWiiqS4nncA1U=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=k4GQaww5MQ728t3qTcPjhTsc6H2NUCWNsiwtM3i4chYe+6Vx0eO/0jFDEa1jnm6bePDsLJZRXf6mDTCy0WhPQBsQ58U49uGI7WYdORtMecPMzrDxGVW9HFioiWxsg80kOISgt4pry+L3jgELrSGgTfL9s4ww+5fgjIldUIv/L5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TIr/tNyZ; arc=none smtp.client-ip=209.85.218.70
+	 To:Cc:Content-Type; b=pYCYEUlaMgzd8j1P5PLkMRXmJmsagOMFQ1xTtCY9dJZIB7B2T1BkqJ7fZo6l5MBKO89cLGxSwYTvUc0UMpUAYtZgQpKVcbj3zwCHnV1hCtcHmrc0SDZYn8QMn2957Czv4re7N5p6hknNy3C9AQy4vdeKRG6EqONeCUJm9JeBsZ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bOaVKKMe; arc=none smtp.client-ip=209.85.128.72
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TIr/tNyZ"
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-c15ddb61f13so290347066b.0
-        for <kvmarm@lists.linux.dev>; Fri, 07 Aug 2026 09:43:45 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bOaVKKMe"
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-49561facb1dso21895455e9.3
+        for <kvmarm@lists.linux.dev>; Fri, 07 Aug 2026 09:43:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1786121024; x=1786725824; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=ubeHaXbMbCOzTTinYD2VelpFhUrhVALfoKhm+KzrKis=;
-        b=TIr/tNyZvFJkB7ieThxfGzvcn3D8FrHZchA7LvpWWK5LnvKy/RZQE+Zq+Huz4GjrXd
-         aOWD2wYM3h4Xi1Ld5QIOKsIPxr2eqM0B8V1HhnQ7Qpz5AbJzpmja7knOtw5LuL/ct4XT
-         AdVl2io/3UXBtVz9fqXXLCCWp64OaDrB7zkHMp9YNVgz3QzNUezJK9cWqBPRV4/gT+tc
-         WDWeFnihYixNA5uNdNWUmMXfZ7hYjWF7yUzMvNZOsLXQLUZBL+ostuaCRudeZVkxQb70
-         OHgZn/xEOo1dve1xAt0G+wPogssCjakSo1cSejDCdS/uG5k99Cfy7TDASUxzU9MptZc+
-         p1IQ==
+        d=google.com; s=20251104; t=1786121025; x=1786725825; darn=lists.linux.dev;
+        h=content-transfer-encoding:content-type:cc:to:from:subject
+         :message-id:references:mime-version:in-reply-to:date:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=iZntm8VORvDjKObm+3e5kg7isnusBSNzR7FkdFCW7YM=;
+        b=bOaVKKMeb+R4GrwYBbRIJS88Polq5ierv4haX3/Gq4KZlAGvHmYzO2K3gYHoFLLPxH
+         j3FQ/AkXine2Wuk34XKq533pPsfq6d50OonvEM58bz43jEX7wSRXQan1CRq657A4GcGy
+         EXgZwNUmTxazmzJCR8N/ajG8w7cCLeZFHayTHGmGYTv/k/JxTMXFJH2YPUVK+pe9YosZ
+         MPa/7nLCzItnz9hnjDJs5zkVIJijX8F9UcFIUrnJESfGWFXLc7VLFOArte7yR6z0fj7H
+         Y/V08Z7vtn6TfXmk2e9uEtPLkutHVqjOs3dxS3qRkQCs+Tt59Eic58rP59UUS4VtnC6O
+         wwCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786121024; x=1786725824;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=ubeHaXbMbCOzTTinYD2VelpFhUrhVALfoKhm+KzrKis=;
-        b=MzOjCHvbR1zdZ24W5iISxmMs1juE0hUJx/tZsdyneqwF7n7jQqJvGBV7K3uiUgYPj9
-         vkD8NFsnYJN8dCWilrYvpl+6c8WTyM8o3jR/XLb82Y1vzp3Q5SZm0GFeoqw6xbQ+cieF
-         u8d/oH2zOIf0vGXFJ9ix7i909c6610H5W9eGfDoiz5/qTn5WUo0RyhmKyGrnajSR8XOH
-         KOgG3U6/Eg8e9PL+yoKgMauOq7uRSedZ+0+Ruwok7AfJ/Pmewi2KIZI4Iw3QgkOyJqfI
-         XlMLuPGw/tbX1pAw4aaAxjaZDyz2rR79+4KVdc2WdzvCmgz4mI5UtY9T0rXTx4HG3UgY
-         E3Pw==
-X-Gm-Message-State: AOJu0YxYRJbznl99pcu7gHKW6Te4xUl25Ep7P99/dRsh4/OZBA2R9nzB
-	P4p7oQRgNqNex17zcMmL764wP4LQncnpRbnygbnVrriaD6pWyk/nyhiE6efl6gFr4QQs/xn2VXL
-	At1oBSDLEtaAyFk44HGkp0Wf5mK4vpA==
-X-Received: from ejfv7.prod.google.com ([2002:a17:906:3bc7:b0:c12:8ea1:b062])
+        d=1e100.net; s=20251104; t=1786121025; x=1786725825;
+        h=content-transfer-encoding:content-type:cc:to:from:subject
+         :message-id:references:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=iZntm8VORvDjKObm+3e5kg7isnusBSNzR7FkdFCW7YM=;
+        b=LzmxksXe+BycISDnPX76fmCKo+p9Y7/fF2QDPmmEisFEshZSK/rMlB+35jp40QG/Mx
+         l8bmcJ1zmfaSQRXWc7OSxt+KqmWmLABbLNJ7SKHohQOnyHK6D+lv8ZlSWYX1yFbztEjZ
+         5YslwyPPAluLs1tOZjeAHTeCPl/1TMYm6/i7NpI917IlxAUskcSPtEIbwY/3HQZ8F30F
+         I7vxVrLje1Pme49XY8tci3m6PJbezmq3+vq7aK0fFq/ipreu0knRB3qZBvpCnYM6eu+t
+         13KF3xZwwlZwl9dpaWQaz56ppuIQwN0ZoUWpJCz2X9mCypU7C7MqKYHRMNbesUMu72Sk
+         dvPQ==
+X-Gm-Message-State: AOJu0YxomQzakXy1Rz71KBs5SE1ktVnB9eHHvpgNA59t0MoU75oICvHA
+	lfFJQMgLyktIRs+8y7MBTjqwa4QbKFyG6Yl4rPet9qhN+zi55wvuLH3vyN5nUuu9crhLIrTSoOX
+	IYBd6yihEAwgQX0lrIseecjzPglHxyg==
+X-Received: from wmsk23-n2.prod.google.com ([2002:a05:600d:8497:20b0:493:c773:ff79])
  (user=sebastianene job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:907:1b24:b0:c12:8b1c:454f with SMTP id a640c23a62f3a-c2039c0264bmr1298937866b.2.1786121023739;
- Fri, 07 Aug 2026 09:43:43 -0700 (PDT)
-Date: Fri,  7 Aug 2026 16:43:14 +0000
+ 2002:a05:600c:4ed3:b0:493:e983:806e with SMTP id 5b1f17b1804b1-4994e72f795mr337802465e9.3.1786121025032;
+ Fri, 07 Aug 2026 09:43:45 -0700 (PDT)
+Date: Fri,  7 Aug 2026 16:43:15 +0000
 In-Reply-To: <20260807164322.2970811-2-sebastianene@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,9 +60,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20260807164322.2970811-2-sebastianene@google.com>
 X-Mailer: git-send-email 2.55.0.654.g21b8a5bc05-goog
-Message-ID: <20260807164322.2970811-6-sebastianene@google.com>
-Subject: [PATCH v2 04/13] KVM: Parse the device tree and register the ITS
- region with pKVM
+Message-ID: <20260807164322.2970811-7-sebastianene@google.com>
+Subject: [PATCH v2 05/13] irqchip/gic-v3-its: Add support for the ITS
+ emulation setup
 From: Sebastian Ene <sebastianene@google.com>
 To: catalin.marinas@arm.com, fuad.tabba@linux.dev, joey.gouly@arm.com, 
 	mark.rutland@arm.com, maz@kernel.org, oupton@kernel.org, rananta@google.com, 
@@ -73,173 +74,292 @@ Cc: kvmarm@lists.linux.dev, android-kvm@google.com, bgrzesik@google.com,
 	vdonnefort@google.com, vladimir.murzin@arm.com, yuzenghui@huawei.com, 
 	zenghui.yu@linux.dev
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Identify the ITS base address from the device tree and store it in the
-pkvm_protected_regs array so that it will be unmapped from the host
-address space.
-Register a callback to forward all the MMIO requests to the device to
-prevent breaking ITS functionality in this patch. The patch by itself
-shouldn't break any existing functionality even though all the accesses
-from the gic-ITS driver are now mediated inside pKVM.
+Introduce two new helper functions to allow locking the ITS and setting
+up a copy of the host ITS state that will be given to the pKVM
+emulation. The caller of these functions is responsible to implement a
+callback which will be used to setup the emulation layer. The calling
+flow is expected to do the following:
 
+pkvm_its_emulate_setup(its_phys, host)
+	// allocate memory for the priv state of the ITS emulation
+	// call the its emulation setup(its_phys, host, priv_state);
+
+pkvm_drop_host_privileges()
+	its_emulate_acquire_locks(&flags);
+		on_each_cpu(_kvm_host_prot_finalize, &ret, 1);
+	its_emulate_release_locks(ret, &flags, pkvm_its_emulate_setup);
+
+Augment the its_baser structure with a new fiels that will hold a
+pointer to the base table copy. The gic ITS driver will use the pointer
+to the base table copy when emulation is enabled, as this allows us to
+hide away the original first level of an indirect table to prevent the
+following:
+
+// assumming an indirect Device Table layout
+1. malicious host patches an entry in the 1st level table with an
+   address that it wants to write to.
+2. malicious host issues MAPD to install a DTE in the table pointed by
+   the address from (1).
+
+As the driver only manipulates a copy of the table, the emulation is
+responsible for looking at the updates from the copy table, sanitizing
+them and updating the original table before talking to the hardware.
+
+In a simillar fashion, when emulation is in place we no longer let the
+gic ITS driver use the original command queue but we present the driver
+a copy of it and we hide away the original command queue from the driver
+as this will be used entirely by the emulation layer.
+
+Co-authored-by: Bart=C5=82omiej Grzesik <bgrzesik@google.com>
 Signed-off-by: Sebastian Ene <sebastianene@google.com>
 ---
- arch/arm64/include/asm/kvm_pkvm.h     |  2 ++
- arch/arm64/kvm/hyp/nvhe/Makefile      |  3 +-
- arch/arm64/kvm/hyp/nvhe/its_emulate.c | 37 +++++++++++++++++++
- arch/arm64/kvm/pkvm.c                 | 52 +++++++++++++++++++++++++++
- 4 files changed, 93 insertions(+), 1 deletion(-)
- create mode 100644 arch/arm64/kvm/hyp/nvhe/its_emulate.c
+ drivers/irqchip/irq-gic-v3-its.c   | 157 +++++++++++++++++++++++++++--
+ include/linux/irqchip/arm-gic-v3.h |  39 +++++++
+ 2 files changed, 185 insertions(+), 11 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
-index 0a471564be00..370225f0e72c 100644
---- a/arch/arm64/include/asm/kvm_pkvm.h
-+++ b/arch/arm64/include/asm/kvm_pkvm.h
-@@ -31,6 +31,8 @@ struct pkvm_protected_reg {
- 
- extern struct pkvm_protected_reg kvm_nvhe_sym(pkvm_protected_regs)[];
- extern unsigned int kvm_nvhe_sym(num_protected_reg);
-+extern void kvm_nvhe_sym(its_emulate_forward_req)(struct pkvm_protected_reg *region, u64 offset,
-+						  bool write, u64 *reg, u8 reg_size);
- 
- int pkvm_init_host_vm(struct kvm *kvm, unsigned long type);
- int pkvm_create_hyp_vm(struct kvm *kvm);
-diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-index f57450ebcb49..70fbca325852 100644
---- a/arch/arm64/kvm/hyp/nvhe/Makefile
-+++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-@@ -24,7 +24,8 @@ CFLAGS_switch.nvhe.o += -Wno-override-init
- 
- hyp-obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o \
- 	 hyp-main.o hyp-smp.o psci-relay.o early_alloc.o page_alloc.o \
--	 cache.o setup.o mm.o mem_protect.o sys_regs.o pkvm.o stacktrace.o ffa.o
-+	 cache.o setup.o mm.o mem_protect.o sys_regs.o pkvm.o stacktrace.o ffa.o \
-+	 its_emulate.o
- hyp-obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
- 	 ../hyp-entry.o ../exception.o ../pgtable.o ../vgic-v5-sr.o
- hyp-obj-y += ../../../kernel/smccc-call.o
-diff --git a/arch/arm64/kvm/hyp/nvhe/its_emulate.c b/arch/arm64/kvm/hyp/nvhe/its_emulate.c
-new file mode 100644
-index 000000000000..63a42f520ed2
---- /dev/null
-+++ b/arch/arm64/kvm/hyp/nvhe/its_emulate.c
-@@ -0,0 +1,37 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+
-+#include <asm/kvm_pkvm.h>
-+#include <nvhe/mem_protect.h>
-+
-+void its_emulate_forward_req(struct pkvm_protected_reg *region, u64 offset, bool write, u64 *reg,
-+			     u8 reg_size)
-+{
-+	void __iomem *addr = __hyp_va(PFN_PHYS(region->pfn) + offset);
-+
-+	switch (reg_size) {
-+	case 1:
-+		if (!write)
-+			*reg = readb_relaxed(addr);
-+		else
-+			writeb_relaxed(*reg, addr);
-+		break;
-+	case 2:
-+		if (!write)
-+			*reg = readw_relaxed(addr);
-+		else
-+			writew_relaxed(*reg, addr);
-+		break;
-+	case 4:
-+		if (!write)
-+			*reg = readl_relaxed(addr);
-+		else
-+			writel_relaxed(*reg, addr);
-+		break;
-+	case 8:
-+		if (!write)
-+			*reg = readq_relaxed(addr);
-+		else
-+			writeq_relaxed(*reg, addr);
-+		break;
-+	}
-+}
-diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index 428723b1b0f5..4bfffbedac4c 100644
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -9,8 +9,13 @@
- #include <linux/kmemleak.h>
- #include <linux/kvm_host.h>
- #include <asm/kvm_mmu.h>
-+#include <asm/kvm_pkvm.h>
- #include <linux/memblock.h>
- #include <linux/mutex.h>
-+#include <linux/of_address.h>
-+#include <linux/of_reserved_mem.h>
-+#include <linux/platform_device.h>
-+#include <linux/irqchip/arm-gic-v3.h>
- 
- #include <asm/kvm_pkvm.h>
- 
-@@ -39,6 +44,47 @@ static int __init register_memblock_regions(void)
- 	return 0;
+diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-=
+its.c
+index 6f5811aae59c..e74ae9220af5 100644
+--- a/drivers/irqchip/irq-gic-v3-its.c
++++ b/drivers/irqchip/irq-gic-v3-its.c
+@@ -78,17 +78,6 @@ struct its_collection {
+ 	u16			col_id;
+ };
+=20
+-/*
+- * The ITS_BASER structure - contains memory information, cached
+- * value of BASER register configuration and ITS page size.
+- */
+-struct its_baser {
+-	void		*base;
+-	u64		val;
+-	u32		order;
+-	u32		psz;
+-};
+-
+ struct its_device;
+=20
+ /*
+@@ -5226,6 +5215,152 @@ static int __init its_compute_its_list_map(struct i=
+ts_node *its)
+ 	return its_number;
  }
- 
-+static int __init register_its_emulated_region(void)
+=20
++static void its_free_snapshot(struct its_host_state *snapshot)
 +{
-+	struct device_node *np;
-+	struct resource res;
-+	int i = 0;
-+	int ret;
++	int i;
 +
-+	for_each_compatible_node(np, NULL, "arm,gic-v3-its") {
-+		ret = of_address_to_resource(np, 0, &res);
-+		if (ret)
-+			goto out_fail;
++	if (snapshot->cmd_host_copy)
++		its_free_pages(snapshot->cmd_host_copy, get_order(ITS_CMD_QUEUE_SZ));
 +
-+		if (i >= PKVM_PROTECTED_REGS_NUM) {
-+			kvm_err("Out of protected region slots\n");
-+			ret = -ENOSPC;
-+			goto out_fail;
-+		}
++	for (i =3D 0; i < GITS_BASER_NR_REGS; i++) {
++		if (!snapshot->tables[i].base_snapshot)
++			continue;
 +
-+		/*
-+		 * Note: don't unmap the entire animal from the host because devices need
-+		 * to be able to access GITS_TRANSLATER to raise MSIs. If the
-+		 * page where GITS_TRANSLATER is given to HYP, devices won't be
-+		 * able to map it in their IOMMU when the IOMMU is managed by
-+		 * pKVM.
-+		 */
-+		kvm_nvhe_sym(pkvm_protected_regs)[i].pfn = PHYS_PFN(res.start);
-+		kvm_nvhe_sym(pkvm_protected_regs)[i].cb =
-+			lm_alias(&kvm_nvhe_sym(its_emulate_forward_req));
-+		kvm_nvhe_sym(pkvm_protected_regs)[i].nr_pages =
-+			PFN_DOWN(min_t(u64, resource_size(&res), PAGE_ALIGN_DOWN(GITS_TRANSLATER)));
-+
-+		i++;
++		its_free_pages(snapshot->tables[i].base_snapshot, snapshot->tables[i].or=
+der);
 +	}
 +
-+	kvm_nvhe_sym(num_protected_reg) = i;
++	its_free_pages(snapshot, 0);
++}
++
++static struct its_host_state *its_snapshot_host_state(struct its_node *its=
+)
++{
++	void *page;
++	struct its_host_state *snapshot;
++	int i;
++
++	page =3D its_alloc_pages_node(its->numa_node, GFP_ATOMIC | __GFP_ZERO, 0)=
+;
++	if (!page)
++		return NULL;
++
++	snapshot =3D (void *)page_address(page);
++	page =3D its_alloc_pages_node(its->numa_node, GFP_ATOMIC | __GFP_ZERO,
++				    get_order(ITS_CMD_QUEUE_SZ));
++	if (!page)
++		goto err_alloc;
++
++	snapshot->cmd_host_copy	=3D page_address(page);
++	snapshot->cmdq_len	=3D ITS_CMD_QUEUE_SZ;
++	snapshot->cmd_original	=3D its->cmd_base;
++	snapshot->cmd_write	=3D its->cmd_write;
++
++	memcpy(snapshot->tables, its->tables, sizeof(struct its_baser) * GITS_BAS=
+ER_NR_REGS);
++
++	for (i =3D 0; i < GITS_BASER_NR_REGS; i++) {
++		if (!(snapshot->tables[i].val & GITS_BASER_VALID))
++			continue;
++
++		if (!(snapshot->tables[i].val & GITS_BASER_INDIRECT))
++			continue;
++
++		page =3D its_alloc_pages_node(its->numa_node,
++					    GFP_ATOMIC | __GFP_ZERO,
++					    snapshot->tables[i].order);
++		if (!page)
++			goto err_alloc;
++
++		snapshot->tables[i].base_snapshot =3D page_address(page);
++
++		memcpy(snapshot->tables[i].base_snapshot, snapshot->tables[i].base,
++		       PAGE_ORDER_TO_SIZE(snapshot->tables[i].order));
++	}
++
++	return snapshot;
++
++err_alloc:
++	its_free_snapshot(snapshot);
++	return NULL;
++}
++
++static int its_emulate_switch_queues_locked(struct its_node *its, its_emul=
+ate_setup cb)
++{
++	struct its_host_state *host_snaphsot, host;
++	int i, ret;
++	u64 baser_phys;
++
++	host_snaphsot =3D its_snapshot_host_state(its);
++	if (!host_snaphsot)
++		return -ENOMEM;
++
++	/*
++	 * The snapshot of the ITS state will be given to the emulation, make a c=
+opy of it
++	 * so that we don't go in weeds.
++	 */
++	memcpy(&host, host_snaphsot, sizeof(host));
++
++	ret =3D cb(its->phys_base, host_snaphsot);
++	if (ret) {
++		its_free_snapshot(host_snaphsot);
++		return ret;
++	}
++
++	/* Switch the driver command queue to use the host copy and update the wr=
+ite index */
++	its->cmd_write =3D (its->cmd_write - its->cmd_base) +
++		(struct its_cmd_block *)host.cmd_host_copy;
++	its->cmd_base =3D host.cmd_host_copy;
++
++	/*
++	 * Replace the first level of the indirect tables with the snapshot table=
+ as the
++	 * emulation layer will make it innaccessible to the host.
++	 */
++	for (i =3D 0; i < GITS_BASER_NR_REGS; i++) {
++		if (!(host.tables[i].val & GITS_BASER_INDIRECT))
++			continue;
++
++		baser_phys =3D virt_to_phys(host.tables[i].base_snapshot);
++		if (IS_ENABLED(CONFIG_ARM64_64K_PAGES) && (baser_phys >> 48))
++			baser_phys =3D GITS_BASER_PHYS_52_to_48(baser_phys);
++
++		its->tables[i].val &=3D ~GENMASK(47, 12);
++		its->tables[i].val |=3D baser_phys;
++		its->tables[i].base =3D host.tables[i].base_snapshot;
++	}
++
 +	return 0;
-+out_fail:
-+	of_node_put(np);
++}
++
++void its_emulate_acquire_locks(unsigned long *flags)
++{
++	struct its_node *its;
++
++	if (WARN_ON(!flags))
++		return;
++
++	raw_spin_lock_irqsave(&its_lock, *flags);
++
++	list_for_each_entry(its, &its_nodes, entry)
++		raw_spin_lock(&its->lock);
++}
++
++int its_emulate_release_locks(int ret_pkvm_finalize, unsigned long *flags,=
+ its_emulate_setup cb)
++{
++	struct its_node *its;
++	int ret =3D 0;
++
++	if (WARN_ON(!flags || !cb))
++		ret =3D -EINVAL;
++
++	list_for_each_entry(its, &its_nodes, entry) {
++		if (!ret_pkvm_finalize && !ret)
++			ret =3D its_emulate_switch_queues_locked(its, cb);
++
++		raw_spin_unlock(&its->lock);
++	}
++
++	raw_spin_unlock_irqrestore(&its_lock, *flags);
++
 +	return ret;
 +}
 +
- void __init kvm_hyp_reserve(void)
+ static int __init its_probe_one(struct its_node *its)
  {
- 	u64 hyp_mem_pages = 0;
-@@ -57,6 +103,12 @@ void __init kvm_hyp_reserve(void)
- 		return;
- 	}
- 
-+	ret = register_its_emulated_region();
-+	if (ret) {
-+		kvm_err("Failed to register ITS region %d\n", ret);
-+		return;
-+	}
+ 	u64 baser, tmp;
+diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm=
+-gic-v3.h
+index ea5fd2374ebe..b75f82cef4bf 100644
+--- a/include/linux/irqchip/arm-gic-v3.h
++++ b/include/linux/irqchip/arm-gic-v3.h
+@@ -657,6 +657,45 @@ static inline bool gic_enable_sre(void)
+ 	return !!(val & ICC_SRE_EL1_SRE);
+ }
+=20
++/*
++ * The ITS_BASER structure - contains memory information, cached
++ * value of BASER register configuration and ITS page size.
++ */
++struct its_baser {
++	void		*base;
 +
- 	hyp_mem_pages += hyp_s1_pgtable_pages();
- 	hyp_mem_pages += host_s2_pgtable_pages();
- 	hyp_mem_pages += hyp_vm_table_pages();
--- 
++	/*
++	 * The table used when emulation is in place and indirect layout is
++	 * configured.
++	 */
++	void		*base_snapshot;
++	u64		val;
++	u32		order;
++	u32		psz;
++};
++
++struct its_host_state {
++	struct its_baser	tables[GITS_BASER_NR_REGS];
++
++	/* The command queue used after the emulation is in place */
++	void			*cmd_host_copy;
++
++	/* The command queue configured by the ITS driver at boot */
++	void			*cmd_original;
++	void			*cmd_write;
++	size_t			cmdq_len;
++};
++
++/*
++ * Callback used to initialize the emulation. It is expected to allocate m=
+emory for the private
++ * state of the emulation and receive as arguments copy of the host ITS dr=
+iver state along
++ * with the address of the ITS.
++ */
++typedef int (*its_emulate_setup)(phys_addr_t its_phys_base, struct its_hos=
+t_state *host);
++
++void its_emulate_acquire_locks(unsigned long *flags);
++int its_emulate_release_locks(int ret_pkvm_finalize, unsigned long *flags,=
+ its_emulate_setup cb);
++
+ #endif
+=20
+ #endif
+--=20
 2.55.0.654.g21b8a5bc05-goog
 
