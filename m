@@ -1,32 +1,32 @@
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B73541D206
-	for <kvmarm@lists.linux.dev>; Fri,  7 Aug 2026 10:41:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B64C642F6E3
+	for <kvmarm@lists.linux.dev>; Fri,  7 Aug 2026 10:41:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786099290; cv=none; b=RYONAVAiR3wfYEHf6rBndVooJpuJPIrZ1Db4wTmYWFSMtkrYq9IyYc0ORcHc3WXBmRNTBmRzMybVY14cifN+ythVNoKUrnO8DnxxAmwIFklG2xuTmEjpIw7CqOzz54x9wmvLxK1O83y1GxM1B5GPGTfEHD9+57m+/90dMSUWJK8=
+	t=1786099293; cv=none; b=CNPhUymL2J74NPohQiwKn5WA4ZUWopU5/2K6JA39R0XDddDm/SVaZITEwY9Jtw2DHbdSIV3imR5E3I9VqLL66uKTkvcUSwfbmDlZvsbyc7n43SobAAa3yQqQluuNIfnzgI8a+FhgTNjumTuaNl/LGZmkDRuF8+zhU8lfk+8gFPE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786099290; c=relaxed/simple;
-	bh=dooZ2Nsw+1ffRigL9s2oct8rGMhsJ7urG/uzFCCcWZQ=;
+	s=arc-20240116; t=1786099293; c=relaxed/simple;
+	bh=sBAMk3TIjuNteCkbUOcCaHOcuRV3JfadVEPYVHAwTrw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=o7thjIUbqE0B0i84ANIokwMtDVQNgeWFUK9rJ2gqt+ApaIonetrOLXcvTj4XxQ5oYxsgyIDom2+KPaGJR0w3EYkhfX27g3/eZXQwFdb2LnYeXG+ArJvGNsM0+d6LWbP1bsutrj8QP3gBJTPgLsxe8+qn7Q+9Nz9QJCNyXHsZtUc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=iauK43Lz; arc=none smtp.client-ip=91.218.175.177
+	 MIME-Version; b=tR55s7x9ht/1cZXrfKbtgDoSZHXqUMIYlVlgu96unN+QHg2WGdxNs9XjzIGQaHaQ4ssZFu6nWEfYzjAymvwUOJmvjti1AZjCB3TB4+DQlW3oQ6y0QgTclBrcH+kwsM4QJ5m1X8Fw+cBTpRe4j9rIPLfM/tVq7CA1e5hv1IgyjIY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kyHH7hsL; arc=none smtp.client-ip=91.218.175.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="iauK43Lz"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kyHH7hsL"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1786099285;
+	t=1786099287;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=3nr/a0dOZRkxfGZoRpT42C6sSO2flc3qcvSm9XbBZls=;
-	b=iauK43LzFFEk438JMee7/pnVbCao2fOGE8Vj+GrWkJP5A0Ql9PLgc5IyAoOuBVwggvJdfA
-	HVK7SqW89K8YcqJ26dFijI5Skizch3Z4iPLVIbhsp+0ddDrZN/lCmQ6/Eiqzujyjlblo/n
-	9SxEuIcr5p0Fpn0X/UMATxCraq0ZnUU=
+	bh=FXAUwRKtIA0sEu908Fyzr1rasWtjR+9/qFmLbf34T8M=;
+	b=kyHH7hsLJROPYWYpdDqxaH6UQTXc3sRl2HQttC8Q+OCWBcKB3LHKv8tx9G3nVrgLbNGkO1
+	MzUycBBIi52m5RAPF0d3UoQnyVoONLV2H9D5Y+5R0zq2fgDHiXrKQeCDAtipbRPQfU2CHs
+	GVzmNRrVMC/0B422oEcoL07SZL6/x3Q=
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oupton@kernel.org>
@@ -40,9 +40,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 3/4] KVM: arm64: vgic-its: Don't save collections the table cannot hold
-Date: Fri,  7 Aug 2026 11:41:01 +0100
-Message-Id: <20260807104102.2410744-4-fuad.tabba@linux.dev>
+Subject: [PATCH v2 4/4] KVM: arm64: vgic-its: Point saved ITEs at the next valid entry
+Date: Fri,  7 Aug 2026 11:41:02 +0100
+Message-Id: <20260807104102.2410744-5-fuad.tabba@linux.dev>
 In-Reply-To: <20260807104102.2410744-1-fuad.tabba@linux.dev>
 References: <20260807104102.2410744-1-fuad.tabba@linux.dev>
 Precedence: bulk
@@ -54,40 +54,47 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-A guest that disables the ITS and rewrites GITS_BASER with fewer pages,
-VALID still set, keeps every collection it mapped against the larger
-table: KVM stores the new BASER unconditionally and frees the list only
-when VALID is cleared. vgic_its_save_collection_table() then walks the
-whole list, writing up to 448K past the end of the table, and saves
-collection IDs that vgic_its_restore_cte() rejects, so the save succeeds
-and the restore fails with -EINVAL on the destination. The overrun stays
-in guest memory, as vgic_write_guest_lock() validates every gfn.
+An ITE whose collection was dropped is saved as an invalid entry, and
+vgic_its_restore_ite() has no offset to follow from one, so the scan
+steps a single entry at a time until it reaches a valid entry or the
+end of the ITT.
 
-Validate each collection against the current table with
-vgic_its_check_id() and return -EINVAL, as vgic_its_save_device_tables()
-does for devices. Collection IDs are unique and the collection table is
-never indirect, so the check also bounds the walk.
+Compute the offset to the next ITE that is saved as valid instead.
 
-Fixes: ea1ad53e1e31a ("KVM: arm64: vgic-its: Collection table save/restore")
+Suggested-by: Oliver Upton <oupton@kernel.org>
 Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
- arch/arm64/kvm/vgic/vgic-its.c | 3 +++
- 1 file changed, 3 insertions(+)
+ arch/arm64/kvm/vgic/vgic-its.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
 diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index ed281fbf008b9..1589f06e66904 100644
+index 1589f06e66904..9e782a4fea7e5 100644
 --- a/arch/arm64/kvm/vgic/vgic-its.c
 +++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -2540,6 +2540,9 @@ static int vgic_its_save_collection_table(struct vgic_its *its)
- 	max_size = GITS_BASER_NR_PAGES(baser) * SZ_64K;
+@@ -2035,15 +2035,16 @@ static u32 compute_next_devid_offset(struct list_head *h,
  
- 	list_for_each_entry(collection, &its->collection_list, coll_list) {
-+		if (!vgic_its_check_id(its, baser, collection->collection_id, NULL))
-+			return -EINVAL;
-+
- 		ret = vgic_its_save_cte(its, collection, gpa);
- 		if (ret)
- 			return ret;
+ static u32 compute_next_eventid_offset(struct list_head *h, struct its_ite *ite)
+ {
+-	struct its_ite *next;
+-	u32 next_offset;
++	struct its_ite *next = ite;
+ 
+-	if (list_is_last(&ite->ite_list, h))
+-		return 0;
+-	next = list_next_entry(ite, ite_list);
+-	next_offset = next->event_id - ite->event_id;
++	/* Point at the next ITE that vgic_its_save_ite() stores as valid. */
++	list_for_each_entry_continue(next, h, ite_list) {
++		if (next->collection)
++			return min_t(u32, next->event_id - ite->event_id,
++				     VITS_ITE_MAX_EVENTID_OFFSET);
++	}
+ 
+-	return min_t(u32, next_offset, VITS_ITE_MAX_EVENTID_OFFSET);
++	return 0;
+ }
+ 
+ /**
 -- 
 2.39.5
 
