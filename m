@@ -1,196 +1,145 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC31138AC78
-	for <kvmarm@lists.linux.dev>; Fri,  7 Aug 2026 17:02:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0EDD34751F
+	for <kvmarm@lists.linux.dev>; Fri,  7 Aug 2026 17:03:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786122152; cv=none; b=luGxD1d+V4O/Lo9we2mA2ad/Sgvx+SW07XORDI4UmgN4qwWfN/03/By6Ha+YTJovoL1uMiUkLBhkapPwq16C81NRqz67iD56/uP9+YyM2UvWaujfC6EfZBCo4LHoOzB7raZ4VAmZJqpol8v+QjiANrcGamJRwJNXDqY1oXV6cuI=
+	t=1786122199; cv=none; b=hHpA6q1Rhj+hVasArQk3tghTrPX6B1QGiKJkCLw8jE8zziLCl7IG2w8jdHV2+5OI9eR8VYK6OdDAwRIcYLaWSggZE5pV5j6+/ASqZL4gPIAFLC5ehYjDjXOsjDDbrZgKmcWmNRJQ45eY5Gz3OMa5EoPN3kc93Zo3LxqV8VL5CY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786122152; c=relaxed/simple;
-	bh=kin48Y6Qqn6rNMOsXf3YDwnwBNqpEZA8dQVGJj4oLyA=;
+	s=arc-20240116; t=1786122199; c=relaxed/simple;
+	bh=a+Y6AsMD16vjhMlInsEfQ1rxW367wPCASpNkeyX7QB4=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=o/x/jpoPzcOpUxzy3QkIuEQ9UmlIZaVq0Vi4kNIGjGZ0ScCurBbYcsG9ovMxpTrmIknH6xLaJBxJ4HsP+YfV2zvMMZWxK3J5TkK5tuQ/te0MK1DRRsVpSEIRBuMj+AG79Rz90p2TpwjK2ZR8C/Sj3KIKheoSuiJhB+lP19F2PvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UkIHDxF+; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=hC9k7Xb6PhDtP9KX25mUPjyvrXd8OBle/Y12WOBTKOOhvL1hw9/ch7Xt+e2fwEAEpJeXh9W+AZAP6J1/b6+e5Sq+XXAvuqsItTIofM81HT/XFhQV8oYw8IBFwxpm3I86VWl2ba3ZMnsyh+fmzgczQ0lNj1zRw6T002s9HO+634s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jy6QIGn0; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UkIHDxF+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23D301F000E9;
-	Fri,  7 Aug 2026 17:02:30 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jy6QIGn0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7474C1F000E9;
+	Fri,  7 Aug 2026 17:03:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786122150;
-	bh=+T4wNgU1/OtEF3aFdo9z5GtoaIdGyIX+3NgZlMD4HZo=;
+	s=k20260515; t=1786122196;
+	bh=D19zoMio3bgYBXvqkzm0hJEjdYps0QUAsU7zP7YwKfA=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=UkIHDxF+13wowE/vpFDxLFkRtfYuqwpjRi6+FKAVao+TtZh8pL7gm/bfxcDRig3/+
-	 ypbVECFBhmOizP1i9dXP5yyI3rLrHZCk56nQFssUwusEMshHleDBdaez+6X1NWvtVf
-	 9xWzo9pj30RGzbjuNPGhdgFy1JT8KeEzcCKZliWWZmotguEbgpE+UgHCa3TNMpsdyV
-	 tpKVtnqWuBD5NlUYIlK5gIyr5KqwSzLYsp0yY6EOskZJZ0s9ww7epaR8GSUAh5H7yq
-	 rBbTO6gqUBw5546shpFJmG1UBnjDyLtPMdcwI83zgzHIt3ftVCFPzijBvYQbMXgTtD
-	 F4DzHLZlRPxNw==
+	b=jy6QIGn0mRVREWZIby+yLOYgV+Nvs9u4FxpywVqCarJnf9BwPNsYhe0MS8ti3IU9K
+	 QUERan2afsavncvr3Izk0X2mrvhDLNBgqcqcBphU0RNouYQWcrMOhymQ3rQRwqjul6
+	 rPwln3Jx6Uw+jmYDi9kOhG9NkC1eDWO38vjlEz5skwIAr5Mh8B4CA7XMU4BprDylJt
+	 P2ckdIYLARnQul1f3iCctu4HwouexvAIv9D/VldcIzn/r2AvTqxxHoOXfLNyZrW4Tn
+	 uOWSxUNy+HRWfHTkPh+PZUoO1eY9+w7nv4puqKt6hZ1PCaU5/Uan8byUcpThvWQQuV
+	 FZXggSmvIXNQg==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2 10/13] KVM: arm64: Restrict host updates to GITS_CTLR
+Subject: Re: [PATCH v2 03/13] KVM: arm64: Support host MMIO trap handlers
+ for unmapped devices
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Sebastian Ene" <sebastianene@google.com>
 Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev
-In-Reply-To: <20260807164322.2970811-12-sebastianene@google.com>
+In-Reply-To: <20260807164322.2970811-5-sebastianene@google.com>
 References: <20260807164322.2970811-2-sebastianene@google.com>
- <20260807164322.2970811-12-sebastianene@google.com>
+ <20260807164322.2970811-5-sebastianene@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Aug 2026 17:02:29 +0000
-Message-Id: <20260807170230.23D301F000E9@smtp.kernel.org>
+Date: Fri, 07 Aug 2026 17:03:16 +0000
+Message-Id: <20260807170316.7474C1F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 6 potential issue(=
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
 s) to consider:
-- [Critical] Missing interception of GITS_CBASER and GITS_BASER<n> allows t=
-he host to bypass ITS emulation and execute unvalidated commands.
-- [High] Concurrent modification of the host's `snapshot_table` during ITS =
-command rollback leads to arbitrary memory donation attempts.
-- [High] Widespread use of `WARN_ON` for host-reachable error conditions in=
- ITS emulation panics the hypervisor.
-- [High] Incorrect sub-word MMIO handling in `ctlr_write` and `ctlr_read` l=
-eads to register corruption.
-- [Medium] 64-bit accesses to GITS_CTLR are incorrectly dropped, causing re=
-ads to return uninitialized memory and writes to be silently ignored.
-- [Medium] The handler fails to mask reserved (RES0) bits from the host-pro=
-vided `value` before writing to the physical `GITS_CTLR` register.
+- [High] Host MMIO trap handler fails to properly mask, sign-extend, and tr=
+uncate register values during emulation.
+- [Medium] Unconditional 4-byte instruction skip breaks AArch32 EL0 Thumb e=
+xecution.
 --
 
---- Patch [10]: [PATCH v2 10/13] KVM: arm64: Restrict host updates to GITS_=
-CTLR ---
-commit 8547f0737e8d44ccf52c0d09c7367b0079543481
+--- Patch [3]: [PATCH v2 03/13] KVM: arm64: Support host MMIO trap handlers=
+ for unmapped devices ---
+commit 4f82f551a35a497988ae3208761d26c15c28de61
 Author: Sebastian Ene <sebastianene@google.com>
 
-    KVM: arm64: Restrict host updates to GITS_CTLR
-   =20
-    Prevent unpredictable hardware behavior when the host tries to enable
-    the ITS while it is not in quiescent state.
+KVM: arm64: Support host MMIO trap handlers for unmapped devices
 
-This commit adds emulation for the GITS_CTLR register to restrict the host
-from enabling the ITS while it is not in a quiescent state. It adds
-ctlr_read and ctlr_write handlers and registers them in the its_handlers
-array.
+This commit introduces a stage-2 fault handler in the hypervisor to interce=
+pt
+and emulate host memory accesses to unmapped or protected MMIO regions. It
+hooks into handle_host_mem_abort() to check if a registered callback can ha=
+ndle
+the access.
 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/its_emulate.c b/arch/arm64/kvm/hyp/n=
-vhe/its_emulate.c
-> index 5629e2a070df5..b9b71aa18d48b 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/its_emulate.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/its_emulate.c
-> @@ -403,8 +403,35 @@ static void cwriter_read(struct pkvm_protected_reg *=
-region, u64 offset, u64 *rea
->  	*read =3D readq_relaxed(its->base + GITS_CWRITER);
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/n=
+vhe/mem_protect.c
+> index 500c18c2fd48b..7e978e0c44b9e 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+[ ... ]
+> @@ -752,6 +753,50 @@ static void host_inject_mem_abort(struct kvm_cpu_con=
+text *host_ctxt)
+>  	inject_host_exception(esr);
 >  }
 > =20
-> +static void ctlr_read(struct pkvm_protected_reg *region, u64 offset, u64=
- *read)
+> +static bool handle_host_mmio_trap(struct kvm_cpu_context *host_ctxt, u64=
+ esr, u64 addr)
 > +{
-> +	struct its_priv_state *its =3D region->priv;
-> +	*read =3D readl_relaxed(its->base + GITS_CTLR);
-> +}
+> +	u64 offset, reg_value =3D 0, start, end;
+> +	u8 reg_size, reg_index;
+> +	bool write;
+> +	int i;
+> +
+> +	for (i =3D 0; i < num_protected_reg; i++) {
+> +		if (!pkvm_protected_regs[i].pfn || !pkvm_protected_regs[i].nr_pages ||
+> +		    !pkvm_protected_regs[i].cb)
+> +			continue;
+> +
+> +		start =3D PFN_PHYS(pkvm_protected_regs[i].pfn);
+> +		end =3D start + PFN_PHYS(pkvm_protected_regs[i].nr_pages);
+> +		reg_size =3D BIT((esr & ESR_ELx_SAS) >> ESR_ELx_SAS_SHIFT);
+> +
+> +		if (start > addr || addr + reg_size > end)
+> +			continue;
+> +
+> +		reg_index =3D (esr & ESR_ELx_SRT_MASK) >> ESR_ELx_SRT_SHIFT;
+> +		write =3D (esr & ESR_ELx_WNR) =3D=3D ESR_ELx_WNR;
+> +		offset =3D addr - start;
+> +
+> +		if (write && reg_index !=3D 31)
+> +			reg_value =3D host_ctxt->regs.regs[reg_index];
+> +
+> +		pkvm_protected_regs[i].cb(&pkvm_protected_regs[i], offset, write,
+> +					  &reg_value, reg_size);
+> +
+> +		if (!write && reg_index !=3D 31)
+> +			host_ctxt->regs.regs[reg_index] =3D reg_value;
 
 [Severity: High]
-Does this read handler account for the access offset? When the host performs
-a partial sub-word read at a non-zero offset, it appears we return the full
-32-bit register value instead of the requested bytes.
+Does this emulation handle sign extension and register width properly?
+
+When the host executes an instruction like LDRSB, shouldn't the handler ins=
+pect
+the ESR_ELx_SSE (Sign Extend) bit to properly sign-extend the value? Also, =
+for
+32-bit register destinations (ESR_ELx_SF =3D=3D 0), the architecture requir=
+es the
+upper 32 bits to be zeroed, but it looks like this assigns the value direct=
+ly.
 
 > +
-> +static void ctlr_write(struct pkvm_protected_reg *region, u64 offset, u6=
-4 value)
-> +{
-> +	struct its_priv_state *its =3D region->priv;
-> +	bool is_quiescent, is_enabled;
-> +	u32 ctlr;
-> +
-> +	ctlr =3D readl_relaxed(its->base + GITS_CTLR);
-> +	is_quiescent =3D !!(ctlr & GITS_CTLR_QUIESCENT);
-> +	is_enabled =3D !!(ctlr & GITS_CTLR_ENABLE);
-> +
-> +	/*
-> +	 * If it's disabled and not in quiescent state and it tries to enable
-> +	 * it, bail out.
-> +	 */
-> +	if (!is_enabled && (value & GITS_CTLR_ENABLE) && !is_quiescent)
-> +		return;
-> +
-> +	writel_relaxed(value, its->base + GITS_CTLR);
-
-[Severity: High]
-Can a sub-word write corrupt the register state here? If the host performs a
-partial 8-bit or 16-bit write at a non-zero offset, this writes the provided
-value directly to offset 0 as a 32-bit word, which would zero-extend the va=
-lue
-and wipe out other bits in GITS_CTLR.
+> +		kvm_skip_host_instr();
 
 [Severity: Medium]
-Should we mask out reserved (RES0) bits from the host-provided value before
-writing it? The host could write non-zero values to RES0 bits, which the
-architecture states can lead to unpredictable hardware behavior.
+Can this break AArch32 EL0 Thumb execution?
 
-> +}
+kvm_skip_host_instr() unconditionally adds 4 to the ELR. If the stage-2 data
+abort originates from a host userspace process executing a 2-byte Thumb
+instruction, shouldn't it inspect the ESR_ELx_IL bit to advance the PC by 2
+bytes instead?
+
+> +		return true;
+> +	}
 > +
->  static struct its_handler its_handlers[] =3D {
->  	ITS_HANDLER(GITS_CWRITER, sizeof(u64), cwriter_write, cwriter_read),
-> +	ITS_HANDLER(GITS_CTLR, sizeof(u32), ctlr_write, ctlr_read),
->  	{},
->  };
-
-[Severity: Critical]
-Does this registry need to intercept GITS_CBASER and GITS_BASER<n>? Because
-they are omitted, writes to these registers fall through and are forwarded
-directly to hardware. This could allow the host to bypass the ITS emulation
-completely by configuring the hardware to read from host-controlled memory,
-leading to a potential DMA attack against EL2 memory.
-
-
-I also noticed a few other issues in the ITS emulation code that might need
-attention.
-
-[Severity: High]
-In check_table_update(), could there be a TOCTOU race with the host?
-
-	snapshot_table =3D kern_hyp_va(table->base_snapshot);
-...
-	new_entry =3D snapshot_table[new_entry_index];
-...
-	if (rollback)
-		new_entry =3D new_entry ^ GITS_BASER_VALID;
-
-	if (new_entry & GITS_BASER_VALID)
-		ret =3D __pkvm_host_donate_hyp(hyp_phys_to_pfn(new_entry & PHYS_MASK),
-
-The snapshot_table is in host-shared memory. If the host concurrently
-modifies the entry between the initial check and the rollback, couldn't it
-force the rollback path to donate an arbitrary PFN to the hypervisor?
-
-[Severity: High]
-Can an untrusted host trigger the WARN_ON() in cwriter_write()?
-
-		if (submit_single_cmd(its, retry)) {
-			WARN_ON(process_cmd(its, &cmd, /* rollback */ true));
-			return;
-		}
-
-If the host intentionally stalls the ITS to force a command timeout, this
-rollback path is executed. If the rollback fails, the WARN_ON() will panic
-the hypervisor in EL2 nVHE, bringing down the host and all protected VMs.
-
-[Severity: Medium]
-Are 64-bit accesses to GITS_CTLR incorrectly dropped by pkvm_its_emulate_ha=
-ndler()?
-
-		if (reg_handler->access_size < reg_size)
-			return;
-
-Since GITS_CTLR is configured with an access_size of 4, a valid 64-bit acce=
-ss
-from the host (which is permitted by the GICv3 architecture) would be silen=
-tly
-ignored, potentially returning uninitialized memory on reads.
+> +	return false;
+> +}
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260807164322.2970=
-811-2-sebastianene@google.com?part=3D10
+811-2-sebastianene@google.com?part=3D3
