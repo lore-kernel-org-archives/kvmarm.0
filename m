@@ -1,44 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59CE538D3ED
-	for <kvmarm@lists.linux.dev>; Fri,  7 Aug 2026 17:09:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6FCF3A6F05
+	for <kvmarm@lists.linux.dev>; Fri,  7 Aug 2026 17:11:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786122553; cv=none; b=gNPOqeB97NR5z2RtApFcZvLYeA1oMliQNHuBiyNt2BR1QMrXSm+JpIEJxxeHiJMU2icDR6WixBxvsbW6kz6bVPQjjME/9mvIHjxndi8zfjp9aDsUs+H+FWEXT0aa3STDlB2SOAkmwsbcGMw0kHac8w0VYRsdy5BkV4RlDeT7wnI=
+	t=1786122695; cv=none; b=LXv6cp+dU8UQG0RkgrTbbZL/UpsKWFHIreTCIzRGFfIdbHxvGOuR8o5q01wpwnSJtbz4UJQx0sROrWkCh+rGXhxGvyPTLSEgrlVx+mlAKY2APQ8QjvbOxniXSrDPgCKq+J7lb4ciaVU0C9NxUGFupLaknXSrdGNUZdVSgkKGjS4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786122553; c=relaxed/simple;
-	bh=f3wgD0s6WiCfO58wgvrs+eRA0YJsQI71MxxJn/mXyns=;
+	s=arc-20240116; t=1786122695; c=relaxed/simple;
+	bh=lwFA32oMuza/tu9hFDZFS7sbm5Lt8Sd2BLDVSji8r8s=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=QrWK49YpxNJ4Q1PADS3BMGcqMXXSZKZLxUz42p+qgL7r7/GNzeTGiB6OvkftC4kGjCaLISdexJIM13yuknXvfSFyiUjGokoCMGgDnAj0aGQUR19jP6F22Q7IGXdAhFJEjJf+8J1W6KldUaLx1zVGGdNEEow9RADWlCqb1/1eXI8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fzf0W9nN; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=acIRIFgSSBoiGPvnRRpk/w2eWJg58vww08H+dztVWyGzjQ7Ick2AAwW4TeD3Oe8oY9eUg+mNDS+AB3+42kqbekgAlK+w5BMEB8AlhbkvY2Bg1gudHxSlnTSj3aCa1Q93k6Ix9plAZ+Hcf4wUsL0K+Dd6aW/wCjQsMTyxJsozDF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gQcOo5wp; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fzf0W9nN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6EAF1F000E9;
-	Fri,  7 Aug 2026 17:09:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gQcOo5wp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 364CC1F00A3A;
+	Fri,  7 Aug 2026 17:11:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786122552;
-	bh=9faBLOj3FRHWHCRyKgKrFDuTzBqIO2rvymgzf2UFwLc=;
+	s=k20260515; t=1786122693;
+	bh=Svq42rDYi9/7g4bm4zrwBrzYToRFtiYY237avxVOgGA=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=fzf0W9nNunzNqy2HjX52+JvHs1gi7dPoYSTQPIgTDJy6U0YVwrIqDkUorXjDGhuUD
-	 917JfA1p5LXVMLEqAnv12VZO4u6nW5QF18hKr5oYOBmpH46SoZzyqwsLnhrJ4qx6Sc
-	 Wo7CJEQl+mdpm/G9ZOD7Avy9/Xo1wqVMTRKSYEp2aLnH2rua7GqpHr4Tg2dwQeggLk
-	 w0p2jro8/1iwuAxjPUiLiJVGGK20LREca31pZSwIFB4vwrptz7H0XSE9kRQcgX6vN/
-	 /tGHCHGv0sU4PvTAlqYshhJloG5NYb6or0vSsbLxC2nYgLvRQ+vHLRMJiP1zqffJsc
-	 OY1Pmmq3TUfIQ==
+	b=gQcOo5wpxXeiqqogKd6LOxgKGbQNBww+JUDgnOAJlkSTptxLYfz0Ozvnpo5MLu1WM
+	 zeS041tcOcnV63o7oLqFHDCC3H3I90DSayX0zgmWhkpG6f+p1ofL9jsGzFtCvaA3e4
+	 0MECcqTWO86sEJn4hdjUR+emJWcnrW5yvFoqnMXpySL7honXnGKEmspjoLJSOvu3Sq
+	 6US4jc3DqzoDnUcE9iQowx0b5aNngfbT3hNzvPeDQGCkERbKcPHf6dNdprNxlF1TjN
+	 xynAUddjfc9DWLuHdwaZf90TyDJRGgL42C3rJW+ym8oS7YeBDk1W10pkSc9Y9Foyrk
+	 iehQE0+Bm0Hyw==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2 04/13] KVM: Parse the device tree and register the
- ITS region with pKVM
+Subject: Re: [PATCH v2 12/13] KVM: arm64: Prevent the host from programming
+ new GITS_BASER tables
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Sebastian Ene" <sebastianene@google.com>
-Cc: "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev
-In-Reply-To: <20260807164322.2970811-6-sebastianene@google.com>
+Cc: "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>
+In-Reply-To: <20260807164322.2970811-14-sebastianene@google.com>
 References: <20260807164322.2970811-2-sebastianene@google.com>
- <20260807164322.2970811-6-sebastianene@google.com>
+ <20260807164322.2970811-14-sebastianene@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Aug 2026 17:09:11 +0000
-Message-Id: <20260807170911.B6EAF1F000E9@smtp.kernel.org>
+Date: Fri, 07 Aug 2026 17:11:32 +0000
+Message-Id: <20260807171133.364CC1F00A3A@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,118 +47,121 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 4 potential issue(=
 s) to consider:
-- [Critical] The function pointer for the MMIO emulator passed to EL2 point=
-s to unmapped/NX memory, causing an Instruction Abort.
-- [High] MMIO emulation in `its_emulate_forward_req` double-swaps on Big En=
-dian kernels by using `readX_relaxed` and `writeX_relaxed`.
-- [High] pKVM incorrectly maps and accesses MMIO devices using the hypervis=
-or's linear map (`__hyp_va()`) rather than a private VA range.
-- [High] handle_host_mmio_trap ignores the ESR_ELx_SSE (Sign Extend) bit fo=
-r MMIO reads, returning zero-extended values for signed loads.
+- [Critical] Sub-word (32-bit) MMIO writes to 64-bit ITS registers cause hy=
+pervisor crashes (Alignment Fault) and silent state corruption.
+- [Critical] Incomplete attribute masking in baser_write and cbaser_write a=
+llows the host to alter ITS table Cacheability and Shareability.
+- [Critical] The host can activate unvalidated ITS tables by toggling the G=
+ITS_BASER Valid bit (bit 63).
+- [High] Incomplete physical address masking in baser_write on 52-bit PA sy=
+stems (FEAT_LPA) allows physical address hijacking.
 --
 
---- Patch [4]: [PATCH v2 04/13] KVM: Parse the device tree and register the=
- ITS region with pKVM ---
-commit 6f98f20a817e227941fab67881459ac609810480
+--- Patch [12]: [PATCH v2 12/13] KVM: arm64: Prevent the host from programm=
+ing new GITS_BASER tables ---
+commit ceb5f9bba1bc25bf01683842fe6461183f94c200
 Author: Sebastian Ene <sebastianene@google.com>
 
-KVM: Parse the device tree and register the ITS region with pKVM
+KVM: arm64: Prevent the host from programming new GITS_BASER tables
 
-Identify the ITS base address from the device tree and store it in the
-pkvm_protected_regs array so that it will be unmapped from the host
-address space. Register a callback to forward all the MMIO requests to
-the device to prevent breaking ITS functionality.
+Don't allow the host to change the layout of the tables or to modify the
+address programmed in the GITS_BASER registers to point to new tables
+and bypass the sanitization.
+Prevent the host from updating the ITS tables while the ITS is enabled
+and the tables are set to prevent undefined behavior.
 
 > diff --git a/arch/arm64/kvm/hyp/nvhe/its_emulate.c b/arch/arm64/kvm/hyp/n=
 vhe/its_emulate.c
-> new file mode 100644
-> index 0000000000000..63a42f520ed25
-> --- /dev/null
+> --- a/arch/arm64/kvm/hyp/nvhe/its_emulate.c
 > +++ b/arch/arm64/kvm/hyp/nvhe/its_emulate.c
-> @@ -0,0 +1,37 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +
-> +#include <asm/kvm_pkvm.h>
-> +#include <nvhe/mem_protect.h>
-> +
-> +void its_emulate_forward_req(struct pkvm_protected_reg *region, u64 offs=
-et, bool write, u64 *reg,
-> +			     u8 reg_size)
-> +{
-> +	void __iomem *addr =3D __hyp_va(PFN_PHYS(region->pfn) + offset);
-
-[Severity: High]
-Does using __hyp_va() here work for MMIO addresses? The __hyp_va() macro
-subtracts hyp_physvirt_offset, which is based on RAM physical addresses.
-Since MMIO regions often reside at lower physical addresses than RAM,
-wouldn't this underflow and produce a virtual address with the top bits set,
-leading to a Translation Fault? This same issue seems to be present in
-__pkvm_host_donate_hyp_mmio() where it populates the page tables.
-
-> +
-> +	switch (reg_size) {
-> +	case 1:
-> +		if (!write)
-> +			*reg =3D readb_relaxed(addr);
-> +		else
-> +			writeb_relaxed(*reg, addr);
-
-[Severity: High]
-Will these relaxed accessors cause a double-swap on Big Endian kernels?
-When the host traps to EL2 on an MMIO access, the CPU register already
-contains the exact data the host intended to write (swapped to Little
-Endian by the host driver's writel). Using writeb_relaxed and similar
-helpers will apply cpu_to_le* again. Should this use the __raw_read*
-and __raw_write* accessors to preserve the trapped register's exact bit
-representation?
-
-> +		break;
 
 [ ... ]
 
-> diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-> index 053e4f733e4be..5e80da18f3120 100644
-> --- a/arch/arm64/kvm/pkvm.c
-> +++ b/arch/arm64/kvm/pkvm.c
-
-[ ... ]
-
-> @@ -39,6 +44,47 @@ static int __init register_memblock_regions(void)
+> @@ -460,10 +465,42 @@ static void cbaser_read(struct pkvm_protected_reg *=
+region, u64 offset, u64 *read
+>  	*read =3D readq_relaxed(its->base + GITS_CBASER);
+>  }
 > =20
-> +static int __init register_its_emulated_region(void)
+> +static void baser_write(struct pkvm_protected_reg *region, u64 offset, u=
+64 value)
 > +{
-
-[ ... ]
-
-> +		kvm_nvhe_sym(pkvm_protected_regs)[i].pfn =3D PHYS_PFN(res.start);
-> +		kvm_nvhe_sym(pkvm_protected_regs)[i].cb =3D
-> +			lm_alias(&kvm_nvhe_sym(its_emulate_forward_req));
+> +	struct its_priv_state *its =3D region->priv;
+> +	u32 ctlr =3D readl_relaxed(its->base + GITS_CTLR);
+> +	int baser_idx;
+> +	u64 baser;
+> +
+> +	if ((ctlr & GITS_CTLR_ENABLE) || !(ctlr & GITS_CTLR_QUIESCENT))
+> +		return;
+> +
+> +	baser_idx =3D (offset - GITS_BASER) >> 3;
+> +	baser =3D its->host_state->tables[baser_idx].val;
+> +
+> +	/* Prevent if it tries to change from direct layout to indirect layout =
+*/
+> +	if ((value & GITS_BASER_INDIRECT) !=3D (baser & GITS_BASER_INDIRECT))
+> +		return;
+> +
+> +	/* Don't allow the host to point to new tables or new attributes */
+> +	value &=3D ~(GENMASK_ULL(47, 12) | GENMASK_ULL(9, 0));
+> +	value |=3D (baser & GENMASK_ULL(47, 12)) | (baser & GENMASK_ULL(9, 0));
 
 [Severity: Critical]
-Can this function pointer be safely executed at EL2? The host initializes
-the callback using lm_alias, producing a host linear-map address. When
-the hypervisor later applies kern_hyp_va() to it in
-donate_protected_mmio_regions(), it converts it to a hyp linear-map
-address. However, .hyp.text physical pages are not part of the
-dynamically allocated hyp memory pool, so they are unmapped in the hyp
-linear map. Does jumping to this pointer in handle_host_mmio_trap()
-trigger an Instruction Abort?
+Does this mask correctly restrict the cacheability and shareability attribu=
+tes?
+
+The mask only clears bits 47:12 and 9:0, which leaves Cacheability
+(bits 61:53) and Shareability (bits 11:10) unmasked. This allows the host
+to force the ITS hardware to bypass caches while EL2 accesses the same
+memory via Cacheable mappings, potentially compromising memory coherency
+and EL2 isolation.
+
+The cbaser_write() function similarly fails to mask Cacheability and
+Shareability attributes for the command queue base register.
 
 [Severity: High]
-Regarding how this callback's result is handled in handle_host_mmio_trap(),
-does the trap handler process sign extension for MMIO reads? When the host
-traps to EL2 on a stage-2 data abort caused by a signed read access (like
-LDRSB), the ESR_ELx_SSE bit indicates the destination register should be
-sign-extended. If handle_host_mmio_trap() writes the zero-extended value
-directly into the host context, could this alter functional behavior for
-signed loads?
+Can this mask allow the host to hijack the physical address on 52-bit PA
+systems?
 
-> +		kvm_nvhe_sym(pkvm_protected_regs)[i].nr_pages =3D
-> +			PFN_DOWN(min_t(u64, resource_size(&res), PAGE_ALIGN_DOWN(GITS_TRANSLA=
-TER)));
+For systems with FEAT_LPA, PA[51:48] are stored in bits 51:48 of GITS_BASER.
+Since the mask only covers up to bit 47, the host can supply arbitrary
+values in bits 51:48. This would redirect the ITS table physical address
+by multiples of 256TB to untracked memory, bypassing pKVM stage-2 tracking.
 
-[ ... ]
+[Severity: Critical]
+Could this allow the host to activate unvalidated ITS tables by toggling the
+Valid bit (bit 63)?
+
+Because bit 63 is unmasked, a malicious host could boot with a fabricated PA
+and VALID =3D 0, skipping KVM's validation and memory donation. If the host
+subsequently writes to GITS_BASER with VALID =3D 1, this mask restores the
+fabricated PA and writes VALID =3D 1 to the hardware, granting the ITS
+hardware DMA access to arbitrary physical addresses.
+
+> +
+> +	writeq_relaxed(value, its->base + offset);
+
+[Severity: Critical]
+Could a 32-bit MMIO write to a 64-bit ITS register cause a hypervisor crash
+or state corruption here?
+
+Looking at pkvm_its_emulate_handler() in this file, it permits sub-word
+accesses to 64-bit registers:
+
+    if (reg_handler->access_size < reg_size)
+            return;
+
+If a host issues a 32-bit write to an unaligned offset (e.g.,
+GITS_BASER + 4), this writeq_relaxed() will perform a 64-bit device memory
+access at an unaligned address, triggering an Alignment Fault at EL2. Even
+if aligned, writing a 32-bit payload via a 64-bit writeq_relaxed() will
+overwrite the upper 32 bits of the hardware register with zeros, wiping
+critical fields.
+
+Should the payload be adapted for a read-modify-write, or alignment
+enforced? The cbaser_write() function appears to share this same behavior.
+
+> +}
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260807164322.2970=
-811-2-sebastianene@google.com?part=3D4
+811-2-sebastianene@google.com?part=3D12
