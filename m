@@ -1,60 +1,50 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE2CE3F4125;
-	Fri,  7 Aug 2026 15:42:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 723A0318ECD;
+	Fri,  7 Aug 2026 15:58:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786117349; cv=none; b=nfLgUS/h11D50nodAhpyrccIdF+g7atx9g7RDjKPdqAiwUZVerDMZEKPcKARZD8CRuMcNKeCIWNIgbRRDM/dss9o1rnozDI1Squ+pbFxjcoKDS/yBqIT3TetiQS61dkS4jgVMf3tRKJ6VPSOgAIL2FPnEaacEiOQwnT0g+1HjFA=
+	t=1786118282; cv=none; b=ZdISF+31NgVesm98zk6hOOlJcuzu0CTzDbxmNp6VPllA8hbkl3WhzG3VriHAnPVTcR7rXvnXDeW/zxuMn+mWZMQCRcLHIqy6Hbcz9HfOpjTvQWqoU20n20FtXZC4TRqw83MmGZOVKhLT7xmdYaR/rkElMZeJPybrxXonCsAwvME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786117349; c=relaxed/simple;
-	bh=rCEqMV+uPIsth9n1E1JQC2j8NZuXu4XTM3VkXsyPAZI=;
+	s=arc-20240116; t=1786118282; c=relaxed/simple;
+	bh=yOdMXiznmWMdNlH7BcMN3yp+3ovM4HFNUQAl72cgHW0=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TV0+dAl7+djp5Ttf85ZveIHUTmRD3etrdwuodnCUhfe0cigg9x8ent2xhg2/8BlptETz6DhcbRSGwiDm9rHunwrGNmN/Zyff23ASiXeXLa6ZvJfrEo4chm4yWp+LquUa7c5aQYFEfxgNw8bmIF8WAeBj8Cyv5aqZVF+5Kl/ki2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fbKUZSLA; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=p0J21wVAlHkMCENqwEMpMbIAg3VpWlLX7t+b2DNc7aGlW0V8OqRDYbuv3bzr57htANdiqXuOmDNEoGvFZQ0vp2+Fh2bJQCC6nEKpQrTSLUjRS3r2gYaTEXN9EqFi7Q+ySd3gwU4WwSZgpd2pPcMjwVL37QD/6/Pmuzf4Z29up74=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J6UKsoGK; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fbKUZSLA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B2781F00A3A;
-	Fri,  7 Aug 2026 15:42:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J6UKsoGK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5825A1F000E9;
+	Fri,  7 Aug 2026 15:58:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786117348;
-	bh=E582xZDvt+4gsNcuth6hcv6sLRoTSurZWsRQ5mdDTfE=;
+	s=k20260515; t=1786118281;
+	bh=H9yHLZZwqi/1FJ13kcoLlPaPvDMFshF3bFHXxJWeoYM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=fbKUZSLAEE+K/4fea2CIPBaXkUycKN/2PNjz2wULzKmBffAptjyRqGSYjgA/88OQe
-	 jpMHpaoffMQKgdFT21SSYdbKvrtRUZ2fnyAjlBEWkPvvRb2cj22qlwvaFwCSv/Ljtk
-	 U2XiAytFEKYCBDzxmlOR0KoTjYBpRgOGAQcxP0k8EezCGms6eF1+eI3GfpCPcMRAnh
-	 iDDsZdP2WZu5T8CYTWYTTtLoiYt6eq2x3BP5VU07vwDNiFpxHGQ9KMbbMbGWnnJrq2
-	 nQELkZ+bkhoV1Or0mQDWSTgTipkgII/CVNIDPuMbAVVn3DgPqMKuxuFpQybw1kBOdx
-	 Fc+B6mMV9gsRA==
+	b=J6UKsoGKstA84e+c0qs2R8K8N6MYLVo/ma7x4zN2iCPT0xIVTkXTn7d5DDlEqKSqL
+	 898E/l+cR+vrnVfMVH6cWzxqBfoqmI2qiit3MJsn7v25MZinPp7rviMjOAMlii78RB
+	 p2ktstzxZtkQ6JDgrPIIiX73CF7hKSrDP30EDaP+emO0xAFn4E/D1Sk0r60jFso426
+	 80W6Q5yv5+tZy3A8bdrEgiCQzS1ImfhMHLXRilO95VuOhsV8HezLgMDMdNK/ccOkeZ
+	 1VOuMbcEAUtYgA7Sy9eaL/XRIvHROaOSgqvopvTOH8nPEfNRYhXe5UXgAuW44GB+6d
+	 3VCpsJf6feIig==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wsMiI-0000000DR3X-18fk;
-	Fri, 07 Aug 2026 15:42:26 +0000
-Date: Fri, 07 Aug 2026 16:43:47 +0100
-Message-ID: <87h5l6os0c.wl-maz@kernel.org>
+	id 1wsMxL-0000000DRIq-153k;
+	Fri, 07 Aug 2026 15:57:59 +0000
+Date: Fri, 07 Aug 2026 16:59:21 +0100
+Message-ID: <87fr0pq5uu.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Karl Mehltretter <kmehltretter@gmail.com>
-Cc: Wei-Lin Chang <weilin.chang@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <tabba@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: sashiko-reviews@lists.linux.dev,
 	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	grayhat@foxmail.com
-Subject: Re: [PATCH v3] KVM: arm64: nv: Keep the shadow S2 MMUs at fixed addresses
-In-Reply-To: <anUt9gd8HIwaj9jf@gmail.com>
-References: <20260806192451.10169-1-kmehltretter@gmail.com>
-	<d5svhw3jkjnkucohx2ntwhphemgbtfcmjt2zoyyw6svz56zfrh@z2ziydov5ras>
-	<anUt9gd8HIwaj9jf@gmail.com>
+	Oliver Upton <oupton@kernel.org>
+Subject: Re: [PATCH v2 2/4] KVM: arm64: vgic: Don't leak the SPI array when init is retried
+In-Reply-To: <CA+EHjTwVKkAwWUeMrF_m2-35kyhESqAezOKJy-Pj=vA3qE5Bjw@mail.gmail.com>
+References: <20260807104102.2410744-1-fuad.tabba@linux.dev>
+	<20260807104102.2410744-3-fuad.tabba@linux.dev>
+	<20260807105558.73D701F000E9@smtp.kernel.org>
+	<CA+EHjTwVKkAwWUeMrF_m2-35kyhESqAezOKJy-Pj=vA3qE5Bjw@mail.gmail.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -66,52 +56,51 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kmehltretter@gmail.com, weilin.chang@arm.com, oupton@kernel.org, tabba@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, stable@vger.kernel.org, grayhat@foxmail.com
+X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev, oupton@kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 07 Aug 2026 02:13:17 +0100,
-Karl Mehltretter <kmehltretter@gmail.com> wrote:
+On Fri, 07 Aug 2026 13:15:52 +0100,
+Fuad Tabba <fuad.tabba@linux.dev> wrote:
 > 
-> On Thu, Aug 06, 2026 at 10:54:03PM +0100, Wei-Lin Chang wrote:
-> > 
-> > Hey sorry for nitpicking once more, I actually like v2 more, as this
-> > version splits the error handling to two places. Marc's implementation
-> > [1] is also good, but that requires a twist in kvm_arch_flush_shadow_all().
-> > So I'd personally go with v2 (+my suggestions for it :)), but also fine if
-> > others have other opinions.
-> > 
-> > I also think the comment in kvm_vcpu_init_nested() is worth adjusting
-> > slightly, too.
-> > 
+> On Fri, 7 Aug 2026 at 11:56, <sashiko-bot@kernel.org> wrote:
+> >
+> > Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
 > 
-> No worries, thanks for taking another look.
+> No, thank _you_ Sashiko!
 > 
-> I was following the guidance in include/linux/cleanup.h:
+> >
+> > Pre-existing issues:
+> > - [High] If `vgic_init()` fails after `vgic_v4_init()` succeeds, the VPE array is left allocated but `vgic_initialized` remains false. Userspace can then create additional VCPUs and retry `vgic_init()`. The second `vgic_v4_init()` returns early because the VPE array is already allocated, leaving the new VCPUs without initialized VPE IRQs.
+> ...
+> > When a new VCPU runs, `vgic_v4_load()` calls `irq_set_affinity()` with an uninitialized IRQ (0), which fails and triggers a host `WARN_ON`, causing a host-side denial of service.
 > 
->   the expectation is that usage of "goto" and cleanup helpers is never
->   mixed in the same function.
+> This is a separate fix. But you're right about the state.
+> kvm_arch_vcpu_precreate() only refuses vCPUs once vgic_initialized()
+> is true, so the retry admits one the VPE array does not cover.
 > 
-> But maybe keeping goto is better. I'll wait a bit for others
-> to comment.
+> I don't think a VMM can drive it. kvm_vgic_setup_default_irq_routing()
+> is the only failure after vgic_v4_init(), and it builds its own
+> routing entries, so nothing short of a real -ENOMEM fails it.
+> 
+> The fix I have in mind keeps vgic_v4_init() idempotent, as this patch
+> is: return early only while the vCPU count is unchanged, rebuild when
+> it grew. That needs its_free_vcpu_irqs() to clear vm->domain and
+> vm->fwnode first, which it does not today, so its_alloc_vcpu_irqs()
+> can reach its error path with a domain it has already removed.
+> 
+> Let me think about it some more and I'll send something once others
+> have had a chance to digest this as well.
 
-The version I proposed in response to your first version had no goto,
-and trivial error handling. Can we *please* stop the bike shedding and
-settle on the simplest possible fix? Or *any* fix at all?
+I don't think we should grow anything opportunistically.
 
-> 
-> For the comment, I propose replacing the current text with:
-> 
-> 	/*
-> 	 * If allocating an MMU object fails, keep the VNCR page alive so
-> 	 * that userspace can retry vCPU initialisation without affecting
-> 	 * the VM.
-> 	 */
-> 
-> Is that the adjustment you had in mind?
+The GICv4 code expects the number of vcpus to be fixed when first
+initialised, and if we must fail it one way or another, then
+everything should be torn down and reinitialised from scratch.
 
-I don't think we need to change any comment. If anything, it should be
-deleted altogether. This is a security fix, not a literary exercise.
+I really don't want to have to think about the intermediate state.
+
+Thanks,
 
 	M.
 
