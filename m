@@ -1,55 +1,55 @@
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
+Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com [209.85.208.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4257147ACE0
-	for <kvmarm@lists.linux.dev>; Fri,  7 Aug 2026 16:43:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 618FC47CA65
+	for <kvmarm@lists.linux.dev>; Fri,  7 Aug 2026 16:43:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786121038; cv=none; b=TJPpwYmSrZt9x7FbcXyTOdBt/qls3hOjvD7PeMxJJboESUcLzmM/oSgluTqXu09v065N6UVQSpS0kpL7gr0M6WbTa0+fO9JJ7QxEXz4MEW89JYR0Gdufl9U9fW1mr7qp7uMKYALQ9cKSIGr9DEaYjhPijCcZ/PXNVFO6AqIstC0=
+	t=1786121041; cv=none; b=NSJSO4Upd35NkXxIi0z7tO2YYaLnSuSH5izvENSNAmxGwQnYRcXPZ0Tt3X1n+b4jm1b+o4bScauUdBVmBhE4HRuG0ECQ/8T8b1Pbi6b4s4ZiUSYyzDeqEa+N8Ahqw831kJ0kY+hf7Vvohpo19wft4B1F1ME20wnG1Wno5ikEWAo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786121038; c=relaxed/simple;
-	bh=STYl0ghz5J/YkTbmptnKIYNWYygu2v7YgYHI7YW7274=;
+	s=arc-20240116; t=1786121041; c=relaxed/simple;
+	bh=WJpZQ0SdOrH7RGvEvyDpMPhGUMqMI5kRtv8KfcRLpcY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=phbE8vz7V1GRPSDPwh0NsGvW3bQPSnyjGrRK+5Dvgp/ivqVjvm8gjhX73lmHvB5B+YEK8uPaMif6GTIWqmdSBQsQGz3koX3HuHVgTVjSO10up36TG66qLjQBH/nTdSrdzFffwybw1T6xnOl/81dXniALRraoVw/g7A9B1mdwMfk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IsQGPit3; arc=none smtp.client-ip=209.85.128.69
+	 To:Cc:Content-Type; b=cxEvXwbI8THv/27SJby64hBNHAURMIuOOFuzuToS6FH3OweIFSdXTkH0OTOimjdQWgsonvg8ynmibPDEJi+75PfhNVFR2urYhiJPrqP4NripLgJtkpMY5d4xzgvzaAFOL3Y0n0gL4T5/nCDs7NLmA9xNXpjRG/aRtBap75VXNBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cSMASzM7; arc=none smtp.client-ip=209.85.208.197
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IsQGPit3"
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-49571407d1dso22488775e9.0
-        for <kvmarm@lists.linux.dev>; Fri, 07 Aug 2026 09:43:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cSMASzM7"
+Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-39f44d8edb6so13439381fa.3
+        for <kvmarm@lists.linux.dev>; Fri, 07 Aug 2026 09:43:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1786121033; x=1786725833; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1786121035; x=1786725835; darn=lists.linux.dev;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=pEop5HcfowkDeNq3FT2Q1c6RiGCFxpFvlXH/k0dA9E8=;
-        b=IsQGPit3Tn1KAYQizfwwfVPAvJz6+Q6cOdrY2CFjZltXcR2YNK9El2O5qnYLG+yZCW
-         oGKRqOSP8dY8YUR9Im/mbgm81Kv9QIyt6C+neM0GEu4j7XrDqbw18pkNEjUOYBJbE8Cf
-         0lhal4IY8NoBw/m3CJXDngG5pEycw6ISvgnPVkiP6zvS0jv/oViu2BxQHljkoXvSDRPT
-         4hDkt9bFWdEu304XYywPUD0ehHmMP1rADc4KyD2GyiFxN28vGqd92gaCAJtcH3VotJ25
-         LkF+LYV+5+G0QqcXp2I7sbD5/2gWVPqQoaJmXIoiv3eX3FFHJaQjd7hALQc7HqPLB3/7
-         PiIQ==
+        bh=7TXLJIzu0sdUTbcYifBsweWW0qiwt6RC0AmUjCHWXcg=;
+        b=cSMASzM7c0+uXiQdQIwGKmSqLxX+y+z1iqYNUhdrn0YfB7dL2nesWHWlGE6LvY6b+q
+         tiM8MOc4o6I15qv2QA/eE3IbY6JhcW18N0mfFJntWW7wrNgiJdAAZ5z70ff5jhKNwvMX
+         QfTajyIwdUhtacA3Gy+jmSwTjVZ3nHVHekE+9hqismQXTPx7DObzhtWPVtQV4/jOVogB
+         da6OE+wfki/Qblm1kydfdlQNrRrX4N8lFWl1QfDJxwNWMQzEZes2I2MLPk8SV2SXqphm
+         hc3HTasJEYgUTbNrvgqVlkM+ctXMRD+9/XVMPrdeqxNA8uHdgF7VvPEKQK3pF7INNMPs
+         TLyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786121033; x=1786725833;
+        d=1e100.net; s=20251104; t=1786121035; x=1786725835;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=pEop5HcfowkDeNq3FT2Q1c6RiGCFxpFvlXH/k0dA9E8=;
-        b=jY6Vjm/+H0esy+gTywjSeIfJGrRp/Mesik8/Zfxwd6I93+qImzskPIIS4gzyVpEAHB
-         r0l+4a55nOEUB3dQIKaiqt9nEaMs1f+KSuUQQ6nDHe8hiWB95i8qKPH6pI2U28eePRBD
-         Gk/rPkwkh7tZpWk1ulNh8OqR2ZcOeG4wZbRJe1oU+8h/amhhljxDiTK9eClp9sVmby9I
-         UJFWSmnf3PeAYRIHkjt+0dle6JuK/yKx8O5n99nC8zRt3Dqi0jZuOMWyNPY+8OTB/pRW
-         ZFDjTdyMDH7lss1DQvV9IUmDJCNAHa5Q1LagSdoGRMSoAyQ7KJ8RttuH0tX/OT1hALN1
-         QNsQ==
-X-Gm-Message-State: AOJu0YxbwfYEW+0kVo9+e9tekXftgTN7C9/bFuHg438JQV9K8ezV93xN
-	hrKAwgILQbaRMKoLEbL71FgmIRZCq4+ydl9gTkdE+MOC1D0Iumqj/p2p5J2iCg7MD2yKnO8KZc7
-	ujCISBIWPC0UZRLZr/dAyUrevDTbecw==
-X-Received: from wmbhi12.prod.google.com ([2002:a05:600c:534c:b0:498:124b:1aa0])
+        bh=7TXLJIzu0sdUTbcYifBsweWW0qiwt6RC0AmUjCHWXcg=;
+        b=PTmUXmwdni7t/sNy9KKJV0Zn0DQxd6M6pTZeiYxcsdpHcdwMTCHvUcbGn8brCAZ25+
+         tUMCuJdjbRgMl8qaYeX7vKu/bx4sjfPdzjfV0LAuLZgVEkxuFb1hHS1+63I8M+RTp3gn
+         3RKQLeUtKYqWhLBVUgSHUBuFb+orW/9Wq9XfLsgMOCq8jpsO6wGHC6R1jWRFnNASDMg2
+         5Ufym+Xjt0q4GWrAM9yF7A19wSdI1BOkPqlk/x4q/AoDuVqhuf083Prmk/O28r+U6Uge
+         CehVM/11nCMlj5yDjGXmXEyGTdNMCL+s2ax7/OhjVo8IziiHrC1svbqlsOTgSuejSuPo
+         ZWdA==
+X-Gm-Message-State: AOJu0YxsNFp9hzI1C8Dite86GQXL83viGS8cq+W4Bs8pshE/pQ7UbShb
+	tUaRFtOTJnQ2CMdWObpaTT7/qgcQ/+rXdLWElC+uz1+avoWXHUUfqQcG4SHBSBoNeKj6iNGX9qs
+	dWttqXdGuK0ynBTyF/Q+ZCJTb6Mxg1w==
+X-Received: from ljik18.prod.google.com ([2002:a2e:8892:0:b0:397:f415:3317])
  (user=sebastianene job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:2e54:b0:495:4e1d:82df with SMTP id 5b1f17b1804b1-4994e7c1445mr233498895e9.10.1786121033123;
- Fri, 07 Aug 2026 09:43:53 -0700 (PDT)
-Date: Fri,  7 Aug 2026 16:43:20 +0000
+ 2002:a2e:bc0d:0:b0:39b:f64:1af3 with SMTP id 38308e7fff4ca-39fe56728b1mr2004231fa.8.1786121034668;
+ Fri, 07 Aug 2026 09:43:54 -0700 (PDT)
+Date: Fri,  7 Aug 2026 16:43:21 +0000
 In-Reply-To: <20260807164322.2970811-2-sebastianene@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20260807164322.2970811-2-sebastianene@google.com>
 X-Mailer: git-send-email 2.55.0.654.g21b8a5bc05-goog
-Message-ID: <20260807164322.2970811-12-sebastianene@google.com>
-Subject: [PATCH v2 10/13] KVM: arm64: Restrict host updates to GITS_CTLR
+Message-ID: <20260807164322.2970811-13-sebastianene@google.com>
+Subject: [PATCH v2 11/13] KVM: arm64: Prevent the host from specifying a
+ different command queue
 From: Sebastian Ene <sebastianene@google.com>
 To: catalin.marinas@arm.com, fuad.tabba@linux.dev, joey.gouly@arm.com, 
 	mark.rutland@arm.com, maz@kernel.org, oupton@kernel.org, rananta@google.com, 
@@ -73,51 +74,59 @@ Cc: kvmarm@lists.linux.dev, android-kvm@google.com, bgrzesik@google.com,
 	zenghui.yu@linux.dev
 Content-Type: text/plain; charset="UTF-8"
 
-Prevent unpredictable hardware behavior when the host tries to enable
-the ITS while it is not in quiescent state.
+Don't let a malicious host re-program the command queue register with a
+different address and size to bypass the commands sanitization.
+Prevent unpredictable hardware behavior and restrict updates to the
+GITS_CBASER while the ITS is enabled or not in a quiescent state.
 
 Signed-off-by: Sebastian Ene <sebastianene@google.com>
 ---
- arch/arm64/kvm/hyp/nvhe/its_emulate.c | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+ arch/arm64/kvm/hyp/nvhe/its_emulate.c | 32 +++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
 
 diff --git a/arch/arm64/kvm/hyp/nvhe/its_emulate.c b/arch/arm64/kvm/hyp/nvhe/its_emulate.c
-index 5629e2a070df..b9b71aa18d48 100644
+index b9b71aa18d48..97cfa31d90d1 100644
 --- a/arch/arm64/kvm/hyp/nvhe/its_emulate.c
 +++ b/arch/arm64/kvm/hyp/nvhe/its_emulate.c
-@@ -403,8 +403,35 @@ static void cwriter_read(struct pkvm_protected_reg *region, u64 offset, u64 *rea
- 	*read = readq_relaxed(its->base + GITS_CWRITER);
+@@ -429,9 +429,41 @@ static void ctlr_write(struct pkvm_protected_reg *region, u64 offset, u64 value)
+ 	writel_relaxed(value, its->base + GITS_CTLR);
  }
  
-+static void ctlr_read(struct pkvm_protected_reg *region, u64 offset, u64 *read)
++static void cbaser_write(struct pkvm_protected_reg *region, u64 offset, u64 value)
 +{
 +	struct its_priv_state *its = region->priv;
-+	*read = readl_relaxed(its->base + GITS_CTLR);
-+}
-+
-+static void ctlr_write(struct pkvm_protected_reg *region, u64 offset, u64 value)
-+{
-+	struct its_priv_state *its = region->priv;
-+	bool is_quiescent, is_enabled;
-+	u32 ctlr;
++	int num_pages;
++	u64 ctlr;
 +
 +	ctlr = readl_relaxed(its->base + GITS_CTLR);
-+	is_quiescent = !!(ctlr & GITS_CTLR_QUIESCENT);
-+	is_enabled = !!(ctlr & GITS_CTLR_ENABLE);
-+
-+	/*
-+	 * If it's disabled and not in quiescent state and it tries to enable
-+	 * it, bail out.
-+	 */
-+	if (!is_enabled && (value & GITS_CTLR_ENABLE) && !is_quiescent)
++	if ((ctlr & GITS_CTLR_ENABLE) || !(ctlr & GITS_CTLR_QUIESCENT))
 +		return;
 +
-+	writel_relaxed(value, its->base + GITS_CTLR);
++	num_pages = its->host_state->cmdq_len / SZ_4K;
++
++	/* Don't let the host program a different command queue */
++	value &= ~(GENMASK(7, 0) | GENMASK_ULL(51, 12));
++	value |= (num_pages - 1) & GENMASK(7, 0);
++	value |= __hyp_pa(its->cmd_original) & GENMASK_ULL(51, 12);
++	its->needs_flush = (value & GITS_CBASER_SHAREABILITY_MASK) != GITS_CBASER_InnerShareable;
++
++	writeq_relaxed(value, its->base + GITS_CBASER);
++
++	/* Restart the CMDQ to read from 0 */
++	its->cmd_offset = 0;
++	writeq_relaxed(0, its->base + GITS_CWRITER);
++}
++
++static void cbaser_read(struct pkvm_protected_reg *region, u64 offset, u64 *read)
++{
++	struct its_priv_state *its = region->priv;
++	*read = readq_relaxed(its->base + GITS_CBASER);
 +}
 +
  static struct its_handler its_handlers[] = {
  	ITS_HANDLER(GITS_CWRITER, sizeof(u64), cwriter_write, cwriter_read),
-+	ITS_HANDLER(GITS_CTLR, sizeof(u32), ctlr_write, ctlr_read),
+ 	ITS_HANDLER(GITS_CTLR, sizeof(u32), ctlr_write, ctlr_read),
++	ITS_HANDLER(GITS_CBASER, sizeof(u64), cbaser_write, cbaser_read),
  	{},
  };
  
