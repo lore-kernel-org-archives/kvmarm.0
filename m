@@ -1,131 +1,164 @@
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 984BA38D3ED
-	for <kvmarm@lists.linux.dev>; Fri,  7 Aug 2026 17:08:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59CE538D3ED
+	for <kvmarm@lists.linux.dev>; Fri,  7 Aug 2026 17:09:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786122504; cv=none; b=bysHnxGeK1n51zrQzz8dUMr7Em9qJCKuRsLIkRxGvRoglWFDYVS0XlurzeqYKxD2OZ2HPDiE8unyHgK3rnjjp75VUwxTzGVHsErT0kgsqwoj1vPvjdJ9ASlz3DuRlOWTfYqaEN9BgsyQFbwStn+qZMwQGGP4Fo3cLqPJVR1GauY=
+	t=1786122553; cv=none; b=gNPOqeB97NR5z2RtApFcZvLYeA1oMliQNHuBiyNt2BR1QMrXSm+JpIEJxxeHiJMU2icDR6WixBxvsbW6kz6bVPQjjME/9mvIHjxndi8zfjp9aDsUs+H+FWEXT0aa3STDlB2SOAkmwsbcGMw0kHac8w0VYRsdy5BkV4RlDeT7wnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786122504; c=relaxed/simple;
-	bh=PEyv/ZNi02HaucwD0lzLJLCQOah9Kpc2cmwW88odXGA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oQD1Y5jChvP4HkdjJsNIG+ltd8ea+L3cncQyHL8J6zCgsVYHLR2FfbMMaG1HhNpEQelrJVVj3HvY+kxDolN4NzLOylFOHtVmmL8r+p22oTKpZDO2INv+sEKo+N3FF08kkfb3Sk152l9/Q55l7K9j7tVgCYr6iV0o4VEIhwt911k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QkFssbW3; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1786122553; c=relaxed/simple;
+	bh=f3wgD0s6WiCfO58wgvrs+eRA0YJsQI71MxxJn/mXyns=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=QrWK49YpxNJ4Q1PADS3BMGcqMXXSZKZLxUz42p+qgL7r7/GNzeTGiB6OvkftC4kGjCaLISdexJIM13yuknXvfSFyiUjGokoCMGgDnAj0aGQUR19jP6F22Q7IGXdAhFJEjJf+8J1W6KldUaLx1zVGGdNEEow9RADWlCqb1/1eXI8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fzf0W9nN; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QkFssbW3"
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4955de8797cso25660385e9.3
-        for <kvmarm@lists.linux.dev>; Fri, 07 Aug 2026 10:08:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1786122501; x=1786727301; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=iaOeMTZOYIaS16knxOG50vS1TNGyqbn7Zjc+qZ37u3k=;
-        b=QkFssbW3S/mLgUXGqTFfBfIz0MdRIX9U6ndLYVXHVXw7RctxcPNqXBkP9VBMr3AMOO
-         qqgSQQd52AL2ZBFl0eQrx5VC/eBRBuOI75OxAi4CecWCBm8tPhNrJIuZCVAUnNTOb9hi
-         uTG9NIfTHxKHxmEGnHD/gK6y5HIO4goq9DC83W6ZGGcvPqRNQc63BtnVM5N3x25Swxig
-         RYystAV8MG7xRc0m6tPYbZXwmCg+sPzFHYj0ECAk+jflkdWu8FCFqweRKkK+81Rgzwf3
-         L+jwdmzohlrRqcum9u622squ6ThsAwL1bRh21G4JeWiTWeko1q7T/3zjISTqggnojy6D
-         l4QA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786122501; x=1786727301;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=iaOeMTZOYIaS16knxOG50vS1TNGyqbn7Zjc+qZ37u3k=;
-        b=mIxKxB54pnuEoKyJWVZCEvi4l4dTOQDEX3Pg978XcrsbKOGQqkLaWMNnjYUZILDEKP
-         CqLMjLdsX14k0Z1eJY6YJq7+4lRprSomfWfIqT810Y7budeaAaZ/2Evd2D7H7LKUsVfv
-         xPYxgSs2aVwVBY03LMsJa4tmuKlknt6Mm0zirrH9QbI56QU6xyYVV/CvHiovZ1uTWPDI
-         GYBbYI9N43HiY8lh0RdTnZwfnuBeJAtwMitxQF+iBrLDXkFsRjn7khSjB1nhMzf3ty37
-         TXs8plI7UdtfEP0uaqFZSqujxKve8fqGmkIEOJVCnTYEXOzc79XEl+oGK7OAjRSG3zrp
-         RbUA==
-X-Forwarded-Encrypted: i=1; AHgh+RpX+ptLIYBO1Qx+PuE1OVXccp3Inw8NxHE8Dvf5gG+ZDFuhzsfPo45cJ91bX+OjZEaCkG7HE+U=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yw3DtW238zdawaIn75yNvYympWf/Ak+nbY4aDChT6jJK4ozQZiT
-	fwiLBagwJkWb6jzDhoNJgdfvB/moC+/FBC2nbxzJ3fFpWZKV+BtvwvrmgCy4mceG
-X-Gm-Gg: AR+sD123X7Z5LKQLq9JEtt/8qx1EFIhGO5HpUR3LRQqjVyEpd77e+R5y2j6n6p54VLr
-	s7VcsYCVDqOSttiN5f5xm/QrxweCDxhLMqUzsUmLlbNBQeA/zEEI35npeYiZEz+9BWCEbB7f28r
-	mAMUfb0cR/zTDut0wrBeMARfkA0t8yB3NWK/S3Oh7WpT3DKwJLlFFbpNNN2Dud390gOgPtfcQ7j
-	Ytjl0EM3qTgcY9UU+7bNqPBDJi9xP1WK4NhJr3WbwBmWZAcsDdTL4lmosmPoZqn93X9ZISAjEgR
-	LThXTl2aJ6a8jADNM/VUQtS3nBgLBoWcEDxE/Hn3AZQnkvUq1ozfWxNQqLW7UoYVBsXaO382r5t
-	vjzK0xItSfwlMo0pA/ADCo44beLdHVkA6DrVuylu3hGkFPQejePESJ40Q3ENSeG03CGixuk2bb9
-	7Cv6gNINJ7r43GtD3jZjAYL9Skqn8e1rrQ5d+qUotFHjYs7I7bZLns1TJSptSTIKvWewhpFX4pe
-	O/fIyPRPbJEIWFOVlBgdWqLWhLjuHayElBgtOevRbJU6a1oDGqF7qf41ySJiKR5RZq+EXU5fijF
-	8XJDClB+JUofDwm5+AyTRJ51tfN8PUUTcYcfI6XAc6zC0/4aacdn/Q6UgQReVfNxJQ2VThUPO1/
-	jaXNdfv8JrnLspd78hj4=
-X-Received: by 2002:a05:600c:b85:b0:496:c93d:e2f with SMTP id 5b1f17b1804b1-4995e0dff0amr73285775e9.15.1786122500534;
-        Fri, 07 Aug 2026 10:08:20 -0700 (PDT)
-Received: from MacBook-Pro-von-Karl.localdomain (dynamic-2a02-3100-b105-e101-a437-493a-4de9-ee3e.310.pool.telefonica.de. [2a02:3100:b105:e101:a437:493a:4de9:ee3e])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4995ea27ef0sm60747585e9.9.2026.08.07.10.08.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Aug 2026 10:08:19 -0700 (PDT)
-Date: Fri, 7 Aug 2026 19:08:17 +0200
-From: Karl Mehltretter <kmehltretter@gmail.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>, Fuad Tabba <tabba@google.com>, 
-	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org
-Subject: Re: [PATCH 1/2] KVM: arm64: nv: Allocate the shadow S2 MMUs
- individually
-Message-ID: <anYNTW2e3HalTqTk@gmail.com>
-References: <20260803224405.41468-1-kmehltretter@gmail.com>
- <86mrv2arf2.wl-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fzf0W9nN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6EAF1F000E9;
+	Fri,  7 Aug 2026 17:09:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1786122552;
+	bh=9faBLOj3FRHWHCRyKgKrFDuTzBqIO2rvymgzf2UFwLc=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=fzf0W9nNunzNqy2HjX52+JvHs1gi7dPoYSTQPIgTDJy6U0YVwrIqDkUorXjDGhuUD
+	 917JfA1p5LXVMLEqAnv12VZO4u6nW5QF18hKr5oYOBmpH46SoZzyqwsLnhrJ4qx6Sc
+	 Wo7CJEQl+mdpm/G9ZOD7Avy9/Xo1wqVMTRKSYEp2aLnH2rua7GqpHr4Tg2dwQeggLk
+	 w0p2jro8/1iwuAxjPUiLiJVGGK20LREca31pZSwIFB4vwrptz7H0XSE9kRQcgX6vN/
+	 /tGHCHGv0sU4PvTAlqYshhJloG5NYb6or0vSsbLxC2nYgLvRQ+vHLRMJiP1zqffJsc
+	 OY1Pmmq3TUfIQ==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v2 04/13] KVM: Parse the device tree and register the
+ ITS region with pKVM
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Sebastian Ene" <sebastianene@google.com>
+Cc: "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev
+In-Reply-To: <20260807164322.2970811-6-sebastianene@google.com>
+References: <20260807164322.2970811-2-sebastianene@google.com>
+ <20260807164322.2970811-6-sebastianene@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 07 Aug 2026 17:09:11 +0000
+Message-Id: <20260807170911.B6EAF1F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86mrv2arf2.wl-maz@kernel.org>
 
-On Tue, Aug 04, 2026 at 03:31:13PM +0100, Marc Zyngier wrote:
-> See the hack below that seems to work OK.
-> 
+Thank you for your contribution! Sashiko AI review found 4 potential issue(=
+s) to consider:
+- [Critical] The function pointer for the MMIO emulator passed to EL2 point=
+s to unmapped/NX memory, causing an Instruction Abort.
+- [High] MMIO emulation in `its_emulate_forward_req` double-swaps on Big En=
+dian kernels by using `readX_relaxed` and `writeX_relaxed`.
+- [High] pKVM incorrectly maps and accesses MMIO devices using the hypervis=
+or's linear map (`__hyp_va()`) rather than a private VA range.
+- [High] handle_host_mmio_trap ignores the ESR_ELx_SSE (Sign Extend) bit fo=
+r MMIO reads, returning zero-extended values for signed loads.
+--
 
-Hi Marc,
+--- Patch [4]: [PATCH v2 04/13] KVM: Parse the device tree and register the=
+ ITS region with pKVM ---
+commit 6f98f20a817e227941fab67881459ac609810480
+Author: Sebastian Ene <sebastianene@google.com>
 
-Since error handling has come up again, I should clarify why
-v2 did not use this sketch verbatim.
+KVM: Parse the device tree and register the ITS region with pKVM
 
-> -	kvm_init_nested(kvm);
-> +	ret = kvm_init_nested(kvm);
-> +	if (ret)
-> +		return ret;
->  
->  	ret = kvm_share_hyp(kvm, kvm + 1);
->  	if (ret)
+Identify the ITS base address from the device tree and store it in the
+pkvm_protected_regs array so that it will be unmapped from the host
+address space. Register a callback to forward all the MMIO requests to
+the device to prevent breaking ITS functionality.
 
-Once kvm_init_nested() has allocated the pointer table, failure in
-kvm_share_hyp() or any subsequent VM initialisation step leaks that
-table.
+> diff --git a/arch/arm64/kvm/hyp/nvhe/its_emulate.c b/arch/arm64/kvm/hyp/n=
+vhe/its_emulate.c
+> new file mode 100644
+> index 0000000000000..63a42f520ed25
+> --- /dev/null
+> +++ b/arch/arm64/kvm/hyp/nvhe/its_emulate.c
+> @@ -0,0 +1,37 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +
+> +#include <asm/kvm_pkvm.h>
+> +#include <nvhe/mem_protect.h>
+> +
+> +void its_emulate_forward_req(struct pkvm_protected_reg *region, u64 offs=
+et, bool write, u64 *reg,
+> +			     u8 reg_size)
+> +{
+> +	void __iomem *addr =3D __hyp_va(PFN_PHYS(region->pfn) + offset);
 
-v2 therefore calls kvm_init_nested() after the earlier initialisation
-steps have succeeded and frees the table if a later step in
-kvm_arch_init_vm() fails.
+[Severity: High]
+Does using __hyp_va() here work for MMIO addresses? The __hyp_va() macro
+subtracts hyp_physvirt_offset, which is based on RAM physical addresses.
+Since MMIO regions often reside at lower physical addresses than RAM,
+wouldn't this underflow and produce a virtual address with the top bits set,
+leading to a Translation Fault? This same issue seems to be present in
+__pkvm_host_donate_hyp_mmio() where it populates the page tables.
 
-> +		for (int i = 0; !ret && i < S2_MMU_PER_VCPU; i++)
-> +			ret = init_nested_s2_mmu(kvm, &tmp[i]);
+> +
+> +	switch (reg_size) {
+> +	case 1:
+> +		if (!write)
+> +			*reg =3D readb_relaxed(addr);
+> +		else
+> +			writeb_relaxed(*reg, addr);
 
-> +		if (ret) {
-> +			for (int i = 0; i < S2_MMU_PER_VCPU; i++)
-> +				kvm_free_stage2_pgd(&tmp[i]);
+[Severity: High]
+Will these relaxed accessors cause a double-swap on Big Endian kernels?
+When the host traps to EL2 on an MMIO access, the CPU register already
+contains the exact data the host intended to write (swapped to Little
+Endian by the host driver's writel). Using writeb_relaxed and similar
+helpers will apply cpu_to_le* again. Should this use the __raw_read*
+and __raw_write* accessors to preserve the trapped register's exact bit
+representation?
 
-This cleanup includes the entry whose initialisation failed and any
-entries whose initialisation was never attempted. An uninitialised
-entry has no valid mmu->arch, but kvm_free_stage2_pgd() immediately
-derives kvm from mmu->arch before checking mmu->pgt. It can therefore
-dereference an invalid pointer.
+> +		break;
 
-This is why v2 tracks successfully initialised MMUs and frees only
-those entries.
+[ ... ]
 
-Thanks,
-Karl
+> diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+> index 053e4f733e4be..5e80da18f3120 100644
+> --- a/arch/arm64/kvm/pkvm.c
+> +++ b/arch/arm64/kvm/pkvm.c
+
+[ ... ]
+
+> @@ -39,6 +44,47 @@ static int __init register_memblock_regions(void)
+> =20
+> +static int __init register_its_emulated_region(void)
+> +{
+
+[ ... ]
+
+> +		kvm_nvhe_sym(pkvm_protected_regs)[i].pfn =3D PHYS_PFN(res.start);
+> +		kvm_nvhe_sym(pkvm_protected_regs)[i].cb =3D
+> +			lm_alias(&kvm_nvhe_sym(its_emulate_forward_req));
+
+[Severity: Critical]
+Can this function pointer be safely executed at EL2? The host initializes
+the callback using lm_alias, producing a host linear-map address. When
+the hypervisor later applies kern_hyp_va() to it in
+donate_protected_mmio_regions(), it converts it to a hyp linear-map
+address. However, .hyp.text physical pages are not part of the
+dynamically allocated hyp memory pool, so they are unmapped in the hyp
+linear map. Does jumping to this pointer in handle_host_mmio_trap()
+trigger an Instruction Abort?
+
+[Severity: High]
+Regarding how this callback's result is handled in handle_host_mmio_trap(),
+does the trap handler process sign extension for MMIO reads? When the host
+traps to EL2 on a stage-2 data abort caused by a signed read access (like
+LDRSB), the ESR_ELx_SSE bit indicates the destination register should be
+sign-extended. If handle_host_mmio_trap() writes the zero-extended value
+directly into the host context, could this alter functional behavior for
+signed loads?
+
+> +		kvm_nvhe_sym(pkvm_protected_regs)[i].nr_pages =3D
+> +			PFN_DOWN(min_t(u64, resource_size(&res), PAGE_ALIGN_DOWN(GITS_TRANSLA=
+TER)));
+
+[ ... ]
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260807164322.2970=
+811-2-sebastianene@google.com?part=3D4
