@@ -1,56 +1,58 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 264CE3A83A9;
-	Sat,  8 Aug 2026 08:09:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 594C92D1F44;
+	Sat,  8 Aug 2026 08:41:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786176549; cv=none; b=u88EP7eBMflRO6cdhNGw3hL/RLnekPvUa2f6HHItHHSGnYzY8ZWmdHTXGv5oz1HNXmKfPSw2JDoX0Q458CmNKx7mtMH46sgpF/CyDs4p4KDsiBiNaobi+VKAFvlztcAfXK8cv4SK8yqoGdzDYkycuwd8qoUAV1HoTZTjo8jQegI=
+	t=1786178504; cv=none; b=X8Em2oSeBNKqoH71kiSJpaWGeymHOpdwHyBVJfpl9fQ6xNhviPgzHhM6CMgEjzj11jOW6ykZqyep2Ag439XK1NNFiIVVkV5yfdZ5SEq6UC0fhz89dl+9vaOpfXYt7SQJv3rdyxiu5ReFao3myJtM+4diJ1e5u5XXtrHs3K4NKVI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786176549; c=relaxed/simple;
-	bh=EEtL0ADvMgRx6jV9x6sIrhuX4M2qKYjaS2dS6bZhE9Y=;
+	s=arc-20240116; t=1786178504; c=relaxed/simple;
+	bh=1+ccyQHLTyXoTOlZONVYdoSGXrIL+vULPwDfgdkoM28=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ru9NeH49iMvS8UBl31dfmel19BgoAqho8LWFgC84vs0wMEmvCq3H/INwMYT8Tf7eZh9iZaA2macunHv+IonE1uYZ4+7eD9FJ3yLIW7wmBGt5UPufbPxSjo7CtmH/Jy9CA6h6p1G9IYsXgmp/1WuKs8rLtUq3Gan5b4LZaaxyeLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TokhsMIs; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=R6UsNLxDzgWvSapOS5FKtgd4n25TWBAThF8BxQ+MdcHX6zSshnuDaS0IseIl9YZHYAwrWL8gr4OS1NLBbA56O5UGRPNPV9bLQXhPxOoJfsuemx6XH2Hl2bMJeOHAKRjhLIYuNx7fgDSw4lD/fQB0AJiAlSxpIglFV+4wanBTzB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AgrKIWaf; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TokhsMIs"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4FA11F000E9;
-	Sat,  8 Aug 2026 08:09:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AgrKIWaf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 899111F000E9;
+	Sat,  8 Aug 2026 08:41:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786176547;
-	bh=XtFxe7lTSkyr2Cg+Wnox9DL2CC/sLeXegVl9950TLyA=;
+	s=k20260515; t=1786178502;
+	bh=oYbHM1vJ7ZgROmF2e4fVFb9BfOOu7HRtmQzEsZWunto=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=TokhsMIsIsjXaK+crrDB0+vAhOAD0Pv519ZF1AofRnBHHlLlww6Pk7Ug8gQnkSVJh
-	 a29OUCpEEDGqDnXn67E/vQ+VSPSIQvvwHEDUWtx52Mmz9/piF3DEVQYAAjSrFXiyJc
-	 NnlLXtuW7ivW4PJ/fm4tJFiioSUY62GA+6XVKXTBgxT2aguMwZuhJIUUJ66XmZDeGl
-	 EpCVgqso62YzhvRxxoLiKaM6dTWXxdyTq+SATnDajxPodNgaimAKyxkntJ4tNI6m5Z
-	 7/cD+wOQM/LwSH6gGtCMFnVoWLe2pmz2enl9EO26WkDoPmz5XBxY19Xp7J7RgGS/rM
-	 6+CYcytLv69Ww==
+	b=AgrKIWafk6nNePE4pN+KbC1IIY/La+oPxeIqnbIvh29knKD0FFzwxM7mG98fctUjJ
+	 v58GVlLYonD61hoQpRcL6nFccRYUZ5afpCBqKeVmAy/br6WdT2sY14Rd6BtzAkvQfW
+	 QcF6phEZVXfNPecvXzO49Hb0DGP0crcnRundxCGekAqPiXifgIIphaOeEfF+jHcqZo
+	 3IW/C0+/zlX1IncIGcdUK/42PimVyzq0PlLLX95KOyvOV6bEyc8JnaNjqcd9KsRoZk
+	 THL3f6jCNUHEqk8kkb8Ab2KKLbF8kHg9dq46q469ht0knuaphs18mgD9bejzsyTKBV
+	 FgCr4SxqSo7OA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wsc77-0000000DcX6-1h5a;
-	Sat, 08 Aug 2026 08:09:05 +0000
-Date: Sat, 08 Aug 2026 09:10:29 +0100
-Message-ID: <87ecg9owwa.wl-maz@kernel.org>
+	id 1wscce-0000000Dcrl-1Czv;
+	Sat, 08 Aug 2026 08:41:40 +0000
+Date: Sat, 08 Aug 2026 09:43:04 +0100
+Message-ID: <87cxvtovdz.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Will Deacon <will@kernel.org>,
-	Sascha Bischoff <sascha.bischoff@arm.com>,
-	Sebastian Ene <sebastianene@google.com>,
-	kvmarm@lists.linux.dev,
+To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 3/4] KVM: arm64: vgic-its: Don't save collections the table cannot hold
-In-Reply-To: <20260807104102.2410744-4-fuad.tabba@linux.dev>
-References: <20260807104102.2410744-1-fuad.tabba@linux.dev>
-	<20260807104102.2410744-4-fuad.tabba@linux.dev>
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Hyunwoo Kim <imv4bel@gmail.com>,
+	Yao Yuan <yaoyuan@linux.alibaba.com>,
+	stable@vger.kernel.org
+Subject: Re: [PATCH v2 1/8] KVM: arm64: Remove VM-wide VNCR mapping counter
+In-Reply-To: <anXmBQRdORVwl6Rp@lucifer>
+References: <20260806091026.620700-1-maz@kernel.org>
+	<20260806091026.620700-2-maz@kernel.org>
+	<anXmBQRdORVwl6Rp@lucifer>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -62,36 +64,188 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, will@kernel.org, sascha.bischoff@arm.com, sebastianene@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: ljs@kernel.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, fuad.tabba@linux.dev, imv4bel@gmail.com, yaoyuan@linux.alibaba.com, stable@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 07 Aug 2026 11:41:01 +0100,
-Fuad Tabba <fuad.tabba@linux.dev> wrote:
+On Fri, 07 Aug 2026 17:45:17 +0100,
+"Lorenzo Stoakes (ARM)" <ljs@kernel.org> wrote:
 > 
-> A guest that disables the ITS and rewrites GITS_BASER with fewer pages,
-> VALID still set, keeps every collection it mapped against the larger
-> table: KVM stores the new BASER unconditionally and frees the list only
-> when VALID is cleared.
+> Bear with me being verbose here, as this is both nascent review + learning
+> :)
 
-But isn't that the *real* problem? Shouldn't we instead nuke the
-collections entirely and go through a reload sequence?
+No worries.
 
-> vgic_its_save_collection_table() then walks the
-> whole list, writing up to 448K past the end of the table, and saves
-> collection IDs that vgic_its_restore_cte() rejects, so the save succeeds
-> and the restore fails with -EINVAL on the destination. The overrun stays
-> in guest memory, as vgic_write_guest_lock() validates every gfn.
 > 
-> Validate each collection against the current table with
-> vgic_its_check_id() and return -EINVAL, as vgic_its_save_device_tables()
-> does for devices. Collection IDs are unique and the collection table is
-> never indirect, so the check also bounds the walk.
+> On Thu, Aug 06, 2026 at 10:10:19AM +0100, Marc Zyngier wrote:
+> > The global VNCR mapping counter is used to decide whether an L1
+> > provided VNCR page is mapped in L0 on any CPU at the point of
+> > dealing with a TLB invalidation. It is incremented when a mapping
+> > is made in the fixmap, and decremented when unmapped.
+> >
+> > As it turns out, this tracking has several flaws:
+> >
+> > - we are trying to invalidate TLBs, and the mapping is only an
+> >   opportunistic consequence of the TLB. Checking this counter to
+> >   decide whether a TLB needs to be invalidated may result in missed
+> >   invalidations.
+> 
+> Is it largely the self-invalidation mentioned below or are there other cases?
 
-I think returning -EINVAL here was a mistake, as it aborts the save
-procedure that userspace should be able to issue reliably, even if
-that means the state is crap. I don't think we should expand that
-behaviour any further.
+No. The self-invalidation is only an additional consequence outlining
+that even the most basic requirements cannot be honoured.
+
+The thing to realise is that is that we are dealing with two separate
+"objects" when it comes to VNCR:
+
+- a SW TLB, which represent the guest VA to guest IPA to host PA
+  translations. This is the vncr_tlb structure, populated as we walk
+  the S1/S2 page tables. This structure's lifetime is controlled by
+  TLB invalidations from the guest, MMU notifiers from the host, and
+  natural eviction (there is only one such structure per vcpu).
+
+- a shadow page table that implements the translation at *runtime*, as
+  described by vncr_tlb. This is the per-CPU fixmap mapping. It's
+  lifetime is at most a vcpu_load/vcpu_put cycle, but it can also be
+  torn down by TLBI and notifiers.
+
+vncr_map_count only tracks the latter, not the former. Which means
+that if the mapping is not live on a CPU at the point of TLBI on *any*
+CPU, nothing will happen. That's a blatant violation of the
+architecture, and it could lead to memory corruption in the guest.
+
+The obvious fix is in patch 8, tracking the TLBs rather than the
+mappings.
+
+>
+> >
+> > - an L1 vcpu invalidating its own TLB (a very likely case) will not
+> >   succeed in invalidating the VNCR pseudo TLB because that page is
+> >   not mapped in L0 at this stage.
+> 
+> Ahh yes this is pretty compelling then!
+> 
+> >
+> > Given that this tracking fails at delivering the minimum guarantees
+> > that are required and is only a performance optimisation, remove it
+> > completely.
+> >
+> > Fixes: 4ffa72ad8f37e ("KVM: arm64: nv: Add S1 TLB invalidation primitive for VNCR_EL2")
+> > Reviewed-by: Yuan Yao <yaoyuan@linux.alibaba.com>
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> 
+> The change LGTM, it neatly removes the described mechanism which is well
+> evidenced.
+> 
+> Comments below that are largely me talking out loud as I learn things :)
+> 
+> Acked-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+>
+> > Cc: stable@vger.kernel.org
+> > ---
+> >  arch/arm64/include/asm/kvm_host.h | 3 ---
+> >  arch/arm64/kvm/hyp/vhe/switch.c   | 3 +--
+> >  arch/arm64/kvm/nested.c           | 3 ---
+> >  3 files changed, 1 insertion(+), 8 deletions(-)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index bae2c4f92ef5c..ac16f96c878d6 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -411,9 +411,6 @@ struct kvm_arch {
+> >  	/* Masks for VNCR-backed and general EL2 sysregs */
+> >  	struct kvm_sysreg_masks	*sysreg_masks;
+> >
+> > -	/* Count the number of VNCR_EL2 currently mapped */
+> > -	atomic_t vncr_map_count;
+> > -
+> >  	/*
+> >  	 * For an untrusted host VM, 'pkvm.handle' is used to lookup
+> >  	 * the associated pKVM instance in the hypervisor.
+> > diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> > index bbe9cebd3d9d5..c09b1d411c584 100644
+> > --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> > +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> > @@ -427,8 +427,7 @@ static bool kvm_hyp_handle_tlbi_el2(struct kvm_vcpu *vcpu, u64 *exit_code)
+> >  	 * If we have to check for any VNCR mapping being invalidated,
+> >  	 * go back to the slow path for further processing.
+> >  	 */
+> > -	if (vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu) &&
+> > -	    atomic_read(&vcpu->kvm->arch.vncr_map_count))
+> > +	if (vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu))
+> >  		return false;
+> 
+> So this seems to be the crux of it - seems to be 'is there any possibility that
+> we will need to check for VNCR mappings being invalidated?'
+
+Yup. If the guest's state is HCR_EL2.{E2H,TGE}={1,1}, then this is the
+guest hypervisor invalidating TLBs for itself (and not its guest), and
+returning 'false' takes us on the slow path where we'll have to look
+at the individual vcnt_tlb structures to find out if there is any overlap.
+
+> 
+> Checks:
+> 
+> * vcpu_el2_e2h_is_set() - is the guest host kernel (?)'s hcr_el2.e2h
+>   enabled? From what I gather hcr_el2.e2h is what allows sysreg_EL1 ->
+>   sysreg_EL2 for the host kernel to allow unmodified kernels to run in EL2.
+
+Amongst other things, yes. Please see FEAT_VHE in the ARM ARM for a
+description of what HCR_EL2.E2H==1 implies.
+
+>
+>   IOW - is the guest host kernel VHE?
+
+Note that for a KVM guest, if FEAT_VHE is present, the FEAT_E2H0 is
+not implemented, which means that E2H is RES1. As an additional
+restriction, we only expose NV to VHE guests. This greatly simplifies
+the scope of what we need to support, and conveniently hides a bunch
+of architecture defects that cannot be otherwise mitigated.
+
+> 
+> * vcpu_el2_tge_is_set() - Similarly tests for the hcr_el2.tge bit - and this
+>   seems to be is 'EL1 -> EL2 redirection on?' - IOW - is this a kernel running
+>   in EL2?
+
+Not quite. We know for sure this is running at virtual EL2 (we trapped
+with HCR_EL2.NV set, for a start). In the TLBI case, HCR_EL2.TGE
+controls whether the behaviour of a TLBI S1E1* instruction targets the
+host (TGE==1) or the guest (TGE==0).
+
+> 
+> Actually I see in is_hyp_ctxt():
+> 
+> 	 * We are in a hypervisor context if the vcpu mode is EL2 or
+> 	 * E2H and TGE bits are set. The latter means we are in the user space
+> 	 * of the VHE kernel. ARMv8.1 ARM describes this as 'InHost'
+> 
+> So I _think_ the combination of the two is checking to see if you're the L0
+> kernel that _could_ send TLBi's that need to be handled?
+
+The combination of the two bits indicates: is this a VHE hypervisor
+invalidating TLBs for itself. If yes, then we need to check the VNCR
+SW TLBs to complete the job.
+
+> Previously it seemed the logic was 'if there are no VNCR mappings present then
+> we can optimise by short-circuiting the rest of the processing in
+> kvm_hyp_handle_sysreg_vhe()'.
+
+Exactly.
+
+> 
+> It seems that the hardware TLBi has been processed by now so it's actually more
+> like - there's still work to be done maintaining the software TLB and that's
+> done elsewhere.
+
+Yup.
+
+[...]
+
+> I think this is all vaguely sane :)
+
+You have been assimilated.
+
+Thanks for reading thus far!
 
 	M.
 
