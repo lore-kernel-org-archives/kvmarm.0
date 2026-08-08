@@ -1,85 +1,174 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 096D93812D1;
-	Sat,  8 Aug 2026 18:44:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A14662BEFFD
+	for <kvmarm@lists.linux.dev>; Sat,  8 Aug 2026 21:41:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786214661; cv=none; b=Ffewpbg2UFLVxJT1R8IZXyOBRP+vmCFq851FaPboWTFB1lozWJ5touAudJBczETEqPveAhokbl8/vMzvo0nhGXVVZQS8R2g8woTqTfOHIhlj7Zm736oTJ2zOyUjzWZqcTSqitX1fv92BbWAaRHS2G2i8dVcdDvkDwn06hkxdVWU=
+	t=1786225307; cv=none; b=gthJs9L9pN6zeEQith9CuVytJUkn7wzc71mngs75PYz2KV2JS2R/6W7aOhD9kou/MqxXlmQFKPIkdp/RL2sGzbjkgG6PD71rFmPNPmdW84VciMmo5Zjl2iuFAW6NncqfItyp8d8yrFDUnBoNziA70j/P85m9+b6/x+8DAkEz2ls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786214661; c=relaxed/simple;
-	bh=OWVT8GhzRscDTiXdBnwxKhY61dH4eF7HeC9qYy2IdeQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XS7pNT4qlBGxHuQSvKZ1XctRLMJMdZeMKZGAYvPAJzSTKP0OStMp7eqnDjRIHe5CfpvrOQ4aAHqSVUxMcrddEn3/mMqxUx8wFufhpRJK1kHIjtS1XD45YAlXTCfQGqIeIj6lMzHeddV9079Mc4xnK4IJCqdoziHRFgXycDqOaJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cip1EV8d; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786225307; c=relaxed/simple;
+	bh=I4DdleW8mzxVeMyiB3L8HY8f1W4aXjk83V1EP/T4+I4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=K7S4oamDmHX2zm6F4cGvxLa89Xkz0w3q9ppUYyrC6hqL7Ze2c2EpET62VcfIjX1H67/MD2N1btPTi9Oa7suXQhm4bXK35y1p5oyP6iClcrHIdZeZooQYT6mTFkvb7XMTdiNn9E/3e5np1XWTduGLKVN5WSdjxSd31ZIV4wqX2Ss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=BI9ksKow; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cip1EV8d"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5130D1F000E9;
-	Sat,  8 Aug 2026 18:44:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786214659;
-	bh=YfvtnhYlOjlLxdP08uU/4xA8PeOG0Ri4dShMX5YdVRE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=cip1EV8d7zjSlPE46VIKquUEHeGQCSQC85Gefg9BUPfQpyDoPpM5vYCWuKbId1/F1
-	 k9FfuYqjH+7gok2ymhdrsGyvyJ+19L0opqNohl4gejlyfngpgYrNUzaDcDjnBAzWRr
-	 KFoSkh3cFlda55Gk6pC6wtEVfqAXztlAvgb93Z96gkwcQyZw0DXWizC/NRz1TbOB7a
-	 TTB0nEY0iBcI+pT2Ix+DyV2QGwvugdKOrnWnb4ebwyvk7ZndRjbUrQ7rjnjT8qZGh8
-	 0uoAPDy6ONdabbxqr7qSkgu6J9TDEzp8WrMzbXWNdzIUUqx/5KUGGgd/sCOynO5cd1
-	 sNTCHg+s6a6wg==
-From: Oliver Upton <oupton@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Mostafa Saleh <smostafa@google.com>
-Cc: Oliver Upton <oupton@kernel.org>,
-	maz@kernel.org,
-	seiden@linux.ibm.com,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	vdonnefort@google.com,
-	tabba@google.com,
-	sebastianene@google.com,
-	keirf@google.com,
-	yaoyuan@linux.alibaba.com
-Subject: Re: [PATCH v2 0/3] KVM: arm64: Fixes for timers and pKVM
-Date: Sat,  8 Aug 2026 11:44:11 -0700
-Message-ID: <178621460524.381735.15023846552532101058.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260808085824.732659-1-smostafa@google.com>
-References: <20260808085824.732659-1-smostafa@google.com>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="BI9ksKow"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B301C152B;
+	Sat,  8 Aug 2026 14:41:39 -0700 (PDT)
+Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B7C103F9A2;
+	Sat,  8 Aug 2026 14:41:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1786225303; bh=I4DdleW8mzxVeMyiB3L8HY8f1W4aXjk83V1EP/T4+I4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BI9ksKowFBrkK396n5hsWjimnlOOable3MsLV4y3n7S5+1tgNqP6N6WFXFGtDTE32
+	 hEr/u9esRbfm0i0MrHb1lIeDuaaWjUuK/9esr7GvjoQEWbNKWioArCRJofLMM62J3r
+	 8+yBNoBgpQhKZ7WczfW/mYTuBK0b3wymIrkMqDnE=
+Date: Sat, 8 Aug 2026 22:41:31 +0100
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: Steffen Eiden <seiden@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oupton@kernel.org>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Fuad Tabba <fuad.tabba@linux.dev>, 
+	Hyunwoo Kim <imv4bel@gmail.com>, Yao Yuan <yaoyuan@linux.alibaba.com>, ljs@kernel.org, 
+	stable@vger.kernel.org
+Subject: Re: [PATCH v2 4/8] KVM: arm64: Correctly handle end of VA space TLBI
+ invalidation
+Message-ID: <yifz3wn5gk5sr6mapi32trgk5m5kp33bquctsjmkifebnsnndt@fix6u4rthx4g>
+References: <20260806091026.620700-1-maz@kernel.org>
+ <20260806091026.620700-5-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260806091026.620700-5-maz@kernel.org>
 
-On Sat, 08 Aug 2026 08:58:21 +0000, Mostafa Saleh wrote:
-> What started as a  small patch ended up as a 3 patch series thanks
-> to Sashiko.
+Hi Marc,
+
+On Thu, Aug 06, 2026 at 10:10:22AM +0100, Marc Zyngier wrote:
+> Our TLB invalidation by VA code is based on comparing two ranges,
+> one defined by the TLB, and one defined by the TLBI instruction.
 > 
-> First patch from Marc to consolidate the offset calculation,
-> follow up patches fix issues with non-protected VM and timer
-> offset and protected VM running with broken CNTVOFF_EL2.
+> Each range is defined by a start and a size. However, the way the
+> comparison is done doesn't account for address rollover, as it
+> compares an address with (base + size). This works nicely until
+> this expression represent the last page/block in the TTBR1 VA space,
+> as the result is a big fat 0. And a failed TLB invalidation.
 > 
-> [...]
+> Rewrite the comparison in a way that is immune to the address
+> rollover (making the end address inclusive instead of exclusive),
+> and move this into a common helper that is used by both VA and IPA
+> invalidations, as suggested by Hyunwoo Kim (although the IPA version
+> didn't suffer from this particular problem, obviously).
+> 
+> Fixes: 4ffa72ad8f37e ("KVM: arm64: nv: Add S1 TLB invalidation primitive for VNCR_EL2")
+> Reviewed-by: Yuan Yao <yaoyuan@linux.alibaba.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Cc: stable@vger.kernel.org
+> ---
+>  arch/arm64/kvm/nested.c | 43 ++++++++++++++++++-----------------------
+>  1 file changed, 19 insertions(+), 24 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 27bc7ee4b3382..8a602d074dbb4 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -999,6 +999,20 @@ static void invalidate_vncr(struct vncr_tlb *vt)
+>  		clear_fixmap(vncr_fixmap(vt->cpu));
+>  }
+>  
+> +static bool vncr_tlb_intersects(struct vncr_tlb *vt, u64 addr,
+> +				u64 scope_start, u64 scope_size)
+> +{
+> +	u64 tlb_size, tlb_start, tlb_end, scope_end;
+> +
+> +	tlb_size = ttl_to_size(pgshift_level_to_ttl(vt->wi.pgshift, vt->wr.level));
+> +
+> +	tlb_start = addr & ~(tlb_size - 1);
+> +	tlb_end = tlb_start + tlb_size - 1;
+> +	scope_end = scope_start + scope_size - 1;
 
-Dropped the unintended SOB in patch 3 you mentioned.
+I think if scope_end overflows,
 
-Applied to next, thanks!
+> +
+> +	return !(tlb_end < scope_start || tlb_start > scope_end);
 
-[1/3] KVM: arm64: Make timer_get_offset() work in all contexts
-      https://git.kernel.org/kvmarm/kvmarm/c/2858600ecd01
-[2/3] KVM: arm64: Fix timer offsets for non-protected VMs
-      https://git.kernel.org/kvmarm/kvmarm/c/47d3eef780e3
-[3/3] KVM: arm64: Fix hvhe and broken CNTVOFF_EL2
-      https://git.kernel.org/kvmarm/kvmarm/c/2e813a6e8ebe
+tlb_start > scope_end can evaluate to true and we return false even when
+there is overlap near the end of the TTBR1 address space.
 
---
-Best,
-Oliver
+Therefore I think we need to saturate scope_end to ULONG_MAX when overflow
+happens. This is also what the architecture does when looking at the
+pseudocode J1.2.3.442 TLBIRange (M.c).
+
+Thanks,
+Wei-Lin Chang
+
+> +}
+> +
+>  /*
+>   * VNCR TLB invalidation occurs from MMU notifiers or TLBI instructions, and
+>   * either can race against a vcpu not being onlined yet (no pseudo-TLB
+> @@ -1021,19 +1035,9 @@ static void kvm_invalidate_vncr_ipa(struct kvm *kvm, u64 start, u64 end)
+>  	if (!kvm_has_feat(kvm, ID_AA64MMFR4_EL1, NV_frac, NV2_ONLY))
+>  		return;
+>  
+> -	kvm_for_each_vncr_tlb(i, vcpu, vt, kvm) {
+> -		u64 ipa_start, ipa_end, ipa_size;
+> -
+> -		ipa_size = ttl_to_size(pgshift_level_to_ttl(vt->wi.pgshift,
+> -							    vt->wr.level));
+> -		ipa_start = vt->wr.pa & ~(ipa_size - 1);
+> -		ipa_end = ipa_start + ipa_size;
+> -
+> -		if (ipa_end <= start || ipa_start >= end)
+> -			continue;
+> -
+> -		invalidate_vncr(vt);
+> -	}
+> +	kvm_for_each_vncr_tlb(i, vcpu, vt, kvm)
+> +		if (vncr_tlb_intersects(vt, vt->wr.pa, start, end - start))
+> +			invalidate_vncr(vt);
+>  }
+>  
+>  struct s1e2_tlbi_scope {
+> @@ -1059,28 +1063,19 @@ static void invalidate_vncr_va(struct kvm *kvm,
+>  	lockdep_assert_held_write(&kvm->mmu_lock);
+>  
+>  	kvm_for_each_vncr_tlb(i, vcpu, vt, kvm) {
+> -		u64 va_start, va_end, va_size;
+> -
+> -		va_size = ttl_to_size(pgshift_level_to_ttl(vt->wi.pgshift,
+> -							   vt->wr.level));
+> -		va_start = vt->gva & ~(va_size - 1);
+> -		va_end = va_start + va_size;
+> -
+>  		switch (scope->type) {
+>  		case TLBI_ALL:
+>  			break;
+>  
+>  		case TLBI_VA:
+> -			if (va_end <= scope->va ||
+> -			    va_start >= (scope->va + scope->size))
+> +			if (!vncr_tlb_intersects(vt, vt->gva, scope->va, scope->size))
+>  				continue;
+>  			if (vt->wr.nG && vt->wr.asid != scope->asid)
+>  				continue;
+>  			break;
+>  
+>  		case TLBI_VAA:
+> -			if (va_end <= scope->va ||
+> -			    va_start >= (scope->va + scope->size))
+> +			if (!vncr_tlb_intersects(vt, vt->gva, scope->va, scope->size))
+>  				continue;
+>  			break;
+>  
+> -- 
+> 2.47.3
+> 
