@@ -1,170 +1,184 @@
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D15B436197D
-	for <kvmarm@lists.linux.dev>; Sat,  8 Aug 2026 08:58:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E43B205E02;
+	Sat,  8 Aug 2026 09:05:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786179517; cv=none; b=NQjNOsZZwoluRqXagSLeJ/Ef+R5mXoaop6k9yxpDzQQVlptY1kA6PrI9+Di5P9xxHOWrJ/FmDRG9ikUuchk0rTnqT1r00Zb9zMvPLcZSwIyE+QIjat01BQe5hvxGM/N8c/4dE7sqx7NKQZzqK4H95icd0ESYu72+ef5MeNNmUh8=
+	t=1786179911; cv=none; b=E3MmvQO+GdhSMvJKb91ozq4PR0VZIdt1I60K6zA+1kzqx0RX/ACogTS8SICbLWqo1s256YZtzE0pW0SxYSpzUfW/biNOZYLDEIbBHUC9ds3S8Rj5AAA6uYQdvtcsvnuKMyV0R1BO2j1J1S9/8LgfX9J0HnWwX4eMz5tS1sgMol0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786179517; c=relaxed/simple;
-	bh=yZk+++kSee3JvNzACwuptz4ROqE71reOY1As/HQTYeY=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=PLJLnn8HIMU8G9ros/lGhQq4Qrxnnry/qIbK7imZDMhzGaPGh2btXuGgh85w1fbUg70GbYCklYQ45zzVBS/iFSuB5TkUFXeUQVArhS1FQWSTYK5a1g0XJDiAQjVqZ20jC4Lv4wAuXW3YTzv7SIqAx9zfOFY3c11xP91e2QQsElY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GI7y0jVB; arc=none smtp.client-ip=209.85.221.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com
+	s=arc-20240116; t=1786179911; c=relaxed/simple;
+	bh=bzaEg3gm2Oynfwunq94gF4vhX2Dly/Gcow3HBJqo3o8=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=q885EtXgN5TBKDrz5HrIFu5zhOy3RpOTlqs5LsZeN8Z3MYYJtJvCP4N714z0Vai291O9MgviPuXbQ8g53A19yHyI24wWoycCP8hcq+x7tlRyPp028HIdCXx/lslFVK5srzSj80EWeBgEWCrQNr+0AwYiUbGcQPHKTBuhz3sB8po=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lkTGYsW1; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GI7y0jVB"
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-47f84ac1990so195105f8f.2
-        for <kvmarm@lists.linux.dev>; Sat, 08 Aug 2026 01:58:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1786179513; x=1786784313; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=56TnglbK1xrAvqmnbHBS7x8Hfawflf/2HSwwBboYSo0=;
-        b=GI7y0jVB9v/FZTCGqERTzrPyGSZwaIGTrhn4zO0iae9eo32stfnmqASTgmiHREr1S3
-         8p0YymeH9Ys9+rU00hIEDKbvXVOc5eHSHgiP7FzujpKynx3f+jfWh+21ScD3Oo7636dL
-         PkgQTWo26pg9zYuR1QcUr323A8i2bVJAgumaNTNhslz7VBj0C1Td26TFNTAwRoz8fJPb
-         WOb3JVGrpicwIt9su/BEIWB4uMTs+IDIDZEUMWr5QXu+uDg7ofnXMhsVqZQ45tQAjG1T
-         NwB15u8flGAJ43Pq/TD/W4BowcIp8ITlcAFXXPZn3hxO3kWk96ihaacWx8OoeodojhK2
-         Rz8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786179513; x=1786784313;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=56TnglbK1xrAvqmnbHBS7x8Hfawflf/2HSwwBboYSo0=;
-        b=o2bbs9o18MEA+PZbCK38O8k6W9/kxcj/aBc0trKs/AQ/6xlKGfNVXjANYY6e464ogY
-         pCdVU/ZOSNsPtTcT/zB/9Vy2lnT0cIDOcYqChU240TysUXVwItUmy8PKchgV6On7JxpW
-         7NqBpS4JMi3Eenb59TMiO61HaLtA09jTWfxTPcQmLv67u1fYGyWXj/0ZRTGXQd1y43pr
-         0FEG5EGxRCpapd59HCApHg9UQVJYuj+M8E2UApq2XdGpVN+fhkvg/XWz32EujrBCWDso
-         HfLEAS3mERiqDF8uM73aM7QJua/ratmXxkYy/cHr9INqKn6/8DofnQCb0iHRU8c/5ysm
-         hviQ==
-X-Forwarded-Encrypted: i=1; AHgh+Rqqg0psudvDsQrcN6PxPzAJ/JG1wOgsaAtDOhUOnaaTcTytQfT4Q5roxGPeO2W8vjWXSKC3Iqw=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyVBQmD/z13TqoLbo/GGR5/RBlg/W97jXKrkp+Sd3WcNIUFqYJJ
-	Osyo0CpToJNJPhsvf3D1XAbhpKIgJLW9quX0QzaPwvB7xaU0LTcgH3uILvXbfAZq44RNvazVLv5
-	E7jUqmh7DNS6LJQ==
-X-Received: from wrqv10.prod.google.com ([2002:a5d:4b0a:0:b0:47f:586c:8371])
- (user=smostafa job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:46cc:b0:493:bd2a:93be with SMTP id 5b1f17b1804b1-4995e085347mr124527135e9.6.1786179512744;
- Sat, 08 Aug 2026 01:58:32 -0700 (PDT)
-Date: Sat,  8 Aug 2026 08:58:23 +0000
-In-Reply-To: <20260808085824.732659-1-smostafa@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lkTGYsW1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E52511F000E9;
+	Sat,  8 Aug 2026 09:05:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1786179909;
+	bh=BcQpUXzQNF+2Q+6o8/0P7HWncW1idJum/qJtU1Voeqo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=lkTGYsW1dZasSDUaE9oKcDoNEJuYeo3oNBSycdPzNb9GtBwb9fh8lUX1B+hnDKyBN
+	 LDjvFM/0hlJaHuObNzAnGsZnYgQ6Kz5WYQLet5RwUGQ4llz7MS5l7gnsLdv9g8dzaU
+	 yLEh2e704eiOD488zCQUHBvIQG7J5ZnS2VD8qU/P9Jo9yNeCqtWj4xbJKeTE2L5JbP
+	 kMqaNt6gAkTOJ1M8o+gXFvUDS5a3VNavTNH0OSydcHIwS/Uy7/qUkirAk4fmc2oD/H
+	 ky4rJojkbfGyDVqbNNFpY0Zy4KKvn6X3ldnkXiJP6ixcVZG0lBS8544tnLqsLIVnv7
+	 VUrSTq3sj8Jsw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wsczL-0000000Dd90-3XoN;
+	Sat, 08 Aug 2026 09:05:07 +0000
+Date: Sat, 08 Aug 2026 10:06:31 +0100
+Message-ID: <87bjbdouaw.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Hyunwoo Kim <imv4bel@gmail.com>,
+	Yao Yuan <yaoyuan@linux.alibaba.com>,
+	stable@vger.kernel.org
+Subject: Re: [PATCH v2 2/8] KVM: arm64: Handle negative S1 walk levels in VNCR TLB size evaluation
+In-Reply-To: <anYL8J1ejjujgp-A@lucifer>
+References: <20260806091026.620700-1-maz@kernel.org>
+	<20260806091026.620700-3-maz@kernel.org>
+	<anYL8J1ejjujgp-A@lucifer>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20260808085824.732659-1-smostafa@google.com>
-X-Mailer: git-send-email 2.55.0.654.g21b8a5bc05-goog
-Message-ID: <20260808085824.732659-3-smostafa@google.com>
-Subject: [PATCH v2 2/3] KVM: arm64: Fix timer offsets for non-protected VMs
-From: Mostafa Saleh <smostafa@google.com>
-To: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org
-Cc: maz@kernel.org, oupton@kernel.org, seiden@linux.ibm.com, 
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	catalin.marinas@arm.com, will@kernel.org, vdonnefort@google.com, 
-	tabba@google.com, sebastianene@google.com, keirf@google.com, 
-	yaoyuan@linux.alibaba.com, Mostafa Saleh <smostafa@google.com>, 
-	Sashiko <sashiko-bot@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ljs@kernel.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, fuad.tabba@linux.dev, imv4bel@gmail.com, yaoyuan@linux.alibaba.com, stable@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-With pKVM, protected VMs always have offset of zero.
-However, timer offsets for non-protected guests fail to take effect
-for two reasons:
-1) In __timer_enable_traps(), enabling of traps check for
-   is_protected_kvm_enabled() rather than vcpu_is_protected(vcpu)
+On Fri, 07 Aug 2026 18:12:18 +0100,
+"Lorenzo Stoakes (ARM)" <ljs@kernel.org> wrote:
 
-2) The vcpu timer offsets were never initialised and kept as NULL.
-
-This is problematic for cases when the timer is trapped in the
-hypervisor as the with the case of broken CNTVOFF_EL2, which leads
-to the hypervisor and host using different offsets and causing VM
-hangs.
-
-This can be confirmed by running the arch_timer selftest which fails:
-./arch_timer -o 100000000
-Random seed: 0x6b8b4567
-Guest assert failed,  vcpu 0; stage; 3; iter: 0
-==== Test Assertion Failure ====
-  arm64/arch_timer.c:137: config_iter + 1 == irq_iter
-  pid=310 tid=312 errno=4 - Interrupted system call
-Guest assert failed,  vcpu 3; stage; 3; iter: 0
-Guest assert failed,  vcpu 1; stage; 3; iter: 0
-==== Test Assertion Failure ====
-  arm64/arch_timer.c:137: config_iter + 1 == irq_iter
-  pid=310 tid=313 errno=4 - Interrupted system call
-Guest assert failed,  vcpu 2; stage; 3; iter: 0
-==== Test Assertion Failure ====
-  arm64/arch_timer.c:137: config_iter + 1 == irq_iter
-  pid=310 tid=314 errno=4 - Interrupted system call
 [...]
 
-After the fix:
+> So actually if granularity is TLBI_TTL_TG_4K this will return SZ_1G and 0 in the
+> other cases unless I'm getting something wrong here?
+>
+> This is really more a 'maybe worth mentioning in the commit log to be pedantic'
+> kind of thing :)
+> 
+> IOW you could luck out before with SZ_1G for TLBI_TTL_TG_4K.
 
-./arch_timer -o 100000000
-Random seed: 0x6b8b4567
-PASS(vCPU-1).
-PASS(vCPU-3).
-PASS(vCPU-0).
-PASS(vCPU-2)
+Yes, and that's what happens in most cases. But as Huynwoo Kim's
+reports, 16k and 64k lead to something really bad. And even 4k works
+by pure luck, so this is all fsck'd in my book.
 
-Reported-by: Sashiko <sashiko-bot@kernel.org>
-Fixes: cb0c272acebd ("KVM: arm64: Initialize the hypervisor's VM state at EL2")
-Signed-off-by: Mostafa Saleh <smostafa@google.com>
----
- arch/arm64/kvm/hyp/nvhe/pkvm.c     | 14 ++++++++++++++
- arch/arm64/kvm/hyp/nvhe/timer-sr.c |  6 +++---
- 2 files changed, 17 insertions(+), 3 deletions(-)
+> 
+> >
+> > Tidy-up pgshift_level_to_ttl() to handle these negative levels, and
+> > ttl_to_size() to always return SZ_1G when no valid TTL is present.
+> > This allows the removal of open-coded checks for similar situations.
+> 
+> I guess SZ_1G is a reasonable default here?
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index 24d6f164129a..89f3d5fb55ca 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -529,6 +529,20 @@ static int init_pkvm_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu,
- 	hyp_vcpu->vcpu.arch.cflags = READ_ONCE(host_vcpu->arch.cflags);
- 	hyp_vcpu->vcpu.arch.mp_state.mp_state = KVM_MP_STATE_STOPPED;
- 
-+	if (!pkvm_hyp_vcpu_is_protected(hyp_vcpu)) {
-+		/*
-+		 * Timer offsets are pointing to the untrusted KVM copy,
-+		 * which is pinned in __pkvm_init_vm() for the VM life time.
-+		 * It is worth noting that hyp_vm->host_kvm points to an EL2
-+		 * linear map address and timer_get_offset() will use
-+		 * kern_hyp_va() which is safe as it is idempotent.
-+		 */
-+		vcpu_vtimer(&hyp_vcpu->vcpu)->offset.vm_offset =
-+			&hyp_vm->host_kvm->arch.timer_data.voffset;
-+		vcpu_ptimer(&hyp_vcpu->vcpu)->offset.vm_offset =
-+			&hyp_vm->host_kvm->arch.timer_data.poffset;
-+	}
-+
- 	ret = pkvm_vcpu_init_sysregs(hyp_vcpu);
- 	if (ret)
- 		goto done;
-diff --git a/arch/arm64/kvm/hyp/nvhe/timer-sr.c b/arch/arm64/kvm/hyp/nvhe/timer-sr.c
-index ff176f4ce7de..51b4f5010b66 100644
---- a/arch/arm64/kvm/hyp/nvhe/timer-sr.c
-+++ b/arch/arm64/kvm/hyp/nvhe/timer-sr.c
-@@ -45,11 +45,11 @@ void __timer_enable_traps(struct kvm_vcpu *vcpu)
- 	/*
- 	 * Disallow physical timer access for the guest
- 	 * Physical counter access is allowed if no offset is enforced
--	 * or running protected (we don't offset anything in this case).
-+	 * or running a protected VM (we don't offset anything in this case).
- 	 */
- 	clr = CNTHCTL_EL1PCEN;
--	if (is_protected_kvm_enabled() ||
--	    !kern_hyp_va(vcpu->kvm)->arch.timer_data.poffset)
-+	if (vcpu_is_protected(vcpu) ||
-+	    !timer_get_offset(vcpu_ptimer(vcpu)))
- 		set |= CNTHCTL_EL1PCTEN;
- 	else
- 		clr |= CNTHCTL_EL1PCTEN;
+It is more than a reasonable default. It is the maximum block size
+that can architecturally be mapped in the absence of FEAT_LPA*. In
+this situation, 16k pages imply a 32M max block mapping, and 64k
+implies 512M. 4K pages, by virtue of allowing a level-1 block mapping
+result in a 1G size.
+
+> 
+> >
+> > Note that the check for a negative value not explicitely checking for
+> 
+> NIT: explicitely -> explicitly
+> 
+> > S1_MMU_DISABLED is deliberate, so that actual negative levels introduced
+> > with LVA2 and D128 can take the same path if we ever support them.
+> >
+> > Fixes: 7270cc9157f47 ("KVM: arm64: nv: Handle VNCR_EL2 invalidation from MMU notifiers")
+> > Reported-by: Hyunwoo Kim <imv4bel@gmail.com>
+> > Link: https://lore.kernel.org/r/ameGoxbn2wzBq2kL@v4bel
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > Cc: stable@vger.kernel.org
+> > ---
+> >  arch/arm64/kvm/nested.c | 26 +++++++++++++++++++-------
+> >  1 file changed, 19 insertions(+), 7 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> > index f3c75954cf36c..035cda256e2a5 100644
+> > --- a/arch/arm64/kvm/nested.c
+> > +++ b/arch/arm64/kvm/nested.c
+> > @@ -505,7 +505,7 @@ int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
+> >  	return ret;
+> >  }
+> >
+> > -static unsigned int ttl_to_size(u8 ttl)
+> > +static unsigned int __ttl_to_size(u8 ttl)
+> >  {
+> >  	int level = ttl & 3;
+> >  	int gran = (ttl >> 2) & 3;
+> > @@ -561,10 +561,22 @@ static unsigned int ttl_to_size(u8 ttl)
+> >  	return max_size;
+> >  }
+> >
+> > -static u8 pgshift_level_to_ttl(u16 shift, u8 level)
+> > +static unsigned int ttl_to_size(u8 ttl)
+> > +{
+> > +	return __ttl_to_size(ttl) ?: SZ_1G;
+> > +}
+> 
+> Might be worth a comment about the default?
+
+It's the architecture. I'm trying hard not to make KVM a running
+commentary of the ARM ARM ;-).
+
+> 
+> > +
+> > +static u8 pgshift_level_to_ttl(u16 shift, s8 level)
+> >  {
+> >  	u8 ttl;
+> >
+> > +	/*
+> > +	 * If we don't have a proper level, fallback to the maximum
+> > +	 * size.
+> > +	 */
+> > +	if (level < 0)
+> > +		return 0;
+> > +
+> >  	switch(shift) {
+> >  	case 12:
+> >  		ttl = TLBI_TTL_TG_4K;
+> > @@ -675,7 +687,11 @@ unsigned long compute_tlb_inval_range(struct kvm_s2_mmu *mmu, u64 val)
+> >  		ttl = get_guest_mapping_ttl(mmu, addr);
+> >  	}
+> >
+> > -	max_size = ttl_to_size(ttl);
+> > +	/*
+> > +	 * Don't use the default 1GB fallback, as we can adapt to the
+> > +	 * max mapping size we allow at S2.
+> > +	 */
+> 
+> Being a bit pedantic here but I wonder if simply just to say 'Adapt to the max
+> mapping size allowed at S2' as the fallback is inferred?
+
+Sure.
+
+Thanks,
+
+	M.
+
 -- 
-2.55.0.654.g21b8a5bc05-goog
-
+Jazz isn't dead. It just smells funny.
