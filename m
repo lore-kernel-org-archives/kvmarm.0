@@ -1,174 +1,184 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A14662BEFFD
-	for <kvmarm@lists.linux.dev>; Sat,  8 Aug 2026 21:41:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7884535836E;
+	Sun,  9 Aug 2026 06:42:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786225307; cv=none; b=gthJs9L9pN6zeEQith9CuVytJUkn7wzc71mngs75PYz2KV2JS2R/6W7aOhD9kou/MqxXlmQFKPIkdp/RL2sGzbjkgG6PD71rFmPNPmdW84VciMmo5Zjl2iuFAW6NncqfItyp8d8yrFDUnBoNziA70j/P85m9+b6/x+8DAkEz2ls=
+	t=1786257773; cv=none; b=CdLWbYPZdUF+HXyIg+Y5SP4dJKrVspwoEMBb3QHes3Cid5ujQ1FTI4NUiPu7WX/df7Ij0mdGH9g9NJwPG6DaK2yiLkyWAfP1Uh5Hcbk6NI5ZvKgpatjRJ9PmNojzMs2t1uucqvOscjEwhrMcnpt3cehBBb+nDQF/FHINHvYfK2g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786225307; c=relaxed/simple;
-	bh=I4DdleW8mzxVeMyiB3L8HY8f1W4aXjk83V1EP/T4+I4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K7S4oamDmHX2zm6F4cGvxLa89Xkz0w3q9ppUYyrC6hqL7Ze2c2EpET62VcfIjX1H67/MD2N1btPTi9Oa7suXQhm4bXK35y1p5oyP6iClcrHIdZeZooQYT6mTFkvb7XMTdiNn9E/3e5np1XWTduGLKVN5WSdjxSd31ZIV4wqX2Ss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=BI9ksKow; arc=none smtp.client-ip=217.140.110.172
+	s=arc-20240116; t=1786257773; c=relaxed/simple;
+	bh=R6yBmyxuR+V780x3naz0o++V38Ykhmc588fXz/oxl8I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fIhG0Nyj+QFO6nw5hTsxJ7PSaDrrU8ptVP9l/zQbtafebNBnJ7KcbuPyBT36Hw2CBH5Dp+o9d/o704AEJot/CXgqt6Y8pLPvCggAVI5JLH/zlbACkxCFm7n+QT9+9a0cpd/yr+aFif+m3qTI/U4rdn7i5rrhTt+goH1ZTxCmoGo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=IXjLH+zF; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="BI9ksKow"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="IXjLH+zF"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B301C152B;
-	Sat,  8 Aug 2026 14:41:39 -0700 (PDT)
-Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B7C103F9A2;
-	Sat,  8 Aug 2026 14:41:40 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DEFD6152B;
+	Sat,  8 Aug 2026 23:42:47 -0700 (PDT)
+Received: from [10.57.41.8] (unknown [10.57.41.8])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 909D83F9A2;
+	Sat,  8 Aug 2026 23:42:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1786225303; bh=I4DdleW8mzxVeMyiB3L8HY8f1W4aXjk83V1EP/T4+I4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BI9ksKowFBrkK396n5hsWjimnlOOable3MsLV4y3n7S5+1tgNqP6N6WFXFGtDTE32
-	 hEr/u9esRbfm0i0MrHb1lIeDuaaWjUuK/9esr7GvjoQEWbNKWioArCRJofLMM62J3r
-	 8+yBNoBgpQhKZ7WczfW/mYTuBK0b3wymIrkMqDnE=
-Date: Sat, 8 Aug 2026 22:41:31 +0100
-From: Wei-Lin Chang <weilin.chang@arm.com>
-To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Cc: Steffen Eiden <seiden@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oupton@kernel.org>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Fuad Tabba <fuad.tabba@linux.dev>, 
-	Hyunwoo Kim <imv4bel@gmail.com>, Yao Yuan <yaoyuan@linux.alibaba.com>, ljs@kernel.org, 
-	stable@vger.kernel.org
-Subject: Re: [PATCH v2 4/8] KVM: arm64: Correctly handle end of VA space TLBI
- invalidation
-Message-ID: <yifz3wn5gk5sr6mapi32trgk5m5kp33bquctsjmkifebnsnndt@fix6u4rthx4g>
-References: <20260806091026.620700-1-maz@kernel.org>
- <20260806091026.620700-5-maz@kernel.org>
+	t=1786257771; bh=R6yBmyxuR+V780x3naz0o++V38Ykhmc588fXz/oxl8I=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=IXjLH+zFuDRuSANWFWGuHCpS6ALdYgLhbhvVMnuCqMwBhwBPmXa/0cD4MrUh3IKIC
+	 7Mjsp2FKa01EHb/WVQMyqw3gA19/c3hvrFrgMoljCyJ4nYIVr6cfs8GKinuHdvc2Cr
+	 v+3hmtoka+4W+HdTJiae9BKJJ1W4iarPT0cc7iV0=
+Message-ID: <c6c7debd-42e3-41ac-87ca-96ba543f6c84@arm.com>
+Date: Sun, 9 Aug 2026 07:42:46 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260806091026.620700-5-maz@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v16 06/45] firmware: arm_rmm: Ensure the RMM has GPT
+ entries for memory
+Content-Language: en-GB
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
+ Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
+ Lorenzo Pieralisi <lpieralisi@kernel.org>
+References: <20260803134403.80630-1-steven.price@arm.com>
+ <20260803134403.80630-7-steven.price@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20260803134403.80630-7-steven.price@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Marc,
+On 03/08/2026 14:43, Steven Price wrote:
+> The RMM maintains the state of all the granules in the system to make
+> sure that the host is abiding by the rules. This state can be maintained
+> at different granularity, per page (TRACKING_FINE) or per region
+> (TRACKING_COARSE). The region size depends on the underlying
+> "RMI_GRANULE_SIZE". For a "coarse" region all pages in the region must
+> be of the same state, this implies we need to have "fine" tracking for
+> DRAM, so that we can delegate individual pages.
+> 
+> For now we only support a statically carved out memory for tracking
+> granules for the "fine" regions. This can be extended in the future to
+> allow modifying the tracking granularity and remove the need for a
+> static allocation.
+> 
+> Similarly, the firmware may create L0 GPT entries describing the total
+> address space. But if we change the "PAS" (Physical Address Space) of a
+> granule then the firmware may need to create L1 tables to track the PAS
+> at a finer granularity.
 
-On Thu, Aug 06, 2026 at 10:10:22AM +0100, Marc Zyngier wrote:
-> Our TLB invalidation by VA code is based on comparing two ranges,
-> one defined by the TLB, and one defined by the TLBI instruction.
+This sounds a bit incomplete to me. We could add:
+
+"Again, this series do not support creation of L1 GPT tables yet. Thus 
+make sure that the firmware has L1 GPTs covering the DRAM region."
+
+
 > 
-> Each range is defined by a start and a size. However, the way the
-> comparison is done doesn't account for address rollover, as it
-> compares an address with (base + size). This works nicely until
-> this expression represent the last page/block in the TTBR1 VA space,
-> as the result is a big fat 0. And a failed TLB invalidation.
-> 
-> Rewrite the comparison in a way that is immune to the address
-> rollover (making the end address inclusive instead of exclusive),
-> and move this into a common helper that is used by both VA and IPA
-> invalidations, as suggested by Hyunwoo Kim (although the IPA version
-> didn't suffer from this particular problem, obviously).
-> 
-> Fixes: 4ffa72ad8f37e ("KVM: arm64: nv: Add S1 TLB invalidation primitive for VNCR_EL2")
-> Reviewed-by: Yuan Yao <yaoyuan@linux.alibaba.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Cc: stable@vger.kernel.org
+> Signed-off-by: Steven Price <steven.price@arm.com>
 > ---
->  arch/arm64/kvm/nested.c | 43 ++++++++++++++++++-----------------------
->  1 file changed, 19 insertions(+), 24 deletions(-)
+> Changes since v15:
+>   * Skip firmware-reserved NOMAP memory in rmi_init_metadata()
+>   * Handle negative error codes from wrappers.
+> Changes since v14:
+>   * Move the implementation into drivers/firmware/arm_rmm.
+> Changes since v13:
+>   * Moved out of KVM
+> ---
+>   drivers/firmware/arm_rmm/rmi.c | 101 +++++++++++++++++++++++++++++++++
+>   include/linux/arm-rmi-cmds.h   |   2 +
+>   2 files changed, 103 insertions(+)
 > 
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 27bc7ee4b3382..8a602d074dbb4 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -999,6 +999,20 @@ static void invalidate_vncr(struct vncr_tlb *vt)
->  		clear_fixmap(vncr_fixmap(vt->cpu));
->  }
->  
-> +static bool vncr_tlb_intersects(struct vncr_tlb *vt, u64 addr,
-> +				u64 scope_start, u64 scope_size)
+> diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/arm_rmm/rmi.c
+> index 51ea661cecf9..bce3304bbc1a 100644
+> --- a/drivers/firmware/arm_rmm/rmi.c
+> +++ b/drivers/firmware/arm_rmm/rmi.c
+> @@ -12,6 +12,8 @@
+>   #include <asm/memory.h>
+>   #include <asm/pgtable-hwdef.h>
+>   
+> +static bool arm64_rmi_is_available;
+> +
+>   /* Currently only the first 2 registers are used by Linux */
+>   #define RMI_FEAT_REG_COUNT	2
+>   static __ro_after_init unsigned long rmi_feat_reg_cache[RMI_FEAT_REG_COUNT];
+> @@ -647,6 +649,98 @@ static int rmi_configure(void)
+>   	return ret;
+>   }
+>   
+> +/*
+> + * Make sure the area is tracked by RMM at FINE granularity.
+> + * We do not support changing the tracking yet.
+> + */
+> +static int rmi_verify_memory_tracking(phys_addr_t start, phys_addr_t end)
 > +{
-> +	u64 tlb_size, tlb_start, tlb_end, scope_end;
+> +	while (start < end) {
+> +		unsigned long ret, category, state, next;
 > +
-> +	tlb_size = ttl_to_size(pgshift_level_to_ttl(vt->wi.pgshift, vt->wr.level));
+> +		ret = rmi_granule_tracking_get(start, end, &category, &state, &next);
+> +		if (ret != RMI_SUCCESS ||
+> +		    state != RMI_TRACKING_FINE ||
+> +		    category != RMI_MEM_CATEGORY_CONVENTIONAL) {
+> +			/* TODO: Set granule tracking in this case */
+> +			pr_err("Granule tracking for region isn't fine/conventional: %llx\n",
+> +			       start);
+> +			return -ENODEV;
+> +		}
+> +		start = next;
+> +	}
 > +
-> +	tlb_start = addr & ~(tlb_size - 1);
-> +	tlb_end = tlb_start + tlb_size - 1;
-> +	scope_end = scope_start + scope_size - 1;
-
-I think if scope_end overflows,
-
-> +
-> +	return !(tlb_end < scope_start || tlb_start > scope_end);
-
-tlb_start > scope_end can evaluate to true and we return false even when
-there is overlap near the end of the TTBR1 address space.
-
-Therefore I think we need to saturate scope_end to ULONG_MAX when overflow
-happens. This is also what the architecture does when looking at the
-pseudocode J1.2.3.442 TLBIRange (M.c).
-
-Thanks,
-Wei-Lin Chang
-
+> +	return 0;
 > +}
 > +
->  /*
->   * VNCR TLB invalidation occurs from MMU notifiers or TLBI instructions, and
->   * either can race against a vcpu not being onlined yet (no pseudo-TLB
-> @@ -1021,19 +1035,9 @@ static void kvm_invalidate_vncr_ipa(struct kvm *kvm, u64 start, u64 end)
->  	if (!kvm_has_feat(kvm, ID_AA64MMFR4_EL1, NV_frac, NV2_ONLY))
->  		return;
->  
-> -	kvm_for_each_vncr_tlb(i, vcpu, vt, kvm) {
-> -		u64 ipa_start, ipa_end, ipa_size;
-> -
-> -		ipa_size = ttl_to_size(pgshift_level_to_ttl(vt->wi.pgshift,
-> -							    vt->wr.level));
-> -		ipa_start = vt->wr.pa & ~(ipa_size - 1);
-> -		ipa_end = ipa_start + ipa_size;
-> -
-> -		if (ipa_end <= start || ipa_start >= end)
-> -			continue;
-> -
-> -		invalidate_vncr(vt);
-> -	}
-> +	kvm_for_each_vncr_tlb(i, vcpu, vt, kvm)
-> +		if (vncr_tlb_intersects(vt, vt->wr.pa, start, end - start))
-> +			invalidate_vncr(vt);
->  }
->  
->  struct s1e2_tlbi_scope {
-> @@ -1059,28 +1063,19 @@ static void invalidate_vncr_va(struct kvm *kvm,
->  	lockdep_assert_held_write(&kvm->mmu_lock);
->  
->  	kvm_for_each_vncr_tlb(i, vcpu, vt, kvm) {
-> -		u64 va_start, va_end, va_size;
-> -
-> -		va_size = ttl_to_size(pgshift_level_to_ttl(vt->wi.pgshift,
-> -							   vt->wr.level));
-> -		va_start = vt->gva & ~(va_size - 1);
-> -		va_end = va_start + va_size;
-> -
->  		switch (scope->type) {
->  		case TLBI_ALL:
->  			break;
->  
->  		case TLBI_VA:
-> -			if (va_end <= scope->va ||
-> -			    va_start >= (scope->va + scope->size))
-> +			if (!vncr_tlb_intersects(vt, vt->gva, scope->va, scope->size))
->  				continue;
->  			if (vt->wr.nG && vt->wr.asid != scope->asid)
->  				continue;
->  			break;
->  
->  		case TLBI_VAA:
-> -			if (va_end <= scope->va ||
-> -			    va_start >= (scope->va + scope->size))
-> +			if (!vncr_tlb_intersects(vt, vt->gva, scope->va, scope->size))
->  				continue;
->  			break;
->  
-> -- 
-> 2.47.3
-> 
+> +static int rmi_create_gpts(phys_addr_t start, phys_addr_t end)
+> +{
+> +	struct rmi_sro_state *sro;
+> +	unsigned long l0gpt_sz;
+> +
+> +	sro = kmalloc_obj(*sro, GFP_KERNEL);
+> +	if (!sro)
+> +		return -ENOMEM;
+> +
+> +	l0gpt_sz = 1UL << (30 + FIELD_GET(RMI_FEATURE_REGISTER_1_L0GPTSZ,
+> +					  rmi_feat_reg(1)));
+> +	start = ALIGN_DOWN(start, l0gpt_sz);
+> +	end = ALIGN(end, l0gpt_sz);
+> +
+> +	while (start < end) {
+> +		long ret = rmi_gpt_l1_create(start, sro, GFP_KERNEL);
+> +
+> +		/*
+> +		 * Make sure the L1 GPT tables are created for the region.
+> +		 * RMI_ERROR_GPT indicates the L1 table already exists.
+> +		 */
+
+minor nit: The comment could be moved down closer to the check.
+
+> +		if (ret < 0) {
+> +			kfree(sro);
+> +			return ret;
+> +		}
+> +
+> +		if (ret != RMI_SUCCESS && RMI_RETURN_STATUS(ret) != RMI_ERROR_GPT) {
+> +			pr_err("GPT Level1 table missing for %llx\n", start);
+> +			kfree(sro);
+> +			return -ENOMEM;
+> +		}
+> +		start += l0gpt_sz;
+> +	}
+> +
+
+Rest looks good to me
+
+Suzuki
