@@ -1,57 +1,57 @@
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com [209.85.128.72])
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com [209.85.218.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B956D3DC878
-	for <kvmarm@lists.linux.dev>; Mon, 10 Aug 2026 13:21:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D38635C68E
+	for <kvmarm@lists.linux.dev>; Mon, 10 Aug 2026 13:22:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786368087; cv=none; b=Fi+Ruf99KJYz74GDIuIUitj9qtYe1EZ2OjOQZ30TmfkcvsDwprK/td+eZm0SEemo1vfTi+S08MqP+nh8CzENIJV9Y4l086fzMg/gGrHtqc18pSHI+0m+xvvH2uvAHwGf1lbE03Hx5OuED8wbSlCqsJvSb1h0jTuhGTYfFbSRsAs=
+	t=1786368169; cv=none; b=KPsTc1kBJxZPdcX9CbpSmNKGbcIJ1PeShSdsVQu3SKRZDvdih5zZ4MDa9xTHhAPG9vsoTRuJ6guE+2bXsTKkDf2ekMwhaAcdaoZ1nAK1JWhzkCMzYMjTsKernA72/BbQRaQ9sCGgExBaqHa2YIwI3jx2pym3nf1jpo8uJDUbKbg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786368087; c=relaxed/simple;
-	bh=Jritruhw88V157bsaVjUyVKBcWQHYkBHQchXkcJBv5s=;
+	s=arc-20240116; t=1786368169; c=relaxed/simple;
+	bh=QgQ3h16t1I2y58P4HYcYNeAl6wbVQDA6rb4jfsvSqvs=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=R/RGq3+3biwG+q9xFImM2XRccixQs10pUsZFFEnDQ2dxeEkyAYsdsZTm1Y817jVaNdhBvNXeVTZ37x6OJBrqTeTxo2NR18b0u409xvxPWTsLumzqgmn5VtnhH5rZZz5XBK0fN8gkX9sUWbiNsaE4TaUQhd96x8+ImfV9K8XajrA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tarunsahu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CbR/wRsT; arc=none smtp.client-ip=209.85.128.72
+	 To:Cc:Content-Type; b=DF2l9axGNNGunJcpRMnKl3OgUnlbUD3D9mthrZ/f6hl3x1+EZd42wtz7hyBKxz1EzMlnBq+wgWhDBf0YF25KPFtPP7+vczr01Pi2BykGzlss9On6T/LQXW5Qqg+1Zq3ueU5WpiIMR9A+GlLveZYIzcnwe4rxmXF0JFBGxG1r4mU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tarunsahu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IwvM8Cav; arc=none smtp.client-ip=209.85.218.69
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tarunsahu.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CbR/wRsT"
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-496b6f97676so18841055e9.2
-        for <kvmarm@lists.linux.dev>; Mon, 10 Aug 2026 06:21:25 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IwvM8Cav"
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-c15c32294e1so167987466b.3
+        for <kvmarm@lists.linux.dev>; Mon, 10 Aug 2026 06:22:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1786368084; x=1786972884; darn=lists.linux.dev;
-        h=content-transfer-encoding:content-type:cc:to:from:subject
-         :message-id:references:mime-version:in-reply-to:date:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=NUXsdBwMwxI/nd8pDWWxjP+P4ja3jy+HCgssAFJhmgg=;
-        b=CbR/wRsT5od2T8ZzVx6vT+CvheVXxQxC7tuL1N/aYTl6eYPFe+8J9VPDnIiET2CGuk
-         jcK0zxTUynLI9vv9uGObHmxaoMGV3gh1Zem0QCjsAqwcJP8Gkng47ZEtYVI+hGlgDOaf
-         8NCU6HQbMSytbIHRRBrxukvH6EA2LCSsVW5RJbw43fILkNzswzk9CLaV19hNopfmLiFU
-         6fD6tjURuXKtCerINrYxcg+gh+ATpxSFbv0Lr3lC7d8UtXvmyBPkjFplxxR6sUmfQAtw
-         7oz+FcWATk+Kjn7OOKLcoZq5dprGH6XYmefO2ep5EUJegxW66SbN3BXW3GAiskUi1XQB
-         bSMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786368084; x=1786972884;
-        h=content-transfer-encoding:content-type:cc:to:from:subject
-         :message-id:references:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+        d=google.com; s=20251104; t=1786368165; x=1786972965; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=NUXsdBwMwxI/nd8pDWWxjP+P4ja3jy+HCgssAFJhmgg=;
-        b=Mf3TlBa/a2mK0ffVRF6r7V5ESlKkhN9Gqw8EaPUhCRD+5kWEQld46mCMh+H57sr38V
-         Nk3xPmvXdXCTrdvxVZ0f/lqwOdwtx4KKibKyAFDYu65c2pfzcMIlQWtrnm9Y/3HjPFtQ
-         +KmoGFWxlPhZ9p/eBPD282skSi7o1LwWJ2RYJ4A0pnCfoG4ewIT3+OLE01AmJf/te5jI
-         SK7AQaDyZd9D5VACSa8XdnOlZwxd5AASVIzzntg+/CprnQfkaXqVKf8Lwzfp7CjkR4Y8
-         DXNznx1rx09jGKZa9jkE6WCFU/6RhVJ0Idjnrq4S5yaiYQ4pKdY+vwwNX9Nry6+1SsaH
-         Ev8g==
-X-Gm-Message-State: AOJu0YzMbV+1NxV0PmB4+BIJDl1R1qKRFNA1Vgw+bgEAHZJMql4cZri4
-	Cm/kAke7MaFrgPgpCIDfE7T+UNf5NMDWbD3sdwcQl0qaCCDKBqKn8T5+AOHIZ40guH4PO8qvWST
-	JN3SFB1CYhQF92jts9g==
-X-Received: from wrwl10.prod.google.com ([2002:a5d:674a:0:b0:47d:fb5d:6130])
+        bh=iM/Qa4ThtXGVoAOuESD7ZLMy4Hwa1Cb/UO9QtFpTQ7s=;
+        b=IwvM8Cav+f/bvi5GnuYU6KSd0ylOhQ8n/npADDDryrw5UVQByD3WzWu5a7NZFqgjIz
+         B5/mqTkyBleT8si4px8KYibtrf0CrUW2yPyYj0M0yFo4nnFSgyUjW650k82n1wl8INmY
+         jC9m87h4ECVbVt5zN/VWqbkqoArxcTtxk1/lwYaldtzOKHb3iyINsawWKrfKXr/cMxNY
+         5sEDf5mp0qBya1OZpfo72EAYKoXZ7F//0WNxMtET8ruQ5PX0FBS8NtVtJXTCZVJqyA9W
+         XH986rj2YG2le/4c81z3vZv8+OftsDr6sHB0FQZ7+jh2O/CjfSxxQkJqTniDemiuBg90
+         K8Uw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786368165; x=1786972965;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=iM/Qa4ThtXGVoAOuESD7ZLMy4Hwa1Cb/UO9QtFpTQ7s=;
+        b=Xq/xASO+bQBMMy45eKMqVbE/wF7NUA8gGqEmUZyILgZgKUlLD3SBnIzqXSnAzxOXJ/
+         wt0Pl/ifpVIQgSlFayagcYVVNL0iRe+4aOe+IwgXWIAFv3UWBkYv45ZcbaeO8rJ0EugZ
+         ozE8di8QvAwap2T/Z9PrCes1/D42zyx/df8OSj6vidYRKB9l8BDwvQWnWm2y4IZ5D+UF
+         PhFj6HYAwnlq1IBRdqeMKXHCF9Jd9pqtqDMPEuuZQUZ18Mdhc14dzj3Oq2nCXmynn1bC
+         i8CEOOD6hBd0ZDzHpMpBKgea8rTcS6bZLpFdEff/USH6IeLX9MpGomzbg6puk05rF7U9
+         uMjw==
+X-Forwarded-Encrypted: i=1; AHgh+RoNsTIM/ixbAyQBXWwNy2ru4CtyLNoLDPumNRfGE40Ohq3z74z36vsSeiyRrvUl7cS68fw/pN0=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yw485yt/qw/JX0Mcnx4Jy3sJDe1gERwAaoNR+YGKw1D9DfOiC1Z
+	VYo2qEj+XU7MMvxj6R04bIvDYosNvqFkiTtREt9O6HybHxS1YTtJ8auoXu/STDuxqvaLd7Rb7f+
+	Jmxhgyz6a8WdDjp5n7g==
+X-Received: from edap32.prod.google.com ([2002:a05:6402:5020:b0:6a0:ddb8:db7f])
  (user=tarunsahu job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:4715:b0:493:cefc:d113 with SMTP id 5b1f17b1804b1-4996195884bmr227828785e9.5.1786368083378;
- Mon, 10 Aug 2026 06:21:23 -0700 (PDT)
-Date: Mon, 10 Aug 2026 13:21:22 +0000
-In-Reply-To: <20260728122128.D0E831F000E9@smtp.kernel.org>
+ 2002:a05:6402:a5c1:20b0:6a1:f7f4:200b with SMTP id 4fb4d7f45d1cf-6a1f7f4278bmr5285938a12.12.1786368164940;
+ Mon, 10 Aug 2026 06:22:44 -0700 (PDT)
+Date: Mon, 10 Aug 2026 13:22:44 +0000
+In-Reply-To: <CAEvNRgEbS06snhyHznPSqxnUrdudVEKUuOpPwnU+AJATWFBRBA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -59,95 +59,73 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20260728121138.1103610-1-tarunsahu@google.com>
- <20260728121138.1103610-10-tarunsahu@google.com> <20260728122128.D0E831F000E9@smtp.kernel.org>
-Message-ID: <9huzy0ee6rhp.fsf@tarunix.c.googlers.com>
-Subject: Re: [PATCH v4 09/11] docs: liveupdate: Add documentation for VM and
- guest_memfd preservation
+ <20260728121138.1103610-12-tarunsahu@google.com> <CAEvNRgEbS06snhyHznPSqxnUrdudVEKUuOpPwnU+AJATWFBRBA@mail.gmail.com>
+Message-ID: <9huzv79i6rff.fsf@tarunix.c.googlers.com>
+Subject: Re: [PATCH v4 11/11] KVM: selftests: Add guest_memfd_preservation_test
 From: tarunsahu@google.com
-To: sashiko-reviews@lists.linux.dev
-Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oupton@kernel.org>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+To: Ackerley Tng <ackerleytng@google.com>, fuad.tabba@linux.dev, 
+	Andrew Morton <akpm@linux-foundation.org>, seanjc@google.com, dmatlack@google.com, 
+	Shuah Khan <skhan@linuxfoundation.org>, Jonathan Corbet <corbet@lwn.net>, david@redhat.com, 
+	Pasha Tatashin <pasha.tatashin@soleen.com>, Pratyush Yadav <pratyush@kernel.org>, sagis@google.com, 
+	Paolo Bonzini <pbonzini@redhat.com>, Mike Rapoport <rppt@kernel.org>, Alexander Graf <graf@amazon.com>
+Cc: linux-kselftest@vger.kernel.org, andre.przywara@arm.com, 
+	michael.roth@amd.com, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
+	will@kernel.org, vannapurve@google.com, maz@kernel.org, fvdl@google.com, 
+	kvm@vger.kernel.org, oliver.upton@linux.dev, kvmarm@lists.linux.dev, 
+	alexandru.elisei@arm.com, skhawaja@google.com, aneesh.kumar@kernel.org, 
+	linux-doc@vger.kernel.org, David Hildenbrand <david@kernel.org>, yan.y.zhao@intel.com, 
+	kexec@lists.infradead.org, suzuki.poulose@arm.com
+Content-Type: text/plain; charset="UTF-8"
 
-sashiko-bot@kernel.org writes:
+Ackerley Tng <ackerleytng@google.com> writes:
 
-> Thank you for your contribution! Sashiko AI review found 1 potential issu=
-e(s) to consider:
-> - [Low] Mismatched kernel-doc section titles cause Sphinx build warnings =
-and missing documentation.
-> --
+> Tarun Sahu <tarunsahu@google.com> writes:
 >
-> --- Patch [9]: [PATCH v4 09/11] docs: liveupdate: Add documentation for V=
-M and guest_memfd preservation ---
-> commit a930d2f58a9edc06bdcfd10fb383e97d7fe3996c
-> Author: Tarun Sahu <tarunsahu@google.com>
+>> Add guest_memfd_preservation_test to verify that KVM VM state and guest
+>> memory backed by guest_memfd are preserved across a kexec reboot via Live
+>> Update Orchestrator (LUO).
+>>
+>> This test includes multiple tests
+>> - (A) Test to preserve non-guest_memfd, non-memfd which must fail (/dev/null)
+>> - (B) Test to preserve guest_memfd with no INIT_SHARED flag which must fail
+>> - (C) Test to allocate the guest_memfd memory after preservation because
+>>   preservation makes the guest_memfd frozen. Which must fail as well.
+>> - (D) Test to verify guest_memfd with INIT_SHARED flag preservation across
+>>   kexec: Below is the details of stages in this test.
+>>
 >
-> docs: liveupdate: Add documentation for VM and guest_memfd preservation
->    =20
-> Add Documentation/liveupdate/vmm.rst detailing VMM requirements, scope,
-> ordering constraints, and kernel-doc inclusions for KVM VM and
-> guest_memfd preservation via Live Update Orchestrator (LUO).
->
->> diff --git a/Documentation/liveupdate/vmm.rst b/Documentation/liveupdate=
-/vmm.rst
->> new file mode 100644
->> index 0000000000000..b8e8fb2b63c21
->> --- /dev/null
->> +++ b/Documentation/liveupdate/vmm.rst
->> @@ -0,0 +1,107 @@
->> +.. SPDX-License-Identifier: GPL-2.0-or-later
->> +
->> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D
->> +VM & Guest_Memfd Preservation
->> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D
->> +
->> +.. kernel-doc:: virt/kvm/kvm_luo.c
->> +   :doc: KVM VM Preservation via LUO
->> +
->> +.. kernel-doc:: virt/kvm/guest_memfd_luo.c
->> +   :doc: Guest_Memfd Preservation via LUO
->
-> [Severity: Low]
-> Does this section title exactly match the DOC: title in
-> virt/kvm/guest_memfd_luo.c?
->
-> If the source file uses "Guestmemfd Preservation via LUO" without the
-> underscore, this directive will fail to find the documentation and genera=
-te a
-> Sphinx build warning.
+> I think we should split this into multiple patches, where each patch
+> introduces 1 test.
 
+Got it. I will split them. I thought that this test already spawn a VM
+and other test can just reuse the same VM.
 
-I will correct it. Good find!
 >
-> [ ... ]
+>>
+>> [...snip...]
+>>
+>> +++ b/tools/testing/selftests/kvm/guest_memfd_preservation_test.c
+>> @@ -0,0 +1,357 @@
+>> +// SPDX-License-Identifier: GPL-2.0
+>> +/*
+>> + * Copyright (C) 2026, Google LLC.
+>> + *
+>> + * Author: Tarun Sahu <tarunsahu@google.com>
+>> + *
+>> + * Test for VM and guest_memfd preservation across kexec (Live Update) via LUO.
+>> + *
+>> + * NOTE: This is a MANUAL test and is excluded from automated CI/testing
+>> + * frameworks because Stage 1 daemonizes into the background to pin resources
+>> + * and requires a human operator to manually trigger kexec before Stage 2
+>> + * is executed. Running Stage 1 automatically would leak the background daemon
+>> + * and cause CI runners to falsely interpret it as a passed test.
+>> + *
 >
->> +VM & Guest_Memfd Preservation ABI
->> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->> +
->> +.. kernel-doc:: include/linux/kho/abi/kvm.h
->> +   :doc: DOC: guest_memfd Live Update ABI
+> Usually there aren't many printfs in tests, but since this is a MANUAL
+> test, maybe that's ok?
 >
-> [Severity: Low]
-> Does this section title match the actual title in include/linux/kho/abi/k=
-vm.h?
+> Would like to know what Sean thinks of this, and printfs in general.
 >
-> If the source file uses "KVM and guest_memfd Live Update ABI", this misma=
-tch
-> will cause empty sections in the generated documentation.
->
-> Also, should the literal "DOC: " prefix be omitted here? The directive
-> typically only expects the text that follows the prefix.
->
->> +
->> +.. kernel-doc:: include/linux/kho/abi/kvm.h
->> +   :internal:
->> +
->> +See Also
->
-> --=20
-> Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260728121138.11=
-03610-1-tarunsahu@google.com?part=3D9
+>>
+>> [...snip...]
+>>
