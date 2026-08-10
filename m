@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31BC0442FA7
-	for <kvmarm@lists.linux.dev>; Mon, 10 Aug 2026 20:51:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AECB443AAF
+	for <kvmarm@lists.linux.dev>; Mon, 10 Aug 2026 20:51:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786395115; cv=none; b=gB8tn+PBq4/EV7/3+7b3lPw8J5N6e0tI2yhqp9WII9JtK0+i/Wf8J0HKIZgHsKSzTEl+pZDYV6uvpSi0IV9ue+x2s/UqAfvY1a+Qopfd02BkWgBrq4hbmNBsu22kcEAE+eql/DNL9pBsxRJs7oFl6tKwEsfq+5O2MyKMyQzx4Ec=
+	t=1786395118; cv=none; b=FGD21danXB3g9pC+iBwLKL5LQIcK78+QLU9HZ1oQpzvFcMmwX2Wa914j83A4xgfTFelnoArsgHbdw2tySrbGHgUNjLJXo5xB6vZjSSzMGoxLdh+Knu7USAieoxivQRKEQsxQ1Ut5BKgIvLjWf2k83dokHklWAoIxz44hLSsoXNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786395115; c=relaxed/simple;
-	bh=+00wwLx2iD8NqUqVubsawzy5FD696qdsjH5gps6fsU8=;
+	s=arc-20240116; t=1786395118; c=relaxed/simple;
+	bh=hN26P/A7fPLce60cNx8etfOGz+xdHCZDDJNeNaHZn5U=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hPCZ3Iur84p91huftLtNH0GaG+Al0/jGSzaeREB5hgN0NTbwDnYcqUU8FHaMdpafW54dwXfyHGG4NTjAvtujcCCBlzZ9ZI9fvFG4Gx+6IYxQEHnIxSYfWMl8SJNup6aIXtf2a4oz1HQtI2jJlc71SFpAGOprJKfBDFwc78C2rOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=g34esSVb; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=onbn4dW+m0jHX0Da7dDJyuvSMWl6S3oK8ZXjMtcbrI1ioDgBQ2qoL3PCP93TwLyrtyFZVFOv+3+BnVt8dpgubXzwqTgxM1Y//z9gqFrcgDJVZFutU3cI+C6ZGzB1Wp4B3mm++axKTWNVplCSYlw0brYbg5V9peFJYlML0bBOdYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=KbEWoXia; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="g34esSVb"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="KbEWoXia"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 929A61655;
-	Mon, 10 Aug 2026 13:51:49 -0700 (PDT)
-Received: from workstation-e142269.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A27EA3F673;
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C44791516;
 	Mon, 10 Aug 2026 13:51:51 -0700 (PDT)
+Received: from workstation-e142269.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D2BB83F673;
+	Mon, 10 Aug 2026 13:51:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1786395113; bh=+00wwLx2iD8NqUqVubsawzy5FD696qdsjH5gps6fsU8=;
+	t=1786395115; bh=hN26P/A7fPLce60cNx8etfOGz+xdHCZDDJNeNaHZn5U=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=g34esSVbwgvbpFnxNBpR1Me1bmsksw0WYXt0Sq2xiR4AT3vfjPITtqT56LaFKP/RB
-	 QKtAiNOmsH1OF4L1utKZU8Q+ej6AIMcG9Exk7XpM2YkOUJmO9IpGxXYpfNcCzf3Mc6
-	 sajgsFgdsiv8DS4sLiamM19Dv6DOy1LCb2CK+QL4=
+	b=KbEWoXiadmbBfT9ixd2GAFqz9FXrmRXiuqzsMnN8bAxCWDoVW6zt/ngneh3o/bRl/
+	 iiU2+MKQwB7mp2sWun5HX2a8rX4ayUV2qiXc5tjRvFsyMsbsHBT6KPnWdl17LJPWKx
+	 5ZcQ0YdIG1LXmBJVJS1W66ODjqJ+8QjTwdqrxUVs=
 From: Wei-Lin Chang <weilin.chang@arm.com>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
@@ -42,9 +42,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Lorenzo Stoakes <ljs@kernel.org>,
 	Itaru Kitayama <itaru.kitayama@fujitsu.com>,
 	Wei-Lin Chang <weilin.chang@arm.com>
-Subject: [PATCH v5 2/6] KVM: arm64: nv: Introduce guest stage-2 tracking structures
-Date: Mon, 10 Aug 2026 21:50:34 +0100
-Message-ID: <20260810205038.118843-3-weilin.chang@arm.com>
+Subject: [PATCH v5 3/6] KVM: arm64: nv: Track guest stage-2 mapping creation
+Date: Mon, 10 Aug 2026 21:50:35 +0100
+Message-ID: <20260810205038.118843-4-weilin.chang@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260810205038.118843-1-weilin.chang@arm.com>
 References: <20260810205038.118843-1-weilin.chang@arm.com>
@@ -56,187 +56,173 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-In order to avoid unmapping all shadow stage-2 mappings when KVM
-receives a MMU notifier unmap call, we have to keep track of the
-canonical IPA -> nested IPA relationship of the shadow mappings
-created. This essentially means tracking the guest's stage-2.
+During shadow stage-2 faults, in addition to creating mappings in the
+shadow page tables, also allocate kvm_guest_s2_mapping objects, record
+the mapping ranges, and insert them into the canonical and nested mmu's
+guest_s2_mappings tree.
 
-To do this, represent each mapping by struct kvm_guest_s2_mapping. It
-stores the mapping's canonical IPA range and the nested IPA range using
-two interval tree nodes. Both nodes will be inserted into their
-respective interval trees called guest_s2_mappings. The canonical IPA
-ranges will be stored in the tree within the canonical MMU, and the
-nested IPA ranges will be stored in the corresponding nested MMU's tree.
-
-For example:
-
-struct kvm_guest_s2_mapping mapping1, mapping2;
-
-    ---------------------> mapping2.canonical
-    |                      mapping1.canonical
-    |                          ^   (both stored in canonical mmu's tree)
-    |                          |
---*****-----------------------*****----------- CIPA
-   \\\\\                      |||||                  mapping1.nested_mmu
-    \\\\\                     \\\\\                            |
-     \\\\\                     \\\\\                           v
-------\\\\\---------------------*****--------- NIPA #1 (nested mmu #1)
-       \\\\\                      |
-        \\\\\                     -> mapping1.nested
-         \\\\\                       (stored in nested mmu #1's tree)
-          \\\\\
------------*****------------------------------ NIPA #2 (nested mmu #2)
-             |                                                 ^
-             -> mapping2.nested                                |
-                (stored in nested mmu #2's tree)   mapping2.nested_mmu
-
-Using the trees we can look up nodes in either of the IPA spaces, and
-for each node, find the corresponding range in the other IPA space from
-the other node in the enclosing kvm_guest_s2_mapping.
-
-Define kvm_guest_s2_mapping and the interval tree here. Guest stage-2
-mapping tracking will come in subsequent patches.
+Note that because we allow parallel faulting, the interval trees could
+store mappings that are not live in the shadow page tables. Storing a
+superset of the live mappings is fine because we will only over-unmap
+when we use this information later to do the targeted MMU notifier
+unmap.
 
 Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
 ---
- arch/arm64/include/asm/kvm_host.h | 17 +++++++++++++++++
- arch/arm64/kvm/mmu.c              | 30 ++++++++++++++++++++++++++++++
- arch/arm64/kvm/nested.c           |  1 +
- 3 files changed, 48 insertions(+)
+ arch/arm64/include/asm/kvm_nested.h |  3 +++
+ arch/arm64/kvm/mmu.c                | 29 +++++++++++++++++++++++++++++
+ arch/arm64/kvm/nested.c             | 25 +++++++++++++++++++++++++
+ 3 files changed, 57 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index bae2c4f92ef5..0695c4ef93f1 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -14,6 +14,7 @@
- #include <linux/arm-smccc.h>
- #include <linux/bitmap.h>
- #include <linux/types.h>
-+#include <linux/interval_tree.h>
- #include <linux/jump_label.h>
- #include <linux/kvm_types.h>
- #include <linux/maple_tree.h>
-@@ -150,6 +151,16 @@ struct kvm_vmid {
- 	atomic64_t id;
- };
- 
-+/*
-+ * Record of a guest stage-2 mapping, storing canonical and nested IPA
-+ * ranges. Both ranges have the same size.
-+ */
-+struct kvm_guest_s2_mapping {
-+	struct interval_tree_node canonical;
-+	struct interval_tree_node nested;
-+	struct kvm_s2_mmu *nested_mmu;
-+};
-+
- struct kvm_s2_mmu {
- 	struct kvm_vmid vmid;
- 
-@@ -227,6 +238,9 @@ struct kvm_s2_mmu {
- 	 */
- 	bool	pending_unmap;
- 
-+	/* Guest s2 mapping records indexed in this MMU's IPA space. */
-+	struct rb_root_cached guest_s2_mappings;
-+
- 	/*
- 	 *  0: Nobody is currently using this, check vttbr for validity
- 	 * >0: Somebody is actively using this.
-@@ -326,6 +340,9 @@ struct kvm_arch {
- 	size_t nested_mmus_size;
- 	int nested_mmus_next;
- 
-+	/* Guest s2 tracking trees access serialization. */
-+	spinlock_t guest_s2_tracking_lock;
-+
- 	/* Interrupt controller */
- 	struct vgic_dist	vgic;
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index 012d711034d1..560b78b3f5ff 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -77,6 +77,9 @@ extern void kvm_s2_mmu_iterate_by_vmid(struct kvm *kvm, u16 vmid,
+ 				       const union tlbi_info *info,
+ 				       void (*)(struct kvm_s2_mmu *,
+ 						const union tlbi_info *));
++extern void kvm_record_guest_s2_mapping(struct kvm_s2_mmu *mmu, gpa_t canonical_ipa,
++					gpa_t nested_ipa, size_t map_size,
++					struct kvm_guest_s2_mapping *mapping);
+ extern void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu);
+ extern void kvm_vcpu_put_hw_mmu(struct kvm_vcpu *vcpu);
  
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 336dd8f7e8ab..59b4f583240e 100644
+index 59b4f583240e..cea968921041 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -7,6 +7,7 @@
- #include <linux/acpi.h>
- #include <linux/mman.h>
- #include <linux/kvm_host.h>
-+#include <linux/interval_tree.h>
- #include <linux/io.h>
- #include <linux/hugetlb.h>
- #include <linux/sched/signal.h>
-@@ -1033,6 +1034,8 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
- 
- 	mmu->pgd_phys = __pa(pgt->pgd);
- 
-+	mmu->guest_s2_mappings = RB_ROOT_CACHED;
-+
- 	if (kvm_is_nested_s2_mmu(kvm, mmu))
- 		kvm_init_nested_s2_mmu(mmu);
- 
-@@ -1122,10 +1125,32 @@ void stage2_unmap_vm(struct kvm *kvm)
- 	srcu_read_unlock(&kvm->srcu, idx);
- }
- 
-+static void guest_s2_tracking_destroy(struct kvm_s2_mmu *mmu,
-+				      struct rb_root_cached *tree)
-+{
-+	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
-+	struct kvm_guest_s2_mapping *mapping;
-+	struct interval_tree_node *node;
-+
-+	while ((node = interval_tree_iter_first(tree, 0, ULONG_MAX))) {
-+		interval_tree_remove(node, tree);
-+
-+		if (!kvm_is_nested_s2_mmu(kvm, mmu)) {
-+			mapping = container_of(node, struct kvm_guest_s2_mapping,
-+					       canonical);
-+			/* The canonical MMU is destroyed after the nested MMUs. */
-+			kfree(mapping);
+@@ -1642,6 +1642,7 @@ static int gmem_abort(const struct kvm_s2_fault_desc *s2fd)
+ 	enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_SHARED;
+ 	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
+ 	struct kvm_pgtable *pgt = s2fd->vcpu->arch.hw_mmu->pgt;
++	struct kvm_guest_s2_mapping *mapping = NULL;
+ 	unsigned long mmu_seq;
+ 	struct page *page;
+ 	struct kvm *kvm = s2fd->vcpu->kvm;
+@@ -1655,6 +1656,11 @@ static int gmem_abort(const struct kvm_s2_fault_desc *s2fd)
+ 		ret = topup_mmu_memcache(s2fd->vcpu, memcache);
+ 		if (ret)
+ 			return ret;
++		if (kvm_is_nested_s2_mmu(kvm, pgt->mmu)) {
++			mapping = kmalloc_obj(struct kvm_guest_s2_mapping, GFP_KERNEL_ACCOUNT);
++			if (!mapping)
++				return -ENOMEM;
 +		}
-+
-+		cond_resched();
-+	}
-+}
-+
- void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
- {
- 	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
- 	struct kvm_pgtable *pgt = NULL;
-+	struct rb_root_cached mappings_tree;
- 
- 	write_lock(&kvm->mmu_lock);
- 	pgt = mmu->pgt;
-@@ -1138,12 +1163,17 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
- 	if (kvm_is_nested_s2_mmu(kvm, mmu))
- 		kvm_init_nested_s2_mmu(mmu);
- 
-+	mappings_tree = mmu->guest_s2_mappings;
-+	mmu->guest_s2_mappings = RB_ROOT_CACHED;
-+
- 	write_unlock(&kvm->mmu_lock);
- 
- 	if (pgt) {
- 		kvm_stage2_destroy(pgt);
- 		kfree(pgt);
  	}
-+
-+	guest_s2_tracking_destroy(mmu, &mappings_tree);
- }
  
- static void hyp_mc_free_fn(void *addr, void *mc)
+ 	if (s2fd->nested)
+@@ -1675,6 +1681,7 @@ static int gmem_abort(const struct kvm_s2_fault_desc *s2fd)
+ 	if (ret) {
+ 		kvm_prepare_memory_fault_exit(s2fd->vcpu, s2fd->fault_ipa, PAGE_SIZE,
+ 					      write_fault, exec_fault, false);
++		kfree(mapping);
+ 		return ret;
+ 	}
+ 
+@@ -1708,11 +1715,17 @@ static int gmem_abort(const struct kvm_s2_fault_desc *s2fd)
+ 		ret = KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, s2fd->fault_ipa, PAGE_SIZE,
+ 							 __pfn_to_phys(pfn), prot,
+ 							 memcache, flags);
++		if (!ret && kvm_is_nested_s2_mmu(kvm, pgt->mmu)) {
++			kvm_record_guest_s2_mapping(pgt->mmu, gfn << PAGE_SHIFT,
++						    s2fd->fault_ipa, PAGE_SIZE, mapping);
++			mapping = NULL;
++		}
+ 	}
+ 
+ out_unlock:
+ 	kvm_release_faultin_page(kvm, page, !!ret, prot & KVM_PGTABLE_PROT_W);
+ 	kvm_fault_unlock(kvm);
++	kfree(mapping);
+ 
+ 	if ((prot & KVM_PGTABLE_PROT_W) && !ret)
+ 		mark_page_dirty_in_slot(kvm, s2fd->memslot, gfn);
+@@ -2049,6 +2062,7 @@ static int kvm_s2_fault_map(const struct kvm_s2_fault_desc *s2fd,
+ 			    void *memcache)
+ {
+ 	enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_SHARED;
++	struct kvm_guest_s2_mapping *mapping = NULL;
+ 	bool writable = prot & KVM_PGTABLE_PROT_W;
+ 	struct kvm *kvm = s2fd->vcpu->kvm;
+ 	phys_addr_t canonical_ipa;
+@@ -2059,6 +2073,15 @@ static int kvm_s2_fault_map(const struct kvm_s2_fault_desc *s2fd,
+ 	gfn_t gfn;
+ 	int ret;
+ 
++	if (kvm_is_nested_s2_mmu(kvm, s2fd->vcpu->arch.hw_mmu)) {
++		mapping = kmalloc_obj(struct kvm_guest_s2_mapping,
++				      GFP_KERNEL_ACCOUNT);
++		if (!mapping) {
++			kvm_release_page_unused(s2vi->page);
++			return -ENOMEM;
++		}
++	}
++
+ 	kvm_fault_lock(kvm);
+ 	pgt = s2fd->vcpu->arch.hw_mmu->pgt;
+ 	ret = -EAGAIN;
+@@ -2112,11 +2135,17 @@ static int kvm_s2_fault_map(const struct kvm_s2_fault_desc *s2fd,
+ 		ret = KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, gfn_to_gpa(gfn), mapping_size,
+ 							 __pfn_to_phys(pfn), prot,
+ 							 memcache, flags);
++		if (!ret && kvm_is_nested_s2_mmu(kvm, pgt->mmu)) {
++			kvm_record_guest_s2_mapping(pgt->mmu, canonical_ipa,
++						    gfn_to_gpa(gfn), mapping_size, mapping);
++			mapping = NULL;
++		}
+ 	}
+ 
+ out_unlock:
+ 	kvm_release_faultin_page(kvm, s2vi->page, !!ret, writable);
+ 	kvm_fault_unlock(kvm);
++	kfree(mapping);
+ 
+ 	/*
+ 	 * Mark the page dirty only if the fault is handled successfully,
 diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index dfb96edbdc43..744aacba61ae 100644
+index 744aacba61ae..646b628bba17 100644
 --- a/arch/arm64/kvm/nested.c
 +++ b/arch/arm64/kvm/nested.c
-@@ -49,6 +49,7 @@ void kvm_init_nested(struct kvm *kvm)
- 	kvm->arch.nested_mmus = NULL;
- 	kvm->arch.nested_mmus_size = 0;
- 	atomic_set(&kvm->arch.vncr_map_count, 0);
-+	spin_lock_init(&kvm->arch.guest_s2_tracking_lock);
+@@ -5,6 +5,7 @@
+  */
+ 
+ #include <linux/bitfield.h>
++#include <linux/interval_tree.h>
+ #include <linux/kvm.h>
+ #include <linux/kvm_host.h>
+ 
+@@ -852,6 +853,30 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
+ 	return s2_mmu;
  }
  
- static int init_nested_s2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
++void kvm_record_guest_s2_mapping(struct kvm_s2_mmu *mmu, gpa_t canonical_ipa,
++				 gpa_t nested_ipa, size_t map_size,
++				 struct kvm_guest_s2_mapping *mapping)
++{
++	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
++
++	lockdep_assert_held_read(&kvm->mmu_lock);
++
++	if (WARN_ON(!IS_ALIGNED(canonical_ipa, map_size)))
++		canonical_ipa = ALIGN_DOWN(canonical_ipa, map_size);
++
++	mapping->canonical.start = canonical_ipa;
++	mapping->canonical.last  = canonical_ipa + map_size - 1;
++
++	mapping->nested.start    = nested_ipa;
++	mapping->nested.last     = nested_ipa + map_size - 1;
++
++	mapping->nested_mmu      = mmu;
++
++	guard(spinlock)(&kvm->arch.guest_s2_tracking_lock);
++	interval_tree_insert(&mapping->nested, &mmu->guest_s2_mappings);
++	interval_tree_insert(&mapping->canonical, &kvm->arch.mmu.guest_s2_mappings);
++}
++
+ void kvm_init_nested_s2_mmu(struct kvm_s2_mmu *mmu)
+ {
+ 	/* CnP being set denotes an invalid entry */
 -- 
 2.43.0
 
