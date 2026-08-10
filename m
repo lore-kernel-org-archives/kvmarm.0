@@ -1,160 +1,122 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7B1723ABB9
-	for <kvmarm@lists.linux.dev>; Sun,  9 Aug 2026 21:10:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13C9B2931CB
+	for <kvmarm@lists.linux.dev>; Mon, 10 Aug 2026 00:56:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786309831; cv=none; b=G8Rreg22016XPSOS2LX/tBH7No0vvO6hR3YbqcoD5km2mXAqQrtqjICCkU0pf36eKBM+EK1KERbSpMqjF4dI6ED4CrYIQXnZBJj722JOyLV+AuYNGQFf/UE/HTagkcSwUVmeIN/o9rHM45pjE3K4KsG4svov3UJueh4pwHguMtc=
+	t=1786323387; cv=none; b=tUeaaSXCV2QK05JUS1+cdOgT51Xux32yQZFx+L4vftQc93/4K0pj9dVZ32VY3srWry2tYXCmocUkU6sO+ditIcmjJvxPlSfiP1ploMXkcOltVtMr/YrxSCsBKv0Z3wXux4kB5yZZzWMdD6OMtODFNbM2PDKKGgTsCH4DtVlkrVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786309831; c=relaxed/simple;
-	bh=aUenOQaxYfurqAqvCj57DN6G70zQmIE9xEPJQtycqtM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SxvZjej1R3UekW/Rq++sHbTbEFwXX9f9lz6J8SOWBUP64S9/dvhwxuqarrG96N3RzytbobqtwrdHntldokPZ5yIvKFmt52FGe4NeaNUlq/j9M9DghI3qUg5VIk0oVU7smNlOwsQHkyyYUHNpLTFsSLGJvqj8EcjFLUl/MzeI2u4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=jWGWc+x2; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1786323387; c=relaxed/simple;
+	bh=rJry1y/C4IOyBGrEJ8k2O+n8bSkoMmhplCKSO/Vr0po=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dWZc+lpaGY2En83QXVWRq9Wk3NNUIka1WvDH/wJ4CxXPwAFNETmSnXFIz/lSeREIJGhow/Wz6y9fysjiVELd22S8yEZVDaZ2pPFkbVCAD+oPYv9h3WjQr7W6ftUX65MUBQi1tcRFK8yXY+/RAdVxB5gcTP4c25R3uHWOWFWasTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gaVYZ76c; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="jWGWc+x2"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 995BD1516;
-	Sun,  9 Aug 2026 14:10:16 -0700 (PDT)
-Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D95E43F673;
-	Sun,  9 Aug 2026 14:10:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1786309820; bh=aUenOQaxYfurqAqvCj57DN6G70zQmIE9xEPJQtycqtM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jWGWc+x2RiRkdSWgVaLkkFiJjpGxXeWWG5N7cY627JtHUEKuR25MtyyQRiBk05oeB
-	 hob+ot8gudp0s6nAYrlRV1n2u1NIbUMNu9TVj0zghB/fva4V3HdeA1Z9H5bONxVLiT
-	 A0d0/ZBt6CFiggPk/eWlJosIdjo7HYvp9LYMk+WY=
-Date: Sun, 9 Aug 2026 22:10:08 +0100
-From: Wei-Lin Chang <weilin.chang@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, Steffen Eiden <seiden@linux.ibm.com>, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Fuad Tabba <fuad.tabba@linux.dev>, Hyunwoo Kim <imv4bel@gmail.com>, 
-	Yao Yuan <yaoyuan@linux.alibaba.com>, ljs@kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH v2 4/8] KVM: arm64: Correctly handle end of VA space TLBI
- invalidation
-Message-ID: <25bqhok76mwuuqbklccvvrstatnlorxjimopx66pef2kgffsbr@aof7o3w4aocz>
-References: <20260806091026.620700-1-maz@kernel.org>
- <20260806091026.620700-5-maz@kernel.org>
- <yifz3wn5gk5sr6mapi32trgk5m5kp33bquctsjmkifebnsnndt@fix6u4rthx4g>
- <86wltz9n6u.wl-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gaVYZ76c"
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-495437bb891so10389715e9.1
+        for <kvmarm@lists.linux.dev>; Sun, 09 Aug 2026 17:56:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1786323384; x=1786928184; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=+bCXqXiVHaA5FZ3XKQFV9NmmEszADDHeGAjplPg15vc=;
+        b=gaVYZ76cGf9TQCY95kNNIKMQpP42R4PiafFI1bJ9FVnnqXREL0NhFc4fqWNqCfY5OQ
+         JTnF1emHnFPF5wku0FA2YeUFG9D92Uz2FzM1f6/vJbBvod7tyf8VyM3b/rQhbS+gLzRx
+         CSGdaN+AWLhaH6ar3Ze45u13d8ccfhVI3kUdKZR4seDnRV2ZnEJFuVssRRmetFJKJvIA
+         CnE7t2g0hiOtS6LrWZt/dr7tQioa8NhYKCbU2PiP4B+3hS/uCaTc1jSrRgn8o1a2rrcf
+         TpX/eyxooQGNoyi15RXOqavq3MPwGt3FTM8jAjtTn47aKzuFPtvgBMqNJlUVYI5inQeK
+         4zcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786323384; x=1786928184;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=+bCXqXiVHaA5FZ3XKQFV9NmmEszADDHeGAjplPg15vc=;
+        b=M1TwvKHm3xDxJId7djHAUH3pfI+Z256oGSZ/Cezr0avTh+8rNPdBw4iMA4Uamq/T5c
+         vH44s3QQbTRIhoeHnhmYLKaH1ZSw9DeMeCiLWugU1SVYUT901Sqc9+Styaf/i7Q/ebJB
+         9f2MTLvubAS3cbHQ6L39Zye02PzuNgbaElAoY7Vu8DPTz27iCNokYuvm97SS5oK7BgHu
+         7n+KWdkUogyLuLEZykrtebA7UqAg8RqCqqlotcHFjhdglbrOhcy8HP8euediEB3hqDsK
+         3ds4RPB1Q3uQjZ8zmzZms0+8p+bQQlSAsXBxS+6xdJQH7KWBXRYbHK3WW7ygQDcEWhrH
+         Ei7Q==
+X-Forwarded-Encrypted: i=1; AHgh+RpBRWUqfeg+2zRE1QHdkqD7h0s2YYuB794a/lyG3kEtueSa0c4trALNX74bcGtimwEDZjrYf9E=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzH+Dkd349DTl1LOSmmWpbZhf/0bCOa9+hR2kXFXor4RD3AAca5
+	wFSc/Aftrudsg7mVrk0vZGEXXCK/nf+KVllZT8Ocka46gnVTxaB7KpXz
+X-Gm-Gg: AR+sD137Qm0fTW8OpO9Yw6vrEVIasI5+y9jbcJkEc55LkMZ+py8QP/hU2C8osZDIxIy
+	/wuYI0hO+16RC+tGVTVYSeChEsoHtH+Eq0HfYvheDskpvsT1563yBhFZ1cjuE445QsWAiYysH8q
+	g15b6cFSHRMwVI8mRwrMr0aC51aa/+se+qX5gj8wgTtFG5XH25t/O4RLKqjgBgXH9Kbn+7Lypdd
+	7xVQinGwjEmrAN8uHnsYVMpe2yqKAziQ62wJTdQs7v9FCl7V3Rdq7VyxRV7SElqLn9UsWUFD1rc
+	LHz+3SyTAWk+JQpNhmA6ICAyv3LQv0JbehkezNHtWwlFDW7efe0u/TBEaiY3qYQtmFRMB0e+vQC
+	clp40PuL2HkLdUEeZNt2OhhRJMMta+oWe+1kcUSO/RSKKMHFkgvxJqEH+wIbbChrB7kPhNk2QS9
+	Tb35bQNfOn08YE3NQ/8tlyJ+R8xHObXV+Aygwjplgg2Omu30tkrIR7DEEek795Jsc2AmWgmKtJI
+	7ndEcD4iNxsPT8hDMkmYsYq/+hBvxoey9TFMkGzqt814AlIokADsJovTXuSFBYCrsW2y6ZIJZTM
+	WrYOcQf03dvQ4WHjeMesGnh5pWxoVIJgX5rXZurevE0GwO+b7lt1dhLPY9zeHjFiTftf
+X-Received: by 2002:a05:600c:c87:b0:493:f783:c46a with SMTP id 5b1f17b1804b1-49962472d69mr139626325e9.6.1786323384059;
+        Sun, 09 Aug 2026 17:56:24 -0700 (PDT)
+Received: from localhost.localdomain (dynamic-2a02-3100-ac88-a501-9c5c-9666-3a00-3cdb.310.pool.telefonica.de. [2a02:3100:ac88:a501:9c5c:9666:3a00:3cdb])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4995422016fsm302405405e9.8.2026.08.09.17.56.22
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Sun, 09 Aug 2026 17:56:22 -0700 (PDT)
+From: Karl Mehltretter <kmehltretter@gmail.com>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	kvmarm@lists.linux.dev
+Cc: Karl Mehltretter <kmehltretter@gmail.com>,
+	Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: arm64: Fix AArch32 DBGBXVR<n> handling
+Date: Mon, 10 Aug 2026 02:56:16 +0200
+Message-Id: <20260810005616.13227-1-kmehltretter@gmail.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86wltz9n6u.wl-maz@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Sun, Aug 09, 2026 at 07:13:45PM +0100, Marc Zyngier wrote:
-> On Sat, 08 Aug 2026 22:41:31 +0100,
-> Wei-Lin Chang <weilin.chang@arm.com> wrote:
-> > 
-> > Hi Marc,
-> > 
-> > On Thu, Aug 06, 2026 at 10:10:22AM +0100, Marc Zyngier wrote:
-> > > Our TLB invalidation by VA code is based on comparing two ranges,
-> > > one defined by the TLB, and one defined by the TLBI instruction.
-> > > 
-> > > Each range is defined by a start and a size. However, the way the
-> > > comparison is done doesn't account for address rollover, as it
-> > > compares an address with (base + size). This works nicely until
-> > > this expression represent the last page/block in the TTBR1 VA space,
-> > > as the result is a big fat 0. And a failed TLB invalidation.
-> > > 
-> > > Rewrite the comparison in a way that is immune to the address
-> > > rollover (making the end address inclusive instead of exclusive),
-> > > and move this into a common helper that is used by both VA and IPA
-> > > invalidations, as suggested by Hyunwoo Kim (although the IPA version
-> > > didn't suffer from this particular problem, obviously).
-> > > 
-> > > Fixes: 4ffa72ad8f37e ("KVM: arm64: nv: Add S1 TLB invalidation primitive for VNCR_EL2")
-> > > Reviewed-by: Yuan Yao <yaoyuan@linux.alibaba.com>
-> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > Cc: stable@vger.kernel.org
-> > > ---
-> > >  arch/arm64/kvm/nested.c | 43 ++++++++++++++++++-----------------------
-> > >  1 file changed, 19 insertions(+), 24 deletions(-)
-> > > 
-> > > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> > > index 27bc7ee4b3382..8a602d074dbb4 100644
-> > > --- a/arch/arm64/kvm/nested.c
-> > > +++ b/arch/arm64/kvm/nested.c
-> > > @@ -999,6 +999,20 @@ static void invalidate_vncr(struct vncr_tlb *vt)
-> > >  		clear_fixmap(vncr_fixmap(vt->cpu));
-> > >  }
-> > >  
-> > > +static bool vncr_tlb_intersects(struct vncr_tlb *vt, u64 addr,
-> > > +				u64 scope_start, u64 scope_size)
-> > > +{
-> > > +	u64 tlb_size, tlb_start, tlb_end, scope_end;
-> > > +
-> > > +	tlb_size = ttl_to_size(pgshift_level_to_ttl(vt->wi.pgshift, vt->wr.level));
-> > > +
-> > > +	tlb_start = addr & ~(tlb_size - 1);
-> > > +	tlb_end = tlb_start + tlb_size - 1;
-> > > +	scope_end = scope_start + scope_size - 1;
-> > 
-> > I think if scope_end overflows,
-> > 
-> > > +
-> > > +	return !(tlb_end < scope_start || tlb_start > scope_end);
-> > 
-> > tlb_start > scope_end can evaluate to true and we return false even when
-> > there is overlap near the end of the TTBR1 address space.
-> 
-> I assume that you are implicitly talking about TLB Range Invalidation,
-> right? Because we otherwise align base on size, making overflows
-> impossible with this patch.
+The consolidation of the breakpoint and watchpoint register accessors
+switched DBGBXVR<n> from trap_bvr() to trap_dbg_wb_reg(). The latter
+selects backing storage with demux_wb_reg(), which only handles Op2 values
+4 through 7. Since DBGBXVR<n> uses Op2 1, an AArch32 guest access hits
+KVM_BUG_ON() and marks the VM dead.
 
-Yes, I am talking about TLB range invalidations.
+DBGBXVR<n> aliases DBGBVR<n>_EL1[63:32], and its AA32(HI) descriptor
+already selects the upper half. Map Op2 1 to dbg_bvr[] alongside Op2 4,
+restoring the pre-regression behavior.
 
-> 
-> > Therefore I think we need to saturate scope_end to ULONG_MAX when overflow
-> > happens. This is also what the architecture does when looking at the
-> > pseudocode J1.2.3.442 TLBIRange (M.c).
-> 
-> That's one possible implementation, because the pseudocode is dealing
-> with start/end directly, but that's not how our scope works (it deals
-> with start and size).
-> 
-> For that we need to cap the *size*, similarly to what is done in
-> handle_ripas2e1is() (see patch #6). Something like the hack below.
+Fixes: 3ce9f3357e9e ("KVM: arm64: Fold DBGxVR/DBGxCR accessors into common set")
+Assisted-by: Claude:claude-opus-5
+Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
+---
+Tested on a Raspberry Pi 400 with a minimal AArch32 guest. The unpatched
+kernel WARNed in demux_wb_reg() and returned -EIO from KVM_RUN. The
+patched kernel completed the access without a warning.
 
-Makes sense.
+ arch/arm64/kvm/sys_regs.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-> 
-> 	M.
-> 
-> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-> index 21d0f4cbe07f1..5b8edb2e8a87d 100644
-> --- a/arch/arm64/include/asm/kvm_nested.h
-> +++ b/arch/arm64/include/asm/kvm_nested.h
-> @@ -305,6 +305,12 @@ static inline u64 decode_range_tlbi(u64 val, u64 *range, u16 *asid)
->  	num	= FIELD_GET(GENMASK(43, 39), val);
->  	*range	= __TLBI_RANGE_PAGES(num, scale) << shift;
->  
-> +	/* Cap the range to the correct half of the address space */
-> +	if (!(base & BIT(48)))
-> +		*range = min(*range, (BIT(48) - base));
-> +	else
-> +		*range = min(*range, ~base + 1);
-> +
->  	return base;
->  }
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 5d5c579d4579..2862df188155 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -889,6 +889,7 @@ static u64 *demux_wb_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd)
+ 	struct kvm_guest_debug_arch *dbg = &vcpu->arch.vcpu_debug_state;
+ 
+ 	switch (rd->Op2) {
++	case 0b001:
+ 	case 0b100:
+ 		return &dbg->dbg_bvr[rd->CRm];
+ 	case 0b101:
+-- 
+2.39.5 (Apple Git-154)
 
-This looks correct to me!
-
-Thanks,
-Wei-Lin Chang
-
->  
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
