@@ -1,52 +1,55 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 485FF35C681;
-	Mon, 10 Aug 2026 08:41:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D5C039D6F2;
+	Mon, 10 Aug 2026 08:52:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786351271; cv=none; b=sHnn5jcmPvbLzVAkygVZjqx6P8hrOcD4kIvk91E2UQ+DNmRwg6jJtJE4XwhJGYCF+S4gJ/+jSWVuqQx3AwrEBjKAFXrv2V1vzWQsuY2AWSifsfp1Ls3MHQPscGdkomEfIf6IynGGYDQvIfZQ8sO08ol9xb7S58Wq/hENPXqQBpc=
+	t=1786351960; cv=none; b=aAbu5S6amjdu6rePACsLaZt72kSa0B3Y85WJIgYK6tzhT5i7c4CeW7P9uGkDXVpnjVExyqjXzh5KpkXkSv/6CqR31TAefvkX9elEHarTg11upWLcMZ259mSa3wY+jQLEFs0e9NjuSEICKDESYt1o14C2ucrOmuGaslzZ9pFWaQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786351271; c=relaxed/simple;
-	bh=AivFDgsImnQT2d9ji2onUVZdA4gMm4SR03L87lUtdtc=;
+	s=arc-20240116; t=1786351960; c=relaxed/simple;
+	bh=mgI1A5xxMUA4gh1TXWJ/YIU1vpgad5CqsEcXQSz6G6o=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XE0czA+rUEMJ0UPCXncxYxa+tRAAB2NsP2Q+dqOMQ261FZwBYmIdX68/A0wxBA0IXpEE/SnHrrdrgqy4/VgZgqrp6YaqpLqP/dyYna0qaFfyuuLIAz5XUqlLnwdYxPXfBguHelJl11VyOBOCWDa9y80dcdiKmPMta6qQRcWnQRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PG0kMaKd; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=gH3G30+kDXRlf6JdLpYNXw2gcErkaQjvvOD3CF4hNS4DelrwRc3IC25Ech5+WFiGWQdoz2BFwgX1bRz4Me8d3JqoGt/qQY1cOW2CI02W3RcUSIoD+XEHqq5B/PSn2JHNYYcmF+6Joyq3g/xOSILltLR2SXZD4eiakly+hdqVBDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CHxySg7v; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PG0kMaKd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC6B21F000E9;
-	Mon, 10 Aug 2026 08:41:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CHxySg7v"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F12D1F000E9;
+	Mon, 10 Aug 2026 08:52:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786351269;
-	bh=Q003pFrnrktZyIZY/xviIClVkpqPmqmMLUU3EH/6sTA=;
+	s=k20260515; t=1786351959;
+	bh=pq+u/KHK9r+MSQrkQ4op9UevKKFwZbJcBlJBfLPWaJo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=PG0kMaKdia+h2mVbHKCVGoaxI4XI4rhY0lcIhhzYJjgsC1D1IBOSkQNCiDLwF5bGP
-	 pMR37Fztie6VTNpPnhwYe/STo0CTRaXnsI43ESg8Jw/T/yuZLNHCAHsZR2kNUMqbfm
-	 2AZFE2ydhRw6cIPYGKop5bxj4cro/y/GYHeHW77kHdR0zW5+kizGHI6NV5WgOUJOxz
-	 D2198PLIMAmzHtj4N9d2n2yvQdaUd79j7ceTDSMdb4uXyluHU8AAh+9wLtK1RfsO9F
-	 U06/0rNVyO7BnLqyncdeP4EIAAtKf+zWcTfWts2whcW3tznikRnVJ38eI9l79migwI
-	 W8rd+p6PzGTxw==
+	b=CHxySg7vub9y9D0F0caT3xQMuh9IfRYQQ4jnur3KdmHS41+KPOZob+xb8LkVwrYpz
+	 3QQu/LNAAl8LztgatnYVVVAvEpbQYnA30f74Aq4mJ8G1/YZNlGSE1C6ddOWR2qlwJh
+	 XjVxsmeh8jBfDtGMwprj84CXEJS577x8+4Jv23t/qDoWBcpJ1Yymr9itNseF7DMuxj
+	 149QD0pHNjFE/LxizeN7noSN+zqCyQ7soWpDGwcvIF1QJH1M3qAaU3mufeVpPUr8+M
+	 4F4wkd8IiEXanyD0RZoMhsVWwfjzleC8eDI+bNBxnOjJqCTGo0CxTZRSbRuOFpjRxX
+	 T3unaLHs3I1xQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wtLZD-0000000E17v-3Liw;
-	Mon, 10 Aug 2026 08:41:07 +0000
-Date: Mon, 10 Aug 2026 09:41:00 +0100
-Message-ID: <86se4m9xlv.wl-maz@kernel.org>
+	id 1wtLkK-0000000E1LL-3X8j;
+	Mon, 10 Aug 2026 08:52:36 +0000
+Date: Mon, 10 Aug 2026 09:52:36 +0100
+Message-ID: <86qzk69x2j.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Karl Mehltretter <kmehltretter@gmail.com>
 Cc: Oliver Upton <oupton@kernel.org>,
+	kvmarm@lists.linux.dev,
+	Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
-	Andre Przywara <andre.przywara@arm.com>,
 	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] KVM: arm64: Preserve GPRs for AArch32 CP64 reads generating an UNDEF
-In-Reply-To: <20260802182222.2239-1-kmehltretter@gmail.com>
-References: <20260802182222.2239-1-kmehltretter@gmail.com>
+Subject: Re: [PATCH] KVM: arm64: Fix AArch32 DBGBXVR<n> handling
+In-Reply-To: <20260810005616.13227-1-kmehltretter@gmail.com>
+References: <20260810005616.13227-1-kmehltretter@gmail.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -58,33 +61,49 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kmehltretter@gmail.com, oupton@kernel.org, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, andre.przywara@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: kmehltretter@gmail.com, oupton@kernel.org, kvmarm@lists.linux.dev, tabba@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sun, 02 Aug 2026 19:22:22 +0100,
+On Mon, 10 Aug 2026 01:56:16 +0100,
 Karl Mehltretter <kmehltretter@gmail.com> wrote:
 > 
-> kvm_handle_cp_64() only seeds params.regval for writes. If a CP64 read is
-> decoded but UNDEFs, emulate_cp() still returns handled and the caller
-> writes params.regval back to Rt/Rt2.
+> The consolidation of the breakpoint and watchpoint register accessors
+> switched DBGBXVR<n> from trap_bvr() to trap_dbg_wb_reg(). The latter
+> selects backing storage with demux_wb_reg(), which only handles Op2 values
+> 4 through 7. Since DBGBXVR<n> uses Op2 1, an AArch32 guest access hits
+> KVM_BUG_ON() and marks the VM dead.
 > 
-> This can happen for PMU counter read accesses generating an UNDEF. KVM
-> injects the exception into the guest, so the MRRC GPRs must remain
-> unchanged.
+> DBGBXVR<n> aliases DBGBVR<n>_EL1[63:32], and its AA32(HI) descriptor
+> already selects the upper half. Map Op2 1 to dbg_bvr[] alongside Op2 4,
+> restoring the pre-regression behavior.
 > 
-> Instead, the uninitialised regval is copied into the guest GPRs. With stack
-> auto-initialisation this is a deterministic zero or pattern value. With
-> CONFIG_INIT_STACK_NONE it may be stale host stack data.
-> 
-> Match kvm_handle_cp_32() and kvm_handle_sys_reg() by seeding regval from
-> the GPRs before emulation.
-> 
-> Fixes: 62a89c44954f0 ("arm64: KVM: 32bit handling of coprocessor traps")
+> Fixes: 3ce9f3357e9e ("KVM: arm64: Fold DBGxVR/DBGxCR accessors into common set")
 > Assisted-by: Claude:claude-opus-5
 > Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
+> ---
+> Tested on a Raspberry Pi 400 with a minimal AArch32 guest. The unpatched
+> kernel WARNed in demux_wb_reg() and returned -EIO from KVM_RUN. The
+> patched kernel completed the access without a warning.
+> 
+>  arch/arm64/kvm/sys_regs.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 5d5c579d4579..2862df188155 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -889,6 +889,7 @@ static u64 *demux_wb_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd)
+>  	struct kvm_guest_debug_arch *dbg = &vcpu->arch.vcpu_debug_state;
+>  
+>  	switch (rd->Op2) {
+> +	case 0b001:
+>  	case 0b100:
+>  		return &dbg->dbg_bvr[rd->CRm];
+>  	case 0b101:
 
 Reviewed-by: Marc Zyngier <maz@kernel.org>
+Cc: stable@vger.kernel.org
 
 	M.
 
