@@ -1,133 +1,165 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6E6D3C1966;
-	Mon, 10 Aug 2026 11:36:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A26F53C13E9;
+	Mon, 10 Aug 2026 11:45:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786361784; cv=none; b=Jvjtn3TGNdXiDVFjnr33yUcPnwRcqRNSocWyVAC4LIc76j3inZiz9UwjHorrGxmhRmg/Y35gq/n1n2WHU36fISTa4atZIvporxhSoFJNdf4D7zgwqWgAD3LoD3M+z3U0UqTD8kUU1kV8kBpMQ7Me/ySPKiijZNXD3//haN4XNs8=
+	t=1786362316; cv=none; b=GtYGORxZ/nBFZoy/7Bmmw/K276nh2foFOJGdTGULkw+o7m/CMq3yrN+OZwBgjOoyPsgIna7fjverea/hta7368Ccq1qN6lb04ZcURJppDVZCBTpcDiwB5fgwmNq82vIi3H5mOISdgAOwC3O8biRaVn8S6RImmRf85kuR+1vMiRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786361784; c=relaxed/simple;
-	bh=OWxBuZpOkN7fcqjzy2VzDvH1uaoL+6TDuKM9WxqSmBA=;
+	s=arc-20240116; t=1786362316; c=relaxed/simple;
+	bh=EpK3Mc0c/SYcXBl1Qb1gQ1g1B5inqcMO5/cWifyLcY4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JLyBIH5Ihdof91jeozobxnLea2uyaDLhLWERQyrfGM1YO5gpq0rCQWIRLjbmtPvT0D/eYB4C2fVgEl6sZjD0Y6YLHTWGAbrqHICsmSe+aotUMfIfo+5A+kKFopmhW71LbtmNLC2HQtbJnXX1LtOq19+PSPb/APiO5rAmIx3oXUU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Aa5izIM6; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=MU077XmFlrCvf+Nlfl666hU7aWCzwPZJs/OuU/Cg+nXoq5U3b/szxNxkUWr9v7mMHBrI6pz3sZY1BdmByHzFwaOADkAbi4HCgJWju452tA1a438ed1Ghc8y64NMR4s7KiynmWfewjd0hjc0lt5Gs6n65MMIEz1oj/PAMFHV/Hmc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FBSPezM5; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Aa5izIM6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E89E11F000E9;
-	Mon, 10 Aug 2026 11:36:20 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FBSPezM5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 726781F000E9;
+	Mon, 10 Aug 2026 11:45:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786361783;
-	bh=WRKK4z+x45IWP0hIqC6+DM+wz3tna9hF8aQoj6Ri1T4=;
+	s=k20260515; t=1786362315;
+	bh=vUe1f3pgujs6K1MoZm7uuHtbuihLqP7ejVyvgiIgEAM=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=Aa5izIM6VIgu27KQmRZnjVjU4Wg85NXtu3BKTMGn1dYtChL9YDyhSfUjZjKeWBF1+
-	 4Sq+870GQ8kPGYWO29hkeQdI1jDgCSQ24lnop9enazZKIac7ASeCt+0tcWI4jfWHjm
-	 y31WfhEvi5d9mxVkR2nX17Q9DJt27o9IidC4Vc3qCr2xCYoLT9D84vpPU73WO8VgYu
-	 gMTWggE0hKNnTA/TXrGO13c5y8FOtgEVaoZAX4W9ZMXbDlgHO2GCIQdxkoZpIv/uUz
-	 Pa+1jx0q/2R6SjBL4pH/VQqg66KcDBw+bpF8cW2pwr/LsiF2MQ49+lvE6zqkh0kvnt
-	 h8R9c1rHnVBRg==
-Date: Mon, 10 Aug 2026 13:36:18 +0200
+	b=FBSPezM5AdYZ+abrnIzGMUjIDKcHNcKCD9H3Nac2Uybl9tVYtXFwqbFl9pL6dUYBD
+	 KXkvY0n1pqUpZQoDGJ6ziPOPQ5kCkua58Gal6PCWWOy0HU3AocvadilAA4T4K46Ezu
+	 YMc8qr4HA6WUgvgcNL2iP40WB4u3EZnLNC+LEJ/czijgdSNl1veadJFO/GIT4Be9X0
+	 7OM6cdd92YG8Z6vTjVpacwBvlazkfHkY4ls8Wmi7LACqeT1+gMmTeyzO921RWQOfl9
+	 ZScHYNxO0Lqn3t5++XkqGVdkt4uCo07TrsTylxUJzhf0KSnRddDrSgQgQy1ZEgLzBv
+	 ShwZrD8Z3HtFQ==
+Date: Mon, 10 Aug 2026 13:45:11 +0200
 From: Lorenzo Pieralisi <lpieralisi@kernel.org>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd <nd@arm.com>,
-	"maz@kernel.org" <maz@kernel.org>,
-	"oupton@kernel.org" <oupton@kernel.org>,
-	Joey Gouly <Joey.Gouly@arm.com>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>
+To: sashiko-reviews@lists.linux.dev
+Cc: Sascha Bischoff <Sascha.Bischoff@arm.com>,
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev
 Subject: Re: [PATCH 2/5] irqchip/gic-v5: Clear per-CPU IRS data on teardown
-Message-ID: <anm3snqnGHcqUogW@red-moon>
+Message-ID: <anm5x_e2HTzJAXMD@red-moon>
 References: <20260810102652.758719-1-sascha.bischoff@arm.com>
  <20260810102652.758719-3-sascha.bischoff@arm.com>
+ <20260810104747.E5CE71F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20260810102652.758719-3-sascha.bischoff@arm.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260810104747.E5CE71F000E9@smtp.kernel.org>
 
-On Mon, Aug 10, 2026 at 10:28:07AM +0000, Sascha Bischoff wrote:
-> IRS affinity setup publishes an IRS pointer and IAFFID state in the
-> per-CPU data before the remaining IRS initialization can fail. The
-> error path then frees the IRS data without clearing that published
-> state, leaving CPUs associated with freed memory.
+On Mon, Aug 10, 2026 at 10:47:47AM +0000, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 5 potential issue(s) to consider:
 > 
-> On initialization failure and normal IRS teardown, clear the per-CPU
-> IRS association by removing the stale pointer to irs_data. Also clear
-> the per-CPU IAFFID state for any CPUs that were tied to the IRS before
-> it was freed.
-> 
-> Fixes: 5cb1b6dab2de ("irqchip/gic-v5: Add GICv5 IRS/SPI support")
-> Fixes: 35866efa52fe ("irqchip/gic-v5: Add ACPI IRS probing")
-> Link: https://sashiko.dev/#/patchset/20260724104819.1296803-1-sascha.bischoff@arm.com?part=2
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-> ---
->  drivers/irqchip/irq-gic-v5-irs.c | 16 ++++++++++++++++
->  1 file changed, 16 insertions(+)
+> Pre-existing issues:
+> - [High] Unconditional call to irq_domain_remove() with a potentially NULL pointer in gicv5_free_lpi_domain() during error teardown causes a fatal kernel panic.
+> - [High] Missing release of requested memory regions on initialization error paths and module removal results in a permanent physical memory leak.
+> - [High] The ACPI MADT generic interrupt parser does not validate if get_logical_index() successfully found a logical CPU index, leading to out-of-bounds memory access.
+> - [High] Using smp_processor_id() in preemptible context triggers a BUG and can lead to stale per-CPU data access.
+> - [High] The GICv5 IRS hardware is left enabled on initialization error and teardown paths.
 
-Thank you Sascha, a minor comment below otherwise:
-
-Reviewed-by: Lorenzo Pieralisi <lpieralisi@kernel.org>
-
-> diff --git a/drivers/irqchip/irq-gic-v5-irs.c b/drivers/irqchip/irq-gic-v5-irs.c
-> index f3fce0b1e25d9..67940ea9e39b7 100644
-> --- a/drivers/irqchip/irq-gic-v5-irs.c
-> +++ b/drivers/irqchip/irq-gic-v5-irs.c
-> @@ -651,6 +651,19 @@ static int __init gicv5_irs_of_init_affinity(struct device_node *node,
->  	return ret;
->  }
->  
-> +static void __init gicv5_irs_clear_affinity(struct gicv5_irs_chip_data *irs_data)
-> +{
-> +	int cpu;
-> +
-> +	for_each_possible_cpu(cpu) {
-> +		if (per_cpu(per_cpu_irs_data, cpu) == irs_data) {
-> +			per_cpu(cpu_iaffid, cpu).iaffid = 0;
-
-As long we set valid to false this is not necessarily needed, 0 is a valid
-value.
+Looking into those.
 
 Thanks,
 Lorenzo
 
-> +			per_cpu(cpu_iaffid, cpu).valid = false;
-> +			per_cpu(per_cpu_irs_data, cpu) = NULL;
-> +		}
-> +	}
-> +}
-> +
->  static void irs_setup_pri_bits(u32 idr1)
->  {
->  	switch (FIELD_GET(GICV5_IRS_IDR1_PRIORITY_BITS, idr1)) {
-> @@ -773,6 +786,7 @@ static int __init gicv5_irs_of_init(struct device_node *node)
->  	return ret;
->  
->  out_iomem:
-> +	gicv5_irs_clear_affinity(irs_data);
->  	iounmap(irs_base);
->  out_err:
->  	kfree(irs_data);
-> @@ -787,6 +801,7 @@ void __init gicv5_irs_remove(void)
->  	gicv5_deinit_lpis();
->  
->  	list_for_each_entry_safe(irs_data, tmp_data, &irs_nodes, entry) {
-> +		gicv5_irs_clear_affinity(irs_data);
->  		iounmap(irs_data->irs_base);
->  		list_del(&irs_data->entry);
->  		kfree(irs_data);
-> @@ -951,6 +966,7 @@ static int __init gic_acpi_parse_madt_irs(union acpi_subtable_headers *header,
->  	return 0;
->  
->  out_map:
-> +	gicv5_irs_clear_affinity(irs_data);
->  	iounmap(irs_base);
->  out_release:
->  	release_mem_region(r->start, resource_size(r));
+> --
+> 
+> --- Patch [2]: [PATCH 2/5] irqchip/gic-v5: Clear per-CPU IRS data on teardown ---
+> commit 280b220e4ca7867e34828e36c13d55683f188fae
+> Author: Sascha Bischoff <Sascha.Bischoff@arm.com>
+> 
+> irqchip/gic-v5: Clear per-CPU IRS data on teardown
+> 
+> IRS affinity setup publishes an IRS pointer and IAFFID state before
+> the remaining IRS initialization can fail. This commit adds a teardown
+> function to clear the published state to prevent CPUs from being associated
+> with freed memory on initialization failure and module removal.
+> 
+> Link: https://sashiko.dev/#/patchset/20260724104819.1296803-1-sascha.bischoff@arm.com?part=2
+> 
+> > diff --git a/drivers/irqchip/irq-gic-v5-irs.c b/drivers/irqchip/irq-gic-v5-irs.c
+> > index f3fce0b1e25d9..67940ea9e39b7 100644
+> > --- a/drivers/irqchip/irq-gic-v5-irs.c
+> > +++ b/drivers/irqchip/irq-gic-v5-irs.c
+> 
+> [ ... ]
+> 
+> > @@ -773,6 +786,7 @@ static int __init gicv5_irs_of_init(struct device_node *node)
+> >  	return ret;
+> >  
+> >  out_iomem:
+> > +	gicv5_irs_clear_affinity(irs_data);
+> >  	iounmap(irs_base);
+> 
+> [Severity: High]
+> This is a pre-existing issue, but should the IRS hardware be explicitly
+> disabled before we unmap the registers?
+> 
+> The error and teardown paths call iounmap(irs_base) and free the structures,
+> but there doesn't seem to be a step to clear GICV5_IRS_CR0_IRSEN. Does this
+> abandon active DMA-capable hardware?
+> 
+> [Severity: High]
+> This is a pre-existing issue, but are we missing a call to
+> release_mem_region() on these teardown paths?
+> 
+> The setup path uses of_io_request_and_map() which internally requests a
+> memory region, but the cleanup paths only call iounmap(). Does this leave the
+> physical memory permanently stranded in the iomem tree?
+> 
+> >  out_err:
+> >  	kfree(irs_data);
+> > @@ -787,6 +801,7 @@ void __init gicv5_irs_remove(void)
+> >  	struct gicv5_irs_chip_data *irs_data, *tmp_data;
+> >  
+> >  	gicv5_free_lpi_domain();
+> 
+> [Severity: High]
+> This is a pre-existing issue, but does gicv5_free_lpi_domain() safely handle
+> a NULL domain?
+> 
+> Looking at drivers/irqchip/irq-gic-v5.c:gicv5_free_lpi_domain(), it
+> unconditionally calls irq_domain_remove(gicv5_global_data.lpi_domain). If
+> initialization fails early leaving lpi_domain uninitialized, could this
+> trigger a kernel panic during teardown?
+> 
+> >  	gicv5_deinit_lpis();
+> >  
+> >  	list_for_each_entry_safe(irs_data, tmp_data, &irs_nodes, entry) {
+> > +		gicv5_irs_clear_affinity(irs_data);
+> >  		iounmap(irs_data->irs_base);
+> >  		list_del(&irs_data->entry);
+> >  		kfree(irs_data);
+> 
+> [ ... ]
+> 
+> [Severity: High]
+> This is a pre-existing issue, but does gic_acpi_parse_iaffid() validate the
+> return value of get_logical_index()?
+> 
+> drivers/irqchip/irq-gic-v5-irs.c:gic_acpi_parse_iaffid() {
+>     ...
+>     cpu = get_logical_index(gicc->arm_mpidr);
+>     ...
+> }
+> 
+> If get_logical_index() fails and returns a negative error code, could this
+> lead to out-of-bounds memory corruption when cpu is used as an array index?
+> 
+> [Severity: High]
+> This is a pre-existing issue, but is it safe to use smp_processor_id() in
+> gicv5_irs_iste_alloc()?
+> 
+> drivers/irqchip/irq-gic-v5-irs.c:gicv5_irs_iste_alloc() {
+>     ...
+>     irs_data = per_cpu(per_cpu_irs_data, smp_processor_id());
+>     ...
+> }
+> 
+> Since this function executes in a sleepable context bound by GFP_KERNEL
+> constraints, could using smp_processor_id() without preemption disabled
+> trigger a BUG splat or lead to stale per-CPU data access?
+> 
 > -- 
-> 2.34.1
+> Sashiko AI review · https://sashiko.dev/#/patchset/20260810102652.758719-1-sascha.bischoff@arm.com?part=2
