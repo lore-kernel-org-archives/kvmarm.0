@@ -1,93 +1,106 @@
-Received: from relay.hostedemail.com (smtprelay0013.hostedemail.com [216.40.44.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38E50352C5B
-	for <kvmarm@lists.linux.dev>; Mon, 10 Aug 2026 22:30:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99E463803D2
+	for <kvmarm@lists.linux.dev>; Mon, 10 Aug 2026 22:32:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786401014; cv=none; b=p78ku/aPOVf6jOdtWGqh2up0NyjcJMYnFt7yIBckyRgJsso/U/Adl1GS2FAs4F70wVytDpNqZGxBWFwfFBywO50rNmuHp2EoVD5Mxiyg+I9015Xs32+7bBPJICITziRb2S1rmYLPTMtYdq8BxI9uTJ+c8o9b4W2A5Tncvv9xXls=
+	t=1786401170; cv=none; b=DOlODhyOuMmYlrxoHth+tkum/qmfkgQBIKdXoXL9xVhNDqGss2jvJCiz9h6TLmvpa9Y1aokFRsVmhjqL95lZxruEJ8Z7b276rCIs0agMozzQ3qELET2kEOrjTxyDLMOvbRANrw3GIrt1nryXfjbO84zvtzUtfKfWXAGLihT2JnA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786401014; c=relaxed/simple;
-	bh=pMQeTWAJgjBFPryP+mgHfeSEFIXYfLKuU6oqLQ3/Q/4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Anx6STLHqRFGcmdR9e9F8Ux4WFzPEnNwthBt14qwGct7hvoJ2Yn/Wei13CkD/DCwGJO1szlXrKcbmshiZXVvlulDbQFVMBBenzX2PpekdBvTLi1EPZ3hvlxOrsgtCDw1QMajTKNmqKYEVmL+cq3Qq7dFp73ZLqhS0tx7K/5u18U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org; spf=pass smtp.mailfrom=goodmis.org; arc=none smtp.client-ip=216.40.44.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=goodmis.org
-Received: from omf04.hostedemail.com (lb01a-stub [10.200.18.249])
-	by unirelay05.hostedemail.com (Postfix) with ESMTP id E6FE340112;
-	Mon, 10 Aug 2026 22:30:10 +0000 (UTC)
-Received: from [HIDDEN] (Authenticated sender: rostedt@goodmis.org) by omf04.hostedemail.com (Postfix) with ESMTPA id 589DF20027;
-	Mon, 10 Aug 2026 22:30:07 +0000 (UTC)
-Date: Mon, 10 Aug 2026 18:30:17 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: maz@kernel.org, oupton@kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org,
- mhiramat@kernel.org, alexandru.elisei@arm.com, vdonnefort@google.com,
- joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com,
- yuzenghui@huawei.com, qperret@google.com, ardb@kernel.org,
- linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- tabba@google.com
-Subject: Re: [PATCH v3 01/11] tracing: Include linux/types.h in
- trace_remote_event.h
-Message-ID: <20260810183017.32db8b80@gandalf.local.home>
-In-Reply-To: <20260804112317.1937387-2-fuad.tabba@linux.dev>
-References: <20260804112317.1937387-1-fuad.tabba@linux.dev>
-	<20260804112317.1937387-2-fuad.tabba@linux.dev>
-X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1786401170; c=relaxed/simple;
+	bh=Ut4xeXPIHkP/ZTuqOULeqn9lHhqonacl55jKH6OZGjI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hRE7GsPnpBTFdrPSKFR2OB/0TOBS/xDi5rwd+cNueiuV4hdXdffxj/Vupx3f2jGJoGCJ+quZ2mAbRl4e5ACPcKGzQnYMkKM0nR6HyFRQvVj8lr1teA3yM0zcfycJ1h1bSyegEl5a7iChPBOxu3sFDlKftqm7eDYcrP+jPmaD+Vo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MpJuVCa7; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MpJuVCa7"
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4980dc26022so24446815e9.1
+        for <kvmarm@lists.linux.dev>; Mon, 10 Aug 2026 15:32:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1786401167; x=1787005967; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=KujuDXjufsH4fQ0xRNZyj2JY4LmTzir+J1KJ4jS+lJA=;
+        b=MpJuVCa7p29uYRwiKyvzAQ/uOGLavgaf2dY0lS0w7pFkX0Dh0IAUWCEunVK7sY9VOl
+         5nbVnjs+mdbaq7A/tLRblHIslcnloOkK4z7Tn2nX1LGZ9i/15MGIffM1m4bD7244n8Oa
+         25yg2WQEazQoEIqDPHLZt/eh2S2eBtjL5KRyPmlKvo+VeLPh1wCpagOSybl990ZvttVY
+         HsYqsRnYWstIiF5WFJi+lWHQoysB5QpCL48CgmSOhx2IHEpvZ5hJ1QOyqgu33mod3qpJ
+         OBhmtVEdxSphbk/U/rGIqfNGZyJ0hvJcWhkKoazy5sRfARUEvJ8e33Jgvzp4ZzZcOQl0
+         dp1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786401167; x=1787005967;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=KujuDXjufsH4fQ0xRNZyj2JY4LmTzir+J1KJ4jS+lJA=;
+        b=l/zkun2WJPTZc+hGG201We9TFLXgSOqc7I7hpwr4a/F8Oe6hsaAp4nFZYrRV2fkW7T
+         McO0EWZ+odaMEgFQbvFrlj9Ye8YJjyn5DJwVXoOxpJBAPVj/Pmmlk6tGpD5iiHf5v5rh
+         SITyGRoz543k0nJHYyZCl5+qk/Za7q/VXEJroe6Mn5Sdb9Gw9ZyLB3qg9UTOlIklsJUT
+         G5oD3+AoIsjtZ1Z9ImnbEaOBYKq9FgZ1WVPBnUObBADPK5Bigbv0v5nQCDNLN6Vk79e6
+         +pizwohGd9r2lo8QONJFTrqvfgep34qYcTRWkFvtbp3vMI1d6GJNTLPRQ96m+FM9qLkv
+         CbaA==
+X-Forwarded-Encrypted: i=1; AHgh+RoEU5qNvxGW9uyCtqA1LRZ9n3/2bAaa0h92Tx/rZ3ylw5sUUZ5iKlW2/rkuKq6pQV23lOZazew=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzxwKSAMbugopTKgdQmj7CgKJUZ5RR9BjDL42khaUMJWHeoC8vR
+	41mbWf9Eaftg9jqT45A33xmHYtLfzQy+zmm7vB+6fXIFdxcTjAAO6qbA
+X-Gm-Gg: AR+sD131095UxI9tNh5f5pUH+/CELSiKhyoPCmuauR/k1xYn06ZHXwEoJvnPyMTHe3x
+	VmSIqtxPf8S+mZvu+nnhEb8U3PXj9Bn1iyBihu6gsoNuShKZi5tPLDCa7sHt4/0gsqB77wF+gQu
+	LB6/FZmazggPT8lzyExVuw7G8uz9EO/h/3eGSKd5tocmJx6MbqygXEyadGoYyDX+E0KIAA+p6rV
+	+2QmTKx1vX7DVeTBzoKAUGe87Hm05Pb2yU86varIhyeKWK4z3tc6oFHYdd+U281pR7tESSjbErF
+	vInOqEVB8g75KCOIkSasJNBINfGE7Er1Dkwxi5UKo3zzO7CPsyBIP2VzSecjRWsJmlVrF/OASIB
+	mJehu86X5Np+9FQ8qL8+SJHagwADAq9UyeRFgP8a7uYs2vaw3ywLBoik5609gFzuZks5+Wro2Z+
+	iMiRPRasDWDv/DYS0u+yq0wI9UArNfCq2T0JBxdDyFA5CTnTtpVidae/002fbPtRFhsYMCvsyfM
+	+vVo444Ryl9Sg+6jNQlUDRr7Vgq3qkli6TfKSxff+i8wGTCEpybg2LWlTYyp+D1JhJxQ3ihc/fI
+	VMCbULcEg2Qud9J2XiDocwU3T8WmHAc8JAIwso5Pu/J7aTt3xspt8rMRzx8Qxg94+8sEIi0=
+X-Received: by 2002:a05:600c:8b17:b0:499:726c:50e with SMTP id 5b1f17b1804b1-499727b1011mr49652125e9.14.1786401166552;
+        Mon, 10 Aug 2026 15:32:46 -0700 (PDT)
+Received: from unknown748F3CBA5068 (dynamic-2a02-3100-a1e8-7401-316d-6c00-7a9a-8fac.310.pool.telefonica.de. [2a02:3100:a1e8:7401:316d:6c00:7a9a:8fac])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4995d85254asm153382245e9.1.2026.08.10.15.32.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Aug 2026 15:32:45 -0700 (PDT)
+Date: Tue, 11 Aug 2026 00:32:44 +0200
+From: Karl Mehltretter <kmehltretter@gmail.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oupton@kernel.org>, Fuad Tabba <tabba@google.com>, 
+	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
+Subject: Re: [PATCH 1/2] KVM: arm64: nv: Allocate the shadow S2 MMUs
+ individually
+Message-ID: <anpRMrGG_54yO6CL@gmail.com>
+References: <20260803224405.41468-1-kmehltretter@gmail.com>
+ <86mrv2arf2.wl-maz@kernel.org>
+ <anYNTW2e3HalTqTk@gmail.com>
+ <878q6fplpd.wl-maz@kernel.org>
+ <anizGXThM-haqQXU@gmail.com>
+ <86v79i9zl7.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Stat-Signature: xtakhy7qecsge63wfcdxaimch8gwjbnx
-X-Rspamd-Server: rspamout08
-X-Rspamd-Queue-Id: 589DF20027
-X-Session-Marker: 726F737465647440676F6F646D69732E6F7267
-X-Session-ID: U2FsdGVkX19liynQwYzW2cdd/ru5E/BnLybWK79UrC0=
-X-HE-Tag: 1786401007-540265
-X-HE-Meta: U2FsdGVkX19l/bEg6WyVs62MYOai422ZzDxhronGQpZKSZ4s32iH4P1VGDA53+tbK+BXLKUYFsHv9yDFVr+GrYI2NEUMPXj7HpMSDIQaYc9Nj1Bctwp/Pkrf3ctMcaxVNwTrSGdYSeNYZebmMWL5W/FsZmgRe2nI6yH1kGp7W7hDfHVMN3YMrGVgDrxQcimnv/BgQhppR6tttie8NfRdTPliP0DjxctbAOqHn0KgbbWI8kcTvhonPhC6ogthYw86+2FBdA2vsizcy1JrQIyVAydisG7j19nqTbfB+8Ava2qZG77H02CYKP+uX6GvyBal8cxaWhLuiM5Q8MQxna5x8bs5L70pNOSC5lKESCizsfvyPn9i9o2vs6GbFNgWRZu1r6pNcDt/u6CLtKPN95bmq6hvw+NM6L54
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86v79i9zl7.wl-maz@kernel.org>
 
-On Tue,  4 Aug 2026 12:23:07 +0100
-Fuad Tabba <fuad.tabba@linux.dev> wrote:
-
-> trace_remote_event.h uses bool without including linux/types.h, so a
-> translation unit that includes it ahead of anything else that pulls
-> types.h in fails to build, as with nvhe/trace.h at EL2.
+On Mon, Aug 10, 2026 at 08:58:12AM +0100, Marc Zyngier wrote:
+> > The increment expression of the for loop still runs after an error.
 > 
-> Fixes: 072529158e60 ("tracing: Add events to trace remotes")
+> Yup. Should be fixed with
 
-Is there a config that already fails the build without this change? Or is
-it that new code will fail without it?
+> +		for (i = 0; !ret && i < S2_MMU_PER_VCPU; i++) {
+>  			ret = init_nested_s2_mmu(kvm, &tmp[i]);
+> +			if (ret)
+> +				break;
+> +		}
 
-If it is the former, please drop the fixes tag, as nothing is currently
-broken. If it is the latter, then sure, keep it, but you should mention
-what config options break with it.
+Yes, that fixes the cleanup issue. I have no other concerns with the patch.
 
--- Steve
-
-
-> Acked-by: Steven Rostedt <rostedt@goodmis.org>
-> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
-> ---
->  include/linux/trace_remote_event.h | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/include/linux/trace_remote_event.h b/include/linux/trace_remote_event.h
-> index c8ae1e1f5e721..e4cc2d4497bcf 100644
-> --- a/include/linux/trace_remote_event.h
-> +++ b/include/linux/trace_remote_event.h
-> @@ -3,6 +3,8 @@
->  #ifndef _LINUX_TRACE_REMOTE_EVENTS_H
->  #define _LINUX_TRACE_REMOTE_EVENTS_H
->  
-> +#include <linux/types.h>
-> +
->  struct trace_remote;
->  struct trace_event_fields;
->  struct trace_seq;
-
+Thanks,
+Karl
