@@ -1,126 +1,113 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAA6E3BED30;
-	Mon, 10 Aug 2026 11:16:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BB713BB13D;
+	Mon, 10 Aug 2026 11:32:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786360576; cv=none; b=Tyz279dD6/J4d0yeWMoY86AS4rNTX6u6mM6SUQL7Cbj6uRI7yGOpEDXSTlnHSUTIsFPdN2LnBWCebrg7zj0LRjHuPQCXK9aXhVhq+/YET5ZkSeug1pRenyqpFUpHdLEJiMNxRz1P7RN6Ss369iwBnsXy6MFqZeENlNMdEnLK8eE=
+	t=1786361578; cv=none; b=YuP9saBljzzek81IQb51iMV6qrNG5DmcHOucj2LbEPMBLzxrS+07BqSLBh+9S2B5VGYYVElRxVYyBRblXUULNAlwRyt7J9SgVhRFWCgjGfBIaMoy9xMYChLhzYNPtwc1UNFzajZ7FZpp0Dv5vVc/Lqv4tGk0euPtrf0iRW9mOtY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786360576; c=relaxed/simple;
-	bh=uEUhT3YIVexjE7DIMB/gsT6flEZfJYWdAkkA82o3gWY=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=necrgtcW/Bmw9pxkRJELrBoPdjn/WrbuIJwYLT1smKi+h0uaoM+P7JRQyFqaKndSyD9YJ899ug1Ze+pbTFfI3AqM6fqcDfFVIEU1l3jffdyzQgTUW+et1RKD6PSZmsokBsMNJaN7a3Lkl8qNBB6EFyl1B3uuV0VQWlv/3MjNHsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HANZfPUy; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786361578; c=relaxed/simple;
+	bh=ICZJwBQyIMFmTYvQXLPBygQoTomr5w7GG1oxhfcWvRg=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=frY379mHGwUTANod8Iq8T7snhMK7lGkOLZBhmiSVdg2MMWYjnK7V34YYQQhvL/LWgRANzEbsir1wONOOfYVr/oH/hFA0694bwJjuPFHqiOL8+tNQdHXQqDtKY1wq4mJBIt02TofkbHHl/OSOjegg3nfOxfXHqkYUVuBdqG6WEzg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bCpzli4p; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HANZfPUy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDC731F000E9;
-	Mon, 10 Aug 2026 11:16:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bCpzli4p"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 058671F000E9;
+	Mon, 10 Aug 2026 11:32:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786360575;
-	bh=5GkJ60QfR59Z1ddarWazchyTjT6S4Ti5bYVuNBSD5Ug=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=HANZfPUyLhM4BbCc2ZLgA/oIUtPpqUpvFh6zfP2nDuGFhQjH1ht1s5WkGn7eLiYmf
-	 OPOu3HAW6fHZaNQtH+ZcflPCYV36FL/+3LBTb1oy7tiG9SKCLdBK+9YaJuIgoL1die
-	 CYXQpJN9nD7TLxYEFal/LxBK0fegzqqbphY0ApA0N6TVkI5vFEgWhKloJ7gMLYoQPB
-	 ozIbydFL6xoarbLiQYdxDpz7Ho/C8GbUrejlQXA3+394sDvYLrc9UYMN6bY7qkhUea
-	 KQnnm1zdEtJZiVmiBbitiiNL52HpR4Asmzl6q5fmhwyp5ylhHUiVwpfcFNXiA7og4M
-	 o6W69oH/PjA7g==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 5/5] KVM: arm64: vgic: Reject out-of-range GICv5 PPI IDs
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Sascha Bischoff" <Sascha.Bischoff@arm.com>
-Cc: kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, kvm@vger.kernel.org
-In-Reply-To: <20260810102652.758719-6-sascha.bischoff@arm.com>
-References: <20260810102652.758719-1-sascha.bischoff@arm.com>
- <20260810102652.758719-6-sascha.bischoff@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 10 Aug 2026 11:16:14 +0000
-Message-Id: <20260810111614.DDC731F000E9@smtp.kernel.org>
+	s=k20260515; t=1786361577;
+	bh=+WUQmunuAHmUFO6LakZVc7vewqsfFce18N0HbJ03AJY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=bCpzli4pKk0jcdIZyFhrTY2Le3Y/aU/b80NAjqMtcwwd/BpCO2tm0p8Xrsn1A2RB4
+	 xaZyNywK+uaDui0S+FKo62Ztx+3KsyS7PvQPSO8cyNy9zGDrm3+/kAvECy6whPae9f
+	 rEd6BXmrDAlmWzpTRyAd2R1fTFblPP+lwl8ytMUJABA5FQ2FEigj/418cFuhZa1sJy
+	 XMktKWwJKPYA6LJjD3T4iwDUwRSADszelTWkrpDiRmVtohNM7EZkfSS7KQXBYMq+8p
+	 Js+GqpTP9OG0kx9T0/VIcu7oMWlO2w4Yi+N7JBox1RJBPBnclm3WtncEyfWMlGDSUE
+	 PykIIzsEz+5SA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wtOFT-0000000E4kX-0fxH;
+	Mon, 10 Aug 2026 11:32:55 +0000
+Date: Mon, 10 Aug 2026 12:32:54 +0100
+Message-ID: <86v79i1a8p.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Kajetan Puchalski <kajetan.puchalski@arm.com>
+Cc: oupton@kernel.org,
+	fuad.tabba@linux.dev,
+	joey.gouly@arm.com,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	jic23@kernel.org,
+	Sascha.Bischoff@arm.com,
+	zenghui.yu@linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	stable@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: vgic: Fix detection of MI on no pending LR
+In-Reply-To: <20260810102923.2426475-2-kajetan.puchalski@arm.com>
+References: <20260810102923.2426475-2-kajetan.puchalski@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kajetan.puchalski@arm.com, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, jic23@kernel.org, Sascha.Bischoff@arm.com, zenghui.yu@linux.dev, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, stable@vger.kernel.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [Critical] Returning NULL for out-of-range GICv5 PPIs causes a determinis=
-tic host kernel panic via NULL pointer dereference or BUG_ON() during timer=
- initialization with user-controlled inputs.
---
+[Fixing up the initial recipient list...]
 
---- Patch [5]: [PATCH 5/5] KVM: arm64: vgic: Reject out-of-range GICv5 PPI =
-IDs ---
-commit b745364de86ed8f379d9297c2d334e7a734654d6
-Author: Sascha Bischoff <Sascha.Bischoff@arm.com>
+On Mon, 10 Aug 2026 11:29:24 +0100,
+Kajetan Puchalski <kajetan.puchalski@arm.com> wrote:
+> 
+> As per the ARM GICv3 spec, the maintenance interrupt identified by
+> ICH_MISR_EL2.NP is asserted when it is enabled and no List register is
+> in pending state. This is further described in the document as "no List
+> registers with the State field set to 0b01 (pending)". By checking only
+> the pending bit of the LR (bit 62), KVM currently asserts the MI when
+> there are no LRs in "pending" or "pending and active" states.
+> Fix the detection logic to consider only the "pending" state.
+> 
+> Cc: stable@vger.kernel.org
+> Fixes: 96c2f03311de ("KVM: arm64: nv: Plumb handling of GICv3 EL2 accesses")
+> Signed-off-by: Kajetan Puchalski <kajetan.puchalski@arm.com>
+> ---
+>  arch/arm64/kvm/vgic/vgic-v3-nested.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+> index 5c69fa615823..e3e84d7f5ad5 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+> @@ -152,7 +152,7 @@ static void vgic_compute_mi_state(struct kvm_vcpu *vcpu, struct mi_state *mi_sta
+>  			eisr |= BIT(i);
+>  		if (!(lr & ICH_LR_STATE))
+>  			elrsr |= BIT(i);
+> -		pend |= (lr & ICH_LR_PENDING_BIT);
+> +		pend |= (lr & ICH_LR_STATE) == ICH_LR_PENDING_BIT;
+>  	}
+>  
+>  	mi_state->eisr	= eisr;
 
-KVM: arm64: vgic: Reject out-of-range GICv5 PPI IDs
+Thanks for catching this.
 
-The commit prevents KVM from clamping out-of-range GICv5 PPIs to index 0.
-It introduces a check in vgic_get_vcpu_irq() that returns NULL when the
-extracted hardware IRQ ID exceeds the supported range.
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 
-Link: https://sashiko.dev/#/patchset/20260724104819.1296803-1-sascha.bischo=
-ff@arm.com?part=3D27
+	M.
 
-> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-> index 3077cfdaa146d..d0c91f0c52698 100644
-> --- a/arch/arm64/kvm/vgic/vgic.c
-> +++ b/arch/arm64/kvm/vgic/vgic.c
-> @@ -118,6 +118,8 @@ struct vgic_irq *vgic_get_vcpu_irq(struct kvm_vcpu *v=
-cpu, u32 intid)
->  		switch (type) {
->  		case KVM_DEV_TYPE_ARM_VGIC_V5:
->  			intid =3D vgic_v5_get_hwirq_id(intid);
-> +			if (intid >=3D VGIC_V5_NR_PRIVATE_IRQS)
-> +				return NULL;
-
-[Severity: Critical]
-Does returning NULL here allow a malicious userspace process to trigger a h=
-ost
-kernel panic?
-
-If a user configures a VM and sets the timer IRQ to an out-of-bounds GICv5 =
-PPI
-ID (>=3D 64) via the KVM_SET_DEVICE_ATTR ioctl, the input is validated using
-irq_is_ppi(). Because irq_is_ppi() only checks the upper type bits for GICv=
-5,
-it accepts the invalid ID and stores it.
-
-When the vCPU is subsequently run, kvm_timer_enable() initializes the timers
-and calls functions like kvm_vgic_set_owner() and kvm_vgic_map_phys_irq() w=
-ith
-the out-of-bounds IRQ. These callers lack NULL checks and assume the return=
-ed
-pointer is valid.
-
-For example, kvm_vgic_set_owner() unconditionally dereferences it:
-
-arch/arm64/kvm/vgic/vgic.c:kvm_vgic_set_owner() {
-	irq =3D vgic_get_vcpu_irq(vcpu, intid);
-	raw_spin_lock_irqsave(&irq->irq_lock, flags);
-	...
-}
-
-And kvm_vgic_map_phys_irq() explicitly asserts it with BUG_ON():
-
-arch/arm64/kvm/vgic/vgic.c:kvm_vgic_map_phys_irq() {
-	struct vgic_irq *irq =3D vgic_get_vcpu_irq(vcpu, vintid);
-	...
-	BUG_ON(!irq);
-	...
-}
-
-Should the boundary check be enforced earlier, such as during the ioctl
-validation itself, to prevent storing the invalid ID and crashing during
-timer initialization?
-
->  			intid =3D array_index_nospec(intid, VGIC_V5_NR_PRIVATE_IRQS);
->  			break;
->  		default:
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260810102652.7587=
-19-1-sascha.bischoff@arm.com?part=3D5
+-- 
+Without deviation from the norm, progress is not possible.
