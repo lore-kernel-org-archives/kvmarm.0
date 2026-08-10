@@ -1,171 +1,124 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com [209.85.208.71])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76DFF3B19A0;
-	Mon, 10 Aug 2026 09:42:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27A8E3B776C
+	for <kvmarm@lists.linux.dev>; Mon, 10 Aug 2026 10:13:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786354922; cv=none; b=jOoEbPhqQYkVFGkYeopMvTGK+wtVfs/usVu7d2NAvXjF+zl/i09TU2wen0qS3Y0q1BZHDRoNzo9EkVuA2REunXKNGNLb6lG+4TJeoAmPWUBVqzsk4LPLnp9Y3Ik31ZxCV6EBucd+wbaOrHWUvALq0SGVw6iaitVmfjueeVozeB0=
+	t=1786356832; cv=none; b=UoMX/N9XF0AHi5InoqhCS/en5THwMr9EypuQP0CQZf1wFMW6s5cwWq3V/48F2ZctDo0mPEcwooQMZVM50McqjI5BQe58ydcOpuiS5ojBUJ9NH7mKVIhEaPwO51xRqO/bMJAfkzFyydP2BlgWLhIDkQ0eApfi5PDLf1z6ajsALcY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786354922; c=relaxed/simple;
-	bh=dKWOjgCHJjHzYTmqrZ/c+AqCjIh1wH9W7xeIAmA/5zM=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=m0VL+49sht5BaqXOtdnVggsDu4FSqoWxN7knzpd/AjQfzZjDqD4z4LRfbQYmCsYA7hO+48NlC8c1aBWhSDuRQ50ZwyZ3sAZrUCjfvAs+gFULPKyDX1Pz4ZtFYcAuB7zLbjMmoLt7T4uKCqREiuy/jMSDUoI80kVlPNEStqm31rI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lSVpwzjm; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786356832; c=relaxed/simple;
+	bh=MeXfYhzXMPHdPIsGXHtVw7BYqOJa1dL6Rn+GgOZlz7Y=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=R17RWkw53UZhhV1cfsLcS+4OzUtXLuwah51fjWpK2pcGtoYSEbuM4/r96VuJxuibpLdMP65aLX30ccAd8bR9GRWSAlor8Mto3RA9xBKJ5mN+R01Qv1s9qjW5T7ZowKPiVzyL0owQ1Z/aT1m3hseu5EBSpuPXQUIsUS1yG2ZgEyo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tarunsahu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kLhn2JGb; arc=none smtp.client-ip=209.85.208.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tarunsahu.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lSVpwzjm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44CB81F000E9;
-	Mon, 10 Aug 2026 09:42:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786354921;
-	bh=YRvZvvHIVpj4XP+Xsbw9vpzce7EuvuetlAXvbhkPlhE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=lSVpwzjmSuwmAGnmejzEHRj/Qb/ufx9XmA+X48gJ9k9URKIk1fNF0kvhsHA856m9H
-	 gR8O3bXZrso2oTm7UMQ9SWgkZ5YvCF9BesZYdBlupKe0qX16HnXDItJEjQ/mYpBhcK
-	 h7JTBYXdguDPWaNVRzwXyEkzk9p9TtlMQIxn3OaZzKlVud5+QFAmQJkwPC4rXIOOlO
-	 ULjLZ6/q6Dn1NsVinRhzZjiT9cceLzc5YB7YU+RXxPpr2aDEiN0OqdgF9KoLG/1l24
-	 Fsx2VdnAbbEvcG20EMziFhk8HLbdDuSLsnTx745AAiB8CpbH5GkQtFc3yZBg1UEZ+o
-	 BM9Km83rcOMJQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wtMW6-0000000E2IC-3tVB;
-	Mon, 10 Aug 2026 09:41:59 +0000
-Date: Mon, 10 Aug 2026 10:41:51 +0100
-Message-ID: <86wlty1fds.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Kohei Enju <enju.kohei@fujitsu.com>
-Cc: Steven Price <steven.price@arm.com>,
-	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
-	Emi Kisanuki <fj0570is@fujitsu.com>,
-	Vishal Annapurve <vannapurve@google.com>,
-	WeiLin.Chang@arm.com,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>
-Subject: Re: [PATCH v16 44/45] KVM: arm64: CCA: Require ICH_HCR_EL2.TDIR for realms
-In-Reply-To: <anlZCIauOq4Lvv0I@FCCLS0092175.localdomain>
-References: <20260803134403.80630-1-steven.price@arm.com>
-	<20260803134403.80630-45-steven.price@arm.com>
-	<anlZCIauOq4Lvv0I@FCCLS0092175.localdomain>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kLhn2JGb"
+Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-69e70c286ecso1440757a12.0
+        for <kvmarm@lists.linux.dev>; Mon, 10 Aug 2026 03:13:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1786356829; x=1786961629; darn=lists.linux.dev;
+        h=content-transfer-encoding:content-type:cc:to:from:subject
+         :message-id:references:mime-version:in-reply-to:date:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=K9UaDyUPuckC37zrOmaQcbngoaGVbYZA3xXl4q/mPgY=;
+        b=kLhn2JGbexzoXgpBK0ZPIUEppQZOaKkTPBQNj9h5DvliIjZMcE2MBiyXC6ACc0Qmw7
+         cAUTTGNJV5tMPZiYJOHNOR8De+AXUwd9CRqTCJ+cqMzMrJOAgSahEurr59pg0C6PMlYj
+         H4/KWt+HZPsNSopUWO2Hs6HDm+QU9Cer664klOOgVcrtaUVW3McwpsaXQJiAi39uPPj2
+         rtgfoIR8aIVX7TpCQMMqcVxT3qrZAB7bNc2QQPkL9Abdd8uPxHukpuAzIT7pDEup13yo
+         QZOFdht91La7SA8+6no/GGlCgeAvv2lylaC5cIGj3ugm+3QjHmZGOWiygvJzPpXaIaSw
+         NCBg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786356829; x=1786961629;
+        h=content-transfer-encoding:content-type:cc:to:from:subject
+         :message-id:references:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=K9UaDyUPuckC37zrOmaQcbngoaGVbYZA3xXl4q/mPgY=;
+        b=liWDtH3zxOf2MZd6TPKM9ij72GYoSpho4Q44iw3KGWAKkLRIR5qGi+jkXc0ORc7YFU
+         jeqIelHeX4ym8vwWyyytaLqlFpxuZNAKMMwuAWZaqd5jP6CJ6t4EH2jxzjSc80l1Bm5w
+         zvXFH2QajsVRKdfq9zfkYxZuVNVGMerDyY3KbZ1UkcFTwi+UKakzgoDpNyxme5Ml7BXE
+         9xS6Cyd65QUl57PfwxhtJFsNVSlDYutC+CblNiQzFzT73svzz0SCGjOfpqyuLexZxyk8
+         ydtD6zLw5wZy5cIDKpbfotNUPYmWsxi2xMIL2rJiAPl78iktlzBTfxioCx7X5KHjJDC1
+         H16A==
+X-Forwarded-Encrypted: i=1; AHgh+Rqz6ERwtgW4idTbuw65GTLsTvZo46UQczjG7YthfwdBuZJVLyPGIOnDlckAll5jghyIKiJCiqM=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yw4EvKEqNp5RfjAY8gFxpxvF6HktwmqZl7u4UoT2X0/gn6pPYbB
+	NX6LnAjnFhMZ0aKrxpY+oqa518LDy7aMLFDAQTYky+EHzqSyC2E05S3OFaWIRTjNwcychgZrGem
+	lzvB3eQotEqTtKedT4Q==
+X-Received: from edyc9.prod.google.com ([2002:aa7:df09:0:b0:697:8356:d9d4])
+ (user=tarunsahu job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6402:24db:b0:6a1:feb6:6d78 with SMTP id 4fb4d7f45d1cf-6a1feb6806amr5150242a12.18.1786356829111;
+ Mon, 10 Aug 2026 03:13:49 -0700 (PDT)
+Date: Mon, 10 Aug 2026 10:13:47 +0000
+In-Reply-To: <CAEvNRgGHuiXG1KZ24+kX-ZgTS_rqGPFqJMjoJhqf6GpZh4xN3g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: enju.kohei@fujitsu.com, steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com, aneesh.kumar@kernel.org, fj0570is@fujitsu.com, vannapurve@google.com, WeiLin.Chang@arm.com, lpieralisi@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+References: <20260728121138.1103610-1-tarunsahu@google.com>
+ <20260728121138.1103610-2-tarunsahu@google.com> <20260728122245.AA83D1F000E9@smtp.kernel.org>
+ <CAEvNRgGHuiXG1KZ24+kX-ZgTS_rqGPFqJMjoJhqf6GpZh4xN3g@mail.gmail.com>
+Message-ID: <9huzjypy8eqs.fsf@tarunix.c.googlers.com>
+Subject: Re: [PATCH v4 01/11] liveupdate: Add LIVEUPDATE_GUEST_MEMFD config option
+From: tarunsahu@google.com
+To: Ackerley Tng <ackerleytng@google.com>, sashiko-reviews@lists.linux.dev
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev, 
+	Oliver Upton <oupton@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 10 Aug 2026 05:58:10 +0100,
-Kohei Enju <enju.kohei@fujitsu.com> wrote:
-> 
-> On 08/03 14:44, Steven Price wrote:
-> > KVM advertises realm support when the RMM is available, and allows
-> > userspace to create a VM with KVM_VM_TYPE_ARM_REALM on that basis.
-> > 
-> > On CPUs that lack ICH_HCR_EL2.TDIR, KVM uses ICH_HCR_EL2.TC for
-> > normal guests so that ICC_DIR_EL1 is still trapped via the common GICv3
-> > CPU interface trap. Realms cannot rely on the normal hyp-side trap
-> > handling for that fallback, so advertising RMI support on such systems
-> > lets userspace create a realm that cannot safely run.
-> > 
-> > Require the finalized ARM64_HAS_ICH_HCR_EL2_TDIR capability when
-> > reporting KVM_CAP_ARM_RMI and when accepting KVM_VM_TYPE_ARM_REALM.
-> > This leaves normal VM creation unchanged on systems that need the TC
-> > workaround.
-> 
-> Hi Steven,
-> 
-> Thanks for your work on upstreaming CCA.
-> 
-> In the v15 discussion [0], you asked whether the system I was testing was a
-> "hacked up test system" or closer to "production hardware", and I said I would
-> share more when the time came. I can now say that this is not a hacked-up test
-> system. At Fujitsu, we have real hardware (FUJITSU-MONAKA) which implements CCA
-> (FEAT_RME) but does not implement FEAT_GICv3_TDIR. The hardware details are as
-> follows:
-> 
->   - GICv4.2 compliant implementation
->   - Supports FEAT_GICv3, FEAT_GICv3p1, FEAT_GICv4, FEAT_GICv4p1, and FEAT_GICv3_NMI
->   - Does not support FEAT_GICv3_LEGACY (deprecated)
->   - Does not support FEAT_GICv3_TDIR (ICH_VTR_EL2.TDS == 0)
-> 
-> For reference, compared with Arm Neoverse V3, the virtual GIC configuration is
-> largely equivalent. The only missing non-deprecated architectural feature is
-> FEAT_GICv3_TDIR.
 
-A *very* significant difference. Given the cost of trapping between
-R-EL1 and NS-EL2, something as simple as accesses to ICV_PMR_EL1
-result in an extremely expensive trap.
+Thanks for reviewing it.
 
-> 
-> The issue I see is that the CCA KVM code currently does not support a
-> configuration (non-TDIR/common-trap) that normal KVM already supports. For
-> normal guests, KVM handles systems without TDIR by using ICH_HCR_EL2.TC and the
-> existing GICv3 CPU interface emulation path. However, Realm guests currently
-> fail because the CCA path bypasses that existing emulation path, as Marc also
-> pointed out in [1].
+Ackerley Tng <ackerleytng@google.com> writes:
 
-Plugging CCA in the emulation code will solve the *functional* aspect.
-The performance aspect is still there, unfortunately, and there isn't
-much KVM can do about that.
+> sashiko-bot@kernel.org writes:
+>
+>>>
+>>> +config LIVEUPDATE_GUEST_MEMFD
+>>> +	bool "Live update support for guest_memfd"
+>>> +	depends on LIVEUPDATE
+>>> +	depends on KVM_GUEST_MEMFD
+>>> +	default LIVEUPDATE
+>>
+>> [Severity: Medium]
+>> Is the implementation for this feature missing from this patch?
+>>
+>> The commit message notes that this patch enables live update support for=
+ KVM
+>> guest_memfd files, but the newly added LIVEUPDATE_GUEST_MEMFD symbol app=
+ears
+>> to be unreferenced in the tree. Since there are no Makefiles, C files, o=
+r
+>> preprocessor checks that use it, this currently acts as dead code.
+>>
+>> Could the implementation be missing, or was this intended to be introduc=
+ed as
+>> part of a larger series where the symbol is used in a subsequent patch?
+>>
+>
+> Sashiko is right here, I think this patch should be squashed with the
+> first usage.
 
-> 
-> Also, this is not limited to systems that actually lack TDIR. The same failure
-> can be reproduced on a TDIR-capable system by booting with:
->   kvm-arm.vgic_v3_common_trap=1
+Sure, will update it.
 
-This is a *debug* option for broken hardware. ThunderX, for
-example. You really are in good company when this bit is set.
-
-> 
-> So it seems that the current CCA KVM implementation does not yet cover a
-> configuration that normal KVM already supports today, rather than this being a
-> limitation of the RMM specification or the underlying hardware.
-> 
-> I've included a patch below which reuses the existing GICv3 early emulation
-> path for Realm sysreg exits. This patch does not add any new vGIC emulation
-> code, and leaves the existing vGIC emulation code unchanged. So I believe this
-> is in line with Marc's request in [1]. With this patch, Realm guests can run
-> when the common CPU interface trap path is enabled.
-> 
-> I tested the exact patch both on our real silicon and on QEMU, and
-> confirmed that all Realm-related tests in kvm-unit-tests-cca passed.
-
-KUTs are unfortunately not something that people run in production. I
-wonder why...
-
-Please run a Linux guest compiled with CONFIG_ARM64_PSEUDO_NMI=y and
-irqchip.gicv3_pseudo_nmi=1 on the command line. Run any significant
-workload (hackbench, for example), and report the overhead. This will
-give you the expected impact introduced by the lack of TDIR.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+>
+>>> +	help
+>>> +	  Enable live update support for KVM guest_memfd files. This allows
+>>> +	  preserving VM Memory backed by guest_memfd file across kernel live
+>>> +	  updates.
+>>> +
+>>> +	  This can only be used for the guest_memfd that are fully-shared
+>>> +	  and pre-faulted.
+>>> +
+>>> +	  If unsure, say N.
+>>> +
+>>>  endmenu
+>>
+>> --
+>> Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260728121138.1=
+103610-1-tarunsahu@google.com?part=3D1
