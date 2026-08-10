@@ -1,96 +1,99 @@
-Received: from mail11.truemail.it (mail11.truemail.it [217.194.8.81])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EE033EFD24;
-	Mon, 10 Aug 2026 15:05:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.194.8.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AC953876C4;
+	Mon, 10 Aug 2026 17:06:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786374343; cv=none; b=Nh2TuYJHxBQnrIPEfP/X+OlKTAINwuzky52L1CRq68kJ3IqwS6E2qwM1yk7AfOUKfOKLYmInEQfDfhNAA+5dkUBE+AgMci65Acdrb+mNOPnolNs6fo3Un5EAZ74V6EsAnmg9HcIwOBFHnl8WKC3ukiGeHn01teI0OqUhupn5Kww=
+	t=1786381582; cv=none; b=L7JnzuHr3eXp6bXO8HrOl7mx0KiZPvRPTp4Vsohm0+lzyIh+CodtvEpYqRnu9nDs2vv3pPrShFALnGN/qx6UndEblpXuRvypHPKqydU2fYvkN9krYByiXrDX6Q7+y6SlXo3onL+gMzwRXpYaA6nrk8VrupGTpNfrXABuLj5OoQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786374343; c=relaxed/simple;
-	bh=9hocbGktqstTMjPnIEb61JAFPnzqOpAsoX7EfvB6d88=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ati98uIfwsy/nzrTElhP/MhqlRHFUhDsDFJzMGiUZGhgp7GLi4apwQV28LL6rJuk/FRGOufL8o1+fO2hdxUGSJKWghprUWWlx0GR5ysQBKYh/OHRW1g02coIY8xw/LBP9Ere5mihp9nGFO4/tnRhVSxwiRFITFOD1BWYBCLV9EQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dolcini.it; spf=pass smtp.mailfrom=dolcini.it; dkim=pass (2048-bit key) header.d=dolcini.it header.i=@dolcini.it header.b=RANKzl0r; arc=none smtp.client-ip=217.194.8.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dolcini.it
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dolcini.it
+	s=arc-20240116; t=1786381582; c=relaxed/simple;
+	bh=1ORMP8gd/6VKAjjhv+JmIQhO7i6YW8HRoG3EcfyadgE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dB1NiB1rUWJa6ZnMpxyVcb8jvEqE6B3ACnRWybd04h5WUFhuLDZx3LtP3ow/y6sADIec8nhl7KIsiLV1CU/A7DRTgrdp6jDiYe+2rirJMtVKAa4jGAy4BX/fBnj4yjz62YRf8obxGsAD50lpA3l8fDseCs3V7hRrs29evhc+XOI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=asMIQGAu; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dolcini.it header.i=@dolcini.it header.b="RANKzl0r"
-Received: from francesco-nb (93-35-5-212.ip52.fastwebnet.it [93.35.5.212])
-	by mail11.truemail.it (Postfix) with ESMTPA id 75AAD1F83F;
-	Mon, 10 Aug 2026 16:51:53 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dolcini.it;
-	s=default; t=1786373515;
-	bh=8xOWdWttJ5lEYJAi21opwk9aDpKJg8EeQXY1WVzHESc=; h=From:To:Subject;
-	b=RANKzl0rwIbXN++I6LA8Rlhna7AgTZYi8AbfcmaILTUXvORdWCRcBx64ECxagA2MJ
-	 BspMT1vAvOBmCSw9kdnSnrJaEueE+vt1by7Gf1gGafC4T1t6wa25e/eoHBZzLynsDJ
-	 yxBALaK8zAkLmDzyi47NQZ3/I7RSGTz9FH1ILF+uxfsaR39QgUp4Ia9XEYi+RGPtA1
-	 a7B+okTo48bYkaP4jR4Y8etBFO4y3M2uAWqcoY5uTTiUwGclz34pcaj496Uy04uXMq
-	 IRZu4UHuTQOkdRZ4MNVsjBefRn9kVgLio9jjwQ5q/Q6ZlIA3d0KqpZBSwKxBUobFUB
-	 LUDheqXSoUyvg==
-Date: Mon, 10 Aug 2026 16:51:49 +0200
-From: Francesco Dolcini <francesco@dolcini.it>
-To: "Peng Fan (OSS)" <peng.fan@oss.nxp.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="asMIQGAu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31C131F000E9;
+	Mon, 10 Aug 2026 17:06:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1786381581;
+	bh=5CEKvdjZ+GqV7pqn1nM6jfrimrYnL16pPlu4q1fQ5xU=;
+	h=From:To:Cc:Subject:Date;
+	b=asMIQGAuH+bY8/eRhEhYan4Y0Q39sbZsdOmdZOsJGyiJkB+8pAomI0kPRIvLctkt9
+	 Aeo7Rm1/d9U5PTwpKUq39ZJaIJM1TrHLv4dBqlb3RR7mk4M/5gA7dS2EjeUXct50vP
+	 BLZ/NnXIUnr3T10Mi1LWk56560/5E0LW2QjAqeIpAxo1uVPCyCzPmhXvkir0tV4612
+	 74RdYxxo2oqErcv1lG9KVIIb3PUe6nVSE+J4o8DCCGyO+srzmVijT/SUWCP+cU/KLN
+	 BBwvaQuQ3OvyU5ln5qNPlDpZcoSKRixMjV9C7VQ3yXqI7FDfCnpPE3xLCru8xdJ3it
+	 HYS7PcslXtAcw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wtTS7-0000000ECcp-0cSL;
+	Mon, 10 Aug 2026 17:06:19 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org
+Cc: Steffen Eiden <seiden@linux.ibm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	"Ivan T. Ivanov" <iivanov@suse.de>,
-	Francesco Dolcini <francesco@dolcini.it>,
-	Frank Li <frank.li@nxp.com>, linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, imx@lists.linux.dev,
-	Peng Fan <peng.fan@nxp.com>, Steffen Eiden <seiden@linux.ibm.com>
-Subject: Re: [PATCH v3] arm64: errata: Add NXP iMX8QM workaround for A53
- cache coherency issue
-Message-ID: <20260810145149.GA81453@francesco-nb>
-References: <20260803-imx8qm-cache-coherency-v3-1-c518d0da3d3b@nxp.com>
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] KVM: arm64: Correctly cap TLBI Range to the architural limit
+Date: Mon, 10 Aug 2026 18:06:16 +0100
+Message-ID: <20260810170616.746100-1-maz@kernel.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260803-imx8qm-cache-coherency-v3-1-c518d0da3d3b@nxp.com>
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, fuad.tabba@linux.dev, weilin.chang@arm.com, stable@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hello Peng,
-thanks for the patch, very much appreciated.
+TLB Invalidation by Range has a fairly powerful way of encoding pretty
+large ranges in a small number of bits. This range can be based on an
+arbitrary VA, which means it is pretty easy for a guest to generate an
+overflow should the hypervisor be naive enough to add the range to the
+base...
 
-On Mon, Aug 03, 2026 at 04:54:44PM +0800, Peng Fan (OSS) wrote:
-> From: Peng Fan <peng.fan@nxp.com>
-> 
-> According to NXP errata document IMX8_1N94W[1], the i.MX8QuadMax SoC
-> suffers from a cache coherency issue (ERR050104). The upper bits, above
-> bit 35, of the ARADDR and ACADDR buses within the Arm A53 subsystem
-> have been incorrectly connected. This causes some TLBI and IC
-> maintenance operations exchanged between the A53 and A72 core clusters
-> to be corrupted.
+Make sure the range is capped to the limit dictated by the address bit
+that determines the VA range. For an IPA invalidation, this is further
+corrected down the line to ignore the upper range.
 
-...
+Fixes: 4ffa72ad8f37e ("KVM: arm64: nv: Add S1 TLB invalidation primitive for VNCR_EL2")
+Reported-by: Wei-Lin Chang <weilin.chang@arm.com>
+Link: https://lore.kernel.org/r/yifz3wn5gk5sr6mapi32trgk5m5kp33bquctsjmkifebnsnndt@fix6u4rthx4g
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Cc: stable@vger.kernel.org
+---
+ arch/arm64/include/asm/kvm_nested.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-> diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
-> index 5db8f0619e4b..4ba68c1f29b2 100644
-> --- a/arch/arm64/kernel/cpu_errata.c
-> +++ b/arch/arm64/kernel/cpu_errata.c
-> @@ -200,6 +202,28 @@ cpu_enable_cache_maint_trap(const struct arm64_cpu_capabilities *__unused)
->  	sysreg_clear_set(sctlr_el1, SCTLR_EL1_UCI, 0);
->  }
->  
-> +#ifdef CONFIG_NXP_IMX8QM_ERRATUM_ERR050104
-> +static bool
-> +is_imx8qm_soc(const struct arm64_cpu_capabilities *entry, int scope)
-> +{
-> +	WARN_ON(preemptible());
-> +
-> +	return of_machine_is_compatible("fsl,imx8qm");
-
-fsl,imx8qp is also affected, please adjust
-
-
-Francesco
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index c83be6d0e79ac..1ed7083358096 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -305,6 +305,12 @@ static inline u64 decode_range_tlbi(u64 val, u64 *range, u16 *asid)
+ 	num	= FIELD_GET(GENMASK(43, 39), val);
+ 	*range	= __TLBI_RANGE_PAGES(num, scale) << shift;
+ 
++	/* Cap the range to the correct half of the address space */
++	if (!(base & BIT(48)))
++		*range = min(*range, (BIT(48) - base));
++	else
++		*range = min(*range, ~base + 1);
++
+ 	return base;
+ }
+ 
+-- 
+2.47.3
 
