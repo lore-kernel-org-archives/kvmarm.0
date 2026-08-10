@@ -1,234 +1,222 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from esa9.hc1455-7.c3s2.iphmx.com (esa9.hc1455-7.c3s2.iphmx.com [139.138.36.223])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D44C3A383C;
-	Mon, 10 Aug 2026 14:03:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84A383FBEB8;
+	Mon, 10 Aug 2026 14:48:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.138.36.223
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786370629; cv=none; b=L/1qjWBZnjfHHlcSOpqWKBWh88ArcT+w4aqogJCOGUJ7DqWkZQlU4n81Q3L6R6C9OMo4yN8TNa3OyNjWXEDoGcEDTyNa3t+ngUxWjH4c7IZCFJaqRT4iRIRVLVLuxZoTDsq6Q//o88Icxj0vSCLxTQIvAgjxgytt3FhbzD+dZvg=
+	t=1786373293; cv=none; b=awt3Z5hUWvVYB4eM0L9yxfSeONHd0gXi+sB5N4hY92SmdozqSYdRWokmMyHfAMB7gr5Sb0QQhMzXeyVF2QZlrlgjoyXKU2Uy5wFRR0qEWx5UCtvbqNCIr2R8HCDtUl6UK96Bj5/Hpe59MB/l2+XfulnB5Cz8xcLnv1h3m/bWQi8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786370629; c=relaxed/simple;
-	bh=iKgaQJIjcdWs4LaCjt3vfrTthKiqTPWMkO+qs4P7hfM=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=R6oITKMXLuLqGD1ODboN8ZN1kmFPA3HYcY00n0J9bjahN1UM6RsssrtXWNs1tWnPkCQOfBHaV2e/ojLw/QUgI5xAuo5Th25aKZ8liNFNR8RYHPU16IqYF8YZXzM8SeSUIjIxw/lrf1rgBtxv8no18ZiODCrm2UMsXnCo5ZGZdQE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SWQRkjKP; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786373293; c=relaxed/simple;
+	bh=99XkH2IMF7D6nyHbHISy+8bb2LKxW8tAVwIQzhTqFok=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Bf1FW2VRQuVv5usqraMyC8ZlZsIJIAixgdnwEMrWbjQzEKQbnXdIzJC4izpkfbjapl4pVAGiUi9EcWlqswCpsjftzeInRMq0Kt3G5gdoIxajnrzz3QsZ7wiwOE6FikBxDqzEduykF2dVRk1oYYex3FKpwZ4lAKZZd6eVRmFFAME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=bLxON1m2; arc=none smtp.client-ip=139.138.36.223
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SWQRkjKP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB20F1F000E9;
-	Mon, 10 Aug 2026 14:03:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786370627;
-	bh=Em+BQBracOSXwokRIimW6WdMSO/3+8vopQcKAyQpy+Y=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=SWQRkjKPpy6Z7XWCAcAQi4AW/srTp0eWQMuAibTB4MPtBtgKWR4V3WXbolzXHvHHY
-	 QtzWvJ8JO7R1vg2lzPAN8biSEP+74sl7wOqPCccf47NCJfqwDbsfv0dB/56OBNe5vX
-	 eu1ja8fMK5ScNpW/ARrrLswNrpJcvolKzVq2UHmXZmtiiCI3HmoyLh5v5aArKDYdbA
-	 Tqvp5deUdQLGmhcizGzCp3y5laEpx9ydGOkrgzcE1L/NPbbZXJR7PfygMJUlTcXO1O
-	 kg6k/ut045DscaciSP6kwFJYwm8vVSQln4AKTXDHZ9ulo4a4NZL5mkJUT/L4UJ1Zw9
-	 QRYfhYK5cOEOg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wtQbR-0000000E8L5-19oa;
-	Mon, 10 Aug 2026 14:03:45 +0000
-Date: Mon, 10 Aug 2026 15:03:44 +0100
-Message-ID: <86tsp2139b.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Karl Mehltretter <kmehltretter@gmail.com>
-Cc: Oliver Upton <oupton@kernel.org>,
-	kvmarm@lists.linux.dev,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Eric Auger <eric.auger@redhat.com>,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [RFC PATCH 1/2] KVM: arm64: vgic-v3: Roll back failed redistributor region setup
-In-Reply-To: <4e00fc25aa61ec52e6ef033a53588ce3f5550982.1786344511.git.kmehltretter@gmail.com>
-References: <cover.1786344511.git.kmehltretter@gmail.com>
-	<4e00fc25aa61ec52e6ef033a53588ce3f5550982.1786344511.git.kmehltretter@gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="bLxON1m2"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
+  t=1786373291; x=1817909291;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=99XkH2IMF7D6nyHbHISy+8bb2LKxW8tAVwIQzhTqFok=;
+  b=bLxON1m25lhmqq5s+fq8ZyWgOE28SoKe/4uudolfQ/HOZ0QV4BWKeyqy
+   cz/Lr+SrMW/cUAyQCG2K0MxFssJZ6ENlJzSOnnjVQsgRNFNQPQfJl5W7k
+   /lZwbqnJB8DYsWvRMIvgDvVcTQmkStd9KgX/XsZrCmjAq2MG1lVqPqvU+
+   HZNt1OgXgd1EICFPmcUF+PqJgviVQxy6SPB6A2TtvzfMDpYt/OaW/4lkT
+   BamBKg+TChJcLo2CV+uoTMFjZzWUaoWoNkM2Qp2zSLlyvf02n19fY0X1e
+   2CdX2ra9Po1Qz2bvtI43Q6R0dWe40yJgTSJRVFtkDvE7b1u2UtKJxk3mk
+   A==;
+X-CSE-ConnectionGUID: bf/0rBchSAus2RW8RYT+ZA==
+X-CSE-MsgGUID: lKLUCAGuQAKmzMksAH8CQw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11870"; a="237901631"
+X-IronPort-AV: E=Sophos;i="6.25,215,1779116400"; 
+   d="scan'208";a="237901631"
+Received: from gmgwnl01.global.fujitsu.com ([52.143.17.124])
+  by esa9.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2026 23:47:00 +0900
+Received: from az2nlsmgm1.o.css.fujitsu.com (unknown [10.150.26.203])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by gmgwnl01.global.fujitsu.com (Postfix) with ESMTPS id 3E6691000340;
+	Mon, 10 Aug 2026 14:47:00 +0000 (UTC)
+Received: from az2uksmom2.o.css.fujitsu.com (unknown [10.151.22.203])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by az2nlsmgm1.o.css.fujitsu.com (Postfix) with ESMTPS id E906CC09656;
+	Mon, 10 Aug 2026 14:46:59 +0000 (UTC)
+Received: from FCCLS0092175.localdomain (unknown [10.9.24.243])
+	by az2uksmom2.o.css.fujitsu.com (Postfix) with SMTP id 503D314000B0;
+	Mon, 10 Aug 2026 14:46:52 +0000 (UTC)
+Date: Mon, 10 Aug 2026 23:46:50 +0900
+From: Kohei Enju <enju.kohei@fujitsu.com>
+To: Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, 
+	James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, 
+	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev, 
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, Gavin Shan <gshan@redhat.com>, 
+	Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun <alpergun@google.com>, 
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>, 
+	Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com, Lorenzo Pieralisi <lpieralisi@kernel.org>
+Subject: Re: [PATCH v16 30/45] KVM: arm64: CCA: Handle realm vCPU load
+Message-ID: <annfY97FFA8ZuoHE@FCCLS0092175.localdomain>
+References: <20260803134403.80630-1-steven.price@arm.com>
+ <20260803134403.80630-31-steven.price@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kmehltretter@gmail.com, oupton@kernel.org, kvmarm@lists.linux.dev, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, pbonzini@redhat.com, shuah@kernel.org, eric.auger@redhat.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260803134403.80630-31-steven.price@arm.com>
 
-On Mon, 10 Aug 2026 07:52:16 +0100,
-Karl Mehltretter <kmehltretter@gmail.com> wrote:
+On 08/03 14:43, Steven Price wrote:
+> When loading a realm VCPU much of the work is handled by the RMM so only
+> some of the actions are required. Rearrange kvm_arch_vcpu_load()
+> slightly so we can bail out early for a realm guest.
 
-I'm sorry, but I find it difficult understand what you are trying to
-explain here:
+Hi Steven,
 
-> A later REDIST_REGION attribute can be inserted successfully and then
+I found that Realm guests can execute WFI/WFE instructions without
+causing a REC exit, ignoring KVM's WFx trap policy.
 
-Later than what?
+I'd suggest translating HCR_EL2.TWE/TWI into the corresponding
+run->enter.flags to honor the policy. Below is the patch I tested.
 
-> fail while registering redistributor iodevs. For example, a region that
-> overlaps the distributor is caught by vgic_v3_check_base() when the first
-> unassigned vCPU is processed.
->
-> The existing rollback unregisters all previously registered
-> redistributor iodevs. It leaves their rd_iodev.base_addr values set, so a
-> corrected retry skips re-registering those stale vCPUs and succeeds with
-> holes in the MMIO bus.
+----
+From 8637cd6f818a3c56d8b898a72874e9485eb94e59 Mon Sep 17 00:00:00 2001
+From: Kohei Enju <enju.kohei@fujitsu.com>
+Date: Mon, 10 Aug 2026 22:54:27 +0900
+Subject: [PATCH] KVM: arm64: CCA: Honor WFx trap policy for Realm vCPUs
 
-Holes in the MMIO space are the norm. The IPA space can multi-TB
-large, and there is no reason why it'd cover everything (where would
-you place the RAM otherwise?).
+Propagate KVM's WFx trap policy to the RMM by translating
+HCR_EL2.TWE/TWI into REC_ENTER TRAP_WFE/WFI flags before entering a REC.
 
-Is the problem here that you are left with vcpus that seem to have
-been matched to an RD (base_addr being set), but that really are left
-unconnected?
+Without this, guests can execute WFE/WFI instructions without causing a
+REC exit, ignoring KVM's common trap policy. Configure the REC_ENTER
+flags to honor the policy.
 
-> 
-> A failure from kvm_io_bus_register_dev() can leave another hole. The
+Signed-off-by: Kohei Enju <enju.kohei@fujitsu.com>
+---
+ arch/arm64/include/asm/kvm_rmi.h |  2 ++
+ arch/arm64/kvm/arm.c             |  3 +++
+ arch/arm64/kvm/rmi.c             | 14 ++++++++++++++
+ 3 files changed, 19 insertions(+)
 
-MMIO hole? Coverage hole?
-
-> failing vCPU already has its base address and region assigned, but the
-> old i < c rollback does not include it.
-
-What is "it"?
-
-> 
-> Preserve devices assigned by earlier successful setters. On failure,
-> unregister only vCPUs associated with the newly inserted region, clear
-> their cached base addresses, and free that region. This also includes the
-> current vCPU when iodev registration itself fails.
-
-What I don't see here is an argument explaining that doing this
-doesn't change the guest-visible assignment of RDs, which would be a
-regression.
-
-> 
-> Fixes: c011f4ea106b ("KVM: arm/arm64: Check vcpu redist base before registering an iodev")
-> Assisted-by: Codex:gpt-5.6-sol
-> Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
-> ---
->  arch/arm64/kvm/vgic/vgic-mmio-v3.c | 42 ++++++++++++++++++------------
->  1 file changed, 26 insertions(+), 16 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> index 5913a20d83019..832a7fe65984c 100644
-> --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> @@ -841,6 +841,31 @@ void vgic_unregister_redist_iodev(struct kvm_vcpu *vcpu)
->  	kvm_io_bus_unregister_dev(vcpu->kvm, KVM_MMIO_BUS, &rd_dev->dev);
->  }
->  
-> +static void vgic_v3_rollback_redist_region(struct kvm *kvm, u32 index)
-> +{
-> +	struct vgic_redist_region *rdreg;
-> +	struct kvm_vcpu *vcpu;
-> +	unsigned long c;
-> +
-> +	lockdep_assert_held(&kvm->slots_lock);
-> +
-> +	rdreg = vgic_v3_rdist_region_from_index(kvm, index);
-> +
-> +	kvm_for_each_vcpu(c, vcpu, kvm) {
-> +		if (vcpu->arch.vgic_cpu.rdreg == rdreg)
-> +			vgic_unregister_redist_iodev(vcpu);
-> +	}
-> +
-> +	guard(mutex)(&kvm->arch.config_lock);
-> +
-> +	kvm_for_each_vcpu(c, vcpu, kvm) {
-> +		if (vcpu->arch.vgic_cpu.rdreg == rdreg)
-> +			vcpu->arch.vgic_cpu.rd_iodev.base_addr = VGIC_ADDR_UNDEF;
-> +	}
-> +
-> +	vgic_v3_free_redist_region(kvm, rdreg);
-> +}
-> +
->  static int vgic_register_all_redist_iodevs(struct kvm *kvm)
->  {
->  	struct kvm_vcpu *vcpu;
-> @@ -855,16 +880,6 @@ static int vgic_register_all_redist_iodevs(struct kvm *kvm)
->  			break;
->  	}
->  
-> -	if (ret) {
-> -		/* The current c failed, so iterate over the previous ones. */
-> -		int i;
-> -
-> -		for (i = 0; i < c; i++) {
-> -			vcpu = kvm_get_vcpu(kvm, i);
-> -			vgic_unregister_redist_iodev(vcpu);
-> -		}
-> -	}
-> -
->  	return ret;
->  }
->  
-> @@ -984,12 +999,7 @@ int vgic_v3_set_redist_base(struct kvm *kvm, u32 index, u64 addr, u32 count)
->  	 */
->  	ret = vgic_register_all_redist_iodevs(kvm);
->  	if (ret) {
-> -		struct vgic_redist_region *rdreg;
-> -
-> -		mutex_lock(&kvm->arch.config_lock);
-> -		rdreg = vgic_v3_rdist_region_from_index(kvm, index);
-> -		vgic_v3_free_redist_region(kvm, rdreg);
-> -		mutex_unlock(&kvm->arch.config_lock);
-> +		vgic_v3_rollback_redist_region(kvm, index);
->  		return ret;
->  	}
->  
-
-Based on what I understand of your earlier description, why isn't this
-as simple as this untested hack:
-
-diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-index 5913a20d83019..804fcc69cbd48 100644
---- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-@@ -859,7 +859,7 @@ static int vgic_register_all_redist_iodevs(struct kvm *kvm)
- 		/* The current c failed, so iterate over the previous ones. */
- 		int i;
+diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
+index 2789879b6701..b858c6b4db6a 100644
+--- a/arch/arm64/include/asm/kvm_rmi.h
++++ b/arch/arm64/include/asm/kvm_rmi.h
+@@ -109,6 +109,8 @@ void kvm_destroy_realm(struct kvm *kvm);
+ int kvm_realm_teardown_stage2(struct kvm *kvm);
+ void kvm_destroy_rec(struct kvm_vcpu *vcpu);
  
--		for (i = 0; i < c; i++) {
-+		for (i = 0; i <= c; i++) {
- 			vcpu = kvm_get_vcpu(kvm, i);
- 			vgic_unregister_redist_iodev(vcpu);
- 		}
-@@ -960,8 +960,10 @@ void vgic_v3_free_redist_region(struct kvm *kvm, struct vgic_redist_region *rdre
++void kvm_rec_set_wfx_traps(struct kvm_vcpu *vcpu);
++
+ int kvm_rec_enter(struct kvm_vcpu *vcpu);
+ int kvm_rec_exit(struct kvm_vcpu *vcpu, int rec_run_status);
+ int kvm_rec_handle_request(struct kvm_vcpu *vcpu);
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 7edc572dd8ab..0cba333b4fd2 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -770,6 +770,9 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 	else
+ 		vcpu->arch.hcr_el2 |= HCR_TWI;
  
- 	/* Garbage collect the region */
- 	kvm_for_each_vcpu(c, vcpu, kvm) {
--		if (vcpu->arch.vgic_cpu.rdreg == rdreg)
-+		if (vcpu->arch.vgic_cpu.rdreg == rdreg) {
- 			vcpu->arch.vgic_cpu.rdreg = NULL;
-+			vcpu->arch.vgic_cpu.rd_iodev.base_addr = VGIC_ADDR_UNDEF;
-+		}
- 	}
++	if (vcpu_is_rec(vcpu))
++		kvm_rec_set_wfx_traps(vcpu);
++
+ 	vcpu_set_pauth_traps(vcpu);
  
- 	list_del(&rdreg->list);
-
-I don't mind the cleaning up, but not as part of fixing the issue,
-which has to be as small as possible (think of the backports).
-
-Thanks,
-
-	M.
-
+ 	if (is_protected_kvm_enabled()) {
+diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
+index c242dfc2c7a6..c472f3d03234 100644
+--- a/arch/arm64/kvm/rmi.c
++++ b/arch/arm64/kvm/rmi.c
+@@ -1302,6 +1302,20 @@ static void noinstr load_realm_timer_state(struct kvm_vcpu *vcpu)
+ 	write_sysreg_el0(rec_exit->cntp_ctl, SYS_CNTP_CTL);
+ }
+ 
++void kvm_rec_set_wfx_traps(struct kvm_vcpu *vcpu)
++{
++	struct realm_rec *rec = &vcpu->arch.rec;
++
++	rec->run->enter.flags &=
++		~(REC_ENTER_FLAG_TRAP_WFE | REC_ENTER_FLAG_TRAP_WFI);
++
++	if (vcpu->arch.hcr_el2 & HCR_TWE)
++		rec->run->enter.flags |= REC_ENTER_FLAG_TRAP_WFE;
++
++	if (vcpu->arch.hcr_el2 & HCR_TWI)
++		rec->run->enter.flags |= REC_ENTER_FLAG_TRAP_WFI;
++}
++
+ int noinstr kvm_rec_enter(struct kvm_vcpu *vcpu)
+ {
+ 	struct realm_rec *rec = &vcpu->arch.rec;
 -- 
-Without deviation from the norm, progress is not possible.
+2.43.0
+
+> 
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+>  arch/arm64/kvm/arm.c | 19 ++++++++++++-------
+>  1 file changed, 12 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index f1b26b263bf0..96e536d2dda8 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -707,7 +707,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>  	struct kvm_s2_mmu *mmu;
+>  	int *last_ran;
+>  
+> -	if (is_protected_kvm_enabled())
+> +	if (is_protected_kvm_enabled() || kvm_is_realm(vcpu->kvm))
+>  		goto nommu;
+>  
+>  	if (vcpu_has_nv(vcpu))
+> @@ -751,12 +751,6 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>  	kvm_vgic_load(vcpu);
+>  	kvm_vcpu_load_debug(vcpu);
+>  	kvm_vcpu_load_fgt(vcpu);
+> -	if (has_vhe())
+> -		kvm_vcpu_load_vhe(vcpu);
+> -	kvm_arch_vcpu_load_fp(vcpu);
+> -	kvm_vcpu_pmu_restore_guest(vcpu);
+> -	if (kvm_arm_is_pvtime_enabled(&vcpu->arch))
+> -		kvm_make_request(KVM_REQ_RECORD_STEAL, vcpu);
+>  
+>  	if (kvm_vcpu_should_clear_twe(vcpu))
+>  		vcpu->arch.hcr_el2 &= ~HCR_TWE;
+> @@ -778,6 +772,17 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>  			     &vcpu->arch.vgic_cpu.vgic_v3);
+>  	}
+>  
+> +	/* No additional state needs to be loaded on Realmed VMs */
+> +	if (vcpu_is_rec(vcpu))
+> +		return;
+> +
+> +	if (has_vhe())
+> +		kvm_vcpu_load_vhe(vcpu);
+> +	kvm_arch_vcpu_load_fp(vcpu);
+> +	kvm_vcpu_pmu_restore_guest(vcpu);
+> +	if (kvm_arm_is_pvtime_enabled(&vcpu->arch))
+> +		kvm_make_request(KVM_REQ_RECORD_STEAL, vcpu);
+> +
+>  	if (!cpumask_test_cpu(cpu, vcpu->kvm->arch.supported_cpus))
+>  		vcpu_set_on_unsupported_cpu(vcpu);
+>  
+> -- 
+> 2.43.0
+> 
