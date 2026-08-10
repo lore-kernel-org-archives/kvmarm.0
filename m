@@ -1,209 +1,434 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from esa6.hc1455-7.c3s2.iphmx.com (esa6.hc1455-7.c3s2.iphmx.com [68.232.139.139])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56DED311C2C
-	for <kvmarm@lists.linux.dev>; Mon, 10 Aug 2026 01:29:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786325390; cv=fail; b=eyxJK2Y6W8hCGah4uzKqH9HS6c8O6yFACa2MnnZU/2GdDtyn4793GGFRBWRcz6cuFCwXhgXB0Ui1ehbaibJRb/bYMTe5Nkg2ygTn70dU3tvYwgsg2azeH3lec26TaTfZ7d1MGp4UR+bVNeUe9lK4oxQ2X+j65+njv1BzQch8BGU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786325390; c=relaxed/simple;
-	bh=KJVyYDAu9oTtl6PukNXbPc3Me7jyqh4zg5WQ3glo2MA=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=HxR+XV/MXY2qA30hy6+PLrPhEpB+yCk16xCsCAWt7uZrryYsXEuThe/7c08CvtjPsMtfUiBRXMW0ZBDpFk6IiMXdPUx4deI6PGek/sKFuTf9LmqBX1FXuEHAEi3+hgtNSFqHvIEYjU4DaNjQlWahGj/z7DsoZ5bGs/qc/aOBDqg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=etmp6E94; arc=fail smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A6A032D0EE;
+	Mon, 10 Aug 2026 04:58:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.139.139
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1786337914; cv=none; b=UzMjCVK9Hva0dK27SNxezndr9evprQOxOQpfsPftkLpYsRDWvE8J8ucVj+inAKa1HYvGjXXS6wUEIriQ86/qXalJjA0RVeLjU8z6ETJntGhTyIAfW2DwMOBrZAR7d/44lwsS4cPl+MyRfM7kh8nB+ZQTsZc1Oo1DkPXbWfzqRik=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1786337914; c=relaxed/simple;
+	bh=jCOlaum+43iVbWTgaD98C2MyzA+ilU9ycpxmRKx6wBI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=osgIC+VlaryF/3VvhLF61TSPoSWw/UsNoJPEiCMwPmF2Eh3n71S0Y1DmmdeEi/iqk1DOFNmSoCh4GAk5CBdIvxLyVeb5XSJnNvpzsIylW3BFvdYBJzqQymQpD/KPOSCzWZpsdIDKHHjkEesAfzNR/6aHaxxU1SbuccpAEACJ998=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=UhcsgWb3; arc=none smtp.client-ip=68.232.139.139
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="etmp6E94"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1786325387; x=1817861387;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=KJVyYDAu9oTtl6PukNXbPc3Me7jyqh4zg5WQ3glo2MA=;
-  b=etmp6E94+j/SES3dFFDnn9/LigYNBkZIElk0z8aB5AXaToamWLc/DvD/
-   oDq4RskU1x1pSF1zLsA77te6/4Pyv1lyl/TdqnFm3KewKVdT1E+Kr1BUR
-   EtFk/gn63Xq6vRRDJVtDgRQptD7nn37OOpVM5Su8YHAV+NvxEsDvc1SHh
-   5bv2hnmZKDY4K5gue6vTy5Z+o7+JTYLhtfaHUukaIyRUlcATs6JZSE8F4
-   fjTL3Ng2Hb8h4bnzyhyt4TNZnO9g8FGOnD/ldD9B7uOMFvhPhRLecteLf
-   mXj6dOOvcWfpLMRkQ8PrMvQYLuqGhlcMfvwOy61TCJRYudV7mp24GcGwu
-   Q==;
-X-CSE-ConnectionGUID: 9btY3/c+RmW49+pLtOElHg==
-X-CSE-MsgGUID: LiZxNSpiSAew3qlQBDIKpw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11870"; a="104225942"
-X-IronPort-AV: E=Sophos;i="6.25,214,1779174000"; 
-   d="scan'208";a="104225942"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Aug 2026 18:29:47 -0700
-X-CSE-ConnectionGUID: 4DKzM5WQQP+K0QXaKPHEDA==
-X-CSE-MsgGUID: C8rqDwkTR8qHhnJ0x/tW6A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.25,214,1779174000"; 
-   d="scan'208";a="259582023"
-Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
-  by fmviesa007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Aug 2026 18:29:46 -0700
-Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
- fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.45; Sun, 9 Aug 2026 18:29:46 -0700
-Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
- FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.45 via Frontend Transport; Sun, 9 Aug 2026 18:29:46 -0700
-Received: from DM1PR04CU001.outbound.protection.outlook.com (52.101.61.21) by
- edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.45; Sun, 9 Aug 2026 18:29:46 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=G7lT9Nw4LxUV96GPDNm1khN9i6jrq82cI1A88YJCZlJxejQXhEXBiPDoTjRYDmnO+QC9woWRWqhKIba9HSLenkfUHttiBJvXIYOd+1p9n/kWwKahKQGFVyLw1MAmILF4Q1VAhzOdKwhDzGnD8uQQtevcY9o5rsCqIOSfJEdJAegUqjggjgnm+rRn38RL4IgYQkYxIr8irSUJ084OQG1y3n6+TYjKve/m5J9gwdsVQbfQ/gEejq+akAbw4mrkNVChpUX39vofowmr2UdvT4x36+XLsuauh84xeLN31BP8MC8T7ehto4zj0LNB22ECL1/ndXTLXSB6sUexkrvlUc1EjA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KJVyYDAu9oTtl6PukNXbPc3Me7jyqh4zg5WQ3glo2MA=;
- b=fIpSoceFtl46UgXK/Te6VwSJb48wdUDUGoaW3j7e7Pb5WwKk/GiK5IuyE8Fy5bAza6m+f0q6KVfTfN2AP3rLiiw9wNgeMCQBPVjTWk3z8etS4GCK2UjhFlHs69x0aZ4D1ioa53od1iRLYc43aoR0yAxqv5fDjdofUh9lIgB91lrkpj0z2N1UC3sjtCUfAov6fPbGBI/wH4OrPvd2bbIYucqdRkBsMxY8bW4bSP7wk10ZGqqqzkGb/disnGP2j7w7uGvPrnD3sf3D7ZG+pg8b9vrnrwX2N8otBGiOFEVHHNmPuFOfNnuvfp1eoa3gobNqStp52BfZroRGq5QdApcQmQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from CH0PR11MB5300.namprd11.prod.outlook.com (2603:10b6:610:bf::18)
- by DM4PR11MB7326.namprd11.prod.outlook.com (2603:10b6:8:106::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.292.25; Mon, 10 Aug
- 2026 01:29:44 +0000
-Received: from CH0PR11MB5300.namprd11.prod.outlook.com
- ([fe80::3a08:e2e0:c8b9:7a7c]) by CH0PR11MB5300.namprd11.prod.outlook.com
- ([fe80::3a08:e2e0:c8b9:7a7c%6]) with mapi id 15.21.0292.024; Mon, 10 Aug 2026
- 01:29:43 +0000
-From: "Huang, Kai" <kai.huang@intel.com>
-To: "maz@kernel.org" <maz@kernel.org>, "pbonzini@redhat.com"
-	<pbonzini@redhat.com>, "oupton@kernel.org" <oupton@kernel.org>,
-	"seanjc@google.com" <seanjc@google.com>
-CC: "yuzenghui@huawei.com" <yuzenghui@huawei.com>, "suzuki.poulose@arm.com"
-	<suzuki.poulose@arm.com>, "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, "joey.gouly@arm.com" <joey.gouly@arm.com>,
-	"seiden@linux.ibm.com" <seiden@linux.ibm.com>
-Subject: Re: [PATCH] KVM: Never clear KVM_REQ_VM_DEAD from a vCPU's requests
-Thread-Topic: [PATCH] KVM: Never clear KVM_REQ_VM_DEAD from a vCPU's requests
-Thread-Index: AQHdJe0anT6ZXxgFcU+KXMCw4ElF6raWg5IA
-Date: Mon, 10 Aug 2026 01:29:43 +0000
-Message-ID: <4122846f2c7a9b8025aa9915162ae605d5853ed4.camel@intel.com>
-References: <20260806214618.82180-1-seanjc@google.com>
-In-Reply-To: <20260806214618.82180-1-seanjc@google.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.58.3 (3.58.3-1.fc43) 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CH0PR11MB5300:EE_|DM4PR11MB7326:EE_
-x-ms-office365-filtering-correlation-id: 73da5210-f642-484c-8fc3-08def67edb3e
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014|23010399003|18002099003|22082099003|6133799003|5023799004|11063799006|56012099006|10067099003|38070700021;
-x-microsoft-antispam-message-info: 0QChyQmYejj8gMxWjlbtWhsn7zqI203fpY0+/J0P4GZ6CsdTjwiKEd3Ez//DU6Qli/1M/TmIgCRpN5xA8TS58Pry56ftjv4C8HvI5W4oK/xkuxcvs6f7LwZQY415Lp5USYB1xDBT43X4+UJYLwM6N3YMmoEv18FxIGitZNTCa5OoMxMtVukv45Mlk2v4QulKrTfrHIvIwgBztit2cO/+IlxH8bJtJZ9MjkBOiQwRvbN44pvggPSgggtoiDt7pKap0QGniNgitCkQpVUbZCeVNhCnJeIuHRPDscgWIVDhbf47Tum22XBwgIVJG1wJeqikVWNMa1+lEh/BODtqxUFBJBzEnLJ+Gp7LdT1Ep5DLd4X8P6aKCNZ+vKTsQnnHPiM69Git8P0lzyiSbuYJJI798Usq7q0cG3G8UGhAO6G3x4pn7ws7EDVMRbvBp7JkxWIGbQHJH6pvmxWMZiV5VxOz6UzXR8zpn6bd7On6jKtJHT/1Hk/gVCDpZ1rYa48B5OUkqu7yhGeBmikirgCZ8/VeEZM7nw62o/hldhIMo9oFFKC62f5yPDmotWOpMzWDjWDov5aeR+pM/GxaB/eWFrenUFGaC58uah9MT6x3UDPm01bw4GSDsXMoAVVrptU7vc5HUOo5s72N0hFkacS9Xx3XZppH/Ng59WIxZYARn4Jml9W1sE2SoaCZkBoYT3cbCot8KMSHRJZk+Iat0JErJ3dtc4EZig8WAM4Qh7yPM8FH0zk=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH0PR11MB5300.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(23010399003)(18002099003)(22082099003)(6133799003)(5023799004)(11063799006)(56012099006)(10067099003)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?OU5yVU82V2tmNFkvNDJjRHAzTTUxRThGSkNwbHhrUkJGYTVUMkZuZ3VleXRt?=
- =?utf-8?B?WmVUYmJORzk5VUJCemc5Z0lNaEx0a1hidHlFVExEVm1PLzBHUmRmc0dOQ3lE?=
- =?utf-8?B?WUVLM2Y3OEI0UDB6b01Kb3IxN1BaSW9adDBSeFg4c3lCSFY4b1E2eXZYME1B?=
- =?utf-8?B?eUlNNFgwYWpGQVpobTJwdDRuNlhISjJIQUk0cFhQcEhLcmVwaTNaYTV3V0My?=
- =?utf-8?B?aUNTa1VGR1ZRTGNHc3JjV1JkUENrSGcyVHJVYlVqOUhFZzU4NGNoRTkzMDBN?=
- =?utf-8?B?YmdKSkxTRnJCdSsrVEE0dkN6UjZSdXgrR1FFR0dxVjdQWXRsTWIvR3JVT2da?=
- =?utf-8?B?RmFiYUwreWNiRUw0YjQza1Z5cFlaQ25zaUFRNmFBTnNxSTZGWFppd1N0Y3VJ?=
- =?utf-8?B?alR2cnZOSFhsOCsvQmtWOTR0NmFjQlhldlc3Y1hmMnBpbXpZWDdOSG9OVmdo?=
- =?utf-8?B?VlhYZlpZTDR6Z0srdWZyQTFBRHQxWXpVOHBqUk85UHo5TEFSWEFXZW1qZE9Y?=
- =?utf-8?B?OFYvT1FIK0x3Y1pvSjBqVHZDa0lJakJnR0VPejRSL2JkWTZHQTV3d1loVXhW?=
- =?utf-8?B?aC9BbnZEUFFQYW1YeGNJMkRkVlB0YzByWFZLVGtkMHkxMG03VWNjWFlCYXVr?=
- =?utf-8?B?Ni9ndi9mR08xT1dBMzMxTEVOaGtoaFovVFpWbU40dG9DOExrcThYVzh1b3Nx?=
- =?utf-8?B?WnFNNUVqUjRGQVZFanJ1cUVURDkzdTlyWkJDQTJDQzhFUzhBaGh0SnoyTm1u?=
- =?utf-8?B?Q1o1b0tRdEtmVVV1cXNHODlNR2dEb00xVHZ6bHFpZU5VVlgvT3hnanpWREtj?=
- =?utf-8?B?TmcxeHFCd3dLd01KU0kwd1g0dUFVZFY4bXVwek1CMjBtd3dtVHJGN2w5ZXo1?=
- =?utf-8?B?N3o0Q2M2M2VLd0JBVzZybEhGM1JyZzY4aXlPaDJuNUVtSmdzSXRQQkEvQUJi?=
- =?utf-8?B?endQTG9BbUgyTGplZ1dUV2NrMVdlK1RuZ2gxZWxRb0Yrai9jeUZwbzhiS1FV?=
- =?utf-8?B?WWNGTGRXMnY5cnExZW1GeExTUXNzMjgwRDBGSHA3dXJOTW1tN0o0dHpnSGhH?=
- =?utf-8?B?OEoxNGRQWVRIeEovN1JLV0piNEZTcDFtSFRBc0U2V1ZZeHI3U040VFRFdkJl?=
- =?utf-8?B?c0NyK29UWS9ndi9Da2tFb252LzZremZXY05XVE04ZGRlVllRbzc1WmwvZS9q?=
- =?utf-8?B?K3pxcTNtTVRwQWFwS2d3QnpYb0xoVWNhNFZqRElJU1dJTUZ0elVONUwxMXZm?=
- =?utf-8?B?bStBaTgwNmNoNmJMU2cvYVpmRjN5MDNkdHZRZnhqWTJVbzZZMDk4cEJxcGFm?=
- =?utf-8?B?VldxOS9FK0JDUG05dE8rZDVVdVZvaFppRWhvRWFMU1FteGJsNnJFWWhadG93?=
- =?utf-8?B?MUUxSHJxQk5USUdHeGlQR2NwVko1V3E0YTZvZlU5ZjNGRjhwdHFYekVRSVRF?=
- =?utf-8?B?OUJSYjZpQ24vWXoxQWNJdXg4ekUwTjFLZGdNWlJsUHBzUk5LcEc5ZklvREky?=
- =?utf-8?B?cWoybTdsRnFpeWdHMkN2QVdOSmxSRGsvUFF5bVBTRWVMM0RJczdIWk5td0NV?=
- =?utf-8?B?UVgrNitCVGJTaVlzRG1qdXBXeUhPNGhYN1hBQlYrQUtNaHJaSTV3TjdCNXpn?=
- =?utf-8?B?V1Y4N1k0STJ5T00xMlgwUnAxak9INnRxaVkvVjJsQnV0TXM2eUZORm1FNVE2?=
- =?utf-8?B?MEJPS2NnQjNqcTh5ZXExaUl2b25TNko1dCtDVGMzL05PamVXZ1NIdmQ5NUpp?=
- =?utf-8?B?dzBoK3VMeGtJd3Y2b1NZdnpCZTA3NWJhQ0ZlQzVHMFhaLzZWV1hYTVYwcllW?=
- =?utf-8?B?V0lEd3MwY0lsekErOXBDSFNSRHptVWI0Q2UySDAzVmoyTFE0SUVhWFFhdldG?=
- =?utf-8?B?UUJpOWFOdlA2WVBiU0pIaTNYcCt0VDVXWTdveGpzL2dsNHRSNWY4MEJzS1N0?=
- =?utf-8?B?cVJiZTRPWklRRTJrTWwrcHBqNXdUYXd5MU1Xd1hYZ3hwQnBFM1Q3Ni9nN2xQ?=
- =?utf-8?B?WXBmM1hTVzNLWHdISmYrdGdmd0NsWk9rdDJ2d21RSG5XeGJ1REJIYlVwTEJx?=
- =?utf-8?B?TGZPdkVpb2RXdW5Id092NjN2cUkwVHZSMm9GZ0ZwWS9ENUkyL0VRNmlzMERs?=
- =?utf-8?B?TzFRNDVOMWZON2V3bVUzbi9QZVJoSi9KZVlBY0ZjVS9ZZFFPMlNuTEpEbmlo?=
- =?utf-8?B?Z3M0anM0QlozKzN5ZjY4eFM4T1NYcG1YcG1qbWJzaU9zckZlckRVdTdQYlJP?=
- =?utf-8?B?MDhZbzRsZ1B2emhpa3E1VmhpU3g4VGJsYmJ4ZS9DVUlpNWlTdU1jS0pZSnBI?=
- =?utf-8?B?UGsvaDJiekNDZ1hmcHdmdmRIZzlLcGczYUZqUXU3R1FpUGhGVzN6Zz09?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <E8BD54BF21E3BB42A0F2D7577A94834E@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="UhcsgWb3"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
+  t=1786337916; x=1817873916;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=jCOlaum+43iVbWTgaD98C2MyzA+ilU9ycpxmRKx6wBI=;
+  b=UhcsgWb3dSvv+M4cgLxDppjhACoPoPRqxQ69fffH2KAeFZLToAxdQv6h
+   9cnOiWS9Ivqd1k3rALjNyLpC5pHWXPE9d77bzDeVFAueBVSNx5CzZku/O
+   v6Kot0l9wn3PT41TMhZyz8/XdknKULEXBmreYq1JPvGJXvMM0E8ylVdDG
+   h8RoDa5u/4FFcmwpCOaHkL1zbaTuS/3g3udEtXYUWKuafFLvWIO7MQvBY
+   NR+kXkQqWz/8bXAAKy8u9wokqDUwLETGNDdN9r3n7aedyBpDCVwTOkhHn
+   OuceiKwEouYU/soU2OxNBtgAxQ6aeyZ3/4E6viBL0Hz5CM3I9ySp/Xezr
+   A==;
+X-CSE-ConnectionGUID: 3l53BIgXQTm8bdQUlV1Yqg==
+X-CSE-MsgGUID: BQ6VvGoZQFGFR59/Wly/sQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11870"; a="253989912"
+X-IronPort-AV: E=Sophos;i="6.25,215,1779116400"; 
+   d="scan'208";a="253989912"
+Received: from gmgwuk01.global.fujitsu.com ([172.187.114.235])
+  by esa6.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2026 13:58:29 +0900
+Received: from az2uksmgm4.o.css.fujitsu.com (unknown [10.151.22.201])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by gmgwuk01.global.fujitsu.com (Postfix) with ESMTPS id 8D64EC00540;
+	Mon, 10 Aug 2026 04:58:25 +0000 (UTC)
+Received: from az2nlsmom4.fujitsu.com (unknown [10.150.26.201])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by az2uksmgm4.o.css.fujitsu.com (Postfix) with ESMTPS id 444CA14003F5;
+	Mon, 10 Aug 2026 04:58:25 +0000 (UTC)
+Received: from FCCLS0092175.localdomain (unknown [10.8.69.80])
+	by az2nlsmom4.fujitsu.com (Postfix) with SMTP id 7CA0A2000210;
+	Mon, 10 Aug 2026 04:58:17 +0000 (UTC)
+Date: Mon, 10 Aug 2026 13:58:10 +0900
+From: Kohei Enju <enju.kohei@fujitsu.com>
+To: Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, 
+	James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, 
+	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev, 
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, Gavin Shan <gshan@redhat.com>, 
+	Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun <alpergun@google.com>, 
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>, 
+	Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com, Lorenzo Pieralisi <lpieralisi@kernel.org>
+Subject: Re: [PATCH v16 44/45] KVM: arm64: CCA: Require ICH_HCR_EL2.TDIR for
+ realms
+Message-ID: <anlZCIauOq4Lvv0I@FCCLS0092175.localdomain>
+References: <20260803134403.80630-1-steven.price@arm.com>
+ <20260803134403.80630-45-steven.price@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: s/dNz8Td0k3LFM8ef9p9mMTQz6GBbwZT67FE59JVEmIHJQxHbOid1DHg5h6W8h8cvdJsvk9gKX929Q9CF4eNYUHlYGn0rFzSTX3qZsLcpn8XI47qp1rSR6KpU3WFmAD3gCeWbAAZhJmTx1UoIqeWllOmS41ZY9wNLYSuPJzT0a0y19vSxwx1V+rhZ6J21DfW+TZtirf9mOuWIWpEsM+eCkcW5aEe7wq+pwYX2zzgkDzNmuOWaQUMGOgfJcdPBG8rFVv+3JTfTaAjWiXMEwAkkWC5dNq0jMAYZj1ZmMvpLUvNtewm3GqY4kPe2+ZNnzym3s7X0Rt7uVhsnL3reb08eg==
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CH0PR11MB5300.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 73da5210-f642-484c-8fc3-08def67edb3e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Aug 2026 01:29:43.7192
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: n78Pz1QE4+IXBowhZfQg3XW2uglsyAZ0gvo7fwI+7MEEpjI92JyE2FKY/tXAepOh73XLrpNrFxsbeHw00KlW2g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB7326
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260803134403.80630-45-steven.price@arm.com>
 
-T24gVGh1LCAyMDI2LTA4LTA2IGF0IDE0OjQ2IC0wNzAwLCBTZWFuIENocmlzdG9waGVyc29uIHdy
-b3RlOg0KPiBVc2Uga3ZtX3Rlc3RfcmVxdWVzdCgpIGluc3RlYWQgb2Yga3ZtX2NoZWNrX3JlcXVl
-c3QoKSB3aGVuIHF1ZXJ5aW5nDQo+IEtWTV9SRVFfVk1fREVBRCwgaS5lLiBkb24ndCBjbGVhciBL
-Vk1fUkVRX1ZNX0RFQUQsIGFzIHRoZSBlbnRpcmUgcHVycG9zZQ0KPiBvZiBLVk1fUkVRX1ZNX0RF
-QUQgaXMgdG8gcHJldmVudCB0aGUgdkNQVSBmcm9tIGVudGVycmluZyB0aGUgZ3Vlc3QgZXZlcg0K
-PiBhZ2FpbiwgZXZlbiBpZiB1c2Vyc3BhY2UgaW5zaXN0cyBvbiByZWRvaW5nIEtWTV9SVU4uDQo+
-IA0KPiBFbnN1cmluZyBLVk1fUkVRX1ZNX0RFQUQgaXMgbmV2ZXIgY2xlYXJlZCB3aWxsIGFsbG93
-IHJlbGF4aW5nIEtWTSdzIHJ1bGUNCj4gdGhhdCBpb2N0bHMgY2FuJ3QgYmUgaW52b2tlZCBvbiBk
-ZWFkIFZNcywgdG8gb25seSBkaXNhbGxvdyBpb2N0bHMgaWYgdGhlDQo+IFZNIGlzIGJ1Z2dlZCwg
-aS5lLiBpZiBLVk0gaGl0IGEgS1ZNX0JVR19PTigpLg0KPiANCj4gT3Bwb3J0dW5pc3RpY2FsbHkg
-YWRkIGNvbXBpbGUtdGltZSBhc3NlcnRpb25zIHRvIGd1YXJkIGFnYWluc3QgY2xlYXJpbmcNCj4g
-S1ZNX1JFUV9WTV9ERUFEIHRocm91Z2ggdGhlIHN0YW5kYXJkIEFQSXMuDQo+IA0KPiBTaWduZWQt
-b2ZmLWJ5OiBTZWFuIENocmlzdG9waGVyc29uIDxzZWFuamNAZ29vZ2xlLmNvbT4NCg0KUmV2aWV3
-ZWQtYnk6IEthaSBIdWFuZyA8a2FpLmh1YW5nQGludGVsLmNvbT4NCg0KRldJVywgSSBidWlsZCB0
-ZXN0ZWQgdGhhdCBib3RoIGdjYyBhbmQgY2xhbmcgY291bGQgYnVpbGQgc3VjY2Vzc2Z1bGx5IChi
-b3RoIC1PMg0KYW5kIC1PcykuDQoNClsuLi5dDQoNCj4gLS0tIGEvaW5jbHVkZS9saW51eC9rdm1f
-aG9zdC5oDQo+ICsrKyBiL2luY2x1ZGUvbGludXgva3ZtX2hvc3QuaA0KPiBAQCAtMjMyNCwxMyAr
-MjMyNCwxOCBAQCBzdGF0aWMgaW5saW5lIGJvb2wga3ZtX3Rlc3RfcmVxdWVzdChpbnQgcmVxLCBz
-dHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpDQo+ICAJcmV0dXJuIHRlc3RfYml0KHJlcSAmIEtWTV9SRVFV
-RVNUX01BU0ssICh2b2lkICopJnZjcHUtPnJlcXVlc3RzKTsNCj4gIH0NCj4gIA0KPiAtc3RhdGlj
-IGlubGluZSB2b2lkIGt2bV9jbGVhcl9yZXF1ZXN0KGludCByZXEsIHN0cnVjdCBrdm1fdmNwdSAq
-dmNwdSkNCj4gK3N0YXRpYyBfX2Fsd2F5c19pbmxpbmUgdm9pZCBrdm1fY2xlYXJfcmVxdWVzdChp
-bnQgcmVxLCBzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpDQo+ICB7DQo+ICsJQlVJTERfQlVHX09OKHJl
-cSA9PSBLVk1fUkVRX1ZNX0RFQUQpOw0KPiArDQo+ICAJY2xlYXJfYml0KHJlcSAmIEtWTV9SRVFV
-RVNUX01BU0ssICh2b2lkICopJnZjcHUtPnJlcXVlc3RzKTsNCj4gIH0NCj4gIA0KPiAtc3RhdGlj
-IGlubGluZSBib29sIGt2bV9jaGVja19yZXF1ZXN0KGludCByZXEsIHN0cnVjdCBrdm1fdmNwdSAq
-dmNwdSkNCj4gK3N0YXRpYyBfX2Fsd2F5c19pbmxpbmUgYm9vbCBrdm1fY2hlY2tfcmVxdWVzdChp
-bnQgcmVxLCBzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpDQo+ICB7DQo+ICsJLyogT25jZSBhIFZNIGlz
-IGRlYWQsIGl0IG5lZWRzIHRvIHN0YXkgZGVhZC4gKi8NCj4gKwlCVUlMRF9CVUdfT04ocmVxID09
-IEtWTV9SRVFfVk1fREVBRCk7DQo+ICsNCj4gIAlpZiAoa3ZtX3Rlc3RfcmVxdWVzdChyZXEsIHZj
-cHUpKSB7DQo+ICAJCWt2bV9jbGVhcl9yZXF1ZXN0KHJlcSwgdmNwdSk7DQo+ICANCg0KTml0OiBB
-RkFJQ1QgdGhlIGNoYW5nZSB0byBfX2Fsd2F5c19pbmxpbmUgaXMgdG8gYXZvaWQgYnVpbGQgZmFp
-bHVyZS4gIFBlcmhhcHMNCmV4cGxpY2l0bHkgbWVudGlvbiB0aGlzIGluIGNoYW5nZWxvZz8NCg0K
-QnR3LCBJIGFsc28gdHJpZWQgYnVpbGRpbmcgdGhlIGtlcm5lbCBhZnRlciByZXZlcnRpbmcgX19h
-bHdheXNfaW5saW5lIHRvIHBsYWluDQppbmxpbmUsIGJ1dCBpbmRlZWQgZ290IGJ1aWxkIGVycm9y
-IHdoZW4gdXNpbmcgY2xhbmcgKGNsYW5nIGZhaWxlZCB3aXRoIGJvdGggLU8yDQphbmQgLU9zLCBi
-dXQgZ2NjIHdhcyBmaW5lIGZvciBib3RoLCB0aG91Z2gpLg0K
+On 08/03 14:44, Steven Price wrote:
+> KVM advertises realm support when the RMM is available, and allows
+> userspace to create a VM with KVM_VM_TYPE_ARM_REALM on that basis.
+> 
+> On CPUs that lack ICH_HCR_EL2.TDIR, KVM uses ICH_HCR_EL2.TC for
+> normal guests so that ICC_DIR_EL1 is still trapped via the common GICv3
+> CPU interface trap. Realms cannot rely on the normal hyp-side trap
+> handling for that fallback, so advertising RMI support on such systems
+> lets userspace create a realm that cannot safely run.
+> 
+> Require the finalized ARM64_HAS_ICH_HCR_EL2_TDIR capability when
+> reporting KVM_CAP_ARM_RMI and when accepting KVM_VM_TYPE_ARM_REALM.
+> This leaves normal VM creation unchanged on systems that need the TC
+> workaround.
+
+Hi Steven,
+
+Thanks for your work on upstreaming CCA.
+
+In the v15 discussion [0], you asked whether the system I was testing was a
+"hacked up test system" or closer to "production hardware", and I said I would
+share more when the time came. I can now say that this is not a hacked-up test
+system. At Fujitsu, we have real hardware (FUJITSU-MONAKA) which implements CCA
+(FEAT_RME) but does not implement FEAT_GICv3_TDIR. The hardware details are as
+follows:
+
+  - GICv4.2 compliant implementation
+  - Supports FEAT_GICv3, FEAT_GICv3p1, FEAT_GICv4, FEAT_GICv4p1, and FEAT_GICv3_NMI
+  - Does not support FEAT_GICv3_LEGACY (deprecated)
+  - Does not support FEAT_GICv3_TDIR (ICH_VTR_EL2.TDS == 0)
+
+For reference, compared with Arm Neoverse V3, the virtual GIC configuration is
+largely equivalent. The only missing non-deprecated architectural feature is
+FEAT_GICv3_TDIR.
+
+The issue I see is that the CCA KVM code currently does not support a
+configuration (non-TDIR/common-trap) that normal KVM already supports. For
+normal guests, KVM handles systems without TDIR by using ICH_HCR_EL2.TC and the
+existing GICv3 CPU interface emulation path. However, Realm guests currently
+fail because the CCA path bypasses that existing emulation path, as Marc also
+pointed out in [1].
+
+Also, this is not limited to systems that actually lack TDIR. The same failure
+can be reproduced on a TDIR-capable system by booting with:
+  kvm-arm.vgic_v3_common_trap=1
+
+So it seems that the current CCA KVM implementation does not yet cover a
+configuration that normal KVM already supports today, rather than this being a
+limitation of the RMM specification or the underlying hardware.
+
+I've included a patch below which reuses the existing GICv3 early emulation
+path for Realm sysreg exits. This patch does not add any new vGIC emulation
+code, and leaves the existing vGIC emulation code unchanged. So I believe this
+is in line with Marc's request in [1]. With this patch, Realm guests can run
+when the common CPU interface trap path is enabled.
+
+I tested the exact patch both on our real silicon and on QEMU, and
+confirmed that all Realm-related tests in kvm-unit-tests-cca passed.
+
+I'm not attached to this exact implementation, and I'm happy if the solution is
+reworked to better fit into the next revision. 
+
+Given that this configuration can be supported by reusing the existing KVM
+emulation infrastructure, I think it would be reasonable for CCA to support the
+non-TDIR/common-trap configuration rather than requiring ICH_HCR_EL2.TDIR
+unconditionally for Realm support. 
+
+Supporting this configuration would also allow us to validate the upstream CCA
+KVM implementation on real silicon using upstream code paths, and contribute
+additional real-hardware testing coverage as the implementation
+evolves.
+
+I'd be very interested in hearing your thoughts.
+
+Thanks,
+Kohei
+
+[0] https://lore.kernel.org/all/1cd3327c-1eab-4022-9ab1-625ca8641e81@arm.com/
+[1] https://lore.kernel.org/all/86cxwfe5m8.wl-maz@kernel.org/
+
+Below is the patch I tested, and it should be applied on top of this series.
+
+----8<----
+From 11ce6b7e5ee2f21a71f657e9f45f58871d011286 Mon Sep 17 00:00:00 2001
+From: Kohei Enju <enju.kohei@fujitsu.com>
+Date: Tue, 4 Aug 2026 11:45:53 +0900
+Subject: [PATCH] KVM: arm64: CCA: Reuse early vGIC sysreg emulation for Realm
+ exits
+
+Realm vGIC CPU interface sysreg exits currently bypass KVM's early vGIC
+emulation and reach the generic sysreg descriptors. This breaks Realm
+guests when common-trap trapping is enabled, including on systems
+without ICH_HCR_EL2.TDIR.
+
+Prepare REC exits in the state expected by the existing vGIC dispatcher
+and invoke it before KVM synchronizes the vGIC hardware state. Complete
+handled accesses through the REC run structure and re-enter the REC.
+
+This reuses the existing vGIC emulation unchanged and allows Realm
+guests to run with the non-TDIR/common-trap configuration.
+
+Signed-off-by: Kohei Enju <enju.kohei@fujitsu.com>
+---
+ arch/arm64/kvm/rmi-exit.c |  21 +------
+ arch/arm64/kvm/rmi.c      | 122 ++++++++++++++++++++++++++++++++++----
+ 2 files changed, 112 insertions(+), 31 deletions(-)
+
+diff --git a/arch/arm64/kvm/rmi-exit.c b/arch/arm64/kvm/rmi-exit.c
+index 7cde820bb77b..0580433eb335 100644
+--- a/arch/arm64/kvm/rmi-exit.c
++++ b/arch/arm64/kvm/rmi-exit.c
+@@ -22,21 +22,14 @@ static int rec_exit_fatal(struct kvm_vcpu *vcpu, const char *reason,
+ static void rec_exit_sync(struct kvm_vcpu *vcpu)
+ {
+ 	struct realm_rec *rec = &vcpu->arch.rec;
+-	u64 esr = rec->run->exit.esr;
++	u64 esr = kvm_vcpu_get_esr(vcpu);
+ 	u8 ec = ESR_ELx_EC(esr);
+ 
+ 	switch (ec) {
+-	case ESR_ELx_EC_SYS64: {
+-		int rt = ESR_ELx_SYS64_ISS_RT(esr);
+-		bool is_write = (esr & ESR_ELx_SYS64_ISS_DIR_MASK) ==
+-				ESR_ELx_SYS64_ISS_DIR_WRITE;
+-
+-		if (is_write && rt < REC_RUN_GPRS)
+-			vcpu_set_reg(vcpu, rt, rec->run->exit.gprs[rt]);
+-		else if (!is_write)
++	case ESR_ELx_EC_SYS64:
++		if ((esr & ESR_ELx_SYS64_ISS_DIR_MASK) == ESR_ELx_SYS64_ISS_DIR_READ)
+ 			kvm_make_request(KVM_REQ_RMI, vcpu);
+ 		break;
+-	}
+ 	case ESR_ELx_EC_DABT_LOW:
+ 		/*
+ 		 * The RMM reports the value of an MMIO write in gprs[0],
+@@ -141,14 +134,6 @@ int kvm_rec_exit(struct kvm_vcpu *vcpu, int rec_run_ret)
+ 		return rec_exit_fatal(vcpu, "Unexpected REC_ENTER status",
+ 				      rec_run_ret);
+ 
+-	vcpu->arch.fault.esr_el2 = rec->run->exit.esr;
+-	vcpu->arch.fault.far_el2 = rec->run->exit.far;
+-	/* HPFAR_EL2 is only valid for RMI_EXIT_SYNC */
+-	vcpu->arch.fault.hpfar_el2 = 0;
+-
+-	/* Reset the emulation flags for the next run of the REC */
+-	rec->run->enter.flags = 0;
+-
+ 	switch (rec->run->exit.exit_reason) {
+ 	case RMI_EXIT_SYNC:
+ 		/*
+diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
+index c242dfc2c7a6..756281b0054a 100644
+--- a/arch/arm64/kvm/rmi.c
++++ b/arch/arm64/kvm/rmi.c
+@@ -1251,23 +1251,28 @@ static int kvm_rec_complete_psci(struct kvm_vcpu *vcpu)
+ 	return r ?: 1;
+ }
+ 
++static void noinstr kvm_rec_complete_sysreg_access(struct kvm_vcpu *vcpu)
++{
++	struct realm_rec *rec = &vcpu->arch.rec;
++	u64 esr = kvm_vcpu_get_esr(vcpu);
++	int rt;
++
++	if (ESR_ELx_EC(esr) != ESR_ELx_EC_SYS64 ||
++	    (esr & ESR_ELx_SYS64_ISS_DIR_MASK) != ESR_ELx_SYS64_ISS_DIR_READ)
++		return;
++
++	rt = kvm_vcpu_sys_get_rt(vcpu);
++	if (rt < REC_RUN_GPRS)
++		rec->run->enter.gprs[rt] = vcpu_get_reg(vcpu, rt);
++}
++
+ int kvm_rec_handle_request(struct kvm_vcpu *vcpu)
+ {
+ 	struct realm_rec *rec = &vcpu->arch.rec;
+-	u64 esr;
+ 
+ 	switch (rec->run->exit.exit_reason) {
+ 	case RMI_EXIT_SYNC:
+-		esr = rec->run->exit.esr;
+-		if (ESR_ELx_EC(esr) == ESR_ELx_EC_SYS64 &&
+-		    (esr & ESR_ELx_SYS64_ISS_DIR_MASK) ==
+-				ESR_ELx_SYS64_ISS_DIR_READ) {
+-			int rt = ESR_ELx_SYS64_ISS_RT(esr);
+-
+-			if (rt < REC_RUN_GPRS)
+-				rec->run->enter.gprs[rt] =
+-					vcpu_get_reg(vcpu, rt);
+-		}
++		kvm_rec_complete_sysreg_access(vcpu);
+ 		break;
+ 	case RMI_EXIT_PSCI:
+ 		return kvm_rec_complete_psci(vcpu);
+@@ -1302,14 +1307,105 @@ static void noinstr load_realm_timer_state(struct kvm_vcpu *vcpu)
+ 	write_sysreg_el0(rec_exit->cntp_ctl, SYS_CNTP_CTL);
+ }
+ 
++static void noinstr rec_prepare_exit_state(struct kvm_vcpu *vcpu)
++{
++	struct realm_rec *rec = &vcpu->arch.rec;
++	u64 esr = rec->run->exit.esr;
++	bool is_write;
++	int rt;
++
++	vcpu->arch.fault.esr_el2 = esr;
++	vcpu->arch.fault.far_el2 = rec->run->exit.far;
++	/* HPFAR_EL2 is only valid for RMI_EXIT_SYNC */
++	vcpu->arch.fault.hpfar_el2 = 0;
++
++	/* Reset the emulation flags for the next run of the REC */
++	rec->run->enter.flags = 0;
++
++	is_write = (esr & ESR_ELx_SYS64_ISS_DIR_MASK) ==
++		   ESR_ELx_SYS64_ISS_DIR_WRITE;
++	if (rec->run->exit.exit_reason != RMI_EXIT_SYNC ||
++	    ESR_ELx_EC(esr) != ESR_ELx_EC_SYS64 || !is_write)
++		return;
++
++	rt = kvm_vcpu_sys_get_rt(vcpu);
++	if (rt < REC_RUN_GPRS)
++		vcpu_set_reg(vcpu, rt, rec->run->exit.gprs[rt]);
++}
++
++static int noinstr rec_perform_vgic_cpuif_access(struct kvm_vcpu *vcpu)
++{
++	unsigned long elr, spsr, pc, pstate;
++	int handled;
++
++	elr = read_sysreg_el2(SYS_ELR);
++	spsr = read_sysreg_el2(SYS_SPSR);
++	pc = *vcpu_pc(vcpu);
++	pstate = *vcpu_cpsr(vcpu);
++
++	/*
++	 * RMM has already completed the trapped Realm instruction.
++	 * Install disposable AArch64 exception-return state for
++	 * the PC adjustment made by the existing early VGIC
++	 * dispatcher, and restore both views before returning to
++	 * the Realm plumbing.
++	 */
++	*vcpu_cpsr(vcpu) = PSR_MODE_EL1h;
++	write_sysreg_el2(0, SYS_ELR);
++	write_sysreg_el2(PSR_MODE_EL1h, SYS_SPSR);
++
++	handled = __vgic_v3_perform_cpuif_access(vcpu);
++
++	write_sysreg_el2(elr, SYS_ELR);
++	write_sysreg_el2(spsr, SYS_SPSR);
++	*vcpu_pc(vcpu) = pc;
++	*vcpu_cpsr(vcpu) = pstate;
++
++	return handled;
++}
++
++static bool noinstr rec_handle_vgic_cpuif_exit(struct kvm_vcpu *vcpu)
++{
++	struct realm_rec *rec = &vcpu->arch.rec;
++	u64 esr;
++
++	if (!static_branch_unlikely(&vgic_v3_cpuif_trap))
++		return false;
++
++	esr = kvm_vcpu_get_esr(vcpu);
++	if (rec->run->exit.exit_reason != RMI_EXIT_SYNC ||
++	    ESR_ELx_EC(esr) != ESR_ELx_EC_SYS64)
++		return false;
++
++	if (rec_perform_vgic_cpuif_access(vcpu) != 1)
++		return false;
++
++	kvm_rec_complete_sysreg_access(vcpu);
++
++	/*
++	 * The emulation may have updated ICH_HCR_EL2.EOIcount.
++	 * Synchronize that update before reading ICH_HCR_EL2
++	 * again to enable the CPU interface.
++	 */
++	isb();
++	sysreg_clear_set_s(SYS_ICH_HCR_EL2, 0, ICH_HCR_EL2_En);
++
++	return true;
++}
++
+ int noinstr kvm_rec_enter(struct kvm_vcpu *vcpu)
+ {
+ 	struct realm_rec *rec = &vcpu->arch.rec;
+ 	int ret;
+ 
+-	ret = rmi_rec_enter(rec->rec_phys, rec->run_phys);
+-	if (!ret)
++	do {
++		ret = rmi_rec_enter(rec->rec_phys, rec->run_phys);
++		if (ret)
++			break;
++
+ 		load_realm_timer_state(vcpu);
++		rec_prepare_exit_state(vcpu);
++	} while (rec_handle_vgic_cpuif_exit(vcpu));
+ 
+ 	return ret;
+ }
+-- 
+2.43.0
+
+> 
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+> New patch for v16
+> ---
+>  arch/arm64/kvm/arm.c | 10 ++++++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index fd4e13ff17cf..7edc572dd8ab 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -125,6 +125,12 @@ static bool vgic_present, kvm_arm_initialised;
+>  
+>  static DEFINE_PER_CPU(unsigned char, kvm_hyp_initialized);
+>  
+> +static bool kvm_arm_rmi_supported(void)
+> +{
+> +	return static_key_enabled(&kvm_rmi_is_available) &&
+> +	       cpus_have_final_cap(ARM64_HAS_ICH_HCR_EL2_TDIR);
+> +}
+> +
+>  bool is_kvm_arm_initialised(void)
+>  {
+>  	return kvm_arm_initialised;
+> @@ -256,7 +262,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>  		return -EINVAL;
+>  
+>  	if (type & KVM_VM_TYPE_ARM_REALM) {
+> -		if (!static_branch_unlikely(&kvm_rmi_is_available))
+> +		if (!kvm_arm_rmi_supported())
+>  			return -EINVAL;
+>  		kvm_set_realm_state(kvm, REALM_STATE_NONE);
+>  		kvm->arch.is_realm = true;
+> @@ -537,7 +543,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  			r = kvm_supports_cacheable_pfnmap();
+>  		break;
+>  	case KVM_CAP_ARM_RMI:
+> -		r = static_key_enabled(&kvm_rmi_is_available);
+> +		r = kvm_arm_rmi_supported();
+>  		break;
+>  
+>  	default:
+> -- 
+> 2.43.0
+> 
