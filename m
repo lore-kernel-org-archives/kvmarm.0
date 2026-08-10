@@ -1,55 +1,71 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D5C039D6F2;
-	Mon, 10 Aug 2026 08:52:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76DFF3B19A0;
+	Mon, 10 Aug 2026 09:42:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786351960; cv=none; b=aAbu5S6amjdu6rePACsLaZt72kSa0B3Y85WJIgYK6tzhT5i7c4CeW7P9uGkDXVpnjVExyqjXzh5KpkXkSv/6CqR31TAefvkX9elEHarTg11upWLcMZ259mSa3wY+jQLEFs0e9NjuSEICKDESYt1o14C2ucrOmuGaslzZ9pFWaQU=
+	t=1786354922; cv=none; b=jOoEbPhqQYkVFGkYeopMvTGK+wtVfs/usVu7d2NAvXjF+zl/i09TU2wen0qS3Y0q1BZHDRoNzo9EkVuA2REunXKNGNLb6lG+4TJeoAmPWUBVqzsk4LPLnp9Y3Ik31ZxCV6EBucd+wbaOrHWUvALq0SGVw6iaitVmfjueeVozeB0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786351960; c=relaxed/simple;
-	bh=mgI1A5xxMUA4gh1TXWJ/YIU1vpgad5CqsEcXQSz6G6o=;
+	s=arc-20240116; t=1786354922; c=relaxed/simple;
+	bh=dKWOjgCHJjHzYTmqrZ/c+AqCjIh1wH9W7xeIAmA/5zM=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gH3G30+kDXRlf6JdLpYNXw2gcErkaQjvvOD3CF4hNS4DelrwRc3IC25Ech5+WFiGWQdoz2BFwgX1bRz4Me8d3JqoGt/qQY1cOW2CI02W3RcUSIoD+XEHqq5B/PSn2JHNYYcmF+6Joyq3g/xOSILltLR2SXZD4eiakly+hdqVBDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CHxySg7v; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=m0VL+49sht5BaqXOtdnVggsDu4FSqoWxN7knzpd/AjQfzZjDqD4z4LRfbQYmCsYA7hO+48NlC8c1aBWhSDuRQ50ZwyZ3sAZrUCjfvAs+gFULPKyDX1Pz4ZtFYcAuB7zLbjMmoLt7T4uKCqREiuy/jMSDUoI80kVlPNEStqm31rI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lSVpwzjm; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CHxySg7v"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F12D1F000E9;
-	Mon, 10 Aug 2026 08:52:39 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lSVpwzjm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44CB81F000E9;
+	Mon, 10 Aug 2026 09:42:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786351959;
-	bh=pq+u/KHK9r+MSQrkQ4op9UevKKFwZbJcBlJBfLPWaJo=;
+	s=k20260515; t=1786354921;
+	bh=YRvZvvHIVpj4XP+Xsbw9vpzce7EuvuetlAXvbhkPlhE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=CHxySg7vub9y9D0F0caT3xQMuh9IfRYQQ4jnur3KdmHS41+KPOZob+xb8LkVwrYpz
-	 3QQu/LNAAl8LztgatnYVVVAvEpbQYnA30f74Aq4mJ8G1/YZNlGSE1C6ddOWR2qlwJh
-	 XjVxsmeh8jBfDtGMwprj84CXEJS577x8+4Jv23t/qDoWBcpJ1Yymr9itNseF7DMuxj
-	 149QD0pHNjFE/LxizeN7noSN+zqCyQ7soWpDGwcvIF1QJH1M3qAaU3mufeVpPUr8+M
-	 4F4wkd8IiEXanyD0RZoMhsVWwfjzleC8eDI+bNBxnOjJqCTGo0CxTZRSbRuOFpjRxX
-	 T3unaLHs3I1xQ==
+	b=lSVpwzjmSuwmAGnmejzEHRj/Qb/ufx9XmA+X48gJ9k9URKIk1fNF0kvhsHA856m9H
+	 gR8O3bXZrso2oTm7UMQ9SWgkZ5YvCF9BesZYdBlupKe0qX16HnXDItJEjQ/mYpBhcK
+	 h7JTBYXdguDPWaNVRzwXyEkzk9p9TtlMQIxn3OaZzKlVud5+QFAmQJkwPC4rXIOOlO
+	 ULjLZ6/q6Dn1NsVinRhzZjiT9cceLzc5YB7YU+RXxPpr2aDEiN0OqdgF9KoLG/1l24
+	 Fsx2VdnAbbEvcG20EMziFhk8HLbdDuSLsnTx745AAiB8CpbH5GkQtFc3yZBg1UEZ+o
+	 BM9Km83rcOMJQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wtLkK-0000000E1LL-3X8j;
-	Mon, 10 Aug 2026 08:52:36 +0000
-Date: Mon, 10 Aug 2026 09:52:36 +0100
-Message-ID: <86qzk69x2j.wl-maz@kernel.org>
+	id 1wtMW6-0000000E2IC-3tVB;
+	Mon, 10 Aug 2026 09:41:59 +0000
+Date: Mon, 10 Aug 2026 10:41:51 +0100
+Message-ID: <86wlty1fds.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Karl Mehltretter <kmehltretter@gmail.com>
-Cc: Oliver Upton <oupton@kernel.org>,
+To: Kohei Enju <enju.kohei@fujitsu.com>
+Cc: Steven Price <steven.price@arm.com>,
+	kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev,
-	Fuad Tabba <tabba@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
 	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: Fix AArch32 DBGBXVR<n> handling
-In-Reply-To: <20260810005616.13227-1-kmehltretter@gmail.com>
-References: <20260810005616.13227-1-kmehltretter@gmail.com>
+	linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+	Emi Kisanuki <fj0570is@fujitsu.com>,
+	Vishal Annapurve <vannapurve@google.com>,
+	WeiLin.Chang@arm.com,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>
+Subject: Re: [PATCH v16 44/45] KVM: arm64: CCA: Require ICH_HCR_EL2.TDIR for realms
+In-Reply-To: <anlZCIauOq4Lvv0I@FCCLS0092175.localdomain>
+References: <20260803134403.80630-1-steven.price@arm.com>
+	<20260803134403.80630-45-steven.price@arm.com>
+	<anlZCIauOq4Lvv0I@FCCLS0092175.localdomain>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -61,49 +77,93 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kmehltretter@gmail.com, oupton@kernel.org, kvmarm@lists.linux.dev, tabba@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: enju.kohei@fujitsu.com, steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com, aneesh.kumar@kernel.org, fj0570is@fujitsu.com, vannapurve@google.com, WeiLin.Chang@arm.com, lpieralisi@kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 10 Aug 2026 01:56:16 +0100,
-Karl Mehltretter <kmehltretter@gmail.com> wrote:
+On Mon, 10 Aug 2026 05:58:10 +0100,
+Kohei Enju <enju.kohei@fujitsu.com> wrote:
 > 
-> The consolidation of the breakpoint and watchpoint register accessors
-> switched DBGBXVR<n> from trap_bvr() to trap_dbg_wb_reg(). The latter
-> selects backing storage with demux_wb_reg(), which only handles Op2 values
-> 4 through 7. Since DBGBXVR<n> uses Op2 1, an AArch32 guest access hits
-> KVM_BUG_ON() and marks the VM dead.
+> On 08/03 14:44, Steven Price wrote:
+> > KVM advertises realm support when the RMM is available, and allows
+> > userspace to create a VM with KVM_VM_TYPE_ARM_REALM on that basis.
+> > 
+> > On CPUs that lack ICH_HCR_EL2.TDIR, KVM uses ICH_HCR_EL2.TC for
+> > normal guests so that ICC_DIR_EL1 is still trapped via the common GICv3
+> > CPU interface trap. Realms cannot rely on the normal hyp-side trap
+> > handling for that fallback, so advertising RMI support on such systems
+> > lets userspace create a realm that cannot safely run.
+> > 
+> > Require the finalized ARM64_HAS_ICH_HCR_EL2_TDIR capability when
+> > reporting KVM_CAP_ARM_RMI and when accepting KVM_VM_TYPE_ARM_REALM.
+> > This leaves normal VM creation unchanged on systems that need the TC
+> > workaround.
 > 
-> DBGBXVR<n> aliases DBGBVR<n>_EL1[63:32], and its AA32(HI) descriptor
-> already selects the upper half. Map Op2 1 to dbg_bvr[] alongside Op2 4,
-> restoring the pre-regression behavior.
+> Hi Steven,
 > 
-> Fixes: 3ce9f3357e9e ("KVM: arm64: Fold DBGxVR/DBGxCR accessors into common set")
-> Assisted-by: Claude:claude-opus-5
-> Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
-> ---
-> Tested on a Raspberry Pi 400 with a minimal AArch32 guest. The unpatched
-> kernel WARNed in demux_wb_reg() and returned -EIO from KVM_RUN. The
-> patched kernel completed the access without a warning.
+> Thanks for your work on upstreaming CCA.
 > 
->  arch/arm64/kvm/sys_regs.c | 1 +
->  1 file changed, 1 insertion(+)
+> In the v15 discussion [0], you asked whether the system I was testing was a
+> "hacked up test system" or closer to "production hardware", and I said I would
+> share more when the time came. I can now say that this is not a hacked-up test
+> system. At Fujitsu, we have real hardware (FUJITSU-MONAKA) which implements CCA
+> (FEAT_RME) but does not implement FEAT_GICv3_TDIR. The hardware details are as
+> follows:
 > 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 5d5c579d4579..2862df188155 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -889,6 +889,7 @@ static u64 *demux_wb_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd)
->  	struct kvm_guest_debug_arch *dbg = &vcpu->arch.vcpu_debug_state;
->  
->  	switch (rd->Op2) {
-> +	case 0b001:
->  	case 0b100:
->  		return &dbg->dbg_bvr[rd->CRm];
->  	case 0b101:
+>   - GICv4.2 compliant implementation
+>   - Supports FEAT_GICv3, FEAT_GICv3p1, FEAT_GICv4, FEAT_GICv4p1, and FEAT_GICv3_NMI
+>   - Does not support FEAT_GICv3_LEGACY (deprecated)
+>   - Does not support FEAT_GICv3_TDIR (ICH_VTR_EL2.TDS == 0)
+> 
+> For reference, compared with Arm Neoverse V3, the virtual GIC configuration is
+> largely equivalent. The only missing non-deprecated architectural feature is
+> FEAT_GICv3_TDIR.
 
-Reviewed-by: Marc Zyngier <maz@kernel.org>
-Cc: stable@vger.kernel.org
+A *very* significant difference. Given the cost of trapping between
+R-EL1 and NS-EL2, something as simple as accesses to ICV_PMR_EL1
+result in an extremely expensive trap.
+
+> 
+> The issue I see is that the CCA KVM code currently does not support a
+> configuration (non-TDIR/common-trap) that normal KVM already supports. For
+> normal guests, KVM handles systems without TDIR by using ICH_HCR_EL2.TC and the
+> existing GICv3 CPU interface emulation path. However, Realm guests currently
+> fail because the CCA path bypasses that existing emulation path, as Marc also
+> pointed out in [1].
+
+Plugging CCA in the emulation code will solve the *functional* aspect.
+The performance aspect is still there, unfortunately, and there isn't
+much KVM can do about that.
+
+> 
+> Also, this is not limited to systems that actually lack TDIR. The same failure
+> can be reproduced on a TDIR-capable system by booting with:
+>   kvm-arm.vgic_v3_common_trap=1
+
+This is a *debug* option for broken hardware. ThunderX, for
+example. You really are in good company when this bit is set.
+
+> 
+> So it seems that the current CCA KVM implementation does not yet cover a
+> configuration that normal KVM already supports today, rather than this being a
+> limitation of the RMM specification or the underlying hardware.
+> 
+> I've included a patch below which reuses the existing GICv3 early emulation
+> path for Realm sysreg exits. This patch does not add any new vGIC emulation
+> code, and leaves the existing vGIC emulation code unchanged. So I believe this
+> is in line with Marc's request in [1]. With this patch, Realm guests can run
+> when the common CPU interface trap path is enabled.
+> 
+> I tested the exact patch both on our real silicon and on QEMU, and
+> confirmed that all Realm-related tests in kvm-unit-tests-cca passed.
+
+KUTs are unfortunately not something that people run in production. I
+wonder why...
+
+Please run a Linux guest compiled with CONFIG_ARM64_PSEUDO_NMI=y and
+irqchip.gicv3_pseudo_nmi=1 on the command line. Run any significant
+workload (hackbench, for example), and report the overhead. This will
+give you the expected impact introduced by the lack of TDIR.
 
 	M.
 
