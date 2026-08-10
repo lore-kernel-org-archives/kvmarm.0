@@ -1,165 +1,148 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com [209.85.208.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A26F53C13E9;
-	Mon, 10 Aug 2026 11:45:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D3CC3D953A
+	for <kvmarm@lists.linux.dev>; Mon, 10 Aug 2026 12:55:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786362316; cv=none; b=GtYGORxZ/nBFZoy/7Bmmw/K276nh2foFOJGdTGULkw+o7m/CMq3yrN+OZwBgjOoyPsgIna7fjverea/hta7368Ccq1qN6lb04ZcURJppDVZCBTpcDiwB5fgwmNq82vIi3H5mOISdgAOwC3O8biRaVn8S6RImmRf85kuR+1vMiRA=
+	t=1786366535; cv=none; b=SWVLtcYYd0P8/gaDz9CWizh+Wj1eZMC4XUTBBlmR+hvZc5rwEU7piBqGq898vjzO5Wuf1U8yMWFmbFjjHN1mEGuT7NXv6qaNPSTDqz6GROJlFxQn8gI6U1UCsCoIiY8MI7xOs36KZNdR471k+hrtKASM5+/6y0gAQKzexjxVpEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786362316; c=relaxed/simple;
-	bh=EpK3Mc0c/SYcXBl1Qb1gQ1g1B5inqcMO5/cWifyLcY4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MU077XmFlrCvf+Nlfl666hU7aWCzwPZJs/OuU/Cg+nXoq5U3b/szxNxkUWr9v7mMHBrI6pz3sZY1BdmByHzFwaOADkAbi4HCgJWju452tA1a438ed1Ghc8y64NMR4s7KiynmWfewjd0hjc0lt5Gs6n65MMIEz1oj/PAMFHV/Hmc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FBSPezM5; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786366535; c=relaxed/simple;
+	bh=ABQ7rLH8LdDNKLwT5rPObn5whIed+p2i6tm3SaUf8iY=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=beOE+piEs2SsTFHbdZGpr/QzZ4g9RZqvGT2FSvhjwd1GY0sOSyUc5lLgVC9Uh3jVi9puBgKdlgyYFLUNGmxt1qorswNjb9+n2f+0yGVI4q3uxG780GBlO3zu/+KiMMYOCDeJoJNqoBbM/mKMB3WvpOS7n/T9rVrEL9xBGi+xwE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tarunsahu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LHBlAV8c; arc=none smtp.client-ip=209.85.208.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tarunsahu.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FBSPezM5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 726781F000E9;
-	Mon, 10 Aug 2026 11:45:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786362315;
-	bh=vUe1f3pgujs6K1MoZm7uuHtbuihLqP7ejVyvgiIgEAM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=FBSPezM5AdYZ+abrnIzGMUjIDKcHNcKCD9H3Nac2Uybl9tVYtXFwqbFl9pL6dUYBD
-	 KXkvY0n1pqUpZQoDGJ6ziPOPQ5kCkua58Gal6PCWWOy0HU3AocvadilAA4T4K46Ezu
-	 YMc8qr4HA6WUgvgcNL2iP40WB4u3EZnLNC+LEJ/czijgdSNl1veadJFO/GIT4Be9X0
-	 7OM6cdd92YG8Z6vTjVpacwBvlazkfHkY4ls8Wmi7LACqeT1+gMmTeyzO921RWQOfl9
-	 ZScHYNxO0Lqn3t5++XkqGVdkt4uCo07TrsTylxUJzhf0KSnRddDrSgQgQy1ZEgLzBv
-	 ShwZrD8Z3HtFQ==
-Date: Mon, 10 Aug 2026 13:45:11 +0200
-From: Lorenzo Pieralisi <lpieralisi@kernel.org>
-To: sashiko-reviews@lists.linux.dev
-Cc: Sascha Bischoff <Sascha.Bischoff@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-	kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH 2/5] irqchip/gic-v5: Clear per-CPU IRS data on teardown
-Message-ID: <anm5x_e2HTzJAXMD@red-moon>
-References: <20260810102652.758719-1-sascha.bischoff@arm.com>
- <20260810102652.758719-3-sascha.bischoff@arm.com>
- <20260810104747.E5CE71F000E9@smtp.kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LHBlAV8c"
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-6a178080182so2460107a12.2
+        for <kvmarm@lists.linux.dev>; Mon, 10 Aug 2026 05:55:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1786366531; x=1786971331; darn=lists.linux.dev;
+        h=content-transfer-encoding:content-type:cc:to:from:subject
+         :message-id:references:mime-version:in-reply-to:date:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=CXS0NEGBTZuSyd76xEU6892riTmJKR4JCJe3n8Ek3/c=;
+        b=LHBlAV8cmPecaatXdbL20WVSqeWmK5GT4Ouq2JeSe3QD3J9WBre5+R8ah+Sdi5zyUJ
+         GeYQEvmf/HRnhysrkvqc1NLtUhys0PrJogBGFi5qKqWR0NboMOuydayxDrqUi/1cjh7G
+         Huhy16N8RfRi9xZCceY5E/4a3BEqyvgwVYG7NC+akaN/h7VSuBnrz+ZbwRMBPUPfmiTo
+         z76TYta3/+SPB68VKTHM1KtxgbVlxNl2eJWqwI9gy0dGfc0VhvqbmVMvKlExzzrYbjGw
+         eONswa3ykrjaPnSChh3sQK8XIg2KheNxr1/yC/MkSD3l9/w6sRnH8LHtDTULKRVrVJmG
+         Y9AQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786366531; x=1786971331;
+        h=content-transfer-encoding:content-type:cc:to:from:subject
+         :message-id:references:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=CXS0NEGBTZuSyd76xEU6892riTmJKR4JCJe3n8Ek3/c=;
+        b=SDxIIaHxu2utuOm85Cp8YkuR4sMIwLVH41BtIw7VQyOuELMAvF+AyWSd38o/a5UUbA
+         NsUkiRojeMYaPwBO9djcBwVClH7zJpksFOAFvkrvpAD9kHGD+n4XdYxqzlK4m/N2Dsu5
+         3iQNgtgeYj2Qn05dYDNGSr21erpBy4YpwOdDzUf5eZA3qEPqWcABq59M1GyOpp+6gyfp
+         mM8JwzE1UhsO2ocnFif7TRNNxzfNu8VA/0XV+ojY+kxxQl8BIBEFGcsBryR2lv4HPRd2
+         xK/L3zm9YwFhifrpBYiwsE/XqQecDPzrhM/EX/5pRB65oObOxy+FxBzGkNBg214uhvf9
+         pMJg==
+X-Forwarded-Encrypted: i=1; AHgh+Rpd1ljUVrHZ0CGLdHg9JcDe2aB549VLFcWEPGLsGoWbggFTw2KhTsXGF3JDEvQ1QC8nxKr2EX4=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzYfze/Ux0DrBEvbqpHF8BAIqgVT8eun6j2Fu3RayR5Pk9ZJeLN
+	rbnAtwuXODcG/oyFPmziLvkgGGsijL8BY/y2Zn9YuwJxJbIpTKjuHsjgGGWlQG0dKn9J97H3Zt4
+	frGVsMgxkAkyVoQDXEQ==
+X-Received: from edeu12-n1.prod.google.com ([2002:a05:6402:a6cc:10b0:6a1:f089:88d7])
+ (user=tarunsahu job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6402:21cc:b0:6a1:88e:90c1 with SMTP id 4fb4d7f45d1cf-6a355da6287mr898442a12.9.1786366531239;
+ Mon, 10 Aug 2026 05:55:31 -0700 (PDT)
+Date: Mon, 10 Aug 2026 12:55:30 +0000
+In-Reply-To: <CAEvNRgGDhcu2LUqhwVtGJSUo4uXQHrGOYRDaM2qzPTO4LX=jKQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260810104747.E5CE71F000E9@smtp.kernel.org>
+Mime-Version: 1.0
+References: <20260728121138.1103610-1-tarunsahu@google.com>
+ <20260728121138.1103610-4-tarunsahu@google.com> <20260728122655.17C791F00A3A@smtp.kernel.org>
+ <CAEvNRgGDhcu2LUqhwVtGJSUo4uXQHrGOYRDaM2qzPTO4LX=jKQ@mail.gmail.com>
+Message-ID: <9huza4qu8799.fsf@tarunix.c.googlers.com>
+Subject: Re: [PATCH v4 03/11] KVM: Export kvm_uevent_notify_vm_create()
+From: tarunsahu@google.com
+To: Ackerley Tng <ackerleytng@google.com>, sashiko-reviews@lists.linux.dev
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Aug 10, 2026 at 10:47:47AM +0000, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 5 potential issue(s) to consider:
-> 
-> Pre-existing issues:
-> - [High] Unconditional call to irq_domain_remove() with a potentially NULL pointer in gicv5_free_lpi_domain() during error teardown causes a fatal kernel panic.
-> - [High] Missing release of requested memory regions on initialization error paths and module removal results in a permanent physical memory leak.
-> - [High] The ACPI MADT generic interrupt parser does not validate if get_logical_index() successfully found a logical CPU index, leading to out-of-bounds memory access.
-> - [High] Using smp_processor_id() in preemptible context triggers a BUG and can lead to stale per-CPU data access.
-> - [High] The GICv5 IRS hardware is left enabled on initialization error and teardown paths.
+Ackerley Tng <ackerleytng@google.com> writes:
 
-Looking into those.
+> sashiko-bot@kernel.org writes:
+>
+>> Thank you for your contribution! Sashiko AI review found 1 potential iss=
+ue(s) to consider:
+>> - [Low] The patch claims to export `kvm_uevent_notify_vm_create()` but f=
+ails to include the `EXPORT_SYMBOL_GPL()` or `EXPORT_SYMBOL_FOR_KVM_INTERNA=
+L()` macro.
+>> --
+>>
+>> --- Patch [3]: [PATCH v4 03/11] KVM: Export kvm_uevent_notify_vm_create(=
+) ---
+>> commit 5e642ea16f0d267e622a352de60bfe397ecf79df
+>> Author: Tarun Sahu <tarunsahu@google.com>
+>>
+>> KVM: Export kvm_uevent_notify_vm_create()
+>>
+>> This commit exposes the kvm_uevent_notify_vm_create function to allow
+>> triggering KVM event notifications during VM creation.
+>>
+>> [ ... ]
+>>
+>>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+>>> --- a/virt/kvm/kvm_main.c
+>>> +++ b/virt/kvm/kvm_main.c
+>>> @@ -6348,6 +6348,11 @@ static void kvm_uevent_notify_change(unsigned in=
+t type, struct kvm *kvm)
+>>>  	kfree(env);
+>>>  }
+>>>
+>>> +void kvm_uevent_notify_vm_create(struct kvm *kvm)
+>>> +{
+>>> +	kvm_uevent_notify_change(KVM_EVENT_CREATE_VM, kvm);
+>>> +}
+>>
+>> [Severity: Low]
+>> The commit message mentions exporting this function, but is it missing a=
+n
+>> EXPORT_SYMBOL_GPL or EXPORT_SYMBOL_FOR_KVM_INTERNAL declaration?
+>>
+>> Without the macro, won't dynamically loaded architecture-specific module=
+s
+>> like kvm-intel.ko hit undefined symbol linking errors when they try to
+>> call it?
+>>
+>
+> I'm not 100% sure about the use of EXPORT_SYMBOL... here but usually I
+> compile kvm as a module to try and catch these types of linking
+> issues. Maybe Sean will have a better method/explanation for this.
 
-Thanks,
-Lorenzo
+The Intention is just to make it global to kvm module files. it is only
+used in kvm module so need to use EXPORT symbol as Sean also mentioned.
+>
+> This brings about another question I have though. How does luo work if
+> the new kernel's deserialization of the persisted data structures
+> depends on a module? Like in this case, KVM is a module, if KVM isn't
+> loaded in the new kernel, do the data structures stick around until KVM
+> is loaded? Or is KVM required to be loaded as a module in the new
+> kernel?
 
-> --
-> 
-> --- Patch [2]: [PATCH 2/5] irqchip/gic-v5: Clear per-CPU IRS data on teardown ---
-> commit 280b220e4ca7867e34828e36c13d55683f188fae
-> Author: Sascha Bischoff <Sascha.Bischoff@arm.com>
-> 
-> irqchip/gic-v5: Clear per-CPU IRS data on teardown
-> 
-> IRS affinity setup publishes an IRS pointer and IAFFID state before
-> the remaining IRS initialization can fail. This commit adds a teardown
-> function to clear the published state to prevent CPUs from being associated
-> with freed memory on initialization failure and module removal.
-> 
-> Link: https://sashiko.dev/#/patchset/20260724104819.1296803-1-sascha.bischoff@arm.com?part=2
-> 
-> > diff --git a/drivers/irqchip/irq-gic-v5-irs.c b/drivers/irqchip/irq-gic-v5-irs.c
-> > index f3fce0b1e25d9..67940ea9e39b7 100644
-> > --- a/drivers/irqchip/irq-gic-v5-irs.c
-> > +++ b/drivers/irqchip/irq-gic-v5-irs.c
-> 
-> [ ... ]
-> 
-> > @@ -773,6 +786,7 @@ static int __init gicv5_irs_of_init(struct device_node *node)
-> >  	return ret;
-> >  
-> >  out_iomem:
-> > +	gicv5_irs_clear_affinity(irs_data);
-> >  	iounmap(irs_base);
-> 
-> [Severity: High]
-> This is a pre-existing issue, but should the IRS hardware be explicitly
-> disabled before we unmap the registers?
-> 
-> The error and teardown paths call iounmap(irs_base) and free the structures,
-> but there doesn't seem to be a step to clear GICV5_IRS_CR0_IRSEN. Does this
-> abandon active DMA-capable hardware?
-> 
-> [Severity: High]
-> This is a pre-existing issue, but are we missing a call to
-> release_mem_region() on these teardown paths?
-> 
-> The setup path uses of_io_request_and_map() which internally requests a
-> memory region, but the cleanup paths only call iounmap(). Does this leave the
-> physical memory permanently stranded in the iomem tree?
-> 
-> >  out_err:
-> >  	kfree(irs_data);
-> > @@ -787,6 +801,7 @@ void __init gicv5_irs_remove(void)
-> >  	struct gicv5_irs_chip_data *irs_data, *tmp_data;
-> >  
-> >  	gicv5_free_lpi_domain();
-> 
-> [Severity: High]
-> This is a pre-existing issue, but does gicv5_free_lpi_domain() safely handle
-> a NULL domain?
-> 
-> Looking at drivers/irqchip/irq-gic-v5.c:gicv5_free_lpi_domain(), it
-> unconditionally calls irq_domain_remove(gicv5_global_data.lpi_domain). If
-> initialization fails early leaving lpi_domain uninitialized, could this
-> trigger a kernel panic during teardown?
-> 
-> >  	gicv5_deinit_lpis();
-> >  
-> >  	list_for_each_entry_safe(irs_data, tmp_data, &irs_nodes, entry) {
-> > +		gicv5_irs_clear_affinity(irs_data);
-> >  		iounmap(irs_data->irs_base);
-> >  		list_del(&irs_data->entry);
-> >  		kfree(irs_data);
-> 
-> [ ... ]
-> 
-> [Severity: High]
-> This is a pre-existing issue, but does gic_acpi_parse_iaffid() validate the
-> return value of get_logical_index()?
-> 
-> drivers/irqchip/irq-gic-v5-irs.c:gic_acpi_parse_iaffid() {
->     ...
->     cpu = get_logical_index(gicc->arm_mpidr);
->     ...
-> }
-> 
-> If get_logical_index() fails and returns a negative error code, could this
-> lead to out-of-bounds memory corruption when cpu is used as an array index?
-> 
-> [Severity: High]
-> This is a pre-existing issue, but is it safe to use smp_processor_id() in
-> gicv5_irs_iste_alloc()?
-> 
-> drivers/irqchip/irq-gic-v5-irs.c:gicv5_irs_iste_alloc() {
->     ...
->     irs_data = per_cpu(per_cpu_irs_data, smp_processor_id());
->     ...
-> }
-> 
-> Since this function executes in a sleepable context bound by GFP_KERNEL
-> constraints, could using smp_processor_id() without preemption disabled
-> trigger a BUG splat or lead to stale per-CPU data access?
-> 
-> -- 
-> Sashiko AI review · https://sashiko.dev/#/patchset/20260810102652.758719-1-sascha.bischoff@arm.com?part=2
+If kvm module is not loaded then guest_memfd_luo/kvm_luo handler will
+also not be registered. So luo_finish call will leak this memory and not
+be freed. This is aligned with LUO design.
+
+I have raised the saperate thread with LUO list to discuss if LUO_CORE
+should throw a warning in such cases. [1]
+
+[1] https://lore.kernel.org/all/9huzecg6ta6h.fsf@tarunix.c.googlers.com/
+
+~Tarun
+>
+>> --
+>> Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260728121138.1=
+103610-1-tarunsahu@google.com?part=3D3
