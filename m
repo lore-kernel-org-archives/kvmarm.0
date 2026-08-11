@@ -1,104 +1,123 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56C90446849;
-	Tue, 11 Aug 2026 14:26:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31299426438;
+	Tue, 11 Aug 2026 14:44:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786458376; cv=none; b=s8u3vRTlR9invksqUppvEdo+LroJsVovZ5iAaBY76hQgWiH2WDA6Xx6TU88ITC9uDHv0etea7f8i0E/BsaOsi9YFuY5GEPnvKjoLFiX1UviWaZyiP5JO0GRbPpukJmuZGWPtvpawJNf+Rq78GBtddx4dbV6usH2hdOHwAgIx60E=
+	t=1786459502; cv=none; b=BoHwciSaAPLAtP6wIcdJ98s2HEPOx3vEHIQALtHdhcgBB7dksx+SH7HwZXYkIR6fobaVbEDu4RjRhLxi6f9pSRBiJx7NhXpa6xd0oBcesllS+1N9+OSqR+dGFqXh3uud3WfuypmYxX8a2Va1Poa1t57ALZgBk7TJwvSg58zzM2Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786458376; c=relaxed/simple;
-	bh=Xf8IW2PoKEaI9XjO0KPhFgu/IxFmoWD+LuuiaO9WROs=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=I9WuQw/enQ67fDPcGWioyRYNF9RA+vRqjJdqiLDZ8rNHxcRDb1fwpF7smy2aN4PvvZhq20nmFJZ6PzuQFXyCfv6R8msmGluDyHxShFlxMotmglIx8qXbF+6xqOJ7sNjm7v+xKqrBH0qAOZzBgxVkB8GfekoTXy2ciLo0jpwWBiU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eDBCBzBo; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786459502; c=relaxed/simple;
+	bh=/LPEH55R6LClPqeXnYARvDZU8XDKgr9ZBtZUHbi7ZdM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Tq389bv5KnGt/yxb0BWFgdXHhLDDNKTY2I+QI2XycVRgh491eK6FkHnCnDCUcr8WBX9FhC2pDmXey/kChm++04bezg5it9OJxP8hXOWlyIArjUOha5jCbYVHDST/ZE55af+pxJ6v7KXzcGA2DA0xecpIRbmSP9iGIspeOfl04J8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=UhMkyTJN; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eDBCBzBo"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E46DF1F000E9;
-	Tue, 11 Aug 2026 14:26:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786458374;
-	bh=j382q/eDo7NZRlCB8G+HYMC1atDyj9D1eZrb0YzdQcY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=eDBCBzBol/0gRW/p1dCFr07C+760Y0ZDMLtAhhjrUo7YyElei4LLBK+rnG8lqkFr/
-	 aQOAtc/Wuva0VDxFn4yGzU7DhyGXHm6uWR6I77cmgMknJcV0kMP9o1MrctrKUsK9OC
-	 x3ILGX8vTSbCzs1m/bn/CZ7MS47bvHYLaHBn24kqZ6oyyVU6b8TRsFzxrzeyRLUrQt
-	 fNgS1xLTLwk+6naZ9PQ5c5xRzoCNuDLec0jKoV6PK51NaiCJOPVkUIodOCsRPqqsLf
-	 LEm9FJv7tIoUGvzA5tMLAd+bEWI0t9zSi+E1u4t8HOxf2IVirHjJgHiSGgDptxXp4P
-	 qa8qu4Ocblg3w==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wtnQi-0000000EXak-330f;
-	Tue, 11 Aug 2026 14:26:12 +0000
-Date: Tue, 11 Aug 2026 15:26:12 +0100
-Message-ID: <86o6f820or.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: "Peng Fan (OSS)" <peng.fan@oss.nxp.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="UhMkyTJN"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E97BB1682;
+	Tue, 11 Aug 2026 07:44:54 -0700 (PDT)
+Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EF9DA3F86F;
+	Tue, 11 Aug 2026 07:44:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1786459498; bh=/LPEH55R6LClPqeXnYARvDZU8XDKgr9ZBtZUHbi7ZdM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=UhMkyTJN6nwQPPoHojp2Lj90fCxYgfZoPQnlFeUfUA7QykLZDiF4BKo9sc5b4f8Cu
+	 tgVMWQsawjcyUgRgg0Bm7XS/nBDFtj0Sesm5suAVALsIGilMsDyBy47x0YNQEeI5bh
+	 5ONfXUPbgnRx3kWP8wbSZ0K3W95SrAy0Gy8N9cpw=
+Date: Tue, 11 Aug 2026 15:44:53 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	"Ivan T. Ivanov" <iivanov@suse.de>,
-	Francesco Dolcini <francesco@dolcini.it>,
-	Frank Li <frank.li@nxp.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	imx@lists.linux.dev,
-	Peng Fan <peng.fan@nxp.com>,
-	Steffen Eiden <seiden@linux.ibm.com>
-Subject: Re: [PATCH v3] arm64: errata: Add NXP iMX8QM workaround for A53 cache coherency issue
-In-Reply-To: <20260803-imx8qm-cache-coherency-v3-1-c518d0da3d3b@nxp.com>
-References: <20260803-imx8qm-cache-coherency-v3-1-c518d0da3d3b@nxp.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+	Emi Kisanuki <fj0570is@fujitsu.com>,
+	Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>
+Subject: Re: [PATCH v16 07/45] arm64: mm: Handle Granule Protection Faults
+ (GPFs)
+Message-ID: <ans1ZSwMEKeT9Gfz@arm.com>
+References: <20260803134403.80630-1-steven.price@arm.com>
+ <20260803134403.80630-8-steven.price@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: peng.fan@oss.nxp.com, catalin.marinas@arm.com, will@kernel.org, corbet@lwn.net, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, iivanov@suse.de, francesco@dolcini.it, frank.li@nxp.com, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, imx@lists.linux.dev, peng.fan@nxp.com, seiden@linux.ibm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260803134403.80630-8-steven.price@arm.com>
 
-On Mon, 03 Aug 2026 09:54:44 +0100,
-"Peng Fan (OSS)" <peng.fan@oss.nxp.com> wrote:
->
-
-[...]
-
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 9a6c72a18672..1b9213d3e168 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -3176,4 +3176,9 @@ enum kvm_mode kvm_get_mode(void)
->  	return kvm_mode;
+On Mon, Aug 03, 2026 at 02:43:23PM +0100, Steven Price wrote:
+> If the host attempts to access granules that have been delegated for use
+> in a realm these accesses will be caught and will trigger a Granule
+> Protection Fault (GPF).
+> 
+> A fault during a page walk signals a bug in the kernel and is handled by
+> oopsing the kernel. A non-page walk fault could be caused by user space
+> having access to a page which has been delegated to the kernel and will
+> trigger a SIGBUS to allow debugging why user space is trying to access a
+> delegated page.
+> 
+> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+> Changes since v10:
+>  * Don't call arm64_notify_die() in do_gpf() but simply return 1.
+> Changes since v2:
+>  * Include missing "Granule Protection Fault at level -1"
+> ---
+>  arch/arm64/mm/fault.c | 28 ++++++++++++++++++++++------
+>  1 file changed, 22 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
+> index 85e23388f9bb..ea3ae0ca7dba 100644
+> --- a/arch/arm64/mm/fault.c
+> +++ b/arch/arm64/mm/fault.c
+> @@ -909,6 +909,22 @@ static int do_tag_check_fault(unsigned long far, unsigned long esr,
+>  	return 0;
 >  }
 >  
-> +void kvm_disable_mode(void)
+> +static int do_gpf_ptw(unsigned long far, unsigned long esr, struct pt_regs *regs)
 > +{
-> +	kvm_mode = KVM_MODE_NONE;
+> +	const struct fault_info *inf = esr_to_fault_info(esr);
+> +
+> +	die_kernel_fault(inf->name, far, esr, regs);
+> +	return 0;
 > +}
 > +
+> +static int do_gpf(unsigned long far, unsigned long esr, struct pt_regs *regs)
+> +{
+> +	if (!is_el1_instruction_abort(esr) && fixup_exception(regs, esr))
+> +		return 0;
+> +
+> +	return 1;
+> +}
 
-If you are respinning this for any odd reason, please rename it to
-kvm_force_disabled(), and place it next to early_kvm_mode_cfg().
+Is there a valid case for fixup_exception() here? IOW, do we ever have a
+valid user mapping of the pages delegated to a guest? If the above is
+considered a kernel bug, I'd not silently ignore this (like return less
+bytes copied or -EFAULT to user) but rather warn, potentially
+rate-limited.
 
-Thanks,
-
-	M.
+If there is a real use-case for this, what's preventing GUP + memcpy()
+from triggering a similar fault with no fixup available?
 
 -- 
-Without deviation from the norm, progress is not possible.
+Catalin
