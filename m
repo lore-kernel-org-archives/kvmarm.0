@@ -1,251 +1,116 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8827D4119E5
-	for <kvmarm@lists.linux.dev>; Tue, 11 Aug 2026 08:11:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63C3242BE8A;
+	Tue, 11 Aug 2026 10:06:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786435865; cv=none; b=jiyJ88kO0CnnB2tlcqeM91U0D/sW5LTbhrqFOJ3Sbf2PMOQ8pB0bH6jokRyBW0rsQOGpNzXFGXnE0xKPNinD39h6UgsNAmqEUhxO1jIdUggvaN9kxZeBvM9Wh3myUTcuf0aNvu5gqIxkqZtR7OjeT+ERE188kyldxBvClDqKTBU=
+	t=1786442777; cv=none; b=GTaF19UVvO6uvyvLgOKRphgZOcjFMoodHLc5oywJcxvkHomRIxI9xW/9EpDljyRK8+5CSdSX8SvvV/7THZ+kWpI82IRZHqsOPVM0StrXcitzxHhb/C/XucPCx2ckA1xL1tQJmeU7xM9C4atyxEWEK+UNQ5sVzIorfOsoksT5TdA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786435865; c=relaxed/simple;
-	bh=2kWB1zdQLxJopJW8QDZXLw5tFUIcuoAkbTonR3We1AQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jTth8ldrJRxbfgYC2nrs1eJ2pFiqLjQuTtIVwgQeyylKXnGLCFjfPBTODP5ysAaKZylgoLCy2bqXwNKBkBNTHOvxtxTg39f8jF88PVRv46vN5jPAD6T4TXXStV3Z5Oz5YKjyKVqTQH+lPJp6CgtGn16auuinjHMgZK6AUKAmzw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WLXiBiyo; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1786442777; c=relaxed/simple;
+	bh=ChzBs6eFPalqN+ZhvLBVhTuPnBWGf6rgJlj+9ZyX3BA=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=O+2c08vlL6rl3vPEZaQf4kSjG4m9C0q8AD+p67cpbx1QbY7UdTBxjN4+4VN5rKrOUBBrgZfMvAjlOLUgvBrKIx+1NroTv5usGp1464VVcwENDUHUDwM/CPAMD9pnHR0lg3MvvK7nIRye/dtgM7uDLQymDftQL2kPP0l+eV0/nnw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IeDAQ/7I; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WLXiBiyo"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1786435862;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PCqV+LwYeH1TzbOC6x2tcguj3jnVdShCKf3wQhrW4jI=;
-	b=WLXiBiyopXLcDBpMxvSkZBYtyX4Ipyp9qZe1CNWz4KfwjfctbK+70PWph20TDgp2oqOQwl
-	dYKcfR5tamqNtjEKipwk+2z2iqPcvlRX0P3k+xBcXJF+HmctHp/MVe24RstPJW8Hm5Qda1
-	A2ScpMf3H+7b4pwkDLt/OxbTRlPl/tQ=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-348-LQxI0lpiPYyDheeurAXXEQ-1; Tue, 11 Aug 2026 04:11:01 -0400
-X-MC-Unique: LQxI0lpiPYyDheeurAXXEQ-1
-X-Mimecast-MFC-AGG-ID: LQxI0lpiPYyDheeurAXXEQ_1786435860
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-492488f8583so22371495e9.2
-        for <kvmarm@lists.linux.dev>; Tue, 11 Aug 2026 01:11:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786435860; x=1787040660;
-        h=content-transfer-encoding:content-type:in-reply-to:from:references
-         :cc:to:content-language:subject:reply-to:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=PCqV+LwYeH1TzbOC6x2tcguj3jnVdShCKf3wQhrW4jI=;
-        b=Pkj3+6wJJdQQDfnVhJTqy3/7vcqH2o5z2UoLnZ+PsLwxIiouuUoNWK8vYsbAI9r26e
-         veuRSuir+T1KQrQt5wbfGRDOYHz3903bvgkaK/gAZTn5m33/4md1Cb8QIBzPGq88efPT
-         GUPYuROgPIozyl1eWXuv5hGVNS6KcTDgob5rBIq3W4AoLJPZR3rfE+3wcSmV/VL86NpI
-         +qczcOk5U1AIJKiXFcl2Xs9jI1z6WtPhPUPngfzfu9ROKPWZgLwB+pgyigZHBAq9S9SU
-         2Z8nKcU5GQjoBfp1D+3Q3yee5l5wZ9tViB0PnGGI2gs2Vu/9DVAO06qMO/qzXkbv0CnT
-         V6Nw==
-X-Forwarded-Encrypted: i=1; AHgh+RrlghFwSSMLF6BaJ9niwB1Spa64YORWCuCF4FeY3SLlpnac2Q00Oa7XREl7IhZJ1NG0Vj/KoGU=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzP6C4kUxbH9vn32UfPPGR3cZu2UIlb/DF6iAUAPVoq02fpOr2z
-	DPLrIqsIrvq6YvHbn+8twN4v3Jo2T2hX4+93uPQRwXB3k5fGi8OzO8oLAwkD2rE4cyQ37dCnWPC
-	KNAB3kOoiPDn1GALrn2uQvjsN+xfxVEafHqqBhljBMmMSY7m9H3CNTfLOIw==
-X-Gm-Gg: AR+sD13lfgykHBWPKxybNCDxPkBdvmeUY2qa0OmhorGYoqCIPT54YRjWYxIaDjvnMHw
-	CV2hghrrzYdgytu6Elv7lUjVb+S6RJQz70wpnAQZwEBmTbF+oqF3YNtR2WGAfahQoijYVgHkgHf
-	H5Rh1ef6RtASV0elNl9gm1iWTEU8urfv0yyrwBQoNK24/PgSf5yK9rln83tOm8qAAHVWYIeopP0
-	itwuqEbcfjeP68mqnF/tKiL5+Ir6ncaGJ0po5xXXJI8I6zRU5xH+zfO7e7iGWhEQe6UHGgi4hls
-	Bc+zWGbmHha8si1uM3qxHKQsy7XaQGANoUx+kfxtHsQX8eLv56OImGAG6/g/hXdRIhNsZvmnjVX
-	M/CgYrA4DaZOurZh7Px9cUbwWkGuiX1ggn3jyyr3aahGbL6uL
-X-Received: by 2002:a05:600c:4585:b0:495:4e1d:82df with SMTP id 5b1f17b1804b1-499784612aemr23515525e9.10.1786435859997;
-        Tue, 11 Aug 2026 01:10:59 -0700 (PDT)
-X-Received: by 2002:a05:600c:4585:b0:495:4e1d:82df with SMTP id 5b1f17b1804b1-499784612aemr23513965e9.10.1786435859092;
-        Tue, 11 Aug 2026 01:10:59 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49977e86b55sm41224385e9.4.2026.08.11.01.10.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Aug 2026 01:10:58 -0700 (PDT)
-Message-ID: <de4f28a8-5f6a-4675-8daa-327ee7d938d7@redhat.com>
-Date: Tue, 11 Aug 2026 10:10:55 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IeDAQ/7I"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A4701F000E9;
+	Tue, 11 Aug 2026 10:06:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1786442767;
+	bh=uSgyWUQUOXkT3ixZAZs04DUNanjZeEZwO2+Fu0C0pOU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date;
+	b=IeDAQ/7Ish/yX0U8VJXoYoq4pKb7kydnqDGq/pZDcnkkADYcmeOfiyjd/6K4fk7IH
+	 cD1VmCa377mV5C7Cj0vQzAc2AaiKI0TEGHX+U9dsQGnFq+puC2A9vz85sQwUiPpob+
+	 br1klWfTZVFVWBlODjbrY3ZmJgoyU5EMYoE8/kHeBCejB6ke4jvIlEH5OBQMIZa5Pl
+	 dwv9cup14TcREBxrxzhzwHaGzpYe3kbMzp1upF8cguLIWjEwooCTtLccIjuF7PRNOh
+	 pQysWZPHJp3QJ/A7Uqv3HkfY9Gk5toww7/fsEf60j8QNVj4sYYJTNbMd7S/jJfTE8V
+	 QXq9+WdeSKFUw==
+From: Pratyush Yadav <pratyush@kernel.org>
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: Tarun Sahu <tarunsahu@google.com>,  fuad.tabba@linux.dev,  Andrew Morton
+ <akpm@linux-foundation.org>,  seanjc@google.com,  dmatlack@google.com,
+  Shuah Khan <skhan@linuxfoundation.org>,  Jonathan Corbet
+ <corbet@lwn.net>,  david@redhat.com,  Pasha Tatashin
+ <pasha.tatashin@soleen.com>,  Pratyush Yadav <pratyush@kernel.org>,
+  sagis@google.com,  Paolo Bonzini <pbonzini@redhat.com>,  Mike Rapoport
+ <rppt@kernel.org>,  Alexander Graf <graf@amazon.com>,
+  linux-kselftest@vger.kernel.org,  andre.przywara@arm.com,
+  michael.roth@amd.com,  linux-kernel@vger.kernel.org,  linux-mm@kvack.org,
+  will@kernel.org,  vannapurve@google.com,  maz@kernel.org,
+  fvdl@google.com,  kvm@vger.kernel.org,  oliver.upton@linux.dev,
+  kvmarm@lists.linux.dev,  alexandru.elisei@arm.com,  skhawaja@google.com,
+  aneesh.kumar@kernel.org,  linux-doc@vger.kernel.org,  David Hildenbrand
+ <david@kernel.org>,  yan.y.zhao@intel.com,  kexec@lists.infradead.org,
+  suzuki.poulose@arm.com
+Subject: Re: [PATCH v4 11/11] KVM: selftests: Add guest_memfd_preservation_test
+In-Reply-To: <CAEvNRgEbS06snhyHznPSqxnUrdudVEKUuOpPwnU+AJATWFBRBA@mail.gmail.com>
+	(Ackerley Tng's message of "Thu, 30 Jul 2026 11:18:44 -0700")
+References: <20260728121138.1103610-1-tarunsahu@google.com>
+	<20260728121138.1103610-12-tarunsahu@google.com>
+	<CAEvNRgEbS06snhyHznPSqxnUrdudVEKUuOpPwnU+AJATWFBRBA@mail.gmail.com>
+Date: Tue, 11 Aug 2026 12:06:00 +0200
+Message-ID: <2vxzy0ed3rav.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: eric.auger@redhat.com
-Subject: Re: [RFC PATCH v7 10/18] target/arm/kvm: Retrieve writable ID reg map
-To: Khushit Shah <khushit.shah@nutanix.com>
-Cc: "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
- "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- Shaju Abraham <shaju.abraham@nutanix.com>,
- "yangjinqian1@huawei.com" <yangjinqian1@huawei.com>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
- "sebott@redhat.com" <sebott@redhat.com>,
- "skolothumtho@nvidia.com" <skolothumtho@nvidia.com>,
- "philmd@oss.qualcomm.com" <philmd@oss.qualcomm.com>,
- "maz@kernel.org" <maz@kernel.org>,
- "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "armbru@redhat.com" <armbru@redhat.com>,
- "berrange@redhat.com" <berrange@redhat.com>,
- "abologna@redhat.com" <abologna@redhat.com>,
- "jdenemar@redhat.com" <jdenemar@redhat.com>
-References: <20260726153221.24773-1-eric.auger@redhat.com>
- <20260726153221.24773-11-eric.auger@redhat.com>
- <650A3325-5A8A-477A-9E60-D1D02363FA19@nutanix.com>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <650A3325-5A8A-477A-9E60-D1D02363FA19@nutanix.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: C_aLPTdpwX49en44-WzuKXBdRP53SMJ_7zYs9yFUh5U_1786435860
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-Hi Khushit,
-On 8/6/26 6:52 AM, Khushit Shah wrote:
+On Thu, Jul 30 2026, Ackerley Tng wrote:
+
+> Tarun Sahu <tarunsahu@google.com> writes:
 >
->> On 26 Jul 2026, at 8:59 PM, Eric Auger <eric.auger@redhat.com> wrote:
+>> Add guest_memfd_preservation_test to verify that KVM VM state and guest
+>> memory backed by guest_memfd are preserved across a kexec reboot via Live
+>> Update Orchestrator (LUO).
 >>
->> !-------------------------------------------------------------------|
->>  CAUTION: External Email
->>
->> |-------------------------------------------------------------------!
->>
->> From: Cornelia Huck <cohuck@redhat.com>
->>
->> Add an helper to retrieve the writable id reg bitmask.
->>
->> then retrieve the writable_map array and dispatch it in the writable_map
->> fields of arm64_id_regs[] elements.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
->>
->> ---
->>
->> v5 -> v6
->> - use arm64_id_regs[].writable_map
->> - squashed 2 commits (helper + user)
->> - removed stub
->> ---
->> target/arm/kvm.c | 61 ++++++++++++++++++++++++++++++++++++++++++++++++
->> 1 file changed, 61 insertions(+)
->>
->> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
->> index d40a6a9859..d270f9870e 100644
->> --- a/target/arm/kvm.c
->> +++ b/target/arm/kvm.c
->> @@ -28,6 +28,7 @@
->> #include "kvm_arm.h"
->> #include "cpu.h"
->> #include "cpu-sysregs.h"
->> +#include "cpu-idregs.h"
->> #include "trace.h"
->> #include "internals.h"
->> #include "hw/pci/pci.h"
->> @@ -51,6 +52,7 @@ const KVMCapabilityInfo kvm_arch_required_capabilities[] = {
->> static bool cap_has_mp_state;
->> static bool cap_has_inject_serror_esr;
->> static bool cap_has_inject_ext_dabt;
->> +static bool writable_map_dispatched;
->>
->> /**
->>  * ARMHostCPUFeatures: information about the host CPU (identified
->> @@ -273,6 +275,21 @@ static uint32_t kvm_arm_sve_get_vls(int fd)
->>     return vls[0] & MAKE_64BIT_MASK(0, ARM_MAX_VQ);
->> }
->>
->> +static int kvm_feature_idx_to_idregs_idx(int kidx)
->> +{
->> +    int op1, crm, op2;
->> +    ARMSysRegs sysreg;
->> +
->> +    op1 = kidx / 64;
->> +    if (op1 == 2) {
->> +        op1 = 3;
->> +    }
->> +    crm = (kidx % 64) / 8;
->> +    op2 = kidx % 8;
->> +    sysreg = ENCODE_ID_REG(3, op1, 0, crm, op2);
->> +    return get_sysreg_idx(sysreg);
->> +}
->> +
->> static void kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
->> {
->>     /* Identify the feature bits corresponding to the host CPU, and
->> @@ -480,9 +497,53 @@ static void kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
->>     ahcf->features = features;
->> }
->>
->> +static int kvm_arm_get_writable_id_regs(uint64_t *idregmap)
->> +{
-> This should probably be gated with kvm_enabled()?
+>> This test includes multiple tests
+>> - (A) Test to preserve non-guest_memfd, non-memfd which must fail (/dev/null)
+>> - (B) Test to preserve guest_memfd with no INIT_SHARED flag which must fail
+>> - (C) Test to allocate the guest_memfd memory after preservation because
+>>   preservation makes the guest_memfd frozen. Which must fail as well.
+>> - (D) Test to verify guest_memfd with INIT_SHARED flag preservation across
+>>   kexec: Below is the details of stages in this test.
+[...]
+>> +++ b/tools/testing/selftests/kvm/guest_memfd_preservation_test.c
+>> @@ -0,0 +1,357 @@
+>> +// SPDX-License-Identifier: GPL-2.0
+>> +/*
+>> + * Copyright (C) 2026, Google LLC.
+>> + *
+>> + * Author: Tarun Sahu <tarunsahu@google.com>
+>> + *
+>> + * Test for VM and guest_memfd preservation across kexec (Live Update) via LUO.
+>> + *
+>> + * NOTE: This is a MANUAL test and is excluded from automated CI/testing
+>> + * frameworks because Stage 1 daemonizes into the background to pin resources
+>> + * and requires a human operator to manually trigger kexec before Stage 2
+>> + * is executed. Running Stage 1 automatically would leak the background daemon
+>> + * and cause CI runners to falsely interpret it as a passed test.
+>> + *
+
+I think this is fine as a first step but we really should automate
+these.
+
+We have some infrastructure to automate other live update tests across
+both stages already by launching a VM under qemu and making the test
+process as the init task. See tools/testing/selftests/kho/vmtest.sh. For
+KVM tests you'd need the runner to be able to run nested VMs.
+
+The script right now is pretty bare bones, but I really think we should
+spend time improving it to the point where we can automate all our tests
+using it.
+
 >
-> qtest-aarch64/device-introspect-test fails on my aarch64 devvm, which does not
-> have KVM.
-Thanks for the report.
-
-I will fix that in next respin
-
-Eric
+> Usually there aren't many printfs in tests, but since this is a MANUAL
+> test, maybe that's ok?
 >
->> +    int cap_writable_id_regs;
->> +    struct reg_mask_range range = {
->> +        .range = KVM_ARM_FEATURE_ID_RANGE,
->> +        .reserved = {0},
->> +        .addr = (uint64_t)idregmap,
->> +    };
->> +
->> +    cap_writable_id_regs =
->> +        kvm_check_extension(kvm_state, KVM_CAP_ARM_SUPPORTED_REG_MASK_RANGES);
->> +
->> +    if (!cap_writable_id_regs ||
->> +        !(cap_writable_id_regs & (1 << KVM_ARM_FEATURE_ID_RANGE))) {
->> +        return -ENOSYS;
->> +    }
->> +
->> +    if (kvm_vm_ioctl(kvm_state, KVM_ARM_GET_REG_WRITABLE_MASKS, &range)) {
->> +        return -errno;
->> +    }
->> +    return 0;
->> +}
->> +
->> void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu)
->> {
->>     CPUARMState *env = &cpu->env;
->> +    uint64_t *writable_map;
->> +
->> +    writable_map = g_new(uint64_t, KVM_ARM_FEATURE_ID_RANGE_SIZE);
->> +
->> +    if (!writable_map_dispatched &&
->> +        !kvm_arm_get_writable_id_regs(writable_map)) {
->> +        for (int i = 0; i < KVM_ARM_FEATURE_ID_RANGE_SIZE; i++) {
->> +            uint64_t mask = writable_map[i];
->> +
->> +            if (mask) {
->> +                int idx = kvm_feature_idx_to_idregs_idx(i);
->> +
->> +                if (idx < 0 || idx > ARRAY_SIZE(arm64_id_regs)) {
->> +                    continue;
->> +                }
->> +                arm64_id_regs[idx].writable_mask = mask;
->> +            }
->> +        }
->> +        writable_map_dispatched = true;
->> +    }
->> +    g_free(writable_map);
->>
->>     if (!arm_host_cpu_features.dtb_compatible) {
->>         kvm_arm_get_host_cpu_features(&arm_host_cpu_features);
->> -- 
->> 2.53.0
->>
+> Would like to know what Sean thinks of this, and printfs in general.
 
+-- 
+Regards,
+Pratyush Yadav
