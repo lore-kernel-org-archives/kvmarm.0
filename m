@@ -1,176 +1,147 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D74A53B42D3;
-	Tue, 11 Aug 2026 11:31:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786447912; cv=none; b=bteNnyAR3ESvUKsFo5zKgYhqI+z+iw7eXux/6w7zVjUryrQ93EaXuZu88Ntj50tApDyQIr56tTv0HIvxi2r20NY5VI+TrQRDrs78AsCNz8BTD0WUKAzaASF26u2vDrV8FXmxwF+37jL+F0aYBrhBlks0WL0qc7iiXLyr3dAzddM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786447912; c=relaxed/simple;
-	bh=vkmS5xbZv/MhrmuCuWRhhmFAuTY1aGqY1fkJvBus3Io=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=lf6istahwf4INGLFlN6va8ta78YHse419ZQZXuJRw+qB1vyE2WqW8LILqgciLVbccN1Zdo6WipnY9fuMWPwF36ebCWxysgnG4tO/F1pU9R3n3Wcp5G1MONkxPbHy63X+2oIZc0Ww9CTGynAKrXBw/yS9SSnXZU4jknfUZz0/nIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=om8xJIfj; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3FD8443AA9
+	for <kvmarm@lists.linux.dev>; Tue, 11 Aug 2026 12:17:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.52
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1786450662; cv=pass; b=oTezh1RfpX2HmO1xd3HB8g/A9Me38BC0BVQwbs66Ilrlnk76sKnCOfegoO4d+Ch3of15tYu6Y1mQtV5fq4iTym0pIjaQtkF6kplcFX4dQOr8nUuhFCP+8+DsS//p5RpiKLuGjIxcGqJOBUdKV6rb95/ks9pFKrclouxCZ6uxANg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1786450662; c=relaxed/simple;
+	bh=aQxnaVgFyk/TYxcPsgQAcOYDWwxVTsIZQNXoC1wDgK8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nwQhzPgPRddd9zpj6J+GdINI3nWZ5FnMNKxF9uaHZGIxod022XkfLyh+nXLYaqQXronxZC8eVM/4MbookAxe8IYKBBkVDnwSuM29oq/4DYZGD6tBD1g6DjO/oZqpySTttsiyRNcbJoOh1wGUHuhEDTUPDuFrserng2LPpRdHwoY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tIExOq1t; arc=pass smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="om8xJIfj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16A141F000E9;
-	Tue, 11 Aug 2026 11:31:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786447910;
-	bh=4h7/hkwvCsY0fI00T2PR/Y4OZG0mhUElOQ2zn4pF7HM=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=om8xJIfjsRUCvKibHk4AB92a86v/0sm2xMl+BtSmgoyg7QzhmHmd3v9z3YvwkioCW
-	 9u/nZK6wJXKOBRJSadI/b5pqpyXdCXcN7dsJ9BaeaAZz90F1BIBA4twS1gV3wuBHJO
-	 mJtZngYdB7FxDju+zrnYNhjNPFjwE8vD9dfqPU/3VUsDjvBzcsgX4U7GyWO21QietQ
-	 +uDGaQz1ywUPS27qK7TYb35Ab1PJEijr+OqHQQPgoG/BBG0vdmmBqVwPLY/LGZtoQR
-	 7NrPUAPpNv5bhHusvIMbXZwA2gJ2vJg4PJ/zmo8j6qYfhy4KZUMw6mp3S6iqu2krU4
-	 1EuINsbUcsIhg==
-From: Pratyush Yadav <pratyush@kernel.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Tarun Sahu <tarunsahu@google.com>,  ackerleytng@google.com,
-  fuad.tabba@linux.dev,  Andrew Morton <akpm@linux-foundation.org>,
-  dmatlack@google.com,  Shuah Khan <skhan@linuxfoundation.org>,  Jonathan
- Corbet <corbet@lwn.net>,  david@redhat.com,  Pasha Tatashin
- <pasha.tatashin@soleen.com>,  Pratyush Yadav <pratyush@kernel.org>,
-  sagis@google.com,  Paolo Bonzini <pbonzini@redhat.com>,  Mike Rapoport
- <rppt@kernel.org>,  Alexander Graf <graf@amazon.com>,
-  linux-kselftest@vger.kernel.org,  andre.przywara@arm.com,
-  michael.roth@amd.com,  linux-kernel@vger.kernel.org,  linux-mm@kvack.org,
-  will@kernel.org,  vannapurve@google.com,  maz@kernel.org,
-  fvdl@google.com,  kvm@vger.kernel.org,  oliver.upton@linux.dev,
-  kvmarm@lists.linux.dev,  alexandru.elisei@arm.com,  skhawaja@google.com,
-  aneesh.kumar@kernel.org,  linux-doc@vger.kernel.org,  David Hildenbrand
- <david@kernel.org>,  yan.y.zhao@intel.com,  kexec@lists.infradead.org,
-  suzuki.poulose@arm.com
-Subject: Re: [PATCH v4 05/11] KVM: LUO: Support VM preservation across live
- updates
-In-Reply-To: <anphyjFv3FhF61iB@google.com> (Sean Christopherson's message of
-	"Mon, 10 Aug 2026 16:42:02 -0700")
-References: <20260728121138.1103610-1-tarunsahu@google.com>
-	<20260728121138.1103610-6-tarunsahu@google.com>
-	<anphyjFv3FhF61iB@google.com>
-Date: Tue, 11 Aug 2026 13:31:43 +0200
-Message-ID: <2vxzpkzo51wg.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tIExOq1t"
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-69fec8b4638so11481a12.0
+        for <kvmarm@lists.linux.dev>; Tue, 11 Aug 2026 05:17:40 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1786450659; cv=none;
+        d=google.com; s=arc-20260327;
+        b=rokKoUWhSw83zPSqWkmlWn+IOYhjhAmG6QDYGkYsPXQS7+KsJfkjwvIpVxj1FbjxiB
+         7Qadwodr2PUHIOMxeb/xhF3B8TYZkQNiLvasCZL/wXcf5TB3Pm25IJ93cXDASGEdRXPQ
+         8fOajpCj6DFgfeVi+CSL2u3+Vo73C0gLx7XDXDRcsVuCtDgt3c1DY2wNOnb91xzNU5Pb
+         nUAs4+30oP+y2xP0D3+m5x4lpDSdLR+wYFl8p5rTMvbw4NbMrmju9noXqu2BOE5WYv5U
+         bYorGyvvoJKwsE/LLgNPUyfjZo+IwdaIQXmExpUn0m5hTjEmGF9pTI50ZOPejJjdkndv
+         njmw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=+g0yyxU25w21pcLuXRAHww3PrvUBtCpd+aa0SHubV3M=;
+        fh=3i6Lp6aAtdIWk5bn8VpHUckueNakMlGxIe0xPq7L4mk=;
+        b=ayvYt09BXeRd4ltIlyTa/rHBCTtaSAsFvhTPK/h69oGiO95pNF60xpZFbA21Lh9oKy
+         6J1HDeiVGKaE+5DGiphig6VRYYrb9Bd7NQdw2NbUJXssgLySDvGuDRXkIGqfbj7cFC4b
+         V441gXJY6UF2HoLI0bBJiR6cvxRLwBLwDhfvyD80oScTCvxacfFsy4659UBJjUTwgDLX
+         XYyYT+Xg3v5Wz45P6flejT2d1oUqhI2scf9iXQy9jOQuo09ZGpoR28noX6wsoL/2euOB
+         w5JaaYiFfbO7UexUg8VFjTdM9FMDkiOf+kRhCjpyz7pMHKtWFoLNhuhyQqofuSzX6rJL
+         4xxg==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1786450659; x=1787055459; darn=lists.linux.dev;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=+g0yyxU25w21pcLuXRAHww3PrvUBtCpd+aa0SHubV3M=;
+        b=tIExOq1txBsmUk/c75ilZMISKfKEc3IUbg/Yz6ti+gQYZiaD+HFWAXt0yODkRehBxe
+         Q5dh9rMr5FlqCHZ5TunwDuQBLAkLzuwwmk0XZs7p4bssuvSqZ2WdTugi+5yRcCNweVCy
+         YA04FWGbO5q+7sAAmXRQtjA1sfGP/v+1d+5VK/E6vqji1NsL34CAA/rsXe3aym2hlVjE
+         Dj2aDTDgdUDn7C9rfu2qD6CSXDE3dc4Z4pIv+aFGCVFWrx+zAPlvStQdDcxIks3pxlZh
+         ShwnpqIZ6RMRxmrhHFT9WubYtZ1fU/vmC3olas8jR8C9pM8FJ4OIjKvyRuHw/5ZNRfDb
+         0GEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786450659; x=1787055459;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=+g0yyxU25w21pcLuXRAHww3PrvUBtCpd+aa0SHubV3M=;
+        b=EXa0OUyRCUEt/x1s0oD27DdXfVxZXGdeY3Re0+7wn45BI1EuWNQzz0Kq4B9xlVWZNn
+         wEOJWg1fohIA2aiouSVXb6AeMINrbtZ8zuZfFWedd6UVxclb+u4X3iZj8XZYMQ1w/fS2
+         +pLpOb7W2QiQci1mImOcfdUAIRn/XBZjyveYl4z0T8+F6ID8klRMDXbl13O6s/SM10eJ
+         vIUJcdtck09BTlw08ZdP0r0daCe76Y0ob0Gm48uydlbUUXnq0Ms76DbvU+iV2Y2FUffO
+         fAoNzo6pnsmN833ACFyras00WXpgS9/WBf9lkAQcUKhngQZ1c4pXyO3t8Mz2o58pYACo
+         Sogw==
+X-Forwarded-Encrypted: i=1; AHgh+RpaF8DCyFR+hbyu5r74IIlPNZKwnhQ0uaNfSNQVp/7SgpFVM7MuCQs2NNMzqz3m9VG0CKLvmMc=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwwLNXMJh7043G++lAer+icNvm5Knk9bKgM6lLp0r9xeqhHtsPt
+	bWaSXwaywE3f/AozuYdb93Jw3AS1T16ocHau9RmN9sgBhAGAWoYMN2zosJeWjEhnEJEAfeti6Ka
+	csjsyAQCUIVTdhH4Tmr6UlhOka90mNOKPkY/GaF07
+X-Gm-Gg: AR+sD12MM/HFtGDvXmluo1B+saFeHTfLNxPggyV2XlQ8+LOzjap7O4MH0DOEtxXMxwO
+	MxGqnQM9R80glnYcBghZyCCz3u6AO4JNN5AjnB6L2beix7KMnBsSj2MjuQayvLyKNRMdY9mh7S4
+	uEvXYnfKufqjnHd6jh7cHraUvZaXQ7To3kCkRjBgWKDtoVKZkZvfXuw0728pIqtNaIo5j3NsX61
+	0qcByUpDZanFTNTn7/NeMDXylPprSdfV29L+/MovU5ETCUC9tQZAHpXdbT16jD1oNYHknNt+8Fh
+	h3QlwzMjh74yBjzWXfGshTAhyTqMIqIpTbqC4QjOpRVufg6UpnpYU1zaQnBz/vJJqRtgJqaczgI
+	=
+X-Received: by 2002:a05:6402:1843:b0:67b:7d05:60b8 with SMTP id
+ 4fb4d7f45d1cf-6a3697f7d29mr8059a12.10.1786450658392; Tue, 11 Aug 2026
+ 05:17:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20260808085824.732659-1-smostafa@google.com> <178621460524.381735.15023846552532101058.b4-ty@kernel.org>
+In-Reply-To: <178621460524.381735.15023846552532101058.b4-ty@kernel.org>
+From: Mostafa Saleh <smostafa@google.com>
+Date: Tue, 11 Aug 2026 13:17:25 +0100
+X-Gm-Features: AUfX_mylL7mka5X7s4oaoqXqkvT0gVqweb7ayJRqhutnUStI5GPh-r5yrwruQqA
+Message-ID: <CAFgf54qY8c9wO_RHQZpVSKUCTOgr+WWKCxetjb6BGf-G=5OTSA@mail.gmail.com>
+Subject: Re: [PATCH v2 0/3] KVM: arm64: Fixes for timers and pKVM
+To: Oliver Upton <oupton@kernel.org>
+Cc: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, maz@kernel.org, seiden@linux.ibm.com, 
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	catalin.marinas@arm.com, will@kernel.org, vdonnefort@google.com, 
+	tabba@google.com, sebastianene@google.com, keirf@google.com, 
+	yaoyuan@linux.alibaba.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Aug 10 2026, Sean Christopherson wrote:
-
-> On Tue, Jul 28, 2026, Tarun Sahu wrote:
->> Register a Live Update Orchestrator (LUO) file handler for KVM VM files
->> to serialize and deserialize VM state across kexec live updates.
->> 
->> Currently, Only VM type (e.g. arch.vm_type on x86) is preserved as part
->> of VM preservation.
+On Sat, Aug 8, 2026 at 7:44=E2=80=AFPM Oliver Upton <oupton@kernel.org> wro=
+te:
 >
-> Why?
+> On Sat, 08 Aug 2026 08:58:21 +0000, Mostafa Saleh wrote:
+> > What started as a  small patch ended up as a 3 patch series thanks
+> > to Sashiko.
+> >
+> > First patch from Marc to consolidate the offset calculation,
+> > follow up patches fix issues with non-protected VM and timer
+> > offset and protected VM running with broken CNTVOFF_EL2.
+> >
+> > [...]
 >
->> On retrieval, kvm_luo_retrieve() recreates the KVM VM file via
->> kvm_create_vm_file() and use an atomically incremented ID for the internal
->> fdname, as the final fdname assigned by userspace is not yet known during
->> retrieval. As this fdname is only used in debugfs infra, This will not break
->> any UAPI.
->> 
->> This infrastructure establishes the foundation for preserving guest_memfd
->> instances across live updates, and can be expanded in the future to
->> preserve additional VM state.
+> Dropped the unintended SOB in patch 3 you mentioned.
 >
-> Uh, why guest_memfd?  As much as I want to push guest_memfd adoption, it seems
-> guest_memfd should be the _last_ thing we support, not the first.  As evidenced
-> by the last two decades, it's very doable to have KVM VMs without guest_memfd,
-> but it's rather hard to have VMs without vCPUs.
-
-You _can_ preserve vCPUs today using KVM_{GET,SET}_REGS, they just won't
-run in the background during the reboot. This series can save you from
-dumping VM memory to disk if it is backed by guest_memfd.
-
+> Applied to next, thanks!
 >
->> Also updates MAINTAINERS to include virt/kvm/kvm_luo.c and
->> include/linux/kho/abi/kvm.h.
->> 
->> Signed-off-by: Tarun Sahu <tarunsahu@google.com>
->> ---
->>  MAINTAINERS                 |  11 ++
->>  include/linux/kho/abi/kvm.h |  39 ++++++++
->>  virt/kvm/Makefile.kvm       |   1 +
->>  virt/kvm/kvm_luo.c          | 195 ++++++++++++++++++++++++++++++++++++
->>  virt/kvm/kvm_main.c         |   8 ++
->>  virt/kvm/kvm_mm.h           |   8 ++
->>  6 files changed, 262 insertions(+)
->>  create mode 100644 include/linux/kho/abi/kvm.h
->>  create mode 100644 virt/kvm/kvm_luo.c
->> 
->> diff --git a/MAINTAINERS b/MAINTAINERS
->> index a3ed337e827d..0283f0fd6ef4 100644
->> --- a/MAINTAINERS
->> +++ b/MAINTAINERS
->> @@ -14539,6 +14539,17 @@ S:	Maintained
->>  F:	Documentation/devicetree/bindings/leds/backlight/kinetic,ktz8866.yaml
->>  F:	drivers/video/backlight/ktz8866.c
->>  
->> +KVM LIVE UPDATE
->> +M:	Pasha Tatashin <pasha.tatashin@soleen.com>
->> +M:	Mike Rapoport <rppt@kernel.org>
->> +M:	Pratyush Yadav <pratyush@kernel.org>
->> +R:	Tarun Sahu <tarunsahu@google.com>
->> +L:	kexec@lists.infradead.org
->> +L:	kvm@vger.kernel.org
->> +S:	Maintained
->> +T:	git git://git.kernel.org/pub/scm/linux/kernel/git/liveupdate/linux.git
+> [1/3] KVM: arm64: Make timer_get_offset() work in all contexts
+>       https://git.kernel.org/kvmarm/kvmarm/c/2858600ecd01
+> [2/3] KVM: arm64: Fix timer offsets for non-protected VMs
+>       https://git.kernel.org/kvmarm/kvmarm/c/47d3eef780e3
+> [3/3] KVM: arm64: Fix hvhe and broken CNTVOFF_EL2
+>       https://git.kernel.org/kvmarm/kvmarm/c/2e813a6e8ebe
 >
-> NAK on taking changes through a different tree.  This is KVM code, period.
->
-> In general, I'm skeptical of the dedicated MAINTAINERS entry.  It's extremely
-> difficult to tell since this series is little more than a skeleton (either that
-> or liveupdate is way simpler that I was expecting), but I suspect that maintaining
 
-It's a bit of both. This series of course doesn't support everything
-that guest_memfd can. At the same time, I also keep being (pleasantly)
-surprised at preservation being relatively simple. For example, the code
-to preserve a shmem file (via memfd) is roughly 600 lines, a big chunk
-of which is comments. The code of course has some limitations, but it is
-good enough for use in production.
+Thanks Oliver! I believe there is one more bug. I'm not sure where the
+bug is or if it relates to the broken timers.
+Before those patches I could not boot a protected VM because of the
+panic, now after booting protected VMs, I sometimes get a system
+reset.
+I confirmed that cntvoff_el2 does not get written to non-zero, I also
+removed the sysreg write completely (rely on xzr value at init) so my
+guess is that the HW might be allergic to more than just non-zero
+values in cntvoff_el2.
+I do not have issues with non-protected VMs anymore.
 
-> liveupdate for KVM (or for any subsystem) will require more subsystem-specific
-> knowledge than liveupdate knowledge.
->
-> E.g. the LUO APIs seem pretty straightforward; I assume the bulk of the complexity
-> is going to be in knowing what to save/restore, and how, which is much more about
-> KVM than it is about liveupdate.
+Thanks,
+Mostafa
 
-I think it is fine if you want to take these changes through the KVM
-tree, but I would like live update maintainers to be listed as reviewers
-at least.
 
-For one, we care about ABI breakages and versioning. The serialized
-state is a part of live update ABI and changes to it should be ACKed by
-us. For another, how the file handlers interact with their dependencies
-can affect the behaviour that VMMs observe. Those changes should also
-pass by some live update eyes.
 
-So I think we should have a separate entry for KVM LIVE UPDATE that
-lists the live update maintainers (or perhaps only kexec@) as a
-reviewer. The patches can still flow through KVM tree but we'd get a
-chance to ACK/NACK them.
 
-Of course this all can evolve later as we see fit but I think this is a
-good starting point.
-
->
->> +F:	virt/kvm/kvm_luo.c
->> +
->>  KVM PARAVIRT (KVM/paravirt)
->>  M:	Paolo Bonzini <pbonzini@redhat.com>
->>  R:	Vitaly Kuznetsov <vkuznets@redhat.com>
-[...]
-
--- 
-Regards,
-Pratyush Yadav
+> --
+> Best,
+> Oliver
