@@ -1,272 +1,197 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8EE943D50D
-	for <kvmarm@lists.linux.dev>; Wed, 12 Aug 2026 15:37:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3F0F4756C1;
+	Wed, 12 Aug 2026 15:40:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786549054; cv=none; b=V0uFfS5P8+YPnJt5kdMgbe6dSRf4SCus6ECu7k0geHBj84Yw4atwR4/374WaIKf5N767dBL9neZo1K91Wmr536E3fJVsXtdMw7q+yXCs7IhkrDssozFvQOX4IYk0IGbgkvPHqu825Gmg/W8rd9boTMktQ4J6oeR29Ne7olm3osw=
+	t=1786549221; cv=none; b=rqjf96Eigo9PAn69GhzBSngmQS4JQR5n+a9OWsrpXIrsCQ+06f166VEeW7a9MYbMl+NOm03YEt8GuAisLk1KatZQFaO4Gr2h0bVi/lA9d++6f7dCyT/o0KcYLSPgkWbO9LEAwqZGevjr5gobRP16jIHu04fudl4mSt+GGVvL9Dc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786549054; c=relaxed/simple;
-	bh=aDIXAEzAicxkD4XEiv+JHiFLBMEArebacVqMOtVuAvw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UMKxeFMcSTs6aFuv4zw/1XPBXqXQm4KDIBiB+YpTRCUcM7dfsFxRFEMq32sd3zxE6XCtZxYqz3mfYhyfSqnSagG7XZJ+p9dSM/sTbmZgUcqM5YfeJJU8CX7W7ouQhCJd1si4+AP3VoNGV/bP0Ot7QrNFg+FmhZs7GJl5Y5uw75M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ptpb5dTC; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1786549221; c=relaxed/simple;
+	bh=zN/WiVKoMI3rKwUNQzf/CFzkgl2DOGa4/+tIpa89YXg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LeLwC+Bq3uaiAAg7yBaJ7Ekh6GWrGvjN1ARTfbBivEWrE7V3X50DlYiG9MP2ttE8dcTn5hYRe44ZntdBFrYMscQwabMpr2ryOvLzd6RYoQlxSZOHlbtMWGg1h60+AqRupPf/nveViWR84bRG9faeq8IA/BvphC1XZmYsp5GTXvk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=P5KBS1DD; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ptpb5dTC"
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67CE1U1T1816401;
-	Wed, 12 Aug 2026 15:36:47 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=paNchfOTWdMKv9FJr
-	N/nKZAvpQCN48XSKdz47wR3WCE=; b=ptpb5dTCPffv9T303JSGqMdLDpOtDLKbP
-	hGKYfdbJHhDG9SN6FaTG5VdBDLrRgQs0BOLK+fB2+P2/5vV3mK2EvUJFSaIKowhw
-	78kTHcxcvmVNT+XLmFKhwY9TohSisFSWeBK0Xbe0i0UPlqljGBhAU2Ysou0YbZ5B
-	fTP6ScKnF6kZJG3yGCLIuC49qi/9F0DAdYVouAOfR3FUUcu7Ca6u0O4+VVuf8g4R
-	uj4rajpDjN99ccpKdtnN50a55xVoEQCfzB7f/NmtEvtU9NtOtKqkNLzXNKO/PkaR
-	yN5NL/qsI17eNXybNT8zjNpJBy3TaLsI0+MTIq2GZ6V1u3I6JeUbg==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fwvk0381f-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 12 Aug 2026 15:36:46 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 67CFBKx2018652;
-	Wed, 12 Aug 2026 15:36:45 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4fxf5w6tdf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 12 Aug 2026 15:36:45 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 67CFafIs49545500
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 12 Aug 2026 15:36:41 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 502FA2004B;
-	Wed, 12 Aug 2026 15:36:41 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 01B092004F;
-	Wed, 12 Aug 2026 15:36:41 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 12 Aug 2026 15:36:40 +0000 (GMT)
-From: Steffen Eiden <seiden@linux.ibm.com>
-To: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
-        Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@kernel.org>,
-        Friedrich Welter <fritz@linux.ibm.com>, Fuad Tabba <tabba@google.com>,
-        Gautam Gala <ggala@linux.ibm.com>,
-        Hariharan Mari <hari55@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Hendrik Brueckner <brueckner@linux.ibm.com>,
-        Ilya Leoshkevich <iii@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
-        Marc Zyngier <maz@kernel.org>, Nico Boehr <nrb@linux.ibm.com>,
-        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
-        Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v6 24/33] KVM: s390: Use arm64 code
-Date: Wed, 12 Aug 2026 17:36:20 +0200
-Message-ID: <20260812153631.3376090-25-seiden@linux.ibm.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260812153631.3376090-1-seiden@linux.ibm.com>
-References: <20260812153631.3376090-1-seiden@linux.ibm.com>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="P5KBS1DD"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9C0611596;
+	Wed, 12 Aug 2026 08:40:11 -0700 (PDT)
+Received: from [10.57.44.219] (unknown [10.57.44.219])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2EBD43F66F;
+	Wed, 12 Aug 2026 08:40:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1786549215; bh=zN/WiVKoMI3rKwUNQzf/CFzkgl2DOGa4/+tIpa89YXg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=P5KBS1DDcDt2umaSj9ukE+Pf/OEVx8CX3GAxEaA33tJPWUKE5tNdg3+HnYhNXUYF/
+	 mcjVrCElP6IQxLr4ZZoJse04WLDbVWovt/TSx0KU9vcCZqryPCmzA5Y8rMQtu26f7e
+	 VHpO83jjPRPU35BRVOF/cj2zH5ONRHBA9BWEqetM=
+Message-ID: <2c04aab0-99e3-47e6-808d-9662dd5b1a10@arm.com>
+Date: Wed, 12 Aug 2026 16:40:09 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODEyMDEyNiBTYWx0ZWRfX0ph/DOSarjSF
- +YiRgT7n4se5StELOZgOig+FH1QpKID4M+XSqExSP2n0dZ9jxJUp6zG9Kv7J4Z2GgJ9MFUpn1by
- hZNtVIcNABkAWpJE05aZj+9DqVUyuk7pyBlP8uWaJDBGv+qm6zL8IsfuAJ7x2WOCCULX5mfXiOc
- 2ZVjGgOnAmnY6RRtsI6Fp4DdnBF2dYintlc+2J8wsYsVMWnFuZ4nBAuEGEJt4+zI4ZovJoDEah8
- cJ5OgsnzO88BEzbHIu9fDrUo39SkuwUiA9yR1TJjrJnRE/wWIsF260N2uZv5HvFwrVBHzvpi4z2
- ZYN7hEjuNd0ec/mobm6lDSaetQIuJ1FbwIeaulQJe8tCK9HYARh0mO43K8Qal7f0sGw2nEPZfvC
- f3AZuhjWbBIWtUoxWJ5V6jw20l0Or+34q8uTY2PXTgwbudzUxq9VqDmk+xby1iiPILzQCDWaqjC
- +NPd5VioinmjVuqWyXA==
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODEyMDEyNiBTYWx0ZWRfX9bJhdGGOurDP
- MZDfYggZkGcmXiq6XkqeOxK7e15GiwjbcJptNIHL5Oouqf+y4Rkmum3mB/IR0voa8lczzPFcrrr
- NujtGumglCd/WkomMVzc6jRv9zR766A=
-X-Authority-Analysis: v=2.4 cv=RqD16imK c=1 sm=1 tr=0 ts=6a7c930f cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
- a=uAbxVGIbfxUO_5tXvNgY:22 a=VnNF1IyMAAAA:8 a=x1b9RNJZmR4nZInT6RoA:9
-X-Proofpoint-GUID: Wk3lkGnltghMJCG-hewYrwIZFT9DP1a2
-X-Proofpoint-ORIG-GUID: cTH3nKZmSq9UlDzDntXatl3wgED-Qsy8
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-08-12_04,2026-08-12_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 priorityscore=1501 suspectscore=0 lowpriorityscore=0
- clxscore=1015 adultscore=0 bulkscore=0 malwarescore=0 impostorscore=0
- spamscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
- definitions=main-2608120126
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v16 29/45] KVM: arm64: CCA: Support runtime faulting of
+ memory
+Content-Language: en-GB
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
+ Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
+ Lorenzo Pieralisi <lpieralisi@kernel.org>
+References: <20260803134403.80630-1-steven.price@arm.com>
+ <20260803134403.80630-30-steven.price@arm.com> <antC5JOxDPs7i876@arm.com>
+ <b512db4b-793b-4dd1-baac-e873b39f5b0b@arm.com> <anx9195WR8wokAcL@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <anx9195WR8wokAcL@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Add the infrastructure to extract KVM/arm64 code into s390 at built
-time similar to the arm64 header sharing. Add copy-arm64c.awk hat
-detects ARM64_S390_COMMON markers and extracts marked section into an
-.inc file that can be consumed by arm on s390 host code. If no marker is
-found make will fail.
+On 12/08/2026 15:06, Catalin Marinas wrote:
+> On Wed, Aug 12, 2026 at 10:01:48AM +0100, Suzuki K Poulose wrote:
+>> On 11/08/2026 16:42, Catalin Marinas wrote:
+>>> On Mon, Aug 03, 2026 at 02:43:45PM +0100, Steven Price wrote:
+>>>> At runtime if the realm guest accesses memory which hasn't yet been
+>>>> mapped then KVM needs to either populate the region or fault the guest.
+>>>>
+>>>> For memory in the lower (protected) region of IPA a fresh page is
+>>>> provided to the RMM which will zero the contents. For memory in the
+>>>> upper (shared) region of IPA, the memory from the memslot is mapped
+>>>> into the realm VM non secure.
+>>>
+>>> Is this still true with in-place guestmem conversion?
+>>>
+>>>> @@ -1693,7 +1709,14 @@ static int gmem_abort(const struct kvm_s2_fault_desc *s2fd)
+>>>>    	kvm_fault_lock(kvm);
+>>>>    	if (mmu_invalidate_retry(kvm, mmu_seq)) {
+>>>>    		ret = -EAGAIN;
+>>>> -		goto out_unlock;
+>>>> +		goto out_release_page;
+>>>> +	}
+>>>> +
+>>>> +	if (kvm_is_realm(kvm)) {
+>>>> +		prot &= ~KVM_PGTABLE_PROT_X;
+>>>> +		ret = realm_map_ipa(kvm, s2fd->fault_ipa, pfn,
+>>>> +				    PAGE_SIZE, prot, memcache);
+>>>> +		goto out_release_page;
+>>>>    	}
+>>>
+>>> [...]
+>>>
+>>>> +int realm_map_ipa(struct kvm *kvm, phys_addr_t ipa,
+>>>> +		  kvm_pfn_t pfn, unsigned long map_size,
+>>>> +		  enum kvm_pgtable_prot prot,
+>>>> +		  struct kvm_mmu_memory_cache *memcache)
+>>>> +{
+>>>> +	struct realm *realm = &kvm->arch.realm;
+>>>> +
+>>>> +	ipa = ALIGN_DOWN(ipa, map_size);
+>>>> +	if (!kvm_realm_is_private_address(realm, ipa)) {
+>>>> +		return realm_map_non_secure(kvm, ipa, pfn, map_size, prot,
+>>>> +					    memcache);
+>>>> +	}
+>>>> +
+>>>> +	/* It's impossible to map protected pages read-only. */
+>>>> +	if (WARN_ON(!(prot & KVM_PGTABLE_PROT_W)))
+>>>> +		return -EFAULT;
+>>>> +	return realm_map_protected(kvm, ipa, pfn, map_size, memcache);
+>>>> +}
+>>>
+>>> I was trying to understand (with the help of some LLMs) to understand
+>>> whether we can end up on the do_gpf() path as a result of VMM actions.
+>>> The above kvm_realm_is_private_address() only checks for the IPA but
+>>> does not check against guestmem if the page is truly private. I probably
+>>> miss something but the scenario would be something like:
+>>>
+>>> 1. VMM creates the gmem region with GUEST_MEMFD_FLAG_MMAP |
+>>>      GUEST_MEMFD_FLAG_INIT_SHARED, mmap()able and GUP-pinnable
+>>>
+>>> 2. VMM starts an O_DIRECT write() from that mapping; the block layer
+>>>      FOLL_PINs the shared folio
+>>>
+>>> 3. VMM runs a vCPU so the realm touches the protected-IPA alias of the
+>>>      same gfn. gmem_abort() delegates the pinned, still-shared page to
+>>>      the RMM
+>>>
+>>> 4. The in-flight I/O then reads the now-Realm page from the kernel
+>>>      linear map. That access takes a GPF at EL1, so do_gpf() ->
+>>>      die_kernel_fault()
+>>
+>> This is correct. The fundamental issue is that we have a disconnect
+>> between the "gmem attribute" changes (to private/shared) and the
+>> RIPAS and this is something we want to fix.
+>>
+>> e.g., the KVM CCA driver sets the entire DRAM to RIPAS_RAM for
+>> the Realm before ACTIVATION and we expect that the VMM changes
+>> the gmem to PRIVATE. They both are not in sync. his is something
+>> we were discussing the other day with Aneesh.
+>>
+>> Once they are in sync, we are protected. If the RIPAS=EMPTY
+>> (gmem=shared) a stage2 fault doesn't come to the Host.
+>>
+>> If the RIPAS=RAM, the gmem is private and there are no usespace
+>> mappings.
+>>
+>> The reason why it is disconnected at the moment is due to the
+>> weird semantics for Guest triggered conversions in CCA
+>> i.e., Realm requests via RSI_IPA_STATE_SET, triggering a RIPAS_CHANGE
+>> exit to the KVM.
+>>
+>> The KVM exits to VMM with MEMORY_FAULT_EXIT and the VMM can service this
+>> by invoking GMEM(SET_ATTRIBUTES2).
+> 
+> I guess a buggy or malicious VMM may skip the gmem attribute setting and
+> simply resume the guest. Currently we can end up with SET_RIPAS
+> irrespective of what the VMM did. So at this point maybe we need to
+> check that the gmem attribute was actually changed before handling the
+> pending RMI requests.
+> 
+> The other place to check the gmem status is when handling the
+> gmem_abort().
 
-To ensure that no code is consumed twice by accident a guard is added
-during file generation. A s390 C file wanting to consume such an inc
-file must first define __INCL_GEN_ARM_FILE otherwise the inc file will
-emit a compile error.
+We did have that check in v14 [0] and forcing a MEMORY_FAULT_EXIT. I 
+thought we didn't need it with in-place conversion, but looks like that was
+wrong call.
 
-Example:
-	#define __INCL_GEN_ARM_FILE
-	#include <generated/arm.inc>
-	#undef __INCL_GEN_ARM_FILE
 
-Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
----
- arch/s390/kvm/arm64/.gitignore      |  2 +
- arch/s390/kvm/arm64/Makefile.gen    | 29 ++++++++++++
- arch/s390/kvm/arm64/copy-arm64c.awk | 72 +++++++++++++++++++++++++++++
- 3 files changed, 103 insertions(+)
- create mode 100644 arch/s390/kvm/arm64/.gitignore
- create mode 100644 arch/s390/kvm/arm64/Makefile.gen
- create mode 100644 arch/s390/kvm/arm64/copy-arm64c.awk
+[0] 
+https://lore.kernel.org/all/20260513131757.116630-30-steven.price@arm.com/
 
-diff --git a/arch/s390/kvm/arm64/.gitignore b/arch/s390/kvm/arm64/.gitignore
-new file mode 100644
-index 000000000000..bd9d90694676
---- /dev/null
-+++ b/arch/s390/kvm/arm64/.gitignore
-@@ -0,0 +1,2 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+generated/*
-diff --git a/arch/s390/kvm/arm64/Makefile.gen b/arch/s390/kvm/arm64/Makefile.gen
-new file mode 100644
-index 000000000000..cb9482eb947b
---- /dev/null
-+++ b/arch/s390/kvm/arm64/Makefile.gen
-@@ -0,0 +1,29 @@
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# Extracts ARM64 marked sections to .inc files that are included by main source
-+# files
-+
-+# List of ARM64 C files to extract
-+ARM64_CFILES := \
-+	arm.c \
-+	guest.c \
-+	handle_exit.c \
-+	mmio.c \
-+
-+quiet_cmd_extract_inc = GEN     $@
-+      cmd_extract_inc = mkdir -p $(dir $@); \
-+                        $(AWK) -f $(src)/copy-arm64c.awk $< > $@ || \
-+                        { echo "Error: No or unbalanced ARM64_S390_COMMON markers in $<" >&2; rm -f $@; exit 1; }
-+
-+$(obj)/generated/%.inc: $(srctree)/arch/arm64/kvm/%.c $(src)/copy-arm64c.awk FORCE
-+	$(call if_changed,extract_inc)
-+
-+ARM64_INC_FILES := $(foreach cfile,$(ARM64_CFILES),generated/$(basename $(cfile)).inc)
-+
-+targets += $(ARM64_INC_FILES)
-+clean-files += generated/*.inc
-+
-+$(addprefix $(obj)/,$(kvm-arm64-obj)): $(addprefix $(obj)/,$(ARM64_INC_FILES))
-+
-+$(foreach cfile,$(basename $(ARM64_CFILES)),\
-+	$(eval $(obj)/$(cfile).o: $(obj)/generated/$(cfile).inc))
-diff --git a/arch/s390/kvm/arm64/copy-arm64c.awk b/arch/s390/kvm/arm64/copy-arm64c.awk
-new file mode 100644
-index 000000000000..20bd73c52ec4
---- /dev/null
-+++ b/arch/s390/kvm/arm64/copy-arm64c.awk
-@@ -0,0 +1,72 @@
-+#!/usr/bin/awk -f
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# Extract marked sections from ARM64 C files for sharing with s390 KVM
-+#
-+# Usage: share-arm64-cfile.awk <input_file>
-+#
-+# Extracts all sections between start/end markers. If no markers found, signals failure.
-+
-+BEGIN {
-+	# Constants
-+	start_pattern = "^#ifdef ARM64_S390_COMMON$"
-+	end_pattern = "^#endif /\\* ARM64_S390_COMMON \\*/$"
-+
-+	# State variables
-+	copying = found_marker = 0
-+	file_header_done = 0
-+}
-+
-+!file_header_done {
-+	if (/^\/\*/ || /^\/\/ SPDX-License-Identifier:/) {
-+		print
-+		next
-+	}
-+	if (/[[:space:]]\*([[:space:]]|$)/) {
-+		print
-+		next
-+	}
-+	if (/\*\//) {
-+		print " *"
-+	} else {
-+		print "/*"
-+	}
-+
-+	filename = FILENAME
-+	sub(/^.*arch\/arm64\//, "arch/arm64/", filename)
-+	print " * This file was automatically generated from " filename
-+	print " * Do not modify this file directly."
-+	print " */"
-+	print ""
-+	print "#ifndef __INCL_GEN_ARM_FILE"
-+	print "#error included .inc file w/o proper guard definition"
-+	print "#else"
-+	print "#undef __INCL_GEN_ARM_FILE"
-+	print "#endif /* __INCL_GEN_ARM_FILE */"
-+	print ""
-+
-+	file_header_done = 1
-+}
-+
-+$0 ~ start_pattern {
-+	if (copying) { exit 1 }
-+	copying = found_marker = 1
-+	next
-+}
-+
-+$0 ~ end_pattern {
-+	if (!copying) { exit 1 }
-+	copying = 0
-+	next
-+}
-+
-+copying {
-+	gsub(/#include <asm\//, "#include <arm64/")
-+	gsub(/#include <uapi\/asm\//, "#include <uapi/arm64/")
-+	print
-+	next
-+}
-+
-+END {
-+	exit !found_marker || copying
-+}
--- 
-2.53.0
+
+> 
+> I wonder whether we can have any races with either of these if multiple
+> vCPUs toggle the RIPAS state between RAM and EMPTY and we need both
+> places (the RIPAS_CHANGE exit and the actual stage 2 fault).
+> 
+>> But, the KVM needs to invoke the
+>> RMI_RTT_SET_RIPAS in the context of the "vcpu", which we don't have
+>> from the "kvm" context. I guess we can fix it by running through the
+>> vcpus and find the matching one with the "ipa" range and the "ripas".
+> 
+> Or multiple vcpus? Does the spec allow multiple RIPAS_CHANGE requests
+> for the same IPA? If yes, we probably need to clear all.
+
+Ideally, a guest shouldn't pass overlapping requests to the host. Host
+could reject either of them, irrespective of the order we got it.
+
+I will get this clarified in the spec.
+
+Cheers
+Suzuki
+
+
 
