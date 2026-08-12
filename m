@@ -1,44 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4990321E097
-	for <kvmarm@lists.linux.dev>; Wed, 12 Aug 2026 19:32:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0137F379C2A
+	for <kvmarm@lists.linux.dev>; Wed, 12 Aug 2026 19:33:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786563140; cv=none; b=kOQkkV3UjgIWFY/7+0CzGzMn35UHN48NRaLvYOqamsWIph2nywvOokK5/BmsoszChRR9fnIVw+MQfGq+T9gXzjiC5N7RK78YiFfHQoIf7nFY7yd68Wk9SzDjDXVorJIlwnFSrcDU+Gw3yusa4xgCCgXCKSZx4QC2A/6SHBlwRFQ=
+	t=1786563212; cv=none; b=TCGntQT6UUUz9G48jxOEo5zUwBCE4AeYYFrIA/tstbL1U1mDc8dplBSR8MKiedfXizN+mmKR9o4o5raGTXng6gg2vLI2wl891CUq/7oJ144Yj86ThYsB/ww90rc8WdObBmdSQXWCpGCx5g3E0DlQu5BWmIZd7uRCqQDqhsBO2yw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786563140; c=relaxed/simple;
-	bh=afLZ+QxEJHFLC9npPGlWHd8b0CsS643E04/bWoU0UCw=;
+	s=arc-20240116; t=1786563212; c=relaxed/simple;
+	bh=5d9t/9xRwxNYE4UPY3s3mpOSX28NwlrZvzH4wdf2Iio=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=solsqEL7Jx0vGirr4VOrqBFWtiq0dW+hAAlvNkV601dNXtpf+gZN7YYdlqMC2dQW4eNpZuaef5F6F63MeiOmJ4sWBGU4ptSNPT/WyA7kQm+dTMZmER9MulZUvoucMKM4sppGx9+f0rYfalMvJc3Rvv91Q5ZoK9sxa+acqpMUQkQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S0QLr9hL; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=nj06V7Net/5nEdQryh7U06wAdFejlEU6gNKAmQccnS1Eqgauu8Je/9GUfgJ37l1mUHuvTBcRghq1gfezSDDDzlCd4WvSkomzIRY7Nguy1fA7giCKMPiilEFVoM0/S5BmsTlTry9+ARUy2rrCaJtrpHrzByNcHN5BtaroHpLMHsw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TpCOJY/s; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S0QLr9hL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD3B41F000E9;
-	Wed, 12 Aug 2026 19:32:18 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TpCOJY/s"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51CB31F000E9;
+	Wed, 12 Aug 2026 19:33:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786563138;
-	bh=0x/MXPBLacf8BpJzLCogNMaUscn6aARIpCexozdSkzg=;
+	s=k20260515; t=1786563210;
+	bh=jMSRT4EvpIpdYQnVNmlaFXCTBJnmwLqpaXYAHohAb4s=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=S0QLr9hLnHNfM6i5JigfMZkUcaSE2K8vA3R36rcZ6r+2PkXkmCqvKwNPJ3528jtYZ
-	 q+DtgxPts+Fr6yGcBBfvNCej8NQcgweAhf0bW7Wc9ML3ou/M2Hq+0wR++t2BqUCm5y
-	 aMk8Xp5hGbyuT+50TQbuLI3/Mffj9sL/psdtgDIbSAvrmUh4Fyx6uufKCtVsj98sbc
-	 QQQMkYHAJU9YFdFcjveFangvaCWzm/yH4vDR4WwKdqFz7B/mrnTaU/yvcOR0NRHx/W
-	 q+6X/0ddmBrrblD11Cfd3MMj2dFvYOBG4HoVzxJ692IMlceWvcqlljRWo+qJW0gAD6
-	 DTJ/35ld0Pbmw==
+	b=TpCOJY/srjgiEtj+lk2ZR3szR7pV6x8dUtcOA8u8490fHXQmWpflD4efk4X4+qHAu
+	 1+vZLfOxLBob2vj276gdWVWRLJ64OyS45XwcSlBOV9Rl0ZkFe8Fq9aD/CEHOR4Noql
+	 yPY9yPGlxQP7rNp6wR+aPxEoH1BZEWBEabyI1UfYykH3NHxDRV9FODuKwj2YmCygCh
+	 lS3226U7KjqoG+X/E4sLb8doFRA/6Codb9wGsRcL0n2dhLShYHQexDsAHKwo3OHcye
+	 bSXwcI+5x4AzVU9a9E5GS0WsLKNkXKe2mRhSLuHqAZd8HVKmUiSTKGH2/jb9SBj4sq
+	 V0F98jdLJogPg==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v19 07/14] KVM: arm64: Forward GCS exceptions to nested
- guests
+Subject: Re: [PATCH v19 05/14] KVM: arm64: Set PSTATE.EXLOCK when entering
+ an exception
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Mark Brown" <broonie@kernel.org>
-Cc: kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>
-In-Reply-To: <20260812-arm64-gcs-v19-7-9105afd828ac@kernel.org>
+Cc: "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20260812-arm64-gcs-v19-5-9105afd828ac@kernel.org>
 References: <20260812-arm64-gcs-v19-0-9105afd828ac@kernel.org>
- <20260812-arm64-gcs-v19-7-9105afd828ac@kernel.org>
+ <20260812-arm64-gcs-v19-5-9105afd828ac@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 12 Aug 2026 19:32:18 +0000
-Message-Id: <20260812193218.AD3B41F000E9@smtp.kernel.org>
+Date: Wed, 12 Aug 2026 19:33:29 +0000
+Message-Id: <20260812193330.51CB31F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,63 +48,91 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [Medium] `kvm_handle_gcs` uses `vcpu_has_nv(vcpu)` instead of `is_nested_=
-ctxt(vcpu)` to forward GCS exceptions, bypassing safety warnings and misrou=
-ting unexpected L1 traps.
+- [Medium] `compute_exlock()` uses `is_hyp_ctxt(vcpu)` to select between `G=
+CSCR_EL1` and `GCSCR_EL2`, which evaluates the current execution context ra=
+ther than the explicit target exception level.
 --
 
---- Patch [7]: [PATCH v19 07/14] KVM: arm64: Forward GCS exceptions to nest=
-ed guests ---
-commit f418917369df0c1bc3138d818288366ea3e842e1
+--- Patch [5]: [PATCH v19 05/14] KVM: arm64: Set PSTATE.EXLOCK when enterin=
+g an exception ---
+commit 0b3b4f11382cdcd92d8ee1a1c35e2013e9df99ba
 Author: Mark Brown <broonie@kernel.org>
 
-KVM: arm64: Forward GCS exceptions to nested guests
+KVM: arm64: Set PSTATE.EXLOCK when entering an exception
 
-This commit adds handling to forward GCS exceptions to nested guests when
-HFGITR_EL2.nGCSSTR_EL1 is clear or for GCS data check exceptions in an L2
-guest.
+This commit implements the management of PSTATE.EXLOCK when entering an
+exception in KVM's AArch64 exception injection path. When taking an excepti=
+on
+to the same EL, EXLOCK is set to the value of GCSCR_ELx.EXLOCKEN.
 
-> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-> index 54aedf93c78b6..63dcc4a0e69a8 100644
-> --- a/arch/arm64/kvm/handle_exit.c
-> +++ b/arch/arm64/kvm/handle_exit.c
+> diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exceptio=
+n.c
+> index bef40ddb16dbc..15b00e0ee1ec7 100644
+> --- a/arch/arm64/kvm/hyp/exception.c
+> +++ b/arch/arm64/kvm/hyp/exception.c
 [ ... ]
-> +/*
-> + * We might get GCS exceptions that need to be forwarded to the
-> + * hypervisor when a nested guest has HFGITR_EL2.nGCSSTR_EL1 clear, or
-> + * for a GCS data check exception for a L2 guest.
-> + */
->  static int kvm_handle_gcs(struct kvm_vcpu *vcpu)
->  {
-> -	/* We don't expect GCS, so treat it with contempt */
-> -	if (kvm_has_feat(vcpu->kvm, ID_AA64PFR1_EL1, GCS, IMP))
-> -		WARN_ON_ONCE(1);
-> +	if (!kvm_has_gcs(vcpu->kvm)) {
-> +		kvm_inject_undefined(vcpu);
-> +		return 1;
-> +	}
+> @@ -65,6 +65,38 @@ static void __vcpu_write_spsr_und(struct kvm_vcpu *vcp=
+u, u64 val)
+>  		vcpu->arch.ctxt.spsr_und =3D val;
+>  }
 > =20
-> +	if (vcpu_has_nv(vcpu)) {
+> +static unsigned long compute_exlock(struct kvm_vcpu *vcpu,
+> +				    unsigned long mode,
+> +				    unsigned long target_mode)
+> +{
+> +	u64 gcscr;
+> +
+> +	if (!kvm_has_gcs(kern_hyp_va(vcpu->kvm)))
+> +		return 0;
+> +
+> +	/* GCS can't be enabled for 32 bit */
+> +	if (mode & PSR_MODE32_BIT)
+> +		return 0;
+> +
+> +	/* When taking an exception to a higher EL EXLOCK is cleared. */
+> +	if ((mode | PSR_MODE_THREAD_BIT) !=3D target_mode)
+> +		return 0;
+> +
+> +	/*
+> +	 * When taking an exception to the same EL EXLOCK is set to
+> +	 * the effective value of GCSR_ELx.EXLOCKEN.
+> +	 */
+> +	if (is_hyp_ctxt(vcpu))
+> +		gcscr =3D __vcpu_read_sys_reg(vcpu, GCSCR_EL2);
+> +	else
+> +		gcscr =3D __vcpu_read_sys_reg(vcpu, GCSCR_EL1);
 
 [Severity: Medium]
-Does this code use the correct check for nested execution here?
+Does this code read the correct GCSCR_ELx register if the target exception
+level differs from the current hypervisor context?
 
-By checking vcpu_has_nv() instead of is_nested_ctxt(), if an unexpected GCS
-trap occurs while executing the L1 guest, KVM will erroneously forward the
-trap to the L1 virtual EL2.
+By using is_hyp_ctxt(vcpu), this evaluates the current execution context
+(for example, if HCR_EL2.TGE is set) rather than relying on target_mode. In
+enter_exception64(), the target mode is explicitly used to select the
+correct registers:
 
-Should this check be is_nested_ctxt(vcpu) so that unexpected L1 traps fall
-through to the host WARN_ON_ONCE and correctly inject an UNDEF?
+	switch (target_mode) {
+	case PSR_MODE_EL1h:
+		vbar =3D __vcpu_read_sys_reg(vcpu, VBAR_EL1);
+		sctlr =3D __vcpu_read_sys_reg(vcpu, SCTLR_EL1);
+		...
 
-> +		kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
-> +		return 1;
-> +	}
+If KVM injects an exception to EL1 (where target_mode =3D=3D PSR_MODE_EL1h)
+while is_hyp_ctxt(vcpu) evaluates to true, compute_exlock() would
+incorrectly read GCSCR_EL2 instead of GCSCR_EL1.
+
+Should this logic be updated to use target_mode =3D=3D PSR_MODE_EL2h instea=
+d of
+is_hyp_ctxt(vcpu) to ensure consistency with the rest of the exception
+injection path?
+
 > +
-> +	WARN_ON_ONCE(1);
->  	kvm_inject_undefined(vcpu);
->  	return 1;
->  }
+> +	if (gcscr & GCSCR_ELx_EXLOCKEN)
+> +		return PSR_EXLOCK_BIT;
+> +
+> +	return 0;
+> +}
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260812-arm64-gcs-=
-v19-0-9105afd828ac@kernel.org?part=3D7
+v19-0-9105afd828ac@kernel.org?part=3D5
