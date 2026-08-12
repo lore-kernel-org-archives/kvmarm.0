@@ -1,57 +1,58 @@
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28351470EB6
-	for <kvmarm@lists.linux.dev>; Wed, 12 Aug 2026 15:36:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8CAA46AA67
+	for <kvmarm@lists.linux.dev>; Wed, 12 Aug 2026 15:37:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786549022; cv=none; b=ca/zCi8D4TKw4YRGyYqxYFUu4bjuYWBBGRL6JUQjUmuGFZI9mhzPNxlb4aKZciZua73TJCp0lfzOE4tjwreRRnKlZKiwrEkMNkXR6MjEuL0KNGBTa1KykC+yDUjdzZSMAecBasxHmgYMDZXYITFCq+Trxscjkjk8eH9/QS6eQgc=
+	t=1786549026; cv=none; b=GbgiCfKnb8449MbnSM85L9N95vIMD2j6LlF6IbahDHJ+IPKnd57l1Rxpsn/9F2xdKe/lrYVxk4Ni/42FJlFsGseIU1mpyS7poMtIATPOn71i6Rss5rDZXiePsHKfKzXTFFU2RI4Xzgbv/r01sWgJobQeoKg5vxGSIYj3QIEh0Ng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786549022; c=relaxed/simple;
-	bh=n3z6+ADK4s80ht8PPFuqP9gqlcBgx+fAfILpx9ECUCM=;
+	s=arc-20240116; t=1786549026; c=relaxed/simple;
+	bh=uOcF1zD1XNDj2iXI9EzY9mfpPt/FXOE/SA6gY8bVyx8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XlEPXxPbP4R0wa1qhOIh33otqcqd/ilAHMppLP9+NC2tYOAtQPpDMSwjEdTSqVcoKGFHuQsgauSeNJB2TC6Nm21RoQRdtH9cFV4ZF6fQ6EFq+eJI3YSzDJtTevO++Jnh4zZwh2MSuL3sg01X4PShfvpts9b96ih/iUZ8uP6iGOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=fjvLmaSQ; arc=none smtp.client-ip=148.163.156.1
+	 MIME-Version:Content-Type; b=K1ugqTqWJV8X+Y02g+zwP8Vm6jQ/eX0KpvCORFAv7Qn4BukY8ryw5AK6CYOdtdzS2pap2Z/nLnMj2dvI79X3MWiy6lChvvQPkslbWBd09YkPcoMeczKLXMT3UKRqoS9yJZ7E5CIeIMdv34NiHHWdbB7WNi2kMx606aylSzQZZmE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=rR9egrau; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="fjvLmaSQ"
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67CE1RsT3686399;
-	Wed, 12 Aug 2026 15:36:41 GMT
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="rR9egrau"
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67CE1UBZ1816396;
+	Wed, 12 Aug 2026 15:36:38 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=jbrY1Z1fuhnAvoemp
-	nnGD1Lf2vQL6r8+6XRighIy7Wg=; b=fjvLmaSQZXjUt+B6EJARGTC3HCCh5Ohde
-	Lg+I/LxNRt5spxV25ivPKbLSu2V27Mtqp0mxmYFL34cLpxcFtZy/yfcpVvubbj7p
-	5QbwrIFuM2Vv8VvxB0ow4EqWxx8j3qYVoxcZTCwdDmJGiWTDuRfuyypclUXdz6R4
-	kfM2wHAaqueEGXBcYsoRqqwc6edc0dK4HnSd8K6nbm2k/aJ/Fvrfcwrh8znvTfBC
-	ALneoS4GMlCnax3NPoencz6/1yIFFGSY5Fypks4ELVuMAT0QqXD1fw56fhB5EeJx
-	xhn8fFhklGK8Zf7SZELLCmk6jXXJg3eaEMhPZeZT957RiWrM3szpw==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fwvm9u9th-1
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=/5NL9D
+	O/LCOIeBJYhlzjg0RPSv1yXhjruJs23EtLbMw=; b=rR9egrauJDdTNZ4sBpxhgZ
+	6mRcA61jxuHt1yi0ni9FjsLR1xBVRz+DuxGaYph+IptMHB+AYkONqMPkIAMfF66M
+	7/y0Qy3gY6BxgXbPsMxpJzDQEuUK6f3PkdQImu3ikk6fmxyqxKxeykM7gMzcpEeo
+	BBcBj3DWEMpl2wc+tM5qNgUfh+capnWvJ+utPO7k++9z8nGb+utYLKsDgNUdOkM7
+	aMWgFSXDQRTkniFlQu0ke9lvs1CeAZDAzqA/2rlCm83MI/b0epVZhv/DGUE3HUTn
+	9v5b/3O+zf1fuEVofC6EKVX4I8+UZZL5SxT+8q81g8T+ypW+GCbthoMbXzLA9pvA
+	==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fwvk0380c-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 12 Aug 2026 15:36:40 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 67CFQTf4024859;
-	Wed, 12 Aug 2026 15:36:39 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4fxfsjxpj6-1
+	Wed, 12 Aug 2026 15:36:37 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 67CFQHOM021704;
+	Wed, 12 Aug 2026 15:36:36 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4fxhfy6g3g-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 12 Aug 2026 15:36:39 +0000 (GMT)
+	Wed, 12 Aug 2026 15:36:36 +0000 (GMT)
 Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 67CFaZ1M38469992
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 67CFaWqT35717612
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 12 Aug 2026 15:36:35 GMT
+	Wed, 12 Aug 2026 15:36:33 GMT
 Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id F3F7820040;
-	Wed, 12 Aug 2026 15:36:34 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id CE8742004E;
+	Wed, 12 Aug 2026 15:36:32 +0000 (GMT)
 Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id ADC2B2004E;
-	Wed, 12 Aug 2026 15:36:34 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 664A02004D;
+	Wed, 12 Aug 2026 15:36:32 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
 	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 12 Aug 2026 15:36:34 +0000 (GMT)
+	Wed, 12 Aug 2026 15:36:32 +0000 (GMT)
 From: Steffen Eiden <seiden@linux.ibm.com>
 To: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
         linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
@@ -78,9 +79,9 @@ Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
         Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v6 07/33] KVM: arm64: Access elements of vcpu_gp_regs individually
-Date: Wed, 12 Aug 2026 17:36:03 +0200
-Message-ID: <20260812153631.3376090-8-seiden@linux.ibm.com>
+Subject: [PATCH v6 01/33] vfio: Use file-based reference counting for KVM
+Date: Wed, 12 Aug 2026 17:35:57 +0200
+Message-ID: <20260812153631.3376090-2-seiden@linux.ibm.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260812153631.3376090-1-seiden@linux.ibm.com>
 References: <20260812153631.3376090-1-seiden@linux.ibm.com>
@@ -90,182 +91,639 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODEyMDEyNiBTYWx0ZWRfX8OZMeRXGegtI
- QKyiLvL/lhjkU+DTakyaX5JPV23g0btqovRLufAVQ2KCcWJlLZOXo0ynzHhOe8m9uGRnbDXgvVN
- yo8k6My/B4SZS7cTToa+6hxeNVoBEzmcnxZ3VaFNgKEYJtrPWArzFcxVcOtAuzAwd/XEOJc9mn9
- M3niq6ELrET/8jzJcXkZx5Ld3a2LjUgDH4xEvG3Pbik90SP7Rm5xPfi3OUO/nVzIMvWiYfbrWZc
- oHjV+fCP2YOyqH+ZdPH87AI/Palcp4jTqIYTvd2CstMj0e5bXxcONiGX0mGr7DYBWvaC9x//K+h
- BxYbmGjSHkts6tckpj7q5v/iudL9ENhm2T67gqpYQMLyXOP3G00PeQCRxfGG9ujzXDoUGtGn2RF
- tppEhTEN0otcTAkmU5cwCwAgCZ2FnhBjhgoj/zCqr2FqRLozo6wgPWhaZrYpqvtxmPfypfy7OaS
- CzWceRwduf+Ptwv1XEA==
-X-Proofpoint-ORIG-GUID: X9rjb23duR4IfjNUTcfpdrjj0jqCZtrQ
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODEyMDEyNiBTYWx0ZWRfX43IrGf2VWKvS
- NfEiNCjxD4TTpigsCCBWz+QDZmBYPtRTAUl1hx4RMB4SgGco2238u7Oz5qRpzhWcXDRkL+ifkHY
- h2SEifs+smlN0M0P+5TsTLJoQOWcZt8=
-X-Authority-Analysis: v=2.4 cv=IfK3n2qa c=1 sm=1 tr=0 ts=6a7c9308 cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
- a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
- a=U7nrCbtTmkRpXpFmAIza:22 a=VnNF1IyMAAAA:8 a=0bZ0xZpKCs-q1FEIZIEA:9
-X-Proofpoint-GUID: Iv_hC1INciEPlHlkbETAoBX9hnqyvuJI
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODEyMDEyNiBTYWx0ZWRfXxAVS7HSTpWB9
+ g7fP50abyPZerqWSYDope405Egt8jTS08PYdST2faGhKQKlunIYX6JXMqhKNpVbxPUCEWBx5c1K
+ arHrUZKC8tphL+fWm3xBoOtfgs5L7SrWhEpXhuQo+l/4U35HlUpqFngDqaOLUU64m72hgB2GGdo
+ kb3aAEPnOnDa4jgWYJjOHxzsTDZRejCQE7PUyqso3LAiSMafgXSvN84W7xQSEEpMXD6FLlLMELj
+ 1nC4DFmJ1fYLTa2zEkb6CY5PwoCzOkDcJu7zbfcqdAgY3rS8usENbbRZF2bPmZyVF2PLsGFHa9p
+ sK8PkYhvxG5tGcK3GlstRfRpSllY9Zzw+h8NYRDsV/BAK7TIN3Zfap+XIkATPGgrhoZQKb0lg/b
+ IFJNuwpBh7Sj7oCGFdxPxGuL/jFCEX42PWvSknkPYnDjimLj6G1Cj6tD4RBNnGWBmKGinlXRabo
+ DO92A6mlANNDzMG+FmQ==
+X-Proofpoint-Spam-Info: AW1haW4tMjYwODEyMDEyNiBTYWx0ZWRfX/BXwSuGKiKj8
+ FFfhUFDTPx+D3wiQDz5AQBMfeDCTJX52pv7thdMnDBrkMF0/Cosm9pbFYvJs2AhHPMjqgf60hCt
+ LrLJw/4gBNJQ4c6ioZQURG/pFB245Tc=
+X-Authority-Analysis: v=2.4 cv=RqD16imK c=1 sm=1 tr=0 ts=6a7c9306 cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=IkcTkHD0fZMA:10 a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=uAbxVGIbfxUO_5tXvNgY:22 a=Ikd4Dj_1AAAA:8
+ a=1XWaLZrsAAAA:8 a=VnNF1IyMAAAA:8 a=cFm4mksYcdg9GKIP9xkA:9 a=3ZKOabzyN94A:10
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: yBHl0QxAJqzQt7qjTPFFOCUdDnfVramG
+X-Proofpoint-ORIG-GUID: NbXaTicKfGWwKZQ_vNSULy1AMpFKRX7z
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
  definitions=2026-08-12_04,2026-08-12_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 priorityscore=1501 impostorscore=0 bulkscore=0 clxscore=1015
- lowpriorityscore=0 adultscore=0 malwarescore=0 spamscore=0 suspectscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2608120126
+ phishscore=0 priorityscore=1501 suspectscore=0 lowpriorityscore=0
+ clxscore=1015 adultscore=0 bulkscore=0 malwarescore=0 impostorscore=0
+ spamscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
+ adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
+ definitions=main-2608120126
 
-While for arm64 the members of vcpu_gp_regs are allocated continuous
-this is not necessarily true for other architectures implementing ARM.
+Replace manual module reference counting with file-based reference
+counting for KVM integration. Previously, VFIO used symbol_get() to
+obtain function pointers for kvm_get_kvm_safe() and kvm_put_kvm(),
+then manually tracked module references through these symbols. This
+approach required storing the put_kvm function pointer in each device
+and carefully managing symbol references. Remove the put_kvm field in
+struct vfio_device as is it no longer used.
 
-Let vcpu_gp_regs() no longer return the address of the user_pt_regs in
-the vcpu context but the address of the gp-register array field in the
-user_pt_reg struct. Note, this change semantically excludes pc from the
-GPRs.
+Pass struct file pointers instead of struct kvm pointers throughout the
+VFIO-KVM interface. This leverages the kernel's existing file reference
+counting mechanism via get_file_active() and fput(), eliminating the
+need for manual module reference tracking. The file->private_data field
+provides access to the underlying struct kvm when needed.
 
-No functional change.
+This simplifies the code and removes all remaining externally exported
+symbols for KVM, paving the path for a second concurrent KVM module.
 
-Co-developed-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+Co-developed-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
 ---
- arch/arm64/include/asm/kvm_emulate.h       | 14 ++++++++------
- arch/arm64/include/asm/kvm_host.h          |  2 +-
- arch/arm64/kvm/hyp/exception.c             |  4 ++--
- arch/arm64/kvm/hyp/include/hyp/adjust_pc.h |  4 ++--
- arch/arm64/kvm/hyp/include/hyp/switch.h    |  4 ++--
- 5 files changed, 15 insertions(+), 13 deletions(-)
+ arch/x86/include/asm/kvm_page_track.h |  8 ++---
+ arch/x86/kvm/Makefile                 |  3 --
+ arch/x86/kvm/mmu/page_track.c         | 16 +++++----
+ drivers/s390/crypto/vfio_ap_ops.c     | 30 ++++++++++++----
+ drivers/s390/crypto/vfio_ap_private.h |  1 +
+ drivers/vfio/device_cdev.c            |  2 +-
+ drivers/vfio/group.c                  |  4 +--
+ drivers/vfio/pci/vfio_pci_zdev.c      |  7 +++-
+ drivers/vfio/vfio.h                   | 10 +++---
+ drivers/vfio/vfio_main.c              | 52 +++++++--------------------
+ include/linux/kvm_host.h              |  7 ++++
+ include/linux/vfio.h                  |  5 ++-
+ virt/kvm/kvm_main.c                   | 22 ++++++++++--
+ virt/kvm/vfio.c                       |  8 ++---
+ 14 files changed, 97 insertions(+), 78 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index a3c1928bdf74..8603766c1b4d 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -133,12 +133,12 @@ static inline void vcpu_set_vsesr(struct kvm_vcpu *vcpu, u64 vsesr)
+diff --git a/arch/x86/include/asm/kvm_page_track.h b/arch/x86/include/asm/kvm_page_track.h
+index 3d040741044b..046a25c8fe4f 100644
+--- a/arch/x86/include/asm/kvm_page_track.h
++++ b/arch/x86/include/asm/kvm_page_track.h
+@@ -44,13 +44,13 @@ struct kvm_page_track_notifier_node {
+ 				    struct kvm_page_track_notifier_node *node);
+ };
  
- static __always_inline unsigned long *vcpu_pc(const struct kvm_vcpu *vcpu)
- {
--	return (unsigned long *)&vcpu_gp_regs(vcpu)->pc;
-+	return (unsigned long *)&vcpu->arch.ctxt.regs.pc;
- }
+-int kvm_page_track_register_notifier(struct kvm *kvm,
++int kvm_page_track_register_notifier(struct file *file,
+ 				     struct kvm_page_track_notifier_node *n);
+-void kvm_page_track_unregister_notifier(struct kvm *kvm,
++void kvm_page_track_unregister_notifier(struct file *file,
+ 					struct kvm_page_track_notifier_node *n);
  
- static __always_inline unsigned long *vcpu_cpsr(const struct kvm_vcpu *vcpu)
- {
--	return (unsigned long *)&vcpu_gp_regs(vcpu)->pstate;
-+	return (unsigned long *)&vcpu->arch.ctxt.regs.pstate;
- }
- 
- static __always_inline bool vcpu_mode_is_32bit(const struct kvm_vcpu *vcpu)
-@@ -167,14 +167,14 @@ static inline void vcpu_set_thumb(struct kvm_vcpu *vcpu)
- static __always_inline unsigned long vcpu_get_reg(const struct kvm_vcpu *vcpu,
- 					 u8 reg_num)
- {
--	return (reg_num == 31) ? 0 : vcpu_gp_regs(vcpu)->regs[reg_num];
-+	return (reg_num == 31) ? 0 : vcpu_gp_regs(vcpu)[reg_num];
- }
- 
- static __always_inline void vcpu_set_reg(struct kvm_vcpu *vcpu, u8 reg_num,
- 				unsigned long val)
- {
- 	if (reg_num != 31)
--		vcpu_gp_regs(vcpu)->regs[reg_num] = val;
-+		vcpu_gp_regs(vcpu)[reg_num] = val;
- }
- 
- static inline bool vcpu_is_el2_ctxt(const struct kvm_cpu_context *ctxt)
-@@ -750,13 +750,15 @@ static inline void kvm_reset_vcpu_core(struct kvm_vcpu *vcpu)
- 		pstate = VCPU_RESET_PSTATE_EL1;
- 
- 	/* Reset core registers */
--	memset(vcpu_gp_regs(vcpu), 0, sizeof(*vcpu_gp_regs(vcpu)));
-+	memset(vcpu_gp_regs(vcpu), 0, sizeof(vcpu_gp_regs(vcpu)));
-+	*vcpu_pc(vcpu) = 0;
-+	vcpu->arch.ctxt.regs.sp = 0;
- 	memset(&vcpu->arch.ctxt.fp_regs, 0, sizeof(vcpu->arch.ctxt.fp_regs));
- 	vcpu->arch.ctxt.spsr_abt = 0;
- 	vcpu->arch.ctxt.spsr_und = 0;
- 	vcpu->arch.ctxt.spsr_irq = 0;
- 	vcpu->arch.ctxt.spsr_fiq = 0;
--	vcpu_gp_regs(vcpu)->pstate = pstate;
-+	*vcpu_cpsr(vcpu) = pstate;
- }
- 
- /* PSCI reset handling for a vcpu. */
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 27fe0cd5b2d7..46c8d7928b3f 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -1158,7 +1158,7 @@ struct kvm_vcpu_arch {
- #define vcpu_clear_on_unsupported_cpu(vcpu)				\
- 	vcpu_clear_flag(vcpu, ON_UNSUPPORTED_CPU)
- 
--#define vcpu_gp_regs(v)		(&(v)->arch.ctxt.regs)
-+#define vcpu_gp_regs(v)		((v)->arch.ctxt.regs.regs)
- 
+-int kvm_write_track_add_gfn(struct kvm *kvm, gfn_t gfn);
+-int kvm_write_track_remove_gfn(struct kvm *kvm, gfn_t gfn);
++int kvm_write_track_add_gfn(struct file *file, gfn_t gfn);
++int kvm_write_track_remove_gfn(struct file *file, gfn_t gfn);
+ #else
  /*
-  * Only use __vcpu_sys_reg/ctxt_sys_reg if you know you want the
-diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
-index 754e2dc1df54..0640c9ccaa3c 100644
---- a/arch/arm64/kvm/hyp/exception.c
-+++ b/arch/arm64/kvm/hyp/exception.c
-@@ -276,12 +276,12 @@ static void enter_exception32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
- 	switch(mode) {
- 	case PSR_AA32_MODE_ABT:
- 		__vcpu_write_spsr_abt(vcpu, host_spsr_to_spsr32(spsr));
--		vcpu_gp_regs(vcpu)->compat_lr_abt = return_address;
-+		vcpu_gp_regs(vcpu)[__compat_lr_abt] = return_address;
- 		break;
+  * Allow defining a node in a structure even if page tracking is disabled, e.g.
+diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
+index 0474604ab8a1..70645c2cd8ed 100644
+--- a/arch/x86/kvm/Makefile
++++ b/arch/x86/kvm/Makefile
+@@ -61,9 +61,6 @@ exports_grep_trailer := --include='*.[ch]' -nrw $(srctree)/virt/kvm $(srctree)/a
+ 				-e kvm_page_track_unregister_notifier \
+ 				-e kvm_write_track_add_gfn \
+ 				-e kvm_write_track_remove_gfn \
+-				-e kvm_get_kvm \
+-				-e kvm_get_kvm_safe \
+-				-e kvm_put_kvm
  
- 	case PSR_AA32_MODE_UND:
- 		__vcpu_write_spsr_und(vcpu, host_spsr_to_spsr32(spsr));
--		vcpu_gp_regs(vcpu)->compat_lr_und = return_address;
-+		vcpu_gp_regs(vcpu)[__compat_lr_und] = return_address;
- 		break;
+ # Force grep to emit a goofy group separator that can in turn be replaced with
+ # the above newline macro (newlines in Make are a nightmare).  Note, grep only
+diff --git a/arch/x86/kvm/mmu/page_track.c b/arch/x86/kvm/mmu/page_track.c
+index 7e8195a311bb..860049ed24ea 100644
+--- a/arch/x86/kvm/mmu/page_track.c
++++ b/arch/x86/kvm/mmu/page_track.c
+@@ -237,10 +237,11 @@ static int kvm_enable_external_write_tracking(struct kvm *kvm)
+  * register the notifier so that event interception for the tracked guest
+  * pages can be received.
+  */
+-int kvm_page_track_register_notifier(struct kvm *kvm,
++int kvm_page_track_register_notifier(struct file *file,
+ 				     struct kvm_page_track_notifier_node *n)
+ {
+ 	struct kvm_page_track_notifier_head *head;
++	struct kvm *kvm = file_to_kvm(file);
+ 	int r;
+ 
+ 	if (!kvm || kvm->mm != current->mm)
+@@ -252,7 +253,7 @@ int kvm_page_track_register_notifier(struct kvm *kvm,
+ 			return r;
  	}
  
-diff --git a/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h b/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h
-index 4fdfeabefeb4..a049983bd5c3 100644
---- a/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h
-@@ -33,11 +33,11 @@ static inline void kvm_skip_instr(struct kvm_vcpu *vcpu)
- static inline void __kvm_skip_instr(struct kvm_vcpu *vcpu)
+-	kvm_get_kvm(kvm);
++	get_file(file);
+ 
+ 	head = &kvm->arch.track_notifier_head;
+ 
+@@ -267,10 +268,11 @@ EXPORT_SYMBOL_GPL(kvm_page_track_register_notifier);
+  * stop receiving the event interception. It is the opposed operation of
+  * kvm_page_track_register_notifier().
+  */
+-void kvm_page_track_unregister_notifier(struct kvm *kvm,
++void kvm_page_track_unregister_notifier(struct file *file,
+ 					struct kvm_page_track_notifier_node *n)
  {
- 	*vcpu_pc(vcpu) = read_sysreg_el2(SYS_ELR);
--	vcpu_gp_regs(vcpu)->pstate = read_sysreg_el2(SYS_SPSR);
-+	*vcpu_cpsr(vcpu) = read_sysreg_el2(SYS_SPSR);
+ 	struct kvm_page_track_notifier_head *head;
++	struct kvm *kvm = file_to_kvm(file);
  
- 	kvm_skip_instr(vcpu);
+ 	head = &kvm->arch.track_notifier_head;
  
--	write_sysreg_el2(vcpu_gp_regs(vcpu)->pstate, SYS_SPSR);
-+	write_sysreg_el2(*vcpu_cpsr(vcpu), SYS_SPSR);
- 	write_sysreg_el2(*vcpu_pc(vcpu), SYS_ELR);
+@@ -279,7 +281,7 @@ void kvm_page_track_unregister_notifier(struct kvm *kvm,
+ 	write_unlock(&kvm->mmu_lock);
+ 	synchronize_srcu(&head->track_srcu);
+ 
+-	kvm_put_kvm(kvm);
++	fput(file);
+ }
+ EXPORT_SYMBOL_GPL(kvm_page_track_unregister_notifier);
+ 
+@@ -339,8 +341,9 @@ void kvm_page_track_delete_slot(struct kvm *kvm, struct kvm_memory_slot *slot)
+  * @kvm: the guest instance we are interested in.
+  * @gfn: the guest page.
+  */
+-int kvm_write_track_add_gfn(struct kvm *kvm, gfn_t gfn)
++int kvm_write_track_add_gfn(struct file *file, gfn_t gfn)
+ {
++	struct kvm *kvm = file_to_kvm(file);
+ 	struct kvm_memory_slot *slot;
+ 	int idx;
+ 
+@@ -369,8 +372,9 @@ EXPORT_SYMBOL_GPL(kvm_write_track_add_gfn);
+  * @kvm: the guest instance we are interested in.
+  * @gfn: the guest page.
+  */
+-int kvm_write_track_remove_gfn(struct kvm *kvm, gfn_t gfn)
++int kvm_write_track_remove_gfn(struct file *file, gfn_t gfn)
+ {
++	struct kvm *kvm = file_to_kvm(file);
+ 	struct kvm_memory_slot *slot;
+ 	int idx;
+ 
+diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+index 99a0efd999ef..875e67063d8e 100644
+--- a/drivers/s390/crypto/vfio_ap_ops.c
++++ b/drivers/s390/crypto/vfio_ap_ops.c
+@@ -8,6 +8,7 @@
+  *	      Halil Pasic <pasic@linux.ibm.com>
+  *	      Pierre Morel <pmorel@linux.ibm.com>
+  */
++#include "linux/cleanup.h"
+ #include <linux/string.h>
+ #include <linux/vfio.h>
+ #include <linux/device.h>
+@@ -1822,12 +1823,25 @@ static const struct attribute_group *vfio_ap_mdev_attr_groups[] = {
+  * @matrix_mdev: a mediated matrix device
+  * @kvm: reference to KVM instance
+  *
+- * Return: 0 if no other mediated matrix device has a reference to @kvm;
+- * otherwise, returns an -EPERM.
++ * Returns: 0 if the reference to kvm is successfully retrieved from @kvm_file
++ * and set into @matrix_mdev; otherwise, returns:
++ *	-ENOENT if a reference to kvm could not be retrieved from @kvm_file
++ *	-EPERM if another mediated matrix device already has a reference to the same kvm instance
+  */
+ static int vfio_ap_mdev_set_kvm(struct ap_matrix_mdev *matrix_mdev,
+-				struct kvm *kvm)
++				struct file **kvm_file)
+ {
++	struct file *kvm_file_ref __free(fput) = NULL;
++	struct kvm *kvm;
++
++	kvm_file_ref = get_file_active(kvm_file);
++	if (!kvm_file_ref)
++		return -ENOENT;
++
++	kvm = kvm_file_ref->private_data;
++	if (!kvm)
++		return -ENOENT;
++
+ 	if (kvm->arch.crypto.crycbd) {
+ 		get_update_locks_for_kvm(kvm);
+ 		if (kvm->arch.crypto.pqap_hook) {
+@@ -1836,10 +1850,11 @@ static int vfio_ap_mdev_set_kvm(struct ap_matrix_mdev *matrix_mdev,
+ 		}
+ 		kvm->arch.crypto.pqap_hook = &matrix_mdev->pqap_hook;
+ 
+-		kvm_get_kvm(kvm);
+ 		matrix_mdev->kvm = kvm;
+ 		vfio_ap_mdev_update_guest_apcb(matrix_mdev);
+ 		release_update_locks_for_kvm(kvm);
++
++		matrix_mdev->kvm_file = no_free_ptr(kvm_file_ref);
+ 	}
+ 
+ 	return 0;
+@@ -1878,9 +1893,10 @@ static void vfio_ap_mdev_dma_unmap(struct vfio_device *vdev, u64 iova,
+  */
+ static void vfio_ap_mdev_unset_kvm(struct ap_matrix_mdev *matrix_mdev)
+ {
++	struct file *kvm_file = matrix_mdev->kvm_file;
+ 	struct kvm *kvm = matrix_mdev->kvm;
+ 
+-	if (kvm && kvm->arch.crypto.crycbd) {
++	if (kvm_file && kvm && kvm->arch.crypto.crycbd) {
+ 		get_update_locks_for_kvm(kvm);
+ 		kvm->arch.crypto.pqap_hook = NULL;
+ 
+@@ -1889,7 +1905,7 @@ static void vfio_ap_mdev_unset_kvm(struct ap_matrix_mdev *matrix_mdev)
+ 		matrix_mdev->kvm = NULL;
+ 
+ 		release_update_locks_for_kvm(kvm);
+-		kvm_put_kvm(kvm);
++		fput(kvm_file);
+ 	}
  }
  
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 1ce7130e2549..a2a054fec2e2 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -470,7 +470,7 @@ static inline bool kvm_hyp_handle_mops(struct kvm_vcpu *vcpu, u64 *exit_code)
- 	u64 spsr;
+@@ -2053,7 +2069,7 @@ static int vfio_ap_mdev_open_device(struct vfio_device *vdev)
+ 	if (!vdev->kvm)
+ 		return -EINVAL;
  
- 	*vcpu_pc(vcpu) = read_sysreg_el2(SYS_ELR);
--	arm64_mops_reset_regs(vcpu_gp_regs(vcpu), vcpu->arch.fault.esr_el2);
-+	arm64_mops_reset_regs(&vcpu->arch.ctxt.regs, vcpu->arch.fault.esr_el2);
- 	write_sysreg_el2(*vcpu_pc(vcpu), SYS_ELR);
+-	return vfio_ap_mdev_set_kvm(matrix_mdev, vdev->kvm);
++	return vfio_ap_mdev_set_kvm(matrix_mdev, &vdev->kvm);
+ }
  
- 	/*
-@@ -902,7 +902,7 @@ static inline void synchronize_vcpu_pstate(struct kvm_vcpu *vcpu)
- 	/*
- 	 * Check for the conditions of Cortex-A510's #2077057. When these occur
- 	 * SPSR_EL2 can't be trusted, but isn't needed either as it is
--	 * unchanged from the value in vcpu_gp_regs(vcpu)->pstate.
-+	 * unchanged from the value in vcpu_cpsr(vcpu).
- 	 * Are we single-stepping the guest, and took a PAC exception from the
- 	 * active-not-pending state?
+ static void vfio_ap_mdev_close_device(struct vfio_device *vdev)
+diff --git a/drivers/s390/crypto/vfio_ap_private.h b/drivers/s390/crypto/vfio_ap_private.h
+index 9bff666b0b35..4ec91c6827eb 100644
+--- a/drivers/s390/crypto/vfio_ap_private.h
++++ b/drivers/s390/crypto/vfio_ap_private.h
+@@ -117,6 +117,7 @@ struct ap_matrix_mdev {
+ 	struct ap_matrix matrix;
+ 	struct ap_matrix shadow_apcb;
+ 	struct kvm *kvm;
++	struct file *kvm_file;
+ 	crypto_hook pqap_hook;
+ 	struct mdev_device *mdev;
+ 	struct ap_queue_table qtable;
+diff --git a/drivers/vfio/device_cdev.c b/drivers/vfio/device_cdev.c
+index 1d9515c967b0..e32176a55c46 100644
+--- a/drivers/vfio/device_cdev.c
++++ b/drivers/vfio/device_cdev.c
+@@ -65,7 +65,7 @@ int vfio_device_fops_cdev_open(struct inode *inode, struct file *filep)
+ static void vfio_df_get_kvm_safe(struct vfio_device_file *df)
+ {
+ 	spin_lock(&df->kvm_ref_lock);
+-	vfio_device_get_kvm_safe(df->device, df->kvm);
++	vfio_device_get_kvm_safe(df->device, &df->kvm);
+ 	spin_unlock(&df->kvm_ref_lock);
+ }
+ 
+diff --git a/drivers/vfio/group.c b/drivers/vfio/group.c
+index b2299e5bc6df..197298ca0003 100644
+--- a/drivers/vfio/group.c
++++ b/drivers/vfio/group.c
+@@ -163,7 +163,7 @@ static int vfio_group_ioctl_set_container(struct vfio_group *group,
+ static void vfio_device_group_get_kvm_safe(struct vfio_device *device)
+ {
+ 	spin_lock(&device->group->kvm_ref_lock);
+-	vfio_device_get_kvm_safe(device, device->group->kvm);
++	vfio_device_get_kvm_safe(device, &device->group->kvm);
+ 	spin_unlock(&device->group->kvm_ref_lock);
+ }
+ 
+@@ -860,7 +860,7 @@ bool vfio_group_enforced_coherent(struct vfio_group *group)
+ 	return ret;
+ }
+ 
+-void vfio_group_set_kvm(struct vfio_group *group, struct kvm *kvm)
++void vfio_group_set_kvm(struct vfio_group *group, struct file *kvm)
+ {
+ 	spin_lock(&group->kvm_ref_lock);
+ 	group->kvm = kvm;
+diff --git a/drivers/vfio/pci/vfio_pci_zdev.c b/drivers/vfio/pci/vfio_pci_zdev.c
+index 0990fdb146b7..d3a110101353 100644
+--- a/drivers/vfio/pci/vfio_pci_zdev.c
++++ b/drivers/vfio/pci/vfio_pci_zdev.c
+@@ -144,6 +144,7 @@ int vfio_pci_info_zdev_add_caps(struct vfio_pci_core_device *vdev,
+ int vfio_pci_zdev_open_device(struct vfio_pci_core_device *vdev)
+ {
+ 	struct zpci_dev *zdev = to_zpci(vdev->pdev);
++	struct kvm *kvm;
+ 
+ 	if (!zdev)
+ 		return -ENODEV;
+@@ -151,8 +152,12 @@ int vfio_pci_zdev_open_device(struct vfio_pci_core_device *vdev)
+ 	if (!vdev->vdev.kvm)
+ 		return 0;
+ 
++	kvm = vdev->vdev.kvm->private_data;
++	if (!kvm)
++		return -ENOENT;
++
+ 	if (zpci_kvm_hook.kvm_register)
+-		return zpci_kvm_hook.kvm_register(zdev, vdev->vdev.kvm);
++		return zpci_kvm_hook.kvm_register(zdev, kvm);
+ 
+ 	return -ENOENT;
+ }
+diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
+index 7728bc99b63d..7935c51ea1ac 100644
+--- a/drivers/vfio/vfio.h
++++ b/drivers/vfio/vfio.h
+@@ -23,7 +23,7 @@ struct vfio_device_file {
+ 	u8 access_granted;
+ 	u32 devid; /* only valid when iommufd is valid */
+ 	spinlock_t kvm_ref_lock; /* protect kvm field */
+-	struct kvm *kvm;
++	struct file *kvm;
+ 	struct iommufd_ctx *iommufd; /* protected by struct vfio_device_set::lock */
+ };
+ 
+@@ -88,7 +88,7 @@ struct vfio_group {
+ #endif
+ 	enum vfio_group_type		type;
+ 	struct mutex			group_lock;
+-	struct kvm			*kvm;
++	struct file			*kvm;
+ 	struct file			*opened_file;
+ 	struct iommufd_ctx		*iommufd;
+ 	spinlock_t			kvm_ref_lock;
+@@ -107,7 +107,7 @@ void vfio_device_group_unuse_iommu(struct vfio_device *device);
+ void vfio_df_group_close(struct vfio_device_file *df);
+ struct vfio_group *vfio_group_from_file(struct file *file);
+ bool vfio_group_enforced_coherent(struct vfio_group *group);
+-void vfio_group_set_kvm(struct vfio_group *group, struct kvm *kvm);
++void vfio_group_set_kvm(struct vfio_group *group, struct file *kvm);
+ bool vfio_device_has_container(struct vfio_device *device);
+ int __init vfio_group_init(void);
+ void vfio_group_cleanup(void);
+@@ -429,11 +429,11 @@ static inline void vfio_virqfd_exit(void)
+ #endif
+ 
+ #if IS_ENABLED(CONFIG_KVM)
+-void vfio_device_get_kvm_safe(struct vfio_device *device, struct kvm *kvm);
++void vfio_device_get_kvm_safe(struct vfio_device *device, struct file **kvm);
+ void vfio_device_put_kvm(struct vfio_device *device);
+ #else
+ static inline void vfio_device_get_kvm_safe(struct vfio_device *device,
+-					    struct kvm *kvm)
++					    struct file **kvm)
+ {
+ }
+ 
+diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+index 423ead48aafe..b06d1a911605 100644
+--- a/drivers/vfio/vfio_main.c
++++ b/drivers/vfio/vfio_main.c
+@@ -472,36 +472,17 @@ void vfio_unregister_group_dev(struct vfio_device *device)
+ EXPORT_SYMBOL_GPL(vfio_unregister_group_dev);
+ 
+ #if IS_ENABLED(CONFIG_KVM)
+-void vfio_device_get_kvm_safe(struct vfio_device *device, struct kvm *kvm)
++void vfio_device_get_kvm_safe(struct vfio_device *device, struct file **kvm)
+ {
+-	void (*pfn)(struct kvm *kvm);
+-	bool (*fn)(struct kvm *kvm);
+-	bool ret;
++	struct file *kvm_file_ref __free(fput) = NULL;
+ 
+ 	lockdep_assert_held(&device->dev_set->lock);
+ 
+-	if (!kvm)
++	kvm_file_ref = get_file_active(kvm);
++	if (!kvm_file_ref)
+ 		return;
+ 
+-	pfn = symbol_get(kvm_put_kvm);
+-	if (WARN_ON(!pfn))
+-		return;
+-
+-	fn = symbol_get(kvm_get_kvm_safe);
+-	if (WARN_ON(!fn)) {
+-		symbol_put(kvm_put_kvm);
+-		return;
+-	}
+-
+-	ret = fn(kvm);
+-	symbol_put(kvm_get_kvm_safe);
+-	if (!ret) {
+-		symbol_put(kvm_put_kvm);
+-		return;
+-	}
+-
+-	device->put_kvm = pfn;
+-	device->kvm = kvm;
++	device->kvm = no_free_ptr(kvm_file_ref);
+ }
+ 
+ void vfio_device_put_kvm(struct vfio_device *device)
+@@ -511,14 +492,7 @@ void vfio_device_put_kvm(struct vfio_device *device)
+ 	if (!device->kvm)
+ 		return;
+ 
+-	if (WARN_ON(!device->put_kvm))
+-		goto clear;
+-
+-	device->put_kvm(device->kvm);
+-	device->put_kvm = NULL;
+-	symbol_put(kvm_put_kvm);
+-
+-clear:
++	fput(device->kvm);
+ 	device->kvm = NULL;
+ }
+ #endif
+@@ -1544,7 +1518,7 @@ bool vfio_file_enforced_coherent(struct file *file)
+ }
+ EXPORT_SYMBOL_GPL(vfio_file_enforced_coherent);
+ 
+-static void vfio_device_file_set_kvm(struct file *file, struct kvm *kvm)
++static void vfio_device_file_set_kvm(struct file *file, struct file *kvm)
+ {
+ 	struct vfio_device_file *df = file->private_data;
+ 
+@@ -1560,22 +1534,22 @@ static void vfio_device_file_set_kvm(struct file *file, struct kvm *kvm)
+ 
+ /**
+  * vfio_file_set_kvm - Link a kvm with VFIO drivers
+- * @file: VFIO group file or VFIO device file
+- * @kvm: KVM to link
++ * @vfio_file: VFIO group file or VFIO device file
++ * @kvm: KVM file to link
+  *
+  * When a VFIO device is first opened the KVM will be available in
+  * device->kvm if one was associated with the file.
+  */
+-void vfio_file_set_kvm(struct file *file, struct kvm *kvm)
++void vfio_file_set_kvm(struct file *vfio_file, struct file *kvm)
+ {
+ 	struct vfio_group *group;
+ 
+-	group = vfio_group_from_file(file);
++	group = vfio_group_from_file(vfio_file);
+ 	if (group)
+ 		vfio_group_set_kvm(group, kvm);
+ 
+-	if (vfio_device_from_file(file))
+-		vfio_device_file_set_kvm(file, kvm);
++	if (vfio_device_from_file(vfio_file))
++		vfio_device_file_set_kvm(vfio_file, kvm);
+ }
+ EXPORT_SYMBOL_GPL(vfio_file_set_kvm);
+ 
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 03bfc92864b6..1c5bf2801bf1 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -784,6 +784,12 @@ struct kvm {
+ 	 * kvm_swap_active_memslots().
  	 */
+ 	struct mutex slots_arch_lock;
++	/*
++	 * Back-reference to VM file descriptor without extra refcount held.
++	 * Use get_file_active() to safely access the file without circular references.
++	 * RCU-protected to ensure safe access even during file release.
++	 */
++	struct file __rcu *file;
+ 	struct mm_struct *mm; /* userspace tied to this vm */
+ 	unsigned long nr_memslot_pages;
+ 	/* The two memslot sets - active and inactive (per address space) */
+@@ -1082,6 +1088,7 @@ void kvm_get_kvm(struct kvm *kvm);
+ bool kvm_get_kvm_safe(struct kvm *kvm);
+ void kvm_put_kvm(struct kvm *kvm);
+ bool file_is_kvm(struct file *file);
++struct kvm *file_to_kvm(struct file *file);
+ void kvm_put_kvm_no_destroy(struct kvm *kvm);
+ 
+ static inline struct kvm_memslots *__kvm_memslots(struct kvm *kvm, int as_id)
+diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+index 45f08986359e..0cc91c6f96d2 100644
+--- a/include/linux/vfio.h
++++ b/include/linux/vfio.h
+@@ -54,7 +54,7 @@ struct vfio_device {
+ 	struct list_head dev_set_list;
+ 	unsigned int migration_flags;
+ 	u8 precopy_info_v2;
+-	struct kvm *kvm;
++	struct file *kvm;
+ 
+ 	/* Members below here are private, not for driver use */
+ 	unsigned int index;
+@@ -66,7 +66,6 @@ struct vfio_device {
+ 	unsigned int open_count;
+ 	struct completion comp;
+ 	struct iommufd_access *iommufd_access;
+-	void (*put_kvm)(struct kvm *kvm);
+ 	struct inode *inode;
+ #if IS_ENABLED(CONFIG_IOMMUFD)
+ 	struct iommufd_device *iommufd_device;
+@@ -378,7 +377,7 @@ static inline bool vfio_file_has_dev(struct file *file, struct vfio_device *devi
+ #endif
+ bool vfio_file_is_valid(struct file *file);
+ bool vfio_file_enforced_coherent(struct file *file);
+-void vfio_file_set_kvm(struct file *file, struct kvm *kvm);
++void vfio_file_set_kvm(struct file *vfio_file, struct file *kvm);
+ 
+ #define VFIO_PIN_PAGES_MAX_ENTRIES	(PAGE_SIZE/sizeof(unsigned long))
+ 
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 65eb26a0520d..0d80730e8424 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1314,7 +1314,7 @@ void kvm_get_kvm(struct kvm *kvm)
+ {
+ 	refcount_inc(&kvm->users_count);
+ }
+-EXPORT_SYMBOL_GPL(kvm_get_kvm);
++EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_get_kvm);
+ 
+ /*
+  * Make sure the vm is not during destruction, which is a safe version of
+@@ -1324,14 +1324,14 @@ bool kvm_get_kvm_safe(struct kvm *kvm)
+ {
+ 	return refcount_inc_not_zero(&kvm->users_count);
+ }
+-EXPORT_SYMBOL_GPL(kvm_get_kvm_safe);
++EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_get_kvm_safe);
+ 
+ void kvm_put_kvm(struct kvm *kvm)
+ {
+ 	if (refcount_dec_and_test(&kvm->users_count))
+ 		kvm_destroy_vm(kvm);
+ }
+-EXPORT_SYMBOL_GPL(kvm_put_kvm);
++EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_put_kvm);
+ 
+ /*
+  * Used to put a reference that was taken on behalf of an object associated
+@@ -1352,6 +1352,9 @@ static int kvm_vm_release(struct inode *inode, struct file *filp)
+ 
+ 	kvm_irqfd_release(kvm);
+ 
++	rcu_assign_pointer(kvm->file, NULL);
++	synchronize_rcu();
++
+ 	kvm_put_kvm(kvm);
+ 	return 0;
+ }
+@@ -5496,6 +5499,15 @@ bool file_is_kvm(struct file *file)
+ }
+ EXPORT_SYMBOL_FOR_KVM_INTERNAL(file_is_kvm);
+ 
++struct kvm *file_to_kvm(struct file *file)
++{
++	if (!file_is_kvm(file))
++		return NULL;
++
++	return file->private_data;
++}
++EXPORT_SYMBOL_FOR_KVM_INTERNAL(file_to_kvm);
++
+ static int kvm_dev_ioctl_create_vm(unsigned long type)
+ {
+ 	char fdname[ITOA_MAX_LEN + 1];
+@@ -5527,6 +5539,10 @@ static int kvm_dev_ioctl_create_vm(unsigned long type)
+ 	 * cases it will be called by the final fput(file) and will take
+ 	 * care of doing kvm_put_kvm(kvm).
+ 	 */
++
++	/* Store back-reference for VFIO and other subsystems */
++	rcu_assign_pointer(kvm->file, file);
++
+ 	kvm_uevent_notify_change(KVM_EVENT_CREATE_VM, kvm);
+ 
+ 	fd_install(fd, file);
+diff --git a/virt/kvm/vfio.c b/virt/kvm/vfio.c
+index 6cdc4e9a333a..0166cc4d39b3 100644
+--- a/virt/kvm/vfio.c
++++ b/virt/kvm/vfio.c
+@@ -35,15 +35,15 @@ struct kvm_vfio {
+ 	bool noncoherent;
+ };
+ 
+-static void kvm_vfio_file_set_kvm(struct file *file, struct kvm *kvm)
++static void kvm_vfio_file_set_kvm(struct file *vfio_file, struct file *kvm)
+ {
+-	void (*fn)(struct file *file, struct kvm *kvm);
++	void (*fn)(struct file *vfio_file, struct file *kvm);
+ 
+ 	fn = symbol_get(vfio_file_set_kvm);
+ 	if (!fn)
+ 		return;
+ 
+-	fn(file, kvm);
++	fn(vfio_file, kvm);
+ 
+ 	symbol_put(vfio_file_set_kvm);
+ }
+@@ -168,7 +168,7 @@ static int kvm_vfio_file_add(struct kvm_device *dev, unsigned int fd)
+ 	kvf->file = get_file(filp);
+ 	list_add_tail(&kvf->node, &kv->file_list);
+ 
+-	kvm_vfio_file_set_kvm(kvf->file, dev->kvm);
++	kvm_vfio_file_set_kvm(kvf->file, dev->kvm->file);
+ 	kvm_vfio_update_coherency(dev);
+ 
+ 	return 0;
 -- 
 2.53.0
 
