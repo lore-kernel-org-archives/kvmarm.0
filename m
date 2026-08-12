@@ -1,153 +1,199 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA0CF31A065
-	for <kvmarm@lists.linux.dev>; Wed, 12 Aug 2026 14:01:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23DA94570DA;
+	Wed, 12 Aug 2026 14:02:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786543264; cv=none; b=JQLpYP4Ck5dE7fD/G3MgxiOCg5jxi7V907qIbxPw6kkk1coBJX+lXx1Zqa2luyVhJUCwwqXh+UoTQhmmD3+OJ/Utp5bvhYYXO6ItjcSgQAfvW1e10jISMTY/ODTw9UrpoRonWMn907h/F4+NSUXdwyNx+q8jHG6E4yCbpm+ewgE=
+	t=1786543358; cv=none; b=eap8l6uTO1iLOz5Gpcv+eIqJ3VZ+AhXmFAoNyc0qdukx3YfoFy0t2SudpKCwTk75d1+9KDBFyHrGvE6sUxusz3gmnu2i2/GX06Hbry5ZlBU3w790rZopq4YDD34dWJOmlUQAg2oDB+FJZBVSsGyH5BkIEM/G6KqZzqoEOxNCUOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786543264; c=relaxed/simple;
-	bh=WOJInSgW85XGZONmFlBScgLbqy0owEpxbjypHhGgWrM=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=OBvPjpVNy6QlndmtZEc9w4tUSGrWXfHQsTO3RbcpKwyOOWCyQPlBtkOF/tTxYpE2P3TuU8Wnu4NYiWuhgtc+B7nw7rWwJPAWh728Ip/whEQ/r1urCvdIpVatC+P37yKXnE9eRtwOXOai76ANrYI+hcYCZuoEBe+L+A/chTBbBjY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mNtttJb7; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786543358; c=relaxed/simple;
+	bh=Q6pDLlczI52p6LfslbljdsgOn+w5Bz4tVVZNxclLTXs=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dTqieCjOdTJUpuo1iFbUtW4Xn1Ji7YVAyPzVVA/JPdDG8KNbFDNci1z1nwpXEL87Nf9XXUrQ4TwwQE9+Hlt8jRbkYPiOQ8hZmEBg/Va1apzUqgn5jkIWovWykonnDHTkB5g54tN93cUfZbELtQro2bta2E6TAugjCw+by4kjPrM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DvNIQ975; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mNtttJb7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D77AC1F000E9;
-	Wed, 12 Aug 2026 14:01:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DvNIQ975"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B47D21F00A3A;
+	Wed, 12 Aug 2026 14:02:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786543262;
-	bh=B+KghM+r7Uc99cx5iGZohqhy3vsTCtziRQv6LyEQlGc=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=mNtttJb7sqLXa/7m5guBfAm6v9C+t5zRVvy6UYykEh3e2ohNdHxZw80b3Xizrm22Z
-	 c7dwEz2FoGbZ5825cKJHlIp0abel3gm2TfKmcQ/b3FS7lg2cXNepDS49qvFMTm4ofw
-	 AiJ8n7tyqGWnt/usLAmHx3v6azOcUS6jZIVNyNvMMXOiRMrTxA8yHYA8tzUNef03Bb
-	 EtK8ZmWD1MuUZHrIY4cJ/ZY0XtKhSMoDKWaHcPrCrwkZxV9yoAVlqhlkkSYFVEQcJk
-	 urkgzkQZP9fa9bKASgu/FrlWVBaVnlcgFJ2r/9WzcamDZvQNVHhUVvZfCIWg2CscXj
-	 4e7F5loTLJfnQ==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 2/2] KVM: arm64: nv: Fix null ptr deref in
- kvm_nested_s2_unmap() on S2 teardown
-Reply-To: sashiko-reviews@lists.linux.dev
-To: =?utf-8?b?TG9yZW56byBTdG9ha2VzIChBUk0p?= <ljs@kernel.org>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260812-kvm-arm-nested-virt-fix-v1-2-4ad883f1b6a5@kernel.org>
-References: <20260812-kvm-arm-nested-virt-fix-v1-0-4ad883f1b6a5@kernel.org>
- <20260812-kvm-arm-nested-virt-fix-v1-2-4ad883f1b6a5@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 12 Aug 2026 14:01:01 +0000
-Message-Id: <20260812140101.D77AC1F000E9@smtp.kernel.org>
+	s=k20260515; t=1786543355;
+	bh=fm2lkQQTeatuHGurNh7/1ULP0hoNWqxW+N4geEJMvaQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=DvNIQ975LyKKF4Z2fXIGSbRsV/QRYPF1yCnmpNjRpQkAoGLnLRUrPgM9y+wt14GRA
+	 3c0ssLb3l+t9MZksJR1rv2y/IoS06rKmTxvWfKclMdSDyKi8HD6yUxFT/1KBOtF3yn
+	 pEtVXLHxo6eLUgzYWqpTk3eFb+wtCSgbTiCPeBPkd4Aw8K6odvl9xSlSh4MgLofHaO
+	 QKFMeLGfEJdoQ9cCBZyj0o7MQ7sgWyjb9nbzB300GUSopQpIYZL3SIQ6uLPCS24XJn
+	 VkaRd1PdUxzuNBYW9+pDf3mh+a9Y/lL+PzFl6GdznhdFUOqnzW9KeOACVjmYFwsty+
+	 OE8EgYR1h3UUg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wu9XN-0000000ExQm-1KYL;
+	Wed, 12 Aug 2026 14:02:33 +0000
+Date: Wed, 12 Aug 2026 15:02:32 +0100
+Message-ID: <86ik5f1lon.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Shen Yongchao <grayhat@foxmail.com>,
+	Karl Mehltretter <kmehltretter@gmail.com>,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: nv: Fix life cycle of the nested_mmus array
+In-Reply-To: <anxXP_ZTZb_iKu1w@e143914.arm.com>
+References: <20260811122057.754772-1-maz@kernel.org>
+	<anxXP_ZTZb_iKu1w@e143914.arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, seiden@linux.ibm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, fuad.tabba@linux.dev, grayhat@foxmail.com, kmehltretter@gmail.com, stable@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Thank you for your contribution! Sashiko AI review found 3 potential issue(=
-s) to consider:
+Hi Joey,
 
-Pre-existing issues:
-- [Critical] Use-After-Free on `kvm->arch.nested_mmus` array due to concurr=
-ent teardown.
-- [Critical] Incomplete Fix: `kvm_nested_s2_wp()` is vulnerable to the same=
- NULL pointer dereference and UAF.
-- [High] Data Race: `kvm->arch.nested_mmus_size` updated locklessly causing=
- uninitialized memory reads.
---
+On Wed, 12 Aug 2026 12:21:35 +0100,
+Joey Gouly <joey.gouly@arm.com> wrote:
+> 
+> Hi,
+> 
+> Small comment / suggestion.
+> 
+> On Tue, Aug 11, 2026 at 01:20:57PM +0100, Marc Zyngier wrote:
+> > The nested_mmus array holds the shadow page tables that are used when
+> > a guest is running a nested context. These structures are allocated on
+> > VCPU_INIT for whole guest, which implies that they may have to be
+> > relocated as the array grows.
+> > 
+> > Should a VCPU_INIT occur whilst a vcpu is actively running an L2 and
+> > that the allocation requires relocation, that vcpu will still be
+> > running with a pointer to the previous structure, which will have been
+> > freed.
+> > 
+> > Fix this by turning the array of structures to an array of pointers,
+> > which is now allocated at VM creation, sized to the absolute maximum
+> > that KVM can handle.
+> > 
+> > In turn, each VCPU_INIT contributes S2_MMU_PER_VCPU to the pool. No
+> > reallocation is ever performed, and the life cycle of each object is
+> > much clearer:
+> > 
+> > - the nested_mmus array is allocated in kvm_init_nested(), and freed
+> >   in kvm_arch_destroy_vm()
+> > 
+> > - s2_mmu structures are allocated in kvm_vcpu_init_nested(), and freed
+> >   on kvm_arch_flush_shadow_all()
+> > 
+> > Finally, the freeing of vcpu->arch.vncr_array is made consistent
+> > rather than being done on some failure paths, but not others.
+> > 
+> > Fixes: 4f128f8e1aaa ("KVM: arm64: nv: Support multiple nested Stage-2 mmu structures")
+> > Reported-by: Shen Yongchao <grayhat@foxmail.com>
+> > Reported-by: Karl Mehltretter <kmehltretter@gmail.com>
+> > Suggested-by: Karl Mehltretter <kmehltretter@gmail.com>
+> > Link: https://lore.kernel.org/r/20260803224405.41468-1-kmehltretter@gmail.com
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > Cc: stable@vger.kernel.org
+> > ---
+> > 
+> > Notes:
+> >     Sending this as a first class patch, since the other approaches were even
+> >     uglier than this one. I'm still displeased with kvm_arch_flush_shadow_all(),
+> >     but that's a step in the direction of tightening it:
+> > 
+> >  arch/arm64/include/asm/kvm_host.h   |  2 +-
+> >  arch/arm64/include/asm/kvm_nested.h |  2 +-
+> >  arch/arm64/kvm/arm.c                |  8 ++-
+> >  arch/arm64/kvm/nested.c             | 91 +++++++++++++----------------
+> >  4 files changed, 49 insertions(+), 54 deletions(-)
+> > 
+> [..]
+> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> > index 20af94197a8a7..50d6dcc75582c 100644
+> > --- a/arch/arm64/kvm/nested.c
+> > +++ b/arch/arm64/kvm/nested.c
+> > @@ -44,11 +44,15 @@ struct vncr_tlb {
+> >   */
+> >  #define S2_MMU_PER_VCPU		2
+> >  
+> > -void kvm_init_nested(struct kvm *kvm)
+> > +int kvm_init_nested(struct kvm *kvm)
+> >  {
+> > -	kvm->arch.nested_mmus = NULL;
+> > +	kvm->arch.nested_mmus = kvmalloc_array(KVM_MAX_VCPUS * S2_MMU_PER_VCPU,
+> > +					       sizeof(struct s2_mmu *),
+> > +					       GFP_KERNEL_ACCOUNT);
+> >  	kvm->arch.nested_mmus_size = 0;
+> >  	atomic_set(&kvm->arch.vncr_tlb_count, 0);
+> > +
+> > +	return kvm->arch.nested_mmus ? 0 : -ENOMEM;
+> >  }
+> >  
+> >  static int init_nested_s2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
+> > @@ -69,8 +73,7 @@ static int init_nested_s2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
+> >  int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
+> >  {
+> >  	struct kvm *kvm = vcpu->kvm;
+> > -	struct kvm_s2_mmu *tmp;
+> > -	int num_mmus, ret = 0;
+> > +	int num_mmus;
+> >  
+> >  	if (test_bit(KVM_ARM_VCPU_HAS_EL2_E2H0, kvm->arch.vcpu_features) &&
+> >  	    !cpus_have_final_cap(ARM64_HAS_HCR_NV1))
+> > @@ -83,51 +86,40 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
+> >  	if (!vcpu->arch.ctxt.vncr_array)
+> >  		return -ENOMEM;
+> >  
+> > -	/*
+> > -	 * Let's treat memory allocation failures as benign: If we fail to
+> > -	 * allocate anything, return an error and keep the allocated array
+> > -	 * alive. Userspace may try to recover by initializing the vcpu
+> > -	 * again, and there is no reason to affect the whole VM for this.
+> > -	 */
+> >  	num_mmus = atomic_read(&kvm->online_vcpus) * S2_MMU_PER_VCPU;
+> >  
+> >  	if (num_mmus > kvm->arch.nested_mmus_size) {
+> 
+> Sashiko.dev complained about a possible race here, but looking at the
+> code, it seems incorrect?
+> 
+> Unsure why it didn't e-mail it.
+> https://sashiko.dev/#/patchset/20260811122057.754772-1-maz%40kernel.org
+> 
+> It seems that this code is serialised / protected by
+> kvm->arch.config_lock in __kvm_vcpu_set_target() (which is the only
+> caller of kvm_vcpu_init_nested() via kvm_setup_vcpu())
 
---- Patch [2]: [PATCH 2/2] KVM: arm64: nv: Fix null ptr deref in kvm_nested=
-_s2_unmap() on S2 teardown ---
-commit 04c9d62ec51b0000a28c8099341f6a2d31ce7848
-Author: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+Yeah, this looks like Sashiko went south again. You'd hope it'd be
+able to follow such a simple code path...
 
-KVM: arm64: nv: Fix null ptr deref in kvm_nested_s2_unmap() on S2 teardown
+> 
+> So maybe a
+> 
+> 	lockdep_assert_held(&kvm->arch.config_lock);
+> 
+> makes sense in kvm_vcpu_init_nested()?
 
-This commit adds a NULL check for kvm->arch.mmu.pgt in kvm_nested_s2_unmap()
-to prevent a NULL pointer dereference. This happens when the MMU lock is
-dropped during stage 2 teardown, allowing concurrent progress that clears t=
-he
-page table.
+Sure, that's never a bad thing to add.
 
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 17123f0b6daba..9fc0b1696dcb6 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -1295,7 +1295,11 @@ void kvm_nested_s2_unmap(struct kvm *kvm, bool may=
-_block)
->  			kvm_stage2_unmap_range(mmu, 0, kvm_phys_size(mmu), may_block);
+Thanks,
 
-[Severity: Critical]
-This isn't a bug introduced by this patch, but does this loop contain a
-Use-After-Free vulnerability?
+	M.
 
-While iterating over the nested_mmus array in kvm_nested_s2_unmap(),
-kvm_stage2_unmap_range() can drop kvm->mmu_lock inside stage2_apply_range().
-
-Concurrently, if kvm_mmu_notifier_release() calls kvm_arch_flush_shadow_all=
-(),
-it frees the kvm->arch.nested_mmus array unconditionally and without taking
-kvm->mmu_lock:
-
-kvm_arch_flush_shadow_all() {
-    ...
-    kvfree(kvm->arch.nested_mmus);
-    ...
-}
-
-If the array is freed during the lock-drop window, the local mmu pointer
-becomes dangling, and accessing it when the lock is reacquired could result
-in a Use-After-Free.
-
->  	}
-> =20
-> -	kvm_invalidate_vncr_ipa(kvm, 0, BIT(kvm->arch.mmu.pgt->ia_bits));
-> +	/* NULL pgt should only be possible if raced when mmu_lock dropped. */
-> +	if (kvm->arch.mmu.pgt)
-> +		kvm_invalidate_vncr_ipa(kvm, 0, BIT(kvm->arch.mmu.pgt->ia_bits));
-> +	else
-> +		WARN_ON(!may_block);
->  }
-
-[Severity: Critical]
-This is a pre-existing issue, but does kvm_nested_s2_wp() suffer from the e=
-xact
-same NULL pointer dereference and Use-After-Free vulnerability?
-
-Like kvm_nested_s2_unmap(), kvm_nested_s2_wp() iterates over the nested_mmus
-array and drops mmu_lock via stage2_apply_range_resched(). When it resumes
-and exits the loop, it also unconditionally executes
-BIT(kvm->arch.mmu.pgt->ia_bits).
-
-Should the same fix be applied to kvm_nested_s2_wp() to prevent a guaranteed
-NULL pointer dereference when kvm_arch_flush_shadow_all() clears the page
-table in the window where the lock is dropped?
-
-[Severity: High]
-This isn't a bug introduced by this patch, but is there a data race on
-kvm->arch.nested_mmus_size?
-
-In kvm_vcpu_init_nested(), nested_mmus_size is updated outside of
-kvm->mmu_lock and without memory barriers:
-
-kvm_vcpu_init_nested() {
-    ...
-    kvm->arch.nested_mmus_size =3D num_mmus;
-    ...
-}
-
-A concurrent reader like kvm_nested_s2_unmap() can see the updated size
-before the stores initializing the new array elements become visible. Becau=
-se
-the new array is allocated with kvcalloc(), an uninitialized/zeroed
-mmu->tlb_vttbr causes kvm_s2_mmu_valid() to incorrectly evaluate to TRUE.
-
-Will this cause the reader to process the zeroed mmu structure, passing it
-to kvm_stage2_unmap_range(), which would dereference a NULL mmu->pgt or
-access a partially initialized pgt?
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260812-kvm-arm-ne=
-sted-virt-fix-v1-0-4ad883f1b6a5@kernel.org?part=3D2
+-- 
+Without deviation from the norm, progress is not possible.
