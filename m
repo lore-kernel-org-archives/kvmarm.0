@@ -1,151 +1,224 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11CF843E488
-	for <kvmarm@lists.linux.dev>; Wed, 12 Aug 2026 13:54:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF09C346774;
+	Wed, 12 Aug 2026 13:57:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786542873; cv=none; b=YXatuYTzlV5fiyDywqjYpMXM4qW+s/f2oBBIumjwioNZroc0xdlg64c1kimmJxPFA33NtnAGkbYp8LxMRYyTlpJOA5XnqztPMHCyHM0Z3MxSrxeWZryp6XL45Q0n6mXiL2BwhocVF0QJ5b4v1PcsNThambm9Hg3aPwfFSwoKzxI=
+	t=1786543032; cv=none; b=bkj6Wjs7oEPXWSOK12Xy/hFIUncuV16/6FImEPalvtruQmLJys2JHT1Dnp/kXWxBHiv49ijba0EjQi3N1guSxXRHld/6uiHlCdSBLD7X7BP9TMU+9CVQeULQ+VJAyWLJjZot9l83b9PDxauiTrMIwnYqZ6krTV4GevZbNpJlh9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786542873; c=relaxed/simple;
-	bh=wfI7mOS0vCpUdVl77KXcL1QKWgs8YY34Ki4bq0rGlS8=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=hbpibA97SJjEv4o5CE1ViLvbtdFsbRUHF7ohELgOMpqD46kKBdcNorZ0SndEloryA/E7H4QadIyamFG18TSUXtbCn6B5pNGBtw5slp/0ny0l2kkKX5caeeb8XcX++81hCj+q/kWblsxoG+AmZEoyNnv3A4kqbaqqGE/sRWvHTl4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LxEjwQZn; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786543032; c=relaxed/simple;
+	bh=fcKog4W6ODmp8g8iijGuW5/7CX8U+bWpUyHANSsW+Zk=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Ew/iA/9qgwub5YpFoW5I6jUoP+9yviCtcYla9X1QIG8FYpdkyEn7uVR4W65LwR7OJ4HjUkBVzmsKdOcPqA8leXx12taUdGYKf7s2yt2H4c5kDmA44PhwZZns+fB59yxF9/aXgEjxvLMgf9qKRbV3ePPdr5utPgOppsiex4H3hes=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q3Uwd7Td; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LxEjwQZn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF04E1F00A3A;
-	Wed, 12 Aug 2026 13:54:29 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q3Uwd7Td"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68E0F1F000E9;
+	Wed, 12 Aug 2026 13:57:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786542870;
-	bh=RoXxITx+Tbc7DNp0pETdpxLe+F/hwFw0seVpPNMi8D0=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=LxEjwQZnkldTKCZpwJEE8L40ion6kzpa8fizIwaZUGWaQ6Z6Q8TgxXlkto8yyPUPk
-	 vHxWEwqmVXrr50W3Rs0rmSEhH1pfiJS9uXLZmFmE5QH1/lnmiOXdEsuue03bCCJcqo
-	 xxahJlynQBtuAg71z4bOW6gsC76JMU2+vInlfCG4IWh6z4AAGc6H8axtqTTaarQXS1
-	 0YNUl9cFfgI8iFK7vjaOzL5mRW095XxTmaRtOeKnq/0qgDCMXklRL0Yrr0pGAn4QSN
-	 tEhKlrYdzxcte+dLzx4u74PuL3p1SVzZFz6vC4keGOR2rbLeeFlXYr20ck+6pOIuWk
-	 /yciJGMBtruwA==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 1/2] KVM: arm64: Fix spurious warning for benign stage 2
- teardown race
-Reply-To: sashiko-reviews@lists.linux.dev
-To: =?utf-8?b?TG9yZW56byBTdG9ha2VzIChBUk0p?= <ljs@kernel.org>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260812-kvm-arm-nested-virt-fix-v1-1-4ad883f1b6a5@kernel.org>
-References: <20260812-kvm-arm-nested-virt-fix-v1-0-4ad883f1b6a5@kernel.org>
- <20260812-kvm-arm-nested-virt-fix-v1-1-4ad883f1b6a5@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 12 Aug 2026 13:54:29 +0000
-Message-Id: <20260812135429.DF04E1F00A3A@smtp.kernel.org>
+	s=k20260515; t=1786543030;
+	bh=xmhuhS+v/9s11IQrzskxs9EJP+Sc9JsApWwLp7y5lZ4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=Q3Uwd7Td5hGP+kPmHFixQfsLdhmicx7BAUb5SsDNUrDPoWJ/g5Hb7A0xRUOzqwafv
+	 RIJohD9pY0t99xmg8HLWoaWUNiTTqqo0MpxbASbINR9VpNJDMsyePrgvLY8Z8AKqn+
+	 QcsqTLEISJzN3HOuIH3f7nDCNLSIom7L/NLzPwvHlKfTr4Xz/iZeH16XSn2lT+hKju
+	 KrHRF9VBdQLIbBQZhjijW3PLnc3bjgIaXaKf0BJLaxfHKXNVSUkKEiAPbnw6NhnWCq
+	 aN2+7j0tqF6i2f8ogKS8fM4udmk63SO0mv+D5cuN5cyAD+KvKk5HwZTwNbtdcFNpLN
+	 Opmr99PtTN/qw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wu9S8-0000000ExFT-0HJ3;
+	Wed, 12 Aug 2026 13:57:08 +0000
+Date: Wed, 12 Aug 2026 14:57:07 +0100
+Message-ID: <86jypv1lxo.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Karl Mehltretter <kmehltretter@gmail.com>
+Cc: Oliver Upton <oupton@kernel.org>,
+	kvmarm@lists.linux.dev,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Eric Auger <eric.auger@redhat.com>,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [RFC PATCH 1/2] KVM: arm64: vgic-v3: Roll back failed redistributor region setup
+In-Reply-To: <anotFcOP0kcQJwrA@gmail.com>
+References: <cover.1786344511.git.kmehltretter@gmail.com>
+	<4e00fc25aa61ec52e6ef033a53588ce3f5550982.1786344511.git.kmehltretter@gmail.com>
+	<86tsp2139b.wl-maz@kernel.org>
+	<anotFcOP0kcQJwrA@gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kmehltretter@gmail.com, oupton@kernel.org, kvmarm@lists.linux.dev, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, pbonzini@redhat.com, shuah@kernel.org, eric.auger@redhat.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Thank you for your contribution! Sashiko AI review found 2 potential issue(=
-s) to consider:
+On Mon, 10 Aug 2026 22:22:37 +0100,
+Karl Mehltretter <kmehltretter@gmail.com> wrote:
+> 
+> On Mon, Aug 10, 2026 at 03:03:44PM +0100, Marc Zyngier wrote:
+> > 
+> > > A later REDIST_REGION attribute can be inserted successfully and then
+> > 
+> > Later than what?
+> 
+> I meant a REDIST_REGION write after earlier
+> region writes have already assigned RDs to some vCPUs.
+> 
+> In the selftest (patch 2) 
+> - region 0 contains RDs for vCPUs 0 and 1
+> - region 1 contains RD for vCPU 2
+> - the REDIST_REGION write for region 2 fails while KVM processes vCPU 3
+> 
+> > Holes in the MMIO space are the norm. The IPA space can multi-TB
+> > large, and there is no reason why it'd cover everything (where would
+> > you place the RAM otherwise?).
+> > 
+> > Is the problem here that you are left with vcpus that seem to have
+> > been matched to an RD (base_addr being set), but that really are left
+> > unconnected?
+> 
+> Yes I guess "hole" is the wrong term. The vCPU still has an RD and a
+> base address, but its iodev has been removed from KVM_MMIO_BUS.
+> An access to that RD address then causes KVM_RUN to return
+> to userspace with KVM_EXIT_MMIO.
+> 
+> > 
+> > > failing vCPU already has its base address and region assigned, but the
+> > > old i < c rollback does not include it.
+> > 
+> > What is "it"?
+> 
+> I meant the current vCPU redistributor iodev.
+> vgic_register_redist_iodev() sets the vCPU's region and base address
+> before calling kvm_io_bus_register_dev(). If this call fails for
+> vCPU c, the rollback in vgic_register_all_redist_iodevs() processes only
+> vCPUs with indices below c.
+> 
+> > > Preserve devices assigned by earlier successful setters. On failure,
+> > > unregister only vCPUs associated with the newly inserted region, clear
+> > > their cached base addresses, and free that region. This also includes the
+> > > current vCPU when iodev registration itself fails.
+> > 
+> > What I don't see here is an argument explaining that doing this
+> > doesn't change the guest-visible assignment of RDs, which would be a
+> > regression.
+> 
+> vgic_register_redist_iodev() returns immediately if a vCPU's RD base
+> address is already set, so its RD region and address don't change.
+> 
+> Regions are filled in index order, a vCPU without an RD address can
+> use the new region only after older regions are full.
+> 
+> So freeing the new region and clearing the RD state of vCPUs associated
+> with it restores the state before the failed write.
+> 
+> > Based on what I understand of your earlier description, why isn't this
+> > as simple as this untested hack:
+> 
+> I ran the selftest (patch 2) with this, still failed with:
+> 
+>   Unexpected MMIO exit at 0x8050008
+> 
+> When redistributor registration for vCPU 3 fails, the for loop does
+> vCPUs 0 to 3. The issue is that the iodevs for vCPUs 0 to 2 were
+> registered by earlier successful region writes and should not be
+> unregistered.
 
-Pre-existing issues:
-- [Critical] Use-After-Free of the dynamically allocated `kvm->arch.nested_=
-mmus` array when the MMU lock is dropped during stage-2 unmap operations.
-- [High] NULL Pointer Dereference in `kvm_vcpu_init_nested()` during concur=
-rent VM teardown.
---
+But that's not something we guarantee. Actually, that's not something
+userspace should have any view on. And we're far better off just
+resetting everything
 
---- Patch [1]: [PATCH 1/2] KVM: arm64: Fix spurious warning for benign stag=
-e 2 teardown race ---
-commit ffda2ec0115c7506d269acccba8c1f4511410e87
-Author: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+> 
+> On retry, vgic_register_redist_iodev() sees the set addresses
+> and does not re-register those iodevs.
 
-KVM: arm64: Fix spurious warning for benign stage 2 teardown race
+Which address? All addresses have been reset. What's missing in my
+original patch is resetting the free_index counter.
 
-This patch suppresses a warning in stage2_apply_range() when the page table
-pointer is found to be NULL after reacquiring the MMU lock. It assumes that
-the NULL page table is a benign result of a concurrent teardown.
+> 
+> > I don't mind the cleaning up, but not as part of fixing the issue,
+> > which has to be as small as possible (think of the backports).
+> 
+> I reworked the change without a new helper (see below).
+> Is this closer to what you had in mind?
 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 74e7e7f7564c8..31e049ded0932 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -59,19 +59,25 @@ static phys_addr_t stage2_range_addr_end(phys_addr_t =
-addr, phys_addr_t end)
->   * long will also starve other vCPUs. We have to also make sure that the=
- page
->   * tables are not freed while we released the lock.
->   */
-> -static int stage2_apply_range(struct kvm_s2_mmu *mmu, phys_addr_t addr,
-> +static int stage2_apply_range(struct kvm_s2_mmu *mmu, phys_addr_t start,
->  			      phys_addr_t end,
->  			      int (*fn)(struct kvm_pgtable *, u64, u64),
->  			      bool resched)
->  {
->  	struct kvm *kvm =3D kvm_s2_mmu_to_kvm(mmu);
-> +	phys_addr_t addr =3D start;
->  	int ret;
->  	u64 next;
-> =20
->  	do {
->  		struct kvm_pgtable *pgt =3D mmu->pgt;
-> +		/*
-> +		 * We may be raced on PGT teardown when we release the
-> +		 * kvm->mmu_lock. That's fine as the PGT is legitimately no
-> +		 * longer present.
-> +		 */
->  		if (!pgt)
-> -			return -EINVAL;
-> +			return resched && addr > start ? 0 : -EINVAL;
+[snip]
 
-[Severity: Critical]
-This is a pre-existing issue, but does suppressing this warning mask a
-regression where the mmu pointer itself is used after being freed?
+No. I want *all* RDs to be gone on failure, and the next successful
+registration to result in all possible RDs to be matched against a
+vcpu if there are enough of them. Effectively an atomic behaviour from
+the PoV of userspace.
 
-When kvm_nested_s2_unmap() passes an mmu pointer to stage2_apply_range(),
-that pointer references a dynamically allocated array:
+See the patch below for what I came up with.
 
-arch/arm64/kvm/nested.c:kvm_nested_s2_unmap() {
-    ...
-    struct kvm_s2_mmu *mmu =3D &kvm->arch.nested_mmus[i];
-    if (kvm_s2_mmu_valid(mmu))
-        kvm_stage2_unmap_range(mmu, ...);
-}
+	M.
 
-If cond_resched_rwlock_write() drops the lock inside stage2_apply_range(),
-a concurrent VM teardown or VCPU initialization can completely free this
-array:
+diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+index 5913a20d8301..94d2f4c6dc51 100644
+--- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+@@ -839,6 +839,13 @@ void vgic_unregister_redist_iodev(struct kvm_vcpu *vcpu)
+ 	struct vgic_io_device *rd_dev = &vcpu->arch.vgic_cpu.rd_iodev;
+ 
+ 	kvm_io_bus_unregister_dev(vcpu->kvm, KVM_MMIO_BUS, &rd_dev->dev);
++
++	guard(mutex)(&vcpu->kvm->arch.config_lock);
++	if (vcpu->arch.vgic_cpu.rdreg) {
++		vcpu->arch.vgic_cpu.rdreg->free_index--;
++		vcpu->arch.vgic_cpu.rdreg = NULL;
++	}
++	rd_dev->base_addr = VGIC_ADDR_UNDEF;
+ }
+ 
+ static int vgic_register_all_redist_iodevs(struct kvm *kvm)
+@@ -859,7 +866,7 @@ static int vgic_register_all_redist_iodevs(struct kvm *kvm)
+ 		/* The current c failed, so iterate over the previous ones. */
+ 		int i;
+ 
+-		for (i = 0; i < c; i++) {
++		for (i = 0; i <= c; i++) {
+ 			vcpu = kvm_get_vcpu(kvm, i);
+ 			vgic_unregister_redist_iodev(vcpu);
+ 		}
+@@ -953,17 +960,8 @@ static int vgic_v3_alloc_redist_region(struct kvm *kvm, uint32_t index,
+ 
+ void vgic_v3_free_redist_region(struct kvm *kvm, struct vgic_redist_region *rdreg)
+ {
+-	struct kvm_vcpu *vcpu;
+-	unsigned long c;
+-
+ 	lockdep_assert_held(&kvm->arch.config_lock);
+ 
+-	/* Garbage collect the region */
+-	kvm_for_each_vcpu(c, vcpu, kvm) {
+-		if (vcpu->arch.vgic_cpu.rdreg == rdreg)
+-			vcpu->arch.vgic_cpu.rdreg = NULL;
+-	}
+-
+ 	list_del(&rdreg->list);
+ 	kfree(rdreg);
+ }
 
-arch/arm64/kvm/nested.c:kvm_arch_flush_shadow_all() {
-    ...
-    kvfree(kvm->arch.nested_mmus);
-    kvm->arch.nested_mmus =3D NULL;
-}
-
-When the lock is reacquired, the loop continues and accesses mmu->pgt
-from the now-freed memory. Is it possible that the warning was actually
-firing because we were reading a freed mmu structure?
-
-
-[Severity: High]
-This is also a pre-existing issue, but looking at the concurrent VM teardown
-path, does kvm_vcpu_init_nested() have a NULL pointer dereference?
-
-When kvm_vcpu_init_nested() reallocates the array, it unconditionally
-updates the mmu pointer for each entry:
-
-arch/arm64/kvm/nested.c:kvm_vcpu_init_nested() {
-    ...
-    for (int i =3D 0; i < kvm->arch.nested_mmus_size; i++)
-        tmp[i].pgt->mmu =3D &tmp[i];
-    ...
-}
-
-If kvm_arch_flush_shadow_all() concurrently calls kvm_free_stage2_pgd()
-and sets pgt to NULL before the lock is acquired here, wouldn't this crash
-when dereferencing tmp[i].pgt?
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260812-kvm-arm-ne=
-sted-virt-fix-v1-0-4ad883f1b6a5@kernel.org?part=3D1
+-- 
+Without deviation from the norm, progress is not possible.
