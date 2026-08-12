@@ -1,240 +1,163 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C05CC3515FD;
-	Wed, 12 Aug 2026 16:41:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42C183ACF04;
+	Wed, 12 Aug 2026 16:59:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786552903; cv=none; b=Mvq2JXthm8L7atDsL8Sxie8N8U8KPRpaBJ6ZE45kM8I0Pu/UlZKZmJex27YVGh47A4OL4Mo0OJWjk8e55gCFohQoTdSY6vIEExFjapLXHkwul8SFJ6RR8B7YBogMb9IuclBzkXSHZcaD4IkO+gF5743kUF5ZzxxsrIDyrTBZDVQ=
+	t=1786553955; cv=none; b=Ms4vE8LMPhwBHl5eJ2x5XyXHAh7kmre3c4mI4pKCjBQSr19fNkh2jOIpaTYt5tpbV3pnnnA27IcAVCHy64kiv7Lh97AEktVgiJFvlgLlPE+nLX5pPOv3/aFMblc8qFIVusTaF1gpl70c0Z5Wz/FtJWn8f2EOrFhNjxynyV6VruY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786552903; c=relaxed/simple;
-	bh=D8FGi5ObNQbyVtlpTliLOfNlz/KUS8Q++cKptM4KhMQ=;
+	s=arc-20240116; t=1786553955; c=relaxed/simple;
+	bh=E3vInNis2xJIkjOjFjpgtJI9yDD7vXEo4llG/3S6xYg=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=SWoOADBAjJypg1TaCeYvL5w/T1kNbPms6lbJLKcY5CDbTGNlELCBWtU0im6X+jpzt1XhpTOwB+wuNFbVqERDdjBq/UbcwLQRrMuB6/EKn6a4QQi64eyiEq7pZMK47UsdiXBZ0mt4xq0zBlvj4L1378J8+gxxGnn3Ndt/iDfyMcw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VV5h9lEn; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=h8gS5PwSyfc7KFITOVnID/4pX7wv9Euly9r/Cw3bSZY0Jj3+vpyirYHs+DsBl4pNX/NarE/cCIO+pekrRh4R2M5zi1DrQfCqr590aN3WsN+yO8PtV1rs/dZOdeud9D05J3sE/pKaiyR628QG9vn3qrk+ScKYm3aqCKnDOx8cRdA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SH0qmu4B; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VV5h9lEn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DADFF1F000E9;
-	Wed, 12 Aug 2026 16:41:40 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SH0qmu4B"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB7351F000E9;
+	Wed, 12 Aug 2026 16:59:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786552901;
-	bh=oEGqIl9xKMDRuD7jt7p6plnnvYSi5uw7BSEu0Y2QZvY=;
+	s=k20260515; t=1786553951;
+	bh=3V0itp+OJ0kUUqTzHdPrFG5f0jqkDgW+cSWJ4Nzqk88=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=VV5h9lEnwFbTeSAGaQhUzipdV/l66XjXHeqPGEGl7FtfT8K0kclxqraJYxGc/pCOv
-	 oZOyphuGgM4dGOHrWRznMLfURDmDluX+IgzBh1pHVi1BLc39RXNW0UL5W0q0bthKTP
-	 XbbISROaSMcJTyKnH7ld4zYczxjkPYXkLWo8j16SB29q9LkZSKtG97/K2Cj0c22X0O
-	 hnCIH3q1Cl9fnS4U2wSQWU8Jog4/9oXdO/goeUmSeqTiMlVp0ZCWkRJBifibgIxw1q
-	 uTwKZaQ39w7uSz/z42rUFxAJsBVWEbMQFxyalo9ZwDnrdmLA+s+zGmvcJ+l1Bo2gii
-	 01R8IFsG8gS0g==
+	b=SH0qmu4BuxQfRTkpLfJh5QIBjR1PpSgRjj6btY05d3f1nHzFoJylIKgykz7VYOMUg
+	 3yWfKV9aT6F/y+IBXyhWvVr/pjBuo4Q/6iAHnsOS21eUwyyr77zPpwMqnNHyMlXRdT
+	 9iOdptDSpZyj36Cs9BXOoL+K+ZZOq9s40ue4IYUAceKr7bym9KqGQWfMByGzdVYKRf
+	 QxpxHO97zYh8WwKMGdiNMrJAmpiOLURUTAVV37PRR4vpCVwFBeoye6Cj6lIiATDeeW
+	 yW9ltEf+R2Wfx883xTDlAKQijiLljd5x/9UHmG/FvcvdT7xjjZe9Pu0qEUZyAOFCtC
+	 N2rN7z7D+ayIQ==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v6 31/33] KVM: s390: arm64: Implement vCPU IOCTLs
+Subject: Re: [PATCH v6 33/33] KVM: s390: arm64: Enable KVM_ARM64 config and
+ Kbuild
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Steffen Eiden" <seiden@linux.ibm.com>
-Cc: "Vasily Gorbik" <gor@linux.ibm.com>, "Heiko Carstens" <hca@linux.ibm.com>, linux-s390@vger.kernel.org, "Alexander
- Gordeev" <agordeev@linux.ibm.com>, kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, "Oliver
- Upton" <oupton@kernel.org>, kvm@vger.kernel.org, "Christian Borntraeger" <borntraeger@linux.ibm.vom>
-In-Reply-To: <20260812153631.3376090-32-seiden@linux.ibm.com>
+Cc: "Vasily Gorbik" <gor@linux.ibm.com>, kvm@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, linux-s390@vger.kernel.org, "Heiko
+ Carstens" <hca@linux.ibm.com>, "Christian Borntraeger" <borntraeger@linux.ibm.vom>, "Marc
+ Zyngier" <maz@kernel.org>, "Alexander Gordeev" <agordeev@linux.ibm.com>, kvmarm@lists.linux.dev
+In-Reply-To: <20260812153631.3376090-34-seiden@linux.ibm.com>
 References: <20260812153631.3376090-1-seiden@linux.ibm.com>
- <20260812153631.3376090-32-seiden@linux.ibm.com>
+ <20260812153631.3376090-34-seiden@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 12 Aug 2026 16:41:40 +0000
-Message-Id: <20260812164140.DADFF1F000E9@smtp.kernel.org>
+Date: Wed, 12 Aug 2026 16:59:10 +0000
+Message-Id: <20260812165910.AB7351F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 6 potential issue(=
+Thank you for your contribution! Sashiko AI review found 3 potential issue(=
 s) to consider:
-- [Critical] kvm_arch_vcpu_ioctl_run() fails to acquire the kvm->srcu read =
-lock, leading to a Use-After-Free when accessing memslots during guest abor=
-ts.
-- [High] Guest-reachable WARN_ONCE on SAE validity intercept enables a host=
- DoS.
-- [High] Calling local_irq_enable() immediately after guest_enter_irqoff() =
-violates strict RCU extended quiescent state (EQS) rules.
-- [High] check_vcpu_requests() fails to handle critical KVM requests like K=
-VM_REQ_TLB_FLUSH and KVM_REQ_VM_DEAD.
-- [High] Missing IN_GUEST_MODE coordination in the vCPU run loop creates a =
-race condition that can delay or drop signals and KVM requests.
-- [High] Missing vcpu_load() and vcpu_put() around KVM IOCTLs that modify a=
-rchitectural state in kvm_arch_vcpu_ioctl.
+- [Medium] Trace event name collisions completely break tracing for the kvm=
+-arm64 subsystem.
+- [Low] The `$(NM) -jU` command is incompatible with GNU nm, causing build =
+failures.
+- [Low] The Makefile passes `-O default` to `objcopy`, which is an invalid =
+BFD target.
 --
 
---- Patch [31]: [PATCH v6 31/33] KVM: s390: arm64: Implement vCPU IOCTLs ---
-commit e43ea7af3ba7491497b01c2a0860a8b946aad58d
+--- Patch [33]: [PATCH v6 33/33] KVM: s390: arm64: Enable KVM_ARM64 config =
+and Kbuild ---
+commit 9d8a545589b9d6b384f0fa20e8bcb8b16fc11bd1
 Author: Steffen Eiden <seiden@linux.ibm.com>
 
-KVM: s390: arm64: Implement vCPU IOCTLs
+KVM: s390: arm64: Enable KVM_ARM64 config and Kbuild
 
-This commit implements the required vCPU IOCTLs for the s390 arm64 KVM
-port. It provides the core structures for register access, lifecycle
-management, and the main vCPU execution loop.
+Adds Kbuild/Makefile configurations to build a second KVM module on s390
+implementing the arm64-KVM API. To prevent symbol conflicts with kvm-s390,
+internal symbols in kvm-arm64 are mangled if compiled as built-in.
 
-> diff --git a/arch/s390/kvm/arm64/arm.c b/arch/s390/kvm/arm64/arm.c
-> --- a/arch/s390/kvm/arm64/arm.c
-> +++ b/arch/s390/kvm/arm64/arm.c
+> diff --git a/arch/s390/kvm/arm64/Makefile b/arch/s390/kvm/arm64/Makefile
+> new file mode 100644
+> index 0000000000000..2ae4a5624151d
+> --- /dev/null
+> +++ b/arch/s390/kvm/arm64/Makefile
+> @@ -0,0 +1,91 @@
+> +# SPDX-License-Identifier: GPL-2.0
+> +
+> +KVM :=3D ../../../../virt/kvm
+> +include $(srctree)/virt/kvm/Makefile.kvm
+> +include $(srctree)/arch/s390/kvm/gmap/Makefile
+> +include $(src)/Makefile.gen
+> +
+> +ccflags-y +=3D -I $(src) -I $(objtree)/$(obj) -I$(srctree)/arch/s390/kvm=
+/gmap -DKVM_S390_ARM64
+> +
+> +kvm-arm64-obj :=3D \
+> +	arm.o \
+> +	guest.o \
+> +	handle_exit.o \
+> +	inject_fault.o \
+> +	mmu.o \
+> +	mmio.o \
+> +	reset.o \
+> +
+> +kvm-arm64-obj +=3D $(patsubst %.o,%-arm64.o,$(kvm-y))
+
+[Severity: Medium]
+Because kvm_main.c is compiled into both the s390 kvm.ko and kvm-arm64.ko
+modules, it includes the trace headers with TRACE_SYSTEM kvm. Does this mean
+both modules will generate trace event structures mapped to the exact same
+system and event names? If eventfs processes these tracepoints during module
+load, could the kvm-arm64 trace events be permanently shadowed by the kvm
+subsystem's events?
 
 [ ... ]
+> +prereq-o-cmd =3D $(foreach o, $(filter %.o, $^), $(dir $(o)).$(notdir $(=
+o)).cmd)
+> +cmd_gen_symversions_o =3D \
+> +	grep --no-filename "^\#SYMVER" $(prereq-o-cmd) >> $(dot-target).cmd || =
+true
+> +
+> +define rule_ld_o_o
+> +	$(call cmd_and_savecmd,ld)
+> +	$(call cmd,gen_symversions_o)
+> +endef
+> +
+> +LDFLAGS_kvm-unnamespaced.o :=3D -r --whole-archive
+> +$(obj)/kvm-unnamespaced.o: $(addprefix $(obj)/,$(kvm-arm64-obj)) FORCE
+> +	$(call if_changed_rule,ld_o_o)
+> +
+> +quiet_cmd_nm_filter =3D NMFLTR  $@
+> +	cmd_nm_filter =3D $(NM) -jU $< | sort -u > $@
 
-> @@ -284,15 +309,15 @@
-> +static int check_vcpu_requests(struct kvm_vcpu *vcpu)
-> +{
-> +	if (kvm_request_pending(vcpu)) {
-> +		if (kvm_check_request(KVM_REQ_VCPU_RESET, vcpu))
-> +			kvm_reset_vcpu(vcpu);
-> +		/*
-> +		 * Clear IRQ_PENDING requests that were made to guarantee
-> +		 * that a VCPU sees new virtual interrupts.
-> +		 */
-> +		kvm_check_request(KVM_REQ_IRQ_PENDING, vcpu);
-> +	}
-
-[Severity: High]
-Does this function properly handle all critical KVM requests?
-
-It appears to drop requests like KVM_REQ_TLB_FLUSH and KVM_REQ_VM_DEAD by
-not explicitly handling or clearing them. Can this bypass necessary TLB
-invalidations and dead VM checks?
+[Severity: Low]
+Are the -j and -U flags compatible with standard GNU nm? GNU nm does not
+support these flags natively and requires --defined-only instead. Will this
+cause a build failure on systems using standard GCC/binutils toolchains?
 
 > +
-> +	return 1;
-> +}
-
-[ ... ]
-
-> @@ -390,13 +415,13 @@
-> +static void arm_vcpu_run(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm_sae_block *sae_block =3D &vcpu->arch.sae_block;
+> +$(obj)/kvm_symbol_list: $(obj)/kvm-unnamespaced.o FORCE
+> +	$(call if_changed,nm_filter)
 > +
-> +	adjust_pc(vcpu);
+> +define rule_oc_o_o
+> +	$(call cmd_and_savecmd,objcopy)
+> +	$(call cmd,gen_objtooldep)
+> +	$(call cmd,gen_symversions_o)
+> +endef
 > +
-> +	local_irq_disable();
-> +	guest_enter_irqoff();
-> +	local_irq_enable();
+> +OBJCOPYFLAGS_kvm-namespaced.o :=3D -O default --localize-symbols=3D$(obj=
+)/kvm_symbol_list
 
-[Severity: High]
-Does this sequence violate RCU extended quiescent state rules?
+[Severity: Low]
+Is default a valid BFD architecture/target name for objcopy? GNU objcopy
+strictly requires a recognized target like elf64-s390, or for the -O flag to
+be omitted entirely to preserve the input format. Could this cause a fatal
+invalid bfd target error?
 
-Calling local_irq_enable() immediately after guest_enter_irqoff() allows
-host interrupts to fire while RCU believes the CPU is idle.
-
+> +$(obj)/kvm-namespaced.o: $(obj)/kvm-unnamespaced.o $(obj)/kvm_symbol_lis=
+t FORCE
+> +	$(call if_changed_rule,oc_o_o)
 > +
-> +	sae_block->icptr =3D 0;
+> +kvm-arm64-y =3D kvm-namespaced.o
 > +
-> +	sae64a(sae_block);
-
-[ ... ]
-
-> @@ -436,15 +461,15 @@
-> +	ret =3D 1;
-> +	do {
-> +		if (signal_pending(current)) {
-> +			kvm_run->exit_reason =3D KVM_EXIT_INTR;
-> +			ret =3D -EINTR;
-> +			continue;
-> +		}
+> +targets +=3D kvm-unnamespaced.o kvm_symbol_list kvm-namespaced.o
 > +
-> +		if (need_resched())
-> +			schedule();
+> +endif
 > +
-> +		if (ret > 0)
-> +			ret =3D check_vcpu_requests(vcpu);
-> +
-> +		vcpu->arch.sae_block.icptr =3D 0;
-> +
-> +		arm_vcpu_run(vcpu);
-
-[Severity: High]
-Could this loop race with concurrent IPI kicks?
-
-It executes arm_vcpu_run() without coordinating via vcpu->mode =3D IN_GUEST=
-_MODE.
-A concurrent request kick via kvm_vcpu_kick() might see OUTSIDE_GUEST_MODE
-and skip sending the IPI.
-
-> +
-> +		ret =3D handle_exit(vcpu);
-
-[Severity: Critical]
-Does handle_exit() require SRCU protection here?
-
-The loop calls handle_exit() which routes synchronous exceptions to the gue=
-st
-abort handler. If the abort handler translates guest addresses and accesses
-active memslots without holding kvm->srcu, could a concurrent userspace
-operation like KVM_SET_USER_MEMORY_REGION trigger a use-after-free?
-
-> +
-> +	} while (ret > 0);
-
-[ ... ]
-
-> @@ -515,15 +540,15 @@
-> +long kvm_arch_vcpu_ioctl(struct file *filp, unsigned int ioctl, unsigned=
- long arg)
-> +{
-> +	struct kvm_vcpu *vcpu =3D filp->private_data;
-> +	void __user *argp =3D (void __user *)arg;
-> +	struct kvm_device_attr attr;
-> +	int ret;
-> +
-> +	switch (ioctl) {
-> +	case KVM_ARM_VCPU_INIT: {
-> +		struct kvm_vcpu_init init;
-
-[Severity: High]
-Are vcpu_load() and vcpu_put() required around these ioctls?
-
-Operations like KVM_SET_ONE_REG modify architectural state but do not acqui=
-re
-the vcpu_load locks, potentially bypassing preempt notifiers and physical-C=
-PU
-hardware state tracking hooks.
-
-> +
-> +		ret =3D -EFAULT;
-> +		if (copy_from_user(&init, argp, sizeof(init)))
-> +			break;
-
-[ ... ]
-
-> diff --git a/arch/s390/kvm/arm64/handle_exit.c b/arch/s390/kvm/arm64/hand=
-le_exit.c
-> --- a/arch/s390/kvm/arm64/handle_exit.c
-> +++ b/arch/s390/kvm/arm64/handle_exit.c
-
-[ ... ]
-
-> @@ -66,13 +78,13 @@
-> +int handle_exit(struct kvm_vcpu *vcpu)
-> +{
-> +	u8 icptr =3D vcpu->arch.sae_block.icptr;
-> +	int ret =3D 1;
-> +
-> +	switch (icptr) {
-> +	case SAE_ICPTR_SPURIOUS:
-> +		break;
-> +	case SAE_ICPTR_VALIDITY:
-> +		WARN_ONCE(true, "SAE: validity intercept. vir: 0x%04x",
-> +			  vcpu->arch.sae_block.vir);
-
-[Severity: High]
-Is it safe to use a guest-reachable WARN_ONCE here?
-
-An unprivileged userspace process configuring KVM could set malformed guest
-state via KVM_SET_ONE_REG, and the hardware would reject this during
-execution, returning a validity intercept. Should this return an error to
-userspace instead of triggering a host warning?
-
-> +		ret =3D -EINVAL;
-> +		break;
-
-[ ... ]
+> +obj-$(CONFIG_KVM_ARM64) +=3D kvm-arm64.o
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260812153631.3376=
-090-1-seiden@linux.ibm.com?part=3D31
+090-1-seiden@linux.ibm.com?part=3D33
