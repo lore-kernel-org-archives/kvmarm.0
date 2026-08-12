@@ -1,189 +1,244 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15D7037F727
-	for <kvmarm@lists.linux.dev>; Wed, 12 Aug 2026 19:44:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7860F409604
+	for <kvmarm@lists.linux.dev>; Wed, 12 Aug 2026 23:20:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786563889; cv=none; b=fZUz5VSl0xUaLTKsrlkjce/ET8jWyPOCeAQ1qtgkTJOy2Sih8uY0YFxMSyHrPvig8c0NkMXLojS1pk17JEHdzw1MDgV4RIY/i8C4oFnYfREKZ2dz59elHlersMk0Rxb3UW12+GRQqThnHm31PSha+qxtdynmivtxY35/mHD7pKU=
+	t=1786576857; cv=none; b=qKNB9Bg8SdYQDEUAFybef/TJd3fOcGaPus0niKblpXiZ0yrpw8UXGhd6KkYcxJo6nnN9vYbI617cM6je9b6XAMR2Gsm+gkuiJB9/UmvWtga5lVCi7C7n2kPgFUxwxEiUe311eaArwB8TO3nGIwFgmOv6gJ23An3MiHWEz0R0yUk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786563889; c=relaxed/simple;
-	bh=XJOtR/vDAYXYMU/wTRPK7sSMj633Z2VM51pvqrzHzy4=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=uuldOdwMSRndusU7Mw56DkORoK6YCjC7hXGcFjGvzQ+69SbrMw3MogvcF2DbdEyIuKuAU9fXR9WxidEiOW7+fzKOggydhg9iSwx0L0Qyle7JltSh/8yftXaXL8aK0yOLsMkrSbw0S4W2jPTy5xup3/9aKD5m3aWM76YGS7+HWP0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fOB0Ak1d; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786576857; c=relaxed/simple;
+	bh=9cBVCmEpx9hBzn7jRJeTK3dyTGjtjOtHpTN6vszWliE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BOKufTyqqGaHqTpYiSG37bIg53zPuz8LJ6O+ixIsNHxlQ4qzS076DArmM33i8IjKslfBNgKZBckY6ZhQRVN+D3nTOlwif+gxx/5bkfVIxM0quFr8V7ttH6zGvehXCTMRI2sIoU+NS6GKUCRTDPzAkkeSJy+ciFL/C1Y6b5Wkobk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=KoW3ci1/; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fOB0Ak1d"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB8131F000E9;
-	Wed, 12 Aug 2026 19:44:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786563888;
-	bh=Dc2PdOq7q4aZ7q+HNr4Wt9yNRjJvrrjj71unBUfxup4=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=fOB0Ak1dI8zBp1ws2UcU7jFnSlOeIOzGYl8ls4ptjNOYHrvpKfS5lPo64nUUazjIv
-	 2JICqoiI7ktTgKVu+B1cEkwkNK9Zrylvb0z3GcvmMtuMjRlsmUVNybq0RmeOILefuS
-	 GqPxZtLifl4n3W0QgSKXbKe6mbsEUxQ7og0XMo7ERgPQvOCVPMET4jLzOBKlSpTN71
-	 VIykt691SbanojrZkDIUwjyEz2gXY61AAC5s0Dzyv9sWQ4gI6A2gc1V0dLuQkZ+YLj
-	 khYDY+ZqxD8yP2T5m2OBNRzeSXK2uMYhB4WCWk+NQ5FPbldgm0jotVPLd7s4IAcBhl
-	 7Bov7iadjPjxw==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v19 03/14] KVM: arm64: Manage GCS access and registers
- for guests
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Mark Brown" <broonie@kernel.org>
-Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev
-In-Reply-To: <20260812-arm64-gcs-v19-3-9105afd828ac@kernel.org>
-References: <20260812-arm64-gcs-v19-0-9105afd828ac@kernel.org>
- <20260812-arm64-gcs-v19-3-9105afd828ac@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 12 Aug 2026 19:44:47 +0000
-Message-Id: <20260812194447.AB8131F000E9@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="KoW3ci1/"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BB31C153B;
+	Wed, 12 Aug 2026 16:20:50 -0700 (PDT)
+Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2F3EF3F673;
+	Wed, 12 Aug 2026 16:20:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1786576854; bh=9cBVCmEpx9hBzn7jRJeTK3dyTGjtjOtHpTN6vszWliE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KoW3ci1//DXHkRt9Dyfnsa7rB03/KlQU4p5ge6kMf5EH3c4+mRRlorkvZBlxdMdPF
+	 Gna60culXoDSTTM1Ak35b6yG5n60r4/O5gywUYXioXTibXc92NO3EMyWZA1Q9z+qS+
+	 xN9l1cU1mckcKGXzzzbUriQIoL4jpqnlpGRYhPzM=
+Date: Thu, 13 Aug 2026 00:20:43 +0100
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Fuad Tabba <tabba@google.com>, 
+	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Jintack Lim <jintack.lim@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>, 
+	Christoffer Dall <christoffer.dall@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH 1/2] KVM: arm64: Fix spurious warning for benign stage 2
+ teardown race
+Message-ID: <qfhlmmidzdmmsfopfhxpddgwa7nob45jwgb6sabskawaxtox7i@mnxplk3zn34k>
+References: <20260812-kvm-arm-nested-virt-fix-v1-0-4ad883f1b6a5@kernel.org>
+ <20260812-kvm-arm-nested-virt-fix-v1-1-4ad883f1b6a5@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260812-kvm-arm-nested-virt-fix-v1-1-4ad883f1b6a5@kernel.org>
 
-Thank you for your contribution! Sashiko AI review found 2 potential issue(=
-s) to consider:
-- [Critical] GCS system register save/restore logic is incorrectly nested i=
-nside unrelated S1PIE and TCRX feature checks, causing guest state corrupti=
-on and potential host control-flow hijack.
-- [Critical] Calling ctxt_has_gcs() on the host context calculates a bogus =
-vCPU pointer and dereferences arbitrary memory, crashing the host kernel on=
- VCPU load/put.
---
+Hi Lorenzo,
 
---- Patch [3]: [PATCH v19 03/14] KVM: arm64: Manage GCS access and register=
-s for guests ---
-commit 7b54a8ce806322bdd9585098668578c6af7e75b8
-Author: Mark Brown <broonie@kernel.org>
-Date:   Wed Aug 12 19:12:02 2026 +0000
+Thanks for the detailed analysis!
 
-    KVM: arm64: Manage GCS access and registers for guests
-   =20
-    GCS introduces a number of system registers, on systems with GCS we need
-    to context switch them and expose them to VMMs to allow guests to use
-    GCS.
-   =20
-    In order to allow guests to use GCS we also need to configure
-    HCRX_EL2.GCSEn, if this is not set GCS instructions will be noops and
-    CHKFEAT will report GCS as disabled.
+I can follow what's happening from the report, but one thing I don't
+get:
 
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/=
-hyp/include/hyp/sysreg-sr.h
-> index a17cbe7582de9..053d7b3c5104d 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> @@ -67,6 +68,11 @@ static inline void __sysreg_save_user_state(struct kvm=
-_cpu_context *ctxt)
->  {
->  	ctxt_sys_reg(ctxt, TPIDR_EL0)	=3D read_sysreg(tpidr_el0);
->  	ctxt_sys_reg(ctxt, TPIDRRO_EL0)	=3D read_sysreg(tpidrro_el0);
-> +
-> +	if (ctxt_has_gcs(ctxt)) {
-> +		ctxt_sys_reg(ctxt, GCSPR_EL0) =3D read_sysreg_s(SYS_GCSPR_EL0);
-> +		ctxt_sys_reg(ctxt, GCSCRE0_EL1)	=3D read_sysreg_s(SYS_GCSCRE0_EL1);
-> +	}
->  }
+On Wed, Aug 12, 2026 at 02:31:20PM +0100, Lorenzo Stoakes (ARM) wrote:
+> A batch of kernel warnings were triggered in the L0 host kernel when using
+> kvmtool to experiment with nested virtualisation.
+> 
+> The issue was observed on an M2 macbook pro with 24 GiB of RAM running
+> asahi linux 7.1.6-400.asahi.fc44.aarch64+16k with 16 KiB page size.
+> 
+> The bug is confirmed to exist in mainline and does not appear to be
+> impacted by any downstream patches carried by asahi.
+> 
+> kvmtool was used to establish an L1 guest with 8 CPUs and 8 GiB of RAM.
+> 
+> kvmtool was then run again within the L1 guest to establish an L2 guest
+> with 4 CPUs and 4 GiB of RAM.
+> 
+> Then it was run again to establish another inner guest with 2 CPUs and 2
+> GiB of RAM at L3.
+> 
+> Both the L2 and L3 guests were then exited and another L2 guest was
+> established with the same characteristics.
+> 
+> Sufficient memory pressure was present in the L0 host to trigger indirect
+> reclaim, waking kcompactd up and triggering migration.
+> 
+> Shortly afterwards the L2 guest was stopped, at which point three warnings
+> were observed in the L0 host in quick succession with the second and the
+> third occurring 114us and 189us after the first, respectively.
+> 
+> In each case the call trace was the same:
+> 
+> WARNING: arch/arm64/kvm/mmu.c:336 at __unmap_stage2_range+0x64/0x80,
+> CPU#5: kcompactd0/66
+> ...
+> __unmap_stage2_range (arch/arm64/kvm/mmu.c:335 (discriminator 3)) (P)
+> kvm_stage2_unmap_range (arch/arm64/kvm/mmu.c:346)
+> kvm_nested_s2_unmap (arch/arm64/kvm/nested.c:1168 (discriminator 14))
+> kvm_unmap_gfn_range (arch/arm64/kvm/mmu.c:2416)
+> kvm_mmu_notifier_invalidate_range_start (arch/arm64/kvm/../../../virt/kvm/kvm_main.c:718 ...)
+> mn_hlist_invalidate_range_start (mm/mmu_notifier.c:525)
+> __mmu_notifier_invalidate_range_start (mm/mmu_notifier.c:580)
+> try_to_migrate_one (./include/linux/mmu_notifier.h:478 ./include/linux/mmu_notifier.h:471 mm/rmap.c:2459)
+> rmap_walk_anon (mm/rmap.c:3001)
+> rmap_walk (mm/rmap.c:3106 mm/rmap.c:3101)
+> try_to_migrate (mm/rmap.c:2774)
+> migrate_folio_unmap (mm/migrate.c:1330 (discriminator 3))
+> migrate_pages_batch (mm/migrate.c:1909)
+> migrate_pages_sync (mm/migrate.c:2026)
+> migrate_pages (mm/migrate.c:2135)
+> compact_zone (mm/compaction.c:2663)
+> compact_node (mm/compaction.c:2932)
+> kcompactd (mm/compaction.c:3230)
+> kthread (kernel/kthread.c:436)
+> ret_from_fork (arch/arm64/kernel/entry.S:858)
+> 
+> Analysing this:
+> 
+> try_to_migrate() performs the first part of migration on a folio -
+> establishing migration entries in all page tables mapping it - calling
+> try_to_migrate_one() for each VMA the folio is mapped in.
+> 
+> Immediately prior to installing the migration entry, try_to_migrate_one()
+> calls mmu_notifier_invalidate_range_start() to signal to notifiers that the
+> existing page table entry is about to be unmapped.
+> 
+> Since this range happened to contain folios used by the virtual machine
+> (given its memory consumption this was highly likely to be a target) this
+> in turn triggers arm64 kvm code via an MMU notifier:
+> 
+> mmu_notifier_invalidate_range_start()
+>   -> ... -> kvm_mmu_notifier_invalidate_range_start()
+>     -> kvm_mmu_unmap_gfn_range()
+>       -> kvm_unmap_gfn_range()
+>         -> kvm_nested_s2_unmap()
+>           -> kvm_stage2_unmap_range()
+>             -> __unmap_stage2_range()
+>                -> stage2_apply_range()
+>        	       <- -EINVAL, triggering a WARN_ON()
+> 
+> Since commit ec14c272408a ("KVM: arm64: nv: Unmap/flush shadow stage 2 page
+> tables") kvm_unmap_gfn_range() invokes kvm_nested_s2_unmap() which takes
+> the rather drastic step of evicting the entirety of the stage 2 shadow page
+> tables for each nested guest:
+> 
+> 	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
+> 		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+> 
+> 		if (kvm_s2_mmu_valid(mmu))
+> 			kvm_stage2_unmap_range(mmu, 0, kvm_phys_size(mmu), may_block);
+> 	}
+> 
+> This will iterate through every valid MMU.
+> 
+> mmu_notifier_invalidate_range_start() sets the MMU_NOTIFIER_RANGE_BLOCKABLE
+> flag when signalling notifiers, so may_block is true here.
+> 
+> __unmap_stage2_range() wraps invocation of stage2_apply_range() in a
+> WARN_ON():
+> 
+> 	WARN_ON(stage2_apply_range(mmu, start, end, KVM_PGT_FN(kvm_pgtable_stage2_unmap),
+> 				   may_block));
+> 
+> Which is precisely the triggered warning and means stage2_apply_range() is
+> returning an error.
+> 
+> In arm64 return values are stored in the x0 register and in each splat w0
+> (since it's a 32-bit value) is 0xffffffea which, by two's complement, is
+> -0b00010110 or -EINVAL.
+> 
+> The only way in which stage2_apply_range() can return an error is if either
+> the passed in walk function (kvm_pgtable_stage2_unmap()) returns an error
+> or mmu->pgt is NULL:
+> 
+> 	static int stage2_apply_range(...)
+> 	{
+> 		do {
+> 			struct kvm_pgtable *pgt = mmu->pgt;
+> 			if (!pgt)
+> 				return -EINVAL;
+> 
+> 			next = stage2_range_addr_end(addr, end);
+> 			ret = fn(pgt, addr, next - addr);
+> 			if (ret)
+> 				break;
+> 			if (resched && next != end)
+> 				cond_resched_rwlock_write(&kvm->mmu_lock);
+> 		} while (addr = next, addr != end);
+> 
+> 		return ret;
+> 	}
+> 
+> This loop is batched by stage2_range_addr_end() at the granularity of
+> kvm_granule_size(KVM_PGTABLE_MIN_BLOCK_LEVEL), which for a 16 KiB page size
+> kernel is 32 MiB.
+> 
+> kvm_pgtable_stage2_unmap() only returns an error if
+> kvm_pgtable_walk_begin() or _kvm_pgtable_walk() return an error. On arm64
+> the former doesn't ever do so, and the latter only returns -EINVAL if
+> either pgd is NULL (we gate that already) or an invalid pgt->start_level is
+> specified (not the case).
+> 
+> So the cause of the warning is that mmu->pgt is NULL here.
+> 
+> This field is protected by kvm->mmu_lock, but after each invocation of the
+> walk function, if the end of the range has not yet been reached, the lock
+> is dropped.
+> 
+> This is done by calling cond_resched_rwlock_write() which drops
+> kvm->mmu_lock when yielding the time slice before reacquiring it upon being
+> scheduled again:
+> 
+> 		if (resched && next != end)
+> 			cond_resched_rwlock_write(&kvm->mmu_lock);
+> 
+> Note that resched = may_block here and is always true for these walks.
+> 
+> This points to something else racing this code to clearing the pgt, and
+> brings us back to the observation above that the issue occurs when tearing
+> down the L2 guest.
+> 
+> Upon L0's userspace mm_struct teardown, stage 2 mappings for IPAs mapped by
+> the guest are unmapped via mmu notifier:
+> 
+> exit_mm()
+>   -> mmput()
+>     -> __mmput()
+>       -> exit_mmap()
+>         -> mmu_notifier_release()
+> 	  -> ... -> kvm_mmu_notifier_release()
+>             -> kvm_flush_shadow_all()
+>               -> kvm_arch_flush_shadow_all()
+> 	        -> kvm_free_stage2_pgd()
+> 		  -> [ acquire kvm->mmu_lock for write ]
+> 		  -> mmu->pgt = NULL [ among other tasks ]
+> 		  -> [ release kvm->mmu_lock for write ]
 
-[Severity: Critical]
-Does this cause a host kernel panic when called on the host context?
+You mentioned stopping the L2 VM only, which means L1 is still running.
+Why would the L0 userspace mm_struct get torn down if L1 is still live?
+What did I miss?
 
-__sysreg_save_user_state() is called on the host context during vcpu_load()
-and vcpu_put(). The host_ctxt is embedded inside the per-CPU struct
-kvm_host_data, not a kvm_vcpu.
+Thanks,
+Wei-Lin Chang
 
-When ctxt_has_gcs(ctxt) evaluates ctxt_to_vcpu(ctxt), the container_of() ma=
-th
-will yield a bogus kvm_vcpu pointer, leading to an out-of-bounds memory read
-when it dereferences vcpu->kvm to check the features.
-
-[ ... ]
-> @@ -144,6 +161,10 @@ static inline void __sysreg_save_el1_state(struct kv=
-m_cpu_context *ctxt)
->  		if (ctxt_has_s1pie(ctxt)) {
->  			ctxt_sys_reg(ctxt, PIR_EL1)	=3D read_sysreg_el1(SYS_PIR);
->  			ctxt_sys_reg(ctxt, PIRE0_EL1)	=3D read_sysreg_el1(SYS_PIRE0);
-> +			if (ctxt_has_gcs(ctxt)) {
-> +				ctxt_sys_reg(ctxt, GCSPR_EL1)	=3D read_sysreg_el1(SYS_GCSPR);
-> +				ctxt_sys_reg(ctxt, GCSCR_EL1)	=3D read_sysreg_el1(SYS_GCSCR);
-> +			}
->  		}
-
-[Severity: Critical]
-Should the GCS register saving be conditionally nested inside the S1PIE
-feature check?
-
-If a KVM guest is configured with GCS enabled but without S1PIE, it appears
-the GCS registers will not be saved or restored. This could leave stale GCS
-register values in hardware across context switches, potentially allowing
-guest-to-host privilege escalation if the host resumes with a guest-control=
-led
-GCSPR_EL1.
-
-[ ... ]
-> @@ -239,6 +265,11 @@ static inline void __sysreg_restore_el1_state(struct=
- kvm_cpu_context *ctxt,
->  		if (ctxt_has_s1pie(ctxt)) {
->  			write_sysreg_el1(ctxt_sys_reg(ctxt, PIR_EL1),	SYS_PIR);
->  			write_sysreg_el1(ctxt_sys_reg(ctxt, PIRE0_EL1),	SYS_PIRE0);
-> +
-> +			if (ctxt_has_gcs(ctxt)) {
-> +				write_sysreg_el1(ctxt_sys_reg(ctxt, GCSPR_EL1),	SYS_GCSPR);
-> +				write_sysreg_el1(ctxt_sys_reg(ctxt, GCSCR_EL1),	SYS_GCSCR);
-> +			}
->  		}
-
-[Severity: Critical]
-Similarly, the GCS register restoration appears to be incorrectly tied to t=
-he
-S1PIE feature check here.
-
-> diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/=
-sysreg-sr.c
-> index be685b63e8cf2..4f775545c71ba 100644
-> --- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-> +++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-> @@ -61,6 +61,9 @@ static void __sysreg_save_vel2_state(struct kvm_vcpu *v=
-cpu)
-> =20
->  			if (ctxt_has_s1poe(&vcpu->arch.ctxt))
->  				__vcpu_assign_sys_reg(vcpu, POR_EL2, read_sysreg_el1(SYS_POR));
-> +
-> +			if (ctxt_has_gcs(&vcpu->arch.ctxt))
-> +				__vcpu_assign_sys_reg(vcpu, GCSCR_EL2, read_sysreg_el1(SYS_GCSCR));
->  		}
-
-[Severity: Critical]
-Is there a structural asymmetry being introduced here?=20
-
-GCSCR_EL2 save is nested inside the TCRX feature check, while GCSPR_EL2 is
-saved entirely independently later in this function. This ties GCSCR_EL2
-saving to an unrelated feature.
-
-[ ... ]
-> @@ -129,6 +134,11 @@ static void __sysreg_restore_vel2_state(struct kvm_v=
-cpu *vcpu)
->  		if (ctxt_has_s1pie(&vcpu->arch.ctxt)) {
->  			write_sysreg_el1(__vcpu_sys_reg(vcpu, PIR_EL2), SYS_PIR);
->  			write_sysreg_el1(__vcpu_sys_reg(vcpu, PIRE0_EL2), SYS_PIRE0);
-> +
-> +			if (ctxt_has_gcs(&vcpu->arch.ctxt)) {
-> +				write_sysreg_el1(__vcpu_sys_reg(vcpu, GCSCR_EL2), SYS_GCSCR);
-> +				write_sysreg_el1(__vcpu_sys_reg(vcpu, GCSPR_EL2), SYS_GCSPR);
-> +			}
->  		}
-
-[Severity: Critical]
-Does this also tie the GCS restoration to the unrelated S1PIE and TCRX
-features?
-
-Both GCSCR_EL2 and GCSPR_EL2 restorations are deeply nested inside the S1PIE
-feature check here, breaking symmetry with the save path above and requiring
-S1PIE to be enabled for GCS registers to be restored.
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260812-arm64-gcs-=
-v19-0-9105afd828ac@kernel.org?part=3D3
+[...]
