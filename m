@@ -1,35 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A94C36728B;
-	Wed, 12 Aug 2026 19:13:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD618366049;
+	Wed, 12 Aug 2026 19:13:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786561999; cv=none; b=dPRhaMYE/73+GQNXWEqP17rAEYyoyNuDkvix+iEtHL01qPP0VQAKeXaJh+25twywQFnPkQthT8eKdTm6nD6E83R57fs97rR5+LlHeLMm/4NAIBD1dUFDDiWSOxxe5NT6gEMgF3waRtYShPMuJNtPrCexDXUQbx5Z1OxR+E/1fAw=
+	t=1786562003; cv=none; b=G0Ed9aVH1JKMDUjA898KWA+DrlUAHEHveEiWmUUiJKlUdH2Eg/X/eqVcs+AAuiX3v5IqX3QJCVMMG88Al+YgpeoJUOy8Y8MLHw62AIN7xektpwUhYuZaWwuVv1eNypHPYAyQlwJcQX+kyeIRSnBEETbMfw4lwkY+RXWRjYq3SKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786561999; c=relaxed/simple;
-	bh=DZmwxJP+W8fGWvn/wOKVMifNip3avlrIAIcelKvVs+o=;
+	s=arc-20240116; t=1786562003; c=relaxed/simple;
+	bh=cmvAQBxB4SuCRvDZjmRe7yIsmwDDWXuwPP1P7cDHpHg=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=kXccwU7ewIIobPe0o+EsWz5vZ0rSb1VVfP6/XMyNNXIexj7y0mtAAiwWvJUiBBJfR8ICTXV5CNJP5uhwey59Bpbpoy3IbDWsFKNjV7fNLTklvWutad3RtKRWj8vF3g4Jgppw4Ylq7Ne8KvO5ktAQF6HgUl+Nu4M+vA1nh00Rm/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ch10FdKC; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=iz+I69EYAhtRV7n3X9HF0mMpMSbpXhxfsY6JrDFrFr+yS961KnOWs6OggBVSxtauKHLQDlfY7UzjZHmJcJGG1v18pyT326aX9XhUydHDuqPwftXzD0+/+uUmzVpkxVzEwFhaWLi2dz1dju9MN53VDJ0I8XtH/44nFUNYLX32x3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hr2MvsEu; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ch10FdKC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 459D51F00A3A;
-	Wed, 12 Aug 2026 19:13:15 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hr2MvsEu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92C381F000E9;
+	Wed, 12 Aug 2026 19:13:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786561998;
-	bh=MWKdz3JjvBdWuvOM6XAtmb0QINEsI1qn45G5e91+shs=;
+	s=k20260515; t=1786562001;
+	bh=YWlLd/PWbYINVwpXcYMDnYu5TnVLNXcprwUMzPtexF8=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=ch10FdKCYrPAge4YrDIKurVwiVkcvI3avuxDVD/hpNb9oGd2q0ZKs/9Y8EYdE2Hh6
-	 gHN2OIvPlLdUp+87f/j187KDkiHw3290k2QmmiWTFqQ4K2165XVwWeQU2Rp0fabGmZ
-	 6qXO3/nhIKt3c38zW6eoVcIGZMFGsbtuTPrWcw9rvAkoS6nn0WkyC1BO0vVjE0o5P9
-	 1MBHvmsLmPc6urMKU1Ey4n4gA1oHxHuWWrLDtqVStUfPNzH0f/iTVv7OWM5iX4aBno
-	 ecqKsv0qp6yXjsWGrBBN/F9vn/bRhp3OODdZ0djeaoxZZZDYOFi8L+G5z6/iqfcbvX
-	 MXHxW3iMj/bug==
+	b=Hr2MvsEuaaEzcnb7pqx0fDgksL9RmFYJMkgCZLgfSVmtA2v5njcIiu97WrxWFn4e1
+	 Ov1BoT7tE/ncfuzI4cZV4HWqOzyHA9RrhJ2qNsb9fGFQhi1f2p6HOanh63+MmAo35b
+	 NdiKSOZ8ijOwnGNF0HdLXL2INR9Kds3iDADAxkTZFnYk4tunKWPbviJfnUoXT850ZW
+	 sxugucq/tXcbt0eVpe/42oRB2eMRnPrhEzN+UCrVfdZPhEkRR4KLpNj7ngfi4neZop
+	 oLNwP6k7zmx5bfnPzbe5sIO3aJWpRnJJ9H7XyOpw56QN8zypl0W/FIiGTgJAoXyL62
+	 GQ4rk0QPx3kIg==
 From: Mark Brown <broonie@kernel.org>
-Date: Wed, 12 Aug 2026 20:12:00 +0100
-Subject: [PATCH v19 01/14] arm64/gcs: Ensure FGTs for EL1 GCS instructions
- are disabled
+Date: Wed, 12 Aug 2026 20:12:01 +0100
+Subject: [PATCH v19 02/14] KVM: arm64: Fix FGT mapping for
+ HFGITR_EL2.nGCSEPP
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -38,7 +38,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260812-arm64-gcs-v19-1-9105afd828ac@kernel.org>
+Message-Id: <20260812-arm64-gcs-v19-2-9105afd828ac@kernel.org>
 References: <20260812-arm64-gcs-v19-0-9105afd828ac@kernel.org>
 In-Reply-To: <20260812-arm64-gcs-v19-0-9105afd828ac@kernel.org>
 To: Catalin Marinas <catalin.marinas@arm.com>, 
@@ -52,43 +52,42 @@ Cc: Peter Maydell <peter.maydell@linaro.org>,
  linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
  Mark Brown <broonie@kernel.org>
 X-Mailer: b4 0.17-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=906; i=broonie@kernel.org;
- h=from:subject:message-id; bh=DZmwxJP+W8fGWvn/wOKVMifNip3avlrIAIcelKvVs+o=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBqfMW6RedFIHw3NdjVXn4+RQSWMjajzdkv9Vt/S
- +f/MmP6zhiJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCanzFugAKCRAk1otyXVSH
- 0KhHB/9wfTWobWZqN3e8DvFY3Owj3Ai5t96DelDcqPkBKnT2iBecIiC+nl9PbHRyf4PDmbdjw5a
- hIZXrAb9UtOIQ4/MuZMK85oaTmuu+y0ptI0Ge0Mr75s6dNdTbD5LQk1PzRvnHPSGVfgMNMSPhyV
- rFXPEfEUuXF+K149gtkN4Nrt9R0okPxOUHjpLULia57/n9HWhJwbkeZgprtG8RZZkmRQH1vvErO
- 4V+gRJzt7pUKzilNuA1CSV4M5FE4BQXAgunpUtobxh3g/jX9R6Dsm3HugxjDdl9zIeDoZVxlW+B
- kRQEmKCAJC7EmC7pK5vg6XhzxAsLtkghqzzzdSKQtJVHXbhB
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1184; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=cmvAQBxB4SuCRvDZjmRe7yIsmwDDWXuwPP1P7cDHpHg=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBqfMW7xoiqvOLOz8+6G2+5A+ZgECZ+QwPkUzOLt
+ FoOuI2C4wCJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCanzFuwAKCRAk1otyXVSH
+ 0IvaB/wI/FpFkLyGyj1sYsB6MEmyR0ik9n4QuHmN5KWkK73wFPPVJsIFSFHjknqTDNsyB09SjFz
+ azxPsfYekK80iNCgjxwTwfZqBYbDJ9VCV0jR8GREHkM73c1Xgrxhxev9hYi4lUg8+jkNfj76Pfc
+ 6tOt3aT09Z27h7IaMmdSielrg7qg3PbnwnRoYALFINkCnDbbgkwtPWOGvlR7jZIuJPcjucaiVtv
+ R4HNujT7W66L6kcHqwHmr/2YTOFZ50XerlMMiQ58ACSEjFPPZVlyAyboWYGt4xsHd4N83IqGZrP
+ 64uyKkPUJd7AoFscpOZfS/MS6WnpxsrMNcPidD03h80zddgz
 X-Developer-Key: i=broonie@kernel.org; a=openpgp;
  fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-The initial EL2 setup for GCS did not include disabling of EL1 usage of
-GCS instructions, also disable these traps.
+The encoding to trap mapping currently maps a FGT on OP_GCSPOPX to
+HFGITR_EL2.nGCSEPP but as per DDI0601 2026-06 this FGT controls trapping
+of GCSPUSHX and GCSPOPCX, and not the separate GCSPOPX instruction.
+Update the mapping to reflect the architecture.
 
-Fixes: ff5181d8a2a8 ("arm64/gcs: Provide basic EL2 setup to allow GCS usage at EL0 and EL1")
+Fixes: 863ac38984a82 ("KVM: arm64: Add missing HFGITR_EL2 FGT entries to nested virt")
 Signed-off-by: Mark Brown <broonie@kernel.org>
 ---
- arch/arm64/include/asm/el2_setup.h | 5 +++++
- 1 file changed, 5 insertions(+)
+ arch/arm64/kvm/emulate-nested.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
-index aa8ec9df8024..d308c6e6757d 100644
---- a/arch/arm64/include/asm/el2_setup.h
-+++ b/arch/arm64/include/asm/el2_setup.h
-@@ -393,6 +393,11 @@
- 	orr	x0, x0, #HFGRTR_EL2_nGCS_EL1_MASK
- 	orr	x0, x0, #HFGRTR_EL2_nGCS_EL0_MASK
- 
-+	/* Disable traps of GCS instructions at EL1 */
-+	orr	x2, x2, #HFGITR_EL2_nGCSEPP_MASK
-+	orr	x2, x2, #HFGITR_EL2_nGCSSTR_EL1_MASK
-+	orr	x2, x2, #HFGITR_EL2_nGCSPUSHM_EL1_MASK
-+
- .Lskip_gce_fgt_\@:
- 
- .Lset_fgt_\@:
+diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+index 3c82f392845d..b32742d9dd73 100644
+--- a/arch/arm64/kvm/emulate-nested.c
++++ b/arch/arm64/kvm/emulate-nested.c
+@@ -1432,7 +1432,7 @@ static const struct encoding_to_trap_config encoding_to_fgt[] __initconst = {
+ 	SR_FGT(OP_AT_S1E1A, 		HFGITR, ATS1E1A, 1),
+ 	SR_FGT(OP_COSP_RCTX, 		HFGITR, COSPRCTX, 1),
+ 	SR_FGT(OP_GCSPUSHX, 		HFGITR, nGCSEPP, 0),
+-	SR_FGT(OP_GCSPOPX, 		HFGITR, nGCSEPP, 0),
++	SR_FGT(OP_GCSPOPCX, 		HFGITR, nGCSEPP, 0),
+ 	SR_FGT(OP_GCSPUSHM, 		HFGITR, nGCSPUSHM_EL1, 0),
+ 	SR_FGT(OP_BRB_IALL, 		HFGITR, nBRBIALL, 0),
+ 	SR_FGT(OP_BRB_INJ, 		HFGITR, nBRBINJ, 0),
 
 -- 
 2.47.3
