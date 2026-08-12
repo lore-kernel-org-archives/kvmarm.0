@@ -1,157 +1,151 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E73B356A37;
-	Wed, 12 Aug 2026 13:51:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11CF843E488
+	for <kvmarm@lists.linux.dev>; Wed, 12 Aug 2026 13:54:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786542698; cv=none; b=qwuBuTA9v8Cfsi/gwe9P1Ux9k/S6dmmORxp6GseWqCCgMn11ubOwRpP6t8IqOJ8AsR+gwfijzb5EgeAgsDXvuO6xnP5cH6cenQNoR2h60bodSMtgv6lWa6NK/w+vmRuxPcAzcmY2SDbozpEWTwQKRbqi6qs2i080gAeyLOipe4Y=
+	t=1786542873; cv=none; b=YXatuYTzlV5fiyDywqjYpMXM4qW+s/f2oBBIumjwioNZroc0xdlg64c1kimmJxPFA33NtnAGkbYp8LxMRYyTlpJOA5XnqztPMHCyHM0Z3MxSrxeWZryp6XL45Q0n6mXiL2BwhocVF0QJ5b4v1PcsNThambm9Hg3aPwfFSwoKzxI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786542698; c=relaxed/simple;
-	bh=7nCoc+Gd4dBqkVM3L9DgfcWFTtT0Go8fgXf2EaF6ryw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BA20NWmnCBbCOjkVhRwFvM8kSyM36HQSg04VoH75qvkhxC0Q3iIIO1UOtWRIFGS9b2gzeG1GgEK2UdQWUzDCsu6xFZc5WqkPAVeBlQgpyj0ybJCcHAZNDzD5HKsBF2TSu8KZSzx1/xiwa00sc6rjgXwAHwShBMuhH/W8FbIo+vw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=mdhIzOxU; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1786542873; c=relaxed/simple;
+	bh=wfI7mOS0vCpUdVl77KXcL1QKWgs8YY34Ki4bq0rGlS8=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=hbpibA97SJjEv4o5CE1ViLvbtdFsbRUHF7ohELgOMpqD46kKBdcNorZ0SndEloryA/E7H4QadIyamFG18TSUXtbCn6B5pNGBtw5slp/0ny0l2kkKX5caeeb8XcX++81hCj+q/kWblsxoG+AmZEoyNnv3A4kqbaqqGE/sRWvHTl4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LxEjwQZn; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="mdhIzOxU"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 95556153B;
-	Wed, 12 Aug 2026 06:51:31 -0700 (PDT)
-Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6B3253F66F;
-	Wed, 12 Aug 2026 06:51:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1786542695; bh=7nCoc+Gd4dBqkVM3L9DgfcWFTtT0Go8fgXf2EaF6ryw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mdhIzOxU4DrVBTfWu9sQVemCRyfbINm+gJGsobbhcHm6RT2xmNZhB26+0R9dosOlZ
-	 xJoZ5cz12TtS+PoAC7Z6fjscj7CPeR3vEFkFy0T4SY9x7smJreqT9+FtH5Fyd4YiTR
-	 1YAp2YSqYL4igzdFr1iNMh6k+hMv25AjPvBXLAdU=
-Date: Wed, 12 Aug 2026 14:51:29 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Pavan Kondeti <pavan.kondeti@oss.qualcomm.com>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
-	Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
-	Emi Kisanuki <fj0570is@fujitsu.com>,
-	Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>
-Subject: Re: [PATCH v16 07/45] arm64: mm: Handle Granule Protection Faults
- (GPFs)
-Message-ID: <anx6YbPMVz3OlpA5@arm.com>
-References: <20260803134403.80630-1-steven.price@arm.com>
- <20260803134403.80630-8-steven.price@arm.com>
- <ans1ZSwMEKeT9Gfz@arm.com>
- <d4bdecca-517a-4b4b-bf67-cef6b09bc8c1@arm.com>
- <7d4e5920-aa20-40cd-954e-037631bd0d6c@quicinc.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LxEjwQZn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF04E1F00A3A;
+	Wed, 12 Aug 2026 13:54:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1786542870;
+	bh=RoXxITx+Tbc7DNp0pETdpxLe+F/hwFw0seVpPNMi8D0=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=LxEjwQZnkldTKCZpwJEE8L40ion6kzpa8fizIwaZUGWaQ6Z6Q8TgxXlkto8yyPUPk
+	 vHxWEwqmVXrr50W3Rs0rmSEhH1pfiJS9uXLZmFmE5QH1/lnmiOXdEsuue03bCCJcqo
+	 xxahJlynQBtuAg71z4bOW6gsC76JMU2+vInlfCG4IWh6z4AAGc6H8axtqTTaarQXS1
+	 0YNUl9cFfgI8iFK7vjaOzL5mRW095XxTmaRtOeKnq/0qgDCMXklRL0Yrr0pGAn4QSN
+	 tEhKlrYdzxcte+dLzx4u74PuL3p1SVzZFz6vC4keGOR2rbLeeFlXYr20ck+6pOIuWk
+	 /yciJGMBtruwA==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH 1/2] KVM: arm64: Fix spurious warning for benign stage 2
+ teardown race
+Reply-To: sashiko-reviews@lists.linux.dev
+To: =?utf-8?b?TG9yZW56byBTdG9ha2VzIChBUk0p?= <ljs@kernel.org>
+Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20260812-kvm-arm-nested-virt-fix-v1-1-4ad883f1b6a5@kernel.org>
+References: <20260812-kvm-arm-nested-virt-fix-v1-0-4ad883f1b6a5@kernel.org>
+ <20260812-kvm-arm-nested-virt-fix-v1-1-4ad883f1b6a5@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 12 Aug 2026 13:54:29 +0000
+Message-Id: <20260812135429.DF04E1F00A3A@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7d4e5920-aa20-40cd-954e-037631bd0d6c@quicinc.com>
 
-On Wed, Aug 12, 2026 at 06:12:09PM +0530, Pavan Kondeti wrote:
-> On Tue, Aug 11, 2026 at 04:11:13PM +0100, Suzuki K Poulose wrote:
-> > On 11/08/2026 15:44, Catalin Marinas wrote:
-> > > On Mon, Aug 03, 2026 at 02:43:23PM +0100, Steven Price wrote:
-> > > > If the host attempts to access granules that have been delegated for use
-> > > > in a realm these accesses will be caught and will trigger a Granule
-> > > > Protection Fault (GPF).
-> > > > 
-> > > > A fault during a page walk signals a bug in the kernel and is handled by
-> > > > oopsing the kernel. A non-page walk fault could be caused by user space
-> > > > having access to a page which has been delegated to the kernel and will
-> > > > trigger a SIGBUS to allow debugging why user space is trying to access a
-> > > > delegated page.
-> > > > 
-> > > > Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> > > > Reviewed-by: Gavin Shan <gshan@redhat.com>
-> > > > Signed-off-by: Steven Price <steven.price@arm.com>
-> > > > ---
-> > > > Changes since v10:
-> > > >   * Don't call arm64_notify_die() in do_gpf() but simply return 1.
-> > > > Changes since v2:
-> > > >   * Include missing "Granule Protection Fault at level -1"
-> > > > ---
-> > > >   arch/arm64/mm/fault.c | 28 ++++++++++++++++++++++------
-> > > >   1 file changed, 22 insertions(+), 6 deletions(-)
-> > > > 
-> > > > diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
-> > > > index 85e23388f9bb..ea3ae0ca7dba 100644
-> > > > --- a/arch/arm64/mm/fault.c
-> > > > +++ b/arch/arm64/mm/fault.c
-> > > > @@ -909,6 +909,22 @@ static int do_tag_check_fault(unsigned long far, unsigned long esr,
-> > > >   	return 0;
-> > > >   }
-> > > > +static int do_gpf_ptw(unsigned long far, unsigned long esr, struct pt_regs *regs)
-> > > > +{
-> > > > +	const struct fault_info *inf = esr_to_fault_info(esr);
-> > > > +
-> > > > +	die_kernel_fault(inf->name, far, esr, regs);
-> > > > +	return 0;
-> > > > +}
-> > > > +
-> > > > +static int do_gpf(unsigned long far, unsigned long esr, struct pt_regs *regs)
-> > > > +{
-> > > > +	if (!is_el1_instruction_abort(esr) && fixup_exception(regs, esr))
-> > > > +		return 0;
-> > > > +
-> > > > +	return 1;
-> > > > +}
-> > > 
-> > > Is there a valid case for fixup_exception() here? IOW, do we ever have a
-> > > valid user mapping of the pages delegated to a guest? If the above is
-> > > considered a kernel bug, I'd not silently ignore this (like return less
-> > > bytes copied or -EFAULT to user) but rather warn, potentially
-> > > rate-limited.
-> > 
-> > Good question. This shouldn't be a valid case. We expect the VMM to use
-> > guest_memfd and that should prevent any mmaps and thus fixups shouldn't
-> > be required. That said, this series doesn't enforce that the VMM uses
-> > GMEM backed memslots for Guest RAM. We should probably do that while
-> > mapping things in.
-> > 
-> > With that, we could drop that fixup and scream a bit.
-> 
-> There is a valid case for fixup_exception() to be needed here in GPF
-> handling.
-> 
-> -000 |load_unaligned_zeropad(inline)
-> -000 |hash_name(inline)
-> -000 |link_path_walk()
-> -001 |path_lookupat()
-> -002 |filename_lookup()
-> -003 |vfs_statx()
-> -004 |vfs_fstatat()
-> 
-> We observed this in Android running Gunyah when the page is mapped in
-> EL1 but unmapped at EL2. path_lookupat() can actually handle this
-> via fixup_exeption() when a word load crosses the page boundary.
-> However, Gunyah injects a Synchronous External Abort and we have
-> a downstream patch [1] that adds fixup_exception() in do_sea(). pKVM
-> injects [2] such faults back to EL1 and fixup_exception() is taken care.
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+s) to consider:
 
-Ah, good point, completely forgot about load_unaligned_zeropad(). Since
-we don't unmap the linear map for delegated pages, we'll need the
-fixup_exception(). And I guess warning in this case is not desirable
-either. We could limit it to EX_TYPE_KACCESS_ERR_ZERO and
-EX_TYPE_LOAD_UNALIGNED_ZEROPAD, though not sure it's worth it.
+Pre-existing issues:
+- [Critical] Use-After-Free of the dynamically allocated `kvm->arch.nested_=
+mmus` array when the MMU lock is dropped during stage-2 unmap operations.
+- [High] NULL Pointer Dereference in `kvm_vcpu_init_nested()` during concur=
+rent VM teardown.
+--
 
--- 
-Catalin
+--- Patch [1]: [PATCH 1/2] KVM: arm64: Fix spurious warning for benign stag=
+e 2 teardown race ---
+commit ffda2ec0115c7506d269acccba8c1f4511410e87
+Author: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+
+KVM: arm64: Fix spurious warning for benign stage 2 teardown race
+
+This patch suppresses a warning in stage2_apply_range() when the page table
+pointer is found to be NULL after reacquiring the MMU lock. It assumes that
+the NULL page table is a benign result of a concurrent teardown.
+
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 74e7e7f7564c8..31e049ded0932 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -59,19 +59,25 @@ static phys_addr_t stage2_range_addr_end(phys_addr_t =
+addr, phys_addr_t end)
+>   * long will also starve other vCPUs. We have to also make sure that the=
+ page
+>   * tables are not freed while we released the lock.
+>   */
+> -static int stage2_apply_range(struct kvm_s2_mmu *mmu, phys_addr_t addr,
+> +static int stage2_apply_range(struct kvm_s2_mmu *mmu, phys_addr_t start,
+>  			      phys_addr_t end,
+>  			      int (*fn)(struct kvm_pgtable *, u64, u64),
+>  			      bool resched)
+>  {
+>  	struct kvm *kvm =3D kvm_s2_mmu_to_kvm(mmu);
+> +	phys_addr_t addr =3D start;
+>  	int ret;
+>  	u64 next;
+> =20
+>  	do {
+>  		struct kvm_pgtable *pgt =3D mmu->pgt;
+> +		/*
+> +		 * We may be raced on PGT teardown when we release the
+> +		 * kvm->mmu_lock. That's fine as the PGT is legitimately no
+> +		 * longer present.
+> +		 */
+>  		if (!pgt)
+> -			return -EINVAL;
+> +			return resched && addr > start ? 0 : -EINVAL;
+
+[Severity: Critical]
+This is a pre-existing issue, but does suppressing this warning mask a
+regression where the mmu pointer itself is used after being freed?
+
+When kvm_nested_s2_unmap() passes an mmu pointer to stage2_apply_range(),
+that pointer references a dynamically allocated array:
+
+arch/arm64/kvm/nested.c:kvm_nested_s2_unmap() {
+    ...
+    struct kvm_s2_mmu *mmu =3D &kvm->arch.nested_mmus[i];
+    if (kvm_s2_mmu_valid(mmu))
+        kvm_stage2_unmap_range(mmu, ...);
+}
+
+If cond_resched_rwlock_write() drops the lock inside stage2_apply_range(),
+a concurrent VM teardown or VCPU initialization can completely free this
+array:
+
+arch/arm64/kvm/nested.c:kvm_arch_flush_shadow_all() {
+    ...
+    kvfree(kvm->arch.nested_mmus);
+    kvm->arch.nested_mmus =3D NULL;
+}
+
+When the lock is reacquired, the loop continues and accesses mmu->pgt
+from the now-freed memory. Is it possible that the warning was actually
+firing because we were reading a freed mmu structure?
+
+
+[Severity: High]
+This is also a pre-existing issue, but looking at the concurrent VM teardown
+path, does kvm_vcpu_init_nested() have a NULL pointer dereference?
+
+When kvm_vcpu_init_nested() reallocates the array, it unconditionally
+updates the mmu pointer for each entry:
+
+arch/arm64/kvm/nested.c:kvm_vcpu_init_nested() {
+    ...
+    for (int i =3D 0; i < kvm->arch.nested_mmus_size; i++)
+        tmp[i].pgt->mmu =3D &tmp[i];
+    ...
+}
+
+If kvm_arch_flush_shadow_all() concurrently calls kvm_free_stage2_pgd()
+and sets pgt to NULL before the lock is acquired here, wouldn't this crash
+when dereferencing tmp[i].pgt?
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260812-kvm-arm-ne=
+sted-virt-fix-v1-0-4ad883f1b6a5@kernel.org?part=3D1
