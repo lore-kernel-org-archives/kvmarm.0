@@ -1,181 +1,240 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 519A3470EA2;
-	Wed, 12 Aug 2026 16:38:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C05CC3515FD;
+	Wed, 12 Aug 2026 16:41:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786552724; cv=none; b=Nm6w2EltILxfP+UfoHPs8yvGBb2+G47jmy8EbZoiPbLRbP9fW5NPgRnIPMBlwB9dxdAM+V7Usfa4a55utJshsOjVfiiV/NpeNYjTvIxwFzgWpRHdUFRSx+YVflgTM+XX54QHBqAGjBruOsL1MbvMV6k1/Yxz6JC/dHpP7cMa+UE=
+	t=1786552903; cv=none; b=Mvq2JXthm8L7atDsL8Sxie8N8U8KPRpaBJ6ZE45kM8I0Pu/UlZKZmJex27YVGh47A4OL4Mo0OJWjk8e55gCFohQoTdSY6vIEExFjapLXHkwul8SFJ6RR8B7YBogMb9IuclBzkXSHZcaD4IkO+gF5743kUF5ZzxxsrIDyrTBZDVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786552724; c=relaxed/simple;
-	bh=CBcx1FXjxgV9xrEr51C5aAI3GA0VO4xvtbdHQrcJjuw=;
+	s=arc-20240116; t=1786552903; c=relaxed/simple;
+	bh=D8FGi5ObNQbyVtlpTliLOfNlz/KUS8Q++cKptM4KhMQ=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=tuq41tBooxSUzohGdGrinRUWh+rZuuZZrieCT+tVQ3Rz4mdtkbe6zAtLMouZiPiQDHonYBmvlaLMD+v1qnqwmNVe7O1PyoI8zRpC2hIF4zh6h0FuwMpSpavTiREYaJXnU+Rwkv8o8YS8BmbQp2zVqNgm1icjMNiWQVE5rRolWxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dYmxiS1u; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=SWoOADBAjJypg1TaCeYvL5w/T1kNbPms6lbJLKcY5CDbTGNlELCBWtU0im6X+jpzt1XhpTOwB+wuNFbVqERDdjBq/UbcwLQRrMuB6/EKn6a4QQi64eyiEq7pZMK47UsdiXBZ0mt4xq0zBlvj4L1378J8+gxxGnn3Ndt/iDfyMcw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VV5h9lEn; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dYmxiS1u"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76C071F00A3A;
-	Wed, 12 Aug 2026 16:38:42 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VV5h9lEn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DADFF1F000E9;
+	Wed, 12 Aug 2026 16:41:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786552723;
-	bh=0+/9nol15K57ypPQ6svx7wYijNxYXJFNMqk5t1tn1fE=;
+	s=k20260515; t=1786552901;
+	bh=oEGqIl9xKMDRuD7jt7p6plnnvYSi5uw7BSEu0Y2QZvY=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=dYmxiS1ultvHQC9pBXqpsmJXNzWXF0tR5H2DkyW0diEFt37oGajEwyYyzlAa4a/7b
-	 bCV8ge9sI1q1ht+niej0MDpzzio9zdgSjhmo6c4fJIK6ptcA7Jb9LjZeFczQ5sv71n
-	 cpRgxDrWKcdQpVsjH8Nmx/maHoRxdQ/TEXIp1lQka/FvZHoU0RrKzNI05v47a+qoJE
-	 x2ac4KII/IR9I+rH9l0dR+aUjYmhuD+TEXpW+o2sbUAqujrj2OxsswN8wIiSB+j+6z
-	 x6p7ZFqWoWL2Rf/g9I4kZo3USFNFP7LDvk5tcMQNAXCsYI1E1QJc49B9LjpG0CdOqx
-	 MDDHKDI3a6tqw==
+	b=VV5h9lEnwFbTeSAGaQhUzipdV/l66XjXHeqPGEGl7FtfT8K0kclxqraJYxGc/pCOv
+	 oZOyphuGgM4dGOHrWRznMLfURDmDluX+IgzBh1pHVi1BLc39RXNW0UL5W0q0bthKTP
+	 XbbISROaSMcJTyKnH7ld4zYczxjkPYXkLWo8j16SB29q9LkZSKtG97/K2Cj0c22X0O
+	 hnCIH3q1Cl9fnS4U2wSQWU8Jog4/9oXdO/goeUmSeqTiMlVp0ZCWkRJBifibgIxw1q
+	 uTwKZaQ39w7uSz/z42rUFxAJsBVWEbMQFxyalo9ZwDnrdmLA+s+zGmvcJ+l1Bo2gii
+	 01R8IFsG8gS0g==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v6 30/33] KVM: s390: arm64: Implement vm/vcpu create
- destroy.
+Subject: Re: [PATCH v6 31/33] KVM: s390: arm64: Implement vCPU IOCTLs
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Steffen Eiden" <seiden@linux.ibm.com>
-Cc: "Oliver Upton" <oupton@kernel.org>, linux-s390@vger.kernel.org, kvmarm@lists.linux.dev, "Marc
- Zyngier" <maz@kernel.org>, "Christian Borntraeger" <borntraeger@linux.ibm.vom>, "Alexander
- Gordeev" <agordeev@linux.ibm.com>, "Vasily Gorbik" <gor@linux.ibm.com>, kvm@vger.kernel.org, "Heiko
- Carstens" <hca@linux.ibm.com>
-In-Reply-To: <20260812153631.3376090-31-seiden@linux.ibm.com>
+Cc: "Vasily Gorbik" <gor@linux.ibm.com>, "Heiko Carstens" <hca@linux.ibm.com>, linux-s390@vger.kernel.org, "Alexander
+ Gordeev" <agordeev@linux.ibm.com>, kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, "Oliver
+ Upton" <oupton@kernel.org>, kvm@vger.kernel.org, "Christian Borntraeger" <borntraeger@linux.ibm.vom>
+In-Reply-To: <20260812153631.3376090-32-seiden@linux.ibm.com>
 References: <20260812153631.3376090-1-seiden@linux.ibm.com>
- <20260812153631.3376090-31-seiden@linux.ibm.com>
+ <20260812153631.3376090-32-seiden@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 12 Aug 2026 16:38:42 +0000
-Message-Id: <20260812163842.76C071F00A3A@smtp.kernel.org>
+Date: Wed, 12 Aug 2026 16:41:40 +0000
+Message-Id: <20260812164140.DADFF1F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+Thank you for your contribution! Sashiko AI review found 6 potential issue(=
 s) to consider:
-- [High] Integer underflow in `kvm_max_guest_address()` bypassing KVM's IPA=
- limits and causing Undefined Behavior.
-- [High] VM IPA size configuration is ignored for memory boundaries, and me=
-m_limit suffers from an off-by-one error.
+- [Critical] kvm_arch_vcpu_ioctl_run() fails to acquire the kvm->srcu read =
+lock, leading to a Use-After-Free when accessing memslots during guest abor=
+ts.
+- [High] Guest-reachable WARN_ONCE on SAE validity intercept enables a host=
+ DoS.
+- [High] Calling local_irq_enable() immediately after guest_enter_irqoff() =
+violates strict RCU extended quiescent state (EQS) rules.
+- [High] check_vcpu_requests() fails to handle critical KVM requests like K=
+VM_REQ_TLB_FLUSH and KVM_REQ_VM_DEAD.
+- [High] Missing IN_GUEST_MODE coordination in the vCPU run loop creates a =
+race condition that can delay or drop signals and KVM requests.
+- [High] Missing vcpu_load() and vcpu_put() around KVM IOCTLs that modify a=
+rchitectural state in kvm_arch_vcpu_ioctl.
 --
 
---- Patch [30]: [PATCH v6 30/33] KVM: s390: arm64: Implement vm/vcpu create=
- destroy. ---
-commit ac331802b4f3974b686910d63a6161cfc71cfae4
+--- Patch [31]: [PATCH v6 31/33] KVM: s390: arm64: Implement vCPU IOCTLs ---
+commit e43ea7af3ba7491497b01c2a0860a8b946aad58d
 Author: Steffen Eiden <seiden@linux.ibm.com>
 
-KVM: s390: arm64: Implement vm/vcpu create destroy.
+KVM: s390: arm64: Implement vCPU IOCTLs
 
-Implement init and destroy IOCTLS for vcpu and vm.
-Implement arch vm IOCTL. Use s390 gmap and gmap plumbing.
-Implement function (stubs) required by gamp.
+This commit implements the required vCPU IOCTLs for the s390 arm64 KVM
+port. It provides the core structures for register access, lifecycle
+management, and the main vCPU execution loop.
 
 > diff --git a/arch/s390/kvm/arm64/arm.c b/arch/s390/kvm/arm64/arm.c
-> index 8e17b7eef8131..69d43066f9e1a 100644
 > --- a/arch/s390/kvm/arm64/arm.c
 > +++ b/arch/s390/kvm/arm64/arm.c
-> @@ -53,6 +58,83 @@ static u64 kvm_max_guest_address(void)
->  	return ALIGN_DOWN(max_addr + 1, 1 << 30) - 1;
->  }
-
-[Severity: High]
-Does this underflow if the host is booted with less than 1GB of memory?
-
-If sclp.hamax is less than 1GB, max_addr + 1 is less than 1 << 30.
-ALIGN_DOWN would result in 0, and 0 - 1 would underflow to U64_MAX.
 
 [ ... ]
 
-> +static int kvm_vm_type_ipa_size_shift(unsigned long type)
+> @@ -284,15 +309,15 @@
+> +static int check_vcpu_requests(struct kvm_vcpu *vcpu)
 > +{
-> +	int phys_shift;
-> +
-> +	phys_shift =3D KVM_VM_TYPE_ARM_IPA_SIZE(type);
-> +	if (phys_shift) {
-> +		if (phys_shift > get_kvm_ipa_limit() ||
-> +		    phys_shift < ARM64_MIN_PARANGE_BITS)
-> +			return -EINVAL;
+> +	if (kvm_request_pending(vcpu)) {
+> +		if (kvm_check_request(KVM_REQ_VCPU_RESET, vcpu))
+> +			kvm_reset_vcpu(vcpu);
+> +		/*
+> +		 * Clear IRQ_PENDING requests that were made to guarantee
+> +		 * that a VCPU sees new virtual interrupts.
+> +		 */
+> +		kvm_check_request(KVM_REQ_IRQ_PENDING, vcpu);
+> +	}
 
 [Severity: High]
-This seems to cascade from the potential underflow in kvm_max_guest_address=
-().
+Does this function properly handle all critical KVM requests?
 
-If get_kvm_ipa_limit() computes fls64(0) - 1, it would return -1 as 0xFFFFF=
-FFF
-via u32. Could a malicious userspace then bypass this IPA size check since
-phys_shift > get_kvm_ipa_limit() would evaluate to false?
+It appears to drop requests like KVM_REQ_TLB_FLUSH and KVM_REQ_VM_DEAD by
+not explicitly handling or clearing them. Can this bypass necessary TLB
+invalidations and dead VM checks?
+
+> +
+> +	return 1;
+> +}
 
 [ ... ]
 
-> +int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
-> +{
-> +	char debug_name[32];
-> +	int ret;
-> +
-> +	if (type & ~KVM_VM_TYPE_ARM_IPA_SIZE_MASK)
-> +		return -EINVAL;
-> +
-> +	ret =3D kvm_vm_type_ipa_size_shift(type);
-> +	if (ret < 0)
-> +		return ret;
-> +	kvm->arch.guest_phys_size =3D 1UL << ret;
-
-[Severity: High]
-If the check in kvm_vm_type_ipa_size_shift() is bypassed, the phys_shift va=
-lue
-(up to 255) would be used in this shift. Would this invoke undefined behavi=
-or
-since the shift amount could exceed the width of the type?
-
-[ ... ]
-
-> +	ret =3D kvm_gmap_init(kvm);
-> +	if (ret)
-> +		goto out_err;
-> +	kvm->arch.mem_limit =3D kvm_max_guest_address();
-
-[Severity: High]
-Is it intended that kvm->arch.mem_limit is hardcoded to the global host
-maximum instead of the VM's configured IPA size limit
-(kvm->arch.guest_phys_size)?
-
-If it uses the host's maximum, could userspace successfully map memory high=
-er
-than the configured VM IPA size limit?
-
-Also, kvm_max_guest_address() appears to return an inclusive limit, but when
-s390_kvm_mmu_prepare_memory_region() checks this limit:
-
-    if ((new->base_gfn + new->npages) * PAGE_SIZE > kvm->arch.mem_limit)
-
-it treats mem_limit as an exclusive boundary. Does this off-by-one prevent
-userspace from mapping the final page of the allowed memory region?
-
-[ ... ]
-
-> +int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+> @@ -390,13 +415,13 @@
+> +static void arm_vcpu_run(struct kvm_vcpu *vcpu)
 > +{
 > +	struct kvm_sae_block *sae_block =3D &vcpu->arch.sae_block;
-> +	struct kvm_sae_save_area *save_area =3D &vcpu->arch.save_area;
 > +
-> +	spin_lock_init(&vcpu->arch.mp_state_lock);
+> +	adjust_pc(vcpu);
 > +
-> +	/* Force users to call KVM_ARM_VCPU_INIT */
-> +	vcpu_clear_flag(vcpu, VCPU_INITIALIZED);
-> +
-> +	vcpu->arch.mc =3D kvm_s390_new_mmu_cache();
-> +	if (!vcpu->arch.mc)
-> +		return -ENOMEM;
-> +
-> +	sae_block->hbasce =3D vcpu->kvm->arch.gmap->asce.val;
-> +	sae_block->mso =3D 0L;
-> +	sae_block->msl =3D kvm_max_guest_address();
+> +	local_irq_disable();
+> +	guest_enter_irqoff();
+> +	local_irq_enable();
 
 [Severity: High]
-Does sae_block->msl also need to be scoped to the VM's requested size rather
-than the host maximum?
+Does this sequence violate RCU extended quiescent state rules?
 
-Setting this to the host maximum might remove hardware emulation boundaries=
- if
-the guest physical size was configured to be smaller.
+Calling local_irq_enable() immediately after guest_enter_irqoff() allows
+host interrupts to fire while RCU believes the CPU is idle.
+
+> +
+> +	sae_block->icptr =3D 0;
+> +
+> +	sae64a(sae_block);
+
+[ ... ]
+
+> @@ -436,15 +461,15 @@
+> +	ret =3D 1;
+> +	do {
+> +		if (signal_pending(current)) {
+> +			kvm_run->exit_reason =3D KVM_EXIT_INTR;
+> +			ret =3D -EINTR;
+> +			continue;
+> +		}
+> +
+> +		if (need_resched())
+> +			schedule();
+> +
+> +		if (ret > 0)
+> +			ret =3D check_vcpu_requests(vcpu);
+> +
+> +		vcpu->arch.sae_block.icptr =3D 0;
+> +
+> +		arm_vcpu_run(vcpu);
+
+[Severity: High]
+Could this loop race with concurrent IPI kicks?
+
+It executes arm_vcpu_run() without coordinating via vcpu->mode =3D IN_GUEST=
+_MODE.
+A concurrent request kick via kvm_vcpu_kick() might see OUTSIDE_GUEST_MODE
+and skip sending the IPI.
+
+> +
+> +		ret =3D handle_exit(vcpu);
+
+[Severity: Critical]
+Does handle_exit() require SRCU protection here?
+
+The loop calls handle_exit() which routes synchronous exceptions to the gue=
+st
+abort handler. If the abort handler translates guest addresses and accesses
+active memslots without holding kvm->srcu, could a concurrent userspace
+operation like KVM_SET_USER_MEMORY_REGION trigger a use-after-free?
+
+> +
+> +	} while (ret > 0);
+
+[ ... ]
+
+> @@ -515,15 +540,15 @@
+> +long kvm_arch_vcpu_ioctl(struct file *filp, unsigned int ioctl, unsigned=
+ long arg)
+> +{
+> +	struct kvm_vcpu *vcpu =3D filp->private_data;
+> +	void __user *argp =3D (void __user *)arg;
+> +	struct kvm_device_attr attr;
+> +	int ret;
+> +
+> +	switch (ioctl) {
+> +	case KVM_ARM_VCPU_INIT: {
+> +		struct kvm_vcpu_init init;
+
+[Severity: High]
+Are vcpu_load() and vcpu_put() required around these ioctls?
+
+Operations like KVM_SET_ONE_REG modify architectural state but do not acqui=
+re
+the vcpu_load locks, potentially bypassing preempt notifiers and physical-C=
+PU
+hardware state tracking hooks.
+
+> +
+> +		ret =3D -EFAULT;
+> +		if (copy_from_user(&init, argp, sizeof(init)))
+> +			break;
+
+[ ... ]
+
+> diff --git a/arch/s390/kvm/arm64/handle_exit.c b/arch/s390/kvm/arm64/hand=
+le_exit.c
+> --- a/arch/s390/kvm/arm64/handle_exit.c
+> +++ b/arch/s390/kvm/arm64/handle_exit.c
+
+[ ... ]
+
+> @@ -66,13 +78,13 @@
+> +int handle_exit(struct kvm_vcpu *vcpu)
+> +{
+> +	u8 icptr =3D vcpu->arch.sae_block.icptr;
+> +	int ret =3D 1;
+> +
+> +	switch (icptr) {
+> +	case SAE_ICPTR_SPURIOUS:
+> +		break;
+> +	case SAE_ICPTR_VALIDITY:
+> +		WARN_ONCE(true, "SAE: validity intercept. vir: 0x%04x",
+> +			  vcpu->arch.sae_block.vir);
+
+[Severity: High]
+Is it safe to use a guest-reachable WARN_ONCE here?
+
+An unprivileged userspace process configuring KVM could set malformed guest
+state via KVM_SET_ONE_REG, and the hardware would reject this during
+execution, returning a validity intercept. Should this return an error to
+userspace instead of triggering a host warning?
+
+> +		ret =3D -EINVAL;
+> +		break;
+
+[ ... ]
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260812153631.3376=
-090-1-seiden@linux.ibm.com?part=3D30
+090-1-seiden@linux.ibm.com?part=3D31
