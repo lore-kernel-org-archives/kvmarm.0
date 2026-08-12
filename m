@@ -1,53 +1,53 @@
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB979470EB2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8E0A4302F0
 	for <kvmarm@lists.linux.dev>; Wed, 12 Aug 2026 15:37:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786549029; cv=none; b=i+LVRIXsp/ubvFDkLYaOfVX2X3WFNpOCbugxQDAzWVqf0yOvJ25FpG0Q6Zg6ZOHy8ms1UNDeGpcv81Bq2PuyXIU7ZzCtFUQfejyW+AkGHvN0CIzBYNUdf+YAGNMssGXakRYkCLQIHiduly8VMQzsKtWDnb2xDQ8UhpQ+Q9ZuuVU=
+	t=1786549029; cv=none; b=qVMvXAUF7naKarFx0VhE229SyBODvi2GXtAFPhSHKZBxFxOPh4EPbfVX2nYnA13ylN+6sx9RgIItGeckLRjm/cOzihsqOLRb/5WHBfOGWwpE+JGKlQSNdRUuaqFC43fB8idjvF5rr1hPhfCBDyLoN+mJt1r9AWySmFM/VpX1/qs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1786549029; c=relaxed/simple;
-	bh=MNr34QA4exGDujDQ2v/MKuHtAdWp6LYgl1KHdt/wpbM=;
+	bh=dSvMIDvJm6IzwXNQ65iwxXqa90FGz9LEvL0jLe1mkqA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NXmE8EueyV5vhhmQnBkPKcqW1+Aqcpw9DBZoNT5OcHnuTDIkWzeP4Ov3+OzkIzeUxHp4fFWIIjcpbtykSR1u+yCI2kFiBUpNE0CqdbeceP90vtu8+svzRiPJhPATNNCCsg4lKUbBI+YH6AS+cNsEKrkSOh7TYpABCq5abDzVS/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=LyfMAkyA; arc=none smtp.client-ip=148.163.156.1
+	 MIME-Version; b=K02T5fH0Xmh0iY9BMjmDonCuEGjEB7a+6vpebETlWh1EP80XuGRa71Eb5x4rcNMHSYjzXbo5S1R1JMiP7ncqzUpKWFAO6B1wdAiZPrTYrb0kMrPX08a04CZKNFrZqvG4yPy5KjkIPtgILut6dS/xOS3HnIsugFtQtIX1dY4vl50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=MnJD6QwV; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="LyfMAkyA"
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67CE1meH3687174;
-	Wed, 12 Aug 2026 15:36:43 GMT
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="MnJD6QwV"
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67CE1bCC3640263;
+	Wed, 12 Aug 2026 15:36:42 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=vX0JhDDXNBnfGCA1V
-	Hi3fAjLiUTD3W0wwM5OuZSdrF0=; b=LyfMAkyAZNkM9A/IOutveFkJo0c8PRhab
-	wteD00bsZ0+h9ik0oyrHSnoVgid1nd/91IBcHE1PeXHeD1C1c9SNuHQaanN4l25q
-	MOw/EHdY85jxcTkaYuWIULvLyrR+V9+FLswg9y2aeqE7Ov0H30Ip9JH+9xzzgLB+
-	CEDJGNm3WpwxX4+5lqcGGGBhEbCoHNdspWFpuLeWW76TBtzzk3mwFQ7NEfXGUQaZ
-	lzjicfOhxKl2tdrEOpbsBMLYWCcercW2V9siHm7UizfZ2BZGIhLLsyaADmKdq77W
-	7Zga4h3Kw2By9cXcOuQAwhXYL71dXAoWJrItyrzXb8L/Z6Umv8FKg==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fwvm9u9u0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 12 Aug 2026 15:36:42 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 67CFQOOc013784;
-	Wed, 12 Aug 2026 15:36:41 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4fxg9h6mk3-1
+	:mime-version:references:subject:to; s=pp1; bh=cPdtovAYXF22FUXJg
+	W37R+HUCWsKp0CDniDtlu11EGg=; b=MnJD6QwV8QED0nGLoC16FBJVUiAJ5SEsz
+	6zL5joYFfa17uLTNgWoJm2q2BcZtN/ZuauvR5i2N5bfvzNuzRg6sOrLGizOGOVzf
+	iGn1IV10TbJJyM5fplbUvsSP/LBag+XhCX120uowQeq03GWq9+Il4QgqPhb1309N
+	DKm+wqaF4dI7B8YKutp1WDe1qEU0FIaGgi0T3dUTKrGOSQFK2OANp2ZgHBVX6Itb
+	LU7b7yKz46jC2ip+JTzROea+n2vgP2lrj7gR2mR/H//yA6x0icSm+ffg1/11qgok
+	rdna94pw2tBlPqT5cDBNvjBiLR6DMiDy/sWrGIOt2GxZurKyMPBfg==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fwvq9k7bv-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Wed, 12 Aug 2026 15:36:41 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 67CFQNvt012331;
+	Wed, 12 Aug 2026 15:36:40 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4fxesq6uta-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 12 Aug 2026 15:36:40 +0000 (GMT)
 Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 67CFabDo37618088
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 67CFaa1I38797602
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
 	Wed, 12 Aug 2026 15:36:37 GMT
 Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3748820049;
-	Wed, 12 Aug 2026 15:36:37 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id D003920040;
+	Wed, 12 Aug 2026 15:36:36 +0000 (GMT)
 Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D540C2004D;
+	by IMSVA (Postfix) with ESMTP id 7ECE22004F;
 	Wed, 12 Aug 2026 15:36:36 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
 	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
@@ -78,9 +78,9 @@ Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
         Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v6 13/33] KVM: s390: Prepare include guards for a new location
-Date: Wed, 12 Aug 2026 17:36:09 +0200
-Message-ID: <20260812153631.3376090-14-seiden@linux.ibm.com>
+Subject: [PATCH v6 12/33] KVM: s390: Extract gmap tracing to a separate header
+Date: Wed, 12 Aug 2026 17:36:08 +0200
+Message-ID: <20260812153631.3376090-13-seiden@linux.ibm.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260812153631.3376090-1-seiden@linux.ibm.com>
 References: <20260812153631.3376090-1-seiden@linux.ibm.com>
@@ -93,108 +93,147 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODEyMDEyNiBTYWx0ZWRfXwkTyVP7pbZ8t
- 9dnTQsMba2GOfibuR6ehI1P0QaT45jqz3Y1S9kM9h/PzmCIW9/xs2Qma/xXQFrGK526knJEVXm/
- vmrEu3HN/l5n+96UIfd51exg7dtLT6SNFYk+K9ZuvIc96ayI2FoonKfHRt0I9JdoodS+YhpD4A/
- 0ZsWXE9PZ+SUTD5zMI92FS2dYJGNlT89QysLXspKlBEt23FWVzaAXP0dIGoswVqYBrmHKqUUQgX
- d32luaawgrTAUhBRUp024728SBVPSY7rIyzri+bXC5getvwX9896H6MRHaDA2HNcJcl4ST8P7tL
- THhKAmf+sZYN8Gs3lKjVuAld5CqaGedYclaHIv8PwGxcPHLvp46dMQYuSnwDokUoFVuckH06ubw
- 7kEwHh+1PPNhFUERSPyODXDCy4Dkz5JojOB/smiCNjom+AA8/FjiuI73treGWFNmQWpggVj1uRU
- rvB5SzdI1ZvG2wBEZnA==
-X-Proofpoint-ORIG-GUID: Qc9OFY2T-XcjZQj8nkFY2REe8_BxbBFR
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODEyMDEyNiBTYWx0ZWRfX8Ar6d0KCJwig
- AZbos1cn/AEVmkLzgIaXsK7Zphmfkz33CSIVY599/rDvq5t0yg5kaHaUK2nlwZXA5b8kLj2WRzQ
- S7j+3E5BBra0oU76PQkeQU33WEkh8yI=
-X-Authority-Analysis: v=2.4 cv=IfK3n2qa c=1 sm=1 tr=0 ts=6a7c930b cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+X-Proofpoint-GUID: 4RLhiJBG_ECstebReXH6oyQMvCaJMXi-
+X-Authority-Analysis: v=2.4 cv=PbDPQChd c=1 sm=1 tr=0 ts=6a7c930a cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
  a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
- a=U7nrCbtTmkRpXpFmAIza:22 a=VnNF1IyMAAAA:8 a=0n0nkFggx1xHrEoCumAA:9
-X-Proofpoint-GUID: nPtXakkkjq2FEaatpXQhgPu4_iaHtAeG
+ a=iQ6ETzBq9ecOQQE5vZCe:22 a=VnNF1IyMAAAA:8 a=hUpfy6h2KLrKm0K-hOsA:9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODEyMDEyNiBTYWx0ZWRfXyOQhuOvmWgCu
+ 7789l1u8jBSO0roN5429dQzs9DBD1PnpcXnSmGjar6P1hemnGXx1lNL2BU2+zugIzYBbZTdkRm6
+ f0CS0BIepVRH6Y3QeaAd+ic27J1GywGejUqmDi+tGSJFPkuItMEK5R1j61uWzK1fuMFf2BccNTQ
+ 0AQ0btIGj6wiBg5YLyAy0NzhIsverd9Gm0E9o2Ywo5fJQA8l/+SqtxK0/pBFGEJ47edx3NTHb0f
+ gnwZeIfasaDmb1O5nValexZL+uVarOJe8KSs8hFSsENgc+pjAza/1kC3lh8ppy4TZT9aoSmok0D
+ wRHP8Q00M67kNuruz5GPpG0pi+kCZmCFsqGkFFGUXHXL5ZG2L/h8rT6QVN8VTYbKUvH13BDbo9G
+ m3+BjeS7VRoMHJ2windd7n9GDkLQOtl6QPOgOM3OPdjtOBHWpSXG5jhHg3rAchenWsC0ZcZwGie
+ ThEbiDgv8E8iUokl4Ow==
+X-Proofpoint-ORIG-GUID: 4IKwY207ohIYZNIWOT49smatfU6whGSv
+X-Proofpoint-Spam-Info: AW1haW4tMjYwODEyMDEyNiBTYWx0ZWRfX9tOJ76A74RdO
+ Mr75z1r2CBqdEhbpFR/hsBnEEAoYyVxE5N122ZihtoztnVx21xd87qjKnd5grinZ5q7w7S8G164
+ ObvHns3xuS9b8dOBv3k3grWnVsuqIZw=
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
  definitions=2026-08-12_04,2026-08-12_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 priorityscore=1501 impostorscore=0 bulkscore=0 clxscore=1015
- lowpriorityscore=0 adultscore=0 malwarescore=0 spamscore=0 suspectscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2608120126
+ spamscore=0 bulkscore=0 impostorscore=0 malwarescore=0 adultscore=0
+ clxscore=1015 priorityscore=1501 suspectscore=0 phishscore=0
+ lowpriorityscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
+ definitions=main-2608120126
 
-Update include guard names in dat.h, faultin.h, and gmap.h to
-ARCH_KVM_GMAP_* to reflect their upcoming relocation to a shared gmap
-directory.
+Move the kvm_s390_major_guest_pfault trace event from trace.h to a new
+trace_gmap.h header. This separates gmap-specific tracing from general
+KVM/s390 tracing, preparing for code sharing between multiple KVM
+implementations.
+
+The trace event definition is updated to use local defines for
+parameters so that they can be replaced later with ease for when another
+KVM implementation uses these traces.
 
 No functional change.
 
 Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
 ---
- arch/s390/kvm/dat.h     | 6 +++---
- arch/s390/kvm/faultin.h | 6 +++---
- arch/s390/kvm/gmap.h    | 6 +++---
- 3 files changed, 9 insertions(+), 9 deletions(-)
+ arch/s390/kvm/faultin.c    |  3 ++-
+ arch/s390/kvm/trace.h      | 14 ------------
+ arch/s390/kvm/trace_gmap.h | 47 ++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 49 insertions(+), 15 deletions(-)
+ create mode 100644 arch/s390/kvm/trace_gmap.h
 
-diff --git a/arch/s390/kvm/dat.h b/arch/s390/kvm/dat.h
-index 141ee7b9f019..87108f51228e 100644
---- a/arch/s390/kvm/dat.h
-+++ b/arch/s390/kvm/dat.h
-@@ -6,8 +6,8 @@
-  *    Author(s): Claudio Imbrenda <imbrenda@linux.ibm.com>
-  */
- 
--#ifndef __KVM_S390_DAT_H
--#define __KVM_S390_DAT_H
-+#ifndef ARCH_KVM_GMAP_DAT_H
-+#define ARCH_KVM_GMAP_DAT_H
- 
- #include <linux/radix-tree.h>
- #include <linux/refcount.h>
-@@ -975,4 +975,4 @@ static inline bool crste_is_ucas(union crste crste)
- 	return is_pmd(crste) && crste.h.i && crste.h.fc0.tl == 1 && crste.h.fc == 0;
- }
- 
--#endif /* __KVM_S390_DAT_H */
-+#endif /* ARCH_KVM_GMAP_DAT_H */
-diff --git a/arch/s390/kvm/faultin.h b/arch/s390/kvm/faultin.h
-index f86176d2769c..f343b6fb6f16 100644
---- a/arch/s390/kvm/faultin.h
-+++ b/arch/s390/kvm/faultin.h
-@@ -6,8 +6,8 @@
-  *    Author(s): Claudio Imbrenda <imbrenda@linux.ibm.com>
-  */
- 
--#ifndef __KVM_S390_FAULTIN_H
--#define __KVM_S390_FAULTIN_H
-+#ifndef ARCH_KVM_GMAP_FAULTIN_H
-+#define ARCH_KVM_GMAP_FAULTIN_H
- 
+diff --git a/arch/s390/kvm/faultin.c b/arch/s390/kvm/faultin.c
+index 3cc45f7f5b2d..1dc79807012c 100644
+--- a/arch/s390/kvm/faultin.c
++++ b/arch/s390/kvm/faultin.c
+@@ -9,10 +9,11 @@
  #include <linux/kvm_host.h>
  
-@@ -89,4 +89,4 @@ static inline int kvm_s390_get_guest_pages(struct kvm *kvm, struct guest_fault *
- #define kvm_s390_array_needs_retry_safe(kvm, seq, array) \
- 	kvm_s390_multiple_faults_need_retry(kvm, seq, array, ARRAY_SIZE(array), false)
+ #include "gmap.h"
+-#include "trace.h"
+ #include "faultin.h"
  
--#endif /* __KVM_S390_FAULTIN_H */
-+#endif /* ARCH_KVM_GMAP_FAULTIN_H */
-diff --git a/arch/s390/kvm/gmap.h b/arch/s390/kvm/gmap.h
-index 39938d363ec9..c54c35e47d6d 100644
---- a/arch/s390/kvm/gmap.h
-+++ b/arch/s390/kvm/gmap.h
-@@ -7,8 +7,8 @@
-  *               Claudio Imbrenda <imbrenda@linux.ibm.com>
-  */
+ bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu);
++#define CREATE_TRACE_POINTS
++#include "trace_gmap.h"
  
--#ifndef ARCH_KVM_S390_GMAP_H
--#define ARCH_KVM_S390_GMAP_H
-+#ifndef ARCH_KVM_GMAP_GMAP_H
-+#define ARCH_KVM_GMAP_GMAP_H
+ /*
+  * kvm_s390_faultin_gfn() - handle a dat fault.
+diff --git a/arch/s390/kvm/trace.h b/arch/s390/kvm/trace.h
+index dd2685c7df5b..3d2fffb1555a 100644
+--- a/arch/s390/kvm/trace.h
++++ b/arch/s390/kvm/trace.h
+@@ -45,20 +45,6 @@ TRACE_EVENT(kvm_s390_skey_related_inst,
+ 	    VCPU_TP_PRINTK("%s", "storage key related instruction")
+ 	);
  
- #include "dat.h"
- 
-@@ -330,4 +330,4 @@ static inline bool gmap_is_shadow_valid(struct gmap *sg, union asce asce, int ed
- 	return sg->guest_asce.val == asce.val && sg->edat_level == edat_level;
- }
- 
--#endif /* ARCH_KVM_S390_GMAP_H */
-+#endif /* ARCH_KVM_GMAP_GMAP_H */
+-TRACE_EVENT(kvm_s390_major_guest_pfault,
+-	    TP_PROTO(VCPU_PROTO_COMMON),
+-	    TP_ARGS(VCPU_ARGS_COMMON),
+-
+-	    TP_STRUCT__entry(
+-		    VCPU_FIELD_COMMON
+-		    ),
+-
+-	    TP_fast_assign(
+-		    VCPU_ASSIGN_COMMON
+-		    ),
+-	    VCPU_TP_PRINTK("%s", "major fault, maybe applicable for pfault")
+-	);
+-
+ TRACE_EVENT(kvm_s390_pfault_init,
+ 	    TP_PROTO(VCPU_PROTO_COMMON, long pfault_token),
+ 	    TP_ARGS(VCPU_ARGS_COMMON, pfault_token),
+diff --git a/arch/s390/kvm/trace_gmap.h b/arch/s390/kvm/trace_gmap.h
+new file mode 100644
+index 000000000000..a3cad705021b
+--- /dev/null
++++ b/arch/s390/kvm/trace_gmap.h
+@@ -0,0 +1,47 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#if !defined(GMAP_TRACE_KVM_H) || defined(TRACE_HEADER_MULTI_READ)
++#define GMAP_TRACE_KVM_H
++
++#include <linux/tracepoint.h>
++
++#undef TRACE_SYSTEM
++#define TRACE_SYSTEM kvm
++#undef TRACE_INCLUDE_PATH
++#define TRACE_INCLUDE_PATH .
++#undef TRACE_INCLUDE_FILE
++#define TRACE_INCLUDE_FILE trace_gmap
++
++#define __KVM_FIELDS \
++	__field(unsigned long, pswmask) \
++	__field(unsigned long, pswaddr)
++#define __KVM_ASSIGN ({\
++	__entry->pswmask = vcpu->arch.sie_block->gpsw.mask; \
++	__entry->pswaddr = vcpu->arch.sie_block->gpsw.addr; \
++	})
++#define __KVM_PRINT \
++	__entry->pswmask,\
++	__entry->pswaddr
++
++TRACE_EVENT(kvm_s390_major_guest_pfault,
++	    TP_PROTO(struct kvm_vcpu *vcpu),
++	    TP_ARGS(vcpu),
++
++	    TP_STRUCT__entry(
++		__field(int, id)
++		__KVM_FIELDS
++		),
++
++	    TP_fast_assign(
++		__entry->id = vcpu->vcpu_id;
++		__KVM_ASSIGN
++		),
++	    TP_printk("%02d[%016lx-%016lx]: major fault, maybe applicable for pfault",
++		__entry->id,
++		__KVM_PRINT
++		)
++	    );
++
++#endif /* GMAP_TRACE_KVM_H */
++
++/* This part must be outside protection */
++#include <trace/define_trace.h>
 -- 
 2.53.0
 
