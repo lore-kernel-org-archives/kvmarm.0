@@ -1,33 +1,33 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B63EE2F3C18;
-	Wed, 12 Aug 2026 06:04:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B29E73E867A;
+	Wed, 12 Aug 2026 09:01:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786514675; cv=none; b=MBk1Ymm+BqQBJxN7yg02Gm2MSp40ED2XA7eesGBpGXdSulJV5GjqC9VSwBOxoExnqYExvFq9D9vy7SuNCvRi5ZVJkvUStvIL+1DGv8hBpqLwrnkGVIx3xVYQfyUJeTst/vYR+4cb8fkmRTFjmYeAQqUg4lJkxBXxKWRmmXGr22o=
+	t=1786525320; cv=none; b=N6vQXFSR1TnfxjQI4ppCiRXT/lLCXy9lJ+ROdbLHMipuERFIcAUINWxIQ3BfqQCkgSc75njaArYgWWjYxy9ZePxvU/hXtfdcYtiP4ZabhLRnqYBAXssAL6atJHKA8nH+u7mPbrMYLpdtTx2uWHjaow4sHPLbRz3HLSVUZbKW0ok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786514675; c=relaxed/simple;
-	bh=tmIAlhtUrYkRiVryzRy6E42aPb+KIvoQND5y6DtYj/8=;
+	s=arc-20240116; t=1786525320; c=relaxed/simple;
+	bh=fhi1CG9KJ7r5EFbdg94wZP9tdmI61cXorDFoinPpFvI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qTDOj2i5qaHNUwRkRC6bniNodB1m/D7Xybzc6w8wMIc+l1wJgNr8UhKsR9H7+CFJTlLFsgLdzDusJuE9mQZBzSW6ROWHEdy+q0OQO+8bHAS5ol62xmiE9kLoYxLDIsJDk4YeZG07mMdV7Pw2VhBiET+lhUdKImNEipHsgIQ2fFU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=pr0gPwat; arc=none smtp.client-ip=217.140.110.172
+	 In-Reply-To:Content-Type; b=Z5mJNPWEOw41xdz7dkTX96hYHexJheecaEDT1D2bV6bu0OJUuOpTc3qaVgFdndg8gnoEnIrnW28koMxvFrqKcZKGxq5xiWbNzHpXYciIQe1EnZKry+qgV8LCzFp/laujI7xP5mWls80/MJmhS4jyOwl7pyUQ7m66sAK9rK4eZb0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=QGPEfFKy; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="pr0gPwat"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="QGPEfFKy"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 412751516;
-	Tue, 11 Aug 2026 23:04:22 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DE1441596;
+	Wed, 12 Aug 2026 02:01:51 -0700 (PDT)
 Received: from [10.57.44.219] (unknown [10.57.44.219])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BCA7C3F86F;
-	Tue, 11 Aug 2026 23:04:22 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BE2753F86F;
+	Wed, 12 Aug 2026 02:01:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1786514666; bh=tmIAlhtUrYkRiVryzRy6E42aPb+KIvoQND5y6DtYj/8=;
+	t=1786525315; bh=fhi1CG9KJ7r5EFbdg94wZP9tdmI61cXorDFoinPpFvI=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=pr0gPwatQrinT/xvvxhWSrPY8SQhis1ft5oWWGKpUlOlSsmKBigV7jyKOXWEQXEzR
-	 K6e9O8yEfSfCP1WQAj7dLNjj7jjjol+T3OWtrgsGfFIlHjKeqoi0eVTLj9ioz3iOOg
-	 jfKWBE0aQKAZi9Fpjuq6iyLTeeahfHryAvVN9Ktw=
-Message-ID: <f5d47f5f-5869-4e3a-a176-4fd632567975@arm.com>
-Date: Wed, 12 Aug 2026 07:04:21 +0100
+	b=QGPEfFKybXe6rNomdv0fzgoUx1xUydEqGfiSseGhGVM9AgQ2oBiMSL++OZ1Z6BDei
+	 +U9WxgtH3yQbk+rt/X7cx2cSz05c1xdVZ1kJ0xtqt3bmOl2mIEkr28sEjAiJ86XpQm
+	 sXbjd99E1hsDc3d4VRdqy/3aroVUYRnmw2mUPcuo=
+Message-ID: <b512db4b-793b-4dd1-baac-e873b39f5b0b@arm.com>
+Date: Wed, 12 Aug 2026 10:01:48 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -35,12 +35,13 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v16 00/45] arm64: Support for Arm CCA in KVM
+Subject: Re: [PATCH v16 29/45] KVM: arm64: CCA: Support runtime faulting of
+ memory
 Content-Language: en-GB
-To: Alper Gun <alpergun@google.com>, Gavin Shan <gshan@redhat.com>
-Cc: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev, Catalin Marinas <catalin.marinas@arm.com>,
- Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+To: Catalin Marinas <catalin.marinas@arm.com>,
+ Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, Marc Zyngier
+ <maz@kernel.org>, Will Deacon <will@kernel.org>,
  James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
  Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
  linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
@@ -48,133 +49,125 @@ Cc: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
  Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
  linux-coco@lists.linux.dev,
  Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>,
- "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
- Emi Kisanuki <fj0570is@fujitsu.com>, Vishal Annapurve
- <vannapurve@google.com>, WeiLin.Chang@arm.com,
- Lorenzo Pieralisi <lpieralisi@kernel.org>, Javier.AlmansaSobrino@arm.com
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
+ Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
+ Lorenzo Pieralisi <lpieralisi@kernel.org>
 References: <20260803134403.80630-1-steven.price@arm.com>
- <42170467-fe36-4382-867f-49bdc6a7bc9a@arm.com>
- <d0ffbcb5-0cca-4d1e-9788-6b430345fa9b@redhat.com>
- <5e86232a-89ed-40ff-89e2-9e48fbf9554e@arm.com>
- <e2894206-7470-4606-b9ac-eedc8d2bdaf3@redhat.com>
- <CABpDEukGY+ctSi6wHAaC7o4pGmastX_Y18K2_VYDhNME7TF+wQ@mail.gmail.com>
+ <20260803134403.80630-30-steven.price@arm.com> <antC5JOxDPs7i876@arm.com>
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <CABpDEukGY+ctSi6wHAaC7o4pGmastX_Y18K2_VYDhNME7TF+wQ@mail.gmail.com>
+In-Reply-To: <antC5JOxDPs7i876@arm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-Hi Alper, Gavin
-
-On 12/08/2026 04:25, Alper Gun wrote:
-> On Tue, Aug 11, 2026 at 8:08 PM Gavin Shan <gshan@redhat.com> wrote:
->> As the following calltrace indicates, -EAGAIN is returned from tf-rmm::update_ripas()
->> because true is returned from s2tte_drain_pending() for the S2TTE corresponding to
->> IPA 0x80000000. Linux host received error (RMI_ERROR_RTT, level=3) in ripas_change().
->> Upon this specific error and the IPA range [0x80000000 0x90000000], find_map_level()
->> returns level of 2, and realm_create_rtt_levels() returns 0 without populating any
->> RTTs. After that, rmi_rtt_set_ripas() is re-executed and the above loop starts over
->> again.
+On 11/08/2026 16:42, Catalin Marinas wrote:
+> On Mon, Aug 03, 2026 at 02:43:45PM +0100, Steven Price wrote:
+>> At runtime if the realm guest accesses memory which hasn't yet been
+>> mapped then KVM needs to either populate the region or fault the guest.
 >>
->>     Linux host
->>     ==========
->>     kvm_arch_vcpu_ioctl_run                     // cca/host-v16
->>       check_vcpu_requests
->>         kvm_check_request
->>           kvm_rec_handle_request
->>             kvm_complete_ripas_change
->>               realm_set_ipa_state
->>                 ripas_change
->>                   rmi_rtt_set_ripas
->>                     SMC_RMI_RTT_SET_RIPAS
->>
->>     TF-RMM
->>     ======
->>     SMC_RMI_RTT_SET_RIPAS                      // tf-rmm/topics/rmm-v2.0-poc_3
->>       smc_rtt_set_ripas
->>         s2tt_walk_lock_unlock
->>         rtt_set_ripas_range
->>           update_ripas
->>             s2tte_drain_pending                // true, returns -EAGAIN
->>
->> The problem is the pending-bit for RTE corresponding IPA address 0x80000000 isn't cleared
->> when SMC_RMI_RTT_SET_RIPAS is invoked. I didn't figure out how this bit is set and why
->> it's not cleared in time.
-
-Thanks for the details.
-
->>
+>> For memory in the lower (protected) region of IPA a fresh page is
+>> provided to the RMM which will zero the contents. For memory in the
+>> upper (shared) region of IPA, the memory from the memslot is mapped
+>> into the realm VM non secure.
 > 
-> Hi Gavin, Suzuki,
+> Is this still true with in-place guestmem conversion?
 > 
-> I think I ran into a similar issue on rmm-v2.0-poc_3 last week.
-> This looks like a potential RMM bug: could bit 32 be part of the physical
-> Address (if PA >= 4 GiB)?
+>> @@ -1693,7 +1709,14 @@ static int gmem_abort(const struct kvm_s2_fault_desc *s2fd)
+>>   	kvm_fault_lock(kvm);
+>>   	if (mmu_invalidate_retry(kvm, mmu_seq)) {
+>>   		ret = -EAGAIN;
+>> -		goto out_unlock;
+>> +		goto out_release_page;
+>> +	}
+>> +
+>> +	if (kvm_is_realm(kvm)) {
+>> +		prot &= ~KVM_PGTABLE_PROT_X;
+>> +		ret = realm_map_ipa(kvm, s2fd->fault_ipa, pfn,
+>> +				    PAGE_SIZE, prot, memcache);
+>> +		goto out_release_page;
+>>   	}
 > 
-> It seems s2tte_drain_pending() in lib/s2tt/src/s2tt.c checks bit 32 without
-> checking whether the descriptor is valid or invalid.
+> [...]
 > 
-> In my testing, guarding the drain checks with a check for S2TTE_INVALID seemed
-> to resolve the boot hang:
-> --- a/lib/s2tt/src/s2tt.c
-> +++ b/lib/s2tt/src/s2tt.c
-> @@ -1701,6 +1701,10 @@ unsigned long
-> s2tte_clear_drain_pending(unsigned long s2tte)
+>> +int realm_map_ipa(struct kvm *kvm, phys_addr_t ipa,
+>> +		  kvm_pfn_t pfn, unsigned long map_size,
+>> +		  enum kvm_pgtable_prot prot,
+>> +		  struct kvm_mmu_memory_cache *memcache)
+>> +{
+>> +	struct realm *realm = &kvm->arch.realm;
+>> +
+>> +	ipa = ALIGN_DOWN(ipa, map_size);
+>> +	if (!kvm_realm_is_private_address(realm, ipa)) {
+>> +		return realm_map_non_secure(kvm, ipa, pfn, map_size, prot,
+>> +					    memcache);
+>> +	}
+>> +
+>> +	/* It's impossible to map protected pages read-only. */
+>> +	if (WARN_ON(!(prot & KVM_PGTABLE_PROT_W)))
+>> +		return -EFAULT;
+>> +	return realm_map_protected(kvm, ipa, pfn, map_size, memcache);
+>> +}
 > 
->   bool s2tte_drain_pending(unsigned long s2tte)
->   {
-> + if ((s2tte & S2TT_DESC_VALID_MASK) != S2TTE_INVALID) {
-> + return false;
+> I was trying to understand (with the help of some LLMs) to understand
+> whether we can end up on the do_gpf() path as a result of VMM actions.
+> The above kvm_realm_is_private_address() only checks for the IPA but
+> does not check against guestmem if the page is truly private. I probably
+> miss something but the scenario would be something like:
+> 
+> 1. VMM creates the gmem region with GUEST_MEMFD_FLAG_MMAP |
+>     GUEST_MEMFD_FLAG_INIT_SHARED, mmap()able and GUP-pinnable
+> 
+> 2. VMM starts an O_DIRECT write() from that mapping; the block layer
+>     FOLL_PINs the shared folio
+> 
+> 3. VMM runs a vCPU so the realm touches the protected-IPA alias of the
+>     same gfn. gmem_abort() delegates the pinned, still-shared page to
+>     the RMM
+> 
+> 4. The in-flight I/O then reads the now-Realm page from the kernel
+>     linear map. That access takes a GPF at EL1, so do_gpf() ->
+>     die_kernel_fault()
 
-We should use also consider cases where the entry is INVALID, but
-has HIPAS=ASSIGNED/ASSIGNED_DEV to make it tighter. So, I think
-it is better to use :
+This is correct. The fundamental issue is that we have a disconnect
+between the "gmem attribute" changes (to private/shared) and the
+RIPAS and this is something we want to fix.
 
-s2tte_is_unassigned() or in the library stick to :
+e.g., the KVM CCA driver sets the entire DRAM to RIPAS_RAM for
+the Realm before ACTIVATION and we expect that the VMM changes
+the gmem to PRIVATE. They both are not in sync. his is something
+we were discussing the other day with Aneesh.
 
-if (!s2tte_has_hipas(s2tte, S2TTE_INVALID_HIPAS_UNASSIGNED))
-	return false;
+Once they are in sync, we are protected. If the RIPAS=EMPTY
+(gmem=shared) a stage2 fault doesn't come to the Host.
 
-May be we should assert this and make the caller responsible for
-checking the bit. I will leave it to the tf-RMM team to fix.
+If the RIPAS=RAM, the gmem is private and there are no usespace
+mappings.
 
-But for now, please use the above fix.
+The reason why it is disconnected at the moment is due to the
+weird semantics for Guest triggered conversions in CCA
+i.e., Realm requests via RSI_IPA_STATE_SET, triggering a RIPAS_CHANGE
+exit to the KVM.
 
-Cheers
+The KVM exits to VMM with MEMORY_FAULT_EXIT and the VMM can service this
+by invoking GMEM(SET_ATTRIBUTES2). But, the KVM needs to invoke the
+RMI_RTT_SET_RIPAS in the context of the "vcpu", which we don't have
+from the "kvm" context. I guess we can fix it by running through the
+vcpus and find the matching one with the "ipa" range and the "ripas".
+
+And as for the VMM requests before the Realm is activated, we could
+map that to RMI_RTT_INIT_RIPAS and removing the implicit change
+from KVM arm64.
+
+
+Thanks
 Suzuki
 
 
-> + }
-> +
->    return (s2tte & S2TTE_SW_DRAIN_PENDING_BIT) != 0UL;
->   }
 > 
-> @@ -1730,11 +1734,19 @@ unsigned long
-> s2tte_clear_tlbi_pending(unsigned long s2tte)
+> x86, IIUC, also checks kvm_gmem_is_private(). They also have
+> kvm_arch_gmem_make_private() triggered on the kvm_gmem_get_pfn() path
+> but I got lost in the call sites, not sure whether that's strictly
+> needed if we check both private IPA and kvm_gmem_is_private().
 > 
->   bool s2tte_tlbi_pending(unsigned long s2tte)
->   {
-> + if ((s2tte & S2TT_DESC_VALID_MASK) != S2TTE_INVALID) {
-> + return false;
-> + }
-> +
->    return (s2tte & S2TTE_SW_TLBI_PENDING_BIT) != 0UL;
->   }
-> 
->   unsigned int s2tte_drain_handle(unsigned long s2tte)
->   {
-> + if ((s2tte & S2TT_DESC_VALID_MASK) != S2TTE_INVALID) {
-> + return 0U;
-> + }
-> +
->    return (unsigned int)EXTRACT(S2TTE_SW_HANDLE, s2tte);
->   }
-> 
-
-
-
-
-> Sharing in case it helps.
-> Thanks,
-> Alper
 
