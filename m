@@ -1,197 +1,169 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3F0F4756C1;
-	Wed, 12 Aug 2026 15:40:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D6424746A3
+	for <kvmarm@lists.linux.dev>; Wed, 12 Aug 2026 15:42:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786549221; cv=none; b=rqjf96Eigo9PAn69GhzBSngmQS4JQR5n+a9OWsrpXIrsCQ+06f166VEeW7a9MYbMl+NOm03YEt8GuAisLk1KatZQFaO4Gr2h0bVi/lA9d++6f7dCyT/o0KcYLSPgkWbO9LEAwqZGevjr5gobRP16jIHu04fudl4mSt+GGVvL9Dc=
+	t=1786549328; cv=none; b=Q7EK7lBaKjB0Lilrp5MnmpgCmqYutLnI7yuFqafkitAvgs4SRFh3WclVgIqTeJKJ/0p7tBYePcmKvEMC+gPltOvYICqjmq8Oh0jFDPvlYyL28XIFHArWPahIg0P5wfCh7EDArTlUET1FlnyXnQWsmYVxAlXLr3BN23uScj16iX8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786549221; c=relaxed/simple;
-	bh=zN/WiVKoMI3rKwUNQzf/CFzkgl2DOGa4/+tIpa89YXg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LeLwC+Bq3uaiAAg7yBaJ7Ekh6GWrGvjN1ARTfbBivEWrE7V3X50DlYiG9MP2ttE8dcTn5hYRe44ZntdBFrYMscQwabMpr2ryOvLzd6RYoQlxSZOHlbtMWGg1h60+AqRupPf/nveViWR84bRG9faeq8IA/BvphC1XZmYsp5GTXvk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=P5KBS1DD; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1786549328; c=relaxed/simple;
+	bh=toUuq+e8+AhEgq4luBQMAPg2nLKcYYOSDvgjOF8SIYw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=tiLKzxVn6oGd4lh4Q4ppu7ch3LH0KWGmhgkLupyA1H2Lp2Xz2dDxUhERTKYlealI497UVFuVf2Ki4bsQ0jceT4glalqz1YaZKqfF7TwbDd0VfHV747qdBqg1iXWHHByEMLMRHAmji8gWoFHwatgNHPpkQRqXIQa5u4YoZQ0w3KU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ZDCY0KHp; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="P5KBS1DD"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9C0611596;
-	Wed, 12 Aug 2026 08:40:11 -0700 (PDT)
-Received: from [10.57.44.219] (unknown [10.57.44.219])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2EBD43F66F;
-	Wed, 12 Aug 2026 08:40:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1786549215; bh=zN/WiVKoMI3rKwUNQzf/CFzkgl2DOGa4/+tIpa89YXg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=P5KBS1DDcDt2umaSj9ukE+Pf/OEVx8CX3GAxEaA33tJPWUKE5tNdg3+HnYhNXUYF/
-	 mcjVrCElP6IQxLr4ZZoJse04WLDbVWovt/TSx0KU9vcCZqryPCmzA5Y8rMQtu26f7e
-	 VHpO83jjPRPU35BRVOF/cj2zH5ONRHBA9BWEqetM=
-Message-ID: <2c04aab0-99e3-47e6-808d-9662dd5b1a10@arm.com>
-Date: Wed, 12 Aug 2026 16:40:09 +0100
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ZDCY0KHp"
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67CE1uFi3594446;
+	Wed, 12 Aug 2026 15:36:46 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:in-reply-to:message-id
+	:mime-version:references:subject:to; s=pp1; bh=FXg4mQ5ABYtlMNvWj
+	pCpG3Ntfpr0j+KTb6BbqGNeJIo=; b=ZDCY0KHpMU8MmeBfRS6QGw///hNC05IK/
+	dBu5SEQIVK6ywmHcxyWsE+DCII0pokJDWCKBajygZusqYZp39qfDJEZLyJ/+Ivj6
+	4lnlRC61OdbTiJMWiKr2Tof9e+uHjb0pTQSnAZgA+Nznp/F24n9Dxr5O6/OZFjZY
+	FfXTUgGI4AvqHlZWAtf5Id1C6IJmip2T3bGmz0pLLhPdUq2XCRePD3YqxDwzf//3
+	0Xya2y8n9GfaqA9b/HeiWDDMe576wDzcl+wdVG3SgqiG6MPeZZQQmnSkxl59tRiV
+	gQRaxKOaoqeqw4hEsk7mfdjgZZrSCOSGyrxcsPk5YlseYIANDdA8w==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fwvp32e1y-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 12 Aug 2026 15:36:45 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 67CFQGeB021692;
+	Wed, 12 Aug 2026 15:36:44 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4fxhfy6g4a-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 12 Aug 2026 15:36:44 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 67CFaeEK31130130
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 12 Aug 2026 15:36:40 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 912B220063;
+	Wed, 12 Aug 2026 15:36:40 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 41B502004B;
+	Wed, 12 Aug 2026 15:36:40 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 12 Aug 2026 15:36:40 +0000 (GMT)
+From: Steffen Eiden <seiden@linux.ibm.com>
+To: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
+        Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@kernel.org>,
+        Friedrich Welter <fritz@linux.ibm.com>, Fuad Tabba <tabba@google.com>,
+        Gautam Gala <ggala@linux.ibm.com>,
+        Hariharan Mari <hari55@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Hendrik Brueckner <brueckner@linux.ibm.com>,
+        Ilya Leoshkevich <iii@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
+        Marc Zyngier <maz@kernel.org>, Nico Boehr <nrb@linux.ibm.com>,
+        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
+        Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH v6 22/33] KVM: s390: Prepare KVM/s390 for a second KVM module
+Date: Wed, 12 Aug 2026 17:36:18 +0200
+Message-ID: <20260812153631.3376090-23-seiden@linux.ibm.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260812153631.3376090-1-seiden@linux.ibm.com>
+References: <20260812153631.3376090-1-seiden@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v16 29/45] KVM: arm64: CCA: Support runtime faulting of
- memory
-Content-Language: en-GB
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
- Lorenzo Pieralisi <lpieralisi@kernel.org>
-References: <20260803134403.80630-1-steven.price@arm.com>
- <20260803134403.80630-30-steven.price@arm.com> <antC5JOxDPs7i876@arm.com>
- <b512db4b-793b-4dd1-baac-e873b39f5b0b@arm.com> <anx9195WR8wokAcL@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <anx9195WR8wokAcL@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Authority-Analysis: v=2.4 cv=AMtp2X5w c=1 sm=1 tr=0 ts=6a7c930d cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
+ a=Y2IxJ9c9Rs8Kov3niI8_:22 a=VnNF1IyMAAAA:8 a=m33X-YrdrFVFgJ0cfecA:9
+X-Proofpoint-GUID: sYLW8VJ-mz1HbBc_1dqJ-6AQWIHpYnSe
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODEyMDEyNiBTYWx0ZWRfX9zZF7x4XLFTE
+ QcKiZ7F5+UvLQrlCiYPhvrRqg5Xr79Y6QuGeTyZgbzJFhKRdeL+9lr/4frbiEQoU+wEisdbuuU3
+ HDqS4JDk/4rbaoJ9yKYEoF4wsbX/G8q1pchaonPc4fi3s6So/lguJ0sOI210c7AyVjOjh5y55ZF
+ d7ZQbmxga80OZOTdjZBq5pctMkltUydyDjJOOn1SW5Aa8Lfy2xrv3hZ8IVSZ+wf92QSINknL9BG
+ Bhfp06UeSTFxLNPPbm/NZ3QLUg1aRmUxaLrzbkf4mBadaSVr07zP9H8VOC5tM/E7x+GAMK7C9vx
+ qZzo/PC7O2YiKT2vZGlfAFiKPSOMg74UmMQhK1ftutYk04wkac3wH7O7RWp6V9XxqTXr9F32dxc
+ 1+/yWR9f74G4RX+PeSRx10ehPrz/WoT/iRizZYv7SRymTVk/i/b/Jc0tGF5Vknkmplk9ccfFgWH
+ AOF7Wt/FZIAPuuZtBkA==
+X-Proofpoint-ORIG-GUID: AU-9JOyLvryHb86NGv5uDMXjFShF84y8
+X-Proofpoint-Spam-Info: AW1haW4tMjYwODEyMDEyNiBTYWx0ZWRfXylZPU5qhyBZW
+ fbC5/BKDb9fY4B5/4pyxSD6eK8QZjc8Hj6uYWVgyKZZx1tzKt3BT/BZa2geJCvqUPj2z46TcsXy
+ cNNbSw6pm4en88xvosDt9vfmm2On9Fw=
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-08-12_04,2026-08-12_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ suspectscore=0 adultscore=0 lowpriorityscore=0 clxscore=1015
+ priorityscore=1501 impostorscore=0 phishscore=0 spamscore=0 bulkscore=0
+ malwarescore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
+ definitions=main-2608120126
 
-On 12/08/2026 15:06, Catalin Marinas wrote:
-> On Wed, Aug 12, 2026 at 10:01:48AM +0100, Suzuki K Poulose wrote:
->> On 11/08/2026 16:42, Catalin Marinas wrote:
->>> On Mon, Aug 03, 2026 at 02:43:45PM +0100, Steven Price wrote:
->>>> At runtime if the realm guest accesses memory which hasn't yet been
->>>> mapped then KVM needs to either populate the region or fault the guest.
->>>>
->>>> For memory in the lower (protected) region of IPA a fresh page is
->>>> provided to the RMM which will zero the contents. For memory in the
->>>> upper (shared) region of IPA, the memory from the memslot is mapped
->>>> into the realm VM non secure.
->>>
->>> Is this still true with in-place guestmem conversion?
->>>
->>>> @@ -1693,7 +1709,14 @@ static int gmem_abort(const struct kvm_s2_fault_desc *s2fd)
->>>>    	kvm_fault_lock(kvm);
->>>>    	if (mmu_invalidate_retry(kvm, mmu_seq)) {
->>>>    		ret = -EAGAIN;
->>>> -		goto out_unlock;
->>>> +		goto out_release_page;
->>>> +	}
->>>> +
->>>> +	if (kvm_is_realm(kvm)) {
->>>> +		prot &= ~KVM_PGTABLE_PROT_X;
->>>> +		ret = realm_map_ipa(kvm, s2fd->fault_ipa, pfn,
->>>> +				    PAGE_SIZE, prot, memcache);
->>>> +		goto out_release_page;
->>>>    	}
->>>
->>> [...]
->>>
->>>> +int realm_map_ipa(struct kvm *kvm, phys_addr_t ipa,
->>>> +		  kvm_pfn_t pfn, unsigned long map_size,
->>>> +		  enum kvm_pgtable_prot prot,
->>>> +		  struct kvm_mmu_memory_cache *memcache)
->>>> +{
->>>> +	struct realm *realm = &kvm->arch.realm;
->>>> +
->>>> +	ipa = ALIGN_DOWN(ipa, map_size);
->>>> +	if (!kvm_realm_is_private_address(realm, ipa)) {
->>>> +		return realm_map_non_secure(kvm, ipa, pfn, map_size, prot,
->>>> +					    memcache);
->>>> +	}
->>>> +
->>>> +	/* It's impossible to map protected pages read-only. */
->>>> +	if (WARN_ON(!(prot & KVM_PGTABLE_PROT_W)))
->>>> +		return -EFAULT;
->>>> +	return realm_map_protected(kvm, ipa, pfn, map_size, memcache);
->>>> +}
->>>
->>> I was trying to understand (with the help of some LLMs) to understand
->>> whether we can end up on the do_gpf() path as a result of VMM actions.
->>> The above kvm_realm_is_private_address() only checks for the IPA but
->>> does not check against guestmem if the page is truly private. I probably
->>> miss something but the scenario would be something like:
->>>
->>> 1. VMM creates the gmem region with GUEST_MEMFD_FLAG_MMAP |
->>>      GUEST_MEMFD_FLAG_INIT_SHARED, mmap()able and GUP-pinnable
->>>
->>> 2. VMM starts an O_DIRECT write() from that mapping; the block layer
->>>      FOLL_PINs the shared folio
->>>
->>> 3. VMM runs a vCPU so the realm touches the protected-IPA alias of the
->>>      same gfn. gmem_abort() delegates the pinned, still-shared page to
->>>      the RMM
->>>
->>> 4. The in-flight I/O then reads the now-Realm page from the kernel
->>>      linear map. That access takes a GPF at EL1, so do_gpf() ->
->>>      die_kernel_fault()
->>
->> This is correct. The fundamental issue is that we have a disconnect
->> between the "gmem attribute" changes (to private/shared) and the
->> RIPAS and this is something we want to fix.
->>
->> e.g., the KVM CCA driver sets the entire DRAM to RIPAS_RAM for
->> the Realm before ACTIVATION and we expect that the VMM changes
->> the gmem to PRIVATE. They both are not in sync. his is something
->> we were discussing the other day with Aneesh.
->>
->> Once they are in sync, we are protected. If the RIPAS=EMPTY
->> (gmem=shared) a stage2 fault doesn't come to the Host.
->>
->> If the RIPAS=RAM, the gmem is private and there are no usespace
->> mappings.
->>
->> The reason why it is disconnected at the moment is due to the
->> weird semantics for Guest triggered conversions in CCA
->> i.e., Realm requests via RSI_IPA_STATE_SET, triggering a RIPAS_CHANGE
->> exit to the KVM.
->>
->> The KVM exits to VMM with MEMORY_FAULT_EXIT and the VMM can service this
->> by invoking GMEM(SET_ATTRIBUTES2).
-> 
-> I guess a buggy or malicious VMM may skip the gmem attribute setting and
-> simply resume the guest. Currently we can end up with SET_RIPAS
-> irrespective of what the VMM did. So at this point maybe we need to
-> check that the gmem attribute was actually changed before handling the
-> pending RMI requests.
-> 
-> The other place to check the gmem status is when handling the
-> gmem_abort().
+The second KVM module will have a different Kconfig set. When both
+modules are compiled the Kconfig sets get merged and the native s390 KVM
+needs to implement functionality required by the respective config
+options. Ensure that s390-KVM will still compile by implementing a stub
+for kvm_arch_vcpu_run_pid_change if CONFIG_HAVE_KVM_VCPU_RUN_PID_CHANGE
+is enabled and defining KVM_NO_MMIO to disable KVM_MMIO.
 
-We did have that check in v14 [0] and forcing a MEMORY_FAULT_EXIT. I 
-thought we didn't need it with in-place conversion, but looks like that was
-wrong call.
+Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
+---
+ arch/s390/include/asm/kvm_host_s390.h | 1 +
+ arch/s390/kvm/s390/s390.c             | 8 ++++++++
+ 2 files changed, 9 insertions(+)
 
-
-[0] 
-https://lore.kernel.org/all/20260513131757.116630-30-steven.price@arm.com/
-
-
-> 
-> I wonder whether we can have any races with either of these if multiple
-> vCPUs toggle the RIPAS state between RAM and EMPTY and we need both
-> places (the RIPAS_CHANGE exit and the actual stage 2 fault).
-> 
->> But, the KVM needs to invoke the
->> RMI_RTT_SET_RIPAS in the context of the "vcpu", which we don't have
->> from the "kvm" context. I guess we can fix it by running through the
->> vcpus and find the matching one with the "ipa" range and the "ripas".
-> 
-> Or multiple vcpus? Does the spec allow multiple RIPAS_CHANGE requests
-> for the same IPA? If yes, we probably need to clear all.
-
-Ideally, a guest shouldn't pass overlapping requests to the host. Host
-could reject either of them, irrespective of the order we got it.
-
-I will get this clarified in the spec.
-
-Cheers
-Suzuki
-
-
+diff --git a/arch/s390/include/asm/kvm_host_s390.h b/arch/s390/include/asm/kvm_host_s390.h
+index cd692f8fb764..207f44cb86d9 100644
+--- a/arch/s390/include/asm/kvm_host_s390.h
++++ b/arch/s390/include/asm/kvm_host_s390.h
+@@ -29,6 +29,7 @@
+ 
+ #define KVM_HAVE_MMU_RWLOCK
+ #define KVM_MAX_VCPUS 255
++#define KVM_NO_MMIO
+ 
+ #define KVM_INTERNAL_MEM_SLOTS 1
+ 
+diff --git a/arch/s390/kvm/s390/s390.c b/arch/s390/kvm/s390/s390.c
+index 1d0d94f000f7..d1e736e1f06f 100644
+--- a/arch/s390/kvm/s390/s390.c
++++ b/arch/s390/kvm/s390/s390.c
+@@ -5868,6 +5868,14 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+ 	return gmap_unmap_gfn_range(kvm->arch.gmap, range->slot, range->start, range->end);
+ }
+ 
++#ifdef CONFIG_HAVE_KVM_VCPU_RUN_PID_CHANGE
++/* Make s390 compile if arm64-on-s390 is selected */
++int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
++{
++	return 0;
++}
++#endif /* CONFIG_HAVE_KVM_VCPU_RUN_PID_CHANGE */
++
+ static inline unsigned long nonhyp_mask(int i)
+ {
+ 	unsigned int nonhyp_fai = (sclp.hmfai << i * 2) >> 30;
+-- 
+2.53.0
 
