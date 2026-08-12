@@ -1,168 +1,178 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAFD94399DD
-	for <kvmarm@lists.linux.dev>; Wed, 12 Aug 2026 11:21:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D554143E072;
+	Wed, 12 Aug 2026 12:18:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786533706; cv=none; b=Ycw7du7DmHuK0ps6JhT6iS2omuJoli2VyJX6L/pWouy7L9balOEAA08AMHKIgKiQRjhAYtggsEw5jnEClVRCBIQNE2IAWTv9zXw7CW4FVz0qmFZ15Zht68YOpow/0zmKmGayEItAJfLsGpJH72xQNTRZbHtmk1ugR3EP2OVuT2k=
+	t=1786537133; cv=none; b=KkjT+myRRRJpRLn4Qkqeq8NtrCHeWysAOBARNSaFgFEvM6yzxNbUCaGZbw4+coeuVaZHuq4A8L97dQq7CJG39Pe5i0CRtpHxEHHK/eDgTbiy3Se4R7cvbigHyan+p/YNEBS+RpQ3T+QMjGjr00xCKxcpjXgC2dULJHYYf4bFUBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786533706; c=relaxed/simple;
-	bh=uc8UMTUcAc8ZS/P+6zbuB/2Y5u+uo+jypF+mtHt96pE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CIOvn8PvCblBBCCT5gGN8WDcFsRNc+Rju4BZVsv7FV5pWbxyp+wyo4Rif+iRKF89vqpM2D39kCDxxsV+PVj2eCqS3+r+aMbxFroB42VazSimEse+5BO+AVD3db+psRpasdSUMxDt0dMc6rBVUPAM7aEtNgDKk94kco50w3RgQmk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=ekPfEqaV; arc=none smtp.client-ip=217.140.110.172
+	s=arc-20240116; t=1786537133; c=relaxed/simple;
+	bh=enjpyTGV6J/Ax7972/ygga5P+saUH5TOac+lROt0YfI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tIC00CGPFt7C8zbHG4Or5UCqhZlaMjm8dFZJu6ymcqP9Ypc5OKJauG+uzheIVtAfOUM4Npv7s9OVL0kwhit/6L0UhksCAeLOV/Q1AnuFt49Z+tL16tvhmdSSvPxUdUK6qEUxKw+5jSZWTe6tfl3YcBCoPNJ9KDZn51rxAkOv4vw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=kNCmgPa7; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="ekPfEqaV"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="kNCmgPa7"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 01F161682;
-	Wed, 12 Aug 2026 04:21:39 -0700 (PDT)
-Received: from e143914.arm.com (e143914.arm.com [10.2.213.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 15DEC3F632;
-	Wed, 12 Aug 2026 04:21:40 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 19FC61596;
+	Wed, 12 Aug 2026 05:18:45 -0700 (PDT)
+Received: from [10.57.44.219] (unknown [10.57.44.219])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 614353F632;
+	Wed, 12 Aug 2026 05:18:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1786533702; bh=uc8UMTUcAc8ZS/P+6zbuB/2Y5u+uo+jypF+mtHt96pE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ekPfEqaVCpaAXY6MbA6c2uUF2x/vChiTFrl+sZEaEeIKaGHASaoEctkvB7NDS5qAm
-	 PQtiEK3PgUp7SvcMdLGsJokNrbEtsEgWJyeH9k95+KVbCPXDpkPgenhfWhcrPuwA++
-	 8nnibAEVoFlzWR5a9vd/ZTEhMitRodi1fROi8hCY=
-Date: Wed, 12 Aug 2026 12:21:35 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Shen Yongchao <grayhat@foxmail.com>,
-	Karl Mehltretter <kmehltretter@gmail.com>, stable@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: nv: Fix life cycle of the nested_mmus array
-Message-ID: <anxXP_ZTZb_iKu1w@e143914.arm.com>
-References: <20260811122057.754772-1-maz@kernel.org>
+	t=1786537129; bh=enjpyTGV6J/Ax7972/ygga5P+saUH5TOac+lROt0YfI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=kNCmgPa7qbwWpc4aPu/N9O4IsZPqlPzAwORtgDQiHuFdRMliEFHLMbHgcSvs8EDCJ
+	 n4amYci4PH8hgMq4unWEILtiTirpl3DM9zhHsyb+uOFBMrPYCDKBIgGlx4RPhm6WqX
+	 pG4b/waj23NmfedDPTA6MyJ3XEjTDadHBaaYzNUc=
+Message-ID: <650bb70a-a02d-4976-a5c8-7cc5fb811b55@arm.com>
+Date: Wed, 12 Aug 2026 13:18:43 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260811122057.754772-1-maz@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v16 00/45] arm64: Support for Arm CCA in KVM
+Content-Language: en-GB
+To: Gavin Shan <gshan@redhat.com>, Alper Gun <alpergun@google.com>
+Cc: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev, Catalin Marinas <catalin.marinas@arm.com>,
+ Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+ James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Shanker Donthineni <sdonthineni@nvidia.com>,
+ "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+ Emi Kisanuki <fj0570is@fujitsu.com>, Vishal Annapurve
+ <vannapurve@google.com>, WeiLin.Chang@arm.com,
+ Lorenzo Pieralisi <lpieralisi@kernel.org>, Javier.AlmansaSobrino@arm.com
+References: <20260803134403.80630-1-steven.price@arm.com>
+ <42170467-fe36-4382-867f-49bdc6a7bc9a@arm.com>
+ <d0ffbcb5-0cca-4d1e-9788-6b430345fa9b@redhat.com>
+ <5e86232a-89ed-40ff-89e2-9e48fbf9554e@arm.com>
+ <e2894206-7470-4606-b9ac-eedc8d2bdaf3@redhat.com>
+ <CABpDEukGY+ctSi6wHAaC7o4pGmastX_Y18K2_VYDhNME7TF+wQ@mail.gmail.com>
+ <f5d47f5f-5869-4e3a-a176-4fd632567975@arm.com>
+ <ad7d1093-685d-4c11-807d-929d16271cdb@redhat.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <ad7d1093-685d-4c11-807d-929d16271cdb@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi,
+On 12/08/2026 11:35, Gavin Shan wrote:
+> Hi Alper and Suzuki,
+> 
+> On 8/12/26 4:04 PM, Suzuki K Poulose wrote:
+>> Hi Alper, Gavin
+>>
+>> On 12/08/2026 04:25, Alper Gun wrote:
+>>> On Tue, Aug 11, 2026 at 8:08 PM Gavin Shan <gshan@redhat.com> wrote:
+>>>> As the following calltrace indicates, -EAGAIN is returned from tf- 
+>>>> rmm::update_ripas()
+>>>> because true is returned from s2tte_drain_pending() for the S2TTE 
+>>>> corresponding to
+>>>> IPA 0x80000000. Linux host received error (RMI_ERROR_RTT, level=3) 
+>>>> in ripas_change().
+>>>> Upon this specific error and the IPA range [0x80000000 0x90000000], 
+>>>> find_map_level()
+>>>> returns level of 2, and realm_create_rtt_levels() returns 0 without 
+>>>> populating any
+>>>> RTTs. After that, rmi_rtt_set_ripas() is re-executed and the above 
+>>>> loop starts over
+>>>> again.
+>>>>
+>>>>     Linux host
+>>>>     ==========
+>>>>     kvm_arch_vcpu_ioctl_run                     // cca/host-v16
+>>>>       check_vcpu_requests
+>>>>         kvm_check_request
+>>>>           kvm_rec_handle_request
+>>>>             kvm_complete_ripas_change
+>>>>               realm_set_ipa_state
+>>>>                 ripas_change
+>>>>                   rmi_rtt_set_ripas
+>>>>                     SMC_RMI_RTT_SET_RIPAS
+>>>>
+>>>>     TF-RMM
+>>>>     ======
+>>>>     SMC_RMI_RTT_SET_RIPAS                      // tf-rmm/topics/rmm- 
+>>>> v2.0-poc_3
+>>>>       smc_rtt_set_ripas
+>>>>         s2tt_walk_lock_unlock
+>>>>         rtt_set_ripas_range
+>>>>           update_ripas
+>>>>             s2tte_drain_pending                // true, returns -EAGAIN
+>>>>
+>>>> The problem is the pending-bit for RTE corresponding IPA address 
+>>>> 0x80000000 isn't cleared
+>>>> when SMC_RMI_RTT_SET_RIPAS is invoked. I didn't figure out how this 
+>>>> bit is set and why
+>>>> it's not cleared in time.
+>>
+>> Thanks for the details.
+>>
+>>>>
+>>>
+>>> Hi Gavin, Suzuki,
+>>>
+>>> I think I ran into a similar issue on rmm-v2.0-poc_3 last week.
+>>> This looks like a potential RMM bug: could bit 32 be part of the 
+>>> physical
+>>> Address (if PA >= 4 GiB)?
+>>>
+>>> It seems s2tte_drain_pending() in lib/s2tt/src/s2tt.c checks bit 32 
+>>> without
+>>> checking whether the descriptor is valid or invalid.
+>>>
+>>> In my testing, guarding the drain checks with a check for 
+>>> S2TTE_INVALID seemed
+>>> to resolve the boot hang:
+>>> --- a/lib/s2tt/src/s2tt.c
+>>> +++ b/lib/s2tt/src/s2tt.c
+>>> @@ -1701,6 +1701,10 @@ unsigned long
+>>> s2tte_clear_drain_pending(unsigned long s2tte)
+>>>
+>>>   bool s2tte_drain_pending(unsigned long s2tte)
+>>>   {
+>>> + if ((s2tte & S2TT_DESC_VALID_MASK) != S2TTE_INVALID) {
+>>> + return false;
+>>
+>> We should use also consider cases where the entry is INVALID, but
+>> has HIPAS=ASSIGNED/ASSIGNED_DEV to make it tighter. So, I think
+>> it is better to use :
+>>
+>> s2tte_is_unassigned() or in the library stick to :
+>>
+>> if (!s2tte_has_hipas(s2tte, S2TTE_INVALID_HIPAS_UNASSIGNED))
+>>      return false;
+>>
+>> May be we should assert this and make the caller responsible for
+>> checking the bit. I will leave it to the tf-RMM team to fix.
+>>
+>> But for now, please use the above fix.
+>>
+> 
+> Both worked for me. With the extra check in place, the realm guest can boot
+> up successfully.
+> 
+> FYI, The below additional checks in s2tte_tlbi_pending() and 
+> s2tte_drain_handle()
+> aren't needed because they're always guarded by s2tte_drain_pending() in 
+> all
+> calling sites.
 
-Small comment / suggestion.
+fyi, the tf-RMM patch is out for review here : (Thanks Javier)
 
-On Tue, Aug 11, 2026 at 01:20:57PM +0100, Marc Zyngier wrote:
-> The nested_mmus array holds the shadow page tables that are used when
-> a guest is running a nested context. These structures are allocated on
-> VCPU_INIT for whole guest, which implies that they may have to be
-> relocated as the array grows.
-> 
-> Should a VCPU_INIT occur whilst a vcpu is actively running an L2 and
-> that the allocation requires relocation, that vcpu will still be
-> running with a pointer to the previous structure, which will have been
-> freed.
-> 
-> Fix this by turning the array of structures to an array of pointers,
-> which is now allocated at VM creation, sized to the absolute maximum
-> that KVM can handle.
-> 
-> In turn, each VCPU_INIT contributes S2_MMU_PER_VCPU to the pool. No
-> reallocation is ever performed, and the life cycle of each object is
-> much clearer:
-> 
-> - the nested_mmus array is allocated in kvm_init_nested(), and freed
->   in kvm_arch_destroy_vm()
-> 
-> - s2_mmu structures are allocated in kvm_vcpu_init_nested(), and freed
->   on kvm_arch_flush_shadow_all()
-> 
-> Finally, the freeing of vcpu->arch.vncr_array is made consistent
-> rather than being done on some failure paths, but not others.
-> 
-> Fixes: 4f128f8e1aaa ("KVM: arm64: nv: Support multiple nested Stage-2 mmu structures")
-> Reported-by: Shen Yongchao <grayhat@foxmail.com>
-> Reported-by: Karl Mehltretter <kmehltretter@gmail.com>
-> Suggested-by: Karl Mehltretter <kmehltretter@gmail.com>
-> Link: https://lore.kernel.org/r/20260803224405.41468-1-kmehltretter@gmail.com
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Cc: stable@vger.kernel.org
-> ---
-> 
-> Notes:
->     Sending this as a first class patch, since the other approaches were even
->     uglier than this one. I'm still displeased with kvm_arch_flush_shadow_all(),
->     but that's a step in the direction of tightening it:
-> 
->  arch/arm64/include/asm/kvm_host.h   |  2 +-
->  arch/arm64/include/asm/kvm_nested.h |  2 +-
->  arch/arm64/kvm/arm.c                |  8 ++-
->  arch/arm64/kvm/nested.c             | 91 +++++++++++++----------------
->  4 files changed, 49 insertions(+), 54 deletions(-)
-> 
-[..]
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 20af94197a8a7..50d6dcc75582c 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -44,11 +44,15 @@ struct vncr_tlb {
->   */
->  #define S2_MMU_PER_VCPU		2
->  
-> -void kvm_init_nested(struct kvm *kvm)
-> +int kvm_init_nested(struct kvm *kvm)
->  {
-> -	kvm->arch.nested_mmus = NULL;
-> +	kvm->arch.nested_mmus = kvmalloc_array(KVM_MAX_VCPUS * S2_MMU_PER_VCPU,
-> +					       sizeof(struct s2_mmu *),
-> +					       GFP_KERNEL_ACCOUNT);
->  	kvm->arch.nested_mmus_size = 0;
->  	atomic_set(&kvm->arch.vncr_tlb_count, 0);
-> +
-> +	return kvm->arch.nested_mmus ? 0 : -ENOMEM;
->  }
->  
->  static int init_nested_s2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
-> @@ -69,8 +73,7 @@ static int init_nested_s2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
->  int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
->  {
->  	struct kvm *kvm = vcpu->kvm;
-> -	struct kvm_s2_mmu *tmp;
-> -	int num_mmus, ret = 0;
-> +	int num_mmus;
->  
->  	if (test_bit(KVM_ARM_VCPU_HAS_EL2_E2H0, kvm->arch.vcpu_features) &&
->  	    !cpus_have_final_cap(ARM64_HAS_HCR_NV1))
-> @@ -83,51 +86,40 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
->  	if (!vcpu->arch.ctxt.vncr_array)
->  		return -ENOMEM;
->  
-> -	/*
-> -	 * Let's treat memory allocation failures as benign: If we fail to
-> -	 * allocate anything, return an error and keep the allocated array
-> -	 * alive. Userspace may try to recover by initializing the vcpu
-> -	 * again, and there is no reason to affect the whole VM for this.
-> -	 */
->  	num_mmus = atomic_read(&kvm->online_vcpus) * S2_MMU_PER_VCPU;
->  
->  	if (num_mmus > kvm->arch.nested_mmus_size) {
+https://review.trustedfirmware.org/c/TF-RMM/tf-rmm/+/53531
 
-Sashiko.dev complained about a possible race here, but looking at the
-code, it seems incorrect?
+Please feel free to cherry-pick that one
 
-Unsure why it didn't e-mail it.
-https://sashiko.dev/#/patchset/20260811122057.754772-1-maz%40kernel.org
-
-It seems that this code is serialised / protected by
-kvm->arch.config_lock in __kvm_vcpu_set_target() (which is the only
-caller of kvm_vcpu_init_nested() via kvm_setup_vcpu())
-
-So maybe a
-
-	lockdep_assert_held(&kvm->arch.config_lock);
-
-makes sense in kvm_vcpu_init_nested()?
-
-Thanks,
-Joey
+Cheers
+Suzuki
