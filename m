@@ -1,173 +1,93 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B29E73E867A;
-	Wed, 12 Aug 2026 09:01:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA7AD41684A
+	for <kvmarm@lists.linux.dev>; Wed, 12 Aug 2026 09:42:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786525320; cv=none; b=N6vQXFSR1TnfxjQI4ppCiRXT/lLCXy9lJ+ROdbLHMipuERFIcAUINWxIQ3BfqQCkgSc75njaArYgWWjYxy9ZePxvU/hXtfdcYtiP4ZabhLRnqYBAXssAL6atJHKA8nH+u7mPbrMYLpdtTx2uWHjaow4sHPLbRz3HLSVUZbKW0ok=
+	t=1786527776; cv=none; b=Lm48YrKkyFmKRGcrd0WT1iTcgHYNezTHvZ6dX/t6Et4tx9K60WnXc6K9Ng9XQU5vgxKfyjmWrp9nPJcCfscTEEjZBQZBgiPvo4KYc+8QqdRoLcFgHZCUOguV8EkDFZPCVdAOaxcuWdapYqh29NI/IbhQFEGKA0u4hkyW5ZVsAjg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786525320; c=relaxed/simple;
-	bh=fhi1CG9KJ7r5EFbdg94wZP9tdmI61cXorDFoinPpFvI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Z5mJNPWEOw41xdz7dkTX96hYHexJheecaEDT1D2bV6bu0OJUuOpTc3qaVgFdndg8gnoEnIrnW28koMxvFrqKcZKGxq5xiWbNzHpXYciIQe1EnZKry+qgV8LCzFp/laujI7xP5mWls80/MJmhS4jyOwl7pyUQ7m66sAK9rK4eZb0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=QGPEfFKy; arc=none smtp.client-ip=217.140.110.172
+	s=arc-20240116; t=1786527776; c=relaxed/simple;
+	bh=TWIx30sQ2XIiCJN5oInxN1eYSUaNHzZF/7kx70htilc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MI/6T+VxFxfOY7cEb15lbqf5x9gOmpasmNHc4YMZsGkWJiX2I6dga55EaPKnUFwdTZT3D/Hj/6UWicit9bv7Rz3WgkaaTpr6hykktPZ1ZCnQGn7ySBmNAcPQ5KwYrNMg9CssDKquCFxHcKg5Dtvq+ki1RlvCnjckY24eukwvhM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=V8rQHImN; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="QGPEfFKy"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="V8rQHImN"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DE1441596;
-	Wed, 12 Aug 2026 02:01:51 -0700 (PDT)
-Received: from [10.57.44.219] (unknown [10.57.44.219])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BE2753F86F;
-	Wed, 12 Aug 2026 02:01:51 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5F69F1596;
+	Wed, 12 Aug 2026 02:42:50 -0700 (PDT)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B74A03F632;
+	Wed, 12 Aug 2026 02:42:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1786525315; bh=fhi1CG9KJ7r5EFbdg94wZP9tdmI61cXorDFoinPpFvI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=QGPEfFKybXe6rNomdv0fzgoUx1xUydEqGfiSseGhGVM9AgQ2oBiMSL++OZ1Z6BDei
-	 +U9WxgtH3yQbk+rt/X7cx2cSz05c1xdVZ1kJ0xtqt3bmOl2mIEkr28sEjAiJ86XpQm
-	 sXbjd99E1hsDc3d4VRdqy/3aroVUYRnmw2mUPcuo=
-Message-ID: <b512db4b-793b-4dd1-baac-e873b39f5b0b@arm.com>
-Date: Wed, 12 Aug 2026 10:01:48 +0100
+	t=1786527774; bh=TWIx30sQ2XIiCJN5oInxN1eYSUaNHzZF/7kx70htilc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=V8rQHImNyNAzejdLBSghKJJtyP98JyGNFZAaclJgQJX4RU6fdfS2KryNs33viqr2F
+	 XQje0saWr6PrHVv39YXDAKLHVPXX4bNANey2IJxbw0sXCRaSm+y1tzJjYEtIzKyjYo
+	 XQxiGkhteJciKjIwzdtfB12Wmc1C3H00f2wNuhLI=
+Date: Wed, 12 Aug 2026 10:42:50 +0100
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: pbonzini@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	maz@kernel.org, oupton@kernel.org, suzuki.poulose@arm.com,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	david.hildenbrand@arm.com, mark.rutland@arm.com,
+	ackerleytng@google.com
+Subject: Re: [PATCH v2] KVM: Ignore MMU notifiers for guest_memfd-only
+ memslots
+Message-ID: <anxAGkdyPYXBlS00@raptor>
+References: <20260714160411.302386-1-alexandru.elisei@arm.com>
+ <amPCdAswlk24Xilf@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v16 29/45] KVM: arm64: CCA: Support runtime faulting of
- memory
-Content-Language: en-GB
-To: Catalin Marinas <catalin.marinas@arm.com>,
- Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, Marc Zyngier
- <maz@kernel.org>, Will Deacon <will@kernel.org>,
- James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
- Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
- Lorenzo Pieralisi <lpieralisi@kernel.org>
-References: <20260803134403.80630-1-steven.price@arm.com>
- <20260803134403.80630-30-steven.price@arm.com> <antC5JOxDPs7i876@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <antC5JOxDPs7i876@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <amPCdAswlk24Xilf@google.com>
 
-On 11/08/2026 16:42, Catalin Marinas wrote:
-> On Mon, Aug 03, 2026 at 02:43:45PM +0100, Steven Price wrote:
->> At runtime if the realm guest accesses memory which hasn't yet been
->> mapped then KVM needs to either populate the region or fault the guest.
->>
->> For memory in the lower (protected) region of IPA a fresh page is
->> provided to the RMM which will zero the contents. For memory in the
->> upper (shared) region of IPA, the memory from the memslot is mapped
->> into the realm VM non secure.
+Hi Sean,
+
+(Sorry for the silence, was on holiday)
+
+On Fri, Jul 24, 2026 at 12:52:20PM -0700, Sean Christopherson wrote:
+> On Tue, Jul 14, 2026, Alexandru Elisei wrote:
+> > +	 * TODO: Skip gmem-only memslots on mmu_notifier events entirely, once
+> > +	 * gfn_to_pfn_cache is also wired up to directly pull from guest_memfd.
 > 
-> Is this still true with in-place guestmem conversion?
+> So it turns out we need to solve a very related problem[*], thanks to commit
+> b9220d32799a ("KVM: x86/xen: allow shared_info to be mapped by fixed HVA"),
+> which as it says, allows populating gfn_to_pfn_cache directly with an HVA, i.e.
+> without a memslot.
 > 
->> @@ -1693,7 +1709,14 @@ static int gmem_abort(const struct kvm_s2_fault_desc *s2fd)
->>   	kvm_fault_lock(kvm);
->>   	if (mmu_invalidate_retry(kvm, mmu_seq)) {
->>   		ret = -EAGAIN;
->> -		goto out_unlock;
->> +		goto out_release_page;
->> +	}
->> +
->> +	if (kvm_is_realm(kvm)) {
->> +		prot &= ~KVM_PGTABLE_PROT_X;
->> +		ret = realm_map_ipa(kvm, s2fd->fault_ipa, pfn,
->> +				    PAGE_SIZE, prot, memcache);
->> +		goto out_release_page;
->>   	}
+> My not-yet-tested solution for that mess is to give gfn_to_pfn_cache its own
+> invalidation sequence, at which point there shouldn't be a need to process
+> gmem-only memslots just for gfn_to_pfn_cache, because it will already be equipped
+> to handle memslot-less invalidation.
 > 
-> [...]
-> 
->> +int realm_map_ipa(struct kvm *kvm, phys_addr_t ipa,
->> +		  kvm_pfn_t pfn, unsigned long map_size,
->> +		  enum kvm_pgtable_prot prot,
->> +		  struct kvm_mmu_memory_cache *memcache)
->> +{
->> +	struct realm *realm = &kvm->arch.realm;
->> +
->> +	ipa = ALIGN_DOWN(ipa, map_size);
->> +	if (!kvm_realm_is_private_address(realm, ipa)) {
->> +		return realm_map_non_secure(kvm, ipa, pfn, map_size, prot,
->> +					    memcache);
->> +	}
->> +
->> +	/* It's impossible to map protected pages read-only. */
->> +	if (WARN_ON(!(prot & KVM_PGTABLE_PROT_W)))
->> +		return -EFAULT;
->> +	return realm_map_protected(kvm, ipa, pfn, map_size, memcache);
->> +}
-> 
-> I was trying to understand (with the help of some LLMs) to understand
-> whether we can end up on the do_gpf() path as a result of VMM actions.
-> The above kvm_realm_is_private_address() only checks for the IPA but
-> does not check against guestmem if the page is truly private. I probably
-> miss something but the scenario would be something like:
-> 
-> 1. VMM creates the gmem region with GUEST_MEMFD_FLAG_MMAP |
->     GUEST_MEMFD_FLAG_INIT_SHARED, mmap()able and GUP-pinnable
-> 
-> 2. VMM starts an O_DIRECT write() from that mapping; the block layer
->     FOLL_PINs the shared folio
-> 
-> 3. VMM runs a vCPU so the realm touches the protected-IPA alias of the
->     same gfn. gmem_abort() delegates the pinned, still-shared page to
->     the RMM
-> 
-> 4. The in-flight I/O then reads the now-Realm page from the kernel
->     linear map. That access takes a GPF at EL1, so do_gpf() ->
->     die_kernel_fault()
+> Given how simple this change *should* be, I'm going to put this patch on the
+> backburner for now, and then assuming my proposed change actually works, I'll
+> grab your original change (or more likely, re-post it as the last patch in the
+> series weans gfn_to_pfn_cache off mmu_invalidate_seq).
 
-This is correct. The fundamental issue is that we have a disconnect
-between the "gmem attribute" changes (to private/shared) and the
-RIPAS and this is something we want to fix.
+By "original change" I assume you mean the RFC patch [1], where I skip the
+memslot entirely in handle_hva_range(), which would make sense since the
+problem you are solving involves cache entries without a memslot.
 
-e.g., the KVM CCA driver sets the entire DRAM to RIPAS_RAM for
-the Realm before ACTIVATION and we expect that the VMM changes
-the gmem to PRIVATE. They both are not in sync. his is something
-we were discussing the other day with Aneesh.
-
-Once they are in sync, we are protected. If the RIPAS=EMPTY
-(gmem=shared) a stage2 fault doesn't come to the Host.
-
-If the RIPAS=RAM, the gmem is private and there are no usespace
-mappings.
-
-The reason why it is disconnected at the moment is due to the
-weird semantics for Guest triggered conversions in CCA
-i.e., Realm requests via RSI_IPA_STATE_SET, triggering a RIPAS_CHANGE
-exit to the KVM.
-
-The KVM exits to VMM with MEMORY_FAULT_EXIT and the VMM can service this
-by invoking GMEM(SET_ATTRIBUTES2). But, the KVM needs to invoke the
-RMI_RTT_SET_RIPAS in the context of the "vcpu", which we don't have
-from the "kvm" context. I guess we can fix it by running through the
-vcpus and find the matching one with the "ipa" range and the "ripas".
-
-And as for the VMM requests before the Realm is activated, we could
-map that to RMI_RTT_INIT_RIPAS and removing the implicit change
-from KVM arm64.
-
-
-Thanks
-Suzuki
-
+[1] https://lore.kernel.org/kvm/20260615155244.183044-1-alexandru.elisei@arm.com/
 
 > 
-> x86, IIUC, also checks kvm_gmem_is_private(). They also have
-> kvm_arch_gmem_make_private() triggered on the kvm_gmem_get_pfn() path
-> but I got lost in the call sites, not sure whether that's strictly
-> needed if we check both private IPA and kvm_gmem_is_private().
-> 
+> It'll probably take me a few weeks to circle back to this, as I finally crawled
+> out from underneath a pile of urgent and am just now getting back into review
+> mode, but this is fairly high on my todo list, so with luck we might still squeeze
+> this into 7.3.
 
+Sounds great to me, thank you for your time and patience!
+
+Alex
+
+> 
+> [*] https://lore.kernel.org/all/aj2hi-NcqUUCaoQF@google.com
