@@ -1,57 +1,57 @@
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA82F471CED
-	for <kvmarm@lists.linux.dev>; Wed, 12 Aug 2026 15:36:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5935D353A68
+	for <kvmarm@lists.linux.dev>; Wed, 12 Aug 2026 15:37:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786549023; cv=none; b=r9bEEKmiwZv840WUuY/fcPbTJq/RFudD1yWzz6sZBBRUwQT3maShsZNagYK8F/G+Fnd5Qb5geXwIchkmMojsLJmnj9Xpw3sPhoCh+j+LrjISKXvc1YS5tqqrg6vlLfOje1wCpdseQoPl5erC7nsg2f/lXWLX7V04soC+xCCqDv0=
+	t=1786549028; cv=none; b=KIiX7iIbibO0nCMECTF220xOafruLf7LHH+kZSD2C2szKzvO+FJaW57I6iyu7wfFS494qxQYP5B688eqmHKF94JqhWhJu5tHIq8u9o5Y25jUVEW/4gwD6HoxjRwF9bgra2swKNbHoPMOUFg/eTsKAqQBRDUuSZeOv6N6bkBTY6Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786549023; c=relaxed/simple;
-	bh=TVQaQmRnmBhta/zgdtQYlEzfKdGrKE5RbZXcZPD+9G0=;
+	s=arc-20240116; t=1786549028; c=relaxed/simple;
+	bh=w9lz+ST5U53kK0vlGc5alo8GnjBmpYDaSNL5Bz2Wd9U=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Jpyz9JCsxUEeoDJJWjPKuTy6g8crpBt21OQ1ZUvODj026fQBivorSQeueA4IoISYGSAg3NhINyH/WCTx2/MyQLZBh7xaWI5HfV+7fZQYdACaJCVmX1T2vPticLKUYVnqG/iiviLKowfGvUxGAACP5qSOYFG0b5JcCRu/sqVcoGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=dF6GEtXA; arc=none smtp.client-ip=148.163.158.5
+	 MIME-Version; b=EWGCVQPp8dHtYtW4VrgmkSypKlQWACt1NTseRPx9ZephX2um8rCD+Fj4VnlsIKDc+Da7r9Ocy+N5dT66gfihmxmLRJmWywPhvJ5x4zjqCzRGKFXmMZY2uDDO7T/MFNCsfYmbvBTOgjpB+dAMJS7rlGuBZ17oLThq0YStulBvgjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=jkRaOv13; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="dF6GEtXA"
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67CE1eUK2585741;
-	Wed, 12 Aug 2026 15:36:40 GMT
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="jkRaOv13"
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67CE1uZ53594454;
+	Wed, 12 Aug 2026 15:36:44 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=xalLNEWrJY6441oMy
-	g+rTz0yPpUDhYP9aCyCGhuBalE=; b=dF6GEtXAyunRzG27I6sfAU4H6Z1+l8wSt
-	DOONnbesqfFMOmwjAt7lGeKlOTXH1hT89w66xpEZURLuikLC1Tp/wEexrKp314J+
-	aNpTCWFIlUEQSuJL0s6oZ5nWInKSd5DxoRqubycOZ9YLZt/dPgjcUYwLCZ7iC/BS
-	4budAHIaLJMEhHb3w6MH1rJOI/565UzM4Sqq7Re90fdALxE+F9W9vdDHwtpw3sLY
-	eMhI5BUa8SUIKUNgvJnkeVxw3/VMa4mso8Cuu9GZFmIoUy29lOFUShANfoDpVtw+
-	7ujVGE2YOIFacnK7cR+sm51Oko5lSnrPqmZWmrLFHK5VVP3CivLxg==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fyb23usfx-1
+	:mime-version:references:subject:to; s=pp1; bh=14LSQB2Ua2JnbWDG5
+	vBR62154KgGG9UD45CnK8iJMI8=; b=jkRaOv13XNyrfFB6tsxOS/nfBtB5IW7bx
+	wZ91m2TnSZUV/AFyl9Dyx33ys6MzcSTlEhm/CcynMhrVg85yVw3np9pfKmMNJ2U6
+	m4pCFCo/o71c8GfUFsBPJ09wLRvki3NNr+8utAA5sIlYpIdJY+BHWPnUMjBKJujA
+	jhIPvkfFSZgIeEvlE+Xu6mHA3RMKpu5f6Aipo3F0UX85PwNTVLP2dFCJluX0Ijqs
+	H9VQP0qDtlY6l/PfVj2KoGGKX4gO+hE8STm1f57Lt8E2HKzfrH5qO6yvOHoJrOxv
+	E0s4ADpD8AiMYo5KskONnB8VBOk799Hi1WkInGzQf7vswgcme8VgQ==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fwvp32e1r-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 12 Aug 2026 15:36:39 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 67CFQOux013787;
-	Wed, 12 Aug 2026 15:36:38 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4fxg9h6mjw-1
+	Wed, 12 Aug 2026 15:36:43 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 67CFQIVW023680;
+	Wed, 12 Aug 2026 15:36:42 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4fxh0gejgf-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 12 Aug 2026 15:36:38 +0000 (GMT)
+	Wed, 12 Aug 2026 15:36:42 +0000 (GMT)
 Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 67CFaYAU39846232
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 67CFacOJ30605700
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 12 Aug 2026 15:36:34 GMT
+	Wed, 12 Aug 2026 15:36:39 GMT
 Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A821F20040;
-	Wed, 12 Aug 2026 15:36:34 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id C4B9020040;
+	Wed, 12 Aug 2026 15:36:38 +0000 (GMT)
 Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 569112005A;
-	Wed, 12 Aug 2026 15:36:34 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 7434B20049;
+	Wed, 12 Aug 2026 15:36:38 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
 	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 12 Aug 2026 15:36:34 +0000 (GMT)
+	Wed, 12 Aug 2026 15:36:38 +0000 (GMT)
 From: Steffen Eiden <seiden@linux.ibm.com>
 To: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
         linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
@@ -78,9 +78,9 @@ Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
         Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v6 06/33] arm64: sysreg: Convert SPSR_ELx to automatic register generation
-Date: Wed, 12 Aug 2026 17:36:02 +0200
-Message-ID: <20260812153631.3376090-7-seiden@linux.ibm.com>
+Subject: [PATCH v6 17/33] KVM: s390: Move PGM code definitions to asm/kvm_host.h
+Date: Wed, 12 Aug 2026 17:36:13 +0200
+Message-ID: <20260812153631.3376090-18-seiden@linux.ibm.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260812153631.3376090-1-seiden@linux.ibm.com>
 References: <20260812153631.3376090-1-seiden@linux.ibm.com>
@@ -93,128 +93,179 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Authority-Analysis: v=2.4 cv=XqfK/1F9 c=1 sm=1 tr=0 ts=6a7c9308 cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+X-Authority-Analysis: v=2.4 cv=AMtp2X5w c=1 sm=1 tr=0 ts=6a7c930c cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
  a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
- a=V8glGbnc2Ofi9Qvn3v5h:22 a=VnNF1IyMAAAA:8 a=qAnUzrOnmDNqMeXR4cMA:9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODEyMDEyNiBTYWx0ZWRfXzLOSztFwq1rM
- TLnTbKzxQ5PjPusYwkoWRufpDgw4r1EUjC8ntBqRMMx1yD/fGdCzH1G/ErXcPjY6aXvwhkrY31/
- D2UEujNpUvrZp4YoP/YqX6BZU0tPgk+gHhkrtxBQaX+rhxTumhrF6nfXpa4lkN7+GEUXfDa9/07
- mQHm0Qm1rz0E9+k93faGk/QA2eoq/YVHFVSEtqjxczj3spQkdTdF99TR1f3hXNRvHBGzxGoI8BG
- AO0IihWvwuL1rbcIlYIju5wMCq4ZXBTL6wdrlWlHUukiQhZU0jt62bSzhZZi/5cafnC802CmBXD
- hsVvUjgo5YTsloSyOmDTkWN9pjCiNIYB3UwhYiR0FLGUdzEIS2r5aDvE+CAP+MHiEge6deZPQyk
- bu+SZn2mWj36P0USBuu4TuTNSC0zeNcrG0WsRzF22VwQmr8WER0S/1sBobftBjx/vYrIVLOt5Pf
- 95CG+TGW5DW4bsgFgMA==
-X-Proofpoint-ORIG-GUID: mV2r1km3Yvu7iM34gEtAqFW3U6R-B2Te
-X-Proofpoint-GUID: K95bFIa4deShqD3jNtm-8ub_33cdind6
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODEyMDEyNiBTYWx0ZWRfX31fcQ2gX0qhk
- oN0YLipqK4Pw3wY/guravnvRmVboeop4uU8QYkju15JDlV9+rkIy1BuZTr67icpl+kcc0raFtxS
- ziPxhSU3vzGQLlnGk2Fmraze8iohyFw=
+ a=Y2IxJ9c9Rs8Kov3niI8_:22 a=VnNF1IyMAAAA:8 a=7A3N2L3ptH-yS8k9SGwA:9
+X-Proofpoint-GUID: PAmGJQGQAdbw2nbGtS_kExc-VFhb3xVC
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODEyMDEyNiBTYWx0ZWRfXxH7L9fG7x3WZ
+ nPqIhg0hUh20oebS6tlTTC4N0egBtYWe5jBmRnhTRteoEqa64Q5/lK/tfu7+hri7kCqvnBuIaSd
+ jwcrQn1IC4pB8ag/egOUiUB63izYFzoLbxVOaOzR3bvaxxhke+QC6eZ0MeIdCmot3Ow7CkWD7bI
+ 88yS6Pe0zCjumeLgTb/USujUXuHlv8tBjUj3aOcaIV5rHwq4/MWdeDKBPTQvT8beG2kkxfqBdWj
+ xoIhkXgpxFAdg5/dFABlHSvgBIlODvYT/lYtLeExa6XE1EUd2232fm68TiGOZKPeGZZ+79tVDxP
+ ptzs6lR3RvEzm2pJB2Sp22Oej0A4JD/snjowG3b1I7oYaU+237avL5GJd4kcrBpKuGa+Ah8UACR
+ HmIBViGh1m0a5vxdcqdyCHPZZVHZyZelw7ubNt2OzVCN8B9BDr45PI8n0F5imNY77oTjsEqtrNo
+ h9RairFhIag0LdThslA==
+X-Proofpoint-ORIG-GUID: w_FE-BSIIpBCRU0KVMbNrwNM4lQk4Aq0
+X-Proofpoint-Spam-Info: AW1haW4tMjYwODEyMDEyNiBTYWx0ZWRfX3yDz3oh0pOhd
+ jPqF78rcCa3vHqkgJFIiXlKXDHv2yTe/qXpdCgO9PUPwGlhZjxBqjEMDGJuVnzwT1mC280NQUVk
+ ML4cem6TTb685CW2qjYFiLpGRpWsP8A=
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
  definitions=2026-08-12_04,2026-08-12_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0 spamscore=0 adultscore=0 malwarescore=0 clxscore=1015
- suspectscore=0 priorityscore=1501 impostorscore=0 phishscore=0 bulkscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2608120126
+ suspectscore=0 adultscore=0 lowpriorityscore=0 clxscore=1015
+ priorityscore=1501 impostorscore=0 phishscore=0 spamscore=0 bulkscore=0
+ malwarescore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
+ definitions=main-2608120126
 
-Convert SPSR_EL{1, 2, 12} to automatic register generation as per
-DDIO616 2026-06. No functional change.
+Move PGM code definitions from kvm_host_s390.h (back) to the generic
+kvm_host.h. These definitions are needed by multiple KVM implementations
+and should be in a shared location.
+
+No functional change.
 
 Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
 ---
- arch/arm64/include/asm/sysreg.h |  3 ---
- arch/arm64/tools/sysreg         | 48 +++++++++++++++++++++++++++++++++
- 2 files changed, 48 insertions(+), 3 deletions(-)
+ arch/s390/include/asm/kvm_host.h      | 57 +++++++++++++++++++++++++++
+ arch/s390/include/asm/kvm_host_s390.h | 57 ---------------------------
+ 2 files changed, 57 insertions(+), 57 deletions(-)
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 4bfdac9401bd..1aa601c95188 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -295,7 +295,6 @@
- #define SYS_APGAKEYLO_EL1		sys_reg(3, 0, 2, 3, 0)
- #define SYS_APGAKEYHI_EL1		sys_reg(3, 0, 2, 3, 1)
+diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+index e76ceee11ef5..147325978225 100644
+--- a/arch/s390/include/asm/kvm_host.h
++++ b/arch/s390/include/asm/kvm_host.h
+@@ -5,4 +5,61 @@
  
--#define SYS_SPSR_EL1			sys_reg(3, 0, 4, 0, 0)
- #define SYS_ELR_EL1			sys_reg(3, 0, 4, 0, 1)
+ #include <asm/kvm_host_s390.h>
  
- #define SYS_ICC_PMR_EL1			sys_reg(3, 0, 4, 6, 0)
-@@ -518,7 +517,6 @@
- #define SYS_VTTBR_EL2			sys_reg(3, 4, 2, 1, 0)
++#define PGM_OPERATION			0x01
++#define PGM_PRIVILEGED_OP		0x02
++#define PGM_EXECUTE			0x03
++#define PGM_PROTECTION			0x04
++#define PGM_ADDRESSING			0x05
++#define PGM_SPECIFICATION		0x06
++#define PGM_DATA			0x07
++#define PGM_FIXED_POINT_OVERFLOW	0x08
++#define PGM_FIXED_POINT_DIVIDE		0x09
++#define PGM_DECIMAL_OVERFLOW		0x0a
++#define PGM_DECIMAL_DIVIDE		0x0b
++#define PGM_HFP_EXPONENT_OVERFLOW	0x0c
++#define PGM_HFP_EXPONENT_UNDERFLOW	0x0d
++#define PGM_HFP_SIGNIFICANCE		0x0e
++#define PGM_HFP_DIVIDE			0x0f
++#define PGM_SEGMENT_TRANSLATION		0x10
++#define PGM_PAGE_TRANSLATION		0x11
++#define PGM_TRANSLATION_SPEC		0x12
++#define PGM_SPECIAL_OPERATION		0x13
++#define PGM_OPERAND			0x15
++#define PGM_TRACE_TABEL			0x16
++#define PGM_VECTOR_PROCESSING		0x1b
++#define PGM_SPACE_SWITCH		0x1c
++#define PGM_HFP_SQUARE_ROOT		0x1d
++#define PGM_PC_TRANSLATION_SPEC		0x1f
++#define PGM_AFX_TRANSLATION		0x20
++#define PGM_ASX_TRANSLATION		0x21
++#define PGM_LX_TRANSLATION		0x22
++#define PGM_EX_TRANSLATION		0x23
++#define PGM_PRIMARY_AUTHORITY		0x24
++#define PGM_SECONDARY_AUTHORITY		0x25
++#define PGM_LFX_TRANSLATION		0x26
++#define PGM_LSX_TRANSLATION		0x27
++#define PGM_ALET_SPECIFICATION		0x28
++#define PGM_ALEN_TRANSLATION		0x29
++#define PGM_ALE_SEQUENCE		0x2a
++#define PGM_ASTE_VALIDITY		0x2b
++#define PGM_ASTE_SEQUENCE		0x2c
++#define PGM_EXTENDED_AUTHORITY		0x2d
++#define PGM_LSTE_SEQUENCE		0x2e
++#define PGM_ASTE_INSTANCE		0x2f
++#define PGM_STACK_FULL			0x30
++#define PGM_STACK_EMPTY			0x31
++#define PGM_STACK_SPECIFICATION		0x32
++#define PGM_STACK_TYPE			0x33
++#define PGM_STACK_OPERATION		0x34
++#define PGM_ASCE_TYPE			0x38
++#define PGM_REGION_FIRST_TRANS		0x39
++#define PGM_REGION_SECOND_TRANS		0x3a
++#define PGM_REGION_THIRD_TRANS		0x3b
++#define PGM_SECURE_STORAGE_ACCESS	0x3d
++#define PGM_NON_SECURE_STORAGE_ACCESS	0x3e
++#define PGM_SECURE_STORAGE_VIOLATION	0x3f
++#define PGM_MONITOR			0x40
++#define PGM_PER				0x80
++#define PGM_CRYPTO_OPERATION		0x119
++
+ #endif /* ASM_KVM_HOST_H */
+diff --git a/arch/s390/include/asm/kvm_host_s390.h b/arch/s390/include/asm/kvm_host_s390.h
+index 0c4e061d7437..22e8d7c4a755 100644
+--- a/arch/s390/include/asm/kvm_host_s390.h
++++ b/arch/s390/include/asm/kvm_host_s390.h
+@@ -150,63 +150,6 @@ struct kvm_vcpu_stat {
+ 	u64 signal_exits;
+ };
  
- #define SYS_HAFGRTR_EL2			sys_reg(3, 4, 3, 1, 6)
--#define SYS_SPSR_EL2			sys_reg(3, 4, 4, 0, 0)
- #define SYS_ELR_EL2			sys_reg(3, 4, 4, 0, 1)
- #define SYS_SP_EL1			sys_reg(3, 4, 4, 1, 0)
- #define SYS_SPSR_irq			sys_reg(3, 4, 4, 3, 0)
-@@ -604,7 +602,6 @@
- #define SYS_BRBCR_EL12			sys_reg(2, 5, 9, 0, 0)
- #define SYS_TTBR0_EL12			sys_reg(3, 5, 2, 0, 0)
- #define SYS_TTBR1_EL12			sys_reg(3, 5, 2, 0, 1)
--#define SYS_SPSR_EL12			sys_reg(3, 5, 4, 0, 0)
- #define SYS_ELR_EL12			sys_reg(3, 5, 4, 0, 1)
- #define SYS_AFSR0_EL12			sys_reg(3, 5, 5, 1, 0)
- #define SYS_AFSR1_EL12			sys_reg(3, 5, 5, 1, 1)
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index 94bf065c8ac7..6e625a05c477 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -401,6 +401,54 @@ Res0	3:1
- Field	0	SO
- EndSysreg
- 
-+SysregFields	SPSR_ELx
-+Res0	63:37
-+Field	36	UNIJ
-+Field	35	PACM
-+Field	34	EXLOCK
-+Res0	33
-+Field	32	PM
-+Field	31	N
-+Field	30	Z
-+Field	29	C
-+Field	28	V
-+Res0	27:26
-+Field	25	TCO
-+Field	24	DIT
-+Field	23	UAO
-+Field	22	PAN
-+Field	21	SS
-+Field	20	IL
-+Res0	19:14
-+Field	13	ALLINT
-+Field	12	SSBS
-+Field	11:10	BTYPE
-+Field	9	D
-+Field	8	A
-+Field	7	I
-+Field	6	F
-+Res0	5
-+Enum	4:0	M
-+	0b0000	EL0
-+	0b0100	EL1t
-+	0b0101	EL1h
-+	0b1000	EL2t
-+	0b1001	EL2h
-+EndEnum
-+EndSysregFields
-+
-+Sysreg	SPSR_EL1	3	0	4	0	0
-+Fields	SPSR_ELx
-+EndSysreg
-+
-+Sysreg	SPSR_EL2	3	4	4	0	0
-+Fields	SPSR_ELx
-+EndSysreg
-+
-+Sysreg	SPSR_EL12	3	5	4	0	0
-+Mapping	SPSR_EL1
-+EndSysreg
-+
- Sysreg ID_PFR0_EL1	3	0	0	1	0
- Res0	63:32
- UnsignedEnum	31:28	RAS
+-#define PGM_OPERATION			0x01
+-#define PGM_PRIVILEGED_OP		0x02
+-#define PGM_EXECUTE			0x03
+-#define PGM_PROTECTION			0x04
+-#define PGM_ADDRESSING			0x05
+-#define PGM_SPECIFICATION		0x06
+-#define PGM_DATA			0x07
+-#define PGM_FIXED_POINT_OVERFLOW	0x08
+-#define PGM_FIXED_POINT_DIVIDE		0x09
+-#define PGM_DECIMAL_OVERFLOW		0x0a
+-#define PGM_DECIMAL_DIVIDE		0x0b
+-#define PGM_HFP_EXPONENT_OVERFLOW	0x0c
+-#define PGM_HFP_EXPONENT_UNDERFLOW	0x0d
+-#define PGM_HFP_SIGNIFICANCE		0x0e
+-#define PGM_HFP_DIVIDE			0x0f
+-#define PGM_SEGMENT_TRANSLATION		0x10
+-#define PGM_PAGE_TRANSLATION		0x11
+-#define PGM_TRANSLATION_SPEC		0x12
+-#define PGM_SPECIAL_OPERATION		0x13
+-#define PGM_OPERAND			0x15
+-#define PGM_TRACE_TABEL			0x16
+-#define PGM_VECTOR_PROCESSING		0x1b
+-#define PGM_SPACE_SWITCH		0x1c
+-#define PGM_HFP_SQUARE_ROOT		0x1d
+-#define PGM_PC_TRANSLATION_SPEC		0x1f
+-#define PGM_AFX_TRANSLATION		0x20
+-#define PGM_ASX_TRANSLATION		0x21
+-#define PGM_LX_TRANSLATION		0x22
+-#define PGM_EX_TRANSLATION		0x23
+-#define PGM_PRIMARY_AUTHORITY		0x24
+-#define PGM_SECONDARY_AUTHORITY		0x25
+-#define PGM_LFX_TRANSLATION		0x26
+-#define PGM_LSX_TRANSLATION		0x27
+-#define PGM_ALET_SPECIFICATION		0x28
+-#define PGM_ALEN_TRANSLATION		0x29
+-#define PGM_ALE_SEQUENCE		0x2a
+-#define PGM_ASTE_VALIDITY		0x2b
+-#define PGM_ASTE_SEQUENCE		0x2c
+-#define PGM_EXTENDED_AUTHORITY		0x2d
+-#define PGM_LSTE_SEQUENCE		0x2e
+-#define PGM_ASTE_INSTANCE		0x2f
+-#define PGM_STACK_FULL			0x30
+-#define PGM_STACK_EMPTY			0x31
+-#define PGM_STACK_SPECIFICATION		0x32
+-#define PGM_STACK_TYPE			0x33
+-#define PGM_STACK_OPERATION		0x34
+-#define PGM_ASCE_TYPE			0x38
+-#define PGM_REGION_FIRST_TRANS		0x39
+-#define PGM_REGION_SECOND_TRANS		0x3a
+-#define PGM_REGION_THIRD_TRANS		0x3b
+-#define PGM_SECURE_STORAGE_ACCESS	0x3d
+-#define PGM_NON_SECURE_STORAGE_ACCESS	0x3e
+-#define PGM_SECURE_STORAGE_VIOLATION	0x3f
+-#define PGM_MONITOR			0x40
+-#define PGM_PER				0x80
+-#define PGM_CRYPTO_OPERATION		0x119
+-
+ /* irq types in ascend order of priorities */
+ enum irq_types {
+ 	IRQ_PEND_SET_PREFIX = 0,
 -- 
 2.53.0
 
