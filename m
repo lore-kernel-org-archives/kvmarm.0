@@ -1,42 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF46048D862;
-	Thu, 13 Aug 2026 15:36:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD126345EA2;
+	Thu, 13 Aug 2026 15:56:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786635387; cv=none; b=pQpt3PGtpDn4yQZuZVFoObovppizFAfvJqpWxAPZLvW8SL40OjJtA9Ah+0LGVt1fPTwdlli69L6nFiZK7SNUBSDBwceFCXdBrZfhcQdurHVCN6o0FU74P4AJ8ZaO0RA28Kl36rEEhYgEImwTKlXaPol4m8YMyxOPUDjRB9sTtFI=
+	t=1786636583; cv=none; b=bsH0k34k1ShkBcYmo0xJLdG0eRLMKie39dtNcOR+8LqcmKDKiOUF5IZfq+1PX2BQ4Htz115iVWVt1KzB0q9D4f+RVzXeEsndmG1DLeV3Zo1jlLRD3i4CEhZ272mmlMvJTR7tMNCv1R73Msld7VHsY1tF1sP6N2N5aOG5tuYCXms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786635387; c=relaxed/simple;
-	bh=bDq/VpZLsWkV+WY8dorsu8XzvYizhx1dAcvkf6wKpkY=;
+	s=arc-20240116; t=1786636583; c=relaxed/simple;
+	bh=5Y52WDn+x2YvZ+N4VN8lYflQWRFDJnc5MuXpaZUEGx0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=INLhAW+4TDsxpvW+pKhOjnizlyHElk71lbbu4Oqtd3KbGAnSEuMB1LFUJtpbaUenvzwj3cOeYhKWBShRlD/xz7oKCLxE/J6+ssMn87HyAK05pR9RvY2NXa8F3IF7Ypf0l8NFFr2B3BmZvOUHuT7u8f202+qnECFhsYEhgfre8GE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pc6USizA; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=B72v32Nlyapga0gzIkCdegsfiQamEVXH9yUcBhugb2FxgfDohitcjEISno9NAOX11C7GhH/TJf/Cfq0Azqx/C5farTqRiHx9NaARI1/YxHJPgmBDa6DFGbQT5ccPATnfKqcI/g/Anz4w/ymIBJJODkhl26e2jSeo77od+ALpYdM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MUu9mCX/; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pc6USizA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D872E1F000E9;
-	Thu, 13 Aug 2026 15:36:12 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MUu9mCX/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55E5E1F000E9;
+	Thu, 13 Aug 2026 15:56:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786635374;
-	bh=Jr8DnVEse/w2rPkJNtzp0dK+qPNR39FkLGyVNFDoQxg=;
+	s=k20260515; t=1786636580;
+	bh=zFi/eYdDkOk4QFk4d5TCUoZ5IdueZQPw39MRIni2akY=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=Pc6USizAbfaLoN1wOStVGd4CSaxAmssXcjLPQJVwrBoge64P2hqmlcPBYdtdSMOGd
-	 od9gD5n7+LmGYe4YttnkpyLZYrqpV7LNp6jGX5Pwls/QlpfbOxXhNcu7er28dgkgq0
-	 I6P/BVfojls05GzbpLq7ofYrg5oQeDBRqg36injWbzKVLZnWty7qmu7z4/pONwy767
-	 WfkpXhPzRdl8s/RlEsUe0BBNRbpldsWBmUBuwN63HrKcaPNQ2BGeFqTddQJ92Py7Fd
-	 UXZqW+zTy5pfhKn8mXXTO2SWDcSiWi6BmvmpfMS8DYUH4T6uRaDnC4KYNWU3vR+Abn
-	 HAhbklCCnufoQ==
-Date: Thu, 13 Aug 2026 16:35:55 +0100
+	b=MUu9mCX/Od1l/M7P2njj5Nk/Mt9Swu9kF/om7GqhK1ROjaH/xP4RaNWqJFYzVWAtt
+	 lCu0BuvJZpXOClgRNvRZ3vVPhmeZIA+S+Wt3MlKxnCvmqbGhm+roFdjmtV9eccqgn9
+	 z7oLi6FWgvPOTgd/hvUdQdKLu1QiCoO3o3L8amm3a3z6Weo3d9FzPuZVnw2nDNnvTS
+	 rqRHF2XvTDAvJsfI780+4IyUbtpctDs+Szx5Dkz+0FVPiSe1GGVXGiB2DCWped5hxG
+	 zWs8jrQ5WqnDlZcI7niHFikOsOSb4ibDuE4/FkmauCgNUsiXOhf4MEaCHUfd194nsS
+	 LPB4N0hP3D8jQ==
+Date: Thu, 13 Aug 2026 16:56:02 +0100
 From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
 To: sashiko-reviews@lists.linux.dev
 Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>, 
 	Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 1/2] KVM: arm64: Fix spurious warning for benign stage 2
- teardown race
-Message-ID: <an3iN22IAIv1i_nR@lucifer>
+Subject: Re: [PATCH 2/2] KVM: arm64: nv: Fix null ptr deref in
+ kvm_nested_s2_unmap() on S2 teardown
+Message-ID: <an3lHhgmwS0RnCgI@lucifer>
 References: <20260812-kvm-arm-nested-virt-fix-v1-0-4ad883f1b6a5@kernel.org>
- <20260812-kvm-arm-nested-virt-fix-v1-1-4ad883f1b6a5@kernel.org>
- <20260812135429.DF04E1F00A3A@smtp.kernel.org>
+ <20260812-kvm-arm-nested-virt-fix-v1-2-4ad883f1b6a5@kernel.org>
+ <20260812140101.D77AC1F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -46,111 +46,115 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260812135429.DF04E1F00A3A@smtp.kernel.org>
+In-Reply-To: <20260812140101.D77AC1F000E9@smtp.kernel.org>
 
-On Wed, Aug 12, 2026 at 01:54:29PM +0000, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 2 potential issue(s) to consider:
+On Wed, Aug 12, 2026 at 02:01:01PM +0000, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 3 potential issue(s) to consider:
 >
 > Pre-existing issues:
-> - [Critical] Use-After-Free of the dynamically allocated `kvm->arch.nested_mmus` array when the MMU lock is dropped during stage-2 unmap operations.
-> - [High] NULL Pointer Dereference in `kvm_vcpu_init_nested()` during concurrent VM teardown.
+> - [Critical] Use-After-Free on `kvm->arch.nested_mmus` array due to concurrent teardown.
+
+Addressed by Marc's changes + discussed over there.
+
+> - [Critical] Incomplete Fix: `kvm_nested_s2_wp()` is vulnerable to the same NULL pointer dereference and UAF.
+
+OK interesting!
+
+> - [High] Data Race: `kvm->arch.nested_mmus_size` updated locklessly causing uninitialized memory reads.
+
+Addressed by Marc's changes + discussed over there.
+
 > --
 >
-> --- Patch [1]: [PATCH 1/2] KVM: arm64: Fix spurious warning for benign stage 2 teardown race ---
-> commit ffda2ec0115c7506d269acccba8c1f4511410e87
+> --- Patch [2]: [PATCH 2/2] KVM: arm64: nv: Fix null ptr deref in kvm_nested_s2_unmap() on S2 teardown ---
+> commit 04c9d62ec51b0000a28c8099341f6a2d31ce7848
 > Author: Lorenzo Stoakes (ARM) <ljs@kernel.org>
 >
-> KVM: arm64: Fix spurious warning for benign stage 2 teardown race
+> KVM: arm64: nv: Fix null ptr deref in kvm_nested_s2_unmap() on S2 teardown
 >
-> This patch suppresses a warning in stage2_apply_range() when the page table
-> pointer is found to be NULL after reacquiring the MMU lock. It assumes that
-> the NULL page table is a benign result of a concurrent teardown.
+> This commit adds a NULL check for kvm->arch.mmu.pgt in kvm_nested_s2_unmap()
+> to prevent a NULL pointer dereference. This happens when the MMU lock is
+> dropped during stage 2 teardown, allowing concurrent progress that clears the
+> page table.
 >
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index 74e7e7f7564c8..31e049ded0932 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -59,19 +59,25 @@ static phys_addr_t stage2_range_addr_end(phys_addr_t addr, phys_addr_t end)
-> >   * long will also starve other vCPUs. We have to also make sure that the page
-> >   * tables are not freed while we released the lock.
-> >   */
-> > -static int stage2_apply_range(struct kvm_s2_mmu *mmu, phys_addr_t addr,
-> > +static int stage2_apply_range(struct kvm_s2_mmu *mmu, phys_addr_t start,
-> >  			      phys_addr_t end,
-> >  			      int (*fn)(struct kvm_pgtable *, u64, u64),
-> >  			      bool resched)
-> >  {
-> >  	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
-> > +	phys_addr_t addr = start;
-> >  	int ret;
-> >  	u64 next;
-> >
-> >  	do {
-> >  		struct kvm_pgtable *pgt = mmu->pgt;
-> > +		/*
-> > +		 * We may be raced on PGT teardown when we release the
-> > +		 * kvm->mmu_lock. That's fine as the PGT is legitimately no
-> > +		 * longer present.
-> > +		 */
-> >  		if (!pgt)
-> > -			return -EINVAL;
-> > +			return resched && addr > start ? 0 : -EINVAL;
+> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> > index 17123f0b6daba..9fc0b1696dcb6 100644
+> > --- a/arch/arm64/kvm/nested.c
+> > +++ b/arch/arm64/kvm/nested.c
+> > @@ -1295,7 +1295,11 @@ void kvm_nested_s2_unmap(struct kvm *kvm, bool may_block)
+> >  			kvm_stage2_unmap_range(mmu, 0, kvm_phys_size(mmu), may_block);
 >
 > [Severity: Critical]
-> This is a pre-existing issue, but does suppressing this warning mask a
-> regression where the mmu pointer itself is used after being freed?
+> This isn't a bug introduced by this patch, but does this loop contain a
+> Use-After-Free vulnerability?
 >
-> When kvm_nested_s2_unmap() passes an mmu pointer to stage2_apply_range(),
-> that pointer references a dynamically allocated array:
+> While iterating over the nested_mmus array in kvm_nested_s2_unmap(),
+> kvm_stage2_unmap_range() can drop kvm->mmu_lock inside stage2_apply_range().
 >
-> arch/arm64/kvm/nested.c:kvm_nested_s2_unmap() {
->     ...
->     struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
->     if (kvm_s2_mmu_valid(mmu))
->         kvm_stage2_unmap_range(mmu, ...);
-> }
+> Concurrently, if kvm_mmu_notifier_release() calls kvm_arch_flush_shadow_all(),
+> it frees the kvm->arch.nested_mmus array unconditionally and without taking
+> kvm->mmu_lock:
 >
-> If cond_resched_rwlock_write() drops the lock inside stage2_apply_range(),
-> a concurrent VM teardown or VCPU initialization can completely free this
-> array:
->
-> arch/arm64/kvm/nested.c:kvm_arch_flush_shadow_all() {
+> kvm_arch_flush_shadow_all() {
 >     ...
 >     kvfree(kvm->arch.nested_mmus);
->     kvm->arch.nested_mmus = NULL;
+>     ...
 > }
 >
-> When the lock is reacquired, the loop continues and accesses mmu->pgt
-> from the now-freed memory. Is it possible that the warning was actually
-> firing because we were reading a freed mmu structure?
-
-All stuff being handled elsewhere with Marc's series AFAICT.
-
+> If the array is freed during the lock-drop window, the local mmu pointer
+> becomes dangling, and accessing it when the lock is reacquired could result
+> in a Use-After-Free.
 >
+> >  	}
+> >
+> > -	kvm_invalidate_vncr_ipa(kvm, 0, BIT(kvm->arch.mmu.pgt->ia_bits));
+> > +	/* NULL pgt should only be possible if raced when mmu_lock dropped. */
+> > +	if (kvm->arch.mmu.pgt)
+> > +		kvm_invalidate_vncr_ipa(kvm, 0, BIT(kvm->arch.mmu.pgt->ia_bits));
+> > +	else
+> > +		WARN_ON(!may_block);
+> >  }
+>
+> [Severity: Critical]
+> This is a pre-existing issue, but does kvm_nested_s2_wp() suffer from the exact
+> same NULL pointer dereference and Use-After-Free vulnerability?
+>
+> Like kvm_nested_s2_unmap(), kvm_nested_s2_wp() iterates over the nested_mmus
+> array and drops mmu_lock via stage2_apply_range_resched(). When it resumes
+> and exits the loop, it also unconditionally executes
+> BIT(kvm->arch.mmu.pgt->ia_bits).
+>
+> Should the same fix be applied to kvm_nested_s2_wp() to prevent a guaranteed
+> NULL pointer dereference when kvm_arch_flush_shadow_all() clears the page
+> table in the window where the lock is dropped?
+
+Yeah this seems valid actually, will note and can send as a follow-up?
+
 >
 > [Severity: High]
-> This is also a pre-existing issue, but looking at the concurrent VM teardown
-> path, does kvm_vcpu_init_nested() have a NULL pointer dereference?
+> This isn't a bug introduced by this patch, but is there a data race on
+> kvm->arch.nested_mmus_size?
 >
-> When kvm_vcpu_init_nested() reallocates the array, it unconditionally
-> updates the mmu pointer for each entry:
+> In kvm_vcpu_init_nested(), nested_mmus_size is updated outside of
+> kvm->mmu_lock and without memory barriers:
 >
-> arch/arm64/kvm/nested.c:kvm_vcpu_init_nested() {
+> kvm_vcpu_init_nested() {
 >     ...
->     for (int i = 0; i < kvm->arch.nested_mmus_size; i++)
->         tmp[i].pgt->mmu = &tmp[i];
+>     kvm->arch.nested_mmus_size = num_mmus;
 >     ...
 > }
 >
-> If kvm_arch_flush_shadow_all() concurrently calls kvm_free_stage2_pgd()
-> and sets pgt to NULL before the lock is acquired here, wouldn't this crash
-> when dereferencing tmp[i].pgt?
-
-This seems like what my 2nd patch handles :)
-
+> A concurrent reader like kvm_nested_s2_unmap() can see the updated size
+> before the stores initializing the new array elements become visible. Because
+> the new array is allocated with kvcalloc(), an uninitialized/zeroed
+> mmu->tlb_vttbr causes kvm_s2_mmu_valid() to incorrectly evaluate to TRUE.
+>
+> Will this cause the reader to process the zeroed mmu structure, passing it
+> to kvm_stage2_unmap_range(), which would dereference a NULL mmu->pgt or
+> access a partially initialized pgt?
 >
 > --
-> Sashiko AI review · https://sashiko.dev/#/patchset/20260812-kvm-arm-nested-virt-fix-v1-0-4ad883f1b6a5@kernel.org?part=1
+> Sashiko AI review · https://sashiko.dev/#/patchset/20260812-kvm-arm-nested-virt-fix-v1-0-4ad883f1b6a5@kernel.org?part=2
 
 --
 Cheers, Lorenzo
