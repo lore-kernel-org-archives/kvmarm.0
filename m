@@ -1,104 +1,226 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ECC43B2D00;
-	Thu, 13 Aug 2026 10:11:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC6B830F924;
+	Thu, 13 Aug 2026 10:14:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786615873; cv=none; b=V14XGF6R5ZvqgYMKlsfJGBUO620Lzn6f12HIZ50QvpBup/WFzhClW9iBFNBwO3fujerwWz6uGqNZ8h9jZ8DcJjtCSv/oZ9N6DrQMaUHw/pCpJ2rr+S99/ZhXanDe3G4WDqWEdqVefJKkG1jOzgD0xuLzOBUB5v6abxA3B100/MI=
+	t=1786616061; cv=none; b=JNs0pjeeZetpmbKe5TdUY6j0hq0U+A9eu4gs4I6C5/qoFepHZHBxmjOb99qhHdHJ3YTFLxOKEBvU+xBTJniD3Pdh+0KsNTBfUViSVlxdZ3dCbQrwJItH9u7Xh44znpJYfmrnGaRHh11Y9gbrUrEmsP4kGYxVV3o4kZTSJYw5wd8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786615873; c=relaxed/simple;
-	bh=S5lRUjdLp3oI5PZ7dawLDovgFfcY3oYgCUjnNo6ZAaY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WbM/qD79l3Xj0rhwr72VJsKyM863MpFnLHaYAOJSU6m0JcaDyHQec9Pa2on2riz53S4EpMHIhOOvxtcopkRK6Uo9baTc7Lz7t9tBcLaiRB3THNIlGjw/123XNEzod1q5f2GXhXcggEcvoBHjSVqn+hTd4C6fWo9qz8FuKKkHuCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uh72INHK; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786616061; c=relaxed/simple;
+	bh=fwftfs/h5D3dQzHoQQEOXNZ13Ld+SmY+4YAGAaVkPcU=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=aEUP0anvHwFp/xzWKba11RbOky/LAQoqnh0WA+JJQaj4Q34cWJMgLwDSPAGTvZw/XcqwkKlKq1q9TVocQmcDSTXzGFNyaVM5N6B/nscHGy07sMAt8/ESv3vACQXBO0NazU0XyGpWHCbdvB+hV5EXrW/QGWFOHYMC0c5aEtIUB+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dPrRuqQ1; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uh72INHK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71B2B1F000E9;
-	Thu, 13 Aug 2026 10:11:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dPrRuqQ1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 270771F000E9;
+	Thu, 13 Aug 2026 10:14:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786615871;
-	bh=1GUvy4NsSEhlxO1mGSlkQ8deO2KrloNrrXAd8AHoYE8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=Uh72INHK/sIbkNYsIDOPjGO143EsGaQlP7xQY3AROGkJGS0/0IdBYQHDCvp1O5oM8
-	 oaoI+ZDz/JHZS+7HYo6heMzXrWDq3R9JoHYsJ+6PH8z7UlLt+2dRJCIX8KLOxLsE0W
-	 RPhMJleW/O0L2O3kGBOy6PqG73URg60mJM5eCvmmpoypJbq06/4eW3EI2a/z9Ibg1G
-	 NgEF8AnsHzQ0yR4Ii3p1AGmKDV//SqJRsEYIo5folawdWjVa7go7BlIMYzhtzP3KtN
-	 8LOjezI5ivbdQCFV5ug5X9NRpIeTcTNM/Ry1xf1ieV5i3viFeT1+G6zHTi0twu/0TX
-	 kdMpVTQo5iiHQ==
-Date: Thu, 13 Aug 2026 11:11:03 +0100
-From: Will Deacon <will@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Pavan Kondeti <pavan.kondeti@oss.qualcomm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	s=k20260515; t=1786616052;
+	bh=uSZUuVpg9SCc7RZSw/Ssreis2MVZVjsphaT0uMe4oMU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=dPrRuqQ1x9D9rMkX+lbk4Bc/EbxPS/82Q06yoG3nI/BswMuRJt+Uj0EByx7DtjOVL
+	 RDFvp5EqiIPLEB0+7s7RAZdnKA96jfpzZT2ukcYPIuXOdVcG7LumUqLQddtBCpGV0x
+	 EXj0FidbNgYVDV1PMhNXsBdK43RLF3SWZvU3p+vlByll/WYbw9O0d86v8J5glnpel9
+	 Gs7KY1qHUAgdZy4TOiX7o/dxaTig5MFl+Kr6CQplVLfkp1219QWIUyL7Tu+fxF6okt
+	 iWowso/n+nG4czMd3mbqe3a+3gn1512ePCWN1tnyFktB0+MMSy98pm4r8HC4XQ2Daz
+	 461F1EoqUHHLw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wuSRu-0000000FI7L-0X1r;
+	Thu, 13 Aug 2026 10:14:10 +0000
+Date: Thu, 13 Aug 2026 11:14:09 +0100
+Message-ID: <868q6a1g5q.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Steffen Eiden <seiden@linux.ibm.com>
+Cc: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Andreas Grapentin <gra@linux.ibm.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	David Hildenbrand <david@kernel.org>,
+	Friedrich Welter <fritz@linux.ibm.com>,
+	Fuad Tabba <tabba@google.com>,
+	Gautam Gala <ggala@linux.ibm.com>,
+	Hariharan Mari <hari55@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Hendrik Brueckner <brueckner@linux.ibm.com>,
+	Ilya Leoshkevich <iii@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
 	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
-	Emi Kisanuki <fj0570is@fujitsu.com>,
-	Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>
-Subject: Re: [PATCH v16 07/45] arm64: mm: Handle Granule Protection Faults
- (GPFs)
-Message-ID: <an2YN7kxB7bjCd2s@willie-the-truck>
-References: <20260803134403.80630-1-steven.price@arm.com>
- <20260803134403.80630-8-steven.price@arm.com>
- <ans1ZSwMEKeT9Gfz@arm.com>
- <d4bdecca-517a-4b4b-bf67-cef6b09bc8c1@arm.com>
- <7d4e5920-aa20-40cd-954e-037631bd0d6c@quicinc.com>
- <anx6YbPMVz3OlpA5@arm.com>
+	Nico Boehr <nrb@linux.ibm.com>,
+	Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
+	Oliver Upton <oupton@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Will Deacon <will@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v6 09/33] arm64: Prepare sharing arm64 headers with s390
+In-Reply-To: <20260812153631.3376090-10-seiden@linux.ibm.com>
+References: <20260812153631.3376090-1-seiden@linux.ibm.com>
+	<20260812153631.3376090-10-seiden@linux.ibm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <anx6YbPMVz3OlpA5@arm.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: seiden@linux.ibm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, agordeev@linux.ibm.com, gra@linux.ibm.com, arnd@arndb.de, catalin.marinas@arm.com, borntraeger@linux.ibm.com, imbrenda@linux.ibm.com, david@kernel.org, fritz@linux.ibm.com, tabba@google.com, ggala@linux.ibm.com, hari55@linux.ibm.com, hca@linux.ibm.com, brueckner@linux.ibm.com, iii@linux.ibm.com, frankja@linux.ibm.com, joey.gouly@arm.com, nrb@linux.ibm.com, oss@nina.schoetterlglausch.eu, oupton@kernel.org, pbonzini@redhat.com, seanjc@google.com, suzuki.poulose@arm.com, svens@linux.ibm.com, Ulrich.Weigand@de.ibm.com, gor@linux.ibm.com, will@kernel.org, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Aug 12, 2026 at 02:51:29PM +0100, Catalin Marinas wrote:
-> On Wed, Aug 12, 2026 at 06:12:09PM +0530, Pavan Kondeti wrote:
-> > There is a valid case for fixup_exception() to be needed here in GPF
-> > handling.
-> > 
-> > -000 |load_unaligned_zeropad(inline)
-> > -000 |hash_name(inline)
-> > -000 |link_path_walk()
-> > -001 |path_lookupat()
-> > -002 |filename_lookup()
-> > -003 |vfs_statx()
-> > -004 |vfs_fstatat()
-> > 
-> > We observed this in Android running Gunyah when the page is mapped in
-> > EL1 but unmapped at EL2. path_lookupat() can actually handle this
-> > via fixup_exeption() when a word load crosses the page boundary.
-> > However, Gunyah injects a Synchronous External Abort and we have
-> > a downstream patch [1] that adds fixup_exception() in do_sea(). pKVM
-> > injects [2] such faults back to EL1 and fixup_exception() is taken care.
-> 
-> Ah, good point, completely forgot about load_unaligned_zeropad(). Since
-> we don't unmap the linear map for delegated pages, we'll need the
-> fixup_exception(). And I guess warning in this case is not desirable
-> either. We could limit it to EX_TYPE_KACCESS_ERR_ZERO and
-> EX_TYPE_LOAD_UNALIGNED_ZEROPAD, though not sure it's worth it.
+On Wed, 12 Aug 2026 16:36:05 +0100,
+Steffen Eiden <seiden@linux.ibm.com> wrote:
 
-Alternatively, I think the series to unmap guest memory from the linear
-map would solve that for gmem:
+[...]
 
-https://lore.kernel.org/all/20260410151746.61150-1-kalyazin@amazon.com/
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 46c8d7928b3f..22770c1132cb 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -56,6 +56,36 @@
+>  #define KVM_REQ_MAP_L1_VNCR_EL2		KVM_ARCH_REQ(10)
+>  #define KVM_REQ_VGIC_PROCESS_UPDATE	KVM_ARCH_REQ(11)
+>  
+> +/*
+> + * If we encounter a data abort without valid instruction syndrome
+> + * information, report this to user space.  User space can (and
+> + * should) opt in to this feature if KVM_CAP_ARM_NISV_TO_USER is
+> + * supported.
+> + */
+> +#define KVM_ARCH_FLAG_RETURN_NISV_IO_ABORT_TO_USER	0
+> +/* Memory Tagging Extension enabled for the guest */
+> +#define KVM_ARCH_FLAG_MTE_ENABLED			1
+> +/* At least one vCPU has ran in the VM */
+> +#define KVM_ARCH_FLAG_HAS_RAN_ONCE			2
+> +/* The vCPU feature set for the VM is configured */
+> +#define KVM_ARCH_FLAG_VCPU_FEATURES_CONFIGURED		3
+> +/* PSCI SYSTEM_SUSPEND enabled for the guest */
+> +#define KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED		4
+> +/* VM counter offset */
+> +#define KVM_ARCH_FLAG_VM_COUNTER_OFFSET			5
+> +/* Timer PPIs made immutable */
+> +#define KVM_ARCH_FLAG_TIMER_PPIS_IMMUTABLE		6
+> +/* Initial ID reg values loaded */
+> +#define KVM_ARCH_FLAG_ID_REGS_INITIALIZED		7
+> +/* Fine-Grained UNDEF initialised */
+> +#define KVM_ARCH_FLAG_FGU_INITIALIZED			8
+> +/* SVE exposed to guest */
+> +#define KVM_ARCH_FLAG_GUEST_HAS_SVE			9
+> +/* MIDR_EL1, REVIDR_EL1, and AIDR_EL1 are writable from userspace */
+> +#define KVM_ARCH_FLAG_WRITABLE_IMP_ID_REGS		10
+> +/* Unhandled SEAs are taken to userspace */
+> +#define KVM_ARCH_FLAG_EXIT_SEA				11
+> +
 
-but I can't tell whether that's still being actively pursued.
+I don't mind the move, but please add a comment indicating that these
+are bit indices for for kvm_arch::flags, as we have now lost locality.
 
-Will
+And whilst we're at it, there is not reason why this has to be a set
+of #define, it can perfectly be an enum, as the numbers themselves
+have no particular meaning. Something like the untested hack below.
+
+	M.
+
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 08b2f24dc3c79..402bbb5eb0d91 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -306,6 +306,39 @@ enum fgt_group_id {
+ 	__NR_FGT_GROUP_IDS__
+ };
+ 
++/* Bit indices for kvm_arch::flags */
++enum kvm_arch_flag_bits {
++	/*
++	 * If we encounter a data abort without valid instruction syndrome
++	 * information, report this to user space.  User space can (and
++	 * should) opt in to this feature if KVM_CAP_ARM_NISV_TO_USER is
++	 * supported.
++	 */
++	KVM_ARCH_FLAG_RETURN_NISV_IO_ABORT_TO_USER,
++	/* Memory Tagging Extension enabled for the guest */
++	KVM_ARCH_FLAG_MTE_ENABLED,
++	/* At least one vCPU has ran in the VM */
++	KVM_ARCH_FLAG_HAS_RAN_ONCE,
++	/* The vCPU feature set for the VM is configured */
++	KVM_ARCH_FLAG_VCPU_FEATURES_CONFIGURED,
++	/* PSCI SYSTEM_SUSPEND enabled for the guest */
++	KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED,
++	/* VM counter offset */
++	KVM_ARCH_FLAG_VM_COUNTER_OFFSET,
++	/* Timer PPIs made immutable */
++	KVM_ARCH_FLAG_TIMER_PPIS_IMMUTABLE,
++	/* Initial ID reg values loaded */
++	KVM_ARCH_FLAG_ID_REGS_INITIALIZED,
++	/* Fine-Grained UNDEF initialised */
++	KVM_ARCH_FLAG_FGU_INITIALIZED,
++	/* SVE exposed to guest */
++	KVM_ARCH_FLAG_GUEST_HAS_SVE,
++	/* MIDR_EL1, REVIDR_EL1, and AIDR_EL1 are writable from userspace */
++	KVM_ARCH_FLAG_WRITABLE_IMP_ID_REGS,
++	/* Unhandled SEAs are taken to userspace */
++	KVM_ARCH_FLAG_EXIT_SEA,
++};
++
+ struct kvm_arch {
+ 	struct kvm_s2_mmu mmu;
+ 
+@@ -338,35 +371,7 @@ struct kvm_arch {
+ 	/* Protects VM-scoped configuration data */
+ 	struct mutex config_lock;
+ 
+-	/*
+-	 * If we encounter a data abort without valid instruction syndrome
+-	 * information, report this to user space.  User space can (and
+-	 * should) opt in to this feature if KVM_CAP_ARM_NISV_TO_USER is
+-	 * supported.
+-	 */
+-#define KVM_ARCH_FLAG_RETURN_NISV_IO_ABORT_TO_USER	0
+-	/* Memory Tagging Extension enabled for the guest */
+-#define KVM_ARCH_FLAG_MTE_ENABLED			1
+-	/* At least one vCPU has ran in the VM */
+-#define KVM_ARCH_FLAG_HAS_RAN_ONCE			2
+-	/* The vCPU feature set for the VM is configured */
+-#define KVM_ARCH_FLAG_VCPU_FEATURES_CONFIGURED		3
+-	/* PSCI SYSTEM_SUSPEND enabled for the guest */
+-#define KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED		4
+-	/* VM counter offset */
+-#define KVM_ARCH_FLAG_VM_COUNTER_OFFSET			5
+-	/* Timer PPIs made immutable */
+-#define KVM_ARCH_FLAG_TIMER_PPIS_IMMUTABLE		6
+-	/* Initial ID reg values loaded */
+-#define KVM_ARCH_FLAG_ID_REGS_INITIALIZED		7
+-	/* Fine-Grained UNDEF initialised */
+-#define KVM_ARCH_FLAG_FGU_INITIALIZED			8
+-	/* SVE exposed to guest */
+-#define KVM_ARCH_FLAG_GUEST_HAS_SVE			9
+-	/* MIDR_EL1, REVIDR_EL1, and AIDR_EL1 are writable from userspace */
+-#define KVM_ARCH_FLAG_WRITABLE_IMP_ID_REGS		10
+-	/* Unhandled SEAs are taken to userspace */
+-#define KVM_ARCH_FLAG_EXIT_SEA				11
++	/* VM-wide flags, described in kvm_arch_flag_bits */
+ 	unsigned long flags;
+ 
+ 	/* VM-wide vCPU feature set */
+
+-- 
+Without deviation from the norm, progress is not possible.
