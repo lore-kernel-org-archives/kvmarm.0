@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 086373B47EB;
-	Thu, 13 Aug 2026 09:17:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 060083B9937;
+	Thu, 13 Aug 2026 09:33:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786612672; cv=none; b=eFnk/aTgIYuGtUctAGB6JZQBP/q6moqirlnZfCQYXh6OVy2ERoCXvuckUP301aGrjhIzMPrfF81ihlzkQWDVrx83TyO4VhFRW3OMWgPsp09R37iUTBLXxPpUBtvT6yRaofdsqZfyZQtx4gibgFKDz+6P/wsqb9sUaZhobMbOBP0=
+	t=1786613589; cv=none; b=p0f5fNuJwz/fmEQYurT+/LmnGHk2haAMLPQtGEfx6MnmSwViY/J+enIYPZ79Zvbh51SjWNALeaFXQflHB99GgBHzp98FWqovG4Qg4bgJMlQumyShx476Tm9YgAlhxVbxLNXHQ6xAE61M+nnw9+6F/oKQmiOmXP5gXX68CvGd9xg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786612672; c=relaxed/simple;
-	bh=skgSVBXC3XlrQgS5glBZgqXv3+ee6DqmIaLk3dFOiyg=;
+	s=arc-20240116; t=1786613589; c=relaxed/simple;
+	bh=TCCeNw6/6InKS6yKzz6wtJNG01BstF82n0QFE8i6qJo=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DYGoZsa2f/wxg7qdr1W+PW38kvzaj7gLSsKgKO/XV8qhPufDQ3GeSJdShuj/GQdkzQYu8BBrKQNSp+vZNP4UjLFHzSIRicmZn3fNPHREiehAzJm3Gw1Eb09j1hN/Ta0rFMUn7SIbYy+0vXEHkuAKQA89WCw1l17epfXqalzLe5g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IMXZwGBv; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=uUtatvrjWzGqwH5li9HZjSedp6CLGJiV0pxSsiRidXT+LONpwju/GYPCZgeHdB0AXAP14Js9VvUy+NUuwkuEVWd72w/cS1DPAlRrEOCKogu5iYdFiIXOQp3J2m5TYieMsjjexDkVd9STx2onG7Z9z2PlajBUhQEab6R4Z2dsdgk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HjIuT5uP; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IMXZwGBv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E85F81F000E9;
-	Thu, 13 Aug 2026 09:17:47 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HjIuT5uP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CC271F000E9;
+	Thu, 13 Aug 2026 09:33:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786612668;
-	bh=SFa96UMPUKdPMFLMZa9e++7ab7lmWL1tMpa/ViaInoM=;
+	s=k20260515; t=1786613587;
+	bh=LxMU8Wh5IEENDMpZo4oo0mR+i7a46pl2E7NjfryRXQ8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=IMXZwGBv7s7z4J73JtHq94MBWzh8TJGMCPUSQz75YC/gWWn84liNir/y4SJXASOpA
-	 jIoeaVUfxaUcAI+x3HtDwvfuiK5FFM1b9cv3HfvOT6ED7GOmuwUYaVHufA6wqq0cgT
-	 veCPb6T4dr/Kfgs6HuGRtc4M5jra8VzoSveAr3c5ULUIo8nmsTJB+DqSUhsE6vd7u3
-	 Bc+aERd7JjqT3rtK5jisskUitZk3cNpOWp/rJAGBpuacn6efxYaRrXJenozbZ6AiQ3
-	 awuQlEjS6VLy0qkDrk76SvA43nC2/WqMU888f5pju/JXZ7AnEMFHfitZekSG0mdhaW
-	 nnjobiDh60Bxw==
+	b=HjIuT5uPEzbtrapTnOryZUgB/anrlIB0mDwEFOBe2JspqtXYBOpqTUziewIegCUcq
+	 z5/1zVk7Olqz5KNZ4V6vFk4w+2ed/IzjWAtcCefJFHbig5FQ7+TLSW1MNksvLgnZ/q
+	 xvyD4+z02nim3gZ2D0YsV0b16hq/2Lv+4njWZtN49B2H+7TYHtNqovnqP4zEZg1mp+
+	 N5i09/N8k0LpFf9sUrr2N/avdp7T7Exfq29CkXZBKU063rAl3DkfkcoQfBmuGjNmbv
+	 bSix7SMa3EghI/NpfqzmdwNTbygyZqaEeToVdub5WIWdSOuePQlXLuhmtg3L3kPkaB
+	 /9FCpf1I8xiRw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wuRZJ-0000000FGXk-45XV;
-	Thu, 13 Aug 2026 09:17:46 +0000
-Date: Thu, 13 Aug 2026 10:17:45 +0100
-Message-ID: <86ecg21irq.wl-maz@kernel.org>
+	id 1wuRo9-0000000FGvb-1YDY;
+	Thu, 13 Aug 2026 09:33:05 +0000
+Date: Thu, 13 Aug 2026 10:33:04 +0100
+Message-ID: <86cxvm1i27.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Steffen Eiden <seiden@linux.ibm.com>
 Cc: kvm@vger.kernel.org,
@@ -68,10 +68,10 @@ Cc: kvm@vger.kernel.org,
 	Vasily Gorbik <gor@linux.ibm.com>,
 	Will Deacon <will@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v6 05/33] arm64: ptrace: Use constants for compat register numbers
-In-Reply-To: <20260812153631.3376090-6-seiden@linux.ibm.com>
+Subject: Re: [PATCH v6 06/33] arm64: sysreg: Convert SPSR_ELx to automatic register generation
+In-Reply-To: <20260812153631.3376090-7-seiden@linux.ibm.com>
 References: <20260812153631.3376090-1-seiden@linux.ibm.com>
-	<20260812153631.3376090-6-seiden@linux.ibm.com>
+	<20260812153631.3376090-7-seiden@linux.ibm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -87,16 +87,48 @@ X-SA-Exim-Rcpt-To: seiden@linux.ibm.com, kvm@vger.kernel.org, kvmarm@lists.linux
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 12 Aug 2026 16:36:01 +0100,
+On Wed, 12 Aug 2026 16:36:02 +0100,
 Steffen Eiden <seiden@linux.ibm.com> wrote:
 > 
-> Define an enum to determine the register number for the mapping from
-> AArch32 and AArch64 registers. This allows for a more flexible use of
-> the register mappings.
+> Convert SPSR_EL{1, 2, 12} to automatic register generation as per
+> DDIO616 2026-06. No functional change.
 > 
 > Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
+> ---
+>  arch/arm64/include/asm/sysreg.h |  3 ---
+>  arch/arm64/tools/sysreg         | 48 +++++++++++++++++++++++++++++++++
+>  2 files changed, 48 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index 4bfdac9401bd..1aa601c95188 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
 
-Reviewed-by: Marc Zyngier <maz@kernel.org>
+[...]
+
+> +Enum	4:0	M
+> +	0b0000	EL0
+> +	0b0100	EL1t
+> +	0b0101	EL1h
+> +	0b1000	EL2t
+> +	0b1001	EL2h
+
+I think you need to be consistent with the way you represent things,
+as you are mixing two representations:
+
+- either you have a separate M[4] representing PSTATE.nRW, and then
+  the M[3-0] enum is a 4 bit field (and for simplicity you only
+  describe the AArch64 ELs including EL3[th], which are missing here)
+
+- or M is a 5 bit field and, and you represent everything as a 5 bit
+  enum, providing all the AArch32 modes and EL3.
+
+The former matches the JSON, the latter is closer to the
+representation in older versions of the ARM ARM.
+
+Pick one, stick to it.
+
+Thanks,
 
 	M.
 
