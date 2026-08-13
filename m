@@ -1,193 +1,156 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 802273B71C0;
-	Thu, 13 Aug 2026 15:29:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF46048D862;
+	Thu, 13 Aug 2026 15:36:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786634960; cv=none; b=ad6cgnzFehoBZQnshXwcxNX2d+XGbRF/ObJ4MHqMxNfggnNpDUYAhJ2ig6nRBiHQ5nO2AHlOPtc/1Vxh/mAersCq85EPfr+rBXa72BjIuIVTJYtO7bcvy6Sk/u+jlD7osoKPN8FbGi/njd6rNTtYo3RoKUXraAVztLiuEJNxahQ=
+	t=1786635387; cv=none; b=pQpt3PGtpDn4yQZuZVFoObovppizFAfvJqpWxAPZLvW8SL40OjJtA9Ah+0LGVt1fPTwdlli69L6nFiZK7SNUBSDBwceFCXdBrZfhcQdurHVCN6o0FU74P4AJ8ZaO0RA28Kl36rEEhYgEImwTKlXaPol4m8YMyxOPUDjRB9sTtFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786634960; c=relaxed/simple;
-	bh=XiCbGqpOXXJXofURPwtzJHhcISrABgmJajxK9Ioz9y4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Y4fokn6+lFtoK0Uzi7MpfegXf7XU+RzM60kYDA/fflBSM7PQlgKgJiI958PRfNwvhbWljVtfXnXOz2xHMGlzNz9auOcBKI7rhvw3nibQqp8yE6Zq30MOz8y/+pCCyGqzMk2rK4YcK54JFBcjgDDbiut47tsMLdEX1lYGaC/4HK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Wz4RW0h7; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1786635387; c=relaxed/simple;
+	bh=bDq/VpZLsWkV+WY8dorsu8XzvYizhx1dAcvkf6wKpkY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=INLhAW+4TDsxpvW+pKhOjnizlyHElk71lbbu4Oqtd3KbGAnSEuMB1LFUJtpbaUenvzwj3cOeYhKWBShRlD/xz7oKCLxE/J6+ssMn87HyAK05pR9RvY2NXa8F3IF7Ypf0l8NFFr2B3BmZvOUHuT7u8f202+qnECFhsYEhgfre8GE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pc6USizA; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Wz4RW0h7"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ECFD31756;
-	Thu, 13 Aug 2026 08:29:14 -0700 (PDT)
-Received: from [10.1.25.28] (e122027.cambridge.arm.com [10.1.25.28])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CA5E33F632;
-	Thu, 13 Aug 2026 08:29:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1786634958; bh=XiCbGqpOXXJXofURPwtzJHhcISrABgmJajxK9Ioz9y4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Wz4RW0h79cKIdIsdDbdMd8NGAcegqk85VdY1+tdw4yN8gzlnr05Af5QUdIpck76X6
-	 zeiPKM1/qTYrljz4IWISGzv11YICemYUYPJ+cHWftg4mGDfdsKJeLy8eqrrAWIx1MC
-	 Ojrc6+AQac06tJK3Wqj+8qD9p2CTw3puSp/Cy5KE=
-Message-ID: <a36e83e2-8f26-4d68-9b5e-756ca8740abf@arm.com>
-Date: Thu, 13 Aug 2026 15:38:26 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pc6USizA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D872E1F000E9;
+	Thu, 13 Aug 2026 15:36:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1786635374;
+	bh=Jr8DnVEse/w2rPkJNtzp0dK+qPNR39FkLGyVNFDoQxg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=Pc6USizAbfaLoN1wOStVGd4CSaxAmssXcjLPQJVwrBoge64P2hqmlcPBYdtdSMOGd
+	 od9gD5n7+LmGYe4YttnkpyLZYrqpV7LNp6jGX5Pwls/QlpfbOxXhNcu7er28dgkgq0
+	 I6P/BVfojls05GzbpLq7ofYrg5oQeDBRqg36injWbzKVLZnWty7qmu7z4/pONwy767
+	 WfkpXhPzRdl8s/RlEsUe0BBNRbpldsWBmUBuwN63HrKcaPNQ2BGeFqTddQJ92Py7Fd
+	 UXZqW+zTy5pfhKn8mXXTO2SWDcSiWi6BmvmpfMS8DYUH4T6uRaDnC4KYNWU3vR+Abn
+	 HAhbklCCnufoQ==
+Date: Thu, 13 Aug 2026 16:35:55 +0100
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: sashiko-reviews@lists.linux.dev
+Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>, 
+	Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH 1/2] KVM: arm64: Fix spurious warning for benign stage 2
+ teardown race
+Message-ID: <an3iN22IAIv1i_nR@lucifer>
+References: <20260812-kvm-arm-nested-virt-fix-v1-0-4ad883f1b6a5@kernel.org>
+ <20260812-kvm-arm-nested-virt-fix-v1-1-4ad883f1b6a5@kernel.org>
+ <20260812135429.DF04E1F00A3A@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v16 21/45] KVM: arm64: CCA: Handle realm enter/exit
-To: Kohei Enju <enju.kohei@fujitsu.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
- Lorenzo Pieralisi <lpieralisi@kernel.org>
-References: <20260803134403.80630-1-steven.price@arm.com>
- <20260803134403.80630-22-steven.price@arm.com>
- <anl7EwU9jSig-uQs@FCCLS0092175.localdomain>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <anl7EwU9jSig-uQs@FCCLS0092175.localdomain>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260812135429.DF04E1F00A3A@smtp.kernel.org>
 
-On 10/08/2026 09:03, Kohei Enju wrote:
-> On 08/03 14:43, Steven Price wrote:
->> Entering a realm is done using a SMC call to the RMM. On exit the
->> exit-codes need to be handled slightly differently to the normal KVM
->> path so define our own functions for realm enter/exit and hook them
->> in if the guest is a realm guest.
-> 
-> Hi Steven,
-> 
-> I found that when the host kernel is booting with pseudo-NMI enabled
-> (irqchip.gicv3_pseudo_nmi=1), Realm VMs fail boot successfully and the
-> watchdog reports RCU stalls and soft lockups.
-> 
-> After some investigations, I confirmed that arch_timer interrupts
-> are not being delivered to some CPUs. This appears to be because PMR is
-> 000000c0 (GICV3_PRIO_IRQ), as shown below:
-> 
->   [  248.769692] pmr: 000000c0
-> 
-> For normal VMs, KVM opens PMR before entering the guest, because having
-> IRQs masked via PMR when entering the guest means the GIC will not
-> signal the CPU of interrupts of lower priority, and in the worst case
-> a guest exit may never occur.
-> (See __kvm_vcpu_run in arch/arm64/kvm/hyp/vhe/switch.c)
-> 
-> [  248.756980] rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
-> [  248.758649] rcu:     3-...0: (113 ticks this GP) idle=d2ec/1/0x4000000000000000 softirq=1631/1633 fqs=297
-> [  248.759413] rcu:     4-...0: (7 ticks this GP) idle=b77c/1/0x4000000000000000 softirq=1589/1589 fqs=297
-> [  248.760101] rcu:     (detected by 7, t=6003 jiffies, g=4553, q=86 ncpus=8)
-> [  248.760731] Sending NMI from CPU 7 to CPUs 3:
-> [  248.766814] NMI backtrace for cpu 3
-> [  248.768285] CPU: 3 UID: 0 PID: 387 Comm: kvm-vcpu-0 Not tainted 7.2.0-rc2-00267-g7326f0114689 #238 PREEMPT(lazy)
-> [  248.768681] Hardware name: QEMU QEMU Virtual Machine, BIOS unknown 02/02/2022
-> [  248.768936] pstate: 61402009 (nZCv daif +PAN -UAO -TCO +DIT -SSBS BTYPE=--)
-> [  248.769021] pc : kvm_rec_enter+0xa0/0xb8
-> [  248.769585] lr : kvm_rec_enter+0x24/0xb8
-> [  248.769655] sp : ffff800084943830
-> [  248.769692] pmr: 000000c0
-> [  248.769757] x29: ffff800084943830 x28: ffff0000079c6c00 x27: 0000000000000000
-> [  248.770441] x26: 0000000000000000 x25: 0000000000000000 x24: 0000000000000000
-> [  248.770536] x23: 0000000080000000 x22: 0000000000000001 x21: 0000000049d99000
-> [  248.770590] x20: 0000000049d9a000 x19: ffff00000e018000 x18: 0000000000000000
-> [  248.770647] x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000000
-> [  248.770756] x14: 0000000000000000 x13: 0000000000000000 x12: 0000000000000000
-> [  248.770863] x11: 0000000000000000 x10: 0000000000000000 x9 : ffff8000812ab1bc
-> [  248.771018] x8 : 0000000000000000 x7 : 0000000000000020 x6 : 0000000000000080
-> [  248.771123] x5 : 0000000000000004 x4 : 0000000000000040 x3 : 0000000000000000
-> [  248.771172] x2 : 0000000000000000 x1 : 0000000000000000 x0 : 0000000000000000
-> [  248.771385] Call trace:
-> [  248.771612]  kvm_rec_enter+0xa0/0xb8 (P)
-> [  248.771757]  kvm_arm_vcpu_enter_exit+0x8c/0x218
-> [  248.771796]  kvm_arch_vcpu_ioctl_run+0x274/0x890
-> [  248.771843]  kvm_vcpu_ioctl+0x180/0xb50
-> [  248.771883]  __arm64_sys_ioctl+0xb4/0x118
-> [  248.771920]  invoke_syscall.constprop.0+0xb8/0x120
-> [  248.771954]  do_el0_svc+0x48/0xc8
-> [  248.771982]  el0_svc+0x48/0x280
-> [  248.772012]  el0t_64_sync_handler+0xa0/0xe8
-> [  248.772041]  el0t_64_sync+0x1ac/0x1b0
-> [...]
-> 
->> [...]
->> +int noinstr kvm_rec_enter(struct kvm_vcpu *vcpu)
->> +{
->> +	struct realm_rec *rec = &vcpu->arch.rec;
->> +	int ret;
->> +
->> +	ret = rmi_rec_enter(rec->rec_phys, rec->run_phys);
->> +	if (!ret)
->> +		load_realm_timer_state(vcpu);
->> +
->> +	return ret;
->> +}
-> 
-> In my testing environment, adding local_daif_mask/restore() in line with
-> __kvm_vcpu_run() fixes the issue, and Realm VMs successfully boot
-> without RCU stalls or soft lockups.
+On Wed, Aug 12, 2026 at 01:54:29PM +0000, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 2 potential issue(s) to consider:
+>
+> Pre-existing issues:
+> - [Critical] Use-After-Free of the dynamically allocated `kvm->arch.nested_mmus` array when the MMU lock is dropped during stage-2 unmap operations.
+> - [High] NULL Pointer Dereference in `kvm_vcpu_init_nested()` during concurrent VM teardown.
+> --
+>
+> --- Patch [1]: [PATCH 1/2] KVM: arm64: Fix spurious warning for benign stage 2 teardown race ---
+> commit ffda2ec0115c7506d269acccba8c1f4511410e87
+> Author: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+>
+> KVM: arm64: Fix spurious warning for benign stage 2 teardown race
+>
+> This patch suppresses a warning in stage2_apply_range() when the page table
+> pointer is found to be NULL after reacquiring the MMU lock. It assumes that
+> the NULL page table is a benign result of a concurrent teardown.
+>
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index 74e7e7f7564c8..31e049ded0932 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -59,19 +59,25 @@ static phys_addr_t stage2_range_addr_end(phys_addr_t addr, phys_addr_t end)
+> >   * long will also starve other vCPUs. We have to also make sure that the page
+> >   * tables are not freed while we released the lock.
+> >   */
+> > -static int stage2_apply_range(struct kvm_s2_mmu *mmu, phys_addr_t addr,
+> > +static int stage2_apply_range(struct kvm_s2_mmu *mmu, phys_addr_t start,
+> >  			      phys_addr_t end,
+> >  			      int (*fn)(struct kvm_pgtable *, u64, u64),
+> >  			      bool resched)
+> >  {
+> >  	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
+> > +	phys_addr_t addr = start;
+> >  	int ret;
+> >  	u64 next;
+> >
+> >  	do {
+> >  		struct kvm_pgtable *pgt = mmu->pgt;
+> > +		/*
+> > +		 * We may be raced on PGT teardown when we release the
+> > +		 * kvm->mmu_lock. That's fine as the PGT is legitimately no
+> > +		 * longer present.
+> > +		 */
+> >  		if (!pgt)
+> > -			return -EINVAL;
+> > +			return resched && addr > start ? 0 : -EINVAL;
+>
+> [Severity: Critical]
+> This is a pre-existing issue, but does suppressing this warning mask a
+> regression where the mmu pointer itself is used after being freed?
+>
+> When kvm_nested_s2_unmap() passes an mmu pointer to stage2_apply_range(),
+> that pointer references a dynamically allocated array:
+>
+> arch/arm64/kvm/nested.c:kvm_nested_s2_unmap() {
+>     ...
+>     struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+>     if (kvm_s2_mmu_valid(mmu))
+>         kvm_stage2_unmap_range(mmu, ...);
+> }
+>
+> If cond_resched_rwlock_write() drops the lock inside stage2_apply_range(),
+> a concurrent VM teardown or VCPU initialization can completely free this
+> array:
+>
+> arch/arm64/kvm/nested.c:kvm_arch_flush_shadow_all() {
+>     ...
+>     kvfree(kvm->arch.nested_mmus);
+>     kvm->arch.nested_mmus = NULL;
+> }
+>
+> When the lock is reacquired, the loop continues and accesses mmu->pgt
+> from the now-freed memory. Is it possible that the warning was actually
+> firing because we were reading a freed mmu structure?
 
-Hi Kohei,
+All stuff being handled elsewhere with Marc's series AFAICT.
 
-Thanks for the detailed investigation.
+>
+>
+> [Severity: High]
+> This is also a pre-existing issue, but looking at the concurrent VM teardown
+> path, does kvm_vcpu_init_nested() have a NULL pointer dereference?
+>
+> When kvm_vcpu_init_nested() reallocates the array, it unconditionally
+> updates the mmu pointer for each entry:
+>
+> arch/arm64/kvm/nested.c:kvm_vcpu_init_nested() {
+>     ...
+>     for (int i = 0; i < kvm->arch.nested_mmus_size; i++)
+>         tmp[i].pgt->mmu = &tmp[i];
+>     ...
+> }
+>
+> If kvm_arch_flush_shadow_all() concurrently calls kvm_free_stage2_pgd()
+> and sets pgt to NULL before the lock is acquired here, wouldn't this crash
+> when dereferencing tmp[i].pgt?
 
-> However, I'm not sure if we can safely call local_daif_mask/restore()
-> here, bacause they call trace_hardirqs_off/on(), which presumably cannot
-> be called from noinstr context.
-> 
-> For reference, the VHE hyp path seems to call local_daif_mask/restore()
-> from noinstr context, but I'm not sure why this is considered safe:
->   noinstr kvm_arm_vcpu_enter_exit()
->     kvm_call_hyp_ret(__kvm_vcpu_run, vcpu) <- normal function call for VHE
->       local_daif_mask()
->         trace_hardirqs_off()
->       local_daif_restore()
->         trace_hardirqs_off/on()
+This seems like what my 2nd patch handles :)
 
-Yes I'm not sure if there's an existing VHE bug there. But it's only if
-CONFIG_TRACE_IRQFLAGS is enabled, so perhaps no-one has noticed?
+>
+> --
+> Sashiko AI review · https://sashiko.dev/#/patchset/20260812-kvm-arm-nested-virt-fix-v1-0-4ad883f1b6a5@kernel.org?part=1
 
-> The following change works in my test environment.
-> Any thoughts on the issue and the proposed fix?
-
-Your proposed fix looks like it matches the VHE behaviour, so I'll go
-for that. If there's an existing VHE bug then hopefully the below will
-work after the fix for that too.
-
-Thanks,
-Steve
-
-> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
-> index c242dfc2c7a6..dd7cb2d7db88 100644
-> --- a/arch/arm64/kvm/rmi.c
-> +++ b/arch/arm64/kvm/rmi.c
-> @@ -1307,7 +1307,13 @@ int noinstr kvm_rec_enter(struct kvm_vcpu *vcpu)
->         struct realm_rec *rec = &vcpu->arch.rec;
->         int ret;
-> 
-> +       local_daif_mask();
-> +       pmr_sync();
-> +
->         ret = rmi_rec_enter(rec->rec_phys, rec->run_phys);
-> +
-> +       local_daif_restore(DAIF_PROCCTX_NOIRQ);
-> +
->         if (!ret)
->                 load_realm_timer_state(vcpu);
-> 
-> Thanks,
-> Kohei
-
+--
+Cheers, Lorenzo
