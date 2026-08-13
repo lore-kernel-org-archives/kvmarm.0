@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D31AE3469EE;
-	Thu, 13 Aug 2026 09:17:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 086373B47EB;
+	Thu, 13 Aug 2026 09:17:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786612621; cv=none; b=c1NM3/GM4KIZhDxoFxU4ojriBKS54vgQRLAGq9Vbos+224rIzsjXy8g0Q9thfzZG0LH5JakKImQDuE7SAbr0v+ujVS6cD1z+llJSxhziKwV6X1jQXevD93d1HmsQAxbl2DFo/tTV2eSloEA1KcBU9fTu2AEMKxBxg9LPDN3TJdU=
+	t=1786612672; cv=none; b=eFnk/aTgIYuGtUctAGB6JZQBP/q6moqirlnZfCQYXh6OVy2ERoCXvuckUP301aGrjhIzMPrfF81ihlzkQWDVrx83TyO4VhFRW3OMWgPsp09R37iUTBLXxPpUBtvT6yRaofdsqZfyZQtx4gibgFKDz+6P/wsqb9sUaZhobMbOBP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786612621; c=relaxed/simple;
-	bh=b25ziOub7qf/t1EvUCROjSiT75wsipG3UELqUR/WNvU=;
+	s=arc-20240116; t=1786612672; c=relaxed/simple;
+	bh=skgSVBXC3XlrQgS5glBZgqXv3+ee6DqmIaLk3dFOiyg=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=T405DcxHsvU1hdKSlvD1dZpUmFVh2m/RyeFpAWvECLT8VZ9g3LRIhJWroJnSZpj0yJRv3aXttZ7UgbLMojMj3ZKJxqy+JSRCPIrVREXT7T7jexdY0kWJSUK6372tL4nAzKDj1WBe1GISKWFx7IHrwZ6/9h6YZIs9mt0IuYfM6Lk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OSSlvxUS; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=DYGoZsa2f/wxg7qdr1W+PW38kvzaj7gLSsKgKO/XV8qhPufDQ3GeSJdShuj/GQdkzQYu8BBrKQNSp+vZNP4UjLFHzSIRicmZn3fNPHREiehAzJm3Gw1Eb09j1hN/Ta0rFMUn7SIbYy+0vXEHkuAKQA89WCw1l17epfXqalzLe5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IMXZwGBv; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OSSlvxUS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75B4B1F000E9;
-	Thu, 13 Aug 2026 09:17:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IMXZwGBv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E85F81F000E9;
+	Thu, 13 Aug 2026 09:17:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786612620;
-	bh=kIqhZs3FKvSwy1BNUsfQzjPnm36Ri75iiQox/jpOJyM=;
+	s=k20260515; t=1786612668;
+	bh=SFa96UMPUKdPMFLMZa9e++7ab7lmWL1tMpa/ViaInoM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=OSSlvxUSbp0ZqEsgL++LWTWwBHTmzBT1032P8TjwuzeK+iK9uuVVkUGjvZaPqR7Nh
-	 hee38iyq2KjVPfdHIWxYGjLH+hmTd+SUGz+fiI9u+bKJU+QnDWEPZuz7me6IyKaOAz
-	 n9ctp5xLatiB0hxTZRm7eMQIek19nSZikPGJiy4D3XXRj4p9HFaccMqZ3aHO8CN6bD
-	 0fChkItfWFo/T+7eXb7F5hCWuG6HVgBF30g+LFGZEK1OOnx0aB2wiexnTygt7Pa+Gp
-	 WlzrPy1SQGFP8zglcR/SSbjF+PYrcldsJH0bSHW0S700Eei023B3ZojbaEl0eV1F0Q
-	 eiwmA8J995IIA==
+	b=IMXZwGBv7s7z4J73JtHq94MBWzh8TJGMCPUSQz75YC/gWWn84liNir/y4SJXASOpA
+	 jIoeaVUfxaUcAI+x3HtDwvfuiK5FFM1b9cv3HfvOT6ED7GOmuwUYaVHufA6wqq0cgT
+	 veCPb6T4dr/Kfgs6HuGRtc4M5jra8VzoSveAr3c5ULUIo8nmsTJB+DqSUhsE6vd7u3
+	 Bc+aERd7JjqT3rtK5jisskUitZk3cNpOWp/rJAGBpuacn6efxYaRrXJenozbZ6AiQ3
+	 awuQlEjS6VLy0qkDrk76SvA43nC2/WqMU888f5pju/JXZ7AnEMFHfitZekSG0mdhaW
+	 nnjobiDh60Bxw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wuRYY-0000000FGVs-0iOI;
-	Thu, 13 Aug 2026 09:16:58 +0000
-Date: Thu, 13 Aug 2026 10:16:57 +0100
-Message-ID: <86fr0i1it2.wl-maz@kernel.org>
+	id 1wuRZJ-0000000FGXk-45XV;
+	Thu, 13 Aug 2026 09:17:46 +0000
+Date: Thu, 13 Aug 2026 10:17:45 +0100
+Message-ID: <86ecg21irq.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Steffen Eiden <seiden@linux.ibm.com>
 Cc: kvm@vger.kernel.org,
@@ -68,10 +68,10 @@ Cc: kvm@vger.kernel.org,
 	Vasily Gorbik <gor@linux.ibm.com>,
 	Will Deacon <will@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v6 04/33] arm64: Use proper include variant
-In-Reply-To: <20260812153631.3376090-5-seiden@linux.ibm.com>
+Subject: Re: [PATCH v6 05/33] arm64: ptrace: Use constants for compat register numbers
+In-Reply-To: <20260812153631.3376090-6-seiden@linux.ibm.com>
 References: <20260812153631.3376090-1-seiden@linux.ibm.com>
-	<20260812153631.3376090-5-seiden@linux.ibm.com>
+	<20260812153631.3376090-6-seiden@linux.ibm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -87,33 +87,16 @@ X-SA-Exim-Rcpt-To: seiden@linux.ibm.com, kvm@vger.kernel.org, kvmarm@lists.linux
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 12 Aug 2026 16:36:00 +0100,
+On Wed, 12 Aug 2026 16:36:01 +0100,
 Steffen Eiden <seiden@linux.ibm.com> wrote:
 > 
-> Use <> for including the sysreg header as it is not discoverable from
-> the current directory.
+> Define an enum to determine the register number for the mapping from
+> AArch32 and AArch64 registers. This allows for a more flexible use of
+> the register mappings.
 > 
-> Fixes: c07d8017bceb ("arm64/sysreg: Enable automatic generation of system register definitions")
 > Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
-> ---
->  arch/arm64/include/asm/sysreg.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index 7aa08d59d494..4bfdac9401bd 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -173,7 +173,7 @@
->   * come from here. The header relies on the definition of sys_reg()
->   * earlier in this file.
->   */
-> -#include "asm/sysreg-defs.h"
-> +#include <asm/sysreg-defs.h>
->  
->  /*
->   * System registers, organised loosely by encoding but grouped together
 
-Acked-by: Marc Zyngier <maz@kernel.org>
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 
 	M.
 
