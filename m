@@ -1,160 +1,108 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD126345EA2;
-	Thu, 13 Aug 2026 15:56:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35560379974;
+	Thu, 13 Aug 2026 15:59:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786636583; cv=none; b=bsH0k34k1ShkBcYmo0xJLdG0eRLMKie39dtNcOR+8LqcmKDKiOUF5IZfq+1PX2BQ4Htz115iVWVt1KzB0q9D4f+RVzXeEsndmG1DLeV3Zo1jlLRD3i4CEhZ272mmlMvJTR7tMNCv1R73Msld7VHsY1tF1sP6N2N5aOG5tuYCXms=
+	t=1786636791; cv=none; b=E/0a3GZqIe9y91a0rYZV8dF0Ynoe9U+ZyoQfyJZGno9ALRqKe9rS2RqzfecR1I26TAjRwD/Rpk+YyZSnh14kdbqM93qNaPEPuoB9qjl450suq6Rd4YtCUia39lHowZxuTKaY4nXcKz6+lTcao3CqRppSHaXWydx7hR87KUYfhKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786636583; c=relaxed/simple;
-	bh=5Y52WDn+x2YvZ+N4VN8lYflQWRFDJnc5MuXpaZUEGx0=;
+	s=arc-20240116; t=1786636791; c=relaxed/simple;
+	bh=rKdzEaB6WkyQKiaetuzxAeCyCkoIM5yLYJSw7iS6/8c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B72v32Nlyapga0gzIkCdegsfiQamEVXH9yUcBhugb2FxgfDohitcjEISno9NAOX11C7GhH/TJf/Cfq0Azqx/C5farTqRiHx9NaARI1/YxHJPgmBDa6DFGbQT5ccPATnfKqcI/g/Anz4w/ymIBJJODkhl26e2jSeo77od+ALpYdM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MUu9mCX/; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=OSHxIW3CPVUqchA7upzajG0Ys9uBXVAUDym9hy5+ICXXBl3ghiUdj0u+Op81XZGWrW3VZUdq04pcsNizq2DAbyVZqFbUzKU9/9VPcuLVO/+m0WT8NmmuA4LXbeXJ9Qw73J9Xd/3yA6923OryX0ezyCHWDavhEa6Dojw0o9HRHhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B8W4ndih; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MUu9mCX/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55E5E1F000E9;
-	Thu, 13 Aug 2026 15:56:19 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B8W4ndih"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F7211F000E9;
+	Thu, 13 Aug 2026 15:59:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786636580;
-	bh=zFi/eYdDkOk4QFk4d5TCUoZ5IdueZQPw39MRIni2akY=;
+	s=k20260515; t=1786636789;
+	bh=cBLS0FUJYhQkT1zB8ZANDPYH4FFbqlmbBM7/T/YIqRo=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=MUu9mCX/Od1l/M7P2njj5Nk/Mt9Swu9kF/om7GqhK1ROjaH/xP4RaNWqJFYzVWAtt
-	 lCu0BuvJZpXOClgRNvRZ3vVPhmeZIA+S+Wt3MlKxnCvmqbGhm+roFdjmtV9eccqgn9
-	 z7oLi6FWgvPOTgd/hvUdQdKLu1QiCoO3o3L8amm3a3z6Weo3d9FzPuZVnw2nDNnvTS
-	 rqRHF2XvTDAvJsfI780+4IyUbtpctDs+Szx5Dkz+0FVPiSe1GGVXGiB2DCWped5hxG
-	 zWs8jrQ5WqnDlZcI7niHFikOsOSb4ibDuE4/FkmauCgNUsiXOhf4MEaCHUfd194nsS
-	 LPB4N0hP3D8jQ==
-Date: Thu, 13 Aug 2026 16:56:02 +0100
-From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-To: sashiko-reviews@lists.linux.dev
-Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>, 
-	Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 2/2] KVM: arm64: nv: Fix null ptr deref in
- kvm_nested_s2_unmap() on S2 teardown
-Message-ID: <an3lHhgmwS0RnCgI@lucifer>
-References: <20260812-kvm-arm-nested-virt-fix-v1-0-4ad883f1b6a5@kernel.org>
- <20260812-kvm-arm-nested-virt-fix-v1-2-4ad883f1b6a5@kernel.org>
- <20260812140101.D77AC1F000E9@smtp.kernel.org>
+	b=B8W4ndihMue/+2EAWms1e0Bq8lI0vlF75HckH/GSe9oxI23AKQqPlBstT2kWvBw9y
+	 hBqAAufqxC7EgH5vuASZmVMONVy706R1bXu1A8QxKhInkjp1iFpXZ7KGSr9V+1Orz6
+	 6MmRehRlhUD2i+kBh3A9hF0YdnkJIf2PiJdIkQT/+BCB+AUYtBlv1mO20ZwZrr7pOp
+	 00GbaYZlvDUQ6GwvlTVfSowHMntAHYRYOhvk/YGFs9PZUy5aGPaH3J+gcTYD5K8nio
+	 wU3WujaHdwOV2tt+U0uk+ZAI285x0a2QQEvwY3e46Rcje7iZ5+g53pE7ZvwlyQZ2FS
+	 tCrQNUQjv4gLA==
+Date: Thu, 13 Aug 2026 16:59:44 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oupton@kernel.org>, Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 2/2] KVM: arm64: Block ID register changes after we
+ rely on the values
+Message-ID: <81c8d950-2413-4d9e-961d-ae96ab10beb8@sirena.org.uk>
+References: <20260803-kvm-arm64-idreg-final-v2-0-d7d7e4efc640@kernel.org>
+ <20260803-kvm-arm64-idreg-final-v2-2-d7d7e4efc640@kernel.org>
+ <8633wi1372.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="s0CQpxfWlxjP5lls"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260812140101.D77AC1F000E9@smtp.kernel.org>
+In-Reply-To: <8633wi1372.wl-maz@kernel.org>
+X-Cookie: Immanuel doesn't pun, he Kant.
 
-On Wed, Aug 12, 2026 at 02:01:01PM +0000, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 3 potential issue(s) to consider:
->
-> Pre-existing issues:
-> - [Critical] Use-After-Free on `kvm->arch.nested_mmus` array due to concurrent teardown.
 
-Addressed by Marc's changes + discussed over there.
+--s0CQpxfWlxjP5lls
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> - [Critical] Incomplete Fix: `kvm_nested_s2_wp()` is vulnerable to the same NULL pointer dereference and UAF.
+On Thu, Aug 13, 2026 at 03:54:09PM +0100, Marc Zyngier wrote:
+> Mark Brown <broonie@kernel.org> wrote:
 
-OK interesting!
+> > Avoid these issues by adding a new flag that we set when we finalize the
+> > system registers, blocking ID register changes after that has been set
+> > even if something fails later on. Do this in kvm_vm_finalize_sys_regs(),
 
-> - [High] Data Race: `kvm->arch.nested_mmus_size` updated locklessly causing uninitialized memory reads.
+> We already have KVM_ARCH_FLAG_ID_REGS_INITIALIZED. Why do we need
+> another flag for something that appears to be similar? Why can't we
+> broaden the scope of the existing flag to cover the above?
 
-Addressed by Marc's changes + discussed over there.
+That looked like it was for the other end of the process, where we set
+up initial values, and that userspace should still be able to configure
+values afterwards.  A combination of the naming of the flag and the fact
+that it was introduced as part of the writable ID registers series[1]
+but didn't block ID register writes made it seem like it was intentional
+that userspace should be continue to be able to write to the registers
+after the flag has been set.  I have to confess to being unclear what
+the intent with that would be, but as this is ABI I was trying to err on
+the side of minimal changes. =20
 
-> --
->
-> --- Patch [2]: [PATCH 2/2] KVM: arm64: nv: Fix null ptr deref in kvm_nested_s2_unmap() on S2 teardown ---
-> commit 04c9d62ec51b0000a28c8099341f6a2d31ce7848
-> Author: Lorenzo Stoakes (ARM) <ljs@kernel.org>
->
-> KVM: arm64: nv: Fix null ptr deref in kvm_nested_s2_unmap() on S2 teardown
->
-> This commit adds a NULL check for kvm->arch.mmu.pgt in kvm_nested_s2_unmap()
-> to prevent a NULL pointer dereference. This happens when the MMU lock is
-> dropped during stage 2 teardown, allowing concurrent progress that clears the
-> page table.
->
-> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> > index 17123f0b6daba..9fc0b1696dcb6 100644
-> > --- a/arch/arm64/kvm/nested.c
-> > +++ b/arch/arm64/kvm/nested.c
-> > @@ -1295,7 +1295,11 @@ void kvm_nested_s2_unmap(struct kvm *kvm, bool may_block)
-> >  			kvm_stage2_unmap_range(mmu, 0, kvm_phys_size(mmu), may_block);
->
-> [Severity: Critical]
-> This isn't a bug introduced by this patch, but does this loop contain a
-> Use-After-Free vulnerability?
->
-> While iterating over the nested_mmus array in kvm_nested_s2_unmap(),
-> kvm_stage2_unmap_range() can drop kvm->mmu_lock inside stage2_apply_range().
->
-> Concurrently, if kvm_mmu_notifier_release() calls kvm_arch_flush_shadow_all(),
-> it frees the kvm->arch.nested_mmus array unconditionally and without taking
-> kvm->mmu_lock:
->
-> kvm_arch_flush_shadow_all() {
->     ...
->     kvfree(kvm->arch.nested_mmus);
->     ...
-> }
->
-> If the array is freed during the lock-drop window, the local mmu pointer
-> becomes dangling, and accessing it when the lock is reacquired could result
-> in a Use-After-Free.
->
-> >  	}
-> >
-> > -	kvm_invalidate_vncr_ipa(kvm, 0, BIT(kvm->arch.mmu.pgt->ia_bits));
-> > +	/* NULL pgt should only be possible if raced when mmu_lock dropped. */
-> > +	if (kvm->arch.mmu.pgt)
-> > +		kvm_invalidate_vncr_ipa(kvm, 0, BIT(kvm->arch.mmu.pgt->ia_bits));
-> > +	else
-> > +		WARN_ON(!may_block);
-> >  }
->
-> [Severity: Critical]
-> This is a pre-existing issue, but does kvm_nested_s2_wp() suffer from the exact
-> same NULL pointer dereference and Use-After-Free vulnerability?
->
-> Like kvm_nested_s2_unmap(), kvm_nested_s2_wp() iterates over the nested_mmus
-> array and drops mmu_lock via stage2_apply_range_resched(). When it resumes
-> and exits the loop, it also unconditionally executes
-> BIT(kvm->arch.mmu.pgt->ia_bits).
->
-> Should the same fix be applied to kvm_nested_s2_wp() to prevent a guaranteed
-> NULL pointer dereference when kvm_arch_flush_shadow_all() clears the page
-> table in the window where the lock is dropped?
+I would be unsurprised to learn that it's just an oversight, in which
+case we should just use the same flag instead as you suggest.
 
-Yeah this seems valid actually, will note and can send as a follow-up?
+[1] https://lore.kernel.org/r/20230609190054.1542113-7-oliver.upton@linux.d=
+ev
 
->
-> [Severity: High]
-> This isn't a bug introduced by this patch, but is there a data race on
-> kvm->arch.nested_mmus_size?
->
-> In kvm_vcpu_init_nested(), nested_mmus_size is updated outside of
-> kvm->mmu_lock and without memory barriers:
->
-> kvm_vcpu_init_nested() {
->     ...
->     kvm->arch.nested_mmus_size = num_mmus;
->     ...
-> }
->
-> A concurrent reader like kvm_nested_s2_unmap() can see the updated size
-> before the stores initializing the new array elements become visible. Because
-> the new array is allocated with kvcalloc(), an uninitialized/zeroed
-> mmu->tlb_vttbr causes kvm_s2_mmu_valid() to incorrectly evaluate to TRUE.
->
-> Will this cause the reader to process the zeroed mmu structure, passing it
-> to kvm_stage2_unmap_range(), which would dereference a NULL mmu->pgt or
-> access a partially initialized pgt?
->
-> --
-> Sashiko AI review · https://sashiko.dev/#/patchset/20260812-kvm-arm-nested-virt-fix-v1-0-4ad883f1b6a5@kernel.org?part=2
+--s0CQpxfWlxjP5lls
+Content-Type: application/pgp-signature; name="signature.asc"
 
---
-Cheers, Lorenzo
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmp96e8ACgkQJNaLcl1U
+h9A80wgAha8llle9+QqQT+mJR2RuxsY6SQP/3Kj2ODe3Ammr9HvKe7VFlUnYcZf0
+5oQVJfqxCR9Khm8XwlPTFbUnhRxNI2WHnwrIBoDULd1MK3EKjfpNNJrr9jOBS35a
+XHX00r6VuPASZW5onDlxMgzEGQI0a0ngcUSUBH0YZcATe8BzpLBjTEhLAhhDBBrF
+HNahJz6MNNtvPSoSyBe32zavOVQlSMaaY1YFoBxh0TGuym1Z9OH9n3p70mQBeN+T
+9sIV0iJBdEjdPCcx75P+5P04cGp+XyjG3HE41FYAsqTZrKGsEAqUrk9NHqKBlomH
+rzBBLk8MTWWmlEVKRz1p/gF2972u3g==
+=uPvA
+-----END PGP SIGNATURE-----
+
+--s0CQpxfWlxjP5lls--
