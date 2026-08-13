@@ -1,189 +1,104 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8AED3161A1;
-	Thu, 13 Aug 2026 09:56:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ECC43B2D00;
+	Thu, 13 Aug 2026 10:11:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786615002; cv=none; b=qNS9+soh4V8xyppPIp9QyZxY8FQEAS0a3IyXqtf6PO+U6nkd0eYcMgi1CIGGN5DnMEmzUmV1cojfqLDJVc83ezqr8mltOsTl+nV5HH8pQgA/IURJ2dTWR7tp4VSEg+YhLLJb1Ve8ttsVA+aE1DVDwzW2hHV6oK5ywFPInucUGKY=
+	t=1786615873; cv=none; b=V14XGF6R5ZvqgYMKlsfJGBUO620Lzn6f12HIZ50QvpBup/WFzhClW9iBFNBwO3fujerwWz6uGqNZ8h9jZ8DcJjtCSv/oZ9N6DrQMaUHw/pCpJ2rr+S99/ZhXanDe3G4WDqWEdqVefJKkG1jOzgD0xuLzOBUB5v6abxA3B100/MI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786615002; c=relaxed/simple;
-	bh=1ukAlHmDH3w2RqK6Os7+Ms90DmlhG9iudSpZU/2jScs=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Tx5zOYiJ0i1nPMkstzsn6mnGXydSU1l8k4tTq8elxALkMaifEdQnSNaU3tkA84CDPvOHRbrYdg9YK2wyB6Y/dhxBfP8W3fHxnkV+NXEZuPU+Ji5UchzE4L6Jiq35YOTDSiPHZ1gSz9Deaw/t3jTElH22b7CtQTbz6hHYW6oL6DU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CHvYLdEt; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786615873; c=relaxed/simple;
+	bh=S5lRUjdLp3oI5PZ7dawLDovgFfcY3oYgCUjnNo6ZAaY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WbM/qD79l3Xj0rhwr72VJsKyM863MpFnLHaYAOJSU6m0JcaDyHQec9Pa2on2riz53S4EpMHIhOOvxtcopkRK6Uo9baTc7Lz7t9tBcLaiRB3THNIlGjw/123XNEzod1q5f2GXhXcggEcvoBHjSVqn+hTd4C6fWo9qz8FuKKkHuCU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uh72INHK; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CHvYLdEt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94CD41F000E9;
-	Thu, 13 Aug 2026 09:56:40 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uh72INHK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71B2B1F000E9;
+	Thu, 13 Aug 2026 10:11:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786615000;
-	bh=IsAhz04z4JOyOzRAwpcE4XqcGtm8zAE8zmEWF6NGCHw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=CHvYLdEtqJyTYe8V+9uKUglx6hAV77Izcmz/KfrHc5PezB69iysXzbcuPR45KM+j6
-	 5wygXUSO513tUSdDGCLQ1NlwcdG2+ibziRnfIGrgJT30ajeTGGxcZ4swBevHRC0WhV
-	 LspYWILW/000KuXsgqEfm4NF2du2v3zyTdA4RV1sXpfBbrjo6Fc1WS3P+ZFMJzYDy5
-	 GXL0/C9omCKwExiAKALHor+YqFLC01Pkqo2PSKkbs7PEMkwI9vbJsNE2vTA5G7fQkB
-	 697gbftd+2qf5XawHF7BSLRPvbt0sUPuFqmI8efe6NPy6dX6GwNcugt/ajWtJbCUN+
-	 nWmuGbK3yNfxg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wuSAw-0000000FHZg-1nGM;
-	Thu, 13 Aug 2026 09:56:38 +0000
-Date: Thu, 13 Aug 2026 10:56:37 +0100
-Message-ID: <86a4qq1gyy.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Steffen Eiden <seiden@linux.ibm.com>
-Cc: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Andreas Grapentin <gra@linux.ibm.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	David Hildenbrand <david@kernel.org>,
-	Friedrich Welter <fritz@linux.ibm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Gautam Gala <ggala@linux.ibm.com>,
-	Hariharan Mari <hari55@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Hendrik Brueckner <brueckner@linux.ibm.com>,
-	Ilya Leoshkevich <iii@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Nico Boehr <nrb@linux.ibm.com>,
-	Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
-	Oliver Upton <oupton@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
+	s=k20260515; t=1786615871;
+	bh=1GUvy4NsSEhlxO1mGSlkQ8deO2KrloNrrXAd8AHoYE8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=Uh72INHK/sIbkNYsIDOPjGO143EsGaQlP7xQY3AROGkJGS0/0IdBYQHDCvp1O5oM8
+	 oaoI+ZDz/JHZS+7HYo6heMzXrWDq3R9JoHYsJ+6PH8z7UlLt+2dRJCIX8KLOxLsE0W
+	 RPhMJleW/O0L2O3kGBOy6PqG73URg60mJM5eCvmmpoypJbq06/4eW3EI2a/z9Ibg1G
+	 NgEF8AnsHzQ0yR4Ii3p1AGmKDV//SqJRsEYIo5folawdWjVa7go7BlIMYzhtzP3KtN
+	 8LOjezI5ivbdQCFV5ug5X9NRpIeTcTNM/Ry1xf1ieV5i3viFeT1+G6zHTi0twu/0TX
+	 kdMpVTQo5iiHQ==
+Date: Thu, 13 Aug 2026 11:11:03 +0100
+From: Will Deacon <will@kernel.org>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Pavan Kondeti <pavan.kondeti@oss.qualcomm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Will Deacon <will@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v6 08/33] KVM: arm64: Use accessor functions for core regs
-In-Reply-To: <20260812153631.3376090-9-seiden@linux.ibm.com>
-References: <20260812153631.3376090-1-seiden@linux.ibm.com>
-	<20260812153631.3376090-9-seiden@linux.ibm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+	Emi Kisanuki <fj0570is@fujitsu.com>,
+	Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>
+Subject: Re: [PATCH v16 07/45] arm64: mm: Handle Granule Protection Faults
+ (GPFs)
+Message-ID: <an2YN7kxB7bjCd2s@willie-the-truck>
+References: <20260803134403.80630-1-steven.price@arm.com>
+ <20260803134403.80630-8-steven.price@arm.com>
+ <ans1ZSwMEKeT9Gfz@arm.com>
+ <d4bdecca-517a-4b4b-bf67-cef6b09bc8c1@arm.com>
+ <7d4e5920-aa20-40cd-954e-037631bd0d6c@quicinc.com>
+ <anx6YbPMVz3OlpA5@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: seiden@linux.ibm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, agordeev@linux.ibm.com, gra@linux.ibm.com, arnd@arndb.de, catalin.marinas@arm.com, borntraeger@linux.ibm.com, imbrenda@linux.ibm.com, david@kernel.org, fritz@linux.ibm.com, tabba@google.com, ggala@linux.ibm.com, hari55@linux.ibm.com, hca@linux.ibm.com, brueckner@linux.ibm.com, iii@linux.ibm.com, frankja@linux.ibm.com, joey.gouly@arm.com, nrb@linux.ibm.com, oss@nina.schoetterlglausch.eu, oupton@kernel.org, pbonzini@redhat.com, seanjc@google.com, suzuki.poulose@arm.com, svens@linux.ibm.com, Ulrich.Weigand@de.ibm.com, gor@linux.ibm.com, will@kernel.org, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <anx6YbPMVz3OlpA5@arm.com>
 
-On Wed, 12 Aug 2026 16:36:04 +0100,
-Steffen Eiden <seiden@linux.ibm.com> wrote:
+On Wed, Aug 12, 2026 at 02:51:29PM +0100, Catalin Marinas wrote:
+> On Wed, Aug 12, 2026 at 06:12:09PM +0530, Pavan Kondeti wrote:
+> > There is a valid case for fixup_exception() to be needed here in GPF
+> > handling.
+> > 
+> > -000 |load_unaligned_zeropad(inline)
+> > -000 |hash_name(inline)
+> > -000 |link_path_walk()
+> > -001 |path_lookupat()
+> > -002 |filename_lookup()
+> > -003 |vfs_statx()
+> > -004 |vfs_fstatat()
+> > 
+> > We observed this in Android running Gunyah when the page is mapped in
+> > EL1 but unmapped at EL2. path_lookupat() can actually handle this
+> > via fixup_exeption() when a word load crosses the page boundary.
+> > However, Gunyah injects a Synchronous External Abort and we have
+> > a downstream patch [1] that adds fixup_exception() in do_sea(). pKVM
+> > injects [2] such faults back to EL1 and fixup_exception() is taken care.
 > 
-> Instead of accessing the value directly use assessor function that
+> Ah, good point, completely forgot about load_unaligned_zeropad(). Since
+> we don't unmap the linear map for delegated pages, we'll need the
+> fixup_exception(). And I guess warning in this case is not desirable
+> either. We could limit it to EX_TYPE_KACCESS_ERR_ZERO and
+> EX_TYPE_LOAD_UNALIGNED_ZEROPAD, though not sure it's worth it.
 
-s/assessor function/accessors/
+Alternatively, I think the series to unmap guest memory from the linear
+map would solve that for gmem:
 
-> abstract the actual location of the register values. Add a helper
-> function to reset fpsimd registers. Enable other KVM implementations to
-> reuse this code.
+https://lore.kernel.org/all/20260410151746.61150-1-kalyazin@amazon.com/
 
-to reuse this code by overloading the accessors.
+but I can't tell whether that's still being actively pursued.
 
-> 
-> No functional changes.
-> 
-> Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
-> ---
->  arch/arm64/include/asm/kvm_emulate.h | 34 ++++++++++++++++++++++++++--
->  arch/arm64/kvm/guest.c               | 16 ++++++-------
->  2 files changed, 40 insertions(+), 10 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index 8603766c1b4d..b31d50bdf59e 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -141,6 +141,31 @@ static __always_inline unsigned long *vcpu_cpsr(const struct kvm_vcpu *vcpu)
->  	return (unsigned long *)&vcpu->arch.ctxt.regs.pstate;
->  }
->  
-> +static __always_inline unsigned long *vcpu_sp_el0(struct kvm_vcpu *vcpu)
-> +{
-> +	return (unsigned long *)&vcpu->arch.ctxt.regs.sp;
-> +}
-> +
-> +static __always_inline u64 *vcpu_sp_el1(struct kvm_vcpu *vcpu)
-> +{
-> +	return __ctxt_sys_reg(&vcpu->arch.ctxt, SP_EL1);
-> +}
-> +
-> +static __always_inline __u128 *vcpu_vreg(struct kvm_vcpu *vcpu, int n)
-> +{
-> +	return &vcpu->arch.ctxt.fp_regs.vregs[n];
-> +}
-> +
-> +static __always_inline __u32 *vcpu_fpsr(struct kvm_vcpu *vcpu)
-> +{
-> +	return &vcpu->arch.ctxt.fp_regs.fpsr;
-> +}
-> +
-> +static __always_inline __u32 *vcpu_fpcr(struct kvm_vcpu *vcpu)
-> +{
-> +	return &vcpu->arch.ctxt.fp_regs.fpcr;
-> +}
-> +
->  static __always_inline bool vcpu_mode_is_32bit(const struct kvm_vcpu *vcpu)
->  {
->  	return !!(*vcpu_cpsr(vcpu) & PSR_MODE32_BIT);
-> @@ -737,6 +762,11 @@ static inline void vcpu_set_hcrx(struct kvm_vcpu *vcpu)
->  	}
->  }
->  
-> +static inline void kvm_reset_fpsimd(struct kvm_vcpu *vcpu)
-> +{
-> +	memset(&vcpu->arch.ctxt.fp_regs, 0, sizeof(vcpu->arch.ctxt.fp_regs));
-> +}
-> +
->  /* Reset a vcpu's core registers. */
->  static inline void kvm_reset_vcpu_core(struct kvm_vcpu *vcpu)
->  {
-> @@ -752,8 +782,8 @@ static inline void kvm_reset_vcpu_core(struct kvm_vcpu *vcpu)
->  	/* Reset core registers */
->  	memset(vcpu_gp_regs(vcpu), 0, sizeof(vcpu_gp_regs(vcpu)));
->  	*vcpu_pc(vcpu) = 0;
-> -	vcpu->arch.ctxt.regs.sp = 0;
-> -	memset(&vcpu->arch.ctxt.fp_regs, 0, sizeof(vcpu->arch.ctxt.fp_regs));
-> +	*vcpu_sp_el0(vcpu) = 0;
-> +	kvm_reset_fpsimd(vcpu);
->  	vcpu->arch.ctxt.spsr_abt = 0;
->  	vcpu->arch.ctxt.spsr_und = 0;
->  	vcpu->arch.ctxt.spsr_irq = 0;
-> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> index b01d6622b872..773f6c8e5026 100644
-> --- a/arch/arm64/kvm/guest.c
-> +++ b/arch/arm64/kvm/guest.c
-> @@ -134,19 +134,19 @@ static void *core_reg_addr(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->  	     KVM_REG_ARM_CORE_REG(regs.regs[30]):
->  		off -= KVM_REG_ARM_CORE_REG(regs.regs[0]);
->  		off /= 2;
-> -		return &vcpu->arch.ctxt.regs.regs[off];
-> +		return &vcpu_gp_regs(vcpu)[off];
-
-Doesn't this belong to the previous patch?
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Will
