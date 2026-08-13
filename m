@@ -1,33 +1,33 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A1543090F5;
-	Thu, 13 Aug 2026 15:29:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6C483955F0;
+	Thu, 13 Aug 2026 15:29:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786634949; cv=none; b=sAJ3sVeedA8Svx5u1TYkShdHCjuPbtoV1x8tCLOGtI83gk1z5NssJrg9uKHzzHsRmJs2eFHxSDpZ0nn2O297swAj0I7b/DitoHPBssbnBQbdIRmP7mACi99EuLFIiLcMEEVZnPyuwKp+AdTHxoCarzfTAWAUiQtB7oOx3vjNmZY=
+	t=1786634955; cv=none; b=QMzGw4jyPnUzQPt6l7n5crOU183ZA6iOQ04ZemzdcFDShogXx2Hkxk5gGGPuZCZgglpWVQq8s18C4j8FL2oSbb0YNISwuHWtD6y5CpH2UU5+7yi0LDRvcbmvLgyJNtpCH2UnBsaMAXSsnS8VTTjH2d/VjTYQpfqHadpNjSRV1qU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786634949; c=relaxed/simple;
-	bh=hwSP41DeEmtt7lyKNcI/TpZqJSs8Qf3xJssO3OjtPzI=;
+	s=arc-20240116; t=1786634955; c=relaxed/simple;
+	bh=/QD7BRHajvoQsee6evmAg1MF6Mele3ZPoIrU1O/8bqo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HSIMdAM7NS7aUeAOOSY0a0+cNQnJdD7i94og23Le//l+DMAysBYLFKpM9e9HO3ujLgduQAbtQKdLmk/xHFl6XkYFpgnwpgK0QTNvslUdcMfygohxr3ql6YQ3nfbcNYr6lUesv66YYbPfBDBmCw1JKS9mJzs4Z7TzTUlVyi8j9j4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=itBB1IFK; arc=none smtp.client-ip=217.140.110.172
+	 In-Reply-To:Content-Type; b=EEQFx76JxrUOfFuKqaKCZB+wKeW5gy70wxI7FfCSNX/yyzjmbLv6nY5BDjQNy70uf2OeNN3SUQ6shViP7/8nHqgN60hiBzrCK88eO99xExZZjYg+/XLKZ6LKKTxmx4j/B5z3EtBydD30Mf2rX2/BbGGUXy1e4N7mUMi5jSMqSck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=WVwsfOlz; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="itBB1IFK"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="WVwsfOlz"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9A52D1576;
-	Thu, 13 Aug 2026 08:29:03 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 298761576;
+	Thu, 13 Aug 2026 08:29:09 -0700 (PDT)
 Received: from [10.1.25.28] (e122027.cambridge.arm.com [10.1.25.28])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0AEDE3F632;
-	Thu, 13 Aug 2026 08:29:02 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2FA5B3F632;
+	Thu, 13 Aug 2026 08:29:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1786634947; bh=hwSP41DeEmtt7lyKNcI/TpZqJSs8Qf3xJssO3OjtPzI=;
+	t=1786634953; bh=/QD7BRHajvoQsee6evmAg1MF6Mele3ZPoIrU1O/8bqo=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=itBB1IFKjNP9DbOkr/kHIFoks2lYJmw2ANl9SZOyFtDGubOYpdT76oI7qrubQEhvS
-	 5CjB+gB8LUXcDTjQRcQSWY6Q6ualkMYYZmfwi0DTp/zbv1DYBQRKXsuxkDEpuSoxfE
-	 QqxzU6p1Q2t+mx6kzqQs9ixwC+4AMFZV+Ve9mJkc=
-Message-ID: <adba8512-ac9e-4d22-86a8-2ffcff837f11@arm.com>
-Date: Thu, 13 Aug 2026 15:38:19 +0100
+	b=WVwsfOlzjKMLQCPV/Kun+w+rcBJQ56P0bCLXJQcQH51ZRSbmJt9LdaqGEvNLwUh/u
+	 zU6TjugDY38iS6UzQ4WvkoUx2Hs1mWylme0xEXkUQe5wRDoeSaKo73ycu+VyyfHY3k
+	 1qZXM3/+R1fGvFSiETSCfNb01S8ZovMwfZp/uenA=
+Message-ID: <23ef41bc-1028-4cc0-8415-d93d60b0ac47@arm.com>
+Date: Thu, 13 Aug 2026 15:38:22 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -53,16 +53,16 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
  Lorenzo Pieralisi <lpieralisi@kernel.org>
 References: <20260803134403.80630-1-steven.price@arm.com>
- <20260803134403.80630-22-steven.price@arm.com> <yq5a5x1q461s.fsf@kernel.org>
+ <20260803134403.80630-22-steven.price@arm.com> <yq5a33wu3t4k.fsf@kernel.org>
 From: Steven Price <steven.price@arm.com>
 Content-Language: en-GB
-In-Reply-To: <yq5a5x1q461s.fsf@kernel.org>
+In-Reply-To: <yq5a33wu3t4k.fsf@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 04/08/2026 09:57, Aneesh Kumar K.V wrote:
+On 04/08/2026 14:36, Aneesh Kumar K.V wrote:
 > Steven Price <steven.price@arm.com> writes:
-> 
+>> +
 >> +	switch (rec->run->exit.exit_reason) {
 >> +	case RMI_EXIT_SYNC:
 >> +		/*
@@ -80,80 +80,41 @@ On 04/08/2026 09:57, Aneesh Kumar K.V wrote:
 >> +	case RMI_EXIT_PSCI:
 >> +		rec_exit_hvc(vcpu);
 >> +		kvm_make_request(KVM_REQ_RMI, vcpu);
->> +		return ARM_EXCEPTION_TRAP;
->> +	case RMI_EXIT_RIPAS_CHANGE:
->> +		rec_exit_hvc(vcpu);
->> +		return ARM_EXCEPTION_TRAP;
->> +	}
+>>
 > 
-> Should we handle RMI_EXIT_RIPAS_CHANGE differently? Currently, the call path is:
+> I'm also wondering whether we can move the kvm_make_request() call until
+> after the PSCI/HOST_CALL handling is complete. I tried a quick hack, but
+> it did not look particularly clean, since we would end up adding
+> RMM-specific checks in handle_hvc():
 > 
-> kvm_rec_exit()
-> -> RMI_EXIT_RIPAS_CHANGE
-> -> handle_hvc()
-> -> kvm_rec_handle_hvc()
-> -> kvm_prepare_memory_fault_exit()
+> ret = kvm_smccc_call_handler(vcpu);
 > 
-> Could we instead treat RMI_EXIT_RIPAS_CHANGE as a special case and avoid
-> redirecting it through handle_hvc()? The completion part of the RIPAS
-> change could still be handled by kvm_rec_handle_request().
+> if (vcpu_is_rec(vcpu) &&
+>     (vcpu->arch.rec.run->exit.exit_reason == RMI_EXIT_PSCI ||
+>      vcpu->arch.rec.run->exit.exit_reason == RMI_EXIT_HOST_CALL))
+> 	kvm_make_request(KVM_REQ_RMI, vcpu);
+> 
+> That said, having rec_exit_hvc(vcpu) and kvm_make_request() back-to-back
+> is also somewhat confusing. Perhaps we could at least add a comment
+> explaining why the request must always be made here.
 
-Yes that seems like it's slightly neater.
+Agreed, a comment would make it clearer what's going on. I'll add that.
+As you say I'm not convinced trying to delay the kvm_make_request() call
+is the answer because it ends up with an ugly RMM-specific check.
 
 Thanks,
 Steve
 
 > 
-> -bool kvm_rec_handle_hvc(struct kvm_vcpu *vcpu, int *ret)
-> +static int rec_exit_ripas_change(struct kvm_vcpu *vcpu)
->  {
-> -	struct realm_rec *rec;
-> +	struct realm_rec *rec = &vcpu->arch.rec;
->  	struct realm *realm;
->  	unsigned long base;
->  	unsigned long ripas;
->  	unsigned long top;
->  
-> -	if (!vcpu_is_rec(vcpu))
-> -		return false;
-> -
-> -	rec = &vcpu->arch.rec;
-> -	if (rec->run->exit.exit_reason != RMI_EXIT_RIPAS_CHANGE)
-> -		return false;
-> -
->  	realm = &vcpu->kvm->arch.realm;
->  	base = rec->run->exit.ripas_base;
->  	top = rec->run->exit.ripas_top;
-> @@ -89,8 +83,7 @@ bool kvm_rec_handle_hvc(struct kvm_vcpu *vcpu, int *ret)
->  			 base, top, ripas);
->  		/* Set RMI_REJECT bit */
->  		rec->run->enter.flags = REC_ENTER_FLAG_RIPAS_RESPONSE;
-> -		*ret = -EINVAL;
-> -		return true;
-> +		return -EINVAL;
->  	}
->  
->  	/* Exit to VMM, the actual RIPAS change is done on next entry */
-> @@ -102,8 +95,7 @@ bool kvm_rec_handle_hvc(struct kvm_vcpu *vcpu, int *ret)
->  	 * KVM_EXIT_MEMORY_FAULT requires a return code of -EFAULT, see the
->  	 * API documentation
->  	 */
-> -	*ret = -EFAULT;
-> -	return true;
-> +	return -EFAULT;
->  }
->  
->  int kvm_rec_exit(struct kvm_vcpu *vcpu, int rec_run_ret)
-> @@ -169,8 +161,7 @@ int kvm_rec_exit(struct kvm_vcpu *vcpu, int rec_run_ret)
->  		kvm_make_request(KVM_REQ_RMI, vcpu);
->  		return ARM_EXCEPTION_TRAP;
->  	case RMI_EXIT_RIPAS_CHANGE:
-> -		rec_exit_hvc(vcpu);
-> -		return ARM_EXCEPTION_TRAP;
-> +		return rec_exit_ripas_change(vcpu);
->  	}
->  
->  	return rec_exit_fatal(vcpu, "Unsupported Realm exit reason",
+>> +		return ARM_EXCEPTION_TRAP;
+>> +	case RMI_EXIT_RIPAS_CHANGE:
+>> +		rec_exit_hvc(vcpu);
+>> +		return ARM_EXCEPTION_TRAP;
+>> +	}
+>> +
+>> +	return rec_exit_fatal(vcpu, "Unsupported Realm exit reason",
+>> +			      rec->run->exit.exit_reason);
+>> +}
 > 
 > -aneesh
 
