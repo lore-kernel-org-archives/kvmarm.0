@@ -1,57 +1,57 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45AE540DB56;
-	Thu, 13 Aug 2026 14:54:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D33B33F5BC;
+	Thu, 13 Aug 2026 15:01:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786632854; cv=none; b=pv/x33K7RnkhaLR63aIreLcl4TKrnfjUxOkxipADobMcCYICM1/D716Pb3XtWwQIvGFqhX+i4MsGvYw9O9+p7ObOT66yTKJM3SpoATvkQMsgcWH+BoMsa6kATJUHI48EHwlVzkoC9xuluLBAdZ1e2OQylIWs00l8PncZZTHTolE=
+	t=1786633268; cv=none; b=ej4SfsQyeka5j9dZD30hhtdcR+iwdLDmuwHfxNXt5gI4SCqiDN9cqPBfzgjMAtUZ9MVBDM0Rc97EFL2OvS0bkOpyTQG+wVKN+9QJN4UH+Cz/n9mM+d4ZPfTqFoCl0Q2Sx373d1DHBUU6Ga/1FmZw5BKdaZ/aPnGK92OB2iCWf+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786632854; c=relaxed/simple;
-	bh=hHp93k9R/rHAgBR5JtoVdcd/Wy3T91Zzr3hQ9XuON8s=;
+	s=arc-20240116; t=1786633268; c=relaxed/simple;
+	bh=eXTTWXqoagVkPe8ahcfUnJXTMT/akoQydSkZwvQ9u5k=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lvMLXEBhHTN3teAZbhbDg0Udp15yXq6bYKCW9SB+cTS4vpLZlAKDHp1k5CEoSCviH3PSp4KNrscEdQvM3HcaSEVZtdUVuhLN/D9HDaTQwz0fKgUjJ/cDiCFGHVdpY6/Bx60k8PokydKodlALS5Ad5Md/ZxVXasqf3yZmgd0huu8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UETfQjb3; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=YRH+1+7gc8xkkkSGlucvFqTC6jioyRjTw4yhWyywxN+qZhWAGT6/u/th7KH1a5YddUtW7O9zSR4lAhdYfMWKTUsK53SrO2ZBmzrx4rdLEYjN8hsmUmYJobm+2HiwcCpfzKzSt92d3IANXKpGjJ1nAVPC3Iu+shuvapCFpJ5Btxs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EgRk7AGh; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UETfQjb3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4D0F1F000E9;
-	Thu, 13 Aug 2026 14:54:12 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EgRk7AGh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B60DB1F00A3A;
+	Thu, 13 Aug 2026 15:01:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786632852;
-	bh=f0IwIBXs0Nf4kvV4jtG5p/jFb+q1ZW4ONz3qEunuMaM=;
+	s=k20260515; t=1786633266;
+	bh=iDYD01JzcNkmhOWGFh5QbccO2ho8Cwznacy5VjZDXQM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=UETfQjb3ZTfYf1wxqut4RUC4WIeiCx6vGQ+zTMqc/IUrW2tEvZ9zNA9rBMplfSH7Q
-	 W8bI5GJLNLefnIpkKC3FcPihUCdm5f7oBtZvHJypXNUhTQdmyCAgS4NCLMDR/r/AKx
-	 JLRAJbnbVV6iFXSU+Sxf7cBxQ0Bi3twizrze1GNXQs/+2eykGL917x3MTBdAo/NeLN
-	 eJEzxoeL0lCBDVF1isBo9FBJkBCkfmdV7eKAKMtH+95u4UDgrcWSoM0A6DBk1WOx2r
-	 OhU8w5MhRbIBnoymZObnaTYvMw9SK1rNgM5xzmkqO96JoP+tzo0I3Zrjje7BKKoiyr
-	 IsLvxEnl4WBpQ==
+	b=EgRk7AGh2m/Gnf9z5Po7mfly2YewNQgWKeYo76ap52SkjssoYHVDzGE9aFT9hNWvu
+	 ucAXRTeo41NlsZLphB5Zn1UUBBb9gNdjfuV0Nb0xQcHgZUkmNxvb3+XBNb7zuMWk+Y
+	 fWKJgajo8wR/2CX4huM3KKZFDgYDb5LAj90HYYqjSxEka541fkF2LsIEgojBgYbTFv
+	 s1snZdyShAmfBOQUUm/jkQtfONbobYAeGSzn/zxNZvU/vy574iJz6Z/IHz5zKGPvIH
+	 SMDgxkMkPHdK9PSD3E2GV/0wu293gBj8vzmVH0Z5UpJEMePNxTdQjUCJHLpLyFDFlN
+	 /tR5NVUNBljsg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wuWos-0000000FMem-1R82;
-	Thu, 13 Aug 2026 14:54:10 +0000
-Date: Thu, 13 Aug 2026 15:54:09 +0100
-Message-ID: <8633wi1372.wl-maz@kernel.org>
+	id 1wuWvY-0000000FMlC-3sey;
+	Thu, 13 Aug 2026 15:01:05 +0000
+Date: Thu, 13 Aug 2026 16:01:04 +0100
+Message-ID: <861pc212vj.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <tabba@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] KVM: arm64: Block ID register changes after we rely on the values
-In-Reply-To: <20260803-kvm-arm64-idreg-final-v2-2-d7d7e4efc640@kernel.org>
-References: <20260803-kvm-arm64-idreg-final-v2-0-d7d7e4efc640@kernel.org>
-	<20260803-kvm-arm64-idreg-final-v2-2-d7d7e4efc640@kernel.org>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	nd <nd@arm.com>,
+	"oupton@kernel.org"
+	<oupton@kernel.org>,
+	Joey Gouly <Joey.Gouly@arm.com>,
+	Suzuki Poulose
+	<Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>
+Subject: Re: [PATCH v2 0/4] KVM: arm64: GICv5 KVM IRS review fixes
+In-Reply-To: <20260811150941.941295-1-sascha.bischoff@arm.com>
+References: <20260811150941.941295-1-sascha.bischoff@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -63,54 +63,21 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, oupton@kernel.org, tabba@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oupton@kernel.org, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, lpieralisi@kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 03 Aug 2026 23:53:54 +0100,
-Mark Brown <broonie@kernel.org> wrote:
+On Tue, 11 Aug 2026 16:09:46 +0100,
+Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 > 
-> In commit c5bac1ef7df6b ("KVM: arm64: Move existing feature disabling
-> over to FGU infrastructure") a check was added to suppress duplicate
-> recalculation of FGUs based on a flag KVM_ARCH_FLAG_FGU_INITIALIZED. This
-> flag is set when we complete kvm_calculate_traps(), which is called from
-> kvm_arch_vcpu_run_pid_change(). There are several points where that
-> function could fail after we have calculated FGUs (eg, due to an invalid
-> timer configuration). If this happens then userspace will still be able
-> to write to the ID registers, writes to which are gated on
-> KVM_ARCH_FLAG_HAS_RAN_ONCE being set. This in turn means that the FGU
-> configuration for a running guest may not match the ID register
-> configuration.
+> Hi all,
 > 
-> This will result in issues based on the hypervisor assuming a consistent
-> configuration, for example it allows the creation of guests which have
-> untrapped access to system registers which are not context switched for
-> the guest.
-> 
-> A similar issue exists in kvm_init_nv_sysregs() where once sysreg_masks
-> is allocated the RES0/RES1 masks for registers are fixed based on the ID
-> register values at the time the function ran, and also for copying the
-> implementation ID registers to the hypervisor for pKVM.
-> 
-> There is a further issue with vGIC setup, creating a vGIC includes
-> updating the ID registers to reflect the GIC configuration. We refuse
-> to create a vGIC after the first vCPU has run but if a vCPU fails its
-> first run we may already have finalized the ID register values.
-> 
-> Avoid these issues by adding a new flag that we set when we finalize the
-> system registers, blocking ID register changes after that has been set
-> even if something fails later on. Do this in kvm_vm_finalize_sys_regs(),
-> this is where we finalize the GIC fields in the ID registers and happens
-> before we do the FGU and RES0/1 setup. A VMM which tries to create an
-> irqchip after failing to run a vCPU will now get -EBUSY rather than a
-> likely misconfigured guest. Userspace is not expected to try to run a
-> guest that fails to start, never mind try to repair the guest
-> configuration after doing so, so this is not expected to have any impact
-> on practical users.
+> v1 [1] combined irqchip and KVM fixes identified by Sashiko [2] while
+> reviewing the GICv5 KVM IRS series [3]. Following feedback, v2 splits
+> the fixes into separate irqchip and KVM postings. This posting
+> contains the KVM fixes; the irqchip fixes are posted separately.
 
-We already have KVM_ARCH_FLAG_ID_REGS_INITIALIZED. Why do we need
-another flag for something that appears to be similar? Why can't we
-broaden the scope of the existing flag to cover the above?
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 
 	M.
 
