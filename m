@@ -1,275 +1,158 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF4EC33F5BF
-	for <kvmarm@lists.linux.dev>; Fri, 14 Aug 2026 11:34:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0818E46EF62
+	for <kvmarm@lists.linux.dev>; Fri, 14 Aug 2026 12:36:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786707299; cv=none; b=VC+1bMS8kmANP8XqG34GCm8PO+/jgGBm0Fobq2E1zlzz6y+C/k+n0h29UHDnuhqssHQ3vOCR2jkprlyMAX+2Z2qbYbt2LVDAOStptaZzEUJePbkXEHK791mAh8BRlrRpi6u1UlDmDTs9aV26dpElGwvERZg6GWhsA5V5SBfL15g=
+	t=1786711019; cv=none; b=DtJlLlZEl//+ZNGPcaZ0djCT6M8ro/r6x1qNbaIIr97eki/FjuNBcf/TQNjn7nzo14mzKEhuAqXtV2MJ9DoH4628a2hyYStJJT33mSkiOq+izt70HSQCeILu6bxNAaITDvBB5nIai2KON4juDCXsfoWhsrxlqE61qQV/wvPb5ho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786707299; c=relaxed/simple;
-	bh=5OZAxMaI6Fd4IW5TIco3ZsR+RxUNfRmXsdWDoJQfDhA=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=X6z/aPcAG4vyPRRaUAbawsAS54hyraZaGtss2AFmCcY+t8JSjcrsE2ZxzCMVauwHyqTIpl4khG1s2YjqwTbLvrC9GuayMbpjIuaTB88L5qDCuutCYFfoisxkeiSC5+drcl8rEVwe7kJgEJz8jcAtfTEE93vxndZiGorP7PojGFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e1ZMMwl7; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786711019; c=relaxed/simple;
+	bh=h7kMHt9Pj5LSmpdo9z3BjEMgYsEGCc4t/gD2OSYTvcw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mCSzI/uGBW7j4uVU3ecakWzJWSGZ+eiKJFXBGzf1oGjNWAL8jezoRNdNdRbtMm/Sahk7au9dk1BzGxLivkH+3RmGa+jQUZ4KNvtoU4OLqDp5ENSs66TVGv6EuF9JbFuPcoew+iDwnL2drI672dK4ROSGFuLE9YdHhK931csOfCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ce2AeaoJ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e1ZMMwl7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8CF761F000E9;
-	Fri, 14 Aug 2026 11:34:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786707295;
-	bh=w6KdmCvA7dCNLO8bs7T27wC2iXtLMq391QHT8mkTjzc=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=e1ZMMwl7esDoS//GKDTm6e1Oz7vFhLl3lNcEAUEBeKXGsjoguIDT/MEMSsfdOuwXf
-	 fSnCuS5lnGNLuvKU/DzLTYbEmT1VFydBjlD12HtHlIeDUHRnZD4FmimCsR9/irA+Xn
-	 vlzAi5KX2gLLmZltJaX3kp5OTQu3xIhbfR2jAVWsnpKdZdcGzOf9ze1cCasU4iCaSh
-	 65Xn4MW2EGTI7No+rg4LY7CTEwp2jpaqEnK86l804kVZVVPeDb1+UiurpdUHO8VbyU
-	 RF0YGxFipJqCosGy30Mpdi60FIXntGlCsGBfe6Lfzfcqu7prCFhl/kW3FiWR0fjIxQ
-	 d0yvDOEu8htjA==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2 1/2] KVM: arm64: nv: Fix life cycle of the
- nested_mmus array
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Marc Zyngier" <maz@kernel.org>
-Cc: "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260814103230.858578-2-maz@kernel.org>
-References: <20260814103230.858578-1-maz@kernel.org>
- <20260814103230.858578-2-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 14 Aug 2026 11:34:55 +0000
-Message-Id: <20260814113455.8CF761F000E9@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ce2AeaoJ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1786711007;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=z+bad5oyeWP0/0ZF4aAZkwQilG4UExN8XIo8ZjKwl5Y=;
+	b=ce2AeaoJEUE6cG9xyyTL31L7doqqg/w/OVsEBaHvc1tuqrXUg6czOPfF2aHZApGhrJpI/H
+	sYfci31QfcqSo7jGdBSiqOsFll9ZqlEGbG1sPta6htWz6uNAWZjPmh6Yam1oTVl+XR7zA4
+	sJZc+y0tO2V2FRdaOOqUVF8DWC7hMBg=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-633-iL4hSs4rMhKQfO9sLGsz5Q-1; Fri, 14 Aug 2026 08:36:46 -0400
+X-MC-Unique: iL4hSs4rMhKQfO9sLGsz5Q-1
+X-Mimecast-MFC-AGG-ID: iL4hSs4rMhKQfO9sLGsz5Q_1786711005
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4954b1c6310so9385365e9.0
+        for <kvmarm@lists.linux.dev>; Fri, 14 Aug 2026 05:36:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786711005; x=1787315805;
+        h=content-transfer-encoding:content-type:in-reply-to:from:references
+         :cc:to:content-language:subject:user-agent:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=z+bad5oyeWP0/0ZF4aAZkwQilG4UExN8XIo8ZjKwl5Y=;
+        b=gGSjlSUyDl30SjCKfzQf/ju9CRqrcMB46QKEPxVNhQ7zpKmYywYHCzpCML0AD47cj1
+         yKBM0x6MGqL3GcLfKtVHSC3XoT7kWJLD5BcnVP5+ltYDbRMLX92rn6Ky34wO8uetm7ni
+         L54zXyXMkHSGePthkPy4tDlJO+tdEFX+UJBtucQAglSosmYAzJ1enHZyWOftABFSWrLU
+         0u9JLAdnz6BqGc6H07NqLScrAy2yaaq7mggXhf9efc6sczMPAYLiJ8D86MhbOf/RtCIP
+         Z0lXzB9cUMXsJIowowJMzCE5zT94L55J4pYWKb+xPTtwFDTrn1LUc/rUNYVyYi0sMS1A
+         z4fw==
+X-Forwarded-Encrypted: i=1; AHgh+Ro2F64zJ6JGpJjxm3KeSVK6VhiT//bDUu8LtK7ZU3kY+j5XELw7sIb4xszjc7TAcwwgny8BRM0=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzE/rCIAd6R0jQj3NZ1gXMf8gpL4yFZF4/QoVIsijYZsJ/tXgr4
+	StmJuk86Y57WkNxWf7PTfSaR7gLIKK9X0BAiOFH/N/6lRv+juIHFBE54eGnRZ8AVGP8f1tVCylp
+	eSe8lVKKUAhJNcO5WucOg200YGz433oxBw95xWaOipQ8KXq6XkZCq7dnUoA==
+X-Gm-Gg: AR+sD13mqbV/J7km4e/t5fcjfFcp7ZLiZjebNy9jJ/327hofgOk9CIXh6v9ecsROsXO
+	I2bKaVfLAJzMZSV5u+/1CfLrOb56nai2OkwwRytdRVkmzdsOcwEHT8JBqMUubPv3ObIWdGNaYZ+
+	7IN1dW4sCf3X6aWqEUfDmxSy5Jk4q2AEiva/D6il13FE307z3GveMhEZwo5QFtbYa/V/OUC676L
+	wUV5rFkB/2D5GEzCNuhZXvhsCcl372YY39Qe0eIR3PNHELavuJEXgygHaSC5omLnAtMmqh2DMau
+	xDxuHrF1l0bTPWJx+yEqVpp0SW+weAPJOlN+K/X9IaFd1H/3NCjtdnw7hdp3FH5WSmYyF+mBAr5
+	MJePBq8H08mC8dbKXR2CxQqZFsM80mSaQGv2Fzvle1po=
+X-Received: by 2002:a05:600c:3e15:b0:498:ee7:e407 with SMTP id 5b1f17b1804b1-49987999622mr78583005e9.17.1786711005077;
+        Fri, 14 Aug 2026 05:36:45 -0700 (PDT)
+X-Received: by 2002:a05:600c:3e15:b0:498:ee7:e407 with SMTP id 5b1f17b1804b1-49987999622mr78582165e9.17.1786711004715;
+        Fri, 14 Aug 2026 05:36:44 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49989ae96c1sm25906085e9.12.2026.08.14.05.36.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 14 Aug 2026 05:36:44 -0700 (PDT)
+Message-ID: <0ce5e496-a067-48fd-80d2-94fe9981d505@redhat.com>
+Date: Fri, 14 Aug 2026 14:36:42 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/4] KVM: arm64: vgic-its: Don't dereference a NULL
+ collection on ITT save
+To: Fuad Tabba <fuad.tabba@linux.dev>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oupton@kernel.org>
+Cc: Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>,
+ Sascha Bischoff <sascha.bischoff@arm.com>,
+ Sebastian Ene <sebastianene@google.com>, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20260807104102.2410744-1-fuad.tabba@linux.dev>
+ <20260807104102.2410744-2-fuad.tabba@linux.dev>
+From: Eric Auger <eauger@redhat.com>
+In-Reply-To: <20260807104102.2410744-2-fuad.tabba@linux.dev>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: dTdp6OnY93IY2to7W6iucbjjFUmTD0pwLJBjCU49oUI_1786711005
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Thank you for your contribution! Sashiko AI review found 6 potential issue(=
-s) to consider:
+Hi Fuad,
 
-New issues:
-- [High] Graceful VM teardown permanently leaks dynamically allocated `stru=
-ct kvm_s2_mmu` chunks.
-- [High] Post-flush nested vCPU initialization enforces constrained allocat=
-ions, exhausting MMU slot limits.
-- [Low] `kvmalloc_array` utilizes the undefined `struct s2_mmu *`.
+On 8/7/26 12:40 PM, Fuad Tabba wrote:
+> MAPC with V=0 drops ite->collection but leaves the ITE on the device's
+> ITT list, and vgic_its_save_ite() dereferences it unconditionally. A
+> guest that issues MAPD, MAPTI and then MAPC(V=0) therefore oopses the
+> host when the VMM issues KVM_DEV_ARM_ITS_SAVE_TABLES to migrate it.
+Thank you for fixing this bug!
+> That sequence is UNPREDICTABLE per the architecture, but KVM already
+> handles the resulting state in the translate, MOVI and DISCARD paths.
+Maybe: "its_is_collection_mapped() already checks the collection is non
+null in translate, movi and discard"
+> 
+> Save a zeroed entry, which vgic_its_restore_ite() reads back as
+> invalid. Skipping the ITE instead would leave the ITT slot holding
+> whatever is in guest memory, and restore rejects an entry naming a
+> collection the restored collection table does not have.
+> 
+> Fixes: eff484e0298da ("KVM: arm64: vgic-its: ITT save and restore")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+> ---
+>  arch/arm64/kvm/vgic/vgic-its.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+> index 36ab3e4929154..ed281fbf008b9 100644
+> --- a/arch/arm64/kvm/vgic/vgic-its.c
+> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> @@ -2119,6 +2119,14 @@ static int vgic_its_save_ite(struct vgic_its *its, struct its_device *dev,
+>  	u32 next_offset;
+>  	u64 val;
+>  
+> +	/*
+> +	 * MAPC with V=0 keeps the ITEs mapped but drops their collection,
+> +	 * and with it the ICID. Save a zeroed entry, which the restore path
+> +	 * reads back as invalid.
+in
 
-Pre-existing issues:
-- [High] `kvm_arch_flush_shadow_all` unconditionally frees `s2_mmu` memory =
-chunks actively in use by running vCPUs, causing a Use-After-Free.
-- [High] Lockless reading of `nested_mmus_size` leads to data races and uni=
-nitialized pointer dereferences.
-- [High] Uninitialized local pointer dereference in `get_s2_mmu_nested()` i=
-f `nested_mmus_size` is 0.
---
+https://lore.kernel.org/all/CA+EHjTymdanCKoQO3ATmUZ=7Ph2wv4ES8SfkSsTgmOYAYBWayQ@mail.gmail.com/
 
---- Patch [1]: [PATCH v2 1/2] KVM: arm64: nv: Fix life cycle of the nested_=
-mmus array ---
-commit dd101263b02fbf52d5928987d4961bdef4c31086
-Author: Marc Zyngier <maz@kernel.org>
+you also mentionned this can also happen on clearing
+GITS_BASER<coll>.Valid clear. So maybe don't specifically focus on MAPC
+in in the comment.
 
-KVM: arm64: nv: Fix life cycle of the nested_mmus array
 
-This commit changes the nested_mmus array from an array of structures
-to an array of pointers allocated at VM creation. It updates the
-allocation and freeing lifecycle for nested stage-2 MMU structures to
-prevent use-after-free conditions during array resizing.
+> +	 */
+> +	if (!ite->collection)
+> +		return vgic_its_write_entry_lock(its, gpa, 0ULL, ite);
+I would rather squash 4/4 here to emphasize we are unlinking that entry
+from the scan chain.
 
-Link: https://lore.kernel.org/r/20260803224405.41468-1-kmehltretter@gmail.c=
-om
+Besides I also wonder if we should directly remove those entries from
+the &device->itt_head on MAPC and GITS_BASER<coll>.Valid reset.
 
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
+Thanks
 
-[ ... ]
+Eric>  	next_offset = compute_next_eventid_offset(&dev->itt_head, ite);
+>  	val = ((u64)next_offset << KVM_ITS_ITE_NEXT_SHIFT) |
+>  	       ((u64)ite->irq->intid << KVM_ITS_ITE_PINTID_SHIFT) |
 
-> @@ -337,6 +340,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
-> =20
->  	kvm_unshare_hyp(kvm, kvm + 1);
-> =20
-> +	kvfree(kvm->arch.nested_mmus);
-
-[Severity: High]
-Does kvm_arch_destroy_vm() permanently leak the MMU chunks dynamically
-allocated in kvm_vcpu_init_nested()?
-
-Since kvm_arch_flush_shadow_all() is tied to the MMU notifier release
-path and runs upon process exit, a graceful teardown that simply
-closes the VM file descriptor wouldn't necessarily trigger it. This
-could leave the struct kvm_s2_mmu chunks orphaned because only the
-pointer array is being freed here.
-
->  	kvm_arm_teardown_hypercalls(kvm);
->  }
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-
-[ ... ]
-
-> @@ -45,11 +45,15 @@ struct vncr_tlb {
->   */
->  #define S2_MMU_PER_VCPU		2
-> =20
-> -void kvm_init_nested(struct kvm *kvm)
-> +int kvm_init_nested(struct kvm *kvm)
->  {
-> -	kvm->arch.nested_mmus =3D NULL;
-> +	kvm->arch.nested_mmus =3D kvmalloc_array(KVM_MAX_VCPUS * S2_MMU_PER_VCP=
-U,
-> +					       sizeof(struct s2_mmu *),
-> +					       GFP_KERNEL_ACCOUNT);
-
-[Severity: Low]
-Should this be sizeof(struct kvm_s2_mmu *) instead of
-sizeof(struct s2_mmu *)? Even though the pointer size evaluates to the
-same number of bytes, it appears to reference an undefined structure name
-which might bypass compiler type checking.
-
->  	kvm->arch.nested_mmus_size =3D 0;
->  	atomic_set(&kvm->arch.vncr_tlb_count, 0);
-> +
-> +	return kvm->arch.nested_mmus ? 0 : -ENOMEM;
->  }
-
-[ ... ]
-
-> @@ -70,8 +74,9 @@ static int init_nested_s2_mmu(struct kvm *kvm, struct k=
-vm_s2_mmu *mmu)
->  int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
->  {
->  	struct kvm *kvm =3D vcpu->kvm;
-> -	struct kvm_s2_mmu *tmp;
-> -	int num_mmus, ret =3D 0;
-> +	int num_mmus;
-> +
-> +	lockdep_assert_held(&kvm->arch.config_lock);
-
-[ ... ]
-
->  	num_mmus =3D atomic_read(&kvm->online_vcpus) * S2_MMU_PER_VCPU;
-> =20
->  	if (num_mmus > kvm->arch.nested_mmus_size) {
-> -		tmp =3D kvcalloc(num_mmus, sizeof(*tmp), GFP_KERNEL_ACCOUNT);
-> -		if (!tmp)
-> -			return -ENOMEM;
-> +		struct kvm_s2_mmu *tmp;
-> +		int i, ret =3D 0;
-> =20
-> -		write_lock(&kvm->mmu_lock);
-> -
-> -		if (kvm->arch.nested_mmus_size) {
-> -			memcpy(tmp, kvm->arch.nested_mmus,
-> -			       size_mul(sizeof(*tmp), kvm->arch.nested_mmus_size));
-> +		tmp =3D kvcalloc(S2_MMU_PER_VCPU, sizeof(*tmp), GFP_KERNEL_ACCOUNT);
-> +		if (!tmp)
-> +			ret =3D -ENOMEM;
-
-[Severity: High]
-Does this under-provision the nested MMUs if a concurrent flush resets
-nested_mmus_size to zero?
-
-If nested_mmus_size is reset out-of-band by a flush, a subsequent vCPU
-initialization will detect the deficit but only allocate S2_MMU_PER_VCPU
-entries rather than the full num_mmus requirement. This could quickly
-exhaust the under-provisioned pool when multiple vCPUs become active,
-eventually triggering the fallback BUG_ON in get_s2_mmu_nested().
-
-[ ... ]
-
-> +		guard(write_lock)(&kvm->mmu_lock);
-> =20
-> -		for (int i =3D kvm->arch.nested_mmus_size; i < num_mmus; i++)
-> -			kvm_free_stage2_pgd(&kvm->arch.nested_mmus[i]);
-> +		for (i =3D 0; i < S2_MMU_PER_VCPU; i++)
-> +			kvm->arch.nested_mmus[i + kvm->arch.nested_mmus_size] =3D &tmp[i];
-> =20
-> -		free_page((unsigned long)vcpu->arch.ctxt.vncr_array);
-> -		vcpu->arch.ctxt.vncr_array =3D NULL;
-> +		kvm->arch.nested_mmus_size +=3D S2_MMU_PER_VCPU;
->  	}
-
-[Severity: High]
-This is a pre-existing issue, but does locklessly reading
-nested_mmus_size risk dereferencing uninitialized pointers?
-
-Because kvm_arch_flush_shadow_all() reads nested_mmus_size locklessly
-(holding only the SRCU read lock) without memory barriers, the reader
-could observe the incremented size before the pointer stores into the
-nested_mmus array are actually visible. Could this result in a
-dereference of uninitialized memory when reading the refcnt during a
-flush?
-
-> =20
-> -	kvm->arch.nested_mmus_size =3D num_mmus;
-> -
->  	return 0;
->  }
-
-[ ... ]
-
-> @@ -823,7 +817,7 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kv=
-m_vcpu *vcpu)
->  	for (i =3D kvm->arch.nested_mmus_next;
->  	     i < (kvm->arch.nested_mmus_size + kvm->arch.nested_mmus_next);
->  	     i++) {
-> -		s2_mmu =3D &kvm->arch.nested_mmus[i % kvm->arch.nested_mmus_size];
-> +		s2_mmu =3D kvm->arch.nested_mmus[i % kvm->arch.nested_mmus_size];
-> =20
->  		if (atomic_read(&s2_mmu->refcnt) =3D=3D 0)
->  			break;
->  	}
->  	BUG_ON(atomic_read(&s2_mmu->refcnt)); /* We have struct MMUs to spare */
-
-[Severity: High]
-This is a pre-existing issue, but can this dereference an uninitialized
-local pointer if nested_mmus_size is zero?
-
-If a vCPU attempts to execute nested code and requests a stage-2 MMU
-after kvm_arch_flush_shadow_all() has reset nested_mmus_size to 0, the
-search loop evaluates to false immediately. This bypasses the loop
-entirely, leaving the local variable s2_mmu uninitialized when it reaches
-this BUG_ON() check.
-
-[ ... ]
-
-> @@ -1317,16 +1311,15 @@ void kvm_nested_s2_flush(struct kvm *kvm)
-> =20
->  void kvm_arch_flush_shadow_all(struct kvm *kvm)
->  {
-> -	int i;
-> -
-> -	for (i =3D 0; i < kvm->arch.nested_mmus_size; i++) {
-> -		struct kvm_s2_mmu *mmu =3D &kvm->arch.nested_mmus[i];
-> +	for (int i =3D kvm->arch.nested_mmus_size - 1; i >=3D 0; i--) {
-> +		struct kvm_s2_mmu *mmu =3D kvm->arch.nested_mmus[i];
-> =20
->  		if (!WARN_ON(atomic_read(&mmu->refcnt)))
->  			kvm_free_stage2_pgd(mmu);
-> +
-> +		if ((i % S2_MMU_PER_VCPU) =3D=3D 0)
-> +			kvfree(mmu);
-
-[Severity: High]
-This is a pre-existing issue, but does unconditionally freeing
-the MMU chunk risk a use-after-free?
-
-While the code checks if the refcnt is zero before freeing the stage-2 PGD,
-the kvfree(mmu) call happens unconditionally here. If a concurrent vCPU is
-actively executing nested context code and holds a reference to the MMU,
-freeing the memory backing the struct kvm_s2_mmu could result in a
-use-after-free.
-
->  	}
-> -	kvfree(kvm->arch.nested_mmus);
-> -	kvm->arch.nested_mmus =3D NULL;
->  	kvm->arch.nested_mmus_size =3D 0;
->  	kvm_uninit_stage2_mmu(kvm);
->  }
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260814103230.8585=
-78-1-maz@kernel.org?part=3D1
