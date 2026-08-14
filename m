@@ -1,73 +1,73 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D0773BF68F
-	for <kvmarm@lists.linux.dev>; Fri, 14 Aug 2026 15:34:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C042B476065
+	for <kvmarm@lists.linux.dev>; Fri, 14 Aug 2026 15:40:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786721696; cv=none; b=BRHDBgoNAsI66wPH9GFjQwwdmZxUMX7TVoiTMzWqBxg5ryhQk8PMytBGa4NNuBOnMc+Gf2E8UHScUezwqDAQqzFsU2jIoDLFxArh9R5eWwISdjEuXgkmXH/VmaG8PNGV5d8HTVP6mIl6uYnTNpSPAAthzdBsoL61KAvmiZrxHnQ=
+	t=1786722025; cv=none; b=NaF2Ja/U3Dktuc0YSFzSlIw0IdhTjFlhTFg4h8R7CEMpfoWgNFUxo2IIqtg/VHTjVXxX6ZN/PYpIR+6F3RHo9MWES79Mi1NC95NSEyEX92MV4jo6eqy1jERBvFdqgPPkQ9t3cNJlAlyFxEohlgGN8Z/mCfVzU5Acue4qi8yzh0s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786721696; c=relaxed/simple;
-	bh=l1YkUpH2s8LKuu98nYU9z8hqWrhTTSLvhFGcnzShB+Q=;
+	s=arc-20240116; t=1786722025; c=relaxed/simple;
+	bh=KvpiuF7nvz9Mb5xG7O2gHcywb6+1N1HXi9/BDMv4ep8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UENFfSeYpIDKkIRPiqZ2widB3uxuZT8HqdYk9WhvAbz6loeSJqt4dJf1zamuIt91mc9XiZRtPZ4Y+SNO0BvH4l+B55Vo4gPXZoIX/v70vZqu175mpTXDSS36c7tSg5ZO1+RITdjof3z/iiVo8qs6cDNFTeLOsN/OOcOgBhcJQnU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Xx0bjIwH; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=pgMtLUtfwilQ3BUjtcnGsfWKo8FF2vX34CjP0VMnUZJwe4zcn7Tz3uJG0EJiOOJqYrUvthUVzd5glVwIIV7mYqcgSQNOUyuNAKwKXSzuCrMOEeXzvpq+AZcVMNu1AjVwp10RJwyhhrWeIt2tlV6fVnAyNJTeFv0hsfIqKVritY4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Zx8Ifc04; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xx0bjIwH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zx8Ifc04"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1786721693;
+	s=mimecast20190719; t=1786722022;
 	h=from:from:reply-to:reply-to:subject:subject:date:date:
 	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
 	 content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=7okoVJBLZWESdwgLg7Z5BVxv/ezHszMZAamDbVRePaQ=;
-	b=Xx0bjIwHtuoxGa0tiwRMMMUwFyMhz2DRNNorgO4Tj7+soZwFLKFey7t1ftU1elo7xMQtu2
-	6e2nSogN7Lhuu7euc4fGSFlPIjNHHKMWEEF0na9NWJEJOeUSYDH8kWJT0aoPTMEZzXKSag
-	k+8CLsanAOJXxM9xjcY5+hfEiv85tL8=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=99fvnZC3mynUBVTVii7QvmdPVHDtox0FLNvF7OC2fhw=;
+	b=Zx8Ifc04jAuTYVMRHNWMn7JTMDBZmcpuZv7Np4CXx6YWlBjesutlW96OFomYS3Iguwt8p7
+	4Js7nWuTwNcX9Q9kkd6/okl68cheqvgDWwylO5Gwj0aWe2MyFPciZW4JEJZMety+JuvGHW
+	VD+9xgZaY+d8xChEtHC/90y2Q7kqmvI=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-584-kFm6cWhVNLiNTtyyVC-4Cw-1; Fri, 14 Aug 2026 11:34:52 -0400
-X-MC-Unique: kFm6cWhVNLiNTtyyVC-4Cw-1
-X-Mimecast-MFC-AGG-ID: kFm6cWhVNLiNTtyyVC-4Cw_1786721691
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4994aebe932so11921305e9.3
-        for <kvmarm@lists.linux.dev>; Fri, 14 Aug 2026 08:34:51 -0700 (PDT)
+ us-mta-448-IYMnuqncMTi-h2rY559K5A-1; Fri, 14 Aug 2026 11:40:21 -0400
+X-MC-Unique: IYMnuqncMTi-h2rY559K5A-1
+X-Mimecast-MFC-AGG-ID: IYMnuqncMTi-h2rY559K5A_1786722020
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-490a767b782so9372295e9.2
+        for <kvmarm@lists.linux.dev>; Fri, 14 Aug 2026 08:40:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786721691; x=1787326491;
+        d=1e100.net; s=20251104; t=1786722020; x=1787326820;
         h=content-transfer-encoding:content-type:in-reply-to:from:references
          :cc:to:content-language:subject:reply-to:user-agent:mime-version
          :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=7okoVJBLZWESdwgLg7Z5BVxv/ezHszMZAamDbVRePaQ=;
-        b=qEQ5oU1t1AwDJMjf1BEY99MFe+hQyWCtgM1wQaMTJyGYFk+9xHDOTEcoXlXUgUx3KA
-         G5CBmzZ6Oj2IDZJCx4JAqNnsFHQZThWYnL9/3941r/Xja4ld0kByM6HSgeaRN02Iq+gm
-         2AU8MS1FBOcyR5iaLiAzGP0DBfL2x9hMkFoj714WSipL1SHkIPgKQCSvHuRWfCeS60Zb
-         qhSUqJzjT64Kmik/V5X0/kUhyFod4IoMrW1gbl8nKGERZhP13RnXM7/pFDUeqKbmhSD9
-         mH5nHFjdKa4pg3ymUQnyrP0T8RtAYM3MtbSZ5H4JT7i96yR1Mse1OqAsyKcsDRTCidVj
-         5lfw==
-X-Forwarded-Encrypted: i=1; AHgh+Rrsajw+FD7wcBryG05vq9MlCsLnSBOCsTtiTK2s+VYCc3Jw1Gu/in6STUQeQTf5yngKPjLXcEQ=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyQOOBo3t6oHV0ovHRWl6f190+RURgOBttJURjholgTCFyARxjS
-	+wFwMxjD7VpFJKb+y9wxZFvdIWbRHt/gJswQBXJdP2TpjDFWYEukZ62p/IvL5MEmPIla2WYBjxp
-	+c3AyypG4HFwCn7tcR9a0xL36AYyygm23ko/XEJM0sOdLeZHlD8q9D5ZfSA==
-X-Gm-Gg: AR+sD11/5wOANiwqMCH+Nr6CCj9QrLDhG6cphiDQd33J5p5jcI00DZkWRN2dp4tN5xG
-	Dq5Qx9PZTuEN6p74JpSwvQFNuQbDgEoHa5/e/2Fh5+bPu7QP4EvLnly/mKlTtAwlOnSZs6qyuR8
-	EDmUTgjMxALVat/TDV+ENoELdCNNw2+ylfhssLAwcK9TMQaWcxlNlyfSuD+UWROvWQYa8TEUVhp
-	NgLKsGFl+gX+KOb1Hxr7gozaSZ5/nYjRfYfeA4M5XkCWOcOL4zUuz9lFj2g/LRaR9gb5TPS8onA
-	WAOA4mexColSvwyWOGDHfOyGgsSY9GEqqf0zAJ4FGc+OuAQOmIQB3+3yAmacK3mZrJJZpJN7FUJ
-	adD3dtYlVFgOH07/JVWOy2bgG06vO2Y7w6NSIcWDVo2qiKfVH
-X-Received: by 2002:a05:600c:4e13:b0:498:11b5:3ff7 with SMTP id 5b1f17b1804b1-499879bd2e1mr94162185e9.18.1786721690582;
-        Fri, 14 Aug 2026 08:34:50 -0700 (PDT)
-X-Received: by 2002:a05:600c:4e13:b0:498:11b5:3ff7 with SMTP id 5b1f17b1804b1-499879bd2e1mr94161455e9.18.1786721690078;
-        Fri, 14 Aug 2026 08:34:50 -0700 (PDT)
+        bh=99fvnZC3mynUBVTVii7QvmdPVHDtox0FLNvF7OC2fhw=;
+        b=KC6sDDG04hRA+KOnEXgKj8TGN44UbXal+yThpNDHrEA7p7N2wGaJ2ZtDKpFa75TEPU
+         oLtxmqV+yxyUTDmiaky88lBc02dn1fG13rQW5WaDzxpmz9Vb8mCBCuSGLfgen+zXHGfA
+         h8BvGnq+SHbp5Cn3NOw0gKjx4Kd73TOHWMXFMZNFNW9Ft4syPVGGQKOGo9PsB9kM4wkh
+         Xc46zp90s8hX6qsH9XhAnsWpMz5H0v3re5w2FcwcKPrpDEfjTQZFcjkgI/HGeaToWtlB
+         a60LhC3C0Gxd48XfYb4Kn51Y3xhp9RoacCD3CBJvpakP6zQRN4ykBmXWOyT2LHCLks3t
+         +Nkg==
+X-Forwarded-Encrypted: i=1; AHgh+RpIIgu3zeq7qNyAOS21ahHBOXKTLIXx80sTEX/q0Y/7qyyXxtWSe9ltdgVco3XAtif9FixmPok=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yy/Ed7OSDhul7dUP/ALYdrxtVa+8jAdycK4uF37C1zd10KhRCmA
+	NNXHOC7maM4oX9U9ZJDkbpBh8N/BL57vYiT57L+tVH5d5zI3zUf0IlxWDenorCdHZNK9JhaeNWb
+	S72zZcetdHs8UNV2mSEWPe3P8HHDf3wHY7poS3MkuF5QUv25VelKEfzzGqQ==
+X-Gm-Gg: AR+sD111UGAGx4I+qqEI53S7vLQdmyoKaBOenJSkN0bNV9DwwI2bOxkuw7uCyrgDlz/
+	+hx5XZYSVT8q+5W02UhnThjisk72W4Zw5d56wPx7iH4Du4VP6CnG6hl02DL3TEb6DN72dcRDn5H
+	zYtXaPVkKcovbGb2XDqoKhYG+3L+T6q89QlN/BNK3idvKTRywlVYoTytiK3piaFONoTDQgvB66b
+	ONFaUIDcN53FIk92jhyb9qdTKly3Qz0EwlcTXUmnB0w8Bv4TzDuciAI2c4A/CH2hT9TrcQrjZem
+	gG5mcdq27898eJcrwoOstzlMyOxcR0dyWwCoLDL1XT2pwS13Kv25/Ia5du3NFggsyV63CTUlYx8
+	s3i8slrHI55sZIAsNGNlfb80Bc4lA+qqV3sQ55RtritXHbYEC
+X-Received: by 2002:a7b:c015:0:b0:499:80d0:8b73 with SMTP id 5b1f17b1804b1-49987927ebfmr83477585e9.4.1786722019739;
+        Fri, 14 Aug 2026 08:40:19 -0700 (PDT)
+X-Received: by 2002:a7b:c015:0:b0:499:80d0:8b73 with SMTP id 5b1f17b1804b1-49987927ebfmr83476565e9.4.1786722019127;
+        Fri, 14 Aug 2026 08:40:19 -0700 (PDT)
 Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49988ae8af3sm52203945e9.4.2026.08.14.08.34.47
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49989af26eesm40195065e9.15.2026.08.14.08.40.16
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 14 Aug 2026 08:34:48 -0700 (PDT)
-Message-ID: <0cb9dba3-c905-4e2d-a3e9-539dbf2ea787@redhat.com>
-Date: Fri, 14 Aug 2026 17:34:46 +0200
+        Fri, 14 Aug 2026 08:40:18 -0700 (PDT)
+Message-ID: <82131df0-71cc-44ea-92e6-4843d4c86ee8@redhat.com>
+Date: Fri, 14 Aug 2026 17:40:14 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Reply-To: eric.auger@redhat.com
-Subject: Re: [RFC PATCH v3 14/19] target/arm/kvm: compute supported values for
- ID register fields
+Subject: Re: [RFC PATCH v3 09/19] target/arm: Add named cpu model infra +
+ graviton3 named model
 To: Khushit Shah <khushit.shah@nutanix.com>
 Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
  "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
@@ -100,13 +100,13 @@ Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
  Mark Cave-Ayland <mark.caveayland@nutanix.com>,
  Prerna Saxena <prerna.saxena@nutanix.com>
 References: <20260716213858.609699-1-khushit.shah@nutanix.com>
- <20260716213858.609699-15-khushit.shah@nutanix.com>
- <fe76f638-81aa-43cf-aafb-c774ab1902f8@redhat.com>
- <82F566CD-CC65-4368-AE92-3A2E637CC27A@nutanix.com>
+ <20260716213858.609699-10-khushit.shah@nutanix.com>
+ <4f07607b-b21a-4a5c-8daa-6aec5e288353@redhat.com>
+ <04A24C49-129D-4232-9450-7176CBBF5CA5@nutanix.com>
 From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <82F566CD-CC65-4368-AE92-3A2E637CC27A@nutanix.com>
+In-Reply-To: <04A24C49-129D-4232-9450-7176CBBF5CA5@nutanix.com>
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: S43fTjQz47YUuRMlkILVkIdmTzvcy4G6r7icEmr5kqc_1786721691
+X-Mimecast-MFC-PROC-ID: dAyD-dGUPeKMtmBPsEgA7x-qsS4Kay-IWfvxUwBrXWk_1786722020
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8
@@ -114,9 +114,9 @@ Content-Transfer-Encoding: 8bit
 
 
 
-On 8/5/26 11:58 AM, Khushit Shah wrote:
+On 8/5/26 1:35 PM, Khushit Shah wrote:
 >
->> On 26 Jul 2026, at 7:52 PM, Eric Auger <eric.auger@redhat.com> wrote:
+>> On 26 Jul 2026, at 7:04 PM, Eric Auger <eric.auger@redhat.com> wrote:
 >>
 >> !-------------------------------------------------------------------|
 >>  CAUTION: External Email
@@ -126,223 +126,506 @@ On 8/5/26 11:58 AM, Khushit Shah wrote:
 >> Hi Khushit,
 >>
 >> On 7/16/26 11:38 PM, Khushit Shah wrote:
->>> Add arm_field_get_supported_values() which, for a given ID register
->>> field, builds the set of values KVM allows it to take on the live host.
+>>> From: Shaju Abraham <shaju.abraham@nutanix.com>
 >>>
->>> Non-writable fields are pinned to the host value. Writable fields follow
->>> their per field constraints. This function likely needs change when
->>> KVM starts exposing a new writable field that is not lower-safe, hence,
->>> the special handling of TGranX_2/SpecSEI/L1Ip/MIDR/REVIDR/AIDR.
->> so this looks quite risky. 
-> I agree.
+>>> Introduce a small named-CPU-model layer on top of the field-backed
+>>> property infrastructure. Each model is a flat table of (name, value)
+>>> overrides and a parent pointer. At instance-init, the parent chain is
+>>> walked root-first and every level's properties are applied via QOM,
+>>> so a child entry overrides its ancestors for the same name.
+>>>
+>>> For example, the graviton3-v1 named model hierarchy is:
+>>> non-zero-defaults-v1    Known non-zero default ID regs field values
+>>>  arm-v8_4-a-v1       ARMv8.4-A architectural mandate
+>>>    neoverse-v1-v1    Neoverse V1
+>>>      graviton3-v1    AWS Graviton3
+>>>
+>>> non-zero-defaults-v1:
+>>>   Field that should be populated with some non zero value by default.
+>> following which specification? This is not clear to me. Is that layer
+>> really meaningful? Shouldn't we start with the next one?
+> Okay, makes sense. We can get rid of this layer.
 >
-> What are your thoughts on having a authoritative list in QEMU of all
-> writable fields? No matter what KVM exposes as writable, actual fields
-> we allow to be writable will be intersection of KVM writable + QEMU
-> writable. When The QEMU list is updated we make sure things like this
-> function is updated.
->
-> This get’s rid of cases where we silently support writing to a field.
-> It is similar to x86, QEMU only supports writing to specific CPUID
-> leafs (by the defined Properties) and not just any CPUID leafs.
->
->>> Cross-field constraints are not modelled; for example ID_AA64ZFR0_EL1
->>> is gated by SVE. Reproducing every inter-field dependency in QEMU
->>> would only duplicate KVM's logic and drift out of sync with it.
->> Isn't qmp_query_cpu_model_expansion sufficient? In general upper layers
->> will try to apply raw named models. If ajustements are needed between
->> source and destination, we know field candidate values (either the
->> source or dest one) and this latter can be directly tried using
->> qmp_query_cpu_model_expansion write. On top of that
->> qmp_query_cpu_model_expansion can be directly checked against a scratch
->> vcpu reusing the logic implemented at kernel level.
-> I am not sure if it is acceptable for query_cpu_model_expansion should fail
-> if model is not realisable. On at least x86 it does not. It just returns the
-> state which QEMU would request KVM for the given configurations.
->
-> Ref:
-> https://github.com/qemu/qemu/blob/3e3ccab106f879b1512f8e0d51a827dd4de30e22/target/i386/cpu.c#L9689
-
-I need to further study that. I will come back to you.
-
-Currently with v7 you get:
-(QEMU) query-cpu-model-expansion type=full
-model={"name":"host","props":{"SYSREG_ID_AA64MMFR1_EL1_AFP":0x1}}
-{"error": {"class": "GenericError", "desc": "failed to apply new value
-0x1 for field AFP (previous is 0x0): Invalid argument"}}
-
-This can be implemented elsewhere though
-
-Eric
->
-> cpu-definitions is maybe a better candidate for algo you are describing, but
-> it will not take the user overrides into considerations and only say if a
-> base model is usable or not
->
->
+>>> arm-v8_4-a-v1:
+>>>  Only features mandated by the ARM ARM.
+>>>
+>>> neoverse-v1-v1:
+>>>  Reference manual derived feature values for the reference core.
+>>>  Values differ from TRM values based on what was exposed to the guest
+>>>  with -cpu host.
+>>>
+>>> graviton3-v1:
+>>>  SoC integration choices (crypto pin, cache hints, PAuth alg).
+>>>
+>>> The model values are figured out from ID register dump visible to
+>>> QEMU with -cpu host on Graviton3 machine.
+>>>
+>>> Model realization:
+>>> 1. Zero out ID regs array.
+>>> 2. Add all properties to the CPU Object
+>>> 3. arm_realize_model_chain: Walk the parent chain from root first and
+>>>                            apply all the properties.
+>>>
+>>> Co-authored-by: Shaju Abraham <shaju.abraham@nutanix.com>
 >>> Signed-off-by: Khushit Shah <khushit.shah@nutanix.com>
 >>> ---
->>> target/arm/kvm.c     | 99 ++++++++++++++++++++++++++++++++++++++++++++
->>> target/arm/kvm_arm.h | 26 ++++++++++++
->>> 2 files changed, 125 insertions(+)
+>>> hw/arm/virt.c               |   5 +
+>>> target/arm/arm-cpu-models.c | 336 ++++++++++++++++++++++++++++++++++++
+>>> target/arm/arm-cpu-models.h |  35 ++++
+>>> target/arm/meson.build      |   7 +-
+>>> 4 files changed, 381 insertions(+), 2 deletions(-)
+>>> create mode 100644 target/arm/arm-cpu-models.c
+>>> create mode 100644 target/arm/arm-cpu-models.h
 >>>
->>> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
->>> index c38b99cfce..8f452f9570 100644
->>> --- a/target/arm/kvm.c
->>> +++ b/target/arm/kvm.c
->>> @@ -1262,6 +1262,105 @@ bool kvm_arm_cpu_post_load(ARMCPU *cpu)
->>>     return true;
->>> }
->>>
->>> +static bool arm_field_is_signed(const ARM64SysRegField *field)
->>> +{
->>> +    return field_matches(field, ID_AA64MMFR0_EL1_IDX, "TGran4")    ||
->>> +           field_matches(field, ID_AA64MMFR0_EL1_IDX, "TGran64")   ||
->>> +           field_matches(field, ID_MMFR0_EL1_IDX, "InnerShr")      ||
->>> +           field_matches(field, ID_MMFR0_EL1_IDX, "OuterShr")      ||
->>> +           field_matches(field, ID_AA64DFR0_EL1_IDX, "DoubleLock") ||
->>> +           field_matches(field, ID_AA64DFR0_EL1_IDX, "PMUVer")     ||
->>> +           field_matches(field, ID_DFR0_EL1_IDX, "PerfMon")        ||
->>> +           field_matches(field, ID_AA64PFR1_EL1_IDX, "MTE_frac")   ||
->>> +           field_matches(field, ID_AA64MMFR4_EL1_IDX, "E2H0")      ||
->>> +           field_matches(field, ID_DFR1_EL1_IDX, "MTPMU")          ||
->>> +           field_matches(field, ID_AA64PFR0_EL1_IDX, "FP")         ||
->>> +           field_matches(field, ID_AA64PFR0_EL1_IDX, "AdvSIMD");
->> Can't we extract this from Register.json instead?
-> AFAIK, There is not signedness data in Register.json
->
->>> +}
->>> +
->>> +static void ranges_add(GArray *ranges, uint64_t min, uint64_t max)
->>> +{
->>> +    ArmFieldRange r = { .min = min, .max = max };
->>> +    g_array_append_val(ranges, r);
->>> +}
->>> +
->>> +void arm_field_get_supported_values(const ARM64SysRegField *field,
->>> +                                    const ARMISARegisters *host_isar,
->>> +                                    ArmFieldValueSet **value_set)
->>> +{
->>> +    bool is_signed = arm_field_is_signed(field);
->>> +    uint64_t host = extract64(host_isar->idregs[field->index],
->>> +                              field->shift, field->length);
->>> +    GArray *ranges = g_array_new(false, false, sizeof(ArmFieldRange));
->>> +
->>> +    /* A non-writable field can only ever hold the host value. */
->>> +    if (!arm_field_is_writable(field)) {
->>> +        ranges_add(ranges, host, host);
->>> +        goto done;
->> you already get this info from qmp_query_cpu_model_expansion
-> Can you please elaborate how? I thought the current qmp_query_cpu_model_expansion
-> (Your v6) only returns the writable field.
-> (I have not yet looked at v7)
->
+>>> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+>>> index fe19030886..34e56dc1f1 100644
+>>> --- a/hw/arm/virt.c
+>>> +++ b/hw/arm/virt.c
+>>> @@ -3812,6 +3812,11 @@ static GPtrArray *virt_get_valid_cpu_types(const MachineState *ms)
+>>>             g_ptr_array_add(vct, g_strdup(ARM_CPU_TYPE_NAME("host")));
+>>>         }
+>>>     }
+>>> +    if (kvm_enabled() && target_aarch64()) {
+>>> +        g_ptr_array_add(vct, g_strdup(ARM_CPU_TYPE_NAME("arm-v8_4-a-v1")));
+>>> +        g_ptr_array_add(vct, g_strdup(ARM_CPU_TYPE_NAME("neoverse-v1-v1")));
+>>> +        g_ptr_array_add(vct, g_strdup(ARM_CPU_TYPE_NAME("graviton3-v1")));
 >>> +    }
+>>>     g_ptr_array_add(vct, g_strdup(ARM_CPU_TYPE_NAME("max"))); return vct; diff --git a/target/arm/arm-cpu-models.c
+>>> b/target/arm/arm-cpu-models.c new file mode 100644 index
+>>> 0000000000..747e0df010 --- /dev/null +++ b/target/arm/arm-cpu-models.c
+>>> @@ -0,0 +1,336 @@ +/* + * ARM named CPU model definitions. + * + *
+>>> Each model is defined as an array of MODEL_PROP macro, listing only +
+>>> * the properties that DIFFER from the parent model. + * + * At
+>>> realisation the parent chain is walked root-first and + * every
+>>> level's props are applied via QOM, so the leaf's values + * naturally
+>>> override its ancestors. + * + * Hierarchy: + * + *
+>>> non-zero-defaults-v1 Known non-zero default ID reg field values + *
+>>> arm-v8_4-a-v1 ARMv8.4-A architectural mandate + * neoverse-v1-v1
+>>> Neoverse V1 (TRM 102649) + * graviton3-v1 AWS Graviton3 + * + *
+>>> SPDX-License-Identifier: GPL-2.0-or-later + */ + +#include "qemu/osdep.h"
+>>> +#include "qapi/error.h"
+>>> +#include "qemu/error-report.h"
+>>> +#include "system/kvm.h"
+>>> +#include "cpu.h"
+>>> +#include "internals.h"
+>>> +#include "kvm_arm.h"
+>>> +#include "arm-cpu-models.h"
+>>> +#include "cpu-idregs.h"
 >>> +
->>> +    if (field_matches(field, ID_AA64MMFR0_EL1_IDX, "TGran4_2")  ||
->>> +        field_matches(field, ID_AA64MMFR0_EL1_IDX, "TGran16_2") ||
->>> +        field_matches(field, ID_AA64MMFR0_EL1_IDX, "TGran64_2")) {
->>> +        /* Either support the host value or the "off" value */
->>> +        ranges_add(ranges, host, host);
->>> +        if (host != 1) { /* 1 = "off" */
->>> +            ranges_add(ranges, 1, 1);
->>> +        }
->>> +    } else if (field_matches(field, CTR_EL0_IDX, "L1Ip")) {
->>> +        /* Only safe to downgrade to VIPT, other values are reserved. */
->>> +        ranges_add(ranges, host, host);
->>> +        if (host != 2) { /* 2 = "VIPT" */
->>> +            ranges_add(ranges, 2, 2);
->>> +        }
->>> +    } else if (field_matches(field, ID_AA64MMFR1_EL1_IDX, "SpecSEI") ||
->>> +               field_matches(field, ID_MMFR4_EL1_IDX, "SpecSEI")) {
->>> +        /* It is safe to upgrade SpecSEI to 1, other values are reserved. */
->>> +        ranges_add(ranges, host, host);
->>> +        if (host != 1) {
->>> +            ranges_add(ranges, 1, 1);
->>> +        }
->>> +    } else if (field->index == MIDR_EL1_IDX ||
->>> +               field->index == REVIDR_EL1_IDX ||
->>> +               field->index == AIDR_EL1_IDX) {
->>> +        /*
->>> +         * No restriction on value that can be set for implementation ID
->>> +         * registers fields.
->>> +         */
->>> +        uint64_t max = 0;
->>> +        if (field->length == 64) {
->>> +            max = ~0ULL;
->>> +        } else {
->>> +            max = (1ULL << field->length) - 1;
->>> +        }
->>> +        ranges_add(ranges, 0, max);
->>> +    } else {
->>> +        /*
->>> +         * After handling the special cases, other writable fields are
->>> +         * either lower-safe or signed lower-safe.
->>> +         */
->>> +        if (field->arch_vals_count) {
->>> +            for (uint32_t i = 0; i < field->arch_vals_count; i++) {
->>> +                uint64_t av = field->arch_vals[i].value;
->>> +                int64_t v = is_signed ?
->>> +                    sextract64(av, 0, field->length) : (int64_t)av;
->>> +                int64_t hv = is_signed ?
->>> +                    sextract64(host, 0, field->length) : (int64_t)host;
->>> +                if (v <= hv) {
->>> +                    ranges_add(ranges, av, av);
->>> +                }
->>> +            }
->>> +        } else {
->>> +            g_assert(!is_signed); /* No signed field with no arch vals */
->>> +            ranges_add(ranges, 0, host);
->>> +        }
->>> +    }
->>> +done:
->>> +    *value_set = g_new0(ArmFieldValueSet, 1);
->>> +    (*value_set)->n_ranges = ranges->len;
->>> +    (*value_set)->ranges = (ArmFieldRange *)g_array_free(ranges, false);
->>> +}
+>>> +#define MODEL_PROP_FIELD_STR  str
+>>> +#define MODEL_PROP_FIELD_BOOL b
+>>> +#define MODEL_PROP_FIELD_NUM  num
 >>> +
->>> static bool arm_field_skip_writeback_always(const ARM64SysRegField *field)
->>> {
->>>     /*
->>> diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
->>> index 133a026036..9f15c91c4e 100644
->>> --- a/target/arm/kvm_arm.h
->>> +++ b/target/arm/kvm_arm.h
->>> @@ -143,6 +143,32 @@ void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu);
->>> void kvm_arm_add_vcpu_properties(ARMCPU *cpu);
->>>
->>> typedef struct ARM64SysReg ARM64SysReg;
->>> +typedef struct ARM64SysRegField ARM64SysRegField;
->>> +typedef struct ARMISARegisters ARMISARegisters;
+>>> +#define MODEL_PROP(_name, _type, _value) \
+>>> +    { .name = (_name), .type = ARM_MODEL_PROP_##_type, \
+>>> +      .u.MODEL_PROP_FIELD_##_type = (_value) }
 >>> +
->>> +typedef struct ArmFieldRange {
->>> +    uint64_t min;
->>> +    uint64_t max;
->>> +} ArmFieldRange;
+>>> +#define MODEL_PROP_END  { .name = NULL }
+>> Regarding settings somehow we end up with something that is quite
+>> similar to TCG CPU
+>> definitions like in
+>> aarch64_neoverse_n1_initfn(). To me this is in general more readable
+>> because we use name fields instead of putting the full reg value.
+>> This does not prevent us from adding comments along settings to make
+>> this more readable and explicit.
+> Can you please specify further on what types of comments?
+> Like what does each property value means?
+yes, something alike what is done when we populate acpi table fields
+>
 >>> +
->>> +typedef struct ArmFieldValueSet {
->>> +    ArmFieldRange *ranges;
->>> +    size_t n_ranges;
->>> +} ArmFieldValueSet;
->>> +
->>> +/**
->>> + * arm_field_get_supported_values:
->>> + * @field: The field to get the supported values for
->>> + * @host_isar: The host ISAR registers
->>> + * @value_set: The set of supported values for the @field
->>> + *
->>> + * Will be allocated and filled in with the supported values for the @field
->>> + * based on the host_isar and whether the field is writable or not.
->>> + * The caller must free the value_set.
+>>> +/*
+>>> + * These fields should be populated with some non-zero default values.
 >>> + */
->>> +void arm_field_get_supported_values(const ARM64SysRegField *field,
->>> +                                    const ARMISARegisters *host_isar,
->>> +                                    ArmFieldValueSet **value_set);
+>>> +static const ArmModelPropValue non_zero_defaults_v1_props[] = {
+>>> +    /* ID_AA64PFR0_EL1 */
+>>> +    MODEL_PROP("SYSREG_ID_AA64PFR0_EL1_EL0", NUM, 0b0001),
+>>> +    MODEL_PROP("SYSREG_ID_AA64PFR0_EL1_EL1", NUM, 0b0001),
+>>> +    MODEL_PROP("SYSREG_ID_AA64PFR0_EL1_FP", NUM, 0b1111),
+>>> +    MODEL_PROP("SYSREG_ID_AA64PFR0_EL1_AdvSIMD", NUM, 0b1111),
+>>> +
+>>> +    /* ID_AA64PFR1_EL1 */
+>>> +    MODEL_PROP("SYSREG_ID_AA64PFR1_EL1_MTE_frac", NUM, 0b1111),
+>> so I still believe we want a wrapper that transparently either sets a
+>> prop if the field happens to be writable or simply performs checks
+>> against the host if the prop is not available.
+> Can’t we do that easily afterwards once the ID reg view is finalised?
+> Doing it here means all the qmp paths which do not intend to actually
+> create any vCPUs will error out here, which is undesirable.
+sorry but I don't catch
+>
+>>> +
+>>> +    /* ID_AA64MMFR0_EL1 */
+>>> +    MODEL_PROP("SYSREG_ID_AA64MMFR0_EL1_TGran64", NUM, 0b1111),
+>>> +    MODEL_PROP("SYSREG_ID_AA64MMFR0_EL1_TGran4", NUM, 0b1111),
+>>> +    MODEL_PROP("SYSREG_ID_AA64MMFR0_EL1_TGran16_2", NUM, 0b0001),
+>>> +    MODEL_PROP("SYSREG_ID_AA64MMFR0_EL1_TGran64_2", NUM, 0b0001),
+>>> +    MODEL_PROP("SYSREG_ID_AA64MMFR0_EL1_TGran4_2", NUM, 0b0001),
+>>> +
+>>> +    /* ID_AA64DFR0_EL1 */
+>>> +    MODEL_PROP("SYSREG_ID_AA64DFR0_EL1_DebugVer", NUM, 0x6),
+>>> +    MODEL_PROP("SYSREG_ID_AA64DFR0_EL1_DoubleLock", NUM, 0b1111),
+>>> +
+>>> +    /* CTR_EL0 */
+>>> +    MODEL_PROP("SYSREG_CTR_EL0_L1Ip", NUM, 0b10),
+>>> +    MODEL_PROP("SYSREG_CTR_EL0_RES1_31", NUM, 1),
+>>> +
+>>> +    /* ID_AA64MMFR4_EL1 */
+>>> +    MODEL_PROP("SYSREG_ID_AA64MMFR4_EL1_E2H0", NUM, 0b1111),
+>>> +
+>>> +    MODEL_PROP_END,
+>>> +};
+>> To ease the review I would suggest to put a dump of all id regs of a
+>> leaf model in the commit description. It is less error prone that
+>> understanding the various overrides.
+>> I would suggest to have separate patches for each model too.
+> Ack to both. Will do this in v4.
+>
+>> So you said a leaf model shall have explicit values for each field,
+>> including non writable ones. The code does not check that. How do we
+>> make sure we are not missing settings?
+> I am not sure where I say that, assumption is:
+> Base model starts with a zeroed IO reg view, each model in
+> chain applies some settings, a child model’s setting
+> overrides parents’ settings.
+Ah ok I must have misunderstood then.
+>
+> For verification we can dump the leaf ID regs view, it
+> should match with the one in the commit message as per
+> your suggestion.
+>>> +
+>>> +static const ArmModelPropValue armv8_4_a_v1_props[] = {
+>>> +    MODEL_PROP("SYSREG_ID_AA64ISAR0_EL1_CRC32", NUM, 1),
+>>> +    MODEL_PROP("SYSREG_ID_AA64ISAR0_EL1_Atomic", NUM, 2),
+>>> +    MODEL_PROP("SYSREG_ID_AA64MMFR1_EL1_HPDS", NUM, 1),
+>>> +    MODEL_PROP("SYSREG_ID_AA64MMFR1_EL1_LO", NUM, 1),
+>>> +
+>>> +    MODEL_PROP("SYSREG_ID_AA64ISAR1_EL1_DPB", NUM, 1),
+>>> +
+>>> +    MODEL_PROP("SYSREG_ID_AA64PFR0_EL1_RAS", NUM, 1),
+>>> +    MODEL_PROP("SYSREG_ID_AA64PFR1_EL1_RAS_frac", NUM, 0),
+>>> +
+>>> +    MODEL_PROP("SYSREG_ID_AA64MMFR1_EL1_PAN", NUM, 2),
+>>> +    MODEL_PROP("SYSREG_ID_AA64MMFR2_EL1_UAO", NUM, 1),
+>>> +    MODEL_PROP("SYSREG_ID_AA64MMFR2_EL1_CnP", NUM, 1),
+>>> +    MODEL_PROP("SYSREG_ID_AA64MMFR2_EL1_IESB", NUM, 1),
+>>> +
+>>> +    MODEL_PROP("SYSREG_ID_AA64PFR0_EL1_DIT", NUM, 1),
+>>> +    MODEL_PROP("SYSREG_ID_AA64DFR0_EL1_DebugVer", NUM, 9),
+>>> +    MODEL_PROP("SYSREG_ID_AA64DFR0_EL1_PMUVer", NUM, 5),
+>>> +    MODEL_PROP("SYSREG_ID_AA64ISAR0_EL1_TS", NUM, 1),
+>>> +    MODEL_PROP("SYSREG_ID_AA64ISAR1_EL1_LRCPC", NUM, 2),
+>>> +    MODEL_PROP("SYSREG_ID_AA64MMFR2_EL1_AT", NUM, 1),
+>>> +    MODEL_PROP("SYSREG_ID_AA64MMFR2_EL1_IDS", NUM, 1),
+>>> +    /* KVM zeroes out these field when MTE is not enabled. */
+>>> +    MODEL_PROP("SYSREG_ID_AA64PFR1_EL1_MTE_frac", NUM, 0),
+>>> +    MODEL_PROP_END,
+>>> +};
+>>> +
+>>> +static const ArmModelPropValue neoverse_v1_v1_props[] = {
+>>> +    MODEL_PROP("SYSREG_MIDR_EL1_Implementer", NUM, 0x41),
+>>> +    MODEL_PROP("SYSREG_MIDR_EL1_Variant", NUM, 0x1),
+>>> +    MODEL_PROP("SYSREG_MIDR_EL1_Architecture", NUM, 0xF),
+>>> +    MODEL_PROP("SYSREG_MIDR_EL1_PartNum", NUM, 0xD40),
+>>> +    MODEL_PROP("SYSREG_MIDR_EL1_Revision", NUM, 0x1),
+>>> +
+>>> +    MODEL_PROP("SYSREG_ID_AA64DFR0_EL1_BRPs", NUM, 0x5),
+>>> +    MODEL_PROP("SYSREG_ID_AA64DFR0_EL1_WRPs", NUM, 0x3),
+>>> +    MODEL_PROP("SYSREG_ID_AA64DFR0_EL1_CTX_CMPs", NUM, 0x1),
+>>> +    MODEL_PROP("SYSREG_ID_AA64DFR0_EL1_DoubleLock", NUM, 0xF),
+>>> +
+>>> +    MODEL_PROP("SYSREG_ID_AA64ISAR0_EL1_RDM", NUM, 1),
+>>> +    MODEL_PROP("SYSREG_ID_AA64ISAR0_EL1_DP", NUM, 1),
+>>> +    MODEL_PROP("SYSREG_ID_AA64ISAR0_EL1_FHM", NUM, 1),
+>>> +
+>>> +    MODEL_PROP("SYSREG_ID_AA64ISAR1_EL1_DPB", NUM, 2),
+>>> +    MODEL_PROP("SYSREG_ID_AA64ISAR1_EL1_JSCVT", NUM, 1),
+>>> +    MODEL_PROP("SYSREG_ID_AA64ISAR1_EL1_FCMA", NUM, 1),
+>>> +    MODEL_PROP("SYSREG_ID_AA64ISAR1_EL1_BF16", NUM, 1),
+>>> +    MODEL_PROP("SYSREG_ID_AA64ISAR1_EL1_DGH", NUM, 1),
+>>> +    MODEL_PROP("SYSREG_ID_AA64ISAR1_EL1_I8MM", NUM, 1),
+>>> +
+>>> +    MODEL_PROP("SYSREG_ID_AA64PFR0_EL1_FP", NUM, 1),
+>>> +    MODEL_PROP("SYSREG_ID_AA64PFR0_EL1_AdvSIMD", NUM, 1),
+>>> +
+>>> +    MODEL_PROP("SYSREG_ID_AA64PFR0_EL1_RAS", NUM, 2),
+>>> +    MODEL_PROP("SYSREG_ID_AA64PFR1_EL1_RAS_frac", NUM, 0),
+>>> +
+>>> +    MODEL_PROP("SYSREG_ID_AA64PFR0_EL1_CSV2", NUM, 1),
+>>> +    MODEL_PROP("SYSREG_ID_AA64PFR1_EL1_CSV2_frac", NUM, 0),
+>>> +
+>>> +    MODEL_PROP("SYSREG_ID_AA64PFR0_EL1_CSV3", NUM, 1),
+>>> +
+>>> +    MODEL_PROP("SYSREG_ID_AA64PFR1_EL1_SSBS", NUM, 2),
+>>> +
+>>> +    MODEL_PROP("SYSREG_ID_AA64MMFR0_EL1_PARange", NUM, 5),
+>>> +    MODEL_PROP("SYSREG_ID_AA64MMFR0_EL1_ASIDBits", NUM, 2),
+>>> +    MODEL_PROP("SYSREG_ID_AA64MMFR0_EL1_BigEnd", NUM, 1),
+>>> +    MODEL_PROP("SYSREG_ID_AA64MMFR0_EL1_SNSMem", NUM, 1),
+>>> +    MODEL_PROP("SYSREG_ID_AA64MMFR0_EL1_TGran4", NUM, 0),
+>>> +    MODEL_PROP("SYSREG_ID_AA64MMFR0_EL1_TGran16", NUM, 1),
+>>> +    MODEL_PROP("SYSREG_ID_AA64MMFR0_EL1_TGran64", NUM, 0),
+>>> +    MODEL_PROP("SYSREG_ID_AA64MMFR0_EL1_TGran4_2", NUM, 0),
+>>> +    MODEL_PROP("SYSREG_ID_AA64MMFR0_EL1_TGran16_2", NUM, 0),
+>>> +    MODEL_PROP("SYSREG_ID_AA64MMFR0_EL1_TGran64_2", NUM, 0),
+>>> +    MODEL_PROP("SYSREG_ID_AA64MMFR1_EL1_HAFDBS", NUM, 2),
+>>> +    MODEL_PROP("SYSREG_ID_AA64MMFR1_EL1_VMIDBits", NUM, 2),
+>>> +    MODEL_PROP("SYSREG_ID_AA64MMFR1_EL1_VH", NUM, 1),
+>>> +    MODEL_PROP("SYSREG_ID_AA64MMFR1_EL1_HPDS", NUM, 2),
+>>> +    MODEL_PROP("SYSREG_ID_AA64MMFR1_EL1_XNX", NUM, 1),
+>>> +    MODEL_PROP("SYSREG_ID_AA64MMFR1_EL1_SpecSEI", NUM, 0),
+>>> +
+>>> +    MODEL_PROP("SYSREG_ID_AA64MMFR2_EL1_FWB", NUM, 1),
+>>> +    MODEL_PROP("SYSREG_ID_AA64MMFR2_EL1_BBM", NUM, 2),
+>>> +    MODEL_PROP("SYSREG_ID_AA64MMFR2_EL1_EVT", NUM, 2),
+>>> +
+>>> +    MODEL_PROP("SYSREG_ID_AA64MMFR4_EL1_E2H0", NUM, 0),
+>>> +
+>>> +    MODEL_PROP("SYSREG_CTR_EL0_IminLine", NUM, 4),
+>>> +    MODEL_PROP("SYSREG_CTR_EL0_L1Ip", NUM, 3),
+>>> +    MODEL_PROP("SYSREG_CTR_EL0_DminLine", NUM, 4),
+>>> +    MODEL_PROP("SYSREG_CTR_EL0_ERG", NUM, 4),
+>>> +    MODEL_PROP("SYSREG_CTR_EL0_CWG", NUM, 4),
+>>> +
+>>> +    MODEL_PROP("SYSREG_DCZID_EL0_BS", NUM, 0x4),
+>>> +
+>>> +    /* pauth */
+>>> +    MODEL_PROP("SYSREG_ID_AA64ISAR1_EL1_APA", NUM, 3),
+>>> +    MODEL_PROP("SYSREG_ID_AA64ISAR1_EL1_GPA", NUM, 1),
+>>> +
+>>> +    /* sve */
+>>> +    MODEL_PROP("SYSREG_ID_AA64PFR0_EL1_SVE", NUM, 1),
+>>> +    MODEL_PROP("SYSREG_ID_AA64ZFR0_EL1_BF16", NUM, 1),
+>>> +    MODEL_PROP("SYSREG_ID_AA64ZFR0_EL1_I8MM", NUM, 1),
+>>> +    MODEL_PROP("sve128", BOOL, true),
+>>> +
+>>> +    MODEL_PROP_END,
+>>> +};
+>>> +
+>>> +static const ArmModelPropValue graviton3_v1_props[] = {
+>>> +    MODEL_PROP("SYSREG_ID_AA64ISAR0_EL1_AES", NUM, 2),
+>>> +    MODEL_PROP("SYSREG_ID_AA64ISAR0_EL1_SHA1", NUM, 1),
+>>> +    MODEL_PROP("SYSREG_ID_AA64ISAR0_EL1_SHA2", NUM, 2),
+>>> +    MODEL_PROP("SYSREG_ID_AA64ISAR0_EL1_SHA3", NUM, 1),
+>>> +    MODEL_PROP("SYSREG_ID_AA64ISAR0_EL1_SM3", NUM, 1),
+>>> +    MODEL_PROP("SYSREG_ID_AA64ISAR0_EL1_SM4", NUM, 1),
+>>> +    MODEL_PROP("SYSREG_ID_AA64ISAR0_EL1_RNDR", NUM, 1),
+>>> +
+>>> +    MODEL_PROP("SYSREG_CTR_EL0_IDC", NUM, 1),
+>>> +    MODEL_PROP("SYSREG_CTR_EL0_DIC", NUM, 1),
+>>> +
+>>> +    MODEL_PROP("SYSREG_REVIDR_EL1_VAL", NUM, 1),
+>>> +
+>>> +    MODEL_PROP_END,
+>>> +};
+>>> +
+>>> +static const ArmNamedCpuModel arm_cpu_models[] = {
+>>> +    {
+>>> +        .name   = "non-zero-defaults-v1",
+>>> +        .parent = NULL,
+>>> +        .props  = non_zero_defaults_v1_props,
+>>> +    },
+>>> +    {
+>>> +        .name   = "arm-v8_4-a-v1",
+>>> +        .parent = "non-zero-defaults-v1",
+>>> +        .props  = armv8_4_a_v1_props,
+>>> +    },
+>>> +    {
+>>> +        .name   = "neoverse-v1-v1",
+>>> +        .parent = "arm-v8_4-a-v1",
+>>> +        .props  = neoverse_v1_v1_props,
+>>> +    },
+>>> +    {
+>>> +        .name   = "graviton3-v1",
+>>> +        .parent = "neoverse-v1-v1",
+>>> +        .props  = graviton3_v1_props,
+>>> +    },
+>>> +};
+>>> +
+>>> +static ARMCPUInfo arm_named_cpu_infos[ARRAY_SIZE(arm_cpu_models)];
+>>> +const ArmNamedCpuModel *arm_find_model(const char *name)
+>>> +{
+>>> +    size_t i;
+>>> +    for (i = 0; i < ARRAY_SIZE(arm_cpu_models); i++) {
+>>> +        if (g_str_equal(arm_cpu_models[i].name, name)) {
+>>> +            return &arm_cpu_models[i];
+>>> +        }
+>>> +    }
+>>> +    return NULL;
+>>> +}
+>>> +
+>>> +static void arm_apply_model_props(Object *obj, const ArmModelPropValue *props,
+>>> +                                  Error **errp)
+>>> +{
+>>> +    const ArmModelPropValue *pv;
+>>> +    ERRP_GUARD();
+>>> +
+>>> +    for (pv = props; pv->name; pv++) {
+>>> +        switch (pv->type) {
+>>> +        case ARM_MODEL_PROP_BOOL:
+>>> +            object_property_set_bool(obj, pv->name, pv->u.b, errp);
+>>> +            break;
+>>> +        case ARM_MODEL_PROP_NUM:
+>>> +            object_property_set_uint(obj, pv->name, pv->u.num, errp);
+>>> +            break;
+>>> +        default:
+>>> +            g_assert_not_reached();
+>>> +        }
+>>> +        if (*errp) {
+>>> +            error_prepend(errp, "property '%s': ", pv->name);
+>>> +            return;
+>>> +        }
+>>> +    }
+>>> +}
+>>> +
+>>> +static void arm_realize_model_chain(Object *obj, const ArmNamedCpuModel *model,
+>>> +                                    Error **errp)
+>>> +{
+>>> +    const ArmNamedCpuModel *cur, *parent;
+>>> +    const ArmNamedCpuModel *chain[ARRAY_SIZE(arm_cpu_models)];
+>>> +    size_t depth = 0;
+>>> +    for (cur = model; cur; ) {
+>>> +        if (depth >= ARRAY_SIZE(chain)) {
+>>> +            error_setg(errp, "model '%s': parent chain too deep "
+>>> +                       "(possible cycle)", model->name);
+>>> +            return;
+>>> +        }
+>>> +        chain[depth++] = cur;
+>>> +
+>>> +        if (!cur->parent) {
+>>> +            break;
+>>> +        }
+>>> +        parent = arm_find_model(cur->parent);
+>>> +        if (!parent) {
+>>> +            error_setg(errp, "model '%s': unknown parent '%s'",
+>>> +                       cur->name, cur->parent);
+>>> +            return;
+>>> +        }
+>>> +        cur = parent;
+>>> +    }
+>>> +
+>>> +    while (depth--) {
+>>> +        arm_apply_model_props(obj, chain[depth]->props, errp);
+>>> +        if (*errp) {
+>>> +            return;
+>>> +        }
+>>> +    }
+>>> +}
+>>> +
+>>> +static void arm_named_cpu_initfn(Object *obj)
+>>> +{
+>>> +    ARMCPU *cpu = ARM_CPU(obj);
+>>> +    ARMCPUClass *acc = ARM_CPU_GET_CLASS(obj);
+>>> +    const ArmNamedCpuModel *model = arm_find_model(acc->info->name);
+>>> +    if (!model) {
+>>> +        error_report("'%s' CPU model entry not found)",
+>>> +                     acc->info->name);
+>>> +        return;
+>>> +    }
+>>> +
+>>> +    if (!kvm_enabled()) {
+>>> +        error_report("'%s' CPU model requires KVM (-accel kvm)",
+>>> +                     acc->info->name);
+>>> +        return;
+>>> +    }
+>>> +
+>>> +    kvm_arm_set_cpu_features_from_host(cpu);
+>>> +    if (!arm_feature(&cpu->env, ARM_FEATURE_AARCH64)) {
+>>> +        return;
+>>> +    }
+>>> +
+>>> +    /* 1. Reset ID regs to 0 */
+>>> +    memset(cpu->isar.idregs, 0, sizeof(cpu->isar.idregs));
+>>> +
+>>> +    /* 2. Add sveNNNN and SYSREG_ properties */
+>>> +    aarch64_add_sve_properties(obj);
+>>> +    aarch64_add_idregs_properties(obj);
+>>> +
+>>> +    /* 3. Realize the model chain. */
+>>> +    arm_realize_model_chain(obj, model, &error_abort);
+>>> +}
+>>> +
+>>> +void arm_register_named_cpu_models(void)
+>>> +{
+>>> +    size_t i;
+>>> +    for (i = 0; i < ARRAY_SIZE(arm_cpu_models); i++) {
+>>> +        arm_named_cpu_infos[i].name = arm_cpu_models[i].name;
+>>> +        arm_named_cpu_infos[i].initfn = arm_named_cpu_initfn;
+>>> +        arm_cpu_register(&arm_named_cpu_infos[i]);
+>>> +    }
+>>> +}
+>>> +
+>>> +type_init(arm_register_named_cpu_models)
+>>> diff --git a/target/arm/arm-cpu-models.h b/target/arm/arm-cpu-models.h
+>>> new file mode 100644
+>>> index 0000000000..ac4e510499
+>>> --- /dev/null
+>>> +++ b/target/arm/arm-cpu-models.h
+>>> @@ -0,0 +1,35 @@
+>>> +/* SPDX-License-Identifier: GPL-2.0-or-later */
+>>> +/*
+>>> + * ARM named CPU model definitions - public API.
+>>> + */
+>>> +#ifndef ARM_CPU_MODELS_H
+>>> +#define ARM_CPU_MODELS_H
+>>> +
+>>> +#include "qapi/error.h"
+>>> +#include "qom/object.h"
+>>> +
+>>> +typedef enum ArmModelPropType {
+>>> +    ARM_MODEL_PROP_BOOL,
+>>> +    ARM_MODEL_PROP_NUM,
+>>> +} ArmModelPropType;
+>>> +
+>>> +typedef struct ArmModelPropValue {
+>>> +    const char     *name;
+>>> +    ArmModelPropType type;
+>>> +    union {
+>>> +        bool            b;
+>>> +        uint64_t        num;
+>>> +    } u;
+>>> +} ArmModelPropValue;
+>>> +
+>>> +typedef struct ArmNamedCpuModel {
+>>> +    const char              *name;
+>>> +    const char              *parent;
+>>> +    const ArmModelPropValue *props;
+>>> +} ArmNamedCpuModel;
+>>> +
+>>> +void arm_register_named_cpu_models(void);
+>>> +
+>>> +const ArmNamedCpuModel *arm_find_model(const char *name);
+>>> +
+>>> +#endif /* ARM_CPU_MODELS_H */
+>>> diff --git a/target/arm/meson.build b/target/arm/meson.build
+>>> index 64d1ec63ab..72eed1bcc6 100644
+>>> --- a/target/arm/meson.build
+>>> +++ b/target/arm/meson.build
+>>> @@ -10,7 +10,7 @@ arm_user_ss.add(files('gdbstub.c'))
 >>>
->>> /**
->>>  * kvm_arm_steal_time_finalize:
+>>> arm_ss.add(when: 'TARGET_AARCH64', if_true: files(
+>>>   'cpu64.c',
+>>> -  'gdbstub64.c'
+>>> +  'gdbstub64.c',
+>>> ))
+>>>
+>>> arm_common_ss.add(files(
+>>> @@ -21,7 +21,10 @@ arm_common_system_ss.add(files(
+>>>   'arm-qmp-cmds.c',
+>>>   'cpu-idregs.c',
+>>> ))
+>>> -arm_system_ss.add(when: 'CONFIG_KVM', if_true: files('hyp_gdbstub.c', 'kvm.c'))
+>>> +arm_system_ss.add(when: 'TARGET_AARCH64', if_true: files('arm-cpu-models.c'))
+>>> +arm_system_ss.add(when: 'CONFIG_KVM',
+>>> +                  if_true: files('hyp_gdbstub.c',
+>>> +                                 'kvm.c'))
+>>> arm_system_ss.add(when: 'CONFIG_HVF', if_true: files('hyp_gdbstub.c'))
+>>>
+>>> arm_user_ss.add(files('cpu.c'))
 >> Thanks
 >>
 >> Eric
 >
+Thanks
+
+Eric
 
