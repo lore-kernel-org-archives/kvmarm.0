@@ -1,119 +1,49 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9321734E75A
-	for <kvmarm@lists.linux.dev>; Fri, 14 Aug 2026 08:45:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F21613F075A;
+	Fri, 14 Aug 2026 08:48:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786697153; cv=none; b=I8GXKF8uLq2SS+Nl2hXwXGCfczNJ4gTz4m907tUmkhPNxV/KkHm3S3olLU6bmfdPzvri905m8PsjlXZqpblv21siCXW7a9E8OmMMgwqiWhcQ3j7NslawVVw/2H39Yset7eN7LQDXmVupx7CT6msNJLu5KIQAF8CZRbwzEOM1gtY=
+	t=1786697328; cv=none; b=ItaXUk1nefRupM1WhIMZeSwpsTRbHBgtCSEKl5jtpz1quenxvL82aGthcy6n2mYOtzsAnDxdJ61qJO6dJD6TYAmR0AjWUadGcZQCILm3dol11PIdWcOTAUJ4pLk8lXJIIBSqrWfPZQ8MAw8b0q+9ECou+cpkVWWhu1A7hjQ/16Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786697153; c=relaxed/simple;
-	bh=i1c8AJsS/6BsMSz6FYSuta5r13xz+bKehed37J4V0no=;
+	s=arc-20240116; t=1786697328; c=relaxed/simple;
+	bh=ISf3oyrdb6DRe0/DIV9AbD0ZFALjPP6GjtfYOft97EM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cPTej+ke87Ht9IECxQMg4Qa6KzZ3Y47LcuWpdJZ7t0gaoUUKstIukNhhsrXhP8Jfpdwigpv+pM0zhBl5cC8b6BFEjBHC4xmEmryOmlrtGEKkxe8AJADAc3t/KKLIOxEm4EoJtKX82RZKMmVpUoBYvJyxTP6drdxqQiIdsxUXw/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=ADAGnN/k; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=a/WSt/jx; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=tMijjyPKntDQYncA3yXd6CTpD2ff5/z5ZYRwj1l9JdjPTHmBEdLe2hyNXXmKoa632dAEP7e/cUBxjgABeg0VV79dOUhpcfbsPMbq6oRDk1GuvAkGDCZoK7y5sdF8vngmGHFOW4l3VTAM4gSqh5qWt6qn38PaPwMR6BJJK8RdXQE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bGUhbdfv; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="ADAGnN/k";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="a/WSt/jx"
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67E7fb2r2166391
-	for <kvmarm@lists.linux.dev>; Fri, 14 Aug 2026 08:45:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=EVIasMr6ok/pt36pC50hDKA8
-	cdlBEv5jazPUbRxQ61M=; b=ADAGnN/knxZwKwlqppLvR3DFXAywgoljCOl+bDim
-	5OT8g8p1fI+jfG4Tv7QmaNjNoeROItyK5SqhEbWTo+zwlTjzwWTP3rVzs7ks7eIY
-	a9/wsuMj/CE+x6BLqTjGCH8HL1HkoDlnDzR10GS+cDQhgoiRg3jkBzXjfZSAJ8kG
-	+fjd4JynOdTTM2sRCQ1iC9vxldRXmga4ert1Llf1Nf4q2HqFf6ttwkmJ21iRqLLv
-	+Bv1jYNq+LORKb8xk1UyJBCgl4rnQTu0k4KEDFcJ70xHPUngeLqlZrjkMMvD0PbN
-	dCCT9KOOgCVVZF9bS+tojskYCm9xmevmrwLRAEJpHfgm3g==
-Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com [209.85.215.199])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4g1j2nk520-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <kvmarm@lists.linux.dev>; Fri, 14 Aug 2026 08:45:51 +0000 (GMT)
-Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-cbedc1899f7so464294a12.2
-        for <kvmarm@lists.linux.dev>; Fri, 14 Aug 2026 01:45:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1786697151; x=1787301951; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=EVIasMr6ok/pt36pC50hDKA8cdlBEv5jazPUbRxQ61M=;
-        b=a/WSt/jxhu8dOT/J+Jx4JEn5kbT2Ed+kTtE3z7jtk6NwsU9tEJ5tumx+N13GSyulH3
-         jbK4ehuFHi9HbQ9S6RQippHQJnqbvnt5tD8SRIE591FSzCRRpSOxGwPcFzQi0fo7Ofhl
-         6itwWVJCkbTw1RuJLSBDUpP5ToQBwev6Gbc2O3v0sTT3Z63XLUDELewcl+S0xqR/YxeY
-         xsWpHiYwtroGDT4pMfujOVq81eoQyoBZgSEGjJg5yI9xfY3Tqkei/1QpgZoD/g7Fv34+
-         7BC2joMtXyn0AQR1/cqjQlzhoGb1ZCjG5nArUcY7rQKsLZ6xeAuwIq4K35DOU9se++4c
-         feqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786697151; x=1787301951;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=EVIasMr6ok/pt36pC50hDKA8cdlBEv5jazPUbRxQ61M=;
-        b=ntGgVV0QnZnbPM/XdMstfbiiGJ9Aa32Kj+qeTK+JRRSHnSgFcFT0m+LqefnYhSPclS
-         n66OYsfll3rrgbK9to+4dWPwGZyuvay+678+w+69TLGOW2Yd3Um+/fanDbllCJ4sP3lC
-         aZDbo7Sw4LaNK8TRpLajucHMNelUQezcjG9XqTNgUH9INm6gBWrJxKTAta+oE650oNYq
-         3b05NfzyZYLdlnEhjdRnw7i7E4GqT+0p9YvMYvS5uoJ/euoikDvBeOD8IvE9tjjlpnBX
-         WmcP0VEpMexb2fUJWL90LnVQ6CcnFy9lcOtSXe9UuYnzQvJNpExWvHhwuscmTcwpSHYC
-         Q3VQ==
-X-Forwarded-Encrypted: i=1; AHgh+Rr9BG3qRbJZXkJ0MkEb1i3qxkMoPTiozZOBy9vGVTK5/NJGM6OZDEPwdVr26NwjF8UPvA4hym8=@lists.linux.dev
-X-Gm-Message-State: AOJu0YygsjuLkJotm3dxqPmiK4az+kzT4mk73On8XKUzz+81K6+ee8Im
-	DNt0281eiv6brr+gXJMzj3fRognuvZkigKgX8MSABCMa/LIv4YALDFT1rV12HVCJ4aajMQ05EiK
-	FjfK0UJrQdPbOqI4VdRXFnof1gWQtROeHGm/i97dIdq2Phu1xlDTWMuLtc3M=
-X-Gm-Gg: AR+sD13HtcSl+t3BK6tbOt8bVkJGbi3WwVpL0PuqyUWbuHc14wo5s1PR4UHd0VOOz6e
-	+ExV6u0UaDpxdoNjHohpo/dHFMs8GsLlYcWJuYotm6zEVMNacXj9y5qPBpRR52qOmwLYEiRmGAB
-	HVZ88Alxtn/oaoJaZXgrakWLfsx18tqJjC+jZETTYAqNu+Zb0LfFhO1d2MoO+VICmRNw8OOPIqD
-	gBunyq30ahYgvjMFt3iHbaOEsf9DCumD0ZnhsIhYC6Uz1Jf53wWnumgnHdwYmHVWNQFuijh8qGa
-	UINuHn3brrvcWwA/Q0MlHsLQPtj/GFH22ea/XtgVy+5pJYeg5KoQHR7w8St2ST+QGsEH/zUTQnm
-	4ruH+ql6O/w3Lto3xKbFp3J7WvKeht74VUg==
-X-Received: by 2002:a05:6a20:430d:b0:3c3:bbe6:95de with SMTP id adf61e73a8af0-3cc71d533c0mr4527079637.6.1786697150994;
-        Fri, 14 Aug 2026 01:45:50 -0700 (PDT)
-X-Received: by 2002:a05:6a20:430d:b0:3c3:bbe6:95de with SMTP id adf61e73a8af0-3cc71d533c0mr4527037637.6.1786697150586;
-        Fri, 14 Aug 2026 01:45:50 -0700 (PDT)
-Received: from hu-pkondeti-hyd.qualcomm.com ([202.46.22.19])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-320e9df03d4sm1808869eec.15.2026.08.14.01.45.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Aug 2026 01:45:50 -0700 (PDT)
-Date: Fri, 14 Aug 2026 14:15:39 +0530
-From: Pavan Kondeti <pavan.kondeti@oss.qualcomm.com>
-To: Will Deacon <will@kernel.org>
-Cc: Pavan Kondeti <pavan.kondeti@oss.qualcomm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Joey Gouly <joey.gouly@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-        Gavin Shan <gshan@redhat.com>,
-        Shanker Donthineni <sdonthineni@nvidia.com>,
-        Alper Gun <alpergun@google.com>,
-        "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
-        Emi Kisanuki <fj0570is@fujitsu.com>,
-        Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
-        Lorenzo Pieralisi <lpieralisi@kernel.org>
-Subject: Re: [PATCH v16 07/45] arm64: mm: Handle Granule Protection Faults
- (GPFs)
-Message-ID: <5b557560-7664-4336-9e5f-86de8dcd6d90@quicinc.com>
-References: <20260803134403.80630-1-steven.price@arm.com>
- <20260803134403.80630-8-steven.price@arm.com>
- <ans1ZSwMEKeT9Gfz@arm.com>
- <d4bdecca-517a-4b4b-bf67-cef6b09bc8c1@arm.com>
- <7d4e5920-aa20-40cd-954e-037631bd0d6c@quicinc.com>
- <anx6YbPMVz3OlpA5@arm.com>
- <an2YN7kxB7bjCd2s@willie-the-truck>
- <8db602b8-7fd3-4c11-8fbd-3b8251648eb8@quicinc.com>
- <an3ihGk3znnk8TWV@willie-the-truck>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bGUhbdfv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A11C21F000E9;
+	Fri, 14 Aug 2026 08:48:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1786697326;
+	bh=uGQwL5UZJipKTW+qGKPo+sHQSdOsrhX2bDvlMA/o8tk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=bGUhbdfvvAyZ041IRQFT3yaniWAfDI6dXKx46SzgRufqkn0S6nPYrFxuivv+st59Z
+	 GTaziv7CJYxzm91Hna08972IcnR1hf5Kr6yF/KfslD3Ze3LEc77GQC2OJSk5hp8VM2
+	 KLlr+9DDUHDSGmAtrDYic7l2itUh+mio8Tw1SSzHJxIsIKi9w3EnLlr4lZ9V9u6+y/
+	 4TyP8rYO8EybgfqPlubbVMf+8rAR7HO9uRKU57g5HJPYIYI1ekq0F1Uwo4m1EnjzsW
+	 /nMCBP/AOnj2T/C6d1IkiT28NVTMCQoCl4Q2gqSpPzeWdKutby+ara4wQyZd2rZTa3
+	 HOLXqPHI5CJwg==
+Date: Fri, 14 Aug 2026 09:48:39 +0100
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Yao Yuan <yaoyuan@linux.alibaba.com>
+Cc: Wei-Lin Chang <weilin.chang@arm.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oupton@kernel.org>, Fuad Tabba <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Jintack Lim <jintack.lim@linaro.org>, 
+	Christoffer Dall <christoffer.dall@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH 1/2] KVM: arm64: Fix spurious warning for benign stage 2
+ teardown race
+Message-ID: <an7Tk0qrCM84zS54@gremlin>
+References: <20260812-kvm-arm-nested-virt-fix-v1-0-4ad883f1b6a5@kernel.org>
+ <20260812-kvm-arm-nested-virt-fix-v1-1-4ad883f1b6a5@kernel.org>
+ <qfhlmmidzdmmsfopfhxpddgwa7nob45jwgb6sabskawaxtox7i@mnxplk3zn34k>
+ <an3gqCJ1fzloWB_N@lucifer>
+ <v3vgnteumpaxbgqjtfwoilcbwpwohfci3uwu4ooykls6zjwjwe@rukbigno2m5o>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -122,85 +52,247 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <an3ihGk3znnk8TWV@willie-the-truck>
-X-Authority-Analysis: v=2.4 cv=ApXeGu9P c=1 sm=1 tr=0 ts=6a7ed5bf cx=c_pps
- a=Oh5Dbbf/trHjhBongsHeRQ==:117 a=fChuTYTh2wq5r3m49p7fHw==:17
- a=kj9zAlcOel0A:10 a=Sv0fKeRqtYgA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=eoimf2acIAo5FJnRuUoq:22
- a=VwQbUJbxAAAA:8 a=vggBfdFIAAAA:8 a=KKAkSRfTAAAA:8 a=oGdhJ8GHBgxCdCDN5qoA:9
- a=CjuIK1q_8ugA:10 a=_Vgx9l1VpLgwpw_dHYaR:22 a=cvBusfyB2V15izCimMoJ:22
-X-Proofpoint-ORIG-GUID: QLBBtPOZMiPgLwUa0ER7SrdgiB17Fv7I
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODE0MDA2NiBTYWx0ZWRfX8vYfYEi9CsZU
- kjOochKkSEP3ume9lX2ZbpKR4Fa5hpy7eWRlz63PrZFXUeJCgqyT/QWD8roXQPL+LWXZ6dkivvX
- owwo1VWDvsfVF942FGtNtH7cgFzzpJg=
-X-Proofpoint-GUID: QLBBtPOZMiPgLwUa0ER7SrdgiB17Fv7I
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODE0MDA2NiBTYWx0ZWRfXyx2uS16LHUAX
- jTkCukebpCy/fZwlHKkhDGyBK+LWrRpkxjZHEBsd1Np5bja1iYhDdwLyZKbCmmom/0dUxpiUgGh
- jPLS51BrpxWJek+bpRtBkOIpKfsl6cgBP2V1WAn9HBVUsiX0hPZUB8lVGXRKdyYNe1xm7mGdKjY
- S/VdlR7pyQifx7XlXu/cxjLkc+BOXigoUTWoSju/yJSfjt+nvkJfRePq/n/jf2+VIeNjJCtotU/
- gD/35ET7cRglzPr7rzxjrR5CDIPtSJQPph2rJHjWYtJX+xtM+PBIv2sZZWWW60LsfUxgotfgbtS
- nbGreN2D1eG7why8u3CK4yhpTctnPPFnzaNf9tZwrjEP/Bv4jMq9X3lu5MY4C2eCTmLox2UNxKn
- uMgtJNy9rE65efBuYH/68XXoAynMDs1enUpfLciCdrdon+/w2l7gvtGPE5i++Q+/hIUuH38xMO5
- QNYonfQAk3N7c6x7VNA==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-08-14_03,2026-08-12_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 priorityscore=1501 impostorscore=0 clxscore=1015 adultscore=0
- suspectscore=0 lowpriorityscore=0 bulkscore=0 spamscore=0 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2608140066
+In-Reply-To: <v3vgnteumpaxbgqjtfwoilcbwpwohfci3uwu4ooykls6zjwjwe@rukbigno2m5o>
 
-On Thu, Aug 13, 2026 at 04:28:04PM +0100, Will Deacon wrote:
-> On Thu, Aug 13, 2026 at 07:40:41PM +0530, Pavan Kondeti wrote:
-> > On Thu, Aug 13, 2026 at 11:11:03AM +0100, Will Deacon wrote:
-> > > On Wed, Aug 12, 2026 at 02:51:29PM +0100, Catalin Marinas wrote:
-> > > > On Wed, Aug 12, 2026 at 06:12:09PM +0530, Pavan Kondeti wrote:
-> > > > > There is a valid case for fixup_exception() to be needed here in GPF
-> > > > > handling.
-> > > > > 
-> > > > > -000 |load_unaligned_zeropad(inline)
-> > > > > -000 |hash_name(inline)
-> > > > > -000 |link_path_walk()
-> > > > > -001 |path_lookupat()
-> > > > > -002 |filename_lookup()
-> > > > > -003 |vfs_statx()
-> > > > > -004 |vfs_fstatat()
-> > > > > 
-> > > > > We observed this in Android running Gunyah when the page is mapped in
-> > > > > EL1 but unmapped at EL2. path_lookupat() can actually handle this
-> > > > > via fixup_exeption() when a word load crosses the page boundary.
-> > > > > However, Gunyah injects a Synchronous External Abort and we have
-> > > > > a downstream patch [1] that adds fixup_exception() in do_sea(). pKVM
-> > > > > injects [2] such faults back to EL1 and fixup_exception() is taken care.
-> > > > 
-> > > > Ah, good point, completely forgot about load_unaligned_zeropad(). Since
-> > > > we don't unmap the linear map for delegated pages, we'll need the
-> > > > fixup_exception(). And I guess warning in this case is not desirable
-> > > > either. We could limit it to EX_TYPE_KACCESS_ERR_ZERO and
-> > > > EX_TYPE_LOAD_UNALIGNED_ZEROPAD, though not sure it's worth it.
-> > > 
-> > > Alternatively, I think the series to unmap guest memory from the linear
-> > > map would solve that for gmem:
-> > > 
-> > > https://lore.kernel.org/all/20260410151746.61150-1-kalyazin@amazon.com/
-> > > 
-> > 
-> > Thanks Will for sharing this information.
-> > 
-> > There are use cases outside gmem like FF-A lend to Secure Partition.
-> > we may not be enforcing all such memory to be unmapped at EL1, correct?
-> 
-> If you leave the cacheable linear alias of memory intact across an
-> NS -> S transition, then you're in for a bad time [1].
-> 
-> Will
-> 
-> [1] https://lore.kernel.org/all/20221114110329.68413-1-manivannan.sadhasivam@linaro.org/
+On Fri, Aug 14, 2026 at 03:18:42PM +0800, Yao Yuan wrote:
+> On Thu, Aug 13, 2026 at 04:24:49PM +0800, Lorenzo Stoakes (ARM) wrote:
+> > On Thu, Aug 13, 2026 at 12:20:43AM +0100, Wei-Lin Chang wrote:
+> > > Hi Lorenzo,
+> > >
+> > > Thanks for the detailed analysis!
+> >
+> > You're welcome :)
+> >
+> > >
+> > > I can follow what's happening from the report, but one thing I don't
+> > > get:
+> > >
+> > > On Wed, Aug 12, 2026 at 02:31:20PM +0100, Lorenzo Stoakes (ARM) wrote:
+> > > > A batch of kernel warnings were triggered in the L0 host kernel when using
+> > > > kvmtool to experiment with nested virtualisation.
+> > > >
+> > > > The issue was observed on an M2 macbook pro with 24 GiB of RAM running
+> > > > asahi linux 7.1.6-400.asahi.fc44.aarch64+16k with 16 KiB page size.
+> > > >
+> > > > The bug is confirmed to exist in mainline and does not appear to be
+> > > > impacted by any downstream patches carried by asahi.
+> > > >
+> > > > kvmtool was used to establish an L1 guest with 8 CPUs and 8 GiB of RAM.
+> > > >
+> > > > kvmtool was then run again within the L1 guest to establish an L2 guest
+> > > > with 4 CPUs and 4 GiB of RAM.
+> > > >
+> > > > Then it was run again to establish another inner guest with 2 CPUs and 2
+> > > > GiB of RAM at L3.
+> > > >
+> > > > Both the L2 and L3 guests were then exited and another L2 guest was
+> > > > established with the same characteristics.
+> > > >
+> > > > Sufficient memory pressure was present in the L0 host to trigger indirect
+> > > > reclaim, waking kcompactd up and triggering migration.
+> > > >
+> > > > Shortly afterwards the L2 guest was stopped, at which point three warnings
 
-Thanks for the reply. In the above case, XPU does not like the speculative fetches. I am
-not sure if there is a hard requirement for unmap of FF_A memory lent to secure
-partition managed under Root with GPT.
+So TL;DR - correction is to say L0 here, no change elsewhere.
 
-Thanks,
-Pavan
+> > > > were observed in the L0 host in quick succession with the second and the
+> > > > third occurring 114us and 189us after the first, respectively.
+> > > >
+> > > > In each case the call trace was the same:
+> > > >
+> > > > WARNING: arch/arm64/kvm/mmu.c:336 at __unmap_stage2_range+0x64/0x80,
+> > > > CPU#5: kcompactd0/66
+> > > > ...
+> > > > __unmap_stage2_range (arch/arm64/kvm/mmu.c:335 (discriminator 3)) (P)
+> > > > kvm_stage2_unmap_range (arch/arm64/kvm/mmu.c:346)
+> > > > kvm_nested_s2_unmap (arch/arm64/kvm/nested.c:1168 (discriminator 14))
+> > > > kvm_unmap_gfn_range (arch/arm64/kvm/mmu.c:2416)
+> > > > kvm_mmu_notifier_invalidate_range_start (arch/arm64/kvm/../../../virt/kvm/kvm_main.c:718 ...)
+> > > > mn_hlist_invalidate_range_start (mm/mmu_notifier.c:525)
+> > > > __mmu_notifier_invalidate_range_start (mm/mmu_notifier.c:580)
+> > > > try_to_migrate_one (./include/linux/mmu_notifier.h:478 ./include/linux/mmu_notifier.h:471 mm/rmap.c:2459)
+> > > > rmap_walk_anon (mm/rmap.c:3001)
+> > > > rmap_walk (mm/rmap.c:3106 mm/rmap.c:3101)
+> > > > try_to_migrate (mm/rmap.c:2774)
+> > > > migrate_folio_unmap (mm/migrate.c:1330 (discriminator 3))
+> > > > migrate_pages_batch (mm/migrate.c:1909)
+> > > > migrate_pages_sync (mm/migrate.c:2026)
+> > > > migrate_pages (mm/migrate.c:2135)
+> > > > compact_zone (mm/compaction.c:2663)
+> > > > compact_node (mm/compaction.c:2932)
+> > > > kcompactd (mm/compaction.c:3230)
+> > > > kthread (kernel/kthread.c:436)
+> > > > ret_from_fork (arch/arm64/kernel/entry.S:858)
+> > > >
+> > > > Analysing this:
+> > > >
+> > > > try_to_migrate() performs the first part of migration on a folio -
+> > > > establishing migration entries in all page tables mapping it - calling
+> > > > try_to_migrate_one() for each VMA the folio is mapped in.
+> > > >
+> > > > Immediately prior to installing the migration entry, try_to_migrate_one()
+> > > > calls mmu_notifier_invalidate_range_start() to signal to notifiers that the
+> > > > existing page table entry is about to be unmapped.
+> > > >
+> > > > Since this range happened to contain folios used by the virtual machine
+> > > > (given its memory consumption this was highly likely to be a target) this
+> > > > in turn triggers arm64 kvm code via an MMU notifier:
+> > > >
+> > > > mmu_notifier_invalidate_range_start()
+> > > >   -> ... -> kvm_mmu_notifier_invalidate_range_start()
+> > > >     -> kvm_mmu_unmap_gfn_range()
+> > > >       -> kvm_unmap_gfn_range()
+> > > >         -> kvm_nested_s2_unmap()
+> > > >           -> kvm_stage2_unmap_range()
+> > > >             -> __unmap_stage2_range()
+> > > >                -> stage2_apply_range()
+> > > >        	       <- -EINVAL, triggering a WARN_ON()
+> > > >
+> > > > Since commit ec14c272408a ("KVM: arm64: nv: Unmap/flush shadow stage 2 page
+> > > > tables") kvm_unmap_gfn_range() invokes kvm_nested_s2_unmap() which takes
+> > > > the rather drastic step of evicting the entirety of the stage 2 shadow page
+> > > > tables for each nested guest:
+> > > >
+> > > > 	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
+> > > > 		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+> > > >
+> > > > 		if (kvm_s2_mmu_valid(mmu))
+> > > > 			kvm_stage2_unmap_range(mmu, 0, kvm_phys_size(mmu), may_block);
+> > > > 	}
+> > > >
+> > > > This will iterate through every valid MMU.
+> > > >
+> > > > mmu_notifier_invalidate_range_start() sets the MMU_NOTIFIER_RANGE_BLOCKABLE
+> > > > flag when signalling notifiers, so may_block is true here.
+> > > >
+> > > > __unmap_stage2_range() wraps invocation of stage2_apply_range() in a
+> > > > WARN_ON():
+> > > >
+> > > > 	WARN_ON(stage2_apply_range(mmu, start, end, KVM_PGT_FN(kvm_pgtable_stage2_unmap),
+> > > > 				   may_block));
+> > > >
+> > > > Which is precisely the triggered warning and means stage2_apply_range() is
+> > > > returning an error.
+> > > >
+> > > > In arm64 return values are stored in the x0 register and in each splat w0
+> > > > (since it's a 32-bit value) is 0xffffffea which, by two's complement, is
+> > > > -0b00010110 or -EINVAL.
+> > > >
+> > > > The only way in which stage2_apply_range() can return an error is if either
+> > > > the passed in walk function (kvm_pgtable_stage2_unmap()) returns an error
+> > > > or mmu->pgt is NULL:
+> > > >
+> > > > 	static int stage2_apply_range(...)
+> > > > 	{
+> > > > 		do {
+> > > > 			struct kvm_pgtable *pgt = mmu->pgt;
+> > > > 			if (!pgt)
+> > > > 				return -EINVAL;
+> > > >
+> > > > 			next = stage2_range_addr_end(addr, end);
+> > > > 			ret = fn(pgt, addr, next - addr);
+> > > > 			if (ret)
+> > > > 				break;
+> > > > 			if (resched && next != end)
+> > > > 				cond_resched_rwlock_write(&kvm->mmu_lock);
+> > > > 		} while (addr = next, addr != end);
+> > > >
+> > > > 		return ret;
+> > > > 	}
+> > > >
+> > > > This loop is batched by stage2_range_addr_end() at the granularity of
+> > > > kvm_granule_size(KVM_PGTABLE_MIN_BLOCK_LEVEL), which for a 16 KiB page size
+> > > > kernel is 32 MiB.
+> > > >
+> > > > kvm_pgtable_stage2_unmap() only returns an error if
+> > > > kvm_pgtable_walk_begin() or _kvm_pgtable_walk() return an error. On arm64
+> > > > the former doesn't ever do so, and the latter only returns -EINVAL if
+> > > > either pgd is NULL (we gate that already) or an invalid pgt->start_level is
+> > > > specified (not the case).
+> > > >
+> > > > So the cause of the warning is that mmu->pgt is NULL here.
+> > > >
+> > > > This field is protected by kvm->mmu_lock, but after each invocation of the
+> > > > walk function, if the end of the range has not yet been reached, the lock
+> > > > is dropped.
+> > > >
+> > > > This is done by calling cond_resched_rwlock_write() which drops
+> > > > kvm->mmu_lock when yielding the time slice before reacquiring it upon being
+> > > > scheduled again:
+> > > >
+> > > > 		if (resched && next != end)
+> > > > 			cond_resched_rwlock_write(&kvm->mmu_lock);
+> > > >
+> > > > Note that resched = may_block here and is always true for these walks.
+> > > >
+> > > > This points to something else racing this code to clearing the pgt, and
+> > > > brings us back to the observation above that the issue occurs when tearing
+> > > > down the L2 guest.
+> > > >
+> > > > Upon L0's userspace mm_struct teardown, stage 2 mappings for IPAs mapped by
+> >
+> > s/L0/L2/
+> >
+> > > > the guest are unmapped via mmu notifier:
+> > > >
+> > > > exit_mm()
+> > > >   -> mmput()
+> > > >     -> __mmput()
+> > > >       -> exit_mmap()
+> > > >         -> mmu_notifier_release()
+> > > > 	  -> ... -> kvm_mmu_notifier_release()
+> > > >             -> kvm_flush_shadow_all()
+> > > >               -> kvm_arch_flush_shadow_all()
+> > > > 	        -> kvm_free_stage2_pgd()
+> > > > 		  -> [ acquire kvm->mmu_lock for write ]
+> > > > 		  -> mmu->pgt = NULL [ among other tasks ]
+> > > > 		  -> [ release kvm->mmu_lock for write ]
+> > >
+> > > You mentioned stopping the L2 VM only, which means L1 is still running.
+> > > Why would the L0 userspace mm_struct get torn down if L1 is still live?
+> > > What did I miss?
+> >
+> > Ah yeah this is a mistake sorry :) It should say L2 teardown.
+> >
+> > The stuff relevant to L0 is the MMU notifier bit.
+>
+> Hi Lorenzo,
+>
+> Still have question w/ your above addtional information:
+>
+> The trace is observed on L0, means the exit_mm() path should
+> also happens on L0 to race w/ the
+> mmu_notifier_invalidate_range_start() path, but how this is
+> triggred by L2 teardown, IIUC the L2 teardown triggers the
+> exit_mm() path on L1, not on L0. The L1 is still alive thus
+> the qemu/kvmtool process on L0 which hold all L1/L2/L3 is
+> still alive yet. Please correct me if anything I missed
+> here.
+
+OK so - I confused myself here :)
+
+The underlying issue here is that I am working back from a situation where
+I can't quite recall what I did, but am rather reconstructing it based on
+what was observed.
+
+And you're right - this stack makes no sense for an L2 VM being torn down,
+rather only the L0 being torn down.
+
+So clearly this is what I did, and the correction should be to say this at
+the start of the commit message.
+
+(The truth of what happened was rather more button-mashy and 'oh what?'
+than it appears ;)
+
+Sorry for the confusion!
+
+>
+> >
+> > >
+> > > Thanks,
+> > > Wei-Lin Chang
+> > >
+> > > [...]
+
+--
+Cheers, Lorenzo
