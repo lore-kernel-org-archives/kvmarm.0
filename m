@@ -1,178 +1,143 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E958C42AFBB;
-	Fri, 14 Aug 2026 10:33:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D769459AED
+	for <kvmarm@lists.linux.dev>; Fri, 14 Aug 2026 10:42:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786703619; cv=none; b=TikyooOIzzv+yTp5SuPBua6uV/mbwIMwVn3LVvHv8qkcN03xoLMPGjwXcvxtgiavXpxU8Y2x0uth0opq8hJpSIn5EPMY8/SAJXEXERFwcWJH7UjxI5fVTsfDCbp755rP5IojMEYLRw7S66Y4uMbxKLwh0fUDyk2frnKXvt5DH1U=
+	t=1786704172; cv=none; b=HvnkWdbPXcgB22rhBO3FJGCgPbdbVezau8c0GllLxwccFpIuKgYbSoCttf6yWTjoOnFTP2fpZiqC9qkVt3KaJkLKoipY1c2qtzpXf75Mkdh30Smit7XTU90y4dwAH4fqfTNhUiOUS7wZ1LMdCbUSQXAMnNRJyvuntSvg2Pzqa0M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786703619; c=relaxed/simple;
-	bh=BlTj4P6iQLZ++pr3y+IHUQu9uNU8sG0llyQjpLzSTxo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RrrI61+HNdRBb6jGrpkGQozmJURdirgxSXyVpIyWVNfcejPXCfi/4R58PzVuh2tp2yLnmzB+XV2RfFshMGtdRrUgjuCsg9jH9SxY/sK6lo72qoDezmBWuJV3roZEJcISqDoUNY4k5Y1pRTr7hEL8dqnhOKzUGSXmINymXyar3Gk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bBzNbLFO; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786704172; c=relaxed/simple;
+	bh=bLx/XPVcv18THPDJp+XH4URjd7ZZFW5FCaSQAyVUzY4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nNZL9oijzwEowcnOaLrZg3PV2kwkIMC5RnTgRxyLSOUNuAvr1f1WjisHOjrfeeBfxXdPhJHgg5hwdnBvKAxmQoT8dIXdegLwwrUkHeaibArBAd3oIZ1IMS+cELTB9gx21UbDXSl84D6e0dvdZTAK0wcOO6SzDdfWQiIrOHrJfRM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=A0A3FcjC; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bBzNbLFO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F2601F00A3D;
-	Fri, 14 Aug 2026 10:33:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786703606;
-	bh=afnZ0jJXOhQY7VGkttvC9Hi+PEuDYghXStcmJck84J4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=bBzNbLFOmSiE6nkWmpu3CnLBhWL9K9NITZ9sqqvp7yohSr/9HEanfI5OpN925RN69
-	 G3r49KTn4S06vIbvAEZD/VtTy4qfkZSXMIkeP8KLciPxxFR/JGYgYt1sEfacpQwp/a
-	 gTA2DO6PQRZ978mVimQJRNAyY7u9JVEFOzzrIPwGfI8oLK9mO7fuoZQuvLs0sc8H8I
-	 xcKZmtX8TvONB5AhqsBoYQHLn6ZSGNWLHuHaA6NQsV8CI773oldXxLQvFN+ql5dCRE
-	 tcRR/rwqaDb7/1d7G8Z6T/48GbEMGLkInNkCFJ3m7bq/5Xa/EOOxQQca3eOIcLVEYq
-	 6Kxl/Dh8jaBTQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wupE4-0000000FdQO-15I6;
-	Fri, 14 Aug 2026 10:33:24 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org
-Cc: Steffen Eiden <seiden@linux.ibm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	ljs@kernel.org,
-	Shen Yongchao <grayhat@foxmail.com>,
-	Karl Mehltretter <kmehltretter@gmail.com>,
-	Wei-Lin Chang <weilin.chang@arm.com>,
-	stable@vger.kernel.org
-Subject: [PATCH v2 2/2] KVM: arm64: nv: Delay freeing of shadow S2 structures until VM destruction
-Date: Fri, 14 Aug 2026 11:32:30 +0100
-Message-ID: <20260814103230.858578-3-maz@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260814103230.858578-1-maz@kernel.org>
-References: <20260814103230.858578-1-maz@kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="A0A3FcjC"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 235851596;
+	Fri, 14 Aug 2026 03:42:32 -0700 (PDT)
+Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0151D3F632;
+	Fri, 14 Aug 2026 03:42:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1786704155; bh=bLx/XPVcv18THPDJp+XH4URjd7ZZFW5FCaSQAyVUzY4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=A0A3FcjCkUtykivhCurLS2QMM5HEs49QHCNwaqjkAu7FUDflkH96uyQr1NUZoJkpK
+	 waDGiNQAT6YX0n0mau9nLFvFfcKQa+HljKwPbE/KKM7+0AzJtSfSRLQBejYBWJs44Q
+	 VlLPorS7ENpDb1UIUf0EM7n0wMln7A0ARiUc1RCQ=
+Date: Fri, 14 Aug 2026 11:42:24 +0100
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Fuad Tabba <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Lorenzo Stoakes <ljs@kernel.org>
+Subject: Re: [PATCH v5 2/6] KVM: arm64: nv: Introduce guest stage-2 tracking
+ structures
+Message-ID: <y6gzme4o5lsitrjb5bua6vhloypeoluchcmi3ndlvl4e6t6od7@vgkqqf75i25e>
+References: <20260810205038.118843-1-weilin.chang@arm.com>
+ <20260810205038.118843-3-weilin.chang@arm.com>
+ <an5puT6fe3lOMY4Q@sm-arm-grace07>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, fuad.tabba@linux.dev, ljs@kernel.org, grayhat@foxmail.com, kmehltretter@gmail.com, weilin.chang@arm.com, stable@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <an5puT6fe3lOMY4Q@sm-arm-grace07>
 
-We free the shadow S2 structures from kvm_arch_flush_shadow_all(), which
-is a Bad Idea(tm). Freeing the page tables is fair game (this is what
-this callback is for), but freeing the container that could still be
-referenced by another part of the system is not great.
+Hi,
 
-Instead, grow separate destructors that gets called when we tear the VM
-down for good. From there, we can nuke both the individual MMUs as well
-as the global array that points to them, safe in the knowledge that the
-vcpus themselves have been destroyed already.
+On Fri, Aug 14, 2026 at 10:04:57AM +0900, Itaru Kitayama wrote:
+> On Mon, Aug 10, 2026 at 09:50:34PM +0100, Wei-Lin Chang wrote:
+> > In order to avoid unmapping all shadow stage-2 mappings when KVM
+> > receives a MMU notifier unmap call, we have to keep track of the
+> > canonical IPA -> nested IPA relationship of the shadow mappings
+> > created. This essentially means tracking the guest's stage-2.
+> > 
+> > To do this, represent each mapping by struct kvm_guest_s2_mapping. It
+> > stores the mapping's canonical IPA range and the nested IPA range using
+> > two interval tree nodes. Both nodes will be inserted into their
+> > respective interval trees called guest_s2_mappings. The canonical IPA
+> > ranges will be stored in the tree within the canonical MMU, and the
+> > nested IPA ranges will be stored in the corresponding nested MMU's tree.
+> > 
+> > For example:
+> > 
+> > struct kvm_guest_s2_mapping mapping1, mapping2;
+> > 
+> >     ---------------------> mapping2.canonical
+> >     |                      mapping1.canonical
+> >     |                          ^   (both stored in canonical mmu's tree)
+> >     |                          |
+> > --*****-----------------------*****----------- CIPA
+> >    \\\\\                      |||||                  mapping1.nested_mmu
+> >     \\\\\                     \\\\\                            |
+> >      \\\\\                     \\\\\                           v
+> > ------\\\\\---------------------*****--------- NIPA #1 (nested mmu #1)
+> >        \\\\\                      |
+> >         \\\\\                     -> mapping1.nested
+> >          \\\\\                       (stored in nested mmu #1's tree)
+> >           \\\\\
+> > -----------*****------------------------------ NIPA #2 (nested mmu #2)
+> >              |                                                 ^
+> >              -> mapping2.nested                                |
+> >                 (stored in nested mmu #2's tree)   mapping2.nested_mmu
+> > 
+> > Using the trees we can look up nodes in either of the IPA spaces, and
+> > for each node, find the corresponding range in the other IPA space from
+> > the other node in the enclosing kvm_guest_s2_mapping.
+> > 
+> > Define kvm_guest_s2_mapping and the interval tree here. Guest stage-2
+> > mapping tracking will come in subsequent patches.
+> > 
+> > Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
+> > ---
 
-Note that similarly to what happens for the canonical S2 MMU, we need to
-manage the freeing of the page tables both in kvm_arch_flush_shadow_all
-(called on address space teardown) and VM teardown (as a result of
-closing the VM fd, amongst others), as there is no guaranteed ordering
-between these two events.
+[...]
 
-Fixes: 4f128f8e1aaac ("KVM: arm64: nv: Support multiple nested Stage-2 mmu structures")
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Cc: stable@vger.kernel.org
----
- arch/arm64/include/asm/kvm_nested.h |  1 +
- arch/arm64/kvm/arm.c                |  4 ++--
- arch/arm64/kvm/nested.c             | 32 ++++++++++++++++++++---------
- 3 files changed, 25 insertions(+), 12 deletions(-)
+> >  
+> > +/*
+> > + * Record of a guest stage-2 mapping, storing canonical and nested IPA
+> > + * ranges. Both ranges have the same size.
+> > + */
+> > +struct kvm_guest_s2_mapping {
+> > +	struct interval_tree_node canonical;
+> > +	struct interval_tree_node nested;
+> > +	struct kvm_s2_mmu *nested_mmu;
+> > +};
+> 
+> Is this to be used for normal (L1) guests? I guess this series is for
+> shadow stage 2 unmapping optimization, so not sure.
 
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 5b8edb2e8a87d..586026e859030 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -67,6 +67,7 @@ static inline u64 translate_ttbr0_el2_to_ttbr0_el1(u64 ttbr0)
- extern bool forward_smc_trap(struct kvm_vcpu *vcpu);
- extern bool forward_debug_exception(struct kvm_vcpu *vcpu);
- extern int kvm_init_nested(struct kvm *kvm);
-+extern void kvm_destroy_nested(struct kvm *kvm);
- extern int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu);
- extern void kvm_init_nested_s2_mmu(struct kvm_s2_mmu *mmu);
- extern struct kvm_s2_mmu *lookup_s2_mmu(struct kvm_vcpu *vcpu);
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 7607173c1a40c..2b069c6440669 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -269,7 +269,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- 
- err_uninit_mmu:
- 	kvm_uninit_stage2_mmu(kvm);
--	kvfree(kvm->arch.nested_mmus);
-+	kvm_destroy_nested(kvm);
- err_free_cpumask:
- 	free_cpumask_var(kvm->arch.supported_cpus);
- err_unshare_kvm:
-@@ -327,7 +327,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
- 
- 	kvm_unshare_hyp(kvm, kvm + 1);
- 
--	kvfree(kvm->arch.nested_mmus);
-+	kvm_destroy_nested(kvm);
- 	kvm_arm_teardown_hypercalls(kvm);
- }
- 
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 254cbd8703b3d..d0c05db554b1c 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -55,6 +55,27 @@ int kvm_init_nested(struct kvm *kvm)
- 	return kvm->arch.nested_mmus ? 0 : -ENOMEM;
- }
- 
-+static void kvm_uninit_shadow_stage2_mmu(struct kvm *kvm)
-+{
-+	for (int i = 0; i < kvm->arch.nested_mmus_size; i++) {
-+		struct kvm_s2_mmu *mmu = kvm->arch.nested_mmus[i];
-+
-+		if (!WARN_ON(atomic_read(&mmu->refcnt)))
-+			kvm_free_stage2_pgd(mmu);
-+	}
-+}
-+
-+void kvm_destroy_nested(struct kvm *kvm)
-+{
-+	kvm_uninit_shadow_stage2_mmu(kvm);
-+
-+	for (int i = 0; i < kvm->arch.nested_mmus_size; i+= S2_MMU_PER_VCPU)
-+		kvfree(kvm->arch.nested_mmus[i]);
-+
-+	kvm->arch.nested_mmus_size = 0;
-+	kvfree(kvm->arch.nested_mmus);
-+}
-+
- static int init_nested_s2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
- {
- 	/*
-@@ -1310,16 +1331,7 @@ void kvm_nested_s2_flush(struct kvm *kvm)
- 
- void kvm_arch_flush_shadow_all(struct kvm *kvm)
- {
--	for (int i = kvm->arch.nested_mmus_size - 1; i >= 0; i--) {
--		struct kvm_s2_mmu *mmu = kvm->arch.nested_mmus[i];
--
--		if (!WARN_ON(atomic_read(&mmu->refcnt)))
--			kvm_free_stage2_pgd(mmu);
--
--		if ((i % S2_MMU_PER_VCPU) == 0)
--			kvfree(mmu);
--	}
--	kvm->arch.nested_mmus_size = 0;
-+	kvm_uninit_shadow_stage2_mmu(kvm);
- 	kvm_uninit_stage2_mmu(kvm);
- }
- 
--- 
-2.47.3
+Sorry I don't totally understand your question. Yes this series is
+optimizing cases where a GPA (L1's PA) range have to be unmapped, from
+an MMU notifier unmap call.
 
+When we want to unmap a GPA range, the corresponding L2PAs must also be
+unmapped from the shadow page tables. Before this series there is no way
+of knowing what L2PAs are affected, so the code just calls
+kvm_nested_s2_unmap() to unmap all shadow mappings.
+
+Each struct kvm_guest_s2_mapping instance keeps one L1PA <-> L2PA
+mapping record. For example:
+
+canonical (L1PA space): [x, x+4K)  <- node stored in canonical MMU tree
+nested (L2PA space):    [y, y+4K)  <- node stored in nested MMU tree
+
+Does this make sense?
+
+Thanks,
+Wei-Lin Chang
+
+> 
+> Thanks,
+> Itaru.
+> 
+
+[...]
