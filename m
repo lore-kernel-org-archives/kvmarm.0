@@ -1,275 +1,298 @@
-Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011059.outbound.protection.outlook.com [52.101.70.59])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC57B3FAE15
-	for <kvmarm@lists.linux.dev>; Fri, 14 Aug 2026 07:18:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786691936; cv=none; b=WDSlZsTLJr7u+6sfsGUIjpxyolHavBsnmDFIFXdYEg7v3r9nYQbl5qO8NV9d5hWW/c+Bi5TKSQkgAICgl8tIUGDvAzNOjWk9tN86s4+Zi26hA5oDb3IcUiiIvqX18TESFdFw0ahY4vTb+CgFU7Nh0O32r2alK2l827Aq1e1z15c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786691936; c=relaxed/simple;
-	bh=Eal3GKmsTZQwTSbaSyUrWFatjQqx0a8H4ryZTBQ5cmc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fTE+feVNdBLWgV6s+R8dKlxRN14WAshQX2L4PnZyOKApr6+jHodAebwApBlJ2ZxG9zbyosKPAVYJcj4lRIZEIGKW6LX9hZXF8Yj2j6kZA2g4V2p1OxAq3PtBlrmnb3iuJVfVlsG/WsQzDCn8Tns6gj13KILID+x2pCFXRRXqo/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=vtTe/A8t; arc=none smtp.client-ip=115.124.30.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6402D414A09
+	for <kvmarm@lists.linux.dev>; Fri, 14 Aug 2026 07:52:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.59
+ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1786693928; cv=fail; b=t9GNZBET/fmfJirwVllu2vICkOgRT2sNRdReXQhyN6HsXGsStsCCz0m4GmieQamsnojBeR5O0i2u7y6R3mZeHAoRa5r1EX9p1hwqYibkc11cqixtFGlUP4U/Zn4JChi1g5my8aafUZSeCdvv9WMChIZ2I/ee5GyLFwART9owDhU=
+ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1786693928; c=relaxed/simple;
+	bh=NVa/SVvl5irZFvik7wikMN7GWFdZ7khC2PMFJfBcEwA=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Z//eb2R9uqjiRx8MSaoTdGR48mSnMeuLQvXjDfGYnQV20yPCsUT9JJWqjVfNnmDtnXnhcuL4q1eOgd5VAWTDi5vbxMR2ovvT/LwCfV9ax9fzQ64Yv8/JnWnwTbJlWjlXiiiE3tpVZdgNz7c/B5BiD2fb8OECvCDy7UsDQrWtVE8=
+ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=mIM577VK; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=mIM577VK; arc=fail smtp.client-ip=52.101.70.59
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="vtTe/A8t"
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1786691924; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=c6S5VaAkAZXn4sFLjHeqvaxpJlJzr1GA23OPYsB5cBI=;
-	b=vtTe/A8tgMMPwSULSa28g9UPDaZYWEbI9gYRtWR1nWklcmlYaw8yAdclRmI8na+7aPc5Nox/BAGiSh21A15CCAlYqtBQLJdMVHzomUhEbeWF1F4svlyyBa+c2GOkkdr0bADtQ/E/9cxc64zQEgcn074EevvNhSr9Abzz+D1i0DM=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R581e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033032089153;MF=yaoyuan@linux.alibaba.com;NM=1;PH=DS;RN=18;SR=0;TI=SMTPD_---0X8wZbHN_1786691923;
-Received: from localhost(mailfrom:yaoyuan@linux.alibaba.com fp:SMTPD_---0X8wZbHN_1786691923 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Fri, 14 Aug 2026 15:18:43 +0800
-Date: Fri, 14 Aug 2026 15:18:42 +0800
-From: Yao Yuan <yaoyuan@linux.alibaba.com>
-To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Cc: Wei-Lin Chang <weilin.chang@arm.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oupton@kernel.org>, Fuad Tabba <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Jintack Lim <jintack.lim@linaro.org>, 
-	Christoffer Dall <christoffer.dall@linaro.org>, Christoffer Dall <christoffer.dall@arm.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org
-Subject: Re: [PATCH 1/2] KVM: arm64: Fix spurious warning for benign stage 2
- teardown race
-Message-ID: <v3vgnteumpaxbgqjtfwoilcbwpwohfci3uwu4ooykls6zjwjwe@rukbigno2m5o>
-References: <20260812-kvm-arm-nested-virt-fix-v1-0-4ad883f1b6a5@kernel.org>
- <20260812-kvm-arm-nested-virt-fix-v1-1-4ad883f1b6a5@kernel.org>
- <qfhlmmidzdmmsfopfhxpddgwa7nob45jwgb6sabskawaxtox7i@mnxplk3zn34k>
- <an3gqCJ1fzloWB_N@lucifer>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="mIM577VK";
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="mIM577VK"
+ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
+ b=GnufWaKrT4VPKpwDH0G50E1Ga6ZupsVtWDodpWA/t6c/9W7j/6D2EXOfpgiT6qwE+OQ3uA0GQLopAEjpVDSVuu+fo0Bj0AWmknHv3DdlYkNA7gU36hdyQkubzwAO0x6+dfTOyYMFuoJDfEOuO3qDH/LacKXAbrNgKPJ3VYBJKJj7QAJlJIQgIn46omkrd50CdJ7T2egVigySMcYFEnUgHMRnXcBWxjBbO0+X1viAchHiOwz8wqCZZWb22sRAIko0YW+qjlC0SVHR61Z1cFC+ZLqXSiwd3BuEI9HwGqFQNvvuXSLriiJ2wCl+KkX7JTKYx3bwLj+SjknK498OnxyohQ==
+ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xK3QEnlDnwiY+1vhfWnEp9bgn1Cw9lsCgP83UuEM0s4=;
+ b=Y/c3NLfQfbGKzH2rIrhyn096I0/xjxGvUZPWLOauTk/G6YUjEl10kdPTfMWSwCIqKnCL3dUIW/A4TJRT5XXKiz2h/8lv0Adzhp9DecAiY+43jUlyykkbzGt0FSvPw1gZYZ3V637CqLoEFxLaYvYFI2dyXSb/qXS7wvQFzBZIszUVndNlapXowDVYp7KIceysswtN6J462+0dlwJotw6Z18XobGEFR//bhpub9QImHl9wCbufCOf15LYW8okSGWFTEXU4BOcvoIIYvaFVkFEpEec6W2PsNe7iCUvnEJ2uZ4Ew2+MUVk9m+bcobjOgsUNP1m3EG/hvmCSgMH9WfYgj/w==
+ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
+ 4.158.2.129) smtp.rcpttodomain=google.com smtp.mailfrom=arm.com; dmarc=pass
+ (p=none sp=none pct=100) action=none header.from=arm.com; dkim=pass
+ (signature was verified) header.d=arm.com; arc=pass (0 oda=1 ltdi=1
+ spf=[1,1,smtp.mailfrom=arm.com] dkim=[1,1,header.d=arm.com]
+ dmarc=[1,1,header.from=arm.com])
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xK3QEnlDnwiY+1vhfWnEp9bgn1Cw9lsCgP83UuEM0s4=;
+ b=mIM577VKllZEjrraI8EBlIaO2CGS+YKrWeiH1/B7VFanuYxD2IZKcMyMGGpTrwQBJEDe8ULhLI+7BrJHpICiSJuiRP3RR+56Qr06ks+TweMz4igCJX6EUkC2GMCR+jE//Wv0nxyS5AhY3z7ULnA+TPqK1W9Ymn4cEurTusM7VO4=
+Received: from AM0PR02CA0192.eurprd02.prod.outlook.com (2603:10a6:20b:28e::29)
+ by PA4PR08MB7668.eurprd08.prod.outlook.com (2603:10a6:102:265::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.315.15; Fri, 14 Aug
+ 2026 07:51:54 +0000
+Received: from AM3PEPF0000A791.eurprd04.prod.outlook.com
+ (2603:10a6:20b:28e:cafe::9f) by AM0PR02CA0192.outlook.office365.com
+ (2603:10a6:20b:28e::29) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.315.15 via Frontend Transport; Fri,
+ 14 Aug 2026 07:51:53 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
+ smtp.mailfrom=arm.com; dkim=pass (signature was verified)
+ header.d=arm.com;dmarc=pass action=none header.from=arm.com;
+Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
+ 4.158.2.129 as permitted sender) receiver=protection.outlook.com;
+ client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
+Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
+ AM3PEPF0000A791.mail.protection.outlook.com (10.167.16.120) with Microsoft
+ SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.21.339.3
+ via Frontend Transport; Fri, 14 Aug 2026 07:51:53 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=AsoJuIBRtH66TXBciJfNOOCv5O3fV51HYLs7JSO4R03sXYfrXY+pdD/KeChh3sBowZkj7Ng8xwUq02KegUNg/Mj0y3dSji0jDPmKG8soIInEPQqMOl1i5/hNB8SREh/IF3RnJpTxm0XseJn2qqBIoMLNmg2/7fmnHxDxCib11IBevxwVFplGsKnVoo5QE8JcUONKhe7xnCyX01JMhagm5Ju0bwdjJE3L913KeQ2cJAWEIM/bKUGvDYCuhMMAOiqifZ9BbYZS+trQ+oMjg5f+pd4IAokqjqTDxn21AAbI0/jEivlaRTl57v5+K18U4vOgtBSqH9e/72VTI8fnjzdQqA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xK3QEnlDnwiY+1vhfWnEp9bgn1Cw9lsCgP83UuEM0s4=;
+ b=uTph3P4R3NomTw58H+JyAVLnOM3taHEEG+KBy5YyNrcKYtKXAMFqGeioXmZmCBsT/kW6P0CxZf5trCvUx29rElWtsk91FEbTduNsFQmtQLNb3MFpSeUSFKkqAZqDxRAfYsv83TmgXmfz7ovkNdHOSKiKP6O5+CJMEGe8CdGdPwcDEWj3knY5DEeH2V/8Um4Eu87fMgGwhDzsr52Ktj7AqiC/+2Fl8DK2naTjhOW3LmwrhKlGTjUBLBIlZcxmO5kH0JGAFr3bXnNC8IuD9L9+bdV3pf8//vBpw3P2phBl42aY7OOdQO9F+3SrL7XY3O7a60Tw+CYXFzML0QiyLu0Oig==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
+ header.d=arm.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xK3QEnlDnwiY+1vhfWnEp9bgn1Cw9lsCgP83UuEM0s4=;
+ b=mIM577VKllZEjrraI8EBlIaO2CGS+YKrWeiH1/B7VFanuYxD2IZKcMyMGGpTrwQBJEDe8ULhLI+7BrJHpICiSJuiRP3RR+56Qr06ks+TweMz4igCJX6EUkC2GMCR+jE//Wv0nxyS5AhY3z7ULnA+TPqK1W9Ymn4cEurTusM7VO4=
+Authentication-Results-Original: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=arm.com;
+Received: from AS8PR08MB9597.eurprd08.prod.outlook.com (2603:10a6:20b:61b::18)
+ by DB5PR08MB10046.eurprd08.prod.outlook.com (2603:10a6:10:48f::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.315.11; Fri, 14 Aug
+ 2026 07:51:20 +0000
+Received: from AS8PR08MB9597.eurprd08.prod.outlook.com
+ ([fe80::e11:42b9:2ed1:ef5f]) by AS8PR08MB9597.eurprd08.prod.outlook.com
+ ([fe80::e11:42b9:2ed1:ef5f%4]) with mapi id 15.21.0315.014; Fri, 14 Aug 2026
+ 07:51:19 +0000
+Message-ID: <487aa57c-72ad-453b-971d-ca24a8380429@arm.com>
+Date: Fri, 14 Aug 2026 09:51:17 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 0/3] KVM: Dirty page logging for guest_memfd-only
+ memslots
+To: Sean Christopherson <seanjc@google.com>
+Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
+ Mark Rutland <mark.rutland@arm.com>, pbonzini@redhat.com,
+ kvm@vger.kernel.org, maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com,
+ seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ fuad.tabba@linux.dev
+References: <20260702142912.6395-1-alexandru.elisei@arm.com>
+ <akxOrMnlNga-vtQv@google.com> <ak0wSQ1133O7B96D@raptor>
+ <ak0ziUcCXUlDdcla@google.com> <ak-EKSslAz1uqEtv@J2N7QTR9R3>
+ <ak_wC4Q-mQe14DI8@google.com> <alDI1b8fC99SG4_a@J2N7QTR9R3>
+ <a127176a-1722-460c-aa84-754e1d343f53@arm.com> <an3sEiQlIuGEjUur@raptor>
+ <b6080c23-a2a8-4bc5-b3bd-982bd766c648@arm.com> <an5UJ4S_P1LUFmzD@google.com>
+From: David Hildenbrand <david.hildenbrand@arm.com>
+Content-Language: en-US
+Autocrypt: addr=david.hildenbrand@arm.com; keydata=
+ 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 fa0=
+In-Reply-To: <an5UJ4S_P1LUFmzD@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: LO4P123CA0450.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:1a9::23) To AS8PR08MB9597.eurprd08.prod.outlook.com
+ (2603:10a6:20b:61b::18)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <an3gqCJ1fzloWB_N@lucifer>
+X-MS-TrafficTypeDiagnostic:
+	AS8PR08MB9597:EE_|DB5PR08MB10046:EE_|AM3PEPF0000A791:EE_|PA4PR08MB7668:EE_
+X-MS-Office365-Filtering-Correlation-Id: e079ea3e-5896-4f78-4cdb-08def9d8e848
+x-checkrecipientrouted: true
+NoDisclaimer: true
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam-Untrusted:
+ BCL:0;ARA:13230040|366016|1800799024|376014|7416014|23010399003|22082099003|18002099003|56012099006|10067099003|5023799004|11063799006|4143699003;
+X-Microsoft-Antispam-Message-Info-Original:
+ MPIi1ubVNyVPMi4WhFrT/4qLljucmXtOLQLarEqtj4LolEad7lFnpPrl4Aotp6KxYRZ3xS/Adrfd+vOxz+v4Dw9iKLbmiXtzqCbRRUQXGQ1diiYQHesVAs8xjBvA0EKZHvXRk3jfmhvw2G2smfwU+pOuBGHGcGSrtfCiM00mj7q1xIPNIsYSdp6moWU5oVTnQI9UB+TlGoUh7DLRrKzfmMPsOf0g5/TXnC0t9x8BtklG5cbo0ySJCozHo42E2FP/Q4C+kS/3QQ9A6w/MYkfl7z5ilBPrduNsHG4E/fupVmMICjCdCy80kR988byzOZuXAAigmap4lA5ay+GnfGTZclsSeLx8gnMrevtOYDYrI/rm3KrPH8kEWfM+e6rkPdpe2b8vnwTHmEHYIYuclY9vEyX2vSmjQbA7ZejFLe+K3OVmDbyVtEzsn1zq8dDkLvwX6xQ/xjW0QECLd+hyhKvG8XDu4iEyuTrVyt4/ZHU6OkFFd0Mf1LtMGhxRAPkAkHmPv8NRWg/sBZcm/MA3QcLNndcWn8vS2wRE/nMr55Pn8kszC3a90iyVCrhWSUnTFM7aOHwTbc4tljxs0uS4AmrpAQ6MQD/UTBAQ357DhUIgHTW2H1mWdEWEVhs9XINA/Xue+JgSBO75WffhPm7C5tJ7bEVMF7IfwcYBwGFkHKgN854=
+X-Forefront-Antispam-Report-Untrusted:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR08MB9597.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(23010399003)(22082099003)(18002099003)(56012099006)(10067099003)(5023799004)(11063799006)(4143699003);DIR:OUT;SFP:1101;
+X-Exchange-RoutingPolicyChecked:
+ S36bHT0W8b0dgPgVgLbIS7w0yhBUaRgh58VA+5dGXcGF3mD5DPIXapFnecahWnrSdzwFxYhefpnXQDVoghDiY1nJWmKT4SIAz3L6YOYbIvCihTgyWYwLZ1VFeJ3ytG39gxbjK0Xq4E3mJ+66mAQiDC595MPcENFfIUszBus+/4HYjYhC2/xkIZIgAyoNBl/ueEb/HVoEzgxhxb4JiRgU9ngt6ylzH9NLaKybOym3PNz39jpkwouNhGLhsS6Pr+LBTs7I33Lzo6F4FZWjosR1TZsWzBwaAY6p7A4NcwDx5XHRzTgqSWOFQhOjlR1VL6p/YXfkJ3lkuNBvZcUS49vvvg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB5PR08MB10046
+X-EOPAttributedMessage: 0
+X-MS-Exchange-Transport-CrossTenantHeadersStripped:
+ AM3PEPF0000A791.eurprd04.prod.outlook.com
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id-Prvs:
+	1e906365-70e9-4a58-b503-08def9d8d3cc
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|30052699003|7416014|376014|36860700016|23010399003|14060799003|35042699022|82310400026|56012099006|10067099003|4143699003|11063799006|22082099003|18002099003|5023799004;
+X-Microsoft-Antispam-Message-Info:
+	+Bl02aYqEccxSXv8ZNhjg8NLLJroo8XYQRT8HfNIDMBHEbz7W2uUqUv6hONAH/IQcxc6wskZYIqlxkiu9/uhObBCAoA1dOYah8kik8elqwq9ccfrVFggRyjHHVPfPtpfaFyQ0uWAVzDK0QaQOokLfWOemtjzl28KiQirYJH/UgtOYpAt1B6Uv53zqfAF5vBiH61TH66OH7YNhsdljhLkcf25+x3ssQPSltLiWbJcsJzEM82wGHcG4GUXg2QpueQMuuWCmw3cCAvKWth1arzpEjRLfOSLoS4QVmNcZ3D3eBA/SX6VoqpHCRRF85qw+ajWVO46eejLWg3VXFlY8eh4PWuHLkNHzwsIIxJUxnFGmCOzvhWG5fRp+EP+7gSbq4ra4MAOaP1mGB4IIqxA6sEb3fcHh6b99NPUHhXHSjnlkWkuXYgSm71qhbVXBiU9kYlQBAurZiinte9eqZ0m5T12d9s91o5iVKJIhn7xTGWhKFe6CakGwP1faduhFxhxpqrQ6Zlrm4SP1tDFlX9DjXMmKZ2xxjFeNErCXPWArEHTC8mY1YWtomAgw5TZ0Noj2JO5vromF1dH5gY3KnODQL6ZSTDrGMOblD/H33PS3EKJE7/6UDZehCcSSJ9ECQ8t+ukShHn2yLcWDk6JNuzsvOVExFBJaKUwhVfANP/CqjWztw/0yDhK6tUL3dkiq+wjB8E243pUBtjAbDuh7Gvr/xf6rA==
+X-Forefront-Antispam-Report:
+	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(30052699003)(7416014)(376014)(36860700016)(23010399003)(14060799003)(35042699022)(82310400026)(56012099006)(10067099003)(4143699003)(11063799006)(22082099003)(18002099003)(5023799004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	y5voQb2wXAmb025eqAK1tC8Jg15oNuOJ8LcB6mUV66tqP7YNjcZBTjT742oSJeX7ozABKgbRGgmNNyEFqXgE1Cay59QTbC1xqQDfdzmZnwjpt109yDgNd71t9+T60/1nU/reqO/PETyTfEo+Vlhf8UjokpIAB51+Ug8N4sp9ubB5BHZ4jUBgWysI8w1rxmY7LqrdRIUlTg0ddANq8KDLuKqgF3fs4IFIQIiL9OkrmexbZtaJDuBDF3Tysufrf72pgl5xeX0NEB1a5is1D4H++WCEF+vCiJM9AAM7BcF6WiCPGeD7LnaVyFGRwCIqeiu3Mg5ZDo/2noNCmeMwmah1vwSmnFOOwMXgyZDL+NdHE0j9hS4IgRjwhRrDZcwny9H/h66AyANRLRrbJZl5DBSnbMsTeZcs4b0Du1cOYBSvCwGX9AxdgFzme3AzrrzWWqkk
+X-OriginatorOrg: arm.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Aug 2026 07:51:53.7489
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: e079ea3e-5896-4f78-4cdb-08def9d8e848
+X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	AM3PEPF0000A791.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4PR08MB7668
 
-On Thu, Aug 13, 2026 at 04:24:49PM +0800, Lorenzo Stoakes (ARM) wrote:
-> On Thu, Aug 13, 2026 at 12:20:43AM +0100, Wei-Lin Chang wrote:
-> > Hi Lorenzo,
-> >
-> > Thanks for the detailed analysis!
->
-> You're welcome :)
->
-> >
-> > I can follow what's happening from the report, but one thing I don't
-> > get:
-> >
-> > On Wed, Aug 12, 2026 at 02:31:20PM +0100, Lorenzo Stoakes (ARM) wrote:
-> > > A batch of kernel warnings were triggered in the L0 host kernel when using
-> > > kvmtool to experiment with nested virtualisation.
-> > >
-> > > The issue was observed on an M2 macbook pro with 24 GiB of RAM running
-> > > asahi linux 7.1.6-400.asahi.fc44.aarch64+16k with 16 KiB page size.
-> > >
-> > > The bug is confirmed to exist in mainline and does not appear to be
-> > > impacted by any downstream patches carried by asahi.
-> > >
-> > > kvmtool was used to establish an L1 guest with 8 CPUs and 8 GiB of RAM.
-> > >
-> > > kvmtool was then run again within the L1 guest to establish an L2 guest
-> > > with 4 CPUs and 4 GiB of RAM.
-> > >
-> > > Then it was run again to establish another inner guest with 2 CPUs and 2
-> > > GiB of RAM at L3.
-> > >
-> > > Both the L2 and L3 guests were then exited and another L2 guest was
-> > > established with the same characteristics.
-> > >
-> > > Sufficient memory pressure was present in the L0 host to trigger indirect
-> > > reclaim, waking kcompactd up and triggering migration.
-> > >
-> > > Shortly afterwards the L2 guest was stopped, at which point three warnings
-> > > were observed in the L0 host in quick succession with the second and the
-> > > third occurring 114us and 189us after the first, respectively.
-> > >
-> > > In each case the call trace was the same:
-> > >
-> > > WARNING: arch/arm64/kvm/mmu.c:336 at __unmap_stage2_range+0x64/0x80,
-> > > CPU#5: kcompactd0/66
-> > > ...
-> > > __unmap_stage2_range (arch/arm64/kvm/mmu.c:335 (discriminator 3)) (P)
-> > > kvm_stage2_unmap_range (arch/arm64/kvm/mmu.c:346)
-> > > kvm_nested_s2_unmap (arch/arm64/kvm/nested.c:1168 (discriminator 14))
-> > > kvm_unmap_gfn_range (arch/arm64/kvm/mmu.c:2416)
-> > > kvm_mmu_notifier_invalidate_range_start (arch/arm64/kvm/../../../virt/kvm/kvm_main.c:718 ...)
-> > > mn_hlist_invalidate_range_start (mm/mmu_notifier.c:525)
-> > > __mmu_notifier_invalidate_range_start (mm/mmu_notifier.c:580)
-> > > try_to_migrate_one (./include/linux/mmu_notifier.h:478 ./include/linux/mmu_notifier.h:471 mm/rmap.c:2459)
-> > > rmap_walk_anon (mm/rmap.c:3001)
-> > > rmap_walk (mm/rmap.c:3106 mm/rmap.c:3101)
-> > > try_to_migrate (mm/rmap.c:2774)
-> > > migrate_folio_unmap (mm/migrate.c:1330 (discriminator 3))
-> > > migrate_pages_batch (mm/migrate.c:1909)
-> > > migrate_pages_sync (mm/migrate.c:2026)
-> > > migrate_pages (mm/migrate.c:2135)
-> > > compact_zone (mm/compaction.c:2663)
-> > > compact_node (mm/compaction.c:2932)
-> > > kcompactd (mm/compaction.c:3230)
-> > > kthread (kernel/kthread.c:436)
-> > > ret_from_fork (arch/arm64/kernel/entry.S:858)
-> > >
-> > > Analysing this:
-> > >
-> > > try_to_migrate() performs the first part of migration on a folio -
-> > > establishing migration entries in all page tables mapping it - calling
-> > > try_to_migrate_one() for each VMA the folio is mapped in.
-> > >
-> > > Immediately prior to installing the migration entry, try_to_migrate_one()
-> > > calls mmu_notifier_invalidate_range_start() to signal to notifiers that the
-> > > existing page table entry is about to be unmapped.
-> > >
-> > > Since this range happened to contain folios used by the virtual machine
-> > > (given its memory consumption this was highly likely to be a target) this
-> > > in turn triggers arm64 kvm code via an MMU notifier:
-> > >
-> > > mmu_notifier_invalidate_range_start()
-> > >   -> ... -> kvm_mmu_notifier_invalidate_range_start()
-> > >     -> kvm_mmu_unmap_gfn_range()
-> > >       -> kvm_unmap_gfn_range()
-> > >         -> kvm_nested_s2_unmap()
-> > >           -> kvm_stage2_unmap_range()
-> > >             -> __unmap_stage2_range()
-> > >                -> stage2_apply_range()
-> > >        	       <- -EINVAL, triggering a WARN_ON()
-> > >
-> > > Since commit ec14c272408a ("KVM: arm64: nv: Unmap/flush shadow stage 2 page
-> > > tables") kvm_unmap_gfn_range() invokes kvm_nested_s2_unmap() which takes
-> > > the rather drastic step of evicting the entirety of the stage 2 shadow page
-> > > tables for each nested guest:
-> > >
-> > > 	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
-> > > 		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
-> > >
-> > > 		if (kvm_s2_mmu_valid(mmu))
-> > > 			kvm_stage2_unmap_range(mmu, 0, kvm_phys_size(mmu), may_block);
-> > > 	}
-> > >
-> > > This will iterate through every valid MMU.
-> > >
-> > > mmu_notifier_invalidate_range_start() sets the MMU_NOTIFIER_RANGE_BLOCKABLE
-> > > flag when signalling notifiers, so may_block is true here.
-> > >
-> > > __unmap_stage2_range() wraps invocation of stage2_apply_range() in a
-> > > WARN_ON():
-> > >
-> > > 	WARN_ON(stage2_apply_range(mmu, start, end, KVM_PGT_FN(kvm_pgtable_stage2_unmap),
-> > > 				   may_block));
-> > >
-> > > Which is precisely the triggered warning and means stage2_apply_range() is
-> > > returning an error.
-> > >
-> > > In arm64 return values are stored in the x0 register and in each splat w0
-> > > (since it's a 32-bit value) is 0xffffffea which, by two's complement, is
-> > > -0b00010110 or -EINVAL.
-> > >
-> > > The only way in which stage2_apply_range() can return an error is if either
-> > > the passed in walk function (kvm_pgtable_stage2_unmap()) returns an error
-> > > or mmu->pgt is NULL:
-> > >
-> > > 	static int stage2_apply_range(...)
-> > > 	{
-> > > 		do {
-> > > 			struct kvm_pgtable *pgt = mmu->pgt;
-> > > 			if (!pgt)
-> > > 				return -EINVAL;
-> > >
-> > > 			next = stage2_range_addr_end(addr, end);
-> > > 			ret = fn(pgt, addr, next - addr);
-> > > 			if (ret)
-> > > 				break;
-> > > 			if (resched && next != end)
-> > > 				cond_resched_rwlock_write(&kvm->mmu_lock);
-> > > 		} while (addr = next, addr != end);
-> > >
-> > > 		return ret;
-> > > 	}
-> > >
-> > > This loop is batched by stage2_range_addr_end() at the granularity of
-> > > kvm_granule_size(KVM_PGTABLE_MIN_BLOCK_LEVEL), which for a 16 KiB page size
-> > > kernel is 32 MiB.
-> > >
-> > > kvm_pgtable_stage2_unmap() only returns an error if
-> > > kvm_pgtable_walk_begin() or _kvm_pgtable_walk() return an error. On arm64
-> > > the former doesn't ever do so, and the latter only returns -EINVAL if
-> > > either pgd is NULL (we gate that already) or an invalid pgt->start_level is
-> > > specified (not the case).
-> > >
-> > > So the cause of the warning is that mmu->pgt is NULL here.
-> > >
-> > > This field is protected by kvm->mmu_lock, but after each invocation of the
-> > > walk function, if the end of the range has not yet been reached, the lock
-> > > is dropped.
-> > >
-> > > This is done by calling cond_resched_rwlock_write() which drops
-> > > kvm->mmu_lock when yielding the time slice before reacquiring it upon being
-> > > scheduled again:
-> > >
-> > > 		if (resched && next != end)
-> > > 			cond_resched_rwlock_write(&kvm->mmu_lock);
-> > >
-> > > Note that resched = may_block here and is always true for these walks.
-> > >
-> > > This points to something else racing this code to clearing the pgt, and
-> > > brings us back to the observation above that the issue occurs when tearing
-> > > down the L2 guest.
-> > >
-> > > Upon L0's userspace mm_struct teardown, stage 2 mappings for IPAs mapped by
->
-> s/L0/L2/
->
-> > > the guest are unmapped via mmu notifier:
-> > >
-> > > exit_mm()
-> > >   -> mmput()
-> > >     -> __mmput()
-> > >       -> exit_mmap()
-> > >         -> mmu_notifier_release()
-> > > 	  -> ... -> kvm_mmu_notifier_release()
-> > >             -> kvm_flush_shadow_all()
-> > >               -> kvm_arch_flush_shadow_all()
-> > > 	        -> kvm_free_stage2_pgd()
-> > > 		  -> [ acquire kvm->mmu_lock for write ]
-> > > 		  -> mmu->pgt = NULL [ among other tasks ]
-> > > 		  -> [ release kvm->mmu_lock for write ]
-> >
-> > You mentioned stopping the L2 VM only, which means L1 is still running.
-> > Why would the L0 userspace mm_struct get torn down if L1 is still live?
-> > What did I miss?
->
-> Ah yeah this is a mistake sorry :) It should say L2 teardown.
->
-> The stuff relevant to L0 is the MMU notifier bit.
+On 8/14/26 01:32, Sean Christopherson wrote:
+> On Thu, Aug 13, 2026, David Hildenbrand wrote:
+>> On 8/13/26 18:09, Alexandru Elisei wrote:
+>>>
+>>> There's already a proposal for how to do this in the migratable guest_memfd
+>>> series [1] - it's a new guest_memfd creation flag that disables migration.
+>>
+>> In the guest_memfd call I was arguing against the flag in the first version, and
+>> instead adding it when actually required.
+> 
+> Ya, right now a flag is meaningless.  Telling guest_memfd not to do something it
+> doesn't ever do...
 
-Hi Lorenzo,
+Right.
 
-Still have question w/ your above addtional information:
+>>>
+>>> I'm a slightly concerned though that all of this will work by chance, and
+>>> not by design, and in the future the behaviour might change to allow
+>>> guest_memfd memory to be unmapped from stage 2 without the VMM or KVM
+>>> explicitly allowing it or initiating it.
+> 
+> Meh, TDX on x86 already has the same requirement.  Unmapping a page from the S-EPT
+> kills the VM unless the VM was expecting the page to be lost. 
 
-The trace is observed on L0, means the exit_mm() path should
-also happens on L0 to race w/ the
-mmu_notifier_invalidate_range_start() path, but how this is
-triggred by L2 teardown, IIUC the L2 teardown triggers the
-exit_mm() path on L1, not on L0. The L1 is still alive thus
-the qemu/kvmtool process on L0 which hold all L1/L2/L3 is
-still alive yet. Please correct me if anything I missed
-here.
+Right.
 
->
-> >
-> > Thanks,
-> > Wei-Lin Chang
-> >
-> > [...]
->
-> --
-> Cheers, Lorenzo
+> 
+>> Thus my idea of the explicit contract between KVM and guest_memfd. Instead of
+>> being a "this doesn't support migration" it would be a "S2 always mapped"
+>> kind-of contract.
+> 
+> Who would that contract be between though?  KVM can tell a guest_memfd instance
+> that page migration is/isn't supported, but telling guest_memfd that the VM will
+> always keep the entirety of the guest_memfd mapped in stage-2 is nonsensical.
+> guest_memfd simply doesn't care if the page is mapped or not, it only cares if
+> migration is supported.
+
+I think there are more details to this. Let me try to express what my mind was
+up to last night.
+
+We have a hardware feature that requires pages to always be mapped into S2. Some
+things I had in mind:
+
+1) Page migration would not be a problem as long as hardware could be paused
+   while migrating (e.g., kick all vCPUs). I doubt someone would implement that
+   right now,  but you could consider it an implementation detail that page
+   migration cannot be supported right now.
+
+2) Newer hardware could mitigate this problem, allowing the feature to support
+   pages temporarily being unmapped from S2.
+
+3) Disallowing page migration is really just one implication of "pages must
+   always be mapped into S2".
+
+So what we really want is "if feature X is enabled and hardware requires it,
+always keep pages mapped into S2, which currently implies that page migration
+cannot be supported."
+
+Which isn't all that different to "if a confidential VM is run on current TDX
+hardware, always keep pages mapped into S2, which currently implies that page
+migration cannot be supported."
+
+So I was wondering whether the flow could be:
+
+User space enabled CPU feature for VM -> KVM knows that current hardware
+requires for that CPU feature to have S2 always mapped -> KVM tells guest_memfd
+that S2 must be always mapped / disables page migration.
+
+That would be in contrast to user space having to guess that page migration on
+the current hardware with the current guest_memfd implementation does not
+support page migration, to then disable exactly that.
+
+Does that explanation makes sense? I don't know the exact mechanism to do that,
+but that's just my high-level thinking.
+
+> 
+>>> My understanding from the conversation so far is that the plan for the
+>>> future of guest_memfd is to support an option/mode where the memory is
+>>> effectively "pinned" at stage 2 (but which allows userspace to explicitly
+>>> free/unmap it, of course). Is that correct, or am I being overly optimistic
+>>> in my interpretation?
+>>
+>> We could then even disallow fallocate() to punch holes if that contract is
+>> negotiated.
+> 
+> Why?  If userspace pulls a stupid and kills its guest, that's userspace's problem.
+
+It was late, agreed. Unplugging memory would just work, so that's not a concern.
+It's a userspace's problem.
+
+> 
+> KVM would also have to block memslot changes, and probably other things in the
+> future that would unmap stage-2 in response to userspace syscalls/ioctls.
+
+
+-- 
+Cheers,
+
+David
