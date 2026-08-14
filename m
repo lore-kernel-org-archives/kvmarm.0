@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CA393955D3
-	for <kvmarm@lists.linux.dev>; Fri, 14 Aug 2026 22:25:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44C5D3955D3
+	for <kvmarm@lists.linux.dev>; Fri, 14 Aug 2026 22:25:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786746333; cv=none; b=UM2AbBzWCaN8GYvlmA+J9cuLCanh9ws/La+c11oulpxHA6M5CfgC4s17VH23q9wAnAUcW+K9VUwGW5aqnAsbcQwzfhC3jb8QzHDgNjvx2Nvjc/a0grdUKOe+xcrwpUyql4SNxYPweG0ObI6lNHz7BM+YmOonVI+ypz1vG5fSeOw=
+	t=1786746338; cv=none; b=kLptygLmHJkPYMVKp6gM3OKdUGM73V9oPJcj53UGg7iXwB2lnHjZMIXe+5N4vJXCMWbsHNZ5lxzsr4k0P/VSw3d+jg/gEhG7TFF6Y/uL7vVyYq3I2UMYcWV8BZlzakTT9l12tzkG4Stj8Sc4ThAT0yN1jqSQi16FM+ijo7i8q/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786746333; c=relaxed/simple;
-	bh=W5P8QTaXkp+Wayx8mSPrX6v9guhFOjhs2fEdIvE2d+I=;
+	s=arc-20240116; t=1786746338; c=relaxed/simple;
+	bh=cp6X2PC6hanfxlcfE8eqlqn45EQleE/ymqq4QgCE/js=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=I2CVMVYa7wPumknSSHSI0aZhtb6GkKyln+oHWC2ho3oCja6eSWwCykaOnpFgsVFOskY1sIvtajxPIx//kKCf7m6Ocier4L68v+YEMYghTFT/pXIWzQoGZVmPdV4VL3L0C2rD7XX5SWvQzqgR/yRTV4uUFT63luO1B4d8t3Kc/Qk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=P875o408; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=gSZ7ciC3qFGX+8z/EEmMyJIjNzzo05UX2TFrHFWhnNVN+H0HbRe+nkdbSgysZjBq7L5RaWgT7spdaxP45lWCLeWF3jDojA4i/8iIO1vAhzNfW4BfHZ+SObIUIQ+mVRVO8Iz5PLKw6IASrKaRlRbT6zvr2pPfO+x9xWXa9x1JJr0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=DswiL5Bb; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="P875o408"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="DswiL5Bb"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DAC6B1CDD;
-	Fri, 14 Aug 2026 15:25:24 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 947F71BCA;
+	Fri, 14 Aug 2026 15:25:28 -0700 (PDT)
 Received: from workstation-e142269.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 93FB83F632;
-	Fri, 14 Aug 2026 15:25:25 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 27B533F632;
+	Fri, 14 Aug 2026 15:25:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1786746328; bh=W5P8QTaXkp+Wayx8mSPrX6v9guhFOjhs2fEdIvE2d+I=;
+	t=1786746332; bh=cp6X2PC6hanfxlcfE8eqlqn45EQleE/ymqq4QgCE/js=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=P875o408mULJ47Elq+B1BKlLtQSMKs0kL/5VA2/wPLn+jp5uHbbdiUQJA1T3Ko90A
-	 t8UttLJy2+zW+9H8GIUZdEB2BXXm3ytXaXMZ7PfEUryUDv4BD7t6HlVToJ0P+GUjGZ
-	 aWEjVrr9leBaf+80MjWemSkbyIGa8ZOJK8rSFGQM=
+	b=DswiL5BbdZ11TQuaCVj/2Ttu/yRoBmOzYsrGG+J87q8kO1QG0k4D1gECni9Fk5gnp
+	 E6aMO2f2parjbXOfO8uutwt0oX5wXYYYQBeicWUj0eTZJ2Tq0BOjPlYNccLdIiKlVC
+	 eqfEr6Dekto5DIjL/AaCCI+KqE79GCigeyWhto58=
 From: Wei-Lin Chang <weilin.chang@arm.com>
 To: linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
@@ -49,10 +49,11 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Matt Fleming <matt@codeblueprint.co.uk>,
 	Vincent Donnefort <vdonnefort@google.com>,
 	Sebastian Ene <sebastianene@google.com>,
-	Wei-Lin Chang <weilin.chang@arm.com>
-Subject: [PATCH v3 1/2] arm64: ptdump: Make note_page_flush() range aware
-Date: Fri, 14 Aug 2026 23:24:57 +0100
-Message-ID: <20260814222458.584906-2-weilin.chang@arm.com>
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	Sashiko AI <sashiko-bot@kernel.org>
+Subject: [PATCH v3 2/2] KVM: arm64: ptdump: Flush the last region
+Date: Fri, 14 Aug 2026 23:24:58 +0100
+Message-ID: <20260814222458.584906-3-weilin.chang@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260814222458.584906-1-weilin.chang@arm.com>
 References: <20260814222458.584906-1-weilin.chang@arm.com>
@@ -64,92 +65,69 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-note_page_flush() calls note_page() with addr == 0 and level == -1 to
-dump the last row of a ptdump. addr == 0 (1 << 64 wrapped around)
-renders a huge region with enormous size for address spaces with
-IA bits < 64. For example the stage-2 page tables and the EFI runtime
-page table.
+Currently the stage-2 ptdump calls note_page() at each leaf entry visit.
+This simply misses the output of the last region, because note_page()
+only dumps output when it detects a change in level/prot, or when the
+walk enters a next marker section. The last region in the guest IPA
+space with the same level/prot is not dumped since there is no change
+after it.
 
-More importantly, the last region of the address space and everything
-after the address space up to 1 << 64 are merged into one row of
-output. If the last region within the address space is valid, it will
-appear to remain valid up to 1 << 64 with the same attributes.
+Call note_page_flush() to dump the final region. note_page_flush()
+uses ptdump_pg_state.end_address to call the final note_page(), so also
+provide the end address.
 
-Currently only the EFI runtime ptdump is affected by this, but KVM will
-soon fix its stage-2 ptdump by using note_page_flush(). Here is an
-example of an EFI runtime ptdump (last row):
+Also change the second marker's start address to ULONG_MAX so we never
+cross it. This avoids dumping redundant marker names (which are NULL),
+and advancing beyond the end of the marker array.
 
-0x0000008000000000-0x0000000000000000   17179868672G PGD
-
-With this patch:
-
-0x0000008000000000-0x0001000000000000      261632G PGD
-
-To fix this, cache the end address of a ptdump in ptdump_pg_state so
-note_page_flush() can call the final note_page() with the correct end
-address.
-
-Fixes: 9d80448ac92b ("efi/arm64: Add debugfs node to dump UEFI runtime page tables")
+Fixes: 7c4f73548ed1 ("KVM: arm64: Register ptdump with debugfs on guest creation")
+Reported-by: Sashiko AI <sashiko-bot@kernel.org>
+Closes: https://lore.kernel.org/kvmarm/20260630122758.891011F00A3A@smtp.kernel.org/
+Reviewed-by: Dev Jain <dev.jain@arm.com>
+Tested-by: Dev Jain <dev.jain@arm.com>
 Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
 ---
- arch/arm64/include/asm/ptdump.h |  2 ++
- arch/arm64/mm/ptdump.c          | 14 +++++++++++++-
- 2 files changed, 15 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/ptdump.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/include/asm/ptdump.h b/arch/arm64/include/asm/ptdump.h
-index 5b374a6ab34a..1b743de7d89e 100644
---- a/arch/arm64/include/asm/ptdump.h
-+++ b/arch/arm64/include/asm/ptdump.h
-@@ -52,6 +52,8 @@ struct ptdump_pg_state {
- 	const struct addr_marker *marker;
- 	const struct mm_struct *mm;
- 	unsigned long start_address;
-+	/* exclusive end, ULONG_MAX represents an end at 1 << 64 */
-+	unsigned long end_address;
- 	int level;
- 	ptval_t current_prot;
- 	bool check_wx;
-diff --git a/arch/arm64/mm/ptdump.c b/arch/arm64/mm/ptdump.c
-index 1c20144700d7..eab400e744d9 100644
---- a/arch/arm64/mm/ptdump.c
-+++ b/arch/arm64/mm/ptdump.c
-@@ -278,9 +278,19 @@ void note_page_pgd(struct ptdump_state *pt_st, unsigned long addr, pgd_t pgd)
+diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
+index c9140e22abcf..69899797dbad 100644
+--- a/arch/arm64/kvm/ptdump.c
++++ b/arch/arm64/kvm/ptdump.c
+@@ -130,7 +130,7 @@ static struct kvm_ptdump_guest_state *kvm_ptdump_parser_create(struct kvm_s2_mmu
+ 	}
  
- void note_page_flush(struct ptdump_state *pt_st)
- {
-+	struct ptdump_pg_state *st = container_of(pt_st, struct ptdump_pg_state, ptdump);
-+	unsigned long end = st->end_address;
- 	pte_t pte_zero = {0};
+ 	st->ipa_marker[0].name		= "Guest IPA";
+-	st->ipa_marker[1].start_address = BIT(pgtable->ia_bits);
++	st->ipa_marker[1].start_address = ULONG_MAX;
  
--	note_page(pt_st, 0, -1, pte_val(pte_zero));
-+	/*
-+	 * Address spaces that end at 1 << 64 have end_address == ULONG_MAX,
-+	 * but note_page() expects the exclusive end. In this case adjust end
-+	 * to the wraparound value 0.
-+	 */
-+	if (end == ULONG_MAX)
-+		end = 0;
-+
-+	note_page(pt_st, end, -1, pte_val(pte_zero));
+ 	st->mmu				= mmu;
+ 	return st;
+@@ -148,18 +148,21 @@ static int kvm_ptdump_guest_show(struct seq_file *m, void *unused)
+ 		.flags	= KVM_PGTABLE_WALK_LEAF,
+ 	};
+ 
++	guard(write_lock)(&kvm->mmu_lock);
+ 	st->parser_state = (struct ptdump_pg_state) {
+ 		.marker		= &st->ipa_marker[0],
++		.end_address	= BIT(mmu->pgt->ia_bits),
+ 		.level		= -1,
+ 		.pg_level	= &st->level[0],
+ 		.seq		= m,
+ 	};
+ 
+-	write_lock(&kvm->mmu_lock);
+ 	ret = kvm_pgtable_walk(mmu->pgt, 0, BIT(mmu->pgt->ia_bits), &walker);
+-	write_unlock(&kvm->mmu_lock);
++	if (ret)
++		return ret;
++	note_page_flush(&st->parser_state.ptdump);
+ 
+-	return ret;
++	return 0;
  }
  
- static void arm64_ptdump_walk_pgd(struct ptdump_state *st, struct mm_struct *mm)
-@@ -303,6 +313,7 @@ void ptdump_walk(struct seq_file *s, struct ptdump_info *info)
- 		.marker = info->markers,
- 		.mm = info->mm,
- 		.pg_level = &kernel_pg_levels[0],
-+		.end_address = end,
- 		.level = -1,
- 		.ptdump = {
- 			.note_page_pte = note_page_pte,
-@@ -344,6 +355,7 @@ bool ptdump_check_wx(void)
- 			{ -1, NULL},
- 		},
- 		.pg_level = &kernel_pg_levels[0],
-+		.end_address = ~0UL,
- 		.level = -1,
- 		.check_wx = true,
- 		.ptdump = {
+ static int kvm_ptdump_guest_open(struct inode *m, struct file *file)
 -- 
 2.43.0
 
