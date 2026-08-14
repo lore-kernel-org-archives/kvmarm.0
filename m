@@ -1,107 +1,126 @@
-Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com [209.85.210.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D328E4908B5
-	for <kvmarm@lists.linux.dev>; Fri, 14 Aug 2026 19:11:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.198
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF3FA39021F
+	for <kvmarm@lists.linux.dev>; Fri, 14 Aug 2026 22:25:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786734668; cv=none; b=ZaspksST3PaEqhu//IKaKCFUJumrLrNvdjUt/scqnIMSdNJPjTvTThX6J3Eq+psZUFPdlnVRN1Cx4GwyKifHRHft+nu5LTYNy9StFGv+Ghat1c+bGKO6yYEJuhlWp+VrfvL6FcBFlxn0dwETNt9cvokjJyVGY9DeYaXXYiOPPiA=
+	t=1786746330; cv=none; b=ElPp674tvobjsa8VqJiwDKG28laCy2BGawtSTuFr8+I/2hLWcyn/UZlqrOBrGzNfXHwaS6oGKWT8u4kmHQ7uw1N3BuDctMvMHgk9JQ0DhpkQPBAgxubJVghfMxguSTpVYTOAWfK7yr+ClWVdexNnBxawD5Nc2kVIBZ+/8v7Iy0M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786734668; c=relaxed/simple;
-	bh=w9vAK1GoosRceLnXS1z6Nay4ihVtxX38bQKCwzrAPKs=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Ex/A2VT2aXdlWaElNjXs782ya0iiax4bY5ORDD3y8Ls5VsSzl+9QpFAP4VHfsTmPrljGtG+tYcbOlIM+D+ovbJtPAeagSnHWTIZVCwRRl3iOSlVwFpr2CLVBGtffOl2pRV7F+ccG4jsDjCpw4P4fBmnrB78DfMmEaT1fOTG8pcg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=u9Hs8d0l; arc=none smtp.client-ip=209.85.210.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1786746330; c=relaxed/simple;
+	bh=6/V4aV3g0qBuiI8PmXGjHqwJRwdTQPSXQ+huEkBWn6M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lHT/ob0xZxk4SZl6B07Z3McfNuQAePeuLy+H8p/n2Qa5jbFdePjmfXlZT802ngaO6Y98EPIH17JFvZ60srkuf7SOLEaVrrGa+Cwyl+7fUHsLq4xfi11kCWMqOHz9RVtwWMgOsx71+qCoNv32kqM8nC64FN31P110ZQNgGKsIuS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=gkLremvs; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="u9Hs8d0l"
-Received: by mail-pf1-f198.google.com with SMTP id d2e1a72fcca58-8486c3411c8so1634722b3a.2
-        for <kvmarm@lists.linux.dev>; Fri, 14 Aug 2026 12:11:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1786734664; x=1787339464; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=TFEy1Pzzmf9oV8+r6B/Uh7d0hODw3XhZm9afSq3e+o8=;
-        b=u9Hs8d0l4w1ESnbHS2+zwGRbJ6P/r/aOz0Tn15wfWp7l98+egF0n1x3vuWzkAmxY7z
-         MFgxz3bLtkkWp3CQ9DBHPfT6/jBE5ugHpCvvh9P4hyoDx7FpOAx818kXnReGl9az/K6s
-         iBo3HX2lmUCsQH0EA2i+nmLDN9tTUC9VmSoe4SInhEqj/IbLnNNHyn3nukyxB02pllz4
-         luA+Y0XF/0MRzEvmoB7oWfbUTVVLYmR+IlmuAsnSWoRB74Unio0kQoladw1M5mjZU2my
-         koPbapjrQIz1IYv+WTb3iJUMqQMb66wkTBzUIzw5ThysIFp5yRnSPaETUzG0mzklfZCC
-         1qSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786734664; x=1787339464;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=TFEy1Pzzmf9oV8+r6B/Uh7d0hODw3XhZm9afSq3e+o8=;
-        b=j5O1w9IDbu1V8u/Az2+27Jd94YHSOisj4LPR9Nnw0A6SlpPAAmLV8SnphLWfote0lh
-         fwG1z/fLfisLpFdlZaDANgVX/ahOCkS0tvEUDdJYivDMEq+nkKcU2Stwj/0LaK3l6UKB
-         0iPMFPRO45p78WjD4iZMvwgXuI2T1EENSEO+nW0TNAE6Pn76/3Qo5lyYoHWplNK2bgnm
-         TEmz8tUV8jDy2vz0nnJunKsPyQ5HMd4FCYYkYJl8lCBJIZbbdCXg7RW9DzVAwg273AIW
-         oVoFjqu1F9FJ/XE7/RWajVbm9gUTLLVKC2DD7tLZa/G5C8UCBhD7hwrUVSxCQupIKd6/
-         j0ZQ==
-X-Forwarded-Encrypted: i=1; AHgh+Rohp6OXimbI5fuVr0dkHeP66520Jx44MwaGz+NjpDbON0y2ht6tg/lyag5Tfuvtiz/vCkwEYe8=@lists.linux.dev
-X-Gm-Message-State: AOJu0YybLgOowCH3QLbZHyUde06MRGwr6gKdBcI8EqEDmxAH0aRS7YHN
-	pBQR2LMzTv0+YgpYjeUigltuWMkr3XtruAUb+i4jps78TXU3Ix5ogX22hiu0krb93NLypIlxX+n
-	vKu6ZOg==
-X-Received: from pfbkr10.prod.google.com ([2002:a05:6a00:4b4a:b0:848:569f:3464])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:4004:b0:847:99bb:b6d8
- with SMTP id d2e1a72fcca58-84fde251c75mr9480785b3a.26.1786734664084; Fri, 14
- Aug 2026 12:11:04 -0700 (PDT)
-Date: Fri, 14 Aug 2026 12:11:03 -0700
-In-Reply-To: <an9JNUln8dKaidQc@raptor>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="gkLremvs"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 54F181BCA;
+	Fri, 14 Aug 2026 15:25:21 -0700 (PDT)
+Received: from workstation-e142269.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 091D93F632;
+	Fri, 14 Aug 2026 15:25:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1786746325; bh=6/V4aV3g0qBuiI8PmXGjHqwJRwdTQPSXQ+huEkBWn6M=;
+	h=From:To:Cc:Subject:Date:From;
+	b=gkLremvsiYLZ1ce5HKb0X2QbVeMJPn/ITko7pdh9kZC0H1Cz7GK6xNHbQ3Rz3126P
+	 Xf3PwClxmIjqS3PmDICtaH2bKpYMGPT5omfmhabRR6lgmnBBv+4/LuEfnnJKFmPUh+
+	 t5ITEnbKscduYz0JubZxreNQV9q/7x9w5ikpMGt4=
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	"Mike Rapoport (Microsoft)" <rppt@kernel.org>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	"David Hildenbrand (Arm)" <david@kernel.org>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Dev Jain <dev.jain@arm.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Matt Fleming <matt@codeblueprint.co.uk>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Sebastian Ene <sebastianene@google.com>,
+	Wei-Lin Chang <weilin.chang@arm.com>
+Subject: [PATCH v3 0/2] arm64: ptdump flush fixes
+Date: Fri, 14 Aug 2026 23:24:56 +0100
+Message-ID: <20260814222458.584906-1-weilin.chang@arm.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <ak-EKSslAz1uqEtv@J2N7QTR9R3> <ak_wC4Q-mQe14DI8@google.com>
- <alDI1b8fC99SG4_a@J2N7QTR9R3> <a127176a-1722-460c-aa84-754e1d343f53@arm.com>
- <an3sEiQlIuGEjUur@raptor> <b6080c23-a2a8-4bc5-b3bd-982bd766c648@arm.com>
- <an5UJ4S_P1LUFmzD@google.com> <487aa57c-72ad-453b-971d-ca24a8380429@arm.com>
- <an8SOvLybeilzCEU@google.com> <an9JNUln8dKaidQc@raptor>
-Message-ID: <an9oR3dBVgFs7j7q@google.com>
-Subject: Re: [RFC PATCH 0/3] KVM: Dirty page logging for guest_memfd-only memslots
-From: Sean Christopherson <seanjc@google.com>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: David Hildenbrand <david.hildenbrand@arm.com>, Mark Rutland <mark.rutland@arm.com>, pbonzini@redhat.com, 
-	kvm@vger.kernel.org, maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com, 
-	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	fuad.tabba@linux.dev
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Fri, Aug 14, 2026, Alexandru Elisei wrote:
-> On Fri, Aug 14, 2026 at 06:03:54AM -0700, Sean Christopherson wrote:
-> > Yes, I'm supportive of KVM expressing to guest_memfd that page migration isn't
-> > supported by the VM.  I'm only objecting to expressing that memory must stay
-> > mapped in S2, because guest_memfd doesn't care *why* page migration is or isn't
-> > supported/allowed by a particular VM.
-> 
-> My naive contribution is this idea I had:
-> 
-> 1. Userspace queries support in KVM for feature xyz by checking the
-> capability KVM_CAP_xyz.
-> 
-> 2. Userspace knows that for feature xyz to work correctly, it is required
-> that memory remains mapped at stage 2.
-> 
-> 3. Userspace creates a guest_memfd instance with the right combination of
-> flags set and _unset_ for feature xyz to work correctly - i.e, to keep
-> memory mapped at stage 2.
-> 
-> For this to work, new guest_memfd features that might lead to memory being
-> unmapped are enabled via a flag, and KVM keeps memory mapped at stage 2 by
-> default, to maintain compatibility with an userspace not updated for the
-> new features/flags.
+Hi,
 
-Probably?  It's impossible to know what the exact flows will look like, but the
-common theme for everything will be "don't break userspace".
+This series fixes two problems around ptdumps:
 
-We might make guest_memfd page migration opt-in, but if all of the incompatible
-setups can enumerate their existence prior to creating guest_memfd files, we may
-handle it all automatically, e.g. enable page migration by default, but disable
-it if a TDX, SNP, pKVM, or SPE-capable VM is detected.
+1. note_page_flush(), which flushes out the last row of ptdumps, does
+   not account for address spaces that have IA < 64. Other than making
+   the last region extremely huge, the attributes of the last region
+   within the address spaces appear to extend all the way to 1 << 64.
+
+2. KVM/arm64's stage-2 ptdump missed calling note_page_flush().
+
+To address Will's comment [1], I have created an end_address field for
+struct ptdump_pg_state, and initialized it with the end address of the
+ptdumps. It follows the same convention as the last range->end:
+exclusive end, except for the case where the address space ends at
+1 << 64. In that case it is set as ULONG_MAX.
+
+Caching the end address avoids duplicating the range iteration in
+note_page_flush(), at the cost of duplicating state in ptdump_pg_state.
+
+Series is based on v7.2-rc5.
+
+* Changes from v2:
+
+  - Instead of scanning ptdump_state.range[] to find the end address,
+    cache the end address in a new field end_address when we initialize
+    struct ptdump_pg_state.
+
+  - Adjust KVM's struct ptdump_pg_state initialization so it uses
+    end_address instead of ptdump_state.range[].
+
+  - Collected Reviewed-by and Tested-by from Dev, thanks!
+
+  - v2: https://lore.kernel.org/r/20260724185431.2990395-1-weilin.chang@arm.com/
+
+* Changes from v1:
+
+  - Instead of manually calling note_page() for flushing, fix
+    note_page_flush() so that it ends the ptdump at the end of the
+    address space.
+
+  - Changed the start address of the second marker to ULONG_MAX for KVM
+    ptdump, so we don't output extra marker names, and advance past the
+    end of the marker array.
+
+  - v1: https://lore.kernel.org/r/20260717231233.2299068-1-weilin.chang@arm.com/
+
+Thanks!
+
+[1]: https://lore.kernel.org/r/anXFo-igVdqrCogQ@willie-the-truck/
+
+Wei-Lin Chang (2):
+  arm64: ptdump: Make note_page_flush() range aware
+  KVM: arm64: ptdump: Flush the last region
+
+ arch/arm64/include/asm/ptdump.h |  2 ++
+ arch/arm64/kvm/ptdump.c         | 11 +++++++----
+ arch/arm64/mm/ptdump.c          | 14 +++++++++++++-
+ 3 files changed, 22 insertions(+), 5 deletions(-)
+
+-- 
+2.43.0
+
