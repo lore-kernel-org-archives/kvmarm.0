@@ -1,55 +1,66 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC70C3264CB;
-	Sat, 15 Aug 2026 10:57:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 701CA352C2C;
+	Sat, 15 Aug 2026 11:28:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786791449; cv=none; b=owzAZarTxMkRSdDFkvdOZ+iLAKqH6/OPHRtAzCRY0gqtgzlLEuU65+jlc/A71v8VZlLjxNDrr/ezfAtEPEQt512/uE+Ui0cZL6UhNcx28VQwrOz6SFQyt1BAEq/m6x9604gWDnGWY7kk0rhAkAQ2ocFuukYnzQ+07j7DUHw8QqU=
+	t=1786793308; cv=none; b=bVtPimvkOW4/pOMfy4OLU5d/93nNLSm3nRr6p1H9NxWPXygyooXXccrKwT8KnFpP04BgrASm7y+hMW9veabhf4NEqj4Q2BrSHprKgAHE06Ou7slWETgLGbffu/vvGurh+98qRPkxQyFJ1f4tMvE+m+4I6GbKAninix3UiQdzxW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786791449; c=relaxed/simple;
-	bh=9ZZsIPJvQ4oTXZDcdbVq0S3Y1eoSAmQvOSgmSSPlqsE=;
+	s=arc-20240116; t=1786793308; c=relaxed/simple;
+	bh=Rc8ksUJBgnHSXYYdtIFJILfkmQaRQ3ZySn9lwbhWTFA=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fD0Nlz5qSkyZ5DZficMomuQQGnAtLke3srRv384sic/bRjyYtSTbiY5PYeDrqKl/NYrC2wpaYznQ1FvTSGhuR9qKemQQ2ynHAvzgJqgLwGEr/cSbcFx1ksjtLPjx4f5vK/N7YX/VGYwFmZ1tG2cAPACF7tUWSsX1FbjDu/y3KzQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IiqZEHXO; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=iNjKg9Cu3hsMwD40YA/CNHsg5CpQ5Rj0OwsTjxBuqn+HcUKZMpumfVhfeMSOmf1JfJvxfLSkKSAaZltu9nEYmJoEIZVPrW8sPuNPedjtQU5W6orGIaTHE12Bye78AF31i8Rx+hvo0Yj03h1oNZX6rpyhJ/RbvZUMsJsYfC87J4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CRJRjVg3; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IiqZEHXO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 897FC1F000E9;
-	Sat, 15 Aug 2026 10:57:27 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CRJRjVg3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02FBC1F000E9;
+	Sat, 15 Aug 2026 11:28:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786791447;
-	bh=UzMEI1MTAOXlmFMkVLNj5lVlgOkP81/6CiG3vw2PuIk=;
+	s=k20260515; t=1786793307;
+	bh=ugvf8a5SmwQNPVwzIXcq8c6ETBDk4V2dnKiIGUlaOno=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=IiqZEHXOLZffGOcgY5ayZvce6UcpLb5BMTb4EJj6LZM/b2JNIuTSmYtGiJ5Vo0k3j
-	 sXNQ3l2VbvP1QhYZ6iHDANq1++B4KIZRXCMMp98o3AuBTaLvGaYauV7GOQtAd0+XN0
-	 Klf8oiLC1az4AqgAlXbx/Lp9BXbntA/fkN2p/46332ZigCTTKnENJ5didJl7A6IWWc
-	 aMp32dzUw2rgy2yz3tO8tLAvXW0FMdwCFw/ERCs+E40KmFxZQHbBABqQlewnT35By0
-	 8u0qq1+qzZCc0qLiRVYsFhvj2VFq9x/U9jr1NnXPwX807pUqGcS0Bb6sHVAz8jCvlc
-	 kjYPJVcW0s9BA==
+	b=CRJRjVg3NUqrkqQiGfAVCAtwKQ5OuVVtQ+u+34yUYNcRErmuaTv/LFbD6Tea62s2m
+	 TtXf3fTfl1Zf/Sh242quswPihP6K5Qmc/lGTzySiRKtWlQfJXPYb/KDhVKPhxXvzld
+	 +KePBRCjBFmRux/wFxGEm8yRwh5xPjhQ3AKCqOs9IVWwmGYVGWvOGGhHbNHIuWdPOF
+	 C3jKKOfncFKFnp7z5G3Qh/3fXb6d2wyvFZQNIxH2tIoZ2nv9iabjRkSNy7x6NPz89i
+	 AECB7W2RA7fNfm9lPWyGV+xle+JB9kERgLDbiWb/X7XLVqLULvoRBoXI0PIkryvqcL
+	 kVLYVQ88BgtBQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wvC4r-0000000FseR-0emI;
-	Sat, 15 Aug 2026 10:57:25 +0000
-Date: Sat, 15 Aug 2026 11:57:24 +0100
-Message-ID: <86wltrzm5n.wl-maz@kernel.org>
+	id 1wvCYq-0000000Fsrq-3AfX;
+	Sat, 15 Aug 2026 11:28:24 +0000
+Date: Sat, 15 Aug 2026 12:28:23 +0100
+Message-ID: <86v79bzkq0.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Karl Mehltretter <kmehltretter@gmail.com>
-Cc: Oliver Upton <oupton@kernel.org>,
-	Sascha Bischoff <sascha.bischoff@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Jonathan Cameron <jic23@kernel.org>,
-	Timothy Hayes <timothy.hayes@arm.com>,
+To: Wei-Lin Chang <weilin.chang@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
 	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Documentation: KVM: Fix the GICv5 KVM_IRQ_LINE PPI range
-In-Reply-To: <20260815092537.31737-1-kmehltretter@gmail.com>
-References: <20260815092537.31737-1-kmehltretter@gmail.com>
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	"Mike Rapoport (Microsoft)" <rppt@kernel.org>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	"David Hildenbrand (Arm)" <david@kernel.org>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Dev Jain <dev.jain@arm.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Matt Fleming <matt@codeblueprint.co.uk>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Sebastian Ene <sebastianene@google.com>
+Subject: Re: [PATCH v3 1/2] arm64: ptdump: Make note_page_flush() range aware
+In-Reply-To: <20260814222458.584906-2-weilin.chang@arm.com>
+References: <20260814222458.584906-1-weilin.chang@arm.com>
+	<20260814222458.584906-2-weilin.chang@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -61,73 +72,101 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kmehltretter@gmail.com, oupton@kernel.org, sascha.bischoff@arm.com, pbonzini@redhat.com, corbet@lwn.net, skhan@linuxfoundation.org, jic23@kernel.org, timothy.hayes@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: weilin.chang@arm.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, oupton@kernel.org, tabba@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, rppt@kernel.org, ryan.roberts@arm.com, david@kernel.org, anshuman.khandual@arm.com, dev.jain@arm.com, ardb@kernel.org, mark.rutland@arm.com, matt@codeblueprint.co.uk, vdonnefort@google.com, sebastianene@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sat, 15 Aug 2026 10:25:37 +0100,
-Karl Mehltretter <kmehltretter@gmail.com> wrote:
+On Fri, 14 Aug 2026 23:24:57 +0100,
+Wei-Lin Chang <weilin.chang@arm.com> wrote:
 > 
-> KVM rejects GICv5 PPI irq_id values above 63, while the documented
-> range extends to 127. KVM also rejects PPIs not present in the
-
-This is on purpose, and that's not a bug.
-
-> KVM_DEV_ARM_VGIC_USERSPACE_PPIS mask. That mask is populated by
-> KVM_DEV_ARM_VGIC_CTRL_INIT; reading it beforehand currently succeeds
-> but returns all zeroes.
+> note_page_flush() calls note_page() with addr == 0 and level == -1 to
+> dump the last row of a ptdump. addr == 0 (1 << 64 wrapped around)
+> renders a huge region with enormous size for address spaces with
+> IA bits < 64. For example the stage-2 page tables and the EFI runtime
+> page table.
 > 
-> Correct the range, document the mask restriction, and require the mask
-> to be queried after VGIC initialization.
+> More importantly, the last region of the address space and everything
+> after the address space up to 1 << 64 are merged into one row of
+> output. If the last region within the address space is valid, it will
+> appear to remain valid up to 1 << 64 with the same attributes.
 > 
-> Fixes: b88d05a893cb ("KVM: arm64: gic-v5: Support GICv5 interrupts with KVM_IRQ_LINE")
-> Assisted-by: Claude:claude-fable-5
-> Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
+> Currently only the EFI runtime ptdump is affected by this, but KVM will
+> soon fix its stage-2 ptdump by using note_page_flush(). Here is an
+> example of an EFI runtime ptdump (last row):
+> 
+> 0x0000008000000000-0x0000000000000000   17179868672G PGD
+> 
+> With this patch:
+> 
+> 0x0000008000000000-0x0001000000000000      261632G PGD
+> 
+> To fix this, cache the end address of a ptdump in ptdump_pg_state so
+> note_page_flush() can call the final note_page() with the correct end
+> address.
+> 
+> Fixes: 9d80448ac92b ("efi/arm64: Add debugfs node to dump UEFI runtime page tables")
+> Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
 > ---
->  Documentation/virt/kvm/api.rst                  | 4 +++-
->  Documentation/virt/kvm/devices/arm-vgic-v5.rst | 3 +++
->  2 files changed, 6 insertions(+), 1 deletion(-)
+>  arch/arm64/include/asm/ptdump.h |  2 ++
+>  arch/arm64/mm/ptdump.c          | 14 +++++++++++++-
+>  2 files changed, 15 insertions(+), 1 deletion(-)
 > 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index e3003a241d5b0..6d8fd74174492 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -912,7 +912,9 @@ The irq_type field has the following values:
->  	       in-kernel GICv5: SPI, irq_id between 0 and 65535 (incl.)
->  - KVM_ARM_IRQ_TYPE_PPI:
->  	       in-kernel GICv2/GICv3: PPI, irq_id between 16 and 31 (incl.)
-> -	       in-kernel GICv5: PPI, irq_id between 0 and 127 (incl.)
-> +	       in-kernel GICv5: PPI, irq_id between 0 and 63 (incl.), and
-
-No. Please understand the difference between *implementation* and
-*architecture*.
-
-Also, the GICv5 architecture mandates which PPI is used for which
-device for the range 0-63. This is not a carbon copy of the previous
-versions.
-
-> +	       only if present in the mask returned by the
-> +	       KVM_DEV_ARM_VGIC_USERSPACE_PPIS attribute
-
-Which, if you look carefully enough, returns a 128bit mask, as per the
-architecture.
-
+> diff --git a/arch/arm64/include/asm/ptdump.h b/arch/arm64/include/asm/ptdump.h
+> index 5b374a6ab34a..1b743de7d89e 100644
+> --- a/arch/arm64/include/asm/ptdump.h
+> +++ b/arch/arm64/include/asm/ptdump.h
+> @@ -52,6 +52,8 @@ struct ptdump_pg_state {
+>  	const struct addr_marker *marker;
+>  	const struct mm_struct *mm;
+>  	unsigned long start_address;
+> +	/* exclusive end, ULONG_MAX represents an end at 1 << 64 */
+> +	unsigned long end_address;
+>  	int level;
+>  	ptval_t current_prot;
+>  	bool check_wx;
+> diff --git a/arch/arm64/mm/ptdump.c b/arch/arm64/mm/ptdump.c
+> index 1c20144700d7..eab400e744d9 100644
+> --- a/arch/arm64/mm/ptdump.c
+> +++ b/arch/arm64/mm/ptdump.c
+> @@ -278,9 +278,19 @@ void note_page_pgd(struct ptdump_state *pt_st, unsigned long addr, pgd_t pgd)
 >  
->  (The irq_id field thus corresponds nicely to the IRQ ID in the ARM GIC specs)
+>  void note_page_flush(struct ptdump_state *pt_st)
+>  {
+> +	struct ptdump_pg_state *st = container_of(pt_st, struct ptdump_pg_state, ptdump);
+> +	unsigned long end = st->end_address;
+>  	pte_t pte_zero = {0};
 >  
-> diff --git a/Documentation/virt/kvm/devices/arm-vgic-v5.rst b/Documentation/virt/kvm/devices/arm-vgic-v5.rst
-> index d328cf1e22c1f..e24aed0c4afcd 100644
-> --- a/Documentation/virt/kvm/devices/arm-vgic-v5.rst
-> +++ b/Documentation/virt/kvm/devices/arm-vgic-v5.rst
-> @@ -35,6 +35,9 @@ Groups:
->        populated with the userspace PPI mask. The lower __u64 contains the mask
->        for the lower 64 PPIS, with the remaining 64 being in the second __u64.
->  
-> +      Userspace must query this attribute after initializing the VGIC with
-> +      KVM_DEV_ARM_VGIC_CTRL_INIT.
+> -	note_page(pt_st, 0, -1, pte_val(pte_zero));
+> +	/*
+> +	 * Address spaces that end at 1 << 64 have end_address == ULONG_MAX,
+> +	 * but note_page() expects the exclusive end. In this case adjust end
+> +	 * to the wraparound value 0.
+> +	 */
+> +	if (end == ULONG_MAX)
+> +		end = 0;
 > +
+> +	note_page(pt_st, end, -1, pte_val(pte_zero));
+>  }
+>  
+>  static void arm64_ptdump_walk_pgd(struct ptdump_state *st, struct mm_struct *mm)
+> @@ -303,6 +313,7 @@ void ptdump_walk(struct seq_file *s, struct ptdump_info *info)
+>  		.marker = info->markers,
+>  		.mm = info->mm,
+>  		.pg_level = &kernel_pg_levels[0],
+> +		.end_address = end,
+>  		.level = -1,
+>  		.ptdump = {
+>  			.note_page_pte = note_page_pte,
+> @@ -344,6 +355,7 @@ bool ptdump_check_wx(void)
+>  			{ -1, NULL},
+>  		},
+>  		.pg_level = &kernel_pg_levels[0],
+> +		.end_address = ~0UL,
 
-Must? Why? Userspace can perfectly live with ever querying this.
+nit: shouldn't this be ULONG_MAX instead? Yes, this is the same thing,
+but it doesn't hurt to match the documentation.
+
+Thanks,
 
 	M.
 
