@@ -1,187 +1,174 @@
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3211C18C933
-	for <kvmarm@lists.linux.dev>; Sun, 16 Aug 2026 05:42:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAD67395243;
+	Sun, 16 Aug 2026 05:55:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786858930; cv=none; b=OOjNuDaXOxrSu78ic2ny2Jhl/fTSVvgG6UB+Lzs/LAMLoZcb0kIe+FyJvjW4n4coRVfZtrcHLZ01A+JZlJQDaM2lGQHxVSjo3A6CVp1a/42qT4jNW/JJvlxhK7KUmklQYEDMtn6Vof8ihKJBTQ8cnuqLtN36PkrjElnPV8Ok1ao=
+	t=1786859721; cv=none; b=fEg3mQgFS/TMA7+2ql+l1WMiUnoGhRG1eX+8uKvoNSwh8JhhrJWkM8/Rm+GyXKNYbcwP7mOK3nCgGHa0nOYoLx0N3B3fo00M2gT6MSAvll6W8eXYpaXMdkMZP+BhhxJvSAuX91RFcdpCV4YISFF1GYqkE8XtGjjaAlmQx9WY6j8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786858930; c=relaxed/simple;
-	bh=k6aanD4kl87vFIzOM9YpBe892YlmwR2hZh4pu48dqPU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uTSBb93zFIz0huZEvoKfgJfBHmqgJfuUWbIpMNl6wL4/gqNsz1oziTN9BoFt0mc/WMIZGc5prCA8R2eFTmWRA0/bGO+vtIVvoc0kJ6HuSw1GQ/Uxv+SsLvaqGnxUKuGffdUgNFdGsBvtv/pDRBZ+bH884t4na6Wkf88xD5I1Yd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=AMdQU54a; arc=none smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+	s=arc-20240116; t=1786859721; c=relaxed/simple;
+	bh=nahgdkQqpBuPTnNsfR/w8RZeNMm5xkcykO1RYwg7zuU=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=LfdZ22KDaGrPYqia/xnH8Ue38A29/+Vu+FgzUxItNe7pSai2SWEODuM7b0oPDQnsygSpygdpbl2t36VgenUd+mzbxXilKYpv/u3nuoP80f0/nWpRhQm6i744uYtR6YWHevOro9TPo+63PLUh20sSIIGG2xg7+y33sNabyge9ndg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AZ9m06/0; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="AMdQU54a"
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67G5F1Ta1815786;
-	Sun, 16 Aug 2026 05:40:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=corp-2025-04-25; bh=U3pic
-	kv5tVeCDO59K2fiJcHyW63tAnxfs8LPzfOdtoI=; b=AMdQU54a7oWqbTdaZCnoq
-	9knFgopvtp4UgzxYuj81IQKGOxSn3iJ1ZcBNoOxUAVSvydxJRu5luYKl2Ont1/cC
-	66a0OiRKk6EZQuADMVlfJGh18aks3JscqJgmqz4MLf+Nkb5i3gOWa0gVQU0oxo2P
-	RcOTPToOJ3G1kxVJOfWRCVxk7lZUzpnUhHFl6qQOQKRjTOspVI/y2k4TVubU26r0
-	vedm3zzj5aG3+cBhGQ9IzYlSl6ITvdEquwhb4FZBzxd9+jXnyP/UeKqo6OF9YwAL
-	gxZb6ZSx5YGRt5JnqVHWFd5Ji5T7syyS44V+HUM3S/caub5QNcEfX3n7+fttNKu6
-	Q==
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4g2g07gs62-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sun, 16 Aug 2026 05:40:58 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.7/8.18.1.7) with ESMTP id 67G5eAtY011059;
-	Sun, 16 Aug 2026 05:40:57 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 4g2ejammck-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sun, 16 Aug 2026 05:40:57 +0000 (GMT)
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.1.12) with ESMTP id 67G5ereb012353;
-	Sun, 16 Aug 2026 05:40:56 GMT
-Received: from localhost.localdomain (ca-dev80.us.oracle.com [10.211.9.80])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 4g2ejammbp-5;
-	Sun, 16 Aug 2026 05:40:56 +0000 (GMT)
-From: Dongli Zhang <dongli.zhang@oracle.com>
-To: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        linux-kselftest@vger.kernel.org
-Cc: seanjc@google.com, pbonzini@redhat.com, maz@kernel.org, oupton@kernel.org,
-        fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com,
-        suzuki.poulose@arm.com, yuzenghui@huawei.com, dwmw2@infradead.org,
-        joe.jin@oracle.com
-Subject: [PATCH 4/4] KVM: selftests: Add arm64 coverage for steal time pid changes
-Date: Sat, 15 Aug 2026 22:33:05 -0700
-Message-ID: <20260816053630.527528-5-dongli.zhang@oracle.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20260816053630.527528-1-dongli.zhang@oracle.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AZ9m06/0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E96F11F000E9;
+	Sun, 16 Aug 2026 05:55:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1786859720;
+	bh=MjbNaWToAnIzgZzPysZS6Kqukk1Otp0g6q2SVcF/XUk=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=AZ9m06/0obrlnIG+8hNyuKqpB5sJd3UwZ7Imdom5EzE/frzKBKMM37earNUZ3Dduc
+	 iblfFxoWH/YRtGXjsovjDRFTAdH3HXPCusLsfwiYEcPOcCkuAz9K/z9mbCsQ3BFBCM
+	 7o05qg2DwnL0RvSFbjN4cDPpLnqsCuP+5SXbpjPVA6R5KU2UKekmNF4VGBKA0SDNPS
+	 BBg06o26KW+Rfgtrds/0N5SWF7lRjIYttZlmcXNaRMW88k2mrBaS8kIU8xdfOSQWM/
+	 wqPsnwCN6bJmcLNVDQj97aJLqhWXPS5BOp5PDEpoECEPIZeas1IM+lNHiFKMrQMm2a
+	 PJrsmoILISPGg==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH 3/4] KVM: selftests: Test steal time across vCPU pid
+ changes on x86
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Dongli Zhang" <dongli.zhang@oracle.com>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20260816053630.527528-4-dongli.zhang@oracle.com>
 References: <20260816053630.527528-1-dongli.zhang@oracle.com>
+ <20260816053630.527528-4-dongli.zhang@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 16 Aug 2026 05:55:19 +0000
+Message-Id: <20260816055519.E96F11F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-08-16_01,2026-08-12_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
- lowpriorityscore=0 mlxscore=0 spamscore=0 suspectscore=0 bulkscore=0
- adultscore=0 malwarescore=0 mlxlogscore=999 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.19.0-2606160000 definitions=main-2608160039
-X-Proofpoint-GUID: qq1JtjJTPG1EyDjHFGSygFBLem78LP4I
-X-Authority-Analysis: v=2.4 cv=Hu9G3UTS c=1 sm=1 tr=0 ts=6a814d6a cx=c_pps
- a=OOZaFjgC48PWsiFpTAqLcw==:117 a=OOZaFjgC48PWsiFpTAqLcw==:17
- a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22 a=jiCTI4zE5U7BLdzWsZGv:22
- a=EIcjfB9IiI4px24ztqRk:22 a=yPCof4ZbAAAA:8 a=Sb3boAvBcC-Fi6NWb5QA:9
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODE2MDAzOSBTYWx0ZWRfX2r1SXnPWUKBH
- xOKWGO9NkMKr2XjxJDFDZQ1ma7DRuHB6+9G2K8ySSQWJyy+7ykvxkNFh6E6/gZ8N030TodPG2Bq
- iHpE3LEEEe9raJ48WRewMq+DldfgSSnhNssSdMcVWpEGfdMGga8B
-X-Proofpoint-ORIG-GUID: qq1JtjJTPG1EyDjHFGSygFBLem78LP4I
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODE2MDAzOSBTYWx0ZWRfX20IvJoZGijSt
- v/i60LQUJm7lshNsJWHPjfweeCfYVRUatUwNqT0/ZTVpucTpkzYl1o9GLUkpNM0iRpqFO/JrQju
- PONgPUgeVTp9m9C2Tx8moA7HJoHswpdQaqeTja7YoOHHA2ai4gl9trWJXA8dMJ972lhknwoMjYY
- QLMCC1czo1jQccC5RKfb2XDgSa+LRAToQ2jU4kapNgXiUO3hts67jL3P9clp89eZWEUC5Vgvsa7
- mYbFBZePQDJ1WLOmVp4dDUsy2OQVpVcOiSZmKaYii5wCq7qHPu5i2MSHWJFRqPOqbPeAFmn2vF/
- ma57qiBV1fMab6qJvisU95blkQAli5sVdJfvcro1TbvnypxRch78/RUSf4tt2rbki5Mcmrdqv+Q
- S1Zaidg0raOo1Huq045HGFDbzAO5+e9AGYBgUKUOgIVHq+wHngA3TjSO87fYBQoFB7whJSKnPAy
- MTrydrCUcrpaji9oLjg==
 
-The previous patch added the common steal_time_change_pid test with x86
-support. Add the arm64 support so the same test also covers arm64.
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+s) to consider:
+- [Medium] The test races and hangs infinitely if the main thread is schedu=
+led during the helper thread's 200=C2=B5s wall-clock window.
+- [Medium] Unhandled `pthread_create()` and `pthread_setaffinity_np()` erro=
+rs lead to an infinite test hang and undefined behavior.
+--
 
-Use KVM_ARM_VCPU_PVTIME_IPA to enable the steal time shared page from
-userspace, and use the PV_TIME_ST SMCCC call in the guest to retrieve and
-read that page.
+--- Patch [3]: [PATCH 3/4] KVM: selftests: Test steal time across vCPU pid =
+changes on x86 ---
+commit dbc0e15e73158fcb584e1322da57a03214c88dd3
+Author: Dongli Zhang <dongli.zhang@oracle.com>
 
-Assisted-by: Codex:GPT-5.5
-Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
----
- tools/testing/selftests/kvm/Makefile.kvm      |  1 +
- .../selftests/kvm/steal_time_change_pid.c     | 54 +++++++++++++++++++
- 2 files changed, 55 insertions(+)
+KVM: selftests: Test steal time across vCPU pid changes on x86
 
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index c8ce17851561..b01a3403d602 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -199,6 +199,7 @@ TEST_GEN_PROGS_arm64 += guest_memfd_test
- TEST_GEN_PROGS_arm64 += mmu_stress_test
- TEST_GEN_PROGS_arm64 += rseq_test
- TEST_GEN_PROGS_arm64 += steal_time
-+TEST_GEN_PROGS_arm64 += steal_time_change_pid
- 
- TEST_GEN_PROGS_s390 = $(TEST_GEN_PROGS_COMMON)
- TEST_GEN_PROGS_s390 += s390/memop
-diff --git a/tools/testing/selftests/kvm/steal_time_change_pid.c b/tools/testing/selftests/kvm/steal_time_change_pid.c
-index 3c39594db398..12d4927d1c01 100644
---- a/tools/testing/selftests/kvm/steal_time_change_pid.c
-+++ b/tools/testing/selftests/kvm/steal_time_change_pid.c
-@@ -46,6 +46,60 @@ static void steal_time_enable(struct kvm_vcpu *vcpu)
- 		     (ulong)st_gva | KVM_MSR_ENABLED);
- }
- 
-+#elif defined(__aarch64__)
-+
-+#define STEAL_TIME_SIZE	((sizeof(struct st_time) + 63) & ~63)
-+
-+#define PV_TIME_ST	0xc5000021
-+
-+struct st_time {
-+	u32 rev;
-+	u32 attr;
-+	u64 st_time;
-+};
-+
-+static void guest_code(void)
-+{
-+	struct arm_smccc_res res;
-+	struct st_time *st;
-+
-+	do_smccc(PV_TIME_ST, 0, 0, 0, 0, 0, 0, 0, &res);
-+	GUEST_ASSERT_NE(res.a0, -1);
-+	GUEST_ASSERT_EQ(res.a0, (ulong)st_gva);
-+
-+	st = (struct st_time *)res.a0;
-+	WRITE_ONCE(guest_stolen_time, READ_ONCE(st->st_time));
-+	GUEST_SYNC(0);
-+
-+	WRITE_ONCE(guest_stolen_time, READ_ONCE(st->st_time));
-+	GUEST_SYNC(1);
-+
-+	WRITE_ONCE(guest_stolen_time, READ_ONCE(st->st_time));
-+	GUEST_DONE();
-+}
-+
-+static bool steal_time_supported(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_device_attr dev = {
-+		.group = KVM_ARM_VCPU_PVTIME_CTRL,
-+		.attr = KVM_ARM_VCPU_PVTIME_IPA,
-+	};
-+
-+	return !__vcpu_ioctl(vcpu, KVM_HAS_DEVICE_ATTR, &dev);
-+}
-+
-+static void steal_time_enable(struct kvm_vcpu *vcpu)
-+{
-+	u64 st_ipa = (ulong)st_gva;
-+	struct kvm_device_attr dev = {
-+		.group = KVM_ARM_VCPU_PVTIME_CTRL,
-+		.attr = KVM_ARM_VCPU_PVTIME_IPA,
-+		.addr = (u64)&st_ipa,
-+	};
-+
-+	vcpu_ioctl(vcpu, KVM_SET_DEVICE_ATTR, &dev);
-+}
-+
- #else
- #error "steal_time_change_pid is not implemented on this architecture"
- #endif
--- 
-2.43.5
+Add a selftest for the case where the same vCPU fd is run from a new host
+thread after steal time has already been enabled and updated.
 
+> diff --git a/tools/testing/selftests/kvm/steal_time_change_pid.c b/tools/=
+testing/selftests/kvm/steal_time_change_pid.c
+> new file mode 100644
+> index 0000000000000..3c39594db398e
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/steal_time_change_pid.c
+
+[ ... ]
+
+> +int main(void)
+> +{
+> +	struct kvm_vcpu *vcpu;
+> +	struct kvm_vm *vm;
+> +	pthread_attr_t attr;
+> +	pthread_t thread;
+> +	cpu_set_t cpuset;
+> +	long run_delay;
+> +	long run_delay_delta;
+> +
+> +	ksft_print_header();
+> +	ksft_set_plan(1);
+> +
+> +	CPU_ZERO(&cpuset);
+> +	CPU_SET(0, &cpuset);
+> +	pthread_attr_init(&attr);
+> +	pthread_attr_setaffinity_np(&attr, sizeof(cpuset), &cpuset);
+> +	pthread_setaffinity_np(pthread_self(), sizeof(cpuset), &cpuset);
+
+[Severity: Medium]
+Is an error check needed for pthread_setaffinity_np()?
+
+If CPU 0 is offline or excluded by the process taskset mask, this will fail
+silently. The threads would then run on different CPUs and avoid runqueue
+contention, preventing the main thread's wait time from increasing and
+potentially causing an infinite hang in the later sched_yield() loop.
+
+[ ... ]
+
+> +	steal_time_enable(vcpu);
+> +	run_vcpu(vcpu);
+> +
+> +	run_delay =3D get_run_delay();
+> +	pthread_create(&thread, &attr, do_steal_time, NULL);
+
+[Severity: Medium]
+What happens if pthread_create() fails here?
+
+If thread creation fails, do_steal_time() won't execute to generate
+contention, and the subsequent loop waiting for run_delay to increase could
+spin infinitely.
+
+> +
+> +	while (get_run_delay() - run_delay < MIN_RUN_DELAY_NS)
+> +		sched_yield();
+
+[Severity: Medium]
+Can this loop hang infinitely if the main thread is scheduled during the
+helper thread's wall-clock window?
+
+The helper thread do_steal_time() bounds its execution to strictly
+MIN_RUN_DELAY_NS of wall-clock time:
+
+static void *do_steal_time(void *arg)
+{
+	struct timespec ts, stop;
+	clock_gettime(CLOCK_MONOTONIC, &ts);
+	stop =3D timespec_add_ns(ts, MIN_RUN_DELAY_NS);
+	while (timespec_to_ns(timespec_sub(ts, stop)) < 0)
+		clock_gettime(CLOCK_MONOTONIC, &ts);
+	return NULL;
+}
+
+If a scheduler tick occurs during this window, the main thread may preempt
+the helper thread to evaluate this loop condition.
+
+While the main thread is running, its runqueue wait time (run_delay) does
+not increase, but the helper thread's wall-clock timer still advances. As a
+result, the helper thread could exit having been on the runqueue/CPU for
+exactly the requested wall-clock time, but the main thread will have
+accumulated strictly less than MIN_RUN_DELAY_NS of wait time.
+
+Once the helper thread exits, there are no competing threads on the pinned
+CPU, so the main thread's wait time stops increasing permanently, causing
+this loop to spin infinitely.
+
+[ ... ]
+
+> +	run_vcpu(vcpu);
+> +	sync_global_from_guest(vm, guest_stolen_time);
+> +	main_steal =3D guest_stolen_time;
+> +
+> +	TEST_ASSERT(main_steal >=3D MIN_RUN_DELAY_NS,
+> +		    "Expected steal time >=3D %ld, got %"PRIu64,
+> +		    MIN_RUN_DELAY_NS, main_steal);
+> +
+> +	pthread_create(&thread, NULL, vcpu_thread, vcpu);
+
+[Severity: Medium]
+Should we check the return value of pthread_create() here?
+
+If it fails, the thread variable remains uninitialized, which would trigger
+undefined behavior when passed to pthread_join() on the next line.
+
+> +	pthread_join(thread, NULL);
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260816053630.5275=
+28-1-dongli.zhang@oracle.com?part=3D3
