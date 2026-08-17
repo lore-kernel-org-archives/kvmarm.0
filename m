@@ -1,58 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6454B3C3F44;
-	Mon, 17 Aug 2026 08:42:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08D673597B;
+	Mon, 17 Aug 2026 08:53:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786956145; cv=none; b=WpM3H+l/GPpUK4WY2SJkzkDo42mmzwX/KF0/KnCib32DW3YsV+bm1spIi/9vj49+XAWTzXkkFjcGxdxXe+TRiERSkgpuo7l9BmmfousGphh7bFu+O+tlt9tiFVKKgdzk7Azgw2OkWqwPgIFsS+/6uT7Uw0Q3pMeqyqlSCzh9ssM=
+	t=1786956782; cv=none; b=bJsxmdqeZW+r4IxWu8mWsVl2TeXMIBQAlnIXMRBq35IZVTqBSRbJCIPnJc4LDqms35JFp3s8EHQJkaCWZNUdsX32ft5dFNfkfl2IXmeSk7w332WBPjCoOhUoopaz/g3NPTzAE4jMe855+rg/Yym5koTE/J3aBlRcnpwlDuYnzMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786956145; c=relaxed/simple;
-	bh=JXcv/P1P/ptgEetmIaSkVo4yzDIQhWrmKVx/als6qKU=;
+	s=arc-20240116; t=1786956782; c=relaxed/simple;
+	bh=hlArnnRBlxvFxienYxvUPq5zg8b6uZlS1r5dFcXNOUs=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=msfj2+4Ikp8nlPXOU859XBBssapJkh1yz5t3M2jyVEAgBS05VXKVAI/TjlYQ73N/7C2f+po8hhbDaXlWR8kvQZAtyU+U/pCtNdsbgv8QBt6bdXS9LX84GDJshKpbHnnwV7Q+DRzC5AKjdrIRx4edCB//Sw1KXfZ07SB208y2seQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WC+M/5Aj; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=bicK5IZSQZMI6yIlz9Lx+EXNglD0o9DiVmYA4SPdN5o9gTRrapmveIQBEyW/k97c21GspoA6ZwdUaiEKV9mo1AHhL8SKVtZQEVoOwtuh0ASp6Kza8HN8oMpF6WAb+966nfeG9Xaq5E+clZ12oCwLSimhQI0ExN955WqzNfm5gvk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oVAsPwUG; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WC+M/5Aj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5A311F000E9;
-	Mon, 17 Aug 2026 08:42:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oVAsPwUG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91AED1F000E9;
+	Mon, 17 Aug 2026 08:53:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786956143;
-	bh=xRXB1Ssei46fQ4K1P1EZ3r3DtcRZAu/TuSA+r9hIaZE=;
+	s=k20260515; t=1786956780;
+	bh=zZavtv5iKk4G+rubVn2CbRlhboRCftd+KV1d+zlJox4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=WC+M/5AjjmYZbG+uxsleyKXTtnCd84cUNG2OceY5Pln18LCTgClI0thrgMTTAQi3C
-	 DoakoL1CsRQkUPb2gAPJFULvzqLQ44WLBfvzzkqbFSrBNSDHh6phNh7yHN+YXwAG7d
-	 EpcWk7UFe0R7ZufsfMwGBV+zHP3vggRt3/WijeJ1bnEfrJ59L8f4/TkDXZrQ6kd0RL
-	 3W9QGxC77SDCyiFYF3KwcGclSYY8fG/RTEqL2Fq+lO/lV/EhCGbcMQ/SxYs8Ct9EeJ
-	 GtXY4pc1+sx2VCuAeG2kQcINfGOkzHVtHiUaC4QoMD2FOm44N4QI/qohJ0+Z9+mcEy
-	 HzsOJUmH7kv0A==
+	b=oVAsPwUGV4rgDgDfnEl8zJ4cpHX6o3lNLvLMxxKzmfS5tM/s47Jum+fHCuBrvqdwz
+	 FzOYS13ZZ5OgjM91h1GrYxwwGu6b7zrF7gHGwklQBE42D2qbTwNJUyDyFbwxgLIiL1
+	 PnXA6wAuKNFKSUVwWd42mis4QuZXbmkNbXwjb9Y1erV4JZB8Hwc0l54gKNd2TAQX9b
+	 HEh5pmJNLEK6GYQq17rNC93caUazgNsdilEg9Ik7kotOJh3NV7wPBnnX6Jx6dWQpJN
+	 9Cr7kntYhNI6razMah8YrtvT9aKAO71U4YQmknhnwkGevvg+38quSCtNuSgzVkS7ma
+	 WizxBoeRQUfUw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wvsvF-0000000GCpR-1smP;
-	Mon, 17 Aug 2026 08:42:21 +0000
-Date: Mon, 17 Aug 2026 09:42:20 +0100
-Message-ID: <86se4dyw7n.wl-maz@kernel.org>
+	id 1wvt5W-0000000GD03-1gGx;
+	Mon, 17 Aug 2026 08:52:58 +0000
+Date: Mon, 17 Aug 2026 09:52:58 +0100
+Message-ID: <86qzjxyvpx.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Dongli Zhang <dongli.zhang@oracle.com>
-Cc: kvm@vger.kernel.org,
+To: Like Xu <like.xu.linux@gmail.com>
+Cc: Oliver Upton <oupton@kernel.org>,
 	kvmarm@lists.linux.dev,
-	linux-kselftest@vger.kernel.org,
-	seanjc@google.com,
-	pbonzini@redhat.com,
-	oupton@kernel.org,
-	fuad.tabba@linux.dev,
-	joey.gouly@arm.com,
-	seiden@linux.ibm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	dwmw2@infradead.org,
-	joe.jin@oracle.com
-Subject: Re: [PATCH 2/4] KVM: arm64: Reset last_steal on vCPU pid change
-In-Reply-To: <20260816053630.527528-3-dongli.zhang@oracle.com>
-References: <20260816053630.527528-1-dongli.zhang@oracle.com>
-	<20260816053630.527528-3-dongli.zhang@oracle.com>
+	Paolo Bonzini <pbonzini@redhat.com>,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Jiaqi Yan <jiaqiyan@google.com>
+Subject: Re: [PATCH] KVM: selftests: arm64: Skip sea_to_user without 1GB hugepages
+In-Reply-To: <20260817080759.25601-1-likexu@tencent.com>
+References: <20260817080759.25601-1-likexu@tencent.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -64,117 +55,32 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: dongli.zhang@oracle.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, seanjc@google.com, pbonzini@redhat.com, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, dwmw2@infradead.org, joe.jin@oracle.com
+X-SA-Exim-Rcpt-To: like.xu.linux@gmail.com, oupton@kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, jiaqiyan@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sun, 16 Aug 2026 06:33:03 +0100,
-Dongli Zhang <dongli.zhang@oracle.com> wrote:
++ Jiaqi.
+
+On Mon, 17 Aug 2026 09:07:59 +0100,
+Like Xu <like.xu.linux@gmail.com> wrote:
 > 
-> The previous commit resets x86 steal time accounting when the vCPU PID is
-> changed. Do the same for arm64.
-
-Drop this statement, it really doesn't provide any information.
-
+> sea_to_user backs guest memory with 1GB hugepages but never checks any
+> are reserved, aborting instead of skipping when the host has none:
 > 
-> KVM keeps a vCPU fd alive when userspace hot-unplugs a vCPU. If the fd is
-> later reused from a new vCPU thread, vcpu->arch.steal.last_steal still
-> reflects the old task's run_delay, while current->sched_info.run_delay
-> belongs to the new task.
+>   kvm_syscalls.h:68: mem != MAP_FAILED, errno=12 (ENOMEM)
+>   not ok 1 selftests: kvm: sea_to_user # exit=254
 > 
-> Reset vcpu->arch.steal.last_steal from kvm_arch_vcpu_run_pid_change()
-> unconditionally so the next stolen time update computes its delta against
-> the new task's run_delay.
-> 
-> Assisted-by: Codex:GPT-5.5
-> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
-> ---
->  arch/arm64/include/asm/kvm_host.h | 1 +
->  arch/arm64/kvm/arm.c              | 2 ++
->  arch/arm64/kvm/pvtime.c           | 5 +++++
->  3 files changed, 8 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index bae2c4f92ef5..4607f956e787 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -1339,6 +1339,7 @@ static inline bool kvm_arch_pmi_in_guest(struct kvm_vcpu *vcpu)
->  long kvm_hypercall_pv_features(struct kvm_vcpu *vcpu);
->  gpa_t kvm_init_stolen_time(struct kvm_vcpu *vcpu);
->  void kvm_update_stolen_time(struct kvm_vcpu *vcpu);
-> +void kvm_reset_stolen_time(struct kvm_vcpu *vcpu);
->  
->  bool kvm_arm_pvtime_supported(void);
->  int kvm_arm_pvtime_set_attr(struct kvm_vcpu *vcpu,
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 9a6c72a18672..0f6e63eace21 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -929,6 +929,8 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
->  	if (!kvm_arm_vcpu_is_finalized(vcpu))
->  		return -EPERM;
->  
-> +	kvm_reset_stolen_time(vcpu);
-> +
->  	if (likely(vcpu_has_run_once(vcpu)))
->  		return 0;
->  
-> diff --git a/arch/arm64/kvm/pvtime.c b/arch/arm64/kvm/pvtime.c
-> index 4ceabaa4c30b..000bf49cc0fd 100644
-> --- a/arch/arm64/kvm/pvtime.c
-> +++ b/arch/arm64/kvm/pvtime.c
-> @@ -32,6 +32,11 @@ void kvm_update_stolen_time(struct kvm_vcpu *vcpu)
->  	srcu_read_unlock(&kvm->srcu, idx);
->  }
->  
-> +void kvm_reset_stolen_time(struct kvm_vcpu *vcpu)
-> +{
-> +	vcpu->arch.steal.last_steal = current->sched_info.run_delay;
-> +}
-> +
->  long kvm_hypercall_pv_features(struct kvm_vcpu *vcpu)
->  {
->  	u32 feature = smccc_get_arg1(vcpu);
+> Check for enough free hugepages up front so the test skips cleanly.
 
-Why isn't this common code? I really don't see the point in making
-this arch-specific code. I'd expect something like this (untested):
+See my comments at [1].
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index ace5801a592f..3fb77360af01 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -950,6 +950,8 @@ struct kvm_vcpu_arch {
- 	pid_t pid;
- };
- 
-+#define kvm_arch_vcpu_last_steal(v)	(v)->arch.steal.last_steal
-+
- /*
-  * Each 'flag' is composed of a comma-separated triplet:
-  *
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 45e784462ec6..117aeb49231a 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -4459,6 +4459,9 @@ static long kvm_vcpu_ioctl(struct file *filp,
- 			if (r)
- 				break;
- 
-+			if (IS_ENABLED(CONFIG_HAVE_PV_STEAL_CLOCK_GEN))
-+				kvm_arch_vcpu_last_steal(vcpu) = current->sched_info.run_delay;
-+
- 			newpid = get_task_pid(current, PIDTYPE_PID);
- 			write_lock(&vcpu->pid_lock);
- 			vcpu->pid = newpid;
-
-where each architecture that implements steal time provides an
-accessor, and the core code is in charge of the adjustment.
-
-It also makes sure that we don't leave any architecture behind.
-
-Thanks,
+This test is totally borked, and Jiaqi stopped replying. It is a
+liability, and I'd like it *removed*. But if you want to fix it,
+please go ahead.
 
 	M.
+
+[1] https://lore.kernel.org/all/86y0le9cvz.wl-maz@kernel.org/
 
 -- 
 Without deviation from the norm, progress is not possible.
