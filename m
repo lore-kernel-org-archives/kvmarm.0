@@ -1,88 +1,90 @@
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB2FC3BE16A;
-	Mon, 17 Aug 2026 20:28:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5085C2236E8
+	for <kvmarm@lists.linux.dev>; Mon, 17 Aug 2026 21:07:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786998521; cv=fail; b=GCrVbc5jxjCjlHHyJB3cwaKzTVJ/C1kBvgNqqh3x4nuIJlcL0aBn0bKK/u0MJG8/LgOZUZ51HsA8/7YLG4xuM7EK2lZF1ixWKyvZNIBzouSe1L1tkzj4AJ/K6lfNoTrLwBR0Q3+5ENJ+PFyzuaox+emATh89jCZtSvEv/We2Gpg=
+	t=1787000847; cv=fail; b=czM68jchZ7Mf2o97uSAUadAcbI4PL+N/pscmGUaVXEluTSxUIbSzhnipvnM4eoPXRf3kaa+vjEZiT6MjhJ3InghkIWyryn0LDqlvez1PoEMH/GA3lZHYhK4I+ihMou7cnjSn25c9jgQmjtchC+ShVtBrITIH4CECTpbvln/5Qec=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786998521; c=relaxed/simple;
-	bh=BK7RoFLovqYdpqSa23uy9LGP/LpbRbe6CNK7fnYEkuI=;
+	s=arc-20240116; t=1787000847; c=relaxed/simple;
+	bh=YzIrdnn07FyYkh9olTJXFld2k+3xTLW5APvvpvuqvT4=;
 	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=ESCBsjlx/4jn7FjNwssLbybAIWEaOmi4iXPwlhkd2ZqGRo/tCIh4xfplKf3CaJ5x6gFMo25zxgXJy9WMODfW93llAC8eABq24lF3Vt01O76q/bR5k4bnOceAOoz83yYOhPwM+JCn8dvJsu/LFg+KlwhKFp3p/iFaKVZ3RTQgdZ8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=OFc5ha2K; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=GcBERgvn; arc=fail smtp.client-ip=205.220.177.32
+	 Content-Type:MIME-Version; b=JDGlhriMsApTXwNxoSifxVukSmkqGfdy3P90XVqp3XE11rxy57R0kqvcz1mhK/KK+0tUKyh99wEid+ADo5+jyY1PlEYp7SWYxtp9yeSFuRf5+rgghZjWVSZRxLYKparUUi/jHwv7jEm8hyu5X7G1vtW3hCJtKKHLZZ/jFGMa/Vc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=o1Fx+D2C; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=rVqyuXJe; arc=fail smtp.client-ip=205.220.165.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="OFc5ha2K";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="GcBERgvn"
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67HFe6VO2038391;
-	Mon, 17 Aug 2026 20:28:36 GMT
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="o1Fx+D2C";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="rVqyuXJe"
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67HFj85Q814889;
+	Mon, 17 Aug 2026 21:05:52 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=
-	corp-2025-04-25; bh=sBDWjiGVuy7NZeyZIsnMlhZi0qNSqOwaMousVIXNMQY=; b=
-	OFc5ha2K83zv1IYScGoZ1QHkIBfUNxSSy8kQl4UikNjnATDjkPojW3F3Xt8sNLaG
-	L3UA+v78SJAPnPGLg6KlIBg1eErsLG6YffB9DVXhcBR3xTSbk0y35/EqGhtt3Fj9
-	MM6qMPFrb3BdsyDpgXx29MI2g26ANUY04+8o2cRvIk845nrClsT1Ma7ZDrQyep7C
-	qdUYNa9e2w0D1l01CQzAY/jXq3tWAE1moPBGQqmFzx+KPGAIx503oHIyPgOtAfdo
-	RvQ6ivO6cDB/sX4ofwQcJn+HZghrutCbBQD9cyPgpfUqrSIlSBd+aAAfeX2uOLj2
-	+n7iemajNyE3f4Ag/PxmKw==
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4g2g5cb3uv-1
+	corp-2025-04-25; bh=ODisOdi7DmSDatpk0UHQY57orwxe1KEMS5Nq27CXI9A=; b=
+	o1Fx+D2CoqcWiEi20C/vY0tNfDpLB57fy/9ocQOEnW9t4RLOvanPyafmEg8F3Qkw
+	uiK7IsuIBahbXRwzS/edbHM+JC98v0h3wsXKnFu5etAkPYsuUZbqeZEDinW7owAN
+	LxQxT4yu+oksHzDAycOlrzkzcC5i5dCYqmb0kZPijRXNqPrHFxMaNwQGmtigCCp+
+	0BVmFi9k3yBe5WJRlx4bNm4oE2EXiqMzYToBpJehVHGagBOQm3UGcZJ042PNbhLA
+	JofLnjTiYjEOmsA9M0pu9DwdDlJJRY9LO6t69GbJRBB76bEXAcX0HIHl20vzalrJ
+	XP3wCX8oCtyLEVG3NuVLTw==
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4g2epy3brv-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 17 Aug 2026 20:28:36 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.7/8.18.1.7) with ESMTP id 67HKPA3Y016340;
-	Mon, 17 Aug 2026 20:28:35 GMT
-Received: from ch4pr04cu002.outbound.protection.outlook.com (mail-northcentralusazon11013021.outbound.protection.outlook.com [40.107.201.21])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 4g2ejbq95e-1
+	Mon, 17 Aug 2026 21:05:51 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.7/8.18.1.7) with ESMTP id 67HL5frG024049;
+	Mon, 17 Aug 2026 21:05:50 GMT
+Received: from bl2pr02cu003.outbound.protection.outlook.com (mail-eastusazon11011051.outbound.protection.outlook.com [52.101.52.51])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4g32hq137c-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Mon, 17 Aug 2026 20:28:35 +0000 (GMT)
+	Mon, 17 Aug 2026 21:05:49 +0000 (GMT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=fFGroAQCJ/McL3sK3psQucjrNJzlcsrwoRpmI7F/xYRiSwQTnLYePBwQE5MT0L997H50Qz3DWx/8qD+OSaoMspvCHDj9btFKa8Pmk6BFWHJlvOJx7pbetj9UzP4BxE9AUfOGmINGe1vfXZDcJ0lX+ZSFbhlWx1cAMxgUsV/htEXhie+TEPmuga7rxd+ePQt5MUbdqhaRtZto6FmqnIMZLoIdGwRojVtv8x15TE+KoqU1QK7lxTSLiSLKWkXTWiGmj+wBGqzk9osgqVaPRu7nyNH5z/pATY5hzNvh5J59CAE0xSGsuG/i4WNQfwezc90uIH0cH/Q14cUxwjkdW/liQw==
+ b=rNZ7mAjvIYRt+9qrtxAV14qML/7L8QyaGgBJzVPwKLWcz3lxPmu6rpOOzewZ1Mc12GzT8veeLsTthHQpeXg9lgvRYa7JOCM4jxLmO7B4pJazAARjozuzWx4Lxbsavmyef9UJiKFbyWGkGOGEbGwMZpeaolJI8SqY1Lt3yMCDezXHZtzdV1XPAwHeqzVcdsXrBXI9ipvbIb6S0FCXa0xmmyNt/jSU1dHgpqbGfK7FU+Qubivoi21C+PIRCRVRjYuL6bIcV4/nkoOBw9MuqMyFf7FcNupgkgm7Kr/wyYS1B5ZQJqJXqAE2bqBw99q4Hag/ys4Lzsh7BreYhir2fwmZWw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=sBDWjiGVuy7NZeyZIsnMlhZi0qNSqOwaMousVIXNMQY=;
- b=EL3KEgOS3t3AjpFfZ9pg1jXhAMnq2oRyDgaFpbGar6B1GxQbfR9P44LYLCbU5iERhwoQKEa7UPIjoa7vURZ0eC/vPpoNRvW7SBQ4kgDYt7LCy1gKy/j2dONrQnpTKEuXpqMjSnMjtt/J8vXiWsHmNwszffSCGvoEqAQNZPGYUf4HP8OzEWxgaCylf8jj6ln1BGYuGKaxwOIH04zddfGKQ9ytVnVhBW2ZBi9Hip1IdHZtkLffK+ciiiJrMREmkLSicsVsjTyz2GF7krXugMHNMBcziYupeWKteecWxSMwGYDwAd8/GFW59DqaFsaG3EcNPQ7zUt1DjZvR9EuNzA0hBw==
+ bh=ODisOdi7DmSDatpk0UHQY57orwxe1KEMS5Nq27CXI9A=;
+ b=LF4YYOe3Ln72znzk+65+s7hqFk08DvISIN9OqzObOyCwZmUN8+Cy3/+f1VMaYL8xa20xnUXzCBWHowRRUGEqTFNr656UyPxwWJDGsLiJOcmTEMBI4r3XD7IbC7GbpEzcpxRRTFS2LkZia/b5rl8WNVq31Kb22hWbHzZxdulD5cfUr+LixSYPE5MxgBMC/utaAK/Ws90VynrtyNrm+nSViKVZ0+fHQIk6dgBA8K46n1JyutkZHX/Vnx5511VXieDmEB3ABE9pii3YftXkqyRIUCRcNdDlQy6eAg3fwCbW1XXTQ4G9UV8qEkAKQvbpaXabQcZfTX8JTXt5biwpX6ap1A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
  dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sBDWjiGVuy7NZeyZIsnMlhZi0qNSqOwaMousVIXNMQY=;
- b=GcBERgvndIcLqNSOcLV2U+5TspaHqCrJEv6fAMf9zIw0NTmZTzvVMCErnCqEVu0fN6J84D6zQOyL44UoLFGh7ZSZ14GWTQiu3734pSFr5o9HBWJKmjTPTgnJgEBlcSK+/AqwxbJ770ZncPqdvxi70A3YN2U9UtmABvXkmsd61sc=
+ bh=ODisOdi7DmSDatpk0UHQY57orwxe1KEMS5Nq27CXI9A=;
+ b=rVqyuXJeiYY3Og083BJVFle9QaXemDwbbsfGpodDtSbuoHnx5Yb14AzI02WY+5qKyKeY/SjEjg6OTwGIDrA2SUBI4db5N3lgAdLcdRcS9P7kTW8BVKneFFAr9BbJJmMC3jfJAB0Lth8jUaua10DH1ffnrRIOo1Cfvd4tl2vKthY=
 Received: from CO1PR10MB5506.namprd10.prod.outlook.com (2603:10b6:303:161::7)
- by SA1PR10MB5841.namprd10.prod.outlook.com (2603:10b6:806:22b::16) with
+ by PH7PR10MB6459.namprd10.prod.outlook.com (2603:10b6:510:1ee::16) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.315.17; Mon, 17 Aug
- 2026 20:28:29 +0000
+ 2026 21:05:13 +0000
 Received: from CO1PR10MB5506.namprd10.prod.outlook.com
  ([fe80::da72:a0a9:5f18:cda4]) by CO1PR10MB5506.namprd10.prod.outlook.com
  ([fe80::da72:a0a9:5f18:cda4%6]) with mapi id 15.21.0315.016; Mon, 17 Aug 2026
- 20:28:25 +0000
-Message-ID: <23754814-4a94-4100-9786-2c7dc5168f72@oracle.com>
-Date: Mon, 17 Aug 2026 13:28:24 -0700
+ 21:05:13 +0000
+Message-ID: <d71a5dbd-cabe-476d-8837-9519b88ee5cf@oracle.com>
+Date: Mon, 17 Aug 2026 14:05:10 -0700
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/4] KVM: selftests: Test steal time across vCPU pid
- changes on x86
-To: sashiko-reviews@lists.linux.dev
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH 0/4] KVM: Reset steal time accounting on vCPU pid change
+ (x86 and arm64)
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        linux-kselftest@vger.kernel.org, seanjc@google.com,
+        pbonzini@redhat.com, oupton@kernel.org, fuad.tabba@linux.dev,
+        joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com,
+        yuzenghui@huawei.com, dwmw2@infradead.org, joe.jin@oracle.com
 References: <20260816053630.527528-1-dongli.zhang@oracle.com>
- <20260816053630.527528-4-dongli.zhang@oracle.com>
- <20260816055519.E96F11F000E9@smtp.kernel.org>
+ <86tsotyxh5.wl-maz@kernel.org>
 Content-Language: en-US
 From: Dongli Zhang <dongli.zhang@oracle.com>
-In-Reply-To: <20260816055519.E96F11F000E9@smtp.kernel.org>
+In-Reply-To: <86tsotyxh5.wl-maz@kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: PH8P220CA0042.NAMP220.PROD.OUTLOOK.COM
- (2603:10b6:510:2d9::14) To CO1PR10MB5506.namprd10.prod.outlook.com
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PH8PR07CA0033.namprd07.prod.outlook.com
+ (2603:10b6:510:2cf::20) To CO1PR10MB5506.namprd10.prod.outlook.com
  (2603:10b6:303:161::7)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -91,240 +93,195 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR10MB5506:EE_|SA1PR10MB5841:EE_
-X-MS-Office365-Filtering-Correlation-Id: eabdbbb3-38c1-4dab-692f-08defc9e1717
+X-MS-TrafficTypeDiagnostic: CO1PR10MB5506:EE_|PH7PR10MB6459:EE_
+X-MS-Office365-Filtering-Correlation-Id: d82b7fb1-81de-4b25-956c-08defca33af4
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|23010399003|366016|6133799003|56012099006|10067099003|4143699003|18002099003|22082099003;
+	BCL:0;ARA:13230040|23010399003|1800799024|366016|7416014|376014|56012099006|10067099003|4133799003|22082099003|18002099003|4143699003|13003099007;
 X-Microsoft-Antispam-Message-Info:
-	uNvq3lttI7rb3bWxa2x5hUPrvCz77JmReHAOvPNeS7PgJQmpeyrc0xO6cSwiplNrjfLFApQte6J2uAljBEzo+lcxKZ3rL/PQW7xgY3lHHzc+Mw3mI2p6mOK3AUTvNav62CYA+j1k4ESqsYoeTQpSPHhhf2SIc/CPsgtzdCVtQhRLDjKwX6HTkLEfbBgTHXq+G/fMKj9qW48oojCOFPII0T9qapBXcR02Ti9Vzxj8GePsyceZ9HRGRezNICSs/laNd5pyRx9FgO1yO6eKqcyssA6s+slhBwMcz3NfhAW9T0eOr1pQPIEWgoa+gWlb1oCRKzHEVBBd9BbrLF5Uku/bxkKiPdH6n4QIutnaXaeD2exs/EFlo/SoOzRj+gdiaEa+c+rykpo3cuWImFq0c5LlohW3/OVOTio40Ll69sVi0GNaQDv4NTPjMYSEwNAn8pgPVslaLoMkgyfk5mNSYQRU5YTO7ICKWlLlxeyQSHQA1c31H8PIUfn9e+DL0Gy+Ns2jVJ3R1iOLdE0Lu1H1mYMDYQsaPqEiTiiPCzJoSZzg75VVaowhzvNpEb6mRJRX7x2cBwbSzv3hxhK0W2Ak1uXEpAnV00k+YPS2ySBra/b5+CwHgb2aypizAr9eApiCpekbAKe+REHxS1B0SYLeWrerP7kCkxJIn3RwSzbBSbddQGs=
+	1YEOwu/oksa+W8JaJlfqr5mo3//xHxKR8ecj3wbgNGNFNi7mB1QK3bH6Pv15rKctfBUxLKByOB76YpM7Sf9PelNpAyOi5FvsfEciI+fvS7Yj8JNtgoSip07mULDckSXb2JUzMZP/W09qpt2No/1GKBIAlrrT6SPmfAAM2yZ4hQv73YZt1YHdiWAY2m6V28CCMvVeJOIMHCezg44t10jdw7J9urkJkgf8QzkgCWf2OOjE04nUkNhwjY/fcaLASSk1AOyGgOYDoKAuR4Nlj/WaMAlxEGiluSX1WiMEKAKaIH6QgDnuoV/MoWjexoiZ5GMmiunuS6q4DRL7v+AlBpR3KYiNNzrShwPpYABwb/Fh6phXPSIkgDlnv3txCN9u4bT9JvcYlEKS7NsjPsvyKnofRffnokhfQCmd4u2B4WMpgOiKViST2EkqeBW7pKCS9usBDsEgQqRpzWI1O6lkfgNiBX0hrVkE9GtfyC0duSXV1SSpjZL4QnuvTrDMvhqigNXlYfhDmvz00nVrUp/y+x7+tZE278MpxGWeNA9O82RBXBZ10SEfSwXrP9zoyoQy9bkfeIaKh4+w3m/QmaVJUED1rcXNQoLD3orb6622Ys+yPhvSJB87eNd+Mx1nBZqhJBmhs0x0ERxrrGFhQ4dzlEQZXh+Lg2ejULSdWGEGgkJkY0Y=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR10MB5506.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(23010399003)(366016)(6133799003)(56012099006)(10067099003)(4143699003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR10MB5506.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(1800799024)(366016)(7416014)(376014)(56012099006)(10067099003)(4133799003)(22082099003)(18002099003)(4143699003)(13003099007);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?WXRoMWFFZlk0MlpBeUsrZ0dLYnNsS3pSSnhaUnBrZVNHb1c4Umt0UmE4M3Q0?=
- =?utf-8?B?aFJiY3lmOVI5aTJEZ0toZ0VvUCtkV2E0aWtPTWtiYmJVN0JSSzFtMW1Dc0Ix?=
- =?utf-8?B?ZFhEZUNyVzk0T253b2xNQmNKYjE3K2REdno5dkttblVQNmlHcGMrWVhBbHJH?=
- =?utf-8?B?eGVPQ05CSlhTVTNka2tIMnVWckp3Y0pjdXhNRjZmVEhTaHFzdGRyU3A4cnFX?=
- =?utf-8?B?ejJzWjN1ZU5aUGdFZmpFMTFJbUdtdEhjajNMRkdEMUppN1VBM2M2TGszL3Jy?=
- =?utf-8?B?dHRkaHdSU2tzSWVxbk5najlGb1NTNHdiWUZDMWVCbnVNQ3VJeHRtdmRlcWdD?=
- =?utf-8?B?dC92TEg4RzVmMk9tL1pkUEg5UXdPTi9OVElORmtkSjMveEEvcXphTnM0RkFL?=
- =?utf-8?B?ZVY1SUZVTlJBSXZMVGtHdjlTNU1Ec05lZGJLakFLS2FXN21EeGVVSzFqWnJR?=
- =?utf-8?B?Qys2cGU1L1lUWHVTNEIwMDJqd2FTSmdiZ2NIOFNnNkJpMUN5WnFVWWdlS0pG?=
- =?utf-8?B?dUdyTGt2RzBrWlM0MXhvNy9wUk9uTjhPaUdWRE5ETWR6K3F4eDVHeGxvWGJF?=
- =?utf-8?B?b0ttN0ZGUGxyRmVjRTFuYzRSaSt6Y2tVdWh5NGtqWGdMWFBiaUdJUzBrV3JY?=
- =?utf-8?B?OC9ObjlQMG9qTkRkNlh0S1UwbTJQdmtzYjFacUdRVFhOZXU1QzRpanVzblBi?=
- =?utf-8?B?clFWSGUvQUU4RkYwcnRnN0xQR2x3RS9LUnBWK3lQTUlDeWZFdUdTS3ZQZE9G?=
- =?utf-8?B?ZEtWbTQrWGYxSWRBLzdBZmtDOFBmTUhGNmhGQlRVZExaL0R2M3lxRWI5UW5y?=
- =?utf-8?B?ZmFRTmFIRHhtNWZnT0FtL1JHcXQ4M1p4VWxVYzZhMS9oT0xwNVdtNWdJNktD?=
- =?utf-8?B?L0JFSWZtdDgyQVRhbDFqaGtGUGlVcHZpZ3BLQXlrYWllQy91WkI1Vlpqb3ph?=
- =?utf-8?B?WHVrV08xMmRPbU9sR28zdVp0bWl0MGdDRkNOdEZUUlF0L1EvekFSWDNMeWJY?=
- =?utf-8?B?bVdXd3EvalpiemhySFNWa3lJNHFaWEFKMUlYWmJ3b29ETDlhTzY0V3dqYWsz?=
- =?utf-8?B?a0lpanFQWStNejY1ekdvUkJHcUM5a2hZV2VONWdEam95c09RaFA2RnNlc1FJ?=
- =?utf-8?B?WllGcVJoOHBBcXcvcEk3N2NpTWNEakZ5em1SSk5FMDhlZGZNSkdkV1lJWE1p?=
- =?utf-8?B?YkU0R1QyRStuTUhDV3Y1Z1c1M3NWWXZCMUN4YWlQeXdDc293ZmVwVnZDK0ln?=
- =?utf-8?B?N2dKR3F3QklYOHR6TStLWGI2VEpINWpCV1cvdnFCVjNPVE9ockVUQ3NlZnV4?=
- =?utf-8?B?RDF1eGl0UjNKU2pZcE5rY21HZzAydU1XNTZic0crNldmSFlJalpreUV3ZVZU?=
- =?utf-8?B?dks1NFMwNXFrbVdGdDFBSWpVa3daSSsrSTQ2ZHBrcC83WjJDM2JldmFNV0NO?=
- =?utf-8?B?VUxodllIbW1sTGVkLzlLM2JKN3pWNEZ4clZWZnlkdVdtSkN1V3AyVjlTaVg2?=
- =?utf-8?B?dHFXQkJxSFVJVTlsZXlrL1dzcm1Tc0VFakJQbDNzSFhmZkw0ekpLbW9sOUhH?=
- =?utf-8?B?eGNRa0loNFJFKy84WVF6Q3ZKN2c2b080WUU0WXVRTEhwT3krWFRzWS94V1d6?=
- =?utf-8?B?STNiMGM3NDQwQTQrNC9zZmdyaFdxcThZdVI1MWRXV01TeE01QVlqRXc3VE1u?=
- =?utf-8?B?bUdjTFh3V3RoaEdreE9zNEQrTVVxZzB6MkpqRFdzTndsdm9ONE1PTzNRNnNH?=
- =?utf-8?B?K3pMR05TRGdpV2NKWE1ScDQ0dGhyUkpWZTZEL2x0Zlp0eUxtK20rMlp5ZEti?=
- =?utf-8?B?aFgvcXA4UXFvc0o0Q21hRUpueTkxL2s0cysxRVRKZ1lyQXN6MXJzZEZqTkRs?=
- =?utf-8?B?U1gxSFBkWVJSQW9PekFMc0EyUkF1UG5QWEJETmhUTmh0SERadU02ZjdxYXZm?=
- =?utf-8?B?am1zZ050Y2Z3NEJVcllYVk9lODFEaHU3RERVOWp6R3RrRkJ4cWRWb3g4NW91?=
- =?utf-8?B?OUd4S1lFWkdjRTVPeXNvUTZaZVJtR3dJNTZ5allKeC9MdEloTUt2aWpYOGNz?=
- =?utf-8?B?UUYxNVJCWVBka3hGSVZNT3A1K1Y3ZGdPQ213NWlyeFJvMEF2cXVyMldTLzU0?=
- =?utf-8?B?MFJsVEdDeUh1RDE0YnM2L05aQVJ1TG5UaFR4UjNQT094NVhsUXM1OTlTVGF5?=
- =?utf-8?B?M2N1Z1RNYkhXMjJLc1VGWVg1ZGVGWXc0aVV3VFQ0RUJpamJuYmgyalQ3V3R2?=
- =?utf-8?B?UGc3UGFyUlpXYXh3WnNzMTBjdjM4ZC9UaFl3RWZvZ2dpMVZRSkl1Z0NRNE9a?=
- =?utf-8?B?WWx1b3lsV0xxWUlGQ0dlM0o2T0hoeTFBRUZHOWVYMEdtWHlpanlDQT09?=
+	=?utf-8?B?R2w1ZXhOelpEaWRuR0Y5SUFlalo1LzJOdE9JbkFieTlzWGFlL2RtSVZWYmxh?=
+ =?utf-8?B?RmlQdnd2dlBjUmFrdkFqeURaM3VTTi9NRDN3dm9MVGtHamQ3VnNDYUhONHlp?=
+ =?utf-8?B?dE44NCszdE04V3huRW1tdjgxd1ArQUFOeTNmTFNoTDluMHpocXRXU2YzNjRw?=
+ =?utf-8?B?a0VOZDNGT1haeDRmMitmWWU4VmhoQldoa1pkVHVQUzFFYUpUblE5UFpYcWZH?=
+ =?utf-8?B?Y3RxK29SZHBNaEpsSWJRckY2a0xLWHl5Z00xRnduSFZOVmk5Q05ySUw5eHA2?=
+ =?utf-8?B?dHdNUU9abkFrYmsveWx0aWk2WjJxUERIV3VYZnNDZmpNaWg4dGtxRE1udnAr?=
+ =?utf-8?B?VHNmY0hPL3VzMG4rWEdtN3lWVVpzc3l5Q2ZTbUwrLzJyajBUZmZwRi9VR0FO?=
+ =?utf-8?B?SGNXYUVUTHljVmRUQjhXMDAxRk0vdjN6ZDhDNXpCVjVFNFltcFBIcjF0OUVo?=
+ =?utf-8?B?U1lOSTJZV2pqbWZRbHdmOGNyMlNZSS9XNklQZEkzaithbk05K2p2ZjNYcFIx?=
+ =?utf-8?B?NC9wOGxsMU53b0J4eTJtRnFySTFxSUx3N3oxMUpvelpheklmOWxyd1Q5L0R2?=
+ =?utf-8?B?bGNHVFZ1YWM3cmNCcDJpSlMzejVRcUZNWjUwK0dobHBlWTZTMVZsTDUyOEhz?=
+ =?utf-8?B?SGNSSzdzRGlmQ2hkdGp6TTlxbUtRVmdOMUZiNmZuYk9OZDUxZGhDVXZmNzBt?=
+ =?utf-8?B?UlQ5RVpnVFhrS0tnbXZ0dTVlQTZwYzE4cDQvTVJFeXlxdHVMSjFVU0RFbVRZ?=
+ =?utf-8?B?aFhaRHBtdzkya2tTb1VHR0M0QVJVSWx2VHptSW5XcXVvVGxFQjRKRkR3Rlkz?=
+ =?utf-8?B?QVFQVFpLSkJybUZtNEVrVDJwOUZ4Sk9ROHM4YWp5QW9zb0VVWTNOWHgwRXM4?=
+ =?utf-8?B?c1FRVW5RU3lLcWlkUUlyYWFKTWx3SDV2TGU1SDFJb0lBeW5pRnlWUDMyUksy?=
+ =?utf-8?B?aXJBd1JnUHlGUVRwazhwODdpUkJ4c3IySEJCWWhMR0ZTOUlFdWMwdXFreHJa?=
+ =?utf-8?B?aVFJcm5mQ1dhUHBzblAwUTNMWW9PWjdveWJWSitHbkxiazhQOVAxUGtRWWlT?=
+ =?utf-8?B?cFR3K1g1dUlFVSs5UlpuVXFoQnVFdDZQdWprRHRJbnhFUjZjZlFYdDFaZ2tP?=
+ =?utf-8?B?bmdPY3lXVjFUeVJieDl6eE5SbXZVWC95QjZFdENpeCtJb0tNSmt1NWQyRTJ2?=
+ =?utf-8?B?ejY3czZJK2NtL0h2eHhpODhnZ2N3ZGlOb1QvZHhuRXoxZG5rNXRPdWFQWnh0?=
+ =?utf-8?B?Z29pU1l5dlZ0N0RtZVowL252bFcxL1AxQ0hkS1hKQnhENU1hT05GQUR5RVlY?=
+ =?utf-8?B?cjdIUGR5cTRKUHdPUnlkamtDM0tGanNEVGpnd0kyN1hReHZLL3FUZndPUk5p?=
+ =?utf-8?B?bEswRWYzdm4wQUQyandOeGVWUzBSdXlINzBUN1F1eGNDeTlEZmgzcXQyWkNk?=
+ =?utf-8?B?dnNPcWFMaGtPNm1ibFQwa3JzR1h5eWZmZjhWQzNlU0Y2NXVkOXNIUzE4Ymx3?=
+ =?utf-8?B?YnorUUVlMUl0L3Jsd1NmbVN0RnNzK3NxeTdUUTFSeEh3cU5naXBzeno0RXhR?=
+ =?utf-8?B?dFM1TGJBcW44QVl3ajg0elFBUnJWdEdIZmFocmtZWkhveDJjQjgvbThrN081?=
+ =?utf-8?B?Wm5pUHFZN052L0E2dGhuTEIvUlhqQm80cXBhdnlXWUVRSFc2RUEyQ0d4MGRW?=
+ =?utf-8?B?WlljQjh1QWI0d2VGaWhVVkN5Nlp1a0xlbXdOdkFIYUJaQytDZXlHekZzai82?=
+ =?utf-8?B?RGxoSysxbVYxYVRvSEdyb0dVaXVRcW9tMklsNW1aSG1UOGtoSTVVa1loNWVv?=
+ =?utf-8?B?ZUVaT2hVZW9Wb25XMEFselhvYXVFSXF6NzNXR0RjREsvRmc3VEw3SUVjQ1VQ?=
+ =?utf-8?B?V3UyT2lGZnoyNkljTms4aHJObEJCd2Z6V3BDZVhJNEI0VERhb3RWaWhIc2dx?=
+ =?utf-8?B?WllIcHNkblYyUnlCTHZ4WE5meThyWFo3NTZacEZPYnpCQkNad29VdW83VHBp?=
+ =?utf-8?B?YmRPNHhhS2FaWmhTMEp1OWh2SFU3Zi9XY092ME52NXdHb25sbS9yYjN6Qllq?=
+ =?utf-8?B?N2JaUTBrT0tVOUhZYkJJTVMvOTdMUWJvell4WW9tZWF5clo4d2Jhak9sL3lV?=
+ =?utf-8?B?YUx1ZjNkQkk1MzdvMWxZaFZ0T3huVERUdGlWVDlMNTI5d0hjMmNKVWhMMEJN?=
+ =?utf-8?B?LzZWejhVcldnYjdycG9EaVhxeGhzSEVpL1VIemJHeEpIREEyVjJMQ3N4UTBl?=
+ =?utf-8?B?cmNDcmMvZmdwcmkzTDN4UkwyUC8rcFNrVS95NnJGN1h1MHRISVhKSyt5ZktM?=
+ =?utf-8?B?eGFRM0RzUDd0MGJJamNwdStCYlhuR1FGYm43UEx0Sm0vbnVzYzBMdz09?=
 X-Exchange-RoutingPolicyChecked:
-	ZoOJduHMKmYOzGvya7pfD15KCQCfJBsxZC7+GDPZPFDqQb7v5mAGjI4Ju7U8LywDWoG3CGbkQ7E/4mO/H9nJ6XSlIvvPj8jxhlPo/ry+tHhCTy7pRbXkUwQ5kF8pdX1SyaheWwkKOmkV6fKFoGXNpEDer/1x0zXjS6J6wz+za81/RzDHJ0s8wVX5SPygaNcMNxRAjUxWfIwwOQv9pUqAsjY5oliEUfhRGPFU398C66Dpfj/OHyvzSZh0CMVyNTP4jZ4PakhDMIeY1/5A8IreSm+/8fy4hwZyNvhfaucWpnagoYydcDNHEZggCXjSIQxtcF5ZDEcFOfhmPm21jDyj7Q==
+	h+c9WF35WVzv5UdsT5rhqB9nfZYO2jLTEIuqKbfG922lAgnrAkF2FZ3FUvIyu2+FFfyrKF2PYxUWsLUKLzRG8uqo5zqh0dDALT6oTst2aVBUPEhiCOF0XaXPPhmlovvscJcPpG+WBKoolw8Efa1xHIKrLPyCaJNZEyCK2yqjG6ijHiEyzrv8HQWwiA4aYxXqUUQYUraBiEthA38mt3Q8zNmPQ07DgCf08fdnc+56eRw6EZ2PrfCryY3coXBvI4gbT9ucGCrJr4i7bAiUChhilaBgzIybCz1zBawsqr9qcigB6iHMlLFeKWnDpij0q3KsawKxoi5SBSgpn+Ofvla2Xw==
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	QXvE3AzQS/umXtupDsecn2looHxwhJDT9w0W1Da/5DJlMWu6fnn52l0R15gpSEja8pjdPZTCiacYVBf/uc7Y6veS2LIvjapujkwjRmLfOnzLg+SxGg7vmC02MZfCkg/oJSKYC26KPOtghHMS809VTMXBD1AqwR5C3obHL0EGpYNAvcDE8SsEAS1+v8n1AJIehLtmJLM4Dj+nmjJWC1djJ5OB0LC/ljwmgz3QVPD2raJRQiW26jNX5mlchkhBFJWRenB0mfRWgLvjTbVZ895cZ4uFBZTJz4eyP+kAZxuIV3Q7um2tNF7APNObfWLRbMIWq1JmkAxWJEf3NhYTF6Vu1GsnGfI4VMvNO4pjtiv2evm3iUJClzEjy61cOWxPmSC2V0XyeaEARyr6gTiivr7PkOaSpf9rsCiunXH/WbqzRlrXLLrUeamFVeMnNtzluitH4HpgVaLMDUacfhZU99Yd+VpFCG6E+1azul1JBXrekWgYnsiBz6xW+ixJegS8F8dQb1Y8mrAkTa3mBewgy0XkF/B0n8QfwAx83Bih5v8TlLWhJlkqLMOHgVUTygO7yracMBcQQ7p2mIJNb24e4QMf/OMCBo5qt9DD7pfEvj376Wk=
+	LCv6O9xzQfmTApOYhqsh4FnYTcgQXEbOJJF0Lv8gvyOERaVZ544NKyGQzZn3nIOHK052gaO9wx0bFSwpsCkN/F4kDnorgJX02iEYoJ2g4TUAJw7k8NR+4bPuoJ8eaBiTN/1dfZSuMkzuWjyFHY/FiWwpuopP2m4HuPAAMOSIJbRXOSHzJtTbG4YAAuvsiTCwYEdf1WbdrCM+C0YbseWi0RLeg9XcpFWt07oJh37wGFirinax7nc6Oo89i9rD/h8jRRdEHOoaIL+XgsbOTo2hKFAFJgqWRJjquMEATv+QbFsjE3d3ajGUjbyBdsg+qI8OEFl1ecjUmoiIq0MED94DOPNZ+qGsBThYR9fZZRp/sBExwm7abI4s45QPX1NoWAOgOEy2sUYwOZeC8nVmjcsYIt1IGU5Gq2cOkMYEp4UByor9wAxrf449cLaCOkYtQ1ANDdwK4hrZGXqPtEG2qjynJllDKiRYcni2KJyF6RaPDb0/M5J8DMyBdugOl5n5CK6G/xjhe5xL91civ2pGCLgyvwCOmSnfSCLVza0nV7YRlCtfUrUdMzScz8L51z/T6/ebfpz6Lb5UNDUGIWj+Kp4nLPUog+8PM2DWaJBI5iNbGOg=
 X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: eabdbbb3-38c1-4dab-692f-08defc9e1717
+X-MS-Exchange-CrossTenant-Network-Message-Id: d82b7fb1-81de-4b25-956c-08defca33af4
 X-MS-Exchange-CrossTenant-AuthSource: CO1PR10MB5506.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Aug 2026 20:28:25.6603
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Aug 2026 21:05:13.3697
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: hIvCpL+rxf7peLZFOPfG7e8s2n72lt8mqESdyhmPzfwIjg6otZ/BIXCcEgy8JfXc8CrW7XsjBeAH3wNKtXwiUA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR10MB5841
+X-MS-Exchange-CrossTenant-UserPrincipalName: 3gAFJZJlnumj5V0rqxAVcqlcuHo0szLI3tcghTk/qJtKeJz8t+YCdm00siGDm9J+4f7DHKO98hHyqCS0udl5fw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR10MB6459
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
  definitions=2026-08-17_03,2026-08-12_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
- malwarescore=0 mlxscore=0 lowpriorityscore=0 suspectscore=0 spamscore=0
- phishscore=0 mlxlogscore=999 bulkscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2606160000 definitions=main-2608170156
-X-Authority-Analysis: v=2.4 cv=INoyzAvG c=1 sm=1 tr=0 ts=6a836ef4 b=1 cx=c_pps
- a=WeWmnZmh0fydH62SvGsd2A==:117 a=WeWmnZmh0fydH62SvGsd2A==:17
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0
+ malwarescore=0 adultscore=0 mlxlogscore=999 lowpriorityscore=0 mlxscore=0
+ suspectscore=0 phishscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2606160000 definitions=main-2608170161
+X-Proofpoint-GUID: xwAVs9NP192bnzsMCmETGFMi1Iyq5YSH
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODE3MDE2MSBTYWx0ZWRfX6anAzb/Uc9t7
+ TU5spX0woaA9g+1GLTzonPVTzeWWgWkBlepHpAs4rQqPx+ELUl/6jwcKw4tBUSP8T1hscjwZ0US
+ HmACngp0AcFewjYnMqOZaxjmYxCAaSTFG3xRX+TRzZb0hjbzbuGOPXvvQ2kscbdHfJdSURCVEdG
+ mA8hU9sm8x+cM1o7v7l8ffvBi/It4Bv6kQ0OCKfWGjmYz2qT3SmeniG4VrJZU/yfpbS2Y+N2Ssk
+ ZO6Wvak6Zv5k5JxQ+rKLU5rAO6CC2EVkv9SvpZ/02Ny10QbYl2Di6DPIoTqAyMw5Q2xAFNdlgzM
+ sUmaSCoF1zmqoR1MD8jfIfN7Lnrazvv7J/d1xFMkbu0vTZ0esUqKriMTht1PZ7D2WU8c6+ngVCx
+ 0ufAM75b0HjXlkw7PWsytt53/7xIZXrLSNUE/CGakKsI+vpqv+6B5uBqt+RFvI0+vDWCJw1knV7
+ DRg4TuqMSnt53WAPkuVRnZnCQHGsvstu68uJmpR4=
+X-Proofpoint-Spam-Info: AW1haW4tMjYwODE3MDE2MSBTYWx0ZWRfX3VmQmOS1xwCR
+ fEb+H2IsW9g+me5s77pGyXaQB2uD6kCdWjP6xjQ2kl31xi09ba4dipftXAJJfxe91e+vydFexQ0
+ V12K09jq5mpvun/7DPj4SlVcV9jICxgdeR8ipjooH72Vo8V90Ek/
+X-Proofpoint-ORIG-GUID: xwAVs9NP192bnzsMCmETGFMi1Iyq5YSH
+X-Authority-Analysis: v=2.4 cv=EP02FVZC c=1 sm=1 tr=0 ts=6a8377af b=1 cx=c_pps
+ a=qoll8+KPOyaMroiJ2sR5sw==:117 a=qoll8+KPOyaMroiJ2sR5sw==:17
  a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
  a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
  a=Sv0fKeRqtYgA:10 a=GoEa3M9JfhUA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=jiCTI4zE5U7BLdzWsZGv:22 a=BqU2WV_vvsyTyxaotp0D:22 a=VwQbUJbxAAAA:8
- a=yPCof4ZbAAAA:8 a=wSN6PNIQBud6TREbdlMA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=WmVTiCyuxqgg3mnwYu6p:22
-X-Proofpoint-GUID: QPmJRAZUUR46ATYncRa3eCNznRCnYyv5
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODE3MDE1NiBTYWx0ZWRfX4SvfsHHLJtA1
- hnYOEW8m7T52tTd4ksHBJaOrX6ptUTjCTB5BaEXwSaC0hEFGxGbVggKPHLOR18ogWX1ScjfxK9Y
- y6lzwR6Jkpw03rPfWoNV2UnODwXPKRaHQkutkPYUC9t0TvZDdc1BsSUDubcEKtNZrXbmVuJFNkt
- HFwMbiQRy2QOLdl5vPzuApR4uv7m8RZmcpy9V+OVVduMfHy5yBvDPtD0q1oLk4IcwPU0dcCjzb7
- w/uXWuGuNbNUTQQifcnAGEnQshNOeVGwkr2D6IInl46xKjxZzVwWxNqyikSf7f6JhApDPDiXFKa
- PYlHlJcZSzA5q4VMe412UJBk5g58Ps2G/UaHdIv593p9gjFRMAzsL2UUlmafeSG3iKZhQUjSudk
- SN6BIGmc7Qmgdmr9BeLcjWsxBKXRQdS7aTNQg55BqMDqad3n7ZFBMMGxEqZKFDsBdkzVF3R3EgY
- nSTXDVTd6aYF26uSZ+w==
-X-Proofpoint-ORIG-GUID: QPmJRAZUUR46ATYncRa3eCNznRCnYyv5
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODE3MDE1NiBTYWx0ZWRfX9EOieiJL4cyy
- J11X9+o6qZMAZg5AWne40S21h3/9lU8gNT5xwJwVsqnX+yPjD1KkJyBde47h2cyB3S3Qga2oS5s
- Jm9ILasG4UM9xBQmTmxfao7SJ9sFRgNCmUQONEDZWh+DPGHe8hSS
+ a=jiCTI4zE5U7BLdzWsZGv:22 a=RD47p0oAkeU5bO7t-o6f:22 a=VwQbUJbxAAAA:8
+ a=yPCof4ZbAAAA:8 a=cXhUbMmNm04wmYEBA-AA:9 a=QEXdDO2ut3YA:10
+ a=5yU3S35YU4bGjq-dph-N:22 a=Bho9c0fBagfJEIQBS7DQ:22 cc=ntf awl=host:12099
 
 
 
-On Sat, Aug 15, 2026 10:55:19PM -0700, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 2 potential issue(s) to consider:
-> - [Medium] The test races and hangs infinitely if the main thread is scheduled during the helper thread's 200µs wall-clock window.
-> - [Medium] Unhandled `pthread_create()` and `pthread_setaffinity_np()` errors lead to an infinite test hang and undefined behavior.
-> --
+On Mon, Aug 17, 2026 1:15:02AM -0700, Marc Zyngier wrote:
+> On Sun, 16 Aug 2026 06:33:01 +0100,
+> Dongli Zhang <dongli.zhang@oracle.com> wrote:
 > 
-> --- Patch [3]: [PATCH 3/4] KVM: selftests: Test steal time across vCPU pid changes on x86 ---
-> commit dbc0e15e73158fcb584e1322da57a03214c88dd3
-> Author: Dongli Zhang <dongli.zhang@oracle.com>
+> [...]
 > 
-> KVM: selftests: Test steal time across vCPU pid changes on x86
+>> 4. Guest kernel changes are not included. I may send it separately to keep
+>> this series limited to the KVM hypervisor.
 > 
-> Add a selftest for the case where the same vCPU fd is run from a new host
-> thread after steal time has already been enabled and updated.
-> 
->> diff --git a/tools/testing/selftests/kvm/steal_time_change_pid.c b/tools/testing/selftests/kvm/steal_time_change_pid.c
->> new file mode 100644
->> index 0000000000000..3c39594db398e
->> --- /dev/null
->> +++ b/tools/testing/selftests/kvm/steal_time_change_pid.c
-> 
-> [ ... ]
-> 
->> +int main(void)
->> +{
->> +	struct kvm_vcpu *vcpu;
->> +	struct kvm_vm *vm;
->> +	pthread_attr_t attr;
->> +	pthread_t thread;
->> +	cpu_set_t cpuset;
->> +	long run_delay;
->> +	long run_delay_delta;
->> +
->> +	ksft_print_header();
->> +	ksft_set_plan(1);
->> +
->> +	CPU_ZERO(&cpuset);
->> +	CPU_SET(0, &cpuset);
->> +	pthread_attr_init(&attr);
->> +	pthread_attr_setaffinity_np(&attr, sizeof(cpuset), &cpuset);
->> +	pthread_setaffinity_np(pthread_self(), sizeof(cpuset), &cpuset);
-> 
-> [Severity: Medium]
-> Is an error check needed for pthread_setaffinity_np()?
-> 
-> If CPU 0 is offline or excluded by the process taskset mask, this will fail
-> silently. The threads would then run on different CPUs and avoid runqueue
-> contention, preventing the main thread's wait time from increasing and
-> potentially causing an infinite hang in the later sched_yield() loop.
+> Hold on. Do you mean you are changing the guest visible behaviour of a
+> PV interface? That's an ABI. It *cannot* change unilaterally.
 
-This test intentionally follows the existing steal_time.c pattern, which uses
-the same CPU0 affinity setup, unchecked pthread calls, and run_delay wait loop.
+No, this does not change the ABI.
 
-> 
-> [ ... ]
-> 
->> +	steal_time_enable(vcpu);
->> +	run_vcpu(vcpu);
->> +
->> +	run_delay = get_run_delay();
->> +	pthread_create(&thread, &attr, do_steal_time, NULL);
-> 
-> [Severity: Medium]
-> What happens if pthread_create() fails here?
-> 
-> If thread creation fails, do_steal_time() won't execute to generate
-> contention, and the subsequent loop waiting for run_delay to increase could
-> spin infinitely.
-> 
->> +
->> +	while (get_run_delay() - run_delay < MIN_RUN_DELAY_NS)
->> +		sched_yield();
+Taking x86 as an example, the Linux guest currently does not reset the stealtime
+accounting metadata, i.e. rq->prev_steal_time and rq->prev_steal_time_rq, when a
+vCPU is brought online. I meant to reset that metadata before enabling KVM x86
+steal time via MSR_KVM_STEAL_TIME, so that the guest is not affected by a stale
+steal-time value from before the vCPU was offlined.
 
-This test intentionally follows the existing steal_time.c pattern, which uses
-the same CPU0 affinity setup, unchecked pthread calls, and run_delay wait loop.
+For example, in the code below, the guest resets rq->prev_steal_time and
+rq->prev_steal_time_rq after enabling KVM steal time via MSR_KVM_STEAL_TIME.
+
+[PATCH 1/5] x86/kvm: Reset prev_steal_time and prev_steal_time_rq when enabling
+steal time
+https://lore.kernel.org/all/20260505003044.78693-2-dongli.zhang@oracle.com
+
++void sched_steal_time_cpu_init(int cpu, u64 steal)
++{
++	struct rq *rq = cpu_rq(cpu);
++
++	rq->prev_steal_time = steal;
++#ifdef CONFIG_PARAVIRT_TIME_ACCOUNTING
++	rq->prev_steal_time_rq = steal;
++#endif
++}
++
+ #ifdef CONFIG_HAVE_PV_STEAL_CLOCK_GEN
+ static u64 native_steal_clock(int cpu)
+ {
+
+
+@@ -337,6 +354,12 @@ static void kvm_register_steal_time(void)
+ 		return;
+
+ 	wrmsrq(MSR_KVM_STEAL_TIME, (slow_virt_to_phys(st) | KVM_MSR_ENABLED));
++
++	/*
++	 * This CPU is not ready to be scheduled yet.
++	 */
++	sched_steal_time_cpu_init(cpu, kvm_steal_clock(cpu));
++
+ 	pr_debug("stealtime: cpu %d, msr %llx\n", cpu,
+ 		(unsigned long long) slow_virt_to_phys(st));
+ }
 
 > 
-> [Severity: Medium]
-> Can this loop hang infinitely if the main thread is scheduled during the
-> helper thread's wall-clock window?
+>>
+>> [PATCH 1/5] x86/kvm: Reset prev_steal_time and prev_steal_time_rq when enabling steal time
+>> https://urldefense.com/v3/__https://lore.kernel.org/all/20260505003044.78693-2-dongli.zhang@oracle.com__;!!ACWV5N9M2RV99hQ!Kt5J7E63dvSlZsI1Ovt02JMZuh0BwYZZupi0BMQXDxnYkQ6iPNwB7tuWgd7wSVOEVHCF40thrD8Apg$ 
+>>
+>> 5. There is one remaining corner case: this series resets last_steal when
+>> the vCPU run PID changes, but not when steal time is enabled. If additional
+>> host run_delay is accumulated after the PID changes but before the guest
+>> enables steal time, that delta could be unexpectedly accounted to guest
+>> vCPU steal time. In practice, this should not happen for Linux guests.
 > 
-> The helper thread do_steal_time() bounds its execution to strictly
-> MIN_RUN_DELAY_NS of wall-clock time:
+> Why is Linux immune to this? Also, KVM does not cater for Linux guests
+> only.
+I should have explained this more clearly.
 
-This test intentionally follows the existing steal_time.c pattern, which uses
-the same CPU0 affinity setup, unchecked pthread calls, and run_delay wait loop.
+I did not mean that Linux is immune in the architectural sense, or that KVM
+should rely on Linux guest behavior. The corner case I had in mind is:
 
-> 
-> static void *do_steal_time(void *arg)
-> {
-> 	struct timespec ts, stop;
-> 	clock_gettime(CLOCK_MONOTONIC, &ts);
-> 	stop = timespec_add_ns(ts, MIN_RUN_DELAY_NS);
-> 	while (timespec_to_ns(timespec_sub(ts, stop)) < 0)
-> 		clock_gettime(CLOCK_MONOTONIC, &ts);
-> 	return NULL;
-> }
-> 
-> If a scheduler tick occurs during this window, the main thread may preempt
-> the helper thread to evaluate this loop condition.
-> 
-> While the main thread is running, its runqueue wait time (run_delay) does
-> not increase, but the helper thread's wall-clock timer still advances. As a
-> result, the helper thread could exit having been on the runqueue/CPU for
-> exactly the requested wall-clock time, but the main thread will have
-> accumulated strictly less than MIN_RUN_DELAY_NS of wait time.
-> 
-> Once the helper thread exits, there are no competing threads on the pinned
-> CPU, so the main thread's wait time stops increasing permanently, causing
-> this loop to spin infinitely.
-> 
-> [ ... ]
-> 
->> +	run_vcpu(vcpu);
->> +	sync_global_from_guest(vm, guest_stolen_time);
->> +	main_steal = guest_stolen_time;
->> +
->> +	TEST_ASSERT(main_steal >= MIN_RUN_DELAY_NS,
->> +		    "Expected steal time >= %ld, got %"PRIu64,
->> +		    MIN_RUN_DELAY_NS, main_steal);
->> +
->> +	pthread_create(&thread, NULL, vcpu_thread, vcpu);
-> 
-> [Severity: Medium]
-> Should we check the return value of pthread_create() here?
-> 
-> If it fails, the thread variable remains uninitialized, which would trigger
-> undefined behavior when passed to pthread_join() on the next line.
-> 
->> +	pthread_join(thread, NULL);
-> 
+1. The vCPU is run by a new host PID, so KVM resets last_steal to the new PID's
+current run_delay.
 
-This test intentionally follows the existing steal_time.c pattern, which uses
-the same CPU0 affinity setup, unchecked pthread calls, and run_delay wait loop.
+2. The guest has not enabled steal time yet.
+
+3. The new host task accumulates additional run_delay before the guest enables
+steal time.
+
+4. When steal time is later enabled, that pre-enable run_delay can be included
+in the first stealtime update.
+
+For the Linux guest on QEMU/KVM x86 path, this window should normally be very
+small. For example, on x86, a Linux guest enables KVM steal time immediately
+from the CPU online path.  Also, QEMU does not enter KVM_RUN for an offline
+vCPU, so the normal QEMU/KVM hotplug path leaves little opportunity to
+accumulate run_delay before steal time is enabled.
 
 Thank you very much!
 
 Dongli Zhang
-
