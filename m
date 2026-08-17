@@ -1,212 +1,262 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B22A03E92B5;
-	Mon, 17 Aug 2026 11:51:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAFD8415F03
+	for <kvmarm@lists.linux.dev>; Mon, 17 Aug 2026 12:34:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786967519; cv=none; b=DTZXpWpwRfL3FkkkxsxTt2SSuuw1/pOnFgnoE8QORddlL0xI3zg5dMWVEokriF48PaUqiWHgouoLuGfIScQTF1CqskcruJocG0krOZBlN4WT4NlMjIB4qYrs+/+YFc4jbyJknSBb0WxG1FBYG5qNDyXoYYqnhMNCTbm32a6fg08=
+	t=1786970101; cv=none; b=h4WLo/oAGT02Twb/LRbp20i6iUM45AeuxNjpUhIm7IcAi296gBuRQryhm95urTbqwpuAJcOaGPMPZ0kUoVJOnlA/oRKP+JCYlqG44OM3F2I6fSFgPpetCcfs43vPnz59qPkpH4S0QvnG8fwVj5d88uNPFDbDGkpPZwncHlp5cUg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786967519; c=relaxed/simple;
-	bh=PwMJ0xRsJf18yKxDiZsBhHRYHpS/VUXyMPdQ7s7DF+Y=;
-	h=Message-ID:Subject:From:To:Cc:Date:in-reply-to:Content-Type:
-	 MIME-Version; b=gB7mslh40kqq7qKr3OF90A9W/ek5+XqED4JQTYSs7QquRURYc0CvORJc4w9EiU+IgrpN5Cd/QVWj/s7/GOV4DzG7IjHAB5t4yZdq7gpmOGB7NV/ewfjee83Z4zMRR8IRbDWkJyA3JwBXNatFUzndD0f8Nsh6KdfcCVD4PrpR/qg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=IYaH+NWN; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
+	s=arc-20240116; t=1786970101; c=relaxed/simple;
+	bh=KoMYTngtcOx3C4ujY5d/IqD3JolqZNXmrrbXHPnn7uk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ov1/3F5gufWgDfRH+GODEVtZggm4Q/dxXg8+wBjkgy4mctRZIzJkljCNYaQe39uG/5lhHp0XQxc8y2cyWN4/RmGcOWcaWfpF+j8q78PjIKzVpD3paT2Pskq2LIByJhot4E0XIgub5WC74quKASs93uLI6cC7oxArOgVl8ZX4kII=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AemBiaOw; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="IYaH+NWN"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:in-reply-to:
-	Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:
-	Content-ID:Content-Description:References;
-	bh=PwMJ0xRsJf18yKxDiZsBhHRYHpS/VUXyMPdQ7s7DF+Y=; b=IYaH+NWNIW1hnrDjl4R6pUrDio
-	qpW3r+X5FkvcRMOWEPMRm7wqrGClI2pZsrZibk2QVPVMfLe1mejunfF6cYM/VmhImpRYLbFvTpCK3
-	rEA4+s+OO2fTa+7T1NSpka9S8lZAiW4hjIb58AJk0yRJZRHYqAX7WKWPxaqZ8/x6Ud3zQXts1+aN/
-	KDhlwkXPi/y8UfKgorbm2lT9ZEiEolRX15CkeGaVrTf9gII+D2crMcwunVjilwdzPxtolupviHENh
-	Z0csCzV+MTfUhS/cKHwqJ0kcM2HM2JhUkxtguwA3JG0ciUc1s8vhsXfrUO2JB7jnD19hEZDIdfC7u
-	yAPqcTyw==;
-Received: from [2001:8b0:10b:5:21b4:de29:7387:4faa] (helo=u09cd745991455d.ant.amazon.com)
-	by casper.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wvvsb-0000000A3iQ-0iAV;
-	Mon, 17 Aug 2026 11:51:49 +0000
-Message-ID: <b2843bdcbe1123945552e113b0c2727db51d9606.camel@infradead.org>
-Subject: Re: [PATCH 0/4] KVM: Reset steal time accounting on vCPU pid change
- (x86 and arm64)
-From: David Woodhouse <dwmw2@infradead.org>
-To: dongli.zhang@oracle.com
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linux-kselftest@vger.kernel.org, seanjc@google.com, pbonzini@redhat.com, 
-	maz@kernel.org, oupton@kernel.org, fuad.tabba@linux.dev,
- joey.gouly@arm.com, 	seiden@linux.ibm.com, suzuki.poulose@arm.com,
- yuzenghui@huawei.com, 	joe.jin@oracle.com
-Date: Mon, 17 Aug 2026 12:51:38 +0100
-in-reply-to: <20260816053630.527528-1-dongli.zhang@oracle.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-ZqlKCzTF9YDjDCpwa+kX"
-User-Agent: Evolution 3.60.3-0ubuntu1~ppa9~24.04 
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AemBiaOw"
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2d01663d816so29285135ad.1
+        for <kvmarm@lists.linux.dev>; Mon, 17 Aug 2026 05:34:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1786970099; x=1787574899; darn=lists.linux.dev;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=8KjWXP+qZdAduuExhW3Uw0m7asrTX1tGFHFZbEdR7hI=;
+        b=AemBiaOwV5nfwHn8kVmQ5b00mw9N/T7kClvX9ri4oxSL4dvjayZo1us0khEncftGZ1
+         OJcmdGqwzJ6U7E+CgXlB23O/RJ3vqOmI1k+Bq5wrcaamYQMOCwW30YkvTIPqGg9VfOrf
+         nk1fVwbEbqOKc2zfM5zunjjqsnthZ7Y844Qdg/+rp1yXYVAuh8WxFaffQjVPY8lTubn1
+         wlh+GzpqDSC9ptZE8VpdiwYkOiNLdfVaeAOzkJXHBxS1e41wO4VYfFDrrH2md4YvSBcY
+         pwdRWAEfsV4SomtcqgDs+LDRK4r5Z0XapL9XfJOO9Z8bNqMTWhVGHJfJCUEu5h63LcTc
+         2qtg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786970099; x=1787574899;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=8KjWXP+qZdAduuExhW3Uw0m7asrTX1tGFHFZbEdR7hI=;
+        b=FeFktSNSO8oy4XJFWjAVigfoPe0P81QDK5DpeWaaN0wJPyZX/eS0dcOOxl788EiPUz
+         ZXY1d868FBZaKIPaDXDtj+/Z2ji+A4h6CISx3J/SC+zxEI8SvnpXf3DsZiKwdNhHvOMU
+         zJO/yWsZvarLtEu/68zcGfLTO7nbyi/BNPZhyGWpYpPDkI6JSzPE0V569oXa9CV5DJMK
+         p84i0BkLTeANGRJ16QAqNLeZcwJVr8e7D4ahAHe21PSv5DqX+3Ys2uXnQosMj/eD1LJm
+         iv5bTHPLD2xKZBEa9RD5tuTafnqj+Kx+OuSe0YAyv5NnJ6MZmGo1t4bOZ52br2Q5PH56
+         5+fw==
+X-Forwarded-Encrypted: i=1; AHgh+RpV0WmujkgXjmvrhWxE2z2saKRGIx0VF4AetH28n7YXwudlYFaESEmsHHos1Q0IdiGNC2258Po=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyaVuO/UJIHTWKKu9i1+u/aGSaunUvLnsf3k/rnatu/U24sntus
+	nXqKwRv3R1lHje6DNBCoH9fWYASyAAwUVAVYmloEXAv6IA3KY395ytfv
+X-Gm-Gg: AR+sD13EfDqDCOwpmW+W3T/RCR1uanIk6FGqP8go6UREANzNReAqhrKCkNOZ7B8fQQz
+	djGVNm+17vwnDvzv4DZ5dwEwLnJ8rU3qvX3XMjqIwkkSi4zZcg82/E02//mHTEt3NU99CSwdMMM
+	6MNBheC++8CB9TfSk2ZkIOAbCIhRwzJE7smUiKdF99vUtZVqm+iAjjSuLi1m1fYXLDT8V7qOxZQ
+	A99Ux0vGIK9KpNWucXZK7ZPjkiIs5trk/28gWOsmLNG3/GSo5MJsewalrVIelTtsBLdK0b7mL2Z
+	DmnLp3f1SUoq4vlz+QzlJn22aABjua0F2nzowCWrJvXPMSyA4ApjLPcEDgQOnIuNBbavy8mFYHd
+	Fa1wfe+wIuN4+2sgFbjBvBfSkizLmMhc9g/Ycxc6g8dTFhkcwDiSrQ54DpUZLRmq6egKoTGgbkJ
+	1UUO9oUWlE7GNzqGhp9vY2gBOb6o5XQ5DjvtwDWLdS4tLJPJOdSGkcF2dg0/7Cv4SotNNDxv2ER
+	Kfw/iADv0COn0Rkww==
+X-Received: by 2002:a17:902:d4cf:b0:2ca:660:b1d with SMTP id d9443c01a7336-2d3b0d5eccfmr253638745ad.11.1786970098817;
+        Mon, 17 Aug 2026 05:34:58 -0700 (PDT)
+Received: from [10.26.143.42] ([43.132.141.21])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2d5bb511b0esm4947915ad.26.2026.08.17.05.34.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 17 Aug 2026 05:34:58 -0700 (PDT)
+Message-ID: <79ec6855-6764-407f-bf46-add1bdf36b69@gmail.com>
+Date: Mon, 17 Aug 2026 20:34:53 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1] KVM: selftests: Improve sea_to_user test
+To: Marc Zyngier <maz@kernel.org>, Jiaqi Yan <jiaqiyan@google.com>
+Cc: oupton@kernel.org, sebott@redhat.com, gshan@redhat.com,
+ yuzenghui@huawei.com, rananta@google.com, joey.gouly@arm.com,
+ suzuki.poulose@arm.com, pbonzini@redhat.com, shuah@kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260130192837.890688-1-jiaqiyan@google.com>
+ <86y0le9cvz.wl-maz@kernel.org>
+Content-Language: en-US
+From: Like Xu <like.xu.linux@gmail.com>
+In-Reply-To: <86y0le9cvz.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
+On 1/31/26 8:37 PM, Marc Zyngier wrote:
+> On Fri, 30 Jan 2026 19:28:37 +0000,
+> Jiaqi Yan <jiaqiyan@google.com> wrote:
+>>
+>> Several improvments to the test for KVM_EXIT_ARM_SEA:
+>>
+>> - Refactor run_vm to catch GUEST_FAIL, instead of causing confusing
+>>    unhandled MMIO kvm exit.
+>>
+>> - Sync far_invalid to guest.
+>>
+>> - Exit test with KSFT_SKIP or KSFT_FAIL when should.
+>>
+>> - Add comment about VM backing memory type.
+>>
+>> Signed-off-by: Jiaqi Yan <jiaqiyan@google.com>
+>> ---
+>>   .../testing/selftests/kvm/arm64/sea_to_user.c | 94 +++++++++++--------
+>>   1 file changed, 53 insertions(+), 41 deletions(-)
+> 
+> Overall, this test is still pretty broken.
+> 
+> For example, on my Altra box:
+> 
+> maz@filthy-habits:~$ ./sea_to_user
+> Random seed: 0x6b8b4567
+> # Mapped 0x40000 pages: gva=0x80000000 to gpa=0xff80000000
+> # Before EINJect: data=0xbaadcafe
+> # EINJ_GVA=0x81234bad, einj_gpa=0xff81234bad, einj_hva=0xffff41234bad, einj_hpa=0xbad
+> ok 1 # SKIP EINJ table not available in firmware
+> 
+> Well, not quite. EINJ *is* available, it is just that this test,
+> contrary to *all* the other tests, requires some insanely high
+> privileges. But the test is making stupid assumption.
+> 
+> But that's not all:
+> 
+> maz@filthy-habits:~$ sudo ./sea_to_user
+> Random seed: 0x6b8b4567
+> # Mapped 0x40000 pages: gva=0x80000000 to gpa=0xff80000000
+> # Before EINJect: data=0xbaadcafe
+> # EINJ_GVA=0x81234bad, einj_gpa=0xff81234bad, einj_hva=0xffff41234bad, einj_hpa=0x80041234bad
+> # echo 0x10 > /sys/kernel/debug/apei/einj/error_type - done
+> # echo 0x2 > /sys/kernel/debug/apei/einj/flags - done
+> # echo 0x80041234bad > /sys/kernel/debug/apei/einj/param1 - done
+> # echo 0xffffffffffffffff > /sys/kernel/debug/apei/einj/param2 - done
+> # echo 0x1 > /sys/kernel/debug/apei/einj/notrigger - done
+> sh: 1: echo: echo: I/O error
+> Bail out! Failed to write EINJ entry: Success (0)
+> # Totals: pass:0 fail:0 xfail:0 xpass:0 skip:0 error:0
+> 
+> Failed? Or Success? Who knows...
+> 
+> But frankly, the whole "embedded shell script" is disgusting. What is
+> wrong with driving the injection from the test itself, rather than
+> this access()+popen()? popen() itself is a liability (see the man page
+> for system()), and should never be used for this sort of things.
+> 
+>>
+>> diff --git a/tools/testing/selftests/kvm/arm64/sea_to_user.c b/tools/testing/selftests/kvm/arm64/sea_to_user.c
+>> index 573dd790aeb8e..4a3511fa1f940 100644
+>> --- a/tools/testing/selftests/kvm/arm64/sea_to_user.c
+>> +++ b/tools/testing/selftests/kvm/arm64/sea_to_user.c
+>> @@ -12,6 +12,11 @@
+>>    * including the notrigger feature. Otherwise the test will be skipped.
+>>    * The under-test platform's APEI should be unable to claim SEA. Otherwise
+>>    * the test will also be skipped.
+>> + *
+>> + * The VM backing memory is tied to HugeTLB 1G hugepage so far. Make sure
+>> + * there are more than 4 1G hugepage on the system. They can be allocated
+> 
+> Why *more than*? Isn't that *at least* instead?
+> 
+>> + * at runtime by:
+>> + *   echo 4 > /sys/kernel/mm/hugepages/hugepages-1048576kB/nr_hugepages
+>>    */
+> 
+> Why can't you provide an adequate diagnostic instead of this stuff:
+> 
+> maz@filthy-habits:~$ ./sea_to_user
+> Random seed: 0x6b8b4567
+> ==== Test Assertion Failure ====
+>    include/kvm_syscalls.h:58: mem != MAP_FAILED
+>    pid=887 tid=887 errno=12 - Cannot allocate memory
+>       1	0x0000000000405b4f: __kvm_mmap at kvm_syscalls.h:58 (discriminator 3)
+>       2	 (inlined by) kvm_mmap at kvm_syscalls.h:65 (discriminator 3)
+>       3	 (inlined by) vm_mem_add at kvm_util.c:1036 (discriminator 3)
+>       4	0x0000000000402373: vm_create_with_sea_handler at sea_to_user.c:290
+>       5	 (inlined by) main at sea_to_user.c:336
+>       6	0x0000ffffb0dc229b: ?? ??:0
+>       7	0x0000ffffb0dc237b: ?? ??:0
+>       8	0x00000000004027ef: _start at ??:?
+>    mmap() failed, rc: -1 errno: 12 (Cannot allocate memory)
+> 
+> What is preventing you from not requiring huge pages? And not
+> requiring 4kB as the base page size?
+> 
+> Given how broken this is, I'm likely to disable this test until you
+> fix it for real.
 
---=-ZqlKCzTF9YDjDCpwa+kX
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Pls help review the expect output:
 
-On Sat, 2026-08-15 at 22:33 -0700, Dongli Zhang wrote:
-> 3. Although David also suggested doing the same for Xen-on-KVM vCPUs, thi=
-s
-> series does not reset last_steal for Xen vCPUs.
+# selftests: kvm: sea_to_user
+# Random seed: 0x6b8b4567
+# # Mapped 0x40000 pages: gva=0x80000000 to gpa=0xff80000000
+# # Before EINJect: data=0xbaadcafe
+# # EINJ_GVA=0x81234bad, einj_gpa=0xff81234bad, einj_hva=0xffff41234bad, 
+einj_hpa=0x2141234bad
+# 1..0 # SKIP EINJ debugfs interface not available; run as root with 
+CONFIG_ACPI_APEI_EINJ and firmware EINJ support
+ok 1 selftests: kvm: sea_to_user # SKIP
+# 1 skipped test(s) detected.  Consider enabling relevant config options 
+to improve coverage.
+# Totals: pass:0 fail:0 xfail:0 xpass:0 skip:1 error:0
 
-Hm, the more I look at this, the more I like the Xen-on-KVM approach of
-just letting userspace save/restore the values.
+, and the diff behind:
 
-Migration Just Works=E2=84=A2, as the runstate times are migrated along wit=
-h
-the 'current' runstate being set to RUNSTATE_runnable, and the next
-catch-up attributes all the intervening time to steal time, correctly
-tracking the migration downtime.
+diff --git a/tools/testing/selftests/kvm/arm64/sea_to_user.c 
+b/tools/testing/selftests/kvm/arm64/sea_to_user.c
+index a23d74ed45035..7e86cbeb55291 100644
+--- a/tools/testing/selftests/kvm/arm64/sea_to_user.c
++++ b/tools/testing/selftests/kvm/arm64/sea_to_user.c
+@@ -86,25 +86,32 @@ static u64 translate_hva_to_hpa(unsigned long hva)
 
-For your vCPU hotplug case, a VMM hosting Xen guests can use the same
-API to set all the times to zero and the current runstate to
-RUNSTATE_offline.
+  static void write_einj_entry(const char *einj_path, u64 val)
+  {
+-	char cmd[256] = {0};
+-	FILE *cmdfile = NULL;
++	char buf[32];
++	int fd, len, ret;
 
-Shouldn't we just add the same save/restore facility for the native KVM
-steal time too? It'd make live migration fully transparent, and a VMM
-could handle your vCPU hotplug case just the same way by setting it to
-zero (the ioctl would recapture last_steal on the current pid just like
-KVM_XEN_VCPU_ATTR_TYPE_RUNSTATE_DATA does).
+-	sprintf(cmd, "echo %#lx > %s", val, einj_path);
+-	cmdfile = popen(cmd, "r");
++	fd = open(einj_path, O_WRONLY);
++	if (fd < 0)
++		ksft_exit_fail_perror(einj_path);
 
+-	if (pclose(cmdfile) == 0)
+-		ksft_print_msg("echo %#lx > %s - done\n", val, einj_path);
+-	else
+-		ksft_exit_fail_perror("Failed to write EINJ entry");
++	len = snprintf(buf, sizeof(buf), "%#lx\n", val);
++	ret = write(fd, buf, len);
++	if (ret != len)
++		ksft_exit_fail_perror(einj_path);
++
++	close(fd);
++	ksft_print_msg("%#lx > %s - done\n", val, einj_path);
+  }
 
-On the *guest* side, is anything really needed once we fix the host not
-to expose nonsense values? You've given Marc the impression that we
-need guest-side changes to match the host-side changes in this thread,
-and that wasn't my understanding.
+  static void inject_uer(u64 hpa)
+  {
+-	if (access("/sys/firmware/acpi/tables/EINJ", R_OK) == -1)
+-		ksft_test_result_skip("EINJ table no available in firmware");
+-
++	/*
++	 * Reading the ACPI EINJ table requires CAP_SYS_ADMIN, so a plain
++	 * access() check gives a false negative for unprivileged runs. Probe
++	 * the debugfs EINJ interface instead: it is only present when both
++	 * firmware and the kernel EINJ driver support error injection.
++	 */
+  	if (access(EINJ_ETYPE, R_OK | W_OK) == -1)
+-		ksft_test_result_skip("EINJ module probably not loaded?");
++		ksft_exit_skip("EINJ debugfs interface not available; run as root 
+with CONFIG_ACPI_APEI_EINJ and firmware EINJ support\n");
 
-We *should* still fix the guests, of course, but I still prefer my
-approach to that, as discussed in=20
-https://lore.kernel.org/all/f0535c47ea81a311efd5cade70543cdf7b25b15c.camel@=
-infradead.org/
+  	write_einj_entry(EINJ_ETYPE, ERROR_TYPE_MEMORY_UER);
+  	write_einj_entry(EINJ_FLAGS, MASK_MEMORY_UER);
+> 
+> Thanks,
+> 
+> 	M.
+> 
 
---=-ZqlKCzTF9YDjDCpwa+kX
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCE8Ew
-ggWvMIIEl6ADAgECAhANkOKMSmGXhF5eMl0rsRhvMA0GCSqGSIb3DQEBDAUAMGUxCzAJBgNVBAYT
-AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
-BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBHMjAeFw0yNDAzMTMwMDAwMDBaFw0zNDAz
-MTIyMzU5NTlaMGIxCzAJBgNVBAYTAlVTMRcwFQYDVQQKEw5EaWdpQ2VydCwgSW5jLjE6MDgGA1UE
-AxMxRGlnaUNlcnQgQXNzdXJlZCBHMiBTTUlNRSBSU0E0MDk2IFNIQTM4NCAyMDI0IENBMTCCAiIw
-DQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBAOfSIeC0vv1xPQ+dgSxbIIrkaru6skAWJYaGFzmv
-q4Kq+2wU2jxhcWlJg/JeP5jEkq/LM3pn5aaLao79j+XRmS7J1ZpJKUODJVoM4s9MQJhTMvo4qS5Z
-S64g6QR7Obkz3I1Lr3aWeSBmDDEyzue+NKtuWZ1Cxy3RdXo/w5HgRc3l2AercOM3Gt1XonTzEtTb
-Z/Hwc0Sn9Gz8RmGRK6Ka4hVDl8q/2l110KaV233Kh5etP0csXS8MIMdVRfRu3sc5hp13DG7lCKzK
-72a2GEpI8Wpl26G6I1/LMzz/98T+FqjTqxsdquk7Cj7m2vKGLW1BorpQH7WFGPdJQXJe1hfbfiZA
-CcVdCtl4nAacFacmsiArZBfX7AQGL7isvHUwwYFEtcApyGW4p2Lt+t8nvU0CANA6BHOpOz1xOP8W
-mAESbUriIjyuTUf3fJ9oDNCurVqhASMJCDaWI3lYX/QAoiAzt6akqbbZxo2ujW7mGGqc0KxqE2cs
-h2T79v7pC8aUtHBfwNrTR19GnZVxE0eQ7ViIQhR6mpSaUQFA9sG+cmD2G8TnCgYsLa0q8De6F61a
-CBevQGHNzrbZ3JAMneveYg/Jy1XxQHDRcvrMfWKe0jjcWbdKYlaGVPm5V1ILwYz7Yv5ewo3NUrxI
-GJiywe9qPhuJSDZs7VehTuI0FxGIsgKzVjgbAgMBAAGjggFcMIIBWDASBgNVHRMBAf8ECDAGAQH/
-AgEAMB0GA1UdDgQWBBT3m6JO05fF9DQPQw6Bhc6RkzKv+TAfBgNVHSMEGDAWgBTOw0q5mVXyuNtg
-v6l+vVa1lzan1jAOBgNVHQ8BAf8EBAMCAYYwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MHkGCCsGAQUFBwEBBG0wazAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29tMEMG
-CCsGAQUFBzAChjdodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vRGlnaUNlcnRBc3N1cmVkSURS
-b290RzIuY3J0MEUGA1UdHwQ+MDwwOqA4oDaGNGh0dHA6Ly9jcmwzLmRpZ2ljZXJ0LmNvbS9EaWdp
-Q2VydEFzc3VyZWRJRFJvb3RHMi5jcmwwEQYDVR0gBAowCDAGBgRVHSAAMA0GCSqGSIb3DQEBDAUA
-A4IBAQA+b8Uw53sDspdZgukU+qzLyyHkcjlxGGhHlP+zrmDLKm1wEFvCRS2pili3Hy67i8N4N5NU
-vw5Rg6kv3lxb9S9Rktxk43k+tvm68pl7OxQE55ZjVY87P0lUPGwEqOOwLLyH02ZQcsfq5p5LrOH9
-0JvmvZ1yy73HS+VpDAqOlytE0NSvTIRqFFkKQGQwfjvtql9YflujuNNvJztjBaHKYZsnNSg+J38o
-jYq4TP3pSg3UdVH0PncVjPQyqxC9xef5Xae92Kbkzol3x7Nel3A1bwAkalrDMspvTHvey6LfiBks
-FIqviTnoy7fgjaRAJgHS+RXx/cmuRd3rUAclSVVrYu8RMIIHAzCCBOugAwIBAgIQAzUotrsybJHx
-HTjKOIVdIDANBgkqhkiG9w0BAQsFADBiMQswCQYDVQQGEwJVUzEXMBUGA1UEChMORGlnaUNlcnQs
-IEluYy4xOjA4BgNVBAMTMURpZ2lDZXJ0IEFzc3VyZWQgRzIgU01JTUUgUlNBNDA5NiBTSEEzODQg
-MjAyNCBDQTEwHhcNMjYwNzE4MDAwMDAwWhcNMjgwMTA0MjM1OTU5WjAeMRwwGgYDVQQDDBNkd213
-MkBpbmZyYWRlYWQub3JnMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA2pYux73kdbYX
-sWF8f1u6DJP91qcqaZetsyfPkZk0B+MmXmAEv0kVes5n15V2mbDThOnpoPFly0UugQO9JYqLfrtD
-tKD5yL58fgrDB9Dw+LQikgrHafl6YSCds5AvUu/8hw2J6noKrcOLJpKlKn9Fl/4IB9Q3JIdLx5aa
-EtTqMalIPqHFOlgrJ7s+aua8xbB8YQ9ahqYBXWRJNv3P/2b1DYtdrz1oqZPE3CcB8Pc6Gf2a1Tcm
-6TAgtEx7Cf1BFcrsrMz7TWHmGQITieNb2r9UYWSc2Gp+GtYFNJCgT0JJXKUBIauPMKBLteYrL8Fo
-ff/uY44dC/mDWjdCP/5x0qelPQjlBvWdHL5zvBTOj06rJ0m3HNI/hnIcDh0Qu2j9reb9rLVcdym6
-bWmBM4uDEB8Zv9Ph0KTBFSy1IosyakuD1j1Os30EzjGfbi0EUXIvnOcYbTBAbM5UAzrxEHMhBvoX
-Pvnx+OyvjJmc9tWxTX6AcSz+m40esbT17URBeZS18afgieiikm5TynlUYP1LciR3hSgGVzvGXnKO
-02VDFR5itGWdRKZ2W5wIShNfWfhSa0D0K5UdIDt5Qc7sjzwK1Yb1sY5Tu0uA5mhIS82q1ov83uxB
-sFkriNnhGv/M1NCDVLBiOMsHu73qUM+yKmgKLwF9Hfn9WI25glbAMI4S5r3hYzcCAwEAAaOCAfcw
-ggHzMB8GA1UdIwQYMBaAFPebok7Tl8X0NA9DDoGFzpGTMq/5MB0GA1UdDgQWBBRcYhqbcGzn1jrT
-JOZaB8O7qllDpzAwBgNVHREEKTAngRNkd213MkBpbmZyYWRlYWQub3JngRBkYXZpZEB3b29kaG91
-LnNlMBQGA1UdIAQNMAswCQYHZ4EMAQUBAjAOBgNVHQ8BAf8EBAMCBeAwHQYDVR0lBBYwFAYIKwYB
-BQUHAwIGCCsGAQUFBwMEMIGpBgNVHR8EgaEwgZ4wTaBLoEmGR2h0dHA6Ly9jcmwzLmRpZ2ljZXJ0
-LmNvbS9EaWdpQ2VydEFzc3VyZWRHMlNNSU1FUlNBNDA5NlNIQTM4NDIwMjRDQTEuY3JsME2gS6BJ
-hkdodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vRGlnaUNlcnRBc3N1cmVkRzJTTUlNRVJTQTQwOTZT
-SEEzODQyMDI0Q0ExLmNybDCBjQYIKwYBBQUHAQEEgYAwfjAkBggrBgEFBQcwAYYYaHR0cDovL29j
-c3AuZGlnaWNlcnQuY29tMFYGCCsGAQUFBzAChkpodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20v
-RGlnaUNlcnRBc3N1cmVkRzJTTUlNRVJTQTQwOTZTSEEzODQyMDI0Q0ExLmNydDANBgkqhkiG9w0B
-AQsFAAOCAgEAocabrh1cPd5s3vY5rnlBVQSTc7zs2ZWs67dAIltR+05WELrYClVzzUhMs/LOJPlr
-EUo45UDDomXq38DxFepaPd9+iNLjXfn33EX/IG44j04lU/oF/Rg9VeQILkYLbCZ/x9wOjNHZc4SN
-ydY7Dhvf/sT5aBz88u7D5+azZJ7Qf1U57wYseCH1Mt0nDrtr5y19IJ8D9xJJ33RFL6vfpHZBBAQ8
-+3RqkKNxLoV2aFvQhxdhjNLDqTv3LjUIdicwPraN7JkxEu7CV2Lka7eRqJgkWL7SK0YmBjGpRafs
-+icP/ON5RCCKTTb6VlX8eTG2sJJfsFhvJNCCt6xexbWzWtIrfP7NvPBvwBB737AyEGBZkS5aNizT
-McURJGTv9UKvBh1LF/+tNhYtLvPCN7oecGzhCHht9jcwSkygTo3Y6YlK3QgOu+ncmiBbfeuwlLZ1
-LxbYvG6hgNqXv7u6YyADbYajAQJXJ2OQen39pm3Q/AQSyLYG+B8lDglWsM8tYXPlEdrYJcksGK6F
-nqIX6Bumn43rBooLJdiZp4WmfWdL2pxe+LxRDjprmqu1WprixDxULSTOKJZoqTlugs6y3Bc+if+s
-gHnBBtz9WQ6MtPHkh7zONDAFIKcBmv8OqPQCx0F3Wv3OEybwMpXx0OsKgK8wLldaX1pXcMuyDgTL
-Sqs0AV0OHUgwggcDMIIE66ADAgECAhADNSi2uzJskfEdOMo4hV0gMA0GCSqGSIb3DQEBCwUAMGIx
-CzAJBgNVBAYTAlVTMRcwFQYDVQQKEw5EaWdpQ2VydCwgSW5jLjE6MDgGA1UEAxMxRGlnaUNlcnQg
-QXNzdXJlZCBHMiBTTUlNRSBSU0E0MDk2IFNIQTM4NCAyMDI0IENBMTAeFw0yNjA3MTgwMDAwMDBa
-Fw0yODAxMDQyMzU5NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqG
-SIb3DQEBAQUAA4ICDwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZe
-YAS/SRV6zmfXlXaZsNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2z
-kC9S7/yHDYnqegqtw4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qG
-pgFdZEk2/c//ZvUNi12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41va
-v1RhZJzYan4a1gU0kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0c
-vnO8FM6PTqsnSbcc0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PW
-PU6zfQTOMZ9uLQRRci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXt
-REF5lLXxp+CJ6KKSblPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQr
-lR0gO3lBzuyPPArVhvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7Iq
-aAovAX0d+f1YjbmCVsAwjhLmveFjNwIDAQABo4IB9zCCAfMwHwYDVR0jBBgwFoAU95uiTtOXxfQ0
-D0MOgYXOkZMyr/kwHQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3
-bXcyQGluZnJhZGVhZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEC
-MA4GA1UdDwEB/wQEAwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwgakGA1UdHwSB
-oTCBnjBNoEugSYZHaHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0QXNzdXJlZEcyU01J
-TUVSU0E0MDk2U0hBMzg0MjAyNENBMS5jcmwwTaBLoEmGR2h0dHA6Ly9jcmw0LmRpZ2ljZXJ0LmNv
-bS9EaWdpQ2VydEFzc3VyZWRHMlNNSU1FUlNBNDA5NlNIQTM4NDIwMjRDQTEuY3JsMIGNBggrBgEF
-BQcBAQSBgDB+MCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wVgYIKwYBBQUH
-MAKGSmh0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRHMlNNSU1FUlNB
-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
-ZFTbNWABRr9hRejHXv/Em1wAAAAAAAA=
-
-
---=-ZqlKCzTF9YDjDCpwa+kX--
