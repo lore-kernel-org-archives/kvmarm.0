@@ -1,53 +1,81 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 028E9282F1E;
-	Tue, 18 Aug 2026 16:12:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D18753C584B;
+	Tue, 18 Aug 2026 16:14:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787069552; cv=none; b=f1jXf2rTW4Ny0liEj8XjlGbhfIgNIVCFXw0GbpOm+0ZjElc8hihM8peBAayKiIu4DyBqmUJq7jjpCWMo587BAm4qV8kITquIDWgedOVyWvs6yFDUEZZbBHUFnf40uW7DmqSDgp4Vqr/PY2xgx+Dc/y4JI71jiIPUcdOQPwgfx60=
+	t=1787069680; cv=none; b=YcUJ8ZOfJsiqyK2bGoO2lS3h3O1W4fD5aGdGac43v0sQzijeLvNvDWs/HXIuUo3X63tapIbkkzT8Dzr6rwIvhbDUhHNNv9w0/B6qDrNv75tJ+Fc1Ef+SjIVvrtqoaUHEXseKkUue8CkbiPdWZsowIFfLOCKzGi+SOYw5vmJxA+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787069552; c=relaxed/simple;
-	bh=P2PWozcu2sCCQVd2ueH+8VGwvPlyXhpt8AG4GK9IJ0k=;
+	s=arc-20240116; t=1787069680; c=relaxed/simple;
+	bh=Cg7/CNiQ3ccF5ixrvDgAh1nZY8fhV+3ahz/NLquQvVI=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=X9ZdQhMz1fs4KcOR6q0vKM6mnKpR45hmeUDmNpeqZH1s/s85F3do720MzhDQls/7ZLvpmjqGx/91qBdOBHhJBBlcZHhtDHTaXWdWY0zspfQaExxZdKX0G1rq9JdRMaVD/GQSSiFsA0b7bFNuEor8Q9VPjFgxqhwinuW8oCeNugw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cWp5hQiT; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=hHNH7YJdbMqK9+hq/G1fhquMTSunQv6KTlOAMX8ydVHC9m2UGb295UqiSFAO1YMdH1Yrf1ivvPjXC09RhVjADjzqbeEuWSkuEDDTVuskcqNqAocJXnpynEyQdxZHtrfWp0NdN9A3Cr635IThKr8IVlQtmiBzNoi7OA5/NGL/A9s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L2M24O0h; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cWp5hQiT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E3351F000E9;
-	Tue, 18 Aug 2026 16:12:30 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L2M24O0h"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0F941F000E9;
+	Tue, 18 Aug 2026 16:14:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787069550;
-	bh=GrXrMuiesxftt1DXnu2ZTlsi1uFiEr3n3z3WjCq+UDE=;
+	s=k20260515; t=1787069679;
+	bh=E0J6en3McpYf9F3IxCn2pxIwSRX4Sv7Jj1OiegFfc7A=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=cWp5hQiTGuFL5hgSDgtWZ1B9mwrZAEKufqsB8QuR6AmR/mADMPpxHIj1V6cf7MPfO
-	 3oDPePgbwL09wODEyb03v5ANLZM+pLjVXt2ByTXtFWlOB9TOSylxuFT8r/u3CbFbgQ
-	 2OGlMVgp7rJ1uwWvFFpYvfL/H60v6BmhMzaqPL9DwAbGVSjRymdcengpx1FtqtjzKW
-	 I32q2U8uEm6DMXUYIXzoAvJDIgpmoFqyfe+busL3D/WmdniHNseNi6JEU/Ys3+UlGk
-	 kFoAX28oOsmVuINgmepF90f+CwdT9bl255neRrL/S9tGJ26GWE6Uusao2+XWfzMJk0
-	 bVy/31Ijpkc3w==
+	b=L2M24O0hdXxRP3tm59T84NCNnDVISHqkiqUYrBmFkaK9Zxn+UU6RY+1ibYtLAOP4P
+	 w77I7rJ1UVIqEBvr7OYNHw5Evgs1a61TzJj4bqv/9WtPio7GVIp9AnrUaEgobojg0s
+	 VrRatuspsj24LXb0d1/r/xKxa3dDKh8tAfPFPH+xS4TyZG8rHSOZtshjBxfXaLxY/C
+	 Wbqufj5/2TLQ1fWWwhROhy9xhOS0ZPqvhx5fV5X3QGIyRjObBlI2GNjvxV1mWEUTIc
+	 T2i492GYAQe8+nAxmplV9Q5m8VYXju5lKqUafLRI3HTS5AmBtj701x/aYgzgo2wqgJ
+	 vl/TJGCBio2XA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wwMQO-0000000GhD3-2p0W;
-	Tue, 18 Aug 2026 16:12:28 +0000
-Date: Tue, 18 Aug 2026 17:12:28 +0100
-Message-ID: <86a4qj5rwz.wl-maz@kernel.org>
+	id 1wwMST-0000000GhFw-37bp;
+	Tue, 18 Aug 2026 16:14:37 +0000
+Date: Tue, 18 Aug 2026 17:14:37 +0100
+Message-ID: <868q635rte.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: sashiko-reviews@lists.linux.dev,
+To: Steffen Eiden <seiden@linux.ibm.com>
+Cc: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev,
-	Oliver Upton <oupton@kernel.org>
-Subject: Re: [PATCH v2 2/4] KVM: arm64: vgic: Don't leak the SPI array when init is retried
-In-Reply-To: <CA+EHjTyDix+y6NTLTsXP5j9Sn2VLOZcsw94LntQxg_etRBJZuA@mail.gmail.com>
-References: <20260807104102.2410744-1-fuad.tabba@linux.dev>
-	<20260807104102.2410744-3-fuad.tabba@linux.dev>
-	<20260807105558.73D701F000E9@smtp.kernel.org>
-	<CA+EHjTwVKkAwWUeMrF_m2-35kyhESqAezOKJy-Pj=vA3qE5Bjw@mail.gmail.com>
-	<87fr0pq5uu.wl-maz@kernel.org>
-	<CA+EHjTyQ-1sUhgs0LNuPa-VJ=J=+vS7UCwJJU0ATJG9LtEQpSA@mail.gmail.com>
-	<CA+EHjTyDix+y6NTLTsXP5j9Sn2VLOZcsw94LntQxg_etRBJZuA@mail.gmail.com>
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Andreas Grapentin <gra@linux.ibm.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	David Hildenbrand <david@kernel.org>,
+	Friedrich Welter <fritz@linux.ibm.com>,
+	Fuad Tabba <tabba@google.com>,
+	Gautam Gala <ggala@linux.ibm.com>,
+	Hariharan Mari <hari55@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Hendrik Brueckner <brueckner@linux.ibm.com>,
+	Ilya Leoshkevich <iii@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Nico Boehr <nrb@linux.ibm.com>,
+	Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
+	Oliver Upton <oupton@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Will Deacon <will@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v6 08/33] KVM: arm64: Use accessor functions for core regs
+In-Reply-To: <20260818142931.21865-G-seiden@linux.ibm.com>
+References: <20260812153631.3376090-1-seiden@linux.ibm.com>
+	<20260812153631.3376090-9-seiden@linux.ibm.com>
+	<86a4qq1gyy.wl-maz@kernel.org>
+	<20260818092924.21865-C-seiden@linux.ibm.com>
+	<86ecfv613k.wl-maz@kernel.org>
+	<20260818142931.21865-G-seiden@linux.ibm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -59,45 +87,60 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev, oupton@kernel.org
+X-SA-Exim-Rcpt-To: seiden@linux.ibm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, agordeev@linux.ibm.com, gra@linux.ibm.com, arnd@arndb.de, catalin.marinas@arm.com, borntraeger@linux.ibm.com, imbrenda@linux.ibm.com, david@kernel.org, fritz@linux.ibm.com, tabba@google.com, ggala@linux.ibm.com, hari55@linux.ibm.com, hca@linux.ibm.com, brueckner@linux.ibm.com, iii@linux.ibm.com, frankja@linux.ibm.com, joey.gouly@arm.com, nrb@linux.ibm.com, oss@nina.schoetterlglausch.eu, oupton@kernel.org, pbonzini@redhat.com, seanjc@google.com, suzuki.poulose@arm.com, svens@linux.ibm.com, Ulrich.Weigand@de.ibm.com, gor@linux.ibm.com, will@kernel.org, yuzenghui@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 18 Aug 2026 14:22:09 +0100,
-Fuad Tabba <fuad.tabba@linux.dev> wrote:
+On Tue, 18 Aug 2026 15:29:31 +0100,
+Steffen Eiden <seiden@linux.ibm.com> wrote:
 > 
-> Hi again Marc,
+> On Tue, Aug 18, 2026 at 01:54:07PM +0100, Marc Zyngier wrote:
+> > On Tue, 18 Aug 2026 10:29:24 +0100,
+> > Steffen Eiden <seiden@linux.ibm.com> wrote:
+> > > 
+> > > On Thu, Aug 13, 2026 at 10:56:37AM +0100, Marc Zyngier wrote:
+> > > > On Wed, 12 Aug 2026 16:36:04 +0100,
+> > > > Steffen Eiden <seiden@linux.ibm.com> wrote:
+> > > > >
+> > 
+> > [...]
+> > 
+> > > > > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> > > > > index b01d6622b872..773f6c8e5026 100644
+> > > > > --- a/arch/arm64/kvm/guest.c
+> > > > > +++ b/arch/arm64/kvm/guest.c
+> > > > > @@ -134,19 +134,19 @@ static void *core_reg_addr(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+> > > > >  	     KVM_REG_ARM_CORE_REG(regs.regs[30]):
+> > > > >  		off -= KVM_REG_ARM_CORE_REG(regs.mregs[0]);
+> > > > >  		off /= 2;
+> > > > > -		return &vcpu->arch.ctxt.regs.regs[off];
+> > > > > +		return &vcpu_gp_regs(vcpu)[off];
+> > > > 
+> > > > Doesn't this belong to the previous patch?
+> > > > 
+> > > 
+> > > My thoughts about positioning this change in this patch:
+> > > 
+> > > The previous patch changes the semantics of vcpu_gp_regs and just
+> > > touched the part where the old semantic of the function was used.
+> > > This is mainly done by not using vcpu_gp_regs where it was used before
+> > > as it cannot be used to access e.g. pstate anymore.
+> > > 
+> > > This patch then introduces and *uses* new accessor functions for
+> > > abstractions (and uses the vcpu_gp_regs abstraction where it was not
+> > > used before). 
+> > > -> The patch changes direct accesses to using accessor functions.
+> > > 
+> > > However, I have no strong feelings for this. If you want this in the
+> > > previous patch, I can do that.
+> > 
+> > I think it'd make more sense. You can capture this in the commit
+> > message to make it clear.
 > 
-> On Mon, 17 Aug 2026 at 19:40, Fuad Tabba <fuad.tabba@linux.dev> wrote:
-> ...
-> > > I really don't want to have to think about the intermediate state.
-> >
-> > Agreed. I'll drop the idempotent version I sketched and do teardown
-> > and reinit instead.
-> 
-> Here are my thoughts. Three patches, all fixes.
-> 
-> vgic_init() will undo what it created when it fails, so
-> KVM_DEV_ARM_VGIC_CTRL_INIT is all or nothing and a retry starts from
-> scratch. Same thing you asked Karl for on the redistributor rollback
-> [1].
-> 
-> That drops the count check I sketched. vgic_v4_init()'s early return
-> stays, since vgic_its_create() still calls it for an ITS created after
-> init.
-> 
-> irq-gic-v4.c goes first, as two patches. It removes the domains and
-> frees the fwnodes without clearing the pointers, at four sites, and
-> the teardown above makes that reachable on a path where it was not.
-> The second is a leak in the same error path: when
-> its_alloc_vcpu_sgis() fails partway, the SGI domains already allocated
-> below it are never unwound.
-> 
-> What do you think?
+> Just that we are on the same page: you want me to move the change to the
+> previous patch?
 
-Hard to picture when described like this. Please post the patches!
-
-Thanks,
+Yes, please.
 
 	M.
 
