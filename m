@@ -1,162 +1,189 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AC2D472F7C;
-	Tue, 18 Aug 2026 13:24:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9638A468C11;
+	Tue, 18 Aug 2026 13:43:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787059484; cv=none; b=kjCa+UOhgX12kOGlry9uVE3wTCkgkPYBm2NWIC550pD/PzQNWBZEg4v0kfUkOzRQXQZ3JQVQJd9M4HMQMnoawANwfjaY/S2jg/ZKAOl68FcLIWPwjta8y0TaaFuMStAp19d2bFUNOI6DIW0IPFjgHLJ3uk9bEaA3PnP1xXYSCRM=
+	t=1787060605; cv=none; b=LoxG+QNvCmJFjOij4giamvzJV0CZSV7djSz762M8jvM22KTMvFdY4SWuzsMp3d1OjYIbYviRff4c+HlZcpvzny5RUp2YusXYD9dj8ppwQdZ7StgC436Xv8rJ4ANbHhjL2C7EyDLO5vhvto8VPirj4ordz2myTmM4paO4dkr4894=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787059484; c=relaxed/simple;
-	bh=0qeab45JSjlGLR/DCB210viV8qlg/swbTJ0ATdhPMMQ=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UpgATd7Vz2CCzX5fCavsNgm+dd0ekdwFRJx/sgDzdLCWwNWWJV3renoIL6JnZpZNDO60v/1kP2zi5mGVBTxXTLPkU8yyFrvU3ugX7uGmC/uVtw05N1dMIhs2VT+x8LlyV8epi1RiyBR1+kd+nWNDBkbRMyGOVrleZs9B3eeQs8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IvVZYmEa; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1787060605; c=relaxed/simple;
+	bh=uY2e62TGWkZpxEzYpDvfnnHcFMOjTOKr3KB9V/QxwgM=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=VKsQSshb9GVvdYreelxnmSdHHleeGiBNpA07rM0O5jXRiRHgaK0wTc5u/HBcjkZaKMq6LrKOudw4TCvcH7D5ECwR6Tmaysh93/GL2BRbL0wgghsGOEV56uZII/zHj/PAr2ebk2EMfdZXtaeMU20vJhSb1iV1+ESoDpcJra2IAmM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CNqkvMTJ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IvVZYmEa"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B35DA1F000E9;
-	Tue, 18 Aug 2026 13:24:40 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CNqkvMTJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F0CB1F000E9;
+	Tue, 18 Aug 2026 13:43:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787059480;
-	bh=S9IekfwPh1alq+9HUJBgkgWBggDNvqQ7KorXgNc8Ifs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=IvVZYmEaJduqxhOqhcvQD6aUJ5moa6wleRg5iMNiAoqHR0kpyRYwkcmV8O1leHavm
-	 tHo0yzgUIPTgyAIVpWqsHXNG9EZFb4zHvmqhzqdt5beIrh5RM9ApemL/khZQ1K8R3L
-	 f2sOHxoQQU2gaX4cHv6EOcE8V3UvV6H8c/Kzruipq837mNNP4eoeqz3ijsfX0Hnz7t
-	 y0j8Ezkj9DAraCHbOofWu3l3nZQFIrdZCasEitIvw624qqSDw8HnFmRZzK8H2KsOfY
-	 ZzcTZ22iR7zh9TCiBnPo1jrzRK68HOpCUxOkDPLC06dwACN5kBeUUICKJ9XIFofHVb
-	 cybyTXnvLyBhA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wwJny-0000000Gdt3-10V2;
-	Tue, 18 Aug 2026 13:24:38 +0000
-Date: Tue, 18 Aug 2026 14:24:37 +0100
-Message-ID: <86cxvf5zoq.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Dongli Zhang <dongli.zhang@oracle.com>
-Cc: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-kselftest@vger.kernel.org,
-	seanjc@google.com,
-	pbonzini@redhat.com,
-	oupton@kernel.org,
-	fuad.tabba@linux.dev,
-	joey.gouly@arm.com,
-	seiden@linux.ibm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	dwmw2@infradead.org,
-	joe.jin@oracle.com
-Subject: Re: [PATCH 2/4] KVM: arm64: Reset last_steal on vCPU pid change
-In-Reply-To: <77baeb6c-1efa-45fb-8a86-46a6c76b5873@oracle.com>
-References: <20260816053630.527528-1-dongli.zhang@oracle.com>
-	<20260816053630.527528-3-dongli.zhang@oracle.com>
-	<86se4dyw7n.wl-maz@kernel.org>
-	<77baeb6c-1efa-45fb-8a86-46a6c76b5873@oracle.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20260515; t=1787060604;
+	bh=nCaPyvw2iFSAtJp+/S0lPXfdeu+F7EyJ6au4lKiWYEc=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date;
+	b=CNqkvMTJLXNXiEeYKsDcJ5vMCl9APuMbVQIu0B3nogx96ycdVcxhEfA8Y935rOFQB
+	 DwbNjFOYTMnBcvSeBREzeVOMYq7oUx9+JWYNVQm4Q0PKS+TKPkUhGIwiw2tE5w+5Ve
+	 LAEdg6oApkQLyaWE+1c4QN377ZwYbBFYC0UH/Ok81z64U3FaYuILqh5ogSr2NI8qW5
+	 Ege/V5Ma8jQasI6rRqF3rtGgJBIUlCgSKy5x8PZPaKbx9kzGG3jWEalwW+u9kH3QZa
+	 hA+6ZSEFatqG59DQNkEy9P9hX2+kEigKQsIcMrgm1kYnd9bXj74pxxwXASSs+5JduV
+	 qiO3xv/HZavsA==
+From: Pratyush Yadav <pratyush@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Pratyush Yadav <pratyush@kernel.org>,  Tarun Sahu
+ <tarunsahu@google.com>,  ackerleytng@google.com,  fuad.tabba@linux.dev,
+  Andrew Morton <akpm@linux-foundation.org>,  dmatlack@google.com,  Shuah
+ Khan <skhan@linuxfoundation.org>,  Jonathan Corbet <corbet@lwn.net>,
+  david@redhat.com,  Pasha Tatashin <pasha.tatashin@soleen.com>,
+  sagis@google.com,  Paolo Bonzini <pbonzini@redhat.com>,  Mike Rapoport
+ <rppt@kernel.org>,  Alexander Graf <graf@amazon.com>,
+  linux-kselftest@vger.kernel.org,  andre.przywara@arm.com,
+  michael.roth@amd.com,  linux-kernel@vger.kernel.org,  linux-mm@kvack.org,
+  will@kernel.org,  vannapurve@google.com,  maz@kernel.org,
+  fvdl@google.com,  kvm@vger.kernel.org,  oliver.upton@linux.dev,
+  kvmarm@lists.linux.dev,  alexandru.elisei@arm.com,  skhawaja@google.com,
+  aneesh.kumar@kernel.org,  linux-doc@vger.kernel.org,  David Hildenbrand
+ <david@kernel.org>,  yan.y.zhao@intel.com,  kexec@lists.infradead.org,
+  suzuki.poulose@arm.com
+Subject: Re: [PATCH v4 05/11] KVM: LUO: Support VM preservation across live
+ updates
+In-Reply-To: <aoMcqp0gr06YXAPU@google.com> (Sean Christopherson's message of
+	"Mon, 17 Aug 2026 07:37:30 -0700")
+References: <20260728121138.1103610-1-tarunsahu@google.com>
+	<20260728121138.1103610-6-tarunsahu@google.com>
+	<anphyjFv3FhF61iB@google.com> <2vxzpkzo51wg.fsf@kernel.org>
+	<anssOQFNZ2LfihbU@google.com> <2vxzik5f311e.fsf@kernel.org>
+	<anyObKiZIhfok5mk@google.com> <2vxzqzjz1x5f.fsf@kernel.org>
+	<aoMcqp0gr06YXAPU@google.com>
+Date: Tue, 18 Aug 2026 15:43:16 +0200
+Message-ID: <2vxzy0e3zgqz.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: dongli.zhang@oracle.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, seanjc@google.com, pbonzini@redhat.com, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, dwmw2@infradead.org, joe.jin@oracle.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain
 
-On Mon, 17 Aug 2026 22:29:22 +0100,
-Dongli Zhang <dongli.zhang@oracle.com> wrote:
-> 
-> 
-> 
-> On Mon, Aug 17, 2026 1:42:20AM -0700, Marc Zyngier wrote:
-> > On Sun, 16 Aug 2026 06:33:03 +0100,
-> > Dongli Zhang <dongli.zhang@oracle.com> wrote:
+Hi Sean,
 
-[...]
+On Mon, Aug 17 2026, Sean Christopherson wrote:
 
-> >> diff --git a/arch/arm64/kvm/pvtime.c b/arch/arm64/kvm/pvtime.c
-> >> index 4ceabaa4c30b..000bf49cc0fd 100644
-> >> --- a/arch/arm64/kvm/pvtime.c
-> >> +++ b/arch/arm64/kvm/pvtime.c
-> >> @@ -32,6 +32,11 @@ void kvm_update_stolen_time(struct kvm_vcpu *vcpu)
-> >>  	srcu_read_unlock(&kvm->srcu, idx);
-> >>  }
-> >>  
-> >> +void kvm_reset_stolen_time(struct kvm_vcpu *vcpu)
-> >> +{
-> >> +	vcpu->arch.steal.last_steal = current->sched_info.run_delay;
-> >> +}
-> >> +
-> >>  long kvm_hypercall_pv_features(struct kvm_vcpu *vcpu)
-> >>  {
-> >>  	u32 feature = smccc_get_arg1(vcpu);
-> > 
-> > Why isn't this common code? I really don't see the point in making
-> > this arch-specific code. I'd expect something like this (untested):
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index ace5801a592f..3fb77360af01 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -950,6 +950,8 @@ struct kvm_vcpu_arch {
-> >  	pid_t pid;
-> >  };
-> >  
-> > +#define kvm_arch_vcpu_last_steal(v)	(v)->arch.steal.last_steal
-> > +
-> >  /*
-> >   * Each 'flag' is composed of a comma-separated triplet:
-> >   *
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index 45e784462ec6..117aeb49231a 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -4459,6 +4459,9 @@ static long kvm_vcpu_ioctl(struct file *filp,
-> >  			if (r)
-> >  				break;
-> >  
-> > +			if (IS_ENABLED(CONFIG_HAVE_PV_STEAL_CLOCK_GEN))
-> > +				kvm_arch_vcpu_last_steal(vcpu) = current->sched_info.run_delay;
-> > +
-> >  			newpid = get_task_pid(current, PIDTYPE_PID);
-> >  			write_lock(&vcpu->pid_lock);
-> >  			vcpu->pid = newpid;
-> > 
-> > where each architecture that implements steal time provides an
-> > accessor, and the core code is in charge of the adjustment.
-> > 
-> > It also makes sure that we don't leave any architecture behind.
-> > 
-> Or how about making it something like below?
-> 
-> if (IS_ENABLED(CONFIG_HAVE_PV_STEAL_CLOCK_GEN))
-> 	kvm_arch_vcpu_reset_last_steal(vcpu);
+> On Sat, Aug 15, 2026, Pratyush Yadav wrote:
+>> On Wed, Aug 12 2026, Sean Christopherson wrote:
+>> > On Wed, Aug 12, 2026, Pratyush Yadav wrote:
+>> >> This is ABI between kernels. It needs to be stable-ish so you can move
+>> >> from one kernel version to another. At the same time, unlike userspace
+>> >> ABI, it can change.
+>> >
+>> > Uh, yeah, so KVM has been managing such immutable ABI for practically its entire
+>> > existence.  KVM's save/restore uAPI has exactly what you're describing: serialization
+>> > ABI that needs to be backwards and forwards compatible between different kernels
+>> > in order to support both upgrade and rollback scenarios via live migration.
+>> 
+>> I think there is a slight difference between KVM's save/resture uAPI and
+>> live update's ABI. With KVM's uAPI, you need to maintain strict
+>> backwards compatibility because userspace reads what you output. So if
+>> you change the layout, userspace will interpret it wrong and might
+>> break.
+>> 
+>> With live update, the ABI never gets to userspace. It is used to talk
+>> between kernels directly. So if you do break that, your userspace keeps
+>> working fine, you just might not be able to live update to the
+>> incompatible kernel.
+>> 
+>> So with live update, we don't need to keep backwards compatibility in
+>> the ABI forever. Of course, it is good to minimize changes, but we have
+>> more freedom to change it.
 >
-> That would still move the policy to common KVM code, while leaving the exact
-> arch state to the architecture implementation.
+> Ah.  So this is the heart of the disconnect.  I very strongly disagree with the
+> statement that live update doesn't need to support backwards compatibility.  I
+> can totally believe that the folks working on live update are ok breaking backwards
+> compatibility because their use cases are "fine" with such breakage.  And I can
+> also believe live update as an upstream kernel feature being developed by those
+> same folks is also ok with breaking backwards compatibility.
+>
+> But with my upstream KVM maintainer hat on, I am not ok with that.  I did not agree
+> to support a world where KVM is allowed to break backwards compatibility, so long
+> as it's done "carefully" or whatever.  If y'all want to deal with the resulting
+> complexity, that's fine by me, but you'll be doing it without KVM.
 
-I don't think architectures should have a say in this. Steal time, as
-a PV service, should not involve the architectures at all. After all,
-that's the whole point of a PV service: hypervisor-specific hacks that
-do not fit in the architectural envelope.
+Let's step back a bit. I don't think backwards compatibility in the
+_ABI_ is all that important in live update's context. What is important
+is that our users are able to live update from kernel version X to Y.
+The line format the kernel uses to describe its state is an
+implementation detail. Our users never see it.
 
-Bonus points if you move the last_steal field in the main vcpu
-structure instead of some arch-specific one.
+The high level idea is that when you need to make a change to the ABI so
+the kernel can better describe the objects/resources/files it is
+passing, you create a new version of the ABI and allow transitions from
+older versions.
 
-> For x86, the hook can reset vcpu->arch.st.last_steal for regular KVM steal time.
-> If we also decide to cover Xen runstate in this series, the same x86 hook can
-> additionally reset vcpu->arch.xen.last_steal.
+Say you make some changes and need an ABI version v5. You don't get rid
+of v4. You keep it around. LUO core will facilitate picking the right
+version for the next kernel. So it will be possible to seamlessly
+upgrade your kernel that speaks v4 to a new kernel that speaks v4 and
+v5. Now this kernel can start speaking v5 if its successor speaks v5
+too. And so on for going to v6 and v7, etc.
 
-For arch-specific stuff, there is the pid change hook already.
+After a "reasonable" time given for upgrades, you deprecate v4. v4 has
+been around long enough and our users have had a chance to go to kernels
+speaking newer versions. That's when you remove the code for v4 from the
+kernel.
 
-	M.
+We can argue what "reasonable" means, but the core idea stays. 
+
+It will still be possible to go back to v4 or earlier, but you'd need an
+extra stop along the way. And of course, vendors can keep a wider
+support matrix downstream if they see the need for it.
+
+Does this idea of "backwards compatibility" sound acceptable to you, at
+least at a high level?
+
+Now coming back to today's reality. We don't yet support this version
+transition. I proposed the idea at LPC 2025 [0]. Logan Odell has taken
+over the work since I have other things on my plate, but it is something
+being actively developed. Logan recently sent some RFCs [1] for this
+too, though TBH I haven't yet gotten to those patches. We also have
+proposed a talk about this at LPC 2026, it would be great if you could
+attend (if the talk gets accepted).
+
+If you say that we should figure this version transition out and land it
+upstream before we land the KVM code, I think that's a fair ask. I can
+work with that.
+
+But I think we first need to agree on the principles of the
+compatibility model I described above.
+
+[0] https://lpc.events/event/19/contributions/2049/
+[1] https://lore.kernel.org/kexec/20260731215224.831696-1-loganodell@google.com/T/#u
+
+>
+> I totally understand that exploratory work and initial development is best done
+> in private and/or in a small working groups.  But decisions that will significantly
+> impact multiple subsystems need to be made *with* those subystems.  I mean,
+> obviously it's possible to make a decision in a small group and then "publish"
+> the result later, but then as is happening here, the community and subsystem
+> maintainers like me may refuse to play ball if they disagree.
+
+The design of live update was discussed and agreed upon in the open.
+David Rientjes (and now Pasha) has been hosting the live update
+biweeklies [2] from the very start of the project. The series is open to
+everyone and notes shared for those who couldn't join. This meeting was
+attended by a lot of people from different companies and different
+subsystem backgrounds.
+
+There have also been a microconference at LPC 2025 where topics around
+live update in PCI, MM, VFIO, IOMMU, etc. were discussed, along with
+presentations at subsystem tracks in other conferences.
+
+Of course, it is impossible to get all maintainers of all subsystems to
+attend these sessions or conferences. That's fine.
+
+But I think it is quite unfair to say that live update is developed in
+private or in small groups.
+
+[2] https://lore.kernel.org/all/?q=s%3A%22%5BHypervisor+Live+Update%5D%22
 
 -- 
-Without deviation from the norm, progress is not possible.
+Regards,
+Pratyush Yadav
