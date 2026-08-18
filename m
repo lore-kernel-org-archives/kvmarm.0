@@ -1,226 +1,134 @@
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8030391846;
-	Tue, 18 Aug 2026 17:43:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787075030; cv=none; b=fX6VidFR0f4dznkY5lRGnr+WKw5WOUBVO7WuWvKqsh5+6I92W3WZLSxJ8jJWEwldQ1I0Yoi1k/esEe221qKssNzjF0yD55Xnc2woPeYBwNq/cGA4wiZqf4csGM9p1RZ/pfFGq0LFPUcxAiaz9qHuncgXxDaZWvVE9IOCHY3s2FM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787075030; c=relaxed/simple;
-	bh=g9hhg5cPvC+RxRbcs0YvetehpXxMGu9/BaUVLKzNfGE=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=RsJ+jGT+goCkHQHtsurHmj4jOkk44vNuMW4yQ3PkHMI7OAB80aLKVNzTEBpEGqZwHfu+fUASmk57LLj37PzwTmSt3X07FSR9n881Y3yfBcm75XFwGYXUKn3QPZ9WPIC7MDe+S8CYSLHP+2wkhYo6I+Sq2t52gQPh/vDRAVAsO54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=rjX6qxXK; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C58447044A
+	for <kvmarm@lists.linux.dev>; Tue, 18 Aug 2026 17:55:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.47
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1787075760; cv=pass; b=QQcPknj70iUzXY6kPcNxdbDN9WNRaqCb08Zwb474iRY0mA63oZnYXKB7axirMf8BBHtYfq3QtTSIK4s2xu71mCYevnfEcJ2HTCOSmY9BNGzBmUF8ZfLHXe117yVvrQFrX24trPrsXc3Y8v0qgkxciMqWdD0PkQqMzlQ3xIJ78Hs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1787075760; c=relaxed/simple;
+	bh=O/48gIa2vUi7FxYUqNtDfgAuIWzA1oYF6+91I1abQAI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=h5oXsPUY1FGEHP3JFao+ZnKGPSl/k620A6TOt82AeCLcGLahY17UPjXsKRbKHoJoArjGlcgwnVGOscTbEHfVuqRc4UCK6pThDtGOMMfZmMBxnfAc/ZTzq6cEd/g55HM8P8c9KySM/DllIuxuCB07k+jjk3AcmXMmA5K1Nw9+HdU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=J8ezsV/L; arc=pass smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="rjX6qxXK"
-Received: from [10.4.158.9] (unknown [52.172.102.222])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 05DB820B7168;
-	Tue, 18 Aug 2026 10:43:12 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 05DB820B7168
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1787075000;
-	bh=71NdvjfhSL6mWbXOITNIsCZ1w+IRh7JItVsgMhRpEkI=;
-	h=Date:From:Subject:To:Cc:References:In-Reply-To:From;
-	b=rjX6qxXKPLUrCnMN1McoZtM73mCOfJ4Fn0nGlOK5iJqiMr5ENiHFn2JhekPFkd3vn
-	 4/PLC6kleFnWZZWHFWuW5VOIZYrCJFRDAlbxvTwO+wzbRjsqtIvKBjc2VBHPfqCwCx
-	 Wil1ZKEaNk2swisxYtKsJIM7qyhq/CHngHb8mICU=
-Message-ID: <36877aa6-3f70-4da1-aecb-7209a33f8595@linux.microsoft.com>
-Date: Tue, 18 Aug 2026 10:43:20 -0700
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="J8ezsV/L"
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-495509b08ebso63545e9.1
+        for <kvmarm@lists.linux.dev>; Tue, 18 Aug 2026 10:55:58 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1787075757; cv=none;
+        d=google.com; s=arc-20260327;
+        b=fkptld5BpXKMrQmuP0tYbPj3yeYZWZGPc5jQw0TB2IAK4WT9ndElLEN08pa51OmSMf
+         a+Ibc7byeiQ8hvTTCwJnre5WNdNuthDQj1AWj8wWenpyHDXCs4KuzLVh0xJkXfKQ2emc
+         5KvM/M3xqJjsPw0do6GAaPm2aA/cssMv8y6X6fWMH7Zfxlgk9dAk46/EDnuQGZ7JL5o7
+         6JM0ZFbFIrQSQVKEQjGFWmekXW/aGSnQrvmw0Pw45HRImJgnHSUbYzOhTfYt6RwDvEgo
+         0pq3YmTMGCSQy2o6qYH04BOqQ1ctYJV1Xd4EsBdfciC3GuVLhYAkw+oQLaDb4yslTOK1
+         LReQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=xdwPE7pm0zYRhFo3gxRQ7Z14QbNNHShboTJ4Fwvcgk8=;
+        fh=75cRMBKtA+LNrRZk27/KX7XUE3LQNz++PjJIvGih5zw=;
+        b=ioT189AGMy4zRF0p9bt/uf2mji+irYi6JVKMDVvLVpNjRCKdZbia9TdtlKJwnkIMj1
+         K/KB5Wj5N8ypR1qgcISBslM3KPHXS88WIiGfdBbAcViCJwzhp0u8MsQ9e0eFt8houKuC
+         ZSJvmLnQWWS0GqGzo2i09Ko0nqZ7pJ/T4sHZQLP0a+ZH/tqzsrEwVo5ZddoabgTGmbq+
+         OpJTIA8Mj0Jew8wG9g4fId8hql24vX0M9ULA2ySbQqVx8mMB1AyiTDqPmbgp33LriuE2
+         lZCXRTNAS6ATedMJGGgK8GVhEiCPP4rPEbEblwnn2Hc9bZNo6WdWnGj55NqrblWOBTEb
+         W7Xg==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1787075757; x=1787680557; darn=lists.linux.dev;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=xdwPE7pm0zYRhFo3gxRQ7Z14QbNNHShboTJ4Fwvcgk8=;
+        b=J8ezsV/LvB4mJyazOB6cJnDZ2sOvd8dIoocjUhq/2rLKLkSoH79Iy1RFlphzJqMvQg
+         EfxVXUwlHHOW9Njbu7uNPLLEusHMXFhZQpqvJPO2lFKb9Db+C2wY5c7uuZo8PHuWO97Z
+         PQooA0hF/N4FCQGPk4XvlF9gL0WYDYvGDZPHF1aP0mRfn2+VE2bzQzF4rjOxCxrOHVHz
+         gKKIpI25yNuiaWa1FOtNre47Kza5vHDH2L7fQqsHc+clrRK+P6Y6FwpzGgKNnzmmRopY
+         t1aQj9ZeSJ98rJ9stD26TBgb13a1ESoIFrp18liKeHkuCdBeupwvNBx6j+iD2f8YoXC/
+         6QCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787075757; x=1787680557;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=xdwPE7pm0zYRhFo3gxRQ7Z14QbNNHShboTJ4Fwvcgk8=;
+        b=EApsNl3JrRA5y0BUGR82CjWG7RqRU6lXG+FlNFfGCIYpXFyCvMHzFmbv0DCciZimF1
+         9xnCU5esapCLXowPmMTQIEMQ2jXfDGQMw+hMNisilvWa7eaeO9MQbAk3UAxVvPzM7iwS
+         FdDhnYq2tGFsFvpmSGfTndPiQpDyvyznL4XlGF8YvGFzpW5EhHq6LEuh0Bg0+fnOU/Wx
+         kapmhzwEMtTjLcQsmObzTHYt8GWSPDR/grV+E0GHsBckQUJfO2xNxGwJhbY03H11A1DC
+         D2Nr0YwDS8+NIJKZOeFIDVfhfq95V+Z9NL0rFaTciC0SQExdpNSINX7qEMPgFKs1yGK8
+         DTGw==
+X-Forwarded-Encrypted: i=1; AHgh+RrUpEJTywVWjA7ESviBBWk1CwBeGQlG+DNY40oZJ+9WT1731dsqIgyK+wZcG/7qxasnD+SMu1A=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yx3kip5IkatRPgw3S97Euai2ueohuOW8Uu1Z+YznIBNpJUfxOBF
+	O3f6PqP1xDvZUyNUbkzuY/TqWWhQ6+l99ijHjpygR6aF10E1Najh9uctNnR2nOIzstn/vvXbqIw
+	c79hk073puXqWpqStbiD9vnjN2P29PDIi217hzceMMIqYxUNgb+zKAd1N
+X-Gm-Gg: AR+sD136d/TlNg5glvLtJ6qQFw0y/fnu2iPZldIg0GrCwuV070WiudbPgmHJouiwPjx
+	GmBGoSFgSYadVOll4AAflC44V0d02rOASFxYhnpyB8K3T0GwswWNDlvPoBAai0dGxoi/H2oCJiQ
+	L0M4hnUBKa099v9SbHqE8ePU/GQIeFLovpzWr+iR7jEQSK9pjiJKLzBiqcIGCq6787+A9d4Zv3z
+	aXC/8nAIBkmaqGR78596xmPv2gahA2D7GbTllbBbLPZLY/ODoiH8W+b46V2jouLiUZqB8S80/fP
+	0oPk+pdfeeGLpAPzJVoDtt3QlvGK68auItL+Zdqv0o813yDOSvwhOcQBHE2aH8e9apvr8Qp1AZg
+	V7Q==
+X-Received: by 2002:a05:600d:8445:20b0:495:76cf:3bf2 with SMTP id
+ 5b1f17b1804b1-499a2b6ddd7mr990425e9.5.1787075756253; Tue, 18 Aug 2026
+ 10:55:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Kameron Carr <kameroncarr@linux.microsoft.com>
-Subject: Re: [RFC PATCH v4 07/11] coco: guest: arm64: Add guest APIs to read
- host-cached DA objects
-To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
- linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Cc: Alexey Kardashevskiy <aik@amd.com>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Dan Williams <dan.j.williams@intel.com>, Jason Gunthorpe <jgg@ziepe.ca>,
- Jonathan Cameron <jic23@kernel.org>, Marc Zyngier <maz@kernel.org>,
- Samuel Ortiz <sameo@rivosinc.com>, Steven Price <steven.price@arm.com>,
- Suzuki K Poulose <Suzuki.Poulose@arm.com>, Will Deacon <will@kernel.org>,
- Xu Yilun <yilun.xu@linux.intel.com>
-References: <20260427082805.931832-1-aneesh.kumar@kernel.org>
- <20260427082805.931832-8-aneesh.kumar@kernel.org>
-Content-Language: en-US
-In-Reply-To: <20260427082805.931832-8-aneesh.kumar@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20260817080759.25601-1-likexu@tencent.com> <86qzjxyvpx.wl-maz@kernel.org>
+In-Reply-To: <86qzjxyvpx.wl-maz@kernel.org>
+From: Jiaqi Yan <jiaqiyan@google.com>
+Date: Tue, 18 Aug 2026 10:55:43 -0700
+X-Gm-Features: AcwNN1Xge_o53aSOcYhkgsrThZL6nmQlGNWnTD1LEZPHs0U-nSXTMj9os8NN8Fw
+Message-ID: <CACw3F53-_kQV34Rtjc_ZLnS8=SNyPzW5PfRbczEAGGF2oRZ5wA@mail.gmail.com>
+Subject: Re: [PATCH] KVM: selftests: arm64: Skip sea_to_user without 1GB hugepages
+To: Marc Zyngier <maz@kernel.org>, Like Xu <like.xu.linux@gmail.com>
+Cc: Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
+	Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 4/27/2026 1:28 AM, Aneesh Kumar K.V (Arm) wrote:
-> Introduce guest-side helpers to read host-cached DA objects
-> (certificate, VCA, interface report, and measurements).
-> 
-> Add RHI_DA_OBJECT_SIZE and RHI_DA_OBJECT_READ definitions, then implement
-> rhi_read_cached_object() that:
-> - queries object size from host
-> - validates size against MAX_CACHE_OBJ_SIZE
-> - allocates a shared buffer
-> - issues OBJECT_READ into shared memory
-> - copies data into private memory and frees shared pages
-> 
-> Export the helper for later evidence-collection and verification code.
-> 
-> Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
-> ---
->  arch/arm64/include/asm/rhi.h             |  8 +++
->  drivers/virt/coco/arm-cca-guest/rhi-da.c | 71 ++++++++++++++++++++++++
->  drivers/virt/coco/arm-cca-guest/rhi-da.h |  1 +
->  drivers/virt/coco/arm-cca-guest/rsi-da.h |  2 +
->  4 files changed, 82 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/rhi.h b/arch/arm64/include/asm/rhi.h
-> index 2b56a7760904..dc7a57370945 100644
-> --- a/arch/arm64/include/asm/rhi.h
-> +++ b/arch/arm64/include/asm/rhi.h
-> @@ -48,6 +48,14 @@ unsigned long rhi_get_ipa_change_alignment(void);
->  				 RHI_DA_FEATURE_VDEV_SET_TDI_STATE)
->  #define RHI_DA_FEATURES			SMC_RHI_CALL(0x004B)
->  
-> +#define RHI_DA_OBJECT_VCA			0x0
-> +#define RHI_DA_OBJECT_CERTIFICATE		0x1
-> +#define RHI_DA_OBJECT_MEASUREMENT		0x2
-> +#define RHI_DA_OBJECT_INTERFACE_REPORT		0x3
-> +#define RHI_DA_OBJECT_EXTENSION_EVIDENCE	0x4
-> +#define RHI_DA_OBJECT_SIZE		SMC_RHI_CALL(0x004C)
-> +#define RHI_DA_OBJECT_READ		SMC_RHI_CALL(0x004D)
-> +
->  #define RHI_DA_VDEV_CONTINUE		SMC_RHI_CALL(0x0051)
->  
->  #define RHI_VDEV_MEASURE_HASH	0x0
-> diff --git a/drivers/virt/coco/arm-cca-guest/rhi-da.c b/drivers/virt/coco/arm-cca-guest/rhi-da.c
-> index d0f5ae320f83..73c599802a93 100644
-> --- a/drivers/virt/coco/arm-cca-guest/rhi-da.c
-> +++ b/drivers/virt/coco/arm-cca-guest/rhi-da.c
-> @@ -3,6 +3,8 @@
->   * Copyright (C) 2026 ARM Ltd.
->   */
->  
-> +#include <linux/string.h>
-> +
->  #include "rsi-da.h"
->  #include "rhi-da.h"
->  
-> @@ -283,3 +285,72 @@ int rhi_update_vdev_measurements_cache(struct pci_dev *pdev, const u8 *nonce)
->  		pci_err(pdev, "failed to get device measurement (%d)\n", ret);
->  	return ret;
->  }
-> +
-> +int rhi_read_cached_object(int vdev_id, int da_object_type, void **object, int *object_size)
-> +{
-> +	int ret;
-> +	int data_size;
-> +	void *data_buf_shared;
-> +	struct page *shared_pages;
-> +
-> +	*object_size = 0;
-> +	*object = NULL;
-> +
-> +	struct rsi_host_call *rhicall __free(kfree) =
-> +		kmalloc(sizeof(struct rsi_host_call), GFP_KERNEL);
+On Mon, Aug 17, 2026 at 1:53=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote=
+:
+>
+> + Jiaqi.
+>
+> On Mon, 17 Aug 2026 09:07:59 +0100,
+> Like Xu <like.xu.linux@gmail.com> wrote:
+> >
+> > sea_to_user backs guest memory with 1GB hugepages but never checks any
+> > are reserved, aborting instead of skipping when the host has none:
+> >
+> >   kvm_syscalls.h:68: mem !=3D MAP_FAILED, errno=3D12 (ENOMEM)
+> >   not ok 1 selftests: kvm: sea_to_user # exit=3D254
+> >
+> > Check for enough free hugepages up front so the test skips cleanly.
+>
+> See my comments at [1].
+>
+> This test is totally borked, and Jiaqi stopped replying. It is a
+> liability, and I'd like it *removed*. But if you want to fix it,
+> please go ahead.
 
-"Unused bits of the RsiHostCall structure SBZ"
+Sorry the test was written in a way that is highly customized to my
+testing environment, and I have been occupied with many other
+work-related tasks.
 
-It's best practice to use kzalloc for struct rsi_host_call.
+Like, I can help review the patches for the test during this weekend,
+if that's not too late for you.
 
-> +	if (!rhicall)
-> +		return -ENOMEM;
-> +
-> +	rhicall->imm = 0;
-> +	rhicall->gprs[0] = RHI_DA_OBJECT_SIZE;
-> +	rhicall->gprs[1] = vdev_id;
-> +	rhicall->gprs[2] = da_object_type;
-> +
-> +	ret = rsi_host_call(rhicall);
-> +	if (ret != RSI_SUCCESS)
-> +		return -EIO;
-> +
-> +	if (rhicall->gprs[0] != RHI_DA_SUCCESS)
-> +		return -EIO;
-> +
-> +	/* validate against the max cache object size used on host. */
-> +	data_size = rhicall->gprs[1];
-> +	if (data_size > MAX_CACHE_OBJ_SIZE || data_size == 0)
-> +		return -EIO;
-
-Consider making data_size and object_size size_t (unsigned long) to avoid
-truncation and signed comparison.
-
-For consistency with cca_verify_digests() and pci_tsm_evidence_object.len,
-I would also change all the sizes in cca_collect_dev_evidence() to be
-size_t.
-
-> +	shared_pages = alloc_shared_pages(NUMA_NO_NODE, GFP_KERNEL, data_size);
-> +	if (!shared_pages)
-> +		return -ENOMEM;
-> +
-> +	data_buf_shared = page_address(shared_pages);
-> +
-> +	rhicall->imm = 0;
-> +	rhicall->gprs[0] = RHI_DA_OBJECT_READ;
-> +	rhicall->gprs[1] = vdev_id;
-> +	rhicall->gprs[2] = da_object_type;
-> +	rhicall->gprs[3] = virt_to_phys(data_buf_shared);
-> +	rhicall->gprs[4] = data_size;
-> +	rhicall->gprs[5] = 0; /* offset to read from */
-> +	ret = rsi_host_call(rhicall);
-> +	if (ret != RSI_SUCCESS || rhicall->gprs[0] != RHI_DA_SUCCESS) {
-> +		free_shared_pages(shared_pages, data_size);
-> +		return -EIO;
-> +	}
-> +
-> +	if (data_size != rhicall->gprs[1]) {
-> +		/* Short read */
-> +		free_shared_pages(shared_pages, data_size);
-> +		return -EIO;
-> +	}
-> +
-> +	void *data_buf_private = kvmemdup(data_buf_shared,
-> +					  data_size, GFP_KERNEL);
-> +	/* free the shared pages irrespective of error condition */
-> +	free_shared_pages(shared_pages, data_size);
-> +	if (!data_buf_private)
-> +		return -ENOMEM;
-> +
-> +	*object = data_buf_private;
-> +	*object_size = data_size;
-> +	return 0;
-> +}
-> diff --git a/drivers/virt/coco/arm-cca-guest/rhi-da.h b/drivers/virt/coco/arm-cca-guest/rhi-da.h
-> index d32ccc48c0d0..f7655d7ecf18 100644
-> --- a/drivers/virt/coco/arm-cca-guest/rhi-da.h
-> +++ b/drivers/virt/coco/arm-cca-guest/rhi-da.h
-> @@ -13,4 +13,5 @@ bool rhi_has_da_support(void);
->  int rhi_vdev_set_tdi_state(struct pci_dev *pdev, enum rhi_tdi_state target_state);
->  int rhi_update_vdev_interface_report_cache(struct pci_dev *pdev);
->  int rhi_update_vdev_measurements_cache(struct pci_dev *pdev, const u8 *nonce);
-> +int rhi_read_cached_object(int vdev_id, int da_object_type, void **object, int *object_size);
->  #endif
-> diff --git a/drivers/virt/coco/arm-cca-guest/rsi-da.h b/drivers/virt/coco/arm-cca-guest/rsi-da.h
-> index 297cb800edc0..88067d2230ab 100644
-> --- a/drivers/virt/coco/arm-cca-guest/rsi-da.h
-> +++ b/drivers/virt/coco/arm-cca-guest/rsi-da.h
-> @@ -10,6 +10,8 @@
->  #include <linux/pci-tsm.h>
->  #include <asm/rsi_smc.h>
->  
-> +#define MAX_CACHE_OBJ_SIZE	SZ_16M
-
-Why is the limit 16 MiB? I don't see that limitation in the RHI spec.
-Does the limit come from PCI TSM?
-
-Regards,
-Kameron
-
-> +
->  struct cca_guest_dsc {
->  	struct pci_tsm_devsec pci;
->  };
-
+>
+>         M.
+>
+> [1] https://lore.kernel.org/all/86y0le9cvz.wl-maz@kernel.org/
+>
+> --
+> Without deviation from the norm, progress is not possible.
