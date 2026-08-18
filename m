@@ -1,174 +1,116 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01F4037A48D
-	for <kvmarm@lists.linux.dev>; Tue, 18 Aug 2026 14:29:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41938388E62
+	for <kvmarm@lists.linux.dev>; Tue, 18 Aug 2026 14:46:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787063394; cv=none; b=Ho/5HtUeWmgWovIA+VGv4ncZ5+uEhe3C8s7dQa9O8D3EMxo9hAckwr2vjaHv+KDOY+AooaQtgRh+C9657YwU2gHnatwqXX7Oo08BDC1BgqBZbrTVObJ52NiBQuFSqMLRolqXJvH0w6VIgXk7a6zwGM6WVxk2aHd3VCVyjfFG68M=
+	t=1787064376; cv=none; b=rDkFzDzS9kD39cKMBCaB8L3CAmrQ/CamEydcf6ItpZSxqvJW+phq906AhqpDzWdq4Wg3vij7p1lRJ2gIU6AlvR2DoXBsEeoO7o1qGn1rfVxB5ow177AZ1KDEO1A66lYuN2eYZs1En730tmNMDgFblwOLqWen5jB4vvcufSxFcdY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787063394; c=relaxed/simple;
-	bh=Z2Zpn0mMP5umwZgoTWvF2T+J67srfo/UyfNCeRpk0T8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FlAhiX8wQeuUykUVWQbM1QLhlEYqpNgXjUEhzxDfqBh9KhLjqIrA/6WLHXH+asgM0F26ldPL3tIe0prUJlx7Y/sQYqagLWPMnydN/pQ8lzsd9gMLz1D1u1ZWBeY70Y5yzh4LUGfM2CJtQZodexlbrixWZkFZjf3fFhHQvSAsCYY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=RWVwh/Vv; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1787064376; c=relaxed/simple;
+	bh=CieHboMpuXfbRWDkCH9YDuDG33RKKvNl4sdtiHansdU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pVYuCgu89kjFzE+cB7yAVq8P3dIGu6ubc2tzDZZ1wbBferSGitO+23/kODBbqmSDIDCbqPJNIIwmJXuBhWGP1f7v+cmg0771nlp7GvaBsWWDPgRgbAv+85yo/enOWaq7SEk+tHXnFl3CsR0CYv5bfxlFeSTH0ENI8iJ2OyudDHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ogDTc4bO; arc=none smtp.client-ip=95.215.58.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="RWVwh/Vv"
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67IE3ffe542523;
-	Tue, 18 Aug 2026 14:29:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=Q4Ux+/QWCkRJg2MxE2yY8qzYqHCrz3
-	TmVY+vbgce/Xw=; b=RWVwh/VvvXlls5dH7wvJ3j00r2j4SyKTzO3VZmiIPcIy50
-	tOGXXtcdikNr/VzbxPfgwbfPIdYfd3Ug4vzkA0tTcba4tZW+RPSW2AzJUvAWKDxd
-	jhfGokTFUhg4zyz7UdA6phuw9E1SY+fjMNuIoHhcCvCoLzCjuoI9aJAjy2xPJsKL
-	YJ2QpERhsCloi86UHfQfLINbokEbIbfol+tusUc68cpkoUTCC+NQwcB4qBn6ozDq
-	0/cIUEy/EUxcQ2Zat9Epm2ty6lpGDprtAlh0XX8rOs+2edu8AcBLeuwrIM2Frnj1
-	oLoo2II/kYFSpNjAF2Qxb++wElX29GemY3ecratA==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4g2frt88gt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 18 Aug 2026 14:29:37 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 67IEQeEg020014;
-	Tue, 18 Aug 2026 14:29:37 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4g32eq3ts3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 18 Aug 2026 14:29:36 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 67IETXuM42009038
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 18 Aug 2026 14:29:33 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id ED8402004B;
-	Tue, 18 Aug 2026 14:29:32 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8DE7920049;
-	Tue, 18 Aug 2026 14:29:32 +0000 (GMT)
-Received: from osiris (unknown [9.224.76.185])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Tue, 18 Aug 2026 14:29:32 +0000 (GMT)
-Date: Tue, 18 Aug 2026 16:29:31 +0200
-From: Steffen Eiden <seiden@linux.ibm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, Alexander Gordeev <agordeev@linux.ibm.com>,
-        Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@kernel.org>,
-        Friedrich Welter <fritz@linux.ibm.com>, Fuad Tabba <tabba@google.com>,
-        Gautam Gala <ggala@linux.ibm.com>,
-        Hariharan Mari <hari55@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Hendrik Brueckner <brueckner@linux.ibm.com>,
-        Ilya Leoshkevich <iii@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
-        Nico Boehr <nrb@linux.ibm.com>,
-        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
-        Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v6 08/33] KVM: arm64: Use accessor functions for core regs
-Message-ID: <20260818142931.21865-G-seiden@linux.ibm.com>
-References: <20260812153631.3376090-1-seiden@linux.ibm.com>
- <20260812153631.3376090-9-seiden@linux.ibm.com>
- <86a4qq1gyy.wl-maz@kernel.org>
- <20260818092924.21865-C-seiden@linux.ibm.com>
- <86ecfv613k.wl-maz@kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ogDTc4bO"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=CieHboMpuXfbRWDkCH9YDuDG33RKKvNl4sdtiHansdU=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1787064371; v=1; x=1787669171;
+ b=ogDTc4bOFWBRB0YVuEHGYb3VpRXenVr+4AydDsmS67wVv+gEUfMj6Dx4fmKKc3MQ/OoybMeK
+ MZTDBQFF7PuBhEYS497MyFqNACX1Hl3n4YZFygGujiLgwVy+ZUPtGCdx7HdzBP2JDw+chlfGNsv
+ l7WNi4Lx4a5YT7HqpSyv+RWU=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: from mail-lf1-f48.google.com (209.85.167.48)
+	by smtp.migadu.com with ESMTPS id 77082c66cd5ab45e;
+	Tue, 18 Aug 2026 14:46:00 +0000
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-5b2a8173142so7376e87.1
+        for <kvmarm@lists.linux.dev>; Tue, 18 Aug 2026 07:46:00 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+Ro+fIdTiVJBIHi8y+bUPavWhGb7SJ2vo7BUU4PvTwyvBy3GATKbazMGvNtyk3F1RdrbPQK1Bvs=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzCS90gLyOQ3EJwPxXOykiaDRthAq0IY+OZeF/R99Rm6cWhXwGB
+	XxEwW9GVf65AH3i7Z0/qB3Y5mOQuuJ7+A/XSTRL96/oh3hMaJJBbQghEn6McJVn3yzoelc/BsY5
+	5m9rRwqkGnbxOmNJICs9nqLJiSd9teg3NQ2GM2oYK
+X-Received: by 2002:a05:6512:1292:b0:5b1:ca0b:25d2 with SMTP id
+ 2adb3069b0e04-5b471ecc7bcmr238410e87.4.1787064359769; Tue, 18 Aug 2026
+ 07:45:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86ecfv613k.wl-maz@kernel.org>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Authority-Analysis: v=2.4 cv=OfaoyBTY c=1 sm=1 tr=0 ts=6a846c52 cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
- a=kj9zAlcOel0A:10 a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=RzCfie-kr_QcCd8fBx8p:22 a=VnNF1IyMAAAA:8
- a=v8CuuPHm0S7VpODZ9BkA:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODE4MDEwMyBTYWx0ZWRfX+NVez4jOsbpG
- godyTBBEaM0PrH1ZZzKoPyxEiSsG5XX8DiV1/X3t4jBzQFjdzJPIkJUewzswzoJoWFgwB/EED4H
- WICgLAmS5wNH/M3LXQL0K48xhvGGsf8=
-X-Proofpoint-GUID: ibFV31CahW-cnJdkL25DpOaeaRym7fEh
-X-Proofpoint-ORIG-GUID: 7vXRAGfGpAKRcPWjy_33qur8DqEHUmHs
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODE4MDEwMyBTYWx0ZWRfX/Yyr2tRG5nTs
- vzLAP3kp2L1nLG9boP1NJI61AQkTpCz2JLJDnwuCCkRMUjplnpaZKbjWFy2EFSC02jnjkLKOvT8
- H3brincHUwbwXe5xs9kMaTwcgkxZPGACQysqxW2Qo4h1pIPx3cHK05r+piP/bEhTQHAypVO9Rt4
- tescpu0HW/OeBJnbd2lKPuuH+eqkvGsbFfk415nH0442qMMOrp3LuCWjiuH6N1R+g69zIeu/vzy
- ch0e8QUETSXWhL5f17CYUDMk2GqzGKtPCu5QTV678rlsk3tMEsa/V7DvF9fk/+NNJqScq1r8bBy
- qQJRWey+5PZyGQdgG/DYZHmlrblxmu7z9GnUvZpfDDHvqXyjzTXKN+u85Vq0SXHJ4h8qAZb/ioq
- Qrc8kNba0IXedPI0heqhouUZusm4W/l3e9oVkXEv9sOOaupAh8LHcRwOWdIqFJkrm8u4FqqqMOx
- Dn3r+qmLQRi9eYzNlXw==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-08-18_02,2026-08-18_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 adultscore=0 clxscore=1015 lowpriorityscore=0 impostorscore=0
- malwarescore=0 bulkscore=0 phishscore=0 priorityscore=1501 spamscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2608180103
+References: <20260731143541.956291-1-vdonnefort@google.com> <20260731143541.956291-12-vdonnefort@google.com>
+In-Reply-To: <20260731143541.956291-12-vdonnefort@google.com>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Tue, 18 Aug 2026 15:45:23 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTycM7b4d1foNQr33e7dN7WHyeg-Ww8nPkSKu78DGDs9_w@mail.gmail.com>
+X-Gm-Features: AcwNN1WxghC3g5qogm93X3-BDXmvBeGlnHJjBQyn_ThrrYLqy3XthGmODUrBhcE
+Message-ID: <CA+EHjTycM7b4d1foNQr33e7dN7WHyeg-Ww8nPkSKu78DGDs9_w@mail.gmail.com>
+Subject: Re: [PATCH v4 11/17] KVM: arm64: Filter out non-kernel addresses in kern_hyp_va
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, 
+	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com, 
+	qperret@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Aug 18, 2026 at 01:54:07PM +0100, Marc Zyngier wrote:
-> On Tue, 18 Aug 2026 10:29:24 +0100,
-> Steffen Eiden <seiden@linux.ibm.com> wrote:
-> > 
-> > On Thu, Aug 13, 2026 at 10:56:37AM +0100, Marc Zyngier wrote:
-> > > On Wed, 12 Aug 2026 16:36:04 +0100,
-> > > Steffen Eiden <seiden@linux.ibm.com> wrote:
-> > > >
-> 
-> [...]
-> 
-> > > > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> > > > index b01d6622b872..773f6c8e5026 100644
-> > > > --- a/arch/arm64/kvm/guest.c
-> > > > +++ b/arch/arm64/kvm/guest.c
-> > > > @@ -134,19 +134,19 @@ static void *core_reg_addr(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> > > >  	     KVM_REG_ARM_CORE_REG(regs.regs[30]):
-> > > >  		off -= KVM_REG_ARM_CORE_REG(regs.mregs[0]);
-> > > >  		off /= 2;
-> > > > -		return &vcpu->arch.ctxt.regs.regs[off];
-> > > > +		return &vcpu_gp_regs(vcpu)[off];
-> > > 
-> > > Doesn't this belong to the previous patch?
-> > > 
-> > 
-> > My thoughts about positioning this change in this patch:
-> > 
-> > The previous patch changes the semantics of vcpu_gp_regs and just
-> > touched the part where the old semantic of the function was used.
-> > This is mainly done by not using vcpu_gp_regs where it was used before
-> > as it cannot be used to access e.g. pstate anymore.
-> > 
-> > This patch then introduces and *uses* new accessor functions for
-> > abstractions (and uses the vcpu_gp_regs abstraction where it was not
-> > used before). 
-> > -> The patch changes direct accesses to using accessor functions.
-> > 
-> > However, I have no strong feelings for this. If you want this in the
-> > previous patch, I can do that.
-> 
-> I think it'd make more sense. You can capture this in the commit
-> message to make it clear.
+Hi Vincent,
 
-Just that we are on the same page: you want me to move the change to the
-previous patch?
 
-	Steffen
+On Fri, 31 Jul 2026 at 15:36, Vincent Donnefort <vdonnefort@google.com> wrote:
+>
+> kern_hyp_va() is idempotent for the hypervisor linear space. This is
+> handy for nVHE hypervisor callers handling kvm_vcpu or kvm_arch
+> pointers. Those pointers can originate from the hypervisor space (when
+> protected mode is enabled, we don't trust the kernel and the hypervisor
+> uses its own copy) or from the kernel space (we do trust the kernel in
+> "non-protected" nVHE).
+>
+> This idempotence does not hold for addresses within the hypervisor
+> private range, like the ones you get from the pKVM heap allocator
+> (hyp_alloc()). To resolve this, filter out non-kernel addresses based on
+> PAGE_OFFSET.
+>
+> Leave the assembly version untouched as it has no current users.
+>
+> Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
+> Tested-by: Fuad Tabba <fuad.tabba@linux.dev>
+> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+>
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> index 6eae7e7e2a68..d60e5f2de10c 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -126,6 +126,9 @@ static __always_inline unsigned long __kern_hyp_va(unsigned long v)
+>   * replace the instructions with `nop`s.
+>   */
+>  #ifndef __KVM_VHE_HYPERVISOR__
+> +       if (!is_ttbr1_addr(v))
+> +               return v;
+> +
 
+I gave this a tag earlier and only came back to the cost side now, sorry.
+
+The check is unconditional, so plain nVHE pays it on every
+kern_hyp_va(), including the one in __kvm_vcpu_run(), and it has no
+private range to protect.
+
+Could it be gated on is_protected_kvm_enabled(), the same way patch 17
+gates hyp_trace_buffer_alloc_bpages()?
+
+Cheers,
+/fuad
+
+
+>         asm volatile(ALTERNATIVE_CB("and %0, %0, #1\n"         /* mask with va_mask */
+>                                     "ror %0, %0, #1\n"         /* rotate to the first tag bit */
+>                                     "add %0, %0, #0\n"         /* insert the low 12 bits of the tag */
+> --
+> 2.55.0.508.g3f0d502094-goog
+>
