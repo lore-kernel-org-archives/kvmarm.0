@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D18753C584B;
-	Tue, 18 Aug 2026 16:14:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13D2447D44A;
+	Tue, 18 Aug 2026 16:25:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787069680; cv=none; b=YcUJ8ZOfJsiqyK2bGoO2lS3h3O1W4fD5aGdGac43v0sQzijeLvNvDWs/HXIuUo3X63tapIbkkzT8Dzr6rwIvhbDUhHNNv9w0/B6qDrNv75tJ+Fc1Ef+SjIVvrtqoaUHEXseKkUue8CkbiPdWZsowIFfLOCKzGi+SOYw5vmJxA+I=
+	t=1787070326; cv=none; b=STpVPakYKqYVZXfua8F5mY/htz2gJdsINb7sgHwoNYhvxD+tbzDSirZroBn3LdE2FsV2n4pHDVKIjVi+1aeYhAPcqaKqcGajYP40h4wQ8dCnJJXBmB8kANaLH//VtNr5ixasV8DO9KPtHWvEDKuvp+imwR12+csxXL66lNm2Vak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787069680; c=relaxed/simple;
-	bh=Cg7/CNiQ3ccF5ixrvDgAh1nZY8fhV+3ahz/NLquQvVI=;
+	s=arc-20240116; t=1787070326; c=relaxed/simple;
+	bh=I4L4uDLHcDem7WX9mfgTUIIEsDETW1137wzmuRDy8sM=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hHNH7YJdbMqK9+hq/G1fhquMTSunQv6KTlOAMX8ydVHC9m2UGb295UqiSFAO1YMdH1Yrf1ivvPjXC09RhVjADjzqbeEuWSkuEDDTVuskcqNqAocJXnpynEyQdxZHtrfWp0NdN9A3Cr635IThKr8IVlQtmiBzNoi7OA5/NGL/A9s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L2M24O0h; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=iPmdy9bmgJ2UzpCia0KYuIwkijx317vlLP+Li286efl8WsEHJznXGDBs1+4aX644nisZm1XbKAZFOUOeDNn5jwVJTKt4/4Uq13X8VC9wJXjw4SROY6Awewy0HypxQlJEbcMeexuTxHeNDe1Ef96JUnL0ZXus2ZajbpVQciwpL4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i96ySK8i; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L2M24O0h"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0F941F000E9;
-	Tue, 18 Aug 2026 16:14:39 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i96ySK8i"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABCEE1F000E9;
+	Tue, 18 Aug 2026 16:25:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787069679;
-	bh=E0J6en3McpYf9F3IxCn2pxIwSRX4Sv7Jj1OiegFfc7A=;
+	s=k20260515; t=1787070324;
+	bh=7Y7qqLPkyUuMi6qyL5GxK2thHtwUGv3GHWTN3DmEezQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=L2M24O0hdXxRP3tm59T84NCNnDVISHqkiqUYrBmFkaK9Zxn+UU6RY+1ibYtLAOP4P
-	 w77I7rJ1UVIqEBvr7OYNHw5Evgs1a61TzJj4bqv/9WtPio7GVIp9AnrUaEgobojg0s
-	 VrRatuspsj24LXb0d1/r/xKxa3dDKh8tAfPFPH+xS4TyZG8rHSOZtshjBxfXaLxY/C
-	 Wbqufj5/2TLQ1fWWwhROhy9xhOS0ZPqvhx5fV5X3QGIyRjObBlI2GNjvxV1mWEUTIc
-	 T2i492GYAQe8+nAxmplV9Q5m8VYXju5lKqUafLRI3HTS5AmBtj701x/aYgzgo2wqgJ
-	 vl/TJGCBio2XA==
+	b=i96ySK8irJGN7kDYSuR6/cyVpTEYRyD3PKF3scrOjjIRHJ+N2kjkfZ6fIZ+bheu/D
+	 ASWOhbis+NFeMN1heh2njYn5ieZr8Y5YihY+SfAoDMBwJK3mU4fd+mLxs78wF1grzb
+	 IEkJeah/FmcJxhBCAWWrPYngt8B9vVtAd+52gzP0iY1lLLhHpNoNmgXq/ZRGoMjGPF
+	 OBEmA8pM4o8B+Ht8nnkZ++bK2iyypb/sJi8eC+sHnRAdte59oB73SURtIdq7XyDynN
+	 aV05OG+tiyBlMPX8TFzSMfvLMBoKKyby+7HP6DQWmOWkSZ3AblzsrzCat/yBwFIiM4
+	 G1SR5rgls4D8w==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wwMST-0000000GhFw-37bp;
-	Tue, 18 Aug 2026 16:14:37 +0000
-Date: Tue, 18 Aug 2026 17:14:37 +0100
-Message-ID: <868q635rte.wl-maz@kernel.org>
+	id 1wwMcs-0000000GhVj-1n64;
+	Tue, 18 Aug 2026 16:25:22 +0000
+Date: Tue, 18 Aug 2026 17:25:21 +0100
+Message-ID: <867bln5rbi.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Steffen Eiden <seiden@linux.ibm.com>
 Cc: kvm@vger.kernel.org,
@@ -68,14 +68,12 @@ Cc: kvm@vger.kernel.org,
 	Vasily Gorbik <gor@linux.ibm.com>,
 	Will Deacon <will@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v6 08/33] KVM: arm64: Use accessor functions for core regs
-In-Reply-To: <20260818142931.21865-G-seiden@linux.ibm.com>
+Subject: Re: [PATCH v6 10/33] arm64: Share arm64 headers with s390
+In-Reply-To: <20260818140901.21865-F-seiden@linux.ibm.com>
 References: <20260812153631.3376090-1-seiden@linux.ibm.com>
-	<20260812153631.3376090-9-seiden@linux.ibm.com>
-	<86a4qq1gyy.wl-maz@kernel.org>
-	<20260818092924.21865-C-seiden@linux.ibm.com>
-	<86ecfv613k.wl-maz@kernel.org>
-	<20260818142931.21865-G-seiden@linux.ibm.com>
+	<20260812153631.3376090-11-seiden@linux.ibm.com>
+	<865x1e17kb.wl-maz@kernel.org>
+	<20260818140901.21865-F-seiden@linux.ibm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -91,56 +89,97 @@ X-SA-Exim-Rcpt-To: seiden@linux.ibm.com, kvm@vger.kernel.org, kvmarm@lists.linux
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 18 Aug 2026 15:29:31 +0100,
+On Tue, 18 Aug 2026 15:09:01 +0100,
 Steffen Eiden <seiden@linux.ibm.com> wrote:
 > 
-> On Tue, Aug 18, 2026 at 01:54:07PM +0100, Marc Zyngier wrote:
-> > On Tue, 18 Aug 2026 10:29:24 +0100,
-> > Steffen Eiden <seiden@linux.ibm.com> wrote:
-> > > 
-> > > On Thu, Aug 13, 2026 at 10:56:37AM +0100, Marc Zyngier wrote:
-> > > > On Wed, 12 Aug 2026 16:36:04 +0100,
-> > > > Steffen Eiden <seiden@linux.ibm.com> wrote:
-> > > > >
+> On Thu, Aug 13, 2026 at 02:19:48PM +0100, Marc Zyngier wrote:
+> > I'm curious about the reasons for skipping a bunch of architectural
+> > helpers:
 > > 
-> > [...]
-> > 
-> > > > > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> > > > > index b01d6622b872..773f6c8e5026 100644
-> > > > > --- a/arch/arm64/kvm/guest.c
-> > > > > +++ b/arch/arm64/kvm/guest.c
-> > > > > @@ -134,19 +134,19 @@ static void *core_reg_addr(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> > > > >  	     KVM_REG_ARM_CORE_REG(regs.regs[30]):
-> > > > >  		off -= KVM_REG_ARM_CORE_REG(regs.mregs[0]);
-> > > > >  		off /= 2;
-> > > > > -		return &vcpu->arch.ctxt.regs.regs[off];
-> > > > > +		return &vcpu_gp_regs(vcpu)[off];
-> > > > 
-> > > > Doesn't this belong to the previous patch?
-> > > > 
-> > > 
-> > > My thoughts about positioning this change in this patch:
-> > > 
-> > > The previous patch changes the semantics of vcpu_gp_regs and just
-> > > touched the part where the old semantic of the function was used.
-> > > This is mainly done by not using vcpu_gp_regs where it was used before
-> > > as it cannot be used to access e.g. pstate anymore.
-> > > 
-> > > This patch then introduces and *uses* new accessor functions for
-> > > abstractions (and uses the vcpu_gp_regs abstraction where it was not
-> > > used before). 
-> > > -> The patch changes direct accesses to using accessor functions.
-> > > 
-> > > However, I have no strong feelings for this. If you want this in the
-> > > previous patch, I can do that.
-> > 
-> > I think it'd make more sense. You can capture this in the commit
-> > message to make it clear.
+> > - kvm_vcpu_trap_is_permission_fault()
+> we need the s390 state for this function -> we overload it
+> the only use is in shared arm64 code for is_write_fault
+> > - kvm_vcpu_trap_is_translation_fault()
+> > - kvm_vcpu_trap_get_perm_fault_granule()
+> > - kvm_vcpu_abt_issea()
+> as s390 mm works differntly in comparison to ARMs (suprise :) )
+> we do not need those
 > 
-> Just that we are on the same page: you want me to move the change to the
-> previous patch?
+> 
+> > - kvm_vcpu_sys_get_rt()
+> I'll add using this function in the next series (sysreg enablement)
+> I can do that now - It reduces the churn to the next series.
+> 
+> > 
+> > I really think you should include anything that is exclusively derived
+> > from architectural state, specially that these helpers are strictly
+> > dependent on stuff you already include.
+> > 
+> > Any particular reason why this isn't the case?
+> 
+> These functions operate right at the border where the s390 architectural
+> state (host view) and the arm64 architectural state (guest view) meet.
+> 
+> Especially, for the memory management of the guest we need to use
+> s390 based guest memory management (gmap) as the host only knows s390
+> (+SAE & friends to actually run an arm64 guest)
+> 
+> The s390 host work here is to convert the s390-state into arm64 state
+> for the guest. e.g. convert a s390 translation fault into a data abort (if
+> applicable)
 
-Yes, please.
+Exactly. Which is why I was expecting that the s390 code would
+populate the copy of the ESR_EL2 register in the vcpu structure, and
+let the arm64 code do the talking. But evidently, that's not what is
+happening (or at least not that way).
+
+> 
+> The code in the second series should make this more
+> clear. As we now are clear on the code-sharing concept I will sent a
+> respin of the second series using the new sharing approach ASAP.
+>
+> 
+> > 
+> > >  static inline bool kvm_is_write_fault(struct kvm_vcpu *vcpu)
+> > >  {
+> > >  	if (kvm_vcpu_abt_iss1tw(vcpu)) {
+> > > @@ -546,6 +556,8 @@ static inline bool kvm_is_write_fault(struct kvm_vcpu *vcpu)
+> > >  	return kvm_vcpu_dabt_iswrite(vcpu);
+> > >  }
+> > >  
+> > > +#endif /* ARM64_S390_COMMON */
+> > > +
+> > >  static inline unsigned long kvm_vcpu_get_mpidr_aff(struct kvm_vcpu *vcpu)
+> > >  {
+> > >  	return __vcpu_sys_reg(vcpu, MPIDR_EL1) & MPIDR_HWID_BITMASK;
+> > > @@ -587,6 +599,7 @@ static inline bool kvm_vcpu_is_be(struct kvm_vcpu *vcpu)
+> > >  	return vcpu_read_sys_reg(vcpu, r) & bit;
+> > >  }
+> > >  
+> > > +#ifdef ARM64_S390_COMMON
+> > 
+> > Similarly, you have dropped
+> > 
+> > - kvm_vcpu_set_be()
+> > 
+> > - kvm_vcpu_is_be()
+> > 
+> > I suspect that your implementation is LE only (it'd better be, as
+> > we're dropping BE support right now), but it would make a lot more
+> > sense if you could rely on the guest architectural state (which must
+> > be accurate) rather than short-cutting things in your own
+> > implementation.
+> 
+> Yes, you are right we are LE only. Therefore, I defined the function to
+> false such that the compiler/linker can optimize-out unreachable code.
+> This is true for a couple of function-shortcuts.
+> 
+> I would like to keep it that way if this is no show stopper for you.
+
+Not a show-stopper, but I think we'll eventually want to work more at
+the architecture level rather than solely at the "code sharing" level.
+
+I expect it would make things a bit simpler to follow.
 
 	M.
 
