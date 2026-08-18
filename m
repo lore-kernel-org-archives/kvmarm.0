@@ -1,105 +1,162 @@
-Received: from mta1.migadu.com (out-184.mta1.migadu.com [95.215.58.184])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ED8519B5A3
-	for <kvmarm@lists.linux.dev>; Tue, 18 Aug 2026 13:22:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AC2D472F7C;
+	Tue, 18 Aug 2026 13:24:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787059375; cv=none; b=ikLuFc3vhvmlB8pwGivU9oJq+/cq5XgPJ+Hnow2tvHN92UVS060lOLUSATBlZWxBsBffKDb2WufCGhUl4iP+DGOGoO4M1EY86ljUy+XfMH5SNf4JdFiDm+plePPXJLtoD6oPOYBemJtHzKQAc4IN7uoJGvFy7qAvpZbfi/E+5UQ=
+	t=1787059484; cv=none; b=kjCa+UOhgX12kOGlry9uVE3wTCkgkPYBm2NWIC550pD/PzQNWBZEg4v0kfUkOzRQXQZ3JQVQJd9M4HMQMnoawANwfjaY/S2jg/ZKAOl68FcLIWPwjta8y0TaaFuMStAp19d2bFUNOI6DIW0IPFjgHLJ3uk9bEaA3PnP1xXYSCRM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787059375; c=relaxed/simple;
-	bh=8sd1ImM8DoqK9W8lt1KuphpIcTi6YN8Ipnhx1kfGSOY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PH3dHHDPFgzzo8J+Plp2fn6qq+/Q4oGxKCMeO8eavVrx/GY0LvCdl4yrN6i2bvvkWqFKLwe6D+pxDP504Kk3QE7orq9rVnArSYt/8jU+f7JaPOjTd2SZCAnidZE4Hbz9lXxyA/yIa8ujol5G8jJ1TSinM4u4o0GVMFCoFF1818Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=e33GHtLz; arc=none smtp.client-ip=95.215.58.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1787059484; c=relaxed/simple;
+	bh=0qeab45JSjlGLR/DCB210viV8qlg/swbTJ0ATdhPMMQ=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=UpgATd7Vz2CCzX5fCavsNgm+dd0ekdwFRJx/sgDzdLCWwNWWJV3renoIL6JnZpZNDO60v/1kP2zi5mGVBTxXTLPkU8yyFrvU3ugX7uGmC/uVtw05N1dMIhs2VT+x8LlyV8epi1RiyBR1+kd+nWNDBkbRMyGOVrleZs9B3eeQs8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IvVZYmEa; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="e33GHtLz"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=8sd1ImM8DoqK9W8lt1KuphpIcTi6YN8Ipnhx1kfGSOY=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1787059371; v=1; x=1787664171;
- b=e33GHtLziGb32c9U6JSw4dd+zcwAXbDaJWEU0ZR+xpdGJDEbNAAD0+nA4yII40H1oJv3WZXQ
- KmuLk0q/10V4xHaKHwLv7P5epG6RrBlfkxc5NBcBaeT5KTTHEth+6kRpjukgsADJy05TCytkUVL
- CgRdU0BMEbandL7rslGLApZ8=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: from mail-lf1-f50.google.com (209.85.167.50)
-	by smtp.migadu.com with ESMTPS id 4bba23d07b89262e;
-	Tue, 18 Aug 2026 13:22:51 +0000
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-5b2a73da7e1so8714e87.0
-        for <kvmarm@lists.linux.dev>; Tue, 18 Aug 2026 06:22:46 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+RoqMcvDuSZFPwylDk7sGkinALCFMNAI8ogGhIalAso/zH5NZKK+3WJhivqJmJ9ML7EkvBsy5go=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxynoZfOOGhOPig4Fpb/oZrt9/wt755hbP1LnW+tb2P4LKdVIaR
-	sUNFCkO4ah1A4sAKkYH+VyUb8G7c0YfcyCCLjogCdJryL6KPCS7jrZFgg38IWNWiRoq7UDdnWss
-	85l3Dj15MPDqWswUtAHPfi/63ZJnEWkgTNjJltpgJ
-X-Received: by 2002:a05:6512:3c84:b0:5b1:5141:9156 with SMTP id
- 2adb3069b0e04-5b47435fb3fmr174179e87.9.1787059365308; Tue, 18 Aug 2026
- 06:22:45 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IvVZYmEa"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B35DA1F000E9;
+	Tue, 18 Aug 2026 13:24:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1787059480;
+	bh=S9IekfwPh1alq+9HUJBgkgWBggDNvqQ7KorXgNc8Ifs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=IvVZYmEaJduqxhOqhcvQD6aUJ5moa6wleRg5iMNiAoqHR0kpyRYwkcmV8O1leHavm
+	 tHo0yzgUIPTgyAIVpWqsHXNG9EZFb4zHvmqhzqdt5beIrh5RM9ApemL/khZQ1K8R3L
+	 f2sOHxoQQU2gaX4cHv6EOcE8V3UvV6H8c/Kzruipq837mNNP4eoeqz3ijsfX0Hnz7t
+	 y0j8Ezkj9DAraCHbOofWu3l3nZQFIrdZCasEitIvw624qqSDw8HnFmRZzK8H2KsOfY
+	 ZzcTZ22iR7zh9TCiBnPo1jrzRK68HOpCUxOkDPLC06dwACN5kBeUUICKJ9XIFofHVb
+	 cybyTXnvLyBhA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wwJny-0000000Gdt3-10V2;
+	Tue, 18 Aug 2026 13:24:38 +0000
+Date: Tue, 18 Aug 2026 14:24:37 +0100
+Message-ID: <86cxvf5zoq.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Dongli Zhang <dongli.zhang@oracle.com>
+Cc: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-kselftest@vger.kernel.org,
+	seanjc@google.com,
+	pbonzini@redhat.com,
+	oupton@kernel.org,
+	fuad.tabba@linux.dev,
+	joey.gouly@arm.com,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	dwmw2@infradead.org,
+	joe.jin@oracle.com
+Subject: Re: [PATCH 2/4] KVM: arm64: Reset last_steal on vCPU pid change
+In-Reply-To: <77baeb6c-1efa-45fb-8a86-46a6c76b5873@oracle.com>
+References: <20260816053630.527528-1-dongli.zhang@oracle.com>
+	<20260816053630.527528-3-dongli.zhang@oracle.com>
+	<86se4dyw7n.wl-maz@kernel.org>
+	<77baeb6c-1efa-45fb-8a86-46a6c76b5873@oracle.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20260807104102.2410744-1-fuad.tabba@linux.dev>
- <20260807104102.2410744-3-fuad.tabba@linux.dev> <20260807105558.73D701F000E9@smtp.kernel.org>
- <CA+EHjTwVKkAwWUeMrF_m2-35kyhESqAezOKJy-Pj=vA3qE5Bjw@mail.gmail.com>
- <87fr0pq5uu.wl-maz@kernel.org> <CA+EHjTyQ-1sUhgs0LNuPa-VJ=J=+vS7UCwJJU0ATJG9LtEQpSA@mail.gmail.com>
-In-Reply-To: <CA+EHjTyQ-1sUhgs0LNuPa-VJ=J=+vS7UCwJJU0ATJG9LtEQpSA@mail.gmail.com>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Tue, 18 Aug 2026 14:22:09 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTyDix+y6NTLTsXP5j9Sn2VLOZcsw94LntQxg_etRBJZuA@mail.gmail.com>
-X-Gm-Features: AcwNN1XKkVvTo2mJqhihOHA24gckO8qA9o0xqJestbJceVWVo9JpC11WbONO-n0
-Message-ID: <CA+EHjTyDix+y6NTLTsXP5j9Sn2VLOZcsw94LntQxg_etRBJZuA@mail.gmail.com>
-Subject: Re: [PATCH v2 2/4] KVM: arm64: vgic: Don't leak the SPI array when
- init is retried
-To: Marc Zyngier <maz@kernel.org>
-Cc: sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev, 
-	Oliver Upton <oupton@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: dongli.zhang@oracle.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, seanjc@google.com, pbonzini@redhat.com, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, dwmw2@infradead.org, joe.jin@oracle.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi again Marc,
+On Mon, 17 Aug 2026 22:29:22 +0100,
+Dongli Zhang <dongli.zhang@oracle.com> wrote:
+> 
+> 
+> 
+> On Mon, Aug 17, 2026 1:42:20AM -0700, Marc Zyngier wrote:
+> > On Sun, 16 Aug 2026 06:33:03 +0100,
+> > Dongli Zhang <dongli.zhang@oracle.com> wrote:
 
-On Mon, 17 Aug 2026 at 19:40, Fuad Tabba <fuad.tabba@linux.dev> wrote:
-...
-> > I really don't want to have to think about the intermediate state.
+[...]
+
+> >> diff --git a/arch/arm64/kvm/pvtime.c b/arch/arm64/kvm/pvtime.c
+> >> index 4ceabaa4c30b..000bf49cc0fd 100644
+> >> --- a/arch/arm64/kvm/pvtime.c
+> >> +++ b/arch/arm64/kvm/pvtime.c
+> >> @@ -32,6 +32,11 @@ void kvm_update_stolen_time(struct kvm_vcpu *vcpu)
+> >>  	srcu_read_unlock(&kvm->srcu, idx);
+> >>  }
+> >>  
+> >> +void kvm_reset_stolen_time(struct kvm_vcpu *vcpu)
+> >> +{
+> >> +	vcpu->arch.steal.last_steal = current->sched_info.run_delay;
+> >> +}
+> >> +
+> >>  long kvm_hypercall_pv_features(struct kvm_vcpu *vcpu)
+> >>  {
+> >>  	u32 feature = smccc_get_arg1(vcpu);
+> > 
+> > Why isn't this common code? I really don't see the point in making
+> > this arch-specific code. I'd expect something like this (untested):
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index ace5801a592f..3fb77360af01 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -950,6 +950,8 @@ struct kvm_vcpu_arch {
+> >  	pid_t pid;
+> >  };
+> >  
+> > +#define kvm_arch_vcpu_last_steal(v)	(v)->arch.steal.last_steal
+> > +
+> >  /*
+> >   * Each 'flag' is composed of a comma-separated triplet:
+> >   *
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index 45e784462ec6..117aeb49231a 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -4459,6 +4459,9 @@ static long kvm_vcpu_ioctl(struct file *filp,
+> >  			if (r)
+> >  				break;
+> >  
+> > +			if (IS_ENABLED(CONFIG_HAVE_PV_STEAL_CLOCK_GEN))
+> > +				kvm_arch_vcpu_last_steal(vcpu) = current->sched_info.run_delay;
+> > +
+> >  			newpid = get_task_pid(current, PIDTYPE_PID);
+> >  			write_lock(&vcpu->pid_lock);
+> >  			vcpu->pid = newpid;
+> > 
+> > where each architecture that implements steal time provides an
+> > accessor, and the core code is in charge of the adjustment.
+> > 
+> > It also makes sure that we don't leave any architecture behind.
+> > 
+> Or how about making it something like below?
+> 
+> if (IS_ENABLED(CONFIG_HAVE_PV_STEAL_CLOCK_GEN))
+> 	kvm_arch_vcpu_reset_last_steal(vcpu);
 >
-> Agreed. I'll drop the idempotent version I sketched and do teardown
-> and reinit instead.
+> That would still move the policy to common KVM code, while leaving the exact
+> arch state to the architecture implementation.
 
-Here are my thoughts. Three patches, all fixes.
+I don't think architectures should have a say in this. Steal time, as
+a PV service, should not involve the architectures at all. After all,
+that's the whole point of a PV service: hypervisor-specific hacks that
+do not fit in the architectural envelope.
 
-vgic_init() will undo what it created when it fails, so
-KVM_DEV_ARM_VGIC_CTRL_INIT is all or nothing and a retry starts from
-scratch. Same thing you asked Karl for on the redistributor rollback
-[1].
+Bonus points if you move the last_steal field in the main vcpu
+structure instead of some arch-specific one.
 
-That drops the count check I sketched. vgic_v4_init()'s early return
-stays, since vgic_its_create() still calls it for an ITS created after
-init.
+> For x86, the hook can reset vcpu->arch.st.last_steal for regular KVM steal time.
+> If we also decide to cover Xen runstate in this series, the same x86 hook can
+> additionally reset vcpu->arch.xen.last_steal.
 
-irq-gic-v4.c goes first, as two patches. It removes the domains and
-frees the fwnodes without clearing the pointers, at four sites, and
-the teardown above makes that reachable on a path where it was not.
-The second is a leak in the same error path: when
-its_alloc_vcpu_sgis() fails partway, the SGI domains already allocated
-below it are never unwound.
+For arch-specific stuff, there is the pid change hook already.
 
-What do you think?
-/fuad
+	M.
 
-[1] https://lore.kernel.org/all/86jypv1lxo.wl-maz@kernel.org/
->
-> Cheers,
-> /fuad
->
-> >
-> > Thanks,
-> >
-> >         M.
-> >
-> > --
-> > Jazz isn't dead. It just smells funny.
+-- 
+Without deviation from the norm, progress is not possible.
