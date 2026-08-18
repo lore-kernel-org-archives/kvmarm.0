@@ -1,187 +1,118 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com [209.85.208.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13D2447D44A;
-	Tue, 18 Aug 2026 16:25:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7106547A87B
+	for <kvmarm@lists.linux.dev>; Tue, 18 Aug 2026 16:29:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787070326; cv=none; b=STpVPakYKqYVZXfua8F5mY/htz2gJdsINb7sgHwoNYhvxD+tbzDSirZroBn3LdE2FsV2n4pHDVKIjVi+1aeYhAPcqaKqcGajYP40h4wQ8dCnJJXBmB8kANaLH//VtNr5ixasV8DO9KPtHWvEDKuvp+imwR12+csxXL66lNm2Vak=
+	t=1787070592; cv=none; b=M3+QZTEnWkwOQ7KNYm1vs/dIWy7U/AMLbtC4CKuyaltAoi+F05hTfLoTqn49HcUQtW3uroRj40Xm9YExUrRKKvmrKT6TSHLUROWgXOfn1nPsgPlGmekvxgza35Q/U9+YxMUoC8K35G+Ga/ATUNutodUfyI42nGHHC1pxAaSGReA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787070326; c=relaxed/simple;
-	bh=I4L4uDLHcDem7WX9mfgTUIIEsDETW1137wzmuRDy8sM=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iPmdy9bmgJ2UzpCia0KYuIwkijx317vlLP+Li286efl8WsEHJznXGDBs1+4aX644nisZm1XbKAZFOUOeDNn5jwVJTKt4/4Uq13X8VC9wJXjw4SROY6Awewy0HypxQlJEbcMeexuTxHeNDe1Ef96JUnL0ZXus2ZajbpVQciwpL4k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i96ySK8i; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1787070592; c=relaxed/simple;
+	bh=vC2RlolhkLS2+1s4l2UramjQAZbiE9X0zYRFDEG/2wo=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=QR2hl/kAPHavbGDZ8d4ZdPF5b+jVwlW6m8oOqETISd0gzrrEAVwU8CgPfGPtOvDjA49mQtPHKpb8SuMyaQ8H9tWAd8e8TRVthxUXdVtQ3GVYjq/4BDpm7f6d899CYA8oxEZihDkonMVzeX9Ec5NoPu8IUj7FYpv1av+4JtWYJSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tarunsahu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jR8sXqg4; arc=none smtp.client-ip=209.85.208.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tarunsahu.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i96ySK8i"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABCEE1F000E9;
-	Tue, 18 Aug 2026 16:25:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787070324;
-	bh=7Y7qqLPkyUuMi6qyL5GxK2thHtwUGv3GHWTN3DmEezQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=i96ySK8irJGN7kDYSuR6/cyVpTEYRyD3PKF3scrOjjIRHJ+N2kjkfZ6fIZ+bheu/D
-	 ASWOhbis+NFeMN1heh2njYn5ieZr8Y5YihY+SfAoDMBwJK3mU4fd+mLxs78wF1grzb
-	 IEkJeah/FmcJxhBCAWWrPYngt8B9vVtAd+52gzP0iY1lLLhHpNoNmgXq/ZRGoMjGPF
-	 OBEmA8pM4o8B+Ht8nnkZ++bK2iyypb/sJi8eC+sHnRAdte59oB73SURtIdq7XyDynN
-	 aV05OG+tiyBlMPX8TFzSMfvLMBoKKyby+7HP6DQWmOWkSZ3AblzsrzCat/yBwFIiM4
-	 G1SR5rgls4D8w==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wwMcs-0000000GhVj-1n64;
-	Tue, 18 Aug 2026 16:25:22 +0000
-Date: Tue, 18 Aug 2026 17:25:21 +0100
-Message-ID: <867bln5rbi.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Steffen Eiden <seiden@linux.ibm.com>
-Cc: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Andreas Grapentin <gra@linux.ibm.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	David Hildenbrand <david@kernel.org>,
-	Friedrich Welter <fritz@linux.ibm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Gautam Gala <ggala@linux.ibm.com>,
-	Hariharan Mari <hari55@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Hendrik Brueckner <brueckner@linux.ibm.com>,
-	Ilya Leoshkevich <iii@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Nico Boehr <nrb@linux.ibm.com>,
-	Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
-	Oliver Upton <oupton@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Will Deacon <will@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v6 10/33] arm64: Share arm64 headers with s390
-In-Reply-To: <20260818140901.21865-F-seiden@linux.ibm.com>
-References: <20260812153631.3376090-1-seiden@linux.ibm.com>
-	<20260812153631.3376090-11-seiden@linux.ibm.com>
-	<865x1e17kb.wl-maz@kernel.org>
-	<20260818140901.21865-F-seiden@linux.ibm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jR8sXqg4"
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-6a3f8cbd9feso21682a12.2
+        for <kvmarm@lists.linux.dev>; Tue, 18 Aug 2026 09:29:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1787070590; x=1787675390; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=/eyzaZNjJLEyd0fKbeRAuoUQBuqF6sdPIInoyVaJmj0=;
+        b=jR8sXqg4AqXeYJhPKdGeNX2GeybnAAxUboKHlzhVdFBbeBqQ/8gl/0MrzPyWBVc74L
+         SnkR2xS83nPO9NEknhU80v4ur1dAlf1SOKoUUeOAUOppOaNQjaWEBSOJ1rkOxQyoPpgK
+         9xHv9DdGcNrpiwxl7qrDLLJ7TH/Q1abJoEeTkFYaXX9rCE7BzRdXDaO+SYOSAT/0azfR
+         UYvTloPuQKm9bVCnI6WoXDiCNMkBsLK8sgFu1v/Dpl6ZNh6mHIaGoOOBCOteoy6Xl8KG
+         +gtgSYp68KvwkhGi5YCuJ4CLk05AiUptTlxvaq8sXhGZvRgcfViiy4iag5wFxD564Rhm
+         h+WQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787070590; x=1787675390;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=/eyzaZNjJLEyd0fKbeRAuoUQBuqF6sdPIInoyVaJmj0=;
+        b=OrcxNBfKCJlhGN4MQ4Nw7l3mqEtELu//J6c78rzS154/EwyHo2BSJGGdvEIst0CWy2
+         LCRGuxcPDz9l9zjJ3ktyL8RFkmBGueoAykuNQ51k8QqyBV1+/2kquh+26y+XjQLlNtJj
+         lL0BAfbXPEq937QkX7RxQmjAwho7FK2Xeezve4EghaYv2kxO69pKrc1ZmOsUNxcDtmhw
+         klSF9giasdD3KDSDQsozGf104o5mWvrKTcjV1zLX9RNa+9YjSuC05S9jRykwwsdbqW1Z
+         hTkOb9IThLO/r0zubPLasHKbWA9lmzjflNPTNNaZelLLceOgzeG+6Tg9YCXaPF1Zo7+o
+         Clrw==
+X-Forwarded-Encrypted: i=1; AHgh+RplTGKDyeSp41YacWv/4HLT8GGNJtM7Wjd/CqWeK5hQz5dYliZlABALx+El1GQgesjZWP7kGwo=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yy+yUi0UQrd2HdhGofujYrf71n+NIFuk8GRB0Hqm3FD3K8Q9Ywi
+	AEUr2kcvjTZaUawkpTXhiakn2yEcGeyH3ZNZk1NXdZCnPiqs6xAuXuZq0FduQBtj8MEBZB7avgM
+	Q0BlnOGxdqQM0UWRh9A==
+X-Received: from edts26.prod.google.com ([2002:aa7:cb1a:0:b0:6a1:f410:2ec5])
+ (user=tarunsahu job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6402:e85:b0:6a3:edb6:2228 with SMTP id 4fb4d7f45d1cf-6a3edb6285cmr3681617a12.17.1787070589499;
+ Tue, 18 Aug 2026 09:29:49 -0700 (PDT)
+Date: Tue, 18 Aug 2026 16:29:48 +0000
+In-Reply-To: <anpdYD1UaO0ffQgi@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: seiden@linux.ibm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, agordeev@linux.ibm.com, gra@linux.ibm.com, arnd@arndb.de, catalin.marinas@arm.com, borntraeger@linux.ibm.com, imbrenda@linux.ibm.com, david@kernel.org, fritz@linux.ibm.com, tabba@google.com, ggala@linux.ibm.com, hari55@linux.ibm.com, hca@linux.ibm.com, brueckner@linux.ibm.com, iii@linux.ibm.com, frankja@linux.ibm.com, joey.gouly@arm.com, nrb@linux.ibm.com, oss@nina.schoetterlglausch.eu, oupton@kernel.org, pbonzini@redhat.com, seanjc@google.com, suzuki.poulose@arm.com, svens@linux.ibm.com, Ulrich.Weigand@de.ibm.com, gor@linux.ibm.com, will@kernel.org, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+References: <20260728121138.1103610-1-tarunsahu@google.com>
+ <20260728121138.1103610-5-tarunsahu@google.com> <anpdYD1UaO0ffQgi@google.com>
+Message-ID: <9huzik57v1c3.fsf@tarunix.c.googlers.com>
+Subject: Re: [PATCH v4 04/11] KVM: Track weak reference to vm_file in struct kvm
+From: tarunsahu@google.com
+To: Sean Christopherson <seanjc@google.com>
+Cc: ackerleytng@google.com, fuad.tabba@linux.dev, 
+	Andrew Morton <akpm@linux-foundation.org>, dmatlack@google.com, 
+	Shuah Khan <skhan@linuxfoundation.org>, Jonathan Corbet <corbet@lwn.net>, david@redhat.com, 
+	Pasha Tatashin <pasha.tatashin@soleen.com>, Pratyush Yadav <pratyush@kernel.org>, sagis@google.com, 
+	Paolo Bonzini <pbonzini@redhat.com>, Mike Rapoport <rppt@kernel.org>, Alexander Graf <graf@amazon.com>, 
+	linux-kselftest@vger.kernel.org, andre.przywara@arm.com, michael.roth@amd.com, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, will@kernel.org, 
+	vannapurve@google.com, maz@kernel.org, fvdl@google.com, kvm@vger.kernel.org, 
+	oliver.upton@linux.dev, kvmarm@lists.linux.dev, alexandru.elisei@arm.com, 
+	skhawaja@google.com, aneesh.kumar@kernel.org, linux-doc@vger.kernel.org, 
+	David Hildenbrand <david@kernel.org>, yan.y.zhao@intel.com, kexec@lists.infradead.org, 
+	suzuki.poulose@arm.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, 18 Aug 2026 15:09:01 +0100,
-Steffen Eiden <seiden@linux.ibm.com> wrote:
-> 
-> On Thu, Aug 13, 2026 at 02:19:48PM +0100, Marc Zyngier wrote:
-> > I'm curious about the reasons for skipping a bunch of architectural
-> > helpers:
-> > 
-> > - kvm_vcpu_trap_is_permission_fault()
-> we need the s390 state for this function -> we overload it
-> the only use is in shared arm64 code for is_write_fault
-> > - kvm_vcpu_trap_is_translation_fault()
-> > - kvm_vcpu_trap_get_perm_fault_granule()
-> > - kvm_vcpu_abt_issea()
-> as s390 mm works differntly in comparison to ARMs (suprise :) )
-> we do not need those
-> 
-> 
-> > - kvm_vcpu_sys_get_rt()
-> I'll add using this function in the next series (sysreg enablement)
-> I can do that now - It reduces the churn to the next series.
-> 
-> > 
-> > I really think you should include anything that is exclusively derived
-> > from architectural state, specially that these helpers are strictly
-> > dependent on stuff you already include.
-> > 
-> > Any particular reason why this isn't the case?
-> 
-> These functions operate right at the border where the s390 architectural
-> state (host view) and the arm64 architectural state (guest view) meet.
-> 
-> Especially, for the memory management of the guest we need to use
-> s390 based guest memory management (gmap) as the host only knows s390
-> (+SAE & friends to actually run an arm64 guest)
-> 
-> The s390 host work here is to convert the s390-state into arm64 state
-> for the guest. e.g. convert a s390 translation fault into a data abort (if
-> applicable)
+Sean Christopherson <seanjc@google.com> writes:
 
-Exactly. Which is why I was expecting that the s390 code would
-populate the copy of the ESR_EL2 register in the vcpu structure, and
-let the arm64 code do the talking. But evidently, that's not what is
-happening (or at least not that way).
-
-> 
-> The code in the second series should make this more
-> clear. As we now are clear on the code-sharing concept I will sent a
-> respin of the second series using the new sharing approach ASAP.
+> On Tue, Jul 28, 2026, Tarun Sahu wrote:
+>> - Add a weak reference 'vm_file' in struct kvm under
 >
-> 
-> > 
-> > >  static inline bool kvm_is_write_fault(struct kvm_vcpu *vcpu)
-> > >  {
-> > >  	if (kvm_vcpu_abt_iss1tw(vcpu)) {
-> > > @@ -546,6 +556,8 @@ static inline bool kvm_is_write_fault(struct kvm_vcpu *vcpu)
-> > >  	return kvm_vcpu_dabt_iswrite(vcpu);
-> > >  }
-> > >  
-> > > +#endif /* ARM64_S390_COMMON */
-> > > +
-> > >  static inline unsigned long kvm_vcpu_get_mpidr_aff(struct kvm_vcpu *vcpu)
-> > >  {
-> > >  	return __vcpu_sys_reg(vcpu, MPIDR_EL1) & MPIDR_HWID_BITMASK;
-> > > @@ -587,6 +599,7 @@ static inline bool kvm_vcpu_is_be(struct kvm_vcpu *vcpu)
-> > >  	return vcpu_read_sys_reg(vcpu, r) & bit;
-> > >  }
-> > >  
-> > > +#ifdef ARM64_S390_COMMON
-> > 
-> > Similarly, you have dropped
-> > 
-> > - kvm_vcpu_set_be()
-> > 
-> > - kvm_vcpu_is_be()
-> > 
-> > I suspect that your implementation is LE only (it'd better be, as
-> > we're dropping BE support right now), but it would make a lot more
-> > sense if you could rely on the guest architectural state (which must
-> > be accurate) rather than short-cutting things in your own
-> > implementation.
-> 
-> Yes, you are right we are LE only. Therefore, I defined the function to
-> false such that the compiler/linker can optimize-out unreachable code.
-> This is true for a couple of function-shortcuts.
-> 
-> I would like to keep it that way if this is no show stopper for you.
+> "vm_file" is effectively already claimed by vm_area_struct.vm_file.  *If* we go
+> this route, I would very strongly prefer to take a dependency on "vfio: Use
+> file-based reference counting for KVM"[*].  I'll poke that thread, we really
+> should land that one particular patch long before the s390-is-arm64
+> insanity.
 
-Not a show-stopper, but I think we'll eventually want to work more at
-the architecture level rather than solely at the "code sharing" level.
+[*] Seem interesting way to solve this. So we will also have vm_file
+directly in guest_memfd instead of struct kvm and refcounting on vm_file
+instead struct kvm?
 
-I expect it would make things a bit simpler to follow.
+struct gmem_file {
+-	struct kvm *kvm;
++	struct file *vm_file;
+	struct xarray bindings;
+	struct list_head entry;
+};
 
-	M.
+>
+> Empashish on "if" because this all feels backwards.
 
--- 
-Without deviation from the norm, progress is not possible.
+> It's not at all clear to
+> me why liveupdate goes directly to guest_memfd, but then requires a token associated
+> with the VM.
+
+guest_memfd can be recreated without having the struct kvm, Which there
+is no way to pass it on retrieval path. So the function
+kvm_gmem_luo_retrieve() gets this VM token, find the vm_file (hence
+struct kvm) associated with the preserved guest_memfd. Now it create a
+fresh guest_memfd by calling kvm_gmem_create(..., kvm). And populate
+preserved flags and folios to this guest_memfd.
+
+>
+> https://lore.kernel.org/all/20260731130902.654679-2-seiden@linux.ibm.com
