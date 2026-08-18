@@ -1,57 +1,79 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 797104749EA;
-	Tue, 18 Aug 2026 12:51:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FC3A43FD2D;
+	Tue, 18 Aug 2026 12:54:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787057496; cv=none; b=BoO3HEZ1rhxwZDFrxhrbCN3EmGloL0/rByISL50pHzosr+kKBzCtxQqpoAjAkCttzMqgols4KZ0E/XafE8pq6d9utpDo6xojSWg0jshJ89Fcpz952++HRMJmV8GQy2fwJD1CORU3pqX+H62Dnn+lX3YEIG3XnmX7OeMe9bWSH7c=
+	t=1787057651; cv=none; b=pLybEBVvOJAaTiJDqSw5P9VwnQGdQjHTBBoAPhmH3iZAnk8ffKJHqXF8cn3lsmfdsgm3qbwFUsNTH/dOaOVmvDI/3CTYPAiDUlPjBS2bcoyj5pHPijYdng6jUtnLw7r5eQA2zTYkmIqdN06vMc3QLqGklvR2Kzx7rsdu7QPMFec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787057496; c=relaxed/simple;
-	bh=CaQlhnRfhHiCPvm4MoRFQkp0GY3OUY4+aqKgtEjqryo=;
+	s=arc-20240116; t=1787057651; c=relaxed/simple;
+	bh=jdKJ7l4tcYwzu+kiM4WEnwVINTzLMQUXxUVSK2lRhxM=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CXeES3N9yokNnh4L3igU2iYPSqqrtUuhHtHFHyUFlDcR5aa9QOafO/R8SX0ibfi5ZbtzxPqU7D87aG83Eyj0xi/JxgdVCl4hO+FaScCcrmzQw1BUzjy9S41TTizpuIFUXu2IsXvMzp7reYaSMwrrreivag0G/17heB5D420tXeg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bL7DhPbe; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=s2ES5IFYeGGmdfnrOQ/ZetrSNuhwMOzCZSa6GJ0xg4iI2P9lyiy97e2Wkii6g65wiQVLWaQDa6hIOmzqVEHviNhuHVTKRezxmkISxhsrvfVz4M1Xpmi7d+4Tn6IcfbA/muFRZzkzTYIV5+8lnBsXFaCbW0UuC74aCgWcX9v7JeM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jRX/rtRa; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bL7DhPbe"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D959E1F000E9;
-	Tue, 18 Aug 2026 12:51:33 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jRX/rtRa"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F16A01F00A3E;
+	Tue, 18 Aug 2026 12:54:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787057493;
-	bh=fVQkbnkcPID0tlGdkZD/qk8GG6F0/FGCGkoKwHJzbKc=;
+	s=k20260515; t=1787057650;
+	bh=cdD4yZiqqbAHnav72Regg2h6gQd/G7CH6/jonpoAHHg=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=bL7DhPbe5v9QlCLIGfnAMcHPus/g5gYQEQ8stEgthXcOMeZ780Qw4aT0a5dQTYeHF
-	 aW/5ndKvld9cH7ix6o2jQ+BQRnJhr59RSc9cA3lr9vWNqAJrraEks3fLCjdsCW7et5
-	 8GI66GeHDJ/QG871ZlnvaFxPnNSnHtWEtThb5IDFLpJuw/xULuUAzLKDMC40eqrjhK
-	 eKHYDTPgfBeIKZs9Lfb3Xmcvd9Oz20Q7JSP3H9Po4pdIjnYAIjMWadLt50UMwXXhFD
-	 k8mWA1IPdSfBdf6c5C67urFhzSWDcnuJ2Mqf3csG6xwWEjy1pOTIP1LcfvphAdy2Kj
-	 AnoJOQkHw0Ung==
+	b=jRX/rtRaBKwyYlpWyn556jvveH+C9ixh321cFJ2rZqdIVilv0SsZvSG2B+5hH3ba6
+	 XEQ0HnHvRnjFUWy6VFjf401/RjWSX3cKp+ZPh2VbKS6PPxQK3L8fy8vV8iOogtzOrs
+	 HSCTuxDbrUxTriOyelcAvSPqkHqtMX/PD/uVvcZLP4DfN/VQREIb/NK+xkA3Uqy6SW
+	 2bqMWH57ig69ZLoGZdFnWj5/lsB255S+ZcwVpZBvJP8PU97L7eJKSgRCeOjBqCVN8f
+	 2Szq7EE1OK6y6wNJsX4XiEnn/Wq/qoK2sW3pkukBRyaSE+u8YPaREXJkOeOFim7iGk
+	 ZglHvjixJx+7g==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wwJHv-0000000GdB6-2g0Z;
-	Tue, 18 Aug 2026 12:51:31 +0000
-Date: Tue, 18 Aug 2026 13:51:24 +0100
-Message-ID: <86fr0b6183.wl-maz@kernel.org>
+	id 1wwJKS-0000000GdEf-0CF5;
+	Tue, 18 Aug 2026 12:54:08 +0000
+Date: Tue, 18 Aug 2026 13:54:07 +0100
+Message-ID: <86ecfv613k.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Quentin Perret <qperret@google.com>,
-	Stefan Teodorescu <fane@google.com>,
-	tabba@google.com,
-	linux-arm-kernel@lists.infradead.org,
+To: Steffen Eiden <seiden@linux.ibm.com>
+Cc: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: Validate the SVE vector length in pkvm_vcpu_init_sve()
-In-Reply-To: <20260818093117.2379344-1-fuad.tabba@linux.dev>
-References: <20260818093117.2379344-1-fuad.tabba@linux.dev>
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Andreas Grapentin <gra@linux.ibm.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	David Hildenbrand <david@kernel.org>,
+	Friedrich Welter <fritz@linux.ibm.com>,
+	Fuad Tabba <tabba@google.com>,
+	Gautam Gala <ggala@linux.ibm.com>,
+	Hariharan Mari <hari55@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Hendrik Brueckner <brueckner@linux.ibm.com>,
+	Ilya Leoshkevich <iii@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Nico Boehr <nrb@linux.ibm.com>,
+	Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
+	Oliver Upton <oupton@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Will Deacon <will@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v6 08/33] KVM: arm64: Use accessor functions for core regs
+In-Reply-To: <20260818092924.21865-C-seiden@linux.ibm.com>
+References: <20260812153631.3376090-1-seiden@linux.ibm.com>
+	<20260812153631.3376090-9-seiden@linux.ibm.com>
+	<86a4qq1gyy.wl-maz@kernel.org>
+	<20260818092924.21865-C-seiden@linux.ibm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -63,27 +85,53 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, qperret@google.com, fane@google.com, tabba@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: seiden@linux.ibm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, agordeev@linux.ibm.com, gra@linux.ibm.com, arnd@arndb.de, catalin.marinas@arm.com, borntraeger@linux.ibm.com, imbrenda@linux.ibm.com, david@kernel.org, fritz@linux.ibm.com, tabba@google.com, ggala@linux.ibm.com, hari55@linux.ibm.com, hca@linux.ibm.com, brueckner@linux.ibm.com, iii@linux.ibm.com, frankja@linux.ibm.com, joey.gouly@arm.com, nrb@linux.ibm.com, oss@nina.schoetterlglausch.eu, oupton@kernel.org, pbonzini@redhat.com, seanjc@google.com, suzuki.poulose@arm.com, svens@linux.ibm.com, Ulrich.Weigand@de.ibm.com, gor@linux.ibm.com, will@kernel.org, yuzenghui@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 18 Aug 2026 10:31:17 +0100,
-Fuad Tabba <fuad.tabba@linux.dev> wrote:
+On Tue, 18 Aug 2026 10:29:24 +0100,
+Steffen Eiden <seiden@linux.ibm.com> wrote:
 > 
-> pkvm_vcpu_init_sve() clamps only the upper bound of the host-provided
-> sve_max_vl, so an invalid vector length reaches sve_state_size_from_vl()
-> and the WARN_ON() there, which is fatal at EL2. The existing
-> !sve_state_size test rejects such a length, but only after the macro has
-> run.
-> 
-> Check sve_vl_valid() before deriving the state size. A valid length
-> cannot yield a zero size, so the !sve_state_size test goes with it.
-> 
-> Fixes: 5db1bef93342 ("KVM: arm64: Track SVE state in the hypervisor vcpu structure")
-> Reported-by: Stefan Teodorescu <fane@google.com>
-> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+> On Thu, Aug 13, 2026 at 10:56:37AM +0100, Marc Zyngier wrote:
+> > On Wed, 12 Aug 2026 16:36:04 +0100,
+> > Steffen Eiden <seiden@linux.ibm.com> wrote:
+> > >
 
-Reviewed-by: Marc Zyngier <maz@kernel.org>
+[...]
+
+> > > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> > > index b01d6622b872..773f6c8e5026 100644
+> > > --- a/arch/arm64/kvm/guest.c
+> > > +++ b/arch/arm64/kvm/guest.c
+> > > @@ -134,19 +134,19 @@ static void *core_reg_addr(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+> > >  	     KVM_REG_ARM_CORE_REG(regs.regs[30]):
+> > >  		off -= KVM_REG_ARM_CORE_REG(regs.mregs[0]);
+> > >  		off /= 2;
+> > > -		return &vcpu->arch.ctxt.regs.regs[off];
+> > > +		return &vcpu_gp_regs(vcpu)[off];
+> > 
+> > Doesn't this belong to the previous patch?
+> > 
+> 
+> My thoughts about positioning this change in this patch:
+> 
+> The previous patch changes the semantics of vcpu_gp_regs and just
+> touched the part where the old semantic of the function was used.
+> This is mainly done by not using vcpu_gp_regs where it was used before
+> as it cannot be used to access e.g. pstate anymore.
+> 
+> This patch then introduces and *uses* new accessor functions for
+> abstractions (and uses the vcpu_gp_regs abstraction where it was not
+> used before). 
+> -> The patch changes direct accesses to using accessor functions.
+> 
+> However, I have no strong feelings for this. If you want this in the
+> previous patch, I can do that.
+
+I think it'd make more sense. You can capture this in the commit
+message to make it clear.
+
+Thanks,
 
 	M.
 
