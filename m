@@ -1,62 +1,64 @@
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FCEB45FFBB
-	for <kvmarm@lists.linux.dev>; Tue, 18 Aug 2026 11:29:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9597145DF67
+	for <kvmarm@lists.linux.dev>; Tue, 18 Aug 2026 11:29:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787052567; cv=none; b=cORH4ZtO957yOizUvdDZpuVUK51tnNODAJm+bFhk1mn42y3nSNuHSBUlXBiStfO/kmAAqRPCS235uypzqYxGtiRP6n51iBS0MD7DFeJbn9ayuUO0DA87/GfsW6jA9bWtPLvZxfYp12RYQaLbRzLbR3NhbDu7R+8NL+Ji+4nqZvI=
+	t=1787052570; cv=none; b=YM8/eO+Q5Fk8ln5sidp6BerfAWA4N1zZ3Nl72zDWMwGbwS+GE6rj9jirw1wDQFGrZwjI6pp23fHbFV2AYgwxj/EQHSheHFKXcR5GNei8WN6BUJJne8/4uzMEOu5FZXyborc2ZffR39iFXC71ZRf2bsU8Wj4oSO4TfTtjguOvn+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787052567; c=relaxed/simple;
-	bh=IsTo1e1DGjsQsFENkKwvjFrz1btNflZZXlAX3fSz3fQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=o09Bph7WrvSkk+XykRhp5Snr1eiU/F/ERQIlqRPJXJP/0IwOA5c/T70XkQXCSzLInFgKPf8thjw+wTPEV6vWMMh5qrUachwwlm/EoqW5GjL2VF1SfwJ0cA78i0gft7OD/mF6yqZxLswbifTYaZ386ANmzwkDpyq2tJy1J6b7Pr4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=r+wJgBfh; arc=none smtp.client-ip=209.85.216.41
+	s=arc-20240116; t=1787052570; c=relaxed/simple;
+	bh=PQS+rhRuPKHawTipTzrfvIQnxbml1r89m5PT9iaRz8s=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=uWP5eIyJdmwR05J+Er+0wSdK2RVnRhsTD7tmZcdezgHhh+Kf5qP1hfipFzP+6YLDVKOkit7cAl9Ddh1DNiY0nVxSVn7xc5vgRHMA401gyzt2PZ/M3p0CHt7ZS5XjOGx0+Ie8xMmMjiXdUSmhea0pE7XNXrKMmM0fLCs1bwIunTo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nR48uzL8; arc=none smtp.client-ip=209.85.216.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="r+wJgBfh"
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-38e07ebd263so3128064a91.1
-        for <kvmarm@lists.linux.dev>; Tue, 18 Aug 2026 04:29:26 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nR48uzL8"
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-38dcbade417so4485245a91.1
+        for <kvmarm@lists.linux.dev>; Tue, 18 Aug 2026 04:29:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787052566; x=1787657366; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=A8znoO+3TjuD1sNEQAmiSPsrdX02VVlhlMJTSCrbk9Q=;
-        b=r+wJgBfh+NBV2X32+khiDmZPvOtifnRbdbMfaKzC6SV2BdXaBKnF8FGSXORoZZgRzQ
-         GOCT9KLi1jikO3amQXDVWkd+1MTofPwh1eafR47YIrPZiquUeWXuz6/U5L9bzXGMY5pX
-         L1NVJ/HryoF6tKl1zWWOSC9jzpUsfEFOawWhiT/bzgVtZ2PIhrZdtMwZIl4b5w8nAkod
-         GFIajxuLjvy/Vy5nbQ3FYgMnp/HjEjMn6SUYsgY+ru4d5cONTtBgzjhHcqESsKk41FaQ
-         4S8VgAEtH97tB0jMo6qQn6NvHmI5YMK1mo4e+lYlRpifbjy7BArJ6XkP6W5YFn13x/pQ
-         /Rhg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787052566; x=1787657366;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1787052568; x=1787657368; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=A8znoO+3TjuD1sNEQAmiSPsrdX02VVlhlMJTSCrbk9Q=;
-        b=o3MV/uqFwjy3RfLB7JZ0LRG+2WcxkR6iNrJyJcTsqIeo/k+hg19EY864KbsxZcSoCx
-         lhFHvDZsxCa6xog2kIHnsL4SSw/vlDfcnThTlJrHTsxzA9l0iArCJDQEn880fZ6hx96H
-         vOENWJF9JfeBxsaSYFfjxuPHJuIrJf3gIpQ8sku1nB3aYF7Ou8bHX1EsAad6SaY5euJz
-         sPUUOJPoV2p9mzyHLMr8+BJxJFFA21gbK+AW1TW98/hXkyc9Qv7LCSxiKvKgLDSbQW48
-         ouV0Li1gLXHbO6nj31eJyd7OQS24olIrJemLxIzR0iLpouVp3TMfKY1sEHu+5L+Q+6d+
-         73bA==
-X-Forwarded-Encrypted: i=1; AHgh+RqdbnqrofLEiH8Cz7/sBP2QPYnXhIIFQIWiI+mc92VLsiTHp5iT0MO/FUXZeHWS8r3xcvDGmx8=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxX29FDesTGiNZ0yUk4zQ+/Un6eS1mwDkvfV3slJ3agg95FxbUR
-	HCirFur6XFHTnhVuEVPJpQl/SxOR0g99szkJGZ7s8NvL5AXKp4EuUM6x
-X-Gm-Gg: AR+sD12tQpsVvCl1QH63qWn+9iGQX9OuP8SrA6XyB93+JdBTkwIQr7aqW8Ql8+f8Avm
-	KGq9hTAN5oxjhyiXwGVc6XfNkslW7N7WK0e3ZNVrDXXPrEZanysmaIfoO9G1sCxGwW9UwH42WcA
-	NJQzZKrl/OT8DYqUx3PhUbY1RnKM4yY09kOKuUn0LROBTl3V6xhoHAbgapCjmv3l/9XVOkQZXAb
-	kb+zY+g2Z4BW0txibUb5COEt2qTLO0Pd/P2DH5xGbmaNKHrVWZOj4QvUlv9xim6Y0hvJX8Prv5u
-	ob8XwB990DbmeLxZQW9oI6YYa6P2hzOJaqOrWsAVkrX3gCnwtjI5Fx7f9UAhkO5GfqwouLIB0M7
-	qPk4SD2vwz2RyDcCG3jf0tQ5nwLBEl4vesgd06912Jv4JC8bquTJOcw1TVPKNLcHpueNddI8yCm
-	Y7jhhFKWvNs03Tgj3xEWl+VewDiig3DFGlqktD02EsKhvIn0H9TvNCCtvIGAFT/lhPySNPBZK7I
-	v8qOA==
-X-Received: by 2002:a17:90a:38e1:b0:395:5f66:15f1 with SMTP id 98e67ed59e1d1-3955f6616c5mr6100098a91.17.1787052565657;
-        Tue, 18 Aug 2026 04:29:25 -0700 (PDT)
+        bh=GjeuzllnPcqvxrpejMrz9/eK7KMKWWQACjRt8b0xaWE=;
+        b=nR48uzL8qnN9PiKXFpFYOeFcJM6/06AKpyapchxI4NIdwVqq9jlOVhFD/UAPUIxmaJ
+         KZ+uArI5Ct9qN0Sm3+mJ/hD/XNzrBsAYhykFaUH78Rkx8rExW2c7z5tOMzyLL4zVGHC0
+         LtehavYKzuDEY5ZIML95GO8RRcrpnC3aSUeRotdT5hVLcUybl4AKsjLzM0mpM+eJp6dw
+         z47XNHcyGjvDawgUa8Mh81Ff/uTEII4oHPY+6BOC6GBLI0YYviU/T75183vwNI04UbJE
+         9OXC+JpocLraWDUbem7RjjISvwT6ZKyYfCkcaJfVCaVEVuBzOhdQshR5fAbX+wodZ75E
+         aMng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787052568; x=1787657368;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=GjeuzllnPcqvxrpejMrz9/eK7KMKWWQACjRt8b0xaWE=;
+        b=SjEeG19w0eKLj4Zma6g2wHI90s515CcsG6sw3m51OGfhwbvb/EtKRzyzJNyzC8qda0
+         7apLBFgXfqznRf+T3jD9B682bDriblV/ingivUJ5qvZOXlEW5MNPGcTyrONZ6ZaxZZU7
+         kmvE8AWpp6fSfa99FC++3W3pyRx9NjfNl6I6W2M7Xs5Z/986gNnROTmeeZ+xyAoI2sMa
+         gaRbYPJXJfrSLbi7c+bKWS2z9JbzKpM9C7hMewIkuRBioJjC8MKJQGmBvr36sJVYf9cf
+         E8W7XFYToz4WM4FoOUeOCm4MDWbNOJg0K7UaWydYrwQwDvw48rzm+O0WfzQ4/bdBiLNR
+         fzpQ==
+X-Forwarded-Encrypted: i=1; AHgh+RpdrBQ7KkpsJtjpFfJj9QreKHpxX41OsAl0mCzeOPiZ9pTaPJVI0yEgEINlszgcZ2xtXim4J1Q=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzLozz9FbP4mkAvMQiDkWZuyBMIY3Vdokzvuzm55lBjxz6PoaC+
+	5S8H1yYMmGj/ufmn7/4iYQgUx2ISq5wuR/OMKv7iMw6/w2/fZfAqOFpp
+X-Gm-Gg: AR+sD13fD+aqGQAZGZCZDGTwCKcKzXx+K5CYEpf0yYzD4zbR+vR1ker6c1xGLJRORpm
+	/x2tUG91z+GKAAELuPPd4YmXWHdHztdwPZv1xo3u7Aa7A8B9HpG0KCz5W7YcYJSBOcfBlcFRUxF
+	bHd43wmBl8yNz8Zmz+FKbJebxVMR3fjunsCnvWlMSBFvwE05WkoZc5/g8WDXy+QjVjVnM6uvStE
+	fThHeLVaJQNyKECA8TCHlDi6IIzBgwKRUuB0yH+XcW6fqRTpSK4P/pWsipb+iAtTBCFLmePZfpD
+	eIU/lG9eV0ApayOUQjqyfrpciYwhK3nKl+c9xU00chIXKmw54DVoVHzXFWKbJmXHDFCYS3tFRmL
+	YSJpTeNBsH0jxOSgLVpC4nnzD9RsiumROuFCDcRH0irOpd4brAe/J3/Mcxa5RzsBtVSxa8bb8zr
+	/mcHpKRq66kuOD+NtfuPSNMAklSJyR/69cLorsMZgbV6lXLe9/i74qvVOu62nidhlL/xlrXpyVy
+	JK3u5i8dEaAcXla
+X-Received: by 2002:a17:90b:5685:b0:38e:4cb:51f with SMTP id 98e67ed59e1d1-3955a799fcdmr11206957a91.11.1787052567884;
+        Tue, 18 Aug 2026 04:29:27 -0700 (PDT)
 Received: from LIKEXU-MC4 ([43.132.141.24])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-39531e31a9dsm8423420a91.4.2026.08.18.04.29.23
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-39531e31a9dsm8423420a91.4.2026.08.18.04.29.25
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 18 Aug 2026 04:29:25 -0700 (PDT)
+        Tue, 18 Aug 2026 04:29:27 -0700 (PDT)
 From: Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To: Marc Zyngier <maz@kernel.org>,
@@ -66,10 +68,12 @@ Cc: jiaqiyan@google.com,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 0/3] KVM: selftests: arm64: Make sea_to_user skip cleanly
-Date: Tue, 18 Aug 2026 19:29:17 +0800
-Message-ID: <20260818112920.26252-1-likexu@tencent.com>
+Subject: [PATCH v2 1/3] KVM: selftests: arm64: Fix EINJ handling in sea_to_user
+Date: Tue, 18 Aug 2026 19:29:18 +0800
+Message-ID: <20260818112920.26252-2-likexu@tencent.com>
 X-Mailer: git-send-email 2.50.1
+In-Reply-To: <20260818112920.26252-1-likexu@tencent.com>
+References: <20260818112920.26252-1-likexu@tencent.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -78,104 +82,93 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series hardens the arm64 sea_to_user selftest so that it reports a
-clean skip on hosts that cannot actually run it, instead of aborting or
-silently passing.
+sea_to_user drives EINJ injection through popen("echo ... > file"). A
+failed write is hidden behind the shell pipeline, so a botched injection
+is silently ignored and the test proceeds as if a poison were placed.
+Drive the debugfs interface directly so a write failure is reported
+rather than swallowed.
 
-The test drives a real recoverable memory UER through APEI EINJ and
-expects the guest to consume the poison and exit to userspace with
-KVM_EXIT_ARM_SEA. That relies on host and firmware support that is not
-present everywhere, and each unmet dependency is now turned into a skip:
+The EINJ support probe is also unreliable. It checks the ACPI EINJ table
+with access(R_OK), but reading that table needs CAP_SYS_ADMIN, so the
+check gives a false negative for unprivileged runs and skips a test that
+could otherwise report a real problem. Probe by opening the debugfs
+injection interface instead and classify errno: absence means EINJ is
+not built or firmware lacks support, EACCES/EPERM means the test is not
+running as root -- both are skips -- while anything else is a genuine
+failure.
 
-  - EINJ injection is driven directly through debugfs, and an unusable
-    EINJ (not built, no firmware support, or not running as root) is
-    classified from errno and skipped rather than mishandled.
-  - Guest memory is backed by 1GB hugepages; with an empty pool the test
-    now skips up front instead of failing an mmap() with -ENOMEM.
-  - Some firmware only arms EINJ poison as part of the trigger step that
-    notrigger=1 skips, so nothing consumable is left for the guest to
-    read. That case is detected and skipped rather than reported as a
-    spurious KVM_EXIT_MMIO failure.
+The injection path is only reachable through debugfs; the kernel EINJ
+driver exposes no other interface, so the test must depend on it.
 
-Tested on an arm64 host with CONFIG_ACPI_APEI_EINJ: on a platform whose
-firmware places no consumable poison under notrigger=1 the test now
-skips cleanly, and the earlier -ENOMEM and abort paths are gone.
+Link: https://lore.kernel.org/kvm/86y0le9cvz.wl-maz@kernel.org/
+Signed-off-by: Like Xu <likexu@tencent.com>
+---
+ .../testing/selftests/kvm/arm64/sea_to_user.c | 45 ++++++++++++++-----
+ 1 file changed, 33 insertions(+), 12 deletions(-)
 
-v1 [1] was a single patch doing only the 1GB hugepage check. Following
-Marc's review [2], it is expanded into a series that also fixes the EINJ
-handling the test depends on.
-
-Test Results:
-
-  Case 1 (echo 0 > /sys/kernel/mm/hugepages/hugepages-1048576kB/nr_hugepages): 
-
-  # timeout set to 120
-  # selftests: kvm: sea_to_user
-  # Random seed: 0x6b8b4567
-  # 1..0 # SKIP - Requirement not met: get_free_hugepages(backing_page_size) >= VM_MEM_SIZE
-  ok 1 selftests: kvm: sea_to_user # SKIP
-  # 1 skipped test(s) detected.  Consider enabling relevant config options to improve coverage.
-  # Totals: pass:0 fail:0 xfail:0 xpass:0 skip:1 error:0
-
-  Case 2 (rmmod einj):
-
-  # selftests: kvm: sea_to_user
-  # Random seed: 0x6b8b4567
-  # # Mapped 0x40000 pages: gva=0x80000000 to gpa=0xff80000000
-  # # Before EINJect: data=0xbaadcafe
-  # # EINJ_GVA=0x81234bad, einj_gpa=0xff81234bad, einj_hva=0xffff41234bad, einj_hpa=0x42c1234bad
-  # 1..0 # SKIP need CONFIG_ACPI_APEI_EINJ and firmware EINJ support
-  ok 1 selftests: kvm: sea_to_user # SKIP
-  # 1 skipped test(s) detected.  Consider enabling relevant config options to improve coverage.
-  # Totals: pass:0 fail:0 xfail:0 xpass:0 skip:1 error:0
-
-  Case 3 (modprobe einj):
-
-  # selftests: kvm: sea_to_user
-  # Random seed: 0x6b8b4567
-  # # Mapped 0x40000 pages: gva=0x80000000 to gpa=0xff80000000
-  # # Before EINJect: data=0xbaadcafe
-  # # EINJ_GVA=0x81234bad, einj_gpa=0xff81234bad, einj_hva=0xffff41234bad, einj_hpa=0x42c1234bad
-  # # 0x10 > /sys/kernel/debug/apei/einj/error_type - done
-  # # 0x2 > /sys/kernel/debug/apei/einj/flags - done
-  # # 0x42c1234bad > /sys/kernel/debug/apei/einj/param1 - done
-  # # 0xffffffffffffffff > /sys/kernel/debug/apei/einj/param2 - done
-  # # 0x1 > /sys/kernel/debug/apei/einj/notrigger - done
-  # # 0x1 > /sys/kernel/debug/apei/einj/error_inject - done
-  # # Memory UER EINJected
-  # # SIGBUS (7) received, dumping siginfo...
-  # # si_signo=7, si_errno=0, si_code=128, si_addr=(nil)
-  # not ok 1 Exit with signal unhandled
-  ok 1 selftests: kvm: sea_to_user
-  # Totals: pass:1 fail:0 xfail:0 xpass:0 skip:0 error:0
-
-Changes since v1:
-  - New patch 1: drive EINJ injection directly through debugfs with
-    open()/write() instead of access()+popen(). Classify the open()
-    errno so an unprivileged run skips as "requires root" instead of
-    falsely reporting missing firmware EINJ, and report a genuine write
-    failure instead of the ambiguous "Failed... Success (0)".
-  - New patch 3: detect when notrigger=1 leaves no consumable poison and
-    skip cleanly, instead of exiting with a confusing KVM_EXIT_MMIO.
-  - Patch 2 is the original v1 change, unchanged.
-
-Not yet addressed from [2]: dropping the hard 1GB-hugepage and 4kB
-base-page requirements. Suggestions on an acceptable backing scheme are
-welcome.
-
-[1] https://lore.kernel.org/kvm/20260817080759.25601-1-likexu@tencent.com/
-[2] https://lore.kernel.org/all/86y0le9cvz.wl-maz@kernel.org/
-
-Like Xu (3):
-  KVM: selftests: arm64: Fix EINJ handling in sea_to_user
-  KVM: selftests: arm64: Skip sea_to_user without 1GB hugepages
-  KVM: selftests: arm64: Skip sea_to_user when EINJ places no poison
-
- .../testing/selftests/kvm/arm64/sea_to_user.c | 75 +++++++++++++++----
- .../testing/selftests/kvm/include/test_util.h |  1 +
- tools/testing/selftests/kvm/lib/test_util.c   | 15 ++++
- 3 files changed, 77 insertions(+), 14 deletions(-)
-
+diff --git a/tools/testing/selftests/kvm/arm64/sea_to_user.c b/tools/testing/selftests/kvm/arm64/sea_to_user.c
+index e96d8982c28b8..1c2a743ca8e23 100644
+--- a/tools/testing/selftests/kvm/arm64/sea_to_user.c
++++ b/tools/testing/selftests/kvm/arm64/sea_to_user.c
+@@ -81,25 +81,46 @@ static u64 translate_hva_to_hpa(unsigned long hva)
+ 
+ static void write_einj_entry(const char *einj_path, u64 val)
+ {
+-	char cmd[256] = {0};
+-	FILE *cmdfile = NULL;
++	char buf[32];
++	int fd, len, ret;
+ 
+-	sprintf(cmd, "echo %#lx > %s", val, einj_path);
+-	cmdfile = popen(cmd, "r");
++	fd = open(einj_path, O_WRONLY);
++	if (fd < 0)
++		ksft_exit_fail_perror(einj_path);
+ 
+-	if (pclose(cmdfile) == 0)
+-		ksft_print_msg("echo %#lx > %s - done\n", val, einj_path);
+-	else
+-		ksft_exit_fail_perror("Failed to write EINJ entry");
++	len = snprintf(buf, sizeof(buf), "%#lx\n", val);
++	ret = write(fd, buf, len);
++	if (ret != len)
++		ksft_exit_fail_perror(einj_path);
++
++	close(fd);
++	ksft_print_msg("%#lx > %s - done\n", val, einj_path);
+ }
+ 
+ static void inject_uer(u64 hpa)
+ {
+-	if (access("/sys/firmware/acpi/tables/EINJ", R_OK) == -1)
+-		ksft_test_result_skip("EINJ table no available in firmware");
++	int fd;
+ 
+-	if (access(EINJ_ETYPE, R_OK | W_OK) == -1)
+-		ksft_test_result_skip("EINJ module probably not loaded?");
++	/*
++	 * EINJ is exposed only through debugfs, and opening it tells us why it
++	 * is unusable far more reliably than access()-ing the ACPI EINJ table:
++	 * reading that table needs CAP_SYS_ADMIN, so access() gives a false
++	 * negative for unprivileged runs. Open the injection interface and let
++	 * errno say whether the test cannot run (skip) or genuinely failed.
++	 */
++	fd = open(EINJ_ETYPE, O_WRONLY);
++	if (fd < 0) {
++		switch (errno) {
++		case ENOENT:
++			ksft_exit_skip("need CONFIG_ACPI_APEI_EINJ and firmware EINJ support\n");
++		case EACCES:
++		case EPERM:
++			ksft_exit_skip("EINJ requires running as root\n");
++		default:
++			ksft_exit_fail_perror(EINJ_ETYPE);
++		}
++	}
++	close(fd);
+ 
+ 	write_einj_entry(EINJ_ETYPE, ERROR_TYPE_MEMORY_UER);
+ 	write_einj_entry(EINJ_FLAGS, MASK_MEMORY_UER);
 -- 
 2.50.1 (Apple Git-155)
 
