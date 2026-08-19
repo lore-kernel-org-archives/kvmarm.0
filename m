@@ -1,106 +1,108 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB5A44766B9
-	for <kvmarm@lists.linux.dev>; Wed, 19 Aug 2026 13:55:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E28613B95F9;
+	Wed, 19 Aug 2026 14:21:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787147731; cv=none; b=X38RKGfO0l+MIFVj6g51r0adRzjD4EXjtM3eym52cng7+2Y/qY8AZ7ftLuf2Rr29N4ngQleRBhtsyfyQalezdFomM6dItPSm7tkM8wf4ZJVGZoonBJ/yMKFeP9Vc12QeFAC+LGTcX6jd7Nke7ee9evhbcgPrYyDUkVLVD+87kqw=
+	t=1787149299; cv=none; b=oMyK8pgD7+t0Ld5LCEcB5odU+7AN/XoIr/oSFnTMc4k6NpjRETLaY8Ey4+kseqmswGnD0uEWffuS8MOMs8v5ZroDlwhMI9ciIIcwkZ6PoFBNqNi+tjHACx8+Ly9w3KBNAoaQTyjc2VcRlJjtarmYy0fj8vn0GOV+fhPFuJ56jdw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787147731; c=relaxed/simple;
-	bh=UuEKHUn7xr7WabqbuM3/XgJTz2Viqf/N0nxnnC3djV4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=jf9JHUcWLTAXRbU5gBAcSNNJYtgAVvHZEiup5v2u2Duggybhg3XSHRLzQJFAkoKCe+KgVeIdHv8c2IDdHCL9/9uQiQ18lr4qjY9qDNeRq9dXj+UDsiHAjofe5yFh6vHev/JG2s4ic4AkrHr6zQTY28Bw+xiDthyjLWzvUJWo0BU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=WEii9Sm6; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1787149299; c=relaxed/simple;
+	bh=rhf197F+BiirB2/yG03+JJ4YBW52Y4RN03qbnq1bpEc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JCvHg47/VcgW54Y9pUlGp51ge2gy+Qw6vw82KrysyUCvsViQzHkeUg+b1uzUk3TzIKOaOZZpw1QuFNlN1e4GQZEKqiAjaKK1zoXKXlSBB5W6UH0RL9Ua8tNWT2qtfOCv4+IEcJ+/EYILgjafEmOpYRekFzHNfbkGIMU8l/Yy50Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VKohbjQt; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="WEii9Sm6"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 19A4F14BF;
-	Wed, 19 Aug 2026 06:55:24 -0700 (PDT)
-Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CFD673F763;
-	Wed, 19 Aug 2026 06:55:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1787147727; bh=UuEKHUn7xr7WabqbuM3/XgJTz2Viqf/N0nxnnC3djV4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WEii9Sm6ptsXldQBo3H7icR9c5y/Ww/U0WGgnltI09o1uRCn/3MaKwh+KBr83JDBe
-	 4xl5gYp+vubiL6q55Aaaajcsk/pGksWdp5Ca73IFFbI8/akhxPDnD8EbX9g+JhHfPu
-	 u+/pVIcUI2guZhZCGmbS1oDlEgMHk9q09jsSuMR4=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Mark Brown <broonie@kernel.org>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VKohbjQt"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 690E41F00A3A;
+	Wed, 19 Aug 2026 14:21:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1787149297;
+	bh=B7S1oNZ0d0Ppxea6fIUZHSrjDvjafdvBHWU+BL8Rgkg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=VKohbjQtxpEmZPWdiGLLB53jtRq3gLpCe0pPm4oD94Sua26B3Kglmb6SVxKA6OG0f
+	 778AOfOYD+EQhg5rwoTH/Mh2Nr9oYXU2aUIo+9oCFZPbbhYMbmrKEG3seFXbcjFxPu
+	 n6x/OfeD3l9zX+ymmwzEuAau991rDSSAPuWarsTfX465Z+aQUOZkRYYDNejsSDq4IG
+	 1GtOYdTBOTmjNvmGcMllJnFhsmrM/hXjzjYnxj7beNukeo+njCDm03/PwRpWovpB/H
+	 huvDR/cmMtK4Wco3Hdy8DRXEjllzhs5g34Vlbder9j2EHOuiR+xEWNC8nJmUTyINFD
+	 8TmGj9ssUkynA==
+Date: Wed, 19 Aug 2026 15:21:31 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Leonardo Bras <leo.bras@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Fuad Tabba <tabba@google.com>,
+	Shuah Khan <shuah@kernel.org>, Fuad Tabba <tabba@google.com>,
 	Oliver Upton <oupton@kernel.org>,
 	Peter Maydell <peter.maydell@linaro.org>,
 	Yao Yuan <yaoyuan@linux.alibaba.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-kselftest@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v19 02/14] KVM: arm64: Fix FGT mapping for HFGITR_EL2.nGCSEPP
-Date: Wed, 19 Aug 2026 14:55:23 +0100
-Message-ID: <aoW1ywZGCvJaYQqN@LeoBrasDK>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260812-arm64-gcs-v19-2-9105afd828ac@kernel.org>
-References: <20260812-arm64-gcs-v19-0-9105afd828ac@kernel.org> <20260812-arm64-gcs-v19-2-9105afd828ac@kernel.org>
+Subject: Re: [PATCH v19 01/14] arm64/gcs: Ensure FGTs for EL1 GCS
+ instructions are disabled
+Message-ID: <a6fe8050-18f1-4013-8d6f-38ecc754c7e7@sirena.org.uk>
+References: <20260812-arm64-gcs-v19-0-9105afd828ac@kernel.org>
+ <20260812-arm64-gcs-v19-1-9105afd828ac@kernel.org>
+ <aoWyeTx8lYGfiwYc@LeoBrasDK>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="EpiKBYt0FrKwqKPC"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-
-On Wed, Aug 12, 2026 at 08:12:01PM +0100, Mark Brown wrote:
-> The encoding to trap mapping currently maps a FGT on OP_GCSPOPX to
-> HFGITR_EL2.nGCSEPP but as per DDI0601 2026-06 this FGT controls trapping
-> of GCSPUSHX and GCSPOPCX, and not the separate GCSPOPX instruction.
-> Update the mapping to reflect the architecture.
-
-That information seems to match the one in Arm ARM version M.c.
-nGCSEPP, bit [59]
-	When FEAT_GCS is implemented:
-	Trap execution of any of the following AArch64 instructions at EL1 to EL2:
-		• GCSPUSHX.
-		• GCSPOPCX.
-
-It looks like GCSPOPX can fault if the record is not a valid entry, but 
-there seems to be no trap register bit for that.
-
-Thanks!
-Leo, 
+In-Reply-To: <aoWyeTx8lYGfiwYc@LeoBrasDK>
+X-Cookie: Allow 6 to 8 weeks for delivery.
 
 
-> 
-> Fixes: 863ac38984a82 ("KVM: arm64: Add missing HFGITR_EL2 FGT entries to nested virt")
-> Signed-off-by: Mark Brown <broonie@kernel.org>
-> ---
->  arch/arm64/kvm/emulate-nested.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> index 3c82f392845d..b32742d9dd73 100644
-> --- a/arch/arm64/kvm/emulate-nested.c
-> +++ b/arch/arm64/kvm/emulate-nested.c
-> @@ -1432,7 +1432,7 @@ static const struct encoding_to_trap_config encoding_to_fgt[] __initconst = {
->  	SR_FGT(OP_AT_S1E1A, 		HFGITR, ATS1E1A, 1),
->  	SR_FGT(OP_COSP_RCTX, 		HFGITR, COSPRCTX, 1),
->  	SR_FGT(OP_GCSPUSHX, 		HFGITR, nGCSEPP, 0),
-> -	SR_FGT(OP_GCSPOPX, 		HFGITR, nGCSEPP, 0),
-> +	SR_FGT(OP_GCSPOPCX, 		HFGITR, nGCSEPP, 0),
->  	SR_FGT(OP_GCSPUSHM, 		HFGITR, nGCSPUSHM_EL1, 0),
->  	SR_FGT(OP_BRB_IALL, 		HFGITR, nBRBIALL, 0),
->  	SR_FGT(OP_BRB_INJ, 		HFGITR, nBRBINJ, 0),
-> 
-> -- 
-> 2.47.3
-> 
+--EpiKBYt0FrKwqKPC
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Aug 19, 2026 at 02:41:13PM +0100, Leonardo Bras wrote:
+> On Wed, Aug 12, 2026 at 08:12:00PM +0100, Mark Brown wrote:
+
+> > +	/* Disable traps of GCS instructions at EL1 */
+> > +	orr	x2, x2, #HFGITR_EL2_nGCSEPP_MASK
+> > +	orr	x2, x2, #HFGITR_EL2_nGCSSTR_EL1_MASK
+> > +	orr	x2, x2, #HFGITR_EL2_nGCSPUSHM_EL1_MASK
+
+> Which I understand to be the way of us saying that EL2 will not interfere=
+=20
+> on nor manage those instructions that let software change the entries of=
+=20
+> GCS. Is that correct?
+
+Yes, the goal is to allow EL1 to manage things how it wants (there are
+controls for store and push in GCSCR_EL1 too).
+
+> As for the asm routine, x2 at this point have nBRBIALL and nBRBINJ alread=
+y=20
+> set, and will be loaded to SYS_HFGITR_EL2 in the next block of=20
+> instructions.
+
+> Did I get it right? Is there any missing detail here?
+
+That's the idea.
+
+--EpiKBYt0FrKwqKPC
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmqFu+sACgkQJNaLcl1U
+h9AZpQf+M2xlXf78cJhC8qd3kd3TCTXSK7OPaRFzCzopuFWugQZnO8gta1cvLRQm
+hu7hPMPgHfsLHkw07V5RQBBFC7hdozSVwrGK61A7mB9I+Qy36CoYWDiKWXZZW08s
+e5u09U7j1iikPNTOQlKmgWHyjo8HwS6CWHe2qBsGGfoIiOPE5TDj0cioyIsF4I0H
+hCaXKaxmqB5S+1dIkeVTNbJIt5uSG9DCdA5vMANOK3LFFnENrQqoT0D4aiXB4Et0
+/rigSzS3c/ubrD7/I6IFoiV6WoduU0gWqCG473s4ghVaY/3eWC+s7tQlXFDizf4q
+8GbMdi6CGWTzUEA8Gfls55jI8SWUag==
+=vEYu
+-----END PGP SIGNATURE-----
+
+--EpiKBYt0FrKwqKPC--
