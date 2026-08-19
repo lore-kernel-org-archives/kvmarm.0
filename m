@@ -1,163 +1,150 @@
-Received: from mta1.migadu.com (out-227.mta1.migadu.com [95.215.58.227])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BED734432EB
-	for <kvmarm@lists.linux.dev>; Wed, 19 Aug 2026 10:28:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.227
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63F5A3438B7
+	for <kvmarm@lists.linux.dev>; Wed, 19 Aug 2026 10:39:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787135316; cv=none; b=YAWcMJe/p4nVIZl95OJdgx1aAdrf6dNUIpZWjz3UKCUKkZ+g7OSTHH+btn378rVjydqeh0POA2RjApbvOdLSYHGJ7/eceYQsxMPfP5UYCfzbfcHl5mnMaiJoh81VGeNWWZI7G2by8AK47rVrrQ148m8oRLarKKF5wL0Ov92dC4k=
+	t=1787135975; cv=none; b=hJEE9FzX2POu+yZe7rxw0FtCCT+mopS6TTK5aeaIsHTEHc/JUntdOIJd2cNzOiTo+SPf/eNnMdHCzzLoo1CEgeTg5zvASeXzZqlAriIAIzqUIS3e5CNVVQUee0qPLlDKFftEw3IpzKzewoREH4XPJ3piw2U8AeTu1Q9M2oFKsS0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787135316; c=relaxed/simple;
-	bh=ND3FDfa/qCk5V+rP9yXVtcSn7EWp1L01qy+mI7z3Zkk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=tLDX5zjdX149+e3TUJ/CQ8inBJcueUcAh56XDKb47lW34aICpiD5sZaH0R2x+u+LmAge3cWhrvY78aTpUZ5H4zmhwDNCwui7tRgSeomMeUopV9pw2SXk3lTS4txc+yrhA/l/VkMJEHaqBM2Mvt8DVF6CBXt0gfMAspLSiOYpPfs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=OiKqPEq3; arc=none smtp.client-ip=95.215.58.227
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1787135975; c=relaxed/simple;
+	bh=Oy+npDEG61OpT1Dk10aKP6iV7mIBqwJEf2Xpvd00MHc=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=Dg+7TtdGCHsU7E6tdHI7uRmAvWj7QyBwwxCFHOBzfF5j4r/jo7d2uj87dUKeUs0nCquh2wruWLKdkhAbaEDg7epDmnKwnnl9B4FF9mjZAh0sigNBI6/H7iNXmW3Oxr4rH2c75HGwb3N3vjOuYsDXfQ/emI8aYhYIlYTimfw/33A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eeoPW1nX; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="OiKqPEq3"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=ND3FDfa/qCk5V+rP9yXVtcSn7EWp1L01qy+mI7z3Zkk=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1787135309; v=1; x=1787740109;
- b=OiKqPEq3KTu4gORRoIWR5xMLppn2wWk+G5qLoG7tMPbFJ+iLPGHpMb8vnfrdP8qfMihHZI9f
- EP9c1yYiQZ5VVHXGJQU7072aOW6j9jSUhzY5zgF3AFXJUVWZCe9/tMMnAefPIoRz6huSmSfRs2V
- 47ibg3ffvAEFyq89QJaNTb+I=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: from claudy.lan (37.156.72.212)
-	by smtp.migadu.com with ESMTPS id 3086ea0630f1674f;
-	Wed, 19 Aug 2026 10:28:28 +0000
-X-Migadu-Flow: FLOW_OUT
-From: Fuad Tabba <fuad.tabba@linux.dev>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Will Deacon <will@kernel.org>,
-	Sascha Bischoff <sascha.bischoff@arm.com>,
-	Sebastian Ene <sebastianene@google.com>,
-	Eric Auger <eauger@redhat.com>,
-	Fuad Tabba <tabba@google.com>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 3/4] KVM: arm64: vgic-its: Skip unreachable devices instead of failing the save
-Date: Wed, 19 Aug 2026 11:28:08 +0100
-Message-Id: <20260819102809.310708-4-fuad.tabba@linux.dev>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20260819102809.310708-1-fuad.tabba@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eeoPW1nX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C86671F00A3A;
+	Wed, 19 Aug 2026 10:39:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1787135974;
+	bh=o0g376RMHoxEbu7eWSUDeEa9aO+bhuArQ/ErlZ5LT3M=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=eeoPW1nX3EDA+olxlE+LJZVFq4VWUN7Up5mECD7UN0WK2Joi49Y6j6J19D9ZB+TsH
+	 0jUQNiKa8PLMkY3stuZ1DtoxipsqF8pFKAI7LizdRbJZMwRVeaxgFJHUF8Pw0Ah9+q
+	 qkSVCwYEnjQXVn+h0jPCaD69dhsLWCGcr2mNmOPV65/qreHGUqy0AC5wMtXqcgcGfG
+	 eu3Uby57yY0zonWXhjw96mB437YhlNdb9sIsFumyQMYnPXlhRbLMUYGoqwcIvbJ9AN
+	 WiW/IAOE5pVNDcjk7WS2xSxjdrCxyZ4uCAZfO0CTOPgyDqBSXQ3JHwLwImXix4IDV2
+	 h0CzrqWAz7spQ==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH 4/4] KVM: arm64: selftests: Add ITS table save tests
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Fuad Tabba" <fuad.tabba@linux.dev>
+Cc: kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>
+In-Reply-To: <20260819102809.310708-5-fuad.tabba@linux.dev>
 References: <20260819102809.310708-1-fuad.tabba@linux.dev>
+ <20260819102809.310708-5-fuad.tabba@linux.dev>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 19 Aug 2026 10:39:33 +0000
+Message-Id: <20260819103933.C86671F00A3A@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-vgic_its_save_device_tables() aborts with -EINVAL when a device's entry
-falls outside the device table, which a guest can arrange on its own: an
-indirect table lets it clear an L1 entry's valid bit without touching
-GITS_BASER. That fails a save userspace should be able to issue
-reliably.
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+s) to consider:
+- [Medium] The guest code writes L1 device table entries using native endia=
+nness instead of little-endian, which will cause corrupted data on big-endi=
+an guests.
+- [Medium] The guest code modifies GITS_BASER immediately after clearing GI=
+TS_CTLR.Enable without polling for the GITS_CTLR.Quiescent bit.
+--
 
-Skip the device instead, and point the saved DTE chain past it, as
-commit ad1e686e2378d ("KVM: arm64: vgic-its: Point saved ITEs at the
-next valid entry") does for ITEs. compute_next_devid_offset() takes the
-next device off the list whether or not it was saved, so the predecessor
-would otherwise point at an entry the save never wrote. Restore follows
-that offset while it stays inside the table being scanned: within an L2
-block, or anywhere in a flat table. Both need userspace to remove a
-memslot under the table, since dropping an L1 entry takes the whole
-block with it and scan_its_table() stops at the block boundary.
-
-Fixes: 57a9a117154c9 ("KVM: arm64: vgic-its: Device table save/restore")
-Suggested-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/all/86bjaz5s6v.wl-maz@kernel.org/
-Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+--- Patch [4]: [PATCH 4/4] KVM: arm64: selftests: Add ITS table save tests =
 ---
- arch/arm64/kvm/vgic/vgic-its.c | 32 +++++++++++++++++++-------------
- 1 file changed, 19 insertions(+), 13 deletions(-)
+commit 277abfaff8f849d670b2c74f45ab3607f657788b
+Author: Fuad Tabba <fuad.tabba@linux.dev>
 
-diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index cc6ea5c3409ae..717fbd563fb01 100644
---- a/arch/arm64/kvm/vgic/vgic-its.c
-+++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -2013,18 +2013,22 @@ static int vgic_its_attr_regs_access(struct kvm_device *dev,
- 	return ret;
- }
- 
--static u32 compute_next_devid_offset(struct list_head *h,
-+static u32 compute_next_devid_offset(struct vgic_its *its, u64 baser,
- 				     struct its_device *dev)
- {
--	struct its_device *next;
--	u32 next_offset;
-+	struct its_device *next = dev;
- 
--	if (list_is_last(&dev->dev_list, h))
--		return 0;
--	next = list_next_entry(dev, dev_list);
--	next_offset = next->device_id - dev->device_id;
-+	/*
-+	 * Point at the next device vgic_its_save_device_tables() saves. It
-+	 * sorts device_list first, so the subtraction cannot underflow.
-+	 */
-+	list_for_each_entry_continue(next, &its->device_list, dev_list) {
-+		if (vgic_its_check_id(its, baser, next->device_id, NULL))
-+			return min_t(u32, next->device_id - dev->device_id,
-+				     VITS_DTE_MAX_DEVID_OFFSET);
-+	}
- 
--	return min_t(u32, next_offset, VITS_DTE_MAX_DEVID_OFFSET);
-+	return 0;
- }
- 
- static u32 compute_next_eventid_offset(struct list_head *h, struct its_ite *ite)
-@@ -2265,17 +2269,18 @@ static int vgic_its_restore_itt(struct vgic_its *its, struct its_device *dev)
-  * vgic_its_save_dte - Save a device table entry at a given GPA
-  *
-  * @its: ITS handle
-+ * @baser: GITS_BASER<dev> the caller is saving against
-  * @dev: ITS device
-  * @ptr: GPA
-  */
--static int vgic_its_save_dte(struct vgic_its *its, struct its_device *dev,
--			     gpa_t ptr)
-+static int vgic_its_save_dte(struct vgic_its *its, u64 baser,
-+			     struct its_device *dev, gpa_t ptr)
- {
- 	u64 val, itt_addr_field;
- 	u32 next_offset;
- 
- 	itt_addr_field = dev->itt_addr >> 8;
--	next_offset = compute_next_devid_offset(&its->device_list, dev);
-+	next_offset = compute_next_devid_offset(its, baser, dev);
- 	val = (1ULL << KVM_ITS_DTE_VALID_SHIFT |
- 	       ((u64)next_offset << KVM_ITS_DTE_NEXT_SHIFT) |
- 	       (itt_addr_field << KVM_ITS_DTE_ITTADDR_SHIFT) |
-@@ -2374,15 +2379,16 @@ static int vgic_its_save_device_tables(struct vgic_its *its)
- 		int ret;
- 		gpa_t eaddr;
- 
-+		/* Don't fail a save that userspace must be able to issue. */
- 		if (!vgic_its_check_id(its, baser,
- 				       dev->device_id, &eaddr))
--			return -EINVAL;
-+			continue;
- 
- 		ret = vgic_its_save_itt(its, dev);
- 		if (ret)
- 			return ret;
- 
--		ret = vgic_its_save_dte(its, dev, eaddr);
-+		ret = vgic_its_save_dte(its, baser, dev, eaddr);
- 		if (ret)
- 			return ret;
- 	}
--- 
-2.39.5
+KVM: arm64: selftests: Add ITS table save tests
 
+This commit adds selftests for KVM_DEV_ARM_ITS_SAVE_TABLES to handle two
+cases where a guest leaves a table in a modified state. It covers a
+GITS_BASER write that drops described collections, and an invalidated L2
+block that causes a device to be skipped.
+
+> diff --git a/tools/testing/selftests/kvm/arm64/vgic_its_save.c b/tools/te=
+sting/selftests/kvm/arm64/vgic_its_save.c
+> new file mode 100644
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/arm64/vgic_its_save.c
+
+[ ... ]
+
+> +static void guest_shrink_coll_table(void)
+> +{
+> +	unsigned long offset =3D its_baser_offset(GITS_BASER_TYPE_COLLECTION);
+> +	u64 baser;
+> +
+> +	its_set_enable(false);
+> +
+> +	baser =3D readq_relaxed(GITS_BASE_GVA + offset);
+
+[Severity: Medium]
+Is it architecturally valid to read and modify GITS_BASER immediately after
+clearing GITS_CTLR_ENABLE without first polling for the GITS_CTLR.Quiescent
+bit?
+
+While KVM's synchronous implementation might tolerate this sequence today,
+could this missing poll cause unpredictability on asynchronous hardware or
+future emulators?
+
+> +	baser &=3D ~GITS_BASER_PAGES_MASK;
+> +	writeq_relaxed(baser, GITS_BASE_GVA + offset);
+> +}
+
+[ ... ]
+
+> +/* Turn the already installed device table into an indirect one. */
+> +static void guest_make_device_table_indirect(void)
+> +{
+> +	unsigned long offset =3D its_baser_offset(GITS_BASER_TYPE_DEVICE);
+> +	u64 baser;
+> +
+> +	its_set_enable(false);
+> +
+> +	baser =3D readq_relaxed(GITS_BASE_GVA + offset);
+
+[Severity: Medium]
+Similarly here in guest_make_device_table_indirect(), does this need a
+poll for the Quiescent bit after disabling the ITS and before accessing
+GITS_BASER?
+
+> +	writeq_relaxed(baser | GITS_BASER_INDIRECT, GITS_BASE_GVA + offset);
+> +
+> +	its_set_enable(true);
+> +}
+> +
+> +static void guest_unreachable_device(void)
+> +{
+> +	u64 *l1;
+
+[ ... ]
+
+> +	guest_make_device_table_indirect();
+> +
+> +	/* Both L2 blocks present, so both MAPDs are in range. */
+> +	l1 =3D test_data.device_l1_va;
+> +	l1[0] =3D L1E_VALID_MASK | (test_data.device_l2[0] & L1E_ADDR_MASK);
+> +	l1[1] =3D L1E_VALID_MASK | (test_data.device_l2[1] & L1E_ADDR_MASK);
+
+[Severity: Medium]
+Since the host code later reads this memory using le64toh(), will writing
+these L1 device table entries in native endianness cause data corruption
+when running the selftest on big-endian guests?
+
+Should these entries be converted using cpu_to_le64() before assignment?
+
+> +
+> +	its_send_mapd_cmd(test_data.cmdq_base_va, DEVICE_A_ID,
+> +			  test_data.itt_tables, ITT_MAPD_SIZE, true);
+> +	its_send_mapd_cmd(test_data.cmdq_base_va, DEVICE_B_ID,
+> +			  test_data.itt_tables + ITT_SZ, ITT_MAPD_SIZE, true);
+
+[ ... ]
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260819102809.3107=
+08-1-fuad.tabba@linux.dev?part=3D4
