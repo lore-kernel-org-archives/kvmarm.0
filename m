@@ -1,56 +1,56 @@
-Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com [209.85.215.200])
+Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com [209.85.210.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2265139F16B
-	for <kvmarm@lists.linux.dev>; Thu, 20 Aug 2026 23:32:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B25CF379C24
+	for <kvmarm@lists.linux.dev>; Thu, 20 Aug 2026 23:32:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787268767; cv=none; b=aHopNrcRLgsYR6HKuuzqTWnULcPmaB2K33NtkhGDDKdlP9i7MwPBNDJb5p0ik2HoXScPT/0GFS2r9xGObtr0D43vwDBxs4XbB9JPzyyUtWA/dCHeSK8yghrwrs5WDFkvX2FeCypf9brQcVIfBk0IOudL/aMc0VbJMdd6YEAbKHY=
+	t=1787268770; cv=none; b=gxhJ5ObmUgGUhPO+Oh5FmrwQBlaSEA59MBEQI6Rdxp+g1N5n4cEdcaQuDWD5rbh5RdYGheOjqtSGJVHeC4hXplGGSRQUNpNYDJPK2tBh/DAS+nrLAy4QxU5YlPPtw+NBH1iKQkrVeYohcOr7Br6wAElPf15ljTMuDN7DKXVHn5o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787268767; c=relaxed/simple;
-	bh=LtICGHiNmjgfsS++ex4KQnpy0xO35NrIf5VSNcMhCjw=;
+	s=arc-20240116; t=1787268770; c=relaxed/simple;
+	bh=1sJotEgA8ehiPs3J9DAGu4AbZ2bnjjEWvNkwbMlJckU=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=mnaC17OFM+QA7b3KnnPnAwvvjB6K7NlqJ+Yb01w9Nlp05xM/bbhJbNCHgGa975PVQhEyqxJFeti/7REEIMljnyKIb6JJ+baiOxOCNIjD/G6TGIRWRfEFWXxLFgIAr2yKA0+xCjp0TI9uwO5BU4SpsdVsYAPWD819ykojr9w50YY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PXgWNrJd; arc=none smtp.client-ip=209.85.215.200
+	 To:Cc:Content-Type; b=m18BUd4By0ESP5K0EXXFemFaIeOdjIv3EGnjSIHLzmAh2uryi8CgQ9gv11FrcygJU2j44IcolIelj5bBt8MGc5HOb4nsdtsqMKlUMrM7uJZLBFg3yIQ1QfXcyujgjo9P8+Qqf4BxNjFH7SRkcEw03HFXRXcrgDLzA8A97516gQE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FeuCiFpo; arc=none smtp.client-ip=209.85.210.199
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PXgWNrJd"
-Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-cbedf6e8a42so552504a12.1
-        for <kvmarm@lists.linux.dev>; Thu, 20 Aug 2026 16:32:44 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FeuCiFpo"
+Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-84e1da97175so483011b3a.0
+        for <kvmarm@lists.linux.dev>; Thu, 20 Aug 2026 16:32:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1787268763; x=1787873563; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1787268765; x=1787873565; darn=lists.linux.dev;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=ZIY2AhPPQzV0SpGVac6m1vEhtgYyPU90RiUZoPMOP+0=;
-        b=PXgWNrJdT+rbT8KHaor8NfahhSX+13KZF4SzwcJCnp6XsS+gNzX14mveJSRbV/Z+8G
-         qn9MWsFBXf8UVa4wQTKQ64/vIRzuICzAbiAs8R6s20/fWRqnAJnaXpVLld+12MopYYO4
-         DB6vC85pr9DCoaw2vnIXoK1ODhbFHw41B00JdIoZTkrsYMxwWmMrqUJqKdp5a7fSHYO3
-         esHqKJ0NOn+lRjLxRaIcci+LcrgG+uqPBQ4lR3WBpovEFeYGV6nC7TkDK1fCDDY9FyPe
-         pRZt5rTzve6bjK8A+V3qdM8EWDrWXPqAcP8ueZJKsMKbxh6RbVtmdChh+DP0dka/U/FU
-         Kg8w==
+        bh=D9DlHJtu4nYE/0Q7Tlo35sv+3vAygx91goMAZ3ynrq4=;
+        b=FeuCiFpoYpQj4VUuI/kOlx1d0QEeAsNQkLH/NZ5NwwXR6bu3fy6r7wc+H5bwGFRZkP
+         vtZJWlHcVBfvytWwbyFMKDzAgeR9Ffuw3P8aDlPPWHIZd+jahk2Jobuj6diyTromvmKb
+         5JaBHtYXw15Ho6J5w1jxogREgdXuYXU2iM8XbVTqmOCIhCQt3N6P0EGwIJZKJO0avS0T
+         23i4fkkHVHILIvdU0hK9hQP71S4ZaYiPaMhn623IyvHrPxXhNzq82479X/V8g33iBhKg
+         YVSZYEITvq01ESvCpBypcrW7AxR9g+3+QYOZkUTUtwQliJP17UMK1etI4OhPAWnkjUfl
+         KCXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787268763; x=1787873563;
+        d=1e100.net; s=20251104; t=1787268765; x=1787873565;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=ZIY2AhPPQzV0SpGVac6m1vEhtgYyPU90RiUZoPMOP+0=;
-        b=ZCUMo/t/6B9+Nij6GdeqNDGAIJtECRKhoJmKoVl66OPNkyHJIgzoNrPgnDlzE+iTVa
-         1ozDrPWh5Q/P4mQi6k0vsLFX+jgo12yjigOR6xkSmLPxsF2iMYXRdF0XQogH7vFr5BFh
-         Lzh418oTDlqczuKH4gAUIkODTLxU5+iWW5S5Tv+Urkeay6XAG4xT1CfyP8uT+BlYkrna
-         TCRGr8U9+3ax/F+Nw959ZX7P1E3fCtdm5UnDutsz954PzdaI4C1i4iIyQQ2/xfLsgGi6
-         e9UXt4nB8LhZ6PIwA2WjtwySB0OilpnT3yPXnGbkNNWnoBP3ZFrMQ+i39GUPa6wk9UBH
-         jJ3w==
-X-Forwarded-Encrypted: i=1; AHgh+RrtSi4vU1z0MxmRXqdUe/H/W23NnHyAPPJsCFj+8W6ESm+16KCyv/N43R92t8QUM2q2RuTr0pI=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yw5vxm0GLp25jMzUrgyUeL/QHO3/834jciTUUMKeeLwa6xA9EKb
-	efwpY5l2aq9XvBBx/x6yDo8CJY+nrHe2BsrP7jLOVXETDZBHvl/eSHQE8uaK/SPWmuVPC7la3ui
-	7HcLRezKWlc17xbCDsLT38hAv/Q==
-X-Received: from pgbdn2.prod.google.com ([2002:a05:6a02:e02:b0:cc1:577a:be35])
+        bh=D9DlHJtu4nYE/0Q7Tlo35sv+3vAygx91goMAZ3ynrq4=;
+        b=heGhVbbSRT+V8KrfKeBlTm+cuSpyQEKfWlXVtFQ6jRBQLb3u4+cbL3HReHZBztkSjD
+         SBGVBx1ezwOz1r4hsBo6WHziUH9oUyybuojrW3HXcKHaGRuiPHLUzUMLwpUNSRtwwpKh
+         kQCH0ppy85vHLmcPvZSvq6A1pz+gwpILCypjGsRZyB8LuN0chGezkrkJqMQRWwdOi5os
+         1O3EE/Tuze0Ng+iKSjItlNR5x1b8md7yxcdDMKjDQxbprSzqTfUehEsm6yMK3cFtN1+l
+         ndXS8T7D2bmu2afaxj9UcEYSDXUHr6Nz8z2yb793fN3a7UUXiVaIyAOHAerwQXgHghGq
+         D53A==
+X-Forwarded-Encrypted: i=1; AHgh+RpIR7SsQQvrbbL3HzYqG9h7MVpItAUB6QiFRwZAhZuxx6dWujjkjp09Yd8xoLvFe03Zx/rLSIA=@lists.linux.dev
+X-Gm-Message-State: AFuF++lDNZlSMtswDSnVwKMxqHRXXVykIAHgZhydp2lFyBwFgcNe3rGI
+	wGDB6xQbkp8/mmuDYgxtat32z0/g6/ZPHvdJsRbVHl5TTdsl/bBM1NhxczRDKNxmpZAfIr0dcu9
+	LS+PPjs2QjruQxJCwngZuVnVe3w==
+X-Received: from pgsb12.prod.google.com ([2002:a65:67cc:0:b0:cc1:4df5:5acb])
  (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a21:3511:b0:3bf:6acf:2940 with SMTP id adf61e73a8af0-3cd30060d76mr4159740637.11.1787268763335;
- Thu, 20 Aug 2026 16:32:43 -0700 (PDT)
-Date: Thu, 20 Aug 2026 23:32:35 +0000
+ 2002:a05:6a00:8010:b0:84f:a170:4f5b with SMTP id d2e1a72fcca58-851f9aa7714mr2971480b3a.8.1787268764952;
+ Thu, 20 Aug 2026 16:32:44 -0700 (PDT)
+Date: Thu, 20 Aug 2026 23:32:36 +0000
 In-Reply-To: <20260820-gmem-no-return-page-v3-0-3bf8f80a7b4d@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -60,13 +60,13 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20260820-gmem-no-return-page-v3-0-3bf8f80a7b4d@google.com>
 X-Developer-Key: i=ackerleytng@google.com; a=ed25519; pk=sAZDYXdm6Iz8FHitpHeFlCMXwabodTm7p8/3/8xUxuU=
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1787268758; l=4467;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1787268758; l=1353;
  i=ackerleytng@google.com; s=20260225; h=from:subject:message-id;
- bh=gmGK5vSp2T3AX5rxyH8TZSoWy4Yohm1Gq2bGrUFDfX0=; b=uZp0bfS9zqFoFKgb9NG/wM0fl/ZiJb3zgvRPUCdq8MfxfHKHAx6mFHPHhfUBhuv0P/o7ih6Az
- Be0oeIuNnL1BRBWOzUneSjBWLU2ui04EGXoIzvLkwmam2EaiBS3N1/F
+ bh=1sJotEgA8ehiPs3J9DAGu4AbZ2bnjjEWvNkwbMlJckU=; b=x9w/WvPH12uIL2DGAb5DL+tydH0mG6AFPF/kocY0XpSFzUkQYU6qgERR2lFjs4T457yY7MM0c
+ q7HGbnpu+exD47dSoIA22tQ/jsBNKwgkYwIbWfbJghtPXWJ6s+RH79A
 X-Mailer: b4 0.16.0
-Message-ID: <20260820-gmem-no-return-page-v3-2-3bf8f80a7b4d@google.com>
-Subject: [PATCH v3 2/4] KVM: SEV: Drop page refcount early during RMP fault handling
+Message-ID: <20260820-gmem-no-return-page-v3-3-3bf8f80a7b4d@google.com>
+Subject: [PATCH v3 3/4] KVM: SEV: Drop page refcount early in VMSA reload
 From: Ackerley Tng <ackerleytng@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
 	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
@@ -84,127 +84,45 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Ackerley Tng <ackerleytng@google.com>
 Content-Type: text/plain; charset="utf-8"
 
-From: Sean Christopherson <seanjc@google.com>
-
-When handling an RMP fault, KVM retrieves the PFN for a private GPA from
-guest_memfd.
+When reloading the guest VMSA for an SEV-SNP vCPU, KVM retrieves the PFN
+from guest_memfd.
 
 Drop the page reference immediately after retrieving the PFN instead of
-holding it across the entire handler, and adopt the KVM MMU invalidation
-protocol.
+holding it across MMU lock acquisition in preparation for a follow-up patch
+to stop returning page pointers from guest_memfd PFN lookups.
 
-To avoid wrongly warning about not finding an assigned RMP entry if an
-invalidation had taken place, check for invalidations before warning.
+This is safe because the page's validity and presence are governed by KVM's
+MMU invalidation protocol rather than the page reference.
 
-When the RMP level is 4K, the function exits. That doesn't need checking
-for invalidations, since if it is 4K and there was an invalidation, not
-psmashing and not zapping is the right thing to do.
+No functional change intended.
 
-If the RMP level is 2M (the only other option), use the invalidation
-protocol before attempting to psmash. This ensures that if the page is
-truncated and freed, and then re-allocated to another SNP VM (the RMP entry
-is now assigned, but to another SNP VM), psmashing would be correctly
-skipped.
-
-A later patch will follow up with completely not returning refcounted pages
-from kvm_gmem_get_pfn().
-
-Signed-off-by: Sean Christopherson <seanjc@google.com>
 Reviewed-by: Michael Roth <michael.roth@amd.com>
-Co-developed-by: Ackerley Tng <ackerleytng@google.com>
 Signed-off-by: Ackerley Tng <ackerleytng@google.com>
 ---
- arch/x86/kvm/svm/sev.c | 47 ++++++++++++++++++++++++++++++-----------------
- 1 file changed, 30 insertions(+), 17 deletions(-)
+ arch/x86/kvm/svm/sev.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index b2738362a928b..563870342a2ba 100644
+index 563870342a2ba..0375ef709ee2c 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -5003,6 +5003,7 @@ void sev_handle_rmp_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code)
- 	struct kvm_memory_slot *slot;
- 	struct kvm *kvm = vcpu->kvm;
- 	int order, rmp_level, ret;
-+	unsigned long mmu_seq;
- 	struct page *page;
- 	bool assigned;
- 	kvm_pfn_t pfn;
-@@ -5030,18 +5031,26 @@ void sev_handle_rmp_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code)
+@@ -4062,6 +4062,7 @@ static void __sev_snp_reload_vmsa(struct kvm_vcpu *vcpu, gpa_t gpa)
+ 	 */
+ 	if (kvm_gmem_get_pfn(vcpu->kvm, slot, gfn, &pfn, &page, NULL))
  		return;
- 	}
++	kvm_release_page_clean(page);
  
-+	mmu_seq = kvm->mmu_invalidate_seq;
-+	smp_rmb();
-+
- 	ret = kvm_gmem_get_pfn(kvm, slot, gfn, &pfn, &page, &order);
- 	if (ret) {
- 		pr_warn_ratelimited("SEV: Unexpected RMP fault, no backing page for private GPA 0x%llx\n",
- 				    gpa);
- 		return;
- 	}
-+	kvm_release_page_unused(page);
- 
- 	ret = snp_lookup_rmpentry(pfn, &assigned, &rmp_level);
- 	if (ret || !assigned) {
--		pr_warn_ratelimited("SEV: Unexpected RMP fault, no assigned RMP entry found for GPA 0x%llx PFN 0x%llx error %d\n",
--				    gpa, pfn, ret);
--		goto out_no_trace;
-+		guard(read_lock)(&kvm->mmu_lock);
-+
-+		if (!mmu_invalidate_retry_gfn(kvm, mmu_seq, gfn))
-+			pr_warn_ratelimited("SEV: Unexpected RMP fault, no assigned RMP entry found for GPA 0x%llx PFN 0x%llx error %d\n",
-+					    gpa, pfn, ret);
-+
-+		return;
- 	}
- 
+ 	read_lock(&kvm->mmu_lock);
  	/*
-@@ -5069,27 +5078,31 @@ void sev_handle_rmp_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code)
- 	if (rmp_level == PG_LEVEL_4K)
- 		goto out;
- 
--	ret = snp_rmptable_psmash(pfn);
--	if (ret) {
--		/*
--		 * Look it up again. If it's 4K now then the PSMASH may have
--		 * raced with another process and the issue has already resolved
--		 * itself. If it's not assigned, then this must have raced with
--		 * another process that made this page shared.
--		 */
--		if (!snp_lookup_rmpentry(pfn, &assigned, &rmp_level) &&
--		    ((assigned && rmp_level == PG_LEVEL_4K) || !assigned))
-+	scoped_guard(read_lock, &kvm->mmu_lock) {
-+		if (mmu_invalidate_retry_gfn(kvm, mmu_seq, gfn))
- 			goto out;
- 
--		pr_warn_ratelimited("SEV: Unable to split RMP entry for GPA 0x%llx PFN 0x%llx ret %d\n",
--				    gpa, pfn, ret);
-+		ret = snp_rmptable_psmash(pfn);
-+		if (ret) {
-+			/*
-+			 * Look it up again. If it's 4K now then the PSMASH may
-+			 * have raced with another process and the issue has
-+			 * already resolved itself. If it's not assigned, then
-+			 * this must have raced with another process that made
-+			 * this page shared.
-+			 */
-+			if (!snp_lookup_rmpentry(pfn, &assigned, &rmp_level) &&
-+			    ((assigned && rmp_level == PG_LEVEL_4K) || !assigned))
-+				goto out;
-+
-+			pr_warn_ratelimited("SEV: Unable to split RMP entry for GPA 0x%llx PFN 0x%llx ret %d\n",
-+					    gpa, pfn, ret);
-+		}
- 	}
- 
- 	kvm_zap_gfn_range(kvm, gfn, gfn + PTRS_PER_PMD);
- out:
- 	trace_kvm_rmp_fault(vcpu, gpa, pfn, error_code, rmp_level, ret);
--out_no_trace:
--	kvm_release_page_unused(page);
+@@ -4076,8 +4077,6 @@ static void __sev_snp_reload_vmsa(struct kvm_vcpu *vcpu, gpa_t gpa)
+ 	else
+ 		svm->vmcb->control.vmsa_pa = pfn_to_hpa(pfn);
+ 	read_unlock(&kvm->mmu_lock);
+-
+-	kvm_release_page_clean(page);
  }
  
- static bool is_pfn_range_shared(kvm_pfn_t start, kvm_pfn_t end)
+ /*
 
 -- 
 2.55.0.766.g2966f0265a-goog
