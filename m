@@ -1,72 +1,73 @@
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com [209.85.214.200])
+Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com [209.85.210.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA247314A98
-	for <kvmarm@lists.linux.dev>; Thu, 20 Aug 2026 23:32:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8EDF39A4C4
+	for <kvmarm@lists.linux.dev>; Thu, 20 Aug 2026 23:32:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787268763; cv=none; b=hLvesSZjdrs42GYzJI6xcqm3JXzGCZbK9cqMGqZz2y0dTdtzHVCF+95KRQgcjfTGuZa0SVajGOSN+W2oTO1wQBEpcsBwm+baoV3mbc3M84x+pz4CwC9WxqiadCIQ5gB22ceGF3tRhC/lbsg1FOW44Ap++/pUgSRDcfaAoLFCzVA=
+	t=1787268764; cv=none; b=cijsEDX4cqTOOt1KuOgkcwE3K7sZM4r8mY1z0n/C9sru4+FjSRG3gna2nAshiTXr9qNzLRXIfMcxIy1+ZF/Id6dUUmQVwHtusSbEGx1Go/xZ9D6P1pC6RNaUS5mrUoDVI7J2DhKxMxXrOUMNaEEWKYvLFzDpobtdwaCWaMT+JMo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787268763; c=relaxed/simple;
-	bh=0qkgLp/4gNYJUuC928LKmD9dsDMVKNfciXFJMMiMswQ=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=gVXDlpgzG0AKo2X0zA31evzXd14K82d/GCQOqYG9kn3ylgyTjDFzN5BUsw0DbH/fDgAjXGoBQvKud7ONDia88jY9qRjmIksXDRUlnzm/X7kKKoygcE861bRAG0Q1YYG2DxOKJcDRiMp47fCCdfbLl1CVLWqb/7ldaJlAQuwhaNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XA4mNIVG; arc=none smtp.client-ip=209.85.214.200
+	s=arc-20240116; t=1787268764; c=relaxed/simple;
+	bh=mNa+pOHnNs9fqxuQsPFY+ubnJ/wGpTSJgDScv2kh/cw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=n+PKIc3M6NxoVMivG37wkFU6CoI8gx6WsvUy2H7btFl8ekNXG/6LfEeu9UFUIrs19B77tN0EjZzOvB8oSMqYMtuhsCWG5Wz4w3sugjXTnqBOl/GTjKZXlXYty+2hc3jr7qUW/aR8vSVlmVO82vKNZuZDdi1Tbvbn4oyY8Juqf0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aAqUZA7O; arc=none smtp.client-ip=209.85.210.197
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XA4mNIVG"
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-2ce7dff6253so15370355ad.1
-        for <kvmarm@lists.linux.dev>; Thu, 20 Aug 2026 16:32:40 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aAqUZA7O"
+Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-848568a6f62so354370b3a.0
+        for <kvmarm@lists.linux.dev>; Thu, 20 Aug 2026 16:32:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1787268760; x=1787873560; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=AMZ8TZYQN/8a08d3ypLOFhqk0OwFZ/bONgMFOnHGK/o=;
-        b=XA4mNIVGuQ85cIGym3pNCkQPGI9j3n6JGVJliN3A1aeJibUxPuvlbYa7fruAfktxfh
-         DaIrtVZS7p7tEudaj+7+jiFhTmUTOc5205TBdhBCwtee8arvPjQmOL0qlI2YdSkS6VwR
-         3kr5ROyKsQsiRwzR8dClkItUlD9W6ZiGQFlySX1rGjNd7j9qM0fbJW875eTmnAdIceHn
-         fK3moHHBNw5jygXfboiagJwTd7pXx+Y0RJVwTazeYw9zhLPl24gL+LFhkNXv33TyuqdX
-         tWxl32GNhG6NL5Y1dxF2xWyQrweVOxzD5UwZP5fcsGGH0DKIIzqABvYwBkfEBvbW+F2J
-         H+ug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787268760; x=1787873560;
-        h=content-type:cc:to:from:subject:message-id:mime-version:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+        d=google.com; s=20251104; t=1787268762; x=1787873562; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=AMZ8TZYQN/8a08d3ypLOFhqk0OwFZ/bONgMFOnHGK/o=;
-        b=rCnUmvHY+VUsrkrhmy52Ro7fFiVxWKtb1vpYnFa5zYcVygt1f6QOxfWUrLcPYb3mpN
-         GtD8yBo413NZ2Eb0W83MqUvIWizPsIduBnPuKZw5JpojApMnkBdnXzTEySz5i62pREQE
-         nFhhw9oipoc2LcthFnmBncnhxBKYBNdTREj4ExlYhwHAF0Ekg1vk+ERwrQZiVRJCO0gZ
-         VrRg2BnA2z2ox0bnpaSyoDZ8JccNMvx9NWLStkWRZ70Z0HOwjSoClfggFIY3TdPAajIe
-         aTJq9kg2i476zqxHUBQEuoo+mr8cvnT3qD0YGHyhFd9+v7L40o8TsvCcZdP5wxe/HtTy
-         O9mQ==
-X-Forwarded-Encrypted: i=1; AHgh+RovBBjxRJTSYKCyPDN6NLt5RPMSYhwLLweCsZX5YXJS+RdHjct4EWfXMTYaev+LMvnAjD5ej7w=@lists.linux.dev
-X-Gm-Message-State: AFuF++l35io9Ls/1ZngpqO2jQk35L7XzuMq9NCNVn1kWkxlohDiHiEWT
-	DOr4zlmMGhMslyjS3nMR1JlkoDmXLb6FwgSM1613G9SVrcD4MdoT++L/sr6YhMCwJBSCFNongrt
-	3iUCPNS6FIc9W4JOIkaKJwQWmmw==
-X-Received: from plpl10.prod.google.com ([2002:a17:903:3dca:b0:2d2:c22c:7b8a])
+        bh=GOtJGHo3/D29WlRaeSux3KPdmxoRq/W1Kkt3/Ky2TK4=;
+        b=aAqUZA7OHN/WmLFbxVRjnqqpDpmbMbR/jAOauyOEuK6cU4WlLPVojpzsFV0ZPTmdK7
+         N7uC9+RSdk0dgzZFlfDn7U/yunuf5kHmuO5HjOB7J9CdJ6stlfc4KxC9DrdhddCcx7RU
+         G22LffJdJg4A/DIYcYAnrWJfg8kS0Z7IrYCyMAh2g7EqscCb6uNRHHIranIdiuLkhtN5
+         8/9aMQgvmq8JSI06xC7EhZGofvLeEerHwTpjTnBkonyV3gnfufgDnF5iaCqr38T5ggc2
+         k2flVjMH6LEv73j/R3PkJU7lYIYypXcjwAxrxGxKoTaSUBMqUgRHB4doDTySMEchrQd5
+         Cejg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787268762; x=1787873562;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=GOtJGHo3/D29WlRaeSux3KPdmxoRq/W1Kkt3/Ky2TK4=;
+        b=pe63c+RZAnNaXGK0gKz5v8MmCF1jeo5a6EkRd47HHWGMEwgAW9cyeYXDEXrf9xAwtE
+         3UpId+w65FXEPPyB8eJh4TczmjmlR8RvFmEp3C7wxbac80hglaae2rGRdX0I1tru39AY
+         btttqlCToNW4sw1XBzn6XCEcRL27JfzpcRPOqaddI4pbGETm89W3Aq95PWp2ZTSuNBac
+         C3B8TmzVvHGSkd4nVYgvdyr1Aexls1wN6HvNOa18zhc/ZzRJWYFbQ8a/2cVb7rpXQ7f1
+         s7yb/Fe/ehEFLI5f4sVZHXM+tI5YxJgtI8SW/TMNYPGNdyNMZUZnoLAZiQNW90lm3UA5
+         MgwA==
+X-Forwarded-Encrypted: i=1; AHgh+Rqek+SAPZ+0viMHOVqmk+ujyDlHBGLozboPGrUTrcp+lJU/iGBr5+zxp/XmvnbTa4GEIRT31Tc=@lists.linux.dev
+X-Gm-Message-State: AFuF++k0XPB4d6xUETvqPYdtrcnS2wm+F4xmB500GEoetZlSe0QQMztv
+	ejmCG/4ZVGQBaBWYvUM3mxF+0I4RGSr0qGxLaulZw95/WWzhYMHnyGAzqayLGbHkjNnqv1BfC/A
+	yEHMmcC4O3W6wdlw38k7X3QpSDA==
+X-Received: from pgp16-n2.prod.google.com ([2002:a05:6a02:62d0:20b0:c86:5f41:8c94])
  (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:903:90d:b0:2d3:6cb4:e79e with SMTP id d9443c01a7336-2d64d2f0e55mr17242035ad.5.1787268759872;
- Thu, 20 Aug 2026 16:32:39 -0700 (PDT)
-Date: Thu, 20 Aug 2026 23:32:33 +0000
+ 2002:a05:6a00:bb91:b0:84e:2382:f4f0 with SMTP id d2e1a72fcca58-851f9a4b169mr3008115b3a.4.1787268761627;
+ Thu, 20 Aug 2026 16:32:41 -0700 (PDT)
+Date: Thu, 20 Aug 2026 23:32:34 +0000
+In-Reply-To: <20260820-gmem-no-return-page-v3-0-3bf8f80a7b4d@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-X-B4-Tracking: v=1; b=H4sIAJGOh2oC/43NwQ6DIAyA4VcxnMcilSl42nssO6gUJJlgwJEtx
- ncfettl2fFv2q8riRgsRtIWKwmYbLTe5ahOBRnGzhmkVuUmUEJdCiaomXCiztOAyzM4Ond5pWZ
- cQtOB1LIh+XIOqO3rUG/33KONiw/v40li+/S3lxgtKddCyUqiVv1wNd6bB54HP5EdTPAHAhm5g BSag+Ky77+Qbds+wNxaIPwAAAA=
-X-Change-Id: 20260818-gmem-no-return-page-614927a29f97
+References: <20260820-gmem-no-return-page-v3-0-3bf8f80a7b4d@google.com>
 X-Developer-Key: i=ackerleytng@google.com; a=ed25519; pk=sAZDYXdm6Iz8FHitpHeFlCMXwabodTm7p8/3/8xUxuU=
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1787268758; l=3107;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1787268758; l=2054;
  i=ackerleytng@google.com; s=20260225; h=from:subject:message-id;
- bh=0qkgLp/4gNYJUuC928LKmD9dsDMVKNfciXFJMMiMswQ=; b=ogJoOeNVzQpGoZquHAyFAMhLUlsTEwH4nWVvd8g1viOFNq1LGLdgW09j6Da0GMCMrYkPKCI0R
- YUrVrSgZ40hDPh7cUE96XyRxIlKhPEVMZJb7/gE2D0pbDbN+uO8UwO2
+ bh=mNa+pOHnNs9fqxuQsPFY+ubnJ/wGpTSJgDScv2kh/cw=; b=6jdqB/w2bbq3ZNh0ffVDxVWzMNTWlrX73bzku35jkm0BU43Yrh40zgvuTo6drlCXWWiORe1p+
+ oG8cHQn44j5ACK9QKezxII+AIYAkCbRDpSItfDEuBO1ZfxEg/YLwW8A
 X-Mailer: b4 0.16.0
-Message-ID: <20260820-gmem-no-return-page-v3-0-3bf8f80a7b4d@google.com>
-Subject: [PATCH v3 0/4] Stop returning struct page from guest_memfd PFN lookup
+Message-ID: <20260820-gmem-no-return-page-v3-1-3bf8f80a7b4d@google.com>
+Subject: [PATCH v3 1/4] KVM: SEV: Treat unassigned RMP entry as benign race on
+ PSMASH failure
 From: Ackerley Tng <ackerleytng@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
 	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
@@ -84,76 +85,49 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Ackerley Tng <ackerleytng@google.com>
 Content-Type: text/plain; charset="utf-8"
 
-KVM currently expects kvm_gmem_get_pfn() to return a refcounted struct
-page. Callers (such as x86 TDP MMU, arm64 Stage-2 fault handler, and SEV-SNP
-VMSA / RMP handlers) hold this refcount across page fault handling.
+When handling an RMP fault, KVM attempts to split a 2MB page via PSMASH.
+If PSMASH fails, the only expected return value is FAIL_BADADDR, which does
+not distinguish the reason for the bad address. Hence, another RMP entry
+lookup is required to determine whether the failure was benign.
 
-CoCo shared-to-private conversion handling must inspect folio refcounts to
-ensure exclusive ownership by guest_memfd. A concurrent guest page fault
-taking a temporary reference on the folio causes conversions to fail due to
-an elevated refcount.
+Specifically, KVM re-checks the RMP entry to determine if another CPU raced
+and already smashed the entry into 4KB pages.
 
-While this refcount is also taken on host userspace page faults, that
-refcount is taken on behalf of the host userspace page tables. This
-refcount will be dropped when conversions unmaps the page. Either way, once
-there's an mmap() or userspace mapping, the pages are open to way more
-refcounts, transient or not. This series focuses on just dropping refcounts
-before handing KVM a page.
+A concurrent operation (such as guest_memfd truncation or hole punching)
+can also race and transition the page to shared, removing the page from the
+RMP table and causing PSMASH to fail. This can happen even if the page is
+still referenced by KVM, because guest_memfd reclaim transitions the RMP
+entry to shared when the folio is removed from the page cache.
 
-guest_memfd already notifies KVM of page invalidations, so callers within
-KVM only need to respect the MMU invalidation protocol to safely rely on
-guest_memfd for page presence.
+Treat an unassigned RMP entry as an expected race when re-checking after a
+failed PSMASH, and skip logging an error warning.
 
-guest_memfd already notifies KVM of page invalidations, so users of guest_memfd
-within KVM only need to respect the MMU invalidation protocol to safely rely on
-guest_memfd to ensure page presence.
-
-This series first prepares the SEV-SNP handlers by treating unassigned RMP
-entries as benign races on PSMASH failure (which can occur on concurrent
-truncation) and dropping page references early in the RMP fault and VMSA reload
-paths. It then updates kvm_gmem_get_pfn() to drop the folio reference internally
-and stop returning a struct page pointer across x86 and arm64.
-
-Removing struct page from kvm_gmem_get_pfn() also moves KVM closer toward
-supporting memory backends that are not backed by struct page.
-
-This is built off Sean's sample code [1].
-
-[1] https://lore.kernel.org/all/an5RJYTwlYeym--O@google.com/
-
-Thank you everybody for your quick reviews and testing, I really appreciate
-it!
-
-Changes from v2:
-
-+ Picked up Reviewed-bys and Tested-bys
-+ Addressed comments
-
-v2: https://patch.msgid.link/20260818-gmem-no-return-page-v2-0-5298f42d49bb@google.com
-v1: https://patch.msgid.link/20260818-gmem-no-return-page-v1-0-4f8d939efdbc@google.com
-
+Fixes: c63cf135cc99 ("KVM: SEV: Add support to handle RMP nested page faults")
+Reviewed-by: Michael Roth <michael.roth@amd.com>
 Signed-off-by: Ackerley Tng <ackerleytng@google.com>
 ---
-Ackerley Tng (2):
-      KVM: SEV: Treat unassigned RMP entry as benign race on PSMASH failure
-      KVM: SEV: Drop page refcount early in VMSA reload
+ arch/x86/kvm/svm/sev.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-Sean Christopherson (2):
-      KVM: SEV: Drop page refcount early during RMP fault handling
-      KVM: guest_memfd: Stop returning struct page from PFN lookup
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index fcb41dfde4c02..b2738362a928b 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -5074,10 +5074,11 @@ void sev_handle_rmp_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code)
+ 		/*
+ 		 * Look it up again. If it's 4K now then the PSMASH may have
+ 		 * raced with another process and the issue has already resolved
+-		 * itself.
++		 * itself. If it's not assigned, then this must have raced with
++		 * another process that made this page shared.
+ 		 */
+ 		if (!snp_lookup_rmpentry(pfn, &assigned, &rmp_level) &&
+-		    assigned && rmp_level == PG_LEVEL_4K)
++		    ((assigned && rmp_level == PG_LEVEL_4K) || !assigned))
+ 			goto out;
+ 
+ 		pr_warn_ratelimited("SEV: Unable to split RMP entry for GPA 0x%llx PFN 0x%llx ret %d\n",
 
- arch/arm64/kvm/mmu.c     |  4 +---
- arch/arm64/kvm/nested.c  |  4 ++--
- arch/x86/kvm/mmu/mmu.c   |  2 +-
- arch/x86/kvm/svm/sev.c   | 53 ++++++++++++++++++++++++++++--------------------
- include/linux/kvm_host.h |  6 ++----
- virt/kvm/guest_memfd.c   |  9 ++------
- 6 files changed, 39 insertions(+), 39 deletions(-)
----
-base-commit: 1b731e5ded480bd1e5546aed35584238661ce72e
-change-id: 20260818-gmem-no-return-page-614927a29f97
-
-Best regards,
---  
-Ackerley Tng <ackerleytng@google.com>
+-- 
+2.55.0.766.g2966f0265a-goog
 
