@@ -1,51 +1,62 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E92D12C15A0;
-	Thu, 20 Aug 2026 08:27:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF5E53D9DDB;
+	Thu, 20 Aug 2026 08:56:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787214468; cv=none; b=VNbUCTucCWENUtOffPGq7Up9hyHoa7VMbqxt8TgYxEGTrcA3n89ahOoFFFjxZBrwJDpCDUpOWsrsaDAmkGOembhMnHShZQgk0xvEE4IsNqQpcZA8L3EXBqCcJ3wEznUBRlid6xOXoupTm7Xio5Ay9i6cvjOB34wu1+Uq/ffu15E=
+	t=1787216189; cv=none; b=LkfyqG8jrSVQccdqPSRJF/SnqlQu7jYPS3Wo+U/mOnf5xPZvInNVfuORQT6K567zYO1zLTz1wSHWkgyZHXh3OSwIXhIK3wn0T6OphXALwAuDc9tOyieKaPpKIV2jUEwMz6g+iORPQQBJ7XqptfvowaLMbL8ab4x80UONq3qieP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787214468; c=relaxed/simple;
-	bh=XxAYKuknyCFVxVNDieD79kG/aA28qTIdmUjvhRNCt5Y=;
+	s=arc-20240116; t=1787216189; c=relaxed/simple;
+	bh=IHlSvMwq9tSKhGemCiip+/nEfQRm1nM1gvcM4DJggVA=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XZZr7AMgbdBUjt/GIjypl9JCL+VfS8rabrMiNieP//BkOxeDtLuUTtXJdZs/1yVDwdR+psEfYJ8NNDyg9sZVU53j5Hu6vnWK+ErXbekFDTKoeFbbYXyu41TVprj7whRDvp8nShmeLvifN44lZmZgHGjakBbzx82A42/eIh4x3fk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DYXIU7tR; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=Jomks1ynjI74bFnHx0TBxveGcCIYzQ1taKY9VbqBrjEHryfPtWRzb5yxRVOkt+Zr7QgtCrTxzCYDmNLcadPCOx1kCrEPP5za6gdrY53HnK35bcsyQerqd2vLFY58sOyt1qlDj8P0ZWuTyGiGxH6RUlqcitQVsISnDCFk5eUU4sc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QZOx0Ruq; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DYXIU7tR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E6DB1F000E9;
-	Thu, 20 Aug 2026 08:27:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QZOx0Ruq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FC6E1F000E9;
+	Thu, 20 Aug 2026 08:56:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787214466;
-	bh=3wSIzj2uvZmc1TATO8hMXymASQPPrUhb17cx77/Ar2U=;
+	s=k20260515; t=1787216188;
+	bh=5FzXYhM0M5jzCRYnzBUAIuHT1gsO3TFgi0kl9BxMwWs=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=DYXIU7tRLN8z41cLbxEoT/IT/ur5j9w/7FuOZp5Eb2p9N4bWRb8QixQ8HodW3VxaQ
-	 8SaFeK3GefxxhAeTau85PKWlcJpRBkHyQ8A1R55P1yJX3NNeasBbpMXC9kz7FkM1Ck
-	 lQ00EuGfmZcOPC5PhMJpGvTKiJOFJLVp0MKxEGpU0YYJCp8y0rkymXvupZRoVAFatA
-	 QztiCmEp9zRtA5Rl7U6NLnobwpoP3F0wmI+A/UPrnUPdQon6xnmZiwuGhDlunkcD2/
-	 zR+TboYIUBsfgnsOiE+AbL0VLY9nRagJTeUge1uMyIVPVucjznOCovUeBW0cOONG0Q
-	 zy0ixAtIsJVSg==
+	b=QZOx0RuqO1AZi6vfaxCS69JVJbuy1tnf6htquabluybdKcOrfuInrjhp1abtP0NYG
+	 E2rGsaLsIt40lRQVnkk9yrO4rF2g9TsQmHu+EDSImK7n6rj6MMGpVBKM86AiIy3k9h
+	 u2/6+eHKvjQnxnMgaPP0eDQpfUWCrV86U1x+khHDxGS/RGvsu8U8piw5r8zgJW3cyR
+	 4pCypm+N68+YRg5DSMHfpFaZGQhvMo9SWKDFaDvoTWybpblK0KeZvYtCgSvYg14bCc
+	 r5iG1PMJ22CynDXEiSng2xFl/1JAEO+Bckv2vfT6jQb8jffh6FtGlh6PqFGXnKQxHZ
+	 Uwa/d4OHhAJwg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wwy7k-0000000HDEX-28j7;
-	Thu, 20 Aug 2026 08:27:44 +0000
-Date: Thu, 20 Aug 2026 09:30:16 +0100
-Message-ID: <875x15p52f.wl-maz@kernel.org>
+	id 1wwyZW-0000000HDi7-0kgy;
+	Thu, 20 Aug 2026 08:56:26 +0000
+Date: Thu, 20 Aug 2026 09:58:57 +0100
+Message-ID: <874igpp3qm.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: mankyum.kim@samsung.com
+To: Karl Mehltretter <kmehltretter@gmail.com>
 Cc: Oliver Upton <oupton@kernel.org>,
-	Will Deacon <will@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Andrew Walbran <qwandor@google.com>,
-	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: Allow smaller FF-A RX/TX buffers
-In-Reply-To: <20260820-master-v1-1-ea602b6d3860@samsung.com>
-References: <20260820-master-v1-1-ea602b6d3860@samsung.com>
+	Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Eric Auger <eric.auger@redhat.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v2 3/5] KVM: arm64: vgic-v3: Unregister redistributors before freeing regions
+In-Reply-To: <20260819224229.82948-4-kmehltretter@gmail.com>
+References: <20260819224229.82948-1-kmehltretter@gmail.com>
+	<20260819224229.82948-4-kmehltretter@gmail.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -57,44 +68,61 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: mankyum.kim@samsung.com, oupton@kernel.org, will@kernel.org, fuad.tabba@linux.dev, qwandor@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: kmehltretter@gmail.com, oupton@kernel.org, kvmarm@lists.linux.dev, tabba@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, pbonzini@redhat.com, shuah@kernel.org, eric.auger@redhat.com, christoffer.dall@arm.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 20 Aug 2026 06:42:31 +0100,
-Kim Mankyum via B4 Relay <devnull+mankyum.kim.samsung.com@kernel.org> wrote:
+On Wed, 19 Aug 2026 23:42:27 +0100,
+Karl Mehltretter <kmehltretter@gmail.com> wrote:
 > 
-> From: Kim Mankyum <mankyum.kim@samsung.com>
+> vgic_unregister_redist_iodev() uses rdreg to return its region slot. During
+> VM teardown, kvm_vgic_destroy() frees the regions before unregistering
+> their iodevs, so vgic_v3_free_redist_region() must first clear every rdreg
+> pointer.
 > 
-> pKVM currently requires the host to map PAGE_SIZE worth of RX/TX
-> buffers, as do_ffa_rxtx_map() requires the FF-A page count to match
-> the capacity of the hypervisor RX/TX buffers.
+> Unregister the iodevs before kvm_vgic_dist_destroy(), while the regions are
+> still alive. Temporarily drop config_lock because
+> vgic_unregister_redist_iodev() takes it; slots_lock remains held for the
+> MMIO bus updates. The region destructor no longer needs the vCPU scan.
 > 
-> This is unnecessarily restrictive when the kernel page size is larger
-> than the minimum RX/TX buffer size advertised by the SPMC. For
-> example, with a 16K kernel and an SPMC advertising a minimum RX/TX
-> buffer size of 4K, a host request with a page count of one is rejected
-> by pKVM.
+> Suggested-by: Marc Zyngier <maz@kernel.org>
+> Assisted-by: Codex:gpt-5.6-sol
+> Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
+> ---
+>  arch/arm64/kvm/vgic/vgic-init.c    | 11 +++++++----
+>  arch/arm64/kvm/vgic/vgic-mmio-v3.c |  9 ---------
+>  2 files changed, 7 insertions(+), 13 deletions(-)
 > 
-> hyp_ffa_post_init() already allows an SPMC whose minimum RX/TX buffer
-> size is smaller than PAGE_SIZE, and the page count supplied by the host
-> is forwarded unchanged when mapping the hypervisor buffers into the
-> SPMC.
-> 
-> Allow RX/TX buffers smaller than the capacity of the hypervisor buffers
-> while continuing to reject requests which exceed it.
+> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+> index 0a3df6d3a691..df6d0bdda4a9 100644
+> --- a/arch/arm64/kvm/vgic/vgic-init.c
+> +++ b/arch/arm64/kvm/vgic/vgic-init.c
+> @@ -570,14 +570,17 @@ void kvm_vgic_destroy(struct kvm *kvm)
+>  	kvm_for_each_vcpu(i, vcpu, kvm)
+>  		__kvm_vgic_vcpu_destroy(vcpu);
+>  
+> +	if (kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
+> +		mutex_unlock(&kvm->arch.config_lock);
+> +		kvm_for_each_vcpu(i, vcpu, kvm)
+> +			vgic_unregister_redist_iodev(vcpu);
+> +		mutex_lock(&kvm->arch.config_lock);
+> +	}
 
-You don't explain why this is safe.
+This really is awful. It'd be easy enough to have an "already locked"
+primitive (__vgic_unassign_redist_iodev()) that doesn't take the
+config_lock, and simply write this as:
 
-Are you guaranteed that the physical page stays accessible to the
-host?
+	kvm_for_each_vcpu(i, vcpu, kvm) {
+	 	struct vgic_io_device *rd_dev = &vcpu->arch.vgic_cpu.rd_iodev;
+ 		kvm_io_bus_unregister_dev(vcpu->kvm, KVM_MMIO_BUS, &rd_dev->dev);
+		__vgic_unassign_redist_iodev(vcpu);
+	}
 
-What happens if another range in the same physical page gets shared
-again? Best case, this will fail, but why is that an acceptable
-behaviour?
+or another variation on the same theme.
 
-You need to provide answers to these questions before we can consider
-this change.
+The other bit of interest is in __kvm_vgic_vcpu_destroy(), and its
+conditional removal of the RD iodevs. Can't we just get rid of this
+whole block altogether now that we have a saner failing path?
 
 Thanks,
 
