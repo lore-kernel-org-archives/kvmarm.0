@@ -1,60 +1,57 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2F602DEA86;
-	Thu, 20 Aug 2026 10:34:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5897F3DDAF0;
+	Thu, 20 Aug 2026 10:46:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787222057; cv=none; b=KX1MAUsqpDWV9Ei1q0xiYXzaVVsss3bEWQQGiwG8Jbcs49waTSiO0xzEvO8+zpb0VxDfDWhYZifoZmNDX5SGNp7iLg/BtogEA/ef86LlffiOGgtuaFpfehzYdYKhEUbAKGVac1Tep94vOOb0mKcJQ9I+UQgpWCzEbYNJebhF8o4=
+	t=1787222778; cv=none; b=p8L5jHZP+NwkeH2GzTMoJtPZJOgdR/ZC9j1BLTr8+CKnFdELwN7u1hpcMIyqVT+OUHXwxD8mJg3sc3wQHl1d7BxkWlJGvcT+bhQ6JODWHZ+EcwgWgTe9EaQuCWYeEt0R6dsJvNdkRRywFMsoKJQjLTyT+OKTAvceyCtdO0xT+s4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787222057; c=relaxed/simple;
-	bh=IlNbLejSGb92Yd+6UbC0a3KmccbL4mcNGRFnCkRu+nA=;
+	s=arc-20240116; t=1787222778; c=relaxed/simple;
+	bh=dB4Sn+g5+8EXto3KTgmB6+U3sXk6A1AUH07jcEFRxwI=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=E4mLjfvvRJzV5NCDAnZH0Yvsq1jDL7sIL2RLrqSO5uz83gtZW/pWtpaetMVh5gSIRv/qir1cGIN8Jk2NYpuL2YaRof1DJB7C9UvZW3nlQ7PitUmXIiMw2JgeyAzFIbtnFiYWdJ0ttKlj7OdZMTBflhSsE0L7V4VSFZwsqSp91Bg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HEYhR+K9; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=Ws4qMfuRremIOAi1hv/a9806ZKWWIeQRFUtvfXwqyuRVIxpA7SOeoLDW9BeRxQp9AmjORQx+14DRnnPDxVI6J5V0FoK4Y+neLu77+UGHP+MUMIAgon8Q7HDvhgWk0V4zEQQlHiVbdk+U/UuMdvCL5G+2fzeXVbQqo8KN+qiZfm4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UL1xMM+O; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HEYhR+K9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 383AB1F000E9;
-	Thu, 20 Aug 2026 10:34:16 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UL1xMM+O"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2464D1F000E9;
+	Thu, 20 Aug 2026 10:46:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787222056;
-	bh=HF3fHLxh2Hy/ShhD2iOCkKw3EqwT7lvWR8yQzpB1QNA=;
+	s=k20260515; t=1787222777;
+	bh=fGWPN53+LtuQxuiYMSRiXpBjH0T44ztBiCq6/Ef14To=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=HEYhR+K97cWYfvD8C2+2zXvqMnYgQluuWzgdJOFQPm/6w5K41doQ+VgsulbV9mmki
-	 0UNs9vEgR0Q/FhRNZHrEm0ob4Zv4qxK8bs1EKzUb9/iNZNweq6srIP+kd6nqZ3TUYi
-	 FhHFK3Eum85bc7tl42ccqXJoaFi9vZu2zC63X9W07VPkwcqVkUxUwPlY8cgErxrZIC
-	 AZ0Mu+HIB6DnVichh8Urxq8R0lqBwOYwvOHhQJk/T1C3hgXo7oVbw9d59OrmVIEwE1
-	 MIcfIY/txgT0/lv0hD6lTj4sPd/ovUHX5dHCcFLK8Qzj6hyJBhaB5MFuZB+HcSXUH/
-	 rRqAkQe1GbAcQ==
+	b=UL1xMM+O7C1EUZ2FmctdeuCuuw05mogST/CcUm50lr1DQLSNj2ZmC8ph5CjpjJTkm
+	 brAFa3FBlRIC+CdZ5iTT30RjubMcFThNW7uICT+3VKdg+3E3lsO6oTLPbe58VJXCYf
+	 ifSLuoV+kIM+jwVymE9+U1V1PnghbcG8LYSw6asjE98vwhdPLG+U0rHrUTCgm8ae3R
+	 85Z3vhuPsFUWiNibHfK5Ze5w5YfMIcY1uF07wOppayH/ipMUy4LZ+TPLfb3hmHB4+q
+	 l63vQZD0mi+za///e4tBH7fvPWeogEwOCarALfj8vN6vtITXTZmjA/WZgRgCc5BSb+
+	 aM2mFrjcaJgWQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wx06A-0000000HFt4-1GwV;
-	Thu, 20 Aug 2026 10:34:14 +0000
-Date: Thu, 20 Aug 2026 11:36:45 +0100
-Message-ID: <871pbtoz7m.wl-maz@kernel.org>
+	id 1wx0Hn-0000000HG2v-0Ngr;
+	Thu, 20 Aug 2026 10:46:15 +0000
+Date: Thu, 20 Aug 2026 11:48:46 +0100
+Message-ID: <87zeyhnk35.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Eric Auger <eauger@redhat.com>
-Cc: Fuad Tabba <fuad.tabba@linux.dev>,
-	Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu
- <yuzenghui@huawei.com>,
-	Will Deacon <will@kernel.org>,
+To: Karl Mehltretter <kmehltretter@gmail.com>
+Cc: Oliver Upton <oupton@kernel.org>,
 	Sascha Bischoff <sascha.bischoff@arm.com>,
-	Sebastian Ene <sebastianene@google.com>,
-	Fuad Tabba <tabba@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Jonathan Cameron <jic23@kernel.org>,
+	Timothy Hayes <timothy.hayes@arm.com>,
 	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/4] KVM: arm64: vgic-its: Free the caches when GITS_BASER changes
-In-Reply-To: <78d60d96-d0c7-4eaa-b425-ca4f75263b12@redhat.com>
-References: <20260819102809.310708-1-fuad.tabba@linux.dev>
-	<20260819102809.310708-2-fuad.tabba@linux.dev>
-	<78d60d96-d0c7-4eaa-b425-ca4f75263b12@redhat.com>
+Subject: Re: [PATCH] Documentation: KVM: Fix the GICv5 KVM_IRQ_LINE PPI range
+In-Reply-To: <aoBhU6XIarXxeQYB@gmail.com>
+References: <20260815092537.31737-1-kmehltretter@gmail.com>
+	<86wltrzm5n.wl-maz@kernel.org>
+	<aoBhU6XIarXxeQYB@gmail.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -66,101 +63,33 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: eauger@redhat.com, fuad.tabba@linux.dev, oupton@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, will@kernel.org, sascha.bischoff@arm.com, sebastianene@google.com, tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: kmehltretter@gmail.com, oupton@kernel.org, sascha.bischoff@arm.com, pbonzini@redhat.com, corbet@lwn.net, skhan@linuxfoundation.org, jic23@kernel.org, timothy.hayes@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Eric,
-
-On Thu, 20 Aug 2026 11:09:06 +0100,
-Eric Auger <eauger@redhat.com> wrote:
+On Sat, 15 Aug 2026 14:07:38 +0100,
+Karl Mehltretter <kmehltretter@gmail.com> wrote:
 > 
-> Hi Fuad,
+> On Sat, Aug 15, 2026 at 11:57:24AM +0100, Marc Zyngier wrote:
+> > > +	       in-kernel GICv5: PPI, irq_id between 0 and 63 (incl.), and
+> > 
+> > No. Please understand the difference between *implementation* and
+> > *architecture*.
 > 
-> On 8/19/26 12:28 PM, Fuad Tabba wrote:
-> > A guest that disables the ITS and re-points or shrinks GITS_BASER<n>
-> > with VALID still set keeps the devices and collections it mapped
-> > against the old table, as KVM frees them only when VALID is cleared.
-> > The table format is not architected, so a write with a different value
-> > is allowed to lose what it describes. Free the list whenever the
-> I don't really get "a write with a different value is allowed to lose
-> what it describes". A write at which place, in the collection table?
+> Got it. That distinction could perhaps be clearer in api.rst, but 0-127
+> is intentional, not a missed doc update.
 
-A write to the GITS_BASERn register describing the pointer to the
-collection table.
+This is on purpose.
 
-The additional clarification is that because the *content* of the
-table is IMPDEF, if you point the ITS to a different location or size
-in memory, then there is no guarantee that the caches (the KVM
-internal data structures) are up to date. In this case, the proposed
-course of action is to invalidate the caches and start afresh.
+We are not going to go and update the documentation each time
+something change in KVM (such as a new interrupt being controllable
+from the VMM). So by describing everything in architectural terms and
+giving the interfaces for userspace to introspect the implementation,
+we avoid having to disclose all the decisions that we make when
+implementing the hypervisor.
 
-> > stored value changes.
-> > 
-> > Test for a change rather than a write: its_restore_enable() rewrites
-> > GITS_BASER<n> from its probe-time cache on resume, and KVM reports
-> > GITS_TYPER.HCC as 0, so nothing re-maps the boot CPU's collection
-> > afterwards.
-> > 
-> > Fixes: 36d6961c2b481 ("KVM: arm/arm64: vgic-its: Free caches when GITS_BASER Valid bit is cleared")
-> > Suggested-by: Marc Zyngier <maz@kernel.org>
-> > Link: https://lore.kernel.org/all/87ecg9owwa.wl-maz@kernel.org/
-> > Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
-> > ---
-> >  arch/arm64/kvm/vgic/vgic-its.c | 9 ++++++---
-> >  1 file changed, 6 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-> > index f6538b1976f9b..3339d9977af27 100644
-> > --- a/arch/arm64/kvm/vgic/vgic-its.c
-> > +++ b/arch/arm64/kvm/vgic/vgic-its.c
-> > @@ -1649,7 +1649,7 @@ static void vgic_mmio_write_its_baser(struct kvm *kvm,
-> >  				      unsigned long val)
-> >  {
-> >  	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
-> > -	u64 entry_size, table_type;
-> > +	u64 old, entry_size, table_type;
-> >  	u64 reg, *regptr, clearbits = 0;
-> >  
-> >  	/* When GITS_CTLR.Enable is 1, we ignore write accesses. */
-> > @@ -1672,7 +1672,9 @@ static void vgic_mmio_write_its_baser(struct kvm *kvm,
-> >  		return;
-> >  	}
-> >  
-> > -	reg = update_64bit_reg(*regptr, addr & 7, len, val);
-> > +	old = *regptr;
-> > +
-> > +	reg = update_64bit_reg(old, addr & 7, len, val);
-> >  	reg &= ~GITS_BASER_RO_MASK;
-> >  	reg &= ~clearbits;
-> >  
-> > @@ -1682,7 +1684,8 @@ static void vgic_mmio_write_its_baser(struct kvm *kvm,
-> >  
-> >  	*regptr = reg;
-> >  
-> > -	if (!(reg & GITS_BASER_VALID)) {
-> > +	/* The ITS driver rewrites an unchanged GITS_BASER<n> on resume. */
-> > +	if (reg != old) {
-> >  		/* Take the its_lock to prevent a race with a save/restore */
-> >  		mutex_lock(&its->its_lock);
-> >  		switch (table_type) {
-> One question: There is no vgic_its_invalidate_cache() in the function.
-> Is it OK?
-
-Probably not. We should make sure that the translation cache is gone
-as well so that we retranslate and avoid signalling LPIs that have
-undergone such invalidation. Thanks for spotting this.
-
-> Besides out of curiosity, why don't we go further and remove ite entries
-> that refer to removed collections in vgic_its_free_collection()?
-
-The current policy is to keep the LPI alive as long as it is
-mapped. The only thing is that we can't signal it, obviously. But it
-would be legal to drop them altogether, only more work.
-
-An additional question is whether we should consider doing a reload of
-the collection table or not. I'm not keen on it, but I can also see
-how a guest could want to do this. Feels a bit over the top though.
+This is valid for the whole of KVM/arm64, not just the GIC, and
+represent the intent of the ARM architecture.
 
 Thanks,
 
