@@ -1,112 +1,129 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta0.migadu.com (out-157.mta0.migadu.com [91.218.175.157])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1E3341A571;
-	Thu, 20 Aug 2026 11:30:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8620942C4F3
+	for <kvmarm@lists.linux.dev>; Thu, 20 Aug 2026 11:30:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787225411; cv=none; b=hr5b6jg4LAMuAHYd6TSu4XcsMUI5xjAz3QM5usxRzeLSvT6BxyymkhebX/2euuSvNhQoWLOewrrpgrvA3WhQwDs/BmA+3PD6qr1I6ENmK/TqzHo0Fg6yv8HEIuADJ5xaUHQGGWw7JZ58v6z+UQ0j2Rsr4m1jDg+ZrnPyUxOxYLs=
+	t=1787225417; cv=none; b=PtqGm5PteMKiNli+qhSCNSdD3uhXMpkTjP1dcJMot72QufC2A85MHDwY3CVTewLp+Y7mrFFIVszKyXKHV6U/2yDzceOOT1MtpIVSsmmzKlywWI9r1OwzMCrL9fBzXCX4uhaEdP0gmXyANR2quy70o92bmmPHnkGMGO+wmlKQN8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787225411; c=relaxed/simple;
-	bh=x/DK1djQrP4aArL2cm7yHVkhGnuwCsxaQs4emL4I4fk=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=M0XGFn7P2BzZqH14jbcBZzMuczCAOwFZk4QY/75v/HfjEZJy8bUx2+3MVFxadO6KNU/uw2l3ZgjJBunHQ77AOlBc44olLR2LEr5c9+GiqzimfM5GsIYYwa5sGBU/z7MxePTZebISAUEzkRuD3waFIN+2gvtIBE+BJijMDKetXUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Alv0Uksx; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1787225417; c=relaxed/simple;
+	bh=OqIF4LDj3J7ikjkeCVzQqcDHvIZZRrdzH89ljTD8g20=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=b8+Uy/L7I5jIt8TQPlSRqJyesGsrgSJGHhEu8VvnYTMgcG0Mb9Cfxo6olUzL4YpGWoEYn9UjjJa9rrTnFZX/YqHIQL9XzHHq7AiUD/uvyu2c3ylQJXKnnS0EcXEtuyInJf5VBC3/lUoQNBKfuWT6iK5+GTd5K1RGRBe68RBiiQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=sM2czI+s; arc=none smtp.client-ip=91.218.175.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Alv0Uksx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E48F1F00A3D;
-	Thu, 20 Aug 2026 11:30:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787225410;
-	bh=yxMhTRLdavM3BDMahtX3m4KRGa90dfWMFnclmxcH/Kc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=Alv0UksxLwqA1XA9KRzroRLJVP9RPkvI9b/GgKz8BqbAjhySnF/bFcPCihvnMghLL
-	 0aoeQMch6YxbIKM4dy/oVd0WKACWE/BE+50wazKP/MqO++M1rEDuyg2aHupZXprcBl
-	 OsaIwXZioOb5hiVLOoXu3xsoG8Ys+MOHzH7RwlSxYM206gEIGvr/f3MwQ5Ez7YbyCM
-	 HJw0Souj6735YZ/3knzR8wKA7HRgHmF9NmD0b4Sj434T9fSG9/mIajTdEUP+P7TeNo
-	 kjtBB11Z5n+E6zp6t0v0uSD7KC7A0ml2vYbB861QNnnNiJZBUQ3qgO6UfxBepzoe0U
-	 vWMyish1q5x/A==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wx0yG-0000000HGwR-10ar;
-	Thu, 20 Aug 2026 11:30:08 +0000
-Date: Thu, 20 Aug 2026 12:32:39 +0100
-Message-ID: <87y0e1ni20.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Fuad Tabba <tabba@google.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Yao Yuan <yaoyuan@linux.alibaba.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v19 04/14] KVM: arm64: Ensure GCS memory effects are visible
-In-Reply-To: <3cc4cccd-1a4a-487e-8ac6-9bbbc9713e58@sirena.org.uk>
-References: <20260812-arm64-gcs-v19-0-9105afd828ac@kernel.org>
-	<20260812-arm64-gcs-v19-4-9105afd828ac@kernel.org>
-	<aoXmfz5pPwRYRKTO@LeoBrasDK>
-	<3cc4cccd-1a4a-487e-8ac6-9bbbc9713e58@sirena.org.uk>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="sM2czI+s"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=OqIF4LDj3J7ikjkeCVzQqcDHvIZZRrdzH89ljTD8g20=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1787225411; v=1; x=1787830211;
+ b=sM2czI+sDbgFDH2CAoUON77zxak4erViTa1xNdlU3N9Zgfk0RL72QlUVCIBxGAWSsfrt01BT
+ BFulz7kadpCet7z0XjE/GC9zeaVSOYTjrDayzz/QoauTs+Nbj8B02vgwNO0xT01T/FnYs7BzbXN
+ TWfy7MEfNrCZ6yLrjh+1tsRE=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: from mail-lf1-f43.google.com (209.85.167.43)
+	by smtp.migadu.com with ESMTPS id f872cd100dc54ff5;
+	Thu, 20 Aug 2026 11:30:11 +0000
+X-Mizu-Trace-ID: f872cd100dc54ff5
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5b0129cf6ffso8597e87.0
+        for <kvmarm@lists.linux.dev>; Thu, 20 Aug 2026 04:30:07 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+RpUDS7dBoHhNCLmCkygeKtOsdgAq1c9+sVFresVd5iCysbwqA309kuzvnaCxSbw9aQLIqx34xE=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yz0avHAc8Jn/+tjqH5Lmob8vGXuceUg2uldGbIHjF3wdj2dvQhG
+	bW1l/XKX1kAUNfW85llgnkvnjK9hcjRRX7hczcppjPYSrP6/z0AUxIKEKkxAgbMqpZIe+zD6/A+
+	I3Q6JFaa6XqMuspcaar80E7aG78+fsQCJJ3zETrPZ
+X-Received: by 2002:a05:6512:3b88:b0:5a8:6646:d7b4 with SMTP id
+ 2adb3069b0e04-5b47dd877a7mr146343e87.1.1787225406760; Thu, 20 Aug 2026
+ 04:30:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, leo.bras@arm.com, catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, shuah@kernel.org, tabba@google.com, oupton@kernel.org, peter.maydell@linaro.org, yaoyuan@linux.alibaba.com, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20260819102809.310708-1-fuad.tabba@linux.dev> <20260819102809.310708-2-fuad.tabba@linux.dev>
+ <78d60d96-d0c7-4eaa-b425-ca4f75263b12@redhat.com> <871pbtoz7m.wl-maz@kernel.org>
+In-Reply-To: <871pbtoz7m.wl-maz@kernel.org>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Thu, 20 Aug 2026 12:29:30 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTxbhoa6140-EWQhXXjC=8DZkVSpGDSOYFrhybnQrdcsQQ@mail.gmail.com>
+X-Gm-Features: AcwNN1W2LDdE_Byp_W3eAl_A609Io6u9cE21Rn601gKsnfbMx6Lgh7NQOHAxHyg
+Message-ID: <CA+EHjTxbhoa6140-EWQhXXjC=8DZkVSpGDSOYFrhybnQrdcsQQ@mail.gmail.com>
+Subject: Re: [PATCH 1/4] KVM: arm64: vgic-its: Free the caches when GITS_BASER changes
+To: Marc Zyngier <maz@kernel.org>
+Cc: Eric Auger <eauger@redhat.com>, Oliver Upton <oupton@kernel.org>, 
+	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Will Deacon <will@kernel.org>, Sascha Bischoff <sascha.bischoff@arm.com>, 
+	Sebastian Ene <sebastianene@google.com>, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, 19 Aug 2026 19:08:01 +0100,
-Mark Brown <broonie@kernel.org> wrote:
->=20
-> On Wed, Aug 19, 2026 at 06:23:11PM +0100, Leonardo Bras wrote:
->=20
-> > You state that we do _not_ use GCS in the hypervisor, nor in the host.
-> > I understand that we GCSB() when we exit the vcpu context, but why woul=
-d we=20
-> > need to GCSB() before getting back in?
->=20
-> > If cpus will GCSB() on guest_exit, and host/hyp does not use GCS, there=
-=20
-> > should be no GCS pending operation at the entry point.
->=20
-> That's there to ensure that updates written by another PE are seen,
-> following the same pattern as DDI0487 M.c K10.6.5 example K10-8 (or the
-> prior migration between PEs example, that has barriers due to the stack
-> switch operations rather than as distinct instructions).
+Hi Eric, Marc,
 
-This makes no sense at all. The guest itself is in charge of its own
-coherency.
+On Thu, 20 Aug 2026 at 11:34, Marc Zyngier <maz@kernel.org> wrote:
+>
+> Hi Eric,
+>
+> On Thu, 20 Aug 2026 11:09:06 +0100,
+> Eric Auger <eauger@redhat.com> wrote:
+> >
+> > Hi Fuad,
+> >
+> > On 8/19/26 12:28 PM, Fuad Tabba wrote:
+> > > A guest that disables the ITS and re-points or shrinks GITS_BASER<n>
+> > > with VALID still set keeps the devices and collections it mapped
+> > > against the old table, as KVM frees them only when VALID is cleared.
+> > > The table format is not architected, so a write with a different value
+> > > is allowed to lose what it describes. Free the list whenever the
+> > I don't really get "a write with a different value is allowed to lose
+> > what it describes". A write at which place, in the collection table?
+>
+> A write to the GITS_BASERn register describing the pointer to the
+> collection table.
+>
+> The additional clarification is that because the *content* of the
+> table is IMPDEF, if you point the ITS to a different location or size
+> in memory, then there is no guarantee that the caches (the KVM
+> internal data structures) are up to date. In this case, the proposed
+> course of action is to invalidate the caches and start afresh.
 
-=46rom the PoV of the hypervisor, this only needs to be guaranteed when
-a vcpu is migrated from one physical CPU to another, as this is
-invisible to the guest.
+My sentence should have said what the write was to. I'll spell it out
+in v2 along the lines of your reply.
 
-Given that this can only happen on in the interval between vcpu_put()
-and vcpu_load(), the sole location where this could make any sense is
-at vcpu_put() time. And even that can be relaxed in the NV case, where
-we transition between ELs rather than CPUs.
+...
 
-Hammering things in the run loop is both expensive and pointless.
+> > One question: There is no vgic_its_invalidate_cache() in the function.
+> > Is it OK?
+>
+> Probably not. We should make sure that the translation cache is gone
+> as well so that we retranslate and avoid signalling LPIs that have
+> undergone such invalidation. Thanks for spotting this.
 
-	M.
+I'll add it in v2. The device branch already gets it through
+vgic_its_free_device(), but the collection branch doesn't.
 
---=20
-Jazz isn't dead. It just smells funny.
+Thank you both,
+/fuad
+
+> > Besides out of curiosity, why don't we go further and remove ite entries
+> > that refer to removed collections in vgic_its_free_collection()?
+>
+> The current policy is to keep the LPI alive as long as it is
+> mapped. The only thing is that we can't signal it, obviously. But it
+> would be legal to drop them altogether, only more work.
+>
+> An additional question is whether we should consider doing a reload of
+> the collection table or not. I'm not keen on it, but I can also see
+> how a guest could want to do this. Feels a bit over the top though.
+>
+> Thanks,
+>
+>         M.
+>
+> --
+> Jazz isn't dead. It just smells funny.
