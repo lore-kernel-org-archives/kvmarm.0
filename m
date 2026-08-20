@@ -1,99 +1,80 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5897F3DDAF0;
-	Thu, 20 Aug 2026 10:46:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A30940D58B;
+	Thu, 20 Aug 2026 11:13:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787222778; cv=none; b=p8L5jHZP+NwkeH2GzTMoJtPZJOgdR/ZC9j1BLTr8+CKnFdELwN7u1hpcMIyqVT+OUHXwxD8mJg3sc3wQHl1d7BxkWlJGvcT+bhQ6JODWHZ+EcwgWgTe9EaQuCWYeEt0R6dsJvNdkRRywFMsoKJQjLTyT+OKTAvceyCtdO0xT+s4=
+	t=1787224422; cv=none; b=g6QTS5M1mdALBSTqYGRDYt0Gx9gXRhFSqjome4dj7XveXN3S6MLSLlrjmW3qYfCASy5czzRP6WkywcG97kbOAdUorRixc3LsdS+LyYWLIcZbXwxr5xTLgN6Vm6bZ0/+OJHfxVbUxRVwlamkvwxvpmO8yNV+SIXomYBuvijrdMk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787222778; c=relaxed/simple;
-	bh=dB4Sn+g5+8EXto3KTgmB6+U3sXk6A1AUH07jcEFRxwI=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ws4qMfuRremIOAi1hv/a9806ZKWWIeQRFUtvfXwqyuRVIxpA7SOeoLDW9BeRxQp9AmjORQx+14DRnnPDxVI6J5V0FoK4Y+neLu77+UGHP+MUMIAgon8Q7HDvhgWk0V4zEQQlHiVbdk+U/UuMdvCL5G+2fzeXVbQqo8KN+qiZfm4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UL1xMM+O; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1787224422; c=relaxed/simple;
+	bh=KtI5T5Ka930wbyhgmgqkQ4FepflWZdHZnI8uHPdT3NQ=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Q+fNiJRGcWSzRH6cLi4QQEDcvB7ga0djLb8Cxivmu7q8LbJnHq6wBzrzvGtT+oEIekb3JAJKZMH2CC6NhKoaX8f7tcI8Ep3KkvqBu/GNT1pj6cGphbehW6e5SuLbAA5vRpbo0Bfq3qOe8iwr3yzn9+HCZgDf0G3FkS3LJrtR+wM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gSYNUhgr; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UL1xMM+O"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2464D1F000E9;
-	Thu, 20 Aug 2026 10:46:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gSYNUhgr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0C551F000E9;
+	Thu, 20 Aug 2026 11:13:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787222777;
-	bh=fGWPN53+LtuQxuiYMSRiXpBjH0T44ztBiCq6/Ef14To=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=UL1xMM+O7C1EUZ2FmctdeuCuuw05mogST/CcUm50lr1DQLSNj2ZmC8ph5CjpjJTkm
-	 brAFa3FBlRIC+CdZ5iTT30RjubMcFThNW7uICT+3VKdg+3E3lsO6oTLPbe58VJXCYf
-	 ifSLuoV+kIM+jwVymE9+U1V1PnghbcG8LYSw6asjE98vwhdPLG+U0rHrUTCgm8ae3R
-	 85Z3vhuPsFUWiNibHfK5Ze5w5YfMIcY1uF07wOppayH/ipMUy4LZ+TPLfb3hmHB4+q
-	 l63vQZD0mi+za///e4tBH7fvPWeogEwOCarALfj8vN6vtITXTZmjA/WZgRgCc5BSb+
-	 aM2mFrjcaJgWQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wx0Hn-0000000HG2v-0Ngr;
-	Thu, 20 Aug 2026 10:46:15 +0000
-Date: Thu, 20 Aug 2026 11:48:46 +0100
-Message-ID: <87zeyhnk35.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Karl Mehltretter <kmehltretter@gmail.com>
-Cc: Oliver Upton <oupton@kernel.org>,
-	Sascha Bischoff <sascha.bischoff@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Jonathan Cameron <jic23@kernel.org>,
-	Timothy Hayes <timothy.hayes@arm.com>,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org,
+	s=k20260515; t=1787224421;
+	bh=bi8kks1t9xNKvGVo/6jcNJzZIGuN6UX788iT+MOzMzA=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date;
+	b=gSYNUhgrqzk238wabITHC7PbgxskdNvBkQ8ykYb8gYbi3wBC4TZl4R6bUTv8izpKV
+	 kqPIwwiZtspW6BlEqv9a1P6ZZARrkSzP2n3GzchQVb+zyzQj6Z7WEDwBOpZvQz6unT
+	 Dzmz2+vGr8Pk1MWkENMwDieuYaxT+Ut/6cU3hKMJtUqnxBa0f/9OzdEL2xdJQ0dfw7
+	 w2dOUqXtFFOaQ4ddtKCaFbMV4Ezvz4kSRNOxfeCwyW1bbN98aLSSf4n99HPepvs7nY
+	 MvLV78GOznFSvpsIgXQhNbqzNIIwav8ngBFYVuC8aMBhbKESKLXTkbVjG1IFxqJukA
+	 8DWpK7rnYR4eQ==
+X-Mailer: emacs 30.2 (via feedmail 11-beta-1 I)
+From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
+To: Kameron Carr <kameroncarr@linux.microsoft.com>,
+	linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Documentation: KVM: Fix the GICv5 KVM_IRQ_LINE PPI range
-In-Reply-To: <aoBhU6XIarXxeQYB@gmail.com>
-References: <20260815092537.31737-1-kmehltretter@gmail.com>
-	<86wltrzm5n.wl-maz@kernel.org>
-	<aoBhU6XIarXxeQYB@gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+Cc: Alexey Kardashevskiy <aik@amd.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Jonathan Cameron <jic23@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Samuel Ortiz <sameo@rivosinc.com>,
+	Steven Price <steven.price@arm.com>,
+	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Xu Yilun <yilun.xu@linux.intel.com>
+Subject: Re: [RFC PATCH v4 07/11] coco: guest: arm64: Add guest APIs to read
+ host-cached DA objects
+In-Reply-To: <36877aa6-3f70-4da1-aecb-7209a33f8595@linux.microsoft.com>
+References: <20260427082805.931832-1-aneesh.kumar@kernel.org>
+ <20260427082805.931832-8-aneesh.kumar@kernel.org>
+ <36877aa6-3f70-4da1-aecb-7209a33f8595@linux.microsoft.com>
+Date: Thu, 20 Aug 2026 16:43:29 +0530
+Message-ID: <yq5ao6exvycm.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kmehltretter@gmail.com, oupton@kernel.org, sascha.bischoff@arm.com, pbonzini@redhat.com, corbet@lwn.net, skhan@linuxfoundation.org, jic23@kernel.org, timothy.hayes@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain
 
-On Sat, 15 Aug 2026 14:07:38 +0100,
-Karl Mehltretter <kmehltretter@gmail.com> wrote:
-> 
-> On Sat, Aug 15, 2026 at 11:57:24AM +0100, Marc Zyngier wrote:
-> > > +	       in-kernel GICv5: PPI, irq_id between 0 and 63 (incl.), and
-> > 
-> > No. Please understand the difference between *implementation* and
-> > *architecture*.
-> 
-> Got it. That distinction could perhaps be clearer in api.rst, but 0-127
-> is intentional, not a missed doc update.
+Kameron Carr <kameroncarr@linux.microsoft.com> writes:
 
-This is on purpose.
+>> diff --git a/drivers/virt/coco/arm-cca-guest/rsi-da.h b/drivers/virt/coco/arm-cca-guest/rsi-da.h
+>> index 297cb800edc0..88067d2230ab 100644
+>> --- a/drivers/virt/coco/arm-cca-guest/rsi-da.h
+>> +++ b/drivers/virt/coco/arm-cca-guest/rsi-da.h
+>> @@ -10,6 +10,8 @@
+>>  #include <linux/pci-tsm.h>
+>>  #include <asm/rsi_smc.h>
+>>  
+>> +#define MAX_CACHE_OBJ_SIZE	SZ_16M
+>
+> Why is the limit 16 MiB? I don't see that limitation in the RHI spec.
+> Does the limit come from PCI TSM?
+>
 
-We are not going to go and update the documentation each time
-something change in KVM (such as a new interrupt being controllable
-from the VMM). So by describing everything in architectural terms and
-giving the interfaces for userspace to introspect the implementation,
-we avoid having to disclose all the decisions that we make when
-implementing the hypervisor.
+I based that on the SPDM MeasurementRecordLength, which is 16 MB.
 
-This is valid for the whole of KVM/arm64, not just the GIC, and
-represent the intent of the ARM architecture.
-
-Thanks,
-
-	M.
-
--- 
-Jazz isn't dead. It just smells funny.
+-aneesh
