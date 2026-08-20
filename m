@@ -1,287 +1,159 @@
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com [209.85.214.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA5C237C93F
-	for <kvmarm@lists.linux.dev>; Thu, 20 Aug 2026 23:29:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA247314A98
+	for <kvmarm@lists.linux.dev>; Thu, 20 Aug 2026 23:32:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787268571; cv=none; b=Gic3Vl9WhzJRghnJL4G2VDaOWpVOkyjTPAEVrceMEKpwqW+l46SLsDB9xqwlAZYT9qbjTK+8U9uYI2wGiM4xiiXLPaV5ThHF1ejAWmYYRb8wNfIXa+ioUWXvYX/5vGcrpRHcoIH8zYQKnzjRzpaMF17oI9RvDY3rvczFrRKd5pA=
+	t=1787268763; cv=none; b=hLvesSZjdrs42GYzJI6xcqm3JXzGCZbK9cqMGqZz2y0dTdtzHVCF+95KRQgcjfTGuZa0SVajGOSN+W2oTO1wQBEpcsBwm+baoV3mbc3M84x+pz4CwC9WxqiadCIQ5gB22ceGF3tRhC/lbsg1FOW44Ap++/pUgSRDcfaAoLFCzVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787268571; c=relaxed/simple;
-	bh=FM2xAjw5wSTlcQCs5YuFDqE5KTzv01uqml/WI85WPpc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rDb2d9SggAYXXsegjc9xc/n6M57DsZoMPZj3oT4wh3tE98szLXpcT99VL6sg03mnb5G+79guMS7eR0TWmFzJ+RLybYoARnFFAEfGbC7hkVayyad1/w85AFAQzQSrbKee+IWm8Vc0vd6h6LrSsn3H+z0izimpbfbsNp9fIY7YwLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oTVxHn24; arc=none smtp.client-ip=209.85.214.180
+	s=arc-20240116; t=1787268763; c=relaxed/simple;
+	bh=0qkgLp/4gNYJUuC928LKmD9dsDMVKNfciXFJMMiMswQ=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=gVXDlpgzG0AKo2X0zA31evzXd14K82d/GCQOqYG9kn3ylgyTjDFzN5BUsw0DbH/fDgAjXGoBQvKud7ONDia88jY9qRjmIksXDRUlnzm/X7kKKoygcE861bRAG0Q1YYG2DxOKJcDRiMp47fCCdfbLl1CVLWqb/7ldaJlAQuwhaNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XA4mNIVG; arc=none smtp.client-ip=209.85.214.200
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oTVxHn24"
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2d3b440b97aso11765ad.1
-        for <kvmarm@lists.linux.dev>; Thu, 20 Aug 2026 16:29:29 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XA4mNIVG"
+Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-2ce7dff6253so15370355ad.1
+        for <kvmarm@lists.linux.dev>; Thu, 20 Aug 2026 16:32:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1787268569; x=1787873369; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=1/h3VNQtWr5Uh6IO9vIimUOFdkR8pd4y8N4EBbX0fQY=;
-        b=oTVxHn24wgBWFpYWjhUL/p/aRMZDzFbpN/S4HZ5jWUFUWfCojPMmAR4d5HJhcsEeY8
-         cEHguMZAB5kPxpOAWBScd533eK7CiIotSivLVhF0Z6UUnCJvreDc37fBT+sVi8I7PfP4
-         pwpcICCeiqWejBxLwzpq6U5qt+ASTKEkgsJI9IcQuoD+XbILYPG0KngMKM6LTQoD2lVH
-         FH8AbtNabmga5EkT7SePLDQB8SuNENZx168iupcZJvguRMN5biMrvQxOpmqsDN3WQ6ZH
-         mCULM8KqRI5juxPCd3oS0fvq1udLayYV8+mWEjmZ9QML1Hn8/45n9JutLqHLmsz30Ddj
-         iozw==
+        d=google.com; s=20251104; t=1787268760; x=1787873560; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=AMZ8TZYQN/8a08d3ypLOFhqk0OwFZ/bONgMFOnHGK/o=;
+        b=XA4mNIVGuQ85cIGym3pNCkQPGI9j3n6JGVJliN3A1aeJibUxPuvlbYa7fruAfktxfh
+         DaIrtVZS7p7tEudaj+7+jiFhTmUTOc5205TBdhBCwtee8arvPjQmOL0qlI2YdSkS6VwR
+         3kr5ROyKsQsiRwzR8dClkItUlD9W6ZiGQFlySX1rGjNd7j9qM0fbJW875eTmnAdIceHn
+         fK3moHHBNw5jygXfboiagJwTd7pXx+Y0RJVwTazeYw9zhLPl24gL+LFhkNXv33TyuqdX
+         tWxl32GNhG6NL5Y1dxF2xWyQrweVOxzD5UwZP5fcsGGH0DKIIzqABvYwBkfEBvbW+F2J
+         H+ug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787268569; x=1787873369;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
+        d=1e100.net; s=20251104; t=1787268760; x=1787873560;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=1/h3VNQtWr5Uh6IO9vIimUOFdkR8pd4y8N4EBbX0fQY=;
-        b=GhMKhJJ0TVAt3ID0N/ludiBhavmyFIT4DZRu5OetPVCREKXg4Ca2Ylga6MA5a+26Gb
-         JqfbBqOgaJgJoTk9Rx5we3MNKcnodnRhQsQseqzs3+3dmQ03knDZsWUEVzS9LNGl5She
-         WnPbvUv0o6qSS+wQYZjNoGvx5oSjypTrxJwzJiMLrg/Sf96mIfEpL3WZaN1qVUyWs4Dy
-         84Tl256GMD8KwhvqWddb/sJVF8LcIFuofJSqtuFDst4hIjv1KkLW/xBC0t4TX1sYLCfY
-         fMb+5vJIjGqpYO6VOI6gMVBsBWENFjHdPEiQm+kFlEbmi/2NuhFnzD0W2e5tTA3DuIoQ
-         2Uqw==
-X-Forwarded-Encrypted: i=1; AHgh+RpVMprt/R9bLpaAi2EvSQ7teiqDL0A1OykcRO6zglnL9/vTiLC20Jsz1UyQedKBgZGA6MukQPs=@lists.linux.dev
-X-Gm-Message-State: AFuF++n6mOhkedmweWItFInHnUSbjO6M63nJ7NSwVIZThYXAx8TkcCj9
-	gnvulaJ1g4DdXcKyYyCD0R1oW/89LTX3mF4iULMwQurXlXI0rgzG5cduPylY2RKj4c6lIzMw/pc
-	oi3fYtg==
-X-Gm-Gg: AR+sD12JTIvfnYp4HJZMxrpdEGh+YpwGpB5t7OkQxbutVphHrigJa+Mn2VGYgLThibO
-	q6NLMYhIEfQJFZAtTBhAIaX5xxiqElyZ7K2dyUNrz2U5SvxgqNnuhWX9FomE0gJtCTxSvWx1h+/
-	RXtBvkU48YPOWpuTmqUYk8/U+/pNN4UuDW963ZhwFFNJjaSyfVNZmB6H7evpdLVi8PuGz/sP8sS
-	PwMrk5ERThn0+h7YQJ81ZV44fiR87w2lRdQT/PHALgkMbR4ipj7U1lVFIDT1F0SW81pTzc6Kqxo
-	8i8jJ/ZNDUGsMRrPj2v3ie4GJgTzLS9BF7j7GAy+2CS3PcotxkKymNGcRC4tI/6pToJYqieUziZ
-	cGyQ8f93RzziP+Ljrh+RM2DwBLTUbzLxlQMFyM7qhWkyyztIAIjQqV9hzhrvBsSKs/gnCrXQgYE
-	lKnTrFOe94fCUFo9GOjTk79FwwE9qPRAAXoPo6PjCjSNBikbdMF913CUYn3TTmQAgBcTXpX3Tb/
-	znoBCrejXj45aehRKaY4dydbw==
-X-Received: by 2002:a17:902:e951:b0:2bf:1000:d3ac with SMTP id d9443c01a7336-2d650d6510bmr1764635ad.11.1787268568429;
-        Thu, 20 Aug 2026 16:29:28 -0700 (PDT)
-Received: from google.com (176.13.105.34.bc.googleusercontent.com. [34.105.13.176])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-395c8e07801sm97051a91.0.2026.08.20.16.29.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Aug 2026 16:29:27 -0700 (PDT)
-Date: Thu, 20 Aug 2026 16:29:22 -0700
-From: Vipin Sharma <vipinsh@google.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	kvm-riscv@lists.infradead.org, pbonzini@redhat.com, borntraeger@linux.ibm.com, 
-	frankja@linux.ibm.com, imbrenda@linux.ibm.com, anup@brainfault.org, 
-	atish.patra@linux.dev, zhaotianrui@loongson.cn, maobibo@loongson.cn, 
-	chenhuacai@kernel.org, maz@kernel.org, oliver.upton@linux.dev, ajones@ventanamicro.com
-Subject: Re: [PATCH v4 8/9] KVM: selftests: Add rule to generate default
- tests for KVM selftests runner
-Message-ID: <20260820220340.GC618052.vipinsh@google.com>
-References: <20260331194202.1722082-1-vipinsh@google.com>
- <20260331194202.1722082-9-vipinsh@google.com>
- <ampPd9szwRoGKwds@google.com>
+        bh=AMZ8TZYQN/8a08d3ypLOFhqk0OwFZ/bONgMFOnHGK/o=;
+        b=rCnUmvHY+VUsrkrhmy52Ro7fFiVxWKtb1vpYnFa5zYcVygt1f6QOxfWUrLcPYb3mpN
+         GtD8yBo413NZ2Eb0W83MqUvIWizPsIduBnPuKZw5JpojApMnkBdnXzTEySz5i62pREQE
+         nFhhw9oipoc2LcthFnmBncnhxBKYBNdTREj4ExlYhwHAF0Ekg1vk+ERwrQZiVRJCO0gZ
+         VrRg2BnA2z2ox0bnpaSyoDZ8JccNMvx9NWLStkWRZ70Z0HOwjSoClfggFIY3TdPAajIe
+         aTJq9kg2i476zqxHUBQEuoo+mr8cvnT3qD0YGHyhFd9+v7L40o8TsvCcZdP5wxe/HtTy
+         O9mQ==
+X-Forwarded-Encrypted: i=1; AHgh+RovBBjxRJTSYKCyPDN6NLt5RPMSYhwLLweCsZX5YXJS+RdHjct4EWfXMTYaev+LMvnAjD5ej7w=@lists.linux.dev
+X-Gm-Message-State: AFuF++l35io9Ls/1ZngpqO2jQk35L7XzuMq9NCNVn1kWkxlohDiHiEWT
+	DOr4zlmMGhMslyjS3nMR1JlkoDmXLb6FwgSM1613G9SVrcD4MdoT++L/sr6YhMCwJBSCFNongrt
+	3iUCPNS6FIc9W4JOIkaKJwQWmmw==
+X-Received: from plpl10.prod.google.com ([2002:a17:903:3dca:b0:2d2:c22c:7b8a])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:903:90d:b0:2d3:6cb4:e79e with SMTP id d9443c01a7336-2d64d2f0e55mr17242035ad.5.1787268759872;
+ Thu, 20 Aug 2026 16:32:39 -0700 (PDT)
+Date: Thu, 20 Aug 2026 23:32:33 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ampPd9szwRoGKwds@google.com>
+Mime-Version: 1.0
+X-B4-Tracking: v=1; b=H4sIAJGOh2oC/43NwQ6DIAyA4VcxnMcilSl42nssO6gUJJlgwJEtx
+ ncfettl2fFv2q8riRgsRtIWKwmYbLTe5ahOBRnGzhmkVuUmUEJdCiaomXCiztOAyzM4Ond5pWZ
+ cQtOB1LIh+XIOqO3rUG/33KONiw/v40li+/S3lxgtKddCyUqiVv1wNd6bB54HP5EdTPAHAhm5g BSag+Ky77+Qbds+wNxaIPwAAAA=
+X-Change-Id: 20260818-gmem-no-return-page-614927a29f97
+X-Developer-Key: i=ackerleytng@google.com; a=ed25519; pk=sAZDYXdm6Iz8FHitpHeFlCMXwabodTm7p8/3/8xUxuU=
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1787268758; l=3107;
+ i=ackerleytng@google.com; s=20260225; h=from:subject:message-id;
+ bh=0qkgLp/4gNYJUuC928LKmD9dsDMVKNfciXFJMMiMswQ=; b=ogJoOeNVzQpGoZquHAyFAMhLUlsTEwH4nWVvd8g1viOFNq1LGLdgW09j6Da0GMCMrYkPKCI0R
+ YUrVrSgZ40hDPh7cUE96XyRxIlKhPEVMZJb7/gE2D0pbDbN+uO8UwO2
+X-Mailer: b4 0.16.0
+Message-ID: <20260820-gmem-no-return-page-v3-0-3bf8f80a7b4d@google.com>
+Subject: [PATCH v3 0/4] Stop returning struct page from guest_memfd PFN lookup
+From: Ackerley Tng <ackerleytng@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Ashish Kalra <ashish.kalra@amd.com>, 
+	Michael Roth <michael.roth@amd.com>, Brijesh Singh <brijesh.singh@amd.com>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, David Hildenbrand <david@kernel.org>, Fuad Tabba <tabba@google.com>, 
+	Yan Zhao <yan.y.zhao@intel.com>, "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>, 
+	Vishal Annapurve <vannapurve@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	Ackerley Tng <ackerleytng@google.com>
+Content-Type: text/plain; charset="utf-8"
 
-On Wed, Jul 29, 2026 at 12:07:35PM -0700, Sean Christopherson wrote:
-> On Tue, Mar 31, 2026, Vipin Sharma wrote:
-> > +# Default testcases for KVM selftests runner will be generated in this directory.
-> > +DEFAULT_TESTCASES = testcases_default_gen
-> 
-> That's a cumbersome name.  It was also written by Yoda :-) How about default_testcases?
-> 
+KVM currently expects kvm_gmem_get_pfn() to return a refcounted struct
+page. Callers (such as x86 TDP MMU, arm64 Stage-2 fault handler, and SEV-SNP
+VMSA / RMP handlers) hold this refcount across page fault handling.
 
-No fun, you are!
+CoCo shared-to-private conversion handling must inspect folio refcounts to
+ensure exclusive ownership by guest_memfd. A concurrent guest page fault
+taking a temporary reference on the folio causes conversions to fail due to
+an elevated refcount.
 
-> > +
-> >  EXTRA_CLEAN += $(GEN_HDRS) \
-> >  	       $(LIBKVM_OBJS) \
-> >  	       $(SPLIT_TEST_GEN_OBJ) \
-> >  	       $(TEST_DEP_FILES) \
-> >  	       $(TEST_GEN_OBJ) \
-> > +	       $(OUTPUT)/$(DEFAULT_TESTCASES) \
-> >  	       cscope.*
-> >  
-> >  $(LIBKVM_C_OBJ): $(OUTPUT)/%.o: %.c $(GEN_HDRS)
-> > @@ -363,3 +367,23 @@ cscope:
-> >  	find . -name '*.c' \
-> >  		-exec realpath --relative-base=$(PWD) {} \;) | sort -u > cscope.files
-> >  	cscope -b
-> > +
-> > +# Generate runner testcases in DEFAULT_TESTCASES directory.
-> > +# $(OUTPUT) is either CWD or specified in the make command.
-> > +tests_install: list_progs = $(patsubst $(OUTPUT)/%,%,$(TEST_GEN_PROGS))
-> > +tests_install:
-> 
-> This is very much *not* an install.  In fact, install is broken, because the
-> runner isn't added to TEST_FILES.
+While this refcount is also taken on host userspace page faults, that
+refcount is taken on behalf of the host userspace page tables. This
+refcount will be dropped when conversions unmaps the page. Either way, once
+there's an mmap() or userspace mapping, the pages are open to way more
+refcounts, transient or not. This series focuses on just dropping refcounts
+before handing KVM a page.
 
-I think this will also be not a good approach if we are moving towards
-opt-in. I added another option in your FIXUP below.
+guest_memfd already notifies KVM of page invalidations, so callers within
+KVM only need to respect the MMU invalidation protocol to safely rely on
+guest_memfd for page presence.
 
-> 
-> Another issue with install is that it flattens the directory structures, i.e.
-> drops the $ARCH/ subdirectories.  That causes issues for the default.test testcases
-> due to them using partially qualified paths.
-> 
-> And coming back to this with fresh eyes, I don't love generating the testcases
-> for the "normal" build.  It necessitates adding default.test to .gitignore,
-> effectively requires copying the runner to the output directory, and is pure
-> noise for folks that don't want to utilize the runner.
+guest_memfd already notifies KVM of page invalidations, so users of guest_memfd
+within KVM only need to respect the MMU invalidation protocol to safely rely on
+guest_memfd to ensure page presence.
 
-Yes, this is true.
+This series first prepares the SEV-SNP handlers by treating unassigned RMP
+entries as benign races on PSMASH failure (which can occur on concurrent
+truncation) and dropping page references early in the RMP fault and VMSA reload
+paths. It then updates kvm_gmem_get_pfn() to drop the folio reference internally
+and stop returning a struct page pointer across x86 and arm64.
 
-> 
-> Rather than generate testcases for the default build, what if we make this 100%
-> opt-in, and take a hard dependency on install?  That should obviate the need for
-> ignoring default.test, because if someone is silly enough to install testcases
-> in the source tree, they get to deal with the noise.
-> 
-> And we can commit to having the default testcases provide completely unqualified
-> paths, so that the Just Work with the flattened output.  If someone wants to run
-> with an unflattened tree, then we should update the runner itself to handle
-> multiple paths, a la the actual PATH variable.
-> 
-> The other nice thing is that we can make the runner opt-in, without requiring the
-> user to run multiple make commands, by chaining testcases => install => all.  If
-> we try to generate testcases as an optional step to the normal build, then we'll
-> end up being able to run install without having generated the testcases, which
-> is "fine", but probably not what we want for people that are trying to use the
-> runner.
-> 
-> The obvious downside is that it requires doing an install to get the default
-> testcases, but IMO that's an acceptable tradeoff.
-> 
+Removing struct page from kvm_gmem_get_pfn() also moves KVM closer toward
+supporting memory backends that are not backed by struct page.
 
-I like the opt-in approach. However, there is a subtle difference when
-using 'testcases: install' vs 'all: tests_install'
+This is built off Sean's sample code [1].
 
-Test cases can only be generated with
+[1] https://lore.kernel.org/all/an5RJYTwlYeym--O@google.com/
 
-  make -C tools/testing/selftests/kvm testcases
+Thank you everybody for your quick reviews and testing, I really appreciate
+it!
 
-We will not be able to generate test cases from the selftest directory
-or the source root.
+Changes from v2:
 
-New command will be:
++ Picked up Reviewed-bys and Tested-bys
++ Addressed comments
 
-  make -C tools/testing/selftests/kvm testscases INSTALL_PATH=<path>
+v2: https://patch.msgid.link/20260818-gmem-no-return-page-v2-0-5298f42d49bb@google.com
+v1: https://patch.msgid.link/20260818-gmem-no-return-page-v1-0-4f8d939efdbc@google.com
 
-I think this is fine, considering it is opt-in and user has to know how
-to run it. One advantage is that currently when a user runs:
+Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+---
+Ackerley Tng (2):
+      KVM: SEV: Treat unassigned RMP entry as benign race on PSMASH failure
+      KVM: SEV: Drop page refcount early in VMSA reload
 
-  make -C tools/testing/selftests/kvm install INSTALL_PATH=<path>
+Sean Christopherson (2):
+      KVM: SEV: Drop page refcount early during RMP fault handling
+      KVM: guest_memfd: Stop returning struct page from PFN lookup
 
-They don't get run_kselftest.sh to run those tests. With the new rule,
-they will have a runner to work with.
+ arch/arm64/kvm/mmu.c     |  4 +---
+ arch/arm64/kvm/nested.c  |  4 ++--
+ arch/x86/kvm/mmu/mmu.c   |  2 +-
+ arch/x86/kvm/svm/sev.c   | 53 ++++++++++++++++++++++++++++--------------------
+ include/linux/kvm_host.h |  6 ++----
+ virt/kvm/guest_memfd.c   |  9 ++------
+ 6 files changed, 39 insertions(+), 39 deletions(-)
+---
+base-commit: 1b731e5ded480bd1e5546aed35584238661ce72e
+change-id: 20260818-gmem-no-return-page-614927a29f97
 
-> > +	$(foreach tc, $(TEST_PROGS), \
-> > +		$(shell mkdir -p $(OUTPUT)/$(DEFAULT_TESTCASES)/$(patsubst %.sh,%,$(tc))))
-> > +	$(foreach tc, $(TEST_PROGS), \
-> > +		$(shell echo $(tc) > $(patsubst %.sh,$(OUTPUT)/$(DEFAULT_TESTCASES)/%/default.test,$(tc))))
-> > +
-> > +	$(foreach tc, $(list_progs), \
-> > +		$(shell mkdir -p $(OUTPUT)/$(DEFAULT_TESTCASES)/$(tc)))
-> > +	$(foreach tc, $(list_progs), \
-> > +		$(shell echo $(tc) > $(patsubst %,$(OUTPUT)/$(DEFAULT_TESTCASES)/%/default.test,$(tc))))
-> > +
-> > +	@if [ ! -d $(OUTPUT)/runner ]; then             \
-> 
-> This is very wrong, as this will fail to pick up any changes made to the runner.
+Best regards,
+--  
+Ackerley Tng <ackerleytng@google.com>
 
-yeah, I think rsync would have been better.
-
-> 
-> All in all, this as fixup?
-> 
-> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-> index 83aa2fe01bac..91d2b21d396f 100644
-> --- a/tools/testing/selftests/kvm/.gitignore
-> +++ b/tools/testing/selftests/kvm/.gitignore
-> @@ -8,7 +8,6 @@
->  !*.S
->  !*.sh
->  !*.test
-> -default.test
->  !.gitignore
->  !config
->  !settings
-> diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-> index c5821d495ea6..fc9dc41fdbeb 100644
-> --- a/tools/testing/selftests/kvm/Makefile.kvm
-> +++ b/tools/testing/selftests/kvm/Makefile.kvm
-> @@ -1,8 +1,6 @@
->  # SPDX-License-Identifier: GPL-2.0-only
->  include ../../../build/Build.include
->  
-> -all: tests_install
-> -
->  LIBKVM += lib/assert.c
->  LIBKVM += lib/elf.c
->  LIBKVM += lib/guest_modes.c
-> @@ -347,15 +345,13 @@ $(SPLIT_TEST_GEN_PROGS): $(OUTPUT)/%: $(OUTPUT)/%.o $(OUTPUT)/$(ARCH)/%.o
->  $(SPLIT_TEST_GEN_OBJ): $(OUTPUT)/$(ARCH)/%.o: $(ARCH)/%.c
->         $(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
->  
-> -# Default testcases for KVM selftests runner will be generated in this directory.
-> -DEFAULT_TESTCASES = testcases_default_gen
-> +TEST_FILES := $(selfdir)/kvm/runner
-
-Downside of this one is that if someone is not planning to use runner they
-will still get this directory copied.
-
-Should we instead add 'rsync -u' in 'testcases' rule below which can copy
-runner only when it is updated or not present? This would be similar to
-original patch but instead of 'cp' it will be 'rsync' command. This will
-also copy runner when someone is explicitly using it.
-
-I think we should also include 'tests' directory which we are using for
-custom testcases and they also .
-
->  
->  EXTRA_CLEAN += $(GEN_HDRS) \
->                $(LIBKVM_OBJS) \
->                $(SPLIT_TEST_GEN_OBJ) \
->                $(TEST_DEP_FILES) \
->                $(TEST_GEN_OBJ) \
-> -              $(OUTPUT)/$(DEFAULT_TESTCASES) \
->                cscope.*
->  
->  $(LIBKVM_C_OBJ): $(OUTPUT)/%.o: %.c $(GEN_HDRS)
-> @@ -386,21 +382,18 @@ cscope:
->         cscope -b
->  
->  # Generate runner testcases in DEFAULT_TESTCASES directory.
-> -# $(OUTPUT) is either CWD or specified in the make command.
-> -tests_install: list_progs = $(patsubst $(OUTPUT)/%,%,$(TEST_GEN_PROGS))
-> -tests_install:
-> -       $(foreach tc, $(TEST_PROGS), \
-> -               $(shell mkdir -p $(OUTPUT)/$(DEFAULT_TESTCASES)/$(patsubst %.sh,%,$(tc))))
-> -       $(foreach tc, $(TEST_PROGS), \
-> -               $(shell echo $(tc) > $(patsubst %.sh,$(OUTPUT)/$(DEFAULT_TESTCASES)/%/default.test,$(tc))))
-> +DEFAULT_TESTCASES = default_testcases
-> +
-> +testcases: list_progs = $(notdir $(patsubst $(OUTPUT)/%,%,$(TEST_GEN_PROGS)))
-> +testcases: install
-> +       $(foreach tc, $(notdir $(TEST_PROGS)), \
-> +               $(shell mkdir -p $(INSTALL_PATH)/$(DEFAULT_TESTCASES)/$(notdir $(patsubst %.sh,%,$(tc)))))
-> +       $(foreach tc, $(notdir $(TEST_PROGS)), \
-> +               $(shell echo $(tc) > $(patsubst %.sh,$(INSTALL_PATH)/$(DEFAULT_TESTCASES)/%/default.test,$(tc))))
->  
->         $(foreach tc, $(list_progs), \
-> -               $(shell mkdir -p $(OUTPUT)/$(DEFAULT_TESTCASES)/$(tc)))
-> +               $(shell mkdir -p $(INSTALL_PATH)/$(DEFAULT_TESTCASES)/$(tc)))
->         $(foreach tc, $(list_progs), \
-> -               $(shell echo $(tc) > $(patsubst %,$(OUTPUT)/$(DEFAULT_TESTCASES)/%/default.test,$(tc))))
-> -
-> -       @if [ ! -d $(OUTPUT)/runner ]; then             \
-> -               cp -r $(selfdir)/kvm/runner $(OUTPUT);  \
-> -       fi
-> +               $(shell echo $(tc) > $(patsubst %,$(INSTALL_PATH)/$(DEFAULT_TESTCASES)/%/default.test,$(tc))))
-
-All looks good here.
-
-Should I send a next version of this series with the changes you have
-suggested or you wanna take the diff you created and apply before merge?
