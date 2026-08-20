@@ -1,151 +1,124 @@
-Received: from mta0.migadu.com (out-109.mta0.migadu.com [91.218.175.109])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46DDD271443
-	for <kvmarm@lists.linux.dev>; Thu, 20 Aug 2026 14:13:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.109
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAF9346D097
+	for <kvmarm@lists.linux.dev>; Thu, 20 Aug 2026 14:28:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787235227; cv=none; b=rx1V5KPfbpfpIxoXAxye7ZD1+WK5fvnia4StysZiQ/CEJhP6Qnr5IlJBzA7LJfCCgy2qHmR81/vZqGlkT0lpnHdXeiX2mwZi9/XrvOhIFi7S+jhz6jG75X9ZvUzTFX64Nfwki+dRPeKvR/6ajUmEgVp31Qr5Oe9lX3L+bwr+8do=
+	t=1787236133; cv=none; b=pDTuQ5D9GJaFjSrvEc3OhuxWh1zwpctv3WkGAa7jrmlRi6SPXcB7V/h1ZbSMztFW7bTL0lyTOB6zf4IQEDrVHb3zoU82C79t1hzpnYs+wGcuCXoCYRHmWvvrmGS04IQ4ZwC0kEJTLNNHXWkmIi7eLi6bevKrQAXbkh6hTUA9Bho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787235227; c=relaxed/simple;
-	bh=/I2WaGo2nAOXO4n4LbukrKrZ9QkEc8zRDEEn89KjNCM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VkU7MZJyHK3ufZr6NLu8fKidSTdGKGioSv94XYTGyivj7OHROjsWURj66wDYDBjTWrr55/XmHf7hxqzvz+hHucHsRnaGLfYWaDtIqnckeTOe6FtRIhCYo30il/DtBRFpRu2ZY50bytnVBaSCIm/fmRnUIUD1IKq0KgtPKJ8a/1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rzELSdmw; arc=none smtp.client-ip=91.218.175.109
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1787236133; c=relaxed/simple;
+	bh=j7vXC94xLC094gowguZtlDsLgDSpj+ra95W3BzjDxVE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=CQJfJ+iEjowYKnvr1v/iN3nfzYbytFFXk7BsNcOWbhxyuWaWnkR9W8MTvGhdnZNkLS22KXAHTjxSbpxVxQOZGdymO2cDp+oC4Nu0PgZzBLWSE0SAPfEyTlgDcNTkjRrinkF5LVqK4RQlO6wP+qP9JLpy7cGAv4ckjFuqaofIy6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=H7CDUD6w; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rzELSdmw"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=/I2WaGo2nAOXO4n4LbukrKrZ9QkEc8zRDEEn89KjNCM=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1787235222; v=1; x=1787840022;
- b=rzELSdmwyHShl18XM3sM14Y6/hkOv3bP5BUt+ydsjKZ9rfhGC1ZpoqJOU0hy75cBJg7v223u
- L0+mfj0+CUeyvV71wSf6WPf1s+lHK8Ea0V79TqjqMDPsUJXtWvkbw/AmvELsA8P0XXxBD+GO8Yu
- FQMMyrlCQnOH44eAak2iRJ9g=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: from mail-lf1-f47.google.com (209.85.167.47)
-	by smtp.migadu.com with ESMTPS id a5e03baa157cb848;
-	Thu, 20 Aug 2026 14:13:42 +0000
-X-Mizu-Trace-ID: a5e03baa157cb848
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-5b2a73da7e1so11064e87.0
-        for <kvmarm@lists.linux.dev>; Thu, 20 Aug 2026 07:13:38 -0700 (PDT)
-X-Gm-Message-State: AOJu0Ywzevbir1eHZvbrXEJ0a28TCRwXcV7ittTBiBfjnZFIS2tmy5Ai
-	7g6QHJA1Cp7hnOCCtLqCXlEQfaaTVE5UqwE9vE9Xl8pgjHK8cdfO4MJodNcqXQDno8bjKWELIy7
-	XEsQ8w6/rScSzjZz9MecO3MnUIxQhxOTTw6ptZkVX
-X-Received: by 2002:a05:6512:1044:b0:5b1:571f:715f with SMTP id
- 2adb3069b0e04-5b47dd8842dmr247207e87.3.1787235217676; Thu, 20 Aug 2026
- 07:13:37 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="H7CDUD6w"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ABDB0153B;
+	Thu, 20 Aug 2026 07:28:40 -0700 (PDT)
+Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F31903F85F;
+	Thu, 20 Aug 2026 07:28:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1787236124; bh=j7vXC94xLC094gowguZtlDsLgDSpj+ra95W3BzjDxVE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=H7CDUD6wGZ5VKrAa+aKPBjAVtsC54NTefYiyFrrhqBatxPHWP1zaZfdQiSbEdTEes
+	 YhQnNCiKSRNV/geqiVkxRIY6dxZuDf0fE5e4wr7aYUyEf3qtCf7kU9F15d4vI9hMAt
+	 MpI6oNq7/r07ILxe0J+Xnm/z7mldM2NVCf4P+DlA=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Mark Brown <broonie@kernel.org>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Fuad Tabba <tabba@google.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Yao Yuan <yaoyuan@linux.alibaba.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v19 03/14] KVM: arm64: Manage GCS access and registers for guests
+Date: Thu, 20 Aug 2026 15:28:39 +0100
+Message-ID: <aocOi3wjcliZqoe7@LeoBrasDK>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <97ad6e83-b22b-4881-b644-66fa99f68d64@sirena.org.uk>
+References: <aoXamcdKoMynTkpX@LeoBrasDK> <48be9e5d-357a-4863-8682-8b3f34c69723@sirena.org.uk> <aobUGyq8nInJYkdA@LeoBrasDK> <97ad6e83-b22b-4881-b644-66fa99f68d64@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260820125053.2951078-1-fuad.tabba@linux.dev>
- <20260820125053.2951078-3-fuad.tabba@linux.dev> <20260820130302.E89531F000E9@smtp.kernel.org>
-In-Reply-To: <20260820130302.E89531F000E9@smtp.kernel.org>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Thu, 20 Aug 2026 15:13:01 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTzBRdtjWZSuAS1LZTouRZfP4F9Y=Ht1xN1f_kOzwNto0A@mail.gmail.com>
-X-Gm-Features: AcwNN1XQRj8A7CoqHpb1D6TwxDMQ11ZVchz6u7GyIA7RR0c5V2K-tLNtaCsxaMI
-Message-ID: <CA+EHjTzBRdtjWZSuAS1LZTouRZfP4F9Y=Ht1xN1f_kOzwNto0A@mail.gmail.com>
-Subject: Re: [PATCH 2/3] irqchip/gic-v4: Unwind what its_alloc_vcpu_irqs()
- allocated on failure
-To: sashiko-reviews@lists.linux.dev
-Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>, 
-	Marc Zyngier <maz@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-On Thu, 20 Aug 2026 at 14:03, <sashiko-bot@kernel.org> wrote:
->
-> Thank you for your contribution! Sashiko AI review found 1 potential issu=
-e(s) to consider:
->
-> Pre-existing issues:
-> - [High] vgic_v4_init() truncates its_vm.nr_vpes on vgic_v4_request_vpe_i=
-rq() failure, causing a resource leak of previously allocated VPE IRQs and =
-SGIs during teardown.
+On Thu, Aug 20, 2026 at 03:07:14PM +0100, Mark Brown wrote:
+> On Thu, Aug 20, 2026 at 11:16:59AM +0100, Leonardo Bras wrote:
+> > On Wed, Aug 19, 2026 at 05:46:00PM +0100, Mark Brown wrote:
+> 
+> > > This is just because there isn't a preexisting ctxt_has_tcrx() check
+> > > already there, FEAT_GCS architecturally depends on FEAT_TCRX and there
+> > > was a request to make this explicit in the code to try to optimise
+> > > things a bit.  The compiler should skip over both blocks at once if TCRX
+> > > isn't there rather than having two separate tests or static branches.  I
+> > > didn't add new checks where there were none since I expect that to be
+> > > unhelpful for code generation, you'd get the reverse situation and emit
+> > > two checks.
+> 
+> > Humm, but then why saving GCSPR_EL2 does not depend on TCRX/E2H? Or maybe a 
+> > better question, why are not GCSPR_EL2 and GCSCR_EL2 saved in the same 'if' 
+> > clause under ctxt_has_tcrx() (and E2H set), if they are restored in the 
+> > same 'if' clause?
+> 
+> > As you mentioned, GCS depends on TCRX, so it should be fine, but just by 
+> > reading the code I see:
+> > - GCSCR_EL2 :
+> > 	Save if 	GCS=1, TCRX=1, E2H=1
+> > 	Restore if 	GCS=1, TCRX=1
+> > - GCSPR_EL2 :
+> > 	Save if 	GCS=1,
+> > 	Restore if	GCS=1, TCRX=1
+> 
+> > Which looks kind of confusing for the as a first time reader.
+> 
+> > Does it make sense?
+> 
+> I agree that the current situation is a bit hard to follow, I'd actually
+> originally written things without the explict dependency because of that
+> but Marc wanted the optimisation.
 
-https://lore.kernel.org/all/CA+EHjTzf4C6bdwTGWNN1HeapFWEFWm-AJtxi5gQKHekRS2=
-n8Aw@mail.gmail.com/
+Well, I am not against the explicit dependency thing, it just looks odd 
+to me that some save/restore have a dependency and it's counterpart does 
+not. As well as the dependencies for both registers being different.
 
-/fuad
+>  There's similar things with other
+> registers in the current code (eg, the PIE and POE registers are in the
+> same situaton as GCSCR_EL2).  One thing I did miss here is some nesting
+> inside the PIE checks for EL2, I'll update for that.
+> 
 
-> --
->
-> --- Patch [2]: [PATCH 2/3] irqchip/gic-v4: Unwind what its_alloc_vcpu_irq=
-s() allocated on failure ---
-> commit 09380ca1832d1b65e5229cfbb8e1f8ab95b65846
-> Author: Fuad Tabba <fuad.tabba@linux.dev>
->
-> irqchip/gic-v4: Unwind what its_alloc_vcpu_irqs() allocated on failure
->
-> This commit fixes a resource leak in its_alloc_vcpu_irqs() where SGI
-> domains and vPE irqs were not properly freed if the allocation loop
-> failed midway.
->
-> > diff --git a/drivers/irqchip/irq-gic-v4.c b/drivers/irqchip/irq-gic-v4.=
-c
-> > index 754839e409f88..f707a3cb281aa 100644
-> > --- a/drivers/irqchip/irq-gic-v4.c
-> > +++ b/drivers/irqchip/irq-gic-v4.c
->
-> [ ... ]
->
-> > @@ -189,11 +191,14 @@ int its_alloc_vcpu_irqs(struct its_vm *vm)
-> >               vm->vpes[i]->irq =3D vpe_base_irq + i;
-> >               ret =3D its_alloc_vcpu_sgis(vm->vpes[i], i);
-> >               if (ret)
-> > -                     goto err;
-> > +                     goto err_free_irqs;
-> >       }
-> >
-> >       return 0;
-> >
-> > +err_free_irqs:
-> > +     its_free_sgi_irqs(vm);
-> > +     irq_domain_free_irqs(vpe_base_irq, vm->nr_vpes);
-> >  err:
->
-> [Severity: High]
-> This is a pre-existing issue, but does the teardown path in
-> its_free_vcpu_irqs() fully clean up resources if its_vm.nr_vpes gets
-> truncated?
->
-> If vgic_v4_init() in arch/arm64/kvm/vgic/vgic-v4.c fails to request an IR=
-Q
-> via vgic_v4_request_vpe_irq(), it explicitly truncates nr_vpes to avoid
-> calling free_irq() on unrequested IRQs:
->
-> arch/arm64/kvm/vgic/vgic-v4.c:vgic_v4_init() {
->     ...
->     /* Trick: adjust the number of vpes so we know how many to nuke on te=
-ardown... */
->     dist->its_vm.nr_vpes =3D i;
->     break;
->     ...
-> }
->
-> When cleanup subsequently calls its_free_vcpu_irqs(), it relies on this
-> truncated nr_vpes value:
->
-> drivers/irqchip/irq-gic-v4.c:its_free_vcpu_irqs() {
->     ...
->     its_free_sgi_irqs(vm);
->     irq_domain_free_irqs(vm->vpes[0]->irq, vm->nr_vpes);
->     ...
-> }
->
-> Will this sequence leave the previously allocated IRQ domains, fwnodes, a=
-nd
-> SGI domains orphaned for the vCPUs beyond the failure index, since they a=
-re
-> no longer tracked by the truncated nr_vpes count?
->
-> --
-> Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260820125053.29=
-51078-1-fuad.tabba@linux.dev?part=3D2
+Awesome!
+
+> I think what would help here would be to move to generating more of the
+> save/restore sequences rather than open coding them, we could have lists
+> of registers and then use data about the feature dependencies that the
+> architecture has (hopefully it's already in the MRS, I didn't check) to
+> generate these optimised feature checks rather than having to open code
+> them.  Possibly even list features and generate some of the register
+> lists, though that would need far more special case handling and it's
+> *much* less clear if there could be a benefit.
+
+Yeah, that would automatize the feature dependency for register loading, 
+but maybe code would not be that clear on how it works? I have questionable 
+taste, though.
+
+Thanks!
+Leo
