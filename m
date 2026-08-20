@@ -1,163 +1,112 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4BEC3EDE72;
-	Thu, 20 Aug 2026 11:18:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1E3341A571;
+	Thu, 20 Aug 2026 11:30:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787224720; cv=none; b=NalypPQARQFcKChbXMIXvYKXrPNMVONS45IaCT/Cdw3ayqYg0mNMf/aB5C/zgURaMptyfzBM7j15wEmI7duMG8WD/wvassxCL+FhBXWOLkEIlU5FlG35r105wJbrt4HKtrJ1JwCWKugzRriRZg97lA20oGEq5Xu3nnwG3AlagvE=
+	t=1787225411; cv=none; b=hr5b6jg4LAMuAHYd6TSu4XcsMUI5xjAz3QM5usxRzeLSvT6BxyymkhebX/2euuSvNhQoWLOewrrpgrvA3WhQwDs/BmA+3PD6qr1I6ENmK/TqzHo0Fg6yv8HEIuADJ5xaUHQGGWw7JZ58v6z+UQ0j2Rsr4m1jDg+ZrnPyUxOxYLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787224720; c=relaxed/simple;
-	bh=SdEAhDJE3ceKTkP+KHkZa5VUf6xd31d914SRKQNJZ5c=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=MMpnrswTOSlNu+KvfdcP4F/JkVGy+eZ8hQKs8iloeAb6Ge0i5EwSuNsWdPP/YwJj3yWJHo2uGohbm6aNMVYkLdoCplLtl/Xo4FhfuOk7irmmSSb3reZ4Ime5cmbd4mLclyyN8BU1/FWlCLkE4tb+OMFrSYX2wlkYKq3zbmol7fQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N4ejpgkc; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1787225411; c=relaxed/simple;
+	bh=x/DK1djQrP4aArL2cm7yHVkhGnuwCsxaQs4emL4I4fk=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=M0XGFn7P2BzZqH14jbcBZzMuczCAOwFZk4QY/75v/HfjEZJy8bUx2+3MVFxadO6KNU/uw2l3ZgjJBunHQ77AOlBc44olLR2LEr5c9+GiqzimfM5GsIYYwa5sGBU/z7MxePTZebISAUEzkRuD3waFIN+2gvtIBE+BJijMDKetXUk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Alv0Uksx; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N4ejpgkc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10A531F000E9;
-	Thu, 20 Aug 2026 11:18:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Alv0Uksx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E48F1F00A3D;
+	Thu, 20 Aug 2026 11:30:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787224713;
-	bh=kD8M/YKHqWqzGIENajqOC2rY0txazHy/e/Ja7hOOoXE=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=N4ejpgkcSr7xuovl0VUw3yUMsE5hXE63S3pSHaRM7XjXdVv/+Brt0GYH7OKMHkg+W
-	 QMy1BeBvHx0o3sXHvln8dA8ma/oYy4+2Zyl0fDHb11veUnnYoAQyUePu6qPwMnxJnc
-	 ljUeDCitQA/l7zP1BsEnJ9QYTBZKypvZ46isguSOlpNj8oZlXo29rpaMuLX73m6B+x
-	 /f6Q5SaTCtcfgXiKmpncrMXtkZE6urbY8H2nenEICEeiNnVuZCcz3V3XWYGQBmuuco
-	 GVnVaCIN85PNKewAUOYrH943fuMrZuVKIPvJZZtdo9fgYiijyrjFoU0MzgkmVv28nm
-	 3dAf1vXRPuUNA==
-X-Mailer: emacs 30.2 (via feedmail 11-beta-1 I)
-From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: Kameron Carr <kameroncarr@linux.microsoft.com>,
-	linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Cc: Alexey Kardashevskiy <aik@amd.com>,
+	s=k20260515; t=1787225410;
+	bh=yxMhTRLdavM3BDMahtX3m4KRGa90dfWMFnclmxcH/Kc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=Alv0UksxLwqA1XA9KRzroRLJVP9RPkvI9b/GgKz8BqbAjhySnF/bFcPCihvnMghLL
+	 0aoeQMch6YxbIKM4dy/oVd0WKACWE/BE+50wazKP/MqO++M1rEDuyg2aHupZXprcBl
+	 OsaIwXZioOb5hiVLOoXu3xsoG8Ys+MOHzH7RwlSxYM206gEIGvr/f3MwQ5Ez7YbyCM
+	 HJw0Souj6735YZ/3knzR8wKA7HRgHmF9NmD0b4Sj434T9fSG9/mIajTdEUP+P7TeNo
+	 kjtBB11Z5n+E6zp6t0v0uSD7KC7A0ml2vYbB861QNnnNiJZBUQ3qgO6UfxBepzoe0U
+	 vWMyish1q5x/A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wx0yG-0000000HGwR-10ar;
+	Thu, 20 Aug 2026 11:30:08 +0000
+Date: Thu, 20 Aug 2026 12:32:39 +0100
+Message-ID: <87y0e1ni20.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Leonardo Bras <leo.bras@arm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Jonathan Cameron <jic23@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Samuel Ortiz <sameo@rivosinc.com>,
-	Steven Price <steven.price@arm.com>,
-	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
 	Will Deacon <will@kernel.org>,
-	Xu Yilun <yilun.xu@linux.intel.com>
-Subject: Re: [RFC PATCH v4 08/11] coco: guest: arm64: Verify DA evidence
- with RSI_VDEV_GET_INFO digests
-In-Reply-To: <da92b216-e4ee-4392-9a35-de7bc1683f83@linux.microsoft.com>
-References: <20260427082805.931832-1-aneesh.kumar@kernel.org>
- <20260427082805.931832-9-aneesh.kumar@kernel.org>
- <da92b216-e4ee-4392-9a35-de7bc1683f83@linux.microsoft.com>
-Date: Thu, 20 Aug 2026 16:48:23 +0530
-Message-ID: <yq5alda1vy4g.fsf@kernel.org>
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Fuad Tabba <tabba@google.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Yao Yuan <yaoyuan@linux.alibaba.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v19 04/14] KVM: arm64: Ensure GCS memory effects are visible
+In-Reply-To: <3cc4cccd-1a4a-487e-8ac6-9bbbc9713e58@sirena.org.uk>
+References: <20260812-arm64-gcs-v19-0-9105afd828ac@kernel.org>
+	<20260812-arm64-gcs-v19-4-9105afd828ac@kernel.org>
+	<aoXmfz5pPwRYRKTO@LeoBrasDK>
+	<3cc4cccd-1a4a-487e-8ac6-9bbbc9713e58@sirena.org.uk>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, leo.bras@arm.com, catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, shuah@kernel.org, tabba@google.com, oupton@kernel.org, peter.maydell@linaro.org, yaoyuan@linux.alibaba.com, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Kameron Carr <kameroncarr@linux.microsoft.com> writes:
+On Wed, 19 Aug 2026 19:08:01 +0100,
+Mark Brown <broonie@kernel.org> wrote:
+>=20
+> On Wed, Aug 19, 2026 at 06:23:11PM +0100, Leonardo Bras wrote:
+>=20
+> > You state that we do _not_ use GCS in the hypervisor, nor in the host.
+> > I understand that we GCSB() when we exit the vcpu context, but why woul=
+d we=20
+> > need to GCSB() before getting back in?
+>=20
+> > If cpus will GCSB() on guest_exit, and host/hyp does not use GCS, there=
+=20
+> > should be no GCS pending operation at the entry point.
+>=20
+> That's there to ensure that updates written by another PE are seen,
+> following the same pattern as DDI0487 M.c K10.6.5 example K10-8 (or the
+> prior migration between PEs example, that has barriers due to the stack
+> switch operations rather than as distinct instructions).
 
-> On 4/27/2026 1:28 AM, Aneesh Kumar K.V (Arm) wrote:
->
->> +struct rsi_vdevice_info {
->> +	union {
->> +		struct {
->> +			u64 flags;
->> +			u64 id_index;
->> +			union {
->> +				u8 hash_algo;
->> +				u64 padding0;
->> +			};
->> +			u64 lock_nonce;
->> +			u64 meas_nonce;
->> +			u64 report_nonce;
->
-> Nit:
-> I found the name `lock_nonce` confusing. I originally assumed this was the
-> nonce passed in when calling RHI_DA_VDEV_GET_MEASUREMENTS. The new RSI spec
-> (2.0 beta 3) names these lock_seq, meas_seq, report_seq. Consider matching
-> these names since the values represent sequence counters and to
-> differentiate them from the nonce used in RHI_DA_VDEV_GET_MEASUREMENTS.
->
+This makes no sense at all. The guest itself is in charge of its own
+coherency.
 
-Will switch to that name.
+=46rom the PoV of the hypervisor, this only needs to be guaranteed when
+a vcpu is migrated from one physical CPU to another, as this is
+invisible to the guest.
 
->
->> +			union {
->> +				u8 format_type;
->> +				u64 padding1;
->> +			};
->> +			u64 format_version;
->> +			union {
->> +				u8 state;
->> +				u64 padding2;
->> +			};
->> +
->> +		};
->> +		u8 padding3[0x80];
->> +	};
+Given that this can only happen on in the interval between vcpu_put()
+and vcpu_load(), the sole location where this could make any sense is
+at vcpu_put() time. And even that can be relaxed in the NV case, where
+we transition between ELs rather than CPUs.
 
-...
+Hammering things in the run loop is both expensive and pointless.
 
->> +static int cca_apply_evidence_report_range(struct pci_dev *pdev,
->> +		struct pci_tsm_mmio *mmio, bool map)
->> +{
->> +	int i, ret;
->> +	struct resource *res;
->> +	unsigned long mmio_flags = 0; /* non coherent, not limited order */
->> +	int vdev_id = rsi_vdev_id(pdev);
->> +	struct pci_tsm_mmio_entry *entry;
->> +	struct cca_guest_dsc *dsc = to_cca_guest_dsc(pdev);
->> +
->> +	for (i = 0; i < mmio->nr; i++) {
->
-> In the tsm unlock code path cca_tsm_unlock() ->
-> cca_unmap_evidence_report_range() -> cca_apply_evidence_report_range()
-> there is no null pointer check on mmio / dsc->pci.mmio.
->
-> dsc->pci.mmio is only initialized in the tsm accept path, so if the device
-> is locked then unlocked without an accept, this will lead to a null pointer
-> dereference.
->
+	M.
 
-I already have a fix for it in my development branch.
-
-
-modified   drivers/virt/coco/arm-cca-guest/arm-cca.c
-@@ -489,13 +489,15 @@ static void cca_tsm_unlock(struct pci_tsm *tsm)
- 	}
- 
- 	cca_device_unlock(tsm->pdev);
--	pci_tsm_mmio_teardown(cca_dsc->pci.mmio);
-+	if (cca_dsc->pci.mmio)
-+		pci_tsm_mmio_teardown(cca_dsc->pci.mmio);
- 
- err_out:
- 	/*
- 	 * No error handling from this function. Leave the device locked
- 	 */
--	pci_tsm_mmio_free(tsm->pdev, cca_dsc->pci.mmio);
-+	if (cca_dsc->pci.mmio)
-+		pci_tsm_mmio_free(tsm->pdev, cca_dsc->pci.mmio);
- 	kfree(cca_dsc);
- }
- 
-modified   drivers/virt/coco/arm-cca-guest/rsi-da.c
-@@ -155,7 +155,9 @@ int cca_unmap_evidence_report_range(struct pci_dev *pdev)
- 	struct cca_guest_dsc *dsc = to_cca_guest_dsc(pdev);
- 	struct pci_tsm_mmio *tsm_mmio = dsc->pci.mmio;
- 
--	return cca_apply_evidence_report_range(pdev, tsm_mmio, false);
-+	if (tsm_mmio)
-+		return cca_apply_evidence_report_range(pdev, tsm_mmio, false);
-+	return 0;
- }
- 
- int cca_verify_digest(u64 hash_algo, uint8_t *report,
-
-
--aneesh
+--=20
+Jazz isn't dead. It just smells funny.
