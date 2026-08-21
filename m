@@ -1,96 +1,121 @@
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2C6B30F927;
-	Fri, 21 Aug 2026 03:42:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mta0.migadu.com (out-47.mta0.migadu.com [91.218.175.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4968E37B00E
+	for <kvmarm@lists.linux.dev>; Fri, 21 Aug 2026 06:44:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787283751; cv=none; b=trI8UIFWIXta7nqm7o55SYRlMa6R70lyzEC5l6ylNFhZ4R92TyT+/rlzEZdnwUwHdULluu+cAgG402YziOKh+c/UC8o+mXohn0iXUecU0TZQXFvUVbZ/d7v4gpC0IH+DIX0GXNkhUy3tLmzAgVbz6Mlw+1Ajb+9hB7Sn5LL71zM=
+	t=1787294695; cv=none; b=VjfePK0jzbrJZUglc4k5IUHqpp3E8WjTdjabO3s4+I27D6VKauPH54rn3vMZsnZESm8jBGzu8DdeyghfrTVrcvMl88GgrCULCQPeHaJRQobYA2IX9zGfQlisxYcw5rO5ViOskiX/GxlE+FA2iSRfaHyF/T7WMBL5PVcn+7Kg0ag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787283751; c=relaxed/simple;
-	bh=iGDLWLBmuHaguIg1fif8pUs+Vwdf6nReTT4xsi+tWYY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QVZax8MWR+5BEv51hk942H6HhGUUG+eZlqBTaffig3VVG4RPdV5dM2x/mU9B7CfZGrHI+Am3LCg8UrrMlLS/YyBfr31APbdPkPErxrvetmN6PyI095xF6bFRv46yN1sFQLheJP7DZvTxpUCTn+KjsfueNwVo2kztMrtjSGFxelc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=Y5MrYufB; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+	s=arc-20240116; t=1787294695; c=relaxed/simple;
+	bh=7kUZ/3+clATTzGfYeY9/JvP0FEHdJchyOMerj2uhDzk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=CVTYIM/78degmqWgGITqG3BmMv1/xgLV4fyw2LxSJkyAKBEN7LRYwnUZ0vmqRfgzKZnHDAsOEztd253a4qmQ39a9ub8JB/+O0vtDSmvF4cdYheyNPfao71G32h5WCHqBtYEZeJp9xHSnQmfptIXJHLXMtQf0ZgqtbAaYARx3p/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=h+d68IfN; arc=none smtp.client-ip=91.218.175.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="Y5MrYufB"
-Received: from [192.168.0.15] (unknown [4.194.122.162])
-	by linux.microsoft.com (Postfix) with ESMTPSA id DEE4220B7128;
-	Thu, 20 Aug 2026 20:41:53 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com DEE4220B7128
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1787283720;
-	bh=gcge2qUWUjrfLVf+Vom7hfdT2yW5yXg+cm1A2GuzH7Q=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Y5MrYufBFbdpjXo/97GZO4RQUeLoaCJUpVw5CUkj7N/WoHU9HNnYE3YY4wG0NDsg3
-	 CBCKzJL8Lktrj6nWItyozwo/643jeKgmG3hY32hsODUNhd7DmAv2QbU9uwOK1ipPBQ
-	 TW/TJvLorGp5Y1ILe7gC2vaLePTGxfe/S8Dcucu8=
-Message-ID: <3b019c40-e91f-4670-86bb-10c2cd1047a8@linux.microsoft.com>
-Date: Thu, 20 Aug 2026 20:42:19 -0700
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="h+d68IfN"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=7kUZ/3+clATTzGfYeY9/JvP0FEHdJchyOMerj2uhDzk=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1787294691; v=1; x=1787899491;
+ b=h+d68IfNnOkKYoiger1sCB8mu51rPUDsCw52+G+I2Rqm+f7iSLN0bmzUUtJHb3hikT1JRljb
+ NP8gQpAAymWMBvgGLWVGveTVVpEvJLFsBtVXRKIQJFA7fQvq0TxF969YKBmmTN75W5PKq86P4X2
+ l8X8+BGN5EmHU/eVZZEgR9PU=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: from claudy.lan (37.156.72.212)
+	by smtp.migadu.com with ESMTPS id 873a31f318a0fe34;
+	Fri, 21 Aug 2026 06:44:50 +0000
+X-Mizu-Trace-ID: 873a31f318a0fe34
+X-Migadu-Flow: FLOW_OUT
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>
+Cc: Eric Auger <eauger@redhat.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Will Deacon <will@kernel.org>,
+	Sascha Bischoff <sascha.bischoff@arm.com>,
+	Sebastian Ene <sebastianene@google.com>,
+	Fuad Tabba <tabba@google.com>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 0/4] KVM: arm64: vgic-its: Make the ITS table save reliable
+Date: Fri, 21 Aug 2026 07:44:41 +0100
+Message-Id: <20260821064445.615838-1-fuad.tabba@linux.dev>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v4 03/11] coco: guest: arm64: Add Realm Host Interface
- and guest DA helper
-To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
- linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Cc: Alexey Kardashevskiy <aik@amd.com>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Dan Williams <dan.j.williams@intel.com>, Jason Gunthorpe <jgg@ziepe.ca>,
- Jonathan Cameron <jic23@kernel.org>, Marc Zyngier <maz@kernel.org>,
- Samuel Ortiz <sameo@rivosinc.com>, Steven Price <steven.price@arm.com>,
- Suzuki K Poulose <Suzuki.Poulose@arm.com>, Will Deacon <will@kernel.org>,
- Xu Yilun <yilun.xu@linux.intel.com>
-References: <20260427082805.931832-1-aneesh.kumar@kernel.org>
- <20260427082805.931832-4-aneesh.kumar@kernel.org>
-Content-Language: en-US
-From: Kameron Carr <kameroncarr@linux.microsoft.com>
-In-Reply-To: <20260427082805.931832-4-aneesh.kumar@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 4/27/2026 1:27 AM, Aneesh Kumar K.V (Arm) wrote:
-> - Add  guest-side rhi-da helper that drives the vdev TDI state machine
->   via RHI host calls and translates the firmware status codes
+Hi folks,
 
-...
+Changes since v1 [1]:
+  - Free the LPI translation cache in vgic_mmio_write_its_baser() too,
+    inside the its_lock section. (Eric)
+  - Reworded patch 1 to name the register the write is to. (Eric)
+  - Rebased onto kvmarm/next.
 
-> +
-> +bool rhi_has_da_support(void)
-> +{
-> +	int ret;
-> +
-> +	struct rsi_host_call *rhi_call __free(kfree) =
-> +		kmalloc(sizeof(*rhi_call), GFP_KERNEL);
+Marc pointed out on the v2 ITS series [2] that patch 3 fixed the wrong
+end of the problem: KVM should drop the collections when the guest
+changes the table that described them, rather than validating them at
+save time. He also called that patch's -EINVAL a mistake, since it
+aborts a save userspace has to be able to issue. This series does both,
+following his answers [3] to the two open questions: purge the whole
+list, and skip the offending device rather than fail.
 
-Same comment as before that kzalloc is best practice for struct
-rsi_host_call.
+vgic_mmio_write_its_baser() now frees the cached devices or collections
+whenever the stored register value changes, not only when VALID is
+cleared, and drops the translation cache with them. It tests for a
+change rather than a write because the ITS driver rewrites an unchanged
+GITS_BASER<n> on resume. With that in place the check patch 3 added is
+unreachable, so it is reverted, and vgic_its_save_device_tables() skips
+a device the table can no longer address instead of failing the save.
 
-> +	if (!rhi_call)
-> +		return -ENOMEM;
+compute_next_devid_offset() now calls vgic_its_check_id(), which reads
+guest memory for an indirect table, so the save does 2n reads rather
+than n. It stays linear, as the scan stops at the first
+reachable successor. Patch 1's Fixes: tag names a v4.15 commit, so it
+will be picked up for stable. Drop the tag if that is not wanted.
 
-Returning an error value in a bool function will evaluate to true. This is
-probably not your intended behavior.
+Patches 1 and 3 apply to v7.2 unchanged, but patch 2 reverts a commit
+only in kvmarm/next, so the series is based there.
 
-Regards,
-Kameron
+Tested on QEMU: the new selftest, vgic_irq, vgic_lpi_stress and boots.
+Both cases of the new selftest reset and restore the tables they saved,
+and both fail without the series.
 
-> +
-> +	rhi_call->imm = 0;
-> +	rhi_call->gprs[0] = RHI_DA_FEATURES;
-> +
-> +	ret = rsi_host_call(rhi_call);
-> +	if (ret != RSI_SUCCESS || rhi_call->gprs[0] == SMCCC_RET_NOT_SUPPORTED)
-> +		return false;
-> +
-> +	/* For base DA to work we need these to be supported */
-> +	if ((rhi_call->gprs[0] & RHI_DA_BASE_FEATURE) == RHI_DA_BASE_FEATURE)
-> +		return true;
-> +
-> +	return false;
-> +}...
+Based on kvmarm/next (aa8e5dc6a7a2a).
+
+Cheers,
+/fuad
+
+[1] https://lore.kernel.org/all/20260819102809.310708-1-fuad.tabba@linux.dev/
+[2] https://lore.kernel.org/all/87ecg9owwa.wl-maz@kernel.org/
+[3] https://lore.kernel.org/all/86bjaz5s6v.wl-maz@kernel.org/
+
+Fuad Tabba (4):
+  KVM: arm64: vgic-its: Free the caches when GITS_BASER changes
+  Revert "KVM: arm64: vgic-its: Don't save collections the table cannot
+    hold"
+  KVM: arm64: vgic-its: Skip unreachable devices instead of failing the
+    save
+  KVM: arm64: selftests: Add ITS table save tests
+
+ arch/arm64/kvm/vgic/vgic-its.c                |  46 +-
+ tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+ .../selftests/kvm/arm64/vgic_its_save.c       | 441 ++++++++++++++++++
+ 3 files changed, 469 insertions(+), 19 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/arm64/vgic_its_save.c
+
+-- 
+2.39.5
+
