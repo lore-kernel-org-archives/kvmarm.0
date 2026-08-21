@@ -1,263 +1,337 @@
-Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com [209.85.210.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C905361640
-	for <kvmarm@lists.linux.dev>; Fri, 21 Aug 2026 15:34:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.199
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16972331EDF
+	for <kvmarm@lists.linux.dev>; Fri, 21 Aug 2026 15:59:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787326496; cv=none; b=qA7xoQb8QWdvfmceXEmwoNW1q+v7zQttEjgXeJfSKT8hAWcxMI74hzGOvBiAdNAmTaJeSVe9O/ATmsU+ZgpNKrv1+blLv9LeJdT9Ny6m7lQydA0nibLiNZ53+sTCFofpfTcDDlWBeytcJmXMk1AFvQ9gX9P4soe5ImmB9KhAbvk=
+	t=1787327949; cv=none; b=LQ++09xMNnyol7kbKqTy2P4OCsXBMzfK/E9apqBZsA/g53db2wf78qs15zjhsnsyvStWkQ1sLQllzlQGhcEdzd+jTNucsxSYpNbBwmQnFoBsLz4IwntyMH9MXYslZ4QimNMyBaesPgU3NkLi1ZymXfcYbqkqgYzTgW30v4cX6u4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787326496; c=relaxed/simple;
-	bh=GkJXWIi/YBaGv7wnccaUrCemSFcPpUY5fH1FwbC+Jqc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=txbmTrHFMu9Lg+y0KUImHGb87c2lTrmy9KUk8+Wbal2BHjCmtOa1csDcL/g3UqYALBr4MiY+XraUrUvf5ZiXUMetqg5m+eBbXM2X7nh3xMc+McGGtSzG0JicpH+Rn70xn3qy6ikiTmkvvGz+EF+dCfgRCON+GBtOoPQy0D4aX+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HWFqPyvQ; arc=none smtp.client-ip=209.85.210.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1787327949; c=relaxed/simple;
+	bh=zganBHf1DqBEbwzwbMgtNypP1hGIZU7g2HVwvGxyHto=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=u2IypqlrrTuAwmVZbMV1+zPags4jt9FSd0EwyEFlRvV3cCGodBUeyQ1X37VAvhZw87WLM0yTAQy90eVMG+WnDw09j3WfrsJlLypOikjka3WWEQf7OWXGe/bI3UiEb6KNULV6sbP+Qf5dNcH9KnI+d1z02oZFTulUKyUB/eTHL3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=uUNGwvXK; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HWFqPyvQ"
-Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-848662cd2a1so1144647b3a.2
-        for <kvmarm@lists.linux.dev>; Fri, 21 Aug 2026 08:34:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1787326492; x=1787931292; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=ti5oxrQTNw6Tr45mwB3Y4z0EOV4HeTrBLFVAFF1S+N4=;
-        b=HWFqPyvQd1Svcy5dNMGMCjxm0k/hQDdFFfaxHu1/xcmURBE+6KT9Byt9p+aGa19x/b
-         HJjIz4bYWMioTsjMjdMHOvDgX329bPyN+7EhBF0XaaB1ekpb9ojwwEXHkPgAi1gtubmm
-         WZRfs9h+4CzpqYWPoGayCSfq7bUiekrvDXffxu2jUrtcL2ZBeSaoOviWgnprcSXApkT+
-         MATcQ6ff21ub+3loXvrbNAYnD0x521lNBUYKhU/OlbL49DQ/wiDI6KL16lNB3iK8cYWJ
-         u5E2yoPR+BpWR91Eh6sgd7kWMMq6JK7E/EcdeUjn4XjX1ybMFOqy30y8/5/NRfQem4tZ
-         uV0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787326492; x=1787931292;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=ti5oxrQTNw6Tr45mwB3Y4z0EOV4HeTrBLFVAFF1S+N4=;
-        b=XUve3/LtLP/Y8X5jrL2qT3wXG5Qqo+uvfUMSkGtTI8SVDWJJsAF/W2vLHC6r2kxyhW
-         mmtyInsh7u89+ld0P5NQBpqxXGMncr17CKFboJWbWQeeh7AW/4YQt/6JdtMurDYNQtHp
-         ZNaMUSjo0ijC8Lg6hEuMD9DH0tCa2iXWqYxdJol1xnJjEeNTCZHc36Pcv2yW+SSB4oQS
-         S5CrDKI2+eqpiPBeGPGAncanWBa7xIMGA7Zi4r6rdpxHp2RWfMeSAC4Jl/9LYTxv3hqK
-         u45NZ1onlYbdryvXmuxPIp3HqifVzDqK8nXU5MMB/me0PZaazVb84sg25UtlrvD4NED2
-         Od9g==
-X-Forwarded-Encrypted: i=1; AHgh+Rofn+OmrTls9Mh7gye8YwA1YK8VyvqOVbX4teiEBP1Dyd8VWMJ1EAjOUVhU8PGEQ/7gy84kh9k=@lists.linux.dev
-X-Gm-Message-State: AFuF++k4/M5LEQkqpd5FAX8usn1Qg7eqE8hbJmdJ2UDkbje41TNDp054
-	uD8lvjXZg31+WpNjkqXeN1OaSsJlZfe33cxKtwL5bvToXFtEK/jlXqXhubJq4dMg1wD1tm/G8yh
-	gjCcJfQ==
-X-Received: from pfdc3.prod.google.com ([2002:aa7:8c03:0:b0:84c:2e88:693d])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:14d4:b0:84a:2fff:cef9
- with SMTP id d2e1a72fcca58-851f9f84b8emr10555555b3a.13.1787326491490; Fri, 21
- Aug 2026 08:34:51 -0700 (PDT)
-Date: Fri, 21 Aug 2026 08:34:50 -0700
-In-Reply-To: <2vxzy0dzy4gn.fsf@kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="uUNGwvXK"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4029C176B;
+	Fri, 21 Aug 2026 08:59:02 -0700 (PDT)
+Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 140E23F763;
+	Fri, 21 Aug 2026 08:59:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1787327946; bh=zganBHf1DqBEbwzwbMgtNypP1hGIZU7g2HVwvGxyHto=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=uUNGwvXKQ4Hu0CcNxloVyO4zHtq+RLTjag3i8+EyfHGlEXkbAsig+bMdGxQzzNh2W
+	 Z5KxaV0sgHKgVFTvBi3LS8DYDaTen1Upo+Y7e3UVebrOX+tHHDOpfu1CcWG6g5Y1ro
+	 63DaUpaXJl1SPfzm+L4y9Fh1TjtuURpUTqhBwR+E=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Tian Zheng <zhengtian10@huawei.com>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	maz@kernel.org,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	yuzenghui@huawei.com,
+	wangzhou1@hisilicon.com,
+	yangjinqian1@huawei.com,
+	caijian11@h-partners.com,
+	liuyonglong@huawei.com,
+	yezhenyu2@huawei.com,
+	yubihong@huawei.com,
+	linuxarm@huawei.com,
+	joey.gouly@arm.com,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com
+Subject: Re: [PATCH v4 3/6] KVM: arm64: Add auto DBM support for hardware dirty tracking
+Date: Fri, 21 Aug 2026 16:58:55 +0100
+Message-ID: <aoh1vw0ZdWJf6T4q@LeoBrasDK>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <anmvnclRTPS6an8e@LeoBrasDK>
+References: <amoZY8uGLf1PEpjK@LeoBrasDK> <8e36e2c8-587f-4228-ab13-d6783927a281@huawei.com> <45d76d0d-48e9-46a6-b1f9-691f840eba46@huawei.com> <anBrvILpcSFhW7Wg@LeoBrasDK> <95f1ebd4-be04-4684-be68-388f752a1379@huawei.com> <anDCno9HdVI5UAls@LeoBrasDK> <2070002d-94aa-4a5b-8df1-e8e0f0fd265c@huawei.com> <anHIa5PDnF7r9EA4@LeoBrasDK> <3808f469-5403-4f2e-85f0-8c6ca13068bd@huawei.com> <anmvnclRTPS6an8e@LeoBrasDK>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <anphyjFv3FhF61iB@google.com> <2vxzpkzo51wg.fsf@kernel.org>
- <anssOQFNZ2LfihbU@google.com> <2vxzik5f311e.fsf@kernel.org>
- <anyObKiZIhfok5mk@google.com> <2vxzqzjz1x5f.fsf@kernel.org>
- <aoMcqp0gr06YXAPU@google.com> <2vxzy0e3zgqz.fsf@kernel.org>
- <aoSCCTTBn9D5hqzk@google.com> <2vxzy0dzy4gn.fsf@kernel.org>
-Message-ID: <aohwGv6TRqPg9Dwx@google.com>
-Subject: Re: [PATCH v4 05/11] KVM: LUO: Support VM preservation across live updates
-From: Sean Christopherson <seanjc@google.com>
-To: Pratyush Yadav <pratyush@kernel.org>
-Cc: Tarun Sahu <tarunsahu@google.com>, ackerleytng@google.com, fuad.tabba@linux.dev, 
-	Andrew Morton <akpm@linux-foundation.org>, dmatlack@google.com, 
-	Shuah Khan <skhan@linuxfoundation.org>, Jonathan Corbet <corbet@lwn.net>, david@redhat.com, 
-	Pasha Tatashin <pasha.tatashin@soleen.com>, sagis@google.com, 
-	Paolo Bonzini <pbonzini@redhat.com>, Mike Rapoport <rppt@kernel.org>, Alexander Graf <graf@amazon.com>, 
-	linux-kselftest@vger.kernel.org, andre.przywara@arm.com, michael.roth@amd.com, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, will@kernel.org, 
-	vannapurve@google.com, maz@kernel.org, fvdl@google.com, kvm@vger.kernel.org, 
-	oliver.upton@linux.dev, kvmarm@lists.linux.dev, alexandru.elisei@arm.com, 
-	skhawaja@google.com, aneesh.kumar@kernel.org, linux-doc@vger.kernel.org, 
-	David Hildenbrand <david@kernel.org>, yan.y.zhao@intel.com, kexec@lists.infradead.org, 
-	suzuki.poulose@arm.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-On Fri, Aug 21, 2026, Pratyush Yadav wrote:
-> Hi Sean,
+On Mon, Aug 10, 2026 at 12:01:49PM +0100, Leonardo Bras wrote:
+[> On Wed, Aug 05, 2026 at 11:41:51AM +0800, Tian Zheng wrote:
+> > 
+> > 
+> > On 8/4/2026 7:10 PM, Leonardo Bras wrote:
+> > > On Tue, Aug 04, 2026 at 12:54:16PM +0800, Tian Zheng wrote:
+> > > > 
+> > > > 
+> > > > On 8/4/2026 12:32 AM, Leonardo Bras wrote:
+> > > > > On Mon, Aug 03, 2026 at 09:57:46PM +0800, Tian Zheng wrote:
+> > > > > > 
+> > > > > > 
+> > > > > > On 8/3/2026 6:21 PM, Leonardo Bras wrote:
+> > > > > > > On Mon, Aug 03, 2026 at 12:04:24PM +0800, Tian Zheng wrote:
+> > > > > > > > 
+> > > > > > > > 
+> > > > > > > > On 8/3/2026 9:33 AM, Tian Zheng wrote:
+> > > > > > > > > > > > > > > 09, 2026 at 06:40:23PM +0800, Tian Zheng wrote:
+> > > > > > > > > > > > > > > > -    if (prot & KVM_PGTABLE_PROT_W)
+> > > > > > > > > > > > > > > > +    if (prot & KVM_PGTABLE_PROT_W) {
+> > > > > > > > > > > > > > > >                set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
+> > > > > > > > > > > > > > > > 
+> > > > > > > > > > > > > > > > +        /*
+> > > > > > > > > > > > > > > > +         * No DEVICE filter needed here:
+> > > > > > > > > > > > > > > > relax_perms is only called
+> > > > > > > > > > > > > > > > +         * on FSC_PERM faults. Device pages
+> > > > > > > > > > > > > > > > always get full RW from
+> > > > > > > > > > > > > > > > +         * initial mapping and are never write-protected during
+> > > > > > > > > > > > > > > > +         * migration, so they never trigger a permission fault.
+> > > > > > > > > > > > > > > > +         */
+> > > > > > > > > > > > > > > > +        if (pgt->flags & KVM_PGTABLE_S2_DBM)
+> > > > > > > > > > > > > > > > +            set |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
+> > > > > > > > > > > > > > > > +    } else {
+> > > > > > > > > > > > > > > > +        /*
+> > > > > > > > > > > > > > > > +         * Clear DBM on W→RO downgrade to prevent hardware from
+> > > > > > > > > > > > > > > > +         * silently upgrading RO+DBM back to W+dirty, which would
+> > > > > > > > > > > > > > > > +         * bypass KVM's write tracking and cause data corruption.
+> > > > > > > > > > > > > > > > +         */
+> > > > > > > > > > > > > > > > +        clr |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
+> > > > > > > > > > > > > > > > +    }
+> > > > > > > > > > > > > > > > +
+> > > > > > > > > > > > > > > This block makes it pretty evident that the DBM bit really *is* the
+> > > > > > > > > > > > > > > write permission bit. I'd much rather we
+> > > > > > > > > > > > > > > introduce the concept of dirty
+> > > > > > > > > > > > > > > state to the page table library and migrate the abstract write
+> > > > > > > > > > > > > > > permission to the DBM field, even if we don't have FEAT_HAFDBS.
+> > > > > > > > > > > > > > > 
+> > > > > > > > > > > > > 
+> > > > > > > > > > > > > Ohh, that's an amazing idea!
+> > > > > > > > > > > > 
+> > > > > > > > > > > > Thinking about that again...
+> > > > > > > > > > > > If we adopt the encoding with DBM being the write-permission
+> > > > > > > > > > > > bit, and all
+> > > > > > > > > > > > PTEs have it since the start, how can we have lazy-splitting happening?
+> > > > > > > > > > > > 
+> > > > > > > > > > > > Only way I think of is removing both DBM and S2_S2AP_W bit
+> > > > > > > > > > > > from writable
+> > > > > > > > > > > > PTEs during dirty-track enable, and re-adding them during
+> > > > > > > > > > > > the first write
+> > > > > > > > > > > > fault. If we don't remove the DBM bit, systems with HDBSS
+> > > > > > > > > > > > would just dirty
+> > > > > > > > > > > > it by hardware, without causing a fault.
+> > > > > > > > > > > > 
+> > > > > > > > > > > > DBM=0 would need to happen only in the first write-protect (only on
+> > > > > > > > > > > > lazy-splitting). All other write-protecting would just clean
+> > > > > > > > > > > > the S2_S2AP_W
+> > > > > > > > > > > > bit, as everything is already split.
+> > > > > > > > > > > > 
+> > > > > > > > > > > > Is that what was intended?
+> > > > > > > > > > > > 
+> > > > > > > > > > > > Thanks!
+> > > > > > > > > > > > Leo
+> > > > > > > > > > > > 
+> > > > > > > > > > > Hi Leo,
+> > > > > > > > > > > 
+> > > > > > > > > > > I think the cleanest way to handle this is to simply avoid setting DBM
+> > > > > > > > > > > on block mappings. If we only set DBM on page-level PTEs, then block
+> > > > > > > > > > > mappings will naturally stay DBM=0 and trigger a write fault on first
+> > > > > > > > > > > access — exactly what we need for lazy splitting.
+> > > > > > > > > > > 
+> > > > > > > > > > > When the fault occurs, the block gets split into page-level PTEs, and at
+> > > > > > > > > > > that point we can set DBM=1 on the resulting leaf entries. This way:
+> > > > > > > > > > > 
+> > > > > > > > > > > 1. Lazy split works naturally (fault -> split -> set DBM=1)
+> > > > > > > > > > > 
+> > > > > > > > > > > 2. No need to clear DBM globally at dirty-track enable
+> > > > > > > > > > > 
+> > > > > > > > > > > 3. No special handling for block mappings
+> > > > > > > > > > > 
+> > > > > > > > > > > So I think global DBM is still viable — we just need to filter out block
+> > > > > > > > > > > mappings when setting the DBM bit. That way the lazy split path
+> > > > > > > > > > > is preserved
+> > > > > > > > > > > without extra complexity.
+> > > > > > > > > > 
+> > > > > > > > > > Hi Tian,
+> > > > > > > > > > 
+> > > > > > > > > > Humm, but would not that be contrary to what Oliver suggested:
+> > > > > > > > > > changing the
+> > > > > > > > > > encoding from the PTE for all entries?
+> > > > > > > > > > 
+> > > > > > > > > > (Like, if the PTE is writable, it has to have DBM set)
+> > > > > > > > > > 
+> > > > > > > > > > IIUC what you said, on first faulting of the page in the VM:
+> > > > > > > > > > - If the entry is a page (level-3 leaf) and writable, add DBM
+> > > > > > > > > > - If it's a block entry (leaf but not a level-3), don't add DBM
+> > > > > > > > > > 
+> > > > > > > > > > So after we enable dirty-logging:
+> > > > > > > > > > - a level-3 entry would not fault, using HDBSS, and
+> > > > > > > > > > - a block entry would fault, do the splitting, and add DBM to level-3
+> > > > > > > > > >       entries during the split.
+> > > > > > > > > > 
+> > > > > > > > > > If I got that correct, that would be clean indeed.
+> > > > > > > > > > 
+> > > > > > > > > > But then we would have a different encoding for block entries and page
+> > > > > > > > > > entries. In page entries, DBM could be used to say if the page is
+> > > > > > > > > > writable,
+> > > > > > > > > > but on block entries one would have to look at the 'dirty-bit'.
+> > > > > > > > > > 
+> > > > > > > > > > Would that be ok?
+> > > > > > > > > > 
+> > > > > > > > > > Thanks!
+> > > > > > > > > > Leo
+> > > > > > > > > > 
+> > > > > > > > > Hi Leo,
+> > > > > > > > > 
+> > > > > > > > > My initial concern was that clearing all DBM bits at the start of
+> > > > > > > > > migration would be too expensive, so I thought distinguishing between
+> > > > > > > > > level-3 entries and block entries would be better.
+> > > > > > > > > 
+> > > > > > > 
+> > > > > > > I think we expect it to be expensive, but since we already clean the
+> > > > > > > dirty-bit (ro/rw) bit, we can have both happening in the same write :)
+> > > > > > > 
+> > > > > > > (since we only mark the DBM bit when we fault the memory on lazy-splitting,
+> > > > > > > we are expecting to have the same amount of writes to pagetable as we have
+> > > > > > > before HDBSS, both on faulting and 1st iteration cleaning)
+> > > > > > > 
+> > > > > > Hi, Leo
+> > > > > > 
+> > > > > > Actually, I have thought about this approach too, but if we clear DBM in
+> > > > > > kvm_pgtable_stage2_wrprotect(), then during the first round of
+> > > > > > migration, we will fault and release RO -> W, and then add DBM.
+> > > > > 
+> > > > > Yeah, that's only for lazy-splitting, though.
+> > > > > 
+> > > > > > 
+> > > > > > But next time, when we migrate the dirty pages in round two, we will run
+> > > > > > kvm_pgtable_stage2_wrprotect() again, which will clear DBM again. And
+> > > > > > finally, HDBSS will be useless during migration.
+> > > > > 
+> > > > > Right, on lazy splitting, we have to clean the DBM bit on the
+> > > > > write-protect only if it's a block entry (hugepage).
+> > > > > 
+> > > > > Once it faults for the first time, it will lazy-split, and we don't need to
+> > > > > clean the DBM bit.
+> > > > > 
+> > > > > > 
+> > > > > > > 
+> > > > > > > > > However, I ran a quick test on a 400GB VM (4 vCPUs), and the overhead
+> > > > > > > > > turned out to be around 30ns — which I think is acceptable.
+> > > > > > > > 
+> > > > > > > > Just a quick correction — I misstated the unit in my previous email. The
+> > > > > > > > overhead for clearing DBM on the 400GB VM (4 vCPUs) was around 32 µs, not 30
+> > > > > > > > ns.
+> > > > > > > > 
+> > > > > > > 
+> > > > > > > Oh, that seems more likely :)
+> > > > > > > 
+> > > > > > > Question: is tha above amount of memory initially in Level-1 blocks,
+> > > > > > > level-2 blocks or level-3 pages? (aka: were you using explicit/transparent
+> > > > > > > hugepages?)
+> > > > > > > 
+> > > > > > 
+> > > > > > I'm using transparent hugepages. However, if we were to use level-3 stage-2
+> > > > > > pages with -mem-prealloc enabled in QEMU, I believe the time cost would be
+> > > > > > extremely high — potentially out of our control.
+> > > > > > 
+> > > > > 
+> > > > > Yeah, that's the issue.
+> > > > > For this not to explode like this, we need to mark as RO only when the
+> > > > > entries are blocks AND we are doing lazy splitting.
+> > > > > 
+> > > > > We have:
+> > > > > Mode	DBM	Dirty bit
+> > > > > RO	0	X
+> > > > > WC	1	0
+> > > > > WD	1	1
+> > > > > 
+> > > > > On write-protect:
+> > > > > - Lazy splitting + block entry (hugepage, level 2-) -> RO
+> > > > > - Otherwise					    -> WC
+> > > > > 
+> > > > > On first fault, the block entry will be lazy-splitten, and we can set DBM=1
+> > > > > in every new page.
+> > > > > 
+> > > > > That way we guarantee that we are not faulting level-3 pages unecessarily,
+> > > > > nor need to go through the whole tree setting DBM=1 or DBM=0 on level-3
+> > > > > pages.
+> > > > > 
+> > > > > How does that sound?
+> > > > > 
+> > > > > Thanks!
+> > > > > Leo
+> > > > > 
+> > > 
+> > > > 
+> > > > Hi Leo,
+> > > > 
+> > > > I've also been thinking about this approach: clear
+> > > > KVM_PTE_LEAF_ATTR_HI_S2_DBM when kvm_pgtable_stage2_wrprotect() calls
+> > > > stage2_update_leaf_attrs(). And we can check whether a page is a block
+> > > > page during the page walk, right?
+> > > 
+> > > Hi Tian,
+> > > That was what I was thinking :)
+> > > 
+> > > > 
+> > > > So we can check the page level in the walker callback
+> > > > stage2_attr_walker(), filter there, clear DBM for block pages and
+> > > > preserve DBM on level-3 pages. Something like this:
+> > > > 
+> > > > ```
+> > > > pte &= ~data->attr_clr;      // wrprotect: clears S2AP_W only
+> > > > pte |= data->attr_set;
+> > > > if (ctx->level < KVM_PGTABLE_LAST_LEVEL)
+> > > 
+> > > Only on lazy splitting, right?
+> > > 
+> > > Or maybe we get the DBM bit on during eager splitting...
+> > 
+> > Hi, Leo
+> > 
+> > No, it works for both. Whether eager or lazy split, wrprotect always runs
+> > before split, so the block DBM is cleared first.
 > 
-> On Tue, Aug 18 2026, Sean Christopherson wrote:
-> >> Does this idea of "backwards compatibility" sound acceptable to you, at
-> >> least at a high level?
-> >
-> > No.
-> >
-> > It's probably fine for Google and other large companies that tightly control their
-> > kernels and use cases, and have the resources to juggle the resulting complexity,
-> > e.g. have kernel engineers on staff to track feature and dependencies, coordinate
-> > and plan kernel upgrades, etc.
-> >
-> > It's not acceptable for upstream, where downstream consumers often run a distro
-> > kernel, have much more varied use cases, and don't always have a horde of kernel
-> > engineers on staff to help them thread the needle you describe above.  And if
-> > supporting live update as a general feature for all users of the kernel isn't
-> > being factored into design considerations, then that needs to change, otherwise
-> > this is all dead in the water.
-> >
-> > I also don't see the point.  Maintaining a rigid save/restore ABI is annoying,
-> > but it's not _hard_ (or at least, not _that_ hard), especially if there's a set
-> > of well-documented best known practices that subsystems can follow, e.g. so that
-> > individual subsystems don't need to learn painful lessons first-hand.  I genuinely
-> > believe that maintaining the version hell you describe above would be more costly
-> > in the long run than simply committing to full backwards compatibility within a
-> > given subsystem.  I can imagine that enumerating what subsystems' information is
-> > in the payload will require a different scheme, but for a given subsystem, I don't
-> > see any reason to aim for anything less than full backwards compatibility.
+> Hi Tian,
 > 
-> Let's say for argument's sake that we commit for a fully stable
-> backwards compatible ABI. Even then, you have to deal with multiple ABI
-> versions.
+> On eager splitting, why should we ever strip DBM?
 > 
-> Live update's ABI is more complex compared to KVM's save/restore ABI.
-> For the KVM save/restore uAPI, you are largely describing architectural
-> state like CPU registers, etc. These things don't evolve as fast and
-> more or less stay the same.
-
-Right, because nothing meaningful has changed in any architecture in the 20+
-years since KVM has provided save/restore support, whereas guest_memfd looks
-nothing like it did when it was introduced three years ago.
-
-> Live update needs to describe the state of kernel objects. These are
-> more complex
-
-LOL, you might be the first to claim x86 virtualization isn't all that complex.
-
-> and evolve faster.
-
-The speed at which things change doesn't automatically mean we shouldn't strive
-for backwards compatibility.  Yes, providing backwards compatibility requires
-additional care and planning, and over time *might* lead to an ABI that is
-difficult to maintain.  But IMO, that just makes it all the more important to
-get the design right the first time, not that we shouldn't even try because it's
-hard.
-
-> For example, say you merge guest_memfd preservation today. Some time
-> later, someone comes up with a more efficient data structure to track
-> the folios in the file. You _have_ to make a backwards-incompatible ABI
-> change to use this data structure.
-
-Only if those details bleed into the ABI/contract.  I actually have a concrete
-KVM (well, virtualization) example for this.
-
-Intel's VMX architecture disallows direct memory accesses to the VMCS, and instead
-requires software to access the VMCS via dedicated ISA, using architectural encoding
-numbers to reference VMCS fields.  I.e. VMX decouples how data is stored in memory
-(the data structures) from the ABI/contract with software (VMCS field encodings).
-
-This allows Intel to optimize the data structures to be more efficient and performant
-for each microarchitecture based on the features and properties of each uarch, all
-without breaking backwards/forwards compatibility with software.
-
-My favorite esoteric example is AR_BYTES packing.  For Haswell, Intel added an
-optimization in ucode to allow saving/loading segment register state in a single
-uop (IIRC).  The optimization was especially valuable for virtualization as it
-shaved cycles off the VM-Enter/VM-Exit hot paths.  A key piece of the optimization
-was it required the AR_BYTES metadata to be stored in 16 bits, but existing CPUs
-stored AR_BYTES using 32 bits in an "unpacked" format.
-
-Fortunately, because the in-memory representation was decoupled from the contract
-with software, Intel could pack AR_BYTES into 16 bits for Haswell+ and pack/unpack
-the data on VMWRITE/VMREAD, so that the format presented to software remained
-unchanged.
-
-Does VMX's decoupling of the in-memory represntation of a VMCS have downsides?
-Absolutely.  Most notably, it incurs extra complexity (in software and hardware)
-to achieve comparable performance to directly accessible data structures (AMD's
-VMCB and Hyper-V's eVMCS) for nested virtualization.  And I'm sure it has placed
-contraints on Intel's designs, and obviously introduces complexity into the
-overall system by adding a layer of indirection.  But IMO the VMX architecture
-has been a huge win overall for Intel.
-
-> Or say you add a new memory backend (like the HugeTLB patches in
-> flight). That likely will need a different ABI to describe the state of
-> the guest_memfd.
+> Eager splitting means we won't have to fault to do the splitting, so we can 
+> have HAFDBS/HDBSS handle every fault, including the first one that we use 
+> for lazy-splitting.
 > 
-> So you will end up with multiple ABI versions that aren't always
-> backwards compatible.
-
-No, you end up with *features* that aren't backwards compatible.  I can't imagine
-anyone will argue that we should never add new features because then we can't
-rollback to an older kernel.
-
-But adding a new feature shouldn't break the existing ABI.  E.g. adding support
-for HugeTLB in guest_memfd shouldn't prevent rolling back to an older kernel when
-the HugeTLB functionality isn't being used.
-
-Using AMD's VMCB and Intel's VMCS as examples, literally every major new AMD/Intel
-uarch extends the VMC{B,S} in some way, but without fail it's always done in a way
-that is backwards compatible with existing software.  I.e. AMD and Intel ship new
-features, but existing software continues to work, and VMs continue to be migratable
-across CPU generations[*], with the obvious restriction that migrating a VM using
-a feature introduced on generation N to a generation N-1 CPU isn't a smart idea.
-
-[*] There are exceptions.  E.g. Intel removed MPX, and so VMs with MPX can't be
-    migrated to newer CPUs.  Migrating between CPUs with different MAXPHYADDR is
-    sketchy (and simply not done by some CSPs) because neither AMD nor Intel
-    virtualizes MAXPHYADDR.  But those exceptions are absolutely Big Deals that
-    undergo significant scrutiny, from all parties involved.
-
-> If you refuse that idea too, then KVM live update will be dead in the
-> water for a different reason. It will be damn near useless because it
-> can't keep up with an evolving subsystem.
+> > 
+> > For eager split: wrprotect clears W (W=1->W=0) and strips DBM from the
+> > block. Then the block is split into level-3 pages, but since W=0 and DBM
+> > depends on W, DBM stays 0. DBM is only set back to 1 during the first write
+> > fault (relax_perms: W=0->W=1, which also sets DBM=1).
 > 
-> Now once you get multiple ABI versions and you can seamlessly go from
-> old to new one, say you have a version that was superseded 5 years ago.
-> It would be completely reasonable to say that this version is old enough
-> and no one should be going from a 5 year old kernel to a modern one.
-
-LOL, Google literally does this.  Granted, the extreme cases only happen for
-stragglers, and I think we do force VMs to bounce through a "middle" kernel in
-those cases, but I doubt Google is the only company that runs frankenkernels
-for an absurd number of years for a variety of reasons.  E.g. 4.4 LTS was officially
-supported for 6 years, and I'll bet dollars to donuts people ran it for much longer
-than that.
-
-> So you deprecate this ABI. Deprecating old unused uAPIs is not unprecedented.
-
-When there are provably no users, or we can convince existing userspace to migrate
-to an alternative.
-
-> I think we are better off formalizing this deprecation period from the
-> get go.
-
-Why?  What does it buy us?  Because all I see is potential abuse and an excuse
-for not spending time getting the designs right.
-
-> A somewhat tangential example is BPF kfuncs. My BPF program that works
-> in kernel X might not work in kernel Y because the kfunc has changed or
-> been removed.
+> I suggest that, on splitting, set all writable level-3 pages with DBM=1.
+> If lazy-splitting, that will happen naturally on the first fault's split.
+> If eager-splitting that will happen during the split as well. 
 > 
-> The argument they make in kfuncs.rst is that kfuncs "provide a kernel
-> <-> kernel API, and thus are not bound by any of the strict stability
-> restrictions associated with kernel <-> user UAPIs".
+> So total solution looks like:
+> - Dirty-logging on, walk the memslot pagetable
+>   - On block: mark as read-only
+>   - On page: mark as writable-clean
+> - On splitting: Mark writable block's new pages as writable-clean
+> - On fault: after the split, mark the faulting page as writable-dirty
+> 
+> This should take care of everything, including lazy/eager splitting 
+> differences, as well as set the groundwork for HDBSS to work properly.
+> 
+> What do you think?
+> 
 
-BPF's documentation isn't arguing anything, it's merely reiterating Linux's
-long-standing policy that there is no such thing as a stable kernel ABI (in upstream).
+I implemented that down, and will send it soon.
+Seeing the code will make it easier to understand the idea :) 
 
-> For LUO as well, this is a kernel -> kernel API.
-
-Stating the obvious, I disagree with this.  As I said before, if this is the
-stance LUO wants to take, then so be it, but my NAK stands.
-
-> Users can also still do a regular kexec or reboot. They just won't get the
-> performance optimization of LUO.
-
-The amount of time, energy, and money poured into minimizing VM downtime on live
-migration suggests the overwhelming majority of LUO's targeted users aren't going
-to take kindly to this stance.
-
-> Regardless of if you agree with the last bit about deprecating old
-> versions, ABIs evolving with the subsystem is a ground reality of live
-> update and it would be foolish to think we can do with only
-> backwards-compatible ABI changes forever.
-
-I never said the ABI is immutable, I said it needs to be backwards/forwards
-compatible.
+Thanks!
+Leo
