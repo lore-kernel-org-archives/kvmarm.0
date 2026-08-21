@@ -1,83 +1,179 @@
-Received: from mta1.migadu.com (out-190.mta1.migadu.com [95.215.58.190])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pdx-out-004.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-004.esa.us-west-2.outbound.mail-perimeter.amazon.com [44.246.77.92])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5688039890A
-	for <kvmarm@lists.linux.dev>; Fri, 21 Aug 2026 08:56:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62C3F472F7C
+	for <kvmarm@lists.linux.dev>; Fri, 21 Aug 2026 09:06:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.246.77.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787302566; cv=none; b=g/Vk8iRGARdM6LU3d4/aX+RgMDoLUy69ZX/AbLtPtwgvFFLNQorWUaqbufKJi2PHp9m3RCfEPe4PGyiZblYy2FwaFyC2TdTeHEwZp411eG7X/Yc9oPNaG4NTP1Pz5MMqIZA0+TvzQSq/ygrfh7DK8MZRIojdlkevfoaeW/B5Sn4=
+	t=1787303167; cv=none; b=VWtnHRpMUUafJYjPSQTvTcdKEhQ5WFWqDQxW4arZ0BEk4a0hNSdDKc+5iZO3Fy1VIuEoY9A3+GKh2TOu6t5MR7/tMEojxH3c50A1yPc/bYjKPNhpvyu3+E+B5tpdvyff9Jgqv2FdpcmAST7fmpc9WEqpXAFB9fYeD9/B73uVKFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787302566; c=relaxed/simple;
-	bh=8111Qd+mRYZcNLNqgu3KSlEknrL1BX/iBccbqkA4J+s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MWTPcqKoKAzamb5Tl+KmxjJETmzpXXryvpgAFXPEYGapJ2dMeStwP7SB4LeZNm/dcHffH7jIHSKk4YPIEaaDKWCPK6duKIEfM2IgKsg75M1Xmg1+jXeX+oX8yv8ZpWGq0DgkjKA9J3dfY39pkIAIPWPPPajGh2p9Zig2tApTcEk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PSOEo6WA; arc=none smtp.client-ip=95.215.58.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1787303167; c=relaxed/simple;
+	bh=RhM/aNRBbeWRKMTsdM8v7FFxp6FLR8zH3UKc4QkY0Bg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=KOceev0+/u8K530E/XynDQGTOO2uW3I5niwdllYs+G5qnjJzZKYt05ryvdLBCEyBpDSz4uv6qiBI0TPfdIj4PqDcdq4BbflhFlEbFFZ0O60mpll8uR2YKzoBY/Nx5HfKPkv+/KyoAYJQuaVOR/H3dooxab89eUwSjvu4/uk1vy8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b=J8SBPW+j; arc=none smtp.client-ip=44.246.77.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PSOEo6WA"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=8111Qd+mRYZcNLNqgu3KSlEknrL1BX/iBccbqkA4J+s=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1787302562; v=1; x=1787907362;
- b=PSOEo6WAd+Do0J59glLh6O8TArIZlyBROQew/8yJR/fQ3CZyxnf2gPPYIeDxrvuUZ4lzZfF1
- JlHKTYQ8Lvmc9a0Npon+kcT7wYlctSaI68icy0mZCIIHUtEycgsUfUVAK3cIOfvOaYFlviyCcy5
- 3+LgZgVhhR9VtLpyK7XbRLdw=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: from mail-lf1-f51.google.com (209.85.167.51)
-	by smtp.migadu.com with ESMTPS id 67ec3190e052428d;
-	Fri, 21 Aug 2026 08:56:01 +0000
-X-Mizu-Trace-ID: 67ec3190e052428d
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-5aeb688ae83so4357e87.1
-        for <kvmarm@lists.linux.dev>; Fri, 21 Aug 2026 01:55:57 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+RqBIMCijIpTQbxA7zyw+HT34CRvg/n5Iy9wlFEjBUxhGsa3Fj4NdMFAp00YL10KUXXFuiw8Wek=@lists.linux.dev
-X-Gm-Message-State: AFuF++mV91lfN6ANOQ+I3LnrgJ27M7BWz8P0g4tTsEeRtZGBs/WAvrCM
-	YZEa+l78vjELvax6DZjsKkC2swkGA/4HnKXuifp+oq3JX6uhe39hbdRjRiZOyNtI212FXzBdFHe
-	2e9Za+oDIbrcCVOU79SxQzVEHCoYvR/DkpTzBfmKY
-X-Received: by 2002:a05:6512:2508:b0:5b1:4fd9:ac with SMTP id
- 2adb3069b0e04-5b484aa7312mr125597e87.3.1787302556573; Fri, 21 Aug 2026
- 01:55:56 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b="J8SBPW+j"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazoncorp2;
+  t=1787303163; x=1818839163;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=kDikvsdMYoBh9+d7XLGt2RYJcuAPps9Xjx/TmVaf2Js=;
+  b=J8SBPW+jX7DJwE4/Z2Nybpl2yt8UXaIQ/151b++XbO+LVoOk7SsbHoS0
+   6Fx4yQB8LrTXVE29vuQz39+mhPz+w6KvHb7eeSbTAslvmqz9CwnptZxBg
+   VKJhLCB18+k5F86izZGLnkDIy2iY5FaJ/Jr+RnixVZVdvFkSNQTxCiT0+
+   MpBauVLX8jVD8VkYBtjI7wOEFgusrxp/1qRCU8smZPGaL592mpu0otlgc
+   QYjocd8TZpD/Cnn/XilbfHK3wcc5xtsmGVdyffzsw1kUnLv2qt6JFCE7V
+   AwMidAlydfrgKN5LPeJ7WMO9QQE8D+2rS20LthYHN8R/jvEuEzLMxbmhp
+   Q==;
+X-CSE-ConnectionGUID: osgsXeJ8R1WCH3BBfegUfg==
+X-CSE-MsgGUID: LJFy35O7Q6msC9DYR1OT8g==
+X-IronPort-AV: E=Sophos;i="6.25,234,1779148800"; 
+   d="scan'208";a="26569210"
+Received: from ip-10-5-12-219.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.12.219])
+  by internal-pdx-out-004.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2026 09:05:59 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [205.251.233.178:3958]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.16.103:2525] with esmtp (Farcaster)
+ id e5a5d0b5-0376-458c-a3d6-00551f3acdaa; Fri, 21 Aug 2026 09:05:59 +0000 (UTC)
+X-Farcaster-Flow-ID: e5a5d0b5-0376-458c-a3d6-00551f3acdaa
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.45;
+ Fri, 21 Aug 2026 09:05:59 +0000
+Received: from dev-dsk-doebel-1a-7b355d76.us-east-1.amazon.com (10.169.119.5)
+ by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.45;
+ Fri, 21 Aug 2026 09:05:58 +0000
+From: Bjoern Doebel <doebel@amazon.de>
+To: <stable@vger.kernel.org>
+CC: Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton
+	<oliver.upton@linux.dev>, David Matlack <dmatlack@google.com>,
+	<kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>, "Sean
+ Christopherson" <seanjc@google.com>, Bjoern Doebel <doebel@amazon.de>
+Subject: [PATCH 5.10.y] KVM: arm64: Retry fault if vma_lookup() results become invalid
+Date: Fri, 21 Aug 2026 09:05:38 +0000
+Message-ID: <20260821090538.3493280-1-doebel@amazon.de>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260821064445.615838-1-fuad.tabba@linux.dev> <20260821064445.615838-2-fuad.tabba@linux.dev>
- <20260821065743.3563C1F000E9@smtp.kernel.org> <CA+EHjTy6Qb8dv_apBg4RVU+V-LsP1Z+BkDYfRKLX0f6PnbKpeg@mail.gmail.com>
- <861pbr6emw.wl-maz@kernel.org>
-In-Reply-To: <861pbr6emw.wl-maz@kernel.org>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Fri, 21 Aug 2026 09:55:19 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTw+DGr5ZNMwqdSWEejDz-i48uh9uAjNghrYCXPRQBF3WA@mail.gmail.com>
-X-Gm-Features: AcwNN1X3BW8PtRz67w1ebl42ONYlm7lvJCB4ekAzg0lCm2zJbuW6phvOHdrqeos
-Message-ID: <CA+EHjTw+DGr5ZNMwqdSWEejDz-i48uh9uAjNghrYCXPRQBF3WA@mail.gmail.com>
-Subject: Re: [PATCH v2 1/4] KVM: arm64: vgic-its: Free the caches when
- GITS_BASER changes
-To: Marc Zyngier <maz@kernel.org>
-Cc: sashiko-reviews@lists.linux.dev, Oliver Upton <oupton@kernel.org>, 
-	kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D040UWA002.ant.amazon.com (10.13.139.113) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-On Fri, 21 Aug 2026 at 09:50, Marc Zyngier <maz@kernel.org> wrote:
-...
-> > Yes, and it violates the spec: with GITS_CTLR.Enabled == 0 writes to
-> > GITS_TRANSLATER are ignored, so nothing should be injected.
-> >
-> > It was reported in June [1] and is being worked on.
->
-> Is it? I'm worried this has stalled. I'll have a look...
+From: David Matlack <dmatlack@google.com>
 
-I actually noticed it the other day and way planning on picking it up
-later, since it has stalled, as you said. Trying to keep the fixes by
-theme...
+commit 13ec9308a85702af7c31f3638a2720863848a7f2 upstream.
 
-/fuad
+Read mmu_invalidate_seq before dropping the mmap_lock so that KVM can
+detect if the results of vma_lookup() (e.g. vma_shift) become stale
+before it acquires kvm->mmu_lock. This fixes a theoretical bug where a
+VMA could be changed by userspace after vma_lookup() and before KVM
+reads the mmu_invalidate_seq, causing KVM to install page table entries
+based on a (possibly) no-longer-valid vma_shift.
 
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+Re-order the MMU cache top-up to earlier in user_mem_abort() so that it
+is not done after KVM has read mmu_invalidate_seq (i.e. so as to avoid
+inducing spurious fault retries).
+
+This bug has existed since KVM/ARM's inception. It's unlikely that any
+sane userspace currently modifies VMAs in such a way as to trigger this
+race. And even with directed testing I was unable to reproduce it. But a
+sufficiently motivated host userspace might be able to exploit this
+race.
+
+Fixes: 94f8e6418d39 ("KVM: ARM: Handle guest faults in KVM")
+Cc: stable@vger.kernel.org
+Reported-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: David Matlack <dmatlack@google.com>
+Reviewed-by: Marc Zyngier <maz@kernel.org>
+Link: https://lore.kernel.org/r/20230313235454.2964067-1-dmatlack@google.com
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+[doebel: adjust to contextual and naming differences in 5.10]
+Signed-off-by: Bjoern Doebel <doebel@amazon.de>
+---
+The fix is already present in every newer supported stable tree, so
+5.10.y is the only one left without it:
+
+  5.15.y  00f74003edf5 (backport)
+  6.1.y   e1562cc202c9 (backport)
+  6.6.y   and later contain the mainline commit 13ec9308a857 itself
+
+Tested using the Amazon Linux kernel test suite.
+
+ arch/arm64/kvm/mmu.c | 42 ++++++++++++++++++++----------------------
+ 1 file changed, 20 insertions(+), 22 deletions(-)
+
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 26068456ec0f3..2cda74acada2e 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -769,6 +769,19 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 		return -EFAULT;
+ 	}
+ 
++	/*
++	 * Permission faults just need to update the existing leaf entry,
++	 * and so normally don't require allocations from the memcache. The
++	 * only exception to this is when dirty logging is enabled at runtime
++	 * and a write fault needs to collapse a block entry into a table.
++	 */
++	if (fault_status != FSC_PERM || (logging_active && write_fault)) {
++		ret = kvm_mmu_topup_memory_cache(memcache,
++						 kvm_mmu_cache_min_pages(kvm));
++		if (ret)
++			return ret;
++	}
++
+ 	/* Let's check if we will get back a huge page backed by hugetlbfs */
+ 	mmap_read_lock(current->mm);
+ 	vma = find_vma_intersection(current->mm, hva, hva + 1);
+@@ -818,32 +831,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 		fault_ipa &= ~(vma_pagesize - 1);
+ 
+ 	gfn = fault_ipa >> PAGE_SHIFT;
+-	mmap_read_unlock(current->mm);
+ 
+ 	/*
+-	 * Permission faults just need to update the existing leaf entry,
+-	 * and so normally don't require allocations from the memcache. The
+-	 * only exception to this is when dirty logging is enabled at runtime
+-	 * and a write fault needs to collapse a block entry into a table.
++	 * Read mmu_notifier_seq so that KVM can detect if the results of
++	 * find_vma_intersection() or gfn_to_pfn_prot() become stale prior to
++	 * acquiring kvm->mmu_lock.
++	 *
++	 * Rely on mmap_read_unlock() for an implicit smp_rmb(), which pairs
++	 * with the smp_wmb() in kvm_mmu_notifier_invalidate_range_end().
+ 	 */
+-	if (fault_status != FSC_PERM || (logging_active && write_fault)) {
+-		ret = kvm_mmu_topup_memory_cache(memcache,
+-						 kvm_mmu_cache_min_pages(kvm));
+-		if (ret)
+-			return ret;
+-	}
+-
+ 	mmu_seq = vcpu->kvm->mmu_notifier_seq;
+-	/*
+-	 * Ensure the read of mmu_notifier_seq happens before we call
+-	 * gfn_to_pfn_prot (which calls get_user_pages), so that we don't risk
+-	 * the page we just got a reference to gets unmapped before we have a
+-	 * chance to grab the mmu_lock, which ensure that if the page gets
+-	 * unmapped afterwards, the call to kvm_unmap_hva will take it away
+-	 * from us again properly. This smp_rmb() interacts with the smp_wmb()
+-	 * in kvm_mmu_notifier_invalidate_<page|range_end>.
+-	 */
+-	smp_rmb();
++	mmap_read_unlock(current->mm);
+ 
+ 	pfn = gfn_to_pfn_prot(kvm, gfn, write_fault, &writable);
+ 	if (pfn == KVM_PFN_ERR_HWPOISON) {
+-- 
+2.51.0
+
