@@ -1,68 +1,68 @@
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EC1C3B1ED0
-	for <kvmarm@lists.linux.dev>; Fri, 21 Aug 2026 13:52:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA10F25783C
+	for <kvmarm@lists.linux.dev>; Fri, 21 Aug 2026 14:02:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787320343; cv=none; b=onawu1nvZn2FWW1jpJ37ssS1pAWO7gSp/M9tZ02KGE5/rF3QGo7C7/4HsxyJy1gSq55HSHWnEDd9WvUfY8r7RA8RFEFExtCJ1gp2uPm1/PqUeKQdKTZ9s0c0aQr1s6SreGgZjhd6siSA2jrKk8sGJRXFwOTdidx8ePonWkt8ENo=
+	t=1787320925; cv=none; b=clJjvY8djSN45d2OKncqUWpsCHY/iZ6ijgV5WFXnOxWE1kgxwBuIHkRRw1w0UEQc4HslJVeCX4oixWlau5xRZrelJcZW19qce2oZWMBN0NgzQWzQtmGpzTQTtNtUbkzqC08/26cGIDwCnFl++v8PNTOkpWiuRSAMx+mlmhaYnvQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787320343; c=relaxed/simple;
-	bh=/ZPuMKdYiSpLFDDj6KBd5YfXG9RrVJ/W8yRsczFgpRQ=;
+	s=arc-20240116; t=1787320925; c=relaxed/simple;
+	bh=w/VwBDo9UPwUkAEyzce0Vi/QMwtEtK0I0XlnqIp4S9M=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cdGyEf43frGHAJIAWmnyCxmsUk1bdbHpSoToPzxkb+TVc/EXL0lOr2DLf1zlOcElIy9DGXeD/LtiTolPnvmdNDNEiZayAKXy4iFevsfaJmu8FgY1rlmH39d1CfEBaUqCzpCsS6TVt7UQ8Aiy7mjIfQvW9XSJiEWpqDAs04Q/PnA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dsWdK4d0; arc=none smtp.client-ip=209.85.128.52
+	 In-Reply-To:Content-Type; b=IUyURI7z6/wdnMy9x3GNx79cYPRE7Y4kRTjd5W11Hm6yMFJZcSTZka3RXTtthg8EjK2ErXlO4CUIctujkmFW2tbChv1739jcATtL6uIWMhS7iUDlfaPUvqYu8Lpm22whH+NqwAyu9jkgiduhLKogmz8Sn4XE0zMYPM/t5OxBhfs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EnwL8ImJ; arc=none smtp.client-ip=209.85.128.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dsWdK4d0"
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-499ac87c92bso8419435e9.1
-        for <kvmarm@lists.linux.dev>; Fri, 21 Aug 2026 06:52:21 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EnwL8ImJ"
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-495437bb891so5461775e9.1
+        for <kvmarm@lists.linux.dev>; Fri, 21 Aug 2026 07:02:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787320340; x=1787925140; darn=lists.linux.dev;
+        d=gmail.com; s=20251104; t=1787320921; x=1787925721; darn=lists.linux.dev;
         h=content-transfer-encoding:content-type:in-reply-to:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=RKNX+Kx6HqLYYsW8IMt0XRzUyioNItYEZfBrRy9B9xA=;
-        b=dsWdK4d0VWZ92scm/OCvHucwHvz3UcLWKoGIMyJO/o7UDuZM5YsWeMpuLlrZ5IdB6i
-         dc6HWm9nc/U5Pabso7/w3WFCdr2DptA0NwDRN/m+++bZLNnVEbS9yKN6M0z0Ll9gCwcw
-         ZsZ4CUXgizPmAfgn51Ac3Ov6BI1UWbyF8Z+4sNYDSHYuzgYpSlQij4HAqJL8ShtF6dnP
-         j3+tKvIA5USPSQ2JwX0hoARhx+MX8GyWHaT7jhq1cXxKj1U40y92uFuQegxsXwEHb8VD
-         4ylKhpTCuDkYmup7dDD9rbT1sNLgfxCfztw8sAGKRUa1ZpSr+Cj5pGD8FkI+/73JJGIh
-         JKMA==
+        bh=nQd8YnirXzo/05vCBWaK5j7dOswPV7dn2KgbQ3nhodY=;
+        b=EnwL8ImJr4Tc7D26Sd5qtb4jgwhV7NULD2tHvx66eiB9fTmrV6HXLEqHUGQ5z/Yipk
+         J6R8/CvmXpp1SkoBu98x19cFqxWz42MEuCvPiLdCf4z1zL7l5la7o0jjBr98PqaJwXM9
+         sRrJqIRj98TgZDJ1OMY8Km4NkRfYi0AttMeULi/oVp6fThxk9gcbA7PGLKMfbSMXf/lf
+         awIacjym2bpazUsuIj4NeMQQYy7n3OCY5K8qpklxyn0xjVrLOFtISibnI3u5shN0/xIy
+         a4E69W/kCfbCUVT6TO7r2w9jBRFEZKlDPSDsWH3M8Vwr5KI+wJwwJpPZI+/mpYqf8MGE
+         ie+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787320340; x=1787925140;
+        d=1e100.net; s=20251104; t=1787320921; x=1787925721;
         h=content-transfer-encoding:content-type:in-reply-to:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=RKNX+Kx6HqLYYsW8IMt0XRzUyioNItYEZfBrRy9B9xA=;
-        b=mxtdlvoQs50OieqZd1PagiWO2wxuVyAl8MBq00DaKAV0eFdholgI5vpE2ios93aaoG
-         YBEXg48YB0EOqM6OqCQN5w31uoEtyprXW4th1ZqNvv9eMWDOe5nMAeur9M+RsNcQE73+
-         2DxiJkwV1TsSEzxH6oNfpruXGrTjblDBa0dVN31mWJVvfXVkdME94X6wZPujq1d0kItP
-         pEV4Omu86hNJ4wLnOHJmXSIjKNR/si9xLQnZbsOMzcAMYmYUsmrKqQoXx3RBcBWtK8o9
-         ZL/m5xDQpFy+ENlc+hJt/PioJbSrE8DX++QSyyIJolj3NQoeCqUQ3iZ2YZSI/cVATddl
-         PFPQ==
-X-Forwarded-Encrypted: i=1; AHgh+RqtB7dJbxpdsUnP7FydWblBVC2IzEGLCdq9M5+NMU+1tCNCinieActyOdeTXVaOrRAZ4A4fncs=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yyy0fi/QoDI5e5/MAx6/bQSFYxzLarJf+j36oSb7H/vvjOEKRYu
-	HHUZfkeD5nKkFV0aNCpy+x4a0h38N2O/MpKdCVuVLujp9H9kU2hrbftW
-X-Gm-Gg: AR+sD13J9BMkzzMMrRuC9rb6rrCb1fTL5NQVvEU6QeZYemffnHCQZ6jP8s+J0xSwCBN
-	m6rrP2Bd9buZ4ewUVJB4w+GQscKtZltmm4B3qMLw/nptf4+JzGXrTwOa6P/n5fjid84+XA5ozNA
-	Dst+KEKWESnQxShL22WXhdfsN52/LcxyKo/rkoKdb6lQlp27QhIQQcgXz8rYu0mTBlEu2DrP7xD
-	ladBrpel76sP+p1HeywtNNANU39KkhCo4/zW0VCkAhPDG0hBWF+G7Ywdw00ia3ivl7Q4U50KK6x
-	LZ0JQVx3Y9ghGmDK1gnrVx7hkliaAbaJCrYskVal7NEd8ZLJZWLOedAzFTv5BmleSt5mC3x8v7A
-	swBWoDNJE2efebUeNbZWICJhkLKHhfFShwUc5OsZ4v3Re3keHYnIcRrsD996qvYRhHbdbf0xDbm
-	YX41fwb4IZB2uY8zOsrnLXeQpHARelzSXtDk1k1halag+GongJ/zi1Nx7Dld4SbFSoNSstTROdY
-	2Pk
-X-Received: by 2002:a05:600c:a087:b0:499:86ce:465e with SMTP id 5b1f17b1804b1-499b8324b09mr117557705e9.4.1787320339715;
-        Fri, 21 Aug 2026 06:52:19 -0700 (PDT)
+        bh=nQd8YnirXzo/05vCBWaK5j7dOswPV7dn2KgbQ3nhodY=;
+        b=ZhjPuRQN0BHJz5eInLEamPqk0YwmMbtycrFs2+BzFo0UstteK8WpnJTunim88ow1/l
+         JuOHry/ToGbVZL05WsIYK9Q/HcWOUzOFT11cvYXMfmVOYemGLx6M9KtKGOof7d0NqXR/
+         JTGjMUAPGPKVar7hjZ1KTx+tfrpYv6QzMAWNFSrRdu4lI0rIy/yCmzxuIC7bBHqaYj0T
+         EiMjR6ujE9m3Ia78DBaBPD2NvLJXA8OQdMRay81qhYPct5mSDJHC4OfApWWMqmNyCGKf
+         C6rHBIiFA69lE5tmDrHmLOxSPshK+Z/e5VkUroxW14C0yDY75F3kXZQFYYrdkjVYDZSm
+         sT+Q==
+X-Forwarded-Encrypted: i=1; AHgh+RquJ8jppZ7seeLEElv388USVRqn2DgrLAAGuEsmu/TRz4zifY8FQ0IBQ4FPl3cEwx1kh0ifgMM=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwgXkFueT083BvRYiTT2o6ghPyQvdcWQsWc6PzUfcfVyYTceQ2P
+	X/R58I2YzRUiiWVc0L8AAgrFhgwygy6u3NTIbkDTK3ZcrFTQs5jjLvjl
+X-Gm-Gg: AR+sD11r2/tUhljBzwVBtxSnc0EuL90coDuyNgx8tMjKw9IVOG0WNTevWivlKu5KWOr
+	HZKHg0WxSjFRuRg+Ob0aGHEZhQgDEDS/EIzixt1s37ENg5Poj6HuniaO5D7gXv0pkZzf0y5NqOt
+	3tBz1Rt5UYY7Q2dm7FdMv7bcK8lBZGlF9Bskez04JyejtcpyhwbfYeL8A5o84rn4NjaPKCxYipI
+	l71tp+6f/7lfFvOgLOR/kPVBhhrUngR1Ofk4feldrebDBF6NQ0jLqJPRmC9gmHm/F+ZYNoqPYKH
+	dRq4lQBfOxn4rFzpDXbPiXc1oR8AcRDddMe0g8l7jMc1truRWcVqFDRKy0af3HAE7VAuC51hzIm
+	bMlSY8WThfAPqrKasl6prj6bdagKkCX0G6kOTbSCmfNuwjthrywDlEYN+UeZoCVGOhKFIJ/xxGw
+	n7L/35Y9ymk16I+cRzvGU6/MO+tj86YPbrtdUjqw/L/3Oor31s12d+LvyUtGv5fLtNYCKO42b9M
+	YIY
+X-Received: by 2002:a05:600c:1912:b0:499:8d9b:832c with SMTP id 5b1f17b1804b1-499b9182141mr59968525e9.4.1787320921200;
+        Fri, 21 Aug 2026 07:02:01 -0700 (PDT)
 Received: from [10.45.28.226] ([15.248.3.94])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-482b14b80a5sm17753598f8f.24.2026.08.21.06.52.18
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-499b90f8b4fsm34103715e9.9.2026.08.21.07.01.59
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 21 Aug 2026 06:52:19 -0700 (PDT)
-Message-ID: <0365d77d-616b-47f7-a5f2-3388bad692a1@gmail.com>
-Date: Fri, 21 Aug 2026 14:52:17 +0100
+        Fri, 21 Aug 2026 07:02:00 -0700 (PDT)
+Message-ID: <6270fea8-aa08-48ca-ab1e-ab0ada105ded@gmail.com>
+Date: Fri, 21 Aug 2026 15:01:58 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -71,7 +71,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v5 2/5] KVM: arm64: Add pre_fault_memory implementation
-To: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Vincent Donnefort <vdonnefort@google.com>
 Cc: maz@kernel.org, oupton@kernel.org, pbonzini@redhat.com,
  joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com,
  yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org,
@@ -81,93 +81,48 @@ Cc: maz@kernel.org, oupton@kernel.org, pbonzini@redhat.com,
  linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org,
  isaku.yamahata@intel.com, Jack Thomson <jackabt@amazon.com>
 References: <20260612162354.73378-1-jackabt.amazon@gmail.com>
- <20260612162354.73378-3-jackabt.amazon@gmail.com> <alEXtW7w-rqlNG09@raptor>
+ <20260612162354.73378-3-jackabt.amazon@gmail.com>
+ <amc8zlGxegNKHxIY@google.com>
 Content-Language: en-US
 From: "Thomson, Jack" <jackabt.amazon@gmail.com>
-In-Reply-To: <alEXtW7w-rqlNG09@raptor>
+In-Reply-To: <amc8zlGxegNKHxIY@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi Alex,
+Hi Vincent,
 
-On 10/07/2026 5:03 pm, Alexandru Elisei wrote:
+On 27/07/2026 12:11 pm, Vincent Donnefort wrote:
 >> +	unsigned long		*page_size;
 > 
-> As far as I know, fault handling was reworked to use struct
-> kvm_s2_fault_desc to store the fault information that user_mem_abort()
-> needs to handle the fault.  Adding a 'page_size' field, that represents the
-> result of the gpa mapping process, might not be desirable.
+> It looks a bit odd in that struct.
+> 
+> Also, transparent_hugepage_adjust() modifies pfn and gfn. So perhaps it'd be
+> better to introduce a struct kvm_s2_fault_mapping that can be used to get what
+> has actually been mapped in kvm_s2_fault_map()?
 > 
 
-Yeah agreed, Vincent suggested a separate output struct that
-kvm_s2_fault_map() fills with what was actually mapped. I'll do that in
-v6 thanks!
+Yeah that's much nicer I'll do that thanks for the suggestion!
 
->> +	struct kvm_vcpu_fault_info *fault_info = &vcpu->arch.fault;
->> +	struct kvm_vcpu_fault_info fault_backup = *fault_info;
+>> +	if (vcpu_is_protected(vcpu))
+>> +		return -EOPNOTSUPP;
 > 
-> I'm not sure you need to make a backup here. vcpu->arch.fault is populated
-> each time the CPU takes a fault.
+> It could just call pkvm_mem_abort() when the VM is protected?
 > 
 
-So this was actually flagged up by sashiko when I ran it before
-submission, it suggested handling this for the case in which the vCPU
-exited for MMIO, the next KVM_RUN calls kvm_handle_mmio_return which
-uses the vcu->arch.fault.esr_el2. I'll add some comments to this maybe
-to explain why this would be needed.
+I see, I don't have a setup to test this properly myself, so at the
+moment I left the protected vm's out and don't advertise the capability,
+if there's a usecase happy to look at it as a follow-up.
 
->> +	if (memslot->flags & KVM_MEMSLOT_INVALID) {
+>> +	/*
+>> +	 * pKVM stage-2 mappings aren't directly walkable from the host; let
+>> +	 * the fault path handle both new and existing mappings.
+>> +	 */
 > 
-> I don't think that's something we should care about, the flag can be set
-> immediately after the check as the function doesn't take kvm->slots_lock.
-> kvm_vcpu_prefault_memory() takes the srcu lock in read mode, so the
-> function is safe to run even if userspace does something silly like
-> deleting a memslot at the same time that it's prefaulting the guest memory
-> it represents.
-
-I was there not as much for safety, but rather to pick up that error.
-This way rather than userspace getting an -EFAULT it can just retry.
-This is the same way it is handled in x86 as well.
-
-> 
-> It might not be obvious, but taking kvm->mmu_lock in read mode does not
-> guarantee that gpa will be mapped when kvm_pgtable_get_leaf() returns.
-> That's because a concurrent kvm_pgtable_stage2_map() for a different gpa
-> can destroy the mapping of the current gpa.
-[ ... ]
-> The kvm->mmu_lock is dropped here, which means that it is possible for a
-> MMU notifier callback to have just unmapped the entire stage 2 for the VM.
+> pKVM has a host interval-tree where we keep track of what has been mapped and at
+> what level. This tree is also protected with the mmu_lock.
 > 
 
-Yeah as we mentioned in the other thread, this is best effort and we
-can't guarantee that is survives the return. We do this for forward
-progression, reporting the correct advance size for ranges which are
-already mapped, instead of repeating the full dance for every page of them.
-
-> 
-> handle_access_fault() will fail if the mapping is gone. But I guess that's
-> fine if the ioctl does not guarantee that memory is still mapped after it
-> completes.
-
-
-Yeah I think it's fine and will degrade to a no-op in this case.
-
-> 
-> Also, the documentation that this patch adds says: 'On arm64, newly created
-> stage-2 PTEs are marked Accessed'. Does not say anything about marking
-> **existing** ptes as accessed. Would be useful to explain the code does it.
-> 
-
-Ack, will do thanks!
-
->> +		hva = gfn_to_hva_memslot_prot(memslot, gfn, NULL);
-> 
-> There's gfn_to_hva_memslot(memslot, gfn), is that what you are looking for?
-> 
-
-I think gfn_to_hva_memslot() resolves the hva for write, so would fail
-on KVM_MEM_READONLY slots, and prefualting is a read. Also this mirrors
-the guest abort path so matches the way the run path resolves the HVA.
+Thanks, that sounds better. I'll have a look at moving to that for v6 then.
 
 -- 
 Thanks,
