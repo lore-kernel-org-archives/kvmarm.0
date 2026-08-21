@@ -1,179 +1,136 @@
-Received: from pdx-out-004.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-004.esa.us-west-2.outbound.mail-perimeter.amazon.com [44.246.77.92])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62C3F472F7C
-	for <kvmarm@lists.linux.dev>; Fri, 21 Aug 2026 09:06:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.246.77.92
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0649E446C18
+	for <kvmarm@lists.linux.dev>; Fri, 21 Aug 2026 09:14:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787303167; cv=none; b=VWtnHRpMUUafJYjPSQTvTcdKEhQ5WFWqDQxW4arZ0BEk4a0hNSdDKc+5iZO3Fy1VIuEoY9A3+GKh2TOu6t5MR7/tMEojxH3c50A1yPc/bYjKPNhpvyu3+E+B5tpdvyff9Jgqv2FdpcmAST7fmpc9WEqpXAFB9fYeD9/B73uVKFU=
+	t=1787303706; cv=none; b=CQJl/plx3U1bbV+0n6yX1pGNpJDQoykbVi5hGyyGK9loutOvFqxOjkCeChwUZYlmlr0JW5+Xn1MwLPFlSVVcVpjxiV8WYo4dufd1WelYiRp2jABlR85zLi3Cai0IvgLf8/82q4+eOtioN/3RE61kNqj6vu2mnXYAXupD1I9UcDw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787303167; c=relaxed/simple;
-	bh=RhM/aNRBbeWRKMTsdM8v7FFxp6FLR8zH3UKc4QkY0Bg=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=KOceev0+/u8K530E/XynDQGTOO2uW3I5niwdllYs+G5qnjJzZKYt05ryvdLBCEyBpDSz4uv6qiBI0TPfdIj4PqDcdq4BbflhFlEbFFZ0O60mpll8uR2YKzoBY/Nx5HfKPkv+/KyoAYJQuaVOR/H3dooxab89eUwSjvu4/uk1vy8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b=J8SBPW+j; arc=none smtp.client-ip=44.246.77.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
+	s=arc-20240116; t=1787303706; c=relaxed/simple;
+	bh=l1chOlTAGYGvci4a1jVKkvPiFL5CKvRizTrrLTPyYM0=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=hf46kFppGPEPdA1dC80oiOgqcOzSYdpAdqhx1oR3S7WluvHToq0M7IpkroNzIQGzOIFqcQBBuIGZ4T4EbFSvmL65rcr+mx9VuoYU9FoT0BiAFpI4D+FHcwoDeG71qAeQ+CCA634PpjiP1EDC6kcAqykKlB9rq7Gk0ChyOqBqG0s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RqwWWm24; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b="J8SBPW+j"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazoncorp2;
-  t=1787303163; x=1818839163;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=kDikvsdMYoBh9+d7XLGt2RYJcuAPps9Xjx/TmVaf2Js=;
-  b=J8SBPW+jX7DJwE4/Z2Nybpl2yt8UXaIQ/151b++XbO+LVoOk7SsbHoS0
-   6Fx4yQB8LrTXVE29vuQz39+mhPz+w6KvHb7eeSbTAslvmqz9CwnptZxBg
-   VKJhLCB18+k5F86izZGLnkDIy2iY5FaJ/Jr+RnixVZVdvFkSNQTxCiT0+
-   MpBauVLX8jVD8VkYBtjI7wOEFgusrxp/1qRCU8smZPGaL592mpu0otlgc
-   QYjocd8TZpD/Cnn/XilbfHK3wcc5xtsmGVdyffzsw1kUnLv2qt6JFCE7V
-   AwMidAlydfrgKN5LPeJ7WMO9QQE8D+2rS20LthYHN8R/jvEuEzLMxbmhp
-   Q==;
-X-CSE-ConnectionGUID: osgsXeJ8R1WCH3BBfegUfg==
-X-CSE-MsgGUID: LJFy35O7Q6msC9DYR1OT8g==
-X-IronPort-AV: E=Sophos;i="6.25,234,1779148800"; 
-   d="scan'208";a="26569210"
-Received: from ip-10-5-12-219.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.12.219])
-  by internal-pdx-out-004.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2026 09:05:59 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [205.251.233.178:3958]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.16.103:2525] with esmtp (Farcaster)
- id e5a5d0b5-0376-458c-a3d6-00551f3acdaa; Fri, 21 Aug 2026 09:05:59 +0000 (UTC)
-X-Farcaster-Flow-ID: e5a5d0b5-0376-458c-a3d6-00551f3acdaa
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.45;
- Fri, 21 Aug 2026 09:05:59 +0000
-Received: from dev-dsk-doebel-1a-7b355d76.us-east-1.amazon.com (10.169.119.5)
- by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.45;
- Fri, 21 Aug 2026 09:05:58 +0000
-From: Bjoern Doebel <doebel@amazon.de>
-To: <stable@vger.kernel.org>
-CC: Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton
-	<oliver.upton@linux.dev>, David Matlack <dmatlack@google.com>,
-	<kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>, "Sean
- Christopherson" <seanjc@google.com>, Bjoern Doebel <doebel@amazon.de>
-Subject: [PATCH 5.10.y] KVM: arm64: Retry fault if vma_lookup() results become invalid
-Date: Fri, 21 Aug 2026 09:05:38 +0000
-Message-ID: <20260821090538.3493280-1-doebel@amazon.de>
-X-Mailer: git-send-email 2.50.1
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RqwWWm24"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A6FC1F000E9;
+	Fri, 21 Aug 2026 09:14:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1787303679;
+	bh=hdl+A8heZVeyYISGfv6viXmyNz6I1FSK/lSsoPGGOPs=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=RqwWWm24IdJZ//1FTGYL8yvsf7EkMHRAsrFvqZ08fkChG8XGe7ksizm+0853dRele
+	 8t09jRmHfXLppSj7upfh8Zv6+rj6TkLrgsWnmRoa3xqPpRdsA0CEWLR2/zjf7WrgQG
+	 4eok1x2AtOCwpAi4YBF3er+4OLyJOQcFtAim+XY7G08XrLl1+hnSz6WdJwWBuqTSqf
+	 Z0QyOy917Ti1dsx1ISGKoIRt3im7utF1mWgz1UOT22hHnttgrCIACF/0DR+A3K05Ug
+	 tJFnH4CmOt1ENaE7MVrFx8ZsiUP63GAPXLE5LAccXLqFf+HGfcxoIRALHJc7q0dsDa
+	 Uz6kl2CbsCzig==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH 5.10.y] KVM: arm64: Retry fault if vma_lookup() results
+ become invalid
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Bjoern Doebel" <doebel@amazon.de>
+Cc: "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20260821090538.3493280-1-doebel@amazon.de>
+References: <20260821090538.3493280-1-doebel@amazon.de>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 21 Aug 2026 09:14:39 +0000
+Message-Id: <20260821091439.8A6FC1F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D040UWA002.ant.amazon.com (10.13.139.113) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-From: David Matlack <dmatlack@google.com>
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [Critical] Missing read memory barrier (`smp_rmb()`) before resolving the=
+ guest physical address, which breaks the MMU notifier retry protocol.
+--
 
-commit 13ec9308a85702af7c31f3638a2720863848a7f2 upstream.
+--- Patch [1]: [PATCH 5.10.y] KVM: arm64: Retry fault if vma_lookup() resul=
+ts become invalid ---
+commit f032c4129aeef677df2aa27f38db191cca6b6b3d
+Author: David Matlack <dmatlack@google.com>
 
-Read mmu_invalidate_seq before dropping the mmap_lock so that KVM can
-detect if the results of vma_lookup() (e.g. vma_shift) become stale
-before it acquires kvm->mmu_lock. This fixes a theoretical bug where a
-VMA could be changed by userspace after vma_lookup() and before KVM
-reads the mmu_invalidate_seq, causing KVM to install page table entries
-based on a (possibly) no-longer-valid vma_shift.
+KVM: arm64: Retry fault if vma_lookup() results become invalid
 
-Re-order the MMU cache top-up to earlier in user_mem_abort() so that it
-is not done after KVM has read mmu_invalidate_seq (i.e. so as to avoid
-inducing spurious fault retries).
+This commit reads mmu_invalidate_seq before dropping the mmap_lock to detect
+if vma_lookup() results become stale before acquiring kvm->mmu_lock. It also
+moves the MMU cache top-up earlier in user_mem_abort() to avoid spurious
+fault retries.
 
-This bug has existed since KVM/ARM's inception. It's unlikely that any
-sane userspace currently modifies VMAs in such a way as to trigger this
-race. And even with directed testing I was unable to reproduce it. But a
-sufficiently motivated host userspace might be able to exploit this
-race.
-
-Fixes: 94f8e6418d39 ("KVM: ARM: Handle guest faults in KVM")
-Cc: stable@vger.kernel.org
-Reported-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: David Matlack <dmatlack@google.com>
-Reviewed-by: Marc Zyngier <maz@kernel.org>
 Link: https://lore.kernel.org/r/20230313235454.2964067-1-dmatlack@google.com
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-[doebel: adjust to contextual and naming differences in 5.10]
-Signed-off-by: Bjoern Doebel <doebel@amazon.de>
----
-The fix is already present in every newer supported stable tree, so
-5.10.y is the only one left without it:
 
-  5.15.y  00f74003edf5 (backport)
-  6.1.y   e1562cc202c9 (backport)
-  6.6.y   and later contain the mainline commit 13ec9308a857 itself
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 26068456ec0f3..2cda74acada2e 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+[ ... ]
+> @@ -818,32 +831,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, ph=
+ys_addr_t fault_ipa,
+>  		fault_ipa &=3D ~(vma_pagesize - 1);
+> =20
+>  	gfn =3D fault_ipa >> PAGE_SHIFT;
+> -	mmap_read_unlock(current->mm);
+> =20
+> -	/*
+> -	 * Permission faults just need to update the existing leaf entry,
+[ ... ]
+> -	if (fault_status !=3D FSC_PERM || (logging_active && write_fault)) {
+[ ... ]
+> -	}
+> -
+>  	mmu_seq =3D vcpu->kvm->mmu_notifier_seq;
+> -	/*
+> -	 * Ensure the read of mmu_notifier_seq happens before we call
+> -	 * gfn_to_pfn_prot (which calls get_user_pages), so that we don't risk
+> -	 * the page we just got a reference to gets unmapped before we have a
+> -	 * chance to grab the mmu_lock, which ensure that if the page gets
+> -	 * unmapped afterwards, the call to kvm_unmap_hva will take it away
+> -	 * from us again properly. This smp_rmb() interacts with the smp_wmb()
+> -	 * in kvm_mmu_notifier_invalidate_<page|range_end>.
+> -	 */
+> -	smp_rmb();
+> +	/*
+> +	 * Read mmu_notifier_seq so that KVM can detect if the results of
+> +	 * find_vma_intersection() or gfn_to_pfn_prot() become stale prior to
+> +	 * acquiring kvm->mmu_lock.
+> +	 *
+> +	 * Rely on mmap_read_unlock() for an implicit smp_rmb(), which pairs
+> +	 * with the smp_wmb() in kvm_mmu_notifier_invalidate_range_end().
+> +	 */
+> +	mmap_read_unlock(current->mm);
+> =20
+>  	pfn =3D gfn_to_pfn_prot(kvm, gfn, write_fault, &writable);
 
-Tested using the Amazon Linux kernel test suite.
+[Severity: Critical]
+Does removing the explicit smp_rmb() here in user_mem_abort() break the MMU
+notifier retry protocol?
 
- arch/arm64/kvm/mmu.c | 42 ++++++++++++++++++++----------------------
- 1 file changed, 20 insertions(+), 22 deletions(-)
+The comment states that we can rely on mmap_read_unlock() for an implicit
+smp_rmb(). However, mmap_read_unlock() via up_read() typically provides only
+RELEASE semantics.
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 26068456ec0f3..2cda74acada2e 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -769,6 +769,19 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		return -EFAULT;
- 	}
- 
-+	/*
-+	 * Permission faults just need to update the existing leaf entry,
-+	 * and so normally don't require allocations from the memcache. The
-+	 * only exception to this is when dirty logging is enabled at runtime
-+	 * and a write fault needs to collapse a block entry into a table.
-+	 */
-+	if (fault_status != FSC_PERM || (logging_active && write_fault)) {
-+		ret = kvm_mmu_topup_memory_cache(memcache,
-+						 kvm_mmu_cache_min_pages(kvm));
-+		if (ret)
-+			return ret;
-+	}
-+
- 	/* Let's check if we will get back a huge page backed by hugetlbfs */
- 	mmap_read_lock(current->mm);
- 	vma = find_vma_intersection(current->mm, hva, hva + 1);
-@@ -818,32 +831,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		fault_ipa &= ~(vma_pagesize - 1);
- 
- 	gfn = fault_ipa >> PAGE_SHIFT;
--	mmap_read_unlock(current->mm);
- 
- 	/*
--	 * Permission faults just need to update the existing leaf entry,
--	 * and so normally don't require allocations from the memcache. The
--	 * only exception to this is when dirty logging is enabled at runtime
--	 * and a write fault needs to collapse a block entry into a table.
-+	 * Read mmu_notifier_seq so that KVM can detect if the results of
-+	 * find_vma_intersection() or gfn_to_pfn_prot() become stale prior to
-+	 * acquiring kvm->mmu_lock.
-+	 *
-+	 * Rely on mmap_read_unlock() for an implicit smp_rmb(), which pairs
-+	 * with the smp_wmb() in kvm_mmu_notifier_invalidate_range_end().
- 	 */
--	if (fault_status != FSC_PERM || (logging_active && write_fault)) {
--		ret = kvm_mmu_topup_memory_cache(memcache,
--						 kvm_mmu_cache_min_pages(kvm));
--		if (ret)
--			return ret;
--	}
--
- 	mmu_seq = vcpu->kvm->mmu_notifier_seq;
--	/*
--	 * Ensure the read of mmu_notifier_seq happens before we call
--	 * gfn_to_pfn_prot (which calls get_user_pages), so that we don't risk
--	 * the page we just got a reference to gets unmapped before we have a
--	 * chance to grab the mmu_lock, which ensure that if the page gets
--	 * unmapped afterwards, the call to kvm_unmap_hva will take it away
--	 * from us again properly. This smp_rmb() interacts with the smp_wmb()
--	 * in kvm_mmu_notifier_invalidate_<page|range_end>.
--	 */
--	smp_rmb();
-+	mmap_read_unlock(current->mm);
- 
- 	pfn = gfn_to_pfn_prot(kvm, gfn, write_fault, &writable);
- 	if (pfn == KVM_PFN_ERR_HWPOISON) {
--- 
-2.51.0
+RELEASE semantics prevent prior memory operations from being reordered past
+the unlock, but they do not prevent subsequent memory reads from being
+hoisted up before the unlock.
 
+This means the CPU is permitted to reorder the lockless page table reads
+inside gfn_to_pfn_prot() to execute before the read of kvm->mmu_notifier_seq
+occurs.
+
+If a concurrent MMU notifier (e.g. from page reclaim) unmaps the page and
+increments the sequence counter between the hoisted PFN read and the
+mmu_seq read, KVM would capture the new sequence number.
+
+Would this cause the mmu_notifier_retry() check under mmu_lock to falsely
+succeed, allowing KVM to map a freed host page into the guest's stage-2
+page tables?
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260821090538.3493=
+280-1-doebel@amazon.de?part=3D1
