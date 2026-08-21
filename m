@@ -1,146 +1,155 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta1.migadu.com (out-91.mta1.migadu.com [95.215.58.91])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A65DB3115BC
-	for <kvmarm@lists.linux.dev>; Fri, 21 Aug 2026 07:00:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3902D3ADB94
+	for <kvmarm@lists.linux.dev>; Fri, 21 Aug 2026 07:38:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.91
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787295640; cv=none; b=gzq7GKjDLCuCJvjBvKa1I5fqfa9w2a+/XbXeP/b21OBGwGmzmnLshmjjTlOiVDKT6nloDETX4GTQZW74nDcmsFVzIyKrfsMcnoqXr1KiC+J7O1CdyjS5XG83BR/Ra7UGjk/Su7b9woKKF9cxckxI4geV6ZdK9Jm0EVi47AhaNko=
+	t=1787297894; cv=none; b=DFHZQgZ5vr9h2UXW5a0HlU6IgGL/w+3UqDqzQjGuZCpyLb6ST5C12jSYr9+ycBIKBFSvImCOuhvH+2/u3GHrEYLvuQAwcBXWx8d0+HetKmlF55ZI7gZbAph2Y909pX+gBAJox6UseE+moUi0ARpetAc0h7kPhN9bTa82i4X4xpI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787295640; c=relaxed/simple;
-	bh=viyBVnMufxlYh50Ib5lpI9NaBAKKagmLcVCt/NaeZ9c=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=j/tMiIH2GnhVH8wMrbYTIhgQXwbGEa39f//h4S0id0+NTKGmqI2UN2U254Dui1CySCj16kc+98M11H6mTed7h+vOFzsGitVxxzpHVK026/zGH//gJLGPiWHBsN7t6SxpzksHNwlqqFhOv+8skmWrFR5kSrMQFt8L1ngLUZRlnB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fawx3bri; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1787297894; c=relaxed/simple;
+	bh=yah7MrKK7PNquSWPJQDCIwVZ2JPFu1xOp+2NvgehUVA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JIwAmIf1TYeU19aLDbi+vQNFNKs96OU5MkcrlDgzIbneMXouv1ifXyeE9oq8K7dtQZWj2vg+3YBN1NbSA+RpESNx398BfUtWq6++SD8H+gKME2oLxXheH09JMy2TAuw7j5YwBEgtVp/IpAsTjmf5quuL9qgR1S/oT1aJKv0WseE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Rs+2PKOQ; arc=none smtp.client-ip=95.215.58.91
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fawx3bri"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 120B51F000E9;
-	Fri, 21 Aug 2026 07:00:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787295639;
-	bh=ArUMHYPEIA+xKEY0RaaruZqjwxNGl1gK68JM+gpnIrg=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=Fawx3briueOyPvKedI0ioRvEjLguGA/lFarJOF1FJAWIfVvDUQSDioMXHeEEt1trB
-	 2tECL+0oOvJy6l9MdgeqjKyxpvc/pV1Xh9LehHDUflABI2KweXCUNnvMt+ZzH24zbk
-	 RZLiFu/JJIaN911GT2NTbFoIA9PuXlWruPchl5gjEu4WUAhiRlTxhF7Wb2Iwx0Uwc5
-	 kW7cHjuDlUSuYI3S8w8X6dgBMZVLbg7lXxvNa0AEqhjDQsX7pc9nXmLkt35yPxgr0N
-	 bjiemogR5YZOCAv1m7fZca37LUAgIBhfk7u3fzqwkf/ocbysrgB9vDJ5+gnmf+6E9Y
-	 T4BYGlNxNBQ6g==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2 4/4] KVM: arm64: selftests: Add ITS table save tests
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Fuad Tabba" <fuad.tabba@linux.dev>
-Cc: "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260821064445.615838-5-fuad.tabba@linux.dev>
-References: <20260821064445.615838-1-fuad.tabba@linux.dev>
- <20260821064445.615838-5-fuad.tabba@linux.dev>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 21 Aug 2026 07:00:38 +0000
-Message-Id: <20260821070039.120B51F000E9@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Rs+2PKOQ"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=yah7MrKK7PNquSWPJQDCIwVZ2JPFu1xOp+2NvgehUVA=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1787297883; v=1; x=1787902683;
+ b=Rs+2PKOQxiDadgUV9kvGaGCORRX+fL7ovwXQOqiVPB4+++j8/9qzNbGyVyxTPgEH4/LeDppA
+ PtvaYwfO1sKRClj3hVvbxhS3rDiyjI38ldnFuC5T3R2NTAKMKmSe8IIunL31E43eoAzlvhm23QB
+ i9F0QXEW8Yr2W16JVZ5cyeM8=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: from mail-lf1-f50.google.com (209.85.167.50)
+	by smtp.migadu.com with ESMTPS id 3b3adeaa624c651a;
+	Fri, 21 Aug 2026 07:38:03 +0000
+X-Mizu-Trace-ID: 3b3adeaa624c651a
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-5b2a8173142so3380e87.1
+        for <kvmarm@lists.linux.dev>; Fri, 21 Aug 2026 00:38:01 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+RoLk864wHS7/HLAM/rF+rxnzIfiJucgGAvbbMGsn1fMVYdfD9ET7uejHWDUzOJGwh77b80+5kk=@lists.linux.dev
+X-Gm-Message-State: AFuF++nRNK+r2Mb2QtVSDN3PFbw7eIctSUDDixjYFVmpVP44XLDGE1k9
+	WK7yToJvd5fZp6X7oHPwhBrEzudw1Ygsjy4/RhwACPZzeh8LtTkGelxIzGE9b6M06NiJqCLCi8c
+	wDzq6NCQlEx/+qan7D0qRfHUqzjgkI3oRA/CYneYS
+X-Received: by 2002:a05:6512:ba3:b0:5b2:8963:e5d4 with SMTP id
+ 2adb3069b0e04-5b484abe418mr132544e87.5.1787297880970; Fri, 21 Aug 2026
+ 00:38:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+References: <20260821064445.615838-1-fuad.tabba@linux.dev> <20260821064445.615838-2-fuad.tabba@linux.dev>
+ <20260821065743.3563C1F000E9@smtp.kernel.org>
+In-Reply-To: <20260821065743.3563C1F000E9@smtp.kernel.org>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Fri, 21 Aug 2026 08:37:24 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTy6Qb8dv_apBg4RVU+V-LsP1Z+BkDYfRKLX0f6PnbKpeg@mail.gmail.com>
+X-Gm-Features: AcwNN1V3Jgp2N0wWKRNXl0kP7pIhBFQl-DudY3Ff6wk0kH-wghLTEWnL5baySig
+Message-ID: <CA+EHjTy6Qb8dv_apBg4RVU+V-LsP1Z+BkDYfRKLX0f6PnbKpeg@mail.gmail.com>
+Subject: Re: [PATCH v2 1/4] KVM: arm64: vgic-its: Free the caches when
+ GITS_BASER changes
+To: sashiko-reviews@lists.linux.dev
+Cc: Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
+	Marc Zyngier <maz@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Thank you for your contribution! Sashiko AI review found 2 potential issue(=
-s) to consider:
-- [Medium] Unsafe DMA Buffer Configuration (ITT Size Miscalculation)
-- [Medium] Incorrect Endianness Conversion for L1 Device Table
---
+Sashiko, this one is real.
 
---- Patch [4]: [PATCH v2 4/4] KVM: arm64: selftests: Add ITS table save tes=
-ts ---
-commit 00c3ff8ee303e906c6d0f346f17949dbb0abf5fc
-Author: Fuad Tabba <fuad.tabba@linux.dev>
-Subject: KVM: arm64: selftests: Add ITS table save tests
+On Fri, 21 Aug 2026 at 07:57, <sashiko-bot@kernel.org> wrote:
+>
+> Thank you for your contribution! Sashiko AI review found 1 potential issu=
+e(s) to consider:
+>
+> Pre-existing issues:
+> - [High] Pre-existing race condition in ITS MMIO handler allows MSI injec=
+tion while ITS is disabled due to a stale translation cache entry.
+> --
+>
+> --- Patch [1]: [PATCH v2 1/4] KVM: arm64: vgic-its: Free the caches when =
+GITS_BASER changes ---
+> commit 98c89973da07ed23e9bd8348bfd2cf61333c4e66
+> Author: Fuad Tabba <fuad.tabba@linux.dev>
+>
+> KVM: arm64: vgic-its: Free the caches when GITS_BASER changes
+>
+> A guest that disables the ITS and changes GITS_BASER<n> with VALID still =
+set
+> keeps the mapped devices and collections. This patch frees the list and
+> drops the translation cache whenever the stored value changes.
+>
+> Link: https://lore.kernel.org/all/87ecg9owwa.wl-maz@kernel.org/
+>
+> > diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-=
+its.c
+> > index 9e782a4fea7e5..ab89b0138efd0 100644
+> > --- a/arch/arm64/kvm/vgic/vgic-its.c
+> > +++ b/arch/arm64/kvm/vgic/vgic-its.c
+>
+> [ ... ]
+>
+> > @@ -1702,6 +1705,8 @@ static void vgic_mmio_write_its_baser(struct kvm =
+*kvm,
+> >                       vgic_its_free_collection_list(kvm, its);
+> >                       break;
+> >               }
+> > +             /* A concurrent injection may have cached a translation. =
+*/
+> > +             vgic_its_invalidate_cache(its);
+>
+> [Severity: High]
+> This is a pre-existing issue, but the commit message explicitly notes tha=
+t
+> an injection can still cache an entry after the ITS is disabled.
+>
+> Is it possible for a subsequent MSI to trigger an unexpected LPI injectio=
+n?
 
-This commit adds selftests for KVM_DEV_ARM_ITS_SAVE_TABLES to cover cases
-where a guest alters tables. It tests handling of a GITS_BASER<coll> write
-that changes the table, and a device whose L2 block the guest invalidated.
-Each case is then reset and restored to verify the save functionality.
+Yes, and it violates the spec: with GITS_CTLR.Enabled =3D=3D 0 writes to
+GITS_TRANSLATER are ignored, so nothing should be injected.
 
-> diff --git a/tools/testing/selftests/kvm/arm64/vgic_its_save.c b/tools/te=
-sting/selftests/kvm/arm64/vgic_its_save.c
-> new file mode 100644
-> index 0000000000000..864da01539f3f
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/arm64/vgic_its_save.c
-> @@ -0,0 +1,441 @@
-[ ... ]
-> +/*
-> + * its_send_mapd_cmd() encodes ilog2(itt_size) - 1 as num_eventid_bits, =
-and
-> + * vgic_its_restore_itt() scans BIT_ULL(num_eventid_bits) * ESZ, so the =
-size
-> + * handed to MAPD has to match the ITT allocated for it.
-> + */
-> +#define ITT_EVENTID_BITS	13
-> +#define ITT_MAPD_SIZE		BIT_ULL(ITT_EVENTID_BITS + 1)
+It was reported in June [1] and is being worked on.
 
-[Severity: Medium]
-Does this calculation configure the hardware with an ITT size of 128KB inst=
-ead
-of the intended 64KB?
+Cheers,
+/fuad
 
-The test calculates ITT_MAPD_SIZE as BIT_ULL(ITT_EVENTID_BITS + 1) (evaluat=
-ing
-to 16,384) to compensate for its_send_mapd_cmd() subtracting 1. However, KV=
-M's
-its_cmd_get_size() adds 1 back, resulting in 14 bits of event IDs.
+[1] https://lore.kernel.org/all/ah6Lsi4MfKUU6wBR@v4bel/
 
-During restore, KVM computes the scan size as BIT_ULL(14) * 8 =3D 128KB, ca=
-using
-it to read 64KB past the end of the allocated ITT memory.
-
-> +#define ITT_SZ			(BIT_ULL(ITT_EVENTID_BITS) * ESZ)
-[ ... ]
-> +static void guest_unreachable_device(void)
-> +{
-> +	u64 *l1;
-[ ... ]
-> +	guest_make_device_table_indirect();
-> +
-> +	/* Both L2 blocks present, so both MAPDs are in range. */
-> +	l1 =3D test_data.device_l1_va;
-> +	l1[0] =3D L1E_VALID_MASK | (test_data.device_l2[0] & L1E_ADDR_MASK);
-> +	l1[1] =3D L1E_VALID_MASK | (test_data.device_l2[1] & L1E_ADDR_MASK);
-
-[Severity: Medium]
-Will this fail on big-endian hosts? The L1 entries are being populated using
-native CPU endianness.
-
-Since the ARM GICv3 ITS architecture and KVM emulator require these tables =
-to
-be little-endian (using le64_to_cpu on read), shouldn't these use htole64()
-when writing them?
-
-> +
-> +	its_send_mapd_cmd(test_data.cmdq_base_va, DEVICE_A_ID,
-> +			  test_data.itt_tables, ITT_MAPD_SIZE, true);
-> +	its_send_mapd_cmd(test_data.cmdq_base_va, DEVICE_B_ID,
-> +			  test_data.itt_tables + ITT_SZ, ITT_MAPD_SIZE, true);
-
-[Severity: Medium]
-This isn't a separate bug, but as a result of the ITT_MAPD_SIZE miscalculat=
-ion
-above, doesn't this send MAPD commands configuring overlapping, out-of-boun=
-ds
-ITT tables for the two devices?
-
-> +
-> +	/*
-> +	 * Drop the block holding device B. No ITS command and no GITS_BASER
-> +	 * write is involved, so nothing tells KVM the device is now
-> +	 * unreachable.
-> +	 */
-> +	l1[1] =3D 0;
-> +
-> +	GUEST_DONE();
-> +}
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260821064445.6158=
-38-1-fuad.tabba@linux.dev?part=3D4
+>
+> If Thread 1 (e.g. irqfd) calls vgic_its_inject_msi(), takes its_lock, and
+> enters vgic_its_resolve_lpi() in arch/arm64/kvm/vgic/vgic-its.c, it reads
+> its->enabled as true.
+>
+> If Thread 2 (guest vCPU) concurrently disables the ITS via
+> vgic_mmio_write_its_ctlr(), it acquires cmd_lock (but not its_lock), sets
+> its->enabled to false, and clears the cache.
+>
+> Thread 1 could then resume, finish resolving the LPI, and call
+> vgic_its_cache_translation() to insert the entry into the cache, ignoring=
+ the
+> fact that its->enabled is now false.
+>
+> A subsequent MSI would then hit vgic_its_inject_cached_translation(), whi=
+ch
+> does a fast-path lookup without checking its->enabled, successfully injec=
+ting
+> the MSI.
+>
+> Could this violate the GICv3 specification by delivering LPIs while the I=
+TS
+> is explicitly disabled, potentially crashing a guest OS during kexec?
+>
+> >               mutex_unlock(&its->its_lock);
+> >       }
+> >  }
+>
+> --
+> Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260821064445.61=
+5838-1-fuad.tabba@linux.dev?part=3D1
