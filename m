@@ -1,210 +1,174 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 824AB3CAE9B;
-	Fri, 21 Aug 2026 13:43:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EC1C3B1ED0
+	for <kvmarm@lists.linux.dev>; Fri, 21 Aug 2026 13:52:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787319800; cv=none; b=RCvguncT0gzTWsx0U/X2IGZmeS8e6b1GBMkGUUjkAImggFm6jJLW77se3EdsqpgT9kO7G/GEcJ9WSd68KudoyBMDllLn99qN3ldgBeu2ZELlTtmKMmsv7dSjSe/Fh6mbkwTZIpYgwlbzDdl+kvOffTdTpfMiErejLIwDA/1Fuj4=
+	t=1787320343; cv=none; b=onawu1nvZn2FWW1jpJ37ssS1pAWO7gSp/M9tZ02KGE5/rF3QGo7C7/4HsxyJy1gSq55HSHWnEDd9WvUfY8r7RA8RFEFExtCJ1gp2uPm1/PqUeKQdKTZ9s0c0aQr1s6SreGgZjhd6siSA2jrKk8sGJRXFwOTdidx8ePonWkt8ENo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787319800; c=relaxed/simple;
-	bh=fG13yd2nhvZlgt2VOFWDG5OqawaYkDaA3JuDhTjhpy8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=JEPu/FZL1MPJywMNLT4ThBCpXPMEJlsrEX5YpTngdtoTSZIgsY5R5q26w/HyX1ZanMVVwlDBL1/tFhyU24GZnmJpHXJtTe7XdTDes6fvdJ/mvJXenXBsOkaRvNCwufe+uhqgdiCFJVPLFTrG0rzT3GuoyResTyq3hVESiVqGMK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sqfou5ck; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1787320343; c=relaxed/simple;
+	bh=/ZPuMKdYiSpLFDDj6KBd5YfXG9RrVJ/W8yRsczFgpRQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cdGyEf43frGHAJIAWmnyCxmsUk1bdbHpSoToPzxkb+TVc/EXL0lOr2DLf1zlOcElIy9DGXeD/LtiTolPnvmdNDNEiZayAKXy4iFevsfaJmu8FgY1rlmH39d1CfEBaUqCzpCsS6TVt7UQ8Aiy7mjIfQvW9XSJiEWpqDAs04Q/PnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dsWdK4d0; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sqfou5ck"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8E1B1F00A3A;
-	Fri, 21 Aug 2026 13:43:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787319791;
-	bh=QZVuBsFPO7y/+P0oUWt1MocdFg1Mb540trEFoGS+/XI=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=Sqfou5ckAPcZDBKBlY5L6E32jhVWknn+BnkCBXSzAHC7pfl9T3qdvget9Zkc+r6W7
-	 NpjLzhmEdGkPzoP6YkEDGZj6TgnB/x880a3qegXWBJNqoR++tXsgs/b8o2l4cRPEnX
-	 3tNFRlhTDjZsd6m/DepQ44NryZkeOlVBijE4gBgmqx85Z1hWgeFmONtrKsSWm5AdLo
-	 mlkIuqxVEuLtN1t8qiRcyXmdm5KWgBkPBQtUtFOfwqzl4VdKeEQ8V408M2WPxi2b5E
-	 A0squiaZSky8+YbGL0adr/sq8XFJjmk9Q7C1Zpk7ZcIJCc0HV2x3hpXDQjBzlwW7DP
-	 RTIBuEBMJN+Ew==
-From: Pratyush Yadav <pratyush@kernel.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Pratyush Yadav <pratyush@kernel.org>,  Tarun Sahu
- <tarunsahu@google.com>,  ackerleytng@google.com,  fuad.tabba@linux.dev,
-  Andrew Morton <akpm@linux-foundation.org>,  dmatlack@google.com,  Shuah
- Khan <skhan@linuxfoundation.org>,  Jonathan Corbet <corbet@lwn.net>,
-  david@redhat.com,  Pasha Tatashin <pasha.tatashin@soleen.com>,
-  sagis@google.com,  Paolo Bonzini <pbonzini@redhat.com>,  Mike Rapoport
- <rppt@kernel.org>,  Alexander Graf <graf@amazon.com>,
-  linux-kselftest@vger.kernel.org,  andre.przywara@arm.com,
-  michael.roth@amd.com,  linux-kernel@vger.kernel.org,  linux-mm@kvack.org,
-  will@kernel.org,  vannapurve@google.com,  maz@kernel.org,
-  fvdl@google.com,  kvm@vger.kernel.org,  oliver.upton@linux.dev,
-  kvmarm@lists.linux.dev,  alexandru.elisei@arm.com,  skhawaja@google.com,
-  aneesh.kumar@kernel.org,  linux-doc@vger.kernel.org,  David Hildenbrand
- <david@kernel.org>,  yan.y.zhao@intel.com,  kexec@lists.infradead.org,
-  suzuki.poulose@arm.com
-Subject: Re: [PATCH v4 05/11] KVM: LUO: Support VM preservation across live
- updates
-In-Reply-To: <aoSCCTTBn9D5hqzk@google.com> (Sean Christopherson's message of
-	"Tue, 18 Aug 2026 09:02:17 -0700")
-References: <20260728121138.1103610-1-tarunsahu@google.com>
-	<20260728121138.1103610-6-tarunsahu@google.com>
-	<anphyjFv3FhF61iB@google.com> <2vxzpkzo51wg.fsf@kernel.org>
-	<anssOQFNZ2LfihbU@google.com> <2vxzik5f311e.fsf@kernel.org>
-	<anyObKiZIhfok5mk@google.com> <2vxzqzjz1x5f.fsf@kernel.org>
-	<aoMcqp0gr06YXAPU@google.com> <2vxzy0e3zgqz.fsf@kernel.org>
-	<aoSCCTTBn9D5hqzk@google.com>
-Date: Fri, 21 Aug 2026 15:43:04 +0200
-Message-ID: <2vxzy0dzy4gn.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dsWdK4d0"
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-499ac87c92bso8419435e9.1
+        for <kvmarm@lists.linux.dev>; Fri, 21 Aug 2026 06:52:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1787320340; x=1787925140; darn=lists.linux.dev;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=RKNX+Kx6HqLYYsW8IMt0XRzUyioNItYEZfBrRy9B9xA=;
+        b=dsWdK4d0VWZ92scm/OCvHucwHvz3UcLWKoGIMyJO/o7UDuZM5YsWeMpuLlrZ5IdB6i
+         dc6HWm9nc/U5Pabso7/w3WFCdr2DptA0NwDRN/m+++bZLNnVEbS9yKN6M0z0Ll9gCwcw
+         ZsZ4CUXgizPmAfgn51Ac3Ov6BI1UWbyF8Z+4sNYDSHYuzgYpSlQij4HAqJL8ShtF6dnP
+         j3+tKvIA5USPSQ2JwX0hoARhx+MX8GyWHaT7jhq1cXxKj1U40y92uFuQegxsXwEHb8VD
+         4ylKhpTCuDkYmup7dDD9rbT1sNLgfxCfztw8sAGKRUa1ZpSr+Cj5pGD8FkI+/73JJGIh
+         JKMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787320340; x=1787925140;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=RKNX+Kx6HqLYYsW8IMt0XRzUyioNItYEZfBrRy9B9xA=;
+        b=mxtdlvoQs50OieqZd1PagiWO2wxuVyAl8MBq00DaKAV0eFdholgI5vpE2ios93aaoG
+         YBEXg48YB0EOqM6OqCQN5w31uoEtyprXW4th1ZqNvv9eMWDOe5nMAeur9M+RsNcQE73+
+         2DxiJkwV1TsSEzxH6oNfpruXGrTjblDBa0dVN31mWJVvfXVkdME94X6wZPujq1d0kItP
+         pEV4Omu86hNJ4wLnOHJmXSIjKNR/si9xLQnZbsOMzcAMYmYUsmrKqQoXx3RBcBWtK8o9
+         ZL/m5xDQpFy+ENlc+hJt/PioJbSrE8DX++QSyyIJolj3NQoeCqUQ3iZ2YZSI/cVATddl
+         PFPQ==
+X-Forwarded-Encrypted: i=1; AHgh+RqtB7dJbxpdsUnP7FydWblBVC2IzEGLCdq9M5+NMU+1tCNCinieActyOdeTXVaOrRAZ4A4fncs=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yyy0fi/QoDI5e5/MAx6/bQSFYxzLarJf+j36oSb7H/vvjOEKRYu
+	HHUZfkeD5nKkFV0aNCpy+x4a0h38N2O/MpKdCVuVLujp9H9kU2hrbftW
+X-Gm-Gg: AR+sD13J9BMkzzMMrRuC9rb6rrCb1fTL5NQVvEU6QeZYemffnHCQZ6jP8s+J0xSwCBN
+	m6rrP2Bd9buZ4ewUVJB4w+GQscKtZltmm4B3qMLw/nptf4+JzGXrTwOa6P/n5fjid84+XA5ozNA
+	Dst+KEKWESnQxShL22WXhdfsN52/LcxyKo/rkoKdb6lQlp27QhIQQcgXz8rYu0mTBlEu2DrP7xD
+	ladBrpel76sP+p1HeywtNNANU39KkhCo4/zW0VCkAhPDG0hBWF+G7Ywdw00ia3ivl7Q4U50KK6x
+	LZ0JQVx3Y9ghGmDK1gnrVx7hkliaAbaJCrYskVal7NEd8ZLJZWLOedAzFTv5BmleSt5mC3x8v7A
+	swBWoDNJE2efebUeNbZWICJhkLKHhfFShwUc5OsZ4v3Re3keHYnIcRrsD996qvYRhHbdbf0xDbm
+	YX41fwb4IZB2uY8zOsrnLXeQpHARelzSXtDk1k1halag+GongJ/zi1Nx7Dld4SbFSoNSstTROdY
+	2Pk
+X-Received: by 2002:a05:600c:a087:b0:499:86ce:465e with SMTP id 5b1f17b1804b1-499b8324b09mr117557705e9.4.1787320339715;
+        Fri, 21 Aug 2026 06:52:19 -0700 (PDT)
+Received: from [10.45.28.226] ([15.248.3.94])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-482b14b80a5sm17753598f8f.24.2026.08.21.06.52.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 21 Aug 2026 06:52:19 -0700 (PDT)
+Message-ID: <0365d77d-616b-47f7-a5f2-3388bad692a1@gmail.com>
+Date: Fri, 21 Aug 2026 14:52:17 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 2/5] KVM: arm64: Add pre_fault_memory implementation
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: maz@kernel.org, oupton@kernel.org, pbonzini@redhat.com,
+ joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com,
+ yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org,
+ shuah@kernel.org, corbet@lwn.net, vladimir.murzin@arm.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org,
+ isaku.yamahata@intel.com, Jack Thomson <jackabt@amazon.com>
+References: <20260612162354.73378-1-jackabt.amazon@gmail.com>
+ <20260612162354.73378-3-jackabt.amazon@gmail.com> <alEXtW7w-rqlNG09@raptor>
+Content-Language: en-US
+From: "Thomson, Jack" <jackabt.amazon@gmail.com>
+In-Reply-To: <alEXtW7w-rqlNG09@raptor>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Sean,
+Hi Alex,
 
-On Tue, Aug 18 2026, Sean Christopherson wrote:
+On 10/07/2026 5:03 pm, Alexandru Elisei wrote:
+>> +	unsigned long		*page_size;
+> 
+> As far as I know, fault handling was reworked to use struct
+> kvm_s2_fault_desc to store the fault information that user_mem_abort()
+> needs to handle the fault.  Adding a 'page_size' field, that represents the
+> result of the gpa mapping process, might not be desirable.
+> 
 
-> On Tue, Aug 18, 2026, Pratyush Yadav wrote:
->> Hi Sean,
->> 
->> On Mon, Aug 17 2026, Sean Christopherson wrote:
->> 
->> > On Sat, Aug 15, 2026, Pratyush Yadav wrote:
->> >> On Wed, Aug 12 2026, Sean Christopherson wrote:
->> >> > On Wed, Aug 12, 2026, Pratyush Yadav wrote:
->> >> So with live update, we don't need to keep backwards compatibility in
->> >> the ABI forever. Of course, it is good to minimize changes, but we have
->> >> more freedom to change it.
->> >
->> > Ah.  So this is the heart of the disconnect.  I very strongly disagree with the
->> > statement that live update doesn't need to support backwards compatibility.  I
->> > can totally believe that the folks working on live update are ok breaking backwards
->> > compatibility because their use cases are "fine" with such breakage.  And I can
->> > also believe live update as an upstream kernel feature being developed by those
->> > same folks is also ok with breaking backwards compatibility.
->> >
->> > But with my upstream KVM maintainer hat on, I am not ok with that.  I did not agree
->> > to support a world where KVM is allowed to break backwards compatibility, so long
->> > as it's done "carefully" or whatever.  If y'all want to deal with the resulting
->> > complexity, that's fine by me, but you'll be doing it without KVM.
->> 
->> Let's step back a bit. I don't think backwards compatibility in the
->> _ABI_ is all that important in live update's context. What is important
->> is that our users are able to live update from kernel version X to Y.
->> The line format the kernel uses to describe its state is an
->> implementation detail. Our users never see it.
->
-> The rule is thou shalt not break userspace.  Whether or not the breakage is the
-> result of an explicit ABI change is irrelevant.
->
->> The high level idea is that when you need to make a change to the ABI so
->> the kernel can better describe the objects/resources/files it is
->> passing, you create a new version of the ABI and allow transitions from
->> older versions.
->> 
->> Say you make some changes and need an ABI version v5. You don't get rid
->> of v4. You keep it around. LUO core will facilitate picking the right
->> version for the next kernel. So it will be possible to seamlessly
->> upgrade your kernel that speaks v4 to a new kernel that speaks v4 and
->> v5. Now this kernel can start speaking v5 if its successor speaks v5
->> too. And so on for going to v6 and v7, etc.
->> 
->> After a "reasonable" time given for upgrades, you deprecate v4. v4 has
->> been around long enough and our users have had a chance to go to kernels
->> speaking newer versions. That's when you remove the code for v4 from the
->> kernel.
->> 
->> We can argue what "reasonable" means, but the core idea stays. 
->> 
->> It will still be possible to go back to v4 or earlier, but you'd need an
->> extra stop along the way. And of course, vendors can keep a wider
->> support matrix downstream if they see the need for it.
->> 
->> Does this idea of "backwards compatibility" sound acceptable to you, at
->> least at a high level?
->
-> No.
->
-> It's probably fine for Google and other large companies that tightly control their
-> kernels and use cases, and have the resources to juggle the resulting complexity,
-> e.g. have kernel engineers on staff to track feature and dependencies, coordinate
-> and plan kernel upgrades, etc.
->
-> It's not acceptable for upstream, where downstream consumers often run a distro
-> kernel, have much more varied use cases, and don't always have a horde of kernel
-> engineers on staff to help them thread the needle you describe above.  And if
-> supporting live update as a general feature for all users of the kernel isn't
-> being factored into design considerations, then that needs to change, otherwise
-> this is all dead in the water.
->
-> I also don't see the point.  Maintaining a rigid save/restore ABI is annoying,
-> but it's not _hard_ (or at least, not _that_ hard), especially if there's a set
-> of well-documented best known practices that subsystems can follow, e.g. so that
-> individual subsystems don't need to learn painful lessons first-hand.  I genuinely
-> believe that maintaining the version hell you describe above would be more costly
-> in the long run than simply committing to full backwards compatibility within a
-> given subsystem.  I can imagine that enumerating what subsystems' information is
-> in the payload will require a different scheme, but for a given subsystem, I don't
-> see any reason to aim for anything less than full backwards compatibility.
+Yeah agreed, Vincent suggested a separate output struct that
+kvm_s2_fault_map() fills with what was actually mapped. I'll do that in
+v6 thanks!
 
-Let's say for argument's sake that we commit for a fully stable
-backwards compatible ABI. Even then, you have to deal with multiple ABI
-versions.
+>> +	struct kvm_vcpu_fault_info *fault_info = &vcpu->arch.fault;
+>> +	struct kvm_vcpu_fault_info fault_backup = *fault_info;
+> 
+> I'm not sure you need to make a backup here. vcpu->arch.fault is populated
+> each time the CPU takes a fault.
+> 
 
-Live update's ABI is more complex compared to KVM's save/restore ABI.
-For the KVM save/restore uAPI, you are largely describing architectural
-state like CPU registers, etc. These things don't evolve as fast and
-more or less stay the same.
+So this was actually flagged up by sashiko when I ran it before
+submission, it suggested handling this for the case in which the vCPU
+exited for MMIO, the next KVM_RUN calls kvm_handle_mmio_return which
+uses the vcu->arch.fault.esr_el2. I'll add some comments to this maybe
+to explain why this would be needed.
 
-Live update needs to describe the state of kernel objects. These are
-more complex and evolve faster.
+>> +	if (memslot->flags & KVM_MEMSLOT_INVALID) {
+> 
+> I don't think that's something we should care about, the flag can be set
+> immediately after the check as the function doesn't take kvm->slots_lock.
+> kvm_vcpu_prefault_memory() takes the srcu lock in read mode, so the
+> function is safe to run even if userspace does something silly like
+> deleting a memslot at the same time that it's prefaulting the guest memory
+> it represents.
 
-For example, say you merge guest_memfd preservation today. Some time
-later, someone comes up with a more efficient data structure to track
-the folios in the file. You _have_ to make a backwards-incompatible ABI
-change to use this data structure.
+I was there not as much for safety, but rather to pick up that error.
+This way rather than userspace getting an -EFAULT it can just retry.
+This is the same way it is handled in x86 as well.
 
-Or say you add a new memory backend (like the HugeTLB patches in
-flight). That likely will need a different ABI to describe the state of
-the guest_memfd.
+> 
+> It might not be obvious, but taking kvm->mmu_lock in read mode does not
+> guarantee that gpa will be mapped when kvm_pgtable_get_leaf() returns.
+> That's because a concurrent kvm_pgtable_stage2_map() for a different gpa
+> can destroy the mapping of the current gpa.
+[ ... ]
+> The kvm->mmu_lock is dropped here, which means that it is possible for a
+> MMU notifier callback to have just unmapped the entire stage 2 for the VM.
+> 
 
-So you will end up with multiple ABI versions that aren't always
-backwards compatible.
+Yeah as we mentioned in the other thread, this is best effort and we
+can't guarantee that is survives the return. We do this for forward
+progression, reporting the correct advance size for ranges which are
+already mapped, instead of repeating the full dance for every page of them.
 
-If you refuse that idea too, then KVM live update will be dead in the
-water for a different reason. It will be damn near useless because it
-can't keep up with an evolving subsystem.
+> 
+> handle_access_fault() will fail if the mapping is gone. But I guess that's
+> fine if the ioctl does not guarantee that memory is still mapped after it
+> completes.
 
-Now once you get multiple ABI versions and you can seamlessly go from
-old to new one, say you have a version that was superseded 5 years ago.
-It would be completely reasonable to say that this version is old enough
-and no one should be going from a 5 year old kernel to a modern one. So
-you deprecate this ABI. Deprecating old unused uAPIs is not
-unprecedented.
 
-I think we are better off formalizing this deprecation period from the
-get go.
+Yeah I think it's fine and will degrade to a no-op in this case.
 
-A somewhat tangential example is BPF kfuncs. My BPF program that works
-in kernel X might not work in kernel Y because the kfunc has changed or
-been removed.
+> 
+> Also, the documentation that this patch adds says: 'On arm64, newly created
+> stage-2 PTEs are marked Accessed'. Does not say anything about marking
+> **existing** ptes as accessed. Would be useful to explain the code does it.
+> 
 
-The argument they make in kfuncs.rst is that kfuncs "provide a kernel
-<-> kernel API, and thus are not bound by any of the strict stability
-restrictions associated with kernel <-> user UAPIs". For LUO as well,
-this is a kernel -> kernel API. Users can also still do a regular kexec
-or reboot. They just won't get the performance optimization of LUO.
+Ack, will do thanks!
 
-Regardless of if you agree with the last bit about deprecating old
-versions, ABIs evolving with the subsystem is a ground reality of live
-update and it would be foolish to think we can do with only
-backwards-compatible ABI changes forever.
+>> +		hva = gfn_to_hva_memslot_prot(memslot, gfn, NULL);
+> 
+> There's gfn_to_hva_memslot(memslot, gfn), is that what you are looking for?
+> 
+
+I think gfn_to_hva_memslot() resolves the hva for write, so would fail
+on KVM_MEM_READONLY slots, and prefualting is a read. Also this mirrors
+the guest abort path so matches the way the run path resolves the HVA.
 
 -- 
-Regards,
-Pratyush Yadav
+Thanks,
+Jack
