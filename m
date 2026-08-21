@@ -1,173 +1,102 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51DEC388873;
-	Fri, 21 Aug 2026 18:15:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B81F37C92D
+	for <kvmarm@lists.linux.dev>; Fri, 21 Aug 2026 19:09:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787336154; cv=none; b=nPH95Ws81QfWWvr1FmPN6E6BWhizmn6Wg6dijPYVcEE0rwRXR+lcjlRmw4uYworpLacZu2YkZrab0yRsC22l00TMPMLWAu0NHOHyOApdU/9e/TEwzS8zxD9ZJMpXdEyqQ98Ucew1m+cM147X8RJzharxANwlc3x51LDRHCBpGqQ=
+	t=1787339378; cv=none; b=T6+nOjlH1iFrHQUMCWDz6Tb3lHAPQ+X/Phh/Pn+MDee7mloXLGuveBN/MJ7TAXMD5UP3tDI4HRReZJtE0VjkoHwMMOMAVLIA18NBHTJtw5fL9qKt4/OEZ67ygNX+kac/SuIku9U7JhShh+sWz5LW1GsPaRTTF5+WLHmUsRZcitU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787336154; c=relaxed/simple;
-	bh=+99XM01RcrT4lcPtGr0SsrKGPUdEPI6dT2JeqiRU4DU=;
+	s=arc-20240116; t=1787339378; c=relaxed/simple;
+	bh=m4AbHNYOybKycCffk+1NRelRi+xxrvqfKKYJ+6qV4UY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ReaLoqd7tus0ZAhVDtMNQodwWQ+0lwioUBgLkGJJ0qXyYM5P9bK5+D30vGFrqCu8TAh2MDnlFI5PYBkxLC14nstNKz5AyY7Le5puSu5gyy2+Y9wdQ9C/JiH6fnLwclSsdyKM1oHZtjHUvvykY5e5YxCXlepPTBg56+VFKfdidIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QYIUd8ZR; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=e9T8ydLmxuNqNy/lcArbzGty3foRvKhgDqviSzQP50QAWJUJiPXLVbmXIn5QA17NVFky/4Fs/OeL1saCiBEKHTByx1JLSOhJSbFobcDHdqiWjvkBIHxJJ+EOMGHtTVKMpnDD8AowHbEKhgvHWROiuHsPD2m6+dziI28Ss/6x0Kg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qpbgJFB3; arc=none smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QYIUd8ZR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45A111F000E9;
-	Fri, 21 Aug 2026 18:15:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787336151;
-	bh=Ha7VqklCByafbMscCYK5sdSaBdyQHFxscjntKch3xYg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=QYIUd8ZRyIYZtnSUpGlYCZBdotfIv/c9uZQV/LJbOq3p5eaUgBdw4PvhPgyKATm/A
-	 CnrGasr7GX8WJBcdTCmcu5ftVt4g5W15eCCrTqJRgk/pixnO1+oYIZmYczpjcvsFR5
-	 Gi3s3zZD/Cne2LZONbqO/vkBW9Yr9z6lQJFVTbdxldafnKRQwaviFjUu1ge4+7YgHI
-	 egEAPOYD2viQixM/JK5ujpl5yyukDnlQZEvPPeH4DbDCyJ1En3YyV13xkfSrkI6DZu
-	 jnAY+mLEsIxbgAQuiYeqJSF2JNHO7TWURQ/Ae7B4/s8JToBTJe4MjJRPsyh2sYlNLT
-	 8VP2mMzcIqa3A==
-Date: Fri, 21 Aug 2026 19:15:45 +0100
-From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qpbgJFB3"
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-c214e625259so196947766b.2
+        for <kvmarm@lists.linux.dev>; Fri, 21 Aug 2026 12:09:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1787339375; x=1787944175; darn=lists.linux.dev;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=m4AbHNYOybKycCffk+1NRelRi+xxrvqfKKYJ+6qV4UY=;
+        b=qpbgJFB3WGPckK2Yx7R9rhrzJhvh96BLvf8jWXp6R3AIHg4yIj4z2tcSZgrMY62gPu
+         8QH2Y+dqJXhI9nc7DOVOGwlHmr76m1N8lL/37YCLLleN1d82iRGTOBKLcbkKNkYFa6yy
+         073brxrmvGmHuPqvTZQkIK3MrOtkC/i+B5PrRsDZpX6nBRhv6346xU5E47APMMuG2+hG
+         AjC4zfnmJ9f5NIYcUSCAnuaH1wlB7wF0xnXFqYe4BRHezv/w+v9D9ZGTK+cTCgXFiyWn
+         QpKXyHJO4mb/DTKjMdz6DW01QqNBM8rTrShJWrLks8qx7uyRKgTBHBsGqMgLO8v1e/N5
+         UT+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787339375; x=1787944175;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=m4AbHNYOybKycCffk+1NRelRi+xxrvqfKKYJ+6qV4UY=;
+        b=NPO13kiSHP+o9ykfcS+wi2czYnLg/E/KIkTehGkQwEmiP1xuZcWKKuRy6h0O38ReY9
+         wdnNsydRiYdZrFMhyl6ccTBQR9Zrs7gRl9xYNcPz2+IpbS640Ro9NRffIshc74j/pHd2
+         C6tb7/XIzOeHCfEFYiwqs8K/tQ8iCbY+0UKmI1av9LH0WJvZ3dTJiEURmnAEsq5rB/O4
+         sQgYvGBNwFhYujSHI3IuKgNLFlshyKHxAZuRpuJ7tWN2iIPXEELDecKal9wsUxZ+Mpnn
+         X7dmM3OsO3rU3ahSS+zw8dZxL09eY1RkRBNwK6VKhxNucCpw8WvTGnnHXQlS2Jdpt9yr
+         pSUQ==
+X-Forwarded-Encrypted: i=1; AHgh+RpxLehVQN1Ulgii5MHd60gdSeNsO54pZrq6l6NTcL3LEm3HnGAlZMk/13PP6ZwUpUsZhZr6XW8=@lists.linux.dev
+X-Gm-Message-State: AFuF++lyVRz04m+xfZY57II5PYPRu0VxfQACRgGYohOduARJkJMCfLrg
+	BkFsqCLxVlPa6au4JujKvj2OlG0xLaiLyNk+5XID8Cc5bGMLtybVMayG
+X-Gm-Gg: AR+sD10n2ib4avOjdd3TZYfZRtRLcUgRMg9lHCpHggTu6A4JRb+eiSg6DbajXPUXais
+	SZa8h1SIc6UiISaPzOqV04A+RRxxWglFhjUHcZ+1lorfNe0gIsLwDaqwdhram/cQ1ijgz3YXORq
+	E8O0PACARlcNkavvq7e0Xc7N83GKxd8Yvb1FM7qAFmTFBp2tcNP9awPquZBE1m+ugrWSmN9v4bX
+	qOh0adOg7cr7tut+IlexBnrDj24C0pTXi4r33u1som9V2921upLOQAtQ4vIGh+j2IBQCnK27Q0t
+	t0G4D08D20QAOIvMZ+QLwr/NyZRU076ObBl9/V2+Mhvq4jtfL2ylR7UdAUKVqfSipfwYIRNMmSq
+	ZwzCSUhf2U+EGlSCMDxqjRrsksPnqpHCKHNr3XUWjEuGnfaN8x64wHYOaADdViLxfSdgOgV+7uc
+	DsyMPckjDiAAhGTya/Y36Maoq1U8YXW+3+Yh3bE4+eLVpD97uFdkMsTbTMZxQ9ZHX2yZ3vg/XSe
+	7pWSqTwmN4zTJqac0l5QTXfPvrFKrw8LPKvC/SNhgVWcmdc3CcawOmXjmEjGZEmB0Ob5jqHJsLF
+	2of4aP7XYgOtlrnFwGkAJbbuESUySBZj8WWd6TWiYx4VlEoBiDy4a51GbD3kdaMLXxc6NlR5E67
+	6Zg==
+X-Received: by 2002:a17:907:97d5:b0:c20:21be:ea75 with SMTP id a640c23a62f3a-c246a33ea8bmr796814866b.8.1787339375197;
+        Fri, 21 Aug 2026 12:09:35 -0700 (PDT)
+Received: from MBP-von-Karl.localdomain (dynamic-2a02-3100-a103-bf01-4ca5-89c5-9aa3-9754.310.pool.telefonica.de. [2a02:3100:a103:bf01:4ca5:89c5:9aa3:9754])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c24589e2ab2sm584196866b.7.2026.08.21.12.09.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Aug 2026 12:09:34 -0700 (PDT)
+Date: Fri, 21 Aug 2026 21:09:32 +0200
+From: Karl Mehltretter <kmehltretter@gmail.com>
 To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	Steffen Eiden <seiden@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oupton@kernel.org>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Fuad Tabba <fuad.tabba@linux.dev>, 
-	Shen Yongchao <grayhat@foxmail.com>, Karl Mehltretter <kmehltretter@gmail.com>, 
-	Wei-Lin Chang <weilin.chang@arm.com>, stable@vger.kernel.org
-Subject: Re: [PATCH v3 2/2] KVM: arm64: nv: Delay freeing of shadow S2
- structures until VM destruction
-Message-ID: <aoiQuVs5jzB5La4i@gremlin>
-References: <20260821161829.1032561-1-maz@kernel.org>
- <20260821161829.1032561-3-maz@kernel.org>
+Cc: Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
+	Fuad Tabba <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, Eric Auger <eric.auger@redhat.com>, 
+	Christoffer Dall <christoffer.dall@arm.com>, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v2 3/5] KVM: arm64: vgic-v3: Unregister redistributors
+ before freeing regions
+Message-ID: <aoiiHw4hBHB7C5uL@gmail.com>
+References: <20260819224229.82948-1-kmehltretter@gmail.com>
+ <20260819224229.82948-4-kmehltretter@gmail.com>
+ <874igpp3qm.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260821161829.1032561-3-maz@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <874igpp3qm.wl-maz@kernel.org>
 
-On Fri, Aug 21, 2026 at 05:18:29PM +0100, Marc Zyngier wrote:
-> We free the shadow S2 structures from kvm_arch_flush_shadow_all(), which
-> is a Bad Idea(tm). Freeing the page tables is fair game (this is what
-> this callback is for), but freeing the container that could still be
-> referenced by another part of the system is not great.
+On Thu, Aug 20, 2026 at 09:58:57AM +0100, Marc Zyngier wrote:
+> The other bit of interest is in __kvm_vgic_vcpu_destroy(), and its
+> conditional removal of the RD iodevs. Can't we just get rid of this
+> whole block altogether now that we have a saner failing path?
 
-Yes.
+I tested removing that block.
+It reintroduces the use-after-free fixed by ae8f8b376102
+(“KVM: arm64: Unregister redistributor for failed vCPU creation”).
 
->
-> Instead, grow separate destructors that gets called when we tear the VM
-> down for good. From there, we can nuke both the individual MMUs as well
-> as the global array that points to them, safe in the knowledge that the
-> vcpus themselves have been destroyed already.
->
-> Fixes: 4f128f8e1aaac ("KVM: arm64: nv: Support multiple nested Stage-2 mmu structures")
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-
-LGTM so:
-
-Reviewed-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
-
-A couple thoughts/questions below.
-
-> Cc: stable@vger.kernel.org
-> ---
->  arch/arm64/include/asm/kvm_nested.h |  1 +
->  arch/arm64/kvm/arm.c                |  4 ++--
->  arch/arm64/kvm/nested.c             | 15 ++++++++++-----
->  3 files changed, 13 insertions(+), 7 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-> index 5b8edb2e8a87d..586026e859030 100644
-> --- a/arch/arm64/include/asm/kvm_nested.h
-> +++ b/arch/arm64/include/asm/kvm_nested.h
-> @@ -67,6 +67,7 @@ static inline u64 translate_ttbr0_el2_to_ttbr0_el1(u64 ttbr0)
->  extern bool forward_smc_trap(struct kvm_vcpu *vcpu);
->  extern bool forward_debug_exception(struct kvm_vcpu *vcpu);
->  extern int kvm_init_nested(struct kvm *kvm);
-> +extern void kvm_destroy_nested(struct kvm *kvm);
->  extern int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu);
->  extern void kvm_init_nested_s2_mmu(struct kvm_s2_mmu *mmu);
->  extern struct kvm_s2_mmu *lookup_s2_mmu(struct kvm_vcpu *vcpu);
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 7607173c1a40c..2b069c6440669 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -269,7 +269,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->
->  err_uninit_mmu:
->  	kvm_uninit_stage2_mmu(kvm);
-> -	kvfree(kvm->arch.nested_mmus);
-> +	kvm_destroy_nested(kvm);
->  err_free_cpumask:
->  	free_cpumask_var(kvm->arch.supported_cpus);
->  err_unshare_kvm:
-> @@ -327,7 +327,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
->
->  	kvm_unshare_hyp(kvm, kvm + 1);
->
-> -	kvfree(kvm->arch.nested_mmus);
-> +	kvm_destroy_nested(kvm);
->  	kvm_arm_teardown_hypercalls(kvm);
->  }
->
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 05266f8b87304..00580ba6e8ba0 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -55,6 +55,15 @@ int kvm_init_nested(struct kvm *kvm)
->  	return kvm->arch.nested_mmus ? 0 : -ENOMEM;
->  }
->
-> +void kvm_destroy_nested(struct kvm *kvm)
-> +{
-> +	for (int i = 0; i < kvm->arch.nested_mmus_size; i+= S2_MMU_PER_VCPU)
-> +		kvfree(kvm->arch.nested_mmus[i]);
-> +
-> +	kvm->arch.nested_mmus_size = 0;
-> +	kvfree(kvm->arch.nested_mmus);
-> +}
-> +
->  static int init_nested_s2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
->  {
->  	/*
-> @@ -1310,16 +1319,12 @@ void kvm_nested_s2_flush(struct kvm *kvm)
->
->  void kvm_arch_flush_shadow_all(struct kvm *kvm)
->  {
-> -	for (int i = kvm->arch.nested_mmus_size - 1; i >= 0; i--) {
-> +	for (int i = 0; i < kvm->arch.nested_mmus_size; i++) {
-
-Hmm why this was in reverse before? :) I guess some product of the
-kvfree() bit or maybe something else?
-
->  		struct kvm_s2_mmu *mmu = kvm->arch.nested_mmus[i];
->
->  		if (!WARN_ON(atomic_read(&mmu->refcnt)))
->  			kvm_free_stage2_pgd(mmu);
-
-Yeah I think the mmu write lock taken by the function and the fact mmus are
-marked invalid here (VTTBR_CNP_BIT set kvm_free_stage2_pgd() ->
-kvm_init_nested_s2_mmu()) makes this entirely fine to do here, as you say.
-
-> -
-> -		if ((i % S2_MMU_PER_VCPU) == 0)
-> -			kvfree(mmu);
->  	}
-> -	kvm->arch.nested_mmus_size = 0;
-
-And, neatly, this makes the patch simply take away the bad bits to do here and
-to do them in the correct place.
-
->  	kvm_uninit_stage2_mmu(kvm);
->  }
->
-> --
-> 2.47.3
->
-
---
-Cheers, Lorenzo
+Karl
