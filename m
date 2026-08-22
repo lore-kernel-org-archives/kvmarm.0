@@ -1,50 +1,60 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8858D39B4A5;
-	Sat, 22 Aug 2026 07:28:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43CCF493652;
+	Sat, 22 Aug 2026 07:32:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787383702; cv=none; b=E7gkQvUUz8Nof8W9MmnRSThD+ceNX1F063/Y8rrk1ZekQ8NPtXITOzFhAmNJrBAA4cgLrMMDwVqLt/0hFupnUo2Z4pzH/IT40xqjliZRpu4ipXGA5iHT3Yt/qBDuMQxvrLPEUFyoFKc5dG1cr6b4ND3XDiXyOCp3RjAuvbHbLIQ=
+	t=1787383928; cv=none; b=SmUDEJyMkgp4Z+8xYPPXUScIMtLTUhkHQVKRHHStnFV1MRaO9ZLv0vt/hsdqtuM7vZgjgEBP5RTeAPZWB44hnwlzCag6paL8RbaDDJyyvnunvYp54Q0YIOv8TDZgV2PwHLv94WEclQfncIi0q7cHtaVni0VVACFi3NPr1uhP24A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787383702; c=relaxed/simple;
-	bh=7EH6nkAv68Ysc/kGnsAbrQ1JTNu6PdTSsRyUlPbTung=;
+	s=arc-20240116; t=1787383928; c=relaxed/simple;
+	bh=ro48hLvs90KHt1NnusK7STw1kcatbqrL3/ee3Q62b04=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iqTIPbI+ynrOsVsqoo2UnP9aNkygOJ4xJIldip7P6CSN0bL2TtqAyXLfInRFoOIrOyYktIJCK7wwjZ5qe/XmMHgI6UHq7bIuwmOXaOLwOt/eOC7R/i6AGnC5hZAesqklvnraKx4SQgjaEy8/AyiVhYZFQfEVHK+IIKiwP5z/Jfw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l0tRulmt; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=hGTpjluAwgxvPAlteLSmo6PDNlJGx5TmsOs+R/f2ETxk0MfkJC7wSv4K05pugPLSA0xDBxYmngnc0+hLP6zxW9yPlr4PSnQv5i6iUyz/Htk8ls5ND22eHSrHwU/eHz3zgAnhd7VQ6dthcjdDP0q9SX/tQzr7spz2gJK7CTp91ec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V2ahLVo7; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l0tRulmt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34A3A1F000E9;
-	Sat, 22 Aug 2026 07:28:21 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V2ahLVo7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CDCC71F000E9;
+	Sat, 22 Aug 2026 07:32:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787383701;
-	bh=m7jzBL8B5ahaWiykmUYf8brzyElxeR4aRjpZhqmQmkA=;
+	s=k20260515; t=1787383926;
+	bh=7EEflvdgZQe7OvkOracGJyX6vR4Npi3B22FWFR0VKLU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=l0tRulmt1MoVU5RU1dY7WA9U7n0oBzm3xOu69YnYEKh8HhLEGYX8ffF4BOylvRDJt
-	 Kesmpgqiq7BeOifrZ1k80ZqjPUFpyK7t90ViDT2dchCKkkjYjsdhFGvbUUJKAiTcIW
-	 DDv2KVOdM4uj2EZ3AnYzogg2lBH7e/eMbqEXA3LvytHy99ktqlBGKgKpiDcuOJcAt7
-	 +Mv71mgjfkKXhc4LcTunzYPUm4nvcwJWo8A+1G3So0XU3UjhXzVyNZYgZu+UqDBhWP
-	 PoXxqO+VzgoP2O+hy8LkfP7XXj8GPsQnKNhBSRXuQuNyn44TmtSZF3GobqWdw79VsF
-	 8oGEvsGDCaeyw==
+	b=V2ahLVo7vaGqAGyqKtSSqu/dWNmdSL5N1EWqpBPVbDqfrabVuuj2kE1hdyTxZj88f
+	 W72c+CparEppW9iw8s7MYdnnAu5f77KKOCVq1PQeIXNQbwO3hKGlhVyNVKkSdvc3t8
+	 AdD5nHMfmhaMUkNFWR3RYnJzDAUmKeUnPHdfVOXVFqQ4CIZD/E/m8RSwNB+5iixPpJ
+	 LrP57PdfhPWhqa6iPqHZVlNIitIzGD7HYX4ItdZuVKmi/TxLlU+m2buzU0njW/+lJ2
+	 FyPt1poIYh5V0cWNqhYAx4OMo8jaM596jyzhnKseTgDYiQ2+1V5ERDbPYRXiXqAfTm
+	 Q+XK7jLr+ABaw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wxg9L-00000000DYv-0gMu;
-	Sat, 22 Aug 2026 07:28:19 +0000
-Date: Sat, 22 Aug 2026 08:28:18 +0100
-Message-ID: <86zeye4nsd.wl-maz@kernel.org>
+	id 1wxgCy-00000000Dbx-3uWw;
+	Sat, 22 Aug 2026 07:32:05 +0000
+Date: Sat, 22 Aug 2026 08:32:04 +0100
+Message-ID: <86y0dy4nm3.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Cc: sashiko-reviews@lists.linux.dev,
+Cc: Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Jintack Lim <jintack.lim@linaro.org>,
+	Christoffer Dall <christoffer.dall@linaro.org>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
-	Oliver Upton <oupton@kernel.org>
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
 Subject: Re: [PATCH 2/2] KVM: arm64: nv: Fix null ptr deref in kvm_nested_s2_unmap() on S2 teardown
-In-Reply-To: <an3lHhgmwS0RnCgI@lucifer>
+In-Reply-To: <20260812-kvm-arm-nested-virt-fix-v1-2-4ad883f1b6a5@kernel.org>
 References: <20260812-kvm-arm-nested-virt-fix-v1-0-4ad883f1b6a5@kernel.org>
 	<20260812-kvm-arm-nested-virt-fix-v1-2-4ad883f1b6a5@kernel.org>
-	<20260812140101.D77AC1F000E9@smtp.kernel.org>
-	<an3lHhgmwS0RnCgI@lucifer>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -56,69 +66,78 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: ljs@kernel.org, sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev, oupton@kernel.org
+X-SA-Exim-Rcpt-To: ljs@kernel.org, oupton@kernel.org, tabba@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, jintack.lim@linaro.org, christoffer.dall@linaro.org, christoffer.dall@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, stable@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 13 Aug 2026 16:56:02 +0100,
+On Wed, 12 Aug 2026 14:31:21 +0100,
 "Lorenzo Stoakes (ARM)" <ljs@kernel.org> wrote:
 > 
-> On Wed, Aug 12, 2026 at 02:01:01PM +0000, sashiko-bot@kernel.org wrote:
-> > Thank you for your contribution! Sashiko AI review found 3 potential issue(s) to consider:
-> >
-> > Pre-existing issues:
-> > - [Critical] Use-After-Free on `kvm->arch.nested_mmus` array due to concurrent teardown.
+> Commit 7270cc9157f4 ("KVM: arm64: nv: Handle VNCR_EL2 invalidation from MMU
+> notifiers") introduced VNCR_EL2 invalidation in kvm_nested_s2_unmap().
 > 
-> Addressed by Marc's changes + discussed over there.
+> However at the point of this being performed concurrent stage 2 teardown of
+> a nested guest can cause kvm->arch.mmu.pgt to be set to NULL.
 > 
-> > - [Critical] Incomplete Fix: `kvm_nested_s2_wp()` is vulnerable to the same NULL pointer dereference and UAF.
+> This happens in kvm_flush_shadow_all() -> kvm_arch_flush_shadow_all() ->
+> kvm_free_stage2_pgd() and is performed under the kvm->mmu_lock.
 > 
-> OK interesting!
+> Commit ec14c272408a ("KVM: arm64: nv: Unmap/flush shadow stage 2 page
+> tables") introduced the teardown of the entire nested MMU range, which then
+> invokes stage2_apply_range() with resched=true:
+> 
+> mmu_notifier_invalidate_range_start()
+>   -> ... -> kvm_mmu_notifier_invalidate_range_start()
+>     -> kvm_mmu_unmap_gfn_range()
+>       -> kvm_unmap_gfn_range()
+>         -> kvm_nested_s2_unmap()
+>           -> kvm_stage2_unmap_range()
+>             -> __unmap_stage2_range()
+>                 -> stage2_apply_range()
+> 
+> This means that stage2_apply_range() can drop the kvm->mmu_lock and thus
+> concurrent progress can be made in lockstep with
+> kvm_arch_flush_shadow_all().
+> 
+> If kvm_arch_flush_shadow_all() advances ahead of stage2_apply_range() and
+> completes its operation it guarantees a NULL pointer deref.
+> 
+> Since kvm_free_stage2_pgd() is performed under the kvm->mmu_lock this will
+> either be observed NULL or not and serialised against
+> kvm_free_stage2_pgd().
+> 
+> Resolve the issue by explicitly checking for a NULL value. Since this
+> shouldn't be possible if blocking is not allowed, raise a warning if it is
+> ever NULL in this case.
+> 
+> Fixes: 7270cc9157f4 ("KVM: arm64: nv: Handle VNCR_EL2 invalidation from MMU notifiers")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+> ---
+>  arch/arm64/kvm/nested.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 17123f0b6dab..9fc0b1696dcb 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -1295,7 +1295,11 @@ void kvm_nested_s2_unmap(struct kvm *kvm, bool may_block)
+>  			kvm_stage2_unmap_range(mmu, 0, kvm_phys_size(mmu), may_block);
+>  	}
+>  
+> -	kvm_invalidate_vncr_ipa(kvm, 0, BIT(kvm->arch.mmu.pgt->ia_bits));
+> +	/* NULL pgt should only be possible if raced when mmu_lock dropped. */
+> +	if (kvm->arch.mmu.pgt)
+> +		kvm_invalidate_vncr_ipa(kvm, 0, BIT(kvm->arch.mmu.pgt->ia_bits));
+> +	else
+> +		WARN_ON(!may_block);
 
-Will you respin this series with kvm_nested_s2_wp() fixed in a similar
-way? Something like below.
+I don't think the WARN_ON() should be here. We already have one at the
+iterator level, which will fire in the same conditions.
 
 Thanks,
 
 	M.
-
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 00580ba6e8ba0..ebc4f4dc47836 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -1262,6 +1262,14 @@ void kvm_handle_s1e2_tlbi(struct kvm_vcpu *vcpu, u32 inst, u64 val)
- 	invalidate_vncr_va(vcpu->kvm, &scope);
- }
- 
-+static void kvm_invalidate_vncr_ipa_all(struct kvm *kvm)
-+{
-+	lockdep_assert_held_write(&kvm->mmu_lock);
-+
-+	if (kvm->arch.mmu.pgt)
-+		kvm_invalidate_vncr_ipa(kvm, 0, BIT(kvm->arch.mmu.pgt->ia_bits));
-+}
-+
- void kvm_nested_s2_wp(struct kvm *kvm)
- {
- 	int i;
-@@ -1278,7 +1286,7 @@ void kvm_nested_s2_wp(struct kvm *kvm)
- 			kvm_stage2_wp_range(mmu, 0, kvm_phys_size(mmu));
- 	}
- 
--	kvm_invalidate_vncr_ipa(kvm, 0, BIT(kvm->arch.mmu.pgt->ia_bits));
-+	kvm_invalidate_vncr_ipa_all(kvm);
- }
- 
- void kvm_nested_s2_unmap(struct kvm *kvm, bool may_block)
-@@ -1297,7 +1305,7 @@ void kvm_nested_s2_unmap(struct kvm *kvm, bool may_block)
- 			kvm_stage2_unmap_range(mmu, 0, kvm_phys_size(mmu), may_block);
- 	}
- 
--	kvm_invalidate_vncr_ipa(kvm, 0, BIT(kvm->arch.mmu.pgt->ia_bits));
-+	kvm_invalidate_vncr_ipa_all(kvm);
- }
- 
- void kvm_nested_s2_flush(struct kvm *kvm)
 
 -- 
 Without deviation from the norm, progress is not possible.
