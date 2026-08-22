@@ -1,64 +1,54 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA45B36B935;
-	Sat, 22 Aug 2026 08:40:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4AD138AC8C;
+	Sat, 22 Aug 2026 09:13:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787388034; cv=none; b=qQGNR+jIAm8NJZOELpjtIcUT50uvCVTx5iHcECo4OxURhzQJFvqdOhzJ9hIPtflNhXbZICRLTtay+H5F6tWwZxbGj5NhXpCSEWGJ+nvGZjqmQdMeogKvq8YRJSD8ULXxt5MsfC1W0B0np8V1xM1QNy49XWwL7M/AtTOSfATUqK8=
+	t=1787390001; cv=none; b=lilhutSkVSAEIHcrKceIx0ao1NJ6zjq2z/pARGQA/Ii+TfXLde4ryaP1iViTsWKDYHzrFIggihbWl1ji1i+pYO2htVy9HCnILPeDakRcm+7p6eE6pGkx0NPD+Gmc59P3ag3zSq/EaW/Pk8IjT9A0xNRrThXSlblqTwvqJpzl2H0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787388034; c=relaxed/simple;
-	bh=RIGayfiO2+lLMSnzf+4DCjdX0jqyzt4cOKs+zg5dHYs=;
+	s=arc-20240116; t=1787390001; c=relaxed/simple;
+	bh=ijXdtM1ekcgJRbiH+E49UpheOQBxmyi+cUIaf8R82gU=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JbbJJ3mi9JRNUMNokvYKqVFi+Jk9u60V0U2zOldAyWhPOACcnCd0KTihz7Kzr5vdJkALMzjrnF5PQeSrLAZ0FKFEpzXxhOg2igvYuFnok3iVeQAypoFUTeIeb5SucWCTsKQAIFyrq8h7SousnrEefVLLFKknqxlEqvtz7AJO2rU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RCdeEWOl; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=KaZnDtIDVd7kXraB4xdNkH0vo8k9NaMWxqOv94W4tlUSZ077QLj2x/cVMO6tMum17hYPGLRdlZ/qjoGHFKK5hwzF8MBrhupQiYFegp2rDmXIRIYQ6jkJymkmVxZ9mJYwon0ubxMog4lIvSSX9Gqr7YFVdavLQl7sfzLPjRomfmw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=elF6RZnV; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RCdeEWOl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D00A1F000E9;
-	Sat, 22 Aug 2026 08:40:30 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="elF6RZnV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 354D31F00A3A;
+	Sat, 22 Aug 2026 09:13:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787388030;
-	bh=goS0hO9F9PB7GW9OY4RoUpd4niO++BgWcgqth7XojbQ=;
+	s=k20260515; t=1787390000;
+	bh=nANyRlRp+UkSq6EI3GqMNoey2QrmOEinp6jNFIdmAoQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=RCdeEWOl7vwP1easXifPNcEyw4TI9oZUWFv5A1RU6B3fxLxq9AvRr28vJjMKPpvO6
-	 OubQ97d9U7wPbWvXMmFxbcsaxDsoxlRleDvSeqq/70aPfuTgsgYa4aYB/GJ+Mk49Q+
-	 FO4kXaByqE1uzQ9vufOYXrdw2H9oAlouqVPFbgM0aVe0JEGo9ceAmy4qbk1VHlqSUC
-	 bgHU1ukKRmct/nKHNaYA/+zKxP+xHhkkfD/tWqKNB2VufWYdxm1WPbL9dcwB23chYz
-	 I91SPZ+39OlX3L28S0gNLQLsOa5prphUE8zHyuZKXobdb475E20IU08wi8M7E7FFdg
-	 g3OgOKAN9To4g==
+	b=elF6RZnVm9Jun9jZU8qVzOuioObw5gPGTU00/vjkri1/GUBXUx6rbMcSnIc8w0mQU
+	 cA4kIbFLo5BiCTXm1ZDJp6h3UWnIu83kvPiCHuJaovXIv1pH4C13YPxDlJbEiCU37L
+	 vEma+jIltAzo4kBr8Jx/bnbD7381+3SCrXw4yfg6a4qlbWJd90tZuvxUCeZwmLwuMc
+	 m86rbZgWohHvcxI+Es9XaZ/ioYN3/NMnpPMVJpIORv63wqM/PBt79ugesFAB/qP43Y
+	 60zZwa2cljaYzwjF80vHI78igHQrU7GHXOrgP1a4XWiSgWsL+s/P1qwaP/J/YfLcZZ
+	 AOkq9iXuXT5qQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wxhHA-00000000EOp-2Ehu;
-	Sat, 22 Aug 2026 08:40:28 +0000
-Date: Sat, 22 Aug 2026 09:40:28 +0100
-Message-ID: <86tsom4kg3.wl-maz@kernel.org>
+	id 1wxhmv-00000000Ej5-3tj1;
+	Sat, 22 Aug 2026 09:13:18 +0000
+Date: Sat, 22 Aug 2026 10:13:17 +0100
+Message-ID: <86se464ixe.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Karl Mehltretter <kmehltretter@gmail.com>
-Cc: Oliver Upton <oupton@kernel.org>,
-	kvmarm@lists.linux.dev,
-	Fuad Tabba <tabba@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Eric Auger <eric.auger@redhat.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
 	linux-arm-kernel@lists.infradead.org,
+	Oliver Upton <oupton@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Mark Brown <broonie@kernel.org>,
+	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v2 3/5] KVM: arm64: vgic-v3: Unregister redistributors before freeing regions
-In-Reply-To: <aoiiHw4hBHB7C5uL@gmail.com>
-References: <20260819224229.82948-1-kmehltretter@gmail.com>
-	<20260819224229.82948-4-kmehltretter@gmail.com>
-	<874igpp3qm.wl-maz@kernel.org>
-	<aoiiHw4hBHB7C5uL@gmail.com>
+	Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH] arm64: Defer the GMID_EL1 read to {init,update}_cpu_features()
+In-Reply-To: <20260819142558.1300100-1-fuad.tabba@linux.dev>
+References: <20260819142558.1300100-1-fuad.tabba@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -68,36 +58,59 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kmehltretter@gmail.com, oupton@kernel.org, kvmarm@lists.linux.dev, tabba@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, pbonzini@redhat.com, shuah@kernel.org, eric.auger@redhat.com, christoffer.dall@arm.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, oupton@kernel.org, mark.rutland@arm.com, suzuki.poulose@arm.com, broonie@kernel.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, tabba@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 21 Aug 2026 20:09:32 +0100,
-Karl Mehltretter <kmehltretter@gmail.com> wrote:
->=20
-> On Thu, Aug 20, 2026 at 09:58:57AM +0100, Marc Zyngier wrote:
-> > The other bit of interest is in __kvm_vgic_vcpu_destroy(), and its
-> > conditional removal of the RD iodevs. Can't we just get rid of this
-> > whole block altogether now that we have a saner failing path?
->=20
-> I tested removing that block.
-> It reintroduces the use-after-free fixed by ae8f8b376102
-> (=E2=80=9CKVM: arm64: Unregister redistributor for failed vCPU creation=
-=E2=80=9D).
+On Wed, 19 Aug 2026 15:25:58 +0100,
+Fuad Tabba <fuad.tabba@linux.dev> wrote:
+> 
+> __cpuinfo_store_cpu() gates the GMID_EL1 read on the raw
+> ID_AA64PFR1_EL1, so it reads the register on MTE hardware even when the
+> kernel has disabled MTE (CONFIG_ARM64_MTE=n or arm64.nomte). KVM sets
+> HCR_EL2.TID5 in that case, which traps the read to EL2 and injects an
+> UNDEF:
+> 
+>   Internal error: Oops - Undefined instruction: 0000000002000000 [#1]
+>   pc : __cpuinfo_store_cpu+0xf4/0x264
+>   Call trace:
+>    __cpuinfo_store_cpu+0xf4/0x264 (P)
+>    secondary_start_kernel+0xc8/0x1d0
+>    __secondary_switched+0xc0/0xc4
+>   Kernel panic - not syncing: Attempted to kill the idle task!
+> 
+> Only pKVM is affected, and only for a CPU onlined after KVM init: its
 
-At the very least:
+Is that for a CPU that has gone through a an offline/online cycle?
+Because otherwise, such a CPU wouldn't be able to boot at all (we have
+a strong requirement that pKVM sees all CPUs at boot time).
 
-		vgic_cpu->rd_iodev.base_addr =3D VGIC_ADDR_UNDEF;
+If that's the case, some clarification would be good. Otherwise, some
+clarification is absolutely required! ;-)
 
-should be removed, as it serves no purpose anymore: all vcpus, valid
-or not, should now go through vgic_unregister_redist_iodev() which
-resets the value. It isn't massively useful on teardown anyway, so you
-might as well kill the extra one.
+> PSCI CPU_ON relay sets the host HCR before the CPU enters EL1, whereas
+> plain nVHE sets it at CPUHP_AP_KVM_ONLINE, after cpuinfo_store_cpu().
+> 
+> Defer the read to {init,update}_cpu_features() and gate it on the
+> sanitised ID register, as MPAM already does. system_supports_mte()
+> cannot serve as the gate, as update_cpu_features() also runs during
+> initial SMP bring-up, before smp_cpus_done() calls
+> setup_system_features(). The init path gains the CONFIG_ARM64_MTE test
+> the update path already had, leaving SYS_GMID_EL1 uninitialised when
+> MTE is compiled out, where its only other user (lib/mte.S) is not
+> built.
+
+I'm starting to wonder whether having CPUs to go through a feature
+collection process during an offline/online cycle is a good idea. The
+data should still be there, and is not expected to change.
+
+Is it just that we don't have the correct tracking information?
+
+Thanks,
 
 	M.
 
---=20
+-- 
 Without deviation from the norm, progress is not possible.
