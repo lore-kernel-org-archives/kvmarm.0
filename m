@@ -1,58 +1,64 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13F13248867;
-	Sat, 22 Aug 2026 08:12:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA45B36B935;
+	Sat, 22 Aug 2026 08:40:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787386356; cv=none; b=k5OC+qOkIinYV9jDHLr6aTnhbiGu4X80bS/ETW0lordUZo33uHkLd7B+xUoZU581si4OOk2mKaO1ik9Bi0RaOLIK5izbgaZfRTs8mqgropicStnfSYsomJjPKyBek7Gi9bt4tHCN7+VHm+tAioabOMvTHqQ0ZIVlyeOw8gyO9qA=
+	t=1787388034; cv=none; b=qQGNR+jIAm8NJZOELpjtIcUT50uvCVTx5iHcECo4OxURhzQJFvqdOhzJ9hIPtflNhXbZICRLTtay+H5F6tWwZxbGj5NhXpCSEWGJ+nvGZjqmQdMeogKvq8YRJSD8ULXxt5MsfC1W0B0np8V1xM1QNy49XWwL7M/AtTOSfATUqK8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787386356; c=relaxed/simple;
-	bh=W5JCDvufSnsJc+KVV+3ui5Q5ovF7xEP2/gALCQD6KKQ=;
+	s=arc-20240116; t=1787388034; c=relaxed/simple;
+	bh=RIGayfiO2+lLMSnzf+4DCjdX0jqyzt4cOKs+zg5dHYs=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KSe7HqY165zpRsqlSbu/PTxag95X7mlr5fVUR+QshGBstcNqhdLuIICDNEI1q39OkNHqBjWYJgyHUvXdGSzoGYY5nhNRTaB1CBq+pxohKtdJsIzJa2GVjqt+KC22SPU+jEYMqD7bkVzanCIEi7ORYKvYJGeuzORWHYZIf0HfbAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VzsFlLlZ; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=JbbJJ3mi9JRNUMNokvYKqVFi+Jk9u60V0U2zOldAyWhPOACcnCd0KTihz7Kzr5vdJkALMzjrnF5PQeSrLAZ0FKFEpzXxhOg2igvYuFnok3iVeQAypoFUTeIeb5SucWCTsKQAIFyrq8h7SousnrEefVLLFKknqxlEqvtz7AJO2rU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RCdeEWOl; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VzsFlLlZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AAFD1F000E9;
-	Sat, 22 Aug 2026 08:12:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RCdeEWOl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D00A1F000E9;
+	Sat, 22 Aug 2026 08:40:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787386354;
-	bh=XJ1sRYzSe5gmp5y69f27mpBK8RaS1RNxeM0V94UPPv8=;
+	s=k20260515; t=1787388030;
+	bh=goS0hO9F9PB7GW9OY4RoUpd4niO++BgWcgqth7XojbQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=VzsFlLlZyTQaI+HK8Ko3rj3I/ZeYtiIgyEfqtFLzRZ67OtlQZjiop54B44PP5wcJO
-	 eoId8gVC+ctFYjtwC9ThjbOO/5RpXNupkZK8dgmUAo5gKl0+4boQVJSRwj6GvA49vW
-	 kdiTQHyzX7MwNCHl6RD23j/zNK8ApoomHiyc0v1MZZOcxyMxKtceBd9UURagUO8XDK
-	 VsYjYH8uguYdPAK9VV48NfhkAaYnHSeCnPdjQYnJA2YJNy73MTbX+Ko4eWY5J07axK
-	 1Pld7LM5Ld+dKiZxIieNz8I9mQUac6Td54S2lJg/8AOFb45IjB0N/Y9p7TqO6DVY+c
-	 gHKJ+EVKc9nRw==
+	b=RCdeEWOl7vwP1easXifPNcEyw4TI9oZUWFv5A1RU6B3fxLxq9AvRr28vJjMKPpvO6
+	 OubQ97d9U7wPbWvXMmFxbcsaxDsoxlRleDvSeqq/70aPfuTgsgYa4aYB/GJ+Mk49Q+
+	 FO4kXaByqE1uzQ9vufOYXrdw2H9oAlouqVPFbgM0aVe0JEGo9ceAmy4qbk1VHlqSUC
+	 bgHU1ukKRmct/nKHNaYA/+zKxP+xHhkkfD/tWqKNB2VufWYdxm1WPbL9dcwB23chYz
+	 I91SPZ+39OlX3L28S0gNLQLsOa5prphUE8zHyuZKXobdb475E20IU08wi8M7E7FFdg
+	 g3OgOKAN9To4g==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wxgq8-00000000ECd-2A2P;
-	Sat, 22 Aug 2026 08:12:32 +0000
-Date: Sat, 22 Aug 2026 09:12:32 +0100
-Message-ID: <86v7924lqn.wl-maz@kernel.org>
+	id 1wxhHA-00000000EOp-2Ehu;
+	Sat, 22 Aug 2026 08:40:28 +0000
+Date: Sat, 22 Aug 2026 09:40:28 +0100
+Message-ID: <86tsom4kg3.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Steffen Eiden <seiden@linux.ibm.com>,
+To: Karl Mehltretter <kmehltretter@gmail.com>
+Cc: Oliver Upton <oupton@kernel.org>,
+	kvmarm@lists.linux.dev,
+	Fuad Tabba <tabba@google.com>,
 	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Shen Yongchao <grayhat@foxmail.com>,
-	Karl Mehltretter <kmehltretter@gmail.com>,
-	Wei-Lin Chang <weilin.chang@arm.com>,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v3 2/2] KVM: arm64: nv: Delay freeing of shadow S2 structures until VM destruction
-In-Reply-To: <aoiQuVs5jzB5La4i@gremlin>
-References: <20260821161829.1032561-1-maz@kernel.org>
-	<20260821161829.1032561-3-maz@kernel.org>
-	<aoiQuVs5jzB5La4i@gremlin>
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Eric Auger <eric.auger@redhat.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v2 3/5] KVM: arm64: vgic-v3: Unregister redistributors before freeing regions
+In-Reply-To: <aoiiHw4hBHB7C5uL@gmail.com>
+References: <20260819224229.82948-1-kmehltretter@gmail.com>
+	<20260819224229.82948-4-kmehltretter@gmail.com>
+	<874igpp3qm.wl-maz@kernel.org>
+	<aoiiHw4hBHB7C5uL@gmail.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -62,71 +68,36 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: ljs@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, fuad.tabba@linux.dev, grayhat@foxmail.com, kmehltretter@gmail.com, weilin.chang@arm.com, stable@vger.kernel.org
+X-SA-Exim-Rcpt-To: kmehltretter@gmail.com, oupton@kernel.org, kvmarm@lists.linux.dev, tabba@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, pbonzini@redhat.com, shuah@kernel.org, eric.auger@redhat.com, christoffer.dall@arm.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 21 Aug 2026 19:15:45 +0100,
-"Lorenzo Stoakes (ARM)" <ljs@kernel.org> wrote:
-> 
-> On Fri, Aug 21, 2026 at 05:18:29PM +0100, Marc Zyngier wrote:
-> > We free the shadow S2 structures from kvm_arch_flush_shadow_all(), which
-> > is a Bad Idea(tm). Freeing the page tables is fair game (this is what
-> > this callback is for), but freeing the container that could still be
-> > referenced by another part of the system is not great.
-> 
-> Yes.
-> 
-> >
-> > Instead, grow separate destructors that gets called when we tear the VM
-> > down for good. From there, we can nuke both the individual MMUs as well
-> > as the global array that points to them, safe in the knowledge that the
-> > vcpus themselves have been destroyed already.
-> >
-> > Fixes: 4f128f8e1aaac ("KVM: arm64: nv: Support multiple nested Stage-2 mmu structures")
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> 
-> LGTM so:
-> 
-> Reviewed-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+On Fri, 21 Aug 2026 20:09:32 +0100,
+Karl Mehltretter <kmehltretter@gmail.com> wrote:
+>=20
+> On Thu, Aug 20, 2026 at 09:58:57AM +0100, Marc Zyngier wrote:
+> > The other bit of interest is in __kvm_vgic_vcpu_destroy(), and its
+> > conditional removal of the RD iodevs. Can't we just get rid of this
+> > whole block altogether now that we have a saner failing path?
+>=20
+> I tested removing that block.
+> It reintroduces the use-after-free fixed by ae8f8b376102
+> (=E2=80=9CKVM: arm64: Unregister redistributor for failed vCPU creation=
+=E2=80=9D).
 
-Thanks.
+At the very least:
 
-> A couple thoughts/questions below.
+		vgic_cpu->rd_iodev.base_addr =3D VGIC_ADDR_UNDEF;
 
-[...]
-
-> > @@ -1310,16 +1319,12 @@ void kvm_nested_s2_flush(struct kvm *kvm)
-> >
-> >  void kvm_arch_flush_shadow_all(struct kvm *kvm)
-> >  {
-> > -	for (int i = kvm->arch.nested_mmus_size - 1; i >= 0; i--) {
-> > +	for (int i = 0; i < kvm->arch.nested_mmus_size; i++) {
-> 
-> Hmm why this was in reverse before? :) I guess some product of the
-> kvfree() bit or maybe something else?
-
-We allocate s2_mmus in S2_MMU_PER_VCPU chunks. Which means that it
-complicates the freeing of the these structures, as they can only be
-freed once all S2 PTs of that chunk have been freed. We have three
-options:
-
-- scan forward, and use complicated logic to work out that you have
-  freed the last PTs of a chunk, freeing with a negative offset from
-  the current point in the loop. Works, but hard to reason about in
-  fewer than 3 seconds.
-
-- scan backward, use simpler logic to ensure you have reached the
-  beginning of a chunk, nuke it.
-
-- have two loops, one for the PTs, one for the MMUs. That's what we
-  end-up with due to the different garbage collection phases.
-
-Cheers,
+should be removed, as it serves no purpose anymore: all vcpus, valid
+or not, should now go through vgic_unregister_redist_iodev() which
+resets the value. It isn't massively useful on teardown anyway, so you
+might as well kill the extra one.
 
 	M.
 
--- 
+--=20
 Without deviation from the norm, progress is not possible.
