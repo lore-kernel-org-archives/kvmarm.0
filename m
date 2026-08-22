@@ -1,60 +1,57 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43CCF493652;
-	Sat, 22 Aug 2026 07:32:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB10339B978;
+	Sat, 22 Aug 2026 08:02:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787383928; cv=none; b=SmUDEJyMkgp4Z+8xYPPXUScIMtLTUhkHQVKRHHStnFV1MRaO9ZLv0vt/hsdqtuM7vZgjgEBP5RTeAPZWB44hnwlzCag6paL8RbaDDJyyvnunvYp54Q0YIOv8TDZgV2PwHLv94WEclQfncIi0q7cHtaVni0VVACFi3NPr1uhP24A=
+	t=1787385754; cv=none; b=k4Em3jvF23lnp5unuhLSf+9BMxP8D5LFtMBwEPnKQh4EH0WDiIoLPYOAEwdpeBJ5nUKOUYg7eN1qephIgWUfHrBNk8RE+oOnd5pvVBRnr4hBBrl3NIAVEjny6vkypwEw0Ypere9MO09kS0JIFU0Av2xOI4H6dBgbVV+ClRnFXwk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787383928; c=relaxed/simple;
-	bh=ro48hLvs90KHt1NnusK7STw1kcatbqrL3/ee3Q62b04=;
+	s=arc-20240116; t=1787385754; c=relaxed/simple;
+	bh=QnkWzxR5BDXY2RvfExDfzub0evwhS5jOdddGQL60Q1Q=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hGTpjluAwgxvPAlteLSmo6PDNlJGx5TmsOs+R/f2ETxk0MfkJC7wSv4K05pugPLSA0xDBxYmngnc0+hLP6zxW9yPlr4PSnQv5i6iUyz/Htk8ls5ND22eHSrHwU/eHz3zgAnhd7VQ6dthcjdDP0q9SX/tQzr7spz2gJK7CTp91ec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V2ahLVo7; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=VDee+BIdFW3UmURttKOV74ZNP7IGmZthaVivOnQ/gq0ts4hNzFMsbzmpoNTjon/fmeN0K3Ix4kJN8vDtyC9v8Rm8+H19Aj18XAIa9XnV5N4wwJYFKqTHzwgg+2EHZZncB9QAvBSlqkHxAhM5H8bXgbni7gkOwVsJPHmLnEPo/Ss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UUa6eNWY; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V2ahLVo7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CDCC71F000E9;
-	Sat, 22 Aug 2026 07:32:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UUa6eNWY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 859A81F000E9;
+	Sat, 22 Aug 2026 08:02:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787383926;
-	bh=7EEflvdgZQe7OvkOracGJyX6vR4Npi3B22FWFR0VKLU=;
+	s=k20260515; t=1787385752;
+	bh=TqtkQkyTl4mS7J4aXez7TT37PaSDo7fJmYQG5Touqio=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=V2ahLVo7vaGqAGyqKtSSqu/dWNmdSL5N1EWqpBPVbDqfrabVuuj2kE1hdyTxZj88f
-	 W72c+CparEppW9iw8s7MYdnnAu5f77KKOCVq1PQeIXNQbwO3hKGlhVyNVKkSdvc3t8
-	 AdD5nHMfmhaMUkNFWR3RYnJzDAUmKeUnPHdfVOXVFqQ4CIZD/E/m8RSwNB+5iixPpJ
-	 LrP57PdfhPWhqa6iPqHZVlNIitIzGD7HYX4ItdZuVKmi/TxLlU+m2buzU0njW/+lJ2
-	 FyPt1poIYh5V0cWNqhYAx4OMo8jaM596jyzhnKseTgDYiQ2+1V5ERDbPYRXiXqAfTm
-	 Q+XK7jLr+ABaw==
+	b=UUa6eNWYSEbut5PHH26edBdMvSMZu/joqPiO+Ue81cleWKGByVzMqnbWVYaV3L3jB
+	 S/W7TS5tjinUyzRpOR2AOPUlGNe27baRi4yqYFwGlkgZtAqDQMyqPuJdRiGYQ8nEy8
+	 WUX3CDSyhvn+3kpSGU/fb1Z6RH1tSDgPoBrNrYRA4l50kBSejiEL0QNSIFODL/yDbd
+	 6abf8ay7m6k8bDqHIcFVwafATqQkHiOhSGOv5EUIkDIawcvl7c5Sy24qpAAkM8YRvH
+	 BoW5Uu7XiXq8S7n3Z8HxwHz6p+sFgxYDRWkTc0LIXWu+fOlBADiRV1zov5nfkkBeLw
+	 fj6jV8GdyvR9Q==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wxgCy-00000000Dbx-3uWw;
-	Sat, 22 Aug 2026 07:32:05 +0000
-Date: Sat, 22 Aug 2026 08:32:04 +0100
-Message-ID: <86y0dy4nm3.wl-maz@kernel.org>
+	id 1wxggQ-00000000E2n-2bnS;
+	Sat, 22 Aug 2026 08:02:30 +0000
+Date: Sat, 22 Aug 2026 09:02:30 +0100
+Message-ID: <86wlti4m7d.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Fuad Tabba <fuad.tabba@linux.dev>
 Cc: Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <tabba@google.com>,
+	Eric Auger <eauger@redhat.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
-	Jintack Lim <jintack.lim@linaro.org>,
-	Christoffer Dall <christoffer.dall@linaro.org>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
+	Sascha Bischoff <sascha.bischoff@arm.com>,
+	Sebastian Ene <sebastianene@google.com>,
+	Fuad Tabba <tabba@google.com>,
 	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH 2/2] KVM: arm64: nv: Fix null ptr deref in kvm_nested_s2_unmap() on S2 teardown
-In-Reply-To: <20260812-kvm-arm-nested-virt-fix-v1-2-4ad883f1b6a5@kernel.org>
-References: <20260812-kvm-arm-nested-virt-fix-v1-0-4ad883f1b6a5@kernel.org>
-	<20260812-kvm-arm-nested-virt-fix-v1-2-4ad883f1b6a5@kernel.org>
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 0/4] KVM: arm64: vgic-its: Make the ITS table save reliable
+In-Reply-To: <20260821064445.615838-1-fuad.tabba@linux.dev>
+References: <20260821064445.615838-1-fuad.tabba@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -66,76 +63,53 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: ljs@kernel.org, oupton@kernel.org, tabba@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, jintack.lim@linaro.org, christoffer.dall@linaro.org, christoffer.dall@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, eauger@redhat.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, will@kernel.org, sascha.bischoff@arm.com, sebastianene@google.com, tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 12 Aug 2026 14:31:21 +0100,
-"Lorenzo Stoakes (ARM)" <ljs@kernel.org> wrote:
+On Fri, 21 Aug 2026 07:44:41 +0100,
+Fuad Tabba <fuad.tabba@linux.dev> wrote:
 > 
-> Commit 7270cc9157f4 ("KVM: arm64: nv: Handle VNCR_EL2 invalidation from MMU
-> notifiers") introduced VNCR_EL2 invalidation in kvm_nested_s2_unmap().
+> Hi folks,
 > 
-> However at the point of this being performed concurrent stage 2 teardown of
-> a nested guest can cause kvm->arch.mmu.pgt to be set to NULL.
+> Changes since v1 [1]:
+>   - Free the LPI translation cache in vgic_mmio_write_its_baser() too,
+>     inside the its_lock section. (Eric)
+>   - Reworded patch 1 to name the register the write is to. (Eric)
+>   - Rebased onto kvmarm/next.
 > 
-> This happens in kvm_flush_shadow_all() -> kvm_arch_flush_shadow_all() ->
-> kvm_free_stage2_pgd() and is performed under the kvm->mmu_lock.
+> Marc pointed out on the v2 ITS series [2] that patch 3 fixed the wrong
+> end of the problem: KVM should drop the collections when the guest
+> changes the table that described them, rather than validating them at
+> save time. He also called that patch's -EINVAL a mistake, since it
+> aborts a save userspace has to be able to issue. This series does both,
+> following his answers [3] to the two open questions: purge the whole
+> list, and skip the offending device rather than fail.
 > 
-> Commit ec14c272408a ("KVM: arm64: nv: Unmap/flush shadow stage 2 page
-> tables") introduced the teardown of the entire nested MMU range, which then
-> invokes stage2_apply_range() with resched=true:
+> vgic_mmio_write_its_baser() now frees the cached devices or collections
+> whenever the stored register value changes, not only when VALID is
+> cleared, and drops the translation cache with them. It tests for a
+> change rather than a write because the ITS driver rewrites an unchanged
+> GITS_BASER<n> on resume. With that in place the check patch 3 added is
+> unreachable, so it is reverted, and vgic_its_save_device_tables() skips
+> a device the table can no longer address instead of failing the save.
 > 
-> mmu_notifier_invalidate_range_start()
->   -> ... -> kvm_mmu_notifier_invalidate_range_start()
->     -> kvm_mmu_unmap_gfn_range()
->       -> kvm_unmap_gfn_range()
->         -> kvm_nested_s2_unmap()
->           -> kvm_stage2_unmap_range()
->             -> __unmap_stage2_range()
->                 -> stage2_apply_range()
+> compute_next_devid_offset() now calls vgic_its_check_id(), which reads
+> guest memory for an indirect table, so the save does 2n reads rather
+> than n. It stays linear, as the scan stops at the first
+> reachable successor. Patch 1's Fixes: tag names a v4.15 commit, so it
+> will be picked up for stable. Drop the tag if that is not wanted.
 > 
-> This means that stage2_apply_range() can drop the kvm->mmu_lock and thus
-> concurrent progress can be made in lockstep with
-> kvm_arch_flush_shadow_all().
+> Patches 1 and 3 apply to v7.2 unchanged, but patch 2 reverts a commit
+> only in kvmarm/next, so the series is based there.
 > 
-> If kvm_arch_flush_shadow_all() advances ahead of stage2_apply_range() and
-> completes its operation it guarantees a NULL pointer deref.
+> Tested on QEMU: the new selftest, vgic_irq, vgic_lpi_stress and boots.
+> Both cases of the new selftest reset and restore the tables they saved,
+> and both fail without the series.
 > 
-> Since kvm_free_stage2_pgd() is performed under the kvm->mmu_lock this will
-> either be observed NULL or not and serialised against
-> kvm_free_stage2_pgd().
-> 
-> Resolve the issue by explicitly checking for a NULL value. Since this
-> shouldn't be possible if blocking is not allowed, raise a warning if it is
-> ever NULL in this case.
-> 
-> Fixes: 7270cc9157f4 ("KVM: arm64: nv: Handle VNCR_EL2 invalidation from MMU notifiers")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
-> ---
->  arch/arm64/kvm/nested.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 17123f0b6dab..9fc0b1696dcb 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -1295,7 +1295,11 @@ void kvm_nested_s2_unmap(struct kvm *kvm, bool may_block)
->  			kvm_stage2_unmap_range(mmu, 0, kvm_phys_size(mmu), may_block);
->  	}
->  
-> -	kvm_invalidate_vncr_ipa(kvm, 0, BIT(kvm->arch.mmu.pgt->ia_bits));
-> +	/* NULL pgt should only be possible if raced when mmu_lock dropped. */
-> +	if (kvm->arch.mmu.pgt)
-> +		kvm_invalidate_vncr_ipa(kvm, 0, BIT(kvm->arch.mmu.pgt->ia_bits));
-> +	else
-> +		WARN_ON(!may_block);
+> Based on kvmarm/next (aa8e5dc6a7a2a).
 
-I don't think the WARN_ON() should be here. We already have one at the
-iterator level, which will fire in the same conditions.
-
-Thanks,
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 
 	M.
 
