@@ -1,137 +1,123 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3D8D345ED0
-	for <kvmarm@lists.linux.dev>; Sat, 22 Aug 2026 18:02:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3263F13FEE
+	for <kvmarm@lists.linux.dev>; Sat, 22 Aug 2026 18:05:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787421773; cv=none; b=rVgzcJs/MFAFOtLoqQ0TyvHsmmKVoFuT5hIbiTo5Q+dLpXhxm0PhGqDLqc7t6rBDwqN8/DvkmGhKkA8OyV7RVU1blls4z6xxBRl/8VzkLQ8aFWgh32pXv7/A8gDuzjCN9uvNm/XcwtJdVRlYgQ++VhGVzevmlKQEWGNTzUjzPjE=
+	t=1787421959; cv=none; b=lqADQho5cTlJWDd9aa1Vk6gwu8Ag9sp0URw4jjAwsVFOroWUS8FMGMdLIJhsmBfSopxwXZw41my1MM4AJz/S37JoOSgWV5se01vnQX6lsV2Pgp4uuiER6KP66zVoCbZb0rFRQ7uQfQItZToznX2Y0lpUZ0OWy+ZwcQ1rYWbudyA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787421773; c=relaxed/simple;
-	bh=qpshX6SrJC6k0O2jUp+9iMjbSV49RpHw0sqbXVddswI=;
+	s=arc-20240116; t=1787421959; c=relaxed/simple;
+	bh=y1j4qPrluxEJvol0cdNHaCvOmrJrs51L8OSd9mm31/Y=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=fZWg7B1i2SgLqLWBpgCmAT0++gbRPN+4/ba4kTptwdQ1GC9GATY2jO8jxidhzlHKmq6aWIfBPCLruLM6RQJ2xZZnmZjEr6iibBJ1zz64vO17YG22V0lL128vkLHp00mnyz0NGHEQsTu/kZ6S15o0Djbgk9suDv26nMmYtzKFouc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=drLdOJQx; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=RSeqOpSRcWwa/CYwDWW8GzP0eB+LeOfCdFjNJDzw4INX5RiJAfriG4KmmDBu3fcTYlIE7ddXq474rw+TXBcpwKTeWxI+MU8On+wN9tb6oCwH1XGHK6poDg5xnCXbkG4i5lil1s0qGq+VMMxZobEc/aTBx2TzhvErqW98bIIrQzY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hPbFdmXg; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="drLdOJQx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F21B81F000E9;
-	Sat, 22 Aug 2026 18:02:50 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hPbFdmXg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 762691F000E9;
+	Sat, 22 Aug 2026 18:05:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787421771;
-	bh=FJfn7cz72m2NSlVw1sVZ+wx4mlM5Q+T+qWSSHA9lbZo=;
+	s=k20260515; t=1787421957;
+	bh=5jrs9/RbwrK1svYvQQwxIQ2Jo2/cfDeBhmZKdKYyHpw=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=drLdOJQxTZQdDrX6Jg/oqtyCUX++VY++2sD2EdQ3Au1wWac2IG8999F+GbJYhm745
-	 UnGWhOct9X5C/G6spxK/bOijHOk2DdcyyAxWjvsfgg/kfQf6ouUSz1J58/0o0Q9Q+t
-	 qQI8XauanMIUGPlwMzj2SzpcHxoAtg9L+fx99h/d0KQWsmQ6ml9brnU072RgBnon/T
-	 qz7yyKWdexSkoCEZ/+lJUToNp1scBC12v1SXODqxaa97UTkGmduWtc1MZKVjDX3SUH
-	 qtN/OfEMLEbQTnClc2gMmyPnsOO26k/AFAnggpJ5teVdeREyTy3RyZU1yFQPj6Hpc8
-	 xVkIwkwG0fJ/A==
+	b=hPbFdmXgOd9qig5I25jiVR7IKTk1CBSNfF/14wJ6RgA9otNJ9NrtVdIWa4kXkD0Jz
+	 cBUztpjyXLB4MoWgvhhGoE0WwUACJl0QV3+I05rFVdsLd5G0uxmORVBUcABiRKU5yF
+	 M02cKG7idLhlGLZDFlQYiOwBuGQm2kcMEK21faCa+4uB5NCPk3h1g8qL+WzFfUKlsX
+	 tpD4E48U/87kewiHTW0GuHhohjhy1dE/a9t9qRHBcsWWfOJLrtBEHNFMjDgH6XJFPN
+	 N3OntQLJ2LmDyZ1p9rDsqqwX02F6Ty2kKFfrNgp1tFrdJyYunpj4W7f8gLp2csH0KS
+	 jHNFP/fPZK3cg==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2 1/2] KVM: arm64: Fix spurious warning for benign
- stage 2 teardown race
+Subject: Re: [PATCH v2 2/2] KVM: arm64: nv: Fix null ptr deref on nested
+ wp/unmap, teardown race
 Reply-To: sashiko-reviews@lists.linux.dev
 To: =?utf-8?b?TG9yZW56byBTdG9ha2VzIChBUk0p?= <ljs@kernel.org>
-Cc: "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev
-In-Reply-To: <20260822-kvm-arm-nested-virt-fix-v2-1-ac4059a0eaa6@kernel.org>
+Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20260822-kvm-arm-nested-virt-fix-v2-2-ac4059a0eaa6@kernel.org>
 References: <20260822-kvm-arm-nested-virt-fix-v2-0-ac4059a0eaa6@kernel.org>
- <20260822-kvm-arm-nested-virt-fix-v2-1-ac4059a0eaa6@kernel.org>
+ <20260822-kvm-arm-nested-virt-fix-v2-2-ac4059a0eaa6@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 22 Aug 2026 18:02:50 +0000
-Message-Id: <20260822180250.F21B81F000E9@smtp.kernel.org>
+Date: Sat, 22 Aug 2026 18:05:56 +0000
+Message-Id: <20260822180557.762691F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
 s) to consider:
 
 Pre-existing issues:
-- [Critical] The patch masks a severe Use-After-Free (UAF) vulnerability by=
- assuming the NULL pointer read is a benign race, while failing to realize =
-the `mmu` pointer itself points into freed memory (`kvm->arch.nested_mmus`).
+- [High] Use-After-Free of `kvm->arch.nested_mmus` array during nested page=
+ table walks
+- [High] Memory Leak of `kvm->arch.nested_mmus` on VM teardown via fd closu=
+re
 --
 
---- Patch [1]: [PATCH v2 1/2] KVM: arm64: Fix spurious warning for benign s=
-tage 2 teardown race ---
-commit 720eac2d4e746b3335443e77837000d086115449
+--- Patch [2]: [PATCH v2 2/2] KVM: arm64: nv: Fix null ptr deref on nested =
+wp/unmap, teardown race ---
+commit 82456f58d55471e0202bc28188ae985c14d4be0a
 Author: Lorenzo Stoakes (ARM) <ljs@kernel.org>
 
-KVM: arm64: Fix spurious warning for benign stage 2 teardown race
+KVM: arm64: nv: Fix null ptr deref on nested wp/unmap, teardown race
 
-This commit attempts to fix a warning triggered during nested VM teardown
-by ignoring cases where mmu->pgt is NULL after reacquiring the MMU lock.
-It changes stage2_apply_range() to return 0 instead of -EINVAL when the
-page table is no longer present due to concurrent teardown.
+This commit fixes a NULL pointer dereference in the nested page table walk
+paths. It resolves a race condition where concurrent stage 2 teardown can s=
+et
+the page table pointer to NULL while the MMU lock is temporarily dropped.
 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 74e7e7f7564c8..31e049ded0932 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -59,19 +59,25 @@ static phys_addr_t stage2_range_addr_end(phys_addr_t =
-addr, phys_addr_t end)
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 17123f0b6daba..f69722e1592a5 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+
 [ ... ]
-> -static int stage2_apply_range(struct kvm_s2_mmu *mmu, phys_addr_t addr,
-> +static int stage2_apply_range(struct kvm_s2_mmu *mmu, phys_addr_t start,
->  			      phys_addr_t end,
->  			      int (*fn)(struct kvm_pgtable *, u64, u64),
->  			      bool resched)
->  {
->  	struct kvm *kvm =3D kvm_s2_mmu_to_kvm(mmu);
-> +	phys_addr_t addr =3D start;
->  	int ret;
->  	u64 next;
+
+> @@ -1295,7 +1306,7 @@ void kvm_nested_s2_unmap(struct kvm *kvm, bool may_=
+block)
+>  			kvm_stage2_unmap_range(mmu, 0, kvm_phys_size(mmu), may_block);
+
+[Severity: High]
+This isn't a bug introduced by this patch, but can this lead to a
+use-after-free of the mmu pointer?
+
+When we pass the array element pointer down the call chain:
+
+kvm_nested_s2_unmap()
+  -> kvm_stage2_unmap_range()
+    -> __unmap_stage2_range()
+      -> stage2_apply_range()
+
+stage2_apply_range() can drop kvm->mmu_lock by calling
+cond_resched_rwlock_write().
+
+Concurrently, kvm_vcpu_init_nested() can reallocate and free the
+kvm->arch.nested_mmus array, or kvm_arch_flush_shadow_all() can free it
+locklessly. When stage2_apply_range() reacquires the lock, could it
+dereference the dangling mmu pointer?
+
+[Severity: High]
+This is a pre-existing issue, but does kvm->arch.nested_mmus leak during VM
+teardown via fd closure?
+
+It looks like the array is currently only freed in kvm_arch_flush_shadow_al=
+l(),
+which is triggered exclusively by the MMU notifier's release hook.
+
+If a VM is closed via file descriptor, mmu_notifier_unregister() is called
+which does not invoke the release callback. Since kvm_arch_destroy_vm() doe=
+sn't
+appear to clean up the nested_mmus array, is this memory permanently orphan=
+ed?
+
+>  	}
 > =20
->  	do {
->  		struct kvm_pgtable *pgt =3D mmu->pgt;
-
-[Severity: Critical]
-This is a pre-existing issue, but does this dereference of mmu->pgt result
-in a use-after-free if the nested_mmus array is reallocated or freed while
-the lock is dropped?
-
-Looking at stage2_apply_range(), the kvm->mmu_lock can be dropped via
-cond_resched_rwlock_write() at the end of this loop.
-
-During this window, the mmu pointer (which points into the
-kvm->arch.nested_mmus array) can be invalidated. For example,
-kvm_arch_flush_shadow_all() can free the array locklessly:
-
-arch/arm64/kvm/nested.c:kvm_arch_flush_shadow_all() {
-    ...
-    kvfree(kvm->arch.nested_mmus);
-    ...
-}
-
-Or it can be reallocated in kvm_vcpu_init_nested():
-
-arch/arm64/kvm/nested.c:kvm_vcpu_init_nested() {
-    ...
-    tmp =3D kvm->arch.nested_mmus;
-    ...
-    kvfree(tmp);
-    ...
-}
-
-When the loop in stage2_apply_range() resumes after reacquiring the lock,
-accessing mmu->pgt would read from freed memory. By treating a NULL pgt as
-a benign race, does this patch mask the underlying object lifecycle bug and
-leave the use-after-free unaddressed if the freed memory is modified?
-
-> +		/*
-> +		 * We may be raced on PGT teardown when we release the
-> +		 * kvm->mmu_lock. That's fine as the PGT is legitimately no
-> +		 * longer present.
-> +		 */
->  		if (!pgt)
-> -			return -EINVAL;
-> +			return resched && addr > start ? 0 : -EINVAL;
-> =20
->  		next =3D stage2_range_addr_end(addr, end);
->  		ret =3D fn(pgt, addr, next - addr);
+> -	kvm_invalidate_vncr_ipa(kvm, 0, BIT(kvm->arch.mmu.pgt->ia_bits));
+> +	kvm_invalidate_vncr_ipa_all(kvm);
+>  }
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260822-kvm-arm-ne=
-sted-virt-fix-v2-0-ac4059a0eaa6@kernel.org?part=3D1
+sted-virt-fix-v2-0-ac4059a0eaa6@kernel.org?part=3D2
