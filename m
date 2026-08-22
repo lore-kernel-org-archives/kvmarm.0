@@ -1,105 +1,124 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D6943B7753;
-	Fri, 21 Aug 2026 23:01:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8858D39B4A5;
+	Sat, 22 Aug 2026 07:28:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787353287; cv=none; b=IDaDrgK+/u5Bcgt4fL8OtQ7LwYqjogVYkbMrv8XcYcgR9B0ajWxCWucTdONyhRZrkQ3h5QZH8hOIDmqD4zpVAkST4IpRmQ5aK3T/wzbLeJtXJYCi3JT3Emb5ZYli4nUUgCNoxBUMfiPiVv32r1xWKVuAk79bxZs1nVxaFcIaSVU=
+	t=1787383702; cv=none; b=E7gkQvUUz8Nof8W9MmnRSThD+ceNX1F063/Y8rrk1ZekQ8NPtXITOzFhAmNJrBAA4cgLrMMDwVqLt/0hFupnUo2Z4pzH/IT40xqjliZRpu4ipXGA5iHT3Yt/qBDuMQxvrLPEUFyoFKc5dG1cr6b4ND3XDiXyOCp3RjAuvbHbLIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787353287; c=relaxed/simple;
-	bh=03VkZjfehRNlVo5fNmIMDZ/aWcfIjCbGXvZ2PtdSPuk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pf5GKnD4kox/Vc/HOu8ZjFp7/Ph6uLohlg+sUTc+TNG3bM9xoVqRFdP+s32DW73sUr277+6J249fSGByWHxfinBiR5Np/Jsqnd5osfcxH1rL30eoBJHPRI/TgPRGG1Q+Cr4UKwJQjUUbpaohR/gjL79iPchKacrcKRhBvT7itDc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FYZDHLdv; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1787383702; c=relaxed/simple;
+	bh=7EH6nkAv68Ysc/kGnsAbrQ1JTNu6PdTSsRyUlPbTung=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iqTIPbI+ynrOsVsqoo2UnP9aNkygOJ4xJIldip7P6CSN0bL2TtqAyXLfInRFoOIrOyYktIJCK7wwjZ5qe/XmMHgI6UHq7bIuwmOXaOLwOt/eOC7R/i6AGnC5hZAesqklvnraKx4SQgjaEy8/AyiVhYZFQfEVHK+IIKiwP5z/Jfw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l0tRulmt; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FYZDHLdv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C34A41F000E9;
-	Fri, 21 Aug 2026 23:01:22 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l0tRulmt"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34A3A1F000E9;
+	Sat, 22 Aug 2026 07:28:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787353285;
-	bh=hzKschgZvZGUF+9ira6QlB794ZxUSF02QB3OINA6m74=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=FYZDHLdv2T49SIJc79K3OCHvMXN7BV0y4762ev5Ts0hcMOLFdsSlaquyA70X7Jgp8
-	 uQTnZz4XLTvX+bLUhUdn4IGb0wmorlxDuaAlgDLR6Wgok/c6LuvvvCnfCTarRc1LNV
-	 eLR8FQwjwvGzfPPE2O/+xQaiUCz8DtiIcgk2pD3Xmy1+36pPpLTpzHkgxFK3Eh3tzM
-	 Gbe/y5X2Vm4RkPrLuQT4LWaRjbUYRu9OYga5R9ve84gzepx+56HDJe2jc8TVT/Vt9T
-	 IEkhnfC5i5ck4OIWSj6/DUBF3Yn2EwKLUoQgJjzzJOOKcBbu0S6f3gtMiYl9qa3TJ6
-	 eDAio2HmeO2tw==
-Date: Sat, 22 Aug 2026 00:01:20 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Wei-Lin Chang <weilin.chang@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Shuah Khan <shuah@kernel.org>, Fuad Tabba <tabba@google.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Yao Yuan <yaoyuan@linux.alibaba.com>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v19 05/14] KVM: arm64: Set PSTATE.EXLOCK when entering an
- exception
-Message-ID: <f46a292d-5d60-4117-a2db-c54e7acfd0f1@sirena.org.uk>
-References: <20260812-arm64-gcs-v19-0-9105afd828ac@kernel.org>
- <20260812-arm64-gcs-v19-5-9105afd828ac@kernel.org>
- <wu4y6mfg7avc32gg55vkxy565errbecy6kgckmthrjvuben2sc@xmrqciocdmgb>
+	s=k20260515; t=1787383701;
+	bh=m7jzBL8B5ahaWiykmUYf8brzyElxeR4aRjpZhqmQmkA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=l0tRulmt1MoVU5RU1dY7WA9U7n0oBzm3xOu69YnYEKh8HhLEGYX8ffF4BOylvRDJt
+	 Kesmpgqiq7BeOifrZ1k80ZqjPUFpyK7t90ViDT2dchCKkkjYjsdhFGvbUUJKAiTcIW
+	 DDv2KVOdM4uj2EZ3AnYzogg2lBH7e/eMbqEXA3LvytHy99ktqlBGKgKpiDcuOJcAt7
+	 +Mv71mgjfkKXhc4LcTunzYPUm4nvcwJWo8A+1G3So0XU3UjhXzVyNZYgZu+UqDBhWP
+	 PoXxqO+VzgoP2O+hy8LkfP7XXj8GPsQnKNhBSRXuQuNyn44TmtSZF3GobqWdw79VsF
+	 8oGEvsGDCaeyw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1wxg9L-00000000DYv-0gMu;
+	Sat, 22 Aug 2026 07:28:19 +0000
+Date: Sat, 22 Aug 2026 08:28:18 +0100
+Message-ID: <86zeye4nsd.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+Cc: sashiko-reviews@lists.linux.dev,
+	kvmarm@lists.linux.dev,
+	Oliver Upton <oupton@kernel.org>
+Subject: Re: [PATCH 2/2] KVM: arm64: nv: Fix null ptr deref in kvm_nested_s2_unmap() on S2 teardown
+In-Reply-To: <an3lHhgmwS0RnCgI@lucifer>
+References: <20260812-kvm-arm-nested-virt-fix-v1-0-4ad883f1b6a5@kernel.org>
+	<20260812-kvm-arm-nested-virt-fix-v1-2-4ad883f1b6a5@kernel.org>
+	<20260812140101.D77AC1F000E9@smtp.kernel.org>
+	<an3lHhgmwS0RnCgI@lucifer>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="47Ov55ow126IRHuo"
-Content-Disposition: inline
-In-Reply-To: <wu4y6mfg7avc32gg55vkxy565errbecy6kgckmthrjvuben2sc@xmrqciocdmgb>
-X-Cookie: Package sold by weight, not volume.
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ljs@kernel.org, sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev, oupton@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+On Thu, 13 Aug 2026 16:56:02 +0100,
+"Lorenzo Stoakes (ARM)" <ljs@kernel.org> wrote:
+> 
+> On Wed, Aug 12, 2026 at 02:01:01PM +0000, sashiko-bot@kernel.org wrote:
+> > Thank you for your contribution! Sashiko AI review found 3 potential issue(s) to consider:
+> >
+> > Pre-existing issues:
+> > - [Critical] Use-After-Free on `kvm->arch.nested_mmus` array due to concurrent teardown.
+> 
+> Addressed by Marc's changes + discussed over there.
+> 
+> > - [Critical] Incomplete Fix: `kvm_nested_s2_wp()` is vulnerable to the same NULL pointer dereference and UAF.
+> 
+> OK interesting!
 
---47Ov55ow126IRHuo
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Will you respin this series with kvm_nested_s2_wp() fixed in a similar
+way? Something like below.
 
-On Fri, Aug 21, 2026 at 03:15:26PM +0100, Wei-Lin Chang wrote:
-> On Wed, Aug 12, 2026 at 08:12:04PM +0100, Mark Brown wrote:
+Thanks,
 
-> > +static unsigned long compute_exlock(struct kvm_vcpu *vcpu,
-> > +				    unsigned long mode,
-> > +				    unsigned long target_mode)
-> > +{
+	M.
 
-> > +	/* When taking an exception to a higher EL EXLOCK is cleared. */
-> > +	if ((mode | PSR_MODE_THREAD_BIT) != target_mode)
-> > +		return 0;
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 00580ba6e8ba0..ebc4f4dc47836 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -1262,6 +1262,14 @@ void kvm_handle_s1e2_tlbi(struct kvm_vcpu *vcpu, u32 inst, u64 val)
+ 	invalidate_vncr_va(vcpu->kvm, &scope);
+ }
+ 
++static void kvm_invalidate_vncr_ipa_all(struct kvm *kvm)
++{
++	lockdep_assert_held_write(&kvm->mmu_lock);
++
++	if (kvm->arch.mmu.pgt)
++		kvm_invalidate_vncr_ipa(kvm, 0, BIT(kvm->arch.mmu.pgt->ia_bits));
++}
++
+ void kvm_nested_s2_wp(struct kvm *kvm)
+ {
+ 	int i;
+@@ -1278,7 +1286,7 @@ void kvm_nested_s2_wp(struct kvm *kvm)
+ 			kvm_stage2_wp_range(mmu, 0, kvm_phys_size(mmu));
+ 	}
+ 
+-	kvm_invalidate_vncr_ipa(kvm, 0, BIT(kvm->arch.mmu.pgt->ia_bits));
++	kvm_invalidate_vncr_ipa_all(kvm);
+ }
+ 
+ void kvm_nested_s2_unmap(struct kvm *kvm, bool may_block)
+@@ -1297,7 +1305,7 @@ void kvm_nested_s2_unmap(struct kvm *kvm, bool may_block)
+ 			kvm_stage2_unmap_range(mmu, 0, kvm_phys_size(mmu), may_block);
+ 	}
+ 
+-	kvm_invalidate_vncr_ipa(kvm, 0, BIT(kvm->arch.mmu.pgt->ia_bits));
++	kvm_invalidate_vncr_ipa_all(kvm);
+ }
+ 
+ void kvm_nested_s2_flush(struct kvm *kvm)
 
-> This is essentially doing an EL comparison, which is also done in
-> kvm_check_illegal_exlock_return() later. Would it be clearer if we
-> follow the EL comparison pattern there? exlock_el_from_spsr() can have
-> more use too.
-
-Yeah, I wasn't super happy there - it's partly a question of what's to
-hand and already in use in each location.  The rest of this code is
-using mode.  I think given your valid concerns about the naming around
-parsing out the EL in kvm_check_illegal_exlock_return() it's easier to
-go the other way, make that code look more like this and hence sidestep
-the naming issue.
-
---47Ov55ow126IRHuo
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmqI2L8ACgkQJNaLcl1U
-h9DSmwf/Ti0qrhR56sAQYWMszAac7N7dyJ3/ETOQS6tSsbmRY66niGgwbEcvnlmT
-iO/PPDo/y69zkAb/VJI+/SwgyfEdUgsZ1EaoiU6svLwuuGCs5EAVZuKgRbJgUy6K
-f5hqKyIKwydaHgcMm5lyGK830e1Wnd9Fs/huhmqm1L6/0XJzAo4qdXv8rwQRyAD/
-fIsWz2zBB2eOw8hrICNHcsj9HUlwGb9GXIHi6OkLZUFvCI3S67LRMJB6RSP04erl
-jZyM5Hm6qhCQoxlwVQvrrrnv7rrnUdbpsoHHAHymeTBfiRvEs5hPwv/elFOsaFGu
-qg/SXCg5sZWsIWQtuQ3IO69sfo5bMQ==
-=6Imv
------END PGP SIGNATURE-----
-
---47Ov55ow126IRHuo--
+-- 
+Without deviation from the norm, progress is not possible.
