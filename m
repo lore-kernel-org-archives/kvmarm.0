@@ -1,123 +1,111 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3263F13FEE
-	for <kvmarm@lists.linux.dev>; Sat, 22 Aug 2026 18:05:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 816AD2F3632
+	for <kvmarm@lists.linux.dev>; Sun, 23 Aug 2026 05:38:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787421959; cv=none; b=lqADQho5cTlJWDd9aa1Vk6gwu8Ag9sp0URw4jjAwsVFOroWUS8FMGMdLIJhsmBfSopxwXZw41my1MM4AJz/S37JoOSgWV5se01vnQX6lsV2Pgp4uuiER6KP66zVoCbZb0rFRQ7uQfQItZToznX2Y0lpUZ0OWy+ZwcQ1rYWbudyA=
+	t=1787463510; cv=none; b=HoLzxbuQ2cQ+0CEGgc+kOXd5ccZGR43/DjCkqMUlcokWwcXxWvbwzdd3+y/r/gGXX9oyMAtx0SDGr8T7QdJWy5Riuvj/azCm0d5Ac8ixoTN1WLp+K0UAX4FSxrRmphQbarVewWZ9Na/Jx0hxpografOvg5jIW419hE/hCNXYfMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787421959; c=relaxed/simple;
-	bh=y1j4qPrluxEJvol0cdNHaCvOmrJrs51L8OSd9mm31/Y=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=RSeqOpSRcWwa/CYwDWW8GzP0eB+LeOfCdFjNJDzw4INX5RiJAfriG4KmmDBu3fcTYlIE7ddXq474rw+TXBcpwKTeWxI+MU8On+wN9tb6oCwH1XGHK6poDg5xnCXbkG4i5lil1s0qGq+VMMxZobEc/aTBx2TzhvErqW98bIIrQzY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hPbFdmXg; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1787463510; c=relaxed/simple;
+	bh=8OuvN8KSQm8wUw/oMr6mFLhFJi1gNWi88uVLLsdVmmo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iY3w5sNPUSd+43JjkRWF6SkNuAdNjEeF3MrJ75/zNp642RLMVGQTwxDdippC5HvBvVuekH2uDU8nXNO1QIiyDUjBVrqRmAIBaZEvehWW+F0HYEwdntC2ihVyvGN+bCFOywmZMCFfV1Ms8aiNvwAx7MFI6D/XYfS9psijJlufzUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=UjOHVIq9; arc=none smtp.client-ip=115.124.30.113
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hPbFdmXg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 762691F000E9;
-	Sat, 22 Aug 2026 18:05:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787421957;
-	bh=5jrs9/RbwrK1svYvQQwxIQ2Jo2/cfDeBhmZKdKYyHpw=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=hPbFdmXgOd9qig5I25jiVR7IKTk1CBSNfF/14wJ6RgA9otNJ9NrtVdIWa4kXkD0Jz
-	 cBUztpjyXLB4MoWgvhhGoE0WwUACJl0QV3+I05rFVdsLd5G0uxmORVBUcABiRKU5yF
-	 M02cKG7idLhlGLZDFlQYiOwBuGQm2kcMEK21faCa+4uB5NCPk3h1g8qL+WzFfUKlsX
-	 tpD4E48U/87kewiHTW0GuHhohjhy1dE/a9t9qRHBcsWWfOJLrtBEHNFMjDgH6XJFPN
-	 N3OntQLJ2LmDyZ1p9rDsqqwX02F6Ty2kKFfrNgp1tFrdJyYunpj4W7f8gLp2csH0KS
-	 jHNFP/fPZK3cg==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2 2/2] KVM: arm64: nv: Fix null ptr deref on nested
- wp/unmap, teardown race
-Reply-To: sashiko-reviews@lists.linux.dev
-To: =?utf-8?b?TG9yZW56byBTdG9ha2VzIChBUk0p?= <ljs@kernel.org>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260822-kvm-arm-nested-virt-fix-v2-2-ac4059a0eaa6@kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="UjOHVIq9"
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1787463502; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=bhied+RrHvfAlPalGsWSr2PGKdyWrajPn0cro9XXUAU=;
+	b=UjOHVIq904RNOiaXXmYmEWkJzjqqLAy0bzMZG1eYMXDs3mMdDxINumYt55/GC6SzHXs2ILPXfkSjeb64aTkQBKBWvEckf3WJGurONj8D0UUld1+lZYKzUsqMyI75In6bndK0ZmpM5IwWqBtbhq2jjT3j7J7gUZm8huAF3vFhkpY=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R171e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037033178;MF=yaoyuan@linux.alibaba.com;NM=1;PH=DS;RN=16;SR=0;TI=SMTPD_---0X9PtKmb_1787463498;
+Received: from localhost(mailfrom:yaoyuan@linux.alibaba.com fp:SMTPD_---0X9PtKmb_1787463498 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Sun, 23 Aug 2026 13:38:19 +0800
+Date: Sun, 23 Aug 2026 13:38:18 +0800
+From: Yao Yuan <yaoyuan@linux.alibaba.com>
+To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Fuad Tabba <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Christoffer Dall <christoffer.dall@arm.com>, 
+	Wei-Lin Chang <weilin.chang@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] KVM: arm64: Fix spurious warning for benign stage
+ 2 teardown race
+Message-ID: <dycpfrkpphjy5xnb57t2zvdmlpkx76lbow7w23l3d2fwgbfjjj@lbk4uh7awc2p>
 References: <20260822-kvm-arm-nested-virt-fix-v2-0-ac4059a0eaa6@kernel.org>
- <20260822-kvm-arm-nested-virt-fix-v2-2-ac4059a0eaa6@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 22 Aug 2026 18:05:56 +0000
-Message-Id: <20260822180557.762691F000E9@smtp.kernel.org>
+ <20260822-kvm-arm-nested-virt-fix-v2-1-ac4059a0eaa6@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260822-kvm-arm-nested-virt-fix-v2-1-ac4059a0eaa6@kernel.org>
 
-Thank you for your contribution! Sashiko AI review found 2 potential issue(=
-s) to consider:
+On Sat, Aug 22, 2026 at 06:46:53PM +0800, Lorenzo Stoakes (ARM) wrote:
+> A batch of kernel warnings were triggered in the L0 host kernel when using
+> kvmtool to experiment with nested virtualisation.
 
-Pre-existing issues:
-- [High] Use-After-Free of `kvm->arch.nested_mmus` array during nested page=
- table walks
-- [High] Memory Leak of `kvm->arch.nested_mmus` on VM teardown via fd closu=
-re
---
+...
 
---- Patch [2]: [PATCH v2 2/2] KVM: arm64: nv: Fix null ptr deref on nested =
-wp/unmap, teardown race ---
-commit 82456f58d55471e0202bc28188ae985c14d4be0a
-Author: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+> Fixes: ec14c272408a ("KVM: arm64: nv: Unmap/flush shadow stage 2 page tables")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+> ---
+>  arch/arm64/kvm/mmu.c | 10 ++++++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 74e7e7f7564c..31e049ded093 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -59,19 +59,25 @@ static phys_addr_t stage2_range_addr_end(phys_addr_t addr, phys_addr_t end)
+>   * long will also starve other vCPUs. We have to also make sure that the page
+>   * tables are not freed while we released the lock.
+>   */
+> -static int stage2_apply_range(struct kvm_s2_mmu *mmu, phys_addr_t addr,
+> +static int stage2_apply_range(struct kvm_s2_mmu *mmu, phys_addr_t start,
+>  			      phys_addr_t end,
+>  			      int (*fn)(struct kvm_pgtable *, u64, u64),
+>  			      bool resched)
+>  {
+>  	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
+> +	phys_addr_t addr = start;
+>  	int ret;
+>  	u64 next;
+>
+>  	do {
+>  		struct kvm_pgtable *pgt = mmu->pgt;
+> +		/*
+> +		 * We may be raced on PGT teardown when we release the
+> +		 * kvm->mmu_lock. That's fine as the PGT is legitimately no
+> +		 * longer present.
+> +		 */
+>  		if (!pgt)
+> -			return -EINVAL;
+> +			return resched && addr > start ? 0 : -EINVAL;
 
-KVM: arm64: nv: Fix null ptr deref on nested wp/unmap, teardown race
+Hi,
 
-This commit fixes a NULL pointer dereference in the nested page table walk
-paths. It resolves a race condition where concurrent stage 2 teardown can s=
-et
-the page table pointer to NULL while the MMU lock is temporarily dropped.
+I can understand the addr checking makes sure only return 0
+when the mmu_lock is dropped at least once and get pgt =
+NULL, may a variable like drop_lock = true when
+cond_resched_rwlock_write(&kvm->mmu_lock) happens can have
+better readability, but depends on you and others' opinion.
 
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 17123f0b6daba..f69722e1592a5 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
+Reviewed-by: Yuan Yao <yaoyuan@linux.alibaba.com>
 
-[ ... ]
-
-> @@ -1295,7 +1306,7 @@ void kvm_nested_s2_unmap(struct kvm *kvm, bool may_=
-block)
->  			kvm_stage2_unmap_range(mmu, 0, kvm_phys_size(mmu), may_block);
-
-[Severity: High]
-This isn't a bug introduced by this patch, but can this lead to a
-use-after-free of the mmu pointer?
-
-When we pass the array element pointer down the call chain:
-
-kvm_nested_s2_unmap()
-  -> kvm_stage2_unmap_range()
-    -> __unmap_stage2_range()
-      -> stage2_apply_range()
-
-stage2_apply_range() can drop kvm->mmu_lock by calling
-cond_resched_rwlock_write().
-
-Concurrently, kvm_vcpu_init_nested() can reallocate and free the
-kvm->arch.nested_mmus array, or kvm_arch_flush_shadow_all() can free it
-locklessly. When stage2_apply_range() reacquires the lock, could it
-dereference the dangling mmu pointer?
-
-[Severity: High]
-This is a pre-existing issue, but does kvm->arch.nested_mmus leak during VM
-teardown via fd closure?
-
-It looks like the array is currently only freed in kvm_arch_flush_shadow_al=
-l(),
-which is triggered exclusively by the MMU notifier's release hook.
-
-If a VM is closed via file descriptor, mmu_notifier_unregister() is called
-which does not invoke the release callback. Since kvm_arch_destroy_vm() doe=
-sn't
-appear to clean up the nested_mmus array, is this memory permanently orphan=
-ed?
-
->  	}
-> =20
-> -	kvm_invalidate_vncr_ipa(kvm, 0, BIT(kvm->arch.mmu.pgt->ia_bits));
-> +	kvm_invalidate_vncr_ipa_all(kvm);
->  }
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260822-kvm-arm-ne=
-sted-virt-fix-v2-0-ac4059a0eaa6@kernel.org?part=3D2
+>
+>  		next = stage2_range_addr_end(addr, end);
+>  		ret = fn(pgt, addr, next - addr);
+>
+> --
+> 2.55.0
