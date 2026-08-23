@@ -1,50 +1,65 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E67282853F3;
-	Sun, 23 Aug 2026 09:44:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92A89372EEE;
+	Sun, 23 Aug 2026 10:10:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787478257; cv=none; b=hjnw7/R6jJ9xcYvTo+6yhKfUjHP2WH3XqndMJe+ACW46JTPRhW9/2Et8EU9Gjawek/rU9+Ybn8YfKDc5kOP5+b7F6suGMMB0FghPGjq2t+w0HXcXF6i+aD+SPgOAXWgRu0JKfsDUI98wd0mylqj6BQiDdD5rolIXNM/If73fDaA=
+	t=1787479854; cv=none; b=ZO2e5cxP/9z+6jIGYELWJ2QPo35dIjxs0zsdjqazkaSBjQL28IrjKEyDuOLKPMR6DVkocMm7zJ5isPwuEm4HlTAL78TvubIhbkJi2YGuULkE2gr2VzSrpFhRtVRszmMUWlIEWSAtB225eIsajWAZJL+AAAaZiRqbsPoxqhKdKp8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787478257; c=relaxed/simple;
-	bh=5jBgebcCXsD6azjR6ZepYpUAG+JKVIPMzh7LwI55EDE=;
+	s=arc-20240116; t=1787479854; c=relaxed/simple;
+	bh=HRvVKJ7CZQj22MxQOZMJleCzUmYJJyM4dPbYGIhXboE=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=POSCybJFJ+Shq3p/COqcjWre4pAYSg6t8nmbw9RuT17LbCTQYmPEMzP23u7G4OOkRXtHuNiL19nOpb4xSkoQ5mhZvcSY7enUKZti4w9mUOZusGGilQ7irIXwegGiV2N/0MUUBInNHZFJxjcjIyIyXLFUIoAPHkldMSDxu75OGJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ldhqJHbl; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=iC2jUQjN6RFbUlQRrJcYGGFsfQfmMxZrZPRVICuj4lXTIS3F0Twj48iy07FGducQljla0GZOGCVUxWOr1VUh+g077XAxb3l5HXleJO9jWBDRlH1X3CEh1SmdNSpnfyV/iG2QrtGi/V1C+4HgBak5jXiMiy9ONxq9NW0XedpdGLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ScB/ITwx; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ldhqJHbl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 223A41F000E9;
-	Sun, 23 Aug 2026 09:44:15 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ScB/ITwx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D74CA1F000E9;
+	Sun, 23 Aug 2026 10:10:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787478255;
-	bh=MgCRRQExKQ1Adq0mlHstpjGTj+XuXxxBeLXFDXLoOW0=;
+	s=k20260515; t=1787479845;
+	bh=exiQu/n7a35eCwkPUfkUf1Yr2art4np6KjKYg+xxX4s=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=ldhqJHbl3Vbw0vW2u+BVRit/jIf22EJCrxzmNgjqIotXSoFsmJeXQR815ULHeHoLN
-	 0F1/mwPuIkBhTKBiSyWo9hhYBoQeHjYxg/7sYVrIsfS8evdOWqlC2vBGktiSjRXXxZ
-	 IXMaa1vHp09a3EP9YsrXb5UCTl0gWtoO9KsUcH0hEqOfqcHHP4tDDmMKEoT7tkcg3d
-	 X+v861t3L8WWuDVciQfVlXGQxb3zYbRN7H9vP9ACKHLTxm2tSlAciwJpRiCsjPLf5N
-	 u31md802sayZyB3OMD8j8Eue9H1b+Tg+80a1m9uwkEKdJNK6/ZqzKQRD3Pqv1BXNV7
-	 8QCbu+/RInwig==
+	b=ScB/ITwx9MAGtoO1/gup7gxttaecBHwOpwRZf5zXmDnDFpsvMdxiSdxD6mv0DZlUn
+	 QPZvQ7R/UG3oyNJowVOx/fCqjmlvjIXn20t4p3aPaLENhn8aoYFNwUQgNZEeZLvplu
+	 pbR+NZIs0avcYCyJ68lUIzPfb4MV501M25jZ11Y/2ThVztvbmGZHuSqARSRVxppRj0
+	 tGAr23kxoljNtXQMbbbUv4JROP0xX4o+7MXCuwbBsZGjZdLyMbftTDsl/2j4FayCcv
+	 +WLd2rECSZKFgCssuY389oRLDuK8wvlEzn1/2skftMM6wBJKDGbiUndjNQit907VQG
+	 OiQLEYu7Wzv6g==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wy4kO-00000000OSH-3dc8;
-	Sun, 23 Aug 2026 09:44:12 +0000
-Date: Sun, 23 Aug 2026 10:46:41 +0100
-Message-ID: <87ik51np8e.wl-maz@kernel.org>
+	id 1wy5A3-00000000Oc2-1TO6;
+	Sun, 23 Aug 2026 10:10:43 +0000
+Date: Sun, 23 Aug 2026 11:13:15 +0100
+Message-ID: <87h5klno04.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: sashiko-reviews@lists.linux.dev,
+To: 	Will Deacon <will@kernel.org>,
+	Wei-Lin Chang <weilin.chang@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
 	kvmarm@lists.linux.dev,
-	Oliver Upton <oupton@kernel.org>
-Subject: Re: [PATCH 1/3] irqchip/gic-v4: Clear the domain and fwnode pointers after freeing them
-In-Reply-To: <CA+EHjTzf4C6bdwTGWNN1HeapFWEFWm-AJtxi5gQKHekRS2n8Aw@mail.gmail.com>
-References: <20260820125053.2951078-1-fuad.tabba@linux.dev>
-	<20260820125053.2951078-2-fuad.tabba@linux.dev>
-	<20260820130616.1A7241F000E9@smtp.kernel.org>
-	<CA+EHjTzf4C6bdwTGWNN1HeapFWEFWm-AJtxi5gQKHekRS2n8Aw@mail.gmail.com>
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	"Mike Rapoport (Microsoft)" <rppt@kernel.org>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	"David Hildenbrand (Arm)" <david@kernel.org>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Dev Jain <dev.jain@arm.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Matt Fleming <matt@codeblueprint.co.uk>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Sebastian Ene <sebastianene@google.com>
+Subject: Re: [PATCH v3 0/2] arm64: ptdump flush fixes
+In-Reply-To: <20260814222458.584906-1-weilin.chang@arm.com>
+References: <20260814222458.584906-1-weilin.chang@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -56,96 +71,39 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev, oupton@kernel.org
+X-SA-Exim-Rcpt-To: will@kernel.org, weilin.chang@arm.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, oupton@kernel.org, tabba@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, rppt@kernel.org, ryan.roberts@arm.com, david@kernel.org, anshuman.khandual@arm.com, dev.jain@arm.com, ardb@kernel.org, mark.rutland@arm.com, matt@codeblueprint.co.uk, vdonnefort@google.com, sebastianene@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 20 Aug 2026 15:11:03 +0100,
-Fuad Tabba <fuad.tabba@linux.dev> wrote:
+On Fri, 14 Aug 2026 23:24:56 +0100,
+Wei-Lin Chang <weilin.chang@arm.com> wrote:
 > 
-> Oh Sashiko, here we ago again...
+> Hi,
 > 
-> On Thu, 20 Aug 2026 at 14:06, <sashiko-bot@kernel.org> wrote:
-> ...
-> > [Severity: High]
-> > This is a pre-existing issue, but does this function permanently leak IRQs
-> > and SGI domains?
-> >
-> > In arch/arm64/kvm/vgic/vgic-v4.c:vgic_v4_init(), KVM intentionally truncates
-> > dist->its_vm.nr_vpes upon failure to allocate VPE IRQs:
-> >
-> >     dist->its_vm.nr_vpes = i;
-> >
-> > This limits the teardown loop in vgic_v4_teardown(), which later calls
-> > its_free_vcpu_irqs() with the fatally truncated nr_vpes value.
-> >
-> > Because its_free_vcpu_irqs() relies on vm->nr_vpes to free the IRQ hierarchy
-> > and SGI domains originally allocated for all VCPUs, the truncation causes a
-> > partial free.
+> This series fixes two problems around ptdumps:
 > 
-> Looks like a bug indeed...
+> 1. note_page_flush(), which flushes out the last row of ptdumps, does
+>    not account for address spaces that have IA < 64. Other than making
+>    the last region extremely huge, the attributes of the last region
+>    within the address spaces appear to extend all the way to 1 << 64.
 > 
-> I think the problem is that vgic_v4_init() overloads its_vm.nr_vpes:
-> it truncates the count to bound the free_irq() loop, but
-> its_free_vcpu_irqs() reads the same count and under-frees what
-> its_alloc_vcpu_irqs() allocated at and above the failure index.
+> 2. KVM/arm64's stage-2 ptdump missed calling note_page_flush().
 > 
-> The fix I have in mind keeps the two counts apart: teardown frees
-> everything allocated, and free_irq() only touches the requested
-> doorbells. Marc, what do you think? Something like this (not tested):
+> To address Will's comment [1], I have created an end_address field for
+> struct ptdump_pg_state, and initialized it with the end address of the
+> ptdumps. It follows the same convention as the last range->end:
+> exclusive end, except for the case where the address space ends at
+> 1 << 64. In that case it is set as ULONG_MAX.
 > 
-> @@ vgic_v4_init(), on vgic_v4_request_vpe_irq() failure @@
->                  ret = vgic_v4_request_vpe_irq(vcpu, irq);
->                  if (ret) {
->                          kvm_err("failed to allocate vcpu IRQ%d\n", irq);
-> -                        /*
-> -                         * Trick: adjust the number of vpes so we know
-> -                         * how many to nuke on teardown...
-> -                         */
-> -                        dist->its_vm.nr_vpes = i;
->                          break;
->                  }
->          }
+> Caching the end address avoids duplicating the range iteration in
+> note_page_flush(), at the cost of duplicating state in ptdump_pg_state.
 > 
-> -        if (ret)
-> -                vgic_v4_teardown(kvm);
-> +        if (ret) {
-> +                /* Undo the doorbells we requested (0..i-1)... */
-> +                while (--i >= 0) {
-> +                        int db = dist->its_vm.vpes[i]->irq;
-> +                        irq_clear_status_flags(db, DB_IRQ_FLAGS);
-> +                        free_irq(db, kvm_get_vcpu(kvm, i));
-> +                }
-> +                /* ...but free everything its_alloc_vcpu_irqs() allocated. */
-> +                its_free_vcpu_irqs(&dist->its_vm);
-> +                kfree(dist->its_vm.vpes);
-> +                dist->its_vm.nr_vpes = 0;
-> +                dist->its_vm.vpes = NULL;
-> +        }
-> 
->          return ret;
-> 
-> The actual patch would factor the shared teardown tail into a helper
-> rather than duplicate it.
-> 
-> If you (Marc) agree, I'll send this as a separate patch (after testing
-> it), or as part of a possible respin in a couple of days.
+> Series is based on v7.2-rc5.
 
-Why isn't this as simple as:
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 
-diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
-index ed236f083f0d7..57a16530801c0 100644
---- a/arch/arm64/kvm/vgic/vgic-v4.c
-+++ b/arch/arm64/kvm/vgic/vgic-v4.c
-@@ -333,6 +333,8 @@ void vgic_v4_teardown(struct kvm *kvm)
- 		free_irq(irq, vcpu);
- 	}
- 
-+	/* Make sure we free all VM-wide, per-CPU resources */
-+	its_vm->nr_vpes = aromic_read(&kvm->online_vcpus);
- 	its_free_vcpu_irqs(its_vm);
- 	kfree(its_vm->vpes);
- 	its_vm->nr_vpes = 0;
+Will, if you're OK with patch #1, do you want the whole thing to go
+via the arm64 or the kvmarm tree?
 
 Thanks,
 
