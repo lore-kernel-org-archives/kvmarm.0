@@ -1,59 +1,50 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 210E64AEEF;
-	Sun, 23 Aug 2026 07:51:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E67282853F3;
+	Sun, 23 Aug 2026 09:44:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787471464; cv=none; b=LY2XHZSQOu4U4DILHqWBvEbgszh5hUvmTPftstrI0ZtkRwKwPxP5vpQtmcktHYeMPiM9iuN4PQou+BrFtEnZWSCU3aBl0IXJabSXvv949scWjoGO7gQZxP9u+EgSCcaMN6TSmy0CGXTySfGyn3eNW4wSuDA97jnOFN/l5wB8V3M=
+	t=1787478257; cv=none; b=hjnw7/R6jJ9xcYvTo+6yhKfUjHP2WH3XqndMJe+ACW46JTPRhW9/2Et8EU9Gjawek/rU9+Ybn8YfKDc5kOP5+b7F6suGMMB0FghPGjq2t+w0HXcXF6i+aD+SPgOAXWgRu0JKfsDUI98wd0mylqj6BQiDdD5rolIXNM/If73fDaA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787471464; c=relaxed/simple;
-	bh=ZLORkb6qqgyCDskvJMYpim/9TqST1rT4BNtTNgmSe3s=;
+	s=arc-20240116; t=1787478257; c=relaxed/simple;
+	bh=5jBgebcCXsD6azjR6ZepYpUAG+JKVIPMzh7LwI55EDE=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AHunlPpu51IagEuR3BvOZRPBushEUlbu0gphgh94IhIsHPTYq3mMyWFEsL74SVWk69GNzJfCyJLA16BkpZg+HZIZ1BwnoCZ7hgIsOkRxUnDYUpdCB5AoDAAKym0dMHGwem5cTCM4WUFT+o5vFQ7QkwOm3EQWBVNEhe7eB9eHrfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jQcpZfEi; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=POSCybJFJ+Shq3p/COqcjWre4pAYSg6t8nmbw9RuT17LbCTQYmPEMzP23u7G4OOkRXtHuNiL19nOpb4xSkoQ5mhZvcSY7enUKZti4w9mUOZusGGilQ7irIXwegGiV2N/0MUUBInNHZFJxjcjIyIyXLFUIoAPHkldMSDxu75OGJQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ldhqJHbl; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jQcpZfEi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B04B1F000E9;
-	Sun, 23 Aug 2026 07:51:02 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ldhqJHbl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 223A41F000E9;
+	Sun, 23 Aug 2026 09:44:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787471462;
-	bh=3DIEEbwz6PHcPkpp1UT7HF1ofN3OEvJ90bHzV9iEJXw=;
+	s=k20260515; t=1787478255;
+	bh=MgCRRQExKQ1Adq0mlHstpjGTj+XuXxxBeLXFDXLoOW0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=jQcpZfEiS6+cwHQ6IbXiCpOmUF3Ik2OYTaiKQ0E4XMoV4J+s9mi7uN/D21utY1vyC
-	 B2LeV/550wDICtyUannmRKF8t7WiUqQY3Oui81RhPsxSmfC8au+lfTWPQBSShj/PQS
-	 01YrLJeXjXHDzIQ8/BR5yyG3am75louqHIn7rpBDPmxWLM9uZ2nMWfGKkrIsHWZcMD
-	 SYgfvb4PKgWs2wIUEVVhI6kfChs94ZruzET9M3x4r0qOR3zoq44uVfkOsXVKv3Vgzn
-	 PqG1yrDF4+INochMXIqLCktuDFH4hhD0lRkAVHfHedPtsFH2SdMJd1X4JonrXUW1rq
-	 xJVTuqhKKY26A==
+	b=ldhqJHbl3Vbw0vW2u+BVRit/jIf22EJCrxzmNgjqIotXSoFsmJeXQR815ULHeHoLN
+	 0F1/mwPuIkBhTKBiSyWo9hhYBoQeHjYxg/7sYVrIsfS8evdOWqlC2vBGktiSjRXXxZ
+	 IXMaa1vHp09a3EP9YsrXb5UCTl0gWtoO9KsUcH0hEqOfqcHHP4tDDmMKEoT7tkcg3d
+	 X+v861t3L8WWuDVciQfVlXGQxb3zYbRN7H9vP9ACKHLTxm2tSlAciwJpRiCsjPLf5N
+	 u31md802sayZyB3OMD8j8Eue9H1b+Tg+80a1m9uwkEKdJNK6/ZqzKQRD3Pqv1BXNV7
+	 8QCbu+/RInwig==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1wy2yp-00000000NkD-3aq5;
-	Sun, 23 Aug 2026 07:50:59 +0000
-Date: Sun, 23 Aug 2026 08:53:31 +0100
-Message-ID: <87tsolnuh0.wl-maz@kernel.org>
+	id 1wy4kO-00000000OSH-3dc8;
+	Sun, 23 Aug 2026 09:44:12 +0000
+Date: Sun, 23 Aug 2026 10:46:41 +0100
+Message-ID: <87ik51np8e.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <tabba@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Wei-Lin Chang <weilin.chang@arm.com>,
-	Yao Yuan <yaoyuan@linux.alibaba.com>,
-	linux-arm-kernel@lists.infradead.org,
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: sashiko-reviews@lists.linux.dev,
 	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v2 0/2] KVM: arm64: Fix spurious warn, null ptr deref on S2 teardown race
-In-Reply-To: <20260822-kvm-arm-nested-virt-fix-v2-0-ac4059a0eaa6@kernel.org>
-References: <20260822-kvm-arm-nested-virt-fix-v2-0-ac4059a0eaa6@kernel.org>
+	Oliver Upton <oupton@kernel.org>
+Subject: Re: [PATCH 1/3] irqchip/gic-v4: Clear the domain and fwnode pointers after freeing them
+In-Reply-To: <CA+EHjTzf4C6bdwTGWNN1HeapFWEFWm-AJtxi5gQKHekRS2n8Aw@mail.gmail.com>
+References: <20260820125053.2951078-1-fuad.tabba@linux.dev>
+	<20260820125053.2951078-2-fuad.tabba@linux.dev>
+	<20260820130616.1A7241F000E9@smtp.kernel.org>
+	<CA+EHjTzf4C6bdwTGWNN1HeapFWEFWm-AJtxi5gQKHekRS2n8Aw@mail.gmail.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -65,54 +56,98 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: ljs@kernel.org, oupton@kernel.org, tabba@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, christoffer.dall@arm.com, weilin.chang@arm.com, yaoyuan@linux.alibaba.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev, oupton@kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sat, 22 Aug 2026 18:46:52 +0100,
-"Lorenzo Stoakes (ARM)" <ljs@kernel.org> wrote:
+On Thu, 20 Aug 2026 15:11:03 +0100,
+Fuad Tabba <fuad.tabba@linux.dev> wrote:
 > 
-> When GFNs are invalidated in L0 an MMU notifier triggers
-> kvm_unmap_gfn_range() which tears down all of the stage 2 shadow page
-> tables for nested guests via kvm_nested_s2_unmap().
+> Oh Sashiko, here we ago again...
 > 
-> To avoid lockup, the kvm->mmu_lock is dropped while doing this and the task
-> rescheduled once for each block of physical address space (32 MiB for 16
-> KiB page size), with the lock being reacquired once the task is scheduled
-> again.
+> On Thu, 20 Aug 2026 at 14:06, <sashiko-bot@kernel.org> wrote:
+> ...
+> > [Severity: High]
+> > This is a pre-existing issue, but does this function permanently leak IRQs
+> > and SGI domains?
+> >
+> > In arch/arm64/kvm/vgic/vgic-v4.c:vgic_v4_init(), KVM intentionally truncates
+> > dist->its_vm.nr_vpes upon failure to allocate VPE IRQs:
+> >
+> >     dist->its_vm.nr_vpes = i;
+> >
+> > This limits the teardown loop in vgic_v4_teardown(), which later calls
+> > its_free_vcpu_irqs() with the fatally truncated nr_vpes value.
+> >
+> > Because its_free_vcpu_irqs() relies on vm->nr_vpes to free the IRQ hierarchy
+> > and SGI domains originally allocated for all VCPUs, the truncation causes a
+> > partial free.
 > 
-> This results in a potential race between this L0 tear down and tear down of
-> the guest itself in kvm_flush_shadow_all(), a race which has been observed
-> on real hardware.
+> Looks like a bug indeed...
 > 
-> When this race occurs it causes an invalid kernel warning when the PGT of a
-> nested MMU is cleared by kvm_flush_shadow_all() ->
-> kvm_arch_flush_shadow_all() -> kvm_free_stage2_pgd().
+> I think the problem is that vgic_v4_init() overloads its_vm.nr_vpes:
+> it truncates the count to bound the free_irq() loop, but
+> its_free_vcpu_irqs() reads the same count and under-frees what
+> its_alloc_vcpu_irqs() allocated at and above the failure index.
 > 
-> Patch 1 fixes this by having stage2_apply_range() no longer return an error
-> when it has experienced a benign race with pgt teardown when it drops the
-> lock.
+> The fix I have in mind keeps the two counts apart: teardown frees
+> everything allocated, and free_irq() only touches the requested
+> doorbells. Marc, what do you think? Something like this (not tested):
 > 
-> Patch 2 addresses something more serious - bad timing can turn this spurious
-> warning into a NULL pointer dereference.
+> @@ vgic_v4_init(), on vgic_v4_request_vpe_irq() failure @@
+>                  ret = vgic_v4_request_vpe_irq(vcpu, irq);
+>                  if (ret) {
+>                          kvm_err("failed to allocate vcpu IRQ%d\n", irq);
+> -                        /*
+> -                         * Trick: adjust the number of vpes so we know
+> -                         * how many to nuke on teardown...
+> -                         */
+> -                        dist->its_vm.nr_vpes = i;
+>                          break;
+>                  }
+>          }
 > 
-> kvm_arch_flush_shadow_all() calls kvm_uninit_stage2_mmu() which calls
-> kvm_free_stage2_pgd() on the canonical kvm->arch.mmu for that guest's S2
-> mappings, making it NULL.
+> -        if (ret)
+> -                vgic_v4_teardown(kvm);
+> +        if (ret) {
+> +                /* Undo the doorbells we requested (0..i-1)... */
+> +                while (--i >= 0) {
+> +                        int db = dist->its_vm.vpes[i]->irq;
+> +                        irq_clear_status_flags(db, DB_IRQ_FLAGS);
+> +                        free_irq(db, kvm_get_vcpu(kvm, i));
+> +                }
+> +                /* ...but free everything its_alloc_vcpu_irqs() allocated. */
+> +                its_free_vcpu_irqs(&dist->its_vm);
+> +                kfree(dist->its_vm.vpes);
+> +                dist->its_vm.nr_vpes = 0;
+> +                dist->its_vm.vpes = NULL;
+> +        }
 > 
-> This is problematic if it happens before stage2_apply_range() reacquires
-> the kvm->mmu_lock, as it ultimately returns to kvm_nested_s2_unmap() which
-> dereferences kvm->arch.mmu.pgt with the mmu lock held under the incorrect
-> assumption that it means it's valid, resulting in a NULL pointer
-> dereference.
+>          return ret;
 > 
-> Fix that by checking if kvm->arch.mmu.pgt is NULL before dereferencing it
-> in kvm_nested_s2_unmap() and kvm_nested_s2_wp().
+> The actual patch would factor the shared teardown tail into a helper
+> rather than duplicate it.
+> 
+> If you (Marc) agree, I'll send this as a separate patch (after testing
+> it), or as part of a possible respin in a couple of days.
 
-With the commit message for patch #1 trimmed to something that fits on
-a couple of standard terminal screens ;-) :
+Why isn't this as simple as:
 
-Reviewed-by: Marc Zyngier <maz@kernel.org>
+diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
+index ed236f083f0d7..57a16530801c0 100644
+--- a/arch/arm64/kvm/vgic/vgic-v4.c
++++ b/arch/arm64/kvm/vgic/vgic-v4.c
+@@ -333,6 +333,8 @@ void vgic_v4_teardown(struct kvm *kvm)
+ 		free_irq(irq, vcpu);
+ 	}
+ 
++	/* Make sure we free all VM-wide, per-CPU resources */
++	its_vm->nr_vpes = aromic_read(&kvm->online_vcpus);
+ 	its_free_vcpu_irqs(its_vm);
+ 	kfree(its_vm->vpes);
+ 	its_vm->nr_vpes = 0;
+
+Thanks,
 
 	M.
 
