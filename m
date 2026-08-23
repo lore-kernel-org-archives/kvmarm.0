@@ -1,96 +1,96 @@
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 621132D1931
-	for <kvmarm@lists.linux.dev>; Sun, 23 Aug 2026 18:42:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 087C23A425B
+	for <kvmarm@lists.linux.dev>; Sun, 23 Aug 2026 18:57:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.51
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787510566; cv=pass; b=Pp26KhDURlyP16B+MgtrmequFGQ9acw92GKtUoB7nwXel2+cGbNPRwTGH8+PzSmEgeZVqlMxY7VubeVJxKUYeDafbqG5wrqcXUfKjL8IfY4sNhJ1IBrBC1W44fPn+yj5BIgXH4FRqvqpHAN/C0tTyQwAtIsM4+Lsy6XH57EqDkM=
+	t=1787511467; cv=pass; b=gHSOdYVU8r1MtAOdoBRLyjkCLezhJ/1rmG2kg/zw0jC9JPgYEnshqEqyyKtmM47AOXQ+YQfjuyMCP489Bo8NcNt15kuTk4L9BObYtnz42l7Ajkx1aBeOiNY9qkgtjImS7W+Qofh8dgdx/8bBwY3JFPuq+qJ9T+u/alk+f5nD6MA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787510566; c=relaxed/simple;
-	bh=0+IeSPqNw2KbqfGmFRu0WOwcVJjzIsJn1LgqgmtBNR0=;
+	s=arc-20240116; t=1787511467; c=relaxed/simple;
+	bh=lz8aaji5zgC3mWJC1SnLk1rnhhRMJ2GV0lKLpP1PYaA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=V6QV2oAvdgAZaFyYXFtZyfaD/gfml5XNFthERhi6+SKGnoicqhQ/dScBS+sqOMIaXioH6L1FmhjmaROLtqv4mP5duaYw/r4KGvxuU04gWwmHlbLSapaNb8sFUYnC2QogLW9Mus7ZeJbvGlwlLAD4o5NaVUYPKQ1Y2p+rFV7SHAI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QGm/Y/Fw; arc=pass smtp.client-ip=209.85.128.50
+	 To:Cc:Content-Type; b=fDv39cFIFiAoW3EIGLGOLoQKbLr3l7dmlc4cpzRq3mJkaaNjvZBFJudoGmL6Ys+0NHMPTQHcoFuSbJ3W8WU0akgEtwFtEpt3t7JLi0saFz7ixtRlsuM1bX/hv/rO8O/c/tu4KUqjXamudwBUzmCecGPkN96hnM2uYNKfp3vspKA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=V0XB5qH6; arc=pass smtp.client-ip=209.85.128.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QGm/Y/Fw"
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4996e2575dbso49375e9.0
-        for <kvmarm@lists.linux.dev>; Sun, 23 Aug 2026 11:42:44 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1787510563; cv=none;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="V0XB5qH6"
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-498012a61f6so47735e9.0
+        for <kvmarm@lists.linux.dev>; Sun, 23 Aug 2026 11:57:45 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1787511464; cv=none;
         d=google.com; s=arc-20260327;
-        b=Ho8KSsOy2ta0gbEKJu93jaDaQc9QzL4vKMKX6qRvbQkcp9ES7UaQVjiDv52nwweBeL
-         CFtlqGIA9xbB82Oe+PTJz9sZPg1Nk+fFx0a3t4FIhq5TPfilM+Z/N8sVj+GI/HmvQNWN
-         YfGXrq6gS0HoUuONGrIXcFeePQb5N57sEz+y3dLBGPORHHn3QGXfY0veyhlAAkdZ21NZ
-         4x0/GgVP2AR6k95e71DqUq+wAZE3LuqLrQMZRrOo6QBLeLdGcKhpuj8Gb3jqlKykSI92
-         eiSw5r2mYG487+s1cDA2YFCxbgIHs0gHEqXRAPVsoYzQtuOJGm5nXwb1atYdnIcJaXeh
-         m5mQ==
+        b=PxsJltCvrfvgiAtktjajH9dXEqCAT0sZdPpo1jgWF4iWtgswRiF+4PA3K1iCAx9Hm4
+         zOQkjBH2T/gyuZbbrEdOMcLDa2dEFw42CEl8Y/QfviQUEEG9ZbMuCw0Wrw/JrT73F8is
+         +lO9Y7Bfc10lNcvQw7LK6JFIocq6PP5OK15yxzd5gVUClGe3/U1bVO4QZ8eETjSSLr/P
+         43BbwKlEVQKAP+6t9zQwI5BpfBLTvm5d6QLmSGH+BLgxw3v80FLVq0uU2Wu7Kb1Nouk/
+         wBD8mtyQfmeepnezIYxAzid0xl+sLstpxwrj9eh/CSC/MC93S881ARRmwpTMeITOOO5a
+         Pgdg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=7QqxmDSu9ZKigGwHfW3p68zaiz3lbhfuyJNk3aAmOE4=;
-        fh=Eh0s+SjQ1ZSxZTyP0uaj7CCqWd9Xjz5G4pOHMbr1hdo=;
-        b=URu5tRQKlA31uccQOWW5sfQdmNOn2SRNpdFQ6CHlRCrYCrd8GyGGsOopwN5Ik3f0ai
-         wZCS06/8JLv/W3BIDT8Qwwk+abZbRytfoqny0Na2jrIrI/IOHyN+NwScIdc3dIceg/7K
-         7gTCgTO2fi/o+J6aPjz8MSo1RCYjEsNEg9zpngfldREPv+E2JY8iNVVTiVG1JAObDZEH
-         SxYLsGBmSalLTI46lvNUueyu0EYcen6+YG8prCBciopPHUeSKkoVeIPOg3d/8CAVBgcU
-         xegO1wfL4NmNR4a7HqfR08tpVw6ULjDJvG3OoqFk2uJ78+brFS5eR3T0wopW3/xwP3Bd
-         rCoA==;
+        bh=z2ncKZyTY/9/D1QKVtbf5dvrVylSRPaXMNaiLdOiT18=;
+        fh=+m55P4zvWifZOZ0YjxHb8i38Y6JZ8PPhyW03CPRr9xU=;
+        b=Y78R5FOzAwaBzyVHOyXwX23hAdUnAU+E8yjR9IO9lysMc3nWdaiTL0sdfuoCoqqWPI
+         mVXK+0FcjozB8lfR9+Iy4cI376A7/vJ+aIpY/v9wuGHBze5m9mGvtBKTz9MJ7CpYpOFU
+         ClXjHS4I8nP+vnQGBkXTIAZugeeI6p7RZO16SNa5qK8qxVeTYek3WOq4Lj1m2RcFR3A5
+         93MwvNxr9YAWQhO06sNh0WWGQVXC7oz/sOYcv8w94tm1riGfLH7ilPh/h/LCMSzcdACR
+         DRlL68ZmUNoFdP+0V8Gj8aKWn42adPd4sTvOa60dDmOwg37nD34IkCAzBswFbGCagrm9
+         JPkg==;
         darn=lists.linux.dev
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1787510563; x=1788115363; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1787511464; x=1788116264; darn=lists.linux.dev;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=7QqxmDSu9ZKigGwHfW3p68zaiz3lbhfuyJNk3aAmOE4=;
-        b=QGm/Y/Fw4MzDqByhfdui6yg0Z/CWowWyKV6rzamQj/OP5zG+wampMMyLItVYbX0bQP
-         x0AjoQRqaS0ebVYipoImjAaeHONuQU8u0/9qIYUVhBcNfhtGj6MighSZ9RRBUJ4z9qKM
-         HJ7JTEWBZKS5co+Durwot11Ej2KrcFh9ZIg6CK66OyiSfUKiU1t4Ra4J8Ht9iLkL89At
-         /c/VP0xSjE58fYO5HBRAw8EeM8wcYuECCqZQ5HXQ9dZPajHurbqP2o8ZOgSWokPD7WA7
-         Q9RMjRwyqLQVWgXrKzzNoyerfeoig/HGIdmnZtNMhegpfTSxpF/ouEpjzg8xdl1xiD9e
-         HV+Q==
+        bh=z2ncKZyTY/9/D1QKVtbf5dvrVylSRPaXMNaiLdOiT18=;
+        b=V0XB5qH6+6YEdc6Uqq3FxnrnFPcqvKTmwnz4dv4AiAFmL/ZCNqKXVTML5R51wmiHrc
+         Q3zILwwYDGga9rNvZ+i2HGO7sVQiBi4Tiqce2maP6VQHGo3DorO34m2nWFvZ9+68NwLP
+         HmmgF0nRm6pAg/Y3KXEZSicPiuSqJIMZNYRO3jJq/0XjB+3OfW+QaDG5nuJP4kFVCSJq
+         mU6RttgQMqw07fnxUwLfPhNfR1AH1fWwpZE4XbcnphPtt0kxwB8g+WY6bux60vcaZnDp
+         vk0XGWF7qy8tTMHSrMdjI8YXaa5kKAre2CuHqEtBgpiosgFjVcjCMFDeM5qzaBJat7Pp
+         XBQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787510563; x=1788115363;
+        d=1e100.net; s=20251104; t=1787511464; x=1788116264;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=7QqxmDSu9ZKigGwHfW3p68zaiz3lbhfuyJNk3aAmOE4=;
-        b=JePia3LNXtu9cFyTTMxcg2BVAdgY6eUwOqYyFJ2uCYXmut7kRb+h/N5g9oXXUZCGJW
-         u5CAs1OMB1Pw0LccGVIRwqPaJ0/UWinrZHDCkznwqxANEhC2xX4SX9DqVcJNrEQT2SQb
-         /NzIBrsC/QM71aJjfLPaFNDBwPa3Dy+0xW3vruIzrrya4G8Vmvs/hfc+VE6U+86Z0Rm/
-         TFV1cSj4A3efPLnj0/B1SsmdLH0BKrSgMI0F6EW2uyTpw6yZXNL9xLhWe0guNQ2RwlLB
-         8ZS+sknL6CXJ/Bnj7Kv6CvGuvBtmLBTzCZHczJcwEp+mTi6N6ZBBitbT7sB+1znP64zh
-         r1Sw==
-X-Forwarded-Encrypted: i=1; AHgh+RqC9kc3ygmOa9ym4fyU2IyFFZLYwcJJQ6wN4JZ3V6ZeuDZSrbfcoDJkEee455TU/56yt0mILwc=@lists.linux.dev
-X-Gm-Message-State: AFuF++mf02zHVQuxgIKsC/UOrGTGsWngPugjnb7JAyvLBYlDaotrMzPH
-	BXXrOIgiFeFE2uqO6c6bZQ4d9HFnWZWfA83j2YF9We0eU5APaUsiL2x5eMvuzQ+z/loBPrL/Ey1
-	7cY4qIDmxbwjQlJXsORTNoSLGPvgOOzvGMze5qzil
-X-Gm-Gg: AR+sD11q2tqu4+HH7FNvm+hqK+F575z28aKa+RbFhl2C5C5E6boqbYgiyzG24yyi8e3
-	zTQTn8wXtEt4FRcP3xE2zMU5XcQ63WPGyjmYqAxtQ0lIIu6fJXsDux3UxMByuttEdCd/uECYTgB
-	54O74SkccoFsHi2+9U7B76bLGBIt7vcN44+FzmrMAb/EWwuxwS0kbesOvPY79MXzONwFDkXic/g
-	HJrFsE7eQsed14yPaoOYxvAjQDj4VP7KHJroclEKQFElqBiKEECC6zGDp3ShaJoerNYR7udxGyg
-	N9AbohN5h8t64BSzORVGU/ZgZCkBPy+ec1KbWJ99UteYUZ//GgHV2f6By5aWMCpfdSbIGa8yURz
-	u
-X-Received: by 2002:a05:600c:58d0:b0:495:7a0b:3b4a with SMTP id
- 5b1f17b1804b1-499c241397dmr1168755e9.7.1787510562110; Sun, 23 Aug 2026
- 11:42:42 -0700 (PDT)
+        bh=z2ncKZyTY/9/D1QKVtbf5dvrVylSRPaXMNaiLdOiT18=;
+        b=XzwQKIFJRv4O/PIbabKQrT6vQTdSS1j551R630oH373FR2k5S1MTUPak/ETohF3Az1
+         85Uhb3eEZ3EZhDhdxHLBjmf+0FEuTOoOD5pyJRZX5Yoy3QCD5eN5whpl+wIM/hKoJNqK
+         Fx7fGuQ0bzn+7uxgnnd18echiYJmPDfVeui7JbsQUsNhmoGmi7mbx8DhphtdV05H3XKr
+         5WS7gmZ2bojIY+tLDRMwGQfwsKc2Rykl0dq2nCTgF7YLkGP9/iEqvrIjjkY0780v8i0S
+         BS3iupWKZOVWkE9tUNTrNERYZE8DZGEYd3VufSE35fyM0405lxikPTY2ucCys8rwRBic
+         iKpw==
+X-Forwarded-Encrypted: i=1; AHgh+Rr3ASF1g9uAurwG4MjwNTptvoNCt9xR0P7FEWj1Rae27LKpVqZxq/rI2n88sKSJY+Un++IyEQE=@lists.linux.dev
+X-Gm-Message-State: AFuF++mthP/j5Wx6epw4A1c6PZZReWAwMnd+uVg7uydUyTUhfPxelfIH
+	p5MxT5izltlv0CWVL5FDLXBoZ4FJkW7GU8MOeu3YL1ZR2XPA5pNiaRTeVTxjYvWIuPQhU+05eys
+	qOlINXnJP4tSebFfVcVPle001HoFLxfRjnybWf3La
+X-Gm-Gg: AR+sD11e0p2nSzwvyc7lsZvxmiOkQnABZ4kTR2PflxeSMcbNQzh6jDCx75/5ApGYjoz
+	qTig+g5oB2SU6Oun0ded3d+Dax84Hd7RUAsNko19URSmQayj+HG/hNgVDv+8AFcdxwxldm1TRKG
+	P5fDAg9GwXN+k7IxNMshiWNbyp/oa7y6GUt0OscORb1D6NNAUqqy/r4mfnksl0CF2xlK61YnFFI
+	P0iPmMBQ+QsBG4JIDHhOeysL6DYavLVNFUwqUp2Y0BD21lRJNKvdCfKe8mVUlNNWEYWknaZXFVr
+	w1ZEkAnG/u9tkn2R2E6Cupx1XUfJlW1wu5g8srM+Gk/qDFW+dk7oTL+zHxPjD8CFuDSCfU/jzkr
+	j
+X-Received: by 2002:a05:600c:5944:b0:499:a6a5:a687 with SMTP id
+ 5b1f17b1804b1-499c198e4b7mr1421055e9.0.1787511463662; Sun, 23 Aug 2026
+ 11:57:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260818112920.26252-1-likexu@tencent.com> <20260818112920.26252-3-likexu@tencent.com>
-In-Reply-To: <20260818112920.26252-3-likexu@tencent.com>
+References: <20260818112920.26252-1-likexu@tencent.com> <20260818112920.26252-4-likexu@tencent.com>
+In-Reply-To: <20260818112920.26252-4-likexu@tencent.com>
 From: Jiaqi Yan <jiaqiyan@google.com>
-Date: Sun, 23 Aug 2026 11:42:29 -0700
-X-Gm-Features: AcwNN1UVfQ0nU8MkI-sMZoCVlDC1rLeZSnymDq9F6Xx7kDJeK1PGVfv6PmTTlDI
-Message-ID: <CACw3F51WrQ=5=DaKChPtwmf0030R3GSOPjrAZ9Og+V0VHuRhEw@mail.gmail.com>
-Subject: Re: [PATCH v2 2/3] KVM: selftests: arm64: Skip sea_to_user without
- 1GB hugepages
+Date: Sun, 23 Aug 2026 11:57:31 -0700
+X-Gm-Features: AcwNN1UKm1Q7lz-ubUFGA7ulRgZVArWjC692yzAJA6eP0LdE_OW76ZW46Y7eb_4
+Message-ID: <CACw3F51+V9fuYeEPH20+KV6589z36OBDsr+Vgmgs4TS+7V=zEQ@mail.gmail.com>
+Subject: Re: [PATCH v2 3/3] KVM: selftests: arm64: Skip sea_to_user when EINJ
+ places no poison
 To: Like Xu <like.xu.linux@gmail.com>
 Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
 	Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
@@ -100,98 +100,90 @@ Content-Transfer-Encoding: quoted-printable
 On Tue, Aug 18, 2026 at 4:29=E2=80=AFAM Like Xu <like.xu.linux@gmail.com> w=
 rote:
 >
-> sea_to_user backs guest memory with 1GB hugepages but never checks that
-> any are reserved. On a host with an empty pool it aborts instead of
-> skipping:
+> sea_to_user injects a memory UER with EINJ notrigger=3D1 and expects the
+> guest to consume it and trap to KVM as an SEA. On some firmware the test
+> aborts instead:
 >
->   kvm_syscalls.h:68: mem !=3D MAP_FAILED, errno=3D12 (ENOMEM)
->   not ok 1 selftests: kvm: sea_to_user # exit=3D254
+>   arm64/sea_to_user.c:223: exit_reason =3D=3D (41)
+>   Wanted KVM exit reason: 41 (ARM_SEA), got: 6 (MMIO)
 >
-> The mmap() of the hugetlb region fails with -ENOMEM because no 1GB pages
-> are available, and the test treats that as a hard failure even though it
-> simply cannot run without the backing pages. Check the free 1GB hugepage
-> count up front and skip cleanly when the host cannot satisfy the region.
+> notrigger=3D1 asks firmware to arm the poison without consuming it, but o=
+n
+> these platforms the poison is only armed as part of the trigger step that
+> notrigger skips, so nothing consumable is left in memory. The guest reads
+> back the sentinel, no SEA occurs, and GUEST_FAIL fires. On arm64 a ucall
+> is delivered as an MMIO write, which surfaces as the KVM_EXIT_MMIO above
+> rather than a KVM bug.
 
-Looks good to me, just one nit below.
+Thanks for the fixes, looks good to me.
 
 Reviewed-by: Jiaqi Yan <jiaqiyan@google.com>
 
 >
+> The file already documents that the test must be skipped when firmware
+> cannot deliver a consumable error. Detect the guest abort that follows a
+> missing SEA and skip, instead of failing on a firmware limitation the
+> test cannot control.
+>
+> Assisted-by: Claude:claude-opus-4-8
 > Signed-off-by: Like Xu <likexu@tencent.com>
 > ---
->  tools/testing/selftests/kvm/arm64/sea_to_user.c |  6 ++++++
->  tools/testing/selftests/kvm/include/test_util.h |  1 +
->  tools/testing/selftests/kvm/lib/test_util.c     | 15 +++++++++++++++
->  3 files changed, 22 insertions(+)
+>  .../testing/selftests/kvm/arm64/sea_to_user.c | 24 +++++++++++++++++--
+>  1 file changed, 22 insertions(+), 2 deletions(-)
 >
 > diff --git a/tools/testing/selftests/kvm/arm64/sea_to_user.c b/tools/test=
 ing/selftests/kvm/arm64/sea_to_user.c
-> index 1c2a743ca8e23..7cf95da8e594d 100644
+> index 7cf95da8e594d..d4af6e0eed288 100644
 > --- a/tools/testing/selftests/kvm/arm64/sea_to_user.c
 > +++ b/tools/testing/selftests/kvm/arm64/sea_to_user.c
-> @@ -281,6 +281,12 @@ static struct kvm_vm *vm_create_with_sea_handler(str=
-uct kvm_vcpu **vcpu)
->         alignment =3D max(backing_page_size, guest_page_size);
->         num_guest_pages =3D VM_MEM_SIZE / guest_page_size;
+> @@ -215,13 +215,33 @@ static void run_vm(struct kvm_vm *vm, struct kvm_vc=
+pu *vcpu)
 >
+>         ksft_print_msg("Dump kvm_run info about KVM_EXIT_%s\n",
+>                        exit_reason_str(run->exit_reason));
+> +
 > +       /*
-> +        * The region is backed by 1GB hugepages; skip gracefully rather =
-than
-> +        * failing with mmap() -ENOMEM if the host has none reserved.
+> +        * The guest's read of the injected location is expected to trap =
+to KVM
+> +        * as an SEA. If it does not, the injected error was never placed=
+ as
+> +        * consumable poison: some firmware honours EINJ's notrigger requ=
+est by
+> +        * arming the poison only as part of the (now skipped) trigger st=
+ep, so
+> +        * nothing is left in memory for the guest to consume. The guest =
+then
+> +        * reads back the sentinel value and reports it via GUEST_FAIL, w=
+hich
+> +        * arm64 delivers as a ucall over MMIO (hence a KVM_EXIT_MMIO her=
+e).
+> +        * Treat that as "this platform cannot host the test" and skip, m=
+atching
+> +        * the requirement documented at the top of this file, rather tha=
+n
+> +        * failing on a hardware/firmware limitation the test cannot cont=
+rol.
 > +        */
-> +       TEST_REQUIRE(get_free_hugepages(backing_page_size) >=3D VM_MEM_SI=
-ZE);
-
-How about moving the src_type to main or global? Then we can
-TEST_REQUIRE() in main().
-
-
+> +       if (run->exit_reason !=3D KVM_EXIT_ARM_SEA &&
+> +           get_ucall(vcpu, &uc) =3D=3D UCALL_ABORT) {
+> +               ksft_print_msg("Guest consumed no SEA: %s", uc.buffer);
+> +               ksft_exit_skip("EINJ notrigger placed no consumable poiso=
+n on this platform\n");
+> +       }
 > +
->         vm =3D __vm_create_with_one_vcpu(vcpu, num_guest_pages, guest_cod=
-e);
->         vm_init_descriptor_tables(vm);
->         vcpu_init_descriptor_tables(*vcpu);
-> diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/test=
-ing/selftests/kvm/include/test_util.h
-> index a56271c237ae9..0624922c2735d 100644
-> --- a/tools/testing/selftests/kvm/include/test_util.h
-> +++ b/tools/testing/selftests/kvm/include/test_util.h
-> @@ -168,6 +168,7 @@ struct vm_mem_backing_src_alias {
->  bool thp_configured(void);
->  size_t get_trans_hugepagesz(void);
->  size_t get_def_hugetlb_pagesz(void);
-> +size_t get_free_hugepages(size_t page_size);
->  const struct vm_mem_backing_src_alias *vm_mem_backing_src_alias(u32 i);
->  size_t get_backing_src_pagesz(u32 i);
->  bool is_backing_src_hugetlb(u32 i);
-> diff --git a/tools/testing/selftests/kvm/lib/test_util.c b/tools/testing/=
-selftests/kvm/lib/test_util.c
-> index bab1bd2b775b6..29f9c1d60b1b7 100644
-> --- a/tools/testing/selftests/kvm/lib/test_util.c
-> +++ b/tools/testing/selftests/kvm/lib/test_util.c
-> @@ -222,6 +222,21 @@ size_t get_def_hugetlb_pagesz(void)
->         TEST_FAIL("Error in reading /proc/meminfo");
->  }
+> +       TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_ARM_SEA);
+> +
+> +       /* arm_sea holds valid data only for a KVM_EXIT_ARM_SEA exit. */
+>         ksft_print_msg("kvm_run.arm_sea: esr=3D%#llx, flags=3D%#llx\n",
+>                        run->arm_sea.esr, run->arm_sea.flags);
+>         ksft_print_msg("kvm_run.arm_sea: gva=3D%#llx, gpa=3D%#llx\n",
+>                        run->arm_sea.gva, run->arm_sea.gpa);
 >
-> +size_t get_free_hugepages(size_t page_size)
-> +{
-> +       char path[128];
-> +       size_t free;
-> +
-> +       snprintf(path, sizeof(path),
-> +                "/sys/kernel/mm/hugepages/hugepages-%zukB/free_hugepages=
-",
-> +                page_size >> 10);
-> +       if (!test_sysfs_path(path))
-> +               return 0;
-> +
-> +       free =3D get_sysfs_val(path);
-> +       return free * page_size;
-> +}
-> +
->  #define ANON_FLAGS     (MAP_PRIVATE | MAP_ANONYMOUS)
->  #define ANON_HUGE_FLAGS        (ANON_FLAGS | MAP_HUGETLB)
->
+> -       TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_ARM_SEA);
+> -
+>         esr =3D run->arm_sea.esr;
+>         TEST_ASSERT_EQ(ESR_ELx_EC(esr), ESR_ELx_EC_DABT_LOW);
+>         TEST_ASSERT_EQ(esr & ESR_ELx_FSC_TYPE, ESR_ELx_FSC_EXTABT);
 > --
 > 2.50.1 (Apple Git-155)
 >
