@@ -1,130 +1,92 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B50AA450411;
-	Mon, 24 Aug 2026 15:54:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0044E45090A;
+	Mon, 24 Aug 2026 16:02:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787586859; cv=none; b=dYCl+iPQCPYloKn89/lks4iteZr4u3IzVG05hHhofpN+NlH5zSBqV9aHsPvbSHQ/qrETWX80Z+rmEt65P2aOgpFmt3EJg5EknFQolJVKwh++3NoVyL/3Di96bnNI+z8RRcN8p23RzTL6zSwAxBkLPWxsbPB5bLjPspHIi4eY9aI=
+	t=1787587339; cv=none; b=bNGriDsgk6ww/33b49lwjdlhZ4hqNKEMDQTDQ0qgWfj8nav/eL9F1OA8Qqw29itRB2qKgVDK9Gw0ZBlWsVSrb0vgKq7pmprsFXXgGS5hyOmk1rtMtPHs0J80bIQj5oMio1qrxOskKFPedy/+A662L8l57NHTyyXbFA09ayShxWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787586859; c=relaxed/simple;
-	bh=yj+CLjCd6ZN8YVITVo1ajAqsXT5194fFlbwNjWhjLcM=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gaiutvhroZOqfhoYolsZSAaiAayb24QERVoN/q0fwQVz11lTg1kSBMPabCJ6VENj1ISF4dt9eLVJDcM3JM3h6vPSK+p6cnV3TjHAHvFx9N4NF+tc5Uu+oYzyt5kkiWZGILfgmppeESnQJGI7gXhsW0RF5LfiAhkL3fZCp0YP5tA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XBDmeh7t; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1787587339; c=relaxed/simple;
+	bh=OuEuuVDsQIU86m+JZgDF7i1IaRiOC6ZzryaqZNvCmGc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=THptJ/eHtpp18ZLiYedfQxI6tUt/XgZvXgk5TU2LaoME+Owghn9qx4uOglGhwTUtk6Ar6tSUTA6aagYX4lPxtysKXgp5Clihz11Kgq1kljCll0HZHajCQ/I+SWUcY6UbQ24jkokprlJ+vOsqeJydcfWZipca4bKCFyN6CFgsdRw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oL3MYuOo; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XBDmeh7t"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FD5F1F000E9;
-	Mon, 24 Aug 2026 15:54:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oL3MYuOo"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 366391F000E9;
+	Mon, 24 Aug 2026 16:02:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787586857;
-	bh=Q/YK2XBpqlieY7KJvqGJYsHNS+SMvy1GkrZAPQ1gJ5k=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=XBDmeh7tkQdYARPGjPdNBK5kC6zjthQwiRE3A8fSloO/zwyEpGoDL5WZfn1vWgPyJ
-	 3HsYSxOzVN3azk/1bfhQRhwCqOoZBTWxKVMRY78nX/TTx2SsywelssenqSr4Lghtd/
-	 rY3vZehxVuRS0sdmO69AYs04PDwv+E9ZmrruC4AWhnZG/7ythH2wsv0h26DNnTr7a/
-	 qjimLt1MYiq6LJifz+Y8v9Krph0vn7Ek5q5RjJNyxZ30c2H78UjDpLoKj1iSrcoDE+
-	 XE92ftUKKLS65/jS0wX554/1eL4RwAlvVvYzfESciWGxiKAG+b8EHcA9nYW/+nh8EV
-	 +0LvQQUQ9fSTQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1wyX02-00000000l0h-3eHA;
-	Mon, 24 Aug 2026 15:54:15 +0000
-Date: Mon, 24 Aug 2026 16:56:46 +0100
-Message-ID: <87ecfno6kh.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>,
+	s=k20260515; t=1787587337;
+	bh=wdoFeUu5GvTX8rBFW3cJrIUVf+aY84rF9rqx5dNRKh8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=oL3MYuOo1TlVQzpRjyI9MYDJjupL+OGdle/lbGRs24gLXCWfSvbXMzpZ26w8j6Wt7
+	 so4DQmY9Vpwe5btinEUOafrffDEs+bX1qvdcgXuVjFDABJU3UhlplZsMEs+pn+KLiU
+	 eFyQwioGfNqyHYn+4Avwf6lR2nSSxOb32VpzxcvmIvaNy+y+bO6LkEWd446Fpl+roM
+	 Swjz3YGlKxnwymVXA2OcfSWQ8u85pPZTA2QoD/ROGDcL+TCmcJQBGO7dFuHpccgLTp
+	 J6zuh+EMKWPnBtNg+0EbP2D+W0psfn8WYrDOzG2HVgF0TrteSW9/i3/AM7gtb09M/Z
+	 a/cZ5XJ2MGr/g==
+From: Will Deacon <will@kernel.org>
+To: linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	Wei-Lin Chang <weilin.chang@arm.com>
+Cc: catalin.marinas@arm.com,
+	kernel-team@android.com,
+	Will Deacon <will@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
 	Fuad Tabba <tabba@google.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Wei-Lin Chang <weilin.chang@arm.com>,
-	Yao Yuan <yaoyuan@linux.alibaba.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v2 0/2] KVM: arm64: Fix spurious warn, null ptr deref on S2 teardown race
-In-Reply-To: <aoxD4omq8gKYdFKL@gremlin>
-References: <20260822-kvm-arm-nested-virt-fix-v2-0-ac4059a0eaa6@kernel.org>
-	<87tsolnuh0.wl-maz@kernel.org>
-	<aoxD4omq8gKYdFKL@gremlin>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	"Mike Rapoport (Microsoft)" <rppt@kernel.org>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	"David Hildenbrand (Arm)" <david@kernel.org>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Dev Jain <dev.jain@arm.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Matt Fleming <matt@codeblueprint.co.uk>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Sebastian Ene <sebastianene@google.com>
+Subject: Re: [PATCH v3 0/2] arm64: ptdump flush fixes
+Date: Mon, 24 Aug 2026 17:01:55 +0100
+Message-ID: <178757828014.164243.15117526586847861889.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260814222458.584906-1-weilin.chang@arm.com>
+References: <20260814222458.584906-1-weilin.chang@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: ljs@kernel.org, oupton@kernel.org, tabba@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, christoffer.dall@arm.com, weilin.chang@arm.com, yaoyuan@linux.alibaba.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, stable@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On Mon, 24 Aug 2026 14:15:29 +0100,
-"Lorenzo Stoakes (ARM)" <ljs@kernel.org> wrote:
+On Fri, 14 Aug 2026 23:24:56 +0100, Wei-Lin Chang wrote:
+> This series fixes two problems around ptdumps:
 > 
-> On Sun, Aug 23, 2026 at 08:53:31AM +0100, Marc Zyngier wrote:
-> > On Sat, 22 Aug 2026 18:46:52 +0100,
-> > "Lorenzo Stoakes (ARM)" <ljs@kernel.org> wrote:
-> > >
-> > > When GFNs are invalidated in L0 an MMU notifier triggers
-> > > kvm_unmap_gfn_range() which tears down all of the stage 2 shadow page
-> > > tables for nested guests via kvm_nested_s2_unmap().
-> > >
-> > > To avoid lockup, the kvm->mmu_lock is dropped while doing this and the task
-> > > rescheduled once for each block of physical address space (32 MiB for 16
-> > > KiB page size), with the lock being reacquired once the task is scheduled
-> > > again.
-> > >
-> > > This results in a potential race between this L0 tear down and tear down of
-> > > the guest itself in kvm_flush_shadow_all(), a race which has been observed
-> > > on real hardware.
-> > >
-> > > When this race occurs it causes an invalid kernel warning when the PGT of a
-> > > nested MMU is cleared by kvm_flush_shadow_all() ->
-> > > kvm_arch_flush_shadow_all() -> kvm_free_stage2_pgd().
-> > >
-> > > Patch 1 fixes this by having stage2_apply_range() no longer return an error
-> > > when it has experienced a benign race with pgt teardown when it drops the
-> > > lock.
-> > >
-> > > Patch 2 addresses something more serious - bad timing can turn this spurious
-> > > warning into a NULL pointer dereference.
-> > >
-> > > kvm_arch_flush_shadow_all() calls kvm_uninit_stage2_mmu() which calls
-> > > kvm_free_stage2_pgd() on the canonical kvm->arch.mmu for that guest's S2
-> > > mappings, making it NULL.
-> > >
-> > > This is problematic if it happens before stage2_apply_range() reacquires
-> > > the kvm->mmu_lock, as it ultimately returns to kvm_nested_s2_unmap() which
-> > > dereferences kvm->arch.mmu.pgt with the mmu lock held under the incorrect
-> > > assumption that it means it's valid, resulting in a NULL pointer
-> > > dereference.
-> > >
-> > > Fix that by checking if kvm->arch.mmu.pgt is NULL before dereferencing it
-> > > in kvm_nested_s2_unmap() and kvm_nested_s2_wp().
-> >
-> > With the commit message for patch #1 trimmed to something that fits on
-> > a couple of standard terminal screens ;-) :
+> 1. note_page_flush(), which flushes out the last row of ptdumps, does
+>    not account for address spaces that have IA < 64. Other than making
+>    the last region extremely huge, the attributes of the last region
+>    within the address spaces appear to extend all the way to 1 << 64.
 > 
-> Haha sure will put it on a diet and respin :)
+> [...]
 
-Oliver can probably do so when applying the series.
+Applied to arm64 (for-next/core), thanks!
 
-Thanks,
+[1/2] arm64: ptdump: Make note_page_flush() range aware
+      https://git.kernel.org/arm64/c/902caade3cfd
+[2/2] KVM: arm64: ptdump: Flush the last region
+      https://git.kernel.org/arm64/c/beca1b97a21d
 
-	M.
-
+Cheers,
 -- 
-Jazz isn't dead. It just smells funny.
+Will
+
+https://fixes.arm64.dev
+https://next.arm64.dev
+https://will.arm64.dev
