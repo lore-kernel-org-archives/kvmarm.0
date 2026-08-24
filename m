@@ -1,79 +1,45 @@
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73D93432BC1
-	for <kvmarm@lists.linux.dev>; Mon, 24 Aug 2026 16:23:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BC4D463B7D
+	for <kvmarm@lists.linux.dev>; Mon, 24 Aug 2026 16:25:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787588618; cv=none; b=P1cJ/gDg7BI8rvJCTOtT1uKF21BTgxcPNMKe1m8r1YOvCYWgl6DF96/AdrqMpBQjFA53A2JHmsbp7Mlz+x3G1vtcVvoV5j/Y1T4nkp4nAHFxICKqP07pbV/bMyzaDRqsTDZmjEgtGWOJ59ADWBZYB+3rlL9Moe8CFdiFfm1uCjU=
+	t=1787588713; cv=none; b=n+da8dJXH7A96+LQ6GDacAcwZzmfhXTNXPtawVEV4T2LxzSi75qlNvBLIZbu90iQGeyRK2QuDxa+X7vZpDYpeDn7VJ5zCBUS/6hJN3UhuK/yflm4Yg+CN56bHvIALTau+QNgJy//fVMzSlFB+BH++qKyUPuYQ6W/Y1On+MaqBlg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787588618; c=relaxed/simple;
-	bh=CVqShdwopWXthWP5NpoVBSsEeKneG1zYbLGVXGy/2xw=;
+	s=arc-20240116; t=1787588713; c=relaxed/simple;
+	bh=l0zojGsMsGNgqs2R/TURzvKx5nHn3Uw+B2dqC+xyz6Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EEs/U2bOuK8Qi2B4Hx04wqAc3zVCdoSw44VUtn4dcs8fOXVPd6/nEkTlYCyJrNCQc+B1hXy1DKV3HwonHe98NE0rNze1nfE2GkkUSwIPozHdbY3wsFGCSzSSkhIe4OBW0FKrYT6V1iwiGn+8i+aZDw80O7zY4RKCJNoQzg0s8tA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=j1TFoAqL; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=WIpmzS42FhDIajt32Cvg8+vIAcdLIxF9LU9hDZbJ30y3bT6vYVWHsOL7kwYhRD+TuvHnpDh35K5xonfqOJbqQpxcTKW06tEWsTJmU6LZpAtL9ptrtQiX3t91/m54OTsPeEz6JxqBJnITc03de9kdLPH3gEuamo1YaVfB+oxUBk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=WIOAsiBt; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="j1TFoAqL"
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-47de0093c42so2911317f8f.3
-        for <kvmarm@lists.linux.dev>; Mon, 24 Aug 2026 09:23:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1787588615; x=1788193415; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=IO0g4mIiXj10EzMo2R/KDJ9Eie2fuSqpmAU+xz/5e2k=;
-        b=j1TFoAqLbpPAtpccer+hvOSuoCTuSzEvfg/E12bSlmVmeqK4Xd2NukoCLcnLhfTLUI
-         M82MZVXR3wFdVh1SkIWeNn3coybl8BAFl9vPfTZQ4f9o/lGvoJye3DAytTmK1ZA4VUgD
-         dfv6DSWmnYZahE3IWgmPGRCE0874KsPsQEBf/+7zKUthRwo/EJObsjippTEkRho6inkL
-         rab9XhSr+RrUMSsMxuPmYr6ZAVxKsD7kILVkN5c2CuwAiaIuXSCN6A6KV6r1ZwiqKkIa
-         kERfuM7Oux2ereD1BSi0AN94bWZLkgQn+GgGyO8yhJY20WsUnm1CY2o09ov2gTDuhiGB
-         kAXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787588615; x=1788193415;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=IO0g4mIiXj10EzMo2R/KDJ9Eie2fuSqpmAU+xz/5e2k=;
-        b=BypGKLmTIhq0UtzHu3y8EymEzvhY5OlxfhjI4vpGFXwOJtcC5+efqjHn0dhHqJNdhp
-         wHUfFPxpmHe0ycyucWCgabecRqko1IkDsqRaQ3TJA02OsegGgc3k8w+KebKz9DN5KMXZ
-         TKhrlP4+8OC0C78vm6i78d/W1Abqqez10iNyrR9Z7mR4juH6oGA3cm2heiQ5OcebnR8p
-         eoki0x2UTBrxpXLeFr9lTMIOnXngaGqPlD9NtmmRwmcdj81AjeiZC7QgGauG1/2g5EA+
-         MyO5n5rWJT0SDqixZoDs4gLO1pbOvjtgg0EtdeK8gqvHgXfc6OKCALULcklOMeB6cMWR
-         FrPg==
-X-Forwarded-Encrypted: i=1; AHgh+Rr82ADuCNKSYbSNGmJkZ2QAFBP3vs16HxDMq/V99i987oqShPUR3sREHoFywbMQKTOtn5/O+YA=@lists.linux.dev
-X-Gm-Message-State: AFuF++mBVsTAVXhY+ilRj1eoBvBGvvV+GL8alZwrZFliwfL/rLNJGN0V
-	MBul1rgpTcejS8Au93MlL61YmXzenV+eSyC8J4UOCCxgr/GHIthmIJ57cOl7OdsK5w==
-X-Gm-Gg: AR+sD12t6KgXruerlKLikwd5MRTNhCk6FhQTxldr8VkCXxO8mgVNeqk34otelf4hTyM
-	YZebek8Zir0WqaKcf1m28mhGtK+TBIF/8lvodembIhp4B8cZ06NWhszEuNwItmy/9+YSGX6RIJo
-	/BnDsQRljTLFtA006U7rhOFSkkiP7HFOL6NCK8RGmkJEt+1FOHm8EV1m6np6Jzs18iDzGJjaAbZ
-	uQv0W2Ho5vd1uhUVtkGDNVyAsvIruOo8vaMLHn2e1cxP8lIs+8DHZodqDK/okqYw/0tWaSYpBEN
-	SgsISROFothAixJTOX9shnDijyR0DTCRoAVdQ91M0Kj6URTcR3uWKnicUYp0sibsrgdH+PVSZpw
-	LXZ3WTKK3KQZOQOSAEzKXEyP1AcXdw+mPq3Ihu67te7VARRtJuxDdrMgzuaSgd2KpYFqxVgvqD0
-	9auoA5tOkuv9OHfqJcUam9ornD/ox9O7JuCBzXGQABK3+uAaEfDzQOTiInCeeDBj9X+sRCn/MRN
-	vuegYu5HkxQka/OqZGW5dGqrwRBMfnY
-X-Received: by 2002:a05:6000:22c2:b0:47f:d011:f644 with SMTP id ffacd0b85a97d-482c0b54606mr34306523f8f.4.1787588614220;
-        Mon, 24 Aug 2026 09:23:34 -0700 (PDT)
-Received: from google.com (135.91.155.104.bc.googleusercontent.com. [104.155.91.135])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-482c9b69a49sm8579616f8f.7.2026.08.24.09.23.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Aug 2026 09:23:33 -0700 (PDT)
-Date: Mon, 24 Aug 2026 17:23:30 +0100
-From: Vincent Donnefort <vdonnefort@google.com>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com,
-	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com,
-	qperret@google.com
-Subject: Re: [PATCH v4 09/17] KVM: arm64: Add selftests for the pKVM heap
- allocator
-Message-ID: <aoxwAukYucNw1T2p@google.com>
-References: <20260731143541.956291-1-vdonnefort@google.com>
- <20260731143541.956291-10-vdonnefort@google.com>
- <CA+EHjTy7SUFsE3N5ERV_FQw-3GyEo17mqe2=RbV1wz8bVT+JXw@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="WIOAsiBt"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E782D16F2;
+	Mon, 24 Aug 2026 09:25:05 -0700 (PDT)
+Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1A6D23F85F;
+	Mon, 24 Aug 2026 09:25:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1787588709; bh=l0zojGsMsGNgqs2R/TURzvKx5nHn3Uw+B2dqC+xyz6Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=WIOAsiBtOY0kYfuovVHPIsfJwSEgnj9Id9svYkH4BwGORMkuSEF3wxr9zCcaELjCY
+	 KTVxCNCiwlKBVgHm80DKd3lrMNSINarzu56ik2J8f8hDEM1dizJgf20yBW9nrnMZA8
+	 InPkW8Tz6rYoCZy1YUv4U58nZalwIKEIn5nBC29o=
+Date: Mon, 24 Aug 2026 17:25:05 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Will Deacon <will@kernel.org>
+Cc: Fuad Tabba <fuad.tabba@linux.dev>, linux-arm-kernel@lists.infradead.org,
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Mark Brown <broonie@kernel.org>, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH v2] arm64: Defer the GMID_EL1 read to
+ {init,update}_cpu_features()
+Message-ID: <aoxwYb8cpwDV7Q8A@arm.com>
+References: <20260824071004.504894-1-fuad.tabba@linux.dev>
+ <aoxCk5lFQv6lFwHQ@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -82,91 +48,89 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CA+EHjTy7SUFsE3N5ERV_FQw-3GyEo17mqe2=RbV1wz8bVT+JXw@mail.gmail.com>
+In-Reply-To: <aoxCk5lFQv6lFwHQ@willie-the-truck>
 
-[...]
-
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> > index 346365e76ef2..d99c9b1b0c82 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> > @@ -633,6 +633,28 @@ static void handle___pkvm_finalize_teardown_vm(struct kvm_cpu_context *host_ctxt
-> >         cpu_reg(host_ctxt, 1) = __pkvm_finalize_teardown_vm(handle);
-> >  }
-> >
-> > +#ifdef CONFIG_NVHE_EL2_DEBUG
-> > +static void handle___pkvm_hyp_alloc_selftest(struct kvm_cpu_context *host_ctxt)
-> > +{
-> > +       struct pkvm_hyp_req req = { .type = PKVM_HYP_NO_REQ };
-> > +       int ret;
-> > +
-> > +       ret = hyp_allocator_selftest();
-> > +       if (ret == -ENOMEM) {
-> > +               req.type = PKVM_HYP_REQ_HYP_ALLOC_SELFTEST;
-> > +               req.mem.nr_pages = hyp_alloc_selftest_topup_needed();
-> > +       }
-> > +
-> > +       cpu_reg(host_ctxt, 1) = ret;
-> > +       pkvm_hyp_req_to_smccc(host_ctxt, &req);
-> > +}
-> > +#else
-> > +static void handle___pkvm_hyp_alloc_selftest(struct kvm_cpu_context *host_ctxt)
-> > +{
-> > +       cpu_reg(host_ctxt, 1) = -EPERM;
-> > +}
-> > +#endif
+On Mon, Aug 24, 2026 at 02:09:39PM +0100, Will Deacon wrote:
+> On Mon, Aug 24, 2026 at 08:10:04AM +0100, Fuad Tabba wrote:
+> > __cpuinfo_store_cpu() gates the GMID_EL1 read on the raw
+> > ID_AA64PFR1_EL1, so it reads the register on MTE hardware even when the
+> > kernel has disabled MTE (CONFIG_ARM64_MTE=n or arm64.nomte). KVM sets
+> > HCR_EL2.TID5 in that case, which traps the read to EL2 and injects an
+> > UNDEF:
+> > 
+> >   Internal error: Oops - Undefined instruction: 0000000002000000 [#1]
+> >   pc : __cpuinfo_store_cpu+0xf4/0x264
+> >   Call trace:
+> >    __cpuinfo_store_cpu+0xf4/0x264 (P)
+> >    secondary_start_kernel+0xc8/0x1d0
+> >    __secondary_switched+0xc0/0xc4
+> >   Kernel panic - not syncing: Attempted to kill the idle task!
+> > 
+> > Only pKVM is affected, and only for a CPU that is offlined and brought
+> > back online. Every CPU's first bring-up precedes KVM's initcall, and
+> > pKVM refuses CPU_ON for a CPU that was not online when KVM initialised,
+> > so hotplug is the only path to cpuinfo_store_cpu() with TID5 set. pKVM's
+> > PSCI CPU_ON relay sets the host HCR before the CPU enters EL1, whereas
+> > plain nVHE sets it at CPUHP_AP_KVM_ONLINE, after cpuinfo_store_cpu().
+> > 
+> > Defer the read to {init,update}_cpu_features() and gate it on the
+> > sanitised ID register, as MPAM already does. system_supports_mte()
+> > cannot serve as the gate, as update_cpu_features() also runs during
+> > initial SMP bring-up, before smp_cpus_done() calls
+> > setup_system_features(). The init path gains the CONFIG_ARM64_MTE test
+> > the update path already had, leaving SYS_GMID_EL1 uninitialised when
+> > MTE is compiled out, where its only other user (lib/mte.S) is not
+> > built.
+> > 
+> > Fixes: f35abcbb8a084 ("KVM: arm64: Trap MTE access and discovery when MTE is disabled")
+> > Cc: stable@vger.kernel.org
+> > Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+> > ---
 > 
-> My tag stands, but thought about this while going through Sashiko's reviews.
+> [...]
 > 
-> The other arm writes x2 through pkvm_hyp_req_to_smccc(), this one does
-> not, and -EPERM is an error so pkvm_call_hyp_req() goes and decodes
-> x2. Nothing initialises it on a call with no arguments.
+> > diff --git a/arch/arm64/kernel/cpuinfo.c b/arch/arm64/kernel/cpuinfo.c
+> > index d50e2a9b066b3..c8967f185e3dd 100644
+> > --- a/arch/arm64/kernel/cpuinfo.c
+> > +++ b/arch/arm64/kernel/cpuinfo.c
+> > @@ -502,12 +502,14 @@ static void __cpuinfo_store_cpu(struct cpuinfo_arm64 *info)
+> >  	info->reg_id_aa64smfr0 = read_cpuid(ID_AA64SMFR0_EL1);
+> >  	info->reg_id_aa64fpfr0 = read_cpuid(ID_AA64FPFR0_EL1);
+> >  
+> > -	if (id_aa64pfr1_mte(info->reg_id_aa64pfr1))
+> > -		info->reg_gmid = read_cpuid(GMID_EL1);
+> > -
+> >  	if (id_aa64pfr0_32bit_el0(info->reg_id_aa64pfr0))
+> >  		__cpuinfo_store_cpu_32bit(&info->aarch32);
+> >  
+> > +	/*
+> > +	 * info->reg_gmid deferred to {init,update}_cpu_features because
+> > +	 * reading it traps to EL2 when MTE is disabled.
+> > +	 */
 > 
-> It is inert because pkvm_selftests() sits behind the same #ifdef, but
-> the handler is registered either way and nothing states the rule.
-> errno_to_smccc(-EPERM, host_ctxt) here would write the zero, and it
-> may be worth saying on pkvm_call_hyp_req() that any handler reached
-> through it has to set x2.
+> I don't think we should defer this, as I've been actively doing the
+> opposite for parallel CPU onlining (where the ID registers can be read
+> concurrently by incoming CPUs to amortise the cost of a trap) and also
+> for the RNG traps during early boot:
 > 
-> Cheers,
-> /fuad
+> https://lore.kernel.org/all/annJ0oDB2HObQC5j@willie-the-truck/
+> 
+> If you look at the diff I sent in the thread above (I didn't get a
+> reply), the idea is that __read_sysreg_by_encoding() reads from the ID
+> register values stashed by cpuinfo_store_cpu(). So you could use that
+> to check id_aa64pfr1 before reading gmid, as it will give you the
+> sanitised view.
 
-Clearly not something that would happen but I can put the #ifdef inside
-handle___pkvm_hyp_alloc_selftest() so it looks cleaner:
+Since cpu_data[] has the raw per-cpu regs, I think it makes a lot of
+sense to read the cached values in __read_sysreg_by_encoding() than
+issuing the MRS again.
 
-  static void handle___pkvm_hyp_alloc_selftest(struct kvm_cpu_context *host_ctxt)
-  {
-          struct pkvm_hyp_req req = { .type = PKVM_HYP_NO_REQ };
-          int ret = -EPERM;
-
-  #ifdef CONFIG_NVHE_EL2_DEBUG
-          ret = hyp_allocator_selftest();
-          if (ret == -ENOMEM) {
-                  req.type = PKVM_HYP_REQ_HYP_ALLOC_SELFTEST;
-                  req.mem.nr_pages = hyp_alloc_selftest_topup_needed();
-          }
-  #endif
-          cpu_reg(host_ctxt, 1) = ret;
-          pkvm_hyp_req_to_smccc(host_ctxt, &req);
-  }
-
-Regarding pkvm_call_hyp_req(), how about a proper kerneldoc?
-
- /**
-  * pkvm_call_hyp_req() - Issue an HVC that can return hypervisor requests
-  * @f: Hypervisor function symbol to call.
-  * @...: Arguments to pass to the hypercall.
-  *
-  * Re-issue an HVC and process any pending hypervisor request until completion
-  * or error.
-  *
-  * Only use this helper for HVCs whose hypervisor handlers format their return
-  * registers with pkvm_hyp_req_to_smccc().
-  *
-  * Return: Result of the hypercall or a negative error if the hyp request
-  * handling failed.
-  */
+Given Marc's earlier series to make config=n and override behave
+similarly, I wonder whether we should just store the overridden value in
+cpu_data (with the clamp Suzuki was proposing to avoid making up
+features on the command line). We can then get rid of the override
+applied in various places and it might be easier to take the config into
+account as well.
 
 -- 
-Vincent
-
+Catalin
