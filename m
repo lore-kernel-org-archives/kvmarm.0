@@ -1,110 +1,96 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32036403AF0;
-	Mon, 24 Aug 2026 11:12:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DD05259498;
+	Mon, 24 Aug 2026 11:18:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787569925; cv=none; b=SyL4DuBG8TlP8QuPtSwvjLLA5PBzGUmfuZD4vQFNeaqjDXdO48rtoan+Awlw+b4R5r7xVvZZdJsNcKk5k2ywZUEZ7q8bw37CYopaFgKibrNIuCR7DRWblMMGKUkh4Wn7NzYN+YWSJoCYy1xvEwjEmANug0Ok7byTj8UEkw56kcE=
+	t=1787570304; cv=none; b=ARb4Cnu1swKXwjYo5mjME9dNgQEvhegCMZn/r9UjwLaYAUk3Q8Q/kmW7Z9xQVXrfrnoY+9bCvqymo+1mUgqEZRNigosocEyu0djFg011V4JKtl9JW4tFCx0S5AHWxkLtrmP9UCm2QTM2Ccx5ZvH3zFsFEqRnM5BqrsMiuWYY3kA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787569925; c=relaxed/simple;
-	bh=m+morNN8RGBMipO5t+xTLWNLDa2XTQgVC0dfxL3TCxU=;
+	s=arc-20240116; t=1787570304; c=relaxed/simple;
+	bh=Dr9LEAcuFZwHZs+G+xr87dFTcwxUh7Z010YxFDHr0nU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VVps+ouzwKttoDxxj8Bpz9Yr9yUpOwUSs1nK4+1bCH5utMkx07moj4y4Uwk6DnwEnqkxU4pRievRlQAg+VX1OUz25oOr+VE10vX97fpKDdCxOlhTmg+ZVlc+vDYH5c8ix9QQxuwuSsxsJuKu4KITZcL8EbNFcuPtQtZIejVJtiU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AMLFr5yZ; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=DwWWpsOUctiYFd+VONcrTs9TEG9KOVf949cKNhRbhLjFKzqWljUGGjhq0+IkmxMDiDOPBgnsXoFHXIq9+d51yxXPgY0N7iG0JWTwMec9/Veh3P0I745hCi/a1zCokMv6H2HxUvjoZnROJRenYYAKeHA6w+aBjqjaOnaBpc9U+PY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CQaPeYY8; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AMLFr5yZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9641E1F000E9;
-	Mon, 24 Aug 2026 11:12:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CQaPeYY8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 909021F000E9;
+	Mon, 24 Aug 2026 11:18:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787569923;
-	bh=mx+rPoWvI9AkDoOzj5LLsBB5vj6AWlJD0KdPs8BiNks=;
+	s=k20260515; t=1787570302;
+	bh=ncfcDW24tgTUaBIvc+gDahPqdeBvJv0bVDHgY+i5uKw=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=AMLFr5yZzIs0z67GZnwj0OMggnSxwjtK/svgoRHvLnZJLflICjZ7c2H/0ZLr8XRBQ
-	 5peiDCre1Ou8Z17lQI6z7iqe4HP79Am7rOUrqCSkivt2tlw6V656d0fFf3inVa0ilc
-	 LREZ5spgc8ePqqERgIM4DGL+XM8vLXJBlXG7T9t2XLYv3UCSLqOzHVPmG7Aab4KDho
-	 pGz1SEWBqKdmf0x9ghpwGzEbRm5UTisGHBnqw+0ZmEMpGEaT2tebudhm35NtO/NbMN
-	 dcCnvz2BRnKAmLUzV4NpD/iZKt0SLlKiWMhpo5BFzjprSZTMUVGSp89AAcFK1kRU3W
-	 NSVohXySukHMw==
-Date: Mon, 24 Aug 2026 12:11:57 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Wei-Lin Chang <weilin.chang@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Shuah Khan <shuah@kernel.org>, Fuad Tabba <tabba@google.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Yao Yuan <yaoyuan@linux.alibaba.com>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v19 06/14] KVM: arm64: Validate GCS exception lock when
- emulating ERET
-Message-ID: <e0decd21-bd0e-4eab-aa94-b9e97e7b4d7d@sirena.org.uk>
-References: <20260812-arm64-gcs-v19-0-9105afd828ac@kernel.org>
- <20260812-arm64-gcs-v19-6-9105afd828ac@kernel.org>
- <vdmz43ogvmwu4liilfqzdrgsf5v765bucl7mybhfdxj7yrywkd@5mssukdegdwg>
- <02b970b2-dbd9-490f-bfc0-be10708e0f9b@sirena.org.uk>
- <q3lxbu2palhkejnkvncs2iili6vvkcl7boftn4snf4fjy6fhvg@ehrwmqt6eh3m>
+	b=CQaPeYY8aUp59eCWsh629TpndqB58LU0xcEXlX0mLuGKEC+c79cuKJ6HeLvT1e7XH
+	 iqkXbts4Z3peJBtrzSaY8LvDXL/eZwIlRiRlOBEwW/iZKUVWqi7Hn40JF1h+iA0Yun
+	 UmKaIBo6m4g7YguQXxh8B23pjwzIZZAVmYM2t644ng41FZli2EsalneZ5iMcPbM5KO
+	 W4lwIAXGXBNxLY/aJJwUXiEOnjA8DKsXYH8Ojk+jXT/pOH9G6u437QvKzSHcF5JVG2
+	 30eNAgVqpoXobKKDU7xtwaip8rTlZGC804Upd/XnlDmfJDBNC9UkHtgaUikU/kCV46
+	 lCcZOrPpiz8FA==
+Date: Mon, 24 Aug 2026 12:18:18 +0100
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	Steffen Eiden <seiden@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oupton@kernel.org>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Fuad Tabba <fuad.tabba@linux.dev>, 
+	Shen Yongchao <grayhat@foxmail.com>, Karl Mehltretter <kmehltretter@gmail.com>, 
+	Wei-Lin Chang <weilin.chang@arm.com>, stable@vger.kernel.org
+Subject: Re: [PATCH v3 2/2] KVM: arm64: nv: Delay freeing of shadow S2
+ structures until VM destruction
+Message-ID: <aownGeMYtKV0wDxq@gremlin>
+References: <20260821161829.1032561-1-maz@kernel.org>
+ <20260821161829.1032561-3-maz@kernel.org>
+ <aoiQuVs5jzB5La4i@gremlin>
+ <86v7924lqn.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="TdbCqlH/hxhqcRtu"
-Content-Disposition: inline
-In-Reply-To: <q3lxbu2palhkejnkvncs2iili6vvkcl7boftn4snf4fjy6fhvg@ehrwmqt6eh3m>
-X-Cookie: Accuracy, n.:
-
-
---TdbCqlH/hxhqcRtu
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <86v7924lqn.wl-maz@kernel.org>
 
-On Sun, Aug 23, 2026 at 02:18:15PM +0100, Wei-Lin Chang wrote:
-> On Fri, Aug 21, 2026 at 11:19:30PM +0100, Mark Brown wrote:
+On Sat, Aug 22, 2026 at 09:12:32AM +0100, Marc Zyngier wrote:
+> On Fri, 21 Aug 2026 19:15:45 +0100,
+> "Lorenzo Stoakes (ARM)" <ljs@kernel.org> wrote:
+> > > @@ -1310,16 +1319,12 @@ void kvm_nested_s2_flush(struct kvm *kvm)
+> > >
+> > >  void kvm_arch_flush_shadow_all(struct kvm *kvm)
+> > >  {
+> > > -	for (int i = kvm->arch.nested_mmus_size - 1; i >= 0; i--) {
+> > > +	for (int i = 0; i < kvm->arch.nested_mmus_size; i++) {
+> >
+> > Hmm why this was in reverse before? :) I guess some product of the
+> > kvfree() bit or maybe something else?
+>
+> We allocate s2_mmus in S2_MMU_PER_VCPU chunks. Which means that it
+> complicates the freeing of the these structures, as they can only be
+> freed once all S2 PTs of that chunk have been freed. We have three
+> options:
+>
+> - scan forward, and use complicated logic to work out that you have
+>   freed the last PTs of a chunk, freeing with a negative offset from
+>   the current point in the loop. Works, but hard to reason about in
+>   fewer than 3 seconds.
+>
+> - scan backward, use simpler logic to ensure you have reached the
+>   beginning of a chunk, nuke it.
+>
+> - have two loops, one for the PTs, one for the MMUs. That's what we
+>   end-up with due to the different garbage collection phases.
 
-> > As the comment mentions it's not quite that - ELFromSPSR() in the
-> > pseudocode has rather more going on in it that I'd managed to convince
-> > myself wasn't relevant in this specific context.  I didn't want to give
-> > it a name that would cause someone to think it did the full thing and
-> > trip them up using it in a different context where those things do
-> > matter.  I do agree that this results in awkward naming.
+Ah I see, so tear down page tables of the 2nd of the pair, then after doing it
+for the 1st of the pair free the chunk, makes sense.
 
-> Right sorry, I missed the pseudocode part. ELFromSPSR pseudocode is
-> doing more than what its name indicates...
+>
+> Cheers,
+>
+> 	M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
 
-> If we want to stick with the pseudocode then what do you think about
-> el_from_spsr_nocheck/el_from_spsr_raw?
-
-Yeah, those names could help though given your other comment about this
-not looking the same as the code in exception.c I ended up changing it
-to this:
-
-        /* Check the EL only, ignore thread mode */
-        pstate = vcpu->arch.ctxt.regs.pstate;
-        cur_mode = (pstate & PSR_MODE_MASK) | PSR_MODE_THREAD_BIT;
-        target_mode = (spsr & PSR_MODE_MASK) | PSR_MODE_THREAD_BIT;
-
-instead.
-
---TdbCqlH/hxhqcRtu
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmqMJv0ACgkQJNaLcl1U
-h9CjOQf/QMmd6D+ASrY8SyYNHelRK0EJIwW4oBSv0gXC6TA0EC73stA7cfWcDeY6
-U23YT5yN83tHNVoYDjoFrCutJf47NIZNcOJtQbUdTekGUcr5t/upVCOo2nrS5SJg
-syjCHDN8fK+T/qD6u3qWQSbJAe/K5lr67Olv4W9Oxg+qwAiMvb14NtuSQWu+RLwk
-hJpyPCK+UCYOB4XM3rEYX+6O2zkJa1SfhUHPdR+yGguBA7I4kAeimhpttufCkTTr
-UDY/P7qmfzE5jrgnh/NFDKWxClVFO6Rh+N/S+Qre6cY9PVPT8G1A3n9HGPxYPzdd
-n2Jqdfo3C3vbaigTCWrY2B4EwG8l5w==
-=YW/9
------END PGP SIGNATURE-----
-
---TdbCqlH/hxhqcRtu--
+--
+Cheers, Lorenzo
