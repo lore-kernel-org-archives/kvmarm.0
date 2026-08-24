@@ -1,155 +1,182 @@
-Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com [209.85.210.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF83B38A73F
-	for <kvmarm@lists.linux.dev>; Mon, 24 Aug 2026 21:21:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.199
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBD013932FF;
+	Mon, 24 Aug 2026 22:28:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787606497; cv=none; b=olwScYINAhJmJiCKE1CuUA7jl/zHKhJv4yTSieAzTVGefApk4cpzGTsF0BmY1DbfVxgF6eBjA4YJ/jYSVwPe5SnH2T9ZJ7sUmSsTXlntUNDzKMJ628gZm//yHrIG8T6Wkup629XPra5jHRf0r0HQAE74OzPqnqNPBCWa1oS9K8E=
+	t=1787610510; cv=none; b=azfsOHiJ0+KUC61O61q6qtRjRSu2PerBKe5V7eyQmbNFlSxlEfBYbEX5Zu66yBOGpKnETUEipeNT2MzAOu/wx0l5KIqN/iq3GLkS+Qv2vHl5Jp9GfbhKuWdU5iwR7m1RJNOkEXo59XR8cKhVX3akAT5plunHDu6FOjHgfrpmXZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787606497; c=relaxed/simple;
-	bh=Z+nC9E/REizDaGM/y1Zfk8lEpjdNkyuISxRBXNgQRvw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=qzgR/QvZTFbChI3rimKfyiifjmC3HtSDnk7p0Gn0YuaWYTcGMxQSC5uYhDhUi6SY128OsLGXR+l3K5HVbmc1IJCqsEjgcYR3+WWmHnRdB00YKU6etmB3PHNWyNO5iG6gRxyrM2H7/KMsLR5MLJD5is6AEgo88OT2HJW0HlP6U1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=J3w4mfEN; arc=none smtp.client-ip=209.85.210.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1787610510; c=relaxed/simple;
+	bh=8YkalDfOLH7ZhauPFHeeoXqmWKKKSNSdp2k35xerf6A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oYleqg3Dvb4a7/ViTGOhDEJpcE87jDGTNncnjZCXmaKXe7D9mdk3zPBURepxUuBi5YSy42bAjt6dlqKp7NwZK8vD6SPzVREayEr/aOOAYu+Pe4+cR/dPoB3tp6hGSlgudOq9xwwkUUOymKoFwmIom+sfFCKLK9mlRl0b8lwrBEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=pUj6NLIf; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="J3w4mfEN"
-Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-848d21bbb55so6002357b3a.0
-        for <kvmarm@lists.linux.dev>; Mon, 24 Aug 2026 14:21:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1787606495; x=1788211295; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=NU4DYUq1t/9abu87crupOiETuM25Ll46MNDzgrp8Cdg=;
-        b=J3w4mfENTvmgBR7jre6FMU8DBouPiEx7rVM+F2t/so5LKamafwkQWwS/Vtj9OplgyJ
-         DgF1YE4bdVoVMdsNIfJTWU1J9j3Pm8F4TV+o/lNp3LShIhZUewqFwSv7ZY9ynVhpTuUl
-         /nc55/HOuv7GYBHFsxoMGlIPPLGg01Pi0gHNCZZF8Sudyvsf772RnHZnGJUpsOgy8Ewg
-         +B+vfYpxku50DnOR2wkwd3XI9w2D1TRLqH12brwGYt1+GGJXZKIG7rkcJvc3oeb9i57j
-         N7r5Lr9MHtniLgTybWQOMsQZFMURANZlOgwJjDFQZmOuMAZ4V09zYFqPPgJxvZ9yEnfK
-         7Brw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787606495; x=1788211295;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=NU4DYUq1t/9abu87crupOiETuM25Ll46MNDzgrp8Cdg=;
-        b=tUpDpTelWCFKfyPDMvAR4b5Jg+fj3P++ALhpxjRvS8vBBKutGf8E10UlI0oqFBF141
-         W9QlPvzn0shth+ysPDP/+fRMylO32XRoAaetPfjNCDj1WAn1MwnSrL38TBV9+ZhAbkBM
-         NecvGnQgkj42FAgOC+7zlrrsCYLGiZmFdDtqJneQX5UEi9cD/+tRRVuNUtoSvXuqO98z
-         CT2K3tJUYtc/ZHcnvedqPx6YAhr/6QAN76AwW200eMue9MxlO2xcivAolWr+BX+qtjo3
-         Kj9eyFSXkCRHGmfaz6BWxhMcml9HwWxQlp7FNpZ4qDnYmV9Sw3phh77vL2cQzp6e5XBT
-         nM9g==
-X-Forwarded-Encrypted: i=1; AHgh+RrI2aeqw9K74E6FQm/IEpyXebgYNbZmqb8COQjk5N3rhy47zmaVpHSlbSz6D+TFg7tnTiZ1h0w=@lists.linux.dev
-X-Gm-Message-State: AFuF++m+3kFMMh9OM8Z/Ll2ceFgNz5TrJSPGwmcGA31dLxUQacoMLGjP
-	ogkUlbX4vtO7hA0mjJ02cOjqlV+4g1rmXNJuG1Ae11UZ4i8xoopUPzOQaYoYJIMQSpGC2T5Y46x
-	UvrjgTw==
-X-Received: from pfoi3.prod.google.com ([2002:aa7:87c3:0:b0:847:9805:8254])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:398a:b0:84e:2722:5d9e
- with SMTP id d2e1a72fcca58-851f9bb5de5mr47827595b3a.1.1787606494792; Mon, 24
- Aug 2026 14:21:34 -0700 (PDT)
-Date: Mon, 24 Aug 2026 14:21:34 -0700
-In-Reply-To: <20260820220340.GC618052.vipinsh@google.com>
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="pUj6NLIf"
+Received: from [10.4.158.9] (unknown [4.194.122.170])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 51F2E20B7166;
+	Mon, 24 Aug 2026 15:27:49 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 51F2E20B7166
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1787610476;
+	bh=3upJMujWsliLVEDZkldGdb84hlp2TqlRJwjZBbNKU3o=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=pUj6NLIfVHKUDMIbKK8hykSMwbBvQRxMJ6p1Dzw9v9DBx2eiYgnuw2muTtOd6EGDj
+	 VChyaBkAAiREznAxDKC52ri1zfEoV8q8BeocTJ917idvyBQ+iOzfCMfRBR/vthF0U1
+	 sY5zh2GMezaL1zAxJkh4hHDoxI7YrmiAoTDGcQbs=
+Message-ID: <f086f940-edaa-4bd5-ba11-e52e61fd6cee@linux.microsoft.com>
+Date: Mon, 24 Aug 2026 15:28:19 -0700
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20260331194202.1722082-1-vipinsh@google.com> <20260331194202.1722082-9-vipinsh@google.com>
- <ampPd9szwRoGKwds@google.com> <20260820220340.GC618052.vipinsh@google.com>
-Message-ID: <aoy13na7ceOOeh0K@google.com>
-Subject: Re: [PATCH v4 8/9] KVM: selftests: Add rule to generate default tests
- for KVM selftests runner
-From: Sean Christopherson <seanjc@google.com>
-To: Vipin Sharma <vipinsh@google.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org, 
-	pbonzini@redhat.com, borntraeger@linux.ibm.com, frankja@linux.ibm.com, 
-	imbrenda@linux.ibm.com, anup@brainfault.org, atish.patra@linux.dev, 
-	zhaotianrui@loongson.cn, maobibo@loongson.cn, chenhuacai@kernel.org, 
-	maz@kernel.org, oliver.upton@linux.dev, ajones@ventanamicro.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v4 09/11] coco: guest: arm64: Hook TSM accept to Realm
+ TDISP RUN transition
+To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
+ linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Cc: Alexey Kardashevskiy <aik@amd.com>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ Dan Williams <dan.j.williams@intel.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Jonathan Cameron <jic23@kernel.org>, Marc Zyngier <maz@kernel.org>,
+ Samuel Ortiz <sameo@rivosinc.com>, Steven Price <steven.price@arm.com>,
+ Suzuki K Poulose <Suzuki.Poulose@arm.com>, Will Deacon <will@kernel.org>,
+ Xu Yilun <yilun.xu@linux.intel.com>,
+ Jonathan Cameron <jonathan.cameron@huawei.com>
+References: <20260427082805.931832-1-aneesh.kumar@kernel.org>
+ <20260427082805.931832-10-aneesh.kumar@kernel.org>
+Content-Language: en-US
+From: Kameron Carr <kameroncarr@linux.microsoft.com>
+In-Reply-To: <20260427082805.931832-10-aneesh.kumar@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Aug 20, 2026, Vipin Sharma wrote:
-> On Wed, Jul 29, 2026 at 12:07:35PM -0700, Sean Christopherson wrote:
-> > @@ -347,15 +345,13 @@ $(SPLIT_TEST_GEN_PROGS): $(OUTPUT)/%: $(OUTPUT)/%.o $(OUTPUT)/$(ARCH)/%.o
-> >  $(SPLIT_TEST_GEN_OBJ): $(OUTPUT)/$(ARCH)/%.o: $(ARCH)/%.c
-> >         $(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
-> >  
-> > -# Default testcases for KVM selftests runner will be generated in this directory.
-> > -DEFAULT_TESTCASES = testcases_default_gen
-> > +TEST_FILES := $(selfdir)/kvm/runner
+On 4/27/2026 1:28 AM, Aneesh Kumar K.V (Arm) wrote:
+> Add an accept callback in pci_tsm_ops and implement cca_device_accept() to:
+> - verify evidence generation (lock_nonce)
+> - allocate and register protected MMIO ranges
+> - transition TDI state to RUN
 > 
-> Downside of this one is that if someone is not planning to use runner they
-> will still get this directory copied.
+> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
+> Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
+> ---
+>  drivers/virt/coco/arm-cca-guest/arm-cca.c | 20 +++++++++++
+>  drivers/virt/coco/arm-cca-guest/rsi-da.c  | 43 +++++++++++++++++++++++
+>  drivers/virt/coco/arm-cca-guest/rsi-da.h  |  1 +
+>  3 files changed, 64 insertions(+)
 > 
-> Should we instead add 'rsync -u' in 'testcases' rule below which can copy
-> runner only when it is updated or not present? This would be similar to
-> original patch but instead of 'cp' it will be 'rsync' command. This will
-> also copy runner when someone is explicitly using it.
+> diff --git a/drivers/virt/coco/arm-cca-guest/arm-cca.c b/drivers/virt/coco/arm-cca-guest/arm-cca.c
+> index 320dd5aa7b9a..b29b3948a454 100644
+> --- a/drivers/virt/coco/arm-cca-guest/arm-cca.c
+> +++ b/drivers/virt/coco/arm-cca-guest/arm-cca.c
+> @@ -499,9 +499,29 @@ static void cca_tsm_unlock(struct pci_tsm *tsm)
+>  	kfree(cca_dsc);
+>  }
+>  
+> +static int __cca_tsm_accept(struct pci_dev *pdev, unsigned long lock_nonce)
+> +{
+> +	int ret;
+> +
+> +	ret = cca_device_accept(pdev, lock_nonce);
+> +	if (ret) {
+> +		pci_err(pdev, "failed to transition the device to run state (%d)\n", ret);
+> +		return ret;
+> +	}
+> +	return 0;
+> +}
+> +
+> +static int cca_tsm_accept(struct pci_dev *pdev)
+> +{
+> +	struct cca_guest_dsc *dsc = to_cca_guest_dsc(pdev);
+> +
+> +	return __cca_tsm_accept(pdev, dsc->dev_info.lock_nonce);
+> +}
+> +
+>  static struct pci_tsm_ops cca_devsec_pci_ops = {
+>  	.lock = cca_tsm_lock,
+>  	.unlock = cca_tsm_unlock,
+> +	.accept	 = cca_tsm_accept,
+>  };
+>  
+>  static void cca_devsec_tsm_remove(void *tsm_dev)
+> diff --git a/drivers/virt/coco/arm-cca-guest/rsi-da.c b/drivers/virt/coco/arm-cca-guest/rsi-da.c
+> index 039138768f8f..7c2b28fa43a1 100644
+> --- a/drivers/virt/coco/arm-cca-guest/rsi-da.c
+> +++ b/drivers/virt/coco/arm-cca-guest/rsi-da.c
+> @@ -230,3 +230,46 @@ int cca_verify_digests(u64 hash_algo,
+>  	}
+>  	return 0;
+>  }
+> +
+> +int cca_device_accept(struct pci_dev *pdev, unsigned long lock_nonce)
+> +{
+> +	int ret;
+> +	struct cca_guest_dsc *dsc = to_cca_guest_dsc(pdev);
+> +
+> +	if (lock_nonce != dsc->dev_info.lock_nonce) {
+> +		pci_err(pdev, "Device evidence generation mismatch\n");
+> +		return -EIO;
+> +	}
+> +
+> +	/* Allocation private mmio range based on interface report. */
+> +	struct pci_tsm_mmio *tsm_mmio __free(kfree) = pci_tsm_mmio_alloc(pdev);
+> +	if (!tsm_mmio) {
+> +		pci_err(pdev, "Protected mmio range allocation failure\n");
+> +		return -ENOMEM;
+> +	}
+> +
+> +	/*
+> +	 * Present the private mmio range in the resource hierarchy.
+> +	 * We don't use this for ioremap, ioremap check the RIPAS value.
+> +	 */
+> +	ret = pci_tsm_mmio_setup(pdev, tsm_mmio);
+> +	if (ret) {
+> +		pci_err(pdev, "Protected mmio setup failure\n");
+> +		return ret;
+> +	}
+> +
+> +	ret = cca_map_evidence_report_range(pdev, tsm_mmio);
+> +	if (ret) {
+> +		pci_err(pdev, "failed to validate the interface report\n");
+> +		return ret;
+> +	}
+> +
+> +	ret = rhi_vdev_set_tdi_state(pdev, RHI_DA_TDI_CONFIG_RUN);
+> +	if (ret) {
+> +		pci_err(pdev, "failed to switch the device (%u) to RUN state\n", ret);
+> +		return ret;
+> +	}
 
-Hmm, but someone could be using the runner without (re)generating the default
-testcases.  We could add a "runner" target, but that seems like overkill.
+After calling pci_tsm_mmio_setup() we have mappings from insert_resource()
+then failures from later return codes never call mmio_teardown() so
+remove_resource() is never called, only kfree on the tsm_mmio.
 
-I'm good with either option, but I think my vote would be have the runner get
-copied on install, i.e. just do the "TEST_FILES := $(selfdir)/kvm/runner" above.
-But again, either way works for me.
+Likewise after cca_map_evidence_report_range() the mmio entry memory ranges
+have state RIPAS_DEV. Later failures never restore RIPAS_EMPTY.
 
-> I think we should also include 'tests' directory which we are using for
-> custom testcases and they also .
+Could clean up be handled better? Is there a reason these failures don't
+have a rollback path?
 
-Heh, they also what?
+Regards,
+Kameron
 
-> >  EXTRA_CLEAN += $(GEN_HDRS) \
-> >                $(LIBKVM_OBJS) \
-> >                $(SPLIT_TEST_GEN_OBJ) \
-> >                $(TEST_DEP_FILES) \
-> >                $(TEST_GEN_OBJ) \
-> > -              $(OUTPUT)/$(DEFAULT_TESTCASES) \
-> >                cscope.*
-> >  
-> >  $(LIBKVM_C_OBJ): $(OUTPUT)/%.o: %.c $(GEN_HDRS)
-> > @@ -386,21 +382,18 @@ cscope:
-> >         cscope -b
-> >  
-> >  # Generate runner testcases in DEFAULT_TESTCASES directory.
-> > -# $(OUTPUT) is either CWD or specified in the make command.
-> > -tests_install: list_progs = $(patsubst $(OUTPUT)/%,%,$(TEST_GEN_PROGS))
-> > -tests_install:
-> > -       $(foreach tc, $(TEST_PROGS), \
-> > -               $(shell mkdir -p $(OUTPUT)/$(DEFAULT_TESTCASES)/$(patsubst %.sh,%,$(tc))))
-> > -       $(foreach tc, $(TEST_PROGS), \
-> > -               $(shell echo $(tc) > $(patsubst %.sh,$(OUTPUT)/$(DEFAULT_TESTCASES)/%/default.test,$(tc))))
-> > +DEFAULT_TESTCASES = default_testcases
-> > +
-> > +testcases: list_progs = $(notdir $(patsubst $(OUTPUT)/%,%,$(TEST_GEN_PROGS)))
-> > +testcases: install
-> > +       $(foreach tc, $(notdir $(TEST_PROGS)), \
-> > +               $(shell mkdir -p $(INSTALL_PATH)/$(DEFAULT_TESTCASES)/$(notdir $(patsubst %.sh,%,$(tc)))))
-> > +       $(foreach tc, $(notdir $(TEST_PROGS)), \
-> > +               $(shell echo $(tc) > $(patsubst %.sh,$(INSTALL_PATH)/$(DEFAULT_TESTCASES)/%/default.test,$(tc))))
-> >  
-> >         $(foreach tc, $(list_progs), \
-> > -               $(shell mkdir -p $(OUTPUT)/$(DEFAULT_TESTCASES)/$(tc)))
-> > +               $(shell mkdir -p $(INSTALL_PATH)/$(DEFAULT_TESTCASES)/$(tc)))
-> >         $(foreach tc, $(list_progs), \
-> > -               $(shell echo $(tc) > $(patsubst %,$(OUTPUT)/$(DEFAULT_TESTCASES)/%/default.test,$(tc))))
-> > -
-> > -       @if [ ! -d $(OUTPUT)/runner ]; then             \
-> > -               cp -r $(selfdir)/kvm/runner $(OUTPUT);  \
-> > -       fi
-> > +               $(shell echo $(tc) > $(patsubst %,$(INSTALL_PATH)/$(DEFAULT_TESTCASES)/%/default.test,$(tc))))
-> 
-> All looks good here.
-> 
-> Should I send a next version of this series with the changes you have
-> suggested or you wanna take the diff you created and apply before merge?
+> +
+> +	dsc->pci.mmio = no_free_ptr(tsm_mmio);
+> +	return 0;
+> +}
+> diff --git a/drivers/virt/coco/arm-cca-guest/rsi-da.h b/drivers/virt/coco/arm-cca-guest/rsi-da.h
+> index 07a044d3e335..eeb049d374c5 100644
+> --- a/drivers/virt/coco/arm-cca-guest/rsi-da.h
+> +++ b/drivers/virt/coco/arm-cca-guest/rsi-da.h
+> @@ -61,5 +61,6 @@ int cca_verify_digests(u64 hash_algo,
+>  		uint8_t *interface_report, size_t interface_report_size,
+>  		uint8_t *measurements, size_t measurements_size,
+>  		struct rsi_vdevice_info *dev_info);
+> +int cca_device_accept(struct pci_dev *pdev, unsigned long lock_nonce);
+>  
+>  #endif
 
-Go ahead and send the next version.  Given the number of tweaks, it'd be helpful
-to be closer to WYSIWYG.  My changes are at:
-
-  https://github.com/sean-jc/linux slf/runner
-
-if you want to use that as a reference and/or grab changes directly.
