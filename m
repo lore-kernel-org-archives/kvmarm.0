@@ -1,212 +1,178 @@
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB147371867
-	for <kvmarm@lists.linux.dev>; Mon, 24 Aug 2026 16:38:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95458372ED5
+	for <kvmarm@lists.linux.dev>; Mon, 24 Aug 2026 17:21:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787589527; cv=none; b=RiPFRwoXMZ32cMR2So3FWEIS2FOylaOrGuPeYm6RU1Ne6MY0sqsM1w51aYRF+xquzEdvtxAVltxHBqhs3klMIldHAzkZnypeAhjfHD+bnjgvVFxN+yqeA9VJbWfzkr71v4JDJ/n8PVaj/B/nclz32pJJQWVnFEzxIJagcKSLqmQ=
+	t=1787592107; cv=none; b=oDPnmRPIfx3Ze8WSlqkmRsHCbzz77SgtMt/jgNMw9Z3P1qhAlSB/4xOORtnZHtMrtW5iAt9Uh7S6JeNLfbqqd1TsJn0uw1bOToGF5+zHTo0vQBdMMA14q1dk/TW/6+LqdJpS0rCvuz/Dpt6t1nAzZBvQdTJDeH88htjqqkMb3ck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787589527; c=relaxed/simple;
-	bh=xtFg3MKYp+d+9xVLdhid5iZBnFp/CufuOO5e6Jf9Imw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NXYjDzr0ZbRXGTpmNr5RyD6Q2gn5e1YnAx9OFULGnXBCjewDavhQYwjUaG6eMcWt77iyuxIUxDO4RYM1LXfMcals7fUi3FWO4yDcMYhnnSy9GAhrA3RM6LYSXc7ABCKNXjiZWPQqDztW47gODm+QVZh+izzwIA+0zfQHasiovPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LGMRoJQh; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1787592107; c=relaxed/simple;
+	bh=Wcq1kuxqeoc/mV0wBwb7AjQ6/H3J1d9I+JZvl0xIa2U=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=Fh66Rne6Vi935nHsBr4EOwqAg9RD+GRUdOZYPNqWrd7XIgYEoEPhRDqHd7S/3khBKMn4iF5pBlLATRZ9O+XUc2je2V/Vk+KI5uy7QLMTtafF8VS1TUskeSZNG6mmGYFuCHVyUwttSgv8nGGqsZBUjGIRO9RTZSIyCJ1v0WOJ+aM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IO4W7EmY; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LGMRoJQh"
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-47f703a9d05so1805175f8f.0
-        for <kvmarm@lists.linux.dev>; Mon, 24 Aug 2026 09:38:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1787589522; x=1788194322; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=Oifvu65sIA0XdhJEnNqAtZI4A+dT6SUlucjIQqK6vsQ=;
-        b=LGMRoJQhyGJHDO/7kcImPjrg+dWDlIQ+TkpODK0s7Qo/CIAyBOxSNrnKVm3Lk+za5A
-         UdLEGDsaVJZpekU3R29op3Z54+OcxuDCcOVXoahCfPSr7EzPvXnrY9X16KWX1OtvBM8Q
-         utlxCk1M3G+P0M9UVNDzGRT0ocoFj2Wszr9hhGMNvHuH0IMcZwtwmduFPOnFJ0PeVF25
-         tjCh5TZtMgceH49cNXVOqFUM1aCItonzQAtHBWy40kBFh65zTR1/bDmJTcjhl3dGyvFh
-         /+34Zo8RNZ7HGfPeNiqIqgUS+YA86TeVLAdz5RB02ZsTMp5KtBp1sBj4cmyntSpNmPBu
-         k96Q==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IO4W7EmY"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1787592104;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GbUK19ldvIBWtcuD0oTMHA2hFkXjZn0gQlWJ+k3b3+E=;
+	b=IO4W7EmYX0AXieynOvE1A48Suwug0roMz+Rgf6mNL/KFMf4UKTm2dbjoslp8sSqooQWIci
+	OS4XO9IS7F82ZASj4kPMbgJm8SjeR5nSsVmWhURQR0Z9x2BLwtwsK8hU665d8CEzsjTqHt
+	EWCn839+qCf/eQvLByuXXB3pb7cbYGI=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-256-w9RJn8n2NJe4lEAheOJiCA-1; Mon, 24 Aug 2026 13:21:43 -0400
+X-MC-Unique: w9RJn8n2NJe4lEAheOJiCA-1
+X-Mimecast-MFC-AGG-ID: w9RJn8n2NJe4lEAheOJiCA_1787592102
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-c15ceb17a28so283539566b.3
+        for <kvmarm@lists.linux.dev>; Mon, 24 Aug 2026 10:21:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787589522; x=1788194322;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=Oifvu65sIA0XdhJEnNqAtZI4A+dT6SUlucjIQqK6vsQ=;
-        b=D3sFYX1Zl04SsLKN11Y5cmvBSx66WcYNDqptrbQIQ3x5Nx45Yv/ZDkh3ErS+0wepma
-         7iApdK2O3pRA1oX3aifFzOkR/t8Fnav22W+k5I2TwgoxE8p0/6f6UWgwmZ8coyW+iDtq
-         djDjo03jAx+1BlpuK+4GBtVXCUzjSme/wfcnuAIab6DpiMC4/dAfixFeGcwr2iTXD29K
-         Hz7j6yFYivzReHmG0VFTOp90uRLsMBLqWTuWF6aChCJoI4U5POBR9qy4pIqxNMM9SHV1
-         Qwguj/9igYRs8gmlCr6froJdjJ7On0g6lvBDr7pEtf6ySnUSgOBDP7cSXhdIrKBbG+a5
-         i/UA==
-X-Forwarded-Encrypted: i=1; AHgh+RoVLTTPGbgKmcuZIoIHl3MIwwsMJotFs1+v1a6IfgyfYU6CLlONuWYSGLgRnQR0X31XNOXJ7fw=@lists.linux.dev
-X-Gm-Message-State: AFuF++k38PkTp1S5RKYXbUgFYlJH52cLj5SXRCB0MAruAXx46RpS3MZy
-	qSmnUaCX2cyR9o0z2xGOBPmaDerG3q8W+BmK9GrPHM70EU7sRXQJ0xEEgbYum26jiQ==
-X-Gm-Gg: AR+sD12qrJE+SSvJKZAoVtGBzqNOuzYJvmHXepdN1hogFt7RD+8XrrLjc8r//dno7cH
-	hRSq9A5kA8y2LW6vIDBEWKoHsAz/GUF/2fWgu/XMohyzrWTSE/wIOrdH7IF5Fnkq25M96hf8zi3
-	CTvyYxIbj/h+NpFKTQHqQ/r3ZmhlUi1qWSnqvrMvV4fRrQtZAGHX1KlAbHZbTcRhBMbpa6jYmLM
-	tGLqKdeW80QZgkX40Pdn3hwa8Hld2fMJuhQKIftCNmpXfKq6wr5ZAVMiyw09oaOD44F5RkDLN1M
-	aHAA3wa+FWr0btLdKtDK2o72R1dSbfTiPoHUamhISQY6c1NVf3P7RzzLthxJF1nJJ1IsNb7TvP7
-	7zX5+FwLazEke4YCLIcyNMs72gFlIchXdhc6iVKK0mT5cs4or3fKdjwRm8vpzr0m4aayQNDGPAL
-	WdfV22IxO9SXJArEBrkD0XpQPMwDuNeZnXv6Mt8ZlDAD21IWL6oHo1x++mPpXmIzMdtVPlGitbN
-	f6E5MvvXklrmrLJJDR492xHmpgzeQt/
-X-Received: by 2002:a5d:64c4:0:b0:47f:e377:8d61 with SMTP id ffacd0b85a97d-482c0b99d81mr33579028f8f.11.1787589521794;
-        Mon, 24 Aug 2026 09:38:41 -0700 (PDT)
-Received: from google.com (135.91.155.104.bc.googleusercontent.com. [104.155.91.135])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-482c9b69a60sm8912087f8f.1.2026.08.24.09.38.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Aug 2026 09:38:40 -0700 (PDT)
-Date: Mon, 24 Aug 2026 17:38:37 +0100
-From: Vincent Donnefort <vdonnefort@google.com>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com,
-	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com,
-	qperret@google.com
-Subject: Re: [PATCH v4 10/17] KVM: arm64: Add a shrinker for pKVM
-Message-ID: <aoxzjag7xr_emuvX@google.com>
-References: <20260731143541.956291-1-vdonnefort@google.com>
- <20260731143541.956291-11-vdonnefort@google.com>
- <CA+EHjTxU2GCpSR587oR_EaMOvXfu+teCnfC2KCg=vpOtf4sgRA@mail.gmail.com>
+        d=1e100.net; s=20251104; t=1787592102; x=1788196902;
+        h=content-transfer-encoding:content-type:in-reply-to:content-language
+         :references:cc:to:reply-to:subject:from:user-agent:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=GbUK19ldvIBWtcuD0oTMHA2hFkXjZn0gQlWJ+k3b3+E=;
+        b=pTT5YmImPCE8LzuZfkHgCi3osAhXrD3iMYjqxxL+4oEDX83Y6tSasdtXWzd5pa4W84
+         Ivoa3wIVVSnfOCTI/+O7LrTNWCTKmeCPqWi/D6/8X3BK/xBtkTHyCV1+FNr5ea5UbCCb
+         J47MTVxup9IQXYBIgf+Nmvb/Thi/WbiQZiPjNnuJciKb3XbqYEAcY0Sdvm+YjcLZck6V
+         o7eKi1hstNiLX6UrJ0y4nAvo9+bmJtlK5eLJU4FBoIV7Hj50AAXH6SIb2UHO8eUGS57H
+         6YrNp8nq35ff1PPbtEE6trQ4YwUsoKCb6JTOYTWCB3Rnj0e6h0txkH4qgoUCa2fUu2pF
+         w06g==
+X-Forwarded-Encrypted: i=1; AHgh+RpHHHJIuxQZ2uUUcDUhI3CTjcL8D0KaqQZHD/98mNf3rAJrNUpOhqK7nyOV4LSHRV/vfMvwcWI=@lists.linux.dev
+X-Gm-Message-State: AFuF++mcXQPAx4mytv9fieXxKymq45nF1BfGYng+OAoNs4J+wuCi9vSp
+	HrLe+1O0d6kYwNwhb1SxofpKG3bfvrDgyfNbLdoLMsCgZ1ujJRJB/+ngIhUIHUnJgyMbYyE1luB
+	HrrQPpCHHs/yMpiDAZNkYELQA3jD/uO0XmPrZSPmWHHX9geDp/KDJDq9rqw==
+X-Gm-Gg: AR+sD12TI120TQrRRj/ao4y4aU9+t2zGQjoWHu07tvtWU1j+Gn+zESh5tLeAZLfAi92
+	edeo5KxfHuX15ly6YGXwVRqZXIAM5JeUs/rGc6ac2fE/rbH+jvxErbvweKbqS6ESSTKoG/nhKq1
+	Gdv+zduYgtnRDHEV9GJCD5O5gdRemyIzpJrS+3FZhwa7HqNQvoWwrvMoyK2brxLgBka5j795+Zj
+	rjbc4cNT3N/K9MTCY4GX8IrX9rM0752Js10736oP05hTOn5MTkM9y9/uB9cHC34JuoDXcpKTCAx
+	V47Yu7pPtl4kL92bCGVa5Cddo7uhOjBcV9GqlyDMQAZm3XH5fMUaf1bPRZ/fnlRKDJMdw2/IIep
+	xHrL0zSRsrNXCC449LeZpVpMYBa3akOs9kzHQ6iRAUaOgoaS6
+X-Received: by 2002:a17:907:940f:b0:c21:74ad:8b7a with SMTP id a640c23a62f3a-c24e5a5243amr4844166b.9.1787592101829;
+        Mon, 24 Aug 2026 10:21:41 -0700 (PDT)
+X-Received: by 2002:a17:907:940f:b0:c21:74ad:8b7a with SMTP id a640c23a62f3a-c24e5a5243amr4840866b.9.1787592101419;
+        Mon, 24 Aug 2026 10:21:41 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c249629563dsm1407710366b.17.2026.08.24.10.21.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 24 Aug 2026 10:21:40 -0700 (PDT)
+Message-ID: <e2fbfb8a-b3e5-4e27-b938-d92d3ccfe83f@redhat.com>
+Date: Mon, 24 Aug 2026 19:21:39 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+EHjTxU2GCpSR587oR_EaMOvXfu+teCnfC2KCg=vpOtf4sgRA@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+From: Eric Auger <eric.auger@redhat.com>
+Subject: Re: [RFC PATCH v7 12/18] target/arm/kvm: Introduce
+ kvm_arm_expose_idreg_properties
+Reply-To: eric.auger@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+ kvmarm@lists.linux.dev, peter.maydell@linaro.org, shaju.abraham@nutanix.com,
+ khushit.shah@nutanix.com, yangjinqian1@huawei.com, cohuck@redhat.com,
+ richard.henderson@linaro.org, sebott@redhat.com, skolothumtho@nvidia.com,
+ philmd@oss.qualcomm.com, maz@kernel.org, oliver.upton@linux.dev,
+ pbonzini@redhat.com, berrange@redhat.com, abologna@redhat.com,
+ jdenemar@redhat.com
+References: <20260726153221.24773-1-eric.auger@redhat.com>
+ <20260726153221.24773-13-eric.auger@redhat.com> <87a4qh3tbn.fsf@pond.sub.org>
+In-Reply-To: <87a4qh3tbn.fsf@pond.sub.org>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: AOVhts3aNZIFdJFYML-A3qhTqqhqrhhtbkRs9wl6f_s_1787592102
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Aug 18, 2026 at 04:28:38PM +0100, Fuad Tabba wrote:
-> Hi Vincent,
-> 
-> On Fri, 31 Jul 2026 at 15:36, 'Vincent Donnefort' via kernel-team
-> <kernel-team@android.com> wrote:
-> >
-> > Integrate the pKVM memory reclaim interface with the host's memory
-> > management subsystem.
-> >
-> > This allows the host to automatically recover unused memory fom the
-> > hypervisor's heap allocator when the host is under memory pressure.
-> >
-> > Tested-by: Fuad Tabba <fuad.tabba@linux.dev>
-> > Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
-> >
-> > diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-> > index d28422f5c3d6..bfbb1266491d 100644
-> > --- a/arch/arm64/kvm/pkvm.c
-> > +++ b/arch/arm64/kvm/pkvm.c
-> > @@ -115,7 +115,7 @@ static int pkvm_hyp_topup(enum pkvm_topup_id id, unsigned long nr_pages)
-> >         return ret;
-> >  }
-> >
-> > -static __maybe_unused unsigned long pkvm_hyp_reclaim(enum pkvm_topup_id id, unsigned long target)
-> > +static unsigned long pkvm_hyp_reclaim(enum pkvm_topup_id id, unsigned long target)
-> 
-> This is the first caller of these, so it is where reclaim starts
-> running against a concurrent top-up.
-> 
-> Nothing marks the pages a top-up just put in allocator->mc as spoken
-> for, and hyp_allocator_reclaim() ends with an unbounded drain of it,
-> so a shrink with target 1 hands back the lot. Land that between a
-> top-up and the retry it was for, and the retry asks again, and
-> pkvm_call_hyp_req() goes round.
+Hi Markus,
+On 8/20/26 1:49 PM, Markus Armbruster wrote:
+> Eric Auger <eric.auger@redhat.com> writes:
+>
+>> This helper decode the ID reg writable mask, matches it against
+>> ID reg fields defined in target/arm/cpu-idregs.h.inc and
+>> for each writable named field, generates a uint64 property.
+>>
+>> REVIDR_EL1 and AIDR_EL1 are writable but they do not expose any
+>> field. They will be handled separately.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> [...]
+>
+>> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+>> index 4f9b0a559d..1a78893f87 100644
+>> --- a/target/arm/kvm.c
+>> +++ b/target/arm/kvm.c
+> [...]
+>
+>> +static void set_sysreg_prop(Object *obj, Visitor *v,
+>> +                            const char *name, void *opaque,
+>> +                            Error **errp)
+>> +{
+>> +    ARM64SysRegField *field = (ARM64SysRegField *)opaque;
+>> +    ARMCPU *cpu = ARM_CPU(obj);
+>> +    uint64_t *idregs = cpu->isar.idregs;
+>> +    uint64_t old, value, mask;
+>> +    int lower = field->shift;
+>> +    int length = field->length;
+>> +    int index = field->index;
+>> +
+>> +    if (!visit_type_uint64(v, name, &value, errp)) {
+>> +        return;
+>> +    }
+>> +
+>> +    if (length < 64 && value > ((1 << length) - 1)) {
+>> +        error_setg(errp,
+>> +                   "idreg %s set value (0x%lx) exceeds length of field (%d)!",
+>> +                   name, value, length);
+>> +        return;
+>> +    }
+>> +
+>> +    if (field->arch_vals) {
+>> +        /* this field has some enum values */
+>> +        for (int i = 0; i < field->arch_vals_count; i++) {
+>> +            if (value == field->arch_vals[i].value) {
+>> +                goto valid;
+>> +            }
+>> +        }
+>> +        error_setg(errp,
+>> +                   "idreg %s set value (0x%lx) does not match any "
+>> +                   "arch valid enum value!", name, value);
+> Scratch the !
+>
+> From error_setg()'s contract:
+>
+>  * The resulting message should be a single phrase, with no newline or
+>  * trailing punctuation.
 
-Sorry, I am not sure I follow here.
+done. Thank you for the reminder!
 
-IIRC, the shrinker will only reclaim half of what is available. So the pressure
-should be proportional to what is available and limit races with topup!
+Eric
+>
+>> +        return;
+>> +    }
+>> +
+>> +valid:
+>> +
+>> +    mask = MAKE_64BIT_MASK(lower, length);
+>> +    value = value << lower;
+>> +    old = idregs[index];
+>> +    idregs[index] = old & ~mask;
+>> +    idregs[index] |= value;
+>> +    trace_set_sysreg_prop(name, old, mask, value, idregs[index]);
+>> +}
+> [...]
+>
 
-However now looking at it. I wonder if I don't want to ratelimit here the number
-of pages reclaimed in one go to limit the time spent at EL2. Especially we do
-all that with the allocator lock taken...
-
-> 
-> Both are driven by memory pressure, so they are busiest together.
-> Worth holding back what a pending request asked for?
-> 
-> >  {
-> >         struct kvm_hyp_memcache mc;
-> >         struct arm_smccc_res res;
-> > @@ -133,7 +133,7 @@ static __maybe_unused unsigned long pkvm_hyp_reclaim(enum pkvm_topup_id id, unsi
-> >         return reclaimed;
-> >  }
-> >
-> > -static __maybe_unused unsigned long pkvm_hyp_reclaimable(enum pkvm_topup_id id)
-> > +static unsigned long pkvm_hyp_reclaimable(enum pkvm_topup_id id)
-> >  {
-> >         return kvm_call_hyp_nvhe(__pkvm_hyp_reclaimable, id);
-> >  }
-> > @@ -342,8 +342,19 @@ void __init pkvm_selftests(void)
-> >  #endif
-> >  }
-> >
-> > +static unsigned long pkvm_shrinker_count(struct shrinker *shrink, struct shrink_control *sc)
-> > +{
-> > +       return pkvm_hyp_reclaimable(PKVM_TOPUP_HYP_ALLOC) ?: SHRINK_EMPTY;
-> > +}
-> > +
-> > +static unsigned long pkvm_shrinker_scan(struct shrinker *shrink, struct shrink_control *sc)
-> > +{
-> > +       return pkvm_hyp_reclaim(PKVM_TOPUP_HYP_ALLOC, sc->nr_to_scan);
-> > +}
-> 
-> Returning 0 rather than SHRINK_STOP when reclaim comes back empty
-> leaves do_shrink_slab() calling this until total_scan runs out, and
-> each call is an HVC. count_objects() covers the case where there is
-> nothing at all, but not the one where it goes stale between the two
-> calls.
-> 
-> Cheers,
-> /fuad
-
-Ha right, that SHRINK_STOP seems indeed to be the convention for other users.
-
--- 
-Vincent
-> 
-> > +
-> >  static int __init finalize_pkvm(void)
-> >  {
-> > +       struct shrinker *pkvm_shrinker;
-> >         int ret;
-> >
-> >         if (!is_protected_kvm_enabled() || !is_kvm_arm_initialised())
-> > @@ -359,10 +370,21 @@ static int __init finalize_pkvm(void)
-> >         kmemleak_free_part_phys(hyp_mem_base, hyp_mem_size);
-> >
-> >         ret = pkvm_drop_host_privileges();
-> > -       if (ret)
-> > +       if (ret) {
-> >                 pr_err("Failed to finalize Hyp protection: %d\n", ret);
-> > +               return ret;
-> > +       }
-> >
-> > -       return ret;
-> > +       pkvm_shrinker = shrinker_alloc(0, "pkvm");
-> > +       if (pkvm_shrinker) {
-> > +               pkvm_shrinker->count_objects = pkvm_shrinker_count;
-> > +               pkvm_shrinker->scan_objects = pkvm_shrinker_scan;
-> > +               shrinker_register(pkvm_shrinker);
-> > +       } else {
-> > +               kvm_err("Failed to register shrinker for pKVM\n");
-> > +       }
-> > +
-> > +       return 0;
-> >  }
-> >  device_initcall_sync(finalize_pkvm);
-> >
-> > --
-> > 2.55.0.508.g3f0d502094-goog
-> >
-> > To unsubscribe from this group and stop receiving emails from it, send an email to kernel-team+unsubscribe@android.com.
-> >
-> 
-> To unsubscribe from this group and stop receiving emails from it, send an email to kernel-team+unsubscribe@android.com.
-> 
