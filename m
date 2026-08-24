@@ -1,43 +1,44 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 201D2417BCA
-	for <kvmarm@lists.linux.dev>; Mon, 24 Aug 2026 12:24:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB71835E93B;
+	Mon, 24 Aug 2026 13:09:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787574297; cv=none; b=FmcCTpoPE7ODbzvyYyeUvx3A36jxadMB6UHeXPCqremEnzMllgnzLxN/yO28Dqx+dZ9Gs2a0P6BOKcE7lEHkr8O6ISg2HbV4j5ezqUL5R3ge0KZjM48eQx4SoOuMcGjdjnMk1Jv6Hi3NQuFcT/bw42BVWyod3PKCYB/zOBIgQIM=
+	t=1787576986; cv=none; b=Hvib7X3kIYKYJwyjAowLzpU9PGeGdzK01hcQCIDgdJ2jQQVALOwKV3Xh1+YFN9KlLPgCzqER30gVnMvl/l/4d7YvxgVNeCR2LHySygheJIPqBPgrqYNO61/PzuZHSrhlaK4IGs3fF4Y0hJnVgM8tgYLFBSzCx1HkFFRZLNRY+2E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787574297; c=relaxed/simple;
-	bh=y57nrII56IaKQCTkiVNkBmQs5pkbLltNP8lUNCbyO6U=;
+	s=arc-20240116; t=1787576986; c=relaxed/simple;
+	bh=5zRFBPX9ZcC+Grs6u+ubVxvFfjGd0HCRPhBwGECkBxc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S39zfIUtKGzefkAtS1znJAjKOUFOTmddZHhII3vmnWBfPo8bpjzgsazu0HF2mQ1FiJKnefbV0FUrvENWu/abPfS8qgW9wbkWPJgPTA2lTryJZ9bO9YTOXiigG5nO2T0gE4VovBGsmWOWG2KP/yvKqE8LSOwIbVw5C+TotwQD9E4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=jym1L6H9; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=VZv2cw6EqneMYFkyeUV5tTGjftY+bT7oYt8VbdP3QlQpyJFMzqnWz0kBhclXNXsb4RhNP5tuGIa/F9lTH7ySmHep7nO0seCGfqfS4ePwhow1x190Jgvd/fSsyXlbDntsBnJcRKGzaoOcBtS5Exya0nVDjRUNQbj5OnjVs3VcfKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JBE8sGwW; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="jym1L6H9"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D1AF21570;
-	Mon, 24 Aug 2026 05:24:48 -0700 (PDT)
-Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BCF303F85F;
-	Mon, 24 Aug 2026 05:24:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1787574292; bh=y57nrII56IaKQCTkiVNkBmQs5pkbLltNP8lUNCbyO6U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jym1L6H92LJ/ZEJ0f6m2PDeg5wOYnfGAe7lasGu2UlAEFzUhhpJ4ysD5Ged73UoCs
-	 AYvCSuS7g1mUxW7/HmqK0QL62fCiICEFeVuQaaQKPDeKC/BMFOrAdDQPY7Ibc7CUpg
-	 CNfIOWekQZ3G0R36KR+1NQ62WmegcqwE3HAhed30=
-Date: Mon, 24 Aug 2026 13:24:47 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JBE8sGwW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 356731F000E9;
+	Mon, 24 Aug 2026 13:09:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1787576985;
+	bh=OlzJ7OqVnSYFcGsvn6hw98wKPBswIcyCPnPIRgWwcr8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=JBE8sGwWi5IYI/fZv3pG+Y0XyRHrjiaEye7JXAjA9gyMGYl/AQZSlRB2b7xJIcxFN
+	 ttahjaPYiljdsrSiy7V8tIfZn+Zj8HC2UtaPUTMV7/3kH2eZ0wfSkgyEjZDZA2hnI0
+	 I40T4m1XmhMKUdcC3V0MRVhlBE8DYTcK17ROhv2O3Uz8Jl8yeel10RKLMYZzRjyG44
+	 UUvHADaDLB6T3zr6UJHeLoN0wlL4N0Fn5fGrCf6am6+7uNjCYSruZjrVLb0RHHfN4X
+	 jLS0Jfw8c2CD+byqg5i0eHtiZhWZxSNfk3PhX6NmBFOLGd2gWh15Y3wTLLXT402nFc
+	 vxK+KKt6Sm7hw==
+Date: Mon, 24 Aug 2026 14:09:39 +0100
+From: Will Deacon <will@kernel.org>
 To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org,
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
 	Mark Rutland <mark.rutland@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Mark Brown <broonie@kernel.org>, kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org, Fuad Tabba <tabba@google.com>
 Subject: Re: [PATCH v2] arm64: Defer the GMID_EL1 read to
  {init,update}_cpu_features()
-Message-ID: <aow4D2g2nZNwN285@arm.com>
+Message-ID: <aoxCk5lFQv6lFwHQ@willie-the-truck>
 References: <20260824071004.504894-1-fuad.tabba@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -50,6 +51,43 @@ Content-Disposition: inline
 In-Reply-To: <20260824071004.504894-1-fuad.tabba@linux.dev>
 
 On Mon, Aug 24, 2026 at 08:10:04AM +0100, Fuad Tabba wrote:
+> __cpuinfo_store_cpu() gates the GMID_EL1 read on the raw
+> ID_AA64PFR1_EL1, so it reads the register on MTE hardware even when the
+> kernel has disabled MTE (CONFIG_ARM64_MTE=n or arm64.nomte). KVM sets
+> HCR_EL2.TID5 in that case, which traps the read to EL2 and injects an
+> UNDEF:
+> 
+>   Internal error: Oops - Undefined instruction: 0000000002000000 [#1]
+>   pc : __cpuinfo_store_cpu+0xf4/0x264
+>   Call trace:
+>    __cpuinfo_store_cpu+0xf4/0x264 (P)
+>    secondary_start_kernel+0xc8/0x1d0
+>    __secondary_switched+0xc0/0xc4
+>   Kernel panic - not syncing: Attempted to kill the idle task!
+> 
+> Only pKVM is affected, and only for a CPU that is offlined and brought
+> back online. Every CPU's first bring-up precedes KVM's initcall, and
+> pKVM refuses CPU_ON for a CPU that was not online when KVM initialised,
+> so hotplug is the only path to cpuinfo_store_cpu() with TID5 set. pKVM's
+> PSCI CPU_ON relay sets the host HCR before the CPU enters EL1, whereas
+> plain nVHE sets it at CPUHP_AP_KVM_ONLINE, after cpuinfo_store_cpu().
+> 
+> Defer the read to {init,update}_cpu_features() and gate it on the
+> sanitised ID register, as MPAM already does. system_supports_mte()
+> cannot serve as the gate, as update_cpu_features() also runs during
+> initial SMP bring-up, before smp_cpus_done() calls
+> setup_system_features(). The init path gains the CONFIG_ARM64_MTE test
+> the update path already had, leaving SYS_GMID_EL1 uninitialised when
+> MTE is compiled out, where its only other user (lib/mte.S) is not
+> built.
+> 
+> Fixes: f35abcbb8a084 ("KVM: arm64: Trap MTE access and discovery when MTE is disabled")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+> ---
+
+[...]
+
 > diff --git a/arch/arm64/kernel/cpuinfo.c b/arch/arm64/kernel/cpuinfo.c
 > index d50e2a9b066b3..c8967f185e3dd 100644
 > --- a/arch/arm64/kernel/cpuinfo.c
@@ -69,27 +107,22 @@ On Mon, Aug 24, 2026 at 08:10:04AM +0100, Fuad Tabba wrote:
 > +	 * reading it traps to EL2 when MTE is disabled.
 > +	 */
 
-The only nit I have is that cpu_data[0] now won't have the GMID_EL1 set.
-It doesn't matter as we don't expose it via c_show() or sysfs, rather
-for consistency. We have this inconsistency already with mpamidr.
+I don't think we should defer this, as I've been actively doing the
+opposite for parallel CPU onlining (where the ID registers can be read
+concurrently by incoming CPUs to amortise the cost of a trap) and also
+for the RNG traps during early boot:
 
-I guess we just need to call init_cpu_features() on the per-CPU data
-before the assignment to boot_cpu_data. Something like (untested):
+https://lore.kernel.org/all/annJ0oDB2HObQC5j@willie-the-truck/
 
-diff --git a/arch/arm64/kernel/cpuinfo.c b/arch/arm64/kernel/cpuinfo.c
-index d50e2a9b066b..d22f3514ab8b 100644
---- a/arch/arm64/kernel/cpuinfo.c
-+++ b/arch/arm64/kernel/cpuinfo.c
-@@ -538,7 +538,7 @@ void __init cpuinfo_store_boot_cpu(void)
- {
- 	struct cpuinfo_arm64 *info = &per_cpu(cpu_data, 0);
- 	__cpuinfo_store_cpu(info);
-+	init_cpu_features(info);
+If you look at the diff I sent in the thread above (I didn't get a
+reply), the idea is that __read_sysreg_by_encoding() reads from the ID
+register values stashed by cpuinfo_store_cpu(). So you could use that
+to check id_aa64pfr1 before reading gmid, as it will give you the
+sanitised view.
 
- 	boot_cpu_data = *info;
--	init_cpu_features(&boot_cpu_data);
- }
+The only snag is that I didn't convert all the registers over, so
+there's some work there.
 
-Either way:
+WDYT?
 
-Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+Will
