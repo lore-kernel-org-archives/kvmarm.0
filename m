@@ -1,49 +1,53 @@
-Received: from mta0.migadu.com (out-69.mta0.migadu.com [91.218.175.69])
+Received: from mta1.migadu.com (out-32.mta1.migadu.com [95.215.58.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A301B314D1A
-	for <kvmarm@lists.linux.dev>; Mon, 24 Aug 2026 07:10:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E07B39792B
+	for <kvmarm@lists.linux.dev>; Mon, 24 Aug 2026 07:42:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787555417; cv=none; b=K6t5adLuh6Di5V8wKh8w3tCIZb6TWDTULNj9Y111uu1z4nsiAy/WEszANHb89XK/hVgwkr5h6P/dVumn9eFXWj76pmw9+NKR3KPOLJ5SElFcxn2AjcnBDUGx4l3aH1drHnJ/W9NYwo7ut9EpqykgSqEwGDK/i8HjUv/UswclZ50=
+	t=1787557373; cv=none; b=rl+/Jknfhd1fokf8ot8wQlyKhz9BZWDOoGvkLVOgda23ijF9mpewGd98wpDTJ1VeIpGY0jURtY68tGWcbP/y6ZpX1bhXU/v6ddTvjVZjHwneVUD9Zz46ftDxvLFdbT7GbaJAoJRFCUj+/HsFu5iVBOs7dZEOJ9lMuODYXPZuLtg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787555417; c=relaxed/simple;
-	bh=au6xQbhjJ6Ac1efAjVBkkpnspFlnMc1gX/jCiGcALR4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=CRZvGuHNH1ZoCpcQfJyTX03Xu6rEOFs1M7AKERT8xfHqTmr8m0Aq7u20uHidSziegBkP37YQC3MFaNiedMW1VMUQvMzwsOKEU9f38rdMipPStI7YtwVlAsADxmlyNKBei3gXjg0Wq1nRJ9OckFFYUD3jFvK8j0TguXu3nc3jaDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Hfpp4ZKb; arc=none smtp.client-ip=91.218.175.69
+	s=arc-20240116; t=1787557373; c=relaxed/simple;
+	bh=q8/l5C+i6hyPfzKiQB5E1nf0gY1rHDKqf5inh26G/MI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=MlfL/2q+ZKdmtxCRqGDfUlkU1Y+M/B94fSW3Ig0HHkEarREtfWsD8YSwkWM5ok9UT29ApAnFBcN5V+MHcfZmzExCIag40J4ueK3OfKbdKGbv0UgP2bVLDyvFUVRLalix8agLfHpUp6H3fNTHfyrL+iqXrcsVdju02M/dxKoq0mk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Jy/J/+KN; arc=none smtp.client-ip=95.215.58.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Hfpp4ZKb"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Jy/J/+KN"
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=au6xQbhjJ6Ac1efAjVBkkpnspFlnMc1gX/jCiGcALR4=;
+DKIM-Signature: a=rsa-sha256; bh=q8/l5C+i6hyPfzKiQB5E1nf0gY1rHDKqf5inh26G/MI=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1787555410; v=1; x=1788160210;
- b=Hfpp4ZKbj2MAqTcQhNHol4eUbT8tFa1og8fE6abhpNlZzQ+h6RRrJjCy4538luBG8opVFMNO
- QzzERDHMfkJu7b0THiHxiSWD3HTvJKQNr/46heKlvw9OtAHI2ezlZHcyeyYbDOym4O+y+JUsKMl
- dgQWMMCybpEQBjm8rwiPlQUM=
+ t=1787557370; v=1; x=1788162170;
+ b=Jy/J/+KNZpCR1hC7inQ4owY2NuOsyXQK6kBeqW+mksksC3Gtj0v7fdMRKVfq6VQz1Dl9VdAE
+ VDloy0wAe7JDYFrT2R5lnYXGuQv3o4Y0eVMzmAcTQ7qT+GLU8djxvW4P/EqJhuthBJT45qnjLsK
+ Sj9FFJrzuk/wo6qPuVY6s11k=
 X-Envelope-To: kvmarm@lists.linux.dev
 Received: from claudy.local (2a01:4b00:ad36:1d00:3a05:25ff:fe33:35a9)
-	by smtp.migadu.com with ESMTPS id 0d031bd8521c682b;
-	Mon, 24 Aug 2026 07:10:08 +0000
-X-Mizu-Trace-ID: 0d031bd8521c682b
+	by smtp.migadu.com with ESMTPS id 5d1d4802d51e7f8a;
+	Mon, 24 Aug 2026 07:42:49 +0000
+X-Mizu-Trace-ID: 5d1d4802d51e7f8a
 X-Migadu-Flow: FLOW_OUT
 From: Fuad Tabba <fuad.tabba@linux.dev>
-To: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>
+Cc: Thomas Gleixner <tglx@kernel.org>,
+	Eric Auger <eauger@redhat.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Mark Brown <broonie@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Will Deacon <will@kernel.org>,
+	Sascha Bischoff <Sascha.Bischoff@arm.com>,
+	Sebastian Ene <sebastianene@google.com>,
+	Fuad Tabba <tabba@google.com>,
 	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Fuad Tabba <tabba@google.com>
-Subject: [PATCH v2] arm64: Defer the GMID_EL1 read to {init,update}_cpu_features()
-Date: Mon, 24 Aug 2026 08:10:04 +0100
-Message-Id: <20260824071004.504894-1-fuad.tabba@linux.dev>
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 0/4] irqchip/gic-v4, KVM: arm64: Fix the vgic init error paths
+Date: Mon, 24 Aug 2026 08:42:41 +0100
+Message-Id: <20260824074245.710955-1-fuad.tabba@linux.dev>
 X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -53,122 +57,66 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-__cpuinfo_store_cpu() gates the GMID_EL1 read on the raw
-ID_AA64PFR1_EL1, so it reads the register on MTE hardware even when the
-kernel has disabled MTE (CONFIG_ARM64_MTE=n or arm64.nomte). KVM sets
-HCR_EL2.TID5 in that case, which traps the read to EL2 and injects an
-UNDEF:
+Hi folks,
 
-  Internal error: Oops - Undefined instruction: 0000000002000000 [#1]
-  pc : __cpuinfo_store_cpu+0xf4/0x264
-  Call trace:
-   __cpuinfo_store_cpu+0xf4/0x264 (P)
-   secondary_start_kernel+0xc8/0x1d0
-   __secondary_switched+0xc0/0xc4
-  Kernel panic - not syncing: Attempted to kill the idle task!
+Changes since v1 [1]:
+  - New patch 4: restore its_vm.nr_vpes in vgic_v4_teardown() so that
+    its_free_vcpu_irqs() frees every vPE. (sashiko, Marc)
+  - Patch 2: corrected the commit message. Skipping a vPE with no SGI
+    domain avoids a wrong free, not a warning.
+  - Patch 3: added a second Fixes: tag. The SPI-array leak arrived with
+    the routing call, well before the vPE one.
+  - No code changes to patches 1 to 3.
 
-Only pKVM is affected, and only for a CPU that is offlined and brought
-back online. Every CPU's first bring-up precedes KVM's initcall, and
-pKVM refuses CPU_ON for a CPU that was not online when KVM initialised,
-so hotplug is the only path to cpuinfo_store_cpu() with TID5 set. pKVM's
-PSCI CPU_ON relay sets the host HCR before the CPU enters EL1, whereas
-plain nVHE sets it at CPUHP_AP_KVM_ONLINE, after cpuinfo_store_cpu().
+Four fixes on the paths that run when vgic init fails partway. Each one
+needs an allocation failure to reach.
 
-Defer the read to {init,update}_cpu_features() and gate it on the
-sanitised ID register, as MPAM already does. system_supports_mte()
-cannot serve as the gate, as update_cpu_features() also runs during
-initial SMP bring-up, before smp_cpus_done() calls
-setup_system_features(). The init path gains the CONFIG_ARM64_MTE test
-the update path already had, leaving SYS_GMID_EL1 uninitialised when
-MTE is compiled out, where its only other user (lib/mte.S) is not
-built.
+Sashiko reported the vgic_init() case [2] while reviewing the SPI-array
+leak fix, and the two irq-gic-v4.c fixes came out of chasing the first
+[3]. Then, just when I thought I'd squashed every bug Sashiko could
+find, it turned up one more in its v1 review: the pre-existing nr_vpes
+one, fixed in patch 4 as Marc suggested [4].
 
-Fixes: f35abcbb8a084 ("KVM: arm64: Trap MTE access and discovery when MTE is disabled")
-Cc: stable@vger.kernel.org
-Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
----
+Patch 1 clears the irq domain and fwnode pointers at the four GICv4
+sites that free them and leave them set. Patch 2 makes
+its_alloc_vcpu_irqs() release what it allocated when the SGI loop
+fails, which is both the SGI domains and the vPE irqs, wider than the
+SGI-domain leak I described before posting v1 [3]. Patch 3 releases the
+SPI array and the vPEs on vgic_init()'s later failure paths, so
+KVM_DEV_ARM_VGIC_CTRL_INIT is all or nothing and a retry starts from
+scratch. Patch 4 is Marc's suggested fix [4] for the nr_vpes overload.
 
-Notes:
-    Changes since v1:
-    - Clarified that the trap only fires on a CPU that is offlined and
-      brought back online, not a late first boot (Marc).
-    
-    Tested on QEMU with -machine virt,mte=on, under pKVM.
-    
-    Offline/online CPU1 with arm64.nomte on the host cmdline: unpatched
-    panics in __cpuinfo_store_cpu(), patched does not.
+These patches run across two subsystems, but ordering matters, which is
+why this is one series. Patch 2 reuses its_free_sgi_irqs() from an
+error path, which only works once patch 1 has cleared the pointers.
+Patch 3 runs vgic_v4_teardown() on a path it never ran on before, which
+adds a route into what patch 1 fixes. Patch 4 is only correct on top of
+patch 3, which is what stops online_vcpus outgrowing the vPE array.
 
- arch/arm64/kernel/cpufeature.c | 19 ++++++++++++++++---
- arch/arm64/kernel/cpuinfo.c    |  8 +++++---
- 2 files changed, 21 insertions(+), 6 deletions(-)
+Based on kvmarm/next (aa8e5dc6a7a2a).
 
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 9a22df0c5120f..5120f6721b1e0 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -1176,6 +1176,17 @@ static bool detect_ftr_has_mpam(void)
- 	return id_aa64pfr0_mpam(pfr0) || id_aa64pfr1_mpamfrac(pfr1);
- }
- 
-+/*
-+ * Mirrors system_supports_mte(), which cannot be used before the capabilities
-+ * are finalised. KVM sets HCR_EL2.TID5 when it is false, trapping GMID_EL1.
-+ */
-+static bool detect_has_mte(void)
-+{
-+	u64 pfr1 = read_sanitised_ftr_reg(SYS_ID_AA64PFR1_EL1);
-+
-+	return IS_ENABLED(CONFIG_ARM64_MTE) && id_aa64pfr1_mte(pfr1);
-+}
-+
- void __init init_cpu_features(struct cpuinfo_arm64 *info)
- {
- 	/* Before we start using the tables, make sure it is sorted */
-@@ -1228,8 +1239,10 @@ void __init init_cpu_features(struct cpuinfo_arm64 *info)
- 		init_cpu_ftr_reg(SYS_MPAMIDR_EL1, info->reg_mpamidr);
- 	}
- 
--	if (id_aa64pfr1_mte(info->reg_id_aa64pfr1))
-+	if (detect_has_mte()) {
-+		info->reg_gmid = read_cpuid(GMID_EL1);
- 		init_cpu_ftr_reg(SYS_GMID_EL1, info->reg_gmid);
-+	}
- }
- 
- static void update_cpu_ftr_reg(struct arm64_ftr_reg *reg, u64 new)
-@@ -1490,8 +1503,8 @@ void update_cpu_features(int cpu,
- 	 * they read/write depends on the GMID_EL1.BS field. Check that the
- 	 * value is the same on all CPUs.
- 	 */
--	if (IS_ENABLED(CONFIG_ARM64_MTE) &&
--	    id_aa64pfr1_mte(info->reg_id_aa64pfr1)) {
-+	if (detect_has_mte()) {
-+		info->reg_gmid = read_cpuid(GMID_EL1);
- 		taint |= check_update_ftr_reg(SYS_GMID_EL1, cpu,
- 					      info->reg_gmid, boot->reg_gmid);
- 	}
-diff --git a/arch/arm64/kernel/cpuinfo.c b/arch/arm64/kernel/cpuinfo.c
-index d50e2a9b066b3..c8967f185e3dd 100644
---- a/arch/arm64/kernel/cpuinfo.c
-+++ b/arch/arm64/kernel/cpuinfo.c
-@@ -502,12 +502,14 @@ static void __cpuinfo_store_cpu(struct cpuinfo_arm64 *info)
- 	info->reg_id_aa64smfr0 = read_cpuid(ID_AA64SMFR0_EL1);
- 	info->reg_id_aa64fpfr0 = read_cpuid(ID_AA64FPFR0_EL1);
- 
--	if (id_aa64pfr1_mte(info->reg_id_aa64pfr1))
--		info->reg_gmid = read_cpuid(GMID_EL1);
--
- 	if (id_aa64pfr0_32bit_el0(info->reg_id_aa64pfr0))
- 		__cpuinfo_store_cpu_32bit(&info->aarch32);
- 
-+	/*
-+	 * info->reg_gmid deferred to {init,update}_cpu_features because
-+	 * reading it traps to EL2 when MTE is disabled.
-+	 */
-+
- 	/*
- 	 * info->reg_mpamidr deferred to {init,update}_cpu_features because we
- 	 * don't want to read it (and trigger a trap on buggy firmware) if
+Cheers,
+/fuad
+
+[1] https://lore.kernel.org/all/20260820125053.2951078-1-fuad.tabba@linux.dev/
+[2] https://lore.kernel.org/all/20260807105558.73D701F000E9@smtp.kernel.org/
+[3] https://lore.kernel.org/all/CA+EHjTyDix+y6NTLTsXP5j9Sn2VLOZcsw94LntQxg_etRBJZuA@mail.gmail.com/
+[4] https://lore.kernel.org/all/87ik51np8e.wl-maz@kernel.org/
+
+Fuad Tabba (4):
+  irqchip/gic-v4: Clear the domain and fwnode pointers after freeing
+    them
+  irqchip/gic-v4: Unwind what its_alloc_vcpu_irqs() allocated on failure
+  KVM: arm64: vgic: Tear down what vgic_init() created when it fails
+  KVM: arm64: vgic-v4: Restore nr_vpes before freeing the vPE resources
+
+ arch/arm64/kvm/vgic/vgic-init.c | 11 +++++++++--
+ arch/arm64/kvm/vgic/vgic-v4.c   |  3 +++
+ drivers/irqchip/irq-gic-v4.c    | 34 +++++++++++++++++++++++++++------
+ 3 files changed, 40 insertions(+), 8 deletions(-)
+
+
+base-commit: aa8e5dc6a7a2a1141ab40706a51010adcd0e57d2
 -- 
 2.39.5
 
