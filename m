@@ -1,128 +1,132 @@
-Received: from mta0.migadu.com (out-192.mta0.migadu.com [91.218.175.192])
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D0A734D4F9
-	for <kvmarm@lists.linux.dev>; Mon, 24 Aug 2026 15:15:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.192
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2000364929
+	for <kvmarm@lists.linux.dev>; Mon, 24 Aug 2026 15:19:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787584527; cv=none; b=e9OF2CPZkK5SgykuGKsI1EJCA0i1cdHWDZpJj6mW51PR8K6Exobt7XEm/RSUAOLX+RRCmwR4Uuy2g8p3TZU0sMsw03qqg6ajnwfvASkmCLzKdz9grxv4oK0xQu+xKb0xqdBBZjA68PVz5C3zn9xC6637wh40lQf5ef6iY/FIMro=
+	t=1787584779; cv=none; b=Bcisjy0bwhpZZCXm2Ia/Tp/0GCIAp0bZnWbdFTDmbbE+QW6IRoM0mD2fwvBXvqlC6UTgdh13yqGCXKnbQpnm4ZTdOIJUwkNF2lsAg5OaUSV9U6C4e78QCa3NHoBGcHnX+zsyTPzFgcHQuEs2zbZZkPKmSW9hiLGcjmv0j9+S03E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787584527; c=relaxed/simple;
-	bh=c06Gx503jxl6pcEkyyFWb7rMuvr9i6fZ7D0GH9SHlCw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nawyL4jZh48vgrLZlOcifbD9RyDGwnH5e/vJvd6/7OhNShpVoxEv/0ymHPfp6Ez+1Ao8shGQTxBSzPeLWOJaIViPzFjvLLDDEcsYuHF7q2ZURlPHGs8PEUHCN/cqjgGS7860HzKLK1apO9y6mHYWZC02ftdEGZGnNc0oE0okXFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Ry7Yu3ZY; arc=none smtp.client-ip=91.218.175.192
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1787584779; c=relaxed/simple;
+	bh=rDl6WQt8/u2b/vO94uYaM3pS42AlRyIPyx2BSwDwHyo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fBOKqVpFojdictGweCslgogPIOf+bwv90G5nGZ5t/EgXKtneEA0mdSskjrff3qAHT+1ZmrLoFnzawQ818y4Bo7IGFd+7nK3TCaQN461npKnBEDv8hixE+0LRiTd7e60ti/2KQmqsfwWWt9n3KMhtB2o7Pn7JvY6AW6Hi62rg65M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=P9YWxAj4; arc=none smtp.client-ip=209.85.221.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ry7Yu3ZY"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=c06Gx503jxl6pcEkyyFWb7rMuvr9i6fZ7D0GH9SHlCw=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1787584523; v=1; x=1788189323;
- b=Ry7Yu3ZYXmvAejDifO6nVNevgszyvptiW0V9Z9BNV9Y9iCVxneQtvygxoUKz5aMw+JIbXcYf
- Osxzsh9UQFHzvfxcAjgsrjqh8n3YGsbziWnHsPCFG72RXdo0YGLAQMRQIzcw2b3bqkkeAQqAxpo
- xrYbwpWA5WISZXJV5/rISklk=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: from mail-lf1-f43.google.com (209.85.167.43)
-	by smtp.migadu.com with ESMTPS id 1e7690fe7d7b2e14;
-	Mon, 24 Aug 2026 15:15:23 +0000
-X-Mizu-Trace-ID: 1e7690fe7d7b2e14
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5b2a73da7e1so13030e87.0
-        for <kvmarm@lists.linux.dev>; Mon, 24 Aug 2026 08:15:19 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+Rq9W5K0J953ZgPHsO+ZWAoA7Ogad6R0EYaIze1kQrVEVgN7JM/ohFoM9N1rdBCqIrrUKsA4pr8=@lists.linux.dev
-X-Gm-Message-State: AFuF++kw4y6iKt7er4nXEN3n3axdLKfdNC0kvSUCL7EnIfHNLVZBAN2U
-	6wFjYt7MrZqaNAxV8CmCZL0xfh0nLmSqDI6kHZAPJ1YcWJ5Eb2Ye24p7iKazv2gL5/Qf7eHHafH
-	F1C82Nzo2SAH5G05dcUp/ey6gdFlQ1aW6E9a3MVp0
-X-Received: by 2002:a05:6512:ad5:b0:5b2:8963:e5d4 with SMTP id
- 2adb3069b0e04-5b48c308b7fmr281232e87.5.1787584518113; Mon, 24 Aug 2026
- 08:15:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="P9YWxAj4"
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-47fe89fb333so1672889f8f.3
+        for <kvmarm@lists.linux.dev>; Mon, 24 Aug 2026 08:19:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1787584776; x=1788189576; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=DGVlK1rqoRCdYtqSwH3QAU+C34HZwUZucnX4J/0Qdok=;
+        b=P9YWxAj47pKb7n5nUYSitr/KFLP8/UAd0Bm1bEIUY/Mjb7GVlXs8HJVtCnNToDMYyU
+         h3llI2QzGhrUKNLJUQ5Szn26kA4CY+vb397OD2hm0wLtnP2as+WO2joiKej9tnWZMmBS
+         M12X42RZgv0FMuOwqQodytoi6TCWyHJSpklkCkmQbMGA0AYrS7x8qdWt1v0ngb7tFGhI
+         KVKJzrkql/oZ+hyydza/dA5p8qUp9jMBFou3jZC5jkLsMG1O1xb8GpQlTe+X3FeXJiTe
+         hiADrWBMKmkQc59SBpplph3jVg4+KZI3Vrg2EcsXSX0/lIRGfQ0eWOtldxkSZ0pEyBKD
+         cpBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787584776; x=1788189576;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=DGVlK1rqoRCdYtqSwH3QAU+C34HZwUZucnX4J/0Qdok=;
+        b=rikL/5BRfFkLfmj7y8RnTMO22/dEjfO/Fpb8wyfENkNGWwpp0HwDPxt8Zsy2FlBsmH
+         stSU5WsOalBmJnioI05aKSOpHYA5Ye9F7wXaNxC1X7V9gQvKHEZqWwn+86vfRGid7KBK
+         hinRht4GgQud4nyF2SkJBaFT5mdJxPntLYBSbEaVJ525MGiZYC5TbnroSo84VFCv6g9s
+         hRO9mlWoLP9BdOW13hV4NThwx6VRM+NIFcYlJ3wuYAV1gmcaMXJ5wYaKMguU44NUiZFW
+         6rVNgyPmKQz2u9/zncYPoeRXU+0S7xvUPzN7luz1GIFHvuMXsiUx08u3MIfbp5nHHQa9
+         bM7Q==
+X-Forwarded-Encrypted: i=1; AHgh+Ro7CX0fYhGssxRa3OJTl8fd1XeKwCWBz63UJ8fM5Oe5bdJwf5bC+86qCmWYWm9hcKkl22+654Y=@lists.linux.dev
+X-Gm-Message-State: AFuF++mBaD0G/R3gehTmwzE1/wEuQkFhZp/u7jWMrxmmnynOPxVKKvBW
+	+UoUWu/ztBagx6LtbVz/hMHc8gdJKZ+m85532VfaYXRqZUUxEPROaDpOaKeQoiqFMQ==
+X-Gm-Gg: AR+sD11XPu4A891IukxmCtH61D03IlZvlULzWllSOZdN6N+X5HBTRo6OOyqDsveuGML
+	L1fLaDKKEv2IhnN9NBkjU2xT0lGiKT5QfgCtA2ThvAE4158JVdDK+HxsOS42fyocRULexcngDHR
+	POAdKW6rY7JzPI66M+Vt9gsH7Qof1zspSdiv4/PMhpAK9tF92Q7zkJ7Zp/wy2+QH/2XCeo4QxDW
+	tEDqfq5kyuV5a/pVOQGkC+MwtMC5KdijbxEN4yeCskr7H8tag0yRUN1u/0EbG3anaacsHpzJVqo
+	c9fo68p1+1AEZbRVwK7NiRFPSgsgv0TYwcp5qBvZi1gfq0+dsj8kUxt26NJXUYKd9fqOpjkHFhr
+	KIdLub/kACbkDV81Q4zPaomtlE6adIST73wQdoJ4ZfPJYJznAh62c1iVQNVkhXBrAXV3wVKI8TV
+	u0sBDpW0sT2mU3oO4tw75KmRzHmDbote8EY388aOrfP/88W1wt0mpvKwoybaJmweX+7ZoCCL6Fp
+	/TEQguYG+37ttjN01jkdXhKxEHWUmxK
+X-Received: by 2002:a05:600c:4687:b0:493:e451:a9e1 with SMTP id 5b1f17b1804b1-499b82fdac4mr337202065e9.2.1787584775321;
+        Mon, 24 Aug 2026 08:19:35 -0700 (PDT)
+Received: from google.com (135.91.155.104.bc.googleusercontent.com. [104.155.91.135])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-499c7ccac8csm68380715e9.3.2026.08.24.08.19.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Aug 2026 08:19:34 -0700 (PDT)
+Date: Mon, 24 Aug 2026 16:19:31 +0100
+From: Vincent Donnefort <vdonnefort@google.com>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com,
+	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com,
+	qperret@google.com
+Subject: Re: [PATCH v4 04/17] KVM: arm64: Add a heap allocator for the pKVM
+ hyp
+Message-ID: <aoxhA91kHwy7P3re@google.com>
+References: <20260731143541.956291-1-vdonnefort@google.com>
+ <20260731143541.956291-5-vdonnefort@google.com>
+ <CA+EHjTw9KcKgGDgD=khN8qGPgJAe9POhu1uLby9abDbogwu5sA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260824071004.504894-1-fuad.tabba@linux.dev> <aoxCk5lFQv6lFwHQ@willie-the-truck>
-In-Reply-To: <aoxCk5lFQv6lFwHQ@willie-the-truck>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Mon, 24 Aug 2026 16:14:41 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTy6Xh=eNg22fBdjPzZOZitzvcDX2L5zbSUFCsX1n6XobQ@mail.gmail.com>
-X-Gm-Features: AcwNN1XvpxGBrD3A5SrELJ33c_fc3D2mqO8UzqmTV8IHCn1exQF3tnUOLYiOz8g
-Message-ID: <CA+EHjTy6Xh=eNg22fBdjPzZOZitzvcDX2L5zbSUFCsX1n6XobQ@mail.gmail.com>
-Subject: Re: [PATCH v2] arm64: Defer the GMID_EL1 read to {init,update}_cpu_features()
-To: Will Deacon <will@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-arm-kernel@lists.infradead.org, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Mark Brown <broonie@kernel.org>, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTw9KcKgGDgD=khN8qGPgJAe9POhu1uLby9abDbogwu5sA@mail.gmail.com>
 
-Hi Will,
+On Tue, Aug 18, 2026 at 03:22:55PM +0100, Fuad Tabba wrote:
+> Hi Vincent,
+> 
+> On Fri, 31 Jul 2026 at 15:36, 'Vincent Donnefort' via kernel-team
+> <kernel-team@android.com> wrote:
+> ...
+> > +static int hyp_allocator_destroy_chunk(struct hyp_allocator *allocator,
+> > +                                      struct chunk_hdr *prev,
+> > +                                      struct chunk_hdr *chunk)
+> > +{
+> > +       struct chunk_hdr *next;
+> > +
+> > +       next = prev ? chunk_get_next(chunk) : NULL;
+> > +       if (!hyp_allocator_can_destroy_chunk(allocator, prev, next, chunk))
+> > +               return -EINVAL;
+> > +
+> > +       /* Last chunk in the allocator */
+> > +       if (!prev) {
+> > +               allocator->first_unmapped = chunk_unmapped(chunk);
+> > +               allocator->head = allocator->tail = NULL;
+> > +               return 0;
+> > +       }
+> 
+> hyp_allocator_destroy_chunk() has only two callers, both in
+> hyp_allocator_free(), and both pass a non-NULL prev. So this !prev
+> branch cannot be reached, and nor can the matching "if (!prev) return
+> true;" in hyp_allocator_can_destroy_chunk() or the false arm of "next
+> = prev ? chunk_get_next(chunk) : NULL".
+> 
+> The empty-allocator reset it looks like it is handling already happens
+> in hyp_allocator_reclaim_chunk(), in the addr == allocator->start
+> case. Could these be dropped?
 
-On Mon, 24 Aug 2026 at 14:09, Will Deacon <will@kernel.org> wrote:
+Ha yes, correct, that's leftover of the Android version. I can then remove that
+allocator argument in hyp_allocator_can_destroy_chunk().
 
-> > +     /*
-> > +      * info->reg_gmid deferred to {init,update}_cpu_features because
-> > +      * reading it traps to EL2 when MTE is disabled.
-> > +      */
->
-> I don't think we should defer this, as I've been actively doing the
-> opposite for parallel CPU onlining (where the ID registers can be read
-> concurrently by incoming CPUs to amortise the cost of a trap) and also
-> for the RNG traps during early boot:
->
-> https://lore.kernel.org/all/annJ0oDB2HObQC5j@willie-the-truck/
->
-> If you look at the diff I sent in the thread above (I didn't get a
-> reply), the idea is that __read_sysreg_by_encoding() reads from the ID
-> register values stashed by cpuinfo_store_cpu(). So you could use that
-> to check id_aa64pfr1 before reading gmid, as it will give you the
-> sanitised view.
-
-I just did, but I don't think it'll work. The thing is,
-__read_sysreg_by_encoding() gives the override-applied local value,
-not the folded sys_val.
-
-arm64.nomte is a command-line override, so that works. But
-CONFIG_ARM64_MTE=n sets none. Any gate would still need an explicit
-IS_ENABLED(CONFIG_ARM64_MTE).
-
-That said, I don't have to defer it. I can keep the info->reg_gmid
-read in __cpuinfo_store_cpu() and gate that read on the state that
-arms the trap:
-
-        static inline bool gmid_el1_accessible(u64 pfr1)
-        {
-                if (!IS_ENABLED(CONFIG_ARM64_MTE))
-                        return false;
-                if (system_capabilities_finalized())
-                        return system_supports_mte();
-                return id_aa64pfr1_mte(pfr1);
-        }
-
-
-TID5 is set from system_supports_mte() and only once capabilities are
-finalised, so the local check is still correct before that. Gating on
-system_supports_mte() keeps the different-physical-CPU case you want
-to preserve working: if one re-onlines with MTE while the system view
-has it folded off, the gate stays false and it won't read GMID_EL1.
-
-If you agree, I'll respin with that.
-
-Cheers,
-/fuad
-
-
-
-
-
->
-> The only snag is that I didn't convert all the registers over, so
-> there's some work there.
->
-> WDYT?
->
-> Will
+> 
+> With that:
+> 
+> Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
+> 
+> Cheers,
+> /fuad
+> 
+> To unsubscribe from this group and stop receiving emails from it, send an email to kernel-team+unsubscribe@android.com.
+> 
