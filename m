@@ -1,92 +1,136 @@
-Received: from mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7DD63E6DCF
-	for <kvmarm@lists.linux.dev>; Tue, 25 Aug 2026 08:52:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BCF13E6DD0
+	for <kvmarm@lists.linux.dev>; Tue, 25 Aug 2026 08:53:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787647960; cv=none; b=FssIK1viFdq/RLjWzm/uPVaPTSinpvZhv5JTYnjf+w47RmgE11thHo9SZina/RUSdEwX92YPKpFIOvSnZJCKlZCkSQC3Qq5H267cRj0kebBErZk7h011MQ+st5KXh8eVSwrttfFFwrCXQUVp/hTUNbr6FNFiXg4HzO0ksVm6tpg=
+	t=1787647987; cv=none; b=XMVQo5kBtIkjR4rnWPjc8TPr64OCPAlWwsWRjAbH9AXsaIo6UlUwhCdmk9bsa9KL3qbK2g6cuUUBkPaZnoZG264GR6VghTpzmih0ZHb4yTkHZU7NXa2/Xq+iozq8l2Wf1EieLmwvjxgwAQCr+zhH0T0u5javUx0WX5jPDQiWnGU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787647960; c=relaxed/simple;
-	bh=MJRz9UsvtPUogXEuUq018MMm0hDrqct732z/+RmQUpg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DJ+ezs0dpZKCaZXta3oqQeCyBitEOg6HqPzdKGgfyIGZRO3iBI9HcZkYWepTsxQPSJ96lNPl5uN0N5gsZt60Qbzkm91jGEY1maADKQMl92VLUqH6N7IGCLd6D3tXE/s75Yh+Durgje4ZIt26KDjIzZ6+nmU1tR6xpVRnoNJxpZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=LpQNtkBV; arc=none smtp.client-ip=95.215.58.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1787647987; c=relaxed/simple;
+	bh=bWrQce9rvAu96EnDNBTLB9QIBF8ljEVuT331p2FtHZ0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EVpq9rMcp40lkVw4zNpzNbB3sw3Eg5fKGMr6abmYP4ckR0BjbeYaYldP1WqMIQV48Q0ESY6KyabwthVf6hE0dGAT2LmqOjE9UvKXgeO4WDJ6aqwwheCbXODpWOD3fZ5CzjnZTOBmKefbdeIl9pvJk6nmY0oiK2b5o3PYEjVtnXM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Gh+kEiHj; arc=none smtp.client-ip=115.124.30.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="LpQNtkBV"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=MJRz9UsvtPUogXEuUq018MMm0hDrqct732z/+RmQUpg=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1787647955; v=1; x=1788252755;
- b=LpQNtkBVZUtYivGnvmk971V/mAA5R0IQPvxY6EcplQXT4q308aQLWkS5IHLaJaxJsFnpx8fd
- DYaQfPCpajI574Z1eMKOrumebQb99UOTpaFO+GKb0Zs4LRLBjwAxRwSlqYSXSH4Jeo4MUAF+nPJ
- 2gA+W67+67mGitncQzplwClA=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: from mail-lf1-f51.google.com (209.85.167.51)
-	by smtp.migadu.com with ESMTPS id 2954b449a1522c4c;
-	Tue, 25 Aug 2026 08:52:25 +0000
-X-Mizu-Trace-ID: 2954b449a1522c4c
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-5b2a73da7e1so775e87.0
-        for <kvmarm@lists.linux.dev>; Tue, 25 Aug 2026 01:52:25 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+RplcABZrdkVJrxVOBxtF162lgiUcwR3dtfRiqHhac0jt00UDBzYPXGDc9CAX4uPRA/B/b7MgpU=@lists.linux.dev
-X-Gm-Message-State: AFuF++k+jdEoV30X/sW4xJACpZK5wxn/qWXrRYpWHycP7ItyfHb0QWQA
-	0gHLLOgl1CvhIN/LcTOy/oQYWtL8rLvPKrdiMD8i/AcjSXHLUO/YOzURRuo2nxxNcXQVgchaBlX
-	8pCVlQYlX2Ek3WyYnQ8eshhvpe5BHDW7pDTZbKBrW
-X-Received: by 2002:a05:6512:10ce:b0:5b2:a5e9:3aba with SMTP id
- 2adb3069b0e04-5b49de6a580mr52428e87.6.1787647944151; Tue, 25 Aug 2026
- 01:52:24 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Gh+kEiHj"
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1787647975; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=b1/3sxKWMwZmvXn0ohFtsHlyP5vLtleCRLjspTUH1BM=;
+	b=Gh+kEiHjRcP+LN+9tPVHuLSH+zYZ1eRTG1nRd75GmzDUqfmbQ7jNAPiBrBYNxGcJOAnDk66oz3Gy+VmNB+zy5u6XpLFdXCa0maZNoB/wF2rezfw63mhnEyT9wBcFTP2F1Z3RHwFQI7k4ulIr3Oe4vwKdsqqNiPszb23SEz9IuCw=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R461e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033032089153;MF=yaoyuan@linux.alibaba.com;NM=1;PH=DS;RN=16;SR=0;TI=SMTPD_---0X9dJUmE_1787647973;
+Received: from localhost(mailfrom:yaoyuan@linux.alibaba.com fp:SMTPD_---0X9dJUmE_1787647973 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Tue, 25 Aug 2026 16:52:53 +0800
+Date: Tue, 25 Aug 2026 16:52:51 +0800
+From: Yao Yuan <yaoyuan@linux.alibaba.com>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Thomas Gleixner <tglx@kernel.org>, Eric Auger <eauger@redhat.com>, Joey Gouly <joey.gouly@arm.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>, 
+	Sascha Bischoff <Sascha.Bischoff@arm.com>, Sebastian Ene <sebastianene@google.com>, 
+	Fuad Tabba <tabba@google.com>, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/4] irqchip/gic-v4: Clear the domain and fwnode
+ pointers after freeing them
+Message-ID: <xsuxicnwpzpogl7wlh7atdjw75irdd54oytivalf223jfdbfmz@36tvycw2qt6y>
+References: <20260824074245.710955-1-fuad.tabba@linux.dev>
+ <20260824074245.710955-2-fuad.tabba@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260731143541.956291-1-vdonnefort@google.com>
- <20260731143541.956291-7-vdonnefort@google.com> <yq5afr02wstl.fsf@kernel.org> <ao1OAx_zLwpaw_5Y@google.com>
-In-Reply-To: <ao1OAx_zLwpaw_5Y@google.com>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Tue, 25 Aug 2026 09:51:00 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTwX+yNayXYD_22vKazzT-yv-9D8Tt_qH0hgPn0-M3kiWA@mail.gmail.com>
-X-Gm-Features: AcwNN1U9f1FmJy0X5evuVUC4pyUr9OdSe9hRSm1gkswTc6pqY7URUvwVVrwZ7JA
-Message-ID: <CA+EHjTwX+yNayXYD_22vKazzT-yv-9D8Tt_qH0hgPn0-M3kiWA@mail.gmail.com>
-Subject: Re: [PATCH v4 06/17] KVM: arm64: Add pkvm_hyp_req infrastructure
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, maz@kernel.org, oupton@kernel.org, 
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
-	kernel-team@android.com, qperret@google.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260824074245.710955-2-fuad.tabba@linux.dev>
 
-Hi Anseesh,
+On Mon, Aug 24, 2026 at 08:42:42AM +0800, Fuad Tabba wrote:
+> The GICv4 allocation and teardown paths free their irq domains and
+> fwnodes but leave the pointers set, and the allocation error paths test
+> those pointers before removing them. struct its_vm and struct its_vpe
+> are embedded in KVM's per-VM and per-vCPU state, so nothing re-zeroes
+> them between two attempts, and an error path taken after an earlier one
+> already freed the domain calls irq_domain_remove() on freed memory.
 
-On Tue, 25 Aug 2026 at 09:10, Vincent Donnefort <vdonnefort@google.com> wrote:
-...
-> > The SRO model covers more details than the pkvm_hyp_req infrastructure.
-> > Should we look at making the two more similar?
+Hi Tabba,
 
-Thanks for the pointer.
+Real nice finding!
 
-Where I'd expect CCA and pKVM to converge is how confidential
-computing platforms are abstracted to the rest of the kernel, and that
-already happens: arm-cca-guest and pkvm-guest sit side by side. The
-host to hypervisor path seems like a different question to me.
+Reviewed-by: Yuan Yao <yaoyuan@linux.alibaba.com>
 
-Cheers,
-/fuad
-
-
-> >
-> > -aneesh
 >
-> Hum, this is really just a few lines of code. Also, pKVM doesn't need a stable
-> ABI with the kernel. Implementing a portion of a spec here sounds way too
-> complicated for that simple usage IMO. I struggle to see in what way this would
-> make pKVM better.
+> Reaching this takes two allocation failures, one to leave the stale
+> pointer behind and one to send the next attempt down the error path.
 >
+> Fixes: 7de5c0af9c7c ("irqchip/gic-v4: Add per-VM VPE domain creation")
+> Fixes: 6d31b6ff985d ("irqchip/gic-v4.1: Add VSGI allocation/teardown")
+> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+> ---
+>  drivers/irqchip/irq-gic-v4.c | 20 ++++++++++++++++----
+>  1 file changed, 16 insertions(+), 4 deletions(-)
+>
+> diff --git a/drivers/irqchip/irq-gic-v4.c b/drivers/irqchip/irq-gic-v4.c
+> index 8455b4a5fbb0d..754839e409f88 100644
+> --- a/drivers/irqchip/irq-gic-v4.c
+> +++ b/drivers/irqchip/irq-gic-v4.c
+> @@ -147,10 +147,14 @@ static int its_alloc_vcpu_sgis(struct its_vpe *vpe, int idx)
+>  	return 0;
+>
+>  err:
+> -	if (vpe->sgi_domain)
+> +	if (vpe->sgi_domain) {
+>  		irq_domain_remove(vpe->sgi_domain);
+> -	if (vpe->fwnode)
+> +		vpe->sgi_domain = NULL;
+> +	}
+> +	if (vpe->fwnode) {
+>  		irq_domain_free_fwnode(vpe->fwnode);
+> +		vpe->fwnode = NULL;
+> +	}
+>  	kfree(name);
+>  	return -ENOMEM;
+>  }
+> @@ -191,10 +195,14 @@ int its_alloc_vcpu_irqs(struct its_vm *vm)
+>  	return 0;
+>
+>  err:
+> -	if (vm->domain)
+> +	if (vm->domain) {
+>  		irq_domain_remove(vm->domain);
+> -	if (vm->fwnode)
+> +		vm->domain = NULL;
+> +	}
+> +	if (vm->fwnode) {
+>  		irq_domain_free_fwnode(vm->fwnode);
+> +		vm->fwnode = NULL;
+> +	}
+>
+>  	return -ENOMEM;
+>  }
+> @@ -215,6 +223,8 @@ static void its_free_sgi_irqs(struct its_vm *vm)
+>  		irq_domain_free_irqs(irq, 16);
+>  		irq_domain_remove(vm->vpes[i]->sgi_domain);
+>  		irq_domain_free_fwnode(vm->vpes[i]->fwnode);
+> +		vm->vpes[i]->sgi_domain = NULL;
+> +		vm->vpes[i]->fwnode = NULL;
+>  	}
+>  }
+>
+> @@ -224,6 +234,8 @@ void its_free_vcpu_irqs(struct its_vm *vm)
+>  	irq_domain_free_irqs(vm->vpes[0]->irq, vm->nr_vpes);
+>  	irq_domain_remove(vm->domain);
+>  	irq_domain_free_fwnode(vm->fwnode);
+> +	vm->domain = NULL;
+> +	vm->fwnode = NULL;
+>  }
+>
+>  static int its_send_vpe_cmd(struct its_vpe *vpe, struct its_cmd_info *info)
 > --
-> Vincent
+> 2.39.5
+>
