@@ -1,149 +1,147 @@
-Received: from mta0.migadu.com (out-26.mta0.migadu.com [91.218.175.26])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0907E3ED5C9
-	for <kvmarm@lists.linux.dev>; Tue, 25 Aug 2026 09:25:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.26
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57981352020
+	for <kvmarm@lists.linux.dev>; Tue, 25 Aug 2026 09:34:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787649931; cv=none; b=HX5YNGrfjO9YEIlDLOOHvFKKUMalMee/9aFTP+WucV0fyX/qvYr82NCzqkAXo0RLetf1uZbb5VALXpkGeklNPyTGxZTFR0LYL1XK42r+ubrlHFPWPZ41icqD2FHQ7SB2a0HcX7BtR+fLP+lIDV7yIkq6nDQgIz0mweB0hPDXG3g=
+	t=1787650482; cv=none; b=Yj9w3GwZ23HL4EjdVOryvkH8n571ToaDH8ajoYeBFTIgKg0UosoLoqNCZgASRdGKZ3mrE6S/Mw0MENCzDUfWmgm3IwAuJRnlGOHqcNaF0ICZM3X6o/K1/EuF+WaaofOhyBYNPAEFwGB0fG5iUEswRYBUn1ti5I3Rxh6f6VzEOvE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787649931; c=relaxed/simple;
-	bh=Me0T5+G6GU+yqK+pfWnftzQNd1qwsvqsRERpiPzCgCs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=N4FCYdTTieSGV+2+bAi+vC7anmfoE7RmucPRlcf1PMy7Y6fkt3bsm6fsGktzpSzFGQhen9g3QR8wNewRm9OF+nE/qyUktxpPLE54mDl2Pu3CboVwyGhsbw8INw44Og2fnDB5rhQ4t/kBSbn3u3neW4U65aI+iZy2ENJEfZJDG0s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=g2X8Vm5S; arc=none smtp.client-ip=91.218.175.26
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1787650482; c=relaxed/simple;
+	bh=FH0frXmFwsMqFRMHSRLwB7W3NYpNGAKhsuMEZQNsz+Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bscSTePyEm1Ad3O93+CtmzRIO+ZkiE7Ufa7PPsDfgOs08pJ1OLdWeMYuwA3fOvGOc33HZ/XvZwWeroFUJ/3CgQxgynsILGJo1TtgvEL8ogwoIoNiFM/RpTwHi2IwJoydojGlIMNkWpe2C919EDzYpqZzSiDv1ZCjamUqG+LbNq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FNKbhbE6; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="g2X8Vm5S"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=Me0T5+G6GU+yqK+pfWnftzQNd1qwsvqsRERpiPzCgCs=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1787649926; v=1; x=1788254726;
- b=g2X8Vm5S/s+oY5jmdjJ+t0z/kNVLF6BpmR1Sr2bdVQlTfUNJfE/pvwCR1m01RipsihuQX+Oc
- T9OOJa5PyAhxrNYwmwiGkCHlVjUwv9k7iq58aJ7x5zpDEpVQt6OEmnU9Pozw83TawKMkMBALwGf
- swjhUA1NhEewwhUTPbsXn3B0=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: from mail-lf1-f53.google.com (209.85.167.53)
-	by smtp.migadu.com with ESMTPS id 9b2543b749726899;
-	Tue, 25 Aug 2026 09:25:26 +0000
-X-Mizu-Trace-ID: 9b2543b749726899
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-5b2a8173142so969e87.1
-        for <kvmarm@lists.linux.dev>; Tue, 25 Aug 2026 02:25:26 -0700 (PDT)
-X-Gm-Message-State: AFuF++manJX4uTNVRtF3toeR5KxYP0NO63F+sFfzUhOuLWooFyOLfJr3
-	VetLsrcW24lbaG1TWqdJUtfHR4VObqssv8boHg7K7f8xILenSPwRWylz0pLR9m2J4Rsj8x4Hxnj
-	kBHj4tfE3plQyhwTicJskCRdgWi7qTe2hLPhhpadg
-X-Received: by 2002:a05:6512:3ca1:b0:5b2:a967:c0e1 with SMTP id
- 2adb3069b0e04-5b49ddd8905mr67230e87.0.1787649925547; Tue, 25 Aug 2026
- 02:25:25 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FNKbhbE6"
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-4798bea72f9so2042490f8f.1
+        for <kvmarm@lists.linux.dev>; Tue, 25 Aug 2026 02:34:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1787650479; x=1788255279; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=aeU8AkJ8MGIav9tcLVv0+ySWv2dXd+zHgL0Diag8WfA=;
+        b=FNKbhbE6LrkMJ6Uoees2lRo5bZusdm7j/XdYvjuzr+qQLqXgK9vrKa4TtYhmgFnU+f
+         lJ/n2uxMmnr9Zv2KG/wG38vgjJKJK6SK9FNOCgxpzNuIg5zI5xTnWceC3VpHUw/BnObd
+         dBemcIk6Mqb085rwTH2DJ5j5aZ1FBcMJ9wKPigXp+dbsLmViTkcLk2+3jNZ8j+RGCcNE
+         +0hqbZztRVCqydCbBLZnbkD69hZp+vCFDb1JYgppxRUB4vhCVThBdZEOPQ5+Tb1JMxCd
+         EEhAtf1vOD81ZaDgs2760ByCo7J+ykjd7fogYmRivYy2BkNPQQacu1GW4xoQ76YJbWVR
+         xHDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787650479; x=1788255279;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=aeU8AkJ8MGIav9tcLVv0+ySWv2dXd+zHgL0Diag8WfA=;
+        b=mFfIozABDEXPb//DL81ctKSNw28fWkl0NQjHSrzYAKB3ueX2MOMjAAiJdGsprzbQse
+         BYwfK6m3y0ZxdCROXOpvUzPeQdXfTeGLMdPEvZu6db8o4pK2vt6+USp20mOml0B8gPWj
+         DKo68CTFSDQahOUNP34N/w3+dICZaNUv0D2yoPWbBNYHeGa8eFPHz6YxbIM6E2T6yH5l
+         c43y2Uk0ro8Cth+I+bwnmJhNsBinV75URt7qotJRlRi7eZbMiX11VLIOaOFcjE+wXF2r
+         uU1kqnpT8OBd2AbkGIHoUFIMmvtVgQ9AWlBhVHI3jYz/eoeyjc5T8Vs27qogr+//xfgQ
+         /q6g==
+X-Forwarded-Encrypted: i=1; AHgh+RpJXNdPra3KslBEgRww8xm8npRt5S9kMd4K1qUepxc8IEJ+3yrjwhKksd+M+31PPNRqtV5XIZQ=@lists.linux.dev
+X-Gm-Message-State: AFuF++kWDQK6+28CaNzq2wuoZVup6cOOv6jwjhl6wdt+iq8i1kuNsCFv
+	IA424yOj7uNJmLSI2mEQyidDumr0VysDyJ9uIPmRweTDRiuF3TAyEWcnCDtWcD2DRg==
+X-Gm-Gg: AR+sD10lAdhxoN/VUkqB957AUCgRBOZFb92XHiWyt3dwoL7sznualz+G7Jij7ATt2TA
+	Pn/9RroCAcC3ld8KN/lVtNJn0gXuMMrmUabnfrKDHArucAg8/CTonLiInaUCCkZDtxR64WnFXy8
+	dYXSE25aOVFiYXo/F/mdtZXt/lNvdyGT2jFlbi3RFokVPeIvJwHTgDO8Z3Md1MD/6YGL/Abo6NB
+	u5fKLJJJJouq3PY1bEYYGrUhCS2GGKvXDSOiPAr6Vnak0eElQmURuv8gx+OaiLUwntWhycUCzDQ
+	EgUHZhUjAI/0P0m+3d6U7A3lkbVm2WExdsBTB89iwZTBN0e5JdTZCe+OGm04EeNmYXreeq+TXCi
+	u5Cd6U968udeNU0G7hTURSbZ3uC4zGT3mzM4KPR+AhCtYXKZO7eRy0fMDBW9VOXHda6CIGdewbK
+	lUgeIj4EQ8vj4AgcMFWLEdIG2Jx4mCSd5ZHrPaqsxS+xT3sPqwTVgEngZC+wXT55DePB2l0JSV8
+	Hgflw0y2PC6gXEQPuLzIcmkqWR1q133
+X-Received: by 2002:a05:600c:1387:b0:499:7a4f:d13d with SMTP id 5b1f17b1804b1-499b8313ad3mr338541545e9.4.1787650478642;
+        Tue, 25 Aug 2026 02:34:38 -0700 (PDT)
+Received: from google.com (135.91.155.104.bc.googleusercontent.com. [104.155.91.135])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-482c9b69cf5sm10736399f8f.6.2026.08.25.02.34.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Aug 2026 02:34:37 -0700 (PDT)
+Date: Tue, 25 Aug 2026 10:34:34 +0100
+From: Vincent Donnefort <vdonnefort@google.com>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com,
+	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com,
+	qperret@google.com
+Subject: Re: [PATCH v4 11/17] KVM: arm64: Filter out non-kernel addresses in
+ kern_hyp_va
+Message-ID: <ao1hqq-BCmKWmQE7@google.com>
+References: <20260731143541.956291-1-vdonnefort@google.com>
+ <20260731143541.956291-12-vdonnefort@google.com>
+ <CA+EHjTycM7b4d1foNQr33e7dN7WHyeg-Ww8nPkSKu78DGDs9_w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260825085948.1674721-1-fuad.tabba@linux.dev>
- <20260825085948.1674721-3-fuad.tabba@linux.dev> <20260825091816.F361E1F00A3A@smtp.kernel.org>
-In-Reply-To: <20260825091816.F361E1F00A3A@smtp.kernel.org>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Tue, 25 Aug 2026 10:24:49 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTw8wN-MgXXsYr0GtOUWJZ5=25GofefuDjqKfF3b5P4uaQ@mail.gmail.com>
-X-Gm-Features: AcwNN1Xjr3NXNfeX6K1obDu2zEHXIEui6hZzl_xWAkvM-wr4YjqGEMNUSRhqSAY
-Message-ID: <CA+EHjTw8wN-MgXXsYr0GtOUWJZ5=25GofefuDjqKfF3b5P4uaQ@mail.gmail.com>
-Subject: Re: [PATCH 2/4] KVM: arm64: Do not clear VM-wide SVE feature on vCPU
- init failure
-To: sashiko-reviews@lists.linux.dev
-Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>, 
-	Marc Zyngier <maz@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTycM7b4d1foNQr33e7dN7WHyeg-Ww8nPkSKu78DGDs9_w@mail.gmail.com>
 
-On Tue, 25 Aug 2026 at 10:18, <sashiko-bot@kernel.org> wrote:
->
-> Thank you for your contribution! Sashiko AI review found 1 potential issu=
-e(s) to consider:
->
-> Pre-existing issues:
-> - [High] Hypervisor DoS via WARN_ON() upon page table allocation failure
-
-Nope [1]
-
-[1] https://lore.kernel.org/all/CA+EHjTyPxcObTOwi25QTUDbLwAYaKnWY0QJVB_aMso=
-2=3D38PJUg@mail.gmail.com/
-
-> --
->
-> --- Patch [2]: [PATCH 2/4] KVM: arm64: Do not clear VM-wide SVE feature o=
-n vCPU init failure ---
-> commit 1188c411e2a65143d7371d1038c2752c0f2de6c0
-> Author: Fuad Tabba <fuad.tabba@linux.dev>
->
-> KVM: arm64: Do not clear VM-wide SVE feature on vCPU init failure
->
-> pkvm_vcpu_init_sve() clears KVM_ARM_VCPU_SVE in kvm->arch.vcpu_features
-> when it fails, but vcpu_has_sve() tests KVM_ARCH_FLAG_GUEST_HAS_SVE,
-> which is left set. Later vCPUs on that VM then skip the SVE setup and
-> register with a NULL sve_state, which the guest's first FP access hands
-> to sve_load_state().
->
-> Return the error without touching vcpu_features.
->
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/p=
-kvm.c
-> > index c31b9d46b8b60..4340b13ee295b 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
->
-> [ ... ]
->
-> > @@ -462,24 +462,19 @@ static int pkvm_vcpu_init_sve(struct pkvm_hyp_vcp=
-u *hyp_vcpu, struct kvm_vcpu *h
-> >       sve_max_vl =3D min(READ_ONCE(host_vcpu->arch.sve_max_vl), kvm_hos=
-t_sve_max_vl);
-> >       sve_state =3D kern_hyp_va(READ_ONCE(host_vcpu->arch.sve_state));
+On Tue, Aug 18, 2026 at 03:45:23PM +0100, Fuad Tabba wrote:
+> Hi Vincent,
+> 
+> 
+> On Fri, 31 Jul 2026 at 15:36, Vincent Donnefort <vdonnefort@google.com> wrote:
 > >
-> > -     if (!sve_vl_valid(sve_max_vl) || !sve_state) {
-> > -             ret =3D -EINVAL;
-> > -             goto err;
-> > -     }
-> > +     if (!sve_vl_valid(sve_max_vl) || !sve_state)
-> > +             return -EINVAL;
+> > kern_hyp_va() is idempotent for the hypervisor linear space. This is
+> > handy for nVHE hypervisor callers handling kvm_vcpu or kvm_arch
+> > pointers. Those pointers can originate from the hypervisor space (when
+> > protected mode is enabled, we don't trust the kernel and the hypervisor
+> > uses its own copy) or from the kernel space (we do trust the kernel in
+> > "non-protected" nVHE).
 > >
-> >       sve_state_size =3D sve_state_size_from_vl(sve_max_vl);
+> > This idempotence does not hold for addresses within the hypervisor
+> > private range, like the ones you get from the pKVM heap allocator
+> > (hyp_alloc()). To resolve this, filter out non-kernel addresses based on
+> > PAGE_OFFSET.
 > >
-> >       ret =3D hyp_pin_shared_mem(sve_state, sve_state + sve_state_size)=
-;
-> >       if (ret)
-> > -             goto err;
-> > +             return ret;
->
-> [Severity: High]
-> This is a pre-existing issue, but can the call to hyp_pin_shared_mem()
-> trigger a hypervisor panic if EL2 memory is exhausted?
->
-> Looking at hyp_pin_shared_mem() in arch/arm64/kvm/hyp/nvhe/mem_protect.c,
-> it wraps the mapping allocation in a WARN_ON:
->
->         if (p->refcount =3D=3D 1)
->                 WARN_ON(pkvm_create_mappings_locked((void *)cur,
->                                                     (void *)cur + PAGE_SI=
-ZE,
->                                                     PAGE_HYP));
->
-> At EL2 under nVHE/pKVM, WARN_ON() expands to a BRK instruction which pani=
-cs
-> the hypervisor and brings down the host.
->
-> Since host userspace can repeatedly invoke KVM ioctls to create VMs or vC=
-PUs
-> and exhaust the bounded EL2 memory pool, pkvm_create_mappings_locked()
-> might eventually fail and return -ENOMEM.
->
-> Does this allow an unprivileged host process to hit the WARN_ON and crash
-> the host system?
->
-> --
-> Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260825085948.16=
-74721-1-fuad.tabba@linux.dev?part=3D2
+> > Leave the assembly version untouched as it has no current users.
+> >
+> > Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
+> > Tested-by: Fuad Tabba <fuad.tabba@linux.dev>
+> > Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> > index 6eae7e7e2a68..d60e5f2de10c 100644
+> > --- a/arch/arm64/include/asm/kvm_mmu.h
+> > +++ b/arch/arm64/include/asm/kvm_mmu.h
+> > @@ -126,6 +126,9 @@ static __always_inline unsigned long __kern_hyp_va(unsigned long v)
+> >   * replace the instructions with `nop`s.
+> >   */
+> >  #ifndef __KVM_VHE_HYPERVISOR__
+> > +       if (!is_ttbr1_addr(v))
+> > +               return v;
+> > +
+> 
+> I gave this a tag earlier and only came back to the cost side now, sorry.
+> 
+> The check is unconditional, so plain nVHE pays it on every
+> kern_hyp_va(), including the one in __kvm_vcpu_run(), and it has no
+> private range to protect.
+> 
+> Could it be gated on is_protected_kvm_enabled(), the same way patch 17
+> gates hyp_trace_buffer_alloc_bpages()?
+> 
+> Cheers,
+> /fuad
+
+Sure, that's really a micro optimisation though, I don't think that
+is_ttbr1_addr() is expensive.
+
+-- 
+Vincent
+> 
+> 
+> >         asm volatile(ALTERNATIVE_CB("and %0, %0, #1\n"         /* mask with va_mask */
+> >                                     "ror %0, %0, #1\n"         /* rotate to the first tag bit */
+> >                                     "add %0, %0, #0\n"         /* insert the low 12 bits of the tag */
+> > --
+> > 2.55.0.508.g3f0d502094-goog
+> >
