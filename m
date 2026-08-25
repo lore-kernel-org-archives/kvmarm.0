@@ -1,147 +1,123 @@
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+Received: from mta0.migadu.com (out-102.mta0.migadu.com [91.218.175.102])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57981352020
-	for <kvmarm@lists.linux.dev>; Tue, 25 Aug 2026 09:34:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80AE43939A6
+	for <kvmarm@lists.linux.dev>; Tue, 25 Aug 2026 09:48:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.102
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787650482; cv=none; b=Yj9w3GwZ23HL4EjdVOryvkH8n571ToaDH8ajoYeBFTIgKg0UosoLoqNCZgASRdGKZ3mrE6S/Mw0MENCzDUfWmgm3IwAuJRnlGOHqcNaF0ICZM3X6o/K1/EuF+WaaofOhyBYNPAEFwGB0fG5iUEswRYBUn1ti5I3Rxh6f6VzEOvE=
+	t=1787651303; cv=none; b=LRCReJ1PvsxZFcLEkD91UB3DnAHzXMWvgBWM7hAOfy7SXlUDvminf/8ZZHn4yiCKB2IrVG48jPkQaIPvPDiTXyd0b0Bh29I68QetMJ+B/q699YxLqErSZ/lsmDrJ+ruclNzU1p/6Ch1z+dx2kIbQtdbysBc8wqWMktr2KoCQRkU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787650482; c=relaxed/simple;
-	bh=FH0frXmFwsMqFRMHSRLwB7W3NYpNGAKhsuMEZQNsz+Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bscSTePyEm1Ad3O93+CtmzRIO+ZkiE7Ufa7PPsDfgOs08pJ1OLdWeMYuwA3fOvGOc33HZ/XvZwWeroFUJ/3CgQxgynsILGJo1TtgvEL8ogwoIoNiFM/RpTwHi2IwJoydojGlIMNkWpe2C919EDzYpqZzSiDv1ZCjamUqG+LbNq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FNKbhbE6; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1787651303; c=relaxed/simple;
+	bh=WdTwdsXYegr+pt2vMyfS6s6LbEnxhORlW5D9ksXSlj4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Inj9eohcArPlFxfDCYTejA3RumFs/CryOlRkyzirYM68sQpT8iXuUyXJ83wKGUwADx2kDY0TJYHTgEbKXuJnoSLFXdEaB79ZbtXKBaiHwlYwv+VcNRjV2ERIt+BMVKbBfPJLBZT5uUb8L7TO9isycvEyx+hvcv2LOUb1/EsB34Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Rk+A6Ie2; arc=none smtp.client-ip=91.218.175.102
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FNKbhbE6"
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-4798bea72f9so2042490f8f.1
-        for <kvmarm@lists.linux.dev>; Tue, 25 Aug 2026 02:34:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1787650479; x=1788255279; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=aeU8AkJ8MGIav9tcLVv0+ySWv2dXd+zHgL0Diag8WfA=;
-        b=FNKbhbE6LrkMJ6Uoees2lRo5bZusdm7j/XdYvjuzr+qQLqXgK9vrKa4TtYhmgFnU+f
-         lJ/n2uxMmnr9Zv2KG/wG38vgjJKJK6SK9FNOCgxpzNuIg5zI5xTnWceC3VpHUw/BnObd
-         dBemcIk6Mqb085rwTH2DJ5j5aZ1FBcMJ9wKPigXp+dbsLmViTkcLk2+3jNZ8j+RGCcNE
-         +0hqbZztRVCqydCbBLZnbkD69hZp+vCFDb1JYgppxRUB4vhCVThBdZEOPQ5+Tb1JMxCd
-         EEhAtf1vOD81ZaDgs2760ByCo7J+ykjd7fogYmRivYy2BkNPQQacu1GW4xoQ76YJbWVR
-         xHDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787650479; x=1788255279;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=aeU8AkJ8MGIav9tcLVv0+ySWv2dXd+zHgL0Diag8WfA=;
-        b=mFfIozABDEXPb//DL81ctKSNw28fWkl0NQjHSrzYAKB3ueX2MOMjAAiJdGsprzbQse
-         BYwfK6m3y0ZxdCROXOpvUzPeQdXfTeGLMdPEvZu6db8o4pK2vt6+USp20mOml0B8gPWj
-         DKo68CTFSDQahOUNP34N/w3+dICZaNUv0D2yoPWbBNYHeGa8eFPHz6YxbIM6E2T6yH5l
-         c43y2Uk0ro8Cth+I+bwnmJhNsBinV75URt7qotJRlRi7eZbMiX11VLIOaOFcjE+wXF2r
-         uU1kqnpT8OBd2AbkGIHoUFIMmvtVgQ9AWlBhVHI3jYz/eoeyjc5T8Vs27qogr+//xfgQ
-         /q6g==
-X-Forwarded-Encrypted: i=1; AHgh+RpJXNdPra3KslBEgRww8xm8npRt5S9kMd4K1qUepxc8IEJ+3yrjwhKksd+M+31PPNRqtV5XIZQ=@lists.linux.dev
-X-Gm-Message-State: AFuF++kWDQK6+28CaNzq2wuoZVup6cOOv6jwjhl6wdt+iq8i1kuNsCFv
-	IA424yOj7uNJmLSI2mEQyidDumr0VysDyJ9uIPmRweTDRiuF3TAyEWcnCDtWcD2DRg==
-X-Gm-Gg: AR+sD10lAdhxoN/VUkqB957AUCgRBOZFb92XHiWyt3dwoL7sznualz+G7Jij7ATt2TA
-	Pn/9RroCAcC3ld8KN/lVtNJn0gXuMMrmUabnfrKDHArucAg8/CTonLiInaUCCkZDtxR64WnFXy8
-	dYXSE25aOVFiYXo/F/mdtZXt/lNvdyGT2jFlbi3RFokVPeIvJwHTgDO8Z3Md1MD/6YGL/Abo6NB
-	u5fKLJJJJouq3PY1bEYYGrUhCS2GGKvXDSOiPAr6Vnak0eElQmURuv8gx+OaiLUwntWhycUCzDQ
-	EgUHZhUjAI/0P0m+3d6U7A3lkbVm2WExdsBTB89iwZTBN0e5JdTZCe+OGm04EeNmYXreeq+TXCi
-	u5Cd6U968udeNU0G7hTURSbZ3uC4zGT3mzM4KPR+AhCtYXKZO7eRy0fMDBW9VOXHda6CIGdewbK
-	lUgeIj4EQ8vj4AgcMFWLEdIG2Jx4mCSd5ZHrPaqsxS+xT3sPqwTVgEngZC+wXT55DePB2l0JSV8
-	Hgflw0y2PC6gXEQPuLzIcmkqWR1q133
-X-Received: by 2002:a05:600c:1387:b0:499:7a4f:d13d with SMTP id 5b1f17b1804b1-499b8313ad3mr338541545e9.4.1787650478642;
-        Tue, 25 Aug 2026 02:34:38 -0700 (PDT)
-Received: from google.com (135.91.155.104.bc.googleusercontent.com. [104.155.91.135])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-482c9b69cf5sm10736399f8f.6.2026.08.25.02.34.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Aug 2026 02:34:37 -0700 (PDT)
-Date: Tue, 25 Aug 2026 10:34:34 +0100
-From: Vincent Donnefort <vdonnefort@google.com>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com,
-	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com,
-	qperret@google.com
-Subject: Re: [PATCH v4 11/17] KVM: arm64: Filter out non-kernel addresses in
- kern_hyp_va
-Message-ID: <ao1hqq-BCmKWmQE7@google.com>
-References: <20260731143541.956291-1-vdonnefort@google.com>
- <20260731143541.956291-12-vdonnefort@google.com>
- <CA+EHjTycM7b4d1foNQr33e7dN7WHyeg-Ww8nPkSKu78DGDs9_w@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Rk+A6Ie2"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=WdTwdsXYegr+pt2vMyfS6s6LbEnxhORlW5D9ksXSlj4=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1787651299; v=1; x=1788256099;
+ b=Rk+A6Ie2RCabAA5NDiB0YEV7HxORcAEweNOFhLO2+2g+YVC5qzurnWLjUVetaEferv41dG2h
+ ycgB80FGg1kJZDQxTpVyh3/ogUnzkFP/AL2QgYQ7Pby9QIWdu3YXLxY7XYaGkC/VrL0D6lQnAs/
+ cCJZYM4g6P0qey2jKrNX+/V4=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: from mail-lf1-f44.google.com (209.85.167.44)
+	by smtp.migadu.com with ESMTPS id ac16b08109fee947;
+	Tue, 25 Aug 2026 09:48:19 +0000
+X-Mizu-Trace-ID: ac16b08109fee947
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-5b2a8173142so1343e87.1
+        for <kvmarm@lists.linux.dev>; Tue, 25 Aug 2026 02:48:18 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+Ro87Yjo8QVROALpVnNBbsblA1gtMhrA16Yyda4pIBQ2ZSsLkvt9UhiZCOB/aqQT3jqOsKDjEAk=@lists.linux.dev
+X-Gm-Message-State: AFuF++kd+0qgRN5a8b9KFEcXkek43LaUrAdv4KE67dpehes1CVNF1df+
+	jOTsBuKUJ07XTL/wIqKeb6WVc712+kLXMLNkp4UCmT7Os0wZrOMRWZuDh/M3qmjaH8unSc9A21J
+	oHDvNZT6vc/5ZkLoljaNMJMLQ3mzsFzXUY4YjPXmV
+X-Received: by 2002:a05:6512:239c:b0:5b4:9dba:7402 with SMTP id
+ 2adb3069b0e04-5b49de72ba7mr66953e87.12.1787651297880; Tue, 25 Aug 2026
+ 02:48:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+EHjTycM7b4d1foNQr33e7dN7WHyeg-Ww8nPkSKu78DGDs9_w@mail.gmail.com>
+References: <20260824074245.710955-1-fuad.tabba@linux.dev> <20260824074245.710955-4-fuad.tabba@linux.dev>
+ <te43gnvb2v2zlt3m5gwn2qvden5x3vp23o2qo27uif3ebdrodg@grrfqge2htia>
+In-Reply-To: <te43gnvb2v2zlt3m5gwn2qvden5x3vp23o2qo27uif3ebdrodg@grrfqge2htia>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Tue, 25 Aug 2026 10:47:41 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTyYkz5=BV7RfJK_uUuuRunsfSNWmNNrkJ8NdsR_i5NB2g@mail.gmail.com>
+X-Gm-Features: AcwNN1XTSUsaQHSIZboYJ25QZYIL7wzGNkOJWlm0Rb0fGSGlQWens35qrUjEXIc
+Message-ID: <CA+EHjTyYkz5=BV7RfJK_uUuuRunsfSNWmNNrkJ8NdsR_i5NB2g@mail.gmail.com>
+Subject: Re: [PATCH v2 3/4] KVM: arm64: vgic: Tear down what vgic_init()
+ created when it fails
+To: Yao Yuan <yaoyuan@linux.alibaba.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Thomas Gleixner <tglx@kernel.org>, 
+	Eric Auger <eauger@redhat.com>, Joey Gouly <joey.gouly@arm.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>, 
+	Sascha Bischoff <Sascha.Bischoff@arm.com>, Sebastian Ene <sebastianene@google.com>, 
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Aug 18, 2026 at 03:45:23PM +0100, Fuad Tabba wrote:
-> Hi Vincent,
-> 
-> 
-> On Fri, 31 Jul 2026 at 15:36, Vincent Donnefort <vdonnefort@google.com> wrote:
+Hi Yuan,
+
+On Tue, 25 Aug 2026 at 10:18, Yao Yuan <yaoyuan@linux.alibaba.com> wrote:
+...
+> > diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+> > index 4012df6002ea6..7493fded53acc 100644
+> > --- a/arch/arm64/kvm/vgic/vgic-init.c
+> > +++ b/arch/arm64/kvm/vgic/vgic-init.c
+> > @@ -462,7 +462,7 @@ int vgic_init(struct kvm *kvm)
+> >               if (vgic_supports_direct_irqs(kvm)) {
+> >                       ret = vgic_v4_init(kvm);
+> >                       if (ret)
+>
+> Hi Tabba,
+>
+> > -                             return ret;
+> > +                             goto out_teardown;
+>
+> The vigc_v4_init already called vgic_v4_teardown() in error path,
+> thus I think just free dist->spis is enough yet ?
+
+vgic_v4_init() unwinds its own state on every error return, so
+vgic_v4_teardown() is a no-op there and freeing the SPI array would be
+enough. I'll fold the label split in if I respin.
+
+Thanks for the reviews!
+/fuad
+
+>
+> >               }
+> >       } else {
+> >               ret = vgic_v5_init(kvm);
+> > @@ -475,12 +475,19 @@ int vgic_init(struct kvm *kvm)
 > >
-> > kern_hyp_va() is idempotent for the hypervisor linear space. This is
-> > handy for nVHE hypervisor callers handling kvm_vcpu or kvm_arch
-> > pointers. Those pointers can originate from the hypervisor space (when
-> > protected mode is enabled, we don't trust the kernel and the hypervisor
-> > uses its own copy) or from the kernel space (we do trust the kernel in
-> > "non-protected" nVHE).
+> >       ret = kvm_vgic_setup_default_irq_routing(kvm);
+> >       if (ret)
+> > -             return ret;
+> > +             goto out_teardown;
 > >
-> > This idempotence does not hold for addresses within the hypervisor
-> > private range, like the ones you get from the pKVM heap allocator
-> > (hyp_alloc()). To resolve this, filter out non-kernel addresses based on
-> > PAGE_OFFSET.
+> >       vgic_debug_init(kvm);
+> >       dist->initialized = true;
 > >
-> > Leave the assembly version untouched as it has no current users.
-> >
-> > Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
-> > Tested-by: Fuad Tabba <fuad.tabba@linux.dev>
-> > Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
-> >
-> > diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-> > index 6eae7e7e2a68..d60e5f2de10c 100644
-> > --- a/arch/arm64/include/asm/kvm_mmu.h
-> > +++ b/arch/arm64/include/asm/kvm_mmu.h
-> > @@ -126,6 +126,9 @@ static __always_inline unsigned long __kern_hyp_va(unsigned long v)
-> >   * replace the instructions with `nop`s.
-> >   */
-> >  #ifndef __KVM_VHE_HYPERVISOR__
-> > +       if (!is_ttbr1_addr(v))
-> > +               return v;
+> >       return 0;
 > > +
-> 
-> I gave this a tag earlier and only came back to the cost side now, sorry.
-> 
-> The check is unconditional, so plain nVHE pays it on every
-> kern_hyp_va(), including the one in __kvm_vcpu_run(), and it has no
-> private range to protect.
-> 
-> Could it be gated on is_protected_kvm_enabled(), the same way patch 17
-> gates hyp_trace_buffer_alloc_bpages()?
-> 
-> Cheers,
-> /fuad
-
-Sure, that's really a micro optimisation though, I don't think that
-is_ttbr1_addr() is expensive.
-
--- 
-Vincent
-> 
-> 
-> >         asm volatile(ALTERNATIVE_CB("and %0, %0, #1\n"         /* mask with va_mask */
-> >                                     "ror %0, %0, #1\n"         /* rotate to the first tag bit */
-> >                                     "add %0, %0, #0\n"         /* insert the low 12 bits of the tag */
+> > +out_teardown:
+> > +     vgic_v4_teardown(kvm);
+> > +     kfree(dist->spis);
+> > +     dist->spis = NULL;
+> > +
+> > +     return ret;
+> >  }
+> >
+> >  static void kvm_vgic_dist_destroy(struct kvm *kvm)
 > > --
-> > 2.55.0.508.g3f0d502094-goog
+> > 2.39.5
 > >
