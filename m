@@ -1,83 +1,80 @@
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08CF3385D7A
-	for <kvmarm@lists.linux.dev>; Tue, 25 Aug 2026 07:06:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAD063B8920
+	for <kvmarm@lists.linux.dev>; Tue, 25 Aug 2026 07:22:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787641596; cv=none; b=ulo3cTjrASyw9vGo58of3ne51RI0H5dgFqrjG4xM3jgaFXl4QhnIOWPmRFS71UpD8ARwilHa1sXk7hCP52k933wNH/bI1mt+pikCXO0HCggpY4tEIJu5Y4CrQgYGHHf/O6LjlqzL/870Aj0QIJn8AcYdrHEcRIQBO5UJtvNgtgQ=
+	t=1787642555; cv=none; b=ASuaMCb7geNkMNq2MSC0kldi/HS3Ttgy0I/uKejIV9hZPgqjJ350e7fWUOvcFxUJjPuentd43zbB8ZuIcApbmn8OpXgwAyIgN0yRBXsTY1OnY9cnap1SMtZeCAIfxySbYhSNAe88gRmTN6Q2u7xTm5sCvRe2fPx5OubOeHlEEEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787641596; c=relaxed/simple;
-	bh=Q/8gSOHAJgd2SRYbzG1DwwWvl7MRYBB6FR/wRRWch5E=;
+	s=arc-20240116; t=1787642555; c=relaxed/simple;
+	bh=3zM0QJcSGVE9fFDjAv2RmdnKoPmIMzgW1FFqwHFF/7E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=utKiwfyLzKEYUvqtWYWQT+MjMKnLznXcWEudH0z0yRIyu9+D2+E3MmjgHXJcqcHTNOunf/olVM38bQP1bcdH58EbcfJE1Q3OuVFLa7IKVSvol6Rxk3m+mpARChWStH7tXlqv0KHP+LFdBbhuHH3m0BoRFrVq1FnJQ0b+4dFM7Hk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N3ELGRVo; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=e6WDUjmErrxu/hbwxrnV+aUc+g19PMHwP2fBUPi9Y6e/6j1Uq7hDl1aqVT5W4ZhkDq7Pn/VaatBF5eJPese4P7YYATmmezq/KLZsFi/UJa06zCt2Bp15pjjZsPWBX1LSli98o42gmBRvNhe9jGT8tILgMAv3gmfZf5AVXRgB510=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Gx12hFD5; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N3ELGRVo"
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-6a378f90555so6850225a12.3
-        for <kvmarm@lists.linux.dev>; Tue, 25 Aug 2026 00:06:34 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Gx12hFD5"
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-498028b3d5eso43227235e9.1
+        for <kvmarm@lists.linux.dev>; Tue, 25 Aug 2026 00:22:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787641593; x=1788246393; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1787642552; x=1788247352; darn=lists.linux.dev;
         h=in-reply-to:content-disposition:content-type:mime-version
          :references:message-id:subject:cc:to:from:date:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=s3xyRM/wAlBwrs4J1zBbo6tL/K6FbpaVSr4RYy/4QHY=;
-        b=N3ELGRVoQWVOlkaJPNCMTJ2MHzaaAPBDOPFkfGJMCnVHbKn9Zoe+s7kFeIhA08X29p
-         yRqy82etE+UYsckW4scdil1dGkOkp1rKEErLrIJuv1d8Aq6+mwgTkF3/FGB3L/qJVKMb
-         xbeYpcdp972OXX8gLJVH5mAOWy0EZvblM0CsoOfmgbIrHOekWvrUY8hpzYG0SWKykTUL
-         j8HulSTwLEK7zmWVmt37Ri5yGdIxXjXdPkcK8n1L32CdC+KQzj5zJDeazpvsvmFnOvDt
-         m14kxtjbrakAdioy3bZdoRTvZfHIaUCmdtmCH4icSl7qzwH94X/j5sEoRzvckMtX//Ls
-         8gIA==
+        bh=AeanF6wV5Vz38rcMNLwzqqdAl64h6z9Xktwn4H66zlo=;
+        b=Gx12hFD5FoU1jRGUxY2vb0E/sO2xRtjurm1WM/+UBV1Wb6egzkMGEt5/99W17XsOFF
+         IJTmBYSGNkd5/p9mj9mM+jfDyEpZKOJUPueyG0KjIleBCctYnhdz7V79WxQzDtMAaZmP
+         Qbfzc2aYuA4ktYrfgQj8b68eDRkEU7hXHfkQRyS70XFnBpv2MaJzqvaA3GA4BGNmPWRV
+         DRIPp1w9zzfmSPSGZ1vlEgSz0xryvpwxvZAWI9tsIyTxfkTsnTyw6u7moWsuyxez/MMJ
+         RjCfKLKvukAmqh8/2O08Pwo98bxOk4f6Ii1hCFMOXfCqjv2Uv5TyE0gbm1L5pnrsXbDf
+         f5bQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787641593; x=1788246393;
+        d=1e100.net; s=20251104; t=1787642552; x=1788247352;
         h=in-reply-to:content-disposition:content-type:mime-version
          :references:message-id:subject:cc:to:from:date:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=s3xyRM/wAlBwrs4J1zBbo6tL/K6FbpaVSr4RYy/4QHY=;
-        b=hOciu3/MWrMVZYmOc/DtN7Y1iXsHu+ER2R75C0kc3b7LgDxiJOAIsfh45hMnQyEohG
-         R71Y/mYp3PmA99X2gXzSaFyo93FHSz3FadINAuDIfRY9UAiqxufRQxZ9p5Bmmne+k/Y1
-         vwKuKlbxR3LkRLLzvlBJ4UK+7dnnGMiMTCGZb2uoeqgvR2kcFXLTSpQONjtgobSsoJ4T
-         2d9FDH0eoKrqYZ+E5oCqMf3BYlRq3AdL8cWZxLcmEH7u50nbtJuv20yNp9Qw6UVnFeck
-         B3B8btTlj4ZeJNpRCEmSxkiO89mSFLe69+Ld9fJusXAMO+3yxTfeA4c6j3ud0HZBdvff
-         31cg==
-X-Forwarded-Encrypted: i=1; AHgh+Rqsns/r6kZAcmNxdrlaU3iquQEcoEoVVqUzI23MebrM84FgD5Emz3OhO5pkTFuGIMApuBrKHBY=@lists.linux.dev
-X-Gm-Message-State: AFuF++kHms/lIUsLslokyE2plS1qkAVgL/0dUUhwKAdK1+tcy/Y2gyMF
-	VFVj2vZhQvBlTzb193YHveu1ETf6PB3YZLLTlussAGKBnn0vpNuiRVuT
-X-Gm-Gg: AR+sD131Vge9k9UYf4RLXKJH8yaycoucF0qVFdb5iTr/ONUl5mzUE2CaF4iJtKgoiEp
-	w5wbknalZ7/LDiA7NIE6QYo1wcUUqfCIH+kmClhOlyP+TzgW8He6fr/f6JGTviKq4qrcVDzXaSE
-	eOx+SR+d5Eo/+TM0skTEVyEqD6dzab6k/jZRPV+49LbEl5y7m4GYR8zQVHshvBOUKKACIoRR4hx
-	Hb2v6WxP4+AVaZFE/5EaBb68Dpar1KN0nSNUcMOm6B9z14Eca5CXjD9aiIA9bme4D3srnc3aeyo
-	h9/d4Hhhr5KbrrE4503G0JN8V0TNUWCrUIEYTDyHqoi8IKRcAIyCxMhxGGkAPV+N8Ir0T/mj8mi
-	M8149nccwQiIGGuSZI+LbxCnVWMSED1iKPSTDz+Ml6l2NsVFf2iTM3WLOhX8vJZJcdRrv0tmK54
-	pAbKEtGWdpg7bDGDxfvin+perPBv4F9MmRoVZjMbsTEZTDCDK+bBnMLgIOM4xQgRoVE9enhHQI3
-	vH7NGGSZNbWVd+K1tR23NcY3eBtUJ0DTC8nrgN4EVBeO2QgpcdvVn3Fa8yq/i4QNOPfijDcfEbz
-	rbq147m21cnoDvMHDPQPYcf13DQhRgLGcPY=
-X-Received: by 2002:a17:906:a353:10b0:c1c:5c90:1bb0 with SMTP id a640c23a62f3a-c246a353d2emr2513381166b.8.1787641592969;
-        Tue, 25 Aug 2026 00:06:32 -0700 (PDT)
-Received: from franzs-nb (248.201.173.83.static.wline.lns.sme.cust.swisscom.ch. [83.173.201.248])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c2496295627sm1565087966b.15.2026.08.25.00.06.31
+        bh=AeanF6wV5Vz38rcMNLwzqqdAl64h6z9Xktwn4H66zlo=;
+        b=Is2gmjkFBRQtu47I6kKg2WIm7OSyet0Rcxq5Wztw02QnZ9wh0lHotGy/jmSWgzD3AK
+         lHtsSjDgoxTqD/6rTJWzNFpXs9UlQxPkfDpvLkZ0mv3ZlVN9CRQLE4gOPGR8upmSCc13
+         4xTLmpHpfNxtg+7FsROacepqR2MEVne83qQWAsHllaXVpR1E+uSGp66HNnalYN01JLEu
+         LqRcX68hEfv/lv3oht81TmmAcNCepFuUpnDYOw+ovXx/Ld746p/CWAgtO0g4/0AxSfxj
+         sQoOzKIeyfeZP86db+UeVOPo6isUvLdn4Y2cleBcSSfiOQiVtIGOPNO/ozPBAlvI5izp
+         MXxQ==
+X-Forwarded-Encrypted: i=1; AHgh+RrSWwPmC7+QohH54nMorZF1e3fHzkPe5W0TGcoj5dP5Or1t5KRlSlqWOd555hHWYAZpeuSelLo=@lists.linux.dev
+X-Gm-Message-State: AFuF++mJp43fA+ztqiJPrcQInvgVEOjQVDT6pht7Z++90OaRJqzOfjF4
+	Km9eWtruMNJWdbnbrgU4UP1sXGkj9nG0V7cBBv/EDHHp2Tuxppa/1w9BBw5Q1dHNbw==
+X-Gm-Gg: AR+sD13O9Yi3CRBmqmCMmFCnCezYCan706KYihPQ9f0G99Hm0fpn6JXlFntD8FkMC8Y
+	QD0Ct6z19rnM1uouoIumlRE3GtRB105wv7pdpdlxSFAKROKS2XcgYNavKt9LScM/APEkRBgSg0C
+	YZqsLK2evZSbG9dWthdb+k7rEhD/UmIOiUvksGYcZ7iqQUcqbTNuclmk1qYUK+xc+OvT+tFhAsL
+	YV6iwp86A+oowztID6qqtWcZQjTN+nvbspo0YmmIt7mpBzjbSQA8fDNKLHEqSaV1esBcaN0jY+s
+	nIra1wsepkTRqJ69Ysh/EcTdE2Kz/SPdc2Iz6qcpxwA5olm8Bc9UgWLnkPoGhAg4AuDpnddrTEE
+	fCgk3qFLleBUkumA9brrNOHtBpJxcQNuUxa8AonD0Lyu9IyLhbG4+0meSicHKhxTExTDfl6jQ5d
+	CdhC1ybf+AGXBs1vlnyuGpCbf2knEcR+hncH1w+z9XN9l2zjHXKoUmMCHWT6vAO057lhz3Nv1sh
+	kRBlfNLiD6g+hAPSAxLrymrGd03Vwqa
+X-Received: by 2002:a05:600c:6088:b0:499:621a:2ec2 with SMTP id 5b1f17b1804b1-499c19977e0mr323691785e9.3.1787642551487;
+        Tue, 25 Aug 2026 00:22:31 -0700 (PDT)
+Received: from google.com (135.91.155.104.bc.googleusercontent.com. [104.155.91.135])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-499d638fc8esm18764925e9.11.2026.08.25.00.22.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Aug 2026 00:06:32 -0700 (PDT)
-Date: Tue, 25 Aug 2026 09:06:31 +0200
-From: Franz Schnyder <fra.schnyder@gmail.com>
-To: "Peng Fan (OSS)" <peng.fan@oss.nxp.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, 
-	Randy Dunlap <rdunlap@infradead.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, "Ivan T. Ivanov" <iivanov@suse.de>, 
-	Francesco Dolcini <francesco@dolcini.it>, Frank Li <frank.li@nxp.com>, 
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	kvmarm@lists.linux.dev, imx@lists.linux.dev, Peng Fan <peng.fan@nxp.com>
-Subject: Re: [PATCH v4] arm64: errata: Add NXP iMX8QM workaround for A53
- cache coherency issue
-Message-ID: <f5nfbi2lmc73wtxxmzs4damrjtd67p4eb4p2zy5ssqrc3wohne@cjcxqua5dps6>
-References: <20260824-imx8qm-cache-coherency-v4-v4-1-b2e528c7d05e@nxp.com>
+        Tue, 25 Aug 2026 00:22:30 -0700 (PDT)
+Date: Tue, 25 Aug 2026 08:22:26 +0100
+From: Vincent Donnefort <vdonnefort@google.com>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com,
+	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com,
+	qperret@google.com
+Subject: Re: [PATCH v4 10/17] KVM: arm64: Add a shrinker for pKVM
+Message-ID: <ao1CspwFUHyhj0dE@google.com>
+References: <20260731143541.956291-1-vdonnefort@google.com>
+ <20260731143541.956291-11-vdonnefort@google.com>
+ <CA+EHjTxU2GCpSR587oR_EaMOvXfu+teCnfC2KCg=vpOtf4sgRA@mail.gmail.com>
+ <aoxzjag7xr_emuvX@google.com>
+ <CA+EHjTxraCfN1bfZ9ygRiyxxyEPeHw4mg6f6O0qzPBpFi165Qg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -86,50 +83,90 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260824-imx8qm-cache-coherency-v4-v4-1-b2e528c7d05e@nxp.com>
+In-Reply-To: <CA+EHjTxraCfN1bfZ9ygRiyxxyEPeHw4mg6f6O0qzPBpFi165Qg@mail.gmail.com>
 
-On Mon, Aug 24, 2026 at 12:02:04PM +0800, Peng Fan (OSS) wrote:
-> From: Peng Fan <peng.fan@nxp.com>
+On Mon, Aug 24, 2026 at 07:10:37PM +0100, Fuad Tabba wrote:
+> On Mon, 24 Aug 2026 at 17:38, Vincent Donnefort <vdonnefort@google.com> wrote:
+> >
+> > On Tue, Aug 18, 2026 at 04:28:38PM +0100, Fuad Tabba wrote:
+> > > Hi Vincent,
+> > >
+> > > On Fri, 31 Jul 2026 at 15:36, 'Vincent Donnefort' via kernel-team
+> > > <kernel-team@android.com> wrote:
+> > > >
+> > > > Integrate the pKVM memory reclaim interface with the host's memory
+> > > > management subsystem.
+> > > >
+> > > > This allows the host to automatically recover unused memory fom the
+> > > > hypervisor's heap allocator when the host is under memory pressure.
+> > > >
+> > > > Tested-by: Fuad Tabba <fuad.tabba@linux.dev>
+> > > > Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+> > > >
+> > > > diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+> > > > index d28422f5c3d6..bfbb1266491d 100644
+> > > > --- a/arch/arm64/kvm/pkvm.c
+> > > > +++ b/arch/arm64/kvm/pkvm.c
+> > > > @@ -115,7 +115,7 @@ static int pkvm_hyp_topup(enum pkvm_topup_id id, unsigned long nr_pages)
+> > > >         return ret;
+> > > >  }
+> > > >
+> > > > -static __maybe_unused unsigned long pkvm_hyp_reclaim(enum pkvm_topup_id id, unsigned long target)
+> > > > +static unsigned long pkvm_hyp_reclaim(enum pkvm_topup_id id, unsigned long target)
+> > >
+> > > This is the first caller of these, so it is where reclaim starts
+> > > running against a concurrent top-up.
+> > >
+> > > Nothing marks the pages a top-up just put in allocator->mc as spoken
+> > > for, and hyp_allocator_reclaim() ends with an unbounded drain of it,
+> > > so a shrink with target 1 hands back the lot. Land that between a
+> > > top-up and the retry it was for, and the retry asks again, and
+> > > pkvm_call_hyp_req() goes round.
+> >
+> > Sorry, I am not sure I follow here.
+> >
+> > IIRC, the shrinker will only reclaim half of what is available. So the pressure
+> > should be proportional to what is available and limit races with topup!
 > 
-> According to NXP errata document IMX8_1N94W[1], the i.MX8QuadMax SoC
-> suffers from a cache coherency issue (ERR050104). The upper bits, above
-> bit 35, of the ARADDR and ACADDR buses within the Arm A53 subsystem
-> have been incorrectly connected. This causes some TLBI and IC
-> maintenance operations exchanged between the A53 and A72 core clusters
-> to be corrupted.
-> 
-> The workaround requires:
-> 
->   - Downgrading targeted TLBI operations to broadcast-all variants.
->     Instead of patching the low-level __TLBI_1 macro (which interferes
->     with the REPEAT_TLBI workaround and causes excessive over-
->     invalidation), redirect high-level TLB flush functions
->     (flush_tlb_mm, __do_flush_tlb_range, flush_tlb_kernel_range,
->     __flush_tlb_kernel_pgtable) to use VMALLE1IS via static key checks.
-> 
->   - Upgrading IC IVAU to IC IALLUIS for both kernel (via ALTERNATIVE in
->     invalidate_icache_by_line) and EL0 userspace (via trap-and-upgrade
->     in user_cache_maint_handler with SCTLR_EL1.UCI=0).
-> 
->   - Disabling KVM since correct TLB maintenance cannot be guaranteed
->     for guests.
-> 
->   - No need to touch SMMU Broadcast TLB Maintenance (BTM) since i.MX8QM
->     does not support broadcast TLB.
-> 
-> SoC detection uses devicetree compatible string "fsl,imx8qm" or
-> "fsl,imx8qp" since the boot CPU MIDR_EL1 (0x410fd034) and AIDR_EL1 (0)
-> are not unique to this SoC.
-> 
-> [1] https://www.nxp.com/docs/en/errata/IMX8_1N94W.pdf
+> It's the ordering, not the amount.
 
-Hi Peng,
+Do you think we should first try to reclaim from the mapped pages before
+draining the allocator->mc? 
 
-I tested this on our HW and the random crashes that occured when both
-the A72 and A53 clusters were enabled no longer happen.
+Mapped pages are more valuable hence why I have started with allocator->mc.
 
-Tested-by: Franz Schnyder <franz.schnyder@toradex.com> # Toradex Apalis iMX8QM
+But, it is true it might make sense. It is unlikely to have pages left unused
+into that mc. If that mc has been topped-up that's because it is about to be
+allocated from...
 
-Thanks
+> 
+> topup and its retry are separate hypercalls, lock dropped between
+> them, so a shrink on another CPU can slip in, right? .
+> hyp_allocator_reclaim() drains allocator->mc, where the topup pages
+> sit, before any chunk, so half still comes out of them first: a target
+> of 1 fails the retry.
 
-Franz
+I do not see where a target == 1 fails.
+
+> 
+> >
+> > However now looking at it. I wonder if I don't want to ratelimit here the number
+> > of pages reclaimed in one go to limit the time spent at EL2. Especially we do
+> > all that with the allocator lock taken...
+> 
+> Ratelimiting would cap the time under the lock, but it wouldn't stop a
+> concurrent shrink from taking the topup pages, would it?
+
+Yes, my only intent is to avoid blocking at EL2 for too long.
+
+-- 
+Vincent
+
+> 
+> Cheers,
+> /fuad
+> 
+> 
+> >
+
+[...]
