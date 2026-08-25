@@ -1,280 +1,126 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D82A30DEBA;
-	Tue, 25 Aug 2026 05:10:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A7871F3D56
+	for <kvmarm@lists.linux.dev>; Tue, 25 Aug 2026 05:18:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787634624; cv=none; b=dN8TM7W853VijKWf6kO46NyXRtgaLfA3i/qjgUY8boFK7FwgQXN47MhBjtAZCHyxe+VVvM3t5r63EOELzeocDhc6TSinSHVXB+NbEJ2t8NUgfyoQd2LxCibT01cpuSrv+mnz+bOiyOv2bKQWduYACaJlf224JVmtng6e4dK9Fws=
+	t=1787635131; cv=none; b=UyXuRwMw4rpFCuhpGQe3EpCQSJUHaT0JM+t61ftGXg1XA+f5jNItVSDQBwur34zwajG2wotslOWGCncv/HWNNWACMFeJlY0phkEElI6WrsJWfzEDtEh6lPopZTWZZdWcf2TRUpg3ya1tQrxx/fhcoZc2AUV0oKCOUuyYPholtRg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787634624; c=relaxed/simple;
-	bh=hXnMDKcJk9t+ynGzOsO5VQ5udjQ56Oyu67C3zs9QzrI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=lkeNDcRDJd/+kA3IX4cqjPpNiXRssN04oHtez41bq7M54OSrjWy/AuXIPi5Mq4sRaLgN6na5qSOSxsqF6MrFoFWOegK/e7DrGfxoMMwD5Mcy49WNJbmIIB1BLI2/Pdvvx3MXjGz2HaaiQ1XNHZSZR/caNVglNhhGvxG+SpVktAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WLQHeN3d; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1787635131; c=relaxed/simple;
+	bh=qWOsz5UmTYiTYnLzOOMGSUOqII493WgqGkCH0aw+ssM=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=SuDeqU0Egu3YeUceChFym3Cx+0GhdW+TyBe14gUhKRwuhHX9X9wrU64Dr6ZodG+7VZB+FEyVDfKrVtX3woWqaDv4ovhGic3Nc4hIftbkqlCVTOCCI0lRXR3kY73pUmWY/A43Mq7wRG+TSCdZr3RWpgOTUEvm5A0zYLlFuEbDig4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dKDGy1Qk; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WLQHeN3d"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B98A5C2BCB8;
-	Tue, 25 Aug 2026 05:10:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1787634623;
-	bh=hXnMDKcJk9t+ynGzOsO5VQ5udjQ56Oyu67C3zs9QzrI=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=WLQHeN3dIom4b1tnW13mQK+6NWZ47wl59vDrY+X5vMb8enAPNNSGmzl/d8QNfnFkP
-	 DoMEyOt79RAsUt4TroG4cqhj16L0M3DQHXEV3/5S5H/7eFVZxTjwZhngvAsuPnk0bO
-	 PFBBnLgu9qEq/p4O10bISv7ht1VwmDwo2YznC257Nacfgtp8vPT6PIVzcoY+horpwo
-	 i+7DTNMfNVOUZlmV3XMYiwtKc7Ss622ExWBTzLt3wEYGCFIs6SruntNR02lkGc9HIh
-	 sZ4qqih2RMvDFpzwgeZhNcvnysLmjeF3iuJvQfEO8ZsO7i8Z+smzih6vbwVq4X7FO6
-	 IJVeU+JsL3n/Q==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9438EC5DF94;
-	Tue, 25 Aug 2026 05:10:23 +0000 (UTC)
-From: Kim Mankyum via B4 Relay <devnull+mankyum.kim.samsung.com@kernel.org>
-Date: Tue, 25 Aug 2026 14:10:17 +0900
-Subject: [PATCH v2] KVM: arm64: Honour the SPMC FF-A RX/TX buffer size
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dKDGy1Qk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72F691F000E9;
+	Tue, 25 Aug 2026 05:18:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1787635129;
+	bh=FidoLps9L8YFy3buwGQs8VqWjJXTCiXLehpwAfffUEU=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=dKDGy1QkbTPEw9Apzgcg/XEBzEIShROCIdkl5DxdqjrE8x6E1TX63ILtR51RNE2xJ
+	 IFkhvhGfiuzITRHdVzJGs1jzEgiXoPpa2dRNzn+MFzn4hZmXtPgOxV6wSA4uv+ZI1f
+	 QD43zywhBRxwPXc7y3BH466Wpkn3BuXqoXrGFENTBZ3DoE05/2HIfasR2jbASxc4ZX
+	 p0GK2SN6WsLik/nRAhSTSwTUKeUTUO1lsoWBITQh3qr0xAGge5bkJJ0/nP7Cw6MjNa
+	 NqgAnYVr8ES/b2TxmxqtesvIJkh3z1y+MDqiyV4bqdoOGRV9qPeZdvplrrpCFV0QGw
+	 c3D9IwXg0TaRA==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v2] KVM: arm64: Honour the SPMC FF-A RX/TX buffer size
  limits
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Kim Mankyum" <mankyum.kim@samsung.com>
+Cc: "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20260825-master-v2-1-f8af766d1f34@samsung.com>
+References: <20260825-master-v2-1-f8af766d1f34@samsung.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 25 Aug 2026 05:18:48 +0000
+Message-Id: <20260825051849.72F691F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260825-master-v2-1-f8af766d1f34@samsung.com>
-X-B4-Tracking: v=1; b=H4sIALgjjWoC/2WNwQ6DIBAFf8XsuTSAlZKe+h+NB8Ct0gQ1rJI2x
- n8v2GOPk8ybtwFh9EhwqzaImDz5acwgTxW4wYw9Mt9lBsml4lpyFgwtGFlzlRehTd1oYyHLc8S
- nfx+hR/tjWu0L3VLWxRg8LVP8HE9JFO8vmgQTDI3i0qqu1orfyQRax/7spgDtvu9fPHsWlLAAA
- AA=
-X-Change-ID: 20260820-master-572418a358ab
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
- Will Deacon <will@kernel.org>
-Cc: Sudeep Holla <sudeep.holla@kernel.org>, 
- Sebastian Ene <sebastianene@google.com>, Fuad Tabba <fuad.tabba@linux.dev>, 
- Andrew Walbran <qwandor@google.com>, linux-arm-kernel@lists.infradead.org, 
- kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
- Kim Mankyum <mankyum.kim@samsung.com>
-X-Mailer: b4 0.17-dev-1f2f7
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1787634622; l=7690;
- i=mankyum.kim@samsung.com; s=20260820; h=from:subject:message-id;
- bh=Sm5QCwajey1SaOwSaAJcudU9HgqxJdMcerYzBC9FXf0=;
- b=kiBaC1+ZZ9Jvk9u0bYHeEJMYXd+8bw9q7h/Ipl0xoXYPfnHnQfqZSsJBp76NBD8HmCs2PlXpR
- 1QSPFK+0Uw0B7xuiVGWXd5FYxrhhoQRJJUktetoVK66WbLCnlN1H1HO
-X-Developer-Key: i=mankyum.kim@samsung.com; a=ed25519;
- pk=HN6chQ/xsDvZkhMY6iO4umFaQcr/drgbOI/tEzVYrSg=
-X-Endpoint-Received: by B4 Relay for mankyum.kim@samsung.com/20260820 with
- auth_id=964
-X-Original-From: Kim Mankyum <mankyum.kim@samsung.com>
-Reply-To: mankyum.kim@samsung.com
 
-From: Kim Mankyum <mankyum.kim@samsung.com>
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [High] pKVM falsely returns FFA_RET_NOT_SUPPORTED for FFA_FEATURES(FFA_RX=
+TX_MAP) if the negotiated RX/TX buffer size is not exactly 4K, 16K, or 64K.
+--
 
-pKVM currently sizes its FF-A RX/TX buffers according to PAGE_SIZE:
-do_ffa_rxtx_map() rejects any FFA_RXTX_MAP request from the host whose
-page count does not match the hyp buffers' full PAGE_SIZE capacity,
-and FFA_FEATURES for FFA_RXTX_MAP never tells the host otherwise.
-hyp_ffa_post_init() already queries the SPMC's minimum RX/TX buffer
-size, but only for a feasibility check.
+--- Patch [1]: [PATCH v2] KVM: arm64: Honour the SPMC FF-A RX/TX buffer siz=
+e limits ---
+commit c54f99ee793f554a1aaa1ae79c05911b9c5014aa
+Author: Kim Mankyum <mankyum.kim@samsung.com>
 
-This breaks when PAGE_SIZE is larger than the RX/TX buffer size the
-SPMC actually supports. For example, an FF-A 1.2 SPMC advertising both
-a minimum and a maximum RX/TX buffer size of 4K rejects the 16K
-FFA_RXTX_MAP request that pKVM consequently forwards to the SPMC on a
-16K kernel.
+KVM: arm64: Honour the SPMC FF-A RX/TX buffer size limits
 
-Compute the RX/TX buffer size pKVM and the SPMC both support in
-hyp_ffa_post_init(), from the SPMC's advertised minimum and (FF-A 1.2
-onwards) maximum sizes, capped at the hyp buffers' capacity; below
-FF-A 1.2 the maximum field is undefined, so fall back to the minimum.
-Store it in hyp_ffa_rxtx_sz, report it to the host via
-FFA_FEATURES(FFA_RXTX_MAP), and require the host's FFA_RXTX_MAP
-request to match it exactly, as before. The other buffer-size bound
-checks in this file are updated to use hyp_ffa_rxtx_sz too, since that
-is the amount of the hyp buffers actually visible to the SPMC once it
-is smaller than PAGE_SIZE.
+This commit updates pKVM to negotiate the FF-A RX/TX buffer size with the
+SPMC instead of defaulting it to PAGE_SIZE. It computes the supported size
+in hyp_ffa_post_init(), stores it in hyp_ffa_rxtx_sz, and exposes it to the
+host via FFA_FEATURES.
 
-Host page ownership remains PAGE_SIZE-granular: do_ffa_rxtx_map()
-still shares and pins the entire host page backing each RX/TX buffer.
-Such pages leave the plain PKVM_PAGE_OWNED state, so any subsequent
-host FF-A share/lend on any part of them is rejected by
-__pkvm_host_share_ffa(). The part of a page not visible to the SPMC
-therefore stays pinned but is never exposed to it.
+Link: https://patch.msgid.link/20260820-master-v1-1-ea602b6d3860@samsung.com
 
-Fixes: 9d0c6a9af9e3 ("KVM: arm64: Handle FFA_RXTX_MAP and FFA_RXTX_UNMAP calls from the host")
-Suggested-by: Sebastian Ene <sebastianene@google.com>
-Signed-off-by: Kim Mankyum <mankyum.kim@samsung.com>
----
-Changes in v2:
-- Rework the fix to negotiate the RX/TX buffer size with the SPMC
-  instead of relaxing the FFA_RXTX_MAP page-count validation.
-- Account for the maximum RX/TX buffer size advertised since FF-A 1.2.
-- Handle FFA_FEATURES(FFA_RXTX_MAP) in pKVM so the host discovers the
-  negotiated size.
-- Use the negotiated size for the SPMC-facing buffer bounds.
-- Keep host page sharing and pinning PAGE_SIZE-granular, addressing the
-  partial-page sharing concern raised in v1.
+> diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> index a327c2bbb6b64..c3379d1e8fd74 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
+[ ... ]
+> @@ -723,6 +732,26 @@ static bool do_ffa_features(struct arm_smccc_1_2_reg=
+s *res,
+>  	}
+> =20
+>  	switch (id) {
+> +	case FFA_RXTX_MAP:
+> +	case FFA_FN64_RXTX_MAP:
+> +		switch (hyp_ffa_rxtx_sz) {
+> +		case SZ_4K:
+> +			prop =3D FFA_FEAT_RXTX_MIN_SZ_4K;
+> +			break;
+> +		case SZ_16K:
+> +			prop =3D FFA_FEAT_RXTX_MIN_SZ_16K;
+> +			break;
+> +		case SZ_64K:
+> +			prop =3D FFA_FEAT_RXTX_MIN_SZ_64K;
+> +			break;
+> +		default:
+> +			ret =3D FFA_RET_NOT_SUPPORTED;
+> +		}
+> +
 
-Link to v1: https://patch.msgid.link/20260820-master-v1-1-ea602b6d3860@samsung.com
----
- arch/arm64/kvm/hyp/nvhe/ffa.c | 62 ++++++++++++++++++++++++++++++++++++++-----
- include/linux/arm_ffa.h       |  7 +++++
- 2 files changed, 62 insertions(+), 7 deletions(-)
+[Severity: High]
+If the SPMC negotiates an intermediate buffer size, won't this switch fall
+through to the default case and return FFA_RET_NOT_SUPPORTED?
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-index a327c2bbb6b6..c3379d1e8fd7 100644
---- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-+++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-@@ -71,6 +71,15 @@ static u32 hyp_ffa_version;
- static bool has_version_negotiated;
- static hyp_spinlock_t version_lock;
- 
-+/*
-+ * Size, in bytes, of the RX/TX buffers used by the pKVM FF-A proxy: the
-+ * portion of the (fixed, KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE) hyp buffers
-+ * that is actually mapped into the SPMC. Negotiated with the SPMC in
-+ * hyp_ffa_post_init() and, since it is what the host must in turn provide,
-+ * also reported to the host via FFA_FEATURES.
-+ */
-+static size_t hyp_ffa_rxtx_sz;
-+
- static void ffa_to_smccc_error(struct arm_smccc_1_2_regs *res, u64 ffa_errno)
- {
- 	*res = (struct arm_smccc_1_2_regs) {
-@@ -239,7 +248,7 @@ static void do_ffa_rxtx_map(struct arm_smccc_1_2_regs *res,
- 	int ret = 0;
- 	void *rx_virt, *tx_virt;
- 
--	if (npages != (KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE) / FFA_PAGE_SIZE) {
-+	if (npages != hyp_ffa_rxtx_sz / FFA_PAGE_SIZE) {
- 		ret = FFA_RET_INVALID_PARAMETERS;
- 		goto out;
- 	}
-@@ -421,7 +430,7 @@ static void do_ffa_mem_frag_tx(struct arm_smccc_1_2_regs *res,
- 	int ret = FFA_RET_INVALID_PARAMETERS;
- 	u32 nr_ranges;
- 
--	if (fraglen > KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE)
-+	if (fraglen > hyp_ffa_rxtx_sz)
- 		goto out;
- 
- 	if (fraglen % sizeof(*buf))
-@@ -484,7 +493,7 @@ static void __do_ffa_mem_xfer(const u64 func_id,
- 	size_t mem_region_len = FFA_MEM_REGION_SZ(hyp_ffa_version);
- 
- 	if (addr_mbz || npages_mbz || fraglen > len ||
--	    fraglen > KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE) {
-+	    fraglen > hyp_ffa_rxtx_sz) {
- 		ret = FFA_RET_INVALID_PARAMETERS;
- 		goto out;
- 	}
-@@ -619,7 +628,7 @@ static void do_ffa_mem_reclaim(struct arm_smccc_1_2_regs *res,
- 	 * bogus.
- 	 */
- 	if (offset + CONSTITUENTS_OFFSET(0) > len ||
--	    fraglen > KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE) {
-+	    fraglen > hyp_ffa_rxtx_sz) {
- 		ret = FFA_RET_ABORTED;
- 		ffa_rx_release(res);
- 		goto out_unlock;
-@@ -723,6 +732,26 @@ static bool do_ffa_features(struct arm_smccc_1_2_regs *res,
- 	}
- 
- 	switch (id) {
-+	case FFA_RXTX_MAP:
-+	case FFA_FN64_RXTX_MAP:
-+		switch (hyp_ffa_rxtx_sz) {
-+		case SZ_4K:
-+			prop = FFA_FEAT_RXTX_MIN_SZ_4K;
-+			break;
-+		case SZ_16K:
-+			prop = FFA_FEAT_RXTX_MIN_SZ_16K;
-+			break;
-+		case SZ_64K:
-+			prop = FFA_FEAT_RXTX_MIN_SZ_64K;
-+			break;
-+		default:
-+			ret = FFA_RET_NOT_SUPPORTED;
-+		}
-+
-+		if (!ret && hyp_ffa_version >= FFA_VERSION_1_2)
-+			prop |= FIELD_PREP(FFA_FEAT_RXTX_MAX_SZ_MASK,
-+					    hyp_ffa_rxtx_sz / FFA_PAGE_SIZE);
-+		goto out_handled;
- 	case FFA_MEM_SHARE:
- 	case FFA_FN64_MEM_SHARE:
- 	case FFA_MEM_LEND:
-@@ -741,7 +770,8 @@ static bool do_ffa_features(struct arm_smccc_1_2_regs *res,
- 
- static int hyp_ffa_post_init(void)
- {
--	size_t min_rxtx_sz;
-+	size_t min_rxtx_sz, max_rxtx_sz = 0;
-+	size_t capacity = KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE;
- 	struct arm_smccc_1_2_regs res;
- 
- 	hyp_smccc_1_2_smc(&(struct arm_smccc_1_2_regs){
-@@ -774,9 +804,27 @@ static int hyp_ffa_post_init(void)
- 		return -EINVAL;
- 	}
- 
--	if (min_rxtx_sz > PAGE_SIZE)
-+	if (min_rxtx_sz > capacity)
- 		return -EOPNOTSUPP;
- 
-+	/*
-+	 * The maximum RX/TX buffer size was only added to FFA_FEATURES in
-+	 * FF-A 1.2; the field is undefined on earlier versions, so treat it
-+	 * as unavailable there and settle for the (guaranteed supported)
-+	 * minimum size instead of guessing.
-+	 */
-+	if (hyp_ffa_version < FFA_VERSION_1_2) {
-+		hyp_ffa_rxtx_sz = min_rxtx_sz;
-+		return 0;
-+	}
-+
-+	max_rxtx_sz = FIELD_GET(FFA_FEAT_RXTX_MAX_SZ_MASK, res.a2) * FFA_PAGE_SIZE;
-+	if (max_rxtx_sz && max_rxtx_sz < min_rxtx_sz)
-+		max_rxtx_sz = min_rxtx_sz;
-+
-+	/* A maximum of 0 means the SPMC does not enforce an upper bound. */
-+	hyp_ffa_rxtx_sz = min(max_rxtx_sz ?: capacity, capacity);
-+
- 	return 0;
- }
- 
-@@ -868,7 +916,7 @@ static void do_ffa_part_get(struct arm_smccc_1_2_regs *res,
- 	}
- 
- 	copy_sz = partition_sz * count;
--	if (copy_sz > KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE) {
-+	if (copy_sz > hyp_ffa_rxtx_sz) {
- 		ffa_to_smccc_res(res, FFA_RET_ABORTED);
- 		goto out_unlock;
- 	}
-diff --git a/include/linux/arm_ffa.h b/include/linux/arm_ffa.h
-index e71d83ee0aef..a70d087174af 100644
---- a/include/linux/arm_ffa.h
-+++ b/include/linux/arm_ffa.h
-@@ -130,6 +130,13 @@
- #define FFA_FEAT_RXTX_MIN_SZ_16K	2
- #define FFA_FEAT_RXTX_MIN_SZ_MASK	GENMASK(1, 0)
- 
-+/*
-+ * Maximum buffer size supported by the callee, expressed in units of
-+ * FFA_PAGE_SIZE, as returned by an FFA_FEATURES query for FFA_RXTX_MAP.
-+ * A value of 0 means no maximum size is enforced.
-+ */
-+#define FFA_FEAT_RXTX_MAX_SZ_MASK	GENMASK(31, 16)
-+
- /* FFA Bus/Device/Driver related */
- struct ffa_device {
- 	u32 id;
+For example, hyp_ffa_post_init() can compute an 8K size if max_rxtx_sz is 8K
+and the capacity is larger:
 
----
-base-commit: cb8a75eec0877810b50aa1c5a833f929525cd2ee
-change-id: 20260820-master-572418a358ab
+hyp_ffa_post_init() {
+	...
+	max_rxtx_sz =3D FIELD_GET(FFA_FEAT_RXTX_MAX_SZ_MASK, res.a2) * FFA_PAGE_SI=
+ZE;
+	if (max_rxtx_sz && max_rxtx_sz < min_rxtx_sz)
+		max_rxtx_sz =3D min_rxtx_sz;
 
-Best regards,
---  
-Kim Mankyum <mankyum.kim@samsung.com>
+	/* A maximum of 0 means the SPMC does not enforce an upper bound. */
+	hyp_ffa_rxtx_sz =3D min(max_rxtx_sz ?: capacity, capacity);
+	...
+}
 
+Should do_ffa_features() be updated to handle intermediate sizes like 8K or
+32K, instead of strictly requiring an exact match for 4K, 16K, or 64K?
 
+> +		if (!ret && hyp_ffa_version >=3D FFA_VERSION_1_2)
+> +			prop |=3D FIELD_PREP(FFA_FEAT_RXTX_MAX_SZ_MASK,
+> +					    hyp_ffa_rxtx_sz / FFA_PAGE_SIZE);
+> +		goto out_handled;
+>  	case FFA_MEM_SHARE:
+[ ... ]
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260825-master-v2-=
+1-f8af766d1f34@samsung.com?part=3D1
