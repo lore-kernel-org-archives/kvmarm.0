@@ -1,123 +1,160 @@
-Received: from mta0.migadu.com (out-102.mta0.migadu.com [91.218.175.102])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80AE43939A6
-	for <kvmarm@lists.linux.dev>; Tue, 25 Aug 2026 09:48:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.102
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5873A42640C
+	for <kvmarm@lists.linux.dev>; Tue, 25 Aug 2026 12:29:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787651303; cv=none; b=LRCReJ1PvsxZFcLEkD91UB3DnAHzXMWvgBWM7hAOfy7SXlUDvminf/8ZZHn4yiCKB2IrVG48jPkQaIPvPDiTXyd0b0Bh29I68QetMJ+B/q699YxLqErSZ/lsmDrJ+ruclNzU1p/6Ch1z+dx2kIbQtdbysBc8wqWMktr2KoCQRkU=
+	t=1787660965; cv=none; b=QDz53dKy2VyU63vFjgP/1fGQrJyYW2DNUCWsa3bnr63cmWaCfvuWYzJxh4HCPIgLCwFAbLk8WjpxfOnrzUbEDQ4E7DOpyXpUZDBruT2/jRO9uC0ZycPzJ0LURVLhYCDF7LpVpDL8I5sxuIOcCczcQzSX05it93RNbN4hKYQEN8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787651303; c=relaxed/simple;
-	bh=WdTwdsXYegr+pt2vMyfS6s6LbEnxhORlW5D9ksXSlj4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Inj9eohcArPlFxfDCYTejA3RumFs/CryOlRkyzirYM68sQpT8iXuUyXJ83wKGUwADx2kDY0TJYHTgEbKXuJnoSLFXdEaB79ZbtXKBaiHwlYwv+VcNRjV2ERIt+BMVKbBfPJLBZT5uUb8L7TO9isycvEyx+hvcv2LOUb1/EsB34Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Rk+A6Ie2; arc=none smtp.client-ip=91.218.175.102
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1787660965; c=relaxed/simple;
+	bh=3zSUF/gW/Zcaed81GwU3l76v2U3K0J3de2dxbI0c5CQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=epYVb+sHfOcJQzdhU9IH9rCicmlufXDkuK0lLHH9E8dsyDRQooWUMpMVUWJJN4RbHUPKq2SFiGI5GzCvmCTsRz2ngjAImy/jJmx2TT2tP7BLIEU9SlwlRJLkPydaTee0wZygc3vr99IFQ1wbq5AqsKOj+YKiSc6xsdgpo553UoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=kB+u9BRn; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Rk+A6Ie2"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=WdTwdsXYegr+pt2vMyfS6s6LbEnxhORlW5D9ksXSlj4=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1787651299; v=1; x=1788256099;
- b=Rk+A6Ie2RCabAA5NDiB0YEV7HxORcAEweNOFhLO2+2g+YVC5qzurnWLjUVetaEferv41dG2h
- ycgB80FGg1kJZDQxTpVyh3/ogUnzkFP/AL2QgYQ7Pby9QIWdu3YXLxY7XYaGkC/VrL0D6lQnAs/
- cCJZYM4g6P0qey2jKrNX+/V4=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: from mail-lf1-f44.google.com (209.85.167.44)
-	by smtp.migadu.com with ESMTPS id ac16b08109fee947;
-	Tue, 25 Aug 2026 09:48:19 +0000
-X-Mizu-Trace-ID: ac16b08109fee947
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-5b2a8173142so1343e87.1
-        for <kvmarm@lists.linux.dev>; Tue, 25 Aug 2026 02:48:18 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+Ro87Yjo8QVROALpVnNBbsblA1gtMhrA16Yyda4pIBQ2ZSsLkvt9UhiZCOB/aqQT3jqOsKDjEAk=@lists.linux.dev
-X-Gm-Message-State: AFuF++kd+0qgRN5a8b9KFEcXkek43LaUrAdv4KE67dpehes1CVNF1df+
-	jOTsBuKUJ07XTL/wIqKeb6WVc712+kLXMLNkp4UCmT7Os0wZrOMRWZuDh/M3qmjaH8unSc9A21J
-	oHDvNZT6vc/5ZkLoljaNMJMLQ3mzsFzXUY4YjPXmV
-X-Received: by 2002:a05:6512:239c:b0:5b4:9dba:7402 with SMTP id
- 2adb3069b0e04-5b49de72ba7mr66953e87.12.1787651297880; Tue, 25 Aug 2026
- 02:48:17 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="kB+u9BRn"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 48CFC176A;
+	Tue, 25 Aug 2026 05:29:16 -0700 (PDT)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 11AED3F7D8;
+	Tue, 25 Aug 2026 05:29:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1787660960; bh=3zSUF/gW/Zcaed81GwU3l76v2U3K0J3de2dxbI0c5CQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=kB+u9BRnN8KsWTpqT13jVQynNtsWyseMe8JNZ6YsmTsxaxvtw+rE53ZDlu+LfvLNn
+	 dOfgarmQ0ieJd8oQx8drFWvTVuyKbWAKrYi61e0P/9mauCXK/LnK0dN5zg8rNDiIRA
+	 eGNhtBVKJkJVAENWbmpu3fy0O2xJg+UcmFno6tig=
+Date: Tue, 25 Aug 2026 13:29:14 +0100
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: "Thomson, Jack" <jackabt.amazon@gmail.com>
+Cc: maz@kernel.org, oupton@kernel.org, pbonzini@redhat.com,
+	joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org,
+	shuah@kernel.org, corbet@lwn.net, vladimir.murzin@arm.com,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org,
+	isaku.yamahata@intel.com, Jack Thomson <jackabt@amazon.com>
+Subject: Re: [PATCH v5 2/5] KVM: arm64: Add pre_fault_memory implementation
+Message-ID: <ao2KmmUd1lVFUUkp@raptor>
+References: <20260612162354.73378-1-jackabt.amazon@gmail.com>
+ <20260612162354.73378-3-jackabt.amazon@gmail.com>
+ <alEXtW7w-rqlNG09@raptor>
+ <0365d77d-616b-47f7-a5f2-3388bad692a1@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260824074245.710955-1-fuad.tabba@linux.dev> <20260824074245.710955-4-fuad.tabba@linux.dev>
- <te43gnvb2v2zlt3m5gwn2qvden5x3vp23o2qo27uif3ebdrodg@grrfqge2htia>
-In-Reply-To: <te43gnvb2v2zlt3m5gwn2qvden5x3vp23o2qo27uif3ebdrodg@grrfqge2htia>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Tue, 25 Aug 2026 10:47:41 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTyYkz5=BV7RfJK_uUuuRunsfSNWmNNrkJ8NdsR_i5NB2g@mail.gmail.com>
-X-Gm-Features: AcwNN1XTSUsaQHSIZboYJ25QZYIL7wzGNkOJWlm0Rb0fGSGlQWens35qrUjEXIc
-Message-ID: <CA+EHjTyYkz5=BV7RfJK_uUuuRunsfSNWmNNrkJ8NdsR_i5NB2g@mail.gmail.com>
-Subject: Re: [PATCH v2 3/4] KVM: arm64: vgic: Tear down what vgic_init()
- created when it fails
-To: Yao Yuan <yaoyuan@linux.alibaba.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Thomas Gleixner <tglx@kernel.org>, 
-	Eric Auger <eauger@redhat.com>, Joey Gouly <joey.gouly@arm.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>, 
-	Sascha Bischoff <Sascha.Bischoff@arm.com>, Sebastian Ene <sebastianene@google.com>, 
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0365d77d-616b-47f7-a5f2-3388bad692a1@gmail.com>
 
-Hi Yuan,
+Hi Jack,
 
-On Tue, 25 Aug 2026 at 10:18, Yao Yuan <yaoyuan@linux.alibaba.com> wrote:
-...
-> > diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-> > index 4012df6002ea6..7493fded53acc 100644
-> > --- a/arch/arm64/kvm/vgic/vgic-init.c
-> > +++ b/arch/arm64/kvm/vgic/vgic-init.c
-> > @@ -462,7 +462,7 @@ int vgic_init(struct kvm *kvm)
-> >               if (vgic_supports_direct_irqs(kvm)) {
-> >                       ret = vgic_v4_init(kvm);
-> >                       if (ret)
->
-> Hi Tabba,
->
-> > -                             return ret;
-> > +                             goto out_teardown;
->
-> The vigc_v4_init already called vgic_v4_teardown() in error path,
-> thus I think just free dist->spis is enough yet ?
+On Fri, Aug 21, 2026 at 02:52:17PM +0100, Thomson, Jack wrote:
+> Hi Alex,
+> 
+> On 10/07/2026 5:03 pm, Alexandru Elisei wrote:
+> > > +	unsigned long		*page_size;
+> > 
+> > As far as I know, fault handling was reworked to use struct
+> > kvm_s2_fault_desc to store the fault information that user_mem_abort()
+> > needs to handle the fault.  Adding a 'page_size' field, that represents the
+> > result of the gpa mapping process, might not be desirable.
+> > 
+> 
+> Yeah agreed, Vincent suggested a separate output struct that
+> kvm_s2_fault_map() fills with what was actually mapped. I'll do that in
+> v6 thanks!
+> 
+> > > +	struct kvm_vcpu_fault_info *fault_info = &vcpu->arch.fault;
+> > > +	struct kvm_vcpu_fault_info fault_backup = *fault_info;
+> > 
+> > I'm not sure you need to make a backup here. vcpu->arch.fault is populated
+> > each time the CPU takes a fault.
+> > 
+> 
+> So this was actually flagged up by sashiko when I ran it before
+> submission, it suggested handling this for the case in which the vCPU
+> exited for MMIO, the next KVM_RUN calls kvm_handle_mmio_return which
+> uses the vcu->arch.fault.esr_el2. I'll add some comments to this maybe
+> to explain why this would be needed.
 
-vgic_v4_init() unwinds its own state on every error return, so
-vgic_v4_teardown() is a no-op there and freeing the SPI array would be
-enough. I'll fold the label split in if I respin.
+Ok, I see, VCPU exits to userspace due to MMIO, userspace calls
+KVM_PRE_FAULT_MEMORY, userspace resumes VCPU and uses fault_info from
+KVM_PRE_FAULT_MEMORY. Nicely spotted.
 
-Thanks for the reviews!
-/fuad
+> 
+> > > +	if (memslot->flags & KVM_MEMSLOT_INVALID) {
+> > 
+> > I don't think that's something we should care about, the flag can be set
+> > immediately after the check as the function doesn't take kvm->slots_lock.
+> > kvm_vcpu_prefault_memory() takes the srcu lock in read mode, so the
+> > function is safe to run even if userspace does something silly like
+> > deleting a memslot at the same time that it's prefaulting the guest memory
+> > it represents.
+> 
+> I was there not as much for safety, but rather to pick up that error.
+> This way rather than userspace getting an -EFAULT it can just retry.
+> This is the same way it is handled in x86 as well.
 
->
-> >               }
-> >       } else {
-> >               ret = vgic_v5_init(kvm);
-> > @@ -475,12 +475,19 @@ int vgic_init(struct kvm *kvm)
-> >
-> >       ret = kvm_vgic_setup_default_irq_routing(kvm);
-> >       if (ret)
-> > -             return ret;
-> > +             goto out_teardown;
-> >
-> >       vgic_debug_init(kvm);
-> >       dist->initialized = true;
-> >
-> >       return 0;
-> > +
-> > +out_teardown:
-> > +     vgic_v4_teardown(kvm);
-> > +     kfree(dist->spis);
-> > +     dist->spis = NULL;
-> > +
-> > +     return ret;
-> >  }
-> >
-> >  static void kvm_vgic_dist_destroy(struct kvm *kvm)
-> > --
-> > 2.39.5
-> >
+My point was that since there's no serialization between memslot changes and
+KVM_PRE_FAULT_MEMORY, the condition can become true immediately after the if
+statement. Doesn't really matter though anyway.
+
+> 
+> > 
+> > It might not be obvious, but taking kvm->mmu_lock in read mode does not
+> > guarantee that gpa will be mapped when kvm_pgtable_get_leaf() returns.
+> > That's because a concurrent kvm_pgtable_stage2_map() for a different gpa
+> > can destroy the mapping of the current gpa.
+> [ ... ]
+> > The kvm->mmu_lock is dropped here, which means that it is possible for a
+> > MMU notifier callback to have just unmapped the entire stage 2 for the VM.
+> > 
+> 
+> Yeah as we mentioned in the other thread, this is best effort and we
+> can't guarantee that is survives the return. We do this for forward
+> progression, reporting the correct advance size for ranges which are
+> already mapped, instead of repeating the full dance for every page of them.
+> 
+> > 
+> > handle_access_fault() will fail if the mapping is gone. But I guess that's
+> > fine if the ioctl does not guarantee that memory is still mapped after it
+> > completes.
+> 
+> 
+> Yeah I think it's fine and will degrade to a no-op in this case.
+> 
+> > 
+> > Also, the documentation that this patch adds says: 'On arm64, newly created
+> > stage-2 PTEs are marked Accessed'. Does not say anything about marking
+> > **existing** ptes as accessed. Would be useful to explain the code does it.
+> > 
+> 
+> Ack, will do thanks!
+
+I think there's a word missing there, I meant to say that it would be useful to
+explain *why* the x86 implementation does not mark new PTEs as accessed, while
+arm64 marks them as accessed, and arm64 also does that for existing PTEs.
+
+> 
+> > > +		hva = gfn_to_hva_memslot_prot(memslot, gfn, NULL);
+> > 
+> > There's gfn_to_hva_memslot(memslot, gfn), is that what you are looking for?
+> > 
+> 
+> I think gfn_to_hva_memslot() resolves the hva for write, so would fail
+> on KVM_MEM_READONLY slots, and prefualting is a read. Also this mirrors
+> the guest abort path so matches the way the run path resolves the HVA.
+
+Ah, I missed that, thanks for explaining!
+
+I was wondering if you have any plans about posting an updated series.
+
+Thanks,
+Alex
