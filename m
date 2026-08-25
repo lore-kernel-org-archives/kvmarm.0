@@ -1,152 +1,128 @@
-Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azon11010040.outbound.protection.outlook.com [52.101.56.40])
+Received: from esa12.hc1455-7.c3s2.iphmx.com (esa12.hc1455-7.c3s2.iphmx.com [139.138.37.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B559D3988F8;
-	Tue, 25 Aug 2026 21:00:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.56.40
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787691630; cv=fail; b=LbM1ICuwBjDUK5TllbAvLDRVa42nbD9VOZY8R4pftrUaUN4OuDj76iEZJLfdWnn38793/3vjHGLPmSAYs0dcwN2ckAx3usAw9I6i6JBowzKHnsS02NORGbxA00osejl1mf3/6PBv/Qpk0b1nBcTKFCgb61A7e+D/TE3rkiUyaBg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787691630; c=relaxed/simple;
-	bh=EMPTnlaUYjWyU9iI1TkvTCB6rasuMHJx5DYj+H1H1E8=;
-	h=Content-Type:Subject:From:To:Cc:In-Reply-To:References:Date:
-	 Message-Id:MIME-Version; b=noj0Pxo412E36FcQI1+3DBBOBW9jZSqIbPWYG1uyAgf9jx7gjLZoRPYnbH7LH4OBJXE/v0tyVxRbJknuJegMaHJZxpVlfKyZEFQt+DYeA0tCRKK39U1wQ6Nog+/QPXPCG/JzkCBe+16LJF5bsdyisqBeo8+z8oJq9simZBFR7vE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Dx4rIP1l; arc=fail smtp.client-ip=52.101.56.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78DCC3DD516
+	for <kvmarm@lists.linux.dev>; Tue, 25 Aug 2026 21:18:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.138.37.100
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1787692734; cv=none; b=jBrKGo8wPwaFs2WV5tes73HagW0kRaZMh+VaOFCAgX1QxlRSscbumJ/33VuTeSfcbZ2cZEBrXICc6ovBUfxGllPU0tkjPYi7SmFGjsX6ngaQ7qgpVympP+wq/rjLV+XJA7jgOjsaNiPYJm2ANtQdScllSo+GP9izmJb1znWwoc0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1787692734; c=relaxed/simple;
+	bh=DCkh7zwFwuSOe5fTMEye2Oh1ZEjE4In2M9Rjx+1yMUE=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=JoV+f1Q/a7IQ4IS52Eyz8OvW/atz1+tdrUc/eIXp/CaqlidQih43Plkf2+Uh3nDDChKz7FrJ4WA1jtzCdKz+GtToWc8mNTm3hjLG/EsgT5+Ahg7bE/O12HAPN6C8U0Oux+MLYrWeb6/SMxHUDDL+eIPxPvAdPddzpxgPCDcTDwg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=hgAlJ8mF; arc=none smtp.client-ip=139.138.37.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Dx4rIP1l"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=o7ywe8GfwqLUWhyZNOcv8VKZGwT4qWrVNYSGP8ccTKvbjz05xjPg0/2lQww+8TljhvXy0PIhCW70gHQkzX11yZf5z96STh3zggGeHyVdsizAFrPvAqtnsEoRVG2IGeWoAgXxzUhaSME+yzsAIQBdpGqw/FaaRlpc9qiMZkmYSDq8iTdQTShieCnCryIzKj0MHdSF+3OOH8ImCNfWQJzN4/WTdcYyytezuwvReqzZdifcTZe5izlLbcMnzOjxyPYtsIFZYLiDBsMIAVhlG3kmwXMbGevfjbztPQ7a85LDxsQZivySGZ5XEr8Tl5E3E0mAdDMMNFLCOVO8XYoaaPOxXw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ixAzE8m5SdN1YZvpBqAJst4KopCjq2QVC3UwRgl5yN4=;
- b=ZnH/BajnFzpYIbKMrgfX44dZDhqmi3RCmbT/pisWbKafGaDC8tL5V6CJwsHuSR/n5GpAvobFPpPYaMFn28jgL4mVHLMLw9txejaFF9roXB0gHd7UfLcupFN/ObYNGePgLo4Wz39Quqsz79SvWZv1mdgJijnrxZtcvgWsmJzeJc3YjmBC85PFA8JWmzQNNcsLdNs0gO4hV+GVnBqn9blajt1ZBxz2L1AOcmhJk4nbmnycZqzxoIOzBdz5S3qztiDpbrSJbHmoKt+15YZWRjMk6HSfzlggldIOhzuDckC3M8CamO6qlMezlIWwG32rawP1X6HdGD4ZOhH8RTkvf2zIuw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ixAzE8m5SdN1YZvpBqAJst4KopCjq2QVC3UwRgl5yN4=;
- b=Dx4rIP1lrxNNocImBcVas9aCMUkqlRVzIGRcqqqPbYVJgyjX6HStv7ANVXek7OASBcoipgeMP3ypwNLCfJgdSdG2kDKKyZuoWQnHh0JWhHLpc6BH3Mjsb7QDOwvpWC+O/eIjd2D0AKpfX57+S3E6N2ctaBCgu/lfGu3w90ocK8bt945scSlcGmPkcoayW+6C5Bn1ygG9LSyr/ETA217IVr1lTcaXLWXDqE+AAX180kzW8nLN4y7lMgV0UK/kltjb39d28sq6P3XzMNZz5XpTnbAJinmBGgre1qKXIcg0WXQKH3z6HSPTACAupK6ofJEW4pgGBSk0maX8VGb1gM58tw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV8PR12MB9620.namprd12.prod.outlook.com (2603:10b6:408:2a1::19)
- by CY8PR12MB8215.namprd12.prod.outlook.com (2603:10b6:930:77::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.339.12; Tue, 25 Aug
- 2026 20:59:54 +0000
-Received: from LV8PR12MB9620.namprd12.prod.outlook.com
- ([fe80::299d:f5e0:3550:1528]) by LV8PR12MB9620.namprd12.prod.outlook.com
- ([fe80::299d:f5e0:3550:1528%4]) with mapi id 15.21.0339.012; Tue, 25 Aug 2026
- 20:59:54 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [PATCH v7 00/24] KVM: arm64: SMMUv3 driver for pKVM (trap and
- emulate)
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Mostafa Saleh <smostafa@google.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- kvmarm@lists.linux.dev, iommu@lists.linux.dev, catalin.marinas@arm.com, 
- will@kernel.org, maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
- suzuki.poulose@arm.com, yuzenghui@huawei.com, joro@8bytes.org, jgg@ziepe.ca, 
- mark.rutland@arm.com, qperret@google.com, tabba@google.com, 
- vdonnefort@google.com, sebastianene@google.com, keirf@google.com
-In-Reply-To: <20260715115906.2664882-1-smostafa@google.com>
-References: <20260715115906.2664882-1-smostafa@google.com>
-Date: Tue, 25 Aug 2026 17:59:50 -0300
-Message-Id: <178769159057.3356902.1232440069489543145.b4-review@b4>
-X-Mailer: b4 0.17-dev
-X-ClientProxiedBy: BN9P220CA0023.NAMP220.PROD.OUTLOOK.COM
- (2603:10b6:408:13e::28) To LV8PR12MB9620.namprd12.prod.outlook.com
- (2603:10b6:408:2a1::19)
+	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="hgAlJ8mF"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
+  t=1787692731; x=1819228731;
+  h=from:subject:date:message-id:mime-version:
+   content-transfer-encoding:to:cc;
+  bh=DCkh7zwFwuSOe5fTMEye2Oh1ZEjE4In2M9Rjx+1yMUE=;
+  b=hgAlJ8mFFG7rXNAl8ilxL8kTOaZQFHBhUypUt3lavMoyzyHfF6FmuC4J
+   fwGMupSAzrq81Fg6MgnSwfhTOs+k5XXgKrrdxHrKwfBr0tVA3DlE7+tKn
+   IKcJ7+bZA5GVd+iQDRlpJt/kK3QyW3R61EmfSfPjSK42i1eInFu6rmifA
+   J8ULah49qUUxFswEGo9stZpBP2iBs6QYVYOC+rHLCweiDIwxX96dmSs+k
+   ULAkVvEzsbkDLG+R38MN1nM7QpBF8BGrZtxprO6ua67tr9uIpwzB/9+Q/
+   mFfiwCn4vf6n/kJDt5kpaDvlt2V2w5nWgNblncRvY7qt9HsxV7RQ7eS22
+   Q==;
+X-CSE-ConnectionGUID: 74X0QkWJQQ2Ladf+jM2t7g==
+X-CSE-MsgGUID: 846iczG7QmOkKTAUI3Iy/g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11886"; a="230306791"
+X-IronPort-AV: E=Sophos;i="6.25,243,1779116400"; 
+   d="scan'208";a="230306791"
+Received: from gmgwuk01.global.fujitsu.com ([172.187.114.235])
+  by esa12.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Aug 2026 06:18:44 +0900
+Received: from az2uksmgm1.o.css.fujitsu.com (unknown [10.151.22.198])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by gmgwuk01.global.fujitsu.com (Postfix) with ESMTPS id 5B3621C1C714
+	for <kvmarm@lists.linux.dev>; Tue, 25 Aug 2026 21:18:44 +0000 (UTC)
+Received: from az2uksmom1.o.css.fujitsu.com (unknown [10.151.22.202])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by az2uksmgm1.o.css.fujitsu.com (Postfix) with ESMTPS id 173218320FC
+	for <kvmarm@lists.linux.dev>; Tue, 25 Aug 2026 21:18:44 +0000 (UTC)
+Received: from [127.0.1.1] (unknown [10.124.178.20])
+	by az2uksmom1.o.css.fujitsu.com (Postfix) with ESMTP id 459B81801C01;
+	Tue, 25 Aug 2026 21:18:39 +0000 (UTC)
+From: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+Subject: [PATCH 0/2] 52-bit VA guest mode ID support
+Date: Wed, 26 Aug 2026 06:18:33 +0900
+Message-Id: <20260826-arm64-52bit-va-v1-0-14ec98211363@fujitsu.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV8PR12MB9620:EE_|CY8PR12MB8215:EE_
-X-MS-Office365-Filtering-Correlation-Id: d9fe8e27-7c03-4f75-6e42-08df02ebcf84
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|1800799024|7416014|366016|23010399003|11063799006|10067099003|56012099006|18002099003|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	EU+KYdGlg8+XmN7FWpwkN6wJ7v4Q0x2u0u6a7eRdSxafu8d2p6gaLvAqD6kNlcwTUckJUF7krpeB6bUCDvDRBZF6vx2Q5Hm4UVkOTkYQaDRUkhBLGaLYg6A9pz80WJGncP38mgYpwDAyVPMN0WPp6u5j0LHfPWoUzphiHSKw7de4cHR1ViyZdmaAal3pk2R5rUO5B+/7Mh6RGWmvzooOB7nymZkTesKf8zPS/iMjkutAMOzawwbM2zDpfm3AwkltC0K53ZwgTqQAa51BNamzf5CK6KSY6PliTH4C5LX0M7YKG4bcJzyaFywYdUfV4Ps/fiJeLznSimz06ELNvjWsXvNOrkT0v9xi7NF+Xpe/8U6T/KhxJU9ldH2Y1DSnJD1yTmfhPpTcfB13gXCglN+GMS59d4NL25bXli01ZnsAEbek5NQ9I6Lz851B7XqTbnqp4xKpA1Q43chYDDjNIs/WmPSPeqIg0595UfTD0XYf9cZKXCIeVUwLu8mLt0SynWgUXAqX3RY/DHUMQTCfpJBYUGYhd6ixYitTeXvsf+RJ3KbRHbtrOTcLcDqX1WUpFUTLF7H61EdVZEpy2LIkgPTJ9Kwf48tb7c0Qxc5ycfSjEQaJhI+XHVI28RHpGcz+u+RYNZYuY4Uca5qtRNsNMm09jpNxQBiZaNR6yM56dEkvf14=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV8PR12MB9620.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(7416014)(366016)(23010399003)(11063799006)(10067099003)(56012099006)(18002099003)(22082099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?ZHhKbDVyWlgrc1FQZTBzcm5tV3hVcFp4UkkvMkR0VncvOU1tRk1PL2tUdllV?=
- =?utf-8?B?amZES3pxc1dnSDJlYWk5N2dQN2MxRitTa1NOSldtNC9UWFJaalh1K01Id2di?=
- =?utf-8?B?LzdsZkZ4N1IxbnpHV1M4Y0d2Y0JvUXpZaVA4R01VcGJVUC9jS0xDVGpUdm9Z?=
- =?utf-8?B?ZWhDU0czQ01sMVlWOWtESzc3MTUrbE5ldjJEbE9maFVHaXJsZmVhbXlyeS9I?=
- =?utf-8?B?a3JjTFd5WmVmSVlMOW8xbTRyYnBadURrUUNiUkRwU3l2Y3lYZXprMThvM2Rm?=
- =?utf-8?B?d0tiRjlVSlNGNlFvTHA3b2dEVG0zdDNhcU5sUTdrNUV5aCtvL2t2QUcwM2F4?=
- =?utf-8?B?ZXFXK0hrR05XUU16WjNHMHJiRHVIdmVXTXp1Y2EvTXRhMnZUMUJJc3M4MUlo?=
- =?utf-8?B?L0RCbEZOQjhueU1lSkkwaitvNmduN281elZ4WUVvLzNjbXpzMDBHSFdvL3dH?=
- =?utf-8?B?YzJCcmZxSXdjTTYyQTI2SHE0a0Zrczg0OWxyVnc2T3IzbUY0dnpIdklwbEc5?=
- =?utf-8?B?SXhRcmwzQmo4L1Vwd1E4bmduTDZPSXRic1V4QnU3KzRUeHBqSDdVYTFlcGx2?=
- =?utf-8?B?b2lCWlVieWlvRUQybER5alRlQzlIY1ArbVFua2lNd2tPelJYMEg1anZTS3I1?=
- =?utf-8?B?RjZWZ2NhL1E0NklzYmZQQ0pqNXBIcmhhRFR4bEJpQVp0NGtTT2hEdkZEbW9r?=
- =?utf-8?B?MW0xKzkxcklCcHhuZEgwMG81LzEwRXlIKzl5R3J1UnpJeUxVWVRrRGlsTGkx?=
- =?utf-8?B?UHRlRFFSZkovRmdISktpYm85WHNHT0RURld2TmZhUXN3SjZ0c0NBeHRuaTFS?=
- =?utf-8?B?emRBNzBIZHhMKzg2NnppaFEvQXQvNjl4cmk2TUhzaTRvRDhXMmh5N3BCZWdE?=
- =?utf-8?B?U2RmM09lV2Z6STY1bHEzL1NraGtPUlZzUzRvSlhHV2FVWXdQN2hSSzFIMDBa?=
- =?utf-8?B?bGNidDNURzl0akFQb0ZNTDJDbVhzenFIR2FTelB4S1hsRTYyZit2MmtqOXk3?=
- =?utf-8?B?WTAyZkcra1hiOTF2dFJ6RUxBMUtqQlIrN0JHM2doZERjUUMxb3NleEVkVDlS?=
- =?utf-8?B?bGxTbzE3aWl2dklxbldwVWhpSm5Ua1NFbVZsSUl4NjdnWXRRejJKVlRxVE03?=
- =?utf-8?B?K0FPelBHbmpMZldHSDVvNU5WYkVFZ3RSV3ltUWRERlJWODVkU2lJcEVkQmlW?=
- =?utf-8?B?ZFhZZW14RXpRdnozQmZobjVkMFZlZ3ViMmwzaG11TDR1V1BYYVZoMk5sMS9O?=
- =?utf-8?B?NXd5bGRDbEZSMFJEaWVxTDh6MDVUdUlBSjhIQVZjQ0Z3Vk13WW0rR3dIYW5m?=
- =?utf-8?B?dHFYL2lHb05kbWhlbnBSek9USW1rUXdOSWpkREtqSy9nSERKdlZWbkF4ZkRh?=
- =?utf-8?B?VTJxdTI1d0JNOEdZVElXZk9OalExZFNudkQ2K3ZLNnFKd0FUQmdLY0tmSFdG?=
- =?utf-8?B?NUd3Q29HNE1lZWNBb3JOcG1jeW5NWno1S0JQMk5md2RtY0Z5aDhMMlFEb2NI?=
- =?utf-8?B?WnhPbW5DWWU5RTlZYTYrTzlvMUowcU5hK3lvTGV4N3BhNEtETmlXVG1sUG9o?=
- =?utf-8?B?WENVbVo0RVBKYk9GeDJmY2hTcjV4RERwaFhMKzZEV1ExMy8ycWV2U3FTVTV3?=
- =?utf-8?B?VkNFc1Q3cndDZzBaaURCa3BacEl1TkhBNkF3Ulp3ZGJBbEZEa3gxWGNrRDd3?=
- =?utf-8?B?TlhEVDVRSjBEYjlQL0xqZ0NmczlWU254YWFVdnVxMmxDb0ZZcUxSbnMrRnQz?=
- =?utf-8?B?ejdEdHJxQWFKUFRMVDl4L1lLOUpNZFByM1dMcTlDMnRmdHFNbUR4SThteDRY?=
- =?utf-8?B?K2tqdEg0a1JjNjUyLzlxTENGTC9meXJpdE9mWVg5N3FDcE9TZkRGRXJiVDVS?=
- =?utf-8?B?K2VQQjlxQmk0VUltekE2bTFURVpiVjQ1Sjc0OXlTbnhYRmpwU0FLNXF1R05S?=
- =?utf-8?B?VzJsQk96TFUvZERCNU1NakhmdlJVNUNBb1VtSXBLQ0RaOG1qbmNkaFhkejdF?=
- =?utf-8?B?WDUxQzdqZnJsK0FaNmlQWXhmSTdjTkpSZFhKTUNsRTM4VzZ2OFdNOU0zSFNX?=
- =?utf-8?B?WHZFMGZ4MzRUSjAyb3gyVkdCVm41UUN3OEU0RTdLR0R3WWRJdlYwWnVFMm1k?=
- =?utf-8?B?TTFkdlNSZnpMWDJiL25FNTV1d2wzWTFOV2JxN2ZrNHRxc2huRUVnWmJtczg5?=
- =?utf-8?B?d2pjYnRLUXZSSVVwVG1PMWxPWTlWVElCYWsrNjhxUDVtelFzMGlRblprUk1J?=
- =?utf-8?B?RGlPNFd5dUlwRVBGYWszOG5oUkl5Y0JWZWZjbFY2NzMxcWZmNkxDWWtadWZr?=
- =?utf-8?Q?Op0gUUnLfLVoE3bjr2?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d9fe8e27-7c03-4f75-6e42-08df02ebcf84
-X-MS-Exchange-CrossTenant-AuthSource: LV8PR12MB9620.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Aug 2026 20:59:53.4459
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: QWem1SX1BXSzOsz5FBjDMWD5GHR4oxp1zHrh++PWInG+gzjNoPr8euJzZenEZ8Dj
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB8215
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAKkGjmoC/yXMQQqEMAxA0atI1gZqtCJzlcFFbVONMDq0KoJ4d
+ 6su3+L/AyIH4Qif7IDAm0SZp4Qiz8AOZuoZxSUDKapVQxpN+NUVaupkwc1gSb7wlXVKKwcp+gf
+ 2sj/Db/s6rt3IdrkvcJ4X9NTgIXIAAAA=
+X-Change-ID: 20260825-arm64-52bit-va-32f1f4cd050d
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+ Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
+ Steffen Eiden <seiden@linux.ibm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Zenghui Yu <yuzenghui@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+ Shuah Khan <shuah@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+ kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Itaru Kitayama <itaru.kitayama@fujitsu.com>, 
+ Takayuki Okamoto <tokamoto@fujitsu.com>
+X-Mailer: b4 0.16.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1787692718; l=1855;
+ i=itaru.kitayama@fujitsu.com; s=20260825; h=from:subject:message-id;
+ bh=DCkh7zwFwuSOe5fTMEye2Oh1ZEjE4In2M9Rjx+1yMUE=;
+ b=7XNu/jkIySZnSwyMNQ95NlahI1x9xVp4JU7Z8qoAENLXI9Bg2Mlv4Us0xIz4cTk1mLd3wberh
+ apmDZOfqdp8Ag/eP9I4BBkHtOVzEu9B1BccGPvdg0H+ylcLNTr/ecuV
+X-Developer-Key: i=itaru.kitayama@fujitsu.com; a=ed25519;
+ pk=g9bTnr9giRP7JwNSZHy+OMLQZBEUtSE9tUnXso0hH1Y=
 
-> This is v7 of pKVM SMMUv3 support with trap and emulate
+This patch series extends the arm64 KVM selftest framework
+to support 52-bit guest virtual address (VA) modes in addition to
+the existing 52-bit physical address (PA) configurations.
+The motivation is to enable validation of LPA2 guest memory-management
+behaviour in configurations that use a 52-bit VA space.
+While the selftest framework already supports testing 52-bit PA
+configurations, it lacks the ability to exercise guests running with
+52-bit virtual addresses, leaving part of the LPA2 functionality untested.
+To address this, the series introduces new guest modes for 52-bit VA
+operation, adds five-level page table support where required, and
+performs runtime detection of host 52-bit VA capability so that
+LPA2-enabled guest VA tests are executed only on supported systems.
 
-I tried to compile it:
+Testing:
 
-ld.lld-21: error: undefined symbol: __kvm_nvhe_iova_bitmap_set
->>> referenced by __kvm_nvhe_io-pgtable-arm.c
->>>               arch/arm64/kvm/hyp/nvhe/kvm_nvhe.o:(__kvm_nvhe_visit_dirty) in archive vmlinux.a
+Built and tested on arm64.
+Verified on QEMU with a V52-capable guest configuration.
+Confirmed correct operation of high virtual address mappings by
+exercising guest memory accesses in the 52-bit VA range.
 
-I think it is because I have CONFIG_IOMMUFD turned on.
+Signed-off-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+Reviewed-by: Takayuki Okamoto <tokamoto@fujitsu.com>
+---
+Itaru Kitayama (2):
+      KVM: selftest: arm64: Support 5-level paging in stage 1 translation table
+      KVM: selftests: arm64: Add 52-bit VA guest modes
 
--#if IS_ENABLED(CONFIG_IOMMUFD_DRIVER)
-+#if IS_ENABLED(CONFIG_IOMMUFD_DRIVER) && !IS_ENABLED(__KVM_NVHE_HYPERVISOR__)
- struct iova_bitmap *iova_bitmap_alloc(unsigned long iova, size_t length,
+ .../selftests/kvm/include/arm64/processor.h        |  2 +
+ tools/testing/selftests/kvm/include/kvm_util.h     |  3 +
+ tools/testing/selftests/kvm/lib/arm64/processor.c  | 87 ++++++++++++++++++++--
+ tools/testing/selftests/kvm/lib/guest_modes.c      |  5 ++
+ tools/testing/selftests/kvm/lib/kvm_util.c         | 11 +++
+ 5 files changed, 103 insertions(+), 5 deletions(-)
+---
+base-commit: 8d3ae59288f1e7d58d76558a6ee96d533bc5019f
+change-id: 20260825-arm64-52bit-va-32f1f4cd050d
 
-?
+Best regards,
+--  
+Itaru Kitayama <itaru.kitayama@fujitsu.com>
 
--- 
-Jason
