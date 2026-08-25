@@ -1,320 +1,104 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta1.migadu.com (out-78.mta1.migadu.com [95.215.58.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6920340282;
-	Tue, 25 Aug 2026 16:02:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FF2D38BF75
+	for <kvmarm@lists.linux.dev>; Tue, 25 Aug 2026 16:42:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787673723; cv=none; b=AwnyUn0Q07jTmRBhCG+M16VrQiUKEjsv668HW6HDowX72YXTpfCoGFh3YHOExvvVz+Q43qp9X6z5bzEsZSJBlmIp7sEkL3MJUayK1CJZIt6s5aFKGHbk2JY785r064EigpaBNURGaRB3FQNRkWGsVf/M8Hpm95Pz1Q9T0fz4HSs=
+	t=1787676150; cv=none; b=Hw+u2MS66VNMSNidSV0oFBtvwb3gdNy0fe8MfqZbP6qFJnZmbJm3Fo7EGqM8CJCulPOnX0qdTCV3Zo7zjGdNCfaO/IuYF+1LvdHrbH+rf70EJIqeAVPJ/zmdbJTsWz7gG3VHwgVhwSLn8YoRaeWgGMqBN/vzGlkf3/9CJzwEwaQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787673723; c=relaxed/simple;
-	bh=bIU/5QqTt2sESium66hjDrMvxvN9oUs89PlIyr+xpII=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=aUZLZto5KmOSkoErLAguezbT0gCerBnRiRrY05T8J4baOmLD4Q8HiAZhSzXnHQ1hbpEwo1WLkEUQWG6iBvRg01tEX1YqeTseXpYA04bIkQY5B6ZRxidAT26AKl+KaHBi6dG3cwmkI6WnylmUj+8RK35nH2R+zH6JR6J1EgP+EH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZQ2fKSMB; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1787676150; c=relaxed/simple;
+	bh=m4Ir8Cavv78G8+hX1oUwWO13M0HehJctD/4dIgHdMAc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dVvHAciGhQ0iHD/QR28m+N2/eTbBRwKHdtF8832XxJXCUJvtB8kmUFK1lzY5mNCrNBsp2aEo6tQvs3dikz/mcewkPLAhUXL59BzZsDKcnO1NRQzbJBfh77DTEyHa93rifus5Fq2HNOMO0g45d2Gdy0MJKwJIceLf0/JVhtLYwUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=oXzYqLhF; arc=none smtp.client-ip=95.215.58.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZQ2fKSMB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B32971F000E9;
-	Tue, 25 Aug 2026 16:01:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787673721;
-	bh=tcKcgTzP/MaC1TKqD0rXntx2zTo0kP8ybCcblQSok4Q=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=ZQ2fKSMB51ICm8a+uQ7XhMAdLeWtrzaJjIxUqvCXFYKol3tlFUd4AeOGCcJf8JVWB
-	 AcbHuBEKV6I+Cf+jJD2cmjF5CVXyFzNayEUqS34AZwMmakPJshLz8TZ8XAmvfRX9y1
-	 2ZdOmbtRt8cUJUUXMAUsIjeggGUOmSHg2rKxekC+1NV7XfvPm8ZiV5XIkIhHdPEfvH
-	 fzfzT/iKbB6F+55FhYFN75bOwWayybPWtneyUEHzX/3tZDCkbNyU578qTAyLn9JEMw
-	 k5bLFZDq14Lpvx0vUz2QjEYdIlUGSDHEnIJDtQADg3HebMt3dA7WxkCzXjhqxB7Z/H
-	 bjljMnkItf9Rw==
-From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Date: Tue, 25 Aug 2026 17:00:42 +0100
-Subject: [PATCH 8/8] KVM: selftests: Add nested pre-fault test for arm64
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="oXzYqLhF"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=m4Ir8Cavv78G8+hX1oUwWO13M0HehJctD/4dIgHdMAc=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1787676145; v=1; x=1788280945;
+ b=oXzYqLhFaBc18cwa1SLhpAo7QhuxWELEZC2ZEVZO2nElJqnUdjqzLQuyODS4k7u9JXOHXxzW
+ xe1/jv68a0SprmKRoGo9YY969KeeziGKL9TmHR89D5qO9vMQP0Wzww75wlY7ADlDs03c9Yml4uw
+ Wr79I1WdT5mnEJ8L6loVAV9A=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: from claudy.local (2a01:4b00:ad36:1d00:3a05:25ff:fe33:35a9)
+	by smtp.migadu.com with ESMTPS id 78016a66fb8f874d;
+	Tue, 25 Aug 2026 16:42:25 +0000
+X-Mizu-Trace-ID: 78016a66fb8f874d
+X-Migadu-Flow: FLOW_OUT
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Mark Brown <broonie@kernel.org>,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Fuad Tabba <tabba@google.com>
+Subject: [PATCH v4 0/2] arm64: Clamp ID overrides and gate the GMID_EL1 read
+Date: Tue, 25 Aug 2026 17:42:17 +0100
+Message-Id: <20260825164219.3347229-1-fuad.tabba@linux.dev>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260825-kvm-arm-prefault-v1-8-befe8947702e@kernel.org>
-References: <20260825-kvm-arm-prefault-v1-0-befe8947702e@kernel.org>
-In-Reply-To: <20260825-kvm-arm-prefault-v1-0-befe8947702e@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>, 
- Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, 
- Oliver Upton <oupton@kernel.org>, Fuad Tabba <tabba@google.com>, 
- Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Zenghui Yu <yuzenghui@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, 
- Jonathan Corbet <corbet@lwn.net>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, Jack Thomson <jackabt@amazon.com>, 
- Jack Thomson <jackabt.amazon@gmail.com>, 
- Alexandru Elisei <alexandru.elisei@arm.com>, 
- Vincent Donnefort <vdonnefort@google.com>, 
- "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, 
- Sean Christopherson <seanjc@google.com>, 
- Claudio Imbrenda <imbrenda@linux.ibm.com>, 
- Leo Soares Passos <Leo.Bras@arm.com>, 
- "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=8041; i=ljs@kernel.org;
- h=from:subject:message-id; bh=uxEB4tWFsMMdxFr1BeaQVWSs7h76x9U+I63sFxRh9hg=;
- b=owGbwMvMwCV2fu7ZrsZH9SKMp9WSGLJ69zgrtNl/tlib23ByjswG0aAD067fmScoZsIqZ/0rb
- d8s/z3WHaUsDGJcDLJiiizPv4jvDxIJm9d5wd8NZg4rE8gQBi5OAZjI8TkM/2y9Ik/v1grsPSJU
- 0617vtbsU+/yFTFx9pF9970/nk1QD2NkWLfgRvf2Mv1qbbFZCSZuQkpKHtbPllgoLN+W6SK086A
- DBwA=
-X-Developer-Key: i=ljs@kernel.org; a=openpgp;
- fpr=E7F417BF5214569E89D04F46CF9DCD8A81E27F14
+Content-Transfer-Encoding: 8bit
 
-From: Jack Thomson <jackabt@amazon.com>
+Hi folks,
 
-Add an arm64 nested-virt selftest for KVM_PRE_FAULT_MEMORY. The guest
-enters vEL1 and exits to userspace with a nested/shadow stage-2 MMU as
-the vCPU's last-run context.
+Changes since v3 [1]:
+  - Gate on __read_sysreg_by_encoding() and drop the helper's argument,
+    so the command-line override is not open-coded in the header.
+    (Catalin)
+  - Pick up Suzuki's override clamp as patch 1, rather than adding a
+    raw-presence check to the gate. (Will)
 
-Before prefaulting, userspace enables HCR_EL2.VM and points VTTBR_EL2 at
-an empty nested stage-2 root. A prefault implementation that incorrectly
-treats the userspace GPA as an L2 IPA will fail the ioctl; the correct
-path targets the canonical stage-2 and succeeds.
+Patch 2 fixes a GMID_EL1 read that traps to EL2 when the kernel has
+disabled MTE, panicking the host under pKVM on a CPU that is offlined
+and brought back online. It gates the read on
+__read_sysreg_by_encoding().
 
-Restore the original nested state before resuming the guest, then touch
-the prefaulted range to check that vEL1 still runs correctly.
+That needs patch 1, Suzuki's override clamp [2]. Without it
+__read_sysreg_by_encoding() applies the command-line override raw, so
+id_aa64pfr1.mte=2 on a CPU without FEAT_MTE2 makes the gate true and the
+kernel reads a GMID_EL1 that is not there. On the boot CPU that read
+comes before init_cpu_ftr_reg() strips the unsafe override, so the gate
+cannot rely on it.
 
-Signed-off-by: Jack Thomson <jackabt@amazon.com>
-[ljs: partial progress, >4 KiB pgsize, commit msg, comment fixups]
-Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
----
- tools/testing/selftests/kvm/Makefile.kvm           |   1 +
- .../selftests/kvm/arm64/nv_pre_fault_memory_test.c | 206 +++++++++++++++++++++
- 2 files changed, 207 insertions(+)
+Tested on QEMU under pKVM. With -machine virt,mte=on, offlining and
+onlining CPU1 with arm64.nomte panics an unpatched v7.2 in
+__cpuinfo_store_cpu() and does not with the series. Without tag memory,
+where QEMU implements no GMID_EL1, id_aa64pfr1.mte=2 covers the
+force-up case.
 
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index 66a9a4e62888..1e0edd0f99f7 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -173,6 +173,7 @@ TEST_GEN_PROGS_arm64 += arm64/debug-exceptions
- TEST_GEN_PROGS_arm64 += arm64/hello_el2
- TEST_GEN_PROGS_arm64 += arm64/host_sve
- TEST_GEN_PROGS_arm64 += arm64/hypercalls
-+TEST_GEN_PROGS_arm64 += arm64/nv_pre_fault_memory_test
- TEST_GEN_PROGS_arm64 += arm64/external_aborts
- TEST_GEN_PROGS_arm64 += arm64/mmio_sign_ext
- TEST_GEN_PROGS_arm64 += arm64/page_fault_test
-diff --git a/tools/testing/selftests/kvm/arm64/nv_pre_fault_memory_test.c b/tools/testing/selftests/kvm/arm64/nv_pre_fault_memory_test.c
-new file mode 100644
-index 000000000000..b3833aea2a34
---- /dev/null
-+++ b/tools/testing/selftests/kvm/arm64/nv_pre_fault_memory_test.c
-@@ -0,0 +1,206 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * nv_pre_fault_memory_test - Test KVM_PRE_FAULT_MEMORY on a vCPU whose
-+ * last-run context is nested.
-+ *
-+ * The guest starts at vEL2, mirrors its EL2 translation regime into the
-+ * real EL1 registers, drops HCR_EL2.TGE and ERETs to vEL1, then exits to
-+ * userspace from vEL1 so that the vCPU's last-run context selects a
-+ * shadow stage-2 MMU. Userspace then enables an empty nested stage-2
-+ * before prefaulting. Prefaulting must target the canonical stage-2,
-+ * regardless of the vCPU's nested state.
-+ */
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "test_util.h"
-+#include "ucall.h"
-+
-+#include <asm/sysreg.h>
-+#include <linux/sizes.h>
-+
-+#define TEST_MEM_SLOT		10
-+#define NESTED_S2_ROOT_SLOT	11
-+#define TEST_MEM_SIZE		SZ_2M
-+#define TEST_MEM_GPA		SZ_1G
-+#define NESTED_S2_ROOT_GPA	(TEST_MEM_GPA + TEST_MEM_SIZE)
-+
-+struct nested_s2_state {
-+	u64 hcr_el2;
-+	u64 vttbr_el2;
-+};
-+
-+static void guest_el1_code(void)
-+{
-+	u64 offset;
-+
-+	GUEST_ASSERT_EQ(get_current_el(), 1);
-+
-+	/* Exit to userspace with the vEL1 (nested) context live. */
-+	GUEST_SYNC(1);
-+
-+	/*
-+	 * Touch the prefaulted range. vstage-2 is disabled, so the shadow
-+	 * stage-2 is a 1:1 view of the canonical IPA space.
-+	 */
-+	for (offset = 0; offset < TEST_MEM_SIZE; offset += SZ_4K)
-+		READ_ONCE(*(u64 *)(TEST_MEM_GPA + offset));
-+
-+	GUEST_DONE();
-+}
-+
-+static void guest_code(void)
-+{
-+	u64 sp;
-+
-+	GUEST_ASSERT_EQ(get_current_el(), 2);
-+
-+	/*
-+	 * Mirror the EL2 translation regime into the real EL1 registers so
-+	 * that vEL1 runs on the test's stage-1 page tables. With E2H=1, the
-+	 * _EL1 accessors read the EL2 registers, and the _EL12 accessors
-+	 * write the real EL1 registers.
-+	 */
-+	write_sysreg_s(read_sysreg(sctlr_el1), SYS_SCTLR_EL12);
-+	write_sysreg_s(read_sysreg(tcr_el1), SYS_TCR_EL12);
-+	write_sysreg_s(read_sysreg(ttbr0_el1), SYS_TTBR0_EL12);
-+	write_sysreg_s(read_sysreg(mair_el1), SYS_MAIR_EL12);
-+	write_sysreg_s(read_sysreg(cpacr_el1), SYS_CPACR_EL12);
-+
-+	/* Run vEL1 on the same stack. */
-+	asm volatile("mov %0, sp" : "=r"(sp));
-+	write_sysreg(sp, sp_el1);
-+
-+	/*
-+	 * Drop TGE so that vEL1 is a nested context rather than host EL0.
-+	 * KVM backs it with a shadow stage-2 MMU even though vstage-2 is
-+	 * disabled (HCR_EL2.VM=0).
-+	 */
-+	write_sysreg(read_sysreg(hcr_el2) & ~HCR_EL2_TGE, hcr_el2);
-+	isb();
-+
-+	write_sysreg(PSR_MODE_EL1h | PSR_F_BIT | PSR_I_BIT | PSR_A_BIT |
-+		     PSR_D_BIT, spsr_el2);
-+	write_sysreg((u64)guest_el1_code, elr_el2);
-+	asm volatile("eret");
-+
-+	GUEST_ASSERT(false);
-+}
-+
-+static void pre_fault(struct kvm_vcpu *vcpu, u64 gpa, u64 size)
-+{
-+	struct kvm_pre_fault_memory range = {
-+		.gpa = gpa,
-+		.size = size,
-+	};
-+	int ret;
-+
-+	do {
-+		ret = __vcpu_ioctl(vcpu, KVM_PRE_FAULT_MEMORY, &range);
-+	} while ((!ret && range.size) ||
-+		 (ret < 0 && (errno == EINTR || errno == EAGAIN)));
-+
-+	TEST_ASSERT(!ret, "KVM_PRE_FAULT_MEMORY failed, ret: %d errno: %d",
-+		    ret, errno);
-+	TEST_ASSERT_EQ(range.size, 0);
-+}
-+
-+static struct nested_s2_state enable_empty_nested_s2(struct kvm_vcpu *vcpu)
-+{
-+	struct nested_s2_state state = {
-+		.hcr_el2 = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_HCR_EL2)),
-+		.vttbr_el2 = vcpu_get_reg(vcpu,
-+					   KVM_ARM64_SYS_REG(SYS_VTTBR_EL2)),
-+	};
-+
-+	TEST_ASSERT(!(state.hcr_el2 & HCR_EL2_TGE),
-+		    "vCPU should be in nested/vEL1 context");
-+
-+	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_VTTBR_EL2),
-+		     NESTED_S2_ROOT_GPA);
-+	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_HCR_EL2),
-+		     state.hcr_el2 | HCR_EL2_VM);
-+
-+	return state;
-+}
-+
-+static void restore_nested_s2(struct kvm_vcpu *vcpu,
-+			      struct nested_s2_state *state)
-+{
-+	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_HCR_EL2), state->hcr_el2);
-+	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_VTTBR_EL2),
-+		     state->vttbr_el2);
-+}
-+
-+int main(void)
-+{
-+	struct nested_s2_state s2;
-+	struct kvm_vcpu_init init;
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	struct ucall uc;
-+	u64 npages;
-+
-+	TEST_REQUIRE(kvm_check_cap(KVM_CAP_ARM_EL2));
-+	TEST_REQUIRE(kvm_check_cap(KVM_CAP_PRE_FAULT_MEMORY));
-+
-+	vm = vm_create(1);
-+
-+	kvm_get_default_vcpu_target(vm, &init);
-+	init.features[0] |= BIT(KVM_ARM_VCPU_HAS_EL2);
-+	vcpu = aarch64_vcpu_add(vm, 0, &init, guest_code);
-+	kvm_arch_vm_finalize_vcpus(vm);
-+
-+	npages = TEST_MEM_SIZE / vm->page_size;
-+	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, TEST_MEM_GPA,
-+				    TEST_MEM_SLOT, npages, 0);
-+	virt_map(vm, TEST_MEM_GPA, TEST_MEM_GPA, npages);
-+
-+	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
-+				    NESTED_S2_ROOT_GPA, NESTED_S2_ROOT_SLOT,
-+				    vm_adjust_num_guest_pages(vm->mode, 1), 0);
-+
-+	/* Run the guest until it has ERET'd from vEL2 to vEL1. */
-+	vcpu_run(vcpu);
-+	switch (get_ucall(vcpu, &uc)) {
-+	case UCALL_SYNC:
-+		TEST_ASSERT_EQ(uc.args[1], 1);
-+		break;
-+	case UCALL_ABORT:
-+		REPORT_GUEST_ASSERT(uc);
-+		break;
-+	default:
-+		TEST_FAIL("Unhandled ucall: %ld", uc.cmd);
-+	}
-+
-+	/*
-+	 * The vCPU's last-run context is vEL1, backed by a shadow stage-2
-+	 * MMU. Enable nested stage-2 with an empty root so that the ioctl
-+	 * fails if it tries to interpret the userspace GPA as an L2 IPA.
-+	 *
-+	 * Prefault in two halves so that the second ioctl exercises a
-+	 * repeated shadow-MMU attach and canonical stage-2 swap.
-+	 *
-+	 * (Note that an implementation that wrongly populates shadow
-+	 * stage-2 page tables would not be caught as userland can't
-+	 * inspect these.)
-+	 */
-+	s2 = enable_empty_nested_s2(vcpu);
-+	pre_fault(vcpu, TEST_MEM_GPA, TEST_MEM_SIZE / 2);
-+	pre_fault(vcpu, TEST_MEM_GPA + TEST_MEM_SIZE / 2, TEST_MEM_SIZE / 2);
-+	restore_nested_s2(vcpu, &s2);
-+
-+	/* Resume at vEL1 and touch the prefaulted range. */
-+	vcpu_run(vcpu);
-+	switch (get_ucall(vcpu, &uc)) {
-+	case UCALL_DONE:
-+		break;
-+	case UCALL_ABORT:
-+		REPORT_GUEST_ASSERT(uc);
-+		break;
-+	default:
-+		TEST_FAIL("Unhandled ucall: %ld", uc.cmd);
-+	}
-+
-+	kvm_vm_free(vm);
-+	return 0;
-+}
+Based on Linux 7.2 (8d3ae59288f1e).
+
+Cheers,
+/fuad
+
+[1] https://lore.kernel.org/all/20260824184155.2644646-1-fuad.tabba@linux.dev/
+[2] https://lore.kernel.org/all/afc5bd00-28ca-413b-b047-ee53589c285d@arm.com/
+
+Fuad Tabba (1):
+  arm64: Don't read GMID_EL1 when MTE is disabled
+
+Suzuki K Poulose (1):
+  arm64: Apply overrides to CPU local capabilities
+
+ arch/arm64/include/asm/cpufeature.h |  9 ++++++
+ arch/arm64/kernel/cpufeature.c      | 48 +++++++++++++++++++++--------
+ arch/arm64/kernel/cpuinfo.c         |  2 +-
+ 3 files changed, 46 insertions(+), 13 deletions(-)
 
 -- 
-2.55.0
+2.39.5
 
