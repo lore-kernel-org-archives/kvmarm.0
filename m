@@ -1,314 +1,177 @@
-Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com [209.85.214.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90DB13B7B79
-	for <kvmarm@lists.linux.dev>; Wed, 26 Aug 2026 09:02:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71AEF345EA9
+	for <kvmarm@lists.linux.dev>; Wed, 26 Aug 2026 09:38:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787734938; cv=none; b=n8OaDJnGT7gAJ+EAs4EEcHxuy085/b8Us0Zl6fSUnCmPvdUZPsmk32Gq92xmUq3WAuKxdvuvu5E4/fxWq7aEPiXRhmnEurKyFJWDmwX24lUbZSiSC6IvWpFG9+xwPDmsUWcR2LpOISMzmluWUCJE/dumlWD7489DQTYhTOosbRU=
+	t=1787737086; cv=none; b=ov95KfPokgSFGNUP1IB4LWKfPzyh5FJKf3wYKnJNxRbn5mU19rXWCjsKQ7IAxNXXJpTA8ZiftdEDdddCfQtwpeK1k6rguShr/yuorHNHh6tO9XuMm2Gct6B4pa8fPC5D+7XSF8i1wVUqrU6bVyEjTR3nPem1jV4epG+ms+MSOmw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787734938; c=relaxed/simple;
-	bh=EuG4Bw/IwxonT7NoYlGbm2ezLAZ4QQJbygHjHjvFx1U=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=cZZv+soYA2RLVRRq7Kim+xowaBgepIJ22zOIHMQvcmBB+0SCx+LkzxpfySaGTM0iI255ALP1DZpv6euJGTOct+TvXn9cTaMlZjhVgr6VndeTvRsrp/eTx5FapQMBFyTx0e4q9yuV2rXPeXfHeVNSOWNlFdfBohzsSmd7NrKZ8VA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qY0tyHA8; arc=none smtp.client-ip=209.85.214.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+	s=arc-20240116; t=1787737086; c=relaxed/simple;
+	bh=JC+ONpHwSsdaWBESNo65yVYlUc+YWDBzZjFOHWnegEo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:content-type; b=dmeNBhoV98A5Sqaln++KF5rSbpNZc4CXsDMrTGLVfOdMLLbDyrpO+v20AgCpuGAsb9ck6hjZ3ydkikVMarkPTMvxpujQQ8yYAC8jiJpkGek0jsKYdWu5WxEWZPILxLIv4tTb0SMJWRhtKJAqZCCialosYBzdwWjqphQoHtP2OaY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HB8lsnac; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qY0tyHA8"
-Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-2d6f75c1219so16960585ad.3
-        for <kvmarm@lists.linux.dev>; Wed, 26 Aug 2026 02:02:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1787734931; x=1788339731; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=jLtAYTqZ8m2gVWkFMzaTBxqNZtYSobzX0FvE5dD3wNU=;
-        b=qY0tyHA8Uyz5QXvoF59mymr7mZCCCaOxiqqFOAfm7iU0z2igNi5rQqHlDpwolt47ne
-         rTEYCnNO/BTjHlv1xFvDTQbKRiqHVGrrxPFzX9EM8zkl9LeBuONMoKgdb6a4EmtiMDMt
-         6m4TwGbHnIadr+dZISoCZBJVWC6JYm0RGQyiVyIyEnIp3aX0NO94bRlAdoLLiKU+1Qdw
-         JrxxtY74LmHfUEBvQgJR3GcOa7vBd+Yh6kSsKUUvWXeW9HGEAp8QUe3VRTi82aB6rOKV
-         HkKhI5+CG/6F30+JKjhu3hHayiUr6cMDSZEUht45ogaSMPZjnSg79niV6UPLjS+kGiEV
-         wq5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787734931; x=1788339731;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=jLtAYTqZ8m2gVWkFMzaTBxqNZtYSobzX0FvE5dD3wNU=;
-        b=Oj/BAjTPZJKBQQKNDyWkzHWxVQfefe4fKgaRSEbplXdIi0LmctsyjN0Z1KQH8TgO9F
-         pIJk2HiPG4GEmgBLcJoeQfNhx5ZQKzg+SpO0d/m+DaRwJtPumC4GDYrc3A9QLSvp5MuA
-         NIMhaK1bI8K+56S8W6sQZFVNttTYRFCwUAdeKRY2OCyFnpmtqes0j1xUJDkFanvBaCS6
-         GA3TIdVbD7SQtRhRCwWBxGAOdOmz3DyHJYETGmk4QkVZc/z0kGKi9XnJCMx0ab57pxP+
-         5jiGSEbp8ZXdxg0uPeNZQSS8GZeysZfLnIDeLT9Oob2cvgu78vx+nKJ+2BCk8wEM7y2l
-         YaaA==
-X-Forwarded-Encrypted: i=1; AHgh+Rq+JvBYxxJxP3rCRz16yJ4enQTdjzv+2PZGegpq2JBdFScReBBZYJwPdQd4SBp838TWXgp9Ylc=@lists.linux.dev
-X-Gm-Message-State: AFuF++kL1Zx4VJ3TyoId72uWuozs+hUmeNiepFsgePetvOZ70VMj9R9N
-	4VKoGIn6UiHF4HjwXBqwbyyXK5bqUu2qBgWXcmcAiH96S5HxqxTHfvfGzPBJATPWeIsMY8Yp2dW
-	NNYu718rPAz+etOQRZoEFmp2uXQ==
-X-Received: from plkq13.prod.google.com ([2002:a17:902:edcd:b0:2cb:6ca0:1248])
- (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:902:cf0f:b0:2cf:ccc2:6088 with SMTP id d9443c01a7336-2d7079d7abdmr97226905ad.4.1787734930475;
- Wed, 26 Aug 2026 02:02:10 -0700 (PDT)
-Date: Wed, 26 Aug 2026 09:01:50 +0000
-In-Reply-To: <20260826-gmem-no-return-page-v4-0-3bb9c1ddb4e3@google.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HB8lsnac"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1787737083;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=FJp4l3dVaEpF/wIz9uWIw4z6hu4ommx+SYhUrHPTo8Y=;
+	b=HB8lsnacQu0pvPoGrRTRlvsi9apHX5AEjXxN01Fw/a5wq0WR6NmXBWwTvQU+infWXF/3yG
+	lPpSlfpob9nULNBIOsfcZrqvvysxMGAk4iLvDj1x6U81RXcA/psRJbN8QJqEGJQfqWsAQq
+	aNyCJyLCPecnzK94EW9gijCGTeJTEKM=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-423-4WQ0XhNRN4aW_93gmPkCsA-1; Wed,
+ 26 Aug 2026 05:37:59 -0400
+X-MC-Unique: 4WQ0XhNRN4aW_93gmPkCsA-1
+X-Mimecast-MFC-AGG-ID: 4WQ0XhNRN4aW_93gmPkCsA_1787737077
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CA9B21953988;
+	Wed, 26 Aug 2026 09:37:56 +0000 (UTC)
+Received: from laptop.redhat.com (unknown [10.44.48.93])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7F4CB1955F05;
+	Wed, 26 Aug 2026 09:37:49 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com,
+	eric.auger@redhat.com,
+	qemu-devel@nongnu.org,
+	qemu-arm@nongnu.org,
+	kvmarm@lists.linux.dev,
+	peter.maydell@linaro.org,
+	shaju.abraham@nutanix.com,
+	khushit.shah@nutanix.com,
+	yangjinqian1@huawei.com,
+	cohuck@redhat.com,
+	richard.henderson@linaro.org,
+	sebott@redhat.com,
+	skolothumtho@nvidia.com,
+	philmd@oss.qualcomm.com
+Cc: maz@kernel.org,
+	oliver.upton@linux.dev,
+	pbonzini@redhat.com,
+	armbru@redhat.com,
+	berrange@redhat.com,
+	abologna@redhat.com,
+	jdenemar@redhat.com
+Subject: [RFC PATCH v8 00/20] kvm/arm: Introduce a customizable aarch64 KVM host model
+Date: Wed, 26 Aug 2026 11:36:05 +0200
+Message-ID: <20260826093747.1670077-1-eric.auger@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20260826-gmem-no-return-page-v4-0-3bb9c1ddb4e3@google.com>
-X-Developer-Key: i=ackerleytng@google.com; a=ed25519; pk=sAZDYXdm6Iz8FHitpHeFlCMXwabodTm7p8/3/8xUxuU=
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1787734920; l=8731;
- i=ackerleytng@google.com; s=20260225; h=from:subject:message-id;
- bh=nQHQvdfVTe8YWF07i/KIfGAKndM7sUZ07Zir0Zm3JhM=; b=7O/YDRidiYyfgNPRedNkaCXKwFh2juYusyUvJu78qdc3QMByvSs6i/jUYXaHo7huBUVQkQgYa
- OlaPL1guJ3aBqO9gSzVN8dFDMXou2keyNE93y8J56B67HXEqHhNIYMx
-X-Mailer: b4 0.16.0
-Message-ID: <20260826-gmem-no-return-page-v4-5-3bb9c1ddb4e3@google.com>
-Subject: [PATCH v4 5/5] KVM: guest_memfd: Stop returning struct page from PFN lookup
-From: Ackerley Tng <ackerleytng@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Ashish Kalra <ashish.kalra@amd.com>, 
-	Michael Roth <michael.roth@amd.com>, Brijesh Singh <brijesh.singh@amd.com>, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, David Hildenbrand <david@kernel.org>, Yan Zhao <yan.y.zhao@intel.com>, 
-	"Edgecombe, Rick P" <rick.p.edgecombe@intel.com>, Vishal Annapurve <vannapurve@google.com>, 
-	Fuad Tabba <fuad.tabba@linux.dev>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	Ackerley Tng <ackerleytng@google.com>
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-Mimecast-MFC-PROC-ID: LjcjtmmwhIWC5lmo9R6uigP8VfaXC3IFRJaT2q6EAgQ_1787737077
+X-Mimecast-Originator: redhat.com
+Content-Transfer-Encoding: 8bit
+content-type: text/plain; charset="US-ASCII"; x-default=true
 
-From: Sean Christopherson <seanjc@google.com>
+This series enhances the current host KVM model with capability to
+set writable ID reg fields.
 
-KVM currently expects guest_memfd PFN lookups to return a refcounted struct
-page, which callers hold across fault handling.
+Since v6.7 kernel, KVM/arm allows the userspace to overwrite the values
+of a subset of ID regs. The list of writable fields continues to grow.
+The feature ID range is defined as the AArch64 System register space
+with op0==3, op1=={0, 1, 3}, CRn==0, CRm=={0-7}, op2=={0-7}.
 
-Drop the page's refcount before returning from kvm_gmem_get_pfn() to
-prepare for the in-place conversions series.
+The end goal is to get more flexibility when migrating guests
+between different host hardware.
 
-CoCo shared-to-private conversion handling must inspect folio refcounts to
-ensure exclusive ownership by guest_memfd. A concurrent guest page fault
-taking a temporary reference on the folio causes conversions to fail due to
-an elevated refcount.
+QEMU retrieves the writable ID fields from KVM UAPI [1] and
+match them against a generated description of ID regs and their
+named fields that stem from AARCHMRS Registers.json file.
+Current description is based on latest 2026-03 edition.
+The content of the generated files was compared against kernel
+linux/arch/arm64/tools/sysreg file. It is not straightforward
+to have unit tests for python scripts as there are many cases for
+field extraction.
 
-While this refcount is also taken on host userspace page faults, that
-refcount is taken on behalf of the host userspace page tables. This
-refcount will be dropped when conversions unmaps the page. Either way, once
-there's an mmap() or userspace mapping, the pages are open to way more
-refcounts, transient or not. This patch focuses on just dropping refcounts
-before handing KVM a page.
+For each writable named field a uint64 property is created
+following the "SYSREG_<REG>_<FIELD>" naming convention. REG and
+FIELD names are those described in ARM ARM Reference manual.
 
-guest_memfd already notifies KVM of page invalidations, so callers within
-KVM only need to respect the MMU invalidation protocol to safely rely on
-guest_memfd for page presence.
+The list of SYSREG_ID properties can be retrieved through the qmp
+monitor using query-cpu-model-expansion.
 
-Since the page refcounts are dropped, don't return the struct page pointer.
+Connie & Eric
 
-Not returning the struct page from the guest_memfd PFN lookup moves KVM
-closer toward supporting memory backends that are not backed by struct
-page.
+This series can be found at:
+https://github.com/eauger/qemu/tree/arm-cpu-model-v8
 
-Here are some notes on the cleanup in the callers of kvm_gmem_get_pfn():
+History:
+--------
+v7 -> v8:
+- fixed make check errors
+- removed demux regs from cpu-sysregs.h.inc
+- Proper handling of ValueRange messed up on v7
+- removed ArmIdRegArchVal
+- introduced kvm_arm_create_scratch_max_host_vcpu and pass
+  error handle to kvm_arm_create_scratch_host_vcpu()
 
-kvm_release_faultin_page() in ARM's gmem_abort() originally also serves to
-set the page dirty and accessed under some conditions. The dirty and
-accessed flags don't matter for guest_memfd anyway, so it is safe to just
-drop the call to kvm_release_faultin_page().
 
-For ARM's kvm_translate_vncr(), the local page pointer must be initialized
-to NULL so that the shared cleanup path that releases faulted-in pages
-safely no-ops for guest_memfd.
+Cornelia Huck (3):
+  target/arm/kvm: Retrieve writable ID reg map
+  arm/cpu-features: document ID reg properties
+  arm-qmp-cmds: introspection for ID register props
 
-For x86, no additional changes are required in the MMU fault path because
-the page fault tracking structure is zero-initialized at the start of page
-fault handling, ensuring the refcounted page pointer is already NULL.
+Eric Auger (16):
+  scripts: introduce scripts/update-aarch64-cpu-sysregs-header.py
+  target/arm/cpu-sysregs.h.inc: Sort by name alphabetical order
+  target/arm/cpu-sysregs.h.inc: Update with automatic generation
+  arm/cpu: Add infra to handle generated ID register definitions
+  scripts: Introduce scripts/aarch64_sysreg_helpers module
+  scripts: Introduce scripts/update-aarch64-cpu-sysreg-properties.py
+  target/arm/cpu-idregs.h.inc: generate with script
+  target/arm/cpu-idregs.h.inc: Generate enum values
+  arm/kvm: Initialize all writable ID registers from host
+  target/arm/kvm: Introduce kvm_arm_expose_idreg_properties
+  target/arm/cpu: Expose writable ID reg field properties on the kvm
+    host vcpu model
+  target/arm/cpu-idregs.h.inc: Generate reserved fields
+  target/arm/kvm: Ignore and trace unexpected writable reserved fields
+  target/arm/kvm: add utility to write idregs in scratch vcpu
+  target/arm/kvm: Add an error handle to
+    kvm_arm_create_scratch_host_vcpu
+  kvm: Introduce kvm_arm_create_scratch_max_host_vcpu
 
-Reported-by: Yan Zhao <yan.y.zhao@intel.com>
-Closes: https://lore.kernel.org/all/anZ4W9o5pTWIEgMY@yzhao56-desk.sh.intel.com/
-Signed-off-by: Sean Christopherson <seanjc@google.com>
-Co-developed-by: Yan Zhao <yan.y.zhao@intel.com>
-Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-Reviewed-by: Michael Roth <michael.roth@amd.com>
-Tested-by: Michael Roth <michael.roth@amd.com>
-Tested-by: Yan Zhao <yan.y.zhao@intel.com>
-Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
-Tested-by: Fuad Tabba <fuad.tabba@linux.dev>
-Co-developed-by: Ackerley Tng <ackerleytng@google.com>
-Signed-off-by: Ackerley Tng <ackerleytng@google.com>
----
- arch/arm64/kvm/mmu.c     | 4 +---
- arch/arm64/kvm/nested.c  | 4 ++--
- arch/x86/kvm/mmu/mmu.c   | 2 +-
- arch/x86/kvm/svm/sev.c   | 8 ++------
- include/linux/kvm_host.h | 6 ++----
- virt/kvm/guest_memfd.c   | 9 ++-------
- 6 files changed, 10 insertions(+), 23 deletions(-)
+Shaju Abraham (1):
+  target/arm/cpu_idregs: generate tables for Arm64 ID registers and
+    fields
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 9ba86450fe4af..d57f8181f1b7d 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1613,7 +1613,6 @@ static int gmem_abort(const struct kvm_s2_fault_desc *s2fd)
- 	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
- 	struct kvm_pgtable *pgt = s2fd->vcpu->arch.hw_mmu->pgt;
- 	unsigned long mmu_seq;
--	struct page *page;
- 	struct kvm *kvm = s2fd->vcpu->kvm;
- 	void *memcache = NULL;
- 	kvm_pfn_t pfn;
-@@ -1641,7 +1640,7 @@ static int gmem_abort(const struct kvm_s2_fault_desc *s2fd)
- 	/* Pairs with the smp_wmb() in kvm_mmu_invalidate_end(). */
- 	smp_rmb();
- 
--	ret = kvm_gmem_get_pfn(kvm, s2fd->memslot, gfn, &pfn, &page, NULL);
-+	ret = kvm_gmem_get_pfn(kvm, s2fd->memslot, gfn, &pfn, NULL);
- 	if (ret) {
- 		kvm_prepare_memory_fault_exit(s2fd->vcpu, s2fd->fault_ipa, PAGE_SIZE,
- 					      write_fault, exec_fault, false);
-@@ -1681,7 +1680,6 @@ static int gmem_abort(const struct kvm_s2_fault_desc *s2fd)
- 	}
- 
- out_unlock:
--	kvm_release_faultin_page(kvm, page, !!ret, prot & KVM_PGTABLE_PROT_W);
- 	kvm_fault_unlock(kvm);
- 
- 	if ((prot & KVM_PGTABLE_PROT_W) && !ret)
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 17123f0b6daba..dd62840d36741 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -1415,7 +1415,7 @@ static int kvm_translate_vncr(struct kvm_vcpu *vcpu, bool *is_gmem)
- 	bool write_fault, writable;
- 	unsigned long mmu_seq;
- 	struct vncr_tlb *vt;
--	struct page *page;
-+	struct page *page = NULL;
- 	u64 va, pfn, gfn;
- 	int ret;
- 
-@@ -1471,7 +1471,7 @@ static int kvm_translate_vncr(struct kvm_vcpu *vcpu, bool *is_gmem)
- 			return -EFAULT;
- 		}
- 	} else {
--		ret = kvm_gmem_get_pfn(vcpu->kvm, memslot, gfn, &pfn, &page, NULL);
-+		ret = kvm_gmem_get_pfn(vcpu->kvm, memslot, gfn, &pfn, NULL);
- 		if (ret) {
- 			kvm_prepare_memory_fault_exit(vcpu, vt->wr.pa, PAGE_SIZE,
- 					      write_fault, false, false);
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 064ecc33b9267..947c9cd843450 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4628,7 +4628,7 @@ static int kvm_mmu_faultin_pfn_gmem(struct kvm_vcpu *vcpu,
- 	}
- 
- 	r = kvm_gmem_get_pfn(vcpu->kvm, fault->slot, fault->gfn, &fault->pfn,
--			     &fault->refcounted_page, &max_order);
-+			     &max_order);
- 	if (r) {
- 		kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
- 		return r;
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index f094b19226b92..0a887f8e05d3a 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -4032,7 +4032,6 @@ static void __sev_snp_reload_vmsa(struct kvm_vcpu *vcpu, gpa_t gpa)
- 	struct kvm *kvm = vcpu->kvm;
- 	gfn_t gfn = gpa_to_gfn(gpa);
- 	unsigned long mmu_seq;
--	struct page *page;
- 	kvm_pfn_t pfn;
- 
- 	lockdep_assert_held(&svm->sev_es.snp_vmsa_mutex);
-@@ -4076,9 +4075,8 @@ static void __sev_snp_reload_vmsa(struct kvm_vcpu *vcpu, gpa_t gpa)
- 	 * The new VMSA will be private memory guest memory, so retrieve the
- 	 * PFN from the gmem backend.
- 	 */
--	if (kvm_gmem_get_pfn(vcpu->kvm, slot, gfn, &pfn, &page, NULL))
-+	if (kvm_gmem_get_pfn(vcpu->kvm, slot, gfn, &pfn, NULL))
- 		return;
--	kvm_release_page_clean(page);
- 
- 	read_lock(&kvm->mmu_lock);
- 	/*
-@@ -5019,7 +5017,6 @@ void sev_handle_rmp_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code)
- 	struct kvm *kvm = vcpu->kvm;
- 	int order, rmp_level, ret;
- 	unsigned long mmu_seq;
--	struct page *page;
- 	bool assigned;
- 	kvm_pfn_t pfn;
- 	gfn_t gfn;
-@@ -5049,13 +5046,12 @@ void sev_handle_rmp_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code)
- 	mmu_seq = kvm->mmu_invalidate_seq;
- 	smp_rmb();
- 
--	ret = kvm_gmem_get_pfn(kvm, slot, gfn, &pfn, &page, &order);
-+	ret = kvm_gmem_get_pfn(kvm, slot, gfn, &pfn, &order);
- 	if (ret) {
- 		pr_warn_ratelimited("SEV: Unexpected RMP fault, no backing page for private GPA 0x%llx\n",
- 				    gpa);
- 		return;
- 	}
--	kvm_release_page_unused(page);
- 
- 	ret = snp_lookup_rmpentry(pfn, &assigned, &rmp_level);
- 	if (ret || !assigned) {
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 03bfc92864b6e..502465119ca0c 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -2586,13 +2586,11 @@ static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
- 
- #ifdef CONFIG_KVM_GUEST_MEMFD
- int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
--		     gfn_t gfn, kvm_pfn_t *pfn, struct page **page,
--		     int *max_order);
-+		     gfn_t gfn, kvm_pfn_t *pfn, int *max_order);
- #else
- static inline int kvm_gmem_get_pfn(struct kvm *kvm,
- 				   struct kvm_memory_slot *slot, gfn_t gfn,
--				   kvm_pfn_t *pfn, struct page **page,
--				   int *max_order)
-+				   kvm_pfn_t *pfn, int *max_order)
- {
- 	KVM_BUG_ON(1, kvm);
- 	return -EIO;
-diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-index b596486d184ca..589762140c3ef 100644
---- a/virt/kvm/guest_memfd.c
-+++ b/virt/kvm/guest_memfd.c
-@@ -751,8 +751,7 @@ static struct folio *__kvm_gmem_get_pfn(struct file *file,
- }
- 
- int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
--		     gfn_t gfn, kvm_pfn_t *pfn, struct page **page,
--		     int *max_order)
-+		     gfn_t gfn, kvm_pfn_t *pfn, int *max_order)
- {
- 	pgoff_t index = kvm_gmem_get_index(slot, gfn);
- 	struct folio *folio;
-@@ -780,11 +779,7 @@ int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
- #endif
- 
- 	folio_unlock(folio);
--
--	if (!r)
--		*page = folio_file_page(folio, index);
--	else
--		folio_put(folio);
-+	folio_put(folio);
- 
- 	return r;
- }
+ docs/system/arm/cpu-features.rst              |  106 +-
+ target/arm/cpu-idregs.h                       |   36 +
+ target/arm/kvm_arm.h                          |   36 +-
+ target/arm/cpu-idregs.h.inc                   | 2512 +++++++++++++++++
+ target/arm/cpu-sysregs.h.inc                  |   55 +-
+ target/arm/arm-qmp-cmds.c                     |   73 +
+ target/arm/cpu-idregs.c                       |   96 +
+ target/arm/cpu64.c                            |    5 +
+ target/arm/kvm-stub.c                         |   18 +
+ target/arm/kvm.c                              |  480 +++-
+ scripts/aarch64_sysreg_helpers.py             |  121 +
+ .../update-aarch64-cpu-sysreg-properties.py   |  299 ++
+ scripts/update-aarch64-cpu-sysregs-header.py  |   51 +
+ target/arm/meson.build                        |    1 +
+ target/arm/trace-events                       |    8 +
+ 15 files changed, 3813 insertions(+), 84 deletions(-)
+ create mode 100644 target/arm/cpu-idregs.h
+ create mode 100644 target/arm/cpu-idregs.h.inc
+ create mode 100644 target/arm/cpu-idregs.c
+ create mode 100644 scripts/aarch64_sysreg_helpers.py
+ create mode 100644 scripts/update-aarch64-cpu-sysreg-properties.py
+ create mode 100755 scripts/update-aarch64-cpu-sysregs-header.py
 
 -- 
-2.55.0.887.g758fc8c411-goog
+2.53.0
 
