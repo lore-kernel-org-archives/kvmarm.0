@@ -1,280 +1,166 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83E8D348883
-	for <kvmarm@lists.linux.dev>; Wed, 26 Aug 2026 09:40:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EDAA3A48ED
+	for <kvmarm@lists.linux.dev>; Wed, 26 Aug 2026 09:44:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787737219; cv=none; b=qeQyO3plmaVBvFt4pzJ6IcTfyVpVmJ/fqYbLN7xU9dJDzAr3aagi036MyqQaUfWNJJ+uHRzQ4H93mfLnBawwr6UwqN71/9kkNne0GpLN1zB484L21xvj7EPttebwcbwuksYHyq7gXKFYRbukrq6dq9412YIOfDcYpfpPWky/6HY=
+	t=1787737469; cv=none; b=siDNhMyLD2FFYigBdIy8NevwBlUjpMfcaAh6EBdKdy5Z2JHduzmlPAcSdOj2y/1yondxGwyB+6tr5IZZ/EmxsHSjhNlVPxdZ6cQ9VEgKKydGpzIOMMuFlR9Wh3JantHVAqqVhy2j3nB3n7+YVDajTsOAHxD7wWdLBp0rh21Z03U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787737219; c=relaxed/simple;
-	bh=R57318t6NrSevFToot7SgyJlzklryqeJNGa00qlesLk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:content-type; b=EcHabYyfZSFNsUJauR5SQCZTLNN7kHJGWBy0n+xNF1bBubqZaS5q1wYv6gH6aFARiBaGShxv1s+EvF9CHfFST4xPc71K0Jgd86kegE/m3KPE6n0rDI7EJmoROCuLJYQjJ6F+5GI0boB3dbcM52ZS1xrhmIX6ggGYnEcV08OPskQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BgeQKtXw; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1787737469; c=relaxed/simple;
+	bh=9GuDmecgyVvxCQJOyCXGHOjgfhqUN7ivkB/e7B/dl2g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ksezoD/KTPntCGGJlWj58vKRfZf8adUI1SOEL7Esd/Upeyriu9iBo+QG6Ep2NGb7mEHM0Z8tyw7mOARBUPkk3kTzYQpY8U9I98TyylPbMEynVIDDF2c5gFs8zNizz1NFd38KJqTqgfhOmSYsoLqs4pLRxH804nqTaQaXkK1KWbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=f59f9pDy; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BgeQKtXw"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1787737216;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=a6iZu6rf5S/9O7j6BIxkBTfH3lHbl8hWJ/3LTvlTmQs=;
-	b=BgeQKtXwsnWok3JMmERv/QOW0T4JMYSvGBoQp2c9DkKMJ8WBAXR21t72cHMHJn3uYh1a2e
-	24/49OpH8FPZNJ0DXtc0azjkza+igIXpnM0B2OhD2ZuKkV6GgKjFV05MBDig81zmWTaOXm
-	RjxJUsckF4U0IcL4kKV/6WpquFpRDZ0=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-2-9uPRfy80NEqVJnmcp7WuyA-1; Wed,
- 26 Aug 2026 05:40:11 -0400
-X-MC-Unique: 9uPRfy80NEqVJnmcp7WuyA-1
-X-Mimecast-MFC-AGG-ID: 9uPRfy80NEqVJnmcp7WuyA_1787737208
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9693D197765F;
-	Wed, 26 Aug 2026 09:40:08 +0000 (UTC)
-Received: from laptop.redhat.com (unknown [10.44.48.93])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9A9021955F05;
-	Wed, 26 Aug 2026 09:40:02 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com,
-	eric.auger@redhat.com,
-	qemu-devel@nongnu.org,
-	qemu-arm@nongnu.org,
-	kvmarm@lists.linux.dev,
-	peter.maydell@linaro.org,
-	shaju.abraham@nutanix.com,
-	khushit.shah@nutanix.com,
-	yangjinqian1@huawei.com,
-	cohuck@redhat.com,
-	richard.henderson@linaro.org,
-	sebott@redhat.com,
-	skolothumtho@nvidia.com,
-	philmd@oss.qualcomm.com
-Cc: maz@kernel.org,
-	oliver.upton@linux.dev,
-	pbonzini@redhat.com,
-	armbru@redhat.com,
-	berrange@redhat.com,
-	abologna@redhat.com,
-	jdenemar@redhat.com
-Subject: [RFC PATCH v8 20/20] arm-qmp-cmds: introspection for ID register props
-Date: Wed, 26 Aug 2026 11:36:25 +0200
-Message-ID: <20260826093747.1670077-21-eric.auger@redhat.com>
-In-Reply-To: <20260826093747.1670077-1-eric.auger@redhat.com>
-References: <20260826093747.1670077-1-eric.auger@redhat.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="f59f9pDy"
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-499b1409a75so35815e9.1
+        for <kvmarm@lists.linux.dev>; Wed, 26 Aug 2026 02:44:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1787737465; x=1788342265; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=DCpGxFqreLjSVtJ1Gq5kxQUJHIsXo7AfwLCjemfnd9c=;
+        b=f59f9pDyq0XxLi/KXxBA5PNCzAd6tUTRlUJ2NP0NEmdnHA2zXjiXJS4qanoVyv9Uoi
+         v3+jWcLs+YUTCk93yISkvey6DRpb4pt0cePSy27Q7SiMs2ySIBRmy5xoUt/g1aOb103q
+         pMhqTKURuexb7yLiZMgEGYWZomzqWNwFa49iWWc5V7skseQ+hZn//DlU8fVggm1rnW0p
+         wAdKqHa9nlTg6PTcS+1JoD4HFIC4hwoLg4GztYT653Y3Sx7W+tc1eUQyU29l7XsIhYeM
+         RIeConBlN7olZ0KCL6eBAPMQtjJUUHMF0NR+1sDUTvD+Pnk/x99Z0WXJkEM1zwJyvnCK
+         bLdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787737465; x=1788342265;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=DCpGxFqreLjSVtJ1Gq5kxQUJHIsXo7AfwLCjemfnd9c=;
+        b=SCiJ+e/khEihPB5V3RjI7ickbx2rLSOgfGxttGcGn4Dq7UrTBtAv4mj9M7WFvYeD3l
+         aA7gKaYBcW4R2EyEBbsYxGOZejy4d7EUGNOQRuKWaSyHuZeE/eMui0siBHKIhMnIJhSC
+         RqsU2e/Gu2mQfTHS1swaxKv0pqnjygjy8UdlZkYMlgwym6XjHjM1vyEHZoiInuSd15LI
+         dubLZ6M5PmKsId6vGR5tzwB9DtXomtNb5SK360kCjHxgLm8Y5ULk5q7lPMW9JgvP/nEF
+         JMiRfAYAukLXqv69by91Nr9YQe7kU54m+DpX0zZmOz00nO823mh7/DrFwVS1DyYzDG+0
+         SqmQ==
+X-Forwarded-Encrypted: i=1; AHgh+RpupeTzAzy22aavfhQRD4d1ZNwIfUZdwn+4lCGFz8gcP+vPOcVFHmUDP3at7rn2M0MPqJQLHoY=@lists.linux.dev
+X-Gm-Message-State: AFuF++kdm3wQRgUO+2nTKfIDvqiS8eAplSYPLhf0BGX5UX1hUDah/oNr
+	inSnwzymlZiPYaEpfNPm/wDb4FVgVmd+AF4NW8aoOmZqK2Dyh+zg184g+kQK7m+1Zw==
+X-Gm-Gg: AR+sD13vDIscGhFhjsdv9YTI27AlnFpJHdei755pf8bkQ3apFGeA3G8rfcF/40uDnGg
+	NSFdFGQ7p1fHtm+An1n+LmOHD3NWck4lcIF4/06Akb8RBqo3hC06pUwmdL2IvoyF8jyQdGFzigr
+	8twYWmuiHCPvIgmT782cD8B5znOyXFR/oHrwL9lkPeeGOdONwrZevuLAo/tEzK6dgSQ6XM6DZjn
+	mrf2jTio4q6GyIRX6B5+ILGe5GP+B+bKzNizzetCEtxr/Kebj286OFqhXM3UV/AQJfR4+MHccVp
+	RMIi4JmxnOQIWUv75+4mNZegDX7x76Tgrl/oB0JpO1OlFkHPDdL3FuZVkc7zVw5ploPyjNvZ8/z
+	7n49LOutncr+pCdaTLJdQvA3uZMqRZXpcGCn7Juq3tY3ahl7pzuM0f0EKz4CZsCr7YP2uRac5Kn
+	M/pzu/1LsonaRW3Z5SpuGiPQNruBRwmEuE1ZC0FURKx2ICxtlMZedXfVWE4M3cANp7y5WW+LS1/
+	y/ABIVxFe40uORYudIVb0NW5LZWlQ==
+X-Received: by 2002:a05:600c:6085:b0:48a:623c:8859 with SMTP id 5b1f17b1804b1-499dda23078mr651695e9.7.1787737464409;
+        Wed, 26 Aug 2026 02:44:24 -0700 (PDT)
+Received: from google.com (250.192.189.35.bc.googleusercontent.com. [35.189.192.250])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-499dca8c75csm20805035e9.2.2026.08.26.02.44.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Aug 2026 02:44:23 -0700 (PDT)
+Date: Wed, 26 Aug 2026 09:44:20 +0000
+From: Mostafa Saleh <smostafa@google.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, iommu@lists.linux.dev,
+	catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
+	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, joro@8bytes.org, jgg@ziepe.ca,
+	mark.rutland@arm.com, qperret@google.com, tabba@google.com,
+	vdonnefort@google.com, sebastianene@google.com, keirf@google.com
+Subject: Re: [PATCH v7 05/24] iommu/arm-smmu-v3: Move IDR parsing to common
+ functions
+Message-ID: <ao61dMZqUEgC7huD@google.com>
+References: <20260715115906.2664882-1-smostafa@google.com>
+ <20260715115906.2664882-6-smostafa@google.com>
+ <178769159057.3356902.8176677714818911833.b4-review@b4>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
-X-Mimecast-MFC-PROC-ID: yLjcwTLSTKh-P7iorm0BTVDOWVFD4WwYzb6SzDIBxzA_1787737208
-X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-content-type: text/plain; charset="US-ASCII"; x-default=true
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <178769159057.3356902.8176677714818911833.b4-review@b4>
 
-From: Cornelia Huck <cohuck@redhat.com>
+On Tue, Aug 25, 2026 at 05:59:50PM -0300, Jason Gunthorpe wrote:
+> > [ ... 21 lines skipped ... ]
+> > +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-common-lib.c
+> > @@ -0,0 +1,184 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +/*
+> > + * Copyright (C) 2015 ARM Limited
+> > + *
+> > + * Author: Will Deacon <will.deacon@arm.com>
+> > + * Arm SMMUv3 driver functions shared with hypervisor.
+> > + */
+> > +
+> > +#include "arm-smmu-v3.h"
+> > +#include <asm-generic/errno-base.h>
+> > +
+> > +#include <linux/string.h>
+> > +
+> > +u32 smmu_idr0_features(u32 reg)
+> > +{
+> 
+> I think you should do more to make this shared C file usable by both
+> compiles with more of the infrastructure available.
+> 
+> For instance, something like this at the top:
+> 
+>  #ifdef __KVM_NVHE_HYPERVISOR__
+>  #include "pkvm/arm_smmu_v3.h"
+>  #define arm_smmu_device  hyp_arm_smmu_v3_device
+>  #else
+>  #include "arm-smmu-v3.h"
+>  #endif
+> 
+> (heh you used _ and the driver uses - in file names)
 
-Implement the capability to query available ID register values by
-adding SYSREG_* options and values to the cpu model expansion for the
-host model, if available.
+Yes, that's a bit ugly, I can rename it to arm-smmu-v3-hyp.h
 
-Here are some qmp-shell examples:
+> 
+> Then the existing code using 'arm_smmu_device' just works fine since
+> the hyp version has the same structure members. Now just move the code
+> as-is.
+> 
+> Otherwise we still have alot of cut and paste duplication:
+> 
+> 	reg = readl_relaxed(smmu->base + ARM_SMMU_IDR0);
+> 
+> 	smmu->features |= smmu_idr0_features(reg);
+> 	if (!(smmu->features & (ARM_SMMU_FEAT_TT_LE | ARM_SMMU_FEAT_TT_BE))) {
+> 		dev_err(smmu->dev, "unknown/unsupported TT endianness!\n");
+> 		return -ENXIO;
+> 	}
+> 
+> vs
+> 
+> 	reg = readl_relaxed(smmu->base + ARM_SMMU_IDR0);
+> 
+> 	smmu->features |= smmu_idr0_features(reg);
+> 	if (!(smmu->features & (ARM_SMMU_FEAT_TT_LE | ARM_SMMU_FEAT_TT_BE)))
+> 		return -ENXIO;
 
-(QEMU) query-cpu-model-expansion type=full model={"name":"host"}
-{"return": {"model": {"name": "host", "props": {"SYSREG_ID_AA64PFR0_EL1_EL3": 1,
-"SYSREG_ID_AA64ISAR2_EL1_CLRBHB": 0, "SYSREG_CTR_EL0_L1Ip": 3,
-"SYSREG_MIDR_EL1_PartNum": 3407, "SYSREG_CTR_EL0_DminLine": 4,
-"SYSREG_ID_AA64MMFR0_EL1_PARange": 5, "SYSREG_ID_AA64MMFR1_EL1_ECBHB": 0
-../..
+I am not sure I get this, the only difference is the printk?
 
-This allows the upper stack to detect available writable ID regs and
-the "host passthrough model" values.
+We can do more with that, but as discussed last time, I am worried that
+re-defining structs using macros just makes things harder for
+maintenance and more fragile to changes, causing build failures,
+and mismatch in types between the 2 structs.
+I can experiment with that when working on the next version and see
+if the there is significant benefits.
 
-It also allows to test some ID reg field values:
-(QEMU) query-cpu-model-expansion type=full model={"name":"host","props":{"SYSREG_ID_AA64ISAR0_EL1_DP":0x13}}
-{"error": {"class": "GenericError", "desc": "idreg SYSREG_ID_AA64ISAR0_EL1_DP set value (0x13) exceeds length of field (4)!"}}
+Thanks,
+Mostafa
 
-(QEMU) query-cpu-model-expansion type=full model={"name":"host","props":{"SYSREG_ID_AA64ISAR0_EL1_DP":0x2}}
-{"error": {"class": "GenericError", "desc": "idreg SYSREG_ID_AA64ISAR0_EL1_DP set value (0x2) does not match any arch valid enum value!"}}
-
-The following checks are performed:
-- the value does not exceed the field size
-- if the field is associated to enum values, the set value must be one
-  of those enum values
-- the value is applied against a scratch vcpu making sure the setting is
-  not rejected for this host
-
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-
----
-
-v7 -> v8:
-- do not check if the prop exists (this is checked elsewhere with a
-  different error message)
-- clarify that examples given in the commit msg are based on qmp-shell
-
-v5 -> v6:
-- add the write capability
----
- target/arm/arm-qmp-cmds.c | 73 +++++++++++++++++++++++++++++++++++++++
- target/arm/kvm-stub.c     |  5 +++
- 2 files changed, 78 insertions(+)
-
-diff --git a/target/arm/arm-qmp-cmds.c b/target/arm/arm-qmp-cmds.c
-index 83ec95c290..5fbdca3253 100644
---- a/target/arm/arm-qmp-cmds.c
-+++ b/target/arm/arm-qmp-cmds.c
-@@ -21,6 +21,7 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "qemu/target-info.h"
- #include "hw/core/boards.h"
- #include "kvm_arm.h"
-@@ -30,7 +31,10 @@
- #include "qapi/qapi-commands-machine.h"
- #include "qapi/qapi-commands-misc-arm.h"
- #include "qobject/qdict.h"
-+#include "qobject/qnum.h"
- #include "qom/qom-qobject.h"
-+#include <linux/kvm.h>
-+#include "system/kvm.h"
- #include "cpu.h"
- 
- static GICCapability *gic_cap_new(int version)
-@@ -84,11 +88,14 @@ CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionType type,
-                                                      Error **errp)
- {
-     CpuModelExpansionInfo *expansion_info;
-+    ObjectPropertyIterator iter;
-     const QDict *qdict_in;
-+    ObjectProperty *idregprop;
-     QDict *qdict_out;
-     ObjectClass *oc;
-     Object *obj;
-     const char *name;
-+    int fdarray[3];
-     int i;
- 
-     if (type != CPU_MODEL_EXPANSION_TYPE_FULL) {
-@@ -133,6 +140,17 @@ CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionType type,
- 
-     obj = object_new(object_class_get_name(oc));
- 
-+    if (kvm_enabled()) {
-+        uint32_t init_features0, target;
-+        bool success;
-+
-+        success = kvm_arm_create_scratch_max_host_vcpu(fdarray, &init_features0,
-+                                                       &target, errp);
-+        if (!success) {
-+            return NULL;
-+        }
-+    }
-+
-     if (model->props) {
-         Visitor *visitor;
-         Error *err = NULL;
-@@ -145,6 +163,45 @@ CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionType type,
-         }
- 
-         qdict_in = qobject_to(QDict, model->props);
-+
-+        for (const QDictEntry *entry = qdict_first(qdict_in);
-+                 entry != NULL; entry = qdict_next(qdict_in, entry)) {
-+            const char *key = qdict_entry_key(entry);
-+            QObject *val_obj = qdict_entry_value(entry);
-+            ObjectProperty *prop;
-+            Visitor *v;
-+            bool success;
-+            uint64_t val;
-+
-+            prop = object_property_find(obj, key);
-+
-+            if (!g_str_has_prefix(key, "SYSREG_")) {
-+                continue;
-+            }
-+
-+            /* consume the prop to avoid unexpected parameter */
-+            if (!visit_type_uint64(visitor, key, &val, errp)) {
-+                return NULL;
-+            }
-+
-+            v = qobject_input_visitor_new(val_obj);
-+
-+            if (!object_property_set(obj, key, v, errp)) {
-+                visit_free(v);
-+                return NULL;
-+            }
-+
-+            if (kvm_enabled()) {
-+                success = kvm_idreg_write_scratch_vcpu(fdarray[2], v, key,
-+                                                       prop->opaque, errp);
-+                if (!success) {
-+                    visit_free(v);
-+                    return NULL;
-+                }
-+            }
-+            visit_free(v);
-+        }
-+
-         i = 0;
-         while ((name = cpu_model_advertised_features[i++]) != NULL) {
-             if (qdict_get(qdict_in, name)) {
-@@ -160,6 +217,10 @@ CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionType type,
-         if (!err) {
-             arm_cpu_finalize_features(ARM_CPU(obj), &err);
-         }
-+
-+        if (kvm_enabled()) {
-+            kvm_arm_destroy_scratch_host_vcpu(fdarray);
-+        }
-         visit_end_struct(visitor, NULL);
-         visit_free(visitor);
-         if (err) {
-@@ -190,6 +251,18 @@ CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionType type,
-         }
-     }
- 
-+    object_property_iter_init(&iter, obj);
-+
-+    while ((idregprop = object_property_iter_next(&iter))) {
-+        QObject *value;
-+
-+        if (!g_str_has_prefix(idregprop->name, "SYSREG_")) {
-+            continue;
-+        }
-+        value = object_property_get_qobject(obj, idregprop->name, &error_abort);
-+        qdict_put_obj(qdict_out, idregprop->name, value);
-+    }
-+
-     if (!qdict_size(qdict_out)) {
-         qobject_unref(qdict_out);
-     } else {
-diff --git a/target/arm/kvm-stub.c b/target/arm/kvm-stub.c
-index 0d6c841a24..eae2e1ec2c 100644
---- a/target/arm/kvm-stub.c
-+++ b/target/arm/kvm-stub.c
-@@ -132,3 +132,8 @@ bool kvm_arm_create_scratch_max_host_vcpu(int *fdarray,
- {
-     g_assert_not_reached();
- }
-+
-+void kvm_arm_destroy_scratch_host_vcpu(int *fdarray)
-+{
-+    g_assert_not_reached();
-+}
--- 
-2.53.0
-
+> 
+> Then you can put the prior patches tlbi stuff here instead of the
+> header file, which is important because after I get the CONT and
+> errata stuff worked in it becomes really quite big.
+> 
+> -- 
+> Jason
