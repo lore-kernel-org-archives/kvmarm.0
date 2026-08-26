@@ -1,57 +1,57 @@
-Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com [209.85.215.199])
+Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com [209.85.215.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 926F13B777D
-	for <kvmarm@lists.linux.dev>; Wed, 26 Aug 2026 23:05:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FEC13911C6
+	for <kvmarm@lists.linux.dev>; Wed, 26 Aug 2026 23:05:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787785522; cv=none; b=iujylY2u7KEclku7sdK3bZtmIouuOBkcRp3y1k12YzFpSNJky9QNvWQrhQKGTljMCsNBDOSiG8HZhgVljsRmp/LNgSB8f3RzhsTclITNytY9rQhn1xP3t3CjccwnpbztNkxPMQUxmsdxsankofVveoL5g1By319VJJYdTd1MR68=
+	t=1787785529; cv=none; b=Kn3zo3KDpnXfbgCW0cdmExlefVZveAQkXBg6MUtfV7kd2AFcbUmoWIZWvyxLkU7Q6Z7uyzNO9lYqlRS6OIM7Wb1mRszqtHPWPNeltvJrxmRY4tvluhC2eQW2k2iGzLgoEdG4VFFi7JaAIhCe1/796iDOZtYDLG4VsQ8gSuZKFXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787785522; c=relaxed/simple;
-	bh=ihEFNvdsKZLFllAnEFHRtIRIdEUMLnHYDqRmMESDYIE=;
+	s=arc-20240116; t=1787785529; c=relaxed/simple;
+	bh=m3Lp8WMJLB/tampmgFN8ph5luv5ZjkhRNjnxAVae4ys=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=HxO5D3vmZdT1DpjD49KTEAfHeZoZrQoNaPeLviNZKnKMmuP5Sa4kzO6Pc4T+z7ldYZX95n8teA7tu6L+2AhM6IFuJeE3vpXz4yDvrADj/aAltCb7MTG6J0DybqNATeRd/AReGCvFCQIhW5AeqVfYNZauK8wquEdzPlO91+jtVLA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PfpY1HM/; arc=none smtp.client-ip=209.85.215.199
+	 To:Cc:Content-Type; b=F902wPP0KxXRevA/ZXhyvcLwXySlo03b29GMbFaEE7d9U8uBvQanDaIPAWMKW/UJEbkn1JjrxnwRGVPTZn3LjMkLaQwf1Xk5w/EAo8tOU0qtOnwkCKF64DN1BbjEIP8IhmFuPXS9xk6a8Dk2lj1mu9lw15VLTKmB19k624j9Hck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ictt+ncy; arc=none smtp.client-ip=209.85.215.198
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PfpY1HM/"
-Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-cb6cf425e86so1899314a12.1
-        for <kvmarm@lists.linux.dev>; Wed, 26 Aug 2026 16:05:19 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ictt+ncy"
+Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-c85798977dcso2110346a12.0
+        for <kvmarm@lists.linux.dev>; Wed, 26 Aug 2026 16:05:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1787785519; x=1788390319; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1787785523; x=1788390323; darn=lists.linux.dev;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:reply-to:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=7O76V/eNZATQNVf7YqKvmEoyxMF4aKASfVXbmkJmYVA=;
-        b=PfpY1HM/jhwTJHop1Gka6MV8B9XLq46Dg5bxIWqEBtVHgkoYesa6pztaq+NRSJCyIb
-         fQxOkUB8saVSqEGEI9Gx3YDCGJwbaaBExfrMMkIof6kIsICot18x4ohJ5lEWlx0eIs6S
-         +FgqqHBJj/uqlpCVmcom5B76xRbqyq1H+XKRLM1sTIwpQxBo7HFkHR/wU1qCI954z2xG
-         eTqMa0DmAw8RNvV0ijhBHwP/WX8xDDpTLVtWCCsZvZ7R7SY7ch1tvFBeCQlIQlhzwE7C
-         OlD2+4DaDd+5iQTASCpwsrL0RlMJCEcKphB/mVK95vs89MZtu60cFQxdS+AlLHt/Srdm
-         Nqkw==
+        bh=ypnv5ADnidmiHmk4i8NjwAmXQS3vAgk870JArYSva+A=;
+        b=Ictt+ncyFhq0rhgS1qr4JL5jyrbsjgkLUj0iyzMAWzVw301O/C79Bg4iCE/arGGY9W
+         GhVy1Db8qDJtm6IJydc0S/UUquLYzQoVt5tH+2DLV+V3GGxu3ux9fmJ33uB3pcGRu4wY
+         6Ifqya2naXq45hn5X5UtQi4i5FY6RCSOB3lq1ZH8W2Jc8VhOQLbItHXcqJfnjO/Q7IU1
+         pe/DJ5giTr+j5kztyKIyMMUH0KER4bCY/2lbq7t5IzeImjLVZyzLU7AdaKm0WPGajVqg
+         i/gf38/rl3qMYAOIdzTgLiAcXgs7ITOIBNwYakWEY861mCsJ8rAIzwmD0UvNcH11EadA
+         5ipQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787785519; x=1788390319;
+        d=1e100.net; s=20251104; t=1787785523; x=1788390323;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:reply-to:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=7O76V/eNZATQNVf7YqKvmEoyxMF4aKASfVXbmkJmYVA=;
-        b=Q6pSxqxw986c8ORXs6Y/jRItiApF5tpeDUpCzvPwckTGoi+X47AtOdewrOmqQ5KP0i
-         F+raFTbv1Rzb24y2wAq0RaD6cpIES06qHx6SxM0u0pLCuLG4J9wozJNu4SeBSJVCl95E
-         NlgC4EE64mCBGgNRI/WemZPYnX925Ih0mfzldR8BCEHCot78hS1NbwV/UWDVT1V5ZR9v
-         gnPRQ+DCcULnTH63S6Ujwu72t3dUH6v5y8dbPP2m8RJ6sFJapIMbZUkucjZ82zJOrgjy
-         b7t9EPRDxTaI3oa4EbEaD7wO0jEE0maDRry2aNbphp0YRWgci1yx5Wyd3wWqVEmYLolG
-         Ctmw==
-X-Forwarded-Encrypted: i=1; AHgh+RpY/PUecV0VO7rjTFtJU5XK3u3oMEp3hsL1xgbtT5UL00q9XU5qo+s2UwWrKQ6ySCHd140Ts/4=@lists.linux.dev
-X-Gm-Message-State: AFuF++ng16XDyqMIoXVJ9LI28ogkdoPD8xbw8vE9Za8g50Xpyn1MR7cL
-	8jX5uw2WYrnu4MGG3BROp86pwSw1/I7lles43cM98lloUImaWswPIt/Hi/UrdFaLznc6InKCq0E
-	4HvbSbw==
-X-Received: from pgby7-n2.prod.google.com ([2002:a05:6a02:6507:20b0:cbe:9dc7:9ee8])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:6f03:b0:3cd:9f0b:f788
- with SMTP id adf61e73a8af0-3cf83d1ef40mr22810769637.12.1787785518656; Wed, 26
- Aug 2026 16:05:18 -0700 (PDT)
+        bh=ypnv5ADnidmiHmk4i8NjwAmXQS3vAgk870JArYSva+A=;
+        b=ODx9G5XCeyn8uaV78DZhB5nwPmSuIsbHqBjkeWGuuA4HIhwigAs01gzv0HomDzCho8
+         KoaS21Gkz61Gn3bihYiYhS0c3oNOJVKbtH8opIxTlF65FnxK3nlQN1xFk/rXDqwyoyOc
+         Zw1seNoPes5c/KSiqPs0TVRFFNK873BJDufKImYAcFe9yX9kVWnlrDiIXjGmk0+6rLqW
+         ITtoIUVIrdgpyMZmKEad0EAMPQelVFDiTikCtyOdZp8J5ng7hLYsqMt8YxwJZPm2dKLW
+         PQaPuTcDjRM8jqONT1r7/gs3GFkPgHIARhrb6AC8LKfszF4Y3EsboF8m5h5Nh2DXHtz1
+         mtwA==
+X-Forwarded-Encrypted: i=1; AHgh+Rqb5eon79k4lkmlBIx0/JdTYFOxMUih/kEijhSsEr9+tYAlhc4geH1+kFg03Qx+Nmnv3GWJRe0=@lists.linux.dev
+X-Gm-Message-State: AFuF++kPOFasSUnehzZ9bU5P2sAZsUfbEC3iR4XOMll+9ZoQB9xhMZOm
+	7VJKcGJ8hogq0IZ5U7XdfuVmnlS5IV51xfDCu5maEJi+hN1vfKNOotkLrxCij35zy8Akq/UyeiU
+	pJhuB1Q==
+X-Received: from pghz21.prod.google.com ([2002:a63:e115:0:b0:cbe:ddc9:c670])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:a110:b0:3c3:33df:4d9a
+ with SMTP id adf61e73a8af0-3cf7596a65cmr18790428637.1.1787785522980; Wed, 26
+ Aug 2026 16:05:22 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 26 Aug 2026 16:04:54 -0700
+Date: Wed, 26 Aug 2026 16:04:57 -0700
 In-Reply-To: <20260826230511.972824-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,9 +61,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20260826230511.972824-1-seanjc@google.com>
 X-Mailer: git-send-email 2.55.0.887.g758fc8c411-goog
-Message-ID: <20260826230511.972824-4-seanjc@google.com>
-Subject: [PATCH 03/20] KVM: selftests: Use vm_alloc_page_table() to allocate
- LoongArch page tables
+Message-ID: <20260826230511.972824-7-seanjc@google.com>
+Subject: [PATCH 06/20] KVM: selftests: Extend page allocator to support
+ naturally aligned allocations
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
 	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
@@ -82,42 +82,78 @@ Cc: Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
 	Ritesh Harjani <ritesh.list@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Now that KVM_GUEST_PAGE_TABLE_MIN_PADDR == LOONGARCH_PAGE_TABLE_PHYS_MIN,
-use the common vm_alloc_page_table() instead of open coding the same.
+Extend the page allocator to support naturally aligned allocations, as some
+flavors of PowerPC page tables require multiple guest pages per table, and
+those tables need to be naturally aligned.
 
-Opportunistically drop the assert that the allocation succeeded, as the
-allocator itself guarantees success.
-
-For all intents and purposes, no functional change intended.
+Take care to align the potential base address *inside* the retry loop, i.e.
+the base needs to be (re)aligned on every attempt.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/lib/loongarch/processor.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+ tools/testing/selftests/kvm/include/kvm_util.h |  2 ++
+ tools/testing/selftests/kvm/lib/kvm_util.c     | 13 +++++++++++--
+ 2 files changed, 13 insertions(+), 2 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/lib/loongarch/processor.c b/tools/testing/selftests/kvm/lib/loongarch/processor.c
-index 47bbde3e205a..fcd41bc6fbda 100644
---- a/tools/testing/selftests/kvm/lib/loongarch/processor.c
-+++ b/tools/testing/selftests/kvm/lib/loongarch/processor.c
-@@ -9,7 +9,6 @@
- #include "processor.h"
- #include "ucall_common.h"
+diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+index b1c5597b1def..96c8251c224a 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util.h
++++ b/tools/testing/selftests/kvm/include/kvm_util.h
+@@ -991,6 +991,8 @@ void kvm_gsi_routing_write(struct kvm_vm *vm, struct kvm_irq_routing *routing);
+ const char *exit_reason_str(unsigned int exit_reason);
  
--#define LOONGARCH_PAGE_TABLE_PHYS_MIN		0x200000
- #define LOONGARCH_GUEST_STACK_VADDR_MIN		0x200000
+ gpa_t vm_phy_page_alloc(struct kvm_vm *vm, gpa_t min_gpa, u32 memslot);
++gpa_t ____vm_phy_pages_alloc(struct kvm_vm *vm, size_t nr_pages, gpa_t min_gpa,
++			     u32 memslot, bool protected, bool naturally_aligned);
+ gpa_t __vm_phy_pages_alloc(struct kvm_vm *vm, size_t nr_pages, gpa_t min_gpa,
+ 			   u32 memslot, bool protected);
+ gpa_t vm_alloc_page_table(struct kvm_vm *vm);
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index bbf6d7684c0c..896da440659e 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -17,6 +17,7 @@
+ #include <sys/stat.h>
+ #include <time.h>
+ #include <unistd.h>
++#include <linux/align.h>
+ #include <linux/kernel.h>
  
- static gpa_t invalid_pgtable[4];
-@@ -57,9 +56,7 @@ void virt_arch_pgd_alloc(struct kvm_vm *vm)
- 	child = table = 0;
- 	for (i = 0; i < vm->mmu.pgtable_levels; i++) {
- 		invalid_pgtable[i] = child;
--		table = vm_phy_page_alloc(vm, LOONGARCH_PAGE_TABLE_PHYS_MIN,
--				vm->memslots[MEM_REGION_PT]);
--		TEST_ASSERT(table, "Fail to allocate page tale at level %d\n", i);
-+		table = vm_alloc_page_table(vm);
- 		virt_set_pgtable(vm, table, child);
- 		child = table;
- 	}
+ #define KVM_UTIL_MIN_PFN	2
+@@ -2032,9 +2033,10 @@ const char *exit_reason_str(unsigned int exit_reason)
+  *
+  * Note, success is guaranteed!
+  */
+-gpa_t __vm_phy_pages_alloc(struct kvm_vm *vm, size_t nr_pages, gpa_t min_gpa,
+-			   u32 memslot, bool protected)
++gpa_t ____vm_phy_pages_alloc(struct kvm_vm *vm, size_t nr_pages, gpa_t min_gpa,
++			     u32 memslot, bool protected, bool naturally_aligned)
+ {
++	size_t alignment = naturally_aligned ? nr_pages : 1;
+ 	struct userspace_mem_region *region;
+ 	sparsebit_idx_t pg, base;
+ 
+@@ -2051,6 +2053,7 @@ gpa_t __vm_phy_pages_alloc(struct kvm_vm *vm, size_t nr_pages, gpa_t min_gpa,
+ 
+ 	base = min_gpa >> vm->page_shift;
+ again:
++	base = ALIGN(base, alignment);
+ 	for (pg = base; pg < base + nr_pages; ++pg) {
+ 		if (!sparsebit_is_set(region->unused_phy_pages, pg)) {
+ 			base = sparsebit_next_set(region->unused_phy_pages, pg);
+@@ -2077,6 +2080,12 @@ gpa_t __vm_phy_pages_alloc(struct kvm_vm *vm, size_t nr_pages, gpa_t min_gpa,
+ 	__builtin_unreachable();
+ }
+ 
++gpa_t __vm_phy_pages_alloc(struct kvm_vm *vm, size_t nr_pages, gpa_t min_gpa,
++			   u32 memslot, bool protected)
++{
++	return ____vm_phy_pages_alloc(vm, nr_pages, min_gpa, memslot, protected, false);
++}
++
+ gpa_t vm_phy_page_alloc(struct kvm_vm *vm, gpa_t min_gpa, u32 memslot)
+ {
+ 	return vm_phy_pages_alloc(vm, 1, min_gpa, memslot);
 -- 
 2.55.0.887.g758fc8c411-goog
 
