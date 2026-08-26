@@ -1,57 +1,57 @@
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com [209.85.214.200])
+Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com [209.85.214.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76D38331A53
-	for <kvmarm@lists.linux.dev>; Wed, 26 Aug 2026 23:05:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 721303DAAC3
+	for <kvmarm@lists.linux.dev>; Wed, 26 Aug 2026 23:05:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787785537; cv=none; b=QIY63brkURVFdkK2ya4BJwnrA7K1mnm6y753aEbcoCmoNCOxaIUWvj3oW3MWfwGJe1KWzPhU0oLwhNBZE454N+70dAQJfeAqvvlZcEfxE8fikI/OWNJDIuceWwONQUR1VVSC6wmmmcIgxZ8/5jt4QXzzr4Bb5RAPif5W3W7VD/A=
+	t=1787785539; cv=none; b=CFSv3WkeR+jXv0QgLG7X3CtqLhpKGGkhcKnupqlE1iTLC6rZOlI0/yyjOJhslYXBjiCMM2ErXj75Brnb6uIhELdRGRl9VQcQjHW69iWmYIRS5Baaga2d+JUv88HTPgUA4hLeFw9l8eWnsyFJ6lJ8EJXNQqBg++7wlW5S9emWVrQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787785537; c=relaxed/simple;
-	bh=vGtFww1PuxppHfkNm4nZY6ebSxcqiYn2V+uIZxWhPY4=;
+	s=arc-20240116; t=1787785539; c=relaxed/simple;
+	bh=tI28fyZgaxj3QeLG5gsP33C411QZoueUpyjlmbF4icU=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=WOnz1Satcw3XV1u1Ncu0yLIhTornq2CSs6nYTllasdSuy9mdjoVx73Up2gBdm7cy+4bWEKYkJySHLlHtCYH40cw/wzGTRUclQp/P/5//SGR3tO8vdryS5EA/uztnk9wzYIlRylmVzdANJxsXSjtJabCOGr73dmS3chNYm8XOmfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fqZxpoBX; arc=none smtp.client-ip=209.85.214.200
+	 To:Cc:Content-Type; b=SMnpeqhgcUMcAvqNmAoX7PUvhFHcA1UZ9nAmg16Em29HkdujhSp+gb8T3ZvGhegvSUMXSOohc+KGWrGagFuXEBZJdR1AVbvBg5G+40j5CLNig9OUvkQJtlJI3GN2+vV1+p70PUXftlpRU8+L9HlXnEX3zvKnqD9muvorxslRK6I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eh2E+nf/; arc=none smtp.client-ip=209.85.214.197
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fqZxpoBX"
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-2d52734fc41so31225905ad.1
-        for <kvmarm@lists.linux.dev>; Wed, 26 Aug 2026 16:05:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eh2E+nf/"
+Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-2d54187d8b0so36355365ad.0
+        for <kvmarm@lists.linux.dev>; Wed, 26 Aug 2026 16:05:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1787785533; x=1788390333; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1787785535; x=1788390335; darn=lists.linux.dev;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:reply-to:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=Qrd3Eszpzuyl+ARXBwnNOR4mn5401Rmq7plszPl1Tnk=;
-        b=fqZxpoBXNafjzPxPdOPuOYZPVG3KAKKmF5SQuMHaL+iVcepr5mK9qieEVD2QYQFaFB
-         LWwXbF+L9uWjVTlDcDm4jOc0mYPArlfEDRv89l7RgUKPU1S/2wXKLsZ0ilGwknWn4ile
-         WtLiZvVo/KBNF6wa/t6FgjVlt+7Mz+eNvWixUKIQtGpougPHzOdeopEdG1/KJ6pYzwA+
-         bP7lxRtI70VECioAEf8E7wf1m6XuX4R8Mb79QfS54PwZIA5dHuNpe8d0bqTbFunWC2VW
-         LE6UUgvjlWNiVOzViLs/DWme+4xLScUMLwDUpfaj+uhW1GZKeL1qx7pFCqlNqGlDmD9q
-         z9AA==
+        bh=lK9hNNEVcV137VJifUj1j8FlSQZ8ZR6EJrURDAfa97I=;
+        b=eh2E+nf/DxGTO4kAEQBN5maEyR0slWObEeBKlNIdi3RbClp+RpiRPnM3L6d7Wf0I3s
+         MnQSq4OySDCxQrsTNWmSKhbl0iMlzvTxujTybX2PAXSbvg1NF69OyPvp9HVBHH8mie7c
+         r04GYlvXAzFnN6feyHtt6pgn6vZLWM/YIohiD0thMlf3Z6//ZU9aDpSu3c4m0kjYETGF
+         rql6oqryqwr+H+z5UwKEBIy1WebaNkbxmsG6RNBM/idZ0tW+OZ/JrZeM7HUAHdRz2L7T
+         4YPyTU9PRZ3SOBcvurXwinEZSsBMnW8PZgd6/+qfy5IWJnS+ruab+4/L+ZxQGSRX2DzF
+         vRdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787785533; x=1788390333;
+        d=1e100.net; s=20251104; t=1787785535; x=1788390335;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:reply-to:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=Qrd3Eszpzuyl+ARXBwnNOR4mn5401Rmq7plszPl1Tnk=;
-        b=f/YpjEOanymTLf4bdn2ZmGxFzudGbHeuaxxnQFYQ0xJ/A03mJUVgRLcajSmApG6Kzk
-         i0U2Gm/b2dX1sy198IDpjFVKxqKmXkmWBjn2cIPtKi30eQyCJfJLwxnrsN+6EyhSTLs7
-         Ctm8sQ8z4Jse0mnioySEqN358aUgDg86B/AduyiqUst5daQR+eDHcGmGK+bWlCptfiWu
-         cTcQNEZQPlUXbrQqAvZ0EQdP+Y9Nw6OJZ0CSG1sH0RoMdMyFo7pZT0qPYdRkJHR1ttgM
-         Y+71aumSySbL9pwXpUOI88Ofe3kT29gMIyZ4BBX6ip20BmXMtwgTOt5sR0g6qOetYKhs
-         maIw==
-X-Forwarded-Encrypted: i=1; AHgh+Rq5471WickastbDn1Mrox7lJ14vPNmAtS4BhtiEVbB3qceTAbV7Ly6oqHbaeECWWNhb4TSoQT8=@lists.linux.dev
-X-Gm-Message-State: AFuF++kGeJO2iMfL71LtqaUN7ewv91zPIiOKMscHbf4I78743Tv4xfzh
-	Z2VNfxAqnTXjxBJYtO0uWkaN1Y0bBhwUjeHQTA1fXYmGvBnLLNBQE55W5yuIDnjGS99lQmJ5Cyg
-	UfW2I0g==
-X-Received: from plfn5.prod.google.com ([2002:a17:902:e545:b0:2cc:fd6e:8ff3])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:32c9:b0:2c9:df1b:e948
- with SMTP id d9443c01a7336-2d7079eb7e9mr183803125ad.4.1787785532402; Wed, 26
- Aug 2026 16:05:32 -0700 (PDT)
+        bh=lK9hNNEVcV137VJifUj1j8FlSQZ8ZR6EJrURDAfa97I=;
+        b=iwztKj6IXx0EJ0bArtv19+RWv3r3GbwkaDMEv8yapYSzW98PpBnTFEt03OggpJaHKs
+         jqlScOMIi3+UlE6njEoFaQ9vhdotqM3NCgrWCzJdLulqitxKkp+erCDgD+uxZkGXXvwB
+         LWOXfL9O1gJ+TAzX7showfx+spAg+o4qJ1DBTJ2NJLAnr4hHxn4iFcFxNxpwUIHgS0vV
+         J73uzr3nKNxy7Y4ENKPW9bKQiGfnrVPCqOCjls1Iah3UDxxadt5IUKnOqzC4wUEc95PQ
+         bLXdvkFs9MzIuNzxOwkdrH7YIf72bzf6AZPCIT1kJAme6sd8W5FwffTbQtGIh2ZCRjid
+         KN8w==
+X-Forwarded-Encrypted: i=1; AHgh+RqmAPOW0fdTiv+YiCU10D0JS2J569irthw3wuDyVKcGDL3o8gsZrQA1JBS4B4sHk+niWYwSLo0=@lists.linux.dev
+X-Gm-Message-State: AFuF++mrt+iVF2hGwlXuRH/HBpI5uDrbEgxFflJyoNvBi9CmDNJjeVbs
+	z3o9C0BQxbZ3AwEup9hdxq8bde9+vZqTw1XDvDMqDIOQnoH9QJ6fkzITchTHMuinUb4oZFT1taZ
+	om8J4VQ==
+X-Received: from plblc16.prod.google.com ([2002:a17:902:fa90:b0:2ce:9b92:ec60])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d4c7:b0:2ca:6d87:cda0
+ with SMTP id d9443c01a7336-2d7079fa6d5mr157756405ad.6.1787785534676; Wed, 26
+ Aug 2026 16:05:34 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 26 Aug 2026 16:05:04 -0700
+Date: Wed, 26 Aug 2026 16:05:06 -0700
 In-Reply-To: <20260826230511.972824-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,9 +61,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20260826230511.972824-1-seanjc@google.com>
 X-Mailer: git-send-email 2.55.0.887.g758fc8c411-goog
-Message-ID: <20260826230511.972824-14-seanjc@google.com>
-Subject: [PATCH 13/20] KVM: selftests: Add TEST_EXTRA memory region type for
- "special" memslots
+Message-ID: <20260826230511.972824-16-seanjc@google.com>
+Subject: [PATCH 15/20] KVM: selftests: Use TEST_EXTRA region in x86's smaller
+ MAXPHYADDR test
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
 	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
@@ -82,122 +82,37 @@ Cc: Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
 	Ritesh Harjani <ritesh.list@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 
-And another memory region type to deal with extra, one-off memory regions,
-and use the new type to manage x86's SMRAM memslot, as another step towards
-taking the region type instead of the raw memslot in the physical page
-allocator APIs.
+Use the TEST_EXTRA region/memslot for x86's smaller MAXPHYADDR test instead
+of a custom memslot, so that the primary vm_phy_pages_alloc() APIs can be
+reworked to take a region type instead of a raw memslot.
 
-Alternatively, SMRAM setup could simply use the quad-underscore API to
-continue passing in the memslot, but a surprising number of tests use an
-"extra" memslot for a variety of reasons.  I.e. allocating memory from one
-(and exactly one) extra memslot isn't all that rare, and so should be
-treated as normal behavior, not as something extraordinary, as
-quad-underscore functions typically suggest.
-
-Opportunistically add comments to document the intended usage of the types,
-as the difference between DATA, TEST_DATA, and TEST_EXTRA in particular
-isn't exactly obvious.
+For all intents and purposes, no functional change intended, as
+vm_add_extra_mem_region() is barely more than a wrapper for
+vm_userspace_mem_region_add().
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- .../testing/selftests/kvm/include/kvm_util.h  | 37 ++++++++++++++++---
- tools/testing/selftests/kvm/include/x86/smm.h |  2 +-
- .../testing/selftests/kvm/lib/x86/processor.c |  7 ++--
- 3 files changed, 37 insertions(+), 9 deletions(-)
+ .../selftests/kvm/x86/smaller_maxphyaddr_emulation_test.c  | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-index 14f87c8a00ec..f4f4f360a10b 100644
---- a/tools/testing/selftests/kvm/include/kvm_util.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util.h
-@@ -82,11 +82,43 @@ struct userspace_mem_regions {
- 	DECLARE_HASHTABLE(slot_hash, 9);
- };
+diff --git a/tools/testing/selftests/kvm/x86/smaller_maxphyaddr_emulation_test.c b/tools/testing/selftests/kvm/x86/smaller_maxphyaddr_emulation_test.c
+index 3dca85e95478..b21798a385ca 100644
+--- a/tools/testing/selftests/kvm/x86/smaller_maxphyaddr_emulation_test.c
++++ b/tools/testing/selftests/kvm/x86/smaller_maxphyaddr_emulation_test.c
+@@ -62,9 +62,10 @@ int main(int argc, char *argv[])
+ 	TEST_ASSERT(rc, "KVM_CAP_EXIT_ON_EMULATION_FAILURE is unavailable");
+ 	vm_enable_cap(vm, KVM_CAP_EXIT_ON_EMULATION_FAILURE, 1);
  
-+/*
-+ * Memory region types are passed to various page allocators to communicate
-+ * various properties and metadata related to the allocation.  Note, the
-+ * descriptions below described the primary usage of each type.  Individual
-+ * tests may allocate memory for other purposes.
-+ *
-+ * By default, all regions are mapped to memslot '0'.  Tests can override the
-+ * memslot for any or all types, e.g. so that all test data is allocated from a
-+ * curated memslot.
-+ */
- enum kvm_mem_region_type {
-+	/*
-+	 * The CODE region is used by lib/elf when loading the test's code into
-+	 * guest memory.
-+	 */
- 	MEM_REGION_CODE,
-+	/*
-+	 * The DATA region is used to allocate core data structures, e.g. vCPU
-+	 * stacks, VM exception tables, x86's TSS, etc.
-+	 */
- 	MEM_REGION_DATA,
-+	/*
-+	 * The PT region, a.k.a. Page Table region, is used to allocate page
-+	 * table pages.
-+	 */
- 	MEM_REGION_PT,
-+	/*
-+	 * The TEST_DATA region is used for allocating test data that is either
-+	 * test specific, and/or isn't considered a "core" data structure.
-+	 */
- 	MEM_REGION_TEST_DATA,
-+	/*
-+	 * The TEST_EXTRA region is for special snowflakes, where a test wants
-+	 * to create and use a one-off memslot, without impacting "normal" test
-+	 * data allocations.
-+	 */
-+	MEM_REGION_TEST_EXTRA,
- 	NR_MEM_REGIONS,
- };
- 
-@@ -129,11 +161,6 @@ struct kvm_vm {
- 
- 	struct kvm_binary_stats stats;
- 
--	/*
--	 * KVM region slots. These are the default memslots used by page
--	 * allocators, e.g., lib/elf uses the memslots[MEM_REGION_CODE]
--	 * memslot.
--	 */
- 	u32 memslots[NR_MEM_REGIONS];
- };
- 
-diff --git a/tools/testing/selftests/kvm/include/x86/smm.h b/tools/testing/selftests/kvm/include/x86/smm.h
-index 2d1afa09819b..15faaa060126 100644
---- a/tools/testing/selftests/kvm/include/x86/smm.h
-+++ b/tools/testing/selftests/kvm/include/x86/smm.h
-@@ -8,7 +8,7 @@
- #define SMRAM_MEMSLOT	((1 << 16) | 1)
- #define SMRAM_PAGES	(SMRAM_SIZE / PAGE_SIZE)
- 
--void setup_smram(struct kvm_vm *vm, struct kvm_vcpu *vcpu, u64 smram_gpa,
-+void setup_smram(struct kvm_vm *vm, struct kvm_vcpu *vcpu, gpa_t smram_gpa,
- 		 const void *smi_handler, size_t handler_size);
- 
- void inject_smi(struct kvm_vcpu *vcpu);
-diff --git a/tools/testing/selftests/kvm/lib/x86/processor.c b/tools/testing/selftests/kvm/lib/x86/processor.c
-index ea5fa59888af..b988eea373ad 100644
---- a/tools/testing/selftests/kvm/lib/x86/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86/processor.c
-@@ -1468,11 +1468,12 @@ bool kvm_arch_has_default_irqchip(void)
- 	return true;
- }
- 
--void setup_smram(struct kvm_vm *vm, struct kvm_vcpu *vcpu, u64 smram_gpa,
-+void setup_smram(struct kvm_vm *vm, struct kvm_vcpu *vcpu, gpa_t smram_gpa,
- 		 const void *smi_handler, size_t handler_size)
- {
--	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, smram_gpa,
--				    SMRAM_MEMSLOT, SMRAM_PAGES, 0);
+-	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
+-				    MEM_REGION_GPA, MEM_REGION_SLOT,
+-				    MEM_REGION_SIZE / PAGE_SIZE, 0);
 +	vm_override_mem_region(vm, MEM_REGION_TEST_EXTRA, VM_MEM_SRC_ANONYMOUS,
-+			       smram_gpa, SMRAM_MEMSLOT, SMRAM_PAGES);
++			       MEM_REGION_GPA, MEM_REGION_SLOT,
++			       MEM_REGION_SIZE / PAGE_SIZE);
 +
- 	TEST_ASSERT(vm_phy_pages_alloc(vm, SMRAM_PAGES, smram_gpa,
- 				       SMRAM_MEMSLOT) == smram_gpa,
- 		    "Could not allocate guest physical addresses for SMRAM");
+ 	gpa = vm_phy_pages_alloc(vm, MEM_REGION_SIZE / PAGE_SIZE,
+ 				 MEM_REGION_GPA, MEM_REGION_SLOT);
+ 	TEST_ASSERT(gpa == MEM_REGION_GPA, "Failed vm_phy_pages_alloc");
 -- 
 2.55.0.887.g758fc8c411-goog
 
