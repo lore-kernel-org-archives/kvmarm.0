@@ -1,151 +1,125 @@
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com [209.85.214.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 810563112B2
-	for <kvmarm@lists.linux.dev>; Wed, 26 Aug 2026 08:54:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 165B11990C7
+	for <kvmarm@lists.linux.dev>; Wed, 26 Aug 2026 09:02:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787734468; cv=none; b=HqeDYgYb3vTgXMySMW0Th7rl7Dn2ltbk67MNSxH6Xnp0QAWht1BQvx6Nte8zcqz/4noyY9XVaWp/uNGWaY+l/jGTgPhUEwI5BVOyzUxeEXMhZhmfuQyMEyfco2a/LF1Iquji/OPk9FdRb7juewm4bn48dA82Z16rNoohULYnAds=
+	t=1787734925; cv=none; b=WYWG0OptlXmgK7zh/nmLQ78U3U9vOllqEWHzcLHZKfkep+rdQjePqN4+bPpejv/pDn7hGwYrLCD4+E76WB0p/isBAibOzYWTMqKNxDZlDdupLDXXIg2RQzL6Gz5qiNLIY05znzdWfnEoFvF1SG8D8lI3UYQtb2rB3JGSvnN1E1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787734468; c=relaxed/simple;
-	bh=bl/YMALd3mQ/g2M3kVKZpJBRcUl71G7E1PaFpoMCpTE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D0OHXXHJfR1LHEBzuaPG5hOIy81J4SpmHOLwjvqK11JnUjjQTm4nYsn+ebXjkCMwVtLWBuDQLqxTzO7SiNWohpQTDqbxvo6q1jawmqB1Vpmicld//KpdTwjZbkG5JLXh8b4FLunPHV/DlPlkO1D3PoMGO6eayCSvIMwVoFEqCCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cjrrCq/1; arc=none smtp.client-ip=209.85.128.51
+	s=arc-20240116; t=1787734925; c=relaxed/simple;
+	bh=OAlLWBhYYG/9ob/PX5hBH6y+Ywi1lILRcsrUDjKKezs=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=WrFlt3T+vWCZIKJEsPeenjB0Wxbz2Xb9DF07tDM4ShshgL4ia5sh+Wqzlu1IrHWD7Mlf/MkxW8Y41y8+ageTvhKxk1FLHJeBjrugrAvy9UemMc52cNLlI/CSfbVn+lJDL8oJCRByjSDcIej3HwXylMuFBglacz14edZ4i7C0J+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=v7/I4e+e; arc=none smtp.client-ip=209.85.214.198
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cjrrCq/1"
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-499b1409a75so31845e9.1
-        for <kvmarm@lists.linux.dev>; Wed, 26 Aug 2026 01:54:26 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="v7/I4e+e"
+Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-2d63c16fc5bso17850365ad.1
+        for <kvmarm@lists.linux.dev>; Wed, 26 Aug 2026 02:02:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1787734465; x=1788339265; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=GC7HaV6ubG2A4QN/tpZz7iru0oh8bNIqfpSQwQL8lBA=;
-        b=cjrrCq/1gv5qb12Q1ZbNheE6ZXpqGoeLEQ9yM/KkbLGadNg+v9fUb1o0m5cLz3is0p
-         L64ALlb3YPWdlGM7hjBWOO0KLuKWnBD0motqHy6TnE3XQKUvM6Q1Hs5GioMrwLpIHV5m
-         q3Q+5q6bzkSlwi7QiqckViIiTv3PvS5tZ3cOm5WQIVW8vewGJitm76sxTGB0XR7jEh58
-         KFLwx34AQLlYrCHisM3nwaIt46JQIndx+gc6j8//NZTq8uuqnjBzzB09m2owgtn9w6Ak
-         v38lMqEiD/u3j096FUTAqWS+hFlKDDCCvzbuwTC3hi9sJ+02jN8FbAvyGC5BVv68x9FN
-         N5Zw==
+        d=google.com; s=20251104; t=1787734922; x=1788339722; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=q1tZdo4e5URbud8PZx65gIP4aGbHrtpDN3AOBapMbqs=;
+        b=v7/I4e+eEvxUv4EhT0RYlONMffIDO6mw0l3x9wtG9q3JZzl8qxeCm0BH3jOCw/QQCd
+         5tMzerwgnkBzmjO1AU/7gsY6Qr/216nAU6XoXODsxn2pta4hPM+791ZF4utpr4cwHVH/
+         HT30nw4sAUHC+Ysl9Vhs+Cy0sRKxZu45rSIBsqnKJIONAono2w57b8VeG82nw+FvfnVG
+         aoqAizVXZhxn+u1xWwl0eGByK/PSM4JaTYG2fzbkX9bB+e3h6EZqDDIZKcokRh88eTeJ
+         xoI+lRC3FeAZkAHvkRUATxOvvC9KE5NUZi/XIgqLkqkBhURMZ6N4c1f3wNM0V85ZQ6qz
+         RZYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787734465; x=1788339265;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
+        d=1e100.net; s=20251104; t=1787734922; x=1788339722;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=GC7HaV6ubG2A4QN/tpZz7iru0oh8bNIqfpSQwQL8lBA=;
-        b=AhrfWrfHEm1neLdK44jsqDE6rcgLSe93qFlCV6XFbBEYIpEGraNzydwjTGDUl+z/wF
-         UwZoz7ByDD7gbfo+NFofA0yRQHykJSdSoPCyNziBKqWE4+2bzx87hZSBnfMWvVkN5YKE
-         Vn+2Zow9jULj6Dfy65lMMh8/2g5Zs2R5chImgB10fmP54hTAvrp9/DE8H48CWRYew/rb
-         MDxWavxDfmEUaPEvqGBoebAtdNYme2R/Pyz2fdNFG32oSswGv9gIszWy+N70injvubbR
-         mvh3NLqMtwqJvLek/PspHx/clCFbDOhhva8YV5x41Iw8pnu8vYoEDyI656Gfg6HrFol3
-         qCZg==
-X-Forwarded-Encrypted: i=1; AHgh+Rp6XrdcGv2eIDm8grcQ0C9o3Q/8y2Ly/Mpsmh2nlbqEVENdt3QiasZXozedf51DEis8U3cdLa0=@lists.linux.dev
-X-Gm-Message-State: AFuF++kvtKwdK96Z/VnYJB3qsO/vSQh4L+K7J8uwzCOAbEg69/iOCbc2
-	5nI1+qW47IMQIP9dpc7GDZeDzE5F7Bs3CHAe109XD7/ijG1P+5/s0azCCiyPOwMX2Q==
-X-Gm-Gg: AR+sD11lThe2THc15nF2w+d08EqqOF87+lHkqahG6K/6vAZ2quhuo0m9iwQY8w3Svj/
-	cJ9ZrJGbeMKuhx7KCko6Uqtz+uJAxWP5FZjh8z2agFBJECP4KObNlD7cwoDZVd4lxUT+2cU+C5w
-	hC014cmIwp+KlDEgZ2InjWU1KLvUk353dMKgyZgUQMD2py79Ot1MpfhJAIY5f0Wjbk7ATvDVfth
-	d2R1KgQoDoqmr0cVy4Eb29Ahouev+SYY4vLlQa68xfHNxBvI2fQxH/4ZbyzMeZP2lOAgq9vpUF/
-	5zRl52T9pDnn7p5KW46OsIfMbDZntzSqK1zVogaNfxPZowpefg7mpMt3hj4xJMBDQxFHkKtbUbT
-	rKAiWg43y9Q0mz8N0mNRdbswMAy5vSdCx5nk3b0DDPl+mpW+wQxZ0ooKU4kMJmtSEZURY9NOgGk
-	oKdolSHq/oBYG6pl0zB2zZYtv/gjiggFoHKKtUII/8HmKr8cg1MbRiRuZuAxQilDl9cGxLLp7IN
-	Uo9nId6vMHG3B2uQNTTJ/3cs8mNmHClix2qWQ/6
-X-Received: by 2002:a05:600c:c0d3:b0:499:cfeb:4f17 with SMTP id 5b1f17b1804b1-499dda22aedmr502865e9.5.1787734464271;
-        Wed, 26 Aug 2026 01:54:24 -0700 (PDT)
-Received: from google.com (250.192.189.35.bc.googleusercontent.com. [35.189.192.250])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-499dcad2532sm19052725e9.11.2026.08.26.01.54.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Aug 2026 01:54:23 -0700 (PDT)
-Date: Wed, 26 Aug 2026 08:54:19 +0000
-From: Mostafa Saleh <smostafa@google.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, iommu@lists.linux.dev,
-	catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
-	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, joro@8bytes.org, jgg@ziepe.ca,
-	mark.rutland@arm.com, qperret@google.com, tabba@google.com,
-	vdonnefort@google.com, sebastianene@google.com, keirf@google.com
-Subject: Re: [PATCH v7 23/24] iommu/arm-smmu-v3-kvm: Enable nesting
-Message-ID: <ao6puxVSNsLC8aql@google.com>
-References: <20260715115906.2664882-1-smostafa@google.com>
- <20260715115906.2664882-24-smostafa@google.com>
- <178769159057.3356902.13161185498161727294.b4-review@b4>
+        bh=q1tZdo4e5URbud8PZx65gIP4aGbHrtpDN3AOBapMbqs=;
+        b=ZvFXDuawVBXjgDXz5dQjGK3AWhHHBr99MdtJvsOzQlNVdi/YYhZmIlrWQpF9Rqnj6q
+         ZowV1sJj3hlgfO3QN2jb7KPgGRjvXF/q000EGnQ6j3ZWdIJeTO04ZrcsFGInsMNXgwBF
+         svZfEkQEFUvHmjICRTICFe6MxOel/9rFWiGVNHxl538XM5uhejEDPExSAGB7iuwRjfeL
+         N0ic91fqaavtbkxGJMZrvozpl+Q0qzBPfwo/MrTGN9BywqIoMkRM8m8B8pftdIaE8AU7
+         u+NtFddF/+HyoCx8kN8Ii18iIhRNAn6Q7N2QFjAyt2nhC/P5U1FrVLAdSaQgxZtLXiDe
+         UeVQ==
+X-Forwarded-Encrypted: i=1; AHgh+Rp64r4D6LsCT31s5UjwnYLx4VcRQRdvHNzWPdS8Hl2E8/2xo0bcNm6ZAFUUy3Fyw+BWUVUpJmk=@lists.linux.dev
+X-Gm-Message-State: AFuF++l6p9+ls2dnOkpnTJkraot0Ib/lyAt2CmDqoT3mGcaLREP6moo2
+	t7TH5wrq/Dq/g7EwAxiN5e5FX60kljkES3OhZyunXTChGbHa0yGNbbsSCbPAm0iiLCnIOxm5Yvv
+	tJBDLy4ydVPlVmQKX/DPR1seEHw==
+X-Received: from plbko13.prod.google.com ([2002:a17:903:7cd:b0:2cc:bb5f:3fd7])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:903:284:b0:2d6:2901:6265 with SMTP id d9443c01a7336-2d707953a1emr98628575ad.2.1787734922088;
+ Wed, 26 Aug 2026 02:02:02 -0700 (PDT)
+Date: Wed, 26 Aug 2026 09:01:45 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <178769159057.3356902.13161185498161727294.b4-review@b4>
+Mime-Version: 1.0
+X-B4-Tracking: v=1; b=H4sIAHmrjmoC/43NwQ6CMAyA4VchOzszyoTNk+9hPGysG0uEkYFEQ
+ 3h3ByeNxnj8m/brTAaMHgdyzGYScfKDD10KvstI3ajOIfUmNQEGJRO5oK7FlnaBRhxvsaO9Sit
+ lziVUCqSVFUmXfUTr75t6vqRu/DCG+NieTPk6/e1NOWWUW2FkIdEaXZ9cCO6K+zq0ZAUn+AOBh BxACsvBcKn1B1K8IMC+I0VCCm2FFUxVmps3ZFmWJ7gutz9BAQAA
+X-Change-Id: 20260818-gmem-no-return-page-614927a29f97
+X-Developer-Key: i=ackerleytng@google.com; a=ed25519; pk=sAZDYXdm6Iz8FHitpHeFlCMXwabodTm7p8/3/8xUxuU=
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1787734920; l=1513;
+ i=ackerleytng@google.com; s=20260225; h=from:subject:message-id;
+ bh=OAlLWBhYYG/9ob/PX5hBH6y+Ywi1lILRcsrUDjKKezs=; b=daPi3Fjs1SSb8r0p9nYFDfhMv5JgbSUJww8xvwdjn/5ezcuq3olIFhfPZsB7H97tyDKbuwa/i
+ HzQS2OkcWgBCL8fXp9OmJpR3tdyNqhLN3UNa4IWubqk/JfORozIirAG
+X-Mailer: b4 0.16.0
+Message-ID: <20260826-gmem-no-return-page-v4-0-3bb9c1ddb4e3@google.com>
+Subject: [PATCH v4 0/5] Stop returning struct page from guest_memfd PFN lookup
+From: Ackerley Tng <ackerleytng@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Ashish Kalra <ashish.kalra@amd.com>, 
+	Michael Roth <michael.roth@amd.com>, Brijesh Singh <brijesh.singh@amd.com>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, David Hildenbrand <david@kernel.org>, Yan Zhao <yan.y.zhao@intel.com>, 
+	"Edgecombe, Rick P" <rick.p.edgecombe@intel.com>, Vishal Annapurve <vannapurve@google.com>, 
+	Fuad Tabba <fuad.tabba@linux.dev>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	Ackerley Tng <ackerleytng@google.com>
+Content-Type: text/plain; charset="utf-8"
 
-On Tue, Aug 25, 2026 at 05:59:50PM -0300, Jason Gunthorpe wrote:
-> > [ ... 129 lines skipped ... ]
-> > +	ret = smmu_attach_stage_2(&target);
-> > +	if (ret)
-> > +		return ret;
-> > +	hyp_spin_lock(&smmu->hw_lock);
-> > +	cur_valid = FIELD_GET(STRTAB_STE_0_V, le64_to_cpu(hyp_ste_ptr->data[0]));
-> > +	target_cfg = FIELD_GET(STRTAB_STE_0_CFG, le64_to_cpu(target.data[0]));
-> > +	target_valid = FIELD_GET(STRTAB_STE_0_V, le64_to_cpu(target.data[0]));
-> > +	if ((cur_valid && !target_valid) ||
-> > +	    (target_cfg == STRTAB_STE_0_CFG_ABORT)) {
-> > +		WRITE_ONCE(hyp_ste_ptr->data[0], target.data[0]);
-> > +		WARN_ON(smmu_send_cmd(smmu, &cfgi_cmd));
-> > +		for (i = 1; i < STRTAB_STE_DWORDS; i++)
-> > +			WRITE_ONCE(hyp_ste_ptr->data[i], target.data[i]);
-> > +	} else {
-> > +		for (i = 1; i < STRTAB_STE_DWORDS; i++)
-> > +			WRITE_ONCE(hyp_ste_ptr->data[i], target.data[i]);
-> > +		WARN_ON(smmu_send_cmd(smmu, &cfgi_cmd));
-> > +		WRITE_ONCE(hyp_ste_ptr->data[0], target.data[0]);
-> > +	}
-> 
-> This doesn't look good enough, a driver can't safe writely to a valid
-> STE in any order like this, and it can't make it non-valid or risk
-> breaking guests. We had this bug in linux already, the hitless STE
-> update in the hypervisor is mandatory for linux guests using PASID.
+v4 splits out a new patch (3) that makes use of KVM MMU invalidation logic
+introduced into the RMP fault handling in patch 2 to avoid warning on a
+benign case.
 
-This piggy-backs on the kernel algorithm, as described in the comment
-in this patch:
-+       /*
-+        * Summary of each host emulated state vs real HW.
-+        * |    Host    |       HW      |
-+        * ==============================
-+        * |    V=0     |       V=0     |
-+        * |    Abort   |       Abort   |
-+        * |    Bypass  |       S2      |
-+        * |    S1      |       S1+S2   |
-+        *
-+        * For the host, any V=0 transition is not hitless, all other permutations of
-+        * (abort, bypass, S1) transitions are hitless.
-+        * For the HW state, any V=0 transition is not hitless, as all the S2 config is
-+        * always the same (ttbr, vtcr...), all other transitions should be hitless too.
-+        * However, the host is not trusted, which means that any V=0 <=> V=1 transitions
-+        * or any transition to an abort STE we need to enforce writing order of the STE
-+        * dword 0 and add CFGI.
-+        * Otherwise, we write the STE in the opposite order to cover cases from abort
-+        * to S2 or nested.
-+        */
+Other changes in v4:
 
-So this way, the hypervisor doesn't break the STE and keeps the host
-STE transitions hitless.
++ Took Sean's version of the changelog for patch 2
++ Picked up Fuad's Reviewed-by: and Tested-by:
 
-Or there is an example that I missed and is broken by this?
+v3: https://patch.msgid.link/20260820-gmem-no-return-page-v3-0-3bf8f80a7b4d@google.com
+v2: https://patch.msgid.link/20260818-gmem-no-return-page-v2-0-5298f42d49bb@google.com
+v1: https://patch.msgid.link/20260818-gmem-no-return-page-v1-0-4f8d939efdbc@google.com
 
-Thanks,
-Mostafa
+Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+---
+Ackerley Tng (3):
+      KVM: SEV: Treat unassigned RMP entry as benign race on PSMASH failure
+      KVM: SEV: Check for invalidation before warning on unassigned RMP entry
+      KVM: SEV: Drop page refcount early in VMSA reload
 
-> 
-> You should use the STE programmer logic from the main driver which
-> gets this right for every scenario a linux guest can trigger. I don't
-> think there is anything about it that would be difficult for pkvm.
-> 
-> -- 
-> Jason
+Sean Christopherson (2):
+      KVM: SEV: Drop page refcount early during RMP fault handling
+      KVM: guest_memfd: Stop returning struct page from PFN lookup
+
+ arch/arm64/kvm/mmu.c     |  4 +---
+ arch/arm64/kvm/nested.c  |  4 ++--
+ arch/x86/kvm/mmu/mmu.c   |  2 +-
+ arch/x86/kvm/svm/sev.c   | 53 ++++++++++++++++++++++++++++--------------------
+ include/linux/kvm_host.h |  6 ++----
+ virt/kvm/guest_memfd.c   |  9 ++------
+ 6 files changed, 39 insertions(+), 39 deletions(-)
+---
+base-commit: 76671054f9a1ff6abb976583cd8da37650acdc97
+change-id: 20260818-gmem-no-return-page-614927a29f97
+
+Best regards,
+--  
+Ackerley Tng <ackerleytng@google.com>
+
