@@ -1,46 +1,88 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E32457C9F;
-	Fri, 28 Aug 2026 13:53:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A81E4376A16
+	for <kvmarm@lists.linux.dev>; Fri, 28 Aug 2026 16:04:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787925200; cv=none; b=hx4NJjIoKkiEnYsYg+cOXlHn+zPUtcxpEYfhT8oUuk4ihZzrgjl5YLNy7QdgzXWQnU9QP8B0VAZ8pZK9zcSdjmLFjHHHebcHynPBIQCrs6ur5hFf4IyasQw9mRg7sdCIY0ciYcq1AFm1rDbdfbqtmmyC81K/fYqORBx5PEKbMFw=
+	t=1787933061; cv=none; b=L0hqYRH88F3onjYiBk2k8+i0UK+2R0PpbF0/GmU8gYymq6fngPi5FEOM9AVNrEVUjdCzCJcXBEwO99vo5x4OWGeZGVs+wUDMOrtKsVXYWWqY3yHk4+RZl2KRKP7ourIj7rGff/dyAhkWZJXM/GVbIWXAnaV82FriATwjlNqE47k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787925200; c=relaxed/simple;
-	bh=/eLzOt2jP53ZhLkDuOg3I7udBfAM7daywjAdbVuZvIo=;
+	s=arc-20240116; t=1787933061; c=relaxed/simple;
+	bh=YdHURS/OkStZN+lDVntHsnIayXRryLL9rVY3WqT0oys=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fjzla3MHqtGQz9AP6XQAdZdsudz1ej2eiF1fFxlQbdUX3pnK3reTvVQuADM2hYNxd3E5Kmj0bW2DRYr3mQtjNgvqMzI4kEpfEHQvt0GKsB93i7C2N7ufl59Ybewlvmw7p4a1PbZAjTUCH5WaNemVPJ8zRFO5FrfV3Z15C4AyHIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mUdx5Sge; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=s5Jzasoqp1ktBndParawgtNmAZS3Q2oyiWSFKTMLQqAaXxCReF9HizQ1eZOnxzTf1fi9Cw1RsKYjWvTWGrVlrYEV6AaPpZ+LDBE+AQeTQQBW7kVkDpHvdLjlMDzgY/ahfvNVkunMB4nmTk3ChMclrmz1pt0X1g2Xw8ewkm4uVzA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=pnXUkCN3; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mUdx5Sge"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE68C1F00A3A;
-	Fri, 28 Aug 2026 13:53:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787925198;
-	bh=bY0OwgPal6QlPB3ty/eOUhetwtY4hZxNYf6/eJ0Xpq8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=mUdx5SgeR+7kSaRoPuUgUMnVzm3fhdg8NQ2Oc/VCXSJlKo5B7Wyha57FemARc7g8d
-	 WTfbjGIC5T7No8nZ87o8kDxcYBgyTAVwXqNVsz1NtzKKe0+8fSsGvDehx90Bpp27/0
-	 uChQ1BehxD/grIKjBUQyZsiWgpahoj+eTh9xm9yBejCwehPpYC8EobjdvW8MH9lu5Q
-	 ruvT5o5In58HuJXKLZ2Xfz/wfc3U9A2QNSkIKe340Eq2MCR7+YEep1JNdWu7i+fg4g
-	 9DN9W6MKDKi5/SrBXb/0sck0/UoWaMoUNCPnybd0pWCpArGhVcH6ZoZfkKMSmSc+vG
-	 DVGwM9NCFrugw==
-Date: Fri, 28 Aug 2026 14:53:13 +0100
-From: Will Deacon <will@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Fuad Tabba <fuad.tabba@linux.dev>, linux-arm-kernel@lists.infradead.org,
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Mark Brown <broonie@kernel.org>, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH v4 2/2] arm64: Don't read GMID_EL1 when MTE is disabled
-Message-ID: <apGSye1_M737mITN@willie-the-truck>
-References: <20260825164219.3347229-1-fuad.tabba@linux.dev>
- <20260825164219.3347229-3-fuad.tabba@linux.dev>
- <apA0A-bqLVBcmdSv@willie-the-truck>
- <apFn5JihFkRoqX06@arm.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="pnXUkCN3"
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67SDVcqL2186123;
+	Fri, 28 Aug 2026 16:04:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=dgH8c3K41onSn3JaUmFd6PfY9U5p0W
+	8ii5soacR13YA=; b=pnXUkCN3smJhN/Xhj5/T4u6z9CmxFA6JvwVrwTGjBe7was
+	MRFrmBoZlfHDK3LEBqiGCRc8KhDZ/bWew5u6BLLdP1uWbtWwlgRiTLGjP6KJ0r4X
+	q0jppp5CVV8p+DN9U6k9mkJN0jZuiAhIIfT4d9RDxZ/VFQDCbg2Qsfo5vQGChg+6
+	OEm+x98MEZhiHQ0u3aCcYeX6lLoAWR65O3cbbntx90rz4r8RqEr9QMZHelbtRUsH
+	QvNeHYBSOnHJNFuCMiPW1rQLyTvnaJHDGGWLZIOV2bPqiXP59W3Z+RfTQu0tWdT8
+	I8trrYyI2z4NV8oYxJ4Efb5fj4KfoVmtT5XTltNw==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4g73dxw67a-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 28 Aug 2026 16:04:02 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 67SFuHKM028232;
+	Fri, 28 Aug 2026 16:04:01 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4g7rsyq33d-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 28 Aug 2026 16:04:01 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 67SG3v2M28508426
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 28 Aug 2026 16:03:57 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1C8262004B;
+	Fri, 28 Aug 2026 16:03:57 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2CE2720040;
+	Fri, 28 Aug 2026 16:03:56 +0000 (GMT)
+Received: from osiris (unknown [9.111.68.102])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Fri, 28 Aug 2026 16:03:56 +0000 (GMT)
+Date: Fri, 28 Aug 2026 18:03:54 +0200
+From: Steffen Eiden <seiden@linux.ibm.com>
+To: Janosch Frank <frankja@linux.ibm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, Alexander Gordeev <agordeev@linux.ibm.com>,
+        Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@kernel.org>,
+        Friedrich Welter <fritz@linux.ibm.com>, Fuad Tabba <tabba@google.com>,
+        Gautam Gala <ggala@linux.ibm.com>,
+        Hariharan Mari <hari55@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Hendrik Brueckner <brueckner@linux.ibm.com>,
+        Ilya Leoshkevich <iii@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
+        Marc Zyngier <maz@kernel.org>, Nico Boehr <nrb@linux.ibm.com>,
+        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
+        Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v6 28/33] KVM: s390: Add basic arm64 kvm module
+Message-ID: <20260828160354.164752-A-seiden@linux.ibm.com>
+References: <20260812153631.3376090-1-seiden@linux.ibm.com>
+ <20260812153631.3376090-29-seiden@linux.ibm.com>
+ <a90009dd-d4eb-427d-b23c-23bcc19af478@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -49,60 +91,80 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <apFn5JihFkRoqX06@arm.com>
+In-Reply-To: <a90009dd-d4eb-427d-b23c-23bcc19af478@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-Spam-Info: AW1haW4tMjYwODI4MDEzOSBTYWx0ZWRfXxZjSXhp3nkOk
+ y7KNrDuosG3X05DSyEWfW9Q0EQdVJ/Mmkf87YXU6yB+cI234f2wsHs0FCGXZo8lmx7gT7DIPSIT
+ EV+vXHWoy2Qf/BT+85mlM7La/cOm7pg=
+X-Authority-Analysis: v=2.4 cv=AYuB2XXG c=1 sm=1 tr=0 ts=6a91b172 cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=kj9zAlcOel0A:10 a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=RzCfie-kr_QcCd8fBx8p:22 a=VnNF1IyMAAAA:8
+ a=GjRpCgEQHAvZYWd-grkA:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-ORIG-GUID: lxX3HICFKqkj1nkyoBdOLCFKkY1MzdX5
+X-Proofpoint-GUID: zBAItN-4a0Pfu2NxxPon1fOrObeMNtcw
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODI4MDEzOSBTYWx0ZWRfX5/Kh0Zsnk+Tw
+ 7qfXF31QN8c73e83tylqE6SvfujuHTVzvUlSaqusvmw/QHy7o8JCudslqRQ1CsxIDrU60UTTA0a
+ ThoIS4/ftcbdln79cNS6loGg0kQ7j78LZfRr+EmJvUqXsEmfy1+6NVPwl8r9APyIVUyxnK5rXLF
+ oCxChN4UZ4DiV7h+cpGhOefVRH+Leg3r8mE4U3wy1AfoOYIbAVH/taWO6kYMcqyH1XwL1b4q7ym
+ iq6fWeJtHcb/tNW17xtP/aUVluFaSP9/9CNw/0ZV2CWmdwCbK00RhONeVvBua+hSoTom92l0iiz
+ Tjkd5zANSjQ6DnFCM0iBZ52HC+U8wxu6D2+HdBg/N3OlrttSXupKLwAZSlgLei9OSpsLRlNSutB
+ L9UwewKVabT85N8UE7/yEOuy0DC6C9V10oNe1C4ZW1wQ8uluQ5zxK44HcTgB+4Q+IE+216Wxgy9
+ OcwTXbjpXjHtrM//kAA==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-08-28_04,2026-08-27_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 phishscore=0 clxscore=1015 adultscore=0 bulkscore=0
+ impostorscore=0 priorityscore=1501 lowpriorityscore=0 spamscore=0
+ suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
+ definitions=main-2608280139
 
-On Fri, Aug 28, 2026 at 11:50:12AM +0100, Catalin Marinas wrote:
-> On Thu, Aug 27, 2026 at 01:56:35PM +0100, Will Deacon wrote:
-> > On Tue, Aug 25, 2026 at 05:42:19PM +0100, Fuad Tabba wrote:
-> > > +/* No ID register reflects CONFIG_ARM64_MTE. */
-> > > +static inline bool gmid_el1_accessible(void)
-> > > +{
-> > > +	if (!IS_ENABLED(CONFIG_ARM64_MTE))
-> > > +		return false;
-> > > +
-> > > +	return id_aa64pfr1_mte(__read_sysreg_by_encoding(SYS_ID_AA64PFR1_EL1));
+On Fri, Aug 28, 2026 at 01:33:00PM +0200, Janosch Frank wrote:
+> On 8/12/26 5:36 PM, Steffen Eiden wrote:
+> > Add basic code for the new arm64 on s390 KVM implementation.
+> > Add kernel module boilerplate code and trivial functions.
+> > Add tracing scaffolding.
 > > 
-> > I'm planning to internalise __read_sysreg_by_encoding() into cpufeature.c
-> > so I'd prefer to avoid adding another user of it, if possible. In this case,
-> > __cpuinfo_store_cpu() has already read the thing, so all it needs is the
-> > override logic (but see below).
-> 
-> That's a valid point.
-> 
-> > > @@ -502,7 +502,7 @@ static void __cpuinfo_store_cpu(struct cpuinfo_arm64 *info)
-> > >  	info->reg_id_aa64smfr0 = read_cpuid(ID_AA64SMFR0_EL1);
-> > >  	info->reg_id_aa64fpfr0 = read_cpuid(ID_AA64FPFR0_EL1);
-> > >  
-> > > -	if (id_aa64pfr1_mte(info->reg_id_aa64pfr1))
-> > > +	if (gmid_el1_accessible())
-> > >  		info->reg_gmid = read_cpuid(GMID_EL1);
+> > Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
+> > ---
+> >   arch/s390/kvm/arm64/arm.c   | 157 ++++++++++++++++++++++++++++++++++++
+> >   arch/s390/kvm/arm64/arm.h   |   7 ++
+> >   arch/s390/kvm/arm64/guest.c |  92 +++++++++++++++++++++
+> >   arch/s390/kvm/arm64/trace.h |  18 +++++
+> >   4 files changed, 274 insertions(+)
+> >   create mode 100644 arch/s390/kvm/arm64/arm.c
+> >   create mode 100644 arch/s390/kvm/arm64/arm.h
+> >   create mode 100644 arch/s390/kvm/arm64/guest.c
+> >   create mode 100644 arch/s390/kvm/arm64/trace.h
 > > 
-> > I'm not sure this is safe. For the boot CPU, __cpuinfo_store_cpu() is
-> > called before init_cpu_features(), so the arm64_ftr_regs[] array hasn't
-> > been sorted and we can't call get_arm64_ftr_reg() reliably.
+> > diff --git a/arch/s390/kvm/arm64/arm.c b/arch/s390/kvm/arm64/arm.c
+> > new file mode 100644
+> > index 000000000000..8e17b7eef813
+> > --- /dev/null
+> > +++ b/arch/s390/kvm/arm64/arm.c
+> > @@ -0,0 +1,157 @@
 > 
-> We no longer sort this array at boot-time, we just check that it's
-> pre-sorted.
-
-Fair enough, but I still don't think we should access it until we've
-checked that.
-
-> > In fact, it
-> > doesn't even look like the overrides will have been processed.
+> [...]
 > 
-> init_feature_override() runs from early_map_kernel() but yes,
-> init_cpu_ftr_reg() hasn't been called yet to vet the override. Suzuki's
-> patch was adding extra checks in __read_sysreg_by_encoding() but if we
-> drop that patch (and function eventually), better not to rely on it.
+> > +
+> > +static u64 kvm_max_guest_address(void)
+> > +{
+> > +	u64 max_addr;
+> > +
+> > +	if (sclp.hamax == U64_MAX)
+> > +		max_addr = TASK_SIZE_MAX;
+> > +	else
+> > +		max_addr = min_t(u64, TASK_SIZE_MAX, sclp.hamax);
+> > +	return ALIGN_DOWN(max_addr + 1, 1 << 30) - 1;
+> > +}
+> We're sure that the MSLA + 1 - MSOA > MGPAS check aka VIR code 4 will never
+> bite us? Or will you touch this up with the qmc support?
 
-Right, and we have to be really careful here with things like the new
-"nohaft" override because otherwise we could accidentally end up
-thinking we have hardware dirty on CPUs that don't have it. In other
-words, it's not just about people passing bonkers settings on the cmdline.
+Series 2 with qmc support will in addition verify that the maximum guest
+address is smaller or equal to MGPAS, which is calculated from the
+PARange. MSO is always zero, so we should not run into this invalidity.
 
-> So I don't think we have a correctness issue here but I don't mind v5
-> either. I'll go and check.
-
-Thanks.
-
-Will
+	Steffen
