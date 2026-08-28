@@ -1,60 +1,60 @@
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DD073CEB83
-	for <kvmarm@lists.linux.dev>; Fri, 28 Aug 2026 11:34:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 880F545040F
+	for <kvmarm@lists.linux.dev>; Fri, 28 Aug 2026 13:34:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787916860; cv=none; b=EAP5c0e1nMzNPmlQNRiNos4v0Z8aKGn6KFi+vGGYTtNvUCdiTjRVOPjLKe3GCJnq+82ZaxREKfRZJuLxSHyjvyhUiF1e701XmjALMqE4oArMzCWl97sOY1mjMIT4aB3Zzb1KzpG8gnhBM8aq1m+aVk6F693bGpTnyiNXXMee260=
+	t=1787924110; cv=none; b=mHGvfPVtT6Bdgn0akvaJpWCNpA5TbjnXEknTDCme64L221jUX9rV+q1hfK4ek2/8Uhiu79dMm3xn4ZZrtiFCg8vmU/YC1kNbhOMZimZS5DOLFmiT9PegVA4vDb7mvklyF4J3EgfIJwWvv+xYoFFzDCT4QIvjY4elstxTCzgp5ww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787916860; c=relaxed/simple;
-	bh=x+J87+SCki3FDXMCntccLBFhvtK8/AZdCMTINP8GhVc=;
+	s=arc-20240116; t=1787924110; c=relaxed/simple;
+	bh=Pz7f69K+RH5Fchqq/rsM1ft61yITqQXyHyngJemZUks=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GW0/Bb0miSZ/fvA4DZy7fo+zzIevGPeR/Wf2WOlSIFUiLnFqAbaPRL4sa2AjEFN+Jf1oH4lFOfIgt/2EqZTpp6IK5U+p+3CaZMKcUUkdpZIhZynZUeXrNCsktevEle2H/FDlVwF5M6U1Y1HqXTJAZJskyzzOtPEpe6bOTKe4X+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=skp2B3ze; arc=none smtp.client-ip=148.163.156.1
+	 In-Reply-To:Content-Type; b=hAnFC+rmz2nD7ZEzn8lmnRgJgqn6OuMc++VQ5KWbMWv+2vgOwW+vDkbORX86bWSyvEj4uVv5gKU1CxcYTYYQftC33IKJaeC5y6nGTvBIFGpQka9qz9/LqmsqdrsG8TFJWtnT0SdT+Q3ewoRIAIOYWe+dVXJVot6xdnyi23bN0DY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=UTGrcIRG; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="skp2B3ze"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="UTGrcIRG"
 Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67SAVuFe1734293;
-	Fri, 28 Aug 2026 11:34:03 GMT
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67SDVp2P2133870;
+	Fri, 28 Aug 2026 13:34:42 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=+UpAJT
-	INGhkDsXTSVijwVBJEkIiYqrymTFWpgFPL4Lc=; b=skp2B3ze6v+4U50ftnFltg
-	dcAMQCDZ10wOH1Q5LudNI+IP6HLCEuDH2ucQKahinICIV6lj/akRbACeaJaEy6Pn
-	fkfC/1cqrlpKB3kRBGPVTSUtpwF3+QL/LWJ0Nu+/0wkhoYi+Rdbc0pjHx7cmPKkJ
-	n4pnlRQcPrgbS9jujh/kJGS3JHdC3EIAuMT6CveUTkVcXIFFhts+SFNGkMQgOdL1
-	ZYxkHdPTbg7Kj372gcr5egZe4NRdHp2iVYaOxBL05J58LBDOWHw89VtMBMny073K
-	YOb+Ib4Z5yvuSx5WsQ2n4YxEGB9MwGRGnrzEwlP0pcTu3HWqIXo7+qW6iA88HweQ
+	:message-id:mime-version:references:subject:to; s=pp1; bh=JcxPxF
+	DwkA46qm0gx0PAMqkSvlmsVAaDSMlARO4fT20=; b=UTGrcIRGxrhMQo2mp6phfc
+	NTRxFHmjgqztc62JgJaoXkN2EOfhpYEsDLKtajTNHLge9+wcNTB34Hb95t3LrlQA
+	qcSfOt5338dsfpm9J/Qwg0OSXPV3SL7pAJfOLBxq7Uu2RyzyUelbT4zak/EWs34l
+	ZsgS4ywJLRqJWOnW7alcQ55Q1lfbuONr8YCLuoUTUaU/5ov2mgeXimgUfYja4DdN
+	HcUgA/tBBSDmxdp7CD0og8w1sm4ZkMTb0mVXLr1I0IWHFWzxCYnyPM0/7t+YJ7Au
+	DuJ2NMeBpgTaNbcJihAzkzK3eCaxSORVtzAmOIkw16sSEoHGHiDsU/HmunsWJ9Rw
 	==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4g73g5bw51-1
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4g73g5cgcc-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 28 Aug 2026 11:34:02 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 67SBQXXS008221;
-	Fri, 28 Aug 2026 11:34:01 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4g7q3kduqr-1
+	Fri, 28 Aug 2026 13:34:41 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 67SDT59S009238;
+	Fri, 28 Aug 2026 13:34:40 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4g7pfwped1-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 28 Aug 2026 11:34:00 +0000 (GMT)
+	Fri, 28 Aug 2026 13:34:39 +0000 (GMT)
 Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 67SBXu5Y45416828
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 67SDYZpQ46072082
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 28 Aug 2026 11:33:56 GMT
+	Fri, 28 Aug 2026 13:34:35 GMT
 Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C7B7E20043;
-	Fri, 28 Aug 2026 11:33:56 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id B011F2004B;
+	Fri, 28 Aug 2026 13:34:35 +0000 (GMT)
 Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1B71C20040;
-	Fri, 28 Aug 2026 11:33:56 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id F130420040;
+	Fri, 28 Aug 2026 13:34:34 +0000 (GMT)
 Received: from [9.87.143.119] (unknown [9.87.143.119])
 	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 28 Aug 2026 11:33:55 +0000 (GMT)
-Message-ID: <c096194a-fbe9-4761-a21e-b6b690480a6b@linux.ibm.com>
-Date: Fri, 28 Aug 2026 13:33:55 +0200
+	Fri, 28 Aug 2026 13:34:34 +0000 (GMT)
+Message-ID: <8b141a3d-1ea7-44ad-9311-2157ef37d59f@linux.ibm.com>
+Date: Fri, 28 Aug 2026 15:34:34 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -62,7 +62,7 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 29/33] KVM: s390: arm64: Implement required functions
+Subject: Re: [PATCH v6 31/33] KVM: s390: arm64: Implement vCPU IOCTLs
 To: Steffen Eiden <seiden@linux.ibm.com>, kvm@vger.kernel.org,
         kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
         linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org
@@ -90,7 +90,7 @@ Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
  <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
         Zenghui Yu <yuzenghui@huawei.com>
 References: <20260812153631.3376090-1-seiden@linux.ibm.com>
- <20260812153631.3376090-30-seiden@linux.ibm.com>
+ <20260812153631.3376090-32-seiden@linux.ibm.com>
 Content-Language: en-US
 From: Janosch Frank <frankja@linux.ibm.com>
 Autocrypt: addr=frankja@linux.ibm.com; keydata=
@@ -135,72 +135,165 @@ Autocrypt: addr=frankja@linux.ibm.com; keydata=
  DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
  Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
  phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-In-Reply-To: <20260812153631.3376090-30-seiden@linux.ibm.com>
+In-Reply-To: <20260812153631.3376090-32-seiden@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-ORIG-GUID: Tch2NNvRdKefxB0PzPY6lKbM19dcq_qE
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODI4MDA5OSBTYWx0ZWRfX0HMp9OpG7mvA
- slaeUfcdlAQsx0b9GQLBEkOgP1j+VAMMPOo6tXGyvCkWKNVWkuWNM1EyOrPNuTW5YJVJBR0KJ/a
- nqz9+0ZikVtjpRfEGs0dFH1veTJyFxo=
-X-Proofpoint-GUID: BJu3o21MqSYfikmZ2ldz42KmaIqL8RvW
-X-Authority-Analysis: v=2.4 cv=JZyMa0KV c=1 sm=1 tr=0 ts=6a91722a cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
+X-Proofpoint-ORIG-GUID: 1iN58-ZtGQVhsX3epG6R3oFCSty4l4wa
+X-Proofpoint-Spam-Info: AW1haW4tMjYwODI4MDExNyBTYWx0ZWRfX1AmfNCOtASel
+ c8mqmuLOcWKwXmzh4FceT1fM4mNH8GhwNUJ3jbJ2LGLZYSp4epIckfveI3S85+LlYVEX726ijzG
+ vLUMe4KXRzyhC+Te5h5BXrXU4GF4do4=
+X-Proofpoint-GUID: BxhV8CeXPrNDES7uaKZTwgvSF3hFE8xk
+X-Authority-Analysis: v=2.4 cv=JZyMa0KV c=1 sm=1 tr=0 ts=6a918e71 cx=c_pps
+ a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
  a=IkcTkHD0fZMA:10 a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22
  a=RnoormkPH1_aCDwRdu11:22 a=U7nrCbtTmkRpXpFmAIza:22 a=VnNF1IyMAAAA:8
- a=gIM_mWzjaQG1OS2HR58A:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODI4MDA5OSBTYWx0ZWRfX+Svwl7TwVzW6
- wml0NXrfWUSV4mpg5Aa7r3d1tF/zEB+7OqmFfR2AL7p8ain+aF1DRjc/tu+eaTzb6XX0tXSxA/2
- lGD2RZtdF9AhbQsmCvzGKqiwQ88lQZI7Pv0uy6hFHH0GCS3MAh1QvWv797wOQsJX5HEzI642pkY
- dFNq0VWKzcCBcDPWG+lvJz01uy+cQftCkDAl751OS8d3aKR6b3xsqgogsEZvEZGMtGE0LB2/mZM
- s/hzsZV6T3jOSKp0ekB6q3mvtSLp1QC9w5sg93psTnFtTpJZzoV/07Jdnh52LxgD7yeZTagA0Ev
- qvhs7lugI3iaz1nlOUCl+liJ4XySWoGhgzT8U2Se0s8wEb4QEou7LkkaZcX0r0nhYRkC0g8AWlp
- oDo0ewm9oHT5VP6vJWi7y40bLm/P5+bgJArGyOl3ZjjMqFdihgSbNuCHZkXv+a+AAoDEXZEpIno
- 22AM5tcBLjVZ5jXVfGg==
+ a=YrsC2wo8uTxk9zgACYUA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODI4MDExNyBTYWx0ZWRfX6L8fAg0ygd3R
+ RezB3TLIYUYtZOvfHzlMV1lg9Sq1vm7+kh5EX7yRjloUKyXbwh7tiPy3NawVOIkcJApFpAJNjw7
+ QSylPgM2QZMU5qiWmNRU8uBS/yNdFJ/mLnfeI0ApRP2T2h03fLMsFVKutv23UoPn6mkEgn+mIVY
+ +VrDhN4OqJDijzWFYbc9aWthwno+8QlA8VzRwkyxNa1CvnhZ9mPJi5yFnRrmQpnKJ41qATCnsTd
+ R0sUzIkWqk/gvBZZzdlRA1F3qWU+c+BieY5ICZr3AlwY0Y6ms6vqlJjhfq9WA0uWsWVzVJOkcdp
+ 0iU50mIyo3AZ5HADR6ux6o24/X+kPFUs4Rq6I7YsgPm8pmzstJ1hKZzxjiCt4M2ywQpD8DYd23n
+ lLQWriE1pzl0lMJZ4NOKib5iNeMbsmSPf6wFRNrytxcFdWZ7wIADKHS0dTUwBonquAQmuZk8mhi
+ VM3hhtEBpORmWY2O47g==
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-08-28_03,2026-08-27_02,2025-10-01_01
+ definitions=2026-08-28_04,2026-08-27_02,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  spamscore=0 clxscore=1015 adultscore=0 priorityscore=1501 impostorscore=0
  malwarescore=0 bulkscore=0 lowpriorityscore=0 suspectscore=0 phishscore=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2608280099
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2608280117
 
 On 8/12/26 5:36 PM, Steffen Eiden wrote:
-> Implement the mostly trivial functions that the shared arm64 (kvm)
-> code & headers oblige s390 to implement.
+> Implement all required vCPU IOCTLs.
 > 
-> Implement a very basic smccc handler that (non-compliantly) is just able
-> to stop a vcpu.
-> 
+> Co-developed-by: Andreas Grapentin <gra@linux.ibm.com>
+> Signed-off-by: Andreas Grapentin <gra@linux.ibm.com>
+> Co-developed-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+> Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
 > Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
 > ---
->   arch/s390/include/arm64/kvm_emulate.h | 130 ++++++++++++++++++++++++++
->   arch/s390/include/arm64/kvm_nested.h  |  11 +++
->   arch/s390/include/arm64/ptrace.h      |  11 +++
->   arch/s390/include/arm64/sysreg.h      |  13 +++
->   arch/s390/kvm/arm64/handle_exit.c     |  98 +++++++++++++++++++
->   arch/s390/kvm/arm64/inject_fault.c    |  21 +++++
->   6 files changed, 284 insertions(+)
->   create mode 100644 arch/s390/include/arm64/kvm_emulate.h
->   create mode 100644 arch/s390/include/arm64/kvm_nested.h
->   create mode 100644 arch/s390/include/arm64/ptrace.h
->   create mode 100644 arch/s390/include/arm64/sysreg.h
->   create mode 100644 arch/s390/kvm/arm64/handle_exit.c
->   create mode 100644 arch/s390/kvm/arm64/inject_fault.c
+>   arch/s390/kvm/arm64/arm.c         | 392 ++++++++++++++++++++++++++++++
+>   arch/s390/kvm/arm64/guest.c       |  47 +++-
+>   arch/s390/kvm/arm64/handle_exit.c |  31 +++
+>   arch/s390/kvm/arm64/handle_exit.h |   9 +
+>   arch/s390/kvm/arm64/reset.c       |  73 ++++++
+>   arch/s390/kvm/arm64/reset.h       |  11 +
+>   arch/s390/kvm/arm64/trace.h       |   2 +-
+>   7 files changed, 562 insertions(+), 3 deletions(-)
+>   create mode 100644 arch/s390/kvm/arm64/handle_exit.h
+>   create mode 100644 arch/s390/kvm/arm64/reset.c
+>   create mode 100644 arch/s390/kvm/arm64/reset.h
 > 
 
 [...]
 
-> +static __always_inline unsigned long kvm_vcpu_get_hfar(const struct kvm_vcpu *vcpu)
+> +static int kvm_vcpu_initialize(struct kvm_vcpu *vcpu,
+> +			       const struct kvm_vcpu_init *init)
 > +{
-> +	return vcpu->arch.sae_block.hai.far_elz;
-> +}
+> +	unsigned long features = init->features[0];
+> +	struct kvm *kvm = vcpu->kvm;
 > +
-> +static __always_inline phys_addr_t kvm_vcpu_get_fault_ipa(const struct kvm_vcpu *vcpu)
+> +	scoped_guard(mutex, &kvm->arch.config_lock) {
+> +		if (test_bit(KVM_ARCH_FLAG_VCPU_FEATURES_CONFIGURED,
+> +			     &kvm->arch.flags) &&
+
+
+In this case I'd rather have a long line than having to look at this 
+mess. One of the cases where a normal mutex acquisition would have made 
+the code more readable.
+
+
+> +		    kvm_vcpu_init_changed(vcpu, init))
+> +			return -EINVAL;
+> +
+> +		bitmap_copy(kvm->arch.vcpu_features, &features,
+> +			    KVM_VCPU_MAX_FEATURES);
+> +
+> +		kvm_reset_vcpu(vcpu);
+> +
+> +		set_bit(KVM_ARCH_FLAG_VCPU_FEATURES_CONFIGURED,
+> +			&kvm->arch.flags);
+> +		vcpu_set_flag(vcpu, VCPU_INITIALIZED);
+> +	}
+
+[...]
+
+> +/** kvm_arch_vcpu_ioctl_run() - run arm64 vCPU
+> + *
+> + * Execute arm64 guest instructions using SAE.
+> + *
+> + * Returns:
+> + * 1 enter the guest (should not be observed by userspace)
+> + * 0 exit to userspace
+> + * < 0 exit to userspace, where the return value indicates n error
+> + *
+> + *
+> + */
+> +int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
 > +{
-> +	return vcpu->arch.sae_block.hai.teid.addr * PAGE_SIZE;
+> +	DECLARE_KERNEL_FPU_ONSTACK32(fpu_save);
+> +	struct kvm_run *kvm_run = vcpu->run;
+> +	int ret;
+> +
+> +	if (kvm_run->exit_reason == KVM_EXIT_MMIO) {
+> +		ret = kvm_handle_mmio_return(vcpu);
+> +		if (ret <= 0)
+> +			return ret;
+> +	}
+> +
+> +	vcpu_load(vcpu);
+> +
+> +	kernel_fpu_begin(&fpu_save, KERNEL_FPC | KERNEL_VXR);
+> +	load_vx_regs((vcpu->arch.ctxt.vregs));
+> +
+> +	if (!vcpu->wants_to_run) {
+> +		ret = -EINTR;
+> +		goto out;
+> +	}
+> +
+> +	kvm_sigset_activate(vcpu);
+> +
+> +	might_fault();
+> +
+> +	ret = 1;
+> +	do {
+> +		if (signal_pending(current)) {
+> +			kvm_run->exit_reason = KVM_EXIT_INTR;
+> +			ret = -EINTR;
+> +			continue;
 
-gfn_to_gpa()?
+Why not break?
+With continue we'll jump to the condition which is immediately false 
+since we just set ret to a negative value.
 
+> +		}
+> +
+> +		if (need_resched())
+> +			schedule();
+> +
+> +		if (ret > 0)
+> +			ret = check_vcpu_requests(vcpu);
+> +
+> +		vcpu->arch.sae_block.icptr = 0;
+> +
+> +		arm_vcpu_run(vcpu);
+> +
+> +		ret = handle_exit(vcpu);
+> +
+> +	} while (ret > 0);
+> +
+> +	kvm_sigset_deactivate(vcpu);
+> +out:
+> +	if (unlikely(vcpu_get_flag(vcpu, INCREMENT_PC)))
+> +		adjust_pc(vcpu);
+> +
+> +	save_vx_regs(vcpu->arch.ctxt.vregs);
+> +	kernel_fpu_end(&fpu_save, KERNEL_FPC | KERNEL_VXR);
+> +	vcpu_put(vcpu);
+> +
+> +	return ret;
+> +}
