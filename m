@@ -1,108 +1,112 @@
-Received: from mta0.migadu.com (out-151.mta0.migadu.com [91.218.175.151])
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EE3B39B947
-	for <kvmarm@lists.linux.dev>; Sat, 29 Aug 2026 15:05:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9795B3B6BE8
+	for <kvmarm@lists.linux.dev>; Sat, 29 Aug 2026 15:53:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788015910; cv=none; b=mciJD4irzt8veRhrJWpR2sG4XLvJupuSXHqwAqXZKnK6pxtPHKwMQFbzPiWkbV0dAdKwM5zXcObBN11IdivlzqAg6PB+BL73llbD2gecZjtEh5AjQdxm7mov4RRftG+SCiwQY93RDAe78Kn6poZHFBwq7tz0gto03dBf6oOs2RE=
+	t=1788018786; cv=none; b=XDkse9sDdTCwXlzVnOr9R7mKW9hD4QvlfFD8dm/tRejGaPRhAbqd8X7WWivw6hr7VALzfzNE8Gab29pEJWQMrp5drzg/NNIvU29B6cScEBz6dxh2SUFhUkoSZ+V4lUYo7QUW9W2yfms99WEBcITcmU3rsbWmxI44nTRvRf+KyCM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788015910; c=relaxed/simple;
-	bh=kwvpB2s4F2EzLbnFB1heuBDYWxBCbVtzb/X0O2S5ZOc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=G39ekkK2sJsXorlRZZLDMmOsdZmFjgM1Lhs2U8+thBU0iQqIL5GP7lU1KakqDrLPxQ3ravBCuInciB5EB0wmNZqkU6O89KiQ5+9je8iXEbVCkescdPq9fsrobDy95RNt3Bj7ozLrGdI3V6/yX9NivKTqDTX5snsoQYGjOR7GwVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vJHGdqXM; arc=none smtp.client-ip=91.218.175.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1788018786; c=relaxed/simple;
+	bh=u/QcdMTFyvL/N8kNdZkXvPw5nH3ZXvrAXroaB5kwYPY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MNDW8xC5ABGiPYF8Ui9eZjthLLpO3Pl17yRUo9SJw35QKPbs+J80oVSiuP9PsfhVscukkAdgqlP3/fNKi8bpbHN7sUQ9NcSqrlJSNb4lCacw1FdB3Ll7rWf3fpbz2eWaUzAoTVwCJxrBy/juQAE8M8YMpwppsZxszwbq/Xj+OEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hzV/TL4q; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vJHGdqXM"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=kwvpB2s4F2EzLbnFB1heuBDYWxBCbVtzb/X0O2S5ZOc=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1788015906; v=1; x=1788620706;
- b=vJHGdqXMU/2kcg/FrkTSr4bB4CiG8BHHkVkSh2pnIGsrbRuG2P/kMsY+m8/cC5HphJ0TiYMh
- fwTXHe5u8U3iG6dnGffYXWJMiZ8Yvisn+XGGn7Uo5fpoRVfwS4qcdEjURsQO+YAPh7UQjt2rVYF
- /u2twBePttGPQZGgacoFXqQk=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 8552a3e7d7c80a95;
-	Sat, 29 Aug 2026 15:05:04 +0000
-X-Mizu-Trace-ID: 8552a3e7d7c80a95
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5aeb688ae83so2212e87.1
-        for <kvmarm@lists.linux.dev>; Sat, 29 Aug 2026 08:04:59 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBxfcbvSxT4IveMTBIT8qPfjVpSTfPaUEvhi+ghS+M9mO14MKes4QnsFrvf5J7uHxhsHMr2dJdM=@lists.linux.dev
-X-Gm-Message-State: AFuF++ltj8XAHxDWNdjhGc+8ttX9GYnmKpWk1j5UnzS5b+v8/NnswkGL
-	bV3v2Kx+a5XyBHy+pVcpQ8dTEutmJ0FGoxrBrOE+1csQFSxgWOAeSOZ9mkUxXo0q3LClI6zDl6Q
-	rJHJzropRTIZRqPD9701gFFr80TqFzNuXBnG65nzj
-X-Received: by 2002:a05:6512:2392:b0:5ae:b0ee:f737 with SMTP id
- 2adb3069b0e04-5b5ef22d25dmr97393e87.9.1788015898930; Sat, 29 Aug 2026
- 08:04:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hzV/TL4q"
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-47f96c5b722so1195198f8f.0
+        for <kvmarm@lists.linux.dev>; Sat, 29 Aug 2026 08:53:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1788018783; x=1788623583; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=Kqxt2pJA79TUQhxHKJFLWKa2wf0Abmgu0fLyjHQBRCk=;
+        b=hzV/TL4qsnSP7lK4gkb6oFu9AD09cdbHexYN+1ES4w7ziilhB9MHqFyB+iqya6OrT/
+         C8G2qq3k+86aHb+d2UJfmn/wvqR0oidqH0ApFRv4IRYiHSwyQIQjqTb4dKIi3NJFnlWC
+         SYfBLCIHskG5szWleFfkxY++rP9boYs+ZHWEQUQKRWdJk2T54bU7aNXBTZdROLPPB5pQ
+         0mGXoSkZXva2QzjPW7OspuCCFGwGE8XZuzHXXvup6DoErFAy9QvOVQZprNgKGVmrsDgk
+         mHLj4LdikYDW0TmMdD0s6kLfWcEbg9bLAOqkji8f+TO3AxyC3ybjP6rVImJe3OQg8o1x
+         rgCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788018783; x=1788623583;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=Kqxt2pJA79TUQhxHKJFLWKa2wf0Abmgu0fLyjHQBRCk=;
+        b=ipkRJVkHF+bP7owepuM7DMAagdWMUcasBJNHywStXTQY0U8G/wkXdmRYI0E2sGWpXy
+         fsTeC29m3jmEIYTG/CgPwhOWVqMTkydw5vcoB+3rgUOHa5YaEx1y5X2Cq8YCYmHWKfCX
+         eswMr7waYvimOHhA+QagtcTLxn8csX4WyIBivdQdPjEY/cMhtmd3Ptjvsl6VeFCxnnZc
+         Xnh1LJkgr0fE8FhCGm4P8SrrsvCmy0lI6N+pyF9/rj5fRZWSluu5cBDhbojtQYs/wvP4
+         aOCmXYwcBTJxX/DFaT8YCOPRDCsAzFLEv7IWaL+MKV353Km7KX4Ew+D4g87ji8ks7/Mk
+         4n5g==
+X-Forwarded-Encrypted: i=1; AKwUvBzOPqETyWUpb6QJILnTToBy26tHz3GHD2Do6kgeESDMnEXhZVHjJr8RsAmyhjuLBPnkRo8+miw=@lists.linux.dev
+X-Gm-Message-State: AFuF++mnyqGp77lU+s8W/6+4z6hEZfyafx0WTeNyJsYIlTr89UOWVxQH
+	S7RgNMfgOP+YKjxCXbMi62+Fpe3J1qsJtf5ujXXsFgLtxVENNH3n6RSt
+X-Gm-Gg: AYBFou1z4GDM2LmnW76jEAXT7UD09gpTfHZOcnAyUipchJW2adn96MsvHFGGtMSLeRS
+	+azU0cqKXYhTHrYOMPuaUrEsaKaVcXlG4fEAkI2hSF3fQazF7CRJ/xFhUJ2ulhheblYQFbf98UH
+	8AziTR4CfeOcW1f8Zlf+zj5l4dlvgKcCQfXsZvlwQhsLjjS9SesSzsn89CuwiiN5FrYDdlmFNLd
+	/KJJUv6X8p9K1phniGM8Y+JSQwcDjz5/KfCFGCLNiEpdiMIVao21LNQq7DYxzwPQVBqItVyjAbF
+	n7TrF9c7o+84BCZkI/W4jdq/op7iocTmUnNwR1Lcs+BrG6a+wtQh4TUSHjAAEXK5P8igd7MbL6D
+	Bcsf/4Wi6FdP77wPPrCw1Zjai3K8igJL3nO4lbTdRHktEw3R8O82w8DbuViYK1/8ncgxxLJvDGy
+	930TLd3Q+MJPwOAq8UcY54RiicqGP2sebSL8A1NsggxsTzey5fMVWxOop3RyxxAaw30m85jvspc
+	1ubeKCtZlOuxsDb+JYtQl8EeZFsoRct6qwtqip2UjxGOjJkR2SjEB1zXEXSN6eIeVfOLlV6Ogou
+	WIAt3dG/M4E6QQFCpSgLLnxtt5Eop7KS/BSuaP9Mb8dVE9/WoOP0Kxw9+EoQ6fi5CmYIzA==
+X-Received: by 2002:a05:6000:2287:b0:484:3310:f399 with SMTP id ffacd0b85a97d-4843310f41cmr3869418f8f.26.1788018782440;
+        Sat, 29 Aug 2026 08:53:02 -0700 (PDT)
+Received: from unknown748F3CBA5068 (dynamic-2a02-3100-ae86-1b01-80e2-8851-4221-68d8.310.pool.telefonica.de. [2a02:3100:ae86:1b01:80e2:8851:4221:68d8])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-482fbb20122sm10864679f8f.20.2026.08.29.08.53.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 29 Aug 2026 08:53:02 -0700 (PDT)
+Date: Sat, 29 Aug 2026 17:53:00 +0200
+From: Karl Mehltretter <kmehltretter@gmail.com>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	kvmarm@lists.linux.dev, Joey Gouly <joey.gouly@arm.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
+	Shuah Khan <shuah@kernel.org>, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH 1/2] KVM: arm64: Return -EINVAL for an empty SMCCC filter
+ range at base 0
+Message-ID: <apL9jzg-KM_n3Vv2@gmail.com>
+References: <20260829054856.70549-1-kmehltretter@gmail.com>
+ <20260829054856.70549-2-kmehltretter@gmail.com>
+ <CA+EHjTzQM0bf1x2X-Y+eMmUHSYUmJXpt_jQ4Csu7JpkjtFT72Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260829054856.70549-1-kmehltretter@gmail.com> <20260829054856.70549-3-kmehltretter@gmail.com>
-In-Reply-To: <20260829054856.70549-3-kmehltretter@gmail.com>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Sat, 29 Aug 2026 16:04:22 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTzexMPUFJ_DuqAmKFP57UTd_nqGevWBqODDRi3tvg-YEA@mail.gmail.com>
-X-Gm-Features: AcwNN1XqbhfaFCphLC-k_pbis2x4NMIEFS4Vcu3x3JJmr3Eq6xNmX3vLDUzikl0
-Message-ID: <CA+EHjTzexMPUFJ_DuqAmKFP57UTd_nqGevWBqODDRi3tvg-YEA@mail.gmail.com>
-Subject: Re: [PATCH 2/2] KVM: arm64: selftests: Test empty SMCCC filter range
- at base 0
-To: Karl Mehltretter <kmehltretter@gmail.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
-	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Sean Christopherson <seanjc@google.com>, Shuah Khan <shuah@kernel.org>, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTzQM0bf1x2X-Y+eMmUHSYUmJXpt_jQ4Csu7JpkjtFT72Q@mail.gmail.com>
 
-On Sat, 29 Aug 2026 at 06:50, Karl Mehltretter <kmehltretter@gmail.com> wrote:
->
-> test_invalid_nr_functions() only checks an empty range at
-> PSCI_0_2_FN64_CPU_ON, which KVM's end < start check happens to catch.
-> It never exercised base 0, where the inclusive end wraps to U32_MAX
-> instead.
->
-> Add the base 0 case. Without the preceding fix it fails with EEXIST.
->
-> Assisted-by: LLM
-> Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
+On Sat, Aug 29, 2026 at 04:04:01PM +0100, Fuad Tabba wrote:
+> > Fixes: 821d935c87bc ("KVM: arm64: Introduce support for userspace SMCCC filtering")
+> > Assisted-by: LLM
+> 
+> nit: this should be `Assisted-by: AGENT_NAME:MODEL_VERSION [TOOL1]
+> [TOOL2]` rather than LLM
+> 
 
-Same nit as before.
+When I first saw 'LLM' in a patch I thought so too.
 
-Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
-Tested-by: Fuad Tabba < fuad.tabba@linux.dev>
+But it is now allowed, see recent discussion and merge: 
 
-Cheers,
-/fuad
+  https://lore.kernel.org/r/87qzkuahlr.fsf@trenco.lwn.net/
 
-> ---
->  tools/testing/selftests/kvm/arm64/smccc_filter.c | 4 ++++
->  1 file changed, 4 insertions(+)
->
-> diff --git a/tools/testing/selftests/kvm/arm64/smccc_filter.c b/tools/testing/selftests/kvm/arm64/smccc_filter.c
-> index 21e41880261b..a41ed3e016ba 100644
-> --- a/tools/testing/selftests/kvm/arm64/smccc_filter.c
-> +++ b/tools/testing/selftests/kvm/arm64/smccc_filter.c
-> @@ -140,6 +140,10 @@ static void test_invalid_nr_functions(void)
->         TEST_ASSERT(r < 0 && errno == EINVAL,
->                     "Attempt to filter 0 functions should return EINVAL");
->
-> +       r = __set_smccc_filter(vm, 0, 0, KVM_SMCCC_FILTER_DENY);
-> +       TEST_ASSERT(r < 0 && errno == EINVAL,
-> +                   "Attempt to filter 0 functions at base 0 should return EINVAL");
-> +
->         kvm_vm_free(vm);
->  }
->
-> --
-> 2.39.5 (Apple Git-154)
->
+  816d9992d9ed ("coding-assistants: simplify attribution")
+ 
+> Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
+> Tested-by: Fuad Tabba < fuad.tabba@linux.dev>
+
+Thanks for the review and also testing!
+
+Karl
