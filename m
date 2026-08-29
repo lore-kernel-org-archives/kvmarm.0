@@ -1,98 +1,199 @@
-Received: from mta1.migadu.com (out-120.mta1.migadu.com [95.215.58.120])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azon11010045.outbound.protection.outlook.com [52.101.56.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F1D43C0A09
-	for <kvmarm@lists.linux.dev>; Sat, 29 Aug 2026 15:56:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.120
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788018969; cv=none; b=Prek5JfmbVRdePMcmlwQqUMxTv1GtgzOa6zjUClDM9hNWfIR6M6jhgFTyBa03R1y6S3K8woMhQd03KOPshBMlWDdAEVKiWs31S9whEiBp8OqCX2IxePwEt41DIeJ+2w03HwAwWiszSE61vaLhDWXqPujpMBqTPnaV9EoPoAJ6po=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788018969; c=relaxed/simple;
-	bh=3dTe4I+jOUWdWEDTdrRhpKO6zN5DvkrePHACeVTRXMA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tHjRP8j1nNNAA7PxaaVOYPfdED2fX5mBXdjH5X6WTetp8Yhav8aHOgYEh3+OuRQNTqP73hUxa0Y1LpDFiLJ/8vBPV54BiSKxPT0RQ5Q3KEmGufKMQeglzfX7hHtWa8DZ1G2mVxEdePaKHyFbjiODM4RISQ6v6EvM6JFDAc52Z+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dVvsLidc; arc=none smtp.client-ip=95.215.58.120
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30C6D79CD;
+	Sat, 29 Aug 2026 18:22:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.56.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788027744; cv=fail; b=aE/eKoLu8LVj5cOxXMp3aulCQrjt7HYPjbxY/2NuyG5YR+85oJuovKY92/FyPlzql4ksxKXMahh2N6JnC89N0QOoaaNQW6qEdmtz+mb8Ls7in3WghXlr5mvprVXEK1G/GcNGU9OnfNthHVu57JBpW9kYRO6XeA+Wy4o2c2k7tD8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788027744; c=relaxed/simple;
+	bh=zINxc7FFcdGgovKApvH5+8T1ZgidzaSDf06JHYmmi2s=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iTDJqEQj6xZyOXu7UAfMq54MBvXuR1Dwqw3WVux5TWmesP4+Tpzewm2r9Akuu1IqUZ+kNj8QhiOoI5d7N/ybw2QS8oQxypXGvLXbZB4BPKgKvgCHoyYRMU6m9SCLXrGk18Uh+GBSHpmbGTx/FfcrnFuRuWx/BC2352m4BYur9xw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=RSRVTQbs; arc=fail smtp.client-ip=52.101.56.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dVvsLidc"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=3dTe4I+jOUWdWEDTdrRhpKO6zN5DvkrePHACeVTRXMA=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1788018957; v=1; x=1788623757;
- b=dVvsLidcMR1dWi8BRMWNvY2WiZ7LvSHOqx/DoN+uDn0bNJi5i0K+PMyx9ExsmYnbBquGVCd6
- iLzYQ1ap5VaYAHd6KkxAy4HXom3iQulxuXZTQJrYaIjHaQ08K5tMGqVMRay4znTB8N9Nny+qZD6
- OFfbYsM39yzNm24lwUQQh7o4=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 2f78d3edf92b2df7;
-	Sat, 29 Aug 2026 15:55:57 +0000
-X-Mizu-Trace-ID: 2f78d3edf92b2df7
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-5b2a73da7e1so4302e87.0
-        for <kvmarm@lists.linux.dev>; Sat, 29 Aug 2026 08:55:53 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBwCjATc0mo/Td5o1+ChhE5ayDa9R06Md7eeyM9XthlNCI8/mzDS1WxwW8G3lD/JcMQCsoxRV+o=@lists.linux.dev
-X-Gm-Message-State: AFuF++nug30zMW+yN9294oFDxCJ1kAj+NfJVUvvxR0ZSR29BN9cCI9Qo
-	KW/WMlKszzsJx3vMU52PVPdlO/A0Bj9B2PGObBQZ7KK8kQukLV6pPOIEH6IxQbUDvyWnwy3Dg4K
-	BGuAM6wwvkWlJNQxcmU4pznaHnIwZW7ks23lBrhy4
-X-Received: by 2002:a05:6512:4484:b0:5b1:ca0b:25d2 with SMTP id
- 2adb3069b0e04-5b5ef1bf21emr94137e87.4.1788018952785; Sat, 29 Aug 2026
- 08:55:52 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="RSRVTQbs"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=OA9aZTlUsLW12KmEwzpZdeL3XlWZi2f+HCJ121pgD+XSQ3+H1YsMKD98k/lKnRMLd8gz7rBi0rkMg2oHCXXnfWxsdqO02SFLHd3M6Q/KHqr/zbVmKtLd64+akj3vj09w+rNmwji/Z8uhxQ9dcX9hVfmBroiVMwG+obA6nA7JwC1iJk7XBXNAutNkrkyv4oOkoftjYaXQnytrOsyyqCQMKnEeTf3Mlqfc0fu/D6jtFAo+FoRN8KEngNGZNz0yfW51CEblhiJ+SDDAE25Wxjk3H4TWSZNTenrDscjki7CcVFuNTkQpZ1sNmTMP2GV3OA18qW7MKSwV/P5+LVuGtdzcvg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=4TOxm/EjdQ4sLGsI4PX3BcNlLNgsTi2DIFAs4AYkqvs=;
+ b=KPmMgbsqjaPV2sobwCt3SnzWED5VziApZSk9jJDOq4Opv00GaR4SfQ13bRg8wh0+YgKoKxW3K6DkkM/+NX8WlKgkvM4KjpQe6Guhq0SHv8y78oSCs9sGEJWLmPfxHJUuZPCXvzzefoB/kgXD331l94LKhDniit/GNOeHzXOJN8uz8d1UT6umoBIEL1kpvzeftmAxQAPFXLL20u21Hx4XHMsXQ1Z7R6paHrkF293p1zsNJq7c+iUrP7i+uJtRFysnGw4B1WQS1W7MMgyzhu7NdF+gerKFmpfrg6stw4kzWwpgX0sr7xlW26emdiyTKSNYMNKXX7p7O2yoJqaNad7zlw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.233) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4TOxm/EjdQ4sLGsI4PX3BcNlLNgsTi2DIFAs4AYkqvs=;
+ b=RSRVTQbsTJsp+3J0Nw4vUBe340XRccQODl5ThSFPudKQSMCjYYmAmKYKDyF7VlzHC679tOG5wZEiYvX23y4fwu1basaxwQe3Kmmq+gy9s3lezCBcR/NyOo8UGKBtUZqq58lZsRr73Kw6OxniJ8E73pLYOfNs7xS178DXfyOO93VadcD68xKE82zjMi+RBAOTE2DTq8TESuaDJdtvJInp8LMY0SnVv535m4uZVMWb72Vm8KAX6G0+qDj3oeGC8AY0j/qGr7BbiN2nMH4/uU/SoMEzE3Yrn5OIcY5FlCR1NiWk+fuKKi/YxhbjPvdxspObbz9XCcrHQb0qrsn85ndISw==
+Received: from CH2PR19CA0012.namprd19.prod.outlook.com (2603:10b6:610:4d::22)
+ by PH7PR12MB5711.namprd12.prod.outlook.com (2603:10b6:510:1e2::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.360.12; Sat, 29 Aug
+ 2026 18:22:16 +0000
+Received: from MN1PEPF0000ECD9.namprd02.prod.outlook.com
+ (2603:10b6:610:4d:cafe::d) by CH2PR19CA0012.outlook.office365.com
+ (2603:10b6:610:4d::22) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.360.12 via Frontend Transport; Sat,
+ 29 Aug 2026 18:22:16 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.233) by
+ MN1PEPF0000ECD9.mail.protection.outlook.com (10.167.242.138) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.382.8 via Frontend Transport; Sat, 29 Aug 2026 18:22:16 +0000
+Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
+ (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.46; Sat, 29 Aug
+ 2026 11:22:12 -0700
+Received: from drhqmail202.nvidia.com (10.126.190.181) by
+ drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.46; Sat, 29 Aug 2026 11:22:11 -0700
+Received: from nvidia.com (10.127.8.10) by mail.nvidia.com (10.126.190.181)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.46 via Frontend
+ Transport; Sat, 29 Aug 2026 11:22:10 -0700
+Date: Sat, 29 Aug 2026 11:22:09 -0700
+From: Nicolin Chen <nicolinc@nvidia.com>
+To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
+CC: <linux-coco@lists.linux.dev>, <kvmarm@lists.linux.dev>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	Alexey Kardashevskiy <aik@amd.com>, Catalin Marinas
+	<catalin.marinas@arm.com>, Dan Williams <dan.j.williams@intel.com>, "Jason
+ Gunthorpe" <jgg@ziepe.ca>, Joerg Roedel <joro@8bytes.org>, Jonathan Cameron
+	<jic23@kernel.org>, Marc Zyngier <maz@kernel.org>, Pranjal Shrivastava
+	<praan@google.com>, Robin Murphy <robin.murphy@arm.com>, Samuel Ortiz
+	<sameo@rivosinc.com>, Steven Price <steven.price@arm.com>, Suzuki K Poulose
+	<Suzuki.Poulose@arm.com>, Will Deacon <will@kernel.org>, Xu Yilun
+	<yilun.xu@linux.intel.com>
+Subject: Re: [RFC PATCH v4 01/16] iommu/arm-smmu-v3: Discover RME support and
+ realm IRQ topology
+Message-ID: <apMjUSbxcnlAKjks@nvidia.com>
+References: <20260427085344.941627-1-aneesh.kumar@kernel.org>
+ <20260427085344.941627-2-aneesh.kumar@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260829054856.70549-1-kmehltretter@gmail.com>
- <20260829054856.70549-2-kmehltretter@gmail.com> <CA+EHjTzQM0bf1x2X-Y+eMmUHSYUmJXpt_jQ4Csu7JpkjtFT72Q@mail.gmail.com>
- <apL9jzg-KM_n3Vv2@gmail.com>
-In-Reply-To: <apL9jzg-KM_n3Vv2@gmail.com>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Sat, 29 Aug 2026 16:55:16 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTzP0ijpos=1UOTz36b6_e1Ux90rNPm8HV5AKRhMOd76Zg@mail.gmail.com>
-X-Gm-Features: AcwNN1VTjw50xqm9AUGeQ2iOjooRY4VH0Aw3j5JN4xMy5Uv_aVYtiX-pVxGi2Is
-Message-ID: <CA+EHjTzP0ijpos=1UOTz36b6_e1Ux90rNPm8HV5AKRhMOd76Zg@mail.gmail.com>
-Subject: Re: [PATCH 1/2] KVM: arm64: Return -EINVAL for an empty SMCCC filter
- range at base 0
-To: Karl Mehltretter <kmehltretter@gmail.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
-	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Sean Christopherson <seanjc@google.com>, Shuah Khan <shuah@kernel.org>, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20260427085344.941627-2-aneesh.kumar@kernel.org>
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN1PEPF0000ECD9:EE_|PH7PR12MB5711:EE_
+X-MS-Office365-Filtering-Correlation-Id: c01f161a-66a5-42ff-3b63-08df05fa74a4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|36860700016|1800799024|23010399003|7416014|376014|22082099003|18002099003|56012099006|11063799006|4143699003|10067099003;
+X-Microsoft-Antispam-Message-Info:
+	gYGGoOz/yPH6ypA6BBTqcUhL4gci7n4GnxlySarNAc79PC/SBo0UXQ5sZ7sKnx7GPxvbh90IN2Hff2Ue1cZAolU995kM27m1cShPIUymmLJmV1cZev5PjUOepJcHnC2rAfAGe4oc+kdZko/PM3DfaLnN3amgyLoLucbm8aGXrBrsRk1Go6XmkmyiusSHxw7LSq7KfCPXemWeRHNHjTktM5fNMPQGp1X493AoOhm+XA4JC3Y2rueFntw9A/fy06H5UBMhdNGcavqM9pCIHeeXsbALtiExb71dmVmRK7gRc+vP2lM82L/WYost0ozN3011m5yvXVD+2CenL9M0PbpS2Fn++R+EoUuupM7j29TSPuDDiucknKByWhwxmVAnWcK36f8ycz5VFPZS1DGE4sd9QxCPHy9Ng7tg69XybmhpaVGrjPRjlUpFFm38P/HH2o2VrvZUPupU5URnCOarmUZWmoy9uolNIMjH8LV/diRMmSGckCVGIovGMlk60CrU1BV4+72KFqmlftiOzKyviZqtfOOSZKmC8SZjC5SmbYT61kvCklLJjOtyWRTLIF53EhjP9lUzjZqJlKLGRELT2tk5p8ShWx5ckV/wET+rU5hzGt6AfB6u+tn4BAkTDusnylZGUMppwZzfVjV+7e0Gz6t1EELXrs5Vx4JZrWMtTHuU4VLT+KkYYAFFDwQcyMtmm3kQlV+Xj2h0Y8TvG5MLzxrPbg==
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(36860700016)(1800799024)(23010399003)(7416014)(376014)(22082099003)(18002099003)(56012099006)(11063799006)(4143699003)(10067099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	sCsc+0kxK69zsufTPcnVlAYvvv/Q80k/YYL+Q/epGYA5LcyO++w3wovt3qKfbQyUiJiz0s7ekCpNAYQUo7EjnD3xoBVC5MC4WRo/RTol/7rQMGFvunTTGzH6Ii+RqY2O6kyDDtv8KQXhfLmxV4uxGVcVAhva/zKV1PKf59WFAKuSAvyALq00wQkpxjuHSr5vNHSFybZxHLcpvGBQgqYKKQC8IMfE81cX0viI3AGwwjNlMzQ44SbV3m4Gtbz2TvRsyjYo1vLISlTP3NxDO7SCSBtiF0Qtev1uBQvC5z2AofIlXCrF/VO9gGYcTS2hqbfa4gCYl2JCyXSLj7RmT9QbLxoZayeLuXamO2oxteUEtMZzdcrXkUQvfgOj1+AaSYbEvd9BgwqTAJ8CNu93GDDoGpT1XOoRHi2Ln6ST2fFRBOuRChY6XCnrhXsor3uLVIB5
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Aug 2026 18:22:16.4844
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: c01f161a-66a5-42ff-3b63-08df05fa74a4
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	MN1PEPF0000ECD9.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5711
 
-On Sat, 29 Aug 2026 at 16:53, Karl Mehltretter <kmehltretter@gmail.com> wrote:
->
-> On Sat, Aug 29, 2026 at 04:04:01PM +0100, Fuad Tabba wrote:
-> > > Fixes: 821d935c87bc ("KVM: arm64: Introduce support for userspace SMCCC filtering")
-> > > Assisted-by: LLM
-> >
-> > nit: this should be `Assisted-by: AGENT_NAME:MODEL_VERSION [TOOL1]
-> > [TOOL2]` rather than LLM
-> >
->
-> When I first saw 'LLM' in a patch I thought so too.
->
-> But it is now allowed, see recent discussion and merge:
->
->   https://lore.kernel.org/r/87qzkuahlr.fsf@trenco.lwn.net/
+On Mon, Apr 27, 2026 at 02:23:29PM +0530, Aneesh Kumar K.V (Arm) wrote:
+> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-realm.c
+> @@ -0,0 +1,124 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (C) 2026 ARM Ltd.
+> + */
+> +
+> +#include <linux/interrupt.h>
+> +#include <asm/rmi_smc.h>
+> +#include <asm/rmi_cmds.h>
+> +
+> +#include "arm-smmu-v3.h"
+> +
+> +#define	RMI_PSMMU_IRQ_GERROR	BIT(0)
+> +#define	RMI_PSMMU_IRQ_EVENTQ	BIT(1)
+> +#define	RMI_PSMMU_IRQ_PRIQ	BIT(2)
+> +#define	RMI_PSMMU_IRQ_CMDQ	BIT(3)
+[...]
+> +	if (irq == smmu->realm_evtq_irq)
+> +		notify_flags =  RMI_PSMMU_IRQ_EVENTQ;
+> +	else if (irq == smmu->realm_gerr_irq)
+> +		notify_flags =  RMI_PSMMU_IRQ_GERROR;
+> +	else if (irq == smmu->realm_pri_irq)
+> +		notify_flags =  RMI_PSMMU_IRQ_PRIQ;
 
-I missed that. Makes sense to be honest. Either way, that was just a nit :)
+These are defined as BIT(x)...
 
-Thanks!
-/fuad
+> +		if (rmi_psmmu_irq_notify(smmu->base_phys,
+> +					 notify_flags, &event)) {
+[...]
+> +			rmi_psmmu_event_consume(smmu->base_phys, notify_flags);
 
->
->   816d9992d9ed ("coding-assistants: simplify attribution")
->
-> > Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
-> > Tested-by: Fuad Tabba < fuad.tabba@linux.dev>
->
-> Thanks for the review and also testing!
->
-> Karl
+.. and passed to RMI_PSMMU_IRQ_NOTIFY and RMI_PSMMU_EVENT_CONSUME.
+
+RMI_PSMMU_IRQ_NOTIFY takes RmiPsmmuIrqSet type, which is a 4-bit
+field that has a range of [BIT(0), BIT(3)]. So this is correct.
+
+However, RMI_PSMMU_EVENT_CONSUME takes RmiPsmmuIrq type, which is
+a 2-bit field that has a range of [0x0, 0x3]. So this seems wrong.
+
+> +void arm_smmu_setup_realm_irqs(struct arm_smmu_device *smmu)
+> +{
+> +	int irq, ret;
+> +
+> +	irq = smmu->realm_evtq_irq;
+> +	if (irq) {
+> +		ret = devm_request_threaded_irq(smmu->dev, irq, NULL,
+> +						arm_smmu_realm_notify_thread,
+> +						IRQF_ONESHOT,
+> +						"arm-smmu-v3-realm-evtq",
+> +						smmu);
+
+These IRQ numbers are raw numbers forwarded by firmware and then
+returned by RMI_PSMMU_INFO:
+
++		if ((psmmu_info->flags & RMI_PSMMU_IRQCFG_MASK) ==
++		    RMI_PSMMU_IRQCFG_IRQ_WIRED) {
++			smmu->realm_gerr_irq = psmmu_info->gerror_intr_num;
++			smmu->realm_evtq_irq = psmmu_info->eventq_intr_num;
++			smmu->realm_pri_irq = psmmu_info->priq_intr_num;
+
+Should they be converted to Linux IRQ numbers before forwarded to
+devm_request_threaded_irq?
+
+> @@ -782,6 +787,9 @@ struct arm_smmu_device {
+>  
+>  	int				gerr_irq;
+>  	int				combined_irq;
+> +	int				realm_gerr_irq;
+> +	int				realm_evtq_irq;
+> +	int				realm_pri_irq;
+
+Nit: this series adds a few realm-specific things in the top SMMU
+structure. Maybe a "struct arm_realm_psmmu" can make them clearer.
+
+Thanks
+Nicolin
