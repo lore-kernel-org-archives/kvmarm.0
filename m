@@ -1,109 +1,95 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta1.migadu.com (out-206.mta1.migadu.com [95.215.58.206])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6A784C6D;
-	Sat, 29 Aug 2026 05:58:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C47337B402
+	for <kvmarm@lists.linux.dev>; Sat, 29 Aug 2026 07:11:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787983090; cv=none; b=FUc5d2MtiA6y1O5eivD+cxvlJ+/LjfDcHAow1QbUu7ibohpnUTezeMmpk6nYyKzQek5HmB37ZXC0RxBNM4cu8guzxqWvT3JYiOeoPUzCJTI8Aowg2OpF1e1/o4tzJUNEPpGnD4Gh4XYRh2S2EwuJbORIZNyBTNFOyD9SBRjyHtY=
+	t=1787987490; cv=none; b=BsbNzr6TrrdhcA2gR8ARjdsJd84rCBkXsSa8YrDqTXdSMQarhVNBL3eLTKdMJx/6zJ2z+6r/hULNp55lTvNCTvzdG5lu8UeHb0xfRUqeao2c/Eq1J0CQdthtfE9cB7sG+VNJ0diSMz+quu/nPUmstntfHhKQ6sFXBw/8A0cFHrQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787983090; c=relaxed/simple;
-	bh=MOsJ7PmXDjZ8py3Rjr8Pm7XqTBaeuDR6t1MyRWC+5so=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=D0s//BRNcXImWcqYG/Ua6hQdyzCkkQKmw+kOUbGI4Hos4LY0v2YHN1BN1RckEhCPDSOewCFpX5j0/EmkueRoAdfKj6zhkUQUDFMhk0cfWWWywskhutoJS0nZCX/iKZE6KzQ6II2dGfs2V66bXLK6YU9Z2zvIp1VviOzEuiHSwxE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bmN/lr0J; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1787987490; c=relaxed/simple;
+	bh=oSLoS8auaNbOgwA1cZGo0TZ/MHGsOYbNVd/3zqTdn/s=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=r3RdAcNhaksEtteUPdOwAMSIaYv6tSICZ7GThhFpwS/g6h9y+p6FAlVhvL031LbdzvJ40cuU/pWrritAQEJI74x1GQOr540J6nOoCFeRE6bfAw03Z1fbZD5cvWhsU4D6sAflEJ/fFUyfAb357cxQVd36Cnr+1sxmJXVL5LzLBt8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JO1HgOfJ; arc=none smtp.client-ip=95.215.58.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bmN/lr0J"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29AD31F000E9;
-	Sat, 29 Aug 2026 05:58:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787983089;
-	bh=IiGBd0JOvJrJtp4u+ir8NPI5sb9bulLUrxuIULn7zOg=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=bmN/lr0JIp4xeQRnylFLJlEmY0IhSwhBfDzUQyUpUoabzpUTKgdwFNb5sYxSWSrBO
-	 a6G5YJ8PIPyaotzYxNAMWXp4ECZvuUH9M/LceMYo+8g8sEbs/lXNzDXT2zr6zhyZdI
-	 onOjt/V1TFB1Wa72Arjz3Rwl1S4MaUnKRagXR6irIcsw8cdjpswqL8FkDXzL1HDulM
-	 BlJBXJG4w0LfvdgC88CeI4DivnY2WAuS58EiXJi/eeg1Ro2qWrvdsvsJ+hkstVDVhg
-	 duyAMYl1/NJDpRXSPPPkQHSuuS58hy8UYh2TNOddmkPoaJh+IsIqLcHPyy53OQh/kj
-	 WSXnKB5tFkXag==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 1/2] KVM: arm64: Return -EINVAL for an empty SMCCC
- filter range at base 0
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Karl Mehltretter" <kmehltretter@gmail.com>
-Cc: "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, kvm@vger.kernel.org, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260829054856.70549-2-kmehltretter@gmail.com>
-References: <20260829054856.70549-1-kmehltretter@gmail.com>
- <20260829054856.70549-2-kmehltretter@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 29 Aug 2026 05:58:08 +0000
-Message-Id: <20260829055809.29AD31F000E9@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JO1HgOfJ"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=oSLoS8auaNbOgwA1cZGo0TZ/MHGsOYbNVd/3zqTdn/s=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1787987485; v=1; x=1788592285;
+ b=JO1HgOfJ4THQQHKUkvRdapwzp40sW4mPXcrH9PLwX1siE8U/aX7TtsOyqaUTt+BxPpn+zi7J
+ 8H7L/gsRWJVr8CF1tk6Vlwj6/eSzL3hKoHJ+GkY/vvANCtkypnSqj56jvw0yP0g7w715HHOnyQj
+ DsQNiu2PQQMbFp0RTfosjrGg=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 5fdc89b2f6ddef32;
+	Sat, 29 Aug 2026 07:11:25 +0000
+X-Mizu-Trace-ID: 5fdc89b2f6ddef32
+X-Migadu-Flow: FLOW_OUT
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Quentin Perret <qperret@google.com>,
+	Sebastian Ene <sebastianene@google.com>,
+	Hyunwoo Kim <imv4bel@gmail.com>,
+	Fuad Tabba <tabba@google.com>
+Subject: [PATCH 1/2] KVM: arm64: Sync HCR_EL2.VSE back to the host vCPU under pKVM
+Date: Sat, 29 Aug 2026 08:11:19 +0100
+Message-Id: <20260829071120.2522788-1-fuad.tabba@linux.dev>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
+flush_hyp_vcpu() copies HCR_EL2.VSE from the host vCPU into the hyp
+vCPU on every entry, and nothing copies it back. Once the guest takes
+the vSError the hyp vCPU's copy clears with the hardware bit while the
+host's stays set, so the next entry pends the same SError again,
+KVM_GET_VCPU_EVENTS keeps reporting it, and kvm_arch_vcpu_runnable()
+never lets the vCPU block in WFI.
 
-Pre-existing issues:
-- [High] Unprivileged userspace-reachable WARN_ON_ONCE can be triggered by =
-memory pressure, potentially causing a host panic.
---
+Reflect VSE back on every exit, which the flush-side comment already
+promises.
 
-commit 7eae467c4f77ea62fe7302656a7c43a21cc35eb0
-Author: Karl Mehltretter <kmehltretter@gmail.com>
+Fixes: 734dc8c01c838 ("KVM: arm64: Implement lazy vCPU state sync for non-protected guests")
+Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+---
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-KVM: arm64: Return -EINVAL for an empty SMCCC filter range at base 0
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+index 65a7c735aa398..be35ff5958c82 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+@@ -276,6 +276,10 @@ static void sync_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
+ 
+ 	host_vcpu->arch.iflags		= hyp_vcpu->vcpu.arch.iflags;
+ 
++	/* Cleared by hardware once the guest takes the vSError. */
++	host_vcpu->arch.hcr_el2 &= ~HCR_VSE;
++	host_vcpu->arch.hcr_el2 |= hyp_vcpu->vcpu.arch.hcr_el2 & HCR_VSE;
++
+ 	sync_hyp_vgic_state(hyp_vcpu);
+ }
+ 
 
-This commit fixes an issue where an empty SMCCC filter range at base 0
-wraps around to U32_MAX, overlapping reserved ranges and incorrectly
-returning -EEXIST. It explicitly rejects a zero function count instead.
+base-commit: aa8e5dc6a7a2a1141ab40706a51010adcd0e57d2
+-- 
+2.39.5
 
-> diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-> index b11b8821c9fbc..dfa25bb6f25d4 100644
-> --- a/arch/arm64/kvm/hypercalls.c
-> +++ b/arch/arm64/kvm/hypercalls.c
-> @@ -185,7 +185,8 @@ static int kvm_smccc_set_filter(struct kvm *kvm, stru=
-ct kvm_smccc_filter __user
->  	start =3D filter.base;
->  	end =3D start + filter.nr_functions - 1;
-> =20
-> -	if (end < start || filter.action >=3D NR_SMCCC_FILTER_ACTIONS)
-> +	if (!filter.nr_functions || end < start ||
-> +	    filter.action >=3D NR_SMCCC_FILTER_ACTIONS)
->  		return -EINVAL;
-> =20
->  	mutex_lock(&kvm->arch.config_lock);
-
-[Severity: High]
-This isn't a bug introduced by this patch, but while looking at
-kvm_smccc_set_filter(), is it possible for an unprivileged user to trigger
-a kernel panic via the WARN_ON_ONCE lower down in this function?
-
-A userspace process can call the KVM_ARM_VM_SMCCC_FILTER ioctl, which
-requires /dev/kvm access. The kernel calls
-kvm_smccc_filter_insert_reserved(), which in turn invokes
-mtree_insert_range() with GFP_KERNEL_ACCOUNT.
-
-If this maple tree node allocation fails due to memory pressure or cgroup
-limits, it returns -ENOMEM.
-
-The caller kvm_smccc_set_filter() then unconditionally executes the
-warning check:
-
-    if (!kvm_smccc_filter_configured(kvm)) {
-            r =3D kvm_smccc_filter_insert_reserved(kvm);
-            if (WARN_ON_ONCE(r))
-                    goto out_unlock;
-    }
-
-Because KVM subsystem guidelines forbid host-userspace-reachable warnings,
-could this lead to a host denial-of-service if panic_on_warn is enabled?
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260829054856.7054=
-9-1-kmehltretter@gmail.com?part=3D1
