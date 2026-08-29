@@ -1,199 +1,124 @@
-Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D915355814
-	for <kvmarm@lists.linux.dev>; Fri, 28 Aug 2026 19:15:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.215.173
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787944542; cv=pass; b=eAVPwWO7xvzVPorpSIP0+z3tKBUWpn1SXEKVwAA1j8Ve8sMxiHqqYhCrsclxmiCoZSTCYfTJQvtPhqGTj20u93eJgsnO0oTtPn/YX1ne3tdOh78pZVWQKIAnTIGx7NkO4aLVDWQnw3TI1WtDkM3SZKA9RxfAwQAJw/35ZwuOWeA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787944542; c=relaxed/simple;
-	bh=N1Nbw3ovgXhbS9LBKa33iZ8SPB+0x1h20hpoEb1DbDE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SkSiJblojfnmdxY+LvS7n1oS0F6HDr2OJY+bkZIJISqvNHJEdle7JjjS20Z7/nxqKA1e+t1U0AQ9l2kJVuq5FnmExzsQtbr7uuvaNsAU15cs6RPub58omnIgUrfujiqUQLzOgwfy6/s4F62lOcX2eVz+viAWhM4vSFP9+EIT4hQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Gs7yAOPV; arc=pass smtp.client-ip=209.85.215.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7BC3361968
+	for <kvmarm@lists.linux.dev>; Sat, 29 Aug 2026 05:50:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1787982626; cv=none; b=JoHDT1nm3OEIfzALq8CrVlERvPIqjBcw17KafndPol2C6ty7xC4zQZOSVgpXLIpzMEB2DD55nEYxywCgRZzorkKUkHp4V70D2J8qDiDcLzQECYLGmkNwcLYl11Sxloa3IWKpiiIgLBoY+ze/59V3OPUqb/b2fD6fFR6BnLRG1r8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1787982626; c=relaxed/simple;
+	bh=Z+A8Tz7FckQ9L2HOE2LwzbrR7eujbvyPlVNZTZIai2Q=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=IiXV+r4coRTdOZ0zO9dTGVAG8IDQylybNYGjjRiPTlsm2BszdPrKvxC/yk1AKkkMbotnsxl1lZTNk3xjbsZb1Sd9C2drr5fNYhISdjalfwd76dZIhaePHnY4BwctGIKDzd9HbjQAbZVI+Fwn69fKzbzHunRxwUAMSBzX6KEYh6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nexgEzD0; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Gs7yAOPV"
-Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-cc1d57602e8so1207837a12.3
-        for <kvmarm@lists.linux.dev>; Fri, 28 Aug 2026 12:15:40 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1787944540; cv=none;
-        d=google.com; s=arc-20260327;
-        b=Q7JYoN2sTVFMH5dJIl10qhPFmVWF8xjwzAQUMNXZwdTtPTHpwb7pNynyCwcVay4hwe
-         WczyCXbha2oTEhHIMiUwnQMoADr6S0jtCSedUSB1PzqgHQLaB66ey1NHw8upYTP8NUuw
-         KYWpEBbAgHHT6w3XUVCbzFWzi0te9tFC0nvIdj4ZEhmVcEbgdrGuIdEaMQeEPnFyyZjl
-         WPdFly6xs0/tzsETbyvNgPt3sfl4JGZXCnK4YH20po2SJasis2s9Wt/U/TOFIYFPMEl3
-         SmOKR1bU3aLwEbh9FuNYQ4pKETyZb2FFAGANoqaXtsZaWUgs+8u+5SJyJMZfCxn1ew13
-         EzhA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=kiyvKBshQ+wfh6yua+SMCW+QrMRbGzyCCyz1Zxa7SSM=;
-        fh=IE95IvibIFF0X4XH6X7C3EYi3wBd+5bLKsSX6OCGElI=;
-        b=j76pj6WDqUGitgPz5+jXHOsC2+tBKSB0Oqv/gShOWf7LFvzCO1Cajmn/0MziNDBKQQ
-         HG8Y+tHUqjEKfXU8DmgespXXO6KR6ze44Vq/FT0ctAuWcO49qYzsXrEmvsqO/p52JzcC
-         aMts6MoCZBHmz1jv/u7MyG9gcZHQ/ertJJDvlyTBrDbXsn7yorX2I5l1xXss+p1ZBieB
-         32pDGSdfwE2ujAzPIrwNsJYvPvHV+CML10+YAdaYxQAjpEFFcHQ0N3CTA/8l9DYssR1I
-         ucP6+cHYKIApO1rkrnLqDfjK4ITKV63rcXtMNy9e1ATn4ITI8fW4f3KNheOed3U7SOuV
-         J4oA==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nexgEzD0"
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-49b0dd3c9a0so12094745e9.1
+        for <kvmarm@lists.linux.dev>; Fri, 28 Aug 2026 22:50:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1787944540; x=1788549340; darn=lists.linux.dev;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=kiyvKBshQ+wfh6yua+SMCW+QrMRbGzyCCyz1Zxa7SSM=;
-        b=Gs7yAOPVH/sDTseZvCKaXInQFK4ORUEHscuk9RCLhN6j6n1b0/OEOe8ZMu4vfcaXQz
-         hgHV2ueXjFu7u7fey2tgZ2jvFZJHuCKM3m2pI5a7pPlHJ01wWcZCpmx1GF78EH5UxREP
-         9BB9jFlDN+M0dgZnXGP8SNor4N1RZ7zv2+U11brIZy6oG1YxF78dpXWZ19ZTOLIbB9js
-         lpFGXscUazgZww7wTtPIiGfO9v6BvbeylVR9D1m8FP7XwA8fVF6D2KFej/EvCpwxpfai
-         O7GMaYvnq1eDZ9JXsPymfmeU2uxAXJNS2NYMq12DE5us8FRS4WmYpomHaMZ3PIZQdVT1
-         hzKA==
+        d=gmail.com; s=20251104; t=1787982621; x=1788587421; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=ukS+6O6VUnt+grJqSVzkQJWIYuNE2DdB1/VCqDk7Wk0=;
+        b=nexgEzD00ZTDF0DMAJD0HtY5nkrEzbvd6kj7LDnvTwuDNjeeCi0OZm97Z84cvaz0Yy
+         rE5tXtZS2QgLyznwWrlPH5ZJNvqJbiT3VAamCUPhcM9VBUge+tO9DOwcxcHv+A3ODSgC
+         bWRdiQ6rermiv/yedqn5crhAHJ2f0XfbaNS3fgfIbSrF8sWhbkBm9cWQ7iJxlFEyozXD
+         0x4Gr+8MCkUWlqdwHuCCbof3houk6DKdj9XgI2AXvUS0WKQF9nw/MvzWisSbufPD6zGo
+         RYyMXc/vUgnDJsQQqbFALWyWJtrwUCu1Jf7YvkTmSkWgCwXY0XInbtvkaxW+uT5CajKN
+         spAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787944540; x=1788549340;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=kiyvKBshQ+wfh6yua+SMCW+QrMRbGzyCCyz1Zxa7SSM=;
-        b=ryGe71H36okd8vwrWqx3ylB9CMmvQJcg4bdodTt5BBedmhv4mVI0Y++eaNfdrBqkal
-         cl06p3BaNfoJ2lbOhON6DBwy5g3TrhcoMv6LaXLmaoRENykVhVoWFEcXiDewgnRlbQ4A
-         KJAbkhdqd7T9Ic84HfNNPEUFY1gdxx6tkt6bJZ3eYEA3R0E7Mh6ix9m1bSfKopTgaOYp
-         pzlnb22uoxAaG5P+U/qsx/s1897wmLjcskEaHsaAZgqt1Y2e4U96zYkWMQSnEbG8yleO
-         PRwiFY+g1csLt52YVoSCNwktg1WPtClQNF7rzu4eJ/HROJnvgSTOARkYpJZ4A3VwD77W
-         X55g==
-X-Forwarded-Encrypted: i=1; AHgh+RpNutLG/L3KLhQAABRsvLxRSae/HDVtN21hvpgN9c0dqw/rZIzfmVoCQzRK+UUL8zw5yWrz7Cc=@lists.linux.dev
-X-Gm-Message-State: AFuF++k/kYjJsD3L+kVB17bLUtLzLu3sDe24Gblj+diDsiqIibSFyp4P
-	Yhwo/Fz2lSATldTMrT2X2SNynM7MVtTviVhVma6DevdccpRUdDIXtXNw+hVt3kdZIH5VNhs8Cun
-	7ZiAV20jId8E4n+ggcE6It54vW2YXy5W+3vPBWqqK
-X-Gm-Gg: AR+sD10UF9h6cD2j8KAHWx/WNlmZEBQ5zu3MFfBtvay1amoPJ/wXIsEt0Ko5VUVshWJ
-	bCy+K3EtTBTm+SFfqWPApVqPUQntYLsYC8JTPxXs8GK7ZfVi2i16UEa2EQeD/hXEo+iXVTDFjkh
-	3dq2NTCaxK0wBZ43CIDT85zMNWGL+QecIiGgNt5hoDdWT3TYwNu91bs9fb5874aNKzUrbI1pddb
-	QUxFddo3fgqJ+PdhiASH4vI/kyHTG6wMt4gRvI+nmx4GBe01diV/NEVcU3wrsyCIEKzAulsbw9L
-	Llxm8lEsyRmK6pLStlJaPkVnT/BclDBxE6CPA9FsJaBcQuuVtSQeU9Mx//n0495T311jWyqOh+U
-	=
-X-Received: by 2002:a05:6a21:350f:b0:3d3:ae40:51e5 with SMTP id
- adf61e73a8af0-3d3ae405659mr3293243637.25.1787944539838; Fri, 28 Aug 2026
- 12:15:39 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1787982621; x=1788587421;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=ukS+6O6VUnt+grJqSVzkQJWIYuNE2DdB1/VCqDk7Wk0=;
+        b=ipaOvn+1wszGbu9uBc19N7voFErhQ1mlZdHhDwUB0bfis4Bcah5Wm022KaDu5W8dNg
+         llhNILIsU03f2Udwied/VO7141ERnIdO52Z+5ZnEZ2smWP7bX/B0L+3qvx9zhaNdFUWE
+         61F6Bc+DFCDmuDsEHB/CVEYajJbZ9uAqtmuJoeB4EAONus4u9ETcJgtHh77d5Co0znMR
+         PMyY8w0hFUpWvakst5AVk3aP7YDwgwjTGZeZk4P20mmpEx7zzgI62+ix3NzTFWo3tXh4
+         8un8PCHeynrKmhWmKFyl6iVZmTZPZptXt0lbkAYnwVxSOzg0WAQWlv2fA5CXBBIkh511
+         hElw==
+X-Forwarded-Encrypted: i=1; AHgh+RpJPRp/WUrraXSOxm+z+DFCv9F7NII+IFX9ZHopcQTiCZq9c6Nx/D2vRelnhZqel5nvA0aS1DE=@lists.linux.dev
+X-Gm-Message-State: AFuF++kREuvskkiiIrsm6T/GZ9XTWCCzyNZX5CW3OcB3esRNLES/2/lq
+	SgVwaFXs41FkEopBuVef8Anft9RiwWywrDYyqbaBc5j9VQrxChQY9k5O
+X-Gm-Gg: AR+sD120xWZrDjmUnKXD9KIqIqWcbK2sRHYTKTa3J3acI5uVjPF++dtymAPCIk/yUY0
+	lissj5OzN/vfGK5kFQvJ7TJYrQ5WAOuuS4yzvXvevkiYmi55djMdAWjGUXujQzNMoRLq9KWRLnT
+	Vl/cwXf8vZ6VcJ+WTr3ZIqJzBtaX5TWCEm4X9VnLbzDjXLwctezzgie5woumbtSxoUTYgNIhTxn
+	qvtxQP0pl5pQnZ006WOzu8J5fbX/t0ptgCCED+4NVq9KFierAOxG1J1L1wAscjc1XYHYGr2T/0s
+	PsdocPdKOrhQJIdZGDT+ECujp0piZR8HO9xZyCh6fpQfEsZH0vfx6PDBhmIoag8cHAjEwcFURUf
+	WJz0bC62A3jMoC/SRymPZHI8ZglEwAySmGe88v9XBELUMFPaKJNVJkB6QoExmKKSOJUKLp+AclQ
+	aIzXjtPfs2p976sRIOxE2fFy7uhwA/f0tpeU3Pd/Pkz8YWH5qPwCsoaWSTYRbV1NTTS1gc3AQIe
+	lf8bbilmv8G9iYLZscEsxgJH5euSo5bdD9l9dYOLUXICeXGHzFJZqENkHTw+f1F/yHCL8xPy4AE
+	VL7sFZrZ96CViUhq/xLT
+X-Received: by 2002:a05:600c:4715:b0:499:cd34:f7c with SMTP id 5b1f17b1804b1-49b91c26a01mr172319715e9.5.1787982621199;
+        Fri, 28 Aug 2026 22:50:21 -0700 (PDT)
+Received: from localhost.localdomain (dynamic-077-007-015-136.77.7.pool.telefonica.de. [77.7.15.136])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49cca3e642dsm35357485e9.2.2026.08.28.22.50.19
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Fri, 28 Aug 2026 22:50:20 -0700 (PDT)
+From: Karl Mehltretter <kmehltretter@gmail.com>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	kvmarm@lists.linux.dev
+Cc: Karl Mehltretter <kmehltretter@gmail.com>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Shuah Khan <shuah@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH 0/2] KVM: arm64: Return -EINVAL for an empty SMCCC filter range at base 0
+Date: Sat, 29 Aug 2026 07:48:54 +0200
+Message-Id: <20260829054856.70549-1-kmehltretter@gmail.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260818223422.367803-1-jingzhangos@google.com> <87v795ndhz.wl-maz@kernel.org>
-In-Reply-To: <87v795ndhz.wl-maz@kernel.org>
-From: Jing Zhang <jingzhangos@google.com>
-Date: Fri, 28 Aug 2026 12:15:26 -0700
-X-Gm-Features: AcwNN1WrfuoxnPgMF7CmkqwFRNbRW29he8BaRItvN8ezR7fcwwGLFqlhRr6GqCg
-Message-ID: <CAAdAUtiEKMW-Qx+afpFtQrVWgW3+Av0A0JVh+vSYqUg_q+ER1w@mail.gmail.com>
-Subject: Re: [PATCH] KVM: arm64: vgic-its: Fix O(C*I) loop in vgic_its_free_collection_list
-To: Marc Zyngier <maz@kernel.org>
-Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
-	Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Fuad Tabba <fuad.tabba@linux.dev>, 
-	Steffen Eiden <seiden@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Faud,
+KVM_ARM_VM_SMCCC_FILTER rejects an empty range (nr_functions == 0) with
+-EINVAL for every base except 0. kvm_smccc_set_filter() only rejects a
+range if its inclusive end, base + nr_functions - 1, is below base; for
+base 0 that end wraps to U32_MAX, and KVM then tries to insert
+[0, U32_MAX], which overlaps the reserved Arm Architecture Calls
+ranges, so the attribute returns -EEXIST instead of -EINVAL.
 
-Could you please include this patch in your series? I'll be out of
-office until the end of September.
+The request is rejected either way; only the errno is wrong, so this is
+a minor UAPI validation fix.
 
-Thanks,
-Jing
+Patch 1 rejects a zero function count explicitly. Patch 2 adds the base
+0 case to test_invalid_nr_functions(), which only covered a nonzero base
+and therefore never caught this.
 
-On Thu, Aug 20, 2026 at 6:08=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote=
-:
->
-> [+Fuad, Steffen]
->
-> Jing,
->
-> Please make sure you add all the relevant reviewers in the Cc: list,
-> specially as Fuad is doing a lot of work in that particular area.
->
-> On Tue, 18 Aug 2026 23:34:22 +0100,
-> Jing Zhang <jingzhangos@google.com> wrote:
-> >
-> > When destroying the vgic-its collection list,
-> > vgic_its_free_collection_list() iterates over every collection and for
-> > each, calls vgic_its_free_collection(). This function walks every
-> > Interrupt Translation Entry (ITE) across all devices via
-> > for_each_lpi_its() to nullify the collection pointer.
-> >
-> > A guest can allocate up to 65536 collections and hundreds of thousands
-> > of ITEs. By clearing GITS_CTLR.Enable and writing Valid=3D0 to
-> > GITS_BASER1, the guest can trigger this teardown path from a single MMI=
-O
-> > exit. The resulting O(Collections * ITEs) nested loop executes billions
-> > of iterations without a single cond_resched(). This pins a physical CPU
-> > and stalls RCU grace periods for seconds or minutes on PREEMPT_NONE
-> > kernels.
-> >
-> > Fix this by replacing the O(Collections * ITEs) teardown with an
-> > O(Collections + ITEs) pass. Since the entire collection list is being
-> > freed, we can safely bulk-clear the collection pointers from all ITEs i=
-n
-> > a single pass, and then free all the collections in a second pass.
-> >
-> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> > ---
-> >  arch/arm64/kvm/vgic/vgic-its.c | 16 ++++++++++++++--
-> >  1 file changed, 14 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-=
-its.c
-> > index 36ab3e4929154..a8e819fe97898 100644
-> > --- a/arch/arm64/kvm/vgic/vgic-its.c
-> > +++ b/arch/arm64/kvm/vgic/vgic-its.c
-> > @@ -1133,9 +1133,21 @@ static void vgic_its_free_device_list(struct kvm=
- *kvm, struct vgic_its *its)
-> >  static void vgic_its_free_collection_list(struct kvm *kvm, struct vgic=
-_its *its)
-> >  {
-> >       struct its_collection *cur, *temp;
-> > +     struct its_device *device;
-> > +     struct its_ite *ite;
-> >
-> > -     list_for_each_entry_safe(cur, temp, &its->collection_list, coll_l=
-ist)
-> > -             vgic_its_free_collection(its, cur->collection_id);
-> > +     /*
-> > +      * Bulk-clear the collection pointers for all ITEs.
-> > +      * This transforms the teardown complexity from O(Collections * I=
-TEs)
-> > +      * to O(Collections + ITEs), avoiding guest-triggered host RCU st=
-alls.
-> > +      */
->
-> I don't think this comment needs to describe this. You already have
-> described it *extremely thoroughly* in the commit message, and that's
-> probably enough. I'd rather see a justification of why this is *safe*.
->
-> > +     for_each_lpi_its(device, ite, its)
-> > +             ite->collection =3D NULL;
-> > +
-> > +     list_for_each_entry_safe(cur, temp, &its->collection_list, coll_l=
-ist) {
-> > +             list_del(&cur->coll_list);
-> > +             kfree(cur);
-> > +     }
->
-> The other thing that is missing is the invalidation of the translation
-> cache. Please see the discussion at [1], and whether this needs to be
-> taken care of here or in Fuad's series.
->
-> Thanks,
->
->         M.
->
-> [1] https://lore.kernel.org/r/20260819102809.310708-2-fuad.tabba@linux.de=
-v
->
-> --
-> Jazz isn't dead. It just smells funny.
+Tested on an arm64 KVM host in VHE mode running under QEMU TCG: a small
+userspace reproducer gets EEXIST before patch 1 and EINVAL after it, and
+the smccc_filter selftest including the new assertion passes with patch 1
+applied and fails at the new assertion with EEXIST without it.
+
+Karl Mehltretter (2):
+  KVM: arm64: Return -EINVAL for an empty SMCCC filter range at base 0
+  KVM: arm64: selftests: Test empty SMCCC filter range at base 0
+
+ arch/arm64/kvm/hypercalls.c                      | 3 ++-
+ tools/testing/selftests/kvm/arm64/smccc_filter.c | 4 ++++
+ 2 files changed, 6 insertions(+), 1 deletion(-)
+
+
+base-commit: 548e7bcd0c5460ddcbca9600cea603ebeebf4da7
+-- 
+2.39.5 (Apple Git-154)
+
