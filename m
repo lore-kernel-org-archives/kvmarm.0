@@ -1,149 +1,123 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51703331A5B;
-	Sun, 30 Aug 2026 23:08:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01592357D0B
+	for <kvmarm@lists.linux.dev>; Sun, 30 Aug 2026 23:20:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788131316; cv=none; b=RM3cpqpCv78MrCBM1SpG42qNmqjWLoe1hrWDjk3sH/D+h1eHy4058tfhv64HWmFGh4nwo14cjHBO38lzcXWTk22HqG3TlXxiTr5r6R9UppXzYFAbu97h0u4M/vKqxFPjycrbrgvj6higdp+z/9FJiI1apa3DR2Tn0JUYdxipU/E=
+	t=1788132042; cv=none; b=i/ABUNpIK2kAhf35G8Jz01ZHRbJUXuvambZ2C8kbmKoqOyvXTzqPDolrQAZ61IHneSuMhUVCERz8GCY/0amkx9ykSHpoOhxVG2yaDqyzlGUWlehY1fsnbpdFYhKBFuMSOVmaxejFh3lrdkCkHAiB4bRdQknuW++zN+bDTalygMM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788131316; c=relaxed/simple;
-	bh=l87EwSkD1CEn4+bfwgv4gal/kTthTgQXI2kg63rlZWc=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=f2muamFVfE2JZcBydR5Fq618mIN90AT2d1LgnooUV0XqX6CF6UOuEa5QQ1bI/xl8K/tD+j1pfjpn7DY5ebst4oAKIu0nBNhsIHI3oP4TF/79aGW3yQeBtXc5/QBeyAg9dQm6Pjev0alEnyaXc9emekgvIccwPzBQF6MG5jT+zVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uMCCsS8r; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1788132042; c=relaxed/simple;
+	bh=DROVcdnJ47tU/IoZwJG6vTr0l3j/QDBq1a1dO8iPizY=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=YUXb6N0ukTAsfPZ9fAoDXGUeIqONWUsNSAfSIV6ETl+pcdaFTGYEP26se2fp/QhwUpuOzH2071ZnbkxAGON25DYU8YPam13KlltxtnPwUl+Rf8A4JcvpLMAEHsLwjgW8DZDII1B5RONGrOCsDdvzscWXaqS2SjCBVGIeJuFLKC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CtQyYYzU; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uMCCsS8r"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D3C5FC2BCC7;
-	Sun, 30 Aug 2026 23:08:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1788131315;
-	bh=l87EwSkD1CEn4+bfwgv4gal/kTthTgQXI2kg63rlZWc=;
-	h=From:Subject:Date:To:Cc:Reply-To:From;
-	b=uMCCsS8rxAF/ezIWIHWUeleVrebJa3nbQJutor891GhCEPYozvXC3ab2VM/YDhTCh
-	 GhRsMd7W5i3BE0/djdtjGtC2eTk5X1egg2Lp7HygfXVO2u0noF2lQ+7VkWFgcoCZJF
-	 NfSDgmVI3220s3sLUWW2IWTKN9WWD4E3JtR9oGtXaEZzTWKIRDnrXB6zsw8rqqBJpD
-	 TxA897DqQ2cHO8FUJnPRwKc8JFf56jtnXgQl3FswXYLroD7QD2Wtk+3YbvB7A3R6bN
-	 h/T9q1ffj56Y6D37y9Qqw1KXrwLkv/r+2N3hD53yGiRDK4IU+Y05H+M/hCgpXKuOqr
-	 hRwSn8i8mIRSw==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACD00C61DE2;
-	Sun, 30 Aug 2026 23:08:35 +0000 (UTC)
-From: Per Larsen via B4 Relay <devnull+perlarsen.google.com@kernel.org>
-Subject: [PATCH v7 0/3] KVM: arm64: Support FF-A direct messaging
- interfaces
-Date: Sun, 30 Aug 2026 23:08:12 +0000
-Message-Id: <20260830-host-direct-messages-v7-0-45f6e6db72c2@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CtQyYYzU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B0931F000E9;
+	Sun, 30 Aug 2026 23:20:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788132040;
+	bh=fbhpO6QEwIVB61SqTrkYrCXm6V/4kBcpQjDOUHSZsZ8=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=CtQyYYzUHdVn0/aFTsuS08Rck90Uj02MEvW1pu1pP8XryBR5fUoxEnAwz+b3FQsTd
+	 4ylk9nB45I1bViAwKXBYF4UF0PnTrUfmbYcoWVLBcf0g+AYcO+y8LF/19RO0ROdDB+
+	 KmUHBu21aBTr9wXjcTZc1QQdyFfcr09yOU3/AV/Z2odQtK7GjJy+OR7Jr99lXJO+3C
+	 jgAY6nAKRAjB3gxt7saP+F9Zg8HUqQK4KZtMa5PmUqOgW8scZVbN4y7Glq9uQ0+Dfu
+	 2qfBDBmy0ceVDa1SA30YxxTpk34uBZrM68AeVIE6+RNuskle4arzcoTk++V5VmnhgP
+	 fALbPZnxoRFFA==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v7 1/3] KVM: arm64: Block host-initiated FF-A direct
+ responses
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Per Larsen" <perlarsen@google.com>
+Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20260830-host-direct-messages-v7-1-45f6e6db72c2@google.com>
+References: <20260830-host-direct-messages-v7-0-45f6e6db72c2@google.com>
+ <20260830-host-direct-messages-v7-1-45f6e6db72c2@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 30 Aug 2026 23:20:39 +0000
+Message-Id: <20260830232040.5B0931F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIANy3lGoC/43PwWrDMAwG4FcpPs/DkmU72WnvMXZIbTkxrHWJQ
- 9goefc5ZaMbWWDHX6BP+q+i8Ji4iKfDVYw8p5LyuQb3cBB+6M49yxRqFqjQgMJWDrlMMqSR/SR
- PXErXc5EGFQQXjemOQdTVy8gxvd/Yl9eah1SmPH7crsywTr9Arf4GZ5BKktVsXOPAN/G5z7l/4
- 0efT2IVZ/yPglVpIzrPUVun1UbRdwVgp9ysq+IdBUUt0RHtRqFvxSpQewqtv5jQESIEaLaK+aE
- g7CimKujBAvmWuNk2snfFqD3FVkVH6qJDx6Exv5RlWT4Be75FAhcCAAA=
-X-Change-ID: 20251029-host-direct-messages-5201d7f55abd
-To: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Zenghui Yu <yuzenghui@huawei.com>, 
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
- Yeoreum Yun <yeoreum.yun@arm.com>, Ben Horgan <ben.horgan@arm.com>, 
- Oliver Upton <oupton@kernel.org>
-Cc: Sebastien Ene <sebastianene@google.com>, 
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
- linux-kernel@vger.kernel.org, Per Larsen <perlarsen@google.com>, 
- Fuad Tabba <fuad.tabba@linux.dev>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1788131315; l=3303;
- i=perlarsen@google.com; s=20250508; h=from:subject:message-id;
- bh=l87EwSkD1CEn4+bfwgv4gal/kTthTgQXI2kg63rlZWc=;
- b=4SU4ydR/4qW466dgQe0E/kB7YR/oY/pH7E6YpEreh01jPVRt6qHZCHbII/Fta98o+wdMra1sK
- Uyh2G9hx720CsqhyEWBEwXwGdG+h0nH/Y+kMUUzNml5CjdMutvfBenz
-X-Developer-Key: i=perlarsen@google.com; a=ed25519;
- pk=jjc/Ta4VmrLRmMoahP6d1mBcKzvWU+nsmdtYe2oS2kQ=
-X-Endpoint-Received: by B4 Relay for perlarsen@google.com/20250508 with
- auth_id=402
-X-Original-From: Per Larsen <perlarsen@google.com>
-Reply-To: perlarsen@google.com
 
-Block host-initiated FF-A direct responses.
-Support FFA_MSG_SEND_DIRECT_REQ unconditionally.
-Support FFA_MSG_SEND_DIRECT_REQ2 if hypervisor negotiated version 1.2+.
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
 
-Framework messages (FF-A control plane) are filtered out. For
-FFA_MSG_SEND_DIRECT_REQ, we look at flags in w2. Messages using the REQ2
-interface are always partition messages.
+Pre-existing issues:
+- [Critical] The ffa_call_supported() denylist omits several critical FF-A =
+interfaces (e.g., FFA_RX_RELEASE, FFA_MSG_SEND2, FFA_RX_ACQUIRE, and the 64=
+-bit FFA_FN64_NOTIFICATION_INFO_GET). This allows these calls to fall throu=
+gh as "supported" and be passed directly to EL3, which leads to both a TOCT=
+OU vulnerability on the hypervisor's RX buffer and the false advertisement =
+of unimplemented interfaces.
+--
 
-The third patch was part of a previous patch set [0] but was dropped
-since the use case was unclear. A clear use case has now appeared: use
-TPM device with CRB over FF-A when kernel boots with pkvm [1].
+commit fe4021e3b775f95729beec069334d0e2505a799d
+Author: Per Larsen <perlarsen@google.com>
 
-Tested by booting Android under QEMU.
+KVM: arm64: Block host-initiated FF-A direct responses
+   =20
+This commit blocks the host from initiating FF-A direct responses by
+rejecting both the 32-bit and 64-bit calling conventions for
+FFA_MSG_SEND_DIRECT_RESP in ffa_call_supported().
 
-Best Regards,
-Per
+> diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> index a327c2bbb6b64..9e8bb95e8845c 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> @@ -686,8 +686,10 @@ static bool ffa_call_supported(u64 func_id)
+>  	case FFA_MSG_SEND:
+>  	case FFA_MSG_POLL:
+>  	case FFA_MSG_WAIT:
 
-[0]: https://lore.kernel.org/all/20250730-virtio-msg-ffa-v9-0-7f1b55c8d149@google.com/
-[1]: https://lore.kernel.org/all/20251027191729.1704744-1-yeoreum.yun@arm.com/
+[Severity: Critical]
+This is a pre-existing issue, but the ffa_call_supported() blocklist omits
+several critical FF-A interfaces such as FFA_RX_RELEASE, FFA_MSG_SEND2,
+and FFA_RX_ACQUIRE.
 
-Signed-off-by: Per Larsen <perlarsen@google.com>
----
-Changes in v7:
-- New patch 1/3: block FFA_FN64_MSG_SEND_DIRECT_RESP. Only the 32-bit
-  variant was denied, so the host could send unvalidated 64-bit direct
-  responses to EL3, including a forged sender endpoint ID
-- Use hyp_smccc_1_2_smc() so the call is bracketed by hyp_exit/hyp_enter;
-  the pass-through path already traced these calls
-- Declare endp/flags as u64 and reject a non-zero x1[63:32]: these are
-  w1/w2, but the raw 64-bit registers are forwarded to EL3
-- Pass the canonicalised func_id to do_ffa_direct_msg() rather than
-  re-reading x0, which still carries ARM_SMCCC_CALL_HINTS
-- Link to v6: https://lore.kernel.org/r/20260501-host-direct-messages-v6-0-3f4af727ed85@google.com
+Because these missing function IDs return true here, they fall through to
+kvm_host_ffa_handler() and are passed directly to EL3 without any locking or
+validation:
 
-Changes in v6:
-- 1/2: validate that bits 31:16 of w1 is HOST_FFA_ID.
-- Link to v5: https://lore.kernel.org/r/20260121-host-direct-messages-v5-0-2c1614c94e80@google.com
+arch/arm64/kvm/hyp/nvhe/ffa.c:kvm_host_ffa_handler() {
+    ...
+	if (ffa_call_supported(func_id))
+		return false; /* Pass through */
+    ...
+}
 
-Changes in v5:
-- 1/2: do_ffa_direct_msg: validate that sender is HOST_FFA_ID.
-- Link to v4: https://lore.kernel.org/r/20260109-host-direct-messages-v4-0-95da4221d186@google.com
+This opens a TOCTOU window on the hypervisor's RX buffer. KVM (EL2) uses
+its own hypervisor RX buffer to receive descriptors from EL3. Concurrently,
+a malicious host can issue an FFA_RX_RELEASE SMC on another CPU. Since it is
+passed directly to EL3 via __kvm_hyp_host_forward_smc() without acquiring
+host_buffers.lock, EL3 releases KVM's RX buffer.
 
-Changes in v4:
-- 1/2: do_ffa_direct_msg: check that flag in w2 is zero; drop unused vm_handle parameter.
-- 2/2: ffa_call_supported: simplify logic by reordering cases.
--      do_ffa_direct_msg: switch polarity of check and update comment.
-- Link to v3: https://lore.kernel.org/r/20251119-host-direct-messages-v3-0-c74d04944b26@google.com
+Could this allow KVM's RX buffer to be overwritten by new incoming FF-A
+messages while KVM CPU 0 is still processing the previous message, letting
+the host exploit this to unshare arbitrary hypervisor memory?
 
-Changes in v3:
-- Filter out framework messages as suggested by Will Deacon. Update cover letter accordingly.
-- Update trailers: Reviewed-by: Yeoreum Yun <yeoreum.yun@arm.com>
-- Link to v2: https://lore.kernel.org/r/20251030-host-direct-messages-v2-0-9f27cef36730@google.com
+Additionally, it seems the 64-bit variant FFA_FN64_NOTIFICATION_INFO_GET
+is missing from the blocklist further down in this function, which allows t=
+he
+host to circumvent the restriction on the 32-bit interface and causes
+do_ffa_features() to falsely advertise support for interfaces pKVM does not
+implement. Should these missing interfaces also be added to the blocklist?
 
-Changes in v2:
-- 1/2: Drop support for FFA_ID_GET interface in host handler.
-- Link to v1: https://lore.kernel.org/r/20251030-host-direct-messages-v1-0-463e57871c8f@google.com
+> -	/* 32-bit variants of 64-bit calls */
+> +	/* The host is never the target of a direct request */
+>  	case FFA_MSG_SEND_DIRECT_RESP:
+> +	case FFA_FN64_MSG_SEND_DIRECT_RESP:
+> +	/* 32-bit variants of 64-bit calls */
+>  	case FFA_RXTX_MAP:
+>  	case FFA_MEM_DONATE:
+>  	case FFA_MEM_RETRIEVE_REQ:
 
----
-Per Larsen (2):
-      KVM: arm64: Block host-initiated FF-A direct responses
-      KVM: arm64: Support FFA_MSG_SEND_DIRECT_REQ2 in host handler
-
-Sebastian Ene (1):
-      KVM: arm64: Support FFA_MSG_SEND_DIRECT_REQ in host handler
-
- arch/arm64/kvm/hyp/nvhe/ffa.c | 44 +++++++++++++++++++++++++++++++++++++++++--
- include/linux/arm_ffa.h       |  2 ++
- 2 files changed, 44 insertions(+), 2 deletions(-)
----
-base-commit: cee9395acd8043be0644b25c34bfa86623f2b935
-change-id: 20251029-host-direct-messages-5201d7f55abd
-
-Best regards,
--- 
-Per Larsen <perlarsen@google.com>
-
-
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260830-host-direc=
+t-messages-v7-0-45f6e6db72c2@google.com?part=3D1
