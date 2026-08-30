@@ -1,107 +1,104 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD9083BBFAD
-	for <kvmarm@lists.linux.dev>; Sun, 30 Aug 2026 18:29:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 515A32F84F;
+	Sun, 30 Aug 2026 23:08:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788114553; cv=none; b=c8OY/saHtYVPeCiOCBvd2hdVJuEdQviZGyWnD7FrwWX01ViMNDiFr3u1AJOl/SRdneA/ZfQyiaqrkKoDaB1mRA+GiMqn6iPg3G3mfC/ZKRdXmbY6wIrpqBTsYkuzt+JLzdLAs9UrVHdlsSDEITWw/acqFI86ZpvdpJcBE426jjo=
+	t=1788131316; cv=none; b=CPYUrIIptjbg1jqckWaKnioUhi8V3RoBoPXiEjZJ4RyHJgiwLxDO+VoYWY02PU1XfDKbHWcC/5wgpsUZ0OLBSdP2Me0ZYLxyw3Ka1KwiP1QLb8rlp8ZXeiY7XoYZTN0PQkGIdNQQcl/IGVJcOzZYQYWIVPPc851qXdD2cxf4ujw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788114553; c=relaxed/simple;
-	bh=9NKDnSEWfPvKPtUsA/Wf/uYwNlKYFsZ8Y0VhVrZy9KM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I8CFSCYOfk0NBnlltu5AHtD7BRlWKZnb2ILcrHn6v4brqB3l/X9GMsoCXyh/ZRgu/+cV/9AOEKqHJZK3/TB0f8o7ISPbP6OcDoY1ldN0yDOX0AxSdki8P5+QQTAiHsawiayNlXpAlX9PK5CaBrdfDrJKXedKoIf2ubKQzyIgWDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UHg43heT; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1788131316; c=relaxed/simple;
+	bh=jDp+Nw6b7h22SFzKZLUIEWRF8HaZpA2JP2JZBw82m2s=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=B+Y0ct+ig1Svu2079IWMdu8xxFau2Yg5Qkzg44Ag8T6cbXSpq9qzEKT7Xvq+9b3JLcn3uqEFQ2Y16VIzDfZgLPl4+F456feruhgk08MuDBmsrVi3PXsbfmDTKpc/XJ2Z1UFxdpgjqIuj/vTJBsJ/7FswA6uAKsBKjrl1oI4vUmo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cl3pey6V; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UHg43heT"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4998b5a63e2so25812535e9.1
-        for <kvmarm@lists.linux.dev>; Sun, 30 Aug 2026 11:29:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788114550; x=1788719350; darn=lists.linux.dev;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=3Ptf7lkzRK2cEQa7tXSLbtyDvUDpbM17dkTmOc5wvcM=;
-        b=UHg43heTD5cFV+GOoznh9rNGemORuRuOWJwiWVX7DD1hDdB+dtKbwyu0UYxBbqM/Ax
-         QzgYg0T7AJCT+RwGsHZ0KRcYdYrui89R1CXqnMVEnAiq1spHIT000fM3OcSwCZ8a8wBe
-         s3+3GR1OknfDc+xUqFyDgVVLu5qS3r/T6IX/fDuaBBDGrA8gPkIrz8qqLJtpJPZ6NA0p
-         sE/obJmzBf+ybKH1WQAWshy4AKT0dVaorbhG+6b86D5IdSM/a8y/lNGPp7YFeucQPdOS
-         CxKikcTYW/MCKXY3+dHJoaudN9XOKDzMhEKhjvkYyfG2nIqB3vuW+v+zJ/NyYPrSplkq
-         vcfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788114550; x=1788719350;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=3Ptf7lkzRK2cEQa7tXSLbtyDvUDpbM17dkTmOc5wvcM=;
-        b=ovo1tW3DbBfGLA6/1Qwn011kNy7UU8SzOx0vqPWermfrDzGPxOnlDre3H0Jbq4Izw8
-         w7PtcGI3FiCi+RHj7k04RSrUb3itoG6Xv0slQ7tVVrGPGjEtCbsLzbaFvTshxNSx7bzq
-         rcYChKwj0XcQs7mP1x/PdfthiLCTDQ5Pv3IoudR7GVn4iTEHa+MApJNAoLRs48RcR8Cr
-         9uJ1QVhnKo4YHpZf0q7EplQAfVfOH2VQLzyDkndKeI15ZVvjoHWMFuLrhTW4cJCHbmG+
-         WlGxnvw1xGTN2RQNIkuL0X6X9kAyCHNCPpP7PjdKPNegt/s7YdEfaG3x024TbrSEmbkn
-         NKhw==
-X-Forwarded-Encrypted: i=1; AHgh+Rpxp5YYd2jJwi24X8UfeljbX7isBiM+NoXFjJV+PfFQMu00tPtXhdkT3gAnCiFV2pqqtQpo3T0=@lists.linux.dev
-X-Gm-Message-State: AFuF++nSfGEWK+6MZLyu8I6J38rqwEM31cE+K0GkE1VRntrdu78fyXvN
-	nVsnMT+BP7rHUV1RqEFIbuktJXxxE1k0Gd2LoR8bVQ7B03ZVRmhosRn+
-X-Gm-Gg: AR+sD10FmDMLJfJwpxO+YEi3po3jrBFHEjRvTt4H5l5VcxwRMBN1bjvhQS0Ri3srXMw
-	9OFqfEyQwY1Wsyd+zH/5Fv5KXdCkh34h9aMChYiYlh8bn/U4lZegPXWVRq0676msDu94Vl/P9Fw
-	Rjihw1hBBFiQG4q1zM/YEAKvQA1UX/unhFW77JlIGWyiSeRVoNiHgMLcXPKiOi8Lyd3ep+dvuac
-	BlwwmTPqTmqlTvFhfbWqRwv2qJEEa3wcnrp0K66vspWr2WWwK5kNgSZ6s2qK8SUa4a8qW/go11z
-	54qcGWWzhwCn5V8wblFKmbxa38m78ANs//RgdDA2QMWWQ8JmQKRF7wzil0BAO6S3FOjdvMg8Giv
-	1CYmAVowB02NLBRIQs8lVa684WlIIGjEW4FydD2Er6g1PjgfmGXpjRxyaMqOAkTs9Rjv8neu+VA
-	c6t/EuTOat/mynfLHvmYrXwwQoYSiKN1m+JXzD7MIpKoumBAPxrxxSwvlcdkXlKr99FluCAbUWn
-	YT/H1tFnc2uGi+C+DjfK6HHLUmuaJAo9tGNvVN3jUkBhMl7yCaOuf8V5SvoUeCiCKsIFvzc3tQ3
-	++TBpJVCaBtljATcWBVOeWb7LvxgZC1BNTzX/YY8AMbNLMl1vrWr0cawM4zG2AOMyKBtk9vMJAT
-	YpfxGQM7/0s4=
-X-Received: by 2002:a05:600c:4744:b0:499:8b13:3a98 with SMTP id 5b1f17b1804b1-49b91c2479amr317299235e9.4.1788114549893;
-        Sun, 30 Aug 2026 11:29:09 -0700 (PDT)
-Received: from MacBook-Pro-von-Karl.localdomain (dynamic-2a02-3100-adda-dc01-edc7-8a6f-c6f3-73e0.310.pool.telefonica.de. [2a02:3100:adda:dc01:edc7:8a6f:c6f3:73e0])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49b961939ddsm102089915e9.4.2026.08.30.11.29.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 30 Aug 2026 11:29:09 -0700 (PDT)
-Date: Sun, 30 Aug 2026 20:29:07 +0200
-From: Karl Mehltretter <kmehltretter@gmail.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
-	Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, Eric Auger <eric.auger@redhat.com>, 
-	Christoffer Dall <christoffer.dall@arm.com>, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v3 0/5] KVM: arm64: fix VGICv3 redistributor rollback
-Message-ID: <apR2SFrwBa9tCS5y@gmail.com>
-References: <20260822095346.53882-1-kmehltretter@gmail.com>
- <87zey4m2qy.wl-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cl3pey6V"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E3ABDC2BCFB;
+	Sun, 30 Aug 2026 23:08:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1788131316;
+	bh=jDp+Nw6b7h22SFzKZLUIEWRF8HaZpA2JP2JZBw82m2s=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
+	b=Cl3pey6VkNICIFNuLMkHNbav3N80r945qbrQLuAUxxSgr0HgnmaCyNth4fu9MbqS1
+	 d7TBxmQWJUcCGy8sI/MkNKdttmdJCIVzXDeTSgGip3sn+i1lP9LXDvVdCTGOpUGDEd
+	 NMEZ/AVzA7Q3Q77n3NYfG9NemQ7rz7SSDPJS/s3tMhzP44sE5cmapcxZ5HNni9X/kC
+	 GTp8w63IuXJBbLpr6f6CvLhAm01F6IJRMApdelrETswFaT5Erm/NiKoF8Xo68OIOun
+	 D54NEAIhC3BOy0axKm+ad1FH8TWruOHLmUcX0oKqcqkkSFWeYeehxEAQykVp7vJWxA
+	 hVdgl2sQLjU5w==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1762C61DD9;
+	Sun, 30 Aug 2026 23:08:35 +0000 (UTC)
+From: Per Larsen via B4 Relay <devnull+perlarsen.google.com@kernel.org>
+Date: Sun, 30 Aug 2026 23:08:13 +0000
+Subject: [PATCH v7 1/3] KVM: arm64: Block host-initiated FF-A direct
+ responses
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87zey4m2qy.wl-maz@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260830-host-direct-messages-v7-1-45f6e6db72c2@google.com>
+References: <20260830-host-direct-messages-v7-0-45f6e6db72c2@google.com>
+In-Reply-To: <20260830-host-direct-messages-v7-0-45f6e6db72c2@google.com>
+To: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Zenghui Yu <yuzenghui@huawei.com>, 
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+ Yeoreum Yun <yeoreum.yun@arm.com>, Ben Horgan <ben.horgan@arm.com>, 
+ Oliver Upton <oupton@kernel.org>
+Cc: Sebastien Ene <sebastianene@google.com>, 
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+ linux-kernel@vger.kernel.org, Per Larsen <perlarsen@google.com>, 
+ Fuad Tabba <fuad.tabba@linux.dev>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1788131315; l=1110;
+ i=perlarsen@google.com; s=20250508; h=from:subject:message-id;
+ bh=8AHoa5902lBdwgQQj0S5IoBZHdWqjlLxCvW0VZ4P46k=;
+ b=lVUR0IW9heVYxTkTzz63UFlzLz6FnS5mvT3oqFqrWvLIISaAwADTyK2fdfCHeMEb0Dcc0DLSR
+ Bm6c5qGAe/fD27T3Z1wSu6KT8UK27gtIO7zVbMh/0xrLlI66QcOW48n
+X-Developer-Key: i=perlarsen@google.com; a=ed25519;
+ pk=jjc/Ta4VmrLRmMoahP6d1mBcKzvWU+nsmdtYe2oS2kQ=
+X-Endpoint-Received: by B4 Relay for perlarsen@google.com/20250508 with
+ auth_id=402
+X-Original-From: Per Larsen <perlarsen@google.com>
+Reply-To: perlarsen@google.com
 
-On Sun, Aug 30, 2026 at 09:28:05AM +0100, Marc Zyngier wrote:
-> I really don't understand why this is such a massive departure from
-> v2, which was pretty close to what I wanted to see.
-> 
-> Honestly, you are making things harder for everyone by over-designing
-> (or more probably under-filtering) things that should be *fixes*, and
-> just that.
-> 
-> If you want to rework all of the vgic init/destroy, fine by me. Do
-> that as a separate series. But for fixes that carry a Cc stable and
-> require backporting to 6 year old kernels, that's not on.
-> 
-> The hack below is what I have against your v2 to make it acceptable.
+From: Per Larsen <perlarsen@google.com>
 
-Okay, thanks. I’ll adapt your suggestion and send a much more minimal v4.
+ffa_call_supported() rejects FFA_MSG_SEND_DIRECT_RESP, but allows
+FFA_FN64_MSG_SEND_DIRECT_RESP to be forwarded to firmware.
 
-Karl
+The host is never the target of an FF-A direct request and therefore
+cannot initiate a direct response. Reject both calling conventions.
+
+Suggested-by: Fuad Tabba <tabba@google.com>
+Signed-off-by: Per Larsen <perlarsen@google.com>
+---
+ arch/arm64/kvm/hyp/nvhe/ffa.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
+index a327c2bbb6b6..9e8bb95e8845 100644
+--- a/arch/arm64/kvm/hyp/nvhe/ffa.c
++++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
+@@ -686,8 +686,10 @@ static bool ffa_call_supported(u64 func_id)
+ 	case FFA_MSG_SEND:
+ 	case FFA_MSG_POLL:
+ 	case FFA_MSG_WAIT:
+-	/* 32-bit variants of 64-bit calls */
++	/* The host is never the target of a direct request */
+ 	case FFA_MSG_SEND_DIRECT_RESP:
++	case FFA_FN64_MSG_SEND_DIRECT_RESP:
++	/* 32-bit variants of 64-bit calls */
+ 	case FFA_RXTX_MAP:
+ 	case FFA_MEM_DONATE:
+ 	case FFA_MEM_RETRIEVE_REQ:
+
+-- 
+2.55.0.897.gb25b4bd76c-goog
+
+
