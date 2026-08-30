@@ -1,204 +1,177 @@
-Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013027.outbound.protection.outlook.com [40.93.201.27])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 763EA2EFD9B;
-	Sat, 29 Aug 2026 20:01:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.201.27
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788033674; cv=fail; b=A/eF7+yhnytKaAN7DeYOFMDAJq8SoOIcrim1H11fGZzcLkFLfT9CK29OVYD2l7M4okIAaPYimArzGK/rDN2BhK5eoiEG8yoIm0WKcvLYU6cxZmNHfavaADdylFbAoZyoWy5d/da+CdJcQPttBxgDjWtZUkdgBEHm2vdDiiwmvvg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788033674; c=relaxed/simple;
-	bh=xrGO+E+I/OcyzAMgAI3/ynR9AfyogNlX3BTQ1+Szf/s=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Gnx3WywDhV9gDTYL34y34i+n8sae6Kr2L6TQ4eLRuveMY6EVvoZD3uPiRIz4K26eJxFFCwBRJ6sGgLzfyxKvv8l8P2Qb6S+nhqu8QDenL4xH4i2IKQQ+JIpbXTWW447mSRyT8moBhKk2i8jpRoHv8QKI0oAt1m0N7ZqR1O232I0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=sn1mNuhx; arc=fail smtp.client-ip=40.93.201.27
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2DDF1A9F87;
+	Sun, 30 Aug 2026 08:25:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788078337; cv=none; b=X+clRr80HIyu9LS9i9jmNpSnwFXHJCAEcTq0quVbucrwWrknYZ9W3ExPfCEu0VPcdnlyycwSim5x91siP8ZNAjnyAweCM8Q/1YjX4BnU0EWlqEnpNtR+YxOfyhciuooc6+mucRGJ8J6TuDmS3qQG7Vy52flx8SXci5Y+1ZQee4s=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788078337; c=relaxed/simple;
+	bh=enDvrvucjqCB6QorYOu30xPX0Tspl/vdnaZA/OCJVd8=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=eHeXT/exlVD9ZTvcoOU9xNKfadBU/JNA8IeA3hCI+ehOxNLxnrW/S6GBPdtKeyKr+0Y3oAR5BsTx7tR6rI8dtSUr6ESP5Rn3r3dTOcmQFgaHE4JpzoP8JzPlo1xUCTAndX8LdXjapFa2ojcBt0Mj+qwNlqOtQRpCYyopOacbs+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kERBUMQh; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="sn1mNuhx"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=sQSv7tgouWFCUOwdKqT/ZbCK0eoML9PGFSNCHqp92YvRdRzcNlTSZbxWjRDu8Ar/4u/UtGN1KMc+YxcodlpP0eZcXdAYJTHwdtd1uX9tIjtXve04vQ6EEcuzY0YCQvC4Rm4s7i70Q7Q4yOBd8Dzw1X50n/mOc2Q+SDGB48MlfabmQRb0DDIAoVe4fLCah7C1J2gZ4RJps3QAm+SyE33Xvad7Az5WOangcbMttEhEnVeq5vM8eH83F3NZUN8vwuBp9lMH6X36PohUkrpVhQm3wNkGZnunjFu+Z4p9zhaT+ZCcG7qBinCnDR+1FogcXiWGw6emQshN8wnHROfZYlKoSA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1KyyGb35nAAS4oA4Irll3Sa8Tk2Bw+6AdEssgThZrGY=;
- b=dhsUkG14sp6fYMa/rI5U7SkxEbGno5WuCr7TspkJr/nQGbR9WHbfCsLsjPbPGzppQuTZL1VWFWCGDT3yqb7qbMRz3rDpZ49JufAp7XwUJ9YIDPhyL7jkE5MWs6PGNTppErbyVtVmUjNrRf69+xd/+bIbCuTbW9fNoJcMn6H8hFF5/pREHbeVh9h3ZbrCIFYL2KH5At/oOooaJXz9NvUTyEqsQxvNRmpjUHQG/8DYOv3RqJm1PNKQziofsW1Bj+YTk0fTAOwz9heRMwPhzZLmUDmDswpmF3Qi5ojU0CUihIaDaxnbVDYwrn7z1OwpokbS6lci+YFKW4DmjRKTi3lqCA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1KyyGb35nAAS4oA4Irll3Sa8Tk2Bw+6AdEssgThZrGY=;
- b=sn1mNuhxxP27HrG9eE0OgT2VA9FIQnxhb1Sg+odFt0sHJ7gdhP8heI1suzhQlqzFJJVEh7Dg/8csvsV5113BfYcw73RELxb0jgZZ7QaZi8OToEiAK+xHd/RpHctVqJw9oX3tJOwZZAOGDYyK6UI+d38s9eUOjlcp6NCazEH3P8nWdAUJlRa8Z4Ougf88VirhWupsViOx7aUDt8yLm0BvPmwBYPaVAUphxHoTvNSiLkiaveRS23emjg1vLsOFMhcadDcxhMv+/6xeLck0783DXOC2Qhqe8XvIGRzHF0yGaJvnfl+r4TWkcGMgFdslFgXrwzViuwF+AoK4DhMjoAwurg==
-Received: from PH0PR07CA0018.namprd07.prod.outlook.com (2603:10b6:510:5::23)
- by IA1PR12MB8408.namprd12.prod.outlook.com (2603:10b6:208:3db::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.360.12; Sat, 29 Aug
- 2026 20:01:08 +0000
-Received: from SA2PEPF0000150A.namprd04.prod.outlook.com
- (2603:10b6:510:5:cafe::72) by PH0PR07CA0018.outlook.office365.com
- (2603:10b6:510:5::23) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.360.12 via Frontend Transport; Sat,
- 29 Aug 2026 20:01:07 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- SA2PEPF0000150A.mail.protection.outlook.com (10.167.242.42) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.382.8 via Frontend Transport; Sat, 29 Aug 2026 20:01:07 +0000
-Received: from rnnvmail203.nvidia.com (10.129.68.9) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.46; Sat, 29 Aug
- 2026 13:00:54 -0700
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by rnnvmail203.nvidia.com
- (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.46; Sat, 29 Aug
- 2026 13:00:53 -0700
-Received: from nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.46 via Frontend
- Transport; Sat, 29 Aug 2026 13:00:52 -0700
-Date: Sat, 29 Aug 2026 13:00:52 -0700
-From: Nicolin Chen <nicolinc@nvidia.com>
-To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
-CC: <linux-coco@lists.linux.dev>, <kvmarm@lists.linux.dev>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-	Alexey Kardashevskiy <aik@amd.com>, Catalin Marinas
-	<catalin.marinas@arm.com>, Dan Williams <dan.j.williams@intel.com>, "Jason
- Gunthorpe" <jgg@ziepe.ca>, Joerg Roedel <joro@8bytes.org>, Jonathan Cameron
-	<jic23@kernel.org>, Marc Zyngier <maz@kernel.org>, Pranjal Shrivastava
-	<praan@google.com>, Robin Murphy <robin.murphy@arm.com>, Samuel Ortiz
-	<sameo@rivosinc.com>, Steven Price <steven.price@arm.com>, Suzuki K Poulose
-	<Suzuki.Poulose@arm.com>, Will Deacon <will@kernel.org>, Xu Yilun
-	<yilun.xu@linux.intel.com>
-Subject: Re: [RFC PATCH v4 03/16] iommu/arm-smmu-v3: Add initial pSMMU realm
- viommu plumbing
-Message-ID: <apM6dOHcEI2ztWS0@nvidia.com>
-References: <20260427085344.941627-1-aneesh.kumar@kernel.org>
- <20260427085344.941627-4-aneesh.kumar@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kERBUMQh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6500C1F000E9;
+	Sun, 30 Aug 2026 08:25:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788078335;
+	bh=bEUIZ+P1wvBK9wpdoS7CCGcxWQYocPml39xu6l1/88k=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=kERBUMQhAWsGtfPppvbbc5Ow5SVOyx9BzibtFkuYKDdkZKVF/+nExG+oiS5W39jGn
+	 TlfpVFuP300bYoB4ZZm29ZvmOcH5mWtDtO3J3Bn1vjM9ab3rbEjZrH59nooShVKn9F
+	 K2jZ714m8cA7gkqBfpFRTdPH6mbabr0eCD58aHcicTLKLsa7ND6nQPN3bh7bVoxPjM
+	 0pzmG4noJ1tAbDEuR8Wdbs7lv8y86sqkuhHN1y18TCJ1UrSdvqJyODFjIIpTUvjr9C
+	 0V59nsDrZs0y5ZY9GAwEbv8C5k8DFaTlgBDvI6EVpL54T5PuxzIMd3MqG9I4BF2z1y
+	 91Z8nslq4rg6Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1x0ar7-00000002Ri4-09sG;
+	Sun, 30 Aug 2026 08:25:33 +0000
+Date: Sun, 30 Aug 2026 09:28:05 +0100
+Message-ID: <87zey4m2qy.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Karl Mehltretter <kmehltretter@gmail.com>
+Cc: Oliver Upton <oupton@kernel.org>,
+	kvmarm@lists.linux.dev,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Eric Auger <eric.auger@redhat.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v3 0/5] KVM: arm64: fix VGICv3 redistributor rollback
+In-Reply-To: <20260822095346.53882-1-kmehltretter@gmail.com>
+References: <20260822095346.53882-1-kmehltretter@gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20260427085344.941627-4-aneesh.kumar@kernel.org>
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PEPF0000150A:EE_|IA1PR12MB8408:EE_
-X-MS-Office365-Filtering-Correlation-Id: af804dde-6e1c-4184-2dfa-08df060843ba
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|36860700016|1800799024|23010399003|7416014|376014|22082099003|18002099003|56012099006|3023799007|6133799003|11063799006|4143699003|5023799004|10067099003;
-X-Microsoft-Antispam-Message-Info:
-	7oL0aYKYjVbpbk4U+IPrP9pFnIYkvRcEGI8e7L6xJ97rn2ZUFdMX7VRXsusQXvI9HemNYji4Vsy9EDjRaMJCYKPyHLUzvEBYNInMze8333EAoZV4grhBQnDuEwTHpbOGiSrODIQ6dk5TaUuYoZv63WwI1OfEUbmC3VvUp4G1Edz9dIxxd6ORzDoGlULV5nDD9+YBd6/Nfx9PuHpUQ3eBw1s4SUGfb8hk63gQH55sJc6j3Dmn7YJGJ3yieNfwiT04lgwXelZ4Zz76GXr7i2nKRzE2h51caAgjwxQbT1AhHcD651TjEeDoJWg2pEAvGzeIsHvYt0WXwQwkwA65gaMjgTmJPoUXCehPq6/N1Nbhj1O58UXoPtQg0jfjngL2hMpDrCQRVMkI3wY5bpdimQzpMP53/pjwCpfwQSh6q9TpmVlsp6P6ayARrg4Ra7lHccIXcYWX21R2vz9jj4RYf7KcsX49b5yN3GzEdXuG8D5vxP0I4Dx3oSYQzUybxGq9BHNzIss+10DhVMhHvxHeLnJRdWOffSQ+I9bQlaGI4/GlWIwz7EhelSWg6F7DhVWMLzIDsH0LGJzG2fV/gZI+zi1GLA0TnTjtg61oEpJ++Ct7ldfW+t1lBQ+wcyKkPCgOykmszZzGTioN600P5wBu86a3Th4ceWDqvDHvaPenk1QhgdsIACjTFbPr0OI3i0EaCosHFD7PYAQFJHDcZrqiYZHPdw==
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(36860700016)(1800799024)(23010399003)(7416014)(376014)(22082099003)(18002099003)(56012099006)(3023799007)(6133799003)(11063799006)(4143699003)(5023799004)(10067099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	KxE7Juy99ISE9fS7HIlwicdhr1SY1i0HaOCM6OzaCy1GUBwDJQX6Z+Ma3xheHUVfggeBlCd4OxXiOKPbLcyrG646BMqKdnciFsAfsMNl5DBlZ4JQMb9kEd8VVdFIoKn2BaVFozixM9fC5GzAzIlQoa/xOH4Wz/aXRQXyzAuYYaweTTbBFX1AO2yTru/4wjdbo8zubkp/3MFUASkvys5Ht7DOL9e522Tx+SyAV1TAhes93IzSMSN+wrMvrIxc9YF6k9oLhksgUqpj/NAA0+NE67Q3xgLZz+cmVpDQclBlIfoEJQUS3H1HLYUcPpRc7SGuzbz/BjmfbkTH6XFFJTya/79F10weERLn+vnYp0i+tUzA8eLRDJslmC+G4dUtDpzF1YoZaxW0zA7dy8XUCM0+skLnruoVTDF8Ufue9KHyq2+CRNO+1PlFpijV9Ysoir8p
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Aug 2026 20:01:07.4211
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: af804dde-6e1c-4184-2dfa-08df060843ba
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SA2PEPF0000150A.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB8408
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kmehltretter@gmail.com, oupton@kernel.org, kvmarm@lists.linux.dev, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, pbonzini@redhat.com, shuah@kernel.org, eric.auger@redhat.com, christoffer.dall@arm.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, Apr 27, 2026 at 02:23:31PM +0530, Aneesh Kumar K.V (Arm) wrote:
-> +static const struct iommufd_viommu_ops arm_realm_smmu_v3_ops = {
-> +	.destroy = arm_realm_smmu_v3_destroy,
-> +	.alloc_domain_nested = arm_vsmmu_alloc_domain_nested,
-> +	.cache_invalidate = arm_vsmmu_cache_invalidate,
+On Sat, 22 Aug 2026 10:53:41 +0100,
+Karl Mehltretter <kmehltretter@gmail.com> wrote:
+> 
+> A failed REDIST_REGION write can remove redistributor iodevs from
+> KVM_MMIO_BUS while leaving their cached vCPU assignments intact. A
+> corrected retry then skips those redistributors.
+> 
+> Userspace should instead see a failed region update atomically: no prior
+> redistributor assignment survives the failure, and the next successful
+> update rebuilds all possible assignments in region-index order.
+> 
+> Patch 1 fixes a separate accounting bug when an individual MMIO-bus
+> registration fails. It reserves the selected region slot before
+> registration and undoes that known-latest assignment if registration fails.
+> 
+> Patch 2 implements the atomic failed-region behavior. It unregisters every
+> redistributor iodev, clears every cached assignment, resets the region
+> counters, and frees the newly inserted region. An in-flight vCPU can have
+> an RD iodev before kvm_for_each_vcpu() can see it, so REDIST and
+> REDIST_REGION writes are serialized with vCPU creation and return -EBUSY
+> while the created_vcpus/online_vcpus counts differ.
+> 
+> Patch 3 is independent teardown cleanup. It separates MMIO-bus teardown
+> from config-locked assignment cleanup, preserves the cleanup required
+> before a late failed vCPU creation frees the vCPU, and removes the special
+> conditional from the common vCPU destructor.
+> 
+> Patch 4 keeps the selftest helper aligned with vm_create_with_vcpus(), and
+> patch 5 adds regression coverage for an overlapping region, retry, and
+> final GICR_TYPER accesses to all four redistributors. The test exercises
+> patch 2's final-state behavior; patch 1's MMIO-bus allocation failure is
+> not fault-injected.
+> 
+> Testing: built the patched kernel and the arm64 vgic_init selftest with
+> GCC 13.3.0 in an arm64 Linux container. The selftest passed under QEMU
+> 11.0.2 TCG with -machine virt,virtualization=on,gic-version=3 and -cpu max.
+> 
+> ---
+> Changes since v2:
+> - Patch 1: limit free_index rollback to the immediate registration failure
+>   under slots_lock instead of generic unregistration. (Sashiko)
+> - Patch 2: reset all assignments and region counters after a failed region
+>   update (Marc), and serialize REDIST and REDIST_REGION writes with vCPU
+>   creation so rollback cannot miss an unpublished assignment.
+> - Patch 3: add an already-locked unassignment primitive, move failed-vCPU
+>   cleanup to kvm_vgic_vcpu_destroy(), and remove the redundant base_addr
+>   reset. (Marc)
+> - Patch 4: match vm_create_with_vcpus() by using void * for the guest-code
+>   argument. (Sashiko)
+> - Patch 5: document how the first three redistributors span regions 0
+>   and 1; no functional change.
 
-I don't think realm vsmmu should include NS nested domain ops. I
-wonder if adding here is for some covert reason that prevents us
-from registering viommu/vdevice objects?
+I really don't understand why this is such a massive departure from
+v2, which was pretty close to what I wanted to see.
 
-> +static int arm_realm_smmu_v3_vdevice_init(struct iommufd_vdevice *vdev)
-> +{
-> +	struct device *dev = iommufd_vdevice_to_device(vdev);
-> +	struct arm_smmu_master *master = dev_iommu_priv_get(dev);
-> +	// fixme which stream to pick
-> +	/* At this moment, iommufd only supports PCI device that has one SID */
-> +	struct arm_smmu_stream *stream = &master->streams[0];
-> +	struct arm_smmu_device *smmu = master->smmu;
-> +	unsigned long rmi_ret = 0;
-> +	int ret;
-> +
-> +	if (!smmu->realm_initialized)
-> +		return -EINVAL;
-> +
-> +	ret = rmi_psmmu_st_l2_create(smmu->base_phys,
-> +				     ALIGN_DOWN(stream->id, STRTAB_NUM_L2_STES),
-> +				     &rmi_ret);
+Honestly, you are making things harder for everyone by over-designing
+(or more probably under-filtering) things that should be *fixes*, and
+just that.
 
-The "vdevice" is for a PSMMU stream table allocation..
+If you want to rework all of the vgic init/destroy, fine by me. Do
+that as a separate series. But for fixes that carry a Cc stable and
+require backporting to 6 year old kernels, that's not on.
 
-> +int arm_realm_smmu_v3_init(struct iommufd_viommu *viommu,
-> +			   const struct iommu_user_data *user_data)
-> +{
-[...]
-> +psmmu_activate:
-> +	ret = rmi_psmmu_activate(smmu->base_phys, virt_to_phys(params),
-> +				 &rmi_ret);
+The hack below is what I have against your v2 to make it acceptable.
 
-.. and the "viommu" is also for PSMMU activation...
+	M.
 
-> +++ b/include/uapi/linux/iommufd.h
-> @@ -1055,6 +1055,7 @@ enum iommu_viommu_type {
->  	IOMMU_VIOMMU_TYPE_DEFAULT = 0,
->  	IOMMU_VIOMMU_TYPE_ARM_SMMUV3 = 1,
->  	IOMMU_VIOMMU_TYPE_TEGRA241_CMDQV = 2,
-> +	IOMMU_VIOMMU_TYPE_ARM_REALM_SMMUV3 = 3,
+diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+index 84e67c23bedc0..85b00849e6154 100644
+--- a/arch/arm64/kvm/vgic/vgic-init.c
++++ b/arch/arm64/kvm/vgic/vgic-init.c
+@@ -539,8 +539,6 @@ static void __kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu)
+ 		 */
+ 		if (kvm_get_vcpu_by_id(vcpu->kvm, vcpu->vcpu_id) != vcpu)
+ 			vgic_unregister_redist_iodev(vcpu);
+-
+-		vgic_cpu->rd_iodev.base_addr = VGIC_ADDR_UNDEF;
+ 	}
+ }
+ 
+@@ -563,14 +561,13 @@ void kvm_vgic_destroy(struct kvm *kvm)
+ 
+ 	vgic_debug_destroy(kvm);
+ 
+-	kvm_for_each_vcpu(i, vcpu, kvm)
++	kvm_for_each_vcpu(i, vcpu, kvm) {
+ 		__kvm_vgic_vcpu_destroy(vcpu);
+-
+-	if (kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
+-		mutex_unlock(&kvm->arch.config_lock);
+-		kvm_for_each_vcpu(i, vcpu, kvm)
+-			vgic_unregister_redist_iodev(vcpu);
+-		mutex_lock(&kvm->arch.config_lock);
++		if (kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
++			kvm_io_bus_unregister_dev(vcpu->kvm, KVM_MMIO_BUS,
++						  &vcpu->arch.vgic_cpu.rd_iodev.dev);
++			__vgic_unassign_redist_iodev(vcpu);
++		}
+ 	}
+ 
+ 	kvm_vgic_dist_destroy(kvm);
 
-.. and we demand userspace (VMM) to use IOMMU_VIOMMU_ALLOC ioctl,
-even if VMM does not actually expose a guest-level SMMU instance.
-Thus, no user_data.
-
-I can get the reasoning behind the flow using this viommu/vdevice.
-
-But, on the other hand, I can imagine that a Realm VSMMU would add
-a new flag with a user_data to this VIOMMU. Then, this flow would
-give some troubles to VMM (QEMU for example):
-
- - For VM with a guest-level SMMU, QEMU creates a realm instance
-   where IOMMU_VIOMMU_TYPE_ARM_REALM_SMMUV3 (with vsmmu) can be
-   allocated.
- - For VM w/o a guest-level SMMU, QEMU won't create such a realm
-   instance, while still required to invoke the ioctl (w/o vsmmu). 
-
-Taking a step back, I wonder if we really need to use iommufd for
-PSMMU activation and its stream table allocations?
-
-Here are some facts:
-  - An iommufd has a ctx, that's one per VM. Similarly, a Realm
-    has an RD.
-  - For an RMI command that needs an RD, it makes sense to be per
-    iommufd ctx, e.g. RMI_VSMMU_* or RMI_VDEV_* commands.
-  - PSMMU commands are global; they don't need RD. So they don't
-    seem necessary to tie to an iommufd ctx.
-
-Instead, could the PSMMU activation be done after RMI_PSMMU_INFO
-check? Is there any reason not to do that? A safer timing might
-be at the device assignment stage?
-
-Speaking of which, RMI_PSMMU_ST_L2_CREATE doesn't seem necessary
-to be invoked in a vdevice context either. Maybe it should align
-with iommufd idev's lifecycle?
-
-Nicolin
+-- 
+Jazz isn't dead. It just smells funny.
