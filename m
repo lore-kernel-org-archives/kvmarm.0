@@ -1,165 +1,229 @@
-Received: from mta0.migadu.com (out-42.mta0.migadu.com [91.218.175.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01BF137DE8B
-	for <kvmarm@lists.linux.dev>; Mon, 31 Aug 2026 19:28:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EB4237DE8D;
+	Mon, 31 Aug 2026 19:46:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788204509; cv=none; b=NJ4sdljTt50tmZh9RNIiRjZH6HLxte6O3a1LMBVIRIst8CXIi8cQXahB731GJAjZVd5uDO8FLwl2yFEjCcdHbB2NB24rCohXJf5kKqO3MQl1r3fm0pAXX8OUYkXbU2UL76nlaeCZFl92rd/svLlNuzmzdVc1kN6/Haa+OpqKiRg=
+	t=1788205616; cv=none; b=EdUPMGYNnwoqNo/IvFw8UyHWPvnWsiOUu1FpPzzJwDFEIRsXGB1pgSZDFf3lNaXPb7KaW9SgAhlfCJ+KM4xzme/V5YbOSghtuAoe7seAXG3KUjweQwHk/gAE54VpbfolWO7uB8dBiyuKIPnT00hKolk2C5Ah8RgVYtoq4HliiGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788204509; c=relaxed/simple;
-	bh=QL9iDzTYCKrAUBeXvATSPUv4Y1G32BzzX2eraj3q3jQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Keeu5wOXOZoZwouNp2kHDKs5JMMmotRFwJ/zc7t1zVybFQ/r3+lyHZx5ThvY6zbUxJ/ueteWAdOTeHwXnokMF7F8wzSdVmMt0V/Eo6vGXtFFjABheRD/rgfTNFCRxXzpfXEreFvl00iapEym5BXIIhei3rK+fvQhO+clUZve5Eg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FxB9SjgT; arc=none smtp.client-ip=91.218.175.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1788205616; c=relaxed/simple;
+	bh=42/7gMgSmV/LE2c35J8YuO+9eeCCrYo0oTkboCh/Iu4=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=Lg75v14LNxkn5R2lA2EZ2lt2LKe2ayNPqpXdRXtuxdCQtpRyarsUlvWhH2qXpfSBaBNSGjA1N4bucfxTf8o/A5FFYhJdri0wmcyvTz3MCTBydC47rLAqpheC8dwJOI72re9DZzywP1o88Ud99fEHEfbXT7Zrp+VZIpXALZbeqAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZtKMDser; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FxB9SjgT"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=QL9iDzTYCKrAUBeXvATSPUv4Y1G32BzzX2eraj3q3jQ=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1788204505; v=1; x=1788809305;
- b=FxB9SjgTPHIbJKePpWznl6I732NYqdH0ak2NrADH2Vr+ey33oe54SUTGVGoQ9edwJYvHTnX2
- 6bGimqGRQp+ooLfv5ghrp/JoO5bxa63OXOLAFQARudngh4d2tWhyVIWg0uKUdoFaO8XCJ1bZZxj
- 5iDdG+qE5xqmV/VFmVjH9ZGM=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id a0b0cfaec9299cca;
-	Mon, 31 Aug 2026 19:28:15 +0000
-X-Mizu-Trace-ID: a0b0cfaec9299cca
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-5aeb688ae83so1321e87.1
-        for <kvmarm@lists.linux.dev>; Mon, 31 Aug 2026 12:28:15 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBzkFKDPFj60lLIhrfHTTOIis8ZP0JpXS/8HlfIoT4uzw1c/QocOU4GjQ4gkkRYCBQ6l4po7vmY=@lists.linux.dev
-X-Gm-Message-State: AFuF++kotYLBaz6K378YpLeOQt6gHqOPR9pyp43/Of66pfswg/lL7vPX
-	ZPIisFIxRz9zSh0QcbTE2KtjVbCLeVoAjrnVnHmtRPSaAIGAWrngUMGM9Th4FCUQffoT7cJwXFr
-	WX73AS46e6zUbWVhycLCSIwHEZxZTRfw7jF9inPKP
-X-Received: by 2002:a05:6512:3b0d:b0:5b4:9dba:4ece with SMTP id
- 2adb3069b0e04-5b5ff2ae0dcmr23112e87.12.1788204494566; Mon, 31 Aug 2026
- 12:28:14 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZtKMDser"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39B451F000E9;
+	Mon, 31 Aug 2026 19:46:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788205614;
+	bh=4uIN6dioUmlAEUyjrkI7d0TgMBo9zHi6OwDbMT4mFSw=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=ZtKMDserjcOqZ6QZXUc9HajxElI8pjkUPEjTeOcLl8uSjx7Jp2S4CpD4btlukQiN/
+	 MN2Sw4cvqfLoEyB2tL6gOSrPbDUntdHc4EtpErWfERmUd+9zoI5pvoYuMgg6qd/rmr
+	 AW54CpGSbICeiKY8EFTwql9LNgIZsAg8WsssR7LNyZDwkeqzK5YTrOxfpqtRTb9XSg
+	 HCDxf7KEVGz+gT++9mroD0LVPe7sVJ0nWNHr0iYA7Bs2u/r0mzzUtCU+9exrEI9s4I
+	 moySRFL8sXot/gCZNZcBBGk8lg0x7sHIqgq013xd6JPSP4ylfRL/7a4Dy7CO4UKh6Z
+	 6VQgDzz3BVazg==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v2 11/20] KVM: s390: arm64: Query Available Arm features
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Steffen Eiden" <seiden@linux.ibm.com>
+Cc: "Alexander Gordeev" <agordeev@linux.ibm.com>, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-s390@vger.kernel.org, "Marc
+ Zyngier" <maz@kernel.org>, "Christian Borntraeger" <borntraeger@linux.ibm.com>, "Heiko
+ Carstens" <hca@linux.ibm.com>, "Vasily Gorbik" <gor@linux.ibm.com>
+In-Reply-To: <20260831145536.913567-12-seiden@linux.ibm.com>
+References: <20260831145536.913567-1-seiden@linux.ibm.com>
+ <20260831145536.913567-12-seiden@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 31 Aug 2026 19:46:53 +0000
+Message-Id: <20260831194654.39B451F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20260831163421.272420-1-fuad.tabba@linux.dev>
-In-Reply-To: <20260831163421.272420-1-fuad.tabba@linux.dev>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Mon, 31 Aug 2026 20:27:38 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTycOnoVv6jCE2M5bVLG5m1MhnaWSNTpS8vJaWVDk1+S3g@mail.gmail.com>
-X-Gm-Features: AcwNN1VeQcT49sFWxBpO5p7UEcrKsOyar9oNS5xestQbF8q3MfimLDxR9Ts3ohk
-Message-ID: <CA+EHjTycOnoVv6jCE2M5bVLG5m1MhnaWSNTpS8vJaWVDk1+S3g@mail.gmail.com>
-Subject: Re: [PATCH 00/17] KVM: arm64: Confine protected VM vCPU state to EL2
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Vincent Donnefort <vdonnefort@google.com>, Quentin Perret <qperret@google.com>
-Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 31 Aug 2026 at 17:34, Fuad Tabba <fuad.tabba@linux.dev> wrote:
-...
->
-> The kvmtool changes that go with this will be posted separately, and I
-> will reply here with a link.
+Thank you for your contribution! Sashiko AI review found 4 potential issue(=
+s) to consider:
+- [Critical] The EX_TABLE entry in the `qaaf` inline assembly incorrectly p=
+laces the exception fixup label on the non-faulting `lhi` instruction inste=
+ad of the potentially faulting `.insn` instruction, which will cause unhand=
+led hardware exceptions to panic the kernel.
+- [High] `aef_sysfs_init()` unconditionally calls `aef_init_save_area()`, f=
+ailing to skip it when the AEF facility is not present, causing a crash on =
+older hardware.
+- [High] Off-by-two index error when accessing the QAAF registers array in =
+`kvm_qaaf_read_ftr_reg()`, causing KVM to read incorrect memory offsets for=
+ all features.
+- [High] If QAAF initialization fails, the global capability flag `info.arm=
+_guest_supp` is not cleared, leading KVM to initialize using uninitialized =
+hardware capability data.
+--
 
-... and here they are:
-https://lore.kernel.org/all/20260831192406.1341841-1-fuad.tabba@linux.dev/
+commit a7cb3705acf7ea96c94b5937368fbc6655fb99e7
+Author: Steffen Eiden <seiden@linux.ibm.com>
 
-Cheers,
-/fuad
+KVM: s390: arm64: Query Available Arm features
 
->
-> Patch 1 is the HCR_EL2.VSE fix posted separately [2]. It is not part
-> of this series; it is carried so the series applies as is and Sashiko
-> can run on it.
->
-> The KVM_ARM_PREFERRED_TARGET documentation fix [3] went out just ahead
-> of this series. Nothing here needs it to apply, but patch 17 documents
-> vCPU feature availability as something the capabilities report, while
-> api.rst 4.83 still points userspace at a bitmap that has always been
-> empty.
->
-> The series is structured as follows:
->
->   01:     The HCR_EL2.VSE fix, posted separately.
->   02-03:  Capability allowlist and the PVTIME rejection.
->   04-05:  Per-exception-class entry handlers; EL2 owns a protected
->           vCPU's trap configuration.
->   06-08:  Timer state, system register reset and HVC handling at EL2.
->   09-10:  PSCI at EL2, and the KVM_ARM_VCPU_INIT and PSCI version
->           restrictions.
->   11-14:  Host PC adjustments blocked; an UNDEF at EL2 for exit
->           classes the host does not emulate; per-class state
->           marshalling; a protected guest's SError pended with
->           HCR_EL2.VSE.
->   15-16:  Host access to private state, and host power-on of a vCPU
->           EL2 holds powered off, rejected.
->   17:     Documentation.
->
-> Still to come: selftests, self-hosted debug, SVE for protected guests,
-> and much more, as separate series.
->
-> Based on v7.3-rc1 (cee9395acd804).
->
-> Cheers,
-> /fuad
->
-> P.S. Sashiko, bring it on!
->
-> [1] https://lore.kernel.org/all/20260729131823.2021516-1-fuad.tabba@linux.dev/
-> [2] https://lore.kernel.org/all/20260829071120.2522788-1-fuad.tabba@linux.dev/
-> [3] https://lore.kernel.org/all/20260831162815.269851-1-fuad.tabba@linux.dev/
->
-> Fuad Tabba (15):
->   KVM: arm64: Sync HCR_EL2.VSE back to the host vCPU under pKVM
->   KVM: arm64: Advertise the capabilities that protected VMs support
->   KVM: arm64: Reject the PVTIME vCPU attribute for protected VMs
->   KVM: arm64: Skip fixed-feature state flush for protected vCPUs
->   KVM: arm64: Add system register reset framework for protected VMs
->   KVM: arm64: Implement HVC handling for protected guests at EL2
->   KVM: arm64: Handle PSCI calls for protected VMs at EL2
->   KVM: arm64: Restrict KVM_ARM_VCPU_INIT and PSCI version for protected
->     VMs
->   KVM: arm64: Prevent host PC adjustments for protected vCPUs
->   KVM: arm64: Inject an UNDEF at EL2 for unhandled protected guest exits
->   KVM: arm64: Add per-EC entry/exit state marshalling for protected
->     guests
->   KVM: arm64: Pend a protected guest's SError with HCR_EL2.VSE only
->   KVM: arm64: Reject host access to protected VM private state
->   KVM: arm64: Reject host power-on of a vCPU that EL2 holds powered off
->   KVM: arm64: Document the protected VM userspace API
->
-> Marc Zyngier (2):
->   KVM: arm64: Introduce per-EC entry handlers for pKVM
->   KVM: arm64: Add {flush,sync}_hyp_timer_state() primitives
->
->  Documentation/virt/kvm/api.rst                |  22 +-
->  .../virt/kvm/arm/fw-pseudo-registers.rst      |   2 +
->  Documentation/virt/kvm/arm/pkvm.rst           | 141 ++++-
->  Documentation/virt/kvm/devices/vcpu.rst       |   4 +-
->  arch/arm64/include/asm/kvm_asm.h              |   1 +
->  arch/arm64/include/asm/kvm_host.h             |  21 +
->  arch/arm64/include/asm/kvm_pkvm.h             |  34 +-
->  arch/arm64/kvm/arm.c                          |  40 ++
->  arch/arm64/kvm/guest.c                        |  29 +
->  arch/arm64/kvm/hyp/exception.c                |  27 +-
->  arch/arm64/kvm/hyp/include/nvhe/pkvm.h        |  18 +
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c            | 564 +++++++++++++++++-
->  arch/arm64/kvm/hyp/nvhe/pkvm.c                | 401 ++++++++++++-
->  arch/arm64/kvm/hyp/nvhe/switch.c              |  29 +-
->  arch/arm64/kvm/hyp/nvhe/sys_regs.c            |  91 ++-
->  arch/arm64/kvm/hypercalls.c                   |   7 +
->  arch/arm64/kvm/inject_fault.c                 |   5 +-
->  arch/arm64/kvm/pkvm.c                         |  21 +-
->  arch/arm64/kvm/psci.c                         |   3 +
->  19 files changed, 1378 insertions(+), 82 deletions(-)
->
->
-> base-commit: cee9395acd8043be0644b25c34bfa86623f2b935
-> --
-> 2.39.5
->
+This commit introduces the QAAF (Query Available Arm Features) instruction
+support for s390 hosts. It allows KVM to query machine-supported ARM featur=
+es
+and provides an initialized save area for running ARM guests.
+
+> diff --git a/arch/s390/include/asm/kvm_host_arm64_types.h b/arch/s390/inc=
+lude/asm/kvm_host_arm64_types.h
+> index 2c922ef478d13..93fd649a26f47 100644
+> --- a/arch/s390/include/asm/kvm_host_arm64_types.h
+> +++ b/arch/s390/include/asm/kvm_host_arm64_types.h
+[ ... ]
+> +/* QAAF Query Model Capabilities */
+> +struct qaaf_qmc_block {
+> +	u64	_0000;			/* 0x0000 */
+> +	u8	ssdf;			/* 0x0008 */
+> +	u8	_0009;			/* 0x0009 */
+> +	u8	ssaf;			/* 0x000a */
+> +	u8	_000b[3];		/* 0x000b */
+> +	u16	maxncpu;		/* 0x000e */
+> +	u64	regs[0x1fe];		/* 0x0010 */
+> +} __aligned(PAGE_SIZE);
+
+[ ... ]
+> +enum {
+> +	QAAF_REG_MIDR_EL1		=3D 0x02,
+[ ... ]
+> +};
+
+[ ... ]
+> diff --git a/arch/s390/include/asm/sae.h b/arch/s390/include/asm/sae.h
+> index 6580536544eef..f88d15b8f1e90 100644
+> --- a/arch/s390/include/asm/sae.h
+> +++ b/arch/s390/include/asm/sae.h
+[ ... ]
+> +static __always_inline int qaaf(u64 gr0, union qaaf_block *qaaf_block)
+> +{
+> +	int exception =3D 1;
+> +
+> +	asm volatile(
+> +		"	lgr	0,%[r0]\n"
+> +		"	.insn	rre,0xb9ad0000,%[r1],0\n"
+> +		"0:	lhi	%[exc],0\n"
+> +		"1:\n"
+> +		EX_TABLE(0b, 1b)
+> +		: "=3Dm"(*qaaf_block), [exc] "+d"(exception)
+> +		: [r1] "a"(qaaf_block), [r0] "d"(gr0)
+> +		: "r0"
+> +	);
+> +
+> +	return exception;
+> +}
+> +
+
+[Severity: Critical]
+Does the exception table entry point to the wrong instruction?=20
+
+The EX_TABLE(0b, 1b) targets the `lhi` instruction at label `0:`, but the
+instruction that would actually fault is the preceding `.insn` instruction.
+If this executes on hardware without the AEF feature, won't this result in
+an unhandled hardware exception and a kernel panic?
+
+[ ... ]
+> diff --git a/arch/s390/kernel/aef.c b/arch/s390/kernel/aef.c
+> new file mode 100644
+> index 0000000000000..825e2643a8921
+> --- /dev/null
+> +++ b/arch/s390/kernel/aef.c
+[ ... ]
+> +static int  __init aef_query_info(void)
+> +{
+> +	int ret;
+> +
+> +	if (IS_ENABLED(CONFIG_KVM_S390_ARM64)) {
+> +		info.sae_avail =3D sclp.has_aef;
+> +		info.ptff_avail =3D ptff_query(PTFF_QAGTO) &&
+> +				  ptff_query(PTFF_QAGPT);
+> +		info.arm_guest_supp =3D info.sae_avail && info.ptff_avail;
+> +	}
+> +	if (!info.sae_avail)
+> +		return 0;
+> +
+> +	ret =3D qaaf(QAAF_FC_QMC, (union qaaf_block *)&qmc);
+> +	if (ret)
+> +		return ret;
+
+[Severity: High]
+If the qaaf instruction fails and returns an error here, `info.arm_guest_su=
+pp`
+remains set to true.
+
+Because aef_sysfs_init() is called via an arch_initcall, the initialization
+failure is ultimately ignored by the kernel. Later, kvm_s390_arm64_init()
+checks `aef_info()->arm_guest_supp` and will proceed to initialize KVM using
+the uninitialized `qmc` block.
+
+Should `info.arm_guest_supp` be cleared before returning when qaaf() fails?
+
+[ ... ]
+> +static int __init aef_sysfs_init(void)
+> +{
+> +	int rc =3D -ENOMEM;
+> +
+> +	if (!IS_ENABLED(CONFIG_KVM_S390_ARM64))
+> +		return 0;
+> +
+> +	rc =3D aef_query_info();
+> +	if (rc)
+> +		return rc;
+> +
+> +	rc =3D aef_init_save_area();
+> +	if (rc)
+> +		return rc;
+
+[Severity: High]
+Will this execute the new qaaf instruction unconditionally on all hardware?
+
+aef_query_info() correctly returns 0 if the AEF facility is absent (since
+`info.sae_avail` would be false). However, aef_init_save_area() is called
+immediately after without checking if the facility is actually supported.
+
+Could this trigger an operation exception on older hardware?
+
+[ ... ]
+> diff --git a/arch/s390/kvm/arm64/qaaf.c b/arch/s390/kvm/arm64/qaaf.c
+> new file mode 100644
+> index 0000000000000..c3124d38afc23
+> --- /dev/null
+> +++ b/arch/s390/kvm/arm64/qaaf.c
+> @@ -0,0 +1,69 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +
+> +#include <linux/kvm_host.h>
+> +#include <asm/aef.h>
+> +#include "qaaf.h"
+> +
+> +#define _qaaf_reg_case(id) case SYS_##id: return aef_qmc()->regs[QAAF_RE=
+G_##id]
+
+[Severity: High]
+Does this index into the regs array using the wrong offset?
+
+Looking at struct qaaf_qmc_block in asm/kvm_host_arm64_types.h, the regs
+array already starts at offset 0x0010:
+
+    u64 regs[0x1fe];        /* 0x0010 */
+
+However, the QAAF_REG_* enums represent the absolute doubleword offset from=
+ the
+start of the block (e.g., QAAF_REG_MIDR_EL1 is 0x02, which represents byte
+offset 0x0010).
+
+By using the enum to index into the regs array, doesn't this double-apply t=
+he
+0x0010 offset, causing KVM to read incorrect values for all feature registe=
+rs?
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260831145536.9135=
+67-1-seiden@linux.ibm.com?part=3D11
