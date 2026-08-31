@@ -1,32 +1,33 @@
-Received: from mta0.migadu.com (out-230.mta0.migadu.com [91.218.175.230])
+Received: from mta0.migadu.com (out-54.mta0.migadu.com [91.218.175.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36E964968FC
-	for <kvmarm@lists.linux.dev>; Mon, 31 Aug 2026 16:28:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.230
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6756B44E65A
+	for <kvmarm@lists.linux.dev>; Mon, 31 Aug 2026 16:34:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788193710; cv=none; b=k/lmGnKOJ80ksDqSL88YMXnFjP9EXjRXS7FPVSTzLWZ1s4KjKDg0TDyaizVGaOCVudxKzgEdyPWn9MVK9PJsRNQ4RLvFKkfVNOOfo4l+pa2bWXRE+LKmc/+WzvCml1LR2+EI2qDLhATEfio3RBXdDy43wQUwOURkg0zOIG5O1FA=
+	t=1788194067; cv=none; b=c6DwN3bwl46ys31DK3OG5Skdiu4VBkKWFcQDt5/HG3owQacsPYJGZtjHppmMU1WEblHuWkWYwqWMyjGeH2xuVCXJ2OlQPYv0n8rpWYJDCUlhYlvUSrNogmGPSutUxN4IFDdadiIOi93Our3aIDUL3YitEikCx3ZNkkSzSBjIRMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788193710; c=relaxed/simple;
-	bh=xIutThzYKRk+MmgmvnI6jxLg86YKS37TTQ0Ve9SNoQs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Ycn/j8f4QQkQ40yOJI/n9KC96CL/032d7JnLcQNJ5p9ARBc+pjIH/ZDZbdhmC60EwD+QcRDtAoDUH/RqNxqdIdcyOLE0aE8zkHfeFShln09Mb1HL4fuViE5rGJK8B8iX3AUaFOIFi0zBPNIqLtRQ3o7sxM5wo+aZpPyMm3wfAu0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=muKy23us; arc=none smtp.client-ip=91.218.175.230
+	s=arc-20240116; t=1788194067; c=relaxed/simple;
+	bh=PJujOV+1Z+2Pic9F+Xx2wknBh2QM3e+/EoajCgxNjqc=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=DSTdWxHmTMB+gBZTc2Sh3OEONS7lT1SjmigX0zL+CT1IK1+fmXUoC1293tNPhg3MnP6NZ/Qfg4bEbXhV2v1XeuZqcCeLgiRiHvHj2cB4kohiVE5XN4hgU8714v7lIj8zlwWVlfElbpyvjtJ1dmdSyr9m/xO6NFUZPIpCKMdFqng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=X6pQZJbZ; arc=none smtp.client-ip=91.218.175.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="muKy23us"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="X6pQZJbZ"
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=xIutThzYKRk+MmgmvnI6jxLg86YKS37TTQ0Ve9SNoQs=;
+DKIM-Signature: a=rsa-sha256; bh=PJujOV+1Z+2Pic9F+Xx2wknBh2QM3e+/EoajCgxNjqc=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1788193706; v=1; x=1788798506;
- b=muKy23usD4vWUUv8n7mzl9tXJ1DdlsJc9wR9BMMYgW7ZvH/UYqUUNaavCSCAL8U7jxPROdf9
- O1pehhGenqWvZesL5oY1rxdz6whDnSKRTRUXEWsAQwwddrGeETdbOtUUCL1LwzblI5tB4d8gj4y
- 1BJeUlbmVTGjfQ4zyIH+6/3w=
+ t=1788194063; v=1; x=1788798863;
+ b=X6pQZJbZ69yGH+cU7Rqp0jtm1AXp2YM3wzkKGq6CP4rVARiVzT0NEBFeJ+BQ87St12hoham1
+ ILpv/LHz+oKKsD6MrxhiSKtgAQLYZSvoAfYhjOgggYLhLmGjW6scxyWlXYr38tev1W5bfSdi8wz
+ ZyjSa7KWmokn07PcEvLRWuWY=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 55f6d3df3ac0595f;
-	Mon, 31 Aug 2026 16:28:16 +0000
-X-Mizu-Trace-ID: 55f6d3df3ac0595f
+Received: by smtp.migadu.com with ESMTPS id 914f3f102f58101c;
+	Mon, 31 Aug 2026 16:34:23 +0000
+X-Mizu-Trace-ID: 914f3f102f58101c
 X-Migadu-Flow: FLOW_OUT
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
@@ -42,12 +43,13 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Vincent Donnefort <vdonnefort@google.com>,
 	Quentin Perret <qperret@google.com>,
-	Fuad Tabba <tabba@google.com>,
-	kvm@vger.kernel.org
-Subject: [PATCH] KVM: arm64: Fix the KVM_ARM_PREFERRED_TARGET documentation
-Date: Mon, 31 Aug 2026 17:28:15 +0100
-Message-Id: <20260831162815.269851-1-fuad.tabba@linux.dev>
+	Fuad Tabba <tabba@google.com>
+Subject: [PATCH 01/17] KVM: arm64: Sync HCR_EL2.VSE back to the host vCPU under pKVM
+Date: Mon, 31 Aug 2026 17:34:05 +0100
+Message-Id: <20260831163421.272420-2-fuad.tabba@linux.dev>
 X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20260831163421.272420-1-fuad.tabba@linux.dev>
+References: <20260831163421.272420-1-fuad.tabba@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -56,53 +58,37 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-KVM_ARM_PREFERRED_TARGET has never set a feature bit: the original arm64
-implementation zeroed the bitmap, and kvm_vcpu_preferred_target(), which
-only ever zeroed it, was removed by commit 5346f7e13e5e ("KVM: arm64:
-Always return generic v8 as the preferred target"). The ENODEV error had
-gone earlier still, with commit 08e873cb70f3 ("KVM: arm64: Change the
-return type of kvm_vcpu_preferred_target()"). Document what it returns,
-that userspace selects vCPU features itself, and drop the error.
+flush_hyp_vcpu() copies HCR_EL2.VSE from the host vCPU into the hyp
+vCPU on every entry, and nothing copies it back. Once the guest takes
+the vSError the hyp vCPU's copy clears with the hardware bit while the
+host's stays set, so the next entry pends the same SError again,
+KVM_GET_VCPU_EVENTS keeps reporting it, and kvm_arch_vcpu_runnable()
+never lets the vCPU block in WFI.
 
-No functional change intended.
+Reflect VSE back on every exit, which the flush-side comment already
+states.
 
+Fixes: 734dc8c01c838 ("KVM: arm64: Implement lazy vCPU state sync for non-protected guests")
 Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
- Documentation/virt/kvm/api.rst | 16 +++++-----------
- 1 file changed, 5 insertions(+), 11 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index e0430cc750c9e..193f3b0ec77d1 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -3600,20 +3600,14 @@ Possible features:
- :Parameters: struct kvm_vcpu_init (out)
- :Returns: 0 on success; -1 on error
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+index 9a3b92e626adb..b6bfe502bcd04 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+@@ -276,6 +276,10 @@ static void sync_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
  
--Errors:
--
--  ======     ==========================================
--  ENODEV     no preferred target available for the host
--  ======     ==========================================
--
- This queries KVM for preferred CPU target type which can be emulated
- by KVM on underlying host.
+ 	host_vcpu->arch.iflags		= hyp_vcpu->vcpu.arch.iflags;
  
--The ioctl returns struct kvm_vcpu_init instance containing information
--about preferred CPU target type and recommended features for it.  The
--kvm_vcpu_init->features bitmap returned will have feature bits set if
--the preferred target recommends setting these features, but this is
--not mandatory.
-+The ioctl returns a struct kvm_vcpu_init instance containing the
-+preferred CPU target type. The kvm_vcpu_init->features bitmap is
-+returned empty: userspace selects the vCPU features itself, and their
-+availability is reported by the capabilities listed under
-+KVM_ARM_VCPU_INIT.
++	/* Cleared by hardware once the guest takes the vSError. */
++	host_vcpu->arch.hcr_el2 &= ~HCR_VSE;
++	host_vcpu->arch.hcr_el2 |= hyp_vcpu->vcpu.arch.hcr_el2 & HCR_VSE;
++
+ 	sync_hyp_vgic_state(hyp_vcpu);
+ }
  
- The information returned by this ioctl can be used to prepare an instance
- of struct kvm_vcpu_init for KVM_ARM_VCPU_INIT ioctl which will result in
-
-base-commit: cee9395acd8043be0644b25c34bfa86623f2b935
 -- 
 2.39.5
 
