@@ -1,57 +1,57 @@
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F22A7372ED0
-	for <kvmarm@lists.linux.dev>; Mon, 31 Aug 2026 14:48:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4196537206E
+	for <kvmarm@lists.linux.dev>; Mon, 31 Aug 2026 14:48:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788187709; cv=none; b=pQEy/EuiLYzGzhetXTnPGiRVW3xTK0Nf40TPdaTrLV8K5KatjLifhj0JxLHBfBJOQZo270TNv9eeiw+J2++3RdembZwdoMOemMaUaE0oo4GoLPtpdRWfiqh7X4Ly092ix4IJY3IBXIND4l3dFOO5FVCiF3PZ3e5znH6JTn+0Bww=
+	t=1788187710; cv=none; b=g6UQb3d0ABkRl/7O8PrSyesARMluIcBkqSDUNmR9agd0o8VLQkvKSpGtFcfyf12hMUby8oSWOAc8KSDPoEtuqorZDXGxdAi9sm7WCa+vhSrIcEsfbXf+iYDTc9BO8KftJ0IFKTcngbkxryFMIrOy+M6wkBTNX/EDajGbhOvkqyQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788187709; c=relaxed/simple;
-	bh=6YXLXoVkYM7VWNHYea2pkhZPTP32ewjhhhJu6DgMJy0=;
+	s=arc-20240116; t=1788187710; c=relaxed/simple;
+	bh=tmItWwCbeld3hacr1W/IAEWGRv9LaAVfUr4NMchFF/M=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BHWcmVqpjKqNwzcje895f5n59fBlwqKIhuuQ5anjS3vnljrSZLyhIqNjDc/rDmTXG3yvOvvNqy2d+VA6wDnABWCPrkRLN5q9QylNUcnh6cXMiQclXrxpfW8RcEBbJMOaIRncXnQ9mYPQrSwUaeOqMRO0ErvUXNCfF/ioEEko7lY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=BCa1/JBC; arc=none smtp.client-ip=148.163.156.1
+	 MIME-Version; b=ffafyOgF3m7E9Znm5XGIrmr8LYbu1i32vSMYwggyVNAdeAPxpfGKN9JdsOPeLmgVV8bXg7TMBfWYm5zkRoG/SCfy7N4YKJSYLKGHp7iiHdQYqP0p/Kb4uInpcEBax4/2b0S2/IDLDRyS4quPFSW0xS02FPNyXyW+YMT+IAAHFBQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=eKIdLzgz; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="BCa1/JBC"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="eKIdLzgz"
 Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67VEZ9ow652812;
-	Mon, 31 Aug 2026 14:48:15 GMT
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67VEZ9co652825;
+	Mon, 31 Aug 2026 14:48:17 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=1P3UO6IfWZPSKnMp1
-	j4c5L7mrnouk9JbKlUKtFhJ2tU=; b=BCa1/JBC3YnAoNfZ2NNrwhJS69aGph0e7
-	ihLkq6GmnhF0zDcR6YbBOTbPtC1/HwI8oFQ5BqW2Mud1Ufp6KCmiDcUX3m6wEu6u
-	+dH3+lI+BaGwXWg9zfPAx8dnhCk4BV4OzaTV66oot1kCzvdRRW6ebrD7rj47yW/x
-	3JUM9X9lqX6ASF/80e4uV+JHoePQFrmpXBG9GV01JnT9aStUFIe1O/yZmr04ei+M
-	p1uWRri95vI/Qf9AAOKR+UpH8PXAdtdti3qkQyeIjdZ5MiR8LdzKIIHBxHvRKD/G
-	/uKvcDLYYkqbL4kTslTYdKYSeoIufTseHDKCxiazEwpgjJiXW5vMA==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gbq3r1xus-1
+	:mime-version:references:subject:to; s=pp1; bh=ywId08J7Tbx4MqC2r
+	zjHWK754WaVxW5lbY11LpqyFpM=; b=eKIdLzgzJmZ0jhjLGd0gfawMGlxHtWuF9
+	isR6/nMOlFBKks6F4AX1plor8FxLe/vIsxIV3Ejan/Ih2dNBwjQVCMTzKyxb7iS/
+	MFVL2N+cvXPBzy6Ep6zjYMpCCsTHpFsZQzqH9ClhjN1sPxMccXbxuumFm0bXu8jj
+	yPZ6/nfJF5mwb4aP0oO4fYyCqp4pi4Q96JZZb1VZ+IffyyITxi0UHFdZK2NJW6qf
+	ALWQUp7RFj265kz3tbuoPsbbVYwkIgNIUUKf2l8HVHH7g5kw0GQ/z9p56lZnOkPX
+	0p9Gf+beZYVA+rQyC4BHTsAbpLyOImA1vXIjdLHY5ntiNIZoEzu1A==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gbq3r1xuy-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 31 Aug 2026 14:48:16 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 67VEfgVj016964;
+	Mon, 31 Aug 2026 14:48:14 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4gcb8h6cjv-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Mon, 31 Aug 2026 14:48:14 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 67VEfics000505;
-	Mon, 31 Aug 2026 14:48:13 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4gcbyg6955-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 31 Aug 2026 14:48:13 +0000 (GMT)
 Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 67VEm9oK17301836
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 67VEmACD42926512
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 31 Aug 2026 14:48:09 GMT
+	Mon, 31 Aug 2026 14:48:10 GMT
 Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6F99220043;
-	Mon, 31 Aug 2026 14:48:09 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id C6B9920043;
+	Mon, 31 Aug 2026 14:48:10 +0000 (GMT)
 Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0CBC32004B;
-	Mon, 31 Aug 2026 14:48:09 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 633A32005A;
+	Mon, 31 Aug 2026 14:48:10 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
 	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 31 Aug 2026 14:48:08 +0000 (GMT)
+	Mon, 31 Aug 2026 14:48:10 +0000 (GMT)
 From: Steffen Eiden <seiden@linux.ibm.com>
 To: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
         linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
@@ -78,9 +78,9 @@ Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
         Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v7 14/23] KVM: s390: Prepare KVM/s390 for a second KVM module
-Date: Mon, 31 Aug 2026 16:47:51 +0200
-Message-ID: <20260831144802.834315-15-seiden@linux.ibm.com>
+Subject: [PATCH v7 17/23] s390/hwcaps: Report SAE support as hwcap
+Date: Mon, 31 Aug 2026 16:47:54 +0200
+Message-ID: <20260831144802.834315-18-seiden@linux.ibm.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260831144802.834315-1-seiden@linux.ibm.com>
 References: <20260831144802.834315-1-seiden@linux.ibm.com>
@@ -93,23 +93,23 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Authority-Analysis: v=2.4 cv=EIc2FVZC c=1 sm=1 tr=0 ts=6a95942e cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+X-Authority-Analysis: v=2.4 cv=EIc2FVZC c=1 sm=1 tr=0 ts=6a959430 cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
  a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
- a=uAbxVGIbfxUO_5tXvNgY:22 a=VnNF1IyMAAAA:8 a=m33X-YrdrFVFgJ0cfecA:9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODMxMDEyNSBTYWx0ZWRfX3BbrAGFertYJ
- P9NDlfIhGqvRWkFjQCMLjT2pDEgZiT8JwNFuvfWSeLwB7gi1E6DFVg/P4dyUREP8SZhL0FSlZdY
- OsiRMU5xwVKqQzn8vThDArsXe0Lz0IkJtvJewKznTv5P4LCiMcc6wYfL28WmIR9BzAg47vrrzwD
- P2q+cCQorwmN6xXqp8L55l7kZUa/DbMh6BfWIjQDn9EwLpG6JGIpIJ3rjMsecK4yNISSEkBx+cI
- aNhm0WX1qhjUYZ+CBnmJnRLryCdgh1XgVUCYfmrDiIDSyZgoPK0Ele/t2vcHL60D+yMgxnKTQ1x
- 4zEYBztcB3WRCt0U5rpph7F6dnFvMSzbV+tL5DIz3I+Qask2HTuu+ZCJ7p3+goLhL3sCCQExaU2
- FYLTtdTtVWoWFbURySMut1FhSI4+pAK6tsd6I6D1piP6CNRz8f91j6Pj9wNFu8r20bHv97c4kOK
- 3uxCo8RORhr+C0PFdmw==
-X-Proofpoint-GUID: A7e99TjC0FXe58-GIop_ZnTb0VBCrpMC
-X-Proofpoint-ORIG-GUID: IQ84wxL4bJFlgPBhpxz6T78_KO9pFfYb
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODMxMDEyNSBTYWx0ZWRfXxntVxCVh4Zwm
- NqUF6G51YJZZ+jcsxSjbZFyu+90Y6yLyKtQ9hjtPuZD51MJswq/5bbcIi3V3wv0UsF/fmvVKRWq
- 4H5YVAYCmL9j/s4v46iQv7HXzaqTtCQ=
+ a=uAbxVGIbfxUO_5tXvNgY:22 a=VnNF1IyMAAAA:8 a=MMtvGDNtdIwsdepEW5QA:9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODMxMDEyNSBTYWx0ZWRfX9HIjzTrf8CuY
+ DEwceEpV+6pXNZkoy0wu3QrdafG4mm/Ca3xQncIdCeAFerXcKed7f+k53xyVKZCHMmtUselpUaT
+ eB8HZhjGSPh+LoXeKs5bNZLSlnq70/YVFRn0xXPYIelSVmdtuRRlLiDWulNbU/iUAnkGlSwMfXy
+ S5ArdhgUd2EYSldUfr8egaxvvlQuO+4Jn6/vhc6LumGUSSTdrk7wZuZTydeI0UELxE+HnlLRy+1
+ cpJUYUIxzWcuGd/51P5LumjY3oImedXHNJgSkRhO4sQE0mmeTqP3RdE+BayzOf6c5low+PN/2Z6
+ +F6RWUDWq5EWd+XzmpSGE6sHTawR+I1y8NgKvbzoypGUlZNKRAuJfRf+/bV21Us4MVu0u/aCHHg
+ Og2lmeqo6iL+LqG8Bwvsq1Ky4jiRQ89RtZRH8xa5g5zOCeRbN6vqdUrB3E2ol7MUGOec/dCT92N
+ hu2Z2C0aWmq1SXad9Cg==
+X-Proofpoint-GUID: bvZjkqjR1ktNiZX6EJxoVMRoIYYIst0K
+X-Proofpoint-ORIG-GUID: KUz9DYN33Ji3dCI-CPQUV1NxDmqhcceU
+X-Proofpoint-Spam-Info: AW1haW4tMjYwODMxMDEyNSBTYWx0ZWRfX0M1QX2DUg8Qn
+ C5MR5OUEwWCSHow10yw1Ca2QylUGPlAQJukhb+gOT321Bcs7myxA0zPhNFBiX90TresqShWXjYo
+ VqzPv7U2ko58tI7MdEjDBBB8/t3e2qs=
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
  definitions=2026-08-31_05,2026-08-27_02,2025-10-01_01
@@ -119,50 +119,97 @@ X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
  reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2608310125
 
-The second KVM module will have a different Kconfig set. When both
-modules are compiled the Kconfig sets get merged and the native s390 KVM
-needs to implement functionality required by the respective config
-options. Ensure that s390-KVM will still compile by implementing a stub
-for kvm_arch_vcpu_run_pid_change if CONFIG_HAVE_KVM_VCPU_RUN_PID_CHANGE
-is enabled and defining KVM_NO_MMIO to disable KVM_MMIO.
+From: Hendrik Brueckner <brueckner@linux.ibm.com>
 
+Report SAE support as hwcap (and /proc/cpuinfo)
+
+Signed-off-by: Hendrik Brueckner <brueckner@linux.ibm.com>
+Reviewed-by: Steffen Eiden <seiden@linux.ibm.com>
 Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 ---
- arch/s390/include/asm/kvm_host_s390.h | 1 +
- arch/s390/kvm/s390/s390.c             | 8 ++++++++
- 2 files changed, 9 insertions(+)
+ arch/s390/include/asm/elf.h    | 2 ++
+ arch/s390/include/asm/sclp.h   | 5 ++++-
+ arch/s390/kernel/processor.c   | 3 +++
+ drivers/s390/char/sclp_early.c | 1 +
+ 4 files changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/arch/s390/include/asm/kvm_host_s390.h b/arch/s390/include/asm/kvm_host_s390.h
-index cd692f8fb764..207f44cb86d9 100644
---- a/arch/s390/include/asm/kvm_host_s390.h
-+++ b/arch/s390/include/asm/kvm_host_s390.h
-@@ -29,6 +29,7 @@
+diff --git a/arch/s390/include/asm/elf.h b/arch/s390/include/asm/elf.h
+index bb63fa4d20bb..ad3108ecfb07 100644
+--- a/arch/s390/include/asm/elf.h
++++ b/arch/s390/include/asm/elf.h
+@@ -123,6 +123,7 @@ enum {
+ 	HWCAP_NR_NNPA		= 20,
+ 	HWCAP_NR_PCI_MIO	= 21,
+ 	HWCAP_NR_SIE		= 22,
++	HWCAP_NR_SAE		= 23,
+ 	HWCAP_NR_MAX
+ };
  
- #define KVM_HAVE_MMU_RWLOCK
- #define KVM_MAX_VCPUS 255
-+#define KVM_NO_MMIO
+@@ -150,6 +151,7 @@ enum {
+ #define HWCAP_NNPA		BIT(HWCAP_NR_NNPA)
+ #define HWCAP_PCI_MIO		BIT(HWCAP_NR_PCI_MIO)
+ #define HWCAP_SIE		BIT(HWCAP_NR_SIE)
++#define HWCAP_SAE		BIT(HWCAP_NR_SAE)
  
- #define KVM_INTERNAL_MEM_SLOTS 1
+ /*
+  * These are used to set parameters in the core dumps.
+diff --git a/arch/s390/include/asm/sclp.h b/arch/s390/include/asm/sclp.h
+index 44066550b9b1..68f61b71a2d5 100644
+--- a/arch/s390/include/asm/sclp.h
++++ b/arch/s390/include/asm/sclp.h
+@@ -56,7 +56,9 @@ struct sclp_core_entry {
+ 	u8 siif : 1;
+ 	u8 sigpif : 1;
+ 	u8 : 3;
+-	u8 reserved2[3];
++	u8 aef: 1;
++	u8 : 7;
++	u8 reserved2[2];
+ 	u8 : 2;
+ 	u8 ib : 1;
+ 	u8 cei : 1;
+@@ -109,6 +111,7 @@ struct sclp_info {
+ 	unsigned char has_aeni : 1;
+ 	unsigned char has_aisi : 1;
+ 	unsigned char has_astfleie2 : 1;
++	unsigned char has_aef : 1;
+ 	unsigned int ibc;
+ 	unsigned int mtid;
+ 	unsigned int mtid_cp;
+diff --git a/arch/s390/kernel/processor.c b/arch/s390/kernel/processor.c
+index e33a3eccda56..6da55a158027 100644
+--- a/arch/s390/kernel/processor.c
++++ b/arch/s390/kernel/processor.c
+@@ -150,6 +150,7 @@ static void show_cpu_summary(struct seq_file *m, void *v)
+ 		[HWCAP_NR_NNPA]		= "nnpa",
+ 		[HWCAP_NR_PCI_MIO]	= "pcimio",
+ 		[HWCAP_NR_SIE]		= "sie",
++		[HWCAP_NR_SAE]		= "sae",
+ 	};
+ 	int i, cpu;
  
-diff --git a/arch/s390/kvm/s390/s390.c b/arch/s390/kvm/s390/s390.c
-index b0839e887221..697be391f0aa 100644
---- a/arch/s390/kvm/s390/s390.c
-+++ b/arch/s390/kvm/s390/s390.c
-@@ -5873,6 +5873,14 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
- 	return gmap_unmap_gfn_range(kvm->arch.gmap, range->slot, range->start, range->end);
+@@ -254,6 +255,8 @@ static int __init setup_hwcaps(void)
+ 	/* virtualization support */
+ 	if (sclp.has_sief2)
+ 		elf_hwcap |= HWCAP_SIE;
++	if (sclp.has_aef)
++		elf_hwcap |= HWCAP_SAE;
+ 
+ 	return 0;
  }
+diff --git a/drivers/s390/char/sclp_early.c b/drivers/s390/char/sclp_early.c
+index 22dd797e6229..e58d24b95bd1 100644
+--- a/drivers/s390/char/sclp_early.c
++++ b/drivers/s390/char/sclp_early.c
+@@ -96,6 +96,7 @@ static void __init sclp_early_facilities_detect(void)
+ 		sclp.has_ib = cpue->ib;
+ 		sclp.has_cei = cpue->cei;
+ 		sclp.has_skey = cpue->skey;
++		sclp.has_aef = cpue->aef;
+ 		break;
+ 	}
  
-+#ifdef CONFIG_HAVE_KVM_VCPU_RUN_PID_CHANGE
-+/* Make s390 compile if arm64-on-s390 is selected */
-+int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
-+{
-+	return 0;
-+}
-+#endif /* CONFIG_HAVE_KVM_VCPU_RUN_PID_CHANGE */
-+
- static inline unsigned long nonhyp_mask(int i)
- {
- 	unsigned int nonhyp_fai = (sclp.hmfai << i * 2) >> 30;
 -- 
 2.53.0
 
