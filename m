@@ -1,32 +1,33 @@
-Received: from mta0.migadu.com (out-246.mta0.migadu.com [91.218.175.246])
+Received: from mta0.migadu.com (out-249.mta0.migadu.com [91.218.175.249])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0D53361972
-	for <kvmarm@lists.linux.dev>; Mon, 31 Aug 2026 19:24:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1B12364EAB
+	for <kvmarm@lists.linux.dev>; Mon, 31 Aug 2026 19:24:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788204252; cv=none; b=TCCEdFuGw9kUEcTDSrNye2WiCTIUTMXklkbVlxzOS3HNJisWKDzECnyZXKIDJ50YOiU99NEkho2O6iQKPJbuyCJL2Df0vaALlhsh4CY0ZVpkw0q3ydkPhK2FjW2AlsNiC5luiu7ERxynhNlIojVt+dtJcuc5E0UBZ4GBzx4HHfg=
+	t=1788204252; cv=none; b=LexyWHqdLZDUDEec+qfK7trrgToF+GOd5YvkjsgYfayIb0f1NN6iUz4Ep8vtRtl1LAglQQZNWKwKJtss0k3ydeJV75M3M29GTJm0E8+hIFrRk8MwiBV/ca6y/r00gMvKX0dEzi1eqmqI8RjJyX72PRrenj/V2fkl+i1prHDwihc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1788204252; c=relaxed/simple;
-	bh=DrKqvPN9dcIUKE5GULTEUmn87/y2ID4zJ4wY5XNZeJE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=atYNMm8TfyZTpqCCH7kWpMxkyicAOOy7POBkBqp+7pq18UxOmQgJsc929jZ6U2R/SNCHWFtfzIIdVazDlB7eomddhoqO1zG6rReJJI8yevFukaMMRaRmwtAHQZT/QrtusCpMQkufzRwVcfZE8GuygkhWV3QtTv4zW+h76vyQD5M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=nvydepUY; arc=none smtp.client-ip=91.218.175.246
+	bh=0AmK8CNakoQAqZwHRn5zlOSNLYaCkQZbqWhEYUXEYnc=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=TBuv7FFPkOFFobpfwvQ9K2cEKEoG3rDAKLZ0qwFx9Z8gGljEd5uxWUFpeNdx/W1OqpGgzCI3+penOvqWZVJT4Mvw4Nx7ZUvW5N4G8QX+ozq7cTuFS7qcv9G78KzCxe6ShvsPtGaQDXqb/KH33qIrnkqXk5uo+odMA7ucn+94xwg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=c4goKm5h; arc=none smtp.client-ip=91.218.175.249
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="nvydepUY"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="c4goKm5h"
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=DrKqvPN9dcIUKE5GULTEUmn87/y2ID4zJ4wY5XNZeJE=;
+DKIM-Signature: a=rsa-sha256; bh=0AmK8CNakoQAqZwHRn5zlOSNLYaCkQZbqWhEYUXEYnc=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1788204247; v=1; x=1788809047;
- b=nvydepUY4asrjBfjwWubvhvNegtpn2l8kLrKqVRhLhsBgIp56raWNsatwm9IwLnLtJ2GP8XW
- xCwcWy8xiGrT7cQmn18CTkrrDMFFhWKeCFZxyCKZS7VJ/lIaE5NvpfLsTzogIBPZgQtYpq3qIHj
- Kk7Qv499O6yfEIIG8weIYpPM=
+ t=1788204248; v=1; x=1788809048;
+ b=c4goKm5hwIobNm+NRd9oTaMQhVbigG7yH7wrX9vTTuJ3xKcuZrKDc+Ai6ohYAryZb/h4nerU
+ 3ewy0IjyYn5ecIGrIjaK6AqgCjiL2NA5yQ2K+N4cErr9YRK9Vbs7lf6xh1CJGu/f062DwcqOjod
+ FDvcPa5mTszFAiasZID4Ghcg=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 89b251068cf902bc;
-	Mon, 31 Aug 2026 19:24:07 +0000
-X-Mizu-Trace-ID: 89b251068cf902bc
+Received: by smtp.migadu.com with ESMTPS id 5755b3b025ed58c5;
+	Mon, 31 Aug 2026 19:24:08 +0000
+X-Mizu-Trace-ID: 5755b3b025ed58c5
 X-Migadu-Flow: FLOW_OUT
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: kvm@vger.kernel.org
@@ -39,10 +40,12 @@ Cc: kvmarm@lists.linux.dev,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Marc Zyngier <maz@kernel.org>,
 	Fuad Tabba <tabba@google.com>
-Subject: [PATCH kvmtool 0/5] Fix diagnostics and capability probes for protected VMs
-Date: Mon, 31 Aug 2026 20:24:01 +0100
-Message-Id: <20260831192406.1341841-1-fuad.tabba@linux.dev>
+Subject: [PATCH kvmtool 2/5] kvm: Bound-check the exit-reason string lookup
+Date: Mon, 31 Aug 2026 20:24:03 +0100
+Message-Id: <20260831192406.1341841-3-fuad.tabba@linux.dev>
 X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20260831192406.1341841-1-fuad.tabba@linux.dev>
+References: <20260831192406.1341841-1-fuad.tabba@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -51,60 +54,77 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi folks,
+kvm_cpu_thread()'s panic path uses the kernel's exit_reason to index
+kvm_exit_reasons[] without checking it against the array's size. The
+table does not cover every exit reason KVM can return, so a reason past
+its last entry reads out of bounds. KVM_EXIT_SYSTEM_EVENT and
+KVM_EXIT_ARM_NISV are both past it.
 
-These are the kvmtool changes that go with the pKVM series confining a
-protected VM's vCPU state to EL2 [1].
+Move the table behind kvm__exit_reason_str(), which checks the index
+first. The array now has a single caller inside kvm.c, so make it
+static const.
 
-That series stops the host reading a protected vCPU's registers once it
-has run, and stops it setting the PVTIME attribute. kvmtool dies on
-both. Its arm64 register-dump helpers call die() when KVM_GET_ONE_REG
-fails, which turns a diagnostic into a VMM abort.
-kvm_cpu__setup_pvtime() runs into the new -EPERM and fails vCPU init.
-
-The PVTIME failure is a probe on the wrong fd. kvmtool asks the global
-/dev/kvm fd whether steal-time is available, and that fd advertises it
-for a protected VM, which cannot use it.
-The last patch fixes the same wrong-fd probe for the counter offset,
-where "lkvm run --protected --counter-offset" already fails on Linux
-7.3-rc1, without the kernel series.
-The same conversion went in for the vCPU feature probes in July [2].
-
-Patches 2 and 3 are not specific to protected VMs. They fix the
-exit-reason table on the same panic path as patch 1. The lookup ran off
-the end of it, and the table had stopped naming anything KVM added after
-KVM_EXIT_INTERNAL_ERROR, which on arm64 includes KVM_EXIT_SYSTEM_EVENT
-and KVM_EXIT_ARM_NISV.
-
-Patch 1's path needs a protected VM that is already running: "lkvm debug
--d" against one kills the VMM without this series, and prints the errno
-with it.
-
-Based on kvmtool master (f67bc0b).
-
-Cheers,
-/fuad
-
-[1] https://lore.kernel.org/all/20260831163421.272420-1-fuad.tabba@linux.dev/
-[2] https://lore.kernel.org/all/20260714110329.12113-1-fuad.tabba@linux.dev/
-
-Fuad Tabba (5):
-  arm64: Do not abort on register-dump failures
-  kvm: Bound-check the exit-reason string lookup
-  kvm: Name every exit reason the UAPI header defines
-  arm64: Query steal-time support on the VM fd
-  arm64: Query counter-offset support on the VM fd
-
- arm64/kvm-cpu.c   | 36 ++++++++++++++++++++++++------------
- arm64/kvm.c       |  2 +-
- arm64/pvtime.c    |  4 ++--
+Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+---
  builtin-run.c     |  2 +-
  include/kvm/kvm.h |  2 +-
- kvm.c             | 37 ++++++++++++++++++++++++++++++++++---
- 6 files changed, 63 insertions(+), 20 deletions(-)
+ kvm.c             | 10 +++++++++-
+ 3 files changed, 11 insertions(+), 3 deletions(-)
 
-
-base-commit: f67bc0bdae9433a9cfd05e65ea2c1bb6102566d9
+diff --git a/builtin-run.c b/builtin-run.c
+index 81f255f..f36d3e2 100644
+--- a/builtin-run.c
++++ b/builtin-run.c
+@@ -298,7 +298,7 @@ static void *kvm_cpu_thread(void *arg)
+ panic_kvm:
+ 	pr_err("KVM exit reason: %u (\"%s\")",
+ 		current_kvm_cpu->kvm_run->exit_reason,
+-		kvm_exit_reasons[current_kvm_cpu->kvm_run->exit_reason]);
++		kvm__exit_reason_str(current_kvm_cpu->kvm_run->exit_reason));
+ 
+ 	if (current_kvm_cpu->kvm_run->exit_reason == KVM_EXIT_UNKNOWN) {
+ 		pr_err("KVM exit code: %llu",
+diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
+index a9376b6..8619070 100644
+--- a/include/kvm/kvm.h
++++ b/include/kvm/kvm.h
+@@ -255,7 +255,7 @@ int kvm__for_each_mem_bank(struct kvm *kvm, enum kvm_mem_type type,
+  */
+ void kvm__dump_mem(struct kvm *kvm, unsigned long addr, unsigned long size, int debug_fd);
+ 
+-extern const char *kvm_exit_reasons[];
++const char *kvm__exit_reason_str(__u32 exit_reason);
+ 
+ static inline bool host_ptr_in_ram(struct kvm *kvm, void *p)
+ {
+diff --git a/kvm.c b/kvm.c
+index 96583f9..b416f6f 100644
+--- a/kvm.c
++++ b/kvm.c
+@@ -33,7 +33,7 @@
+ 
+ #define DEFINE_KVM_EXIT_REASON(reason) [reason] = #reason
+ 
+-const char *kvm_exit_reasons[] = {
++static const char * const kvm_exit_reasons[] = {
+ 	DEFINE_KVM_EXIT_REASON(KVM_EXIT_UNKNOWN),
+ 	DEFINE_KVM_EXIT_REASON(KVM_EXIT_EXCEPTION),
+ 	DEFINE_KVM_EXIT_REASON(KVM_EXIT_IO),
+@@ -57,6 +57,14 @@ const char *kvm_exit_reasons[] = {
+ #endif
+ };
+ 
++const char *kvm__exit_reason_str(__u32 exit_reason)
++{
++	if (exit_reason >= ARRAY_SIZE(kvm_exit_reasons))
++		return "UNKNOWN";
++
++	return kvm_exit_reasons[exit_reason];
++}
++
+ static int pause_event;
+ static DEFINE_MUTEX(pause_lock);
+ static struct kvm_cpu *pause_req_cpu;
 -- 
 2.39.5
 
