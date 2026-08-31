@@ -1,299 +1,208 @@
-Received: from canpmsgout06.his.huawei.com (canpmsgout06.his.huawei.com [113.46.200.221])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C05B43C7D3;
-	Mon, 31 Aug 2026 13:57:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.221
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DB67370AF8
+	for <kvmarm@lists.linux.dev>; Mon, 31 Aug 2026 14:48:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788184644; cv=none; b=Ggw9jnVm3lnGrd1Z8fcN7ZX528fG2AV42OZDCTkOLgvLmXo/S/kWasjtDstSc59yedF7BwZdog4/OaCKp9JUl6cejEEDTiwv5LzUtXtO51W41uVfduCrg6LXt6Vdko5f3rTj1VxtYyHXDr9TgmtABknsyESRQvxZhtTIqau34cw=
+	t=1788187704; cv=none; b=KZvRQOcXqHwbn2hp5OAS29HaeBftIUHnvqb1EnSgMAo+/iB/lAO9ITgRRtNCiMo40ZYk07ztzm5w10KM1jkrUGby0+q/AOCGIUWUsAjjz7ahpzBRctCO9YSik4sQSaMTp8MlMDJXRPuI1bYNXZcPhu11zlUbU74VfgQPHR5HM2k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788184644; c=relaxed/simple;
-	bh=DYy7Yh5VuqJ1tPQ5cWpknZiVqRNrR5tqzqmfJyw4ppI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=dKjjmtCFjoHbvsp2PAOTU+Ks8qX/TeHz1DfCS9dlaql03B7fnL9+GIJyaMhg/qxEsjNQxHYQZY4AjZDbobD4YOSV0818iilDxyJWdli1KVoSTJ6jXZWr2JK9ZknegJj0TEvV/ssIFZ0oaBdtD5H8njr6XlJjdI+xl/x3/hknx5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=tmZnaFti; arc=none smtp.client-ip=113.46.200.221
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1788187704; c=relaxed/simple;
+	bh=CeH09pt7vIYul3jPdQFCDPibyk3JwItNfJmX1KxMLRA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=UskN+Nxqq7ImMXVGom6Kt0y4/cvMjGAVOJzFAutvD+7PVIXYh5cPiJJvNJHCTwmLVqvBhjeY9gb4ljCiPTbHbMIOZrvF9boaO4JsqwddN6jQnq02xcxeBE6OHcIBj5lWfexvRBVDNpVlcE2gEX9XPJI4is9JPiptmSbgwU1QXok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Fmw8/Zgm; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="tmZnaFti"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=yJ/L9x3rTRjFD26y3XQs185XmGwXv5WubIyollA9Msw=;
-	b=tmZnaFtiFCAbBFLgoaXNhmkgyAZn/eVaaDzcPuviyReaeVQ4TD//qtIEmx0GJiwhGW1k2SCyt
-	h8PQASl+cY89VEVoEeuVgvyyp0YRBaHPTBARcK/M0YSRoP6lj4OXBstkdbKE68K+tFgdDzQ8SBr
-	JUY+2lNhfV6cP/l4j100xas=
-Received: from mail.maildlp.com (unknown [172.19.162.197])
-	by canpmsgout06.his.huawei.com (SkyGuard) with ESMTPS id 4hYVdZ5QqnzRhWS;
-	Mon, 31 Aug 2026 21:46:26 +0800 (CST)
-Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
-	by mail.maildlp.com (Postfix) with ESMTPS id 8CB724057D;
-	Mon, 31 Aug 2026 21:57:13 +0800 (CST)
-Received: from [10.67.120.103] (10.67.120.103) by
- kwepemr100010.china.huawei.com (7.202.195.125) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.45; Mon, 31 Aug 2026 21:57:13 +0800
-Message-ID: <5f750f14-1b80-49d7-96ec-415eb6457224@huawei.com>
-Date: Mon, 31 Aug 2026 21:57:12 +0800
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Fmw8/Zgm"
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67VEZ0862525249;
+	Mon, 31 Aug 2026 14:48:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:in-reply-to:message-id
+	:mime-version:references:subject:to; s=pp1; bh=lm81A7q8yUyeyAYX/
+	W1p02VJiYIZujE9pM4JMcxdrYw=; b=Fmw8/Zgm0hjQ/jjbUirB02oIHKuby/ol9
+	VYBKs7fj/fdDP7WC5Tk/gU0mP43hBEJ2BcLJDBebtzDYGwtnVsRQ43s4Cc/wJ1aq
+	oSXctwlJl+Wjg/hxj32kWqjt+n/RNNc/HFqQeVNoT/zylezGfuxokdFBQnxxudxk
+	ayu9+kta3SlVwZDMqLHJAwGmRUOTefkzf7cO6oy2usX6WuFG3tNh7QkTNB1fvBSJ
+	Opxe8rPBhZ/N4NmQA7S4/LuFOA3v1J8Ss5ENGgdvyXge0k/PH/KchwK96sgyaSvz
+	W4faU19M0OIfWN0zgwW36YPxvM49yUc96layQyKNFdkI1wgKl0zVQ==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gbq54hyay-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 31 Aug 2026 14:48:09 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 67VEfdOW000453;
+	Mon, 31 Aug 2026 14:48:08 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4gcbyg694q-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 31 Aug 2026 14:48:08 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 67VEm4WG37093718
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 31 Aug 2026 14:48:04 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 893B02004B;
+	Mon, 31 Aug 2026 14:48:04 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 204302004E;
+	Mon, 31 Aug 2026 14:48:04 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 31 Aug 2026 14:48:04 +0000 (GMT)
+From: Steffen Eiden <seiden@linux.ibm.com>
+To: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
+        Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@kernel.org>,
+        Friedrich Welter <fritz@linux.ibm.com>, Fuad Tabba <tabba@google.com>,
+        Gautam Gala <ggala@linux.ibm.com>,
+        Hariharan Mari <hari55@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Hendrik Brueckner <brueckner@linux.ibm.com>,
+        Ilya Leoshkevich <iii@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
+        Marc Zyngier <maz@kernel.org>, Nico Boehr <nrb@linux.ibm.com>,
+        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
+        Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH v7 03/23] KVM: Allow KVM implementations to switch off MMIO independent of Kconfig
+Date: Mon, 31 Aug 2026 16:47:40 +0200
+Message-ID: <20260831144802.834315-4-seiden@linux.ibm.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260831144802.834315-1-seiden@linux.ibm.com>
+References: <20260831144802.834315-1-seiden@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 5/6] KVM: arm64: Add HDBSS fault handling and buffer
- flush
-To: <sashiko-reviews@lists.linux.dev>
-CC: Oliver Upton <oupton@kernel.org>, <kvmarm@lists.linux.dev>,
-	<kvm@vger.kernel.org>, Marc Zyngier <maz@kernel.org>
-References: <20260709104026.2612599-1-zhengtian10@huawei.com>
- <20260709104026.2612599-6-zhengtian10@huawei.com>
- <20260709112655.339D91F000E9@smtp.kernel.org>
-From: Tian Zheng <zhengtian10@huawei.com>
-In-Reply-To: <20260709112655.339D91F000E9@smtp.kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
- kwepemr100010.china.huawei.com (7.202.195.125)
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODMxMDEyNSBTYWx0ZWRfXyea0EW5cY30x
+ R49s/wnf8QDs5g7TqQFqng8ArIqTQk3isFN6UaHvz1tEQKd+RH9kHil67Awpz/e9REOfRRDIr9g
+ 6lAJ5uQPWf0KbOK6Z9dPcVsu6YumhLfv5Oplsv7ccgFR+1c/rRX3YOFbezUWiig/hyOhraSalzZ
+ xxsUWFIylv2dyFTucrbowZov3whamCdLUhvhNHpMV6lDU5p4YVooys/P+3jfud/oxHTO/yJqLNJ
+ mRo4Ij4VNCmh7wvkSX7PFBvdj7iUuBYJKGwZZpvioqzCPNMLnfSVTnUJv/IQa9XB2w7tYfBMZY4
+ hySG8k8ZZbqMWoRMJJITNb+OEdqYSDb7HC/SOq+IlfMlUsvCjWpKfmwx3uzqO2yph99X9Lkx2uZ
+ H81Zsq3pulkJyxGZfYCVerUMC2EnA3UBsn/P7GP2EtuOK8VcOJl+iRsylWet4FIj3y/YJVuyq3r
+ jYPifPWqA5KKlq4g9Og==
+X-Proofpoint-ORIG-GUID: YiytUqZHHjArbaiFh6H0IRcZUVP0zVLN
+X-Authority-Analysis: v=2.4 cv=CNgamxrD c=1 sm=1 tr=0 ts=6a959429 cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
+ a=U7nrCbtTmkRpXpFmAIza:22 a=VnNF1IyMAAAA:8 a=-AqJVl6EvvwGbS2dlloA:9
+X-Proofpoint-GUID: -RNe0SPTagOhxDtVZBKNWb90rqdgXg6b
+X-Proofpoint-Spam-Info: AW1haW4tMjYwODMxMDEyNSBTYWx0ZWRfX3oWhY03thxTU
+ dficWllLcdrU8C3uEMdu0kV7weYDkukeDdGX1qheMYqxEcuYlfRpRB3uGpkmHROTnK/k/wyAeG5
+ 0b86hX4m+G3nyt9NP3zbZwTxMuPnhfM=
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-08-31_05,2026-08-27_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 bulkscore=0 suspectscore=0 phishscore=0 lowpriorityscore=0
+ priorityscore=1501 clxscore=1015 impostorscore=0 adultscore=0 malwarescore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2608310125
 
+Only defining KVM_MMIO is not flexible enough for multi-KVM systems
+where one KVM implements MMIO but others do not. Solve this by
+additionally testing for the non-existence of KVM_NO_MMIO before
+including MMIO code to KVM.
 
+Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
+---
+ virt/kvm/coalesced_mmio.c | 4 ++++
+ virt/kvm/coalesced_mmio.h | 2 +-
+ virt/kvm/kvm_main.c       | 8 ++++----
+ 3 files changed, 9 insertions(+), 5 deletions(-)
 
-On 7/9/2026 7:26 PM, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 6 potential issue(s) to consider:
-> - [Critical] Acquiring `kvm->mmu_lock` inside the preempt notifier (`kvm_sched_out` -> `kvm_arch_vcpu_put`) creates an ABBA deadlock with the runqueue lock.
-> - [High] `kvm_flush_hdbss_buffer` calls `kvm_vcpu_mark_page_dirty` without holding `srcu_read_lock(&kvm->srcu)`, leading to Use-After-Free.
-> - [High] `kvm_arch_sync_dirty_log` silently misses dirty pages for vCPUs outside guest mode due to `KVM_REQUEST_WAIT` semantics.
-> - [High] Flushing the entire HDBSS buffer in a single tight loop can overflow the KVM dirty ring, resulting in dropped dirty pages.
-> - [High] Directly accessing the EL2 register `SYS_HDBSSPROD_EL2` from the host kernel will crash in nVHE mode.
-> - [Medium] Missing immediate Context Synchronization Event (`isb()`) after writing to control-plane system register `SYS_HDBSSPROD_EL2`.
-> --
-> 
-> --- Patch [5]: [PATCH v4 5/6] KVM: arm64: Add HDBSS fault handling and buffer flush ---
-> commit ac61acd739dfa5c2e5304969807c386e60452069
-> Author: eillon <yezhenyu2@huawei.com>
-> Date:   Thu Jul 9 10:40:25 2026 +0000
-> 
->      KVM: arm64: Add HDBSS fault handling and buffer flush
-> 
-> This patch adds handling for HDBSS (Hardware Dirty Bit State Stream) faults,
-> triggering flush requests when the hardware buffer becomes full. It implements
-> kvm_flush_hdbss_buffer to sync the hardware buffer to the dirty bitmap, which
-> is invoked during vcpu_put, request checks, and dirty log synchronization.
-> 
->> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> index bf6688245d83a..566953a4e23a1 100644
->> --- a/arch/arm64/kvm/arm.c
->> +++ b/arch/arm64/kvm/arm.c
->> @@ -755,6 +755,9 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->>   		kvm_vcpu_put_hw_mmu(vcpu);
->>   	kvm_arm_vmid_clear_active();
->>   
->> +	if (vcpu->kvm->arch.enable_hdbss)
->> +		kvm_flush_hdbss_buffer(vcpu);
->> +
-> 
-> [Severity: Critical]
-> Could this create an ABBA deadlock with the runqueue lock?
-> 
-> When the scheduler preempts a vCPU thread, it invokes the KVM preempt
-> notifier kvm_sched_out() with the runqueue lock (rq->lock) held and
-> interrupts disabled. This calls kvm_arch_vcpu_put(), which in turn
-> calls kvm_flush_hdbss_buffer().
-> 
-> The flush function then acquires vcpu->kvm->mmu_lock. Because other
-> standard KVM execution paths acquire mmu_lock and may subsequently
-> wake up tasks (which acquires rq->lock), this establishes an unavoidable
-> locking inversion between rq->lock and mmu_lock.
-> 
+diff --git a/virt/kvm/coalesced_mmio.c b/virt/kvm/coalesced_mmio.c
+index 6b1d90161099..8ff9d9a6f47a 100644
+--- a/virt/kvm/coalesced_mmio.c
++++ b/virt/kvm/coalesced_mmio.c
+@@ -15,6 +15,8 @@
+ #include <linux/slab.h>
+ #include <linux/kvm.h>
+ 
++#ifndef KVM_NO_MMIO
++
+ #include "coalesced_mmio.h"
+ 
+ static inline struct kvm_coalesced_mmio_dev *to_mmio(struct kvm_io_device *dev)
+@@ -188,3 +190,5 @@ int kvm_vm_ioctl_unregister_coalesced_mmio(struct kvm *kvm,
+ 	 */
+ 	return 0;
+ }
++
++#endif /* ifndef KVM_NO_MMIO */
+diff --git a/virt/kvm/coalesced_mmio.h b/virt/kvm/coalesced_mmio.h
+index 36f84264ed25..826af421a5be 100644
+--- a/virt/kvm/coalesced_mmio.h
++++ b/virt/kvm/coalesced_mmio.h
+@@ -11,7 +11,7 @@
+  *
+  */
+ 
+-#ifdef CONFIG_KVM_MMIO
++#if defined(CONFIG_KVM_MMIO) && !defined(KVM_NO_MMIO)
+ 
+ #include <linux/list.h>
+ 
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 823b693d89e6..7f37d3b5af48 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -4061,7 +4061,7 @@ static vm_fault_t kvm_vcpu_fault(struct vm_fault *vmf)
+ 	else if (vmf->pgoff == KVM_PIO_PAGE_OFFSET)
+ 		page = virt_to_page(vcpu->arch.pio_data);
+ #endif
+-#ifdef CONFIG_KVM_MMIO
++#if defined(CONFIG_KVM_MMIO) && !defined(KVM_NO_MMIO)
+ 	else if (vmf->pgoff == KVM_COALESCED_MMIO_PAGE_OFFSET)
+ 		page = virt_to_page(vcpu->kvm->coalesced_mmio_ring);
+ #endif
+@@ -4902,7 +4902,7 @@ static int kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
+ 	case KVM_CAP_ENABLE_CAP_VM:
+ 	case KVM_CAP_HALT_POLL:
+ 		return 1;
+-#ifdef CONFIG_KVM_MMIO
++#if defined(CONFIG_KVM_MMIO) && !defined(KVM_NO_MMIO)
+ 	case KVM_CAP_COALESCED_MMIO:
+ 		return KVM_COALESCED_MMIO_PAGE_OFFSET;
+ 	case KVM_CAP_COALESCED_PIO:
+@@ -5243,7 +5243,7 @@ static long kvm_vm_ioctl(struct file *filp,
+ 		break;
+ 	}
+ #endif
+-#ifdef CONFIG_KVM_MMIO
++#if defined(CONFIG_KVM_MMIO) && !defined(KVM_NO_MMIO)
+ 	case KVM_REGISTER_COALESCED_MMIO: {
+ 		struct kvm_coalesced_mmio_zone zone;
+ 
+@@ -5577,7 +5577,7 @@ static long kvm_dev_ioctl(struct file *filp,
+ #ifdef CONFIG_X86
+ 		r += PAGE_SIZE;    /* pio data page */
+ #endif
+-#ifdef CONFIG_KVM_MMIO
++#if defined(CONFIG_KVM_MMIO) && !defined(KVM_NO_MMIO)
+ 		r += PAGE_SIZE;    /* coalesced mmio ring page */
+ #endif
+ 		break;
+-- 
+2.53.0
 
-v5 uses srcu_read_lock(&kvm->srcu) in the flush path, not mmu_lock. The
-flush is also moved from vcpu_put() to the run-loop exit path, so no
-lock inversion is possible.
-
-> [Severity: High]
-> Is it safe to call kvm_flush_hdbss_buffer() here without holding the
-> KVM SRCU read lock?
-> 
-> The kvm_flush_hdbss_buffer() function calls kvm_vcpu_mark_page_dirty(),
-> which dereferences the KVM memslots array via kvm_vcpu_gfn_to_memslot().
-> 
-> When this flush is invoked from kvm_arch_vcpu_put() during vcpu_put(),
-> kvm->srcu is not held. The mmu_lock does not protect the memslots array
-> structure itself, which could lead to a use-after-free if memslots are
-> concurrently modified.
-> 
-> [ ... ]
-> 
->> @@ -1971,7 +1977,15 @@ long kvm_arch_vcpu_unlocked_ioctl(struct file *filp, unsigned int ioctl,
->>   
->>   void kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot *memslot)
->>   {
->> +	/*
->> +	 * Flush all CPUs' dirty log buffers to the dirty_bitmap.  Called
->> +	 * before reporting dirty_bitmap to userspace. Send a request with
->> +	 * KVM_REQUEST_WAIT to flush buffer synchronously.
->> +	 */
->> +	if (!kvm->arch.enable_hdbss)
->> +		return;
->>   
->> +	kvm_make_all_cpus_request(kvm, KVM_REQ_FLUSH_HDBSS | KVM_REQUEST_WAIT);
->>   }
-> 
-
-Fixed in v5. kvm_flush_hdbss_buffer() now holds srcu_read_lock(&kvm-
- >srcu) around memslot lookups.
-
-> [Severity: High]
-> Will this wait for vCPUs that have exited to userspace?
-> 
-> The KVM_REQUEST_WAIT flag causes KVM to wait only for vCPUs that are
-> currently executing in guest mode. If a vCPU has exited the guest to host
-> userspace, it is not in guest mode, but its HDBSS hardware buffer might
-> still contain unflushed dirty pages.
-> 
-> Since the flush request is pended but not waited for, could this return
-> immediately and cause userspace to read an incomplete dirty bitmap during
-> live migration?
-> 
->> diff --git a/arch/arm64/kvm/dirty_bit.c b/arch/arm64/kvm/dirty_bit.c
->> index 6c7a6ef66b5aa..002366337637c 100644
->> --- a/arch/arm64/kvm/dirty_bit.c
->> +++ b/arch/arm64/kvm/dirty_bit.c
->> @@ -50,3 +50,65 @@ void kvm_arm_vcpu_free_hdbss(struct kvm_vcpu *vcpu)
-> 
-> [ ... ]
-> 
->> +void kvm_flush_hdbss_buffer(struct kvm_vcpu *vcpu)
->> +{
->> +	int idx, curr_idx;
->> +	u64 *hdbss_buf;
->> +	struct kvm *kvm = vcpu->kvm;
->> +
->> +	if (!kvm->arch.enable_hdbss)
->> +		return;
->> +
->> +	curr_idx = HDBSSPROD_IDX(read_sysreg_s(SYS_HDBSSPROD_EL2));
-> 
-
-The kvm_vcpu_kick() is indeed asynchronous; it only forces vCPUs
-currently in guest mode to exit, where the exit path flushes their HDBSS
-buffer.
-
-vCPUs that have already exited to userspace have already flushed the
-buffer on their way out, and while parked in userspace they cannot
-accumulate new entries. For the racing case where a vCPU is kicked but
-still in userspace, it will flush before re-entering the guest, but not
-immediately.
-
-This is fine by design: the generic KVM dirty-log API explicitly
-documents that concurrent bitmap writes may race with KVM_GET_DIRTY_LOG
-(see the comment above kvm_get_dirty_log_protect() in virt/kvm/
-kvm_main.c). The GET/CLEAR protocol is self-healing — any bit set after
-the snapshot is taken won't be cleared by the matching
-KVM_CLEAR_DIRTY_LOG, so it survives to the next iteration. The migration
-protocol handles this iteratively, and the final snapshot is taken with
-the guest paused, ensuring completeness.
-
-> [Severity: High]
-> Can this safely execute in nVHE mode?
-> 
-> This reads the SYS_HDBSSPROD_EL2 register directly from host context.
-> In KVM nVHE mode, the host kernel executes at EL1. Accessing an EL2
-> register from EL1 will trigger an undefined instruction exception and
-> panic the host.
-> 
->> +
->> +	/* Do nothing if HDBSS buffer is empty or br_el2 is NULL */
->> +	if (curr_idx == 0 || vcpu->arch.hdbss.hdbssbr_el2 == 0)
->> +		return;
->> +
->> +	hdbss_buf = page_address(phys_to_page(vcpu->arch.hdbss.base_phys));
->> +	if (!hdbss_buf)
->> +		return;
->> +
->> +	guard(write_lock_irqsave)(&vcpu->kvm->mmu_lock);
->> +	for (idx = 0; idx < curr_idx; idx++) {
->> +		u64 gpa;
->> +
->> +		gpa = hdbss_buf[idx];
->> +		if (!(gpa & HDBSS_ENTRY_VALID))
->> +			continue;
->> +
->> +		gpa &= HDBSS_ENTRY_IPA;
->> +		kvm_vcpu_mark_page_dirty(vcpu, gpa >> PAGE_SHIFT);
-> 
-
-Not an issue. HDBSS is VHE-only. system_supports_hdbss() guards all
-register accesses, so nVHE never hits this path.
-
-> [Severity: High]
-> Does this tight loop risk overflowing the dirty ring?
-> 
-> When the KVM dirty ring is enabled, kvm_vcpu_mark_page_dirty() pushes
-> entries to the per-vCPU ring. The dirty ring signals userspace
-> cooperatively when it reaches its soft limit.
-> 
-> Because the entire HDBSS buffer is flushed in one tight loop, the soft
-> limit signal is ignored until the loop finishes. If the number of HDBSS
-> entries exceeds the remaining free slots before the hard limit, could
-> the ring push fail and silently drop the dirty pages?
-> 
->> +	}
->> +
->> +	/* reset HDBSS index */
->> +	write_sysreg_s(0, SYS_HDBSSPROD_EL2);
->> +	vcpu->arch.hdbss.hdbssprod_el2 = 0;
->> +	isb();
-> 
-
-Valid point. It will cause a WARN_ON_ONCE(kvm_dirty_ring_full) during 
-live migration with dirty-ring + HDBSS. Fixed in v5 by two changes:
-
-1. The flush now runs on every VM exit before handle_exit(), so
-check_vcpu_requests() sees the pushed entries on the next loop iteration
-and exits to userspace when soft-full.
-
-2. The dirty ring reservation is wired up via kvm_cpu_dirty_log_size()
-so rsvd = 64 + hdbss_entries, guaranteeing room for a full buffer flush
-— and in dirty-ring mode the HDBSS buffer is fixed at PAGE_SIZE, which 
-maximizes performance by minimizing drain frequency.
-
-> [Severity: Medium]
-> Is the context synchronization event misplaced here?
-> 
-> The architectural rules state that every write to a control-plane system
-> register must be followed by an isb() as the very next instruction.
-> 
-> There is a memory store (vcpu->arch.hdbss.hdbssprod_el2 = 0) placed
-> between the write_sysreg_s() and the isb(). Could this leave the CPU
-> operating under a stale configuration for several cycles?
-> 
->> +}
->> +
->> +int kvm_handle_hdbss_fault(struct kvm_vcpu *vcpu)
->> +{
->> +	u64 prod;
->> +	u64 fsc;
->> +
->> +	prod = read_sysreg_s(SYS_HDBSSPROD_EL2);
-> 
-
-Same answer as the ISB comment on patch 4.
-
-> [Severity: High]
-> Like in kvm_flush_hdbss_buffer() above, does reading SYS_HDBSSPROD_EL2
-> from the host kernel risk triggering an undefined instruction exception
-> if the system is running in nVHE mode?
-> 
->> +	fsc = FIELD_GET(HDBSSPROD_EL2_FSC_MASK, prod);
-> 
-> [ ... ]
-> 
-
-Not an issue. HDBSS is VHE-only. system_supports_hdbss() is false on
-nVHE, so the registers are never accessed there. We note this in the
-cover letter and leave nVHE for future work.
-
-Thanks!
-Tian
