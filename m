@@ -1,33 +1,33 @@
-Received: from mta0.migadu.com (out-88.mta0.migadu.com [91.218.175.88])
+Received: from mta1.migadu.com (out-252.mta1.migadu.com [95.215.58.252])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F73549EC63
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A189C49EC67
 	for <kvmarm@lists.linux.dev>; Mon, 31 Aug 2026 16:34:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.88
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.252
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788194085; cv=none; b=KlbniAockPiEPjZMHVMmTuAvD9+mR9AAitB9+J4Oo+h1d9K0Bcin/9i9ixHw/h1/Q5x84tL5shgtwqVWrpoU6S2+S+DyBaCgT0+ianj7+xNhGdz4elOpwQRYrEXIqb/9J7B1PxqA6On6Ce/sxQqr9rKIWWNh4Gr8z7l8ByRVf3k=
+	t=1788194085; cv=none; b=oUMWQhnLig482csnkNH+yUGmc5PEegUR3XYPg408udHGZ8TafSXifDruCpMJIewxQsxBzfnpeR/FaB9YevyquT0TIWUc+xnsH9ZnPkzYsu4/hMs7BOv1O/LGKljkQ8G7onv/1XBnQyfHseW3dZqXDyby8tmxUx3oQDNtUXIjJ8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1788194085; c=relaxed/simple;
-	bh=6t1gqYdyhRpYCJ4ePxm8eKCyjmvWIh4HU6EgCqsQmzQ=;
+	bh=llHVSBDbIpHVrNbVZKpBn9aInJeZ47+2NBcLRjFcajA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=uZyxez4hzB6o82wg5AKv803cGw5q6ElV7tChbgf3oAUOXp7aTzMijMVyZDUaOm8PtUkjqAC/Xdwisnn0yMvlGC1kPpnqWzZ5vQT/fpOGcMMYhXnr7lzCv2/+NNMzFsf7y4cRmUUA58nqxoIaF7TqeWSqra1SZ1yaLmlY+jToIQg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IgEYf/Az; arc=none smtp.client-ip=91.218.175.88
+	 MIME-Version; b=Mu16ItTAcKNIgHoMdb6ask82UBC8b6nDvuD4cECQkdMdSK49bRmbD9fCqDg6QRsCyFbJLqxBwqKQWGFHyHsVs39KPwQY665BWS5cGtWxuVEJ766N+Dd2kFPKlZSPPVu1SKBxaEluiljK8MCxHpkTPtoutU96TNr78iFxTmU8mmE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Kq179Bi5; arc=none smtp.client-ip=95.215.58.252
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IgEYf/Az"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Kq179Bi5"
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=6t1gqYdyhRpYCJ4ePxm8eKCyjmvWIh4HU6EgCqsQmzQ=;
+DKIM-Signature: a=rsa-sha256; bh=llHVSBDbIpHVrNbVZKpBn9aInJeZ47+2NBcLRjFcajA=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
  t=1788194081; v=1; x=1788798881;
- b=IgEYf/Az+fqDs23NBg8dsv69+fkBGC62ietkamCYq5kJZ/OlVP5fHWII9/BR/SkI46uaM6qd
- jjN+W+/ebrGd2uTq6FfAuyvOsp9yQhPBXw2Ikn3zNU8skFdjfFZodfnIj+vaLF6+3H3Q15KMnX4
- mFrrvXR25KYGRhE8haZZt/7s=
+ b=Kq179Bi5hJyn88Sg2Yfsx2XrXNfIJQS1kZNKKOuoQjqiXr77clvA0GoliK/heBXFvNNvb9Ie
+ m/Rmt2tefSTltkhWH3z8pM2qwCXhfg3/hUABvCWuP9yuVz6G2W2xi3zEzrkSI9TYOsxR/1JBs/G
+ YdQagc00xmFEiwE6fZUPAtsc=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id faf522f5f8183ba7;
-	Mon, 31 Aug 2026 16:34:40 +0000
-X-Mizu-Trace-ID: faf522f5f8183ba7
+Received: by smtp.migadu.com with ESMTPS id f7553cf9231fffe6;
+	Mon, 31 Aug 2026 16:34:41 +0000
+X-Mizu-Trace-ID: f7553cf9231fffe6
 X-Migadu-Flow: FLOW_OUT
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
@@ -44,9 +44,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Vincent Donnefort <vdonnefort@google.com>,
 	Quentin Perret <qperret@google.com>,
 	Fuad Tabba <tabba@google.com>
-Subject: [PATCH 07/17] KVM: arm64: Add system register reset framework for protected VMs
-Date: Mon, 31 Aug 2026 17:34:11 +0100
-Message-Id: <20260831163421.272420-8-fuad.tabba@linux.dev>
+Subject: [PATCH 08/17] KVM: arm64: Implement HVC handling for protected guests at EL2
+Date: Mon, 31 Aug 2026 17:34:12 +0100
+Message-Id: <20260831163421.272420-9-fuad.tabba@linux.dev>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20260831163421.272420-1-fuad.tabba@linux.dev>
 References: <20260831163421.272420-1-fuad.tabba@linux.dev>
@@ -58,165 +58,110 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Reset a protected VM's system registers at EL2 rather than taking the
-host's values: add kvm_reset_pvm_sys_regs() and the
-pvm_sys_reg_reset_vals[] table that drives it, and call it from
-init_pkvm_hyp_vcpu() for protected vCPUs. The values follow the
-host-side reset in sys_regs.c, with a poison value where it resets to
-UNKNOWN, and for VBAR_EL1 and CONTEXTIDR_EL1 in place of the 0 it
-resets them to. MPIDR_EL1 is derived from vcpu_id, as for any KVM
-guest.
+Extend kvm_handle_pvm_hvc64() to handle SMCCC_VERSION,
+SMCCC_ARCH_FEATURES and the vendor hypervisor call UID at EL2, so
+these queries do not reach the host. ARCH_FEATURES is mandatory from
+SMCCC 1.1, the version EL2 reports: it returns SUCCESS for itself and
+for SMCCC_VERSION, and NOT_SUPPORTED for anything else.
+
+Add handle_pvm_entry_hvc64() and handle_pvm_exit_hvc64(), which
+forward a protected guest's HVCs to the host and return the reply; a
+later patch wires them into the per-EC dispatch tables.
 
 Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
- arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  1 +
- arch/arm64/kvm/hyp/nvhe/pkvm.c         |  5 ++
- arch/arm64/kvm/hyp/nvhe/sys_regs.c     | 91 ++++++++++++++++++++++++--
- 3 files changed, 93 insertions(+), 4 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c | 28 ++++++++++++++++++++++++++++
+ arch/arm64/kvm/hyp/nvhe/pkvm.c     | 29 +++++++++++++++++++++++++++++
+ 2 files changed, 57 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-index 49a0a992047ba..a04b7c04d5135 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-@@ -95,6 +95,7 @@ bool kvm_handle_pvm_hvc64(struct kvm_vcpu *vcpu, u64 *exit_code);
- bool kvm_handle_pvm_sysreg(struct kvm_vcpu *vcpu, u64 *exit_code);
- bool kvm_handle_pvm_restricted(struct kvm_vcpu *vcpu, u64 *exit_code);
- void kvm_init_pvm_id_regs(struct kvm_vcpu *vcpu);
-+void kvm_reset_pvm_sys_regs(struct kvm_vcpu *vcpu);
- int kvm_check_pvm_sysreg_table(void);
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+index d4b0f69ff130c..62864db1e099a 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+@@ -4,6 +4,8 @@
+  * Author: Andrew Scull <ascull@google.com>
+  */
  
- #endif /* __ARM64_KVM_NVHE_PKVM_H__ */
++#include <kvm/arm_hypercalls.h>
++
+ #include <hyp/adjust_pc.h>
+ #include <hyp/switch.h>
+ 
+@@ -33,6 +35,32 @@ void __kvm_hyp_host_forward_smc(struct kvm_cpu_context *host_ctxt);
+ 
+ typedef void (*hyp_entry_exit_handler_fn)(struct pkvm_hyp_vcpu *);
+ 
++static void __maybe_unused handle_pvm_entry_hvc64(struct pkvm_hyp_vcpu *hyp_vcpu)
++{
++	int i;
++
++	for (i = 0; i < 4; i++) {
++		u64 ret =
++			READ_ONCE(hyp_vcpu->host_vcpu->arch.ctxt.regs.regs[i]);
++		vcpu_set_reg(&hyp_vcpu->vcpu, i, ret);
++	}
++}
++
++static void __maybe_unused handle_pvm_exit_hvc64(struct pkvm_hyp_vcpu *hyp_vcpu)
++{
++	struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
++	int i;
++
++	WRITE_ONCE(host_vcpu->arch.fault.esr_el2,
++		   hyp_vcpu->vcpu.arch.fault.esr_el2);
++
++	/* Pass the HVC function id (r0) and its arguments. */
++	for (i = 0; i < 8; i++) {
++		WRITE_ONCE(host_vcpu->arch.ctxt.regs.regs[i],
++			   vcpu_get_reg(&hyp_vcpu->vcpu, i));
++	}
++}
++
+ static void handle_vm_entry_generic(struct pkvm_hyp_vcpu *hyp_vcpu)
+ {
+ 	vcpu_copy_flag(&hyp_vcpu->vcpu, hyp_vcpu->host_vcpu, PC_UPDATE_REQ);
 diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index e85f13233da08..af334318d0a03 100644
+index af334318d0a03..0fe11f95e2e26 100644
 --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
 +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -551,6 +551,11 @@ static int init_pkvm_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu,
- 		goto done;
- 
- 	ret = pkvm_vcpu_init_sve(hyp_vcpu, host_vcpu);
-+	if (ret)
-+		goto done;
-+
-+	if (pkvm_hyp_vcpu_is_protected(hyp_vcpu))
-+		kvm_reset_pvm_sys_regs(&hyp_vcpu->vcpu);
- done:
- 	if (ret)
- 		unpin_host_vcpu(host_vcpu);
-diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-index 8758c68017765..ebfd48aa15b56 100644
---- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-+++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-@@ -525,6 +525,84 @@ static const struct sys_reg_desc pvm_sys_reg_descs[] = {
- 	/* Performance Monitoring Registers are restricted. */
- };
- 
-+struct sys_reg_desc_reset {
-+	int reg;
-+	void (*reset)(struct kvm_vcpu *vcpu, const struct sys_reg_desc_reset *rd);
-+	u64 value;
-+};
-+
-+/* Hardware value, as sys_regs.c's reset_actlr()/reset_amair_el1(). */
-+static void reset_actlr(struct kvm_vcpu *vcpu, const struct sys_reg_desc_reset *r)
-+{
-+	__vcpu_assign_sys_reg(vcpu, r->reg, read_sysreg(actlr_el1));
-+}
-+
-+static void reset_amair_el1(struct kvm_vcpu *vcpu, const struct sys_reg_desc_reset *r)
-+{
-+	__vcpu_assign_sys_reg(vcpu, r->reg, read_sysreg(amair_el1));
-+}
-+
-+static void reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc_reset *r)
-+{
-+	__vcpu_assign_sys_reg(vcpu, r->reg, kvm_calculate_mpidr(vcpu));
-+}
-+
-+static void reset_value(struct kvm_vcpu *vcpu, const struct sys_reg_desc_reset *r)
-+{
-+	__vcpu_assign_sys_reg(vcpu, r->reg, r->value);
-+}
-+
-+#define RESET_VAL(REG, RESET_VAL) {  REG, reset_value, RESET_VAL }
-+
-+#define RESET_ZERO(REG) RESET_VAL(REG, 0)
-+
-+#define RESET_UNKNOWN(REG) RESET_VAL(REG, 0x1de7ec7edbadc0deULL)
-+
-+#define RESET_FUNC(REG, RESET_FUNC) {  REG, RESET_FUNC, 0 }
-+
-+/* Sorted ascending by reg; kvm_check_pvm_sysreg_table() enforces it. */
-+static const struct sys_reg_desc_reset pvm_sys_reg_reset_vals[] = {
-+	RESET_FUNC(MPIDR_EL1, reset_mpidr),
-+	RESET_UNKNOWN(TPIDR_EL0),
-+	RESET_UNKNOWN(TPIDRRO_EL0),
-+	RESET_UNKNOWN(TPIDR_EL1),
-+	RESET_ZERO(CNTKCTL_EL1),
-+	RESET_UNKNOWN(PAR_EL1),
-+	RESET_ZERO(MDCCINT_EL1),
-+	RESET_ZERO(DISR_EL1),
-+	RESET_ZERO(PMCCFILTR_EL0),
-+	RESET_ZERO(PMUSERENR_EL0),
-+	RESET_ZERO(CPACR_EL1),
-+	RESET_VAL(CONTEXTIDR_EL1, 0x00000000dbadc0deULL),
-+	RESET_VAL(SCTLR_EL1, 0x00C50078ULL),
-+	RESET_FUNC(ACTLR_EL1, reset_actlr),
-+	RESET_ZERO(TCR_EL1),
-+	RESET_UNKNOWN(AFSR0_EL1),
-+	RESET_UNKNOWN(AFSR1_EL1),
-+	RESET_UNKNOWN(ESR_EL1),
-+	RESET_UNKNOWN(MAIR_EL1),
-+	RESET_FUNC(AMAIR_EL1, reset_amair_el1),
-+	RESET_ZERO(MDSCR_EL1),
-+	RESET_ZERO(ZCR_EL1),
-+	RESET_UNKNOWN(TTBR0_EL1),
-+	RESET_UNKNOWN(TTBR1_EL1),
-+	RESET_UNKNOWN(FAR_EL1),
-+	RESET_VAL(VBAR_EL1, 0x1de7ec7edbadc000ULL),
-+	RESET_UNKNOWN(PIRE0_EL1),
-+	RESET_UNKNOWN(PIR_EL1),
-+};
-+
-+void kvm_reset_pvm_sys_regs(struct kvm_vcpu *vcpu)
-+{
-+	unsigned long i;
-+
-+	for (i = 0; i < ARRAY_SIZE(pvm_sys_reg_reset_vals); i++) {
-+		const struct sys_reg_desc_reset *r = &pvm_sys_reg_reset_vals[i];
-+
-+		r->reset(vcpu, r);
-+	}
-+}
-+
- /*
-  * Initializes feature registers for protected vms.
-  */
-@@ -550,16 +628,21 @@ void kvm_init_pvm_id_regs(struct kvm_vcpu *vcpu)
- }
- 
- /*
-- * Checks that the sysreg table is unique and in-order.
-- *
-- * Returns 0 if the table is consistent, or 1 otherwise.
-+ * Both tables must be unique and sorted ascending. pvm_sys_reg_descs.reg is the
-+ * sys_reg() encoding, pvm_sys_reg_reset_vals.reg the vcpu_sysreg index, so they
-+ * compare differently. BUG_ON() at __pkvm_init: fatal at boot.
-  */
- int kvm_check_pvm_sysreg_table(void)
+@@ -1144,8 +1144,37 @@ bool kvm_handle_pvm_hvc64(struct kvm_vcpu *vcpu, u64 *exit_code)
  {
- 	unsigned int i;
+ 	u64 val[4] = { SMCCC_RET_INVALID_PARAMETER };
+ 	bool handled = true;
++	u32 feature;
++	uuid_t uuid;
  
- 	for (i = 1; i < ARRAY_SIZE(pvm_sys_reg_descs); i++) {
--		if (cmp_sys_reg(&pvm_sys_reg_descs[i-1], &pvm_sys_reg_descs[i]) >= 0)
-+		if (cmp_sys_reg(&pvm_sys_reg_descs[i - 1], &pvm_sys_reg_descs[i]) >= 0)
-+			return 1;
-+	}
-+
-+	for (i = 1; i < ARRAY_SIZE(pvm_sys_reg_reset_vals); i++) {
-+		if (pvm_sys_reg_reset_vals[i - 1].reg >= pvm_sys_reg_reset_vals[i].reg)
- 			return 1;
- 	}
- 
+ 	switch (smccc_get_function(vcpu)) {
++	case ARM_SMCCC_VERSION_FUNC_ID:
++		/* Nothing to be handled by the host. Go back to the guest. */
++		val[0] = ARM_SMCCC_VERSION_1_1;
++		val[1] = 0;
++		val[2] = 0;
++		val[3] = 0;
++		break;
++	case ARM_SMCCC_ARCH_FEATURES_FUNC_ID:
++		/* SUCCESS only for the architecture calls EL2 implements. */
++		feature = smccc_get_arg1(vcpu);
++		switch (feature) {
++		case ARM_SMCCC_VERSION_FUNC_ID:
++		case ARM_SMCCC_ARCH_FEATURES_FUNC_ID:
++			val[0] = SMCCC_RET_SUCCESS;
++			break;
++		default:
++			val[0] = SMCCC_RET_NOT_SUPPORTED;
++			break;
++		}
++		break;
++	case ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID:
++		uuid = ARM_SMCCC_VENDOR_HYP_UID_KVM;
++		val[0] = smccc_uuid_to_reg(&uuid, 0);
++		val[1] = smccc_uuid_to_reg(&uuid, 1);
++		val[2] = smccc_uuid_to_reg(&uuid, 2);
++		val[3] = smccc_uuid_to_reg(&uuid, 3);
++		break;
+ 	case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
+ 		val[0] = BIT(ARM_SMCCC_KVM_FUNC_FEATURES);
+ 		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_HYP_MEMINFO);
 -- 
 2.39.5
 
