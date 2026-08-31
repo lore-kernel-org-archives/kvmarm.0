@@ -1,40 +1,40 @@
-Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
+Received: from canpmsgout06.his.huawei.com (canpmsgout06.his.huawei.com [113.46.200.221])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E43E8403EB3
-	for <kvmarm@lists.linux.dev>; Mon, 31 Aug 2026 12:36:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C05B43C7D3;
+	Mon, 31 Aug 2026 13:57:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.221
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788179784; cv=none; b=Mz//7SNbMGC9AAbUrxFwUJ1vn7noq+/SE+JbLoK46XrCu9K6CsW0kuaK44RneHBs5D6GCrAGZDKdn1R6Z6jdNQY7Vcw2bA/5icB2vxZ26d9qmietoDLDjrBCiHefhULrUxOpDLN3IWzUybs3q4mHzaqiEWcrGgqbxR43+CLo+uU=
+	t=1788184644; cv=none; b=Ggw9jnVm3lnGrd1Z8fcN7ZX528fG2AV42OZDCTkOLgvLmXo/S/kWasjtDstSc59yedF7BwZdog4/OaCKp9JUl6cejEEDTiwv5LzUtXtO51W41uVfduCrg6LXt6Vdko5f3rTj1VxtYyHXDr9TgmtABknsyESRQvxZhtTIqau34cw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788179784; c=relaxed/simple;
-	bh=X6bfww/+pJM0twYq+d/J9pw6pRny5ywgSjA7kevobzM=;
+	s=arc-20240116; t=1788184644; c=relaxed/simple;
+	bh=DYy7Yh5VuqJ1tPQ5cWpknZiVqRNrR5tqzqmfJyw4ppI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=AqL4Oddr65oD4d6VKicLwwODklFJBr9gUc26uMjBzvEshcdLvorTGKcqW6gXlgU1qg7yaWsRb2DGXO0Ee2Jr21Jv1B9Qpx/JFUKns2oGeRbAqWLx2fA/Z+48Sp1UjRFInDGGPjMLc/iih6ldY+nToPdRw8Am68j9zTN07HfUCqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=gr1ay0Q+; arc=none smtp.client-ip=113.46.200.220
+	 In-Reply-To:Content-Type; b=dKjjmtCFjoHbvsp2PAOTU+Ks8qX/TeHz1DfCS9dlaql03B7fnL9+GIJyaMhg/qxEsjNQxHYQZY4AjZDbobD4YOSV0818iilDxyJWdli1KVoSTJ6jXZWr2JK9ZknegJj0TEvV/ssIFZ0oaBdtD5H8njr6XlJjdI+xl/x3/hknx5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=tmZnaFti; arc=none smtp.client-ip=113.46.200.221
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="gr1ay0Q+"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="tmZnaFti"
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=dOqlEtvgzGQZuGQxKlLpMGwA1XPefAqU1vuJIwaKDeU=;
-	b=gr1ay0Q+7DCL1Cb35qVV/FeGumopwlrLgebu4AZuBaHZoGJRLF8o0j86Jl0+z+HcgvXZ6wEQq
-	gMN7SDbLBYhBvK5+nQ3+nOqJDNYouN8kD84oTQkMSrmO1jeKTtvvBQjSTJaCX+KeFCDzP9iklfO
-	gP+PyI2em/h/TGeA2/kVVgo=
-Received: from mail.maildlp.com (unknown [172.19.163.0])
-	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4hYSqV3WGTz12LFw;
-	Mon, 31 Aug 2026 20:24:54 +0800 (CST)
+	bh=yJ/L9x3rTRjFD26y3XQs185XmGwXv5WubIyollA9Msw=;
+	b=tmZnaFtiFCAbBFLgoaXNhmkgyAZn/eVaaDzcPuviyReaeVQ4TD//qtIEmx0GJiwhGW1k2SCyt
+	h8PQASl+cY89VEVoEeuVgvyyp0YRBaHPTBARcK/M0YSRoP6lj4OXBstkdbKE68K+tFgdDzQ8SBr
+	JUY+2lNhfV6cP/l4j100xas=
+Received: from mail.maildlp.com (unknown [172.19.162.197])
+	by canpmsgout06.his.huawei.com (SkyGuard) with ESMTPS id 4hYVdZ5QqnzRhWS;
+	Mon, 31 Aug 2026 21:46:26 +0800 (CST)
 Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
-	by mail.maildlp.com (Postfix) with ESMTPS id D752440537;
-	Mon, 31 Aug 2026 20:36:11 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 8CB724057D;
+	Mon, 31 Aug 2026 21:57:13 +0800 (CST)
 Received: from [10.67.120.103] (10.67.120.103) by
  kwepemr100010.china.huawei.com (7.202.195.125) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.45; Mon, 31 Aug 2026 20:36:10 +0800
-Message-ID: <ad48e628-d036-440e-955d-856c2539e568@huawei.com>
-Date: Mon, 31 Aug 2026 20:36:10 +0800
+ 15.2.2562.45; Mon, 31 Aug 2026 21:57:13 +0800
+Message-ID: <5f750f14-1b80-49d7-96ec-415eb6457224@huawei.com>
+Date: Mon, 31 Aug 2026 21:57:12 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -42,314 +42,258 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 3/6] KVM: arm64: Add auto DBM support for hardware
- dirty tracking
-To: Leonardo Bras <leo.bras@arm.com>
-CC: Oliver Upton <oupton@kernel.org>, <maz@kernel.org>,
-	<catalin.marinas@arm.com>, <will@kernel.org>, <yuzenghui@huawei.com>,
-	<wangzhou1@hisilicon.com>, <yangjinqian1@huawei.com>,
-	<caijian11@h-partners.com>, <liuyonglong@huawei.com>, <yezhenyu2@huawei.com>,
-	<yubihong@huawei.com>, <linuxarm@huawei.com>, <joey.gouly@arm.com>,
-	<kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-	<seiden@linux.ibm.com>, <suzuki.poulose@arm.com>
-References: <amoZY8uGLf1PEpjK@LeoBrasDK>
- <8e36e2c8-587f-4228-ab13-d6783927a281@huawei.com>
- <45d76d0d-48e9-46a6-b1f9-691f840eba46@huawei.com>
- <anBrvILpcSFhW7Wg@LeoBrasDK>
- <95f1ebd4-be04-4684-be68-388f752a1379@huawei.com>
- <anDCno9HdVI5UAls@LeoBrasDK>
- <2070002d-94aa-4a5b-8df1-e8e0f0fd265c@huawei.com>
- <anHIa5PDnF7r9EA4@LeoBrasDK>
- <3808f469-5403-4f2e-85f0-8c6ca13068bd@huawei.com>
- <anmvnclRTPS6an8e@LeoBrasDK> <aoh1vw0ZdWJf6T4q@LeoBrasDK>
+Subject: Re: [PATCH v4 5/6] KVM: arm64: Add HDBSS fault handling and buffer
+ flush
+To: <sashiko-reviews@lists.linux.dev>
+CC: Oliver Upton <oupton@kernel.org>, <kvmarm@lists.linux.dev>,
+	<kvm@vger.kernel.org>, Marc Zyngier <maz@kernel.org>
+References: <20260709104026.2612599-1-zhengtian10@huawei.com>
+ <20260709104026.2612599-6-zhengtian10@huawei.com>
+ <20260709112655.339D91F000E9@smtp.kernel.org>
 From: Tian Zheng <zhengtian10@huawei.com>
-In-Reply-To: <aoh1vw0ZdWJf6T4q@LeoBrasDK>
+In-Reply-To: <20260709112655.339D91F000E9@smtp.kernel.org>
 Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
  kwepemr100010.china.huawei.com (7.202.195.125)
 
 
 
-On 8/21/2026 11:58 PM, Leonardo Bras wrote:
-> On Mon, Aug 10, 2026 at 12:01:49PM +0100, Leonardo Bras wrote:
-> [> On Wed, Aug 05, 2026 at 11:41:51AM +0800, Tian Zheng wrote:
->>>
->>>
->>> On 8/4/2026 7:10 PM, Leonardo Bras wrote:
->>>> On Tue, Aug 04, 2026 at 12:54:16PM +0800, Tian Zheng wrote:
->>>>>
->>>>>
->>>>> On 8/4/2026 12:32 AM, Leonardo Bras wrote:
->>>>>> On Mon, Aug 03, 2026 at 09:57:46PM +0800, Tian Zheng wrote:
->>>>>>>
->>>>>>>
->>>>>>> On 8/3/2026 6:21 PM, Leonardo Bras wrote:
->>>>>>>> On Mon, Aug 03, 2026 at 12:04:24PM +0800, Tian Zheng wrote:
->>>>>>>>>
->>>>>>>>>
->>>>>>>>> On 8/3/2026 9:33 AM, Tian Zheng wrote:
->>>>>>>>>>>>>>>> 09, 2026 at 06:40:23PM +0800, Tian Zheng wrote:
->>>>>>>>>>>>>>>>> -    if (prot & KVM_PGTABLE_PROT_W)
->>>>>>>>>>>>>>>>> +    if (prot & KVM_PGTABLE_PROT_W) {
->>>>>>>>>>>>>>>>>                 set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
->>>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>>> +        /*
->>>>>>>>>>>>>>>>> +         * No DEVICE filter needed here:
->>>>>>>>>>>>>>>>> relax_perms is only called
->>>>>>>>>>>>>>>>> +         * on FSC_PERM faults. Device pages
->>>>>>>>>>>>>>>>> always get full RW from
->>>>>>>>>>>>>>>>> +         * initial mapping and are never write-protected during
->>>>>>>>>>>>>>>>> +         * migration, so they never trigger a permission fault.
->>>>>>>>>>>>>>>>> +         */
->>>>>>>>>>>>>>>>> +        if (pgt->flags & KVM_PGTABLE_S2_DBM)
->>>>>>>>>>>>>>>>> +            set |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
->>>>>>>>>>>>>>>>> +    } else {
->>>>>>>>>>>>>>>>> +        /*
->>>>>>>>>>>>>>>>> +         * Clear DBM on W→RO downgrade to prevent hardware from
->>>>>>>>>>>>>>>>> +         * silently upgrading RO+DBM back to W+dirty, which would
->>>>>>>>>>>>>>>>> +         * bypass KVM's write tracking and cause data corruption.
->>>>>>>>>>>>>>>>> +         */
->>>>>>>>>>>>>>>>> +        clr |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
->>>>>>>>>>>>>>>>> +    }
->>>>>>>>>>>>>>>>> +
->>>>>>>>>>>>>>>> This block makes it pretty evident that the DBM bit really *is* the
->>>>>>>>>>>>>>>> write permission bit. I'd much rather we
->>>>>>>>>>>>>>>> introduce the concept of dirty
->>>>>>>>>>>>>>>> state to the page table library and migrate the abstract write
->>>>>>>>>>>>>>>> permission to the DBM field, even if we don't have FEAT_HAFDBS.
->>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> Ohh, that's an amazing idea!
->>>>>>>>>>>>>
->>>>>>>>>>>>> Thinking about that again...
->>>>>>>>>>>>> If we adopt the encoding with DBM being the write-permission
->>>>>>>>>>>>> bit, and all
->>>>>>>>>>>>> PTEs have it since the start, how can we have lazy-splitting happening?
->>>>>>>>>>>>>
->>>>>>>>>>>>> Only way I think of is removing both DBM and S2_S2AP_W bit
->>>>>>>>>>>>> from writable
->>>>>>>>>>>>> PTEs during dirty-track enable, and re-adding them during
->>>>>>>>>>>>> the first write
->>>>>>>>>>>>> fault. If we don't remove the DBM bit, systems with HDBSS
->>>>>>>>>>>>> would just dirty
->>>>>>>>>>>>> it by hardware, without causing a fault.
->>>>>>>>>>>>>
->>>>>>>>>>>>> DBM=0 would need to happen only in the first write-protect (only on
->>>>>>>>>>>>> lazy-splitting). All other write-protecting would just clean
->>>>>>>>>>>>> the S2_S2AP_W
->>>>>>>>>>>>> bit, as everything is already split.
->>>>>>>>>>>>>
->>>>>>>>>>>>> Is that what was intended?
->>>>>>>>>>>>>
->>>>>>>>>>>>> Thanks!
->>>>>>>>>>>>> Leo
->>>>>>>>>>>>>
->>>>>>>>>>>> Hi Leo,
->>>>>>>>>>>>
->>>>>>>>>>>> I think the cleanest way to handle this is to simply avoid setting DBM
->>>>>>>>>>>> on block mappings. If we only set DBM on page-level PTEs, then block
->>>>>>>>>>>> mappings will naturally stay DBM=0 and trigger a write fault on first
->>>>>>>>>>>> access — exactly what we need for lazy splitting.
->>>>>>>>>>>>
->>>>>>>>>>>> When the fault occurs, the block gets split into page-level PTEs, and at
->>>>>>>>>>>> that point we can set DBM=1 on the resulting leaf entries. This way:
->>>>>>>>>>>>
->>>>>>>>>>>> 1. Lazy split works naturally (fault -> split -> set DBM=1)
->>>>>>>>>>>>
->>>>>>>>>>>> 2. No need to clear DBM globally at dirty-track enable
->>>>>>>>>>>>
->>>>>>>>>>>> 3. No special handling for block mappings
->>>>>>>>>>>>
->>>>>>>>>>>> So I think global DBM is still viable — we just need to filter out block
->>>>>>>>>>>> mappings when setting the DBM bit. That way the lazy split path
->>>>>>>>>>>> is preserved
->>>>>>>>>>>> without extra complexity.
->>>>>>>>>>>
->>>>>>>>>>> Hi Tian,
->>>>>>>>>>>
->>>>>>>>>>> Humm, but would not that be contrary to what Oliver suggested:
->>>>>>>>>>> changing the
->>>>>>>>>>> encoding from the PTE for all entries?
->>>>>>>>>>>
->>>>>>>>>>> (Like, if the PTE is writable, it has to have DBM set)
->>>>>>>>>>>
->>>>>>>>>>> IIUC what you said, on first faulting of the page in the VM:
->>>>>>>>>>> - If the entry is a page (level-3 leaf) and writable, add DBM
->>>>>>>>>>> - If it's a block entry (leaf but not a level-3), don't add DBM
->>>>>>>>>>>
->>>>>>>>>>> So after we enable dirty-logging:
->>>>>>>>>>> - a level-3 entry would not fault, using HDBSS, and
->>>>>>>>>>> - a block entry would fault, do the splitting, and add DBM to level-3
->>>>>>>>>>>        entries during the split.
->>>>>>>>>>>
->>>>>>>>>>> If I got that correct, that would be clean indeed.
->>>>>>>>>>>
->>>>>>>>>>> But then we would have a different encoding for block entries and page
->>>>>>>>>>> entries. In page entries, DBM could be used to say if the page is
->>>>>>>>>>> writable,
->>>>>>>>>>> but on block entries one would have to look at the 'dirty-bit'.
->>>>>>>>>>>
->>>>>>>>>>> Would that be ok?
->>>>>>>>>>>
->>>>>>>>>>> Thanks!
->>>>>>>>>>> Leo
->>>>>>>>>>>
->>>>>>>>>> Hi Leo,
->>>>>>>>>>
->>>>>>>>>> My initial concern was that clearing all DBM bits at the start of
->>>>>>>>>> migration would be too expensive, so I thought distinguishing between
->>>>>>>>>> level-3 entries and block entries would be better.
->>>>>>>>>>
->>>>>>>>
->>>>>>>> I think we expect it to be expensive, but since we already clean the
->>>>>>>> dirty-bit (ro/rw) bit, we can have both happening in the same write :)
->>>>>>>>
->>>>>>>> (since we only mark the DBM bit when we fault the memory on lazy-splitting,
->>>>>>>> we are expecting to have the same amount of writes to pagetable as we have
->>>>>>>> before HDBSS, both on faulting and 1st iteration cleaning)
->>>>>>>>
->>>>>>> Hi, Leo
->>>>>>>
->>>>>>> Actually, I have thought about this approach too, but if we clear DBM in
->>>>>>> kvm_pgtable_stage2_wrprotect(), then during the first round of
->>>>>>> migration, we will fault and release RO -> W, and then add DBM.
->>>>>>
->>>>>> Yeah, that's only for lazy-splitting, though.
->>>>>>
->>>>>>>
->>>>>>> But next time, when we migrate the dirty pages in round two, we will run
->>>>>>> kvm_pgtable_stage2_wrprotect() again, which will clear DBM again. And
->>>>>>> finally, HDBSS will be useless during migration.
->>>>>>
->>>>>> Right, on lazy splitting, we have to clean the DBM bit on the
->>>>>> write-protect only if it's a block entry (hugepage).
->>>>>>
->>>>>> Once it faults for the first time, it will lazy-split, and we don't need to
->>>>>> clean the DBM bit.
->>>>>>
->>>>>>>
->>>>>>>>
->>>>>>>>>> However, I ran a quick test on a 400GB VM (4 vCPUs), and the overhead
->>>>>>>>>> turned out to be around 30ns — which I think is acceptable.
->>>>>>>>>
->>>>>>>>> Just a quick correction — I misstated the unit in my previous email. The
->>>>>>>>> overhead for clearing DBM on the 400GB VM (4 vCPUs) was around 32 µs, not 30
->>>>>>>>> ns.
->>>>>>>>>
->>>>>>>>
->>>>>>>> Oh, that seems more likely :)
->>>>>>>>
->>>>>>>> Question: is tha above amount of memory initially in Level-1 blocks,
->>>>>>>> level-2 blocks or level-3 pages? (aka: were you using explicit/transparent
->>>>>>>> hugepages?)
->>>>>>>>
->>>>>>>
->>>>>>> I'm using transparent hugepages. However, if we were to use level-3 stage-2
->>>>>>> pages with -mem-prealloc enabled in QEMU, I believe the time cost would be
->>>>>>> extremely high — potentially out of our control.
->>>>>>>
->>>>>>
->>>>>> Yeah, that's the issue.
->>>>>> For this not to explode like this, we need to mark as RO only when the
->>>>>> entries are blocks AND we are doing lazy splitting.
->>>>>>
->>>>>> We have:
->>>>>> Mode	DBM	Dirty bit
->>>>>> RO	0	X
->>>>>> WC	1	0
->>>>>> WD	1	1
->>>>>>
->>>>>> On write-protect:
->>>>>> - Lazy splitting + block entry (hugepage, level 2-) -> RO
->>>>>> - Otherwise					    -> WC
->>>>>>
->>>>>> On first fault, the block entry will be lazy-splitten, and we can set DBM=1
->>>>>> in every new page.
->>>>>>
->>>>>> That way we guarantee that we are not faulting level-3 pages unecessarily,
->>>>>> nor need to go through the whole tree setting DBM=1 or DBM=0 on level-3
->>>>>> pages.
->>>>>>
->>>>>> How does that sound?
->>>>>>
->>>>>> Thanks!
->>>>>> Leo
->>>>>>
->>>>
->>>>>
->>>>> Hi Leo,
->>>>>
->>>>> I've also been thinking about this approach: clear
->>>>> KVM_PTE_LEAF_ATTR_HI_S2_DBM when kvm_pgtable_stage2_wrprotect() calls
->>>>> stage2_update_leaf_attrs(). And we can check whether a page is a block
->>>>> page during the page walk, right?
->>>>
->>>> Hi Tian,
->>>> That was what I was thinking :)
->>>>
->>>>>
->>>>> So we can check the page level in the walker callback
->>>>> stage2_attr_walker(), filter there, clear DBM for block pages and
->>>>> preserve DBM on level-3 pages. Something like this:
->>>>>
->>>>> ```
->>>>> pte &= ~data->attr_clr;      // wrprotect: clears S2AP_W only
->>>>> pte |= data->attr_set;
->>>>> if (ctx->level < KVM_PGTABLE_LAST_LEVEL)
->>>>
->>>> Only on lazy splitting, right?
->>>>
->>>> Or maybe we get the DBM bit on during eager splitting...
->>>
->>> Hi, Leo
->>>
->>> No, it works for both. Whether eager or lazy split, wrprotect always runs
->>> before split, so the block DBM is cleared first.
->>
->> Hi Tian,
->>
->> On eager splitting, why should we ever strip DBM?
->>
->> Eager splitting means we won't have to fault to do the splitting, so we can
->> have HAFDBS/HDBSS handle every fault, including the first one that we use
->> for lazy-splitting.
->>
->>>
->>> For eager split: wrprotect clears W (W=1->W=0) and strips DBM from the
->>> block. Then the block is split into level-3 pages, but since W=0 and DBM
->>> depends on W, DBM stays 0. DBM is only set back to 1 during the first write
->>> fault (relax_perms: W=0->W=1, which also sets DBM=1).
->>
->> I suggest that, on splitting, set all writable level-3 pages with DBM=1.
->> If lazy-splitting, that will happen naturally on the first fault's split.
->> If eager-splitting that will happen during the split as well.
->>
->> So total solution looks like:
->> - Dirty-logging on, walk the memslot pagetable
->>    - On block: mark as read-only
->>    - On page: mark as writable-clean
->> - On splitting: Mark writable block's new pages as writable-clean
->> - On fault: after the split, mark the faulting page as writable-dirty
->>
->> This should take care of everything, including lazy/eager splitting
->> differences, as well as set the groundwork for HDBSS to work properly.
->>
->> What do you think?
->>
+On 7/9/2026 7:26 PM, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 6 potential issue(s) to consider:
+> - [Critical] Acquiring `kvm->mmu_lock` inside the preempt notifier (`kvm_sched_out` -> `kvm_arch_vcpu_put`) creates an ABBA deadlock with the runqueue lock.
+> - [High] `kvm_flush_hdbss_buffer` calls `kvm_vcpu_mark_page_dirty` without holding `srcu_read_lock(&kvm->srcu)`, leading to Use-After-Free.
+> - [High] `kvm_arch_sync_dirty_log` silently misses dirty pages for vCPUs outside guest mode due to `KVM_REQUEST_WAIT` semantics.
+> - [High] Flushing the entire HDBSS buffer in a single tight loop can overflow the KVM dirty ring, resulting in dropped dirty pages.
+> - [High] Directly accessing the EL2 register `SYS_HDBSSPROD_EL2` from the host kernel will crash in nVHE mode.
+> - [Medium] Missing immediate Context Synchronization Event (`isb()`) after writing to control-plane system register `SYS_HDBSSPROD_EL2`.
+> --
 > 
-> I implemented that down, and will send it soon.
-> Seeing the code will make it easier to understand the idea :)
+> --- Patch [5]: [PATCH v4 5/6] KVM: arm64: Add HDBSS fault handling and buffer flush ---
+> commit ac61acd739dfa5c2e5304969807c386e60452069
+> Author: eillon <yezhenyu2@huawei.com>
+> Date:   Thu Jul 9 10:40:25 2026 +0000
 > 
-> Thanks!
-> Leo
+>      KVM: arm64: Add HDBSS fault handling and buffer flush
+> 
+> This patch adds handling for HDBSS (Hardware Dirty Bit State Stream) faults,
+> triggering flush requests when the hardware buffer becomes full. It implements
+> kvm_flush_hdbss_buffer to sync the hardware buffer to the dirty bitmap, which
+> is invoked during vcpu_put, request checks, and dirty log synchronization.
+> 
+>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+>> index bf6688245d83a..566953a4e23a1 100644
+>> --- a/arch/arm64/kvm/arm.c
+>> +++ b/arch/arm64/kvm/arm.c
+>> @@ -755,6 +755,9 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+>>   		kvm_vcpu_put_hw_mmu(vcpu);
+>>   	kvm_arm_vmid_clear_active();
+>>   
+>> +	if (vcpu->kvm->arch.enable_hdbss)
+>> +		kvm_flush_hdbss_buffer(vcpu);
+>> +
+> 
+> [Severity: Critical]
+> Could this create an ABBA deadlock with the runqueue lock?
+> 
+> When the scheduler preempts a vCPU thread, it invokes the KVM preempt
+> notifier kvm_sched_out() with the runqueue lock (rq->lock) held and
+> interrupts disabled. This calls kvm_arch_vcpu_put(), which in turn
+> calls kvm_flush_hdbss_buffer().
+> 
+> The flush function then acquires vcpu->kvm->mmu_lock. Because other
+> standard KVM execution paths acquire mmu_lock and may subsequently
+> wake up tasks (which acquires rq->lock), this establishes an unavoidable
+> locking inversion between rq->lock and mmu_lock.
 > 
 
-Hi Leo,
+v5 uses srcu_read_lock(&kvm->srcu) in the flush path, not mmu_lock. The
+flush is also moved from vcpu_put() to the run-loop exit path, so no
+lock inversion is possible.
 
-v5 already implements this, and I'm about to send it out shortly.
+> [Severity: High]
+> Is it safe to call kvm_flush_hdbss_buffer() here without holding the
+> KVM SRCU read lock?
+> 
+> The kvm_flush_hdbss_buffer() function calls kvm_vcpu_mark_page_dirty(),
+> which dereferences the KVM memslots array via kvm_vcpu_gfn_to_memslot().
+> 
+> When this flush is invoked from kvm_arch_vcpu_put() during vcpu_put(),
+> kvm->srcu is not held. The mmu_lock does not protect the memslots array
+> structure itself, which could lead to a use-after-free if memslots are
+> concurrently modified.
+> 
+> [ ... ]
+> 
+>> @@ -1971,7 +1977,15 @@ long kvm_arch_vcpu_unlocked_ioctl(struct file *filp, unsigned int ioctl,
+>>   
+>>   void kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot *memslot)
+>>   {
+>> +	/*
+>> +	 * Flush all CPUs' dirty log buffers to the dirty_bitmap.  Called
+>> +	 * before reporting dirty_bitmap to userspace. Send a request with
+>> +	 * KVM_REQUEST_WAIT to flush buffer synchronously.
+>> +	 */
+>> +	if (!kvm->arch.enable_hdbss)
+>> +		return;
+>>   
+>> +	kvm_make_all_cpus_request(kvm, KVM_REQ_FLUSH_HDBSS | KVM_REQUEST_WAIT);
+>>   }
+> 
 
-Thanks,
+Fixed in v5. kvm_flush_hdbss_buffer() now holds srcu_read_lock(&kvm-
+ >srcu) around memslot lookups.
+
+> [Severity: High]
+> Will this wait for vCPUs that have exited to userspace?
+> 
+> The KVM_REQUEST_WAIT flag causes KVM to wait only for vCPUs that are
+> currently executing in guest mode. If a vCPU has exited the guest to host
+> userspace, it is not in guest mode, but its HDBSS hardware buffer might
+> still contain unflushed dirty pages.
+> 
+> Since the flush request is pended but not waited for, could this return
+> immediately and cause userspace to read an incomplete dirty bitmap during
+> live migration?
+> 
+>> diff --git a/arch/arm64/kvm/dirty_bit.c b/arch/arm64/kvm/dirty_bit.c
+>> index 6c7a6ef66b5aa..002366337637c 100644
+>> --- a/arch/arm64/kvm/dirty_bit.c
+>> +++ b/arch/arm64/kvm/dirty_bit.c
+>> @@ -50,3 +50,65 @@ void kvm_arm_vcpu_free_hdbss(struct kvm_vcpu *vcpu)
+> 
+> [ ... ]
+> 
+>> +void kvm_flush_hdbss_buffer(struct kvm_vcpu *vcpu)
+>> +{
+>> +	int idx, curr_idx;
+>> +	u64 *hdbss_buf;
+>> +	struct kvm *kvm = vcpu->kvm;
+>> +
+>> +	if (!kvm->arch.enable_hdbss)
+>> +		return;
+>> +
+>> +	curr_idx = HDBSSPROD_IDX(read_sysreg_s(SYS_HDBSSPROD_EL2));
+> 
+
+The kvm_vcpu_kick() is indeed asynchronous; it only forces vCPUs
+currently in guest mode to exit, where the exit path flushes their HDBSS
+buffer.
+
+vCPUs that have already exited to userspace have already flushed the
+buffer on their way out, and while parked in userspace they cannot
+accumulate new entries. For the racing case where a vCPU is kicked but
+still in userspace, it will flush before re-entering the guest, but not
+immediately.
+
+This is fine by design: the generic KVM dirty-log API explicitly
+documents that concurrent bitmap writes may race with KVM_GET_DIRTY_LOG
+(see the comment above kvm_get_dirty_log_protect() in virt/kvm/
+kvm_main.c). The GET/CLEAR protocol is self-healing — any bit set after
+the snapshot is taken won't be cleared by the matching
+KVM_CLEAR_DIRTY_LOG, so it survives to the next iteration. The migration
+protocol handles this iteratively, and the final snapshot is taken with
+the guest paused, ensuring completeness.
+
+> [Severity: High]
+> Can this safely execute in nVHE mode?
+> 
+> This reads the SYS_HDBSSPROD_EL2 register directly from host context.
+> In KVM nVHE mode, the host kernel executes at EL1. Accessing an EL2
+> register from EL1 will trigger an undefined instruction exception and
+> panic the host.
+> 
+>> +
+>> +	/* Do nothing if HDBSS buffer is empty or br_el2 is NULL */
+>> +	if (curr_idx == 0 || vcpu->arch.hdbss.hdbssbr_el2 == 0)
+>> +		return;
+>> +
+>> +	hdbss_buf = page_address(phys_to_page(vcpu->arch.hdbss.base_phys));
+>> +	if (!hdbss_buf)
+>> +		return;
+>> +
+>> +	guard(write_lock_irqsave)(&vcpu->kvm->mmu_lock);
+>> +	for (idx = 0; idx < curr_idx; idx++) {
+>> +		u64 gpa;
+>> +
+>> +		gpa = hdbss_buf[idx];
+>> +		if (!(gpa & HDBSS_ENTRY_VALID))
+>> +			continue;
+>> +
+>> +		gpa &= HDBSS_ENTRY_IPA;
+>> +		kvm_vcpu_mark_page_dirty(vcpu, gpa >> PAGE_SHIFT);
+> 
+
+Not an issue. HDBSS is VHE-only. system_supports_hdbss() guards all
+register accesses, so nVHE never hits this path.
+
+> [Severity: High]
+> Does this tight loop risk overflowing the dirty ring?
+> 
+> When the KVM dirty ring is enabled, kvm_vcpu_mark_page_dirty() pushes
+> entries to the per-vCPU ring. The dirty ring signals userspace
+> cooperatively when it reaches its soft limit.
+> 
+> Because the entire HDBSS buffer is flushed in one tight loop, the soft
+> limit signal is ignored until the loop finishes. If the number of HDBSS
+> entries exceeds the remaining free slots before the hard limit, could
+> the ring push fail and silently drop the dirty pages?
+> 
+>> +	}
+>> +
+>> +	/* reset HDBSS index */
+>> +	write_sysreg_s(0, SYS_HDBSSPROD_EL2);
+>> +	vcpu->arch.hdbss.hdbssprod_el2 = 0;
+>> +	isb();
+> 
+
+Valid point. It will cause a WARN_ON_ONCE(kvm_dirty_ring_full) during 
+live migration with dirty-ring + HDBSS. Fixed in v5 by two changes:
+
+1. The flush now runs on every VM exit before handle_exit(), so
+check_vcpu_requests() sees the pushed entries on the next loop iteration
+and exits to userspace when soft-full.
+
+2. The dirty ring reservation is wired up via kvm_cpu_dirty_log_size()
+so rsvd = 64 + hdbss_entries, guaranteeing room for a full buffer flush
+— and in dirty-ring mode the HDBSS buffer is fixed at PAGE_SIZE, which 
+maximizes performance by minimizing drain frequency.
+
+> [Severity: Medium]
+> Is the context synchronization event misplaced here?
+> 
+> The architectural rules state that every write to a control-plane system
+> register must be followed by an isb() as the very next instruction.
+> 
+> There is a memory store (vcpu->arch.hdbss.hdbssprod_el2 = 0) placed
+> between the write_sysreg_s() and the isb(). Could this leave the CPU
+> operating under a stale configuration for several cycles?
+> 
+>> +}
+>> +
+>> +int kvm_handle_hdbss_fault(struct kvm_vcpu *vcpu)
+>> +{
+>> +	u64 prod;
+>> +	u64 fsc;
+>> +
+>> +	prod = read_sysreg_s(SYS_HDBSSPROD_EL2);
+> 
+
+Same answer as the ISB comment on patch 4.
+
+> [Severity: High]
+> Like in kvm_flush_hdbss_buffer() above, does reading SYS_HDBSSPROD_EL2
+> from the host kernel risk triggering an undefined instruction exception
+> if the system is running in nVHE mode?
+> 
+>> +	fsc = FIELD_GET(HDBSSPROD_EL2_FSC_MASK, prod);
+> 
+> [ ... ]
+> 
+
+Not an issue. HDBSS is VHE-only. system_supports_hdbss() is false on
+nVHE, so the registers are never accessed there. We note this in the
+cover letter and leave nVHE for future work.
+
+Thanks!
 Tian
-
