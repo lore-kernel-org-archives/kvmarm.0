@@ -1,257 +1,135 @@
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from canpmsgout10.his.huawei.com (canpmsgout10.his.huawei.com [113.46.200.225])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC6033CB2F6
-	for <kvmarm@lists.linux.dev>; Mon, 31 Aug 2026 08:10:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F40D53D45DF;
+	Mon, 31 Aug 2026 08:52:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788163834; cv=none; b=VMjGgiIXiAeuPyrXDO9zWfs6iMHL+wCn+tuJloyQedyPZmbV/6ifjPTMyGtF+4wpJi+ls+9kGbe9v6otOp48Gthuxs1w+gSLlOej3FvQXX4LWHtgWKLO1B2fQPyKdY86yUtMWFWa6MujVnQ26Du+SVKrncC+Jig8At7EMxL4pnU=
+	t=1788166371; cv=none; b=qfETndUj8nwkQGKdBTvkW6qL2Aet1LpsGilYBLYnBT7Ywl5p+D5dJzmuzUs7u0sNWVh+jJoT3A3lb4X+r8n2rBQdcJkPgIXwb6CdyNa3JqY6kvVOGi1tastQOYuLX7f8bUwEfG7uvcrHiSYKYffqal5t4PnSMcOMrs2rM9EalEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788163834; c=relaxed/simple;
-	bh=viAVRllkrsImHsNb1DnUub6XvU5jvIFJexyLibR+lA0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=mrtabGE0oIvWJEBVcLBXS6zmPE8AoAE/Lene3UYITGjJDA/J7EEW3uYSAw3pyg6EmGOmo2r+nPu4Fn5N/6CqMlnYrkqwTUsqhPVqkPoGvTaqnuh+Gi7Np9Y3HLRzo3ZA/W0Tq3FGsWV0u8auaHwVKKG6hj5w3bH02WNQYN5RzCo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k1j1NyoU; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1788166371; c=relaxed/simple;
+	bh=DILvzi0ZIyssodPNfYDLi/EcM7ED/xZz4i72XZcumpY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=cnxqbA46m/go8HK0MLPSljcpJoF6qubdTBWw+plTlna7ZLpsNUMT4JCWU9ZkLtBjHpfrUxXfEfwxCFvodNvQr8uGkMvb9fBoDhKvH/Pf7jTDAw4gCNsF+nvXr1nrAvhntUONcKGgbM+bBh/KkrCOGm7/oIau846fBG3p4J5h6IA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=PvBPJ/vr; arc=none smtp.client-ip=113.46.200.225
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k1j1NyoU"
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-490cf322ed0so36102775e9.1
-        for <kvmarm@lists.linux.dev>; Mon, 31 Aug 2026 01:10:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788163826; x=1788768626; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=zgxKhL7A1XKhNVrAX+Ck+KuNZ6TSYMACVM9Vad6BlYI=;
-        b=k1j1NyoUBX6YLIkFLc7zi3Laa6UGhOLmvuga8m5zANujP6EQzh4kNBvT7UMmXK8KWj
-         Bx8yfJxgaLlYHSm72qw51dQNUlVuJWoo62ZzWaX/eBSvWKXfDDUk/LYp18XPVfhnV8fh
-         JgrocgSig8cmsMOhkYOXSYxqlHyef0+M9r1Q1JZf+/9ReHKapRqh1t3u5wGZFbex7NCj
-         QH5sv0Ge85wl3EevbWp4+BIQwkFMxXIKnlnjLSZOh4+3Vo8hVrq3yEVBmREJXLxUqPdL
-         QnuFYbvG2JMBEtNuGa05hUqZV1DklESGmJipdsT64y9zhOTr3ltTu0GpiZAO254aCZNz
-         i58w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788163826; x=1788768626;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=zgxKhL7A1XKhNVrAX+Ck+KuNZ6TSYMACVM9Vad6BlYI=;
-        b=VlyR4WoOw28tAjV5ot7CM9sHrorNTuk8oSLUPy8VhV/Rvu/Hew/Ww0ZCuM3R+X6CFW
-         i9aD55xuMtOLKrAUZ1nODmJjMz4pcEkPHzBvs/EoTf+DjvWiC8uF49I8IyqyWK4ckK7g
-         J4FECy5Tx8B/rW6EJSVa21n+Sj+JQT0dVnQuPnWEhBb8NwP4bqIuvyP5cVK6/9/MKdK4
-         Gom1Fn0oD2WLZYHWzGxKz1uPz5oMHHEKYZoJcJ0ctOjp1Y7LPRi2bK8lVY5a9P2HHn4P
-         IkoZbnn6A2iPSIhHFjjzuHgrUd0wVe5dQO6rSePsKgpGg4KDrU4ivzNyMik3HmmCH2vj
-         Ue/Q==
-X-Forwarded-Encrypted: i=1; AHgh+RrrMKVVyA5nu/2usy2jiUJaP1tgx4pxi63M3WLP/qezEUQb61KhvyHfDxelfuNhtK7Uuuxhv2k=@lists.linux.dev
-X-Gm-Message-State: AFuF++nMxWS4iD8qVSlfAX8p1ipOcpI53ehtOLbazo8yq2VKkFfnO6OS
-	BJ4dBRWre96nXpjDSDf0cJP99/AEtLIzRXGa73lsUVE6VIib7CD2F4IS
-X-Gm-Gg: AR+sD11qICVGIMdv7Cu5tVfARTuDFp1cjUPdbcCcqPrqSroN5EDlqwGM5lzE641d6UD
-	kH3dGiqXszbPT5uS5/CEjCOx0hWm1n/5EaSIaIm2cN/cI214mp+oD2Y4nAvr5N1Iu9i/8qD3RrH
-	BEZ/UdjLGb4uIBV6tVUOxbvpVnhbROrOsGum5Gsxhf0w1Dfe3Y8NFswMMDcVF5SB/z4qgR7Fbnt
-	lyTMfo9MAjvA4uzPhrxgZYV0QCoI71ooE5sSDKmW7eq79C1jzmght7HeZEzcScsOUWEtExmBloo
-	pH5qOY21o7GtPHV7vbhFsW7D4o3dAqx/APcnICBR/Pxx250XhJ2ChaA+thT+cHFcdEZEYBVUAet
-	UGjsxkZitwCW7ygFcMW4eRjYBEE3A4gznl7tgsYZHnbazI2PBLxDIbf2+7+PgnZSvcIrrpL8zUa
-	ZW47weN8OO9ItwVNjj6ik7zk1/5NVmHcclqoUDKRxVzHUmsuk0r1IK+ttNaQSnYeaegL8S+Ozb9
-	AkqaShwR2yBwSdag61N1kAjwLvIL+uqxKsZTSjUn8Peb8ahBXRIL7kcqlfh9HLlGVmdrFUid2g1
-	h5dhzHuFKy5tV3Gs2tsymUiyh+CdpeepXipaOdgD/pOsil4dJVL5sgbTjNaKCzeSlGEs9sc=
-X-Received: by 2002:a05:600c:3155:b0:49b:910c:7703 with SMTP id 5b1f17b1804b1-49b91c3dcb4mr350375865e9.9.1788163825607;
-        Mon, 31 Aug 2026 01:10:25 -0700 (PDT)
-Received: from localhost.localdomain (dynamic-2a02-3100-acb9-0201-68d0-34d2-ad1a-175a.310.pool.telefonica.de. [2a02:3100:acb9:201:68d0:34d2:ad1a:175a])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49b95013d06sm370393515e9.12.2026.08.31.01.10.24
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 31 Aug 2026 01:10:24 -0700 (PDT)
-From: Karl Mehltretter <kmehltretter@gmail.com>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	kvmarm@lists.linux.dev
-Cc: Karl Mehltretter <kmehltretter@gmail.com>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Eric Auger <eric.auger@redhat.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH v4 4/4] KVM: arm64: selftests: Test VGICv3 redistributor region retry
-Date: Mon, 31 Aug 2026 10:10:04 +0200
-Message-Id: <20260831081005.41346-5-kmehltretter@gmail.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20260831081005.41346-1-kmehltretter@gmail.com>
-References: <20260831081005.41346-1-kmehltretter@gmail.com>
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="PvBPJ/vr"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=j913auZOQM8vCxWPwi3DTJtC16eIgjjvv2jrOeFm6G4=;
+	b=PvBPJ/vrrzuEuTjEom9riXvAVkbzJuQYeaaUfOxFaI210qy6nlOvACtpVTNdugeR5Ytx9+QbV
+	kq/f8Ltj6qjjJbG5Zpq2FUFfOJ9fqo0qBxkARsKNvBeDFaFzagVHPipofgF77qFUXUoC6cVgIde
+	3C2T8yaH43v2ryHUw0OP+N0=
+Received: from mail.maildlp.com (unknown [172.19.163.127])
+	by canpmsgout10.his.huawei.com (SkyGuard) with ESMTPS id 4hYMt60HJtz1K96b;
+	Mon, 31 Aug 2026 16:41:50 +0800 (CST)
+Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
+	by mail.maildlp.com (Postfix) with ESMTPS id E5E50402AB;
+	Mon, 31 Aug 2026 16:52:38 +0800 (CST)
+Received: from [10.67.120.103] (10.67.120.103) by
+ kwepemr100010.china.huawei.com (7.202.195.125) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.45; Mon, 31 Aug 2026 16:52:38 +0800
+Message-ID: <87c231f4-c281-48be-881a-1ed544f4b35a@huawei.com>
+Date: Mon, 31 Aug 2026 16:52:37 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 1/6] KVM: arm64: Enable eager hugepage splitting if
+ HDBSS is available
+To: <sashiko-reviews@lists.linux.dev>
+CC: <kvm@vger.kernel.org>, Marc Zyngier <maz@kernel.org>,
+	<kvmarm@lists.linux.dev>, Oliver Upton <oupton@kernel.org>
+References: <20260709104026.2612599-1-zhengtian10@huawei.com>
+ <20260709104026.2612599-2-zhengtian10@huawei.com>
+ <20260709110349.4590F1F00A3A@smtp.kernel.org>
+From: Tian Zheng <zhengtian10@huawei.com>
+In-Reply-To: <20260709110349.4590F1F00A3A@smtp.kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ kwepemr100010.china.huawei.com (7.202.195.125)
 
-A failed REDIST_REGION write can remove redistributor iodevs without
-clearing their cached vCPU assignments. A retry then skips those
-assignments and leaves the redistributors absent from the MMIO bus.
 
-Create two partial regions, reject a third region that overlaps the
-distributor, and retry at a valid address. After initializing the VGIC,
-have the guest read GICR_TYPER from all four redistributors and check their
-processor numbers. This verifies the final configuration without assuming
-that assignments survive the failed write.
 
-Keep the redistributor IPAs outside the guest RAM memslot and install only
-the stage-1 mappings needed for the MMIO accesses. If an iodev is missing,
-KVM_RUN therefore exits with KVM_EXIT_MMIO. Without the fix, the first
-redistributor access exits at 0x8030008.
+On 7/9/2026 7:03 PM, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 2 potential issue(s) to consider:
+> - [High] The default eager page splitting chunk size evaluates to an architecturally invalid block size on 16KB and 64KB page systems and suffers from integer truncation in KVM_CHECK_EXTENSION.
+> - [Medium] The global capability query for eager page splitting chunk size incorrectly reports the default as 0 (disabled) when HDBSS is present.
+> --
+> 
+> --- Patch [1]: [PATCH v4 1/6] KVM: arm64: Enable eager hugepage splitting if HDBSS is available ---
+> commit 382048a591b4a06f749e61447083eb8630f1bad5
+> Author: Leonardo Bras <leo.bras@arm.com>
+> Subject: KVM: arm64: Enable eager hugepage splitting if HDBSS is available
+> 
+> This commit enables eager hugepage splitting by default at stage2
+> initialization when the system supports HDBSS. It sets the chunk size
+> to 256K * PAGE_SIZE.
+> 
+>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>> index 6c941aaa10c63..e086c01a9325e 100644
+>> --- a/arch/arm64/kvm/mmu.c
+>> +++ b/arch/arm64/kvm/mmu.c
+>> @@ -1027,8 +1027,12 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
+>>   	for_each_possible_cpu(cpu)
+>>   		*per_cpu_ptr(mmu->last_vcpu_ran, cpu) = -1;
+>>   
+>> -	 /* The eager page splitting is disabled by default */
+>> -	mmu->split_page_chunk_size = KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
+>> +	 /* The eager page splitting is disabled by default if system has no HDBSS */
+>> +	if (system_supports_hdbss())
+>> +		mmu->split_page_chunk_size = 256 * 1024 * PAGE_SIZE;
+> 
+> [Severity: High]
+> Does this chunk size assignment create architecturally invalid block sizes
+> on 16KB and 64KB page systems?
+> 
+> On 16KB and 64KB systems, 256 * 1024 * PAGE_SIZE evaluates to 4GB and
+> 16GB respectively. Since level 1 blocks are not supported for these
+> page sizes on ARM64, this exceeds the valid maximums (32MB and 512MB).
+> If a VMM attempts to restore this configuration, kvm_vm_ioctl_enable_cap()
+> in arch/arm64/kvm/arm.c will reject it via kvm_is_block_size_supported(),
+> which breaks live migration.
+> 
+> Additionally, can this cause integer truncation during capability queries?
+> 
+> In arch/arm64/kvm/arm.c:kvm_vm_ioctl_check_extension(), the 64-bit chunk
+> size is assigned to a 32-bit signed integer. The values 4GB (0x100000000)
+> and 16GB (0x400000000) will truncate to 0. A VMM querying this capability
+> would read 0 and restore 0 on the destination, silently disabling the
+> feature.
+> 
+> [Severity: Medium]
+> Does this new dynamic default desync with the global capability query?
+> 
+> When userspace queries /dev/kvm via KVM_CHECK_EXTENSION for
+> KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE without a VM instance,
+> arch/arm64/kvm/arm.c:kvm_vm_ioctl_check_extension() unconditionally returns
+> KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT (0).
+> 
+> Since this patch changes the default dynamically for new VMs based on
+> system_supports_hdbss(), the global API query now misleads userspace about
+> the default capability.
+> 
+>> +	else
+>> +		mmu->split_page_chunk_size = KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
+>> +
+>>   	mmu->split_page_cache.gfp_zero = __GFP_ZERO;
+>>   
+>>   	mmu->pgd_phys = __pa(pgt->pgd);
+> 
 
-Assisted-by: Codex:gpt-5.6-sol
-Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
-Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
----
- tools/testing/selftests/kvm/arm64/vgic_init.c | 92 +++++++++++++++++++
- 1 file changed, 92 insertions(+)
+In v5 we no longer force-enable eager splitting for HDBSS VMs. So this
+patch is no longer useful.
 
-diff --git a/tools/testing/selftests/kvm/arm64/vgic_init.c b/tools/testing/selftests/kvm/arm64/vgic_init.c
-index 84aa97204b7f..5a30f3cb039b 100644
---- a/tools/testing/selftests/kvm/arm64/vgic_init.c
-+++ b/tools/testing/selftests/kvm/arm64/vgic_init.c
-@@ -5,6 +5,7 @@
-  * Copyright (C) 2020, Red Hat, Inc.
-  */
- #include <linux/kernel.h>
-+#include <linux/sizes.h>
- #include <sys/syscall.h>
- #include <asm/kvm.h>
- #include <asm/kvm_para.h>
-@@ -13,12 +14,21 @@
- 
- #include "test_util.h"
- #include "kvm_util.h"
-+#include "gic.h"
- #include "processor.h"
- #include "vgic.h"
- #include "gic_v3.h"
- 
- #define NR_VCPUS		4
- 
-+#define REDIST_RETRY_REGION0_BASE	GICR_BASE_GPA
-+#define REDIST_RETRY_REGION1_BASE	\
-+	(REDIST_RETRY_REGION0_BASE + 2 * KVM_VGIC_V3_REDIST_SIZE)
-+#define REDIST_RETRY_DIST_BASE		\
-+	(REDIST_RETRY_REGION1_BASE + KVM_VGIC_V3_REDIST_SIZE)
-+#define REDIST_RETRY_REGION2_BASE	\
-+	(REDIST_RETRY_DIST_BASE + KVM_VGIC_V3_DIST_SIZE)
-+
- #define REG_OFFSET(vcpu, offset) (((u64)vcpu << 32) | offset)
- 
- #define VGIC_DEV_IS_V2(_d) ((_d) == KVM_DEV_TYPE_ARM_VGIC_V2)
-@@ -65,6 +75,23 @@ static void guest_code(void)
- 	GUEST_DONE();
- }
- 
-+static void guest_check_redist_retry(void)
-+{
-+	unsigned int i;
-+
-+	/* The first three redistributors span adjacent regions 0 and 1. */
-+	for (i = 0; i < NR_VCPUS; i++) {
-+		u64 base = i < 3 ? REDIST_RETRY_REGION0_BASE +
-+				       i * KVM_VGIC_V3_REDIST_SIZE :
-+				       REDIST_RETRY_REGION2_BASE;
-+		u64 typer = readq((void *)(unsigned long)(base + GICR_TYPER));
-+
-+		GUEST_ASSERT_EQ(GICR_TYPER_CPU_NUMBER(typer), i);
-+	}
-+
-+	GUEST_DONE();
-+}
-+
- /* we don't want to assert on run execution, hence that helper */
- static int run_vcpu(struct kvm_vcpu *vcpu)
- {
-@@ -462,6 +489,70 @@ static void test_v3_new_redist_regions(void)
- 	vm_gic_destroy(&v);
- }
- 
-+static void test_v3_redist_region_retry(void)
-+{
-+	struct kvm_vcpu *vcpus[NR_VCPUS];
-+	struct vm_gic v;
-+	struct ucall uc;
-+	u64 addr;
-+	int ret;
-+
-+	v = vm_gic_create_with_vcpus(KVM_DEV_TYPE_ARM_VGIC_V3, NR_VCPUS,
-+				     guest_check_redist_retry, vcpus);
-+
-+	addr = REDIST_REGION_ATTR_ADDR(2, REDIST_RETRY_REGION0_BASE, 0, 0);
-+	kvm_device_attr_set(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
-+			    KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr);
-+
-+	addr = REDIST_REGION_ATTR_ADDR(1, REDIST_RETRY_REGION1_BASE, 0, 1);
-+	kvm_device_attr_set(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
-+			    KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr);
-+
-+	addr = REDIST_RETRY_DIST_BASE;
-+	kvm_device_attr_set(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
-+			    KVM_VGIC_V3_ADDR_TYPE_DIST, &addr);
-+
-+	addr = REDIST_REGION_ATTR_ADDR(1, REDIST_RETRY_DIST_BASE, 0, 2);
-+	ret = __kvm_device_attr_set(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
-+				    KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION,
-+				    &addr);
-+	TEST_ASSERT(ret && errno == EINVAL,
-+		    "register redist region colliding with dist");
-+
-+	addr = REDIST_REGION_ATTR_ADDR(1, REDIST_RETRY_REGION2_BASE, 0, 2);
-+	kvm_device_attr_set(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
-+			    KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr);
-+
-+	virt_map(v.vm, REDIST_RETRY_REGION0_BASE, REDIST_RETRY_REGION0_BASE,
-+		 vm_calc_num_guest_pages(v.vm->mode,
-+					 3 * KVM_VGIC_V3_REDIST_SIZE));
-+	virt_map(v.vm, REDIST_RETRY_REGION2_BASE, REDIST_RETRY_REGION2_BASE,
-+		 vm_calc_num_guest_pages(v.vm->mode,
-+					 KVM_VGIC_V3_REDIST_SIZE));
-+
-+	kvm_device_attr_set(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
-+			    KVM_DEV_ARM_VGIC_CTRL_INIT, NULL);
-+
-+	vcpu_run(vcpus[0]);
-+	switch (get_ucall(vcpus[0], &uc)) {
-+	case UCALL_DONE:
-+		break;
-+	case UCALL_ABORT:
-+		REPORT_GUEST_ASSERT(uc);
-+		break;
-+	case UCALL_NONE:
-+		if (vcpus[0]->run->exit_reason == KVM_EXIT_MMIO)
-+			TEST_FAIL("Unexpected MMIO exit at 0x%llx",
-+				  vcpus[0]->run->mmio.phys_addr);
-+		fallthrough;
-+	default:
-+		TEST_FAIL("Unexpected ucall %lu, exit_reason %u",
-+			  uc.cmd, vcpus[0]->run->exit_reason);
-+	}
-+
-+	vm_gic_destroy(&v);
-+}
-+
- static void test_v3_typer_accesses(void)
- {
- 	struct vm_gic v;
-@@ -986,6 +1077,7 @@ void run_tests(u32 gic_dev_type)
- 
- 	if (VGIC_DEV_IS_V3(gic_dev_type)) {
- 		test_v3_new_redist_regions();
-+		test_v3_redist_region_retry();
- 		test_v3_typer_accesses();
- 		test_v3_last_bit_redist_regions();
- 		test_v3_last_bit_single_rdist();
--- 
-2.39.5 (Apple Git-154)
+Thanks!
+Tian
+
