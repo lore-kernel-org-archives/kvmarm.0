@@ -1,73 +1,110 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta0.migadu.com (out-246.mta0.migadu.com [91.218.175.246])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F85A25B093;
-	Mon, 31 Aug 2026 19:18:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0D53361972
+	for <kvmarm@lists.linux.dev>; Mon, 31 Aug 2026 19:24:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788203919; cv=none; b=CdmSA4KeTGsMlAd1K6OVMu+Uuq2CNCcc7yBov/JGzT2vF8lQPO4Ii0wTd6j2WXirLBvwsWMhJHKL9UOBqESUxhYBLMdSbrMAqehC7G02tYqXGI5tIrueF9rQCf6YG1PGHgV0JEDIXyoIA0+0tR6Oe4lNelSyLf2lP3eJ0qpTgwA=
+	t=1788204252; cv=none; b=TCCEdFuGw9kUEcTDSrNye2WiCTIUTMXklkbVlxzOS3HNJisWKDzECnyZXKIDJ50YOiU99NEkho2O6iQKPJbuyCJL2Df0vaALlhsh4CY0ZVpkw0q3ydkPhK2FjW2AlsNiC5luiu7ERxynhNlIojVt+dtJcuc5E0UBZ4GBzx4HHfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788203919; c=relaxed/simple;
-	bh=nkQw5gyBYzKIMolHlwd6hw+1nIOh3N+/j60aR8F06f0=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=ZHIQTpbiZQRId18Lh4TsTWFS28zlnKis1fmmDLcYhUeYI/EEfqH/DJmfIpPiQslGkftSyUV1Udz3f3J0z0R/niLQFZGCy1z+sYIL2a3u8w4/bmwBTLBA6m3mIUPITJesA9PGmNR3NK4+PmYkbBvnBdlQQquKmTzuqsR9bCAkAg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oxIuC1qi; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788204252; c=relaxed/simple;
+	bh=DrKqvPN9dcIUKE5GULTEUmn87/y2ID4zJ4wY5XNZeJE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=atYNMm8TfyZTpqCCH7kWpMxkyicAOOy7POBkBqp+7pq18UxOmQgJsc929jZ6U2R/SNCHWFtfzIIdVazDlB7eomddhoqO1zG6rReJJI8yevFukaMMRaRmwtAHQZT/QrtusCpMQkufzRwVcfZE8GuygkhWV3QtTv4zW+h76vyQD5M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=nvydepUY; arc=none smtp.client-ip=91.218.175.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oxIuC1qi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 773191F000E9;
-	Mon, 31 Aug 2026 19:18:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788203917;
-	bh=nkQw5gyBYzKIMolHlwd6hw+1nIOh3N+/j60aR8F06f0=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=oxIuC1qiD0aF8h2bn5p3zylMH/XT/LoE04WJvUBE4r9ZKoCn9FhpvN6dMlifBSpQm
-	 OaWBEY3pKa7FOkAilOujmktDipAozO15lZTCtFcfH8W+LdV5bUhg6m0Oi2I71Pg6Lk
-	 wbyKB3Ynca5VDIK6wPXLHH13Un3YLv6GPZJawD4dWYaC44v/VBjh2h+3f2aFZrZNGO
-	 k4BuFMWXtXSzyOxzy9AtBy+W2RbCnVQVo5Fh5tRnyDUvzM9GF94FxRNhbAw3doQObt
-	 dgAgtfPmNMck40bINvSzFTg5LrB0UWVTLCz06okXzrGEwaQcI6RHjaBn3jsIkTchLw
-	 rJsH12BjEAGhA==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v7 12/23] s390/tools: Use arm64 headers
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Steffen Eiden" <seiden@linux.ibm.com>
-Cc: "Marc Zyngier" <maz@kernel.org>, linux-s390@vger.kernel.org, "Vasily
- Gorbik" <gor@linux.ibm.com>, "Alexander Gordeev" <agordeev@linux.ibm.com>, "Oliver
- Upton" <oupton@kernel.org>, kvm@vger.kernel.org, "Heiko Carstens" <hca@linux.ibm.com>, kvmarm@lists.linux.dev, "Christian
- Borntraeger" <borntraeger@linux.ibm.com>
-In-Reply-To: <20260831144802.834315-13-seiden@linux.ibm.com>
-References: <20260831144802.834315-1-seiden@linux.ibm.com>
- <20260831144802.834315-13-seiden@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 31 Aug 2026 19:18:37 +0000
-Message-Id: <20260831191837.773191F000E9@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="nvydepUY"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=DrKqvPN9dcIUKE5GULTEUmn87/y2ID4zJ4wY5XNZeJE=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1788204247; v=1; x=1788809047;
+ b=nvydepUY4asrjBfjwWubvhvNegtpn2l8kLrKqVRhLhsBgIp56raWNsatwm9IwLnLtJ2GP8XW
+ xCwcWy8xiGrT7cQmn18CTkrrDMFFhWKeCFZxyCKZS7VJ/lIaE5NvpfLsTzogIBPZgQtYpq3qIHj
+ Kk7Qv499O6yfEIIG8weIYpPM=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 89b251068cf902bc;
+	Mon, 31 Aug 2026 19:24:07 +0000
+X-Mizu-Trace-ID: 89b251068cf902bc
+X-Migadu-Flow: FLOW_OUT
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: kvm@vger.kernel.org
+Cc: kvmarm@lists.linux.dev,
+	Will Deacon <will@kernel.org>,
+	Julien Thierry <julien.thierry.kdev@gmail.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Marc Zyngier <maz@kernel.org>,
+	Fuad Tabba <tabba@google.com>
+Subject: [PATCH kvmtool 0/5] Fix diagnostics and capability probes for protected VMs
+Date: Mon, 31 Aug 2026 20:24:01 +0100
+Message-Id: <20260831192406.1341841-1-fuad.tabba@linux.dev>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-> Introduce a flexible system for sharing ARM64 headers with s390 KVM.
-> Selected arm64 headers or snippet of headers will be reachable by s390
-> code through asm/header.h.
->=20
-> Add copy-arm64h.awk that detects ARM64_S390_COMMON markers and extracts
-> marked section into a generated header consumable by s390. Falls back to
-> full file copy when no markers are found.
->=20
-> Transform copied includes by replacing '#include <asm/...>' with
-> '#include <arm64/...>' and similar for uapi headers to ensure
-> correct path resolution on s390 and allow for a clear separation of s390
-> asm headers and arm64 asm headers.
->=20
-> Integrate this extraction into the s390/kapi target, conditional on (the
-> not yet existing) CONFIG_KVM_ARM64.
->=20
-> Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
+Hi folks,
 
-Sashiko has reviewed this patch and found no issues. It looks great!
+These are the kvmtool changes that go with the pKVM series confining a
+protected VM's vCPU state to EL2 [1].
 
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260831144802.8343=
-15-1-seiden@linux.ibm.com?part=3D12
+That series stops the host reading a protected vCPU's registers once it
+has run, and stops it setting the PVTIME attribute. kvmtool dies on
+both. Its arm64 register-dump helpers call die() when KVM_GET_ONE_REG
+fails, which turns a diagnostic into a VMM abort.
+kvm_cpu__setup_pvtime() runs into the new -EPERM and fails vCPU init.
+
+The PVTIME failure is a probe on the wrong fd. kvmtool asks the global
+/dev/kvm fd whether steal-time is available, and that fd advertises it
+for a protected VM, which cannot use it.
+The last patch fixes the same wrong-fd probe for the counter offset,
+where "lkvm run --protected --counter-offset" already fails on Linux
+7.3-rc1, without the kernel series.
+The same conversion went in for the vCPU feature probes in July [2].
+
+Patches 2 and 3 are not specific to protected VMs. They fix the
+exit-reason table on the same panic path as patch 1. The lookup ran off
+the end of it, and the table had stopped naming anything KVM added after
+KVM_EXIT_INTERNAL_ERROR, which on arm64 includes KVM_EXIT_SYSTEM_EVENT
+and KVM_EXIT_ARM_NISV.
+
+Patch 1's path needs a protected VM that is already running: "lkvm debug
+-d" against one kills the VMM without this series, and prints the errno
+with it.
+
+Based on kvmtool master (f67bc0b).
+
+Cheers,
+/fuad
+
+[1] https://lore.kernel.org/all/20260831163421.272420-1-fuad.tabba@linux.dev/
+[2] https://lore.kernel.org/all/20260714110329.12113-1-fuad.tabba@linux.dev/
+
+Fuad Tabba (5):
+  arm64: Do not abort on register-dump failures
+  kvm: Bound-check the exit-reason string lookup
+  kvm: Name every exit reason the UAPI header defines
+  arm64: Query steal-time support on the VM fd
+  arm64: Query counter-offset support on the VM fd
+
+ arm64/kvm-cpu.c   | 36 ++++++++++++++++++++++++------------
+ arm64/kvm.c       |  2 +-
+ arm64/pvtime.c    |  4 ++--
+ builtin-run.c     |  2 +-
+ include/kvm/kvm.h |  2 +-
+ kvm.c             | 37 ++++++++++++++++++++++++++++++++++---
+ 6 files changed, 63 insertions(+), 20 deletions(-)
+
+
+base-commit: f67bc0bdae9433a9cfd05e65ea2c1bb6102566d9
+-- 
+2.39.5
 
