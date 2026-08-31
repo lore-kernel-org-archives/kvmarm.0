@@ -1,33 +1,33 @@
-Received: from mta0.migadu.com (out-54.mta0.migadu.com [91.218.175.54])
+Received: from mta1.migadu.com (out-234.mta1.migadu.com [95.215.58.234])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6756B44E65A
-	for <kvmarm@lists.linux.dev>; Mon, 31 Aug 2026 16:34:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2E3844E673
+	for <kvmarm@lists.linux.dev>; Mon, 31 Aug 2026 16:34:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.234
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788194067; cv=none; b=c6DwN3bwl46ys31DK3OG5Skdiu4VBkKWFcQDt5/HG3owQacsPYJGZtjHppmMU1WEblHuWkWYwqWMyjGeH2xuVCXJ2OlQPYv0n8rpWYJDCUlhYlvUSrNogmGPSutUxN4IFDdadiIOi93Our3aIDUL3YitEikCx3ZNkkSzSBjIRMU=
+	t=1788194067; cv=none; b=XbUnhinHHoPfr4g5INRM7/Cg0aQkUv8tj6kLiLBahLBEpGOchhDkeR/jYur9ghlpkpm2NGxKojJl5YDLnV8tCQ8c+MtslZVUA2A+HMqv4mJMrLGgSC0uM06p0hJMunyUzpAeQyVx1IbXQ+13YSt28/4XVev+bflQbEMPD6ZvzJo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1788194067; c=relaxed/simple;
-	bh=PJujOV+1Z+2Pic9F+Xx2wknBh2QM3e+/EoajCgxNjqc=;
+	bh=FNewsXbgZk6ir7Tq/DaFYrMHnt1LVf+kHlt1OXPPVRQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=DSTdWxHmTMB+gBZTc2Sh3OEONS7lT1SjmigX0zL+CT1IK1+fmXUoC1293tNPhg3MnP6NZ/Qfg4bEbXhV2v1XeuZqcCeLgiRiHvHj2cB4kohiVE5XN4hgU8714v7lIj8zlwWVlfElbpyvjtJ1dmdSyr9m/xO6NFUZPIpCKMdFqng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=X6pQZJbZ; arc=none smtp.client-ip=91.218.175.54
+	 MIME-Version; b=WzslC/2dJCeN+Ihhr4/H5I2zfyaCVUBQ6zos/4Bp4asoAT7Cj7CRG62UcYiKMPNdaeypmZgIs0rPQbFGoISkEUrXRKenykZSULZ1HIg35eZDxmbRCKsi+2CMMfSjFLeNikEx8O/L6AIIBziX+n2Bl/mHRDuYQ+Fh9ml4j95YOOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PG9dyAEN; arc=none smtp.client-ip=95.215.58.234
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="X6pQZJbZ"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PG9dyAEN"
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=PJujOV+1Z+2Pic9F+Xx2wknBh2QM3e+/EoajCgxNjqc=;
+DKIM-Signature: a=rsa-sha256; bh=FNewsXbgZk6ir7Tq/DaFYrMHnt1LVf+kHlt1OXPPVRQ=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
  t=1788194063; v=1; x=1788798863;
- b=X6pQZJbZ69yGH+cU7Rqp0jtm1AXp2YM3wzkKGq6CP4rVARiVzT0NEBFeJ+BQ87St12hoham1
- ILpv/LHz+oKKsD6MrxhiSKtgAQLYZSvoAfYhjOgggYLhLmGjW6scxyWlXYr38tev1W5bfSdi8wz
- ZyjSa7KWmokn07PcEvLRWuWY=
+ b=PG9dyAEND8VSa8noM1PtoqkPn7vLScwS6NbOplgGV5p6S5EVBWZn5rbU8XVR7E9xRTPifAWM
+ faWo9HN+mpbLgAzLlTuHkJjc+jYmuetKFAl3LoSM5jjfzJvoN7snrAcGWiXKvibiVVpfRwwJRs2
+ d80Wpd9nPEG0QMppjXINcERY=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 914f3f102f58101c;
+Received: by smtp.migadu.com with ESMTPS id b210bfa048418e89;
 	Mon, 31 Aug 2026 16:34:23 +0000
-X-Mizu-Trace-ID: 914f3f102f58101c
+X-Mizu-Trace-ID: b210bfa048418e89
 X-Migadu-Flow: FLOW_OUT
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
@@ -44,9 +44,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Vincent Donnefort <vdonnefort@google.com>,
 	Quentin Perret <qperret@google.com>,
 	Fuad Tabba <tabba@google.com>
-Subject: [PATCH 01/17] KVM: arm64: Sync HCR_EL2.VSE back to the host vCPU under pKVM
-Date: Mon, 31 Aug 2026 17:34:05 +0100
-Message-Id: <20260831163421.272420-2-fuad.tabba@linux.dev>
+Subject: [PATCH 02/17] KVM: arm64: Advertise the capabilities that protected VMs support
+Date: Mon, 31 Aug 2026 17:34:06 +0100
+Message-Id: <20260831163421.272420-3-fuad.tabba@linux.dev>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20260831163421.272420-1-fuad.tabba@linux.dev>
 References: <20260831163421.272420-1-fuad.tabba@linux.dev>
@@ -58,37 +58,40 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-flush_hyp_vcpu() copies HCR_EL2.VSE from the host vCPU into the hyp
-vCPU on every entry, and nothing copies it back. Once the guest takes
-the vSError the hyp vCPU's copy clears with the hardware bit while the
-host's stays set, so the next entry pends the same SError again,
-KVM_GET_VCPU_EVENTS keeps reporting it, and kvm_arch_vcpu_runnable()
-never lets the vCPU block in WFI.
+kvm_pkvm_ext_allowed() denies every capability it does not name, so a
+protected VM reports 0 for interfaces it implements: KVM_CHECK_EXTENSION
+denies KVM_CAP_ONE_REG while KVM_{GET,SET}_ONE_REG stage the guest's
+boot state.
 
-Reflect VSE back on every exit, which the flush-side comment already
-states.
+Allow the capabilities that work for a protected guest, the vGIC and
+the I/O bus being host-managed, subject to the restrictions the rest of
+this series adds.
 
-Fixes: 734dc8c01c838 ("KVM: arm64: Implement lazy vCPU state sync for non-protected guests")
 Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
- arch/arm64/kvm/hyp/nvhe/hyp-main.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ arch/arm64/include/asm/kvm_pkvm.h | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 9a3b92e626adb..b6bfe502bcd04 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -276,6 +276,10 @@ static void sync_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
- 
- 	host_vcpu->arch.iflags		= hyp_vcpu->vcpu.arch.iflags;
- 
-+	/* Cleared by hardware once the guest takes the vSError. */
-+	host_vcpu->arch.hcr_el2 &= ~HCR_VSE;
-+	host_vcpu->arch.hcr_el2 |= hyp_vcpu->vcpu.arch.hcr_el2 & HCR_VSE;
-+
- 	sync_hyp_vgic_state(hyp_vcpu);
- }
- 
+diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
+index beea00e693a0a..c4c834d55e503 100644
+--- a/arch/arm64/include/asm/kvm_pkvm.h
++++ b/arch/arm64/include/asm/kvm_pkvm.h
+@@ -42,6 +42,15 @@ static inline bool kvm_pkvm_ext_allowed(struct kvm *kvm, long ext)
+ 	case KVM_CAP_ARM_VM_IPA_SIZE:
+ 	case KVM_CAP_ARM_PTRAUTH_ADDRESS:
+ 	case KVM_CAP_ARM_PTRAUTH_GENERIC:
++	case KVM_CAP_ONE_REG:
++	case KVM_CAP_MP_STATE:
++	case KVM_CAP_VCPU_EVENTS:
++	case KVM_CAP_VCPU_ATTRIBUTES:
++	case KVM_CAP_IMMEDIATE_EXIT:
++	case KVM_CAP_IOEVENTFD:
++	case KVM_CAP_IRQFD_RESAMPLE:
++	case KVM_CAP_ARM_IRQ_LINE_LAYOUT_2:
++	case KVM_CAP_ARM_INJECT_SERROR_ESR:
+ 		return true;
+ 	case KVM_CAP_ARM_MTE:
+ 		return false;
 -- 
 2.39.5
 
