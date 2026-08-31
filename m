@@ -1,45 +1,46 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3508E383333
-	for <kvmarm@lists.linux.dev>; Mon, 31 Aug 2026 22:15:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80BD3383C7B;
+	Mon, 31 Aug 2026 22:16:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788214541; cv=none; b=YXQVT8p74vX7+8TUMfwyEO5uonCiBz7hwjbU93tOUnyqVTKFzSAG9g5esawva4zuXrHN49FwtCIITRnAuOvJQe804DvMmVynvHGYc0CzNF9AOR7SeWc+cTAFpaL45u7FGU7A1mXim15XATwngWF29Vg0DQoYG8wUdhmggUt/9KE=
+	t=1788214617; cv=none; b=Lp6KFf9NbI838nQHjZ+rHZWb66OSkIExhUyqyMyCXQk5L08q5kNaT6Fk02UYEjeNHirMKN6EBYpQu4d7v2IlarYWK7hTE2Zss2SIFzJDjgvGg02tHHOeYBb/NAVfhbGLR61UI1AM1Gm+Or9+RIBHg+lucy7XP3ZE/2Pz3XZAGS4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788214541; c=relaxed/simple;
-	bh=QgcQl7nDut+nuNX30PMy4qBIqh1C1t9SC31fGMJFX/M=;
+	s=arc-20240116; t=1788214617; c=relaxed/simple;
+	bh=AXxjAlPWQ9UegK/NocD8fKrG4IHjHBwDVAiAxCIHrPM=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=pIb5Fl5KG+zB2f7EkNI6RiXN9rgEDOAFB0AIy6swX8DULhUDl5/K1GezmP79PoZMj1VvTSgwnXUKS4xo79URfFR0GwecT8NFWcsnwda8WNq1S5u2675OF9dw81KUTdJBypSt+GL/a90QgiLzMAahfYn3Hk4V3yyDXfPABqrx1O4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TdhMBXK5; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=TDPcC2t7sxFZHYelvJ+r+lFdpzudXetLleFYiyfoOniRv8MXUUUvFd7L0TFkerbaPJ/su5y7W0K6a/Gypj2M7BoCXyh9Laj6nbQS0k6hu9iZILuvqvt5xsvaw8g2F6WjuGdBu/9DklBxW27yxy/86lAQ0pUgCNtNsyegwX0SM6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N3iJ3XPk; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TdhMBXK5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8DB491F000E9;
-	Mon, 31 Aug 2026 22:15:39 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N3iJ3XPk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8478D1F000E9;
+	Mon, 31 Aug 2026 22:16:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788214539;
-	bh=4lij8hx+HdXQlY1eMFJ7+PGqpGTdJS0fS4AHDi6n8lg=;
+	s=k20260515; t=1788214616;
+	bh=UU/HdvNLgLpmqLkCo+G00MQ5XF8rpaHoqHROap+THEE=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=TdhMBXK5dTnhQYt7zkReh7m0jndh2M2Ge80pMs4zPYf8KOovuR5bsAMmx1j3GZV3P
-	 yfuLsVe3eNFDC4+cQgniMan6ngvErpWRATU0uPiBsyE0wm4cXh+mlwZJwHeJq2360x
-	 Jn7aw9lrWajt5FhYVYWn0PbTkyQlv16swoLgF4nJzPhVg9CpgHrL3ufy586lsnk21S
-	 HA68J0We4SlT1stD+13oDgmSk3XqKedmIVSlzTi88jTPep5q7aqjKFw2DNvkIUUFb6
-	 VHyD08t5MIlP+aYgSd7/yT9qV6CVLc3gAh0FrH5HCxXmPsPMc9NwAJenO8SE3w3ueW
-	 P9XFONLv0H8dQ==
+	b=N3iJ3XPk/IUT6X6d8V5v5jZVfzSHLVS9kgtIE7b+qmx7AmjRVosDxqVFJhwx4a01g
+	 /V8D0oTilKd+XE8Ln00eKkEPYrL8DJoCKj16dGEHY9y51bMWxQoxiFdugmoG5QgHj4
+	 nhaSOim+XwqY6BEOUe4Jq8w3XNweb772z1Ns7fD7PYdmnJVwXSMGRwm2LcC6CUrETL
+	 GdvcpOrqyRM4AThA7CWY6ortu9PxHIvanXpaUJD3A8nbNlduo5qC/gZk2SRXp/6lta
+	 V30AeIEs8Q78mvDbZ/h9MjZb/KtUieRFi61Ac4johH+t2U6XZpIqKpk1zUuFrQZrrE
+	 514NrvwhnUj2A==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 13/17] KVM: arm64: Add per-EC entry/exit state
- marshalling for protected guests
+Subject: Re: [PATCH v2 18/20] KVM: s390: arm64: Implement SVE for arm guests
 Reply-To: sashiko-reviews@lists.linux.dev
-To: "Fuad Tabba" <fuad.tabba@linux.dev>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
+To: "Steffen Eiden" <seiden@linux.ibm.com>
+Cc: "Oliver Upton" <oupton@kernel.org>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, "Heiko
+ Carstens" <hca@linux.ibm.com>, "Vasily Gorbik" <gor@linux.ibm.com>, "Christian
+ Borntraeger" <borntraeger@linux.ibm.com>, "Alexander Gordeev" <agordeev@linux.ibm.com>, kvmarm@lists.linux.dev, "Marc
  Zyngier" <maz@kernel.org>
-In-Reply-To: <20260831163421.272420-14-fuad.tabba@linux.dev>
-References: <20260831163421.272420-1-fuad.tabba@linux.dev>
- <20260831163421.272420-14-fuad.tabba@linux.dev>
+In-Reply-To: <20260831145536.913567-19-seiden@linux.ibm.com>
+References: <20260831145536.913567-1-seiden@linux.ibm.com>
+ <20260831145536.913567-19-seiden@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 31 Aug 2026 22:15:39 +0000
-Message-Id: <20260831221539.8DB491F000E9@smtp.kernel.org>
+Date: Mon, 31 Aug 2026 22:16:54 +0000
+Message-Id: <20260831221655.8478D1F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,107 +49,174 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 3 potential issue(=
 s) to consider:
-- [High] The HVC64 entry handler ignores host-requested PC increments and e=
-xception injections, causing an infinite trap loop.
-- [High] Host-injected exceptions and PC advancements are silently ignored =
-for unhandled Exception Classes, causing infinite trap loops.
-- [High] handle_pvm_exit_wfx fails to marshal the WFx timeout register to x=
-0, breaking WFET and WFIT emulation.
+- [Medium] SVE register accessors copy fewer bytes than the KVM ABI specifi=
+es, failing to zero-pad the remainder of the userspace buffer.
+- [Medium] SVE ioctls and vCPU finalization bypass feature gating checks.
+- [Low] Unrecognized or invalid SVE register IDs result in a -EFAULT return=
+ code instead of -ENOENT or -EINVAL.
 --
 
-commit 0b0e245ce37c95597a108d7e1ed3684401ade81b
-Author: Fuad Tabba <fuad.tabba@linux.dev>
-Subject: KVM: arm64: Add per-EC entry/exit state marshalling for protected =
-guests
+commit 7e278493890194c05cc617a90bf08952cf400bea
+Author: Steffen Eiden <seiden@linux.ibm.com>
 
-This patch moves a protected guest's state between the hyp vCPU and the host
-per exception class instead of copying the whole context. It adds per-EC
-entry and exit handlers for various traps and routes protected guests
-through them to marshal only the necessary state.
+KVM: s390: arm64: Implement SVE for arm guests
+   =20
+Add support for Scalable Vector Extension (SVE) in ARM64 guests running
+on s390 hardware, providing 128-bit vector operations backed by s390's
+Vector Extension (VX).
 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe=
-/hyp-main.c
-> index 5925d35abba8c..461e15cab1b92 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-
+> diff --git a/arch/s390/kvm/arm64/guest.c b/arch/s390/kvm/arm64/guest.c
+> index 0474609759360..63fc4a64ab48f 100644
+> --- a/arch/s390/kvm/arm64/guest.c
+> +++ b/arch/s390/kvm/arm64/guest.c
 [ ... ]
-
-> -static void __maybe_unused handle_pvm_entry_hvc64(struct pkvm_hyp_vcpu *=
-hyp_vcpu)
-> +static void handle_pvm_entry_hvc64(struct pkvm_hyp_vcpu *hyp_vcpu)
+> +static inline int get_sve_ffr_reg(struct kvm_vcpu *vcpu, unsigned int re=
+gnum,
+> +				  u16 __user *uptr)
 > +{
-> +	handle_pvm_entry_psci(hyp_vcpu);
-> +}
-
-[Severity: High]
-Does this code omit handling for host-requested PC increments and exception
-injections?=20
-
-If the guest executes an HVC instruction, which traps to EL2, and the host
-handles the call (e.g., standard PSCI fallback) by setting the INCREMENT_PC
-or PENDING_EXCEPTION flags, it appears handle_pvm_entry_hvc64() doesn't
-apply them on re-entry. As a result, the guest's PC wouldn't advance and
-it could infinitely retry the same HVC.
-
-[ ... ]
-
-> +static void handle_pvm_exit_wfx(struct pkvm_hyp_vcpu *hyp_vcpu)
-> +{
-> +	hyp_vcpu->host_vcpu->arch.ctxt.regs.pstate =3D
-> +		hyp_vcpu->vcpu.arch.ctxt.regs.pstate & PSR_MODE_MASK;
-> +}
-
-[Severity: High]
-Can this cause the host to read uninitialized or stale data for WFET and
-WFIT timeout values?
-
-When a protected guest traps to EL2 on a WFET/WFIT, pvm_host_esr()
-deliberately masks out the RN field (the register index holding the timeout)
-from the host's view of the ESR. Because of this, the host's
-kvm_handle_wfx() expects the timeout register value to be marshalled into
-regs[0]. It looks like handle_pvm_exit_wfx() doesn't copy the guest's RN
-register to host_vcpu->arch.ctxt.regs.regs[0] before exiting to the host.
-
-[ ... ]
-
-> @@ -418,10 +638,16 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hy=
-p_vcpu)
->  	case ARM_EXCEPTION_IL:
->  		break;
->  	case ARM_EXCEPTION_TRAP:
-> -		esr_ec =3D ESR_ELx_EC(kvm_vcpu_get_esr(&hyp_vcpu->vcpu));
-> -		ec_handler =3D entry_hyp_vm_handlers[esr_ec];
-> -		if (ec_handler)
-> -			ec_handler(hyp_vcpu);
-> +		/* Nothing was marshalled for this trap, see sync_hyp_vcpu(). */
-> +		if (ARM_SERROR_PENDING(hyp_vcpu->exit_code))
-> +			break;
+> +	/* ffr is pregmax + 1 */
+> +	if (regnum !=3D KVM_ARM64_SVE_NUM_PREGS)
+> +		return -EINVAL;
 > +
-> +		if (pkvm_hyp_vcpu_is_protected(hyp_vcpu)) {
-> +			esr_ec =3D ESR_ELx_EC(kvm_vcpu_get_esr(&hyp_vcpu->vcpu));
-> +			ec_handler =3D entry_hyp_pvm_handlers[esr_ec];
-> +			if (ec_handler)
-> +				ec_handler(hyp_vcpu);
-> +		}
->  		break;
+> +	if (put_user(vcpu->arch.sae_block.sve_ffr, uptr))
 
-[Severity: High]
-Does this logic silently ignore host-injected exceptions and PC advancements
-for unhandled Exception Classes?
+[Severity: Medium]
+The ARM64 KVM ABI defines FFR and PREG registers as 32 bytes
+(KVM_REG_SIZE_U256), but this only writes 2 bytes via the u16 pointer. Will
+this leave 30 bytes of the userspace buffer uninitialized, potentially
+leaking memory contents into the migration stream when QEMU reads it?
 
-If a protected guest executes an unhandled instruction (like SMC64), it
-traps to EL2. The host cannot emulate the unknown EC and pends an exception
-via the PENDING_EXCEPTION flag. Because there is no specific entry handler
-for this EC in entry_hyp_pvm_handlers, ec_handler is NULL and the re-entry
-skips entry handling.=20
+> +		return -EFAULT;
+> +	return 0;
+> +}
+> +
+> +static inline int get_sve_preg(struct kvm_vcpu *vcpu, unsigned int regnu=
+m,
+> +			       u16 __user *uptr)
+> +{
+> +	if (regnum < 0 || regnum >=3D KVM_ARM64_SVE_NUM_PREGS)
+> +		return -EINVAL;
+> +
+> +	if (put_user(vcpu->arch.sae_block.sve_pregs[regnum], uptr))
 
-Since the generic fallback was removed, the PENDING_EXCEPTION flag is
-ignored, the PC is not advanced, and the guest could hang trying to retry
-the failing instruction infinitely.
+[Severity: Medium]
+Similar to get_sve_ffr_reg(), this only copies 2 bytes for a register size
+defined as 32 bytes. Should this zero-pad the rest of the buffer according =
+to
+the ABI?
 
+> +		return -EFAULT;
+> +	return 0;
+> +}
+> +
+> +static inline int get_sve_zreg(struct kvm_vcpu *vcpu, unsigned int regnu=
+m,
+> +			       __vector128 __user *uptr)
+> +{
+> +	if (regnum < 0 || regnum >=3D KVM_ARM64_SVE_NUM_ZREGS)
+> +		return -EINVAL;
+> +
+> +	/* vreg and svreg overlap and zreg is also just 128 bit so we reuse the=
+ vreg space */
+> +	if (copy_to_user(uptr, &vcpu->arch.ctxt.vregs[regnum],
+> +			 sizeof(vcpu->arch.ctxt.vregs[regnum])))
+
+[Severity: Medium]
+The ZREG size is defined as 256 bytes (KVM_REG_SIZE_U2048) by the ABI, but
+this only copies 16 bytes. Does this leave the remaining 240 bytes of the
+userspace buffer untouched, breaking ABI expectations?
+
+> +		return -EFAULT;
+> +	return 0;
+> +}
 [ ... ]
+> +static int get_sve_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *=
+reg)
+> +{
+> +	void __user *uptr =3D (void __user *)reg->addr;
+> +	unsigned int regnum;
+> +	int ret =3D -EFAULT;
+> +
+> +	if (reg->id =3D=3D KVM_REG_ARM64_SVE_VLS)
+> +		ret =3D get_sve_vls(vcpu, uptr);
+> +	else if (sve_ffr_index(reg->id, &regnum) >=3D 0)
+> +		ret =3D get_sve_ffr_reg(vcpu, regnum, uptr);
+> +	else if (sve_preg_index(reg->id, &regnum) >=3D 0)
+> +		ret =3D get_sve_preg(vcpu, regnum, uptr);
+> +	else if (sve_zreg_index(reg->id, &regnum) >=3D 0)
+> +		ret =3D get_sve_zreg(vcpu, regnum, uptr);
+
+[Severity: Medium]
+Does this function need to enforce the vcpu_has_sve() and
+kvm_arm_vcpu_sve_finalized() constraints before delegating to the register
+accessors, as required by the ABI?
+
+[Severity: Low]
+If an unrecognized or invalid SVE register ID is passed, the index validato=
+rs
+(e.g. sve_zreg_index()) return negative error codes like -ENOENT or -EINVAL,
+but this function ignores them and falls through to returning the default
+initialized ret =3D -EFAULT. Is it intentional to return -EFAULT instead of
+propagating the specific error codes, which userspace like QEMU might rely
+on to detect the end of slices?
+
+> +
+> +	return ret;
+> +}
+> +
+> +static int set_sve_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *=
+reg)
+> +{
+> +	const void __user *uptr =3D (const void __user *)reg->addr;
+> +	int ret =3D -EFAULT;
+> +	unsigned int regnum;
+> +
+> +	if (reg->id =3D=3D KVM_REG_ARM64_SVE_VLS)
+> +		ret =3D set_sve_vls(vcpu, uptr);
+> +	else if (sve_ffr_index(reg->id, &regnum) >=3D 0)
+> +		ret =3D set_sve_ffr_reg(vcpu, regnum, uptr);
+> +	else if (sve_preg_index(reg->id, &regnum) >=3D 0)
+> +		ret =3D set_sve_preg(vcpu, regnum, uptr);
+> +	else if (sve_zreg_index(reg->id, &regnum) >=3D 0)
+> +		ret =3D set_sve_zreg(vcpu, regnum, uptr);
+
+[Severity: Medium]
+Like get_sve_reg(), should this also check if the vCPU has the SVE feature
+enabled and finalized before allowing state modifications to vector registe=
+rs?
+
+> +
+> +	return ret;
+> +}
+> +
+> diff --git a/arch/s390/kvm/arm64/reset.c b/arch/s390/kvm/arm64/reset.c
+> index bc7bcee75779e..754c4d4a70b6b 100644
+> --- a/arch/s390/kvm/arm64/reset.c
+> +++ b/arch/s390/kvm/arm64/reset.c
+[ ... ]
+>  int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature)
+>  {
+> -	return 0;
+> +	switch (feature) {
+> +	case KVM_ARM_VCPU_SVE:
+> +		if (!cpu_has_vx())
+> +			return -EINVAL;
+> +		if (vcpu_get_flag(vcpu, VCPU_SVE_FINALIZED))
+> +			return -EPERM;
+
+[Severity: Medium]
+Should this function verify that the KVM_ARM_VCPU_SVE feature is actually
+enabled for this vCPU (e.g. via vcpu_has_feature()) before allowing
+finalization? Without this check, userspace could potentially finalize SVE
+on non-SVE vCPUs.
+
+> +		vcpu_set_flag(vcpu, VCPU_SVE_FINALIZED);
+> +		return 0;
+> +	}
+> +
+> +	return -EINVAL;
+>  }
 
 --=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260831163421.2724=
-20-1-fuad.tabba@linux.dev?part=3D13
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260831145536.9135=
+67-1-seiden@linux.ibm.com?part=3D18
