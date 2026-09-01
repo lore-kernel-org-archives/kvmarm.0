@@ -1,101 +1,181 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta1.migadu.com (out-49.mta1.migadu.com [95.215.58.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E82B37A85D
-	for <kvmarm@lists.linux.dev>; Tue,  1 Sep 2026 17:30:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12DD32BEFF5
+	for <kvmarm@lists.linux.dev>; Tue,  1 Sep 2026 17:30:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788283817; cv=none; b=e2/W/8SVN6QbvtSzi5vB0z37mhGXwXwqNPG7LzTwVLvBWbpKVCzE03QW4Be2iMZ6I5xwCwIOrQxdDccrhjxsw6xAspS+RWHxRlv8KH65EIt6t2EHN3ONlSVCXe1Aw0GjEdPqkg8QwgiYN5qiIMGtKeAM8AWhzpNpsbYx1TcYXT8=
+	t=1788283818; cv=none; b=t1ZowydgR/FK9ZDKBPu2Ef4VnUxBzlMkAnueoI1QIs8+xnKUjBn1C+XbbJ2aQ1ILrZziG6yz67d7o/KJveinzomD7/T3sSLMyB+47Flc/dLVAYEI1xogH4mKvbUUZyaKxtwPgPWNOoQGjHLPxkAgy/a1pBVCmiITlMZ8kP76UOg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788283817; c=relaxed/simple;
-	bh=+76+CRLLUEWcVR08W6IDqcuN/e9lr18DQtd/7o+Yygk=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=JPy9jXTebyB45GKfbM1xQyux+pWzVb2O57AYtshjc9qpMNLZ2xVAssjocI+SPI7uIZ4EGJYKrYGL9BsjmuSFNze9ipeQ6OO0HblcniHVDT6Kag3lFNRZ59oG5gFev815TqHFWWtIn5N47lIaSqzk4A2QUDYNetNSWL0DkvRAFIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jp6m4CZ2; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788283818; c=relaxed/simple;
+	bh=ULSR5be2YtUyyk60Ms2Rw0/VkY/Y5pS/9BTkgu36FE4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=o6watzQ6ef/2ZBhJfxlzEZUN0C5bOxcJgli359pHos1DNbfkvAWLp/UbCPJLViwX2K5m8WJlVZXGXOwiA/85Qv2M/xtYHz2IVSZdHSszC1XZtvFtSFeTvl7l9yE7sQXilgO/RmctTsyPGwl+2zHmM1C+vjCSiFx43ZLscZUSqnk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=aioJSWXD; arc=none smtp.client-ip=95.215.58.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jp6m4CZ2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC1B41F00A3D;
-	Tue,  1 Sep 2026 17:30:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788283815;
-	bh=CyFz3/RN6X136TAC3lfgI3hqs647kuHY2c4UQP9by4w=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=jp6m4CZ2N1LM6A05acuqqkYB1HsaVsyzotmafLSuqwjwbAGZW/TuNIGcRq0vtYdDg
-	 BxcgZ1pA8XNCeoiNaEDjk91NdptHxiq8wyNKfp+LHEYeCm/FEYk+EwFTOkCAzs+xBH
-	 H90kEhPlyGOUTJqPyzLEjUMAhBZ7CLaNYfnvFCq/8tnZWkgcSBBqnUqx05agsGLIyL
-	 PHarj4ZDOebSBcHFEBXEH+F3NslI7SsGFL0QjbFolCJhPNYKIR+AFKXFz1of8ODQv1
-	 TCpWnNIc+rc1pb6I5tXdT+lP4onUhfXK6BDIwidHCCqs/tUldECZmHlS1CUmHL6IeX
-	 2Ff1pfztg+zYQ==
-From: sashiko-bot@kernel.org
-Subject: Re: [RFC PATCH 1/5] KVM: arm64: pgtables: Change write bit from
- S2AP_W to DBM
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Leonardo Bras" <leo.bras@arm.com>
-Cc: "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev
-In-Reply-To: <20260901171558.2674031-2-leo.bras@arm.com>
-References: <20260901171558.2674031-1-leo.bras@arm.com>
- <20260901171558.2674031-2-leo.bras@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 01 Sep 2026 17:30:14 +0000
-Message-Id: <20260901173014.AC1B41F00A3D@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="aioJSWXD"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=ULSR5be2YtUyyk60Ms2Rw0/VkY/Y5pS/9BTkgu36FE4=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1788283810; v=1; x=1788888610;
+ b=aioJSWXDeQhvR0n4EozPQNoFaNKGEwT1lnN0P9BF/aKdWLhMHadCrLfkhkfBf6ppeyhJRa0w
+ Io//CuKxcTw9Ue71Yu3xxJwrpm7OljuOGQTPm9hQllraM9aQbDhnHLcSgzog8apDkj4iB+VeHu3
+ u0K903ozmP+QJuj0Dj8pJ2zQ=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id ad8a45f6d4c58723;
+	Tue, 01 Sep 2026 17:30:10 +0000
+X-Mizu-Trace-ID: ad8a45f6d4c58723
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-5b2a73da7e1so518e87.0
+        for <kvmarm@lists.linux.dev>; Tue, 01 Sep 2026 10:30:08 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBzx2wF+WmPS8bI9gLXPSIX8nMgEFpHs73/GwFoU9D3qHbxt0n1YhnEDkXrQ7AfNFxsDv163Vts=@lists.linux.dev
+X-Gm-Message-State: AFuF++mLD6YzJUbWMtUlsYw/9QdNqo492q763i4Rmpqs+An0OLliqs6l
+	rMHTorlU9PZYbmQNojl+mP4Dq+aTPMOtzt3dG6us3/EOZm2J0bh3gquouOWdfiu9H09f9lgHnQT
+	Zl9/Mvw6Z8QERMqQc+AqKzzSukzHOlmYZUwhMSs/6
+X-Received: by 2002:a05:6512:158b:b0:5b1:ca0b:25d2 with SMTP id
+ 2adb3069b0e04-5b606b396b9mr6047e87.4.1788283807433; Tue, 01 Sep 2026 10:30:07
+ -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+References: <20260901080941.997769-1-vdonnefort@google.com> <20260901080941.997769-11-vdonnefort@google.com>
+In-Reply-To: <20260901080941.997769-11-vdonnefort@google.com>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Tue, 1 Sep 2026 18:30:00 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTw91tzLNXZDoRfty767vxLjao9bADkVD=vyhH64chLyDw@mail.gmail.com>
+X-Gm-Features: AcwNN1VxnCRhcWk2F0atM0MG2flGmEqHcqfsD7nDrWqtoce5L066OBj30S3ayJY
+Message-ID: <CA+EHjTw91tzLNXZDoRfty767vxLjao9bADkVD=vyhH64chLyDw@mail.gmail.com>
+Subject: Re: [PATCH v5 10/18] KVM: arm64: Add a shrinker for pKVM
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, 
+	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com, 
+	qperret@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [High] walk_nested_s2_pgd() incorrectly evaluates the DBM bit in L1's sta=
-ge-2 page tables, leading to L2 memory protection bypass and broken L1 dirt=
-y tracking.
---
+On Tue, 1 Sept 2026 at 09:10, Vincent Donnefort <vdonnefort@google.com> wrote:
+>
+> Integrate the pKVM memory reclaim interface with the host's memory
+> management subsystem.
+>
+> This allows the host to automatically recover unused memory fom the
+> hypervisor's heap allocator when the host is under memory pressure.
+>
+> Tested-by: Fuad Tabba <fuad.tabba@linux.dev>
+> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 
-commit 6c412868c1a4af97b366b23a517db706c4c3511a
-Author: Leonardo Bras <leo.bras@arm.com>
+Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
 
-KVM: arm64: pgtables: Change write bit from S2AP_W to DBM
+Cheers,
+/fuad
 
-As a first step of changing the encoding for the Stage2 PTE descriptor,
-introduce the DBM bit, and adapt every usage of writable to use the DBM bit
-(51) instead of S2AP[1]/Dirty bit (7).
 
-[ ... ]
-
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 17123f0b6daba..eb8dfffc32c76 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -386,7 +386,9 @@ static int walk_nested_s2_pgd(struct kvm_vcpu *vcpu, =
-phys_addr_t ipa,
->  	out->output =3D paddr;
->  	out->block_size =3D 1UL << ((3 - level) * stride + wi->pgshift);
->  	out->readable =3D desc & KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R;
-> -	out->writable =3D desc & KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
-> +	/* Takes care of both RO/RW and RO/WC/WD encodings */
-> +	out->writable =3D desc & (KVM_PTE_LEAF_ATTR_HI_S2_DBM |
-> +				KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W);
-
-[Severity: High]
-Does this code in walk_nested_s2_pgd() incorrectly evaluate the DBM bit in
-the L1 hypervisor's stage-2 page tables?
-
-By checking for the DBM bit unconditionally here, L0 treats L1's read-only
-stage-2 PTEs (where bit 51 is 1 and S2AP_W is 0) as writable. This allows an
-L2 guest to write to memory that the L1 hypervisor intended to be read-only,
-bypassing L1's memory protection.
-
-Additionally, this breaks L1's dirty tracking because L0 never updates L1's
-PTE to set the S2AP_W bit on a write.
-
-Since KVM restricts L1's HAFDBS capability to AF-only (no DBM), bit 51 is
-architecturally RES0 or ignored for L1. An honest L1 hypervisor might safely
-use this ignored bit for software metadata. A malicious L2 guest could then
-exploit this to write to read-only pages (such as shared firmware), breachi=
-ng
-the L1-to-L2 security boundary.
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260901171558.2674=
-031-1-leo.bras@arm.com?part=3D1
+>
+> diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
+> index 366bbd5c854b..976fa65522fe 100644
+> --- a/arch/arm64/include/asm/kvm_pkvm.h
+> +++ b/arch/arm64/include/asm/kvm_pkvm.h
+> @@ -19,6 +19,7 @@
+>
+>  enum pkvm_topup_id {
+>         PKVM_TOPUP_HYP_ALLOC,
+> +       NR_PKVM_TOPUP_HYP_IDS,
+>         PKVM_TOPUP_HYP_ALLOC_SELFTEST,
+>  };
+>
+> diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+> index 7821f2592eba..ea96744f41fb 100644
+> --- a/arch/arm64/kvm/pkvm.c
+> +++ b/arch/arm64/kvm/pkvm.c
+> @@ -133,7 +133,7 @@ static unsigned long __pkvm_hyp_reclaim(enum pkvm_topup_id id, unsigned long tar
+>         return reclaimed;
+>  }
+>
+> -static __maybe_unused unsigned long pkvm_hyp_reclaim(enum pkvm_topup_id id, unsigned long target)
+> +static unsigned long pkvm_hyp_reclaim(enum pkvm_topup_id id, unsigned long target)
+>  {
+>         unsigned long reclaimed = 0;
+>
+> @@ -154,7 +154,7 @@ static __maybe_unused unsigned long pkvm_hyp_reclaim(enum pkvm_topup_id id, unsi
+>         return reclaimed;
+>  }
+>
+> -static __maybe_unused unsigned long pkvm_hyp_reclaimable(enum pkvm_topup_id id)
+> +static unsigned long pkvm_hyp_reclaimable(enum pkvm_topup_id id)
+>  {
+>         return kvm_call_hyp_nvhe(__pkvm_hyp_reclaimable, id);
+>  }
+> @@ -360,8 +360,39 @@ void __init pkvm_selftests(void)
+>  #endif
+>  }
+>
+> +static unsigned long pkvm_shrinker_count(struct shrinker *shrink, struct shrink_control *sc)
+> +{
+> +       unsigned long reclaimable = 0;
+> +       int id;
+> +
+> +       for (id = 0; id < NR_PKVM_TOPUP_HYP_IDS; id++)
+> +               reclaimable += pkvm_hyp_reclaimable(id);
+> +
+> +       return reclaimable ?: SHRINK_EMPTY;
+> +}
+> +
+> +static unsigned long pkvm_shrinker_scan(struct shrinker *shrink, struct shrink_control *sc)
+> +{
+> +       unsigned long reclaimed = 0;
+> +       int id;
+> +
+> +       sc->nr_scanned = 0;
+> +
+> +       for (id = 0; id < NR_PKVM_TOPUP_HYP_IDS; id++) {
+> +               unsigned long r = pkvm_hyp_reclaim(id, sc->nr_to_scan - sc->nr_scanned);
+> +
+> +               reclaimed += r;
+> +               sc->nr_scanned += r;
+> +               if (sc->nr_scanned >= sc->nr_to_scan)
+> +                       break;
+> +       }
+> +
+> +       return reclaimed ?: SHRINK_STOP;
+> +}
+> +
+>  static int __init finalize_pkvm(void)
+>  {
+> +       struct shrinker *pkvm_shrinker;
+>         int ret;
+>
+>         if (!is_protected_kvm_enabled() || !is_kvm_arm_initialised())
+> @@ -377,10 +408,21 @@ static int __init finalize_pkvm(void)
+>         kmemleak_free_part_phys(hyp_mem_base, hyp_mem_size);
+>
+>         ret = pkvm_drop_host_privileges();
+> -       if (ret)
+> +       if (ret) {
+>                 pr_err("Failed to finalize Hyp protection: %d\n", ret);
+> +               return ret;
+> +       }
+>
+> -       return ret;
+> +       pkvm_shrinker = shrinker_alloc(0, "pkvm");
+> +       if (pkvm_shrinker) {
+> +               pkvm_shrinker->count_objects = pkvm_shrinker_count;
+> +               pkvm_shrinker->scan_objects = pkvm_shrinker_scan;
+> +               shrinker_register(pkvm_shrinker);
+> +       } else {
+> +               kvm_err("Failed to register shrinker for pKVM\n");
+> +       }
+> +
+> +       return 0;
+>  }
+>  device_initcall_sync(finalize_pkvm);
+>
+> --
+> 2.55.0.897.gb25b4bd76c-goog
+>
