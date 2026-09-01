@@ -1,172 +1,217 @@
-Received: from mta0.migadu.com (out-176.mta0.migadu.com [91.218.175.176])
+Received: from mta0.migadu.com (out-237.mta0.migadu.com [91.218.175.237])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B2FC47989E
-	for <kvmarm@lists.linux.dev>; Tue,  1 Sep 2026 10:23:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDB5B3CF200
+	for <kvmarm@lists.linux.dev>; Tue,  1 Sep 2026 10:24:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.237
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788258193; cv=none; b=ZN8Yy5nMcW+XofcFaAZ8eJ2fijvo9gLSWFr0Zmu32VqkXYxEnqodprwsI2BC9pLyW3sAi0Qc6wzyBI6bWL8WHsfJiNVfk9L8zbEe2SHjXNhuwdDLkPga6T/SUIpBCurjkWNG9TfyMk4AerAcuW2rrouVOWZJcgcK93Rr1xT6/vA=
+	t=1788258246; cv=none; b=b9pF9QTaIpubuyyc0yfrWduaTKL8VOUfOwFNz4dLXMMghHebvzbOs40qwioIB/Z8PPEdKzm3M0PBDbsCHPIEKWOdvZ14J2JKD9+Z9aJnUF2fnGe4nr3JTxNXKnTATAwPK/uCQWVxrsnfclxLWPtokTvDor2nanNFOlFjkfZFYiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788258193; c=relaxed/simple;
-	bh=yEWR7zpHIkwTSrFo/T77fkUS19P8BkH0CbbF+bcKF7g=;
+	s=arc-20240116; t=1788258246; c=relaxed/simple;
+	bh=1ZRlXJ6pTNiciXCv3e0Qf4lZEbdGciYfHGrczdl+PeU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=A/LJq2cSeHlOfXb0X41MGp+b1jth9Al+xf7hxdulKT1bU1AqnhTZs8DVnIkHx4iwb7H+fmz9cKnZfGcCHEWOTIx+3eOHz29Vcg/EfvQitV8CeFNwvPHUjoRcVbEfeKLNU/K6lldO5x5Hl5sUhOj7oMA80Xzun6FFayunlm5VjOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ozxFHBuJ; arc=none smtp.client-ip=91.218.175.176
+	 To:Cc:Content-Type; b=KWeBiD+f15MG9LQ6ztdqVbOryz9wu3OCxrScQfZop1s3RfdOkd81LZxBBhT0VTLye0x68O+FxxPA8ov/saFjGGlE57aexEh3JrxB3m7bLG3s2cF8Hk6JhtmNFhYEzUwqb9wf+sbJTaIJRCNMOWBF7c5Z0tj41jrhaZ5OMtp7gZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=k8XYEFtV; arc=none smtp.client-ip=91.218.175.237
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ozxFHBuJ"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="k8XYEFtV"
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=yEWR7zpHIkwTSrFo/T77fkUS19P8BkH0CbbF+bcKF7g=;
+DKIM-Signature: a=rsa-sha256; bh=1ZRlXJ6pTNiciXCv3e0Qf4lZEbdGciYfHGrczdl+PeU=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1788258189; v=1; x=1788862989;
- b=ozxFHBuJ3ZUM9mLRw7m0i1BSrbcGoKHGthxRXCnFnSphyXQx3aKHvS3BRZgstRj2L6/A3BD1
- iwtz9eEcW2aP3gskRyqTEPWTZzAvI19G6dJJ8B1BnOraNSWE6xx4MLEMOWTu9tOKjIQzMXeViMs
- WHNc0cygpXfnIvDAWPXo191s=
+ t=1788258242; v=1; x=1788863042;
+ b=k8XYEFtV6woAnpqgFQYMs55na3ipWhg181qDIPqm/1q6scjnNF5RgQk6+hBhvTjvddcinZUI
+ +lpK7UpRA12LNUDSjscfdoTfxXfYA+dsWSltAG0s/uuQX22kYRFa+6yPwFjlojrKliARMHqHGVn
+ yng535oRQs3+1K0zDAyl6B6Y=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 4cd1f7f032af0683;
-	Tue, 01 Sep 2026 10:23:09 +0000
-X-Mizu-Trace-ID: 4cd1f7f032af0683
+Received: by smtp.migadu.com with ESMTPS id 586f08153832ff25;
+	Tue, 01 Sep 2026 10:24:02 +0000
+X-Mizu-Trace-ID: 586f08153832ff25
 X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-5b2a73da7e1so6584e87.0
-        for <kvmarm@lists.linux.dev>; Tue, 01 Sep 2026 03:23:05 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBz35Pd+2Ft23uu/0KsF/IUgc9PHWOxpRROQ9ihsj6IiFsDtrQ2rvgBIR1cNc9yktqcX16r+vQI=@lists.linux.dev
-X-Gm-Message-State: AFuF++mYyYiFn7SOShleHTAAh6LdAM37rhjLazBiR+hXnPzVxVzvnUlh
-	fnSdeVL0M17czDuGh6pz+knhd0X77wmYoMwuf+Y8M+5QtcC5Q7hKleMgOvR41CSVOMzJ1eNmqLE
-	gbIlegn9auIkn9pSAOcoOrEhbWl5NxVndjsMcfiKF
-X-Received: by 2002:ac2:51cd:0:b0:5b1:ca0b:25d2 with SMTP id
- 2adb3069b0e04-5b5ff233baemr134084e87.4.1788258184296; Tue, 01 Sep 2026
- 03:23:04 -0700 (PDT)
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-5b2a73da7e1so6588e87.0
+        for <kvmarm@lists.linux.dev>; Tue, 01 Sep 2026 03:23:58 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBys5PfuGDQ6Bmbhg7GJOxbe+5lXQ9RDNIiTNR2gnuvRZWwinjqBmPJQxgz79meUh9w9Wca4hkw=@lists.linux.dev
+X-Gm-Message-State: AFuF++lbpctkxtipC8CeUUDzT3YxCt0Hl5x5iOBU/eBjb9t1oTA5KV72
+	AfSDbk5IiOcSvvJX/ImnYg4PzHXOEZGNI2YupjLM1QU8HRbt7EyYvDRbr/sRbkTs7QANb17LtQN
+	QQCHxd0VaLNlnBG/EE5aTaIYB0Pts6QLPeqKlsaM2
+X-Received: by 2002:a05:6512:3e0c:b0:5b2:a5e9:3aba with SMTP id
+ 2adb3069b0e04-5b5ff28cff6mr138197e87.6.1788258237767; Tue, 01 Sep 2026
+ 03:23:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260831163421.272420-1-fuad.tabba@linux.dev> <20260831163421.272420-6-fuad.tabba@linux.dev>
- <20260831195900.512F71F000E9@smtp.kernel.org>
-In-Reply-To: <20260831195900.512F71F000E9@smtp.kernel.org>
+References: <20260831163421.272420-1-fuad.tabba@linux.dev> <20260831163421.272420-10-fuad.tabba@linux.dev>
+ <20260831211457.1AE451F00A3D@smtp.kernel.org>
+In-Reply-To: <20260831211457.1AE451F00A3D@smtp.kernel.org>
 From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Tue, 1 Sep 2026 11:22:28 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTzryWTXQCLxgdkJqdguVEjsKPHMypbykGnChWDP0Td5Rg@mail.gmail.com>
-X-Gm-Features: AcwNN1VXWFCoOI5YyiZut7i1K2AXPItxU21w_bnsnnaLyg2YRqfG9XpMu3GC4vQ
-Message-ID: <CA+EHjTzryWTXQCLxgdkJqdguVEjsKPHMypbykGnChWDP0Td5Rg@mail.gmail.com>
-Subject: Re: [PATCH 05/17] KVM: arm64: Skip fixed-feature state flush for
- protected vCPUs
+Date: Tue, 1 Sep 2026 11:23:21 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTyXKua0jbC-9AF4L19ikXopa5ELWPoQV18QojZy_e6F7Q@mail.gmail.com>
+X-Gm-Features: AcwNN1WdTRzgNeFRxi44rzIw9xhKWI3fVZkc5lV-ZnSwni6V793tuOdVH21m308
+Message-ID: <CA+EHjTyXKua0jbC-9AF4L19ikXopa5ELWPoQV18QojZy_e6F7Q@mail.gmail.com>
+Subject: Re: [PATCH 09/17] KVM: arm64: Handle PSCI calls for protected VMs at EL2
 To: sashiko-reviews@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev, 
-	Oliver Upton <oupton@kernel.org>
+Cc: Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
+	Marc Zyngier <maz@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Not this one Sashiko.,..
+Nor this one...
 
-On Mon, 31 Aug 2026 at 20:59, <sashiko-bot@kernel.org> wrote:
+On Mon, 31 Aug 2026 at 22:15, <sashiko-bot@kernel.org> wrote:
 >
 > Thank you for your contribution! Sashiko AI review found 1 potential issu=
 e(s) to consider:
-> - [Medium] Under-inclusion in the per-entry `HCR_EL2` allowlist for prote=
-cted guests, dropping dynamic WFx trapping policy updates.
+> - [High] Malicious host can hijack guest execution flow via CPU_ON TOCTOU=
+ race caused by stale reset_state.reset flag.
 > --
 >
-> commit 2c210642954dbb2df4858e3ad74ba54ba96b05d7
+> commit f4181bbdd19d9d3775a4f479d2c7c70dc5c753b8
 > Author: Fuad Tabba <fuad.tabba@linux.dev>
 >
-> KVM: arm64: Skip fixed-feature state flush for protected vCPUs
+> KVM: arm64: Handle PSCI calls for protected VMs at EL2
 >
-> This commit optimizes the per-entry synchronization for protected vCPUs b=
-y
-> moving the copy of fixed-feature state (like mdcr_el2, TWI/TWE, and debug
-> state) to the non-protected branch and the per-vCPU load path.
+> This patch implements PSCI 1.1 for protected VMs in EL2, handling power s=
+tate
+> transitions (CPU_ON, CPU_OFF, AFFINITY_INFO) within the hypervisor, while
+> keeping non-protected VMs unchanged. It defines protected vCPU power stat=
+es
+> and synchronizes racing transitions via cmpxchg and release/acquire barri=
+ers.
 >
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nv=
+he/hyp-main.c
 > > --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
 > > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
 > [ ... ]
-> > @@ -241,7 +240,14 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *h=
-yp_vcpu)
-> >       if (!pkvm_hyp_vcpu_is_protected(hyp_vcpu)) {
-> >               if (vcpu_get_flag(host_vcpu, PKVM_HOST_STATE_DIRTY))
-> >                       flush_hyp_vcpu_state(hyp_vcpu);
-> > +
-> > +             hyp_vcpu->vcpu.arch.hcr_el2 &=3D ~(HCR_TWI | HCR_TWE);
-> > +             hyp_vcpu->vcpu.arch.hcr_el2 |=3D READ_ONCE(host_vcpu->arc=
-h.hcr_el2) &
-> > +                                                      (HCR_TWI | HCR_T=
-WE);
->
-> [Severity: Medium]
-> Does restricting the per-entry synchronization of HCR_TWI and HCR_TWE to =
-only
-> non-protected guests break dynamic scheduling behavior?
->
-> These bits act as host-owned runtime signals. If the host dynamically upd=
-ates
-> vcpu->arch.hcr_el2 (for example, via kvm_vcpu_on_spin() to yield on
-> spinlocks) and re-enters the guest, the updated WFI/WFE trapping policy
-> won't be synced on entry for protected guests because it is now skipped h=
-ere.
-
-kvm_arch_vcpu_load() is the only writer of those two bits, and it
-calls __pkvm_vcpu_load() with hcr_el2 a few lines later. There is no
-update in between to drop.
-
-/fuad
-
-
-/fuad
-
->
-> [ ... ]
-> > @@ -249,17 +255,13 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *=
-hyp_vcpu)
-> >       /* __hyp_running_vcpu must be NULL in a guest context. */
-> >       hyp_vcpu->vcpu.arch.ctxt.__hyp_running_vcpu =3D NULL;
+> > @@ -37,27 +40,103 @@ typedef void (*hyp_entry_exit_handler_fn)(struct p=
+kvm_hyp_vcpu *);
 > >
-> > -     hyp_vcpu->vcpu.arch.mdcr_el2    =3D host_vcpu->arch.mdcr_el2;
-> >       /*
-> > -      * HCR_EL2.VSE is host-owned (a pending virtual SError to inject)=
-, not a
-> > -      * trap-control bit, so it must flow to the hyp vCPU alongside TW=
-I/TWE
-> > -      * for the vSError to be delivered. sync_hyp_vcpu() reflects it b=
-ack.
-> > +      * A host-injected vSError is masked by the guest's own PSTATE.A,=
- so it
-> > +      * applies to protected guests too.
-> >        */
-> > -     hyp_vcpu->vcpu.arch.hcr_el2 &=3D ~(HCR_TWI | HCR_TWE | HCR_VSE);
-> > -     hyp_vcpu->vcpu.arch.hcr_el2 |=3D READ_ONCE(host_vcpu->arch.hcr_el=
-2) &
-> > -                                              (HCR_TWI | HCR_TWE | HCR=
-_VSE);
-> > -
-> > -     hyp_vcpu->vcpu.arch.vsesr_el2   =3D host_vcpu->arch.vsesr_el2;
-> > +     hyp_vcpu->vcpu.arch.hcr_el2 &=3D ~HCR_VSE;
-> > +     hyp_vcpu->vcpu.arch.hcr_el2 |=3D READ_ONCE(host_vcpu->arch.hcr_el=
-2) & HCR_VSE;
+> >  static void __maybe_unused handle_pvm_entry_hvc64(struct pkvm_hyp_vcpu=
+ *hyp_vcpu)
+> >  {
+> [ ... ]
+> > +                     prev =3D cmpxchg_relaxed(&target_vcpu->power_stat=
+e,
+> > +                                            PSCI_0_2_AFFINITY_LEVEL_ON=
+_PENDING,
+> > +                                            PSCI_0_2_AFFINITY_LEVEL_OF=
+F);
+> > +                     switch (prev) {
+> > +                     case PSCI_0_2_AFFINITY_LEVEL_ON_PENDING:
+> > +                             /*
+> > +                              * Leave reset_state.reset set: clearing =
+it
+> > +                              * races a concurrent CPU_ON's re-publish=
+ and
+> > +                              * wedges the target at ON_PENDING. The s=
+tale
+> > +                              * pc/r0/be are the guest's own.
+> > +                              */
+> > +                             ret =3D PSCI_RET_INTERNAL_FAILURE;
+> > +                             break;
 >
-> [Severity: Medium]
-> Because HCR_TWI and HCR_TWE were removed from this unconditional allowlis=
-t in
-> flush_hyp_vcpu(), are we under-including these required bits for protecte=
-d
-> guests on re-entry?
+> [Severity: High]
+> Does this rollback logic allow a malicious host to hijack guest execution=
+ flow
+> by exploiting a TOCTOU race?
+>
+> If guest vCPU A calls CPU_ON for target T with PC1, the hypervisor sets
+> power_state =3D ON_PENDING. If the host then rejects the call, this rollb=
+ack
+> logic resets power_state to OFF but intentionally leaves reset_state.rese=
+t =3D
+> true and pc =3D PC1.
+>
+> If guest vCPU B then calls CPU_ON for target T with PC2, pvm_psci_vcpu_on=
+()
+> sets power_state =3D ON_PENDING. Before the hypervisor writes PC2, a mali=
+cious
+> host could concurrently issue KVM_RUN for target T on another CPU.
+>
+> Because the stale reset flag is still true from the previous failure, tar=
+get T
+> will immediately boot using the stale PC1 instead of PC2, redirecting the
+> guest control flow.
+>
+> Should this rollback clear the reset state, or is there another way to pr=
+event
+> the host from forcing a boot with a stale PC?
+
+The stale pc/r0/be are from an earlier CPU_ON the guest itself issued,
+so the host can only pick between addresses the guest wrote. Clearing
+the flag races a concurrent CPU_ON's re-publish and wedges the target
+at ON_PENDING, which is why it stays set.
+
+/fuad
+
+
+/fuad
+
 >
 > [ ... ]
-> > @@ -329,6 +332,12 @@ static void handle___pkvm_vcpu_load(struct kvm_cpu=
-_context *host_ctxt)
-> >               /* Propagate WFx trapping flags */
-> >               hyp_vcpu->vcpu.arch.hcr_el2 &=3D ~(HCR_TWE | HCR_TWI);
-> >               hyp_vcpu->vcpu.arch.hcr_el2 |=3D hcr_el2 & (HCR_TWE | HCR=
-_TWI);
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/p=
+kvm.c
+> > --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> [ ... ]
+> > +int pkvm_reset_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
+> > +{
+> > +     struct vcpu_reset_state *reset_state =3D &hyp_vcpu->vcpu.arch.res=
+et_state;
+> > +     int prev;
+> > +
+> > +     /*
+> > +      * Pairs with smp_store_release(&reset_state->reset, true) in
+> > +      * pvm_psci_vcpu_on(). The acquire must precede the cmpxchg: reve=
+rsed, a
+> > +      * winning cmpxchg with a false acquire would leave power_state =
+=3D=3D ON
+> > +      * with the reset skipped.
+> > +      */
+> > +     if (!smp_load_acquire(&reset_state->reset))
+> > +             return -ECANCELED;
 >
-> [Severity: Medium]
-> While this code satisfies the WFx trapping configuration in
-> handle___pkvm_vcpu_load(), doesn't moving it exclusively to the per-load
-> path mean that any subsequent per-entry policy updates made by the host
-> will be silently dropped for protected VMs?
+> [Severity: High]
+> Can the host force pkvm_reset_vcpu() to succeed prematurely here?
+>
+> Since the rollback in handle_pvm_entry_hvc64() leaves reset_state.reset
+> set to true, if a new CPU_ON sets power_state to ON_PENDING, a host-contr=
+olled
+> KVM_RUN can enter this function and pass this smp_load_acquire() check be=
+fore
+> the new PC is actually written by pvm_psci_vcpu_on().
+>
+> [ ... ]
+> > +static bool pvm_psci_vcpu_on(struct pkvm_hyp_vcpu *hyp_vcpu)
+> > +{
+> [ ... ]
+> > +     /*
+> > +      * vCPUs race to power on the same target. Relaxed: reset_state
+> > +      * is published by the release on reset_state.reset below.
+> > +      */
+> > +     power_state =3D cmpxchg_relaxed(&target->power_state,
+> > +                                   PSCI_0_2_AFFINITY_LEVEL_OFF,
+> > +                                   PSCI_0_2_AFFINITY_LEVEL_ON_PENDING)=
+;
+>
+> [Severity: High]
+> Does setting power_state to ON_PENDING here open a TOCTOU window?
+>
+> If the target already has a stale reset_state.reset =3D=3D true from a pr=
+eviously
+> failed CPU_ON attempt, making the target ON_PENDING here allows the host =
+to
+> schedule the target and boot it before the new PC/r0/be states are update=
+d
+> below.
+>
+> > +     switch (power_state) {
+> [ ... ]
 >
 > --
 > Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260831163421.27=
-2420-1-fuad.tabba@linux.dev?part=3D5
+2420-1-fuad.tabba@linux.dev?part=3D9
