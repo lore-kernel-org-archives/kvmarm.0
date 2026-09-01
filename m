@@ -1,189 +1,221 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta0.migadu.com (out-140.mta0.migadu.com [91.218.175.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10C433859D7
-	for <kvmarm@lists.linux.dev>; Tue,  1 Sep 2026 17:49:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5B10490BEE
+	for <kvmarm@lists.linux.dev>; Tue,  1 Sep 2026 17:59:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.140
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788284983; cv=none; b=ZhfuMxCOQU+nNpGueeqvYFAI2kUFKqpRXesxps1qTupUE/kVvRr9mZh5Bhl4fCSBZxuLvb3IH5f6QNBIyOD/qCd2H8CXHKcDFIrTbZQcaWhCPPEVPiyijxh7kwf6OxKgNQhjL4b8IQb6e1IncEn07Fsire6YrchsPwvmJKJW0Ow=
+	t=1788285578; cv=none; b=mmpcdOMMkhZs8R/XNbdcXsyYi8K7GHJpH2qz/ABIkqUBB/NZcSSPaImOfs+gWm9VYUU5P+Nw2J5KnaDtcCFjgB4Y2od3MY7Mpq26OV5IFnF9si66cokNT+MB531mtigA3R2TBVT9nbs8Uy4vtTpdVmTZeuOTQG7DnIwpzkz+n1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788284983; c=relaxed/simple;
-	bh=uRRWdsj51B820Gczod5sWqyhLrhJ5vHljEkXypJTDP0=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=JYX9CAf3st/F+PstaxFq3hq1X2Fei3eWXujzGb3C2zNHtKbZs4uHC6Y8e9/Z3gCmaXw2PG12YzEYPzAcQjUaLnE4xb7+H11MAqoKNdac0nFpXczLRbJheN7qOGY7jYwhff2DfUbaa0eZkFdT119M+SvzwtZWQUiCga0XFVsAeSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z9THwPp7; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788285578; c=relaxed/simple;
+	bh=ghnI0dVMC0i09WYEQnlrUTKjsQ0zQIt9bBoCJHAIec4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZOqwLfUL+wHUox3LnVqa87V3XT1NL7aE8vuG24N7JNJrSnQCR5Ydg3rYYhhSbXmCCxD26DAFF4753v+Ii1tX20RJBjvY9066A9Qa3/YoNQQHHQHCDhKOzhkay/G+8EBVVQ75XdBPQIzU9U30UreBRmxUKup0PQUPjny+IDhVZ+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cH5KorLu; arc=none smtp.client-ip=91.218.175.140
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z9THwPp7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C56A1F000E9;
-	Tue,  1 Sep 2026 17:49:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788284981;
-	bh=B1aBo4wXYAeCeFOBAxYYyRjYs7NTs4VWntb21U8qHts=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=Z9THwPp7aE3Q7pLj9wAPDlOLjlYQC9V/dDXM4lcB9cvywfX2oJJ2gWylBbEZmREzg
-	 qO/8z7PrXqCUJlCUJRLAFv9GnLVcgvxHrrtJg34N4EiWuDyjGTG5gd4THY5apLKFX8
-	 ROGZW41P/iJKo7dsbz4gTzBVtS+dSdFr+DCMrP70HfqtIFhAFpJ9+LAh8vqcCu+P7C
-	 xso6jpWJMwUv3hRpoNb/2twXuI2ic0iovkfgFDDW8OwHTCpYBGwSOcFE9SThRDuOyb
-	 cJciyTqKEmmPKm6ppgxunEbTye8C/EDBrhAjBeDfmRSpJWG3RfXMT+KjWDBv8cONM/
-	 L5blA3MXbv11A==
-From: sashiko-bot@kernel.org
-Subject: Re: [RFC PATCH 5/5] KVM: arm64: Enable HAFDBS for guests not on
- migration
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Leonardo Bras" <leo.bras@arm.com>
-Cc: "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>
-In-Reply-To: <20260901171558.2674031-6-leo.bras@arm.com>
-References: <20260901171558.2674031-1-leo.bras@arm.com>
- <20260901171558.2674031-6-leo.bras@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 01 Sep 2026 17:49:41 +0000
-Message-Id: <20260901174941.7C56A1F000E9@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cH5KorLu"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=ghnI0dVMC0i09WYEQnlrUTKjsQ0zQIt9bBoCJHAIec4=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1788285573; v=1; x=1788890373;
+ b=cH5KorLuTa1bXLcyPJsy5jQYojkgmndZp65q5PIyz0tx6nJJr2t8jDOKSPUMRGhVkhVEOhfE
+ QcLD5SZVnznbzuWJWK8Si/5M2W9/XoykKmRuSe/kdH8dm1dBuvLieOgtQWj/llrX9nKz4BYZUC4
+ /fYT7yJIhq1xAMajXav9hBZY=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 9c2656a5b5262ebd;
+	Tue, 01 Sep 2026 17:59:23 +0000
+X-Mizu-Trace-ID: 9c2656a5b5262ebd
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5b2a8173142so539e87.1
+        for <kvmarm@lists.linux.dev>; Tue, 01 Sep 2026 10:59:22 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvByCPA7d71ydxzV/bVj+lyUDnmiSfWW6rShpfJ6e2m6DcGRAsfdp4WzvP0nR2OrgZ9tfq7u7Qhw=@lists.linux.dev
+X-Gm-Message-State: AFuF++nPswdc0+d94tWn7jPIXyShRI1di+q11mdZEBkRSRyRtsMscRQX
+	fjUHc2x7xswg6luNhgijlDsaILATiYnt+DygNMutcDxySDH7rTp9krGBim82gckXuHOmTdnIoqW
+	+pCdLEqWqnoV8hEj5rPUs9OZQWlD5jv3eNLd5dB5G
+X-Received: by 2002:a05:6512:3baa:b0:5ae:cf5f:4a88 with SMTP id
+ 2adb3069b0e04-5b606b981f9mr11520e87.8.1788285561687; Tue, 01 Sep 2026
+ 10:59:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+References: <20260901080941.997769-1-vdonnefort@google.com> <20260901080941.997769-16-vdonnefort@google.com>
+In-Reply-To: <20260901080941.997769-16-vdonnefort@google.com>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Tue, 1 Sep 2026 18:59:00 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTx=dtrHxQ0npOo3aoaL0OtyXC8xcUuny6fVJzuQ1MXhXg@mail.gmail.com>
+X-Gm-Features: AcwNN1WhPfiAtNZ-tbSiIqWiFtTbvqkjpgty2nafMUH-0LV6wNwKR0dVIOQ6iCE
+Message-ID: <CA+EHjTx=dtrHxQ0npOo3aoaL0OtyXC8xcUuny6fVJzuQ1MXhXg@mail.gmail.com>
+Subject: Re: [PATCH v5 15/18] KVM: arm64: Rename vCPU pkvm_memcache to stage2_mc
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, 
+	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com, 
+	qperret@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-Thank you for your contribution! Sashiko AI review found 4 potential issue(=
-s) to consider:
-- [Critical] Data race and TOCTOU on `kvm->arch.mmu.vtcr` between vCPU setu=
-p and memslot updates, breaking dirty logging.
-- [High] Missing context-wide TLB invalidation after modifying `VTCR_EL2.HD=
-` results in hardware bypassing write-protection.
-- [High] Disabling HAFDBS globally for dirty logging causes massive perform=
-ance degradation on non-logging memslots due to unnecessary permission faul=
-ts.
-- [Low] Unreachable `KVM_MR_DELETE` check inside `log_dirty_pages` block.
---
+On Tue, 1 Sept 2026 at 09:10, Vincent Donnefort <vdonnefort@google.com> wrote:
+>
+> With the introduction of the pKVM hyp allocator, the memcache for vCPUs
+> is now only used for carrying pages dedicated to the stage-2 page tables.
+> Rename pkvm_memcache to stage2_mc to reflect its purpose.
+>
+> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 
-commit 54d7950cd735bc1edc3a9503d03ebffb8e6ca046
-Author: Leonardo Bras <leo.bras@arm.com>
+Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
+Tested-by: Fuad Tabba < fuad.tabba@linux.dev>
 
-KVM: arm64: Enable HAFDBS for guests not on migration
+Cheers,
+/fuad
 
-This patch enables hardware management of access and dirty bits (HAFDBS)
-for KVM guests on arm64 when dirty logging is disabled. It modifies
-vCPU setup and memslot commit paths to dynamically toggle VTCR_EL2.HD
-based on the presence of dirty-logged memslots.
 
+>
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index fe5364b507f9..7aaa139ac89b 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -939,7 +939,7 @@ struct kvm_vcpu_arch {
+>         struct kvm_mmu_memory_cache mmu_page_cache;
+>
+>         /* Pages to top-up the pKVM/EL2 guest pool */
+> -       struct kvm_hyp_memcache pkvm_memcache;
+> +       struct kvm_hyp_memcache stage2_mc;
+>
+>         /* Virtual SError ESR to restore when HCR_EL2.VSE is set */
+>         u64 vsesr_el2;
 > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 1e528d53d0931..76aebaa95cdab 100644
+> index 09ae5431ce58..fa77abf8cff6 100644
 > --- a/arch/arm64/kvm/arm.c
 > +++ b/arch/arm64/kvm/arm.c
-
-[ ... ]
-
-> @@ -1683,6 +1683,13 @@ static int kvm_setup_vcpu(struct kvm_vcpu *vcpu)
->  	if (!ret && vcpu_has_nv(vcpu))
->  		ret =3D kvm_vcpu_init_nested(vcpu);
-> =20
-> +	/* Enable HAFDBS by default if VHE && !nested  */
-> +	if (kvm_supports_hafdbs(kvm) &&
-> +	    atomic_read(&kvm->nr_memslots_dirty_logging) =3D=3D 0)
-> +		kvm->arch.mmu.vtcr |=3D VTCR_EL2_HD;
-> +	else
-> +		kvm->arch.mmu.vtcr &=3D ~VTCR_EL2_HD;
-> +
-
-[Severity: Critical]
-Does this read-modify-write of kvm->arch.mmu.vtcr (holding config_lock)
-create a data race against kvm->slots_lock?
-
-In kvm_set_hafdbs() below, this same variable is modified while holding
-kvm->slots_lock. If userspace concurrently initializes vCPUs and enables
-dirty logging, VTCR_EL2_HD could be incorrectly left at 1. This would cause
-the hardware to silently update dirty bits without trapping, bypassing
-software dirty logging and resulting in lost dirty pages during migration.
-
->  	return ret;
+> @@ -591,7 +591,7 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+>         if (!is_protected_kvm_enabled())
+>                 kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_cache);
+>         else
+> -               free_hyp_memcache(&vcpu->arch.pkvm_memcache);
+> +               free_hyp_memcache(&vcpu->arch.stage2_mc);
+>         kvm_timer_vcpu_terminate(vcpu);
+>         kvm_pmu_vcpu_destroy(vcpu);
+>         kvm_vgic_vcpu_destroy(vcpu);
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> index bc54f477c147..fc3a624b0c4c 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> @@ -407,9 +407,9 @@ static int pkvm_refill_memcache(struct pkvm_hyp_vcpu *hyp_vcpu)
+>  {
+>         struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
+>
+> -       return refill_memcache(&hyp_vcpu->vcpu.arch.pkvm_memcache,
+> -                              host_vcpu->arch.pkvm_memcache.nr_pages,
+> -                              &host_vcpu->arch.pkvm_memcache);
+> +       return refill_memcache(&hyp_vcpu->vcpu.arch.stage2_mc,
+> +                              host_vcpu->arch.stage2_mc.nr_pages,
+> +                              &host_vcpu->arch.stage2_mc);
 >  }
-
-[ ... ]
-
+>
+>  static void handle___pkvm_host_donate_guest(struct kvm_cpu_context *host_ctxt)
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> index 39aa8911f62c..dadd48431036 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> @@ -1023,7 +1023,7 @@ int __pkvm_guest_share_host(struct pkvm_hyp_vcpu *vcpu, u64 gfn)
+>         ret = 0;
+>         WARN_ON(kvm_pgtable_stage2_map(&vm->pgt, ipa, PAGE_SIZE, phys,
+>                                        pkvm_mkstate(KVM_PGTABLE_PROT_RWX, PKVM_PAGE_SHARED_OWNED),
+> -                                      &vcpu->vcpu.arch.pkvm_memcache, 0));
+> +                                      &vcpu->vcpu.arch.stage2_mc, 0));
+>         WARN_ON(__host_set_page_state_range(phys, PAGE_SIZE, PKVM_PAGE_SHARED_BORROWED));
+>  unlock:
+>         guest_unlock_component(vm);
+> @@ -1058,7 +1058,7 @@ int __pkvm_guest_unshare_host(struct pkvm_hyp_vcpu *vcpu, u64 gfn)
+>                                                       PKVM_ID_GUEST, meta));
+>         WARN_ON(kvm_pgtable_stage2_map(&vm->pgt, ipa, PAGE_SIZE, phys,
+>                                        pkvm_mkstate(KVM_PGTABLE_PROT_RWX, PKVM_PAGE_OWNED),
+> -                                      &vcpu->vcpu.arch.pkvm_memcache, 0));
+> +                                      &vcpu->vcpu.arch.stage2_mc, 0));
+>  unlock:
+>         guest_unlock_component(vm);
+>         host_unlock_component();
+> @@ -1422,7 +1422,7 @@ static int __guest_check_pgtable_memcache(struct pkvm_hyp_vcpu *vcpu)
+>  {
+>         struct pkvm_hyp_vm *vm = pkvm_hyp_vcpu_to_hyp_vm(vcpu);
+>
+> -       if (vcpu->vcpu.arch.pkvm_memcache.nr_pages < kvm_mmu_cache_min_pages(vm->pgt.mmu))
+> +       if (vcpu->vcpu.arch.stage2_mc.nr_pages < kvm_mmu_cache_min_pages(vm->pgt.mmu))
+>                 return -ENOMEM;
+>
+>         return 0;
+> @@ -1456,7 +1456,7 @@ int __pkvm_host_donate_guest(u64 pfn, u64 gfn, struct pkvm_hyp_vcpu *vcpu)
+>                                                       PKVM_ID_GUEST, meta));
+>         WARN_ON(kvm_pgtable_stage2_map(&vm->pgt, ipa, PAGE_SIZE, phys,
+>                                        pkvm_mkstate(KVM_PGTABLE_PROT_RWX, PKVM_PAGE_OWNED),
+> -                                      &vcpu->vcpu.arch.pkvm_memcache, 0));
+> +                                      &vcpu->vcpu.arch.stage2_mc, 0));
+>
+>  unlock:
+>         guest_unlock_component(vm);
+> @@ -1527,7 +1527,7 @@ int __pkvm_host_share_guest(u64 pfn, u64 gfn, u64 nr_pages, struct pkvm_hyp_vcpu
+>
+>         WARN_ON(kvm_pgtable_stage2_map(&vm->pgt, ipa, size, phys,
+>                                        pkvm_mkstate(prot, PKVM_PAGE_SHARED_BORROWED),
+> -                                      &vcpu->vcpu.arch.pkvm_memcache, 0));
+> +                                      &vcpu->vcpu.arch.stage2_mc, 0));
+>
+>  unlock:
+>         guest_unlock_component(vm);
+> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> index ee2060aa1131..8a8b694ca00f 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> @@ -760,7 +760,7 @@ struct pkvm_hyp_vcpu *init_selftest_vm(void *virt)
+>                         continue;
+>                 p[i].refcount = 1;
+>                 if (seeded < min_pages) {
+> -                       push_hyp_memcache(&selftest_vcpu.vcpu.arch.pkvm_memcache,
+> +                       push_hyp_memcache(&selftest_vcpu.vcpu.arch.stage2_mc,
+>                                           hyp_page_to_virt(&p[i]), hyp_virt_to_phys);
+>                         seeded++;
+>                 } else {
+> @@ -1002,7 +1002,7 @@ int __pkvm_finalize_teardown_vm(pkvm_handle_t handle)
+>                 if (!hyp_vcpu)
+>                         continue;
+>
+> -               vcpu_mc = &hyp_vcpu->vcpu.arch.pkvm_memcache;
+> +               vcpu_mc = &hyp_vcpu->vcpu.arch.stage2_mc;
+>
+>                 while (vcpu_mc->nr_pages) {
+>                         void *addr = pop_hyp_memcache(vcpu_mc, hyp_phys_to_virt);
 > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 9d4f70430bbea..94094ab56d90f 100644
+> index 3163502cc7d2..afde0894ab15 100644
 > --- a/arch/arm64/kvm/mmu.c
 > +++ b/arch/arm64/kvm/mmu.c
-> @@ -1989,7 +1989,8 @@ static int kvm_s2_fault_compute_prot(const struct k=
-vm_s2_fault_desc *s2fd,
->  	if (s2vi->map_writable) {
->  		*prot |=3D KVM_PGTABLE_PROT_W;
-> =20
-> -		if (s2vi->device || !memslot_is_logging(s2fd->memslot) ||
-> +		if (s2vi->device ||
-> +		    !(memslot_is_logging(s2fd->memslot) || kvm_supports_hafdbs(kvm)) ||
->  		    kvm_is_write_fault(s2fd->vcpu))
->  			*prot |=3D KVM_PGTABLE_PROT_DIRTY;
-
-[Severity: High]
-Can checking the static capability kvm_supports_hafdbs() here instead of
-the dynamic vtcr state starve non-logging slots of the software fallback?
-
-When dirty logging is enabled on one memslot, kvm_set_hafdbs() disables
-VTCR_EL2.HD globally. However, if a guest writes to an unrelated
-non-logging slot that was mapped writable-clean, won't the hardware now
-generate a stage-2 permission fault?
-
-This could cause performance degradation across the entire VM whenever any
-single memslot (like a VGA framebuffer) enables dirty logging.
-
-[ ... ]
-
-> @@ -2577,6 +2578,20 @@ int __init kvm_mmu_init(u32 hyp_va_bits)
->  	return err;
+> @@ -1553,7 +1553,7 @@ static void *get_mmu_memcache(struct kvm_vcpu *vcpu)
+>         if (!is_protected_kvm_enabled())
+>                 return &vcpu->arch.mmu_page_cache;
+>         else
+> -               return &vcpu->arch.pkvm_memcache;
+> +               return &vcpu->arch.stage2_mc;
 >  }
-> =20
-> +static void kvm_set_hafdbs(struct kvm *kvm, bool set)
-> +{
-> +	/* Check if no action required */
-> +	if (!!(kvm->arch.mmu.vtcr & VTCR_EL2_HD) =3D=3D set)
-> +		return;
-> +
-> +	if (set)
-> +		kvm->arch.mmu.vtcr |=3D VTCR_EL2_HD;
-> +	else
-> +		kvm->arch.mmu.vtcr &=3D ~VTCR_EL2_HD;
-
-[Severity: Critical]
-Does modifying kvm->arch.mmu.vtcr here under kvm->slots_lock race against
-the unprotected updates in kvm_setup_vcpu() as noted above?
-
-> +
-> +	kvm_make_all_cpus_request(kvm, KVM_REQ_RELOAD_STAGE2);
-
-[Severity: High]
-Is KVM_REQ_RELOAD_STAGE2 sufficient here to ensure the hardware observes
-the changed VTCR_EL2 state?
-
-The ARM architecture permits translation regime registers like VTCR_EL2 to
-be cached in the TLB (or a context cache). Modifying this register
-typically requires a full VMID TLB invalidation (like calling
-kvm_flush_remote_tlbs(kvm)) to guarantee global visibility.=20
-
-Without it, the CPU might continue using cached translations with HD=3D1 in
-the write-protected memslot, silently bypassing write-protection.
-
-> +}
-> +
->  void kvm_arch_commit_memory_region(struct kvm *kvm,
->  				   struct kvm_memory_slot *old,
->  				   const struct kvm_memory_slot *new,
-> @@ -2594,6 +2609,10 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
->  		if (change =3D=3D KVM_MR_DELETE)
->  			return;
-
-[Severity: Low]
-Is this KVM_MR_DELETE condition reachable?
-
-The log_dirty_pages variable checked just before this is initialized as
-'new && new->flags & KVM_MEM_LOG_DIRTY_PAGES'. During a KVM_MR_DELETE
-change, the 'new' parameter passed into kvm_arch_commit_memory_region() is
-strictly NULL. Therefore, log_dirty_pages will always be false for
-deletes, making this nested check dead code.
-
-[ ... ]
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260901171558.2674=
-031-1-leo.bras@arm.com?part=3D5
+>
+>  static int topup_mmu_memcache(struct kvm_vcpu *vcpu, void *memcache)
+> diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+> index 36e677e51f7d..83e18c0e30b5 100644
+> --- a/arch/arm64/kvm/pkvm.c
+> +++ b/arch/arm64/kvm/pkvm.c
+> @@ -182,7 +182,7 @@ static int __pkvm_create_hyp_vcpu(struct kvm_vcpu *vcpu)
+>         pkvm_handle_t handle = vcpu->kvm->arch.pkvm.handle;
+>         int ret;
+>
+> -       init_hyp_stage2_memcache(&vcpu->arch.pkvm_memcache);
+> +       init_hyp_stage2_memcache(&vcpu->arch.stage2_mc);
+>
+>         ret = pkvm_call_hyp_req(__pkvm_init_vcpu, handle, vcpu);
+>         if (!ret)
+> --
+> 2.55.0.897.gb25b4bd76c-goog
+>
