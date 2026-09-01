@@ -1,44 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3B0C2D1913
-	for <kvmarm@lists.linux.dev>; Tue,  1 Sep 2026 22:05:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E744B2D1913
+	for <kvmarm@lists.linux.dev>; Tue,  1 Sep 2026 22:06:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788300352; cv=none; b=pARFATC9gYJABL4R566nvUdAMz1hpl+SXD4RSgfqoPkC9B7n8gim15S9sf7CXKf5A0oo8jSPO08pWCq4DIXwzr2LRp6R5WfeJGS0rIgWv7t8AE1w0LA8QNm0l0r0WbIPcaCTOSY5Ta4bc3AwyuF7M8e/LusCCe7emxt5s0Qvw4g=
+	t=1788300373; cv=none; b=FOvhTmxlFMixBzFtd175T82IDJussfoywaWxt2Lbj2wpptxkm8+/oSfFjcaZHXHoUqjoxCy1MEUCTwYuHIE6F6+2VeJCvmKU6TF7JcCFSozOvKMN/wqmagl332mOjB/Ze+Xs/POaZGXqk03V+MY5kof4XZu3v8bf8JrFfgXc2aA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788300352; c=relaxed/simple;
-	bh=T2AHPpX9Y3bS3BGUbDfxx49n+0ga/6iOsNBoacA9hBM=;
+	s=arc-20240116; t=1788300373; c=relaxed/simple;
+	bh=roMBVC4YENB9O5kEzF9ORaY0D47d9um3Q2QQmGjwoD4=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=RAsT1LP1tavzbXV89WP86M9ou+ykeKyVVnzJqX99DwiMxsStl4YxYEqo75ptR4Tsk6fQStAhPIAHW9HQDe/wdqB9Jkg1wgx0rHxS+YojZDvcCnkjZDTWQdQN5GUtY0/tpmKQsCBw2plpT5GibsW5fwebaE4F/+u7CaDpKQSJP7g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VqUFtZ6X; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=Z1e6egBnzRBxP0sUGUAruoqQAYYpdcgQixVLTD99lxqqkCL54GQOVY/KRQOcucGPKR4Azpb/auo1fgH7T5U+D49gYcswdEcLBRtXZ3zMxmWzUoWex1pBf0pD1wy7YdFIm/ZXgCDiMlu9e934prTaEF0IkZPEv8FShYkMcMZ0Fp0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eGSCBeqF; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VqUFtZ6X"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 710711F000E9;
-	Tue,  1 Sep 2026 22:05:50 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eGSCBeqF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 372C91F000E9;
+	Tue,  1 Sep 2026 22:06:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788300350;
-	bh=RzSTzF2CBMA1G6qfdKmK0n1GokT6Tvh9q7SL+VuckW8=;
+	s=k20260515; t=1788300371;
+	bh=m8Z4jh6yhFJdrULaK6SWOWjfud1YThIq70D8lGSPNU4=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=VqUFtZ6X/QePTySmtxoMW24JyfwGZMax1iIbmjn2jpoIHm6efz8O+xw592O96xdLR
-	 67G+oMvymW1n0rJXAv37zO+J9l6Hibi6+HZTutiqe2p4zuXDsFafzUtA4PSeTRWFuP
-	 DK5lNplHmsf4uFZULTVUBLkd3EOg5uv90bIXPwyrqLDcpCMaGTXcnGh/P6n9+eppDX
-	 dQslL/O1JCFmiStxs9/StHO4qHPtXMQHU1Ju5jHsoiAVI8+dN66qTIoqE40MPkgkP6
-	 hoYlMTk6oHL/evawC7wCSAka+ghFR+tg6Kez07jn094pgr1ceCs3L5pcWeF07qOHVj
-	 AXDzSZ29+oQkA==
+	b=eGSCBeqFyfjg8sORAoPrmCtD3+GXam7Z5djwI6LS2ljXx/31qZvjp5yQvrAtqh9rF
+	 HbImRNj9AKAA3G1AHy2cvAHESGiNrpeT3Yi2MCp1BLtSmLy35YjhPTPTcNosS+mDsF
+	 f3NqFJzTshWFoNo5dDjqa637xmXuPZT/FoTNqqnfIt4NlSe89dByDo8u+8yyFG1QwK
+	 6xhCg0sV7a1QdbcjXJyL4L/WE0FLC/udBaUdBnnpA24GXNeUt5ZwemjoJE0fT3mz1d
+	 f0nxbF6Ns4NG3nctKY/v9fqlB3fC69ef00w1IOMH+viSWgy/0nrjfq3gdaAPFqPLPQ
+	 KwCp1KFrzgpig==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v20 10/14] KVM: selftests: arm64: Add GCS registers to
- get-reg-list
+Subject: Re: [PATCH v20 04/14] KVM: arm64: Ensure GCS memory effects are
+ visible
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Mark Brown" <broonie@kernel.org>
 Cc: kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>
-In-Reply-To: <20260901-arm64-gcs-v20-10-f31750bdfadb@kernel.org>
+In-Reply-To: <20260901-arm64-gcs-v20-4-f31750bdfadb@kernel.org>
 References: <20260901-arm64-gcs-v20-0-f31750bdfadb@kernel.org>
- <20260901-arm64-gcs-v20-10-f31750bdfadb@kernel.org>
+ <20260901-arm64-gcs-v20-4-f31750bdfadb@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 01 Sep 2026 22:05:49 +0000
-Message-Id: <20260901220550.710711F000E9@smtp.kernel.org>
+Date: Tue, 01 Sep 2026 22:06:10 +0000
+Message-Id: <20260901220611.372C91F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,52 +47,98 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [Low] System registers `GCSPR_EL2` and `GCSCR_EL2` are added out of numer=
-ical encoding order in the `el2_regs[]` array.
+- [High] Missing explicit GCS barriers on the vCPU load/entry paths, failin=
+g to order host acquires against incoming guest GCS memory effects.
 --
 
-commit 48688012983b04c5d07d60f4b5cbfb8bcddc0c42
+commit 171e0d39ad041f789da5126a2b828fc123587e80
 Author: Mark Brown <broonie@kernel.org>
 
-KVM: selftests: arm64: Add GCS registers to get-reg-list
+KVM: arm64: Ensure GCS memory effects are visible
 
-The commit adds the newly introduced GCS registers (GCSCR_ELx, GCSCRE0_EL1,
-and GCSPR_ELx) to the lists validated by the get-reg-list selftest.
+This patch adds explicit GCS barriers to vCPU context switch operations.
+Since the hypervisor and host kernel do not use GCS themselves, they cannot
+rely on implicit barriers and must manually insert them to ensure GCS memory
+effects are visible.
 
-> diff --git a/tools/testing/selftests/kvm/arm64/get-reg-list.c b/tools/tes=
-ting/selftests/kvm/arm64/get-reg-list.c
-> index 533994687b5d8..5c1469153b6cf 100644
-> --- a/tools/testing/selftests/kvm/arm64/get-reg-list.c
-> +++ b/tools/testing/selftests/kvm/arm64/get-reg-list.c
+>     In order to allow efficient implementation of GCS implementations are
+>     permitted to do GCS specific caching, with barriers implicit in stack
+>     switch operations and GCSB DSYNC as an explicit barrier.  Since we do
+>     not use GCS in the hypervisor or host kernel the hypervisor cannot re=
+ly
+>     on any barriers being present in vCPU context switches other than tho=
+se
+>     it explicitly inserts.  Add explicit barriers when loading and saving
+>     vCPU state.
+
+[Severity: High]
+The commit message states that explicit barriers are added when "loading and
+saving vCPU state", but the barriers appear to be missing from the load pat=
+hs.
+
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 8b080804bc90b..52f53f682e6af 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -755,6 +755,13 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+>  			vcpu_set_flag(vcpu, PKVM_HOST_STATE_DIRTY);
+>  	}
+> =20
+> +	/*
+> +	 * Ensure any GCS memory effects from the outgoing vCPU are
+> +	 * visible elsewhere.
+> +	 */
+> +	if (kvm_has_gcs(vcpu->kvm))
+> +		gcsb_dsync();
+> +
+
+[Severity: High]
+While gcsb_dsync() is added here in the saving/outgoing path
+(kvm_arch_vcpu_put), does the corresponding loading/incoming path in
+kvm_arch_vcpu_load() also require this barrier?
+
+Without an incoming barrier on the load/entry paths, could a guest's
+subsequent GCS memory stores be speculatively reordered before the host's l=
+ock
+acquisitions are complete?
+
+Could this regression potentially violate memory ordering guarantees if ano=
+ther
+CPU observes the guest's execution before the host's context switch locks a=
+re
+fully resolved?
 
 [ ... ]
 
-> @@ -740,6 +750,8 @@ static __u64 el2_regs[] =3D {
->  	SYS_REG(VTTBR_EL2),
->  	SYS_REG(VTCR_EL2),
->  	SYS_REG(VNCR_EL2),
-> +	SYS_REG(GCSPR_EL2),
-> +	SYS_REG(GCSCR_EL2),
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe=
+/hyp-main.c
+> index 9a3b92e626adb..534db037c5f69 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> @@ -261,6 +261,13 @@ static void sync_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_=
+vcpu)
+>  	fpsimd_sve_sync(&hyp_vcpu->vcpu);
+>  	sync_debug_state(hyp_vcpu);
+> =20
+> +	/*
+> +	 * Ensure any GCS memory effects from the outgoing vCPU are
+> +	 * visible elsewhere even if the host skips syncing.
+> +	 */
+> +	if (kvm_has_gcs(hyp_vcpu->vcpu.kvm))
+> +		gcsb_dsync();
+> +
 
-[Severity: Low]
-Are these registers added out of their standard encoding order in the
-el2_regs array?
+[Severity: High]
+Similarly, a barrier is added here to sync_hyp_vcpu(), but the entry seam
+flush_hyp_vcpu() does not receive one. Should flush_hyp_vcpu() also include
+an incoming barrier to ensure prior lock acquires are properly ordered agai=
+nst
+the incoming thread's GCS effects?
 
-Based on the encoding layout, GCSPR_EL2 has op2=3D1 while GCSCR_EL2 has op2=
-=3D0,
-which means GCSCR_EL2 should be sorted before GCSPR_EL2.
-
-Adding system registers out of their numerical encoding order (op0, op1, cr=
-n,
-crm, op2) breaks the implicit sorting invariant of the blessed lists in
-get-reg-list.c. When developers regenerate this array using the --list
-parameter, the registers will be printed in the correct encoding order,
-causing unnecessary diff churn.
-
->  	SYS_REG(HDFGRTR2_EL2),
->  	SYS_REG(HDFGWTR2_EL2),
->  	SYS_REG(HFGRTR2_EL2),
+>  	if (pkvm_hyp_vcpu_is_protected(hyp_vcpu)) {
+>  		host_vcpu->arch.ctxt =3D hyp_vcpu->vcpu.arch.ctxt;
+>  	} else {
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260901-arm64-gcs-=
-v20-0-f31750bdfadb@kernel.org?part=3D10
+v20-0-f31750bdfadb@kernel.org?part=3D4
