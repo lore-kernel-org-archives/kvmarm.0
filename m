@@ -1,44 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C94339A4A4
-	for <kvmarm@lists.linux.dev>; Tue,  1 Sep 2026 22:09:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9A744749F6
+	for <kvmarm@lists.linux.dev>; Tue,  1 Sep 2026 22:15:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788300555; cv=none; b=eSpo0nETV8ZD2Tw3BOB7cVnSzkehoo5D9m2YpmbAkzZf4OMNk4EjnWiEP3K6G5YyfbqC2m/U7CcROQ6X/L6Th6xV/m5YZvlizMOFLJWxECIWYWxZ4Xl8gKLr2AfwAqnAXZN42N3DQtablVm30mke4s+cu6YNO/Pqn/mRJpzI03Y=
+	t=1788300924; cv=none; b=N0fPKz/uVeb2+PWRpgx3ExNTI2pfiU0fhvWrh6iY/o6kGisw2hRF66Im5fpI5Qe4aNT7sqOUJWnCF0lDvBSoRLAs0QDIsRBJhjkmNxjUyDlDuWt4VYzZgFh4MdG4hvt6yj+TjiFD1IUHO5fOEvpce3CgugewX+oIYMvnFIjOb70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788300555; c=relaxed/simple;
-	bh=0QKzP8NomqWOLJG+JkOrMzFuvv3+v/sdRh+MowI1JLM=;
+	s=arc-20240116; t=1788300924; c=relaxed/simple;
+	bh=+1rCC8keAP0tDgWbSKCTqUAjxE9nhc7YwE6Mns157Pw=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=uNUyRFEKKpNf9CDSrsqCVoAWPpJ39CjcqnqTE9VWkSkdfDDekcmsfaowtOA/r8VciOLLL0OlbXcujciXnJK2CUMaODMv21JgUZQFGcUu3Yvhj1VlOIzW9bXXifuQe9qH4RrBhVkRJ8DEd+UYOWfLoT8DVs/3KeQWPzjBeTaCRzA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RI3GX2Kj; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=eug73SKrtQKnJtSoHw0TvOTld338ZqMo9BzZ/P/jFeufrBqRdQfwfHMKwRtl+zrBvMtrg6Zrz9JxunapbhiEaf3mAYEMfB5DSKMKu2WkmSwbDe93ExwtJc/T1eLha0IcOEFz/dAZna21vLnsLKvvQA6zAqmoXH+bLpmnNKDZCu0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iJN7bPNz; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RI3GX2Kj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9BC11F000E9;
-	Tue,  1 Sep 2026 22:09:13 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iJN7bPNz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0CB01F000E9;
+	Tue,  1 Sep 2026 22:15:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788300553;
-	bh=6aZ/WFfOg99SDa3sOC0xtwbyslQbYfh0AZcmTqeAxdY=;
+	s=k20260515; t=1788300920;
+	bh=TugCivAW0NtDgf/qiyKsIHtC7GEfau1Il0VzOdX5S/k=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=RI3GX2KjjvWSIHkdW6kf3rKJxvJkrFkG4DzMKdnxcQoi49tmRJKprbmUZV4Bu3JPo
-	 0Ih6vhxK8D8cfzIKYVOlJPK2rHdCmD/vOeClFkIbLmZEAp2dN2v3obw3UNsnPIYZ1D
-	 5FWjVaUvHgg2YP6uYbWfaWMpkDv5hxUYss10Z+WYNAa565/HpEdU1CFMK0xAIxTjRj
-	 YC0SHLYtvHHAPCj2BZXFGb7zIX0UiHp+/meKGOI14E1DdYRBUwdCSgMmV4KA0jJTOQ
-	 s7T0ox7ERG5APmkr22pZXz7yJBu8868M4b8ZtMb47AL64sxLU/W7VnLrUE3LiPParc
-	 wAd3C8sh3gPRg==
+	b=iJN7bPNzfM8bcYA1ocPVsv2/QkPOA/cKaWebomlG15yZM/cWniZVVI0ifv7eeOJSR
+	 kHXWvCpR84dyt8R/eQa9RLqgrdI/+rWN55zuLD43mopJH+19NMvRcgvWuPUXEeqxHK
+	 teU5GKa4boiCgoOg5kW5RCgiVPNB8/kD/hTG/gglOlDPWc7/KkENL86zZc4zasBWha
+	 xic9CQF/gBubCn5zzoK9FPcx9KwKo0oyfMvqzJDeSQi6nTPnDiIUPhk5Zphnq6Fb2Q
+	 4IcSeRvx+vLrnBeHZPEn8SyJjvebiPXlGS1P3gJXFJ93NITPBERX3vHQNAv78/VZKW
+	 x6aQ6UD5Xd4hg==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v20 07/14] KVM: arm64: Forward GCS exceptions to nested
- guests
+Subject: Re: [PATCH v20 08/14] KVM: arm64: Enforce EXLOCK for SPSR and ELR
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Mark Brown" <broonie@kernel.org>
-Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev
-In-Reply-To: <20260901-arm64-gcs-v20-7-f31750bdfadb@kernel.org>
+Cc: "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>
+In-Reply-To: <20260901-arm64-gcs-v20-8-f31750bdfadb@kernel.org>
 References: <20260901-arm64-gcs-v20-0-f31750bdfadb@kernel.org>
- <20260901-arm64-gcs-v20-7-f31750bdfadb@kernel.org>
+ <20260901-arm64-gcs-v20-8-f31750bdfadb@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 01 Sep 2026 22:09:13 +0000
-Message-Id: <20260901220913.B9BC11F000E9@smtp.kernel.org>
+Date: Tue, 01 Sep 2026 22:15:20 +0000
+Message-Id: <20260901221520.B0CB01F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,60 +46,125 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [Medium] Incorrect context check for forwarding GCS exceptions to a neste=
-d hypervisor.
+- [High] KVM incorrectly injects spurious EXLOCK exceptions for ELR_EL1 and=
+ SPSR_EL1 writes when executed from guest EL2.
 --
 
-commit 2265e268ea1606e4aa21cb8062727c3b949089d6
+commit 9a420a46393dc947b55c66f63966668a4f79d12b
 Author: Mark Brown <broonie@kernel.org>
 
-KVM: arm64: Forward GCS exceptions to nested guests
+KVM: arm64: Enforce EXLOCK for SPSR and ELR
 
-For nested guests where HFGITR_EL2.nGCSSTR_EL1 is clear or when there are
-L2 GCS data check exceptions we need to forward the exception to the guest.
-Add handling to do so.
-
-> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-> index db37678dcb05c..a8198e96fcb41 100644
-> --- a/arch/arm64/kvm/handle_exit.c
-> +++ b/arch/arm64/kvm/handle_exit.c
+This commit adds enforcement of the EXLOCK rules for attempts to write to
+SPSR_ELx and ELR_ELx from a guest. It injects an EXLOCK exception if both
+GCSCR_ELx.EXLOCKEN and PSTATE.EXLOCK are set.
 
 [ ... ]
 
-> +static int kvm_handle_gcs(struct kvm_vcpu *vcpu)
->  {
-> -	/* We don't expect GCS, so treat it with contempt */
-> -	if (kvm_has_feat(vcpu->kvm, ID_AA64PFR1_EL1, GCS, IMP))
-> -		WARN_ON_ONCE(1);
-> +	if (!kvm_has_gcs(vcpu->kvm)) {
-> +		kvm_inject_undefined(vcpu);
-> +		return 1;
-> +	}
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index c5ce18b3f7d8d..1f80c26a98393 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -2866,14 +2866,42 @@ static bool access_sp_el1(struct kvm_vcpu *vcpu,
+>  	return true;
+>  }
 > =20
-> +	if (vcpu_has_nv(vcpu)) {
-> +		kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
-> +		return 1;
-> +	}
+> +static inline bool sysregs_exlocked(struct kvm_vcpu *vcpu)
+> +{
+> +	u64 gcscr;
+> +
+> +	if (!kvm_has_gcs(vcpu->kvm))
+> +		return false;
+> +
+> +	if (!(vcpu->arch.ctxt.regs.pstate & PSR_EXLOCK_BIT))
+> +		return false;
+> +
+> +	/*
+> +	 * Note that the EXLOCKEN for the running EL is checked
+> +	 * regardless of the register written to.
+> +	 */
+> +	if (is_hyp_ctxt(vcpu))
+> +		gcscr =3D vcpu_read_sys_reg(vcpu, GCSCR_EL2);
+> +	else
+> +		gcscr =3D vcpu_read_sys_reg(vcpu, GCSCR_EL1);
 
-[Severity: Medium]
-Is it correct to only check vcpu_has_nv() here without verifying if the vCPU
-is currently executing in a nested context?
+[Severity: High]
+Does this logic correctly follow the architectural requirements for EXLOCK
+exceptions?
 
-If a hardware or hypervisor bug causes a GCS exception to trap to the host
-while running L1's EL2, vcpu_has_nv() will be true, but it shouldn't be
-forwarded to the guest. Instead of falling back to the WARN_ON_ONCE() and
-undefined exception injection at the end of kvm_handle_gcs(), this would
-silently emulate an exception to L1's EL2, potentially corrupting its state.
+According to the ARM Architecture Reference Manual, the pseudocode for
+AArch64.CheckEXLOCK(target_el) restricts EXLOCK exception generation to cas=
+es
+where PSTATE.EL =3D=3D target_el.
 
-Should this condition also check is_nested_ctxt(vcpu) to ensure we are
-actually running a nested guest before forwarding the exception?
+When a guest running at vEL2 accesses ELR_EL1 or SPSR_EL1, the target_el is=
+ 1,
+but the PSTATE.EL is 2. Since 2 !=3D 1, the hardware would not generate an
+exception here. However, by checking the running EL's EXLOCKEN (GCSCR_EL2)
+and ignoring the target EL of the register written to, KVM will inject a
+spurious EXLOCK exception into the nested EL2 guest.
+
+Can we update this to skip the check when target_el !=3D PSTATE.EL to preve=
+nt
+spurious exceptions during guest context switching?
 
 > +
-> +	WARN_ON_ONCE(1);
->  	kvm_inject_undefined(vcpu);
->  	return 1;
+> +	return gcscr & GCSCR_ELx_EXLOCKEN;
+> +}
+> +
+>  static bool access_elr(struct kvm_vcpu *vcpu,
+>  		       struct sys_reg_params *p,
+>  		       const struct sys_reg_desc *r)
+>  {
+> -	if (p->is_write)
+> +	if (p->is_write) {
+> +		if (sysregs_exlocked(vcpu)) {
+> +			kvm_inject_exlock(vcpu);
+> +			return false;
+> +		}
+> +
+
+[Severity: High]
+Can this cause spurious exceptions for vEL2 guests?
+
+When a guest hypervisor writes to ELR_EL1 (which is architecturally valid a=
+nd
+necessary for nested virtualization), this check applies the flawed EXLOCK
+logic from sysregs_exlocked() and triggers an incorrect exception injection.
+
+>  		vcpu_write_sys_reg(vcpu, p->regval, ELR_EL1);
+> -	else
+> +	} else {
+>  		p->regval =3D vcpu_read_sys_reg(vcpu, ELR_EL1);
+> +	}
+> =20
+>  	return true;
+>  }
+> @@ -2882,10 +2910,16 @@ static bool access_spsr(struct kvm_vcpu *vcpu,
+>  			struct sys_reg_params *p,
+>  			const struct sys_reg_desc *r)
+>  {
+> -	if (p->is_write)
+> +	if (p->is_write) {
+> +		if (sysregs_exlocked(vcpu)) {
+> +			kvm_inject_exlock(vcpu);
+> +			return false;
+> +		}
+> +
+
+[Severity: High]
+Similarly, can this lead to an incorrect exception injection when a guest
+hypervisor accesses SPSR_EL1 from vEL2?
+
+>  		__vcpu_assign_sys_reg(vcpu, SPSR_EL1, p->regval);
+> -	else
+> +	} else {
+>  		p->regval =3D __vcpu_sys_reg(vcpu, SPSR_EL1);
+> +	}
+> =20
+>  	return true;
 >  }
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260901-arm64-gcs-=
-v20-0-f31750bdfadb@kernel.org?part=3D7
+v20-0-f31750bdfadb@kernel.org?part=3D8
