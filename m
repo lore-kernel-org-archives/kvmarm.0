@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EBB1263F4A;
-	Tue,  1 Sep 2026 21:51:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7B2036CDE8;
+	Tue,  1 Sep 2026 21:51:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788299468; cv=none; b=Tp+4oJN3mMPDJMzOqXLLoDjtkRwxuIQVxl2Xs350MQu2o7GRPaLJKN1SDMEBLmKIFSRAjw7GRf+pPCEhkEovYJht4cWTEqCmlRas+E3aWWtJJ4W8pSGO4ponqyHUztHskEmYu1lQPFzaVNzVJdHUhkjI7P4XJbcU7If1HBsDuQo=
+	t=1788299471; cv=none; b=XR6y2Jkn+/7ZhG5qweGmxOl4rwWX2FTrZ4EpWeHCMjEXeh9X/9zv5swoN4VF+fVO8guYlwh+sgbKUFTEfylUQVDHOcElw/wNcCCDW0V43FDV9yc47QVc6RtLv5B5u3jXZb/+t6GSOeZCkUw1BPue0qoiLOY03QnhsItpserZNYs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788299468; c=relaxed/simple;
-	bh=myX2r5YA1lyE6PF9X7vRwEe8NUR6TEzLmdONy7VX99g=;
+	s=arc-20240116; t=1788299471; c=relaxed/simple;
+	bh=sVwijteYWmwsPHrOhzgNw/h8bxNw24CK78k3J1PaD0o=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=oPuYkSebmsnsKuBrE5xJNCBtIdzoGazkhAYZzupeyHuoatYHQ7QX6eNc9PmwvzlKM0X/Cl1JzHV5yoNWEr+x1xIhJ2/+I0bdDViLzQBr+HOw/yxBd98Or6HuQqcGRWIywI2tpJIJEKZs+MSk1fYHkuVoYbfm5vglDEszO7lhAp8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hCUDSupB; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=SC09gLC6K8N3y8S7UUB655dYN9BQyCPWGtAXmsypVlHbUq2WR0Bfzlqsqr7xdmk2CfvRsgKCBtSrm4I7ofsdzwWmvzoXx0KaLWGGUWBWXjmwAcWVtnDeZr9LsV6IUalOxknvTo/c5tXJ7PRKKasYVRmpV+U9u0yiYKebu48u2ww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eFMG19SV; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hCUDSupB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EB9E1F000E9;
-	Tue,  1 Sep 2026 21:51:02 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eFMG19SV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C72931F00A3A;
+	Tue,  1 Sep 2026 21:51:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788299465;
-	bh=d7n93eEAZcqp/uvmqepwIrUhrufzf1uDi7N0bfkYuMM=;
+	s=k20260515; t=1788299468;
+	bh=Ntvmp5tAW0Lnf6CadWCmQQjHOUTBR9lOMJLkhDreaUU=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=hCUDSupBguzYCJSzjIN8jCrAOnRGpWVOTC+sanb+LjjL3+NHLC6S/X5pkINtIwAg6
-	 8zBjmcZg8T2CLfG7b+r5CGvSEWLG/QDm4xdMqtm5MeMHtomY0Kk+KlW3a3M9kgTjEc
-	 UAaHkMtq5up6DWWDkMxFl2WiMnIQmf2VNIabN8tAutgOqJCfzeLVzwQ+PldmRjZURi
-	 M3GksT4gOfQfw9IsbFURwPVRDK1woHem4PJ65YEfYo3swRQxFt/QgVs84hqkSunS28
-	 JBmcnKY5YZOpFfdTmLfN2DC83UASDVjSje+36ev4BdmaNEhTn8MysQPaBtzxhuyb/t
-	 0dN5NcAfikqYw==
+	b=eFMG19SV03NMaVFnpDeSPY1ZW0q60Rl/wv6m5fW5GccSqDsqXGLKo2cVdLqGYjKmX
+	 p0PPrUrnmkrdxpzW78Tx2nj3Ee7JvbVekHcEuPZHGqao4szXnvpxgjfaAFU209UrE7
+	 PK/uZ5rmth1UPLXcKdNZgLndOdtKWy6wYC3OAfbg1KSORa2k/LngOEvNrfIRPm8Cgk
+	 AOpiItwOxoha4tNdBzIWI+WZ/FsaQ/zq5tf2vENHHkCaiT8MX0raEv/BV/nZLod8b0
+	 D1ngQr5DVsDG6gnGzRJOsy0gGJgQ0Ze0A+/W13sJlFiguCXRrByb3CDnWpUbN/RqB8
+	 6Pw3XWBEY+EHg==
 From: Mark Brown <broonie@kernel.org>
-Date: Tue, 01 Sep 2026 22:47:06 +0100
-Subject: [PATCH v20 08/14] KVM: arm64: Enforce EXLOCK for SPSR and ELR
+Date: Tue, 01 Sep 2026 22:47:07 +0100
+Subject: [PATCH v20 09/14] KVM: arm64: Allow GCS to be enabled for guests
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -37,7 +37,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260901-arm64-gcs-v20-8-f31750bdfadb@kernel.org>
+Message-Id: <20260901-arm64-gcs-v20-9-f31750bdfadb@kernel.org>
 References: <20260901-arm64-gcs-v20-0-f31750bdfadb@kernel.org>
 In-Reply-To: <20260901-arm64-gcs-v20-0-f31750bdfadb@kernel.org>
 To: Catalin Marinas <catalin.marinas@arm.com>, 
@@ -52,117 +52,70 @@ Cc: Peter Maydell <peter.maydell@linaro.org>,
  linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
  Mark Brown <broonie@kernel.org>
 X-Mailer: b4 0.17-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3010; i=broonie@kernel.org;
- h=from:subject:message-id; bh=myX2r5YA1lyE6PF9X7vRwEe8NUR6TEzLmdONy7VX99g=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBql0iivg1NgLATu5WNvTFVbJ7dugWm+35vKG3Qb
- NQBKJxFH0yJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCapdIogAKCRAk1otyXVSH
- 0NfzB/9uir8kEpaV0c5Lfpwjc6r8ijRsibzD0J0REkxIG0i8cO38HIoEix85kGdmnKaObcKiprY
- 9HoJ5z5ZQ5utr4kVqrPU13zPEGcmBDVgMOWt+uFNlxuGrmfyh5VjUxwbGJfd1iUPlhJs+QToEzN
- Fhy0AGKdJjX+79uhlNrmW0D2fzewV+OFXJdGHxTyl63CCsy2WARZZnu4Tn9402xE+cQrX+bRJut
- 3RUba+1JExMN6oOVH9t2Ifv7x/gWV/z327McCpmjnwSjD1OB8Ti2dKhmdQ+nNChhvINfHX1mluF
- aIxqsdwgrqGjL/FiDEaMJKGksdiF+0IjdzQhK97jFtPPzgas
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1947; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=sVwijteYWmwsPHrOhzgNw/h8bxNw24CK78k3J1PaD0o=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBql0ijTOOgU+g5ib2qdw5i9m5Up1vp0bgOidFbt
+ N7sgbGHYNeJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCapdIowAKCRAk1otyXVSH
+ 0D71B/9cf0Tr9O/jvhvol2aAHSpSGqkbgy5qn1+oWqbQ4Gr2Q8DUJj38IvXWXLZVU8+mD9f0BzI
+ RtT9nnduQBP9zjkO0Xxjf2lFL5sbJ63eu12X6ZfULwyCASUzTxOB4VRzEGLcvtshRdpMuT6+biJ
+ 3m+VMjNbqpucJqLCszqSimSggsuxOQfPGRjG9j1VGfpSH4onTKf/XLJBhSIhv7+UeD7YAm1WwaT
+ LMWdOt2tkZHP1u003Em5G86ogV5SkGYzZgZwwboiYBQYJGxdKle9Jw2XVPL+9Tp1+Y8hJkR7nZi
+ 6UsaFzTADQQoNB+2II6Dyf4v8uTDYWTiy9eotFc+bsA97CDa
 X-Developer-Key: i=broonie@kernel.org; a=openpgp;
  fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-As per I_CFFNS and the pseudocode for the SPSR_ELx and ELR_ELx registers
-a GCS exception with ExType 1 is generated for attempts to write to
-those registers when both GCSCR_ELx.EXLOCKEN and PSTATE.EXLOCK are set.
-Ensure that this is enforced for guests if access to these registers
-from the guest is handled by the hypervisor.
+Now that required functionality for GCS is in place expose
+ID_AA64PFR1_EL1.GCS, allowing guests to be given the feature.
 
 Signed-off-by: Mark Brown <broonie@kernel.org>
 ---
- arch/arm64/include/asm/kvm_emulate.h |  8 +++++++
- arch/arm64/kvm/sys_regs.c            | 42 ++++++++++++++++++++++++++++++++----
- 2 files changed, 46 insertions(+), 4 deletions(-)
+ arch/arm64/kvm/nested.c   | 3 +--
+ arch/arm64/kvm/sys_regs.c | 5 +++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 0cd91b3d6c82..e47ab38327de 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -81,6 +81,14 @@ int kvm_inject_nested_irq(struct kvm_vcpu *vcpu);
- int kvm_inject_nested_sea(struct kvm_vcpu *vcpu, bool iabt, u64 addr);
- int kvm_inject_nested_serror(struct kvm_vcpu *vcpu, u64 esr);
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 17123f0b6dab..a9dea85b6192 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -1702,11 +1702,10 @@ u64 limit_nv_id_reg(struct kvm *kvm, u32 reg, u64 val)
+ 		break;
  
-+static inline void kvm_inject_exlock(struct kvm_vcpu *vcpu)
-+{
-+	u64 esr = FIELD_PREP(ESR_ELx_EC_MASK, ESR_ELx_EC_GCS) | ESR_ELx_IL |
-+		  FIELD_PREP(ESR_ELx_ExType_MASK, ESR_ELx_ExType_EXLOCK);
-+
-+	kvm_inject_sync(vcpu, esr);
-+}
-+
- static inline void kvm_inject_nested_sve_trap(struct kvm_vcpu *vcpu)
- {
- 	u64 esr = FIELD_PREP(ESR_ELx_EC_MASK, ESR_ELx_EC_SVE) |
+ 	case SYS_ID_AA64PFR1_EL1:
+-		/* Only support BTI, SSBS, CSV2_frac */
++		/* Only support GCS, BTI, SSBS, CSV2_frac */
+ 		val &= ~(ID_AA64PFR1_EL1_PFAR		|
+ 			 ID_AA64PFR1_EL1_MTEX		|
+ 			 ID_AA64PFR1_EL1_THE		|
+-			 ID_AA64PFR1_EL1_GCS		|
+ 			 ID_AA64PFR1_EL1_MTE_frac	|
+ 			 ID_AA64PFR1_EL1_NMI		|
+ 			 ID_AA64PFR1_EL1_SME		|
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index c5ce18b3f7d8..1f80c26a9839 100644
+index 1f80c26a9839..fb2c9fd42e24 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -2866,14 +2866,42 @@ static bool access_sp_el1(struct kvm_vcpu *vcpu,
- 	return true;
- }
+@@ -2193,10 +2193,12 @@ static u64 sanitise_id_aa64pfr1_el1(const struct kvm_vcpu *vcpu, u64 val)
+ 	      SYS_FIELD_GET(ID_AA64PFR0_EL1, RAS, pfr0) == ID_AA64PFR0_EL1_RAS_IMP))
+ 		val &= ~ID_AA64PFR1_EL1_RAS_frac;
  
-+static inline bool sysregs_exlocked(struct kvm_vcpu *vcpu)
-+{
-+	u64 gcscr;
++	if (!system_supports_gcs())
++		val &= ~ID_AA64PFR1_EL1_GCS;
 +
-+	if (!kvm_has_gcs(vcpu->kvm))
-+		return false;
-+
-+	if (!(vcpu->arch.ctxt.regs.pstate & PSR_EXLOCK_BIT))
-+		return false;
-+
-+	/*
-+	 * Note that the EXLOCKEN for the running EL is checked
-+	 * regardless of the register written to.
-+	 */
-+	if (is_hyp_ctxt(vcpu))
-+		gcscr = vcpu_read_sys_reg(vcpu, GCSCR_EL2);
-+	else
-+		gcscr = vcpu_read_sys_reg(vcpu, GCSCR_EL1);
-+
-+	return gcscr & GCSCR_ELx_EXLOCKEN;
-+}
-+
- static bool access_elr(struct kvm_vcpu *vcpu,
- 		       struct sys_reg_params *p,
- 		       const struct sys_reg_desc *r)
- {
--	if (p->is_write)
-+	if (p->is_write) {
-+		if (sysregs_exlocked(vcpu)) {
-+			kvm_inject_exlock(vcpu);
-+			return false;
-+		}
-+
- 		vcpu_write_sys_reg(vcpu, p->regval, ELR_EL1);
--	else
-+	} else {
- 		p->regval = vcpu_read_sys_reg(vcpu, ELR_EL1);
-+	}
- 
- 	return true;
- }
-@@ -2882,10 +2910,16 @@ static bool access_spsr(struct kvm_vcpu *vcpu,
- 			struct sys_reg_params *p,
- 			const struct sys_reg_desc *r)
- {
--	if (p->is_write)
-+	if (p->is_write) {
-+		if (sysregs_exlocked(vcpu)) {
-+			kvm_inject_exlock(vcpu);
-+			return false;
-+		}
-+
- 		__vcpu_assign_sys_reg(vcpu, SPSR_EL1, p->regval);
--	else
-+	} else {
- 		p->regval = __vcpu_sys_reg(vcpu, SPSR_EL1);
-+	}
- 
- 	return true;
- }
+ 	val &= ~ID_AA64PFR1_EL1_SME;
+ 	val &= ~ID_AA64PFR1_EL1_RNDR_trap;
+ 	val &= ~ID_AA64PFR1_EL1_NMI;
+-	val &= ~ID_AA64PFR1_EL1_GCS;
+ 	val &= ~ID_AA64PFR1_EL1_THE;
+ 	val &= ~ID_AA64PFR1_EL1_MTEX;
+ 	val &= ~ID_AA64PFR1_EL1_PFAR;
+@@ -3444,7 +3446,6 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 				     ~(ID_AA64PFR1_EL1_PFAR |
+ 				       ID_AA64PFR1_EL1_MTEX |
+ 				       ID_AA64PFR1_EL1_THE |
+-				       ID_AA64PFR1_EL1_GCS |
+ 				       ID_AA64PFR1_EL1_MTE_frac |
+ 				       ID_AA64PFR1_EL1_NMI |
+ 				       ID_AA64PFR1_EL1_RNDR_trap |
 
 -- 
 2.47.3
