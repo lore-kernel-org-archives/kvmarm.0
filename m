@@ -1,145 +1,149 @@
-Received: from pdx-out-003.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-003.esa.us-west-2.outbound.mail-perimeter.amazon.com [44.246.68.102])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1EB133C192;
-	Tue,  1 Sep 2026 14:07:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.246.68.102
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0774E377A96;
+	Tue,  1 Sep 2026 14:15:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788271626; cv=none; b=T0yNzeea6VSUUp8AHvGZPtQ0EJAXbZ0enLjglcpxrA5sZRUsxEvIahXNbeucxFgBFq3AI2DyXDGrvXFkNEUW7t9fiCGPcFG6H421qsVdF8MKclkSos5ZpCM4DmFZQtf61vf+aThcBOmSDjdFVecjXzW8sDZYl7w5grRmjWxK7dY=
+	t=1788272150; cv=none; b=pL7Nz8T+1OEU/YOYOqgGBCPyF0Sglc2g44ruth2FcysAatLHzgNB+ivUrljy3uH4P4f+99VxArwRHHLT+76nFS66fnMySsyvRhDDL22b7nholKHwlHDBy2L+SeAJCXPIDX3PJ+5RLwpA110LGRuJ8ckMg5JOAy7rbqXL0X8O3RU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788271626; c=relaxed/simple;
-	bh=1O9/rKU7KHiOHnc3FZFhXmrPr5pw2k6/sI2pYOXuv74=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=C++rrA/Hfs+mA6KrdyRRq/3A4J0QRaiycmsR95r28bOPNTg385FcHSuaE2ARinVCWCBDWdeznbt8XUzh/FQqzYSDIXhJsVl0FUg+MEtoe8NWh9588XkAqpCQ53x3aZxWsjHXRpu3iir7pwg1CS/4Hv+AbzwdQJhM7NaQPwlaVcA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=RCrTl70y; arc=none smtp.client-ip=44.246.68.102
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+	s=arc-20240116; t=1788272150; c=relaxed/simple;
+	bh=TmsQ9Ve01TgN68m6hr1WPJ03S+m8mLtfg3G1zzs94nQ=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=CBfpwU8FozYv1bRYmRtnG1mMhbSxG2d5zAZu3jZ79aag52XG6GGf6MP1ygPe7A/tObfUJZOYFJMQMJoC/y7rC1MG0CTk81GnDKOVgypMpCANPvWeR1PxwHZHulpxV+cFIvztRda7IzNc4+pbIfgKvKBtdfm4UhT6qzos/31TieU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O/rrw3ve; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="RCrTl70y"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1788271624; x=1819807624;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=gwbUYxXHQaXTXqslqakO/JmHO0leSCcNPKEN6HpwsIg=;
-  b=RCrTl70yCep5tvM0skXXfdcyTmenyKF89l9dXiy6f35xjNr6PDC6PYng
-   nPB8DAEpEc13ii5vZ74ElJp+2Us1ZxkW9nsIQ49VHK/4NCtiq+Za8lPff
-   Z1cxMCWXxvQzt29sUcVS1CXlT2dbN1MrUNdEKqpVKEf9U2KAOwlvNxEee
-   NwCFjgVhNxU1AmV8qKAfRYEXTrelkuWeAC4V7VD6bF/LmE3lguz8CT7TA
-   9ce2ZOBj/sTDYblSnGYfB6w8IRfzBtkSPPnH1ATsEXAPGuBeO9zgGOdmQ
-   ocVjM3eddGsyBlnQFc2mm++sMHkHFTJkNTs4T9RwuNoEb5Q4KWiL941hv
-   Q==;
-X-CSE-ConnectionGUID: g7Zx9TRQQvWpTs8W3wP04w==
-X-CSE-MsgGUID: 9pLg4PSzQd6ZYHeZKQt6qQ==
-X-IronPort-AV: E=Sophos;i="6.25,256,1779148800"; 
-   d="scan'208";a="27537013"
-Received: from ip-10-5-6-203.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.6.203])
-  by internal-pdx-out-003.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2026 14:07:01 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [205.251.233.111:11398]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.52.146:2525] with esmtp (Farcaster)
- id 8f131d5e-0695-4138-b720-3dbdcb1830d0; Tue, 1 Sep 2026 14:07:01 +0000 (UTC)
-X-Farcaster-Flow-ID: 8f131d5e-0695-4138-b720-3dbdcb1830d0
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.45;
- Tue, 1 Sep 2026 14:07:01 +0000
-Received: from b0f1d8753182.ant.amazon.com (10.106.82.17) by
- EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.46;
- Tue, 1 Sep 2026 14:06:44 +0000
-From: Takahiro Itazuri <itazur@amazon.com>
-To: <brendan.jackman@linux.dev>, <maz@kernel.org>
-CC: <Liam.Howlett@oracle.com>, <ackerleytng@google.com>,
-	<agordeev@linux.ibm.com>, <ajones@ventanamicro.com>,
-	<akpm@linux-foundation.org>, <alex@ghiti.fr>, <andrii@kernel.org>,
-	<ast@kernel.org>, <baolu.lu@linux.intel.com>, <borntraeger@linux.ibm.com>,
-	<bp@alien8.de>, <bpf@vger.kernel.org>, <catalin.marinas@arm.com>,
-	<chenhuacai@kernel.org>, <corbet@lwn.net>, <coxu@redhat.com>,
-	<daniel@iogearbox.net>, <dave.hansen@linux.intel.com>, <david@kernel.org>,
-	<dev.jain@arm.com>, <eddyz87@gmail.com>, <haoluo@google.com>,
-	<hpa@zytor.com>, <itazur@amazon.co.uk>, <jackmanb@google.com>,
-	<jannh@google.com>, <jgg@ziepe.ca>, <jgross@suse.com>, <jhubbard@nvidia.com>,
-	<jmattson@google.com>, <joey.gouly@arm.com>, <john.fastabend@gmail.com>,
-	<jolsa@kernel.org>, <jthoughton@google.com>, <kalyazin@amazon.co.uk>,
-	<kas@kernel.org>, <kernel@xen0n.name>, <kpsingh@kernel.org>,
-	<kvm@vger.kernel.org>, <kvmarm@lists.linux.dev>, <lenb@kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-doc@vger.kernel.org>,
-	<linux-fsdevel@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-kselftest@vger.kernel.org>, <linux-mm@kvack.org>,
-	<linux-pm@vger.kernel.org>, <linux-riscv@lists.infradead.org>,
-	<linux-s390@vger.kernel.org>, <loongarch@lists.linux.dev>,
-	<lorenzo.stoakes@oracle.com>, <luto@kernel.org>, <maobibo@loongson.cn>,
-	<martin.lau@linux.dev>, <mhocko@suse.com>, <mingo@redhat.com>,
-	<mlevitsk@redhat.com>, <oupton@kernel.org>, <palmer@dabbelt.com>,
-	<patrick.roy@linux.dev>, <pavel@kernel.org>, <pbonzini@redhat.com>,
-	<peterx@redhat.com>, <peterz@infradead.org>, <pfalcato@suse.de>,
-	<pjw@kernel.org>, <prsampat@amd.com>, <riel@surriel.com>, <rppt@kernel.org>,
-	<ryan.roberts@arm.com>, <sdf@fomichev.me>, <seanjc@google.com>,
-	<shijie@os.amperecomputing.com>, <skhan@linuxfoundation.org>,
-	<song@kernel.org>, <surenb@google.com>, <suzuki.poulose@arm.com>,
-	<tabba@google.com>, <tglx@kernel.org>, <thuth@redhat.com>,
-	<vannapurve@google.com>, <vbabka@kernel.org>, <will@kernel.org>,
-	<willy@infradead.org>, <wu.fei9@sanechips.com.cn>, <x86@kernel.org>,
-	<yang@os.amperecomputing.com>, <yangyicong@hisilicon.com>,
-	<yonghong.song@linux.dev>, <yosry@kernel.org>, <yu-cheng.yu@intel.com>,
-	<yuzenghui@huawei.com>, <zhengqi.arch@bytedance.com>, Takahiro Itazuri
-	<zulinx86@gmail.com>
-Subject: Re: [PATCH v12 09/16] KVM: arm64: define kvm_arch_gmem_supports_no_direct_map()
-Date: Tue, 1 Sep 2026 15:05:21 +0100
-Message-ID: <20260901140520.78333-2-itazur@amazon.com>
-X-Mailer: git-send-email 2.43.1
-In-Reply-To: <DJJ28Z81JTQI.1SI0CNIP7W1JQ@linux.dev>
-References: <DJJ28Z81JTQI.1SI0CNIP7W1JQ@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O/rrw3ve"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D6921F000E9;
+	Tue,  1 Sep 2026 14:15:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788272148;
+	bh=vcEFJO92r+XG/50fNyci3n7g0K6boOIqvasmekniDUI=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=O/rrw3vemE2skCOuVtwRFcx8IqvEATHgCiImYxK+tmd30vVT/My8ujJ0nUZYfSLVb
+	 sgxcFPpdNlJLFk0eJBlINVJz+unrNgQB6GIQI17WelfMeruaexUkHqx8EFvAvhISu4
+	 ehB8vPtHrSkcbd2tHa41/lx44Uz0bT5ESw8R95njj1hN83q3Bq/DdwT76CVrM1jpIl
+	 M+1zvqjbnq+OCi04BqiO7EKP1ddQBmX8Aof018zGdg+tu8Lghn6vBL4U9TmerJycGD
+	 68SiOTxuHJKyFNJSv0hxuS2ak9YDZJuORBeVDn+z6olV7YmnOO7tW5KenZnVaBP2Zo
+	 c9eS7OyfebocQ==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v4 11/11] KVM: arm64: Tag host-VA hypercall parameters
+ __kern
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Fuad Tabba" <fuad.tabba@linux.dev>
+Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, linux-trace-kernel@vger.kernel.org, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20260901140326.3812068-12-fuad.tabba@linux.dev>
+References: <20260901140326.3812068-1-fuad.tabba@linux.dev>
+ <20260901140326.3812068-12-fuad.tabba@linux.dev>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 01 Sep 2026 14:15:47 +0000
+Message-Id: <20260901141548.3D6921F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D038UWB004.ant.amazon.com (10.13.139.177) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-Apologies for the delayed response, and thank you for the review.
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+s) to consider:
 
-On Fri, 26 Jun 2026 14:45:45 +0000, Brendan Jackman wrote:
-> On Tue Apr 21, 2026 at 4:55 PM UTC, Marc Zyngier wrote:
-> > Support for GUEST_MEMFD_FLAG_NO_DIRECT_MAP on arm64 depends on 1) direct
-> > map manipulations at 4k granularity being possible, and 2) FEAT_S2FWB.
-> >
-> > Where is this 4kB requirement enforced? Or is it that you means
-> > "PAGE_SIZE"?
->
-> Yeah I believe this means PAGE_SIZE and that it's effectively enforced
-> by checking can_set_direct_map() in
-> kvm_arch_gmem_supports_no_direct_map().
+Pre-existing issues:
+- [Critical] The __kvm_adjust_pc hypercall translates and uses a host-provi=
+ded vcpu pointer without validation, allowing a malicious host kernel to co=
+rrupt protected guest state.
+- [High] __pkvm_host_donate_hyp wraps fallible allocator primitives in WARN=
+_ON(), allowing unprivileged host userspace to trigger a hypervisor panic.
+--
 
-Yes, this should say PAGE_SIZE rather than 4k.
+commit f41e99c0d7eef41b448f7016f3b2a6ae6358d4c0
+Author: Fuad Tabba <fuad.tabba@linux.dev>
+Subject: KVM: arm64: Tag host-VA hypercall parameters __kern
 
-If I understand the arm64 MM code correctly, can_set_direct_map() is the
-capability gate, but it does not require the linear map to be built with
-page-sized PTEs from boot. Without BBML2_NOABORT, force_pte_mapping()
-builds the linear map with PAGE_SIZE PTEs. With BBML2_NOABORT,
-update_range_prot() can use split_kernel_leaf_mapping() to safely split
-larger mappings on demand before changing a PAGE_SIZE range.
+This commit introduces the __kern sparse address space to tag host virtual
+addresses passed to EL2 hypercalls. It updates the hypercall declarations
+and unwrapping functions to ensure host VAs are explicitly translated
+before use, preventing unchecked dereferences at EL2.
 
-I'll update the v13 commit message to describe this.
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe=
+/hyp-main.c
+> index 9085f46c2880f..91e74a1a334f0 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+[ ... ]
+> @@ -548,9 +548,9 @@ DEFINE_KVM_HOST_HCALL(int, __pkvm_host_mkyoung_guest,
+>  }
+> =20
+>  DEFINE_KVM_HOST_HCALL(void, __kvm_adjust_pc,
+> -	struct kvm_vcpu *, vcpu)
+> +	struct kvm_vcpu __kern *, vcpu)
+>  {
+> -	__kvm_adjust_pc(kern_hyp_va(vcpu));
+> +	__kvm_adjust_pc(kern_hyp_va_host(vcpu));
+>  }
 
-On Tue, 21 Apr 2026 17:55:05 +0100, Marc Zyngier wrote:
-> KVM/arm64 has:
->
->         select KVM_GUEST_MEMFD
+[Severity: Critical]
+This is a pre-existing issue, but does this hypercall fail to validate the
+translated vcpu pointer?
 
-I also confirmed that KVM/arm64 selects KVM_GUEST_MEMFD, so I'll drop the
-redundant #ifdef in v13.
+If a compromised host kernel issues the __kvm_adjust_pc hypercall and passes
+a forged virtual address, kern_hyp_va_host() could resolve it to the
+physical memory of a protected VM's pkvm_hyp_vcpu structure residing in the
+EL2 linear map.
 
-> Why is it an inline function? Given that it takes a kvm parameter,
-> I fully expect that you'll have to evaluate this at some point.
->
-> But since struct kvm cannot be dereferenced in asm/kvm_host.h, it will
-> have to move. How about doing it right now?
+Since this pointer is then used directly in __kvm_adjust_pc() to modify
+flags like PENDING_EXCEPTION or INCREMENT_PC, could this allow a malicious
+host to corrupt protected guest state and bypass pKVM isolation boundaries?
 
-Agreed. Although the current implementation does not dereference kvm, it
-makes sense to move it out of asm/kvm_host.h now. I'll move the
-implementation to an arm64 KVM .c file in v13.
+[ ... ]
+> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkv=
+m.c
+> index 6c8e33ebf8bb6..5cdb0318fa7ba 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+[ ... ]
+> @@ -657,9 +657,9 @@ static size_t pkvm_get_hyp_vm_size(unsigned int nr_vc=
+pus)
+>  		size_mul(sizeof(struct pkvm_hyp_vcpu *), nr_vcpus));
+>  }
+> =20
+> -static void *map_donated_memory_noclear(void *host_va, size_t size)
+> +static void *map_donated_memory_noclear(void __kern *host_va, size_t siz=
+e)
+>  {
+> -	void *va =3D kern_hyp_va(host_va);
+> +	void *va =3D kern_hyp_va_host(host_va);
+> =20
+>  	if (!PAGE_ALIGNED(va))
+>  		return NULL;
+> @@ -671,7 +671,7 @@ static void *map_donated_memory_noclear(void *host_va=
+, size_t size)
+>  	return va;
+>  }
+
+[Severity: High]
+This isn't a bug introduced by this patch, but can this donation path lead
+to a hypervisor panic triggered by unprivileged host userspace?
+
+Host userspace can issue KVM_CREATE_VM or KVM_CREATE_VCPU ioctls, which
+trigger hypercalls like __pkvm_init_vm and __pkvm_init_vcpu. These
+eventually call map_donated_memory_noclear() and __pkvm_host_donate_hyp().
+
+Looking at arch/arm64/kvm/hyp/nvhe/mem_protect.c:__pkvm_host_donate_hyp():
+
+	__hyp_set_page_state_range(phys, size, PKVM_PAGE_OWNED);
+	WARN_ON(pkvm_create_mappings_locked(virt, virt + size, PAGE_HYP));
+	WARN_ON(host_stage2_set_owner_locked(phys, size, PKVM_ID_HYP));
+
+Both pkvm_create_mappings_locked() and host_stage2_set_owner_locked()
+allocate page tables from the hypervisor's memory pool and can fail with
+-ENOMEM if the pool is exhausted.
+
+Since WARN_ON() at EL2 expands to a fatal BRK instruction, could an
+unprivileged user exhaust EL2 memory and trigger these paths to crash the
+entire system, rather than safely returning an error and rolling back?
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260901140326.3812=
+068-1-fuad.tabba@linux.dev?part=3D11
