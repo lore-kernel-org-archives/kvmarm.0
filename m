@@ -1,121 +1,187 @@
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+Received: from mta1.migadu.com (out-197.mta1.migadu.com [95.215.58.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40B9D3B4407
-	for <kvmarm@lists.linux.dev>; Tue,  1 Sep 2026 14:34:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07D4A3D47A9
+	for <kvmarm@lists.linux.dev>; Tue,  1 Sep 2026 14:43:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788273290; cv=none; b=jZPoXDWlX2eaViLNiCzrGJiu4F4IWQVIsPMVN/aFj8G3PjSLGlKUZxMmHheimTkaKM6HWHFUjVfFORdaI3HCGgOkMjSif1q7t0rrreIM+Ux8aHNO7JzdERTowibWBxNA+/Ze3FPe+l75hHIgnyo1h9UTp1LLb80nC2vnQ0V2tQc=
+	t=1788273798; cv=none; b=L9jKqqFbYIHIWtVNIdNFcSvFzbi2BcMbT7oHSJ5PutO4a5jJprZ/fpmJ2M4SlY76p7nzy775ANfa761975xfBiQ7EUt6BVPOHvIceFLYkssZz0WdLCCbGW+V0OYgpXy1Z9dK9Ju+Wj1T3OFSVtzjYI64PuY3n9ezePMQp5DszGE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788273290; c=relaxed/simple;
-	bh=8yIR2l5kWTbTZXEBPaalfxQDjpL45I/SVC9tN3kaCb0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uJNEXAxsKAcH5d2skMbALs7XUuTltBVV0noajZxvAhEhJYNF/v/Ek7z9XueaY7REzWPKH8cmBPO/BMEZaYuty6Qyk8N9z2UzC+MwA1NxnfmA1Ns0A3s+JPFjdXecfJOHwYNeLH7rzRjL5cG22jqm+bVQoGdnYXSx20EXSRy2c6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=IhXwtTmd; arc=none smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+	s=arc-20240116; t=1788273798; c=relaxed/simple;
+	bh=qMqqtXFnIeU06gpJdvWqkHC1kvHEcyriAiG82aOitE4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MmxXNudiQyoed81HitoEhfsH1h0W3SmZBhRn3A5D1v4oJrxGw+vvYqC9rehgJAvdnlYvpwJ5lXMg0feZl1Oe8X46NuUNabVqzDM+w7NhtoDcW3VZHKeVLhbqm5Uaxqg5IzelxEzLF/XigvxfxILoNol03sKlvjuROZeT3yVF634=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tV7hWVeE; arc=none smtp.client-ip=95.215.58.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="IhXwtTmd"
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-5301db51586so12022971cf.1
-        for <kvmarm@lists.linux.dev>; Tue, 01 Sep 2026 07:34:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1788273287; x=1788878087; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=4Msi/TOmLhS+cZQhvH9ha0bUxCIzijPq3v5j1Cfzxv4=;
-        b=IhXwtTmdHxzwQ9PGsA+UjB9J+Ix4KZvXqRgauqOXj3EzLRUm15wC9eGh0bJF4x1BuX
-         GDd080U2vlTR9NfxjaUAEzd84AT1Qdk76A2nHcEYA0DTijYzj1uC4c/oJKA0FqNqUoqp
-         7x9plcbd3FMZRSiA/dhy65PO94uyXhFs4MvyGNpVwQ5q8KlPCY/Lb8f4A9ZAcmgk9o8z
-         FgVi42bEh5ozVCIBUut4+z24jkZqlLH/DJlG2KdhaunBLNPYw1dzRbuSUoaRjXMNuA6i
-         NubVjRnAuwOOGS/FweVGbq5+v1ozajLnnRuIGp1/EsPYF4uLN+xmqLgJSluBAufHhCvs
-         hlPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788273287; x=1788878087;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=4Msi/TOmLhS+cZQhvH9ha0bUxCIzijPq3v5j1Cfzxv4=;
-        b=fS4n8EMMOUnBANH3t3IAVtA0P/syy4wZ0zDKHPbOTuoz0BjBOAk1mj6Wo2aT+ykBCk
-         ycI0luVJ+vvrkbxwMCLRArQ+Lsze0zlLmP/A6YlRdJGvTQn+g8O4wgq6+5H9lxnm2ryV
-         VvN/Fv0l1RdaICy/6mUyGM4Ll644395Siig843fl45uHsy7UbLLZPsHIoQPOoRzfuetP
-         5kECo1gsox5fsFiFWpmxfr3U1DyFKdwPTt9KXiDJ0gSglkS/k5bWcXH/83AzbiOHyvmT
-         ggJyC5wtWGo8qNxJ2vc7ntxpoPJvDuMJBYEponSbHp08Z1DN7orMxsc/9zBjDqJ26Eg9
-         s/dg==
-X-Forwarded-Encrypted: i=1; AHgh+RrfS1IFDm1U12Tu767+HEu0NlS+Q846qeKg8K5daA28ydhH9BAaJf4CYy4iNBnm+xstUc5w1tI=@lists.linux.dev
-X-Gm-Message-State: AFuF++nH840UHyXbL5vAND4WaNa9/+u/Ti7h01RzuG20J2KQGALIWYPV
-	580O6EBwllgmcGc1TPX3sN9YvdS1rntDIe/1UYwNgJVLhjR25jE+4EgACkHHUTnINko=
-X-Gm-Gg: AR+sD12NNOJq3840qGAZHX1Iwl/BY5OVODUIfICPLishtGOA1cNX0yAt45kuz1HU57V
-	iIIoa/cmiAgFl14hfXu9AcvEVfxsFPGB/nMlqslUzGk1nE0p3JQ+JcxZl50X6ggwWg4W8dobz5c
-	pYi05pRuZi1NSzvmooYbdXFxSbzbn2tzUCIjurnj1jLluJEraCAkHrRlibntJWBSUViQvZnndzb
-	aBXvzUK7Bdrk7uWMDNdfIJZ1Tki+Ta0K/FppS6VhSRe7fjP/1aWmqAu0qr6feWzmdSlKHXsks4s
-	T3vEbpi5kcv9wZ9miKzD+Xxs9Qsdg9fGHJbVw1gar+uCO2g3CLOR9FdTCS6QJLWHyfipkNSW0tZ
-	ZMT/7O6Dl0n0/LQOU7MmRiXMo4Pefq+OFq4/4dytDfWGolJJU1yuB/5bGAsW6REaFopc7rmz9wF
-	awlcUogW3sCJfJyTN5S8NGdh8GVt2+foRdRbRs/eJCgSC23xVpgGTQHAV/ka1fxfw2pPVbo4T1G
-	6G1KJGSiRi9sV/OnOrQMUzZjEHflRcDVRlBzrhy28b8zLI=
-X-Received: by 2002:a05:622a:5913:b0:52f:f472:bad1 with SMTP id d75a77b69052e-52ff472c08bmr383344431cf.33.1788273287009;
-        Tue, 01 Sep 2026 07:34:47 -0700 (PDT)
-Received: from ziepe.ca (hlfxns010zw-159-2-239-150.pppoe-dynamic.high-speed.ns.bellaliant.net. [159.2.239.150])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-52fbe830222sm98165671cf.20.2026.09.01.07.34.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Sep 2026 07:34:46 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1x1PZV-0000000Bhy0-23ZI;
-	Tue, 01 Sep 2026 11:34:45 -0300
-Date: Tue, 1 Sep 2026 11:34:45 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>
-Cc: Nicolin Chen <nicolinc@nvidia.com>, linux-coco@lists.linux.dev,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, Alexey Kardashevskiy <aik@amd.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Joerg Roedel <joro@8bytes.org>, Jonathan Cameron <jic23@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Pranjal Shrivastava <praan@google.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Samuel Ortiz <sameo@rivosinc.com>,
-	Steven Price <steven.price@arm.com>,
-	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
-	Will Deacon <will@kernel.org>, Xu Yilun <yilun.xu@linux.intel.com>
-Subject: Re: [RFC PATCH v4 03/16] iommu/arm-smmu-v3: Add initial pSMMU realm
- viommu plumbing
-Message-ID: <20260901143445.GC56830@ziepe.ca>
-References: <20260427085344.941627-1-aneesh.kumar@kernel.org>
- <20260427085344.941627-4-aneesh.kumar@kernel.org>
- <apM6dOHcEI2ztWS0@nvidia.com>
- <yq5a8q5lz5yn.fsf@kernel.org>
- <yq5aecfdnv4i.fsf@kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tV7hWVeE"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=qMqqtXFnIeU06gpJdvWqkHC1kvHEcyriAiG82aOitE4=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1788273794; v=1; x=1788878594;
+ b=tV7hWVeEzPynyywJIo1qTHD5PUR3vcmKL6/tBqhsFxcjRmf82MQTECTcrKwAgbTXcX3Kv7D8
+ 48hX7z37plkkuDk/DJcxoEb6YRMsTpULDGIYZKLS2RpY/b4VdtSwPyel8ZJSfZqsWEjvnYl55Yi
+ qxGDVG8Hq93yMzhghY89irN8=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 8522e90eba2312d0;
+	Tue, 01 Sep 2026 14:43:14 +0000
+X-Mizu-Trace-ID: 8522e90eba2312d0
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5aeb688ae83so6692e87.1
+        for <kvmarm@lists.linux.dev>; Tue, 01 Sep 2026 07:43:13 -0700 (PDT)
+X-Gm-Message-State: AFuF++mmo4ZJA+IrOL/CUaAZ7CbWJHoQ7GoanD+JHL67x1E9uky4X6Yl
+	bzCjXPwMri9jW1hUFG8XH2B4Cdzy+DNT5BLDF4aVPmTzPFh7xiz7iRvBYQ9tEXz7Atjb1CT9Nvs
+	PLhzbtFuhTFjXYlN0XQhcZGqG1BuoDZ9VHiQ1qHZt
+X-Received: by 2002:ac2:5689:0:b0:5b4:4c8a:abef with SMTP id
+ 2adb3069b0e04-5b5ff29d7ccmr162861e87.10.1788273792891; Tue, 01 Sep 2026
+ 07:43:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <yq5aecfdnv4i.fsf@kernel.org>
+References: <20260901140326.3812068-1-fuad.tabba@linux.dev>
+ <20260901140326.3812068-12-fuad.tabba@linux.dev> <20260901141548.3D6921F000E9@smtp.kernel.org>
+In-Reply-To: <20260901141548.3D6921F000E9@smtp.kernel.org>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Tue, 1 Sep 2026 15:42:36 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTw8cDcSPb6sGWnPqrCFzk=DGycd_8kEwQBip9xn+j0GLg@mail.gmail.com>
+X-Gm-Features: AcwNN1UFOAjSeSlrWShyG9qazQj-B2qNTNMDXRquUS9Wj0SNWvFKhaeyo-IMivY
+Message-ID: <CA+EHjTw8cDcSPb6sGWnPqrCFzk=DGycd_8kEwQBip9xn+j0GLg@mail.gmail.com>
+Subject: Re: [PATCH v4 11/11] KVM: arm64: Tag host-VA hypercall parameters __kern
+To: sashiko-reviews@lists.linux.dev
+Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>, 
+	linux-trace-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Sep 01, 2026 at 03:36:37PM +0530, Aneesh Kumar K.V wrote:
+On Tue, 1 Sept 2026 at 15:15, <sashiko-bot@kernel.org> wrote:
+>
+> Thank you for your contribution! Sashiko AI review found 2 potential issu=
+e(s) to consider:
+>
+> Pre-existing issues:
+> - [Critical] The __kvm_adjust_pc hypercall translates and uses a host-pro=
+vided vcpu pointer without validation, allowing a malicious host kernel to =
+corrupt protected guest state.
 
-> @@ -463,14 +460,13 @@
->  	vsmmu->vmid = s2_parent->s2_cfg.vmid;
->  
->  	if (viommu->type == IOMMU_VIOMMU_TYPE_ARM_SMMUV3) {
-> +		if (arm_smmu_is_realm_viommu(viommu))
-> +			return arm_realm_smmu_v3_init(viommu, user_data);
-> +
+Fix posted yesterday [1].
 
-I think the realm vsmmu is going to require a different info struct
-than the normal psmmu case, isn't it?
+> - [High] __pkvm_host_donate_hyp wraps fallible allocator primitives in WA=
+RN_ON(), allowing unprivileged host userspace to trigger a hypervisor panic=
+.
 
-If so it needs its own enum value.
+Both pools are sized at boot to map all of memory at page granularity,
+so donating host pages cannot exhaust them.
 
-It would be nice to see a draft patch showing how the real vsmmu works
-on top of the RMM spec for it. If we are using a viommu object then
-non-vsmmu case should be identical just with an option in the info
-struct to not create the vsmmu object.
+/fuad
 
-Jason
+[1] https://lore.kernel.org/all/20260831163421.272420-1-fuad.tabba@linux.de=
+v/
+
+> --
+>
+> commit f41e99c0d7eef41b448f7016f3b2a6ae6358d4c0
+> Author: Fuad Tabba <fuad.tabba@linux.dev>
+> Subject: KVM: arm64: Tag host-VA hypercall parameters __kern
+>
+> This commit introduces the __kern sparse address space to tag host virtua=
+l
+> addresses passed to EL2 hypercalls. It updates the hypercall declarations
+> and unwrapping functions to ensure host VAs are explicitly translated
+> before use, preventing unchecked dereferences at EL2.
+>
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nv=
+he/hyp-main.c
+> > index 9085f46c2880f..91e74a1a334f0 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> [ ... ]
+> > @@ -548,9 +548,9 @@ DEFINE_KVM_HOST_HCALL(int, __pkvm_host_mkyoung_gues=
+t,
+> >  }
+> >
+> >  DEFINE_KVM_HOST_HCALL(void, __kvm_adjust_pc,
+> > -     struct kvm_vcpu *, vcpu)
+> > +     struct kvm_vcpu __kern *, vcpu)
+> >  {
+> > -     __kvm_adjust_pc(kern_hyp_va(vcpu));
+> > +     __kvm_adjust_pc(kern_hyp_va_host(vcpu));
+> >  }
+>
+> [Severity: Critical]
+> This is a pre-existing issue, but does this hypercall fail to validate th=
+e
+> translated vcpu pointer?
+>
+> If a compromised host kernel issues the __kvm_adjust_pc hypercall and pas=
+ses
+> a forged virtual address, kern_hyp_va_host() could resolve it to the
+> physical memory of a protected VM's pkvm_hyp_vcpu structure residing in t=
+he
+> EL2 linear map.
+>
+> Since this pointer is then used directly in __kvm_adjust_pc() to modify
+> flags like PENDING_EXCEPTION or INCREMENT_PC, could this allow a maliciou=
+s
+> host to corrupt protected guest state and bypass pKVM isolation boundarie=
+s?
+>
+> [ ... ]
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/p=
+kvm.c
+> > index 6c8e33ebf8bb6..5cdb0318fa7ba 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> [ ... ]
+> > @@ -657,9 +657,9 @@ static size_t pkvm_get_hyp_vm_size(unsigned int nr_=
+vcpus)
+> >               size_mul(sizeof(struct pkvm_hyp_vcpu *), nr_vcpus));
+> >  }
+> >
+> > -static void *map_donated_memory_noclear(void *host_va, size_t size)
+> > +static void *map_donated_memory_noclear(void __kern *host_va, size_t s=
+ize)
+> >  {
+> > -     void *va =3D kern_hyp_va(host_va);
+> > +     void *va =3D kern_hyp_va_host(host_va);
+> >
+> >       if (!PAGE_ALIGNED(va))
+> >               return NULL;
+> > @@ -671,7 +671,7 @@ static void *map_donated_memory_noclear(void *host_=
+va, size_t size)
+> >       return va;
+> >  }
+>
+> [Severity: High]
+> This isn't a bug introduced by this patch, but can this donation path lea=
+d
+> to a hypervisor panic triggered by unprivileged host userspace?
+>
+> Host userspace can issue KVM_CREATE_VM or KVM_CREATE_VCPU ioctls, which
+> trigger hypercalls like __pkvm_init_vm and __pkvm_init_vcpu. These
+> eventually call map_donated_memory_noclear() and __pkvm_host_donate_hyp()=
+.
+>
+> Looking at arch/arm64/kvm/hyp/nvhe/mem_protect.c:__pkvm_host_donate_hyp()=
+:
+>
+>         __hyp_set_page_state_range(phys, size, PKVM_PAGE_OWNED);
+>         WARN_ON(pkvm_create_mappings_locked(virt, virt + size, PAGE_HYP))=
+;
+>         WARN_ON(host_stage2_set_owner_locked(phys, size, PKVM_ID_HYP));
+>
+> Both pkvm_create_mappings_locked() and host_stage2_set_owner_locked()
+> allocate page tables from the hypervisor's memory pool and can fail with
+> -ENOMEM if the pool is exhausted.
+>
+> Since WARN_ON() at EL2 expands to a fatal BRK instruction, could an
+> unprivileged user exhaust EL2 memory and trigger these paths to crash the
+> entire system, rather than safely returning an error and rolling back?
+>
+> --
+> Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260901140326.38=
+12068-1-fuad.tabba@linux.dev?part=3D11
