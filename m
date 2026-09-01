@@ -1,232 +1,314 @@
-Received: from CY7PR03CU001.outbound.protection.outlook.com (mail-westcentralusazon11010066.outbound.protection.outlook.com [40.93.198.66])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C92D6368D77;
-	Tue,  1 Sep 2026 19:09:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.198.66
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788289771; cv=fail; b=agpq+TNkKhMvjQIQcwno7xf2kXQJdEJEkTlzLgI6QzPC3jXSmEv716J/1TS5178toqk0dIWbDrXotbVc35cKiFAGQk0RytYmAqr3ihf8QovlJpAtdrs3uxhQMoJkpRSBkwAenpgMVBz99Pe3xqouDoI8FGy0i+MNOdaj+4AFgAw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788289771; c=relaxed/simple;
-	bh=lgn2+SWeVWvmnKkGS4cF2sE8Iq3FjVXJef4aNtLXOIA=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k4Ww2QopAoAWb7eoZRBCmGjkPaaHgvbYBs8BVIq7E2wI4bPVBkW3PDBMuRuL86b572RcFwbwB6azct5sxARXF5UMFB+yzusmiedJI4S5dm5TpvLERGJ9By6VvQri5n9DB4fxYF9UCIRM4m7a9YbGBnaTJG4z3jj3Fcu0vqzTr1I=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=PrMNUi7z; arc=fail smtp.client-ip=40.93.198.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8B173A9D80;
+	Tue,  1 Sep 2026 21:50:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788299441; cv=none; b=iJvcz0UZukcGdbsF0jdvxoqryv2pOo3721cn0rN1/bLnmE5IkiNy7ULACK/37ejGE1hKzirWHgRvI+K26ZVZvLvPN/z4xMt3/nnKAXYt1NiweiCJ+3LrNZbGCOd07jfrrNm3vm4XBBxhwk5mzJAW1wlUXtUZithURXjec0MuAQo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788299441; c=relaxed/simple;
+	bh=soBF30gUoR2PVLpLm32ORAuXIHLo76uG13mfe1yoxkI=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Pr8KcT+PNZ52oXzEimIhWzY0ks64l2vdOYT3/JkKQsZmQENFZGrHFykLjv9Y9ZVtm3Qzkxmvlcxcx62WjT7pj5EJBkqDBcbQ4n7XzSt4GGQ3w5k0uv3RAIVeoxZhGRK4Cpp7ylLj3dY9nbaUolnWW1AMuehDk9thUwfv6jB9308=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EEmfbmOp; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="PrMNUi7z"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=dvX2XmVhQCS8BJ9h+KyBlqwM1gDrInuBy+ex3y3eEJeDjPG3pTrj8sN/69CqCp0tE6mQ3fXJNIf+QEr2mR1cnk6PFWzxRGAwnSECCWIHZlHeS/QNdWguUkCLILr7IDFRBu7TJ7uEH/U7YTACMHvDP2+vxQlYJ+B6IKbqKh4BSkORZdPNMSXh2Xqt4RniuGnI1o88mBHKVa6oL7jdISorWaxwB01Sr7/ytVqR4Ox9/iN/sUMl33IL93inwEFeRRiq6vJzy3sGdwYC88jnToNolkH/qHNXGFYpM7WXlFera2iiA7HK06wZL9l7pTr3VV+jmSY8OOYkzAwMI8NClH3zjg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=s7uW5KskTS4dXl+SOZwtRz5cWx2MZfZbWxPzt/1WPV0=;
- b=Gtzo1PNDcFGf5FBl7GZbHQJOcGZwzrwww3TAXfE1cHHbOs3WmdvU91Te4CQQOEwhQM709LTZR2xs6EeWxl97WfrggiX5PQe2PZ+hxFbDGQvkzEkVquFrnPrRMAsK+legCi9nsroZol969Ne6SRVYS0z1uqi1aa/JjkX5MgQLjmRkNAR+YvrFkaLznQRA23a5ofUJGZqrC446SO5Q+7muzlvPJVR6bC2aEjwqyoygwXuhWh2uggKzu2Xfk4DIhbkJRYbd2FgwV6hYxUsv6yLeLCbA8Vz5psq7dqN3/x0eqcJ2wrnF6OrOawQL3r6QWjWvzIlq2GccRfeo13GiKJb+SA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.232) smtp.rcpttodomain=ziepe.ca smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=s7uW5KskTS4dXl+SOZwtRz5cWx2MZfZbWxPzt/1WPV0=;
- b=PrMNUi7z8X3l2rz/4gTenHqFOS/V6pGIKoK92ineeXr3N2Lfmzzkc0Qgte2cfS5XGH/xJGb/kfxUgkUMqq6jdKyKoB0P+ZZiuHMIKDd93xb6emvZopj5arsDWzmvUyyKFLwxAxzS7E0mAMW7RKINZUQTpbc+4IGXLpzbfgNV4kSS25uWlf2ZuQSSqpqOluSI2HRMVy7L3sG+pNZ1EQ6Y0SgqYZJvq11DZ0XllYR3EHT8wqA9M4Zmx0Aw8b8s2liWhh/O8co8WzZGjto6c3E4659sqv1nln8fSFLXo6Hb11MsPYe8VNIJTSQtL2f4+Hzo8TC0kq9rfSw8nsDxzEDoeA==
-Received: from BY3PR03CA0025.namprd03.prod.outlook.com (2603:10b6:a03:39a::30)
- by SJ2PR12MB8718.namprd12.prod.outlook.com (2603:10b6:a03:540::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.360.13; Tue, 1 Sep
- 2026 19:09:04 +0000
-Received: from SJ1PEPF000026C8.namprd04.prod.outlook.com
- (2603:10b6:a03:39a:cafe::7f) by BY3PR03CA0025.outlook.office365.com
- (2603:10b6:a03:39a::30) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.360.13 via Frontend Transport; Tue, 1
- Sep 2026 19:09:04 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.232) by
- SJ1PEPF000026C8.mail.protection.outlook.com (10.167.244.105) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.382.8 via Frontend Transport; Tue, 1 Sep 2026 19:09:04 +0000
-Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
- (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.46; Tue, 1 Sep
- 2026 12:08:41 -0700
-Received: from drhqmail202.nvidia.com (10.126.190.181) by
- drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.46; Tue, 1 Sep 2026 12:08:40 -0700
-Received: from nvidia.com (10.127.8.10) by mail.nvidia.com (10.126.190.181)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.46 via Frontend
- Transport; Tue, 1 Sep 2026 12:08:39 -0700
-Date: Tue, 1 Sep 2026 12:08:38 -0700
-From: Nicolin Chen <nicolinc@nvidia.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-CC: Aneesh Kumar K.V <aneesh.kumar@kernel.org>, <linux-coco@lists.linux.dev>,
-	<kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-kernel@vger.kernel.org>, Alexey Kardashevskiy <aik@amd.com>, "Catalin
- Marinas" <catalin.marinas@arm.com>, Dan Williams <dan.j.williams@intel.com>,
-	Joerg Roedel <joro@8bytes.org>, Jonathan Cameron <jic23@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>, Pranjal Shrivastava <praan@google.com>, "Robin
- Murphy" <robin.murphy@arm.com>, Samuel Ortiz <sameo@rivosinc.com>, "Steven
- Price" <steven.price@arm.com>, Suzuki K Poulose <Suzuki.Poulose@arm.com>,
-	"Will Deacon" <will@kernel.org>, Xu Yilun <yilun.xu@linux.intel.com>
-Subject: Re: [RFC PATCH v4 03/16] iommu/arm-smmu-v3: Add initial pSMMU realm
- viommu plumbing
-Message-ID: <apcitkpASOREamQs@nvidia.com>
-References: <20260427085344.941627-1-aneesh.kumar@kernel.org>
- <20260427085344.941627-4-aneesh.kumar@kernel.org>
- <apM6dOHcEI2ztWS0@nvidia.com>
- <yq5a8q5lz5yn.fsf@kernel.org>
- <yq5aecfdnv4i.fsf@kernel.org>
- <20260901143445.GC56830@ziepe.ca>
- <apcHoHKGoI7WNFXp@nvidia.com>
- <20260901174230.GA2847102@ziepe.ca>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EEmfbmOp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6E191F000E9;
+	Tue,  1 Sep 2026 21:50:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788299437;
+	bh=RGxvPmZFMCNoJJyiuRzYrsMwWqlZzj4qed9N2ZoNTZs=;
+	h=From:Subject:Date:To:Cc;
+	b=EEmfbmOpHL6C80SnJoVQ9vGpFUnMlNQrtsieAzJ9Fuu+h4hIExZ0NkkK3u2hFCYit
+	 JZz75zBLHl9XX1VICycvX1RslzUe0Uo4NxXrF1T2IaMq4f0D0xHCNZ+m+TxEPiNzQv
+	 /1S0rpn2bsZQm3exY0Kwk+ap/6IqkbdYK4njqF2lok89Ks2OKsAxfebhQ5fmy9rXfl
+	 FD+BLBjFASMIUZqRt3gWH0jyRZx2zFZVZlV2VVfBcVbRI5H7vxLhDHa20uSJQ+ufck
+	 uW35VratlXwH6j7FlH8Awjp/jCbuNRsyPoJGEJ7l7IIGWgWAfoYkJvgVcOgh0TGQ7Y
+	 RgG2EiuoAl93g==
+From: Mark Brown <broonie@kernel.org>
+Subject: [PATCH v20 00/14] KVM: arm64: Provide guest support for GCS
+Date: Tue, 01 Sep 2026 22:46:58 +0100
+Message-Id: <20260901-arm64-gcs-v20-0-f31750bdfadb@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20260901174230.GA2847102@ziepe.ca>
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF000026C8:EE_|SJ2PR12MB8718:EE_
-X-MS-Office365-Filtering-Correlation-Id: b94e85a9-e126-4c95-5ad5-08df085c7d5e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700016|23010399003|82310400026|1800799024|7416014|376014|6133799003|10067099003|4143699003|56012099006|11063799006|3023799007|18002099003|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	mzhxmUjEwmpKKkqjSA6VsVXyfOIBeFR0r3as9S3p3Sd0x0oqEex/Huj65UKNKH1fX+o2sLMvxUAMVRgxAATMYAoGaPBs/gjN/tHzq4lntdRrjasRgIG7nZFyVPzT2Czjwtjj7JRJCJBHWjfUiWSliBt0QbXExZdbqwU6ZH1TbpqOGx7HamlW5IUXqCDjq7j2rzD+7viZpvZtLVEbgGc96DuERGpUTyj1DD840MIaa9dpV2oFqAS/NpAst7D1CkJdlbqWFNnEKdEhzMTwW31CR5AVy/JfWHpnZ9+ZHu+1+oGG36VbmepT1HoNEnJb3sp16dyZ2HG8zYoiJSLkxzhVhakVEdsi70uP63pwD/XRnDAd89x0KbTkCWc+51MdSdrW8mJZ0aiF+hO8TgR3uDNwBrp8FwqUeD2AEmf081l//0M5l0k2JO9Fa/r8313NW/rFKSbztPv/1s0hb+fVJE1RawbKbrWS3/cMsQSrOezP12lRNuABvNTfCJPwNJ8VPkXu8iX8glyCYoSHmKqELoOsgde0s6mPMLF1Xt+o7geZWUsfydy8qwlBPjeqvhMbPAGokG0m+38bOBWuPu/OGCO6TEvxHKdkBuzL7jgjvJjWl8AZXqGo3mfeljkK5+soiNO087xPGJnscrzjhvihR1QH4srntOwF4qfOTisTrS4xBiSNKKVlHEHPMI9W/R3WFMgGhPblGqnKGBofG5N89wIWEg==
-X-Forefront-Antispam-Report:
-	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700016)(23010399003)(82310400026)(1800799024)(7416014)(376014)(6133799003)(10067099003)(4143699003)(56012099006)(11063799006)(3023799007)(18002099003)(22082099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	sIkvFzOkPF46m21AYRbJR5jPxvHhoc7/1WnOwzmGr9vs31wQkley/YMhqrm9sdcOo8As9WU1Kb8Kd/cn106k2w3Cs8656o+BR+yq9GbC1ARKoQPKkgCNT4xhusKZgxbuCtel3D6NX5f5Ci5RI2gEWqFp3wCtJSv0FgwOrQwbrnPWb2eyigVUBpJluBvBH4A50YbuWTiIyyUJ24J2eNlvs+boDnKV6twD4hHkr6AsQtstq8S82U8xIwO4Aun8W/edFpkVWSYq7iPyDSbVQb7X2V+DzdbQGO9VQMidBPc31NCvUK3vBEjmOLm4O5th5pH3YDzw0Iz8d9w8lrruXZtcVUOSJNCdTvuw9xUtIwVLqyastMpWx6ZjYZTeHPqzjnh0FASqCIBelgFQWRwY7GnKIASFG/HegPiT5tpd8Gq6cfUDw7U/Gh3v7QJuU7u56uLo
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Sep 2026 19:09:04.2982
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b94e85a9-e126-4c95-5ad5-08df085c7d5e
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF000026C8.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8718
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIANNHl2oC/23TS27bMBAG4KsEWlfFzPDdVe9RdMHH0Bba2IEUC
+ C0C371kglpkaHglwh+HM/z5Nm28LrxN357eppX3ZVuul/JB8OVpimd/OfG8pLIwEZCA8pv9+qz
+ lfIrbzALRB0jWkJvK/4PfeA6rv8RzFa/PL3X1ZeW8/Hkv8eNn+T4v2+t1/ftecce6+rG3Qd3sv
+ eMMc8hKm+xECF5//8XrhX9/va6nqW6zU0NJtpQKTZEiJikjcRioaKjAlopCY0rZZWchOTtQeVA
+ LpqWyUG1j9qIcGbQbqGooUUtVoY4zWkxJC5ID1XeKAK6lulBjWanE3suUBmoOin1VUygBRmlFS
+ Maogdr/VAJ1F7/bOiaXORqjjeA8UHdQTaqlrlDIWkipXbAZBopwWAvd7SDUGTvHFBKhg/FmERv
+ ct4s1URKDRScNxzD2i9TibsxYMyWpdFywFNqP+B4qWe6oP3ZNFREFY8tbYeYRyxZ388KaK1UCB
+ TFpcPSg53uwVDk2dLgmS7EQMnm0wY7JQn1gh/3Aara0FIoVR2HSg8r3cOnPDwnNR2UXPWBA+aB
+ ne2DbxwtrvnKyUUJWPtnxGaJr8Kdj14Q5BOXLDmR97PDtdvsHgEf/EvQEAAA=
+X-Change-ID: 20230303-arm64-gcs-e311ab0d8729
+To: Catalin Marinas <catalin.marinas@arm.com>, 
+ Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+ Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Shuah Khan <shuah@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+ Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Peter Maydell <peter.maydell@linaro.org>, 
+ Leonardo Bras <leo.bras@arm.com>, Wei-Lin Chang <weilin.chang@arm.com>, 
+ Yao Yuan <yaoyuan@linux.alibaba.com>, linux-arm-kernel@lists.infradead.org, 
+ linux-doc@vger.kernel.org, kvmarm@lists.linux.dev, 
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Mark Brown <broonie@kernel.org>, 
+ Thiago Jung Bauermann <thiago.bauermann@linaro.org>
+X-Mailer: b4 0.17-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=11079; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=soBF30gUoR2PVLpLm32ORAuXIHLo76uG13mfe1yoxkI=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBql0icWI9rowjSCIEwAe2hCMqXk/9VVGgwK9FX9
+ GXjEcniYeWJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCapdInAAKCRAk1otyXVSH
+ 0P55B/4lnVehcB5I9GJLt96tprUy746Y+NsnN2ZqIf6zRZQfgEciZ7makEiwUduFU8oRTa+nVow
+ fj94+A41Its1rBfC4BJsQ3w2QYpYSj6stxFKxocIeLsJlRNrJegiyyzIF2Wzj1Wolc++fQ66l3i
+ mQLbWn+FbzB0Ous8Z06qZ8RSD6mpsLNHMXBoHZTXtY3H/VvBCgqT9v+VWiDTVwt979v6Tgejo/J
+ A1Nz081nYjIhBKw82jPRvAPMkg9AqMnC8SDL35hZvTjdgWcSUiAJncS1EFktshTlRMJtVout/51
+ ztA1UWDjGzk3xHnbk00T97ki919dj0ZfXanfT4+dTtUshc3l
+X-Developer-Key: i=broonie@kernel.org; a=openpgp;
+ fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-On Tue, Sep 01, 2026 at 02:42:30PM -0300, Jason Gunthorpe wrote:
-> On Tue, Sep 01, 2026 at 10:13:04AM -0700, Nicolin Chen wrote:
-> 
-> > +/**
-> > + * enum iommu_viommu_arm_realm_vsmmuv3_flags - Flags for ARM SMMUv3 Realm
-> > + * @IOMMU_VIOMMU_ARM_REALM_SMMUV3_FLAGS_VSMMU: Indicates whether the Realm has
-> > + *                                             a guest-visible VSMMU instance
-> > + */
-> > +enum iommu_viommu_arm_realm_vsmmuv3_flags {
-> > +	IOMMU_VIOMMU_ARM_REALM_SMMUV3_FLAGS_VSMMU = 1 << 0,
-> > +};
-> > +
-> > +/**
-> > + * struct iommu_viommu_arm_realm_vsmmuv3 - ARM Realm VSMMUv3 parameters
-> > + *                                         (IOMMU_VIOMMU_TYPE_ARM_REALM_SMMUV3)
-> > + * @flags: Combination of enum iommu_viommu_arm_realm_vsmmuv3_flags
-> > + * @reg_base: MMIO base address of the VSMMU in the guest VM
-> > + * @reg_top: MMIO top address of the VSMMU in the guest VM
-> > + * @aidr: AIDR register value of the VSMMU in the guest VM
-> > + * @idr: IDR register values of the VSMMU in the guest VM
-> > + */
-> > +struct iommu_viommu_arm_realm_vsmmuv3 {
-> > +	__aligned_u64 flags;
-> > +	__aligned_le64 reg_base;
-> > +	__aligned_le64 reg_top;
-> > +	__aligned_le64 aidr;
-> > +	__aligned_le64 idr[7];
-> > +};
-> 
-> Yeah, broadly what I would expect. Pass everything needed to execute
-> RMI_VSMMU_CREATE through this struct.
-> 
-> Is there anything more than RMI_VSMMU_CREATE needed from a RMM
-> perspective? What about that dpt/ats stuff?
+The arm64 Guarded Control Stack (GCS) feature provides support for
+hardware protected stacks of return addresses, intended to provide
+hardening against return oriented programming (ROP) attacks and to make
+it easier to gather call stacks for applications such as profiling.
 
-DPT is a bit hacky currently..
+When GCS is active a secondary stack called the Guarded Control Stack is
+maintained, protected with a memory attribute which means that it can
+only be written with specific GCS operations.  The current GCS pointer
+can not be directly written to by userspace.  When a BL is executed the
+value stored in LR is also pushed onto the GCS, and when a RET is
+executed the top of the GCS is popped and compared to LR with a fault
+being raised if the values do not match.  GCS operations may only be
+performed on GCS pages, a data abort is generated if they are not.
 
-Prior to RMM v2.0 ABI, DPT was allocated statically in RMM; there
-was no RMI command for DPT allocations.
+The combination of hardware enforcement and lack of extra instructions
+in the function entry and exit paths should result in something which
+has less overhead and is more difficult to attack than a purely software
+implementation like clang's shadow stacks.
 
-Now, with RMM v2.0 ABI, DPT can be managed via RMIs. I am making
-it follow GPT at this point, similar to the static idea. But, in
-the long run, I will think of decoupling, but I haven't looked at
-that closely.
- 
-> > I think this should work. But I still feel awkward that a non-vsmmu
-> > case has to allocate a viommu object for a set of RMI commands that
-> > don't need an Realm Descriptor.
-> 
-> It is for the RMI_VDEV_CREATE which needs the RD:
-> 
-> 	case IOMMU_VDEVICE_TSM_BIND:
-> 		rc = tsm_bind(vdev->idev->dev, kvm, vdev->virt_id);
-> 		break;
-> 
-> It has to be tied to a vdevice on a viommu to pick up the kvm and
-> vSID.
-> 
-> If we don't do that we need a new way to get the virt_id and kvm into
-> the flow, which doesn't really seem worthwhile to me.
+This series implements support for managing GCS for KVM guests.
 
-Okay. I see the gap now...
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
+Changes in v20:
+- Rebase onto v7.3-rc1.
+- Relax GCSB DSYNCs, remove them when loading the vCPU and move them to
+  vcpu_put() on the outgoing path.
+- Make kvm_check_illegal_exlock_returns() mode change checks more
+  similar to compute_exlock().
+- Use kvm_has_gcs() in ctxt_has_gcs().
+- Move some EL2 register saves under S1PIE checks.
+- Link to v19: https://patch.msgid.link/20260812-arm64-gcs-v19-0-9105afd828ac@kernel.org
 
-For tsm_bind: idev has dev, idev has kvm, but idev has no vBDF.
+Changes in v19:
+- Fix accessor for GCSCR_EL2 in emulation.
+- Correct locate_direct_register() for EL0 registers.
+- Don't check for GCS without S1PIE when restoring vEL2.
+- Move barriers to align better with nearby dsbs.
+- Link to v18: https://patch.msgid.link/20260803-arm64-gcs-v18-0-fd8c40f5ad88@kernel.org
 
-Maybe we could allow vdevice to have no viommu? In which way, VMM
-can forward vBDF independently. If VMM has a vsmmu instance, then
-it can allocate vdevice in the traditional way.
+Changes in v18:
+- Reinject all GCS exceptions from nested guests.
+- Include GCSCRE0_EL1 and GCSPR_EL0 in the live CPU register accessors.
+- Sort el2_regs in get-reg-list.
+- Link to v17: https://patch.msgid.link/20260731-arm64-gcs-v17-0-5e39ca01b14e@kernel.org
 
-The viommu object here is an empty vehicle that almost has no use
-but to allow another vehicle (vdevice) on top to forward vBDF. It
-makes VMM code a bit awkward: there is no iommu instance, so VMM
-doesn't enable iommu driver, then there is no good place to alloc
-the viomu object for VIOMMU_TYPE_ARM_REALM_SMMUV3.
+Changes in v17:
+- Rebase onto v7.2-rc4.
+- Fix mapping of HFGITR_EL2.nGCSEPP.
+- Implement a test for NV emulation around EXLOCK.
+- Fix NV exception emulation issues.
+- Add GCS[PC]R_EL1 to locate_direct_register().
+- Add barriers.
+- Add ID_AA64PFR1_EL1.GCS to set_id_regs.
+- Comment updates.
+- Link to v16: https://lore.kernel.org/r/20250912-arm64-gcs-v16-0-6435e5ec37db@kernel.org
 
-> > Things could be cleaner if we allow RMI_PSMMU_ACTIVATE and
-> > RMI_PSMMU_ST_L2_CREATE to be independent on a viommu; then leave
-> > IOMMU_VIOMMU_TYPE_ARM_SMMUV3 to vsmmu-visiable case.
-> 
-> This is why I asked in the other message if RMM spec is clear that
-> PSMMU and STE are not required for anything but VDEV_CREATE. If so,
-> the PDEV create and SPDM stuff is fuly independent.
+Changes in v16:
+- Rebase onto v6.17-rc3.
+- Also expose the feature to nested guests.
+- Implement emulation of EXLOCK when returning from nested guests.
+- Rename enter_exception_gcs() to compute_exlock().
+- Move all ID_AA64PFR1_EL1 handling to the final kernel patch.
+- Drop unneeded forwarding of GCS exceptions.
+- Commit and cover message updates.
+- Link to v15: https://lore.kernel.org/r/20250820-arm64-gcs-v15-0-5e334da18b84@kernel.org
 
-I think the spec is clear. And you are right PDEV is independent,
-only linked to PSMMU when VDEV is created.
+Changes in v15:
+- Rebase onto v6.17-rc1.
+- Link to v14: https://lore.kernel.org/r/20241005-arm64-gcs-v14-0-59060cd6092b@kernel.org
 
-> Which is why I'm saying the split doesn't make sense. PSMMU,
-> interrupts, STE, VDEV are all related objects that should be managed
-> together by the SMMUv3 driver. You need a PDEV to create a STE, and
-> you need a STE to create a VDEV.
-> 
-> PDEV is the SPDM channel and should be managed by the TSM driver.
->
-> So, I think the IOMMU_VDEVICE_TSM_BIND is not justified. "BIND" should
-> happen when the SMMUv3 realm viommu ops create the vdevice. The same
-> way the vcmdq sets up the VSID tables when the vdevice is created. Is
-> there a reason to have it in its own command?
-> 
-> Further the implementation of IOMMU_VDEVICE_TSM_BIND in this series
-> *requires* a viommu to work. So OK, let's lean into that. (to be clear
-> I am saying delete tsm_bind)
+Changes in v14:
+- Rebase onto arm64/for-next/gcs which includes all the non-KVM support.
+- Manage the fine grained traps for GCS instructions.
+- Manage PSTATE.EXLOCK when delivering exceptions to KVM guests.
+- Link to v13: https://lore.kernel.org/r/20241001-arm64-gcs-v13-0-222b78d87eee@kernel.org
 
-Yea, IOMMU_VDEVICE_TSM_BIND feels redundant..
+Changes in v13:
+- Rebase onto v6.12-rc1.
+- Allocate VM_HIGH_ARCH_6 since protection keys used all the existing
+  bits.
+- Implement mm_release() and free transparently allocated GCSs there.
+- Use bit 32 of AT_HWCAP for GCS due to AT_HWCAP2 being filled.
+- Since we now only set GCSCRE0_EL1 on change ensure that it is
+  initialised with GCSPR_EL0 accessible to EL0.
+- Fix OOM handling on thread copy.
+- Link to v12: https://lore.kernel.org/r/20240829-arm64-gcs-v12-0-42fec947436a@kernel.org
 
-Thanks
-Nicolin
+Changes in v12:
+- Clarify and simplify the signal handling code so we work with the
+  register state.
+- When checking for write aborts to shadow stack pages ensure the fault
+  is a data abort.
+- Depend on !UPROBES.
+- Comment cleanups.
+- Link to v11: https://lore.kernel.org/r/20240822-arm64-gcs-v11-0-41b81947ecb5@kernel.org
+
+Changes in v11:
+- Remove the dependency on the addition of clone3() support for shadow
+  stacks, rebasing onto v6.11-rc3.
+- Make ID_AA64PFR1_EL1.GCS writeable in KVM.
+- Hide GCS registers when GCS is not enabled for KVM guests.
+- Require HCRX_EL2.GCSEn if booting at EL1.
+- Require that GCSCR_EL1 and GCSCRE0_EL1 be initialised regardless of
+  if we boot at EL2 or EL1.
+- Remove some stray use of bit 63 in signal cap tokens.
+- Warn if we see a GCS with VM_SHARED.
+- Remove rdundant check for VM_WRITE in fault handling.
+- Cleanups and clarifications in the ABI document.
+- Clean up and improve documentation of some sync placement.
+- Only set the EL0 GCS mode if it's actually changed.
+- Various minor fixes and tweaks.
+- Link to v10: https://lore.kernel.org/r/20240801-arm64-gcs-v10-0-699e2bd2190b@kernel.org
+
+Changes in v10:
+- Fix issues with THP.
+- Tighten up requirements for initialising GCSCR*.
+- Only generate GCS signal frames for threads using GCS.
+- Only context switch EL1 GCS registers if S1PIE is enabled.
+- Move context switch of GCSCRE0_EL1 to EL0 context switch.
+- Make GCS registers unconditionally visible to userspace.
+- Use FHU infrastructure.
+- Don't change writability of ID_AA64PFR1_EL1 for KVM.
+- Remove unused arguments from alloc_gcs().
+- Typo fixes.
+- Link to v9: https://lore.kernel.org/r/20240625-arm64-gcs-v9-0-0f634469b8f0@kernel.org
+
+Changes in v9:
+- Rebase onto v6.10-rc3.
+- Restructure and clarify memory management fault handling.
+- Fix up basic-gcs for the latest clone3() changes.
+- Convert to newly merged KVM ID register based feature configuration.
+- Fixes for NV traps.
+- Link to v8: https://lore.kernel.org/r/20240203-arm64-gcs-v8-0-c9fec77673ef@kernel.org
+
+Changes in v8:
+- Invalidate signal cap token on stack when consuming.
+- Typo and other trivial fixes.
+- Don't try to use process_vm_write() on GCS, it intentionally does not
+  work.
+- Fix leak of thread GCSs.
+- Rebase onto latest clone3() series.
+- Link to v7: https://lore.kernel.org/r/20231122-arm64-gcs-v7-0-201c483bd775@kernel.org
+
+Changes in v7:
+- Rebase onto v6.7-rc2 via the clone3() patch series.
+- Change the token used to cap the stack during signal handling to be
+  compatible with GCSPOPM.
+- Fix flags for new page types.
+- Fold in support for clone3().
+- Replace copy_to_user_gcs() with put_user_gcs().
+- Link to v6: https://lore.kernel.org/r/20231009-arm64-gcs-v6-0-78e55deaa4dd@kernel.org
+
+Changes in v6:
+- Rebase onto v6.6-rc3.
+- Add some more gcsb_dsync() barriers following spec clarifications.
+- Due to ongoing discussion around clone()/clone3() I've not updated
+  anything there, the behaviour is the same as on previous versions.
+- Link to v5: https://lore.kernel.org/r/20230822-arm64-gcs-v5-0-9ef181dd6324@kernel.org
+
+Changes in v5:
+- Don't map any permissions for user GCSs, we always use EL0 accessors
+  or use a separate mapping of the page.
+- Reduce the standard size of the GCS to RLIMIT_STACK/2.
+- Enforce a PAGE_SIZE alignment requirement on map_shadow_stack().
+- Clarifications and fixes to documentation.
+- More tests.
+- Link to v4: https://lore.kernel.org/r/20230807-arm64-gcs-v4-0-68cfa37f9069@kernel.org
+
+Changes in v4:
+- Implement flags for map_shadow_stack() allowing the cap and end of
+  stack marker to be enabled independently or not at all.
+- Relax size and alignment requirements for map_shadow_stack().
+- Add more blurb explaining the advantages of hardware enforcement.
+- Link to v3: https://lore.kernel.org/r/20230731-arm64-gcs-v3-0-cddf9f980d98@kernel.org
+
+Changes in v3:
+- Rebase onto v6.5-rc4.
+- Add a GCS barrier on context switch.
+- Add a GCS stress test.
+- Link to v2: https://lore.kernel.org/r/20230724-arm64-gcs-v2-0-dc2c1d44c2eb@kernel.org
+
+Changes in v2:
+- Rebase onto v6.5-rc3.
+- Rework prctl() interface to allow each bit to be locked independently.
+- map_shadow_stack() now places the cap token based on the size
+  requested by the caller not the actual space allocated.
+- Mode changes other than enable via ptrace are now supported.
+- Expand test coverage.
+- Various smaller fixes and adjustments.
+- Link to v1: https://lore.kernel.org/r/20230716-arm64-gcs-v1-0-bf567f93bba6@kernel.org
+
+---
+Mark Brown (14):
+      arm64/gcs: Ensure FGTs for EL1 GCS instructions are disabled
+      KVM: arm64: Fix FGT mapping for HFGITR_EL2.nGCSEPP
+      KVM: arm64: Manage GCS access and registers for guests
+      KVM: arm64: Ensure GCS memory effects are visible
+      KVM: arm64: Set PSTATE.EXLOCK when entering an exception
+      KVM: arm64: Validate GCS exception lock when emulating ERET
+      KVM: arm64: Forward GCS exceptions to nested guests
+      KVM: arm64: Enforce EXLOCK for SPSR and ELR
+      KVM: arm64: Allow GCS to be enabled for guests
+      KVM: selftests: arm64: Add GCS registers to get-reg-list
+      KVM: selftests: arm64: Add GCS to set_id_regs
+      KVM: selftests: arm64: Only restore SPSR_EL1 and ELR_EL1 if they change
+      tools: Synchronise the kernel esr.h
+      KVM: selftests: arm64: Add GCS EXLOCK exception emulation test
+
+ arch/arm64/include/asm/el2_setup.h                 |   5 +
+ arch/arm64/include/asm/kvm_emulate.h               |  11 +
+ arch/arm64/include/asm/kvm_host.h                  |  14 +
+ arch/arm64/include/asm/kvm_nested.h                |  32 ++
+ arch/arm64/include/asm/vncr_mapping.h              |   2 +
+ arch/arm64/include/uapi/asm/ptrace.h               |   1 +
+ arch/arm64/kvm/arm.c                               |   7 +
+ arch/arm64/kvm/emulate-nested.c                    |   7 +-
+ arch/arm64/kvm/handle_exit.c                       |  18 +-
+ arch/arm64/kvm/hyp/exception.c                     |  37 +++
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h         |  28 ++
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c                 |   7 +
+ arch/arm64/kvm/hyp/vhe/switch.c                    |   4 +
+ arch/arm64/kvm/hyp/vhe/sysreg-sr.c                 |  11 +
+ arch/arm64/kvm/nested.c                            |   3 +-
+ arch/arm64/kvm/sys_regs.c                          |  89 +++++-
+ tools/arch/arm64/include/asm/esr.h                 | 113 ++++++-
+ tools/testing/selftests/kvm/Makefile.kvm           |   1 +
+ tools/testing/selftests/kvm/arm64/gcs_exceptions.c | 346 +++++++++++++++++++++
+ tools/testing/selftests/kvm/arm64/get-reg-list.c   |  12 +
+ tools/testing/selftests/kvm/arm64/set_id_regs.c    |   1 +
+ tools/testing/selftests/kvm/lib/arm64/handlers.S   |  10 +
+ 22 files changed, 735 insertions(+), 24 deletions(-)
+---
+base-commit: cee9395acd8043be0644b25c34bfa86623f2b935
+change-id: 20230303-arm64-gcs-e311ab0d8729
+
+Best regards,
+--  
+Mark Brown <broonie@kernel.org>
+
