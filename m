@@ -1,73 +1,92 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2D063B14D1;
-	Tue,  1 Sep 2026 14:25:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C9C835C6B5
+	for <kvmarm@lists.linux.dev>; Tue,  1 Sep 2026 14:32:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788272761; cv=none; b=lJCuJEs1HimesrGnkIcjDKJlkmHVXQx7WnisBe0orjh8vn22foP1OaPZqi+xFtcHqJ+tjFgBuKUnu9v+/DB3fNGFbAAF+M3tJkg4fSOg8A0oKVB8WK2yB51E1v88FO6ln7j0sDBl44uM2MCV6W4rKwMHJdcS0dQkec+/K4N3768=
+	t=1788273146; cv=none; b=aG37VZ+YSKY52qVS+wNV48n/QD7l9bt0jVnDzA3b4Y/0DbgR10g06z+zKUUroXe6ZeFkKZLMPOLRWcGoy8THRVfe97FPhDQpOBcJ6waLQ1Rhv/0rhyPVhfyvEPH4PzHLpmAbZ45YxXOPZdH5kCgMuJu6F18882J/uIIyJWuLLiQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788272761; c=relaxed/simple;
-	bh=LOTCQsOY3jSCnGN/hhjKW7agRKqthDpdG20/R1oZR58=;
+	s=arc-20240116; t=1788273146; c=relaxed/simple;
+	bh=Epea1SJtx0b5eyI7MQ/aNcrxf6TZYklQq7AcTHGfVa4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m1iSw4PHpMldT0KCij8GH6bk2DTuimHaM7FfBp7tAFC2wCsC8KD21cM2wlAr619tGVGabk/mwxZu+Ge9ME/nClmkLKpH9R22xdzwQy66bQf/y2mfOK4UCN4Q4UmIcCGlNYL6zLJEVlhLaTcwx70htkiEE9j/rAAIU3Q1fCES3UI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=T7/i7PwW; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=pMuSLoFO9r3urEm5sAqQQyidT9uEkx1JXByaPXm0Udt4u3lY6aUzzs0YBR4Qx1WnXgbE0EZfgOeuuHjh4nwcDWHjCFo5UDtugSzrJJUMmUgSC3u8/cIVl7uRmGBnpukCH+n1V53mZd8n07KUPxqmiXo3vghxBh0Ea8631b0ReV0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=WxVM2Stv; arc=none smtp.client-ip=209.85.160.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="T7/i7PwW"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 681DW7nt1333760;
-	Tue, 1 Sep 2026 14:25:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=+UtEPetIYbkEkW6qpX4mMtufgGpeic
-	fdKvgGmBH7Gn0=; b=T7/i7PwWo6P8vr/7z+0bsP8WwsHALlmwWKlvv+bhERGQrL
-	LnZzPQlrH1SaTxN6Bfnny7vz7UTI/tRjSlO9C3wFXKWU4oABDcKFLI0hroMwDrC3
-	p8opmR3IwTbOq6x/g8zH7QZT6S7j/ofCb5328UNeK1s3/sWT44Bt6tr6djrr8WIt
-	RT9X+fajRfh+8DU30umg1eGDkAbmQ+flnF2jJMOs4gxBhxKZ8pfi0P94D0xDEW7u
-	VvR5fGyq2S5FSwPdE92WKLvGCqhWaiEZU/UGldEgwSHm5FrJGPSGGfrxCcY+PjlA
-	4sM2KKZxCn5PU9hSDMMKkS9Q/NJsEwIk+cyfOoXg==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gbpx5gcs6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 01 Sep 2026 14:25:56 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 681EBgZa008556;
-	Tue, 1 Sep 2026 14:25:55 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4gcb8hc3dy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 01 Sep 2026 14:25:55 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 681EPpV143319568
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 1 Sep 2026 14:25:51 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7A45E20043;
-	Tue,  1 Sep 2026 14:25:51 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5069120040;
-	Tue,  1 Sep 2026 14:25:51 +0000 (GMT)
-Received: from osiris (unknown [9.224.76.185])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Tue,  1 Sep 2026 14:25:51 +0000 (GMT)
-Date: Tue, 1 Sep 2026 16:25:50 +0200
-From: Steffen Eiden <seiden@linux.ibm.com>
-To: Janosch Frank <frankja@linux.ibm.com>
-Cc: sashiko-reviews@lists.linux.dev,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        Marc Zyngier <maz@kernel.org>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>
-Subject: Re: [PATCH v2 11/20] KVM: s390: arm64: Query Available Arm features
-Message-ID: <20260901142550.231001-C-seiden@linux.ibm.com>
-References: <20260831145536.913567-1-seiden@linux.ibm.com>
- <20260831145536.913567-12-seiden@linux.ibm.com>
- <20260831194654.39B451F000E9@smtp.kernel.org>
- <d6fcf081-7613-4d3a-ab62-6c4f9a42816b@linux.ibm.com>
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="WxVM2Stv"
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-52fa9c055b5so13991431cf.1
+        for <kvmarm@lists.linux.dev>; Tue, 01 Sep 2026 07:32:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1788273144; x=1788877944; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=BSVwyibyFfIHGL0TlXMcUmW3kV25Hg4l49RcXdnb+4E=;
+        b=WxVM2Stvn6ZUEd4m/DPoefoshdc7YoKMy5nFjlThoaCyTqi0FEm2qwLEfJX8LzVdNA
+         9wKSVbhS5emVz0PmVNJKYLOQEs+EbttzYEYMwuDnwQYokWTiItmexbhM/GSJeWF/JLJU
+         MFcIyI3j5tC30a/73o3loVAW75Ofm77pZ9s8LVMx3npaQYP1BGoIfUnE5AcYxnYtaVoO
+         6Zu8GUGBJqQ2Md1oXdg3q24AqvOViZhm8WkbSE8lNhmIzu8sZYOFGpcVdrnJ0NpNynV8
+         GIvdBTIS6KqLpHNOFipd9DPiXSGRS7+TVSUJaZ/OtfgtBneLuSB1BEwikSGicSFLg2Vt
+         /dVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788273144; x=1788877944;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=BSVwyibyFfIHGL0TlXMcUmW3kV25Hg4l49RcXdnb+4E=;
+        b=aAC2NhOjcNpLua/gWtUkv9IpmXVKNk5YCvasFqSATx/A3HNS09FYKhfusuZi1LuHdD
+         RWmh7XVB0ibpiYkHX+ru1VtH51yQG59b5zXOXqwffsDTtbiGrgioJXsDvHLWoWoFZRTS
+         brJb2p25F41RNLjGpf7HpDNaTHc8qKDXJlv4NyjRNPOU40CnL0cdDrA61s1swidfDPvR
+         SQQCqZLHL01X1TUT1GPFxK8k4nHvkr7Kz48nWWF/vlRUK+IAe69vKsinkx3XiwO/p9XW
+         Bb8s0hjkwCuzt5jTeqk0L3+9IESuH8XPw49gXP14BXS1PZP2pt7PSs8KB/DaXe91ZmC5
+         HOlA==
+X-Forwarded-Encrypted: i=1; AHgh+RoqJarle2Au6Fuh8J6o1sZUDN3mio4k2NxF7z0MWn4lDSmy4XxNkrNzXUnJMIZ4nmODmfO7rC8=@lists.linux.dev
+X-Gm-Message-State: AFuF++l9DicciUe44fZ6h7fCgXZfyxv7y7njM0yCZas54DoUfKZq114f
+	duWer/rvj5OUQnTorxH2l5nRHxLdUPwDWTyxMV3+pvzf7+A2we96nWwjwjSlPWb1Yyo=
+X-Gm-Gg: AR+sD13KXlGbzPe5XoN1rW8/+E5faMD3qQkXXVrlfe1VQz1SG7IqnrUSiCS7ZVtNVK2
+	DNnZWHfGAtqqcZV/BX63LqQuqf3Y4PKZ6Zi7FBJF0F3Xg/i6bR81fDMzNwowdp04ADTs87Co2Ms
+	QXSZXTgSxuohAvAOG1wQPKyLaZ8p+28hNj6eqWdNc3s+uOeLe/8V4JoWxCItxktYyd+J128KM0k
+	AMeMVd8cHvGWeFfosgUC8yJ8exmaZuC3lkRckf+IA8DlkX9K+Jt7KLsOPDZXGYSD/LaxJsrSZGN
+	8a21X/lo+mZn5b/4+tudSVzPPDkKbY1BHqtI1BKOhbAppJj+lFnk8aplrGCep19JeXtfvnuJivW
+	9/pTKwd+KLlaXk+DeeiJ0XaqtVmO+YvwwLBjTDmv4OdD4cSslUd9SiwT7gDcVoCEVJVq6aeuR1d
+	mTQbwhgvpWIioPILwMcN8e2L5CCIUEPSWPFZM5wTINqI2XUgbTOqf1jhuDG6oV/Kq9HRxxnNN9L
+	KUr5pM8jtueUY+6zckq0koL9mRdpfw3WprzE2PznydKdeNG2jWm1jVH
+X-Received: by 2002:a05:622a:948:20b0:530:2ded:eb32 with SMTP id d75a77b69052e-5302dedececmr22533091cf.2.1788273142344;
+        Tue, 01 Sep 2026 07:32:22 -0700 (PDT)
+Received: from ziepe.ca (hlfxns010zw-159-2-239-150.pppoe-dynamic.high-speed.ns.bellaliant.net. [159.2.239.150])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-52fbe7fbe06sm96855001cf.17.2026.09.01.07.32.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Sep 2026 07:32:21 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1x1PXA-0000000BhaA-3wav;
+	Tue, 01 Sep 2026 11:32:20 -0300
+Date: Tue, 1 Sep 2026 11:32:20 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>
+Cc: Nicolin Chen <nicolinc@nvidia.com>, linux-coco@lists.linux.dev,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, Alexey Kardashevskiy <aik@amd.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Joerg Roedel <joro@8bytes.org>, Jonathan Cameron <jic23@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Pranjal Shrivastava <praan@google.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Samuel Ortiz <sameo@rivosinc.com>,
+	Steven Price <steven.price@arm.com>,
+	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
+	Will Deacon <will@kernel.org>, Xu Yilun <yilun.xu@linux.intel.com>
+Subject: Re: [RFC PATCH v4 01/16] iommu/arm-smmu-v3: Discover RME support and
+ realm IRQ topology
+Message-ID: <20260901143220.GB56830@ziepe.ca>
+References: <20260427085344.941627-1-aneesh.kumar@kernel.org>
+ <20260427085344.941627-2-aneesh.kumar@kernel.org>
+ <apMjUSbxcnlAKjks@nvidia.com>
+ <yq5aik4pnyul.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -76,138 +95,49 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d6fcf081-7613-4d3a-ab62-6c4f9a42816b@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=PPc/P/qC c=1 sm=1 tr=0 ts=6a96e074 cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
- a=kj9zAlcOel0A:10 a=VdqzKS8jKosA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=VwQbUJbxAAAA:8
- a=p5KpVjJDTnW5N_pSrO4A:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-GUID: mc49I7FBG0xrHGz3VQJjUctauGACZLM9
-X-Proofpoint-ORIG-GUID: mc49I7FBG0xrHGz3VQJjUctauGACZLM9
-X-Proofpoint-Spam-Info: AW1haW4tMjYwOTAxMDEyNCBTYWx0ZWRfX6/oBK93Dt9LR
- txAuLkSk+bRZIh/S4A0fP5ahlvLDqPoYHoTUaM7MpKoCLNW5RmoF+MLpBvGIWSzglikErSRS3Fx
- mbiaXVxDyozoAl7fggjYeIi+r18y2KA=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTAxMDEyNCBTYWx0ZWRfX6K8rBzagABvv
- 3KzyHV8As6lOiT3mhqrQ66jpH4ksjs2JmY6Z5Lt9yJGQSdw3F6Azr28n2Qjt94J05eArHGxbH4c
- 8AvKdF9G525D4YRjr7rFodiCqYw5NmMygPI66S6/r62lqf95bO3Uf6bzF1SSYtPe4PjeaAi0eLj
- 4+WWHBrvkxomIFAvEGUTZtkeiIPk/aYyxkgB+XOWP0p80VPsgT1pbXeLu1p5vHtRm76kTFF4DhD
- rxIKZAzJLkKk5x1QEHZOby5NI2FDCmsyvtlYmZbej6fklF1oLH7lMBGEWKc2LpA39oT+vYZr8Rl
- AxNl+68AFM6L7I6iVKRY1J2F8bcn5a1MPDeKzl1wXfw6irhwch1rwISSHRXMWvWpOozsGyk5V5F
- EICxgjuAHFi0LgXZBGTqeKTT6MpkE3/2TNIBGo66bn4NE9TWoQk+Y9cQn5ucjX61tIHHw1xaN9o
- O1NrKw/RXDo36bSZE0w==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-09-01_03,2026-09-01_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1011 phishscore=0 adultscore=0 suspectscore=0 bulkscore=0
- spamscore=0 priorityscore=1501 impostorscore=0 malwarescore=0
- lowpriorityscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
- definitions=main-2609010124
+In-Reply-To: <yq5aik4pnyul.fsf@kernel.org>
 
-On Tue, Sep 01, 2026 at 01:44:09PM +0200, Janosch Frank wrote:
-> On 8/31/26 9:46 PM, sashiko-bot@kernel.org wrote:
-> > Thank you for your contribution! Sashiko AI review found 4 potential issue(s) to consider:
-> > - [Critical] The EX_TABLE entry in the `qaaf` inline assembly incorrectly places the exception fixup label on the non-faulting `lhi` instruction instead of the potentially faulting `.insn` instruction, which will cause unhandled hardware exceptions to panic the kernel.
-> > - [High] `aef_sysfs_init()` unconditionally calls `aef_init_save_area()`, failing to skip it when the AEF facility is not present, causing a crash on older hardware.
-> > - [High] Off-by-two index error when accessing the QAAF registers array in `kvm_qaaf_read_ftr_reg()`, causing KVM to read incorrect memory offsets for all features.
-> > - [High] If QAAF initialization fails, the global capability flag `info.arm_guest_supp` is not cleared, leading KVM to initialize using uninitialized hardware capability data.
-> > --
-> 
-> [...]
-> 
-> > > diff --git a/arch/s390/kernel/aef.c b/arch/s390/kernel/aef.c
-> > > new file mode 100644
-> > > index 0000000000000..825e2643a8921
-> > > --- /dev/null
-> > > +++ b/arch/s390/kernel/aef.c
-> > [ ... ]
-> > > +static int  __init aef_query_info(void)
-> > > +{
-> > > +	int ret;
-> > > +
-> > > +	if (IS_ENABLED(CONFIG_KVM_S390_ARM64)) {
-> > > +		info.sae_avail = sclp.has_aef;
-> > > +		info.ptff_avail = ptff_query(PTFF_QAGTO) &&
-> > > +				  ptff_query(PTFF_QAGPT);
-> > > +		info.arm_guest_supp = info.sae_avail && info.ptff_avail;
-> > > +	}
-> > > +	if (!info.sae_avail)
-> > > +		return 0;
-> > > +
-> > > +	ret = qaaf(QAAF_FC_QMC, (union qaaf_block *)&qmc);
-> > > +	if (ret)
-> > > +		return ret;
-> > 
-> > [Severity: High]
-> > If the qaaf instruction fails and returns an error here, `info.arm_guest_supp`
-> > remains set to true.
-> > 
-> > Because aef_sysfs_init() is called via an arch_initcall, the initialization
-> > failure is ultimately ignored by the kernel. Later, kvm_s390_arm64_init()
-> > checks `aef_info()->arm_guest_supp` and will proceed to initialize KVM using
-> > the uninitialized `qmc` block.
-> > 
-> > Should `info.arm_guest_supp` be cleared before returning when qaaf() fails?
-> 
-> No, we can instead check the sclp bit for sae_avail and early return before
-> the assignments.
-> I don't see a gain in having this information shadowed considering the two
-> patchsets that are floating around. Maybe you need it at a later time?
+On Tue, Sep 01, 2026 at 02:16:10PM +0530, Aneesh Kumar K.V wrote:
+> +static struct irq_domain *arm_smmu_get_wired_irq_domain(struct arm_smmu_device *smmu)
+> +{
+> +	int irqs[] = {
+> +		smmu->combined_irq,
+> +		smmu->evtq.q.irq,
+> +		smmu->gerr_irq,
+> +		smmu->priq.q.irq,
+> +	};
+> +	struct irq_domain *domain = NULL;
+> +	struct irq_data *irq_data;
+> +	unsigned int i;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(irqs); i++) {
+> +		if (irqs[i] <= 0)
+> +			continue;
+> +
+> +		irq_data = irq_get_irq_data(irqs[i]);
+> +		if (!irq_data || !irq_data->domain)
+> +			return ERR_PTR(-EINVAL);
+> +
+> +		if (domain && domain != irq_data->domain)
+> +			return ERR_PTR(-EINVAL);
+> +
+> +		domain = irq_data->domain;
+> +	}
+> +
+> +	return domain ?: ERR_PTR(-ENXIO);
 
-I'll dump it into sysfs and use it in the init of kvm-arm64.
+I'm not excited to see code like this in a driver. Please put a helper
+function someplace else to translate whatever the RMM value is into a
+normal linux irq number?
 
-The main use is to have a single stop check in the sysfs to find out if
-arm-on-s390 is supported bu the machine. The check in init is just a
-second use.
+But this feels wrong to me, interrupts need to come through the FW
+side, ACPI or DT. Having RMM pass the value outside that
+infrastructure is going to be painful. None of this is trusted, why is
+it working like this vs just adding more interrupt lines to the FW
+description?
 
-> 
-> 
-> sae_avail is also used in patch #20 where it makes even less sense.
-> Either the machine and KVM have sae capabilities or we don't need the sysfs
-> files. So why even add it as a file?
-> 
-> It's not like UV where we need to opt in, it's either supported or not.
-> If it's not supported there's no need to have sysfs files.
-> 
+A naked integer is not enough to describe an interrupt in the system,
+and guessing that it is connected to other interrupts in the psmmu
+seems like an uncomfortable leap to me.
 
-The idea behind this is to provide some information on why kvm-arm64 is
-not available:
-It might be because ptff has not all the supported calls or aef is not
-there. Both must be present.
-
-> 
-> > 
-> > [ ... ]
-> > > +static int __init aef_sysfs_init(void)
-> 
-> aef_info_init()?
-> 
-> > > +{
-> > > +	int rc = -ENOMEM;
-> > > +
-> > > +	if (!IS_ENABLED(CONFIG_KVM_S390_ARM64))
-> > > +		return 0;
-> > > +
-> > > +	rc = aef_query_info();
-> > > +	if (rc)
-> > > +		return rc;
-> > > +
-> > > +	rc = aef_init_save_area();
-> > > +	if (rc)
-> > > +		return rc;
-> > 
-> > [Severity: High]
-> > Will this execute the new qaaf instruction unconditionally on all hardware?
-> > 
-> > aef_query_info() correctly returns 0 if the AEF facility is absent (since
-> > `info.sae_avail` would be false). However, aef_init_save_area() is called
-> > immediately after without checking if the facility is actually supported.
-> > 
-> > Could this trigger an operation exception on older hardware?
-> 
-FWIW: this is a valid finding.
-
-
-	Steffen
+Jason
