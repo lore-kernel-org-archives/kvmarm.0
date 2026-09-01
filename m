@@ -1,235 +1,135 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46ECD2BE630
-	for <kvmarm@lists.linux.dev>; Tue,  1 Sep 2026 04:45:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DB3546AF08
+	for <kvmarm@lists.linux.dev>; Tue,  1 Sep 2026 07:39:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788237951; cv=none; b=YUGfz/z+3rKEeGnQBU+MytP1/mh2BppbZYKa6ha0VReYEqd0cDxfkUQAHNwPr2n/uBPy1q9nuP5hRmKHFVmTQ2ezMdpDWE6++iVLXU2cfwYv93UN46EVWHj1qquLGoRhWlWW+DbwCoDfzfNZmYmr/ysf1H3iwzwGHlD57vvF2f8=
+	t=1788248348; cv=none; b=eJeiM2FzyNYkHqNLO1LUmRb7vv49K+zW6L3qqx/aqwU6xBii2rJdpw7yaQhy/fOfz78amUAMKl0qDLfOMmG9AFzFix4mpRqtFJXK15wfrevrtnzBkQJ9SdDg8cyNcQETHfaVo9lOSy80qF6XbwND+Mqis0oPjwDIV3geZUiS8lM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788237951; c=relaxed/simple;
-	bh=Jmkwxqy/ZvGVHKyyYPxHqUaecy4WhtwqUYZDe5W9ceo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=P4ly5fBJES1DVVdJ27pycciaq2K2lCRyeelmY5BlHZooblNPXPjsDD7aGcou+7IZMPwOXn2S9JDyEwa0bR7Y8aYyjrKG717ZO2CjqeorMt/Z36IUVRU8qmBgms3EPalp3ynYmjsE9B3jKq9Y7Pw1e+xzs2ZvIdVBKzDdVD6T2lI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OORIIB3B; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1788248348; c=relaxed/simple;
+	bh=5dZXMTuVIB4/rqwu6qguosRA2gdca0Wy/7vnL6NSoxI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=j28u2U+sZX4IKkbcKf4IHWvU6rnNgAOlIWyovH2YbS8rGrh4UtARnzOGc/bfstNDfjo3NQMyOmnx1rdAme6+7p2o4WrpngqaqB+fD6MREQYAMNM7e4SImmI9pzCmtzJndqNzIilxjtf3NkeTw6BGxh6mP8bVjYDdPZah2TYue0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=VtE2Iu6v; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OORIIB3B"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1788237949;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pJEzvIaybX9Dts9DYz8bf1h8e9d8Ys+d8ayhElVmFmU=;
-	b=OORIIB3BY0QqW5OJa7EMhJNk5MrXhD4EaQRJAEe7uBvcyUqhMG3hBLmPkmuBYoAOZJFb5p
-	of8nEOcH/bJsoB79b2Y+TLEjq+0VGIgySGy2xzLolylAg6a51tqrGm37DqBuoHYMhVJG+l
-	T5Sz8UdEUZzjY1zqEM+oAC4GnX0ne4M=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-299-Muy8mEY5PrW5TDG4Gh7SpA-1; Tue, 01 Sept 2026 00:45:48 -0400
-X-MC-Unique: Muy8mEY5PrW5TDG4Gh7SpA-1
-X-Mimecast-MFC-AGG-ID: Muy8mEY5PrW5TDG4Gh7SpA_1788237947
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-38f283baf1fso857803a91.3
-        for <kvmarm@lists.linux.dev>; Mon, 31 Aug 2026 21:45:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788237947; x=1788842747;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=pJEzvIaybX9Dts9DYz8bf1h8e9d8Ys+d8ayhElVmFmU=;
-        b=W0ulpuet5fjvcVusU7/RfdW7rq+esr4ByCN68pzN6BsCT/ZRskUxqN2vUZTJov/oPm
-         /e/bhawTRhX/GtD6rddNVZFrE9S6iNtb00XjArb9/v8dTVksOTZa4kwr8HamkFcHiRhc
-         2gxPd3gnf06zRe1tuR1sP+tQ5ZUMd6wY1FtrXmX+/XrUUzJAOBosHz/QSSDgDQ0TFR3i
-         qtQKl0hTyq8hIZEwbOMFvbcMp40xKpvS97kHrhMOJe9zhE0/naFXT7TJ7I3lOx1PDbE6
-         TTV9M23wb7hd5nVhEbGFxXexaw9FYcJCGvaZDSWqg2YwYPtTvZEv9Y5hr+pDcuZJC9xY
-         ZfeA==
-X-Forwarded-Encrypted: i=1; AKwUvBz2WRTcstWG8XtzjylCkeRK3xMD/MRqFdrPotMwWbOFgTVcZE0r4vc/MHXWvwW1Z1br5pg8AOI=@lists.linux.dev
-X-Gm-Message-State: AFuF++kdggEaOQ0TWUHFuXVs5eDoiKRysRoIGLzc4S7fu/en7UP8TXuT
-	qOIpuOJkZoBHlyfPxFrSYU31/QfW7/j3oWpNIksblh0Cv4Zbdhch2ZvLiYeHJRwuXxeAYAREiLA
-	2+HBX7alP5K45OPe3woxX18cvym2exChQquzA3t11O1pIcWGV+q/mFAu45A==
-X-Gm-Gg: AYBFou2fAE6YnNw54ZLtuKScM06rnAU0bXFuTh50dV/QpdfjW5irV5XwxcS/FtLFROr
-	XT0abVCg79qBTes2IGX4q+tsB8i+w75VRha5ryxDevVd7qtqtLMVMRbaka6nm/23KdjxHgsE4i+
-	U8Ofq1UBfyDRbEn/AMXtCpJCBM0B13nSD/1tson7Nk/bdKSRbVfZ0ohDTkEuTg+rZseWFNbM2KO
-	6kzymU+sk5q/GqnMi9BW3609bcmQxf+pFxnhGIt0MCzpvA4r5RvPoJVrxZ57nQaNRhIQH//QRJV
-	SoxeO/+qv2Bb+sBrp+KDcmp7EcRUAp9to9xiwdffXgnjH3Y5pszmvH0f6n1HlCn2BRjTY6I9VvA
-	JSHFL7+vmx4ALBic4ZhSzhcQMnZeIOPok60WQi/Fu/w==
-X-Received: by 2002:a17:90b:3c45:b0:398:c292:ac80 with SMTP id 98e67ed59e1d1-398c292b6b2mr26462488a91.10.1788237946709;
-        Mon, 31 Aug 2026 21:45:46 -0700 (PDT)
-X-Received: by 2002:a17:90b:3c45:b0:398:c292:ac80 with SMTP id 98e67ed59e1d1-398c292b6b2mr26462384a91.10.1788237946100;
-        Mon, 31 Aug 2026 21:45:46 -0700 (PDT)
-Received: from [192.168.68.51] (n175-34-8-244.mrk21.qld.optusnet.com.au. [175.34.8.244])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3286f99585csm33333687eec.21.2026.08.31.21.45.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 31 Aug 2026 21:45:45 -0700 (PDT)
-Message-ID: <216cfe43-e696-4de1-bf8e-58b2d35f3372@redhat.com>
-Date: Tue, 1 Sep 2026 14:45:35 +1000
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="VtE2Iu6v"
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6817VmxK458568;
+	Tue, 1 Sep 2026 07:38:53 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=8fY/Dl2/758QW1rxNPqXXC5GnM3C1m
+	V2NhcBW5N/hzY=; b=VtE2Iu6vRlD48u8PHjVDsTvgegEBr/79jCKiybkRPJe7UN
+	HPVFeHIADAUPsnAIBXkfDFkK25itwdH477EP6Db8l4IVanDDZxPkBZ7PCLYDF7MB
+	ZOMcIljS5r5HKDJWRjEh8VXVaNos15k2cgXKefjBcj4rRdwPkE0yoezdBPIQjcw0
+	JpJSVUESF7fhvHDH91Pss94yKVAadhvE+jQp5yd62iIiS1QwDQRAJGIApP71EFTf
+	wELUrzuebzD+gYbjXDHXw6LOOnCnEYI19o39+SisAobiAY9xkpiqeYLG3EY/CSBn
+	sXmz5WtDwZpY0/r2TS2SyJBHz/Zkc5jf0ktSU6WQ==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gbmuhpeew-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 01 Sep 2026 07:38:52 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 6817QH1c000869;
+	Tue, 1 Sep 2026 07:38:51 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4gcark2f88-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 01 Sep 2026 07:38:51 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6817cnE342140150
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 1 Sep 2026 07:38:49 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3CBD020043;
+	Tue,  1 Sep 2026 07:38:49 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0204420040;
+	Tue,  1 Sep 2026 07:38:49 +0000 (GMT)
+Received: from osiris (unknown [9.224.76.185])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Tue,  1 Sep 2026 07:38:48 +0000 (GMT)
+Date: Tue, 1 Sep 2026 09:38:59 +0200
+From: Steffen Eiden <seiden@linux.ibm.com>
+To: Karl Mehltretter <kmehltretter@gmail.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+        kvmarm@lists.linux.dev, Fuad Tabba <fuad.tabba@linux.dev>,
+        Joey Gouly <joey.gouly@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>, Shuah Khan <shuah@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH 1/2] KVM: arm64: Return -EINVAL for an empty SMCCC filter
+ range at base 0
+Message-ID: <20260901073859.185345-A-seiden@linux.ibm.com>
+References: <20260829054856.70549-1-kmehltretter@gmail.com>
+ <20260829054856.70549-2-kmehltretter@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v16 16/45] KVM: arm64: CCA: Allow passing the machine type
- in KVM creation
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
- Emi Kisanuki <fj0570is@fujitsu.com>, Vishal Annapurve
- <vannapurve@google.com>, WeiLin.Chang@arm.com,
- Lorenzo Pieralisi <lpieralisi@kernel.org>
-References: <20260803134403.80630-1-steven.price@arm.com>
- <20260803134403.80630-17-steven.price@arm.com>
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20260803134403.80630-17-steven.price@arm.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: 1e7zlqnZXLSHWPkR6YD1_u_VHF1o3PLkrcOPfrdYD-U_1788237947
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260829054856.70549-2-kmehltretter@gmail.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-GUID: ZCbQ-ZklX7stda1AuCkPQ0Djjt_a0WKY
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTAxMDA2NiBTYWx0ZWRfX4h+TXCOEI7wH
+ 6eMfhCl9yIVObK3BCrNHD8Dq3qA3ZMS/VYvCRHiJftV4ivux8cMKSQfM92VTBM9XfXw3PmxqFNh
+ 9OTN9SgrFiyzSNKVKBmZQwyaJEU1aJmlrNpYpjbcYTC+RtkDGKeVc9YQb9alJ3jlq/OhHgov1uV
+ JX30A0+5iKSHW0PB6rGEkJGZTI/7vGzNAVe3pr31cENAs+mjp9eQ6qUEJ9EV3ezAHEB79sQ58Y9
+ nJ5YwZGiqaGAWTxYGyWT6R9F6OKuMB9e0fnyZMIEbtUjBbV8UoTAPDcecO6siPiNJ9gBLHbFoDs
+ O7vd0JCz9y8jF5x+LHatF7wO03UuBCd2SnD7m6JEV5zYZD82drlk8SZD8sPtMcGJteuByBxvocw
+ vIArUz59EW6PIbbEWkY4nWUN6wdufOT1SrLKPZWhZx1odnRqyito0KZSb+SkDigDpDaCZsUgAYX
+ WMfgJ6x3bko8mOt7fuw==
+X-Authority-Analysis: v=2.4 cv=Osl/DS/t c=1 sm=1 tr=0 ts=6a96810c cx=c_pps
+ a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
+ a=kj9zAlcOel0A:10 a=VdqzKS8jKosA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=Y2IxJ9c9Rs8Kov3niI8_:22 a=pGLkceISAAAA:8
+ a=VnNF1IyMAAAA:8 a=sTVcf0stEawvOQYPuTgA:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTAxMDA2NiBTYWx0ZWRfXy4lZ/J7YpckL
+ K0SY6MkUpi5sUw7oztTXtF2gTI3R/neK7rxtxiz60RLfyOvT9Nf0r+CbEwZfrLb399CxCRuQ3Y3
+ sM+IqxmBNeFFM3kYX5eDNYok2nAILFA=
+X-Proofpoint-ORIG-GUID: GL9tonZEYnwAQvDdc17GjcJN60W2-KOG
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-09-01_02,2026-08-31_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 malwarescore=0 suspectscore=0 bulkscore=0 lowpriorityscore=0
+ adultscore=0 impostorscore=0 phishscore=0 clxscore=1011 priorityscore=1501
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2609010066
 
-Hi Steve,
-
-On 8/3/26 11:43 PM, Steven Price wrote:
-> Previously machine type was used purely for specifying the physical
-> address size of the guest. Reserve the higher bits to specify an ARM
-> specific machine type and declare a new type 'KVM_VM_TYPE_ARM_REALM'
-> used to create a realm guest.
+On Sat, Aug 29, 2026 at 07:48:55AM +0200, Karl Mehltretter wrote:
+> kvm_smccc_set_filter() only rejects a range if its inclusive end,
+> base + nr_functions - 1, is below base. That catches an empty range
+> (nr_functions == 0) at every nonzero base, but at base 0 the end wraps
+> to U32_MAX and KVM tries to insert [0, U32_MAX], which overlaps the
+> reserved Arm Architecture Calls ranges. KVM_ARM_VM_SMCCC_FILTER then
+> returns -EEXIST instead of the -EINVAL that the smccc_filter selftest
+> expects for an empty range.
 > 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> Changes since v15:
->   * Specify the encoding for each VM type in the documentation.
-> Changes since v13:
->   * Rework to use the two top bits for the machine type now that pKVM has
->     merged and used the top bit for KVM_VM_TYPE_ARM_PROTECTED.
->   * Update the documentation to include KVM_VM_TYPE_ARM_PROTECTED as
->     well.
-> Changes since v9:
->   * Explictly set realm.state to REALM_STATE_NONE rather than rely on the
->     zeroing of the structure.
-> Changes since v7:
->   * Add some documentation explaining the new machine type.
-> Changes since v6:
->   * Make the check for kvm_rme_is_available more visible and report an
->     error code of -EPERM (instead of -EINVAL) to make it explicit that
->     the kernel supports RME, but the platform doesn't.
-> ---
->   Documentation/virt/kvm/api.rst | 21 +++++++++++++++++++--
->   arch/arm64/kvm/arm.c           | 11 +++++++++++
->   include/uapi/linux/kvm.h       |  7 ++++++-
->   3 files changed, 36 insertions(+), 3 deletions(-)
+> Reject a zero function count explicitly.
 > 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index ce588c05b26a..802601eaf560 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -181,8 +181,25 @@ flag KVM_VM_MIPS_VZ.
->   ARM64:
->   ^^^^^^
->   
-> -On arm64, the physical address size for a VM (IPA Size limit) is limited
-> -to 40bits by default. The limit can be configured if the host supports the
-> +On arm64, the machine type identifier is used to encode a type and the
-> +physical address size for the VM. The lower byte (bits[7:0]) encodes the
-> +address size and the upper bits[31:30] encode a machine type. The machine
-> +types that might be available are:
-> +
-> + =========================   =======   ========================================
-> + Type                        [31:30]   Description
-> + =========================   =======   ========================================
-> + KVM_VM_TYPE_ARM_NORMAL      0b00      A standard VM
-> + KVM_VM_TYPE_ARM_REALM       0b01      A "realm" VM using the Arm Confidential
-> +                                       Compute extensions, the VM's memory is
-> +                                       protected from the host.
-> + KVM_VM_TYPE_ARM_PROTECTED   0b10      A "protected" VM using pKVM to
-> +                                       isolate the VM from the host.
-> + Reserved                    0b11      Reserved for future use
-> + =========================   =======   ========================================
-> +
-> +The physical address size for a VM (IPA Size limit) is limited to 40bits
-> +by default. The limit can be configured if the host supports the
->   extension KVM_CAP_ARM_VM_IPA_SIZE. When supported, use
->   KVM_VM_TYPE_ARM_IPA_SIZE(IPA_Bits) to set the size in the machine type
->   identifier, where IPA_Bits is the maximum width of any physical
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 6f39831dcf5d..9881fd6c511c 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -249,6 +249,17 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->   	mutex_unlock(&kvm->lock);
->   #endif
->   
-> +	if ((type & KVM_VM_TYPE_ARM_PROTECTED) &&
-> +	    (type & KVM_VM_TYPE_ARM_REALM))
-> +		return -EINVAL;
-> +
-> +	if (type & KVM_VM_TYPE_ARM_REALM) {
-> +		if (!static_branch_unlikely(&kvm_rmi_is_available))
-> +			return -EINVAL;
-> +		kvm_set_realm_state(kvm, REALM_STATE_NONE);
-> +		kvm->arch.is_realm = true;
-> +	}
-> +
+> Tested with a userspace reproducer on an arm64 VHE host under QEMU TCG:
+> EEXIST before, EINVAL after.
+> 
+> Fixes: 821d935c87bc ("KVM: arm64: Introduce support for userspace SMCCC filtering")
+> Assisted-by: LLM
+> Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
 
-Shall we use kvm_arm_rmi_supported() here? In that way, the check is consistent
-to what has been done for KVM_CAP_ARM_RMI. You know that a misbehaving VMM can
-issue KVM_CREATE_VM to create a realm VM without checking if KVM_CAP_ARM_RMI
-is supported by the host.
+Good catch.
 
-	if (type & KVM_VM_TYPE_ARM_REALM) {
-		if (!kvm_arm_rmi_supported())
-			return -EINVAL;
+Reviewed-by: Steffen Eiden <seiden@linux.ibm.com>
 
-		kvm_set_realm_state(kvm, REALM_STATE_NONE);
-		WRITE_ONCE(kvm->arch.is_realm, true);
-	}
-
->   	kvm_init_nested(kvm);
->   
->   	ret = kvm_share_hyp(kvm, kvm + 1);
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 0231ff174a50..adee3936d6ae 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -700,14 +700,19 @@ struct kvm_enable_cap {
->    * address size for the VM. Bits[7-0] are reserved for the guest
->    * PA size shift (i.e, log2(PA_Size)). For backward compatibility,
->    * value 0 implies the default IPA size, 40bits.
-> + *
-> + * Bits[30-31] are reserved for the VM type
->    */
->   #define KVM_VM_TYPE_ARM_IPA_SIZE_MASK	0xffULL
->   #define KVM_VM_TYPE_ARM_IPA_SIZE(x)		\
->   	((x) & KVM_VM_TYPE_ARM_IPA_SIZE_MASK)
->   
-> +#define KVM_VM_TYPE_ARM_NORMAL		0
-> +#define KVM_VM_TYPE_ARM_REALM		(1UL << 30)
->   #define KVM_VM_TYPE_ARM_PROTECTED	(1UL << 31)
->   #define KVM_VM_TYPE_ARM_MASK		(KVM_VM_TYPE_ARM_IPA_SIZE_MASK | \
-> -					 KVM_VM_TYPE_ARM_PROTECTED)
-> +					 KVM_VM_TYPE_ARM_PROTECTED | \
-> +					 KVM_VM_TYPE_ARM_REALM)
->   
->   /*
->    * ioctls for /dev/kvm fds:
-
-Thanks,
-Gavin
-
+FWIW: Tested it on my downstream version of arm-on-s390 with hypercalls
+already implemented. 
