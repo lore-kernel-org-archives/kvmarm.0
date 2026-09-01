@@ -1,413 +1,166 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C758B1DF980;
-	Tue,  1 Sep 2026 08:28:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9951C27EC7C
+	for <kvmarm@lists.linux.dev>; Tue,  1 Sep 2026 08:34:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788251292; cv=none; b=PhEolCcdGlxLMn0MyMtsQTgiP87ttukLCoPVnFaco6Ffyw5mEpI0tbP/4O8l0v+6kkRODD4gEeSOSrdIOOP47AfreG0FaHHQixyUVgy+7b4aP86HpoVCnIwUtJ8PSR+DdIfJzZTrSmI4ND5SR4bwYQNLwDOAvfOxG7PT9i4hGI0=
+	t=1788251658; cv=none; b=FonD2fqUNrFgB5BpRvkj/aK8x+LaTcgXVFwcBXW8IYzFF5ZiNYH3oDXh3H2g5pdh+cqFo1yPsyERNUvfriRGZ8JjGq5EP7+u7rTM5DHoM/xjf4Mv9rtDgJJIea8tZPQ3Q2mEwpoolr5DFO2FUlovZz57H+NOSWruOg4M00zrqUY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788251292; c=relaxed/simple;
-	bh=OqAOUNBTRJ6Nxf+QfYPH8EV0QrQsTK1olJ7qjjS3yRk=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HOiQg8HVQJU0PKdFiLyjFV163w7vRrIZMAsNSROJioQ6QvXygZtKMT4KM0f4fRKmfArCE22GYIUTTgJMVFMDjYyUHCD12ZhW4PldJtIkA42pfrzTqDY7BP3u+HEHzk+zaxITTP1B8M75K6R1G+STmG65YbRnA60uQ+SCccyA3Mo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LUbLR8I/; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788251658; c=relaxed/simple;
+	bh=TvXusDrDrbiD6WVizuF+lyOFut4t/ltHc34c/DPgQgM=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=IY9E81r7yY3/8wsrTxKd/mzitCWefQa+1BthoannhQYxSulqBJzAM3r9wr4rE8hnpMQY/HG6+tDr2Z1RihEcOyLO2bKFRUNfcXW/2qQy/WjU3kerq+vqbBQAmAvBGwYeEJJevFaDXwY7ZU7FjXb/SXPiHdWrwyweckNgtZLB6GA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c6P7BCSg; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LUbLR8I/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3F7B1F000E9;
-	Tue,  1 Sep 2026 08:28:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c6P7BCSg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0B891F000E9;
+	Tue,  1 Sep 2026 08:34:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788251290;
-	bh=NFMGPc5SrnGwaCZ7sUtMBJVB/X1XYqXdBON1UU2MYc4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=LUbLR8I/AqanKIO8TlOgWzWlfplmYbMrAWrTt8eA/g8nYlLcJfGGR7Vut046WYyax
-	 WOI0S2W14PVYgXuR3JE8eDs6cPtK7LZeur8FYqHq5XzED9iQnNFLkVR6iYK/aCK1cF
-	 3eaJcKMy4EAaSf1hxX/1TYPorf2dIt4Wb0+UCVvgmAsLzcEffzFkhB41D39M8urbvR
-	 mrxxaDl6B5YoWtZEb7J1oP8t6BiTKsPvJxQGDsTc7EdJZCW6d3dmURR7EjU8hCv+tl
-	 WNEJjKWG0/7ulI4wOmUqfSaf1pCvcHibFAqXP+0MveYwQKYWqCJVA+0rJLqPINAD9M
-	 DPlb0NyfWby9Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1x1Jqh-00000003Cie-3E0s;
-	Tue, 01 Sep 2026 08:28:07 +0000
-Date: Tue, 01 Sep 2026 09:30:40 +0100
-Message-ID: <87o6ehmkzz.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Steffen Eiden <seiden@linux.ibm.com>
-Cc: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Andreas Grapentin <gra@linux.ibm.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	David Hildenbrand <david@kernel.org>,
-	Friedrich Welter <fritz@linux.ibm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Gautam Gala <ggala@linux.ibm.com>,
-	Hariharan Mari <hari55@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Hendrik Brueckner <brueckner@linux.ibm.com>,
-	Ilya Leoshkevich <iii@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Nico Boehr <nrb@linux.ibm.com>,
-	Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
-	Oliver Upton <oupton@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Will Deacon <will@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v2 07/20] KVM: arm64: Share more arm64 code with s390
-In-Reply-To: <20260831145536.913567-8-seiden@linux.ibm.com>
-References: <20260831145536.913567-1-seiden@linux.ibm.com>
-	<20260831145536.913567-8-seiden@linux.ibm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20260515; t=1788251657;
+	bh=igwudY8DKn2kNqgYCKSulGw07AKU2c2ykPXY3mLz6m8=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=c6P7BCSgtPIQDQpQI9rCUXToTghpQlP/aUUddEXd7edKEnEc3ZatvO2LCLxkpvqTk
+	 mT2sKf9Up18guBMfCxpt1uSWJhlVrhiHeZqjJotRiiK4Lo3bhf0I/rF7eOOK/olwew
+	 5cOMoatxauCeO2mcFL6s1EnaMZdFr38/lgq+x9t8X+AtTira23pQAJs3QcvxOxvXql
+	 s1m/zNh8Wp7m7rWHNib1xZrInnt87h820/iV1JBn4w46UA0zSbhJ4937PzYYDSHquK
+	 0PsudsqJrjRhZqDT4BiXrqzOdwOigGdzTcf6svNh3pbeRY8GI7tuiQnqT2mlLhhSWJ
+	 1+fept3MxH9lQ==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v5 13/18] KVM: arm64: Alloc pkvm_hyp_vm using pKVM heap
+ allocator
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Vincent Donnefort" <vdonnefort@google.com>
+Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20260901080941.997769-14-vdonnefort@google.com>
+References: <20260901080941.997769-1-vdonnefort@google.com>
+ <20260901080941.997769-14-vdonnefort@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 01 Sep 2026 08:34:16 +0000
+Message-Id: <20260901083416.F0B891F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: seiden@linux.ibm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, agordeev@linux.ibm.com, gra@linux.ibm.com, arnd@arndb.de, catalin.marinas@arm.com, borntraeger@linux.ibm.com, imbrenda@linux.ibm.com, david@kernel.org, fritz@linux.ibm.com, tabba@google.com, ggala@linux.ibm.com, hari55@linux.ibm.com, hca@linux.ibm.com, brueckner@linux.ibm.com, iii@linux.ibm.com, frankja@linux.ibm.com, joey.gouly@arm.com, nrb@linux.ibm.com, oss@nina.schoetterlglausch.eu, oupton@kernel.org, pbonzini@redhat.com, suzuki.poulose@arm.com, svens@linux.ibm.com, Ulrich.Weigand@de.ibm.com, gor@linux.ibm.com, will@kernel.org, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 31 Aug 2026 15:55:22 +0100,
-Steffen Eiden <seiden@linux.ibm.com> wrote:
-> 
-> Mark functions that s390 can use to implement arm on s390 as shared
-> functions.
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [High] Memcg charge bypass and potential charge leak due to `pkvm_hyp_vm`=
+ allocation transitioning to the global EL2 heap without proper host return=
+ or memcg accounting.
+--
 
-More of what? For what purpose? What is the logic behind exposing
-snippets of code to S390? This patch tags some PAuth stuff, a bunch of
-SVE definitions, and a whole lot of sysreg helpers.
+commit 9d9a73aa6d8fa15436c6b53dd36960b9dade0e30
+Author: Vincent Donnefort <vdonnefort@google.com>
 
-What is the rationale for this organisation? I can't see any, and it
-just looks like a very random approach to the problem.
+KVM: arm64: Alloc pkvm_hyp_vm using pKVM heap allocator
 
-I want to see logic, a progression. Something I can follow.
+Transition the allocation of the hypervisor VM state structure (pkvm_hyp_vm)
+from the host to the hypervisor using the new pKVM heap allocator. The host
+now uses pkvm_call_hyp_req() to invoke __pkvm_init_vm, which automatically
+handles any top-up requests if the hypervisor runs out of heap memory.
 
-> 
-> Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
-> ---
->  arch/arm64/kvm/arm.c      |  3 +++
->  arch/arm64/kvm/guest.c    | 11 +++++++----
->  arch/arm64/kvm/sys_regs.c | 36 ++++++++++++++++++++++++++++++++++++
->  3 files changed, 46 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 6b92a3c1d490..62e8b32ee74e 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -340,6 +340,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
->  	kvm_arm_teardown_hypercalls(kvm);
->  }
->  
-> +#ifdef ARM64_S390_COMMON
->  static bool kvm_has_full_ptr_auth(void)
->  {
->  	bool apa, gpa, api, gpi, apa3, gpa3;
-> @@ -374,6 +375,8 @@ static bool kvm_has_full_ptr_auth(void)
->  		(apa + api + apa3) == 1);
->  }
->  
-> +#endif /* ARM64_S390_COMMON */
-> +
-
-This could have been done much earlier.
-
->  int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  {
->  	int r;
-> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> index 6ca5a9f357cd..e978b2fbeb76 100644
-> --- a/arch/arm64/kvm/guest.c
-> +++ b/arch/arm64/kvm/guest.c
-> @@ -307,12 +307,12 @@ static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->  	return err;
->  }
->  
-> -#endif /* ARM64_S390_COMMON */
+> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkv=
+m.c
+> index 0a041d41b9ea4..cabcfb59a89d2 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+[ ... ]
+> @@ -847,15 +846,15 @@ int __pkvm_init_vm(struct kvm *host_kvm, unsigned l=
+ong vm_hva,
+>  	vm_size =3D pkvm_get_hyp_vm_size(nr_vcpus);
+>  	pgd_size =3D kvm_pgtable_stage2_pgd_size(host_mmu.arch.mmu.vtcr);
+> =20
+> -	ret =3D -ENOMEM;
 > -
->  #define vq_word(vq) (((vq) - SVE_VQ_MIN) / 64)
->  #define vq_mask(vq) ((u64)1 << ((vq) - SVE_VQ_MIN) % 64)
->  #define vq_present(vqs, vq) (!!((vqs)[vq_word(vq)] & vq_mask(vq)))
->  
-> +#endif /* ARM64_S390_COMMON */
-> +
+> -	hyp_vm =3D map_donated_memory(vm_hva, vm_size);
+> -	if (!hyp_vm)
+> -		goto err_remove_mappings;
+> +	hyp_vm =3D hyp_alloc(vm_size);
 
-Pointless churn.
+[Severity: High]
+Is it safe to allocate the VM struct from the global EL2 allocator here?
 
->  static int get_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->  {
->  	unsigned int max_vq, vq;
-> @@ -383,6 +383,7 @@ static int set_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+This draws from top-up pages that lack memcg constraints, whereas the
+previous implementation donated memory that was explicitly allocated with
+GFP_KERNEL_ACCOUNT by the host.
+
+> +	if (!hyp_vm) {
+> +		ret =3D hyp_alloc_errno();
+> +		goto err_unpin_kvm;
+> +	}
+[ ... ]
+> @@ -1053,8 +1052,7 @@ int __pkvm_finalize_teardown_vm(pkvm_handle_t handl=
+e)
+>  		teardown_donated_memory(mc, hyp_vcpu, sizeof(*hyp_vcpu));
+>  	}
+> =20
+> -	vm_size =3D pkvm_get_hyp_vm_size(hyp_vm->kvm.created_vcpus);
+> -	teardown_donated_memory(mc, hyp_vm, vm_size);
+> +	hyp_free(hyp_vm);
+
+[Severity: High]
+Does freeing the VM struct back into the global EL2 allocator rather than
+returning it directly to the host create a charge stranding issue if memcg
+accounting is re-enabled?
+
+If accounting is restored at the top-up layer, any memcg charges applied
+during top-up would be stranded indefinitely in the EL2 global pool until
+reclaimed by the host shrinker. This would permanently leave the charge in
+the original memcg even when those pages are subsequently reused by a
+different VM.
+
+>  	hyp_unpin_shared_mem(host_kvm, host_kvm + 1);
 >  	return 0;
->  }
->  
-> +#ifdef ARM64_S390_COMMON
->  #define SVE_REG_SLICE_SHIFT	0
->  #define SVE_REG_SLICE_BITS	5
->  #define SVE_REG_ID_SHIFT	(SVE_REG_SLICE_SHIFT + SVE_REG_SLICE_BITS)
-> @@ -399,6 +400,8 @@ static int set_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->  #define KVM_SVE_ZREG_SIZE KVM_REG_SIZE(KVM_REG_ARM64_SVE_ZREG(0, 0))
->  #define KVM_SVE_PREG_SIZE KVM_REG_SIZE(KVM_REG_ARM64_SVE_PREG(0, 0))
->  
-> +#endif /* ARM64_S390_COMMON */
-> +
->  /*
->   * Number of register slices required to cover each whole SVE register.
->   * NOTE: Only the first slice every exists, for now.
-> @@ -595,8 +598,6 @@ static unsigned long num_core_regs(const struct kvm_vcpu *vcpu)
->  	return copy_core_reg_indices(vcpu, NULL);
->  }
->  
-> -#endif /* ARM64_S390_COMMON */
+> =20
+> diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+> index ea96744f41fb0..8505965dbfb21 100644
+> --- a/arch/arm64/kvm/pkvm.c
+> +++ b/arch/arm64/kvm/pkvm.c
+[ ... ]
+> @@ -230,28 +230,15 @@ static int __pkvm_create_hyp_vm(struct kvm *kvm)
+>  	if (!pgd)
+>  		return -ENOMEM;
+> =20
+> -	/* Allocate memory to donate to hyp for vm and vcpu pointers. */
+> -	hyp_vm_sz =3D PAGE_ALIGN(size_add(PKVM_HYP_VM_SIZE,
+> -					size_mul(sizeof(void *),
+> -						 kvm->created_vcpus)));
+> -	hyp_vm =3D alloc_pages_exact(hyp_vm_sz, GFP_KERNEL_ACCOUNT);
+> -	if (!hyp_vm) {
+> -		ret =3D -ENOMEM;
+> -		goto free_pgd;
+> -	}
 > -
->  static unsigned long num_sve_regs(const struct kvm_vcpu *vcpu)
->  {
->  	const unsigned int slices = vcpu_sve_slices(vcpu);
-> @@ -658,6 +659,8 @@ static int copy_sve_reg_indices(const struct kvm_vcpu *vcpu,
->  	return num_regs;
->  }
->  
-> +#endif /* ARM64_S390_COMMON */
-> +
->  /**
->   * kvm_arm_num_regs - how many registers do we present via KVM_GET_ONE_REG
->   * @vcpu: the vCPU pointer
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 53d096803d9d..b167f9d06fd4 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -45,6 +45,7 @@
->   * 64bit interface.
->   */
->  
-> +#ifdef ARM64_S390_COMMON
->  static u64 sys_reg_to_index(const struct sys_reg_desc *reg);
->  static int set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
->  		      u64 val);
-> @@ -82,6 +83,8 @@ static bool write_to_read_only(struct kvm_vcpu *vcpu,
->  			"sys_reg write to read-only register");
->  }
->  
-> +#endif /* ARM64_S390_COMMON */
-> +
->  enum sr_loc_attr {
->  	SR_LOC_MEMORY	= 0,	  /* Register definitely in memory */
->  	SR_LOC_LOADED	= BIT(0), /* Register on CPU, unless it cannot */
-> @@ -428,6 +431,7 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, enum vcpu_sysreg reg)
->  	__vcpu_assign_sys_reg(vcpu, reg, val);
->  }
->  
-> +#ifdef ARM64_S390_COMMON
->  /* CSSELR values; used to index KVM_REG_ARM_DEMUX_ID_CCSIDR */
->  #define CSSELR_MAX 14
->  
-> @@ -533,6 +537,8 @@ static bool access_rw(struct kvm_vcpu *vcpu,
->  	return true;
->  }
->  
-> +#endif /* ARM64_S390_COMMON */
-> +
->  /*
->   * See note at ARMv7 ARM B1.14.4 (TL;DR: S/W ops are not easily virtualized).
->   */
-> @@ -800,6 +806,7 @@ static bool access_gicv5_ppi_enabler(struct kvm_vcpu *vcpu,
->  	return true;
->  }
->  
-> +#ifdef ARM64_S390_COMMON
->  static bool trap_raz_wi(struct kvm_vcpu *vcpu,
->  			struct sys_reg_params *p,
->  			const struct sys_reg_desc *r)
-> @@ -853,6 +860,8 @@ static bool trap_oslsr_el1(struct kvm_vcpu *vcpu,
->  	return true;
->  }
->  
-> +#endif /* ARM64_S390_COMMON */
-> +
->  static int set_oslsr_el1(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
->  			 u64 val)
->  {
-> @@ -1011,6 +1020,7 @@ static u64 reset_actlr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
->  	return actlr;
->  }
->  
-> +#ifdef ARM64_S390_COMMON
->  static u64 reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
->  {
->  	u64 mpidr = kvm_calculate_mpidr(vcpu);
-> @@ -1019,6 +1029,8 @@ static u64 reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
->  	return mpidr;
->  }
->  
-> +#endif /* ARM64_S390_COMMON */
-> +
->  static unsigned int hidden_visibility(const struct kvm_vcpu *vcpu,
->  				      const struct sys_reg_desc *r)
->  {
-> @@ -1922,6 +1934,7 @@ static u8 pmuver_to_perfmon(u8 pmuver)
->  	}
->  }
->  
-> +#ifdef ARM64_S390_COMMON
->  static u64 sanitise_id_aa64pfr0_el1(const struct kvm_vcpu *vcpu, u64 val);
->  static u64 sanitise_id_aa64pfr1_el1(const struct kvm_vcpu *vcpu, u64 val);
->  static u64 sanitise_id_aa64pfr2_el1(const struct kvm_vcpu *vcpu, u64 val);
-> @@ -2078,6 +2091,8 @@ static bool access_id_reg(struct kvm_vcpu *vcpu,
->  	return true;
->  }
->  
-> +#endif /* ARM64_S390_COMMON */
-> +
->  static unsigned int aa32_id_visibility(const struct kvm_vcpu *vcpu,
->  				       const struct sys_reg_desc *r)
->  {
-> @@ -2127,6 +2142,7 @@ static unsigned int fp8_visibility(const struct kvm_vcpu *vcpu,
->  	return REG_HIDDEN;
->  }
->  
-> +#ifdef ARM64_S390_COMMON
->  static u64 sanitise_id_aa64pfr0_el1(const struct kvm_vcpu *vcpu, u64 val)
->  {
->  	if (!vcpu_has_sve(vcpu))
-> @@ -2288,6 +2304,8 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
->  	return set_id_reg(vcpu, rd, val);
->  }
->  
-> +#endif /* ARM64_S390_COMMON */
-> +
->  static u64 read_sanitised_id_dfr0_el1(struct kvm_vcpu *vcpu,
->  				      const struct sys_reg_desc *rd)
->  {
-> @@ -2332,6 +2350,7 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
->  	return set_id_reg(vcpu, rd, val);
->  }
->  
-> +#ifdef ARM64_S390_COMMON
->  static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
->  			       const struct sys_reg_desc *rd, u64 user_val)
->  {
-> @@ -2661,6 +2680,8 @@ static bool access_ccsidr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
->  	return true;
->  }
->  
-> +#endif /* ARM64_S390_COMMON */
-> +
->  static int get_raz_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
->  		       u64 *val)
->  {
-> @@ -2764,6 +2785,7 @@ static bool bad_redir_trap(struct kvm_vcpu *vcpu,
->  	SYS_REG_USER_FILTER(name, access_arch_timer, reset_val, 0, \
->  			    arch_timer_get_user, arch_timer_set_user, vis)
->  
-> +#ifdef ARM64_S390_COMMON
->  /*
->   * Since reset() callback and field val are not used for idregs, they will be
->   * used for specific purposes for idregs.
-> @@ -2840,6 +2862,8 @@ static bool bad_redir_trap(struct kvm_vcpu *vcpu,
->  	.val = 0,				\
->  }
->  
-> +#endif /* ARM64_S390_COMMON */
-> +
->  static bool access_sp_el1(struct kvm_vcpu *vcpu,
->  			  struct sys_reg_params *p,
->  			  const struct sys_reg_desc *r)
-> @@ -3212,6 +3236,7 @@ static void init_imp_id_regs(void)
->  	boot_cpu_aidr_val = read_sysreg(aidr_el1);
->  }
->  
-> +#ifdef ARM64_S390_COMMON
->  static u64 reset_imp_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
->  {
->  	switch (reg_to_encoding(r)) {
-> @@ -3269,6 +3294,8 @@ static int set_imp_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
->  	.val = mask,					\
->  	}
->  
-> +#endif /* ARM64_S390_COMMON */
-> +
->  static u64 reset_mdcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
->  {
->  	__vcpu_assign_sys_reg(vcpu, r->reg, vcpu->kvm->arch.nr_pmu_counters);
-> @@ -4833,6 +4860,7 @@ static const struct sys_reg_desc cp15_64_regs[] = {
->  	{ SYS_DESC(SYS_AARCH32_CNTVCTSS),     access_arch_timer },
->  };
->  
-> +#ifdef ARM64_S390_COMMON
->  static bool check_sysreg_table(const struct sys_reg_desc *table, unsigned int n,
->  			       bool reset_check)
->  {
-> @@ -4882,6 +4910,8 @@ static void perform_access(struct kvm_vcpu *vcpu,
->  		kvm_incr_pc(vcpu);
->  }
->  
-> +#endif /* ARM64_S390_COMMON */
-> +
->  /*
->   * emulate_cp --  tries to match a sys_reg access in a handling table, and
->   *                call the corresponding trap handler.
-> @@ -5340,6 +5370,7 @@ void kvm_sys_regs_create_debugfs(struct kvm *kvm)
->  			    &sr_resx_fops);
->  }
->  
-> +#ifdef ARM64_S390_COMMON
->  static void reset_vm_ftr_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *reg)
->  {
->  	u32 id = reg_to_encoding(reg);
-> @@ -5360,6 +5391,8 @@ static void reset_vcpu_ftr_id_reg(struct kvm_vcpu *vcpu,
->  	reg->reset(vcpu, reg);
->  }
->  
-> +#endif /* ARM64_S390_COMMON */
-> +
->  /**
->   * kvm_reset_sys_regs - sets system registers to reset value
->   * @vcpu: The VCPU pointer
-> @@ -5432,6 +5465,7 @@ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu)
->  	return 1;
->  }
->  
-> +#ifdef ARM64_S390_COMMON
->  /******************************************************************************
->   * Userspace API
->   *****************************************************************************/
-> @@ -5753,6 +5787,8 @@ int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
->  	return write_demux_regids(uindices);
->  }
->  
-> +#endif /* ARM64_S390_COMMON */
-> +
->  #define KVM_ARM_FEATURE_ID_RANGE_INDEX(r)			\
->  	KVM_ARM_FEATURE_ID_RANGE_IDX(sys_reg_Op0(r),		\
->  		sys_reg_Op1(r),					\
+> -	/* Donate the VM memory to hyp and let hyp initialize it. */
+> -	ret =3D kvm_call_hyp_nvhe(__pkvm_init_vm, kvm, hyp_vm, pgd);
+> +	ret =3D pkvm_call_hyp_req(__pkvm_init_vm, kvm, pgd);
 
-The way you pick and chose random helpers feels *VERY* wrong. I really
-want to understand the rationale for not using most of it, *including*
-the sysreg arrays as a whole. Everything in this file is (or at leats
-aims to be) architectural, and should be directly reused.
+[Severity: High]
+Does this change bypass memcg accounting for the pkvm_hyp_vm allocation?
 
-It should only be a matter of providing the required indirection to
-access the S390 representation of the arm64 state.
+Previously, this memory was allocated with GFP_KERNEL_ACCOUNT. By delegating
+this allocation to the EL2 allocator via pkvm_call_hyp_req(), the memory is
+provisioned through un-accounted top-ups.
 
-	M.
+When pkvm_call_hyp_req() triggers a PKVM_HYP_REQ_HYP_ALLOC to the host, it
+is serviced by pkvm_hyp_topup(). The top-up memcache is initialized with
+zeroed flags (omitting HYP_MEMCACHE_ACCOUNT_KMEMCG), which causes
+hyp_mc_alloc_fn() to use raw GFP_KERNEL.=20
 
--- 
-Jazz isn't dead. It just smells funny.
+Because pkvm_hyp_vm scales with nr_vcpus and is no longer charged to the
+creating task's memcg, can this allow an unprivileged container to bypass
+its memory limits and exhaust host memory, potentially leading to a host
+OOM?
+
+>  	if (ret)
+> -		goto free_vm;
+> +		goto free_pgd;
+>
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260901080941.9977=
+69-1-vdonnefort@google.com?part=3D13
