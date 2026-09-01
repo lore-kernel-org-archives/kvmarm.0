@@ -1,294 +1,159 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5E6E48BD3C
-	for <kvmarm@lists.linux.dev>; Tue,  1 Sep 2026 17:16:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788282977; cv=none; b=lkGBYsUgrw4Ai0v/eoFuQhrElXF0ZbAycdgE9uy7rNjlYqDKclMBeYDLMqeZVwoBQUDF7ZTaMCqNis9503pAvY+KMWvhmq9YW1fjOIjMQpeQpFC5uTOBrn4Wnge/KQOJ535pwAC9IHl783Y0WdXeZCMADdNuz5G+iI27R10wtTc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788282977; c=relaxed/simple;
-	bh=3CGe1F+LaFTs7xAtVeUDK/XWlmbVwQMDD0/oEPgFnn8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ohswu6DmKAOF9nOtaBoxlXaaji4++wySKWGONfjgkMNvl2Rrpqnfgc94w07Cmv6LP5LoPP5u5XvkMOJWhjuMcqW5IqhcCszv0noVYg9anthNVh+CoY6I5XHn1cV39zVuFV/FI6SHv3JEnswyTE2z5I8puJ7EE65PhurGkdrw+qc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Eup5dkhi; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11010022.outbound.protection.outlook.com [52.101.61.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF224488211;
+	Tue,  1 Sep 2026 17:19:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.22
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788283157; cv=fail; b=QTCIJs/xViOxAZoQzUsOLQMSKEYnUsIUpir7GXkm7VfY5MEg6XAZ4ZEO71qZIp7PGJph2rVL8nma+U+QZ6rryEgO3j8h3r3Hl+NTDPrZMVeJYP6eRCBDsHw38S1o6FbD+LST2YJ3UwffRaUO8fgsvTqqVahV3BGbrLQkvpkVDs4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788283157; c=relaxed/simple;
+	bh=pSUNtPf7pte2Uglb3XTVS5/4TgPjU4svIoCQTcxuZp0=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NSpTk9xyizI7NKbjoyw5lsbNPmylzg98b2sg+MUZBKdKQBZH4QcdWtDccCSY3DYOu1EVUA5R/WQEVeaKOMjIlQGIpMKlTqInPFEuawTLSRowoYaZ9fS8dbUAblaPgcg7aVRyOJ/w/zuhX/KvwNcDHcpVlgjwTornlpN7yukaM7Y=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ZPfMiZXo; arc=fail smtp.client-ip=52.101.61.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Eup5dkhi"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B110E1BD0;
-	Tue,  1 Sep 2026 10:16:11 -0700 (PDT)
-Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 73A6F3F7D8;
-	Tue,  1 Sep 2026 10:16:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1788282975; bh=3CGe1F+LaFTs7xAtVeUDK/XWlmbVwQMDD0/oEPgFnn8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Eup5dkhiD8c0LRwp6elhFfAFvt//5n+haLAYubBe3qFVjz+eSY181qwyjRuubusZM
-	 cU5VboOU11ZdCIEGzAuoAJ2TjwzF0RmFRMEaGmZfrK0UATiPmycPs2qpHR300fIVa7
-	 IKqVsD4Zx/H5Y2q6fb4RmuRoYuIoN38qeUBroo70=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Leonardo Bras <leo.bras@arm.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Tian Zheng <zhengtian10@huawei.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: [RFC PATCH 5/5] KVM: arm64: Enable HAFDBS for guests not on migration
-Date: Tue,  1 Sep 2026 18:15:56 +0100
-Message-ID: <20260901171558.2674031-6-leo.bras@arm.com>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260901171558.2674031-1-leo.bras@arm.com>
-References: <20260901171558.2674031-1-leo.bras@arm.com>
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ZPfMiZXo"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ydvSIX/ryypsRdB8DXtGl+vRPphB1udWgkR4jujdNfGjrfizpvrAeSNaAiMb65SuHaebnjLYBtBd/xCB4uIiFUCffi1tnGNZeP5y60ewyNdm6+RMQ9Rm4F40OwnPoiIuJDB9J3GKjECzjbFVUMQWE6q7439amvryDKylHTZZtIID89KgNbBMHfc0hsIWr4Eam4kIqDPwjo/t7sFqvVwL7Ukjpj95PCT+UjT3AtsnOJCIut/ketByMWB1vAgfq3VvqTTXiJziIqD58mlCAYifOwMl2Ah7lX8Le0ad5RRI15y0w78W48hNPq4p3iiFP5v6nv7jDHgKXlNFK07FIurujw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=iAVQ0TJ93CY8h2ybSXsxvwv4B6V+ikyiH86YZsaq4A0=;
+ b=lkfY0bTUjCvRicDVR1TKCwCzY/q7d35YblMLDjrZlolmxnSwv4Ub/Bhc4YXcu35pkSehypu0pID0g1fgYrpv1GfZukHadxFZM56MQPj7/t49DkafQ8v/PyNImfCUbQKiWV8prrcrDi4SrxJUNsoFuzRDOXnAJKUAxxsnGR1FpxB8hPnRtZyimBOwa0G5B04AzyyV6w3R4FHZ3wytxG5Aak8/aHJKRBHSeyFLuDdZs520gj7yI+MMT15CtN5/JmKessBh8tpOp4TCYiv31J3MSu9lby6l4LcZvHZzMAmRIdH6pCkML0135gpTyc1KkdpRcP7EMT575nBPQ9wIVz6hMw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.232) smtp.rcpttodomain=ziepe.ca smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=iAVQ0TJ93CY8h2ybSXsxvwv4B6V+ikyiH86YZsaq4A0=;
+ b=ZPfMiZXoSs+BFs1k8tc44CS3Htm3zgS5+Y+/t+rskffpaQCAdtF4zsuxSu2Ns4K55xGC0R7XB6Iv8mK3eXkbEhjBDal7cAWKCPaxfedZsXUC5ho+jKahX5+Vq/JYd+Rn3mpttTxl+9RY3Z3leHcY5cALPi3G0MLxFNWovRyF/IgIuguGKvE8Gp3/qOsUJBo35PbG1ht7qlykfIX9IAJr43/3bcPvJbBOwlGOKiBuT69VlAHde4f6Zip2IseZ/qNNqhDdc6vAjEtVIBcxjKdlwThy+wC9SMTnydMO4/Rj+YPI0FkSjEz9ADEnhBKtujwFyYqewH5SU7KHZlAgudqPgw==
+Received: from DS1P220CA0026.NAMP220.PROD.OUTLOOK.COM (2603:10b6:8:44c::17) by
+ DS7PR12MB6094.namprd12.prod.outlook.com (2603:10b6:8:9d::14) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.360.13; Tue, 1 Sep 2026 17:19:05 +0000
+Received: from SN1PEPF0002BA4D.namprd03.prod.outlook.com
+ (2603:10b6:8:44c:cafe::ab) by DS1P220CA0026.outlook.office365.com
+ (2603:10b6:8:44c::17) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.382.10 via Frontend Transport; Tue, 1
+ Sep 2026 17:19:05 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.232) by
+ SN1PEPF0002BA4D.mail.protection.outlook.com (10.167.242.70) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.382.8 via Frontend Transport; Tue, 1 Sep 2026 17:19:05 +0000
+Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
+ (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.46; Tue, 1 Sep
+ 2026 10:18:36 -0700
+Received: from drhqmail202.nvidia.com (10.126.190.181) by
+ drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.46; Tue, 1 Sep 2026 10:18:36 -0700
+Received: from nvidia.com (10.127.8.10) by mail.nvidia.com (10.126.190.181)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.46 via Frontend
+ Transport; Tue, 1 Sep 2026 10:18:34 -0700
+Date: Tue, 1 Sep 2026 10:18:33 -0700
+From: Nicolin Chen <nicolinc@nvidia.com>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+CC: Aneesh Kumar K.V <aneesh.kumar@kernel.org>, <linux-coco@lists.linux.dev>,
+	<kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>, Alexey Kardashevskiy <aik@amd.com>, "Catalin
+ Marinas" <catalin.marinas@arm.com>, Dan Williams <dan.j.williams@intel.com>,
+	Joerg Roedel <joro@8bytes.org>, Jonathan Cameron <jic23@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>, Pranjal Shrivastava <praan@google.com>, "Robin
+ Murphy" <robin.murphy@arm.com>, Samuel Ortiz <sameo@rivosinc.com>, "Steven
+ Price" <steven.price@arm.com>, Suzuki K Poulose <Suzuki.Poulose@arm.com>,
+	"Will Deacon" <will@kernel.org>, Xu Yilun <yilun.xu@linux.intel.com>
+Subject: Re: [RFC PATCH v4 03/16] iommu/arm-smmu-v3: Add initial pSMMU realm
+ viommu plumbing
+Message-ID: <apcI6dnRaGRNdzN1@nvidia.com>
+References: <20260427085344.941627-1-aneesh.kumar@kernel.org>
+ <20260427085344.941627-4-aneesh.kumar@kernel.org>
+ <apM6dOHcEI2ztWS0@nvidia.com>
+ <yq5a8q5lz5yn.fsf@kernel.org>
+ <yq5aecfdnv4i.fsf@kernel.org>
+ <20260901143445.GC56830@ziepe.ca>
+ <apcHoHKGoI7WNFXp@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=7932; i=leo.bras@arm.com; h=from:subject; bh=3CGe1F+LaFTs7xAtVeUDK/XWlmbVwQMDD0/oEPgFnn8=; b=owGbwMvMwCX2pizjszvTwvWMp9WSGLKms83Lkllnu3TiZJG9dfqbo6Sco49m6y5duLrYSCnqx gVTfv1pHaUsDGJcDLJiiiyyj+av4vk+JePIlR8LYOawMoEMYeDiFICJWLAwMrzN+73BaqPVVf4l wUn/9fM/q/Deb1Qslzh1R9RzwsGPqh6MDDtK+if/l80++jD6wdfkSrGZL3jnsP+OZLv+QFvrbmf DU14A
-X-Developer-Key: i=leo.bras@arm.com; a=openpgp; fpr=36E6C95AE0F111CC5B6F4D2E688C33F8A0C5B0C5
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <apcHoHKGoI7WNFXp@nvidia.com>
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN1PEPF0002BA4D:EE_|DS7PR12MB6094:EE_
+X-MS-Office365-Filtering-Correlation-Id: c1a96151-1672-40ed-bdaf-08df084d1ffc
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700016|82310400026|376014|7416014|23010399003|1800799024|10067099003|56012099006|4143699003|11063799006|22082099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	+BohfrBwIFeE5vj9QuuZkHY65txW7zuWZS/1aGKBXArDcWZY7V9m9oCC4PtmwAUMppwVa1zu98Gx/0s9sdLy0ciQF58RSbDtZa/MglvbIiD/KeshPgY+4viS/yjjXX+CKBKEyU2SMlsX2IAXBN1XJjCDi1i10sI9DExosnhaJiVTOPAzlBxc4lHgTSSbXyu/61z5RsJWOakoJyjYDFmmrD4DagCgnDRtuFVgVuAnVVN4gyJLvBmRcYiznLdL8acvA4MnMAeyI4MssMJ64WkKyMKz9m4oZbPzueou6CCGT4ntewxDPqMGVqdku6LcBouyMUDUezT3YQD4rGwVUh8Qi6lSh+Clj0Jyy3vE5h4cbWhcX/axgUf2fKDWycdnjXyw2r4W/qfNyTKsKoxlFdVt96AN2elhHfskzYhZFrcz+AkN8EZecw1cZ2EURqZg71YZ+wqbIzgCBjjuMGewkmzKN0VOsA2DJpubUoGaqZ1oF4Seet6IltjPdR0V2lxS8xKb+gtTauCvtTZEKwSv3anFJ5fuYrz3pgU2o1XJcp1b+YctubQ6dZEfMXSF7Q2cRUiYOApGLuEDU73VCpk17aJRLeRcJT6w+dFeaE9Clkq31z3ogypzKfq3jDxOHYgIXRHzeR45xLygT9LLDqC9eEBQL1z2ZYTHZNb/541XjqUEU47UDWv/1mShr/FVMuZIwcVMBnOomRmSdiMIxg94BYrJpg==
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700016)(82310400026)(376014)(7416014)(23010399003)(1800799024)(10067099003)(56012099006)(4143699003)(11063799006)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	HruBIGFzd6D5eQUrI0/AX6ItOIyxt+lotmIw8Q0nif9+3Hd+7kSWRHV4T7HVTVASVDJLpVyPdvUkXHgZFC1cz14zgr5U5pzUrnfnlYloVQhuwlo2WQpBAHwHTb43Xhllef8v13FvtDmq3HjjBLQzaqhyjPD09c5kMJlh92TTQNq0gXwecbNuqm8v7CHt14kx0tzOMpVW22wx+eF7uCivmG6giSmAiZVlsRYGFLAN7YymtOMUyeoIBV2vu+k9q7Xzfrwp4H0IWLf3oz+9uObpVdY9Rf+Kjh/tsrgalcF9kwhyReZi5Owikvb2SNOWDBBnk6kh6ZC+W9HfSk6DY+jsommBu2uaoamO6n5jcWqEpcEdMdU5gJ3ZStbD/DfGxWzkoHZz+QoLGJjek4P+juTkw+vWdQajciS8TlFdMH7/JpYeCnvYZ91FeNn1ELMy+3EG
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Sep 2026 17:19:05.0690
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: c1a96151-1672-40ed-bdaf-08df084d1ffc
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SN1PEPF0002BA4D.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6094
 
-When dirty-logging is disabled, even non-write faults make a page dirty,
-which avoids a second fault when the page is actually written to.
+On Tue, Sep 01, 2026 at 10:13:11AM -0700, Nicolin Chen wrote:
+> On Tue, Sep 01, 2026 at 11:34:45AM -0300, Jason Gunthorpe wrote:
+> > On Tue, Sep 01, 2026 at 03:36:37PM +0530, Aneesh Kumar K.V wrote:
+> > 
+> > > @@ -463,14 +460,13 @@
+> > >  	vsmmu->vmid = s2_parent->s2_cfg.vmid;
+> > >  
+> > >  	if (viommu->type == IOMMU_VIOMMU_TYPE_ARM_SMMUV3) {
+> > > +		if (arm_smmu_is_realm_viommu(viommu))
+> > > +			return arm_realm_smmu_v3_init(viommu, user_data);
+> > > +
+> > 
+> > I think the realm vsmmu is going to require a different info struct
+> > than the normal psmmu case, isn't it?
+> > 
+> > If so it needs its own enum value.
+> > 
+> > It would be nice to see a draft patch showing how the real vsmmu works
+> > on top of the RMM spec for it. If we are using a viommu object then
+> > non-vsmmu case should be identical just with an option in the info
+> > struct to not create the vsmmu object.
+> 
+> Actually, the PSMMU-only viommu object in this series only adds a
+> type with no viommu data structure.
+> 
+> I've drafted the vsmmu case on top of the series, so it would add
+> a structure reusing the same IOMMU_VIOMMU_TYPE_ARM_SMMUV3 with a
+> flag:
 
-On dirty-logging enable, this approach causes all (writable) pages on the
-memslot to be marked clean, even if they were not written to, which can
-take a lot of time, while holding the MMU lock, doing atomic writes to
-PTEs.
+Oh. I replied too fast that I didn't notice this is under the
+standard IOMMU_VIOMMU_TYPE_ARM_SMMUV3 used by non-secure vSTE.
 
-Systems with HAFDBS can use HW to mark a writable-clean page as
-writable-dirty when a write occurs, avoiding the mentioned second fault,
-while keeping dirty only the pages that have been actually written to.
+That doesn't look correct for a no-vsmmu case..
 
-So, if the system supports VHE + HAFDBS, keep the non-write-faulted page as
-writable-clean, and let HAFDBS update that on demand when a write happens.
-
-When dirty-tracking actually starts, disable HAFDBS as having it on
-avoids the same fault that is used for dirty-logging.
-
-Signed-off-by: Leonardo Bras <leo.bras@arm.com>
----
- arch/arm64/include/asm/kvm_mmu.h    |  6 ++++++
- arch/arm64/include/asm/kvm_nested.h |  9 +++++++--
- arch/arm64/kvm/arm.c                |  7 +++++++
- arch/arm64/kvm/mmu.c                | 26 +++++++++++++++++++++++++-
- 4 files changed, 45 insertions(+), 3 deletions(-)
-
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 6eae7e7e2a68..3defa1a988d3 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -383,20 +383,26 @@ static inline void kvm_fault_unlock(struct kvm *kvm)
-  * and CMOs are NOP'd. This has the effect of no longer requiring a
-  * KVA for addresses mapped into the S2. The presence of these features
-  * are thus necessary to support cacheable S2 mapping of VM_PFNMAP.
-  */
- static inline bool kvm_supports_cacheable_pfnmap(void)
- {
- 	return cpus_have_final_cap(ARM64_HAS_STAGE2_FWB) &&
- 	       cpus_have_final_cap(ARM64_HAS_CACHE_DIC);
- }
- 
-+static inline bool kvm_supports_hafdbs(struct kvm *kvm)
-+{
-+	return IS_ENABLED(CONFIG_ARM64_HW_AFDBM) && has_vhe() &&
-+		!kvm_vcpu_has_nv(kvm) && cpus_have_final_cap(ARM64_HW_DBM);
-+}
-+
- #ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
- void kvm_s2_ptdump_create_debugfs(struct kvm *kvm);
- void kvm_nested_s2_ptdump_create_debugfs(struct kvm_s2_mmu *mmu);
- void kvm_nested_s2_ptdump_remove_debugfs(struct kvm_s2_mmu *mmu);
- #else
- static inline void kvm_s2_ptdump_create_debugfs(struct kvm *kvm) {}
- static inline void kvm_nested_s2_ptdump_create_debugfs(struct kvm_s2_mmu *mmu) {}
- static inline void kvm_nested_s2_ptdump_remove_debugfs(struct kvm_s2_mmu *mmu) {}
- #endif /* CONFIG_PTDUMP_STAGE2_DEBUGFS */
- 
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 1ed708335809..9242b5d665af 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -1,24 +1,29 @@
- /* SPDX-License-Identifier: GPL-2.0 */
- #ifndef __ARM64_KVM_NESTED_H
- #define __ARM64_KVM_NESTED_H
- 
- #include <linux/bitfield.h>
- #include <linux/kvm_host.h>
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_pgtable.h>
- 
--static inline bool vcpu_has_nv(const struct kvm_vcpu *vcpu)
-+static inline bool kvm_vcpu_has_nv(const struct kvm *kvm)
- {
- 	return (!__is_defined(__KVM_NVHE_HYPERVISOR__) &&
- 		cpus_have_final_cap(ARM64_HAS_NESTED_VIRT) &&
--		vcpu_has_feature(vcpu, KVM_ARM_VCPU_HAS_EL2));
-+		kvm_vcpu_has_feature(kvm, KVM_ARM_VCPU_HAS_EL2));
-+}
-+
-+static inline bool vcpu_has_nv(const struct kvm_vcpu *vcpu)
-+{
-+	return kvm_vcpu_has_nv(vcpu->kvm);
- }
- 
- /* Translation helpers from non-VHE EL2 to EL1 */
- static inline u64 tcr_el2_ps_to_tcr_el1_ips(u64 tcr_el2)
- {
- 	return (u64)FIELD_GET(TCR_EL2_PS_MASK, tcr_el2) << TCR_IPS_SHIFT;
- }
- 
- static inline u64 translate_tcr_el2_to_tcr_el1(u64 tcr)
- {
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 1e528d53d093..76aebaa95cda 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1676,20 +1676,27 @@ static int kvm_setup_vcpu(struct kvm_vcpu *vcpu)
- 	 * KVM_ARM_VCPU_PMU_V3_SET_PMU.
- 	 */
- 	if (kvm_vcpu_has_pmu(vcpu) && !kvm->arch.arm_pmu &&
- 	    !kvm_vcpu_has_pmuv3_strict(vcpu))
- 		ret = kvm_arm_set_default_pmu(kvm);
- 
- 	/* Prepare for nested if required */
- 	if (!ret && vcpu_has_nv(vcpu))
- 		ret = kvm_vcpu_init_nested(vcpu);
- 
-+	/* Enable HAFDBS by default if VHE && !nested  */
-+	if (kvm_supports_hafdbs(kvm) &&
-+	    atomic_read(&kvm->nr_memslots_dirty_logging) == 0)
-+		kvm->arch.mmu.vtcr |= VTCR_EL2_HD;
-+	else
-+		kvm->arch.mmu.vtcr &= ~VTCR_EL2_HD;
-+
- 	return ret;
- }
- 
- static int __kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
- 				 const struct kvm_vcpu_init *init)
- {
- 	unsigned long features = init->features[0];
- 	struct kvm *kvm = vcpu->kvm;
- 	int ret = -EINVAL;
- 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 9d4f70430bbe..94094ab56d90 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1982,21 +1982,22 @@ static int kvm_s2_fault_compute_prot(const struct kvm_s2_fault_desc *s2fd,
- 	if (esr_fsc_is_excl_atomic_fault(kvm_vcpu_get_esr(s2fd->vcpu))) {
- 		kvm_inject_dabt_excl_atomic(s2fd->vcpu, kvm_vcpu_get_hfar(s2fd->vcpu));
- 		return 1;
- 	}
- 
- 	*prot = KVM_PGTABLE_PROT_R;
- 
- 	if (s2vi->map_writable) {
- 		*prot |= KVM_PGTABLE_PROT_W;
- 
--		if (s2vi->device || !memslot_is_logging(s2fd->memslot) ||
-+		if (s2vi->device ||
-+		    !(memslot_is_logging(s2fd->memslot) || kvm_supports_hafdbs(kvm)) ||
- 		    kvm_is_write_fault(s2fd->vcpu))
- 			*prot |= KVM_PGTABLE_PROT_DIRTY;
- 	}
- 
- 	if (s2fd->nested)
- 		*prot = adjust_nested_fault_perms(s2fd->nested, *prot);
- 
- 	if (kvm_vcpu_trap_is_exec_fault(s2fd->vcpu))
- 		*prot |= KVM_PGTABLE_PROT_X;
- 
-@@ -2570,53 +2571,76 @@ int __init kvm_mmu_init(u32 hyp_va_bits)
- 
- out_destroy_pgtable:
- 	kvm_pgtable_hyp_destroy(hyp_pgtable);
- out_free_pgtable:
- 	kfree(hyp_pgtable);
- 	hyp_pgtable = NULL;
- out:
- 	return err;
- }
- 
-+static void kvm_set_hafdbs(struct kvm *kvm, bool set)
-+{
-+	/* Check if no action required */
-+	if (!!(kvm->arch.mmu.vtcr & VTCR_EL2_HD) == set)
-+		return;
-+
-+	if (set)
-+		kvm->arch.mmu.vtcr |= VTCR_EL2_HD;
-+	else
-+		kvm->arch.mmu.vtcr &= ~VTCR_EL2_HD;
-+
-+	kvm_make_all_cpus_request(kvm, KVM_REQ_RELOAD_STAGE2);
-+}
-+
- void kvm_arch_commit_memory_region(struct kvm *kvm,
- 				   struct kvm_memory_slot *old,
- 				   const struct kvm_memory_slot *new,
- 				   enum kvm_mr_change change)
- {
- 	bool log_dirty_pages = new && new->flags & KVM_MEM_LOG_DIRTY_PAGES;
- 
- 	/*
- 	 * At this point memslot has been committed and there is an
- 	 * allocated dirty_bitmap[], dirty pages will be tracked while the
- 	 * memory slot is write protected.
- 	 */
- 	if (log_dirty_pages) {
- 
- 		if (change == KVM_MR_DELETE)
- 			return;
- 
-+		/* Disable HAFDBS when dirty-logging starts */
-+		if (kvm_supports_hafdbs(kvm))
-+			kvm_set_hafdbs(kvm, 0);
-+
- 		/*
- 		 * Huge and normal pages are write-protected and split
- 		 * on either of these two cases:
- 		 *
- 		 * 1. with initial-all-set: gradually with CLEAR ioctls,
- 		 */
- 		if (kvm_dirty_log_manual_protect_and_init_set(kvm))
- 			return;
- 		/*
- 		 * or
- 		 * 2. without initial-all-set: all in one shot when
- 		 *    enabling dirty logging.
- 		 */
- 		kvm_mmu_wp_memory_region(kvm, new->id);
- 		kvm_mmu_split_memory_region(kvm, new->id);
- 	} else {
-+		/* If dirty-logging was canceled, set HAFDBS back on */
-+		if (kvm_supports_hafdbs(kvm) &&
-+		    atomic_read(&kvm->nr_memslots_dirty_logging) == 0)
-+			kvm_set_hafdbs(kvm, 1);
-+
- 		/*
- 		 * Free any leftovers from the eager page splitting cache. Do
- 		 * this when deleting, moving, disabling dirty logging, or
- 		 * creating the memslot (a nop). Doing it for deletes makes
- 		 * sure we don't leak memory, and there's no need to keep the
- 		 * cache around for any of the other cases.
- 		 */
- 		kvm_mmu_free_memory_cache(&kvm->arch.mmu.split_page_cache);
- 	}
- }
--- 
-2.55.0
-
+Nicolin
