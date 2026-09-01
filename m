@@ -1,160 +1,166 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D18247798B;
-	Tue,  1 Sep 2026 09:17:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4B9C47AF66
+	for <kvmarm@lists.linux.dev>; Tue,  1 Sep 2026 09:26:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788254234; cv=none; b=R6cAk+8zVEEiWAsP5CGYs+kjKRtX2ikhG2utAVONJyxogtpcefZ9QRM5xgLnZ/rc0N3tAMacE5SZa4AuwBq8UksLKS+4d34yerqPvC0ksqQwmxCdHR0Wp+UPBFZ0JoSKclqZcb2Awr9m/iPAwc5TJkhJQtCV4H9On0Cy6HX+bPc=
+	t=1788254781; cv=none; b=ldBZVUArXmXpirs6wnZqtDLdTrF7OWoFJ8AKhUyqkNWWvm2Uwe4mPJ2EwhfT3Q1vVU+eUM6vMCuvSjoeO+Ng2b2Rk5e2Tt3+JWDxUpDMYQyf5+ZZEo3odo8Ne/1OsMzl1stpylm+KAR0aLX8c5m04Kc1UkpYN+77FhVg7vk0GT8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788254234; c=relaxed/simple;
-	bh=SEvxqsLXA5gPmTU0Dj4YKtTfRCn4/vTp5S4oMrM7tGk=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=BJKM/XJRTx1Bm2jdEKprB4xv+tnajlO+MDPkfDN4+czk8XIz8NHFsCnPCmyDKbldp+hyE6iba0YDwckprMli1Cz28IJ4LJwoN/9Qrrhk9EtWr6qRoJhbybMd37PRLeLMIMh1czos4LK3leGktlelWxDEZ38xWc3rIsTLntLwEW4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XROMNIUm; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788254781; c=relaxed/simple;
+	bh=2ZJa10s5B8swPsDfg2S3YAMjoD1kSrH3mbZ5esnW5Gc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gGYRXGquIfjp76n929aWAKVS3WiZtdeM7SQHJOzSi9/DGijRYJdRcFnR2O+sEd5M2jPaGTdNaY5UBeDhRlK0SVY+dG4cbTGCP4VoCRG1aVojuH9Rk1Cw4k4+b8Hj0AiYcLL2Tq3cubp5Ke/zFPvGoPzU2V8APxFTcZdBAaJ2WHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=iPYF385I; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XROMNIUm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4EB61F000E9;
-	Tue,  1 Sep 2026 09:17:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788254232;
-	bh=mITZlxCGGk5dvksU48UBQe0WaGaTY/+s4dpeJMto630=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=XROMNIUmyhA7M/dbxKK8Imo86dz2L5j/zRFqHXNrxib/St5Bz1Wb45NtmhWOw5fJy
-	 1u3rgOng700Q/MQ7vgjnccFx73xrQm/I7XQ3n67GRnFhDKxJ/VFmyX48m+SserSxs+
-	 Tj82D7pJJMB26AvoXAgxRVqAW3LgHXg+Khq3BxBKr9/K3b1pItu8VaSk4UULn1gG//
-	 8C8f2gKAHAI74TDde4b39ZA0HPi0d9Z3mFhPd6KgiQH0aY3Zq0mWuwzTsGSVTSS7ZE
-	 jUydPyVjl+1VTyXdmpr4NjgMXIHt/C0EyY7NN9kjEfZOHNqNA5Ed9dbgxa4YiD6AJE
-	 VftVrjb3WsNrg==
-X-Mailer: emacs 31.1 (via feedmail 11-beta-1 I)
-From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: Nicolin Chen <nicolinc@nvidia.com>
-Cc: linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Alexey Kardashevskiy <aik@amd.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Joerg Roedel <joro@8bytes.org>,
-	Jonathan Cameron <jic23@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Pranjal Shrivastava <praan@google.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Samuel Ortiz <sameo@rivosinc.com>,
-	Steven Price <steven.price@arm.com>,
-	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Xu Yilun <yilun.xu@linux.intel.com>
-Subject: Re: [RFC PATCH v4 03/16] iommu/arm-smmu-v3: Add initial pSMMU realm
- viommu plumbing
-In-Reply-To: <apM6dOHcEI2ztWS0@nvidia.com>
-References: <20260427085344.941627-1-aneesh.kumar@kernel.org>
- <20260427085344.941627-4-aneesh.kumar@kernel.org>
- <apM6dOHcEI2ztWS0@nvidia.com>
-Date: Tue, 01 Sep 2026 14:47:04 +0530
-Message-ID: <yq5a8q5lz5yn.fsf@kernel.org>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="iPYF385I"
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6817VY9x571761;
+	Tue, 1 Sep 2026 09:26:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=xV5uxuK+OqQtUrop5OEhE1Ov9RkWif
+	hVrlckzwzZjFY=; b=iPYF385IC+vCcd9WWwAA7KylYqvthnwLEYL3mqZQqR08Ac
+	Mg8/xaiCR8CuI4nqQhWLjeUatMnmKW48GF3LD9zn+TeEFcAY9aRAkuStH5LBHQ1j
+	Xm9TJ7J3+ytdTWOlasVRUxlINDUMrpc5b6geLeIr4ezaDOQOhme+nxKusfSW2r0f
+	ahA/91PeXK2U5TSoHIY8PM/wLjNcbamRXdiXv+I80VtTCSoiCXaJ7fA8Y+EjU6E/
+	fhfzHAGRjkJVVP435nNBkq/b8LyhcUtqnYxoO53RsCb39vFHS83Y8PjKs5z3QKKk
+	uJ1ft9YqYJioIjHzon5e3M6n5rAJbYfIJfaR+oyw==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gbq54pv5f-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 01 Sep 2026 09:26:02 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 6819BIOD005036;
+	Tue, 1 Sep 2026 09:26:00 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4gcark2w19-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 01 Sep 2026 09:26:00 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6819Ps3537618120
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 1 Sep 2026 09:25:54 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 336602004B;
+	Tue,  1 Sep 2026 09:25:54 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C864C20043;
+	Tue,  1 Sep 2026 09:25:53 +0000 (GMT)
+Received: from osiris (unknown [9.224.76.185])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Tue,  1 Sep 2026 09:25:53 +0000 (GMT)
+Date: Tue, 1 Sep 2026 11:25:52 +0200
+From: Steffen Eiden <seiden@linux.ibm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, Alexander Gordeev <agordeev@linux.ibm.com>,
+        Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@kernel.org>,
+        Friedrich Welter <fritz@linux.ibm.com>, Fuad Tabba <tabba@google.com>,
+        Gautam Gala <ggala@linux.ibm.com>,
+        Hariharan Mari <hari55@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Hendrik Brueckner <brueckner@linux.ibm.com>,
+        Ilya Leoshkevich <iii@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
+        Nico Boehr <nrb@linux.ibm.com>,
+        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
+        Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v2 03/20] arm64: sysreg: Define OSLSR_EL1_OSLK_MASK
+Message-ID: <20260901092552.231001-A-seiden@linux.ibm.com>
+References: <20260831145536.913567-1-seiden@linux.ibm.com>
+ <20260831145536.913567-4-seiden@linux.ibm.com>
+ <87v78pmmtz.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87v78pmmtz.wl-maz@kernel.org>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTAxMDA4MCBTYWx0ZWRfX8xslj0CEzrny
+ I870zjdnuI65T0MuYtoOptYdzTMbteRcW+SxhEtSXVJyq+JKjL1e8xqpqJzbl8ta3JemDEbbxGZ
+ FonFGGrB3t4IVuPmLFKqQV4be7v2CY5fZtn0qX2rZ7LKq8htSy04qEGwiuB2J/kYez7l5t15QBP
+ IH5JpIPQ+NGVk1jfUjTu90FlP7BR0SuTFX89zbz8N/nXk5GPLFlEhqq/GOYe8gnkYZrau91y/iz
+ f7rXrheByTG170YogC6v7SNbWytI5YtnP9voY7HkzFD1IJKokdeipktn+6twX4mWywhIxXLiINk
+ SQGqdVg1zs0aDqDQSez0wdGGrPlQENN8SmewK58qLgt5RS8B1b0n8imqn+osaY5aPOMfILClJyz
+ gMBS2LwIQff1/5+0Ca/rtvdFXcHnIPHHuIb8HZ60WlUM2ue/9iG85H6vVft3lRk38nHQ94GtB2k
+ L/FEKcdsNpp4K5/Yl0g==
+X-Proofpoint-ORIG-GUID: I-mtpcS85hHB8dxIUUm3PzblhLWkM2jC
+X-Authority-Analysis: v=2.4 cv=CNgamxrD c=1 sm=1 tr=0 ts=6a969a2a cx=c_pps
+ a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
+ a=kj9zAlcOel0A:10 a=VdqzKS8jKosA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=U7nrCbtTmkRpXpFmAIza:22 a=VnNF1IyMAAAA:8
+ a=tb7DenZA0QQaIP_q4lIA:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-GUID: LHOJJuwKv02WXCucgi7cBBp1KnMnc0PR
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTAxMDA4MCBTYWx0ZWRfXwtM0K71xZrh6
+ 2N3iuWstOoFIsy8FtxbkR+jF9480VaNirXdbLdtu4uNUhCO6AoadoKorhMXRTKja93QvI5rkFjQ
+ qqSHwIkbMwWMwgqTkFqxoK5Av2Ms+T4=
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-09-01_02,2026-08-31_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 bulkscore=0 suspectscore=0 phishscore=0 lowpriorityscore=0
+ priorityscore=1501 clxscore=1015 impostorscore=0 adultscore=0 malwarescore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2609010080
 
-Nicolin Chen <nicolinc@nvidia.com> writes:
+On Tue, Sep 01, 2026 at 08:51:04AM +0100, Marc Zyngier wrote:
+> On Mon, 31 Aug 2026 15:55:18 +0100,
+> Steffen Eiden <seiden@linux.ibm.com> wrote:
+> > 
+> > Define the missing mask for the OLSK field of OSLSR_EL1 which is
+> > required to safely write a value to that field.
+> > 
+> > Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
+> > ---
+> >  arch/arm64/include/asm/sysreg.h | 1 +
+> >  1 file changed, 1 insertion(+)
+> > 
+> > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> > index 1c5c4df260be..5a439853b721 100644
+> > --- a/arch/arm64/include/asm/sysreg.h
+> > +++ b/arch/arm64/include/asm/sysreg.h
+> > @@ -200,6 +200,7 @@
+> >  #define OSLSR_EL1_OSLM_NI		0
+> >  #define OSLSR_EL1_OSLM_IMPLEMENTED	BIT(3)
+> >  #define OSLSR_EL1_OSLK			BIT(1)
+> > +#define OSLSR_EL1_OSLK_MASK		BIT(1)
+> 
+> Just move the required sysregs to the sysreg file, with the full bit
+> description. This will sort this once and for all.
 
-> On Mon, Apr 27, 2026 at 02:23:31PM +0530, Aneesh Kumar K.V (Arm) wrote:
->> +static const struct iommufd_viommu_ops arm_realm_smmu_v3_ops = {
->> +	.destroy = arm_realm_smmu_v3_destroy,
->> +	.alloc_domain_nested = arm_vsmmu_alloc_domain_nested,
->> +	.cache_invalidate = arm_vsmmu_cache_invalidate,
->
-> I don't think realm vsmmu should include NS nested domain ops. I
-> wonder if adding here is for some covert reason that prevents us
-> from registering viommu/vdevice objects?
->
->> +static int arm_realm_smmu_v3_vdevice_init(struct iommufd_vdevice *vdev)
->> +{
->> +	struct device *dev = iommufd_vdevice_to_device(vdev);
->> +	struct arm_smmu_master *master = dev_iommu_priv_get(dev);
->> +	// fixme which stream to pick
->> +	/* At this moment, iommufd only supports PCI device that has one SID */
->> +	struct arm_smmu_stream *stream = &master->streams[0];
->> +	struct arm_smmu_device *smmu = master->smmu;
->> +	unsigned long rmi_ret = 0;
->> +	int ret;
->> +
->> +	if (!smmu->realm_initialized)
->> +		return -EINVAL;
->> +
->> +	ret = rmi_psmmu_st_l2_create(smmu->base_phys,
->> +				     ALIGN_DOWN(stream->id, STRTAB_NUM_L2_STES),
->> +				     &rmi_ret);
->
-> The "vdevice" is for a PSMMU stream table allocation..
->
->> +int arm_realm_smmu_v3_init(struct iommufd_viommu *viommu,
->> +			   const struct iommu_user_data *user_data)
->> +{
-> [...]
->> +psmmu_activate:
->> +	ret = rmi_psmmu_activate(smmu->base_phys, virt_to_phys(params),
->> +				 &rmi_ret);
->
-> .. and the "viommu" is also for PSMMU activation...
->
->> +++ b/include/uapi/linux/iommufd.h
->> @@ -1055,6 +1055,7 @@ enum iommu_viommu_type {
->>  	IOMMU_VIOMMU_TYPE_DEFAULT = 0,
->>  	IOMMU_VIOMMU_TYPE_ARM_SMMUV3 = 1,
->>  	IOMMU_VIOMMU_TYPE_TEGRA241_CMDQV = 2,
->> +	IOMMU_VIOMMU_TYPE_ARM_REALM_SMMUV3 = 3,
->
-> .. and we demand userspace (VMM) to use IOMMU_VIOMMU_ALLOC ioctl,
-> even if VMM does not actually expose a guest-level SMMU instance.
-> Thus, no user_data.
->
-> I can get the reasoning behind the flow using this viommu/vdevice.
->
-> But, on the other hand, I can imagine that a Realm VSMMU would add
-> a new flag with a user_data to this VIOMMU. Then, this flow would
-> give some troubles to VMM (QEMU for example):
->
->  - For VM with a guest-level SMMU, QEMU creates a realm instance
->    where IOMMU_VIOMMU_TYPE_ARM_REALM_SMMUV3 (with vsmmu) can be
->    allocated.
->  - For VM w/o a guest-level SMMU, QEMU won't create such a realm
->    instance, while still required to invoke the ioctl (w/o vsmmu). 
->
-> Taking a step back, I wonder if we really need to use iommufd for
-> PSMMU activation and its stream table allocations?
->
-> Here are some facts:
->   - An iommufd has a ctx, that's one per VM. Similarly, a Realm
->     has an RD.
->   - For an RMI command that needs an RD, it makes sense to be per
->     iommufd ctx, e.g. RMI_VSMMU_* or RMI_VDEV_* commands.
->   - PSMMU commands are global; they don't need RD. So they don't
->     seem necessary to tie to an iommufd ctx.
->
-> Instead, could the PSMMU activation be done after RMI_PSMMU_INFO
-> check? Is there any reason not to do that? A safer timing might
-> be at the device assignment stage?
->
+You mean to the tools/syreg file to generate the descriptions?
 
-One of the reasons I added IOMMU_VIOMMU_TYPE_ARM_REALM_SMMUV3 was to
-avoid creating a psmmu object when we are not using a PCI passthrough
-VM. That is also the reason for all the refcounting around the psmmu
-objects.
+I wanted to do that but OSLSR has a split field (OSLM in bit 3 and 0)
+which the generation tooling cannot handle. (right?)
 
-If we are okay with creating psmmu objects early, then I guess we can go
-with the above approach.
+Now that I am rethinking this:
 
->
-> Speaking of which, RMI_PSMMU_ST_L2_CREATE doesn't seem necessary
-> to be invoked in a vdevice context either. Maybe it should align
-> with iommufd idev's lifecycle?
->
+I could move the stuff to the tools/sysregs and in addtion define the
+OSLM field here manually but this time using the generated constansts.
+probably sth. like: 
 
--aneesh
+#define OSLSR_EL1_OSLM_MASK		(OSLSR_EL1_OSLM0_MASK | OSLSR_EL1_OSLM3_MASK)
+#define OSLSR_EL1_OSLM_NI		OSLSR_EL1_OSLM0_NI
+#define OSLSR_EL1_OSLM_IMPLEMENTED	OSLSR_EL1_OSLM3_IMPLEMENTED
+
+Shall I do this?
+
+	Steffen
