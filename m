@@ -1,44 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E744B2D1913
-	for <kvmarm@lists.linux.dev>; Tue,  1 Sep 2026 22:06:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8566F2D1913
+	for <kvmarm@lists.linux.dev>; Tue,  1 Sep 2026 22:06:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788300373; cv=none; b=FOvhTmxlFMixBzFtd175T82IDJussfoywaWxt2Lbj2wpptxkm8+/oSfFjcaZHXHoUqjoxCy1MEUCTwYuHIE6F6+2VeJCvmKU6TF7JcCFSozOvKMN/wqmagl332mOjB/Ze+Xs/POaZGXqk03V+MY5kof4XZu3v8bf8JrFfgXc2aA=
+	t=1788300398; cv=none; b=SQSLLh85Dq/C0Nr9SLXJeY6Kik3rqwhTGcjDcVTA4EtKS3tE3sNwVbtj+DhneHDmCne6FxrEhlquDBq0T8+9q5iR4FN0jhXLt4dDTciHXOFMYf+/DC9An1XLzR8K0cVZjy6e1HIg1oKbKtTUvhBO1spSOqOtuvs2XABXx/IAQXQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788300373; c=relaxed/simple;
-	bh=roMBVC4YENB9O5kEzF9ORaY0D47d9um3Q2QQmGjwoD4=;
+	s=arc-20240116; t=1788300398; c=relaxed/simple;
+	bh=cRT+NCFhU0reNMZpJDBa92A6RnOAf73rHu7fKY17hig=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=Z1e6egBnzRBxP0sUGUAruoqQAYYpdcgQixVLTD99lxqqkCL54GQOVY/KRQOcucGPKR4Azpb/auo1fgH7T5U+D49gYcswdEcLBRtXZ3zMxmWzUoWex1pBf0pD1wy7YdFIm/ZXgCDiMlu9e934prTaEF0IkZPEv8FShYkMcMZ0Fp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eGSCBeqF; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=Xbyxvs5SVid3NSPKHn6edJQVnUrdGL7m7hxFLjBuiYG1vKwRPtpy+TIAn2bWVjl44fFw2x8Cuach9aKzZ9FlyghbpjHdYDFV3ylmBLLLh/PumOwea6QrcdZZlPSew4jjgnpfzECYCKUIz/Az3Uk3a/Ocjl0o46b6j6AkMyJt+Z4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cZ9RR3kC; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eGSCBeqF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 372C91F000E9;
-	Tue,  1 Sep 2026 22:06:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cZ9RR3kC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 102E01F000E9;
+	Tue,  1 Sep 2026 22:06:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788300371;
-	bh=m8Z4jh6yhFJdrULaK6SWOWjfud1YThIq70D8lGSPNU4=;
+	s=k20260515; t=1788300397;
+	bh=Bbx7Czafx85HpIiMv6IJkW9Ri1g1M7FbhiM+pQbDfsg=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=eGSCBeqFyfjg8sORAoPrmCtD3+GXam7Z5djwI6LS2ljXx/31qZvjp5yQvrAtqh9rF
-	 HbImRNj9AKAA3G1AHy2cvAHESGiNrpeT3Yi2MCp1BLtSmLy35YjhPTPTcNosS+mDsF
-	 f3NqFJzTshWFoNo5dDjqa637xmXuPZT/FoTNqqnfIt4NlSe89dByDo8u+8yyFG1QwK
-	 6xhCg0sV7a1QdbcjXJyL4L/WE0FLC/udBaUdBnnpA24GXNeUt5ZwemjoJE0fT3mz1d
-	 f0nxbF6Ns4NG3nctKY/v9fqlB3fC69ef00w1IOMH+viSWgy/0nrjfq3gdaAPFqPLPQ
-	 KwCp1KFrzgpig==
+	b=cZ9RR3kCZ+p8M/CNTysrbu163weW6EafDNBKvosYbY3JQNKKZ4EJp9PIKK1qEcrHG
+	 CVXqlkOaZ71PxBcTm1zQxYZ9aqdM43uHZIUr3sfRpKt2vndW31fq1Vz6/Jf8je+YBi
+	 VuvTm5RwsVOYe05F29OiJ853Z3qI5ck/wmtoByouLWTFxwM6xg3mBb9GzXDCp3V+rR
+	 sZNbI6dv44xD8444G0fc1/KfjMwkQLxqTv2bWkZVHdns/Qp90PriQIOzB8lOK/vRJK
+	 wz75c7Q0YByAp1q7HZE1CnBFf0sA3yeAkgafSKPiw4UnrutUSAgc9XfIZZ08XXIkuw
+	 HSC6qxScLBdNg==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v20 04/14] KVM: arm64: Ensure GCS memory effects are
- visible
+Subject: Re: [PATCH v20 05/14] KVM: arm64: Set PSTATE.EXLOCK when entering
+ an exception
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Mark Brown" <broonie@kernel.org>
-Cc: kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>
-In-Reply-To: <20260901-arm64-gcs-v20-4-f31750bdfadb@kernel.org>
+Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev
+In-Reply-To: <20260901-arm64-gcs-v20-5-f31750bdfadb@kernel.org>
 References: <20260901-arm64-gcs-v20-0-f31750bdfadb@kernel.org>
- <20260901-arm64-gcs-v20-4-f31750bdfadb@kernel.org>
+ <20260901-arm64-gcs-v20-5-f31750bdfadb@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 01 Sep 2026 22:06:10 +0000
-Message-Id: <20260901220611.372C91F000E9@smtp.kernel.org>
+Date: Tue, 01 Sep 2026 22:06:36 +0000
+Message-Id: <20260901220637.102E01F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,98 +47,62 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [High] Missing explicit GCS barriers on the vCPU load/entry paths, failin=
-g to order host acquires against incoming guest GCS memory effects.
+- [Medium] Incorrect GCSCR_ELx register selection based on the current cont=
+ext instead of the target exception level.
 --
 
-commit 171e0d39ad041f789da5126a2b828fc123587e80
+commit 42f10f3e973b268a78dccd02e2f0ddbf5ed384fb
 Author: Mark Brown <broonie@kernel.org>
 
-KVM: arm64: Ensure GCS memory effects are visible
+KVM: arm64: Set PSTATE.EXLOCK when entering an exception
 
-This patch adds explicit GCS barriers to vCPU context switch operations.
-Since the hypervisor and host kernel do not use GCS themselves, they cannot
-rely on implicit barriers and must manually insert them to ensure GCS memory
-effects are visible.
+This commit implements managing PSTATE.EXLOCK when entering an exception.
+When taking an exception to a lower EL, the bit is cleared, and when
+entering from the same EL, it is set to GCSCR_ELx.EXLOCKEN.
 
->     In order to allow efficient implementation of GCS implementations are
->     permitted to do GCS specific caching, with barriers implicit in stack
->     switch operations and GCSB DSYNC as an explicit barrier.  Since we do
->     not use GCS in the hypervisor or host kernel the hypervisor cannot re=
-ly
->     on any barriers being present in vCPU context switches other than tho=
-se
->     it explicitly inserts.  Add explicit barriers when loading and saving
->     vCPU state.
-
-[Severity: High]
-The commit message states that explicit barriers are added when "loading and
-saving vCPU state", but the barriers appear to be missing from the load pat=
-hs.
-
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 8b080804bc90b..52f53f682e6af 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -755,6 +755,13 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->  			vcpu_set_flag(vcpu, PKVM_HOST_STATE_DIRTY);
->  	}
+> diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exceptio=
+n.c
+> index 754e2dc1df54a..85c873644fe90 100644
+> --- a/arch/arm64/kvm/hyp/exception.c
+> +++ b/arch/arm64/kvm/hyp/exception.c
+> @@ -49,6 +49,38 @@ static void __vcpu_write_spsr_und(struct kvm_vcpu *vcp=
+u, u64 val)
+>  		vcpu->arch.ctxt.spsr_und =3D val;
+>  }
 > =20
-> +	/*
-> +	 * Ensure any GCS memory effects from the outgoing vCPU are
-> +	 * visible elsewhere.
-> +	 */
-> +	if (kvm_has_gcs(vcpu->kvm))
-> +		gcsb_dsync();
-> +
-
-[Severity: High]
-While gcsb_dsync() is added here in the saving/outgoing path
-(kvm_arch_vcpu_put), does the corresponding loading/incoming path in
-kvm_arch_vcpu_load() also require this barrier?
-
-Without an incoming barrier on the load/entry paths, could a guest's
-subsequent GCS memory stores be speculatively reordered before the host's l=
-ock
-acquisitions are complete?
-
-Could this regression potentially violate memory ordering guarantees if ano=
-ther
-CPU observes the guest's execution before the host's context switch locks a=
-re
-fully resolved?
-
+> +static unsigned long compute_exlock(struct kvm_vcpu *vcpu,
+> +				    unsigned long mode,
+> +				    unsigned long target_mode)
+> +{
+> +	u64 gcscr;
 [ ... ]
-
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe=
-/hyp-main.c
-> index 9a3b92e626adb..534db037c5f69 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -261,6 +261,13 @@ static void sync_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_=
-vcpu)
->  	fpsimd_sve_sync(&hyp_vcpu->vcpu);
->  	sync_debug_state(hyp_vcpu);
-> =20
 > +	/*
-> +	 * Ensure any GCS memory effects from the outgoing vCPU are
-> +	 * visible elsewhere even if the host skips syncing.
+> +	 * When taking an exception to the same EL EXLOCK is set to
+> +	 * the effective value of GCSR_ELx.EXLOCKEN.
 > +	 */
-> +	if (kvm_has_gcs(hyp_vcpu->vcpu.kvm))
-> +		gcsb_dsync();
-> +
+> +	if (is_hyp_ctxt(vcpu))
+> +		gcscr =3D vcpu_read_sys_reg(vcpu, GCSCR_EL2);
+> +	else
+> +		gcscr =3D vcpu_read_sys_reg(vcpu, GCSCR_EL1);
 
-[Severity: High]
-Similarly, a barrier is added here to sync_hyp_vcpu(), but the entry seam
-flush_hyp_vcpu() does not receive one. Should flush_hyp_vcpu() also include
-an incoming barrier to ensure prior lock acquires are properly ordered agai=
-nst
-the incoming thread's GCS effects?
+[Severity: Medium]
+Could compute_exlock() read the wrong register when a nested guest
+configures HCR_EL2.TGE =3D 1 while operating in EL1?
 
->  	if (pkvm_hyp_vcpu_is_protected(hyp_vcpu)) {
->  		host_vcpu->arch.ctxt =3D hyp_vcpu->vcpu.arch.ctxt;
->  	} else {
+If KVM injects an exception to EL1 in this state (where target_mode is
+PSR_MODE_EL1h), is_hyp_ctxt(vcpu) will evaluate to true because TGE is set.
+
+This would cause the hypervisor to read GCSCR_EL2 instead of GCSCR_EL1,
+leading to an incorrect PSTATE.EXLOCK value for the injected exception.
+
+While a nested guest executing in EL1 with TGE=3D1 is architecturally
+unpredictable in hardware, KVM's software model typically avoids
+cross-wiring registers for different exception levels.
+
+Should this logic strictly use the explicitly passed target_mode to
+determine the target exception level, similar to how enter_exception64()
+handles VBAR and SCTLR?
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260901-arm64-gcs-=
-v20-0-f31750bdfadb@kernel.org?part=3D4
+v20-0-f31750bdfadb@kernel.org?part=3D5
