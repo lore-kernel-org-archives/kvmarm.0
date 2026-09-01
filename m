@@ -1,217 +1,200 @@
-Received: from mta0.migadu.com (out-237.mta0.migadu.com [91.218.175.237])
+Received: from mta0.migadu.com (out-4.mta0.migadu.com [91.218.175.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDB5B3CF200
-	for <kvmarm@lists.linux.dev>; Tue,  1 Sep 2026 10:24:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.237
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 867FA431A22
+	for <kvmarm@lists.linux.dev>; Tue,  1 Sep 2026 10:25:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788258246; cv=none; b=b9pF9QTaIpubuyyc0yfrWduaTKL8VOUfOwFNz4dLXMMghHebvzbOs40qwioIB/Z8PPEdKzm3M0PBDbsCHPIEKWOdvZ14J2JKD9+Z9aJnUF2fnGe4nr3JTxNXKnTATAwPK/uCQWVxrsnfclxLWPtokTvDor2nanNFOlFjkfZFYiY=
+	t=1788258319; cv=none; b=tSo5HkKiiUhMKCbs70Av3THrkfY9I8sKzshTpsIDx5UE4MDWEn+s24RNCGVE261St1ovFfIxE2foA1eAay0HtqBKk1ThqLPLud7eRGoVZVLGsFUFNLG0kSxNPhsX8AxhzqqCoBX15BcNgxIG/AT/Z7KBl5XB/k8MerUh18jAloc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788258246; c=relaxed/simple;
-	bh=1ZRlXJ6pTNiciXCv3e0Qf4lZEbdGciYfHGrczdl+PeU=;
+	s=arc-20240116; t=1788258319; c=relaxed/simple;
+	bh=3b1u60+8U6ha5CqTOcL4z0LRCmKhGOjJcF6XTi/oN8I=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KWeBiD+f15MG9LQ6ztdqVbOryz9wu3OCxrScQfZop1s3RfdOkd81LZxBBhT0VTLye0x68O+FxxPA8ov/saFjGGlE57aexEh3JrxB3m7bLG3s2cF8Hk6JhtmNFhYEzUwqb9wf+sbJTaIJRCNMOWBF7c5Z0tj41jrhaZ5OMtp7gZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=k8XYEFtV; arc=none smtp.client-ip=91.218.175.237
+	 To:Cc:Content-Type; b=dYgZj7UDVsH/WsC+qSasuVAPqj3zKT+4EUlEypBoCM7Wg/0XkMuw66dEnJxczP8qzUXEBTWQMzcqztT+jJjHzx4UQuDfIkpX7/Y5W1exbcESyRxJMI8EYQazyYPmLeWEyRl/u4+vYohZCjYmKdDaAuv22gmaXbP7i7w5Y7Oj5OM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=XJmpEvIQ; arc=none smtp.client-ip=91.218.175.4
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="k8XYEFtV"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="XJmpEvIQ"
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=1ZRlXJ6pTNiciXCv3e0Qf4lZEbdGciYfHGrczdl+PeU=;
+DKIM-Signature: a=rsa-sha256; bh=3b1u60+8U6ha5CqTOcL4z0LRCmKhGOjJcF6XTi/oN8I=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1788258242; v=1; x=1788863042;
- b=k8XYEFtV6woAnpqgFQYMs55na3ipWhg181qDIPqm/1q6scjnNF5RgQk6+hBhvTjvddcinZUI
- +lpK7UpRA12LNUDSjscfdoTfxXfYA+dsWSltAG0s/uuQX22kYRFa+6yPwFjlojrKliARMHqHGVn
- yng535oRQs3+1K0zDAyl6B6Y=
+ t=1788258315; v=1; x=1788863115;
+ b=XJmpEvIQmDxJZB4Mi8vvkkklqfwleCetaYDWPhk29a2ihsUlyL0d0wWePhZ8i0Lt6XhabOkU
+ kI4WumFCpUPWikmckvWMjRtifiq2Iijle7JfLvKo8yNn0NxYGkW0jpVXdPXD1KGZt5HiZGtC2x0
+ pRtUJlm9VzuyEKFodKTpufbs=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 586f08153832ff25;
-	Tue, 01 Sep 2026 10:24:02 +0000
-X-Mizu-Trace-ID: 586f08153832ff25
+Received: by smtp.migadu.com with ESMTPS id 3fcf86b2f9c39f72;
+	Tue, 01 Sep 2026 10:25:15 +0000
+X-Mizu-Trace-ID: 3fcf86b2f9c39f72
 X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-5b2a73da7e1so6588e87.0
-        for <kvmarm@lists.linux.dev>; Tue, 01 Sep 2026 03:23:58 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBys5PfuGDQ6Bmbhg7GJOxbe+5lXQ9RDNIiTNR2gnuvRZWwinjqBmPJQxgz79meUh9w9Wca4hkw=@lists.linux.dev
-X-Gm-Message-State: AFuF++lbpctkxtipC8CeUUDzT3YxCt0Hl5x5iOBU/eBjb9t1oTA5KV72
-	AfSDbk5IiOcSvvJX/ImnYg4PzHXOEZGNI2YupjLM1QU8HRbt7EyYvDRbr/sRbkTs7QANb17LtQN
-	QQCHxd0VaLNlnBG/EE5aTaIYB0Pts6QLPeqKlsaM2
-X-Received: by 2002:a05:6512:3e0c:b0:5b2:a5e9:3aba with SMTP id
- 2adb3069b0e04-5b5ff28cff6mr138197e87.6.1788258237767; Tue, 01 Sep 2026
- 03:23:57 -0700 (PDT)
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-5b2a8173142so4354e87.1
+        for <kvmarm@lists.linux.dev>; Tue, 01 Sep 2026 03:25:11 -0700 (PDT)
+X-Gm-Message-State: AFuF++nivpSoirvCxxqJkrA7LZS1qZBTHT9XuxDuw44hxdQkcazgcrRL
+	iFeBwud89e6nT78/FZnqwlsWTYUNZMYA4JiNCca9gyvjE+9Zcs/KjDoxw7xXaqbIRaIWrQaimD/
+	69lFFLrS4Tste6YJM5UqZQ6LJE8OExNufNrLQIVlM
+X-Received: by 2002:a05:6512:3b0d:b0:5b2:a967:c0e1 with SMTP id
+ 2adb3069b0e04-5b5fefc71e5mr148613e87.0.1788258310381; Tue, 01 Sep 2026
+ 03:25:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260831163421.272420-1-fuad.tabba@linux.dev> <20260831163421.272420-10-fuad.tabba@linux.dev>
- <20260831211457.1AE451F00A3D@smtp.kernel.org>
-In-Reply-To: <20260831211457.1AE451F00A3D@smtp.kernel.org>
+References: <20260831163421.272420-1-fuad.tabba@linux.dev> <20260831163421.272420-14-fuad.tabba@linux.dev>
+ <20260831221539.8DB491F000E9@smtp.kernel.org>
+In-Reply-To: <20260831221539.8DB491F000E9@smtp.kernel.org>
 From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Tue, 1 Sep 2026 11:23:21 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTyXKua0jbC-9AF4L19ikXopa5ELWPoQV18QojZy_e6F7Q@mail.gmail.com>
-X-Gm-Features: AcwNN1WdTRzgNeFRxi44rzIw9xhKWI3fVZkc5lV-ZnSwni6V793tuOdVH21m308
-Message-ID: <CA+EHjTyXKua0jbC-9AF4L19ikXopa5ELWPoQV18QojZy_e6F7Q@mail.gmail.com>
-Subject: Re: [PATCH 09/17] KVM: arm64: Handle PSCI calls for protected VMs at EL2
+Date: Tue, 1 Sep 2026 11:24:34 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTwKXcp02nUT2zecXCD6+Hj5Pdq-8GmeZa4PSJYuoptANg@mail.gmail.com>
+X-Gm-Features: AcwNN1UO1DB7feZBAuh-nhYjjO2uStTMPjKIaTJNHFs2D4_LYU8462LL1zPlcqM
+Message-ID: <CA+EHjTwKXcp02nUT2zecXCD6+Hj5Pdq-8GmeZa4PSJYuoptANg@mail.gmail.com>
+Subject: Re: [PATCH 13/17] KVM: arm64: Add per-EC entry/exit state marshalling
+ for protected guests
 To: sashiko-reviews@lists.linux.dev
-Cc: Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
+Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>, 
 	Marc Zyngier <maz@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Nor this one...
+And 0/3 here...
 
-On Mon, 31 Aug 2026 at 22:15, <sashiko-bot@kernel.org> wrote:
+On Mon, 31 Aug 2026 at 23:15, <sashiko-bot@kernel.org> wrote:
 >
-> Thank you for your contribution! Sashiko AI review found 1 potential issu=
+> Thank you for your contribution! Sashiko AI review found 3 potential issu=
 e(s) to consider:
-> - [High] Malicious host can hijack guest execution flow via CPU_ON TOCTOU=
- race caused by stale reset_state.reset flag.
+> - [High] The HVC64 entry handler ignores host-requested PC increments and=
+ exception injections, causing an infinite trap loop.
+> - [High] Host-injected exceptions and PC advancements are silently ignore=
+d for unhandled Exception Classes, causing infinite trap loops.
+> - [High] handle_pvm_exit_wfx fails to marshal the WFx timeout register to=
+ x0, breaking WFET and WFIT emulation.
 > --
 >
-> commit f4181bbdd19d9d3775a4f479d2c7c70dc5c753b8
+> commit 0b0e245ce37c95597a108d7e1ed3684401ade81b
 > Author: Fuad Tabba <fuad.tabba@linux.dev>
+> Subject: KVM: arm64: Add per-EC entry/exit state marshalling for protecte=
+d guests
 >
-> KVM: arm64: Handle PSCI calls for protected VMs at EL2
->
-> This patch implements PSCI 1.1 for protected VMs in EL2, handling power s=
-tate
-> transitions (CPU_ON, CPU_OFF, AFFINITY_INFO) within the hypervisor, while
-> keeping non-protected VMs unchanged. It defines protected vCPU power stat=
-es
-> and synchronizes racing transitions via cmpxchg and release/acquire barri=
-ers.
+> This patch moves a protected guest's state between the hyp vCPU and the h=
+ost
+> per exception class instead of copying the whole context. It adds per-EC
+> entry and exit handlers for various traps and routes protected guests
+> through them to marshal only the necessary state.
 >
 > > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nv=
 he/hyp-main.c
+> > index 5925d35abba8c..461e15cab1b92 100644
 > > --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
 > > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+>
 > [ ... ]
-> > @@ -37,27 +40,103 @@ typedef void (*hyp_entry_exit_handler_fn)(struct p=
-kvm_hyp_vcpu *);
-> >
-> >  static void __maybe_unused handle_pvm_entry_hvc64(struct pkvm_hyp_vcpu=
+>
+> > -static void __maybe_unused handle_pvm_entry_hvc64(struct pkvm_hyp_vcpu=
  *hyp_vcpu)
-> >  {
-> [ ... ]
-> > +                     prev =3D cmpxchg_relaxed(&target_vcpu->power_stat=
-e,
-> > +                                            PSCI_0_2_AFFINITY_LEVEL_ON=
-_PENDING,
-> > +                                            PSCI_0_2_AFFINITY_LEVEL_OF=
-F);
-> > +                     switch (prev) {
-> > +                     case PSCI_0_2_AFFINITY_LEVEL_ON_PENDING:
-> > +                             /*
-> > +                              * Leave reset_state.reset set: clearing =
-it
-> > +                              * races a concurrent CPU_ON's re-publish=
- and
-> > +                              * wedges the target at ON_PENDING. The s=
-tale
-> > +                              * pc/r0/be are the guest's own.
-> > +                              */
-> > +                             ret =3D PSCI_RET_INTERNAL_FAILURE;
-> > +                             break;
+> > +static void handle_pvm_entry_hvc64(struct pkvm_hyp_vcpu *hyp_vcpu)
+> > +{
+> > +     handle_pvm_entry_psci(hyp_vcpu);
+> > +}
 >
 > [Severity: High]
-> Does this rollback logic allow a malicious host to hijack guest execution=
- flow
-> by exploiting a TOCTOU race?
+> Does this code omit handling for host-requested PC increments and excepti=
+on
+> injections?
 >
-> If guest vCPU A calls CPU_ON for target T with PC1, the hypervisor sets
-> power_state =3D ON_PENDING. If the host then rejects the call, this rollb=
-ack
-> logic resets power_state to OFF but intentionally leaves reset_state.rese=
-t =3D
-> true and pc =3D PC1.
->
-> If guest vCPU B then calls CPU_ON for target T with PC2, pvm_psci_vcpu_on=
-()
-> sets power_state =3D ON_PENDING. Before the hypervisor writes PC2, a mali=
-cious
-> host could concurrently issue KVM_RUN for target T on another CPU.
->
-> Because the stale reset flag is still true from the previous failure, tar=
-get T
-> will immediately boot using the stale PC1 instead of PC2, redirecting the
-> guest control flow.
->
-> Should this rollback clear the reset state, or is there another way to pr=
-event
-> the host from forcing a boot with a stale PC?
+> If the guest executes an HVC instruction, which traps to EL2, and the hos=
+t
+> handles the call (e.g., standard PSCI fallback) by setting the INCREMENT_=
+PC
+> or PENDING_EXCEPTION flags, it appears handle_pvm_entry_hvc64() doesn't
+> apply them on re-entry. As a result, the guest's PC wouldn't advance and
+> it could infinitely retry the same HVC.
 
-The stale pc/r0/be are from an earlier CPU_ON the guest itself issued,
-so the host can only pick between addresses the guest wrote. Clearing
-the flag races a concurrent CPU_ON's re-publish and wedges the target
-at ON_PENDING, which is why it stays set.
-
-/fuad
-
-
-/fuad
+An executed HVC has already advanced ELR_EL2, and handle_hvc() does
+not call kvm_incr_pc(). Nor is an exception pending:
+kvm_smccc_call_handler() only sets the return registers.
 
 >
 > [ ... ]
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/p=
-kvm.c
-> > --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> [ ... ]
-> > +int pkvm_reset_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
+>
+> > +static void handle_pvm_exit_wfx(struct pkvm_hyp_vcpu *hyp_vcpu)
 > > +{
-> > +     struct vcpu_reset_state *reset_state =3D &hyp_vcpu->vcpu.arch.res=
-et_state;
-> > +     int prev;
+> > +     hyp_vcpu->host_vcpu->arch.ctxt.regs.pstate =3D
+> > +             hyp_vcpu->vcpu.arch.ctxt.regs.pstate & PSR_MODE_MASK;
+> > +}
+>
+> [Severity: High]
+> Can this cause the host to read uninitialized or stale data for WFET and
+> WFIT timeout values?
+>
+> When a protected guest traps to EL2 on a WFET/WFIT, pvm_host_esr()
+> deliberately masks out the RN field (the register index holding the timeo=
+ut)
+> from the host's view of the ESR. Because of this, the host's
+> kvm_handle_wfx() expects the timeout register value to be marshalled into
+> regs[0]. It looks like handle_pvm_exit_wfx() doesn't copy the guest's RN
+> register to host_vcpu->arch.ctxt.regs.regs[0] before exiting to the host.
+
+A protected guest's WFIT/WFET takes an UNDEF at EL2:
+kvm_handle_pvm_wfx() routes ESR_ELx_WFx_ISS_WFxT to
+kvm_handle_pvm_restricted(). It never reaches the host.
+
+>
+> [ ... ]
+>
+> > @@ -418,10 +638,16 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *=
+hyp_vcpu)
+> >       case ARM_EXCEPTION_IL:
+> >               break;
+> >       case ARM_EXCEPTION_TRAP:
+> > -             esr_ec =3D ESR_ELx_EC(kvm_vcpu_get_esr(&hyp_vcpu->vcpu));
+> > -             ec_handler =3D entry_hyp_vm_handlers[esr_ec];
+> > -             if (ec_handler)
+> > -                     ec_handler(hyp_vcpu);
+> > +             /* Nothing was marshalled for this trap, see sync_hyp_vcp=
+u(). */
+> > +             if (ARM_SERROR_PENDING(hyp_vcpu->exit_code))
+> > +                     break;
 > > +
-> > +     /*
-> > +      * Pairs with smp_store_release(&reset_state->reset, true) in
-> > +      * pvm_psci_vcpu_on(). The acquire must precede the cmpxchg: reve=
-rsed, a
-> > +      * winning cmpxchg with a false acquire would leave power_state =
-=3D=3D ON
-> > +      * with the reset skipped.
-> > +      */
-> > +     if (!smp_load_acquire(&reset_state->reset))
-> > +             return -ECANCELED;
+> > +             if (pkvm_hyp_vcpu_is_protected(hyp_vcpu)) {
+> > +                     esr_ec =3D ESR_ELx_EC(kvm_vcpu_get_esr(&hyp_vcpu-=
+>vcpu));
+> > +                     ec_handler =3D entry_hyp_pvm_handlers[esr_ec];
+> > +                     if (ec_handler)
+> > +                             ec_handler(hyp_vcpu);
+> > +             }
+> >               break;
 >
 > [Severity: High]
-> Can the host force pkvm_reset_vcpu() to succeed prematurely here?
+> Does this logic silently ignore host-injected exceptions and PC advanceme=
+nts
+> for unhandled Exception Classes?
 >
-> Since the rollback in handle_pvm_entry_hvc64() leaves reset_state.reset
-> set to true, if a new CPU_ON sets power_state to ON_PENDING, a host-contr=
-olled
-> KVM_RUN can enter this function and pass this smp_load_acquire() check be=
-fore
-> the new PC is actually written by pvm_psci_vcpu_on().
+> If a protected guest executes an unhandled instruction (like SMC64), it
+> traps to EL2. The host cannot emulate the unknown EC and pends an excepti=
+on
+> via the PENDING_EXCEPTION flag. Because there is no specific entry handle=
+r
+> for this EC in entry_hyp_pvm_handlers, ec_handler is NULL and the re-entr=
+y
+> skips entry handling.
 >
-> [ ... ]
-> > +static bool pvm_psci_vcpu_on(struct pkvm_hyp_vcpu *hyp_vcpu)
-> > +{
-> [ ... ]
-> > +     /*
-> > +      * vCPUs race to power on the same target. Relaxed: reset_state
-> > +      * is published by the release on reset_state.reset below.
-> > +      */
-> > +     power_state =3D cmpxchg_relaxed(&target->power_state,
-> > +                                   PSCI_0_2_AFFINITY_LEVEL_OFF,
-> > +                                   PSCI_0_2_AFFINITY_LEVEL_ON_PENDING)=
-;
+> Since the generic fallback was removed, the PENDING_EXCEPTION flag is
+> ignored, the PC is not advanced, and the guest could hang trying to retry
+> the failing instruction infinitely.
+
+Nor does an unhandled EC. pvm_exit_handlers[] defaults to
+kvm_handle_pvm_restricted() for every class, SMC64 included, so EL2
+injects the UNDEF and returns to the guest.
+
+Thanks for the reviews!
+/fuad
+
 >
-> [Severity: High]
-> Does setting power_state to ON_PENDING here open a TOCTOU window?
->
-> If the target already has a stale reset_state.reset =3D=3D true from a pr=
-eviously
-> failed CPU_ON attempt, making the target ON_PENDING here allows the host =
-to
-> schedule the target and boot it before the new PC/r0/be states are update=
-d
-> below.
->
-> > +     switch (power_state) {
 > [ ... ]
 >
 > --
 > Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260831163421.27=
-2420-1-fuad.tabba@linux.dev?part=3D9
+2420-1-fuad.tabba@linux.dev?part=3D13
