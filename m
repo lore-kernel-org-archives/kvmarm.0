@@ -1,120 +1,124 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4D9B49EC4F
-	for <kvmarm@lists.linux.dev>; Tue,  1 Sep 2026 18:43:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2309148C41F;
+	Tue,  1 Sep 2026 18:50:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788288190; cv=none; b=Q9G7J8iHLqk0PbwjVmdOsp6CmjASXQ35XS6Hj702HZcM5g93DCdMn1XKWL+6Sy+1gVjjqfZjJht/VYhvLGbAs7axWTkAk4jZACAGscvvs9bWb4tETVOcf8/LKFA4w1Z1FiAsitXII2d6IHQ05nMpfin+q9fhLy7T1DrZA6BLVtY=
+	t=1788288630; cv=none; b=aQ4cuuUS7ezkSv14AL2qIbbm1ke6+bdHtvHSIS2Hyqt1+2ESrEFHs8k7qZrz9euROnrgfrQTjan6XVQ+u6TgOnNd+MJhWynXcw2pUrGtRyMLTRY7H9KOXAnlMQrvLpsPqyJSwAPh8ThRgaGyKT7NwLEvqUQBJz4nGMWsLd8XMfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788288190; c=relaxed/simple;
-	bh=wLyA+30kW3tpfxnavozf+J8b/9AodFWdlEv30vNBwsg=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=CVeEqLTwnxC+obfJWELVOYN8feKQE7NFXReg7eRakpdsxmIO9YyfW8k8tQJNGgfBtHyY04+pwKEEfJY8OIfzLQCxN/z36DyDN23USuSoqV1q9w5QU9KLE3T5MKKAXJmFzPgWYnPm9kEWheiVaGrVH5vANYwzYBv1EkUYljpykiQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tno+GlMa; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788288630; c=relaxed/simple;
+	bh=4OkU9WgvaTBr4fJA+BqdrjhjALCzfWtqREvgXEsfess=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=I2TJyQXn/oOpYG1eK1AWPp+Z3+XKPKZFbS3X2iUKDhgYlW3qluh7d0rMQwi2EByklMw3enCmYV0WnOGY63t/kVIP3zkegx5QSyemPtT1W1iRHgwf7BAXRGtzRml7fKFUeZE4m8pj7z5olAEQuzDuyTF1KyilKqLCgZ2fOu/w708=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MZx6z3KB; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tno+GlMa"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74C9C1F00ACA;
-	Tue,  1 Sep 2026 18:43:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MZx6z3KB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 697711F000E9;
+	Tue,  1 Sep 2026 18:50:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788288189;
-	bh=q2Z+dJWYelJ/Nxxk0DaI9+52KQA+DAo1JUWEtwl56h8=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=Tno+GlMaVNSX8v/TnBU+tF46rN2fv5Vd5eZEFn9ddaALRFOsK28w4e4SPA+UBh7MR
-	 Futzn7wTzhbzXLCvz0dFda0my6XsB400ipSi5bcub7s3UfdnYh8KFbROZy+8GEv9bd
-	 varuTHKx9gMj9FaAsIyq0dbsH02CypsDiiqqGxB+BhV3T1dy2xZACkkAjgP+XTnwBz
-	 n0Kc439MRqCSjkbPMjBKs5fgB7Pm1T77f6AI7qCtR3J2UXKPFrBUdLkMgINpeBC0ti
-	 i3BH5G1iblD1nbt0jTBcHnBKhKy3HsN7y8OwNcV6C7aAQHonXC4rjHH6+nQwKOYBUo
-	 lyD1Xc8/siD+g==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v3 1/3] KVM: arm64: Finalize guest-wide sysregs prior to
- per-vCPU sysregs
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Mark Brown" <broonie@kernel.org>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260901-kvm-arm64-idreg-final-v3-1-a0ffa06fa872@kernel.org>
-References: <20260901-kvm-arm64-idreg-final-v3-0-a0ffa06fa872@kernel.org>
- <20260901-kvm-arm64-idreg-final-v3-1-a0ffa06fa872@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 01 Sep 2026 18:43:08 +0000
-Message-Id: <20260901184309.74C9C1F00ACA@smtp.kernel.org>
+	s=k20260515; t=1788288628;
+	bh=+EdOCYHdoxuRmz6Krna/WF/yq1BxGZQXedylPxEwU/M=;
+	h=From:Subject:Date:To:Cc;
+	b=MZx6z3KBd0SIH9k4Qs2ZSYsraNF6DTxsHzcDUZkyk1oiwDe9dx3P9ss0DN7CCeSTd
+	 jwS/KxMPkdLYojMKGy9WjO0vECDYeOndYSGTulci4Ms4QJ04K3Y4Hrame6EjIXARRR
+	 I92DzTshe/GDGqF6swsD7/9/FFiyPEn21zo8i8Sjd/eymQfxk3vyVk77ZPnMzBNnPN
+	 NI2wWJ2B2LrA7AKE0SQg6tGVb51S/PI+zOAK4fZwiYvn2TyuOQH46rT1PkfOY4EO5n
+	 nVSrhtLVjSRXJpMsjqufn7QSKkIoRiv9JAFnxGu2ndO3CKkQ8ZP4uDBVsFgZRNnVOk
+	 aE1I4UxI5Vlfg==
+From: Mark Brown <broonie@kernel.org>
+Subject: [PATCH v7 0/3] KVM: selftests: arm64: Improve diagnostics from
+ set_id_regs
+Date: Tue, 01 Sep 2026 19:50:00 +0100
+Message-Id: <20260901-kvm-arm64-set-id-regs-aarch64-v7-0-7b065b0bda9a@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAFgel2oC/4XPTWrDMBAF4KsErauiGf3ZXfUepQvJmXFEGrtIw
+ bQE371KaDHFCy3fG/iGdxOFcqIiXg43kWlJJc1TDf7pIIZTmEaS6VizQIUWFHbyvFxkyBdnZKF
+ rPcpMY5Eh5OFUO4rR+971RsEgqvGZidPXw397r/mUynXO3493C9zbX1mrhryAVLJ3TOqIEXxHr
+ 2fKE308z3kUd3rBjQMwLQ4r5zwygmEDkXec3jiEvsXpykUOxhsaNEK348wf5xQo1+JM5QZPbKy
+ FwFHvOLtxGnyLs5ULTjHG3jpC3HFu43x7rKucR4OdZ8ug/o9d1/UHB7ANllYCAAA=
+X-Change-ID: 20251028-kvm-arm64-set-id-regs-aarch64-ebb77969401c
+To: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+ Oliver Upton <oupton@kernel.org>
+Cc: Ben Horgan <ben.horgan@arm.com>, linux-arm-kernel@lists.infradead.org, 
+ kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Mark Brown <broonie@kernel.org>
+X-Mailer: b4 0.17-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2411; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=4OkU9WgvaTBr4fJA+BqdrjhjALCzfWtqREvgXEsfess=;
+ b=owGbwMvMwMWocq27KDak/QLjabUkhqzpcrmHRNqMLwefaRC9ed7e1FZmbfI5y+i8fb2Vr/0nV
+ D5fWL+wk9GYhYGRi0FWTJFl7bOMVenhElvnP5r/CmYQKxPIFAYuTgGYSP939j+cTl4dZ+ZKFOcl
+ NX7RYY7tSXmfNuVYlJ/BOzNNMX7GpBspd4UXd+o3Xek4I6UWdCxuifXZCXaTdJjeLG8QVFtwdVO
+ DssbrXQb3aw0VNy55klraM9ErYePcY+/e/NzGo3HWYMbxH68NkoI4+rxnPnacybjl20G2Ki7+BN
+ +I47xVvKrZn7/Fl9drVHxz4JQIcO9fpnf6kJ75W8FKSX379LabmlVbTE6w1m4X26f3qfr51FsXg
+ 3hktr1KulYdfHyJthJ/4SLVMKb+UydPJjbXFb/f0BEacXFn8kG5gJ0rzycdOyJ3JPW/btNzPUF2
+ LqWc5DO3G3c2+GWH3Il09Wnoq0g/XG1wxqr7+Dm/h1rlAA==
+X-Developer-Key: i=broonie@kernel.org; a=openpgp;
+ fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
+While debugging issues related to aarch64 only systems I ran into
+speedbumps due to the lack of detail in the results reported when the
+guest register read and reset value preservation tests were run, they
+generated an immediately fatal assert without indicating which register
+was being tested. Update these tests to non-fatally report a standard
+kselftest result per register, making it much easier to see what the
+problem being reported is.
 
-Pre-existing issues:
-- [High] Iterating over `enum vcpu_sysreg` using a numeric range (`< NR_SYS=
-_REGS`) treats the enum as a dense array, touching unintended unallocated g=
-aps because VNCR-mapped entries have sparse numbering based on their byte o=
-ffsets.
---
+A similar issue exists with the validation of the individual bitfields
+in registers due to the use of immediately fatal asserts. Update those
+asserts to be standard kselftest reports.
 
-commit 54e02ec9a7efd1b5c5a028a29a9441e4c02c5f90
-Author: Mark Brown <broonie@kernel.org>
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
+Changes in v7:
+- Rebase onto v7.3-rc1.
+- Link to v6: https://patch.msgid.link/20260719-kvm-arm64-set-id-regs-aarch64-v6-0-724287f5f108@kernel.org
 
-KVM: arm64: Finalize guest-wide sysregs prior to per-vCPU sysregs
+Changes in v6:
+- Rebase onto v7.2-rc3.
+- Drop changes to handling of aarch32 related registers on 64 bit only
+  systems, an in kernel solution is preferred for those.
+- Use a define to count the non-test_regs registers.
+- Link to v5: https://patch.msgid.link/20260317-kvm-arm64-set-id-regs-aarch64-v5-0-a60f2b956e22@kernel.org
 
-This commit splits the sysreg initialization into a guest-wide phase and a
-per-vCPU phase. It runs the guest-wide setup earlier to prevent mismatches
-between ID registers updated by vGIC finalization and the per-vCPU NV
-register sanitization.
+Changes in v5:
+- Rebase onto v7.0-rc1.
+- Link to v4: https://patch.msgid.link/20260106-kvm-arm64-set-id-regs-aarch64-v4-0-c7ef4551afb3@kernel.org
 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
+Changes in v4:
+- Correct check for 32 bit ID registers.
+- Link to v3: https://patch.msgid.link/20251219-kvm-arm64-set-id-regs-aarch64-v3-0-bfa474ec3218@kernel.org
 
-[ ... ]
+Changes in v3:
+- Rebase onto v6.19-rc1.
+- Link to v2: https://patch.msgid.link/20251114-kvm-arm64-set-id-regs-aarch64-v2-0-672f214f41bf@kernel.org
 
-> +/*
-> + * Because this can be called once per CPU, changes must be idempotent.
-> + */
-> +int kvm_vcpu_finalize_sys_regs(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm *kvm =3D vcpu->kvm;
-> +	int ret;
-> +
-> +	guard(mutex)(&kvm->arch.config_lock);
-> +
-> +	ret =3D kvm_vm_finalize_sys_regs(kvm);
-> +	if (ret)
-> +		return ret;
-> +
-> +	if (vcpu_has_nv(vcpu)) {
-> +		ret =3D kvm_init_nv_sysregs(vcpu);
+Changes in v2:
+- Add a fix for spurious failures with 64 bit only guests.
+- Link to v1: https://patch.msgid.link/20251030-kvm-arm64-set-id-regs-aarch64-v1-0-96fe0d2b178e@kernel.org
 
-[Severity: High]
-This isn't a bug introduced by this patch, but this is a pre-existing=20
-issue in the kvm_init_nv_sysregs() function called here.
+---
+Mark Brown (3):
+      KVM: selftests: arm64: Report set_id_reg reads of test registers as tests
+      KVM: selftests: arm64: Report register reset tests individually
+      KVM: selftests: arm64: Make set_id_regs bitfield validatity checks non-fatal
 
-Does this loop in arch/arm64/kvm/nested.c:kvm_init_nv_sysregs() drop
-guest state?
+ tools/testing/selftests/kvm/arm64/set_id_regs.c | 121 ++++++++++++++++++------
+ 1 file changed, 91 insertions(+), 30 deletions(-)
+---
+base-commit: cee9395acd8043be0644b25c34bfa86623f2b935
+change-id: 20251028-kvm-arm64-set-id-regs-aarch64-ebb77969401c
 
-	for (enum vcpu_sysreg sr =3D __SANITISED_REG_START__; sr < NR_SYS_REGS; sr=
-++)
-		__vcpu_rmw_sys_reg(vcpu, sr, |=3D, 0);
+Best regards,
+--  
+Mark Brown <broonie@kernel.org>
 
-The enum vcpu_sysreg maps VNCR entries using sparse byte offsets rather
-than sequential integers. Iterating over it with a numeric range
-comparison (< NR_SYS_REGS) covers unallocated gaps, which can silently
-drop guest state and desynchronize the host's GET/SET_ONE_REG view when
-a VM is configured with nested virtualization.
-
-Could this loop be replaced with an explicit per-register allowlist?
-
-> +		if (ret)
-> +			return ret;
-> +	}
-> +
-> +	return 0;
-> +}
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260901-kvm-arm64-=
-idreg-final-v3-0-a0ffa06fa872@kernel.org?part=3D1
