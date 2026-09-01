@@ -1,44 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A0BB38A720
-	for <kvmarm@lists.linux.dev>; Tue,  1 Sep 2026 08:34:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 992302E7F20
+	for <kvmarm@lists.linux.dev>; Tue,  1 Sep 2026 08:35:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788251659; cv=none; b=FrlUuFOLQCHdETLo6NHfhp2yc/omlH0NvdQK9X4dez/7X5G2uLm9p1T82vXdzZiX34n8l0w2h9oxmeoIlmD7KLkWJhMqk9o10YCOS4btNiETa3kRSg+cNYmp3m4rbOBw2bJXJZG2XhiLyD4yP6HQbJ9s17QN8u67Jhs0tTqnjes=
+	t=1788251730; cv=none; b=ljkRKI1DRyaJmtO05O/aMuiqkPwYxjII4Te774H48QgcQGRAvFY0IlavWMfSpCcp0jhLmU8R4rhhUPmYRgGMSq51YSHbY2Wpn3zlH6jgxtUk5M+VZcTFvj3fFgb4SSGdJvc5eJ/FrpgfbW1Kbygj2FcDmHC3BIZm6gChUEqh79o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788251659; c=relaxed/simple;
-	bh=zKbjMSCz2qrIGCHnmwbc/GdUkcfpqVCOSy5hlBxnHjs=;
+	s=arc-20240116; t=1788251730; c=relaxed/simple;
+	bh=U5uQ6YXT4zbHnH43DfEfe3uY4FDtefjLTooqeYRN7Lk=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=hlN7qM8sc3lNARBb+mOyf/S3S53do5rPWRaf7VML0FsVnIwD8VCop8m8BVRuoxtey3CC4jRbAb/WhhSNY621U4Q91gBCi0wJu/4yM50KWxfWpniJYxJiN+W28P1b9NbpFfcYKsl9Q9WhnC9NXy5YiFFqEj2Mney2784q0/VBtH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kk9F9mTK; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=aZL2L/Wel1cGBE7s+re6vdcYjrvYXFWnEGdhm5w/ebqcxIN3pRjYsw/zAI14eBhstdfr5d/m5fsB1jh6oYpzuc1ckmEFY9DC3LNm/lCQSpJs0BGKYhOAu/zzZU+fbheiJFrh2/n+uFCKKvHHOmQYx1EMW2zwlrJuT1ParSS+F2o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WS/pi6kz; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kk9F9mTK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E690A1F00A3D;
-	Tue,  1 Sep 2026 08:34:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WS/pi6kz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D48CF1F000E9;
+	Tue,  1 Sep 2026 08:35:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788251658;
-	bh=HOpfP4vZ+r84k5Sv0GCQabgBe6hh67poC3d7A1kSx4k=;
+	s=k20260515; t=1788251729;
+	bh=OLWtjh8biX9v/BwOxQGt2q/O0HDO2FJkWqzTs1su8i8=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=Kk9F9mTKTEjmoM75GOZ0duDvtygN9bN0/3MtQA10NGrbuesMplka+OgE5bEoD31Jb
-	 gndbF2HO+o2BaVqca6hvLIGVFMMGGLxoiPSZx1k3xJrl5cR0GnhIUrk9t84DqAZ4Vr
-	 t8LD3hb8aPNl5IljR7p6YvissgztPH8ZT1U/1J20l2iAR7Wkvv7ie+2aZ/ko6dBPL1
-	 a/PmtHk0dSw6UciG8QQyDmQCTscvhzwZTV0q+T5A2Q4mXmzh8GFFPbouBHxRsH6TYU
-	 +5fsxAnYqfW/vXRRZA2g5d2S6UtdcsDe9Qj2jpafcKFFjBliQMsjw01jrdRG2EpAR8
-	 AG93EYq8YGWPg==
+	b=WS/pi6kzBWfX1soxgErpYzXUw0AsJOMk1ePudSZtL5mibGp646zFLcRjZJQ4W40B+
+	 6XtZYd4bbSlRonw7W9XB4jqpN3cMUMNkkEnmRfiS0nhjqN/Ku9QY99vaFEJpgO8xhi
+	 aUshKQeK5TU5baQDhqmapMXC02XHfZKZwFkVqAGsaeDogaSs0xtBk5Qj4CGBKvtMFN
+	 OS1g+Ti/V5RTAGfVGtbehThkviL49vFVaCmh69Evle4tAagQkynP6X4mlFq/28HsCS
+	 6fM21kG7sEBnlmrtfjyUl+1QZ4vtWzufEuYVe17AnHqbkJDNb9a6FwZydClRBn4vdy
+	 KjqLU/Ze1pugw==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v5 14/18] KVM: arm64: Alloc pkvm_hyp_vcpu using pKVM
- heap allocator
+Subject: Re: [PATCH v5 18/18] KVM: arm64: Alloc simple_buffer_page using
+ pKVM hyp allocator
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Vincent Donnefort" <vdonnefort@google.com>
-Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev
-In-Reply-To: <20260901080941.997769-15-vdonnefort@google.com>
+Cc: kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>
+In-Reply-To: <20260901080941.997769-19-vdonnefort@google.com>
 References: <20260901080941.997769-1-vdonnefort@google.com>
- <20260901080941.997769-15-vdonnefort@google.com>
+ <20260901080941.997769-19-vdonnefort@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 01 Sep 2026 08:34:17 +0000
-Message-Id: <20260901083417.E690A1F00A3D@smtp.kernel.org>
+Date: Tue, 01 Sep 2026 08:35:28 +0000
+Message-Id: <20260901083528.D48CF1F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,87 +47,71 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [High] Loss of memory cgroup (memcg) accounting for hypervisor heap top-u=
-ps enables host memory exhaustion (DoS).
+- [High] Infinite top-up loop in host due to uncoalescable order-0 donation=
+s for high-order `hyp_alloc()`.
 --
 
-commit 1ea96bec624ff9de3986b5d4e5708b17bd70343c
+commit a1f4f52ea836afa69ba85406471c09d62a9b1b7e
 Author: Vincent Donnefort <vdonnefort@google.com>
 
-KVM: arm64: Alloc pkvm_hyp_vcpu using pKVM heap allocator
+KVM: arm64: Alloc simple_buffer_page using pKVM hyp allocator
 
-This patch transitions the allocation of the hypervisor vCPU state structure
-(pkvm_hyp_vcpu) from the host to the hypervisor using the new pKVM heap
-allocator. The host now uses pkvm_call_hyp_req() to invoke
-__pkvm_create_hyp_vcpu, which automatically handles top-up requests if the
-hypervisor runs out of heap memory.
+In protected mode, transition the allocation of the simple_ring_buffer
+structures from the host to the hypervisor using the new pKVM heap
+allocator.
 
-> diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-> index 8505965dbfb21..36e677e51f7d6 100644
-> --- a/arch/arm64/kvm/pkvm.c
-> +++ b/arch/arm64/kvm/pkvm.c
+> diff --git a/arch/arm64/kvm/hyp/nvhe/trace.c b/arch/arm64/kvm/hyp/nvhe/tr=
+ace.c
+> index e34f9133e5d97..45322dec6201b 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/trace.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/trace.c
+> @@ -62,18 +63,34 @@ static void __release_host_mem(void *start, u64 size)
 [ ... ]
-> @@ -174,28 +174,19 @@ static void __pkvm_destroy_hyp_vm(struct kvm *kvm)
-[ ... ]
->  static int __pkvm_create_hyp_vcpu(struct kvm_vcpu *vcpu)
+> -static int hyp_trace_buffer_load_bpage_backing(struct hyp_trace_buffer *=
+trace_buffer,
+> -					       struct hyp_trace_desc *desc)
+> +static int hyp_trace_buffer_alloc_bpages(struct hyp_trace_buffer *trace_=
+buffer,
+> +					 struct hyp_trace_desc *desc)
 >  {
-> -	size_t hyp_vcpu_sz =3D PAGE_ALIGN(PKVM_HYP_VCPU_SIZE);
->  	pkvm_handle_t handle =3D vcpu->kvm->arch.pkvm.handle;
-> -	void *hyp_vcpu;
+> -	void *start =3D (void *)kern_hyp_va(desc->bpages_backing_start);
+> -	size_t size =3D desc->bpages_backing_size;
+> +	void *start;
+> +	size_t size;
 >  	int ret;
 > =20
->  	init_hyp_stage2_memcache(&vcpu->arch.pkvm_memcache);
-> =20
-> -	hyp_vcpu =3D alloc_pages_exact(hyp_vcpu_sz, GFP_KERNEL_ACCOUNT);
-> -	if (!hyp_vcpu)
-> -		return -ENOMEM;
-> -
-> -	ret =3D kvm_call_hyp_nvhe(__pkvm_init_vcpu, handle, vcpu, hyp_vcpu);
-> +	ret =3D pkvm_call_hyp_req(__pkvm_init_vcpu, handle, vcpu);
+> -	ret =3D __admit_host_mem(start, size);
+> -	if (ret)
+> -		return ret;
+> +	if (is_protected_kvm_enabled()) {
+> +		struct ring_buffer_desc *rb_desc;
+> +		int cpu;
+> +
+> +		size =3D 0;
+> +		for_each_ring_buffer_desc(rb_desc, cpu, &desc->trace_buffer_desc)
+> +			size +=3D rb_desc->nr_page_va * sizeof(struct simple_buffer_page);
+> +
+> +		start =3D hyp_alloc(size);
+> +		if (!start)
+> +			return hyp_alloc_errno();
 
 [Severity: High]
-Does this change lose memory cgroup (memcg) accounting for the hypervisor v=
-CPU
-allocations?
+When allocating the trace buffer pages in hyp_trace_buffer_alloc_bpages(),
+size is calculated by summing the required pages for all CPUs. For a larger
+trace buffer, this size easily exceeds a single page.
 
-Previously, alloc_pages_exact() used GFP_KERNEL_ACCOUNT directly, ensuring
-the allocation was charged to the caller's memcg. With this patch, the
-allocation transitions to the EL2 heap. If the heap is exhausted,
-pkvm_call_hyp_req() triggers a top-up request.
+If hyp_alloc() fails to find a high-order contiguous block, it returns
+-ENOMEM. The host intercepts this via pkvm_call_hyp_req(), donates the
+requested number of pages, and retries the hypercall.
 
-However, it appears the top-up path handles the allocation without the memcg
-accounting flag. For instance, when the EL2 heap needs memory:
+However, host-donated pages are inserted at order 0 and are not coalesced.
+Because they are not coalesced, they cannot satisfy the high-order contiguo=
+us
+allocation required by hyp_alloc(size).
 
-arch/arm64/kvm/pkvm.c:pkvm_hyp_topup() {
-	init_hyp_memcache(&mc);
-	ret =3D topup_hyp_memcache(&mc, nr_pages);
-	...
-}
-
-Because init_hyp_memcache() explicitly omits the HYP_MEMCACHE_ACCOUNT_KMEMCG
-flag, the subsequent allocation in hyp_mc_alloc_fn() uses GFP_KERNEL instead
-of GFP_KERNEL_ACCOUNT:
-
-arch/arm64/kvm/mmu.c:hyp_mc_alloc_fn() {
-	gfp =3D memcache->flags & HYP_MEMCACHE_ACCOUNT_KMEMCG ? GFP_KERNEL_ACCOUNT=
- : GFP_KERNEL;
-	addr =3D (void *)__get_free_page(gfp);
-	...
-}
-
-Could this allow an unprivileged container with access to /dev/kvm to bypass
-its memory limits by repeatedly creating VMs and VCPUs, potentially leading=
- to
-host memory exhaustion?
-
->  	if (!ret)
->  		vcpu_set_flag(vcpu, VCPU_PKVM_FINALIZED);
-> -	else
-> -		free_pages_exact(hyp_vcpu, hyp_vcpu_sz);
-> =20
->  	return ret;
->  }
+Can this cause the hypercall to repeatedly fail with -ENOMEM, causing the
+host to loop indefinitely inside pkvm_call_hyp_req() and hang the system?
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260901080941.9977=
-69-1-vdonnefort@google.com?part=3D14
+69-1-vdonnefort@google.com?part=3D18
