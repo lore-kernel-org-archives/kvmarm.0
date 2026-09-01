@@ -1,117 +1,258 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 992302E7F20
-	for <kvmarm@lists.linux.dev>; Tue,  1 Sep 2026 08:35:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 270F738DC66
+	for <kvmarm@lists.linux.dev>; Tue,  1 Sep 2026 08:40:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788251730; cv=none; b=ljkRKI1DRyaJmtO05O/aMuiqkPwYxjII4Te774H48QgcQGRAvFY0IlavWMfSpCcp0jhLmU8R4rhhUPmYRgGMSq51YSHbY2Wpn3zlH6jgxtUk5M+VZcTFvj3fFgb4SSGdJvc5eJ/FrpgfbW1Kbygj2FcDmHC3BIZm6gChUEqh79o=
+	t=1788252060; cv=none; b=F2gd+TIWM1tk7pMLv8m3+vYcIyEIREb9/TCUZNiWwTtsTRpqF/Xsu/egDwMPeF0XYDS8thuBaWVbRV/tzGBbfE96eXtskdMtbiwOWgQMoITuwlby/LNDo3k495N2FgxA4GcYGO96aNMvNCPUjwa8w5IhsCT9UR2ZCqXp5wBtF0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788251730; c=relaxed/simple;
-	bh=U5uQ6YXT4zbHnH43DfEfe3uY4FDtefjLTooqeYRN7Lk=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=aZL2L/Wel1cGBE7s+re6vdcYjrvYXFWnEGdhm5w/ebqcxIN3pRjYsw/zAI14eBhstdfr5d/m5fsB1jh6oYpzuc1ckmEFY9DC3LNm/lCQSpJs0BGKYhOAu/zzZU+fbheiJFrh2/n+uFCKKvHHOmQYx1EMW2zwlrJuT1ParSS+F2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WS/pi6kz; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788252060; c=relaxed/simple;
+	bh=g/YicvtwvLRoTHvAudHmKQo2dsia1xbThYOMgqRjf9o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ejKoec3kLwMkCBOf7kCs0b08Zkj439CegGN0zhoLhhg2WvAH0F1y/oGlEAHA+sDdGLtCmwWt2gTfvZubq3GR9VQzvW5mXPbEMa1SVYbKmJY7UKxRPtOG7CqdCMWc9c1EznFdWwabuqWRUGe5USnI5MDaCPA6y5CfPRgpz+pKq2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ggz/p6Pe; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WS/pi6kz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D48CF1F000E9;
-	Tue,  1 Sep 2026 08:35:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788251729;
-	bh=OLWtjh8biX9v/BwOxQGt2q/O0HDO2FJkWqzTs1su8i8=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=WS/pi6kzBWfX1soxgErpYzXUw0AsJOMk1ePudSZtL5mibGp646zFLcRjZJQ4W40B+
-	 6XtZYd4bbSlRonw7W9XB4jqpN3cMUMNkkEnmRfiS0nhjqN/Ku9QY99vaFEJpgO8xhi
-	 aUshKQeK5TU5baQDhqmapMXC02XHfZKZwFkVqAGsaeDogaSs0xtBk5Qj4CGBKvtMFN
-	 OS1g+Ti/V5RTAGfVGtbehThkviL49vFVaCmh69Evle4tAagQkynP6X4mlFq/28HsCS
-	 6fM21kG7sEBnlmrtfjyUl+1QZ4vtWzufEuYVe17AnHqbkJDNb9a6FwZydClRBn4vdy
-	 KjqLU/Ze1pugw==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v5 18/18] KVM: arm64: Alloc simple_buffer_page using
- pKVM hyp allocator
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Vincent Donnefort" <vdonnefort@google.com>
-Cc: kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>
-In-Reply-To: <20260901080941.997769-19-vdonnefort@google.com>
-References: <20260901080941.997769-1-vdonnefort@google.com>
- <20260901080941.997769-19-vdonnefort@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 01 Sep 2026 08:35:28 +0000
-Message-Id: <20260901083528.D48CF1F000E9@smtp.kernel.org>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ggz/p6Pe"
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6817VVKP2892253;
+	Tue, 1 Sep 2026 08:40:45 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=xxhcAqB8QEZ84GojTYdwOMRzkKgA+w
+	1XZ/nRxWLm/OE=; b=ggz/p6PeqfDDYriTMw42LJo7m/yt0CLpS4lNTFBYlIjG10
+	SV7h0CBlhsG7REXslows6EKVjWkSUSw9/LOCGLt9UODV2PuQRPntFMbmTvLf13St
+	hHRZkjBukmKtlRPMj9K+f8OmuN6KU2YdxOl0Ngo1snLhsKsdaLv9f5XWW8x9wThz
+	yxKzrr0bzgIaTHObEFD2J82td5Mq/J85+OtEZy4sZTyl7B0BawHoyAC3wURaGoJK
+	6nIxbY+o/DSCXv0xC0uG5RDHaHuMk+F5wpkcIRHQNTXb7Ig3I/tySS2rYNE68cIc
+	EpsHqxiRtgFZNcXxn0BUYptH5t7a0ZXh1S5olybg==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gbq3r6mwy-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 01 Sep 2026 08:40:44 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 6818QMdF020562;
+	Tue, 1 Sep 2026 08:40:43 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4gca4w2s2j-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 01 Sep 2026 08:40:42 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6818echH39518516
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 1 Sep 2026 08:40:38 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8F93A2004B;
+	Tue,  1 Sep 2026 08:40:38 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2F4A920040;
+	Tue,  1 Sep 2026 08:40:38 +0000 (GMT)
+Received: from osiris (unknown [9.224.76.185])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Tue,  1 Sep 2026 08:40:38 +0000 (GMT)
+Date: Tue, 1 Sep 2026 10:40:37 +0200
+From: Steffen Eiden <seiden@linux.ibm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, Alexander Gordeev <agordeev@linux.ibm.com>,
+        Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@kernel.org>,
+        Friedrich Welter <fritz@linux.ibm.com>, Fuad Tabba <tabba@google.com>,
+        Gautam Gala <ggala@linux.ibm.com>,
+        Hariharan Mari <hari55@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Hendrik Brueckner <brueckner@linux.ibm.com>,
+        Ilya Leoshkevich <iii@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
+        Nico Boehr <nrb@linux.ibm.com>,
+        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
+        Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v7 11/23] KVM: arm64: Share arm64 code with s390
+Message-ID: <20260901084037.185345-C-seiden@linux.ibm.com>
+References: <20260831144802.834315-1-seiden@linux.ibm.com>
+ <20260831144802.834315-12-seiden@linux.ibm.com>
+ <87se3tmlrv.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87se3tmlrv.wl-maz@kernel.org>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Authority-Analysis: v=2.4 cv=EIc2FVZC c=1 sm=1 tr=0 ts=6a968f8c cx=c_pps
+ a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
+ a=kj9zAlcOel0A:10 a=VdqzKS8jKosA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=uAbxVGIbfxUO_5tXvNgY:22 a=VnNF1IyMAAAA:8
+ a=o0YXK4FomTIqG83GwfgA:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTAxMDA3NSBTYWx0ZWRfX3bKHd2onVRQi
+ M1H/ksAUgtv8GUnhaCvKhEAE1bQlLbtyox34SXSGO9hkxC6nXHVvEU7/XhpF7f9hC3a8FxITGnm
+ Rnm8kFH19g2K8SfKTF+QVUudbmFOuIWjnDC8aSjstj8KyWREgwyqdu3u8U/jhXP/ATneT6gNXgf
+ 9f8K9AdXXyAp/68A46zDq7DeVf92+uYuC7Eu6txfWiB895BXHx1MXyQGIaIV0jtyOUZ9zQg9FAy
+ gBMSQA29oPrMz4QBxXBBl+XeJyEjlt5eCxt4H4aJzuPhepWCvo9jeInWbBT8srTGUvOu64SEbAq
+ 0pGCUORdGVPKlHkOlRDT5qgfTZuHMFf9AyPsjKadtfjhBJcPwWP02lJA45wZJba4k93/IOpkZjv
+ oxfLahHfF/0uOaX/pvMd6YeDI6F5ZhC6dKbOBh/zyKHkufGA1Gug3k2zkTVQR6Y73IF0BmFkm+I
+ hlaMP0OC2KpawS1dZYg==
+X-Proofpoint-GUID: 7wKUDKpRsoBqOygV8xzSu0WG5_odBX3U
+X-Proofpoint-ORIG-GUID: GYY_qmqbellrpmBXqM2ldcTkZ8eYLr0D
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTAxMDA3NSBTYWx0ZWRfX8lILL3zXjoYz
+ sqUCvOK85NCWZfjNpuA7uLa0uoHm5h7675EBfui2MeNOeNh1Rv4PzpzJRHm0WngGooMQA3GJChR
+ OBMNRlosW5WWUFCYy8uSQ+jr2AOz/hU=
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-09-01_02,2026-08-31_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 impostorscore=0 suspectscore=0 priorityscore=1501 clxscore=1015
+ phishscore=0 spamscore=0 adultscore=0 lowpriorityscore=0 malwarescore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2609010075
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [High] Infinite top-up loop in host due to uncoalescable order-0 donation=
-s for high-order `hyp_alloc()`.
---
+On Tue, Sep 01, 2026 at 09:13:56AM +0100, Marc Zyngier wrote:
+> On Mon, 31 Aug 2026 15:47:48 +0100,
+> Steffen Eiden <seiden@linux.ibm.com> wrote:
+> > 
+> > Mark functions that s390 can use to implement arm on s390 as shared
+> > functions.
+> > 
+> > No functional change.
+> > 
+> > Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
+> > ---
+> >  arch/arm64/kvm/arm.c         | 3 +++
+> >  arch/arm64/kvm/guest.c       | 6 ++++++
+> >  arch/arm64/kvm/handle_exit.c | 6 ++++++
+> >  arch/arm64/kvm/mmio.c        | 2 ++
+> >  4 files changed, 17 insertions(+)
+> > 
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index 8b080804bc90..6b92a3c1d490 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -1603,6 +1603,7 @@ static unsigned long system_supported_vcpu_features(void)
+> >  	return features;
+> >  }
+> >  
+> > +#ifdef ARM64_S390_COMMON
+> >  static int kvm_vcpu_init_check_features(struct kvm_vcpu *vcpu,
+> >  					const struct kvm_vcpu_init *init)
+> >  {
+> > @@ -1656,6 +1657,8 @@ static bool kvm_vcpu_init_changed(struct kvm_vcpu *vcpu,
+> >  			     KVM_VCPU_MAX_FEATURES);
+> >  }
+> >  
+> > +#endif /* ARM64_S390_COMMON */
+> > +
+> >  static int kvm_setup_vcpu(struct kvm_vcpu *vcpu)
+> >  {
+> >  	struct kvm *kvm = vcpu->kvm;
+> > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> > index 773f6c8e5026..6ca5a9f357cd 100644
+> > --- a/arch/arm64/kvm/guest.c
+> > +++ b/arch/arm64/kvm/guest.c
+> > @@ -62,6 +62,7 @@ const struct kvm_stats_header kvm_vcpu_stats_header = {
+> >  		       sizeof(kvm_vcpu_stats_desc),
+> >  };
+> >  
+> > +#ifdef ARM64_S390_COMMON
+> >  static bool core_reg_offset_is_vreg(u64 off)
+> >  {
+> >  	return off >= KVM_REG_ARM_CORE_REG(fp_regs.vregs) &&
+> > @@ -306,6 +307,8 @@ static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+> >  	return err;
+> >  }
+> >  
+> > +#endif /* ARM64_S390_COMMON */
+> > +
+> >  #define vq_word(vq) (((vq) - SVE_VQ_MIN) / 64)
+> >  #define vq_mask(vq) ((u64)1 << ((vq) - SVE_VQ_MIN) % 64)
+> >  #define vq_present(vqs, vq) (!!((vqs)[vq_word(vq)] & vq_mask(vq)))
+> > @@ -543,6 +546,7 @@ int kvm_arch_vcpu_ioctl_set_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs)
+> >  	return -EINVAL;
+> >  }
+> >  
+> > +#ifdef ARM64_S390_COMMON
+> >  static int copy_core_reg_indices(const struct kvm_vcpu *vcpu,
+> >  				 u64 __user *uindices)
+> >  {
+> > @@ -591,6 +595,8 @@ static unsigned long num_core_regs(const struct kvm_vcpu *vcpu)
+> >  	return copy_core_reg_indices(vcpu, NULL);
+> >  }
+> >  
+> > +#endif /* ARM64_S390_COMMON */
+> > +
+> >  static unsigned long num_sve_regs(const struct kvm_vcpu *vcpu)
+> >  {
+> >  	const unsigned int slices = vcpu_sve_slices(vcpu);
+> > diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> > index db37678dcb05..6e59a7b12d40 100644
+> > --- a/arch/arm64/kvm/handle_exit.c
+> > +++ b/arch/arm64/kvm/handle_exit.c
+> > @@ -213,6 +213,7 @@ static int kvm_handle_guest_debug(struct kvm_vcpu *vcpu)
+> >  	return 0;
+> >  }
+> >  
+> > +#ifdef ARM64_S390_COMMON
+> >  static int kvm_handle_unknown_ec(struct kvm_vcpu *vcpu)
+> >  {
+> >  	u64 esr = kvm_vcpu_get_esr(vcpu);
+> > @@ -224,6 +225,8 @@ static int kvm_handle_unknown_ec(struct kvm_vcpu *vcpu)
+> >  	return 1;
+> >  }
+> >  
+> > +#endif /* ARM64_S390_COMMON */
+> > +
+> >  /*
+> >   * Guest access to SVE registers should be routed to this handler only
+> >   * when the system doesn't support SVE.
+> > @@ -404,6 +407,7 @@ static exit_handle_fn arm_exit_handlers[] = {
+> >  	[ESR_ELx_EC_GCS]	= kvm_handle_gcs,
+> >  };
+> >  
+> > +#ifdef ARM64_S390_COMMON
+> >  static exit_handle_fn kvm_get_exit_handler(struct kvm_vcpu *vcpu)
+> >  {
+> >  	u64 esr = kvm_vcpu_get_esr(vcpu);
+> > @@ -439,6 +443,8 @@ static int handle_trap_exceptions(struct kvm_vcpu *vcpu)
+> >  	return handled;
+> >  }
+> >  
+> > +#endif /* ARM64_S390_COMMON */
+> 
+> Why the exit handler, and not the EC handlers aside from the UNKNOWN
+> one? Yes, you probably aren't there yet in this series, but I can tell
+> you are going to add more and more of these.
+> 
+> But the EC array is absolutely architectural, and there is no good
+> reason to maintain your own.
+> 
+> So instead of this, why not keep the EC array altogether, and
+> implement stubs for the ECs you don't support?
+> 
+> 	M.
+> 
 
-commit a1f4f52ea836afa69ba85406471c09d62a9b1b7e
-Author: Vincent Donnefort <vdonnefort@google.com>
+There was no specific reasson to define our own EC array as far as I
+remember. I will try reusing the array and find out if there are any
+issues with that. But I do not expect any. 
 
-KVM: arm64: Alloc simple_buffer_page using pKVM hyp allocator
+I assume the stubs probably just forward to handle_unknown_ec, or do you
+have a different suggestion?
 
-In protected mode, transition the allocation of the simple_ring_buffer
-structures from the host to the hypervisor using the new pKVM heap
-allocator.
 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/trace.c b/arch/arm64/kvm/hyp/nvhe/tr=
-ace.c
-> index e34f9133e5d97..45322dec6201b 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/trace.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/trace.c
-> @@ -62,18 +63,34 @@ static void __release_host_mem(void *start, u64 size)
-[ ... ]
-> -static int hyp_trace_buffer_load_bpage_backing(struct hyp_trace_buffer *=
-trace_buffer,
-> -					       struct hyp_trace_desc *desc)
-> +static int hyp_trace_buffer_alloc_bpages(struct hyp_trace_buffer *trace_=
-buffer,
-> +					 struct hyp_trace_desc *desc)
->  {
-> -	void *start =3D (void *)kern_hyp_va(desc->bpages_backing_start);
-> -	size_t size =3D desc->bpages_backing_size;
-> +	void *start;
-> +	size_t size;
->  	int ret;
-> =20
-> -	ret =3D __admit_host_mem(start, size);
-> -	if (ret)
-> -		return ret;
-> +	if (is_protected_kvm_enabled()) {
-> +		struct ring_buffer_desc *rb_desc;
-> +		int cpu;
-> +
-> +		size =3D 0;
-> +		for_each_ring_buffer_desc(rb_desc, cpu, &desc->trace_buffer_desc)
-> +			size +=3D rb_desc->nr_page_va * sizeof(struct simple_buffer_page);
-> +
-> +		start =3D hyp_alloc(size);
-> +		if (!start)
-> +			return hyp_alloc_errno();
+	Steffen
 
-[Severity: High]
-When allocating the trace buffer pages in hyp_trace_buffer_alloc_bpages(),
-size is calculated by summing the required pages for all CPUs. For a larger
-trace buffer, this size easily exceeds a single page.
-
-If hyp_alloc() fails to find a high-order contiguous block, it returns
--ENOMEM. The host intercepts this via pkvm_call_hyp_req(), donates the
-requested number of pages, and retries the hypercall.
-
-However, host-donated pages are inserted at order 0 and are not coalesced.
-Because they are not coalesced, they cannot satisfy the high-order contiguo=
-us
-allocation required by hyp_alloc(size).
-
-Can this cause the hypercall to repeatedly fail with -ENOMEM, causing the
-host to loop indefinitely inside pkvm_call_hyp_req() and hang the system?
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260901080941.9977=
-69-1-vdonnefort@google.com?part=3D18
