@@ -1,44 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8566F2D1913
-	for <kvmarm@lists.linux.dev>; Tue,  1 Sep 2026 22:06:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E935E4734F2
+	for <kvmarm@lists.linux.dev>; Tue,  1 Sep 2026 22:08:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788300398; cv=none; b=SQSLLh85Dq/C0Nr9SLXJeY6Kik3rqwhTGcjDcVTA4EtKS3tE3sNwVbtj+DhneHDmCne6FxrEhlquDBq0T8+9q5iR4FN0jhXLt4dDTciHXOFMYf+/DC9An1XLzR8K0cVZjy6e1HIg1oKbKtTUvhBO1spSOqOtuvs2XABXx/IAQXQ=
+	t=1788300501; cv=none; b=BoOJrOi+KV3xOJL45ruClv7m0b2IMp4iMeP/G+zipHO0JpAFfjlo4Kp9//fyaxZLuGozZrIirXDhICD0Hn0eaw1sskguJiWgRjBL6SEiGuKOHo4GAeJF/hf92YPsOh4T6BPooHNXzA6QsqrwalF03stRkD8ImO3SzdBEwkTd7TQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788300398; c=relaxed/simple;
-	bh=cRT+NCFhU0reNMZpJDBa92A6RnOAf73rHu7fKY17hig=;
+	s=arc-20240116; t=1788300501; c=relaxed/simple;
+	bh=lKe/WadaAFR/hRmbhtKp2V1rrOc2PElWs6goEeyEEE0=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=Xbyxvs5SVid3NSPKHn6edJQVnUrdGL7m7hxFLjBuiYG1vKwRPtpy+TIAn2bWVjl44fFw2x8Cuach9aKzZ9FlyghbpjHdYDFV3ylmBLLLh/PumOwea6QrcdZZlPSew4jjgnpfzECYCKUIz/Az3Uk3a/Ocjl0o46b6j6AkMyJt+Z4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cZ9RR3kC; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=VdmtdsqTH2yFWThcBbi+O9IBnb4tDBG/wWcoiUPSkinj64ojepC9gnvb7PC+IWf0lHGHJcyMn2rWMTVJOVTGAelgZnWKc+Hqqx8kmOnxwtol8cmwdBD03BEVBc4V4yC1JpdaENu2WnjZbYMFkEJFf1SHhqUMQG4pxzjrR0pIiDo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IWoeK/FO; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cZ9RR3kC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 102E01F000E9;
-	Tue,  1 Sep 2026 22:06:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IWoeK/FO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F04121F000E9;
+	Tue,  1 Sep 2026 22:08:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788300397;
-	bh=Bbx7Czafx85HpIiMv6IJkW9Ri1g1M7FbhiM+pQbDfsg=;
+	s=k20260515; t=1788300498;
+	bh=CUbui8CD7Wua3pKfpuk3zN+CNHD2lm9nRmOgNo7lF30=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=cZ9RR3kCZ+p8M/CNTysrbu163weW6EafDNBKvosYbY3JQNKKZ4EJp9PIKK1qEcrHG
-	 CVXqlkOaZ71PxBcTm1zQxYZ9aqdM43uHZIUr3sfRpKt2vndW31fq1Vz6/Jf8je+YBi
-	 VuvTm5RwsVOYe05F29OiJ853Z3qI5ck/wmtoByouLWTFxwM6xg3mBb9GzXDCp3V+rR
-	 sZNbI6dv44xD8444G0fc1/KfjMwkQLxqTv2bWkZVHdns/Qp90PriQIOzB8lOK/vRJK
-	 wz75c7Q0YByAp1q7HZE1CnBFf0sA3yeAkgafSKPiw4UnrutUSAgc9XfIZZ08XXIkuw
-	 HSC6qxScLBdNg==
+	b=IWoeK/FOjf8ZsEhT4VmQOV+WPLzT/Qc0FuJV9RQgGyT9MpBQj+DLWTUDkOimKZfvC
+	 4Kfxq4yUMvbWJnPJ45I7Qx3wy9WTf67Out84q325Ct7ddRr/NBpaFmukVSzr+jgTMB
+	 SiWS+etuiQr+Cvbxzwf4vrIQzNUZ/sP8ykym8m1k5wQ65TBFDdYcm+bArU4EhZ1XWh
+	 NumKJzVfaYn/Rdf3ilMHJ765xb9ujWHpB83BvqD9E/S2eqXmH2UMSE4S2BPbEBPJrO
+	 7GAKb5BHyPYRhDFZF6UU1tfmsYAlWAd4lSDysSScFHdOdW818tLGLGmIIqOjlyYUjt
+	 5WHP29PIV7JSg==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v20 05/14] KVM: arm64: Set PSTATE.EXLOCK when entering
- an exception
+Subject: Re: [PATCH v20 13/14] tools: Synchronise the kernel esr.h
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Mark Brown" <broonie@kernel.org>
-Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev
-In-Reply-To: <20260901-arm64-gcs-v20-5-f31750bdfadb@kernel.org>
+Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20260901-arm64-gcs-v20-13-f31750bdfadb@kernel.org>
 References: <20260901-arm64-gcs-v20-0-f31750bdfadb@kernel.org>
- <20260901-arm64-gcs-v20-5-f31750bdfadb@kernel.org>
+ <20260901-arm64-gcs-v20-13-f31750bdfadb@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 01 Sep 2026 22:06:36 +0000
-Message-Id: <20260901220637.102E01F000E9@smtp.kernel.org>
+Date: Tue, 01 Sep 2026 22:08:17 +0000
+Message-Id: <20260901220817.F04121F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,62 +47,56 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [Medium] Incorrect GCSCR_ELx register selection based on the current cont=
-ext instead of the target exception level.
+- [Medium] The tools version of `esr.h` is synchronized incorrectly, introd=
+ucing an invalid value for the level -1 address size fault status code, whi=
+ch causes `esr_fsc_is_addr_sz_fault()` in userspace tools to misclassify ac=
+tual level -1 address size faults.
 --
 
-commit 42f10f3e973b268a78dccd02e2f0ddbf5ed384fb
+commit 2c5fc93c8578044cae22aadc2c4df4b978889699
 Author: Mark Brown <broonie@kernel.org>
+Subject: tools: Synchronise the kernel esr.h
 
-KVM: arm64: Set PSTATE.EXLOCK when entering an exception
+This commit updates the tools version of esr.h to match the kernel version,
+picking up new definitions for GCS.
 
-This commit implements managing PSTATE.EXLOCK when entering an exception.
-When taking an exception to a lower EL, the bit is cleared, and when
-entering from the same EL, it is set to GCSCR_ELx.EXLOCKEN.
+> diff --git a/tools/arch/arm64/include/asm/esr.h b/tools/arch/arm64/includ=
+e/asm/esr.h
+> index f3c6403e5ef2b..24c6ebe3fd416 100644
+> --- a/tools/arch/arm64/include/asm/esr.h
+> +++ b/tools/arch/arm64/include/asm/esr.h
 
-> diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exceptio=
-n.c
-> index 754e2dc1df54a..85c873644fe90 100644
-> --- a/arch/arm64/kvm/hyp/exception.c
-> +++ b/arch/arm64/kvm/hyp/exception.c
-> @@ -49,6 +49,38 @@ static void __vcpu_write_spsr_und(struct kvm_vcpu *vcp=
-u, u64 val)
->  		vcpu->arch.ctxt.spsr_und =3D val;
->  }
-> =20
-> +static unsigned long compute_exlock(struct kvm_vcpu *vcpu,
-> +				    unsigned long mode,
-> +				    unsigned long target_mode)
-> +{
-> +	u64 gcscr;
 [ ... ]
-> +	/*
-> +	 * When taking an exception to the same EL EXLOCK is set to
-> +	 * the effective value of GCSR_ELx.EXLOCKEN.
-> +	 */
-> +	if (is_hyp_ctxt(vcpu))
-> +		gcscr =3D vcpu_read_sys_reg(vcpu, GCSCR_EL2);
-> +	else
-> +		gcscr =3D vcpu_read_sys_reg(vcpu, GCSCR_EL1);
+
+> @@ -119,6 +123,16 @@
+>  #define ESR_ELx_FSC_SEA_TTW(n)	(0x14 + (n))
+>  #define ESR_ELx_FSC_SECC	(0x18)
+>  #define ESR_ELx_FSC_SECC_TTW(n)	(0x1c + (n))
+> +#define ESR_ELx_FSC_EXCL_ATOMIC	(0x35)
+> +#define ESR_ELx_FSC_ADDRSZ	(0x00)
+> +
+> +/*
+> + * Annoyingly, the negative levels for Address size faults aren't laid o=
+ut
+> + * contiguously (or in the desired order)
+> + */
+> +#define ESR_ELx_FSC_ADDRSZ_nL(n)	((n) =3D=3D -1 ? 0x25 : 0x2C)
 
 [Severity: Medium]
-Could compute_exlock() read the wrong register when a nested guest
-configures HCR_EL2.TGE =3D 1 while operating in EL1?
+Does this synchronization introduce an invalid value for the level -1 addre=
+ss
+size fault status code?
 
-If KVM injects an exception to EL1 in this state (where target_mode is
-PSR_MODE_EL1h), is_hyp_ctxt(vcpu) will evaluate to true because TGE is set.
+The main kernel's esr.h defines the level -1 address size fault as 0x29, but
+this macro evaluates to 0x25 when n =3D=3D -1. If hardware generates a leve=
+l -1
+address size fault, the resulting syndrome value is 0x29. Userspace tools or
+KVM selftests checking the fault with esr_fsc_is_addr_sz_fault() will test
+against 0x25 instead and incorrectly return false.
 
-This would cause the hypervisor to read GCSCR_EL2 instead of GCSCR_EL1,
-leading to an incorrect PSTATE.EXLOCK value for the injected exception.
-
-While a nested guest executing in EL1 with TGE=3D1 is architecturally
-unpredictable in hardware, KVM's software model typically avoids
-cross-wiring registers for different exception levels.
-
-Should this logic strictly use the explicitly passed target_mode to
-determine the target exception level, similar to how enter_exception64()
-handles VBAR and SCTLR?
+> +#define ESR_ELx_FSC_ADDRSZ_L(n)		((n) < 0 ? ESR_ELx_FSC_ADDRSZ_nL(n) : \
+> +						   (ESR_ELx_FSC_ADDRSZ + (n)))
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260901-arm64-gcs-=
-v20-0-f31750bdfadb@kernel.org?part=3D5
+v20-0-f31750bdfadb@kernel.org?part=3D13
