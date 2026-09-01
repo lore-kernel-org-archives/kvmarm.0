@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E173439478C;
-	Tue,  1 Sep 2026 08:46:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D18247798B;
+	Tue,  1 Sep 2026 09:17:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788252381; cv=none; b=CpDBI//BQSnMZh8fkchLijaXa9n4vT4jRzOp2qh837lyjETLEh9QPEJp/Yzrp5AXoWqsKffKHcz/n3TF323IVat+ycN48cGu0yxfxaF+pCNbcObTrdveV7XtGrAcd6cThYAGSbBknHCkCVfLXJDkCgfNQVX6qIfmPrnI/amrTLM=
+	t=1788254234; cv=none; b=R6cAk+8zVEEiWAsP5CGYs+kjKRtX2ikhG2utAVONJyxogtpcefZ9QRM5xgLnZ/rc0N3tAMacE5SZa4AuwBq8UksLKS+4d34yerqPvC0ksqQwmxCdHR0Wp+UPBFZ0JoSKclqZcb2Awr9m/iPAwc5TJkhJQtCV4H9On0Cy6HX+bPc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788252381; c=relaxed/simple;
-	bh=nOYr2/5KGhcoHzBT8RYwc4mrQKvfZhsOsi6k5J/+YeQ=;
+	s=arc-20240116; t=1788254234; c=relaxed/simple;
+	bh=SEvxqsLXA5gPmTU0Dj4YKtTfRCn4/vTp5S4oMrM7tGk=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=T4JMR2SRwCtXIYw7FjJK31Nn1bJXDbT7MkAw4MeO2YYRheS5pLcBTCpw/EL4+cg55uGlFPy/sey+eEbgYMYKaBqwLvaOwfA6zIs/vHxwW2OeybpQ2SEPRQF4jFdIgnF8urjmw8uzL0S+agT1AtKF+LAY43rfTX19HG9Tm6csXww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kghze7x3; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=BJKM/XJRTx1Bm2jdEKprB4xv+tnajlO+MDPkfDN4+czk8XIz8NHFsCnPCmyDKbldp+hyE6iba0YDwckprMli1Cz28IJ4LJwoN/9Qrrhk9EtWr6qRoJhbybMd37PRLeLMIMh1czos4LK3leGktlelWxDEZ38xWc3rIsTLntLwEW4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XROMNIUm; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kghze7x3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3216B1F000E9;
-	Tue,  1 Sep 2026 08:46:13 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XROMNIUm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4EB61F000E9;
+	Tue,  1 Sep 2026 09:17:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788252379;
-	bh=sSZ+W+gpyvva9DOkNjE72UDAxg//MujBrcnUpMW/QcY=;
+	s=k20260515; t=1788254232;
+	bh=mITZlxCGGk5dvksU48UBQe0WaGaTY/+s4dpeJMto630=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=kghze7x3MwDDqCvHjx3ZgTrJRLG41aro+Xm0FE6b6M6N87BFrqfJiFQjdaNbyLjei
-	 /a0OGIdZv30zvjAUQNX00VUKHQKXCR2agw7Z3sq1Iz3YSvNGyKEtzmzcCh7n4KUmXG
-	 uz1hIO1S1ln18PVcx9PsArwCn61NTGEDT+6ibg3Jp48OI2ZzhY5p17nMoy8ky5yUg0
-	 KyGbFbwiDzGSs0LfbmSaPYcAZYNf4/wtrGpomumjEMkz6mpyTmY7z84nicptr3WT/8
-	 RxgbatJmc0fP+5PEruglqmQNsVmlcvcYnePVLmcPF5rhWlw9iSwFakTC14vEGovfKN
-	 zUZN80YOsQ3XA==
+	b=XROMNIUmyhA7M/dbxKK8Imo86dz2L5j/zRFqHXNrxib/St5Bz1Wb45NtmhWOw5fJy
+	 1u3rgOng700Q/MQ7vgjnccFx73xrQm/I7XQ3n67GRnFhDKxJ/VFmyX48m+SserSxs+
+	 Tj82D7pJJMB26AvoXAgxRVqAW3LgHXg+Khq3BxBKr9/K3b1pItu8VaSk4UULn1gG//
+	 8C8f2gKAHAI74TDde4b39ZA0HPi0d9Z3mFhPd6KgiQH0aY3Zq0mWuwzTsGSVTSS7ZE
+	 jUydPyVjl+1VTyXdmpr4NjgMXIHt/C0EyY7NN9kjEfZOHNqNA5Ed9dbgxa4YiD6AJE
+	 VftVrjb3WsNrg==
 X-Mailer: emacs 31.1 (via feedmail 11-beta-1 I)
 From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
 To: Nicolin Chen <nicolinc@nvidia.com>
@@ -46,14 +46,14 @@ Cc: linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
 	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Xu Yilun <yilun.xu@linux.intel.com>
-Subject: Re: [RFC PATCH v4 01/16] iommu/arm-smmu-v3: Discover RME support
- and realm IRQ topology
-In-Reply-To: <apMjUSbxcnlAKjks@nvidia.com>
+Subject: Re: [RFC PATCH v4 03/16] iommu/arm-smmu-v3: Add initial pSMMU realm
+ viommu plumbing
+In-Reply-To: <apM6dOHcEI2ztWS0@nvidia.com>
 References: <20260427085344.941627-1-aneesh.kumar@kernel.org>
- <20260427085344.941627-2-aneesh.kumar@kernel.org>
- <apMjUSbxcnlAKjks@nvidia.com>
-Date: Tue, 01 Sep 2026 14:16:10 +0530
-Message-ID: <yq5aik4pnyul.fsf@kernel.org>
+ <20260427085344.941627-4-aneesh.kumar@kernel.org>
+ <apM6dOHcEI2ztWS0@nvidia.com>
+Date: Tue, 01 Sep 2026 14:47:04 +0530
+Message-ID: <yq5a8q5lz5yn.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -64,153 +64,97 @@ Content-Type: text/plain
 
 Nicolin Chen <nicolinc@nvidia.com> writes:
 
-> On Mon, Apr 27, 2026 at 02:23:29PM +0530, Aneesh Kumar K.V (Arm) wrote:
->> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-realm.c
->> @@ -0,0 +1,124 @@
->> +// SPDX-License-Identifier: GPL-2.0-only
->> +/*
->> + * Copyright (C) 2026 ARM Ltd.
->> + */
->> +
->> +#include <linux/interrupt.h>
->> +#include <asm/rmi_smc.h>
->> +#include <asm/rmi_cmds.h>
->> +
->> +#include "arm-smmu-v3.h"
->> +
->> +#define	RMI_PSMMU_IRQ_GERROR	BIT(0)
->> +#define	RMI_PSMMU_IRQ_EVENTQ	BIT(1)
->> +#define	RMI_PSMMU_IRQ_PRIQ	BIT(2)
->> +#define	RMI_PSMMU_IRQ_CMDQ	BIT(3)
-> [...]
->> +	if (irq == smmu->realm_evtq_irq)
->> +		notify_flags =  RMI_PSMMU_IRQ_EVENTQ;
->> +	else if (irq == smmu->realm_gerr_irq)
->> +		notify_flags =  RMI_PSMMU_IRQ_GERROR;
->> +	else if (irq == smmu->realm_pri_irq)
->> +		notify_flags =  RMI_PSMMU_IRQ_PRIQ;
+> On Mon, Apr 27, 2026 at 02:23:31PM +0530, Aneesh Kumar K.V (Arm) wrote:
+>> +static const struct iommufd_viommu_ops arm_realm_smmu_v3_ops = {
+>> +	.destroy = arm_realm_smmu_v3_destroy,
+>> +	.alloc_domain_nested = arm_vsmmu_alloc_domain_nested,
+>> +	.cache_invalidate = arm_vsmmu_cache_invalidate,
 >
-> These are defined as BIT(x)...
+> I don't think realm vsmmu should include NS nested domain ops. I
+> wonder if adding here is for some covert reason that prevents us
+> from registering viommu/vdevice objects?
 >
->> +		if (rmi_psmmu_irq_notify(smmu->base_phys,
->> +					 notify_flags, &event)) {
-> [...]
->> +			rmi_psmmu_event_consume(smmu->base_phys, notify_flags);
->
-> .. and passed to RMI_PSMMU_IRQ_NOTIFY and RMI_PSMMU_EVENT_CONSUME.
->
-> RMI_PSMMU_IRQ_NOTIFY takes RmiPsmmuIrqSet type, which is a 4-bit
-> field that has a range of [BIT(0), BIT(3)]. So this is correct.
->
-> However, RMI_PSMMU_EVENT_CONSUME takes RmiPsmmuIrq type, which is
-> a 2-bit field that has a range of [0x0, 0x3]. So this seems wrong.
->
-
-Updated that to
-
-#define	RMI_PSMMU_IRQ_PEND_GERROR	BIT(0)
-#define	RMI_PSMMU_IRQ_PEND_EVENTQ	BIT(1)
-#define	RMI_PSMMU_IRQ_PEND_PRIQ		BIT(2)
-#define	RMI_PSMMU_IRQ_PEND_CMDQ		BIT(3)
-
-
-#define	RMI_PSMMU_IRQ_GERROR	0
-#define	RMI_PSMMU_IRQ_EVENTQ	1
-#define	RMI_PSMMU_IRQ_PRIQ	2
-#define	RMI_PSMMU_IRQ_CMDQ	3
-
-
-and 
-	if (irq == smmu->realm.evtq_irq) {
-		notify_flags =  RMI_PSMMU_IRQ_PEND_EVENTQ;
-		psmmu_irq = RMI_PSMMU_IRQ_EVENTQ;
-	} else if (irq == smmu->realm.gerr_irq) {
-
-...
-	rmi_psmmu_event_consume(smmu->base_phys, psmmu_irq);
-
->
->> +void arm_smmu_setup_realm_irqs(struct arm_smmu_device *smmu)
+>> +static int arm_realm_smmu_v3_vdevice_init(struct iommufd_vdevice *vdev)
 >> +{
->> +	int irq, ret;
+>> +	struct device *dev = iommufd_vdevice_to_device(vdev);
+>> +	struct arm_smmu_master *master = dev_iommu_priv_get(dev);
+>> +	// fixme which stream to pick
+>> +	/* At this moment, iommufd only supports PCI device that has one SID */
+>> +	struct arm_smmu_stream *stream = &master->streams[0];
+>> +	struct arm_smmu_device *smmu = master->smmu;
+>> +	unsigned long rmi_ret = 0;
+>> +	int ret;
 >> +
->> +	irq = smmu->realm_evtq_irq;
->> +	if (irq) {
->> +		ret = devm_request_threaded_irq(smmu->dev, irq, NULL,
->> +						arm_smmu_realm_notify_thread,
->> +						IRQF_ONESHOT,
->> +						"arm-smmu-v3-realm-evtq",
->> +						smmu);
+>> +	if (!smmu->realm_initialized)
+>> +		return -EINVAL;
+>> +
+>> +	ret = rmi_psmmu_st_l2_create(smmu->base_phys,
+>> +				     ALIGN_DOWN(stream->id, STRTAB_NUM_L2_STES),
+>> +				     &rmi_ret);
 >
-> These IRQ numbers are raw numbers forwarded by firmware and then
-> returned by RMI_PSMMU_INFO:
+> The "vdevice" is for a PSMMU stream table allocation..
 >
-> +		if ((psmmu_info->flags & RMI_PSMMU_IRQCFG_MASK) ==
-> +		    RMI_PSMMU_IRQCFG_IRQ_WIRED) {
-> +			smmu->realm_gerr_irq = psmmu_info->gerror_intr_num;
-> +			smmu->realm_evtq_irq = psmmu_info->eventq_intr_num;
-> +			smmu->realm_pri_irq = psmmu_info->priq_intr_num;
+>> +int arm_realm_smmu_v3_init(struct iommufd_viommu *viommu,
+>> +			   const struct iommu_user_data *user_data)
+>> +{
+> [...]
+>> +psmmu_activate:
+>> +	ret = rmi_psmmu_activate(smmu->base_phys, virt_to_phys(params),
+>> +				 &rmi_ret);
 >
-> Should they be converted to Linux IRQ numbers before forwarded to
-> devm_request_threaded_irq?
+> .. and the "viommu" is also for PSMMU activation...
 >
-
-Yes, that needs conversion. I guess we can use the irq_domain associated
-with the non-Realm IRQ number to create the mappings?
-
-Something like:
-
-
-+static struct irq_domain *arm_smmu_get_wired_irq_domain(struct arm_smmu_device *smmu)
-+{
-+	int irqs[] = {
-+		smmu->combined_irq,
-+		smmu->evtq.q.irq,
-+		smmu->gerr_irq,
-+		smmu->priq.q.irq,
-+	};
-+	struct irq_domain *domain = NULL;
-+	struct irq_data *irq_data;
-+	unsigned int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(irqs); i++) {
-+		if (irqs[i] <= 0)
-+			continue;
-+
-+		irq_data = irq_get_irq_data(irqs[i]);
-+		if (!irq_data || !irq_data->domain)
-+			return ERR_PTR(-EINVAL);
-+
-+		if (domain && domain != irq_data->domain)
-+			return ERR_PTR(-EINVAL);
-+
-+		domain = irq_data->domain;
-+	}
-+
-+	return domain ?: ERR_PTR(-ENXIO);
-+}
-
+>> +++ b/include/uapi/linux/iommufd.h
+>> @@ -1055,6 +1055,7 @@ enum iommu_viommu_type {
+>>  	IOMMU_VIOMMU_TYPE_DEFAULT = 0,
+>>  	IOMMU_VIOMMU_TYPE_ARM_SMMUV3 = 1,
+>>  	IOMMU_VIOMMU_TYPE_TEGRA241_CMDQV = 2,
+>> +	IOMMU_VIOMMU_TYPE_ARM_REALM_SMMUV3 = 3,
 >
->> @@ -782,6 +787,9 @@ struct arm_smmu_device {
->>  
->>  	int				gerr_irq;
->>  	int				combined_irq;
->> +	int				realm_gerr_irq;
->> +	int				realm_evtq_irq;
->> +	int				realm_pri_irq;
+> .. and we demand userspace (VMM) to use IOMMU_VIOMMU_ALLOC ioctl,
+> even if VMM does not actually expose a guest-level SMMU instance.
+> Thus, no user_data.
 >
-> Nit: this series adds a few realm-specific things in the top SMMU
-> structure. Maybe a "struct arm_realm_psmmu" can make them clearer.
+> I can get the reasoning behind the flow using this viommu/vdevice.
+>
+> But, on the other hand, I can imagine that a Realm VSMMU would add
+> a new flag with a user_data to this VIOMMU. Then, this flow would
+> give some troubles to VMM (QEMU for example):
+>
+>  - For VM with a guest-level SMMU, QEMU creates a realm instance
+>    where IOMMU_VIOMMU_TYPE_ARM_REALM_SMMUV3 (with vsmmu) can be
+>    allocated.
+>  - For VM w/o a guest-level SMMU, QEMU won't create such a realm
+>    instance, while still required to invoke the ioctl (w/o vsmmu). 
+>
+> Taking a step back, I wonder if we really need to use iommufd for
+> PSMMU activation and its stream table allocations?
+>
+> Here are some facts:
+>   - An iommufd has a ctx, that's one per VM. Similarly, a Realm
+>     has an RD.
+>   - For an RMI command that needs an RD, it makes sense to be per
+>     iommufd ctx, e.g. RMI_VSMMU_* or RMI_VDEV_* commands.
+>   - PSMMU commands are global; they don't need RD. So they don't
+>     seem necessary to tie to an iommufd ctx.
+>
+> Instead, could the PSMMU activation be done after RMI_PSMMU_INFO
+> check? Is there any reason not to do that? A safer timing might
+> be at the device assignment stage?
 >
 
-Added
+One of the reasons I added IOMMU_VIOMMU_TYPE_ARM_REALM_SMMUV3 was to
+avoid creating a psmmu object when we are not using a PCI passthrough
+VM. That is also the reason for all the refcounting around the psmmu
+objects.
 
-struct arm_smmu_realm {
-	int				gerr_irq;
-	int				evtq_irq;
-	int				pri_irq;
-	struct mutex			mutex;
-	refcount_t			users;
-};
+If we are okay with creating psmmu objects early, then I guess we can go
+with the above approach.
+
+>
+> Speaking of which, RMI_PSMMU_ST_L2_CREATE doesn't seem necessary
+> to be invoked in a vdevice context either. Maybe it should align
+> with iommufd idev's lifecycle?
+>
 
 -aneesh
