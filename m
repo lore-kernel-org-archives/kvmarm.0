@@ -1,56 +1,56 @@
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com [209.85.208.72])
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com [209.85.221.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDBD0370AE2
-	for <kvmarm@lists.linux.dev>; Tue,  1 Sep 2026 08:09:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB83C46E00B
+	for <kvmarm@lists.linux.dev>; Tue,  1 Sep 2026 08:09:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788250198; cv=none; b=nKbHE7aZWTDDcNriJ4jQ1LwJbEla4/gLh1GMXTIBI75TKLcn16thLmlO85p9eGEvXCxPvFR4Bzs9TNR4DdynsTZplok0zhLf6ziJuGvRw5gM+z8aGzsF9yvR7KKEYfOowhgEWbbNycwgvpoLYtqBzlPYUtB4y/P3aUiTiXEpIBg=
+	t=1788250199; cv=none; b=dWZdnBEXcOFdALZacqv6MxU3YVI621izncrnYfKJcxu2PqZZjg2h6V4d07dF5s0NFfnrMcy2lJZFA0pX2KUjwZAOs8innEAXopVYxv9Y9kHTmvq6dUQI/M1zbhBZXITY5xyAKbUalTgq0/ly4pjLEx/1I+bqMXRjHNWJzZf3eok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788250198; c=relaxed/simple;
-	bh=A0xGjc8uUkIR1aNWLsp090YY0ObBLmm/+xhrG7yM1cY=;
+	s=arc-20240116; t=1788250199; c=relaxed/simple;
+	bh=525SXKtkJWipm/cY2EbI4t3ZCkAuK43q21NBlpiAGOI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=j6f86Fr8w4Hs1xtzhUGyJlynlETasE7LjtqajTv/i4jTmOMVIPDdSBIULNER9sY+roIjRdy24MvMJaJQFPBv7m6rSswgX9SryR+lpmkMnZfLY0g45A4oesqwVB8AYDhxk69XljAB5br/k/Pihk9CmgyYrRt7T5+38DKX/+vZbEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CUMtEjpp; arc=none smtp.client-ip=209.85.208.72
+	 To:Cc:Content-Type; b=m0HhieZ0yvBflBJcQbjlsQ3MnzdBFmDEPmIWxTSld1DLdecell0GAsmygaRqCbv0hSVEzXrjhfNtmTXnp50pqkgrvs0E8VmsYbZY3KngNgyXeSq1xnoJCVCT+AU0gswrL1E5HYW7pAO+pHva6kXZelO2SjxWKFUJ3qAebqe72P8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qGtkV2J6; arc=none smtp.client-ip=209.85.221.71
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CUMtEjpp"
-Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-6a60a4f1ae2so858519a12.2
-        for <kvmarm@lists.linux.dev>; Tue, 01 Sep 2026 01:09:56 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qGtkV2J6"
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-47f6d70223dso3003297f8f.1
+        for <kvmarm@lists.linux.dev>; Tue, 01 Sep 2026 01:09:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1788250195; x=1788854995; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1788250196; x=1788854996; darn=lists.linux.dev;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=6DCOhBJDlEMaibcEAIvX0Fz7RikvCVl0uaVPevsNKhY=;
-        b=CUMtEjppdF4lLef5i6IQX2T+aHQO8AhLriAt1wYAxMHLckwRCuvkLIWEZEuHjFkRng
-         aM9nBZcrISSMTSii41iz3PcVfjhawhy78n1nX6gLLXfER3+ShpFsH1a9PzpghlexwUzy
-         MVtAaas7T8b+Nc0c9oQqOT0TO/XNSgL2A3WU2dGK5qIrFByGn3KE3nYP1KI9PM7gYK4j
-         8hvNt4JJzXRoYYPLRTKvuChmGq4hffP0KYTUafcYIYIz86shjMKfrb6mATrFHYyrEQgE
-         8U2N+qewDZvi8JTj70R+kwe2IBi7lU6bO9oz7RjLU/8H24fIXXkr4r1FQdlFIE3AgGXJ
-         MeaA==
+        bh=VQruuicz/6guQAq8w+QAJ7KPe6zCOEn9cupA41y8u7Y=;
+        b=qGtkV2J6QqNW0+8HozojSCMjMHlm81Z0nkRKV6cLLAKPb2QErsr3TUUk3OSO0rPvaF
+         ZNNWZKmUfK+N4wO6sW7kRWZAj0CsR/V5tZ1d/T0FpNsVXv4t5tuvN10tHDPCSwhrK+7O
+         jxdfk9JzZcuN0ZwYtguhJNfGCBFq5Rqo47rab8noNO0tEQEzoULRUGIrQGls7DLH1g4P
+         0EgVwe53CjdBdHR4IFLhed+zMrFkVDRSxCBMgeDziBEcO/fjOsUn1Es1AuudBTF5TDou
+         MuI1hBGV3yoynfERrTqRTxfEJcsRef7gdgt3uw6AoHraGUkFRb+0Aw4YfpEQ23w9f79f
+         +Ckg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788250195; x=1788854995;
+        d=1e100.net; s=20251104; t=1788250196; x=1788854996;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=6DCOhBJDlEMaibcEAIvX0Fz7RikvCVl0uaVPevsNKhY=;
-        b=XGSGY5QadzgmPEI0kvr/FtOp/5C5vG5xx2ru4Xyf4j90xoohr7uIUYsJ6qeN8jUvQT
-         e2eRHuoqT7kk85iAmrohQcGFwDR+DUM09ao5EAHr2XOENLh+nbGr4miY+c9fooyLrzQE
-         k3L3StgWkcjPnOblhUZGb1XI2iEKXRgzWst46vGcK4Vlk9oh8ll7dfWLmI6s/RDbd8hb
-         XetrC49GRxG8OfFfBxi1aYNhmB4iwVniZWuKJqhuBwWjOEBXJW8pm5MMIyAFt68sB3WE
-         PemNeWzHt12ATB0Wrq1IC1UkpbWG5PqMv9qRloAfx4zKTpYnEqRgfheUn/5vFZLkez+4
-         fNhw==
-X-Forwarded-Encrypted: i=1; AKwUvBy0P5tL3/tdK7WMAFVp0d6zhRQ6dvrAdPQnZmh/Y/TqgVUPtXhOQAyShSfV1BrdXLw3yiVnH44=@lists.linux.dev
-X-Gm-Message-State: AFuF++lJ08w7DRAbxcvoBO0OM6fj3P/cUZ3aNdM7+YRgDdfcM68rfk9x
-	Wm4qs54CA86WtrHfEORHt5CNKaR70sis687v4I4UvLGQvaqE/Ha0HFE8WPlpEvTmjxmg8o0sQZe
-	rEMNAulDw+lDn3n6u0vGcIA==
-X-Received: from edqr22.prod.google.com ([2002:aa7:d596:0:b0:6a5:ed14:166b])
+        bh=VQruuicz/6guQAq8w+QAJ7KPe6zCOEn9cupA41y8u7Y=;
+        b=f9S/SSwJWdnrjPQCDL5nIPMzoO+G+DquFjuaMu/o6b0DBJCwnRh770E9+y5uGWIh5M
+         GdQ286SXT2zoW1zJf9bjo6O2YDHlP2RR5yTSY1nOxFA6Cf+HmsYwqEsUAqQrcKSQNRtr
+         DFKEor+LFOXHusLC09ZvTZ9geuzD/GwQLfta33tr+KtMmrtKnjenGCe+umSCbg8tfG/g
+         7sAeQxy37fyELWZI1ygF75AlmE3+PznQGHmoIgqZ8Ta76SrBuecN2HeV0k/4VUD3wU8u
+         mSRrvPVY+r9CIrFNfxBhPNDgc6j1UaQX7y4aNiP8asw2BHfCom9dB6vEZV9jyJNP1S5D
+         ORwg==
+X-Forwarded-Encrypted: i=1; AKwUvBwFehX9LabZ4/DXhonQGUzxwm/4FrN1vGfJwNDuKqUaLTu0BNDs0SYQwyoIEs0Op9Ft7yeUJVA=@lists.linux.dev
+X-Gm-Message-State: AFuF++lYQNaqXp25q3jZF6lwRWm5HY/HtxtsonYonrl9K5uC1Oud1es4
+	GU1vLWCYhqGHDP+VexRDWmbV1fMyJ4LAgvOlo0kXsjIOJGV7kI3g1vB8zH4R52G3OIpQNpbAL0p
+	KknlVXQH5g5qy/Jddm4xTAw==
+X-Received: from wrsc7.prod.google.com ([2002:adf:fb47:0:b0:47f:45e3:ffb0])
  (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6402:4412:b0:6a3:f47c:969 with SMTP id 4fb4d7f45d1cf-6a60d3071a3mr19384977a12.3.1788250194778;
- Tue, 01 Sep 2026 01:09:54 -0700 (PDT)
-Date: Tue,  1 Sep 2026 09:09:28 +0100
+ 2002:adf:f68f:0:b0:482:f0ee:1390 with SMTP id ffacd0b85a97d-4844101d845mr9401575f8f.22.1788250195887;
+ Tue, 01 Sep 2026 01:09:55 -0700 (PDT)
+Date: Tue,  1 Sep 2026 09:09:29 +0100
 In-Reply-To: <20260901080941.997769-1-vdonnefort@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -60,8 +60,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20260901080941.997769-1-vdonnefort@google.com>
 X-Mailer: git-send-email 2.55.0.897.gb25b4bd76c-goog
-Message-ID: <20260901080941.997769-6-vdonnefort@google.com>
-Subject: [PATCH v5 05/18] KVM: arm64: Allow kvm_hyp_memcache usage outside of stage-2
+Message-ID: <20260901080941.997769-7-vdonnefort@google.com>
+Subject: [PATCH v5 06/18] KVM: arm64: Add pkvm_hyp_req infrastructure
 From: Vincent Donnefort <vdonnefort@google.com>
 To: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
 	linux-arm-kernel@lists.infradead.org
@@ -71,87 +71,230 @@ Cc: joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com,
 	Vincent Donnefort <vdonnefort@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Although currently limited to guest stage-2 page-table allocations,
-struct kvm_hyp_memcache is a useful primitive for passing a list of
-discontiguous pages between host and hypervisor.
+Introduce a struct pkvm_hyp_req to enable the pKVM hypervisor to request
+resources from the host.
 
-Introduce init_hyp_memcache() to initialise a generic hyp memcache, and
-init_hyp_stage2_memcache() for stage-2 specific memcaches. The generic
-initialiser will be used to top up the upcoming pKVM heap allocator.
+Provide serialisation helpers to transport these requests via SMCCC
+registers (starting from a2):
 
-Note that the generic kvm_hyp_memcache does not account for the
-allocated memory. This is expected: donations to the heap allocator are
-shared and recycled, they cannot be accounted for a specific VM.
+  pkvm_hyp_req_to_smccc() to encode into the SMCCC args.
+  smccc_to_pkvm_hyp_req() to decode them.
+
+When the hypervisor raises a request, the host must handle it and retry
+the HVC. To automate this sequence, introduce the pkvm_call_hyp_req()
+macro. This intercepts pending requests, invokes the handler and retries
+the HVC.
+
+Additionally, introduce a trace event to track the handling of these
+requests.
 
 Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
 Tested-by: Fuad Tabba <fuad.tabba@linux.dev>
 Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 27fe0cd5b2d7..3ab41330c94f 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -91,9 +91,22 @@ struct kvm_hyp_memcache {
- 	struct pkvm_mapping *mapping; /* only used from EL1 */
- 
- #define	HYP_MEMCACHE_ACCOUNT_STAGE2	BIT(1)
-+#define	HYP_MEMCACHE_ACCOUNT_KMEMCG	BIT(2)
- 	unsigned long flags;
+diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
+index beea00e693a0..19bddf261c82 100644
+--- a/arch/arm64/include/asm/kvm_pkvm.h
++++ b/arch/arm64/include/asm/kvm_pkvm.h
+@@ -205,6 +205,109 @@ struct pkvm_mapping {
+ 	u64 __subtree_last;	/* Internal member for interval tree */
  };
  
-+static inline void init_hyp_memcache(struct kvm_hyp_memcache *mc)
++enum pkvm_hyp_req_type {
++	PKVM_HYP_NO_REQ = 0,
++	__PKVM_HYP_REQ_TYPE_MAX,
++};
++
++#define PKVM_HYP_REQ_SMCCC_ARG_SIZE_MAX \
++	(sizeof(struct arm_smccc_res) - offsetof(struct arm_smccc_res, a2) - 1)
++
++struct pkvm_hyp_req {
++	u8 type;
++	union {
++		struct {
++			u32	nr_pages;
++		} mem;
++		struct {
++			/* Helper for SMCCC encoding/decoding */
++			u8	args[PKVM_HYP_REQ_SMCCC_ARG_SIZE_MAX];
++		} args;
++	};
++};
++
++static inline size_t pkvm_hyp_req_arg_size(u8 type)
 +{
-+	memset(mc, 0, sizeof(*mc));
-+	mc->mapping = ZERO_SIZE_PTR; /* Prevent allocation, solely useful for stage2 memcache */
++	switch (type) {
++	case PKVM_HYP_NO_REQ:
++		return 0;
++	default:
++		WARN_ON(1);
++	}
++
++	return 0;
 +}
 +
-+static inline void init_hyp_stage2_memcache(struct kvm_hyp_memcache *mc)
++/* Encode the pending pkvm_hyp_req type into the SMCCC args */
++static inline void
++pkvm_hyp_req_to_smccc(struct kvm_cpu_context *host_ctxt, struct pkvm_hyp_req *req)
 +{
-+	memset(mc, 0, sizeof(*mc));
-+	mc->flags = HYP_MEMCACHE_ACCOUNT_STAGE2 | HYP_MEMCACHE_ACCOUNT_KMEMCG;
++	u8 *dst, type = req->type;
++	size_t size;
++
++	if (type == PKVM_HYP_NO_REQ || type >= __PKVM_HYP_REQ_TYPE_MAX) {
++		host_ctxt->regs.regs[2] = 0;
++		return;
++	}
++
++	size = pkvm_hyp_req_arg_size(type);
++	if (WARN_ON(size > PKVM_HYP_REQ_SMCCC_ARG_SIZE_MAX))
++		return;
++
++	dst = (u8 *)&host_ctxt->regs.regs[2];
++	*dst = type;
++
++	memcpy(dst + 1, &req->args, size);
 +}
 +
- static inline void push_hyp_memcache(struct kvm_hyp_memcache *mc,
- 				     phys_addr_t *p,
- 				     phys_addr_t (*to_pa)(void *virt))
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 9ba86450fe4a..3163502cc7d2 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1160,8 +1160,10 @@ static void *hyp_mc_alloc_fn(void *mc)
- {
- 	struct kvm_hyp_memcache *memcache = mc;
- 	void *addr;
-+	gfp_t gfp;
- 
--	addr = (void *)__get_free_page(GFP_KERNEL_ACCOUNT);
-+	gfp = memcache->flags & HYP_MEMCACHE_ACCOUNT_KMEMCG ? GFP_KERNEL_ACCOUNT : GFP_KERNEL;
-+	addr = (void *)__get_free_page(gfp);
- 	if (addr && memcache->flags & HYP_MEMCACHE_ACCOUNT_STAGE2)
- 		kvm_account_pgtable_pages(addr, 1);
- 
++/* Return true if a pkvm_hyp_req has been decoded from the SMCCC args */
++static inline bool smccc_to_pkvm_hyp_req(struct pkvm_hyp_req *req, struct arm_smccc_res *res)
++{
++	u8 *src = (u8 *)res + offsetof(struct arm_smccc_res, a2);
++	u8 type = *src;
++
++	if (type == PKVM_HYP_NO_REQ || type >= __PKVM_HYP_REQ_TYPE_MAX)
++		return false;
++
++	req->type = type;
++	memcpy(&req->args, src + 1, pkvm_hyp_req_arg_size(type));
++
++	return true;
++}
++
++int __pkvm_handle_smccc_req(struct arm_smccc_res *res);
++
++/**
++ * pkvm_call_hyp_req() - Issue an HVC that can return hypervisor requests
++ * @f: Hypervisor function symbol to call.
++ * @...: Arguments to pass to the hypercall.
++ *
++ * Re-issue an HVC and process any pending hypervisor request until completion
++ * or error.
++ *
++ * Only use this helper for HVCs whose hypervisor handlers format their return
++ * registers with pkvm_hyp_req_to_smccc().
++ *
++ * Return: Result of the hypercall or a negative error if the hyp request
++ * handling failed.
++ */
++#define pkvm_call_hyp_req(f, ...)								\
++({												\
++	struct arm_smccc_res __res;								\
++	int __ret;										\
++	do {											\
++		__ret = -1;									\
++		arm_smccc_1_1_hvc(KVM_HOST_SMCCC_FUNC(f), ##__VA_ARGS__, &__res);		\
++		if (WARN_ON(__res.a0 != SMCCC_RET_SUCCESS))					\
++			break;									\
++		__ret = __res.a1;								\
++		if (!__ret)									\
++			break;									\
++		__ret = __pkvm_handle_smccc_req(&__res);					\
++	} while (!__ret);									\
++	__ret;											\
++})
++
+ int pkvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
+ 			     struct kvm_pgtable_mm_ops *mm_ops);
+ void pkvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
 diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index 8e4c6e4bec12..e5200731a45b 100644
+index e5200731a45b..11d9e2f70cd8 100644
 --- a/arch/arm64/kvm/pkvm.c
 +++ b/arch/arm64/kvm/pkvm.c
-@@ -111,7 +111,7 @@ static int __pkvm_create_hyp_vcpu(struct kvm_vcpu *vcpu)
- 	void *hyp_vcpu;
- 	int ret;
+@@ -16,6 +16,9 @@
  
--	vcpu->arch.pkvm_memcache.flags |= HYP_MEMCACHE_ACCOUNT_STAGE2;
-+	init_hyp_stage2_memcache(&vcpu->arch.pkvm_memcache);
+ #include "hyp_constants.h"
  
- 	hyp_vcpu = alloc_pages_exact(hyp_vcpu_sz, GFP_KERNEL_ACCOUNT);
- 	if (!hyp_vcpu)
-@@ -172,7 +172,7 @@ static int __pkvm_create_hyp_vm(struct kvm *kvm)
- 		goto free_vm;
++#define CREATE_TRACE_POINTS
++#include "trace_pkvm.h"
++
+ DEFINE_STATIC_KEY_FALSE(kvm_protected_mode_initialized);
  
- 	kvm->arch.pkvm.is_created = true;
--	kvm->arch.pkvm.stage2_teardown_mc.flags |= HYP_MEMCACHE_ACCOUNT_STAGE2;
-+	init_hyp_stage2_memcache(&kvm->arch.pkvm.stage2_teardown_mc);
- 	kvm_account_pgtable_pages(pgd, pgd_sz / PAGE_SIZE);
+ static struct memblock_region *hyp_memory = kvm_nvhe_sym(hyp_memory);
+@@ -594,3 +597,25 @@ bool pkvm_force_reclaim_guest_page(phys_addr_t phys)
  
- 	return 0;
+ 	return !ret || ret == -EAGAIN;
+ }
++
++static int pkvm_handle_hyp_req(struct pkvm_hyp_req *req)
++{
++	int ret = -EINVAL;
++
++	switch (req->type) {
++	}
++
++	trace_kvm_handle_pkvm_hyp_req(req, ret);
++
++	return ret;
++}
++
++int __pkvm_handle_smccc_req(struct arm_smccc_res *res)
++{
++	struct pkvm_hyp_req req;
++
++	if (smccc_to_pkvm_hyp_req(&req, res))
++		return pkvm_handle_hyp_req(&req);
++
++	return res->a1;
++}
+diff --git a/arch/arm64/kvm/trace_pkvm.h b/arch/arm64/kvm/trace_pkvm.h
+new file mode 100644
+index 000000000000..3966c111e3ad
+--- /dev/null
++++ b/arch/arm64/kvm/trace_pkvm.h
+@@ -0,0 +1,43 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#if !defined(_TRACE_PKVM_ARM64_KVM_H) || defined(TRACE_HEADER_MULTI_READ)
++#define _TRACE_PKVM_ARM64_KVM_H
++
++#include <linux/tracepoint.h>
++#include <asm/kvm_pkvm.h>
++
++#undef TRACE_SYSTEM
++#define TRACE_SYSTEM kvm
++
++TRACE_DEFINE_ENUM(PKVM_HYP_NO_REQ);
++
++#define PKVM_HYP_REQ_TYPES \
++	{ PKVM_HYP_NO_REQ, "NO_REQ" }
++
++TRACE_EVENT(kvm_handle_pkvm_hyp_req,
++	TP_PROTO(struct pkvm_hyp_req *req, int ret),
++	TP_ARGS(req, ret),
++
++	TP_STRUCT__entry(
++		__field(u8,	type)
++		__field(int,	ret)
++	),
++
++	TP_fast_assign(
++		__entry->type = req->type;
++		__entry->ret = ret;
++	),
++
++	TP_printk("type: %s ret: %d",
++		  __print_symbolic(__entry->type, PKVM_HYP_REQ_TYPES),
++		  __entry->ret)
++);
++
++#endif /* _TRACE_PKVM_ARM64_KVM_H */
++
++#undef TRACE_INCLUDE_PATH
++#define TRACE_INCLUDE_PATH .
++#undef TRACE_INCLUDE_FILE
++#define TRACE_INCLUDE_FILE trace_pkvm
++
++/* This part must be outside protection */
++#include <trace/define_trace.h>
 -- 
 2.55.0.897.gb25b4bd76c-goog
 
