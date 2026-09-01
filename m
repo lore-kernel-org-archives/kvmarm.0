@@ -1,154 +1,101 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3475E48BD20;
-	Tue,  1 Sep 2026 17:29:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E82B37A85D
+	for <kvmarm@lists.linux.dev>; Tue,  1 Sep 2026 17:30:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788283775; cv=none; b=R0dL9xsuxjthelv5nFajAaJIzXj65oK8AOSRir4bwcmFqdOK9MljdPLjGOJtSGxCr/w9yoAB3DZBzSkJEk9EZs2y15JZbXdiMuLWyb2Nvpz0iMQYh/55TUAEtKyJkOgWeK9Xf1fU3AFTAcDSW/QABqAjOiyftXq/ICrzh3Ou1gM=
+	t=1788283817; cv=none; b=e2/W/8SVN6QbvtSzi5vB0z37mhGXwXwqNPG7LzTwVLvBWbpKVCzE03QW4Be2iMZ6I5xwCwIOrQxdDccrhjxsw6xAspS+RWHxRlv8KH65EIt6t2EHN3ONlSVCXe1Aw0GjEdPqkg8QwgiYN5qiIMGtKeAM8AWhzpNpsbYx1TcYXT8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788283775; c=relaxed/simple;
-	bh=hIJQVO5FZNvdm0cmp7KFRCyJsyxlcDY2tLzeNko9CCQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=qGFlyVY1/pjCtreMn9jf0cvDRqDD2UjNpg0npmDBiSd+I3xbTZZyM6JACoYkN85x+OzKR5GvMVvZE0P18dpDC1FyMmeWgF3EBmJYidWHw7YAZpGmMSf9lbqlUGJZiktf9P+jYW4JxC2WcD0hRyCe8JxMhSnoyecEIc0GqZtZ1D8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KtkmMZlm; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788283817; c=relaxed/simple;
+	bh=+76+CRLLUEWcVR08W6IDqcuN/e9lr18DQtd/7o+Yygk=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=JPy9jXTebyB45GKfbM1xQyux+pWzVb2O57AYtshjc9qpMNLZ2xVAssjocI+SPI7uIZ4EGJYKrYGL9BsjmuSFNze9ipeQ6OO0HblcniHVDT6Kag3lFNRZ59oG5gFev815TqHFWWtIn5N47lIaSqzk4A2QUDYNetNSWL0DkvRAFIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jp6m4CZ2; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KtkmMZlm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99B5A1F00A3E;
-	Tue,  1 Sep 2026 17:29:30 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jp6m4CZ2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC1B41F00A3D;
+	Tue,  1 Sep 2026 17:30:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788283773;
-	bh=EVyNmPZk8xroeMlfEyBXTtkBWQBzLnb7LaqjL0r2gKY=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=KtkmMZlm7pdlaVD2POunK3BmTzCzGjOiaFm/Kk5cnszKSNphKUepiWoDULW+vEQ4e
-	 PkjA+G/48biGxGdgisfCpcPRNoQ8Y80A/rsMwZuWnp7VZpxJl2VpvZSYRRZEybRzV2
-	 f6YkrWLFdyaVYExTK3p6FZ3D7sfYP8IKivZlOWjROJikuGF5gYFe63U1ozizDYXKdp
-	 NqJ7WjaghELgFfkXEBRtYIHm3e4fGjPBvfbzXYLt6qTSaazHFBMPuuCk1lKtjHKocj
-	 5O9rMzhMZfGs/SR18+lQWbLbrxGHysTvtkVVtc3qjbg4GnP6wWUlt6h7HWjZO3fE9M
-	 b8yJZW0GPf1+Q==
-From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Date: Tue, 01 Sep 2026 18:29:00 +0100
-Subject: [PATCH v3 2/2] KVM: arm64: nv: Fix null ptr deref on nested
- wp/unmap, teardown race
+	s=k20260515; t=1788283815;
+	bh=CyFz3/RN6X136TAC3lfgI3hqs647kuHY2c4UQP9by4w=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=jp6m4CZ2N1LM6A05acuqqkYB1HsaVsyzotmafLSuqwjwbAGZW/TuNIGcRq0vtYdDg
+	 BxcgZ1pA8XNCeoiNaEDjk91NdptHxiq8wyNKfp+LHEYeCm/FEYk+EwFTOkCAzs+xBH
+	 H90kEhPlyGOUTJqPyzLEjUMAhBZ7CLaNYfnvFCq/8tnZWkgcSBBqnUqx05agsGLIyL
+	 PHarj4ZDOebSBcHFEBXEH+F3NslI7SsGFL0QjbFolCJhPNYKIR+AFKXFz1of8ODQv1
+	 TCpWnNIc+rc1pb6I5tXdT+lP4onUhfXK6BDIwidHCCqs/tUldECZmHlS1CUmHL6IeX
+	 2Ff1pfztg+zYQ==
+From: sashiko-bot@kernel.org
+Subject: Re: [RFC PATCH 1/5] KVM: arm64: pgtables: Change write bit from
+ S2AP_W to DBM
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Leonardo Bras" <leo.bras@arm.com>
+Cc: "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev
+In-Reply-To: <20260901171558.2674031-2-leo.bras@arm.com>
+References: <20260901171558.2674031-1-leo.bras@arm.com>
+ <20260901171558.2674031-2-leo.bras@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 01 Sep 2026 17:30:14 +0000
+Message-Id: <20260901173014.AC1B41F00A3D@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260901-kvm-arm-nested-virt-fix-v3-2-b154676f7e4c@kernel.org>
-References: <20260901-kvm-arm-nested-virt-fix-v3-0-b154676f7e4c@kernel.org>
-In-Reply-To: <20260901-kvm-arm-nested-virt-fix-v3-0-b154676f7e4c@kernel.org>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
- Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Zenghui Yu <yuzenghui@huawei.com>, 
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
- Christoffer Dall <christoffer.dall@arm.com>, 
- Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Wei-Lin Chang <weilin.chang@arm.com>, 
- Yao Yuan <yaoyuan@linux.alibaba.com>, linux-arm-kernel@lists.infradead.org, 
- kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
- "Lorenzo Stoakes (ARM)" <ljs@kernel.org>, stable@vger.kernel.org
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3208; i=ljs@kernel.org;
- h=from:subject:message-id; bh=hIJQVO5FZNvdm0cmp7KFRCyJsyxlcDY2tLzeNko9CCQ=;
- b=owGbwMvMwCV2fu7ZrsZH9SKMp9WSGLKmcxf5Mv/I4XDw3rh/n/efK/dZIqJTN9c/tGDv9rXML
- 3cxX1XWUcrCIMbFICumyPL8i/j+IJGweZ0X/N1g5rAygQxh4OIUgIkcE2P4X9PZksZ/X+c9709b
- aSaLHXf2T3++2tr3fRr3kuf+xSLWzgz/w/+1l19Y++Pz/7g7P5b4Bs2cyyk7m/W6akOIMTdntI8
- fDwA=
-X-Developer-Key: i=ljs@kernel.org; a=openpgp;
- fpr=E7F417BF5214569E89D04F46CF9DCD8A81E27F14
 
-Commit 7270cc9157f4 ("KVM: arm64: nv: Handle VNCR_EL2 invalidation from MMU
-notifiers") introduced VNCR_EL2 invalidation in both kvm_nested_s2_unmap()
-and kvm_nested_s2_wp().
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [High] walk_nested_s2_pgd() incorrectly evaluates the DBM bit in L1's sta=
+ge-2 page tables, leading to L2 memory protection bypass and broken L1 dirt=
+y tracking.
+--
 
-However at the point of this being performed concurrent stage 2 teardown of
-a nested guest can cause kvm->arch.mmu.pgt to be set to NULL.
+commit 6c412868c1a4af97b366b23a517db706c4c3511a
+Author: Leonardo Bras <leo.bras@arm.com>
 
-This happens in kvm_flush_shadow_all() -> kvm_arch_flush_shadow_all() ->
-kvm_free_stage2_pgd() and is performed under the kvm->mmu_lock.
+KVM: arm64: pgtables: Change write bit from S2AP_W to DBM
 
-Commit ec14c272408a ("KVM: arm64: nv: Unmap/flush shadow stage 2 page
-tables") introduced the teardown of the entire nested MMU range, which then
-invokes stage2_apply_range() with resched=true:
+As a first step of changing the encoding for the Stage2 PTE descriptor,
+introduce the DBM bit, and adapt every usage of writable to use the DBM bit
+(51) instead of S2AP[1]/Dirty bit (7).
 
-mmu_notifier_invalidate_range_start()
-  -> ... -> kvm_mmu_notifier_invalidate_range_start()
-    -> kvm_mmu_unmap_gfn_range()
-      -> kvm_unmap_gfn_range()
-        -> kvm_nested_s2_unmap()
-          -> kvm_stage2_unmap_range()
-            -> __unmap_stage2_range()
-                -> stage2_apply_range()
+[ ... ]
 
-This means that stage2_apply_range() can drop the kvm->mmu_lock and thus
-concurrent progress can be made in lockstep with
-kvm_arch_flush_shadow_all().
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 17123f0b6daba..eb8dfffc32c76 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -386,7 +386,9 @@ static int walk_nested_s2_pgd(struct kvm_vcpu *vcpu, =
+phys_addr_t ipa,
+>  	out->output =3D paddr;
+>  	out->block_size =3D 1UL << ((3 - level) * stride + wi->pgshift);
+>  	out->readable =3D desc & KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R;
+> -	out->writable =3D desc & KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
+> +	/* Takes care of both RO/RW and RO/WC/WD encodings */
+> +	out->writable =3D desc & (KVM_PTE_LEAF_ATTR_HI_S2_DBM |
+> +				KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W);
 
-If kvm_arch_flush_shadow_all() advances ahead of stage2_apply_range() and
-completes its operation it guarantees a NULL pointer deref.
+[Severity: High]
+Does this code in walk_nested_s2_pgd() incorrectly evaluate the DBM bit in
+the L1 hypervisor's stage-2 page tables?
 
-Since kvm_free_stage2_pgd() is performed under the kvm->mmu_lock this will
-either be observed NULL or not and serialised against
-kvm_free_stage2_pgd().
+By checking for the DBM bit unconditionally here, L0 treats L1's read-only
+stage-2 PTEs (where bit 51 is 1 and S2AP_W is 0) as writable. This allows an
+L2 guest to write to memory that the L1 hypervisor intended to be read-only,
+bypassing L1's memory protection.
 
-Resolve the issue by abstracting the invalidation to a new function,
-kvm_invalidate_vncr_ipa_all(), and check that the pgt is non-NULL before
-dereferencing it.
+Additionally, this breaks L1's dirty tracking because L0 never updates L1's
+PTE to set the S2AP_W bit on a write.
 
-Fixes: 7270cc9157f4 ("KVM: arm64: nv: Handle VNCR_EL2 invalidation from MMU notifiers")
-Cc: stable@vger.kernel.org
-Reviewed-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
----
- arch/arm64/kvm/nested.c | 15 +++++++++++++--
- 1 file changed, 13 insertions(+), 2 deletions(-)
+Since KVM restricts L1's HAFDBS capability to AF-only (no DBM), bit 51 is
+architecturally RES0 or ignored for L1. An honest L1 hypervisor might safely
+use this ignored bit for software metadata. A malicious L2 guest could then
+exploit this to write to read-only pages (such as shared firmware), breachi=
+ng
+the L1-to-L2 security boundary.
 
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 17123f0b6dab..f69722e1592a 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -1260,6 +1260,17 @@ void kvm_handle_s1e2_tlbi(struct kvm_vcpu *vcpu, u32 inst, u64 val)
- 	invalidate_vncr_va(vcpu->kvm, &scope);
- }
- 
-+static void kvm_invalidate_vncr_ipa_all(struct kvm *kvm)
-+{
-+	struct kvm_pgtable *pgt = kvm->arch.mmu.pgt;
-+
-+	lockdep_assert_held_write(&kvm->mmu_lock);
-+
-+	/* if the mmu lock was dropped, pgt teardown may have raced. */
-+	if (pgt)
-+		kvm_invalidate_vncr_ipa(kvm, 0, BIT(pgt->ia_bits));
-+}
-+
- void kvm_nested_s2_wp(struct kvm *kvm)
- {
- 	int i;
-@@ -1276,7 +1287,7 @@ void kvm_nested_s2_wp(struct kvm *kvm)
- 			kvm_stage2_wp_range(mmu, 0, kvm_phys_size(mmu));
- 	}
- 
--	kvm_invalidate_vncr_ipa(kvm, 0, BIT(kvm->arch.mmu.pgt->ia_bits));
-+	kvm_invalidate_vncr_ipa_all(kvm);
- }
- 
- void kvm_nested_s2_unmap(struct kvm *kvm, bool may_block)
-@@ -1295,7 +1306,7 @@ void kvm_nested_s2_unmap(struct kvm *kvm, bool may_block)
- 			kvm_stage2_unmap_range(mmu, 0, kvm_phys_size(mmu), may_block);
- 	}
- 
--	kvm_invalidate_vncr_ipa(kvm, 0, BIT(kvm->arch.mmu.pgt->ia_bits));
-+	kvm_invalidate_vncr_ipa_all(kvm);
- }
- 
- void kvm_nested_s2_flush(struct kvm *kvm)
-
--- 
-2.55.0
-
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260901171558.2674=
+031-1-leo.bras@arm.com?part=3D1
