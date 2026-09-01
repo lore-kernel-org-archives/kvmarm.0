@@ -1,44 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E935E4734F2
-	for <kvmarm@lists.linux.dev>; Tue,  1 Sep 2026 22:08:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C94339A4A4
+	for <kvmarm@lists.linux.dev>; Tue,  1 Sep 2026 22:09:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788300501; cv=none; b=BoOJrOi+KV3xOJL45ruClv7m0b2IMp4iMeP/G+zipHO0JpAFfjlo4Kp9//fyaxZLuGozZrIirXDhICD0Hn0eaw1sskguJiWgRjBL6SEiGuKOHo4GAeJF/hf92YPsOh4T6BPooHNXzA6QsqrwalF03stRkD8ImO3SzdBEwkTd7TQ=
+	t=1788300555; cv=none; b=eSpo0nETV8ZD2Tw3BOB7cVnSzkehoo5D9m2YpmbAkzZf4OMNk4EjnWiEP3K6G5YyfbqC2m/U7CcROQ6X/L6Th6xV/m5YZvlizMOFLJWxECIWYWxZ4Xl8gKLr2AfwAqnAXZN42N3DQtablVm30mke4s+cu6YNO/Pqn/mRJpzI03Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788300501; c=relaxed/simple;
-	bh=lKe/WadaAFR/hRmbhtKp2V1rrOc2PElWs6goEeyEEE0=;
+	s=arc-20240116; t=1788300555; c=relaxed/simple;
+	bh=0QKzP8NomqWOLJG+JkOrMzFuvv3+v/sdRh+MowI1JLM=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=VdmtdsqTH2yFWThcBbi+O9IBnb4tDBG/wWcoiUPSkinj64ojepC9gnvb7PC+IWf0lHGHJcyMn2rWMTVJOVTGAelgZnWKc+Hqqx8kmOnxwtol8cmwdBD03BEVBc4V4yC1JpdaENu2WnjZbYMFkEJFf1SHhqUMQG4pxzjrR0pIiDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IWoeK/FO; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=uNUyRFEKKpNf9CDSrsqCVoAWPpJ39CjcqnqTE9VWkSkdfDDekcmsfaowtOA/r8VciOLLL0OlbXcujciXnJK2CUMaODMv21JgUZQFGcUu3Yvhj1VlOIzW9bXXifuQe9qH4RrBhVkRJ8DEd+UYOWfLoT8DVs/3KeQWPzjBeTaCRzA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RI3GX2Kj; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IWoeK/FO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F04121F000E9;
-	Tue,  1 Sep 2026 22:08:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RI3GX2Kj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9BC11F000E9;
+	Tue,  1 Sep 2026 22:09:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788300498;
-	bh=CUbui8CD7Wua3pKfpuk3zN+CNHD2lm9nRmOgNo7lF30=;
+	s=k20260515; t=1788300553;
+	bh=6aZ/WFfOg99SDa3sOC0xtwbyslQbYfh0AZcmTqeAxdY=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=IWoeK/FOjf8ZsEhT4VmQOV+WPLzT/Qc0FuJV9RQgGyT9MpBQj+DLWTUDkOimKZfvC
-	 4Kfxq4yUMvbWJnPJ45I7Qx3wy9WTf67Out84q325Ct7ddRr/NBpaFmukVSzr+jgTMB
-	 SiWS+etuiQr+Cvbxzwf4vrIQzNUZ/sP8ykym8m1k5wQ65TBFDdYcm+bArU4EhZ1XWh
-	 NumKJzVfaYn/Rdf3ilMHJ765xb9ujWHpB83BvqD9E/S2eqXmH2UMSE4S2BPbEBPJrO
-	 7GAKb5BHyPYRhDFZF6UU1tfmsYAlWAd4lSDysSScFHdOdW818tLGLGmIIqOjlyYUjt
-	 5WHP29PIV7JSg==
+	b=RI3GX2KjjvWSIHkdW6kf3rKJxvJkrFkG4DzMKdnxcQoi49tmRJKprbmUZV4Bu3JPo
+	 0Ih6vhxK8D8cfzIKYVOlJPK2rHdCmD/vOeClFkIbLmZEAp2dN2v3obw3UNsnPIYZ1D
+	 5FWjVaUvHgg2YP6uYbWfaWMpkDv5hxUYss10Z+WYNAa565/HpEdU1CFMK0xAIxTjRj
+	 YC0SHLYtvHHAPCj2BZXFGb7zIX0UiHp+/meKGOI14E1DdYRBUwdCSgMmV4KA0jJTOQ
+	 s7T0ox7ERG5APmkr22pZXz7yJBu8868M4b8ZtMb47AL64sxLU/W7VnLrUE3LiPParc
+	 wAd3C8sh3gPRg==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v20 13/14] tools: Synchronise the kernel esr.h
+Subject: Re: [PATCH v20 07/14] KVM: arm64: Forward GCS exceptions to nested
+ guests
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Mark Brown" <broonie@kernel.org>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260901-arm64-gcs-v20-13-f31750bdfadb@kernel.org>
+Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev
+In-Reply-To: <20260901-arm64-gcs-v20-7-f31750bdfadb@kernel.org>
 References: <20260901-arm64-gcs-v20-0-f31750bdfadb@kernel.org>
- <20260901-arm64-gcs-v20-13-f31750bdfadb@kernel.org>
+ <20260901-arm64-gcs-v20-7-f31750bdfadb@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 01 Sep 2026 22:08:17 +0000
-Message-Id: <20260901220817.F04121F000E9@smtp.kernel.org>
+Date: Tue, 01 Sep 2026 22:09:13 +0000
+Message-Id: <20260901220913.B9BC11F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,56 +47,60 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [Medium] The tools version of `esr.h` is synchronized incorrectly, introd=
-ucing an invalid value for the level -1 address size fault status code, whi=
-ch causes `esr_fsc_is_addr_sz_fault()` in userspace tools to misclassify ac=
-tual level -1 address size faults.
+- [Medium] Incorrect context check for forwarding GCS exceptions to a neste=
+d hypervisor.
 --
 
-commit 2c5fc93c8578044cae22aadc2c4df4b978889699
+commit 2265e268ea1606e4aa21cb8062727c3b949089d6
 Author: Mark Brown <broonie@kernel.org>
-Subject: tools: Synchronise the kernel esr.h
 
-This commit updates the tools version of esr.h to match the kernel version,
-picking up new definitions for GCS.
+KVM: arm64: Forward GCS exceptions to nested guests
 
-> diff --git a/tools/arch/arm64/include/asm/esr.h b/tools/arch/arm64/includ=
-e/asm/esr.h
-> index f3c6403e5ef2b..24c6ebe3fd416 100644
-> --- a/tools/arch/arm64/include/asm/esr.h
-> +++ b/tools/arch/arm64/include/asm/esr.h
+For nested guests where HFGITR_EL2.nGCSSTR_EL1 is clear or when there are
+L2 GCS data check exceptions we need to forward the exception to the guest.
+Add handling to do so.
+
+> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> index db37678dcb05c..a8198e96fcb41 100644
+> --- a/arch/arm64/kvm/handle_exit.c
+> +++ b/arch/arm64/kvm/handle_exit.c
 
 [ ... ]
 
-> @@ -119,6 +123,16 @@
->  #define ESR_ELx_FSC_SEA_TTW(n)	(0x14 + (n))
->  #define ESR_ELx_FSC_SECC	(0x18)
->  #define ESR_ELx_FSC_SECC_TTW(n)	(0x1c + (n))
-> +#define ESR_ELx_FSC_EXCL_ATOMIC	(0x35)
-> +#define ESR_ELx_FSC_ADDRSZ	(0x00)
-> +
-> +/*
-> + * Annoyingly, the negative levels for Address size faults aren't laid o=
-ut
-> + * contiguously (or in the desired order)
-> + */
-> +#define ESR_ELx_FSC_ADDRSZ_nL(n)	((n) =3D=3D -1 ? 0x25 : 0x2C)
+> +static int kvm_handle_gcs(struct kvm_vcpu *vcpu)
+>  {
+> -	/* We don't expect GCS, so treat it with contempt */
+> -	if (kvm_has_feat(vcpu->kvm, ID_AA64PFR1_EL1, GCS, IMP))
+> -		WARN_ON_ONCE(1);
+> +	if (!kvm_has_gcs(vcpu->kvm)) {
+> +		kvm_inject_undefined(vcpu);
+> +		return 1;
+> +	}
+> =20
+> +	if (vcpu_has_nv(vcpu)) {
+> +		kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
+> +		return 1;
+> +	}
 
 [Severity: Medium]
-Does this synchronization introduce an invalid value for the level -1 addre=
-ss
-size fault status code?
+Is it correct to only check vcpu_has_nv() here without verifying if the vCPU
+is currently executing in a nested context?
 
-The main kernel's esr.h defines the level -1 address size fault as 0x29, but
-this macro evaluates to 0x25 when n =3D=3D -1. If hardware generates a leve=
-l -1
-address size fault, the resulting syndrome value is 0x29. Userspace tools or
-KVM selftests checking the fault with esr_fsc_is_addr_sz_fault() will test
-against 0x25 instead and incorrectly return false.
+If a hardware or hypervisor bug causes a GCS exception to trap to the host
+while running L1's EL2, vcpu_has_nv() will be true, but it shouldn't be
+forwarded to the guest. Instead of falling back to the WARN_ON_ONCE() and
+undefined exception injection at the end of kvm_handle_gcs(), this would
+silently emulate an exception to L1's EL2, potentially corrupting its state.
 
-> +#define ESR_ELx_FSC_ADDRSZ_L(n)		((n) < 0 ? ESR_ELx_FSC_ADDRSZ_nL(n) : \
-> +						   (ESR_ELx_FSC_ADDRSZ + (n)))
+Should this condition also check is_nested_ctxt(vcpu) to ensure we are
+actually running a nested guest before forwarding the exception?
+
+> +
+> +	WARN_ON_ONCE(1);
+>  	kvm_inject_undefined(vcpu);
+>  	return 1;
+>  }
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260901-arm64-gcs-=
-v20-0-f31750bdfadb@kernel.org?part=3D13
+v20-0-f31750bdfadb@kernel.org?part=3D7
