@@ -1,258 +1,216 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 270F738DC66
-	for <kvmarm@lists.linux.dev>; Tue,  1 Sep 2026 08:40:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E173439478C;
+	Tue,  1 Sep 2026 08:46:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788252060; cv=none; b=F2gd+TIWM1tk7pMLv8m3+vYcIyEIREb9/TCUZNiWwTtsTRpqF/Xsu/egDwMPeF0XYDS8thuBaWVbRV/tzGBbfE96eXtskdMtbiwOWgQMoITuwlby/LNDo3k495N2FgxA4GcYGO96aNMvNCPUjwa8w5IhsCT9UR2ZCqXp5wBtF0E=
+	t=1788252381; cv=none; b=CpDBI//BQSnMZh8fkchLijaXa9n4vT4jRzOp2qh837lyjETLEh9QPEJp/Yzrp5AXoWqsKffKHcz/n3TF323IVat+ycN48cGu0yxfxaF+pCNbcObTrdveV7XtGrAcd6cThYAGSbBknHCkCVfLXJDkCgfNQVX6qIfmPrnI/amrTLM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788252060; c=relaxed/simple;
-	bh=g/YicvtwvLRoTHvAudHmKQo2dsia1xbThYOMgqRjf9o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ejKoec3kLwMkCBOf7kCs0b08Zkj439CegGN0zhoLhhg2WvAH0F1y/oGlEAHA+sDdGLtCmwWt2gTfvZubq3GR9VQzvW5mXPbEMa1SVYbKmJY7UKxRPtOG7CqdCMWc9c1EznFdWwabuqWRUGe5USnI5MDaCPA6y5CfPRgpz+pKq2M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ggz/p6Pe; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1788252381; c=relaxed/simple;
+	bh=nOYr2/5KGhcoHzBT8RYwc4mrQKvfZhsOsi6k5J/+YeQ=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=T4JMR2SRwCtXIYw7FjJK31Nn1bJXDbT7MkAw4MeO2YYRheS5pLcBTCpw/EL4+cg55uGlFPy/sey+eEbgYMYKaBqwLvaOwfA6zIs/vHxwW2OeybpQ2SEPRQF4jFdIgnF8urjmw8uzL0S+agT1AtKF+LAY43rfTX19HG9Tm6csXww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kghze7x3; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ggz/p6Pe"
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6817VVKP2892253;
-	Tue, 1 Sep 2026 08:40:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=xxhcAqB8QEZ84GojTYdwOMRzkKgA+w
-	1XZ/nRxWLm/OE=; b=ggz/p6PeqfDDYriTMw42LJo7m/yt0CLpS4lNTFBYlIjG10
-	SV7h0CBlhsG7REXslows6EKVjWkSUSw9/LOCGLt9UODV2PuQRPntFMbmTvLf13St
-	hHRZkjBukmKtlRPMj9K+f8OmuN6KU2YdxOl0Ngo1snLhsKsdaLv9f5XWW8x9wThz
-	yxKzrr0bzgIaTHObEFD2J82td5Mq/J85+OtEZy4sZTyl7B0BawHoyAC3wURaGoJK
-	6nIxbY+o/DSCXv0xC0uG5RDHaHuMk+F5wpkcIRHQNTXb7Ig3I/tySS2rYNE68cIc
-	EpsHqxiRtgFZNcXxn0BUYptH5t7a0ZXh1S5olybg==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gbq3r6mwy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 01 Sep 2026 08:40:44 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 6818QMdF020562;
-	Tue, 1 Sep 2026 08:40:43 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4gca4w2s2j-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 01 Sep 2026 08:40:42 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6818echH39518516
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 1 Sep 2026 08:40:38 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8F93A2004B;
-	Tue,  1 Sep 2026 08:40:38 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2F4A920040;
-	Tue,  1 Sep 2026 08:40:38 +0000 (GMT)
-Received: from osiris (unknown [9.224.76.185])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Tue,  1 Sep 2026 08:40:38 +0000 (GMT)
-Date: Tue, 1 Sep 2026 10:40:37 +0200
-From: Steffen Eiden <seiden@linux.ibm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, Alexander Gordeev <agordeev@linux.ibm.com>,
-        Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@kernel.org>,
-        Friedrich Welter <fritz@linux.ibm.com>, Fuad Tabba <tabba@google.com>,
-        Gautam Gala <ggala@linux.ibm.com>,
-        Hariharan Mari <hari55@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Hendrik Brueckner <brueckner@linux.ibm.com>,
-        Ilya Leoshkevich <iii@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
-        Nico Boehr <nrb@linux.ibm.com>,
-        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
-        Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v7 11/23] KVM: arm64: Share arm64 code with s390
-Message-ID: <20260901084037.185345-C-seiden@linux.ibm.com>
-References: <20260831144802.834315-1-seiden@linux.ibm.com>
- <20260831144802.834315-12-seiden@linux.ibm.com>
- <87se3tmlrv.wl-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kghze7x3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3216B1F000E9;
+	Tue,  1 Sep 2026 08:46:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788252379;
+	bh=sSZ+W+gpyvva9DOkNjE72UDAxg//MujBrcnUpMW/QcY=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date;
+	b=kghze7x3MwDDqCvHjx3ZgTrJRLG41aro+Xm0FE6b6M6N87BFrqfJiFQjdaNbyLjei
+	 /a0OGIdZv30zvjAUQNX00VUKHQKXCR2agw7Z3sq1Iz3YSvNGyKEtzmzcCh7n4KUmXG
+	 uz1hIO1S1ln18PVcx9PsArwCn61NTGEDT+6ibg3Jp48OI2ZzhY5p17nMoy8ky5yUg0
+	 KyGbFbwiDzGSs0LfbmSaPYcAZYNf4/wtrGpomumjEMkz6mpyTmY7z84nicptr3WT/8
+	 RxgbatJmc0fP+5PEruglqmQNsVmlcvcYnePVLmcPF5rhWlw9iSwFakTC14vEGovfKN
+	 zUZN80YOsQ3XA==
+X-Mailer: emacs 31.1 (via feedmail 11-beta-1 I)
+From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
+To: Nicolin Chen <nicolinc@nvidia.com>
+Cc: linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Alexey Kardashevskiy <aik@amd.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Joerg Roedel <joro@8bytes.org>,
+	Jonathan Cameron <jic23@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Pranjal Shrivastava <praan@google.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Samuel Ortiz <sameo@rivosinc.com>,
+	Steven Price <steven.price@arm.com>,
+	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Xu Yilun <yilun.xu@linux.intel.com>
+Subject: Re: [RFC PATCH v4 01/16] iommu/arm-smmu-v3: Discover RME support
+ and realm IRQ topology
+In-Reply-To: <apMjUSbxcnlAKjks@nvidia.com>
+References: <20260427085344.941627-1-aneesh.kumar@kernel.org>
+ <20260427085344.941627-2-aneesh.kumar@kernel.org>
+ <apMjUSbxcnlAKjks@nvidia.com>
+Date: Tue, 01 Sep 2026 14:16:10 +0530
+Message-ID: <yq5aik4pnyul.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87se3tmlrv.wl-maz@kernel.org>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Authority-Analysis: v=2.4 cv=EIc2FVZC c=1 sm=1 tr=0 ts=6a968f8c cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=kj9zAlcOel0A:10 a=VdqzKS8jKosA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=uAbxVGIbfxUO_5tXvNgY:22 a=VnNF1IyMAAAA:8
- a=o0YXK4FomTIqG83GwfgA:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTAxMDA3NSBTYWx0ZWRfX3bKHd2onVRQi
- M1H/ksAUgtv8GUnhaCvKhEAE1bQlLbtyox34SXSGO9hkxC6nXHVvEU7/XhpF7f9hC3a8FxITGnm
- Rnm8kFH19g2K8SfKTF+QVUudbmFOuIWjnDC8aSjstj8KyWREgwyqdu3u8U/jhXP/ATneT6gNXgf
- 9f8K9AdXXyAp/68A46zDq7DeVf92+uYuC7Eu6txfWiB895BXHx1MXyQGIaIV0jtyOUZ9zQg9FAy
- gBMSQA29oPrMz4QBxXBBl+XeJyEjlt5eCxt4H4aJzuPhepWCvo9jeInWbBT8srTGUvOu64SEbAq
- 0pGCUORdGVPKlHkOlRDT5qgfTZuHMFf9AyPsjKadtfjhBJcPwWP02lJA45wZJba4k93/IOpkZjv
- oxfLahHfF/0uOaX/pvMd6YeDI6F5ZhC6dKbOBh/zyKHkufGA1Gug3k2zkTVQR6Y73IF0BmFkm+I
- hlaMP0OC2KpawS1dZYg==
-X-Proofpoint-GUID: 7wKUDKpRsoBqOygV8xzSu0WG5_odBX3U
-X-Proofpoint-ORIG-GUID: GYY_qmqbellrpmBXqM2ldcTkZ8eYLr0D
-X-Proofpoint-Spam-Info: AW1haW4tMjYwOTAxMDA3NSBTYWx0ZWRfX8lILL3zXjoYz
- sqUCvOK85NCWZfjNpuA7uLa0uoHm5h7675EBfui2MeNOeNh1Rv4PzpzJRHm0WngGooMQA3GJChR
- OBMNRlosW5WWUFCYy8uSQ+jr2AOz/hU=
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-09-01_02,2026-08-31_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 impostorscore=0 suspectscore=0 priorityscore=1501 clxscore=1015
- phishscore=0 spamscore=0 adultscore=0 lowpriorityscore=0 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2609010075
+Content-Type: text/plain
 
-On Tue, Sep 01, 2026 at 09:13:56AM +0100, Marc Zyngier wrote:
-> On Mon, 31 Aug 2026 15:47:48 +0100,
-> Steffen Eiden <seiden@linux.ibm.com> wrote:
-> > 
-> > Mark functions that s390 can use to implement arm on s390 as shared
-> > functions.
-> > 
-> > No functional change.
-> > 
-> > Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
-> > ---
-> >  arch/arm64/kvm/arm.c         | 3 +++
-> >  arch/arm64/kvm/guest.c       | 6 ++++++
-> >  arch/arm64/kvm/handle_exit.c | 6 ++++++
-> >  arch/arm64/kvm/mmio.c        | 2 ++
-> >  4 files changed, 17 insertions(+)
-> > 
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index 8b080804bc90..6b92a3c1d490 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -1603,6 +1603,7 @@ static unsigned long system_supported_vcpu_features(void)
-> >  	return features;
-> >  }
-> >  
-> > +#ifdef ARM64_S390_COMMON
-> >  static int kvm_vcpu_init_check_features(struct kvm_vcpu *vcpu,
-> >  					const struct kvm_vcpu_init *init)
-> >  {
-> > @@ -1656,6 +1657,8 @@ static bool kvm_vcpu_init_changed(struct kvm_vcpu *vcpu,
-> >  			     KVM_VCPU_MAX_FEATURES);
-> >  }
-> >  
-> > +#endif /* ARM64_S390_COMMON */
-> > +
-> >  static int kvm_setup_vcpu(struct kvm_vcpu *vcpu)
-> >  {
-> >  	struct kvm *kvm = vcpu->kvm;
-> > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> > index 773f6c8e5026..6ca5a9f357cd 100644
-> > --- a/arch/arm64/kvm/guest.c
-> > +++ b/arch/arm64/kvm/guest.c
-> > @@ -62,6 +62,7 @@ const struct kvm_stats_header kvm_vcpu_stats_header = {
-> >  		       sizeof(kvm_vcpu_stats_desc),
-> >  };
-> >  
-> > +#ifdef ARM64_S390_COMMON
-> >  static bool core_reg_offset_is_vreg(u64 off)
-> >  {
-> >  	return off >= KVM_REG_ARM_CORE_REG(fp_regs.vregs) &&
-> > @@ -306,6 +307,8 @@ static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> >  	return err;
-> >  }
-> >  
-> > +#endif /* ARM64_S390_COMMON */
-> > +
-> >  #define vq_word(vq) (((vq) - SVE_VQ_MIN) / 64)
-> >  #define vq_mask(vq) ((u64)1 << ((vq) - SVE_VQ_MIN) % 64)
-> >  #define vq_present(vqs, vq) (!!((vqs)[vq_word(vq)] & vq_mask(vq)))
-> > @@ -543,6 +546,7 @@ int kvm_arch_vcpu_ioctl_set_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs)
-> >  	return -EINVAL;
-> >  }
-> >  
-> > +#ifdef ARM64_S390_COMMON
-> >  static int copy_core_reg_indices(const struct kvm_vcpu *vcpu,
-> >  				 u64 __user *uindices)
-> >  {
-> > @@ -591,6 +595,8 @@ static unsigned long num_core_regs(const struct kvm_vcpu *vcpu)
-> >  	return copy_core_reg_indices(vcpu, NULL);
-> >  }
-> >  
-> > +#endif /* ARM64_S390_COMMON */
-> > +
-> >  static unsigned long num_sve_regs(const struct kvm_vcpu *vcpu)
-> >  {
-> >  	const unsigned int slices = vcpu_sve_slices(vcpu);
-> > diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-> > index db37678dcb05..6e59a7b12d40 100644
-> > --- a/arch/arm64/kvm/handle_exit.c
-> > +++ b/arch/arm64/kvm/handle_exit.c
-> > @@ -213,6 +213,7 @@ static int kvm_handle_guest_debug(struct kvm_vcpu *vcpu)
-> >  	return 0;
-> >  }
-> >  
-> > +#ifdef ARM64_S390_COMMON
-> >  static int kvm_handle_unknown_ec(struct kvm_vcpu *vcpu)
-> >  {
-> >  	u64 esr = kvm_vcpu_get_esr(vcpu);
-> > @@ -224,6 +225,8 @@ static int kvm_handle_unknown_ec(struct kvm_vcpu *vcpu)
-> >  	return 1;
-> >  }
-> >  
-> > +#endif /* ARM64_S390_COMMON */
-> > +
-> >  /*
-> >   * Guest access to SVE registers should be routed to this handler only
-> >   * when the system doesn't support SVE.
-> > @@ -404,6 +407,7 @@ static exit_handle_fn arm_exit_handlers[] = {
-> >  	[ESR_ELx_EC_GCS]	= kvm_handle_gcs,
-> >  };
-> >  
-> > +#ifdef ARM64_S390_COMMON
-> >  static exit_handle_fn kvm_get_exit_handler(struct kvm_vcpu *vcpu)
-> >  {
-> >  	u64 esr = kvm_vcpu_get_esr(vcpu);
-> > @@ -439,6 +443,8 @@ static int handle_trap_exceptions(struct kvm_vcpu *vcpu)
-> >  	return handled;
-> >  }
-> >  
-> > +#endif /* ARM64_S390_COMMON */
-> 
-> Why the exit handler, and not the EC handlers aside from the UNKNOWN
-> one? Yes, you probably aren't there yet in this series, but I can tell
-> you are going to add more and more of these.
-> 
-> But the EC array is absolutely architectural, and there is no good
-> reason to maintain your own.
-> 
-> So instead of this, why not keep the EC array altogether, and
-> implement stubs for the ECs you don't support?
-> 
-> 	M.
-> 
+Nicolin Chen <nicolinc@nvidia.com> writes:
 
-There was no specific reasson to define our own EC array as far as I
-remember. I will try reusing the array and find out if there are any
-issues with that. But I do not expect any. 
+> On Mon, Apr 27, 2026 at 02:23:29PM +0530, Aneesh Kumar K.V (Arm) wrote:
+>> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-realm.c
+>> @@ -0,0 +1,124 @@
+>> +// SPDX-License-Identifier: GPL-2.0-only
+>> +/*
+>> + * Copyright (C) 2026 ARM Ltd.
+>> + */
+>> +
+>> +#include <linux/interrupt.h>
+>> +#include <asm/rmi_smc.h>
+>> +#include <asm/rmi_cmds.h>
+>> +
+>> +#include "arm-smmu-v3.h"
+>> +
+>> +#define	RMI_PSMMU_IRQ_GERROR	BIT(0)
+>> +#define	RMI_PSMMU_IRQ_EVENTQ	BIT(1)
+>> +#define	RMI_PSMMU_IRQ_PRIQ	BIT(2)
+>> +#define	RMI_PSMMU_IRQ_CMDQ	BIT(3)
+> [...]
+>> +	if (irq == smmu->realm_evtq_irq)
+>> +		notify_flags =  RMI_PSMMU_IRQ_EVENTQ;
+>> +	else if (irq == smmu->realm_gerr_irq)
+>> +		notify_flags =  RMI_PSMMU_IRQ_GERROR;
+>> +	else if (irq == smmu->realm_pri_irq)
+>> +		notify_flags =  RMI_PSMMU_IRQ_PRIQ;
+>
+> These are defined as BIT(x)...
+>
+>> +		if (rmi_psmmu_irq_notify(smmu->base_phys,
+>> +					 notify_flags, &event)) {
+> [...]
+>> +			rmi_psmmu_event_consume(smmu->base_phys, notify_flags);
+>
+> .. and passed to RMI_PSMMU_IRQ_NOTIFY and RMI_PSMMU_EVENT_CONSUME.
+>
+> RMI_PSMMU_IRQ_NOTIFY takes RmiPsmmuIrqSet type, which is a 4-bit
+> field that has a range of [BIT(0), BIT(3)]. So this is correct.
+>
+> However, RMI_PSMMU_EVENT_CONSUME takes RmiPsmmuIrq type, which is
+> a 2-bit field that has a range of [0x0, 0x3]. So this seems wrong.
+>
 
-I assume the stubs probably just forward to handle_unknown_ec, or do you
-have a different suggestion?
+Updated that to
+
+#define	RMI_PSMMU_IRQ_PEND_GERROR	BIT(0)
+#define	RMI_PSMMU_IRQ_PEND_EVENTQ	BIT(1)
+#define	RMI_PSMMU_IRQ_PEND_PRIQ		BIT(2)
+#define	RMI_PSMMU_IRQ_PEND_CMDQ		BIT(3)
 
 
-	Steffen
+#define	RMI_PSMMU_IRQ_GERROR	0
+#define	RMI_PSMMU_IRQ_EVENTQ	1
+#define	RMI_PSMMU_IRQ_PRIQ	2
+#define	RMI_PSMMU_IRQ_CMDQ	3
 
+
+and 
+	if (irq == smmu->realm.evtq_irq) {
+		notify_flags =  RMI_PSMMU_IRQ_PEND_EVENTQ;
+		psmmu_irq = RMI_PSMMU_IRQ_EVENTQ;
+	} else if (irq == smmu->realm.gerr_irq) {
+
+...
+	rmi_psmmu_event_consume(smmu->base_phys, psmmu_irq);
+
+>
+>> +void arm_smmu_setup_realm_irqs(struct arm_smmu_device *smmu)
+>> +{
+>> +	int irq, ret;
+>> +
+>> +	irq = smmu->realm_evtq_irq;
+>> +	if (irq) {
+>> +		ret = devm_request_threaded_irq(smmu->dev, irq, NULL,
+>> +						arm_smmu_realm_notify_thread,
+>> +						IRQF_ONESHOT,
+>> +						"arm-smmu-v3-realm-evtq",
+>> +						smmu);
+>
+> These IRQ numbers are raw numbers forwarded by firmware and then
+> returned by RMI_PSMMU_INFO:
+>
+> +		if ((psmmu_info->flags & RMI_PSMMU_IRQCFG_MASK) ==
+> +		    RMI_PSMMU_IRQCFG_IRQ_WIRED) {
+> +			smmu->realm_gerr_irq = psmmu_info->gerror_intr_num;
+> +			smmu->realm_evtq_irq = psmmu_info->eventq_intr_num;
+> +			smmu->realm_pri_irq = psmmu_info->priq_intr_num;
+>
+> Should they be converted to Linux IRQ numbers before forwarded to
+> devm_request_threaded_irq?
+>
+
+Yes, that needs conversion. I guess we can use the irq_domain associated
+with the non-Realm IRQ number to create the mappings?
+
+Something like:
+
+
++static struct irq_domain *arm_smmu_get_wired_irq_domain(struct arm_smmu_device *smmu)
++{
++	int irqs[] = {
++		smmu->combined_irq,
++		smmu->evtq.q.irq,
++		smmu->gerr_irq,
++		smmu->priq.q.irq,
++	};
++	struct irq_domain *domain = NULL;
++	struct irq_data *irq_data;
++	unsigned int i;
++
++	for (i = 0; i < ARRAY_SIZE(irqs); i++) {
++		if (irqs[i] <= 0)
++			continue;
++
++		irq_data = irq_get_irq_data(irqs[i]);
++		if (!irq_data || !irq_data->domain)
++			return ERR_PTR(-EINVAL);
++
++		if (domain && domain != irq_data->domain)
++			return ERR_PTR(-EINVAL);
++
++		domain = irq_data->domain;
++	}
++
++	return domain ?: ERR_PTR(-ENXIO);
++}
+
+>
+>> @@ -782,6 +787,9 @@ struct arm_smmu_device {
+>>  
+>>  	int				gerr_irq;
+>>  	int				combined_irq;
+>> +	int				realm_gerr_irq;
+>> +	int				realm_evtq_irq;
+>> +	int				realm_pri_irq;
+>
+> Nit: this series adds a few realm-specific things in the top SMMU
+> structure. Maybe a "struct arm_realm_psmmu" can make them clearer.
+>
+
+Added
+
+struct arm_smmu_realm {
+	int				gerr_irq;
+	int				evtq_irq;
+	int				pri_irq;
+	struct mutex			mutex;
+	refcount_t			users;
+};
+
+-aneesh
