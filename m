@@ -1,281 +1,120 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 151BC381E82;
-	Tue,  1 Sep 2026 08:15:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D529D47277C
+	for <kvmarm@lists.linux.dev>; Tue,  1 Sep 2026 08:23:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788250511; cv=none; b=S/IeWH3hYRXHJ5LEjPAkv2cpzO9hkP1wZZF0Bb44vwazaPAZUvbGtG0xtAjMiD/dg7h0q5swpeEER1x/f2ghU7WzQ93kdP552+xZvHtumQaiE/TaWHcsp7HmbOiZKCtO2S/XzeoERnp0zk0CKgD3AJcwPihEfnw1oSeViOoSeKg=
+	t=1788251015; cv=none; b=WJLctQhZeQH5URCW7Af5anue0LtfKWW2kqlaurwv6YxXTHkelGphvm6GEO9BaGBH6q7YmCjSU0OJzAy29W0X02bEgC+WzTteEzKREi85kiGTSSNagmn2IGzpfWq4ielluq4+a0gedSho0SZd7yC5+Wr7fkCTPMB8uVVGQVvPa2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788250511; c=relaxed/simple;
-	bh=STBvtDN7yMgntfEDSmdAGiB1Lo86GJRJ68hoouetrkE=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bxIEcKDCPGQM6JweS/V8tDRu0rVHbsBnCC4i6HbPt0fTYiNe9To6U5/1Mu8sFbTVFW0epqWnojtPcDWbWydhL1C5k8HqSWnS25fWLRJYuwnCuh4zllf2GA5y0+YVO83FmT+2B2KP3RazE5XaOb6YETA6Up6ECFp0xsufvqva/cQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f+04YShf; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788251015; c=relaxed/simple;
+	bh=4eDTQFLAllYxwctxoYUjbgJ4B7eM0Ax1wh6lcTfsfgY=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=U3J6P9UIIbgSAzEYZj6/pmwWfnd28X6V5QecwXKPfj7W24McU3CIbWAGYRX9v1u6PG0yNAIoIsnMjzx2ewv5l7KE9h9UrslMF2VkA+Sg+bKmvtlDxqv6jQTD76qV4IDt6KbgQcWT4bgzr7XCjhl10WO9/HztTVjiQcN42pN/ekg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yjei86Cc; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f+04YShf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B8591F00A3D;
-	Tue,  1 Sep 2026 08:15:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yjei86Cc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CC681F000E9;
+	Tue,  1 Sep 2026 08:23:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788250509;
-	bh=5bF2Zr22zF1ExN0EBKh2uA/sdQi5I3Kk26013OME4S8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=f+04YShfVti8/cuhke4D7kJFqxFJsy/0WRmPZoRm44J/TpyaVrsuMUilYuEv57qF7
-	 BxRAuZFlcvpDPWvntn24KOWxVebGYNMdSnDwR1mkGXmS9wNdP9O+EdoBAdCI31jrDj
-	 +9xLtopMsYpAgaj5iVi2ZxnpUShZGJM9qRmAcipKVozKCN9W2nyaKbwVWjPeWj/1c1
-	 bPlME1pRoOkF63nMYGjx+W16Cvduj0k5orLtVRXRVQXaTiqDMxsyPdZvrsk07BSz5/
-	 GPYhd2lRaYFEnfbM3yHn3HiGYVu/rgEcfzYtg3XB6EgNc5cHxfqGnVaLylF3antfL+
-	 e/4CrboZha/Fg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1x1Je7-00000003CMj-1bxe;
-	Tue, 01 Sep 2026 08:15:07 +0000
-Date: Tue, 01 Sep 2026 09:17:39 +0100
-Message-ID: <87pkyxmllo.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Steffen Eiden <seiden@linux.ibm.com>
-Cc: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Andreas Grapentin <gra@linux.ibm.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	David Hildenbrand <david@kernel.org>,
-	Friedrich Welter <fritz@linux.ibm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Gautam Gala <ggala@linux.ibm.com>,
-	Hariharan Mari <hari55@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Hendrik Brueckner <brueckner@linux.ibm.com>,
-	Ilya Leoshkevich <iii@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Nico Boehr <nrb@linux.ibm.com>,
-	Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
-	Oliver Upton <oupton@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Will Deacon <will@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v2 06/20] KVM: arm64: Prepare sys_regs.c for sharing with s390
-In-Reply-To: <20260831145536.913567-7-seiden@linux.ibm.com>
-References: <20260831145536.913567-1-seiden@linux.ibm.com>
-	<20260831145536.913567-7-seiden@linux.ibm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20260515; t=1788251013;
+	bh=w3cykyALRJo7i3RyU1j/wxukO4UDLOz4kciObDB1wK4=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=Yjei86CczdhwptTCpnHljUbEIqhIeWh0kV2SoCGwu71Hu8H5egw2l2m7TCVa/0/sL
+	 Wo+U8ImZ3q4ngKDGZYNU6nsslcP6yrY/Q2pyKvdm2/C7h1gNls8SjNRaNo2S8xwUWt
+	 0xLcwDCqKpQpSlFHk6rdJH9YU3CuG8wMPhd2W/TBCeYtLUbsytn5UQ4bbWMSKzSusb
+	 90ntjF9D6kQgzVsu7fLNvTCu2PSyf1M0s2Ra0eeMxnM5dNAR2h7KTseYLrcMJTpDwE
+	 ECf2kgH8H1mnTuquRp12NiOM/Cc4RcUx8bPv1QeCcngIdLrLGv+AIMRs/s06Eg5zKH
+	 O5amDg4SdfIyw==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v5 11/18] KVM: arm64: Filter out non-kernel addresses in
+ kern_hyp_va
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Vincent Donnefort" <vdonnefort@google.com>
+Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20260901080941.997769-12-vdonnefort@google.com>
+References: <20260901080941.997769-1-vdonnefort@google.com>
+ <20260901080941.997769-12-vdonnefort@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 01 Sep 2026 08:23:32 +0000
+Message-Id: <20260901082333.3CC681F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: seiden@linux.ibm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, agordeev@linux.ibm.com, gra@linux.ibm.com, arnd@arndb.de, catalin.marinas@arm.com, borntraeger@linux.ibm.com, imbrenda@linux.ibm.com, david@kernel.org, fritz@linux.ibm.com, tabba@google.com, ggala@linux.ibm.com, hari55@linux.ibm.com, hca@linux.ibm.com, brueckner@linux.ibm.com, iii@linux.ibm.com, frankja@linux.ibm.com, joey.gouly@arm.com, nrb@linux.ibm.com, oss@nina.schoetterlglausch.eu, oupton@kernel.org, pbonzini@redhat.com, suzuki.poulose@arm.com, svens@linux.ibm.com, Ulrich.Weigand@de.ibm.com, gor@linux.ibm.com, will@kernel.org, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 31 Aug 2026 15:55:21 +0100,
-Steffen Eiden <seiden@linux.ibm.com> wrote:
-> 
-> Prepare sharing of sys_regs.c with s390 by moving functions to another
-> location inside sys_regs.c. This reduces the number of shared regions.
-> 
-> Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
-> ---
->  arch/arm64/kvm/sys_regs.c | 100 +++++++++++++++++++-------------------
->  arch/s390/kvm/arm64/arm.c |   2 +
->  2 files changed, 52 insertions(+), 50 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 7d0047b542f4..53d096803d9d 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -2043,13 +2043,6 @@ static inline bool is_vcpu_ftr_id_reg(u32 id)
->  	return is_feature_id_reg(id) && !is_vm_ftr_id_reg(id);
->  }
->  
-> -static inline bool is_aa32_id_reg(u32 id)
-> -{
-> -	return (sys_reg_Op0(id) == 3 && sys_reg_Op1(id) == 0 &&
-> -		sys_reg_CRn(id) == 0 && sys_reg_CRm(id) >= 1 &&
-> -		sys_reg_CRm(id) <= 3);
-> -}
-> -
->  static unsigned int id_visibility(const struct kvm_vcpu *vcpu,
->  				  const struct sys_reg_desc *r)
->  {
-> @@ -2065,20 +2058,6 @@ static unsigned int id_visibility(const struct kvm_vcpu *vcpu,
->  	return 0;
->  }
->  
-> -static unsigned int aa32_id_visibility(const struct kvm_vcpu *vcpu,
-> -				       const struct sys_reg_desc *r)
-> -{
-> -	/*
-> -	 * AArch32 ID registers are UNKNOWN if AArch32 isn't implemented at any
-> -	 * EL. Promote to RAZ/WI in order to guarantee consistency between
-> -	 * systems.
-> -	 */
-> -	if (!kvm_supports_32bit_el0())
-> -		return REG_RAZ | REG_USER_WI;
-> -
-> -	return id_visibility(vcpu, r);
-> -}
-> -
->  static unsigned int raz_visibility(const struct kvm_vcpu *vcpu,
->  				   const struct sys_reg_desc *r)
->  {
-> @@ -2099,6 +2078,27 @@ static bool access_id_reg(struct kvm_vcpu *vcpu,
->  	return true;
->  }
->  
-> +static unsigned int aa32_id_visibility(const struct kvm_vcpu *vcpu,
-> +				       const struct sys_reg_desc *r)
-> +{
-> +	/*
-> +	 * AArch32 ID registers are UNKNOWN if AArch32 isn't implemented at any
-> +	 * EL. Promote to RAZ/WI in order to guarantee consistency between
-> +	 * systems.
-> +	 */
-> +	if (!kvm_supports_32bit_el0())
-> +		return REG_RAZ | REG_USER_WI;
-> +
-> +	return id_visibility(vcpu, r);
-> +}
-> +
-> +static inline bool is_aa32_id_reg(u32 id)
-> +{
-> +	return (sys_reg_Op0(id) == 3 && sys_reg_Op1(id) == 0 &&
-> +		sys_reg_CRn(id) == 0 && sys_reg_CRm(id) >= 1 &&
-> +		sys_reg_CRm(id) <= 3);
-> +}
-> +
->  /* Visibility overrides for SVE-specific control registers */
->  static unsigned int sve_visibility(const struct kvm_vcpu *vcpu,
->  				   const struct sys_reg_desc *rd)
-> @@ -2553,29 +2553,6 @@ void kvm_set_vm_id_reg(struct kvm *kvm, u32 reg, u64 val)
->  	*p = val;
->  }
->  
-> -static int get_raz_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
-> -		       u64 *val)
-> -{
-> -	*val = 0;
-> -	return 0;
-> -}
-> -
-> -static int set_wi_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
-> -		      u64 val)
-> -{
-> -	return 0;
-> -}
-> -
-> -static bool access_ctr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> -		       const struct sys_reg_desc *r)
-> -{
-> -	if (p->is_write)
-> -		return write_to_read_only(vcpu, p, r);
-> -
-> -	p->regval = kvm_read_vm_id_reg(vcpu->kvm, SYS_CTR_EL0);
-> -	return true;
-> -}
-> -
->  static bool access_clidr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
->  			 const struct sys_reg_desc *r)
->  {
-> @@ -2684,6 +2661,29 @@ static bool access_ccsidr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
->  	return true;
->  }
->  
-> +static int get_raz_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
-> +		       u64 *val)
-> +{
-> +	*val = 0;
-> +	return 0;
-> +}
-> +
-> +static int set_wi_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
-> +		      u64 val)
-> +{
-> +	return 0;
-> +}
-> +
-> +static bool access_ctr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> +		       const struct sys_reg_desc *r)
-> +{
-> +	if (p->is_write)
-> +		return write_to_read_only(vcpu, p, r);
-> +
-> +	p->regval = kvm_read_vm_id_reg(vcpu->kvm, SYS_CTR_EL0);
-> +	return true;
-> +}
-> +
->  static unsigned int mte_visibility(const struct kvm_vcpu *vcpu,
->  				   const struct sys_reg_desc *rd)
->  {
-> @@ -4855,12 +4855,6 @@ static bool check_sysreg_table(const struct sys_reg_desc *table, unsigned int n,
->  	return true;
->  }
->  
-> -int kvm_handle_cp14_load_store(struct kvm_vcpu *vcpu)
-> -{
-> -	kvm_inject_undefined(vcpu);
-> -	return 1;
-> -}
-> -
->  static void perform_access(struct kvm_vcpu *vcpu,
->  			   struct sys_reg_params *params,
->  			   const struct sys_reg_desc *r)
-> @@ -4944,6 +4938,12 @@ static void unhandled_cp_access(struct kvm_vcpu *vcpu,
->  	kvm_inject_undefined(vcpu);
->  }
->  
-> +int kvm_handle_cp14_load_store(struct kvm_vcpu *vcpu)
-> +{
-> +	kvm_inject_undefined(vcpu);
-> +	return 1;
-> +}
-> +
->  /**
->   * kvm_handle_cp_64 -- handles a mrrc/mcrr trap on a guest CP14/CP15 access
->   * @vcpu: The VCPU pointer
-> diff --git a/arch/s390/kvm/arm64/arm.c b/arch/s390/kvm/arm64/arm.c
-> index 3caa72f780a5..2740ee3b703e 100644
-> --- a/arch/s390/kvm/arm64/arm.c
-> +++ b/arch/s390/kvm/arm64/arm.c
-> @@ -9,6 +9,7 @@
->  #include <linux/kvm_host.h>
->  #include <linux/cleanup.h>
->  #include <linux/fpu.h>
-> +#include <linux/bitfield.h>
->  
->  #include <asm/access-regs.h>
->  
-> @@ -25,6 +26,7 @@
->  #include "trace.h"
->  
->  static unsigned long system_supported_vcpu_features(void);
-> +#define read_sanitised_ftr_reg(_id) 0
->  
->  #define __INCL_GEN_ARM_FILE
->  #include "generated/arm.inc"
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [Critical] The patch modifies `__kern_hyp_va()` to return non-TTBR1 point=
+ers unmodified, allowing a malicious host to trick the hypervisor into dere=
+ferencing EL2 private memory instead of host memory, completely bypassing p=
+KVM isolation.
+--
 
-Please split this. arm64 refactor and S390 changes should not be part
-of the same patch.
+commit 1e2548767418379244f938decad822feafe32b7b
+Author: Vincent Donnefort <vdonnefort@google.com>
 
-	M.
+KVM: arm64: Filter out non-kernel addresses in kern_hyp_va
 
--- 
-Jazz isn't dead. It just smells funny.
+This patch updates __kern_hyp_va() to filter out non-kernel addresses based
+on PAGE_OFFSET. When protected mode is enabled, it returns the input address
+unmodified if it is not a TTBR1 address, aiming to handle addresses from the
+hypervisor private range.
+
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kv=
+m_mmu.h
+> index 6eae7e7e2a684..d89864c4b961b 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -126,6 +126,9 @@ static __always_inline unsigned long __kern_hyp_va(un=
+signed long v)
+>   * replace the instructions with `nop`s.
+>   */
+>  #ifndef __KVM_VHE_HYPERVISOR__
+> +	if (is_protected_kvm_enabled() && !is_ttbr1_addr(v))
+> +		return v;
+> +
+
+[Severity: Critical]
+Does this bypass the mandatory translation for non-TTBR1 addresses, breaking
+the guarantee that kern_hyp_va() always restricts the output to the EL2 lin=
+ear
+map?
+
+Since the pKVM threat model treats the host kernel as an adversary against
+hypervisor integrity and guest confidentiality, returning the address
+unmodified could allow a malicious host to trick the hypervisor into
+dereferencing EL2 private memory instead of host memory.
+
+For instance, if a malicious host passes an EL2 private virtual address
+(which is below PAGE_OFFSET) to a hypercall, is_ttbr1_addr() would evaluate
+to false. The address would be returned unmodified, leading to potential
+reads or writes in EL2 private memory.
+
+Could this lead to exploitation in paths such as:
+
+arch/arm64/kvm/hyp/nvhe/hyp-main.c:handle___kvm_tlb_flush_vmid_ipa() {
+    ...
+    __kvm_tlb_flush_vmid_ipa(kern_hyp_va(mmu), ipa, level);
+    ...
+}
+
+In this case, EL2 could read out of bounds from its own private memory.
+
+Similarly, during a hypercall like __KVM_HOST_SMCCC_FUNC___vgic_v5_save_apr:
+
+arch/arm64/kvm/hyp/nvhe/hyp-main.c:handle___vgic_v5_save_apr() {
+    ...
+    __vgic_v5_save_apr(kern_hyp_va(cpu_if));
+    ...
+}
+
+Could this result in __vgic_v5_save_apr() writing hypervisor registers into
+EL2 private memory, allowing privilege escalation from EL1 to EL2?
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260901080941.9977=
+69-1-vdonnefort@google.com?part=3D11
