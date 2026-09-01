@@ -1,114 +1,189 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79F69486BA2
-	for <kvmarm@lists.linux.dev>; Tue,  1 Sep 2026 17:46:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10C433859D7
+	for <kvmarm@lists.linux.dev>; Tue,  1 Sep 2026 17:49:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788284801; cv=none; b=kzDNKTr8DBnTYTPUMUVbY5Lk+z6ZQkVdUJhOCIu/ZJ6CLyF8h5Rdbp3LsvUuVcJ+k3tdEKPgmx62+dDXIo0H80vT1yuODRQtNI3Cek6l0qyFuLx6GqKZdUKl9IB50C2XTyVU7+Suqkik2RTQQn9Nga1YyO0gVQGrC+ecnUD/wKk=
+	t=1788284983; cv=none; b=ZhfuMxCOQU+nNpGueeqvYFAI2kUFKqpRXesxps1qTupUE/kVvRr9mZh5Bhl4fCSBZxuLvb3IH5f6QNBIyOD/qCd2H8CXHKcDFIrTbZQcaWhCPPEVPiyijxh7kwf6OxKgNQhjL4b8IQb6e1IncEn07Fsire6YrchsPwvmJKJW0Ow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788284801; c=relaxed/simple;
-	bh=ReTixL2eDck/tJKgNZOhRnbk/zgSAQwSRJAjotXlmO8=;
+	s=arc-20240116; t=1788284983; c=relaxed/simple;
+	bh=uRRWdsj51B820Gczod5sWqyhLrhJ5vHljEkXypJTDP0=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=qMzPNQlO47KsaQp67yTfr7zQOQhukVSWyDijnORrJ+v3R5ec08nPDg+N6HYiGqZHYTPKIAk3eVMDfp9BKOsHPkjDdDC78w+jwBzVz/ngqedlVP7kTLhu6NsY/NsMj4F2AO45jQvBkerOTWJbk1McOa87qlMaMXqNERqj1ewULdo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SOZPEik1; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=JYX9CAf3st/F+PstaxFq3hq1X2Fei3eWXujzGb3C2zNHtKbZs4uHC6Y8e9/Z3gCmaXw2PG12YzEYPzAcQjUaLnE4xb7+H11MAqoKNdac0nFpXczLRbJheN7qOGY7jYwhff2DfUbaa0eZkFdT119M+SvzwtZWQUiCga0XFVsAeSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z9THwPp7; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SOZPEik1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE9A21F000E9;
-	Tue,  1 Sep 2026 17:46:39 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z9THwPp7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C56A1F000E9;
+	Tue,  1 Sep 2026 17:49:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788284800;
-	bh=ODM5MB0mTeDg0SDruVHv8nUWPwLS1UB5v/PlYGUSvTQ=;
+	s=k20260515; t=1788284981;
+	bh=B1aBo4wXYAeCeFOBAxYYyRjYs7NTs4VWntb21U8qHts=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=SOZPEik1zdhGccD4AL1Gd2ItpcSwNF/PruioLHFb/6pm9YwCYIo9y/4/LDRMwLc2t
-	 gMaY6OyfzDflSW9XfKjlfrOgBWKOZyy3QzkVCzTrdJDib6+lVxJ+Klu+EGhmQDkrxR
-	 o5L70LUyFdT7kbgKBIptAPyFJT9Rje5RIpgpBxiZmbXV+QFxYmU+6ImJ/QTcTNo8oo
-	 XUSUyvoMxWDKqZ24qMHTY6G9ZQBK72dAXqrMwZPtmHxW1bMrt5ENHqzwnAYq4sZeHf
-	 3iW4bKBBaa0svLWaKsfw4cBz44LR+lli2Owce42gKk1a6gYW0yGEOqwJxjDqNkd1MW
-	 ZYIp8iDO4mbCw==
+	b=Z9THwPp7aE3Q7pLj9wAPDlOLjlYQC9V/dDXM4lcB9cvywfX2oJJ2gWylBbEZmREzg
+	 qO/8z7PrXqCUJlCUJRLAFv9GnLVcgvxHrrtJg34N4EiWuDyjGTG5gd4THY5apLKFX8
+	 ROGZW41P/iJKo7dsbz4gTzBVtS+dSdFr+DCMrP70HfqtIFhAFpJ9+LAh8vqcCu+P7C
+	 xso6jpWJMwUv3hRpoNb/2twXuI2ic0iovkfgFDDW8OwHTCpYBGwSOcFE9SThRDuOyb
+	 cJciyTqKEmmPKm6ppgxunEbTye8C/EDBrhAjBeDfmRSpJWG3RfXMT+KjWDBv8cONM/
+	 L5blA3MXbv11A==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v3 2/2] KVM: arm64: nv: Fix null ptr deref on nested
- wp/unmap, teardown race
+Subject: Re: [RFC PATCH 5/5] KVM: arm64: Enable HAFDBS for guests not on
+ migration
 Reply-To: sashiko-reviews@lists.linux.dev
-To: =?utf-8?b?TG9yZW56byBTdG9ha2VzIChBUk0p?= <ljs@kernel.org>
+To: "Leonardo Bras" <leo.bras@arm.com>
 Cc: "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>
-In-Reply-To: <20260901-kvm-arm-nested-virt-fix-v3-2-b154676f7e4c@kernel.org>
-References: <20260901-kvm-arm-nested-virt-fix-v3-0-b154676f7e4c@kernel.org>
- <20260901-kvm-arm-nested-virt-fix-v3-2-b154676f7e4c@kernel.org>
+In-Reply-To: <20260901171558.2674031-6-leo.bras@arm.com>
+References: <20260901171558.2674031-1-leo.bras@arm.com>
+ <20260901171558.2674031-6-leo.bras@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 01 Sep 2026 17:46:39 +0000
-Message-Id: <20260901174639.CE9A21F000E9@smtp.kernel.org>
+Date: Tue, 01 Sep 2026 17:49:41 +0000
+Message-Id: <20260901174941.7C56A1F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+Thank you for your contribution! Sashiko AI review found 4 potential issue(=
 s) to consider:
-
-Pre-existing issues:
-- [High] Concurrent VM teardown frees the `kvm->arch.nested_mmus` array wit=
-hout holding `kvm->mmu_lock`, causing a Use-After-Free when `kvm_nested_s2_=
-unmap`, `kvm_nested_s2_wp`, or `kvm_nested_s2_flush` iterate over the array.
+- [Critical] Data race and TOCTOU on `kvm->arch.mmu.vtcr` between vCPU setu=
+p and memslot updates, breaking dirty logging.
+- [High] Missing context-wide TLB invalidation after modifying `VTCR_EL2.HD=
+` results in hardware bypassing write-protection.
+- [High] Disabling HAFDBS globally for dirty logging causes massive perform=
+ance degradation on non-logging memslots due to unnecessary permission faul=
+ts.
+- [Low] Unreachable `KVM_MR_DELETE` check inside `log_dirty_pages` block.
 --
 
-commit 6d817ae312afc7a3c0a4cae55f93ea78c14d26e1
-Author: Lorenzo Stoakes (ARM) <ljs@kernel.org>
-KVM: arm64: nv: Fix null ptr deref on nested wp/unmap, teardown race
+commit 54d7950cd735bc1edc3a9503d03ebffb8e6ca046
+Author: Leonardo Bras <leo.bras@arm.com>
 
-This commit fixes a NULL pointer dereference caused by concurrent stage 2
-teardown racing with MMU notifiers by wrapping VNCR IPA invalidation in a
-new helper that checks for a NULL page table pointer.
+KVM: arm64: Enable HAFDBS for guests not on migration
 
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 17123f0b6daba..f69722e1592a5 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
+This patch enables hardware management of access and dirty bits (HAFDBS)
+for KVM guests on arm64 when dirty logging is disabled. It modifies
+vCPU setup and memslot commit paths to dynamically toggle VTCR_EL2.HD
+based on the presence of dirty-logged memslots.
+
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 1e528d53d0931..76aebaa95cdab 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
 
 [ ... ]
 
-> @@ -1295,7 +1306,7 @@ void kvm_nested_s2_unmap(struct kvm *kvm, bool may_=
-block)
->  			kvm_stage2_unmap_range(mmu, 0, kvm_phys_size(mmu), may_block);
+> @@ -1683,6 +1683,13 @@ static int kvm_setup_vcpu(struct kvm_vcpu *vcpu)
+>  	if (!ret && vcpu_has_nv(vcpu))
+>  		ret =3D kvm_vcpu_init_nested(vcpu);
+> =20
+> +	/* Enable HAFDBS by default if VHE && !nested  */
+> +	if (kvm_supports_hafdbs(kvm) &&
+> +	    atomic_read(&kvm->nr_memslots_dirty_logging) =3D=3D 0)
+> +		kvm->arch.mmu.vtcr |=3D VTCR_EL2_HD;
+> +	else
+> +		kvm->arch.mmu.vtcr &=3D ~VTCR_EL2_HD;
+> +
+
+[Severity: Critical]
+Does this read-modify-write of kvm->arch.mmu.vtcr (holding config_lock)
+create a data race against kvm->slots_lock?
+
+In kvm_set_hafdbs() below, this same variable is modified while holding
+kvm->slots_lock. If userspace concurrently initializes vCPUs and enables
+dirty logging, VTCR_EL2_HD could be incorrectly left at 1. This would cause
+the hardware to silently update dirty bits without trapping, bypassing
+software dirty logging and resulting in lost dirty pages during migration.
+
+>  	return ret;
+>  }
+
+[ ... ]
+
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 9d4f70430bbea..94094ab56d90f 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1989,7 +1989,8 @@ static int kvm_s2_fault_compute_prot(const struct k=
+vm_s2_fault_desc *s2fd,
+>  	if (s2vi->map_writable) {
+>  		*prot |=3D KVM_PGTABLE_PROT_W;
+> =20
+> -		if (s2vi->device || !memslot_is_logging(s2fd->memslot) ||
+> +		if (s2vi->device ||
+> +		    !(memslot_is_logging(s2fd->memslot) || kvm_supports_hafdbs(kvm)) ||
+>  		    kvm_is_write_fault(s2fd->vcpu))
+>  			*prot |=3D KVM_PGTABLE_PROT_DIRTY;
 
 [Severity: High]
-This is a pre-existing issue, but since this patch explicitly deals with the
-race between kvm_arch_flush_shadow_all() and MMU notifiers dropping the
-mmu_lock, is there a Use-After-Free risk with kvm->arch.nested_mmus here?
+Can checking the static capability kvm_supports_hafdbs() here instead of
+the dynamic vtcr state starve non-logging slots of the software fallback?
 
-If kvm_stage2_unmap_range() ends up calling stage2_apply_range() which
-drops kvm->mmu_lock, kvm_arch_flush_shadow_all() can proceed to tear
-down the nested MMUs.
+When dirty logging is enabled on one memslot, kvm_set_hafdbs() disables
+VTCR_EL2.HD globally. However, if a guest writes to an unrelated
+non-logging slot that was mapped writable-clean, won't the hardware now
+generate a stage-2 permission fault?
 
-In arch/arm64/kvm/nested.c:kvm_arch_flush_shadow_all():
-    kvfree(kvm->arch.nested_mmus);
-    kvm->arch.nested_mmus =3D NULL;
-    kvm->arch.nested_mmus_size =3D 0;
+This could cause performance degradation across the entire VM whenever any
+single memslot (like a VGA framebuffer) enables dirty logging.
 
-This kvfree() happens without holding kvm->mmu_lock.
+[ ... ]
 
-When the MMU notifier path in kvm_nested_s2_unmap() reacquires the lock
-and continues, the mmu pointer (which points into the now-freed
-kvm->arch.nested_mmus array) is completely dangling.
-
-For example, in arch/arm64/kvm/mmu.c:stage2_apply_range():
-    do {
-        struct kvm_pgtable *pgt =3D mmu->pgt;
-        ...
-
-Can this dereference of mmu->pgt cause memory corruption or crashes if the
-underlying array has been freed by a concurrent VM teardown?
-
->  	}
-> =20
-> -	kvm_invalidate_vncr_ipa(kvm, 0, BIT(kvm->arch.mmu.pgt->ia_bits));
-> +	kvm_invalidate_vncr_ipa_all(kvm);
+> @@ -2577,6 +2578,20 @@ int __init kvm_mmu_init(u32 hyp_va_bits)
+>  	return err;
 >  }
 > =20
->  void kvm_nested_s2_flush(struct kvm *kvm)
+> +static void kvm_set_hafdbs(struct kvm *kvm, bool set)
+> +{
+> +	/* Check if no action required */
+> +	if (!!(kvm->arch.mmu.vtcr & VTCR_EL2_HD) =3D=3D set)
+> +		return;
+> +
+> +	if (set)
+> +		kvm->arch.mmu.vtcr |=3D VTCR_EL2_HD;
+> +	else
+> +		kvm->arch.mmu.vtcr &=3D ~VTCR_EL2_HD;
+
+[Severity: Critical]
+Does modifying kvm->arch.mmu.vtcr here under kvm->slots_lock race against
+the unprotected updates in kvm_setup_vcpu() as noted above?
+
+> +
+> +	kvm_make_all_cpus_request(kvm, KVM_REQ_RELOAD_STAGE2);
+
+[Severity: High]
+Is KVM_REQ_RELOAD_STAGE2 sufficient here to ensure the hardware observes
+the changed VTCR_EL2 state?
+
+The ARM architecture permits translation regime registers like VTCR_EL2 to
+be cached in the TLB (or a context cache). Modifying this register
+typically requires a full VMID TLB invalidation (like calling
+kvm_flush_remote_tlbs(kvm)) to guarantee global visibility.=20
+
+Without it, the CPU might continue using cached translations with HD=3D1 in
+the write-protected memslot, silently bypassing write-protection.
+
+> +}
+> +
+>  void kvm_arch_commit_memory_region(struct kvm *kvm,
+>  				   struct kvm_memory_slot *old,
+>  				   const struct kvm_memory_slot *new,
+> @@ -2594,6 +2609,10 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
+>  		if (change =3D=3D KVM_MR_DELETE)
+>  			return;
+
+[Severity: Low]
+Is this KVM_MR_DELETE condition reachable?
+
+The log_dirty_pages variable checked just before this is initialized as
+'new && new->flags & KVM_MEM_LOG_DIRTY_PAGES'. During a KVM_MR_DELETE
+change, the 'new' parameter passed into kvm_arch_commit_memory_region() is
+strictly NULL. Therefore, log_dirty_pages will always be false for
+deletes, making this nested check dead code.
+
+[ ... ]
 
 --=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260901-kvm-arm-ne=
-sted-virt-fix-v3-0-b154676f7e4c@kernel.org?part=3D2
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260901171558.2674=
+031-1-leo.bras@arm.com?part=3D5
