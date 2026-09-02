@@ -1,153 +1,103 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89A7147424A
-	for <kvmarm@lists.linux.dev>; Wed,  2 Sep 2026 10:54:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EB8247044E;
+	Wed,  2 Sep 2026 11:07:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788346458; cv=none; b=Ra04qQC6ncy/TOy8wAAsbd38IOu62jxgLi8X3VBzBnntc+IYJ9oTiDTmRXaEJg9PbnTo9SCM7HayKrsUSiKn6WiluJXjOwFutq5G1BtQeM0R4t3fuZ1S+CWcjUoflVrVB+mSjLtEzahse2K3aPObNMIUF6QBPgLE4BTTVXd6aZ4=
+	t=1788347271; cv=none; b=ntw3lUui5qHV4kborMC3hk+Gog5SIfcamkPWy4dMHUzaPPxfH5bXVsbd2uwleTycjp0f6pWBUmtTIn8h1XL9V1p+rOF2WXPVjXlpCkcVm0cH/SsNqG/kJcyM0NPTj1aBuNFQomp+eTsrGm3vjriYBUo8aaIUnu7JDfevXO5ixU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788346458; c=relaxed/simple;
-	bh=VJhrLZI3tnfJzyrU+XBx+aRk7G0SRkdsT882fdzqnGc=;
+	s=arc-20240116; t=1788347271; c=relaxed/simple;
+	bh=C/nFNCl7y0Wc2aQS0J6axFgFkV9ClrMkWYsc+DjvGJc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=ffVblfEDO/B44ufJK7ikdw49KGrOBnB2Kn7v5w653PyOunowsjhkfEkeaf9njrOrRYPx8hSoDiXBU5pKTwjjHQkHRxtM3AH3uA+Z1yUH5idE0tLudt2aAfb5CYYddp9mhcu0YUy7Yizy2nHWPkDgXFe+HSUDfJCF9VqNA1lNeJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=tJZtD3zg; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version:Content-Type:Content-Disposition; b=KPE6qMuoENbvdHk+mNVBzO83ThfJHz1UXHuF2tH7HsKBshX3DZN4A06X+PcLn7Ei14M0PVtKcBslx7Okg/9N+zORdI0rGsrt6oug0ZGgV/KZQN6K0UhzFnozS+irhmDW35uoPQ/cjxxoFgZUlNL7xUKe564zUed7NuWa894xccQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=B1F8uZUL; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="tJZtD3zg"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="B1F8uZUL"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BBDA0165C;
-	Wed,  2 Sep 2026 03:54:06 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B699F165C;
+	Wed,  2 Sep 2026 04:07:44 -0700 (PDT)
 Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8553D3F8C6;
-	Wed,  2 Sep 2026 03:54:08 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BBB513F85F;
+	Wed,  2 Sep 2026 04:07:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1788346450; bh=VJhrLZI3tnfJzyrU+XBx+aRk7G0SRkdsT882fdzqnGc=;
+	t=1788347268; bh=C/nFNCl7y0Wc2aQS0J6axFgFkV9ClrMkWYsc+DjvGJc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=tJZtD3zgqQnEuGfs/67Yd+ZWlPXHjKoMT0U3ZR57dmGKpRUmMuHF1P6DufUHsQDhc
-	 dE9KFKVVLrberz98boWoi5FfokmKbRPvi0j9drfEMvYknfwXCrjP9H//8pt77gtBVH
-	 G65T8aXCLl88anRM8TxQgiUP5PGq5sbzBdls3yFI=
+	b=B1F8uZULJshmW4icxlOc5cf1Ggh1WcO2wtnDNK6TsUMqMqF4YpetLbQJf89RDWkcN
+	 emrTdd6IwzUcVgAdPRQV6i+PbzZW3kf4QfR0FVYf/1tVq8zj26w+tlXz5Ff426vx1f
+	 yXOcbXUFfHqecQrmtnibVwtdhW7uhtyO95DFSJ9o=
 From: Leonardo Bras <leo.bras@arm.com>
-To: Tian Zheng <zhengtian10@huawei.com>
+To: sashiko-reviews@lists.linux.dev
 Cc: Leonardo Bras <leo.bras@arm.com>,
 	Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 4/5] KVM: arm64: Add KVM_REQ_RELOAD_STAGE2
-Date: Wed,  2 Sep 2026 11:53:55 +0100
-Message-ID: <apgAQ8p3hkGItkYK@LeoBrasDK>
+	kvmarm@lists.linux.dev
+Subject: Re: [RFC PATCH 1/5] KVM: arm64: pgtables: Change write bit from S2AP_W to DBM
+Date: Wed,  2 Sep 2026 12:07:45 +0100
+Message-ID: <apgDgf7JEhpD86cb@LeoBrasDK>
 X-Mailer: git-send-email 2.55.0
-In-Reply-To: <c8a6b6ac-aa4a-4cbc-b4f0-8dd6f4f02341@huawei.com>
-References: <20260901171558.2674031-1-leo.bras@arm.com> <20260901171558.2674031-5-leo.bras@arm.com> <c8a6b6ac-aa4a-4cbc-b4f0-8dd6f4f02341@huawei.com>
+In-Reply-To: <20260901173014.AC1B41F00A3D@smtp.kernel.org>
+References: <20260901171558.2674031-1-leo.bras@arm.com> <20260901171558.2674031-2-leo.bras@arm.com> <20260901173014.AC1B41F00A3D@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 
-On Wed, Sep 02, 2026 at 11:41:39AM +0800, Tian Zheng wrote:
+On Tue, Sep 01, 2026 at 05:30:14PM +0000, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
+> - [High] walk_nested_s2_pgd() incorrectly evaluates the DBM bit in L1's stage-2 page tables, leading to L2 memory protection bypass and broken L1 dirty tracking.
+> --
 > 
+> commit 6c412868c1a4af97b366b23a517db706c4c3511a
+> Author: Leonardo Bras <leo.bras@arm.com>
 > 
-> On 9/2/2026 1:15 AM, Leonardo Bras wrote:
-> > Add a vcpu request to exit guest, reload Stage2, and then come back to
-> > guest.
-> > 
-> > This will be used on future patches that enable S2 HAFDBS and HDBSS, as
-> > they may need to change VTCR bits for enabling/disabling the feature when
-> > the vcpus are still running.
-> > 
-> > Signed-off-by: Leonardo Bras <leo.bras@arm.com>
-> > ---
-> >   arch/arm64/include/asm/kvm_host.h | 2 ++
-> >   arch/arm64/kvm/arm.c              | 8 ++++++++
-> >   2 files changed, 10 insertions(+)
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index 27fe0cd5b2d7..00fe169f239f 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -48,20 +48,22 @@
-> >   #define KVM_REQ_VCPU_RESET		KVM_ARCH_REQ(2)
-> >   #define KVM_REQ_RECORD_STEAL		KVM_ARCH_REQ(3)
-> >   #define KVM_REQ_RELOAD_GICv4		KVM_ARCH_REQ(4)
-> >   #define KVM_REQ_RELOAD_PMU		KVM_ARCH_REQ(5)
-> >   #define KVM_REQ_SUSPEND			KVM_ARCH_REQ(6)
-> >   #define KVM_REQ_RESYNC_PMU_EL0		KVM_ARCH_REQ(7)
-> >   #define KVM_REQ_NESTED_S2_UNMAP		KVM_ARCH_REQ(8)
-> >   #define KVM_REQ_GUEST_HYP_IRQ_PENDING	KVM_ARCH_REQ(9)
-> >   #define KVM_REQ_MAP_L1_VNCR_EL2		KVM_ARCH_REQ(10)
-> >   #define KVM_REQ_VGIC_PROCESS_UPDATE	KVM_ARCH_REQ(11)
-> > +#define KVM_REQ_RELOAD_STAGE2 \
-> > +	KVM_ARCH_REQ_FLAGS(12, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
-> >   #define KVM_DIRTY_LOG_MANUAL_CAPS   (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE | \
-> >   				     KVM_DIRTY_LOG_INITIALLY_SET)
-> >   #define KVM_HAVE_MMU_RWLOCK
-> >   /*
-> >    * Mode of operation configurable with kvm-arm.mode early param.
-> >    * See Documentation/admin-guide/kernel-parameters.txt for more information.
-> >    */
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index 8b080804bc90..1e528d53d093 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -1164,20 +1164,28 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
-> >   		if (kvm_check_request(KVM_REQ_RESYNC_PMU_EL0, vcpu))
-> >   			kvm_vcpu_pmu_restore_guest(vcpu);
-> >   		if (kvm_check_request(KVM_REQ_SUSPEND, vcpu))
-> >   			return kvm_vcpu_suspend(vcpu);
-> >   		if (kvm_dirty_ring_check_request(vcpu))
-> >   			return 0;
-> > +		if (kvm_check_request(KVM_REQ_RELOAD_STAGE2, vcpu)) {
-> > +			unsigned long flags;
-> > +
-> > +			local_irq_save(flags);
-> > +			__load_stage2(vcpu->arch.hw_mmu);
-> > +			local_irq_restore(flags);
-> > +		}
-> > +
-> >   		check_nested_vcpu_requests(vcpu);
-> >   	}
-> >   	return 1;
-> >   }
-> >   static bool vcpu_mode_is_bad_32bit(struct kvm_vcpu *vcpu)
-> >   {
-> >   	if (likely(!vcpu_mode_is_32bit(vcpu)))
-> >   		return false;
-> Hi Leo,
+> KVM: arm64: pgtables: Change write bit from S2AP_W to DBM
 > 
-> Thanks for sending this out. I actually implemented a similar request in
-> my v5 HDBSS series to reload VTCR on enable/disable, but I named it
-> KVM_REQ_HDBSS_RELOAD_VTCR.
+> As a first step of changing the encoding for the Stage2 PTE descriptor,
+> introduce the DBM bit, and adapt every usage of writable to use the DBM bit
+> (51) instead of S2AP[1]/Dirty bit (7).
 > 
-> Without such a request, the new VTCR value only takes effect on the next
-> vcpu_load, which means enable/disable could be delayed indefinitely if
-> the vCPU never goes through a load/put cycle. So I think this request is
-> necessary for HDBSS as well.
+> [ ... ]
 > 
-> Since your KVM_REQ_RELOAD_STAGE2 is more generic, I'd like to rebase on
-> top of your patch and reuse it in v5. Would that work for you? Or do you
-> prefer to keep them separate for now?
+> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> > index 17123f0b6daba..eb8dfffc32c76 100644
+> > --- a/arch/arm64/kvm/nested.c
+> > +++ b/arch/arm64/kvm/nested.c
+> > @@ -386,7 +386,9 @@ static int walk_nested_s2_pgd(struct kvm_vcpu *vcpu, phys_addr_t ipa,
+> >  	out->output = paddr;
+> >  	out->block_size = 1UL << ((3 - level) * stride + wi->pgshift);
+> >  	out->readable = desc & KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R;
+> > -	out->writable = desc & KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
+> > +	/* Takes care of both RO/RW and RO/WC/WD encodings */
+> > +	out->writable = desc & (KVM_PTE_LEAF_ATTR_HI_S2_DBM |
+> > +				KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W);
 > 
+> [Severity: High]
+> Does this code in walk_nested_s2_pgd() incorrectly evaluate the DBM bit in
+> the L1 hypervisor's stage-2 page tables?
+> 
+> By checking for the DBM bit unconditionally here, L0 treats L1's read-only
+> stage-2 PTEs (where bit 51 is 1 and S2AP_W is 0) as writable. This allows an
+> L2 guest to write to memory that the L1 hypervisor intended to be read-only,
+> bypassing L1's memory protection.
 
-Hi Tian, 
-Thanks for reviewing!
+Yeah, for this to work on NV we need Oliver's patch series enabling HAFDBS 
+emulation.
 
-The main reason for this patch series (at least up to patch #3) was to give 
-you a base for HDBSS, so please rebase as much as you want on top of it.
-
-Thanks!
-Leo
+> 
+> Additionally, this breaks L1's dirty tracking because L0 never updates L1's
+> PTE to set the S2AP_W bit on a write.
+> 
+> Since KVM restricts L1's HAFDBS capability to AF-only (no DBM), bit 51 is
+> architecturally RES0 or ignored for L1. An honest L1 hypervisor might safely
+> use this ignored bit for software metadata. A malicious L2 guest could then
+> exploit this to write to read-only pages (such as shared firmware), breaching
+> the L1-to-L2 security boundary.
+> 
+> -- 
+> Sashiko AI review · https://sashiko.dev/#/patchset/20260901171558.2674031-1-leo.bras@arm.com?part=1
