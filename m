@@ -1,119 +1,133 @@
-Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com [209.85.215.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D72C49B203
-	for <kvmarm@lists.linux.dev>; Wed,  2 Sep 2026 13:00:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3E0847988B;
+	Wed,  2 Sep 2026 13:11:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788354051; cv=none; b=LtPkiY2r7ioufRha5Bfj9hJIHeCUhpbsfgEo2Ium2Lkv1jsmb/XmNOFFV4kAH/O3iEFVzrp6vqtEc9vbEwmvjRCHyGc4xekryjKJgFaXFIzW9KCTZkSQ7cHDyz2RVQ9RaEFqc72NY2CvskAApbevgPylYsur5/is2SiBOmKM0Zc=
+	t=1788354669; cv=none; b=bd1c9HW3m5GitjeI5lMhkb2W0Y9STDPmfAx6KPusvtEZRINV1G/K6GtyVfl893ydVplKrpGxk2OoD71RsBRH8Dgg+lJ9R4HPexrph51qpc58jTilDHFK3H7kwwJ25vRhTYoJE5ohrxKMmKDX6GQ9tr9neHJObLVlm9qM22mab3w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788354051; c=relaxed/simple;
-	bh=vMETqGmsLv+O1ZisrqmhUsbiFFXLQKrBrDQkabWILoU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=tmi7wyCGMDnD3VRGtDRtOWrD7wcAwja76Ih2FD677B/VNJihZA3nMY//WsckR5V++x7yDovp9b+0Z8BFLdPxkhL0viA/ieCoz/8ZGCAP4giA8l0wG11UJCkqK0EG59Jf0l/vi8jwOQaqZs3R9rsEUAZHgudbnO7V8g8tsjn1BmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Bm316/ZQ; arc=none smtp.client-ip=209.85.215.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1788354669; c=relaxed/simple;
+	bh=8RDVjphGMT2EY4EWAqX83Bv0HQdJis+1/wyjgNmypO4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=N/FtgIlQ+W+zJFiWDFAhTFeMAA9/uhmPNJyVy5AXvfJh2mzD1Z7Es72HrHVduAH2bIdFRe7Adq+A2Gb56+BjcIdPhcHiS0CbK+eR+HeMi3DWoopwaJiEaGrnHyf5h156dMwkXMzBaUhLmvzI1CB4KiMQOq1Q6+gK/x5tU1rEC7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AjTqpzq4; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Bm316/ZQ"
-Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-cc1ca15334cso1601028a12.1
-        for <kvmarm@lists.linux.dev>; Wed, 02 Sep 2026 06:00:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1788354050; x=1788958850; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=VNGwYj2t4glIGNOen6FjZQq8vvtMMzT1HX41CF0kxhE=;
-        b=Bm316/ZQZ6lajWzib5bi5A7hlvkVJaozpEAzDkwJOiJ8OOUGFn81QTTUr7wJ7Lq5Oz
-         dm0FEjK7ykON9xyArsVQjURZ3AiX8Ss8rF2rya+WO9zFt4erCh3oiEcOi/4Ey0X2rwaz
-         FmZ/h0Khl7DMmR7vLZeBDaE9WNk/ddXV+BTR6xbTSrLxADPPbChxzMUqThMSkVA1cxM+
-         0eUiKkA+CKamrJsZSSXuwDgo5IGx0Au+BCZXVfYn8/m6AszGpae/L+zi5vSxFfh3Ts/U
-         AQY0MZyf6zfrnnC8OIKRlwwjfg+m6LwHfJfbTn2Ri6GzXB+3EitlldgIjo9AuTrXwyv6
-         4oVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788354050; x=1788958850;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=VNGwYj2t4glIGNOen6FjZQq8vvtMMzT1HX41CF0kxhE=;
-        b=qp2Tqt1u1ecfguA/EKc7T/XgyLaUs3uFDuyQ3VtCib1Qc0Bma1YZLYZIL26FPF5z/Z
-         v2HjH6JPmlAZlGsKyPcsTSkUEXl9Mwn8FJdLBg8pQ9I7u2llm8Mqz9ydx0Gsd6PUvn0T
-         wTDWHr7PKHmLYmDXuxazQCvTYfeesTGUlUc4NdH7Mi4etzkUyW0hHo5nxaEH/SE8N5Gm
-         VAiUnqqh/rVBAAMrPO8BIlAkYr7W+LuX2qV05l2Jb9Jdl9ANSUwv7/PLO2De0T4Q44VY
-         jf/c0HotAucj1tiWc6MdjILmT6jC4ZjxX0RUeN0vtTwYvl4WLdOri8G38EWji/Lz1qtl
-         C3Iw==
-X-Forwarded-Encrypted: i=1; AHgh+RpcP/3Eg1/E2HR2qbnNR5cnQoQEx1uJcIM7Iabke2yf+wruckwuNiVTx90CjvPmnPjhfNisbXM=@lists.linux.dev
-X-Gm-Message-State: AFuF++lkiyegteqfMm6eQMBxnXBdH4BW6Pol9uFnt/DUJuZI59YS370g
-	SDcIftlOwJGfk4HLHh+VkTWiymJfX6it2zAekQzEjkhSn1yHayHyxyb7HIVcwX4hMjWm6zKEKiT
-	nyNb/dA==
-X-Received: from pgdo11-n1.prod.google.com ([2002:a05:6a02:620b:10b0:cc1:5155:bdd1])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:9151:b0:3d3:b02a:7252
- with SMTP id adf61e73a8af0-3d9b0f39b5emr5405095637.28.1788354049347; Wed, 02
- Sep 2026 06:00:49 -0700 (PDT)
-Date: Wed, 2 Sep 2026 06:00:48 -0700
-In-Reply-To: <20260902091351.438647-B-seiden@linux.ibm.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AjTqpzq4"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1A611F000E9;
+	Wed,  2 Sep 2026 13:11:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788354667;
+	bh=nRLi1FBteYpjMUirky+hyusys6nAANuCHisJ2JsNe8k=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date;
+	b=AjTqpzq4q2LFSPFFt+yF0vXv5UNifGGusVKCrtWydIJ+Ib1DGqMErun1wVgdXn/1H
+	 lU1n+rD9Cok863jcdsTklSuT6Y0QSauxCSRV+inADasqrGmuGTun/tsJhEpB2YwUFG
+	 JGgxDB4x9N1wpwQ7KOaK5Bw3rrjHVPCEyqlYlZBXcmclfdxz23uEJ4mkQa5KawrX6e
+	 PK2eOBHtzGLnlXN1mzewSMnuqCDJhTfczqRGiRuobPLXqqgegsCKBl3Pe/Covj9d2B
+	 as4VOU1YWGFO52qoukHRQDiZfSAZU1c5ZnFEeOxWWYguRLa2uD4OVvWGAojYxp6ZYg
+	 Dv1XgULDqf4kA==
+X-Mailer: emacs 31.1 (via feedmail 11-beta-1 I)
+From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
+To: Nicolin Chen <nicolinc@nvidia.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>
+Cc: linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Alexey Kardashevskiy <aik@amd.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Joerg Roedel <joro@8bytes.org>,
+	Jonathan Cameron <jic23@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Pranjal Shrivastava <praan@google.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Samuel Ortiz <sameo@rivosinc.com>,
+	Steven Price <steven.price@arm.com>,
+	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Xu Yilun <yilun.xu@linux.intel.com>
+Subject: Re: [RFC PATCH v4 03/16] iommu/arm-smmu-v3: Add initial pSMMU realm
+ viommu plumbing
+In-Reply-To: <apcHoHKGoI7WNFXp@nvidia.com>
+References: <20260427085344.941627-1-aneesh.kumar@kernel.org>
+ <20260427085344.941627-4-aneesh.kumar@kernel.org>
+ <apM6dOHcEI2ztWS0@nvidia.com> <yq5a8q5lz5yn.fsf@kernel.org>
+ <yq5aecfdnv4i.fsf@kernel.org> <20260901143445.GC56830@ziepe.ca>
+ <apcHoHKGoI7WNFXp@nvidia.com>
+Date: Wed, 02 Sep 2026 18:40:57 +0530
+Message-ID: <yq5ajyp3ztlq.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20260831144802.834315-1-seiden@linux.ibm.com> <20260831144802.834315-4-seiden@linux.ibm.com>
- <apdwHcdy2iYRTrww@google.com> <87ik4om4x2.wl-maz@kernel.org> <20260902091351.438647-B-seiden@linux.ibm.com>
-Message-ID: <apgeAJKF--dZvKvF@google.com>
-Subject: Re: [PATCH v7 03/23] KVM: Allow KVM implementations to switch off
- MMIO independent of Kconfig
-From: Sean Christopherson <seanjc@google.com>
-To: Steffen Eiden <seiden@linux.ibm.com>
-Cc: Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	linux-s390@vger.kernel.org, Alexander Gordeev <agordeev@linux.ibm.com>, 
-	Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, David Hildenbrand <david@kernel.org>, 
-	Friedrich Welter <fritz@linux.ibm.com>, Fuad Tabba <tabba@google.com>, 
-	Gautam Gala <ggala@linux.ibm.com>, Hariharan Mari <hari55@linux.ibm.com>, 
-	Heiko Carstens <hca@linux.ibm.com>, Hendrik Brueckner <brueckner@linux.ibm.com>, 
-	Ilya Leoshkevich <iii@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Joey Gouly <joey.gouly@arm.com>, Nico Boehr <nrb@linux.ibm.com>, 
-	Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>, Oliver Upton <oupton@kernel.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Sven Schnelle <svens@linux.ibm.com>, Ulrich Weigand <Ulrich.Weigand@de.ibm.com>, 
-	Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain
 
-On Wed, Sep 02, 2026, Steffen Eiden wrote:
-> On Wed, Sep 02, 2026 at 09:30:17AM +0100, Marc Zyngier wrote:
-> > On Wed, 02 Sep 2026 01:38:53 +0100,
-> > Sean Christopherson <seanjc@google.com> wrote:
-> > > 
-> > > On Mon, Aug 31, 2026, Steffen Eiden wrote:
-> > > > Only defining KVM_MMIO is not flexible enough for multi-KVM systems
-> > > > where one KVM implements MMIO but others do not. Solve this by
-> > > > additionally testing for the non-existence of KVM_NO_MMIO before
-> > > > including MMIO code to KVM.
-> > > 
-> > > Ewwwww.  IIUC, s390 ends up with two KVM modules, i.e. there really are two different
-> > > KVMs being built.  Rather than have a KVM_MMIO and NO_KVM_MMIO, I vote very
-> > > strongly to drop CONFIG_KVM_MMIO entirely and replace it with __KVM_HAVE_ARCH_MMIO,
-> > > a la __KVM_HAVE_ARCH_VM_FREE and others.  Tracking two separate macros is going
-> > > to be annoying to maintain, and will definitely be confusing for non-s390 people.
-> > > 
-> > > It'll mean linking in an emtpy coalesced_mmio.o on s390 when building without arm64
-> > > support, but I'm guessing that won't be at all common for s390 builds.
-> > > 
-> > 
-> > I ended-up doing something very similar locally, because I couldn't
-> > really make head or tail of the logic while being in holiday mode
-> > (which doesn't help). However, I kept the negative logic, so that we
-> > don't need to add anything to any architecture but S390 (they are the
-> > odd one out here).
-> negative makes sense. 
+Nicolin Chen <nicolinc@nvidia.com> writes:
 
-Ya, an opt-out for s390 works for me.
+> On Tue, Sep 01, 2026 at 11:34:45AM -0300, Jason Gunthorpe wrote:
+>> On Tue, Sep 01, 2026 at 03:36:37PM +0530, Aneesh Kumar K.V wrote:
+>> 
+>> > @@ -463,14 +460,13 @@
+>> >  	vsmmu->vmid = s2_parent->s2_cfg.vmid;
+>> >  
+>> >  	if (viommu->type == IOMMU_VIOMMU_TYPE_ARM_SMMUV3) {
+>> > +		if (arm_smmu_is_realm_viommu(viommu))
+>> > +			return arm_realm_smmu_v3_init(viommu, user_data);
+>> > +
+>> 
+>> I think the realm vsmmu is going to require a different info struct
+>> than the normal psmmu case, isn't it?
+>> 
+>> If so it needs its own enum value.
+>> 
+>> It would be nice to see a draft patch showing how the real vsmmu works
+>> on top of the RMM spec for it. If we are using a viommu object then
+>> non-vsmmu case should be identical just with an option in the info
+>> struct to not create the vsmmu object.
+>
+> Actually, the PSMMU-only viommu object in this series only adds a
+> type with no viommu data structure.
+>
+> I've drafted the vsmmu case on top of the series, so it would add
+> a structure reusing the same IOMMU_VIOMMU_TYPE_ARM_SMMUV3 with a
+> flag:
+>
+> +/**
+> + * enum iommu_viommu_arm_realm_vsmmuv3_flags - Flags for ARM SMMUv3 Realm
+> + * @IOMMU_VIOMMU_ARM_REALM_SMMUV3_FLAGS_VSMMU: Indicates whether the Realm has
+> + *                                             a guest-visible VSMMU instance
+> + */
+> +enum iommu_viommu_arm_realm_vsmmuv3_flags {
+> +	IOMMU_VIOMMU_ARM_REALM_SMMUV3_FLAGS_VSMMU = 1 << 0,
+> +};
+> +
+> +/**
+> + * struct iommu_viommu_arm_realm_vsmmuv3 - ARM Realm VSMMUv3 parameters
+> + *                                         (IOMMU_VIOMMU_TYPE_ARM_REALM_SMMUV3)
+> + * @flags: Combination of enum iommu_viommu_arm_realm_vsmmuv3_flags
+> + * @reg_base: MMIO base address of the VSMMU in the guest VM
+> + * @reg_top: MMIO top address of the VSMMU in the guest VM
+> + * @aidr: AIDR register value of the VSMMU in the guest VM
+> + * @idr: IDR register values of the VSMMU in the guest VM
+> + */
+> +struct iommu_viommu_arm_realm_vsmmuv3 {
+> +	__aligned_u64 flags;
+> +	__aligned_le64 reg_base;
+> +	__aligned_le64 reg_top;
+> +	__aligned_le64 aidr;
+> +	__aligned_le64 idr[7];
+> +};
+>
+> I think this should work. But I still feel awkward that a non-vsmmu
+> case has to allocate a viommu object for a set of RMI commands that
+> don't need an Realm Descriptor. Things could be cleaner if we allow
+> RMI_PSMMU_ACTIVATE and RMI_PSMMU_ST_L2_CREATE to be independent on
+> a viommu; then leave IOMMU_VIOMMU_TYPE_ARM_SMMUV3 to vsmmu-visiable
+> case.
+ 
+RMI_VSMMU_CREATE requires an RD, RD won't be available during
+viomm_alloc right?
 
-> IIRC KVM/power does select KVM_MMIO most of the times but not always.
-> I'll check that.
-
-Huh, indeed.  KVM_BOOK3S_64_HV=y && KVM_BOOK3S_64_PR=n ends up with KVM_MMIO=n.
-Though I'm not surprised given the multitude of variants PPC has.
+-aneesh
