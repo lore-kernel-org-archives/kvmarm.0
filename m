@@ -1,188 +1,177 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD85146F4AD;
-	Wed,  2 Sep 2026 11:30:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mta1.migadu.com (out-157.mta1.migadu.com [95.215.58.157])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D90E74772AC
+	for <kvmarm@lists.linux.dev>; Wed,  2 Sep 2026 11:36:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788348645; cv=none; b=cp1VM3tf1HXk7VXqwlg3Q4gePoRrQVl6PmwfFF9Y5PrwfgR+BjjOu3HhX3ycmzYpx/0MtMAAZNJZVyswUmm2RQnAAw+oYu+DGR9O/67Q7Tl6iAa0y0/Ha5vctR85yQLj69SKph26SwA2a3xZ+esBztEzjaa+UMxWIwnGlmM2EUk=
+	t=1788348978; cv=none; b=EO0I14oXeZiBxcVOj69hiVoT1m5OpWH7NeFzCYqpNfwfKAtzltgRFNTCvk6MzNLKo2foi8vZ1bgfufhs1W9O0pNcoJ0BnvFkvxBsUAG5EPFWPNYV5UrndnTPkpocTjQLyvLNfxKvwVXblXFXQ9IZ88cB2pvfQn3boCSRPCxAIes=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788348645; c=relaxed/simple;
-	bh=rsiPb+N3NBg42jR8oIV7SEKwZHQQaAyFyFV6MMqxWdU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=a5hRKZVvODVafQyrqdaKyvwpseXGVaDrS+6fP35HPuXHXomS3EfGpenAvDEvF32vi/diECSyk2yAhwtuIf+dq9kgepaCScXuBd0UV8P2ZVgDldtprxpIdt+CNowzeGbK1aC7l3U31FgGa2C651mJ3yfeEfTHAOM8MzCfUJ7E374=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=hweE4dzD; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1788348978; c=relaxed/simple;
+	bh=BiRsbHGkJc2vaZ1y6LTSpqtajhdT9mOwKxmAqCYwFoc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=blk2ilc/OnuPSbC244pVVf2NKtBeymYtKzvgxx7KS4Vs+8nP+FVpPXX0+tZ+Nx/9XTJ/yZJQ00h0YaaY6P+P2Seo3EbzXqF7FqTBt9RlssiCCYlWQToD4hew3C5TrUv+mWPBIxrwVtAjsx7KkgpQQU20IQ4FxAtCaidvEfKSgQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jumnKcd7; arc=none smtp.client-ip=95.215.58.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="hweE4dzD"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 16EE72F;
-	Wed,  2 Sep 2026 04:30:35 -0700 (PDT)
-Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1AAAB3F85F;
-	Wed,  2 Sep 2026 04:30:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1788348638; bh=rsiPb+N3NBg42jR8oIV7SEKwZHQQaAyFyFV6MMqxWdU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=hweE4dzD7xK1qCxh/+uOl5ZdIsajcvREw9IFsj3T2/PKYOhQcKwLRyEK5cV4CQlnp
-	 /PeVsjc9FyOPt8GrzSAK9kySvbt3aEAPHD3ZU4EhCsJCOTAiDF/WXDX4ASUC6sN1m+
-	 vShxw2HLrxVt1RA3iwVLkifwnqnt9zSQnC1LMkR8=
-From: Leonardo Bras <leo.bras@arm.com>
-To: sashiko-reviews@lists.linux.dev
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	Marc Zyngier <maz@kernel.org>,
-	kvmarm@lists.linux.dev,
-	Oliver Upton <oupton@kernel.org>
-Subject: Re: [RFC PATCH 2/5] KVM: arm64: Add KVM_PGTABLE_PROT_DIRTY
-Date: Wed,  2 Sep 2026 12:30:35 +0100
-Message-ID: <apgI27i_huhue2iP@LeoBrasDK>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260901173453.038E01F000E9@smtp.kernel.org>
-References: <20260901171558.2674031-1-leo.bras@arm.com> <20260901171558.2674031-3-leo.bras@arm.com> <20260901173453.038E01F000E9@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jumnKcd7"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=BiRsbHGkJc2vaZ1y6LTSpqtajhdT9mOwKxmAqCYwFoc=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1788348965; v=1; x=1788953765;
+ b=jumnKcd7yjbFc/KymgpnBVE/D1y3u8TEwLdmSRdLi6goEPhLrK7reSfz2mNd6hKDgdW0GvBG
+ ZDz7rHHPbUSotX9Zcj0Tv17PYRRhM7HeJc1n5M3s0GIaYjAUCx9jRJ9aLm/cvkk7Rvk7DCFz4RX
+ 81GNwqanRKyW5v87hSMnwBQQ=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 325548552829cace;
+	Wed, 02 Sep 2026 11:36:04 +0000
+X-Mizu-Trace-ID: 325548552829cace
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b4a0b384c4so745e87.1
+        for <kvmarm@lists.linux.dev>; Wed, 02 Sep 2026 04:36:04 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBz94VZ9AZ2oa6Kgzzqz8DUPTj0uFm62r5DB12yqN3SB77nWfkW9zIXSeHdM/R/gs6KV/dHPnbA=@lists.linux.dev
+X-Gm-Message-State: AFuF++kAwaA9zfmkAvNONIWdQbif4gjEXYR2xCoxFpq55j5ynkocdsNu
+	r0cJv8ELEIhtWFYhA6AwU2QykpyAO1fGh9/0SnjYxzwBrrt3fYV1U4gM9YCZv9WVSU3wqSr8we4
+	DYXGkYL/vSsF8kj9T606vxmEgSvD6/nihMMlYLGwJ
+X-Received: by 2002:a05:6512:3093:b0:5ae:a4e8:47be with SMTP id
+ 2adb3069b0e04-5b60d6755a2mr15375e87.7.1788348963517; Wed, 02 Sep 2026
+ 04:36:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+References: <20260831163421.272420-1-fuad.tabba@linux.dev> <20260831163421.272420-5-fuad.tabba@linux.dev>
+ <apf2jvCicXlw7JYP@e143914.arm.com>
+In-Reply-To: <apf2jvCicXlw7JYP@e143914.arm.com>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Wed, 2 Sep 2026 12:35:27 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTww35U372+YMHZTU-qP_C6+9wTxU9YWC3tZk8rm33zgVQ@mail.gmail.com>
+X-Gm-Features: AcwNN1VE-_5vfzg4Lhs7Q3UcFlXLB7ylH5M4tdjkXzGG-P3YyREDqCRKlfdtavY
+Message-ID: <CA+EHjTww35U372+YMHZTU-qP_C6+9wTxU9YWC3tZk8rm33zgVQ@mail.gmail.com>
+Subject: Re: [PATCH 04/17] KVM: arm64: Introduce per-EC entry handlers for pKVM
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Vincent Donnefort <vdonnefort@google.com>, 
+	Quentin Perret <qperret@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Sep 01, 2026 at 05:34:52PM +0000, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> - [Critical] Silent data corruption and loss of guest memory due to missing host folio dirty tracking with hardware Dirty Bit Management (HW DBM).
-> --
-> 
-> commit c5bf76c3d6bf3edf785c54c123328d74e2186585
-> Author: Leonardo Bras <leo.bras@arm.com>
-> KVM: arm64: Add KVM_PGTABLE_PROT_DIRTY
-> 
-> This commit introduces KVM_PGTABLE_PROT_DIRTY to distinguish between writable
-> but not dirty pages and writable and dirty pages in the Stage2 PTE descriptor.
-> It evaluates these concepts on a per-case basis across KVM ARM64 page tables.
-> 
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> [ ... ]
-> > @@ -731,8 +731,12 @@ static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot p
-> >  	if (prot & KVM_PGTABLE_PROT_R)
-> >  		attr |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R;
-> >  
-> > -	if (prot & KVM_PGTABLE_PROT_W)
-> > -		attr |= KVM_PTE_LEAF_ATTR_HI_S2_DBM | KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
-> > +	if (prot & KVM_PGTABLE_PROT_W) {
-> > +		attr |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
+On Wed, 2 Sept 2026 at 11:12, Joey Gouly <joey.gouly@arm.com> wrote:
+>
+> On Mon, Aug 31, 2026 at 05:34:08PM +0100, Fuad Tabba wrote:
+> > From: Marc Zyngier <maz@kernel.org>
+> >
+> > Add an ESR_EL2.EC-indexed handler table, entry_hyp_vm_handlers[],
+> > consulted from flush_hyp_vcpu() on re-entry when the previous exit was
+> > a trap: sync_hyp_vcpu() records the exit reason in the hyp vCPU as
+> > exit_code, and the trap's exception class comes from its ESR_EL2.
+> >
+> > Entry carries the host's requested PC updates to the hyp vCPU: add
+> > vcpu_copy_flag() to copy a masked set of flags between the two vCPU
+> > structures, with PC_UPDATE_REQ covering INCREMENT_PC and the
+> > pending-exception flags. The wholesale iflags copy moves into the
+> > non-protected branch; a protected vCPU takes only PC_UPDATE_REQ.
+> >
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > Co-developed-by: Fuad Tabba <fuad.tabba@linux.dev>
+> > Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+>
+> Not really looked at nVHE much (or pkvm ever), but:
+
+That's a plus. Good to get a fresh perspective on the code.
+
+> Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+
+Thanks for the review!
+/fuad
+
+>
+> > ---
+> >  arch/arm64/include/asm/kvm_host.h      | 19 +++++++++++++
+> >  arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  3 ++
+> >  arch/arm64/kvm/hyp/nvhe/hyp-main.c     | 39 +++++++++++++++++++++++---
+> >  3 files changed, 57 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index 27fe0cd5b2d7a..78a4d387f9fd4 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -1033,11 +1033,28 @@ struct kvm_vcpu_arch {
+> >               set;                                            \
+> >       })
+> >
+> > +#define __vcpu_copy_flag(vt, vs, flagset, f, m)                      \
+> > +     do {                                                    \
+> > +             typeof(vs->arch.flagset) tmp, val;              \
+> > +                                                             \
+> > +             __build_check_flag(vs, flagset, f, m);          \
+> > +                                                             \
+> > +             val = READ_ONCE(vs->arch.flagset);              \
+> > +             val &= (m);                                     \
+> > +             __vcpu_flags_preempt_disable();                 \
+> > +             tmp = READ_ONCE(vt->arch.flagset);              \
+> > +             tmp &= ~(m);                                    \
+> > +             tmp |= val;                                     \
+> > +             WRITE_ONCE(vt->arch.flagset, tmp);              \
+> > +             __vcpu_flags_preempt_enable();                  \
+> > +     } while (0)
 > > +
-> > +		if (prot & KVM_PGTABLE_PROT_DIRTY)
-> > +			attr |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
-> > +	}
-> 
-> [Severity: Critical]
-> Could this translation enable hardware DBM bypass for pages not marked
-> PROT_DIRTY? This translates the software PROT_W without PROT_DIRTY into
-> the hardware PTE state (DBM=1, S2AP_W=0), setting up the HW DBM bypass.
-
-That's the desired effect, as we can use HAFDBS/HDBSS to automatically 
-update and track them.
-
-> 
-> [ ... ]
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> [ ... ]
-> > @@ -1681,10 +1683,10 @@ static int gmem_abort(const struct kvm_s2_fault_desc *s2fd)
-> >  	}
-> >  
-> >  out_unlock:
-> > -	kvm_release_faultin_page(kvm, page, !!ret, prot & KVM_PGTABLE_PROT_W);
-> > +	kvm_release_faultin_page(kvm, page, !!ret, prot & KVM_PGTABLE_PROT_DIRTY);
-> 
-> [Severity: Critical]
-> Does limiting the dirty tracking here to PROT_DIRTY instead of the mapping
-> writability (PROT_W) cause host folio dirty tracking to be missed when HAFDBS
-> is enabled?
-> 
-
-Yes, that's why for dirty-tracking host should either disable HAFDBS or 
-enable HDBSS if available.
-
-> [ ... ]
-> > @@ -1984,11 +1986,14 @@ static int kvm_s2_fault_compute_prot(const struct kvm_s2_fault_desc *s2fd,
-> >  
-> >  	*prot = KVM_PGTABLE_PROT_R;
-> >  
-> > -	if (s2vi->map_writable && (s2vi->device ||
-> > -				   !memslot_is_logging(s2fd->memslot) ||
-> > -				   kvm_is_write_fault(s2fd->vcpu)))
-> > +	if (s2vi->map_writable) {
-> >  		*prot |= KVM_PGTABLE_PROT_W;
-> >  
-> > +		if (s2vi->device || !memslot_is_logging(s2fd->memslot) ||
-> > +		    kvm_is_write_fault(s2fd->vcpu))
-> > +			*prot |= KVM_PGTABLE_PROT_DIRTY;
-> > +	}
-> 
-> [Severity: Critical]
-> On a read fault when HAFDBS is enabled, this leaves KVM_PGTABLE_PROT_DIRTY
-> unset while KVM_PGTABLE_PROT_W is set. Can this allow the hardware to
-> locklessly dirty the page later without KVM knowing?
-
-That's the desired behavior. If we need tracking, see above comment.
-
-> 
-> [ ... ]
-> > @@ -2019,7 +2024,7 @@ static int kvm_s2_fault_map(const struct kvm_s2_fault_desc *s2fd,
-> >  			    void *memcache)
-> >  {
-> >  	enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_SHARED;
-> > -	bool writable = prot & KVM_PGTABLE_PROT_W;
-> > +	bool dirty = prot & KVM_PGTABLE_PROT_DIRTY;
-> 
-> [Severity: Critical]
-> By deriving the dirty status for host folio tracking strictly from PROT_DIRTY
-> instead of PROT_W, are we setting up the host MM to track the folio as clean
-> on read faults?
-> 
-
-Yes. The main idea is that a read fault does _not_ dirty a folio, just as 
-it already happens when dirty-tracking is enabled.
-
-> [ ... ]
-> > @@ -2082,7 +2087,7 @@ static int kvm_s2_fault_map(const struct kvm_s2_fault_desc *s2fd,
-> >  	}
-> >  
-> >  out_unlock:
-> > -	kvm_release_faultin_page(kvm, s2vi->page, !!ret, writable);
-> > +	kvm_release_faultin_page(kvm, s2vi->page, !!ret, dirty);
-> 
-> [Severity: Critical]
-> Releasing the folio to the host MM as clean on read faults could break host
-> folio dirty tracking.
-> 
-> If a guest later writes to this page and the CPU locklessly sets S2AP_W=1
-> without trapping, KVM won't be aware. Since KVM ARM64 does not harvest this
-> dirty bit during MMU notifier invalidations, the host Linux MM never learns
-> the folio was dirtied. When the host reclaims the folio under memory
-> pressure, does this result in data corruption and loss of guest memory by
-> discarding the modified data instead of writing it to swap?
-
-Ah, good catch. IIUC:
-CPU0					CPU1
-kvm_s2_fault_map - WC - pageA
-	sets dirty=false
-	...				HAFDBS sets pageA dirty
-	kvm_release_faultin_page
-		kvm_release_page_clean
-
-So, in this case, I think it would be better to use writable instead of 
-clean, as IIUC there should be no issue marking a clean page as dirty other 
-than a bit of overhead on calling kvm_set_page_dirty().
-
-Does it work?
-
-Thanks!
-Leo
-
-
+> >  #define vcpu_get_flag(v, ...)        __vcpu_get_flag((v), __VA_ARGS__)
+> >  #define vcpu_set_flag(v, ...)        __vcpu_set_flag((v), __VA_ARGS__)
+> >  #define vcpu_clear_flag(v, ...)      __vcpu_clear_flag((v), __VA_ARGS__)
+> >  #define vcpu_test_and_clear_flag(v, ...)                     \
+> >       __vcpu_test_and_clear_flag((v), __VA_ARGS__)
+> > +#define vcpu_copy_flag(vt, vs, ...) __vcpu_copy_flag((vt), (vs), __VA_ARGS__)
+> >
+> >  /* KVM_ARM_VCPU_INIT completed */
+> >  #define VCPU_INITIALIZED     __vcpu_single_flag(cflags, BIT(0))
+> > @@ -1055,6 +1072,8 @@ struct kvm_vcpu_arch {
+> >  #define INCREMENT_PC         __vcpu_single_flag(iflags, BIT(1))
+> >  /* Target EL/MODE (not a single flag, but let's abuse the macro) */
+> >  #define EXCEPT_MASK          __vcpu_single_flag(iflags, GENMASK(3, 1))
+> > +/* Cover both PENDING_EXCEPTION and EXCEPT_MASK for global operations */
+> > +#define PC_UPDATE_REQ                __vcpu_single_flag(iflags, GENMASK(3, 0))
+> >  /* Host-set: the hyp flushes the non-protected vCPU state in on entry */
+> >  #define PKVM_HOST_STATE_DIRTY        __vcpu_single_flag(iflags, BIT(4))
+> >
+> > diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+> > index c904647d2f760..49a0a992047ba 100644
+> > --- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+> > +++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+> > @@ -26,6 +26,9 @@ struct pkvm_hyp_vcpu {
+> >        * per-cpu pointer tracking us. Otherwise, NULL if not loaded.
+> >        */
+> >       struct pkvm_hyp_vcpu **loaded_hyp_vcpu;
+> > +
+> > +     /* The previous exit's ARM_EXCEPTION_* code. */
+> > +     u32 exit_code;
+> >  };
+> >
+> >  /*
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> > index b6bfe502bcd04..ca7122b0bccdd 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> > @@ -31,6 +31,17 @@ unsigned int hyp_gicv3_nr_lr;
+> >
+> >  void __kvm_hyp_host_forward_smc(struct kvm_cpu_context *host_ctxt);
+> >
+> > +typedef void (*hyp_entry_exit_handler_fn)(struct pkvm_hyp_vcpu *);
+> > +
+> > +static void handle_vm_entry_generic(struct pkvm_hyp_vcpu *hyp_vcpu)
+> > +{
+> > +     vcpu_copy_flag(&hyp_vcpu->vcpu, hyp_vcpu->host_vcpu, PC_UPDATE_REQ);
+> > +}
+>
+> This is added here because the full copy of iflags was moved into the
+> !pkvm_hyp_vcpu_is_protected() section, so is needed temporarily until
+> each EC has its own handler.
+>
+> Thanks,
+> Joey
