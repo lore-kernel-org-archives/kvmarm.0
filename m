@@ -1,155 +1,123 @@
-Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBE0F306764
-	for <kvmarm@lists.linux.dev>; Wed,  2 Sep 2026 03:41:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CD4A33BBCF;
+	Wed,  2 Sep 2026 07:38:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788320507; cv=none; b=ghVTV084YTnJgN0/ovIJDd3wJ3FTIgVeK6iSBznkNl14LhR9S8UVrF/lKteetMLXgVb/qnpPq1ci2RtKyPlcbZjVT4e09YIlPhTqpvLnfaMZR8w78l67FvuiR3rbVVPUSjQ/3ZpGKp4SqJpB0lNyTPi348315YBT2lvF6Zjswrw=
+	t=1788334738; cv=none; b=hZuDUPfuzKn7d2BhqH+WsZrhhsOALzKeOsd1ga/vRxyWf9WTZkOefbhG0TfJw1ttcDeECb6xV3U/herg69x7Suiy+7IFXc9wLzEQdMGn3X2IQmdqmdTLxJANf4tLmuaGH42watCJewrcrKNbQJKL9JfKKjic6jE8qx0qBxuCAro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788320507; c=relaxed/simple;
-	bh=WAqfUmRYWN7fsydH4ejT9o5RephmRbQCv1dvnXIQrpk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=BrYgP0NSF3MXCIi8uC2DcFjzULwm9aZ6s7vBqGG5X0JHXuuVONBwTkJ0bpxB31Ags3Tg4yVwpAR/2teK6e2XqMiAKYcdT2ZpPg3Cy2HceKxjJTRqL0U/Z9/i5shE2sdLjzXJlFLKXYqzFIYW3BVwOeC0CBLtu9p7q52anL2tGIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=apudg3fM; arc=none smtp.client-ip=113.46.200.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1788334738; c=relaxed/simple;
+	bh=peNBa6XWTvXD5voM6K/4tnfDdD3edZYStWDuoe7amfw=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LU05H30fXIb8RIGKzFndwZtNmrJMDWNi5K7pIEbQz8t6e28GHVORjiJ8YiSBm3/OaDcHhen3Mqa1S70kvSlGFSGMsqIuB7fDneqB1qSp9MYnmovzIrDiRTeTgc7pChgrr0tSxAkU5EON2evf8tf7FtJtUm5pb0WP6XOLMtc8el4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AXX26wr8; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="apudg3fM"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=Y5qp/1tLbmRpVusogjo+SBt+4hrWyvtZXYZWQyBVWfs=;
-	b=apudg3fMEwrmT5Hy7usbj0TCKIHLezzw0xYnNt3GVB/3U1iWyjDy/N7SecSkuy6cGTsSqchL3
-	XRTXSQHZKFxrEpjnN5mG9OmXEd46D0m+z1+1zNFVt6WlERSFO0rQW7BUPgcWWUhwwExdYfNAKk7
-	S++BIDtspilGrGTJhewLJmU=
-Received: from mail.maildlp.com (unknown [172.19.162.223])
-	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4hZSsr1ynQz12LHv;
-	Wed,  2 Sep 2026 11:30:24 +0800 (CST)
-Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
-	by mail.maildlp.com (Postfix) with ESMTPS id A1A8040575;
-	Wed,  2 Sep 2026 11:41:40 +0800 (CST)
-Received: from [10.67.120.103] (10.67.120.103) by
- kwepemr100010.china.huawei.com (7.202.195.125) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.45; Wed, 2 Sep 2026 11:41:39 +0800
-Message-ID: <c8a6b6ac-aa4a-4cbc-b4f0-8dd6f4f02341@huawei.com>
-Date: Wed, 2 Sep 2026 11:41:39 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AXX26wr8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1729D1F00A3A;
+	Wed,  2 Sep 2026 07:38:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788334737;
+	bh=NtFIjwHWOM2KySxyK2jN5lsJXS7iV2NXSRl0dq3VPfM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=AXX26wr8KvCG2QZcfUAqR2Dpzs2Uuq6jgvM57rxgHHBUtsTqCueEKpUbANEZmZDcM
+	 maq551oR8ZMENXN+/udtxaaNwWLPAMcz1DLsYO37wcn8/w72gxqB75vH876jegGJ9P
+	 AJd/kV4r9rvIFxqaZ4UBIio+HPnyaEk8XCnCdk3xtZzH+OAmqoa9slxW78NNWmwprJ
+	 gxQexz9Bc8W/nS0fGe6RtQOv9hUMKVB15b0LP9HocvJFUgBOL59wjsBXW65X9/qPHi
+	 PsucUsjIgB1FR5GAVA38qCBibV7U8Np8iXZl4NqDfL24T62E9A2crzNh43+4fSdjc5
+	 hOZqttRyWIbBA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1x1fYc-00000003lb4-2BeN;
+	Wed, 02 Sep 2026 07:38:54 +0000
+Date: Wed, 02 Sep 2026 08:41:27 +0100
+Message-ID: <87mru0m76g.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Steffen Eiden <seiden@linux.ibm.com>
+Cc: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Andreas Grapentin <gra@linux.ibm.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	David Hildenbrand <david@kernel.org>,
+	Friedrich Welter <fritz@linux.ibm.com>,
+	Fuad Tabba <tabba@google.com>,
+	Gautam Gala <ggala@linux.ibm.com>,
+	Hariharan Mari <hari55@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Hendrik Brueckner <brueckner@linux.ibm.com>,
+	Ilya Leoshkevich <iii@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Nico Boehr <nrb@linux.ibm.com>,
+	Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
+	Oliver Upton <oupton@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Will Deacon <will@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v7 11/23] KVM: arm64: Share arm64 code with s390
+In-Reply-To: <20260901084037.185345-C-seiden@linux.ibm.com>
+References: <20260831144802.834315-1-seiden@linux.ibm.com>
+	<20260831144802.834315-12-seiden@linux.ibm.com>
+	<87se3tmlrv.wl-maz@kernel.org>
+	<20260901084037.185345-C-seiden@linux.ibm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 4/5] KVM: arm64: Add KVM_REQ_RELOAD_STAGE2
-To: Leonardo Bras <leo.bras@arm.com>, Marc Zyngier <maz@kernel.org>, Oliver
- Upton <oupton@kernel.org>, Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly
-	<joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose
-	<suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas
-	<catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Mark Rutland
-	<mark.rutland@arm.com>, Raghavendra Rao Ananta <rananta@google.com>
-CC: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<linux-kernel@vger.kernel.org>
-References: <20260901171558.2674031-1-leo.bras@arm.com>
- <20260901171558.2674031-5-leo.bras@arm.com>
-From: Tian Zheng <zhengtian10@huawei.com>
-In-Reply-To: <20260901171558.2674031-5-leo.bras@arm.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
- kwepemr100010.china.huawei.com (7.202.195.125)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: seiden@linux.ibm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, agordeev@linux.ibm.com, gra@linux.ibm.com, arnd@arndb.de, catalin.marinas@arm.com, borntraeger@linux.ibm.com, imbrenda@linux.ibm.com, david@kernel.org, fritz@linux.ibm.com, tabba@google.com, ggala@linux.ibm.com, hari55@linux.ibm.com, hca@linux.ibm.com, brueckner@linux.ibm.com, iii@linux.ibm.com, frankja@linux.ibm.com, joey.gouly@arm.com, nrb@linux.ibm.com, oss@nina.schoetterlglausch.eu, oupton@kernel.org, pbonzini@redhat.com, seanjc@google.com, suzuki.poulose@arm.com, svens@linux.ibm.com, Ulrich.Weigand@de.ibm.com, gor@linux.ibm.com, will@kernel.org, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-
-
-On 9/2/2026 1:15 AM, Leonardo Bras wrote:
-> Add a vcpu request to exit guest, reload Stage2, and then come back to
-> guest.
+On Tue, 01 Sep 2026 09:40:37 +0100,
+Steffen Eiden <seiden@linux.ibm.com> wrote:
 > 
-> This will be used on future patches that enable S2 HAFDBS and HDBSS, as
-> they may need to change VTCR bits for enabling/disabling the feature when
-> the vcpus are still running.
+> On Tue, Sep 01, 2026 at 09:13:56AM +0100, Marc Zyngier wrote:
+> > Why the exit handler, and not the EC handlers aside from the UNKNOWN
+> > one? Yes, you probably aren't there yet in this series, but I can tell
+> > you are going to add more and more of these.
+> > 
+> > But the EC array is absolutely architectural, and there is no good
+> > reason to maintain your own.
+> > 
+> > So instead of this, why not keep the EC array altogether, and
+> > implement stubs for the ECs you don't support?
+> > 
+> > 	M.
+> > 
 > 
-> Signed-off-by: Leonardo Bras <leo.bras@arm.com>
-> ---
->   arch/arm64/include/asm/kvm_host.h | 2 ++
->   arch/arm64/kvm/arm.c              | 8 ++++++++
->   2 files changed, 10 insertions(+)
+> There was no specific reasson to define our own EC array as far as I
+> remember. I will try reusing the array and find out if there are any
+> issues with that. But I do not expect any. 
 > 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 27fe0cd5b2d7..00fe169f239f 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -48,20 +48,22 @@
->   #define KVM_REQ_VCPU_RESET		KVM_ARCH_REQ(2)
->   #define KVM_REQ_RECORD_STEAL		KVM_ARCH_REQ(3)
->   #define KVM_REQ_RELOAD_GICv4		KVM_ARCH_REQ(4)
->   #define KVM_REQ_RELOAD_PMU		KVM_ARCH_REQ(5)
->   #define KVM_REQ_SUSPEND			KVM_ARCH_REQ(6)
->   #define KVM_REQ_RESYNC_PMU_EL0		KVM_ARCH_REQ(7)
->   #define KVM_REQ_NESTED_S2_UNMAP		KVM_ARCH_REQ(8)
->   #define KVM_REQ_GUEST_HYP_IRQ_PENDING	KVM_ARCH_REQ(9)
->   #define KVM_REQ_MAP_L1_VNCR_EL2		KVM_ARCH_REQ(10)
->   #define KVM_REQ_VGIC_PROCESS_UPDATE	KVM_ARCH_REQ(11)
-> +#define KVM_REQ_RELOAD_STAGE2 \
-> +	KVM_ARCH_REQ_FLAGS(12, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
->   
->   #define KVM_DIRTY_LOG_MANUAL_CAPS   (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE | \
->   				     KVM_DIRTY_LOG_INITIALLY_SET)
->   
->   #define KVM_HAVE_MMU_RWLOCK
->   
->   /*
->    * Mode of operation configurable with kvm-arm.mode early param.
->    * See Documentation/admin-guide/kernel-parameters.txt for more information.
->    */
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 8b080804bc90..1e528d53d093 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -1164,20 +1164,28 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
->   
->   		if (kvm_check_request(KVM_REQ_RESYNC_PMU_EL0, vcpu))
->   			kvm_vcpu_pmu_restore_guest(vcpu);
->   
->   		if (kvm_check_request(KVM_REQ_SUSPEND, vcpu))
->   			return kvm_vcpu_suspend(vcpu);
->   
->   		if (kvm_dirty_ring_check_request(vcpu))
->   			return 0;
->   
-> +		if (kvm_check_request(KVM_REQ_RELOAD_STAGE2, vcpu)) {
-> +			unsigned long flags;
-> +
-> +			local_irq_save(flags);
-> +			__load_stage2(vcpu->arch.hw_mmu);
-> +			local_irq_restore(flags);
-> +		}
-> +
->   		check_nested_vcpu_requests(vcpu);
->   	}
->   
->   	return 1;
->   }
->   
->   static bool vcpu_mode_is_bad_32bit(struct kvm_vcpu *vcpu)
->   {
->   	if (likely(!vcpu_mode_is_32bit(vcpu)))
->   		return false;
-Hi Leo,
+> I assume the stubs probably just forward to handle_unknown_ec, or do you
+> have a different suggestion?
 
-Thanks for sending this out. I actually implemented a similar request in
-my v5 HDBSS series to reload VTCR on enable/disable, but I named it
-KVM_REQ_HDBSS_RELOAD_VTCR.
+Probably. This is an indication of something being deeply wrong in the
+implementation (HW or SW). On reflection, kvm_handle_unknown_ec()
+should result in a KVM_BUG().
 
-Without such a request, the new VTCR value only takes effect on the next
-vcpu_load, which means enable/disable could be delayed indefinitely if
-the vCPU never goes through a load/put cycle. So I think this request is
-necessary for HDBSS as well.
+	M.
 
-Since your KVM_REQ_RELOAD_STAGE2 is more generic, I'd like to rebase on
-top of your patch and reuse it in v5. Would that work for you? Or do you
-prefer to keep them separate for now?
-
-Thanks,
-Tian
+-- 
+Jazz isn't dead. It just smells funny.
