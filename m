@@ -1,139 +1,203 @@
-Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2E25456E15
-	for <kvmarm@lists.linux.dev>; Wed,  2 Sep 2026 16:35:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.98
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01F333D34AC;
+	Wed,  2 Sep 2026 16:39:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788366908; cv=none; b=o5atLICKWQfLSx6mk+7prG7OM1qdtV8JtMuj5zVwNcMpwDY6DYM8QZU5a2BioOdDW3GS0PQGGcKuNpUO3Bz4XTzMaO4m2fVsGjqNyDXi/T12a3w8scrKGJHsxZ/9OfjAyseBf2Q4fGSVqbS6ku68z1d0tCMRlseT4QomkhMJxlE=
+	t=1788367170; cv=none; b=O/femh1NiqmQookI3drO/0ICSH5p34eG7EBRWXvLlvod/w2DgfDIjTSXpKW0ilM59zsJIe8B0+DrsnGHQRVam/GWd3TGu/OwBnjsc7tpTZYZHdr5mfdDPdd/HzDm0NPTPfIoorKtV7jVE0wd96YkgEYAymkK6Hgr79MeLKHL4Fs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788366908; c=relaxed/simple;
-	bh=pn5sy/ZoOK38AtEtuMJVX9rDpF23LMv2oDUU+1FxHGE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ESFA5UR4iFVNWv74LPTTddlNJ1CjSGrh0QvzUS+X//Qpvc+yNdkTxWMWG6FwN8Q4UvLJ4dqTmUYIS7nqDd/0Paazb+I98G0hSh5DyFeRggjjtYObxpj4GJ7o3/aW3JrpHPXrtzL+h56L+v1G9IWZAHTw31ERSUt7ufuUNu+vzCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=aB9LLQng; arc=none smtp.client-ip=115.124.30.98
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+	s=arc-20240116; t=1788367170; c=relaxed/simple;
+	bh=Db3awz/KbnLfwISKxnK4Ng7LXl9bS23HPK6EwyZQFqM=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=EWy8bZN5i4v9uXPA3t8barEeHDtM9oce/jK+KPhiKB6zUuV3f/mvzgKUDtUSMQRQdNFWXqB1NbOp+Bbzuav0oZnii9A6H/b0qsbYKcmKHiK/ixSUJTYBcYejD3LpDwXCMGoi8bvOXvxg0gQMtNWRC3TMyTWxr5nor4QcL74w/Ho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LDQvRkCf; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="aB9LLQng"
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1788366902; h=From:To:Subject:Date:Message-ID:MIME-Version;
-	bh=t3xTtfp8+sFuOL15lrfY9099X11nqv/eMWaYFw/sH5k=;
-	b=aB9LLQngBloirh6poWjvkxUoDSQ8SNYrW+yD+KhNOr/cO8S9oCrI6824jdUUjEvy0YuonS4gZ7yR2ZyP6n5xkr58Q94kRGPoM72UBWjLCQxrqpkoUhj4SH3Bw28H2Ta0mB49ykSAyf9beyns3fzUWrW/XkoQWVLBS6+bvw06ywo=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037026112;MF=wanghan@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0XADH..Q_1788366900;
-Received: from wanghan-Workstation..(mailfrom:wanghan@linux.alibaba.com fp:SMTPD_---0XADH..Q_1788366900 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Thu, 03 Sep 2026 00:35:01 +0800
-From: Wang Han <wanghan@linux.alibaba.com>
-To: weilin.chang@arm.com
-Cc: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LDQvRkCf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE6161F000E9;
+	Wed,  2 Sep 2026 16:39:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788367167;
+	bh=z0JXN1Qg8SKT1PqQszVSTrjn1xMyP8kvqiPKrKavDZM=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date;
+	b=LDQvRkCfft8OKugaNahjcHj8SPwPbh0Lsgz1FJf2bdguoDCEOmR60ruh6hw4HoZ4f
+	 lkWCRjdQ6pdsTbghaNmiDzCl18HInwe4FMqj+Yn/gs4UyhvzpvjVFzE/9H7xOvXSPt
+	 rSl3MVuAjgd1j0lNArjOmMS8VQDPLG55oNCJuzNAj1cQFT3zMs0QEFZSHy5KstIYS4
+	 5oqTIzogNUJSCUe/ib2V9vZ1wo1CNG/jbQar1twhHlw8zr8okeQDvl/JPTNirSKPBp
+	 b+AkHnbQLqcvkPxwgCW4rCWeQ+YKJiNl/76NHbcO8x6lfjduRo0gswP1nCsBMo5qkl
+	 /nmD2hapvphsQ==
+X-Mailer: emacs 31.1 (via feedmail 11-beta-1 I)
+From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Nicolin Chen <nicolinc@nvidia.com>, linux-coco@lists.linux.dev,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
-	maz@kernel.org,
-	oupton@kernel.org,
-	tabba@google.com,
-	joey.gouly@arm.com,
-	seiden@linux.ibm.com,
-	suzuki.poulose@arm.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	ljs@kernel.org,
-	itaru.kitayama@fujitsu.com
-Subject: Re: [PATCH v5 0/6] KVM: arm64: nv: Implement nested stage-2 reverse map (new data structure)
-Date: Thu,  3 Sep 2026 00:35:00 +0800
-Message-ID: <20260902163500.1841671-1-wanghan@linux.alibaba.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260810205038.118843-1-weilin.chang@arm.com>
-References: <20260810205038.118843-1-weilin.chang@arm.com>
+	Alexey Kardashevskiy <aik@amd.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Joerg Roedel <joro@8bytes.org>,
+	Jonathan Cameron <jic23@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Pranjal Shrivastava <praan@google.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Samuel Ortiz <sameo@rivosinc.com>,
+	Steven Price <steven.price@arm.com>,
+	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Xu Yilun <yilun.xu@linux.intel.com>
+Subject: Re: [RFC PATCH v4 03/16] iommu/arm-smmu-v3: Add initial pSMMU realm
+ viommu plumbing
+In-Reply-To: <yq5aik4nztdt.fsf@kernel.org>
+References: <20260427085344.941627-1-aneesh.kumar@kernel.org>
+ <20260427085344.941627-4-aneesh.kumar@kernel.org>
+ <apM6dOHcEI2ztWS0@nvidia.com> <yq5a8q5lz5yn.fsf@kernel.org>
+ <yq5aecfdnv4i.fsf@kernel.org> <20260901143445.GC56830@ziepe.ca>
+ <yq5a8q5kkoz3.fsf@kernel.org> <20260902121700.GC2890729@ziepe.ca>
+ <yq5aik4nztdt.fsf@kernel.org>
+Date: Wed, 02 Sep 2026 22:09:15 +0530
+Message-ID: <yq5aecfbzjyk.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-Hi Wei-Lin,
+Aneesh Kumar K.V <aneesh.kumar@kernel.org> writes:
 
-I tested this series on a Yitian 710 system with an ARM Neoverse-N2 CPU
-(128 CPUs, 2 NUMA nodes).
+> Jason Gunthorpe <jgg@ziepe.ca> writes:
+>
+>> On Wed, Sep 02, 2026 at 02:30:00PM +0530, Aneesh Kumar K.V wrote:
+>>> Jason Gunthorpe <jgg@ziepe.ca> writes:
+>>> 
+>>> > On Tue, Sep 01, 2026 at 03:36:37PM +0530, Aneesh Kumar K.V wrote:
+>>> >
+>>> >> @@ -463,14 +460,13 @@
+>>> >>  	vsmmu->vmid = s2_parent->s2_cfg.vmid;
+>>> >>  
+>>> >>  	if (viommu->type == IOMMU_VIOMMU_TYPE_ARM_SMMUV3) {
+>>> >> +		if (arm_smmu_is_realm_viommu(viommu))
+>>> >> +			return arm_realm_smmu_v3_init(viommu, user_data);
+>>> >> +
+>>> >
+>>> > I think the realm vsmmu is going to require a different info struct
+>>> > than the normal psmmu case, isn't it?
+>>> >
+>>> > If so it needs its own enum value.
+>>> >
+>>> > It would be nice to see a draft patch showing how the real vsmmu works
+>>> > on top of the RMM spec for it. If we are using a viommu object then
+>>> > non-vsmmu case should be identical just with an option in the info
+>>> > struct to not create the vsmmu object.
+>>> 
+>>> Based on feedback on other emails in this thread, I have now implemented
+>>> this without using a vdevice or viommu. This should make the CCA and
+>>> non-CCA cases similar.
+>>
+>> That wasn't the feedback. The feedback was to use the viommu and not
+>> make a bunch of new stuff..
+>>
+>
+> That rework was done before I saw your discussion with Nicolin.
+>
+> To reiterate, for this configuration:
+>
+> - The viommu will use a stage-1 bypass configuration.
+> - A new IOMMU_VIOMMU_TYPE_ARM_REALM_SMMUV3 type will create the viommu.
+>   The psmmu will be activated at this point to avoid creating psmmu
+>   objects early. We will reference-count it to ensure that the same
+>   psmmu is shared across realm guests.
+> - Creating a vdevice will invoke SMC_RMI_PSMMU_ST_L2_CREATE.
+>
+> I am unclear about the vdev_create suggestion. Creating a vdevice
+> requires an RD, which is created later in the flow above. How do you
+> suggest linking vdevice_alloc to vdev_create?
+>
 
-Test environment
-----------------
 
-  L0 kernel: Linux v7.2-rc6
-  L1 guest: Ubuntu 26.04 LTS, kernel 7.0.0-27-generic (aarch64)
-  QEMU: 10.2.3
+I was able to prototype the following flow:
 
-L0 NUMA balancing was enabled (`/proc/sys/kernel/numa_balancing=1`).
-The host was booted with `kvm_arm.mode=nested`.
+ - The viommu uses a stage-1 bypass configuration.
+ - A new IOMMU_VIOMMU_TYPE_ARM_REALM_SMMUV3 type creates the viommu.
+   The pSMMU is activated at this point to avoid creating pSMMU objects
+   early. It is reference-counted so that the same pSMMU can be shared
+   across realm guests.
+ - The realm is created during viommu allocation, ensuring that the
+   vSMMU can be created here.
+ - Creating a vdevice invokes SMC_RMI_PSMMU_ST_L2_CREATE.
+ - This is followed by tsm_bind() if the device has an established TSM
+   link.
 
-This series fixes a functional hang that is exposed when NUMA balancing is
-enabled.  The previous nested stage-2 unmap path is too slow for this
-workload, making the performance problem user-visible: NUMA balancing can
-leave the L1 guest unable to make progress and eventually hang during boot.
+static int arm_realm_smmu_v3_vdevice_init(struct iommufd_vdevice *vdev)
+{
+	struct device *dev = iommufd_vdevice_to_device(vdev);
+	struct kvm *kvm = vdev->viommu->kvm_file->private_data;
+	struct arm_smmu_device *smmu;
+	struct arm_smmu_stream *stream;
+	struct arm_smmu_master *master;
+	unsigned long rmi_ret = 0;
+	unsigned long l2_sid;
+	int ret;
 
-The L1 was started with 8 vCPUs and 32 GiB of RAM using:
+	if (!tsm_is_configured(dev))
+		return 0;
 
-  qemu-system-aarch64 -smp 8 -m 32G \
-    -machine virt,accel=kvm,gic-version=3,virtualization=on \
-    -cpu host -nographic -enable-kvm \
-    -drive if=pflash,format=raw,readonly=on,file=pflash0_bak.img \
-    -drive if=pflash,format=raw,file=pflash1_bak.img \
-    -drive file=./ubuntu-vm.qcow2,format=qcow2,if=virtio,cache=none,aio=native \
-    -nic user,model=virtio-net-pci,hostfwd=tcp::11234-:22 \
-    -serial mon:stdio
+	master = dev_iommu_priv_get(dev);
+	/* FIXME which stream to pick */
+	/* At this moment, iommufd only supports PCI device that has one SID */
+	stream = &master->streams[0];
+	smmu = master->smmu;
 
-With upstream v7.2-rc6 (075b74841bd0065a3bda3440873c747938e69b68),
-L0 NUMA balancing enabled, and the same QEMU configuration, the L1 guest
-hung during boot.  The original L1 console reported:
+	l2_sid = ALIGN_DOWN(stream->id, STRTAB_NUM_L2_STES);
 
-  [   76.595764] watchdog: BUG: soft lockup - CPU#1 stuck for 45s! [k8s-dqlite:3068]
-  [   76.595973] watchdog: BUG: soft lockup - CPU#0 stuck for 38s! [rs:main Q:Reg:1602]
-  [   76.596181] watchdog: BUG: soft lockup - CPU#7 stuck for 45s! [kubelite:2672]
-  [   76.596334] watchdog: BUG: soft lockup - CPU#5 stuck for 38s! [containerd:2375]
+	{
+		guard(mutex)(&smmu->realm.mutex);
 
-The corresponding L0 hung-task report was:
+		if (!arm_realm_smmu_active(smmu))
+			return -EINVAL;
 
-  [Wed Sep  2 22:49:08 2026] INFO: task qemu-system-aar:14681 blocked in I/O wait for more than 120 seconds.
-  [Wed Sep  2 22:49:08 2026]       Tainted: G            E    N  7.2.0-rc6-poluted_opt-7-2-numa #10.al8
-  [Wed Sep  2 22:49:08 2026] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-  [Wed Sep  2 22:49:08 2026] task:qemu-system-aar state:D stack:0     pid:14681 tgid:14681 ppid:14680  task_flags:0x8400080 flags:0x00800000
-  [Wed Sep  2 22:49:08 2026] Call trace:
-  [Wed Sep  2 22:49:08 2026]  __switch_to+0x128/0x168 (T)
-  [Wed Sep  2 22:49:08 2026]  __schedule+0x278/0x910
-  [Wed Sep  2 22:49:08 2026]  schedule+0x3c/0xe8
-  [Wed Sep  2 22:49:08 2026]  io_schedule+0x44/0x68
-  [Wed Sep  2 22:49:08 2026]  softleaf_entry_wait_on_locked+0x280/0x2d0
-  [Wed Sep  2 22:49:08 2026]  migration_entry_wait+0xdc/0x140
-  [Wed Sep  2 22:49:08 2026]  do_swap_page+0x834/0xd80
-  [Wed Sep  2 22:49:08 2026]  handle_pte_fault+0x208/0x2b8
-  [Wed Sep  2 22:49:08 2026]  __handle_mm_fault+0x228/0x528
-  [Wed Sep  2 22:49:08 2026]  handle_mm_fault+0xdc/0x2d8
-  [Wed Sep  2 22:49:08 2026]  do_page_fault+0x388/0x790
-  [Wed Sep  2 22:49:08 2026]  do_translation_fault+0x4c/0x88
-  [Wed Sep  2 22:49:08 2026]  do_mem_abort+0x4c/0xa0
-  [Wed Sep  2 22:49:08 2026]  el0_da+0x54/0x178
-  [Wed Sep  2 22:49:08 2026]  el0t_64_sync_handler+0xd0/0xe8
-  [Wed Sep  2 22:49:08 2026]  el0t_64_sync+0x1ac/0x1b0
+		ret = rmi_psmmu_st_l2_create(smmu->base_phys, l2_sid,
+					     &rmi_ret);
+		if (ret || rmi_ret) {
+			if (!ret)
+				return -EIO;
+			if (RMI_RETURN_STATUS(rmi_ret) != RMI_ERROR_PSMMU_ST ||
+			    RMI_RETURN_INDEX(rmi_ret) != 2) {
+				dev_warn(dev, "failed to create realm stream mapping\n");
+				return -EIO;
+			}
+			/* The L2 stream table already exists. */
+		}
+	}
 
-The same wait and stack were observed repeatedly; the hung-task report
-recurred after 241 and 362 seconds.
+	vdev->destroy = arm_realm_smmu_v3_vdevice_destroy;
+	return tsm_bind(dev, kvm, vdev->virt_id);
+}
 
-I applied the v5 series to the same v7.2-rc6 baseline.  With L0 NUMA
-balancing still enabled and the same QEMU command line, the L1 guest
-booted normally and could be operated through the serial console.  QEMU
-no longer hung.  No new soft-lockup, hung-task, blocked-I/O,
-migration-entry-wait, or softleaf-entry-wait message was observed in the
-patched boot log.
+ - tsm_bind() calls cca_tsm_bind(), which in turn calls vdev_create().
+ - After boot, the guest locks the device. This generates an RHI request
+   that reaches cca_tsm_guest_req() with RHI_DA_TDI_CONFIG_LOCKED.
+ - cca_tsm_guest_req() now handles TSM_REQ_SET_TDI_STATE requests for
+   the unlocked, locked, and running states.
 
-As a control, the unmodified v7.2-rc6 kernel with
-/proc/sys/kernel/numa_balancing=0 also booted the L1 with the same QEMU
-configuration.  This confirms that the patch removes the NUMA-balancing
-failure mode in this setup rather than merely changing the guest setup.
-
-Tested-by: Wang Han <wanghan@linux.alibaba.com>
-
-Thanks,
-Wang Han
+@@ -513,10 +514,16 @@ static ssize_t cca_tsm_guest_req(struct pci_tdi *tdi,
+ 		if (copy_from_user((void *)&req_obj, req.user, req_len))
+ 			return -EFAULT;
+ 
+-		if (req_obj.tdi_state != RHI_DA_TDI_CONFIG_RUN)
++		switch (req_obj.tdi_state) {
++		case RHI_DA_TDI_CONFIG_UNLOCKED:
++			return cca_vdev_device_unlock(pdev);
++		case RHI_DA_TDI_CONFIG_LOCKED:
++			return cca_vdev_device_lock(pdev);
++		case RHI_DA_TDI_CONFIG_RUN:
++			return cca_vdev_device_start(pdev);
++		default:
+ 			return -EINVAL;
+-
+-		return cca_vdev_device_start(pdev);
++		}
+ 	}
+ 
+-aneesh
