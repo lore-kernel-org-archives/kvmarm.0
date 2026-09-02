@@ -1,90 +1,124 @@
-Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com [209.85.210.197])
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33C3323D2A1
-	for <kvmarm@lists.linux.dev>; Wed,  2 Sep 2026 00:40:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 809FA3546C8
+	for <kvmarm@lists.linux.dev>; Wed,  2 Sep 2026 01:51:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788309628; cv=none; b=hhmILVJP+gC0wCK2zIOcVklZKGOpHquwlXYqidX3Q1a1LkHZImcotKRZsqOdfs7ZpH9zNMIq1/vWGh44r4cYXPNAdvIyBJr5EckxP8LnoTJ+btJKy/XMgPNzDE486lpWHtByFBGGyZ3ImD0r/+qxVP0erJ4uH6sqwOhpFeSA6DU=
+	t=1788313907; cv=none; b=dCShzgSXjeNMBffnY9RxMW6aroSD6pn1+pFNAzsid1N2j5Ah2wWw7/icbfKo9QeYKAkJr/X+z4xMiftxC6ZCnSji4PGtLuz1peDyNhtzYjU27uTCBcTESgHUCgthLkHQ7llohRnr/UgqeFD4kqYzf/wJhFVFCFCQQOFV2Thcd98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788309628; c=relaxed/simple;
-	bh=vaDS6XNQUMUuPDi84wd9HFSG8Scz5CNLwlPkibF3DEY=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=JPErjtqeQmjWaJwNpSpGYeUyGwe7JdWi7+Djob0KgQ5+GKUSeiOl/yReUyyXCOKllrk6K1aS1n9JFbwtXnNSdS1ru5Lboa2UbLpfMsTVTWQYJ4jmGqbKnp8VK8MWgwcs7DYWsvBUQVhuPL3+0+g1VoCYUwBT73fCWnoAmUezutw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qX1VFrMi; arc=none smtp.client-ip=209.85.210.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1788313907; c=relaxed/simple;
+	bh=E+oXMdrF2sleLVDXDyRpoFuZgDFkHIlL9VN1wy6t690=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PknIR0tO3CWOW+gDO2+aNyl5OnLlwHGBRljoD2iTnYf3n5LpcY4XTnLshF3AxEF+/UpV7ZompSvZPOW1ha/RFvf9nYOpsnfqOqbmJQKfPnG3lVCQZBMuELU/jZsYKpXWfQoB8BFGZa6OHG5V0IQq/rZuw9gd+3pXJCmRCpNWUdU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=Cokh/1k8; arc=none smtp.client-ip=209.85.219.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qX1VFrMi"
-Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-84e13b57b2cso565307b3a.1
-        for <kvmarm@lists.linux.dev>; Tue, 01 Sep 2026 17:40:27 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="Cokh/1k8"
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-90e8535619bso5656686d6.2
+        for <kvmarm@lists.linux.dev>; Tue, 01 Sep 2026 18:51:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1788309626; x=1788914426; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=0Yk5W8YMQMFUnjqW7SP37P8eIRPlwXT5+5U93q8LYb8=;
-        b=qX1VFrMiXkwRU5u8pswCuToPB3r15/jsUDkpv5sHPWJJs8w1UwSvf8KwGjz7VgObZG
-         hGQXNQqUB9+qOIYJsMaBNyttY11z3wQnFK2qs01Uv3hYGRUQflbMjWMvEuw0qNoUQdtY
-         N8SC0RXRtmcCQsr0zQWNd6s3zw8HgDOifGiQAjQwKwCQ2ra3YTCzEJh0m0wXyxt9JWyP
-         KQo6X2/lJiYI1rDOnILZJnHtFhOcXvsXV4YrUOmdgpT+/pX0+pVKimY5iP2LMU5xngfP
-         S+IPh4W4XebFwivsu7u2cTNxyKK9aXHR+ds/lW1L9NRLWBTlL/v00KIcXEX/C5DVful+
-         LAiA==
+        d=ziepe.ca; s=google; t=1788313900; x=1788918700; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=E+oXMdrF2sleLVDXDyRpoFuZgDFkHIlL9VN1wy6t690=;
+        b=Cokh/1k85vJ4CHgv5xK2B6hIC0TBeuhQwpiDPs/T6jzFx4j3tSi7FxhK/fuEvlQJpV
+         PgJwRJPA29geLfVJFt9nIH/L/Ep+i9sendCwtO27hjtPQJe/Q9ddQRyIAPkwcfg4jZ5w
+         lIMAtNsKQ26s64ofj9UIYqkeXP9QFuEtUoYpfxdijkLiZHG+VvmcTe9JmBvIdJbg91rh
+         DSxOusKi5yjI2HL9XBTXqNEJRuHLGevNFEgCv+Hkk7NE0pXnvTwRxr8XJiL8pZCoICgp
+         OxNZ7S3Kd5fjQITLcgeixgJEVstV/UKqf67D7/AOutS/eCV5TM5/kU1mIy9mJLBior2o
+         xFAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788309626; x=1788914426;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=0Yk5W8YMQMFUnjqW7SP37P8eIRPlwXT5+5U93q8LYb8=;
-        b=S0YVZkeIPisOAptIUP4FdZtfTCQW1enoffVFFb4gxVq9tkq0eNaTgbHwaUZC5d2Hqy
-         f/yLGTqY9bGhy1zrS/PyYy3rEag6CIUsRjyjsSfLuFDtUM+2HSACYUUa6AyajuEYtsF/
-         NKHVFS0gZoKYdciMzXEZYLopZXn4xNhYfI+MgWl7mlXEUTNUQqxuTqsu+LrvMTjkwtDz
-         pvkpUYsOoAJ0GJvmDwSp+R4R7fjG6VN2q4U0mwbDd/J3V9qkfR3xU+hl4qRTw+TRT8KB
-         fMhrLK5lBpt1T5530IMwxfQ39FrPVwTy4kDrOnSIvgprB+tfyOwEDF9sT7jiIU4ODhg3
-         4f7A==
-X-Forwarded-Encrypted: i=1; AKwUvByqbQGDLewO45zDdbp+rqZEVJagF3YiiWqyPH6xKpcYsDjtMg6HoPHBUz/hmhwRB7vrpycJ7O4=@lists.linux.dev
-X-Gm-Message-State: AFuF++mxkGrkPy7dA4hsKVmh62g6qRDTWO0Svg9lUzjJDn2AthbHwBlG
-	0xMsc3fvsLHOG1dPTxFD4guSfqoFU0dZi0Fnu8dsgmOEKRHSBWmtCBMCCO2YuP/+yoLeOdIpx4E
-	o6DzYNg==
-X-Received: from pfbi25-n2.prod.google.com ([2002:a05:6a00:a519:20b0:84f:4ff1:f767])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:ab08:b0:848:5cf5:5040
- with SMTP id d2e1a72fcca58-85ed23e044bmr2745937b3a.10.1788309626365; Tue, 01
- Sep 2026 17:40:26 -0700 (PDT)
-Date: Tue, 1 Sep 2026 17:40:25 -0700
-In-Reply-To: <20260831144802.834315-3-seiden@linux.ibm.com>
+        d=1e100.net; s=20251104; t=1788313900; x=1788918700;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=E+oXMdrF2sleLVDXDyRpoFuZgDFkHIlL9VN1wy6t690=;
+        b=FVg4KkXlcBE1od9BQxouQS4F1Chwn4YZP+qj8Y1VqKs2/UmoRVj+vpRCcRbEKPazCJ
+         f9n4uN2DHBLzpA9hinNzTS9TpnIeLsMNCm9+fnGbxypF3M3k87Z7rZdSzPQ6RcpNfT+z
+         oNSRD1mVpJqd/9o4obUdpNFvU/TsYDjZFZDlhmygNCcXctExGyNVe/YlC+ZR0fE/pKVt
+         k2OtKg84AkOTzv0rTshdueyBKmSmFTmnTojTmDAPbDkbWz6JYwhPCGM48g67ApcuSl2K
+         urUYHrmZEs2tASjexlXE5SYfUii+L0OdEtody5GAe8rrQDo3x6DEiY2NlHA4Uw/xeXlD
+         sfXw==
+X-Forwarded-Encrypted: i=1; AKwUvBzQ2xwAH09eW9ZhsiJMEVLrFf9kvPalAc064UEENws9ou1ac3rRR/N0JrOGk7hsA+QuKNNDBR8=@lists.linux.dev
+X-Gm-Message-State: AFuF++lf/gB3gwQ2roF770Xb3+Nu5mebhGggylN9oIPCMzpyOPcqCX2v
+	ItEvzSc6+yUI47kdr9DBWBDU0aysWX5CE8xBPe+0/rp0uOacRbQ2ZYKdQYD46cMoLrk=
+X-Gm-Gg: AR+sD11Xj520RaWwmAG7VDK2GpFXe7Q22cFjIDtwE2NsY0+tZWofDNfc3g4rp38hisc
+	AbXobOQ3vhMRsM/yE/CiGU4Slc9PniYJEr98Cg4hY0m+mHG/ANjLkYb6O5GnqF5RG42IdjBfcba
+	1J94bdKSy6mYumgy2jrPFgc11DPLq6ZJXKnN5Z6Agf9hV07hiATd2fTNTV6Orj1cnfMav2nYJdx
+	Vec0YE+BCAVhwUEhaEhtR/76U8Tbp7kN24U5/E0sxkrAAuoS93ks7J+P9glgssYeROrXzle7h5y
+	gcsgykS7K7cod3p0JLMBOV9taoTJs1jV4QW5TDXCmgUUN2PJDaSlJFTBxNHowfDvjiTvWhT1p8w
+	gRnc8iRucsxHkIsLijysmC2WRcSMmaq9YPxcGEOdRqrTBtaLABx3tq573+/8512Aj7Ox5kDK7P6
+	JyNe8joHrZ+Vj4aoVCK+LsUTQ4lT0cdXRb/CLhbMHvOqgIOWZGkv6Suo6gOVmSTene17ajdGu8X
+	b+sk6ypLy20aYZ3WZ5sJYvRvIhuV+vEnLka5l/cou3XQg==
+X-Received: by 2002:a05:6214:2584:b0:90c:c53c:a032 with SMTP id 6a1803df08f44-90ebabce888mr24156306d6.25.1788313899587;
+        Tue, 01 Sep 2026 18:51:39 -0700 (PDT)
+Received: from ziepe.ca (hlfxns010zw-159-2-239-150.pppoe-dynamic.high-speed.ns.bellaliant.net. [159.2.239.150])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-90e9eef4f20sm7284946d6.41.2026.09.01.18.51.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Sep 2026 18:51:38 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1x1a8X-0000000Czw5-2tb4;
+	Tue, 01 Sep 2026 22:51:37 -0300
+Date: Tue, 1 Sep 2026 22:51:37 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Nicolin Chen <nicolinc@nvidia.com>
+Cc: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
+	linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Alexey Kardashevskiy <aik@amd.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Joerg Roedel <joro@8bytes.org>, Jonathan Cameron <jic23@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Pranjal Shrivastava <praan@google.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Samuel Ortiz <sameo@rivosinc.com>,
+	Steven Price <steven.price@arm.com>,
+	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
+	Will Deacon <will@kernel.org>, Xu Yilun <yilun.xu@linux.intel.com>
+Subject: Re: [RFC PATCH v4 03/16] iommu/arm-smmu-v3: Add initial pSMMU realm
+ viommu plumbing
+Message-ID: <20260902015137.GA2890729@ziepe.ca>
+References: <20260427085344.941627-1-aneesh.kumar@kernel.org>
+ <20260427085344.941627-4-aneesh.kumar@kernel.org>
+ <apM6dOHcEI2ztWS0@nvidia.com>
+ <yq5a8q5lz5yn.fsf@kernel.org>
+ <yq5aecfdnv4i.fsf@kernel.org>
+ <20260901143445.GC56830@ziepe.ca>
+ <apcHoHKGoI7WNFXp@nvidia.com>
+ <20260901174230.GA2847102@ziepe.ca>
+ <apcitkpASOREamQs@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20260831144802.834315-1-seiden@linux.ibm.com> <20260831144802.834315-3-seiden@linux.ibm.com>
-Message-ID: <apdweRfqt4dTxcU9@google.com>
-Subject: Re: [PATCH v7 02/23] KVM: Make device name configurable
-From: Sean Christopherson <seanjc@google.com>
-To: Steffen Eiden <seiden@linux.ibm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	linux-s390@vger.kernel.org, Alexander Gordeev <agordeev@linux.ibm.com>, 
-	Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, David Hildenbrand <david@kernel.org>, 
-	Friedrich Welter <fritz@linux.ibm.com>, Fuad Tabba <tabba@google.com>, 
-	Gautam Gala <ggala@linux.ibm.com>, Hariharan Mari <hari55@linux.ibm.com>, 
-	Heiko Carstens <hca@linux.ibm.com>, Hendrik Brueckner <brueckner@linux.ibm.com>, 
-	Ilya Leoshkevich <iii@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Joey Gouly <joey.gouly@arm.com>, Marc Zyngier <maz@kernel.org>, Nico Boehr <nrb@linux.ibm.com>, 
-	Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>, Oliver Upton <oupton@kernel.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Sven Schnelle <svens@linux.ibm.com>, Ulrich Weigand <Ulrich.Weigand@de.ibm.com>, 
-	Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <apcitkpASOREamQs@nvidia.com>
 
-On Mon, Aug 31, 2026, Steffen Eiden wrote:
-> Allow KVM implementations to choose alternative device names. This is
-> especially useful for architectures providing multiple KVM
-> implementations simultaneously. Architectures providing multiple KVM
-> implementations must compile the KVM common code once per
-> implementation and mange symbols.
+On Tue, Sep 01, 2026 at 12:08:38PM -0700, Nicolin Chen wrote:
 
-What about tracepoints?  Or do those show up as "kvm" and "kvm-arm64"?
+> The viommu object here is an empty vehicle that almost has no use
+> but to allow another vehicle (vdevice) on top to forward vBDF. It
+> makes VMM code a bit awkward: there is no iommu instance, so VMM
+> doesn't enable iommu driver, then there is no good place to alloc
+> the viomu object for VIOMMU_TYPE_ARM_REALM_SMMUV3.
+
+It would have to allocate singletons viommu for each psmmu as part of
+setting up the vdevices.
+
+Somehow I'd rather the vmm deal with that then invent a whole new set
+of uapis and flows..
+
+At best maybe we can invent a kernel side helper to create the
+singletons like the auto domains, but IDK if it is really so hard for
+the VMM (especially compared with how hard everything else is in CC)
+
+Jason
