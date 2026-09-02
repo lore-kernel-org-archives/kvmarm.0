@@ -1,95 +1,91 @@
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A46147F77A
-	for <kvmarm@lists.linux.dev>; Wed,  2 Sep 2026 12:17:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B378492513
+	for <kvmarm@lists.linux.dev>; Wed,  2 Sep 2026 12:42:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788351426; cv=none; b=gPq7U3yAdZ4gkxCigWYuRBF+JTCetV+j8Gr7SwLNn88KwQjSYVjHa8IWc/DxEFypS7L2zhLQ82YnhH904/TSqMHxAkBIw86si4GQKo7jsaVYoRCNfJHTlX3FW1T0+lP9bmTEv2+h4IPeiJMomAuKCHhLscUU1OeeKOK91AmR7us=
+	t=1788352937; cv=none; b=Jy+uCu1asGCGHE0hYxJWkJ+jRP8rZfOwG6+8oSH9XRhQU3jyQg9cwomheYxY4B+k5LJDplwUz3khf8g1Jb+XO3R7kHXH7Ptsi61kdzuGMXYZ8iI5IqrtSKvIY1EK0NsnSJJFqWkyg+F1EqBlplhE9xSETq1W7WJ8ACca7i9x6Tk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788351426; c=relaxed/simple;
-	bh=KiuQi7KyeiZxotF4pe9yz/R7uxutNRVzafURAOqLelg=;
+	s=arc-20240116; t=1788352937; c=relaxed/simple;
+	bh=ya4i825jy1XPAF9fATyKN3huP2HorW90joM+TUQYcSg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tXTA98WL/0ijOr8jktUeWdzl0fIvq5722IkbdpNbIuDS7mtVg7p6y5j73nshLWa9As0VrMhE6QCebffLfk+VT8ca1k74T4aAb/1Z1SDJiZi5Dt30FIenfIEaqzoLhYW+SAXioESSrNbl1hH9NXC7NIyD2Tn5QC28f/sIYLuy3KQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=Z1aghS/I; arc=none smtp.client-ip=209.85.160.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+	 Content-Type:Content-Disposition:In-Reply-To; b=VL32d4dNpnKq/udERySbLJKDUaPFGY2sXGGqXXxT1jB6w6JE0Vm29r49U/Ylch7SP5FkAYon+k5LbWlT5bcgH7JfQTQ+BfNBL0BZ3yX8NVgUKFdM4p4umok4xjJrqCxA5/dvVoFkfgpIm2Cmg/jyvzHh98Y/DGqNZe4uK9aprmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Uo0XEpDa; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="Z1aghS/I"
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-52de50e77ffso10994731cf.2
-        for <kvmarm@lists.linux.dev>; Wed, 02 Sep 2026 05:17:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1788351423; x=1788956223; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=WlwW9UoqChuDQG8Ubc8yfsDP24EvYv1xxnKt9rNQ+co=;
-        b=Z1aghS/IEorDIQpm+hZy5NzD2fWPVZIKZ74CiWUWo2itxR/kvjUEmJ8GOAhUNTVH3O
-         Ndo0X0yV/f1DP15Uys4DggRMycJGh4I/DtjpkIM/Ov5HYRW/pJRvMh/iH/ZkDc0qekpM
-         FZk3fGERMWwLqoJbjX3eus+F44WHqRvGr46qLhNR0Hv5xwRGKqdw1cr+VRx1GwUBYj8N
-         MssndhvaLID+7Y1/Gp2q/VrnUJTtHWazXZ+RYC6XdTChR8zC5BUMcGBEWUF2lj6T8nft
-         3GsEdVDNYPOxHsWVm427Ho/y5Nv0U8KjWTq1aIkH+pkfpY33CXEfMLuPnLZGTqoyiruf
-         wzdg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788351423; x=1788956223;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=WlwW9UoqChuDQG8Ubc8yfsDP24EvYv1xxnKt9rNQ+co=;
-        b=PTrEMYAFkCT8+BdXLB4RKbDkEsPZaip81tt8Qwj/78B/BRGPio33U348xtQhVvDiLI
-         hxGiDy58pMTgYf7ZOnheyaH+MPWIOV4QjkHcvVHsoOCYj6HjXO6fP4DAtdukxhtyebAP
-         cebLQ90S0S+4lOmht0aqbRHr6cO6ggJWdklCdCfvCrWmZvIh0Hgx3uoCE21fzPo9aKes
-         EYm2Wu1luYH9dfUEV7p7w1F7Bfy7k6rsfOboxY3PV5KkLCDemAdmxmuFeQZ9okdBEatx
-         FXSPmAgbDOSKomwGJX1bMUv3qU7LogMpgfPBDUQZ+25/9NTUpYkvm0pBYYhyss8qHQtj
-         S21g==
-X-Forwarded-Encrypted: i=1; AHgh+RqmjN//k4p6qX+sabMqEWhlltOGWX0wfmmi+xqch6zG2Lk+kOiMKfzRg34ynGKrURNB0YEfgxw=@lists.linux.dev
-X-Gm-Message-State: AFuF++nViw0Vjf59qjEYkGz3d1ljCfh01mK0hDcmn9enSvtjeS2qnPv/
-	SCewQvs+j1Kd3NjXMLHPsvu+v8rtCn1LUGasvaQlwtXE2AQxZobaCKQwr7wxC/StiBI=
-X-Gm-Gg: AR+sD12rqm18wfYD+oyQLc6b5x7WKNcRHM9bJUbEGVMTO8VQB8/zPAjAM9aqOAx388W
-	s837j357zGH3nx1dZ/n+l6RBfPz0RPEnNBhuLvIbCe+aVq6JATcpOQ4uZ2dPmtNSrLfcYGOVgh3
-	pP4qeakQJIGql+PyWxCL+0jnbeaOLj+DjQNN2NH56fPXDh8l18vsE23T0XKI/B/eQAOrDJYgr08
-	Co4ujTwtYtEMxMbdtk8sHBXtdQNSK2MsUSazs7m3Te5xl9/ibiiosG925A2d09MWBKjHoPBDP1r
-	ZkDg+oe8eREGyb58cf6zdY7c79UoIsFSH46kbXc6rS4uClwC5QQN2iL2/vWgmYSBT46dItSRwO7
-	e8+mgv9hcHIhcrtqGuiSqlmBhTAKBVk/ND3AoRs1yVevCst4/NGwIt7VjCVSPs/BiWY9VvAc8A0
-	h9eKLiXnSJlNat6f5mtqs+BwkThd+4o5bK0oOtN3o58wZnL1iMRJgpv99h0VbduLs4zHhAXJQqp
-	oWSRobbmd4kf7yDl61dVwgoBiRihRHXsSwRCN/IgUlnKQ==
-X-Received: by 2002:ac8:5d49:0:b0:527:7a5b:ca67 with SMTP id d75a77b69052e-53036cc7263mr48464101cf.20.1788351423074;
-        Wed, 02 Sep 2026 05:17:03 -0700 (PDT)
-Received: from ziepe.ca (hlfxns010zw-159-2-239-150.pppoe-dynamic.high-speed.ns.bellaliant.net. [159.2.239.150])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-53032ff4e90sm17590961cf.2.2026.09.02.05.17.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Sep 2026 05:17:01 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1x1jtk-0000000EB68-1U6I;
-	Wed, 02 Sep 2026 09:17:00 -0300
-Date: Wed, 2 Sep 2026 09:17:00 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>
-Cc: Nicolin Chen <nicolinc@nvidia.com>, linux-coco@lists.linux.dev,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, Alexey Kardashevskiy <aik@amd.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Joerg Roedel <joro@8bytes.org>, Jonathan Cameron <jic23@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Pranjal Shrivastava <praan@google.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Samuel Ortiz <sameo@rivosinc.com>,
-	Steven Price <steven.price@arm.com>,
-	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
-	Will Deacon <will@kernel.org>, Xu Yilun <yilun.xu@linux.intel.com>
-Subject: Re: [RFC PATCH v4 03/16] iommu/arm-smmu-v3: Add initial pSMMU realm
- viommu plumbing
-Message-ID: <20260902121700.GC2890729@ziepe.ca>
-References: <20260427085344.941627-1-aneesh.kumar@kernel.org>
- <20260427085344.941627-4-aneesh.kumar@kernel.org>
- <apM6dOHcEI2ztWS0@nvidia.com>
- <yq5a8q5lz5yn.fsf@kernel.org>
- <yq5aecfdnv4i.fsf@kernel.org>
- <20260901143445.GC56830@ziepe.ca>
- <yq5a8q5kkoz3.fsf@kernel.org>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Uo0XEpDa"
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 682CW9uD4190243;
+	Wed, 2 Sep 2026 12:42:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=dOiTeKWuwA/odP2KKwquW501Owf+f4
+	0tpwUxcpypkzw=; b=Uo0XEpDaaD6nlVgE2fElH6ZgG+3RUypgOIrmp0cKzeHUfL
+	DpbWsa+zm4Mji+bX5Y3KsfZXOnpdPexKhOMGVwMZw8ozXimnBv8pISe7tDxjlaQg
+	xcHmG8GbNoeuYxlxUvk/CeMjIJ3YPgaB6Vm4RJJZ2FOirqc/hM4jTed/SjK+b3Dt
+	LaS3RI0DKYyqtCOd2fWDCCC+vOSBpMC6M0KHOZsgGXJmT4MaiRFX6oZAg3Mw7/+6
+	Y9c9KjqZZvmF/ES9bfZ8M/i2Ez/NhYtUgly2JHznafPkXaCa9D+Lq81M35WuVrns
+	05E6jZAXZsqrb4GJQVAgo7YiNF0XwV02JT8dvdrQ==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gbpx5pe54-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 02 Sep 2026 12:41:59 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 682CfMji008248;
+	Wed, 2 Sep 2026 12:41:58 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4gecjaj11k-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 02 Sep 2026 12:41:57 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 682Cfsuh50331914
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 2 Sep 2026 12:41:54 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E3CA82004B;
+	Wed,  2 Sep 2026 12:41:53 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 82DFF20040;
+	Wed,  2 Sep 2026 12:41:53 +0000 (GMT)
+Received: from osiris (unknown [9.224.76.185])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Wed,  2 Sep 2026 12:41:53 +0000 (GMT)
+Date: Wed, 2 Sep 2026 14:41:52 +0200
+From: Steffen Eiden <seiden@linux.ibm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, Alexander Gordeev <agordeev@linux.ibm.com>,
+        Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@kernel.org>,
+        Friedrich Welter <fritz@linux.ibm.com>, Fuad Tabba <tabba@google.com>,
+        Gautam Gala <ggala@linux.ibm.com>,
+        Hariharan Mari <hari55@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Hendrik Brueckner <brueckner@linux.ibm.com>,
+        Ilya Leoshkevich <iii@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
+        Nico Boehr <nrb@linux.ibm.com>,
+        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
+        Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v7 11/23] KVM: arm64: Share arm64 code with s390
+Message-ID: <20260902124152.438647-C-seiden@linux.ibm.com>
+References: <20260831144802.834315-1-seiden@linux.ibm.com>
+ <20260831144802.834315-12-seiden@linux.ibm.com>
+ <87se3tmlrv.wl-maz@kernel.org>
+ <20260901084037.185345-C-seiden@linux.ibm.com>
+ <87mru0m76g.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -98,85 +94,102 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <yq5a8q5kkoz3.fsf@kernel.org>
+In-Reply-To: <87mru0m76g.wl-maz@kernel.org>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Authority-Analysis: v=2.4 cv=PPc/P/qC c=1 sm=1 tr=0 ts=6a981997 cx=c_pps
+ a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
+ a=kj9zAlcOel0A:10 a=VdqzKS8jKosA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=VnNF1IyMAAAA:8
+ a=SYUwwzt97VIMazuNbKEA:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-GUID: 6MjRUIWDIBt7iTZF9TiEC9Hdb4wCliq7
+X-Proofpoint-ORIG-GUID: A6X86a91-zHRIEr2PDnZe-nHUUowbUAo
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTAyMDExMSBTYWx0ZWRfX4Xd2aYS3gxXi
+ TH9hCVoNES6hfFUJvnS7uX+oG0mTVmrsR+VcapYhsPjjuWkESTikaChjUYFVdtDakjTUoqdpBhr
+ Ni+EkDCsBgUNCT+NyL5bnGEjSjOP6fY=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTAyMDExMSBTYWx0ZWRfX4lpUgbsqkGlp
+ pDNb4lKIS4w4mGoyrFkEwNBHyPgLAox/7ehHPfVu7RE5Y+aYlH6BV6n1tTkAFUvbTQ5Ek0/KIro
+ 1nBBtPq4ZfqyFKIXE14VrXqjdsGtsDR9E1vJqnvtjhkliY3n+VyURi+05R+k/I2cpnm9DzzRdN+
+ iy7nj+v43x/fWlLv4uMFarTUObQLMss/S9T+2A7CNqRLlyRi14XTuiz2jxKP2jEu9GWWptMgs5f
+ L34EoMGb+MCvBLuKJTNAExbFCermDog5UBHGUkMPzMsjmXxp8fEU/fYEtVzkgjNOUf7Nih9XQeX
+ 0lS0LrrYc9sCel/bQmiPAhyM+Tf5lguZlWo5La0blS3q+ezHK1SzbJv/A+HOx+/UbXDNMdkuY2j
+ kd/jWIqjYPu8oov72HAtBpMApuNW5EPiQbDKxO/Zt7vuefAhqqjhcERDDHSGRra/gonOoyHj5Ro
+ YJ+pP943TrBTt5zySxg==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-09-02_03,2026-09-01_03,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 phishscore=0 adultscore=0 suspectscore=0 bulkscore=0
+ spamscore=0 priorityscore=1501 impostorscore=0 malwarescore=0
+ lowpriorityscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
+ definitions=main-2609020111
 
-On Wed, Sep 02, 2026 at 02:30:00PM +0530, Aneesh Kumar K.V wrote:
-> Jason Gunthorpe <jgg@ziepe.ca> writes:
+On Wed, Sep 02, 2026 at 08:41:27AM +0100, Marc Zyngier wrote:
+> On Tue, 01 Sep 2026 09:40:37 +0100,
+> Steffen Eiden <seiden@linux.ibm.com> wrote:
+> > 
+> > On Tue, Sep 01, 2026 at 09:13:56AM +0100, Marc Zyngier wrote:
+> > > Why the exit handler, and not the EC handlers aside from the UNKNOWN
+> > > one? Yes, you probably aren't there yet in this series, but I can tell
+> > > you are going to add more and more of these.
+> > > 
+> > > But the EC array is absolutely architectural, and there is no good
+> > > reason to maintain your own.
+> > > 
+> > > So instead of this, why not keep the EC array altogether, and
+> > > implement stubs for the ECs you don't support?
+> > > 
+> > > 	M.
+> > > 
+> > 
+> > There was no specific reasson to define our own EC array as far as I
+> > remember. I will try reusing the array and find out if there are any
+> > issues with that. But I do not expect any. 
+> > 
+> > I assume the stubs probably just forward to handle_unknown_ec, or do you
+> > have a different suggestion?
 > 
-> > On Tue, Sep 01, 2026 at 03:36:37PM +0530, Aneesh Kumar K.V wrote:
-> >
-> >> @@ -463,14 +460,13 @@
-> >>  	vsmmu->vmid = s2_parent->s2_cfg.vmid;
-> >>  
-> >>  	if (viommu->type == IOMMU_VIOMMU_TYPE_ARM_SMMUV3) {
-> >> +		if (arm_smmu_is_realm_viommu(viommu))
-> >> +			return arm_realm_smmu_v3_init(viommu, user_data);
-> >> +
-> >
-> > I think the realm vsmmu is going to require a different info struct
-> > than the normal psmmu case, isn't it?
-> >
-> > If so it needs its own enum value.
-> >
-> > It would be nice to see a draft patch showing how the real vsmmu works
-> > on top of the RMM spec for it. If we are using a viommu object then
-> > non-vsmmu case should be identical just with an option in the info
-> > struct to not create the vsmmu object.
+> Probably. This is an indication of something being deeply wrong in the
+> implementation (HW or SW). On reflection, kvm_handle_unknown_ec()
+> should result in a KVM_BUG().
 > 
-> Based on feedback on other emails in this thread, I have now implemented
-> this without using a vdevice or viommu. This should make the CCA and
-> non-CCA cases similar.
-
-That wasn't the feedback. The feedback was to use the viommu and not
-make a bunch of new stuff..
-
-> +int arm_smmu_realm_tsm_bind(struct device *dev, struct kvm *kvm)
-> +{
-> +	struct arm_smmu_master *master = dev_iommu_priv_get(dev);
-> +	int ret;
-> +
-> +	if (!kvm_is_realm(kvm))
-> +		return 0;
-> +
-> +	ret = arm_realm_smmu_get(master->smmu);
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret = arm_realm_smmu_stream_get(master);
-> +	if (ret)
-> +		arm_realm_smmu_put(master->smmu);
-> +	return ret;
-
-It still makes no sense this doesn't do the VDEV_CREATE too.
-
-> iommufd_device_tsm_op_ioctl()
+> 	M.
 > 
-> 	switch (cmd->type) {
-> 	case IOMMU_DEVICE_TSM_BIND:
-> 		if (!idev->tsm_iommu_bound && ops->tsm_bind) {
-> 			if (WARN_ON_ONCE(!ops->tsm_unbind)) {
-> 				ret = -EOPNOTSUPP;
-> 				break;
-> 			}
-> 			ret = ops->tsm_bind(idev->dev, kvm);
-> 			if (ret)
-> 				break;
-> 			idev->tsm_iommu_bound = true;
-> 			iommu_bound = true;
-> 		}
-> 		ret = tsm_bind(idev->dev, kvm, cmd->tdi_id);
+> -- 
+> Jazz isn't dead. It just smells funny.
 
-Yuk! Now this uAPI doesn't make any sense when you have an actual
-viommu involved, we can't take tdi_id from userspace, it must come
-from the vdevice.
 
-I don't want two confusingly different flows, this stuff is hard
-enough to keep straight.
+While I tried to implement the change I noticed that it might be a good
+idea to share most if not all EC functions defined in handle_exit.c
+The handling is architectural as well and s390 and arm do (and should)
+not differ in their implementation.
 
-Your first version was better, we just need to commit to using the
-viommu for everyone on every arch and drop the the tsm_bind() API and
-IOMMU_DEVICE_TSM_BIND interface.
+But switching stubs to a real shared implementation is not possible if
+we want to not mix up changes in arm64 and s390 in one patch. I.e. in
+one patch expand the shared region and remove the stub. But we would
+neet to do that in one so the (s390) kernel keeps compiling.
 
-The only draw back is the VMM has to manage a litte bit more.
+So my suggestion is:
 
-Jason
+For series 1 (and 2) s390 has its own, local implementation of
+handle_exit without sharing any code with arm64 in regard to EC
+
+When s390 has all the relevant code available (likely series 3) s390 can
+switch to using most (if not all) EC handling code used by
+arm_exit_handlers implemented in handle_exit.c.
+
+This can be done without a mixed patch:
+
+1. Mark arm64 handle_exit.c as shared (roughly the first 400Loc w/o
+   includes) - s390 will not use it after this patch.
+2. remove the handle exit code from s390's handle_exit.c and include the
+   new generated handle_exit.inc
+
+This approach brings us further into the share architecture not only code
+approach you meantrioned in the comments regarding sys-regs. (I or
+Andreas will provide a solution for this later :) ) 
+
+Is that OK with you, what do you think?
+	
+	Steffen
