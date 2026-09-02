@@ -1,344 +1,172 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DB263905F5;
-	Wed,  2 Sep 2026 08:27:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6AAE3EC811;
+	Wed,  2 Sep 2026 09:00:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788337669; cv=none; b=bBc84e0YrI+puG6az7ZLQ9TvRLCp/dnIMMQXiZvb7QNitortFB8Bbm/5Q7C3gG6ysVe3R1uABpkNQDzgUwSyNEJY8DuDPZp4T0TvoHam7mZUXwVclNq/sRKmNiuRfrpyJXvZrr4tgj8WVtjuiniCspstaS5z7onfzDMQPYTBj8o=
+	t=1788339610; cv=none; b=g7WVPqQ2kCWA7lXSi5wLcqgkC5GVKLjFC0iIVsQ0geinARxxmFQ/kMDD8RQLsKjdhU4caUVuru/fDYcKJ0aHkp5pTh/DYDXB5UO8oFxHJm9mrV7K0wh9YgJmRVKxTb8e3qklwX69A1t/Zx99OeREJf8H2QnvbaGGDdlJzWYJ/vc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788337669; c=relaxed/simple;
-	bh=29fsueDVIRUntd2iiqt/yyNOOlWMXkIpdYy6w/ABEF8=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=U1yoUJO9e9R0SQy0Ovwpigwo4hw3K76rCMSP7BCttSfMywMTiK0E/r4c7I9vN3WB7CoIpSMw3zycOeGgYTfdXKuKR97MptuJj8LI+iPTrVkFRIFBXix2+FnDy/0m8rJZ+AnnU78kjOJyAJZSecoBjQfoaHC9yBLb6XCydjYC7O4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hoFabAGn; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788339610; c=relaxed/simple;
+	bh=RTuNo/vCd6tr9XWbXJARMNn8ie7kdLSH2vuxcvl2i1A=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=BHBAqs0xmcDtFPFl8g+9Df+0VTkhDaKejWDTzO+ejMxYDj7f4m3GaFnlf8L2bCaRDAwK1vD1raozCFoXIMasBC/U4GJpeTyS8ZO4oC2489Hxhx4Dy5sJ7/0VnCznE7mxRgMSWImlhD8/EtJOiHClNRYy80m8c2hm6M3UqSPyBj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HT9rw3M2; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hoFabAGn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B9011F000E9;
-	Wed,  2 Sep 2026 08:27:47 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HT9rw3M2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E55F01F000E9;
+	Wed,  2 Sep 2026 09:00:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788337667;
-	bh=00lmFy+N2N/bnyvL+i6kv3lyZlzEYxH3S/gtp4CE5WY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=hoFabAGnzh5HePnKfAeMgoIY07ZZ3DKA+IMSrNEhccurnvOkcKhirNJPIjXpF4S4C
-	 +RytmcHUdXHkSoSEyrCXGbm6ergJDagwGuYZ06XOXUgha+iSF7nO9G7nwdxL5fL8/R
-	 6f4Z7eU3BmvCKBoM1Omou/wyajH5jNT2oimFnaorXYdx98O29rOv+mXcnjNl8WqVVP
-	 f72PcG8eTpMdEYvsQzKchwlRxmenmAKOK/hcNGt9PokNoZpWSPMqj8kMGhHhnWktHV
-	 TS5MGtIqXEVqJeBYiDEDCLhtLNAW4ipeTpungXqBc+pOd2qo9G1Amgit5XryiJ6wJa
-	 LFsTzQt5K1gng==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1x1gJs-00000003mfI-2MWI;
-	Wed, 02 Sep 2026 08:27:45 +0000
-Date: Wed, 02 Sep 2026 09:30:17 +0100
-Message-ID: <87ik4om4x2.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Steffen Eiden <seiden@linux.ibm.com>,
-	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
+	s=k20260515; t=1788339609;
+	bh=kGyhqwpoKTL0G6djLUzdmHXBsAx/+FUeg8O/vusz8V0=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date;
+	b=HT9rw3M2ril3h9HMMccrqUbRw18Y37zhmnmK/bItstsqPU4xvADrVr3rHRziehMDw
+	 BOw4h8K19eDGvV5uEW9XBGFwwqKZpgEZHr2FBOCKTGra1KFISWVC2rLqTKmw+zAFta
+	 x9RXu3uiPfFMY5S5Q2IO51/Spu0QzQzo0UY+f0A8s4fRaDqS+ZKVlIX5CTCp34qlwg
+	 g+bYFUVyqj8wsMbDg7JBmHCuq2uyVf/pgX8yOO8mWpbeeJ/+Q7RFQYvj1lZqsWNWqx
+	 PCYywxlsofp9l9u8saVOHj8DrFoOq3Emn4t2HB7mFhKBI+jQ61+t3rTzm/gk0c8+XT
+	 RamxAu6k/gU2A==
+X-Mailer: emacs 31.1 (via feedmail 11-beta-1 I)
+From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Nicolin Chen <nicolinc@nvidia.com>, linux-coco@lists.linux.dev,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Andreas Grapentin <gra@linux.ibm.com>,
-	Arnd Bergmann <arnd@arndb.de>,
+	Alexey Kardashevskiy <aik@amd.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	David Hildenbrand <david@kernel.org>,
-	Friedrich Welter <fritz@linux.ibm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Gautam Gala <ggala@linux.ibm.com>,
-	Hariharan Mari <hari55@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Hendrik Brueckner <brueckner@linux.ibm.com>,
-	Ilya Leoshkevich <iii@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Nico Boehr <nrb@linux.ibm.com>,
-	Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
-	Oliver Upton <oupton@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Joerg Roedel <joro@8bytes.org>,
+	Jonathan Cameron <jic23@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Pranjal Shrivastava <praan@google.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Samuel Ortiz <sameo@rivosinc.com>,
+	Steven Price <steven.price@arm.com>,
+	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
 	Will Deacon <will@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v7 03/23] KVM: Allow KVM implementations to switch off MMIO independent of Kconfig
-In-Reply-To: <apdwHcdy2iYRTrww@google.com>
-References: <20260831144802.834315-1-seiden@linux.ibm.com>
-	<20260831144802.834315-4-seiden@linux.ibm.com>
-	<apdwHcdy2iYRTrww@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Xu Yilun <yilun.xu@linux.intel.com>
+Subject: Re: [RFC PATCH v4 03/16] iommu/arm-smmu-v3: Add initial pSMMU realm
+ viommu plumbing
+In-Reply-To: <20260901143445.GC56830@ziepe.ca>
+References: <20260427085344.941627-1-aneesh.kumar@kernel.org>
+ <20260427085344.941627-4-aneesh.kumar@kernel.org>
+ <apM6dOHcEI2ztWS0@nvidia.com> <yq5a8q5lz5yn.fsf@kernel.org>
+ <yq5aecfdnv4i.fsf@kernel.org> <20260901143445.GC56830@ziepe.ca>
+Date: Wed, 02 Sep 2026 14:30:00 +0530
+Message-ID: <yq5a8q5kkoz3.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: seanjc@google.com, seiden@linux.ibm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, agordeev@linux.ibm.com, gra@linux.ibm.com, arnd@arndb.de, catalin.marinas@arm.com, borntraeger@linux.ibm.com, imbrenda@linux.ibm.com, david@kernel.org, fritz@linux.ibm.com, tabba@google.com, ggala@linux.ibm.com, hari55@linux.ibm.com, hca@linux.ibm.com, brueckner@linux.ibm.com, iii@linux.ibm.com, frankja@linux.ibm.com, joey.gouly@arm.com, nrb@linux.ibm.com, oss@nina.schoetterlglausch.eu, oupton@kernel.org, pbonzini@redhat.com, suzuki.poulose@arm.com, svens@linux.ibm.com, Ulrich.Weigand@de.ibm.com, gor@linux.ibm.com, will@kernel.org, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain
 
-On Wed, 02 Sep 2026 01:38:53 +0100,
-Sean Christopherson <seanjc@google.com> wrote:
-> 
-> On Mon, Aug 31, 2026, Steffen Eiden wrote:
-> > Only defining KVM_MMIO is not flexible enough for multi-KVM systems
-> > where one KVM implements MMIO but others do not. Solve this by
-> > additionally testing for the non-existence of KVM_NO_MMIO before
-> > including MMIO code to KVM.
-> 
-> Ewwwww.  IIUC, s390 ends up with two KVM modules, i.e. there really are two different
-> KVMs being built.  Rather than have a KVM_MMIO and NO_KVM_MMIO, I vote very
-> strongly to drop CONFIG_KVM_MMIO entirely and replace it with __KVM_HAVE_ARCH_MMIO,
-> a la __KVM_HAVE_ARCH_VM_FREE and others.  Tracking two separate macros is going
-> to be annoying to maintain, and will definitely be confusing for non-s390 people.
-> 
-> It'll mean linking in an emtpy coalesced_mmio.o on s390 when building without arm64
-> support, but I'm guessing that won't be at all common for s390 builds.
-> 
+Jason Gunthorpe <jgg@ziepe.ca> writes:
 
-I ended-up doing something very similar locally, because I couldn't
-really make head or tail of the logic while being in holiday mode
-(which doesn't help). However, I kept the negative logic, so that we
-don't need to add anything to any architecture but S390 (they are the
-odd one out here).
+> On Tue, Sep 01, 2026 at 03:36:37PM +0530, Aneesh Kumar K.V wrote:
+>
+>> @@ -463,14 +460,13 @@
+>>  	vsmmu->vmid = s2_parent->s2_cfg.vmid;
+>>  
+>>  	if (viommu->type == IOMMU_VIOMMU_TYPE_ARM_SMMUV3) {
+>> +		if (arm_smmu_is_realm_viommu(viommu))
+>> +			return arm_realm_smmu_v3_init(viommu, user_data);
+>> +
+>
+> I think the realm vsmmu is going to require a different info struct
+> than the normal psmmu case, isn't it?
+>
+> If so it needs its own enum value.
+>
+> It would be nice to see a draft patch showing how the real vsmmu works
+> on top of the RMM spec for it. If we are using a viommu object then
+> non-vsmmu case should be identical just with an option in the info
+> struct to not create the vsmmu object.
+>
 
-Untested hack follows.
+Based on feedback on other emails in this thread, I have now implemented
+this without using a vdevice or viommu. This should make the CCA and
+non-CCA cases similar.
 
-	M.
+This ends up adding:
 
-diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-index 449154f9a4852..dd138b730217e 100644
---- a/arch/arm64/kvm/Kconfig
-+++ b/arch/arm64/kvm/Kconfig
-@@ -22,7 +22,6 @@ menuconfig KVM
- 	select KVM_COMMON
- 	select KVM_GENERIC_HARDWARE_ENABLING
- 	select HAVE_KVM_CPU_RELAX_INTERCEPT
--	select KVM_MMIO
- 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
- 	select VIRT_XFER_TO_GUEST_WORK
- 	select KVM_VFIO
-diff --git a/arch/loongarch/kvm/Kconfig b/arch/loongarch/kvm/Kconfig
-index 15da2d88c0c10..f03872ba0ba8c 100644
---- a/arch/loongarch/kvm/Kconfig
-+++ b/arch/loongarch/kvm/Kconfig
-@@ -28,7 +28,6 @@ config KVM
- 	select KVM_COMMON
- 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
- 	select KVM_GENERIC_HARDWARE_ENABLING
--	select KVM_MMIO
- 	select VIRT_XFER_TO_GUEST_WORK
- 	select SCHED_INFO
- 	select GUEST_PERF_EVENTS if PERF_EVENTS
-diff --git a/arch/mips/kvm/Kconfig b/arch/mips/kvm/Kconfig
-index b1b9a1d677581..c65596fdf54f4 100644
---- a/arch/mips/kvm/Kconfig
-+++ b/arch/mips/kvm/Kconfig
-@@ -22,7 +22,6 @@ config KVM
- 	select EXPORT_UASM
- 	select KVM_COMMON
- 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
--	select KVM_MMIO
- 	select KVM_GENERIC_HARDWARE_ENABLING
- 	select HAVE_KVM_READONLY_MEM
- 	help
-diff --git a/arch/powerpc/kvm/Kconfig b/arch/powerpc/kvm/Kconfig
-index b6bc2fc86dca6..c5565d6fb27e4 100644
---- a/arch/powerpc/kvm/Kconfig
-+++ b/arch/powerpc/kvm/Kconfig
-@@ -30,7 +30,6 @@ config KVM_BOOK3S_HANDLER
- config KVM_BOOK3S_32_HANDLER
- 	bool
- 	select KVM_BOOK3S_HANDLER
--	select KVM_MMIO
- 
- config KVM_BOOK3S_64_HANDLER
- 	bool
-@@ -38,7 +37,6 @@ config KVM_BOOK3S_64_HANDLER
- 
- config KVM_BOOK3S_PR_POSSIBLE
- 	bool
--	select KVM_MMIO
- 
- config KVM_BOOK3S_HV_POSSIBLE
- 	bool
-@@ -201,7 +199,6 @@ config KVM_E500V2
- 	depends on PPC_E500 && !PPC_E500MC
- 	depends on !CONTEXT_TRACKING_USER
- 	select KVM
--	select KVM_MMIO
- 	help
- 	  Support running unmodified E500 guest kernels in virtual machines on
- 	  E500v2 host processors.
-@@ -216,7 +213,6 @@ config KVM_E500MC
- 	depends on PPC_E500MC
- 	depends on !CONTEXT_TRACKING_USER
- 	select KVM
--	select KVM_MMIO
- 	select KVM_BOOKE_HV
- 	help
- 	  Support running unmodified E500MC/E5500/E6500 guest kernels in
-diff --git a/arch/riscv/kvm/Kconfig b/arch/riscv/kvm/Kconfig
-index ec2cee0a39e01..3aea8d4939d2e 100644
---- a/arch/riscv/kvm/Kconfig
-+++ b/arch/riscv/kvm/Kconfig
-@@ -28,7 +28,6 @@ config KVM
- 	select KVM_COMMON
- 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
- 	select KVM_GENERIC_HARDWARE_ENABLING
--	select KVM_MMIO
- 	select VIRT_XFER_TO_GUEST_WORK
- 	select SCHED_INFO
- 	select GUEST_PERF_EVENTS if PERF_EVENTS
-diff --git a/arch/s390/include/asm/kvm_host_s390.h b/arch/s390/include/asm/kvm_host_s390.h
-index cd692f8fb7643..3c65c52d6682b 100644
---- a/arch/s390/include/asm/kvm_host_s390.h
-+++ b/arch/s390/include/asm/kvm_host_s390.h
-@@ -34,6 +34,8 @@
- 
- #define KVM_S390_MANAGES_S390_GUEST 1
- 
-+#define __KVM_NO_MMIO
+modified   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+@@ -4324,6 +4324,8 @@ static const struct iommu_ops arm_smmu_ops = {
+ 	.def_domain_type	= arm_smmu_def_domain_type,
+ 	.get_viommu_size	= arm_smmu_get_viommu_size,
+ 	.viommu_init		= arm_vsmmu_init,
++	.tsm_bind		= arm_smmu_realm_tsm_bind,
++	.tsm_unbind		= arm_smmu_realm_tsm_unbind,
+ 	.user_pasid_table	= 1,
+ 	.owner			= THIS_MODULE,
+ 	.default_domain_ops = &(const struct iommu_domain_ops) {
+
+
+and
+
++int arm_smmu_realm_tsm_bind(struct device *dev, struct kvm *kvm)
++{
++	struct arm_smmu_master *master = dev_iommu_priv_get(dev);
++	int ret;
 +
- /*
-  * These seem to be used for allocating ->chip in the routing table, which we
-  * don't use. 1 is as small as we can get to reduce the needed memory. If we
-diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index 538ed1e803326..48ca567b0a846 100644
---- a/arch/x86/kvm/Kconfig
-+++ b/arch/x86/kvm/Kconfig
-@@ -32,7 +32,6 @@ config KVM_X86
- 	select VHOST_TASK
- 	select KVM_ASYNC_PF
- 	select USER_RETURN_NOTIFIER
--	select KVM_MMIO
- 	select SCHED_INFO
- 	select PERF_EVENTS
- 	select GUEST_PERF_EVENTS
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 03bfc92864b6e..dc9b68793f0d7 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -833,7 +833,7 @@ struct kvm {
- 	struct kvm_vm_stat stat;
- 	struct kvm_arch arch;
- 	refcount_t users_count;
--#ifdef CONFIG_KVM_MMIO
-+#ifndef __KVM_NO_MMIO
- 	struct kvm_coalesced_mmio_ring *coalesced_mmio_ring;
- 	spinlock_t ring_lock;
- 	struct list_head coalesced_zones;
-diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-index c3c0ee253fc77..c012f30127e38 100644
---- a/virt/kvm/Kconfig
-+++ b/virt/kvm/Kconfig
-@@ -40,9 +40,6 @@ config NEED_KVM_DIRTY_RING_WITH_BITMAP
- 	bool
- 	depends on HAVE_KVM_DIRTY_RING
- 
--config KVM_MMIO
--       bool
--
- config KVM_ASYNC_PF
-        bool
- 
-diff --git a/virt/kvm/Makefile.kvm b/virt/kvm/Makefile.kvm
-index d047d4cf58c9f..c4fb1e01d0c89 100644
---- a/virt/kvm/Makefile.kvm
-+++ b/virt/kvm/Makefile.kvm
-@@ -5,9 +5,8 @@
- 
- KVM ?= ../../../virt/kvm
- 
--kvm-y := $(KVM)/kvm_main.o $(KVM)/eventfd.o $(KVM)/binary_stats.o
-+kvm-y := $(KVM)/kvm_main.o $(KVM)/eventfd.o $(KVM)/coalesced_mmio.o $(KVM)/binary_stats.o
- kvm-$(CONFIG_KVM_VFIO) += $(KVM)/vfio.o
--kvm-$(CONFIG_KVM_MMIO) += $(KVM)/coalesced_mmio.o
- kvm-$(CONFIG_KVM_ASYNC_PF) += $(KVM)/async_pf.o
- kvm-$(CONFIG_HAVE_KVM_IRQ_ROUTING) += $(KVM)/irqchip.o
- kvm-$(CONFIG_HAVE_KVM_DIRTY_RING) += $(KVM)/dirty_ring.o
-diff --git a/virt/kvm/coalesced_mmio.c b/virt/kvm/coalesced_mmio.c
-index 6b1d901610998..6bd4157b3ef41 100644
---- a/virt/kvm/coalesced_mmio.c
-+++ b/virt/kvm/coalesced_mmio.c
-@@ -15,6 +15,8 @@
- #include <linux/slab.h>
- #include <linux/kvm.h>
- 
-+#ifndef __KVM_NO_MMIO
++	if (!kvm_is_realm(kvm))
++		return 0;
 +
- #include "coalesced_mmio.h"
- 
- static inline struct kvm_coalesced_mmio_dev *to_mmio(struct kvm_io_device *dev)
-@@ -188,3 +190,4 @@ int kvm_vm_ioctl_unregister_coalesced_mmio(struct kvm *kvm,
- 	 */
- 	return 0;
- }
-+#endif
-diff --git a/virt/kvm/coalesced_mmio.h b/virt/kvm/coalesced_mmio.h
-index 36f84264ed257..77b811dee27c2 100644
---- a/virt/kvm/coalesced_mmio.h
-+++ b/virt/kvm/coalesced_mmio.h
-@@ -11,7 +11,7 @@
-  *
-  */
- 
--#ifdef CONFIG_KVM_MMIO
-+#ifndef __KVM_NO_MMIO
- 
- #include <linux/list.h>
- 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 65eb26a0520d8..2f25b75dbfd44 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -4059,7 +4059,7 @@ static vm_fault_t kvm_vcpu_fault(struct vm_fault *vmf)
- 	else if (vmf->pgoff == KVM_PIO_PAGE_OFFSET)
- 		page = virt_to_page(vcpu->arch.pio_data);
- #endif
--#ifdef CONFIG_KVM_MMIO
-+#ifndef __KVM_NO_MMIO
- 	else if (vmf->pgoff == KVM_COALESCED_MMIO_PAGE_OFFSET)
- 		page = virt_to_page(vcpu->kvm->coalesced_mmio_ring);
- #endif
-@@ -4900,7 +4900,7 @@ static int kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
- 	case KVM_CAP_ENABLE_CAP_VM:
- 	case KVM_CAP_HALT_POLL:
- 		return 1;
--#ifdef CONFIG_KVM_MMIO
-+#ifndef __KVM_NO_MMIO
- 	case KVM_CAP_COALESCED_MMIO:
- 		return KVM_COALESCED_MMIO_PAGE_OFFSET;
- 	case KVM_CAP_COALESCED_PIO:
-@@ -5241,7 +5241,7 @@ static long kvm_vm_ioctl(struct file *filp,
- 		break;
- 	}
- #endif
--#ifdef CONFIG_KVM_MMIO
-+#ifndef __KVM_NO_MMIO
- 	case KVM_REGISTER_COALESCED_MMIO: {
- 		struct kvm_coalesced_mmio_zone zone;
- 
-@@ -5563,7 +5563,7 @@ static long kvm_dev_ioctl(struct file *filp,
- #ifdef CONFIG_X86
- 		r += PAGE_SIZE;    /* pio data page */
- #endif
--#ifdef CONFIG_KVM_MMIO
-+#ifndef __KVM_NO_MMIO
- 		r += PAGE_SIZE;    /* coalesced mmio ring page */
- #endif
- 		break;
++	ret = arm_realm_smmu_get(master->smmu);
++	if (ret)
++		return ret;
++
++	ret = arm_realm_smmu_stream_get(master);
++	if (ret)
++		arm_realm_smmu_put(master->smmu);
++	return ret;
++}
++
++void arm_smmu_realm_tsm_unbind(struct device *dev, struct kvm *kvm)
++{
++	struct arm_smmu_master *master = dev_iommu_priv_get(dev);
++
++	if (!kvm_is_realm(kvm))
++		return;
++
++	arm_realm_smmu_stream_put(master);
++	arm_realm_smmu_put(master->smmu);
++}
 
--- 
-Jazz isn't dead. It just smells funny.
+and tsm op iotcl now becomes
+
+iommufd_device_tsm_op_ioctl()
+
+	switch (cmd->type) {
+	case IOMMU_DEVICE_TSM_BIND:
+		if (!idev->tsm_iommu_bound && ops->tsm_bind) {
+			if (WARN_ON_ONCE(!ops->tsm_unbind)) {
+				ret = -EOPNOTSUPP;
+				break;
+			}
+			ret = ops->tsm_bind(idev->dev, kvm);
+			if (ret)
+				break;
+			idev->tsm_iommu_bound = true;
+			iommu_bound = true;
+		}
+		ret = tsm_bind(idev->dev, kvm, cmd->tdi_id);
+		if (ret && iommu_bound) {
+			ops->tsm_unbind(idev->dev, kvm);
+			idev->tsm_iommu_bound = false;
+		}
+		break;
+	case IOMMU_DEVICE_TSM_UNBIND:
+		__iommufd_device_tsm_unbind(idev);
+		ret = 0;
+		break;
+	default:
+		ret = -EINVAL;
+		break;
+	}
+
+I am yet to clean up the changes. I just wanted to share that we can
+possibly drop the vdevice/viommu requirement.
+
+-aneesh
