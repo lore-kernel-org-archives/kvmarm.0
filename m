@@ -1,202 +1,417 @@
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 324FE4A4406
-	for <kvmarm@lists.linux.dev>; Wed,  2 Sep 2026 15:05:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C65B04A5EAD;
+	Wed,  2 Sep 2026 15:11:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788361525; cv=none; b=FS9pMYBsWDR85RhyqvAJ6HseaF5kTzvmdsuPUjvqq+trNnRW0VR2WT+iJu8/HSZ2hSm/x4Zjv20f1qKN92dHtc5oKztjN4eMPQVcBHbgRsFGvYsgR9U2cyUc9I13OIzTszHS/uBkZatIcQC/6fQAqhvRevzEvWMDfmW4hUS8HZ4=
+	t=1788361873; cv=none; b=tcpi9IYeEPX1vD3x1gynRpmeqeFFv9BnH57CfMnWX1zwZ2HudQrcvHqynKDoKhnKIsi4xtTFi5RFBUGERggmus0iGK2UO1Z5Uhk8azGq8jVXnDtStJbntadgquMVBdOT6LGF/na1+OPNqPdCAUqLQ0va+XJA3Cb9sEgp5i+ef2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788361525; c=relaxed/simple;
-	bh=2/YfSi5N9pOc6yZaIdsRfSoS1HN0gJB2ci1jIQiGiqM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eDY/8fr/P7RwOZdvKWwui/eDMTSo2rnCg3Fq7TCmLIWk9qL1SBI785A15AP/T/GIHKpGBHZvmFkEPcRcl49C8Mk5kf0/CozonkZO7DXvkEtyadRlvZx5vy9CCJq0wSZzE71fZ4jt+ee0qcgH9ChGNhtIAxpxAot1Zho++J1YUdw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oaheGheR; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1788361873; c=relaxed/simple;
+	bh=xDKen3ziMe6r4IuSkrGSaftPq7eWsPGLzBSMeTCjIrA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qmOVAKzgX0l0xhFBS0UzL61KFmVS/oXSh9hSA2LT0351qA5W1Fmvel0M4Kv3N/v0VR+4EsEyLmfMqcl35PEoJApmTVPZOSGEK5+AzUyrDQzxIqKx8U23jM6fsjbCl9YSRBvG8dl6N2KVSu2Y3rqBifj2/z2sJzGHzBN6iOwW9mA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=OqJVhxBR; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oaheGheR"
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-484415c8bf2so931724f8f.0
-        for <kvmarm@lists.linux.dev>; Wed, 02 Sep 2026 08:05:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1788361521; x=1788966321; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=x+YGRuTP0DFkwY53W+VAP0dMbCx4iIs4U3Fk1KxNIFU=;
-        b=oaheGheR+u75uEGKNKdbHKACshfI9772cLY+no3WpAqWneqPOk8rmjUxUrKLjQIjsI
-         /olVG4k7yrFSc8XSU7LBKjMV1oM8vqV/21jMgd2OhbL2O76kGS0Zjkc+WXdMse/jwaTS
-         oRJ5GQk/KBZJ4Hbx2HhuBuSPuAqzLmUOHjjI2IjONH5DYRXkqwL6uxTIcBOa+xOzzqvi
-         PLpkRac+Cdry0r6Dk+9kEthkZNohTFHMzhBHGbedtv9XtW9GUpr7inj8AsytC6ulFDoY
-         CM9SBgw/gKFdr3IR91Tw1daeBMHEXbfJB2X+FIlmBHqZcNucjAzWB2jHVs1SDaiUb7Ix
-         dchw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788361521; x=1788966321;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=x+YGRuTP0DFkwY53W+VAP0dMbCx4iIs4U3Fk1KxNIFU=;
-        b=BKv6FjjZqxBNTcl0bV+HSzw0zl1Qh/5JDPAxOB0EszOfljKICY2zTtG6PM/ckX/BJN
-         tOpKxVEWgn/gLF7g85lMpYqfO5qSA91cA12cMxPFgQiOzzsn5NxskKkupGZIa883bPSo
-         xR2rBML6MXg32KBO2b7/XwpxFGBTq1q4vQCfah2OkJmci+FQJ/GXqAT1qagLa2rLCjDc
-         ukl1tWKUqbCE/W0cFdAfAS3dUX2W7dN2+Z5KUDY8xpxWrU6Kb6bGrw67/khHqi3mGPqh
-         cJvEh4EeLjrBfctP+0ePm/gxFAQHbkPxU1WNXxCskWcoQub+tnNEIn7Rb2INBn+g4a8j
-         b9gg==
-X-Forwarded-Encrypted: i=1; AHgh+RoR4J5HpmdrD8dtfcC4FJ8OMWWmbrfuGpRLRGTNN7FPqdFseQnAFIqXNDya1RHhE1jY7kFUXSs=@lists.linux.dev
-X-Gm-Message-State: AFuF++luM363Vgs7+B8yEsYQITZ68BL2+kimGVwKZcto2q6rYUhXIsef
-	8YTERe36CKw23EIhn0BT3GqLPsyNIYn57Qbs4IyommoCTniI1/B1Yuo0EkxwaDqpvA==
-X-Gm-Gg: AR+sD13Rdn7KPySF87BKBw6xL+ZXc59iDM3xddtCm5sNqL1DequhuodsPrAvU+Kr26Y
-	lcJEKlQOmgGHL/X5LaN9TzIHx3atjSKRYJfqyz466cD9FPw52ZxpM7WpcYgqVvyPQQjx+IR7t45
-	AoTln+RLwISpoExcAaAJWr6zNdP0ZtTwVnOxY4TnW7gbvzqmnJXzPTSLwL4GjIvAsNtUx90T03j
-	jU6Z5pdDowgK1zYVBKdA/brekgLH7zWOmmFn0639CkXfZarl1wKG3ijEKvZVKsTWbzAb3hRaq9c
-	SR5mIXKj1F7rX0D4wgC8isppEEQ1sVC7vDJwbZCKult4nm3HcDuYVqafBahFZjnDdOIFJgG/Frw
-	JZATC6Vi0XAkywqqJamAcaFCyqeVtDoCWFIl4mbnGvcQIe2Vk4YB9XCj08BYS4lgJCvgWhEu+78
-	aabsJicyRXNLF94qW9cNge88NdemMAp4xrqvZBa98QKgpIlE5Mif8pQo6Hnp9TbQ==
-X-Received: by 2002:a05:600c:a086:b0:495:48d7:f178 with SMTP id 5b1f17b1804b1-49ce5815dddmr111164645e9.11.1788361518474;
-        Wed, 02 Sep 2026 08:05:18 -0700 (PDT)
-Received: from google.com (135.91.155.104.bc.googleusercontent.com. [104.155.91.135])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49ce551bf7asm40161205e9.2.2026.09.02.08.05.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Sep 2026 08:05:16 -0700 (PDT)
-Date: Wed, 2 Sep 2026 16:05:12 +0100
-From: Vincent Donnefort <vdonnefort@google.com>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Quentin Perret <qperret@google.com>, Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH 05/17] KVM: arm64: Skip fixed-feature state flush for
- protected vCPUs
-Message-ID: <apg7KNpamnpYi-kl@google.com>
-References: <20260831163421.272420-1-fuad.tabba@linux.dev>
- <20260831163421.272420-6-fuad.tabba@linux.dev>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="OqJVhxBR"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0629C165C;
+	Wed,  2 Sep 2026 08:11:06 -0700 (PDT)
+Received: from [10.57.49.102] (unknown [10.57.49.102])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 42A293F673;
+	Wed,  2 Sep 2026 08:11:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1788361869; bh=xDKen3ziMe6r4IuSkrGSaftPq7eWsPGLzBSMeTCjIrA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=OqJVhxBR1uinXpVDwYKANBKGzsgsy9AFQvsJql59FqOqd0AIrL0idUDnKD1bFyfl1
+	 gLnKdQ+Y6GjdBWdCL4Q/w1cNTSwjAo7ovtUJqY9ucXrWGhInPKiX/kSQwcJRFoGdBc
+	 RfVpsaFgz8YrRBP3n1HdY9olX23gAwHMNVFAkjhY=
+Message-ID: <56aa7422-ded5-449c-ba62-e7e56d229587@arm.com>
+Date: Wed, 2 Sep 2026 16:11:04 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260831163421.272420-6-fuad.tabba@linux.dev>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v16 14/45] KVM: arm64: CCA: Add basic infrastructure for
+ creating a realm
+Content-Language: en-GB
+To: Gavin Shan <gshan@redhat.com>, Steven Price <steven.price@arm.com>,
+ kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
+ <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+ Emi Kisanuki <fj0570is@fujitsu.com>, Vishal Annapurve
+ <vannapurve@google.com>, WeiLin.Chang@arm.com,
+ Lorenzo Pieralisi <lpieralisi@kernel.org>
+References: <20260803134403.80630-1-steven.price@arm.com>
+ <20260803134403.80630-15-steven.price@arm.com>
+ <c9608c82-d4ff-4c0f-8f7b-1793ed205566@redhat.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <c9608c82-d4ff-4c0f-8f7b-1793ed205566@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, Aug 31, 2026 at 05:34:09PM +0100, Fuad Tabba wrote:
-> flush_hyp_vcpu() copies the host's mdcr_el2, TWI/TWE and debug state
-> into the hyp vCPU on every entry, so for a protected vCPU the host's
-> trap configuration overrides the one pkvm_vcpu_init_traps() computed
-> at EL2. Move those copies into the non-protected branch, and sync the
-> debug state back for non-protected vCPUs only: a protected guest's
-> debug registers are hypervisor-owned, and it takes the host's TWI/TWE
-> at vCPU load. MDCR_EL2.TDA traps only the guest's own accesses; it
-> does not stop the world switch from loading host-supplied breakpoints
-> and MDSCR_EL1.
+On 01/09/2026 05:07, Gavin Shan wrote:
+> Hi Steve,
 > 
-> EL2's mdcr_el2 starts from 0, and HPMN == 0 is reserved without
-> FEAT_HPMN0. Set HPMN to the CPU's event counter count at vCPU load,
-> the value the host's copy carried; a protected guest's PMU accesses
-> trap regardless.
+> On 8/3/26 11:43 PM, Steven Price wrote:
+>> Introduce the skeleton functions for creating and destroying a realm.
+>> The IPA size requested is checked against what the RMM supports.
+>>
+>> The actual work of constructing the realm will be added in future
+>> patches.
+>>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>> Changes since v15:
+>>   * Remove realm->params and only temporarily allocate the page when the
+>>     realm is being created.
 > 
-> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
-> ---
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 31 +++++++++++++++++++-----------
->  arch/arm64/kvm/hyp/nvhe/pkvm.c     |  2 +-
->  2 files changed, 21 insertions(+), 12 deletions(-)
+> [...]
 > 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> index ca7122b0bccdd..14e847b122abf 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -231,7 +231,6 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
->  	u8 esr_ec;
->  
->  	fpsimd_sve_flush();
-> -	flush_debug_state(hyp_vcpu);
->  
->  	/*
->  	 * If we deal with a non-protected guest and the state is potentially
-> @@ -241,7 +240,14 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
->  	if (!pkvm_hyp_vcpu_is_protected(hyp_vcpu)) {
->  		if (vcpu_get_flag(host_vcpu, PKVM_HOST_STATE_DIRTY))
->  			flush_hyp_vcpu_state(hyp_vcpu);
-> +
-> +		hyp_vcpu->vcpu.arch.hcr_el2 &= ~(HCR_TWI | HCR_TWE);
-> +		hyp_vcpu->vcpu.arch.hcr_el2 |= READ_ONCE(host_vcpu->arch.hcr_el2) &
-> +							 (HCR_TWI | HCR_TWE);
-> +
-> +		hyp_vcpu->vcpu.arch.mdcr_el2 = host_vcpu->arch.mdcr_el2;
->  		hyp_vcpu->vcpu.arch.iflags = host_vcpu->arch.iflags;
-> +		flush_debug_state(hyp_vcpu);
->  	} else {
->  		hyp_vcpu->vcpu.arch.ctxt = host_vcpu->arch.ctxt;
->  	}
-> @@ -249,17 +255,13 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
->  	/* __hyp_running_vcpu must be NULL in a guest context. */
->  	hyp_vcpu->vcpu.arch.ctxt.__hyp_running_vcpu = NULL;
->  
-> -	hyp_vcpu->vcpu.arch.mdcr_el2	= host_vcpu->arch.mdcr_el2;
->  	/*
-> -	 * HCR_EL2.VSE is host-owned (a pending virtual SError to inject), not a
-> -	 * trap-control bit, so it must flow to the hyp vCPU alongside TWI/TWE
-> -	 * for the vSError to be delivered. sync_hyp_vcpu() reflects it back.
-> +	 * A host-injected vSError is masked by the guest's own PSTATE.A, so it
-> +	 * applies to protected guests too.
->  	 */
-> -	hyp_vcpu->vcpu.arch.hcr_el2 &= ~(HCR_TWI | HCR_TWE | HCR_VSE);
-> -	hyp_vcpu->vcpu.arch.hcr_el2 |= READ_ONCE(host_vcpu->arch.hcr_el2) &
-> -						 (HCR_TWI | HCR_TWE | HCR_VSE);
-> -
-> -	hyp_vcpu->vcpu.arch.vsesr_el2	= host_vcpu->arch.vsesr_el2;
-> +	hyp_vcpu->vcpu.arch.hcr_el2 &= ~HCR_VSE;
-> +	hyp_vcpu->vcpu.arch.hcr_el2 |= READ_ONCE(host_vcpu->arch.hcr_el2) & HCR_VSE;
-> +	hyp_vcpu->vcpu.arch.vsesr_el2 = host_vcpu->arch.vsesr_el2;
->  
->  	flush_hyp_vgic_state(hyp_vcpu);
->  
-> @@ -288,7 +290,8 @@ static void sync_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu, u32 exit_reason)
->  	struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
->  
->  	fpsimd_sve_sync(&hyp_vcpu->vcpu);
-> -	sync_debug_state(hyp_vcpu);
-> +	if (!pkvm_hyp_vcpu_is_protected(hyp_vcpu))
-> +		sync_debug_state(hyp_vcpu);
+>> ---
+>>   arch/arm64/include/asm/kvm_emulate.h | 24 +++++++++++
+>>   arch/arm64/include/asm/kvm_rmi.h     | 63 ++++++++++++++++++++++++++++
+>>   arch/arm64/kvm/arm.c                 | 12 ++++++
+>>   arch/arm64/kvm/mmu.c                 | 18 +++++++-
+>>   arch/arm64/kvm/rmi.c                 | 56 +++++++++++++++++++++++++
+>>   5 files changed, 171 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/ 
+>> include/asm/kvm_emulate.h
+>> index 5bf3d7e1d92c..e26d6755279f 100644
+>> --- a/arch/arm64/include/asm/kvm_emulate.h
+>> +++ b/arch/arm64/include/asm/kvm_emulate.h
+>> @@ -688,4 +688,28 @@ static inline void vcpu_set_hcrx(struct kvm_vcpu 
+>> *vcpu)
+>>               vcpu->arch.hcrx_el2 |= HCRX_EL2_EnASR;
+>>       }
+>>   }
+>> +
+>> +static inline bool kvm_is_realm(struct kvm *kvm)
+>> +{
+>> +    if (static_branch_unlikely(&kvm_rmi_is_available))
+>> +        return kvm->arch.is_realm;
+>> +    return false;
+>> +}
+>> +
+>> +static inline enum realm_state kvm_realm_state(struct kvm *kvm)
+>> +{
+>> +    return READ_ONCE(kvm->arch.realm.state);
+>> +}
+>> +
+>> +static inline void kvm_set_realm_state(struct kvm *kvm,
+>> +                       enum realm_state new_state)
+>> +{
+>> +    WRITE_ONCE(kvm->arch.realm.state, new_state);
+>> +}
+>> +
+>> +static inline bool kvm_realm_is_created(struct kvm *kvm)
+>> +{
+>> +    return kvm_is_realm(kvm) && kvm_realm_state(kvm) != 
+>> REALM_STATE_NONE;
+>> +}
+>> +
+>>   #endif /* __ARM64_KVM_EMULATE_H__ */
+>> diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/ 
+>> asm/kvm_rmi.h
+>> index 57d24b244c95..cefd00b76806 100644
+>> --- a/arch/arm64/include/asm/kvm_rmi.h
+>> +++ b/arch/arm64/include/asm/kvm_rmi.h
+>> @@ -6,12 +6,75 @@
+>>   #ifndef __ASM_KVM_RMI_H
+>>   #define __ASM_KVM_RMI_H
+>> +#include <linux/arm-smccc-rmi.h>
+>> +
+>> +/**
+>> + * enum realm_state - State of a Realm
+>> + *
+>> + * Mirrors the RMM's Realm lifecycle states where they are meaningful 
+>> to KVM,
+>> + * with REALM_STATE_DYING being a KVM-internal state used to prevent 
+>> further
+>> + * requests while teardown is in progress. KVM does not track 
+>> REALM_SYSTEM_OFF
+>> + * or REALM_ZOMBIE separately as they naturally lead to teardown.
+>> + */
+>> +enum realm_state {
+>> +    /**
+>> +     * @REALM_STATE_NONE:
+>> +     *      Realm has not yet been created. rmi_realm_create() has not
+>> +     *      yet been called.
+>> +     */
+>> +    REALM_STATE_NONE,
+>> +    /**
+>> +     * @REALM_STATE_NEW:
+>> +     *      Realm is under construction, rmi_realm_create() has been
+>> +     *      called, but it is not yet activated. Pages may be populated.
+>> +     */
+>> +    REALM_STATE_NEW,
+>> +    /**
+>> +     * @REALM_STATE_ACTIVE:
+>> +     *      Realm has been created and is eligible for execution with
+>> +     *      rmi_rec_enter(). Pages may no longer be populated with
+>> +     *      rmi_data_create().
+>> +     */
+>> +    REALM_STATE_ACTIVE,
+>> +    /**
+>> +     * @REALM_STATE_DYING:
+>> +     *      Realm is in the process of being destroyed or has already 
+>> been
+>> +     *      destroyed.
+>> +     */
+>> +    REALM_STATE_DYING,
+>> +    /**
+>> +     * @REALM_STATE_DEAD:
+>> +     *      Realm has been destroyed.
+>> +     */
+>> +    REALM_STATE_DEAD
+>> +};
+>> +
+>>   /**
+>>    * struct realm - Additional per VM data for a Realm
+>> + *
+>> + * @rd: Kernel mapping of the RMM-managed Realm Descriptor (RD) granule
+>> + * @sro: Preallocated SRO state context for Realm MMU operations
+>> + * @state: The lifetime state machine for the realm
+>> + * @ia_bits: Number of valid Input Address bits in the IPA
+>>    */
+>>   struct realm {
+>> +    void *rd;
+>> +    /*
+>> +     * Reused by RTT map/unmap SRO commands. Those commands are only
+>> +     * issued from Realm stage-2 map/unmap paths while kvm->mmu_lock is
+>> +     * held for write, including Realm fault handling where
+>> +     * kvm_fault_lock() takes the write side, so concurrent use is
+>> +     * serialized.
+>> +     */
+>> +    struct rmi_sro_state *sro;
+>> +    enum realm_state state;
+>> +    unsigned int ia_bits;
+>>   };
+>>   void kvm_init_rmi(void);
+>> +u32 kvm_rmm_ipa_limit(void);
+>> +
+>> +int kvm_init_realm(struct kvm *kvm);
+>> +void kvm_destroy_realm(struct kvm *kvm);
+>>   #endif /* __ASM_KVM_RMI_H */
+>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+>> index b961c22fce3d..c4d906861736 100644
+>> --- a/arch/arm64/kvm/arm.c
+>> +++ b/arch/arm64/kvm/arm.c
+>> @@ -266,6 +266,13 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned 
+>> long type)
+>>       bitmap_zero(kvm->arch.vcpu_features, KVM_VCPU_MAX_FEATURES);
+>> +    /* Initialise the realm bits after the generic bits are enabled */
+>> +    if (kvm_is_realm(kvm)) {
+>> +        ret = kvm_init_realm(kvm);
+>> +        if (ret)
+>> +            goto err_uninit_mmu;
+>> +    }
+>> +
+>>       return 0;
+>>   err_uninit_mmu:
+>> @@ -328,6 +335,8 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+>>       kvm_unshare_hyp(kvm, kvm + 1);
+>>       kvm_arm_teardown_hypercalls(kvm);
+>> +    if (kvm_is_realm(kvm))
+>> +        kvm_destroy_realm(kvm);
+>>   }
+>>   static bool kvm_has_full_ptr_auth(void)
+>> @@ -488,6 +497,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, 
+>> long ext)
+>>           else
+>>               r = kvm_supports_cacheable_pfnmap();
+>>           break;
+>> +    case KVM_CAP_ARM_RMI:
+>> +        r = static_key_enabled(&kvm_rmi_is_available);
+>> +        break;
+>>       default:
+>>           r = 0;
+>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>> index 6c941aaa10c6..8b9efa8a3539 100644
+>> --- a/arch/arm64/kvm/mmu.c
+>> +++ b/arch/arm64/kvm/mmu.c
+>> @@ -904,10 +904,14 @@ static struct kvm_pgtable_mm_ops kvm_s2_mm_ops = {
+>>   static int kvm_init_ipa_range(struct kvm_s2_mmu *mmu, unsigned long 
+>> type)
+>>   {
+>> +    struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
+>>       u32 kvm_ipa_limit = get_kvm_ipa_limit();
+>>       u64 mmfr0, mmfr1;
+>>       u32 phys_shift;
+>> +    if (kvm_is_realm(kvm))
+>> +        kvm_ipa_limit = kvm_rmm_ipa_limit();
+>> +
+>>       phys_shift = KVM_VM_TYPE_ARM_IPA_SIZE(type);
+>>       if (is_protected_kvm_enabled()) {
+>>           phys_shift = kvm_ipa_limit;
+> 
+> get_kvm_ipa_limit() and variable 'kvm_ipa_limit' have been exposed through
+> KVM_CAP_ARM_VM_IPA_SIZE for both normal and realm VMs in this series. 
+> However,
+> the IPA limit determined by the feature-register-0 in TF-RMM, which is 
+> returned
+> by kvm_rmm_ipa_limit(), can be different from 'kvm_ipa_limit'.
+> 
+> This brings confusion to VMM like qemu, where the request to create a 
+> realm VM is
+> rejected if the requested IPA size exceeds the limit, exposed by the 
+> host through
+> KVM_CAP_ARM_VM_IPA_SIZE. So the host needs to return correct IPA limit 
+> through
+> KVM_CAP_ARM_VM_IPA_SIZE for realm VM somewhere in this series?
 
-nit: We can't use the else arm below?
+You're right that the limit exposed by the KVM_CAP_ARM_VM_IPA_SIZE
+doesn't tell the VMM about the limit imposed by the RMM. The only way
+to expose this is via an ioctl() on the KVM VM fd. But the VM fd is
+created with an argument (type), which on arm64 unfortunately specifies
+the IPA Size. So, this is kind of a chicken and egg problem. Or the
+VMM can create a dummy Realm VM (with default IPA size of 0) and then
+run the cap.
 
->  
->  	if (pkvm_hyp_vcpu_is_protected(hyp_vcpu)) {
->  		host_vcpu->arch.ctxt = hyp_vcpu->vcpu.arch.ctxt;
-> @@ -329,6 +332,12 @@ static void handle___pkvm_vcpu_load(struct kvm_cpu_context *host_ctxt)
->  		/* Propagate WFx trapping flags */
->  		hyp_vcpu->vcpu.arch.hcr_el2 &= ~(HCR_TWE | HCR_TWI);
->  		hyp_vcpu->vcpu.arch.hcr_el2 |= hcr_el2 & (HCR_TWE | HCR_TWI);
-> +
-> +		/* HPMN == 0 is reserved without FEAT_HPMN0. */
-> +		if (system_supports_pmuv3())
-> +			u64p_replace_bits(&hyp_vcpu->vcpu.arch.mdcr_el2,
-> +					  FIELD_GET(ARMV8_PMU_PMCR_N, read_sysreg(pmcr_el0)),
-> +					  MDCR_EL2_HPMN);
->  	} else {
->  		memcpy(&hyp_vcpu->vcpu.arch.fgt, hyp_vcpu->host_vcpu->arch.fgt,
->  		       sizeof(hyp_vcpu->vcpu.arch.fgt));
-> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> index 459bd9eb7e4bc..e85f13233da08 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> @@ -102,7 +102,7 @@ static void pvm_init_traps_mdcr(struct kvm_vcpu *vcpu)
->  
->  	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMUVer, IMP)) {
->  		val |= MDCR_EL2_TPM | MDCR_EL2_TPMCR;
-> -		val &= ~(MDCR_EL2_HPME | MDCR_EL2_MTPME | MDCR_EL2_HPMN_MASK);
-> +		val &= ~(MDCR_EL2_HPME | MDCR_EL2_MTPME);
->  	}
->  
->  	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, DebugVer, IMP))
-> -- 
-> 2.39.5
+On the other hand, given the Realm creation is measured, if the Realm
+can't be created with the "IPA Size" requested by the user, then there
+is no point in creating the Realm VM.
+
+So, we decided that this failure condition was alright.
+
+This was mentioned in one of the versions of the series, but got lost
+in the revisions.
+
+If there is interest in getting this exposed, we could do something
+like the above. Or, the other option is limit the IPA size of the VM
+that can be created to RMM IPA limit, when we explicitly choose the
+KVM mode to be CCA (this is something that is coming in the next
+version)
+
+Cheers
+Suzuki
+
+
 > 
+> Thanks,
+> Gavin
+> 
+>> @@ -957,9 +961,18 @@ static void stage2_destroy_range(struct 
+>> kvm_pgtable *pgt, phys_addr_t addr,
+>>   static void kvm_stage2_destroy(struct kvm_pgtable *pgt)
+>>   {
+>> +    struct kvm *kvm = kvm_s2_mmu_to_kvm(pgt->mmu);
+>>       unsigned int ia_bits = VTCR_EL2_IPA(pgt->mmu->vtcr);
+>> -    stage2_destroy_range(pgt, 0, BIT(ia_bits));
+>> +    /*
+>> +     * Realm RTTs are inaccessible to the host and may contain stale 
+>> data
+>> +     * after the RMM has released them. The non-root RTTs are explicitly
+>> +     * destroyed through RMI before the RD is destroyed; only the 
+>> root PGD
+>> +     * pages remain to be freed here.
+>> +     */
+>> +    if (!kvm_is_realm(kvm))
+>> +        stage2_destroy_range(pgt, 0, BIT(ia_bits));
+>> +
+>>       KVM_PGT_FN(kvm_pgtable_stage2_destroy_pgd)(pgt);
+>>   }
+>> @@ -1001,6 +1014,8 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct 
+>> kvm_s2_mmu *mmu, unsigned long t
+>>           return -EINVAL;
+>>       }
+>> +    mmu->arch = &kvm->arch;
+>> +
+>>       err = kvm_init_ipa_range(mmu, type);
+>>       if (err)
+>>           return err;
+>> @@ -1009,7 +1024,6 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct 
+>> kvm_s2_mmu *mmu, unsigned long t
+>>       if (!pgt)
+>>           return -ENOMEM;
+>> -    mmu->arch = &kvm->arch;
+>>       err = KVM_PGT_FN(kvm_pgtable_stage2_init)(pgt, mmu, 
+>> &kvm_s2_mm_ops);
+>>       if (err)
+>>           goto out_free_pgtable;
+>> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
+>> index 247c4f033945..528b01d5d71d 100644
+>> --- a/arch/arm64/kvm/rmi.c
+>> +++ b/arch/arm64/kvm/rmi.c
+>> @@ -5,6 +5,8 @@
+>>   #include <linux/kvm_host.h>
+>> +#include <asm/kvm_emulate.h>
+>> +#include <asm/kvm_mmu.h>
+>>   #include <asm/kvm_pgtable.h>
+>>   #include <asm/rmi_cmds.h>
+>>   #include <asm/virt.h>
+>> @@ -14,6 +16,60 @@ static bool rmi_has_feature(int reg, unsigned long 
+>> feature)
+>>       return !!u64_get_bits(rmi_feat_reg(reg), feature);
+>>   }
+>> +u32 kvm_rmm_ipa_limit(void)
+>> +{
+>> +    return u64_get_bits(rmi_feat_reg(0), RMI_FEATURE_REGISTER_0_S2SZ);
+>> +}
+>> +
+>> +void kvm_destroy_realm(struct kvm *kvm)
+>> +{
+>> +    struct realm *realm = &kvm->arch.realm;
+>> +    size_t pgd_size = kvm_pgtable_stage2_pgd_size(kvm->arch.mmu.vtcr);
+>> +
+>> +    if (!kvm_realm_is_created(kvm)) {
+>> +        kfree(realm->sro);
+>> +        realm->sro = NULL;
+>> +        return;
+>> +    }
+>> +
+>> +    kvm_set_realm_state(kvm, REALM_STATE_DYING);
+>> +
+>> +    if (realm->rd) {
+>> +        phys_addr_t rd_phys = virt_to_phys(realm->rd);
+>> +
+>> +        if (WARN_ON(rmi_realm_terminate(rd_phys, realm->sro)))
+>> +            return;
+>> +
+>> +        if (WARN_ON(rmi_realm_destroy(rd_phys, realm->sro)))
+>> +            return;
+>> +        free_delegated_page(rd_phys);
+>> +        realm->rd = NULL;
+>> +    }
+>> +
+>> +    if (WARN_ON(rmi_undelegate_range(kvm->arch.mmu.pgd_phys,
+>> +                     pgd_size)))
+>> +        return;
+>> +
+>> +    kvm_set_realm_state(kvm, REALM_STATE_DEAD);
+>> +
+>> +    /* Now that the realm is destroyed, free the entry-level RTTs. */
+>> +    kvm_free_stage2_pgd(&kvm->arch.mmu);
+>> +
+>> +    kfree(realm->sro);
+>> +    realm->sro = NULL;
+>> +}
+>> +
+>> +int kvm_init_realm(struct kvm *kvm)
+>> +{
+>> +    struct realm *realm = &kvm->arch.realm;
+>> +
+>> +    realm->sro = kmalloc_obj(*realm->sro);
+>> +    if (!realm->sro)
+>> +        return -ENOMEM;
+>> +
+>> +    return 0;
+>> +}
+>> +
+>>   static int rmm_check_features(void)
+>>   {
+>>       if (kvm_lpa2_is_enabled() &&
+> 
+
