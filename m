@@ -1,48 +1,54 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F19733AE190
-	for <kvmarm@lists.linux.dev>; Wed,  2 Sep 2026 10:12:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89A7147424A
+	for <kvmarm@lists.linux.dev>; Wed,  2 Sep 2026 10:54:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788343961; cv=none; b=Q3wyKUGq4KJ7ea40imd/dR/7XFBvyf7xCwt4QzPL7nNKheEXBDQCpB0Y4dUx9Ptjm97gYI2EC6rESXxYdIKHUHlvCjrrpeRKIA27IEYpuTKmrO0KuhxBucUvBgLGG+dzZlXuRLOpSqbmf/q1W1tHPEGbUSoI4yXu4ezahlxjzTw=
+	t=1788346458; cv=none; b=Ra04qQC6ncy/TOy8wAAsbd38IOu62jxgLi8X3VBzBnntc+IYJ9oTiDTmRXaEJg9PbnTo9SCM7HayKrsUSiKn6WiluJXjOwFutq5G1BtQeM0R4t3fuZ1S+CWcjUoflVrVB+mSjLtEzahse2K3aPObNMIUF6QBPgLE4BTTVXd6aZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788343961; c=relaxed/simple;
-	bh=WAV5GySQgV5zJK3fV42hf/X4XKvZR2TNrIIR65/Ii/Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q67S7IlrvOY5lHUT4Nq9qCSppv42233fHkspA1Z1w9KuDjxeGLI9HOEG/MFCzxcvuF98Oz5Mn2ToT6npjdRd5vxI2INADWGzgwPMCXHH8tgEuKGC0f5Nhdn9JAXswptq634gs3AMG2DGx+3RVqNvJSCKCn3u0TuIeooOMvc85jE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=QvGJZjuX; arc=none smtp.client-ip=217.140.110.172
+	s=arc-20240116; t=1788346458; c=relaxed/simple;
+	bh=VJhrLZI3tnfJzyrU+XBx+aRk7G0SRkdsT882fdzqnGc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=ffVblfEDO/B44ufJK7ikdw49KGrOBnB2Kn7v5w653PyOunowsjhkfEkeaf9njrOrRYPx8hSoDiXBU5pKTwjjHQkHRxtM3AH3uA+Z1yUH5idE0tLudt2aAfb5CYYddp9mhcu0YUy7Yizy2nHWPkDgXFe+HSUDfJCF9VqNA1lNeJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=tJZtD3zg; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="QvGJZjuX"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="tJZtD3zg"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 978F1165C;
-	Wed,  2 Sep 2026 03:12:34 -0700 (PDT)
-Received: from e143914.arm.com (e143914.arm.com [10.2.213.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4343F3F882;
-	Wed,  2 Sep 2026 03:12:36 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BBDA0165C;
+	Wed,  2 Sep 2026 03:54:06 -0700 (PDT)
+Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8553D3F8C6;
+	Wed,  2 Sep 2026 03:54:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1788343958; bh=WAV5GySQgV5zJK3fV42hf/X4XKvZR2TNrIIR65/Ii/Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QvGJZjuXcefswVZMeXVpzZFWYLDCPY4NfBo2oEJ6eLUHq+gAqWIKw/uOcGoO9GPae
-	 3z9256KeR1MmyNSGzfZ0fhgy6CpRK5EkhAU1silcMJeCLHZd4qOUtM0ZvI+xZhq++8
-	 NnmmjoohY2pjIoVgViPORTaAN8Klu8+QnHO/0n5E=
-Date: Wed, 2 Sep 2026 11:12:30 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Steffen Eiden <seiden@linux.ibm.com>,
+	t=1788346450; bh=VJhrLZI3tnfJzyrU+XBx+aRk7G0SRkdsT882fdzqnGc=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=tJZtD3zgqQnEuGfs/67Yd+ZWlPXHjKoMT0U3ZR57dmGKpRUmMuHF1P6DufUHsQDhc
+	 dE9KFKVVLrberz98boWoi5FfokmKbRPvi0j9drfEMvYknfwXCrjP9H//8pt77gtBVH
+	 G65T8aXCLl88anRM8TxQgiUP5PGq5sbzBdls3yFI=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Tian Zheng <zhengtian10@huawei.com>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Quentin Perret <qperret@google.com>, Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH 04/17] KVM: arm64: Introduce per-EC entry handlers for
- pKVM
-Message-ID: <apf2jvCicXlw7JYP@e143914.arm.com>
-References: <20260831163421.272420-1-fuad.tabba@linux.dev>
- <20260831163421.272420-5-fuad.tabba@linux.dev>
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 4/5] KVM: arm64: Add KVM_REQ_RELOAD_STAGE2
+Date: Wed,  2 Sep 2026 11:53:55 +0100
+Message-ID: <apgAQ8p3hkGItkYK@LeoBrasDK>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <c8a6b6ac-aa4a-4cbc-b4f0-8dd6f4f02341@huawei.com>
+References: <20260901171558.2674031-1-leo.bras@arm.com> <20260901171558.2674031-5-leo.bras@arm.com> <c8a6b6ac-aa4a-4cbc-b4f0-8dd6f4f02341@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -51,110 +57,97 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260831163421.272420-5-fuad.tabba@linux.dev>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Aug 31, 2026 at 05:34:08PM +0100, Fuad Tabba wrote:
-> From: Marc Zyngier <maz@kernel.org>
+On Wed, Sep 02, 2026 at 11:41:39AM +0800, Tian Zheng wrote:
 > 
-> Add an ESR_EL2.EC-indexed handler table, entry_hyp_vm_handlers[],
-> consulted from flush_hyp_vcpu() on re-entry when the previous exit was
-> a trap: sync_hyp_vcpu() records the exit reason in the hyp vCPU as
-> exit_code, and the trap's exception class comes from its ESR_EL2.
 > 
-> Entry carries the host's requested PC updates to the hyp vCPU: add
-> vcpu_copy_flag() to copy a masked set of flags between the two vCPU
-> structures, with PC_UPDATE_REQ covering INCREMENT_PC and the
-> pending-exception flags. The wholesale iflags copy moves into the
-> non-protected branch; a protected vCPU takes only PC_UPDATE_REQ.
+> On 9/2/2026 1:15 AM, Leonardo Bras wrote:
+> > Add a vcpu request to exit guest, reload Stage2, and then come back to
+> > guest.
+> > 
+> > This will be used on future patches that enable S2 HAFDBS and HDBSS, as
+> > they may need to change VTCR bits for enabling/disabling the feature when
+> > the vcpus are still running.
+> > 
+> > Signed-off-by: Leonardo Bras <leo.bras@arm.com>
+> > ---
+> >   arch/arm64/include/asm/kvm_host.h | 2 ++
+> >   arch/arm64/kvm/arm.c              | 8 ++++++++
+> >   2 files changed, 10 insertions(+)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index 27fe0cd5b2d7..00fe169f239f 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -48,20 +48,22 @@
+> >   #define KVM_REQ_VCPU_RESET		KVM_ARCH_REQ(2)
+> >   #define KVM_REQ_RECORD_STEAL		KVM_ARCH_REQ(3)
+> >   #define KVM_REQ_RELOAD_GICv4		KVM_ARCH_REQ(4)
+> >   #define KVM_REQ_RELOAD_PMU		KVM_ARCH_REQ(5)
+> >   #define KVM_REQ_SUSPEND			KVM_ARCH_REQ(6)
+> >   #define KVM_REQ_RESYNC_PMU_EL0		KVM_ARCH_REQ(7)
+> >   #define KVM_REQ_NESTED_S2_UNMAP		KVM_ARCH_REQ(8)
+> >   #define KVM_REQ_GUEST_HYP_IRQ_PENDING	KVM_ARCH_REQ(9)
+> >   #define KVM_REQ_MAP_L1_VNCR_EL2		KVM_ARCH_REQ(10)
+> >   #define KVM_REQ_VGIC_PROCESS_UPDATE	KVM_ARCH_REQ(11)
+> > +#define KVM_REQ_RELOAD_STAGE2 \
+> > +	KVM_ARCH_REQ_FLAGS(12, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+> >   #define KVM_DIRTY_LOG_MANUAL_CAPS   (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE | \
+> >   				     KVM_DIRTY_LOG_INITIALLY_SET)
+> >   #define KVM_HAVE_MMU_RWLOCK
+> >   /*
+> >    * Mode of operation configurable with kvm-arm.mode early param.
+> >    * See Documentation/admin-guide/kernel-parameters.txt for more information.
+> >    */
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index 8b080804bc90..1e528d53d093 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -1164,20 +1164,28 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
+> >   		if (kvm_check_request(KVM_REQ_RESYNC_PMU_EL0, vcpu))
+> >   			kvm_vcpu_pmu_restore_guest(vcpu);
+> >   		if (kvm_check_request(KVM_REQ_SUSPEND, vcpu))
+> >   			return kvm_vcpu_suspend(vcpu);
+> >   		if (kvm_dirty_ring_check_request(vcpu))
+> >   			return 0;
+> > +		if (kvm_check_request(KVM_REQ_RELOAD_STAGE2, vcpu)) {
+> > +			unsigned long flags;
+> > +
+> > +			local_irq_save(flags);
+> > +			__load_stage2(vcpu->arch.hw_mmu);
+> > +			local_irq_restore(flags);
+> > +		}
+> > +
+> >   		check_nested_vcpu_requests(vcpu);
+> >   	}
+> >   	return 1;
+> >   }
+> >   static bool vcpu_mode_is_bad_32bit(struct kvm_vcpu *vcpu)
+> >   {
+> >   	if (likely(!vcpu_mode_is_32bit(vcpu)))
+> >   		return false;
+> Hi Leo,
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Co-developed-by: Fuad Tabba <fuad.tabba@linux.dev>
-> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
-
-Not really looked at nVHE much (or pkvm ever), but:
-
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
-
-> ---
->  arch/arm64/include/asm/kvm_host.h      | 19 +++++++++++++
->  arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  3 ++
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c     | 39 +++++++++++++++++++++++---
->  3 files changed, 57 insertions(+), 4 deletions(-)
+> Thanks for sending this out. I actually implemented a similar request in
+> my v5 HDBSS series to reload VTCR on enable/disable, but I named it
+> KVM_REQ_HDBSS_RELOAD_VTCR.
 > 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 27fe0cd5b2d7a..78a4d387f9fd4 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -1033,11 +1033,28 @@ struct kvm_vcpu_arch {
->  		set;						\
->  	})
->  
-> +#define __vcpu_copy_flag(vt, vs, flagset, f, m)			\
-> +	do {							\
-> +		typeof(vs->arch.flagset) tmp, val;		\
-> +								\
-> +		__build_check_flag(vs, flagset, f, m);		\
-> +								\
-> +		val = READ_ONCE(vs->arch.flagset);		\
-> +		val &= (m);					\
-> +		__vcpu_flags_preempt_disable();			\
-> +		tmp = READ_ONCE(vt->arch.flagset);		\
-> +		tmp &= ~(m);					\
-> +		tmp |= val;					\
-> +		WRITE_ONCE(vt->arch.flagset, tmp);		\
-> +		__vcpu_flags_preempt_enable();			\
-> +	} while (0)
-> +
->  #define vcpu_get_flag(v, ...)	__vcpu_get_flag((v), __VA_ARGS__)
->  #define vcpu_set_flag(v, ...)	__vcpu_set_flag((v), __VA_ARGS__)
->  #define vcpu_clear_flag(v, ...)	__vcpu_clear_flag((v), __VA_ARGS__)
->  #define vcpu_test_and_clear_flag(v, ...)			\
->  	__vcpu_test_and_clear_flag((v), __VA_ARGS__)
-> +#define vcpu_copy_flag(vt, vs, ...) __vcpu_copy_flag((vt), (vs), __VA_ARGS__)
->  
->  /* KVM_ARM_VCPU_INIT completed */
->  #define VCPU_INITIALIZED	__vcpu_single_flag(cflags, BIT(0))
-> @@ -1055,6 +1072,8 @@ struct kvm_vcpu_arch {
->  #define INCREMENT_PC		__vcpu_single_flag(iflags, BIT(1))
->  /* Target EL/MODE (not a single flag, but let's abuse the macro) */
->  #define EXCEPT_MASK		__vcpu_single_flag(iflags, GENMASK(3, 1))
-> +/* Cover both PENDING_EXCEPTION and EXCEPT_MASK for global operations */
-> +#define PC_UPDATE_REQ		__vcpu_single_flag(iflags, GENMASK(3, 0))
->  /* Host-set: the hyp flushes the non-protected vCPU state in on entry */
->  #define PKVM_HOST_STATE_DIRTY	__vcpu_single_flag(iflags, BIT(4))
->  
-> diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-> index c904647d2f760..49a0a992047ba 100644
-> --- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-> +++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-> @@ -26,6 +26,9 @@ struct pkvm_hyp_vcpu {
->  	 * per-cpu pointer tracking us. Otherwise, NULL if not loaded.
->  	 */
->  	struct pkvm_hyp_vcpu **loaded_hyp_vcpu;
-> +
-> +	/* The previous exit's ARM_EXCEPTION_* code. */
-> +	u32 exit_code;
->  };
->  
->  /*
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> index b6bfe502bcd04..ca7122b0bccdd 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -31,6 +31,17 @@ unsigned int hyp_gicv3_nr_lr;
->  
->  void __kvm_hyp_host_forward_smc(struct kvm_cpu_context *host_ctxt);
->  
-> +typedef void (*hyp_entry_exit_handler_fn)(struct pkvm_hyp_vcpu *);
-> +
-> +static void handle_vm_entry_generic(struct pkvm_hyp_vcpu *hyp_vcpu)
-> +{
-> +	vcpu_copy_flag(&hyp_vcpu->vcpu, hyp_vcpu->host_vcpu, PC_UPDATE_REQ);
-> +}
+> Without such a request, the new VTCR value only takes effect on the next
+> vcpu_load, which means enable/disable could be delayed indefinitely if
+> the vCPU never goes through a load/put cycle. So I think this request is
+> necessary for HDBSS as well.
+> 
+> Since your KVM_REQ_RELOAD_STAGE2 is more generic, I'd like to rebase on
+> top of your patch and reuse it in v5. Would that work for you? Or do you
+> prefer to keep them separate for now?
+> 
 
-This is added here because the full copy of iflags was moved into the
-!pkvm_hyp_vcpu_is_protected() section, so is needed temporarily until
-each EC has its own handler.
+Hi Tian, 
+Thanks for reviewing!
 
-Thanks,
-Joey
+The main reason for this patch series (at least up to patch #3) was to give 
+you a base for HDBSS, so please rebase as much as you want on top of it.
+
+Thanks!
+Leo
