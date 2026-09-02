@@ -1,87 +1,98 @@
-Received: from esa1.hc1455-7.c3s2.iphmx.com (esa1.hc1455-7.c3s2.iphmx.com [207.54.90.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23BB2427FA0;
-	Wed,  2 Sep 2026 23:07:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.54.90.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E7F646C848
+	for <kvmarm@lists.linux.dev>; Wed,  2 Sep 2026 23:56:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788390440; cv=none; b=t+dQQI1UjfUfqEffi2NL7TZdbA1a07lgTumHuIm3JiugCeCN/DrZJqmg+z/WJOfbI0Yezytv/EFWTACImrRUI/l+EJiNPuTkIzzIwyZUh/iLZ9WnklTiMNNIxKnS5rpIYMf6buPAsfQz6i64nBjxLzmn2KBrddeog+llKRJROTI=
+	t=1788393377; cv=none; b=lNlLOYaWjI4iKpl6peyBj137LmfmgrWdpR3plhZH3ECYtQL9tgcDOUDlCxYnUUfs5Q2PkIpTksjfORiOS9W5YbE3bWKC1kzrZDjPYypaxmiuiAiqXNAD5aem40nTzB0uuRlB9TPwTSCwddVn+VbluDtOhSEu7EVNhY9b1PMz+4U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788390440; c=relaxed/simple;
-	bh=DGhH14+yE9nyt5xO4fYtNZdDfh3D8lYk97bpxGHpfRM=;
+	s=arc-20240116; t=1788393377; c=relaxed/simple;
+	bh=oGFB4tUe4uIiJbL6QZtviPmqaClzJ2Rpq67zK1xKdQU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qTE203pQW/7UVOuOrUZs0Xz6Oa5g5nKo6tDngvrAI/zgaxeAxiDqsLavEDLJjE4Tjh+CT0sDO2cFuyT4MJQIdK2nfC61tXgn36+fMWlEPiw3YODfGuM0DXL28aDMQw+4WSCzkSrVtwhevN7NggGaJw56FR0lIVQgus8KUhHfJWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=t5dNdh6q; arc=none smtp.client-ip=207.54.90.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=AfnkWOjW2lJeESSovupxj66VABtuGwm7SAT8Qof3PW1ZXk016c9Ul2zGMi+WaHU1zbnWrbyS4mdKmhDETwFd/aGNJLVM2sdc+q+r/lXHa1IYdL1g3rxqq1Ip5Y4x5WFCyzVxL2FaE5iuOJT40e5KzDlqxDHmYvtvJhm5Jxv3p14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=iSzURWR1; arc=none smtp.client-ip=209.85.222.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="t5dNdh6q"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
-  t=1788390438; x=1819926438;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=DGhH14+yE9nyt5xO4fYtNZdDfh3D8lYk97bpxGHpfRM=;
-  b=t5dNdh6qef8rjrmdmA0TuPE5wuyxk+sYrgnYft3yj9tEw3DjKOBdrGtL
-   hU4/LslmQSSpTrJBM05FvRcVKbV1qf19zReL1yvVy6CjLZjfPDzXirWcr
-   eEIw87VOCqb9NrW5a3ksj/QHNhm46aB2Ezb5Y6Dz0TDFYdfn/yqtJ4HXN
-   wHxNZY7PAzs5RySNrGWsWZMYwLMH7ZMQD0Vs/b1vzmDe4t8YWRlLiYdja
-   UB9iapTMI1pEGVjT4+pxQ/cSCMZj0CLN9rDrRePFSMuxVFqyXf5uERtOH
-   aE5PRb3MtJexIrp7Mma0iB3Hwpkee1Ny/fMw2PUcv8hcTu7QfLtCr6XbM
-   Q==;
-X-CSE-ConnectionGUID: OEHQqluPRyWjBP8Jt6ZXZg==
-X-CSE-MsgGUID: Fn/56boBToijD0wpLfRSEg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11894"; a="253617835"
-X-IronPort-AV: E=Sophos;i="6.25,258,1779116400"; 
-   d="scan'208";a="253617835"
-Received: from gmgwuk01.global.fujitsu.com ([172.187.114.235])
-  by esa1.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2026 08:07:08 +0900
-Received: from az2uksmgm2.o.css.fujitsu.com (unknown [10.151.22.199])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by gmgwuk01.global.fujitsu.com (Postfix) with ESMTPS id CBC661002BA5;
-	Wed,  2 Sep 2026 23:07:07 +0000 (UTC)
-Received: from az2nlsmom2.o.css.fujitsu.com (unknown [10.150.26.200])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by az2uksmgm2.o.css.fujitsu.com (Postfix) with ESMTPS id 7A94B18000DC;
-	Wed,  2 Sep 2026 23:07:07 +0000 (UTC)
-Received: from sm-arm-grace07 (unknown [10.124.178.20])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by az2nlsmom2.o.css.fujitsu.com (Postfix) with ESMTPS id 9805E18021BF;
-	Wed,  2 Sep 2026 23:06:57 +0000 (UTC)
-Date: Thu, 3 Sep 2026 08:06:54 +0900
-From: Itaru Kitayama <itaru.kitayama@fujitsu.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Tianrui Zhao <zhaotianrui@loongson.cn>,
-	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>,
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Atish Patra <atish.patra@linux.dev>,
-	Alexandre Ghiti <alex@ghiti.fr>,
-	David Hildenbrand <david@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, loongarch@lists.linux.dev,
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-	linux-kernel@vger.kernel.org, Nicholas Piggin <npiggin@gmail.com>,
-	Ritesh Harjani <ritesh.list@gmail.com>
-Subject: Re: [PATCH v2 00/20] KVM: selftests: PPC pre-enabling
-Message-ID: <apisDlhdG7xNDVyl@sm-arm-grace07>
-References: <20260902164123.2546762-1-seanjc@google.com>
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="iSzURWR1"
+Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-9390f8a1c9eso137310985a.3
+        for <kvmarm@lists.linux.dev>; Wed, 02 Sep 2026 16:56:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1788393371; x=1788998171; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=JHkE0KygFhIS9HXgLrJJS0y5ES5oOeyv4LpvZ/FUmdg=;
+        b=iSzURWR1QQFXKc79Dw+fS8617rh+lSRMLV9Uk0r0TTt0LXXT05h9xcotHrXWd072jF
+         pkCHbTiA7631VtVjmJ/R9mw0QEnYBJO5vZpw0V9iVuINkYxQUtk56t5LX4R2jwGbFRq+
+         T7e68pssXK/dxGgddK6v3MZoCxwgyH9O5jaGDNdFTNGnrkAmo68QW0VZ1MTsujfkfZ3r
+         MHc94rNdJj1DlpjoXPV6QvQeh5qD2MovMm/1XJHNuoRYu4PIRuh6Fx94noOaWXHlmseY
+         Q+z0E3gf7XJAnjgmmyLiLs/Yu2qVvCY7rTSVHFMa3wWDtyxjBzXN994n2QqE2adeywpM
+         v9qQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788393371; x=1788998171;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=JHkE0KygFhIS9HXgLrJJS0y5ES5oOeyv4LpvZ/FUmdg=;
+        b=rzHyw/woGTzA6q9PdblW4/J+yVEhY3XJySbhwCcEyovuPxAo1EHEVr+gL50wIVawjt
+         Fnw73qOLNcox5ySnLw0Jz9amqJ7FlVbM18YhyPtUoHmYZT045UDRNZse3FKaar0m5Z5F
+         0dxcpH8xbFnJLi3018V09NyKqjLPuOd/lL/gp8SYldOlMUByBv9qrRfbAgQ1mRwIka/J
+         ojePWf0fgDojtQVuLp5mAJv0aT25Mrtume+mSvTbQWDBT07olEl1v8Xj0WVqEnHyvQfG
+         kDcDYGkduJbjjfltpns6VgzNztvG+kBag6pL1bYzk1e2yDZ1eK0ZaW7c2QTvF9Kda3wQ
+         fX6w==
+X-Forwarded-Encrypted: i=1; AKwUvBzYP2JsOdBRq8ZlrtzZsH2ZUoeoehahJh04wq/GNCm2T7014mq0WV76lG9O9OM8GPghYNhF9Lk=@lists.linux.dev
+X-Gm-Message-State: AFuF++n7oMYlZFj1cU7F3oYksqizr3wFCsYOarJPUyw5IS7qiZsdjyOu
+	TbVCNO5328Y+kEUUol41JCvt8jzK9Q4njasB4UawsBHHP3AcRSoA3cFZvm5q7uHmWSQ=
+X-Gm-Gg: AYBFou0lIFBC45XRyLLPGPoHNrxXdJKCvXr6kCYRBaOrnv52d1OtHQ1qIfvu94vtiqo
+	To6YJuQMWQB5P1hdvq4wT5ROXmAAGOy2t4EvkzCzZe5z5gh6iFiCTkdC5h6sAUXL359nMxjPuaT
+	3oDex+ep2F4DYlUaad0/x7THjQO4905vCzIW9F4jg/ustmDmqju3XuCsXRMU6SwJ/6Nsh6Id35D
+	6VOWDo2xdfm5VFiv5aZuw9UJeUApqAmufF7jw5mVfSTZmbmngHCxTvfn8B8n/S1AVuc23LGXVdt
+	TLZNY26Hy06JwLlvJXmnziMQxbhXjXO6+wTnEZ6+Grgs5cOJs/5Kp2xKsCUuvdVNt7pzklnvcnX
+	zyIKKES2sc3YD9ZlXR8KoJqGY7aU5eNn76QnIJa87AcvA4WXeboKmIs57/7u+Ed+IMbF18Hf40M
+	qcYeDwmRNbFzmGTwHertspYjXvOXydFaK+N4DqkpuLoju0UE6RH79iut14shT+YY/6p8v+znUOL
+	B4PaNRFzKLT1dlhyUWzb/dlWcNsv1ft5Q6v3TBBVl/VSQ==
+X-Received: by 2002:a05:620a:8c98:b0:92e:7ba3:73e5 with SMTP id af79cd13be357-939610139b3mr758596785a.42.1788393370920;
+        Wed, 02 Sep 2026 16:56:10 -0700 (PDT)
+Received: from ziepe.ca (hlfxns010zw-159-2-239-150.pppoe-dynamic.high-speed.ns.bellaliant.net. [159.2.239.150])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-9395f3dd7easm362448885a.45.2026.09.02.16.56.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Sep 2026 16:56:10 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1x1uoL-0000000FTW5-1KK8;
+	Wed, 02 Sep 2026 20:56:09 -0300
+Date: Wed, 2 Sep 2026 20:56:09 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>
+Cc: Nicolin Chen <nicolinc@nvidia.com>, linux-coco@lists.linux.dev,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, Alexey Kardashevskiy <aik@amd.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Joerg Roedel <joro@8bytes.org>, Jonathan Cameron <jic23@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Pranjal Shrivastava <praan@google.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Samuel Ortiz <sameo@rivosinc.com>,
+	Steven Price <steven.price@arm.com>,
+	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
+	Will Deacon <will@kernel.org>, Xu Yilun <yilun.xu@linux.intel.com>
+Subject: Re: [RFC PATCH v4 03/16] iommu/arm-smmu-v3: Add initial pSMMU realm
+ viommu plumbing
+Message-ID: <20260902235609.GG2890729@ziepe.ca>
+References: <20260427085344.941627-1-aneesh.kumar@kernel.org>
+ <20260427085344.941627-4-aneesh.kumar@kernel.org>
+ <apM6dOHcEI2ztWS0@nvidia.com>
+ <yq5a8q5lz5yn.fsf@kernel.org>
+ <yq5aecfdnv4i.fsf@kernel.org>
+ <20260901143445.GC56830@ziepe.ca>
+ <yq5a8q5kkoz3.fsf@kernel.org>
+ <20260902121700.GC2890729@ziepe.ca>
+ <yq5aik4nztdt.fsf@kernel.org>
+ <yq5aecfbzjyk.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -90,92 +101,116 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260902164123.2546762-1-seanjc@google.com>
+In-Reply-To: <yq5aecfbzjyk.fsf@kernel.org>
 
-On Wed, Sep 02, 2026 at 09:41:03AM -0700, Sean Christopherson wrote:
-> This is a big pile of cleanups and refactoring to prepare for PPC support in
-> KVM selftests.  PPC has paging modes that require multi-page page tables, and
-> those page tables need to be naturally aligned.  The original proposal was to
-> plumb in an @align param to the page allocators[*], but I didn't love the idea
-> of adding another rarely used param to the allocators.
+On Wed, Sep 02, 2026 at 10:09:15PM +0530, Aneesh Kumar K.V wrote:
+> static int arm_realm_smmu_v3_vdevice_init(struct iommufd_vdevice *vdev)
+> {
+> 	struct device *dev = iommufd_vdevice_to_device(vdev);
+> 	struct kvm *kvm = vdev->viommu->kvm_file->private_data;
+> 	struct arm_smmu_device *smmu;
+> 	struct arm_smmu_stream *stream;
+> 	struct arm_smmu_master *master;
+> 	unsigned long rmi_ret = 0;
+> 	unsigned long l2_sid;
+> 	int ret;
 > 
-> v2:
->  - Collect tags. [Itaru, Bibo]
+> 	if (!tsm_is_configured(dev))
+> 		return 0;
+> 
+> 	master = dev_iommu_priv_get(dev);
+> 	/* FIXME which stream to pick */
+> 	/* At this moment, iommufd only supports PCI device that has one SID */
+> 	stream = &master->streams[0];
+> 	smmu = master->smmu;
+> 
+> 	l2_sid = ALIGN_DOWN(stream->id, STRTAB_NUM_L2_STES);
+> 
+> 	{
+> 		guard(mutex)(&smmu->realm.mutex);
+> 
+> 		if (!arm_realm_smmu_active(smmu))
+> 			return -EINVAL;
+> 
+> 		ret = rmi_psmmu_st_l2_create(smmu->base_phys, l2_sid,
+> 					     &rmi_ret);
+> 		if (ret || rmi_ret) {
+> 			if (!ret)
+> 				return -EIO;
+> 			if (RMI_RETURN_STATUS(rmi_ret) != RMI_ERROR_PSMMU_ST ||
+> 			    RMI_RETURN_INDEX(rmi_ret) != 2) {
+> 				dev_warn(dev, "failed to create realm stream mapping\n");
+> 				return -EIO;
+> 			}
+> 			/* The L2 stream table already exists. */
+> 		}
+> 	}
+> 
+> 	vdev->destroy = arm_realm_smmu_v3_vdevice_destroy;
+> 	return tsm_bind(dev, kvm, vdev->virt_id);
 
-I ran kvm_page_table_test for arm64 again it went ok on HW.
+I think we should drop tsm_bind() as an abstraction. It doesn't make
+sense to take that round about path when we are calling RMIs directly
+above. It was intended to be an abstraction, but it isn't working out
+with this viommu based abstraction.
 
-Tested-by: Itaru Kitayam <itaru.kitayama@fujitsu.com>
+> @@ -513,10 +514,16 @@ static ssize_t cca_tsm_guest_req(struct pci_tdi *tdi,
+>  		if (copy_from_user((void *)&req_obj, req.user, req_len))
+>  			return -EFAULT;
+>  
+> -		if (req_obj.tdi_state != RHI_DA_TDI_CONFIG_RUN)
+> +		switch (req_obj.tdi_state) {
+> +		case RHI_DA_TDI_CONFIG_UNLOCKED:
+> +			return cca_vdev_device_unlock(pdev);
+> +		case RHI_DA_TDI_CONFIG_LOCKED:
+> +			return cca_vdev_device_lock(pdev);
+> +		case RHI_DA_TDI_CONFIG_RUN:
+> +			return cca_vdev_device_start(pdev);
+> +		default:
+>  			return -EINVAL;
+> -
+> -		return cca_vdev_device_start(pdev);
+> +		}
+>  	}
 
-Thanks,
-Itaru.
->  - Use 0x180000 as the min GPA for page table pages on LoongArch, instead of
->    changing every other arch to use 0x200000. [Sashiko, Bibo]
->  - Opportunistically move the vGIC LPI stress test's global "gpa_base" variable
->    into setup_memslot(). [Sashiko]
-> 
-> v1: https://lore.kernel.org/all/20260826230511.972824-1-seanjc@google.com
-> 
-> [*] https://lore.kernel.org/all/df86b5ccdbdafc3509d9538bd5e6796737bab2db.1781093720.git.ritesh.list@gmail.com
-> 
-> Nicholas Piggin (1):
->   KVM: selftests: Use goto instead of do-while to retry finding unused
->     physical pages
-> 
-> Sean Christopherson (19):
->   KVM: selftests: Use MEM_REGION_PT memslot instead of '0' for s390
->     regions/segments
->   KVM: selftests: Use the common minimum GPA for page tables on
->     LoongArch
->   KVM: selftests: Use vm_alloc_page_table() to allocate LoongArch page
->     tables
->   KVM: selftests: Rename "num" param to "nr_pages" for physical page
->     allocators
->   KVM: selftests: Extend page allocator to support naturally aligned
->     allocations
->   KVM: selftests: Make the single-page allocator APIs static inline
->   KVM: selftests: Use the innermost page allocator API in the memslot
->     perf test
->   KVM: selftests: Use the innermost page allocator API in s390's IRQ
->     routing test
->   KVM: selftests: Add a wrapper API to allocate multiple page table
->     pages
->   KVM: selftests: Initialize vm->memslots[] with invalid memslots during
->     creation
->   KVM: selftests: Add APIs to override memory region types with custom
->     memslots
->   KVM: selftests: Add TEST_EXTRA memory region type for "special"
->     memslots
->   KVM: selftests: Use TEST_EXTRA region in arm64's vGIC LPI stress test
->   KVM: selftests: Use TEST_EXTRA region in x86's smaller MAXPHYADDR test
->   KVM: selftests: Use TEST_EXTRA region in set memory region test
->   KVM: selftests: Take the memory region type, not memslot, in page
->     allocators
->   KVM: selftests: Use TEST_ASSERT(), not assert(), in
->     vm_get_mem_region()
->   KVM: selftests: Automatically pick min_gpa for allocations based on
->     region type
->   KVM: selftests: Add arch hook to force page tables to be naturally
->     aligned
-> 
->  .../selftests/kvm/arm64/page_fault_test.c     |  18 ++-
->  .../selftests/kvm/arm64/vgic_lpi_stress.c     |  21 ++-
->  .../testing/selftests/kvm/include/kvm_util.h  | 106 +++++++++++++--
->  tools/testing/selftests/kvm/include/x86/smm.h |   2 +-
->  .../selftests/kvm/lib/arm64/processor.c       |   4 +-
->  tools/testing/selftests/kvm/lib/kvm_util.c    | 127 +++++++++++-------
->  .../selftests/kvm/lib/loongarch/processor.c   |   5 +-
->  .../selftests/kvm/lib/riscv/processor.c       |   4 +-
->  .../selftests/kvm/lib/s390/processor.c        |   7 +-
->  .../testing/selftests/kvm/lib/x86/processor.c |  15 ++-
->  .../testing/selftests/kvm/memslot_perf_test.c |   3 +-
->  tools/testing/selftests/kvm/s390/cmma_test.c  |  19 +--
->  .../testing/selftests/kvm/s390/irq_routing.c  |   2 +-
->  .../selftests/kvm/set_memory_region_test.c    |   8 +-
->  .../x86/smaller_maxphyaddr_emulation_test.c   |   9 +-
->  15 files changed, 221 insertions(+), 129 deletions(-)
-> 
-> 
-> base-commit: 76671054f9a1ff6abb976583cd8da37650acdc97
-> -- 
-> 2.55.0.966.g6673acef38-goog
-> 
+This stuff cannot flow through sysfs. The VMM must support running in
+a sandbox so it cannot easially call out to sysfs while the VM is
+running. That makes the sandboxing more complex and ugly. The flow we
+have now relies on fd passing from the launcher into the sandbox to
+get things like vfio and iommufd into the VMM.
+
+So these actions really should work the same way unless there is a
+strong reason to do otherwise.
+
+Given these are all acting on bound devices, and those can only be
+created by iommufd, it makes more sense to feed the operations through
+iommufd into the viommu and vdevice ops. AMD wanted to create such
+general command ops anyhow for their viommu emulation (non cc).
+
+And.. then you don't need struct pci_tdi. The vdevice is effectively
+the tdi and the existing locking scheme in iommufd for vdevice takes
+care of everything the tsm code was trying to do, except in a way that
+applies to every viommu out there.. This actually makes a lot of sense
+because the tdi is not really separable from vfio. You cannot have a
+tdi without a kvm and you cannot link a pci dev to a kvm without vfio.
+
+Finally, there is really nothing about the viommu_ops that has much to
+do with smmuv3. It would be fairly straightforward for the tsm_ops to
+be able to create the viommu and provide the viommu_ops. We can get
+there based on the IOMMU_VIOMMU_TYPE_ARM_REALM_SMMUV3.
+
+This then would open up a much nicer split where arm-cca-guest.ko can
+provide a realm smmuv3, and inside those viommu_ops are all the realm
+& tdi related ops, psmmu, vsmmu, vdevice, "guest req".
+
+The arm-cca-guest can just make a simple function call to SMMUv3 to
+get the phys and interrupts. Somehow I think Will would like this
+better than adding to SMMUv3.
+
+Now that the viommu stuff is more developed on the iommufd end, and
+the RMM spec is more complete with vsmmu, I think this arrangement
+becomes visible.
+
+What do you think?
+
+Jason
