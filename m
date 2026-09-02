@@ -1,195 +1,119 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com [209.85.215.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B378492513
-	for <kvmarm@lists.linux.dev>; Wed,  2 Sep 2026 12:42:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D72C49B203
+	for <kvmarm@lists.linux.dev>; Wed,  2 Sep 2026 13:00:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788352937; cv=none; b=Jy+uCu1asGCGHE0hYxJWkJ+jRP8rZfOwG6+8oSH9XRhQU3jyQg9cwomheYxY4B+k5LJDplwUz3khf8g1Jb+XO3R7kHXH7Ptsi61kdzuGMXYZ8iI5IqrtSKvIY1EK0NsnSJJFqWkyg+F1EqBlplhE9xSETq1W7WJ8ACca7i9x6Tk=
+	t=1788354051; cv=none; b=LtPkiY2r7ioufRha5Bfj9hJIHeCUhpbsfgEo2Ium2Lkv1jsmb/XmNOFFV4kAH/O3iEFVzrp6vqtEc9vbEwmvjRCHyGc4xekryjKJgFaXFIzW9KCTZkSQ7cHDyz2RVQ9RaEFqc72NY2CvskAApbevgPylYsur5/is2SiBOmKM0Zc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788352937; c=relaxed/simple;
-	bh=ya4i825jy1XPAF9fATyKN3huP2HorW90joM+TUQYcSg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VL32d4dNpnKq/udERySbLJKDUaPFGY2sXGGqXXxT1jB6w6JE0Vm29r49U/Ylch7SP5FkAYon+k5LbWlT5bcgH7JfQTQ+BfNBL0BZ3yX8NVgUKFdM4p4umok4xjJrqCxA5/dvVoFkfgpIm2Cmg/jyvzHh98Y/DGqNZe4uK9aprmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Uo0XEpDa; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1788354051; c=relaxed/simple;
+	bh=vMETqGmsLv+O1ZisrqmhUsbiFFXLQKrBrDQkabWILoU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=tmi7wyCGMDnD3VRGtDRtOWrD7wcAwja76Ih2FD677B/VNJihZA3nMY//WsckR5V++x7yDovp9b+0Z8BFLdPxkhL0viA/ieCoz/8ZGCAP4giA8l0wG11UJCkqK0EG59Jf0l/vi8jwOQaqZs3R9rsEUAZHgudbnO7V8g8tsjn1BmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Bm316/ZQ; arc=none smtp.client-ip=209.85.215.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Uo0XEpDa"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 682CW9uD4190243;
-	Wed, 2 Sep 2026 12:42:00 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=dOiTeKWuwA/odP2KKwquW501Owf+f4
-	0tpwUxcpypkzw=; b=Uo0XEpDaaD6nlVgE2fElH6ZgG+3RUypgOIrmp0cKzeHUfL
-	DpbWsa+zm4Mji+bX5Y3KsfZXOnpdPexKhOMGVwMZw8ozXimnBv8pISe7tDxjlaQg
-	xcHmG8GbNoeuYxlxUvk/CeMjIJ3YPgaB6Vm4RJJZ2FOirqc/hM4jTed/SjK+b3Dt
-	LaS3RI0DKYyqtCOd2fWDCCC+vOSBpMC6M0KHOZsgGXJmT4MaiRFX6oZAg3Mw7/+6
-	Y9c9KjqZZvmF/ES9bfZ8M/i2Ez/NhYtUgly2JHznafPkXaCa9D+Lq81M35WuVrns
-	05E6jZAXZsqrb4GJQVAgo7YiNF0XwV02JT8dvdrQ==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gbpx5pe54-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 02 Sep 2026 12:41:59 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 682CfMji008248;
-	Wed, 2 Sep 2026 12:41:58 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4gecjaj11k-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 02 Sep 2026 12:41:57 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 682Cfsuh50331914
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 2 Sep 2026 12:41:54 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E3CA82004B;
-	Wed,  2 Sep 2026 12:41:53 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 82DFF20040;
-	Wed,  2 Sep 2026 12:41:53 +0000 (GMT)
-Received: from osiris (unknown [9.224.76.185])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Wed,  2 Sep 2026 12:41:53 +0000 (GMT)
-Date: Wed, 2 Sep 2026 14:41:52 +0200
-From: Steffen Eiden <seiden@linux.ibm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, Alexander Gordeev <agordeev@linux.ibm.com>,
-        Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@kernel.org>,
-        Friedrich Welter <fritz@linux.ibm.com>, Fuad Tabba <tabba@google.com>,
-        Gautam Gala <ggala@linux.ibm.com>,
-        Hariharan Mari <hari55@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Hendrik Brueckner <brueckner@linux.ibm.com>,
-        Ilya Leoshkevich <iii@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
-        Nico Boehr <nrb@linux.ibm.com>,
-        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
-        Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v7 11/23] KVM: arm64: Share arm64 code with s390
-Message-ID: <20260902124152.438647-C-seiden@linux.ibm.com>
-References: <20260831144802.834315-1-seiden@linux.ibm.com>
- <20260831144802.834315-12-seiden@linux.ibm.com>
- <87se3tmlrv.wl-maz@kernel.org>
- <20260901084037.185345-C-seiden@linux.ibm.com>
- <87mru0m76g.wl-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Bm316/ZQ"
+Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-cc1ca15334cso1601028a12.1
+        for <kvmarm@lists.linux.dev>; Wed, 02 Sep 2026 06:00:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1788354050; x=1788958850; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=VNGwYj2t4glIGNOen6FjZQq8vvtMMzT1HX41CF0kxhE=;
+        b=Bm316/ZQZ6lajWzib5bi5A7hlvkVJaozpEAzDkwJOiJ8OOUGFn81QTTUr7wJ7Lq5Oz
+         dm0FEjK7ykON9xyArsVQjURZ3AiX8Ss8rF2rya+WO9zFt4erCh3oiEcOi/4Ey0X2rwaz
+         FmZ/h0Khl7DMmR7vLZeBDaE9WNk/ddXV+BTR6xbTSrLxADPPbChxzMUqThMSkVA1cxM+
+         0eUiKkA+CKamrJsZSSXuwDgo5IGx0Au+BCZXVfYn8/m6AszGpae/L+zi5vSxFfh3Ts/U
+         AQY0MZyf6zfrnnC8OIKRlwwjfg+m6LwHfJfbTn2Ri6GzXB+3EitlldgIjo9AuTrXwyv6
+         4oVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788354050; x=1788958850;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=VNGwYj2t4glIGNOen6FjZQq8vvtMMzT1HX41CF0kxhE=;
+        b=qp2Tqt1u1ecfguA/EKc7T/XgyLaUs3uFDuyQ3VtCib1Qc0Bma1YZLYZIL26FPF5z/Z
+         v2HjH6JPmlAZlGsKyPcsTSkUEXl9Mwn8FJdLBg8pQ9I7u2llm8Mqz9ydx0Gsd6PUvn0T
+         wTDWHr7PKHmLYmDXuxazQCvTYfeesTGUlUc4NdH7Mi4etzkUyW0hHo5nxaEH/SE8N5Gm
+         VAiUnqqh/rVBAAMrPO8BIlAkYr7W+LuX2qV05l2Jb9Jdl9ANSUwv7/PLO2De0T4Q44VY
+         jf/c0HotAucj1tiWc6MdjILmT6jC4ZjxX0RUeN0vtTwYvl4WLdOri8G38EWji/Lz1qtl
+         C3Iw==
+X-Forwarded-Encrypted: i=1; AHgh+RpcP/3Eg1/E2HR2qbnNR5cnQoQEx1uJcIM7Iabke2yf+wruckwuNiVTx90CjvPmnPjhfNisbXM=@lists.linux.dev
+X-Gm-Message-State: AFuF++lkiyegteqfMm6eQMBxnXBdH4BW6Pol9uFnt/DUJuZI59YS370g
+	SDcIftlOwJGfk4HLHh+VkTWiymJfX6it2zAekQzEjkhSn1yHayHyxyb7HIVcwX4hMjWm6zKEKiT
+	nyNb/dA==
+X-Received: from pgdo11-n1.prod.google.com ([2002:a05:6a02:620b:10b0:cc1:5155:bdd1])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:9151:b0:3d3:b02a:7252
+ with SMTP id adf61e73a8af0-3d9b0f39b5emr5405095637.28.1788354049347; Wed, 02
+ Sep 2026 06:00:49 -0700 (PDT)
+Date: Wed, 2 Sep 2026 06:00:48 -0700
+In-Reply-To: <20260902091351.438647-B-seiden@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87mru0m76g.wl-maz@kernel.org>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Authority-Analysis: v=2.4 cv=PPc/P/qC c=1 sm=1 tr=0 ts=6a981997 cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=kj9zAlcOel0A:10 a=VdqzKS8jKosA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=VnNF1IyMAAAA:8
- a=SYUwwzt97VIMazuNbKEA:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-GUID: 6MjRUIWDIBt7iTZF9TiEC9Hdb4wCliq7
-X-Proofpoint-ORIG-GUID: A6X86a91-zHRIEr2PDnZe-nHUUowbUAo
-X-Proofpoint-Spam-Info: AW1haW4tMjYwOTAyMDExMSBTYWx0ZWRfX4Xd2aYS3gxXi
- TH9hCVoNES6hfFUJvnS7uX+oG0mTVmrsR+VcapYhsPjjuWkESTikaChjUYFVdtDakjTUoqdpBhr
- Ni+EkDCsBgUNCT+NyL5bnGEjSjOP6fY=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTAyMDExMSBTYWx0ZWRfX4lpUgbsqkGlp
- pDNb4lKIS4w4mGoyrFkEwNBHyPgLAox/7ehHPfVu7RE5Y+aYlH6BV6n1tTkAFUvbTQ5Ek0/KIro
- 1nBBtPq4ZfqyFKIXE14VrXqjdsGtsDR9E1vJqnvtjhkliY3n+VyURi+05R+k/I2cpnm9DzzRdN+
- iy7nj+v43x/fWlLv4uMFarTUObQLMss/S9T+2A7CNqRLlyRi14XTuiz2jxKP2jEu9GWWptMgs5f
- L34EoMGb+MCvBLuKJTNAExbFCermDog5UBHGUkMPzMsjmXxp8fEU/fYEtVzkgjNOUf7Nih9XQeX
- 0lS0LrrYc9sCel/bQmiPAhyM+Tf5lguZlWo5La0blS3q+ezHK1SzbJv/A+HOx+/UbXDNMdkuY2j
- kd/jWIqjYPu8oov72HAtBpMApuNW5EPiQbDKxO/Zt7vuefAhqqjhcERDDHSGRra/gonOoyHj5Ro
- YJ+pP943TrBTt5zySxg==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-09-02_03,2026-09-01_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 phishscore=0 adultscore=0 suspectscore=0 bulkscore=0
- spamscore=0 priorityscore=1501 impostorscore=0 malwarescore=0
- lowpriorityscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
- definitions=main-2609020111
+Mime-Version: 1.0
+References: <20260831144802.834315-1-seiden@linux.ibm.com> <20260831144802.834315-4-seiden@linux.ibm.com>
+ <apdwHcdy2iYRTrww@google.com> <87ik4om4x2.wl-maz@kernel.org> <20260902091351.438647-B-seiden@linux.ibm.com>
+Message-ID: <apgeAJKF--dZvKvF@google.com>
+Subject: Re: [PATCH v7 03/23] KVM: Allow KVM implementations to switch off
+ MMIO independent of Kconfig
+From: Sean Christopherson <seanjc@google.com>
+To: Steffen Eiden <seiden@linux.ibm.com>
+Cc: Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	linux-s390@vger.kernel.org, Alexander Gordeev <agordeev@linux.ibm.com>, 
+	Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, David Hildenbrand <david@kernel.org>, 
+	Friedrich Welter <fritz@linux.ibm.com>, Fuad Tabba <tabba@google.com>, 
+	Gautam Gala <ggala@linux.ibm.com>, Hariharan Mari <hari55@linux.ibm.com>, 
+	Heiko Carstens <hca@linux.ibm.com>, Hendrik Brueckner <brueckner@linux.ibm.com>, 
+	Ilya Leoshkevich <iii@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Joey Gouly <joey.gouly@arm.com>, Nico Boehr <nrb@linux.ibm.com>, 
+	Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>, Oliver Upton <oupton@kernel.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Sven Schnelle <svens@linux.ibm.com>, Ulrich Weigand <Ulrich.Weigand@de.ibm.com>, 
+	Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Sep 02, 2026 at 08:41:27AM +0100, Marc Zyngier wrote:
-> On Tue, 01 Sep 2026 09:40:37 +0100,
-> Steffen Eiden <seiden@linux.ibm.com> wrote:
-> > 
-> > On Tue, Sep 01, 2026 at 09:13:56AM +0100, Marc Zyngier wrote:
-> > > Why the exit handler, and not the EC handlers aside from the UNKNOWN
-> > > one? Yes, you probably aren't there yet in this series, but I can tell
-> > > you are going to add more and more of these.
+On Wed, Sep 02, 2026, Steffen Eiden wrote:
+> On Wed, Sep 02, 2026 at 09:30:17AM +0100, Marc Zyngier wrote:
+> > On Wed, 02 Sep 2026 01:38:53 +0100,
+> > Sean Christopherson <seanjc@google.com> wrote:
 > > > 
-> > > But the EC array is absolutely architectural, and there is no good
-> > > reason to maintain your own.
+> > > On Mon, Aug 31, 2026, Steffen Eiden wrote:
+> > > > Only defining KVM_MMIO is not flexible enough for multi-KVM systems
+> > > > where one KVM implements MMIO but others do not. Solve this by
+> > > > additionally testing for the non-existence of KVM_NO_MMIO before
+> > > > including MMIO code to KVM.
 > > > 
-> > > So instead of this, why not keep the EC array altogether, and
-> > > implement stubs for the ECs you don't support?
+> > > Ewwwww.  IIUC, s390 ends up with two KVM modules, i.e. there really are two different
+> > > KVMs being built.  Rather than have a KVM_MMIO and NO_KVM_MMIO, I vote very
+> > > strongly to drop CONFIG_KVM_MMIO entirely and replace it with __KVM_HAVE_ARCH_MMIO,
+> > > a la __KVM_HAVE_ARCH_VM_FREE and others.  Tracking two separate macros is going
+> > > to be annoying to maintain, and will definitely be confusing for non-s390 people.
 > > > 
-> > > 	M.
+> > > It'll mean linking in an emtpy coalesced_mmio.o on s390 when building without arm64
+> > > support, but I'm guessing that won't be at all common for s390 builds.
 > > > 
 > > 
-> > There was no specific reasson to define our own EC array as far as I
-> > remember. I will try reusing the array and find out if there are any
-> > issues with that. But I do not expect any. 
-> > 
-> > I assume the stubs probably just forward to handle_unknown_ec, or do you
-> > have a different suggestion?
-> 
-> Probably. This is an indication of something being deeply wrong in the
-> implementation (HW or SW). On reflection, kvm_handle_unknown_ec()
-> should result in a KVM_BUG().
-> 
-> 	M.
-> 
-> -- 
-> Jazz isn't dead. It just smells funny.
+> > I ended-up doing something very similar locally, because I couldn't
+> > really make head or tail of the logic while being in holiday mode
+> > (which doesn't help). However, I kept the negative logic, so that we
+> > don't need to add anything to any architecture but S390 (they are the
+> > odd one out here).
+> negative makes sense. 
 
+Ya, an opt-out for s390 works for me.
 
-While I tried to implement the change I noticed that it might be a good
-idea to share most if not all EC functions defined in handle_exit.c
-The handling is architectural as well and s390 and arm do (and should)
-not differ in their implementation.
+> IIRC KVM/power does select KVM_MMIO most of the times but not always.
+> I'll check that.
 
-But switching stubs to a real shared implementation is not possible if
-we want to not mix up changes in arm64 and s390 in one patch. I.e. in
-one patch expand the shared region and remove the stub. But we would
-neet to do that in one so the (s390) kernel keeps compiling.
-
-So my suggestion is:
-
-For series 1 (and 2) s390 has its own, local implementation of
-handle_exit without sharing any code with arm64 in regard to EC
-
-When s390 has all the relevant code available (likely series 3) s390 can
-switch to using most (if not all) EC handling code used by
-arm_exit_handlers implemented in handle_exit.c.
-
-This can be done without a mixed patch:
-
-1. Mark arm64 handle_exit.c as shared (roughly the first 400Loc w/o
-   includes) - s390 will not use it after this patch.
-2. remove the handle exit code from s390's handle_exit.c and include the
-   new generated handle_exit.inc
-
-This approach brings us further into the share architecture not only code
-approach you meantrioned in the comments regarding sys-regs. (I or
-Andreas will provide a solution for this later :) ) 
-
-Is that OK with you, what do you think?
-	
-	Steffen
+Huh, indeed.  KVM_BOOK3S_64_HV=y && KVM_BOOK3S_64_PR=n ends up with KVM_MMIO=n.
+Though I'm not surprised given the multitude of variants PPC has.
