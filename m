@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 525644EC640
-	for <kvmarm@lists.linux.dev>; Thu,  3 Sep 2026 16:07:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59E184CA785
+	for <kvmarm@lists.linux.dev>; Thu,  3 Sep 2026 16:07:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788451650; cv=none; b=ir+6MqtRZLwdpkjrzPY14y54KWz/plFsvsrO0uQALahNf58q2vRgMs56Xqy+pUTKFbk62gbKIizF3HdCodQyYxWlK/ZsTKvrgG+xM1ciJYWEsdSSoamGfsRoywJEwx+aVi8UG3VgPnH/XiPhRfiAksgZPzzOpTPWkjnZ1+oWsGM=
+	t=1788451654; cv=none; b=mW8n/M7Tin70KQZ5M+akhZkizbqbhT4jafexwVGxtlndMjStiYmMHcMiIGabVhGMqAXKsdzUTx8O/w9cjfojKGud6Sh66m/TM9n2zIkntVszxCButKhhRVe1yyLtjDjhvo9fgAFd3+53n4qSt6gnYl4oMICUyjvHW0ytCu8sHjA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788451650; c=relaxed/simple;
-	bh=pFtVEZ2dhq5smjJX4KiK2ggzIgj0EsmQQlo0I05g5Vc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bU0W2I96oR9Yh98fDSocCNSsJOpN6/cJjnUG2deQeWap/6ZA4RG/vvQmvPNZJOuU8kgqsdqYD92V+gSe2ctq2qYnjTgFwQOSNceN70ngd4zzQIuEMetYHKyZFJMJTsDS/C4bp81LH/D4ODvuOLhnVogt3EHVpqxY7IUUdRQrjos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Cclb8IAx; arc=none smtp.client-ip=217.140.110.172
+	s=arc-20240116; t=1788451654; c=relaxed/simple;
+	bh=PK5crTw8zKz3/t5phMfei5GslsZNl9FLUzgfhq/0CrQ=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Lmkn2i4ccV60/y9W4wTCZVTlXQ3LYpBL7CDtlyz9aY1JDTqgXK+rI7ybqXp0Uo6jhYiIeXfeudcJ/vx+Y8v/4qCi0FtYLhwTaAIEjhC9Sh5NLn98l+xbntXoW4F12+ZzSi7pwlYXgStKf+Wy4lWfIrK6F6itxu1QhOosolLZflw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=u3qR9/qb; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Cclb8IAx"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="u3qR9/qb"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EEC5E1FC4;
-	Thu,  3 Sep 2026 09:07:23 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 054C01650;
+	Thu,  3 Sep 2026 09:07:26 -0700 (PDT)
 Received: from e140010.cambridge.arm.com (e140010.arm.com [10.2.213.25])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C6A3D3F673;
-	Thu,  3 Sep 2026 09:07:25 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F2BFF3F673;
+	Thu,  3 Sep 2026 09:07:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1788451647; bh=pFtVEZ2dhq5smjJX4KiK2ggzIgj0EsmQQlo0I05g5Vc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Cclb8IAxJYcTBznChszZY9BsNWNZGkaQFyqm8nr1EZ8pJ53k665yKYHcVHqy4eZmW
-	 EKqqfGwbBGOF989Nt7eV2VyuttIVcKIl0u8QJvJB3U8urkC3vQ6a4PZj/xxkkDnXi6
-	 AQx7htBRVBDKML7vol5EvWVWcmTJlK5ZJmKq3huI=
+	t=1788451649; bh=PK5crTw8zKz3/t5phMfei5GslsZNl9FLUzgfhq/0CrQ=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=u3qR9/qbvovkMevqzb6sBLXQI8Eof/hbGj6C9mL1kd1qN6Ej2IIn5eSfIhaPpUtKV
+	 I2RWEL3Uu6XJsKhxhFHUE8mSpYiX11J68GShmL5GhjjCIAh82vidPka/99EXDENGsf
+	 tp2KRbxAlnx5ONmRLatKxxT4unNZPvXLxfwu7etU=
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: maz@kernel.org,
 	oupton@kernel.org,
@@ -41,10 +41,9 @@ To: maz@kernel.org,
 	linux-perf-users@vger.kernel.org,
 	catalin.marinas@arm.com,
 	james.clark@linaro.org
-Cc: James Morse <james.morse@arm.com>
-Subject: [RFC PATCH v7 25/28] KVM: arm64: at: Use callback for reading descriptor
-Date: Thu,  3 Sep 2026 17:06:20 +0100
-Message-ID: <20260903160623.315525-26-alexandru.elisei@arm.com>
+Subject: [RFC PATCH v7 26/28] KVM: arm64: Map memory on a SPE stage 2 fault
+Date: Thu,  3 Sep 2026 17:06:21 +0100
+Message-ID: <20260903160623.315525-27-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260903160623.315525-1-alexandru.elisei@arm.com>
 References: <20260903160623.315525-1-alexandru.elisei@arm.com>
@@ -56,125 +55,234 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Allow callers of __kvm_translate_va() to use a custom function for reading
-the translation table descriptor from guest memory. This will be useful for
-handling stage 2 faults reported by SPE, to map the stage 1 translation
-tables at stage 2.
+Make sure SPE in a guest can make progress even if something goes terribly
+wrong in KVM by mapping the memory on stage 2 fault SPE buffer management
+event.
 
-Suggested-by: James Morse <james.morse@arm.com>
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- arch/arm64/include/asm/kvm_nested.h |  7 +++++++
- arch/arm64/kvm/at.c                 | 22 ++++++++++++++--------
- arch/arm64/kvm/nested.c             |  7 ++++---
- 3 files changed, 25 insertions(+), 11 deletions(-)
+ arch/arm64/include/asm/kvm_host.h |  2 +
+ arch/arm64/kvm/arm.c              |  4 +-
+ arch/arm64/kvm/mmu.c              | 53 ++++++++++++++++++
+ arch/arm64/kvm/spe.c              | 93 ++++++++++++++++++++++++++++++-
+ 4 files changed, 148 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 1ed708335809..d812137dcd9e 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -350,8 +350,15 @@ struct s1_walk_filter {
- 	void	*priv;
- };
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 81abfb705aeb..31be131c8486 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -1464,6 +1464,8 @@ void kvm_debug_handle_oslar(struct kvm_vcpu *vcpu, u64 val);
+ #define kvm_guest_owns_debug_regs(vcpu)		\
+ 	((vcpu)->arch.debug_owner == VCPU_DEBUG_GUEST_OWNED)
  
-+typedef int (*read_desc_fn)(struct kvm_vcpu *, u64, u64 *,
-+			    struct s1_walk_info *);
++int kvm_map_gpa(struct kvm_vcpu *vcpu, u64 gpa, u8 fsc, bool s1ptw);
 +
-+int kvm_vcpu_read_s1_desc(struct kvm_vcpu *vcpu, u64 pa, u64 *desc,
-+			  struct s1_walk_info *wi);
-+
- struct s1_walk_info {
- 	struct s1_walk_filter	*filter;
-+	read_desc_fn		read_s1_desc;
- 	u64	     		baddr;
- 	enum trans_regime	regime;
- 	unsigned int		max_oa_bits;
-diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-index 0926426b8798..6e77beced96c 100644
---- a/arch/arm64/kvm/at.c
-+++ b/arch/arm64/kvm/at.c
-@@ -224,6 +224,9 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
- 	unsigned int stride, x;
- 	bool va55, tbi, lva, upper_range;
+ int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
+ 			       struct kvm_device_attr *attr);
+ int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 689fa175f5f4..7c7d0616db53 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1421,8 +1421,6 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 		if (kvm_vcpu_has_pmu(vcpu))
+ 			kvm_pmu_sync_hwstate(vcpu);
  
-+	if (!wi->read_s1_desc)
-+		return -EINVAL;
-+
- 	va55 = va & BIT(55);
- 	upper_range = va55 && wi->regime != TR_EL2;
+-		kvm_spe_sync_hwstate(vcpu);
+-
+ 		/*
+ 		 * Sync the vgic state before syncing the timer state because
+ 		 * the timer code needs to know if the virtual timer
+@@ -1472,6 +1470,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
  
-@@ -427,8 +430,8 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
- 	return -EFAULT;
+ 		preempt_enable();
+ 
++		kvm_spe_sync_hwstate(vcpu);
++
+ 		/*
+ 		 * The ARMv8 architecture doesn't give the hypervisor
+ 		 * a mechanism to prevent a guest from dropping to AArch32 EL0
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 9ba86450fe4a..d7e7365c5c5a 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -2796,3 +2796,56 @@ void kvm_toggle_cache(struct kvm_vcpu *vcpu, bool was_enabled)
+ 
+ 	trace_kvm_toggle_cache(*vcpu_pc(vcpu), was_enabled, now_enabled);
+ }
++
++int kvm_map_gpa(struct kvm_vcpu *vcpu, u64 gpa, u8 fsc, bool s1ptw)
++{
++	struct kvm_vcpu_fault_info *fault_info = &vcpu->arch.fault;
++	struct kvm_vcpu_fault_info fault_backup = *fault_info;
++	struct kvm_s2_fault_desc s2fd = {
++		.vcpu		= vcpu,
++		.fault_ipa	= gpa,
++	};
++	struct kvm_memory_slot *memslot;
++	struct kvm *kvm = vcpu->kvm;
++	gfn_t gfn;
++	hva_t hva;
++	int ret;
++
++	lockdep_assert(srcu_read_lock_held(&kvm->srcu));
++
++	if (WARN_ON_ONCE(is_protected_kvm_enabled() || vcpu_has_nv(vcpu)))
++		return -EOPNOTSUPP;
++
++	if (esr_fsc_is_access_flag_fault(fsc)) {
++		handle_access_fault(vcpu, gpa);
++		return 0;
++	}
++
++	gfn = gpa_to_gfn(gpa);
++	memslot = gfn_to_memslot(kvm, gfn);
++	if (!memslot)
++		return -ENOENT;
++	hva = gfn_to_hva_memslot(memslot, gfn);
++	if (kvm_is_error_hva(hva))
++		return -EFAULT;
++
++	s2fd.memslot = memslot;
++	s2fd.hva = hva;
++
++	fault_info->esr_el2 = FIELD_PREP(ESR_ELx_EC_MASK, ESR_ELx_EC_DABT_LOW) |
++			      ESR_ELx_IL | FIELD_PREP(ESR_ELx_FSC, fsc);
++	if (s1ptw)
++		fault_info->esr_el2 |= ESR_ELx_S1PTW;
++	else
++		fault_info->esr_el2 |= ESR_ELx_WNR;
++	fault_info->hpfar_el2 = FIELD_PREP(HPFAR_EL2_FIPA, gpa >> 12);
++
++	if (kvm_slot_has_gmem(memslot))
++		ret = gmem_abort(&s2fd);
++	else
++		ret = user_mem_abort(&s2fd);
++
++	*fault_info = fault_backup;
++
++	return ret;
++}
+diff --git a/arch/arm64/kvm/spe.c b/arch/arm64/kvm/spe.c
+index ef138562f939..e5f3d0dea7c5 100644
+--- a/arch/arm64/kvm/spe.c
++++ b/arch/arm64/kvm/spe.c
+@@ -10,6 +10,7 @@
+ #include <linux/perf_event.h>
+ 
+ #include <asm/kvm_emulate.h>
++#include <asm/kvm_nested.h>
+ #include <asm/kvm_spe.h>
+ #include <asm/sysreg.h>
+ 
+@@ -242,17 +243,105 @@ static void kvm_spe_update_irq_level(struct kvm_vcpu *vcpu, bool level)
+ 		vcpu_spe->irq_level = level;
  }
  
--static int kvm_read_s1_desc(struct kvm_vcpu *vcpu, u64 pa, u64 *desc,
--			    struct s1_walk_info *wi)
-+int kvm_vcpu_read_s1_desc(struct kvm_vcpu *vcpu, u64 pa, u64 *desc,
-+			  struct s1_walk_info *wi)
- {
- 	u64 val;
- 	int r;
-@@ -513,7 +516,7 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
- 				return ret;
- 		}
- 
--		ret = kvm_read_s1_desc(vcpu, ipa, &desc, wi);
-+		ret = wi->read_s1_desc(vcpu, ipa, &desc, wi);
- 		if (ret) {
- 			fail_s1_walk(wr, ESR_ELx_FSC_SEA_TTW(level), false);
- 			return ret;
-@@ -1324,6 +1327,7 @@ static int handle_at_slow(struct kvm_vcpu *vcpu, u32 op, u64 vaddr, u64 *par)
- 	bool perm_fail = false;
- 	int ret, idx;
- 
-+	wi.read_s1_desc = kvm_vcpu_read_s1_desc;
- 	wi.regime = compute_translation_regime(vcpu, op);
- 	wi.as_el0 = (op == OP_AT_S1E0R || op == OP_AT_S1E0W);
- 	wi.pan = (op == OP_AT_S1E1RP || op == OP_AT_S1E1WP) &&
-@@ -1657,9 +1661,10 @@ int __kvm_at_s12(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
- }
- 
- /*
-- * Translate a VA for a given EL in a given translation regime, with
-- * or without PAN. This requires wi->{regime, as_el0, pan} to be
-- * set. The rest of the wi and wr should be 0-initialised.
-+ * Translate a VA for a given EL in a given translation regime, with or without
-+ * PAN. This requires wi->{regime, as_el0, pan, read_s1_desc} to be set.
-+ * Setting wi->filter is optional. The rest of the wi and wr should be
-+ * 0-initialised.
-  */
- int __kvm_translate_va(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
- 		       struct s1_walk_result *wr, u64 va)
-@@ -1716,8 +1721,9 @@ int __kvm_find_s1_desc_level(struct kvm_vcpu *vcpu, u64 va, u64 ipa, int *level)
- 			.fn	= match_s1_desc,
- 			.priv	= &dm,
- 		},
--		.as_el0	= false,
--		.pan	= false,
-+		.read_s1_desc	= kvm_vcpu_read_s1_desc,
++static bool kvm_spe_should_handle_fault(struct kvm_vcpu *vcpu)
++{
++	u64 pmbsr = vcpu->arch.vcpu_spe.hw_pmbsr_el1;
++	u64 pmbsr_ec = FIELD_GET(PMBSR_EL1_EC, pmbsr);
++
++	if (pmbsr_ec != PMBSR_EL1_EC_FAULT_S2)
++		return false;
++
++	if (FIELD_GET(PMBSR_EL1_EA, pmbsr))
++		return false;
++
++	if (esr_fsc_is_translation_fault(pmbsr) ||
++	    esr_fsc_is_permission_fault(pmbsr) ||
++	    esr_fsc_is_access_flag_fault(pmbsr))
++		return true;
++
++	return false;
++}
++
++static int kvm_spe_read_s1_desc(struct kvm_vcpu *vcpu, u64 gpa, u64 *desc,
++				struct s1_walk_info *wi)
++{
++	u64 pmbsr = vcpu->arch.vcpu_spe.hw_pmbsr_el1;
++	int ret;
++
++	ret = kvm_vcpu_read_s1_desc(vcpu, gpa, desc, wi);
++	if (ret)
++		return ret;
++
++	/* TODO: this should be a hardware capability check */
++	if (kvm_has_feat(vcpu->kvm, ID_AA64DFR2_EL1, SPE_EXC, IMP) &&
++	    !(FIELD_GET(ESR_ELx_S1PTW, pmbsr)))
++		return 0;
++
++	/*
++	 * No choice but to assume that the s2 fault happened on a s1 table
++	 * walk.
++	 */
++	return kvm_map_gpa(vcpu, gpa, FIELD_GET(ESR_ELx_FSC, pmbsr), true);
++}
++
++static int kvm_handle_spe_fault(struct kvm_vcpu *vcpu)
++{
++	struct s1_walk_info wi = {
++		.read_s1_desc	= kvm_spe_read_s1_desc,
++		.regime		= TR_EL10,
 +		.as_el0		= false,
 +		.pan		= false,
- 	};
- 	struct s1_walk_result wr = {};
- 	int ret;
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 17123f0b6dab..e3e71628f8c5 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -1435,9 +1435,10 @@ static int kvm_translate_vncr(struct kvm_vcpu *vcpu, bool *is_gmem)
- 			invalidate_vncr(vcpu->kvm, vt);
++	};
++	struct s1_walk_result wr = {};
++	u64 pmbptr = __vcpu_sys_reg(vcpu, PMBPTR_EL1);
++	u64 pmbsr = vcpu->arch.vcpu_spe.hw_pmbsr_el1;
++	int ret;
++
++	guard(srcu)(&vcpu->kvm->srcu);
++
++	ret = __kvm_translate_va(vcpu, &wi, &wr, pmbptr);
++	if (ret == -EAGAIN)
++		return 0;
++	if (ret)
++		return ret;
++
++	/* Stage 2 fault on a table walk was handled during the translation. */
++	/* TODO: this should be a hardware capability check */
++	if (kvm_has_feat(vcpu->kvm, ID_AA64DFR2_EL1, SPE_EXC, IMP) &&
++	    FIELD_GET(ESR_ELx_S1PTW, pmbsr))
++		return 0;
++
++	return kvm_map_gpa(vcpu, wr.pa, FIELD_GET(ESR_ELx_FSC, pmbsr), false);
++}
++
+ void kvm_spe_sync_hwstate(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_vcpu_spe *vcpu_spe = &vcpu->arch.vcpu_spe;
++	u64 hw_pmbsr_el1;
++	int ret;
  
- 		vt->wi = (struct s1_walk_info) {
--			.regime	= TR_EL20,
--			.as_el0	= false,
--			.pan	= false,
-+			.read_s1_desc	= kvm_vcpu_read_s1_desc,
-+			.regime		= TR_EL20,
-+			.as_el0		= false,
-+			.pan		= false,
- 		};
- 		vt->wr = (struct s1_walk_result){};
- 	}
+ 	if (!vcpu_has_spe(vcpu))
+ 		return;
+ 
+-	if (!FIELD_GET(PMBSR_EL1_S, vcpu_spe->hw_pmbsr_el1))
++	hw_pmbsr_el1 = vcpu_spe->hw_pmbsr_el1;
++	if (!FIELD_GET(PMBSR_EL1_S, hw_pmbsr_el1))
+ 		return;
+ 
+-	__vcpu_assign_sys_reg(vcpu, PMBSR_EL1, vcpu_spe->hw_pmbsr_el1);
++	if (kvm_spe_should_handle_fault(vcpu)) {
++		pr_debug("SPE stage 2 fault PMBSR_EL1=0x%llx PMBPTR_EL1=0x%llx",
++			 hw_pmbsr_el1, __vcpu_sys_reg(vcpu, PMBPTR_EL1));
++		ret = kvm_handle_spe_fault(vcpu);
++		if (ret)
++			goto reinject;
++		/* Let the guest know about the partial record. */
++		if (FIELD_GET(PMBSR_EL1_DL, hw_pmbsr_el1))
++			goto reinject;
++		vcpu_spe->hw_pmbsr_el1 = 0;
++		return;
++	}
++
++reinject:
++	__vcpu_assign_sys_reg(vcpu, PMBSR_EL1, hw_pmbsr_el1);
+ 	vcpu_spe->hw_pmbsr_el1 = 0;
+ 	kvm_spe_update_irq_level(vcpu, true);
+ }
 -- 
 2.43.0
 
