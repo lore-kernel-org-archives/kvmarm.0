@@ -1,157 +1,163 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B835E3E9C1C
-	for <kvmarm@lists.linux.dev>; Thu,  3 Sep 2026 19:13:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EEFA3F327A;
+	Thu,  3 Sep 2026 19:22:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788462856; cv=none; b=aCa5MDFZiXY8mXbCsEKCqelrMsF7RdBxWFVdjMJhM1k0hFoTI5/vwiWv6JgD5wIHaU139lqDd62NEJWfJ4uqhIrksQCVMYoqKfgc1ov5XYNUXXV+s+dVAjj01kaXY7uraNtrGJ/Q4whrKswwt6hhLpzn0lMQH6fGbOpa93yz0CU=
+	t=1788463385; cv=none; b=itB18XVHyL0n/og2ms4tNa+MU2Blwk7CD1T3y9x2JpviUtMnsZ2A52Vo73NvNgpve0JkKRyhjKqs96ZkLx45Uu0KRwaCBZJFkFb/W9nwRIblgnSI25xvyTmxCfk+gBsIKvWWN4imBhrTk7Flev61yEbQ9KmkLc9zCFfI56sRwIw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788462856; c=relaxed/simple;
-	bh=LQ5MmxlCmAkfvdFvXrKZhXx7Fex14wUm+MceK68pFDs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ji1iqh/73453w+cfjet2FuK1f3t1XyMxwoRUJsmDQuGb4Mofw+KmGsUNrBxX9mqs9Ta7RZwgYu4vKW15OonbnF2DrJZVGX+d9Ie4LbgSliE/pcnnzAGbMZUKpv/pSlkM+LE4tvw9aIDYTVoifGlXBMCj5H/sTIZ9mOesXBZwukw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cwdSFHGU; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1788463385; c=relaxed/simple;
+	bh=zIdl91D6ORDkwpknscGEnctFl/pfmgtgzsITEqhGiQ8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XcU7iLjxl9VQO8v9AYetg5NrlLFPXukf4SndnVHMfL7KOqpJ4UEVuvQ5UeLTZ2V/OSor7FnrMp2GNVcxvXk3Lr9QbfvErhZKafM57TIccsDk1Ijx/c1inYWS4Kko9/vf08dJOMX1BXQ3dsHdbvR2SGfAl4AAAWSZemJskTnMsck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Eq3mLAaS; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cwdSFHGU"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1788462825;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ftgzyujbx9F68uHjOCU1/tri9c4N8S6xaXNJtzq3Flg=;
-	b=cwdSFHGUB5A4gw2DrXzNUj8QNSk5NRzKQXNlNBKl5gcyW8AbIIsQ3VXAg8cy9jZEkGboev
-	VknJLN50cEM5kARqRg1jo4r1mWl/2NBSuDGwQxOClWnRO3NdwiFK8kvJm5GYS7U6Pqm3C6
-	7FyygcPNYD+HUEUocketHZue9RCBi+g=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-392-Ci5aLwJBM6K7wyOTZjdNfg-1; Thu, 03 Sep 2026 15:13:43 -0400
-X-MC-Unique: Ci5aLwJBM6K7wyOTZjdNfg-1
-X-Mimecast-MFC-AGG-ID: Ci5aLwJBM6K7wyOTZjdNfg_1788462822
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-47f6d70223dso144531f8f.1
-        for <kvmarm@lists.linux.dev>; Thu, 03 Sep 2026 12:13:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788462822; x=1789067622;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=ftgzyujbx9F68uHjOCU1/tri9c4N8S6xaXNJtzq3Flg=;
-        b=e4tdPy8FlT7KU/Yzt2aLcjiEm3lSbn1pwlof3pMjFEET3pKDFBNuzrq8SX1B4z58nr
-         JzrrX3AT64P1bm+rX96z2D86PC3cuY89v1FsYt87aPHPC7GDcgUavhel9Z+0b42gl1ZA
-         lAHXb+O5ba29YIUr4dw17kaG7uTiCZi8KI6fVV5bhX4eRtNmiim64SIRXMvYQvCqAXEp
-         2u1QcTtNxbfgb4EqJRhlgt2dj0Yp9/VHxGsMLH/Tr7Iq5IxQtLyXOaZJvrcfPCr2NxM6
-         63omfnP2jEIZDCWANaKpGDBOYjfGpB/Z9esNtSTHs0IDVfzA8vZ9BTx9vaIg9n3mZKeX
-         JOmQ==
-X-Forwarded-Encrypted: i=1; AKwUvBxO1FrpZeTmpH/JQ/e7ZEZYy8jHHMflC59MoXE1+IFKk3KnD1kCTvmKmbl/tw4n/UkiD+ZTLGo=@lists.linux.dev
-X-Gm-Message-State: AFuF++kL+aVqBb4Kmhj5UTcOmIWeSr8cfSgI20h+7CviXjMiEehip8d2
-	S2ZDoGbdULw0+XHghZeq6I/GxrsSaAEtW5c3hRdKgO28WSY1l2b7dcaKQzy5uhJOjxM0q+sMUC0
-	EnOJyVu4Okm8L5IiU8SLQ3AbFa4qvngF5wc4lnJy/qPqM9C38VtAj+E+OB7fMNIhb70e+ZoZlbR
-	0SiNUHWhmTcpfvaOUN/omXJ1kFbaqQqQYh
-X-Gm-Gg: AYBFou1H/f1JHU+XiQmBGxrDA/9WDFuIRg319I0wdQNwj6koz9zyEzITWyjZpUrOa8/
-	gvsQdaWRee8vz413ndUOUf9OREdKdjQmcUOr8KiDYtmFMGe5Wvz2yPN00a7bsM9peMmurRN8uHn
-	P3Z1lolMLZei3Ymusu+0KjPyMg0FsvbJbcLLGbVGCy0QwOD4uXG2AZv6Mp8JWIPx3vySKr8SlH4
-	CQfaz/3oBcvmvmKErNI8zLwRO8vC4KmMmPlGmnE8Ubl/CUHASNomfsiSi8u
-X-Received: by 2002:a05:6000:2084:b0:482:f0ee:1390 with SMTP id ffacd0b85a97d-48587289c5bmr2438696f8f.22.1788462822435;
-        Thu, 03 Sep 2026 12:13:42 -0700 (PDT)
-X-Received: by 2002:a05:6000:2084:b0:482:f0ee:1390 with SMTP id
- ffacd0b85a97d-48587289c5bmr2438609f8f.22.1788462821985; Thu, 03 Sep 2026
- 12:13:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Eq3mLAaS"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F19591F000E9;
+	Thu,  3 Sep 2026 19:22:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788463370;
+	bh=jFhzBS1p0lG2LruR2+BckK4vK7HH/sYYjUOds7nc9Hg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=Eq3mLAaSPB4voJ6QGMp4RvSKhHlOJf6YwvpgZNNfizpXsS+y28EGwwS+nWLA69TkI
+	 cvCYG9yS9003xf6MHKDIi4aCU2fgwe0+adOLOYZ4LIuAhr0D/l3QLIuX5nyZ1eOPp9
+	 +Qz5OT5oAPUHtxQVXZX4+MroNEgtD/TH84JQDRhCDjJy6JGa9jJNhLl08L5bF7mvS2
+	 XTFl5L6VgFwIUWHMkapMqfUldN6ytTGMKnuBUi1OHBFv7CiG8bihCcSHDjtooT/ya4
+	 KOtsIHfq1w+k48H1i7JX92j4EkvBHG2eg8Qk8fSSmt1S1o7yRNPsxktXgV6VRKmE1k
+	 v1uW997Z9wDlg==
+Date: Thu, 3 Sep 2026 20:22:44 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Leonardo Bras <leo.bras@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Shuah Khan <shuah@kernel.org>, Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	Yao Yuan <yaoyuan@linux.alibaba.com>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v20 06/14] KVM: arm64: Validate GCS exception lock when
+ emulating ERET
+Message-ID: <2dfd8a6c-42c2-466c-b3d6-2313466fc3d5@sirena.org.uk>
+References: <20260901-arm64-gcs-v20-0-f31750bdfadb@kernel.org>
+ <20260901-arm64-gcs-v20-6-f31750bdfadb@kernel.org>
+ <apmUQETDlhTIuJIY@LeoBrasDK>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260831144802.834315-1-seiden@linux.ibm.com> <20260831144802.834315-3-seiden@linux.ibm.com>
- <apdweRfqt4dTxcU9@google.com> <20260902075028.231001-D-seiden@linux.ibm.com>
- <aphLXQL1H2zYZgTi@google.com> <20260903114241.33034-C-seiden@linux.ibm.com>
- <apmEi1NmOUvmUBFP@google.com> <apmFClPZ2WcDINmT@google.com>
- <apmIGgMEN8w-kQAm@google.com> <19d4feb1-d703-4c62-8622-a6d5e9d6394c@redhat.com>
- <apmYPMMPCNzK9ZEA@google.com>
-In-Reply-To: <apmYPMMPCNzK9ZEA@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 3 Sep 2026 21:13:28 +0200
-X-Gm-Features: AcwNN1VM-0Sta_usKYpoIMa4PlVb-9vByCd46nQw98qW4Zt-Pg_0xPWbP_VjwBM
-Message-ID: <CABgObfZL-qNSaNkNZDj0Kk41zw6UZ30vkSxc6T8wb-pOKab9Wg@mail.gmail.com>
-Subject: Re: [PATCH v7 02/23] KVM: Make device name configurable
-To: Sean Christopherson <seanjc@google.com>
-Cc: Steffen Eiden <seiden@linux.ibm.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	linux-s390@vger.kernel.org, Alexander Gordeev <agordeev@linux.ibm.com>, 
-	Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, David Hildenbrand <david@kernel.org>, 
-	Friedrich Welter <fritz@linux.ibm.com>, Fuad Tabba <tabba@google.com>, 
-	Gautam Gala <ggala@linux.ibm.com>, Hariharan Mari <hari55@linux.ibm.com>, 
-	Heiko Carstens <hca@linux.ibm.com>, Hendrik Brueckner <brueckner@linux.ibm.com>, 
-	Ilya Leoshkevich <iii@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Joey Gouly <joey.gouly@arm.com>, Marc Zyngier <maz@kernel.org>, Nico Boehr <nrb@linux.ibm.com>, 
-	Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>, Oliver Upton <oupton@kernel.org>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Sven Schnelle <svens@linux.ibm.com>, 
-	Ulrich Weigand <Ulrich.Weigand@de.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
-	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: A0JOgjD75QNFX97eAuVr3fi4-89XNMrUnZPDssg8m3w_1788462822
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="Ug4ID8koTk9HgjR1"
+Content-Disposition: inline
+In-Reply-To: <apmUQETDlhTIuJIY@LeoBrasDK>
+X-Cookie: One picture is worth 128K words.
+
+
+--Ug4ID8koTk9HgjR1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Sep 3, 2026 at 5:54=E2=80=AFPM Sean Christopherson <seanjc@google.c=
-om> wrote:
->
-> On Thu, Sep 03, 2026, Paolo Bonzini wrote:
-> > On 9/3/26 16:45, Sean Christopherson wrote:
-> > > > > Actually, thinking about this more, what I've proposed here, plus=
- the pattern of
-> > > > > #define-ing macros in arch-specific kvm_host.h files, should suff=
-ice.  For things
-> > > > > like __KVM_HAVE_ARCH_VM_FREE, it absolutely makes sense to #defin=
-e the macro in
-> > > > > kvm_host.h since it's very directly tied to an arch callback.  Wh=
-ereas with KVM_MIO
-> > > > > and KVM_ASYNC_PF, because they enable compilation of C files, it =
-makes sense to
-> > > > > define them in Makefiles.
-> > Ugh, defining CONFIG symbols in Makefiles sucks.
->
-> Sure, but IMO wrapping entire files in an #ifdef that comes from an arch =
-header
-> sucks more.  And technically, these aren't CONFIG symbols.
+On Thu, Sep 03, 2026 at 04:37:37PM +0100, Leonardo Bras wrote:
+> On Tue, Sep 01, 2026 at 10:47:04PM +0100, Mark Brown wrote:
 
-True it wouldn't be -DCONFIG_ (fortunately). But even if technically
-correct is the best kind of correct...
+> > +	return vcpu_read_sys_reg(vcpu, GCSCR_EL2) & GCSCR_ELx_EXLOCKEN;
+> > +}
 
-> > I don't want KVM to be the. one that does things differently *once more=
-*.
->
-> Too late :-D
->
-> arch/arm64/kvm/hyp/nvhe/Makefile:ccflags-y :=3D -D__KVM_NVHE_HYPERVISOR__=
- -D__DISABLE_EXPORTS -D__DISABLE_TRACE_MMIO__
-> arch/arm64/kvm/hyp/vhe/Makefile:ccflags-y :=3D -D__KVM_VHE_HYPERVISOR__
+> The above perfectly translates the GCS part of IllegalExceptionReturn().
 
-Sure, VHE/nVHE is fair game because the nVHE case is in the same boat
-as vDSO, arch/*/boot, and so on.
+> It's a nit, as I suppose there should be no compiler warning on that, but
+> the function should return a bool, and the last return line returns an u6=
+4.
 
-Looking at a grep for (cflags|CFLAGS).*\-D most are -DDEBUG,
--DDISABLE_BRANCH_PROFILING, -DDEFAULT_SYMBOL_NAMESPACE, etc. and in
-most cases they seem like a bad idea. Don't do it for KVM please;
-requiring -D for all architectures and for random pieces of config,
-when you can put it in asm/kvm_host.h, is just as bad if not worse.
+> Maybe adding a "return !!()" would be better?
 
-Paolo
+There's no need to manually do translations like that in C, the
+conversion of 0 to false and any non-zero value to true when an
+integer is used in a boolean context is in the standard.
 
-> And I think there's value in deliberately being different, because CONFIG=
-s are
-> kernel-wide things, whereas the thingies in question are KVM-local macros=
-.  I.e.
-> IMO, having the behavior stand out is a good thing.
->
-> > I'd prefer to stub out the contents of the .c files instead.
->
+> >  	 * - trying to return to EL1 with HCR_EL2.TGE set
+> > +	 * - GCSCR_ELx.EXLOCKEN is 1 and PSTATE.EXLOCK is 0 when attempting
+> > +	 *   to return from ELx the same EL.
+> >  	 */
+> >  	if (mode =3D=3D PSR_MODE_EL3t   || mode =3D=3D PSR_MODE_EL3h ||
+> >  	    mode =3D=3D 0b00001         || (mode & BIT(1))       ||
+> >  	    (spsr & PSR_MODE32_BIT) ||
+> > +	    kvm_check_illegal_exlock_return(vcpu, spsr) ||
+> >  	    (vcpu_el2_tge_is_set(vcpu) && (mode =3D=3D PSR_MODE_EL1t ||
+> >  					   mode =3D=3D PSR_MODE_EL1h))) {
+> >  		u64 mask;
+>=20
+> In IllegalExceptionReturn(), the GCS-related clause happens at the end, a=
+nd=20
+> here it happens before the TGE one. Could this cause any weird behavior i=
+n=20
+> the future?
+>=20
+> I get that by doing like this you don't change the last line of the "if",=
+=20
+> but I wonder if that could change anything.
 
+Given that we take the same action regardless of which or clause
+triggers I can't see how it would matter.
+
+> > --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> > +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> > @@ -383,6 +383,10 @@ static bool kvm_hyp_handle_eret(struct kvm_vcpu *v=
+cpu, u64 *exit_code)
+> >  		return false;
+> >  	}
+
+> > +	/* Push GCS exception lock failures into the slow path */
+> > +	if (kvm_check_illegal_exlock_return(vcpu, spsr))
+> > +		return false;
+
+> >  	/* If ERETAx fails, take the slow path */
+> >  	if (esr_iss_is_eretax(esr)) {
+> >  		if (!(vcpu_has_ptrauth(vcpu) && kvm_auth_eretax(vcpu, &elr)))
+
+> IIUC, this function will be called on the __kvm_vcpu_run_vhe() inner loop=
+,=20
+> in the cases where the guest exited due to a eret.=20
+
+> What you change here is that in case of an illegal exlock return, it goes=
+=20
+> out of the loop and return to host kernel, probably to deal with it in th=
+e=20
+> mentioned slowpath, the same way the ERETAx entry does.
+
+> I don't question on this being needed.=20
+> I would just like to understand why this is needed here.=20
+
+> This does not seem to be related to nested, as this is called in=20
+> __fixup_guest_exit() and not in fixup_nv_guest_exit(). But would not=20
+> hardware be responsible for cheking this, then?
+
+The code is here because it's part of the ERET handling, this should
+only happen for NV as we're not trapping ERET instructions otherwise.
+We need this because ERETs from vEL2 are handled in software, modulo the
+NV3 fast path mentioned at the top of the function.
+
+--Ug4ID8koTk9HgjR1
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmqZyQMACgkQJNaLcl1U
+h9BdlAgAg/vm1pIuWe7qZ9b1noGxbfdkaFbNZ5SWt0N2KK6/8F2UJ+y4v6tqMYHT
+t9NxEVNZfiIM79x7fKbEreG/OCRWjFAwNUkteyWYMSBLgog/YebnvlrQL66Mop2c
+yL1p6u2l571tA7lZbMEm98HmiT0fttx91f6r2DjLTag8vb4a9H75pHXd3s0kxW8f
+XOwJv8lPIPOkuO0SG8moVB708PvGoWjYxp9Ncks34vNor2Yxy9XsgS+NzHC+Cs2P
+8eiv0xN8E8FQWxx4lbRolJPXxbEActI9PsOmHwlMnIL0QhEbI73X6T+XIr0ljsEH
+H0mA/3kr2QoXIEKU0nwXo8JzIh20qA==
+=6Xn8
+-----END PGP SIGNATURE-----
+
+--Ug4ID8koTk9HgjR1--
