@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF30A4A6CE0
-	for <kvmarm@lists.linux.dev>; Thu,  3 Sep 2026 16:06:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C321B4A6CE0
+	for <kvmarm@lists.linux.dev>; Thu,  3 Sep 2026 16:06:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788451615; cv=none; b=VIVczV8e1TTHaAlAOSS9x9TtiBcAPOAkRpMG2xEyHl4djePm7grhx5G4tk793MihmUzKkWvdZNXN0uatQg6puhz7nEL/rY4yzeoSDQXwi1KtXFUCwVaGyslo+fS01ao7IAePed5iQtvOOyrJoVGnpTX6BxdrX5rLfi9kFO/Knxk=
+	t=1788451618; cv=none; b=BFijjO7drpwAcu/Ept9M4KkzIwuRHUTYPyixluSA8TZ6kUBoMtrGXt0MeBDSn8LTKwM9zvJt+BWnsiyrcIoaNLeozma0h0kmyXChqKxgTYpgjaep0ilq1zDJRC3694/wD+avOyt5JCjw57ZFoIuS2jX6dwR3GfniROgH7kNqDNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788451615; c=relaxed/simple;
-	bh=IYyXPaD2XdK0iGsJ5jrFv2i/pbUyFXfVwjRaAB3XpoA=;
+	s=arc-20240116; t=1788451618; c=relaxed/simple;
+	bh=J7TA+zV8kmgZt4wrJnZbQsqLDsJ8zbM7UZBpwa76m/c=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OppJrbYMxBu5HhSCUthk4IAI+ARqEa3VGzXaFpzj8pYoq/UXdTrB62ibOnMCHaUP0UxhLPIwS3LZlHt9dsPNBdjgFIbS10UBXr7yLi9IMegsnwKQt4dqI3d4xAd5vgRKR1Mmz6SYV4yE1ymfSoWTStynfrKl2vR2kyqj38ma7Vw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Grivi6js; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=CMQRNN5cgPuqYRNW85yzFa9hL/lOHwx8yXqeJX1dpyKPewkk6gtLuRUoBx7X1ksrZfXsNPcur6uZ2RkRS73OCWpmQSSqiCtCiNYNZ6KcR0x7DxF0/wH4S0Dx7iCcCkZDhuZnCTThrsMzoj9aTII2a4y1q95V/XwgYhBqRwy55sI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=YvcxaEaq; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Grivi6js"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="YvcxaEaq"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5ED751596;
-	Thu,  3 Sep 2026 09:06:50 -0700 (PDT)
-Received: from e140010.cambridge.arm.com (e140010.arm.com [10.2.213.25])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 535C63F673;
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6E8531650;
 	Thu,  3 Sep 2026 09:06:52 -0700 (PDT)
+Received: from e140010.cambridge.arm.com (e140010.arm.com [10.2.213.25])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 62C543F673;
+	Thu,  3 Sep 2026 09:06:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1788451614; bh=IYyXPaD2XdK0iGsJ5jrFv2i/pbUyFXfVwjRaAB3XpoA=;
+	t=1788451616; bh=J7TA+zV8kmgZt4wrJnZbQsqLDsJ8zbM7UZBpwa76m/c=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=Grivi6jszekcIPalic01O2eraKmuo0GM5jNL3EGrS4orjaFKvo/NpHGcVVCkCSNil
-	 YLviMhVFXECzDKHQkbu4NJJmIFbu8YmqraWj4UlPvJiEygjf1Sa+VqgtcFzhnAaRCe
-	 yf+tBt5deD4uwh0kyIUW0CgUkzb1Giup1gIlju5c=
+	b=YvcxaEaqUu7xOg2JVbn6D6bN36ItxpJ68KGeHRUloC90DnMx3E7N8V+rcB3cDiuRd
+	 +No+xpPZO2lgW2+Og5j9N8K3A2Ixoi0d/lHnapen+RfIiA5TNpAR3/Ez/Ac6NhDI3n
+	 6nyns/D1mk0yrzClcL40VXoB2GLQxNwJ3hjsW+3I=
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: maz@kernel.org,
 	oupton@kernel.org,
@@ -41,9 +41,9 @@ To: maz@kernel.org,
 	linux-perf-users@vger.kernel.org,
 	catalin.marinas@arm.com,
 	james.clark@linaro.org
-Subject: [RFC PATCH v7 09/28] HACK! KVM: arm64: Enable SPE virtualization only in VHE mode
-Date: Thu,  3 Sep 2026 17:06:04 +0100
-Message-ID: <20260903160623.315525-10-alexandru.elisei@arm.com>
+Subject: [RFC PATCH v7 10/28] HACK! KVM: arm64: Disable SPE virtualization if nested virt is enabled
+Date: Thu,  3 Sep 2026 17:06:05 +0100
+Message-ID: <20260903160623.315525-11-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260903160623.315525-1-alexandru.elisei@arm.com>
 References: <20260903160623.315525-1-alexandru.elisei@arm.com>
@@ -59,24 +59,25 @@ For RFC only.
 
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- arch/arm64/kvm/spe.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/arm.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/arch/arm64/kvm/spe.c b/arch/arm64/kvm/spe.c
-index 97160d1fae81..00908aa2576b 100644
---- a/arch/arm64/kvm/spe.c
-+++ b/arch/arm64/kvm/spe.c
-@@ -22,8 +22,8 @@ void kvm_spe_add_instance(struct arm_spe_pmu *spe_pmu)
- {
- 	struct spe_pmu_entry *entry;
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index b9cee4cf293d..763b102dc51f 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1640,6 +1640,11 @@ static int kvm_vcpu_init_check_features(struct kvm_vcpu *vcpu,
+ 	    !test_bit(KVM_ARM_VCPU_PMU_V3, &features))
+ 		return -EINVAL;
  
--	/* TODO: pKVM support */
--	if (is_protected_kvm_enabled())
-+	/* TODO: pKVM and nVHE support */
-+	if (is_protected_kvm_enabled() || !has_vhe())
- 		return;
++	/* TODO: NV support */
++	if (test_bit(KVM_ARM_VCPU_SPE, &features) &&
++	    test_bit(KVM_ARM_VCPU_HAS_EL2, &features))
++		return -EINVAL;
++
+ 	if (!test_bit(KVM_ARM_VCPU_EL1_32BIT, &features))
+ 		return 0;
  
- 	guard(mutex)(&spe_pmus_lock);
 -- 
 2.43.0
 
