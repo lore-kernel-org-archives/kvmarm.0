@@ -1,58 +1,58 @@
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD69E434407
-	for <kvmarm@lists.linux.dev>; Thu,  3 Sep 2026 08:39:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C19243B6F5
+	for <kvmarm@lists.linux.dev>; Thu,  3 Sep 2026 11:43:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788424764; cv=none; b=CvnRqSymPAz6PPfo4YctH/W2oA3tt6IN/qTIMDqlY+XyAP4fyKaS0RbVeSeHlLlZGEYnNHqvG1flEBk+WYGn0HnlS0cW+Av5fFHbscQW0i/GcQsLkVy9t0V3kyoasjBHcuY4yecGGv5qJlWek7la0aL4bWV5lTtDWsDH+0qTsNA=
+	t=1788435797; cv=none; b=mRQXpmHkaT/sEHqrax0VcdI83atKE6nBdqTkm9FYynJY7c/EfOxQ+VUsUVQKTpyvaIN2xHXQa7btyrjZAz341I+MlB7QDy1oPh/pas1iF9NH4MpSrZTwLOy0VNCSy4AmQLg/lWtHSWRiHk3MKeByfONk6qLhxRUcZrz8ief8lYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788424764; c=relaxed/simple;
-	bh=gy250ESkrbNXAmt1Pukflcbtb9tpx49F7FI58wzn4vQ=;
+	s=arc-20240116; t=1788435797; c=relaxed/simple;
+	bh=ZrbwLximMOBFhEmsQ2KRoTd7L8oPHb0M7HOR1hFw/QM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aNjDa6ZokMjdbAEnZiiVPQVWnyfgpPbCjhhsebN+2Fhk+/OqkR+4B2ZaayJ7BBgVZ5HnliZXerQ390OqQUSur26x7UFK1himq/KhY9pXoJLxGlMFJeqpZIJmCV1dcSj1TZp6HVAE41C3wYx4WRpsygz3fdRQbiFFtPxcao/kRsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=rEQVh27W; arc=none smtp.client-ip=148.163.158.5
+	 Content-Type:Content-Disposition:In-Reply-To; b=J6hRF38DE2xoDUaRvlqmpok24YOa/m/A1KuatRgZjG4DpixNdVc6yZIlnNleXpxL6k69YSYsmjDGiMsQ+HUO3dS2BdjbNxi01lkxTdq/307yDAzOonvfHoBozgsWkUpWnRiGPas36hjXShNN0KYDIEEf/AJCPxT372r6qX9X1m8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=DhmA2Olb; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="rEQVh27W"
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68361dIY2067499;
-	Thu, 3 Sep 2026 08:39:05 GMT
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="DhmA2Olb"
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 683AVdb82788612;
+	Thu, 3 Sep 2026 11:42:49 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=Rt4e7QN0rJH2sd9pKw5EYUdXR/LSB/
-	5HWW+QqOZZCsw=; b=rEQVh27WfTWWYLSguk9gflz5iF8TNsLXhDbfHpqP1yhhXn
-	L5o0CoJHP6CQVA7rzpKSYCyTjKRSAX8oMRCwcmth0zWeI/PisnKV5vsYiLNsiN11
-	jdC/y11SoBEr7B0RhMl4KAoGKCjlq6/MiwydPPrSDYtDm+nyAre4or12tEMo9tNL
-	YnnLH4g+4KFaGBJkYAsorO1/HSaiOlmqzepzxVND3vkB1SGqUSnvYMSndyB3lelj
-	DertguxMa2aHLyFjjai8+xvE93sbuOjhZoOIDEAFcR8PYTDr9rDo2/FuFYAeIenN
-	Zpt7GQkAMH9WZdd0MVPE4GBWRQCMxx0rj93hRMxA==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gbmuj3p4e-1
+	:references:subject:to; s=pp1; bh=9oLkw0qjqO4GI99RoguIDq2Of1fwQf
+	bYDfKvR2b2tKM=; b=DhmA2OlbGLz7GEK7kiDWIF4IAi/NILmTDomo0TFAlGFHYB
+	KSBRpb745sgCXhVbDqoHnrruxZwZazgfAewAwe+DNLAZeiar3doff+n+NZil7l4Z
+	NGh5jbCEb2Xybon06LggFN59wHOS4+asVFQuKc1BdWDiWUVWxh8iXmO0ig69KbIe
+	K6R7sOSOElBYFPPnuUVVRC1z6ibyYJvAJx/TApIMIC8GFuOXwTSOAyeiE4fK+Yci
+	OWZZ4HnI22dhJUNyPQzp+tJF+MLnXW/wTWYT1MR/XeMSMPNB6i0qH/+BWYDopddU
+	RnkECX5KJRxY67oueIpSOpVyXLVyeaWeqp8dddhw==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gbq2tm0p0-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 03 Sep 2026 08:39:04 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 6838QNSR026134;
-	Thu, 3 Sep 2026 08:39:03 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4gcceyem3m-1
+	Thu, 03 Sep 2026 11:42:48 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 683BfFVY021696;
+	Thu, 3 Sep 2026 11:42:47 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4gc9rqqmb1-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 03 Sep 2026 08:39:03 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6838cxWI42336638
+	Thu, 03 Sep 2026 11:42:47 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 683Bgi6a37159326
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 3 Sep 2026 08:39:00 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D7D862004B;
-	Thu,  3 Sep 2026 08:38:59 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E135220043;
-	Thu,  3 Sep 2026 08:38:58 +0000 (GMT)
+	Thu, 3 Sep 2026 11:42:44 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E8B1D2004D;
+	Thu,  3 Sep 2026 11:42:43 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id EFAFC2004B;
+	Thu,  3 Sep 2026 11:42:42 +0000 (GMT)
 Received: from osiris (unknown [9.111.48.84])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Thu,  3 Sep 2026 08:38:58 +0000 (GMT)
-Date: Thu, 3 Sep 2026 10:38:57 +0200
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Thu,  3 Sep 2026 11:42:42 +0000 (GMT)
+Date: Thu, 3 Sep 2026 13:42:41 +0200
 From: Steffen Eiden <seiden@linux.ibm.com>
 To: Sean Christopherson <seanjc@google.com>
 Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
@@ -78,12 +78,13 @@ Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
         Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v7 23/23] KVM: s390: arm64: Add KVM_S390_ARM64 Kconfig
- and Makefile
-Message-ID: <20260903083857.33034-B-seiden@linux.ibm.com>
+Subject: Re: [PATCH v7 02/23] KVM: Make device name configurable
+Message-ID: <20260903114241.33034-C-seiden@linux.ibm.com>
 References: <20260831144802.834315-1-seiden@linux.ibm.com>
- <20260831144802.834315-24-seiden@linux.ibm.com>
- <aphMx5hsoXwIpNjt@google.com>
+ <20260831144802.834315-3-seiden@linux.ibm.com>
+ <apdweRfqt4dTxcU9@google.com>
+ <20260902075028.231001-D-seiden@linux.ibm.com>
+ <aphLXQL1H2zYZgTi@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -92,84 +93,126 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aphMx5hsoXwIpNjt@google.com>
+In-Reply-To: <aphLXQL1H2zYZgTi@google.com>
 X-TM-AS-GCONF: 00
 X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-GUID: rM4PDv8t8LtgoXWWsvkGxVtFUtq-EWVr
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTAzMDA3MyBTYWx0ZWRfX0qBnQykfpZag
- LyEzK0Q2M0otBgsmLVbuaAXKJ1SF9G5knSJd5e9TwSRJWnhgOAIKtus94XMVUFZbY3RAHtC2GFy
- GrJ/EQcRD6HLVB/I53AkO2OBxgHGDKhHPKzP43l2GO/48ztY7rAhh7v87gpdNIe5WDWhmkAJ+ps
- r4v5KU++n8/8KPATh3+9syWC4QpbkaMaOidSWFB3jSmFvZcc64ijxcRxh1oxIPWg7PTPyMNuszZ
- ArgyScowGdXwliSCGujAoDa30fmB3jZZcrv2wZffigtVL7djh0ln08kPoXM44OejTN/LYy91zMX
- Q09wpnUQlRpRCOIQ6R3mHs0FWFxpR436WNSLzGX4z3C/AjbFaUUH71G3nJ3MXzxkcqfqrk9/zLa
- FRaId3HgBwE7Ij5MeYY4GqvWtAsYZksNYqJyEtpqu6P3WRTDs+mdvIZFQOWdrCYOnIjrTmHt3Ib
- gswBu79IXXUSHWb+O3Q==
-X-Authority-Analysis: v=2.4 cv=Osl/DS/t c=1 sm=1 tr=0 ts=6a993229 cx=c_pps
- a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+X-Authority-Analysis: v=2.4 cv=bc1bluPB c=1 sm=1 tr=0 ts=6a995d39 cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
  a=kj9zAlcOel0A:10 a=VdqzKS8jKosA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=Y2IxJ9c9Rs8Kov3niI8_:22 a=FnF-cwsuLINmlKs4EWIA:9
+ a=RnoormkPH1_aCDwRdu11:22 a=RzCfie-kr_QcCd8fBx8p:22 a=OuOidQGzm_B0OR8t9-sA:9
  a=CjuIK1q_8ugA:10
-X-Proofpoint-Spam-Info: AW1haW4tMjYwOTAzMDA3MyBTYWx0ZWRfX1y1xvG8KvX7m
- QIoVzvZSl28jyNFTawqLR78bFVRCcQlmevjvDeSlZNE3I7PMWOOiwILvshbzSvL0170u+/ERtyM
- +G6PSYLb8MF2/wG8GYXB8mQBExjwxiM=
-X-Proofpoint-ORIG-GUID: BC3K-qeP0r6HnRlADMcN-_W4aPty92j0
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTAzMDEwMCBTYWx0ZWRfX6I//yFMP1cvb
+ 2NSO8UtcbS/jeQvugs8aSITFHUubx5IDuYFtrPh776Rm440IrrG9V06vQwZk4Apbqql1Mo/zmhQ
+ Kbu98tkJDhVTrcay/2quJr5yzNARM8c=
+X-Proofpoint-ORIG-GUID: PFKHzACBWoaNkpsFvvSuoBR3lbObVU9R
+X-Proofpoint-GUID: Z39W2fnS2iSIUk0mKJtmPKWfITGpItDI
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTAzMDEwMCBTYWx0ZWRfX5yoMhPcW5hld
+ BSYUovIRTMpBfqaI5PY8NfO/hznkg14OqthzmsfqRtis/roYxWNnMh0UeE5A3A9mINIYzataINO
+ m5mbnK0N17WYfJ4w4V3VSHXkKWPDyhAJchPu0ncyQL1t/hEfis116Pu5/ZIQuGr72yGXUomuO05
+ qar4zin8TnoRPRhkvif4leyWJI1RA1T55RQ/+5qVgtyyfSb+oDH16eA6IyLWkDdaMQHVhqxjW4N
+ rh7OZ7aYsuS0dYbbycwpP/ObNh/kQuhi8yc1QygjxFzUuLnlkGs7MmXt0wpPoNnOmFQoFPwlbnR
+ Xio5HUs82IsLmULN+4kmxpRagb3nMBp9SNjMR+defDYovoRq0HhjhdYnOFXYA9/v8IS17ZTwdkX
+ RJ/Rfootf80xDNOUceFSdXfcUKgSpSDxe2JFUp+HXb6aWwPWkVDm7oQWxDY51HWX1e27KlJ3/RU
+ xaJxHFYeIifbL/hYI0w==
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-09-03_02,2026-09-02_04,2025-10-01_01
+ definitions=2026-09-03_03,2026-09-03_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 malwarescore=0 suspectscore=0 bulkscore=0 lowpriorityscore=0
- adultscore=0 impostorscore=0 phishscore=0 clxscore=1015 priorityscore=1501
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2609030073
+ bulkscore=0 suspectscore=0 adultscore=0 malwarescore=0 spamscore=0
+ lowpriorityscore=0 phishscore=0 clxscore=1015 priorityscore=1501
+ impostorscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
+ definitions=main-2609030100
 
-On Wed, Sep 02, 2026 at 09:20:23AM -0700, Sean Christopherson wrote:
-> On Mon, Aug 31, 2026, Steffen Eiden wrote:
-> > diff --git a/arch/s390/kvm/Kconfig b/arch/s390/kvm/Kconfig
-> > index 8d3ee17a1bcb..9c69ea16031e 100644
-> > --- a/arch/s390/kvm/Kconfig
-> > +++ b/arch/s390/kvm/Kconfig
-> > @@ -53,4 +53,33 @@ config KVM_S390_UCONTROL
-> >  
-> >  	  If unsure, say N.
-> >  
-> > +config KVM_S390_ARM64
-> > +	def_tristate y
-> > +	prompt "KVM support for hardware accelerated arm64 guests"
-> > +	depends on HAS_IOMEM
-> > +	depends on KVM
+On Wed, Sep 02, 2026 at 09:14:21AM -0700, Sean Christopherson wrote:
+> On Wed, Sep 02, 2026, Steffen Eiden wrote:
+> > On Tue, Sep 01, 2026 at 05:40:25PM -0700, Sean Christopherson wrote:
+> > > On Mon, Aug 31, 2026, Steffen Eiden wrote:
+> > > > Allow KVM implementations to choose alternative device names. This is
+> > > > especially useful for architectures providing multiple KVM
+> > > > implementations simultaneously. Architectures providing multiple KVM
+> > > > implementations must compile the KVM common code once per
+> > > > implementation and mange symbols.
+> > > 
+> > > What about tracepoints?  Or do those show up as "kvm" and "kvm-arm64"?
+> > 
+> > Yes, I want them to show up as kvm and  kvm-arm64.
+> > 
+> > Thanks for pointing that out - I just noticed that I forgot to switch
+> > the trace system to kvm-arm64 for the common tracepoints in
+> > trace/events/kvm.h
+> > I only did it for the arch-local traces in PATCH 21.
+> > 
+> > I would just do the following:
+> > 
+> > diff --git a/include/trace/events/kvm.h b/include/trace/events/kvm.h
+> > index b282e3a86769..5d4f8a0693a3 100644
+> > --- a/include/trace/events/kvm.h
+> > +++ b/include/trace/events/kvm.h
+> > @@ -5,7 +5,11 @@
+> >  #include <linux/tracepoint.h>
+> > 
+> >  #undef TRACE_SYSTEM
+> > +#ifdef KVM_S390_ARM64
 > 
-> Is this actually necessary?  I.e. does kvm.ko need to be *loaded* in order for
-> kvm-arm64.ko to be loaded?
+> Side topic, I recommend choosing a macro name that doesn't have a near-collision
+> with CONFIG_KVM_S390_ARM64.  This *looks* like a typo, i.e. it looks like you
+> forgot the CONFIG_ prefix.  Especially since the macro is defined in the Makefile
+> and won't show up with e.g. "git grep -w KVM_S390_ARM64". E.g. KVM_S390_BUILD_ARM64
+> or something?
+
+Interesting. The name was deliberately chosen to be similar. But I
+see that it could be confusing.
+
+I am not totally happy with KVM_S390_BUILD_ARM64 but I cannot find a
+better name either.
+
 > 
-> If kvm-arm64.ko does indeed have a hard dependency on kvm.ko, then I think it
-> makes sense to not have redundant "select" statements below.  As an outsider,
-> it's super confusing because the KVM_S390_ARM64 are incomplete, e.g. are lacking
-> things like VIRT_XFER_TO_GUEST_WORK (at least, I assume those are lacking), and
-> makes it hard to see what is actually unique to kvm-arm64.ko.
+> Side topic #2, this entire approach seems extremely brittle unless you make it
+> all but impossible for non-KVM code to get at KVM structure definitions.  Outside
+> of KVM, all compilation units will see the s390 version of KVM structures.  Which
+> is "fine", but obviously dangerous and IMO asking for maintenance issues down the
+> road.
 > 
-> If kvm-arm64.ko doesn't have a dependency on kvm.ko, e.g. to initialize hardware
-> or something, then this "depends on" should go away.
+> > +#define TRACE_SYSTEM kvm-arm64
+> > +#else
+> >  #define TRACE_SYSTEM kvm
+> > +#endif /* KVM_S390_ARM64 */
+> > 
+> >  #define ERSN(x) { KVM_EXIT_##x, "KVM_EXIT_" #x }
+> > 
+> > 
+> > This would leak a bit of arm on s390 into common KVM but I do not see
+> > another way.
+> 
+> Morpheus: Stop trying to use macros, and use macros!
+> 
+> The most annoying thing is that macro shenanigans don't play well with hyphens,
+> but that can be handled either by using a different macro for the trace name, or
+> by creating /dev/kvm_arm64 instead of /dev/kvm-arm64.  My vote would be to have
+> the device be /dev/kvm_arm64, assuming that doesn't cause problems elsewhere.
 
+I am not aware of any problems that could cause. It was just a personal
+preference IIRC. 
 
-It is a bit more complicated unfortunately. KVM_S390_ARM64 depends on
-KVM as there is code around in the kernel & drivers (arch and common)
-which depends on CONFIG_KVM we need as well. I did not want to leak arch
-local configs to common code if I can avoid that.
-I could change it to select KVM ? Do you have another idea on how to
-solve this issue?
+> And taking things a few steps further, we can solve the MMIO issue in a more
+> elegant way, and eliminate the runtime string building in this patch (after looking
+> more closely, that code needs to be jettisoned no matter what, there's simply no
+> reason to specify the names at runtime since they're separate compilation units).
+> 
+> Rather than splatter #defines throughout header files, deal with the bulk of the
+> pain in Makefile.kvm.  By feeding conditionals into Makefile.kvm, the s390+arm64
+> build can easily omit coalesced_mmio.o and async_pf.o, define __KVM_HAVE_ARCH_MMIO
+> programatically without having to change other architectures, and solve the naming
+> stuff.
 
-The two modules are completely independent at compile and runtime. So
-kvm does not have to be loaded for kvm-arm64 to work.
+Yes, this is a great idea. Thank you. I second you, this looks more clean
+and stable than the stuff we came up with :) 
 
-VIRT_XFER_TO_GUEST_WORK is only lacking for now. I will add it later.
-Currently the kvm-arm64 module is incomplete anyways but I did not want
-to send a 60+patches series and rather stage the introduction over
-multiple series.
+I'll integrate it into the series and send it with the next round.
 
-I will remove the duplicated config selections. Thanks for pointing it
-out. In previous series I had an explicit KVM_S390 config. Both KVM_S390
-and KVM_ARM64 selected KVM. But this created too much churn around the
-whole tech-stack (default config change, s390 is the odd one out for the
-KVM config meaning, ...).
+Thank you for your input. Very much appreciated.
 
 	Steffen
+
+...
