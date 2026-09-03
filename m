@@ -1,56 +1,91 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D03504E2365
-	for <kvmarm@lists.linux.dev>; Thu,  3 Sep 2026 15:38:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D72B84E13EF
+	for <kvmarm@lists.linux.dev>; Thu,  3 Sep 2026 15:43:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788449884; cv=none; b=CpqOrR46H1HmcMuGS9xTO/bYiLeZnXO+bYQoM2IK3yECRou9GX8LJx2NVTRVpehONzI+iaR0Q8yK3xCBkVZEHIFFg5HMeb3x3aJ4HaRaP/+9LI0MJyTz8wUBtqiI7j0fo/Avtk4GZSj1dXPLkTklBlyRcmeymGVfHgS0Kj/Rnkc=
+	t=1788450222; cv=none; b=ZIF7oFEMNh/F+U1OK/DHzvkK9JPuaNn6aRmOGFyDsTRja2xL+nXC9YtYYbsd+vFz7zYQDTBWaEHrmCA4mEY4+zuwDqpmL/LPYMAJP5j+As8+aD3tTxyLzqC6v2HZ3t7Lbp81ISMPrw6kCfAj4pJiLrFaIC4lYYKXHcaSJss41Ig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788449884; c=relaxed/simple;
-	bh=oCZbPDVvCXBkOJzwU5rhSB7/JmNpokz7ClUQIUpFm5c=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=n4aoVYNOEaK9xnDZ0sX8VSFOoDzEU35xO3iBHTwaAAoH8NOVgoRICPaP7npMCgzOw+PnXKYMizgjRY3j0aj534zrAR6wBfAKGW6nvYYvKEz773qkLCrASWE9FbjBd3MYlh+ytls7muowyhq5JShuN5sI2TKAuVk375+snF2nnag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=OEMbio4G; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1788450222; c=relaxed/simple;
+	bh=fvUIuDsf+eRAezG3LZxo95EFORPdrXdVcotZ9dhTwnE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZFgWerlaBlxXsof2w7bhx3vF9jxUEcogeddtVdRTK8stRNc/LSnLlBSyzag0URjapC7oM1xI//Nyl6h14gVn5CbAfxrDTHwDwzCz751JdaXRajJueiVL/OSpyNoYVyA9zS9n8fmHNp+AAXU887RzMenkHuslZYlQUuQ2hysXMNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=qq24X760; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="OEMbio4G"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 320021596;
-	Thu,  3 Sep 2026 08:37:51 -0700 (PDT)
-Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B0D013F7D8;
-	Thu,  3 Sep 2026 08:37:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1788449874; bh=oCZbPDVvCXBkOJzwU5rhSB7/JmNpokz7ClUQIUpFm5c=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=OEMbio4GVl0XWAA8MxNYy8/78cHWeKkeSKov4BrZM47nNeFK1FHGCIutpsBSvLacf
-	 MQJI2phietymUtotbazfVjw/nYwJF3ZyVwqCuG/7fs5xq+DhCZUE/qI9IuNQn8FtKr
-	 1JwJVdol0cXrEDUH4UreZbPXJTz3/pwONCDOXAL8=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Mark Brown <broonie@kernel.org>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Wei-Lin Chang <weilin.chang@arm.com>,
-	Yao Yuan <yaoyuan@linux.alibaba.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v20 06/14] KVM: arm64: Validate GCS exception lock when emulating ERET
-Date: Thu,  3 Sep 2026 16:37:37 +0100
-Message-ID: <apmUQETDlhTIuJIY@LeoBrasDK>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260901-arm64-gcs-v20-6-f31750bdfadb@kernel.org>
-References: <20260901-arm64-gcs-v20-0-f31750bdfadb@kernel.org> <20260901-arm64-gcs-v20-6-f31750bdfadb@kernel.org>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="qq24X760"
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 683DVYJ73109269;
+	Thu, 3 Sep 2026 15:43:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=DWerPAyDUDODY4bzH6HwfhgrgXW1pL
+	fFq/LiqQBYcJs=; b=qq24X760XG8SoNn1gFX3oshVvnMjFEOOpcHiPJvHzMytMk
+	9A1DdWNuD6WTrMor7DuMsBdoyMWRCWsAIFdY5nfUmh8LRDwQ9nxys+JBwydX44Fi
+	31Y0XmohUmw7JDOre5wCb/be6CgpRNRyxkX7K/drbUnYKkWiowPOTbIIyDMpiate
+	EfuuJwqIggzkhsp15O3EZn2OvxOUxvTJxCGjag/SFGyoXZDEMilrnNWCNiDFIg8G
+	LsuVv9XSBU5aQRC1A2MfqzLJWKUCj0CngpB97bOooDf1JpZspwGuDj9HUrdKFGaF
+	9dC+khEmvnMAKnR7RVE/O2/fLS/HvXYqYZAJB6LA==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gbq555rf0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 03 Sep 2026 15:43:25 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 683FfOT3022323;
+	Thu, 3 Sep 2026 15:43:24 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4gcarkgakn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 03 Sep 2026 15:43:23 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 683FhK5L45285742
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 3 Sep 2026 15:43:20 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E201D20043;
+	Thu,  3 Sep 2026 15:43:19 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E5D5420040;
+	Thu,  3 Sep 2026 15:43:18 +0000 (GMT)
+Received: from osiris (unknown [9.111.48.84])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Thu,  3 Sep 2026 15:43:18 +0000 (GMT)
+Date: Thu, 3 Sep 2026 17:43:17 +0200
+From: Steffen Eiden <seiden@linux.ibm.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, Alexander Gordeev <agordeev@linux.ibm.com>,
+        Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@kernel.org>,
+        Friedrich Welter <fritz@linux.ibm.com>, Fuad Tabba <tabba@google.com>,
+        Gautam Gala <ggala@linux.ibm.com>,
+        Hariharan Mari <hari55@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Hendrik Brueckner <brueckner@linux.ibm.com>,
+        Ilya Leoshkevich <iii@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
+        Marc Zyngier <maz@kernel.org>, Nico Boehr <nrb@linux.ibm.com>,
+        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
+        Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v7 23/23] KVM: s390: arm64: Add KVM_S390_ARM64 Kconfig
+ and Makefile
+Message-ID: <20260903154317.246414-A-seiden@linux.ibm.com>
+References: <20260831144802.834315-1-seiden@linux.ibm.com>
+ <20260831144802.834315-24-seiden@linux.ibm.com>
+ <aphMx5hsoXwIpNjt@google.com>
+ <20260903083857.33034-B-seiden@linux.ibm.com>
+ <apmHrnxRLl9BuVhn@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -59,98 +94,203 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <apmHrnxRLl9BuVhn@google.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTAzMDEzNSBTYWx0ZWRfX+tCRhA6sSIdG
+ wH3YsOZWUu6AQ/wbZMy8/8ghxOMLr1JxUYI+F1OuGF3kGMSyFosb1yyEw0Y7SkcdnViRSIGYST3
+ ZKzsuk/yTqkbV86fiBlmnquLGrE/lVjUqJoxxitxftnkHOk9tg0lf6UwUpP94HGjN1haIu/bhvZ
+ vOjQqtsKKo3dH3KxPYftRTR6hCAXVZpNywqL9ZPSpumpJiusj9HVTq0eQdDyz3eQ1Y+gGxJro8l
+ V2dWzLn9xp09A0JVmcSAwV5VZkpGjRK8hm3znkN8FXKMdHOmzNczDGuN9kP/yvuCNwH57VbneZM
+ WEDh5Ny5+ief11kwh0eU7+kEY7iwpp9c1n+1CClsNVzgNsl+fZbs6Pd5fvFvzq6se5TMWk43mLh
+ uszJimiwEQpCccZNeyi83N0rlUhjKo2WddPiM755LR8fWAqvO5pRdcfFJgQxorwDdCF16OL+1fQ
+ UEO/8fVhwbjCETjz5gQ==
+X-Proofpoint-ORIG-GUID: 6z-LCHu0Gt_XtkyXQSEc2p12x2-m7GXw
+X-Authority-Analysis: v=2.4 cv=CNgamxrD c=1 sm=1 tr=0 ts=6a99959d cx=c_pps
+ a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
+ a=kj9zAlcOel0A:10 a=VdqzKS8jKosA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=U7nrCbtTmkRpXpFmAIza:22 a=Jmw6T6Sfydnll6L029oA:9
+ a=_V_nbmSO25lDuQpK:21 a=CjuIK1q_8ugA:10
+X-Proofpoint-GUID: 06nC8yppQ2lADCC-CvXlhYKMn3c0SHeb
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTAzMDEzNSBTYWx0ZWRfXwZdhsr6ocdVw
+ ZR7eud7oQqfLtMVdQYGpum3xVFBPSPw1xK66LdD+ib0PYULKbLIrhBbbCd9swU012WkLAvvNJ10
+ yXfvzYmcZAkKdMmaJwVBzlHe/P2gUkw=
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-09-03_04,2026-09-03_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 bulkscore=0 suspectscore=0 phishscore=0 lowpriorityscore=0
+ priorityscore=1501 clxscore=1015 impostorscore=0 adultscore=0 malwarescore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2609030135
 
-On Tue, Sep 01, 2026 at 10:47:04PM +0100, Mark Brown wrote:
-[...]
-> +#ifdef CONFIG_ARM64_GCS
-> +/* See IllegalExceptionReturn() pseudocode */
-> +static inline bool kvm_check_illegal_exlock_return(struct kvm_vcpu *vcpu,
-> +						   u64 spsr)
-> +{
-> +	u64 pstate, cur_mode, target_mode;
-> +
-> +	if (!kvm_has_gcs(vcpu->kvm))
-> +		return false;
-> +
-> +	if (vcpu->arch.ctxt.regs.pstate & PSR_EXLOCK_BIT)
-> +		return false;
-> +
-> +	/* Check the EL only, ignore thread mode */
-> +	pstate = vcpu->arch.ctxt.regs.pstate;
-> +	cur_mode = (pstate & PSR_MODE_MASK) | PSR_MODE_THREAD_BIT;
-> +	target_mode = (spsr & PSR_MODE_MASK) | PSR_MODE_THREAD_BIT;
-> +
-> +	if (cur_mode != target_mode)
-> +		return false;
-> +
-> +	return vcpu_read_sys_reg(vcpu, GCSCR_EL2) & GCSCR_ELx_EXLOCKEN;
-> +}
+On Thu, Sep 03, 2026 at 07:43:58AM -0700, Sean Christopherson wrote:
+> On Thu, Sep 03, 2026, Steffen Eiden wrote:
+> > On Wed, Sep 02, 2026 at 09:20:23AM -0700, Sean Christopherson wrote:
+> > > On Mon, Aug 31, 2026, Steffen Eiden wrote:
+> > > > diff --git a/arch/s390/kvm/Kconfig b/arch/s390/kvm/Kconfig
+> > > > index 8d3ee17a1bcb..9c69ea16031e 100644
+> > > > --- a/arch/s390/kvm/Kconfig
+> > > > +++ b/arch/s390/kvm/Kconfig
+> > > > @@ -53,4 +53,33 @@ config KVM_S390_UCONTROL
+> > > >  
+> > > >  	  If unsure, say N.
+> > > >  
+> > > > +config KVM_S390_ARM64
+> > > > +	def_tristate y
+> > > > +	prompt "KVM support for hardware accelerated arm64 guests"
+> > > > +	depends on HAS_IOMEM
+> > > > +	depends on KVM
+> > > 
+> > > Is this actually necessary?  I.e. does kvm.ko need to be *loaded* in order for
+> > > kvm-arm64.ko to be loaded?
+> > > 
+> > > If kvm-arm64.ko does indeed have a hard dependency on kvm.ko, then I think it
+> > > makes sense to not have redundant "select" statements below.  As an outsider,
+> > > it's super confusing because the KVM_S390_ARM64 are incomplete, e.g. are lacking
+> > > things like VIRT_XFER_TO_GUEST_WORK (at least, I assume those are lacking), and
+> > > makes it hard to see what is actually unique to kvm-arm64.ko.
+> > > 
+> > > If kvm-arm64.ko doesn't have a dependency on kvm.ko, e.g. to initialize hardware
+> > > or something, then this "depends on" should go away.
+> > 
+> > 
+> > It is a bit more complicated unfortunately. KVM_S390_ARM64 depends on
+> > KVM as there is code around in the kernel & drivers (arch and common)
+> > which depends on CONFIG_KVM we need as well. I did not want to leak arch
+> > local configs to common code if I can avoid that.
+> > I could change it to select KVM ? Do you have another idea on how to
+> > solve this issue?
+> 
+> I would do something similar to what KVM x86 does.
+> 
+> > The two modules are completely independent at compile and runtime. So
+> > kvm does not have to be loaded for kvm-arm64 to work.
+> > 
+> > VIRT_XFER_TO_GUEST_WORK is only lacking for now. I will add it later.
+> > Currently the kvm-arm64 module is incomplete anyways but I did not want
+> > to send a 60+patches series and rather stage the introduction over
+> > multiple series.
+> > 
+> > I will remove the duplicated config selections. Thanks for pointing it
+> > out. In previous series I had an explicit KVM_S390 config. Both KVM_S390
+> > and KVM_ARM64 selected KVM. But this created too much churn around the
+> > whole tech-stack 
+> 
+> LOL, what exactly are you expecting to happen?  You're trying to squeeze support
+> in for a completely different architecture, of course there's going to be churn.
+> 
+> This absolutely needs to be as precisely and correct as possible, otherwise it'll
+> be painfully difficult to maintain,  And to some extent, just for others to review.
+> E.g. as is, it's at all not clear to me which of the IS_ENABLED(CONFIG_KVM) checks
+> in arch/s390 apply to both flavors of virtualization, versus which are specific to
+> "native" s390 virtualization.
+> 
+> I realize this is outside of my immediate scope, but getting this "right" isn't
+> just an s390 thing, because these details bleed into common KVM, and even affect
+> other architectures, e.g. when trying to make "treewide" KVM changes.
 
-The above perfectly translates the GCS part of IllegalExceptionReturn().
+I want to find the 'right' way as well - any ideas are welcome.
 
-It's a nit, as I suppose there should be no compiler warning on that, but
-the function should return a bool, and the last return line returns an u64.
+> 
+> And FWIW, while it might seem daunting, from my perspective it's not actually that
+> much churn to do things "right".  Provide KVM_S390_NATIVE, and then have KVM reflect
+> the "weakest" of S390_NATIVE vs. S390_ARCH.  I.e. make KVM=m if either of the "real"
+> KVMs will be a module.  That requires some creative shenanigans, but it's not hard,
+> just weird.
 
-Maybe adding a "return !!()" would be better?
+FYI the first versions of this series had a 3 configs approach very
+similar to yours. 
 
-[...]
-> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> index 3806ff0920fe..170c0c521f22 100644
-> --- a/arch/arm64/kvm/emulate-nested.c
-> +++ b/arch/arm64/kvm/emulate-nested.c
-> @@ -2748,10 +2748,13 @@ static u64 kvm_check_illegal_exception_return(struct kvm_vcpu *vcpu, u64 spsr)
->  	 * - trying to return to an illegal M value
->  	 * - trying to return to a 32bit EL
->  	 * - trying to return to EL1 with HCR_EL2.TGE set
-> +	 * - GCSCR_ELx.EXLOCKEN is 1 and PSTATE.EXLOCK is 0 when attempting
-> +	 *   to return from ELx the same EL.
->  	 */
->  	if (mode == PSR_MODE_EL3t   || mode == PSR_MODE_EL3h ||
->  	    mode == 0b00001         || (mode & BIT(1))       ||
->  	    (spsr & PSR_MODE32_BIT) ||
-> +	    kvm_check_illegal_exlock_return(vcpu, spsr) ||
->  	    (vcpu_el2_tge_is_set(vcpu) && (mode == PSR_MODE_EL1t ||
->  					   mode == PSR_MODE_EL1h))) {
->  		u64 mask;
+IIRC it was not so much the churn we have in (upstream) kernel code but
+more on the distro side and to everyone building the kernel in their
+favourite architecture (s390 :))
+Suddenly the KVM config changed its behaviour (effectively becoming a noop)
 
-In IllegalExceptionReturn(), the GCS-related clause happens at the end, and 
-here it happens before the TGE one. Could this cause any weird behavior in 
-the future?
+I am starting to think that having no separate config option for arm on
+s390 might be the easisest way. Just KVM and guard both modules behind
+it. It reduces the config space bloat and I do not see a reason why somoeone
+should only compile one KVM module but not the other. kvm-arm64 won't
+load if you do not have the hardware anyways.
 
-I get that by doing like this you don't change the last line of the "if", 
-but I wonder if that could change anything.
+But I am not opposed to the x86 approach. Just thinking loud.
 
-[...]
-> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-> index 7875911c0506..af59d1bf51ad 100644
-> --- a/arch/arm64/kvm/hyp/vhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-> @@ -383,6 +383,10 @@ static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
->  		return false;
->  	}
->  
-> +	/* Push GCS exception lock failures into the slow path */
-> +	if (kvm_check_illegal_exlock_return(vcpu, spsr))
-> +		return false;
-> +
->  	/* If ERETAx fails, take the slow path */
->  	if (esr_iss_is_eretax(esr)) {
->  		if (!(vcpu_has_ptrauth(vcpu) && kvm_auth_eretax(vcpu, &elr)))
+Anyways, I am off for vacation expect a reduced reply frequency from my
+side :) 
 
-IIUC, this function will be called on the __kvm_vcpu_run_vhe() inner loop, 
-in the cases where the guest exited due to a eret. 
-
-What you change here is that in case of an illegal exlock return, it goes 
-out of the loop and return to host kernel, probably to deal with it in the 
-mentioned slowpath, the same way the ERETAx entry does.
-
-I don't question on this being needed. 
-I would just like to understand why this is needed here. 
-
-This does not seem to be related to nested, as this is called in 
-__fixup_guest_exit() and not in fixup_nv_guest_exit(). But would not 
-hardware be responsible for cheking this, then?
-
-Thanks!
-Leo
+	Steffen
+> 
+> > (default config change, s390 is the odd one out for the KVM config meaning, ...).
+> 
+> Nah, x86 is the odd one, where CONFIG_KVM=m doesn't even guarantee kvm.ko gets
+> built :-)
+> 
+> E.g. something like this, which probably doesn't compile and isn't the desired
+> end state, as several of the Kconfig selections need to be reworked into #defines
+> provided by header files, but AFAICT it does what I want/intend.
+> 
+> config KVM
+> 	def_tristate m if (KVM_S390_NATIVE = m || KVM_S390_ARM64 = m)
+> 	select HAVE_KVM_CPU_RELAX_INTERCEPT
+> 	select KVM_COMMON
+> 	select HAVE_KVM_IRQCHIP
+> 	select HAVE_KVM_IRQ_ROUTING
+> 	select KVM_VFIO
+> 	select VIRT_XFER_TO_GUEST_WORK
+> 
+> config KVM_S390_NATIVE
+> 	def_tristate y
+> 	prompt "Kernel-based Virtual Machine (KVM) support"
+> 	select KVM if (y && KVM_S390_ARM64 != m)
+> 	select KVM_ASYNC_PF
+> 	select KVM_ASYNC_PF_SYNC
+> 	select HAVE_KVM_NO_POLL
+> 	select KVM_MMU_LOCKLESS_AGING
+> 	select KVM_GENERIC_PRE_FAULT_MEMORY
+> 	select HAVE_KVM_INVALID_WAKEUPS
+> 	help
+> 	  Support hosting paravirtualized guest machines using the SIE
+> 	  virtualization capability on the mainframe. This should work
+> 	  on any 64bit machine.
+> 
+> 	  This module provides access to the hardware capabilities through
+> 	  a character device node named /dev/kvm.
+> 
+> 	  To compile this as a module, choose M here: the module
+> 	  will be called kvm.
+> 
+> 	  If unsure, say N.
+> 
+> config KVM_S390_UCONTROL
+> 	bool "Userspace controlled virtual machines"
+> 	depends on KVM
+> 	help
+> 	  Allow CAP_SYS_ADMIN users to create KVM virtual machines that are
+> 	  controlled by userspace.
+> 
+> 	  If unsure, say N.
+> 
+> config KVM_S390_ARM64
+> 	def_tristate y
+> 	prompt "KVM support for hardware accelerated arm64 guests"
+> 	depends on HAS_IOMEM
+> 	select KVM if (y && KVM_S390_NATIVE != m)
+> 	select GUEST_PERF_EVENTS if PERF_EVENTS
+> 	select HAVE_KVM_VCPU_RUN_PID_CHANGE
+> 	select HAVE_KVM_IRQ_BYPASS
+> 	select KVM_MMIO
+> 	select SCHED_INFO
+> 	select XARRAY_MULTI
+> 	help
+> 	  Enable support for hosting virtualized, hardware-accelerated arm64
+> 	  virtual machines on s390 systems using the Start ARM Execution (SAE)
+> 	  instruction. This requires hardware models that support the Arm
+> 	  execution facility (AEF).
+> 
+> 	  The module provides a character device named /dev/kvm-arm64 to expose
+> 	  the hardware capabilities.
+> 
+> 	  To compile this driver as a module, choose M here. The module will
+> 	  be called kvm-arm64.
+> 
+> 	  If unsure, say N.
