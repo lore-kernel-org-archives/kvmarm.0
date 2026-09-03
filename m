@@ -1,218 +1,309 @@
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C19243B6F5
-	for <kvmarm@lists.linux.dev>; Thu,  3 Sep 2026 11:43:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 606994AFE27
+	for <kvmarm@lists.linux.dev>; Thu,  3 Sep 2026 13:27:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788435797; cv=none; b=mRQXpmHkaT/sEHqrax0VcdI83atKE6nBdqTkm9FYynJY7c/EfOxQ+VUsUVQKTpyvaIN2xHXQa7btyrjZAz341I+MlB7QDy1oPh/pas1iF9NH4MpSrZTwLOy0VNCSy4AmQLg/lWtHSWRiHk3MKeByfONk6qLhxRUcZrz8ief8lYU=
+	t=1788442085; cv=none; b=WBtNULGGPfFmFi7J4IPcq4Dy/g0w2tkBkmQ5kvryJVZuakie1GR9hAG1BNz5kwscK5xMmLwffhYXziHPaX1fYLISdCEjtud4bl2/0JpXa/m+DM09gMia9gUx5a/DyuNGaNqJUMFkXgzb4VrElIM9vq1FIbFv7LeCV7sjVmDZSpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788435797; c=relaxed/simple;
-	bh=ZrbwLximMOBFhEmsQ2KRoTd7L8oPHb0M7HOR1hFw/QM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=J6hRF38DE2xoDUaRvlqmpok24YOa/m/A1KuatRgZjG4DpixNdVc6yZIlnNleXpxL6k69YSYsmjDGiMsQ+HUO3dS2BdjbNxi01lkxTdq/307yDAzOonvfHoBozgsWkUpWnRiGPas36hjXShNN0KYDIEEf/AJCPxT372r6qX9X1m8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=DhmA2Olb; arc=none smtp.client-ip=148.163.158.5
+	s=arc-20240116; t=1788442085; c=relaxed/simple;
+	bh=GN4Psq55rFjFS1C/HYok3UXx4567d8p12h5hTyZDSAk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hLS/VCpyTLKtXgWKsjJnxGEeyuXawE2zf1/pJ1lE+qYw6miHsu4goEwt7VC90aaI95aiguP0myDqbTm1bmFTDrfYUCVBgdXiP+UL0nLpS+LX8ajPl9KX7x+lK4TSHCmb0uYX8zfKdaUyZ0i8M8YumxU1WhrPeNmswoB9I1dNySQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Uy3CZC4d; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="DhmA2Olb"
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 683AVdb82788612;
-	Thu, 3 Sep 2026 11:42:49 GMT
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Uy3CZC4d"
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 683AVmIt2617826;
+	Thu, 3 Sep 2026 13:27:23 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=9oLkw0qjqO4GI99RoguIDq2Of1fwQf
-	bYDfKvR2b2tKM=; b=DhmA2OlbGLz7GEK7kiDWIF4IAi/NILmTDomo0TFAlGFHYB
-	KSBRpb745sgCXhVbDqoHnrruxZwZazgfAewAwe+DNLAZeiar3doff+n+NZil7l4Z
-	NGh5jbCEb2Xybon06LggFN59wHOS4+asVFQuKc1BdWDiWUVWxh8iXmO0ig69KbIe
-	K6R7sOSOElBYFPPnuUVVRC1z6ibyYJvAJx/TApIMIC8GFuOXwTSOAyeiE4fK+Yci
-	OWZZ4HnI22dhJUNyPQzp+tJF+MLnXW/wTWYT1MR/XeMSMPNB6i0qH/+BWYDopddU
-	RnkECX5KJRxY67oueIpSOpVyXLVyeaWeqp8dddhw==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gbq2tm0p0-1
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=c6AXeP
+	+YlW4+I8ohY4m8qYvFYmyRVywE1mRoFjcW6CA=; b=Uy3CZC4dA8FE/Edqc52Zwe
+	vCL0WX1mRjs9+nQokaRTWHyMQz4EBHAWPmQdW58aOYziZUkeZL6my6FKy3kwP4Wc
+	dSqhNjDJA8eNoSUuqCn/rE2c4RB8GUQRAXnyZHok5+ncR2c1ry/BAklTqzGLPumt
+	CMAyVEh4jPgl+1uRC0Sv5vpkeZPvOSKh1vGy90/uQD5v6utSUSuE4LHZ/++wRTNT
+	+WJPHVpuJb1vRgR0W/IQ7qIAVad6vTSny8dwR/4i0jd1LXeuCr7L8ZK6W+wKAxGM
+	Bhji6GS+I2spDO1hAtP5CbnhUBwn4IkaQklcClXsOduy2U2S28lCcCUwx9PlOvmQ
+	==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gbmuj4tnx-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 03 Sep 2026 11:42:48 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 683BfFVY021696;
-	Thu, 3 Sep 2026 11:42:47 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4gc9rqqmb1-1
+	Thu, 03 Sep 2026 13:27:22 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 683DQKYq030491;
+	Thu, 3 Sep 2026 13:27:22 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4gcb8hqs6j-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 03 Sep 2026 11:42:47 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 683Bgi6a37159326
+	Thu, 03 Sep 2026 13:27:21 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 683DRHhH45154640
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 3 Sep 2026 11:42:44 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E8B1D2004D;
-	Thu,  3 Sep 2026 11:42:43 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id EFAFC2004B;
-	Thu,  3 Sep 2026 11:42:42 +0000 (GMT)
-Received: from osiris (unknown [9.111.48.84])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Thu,  3 Sep 2026 11:42:42 +0000 (GMT)
-Date: Thu, 3 Sep 2026 13:42:41 +0200
-From: Steffen Eiden <seiden@linux.ibm.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, Alexander Gordeev <agordeev@linux.ibm.com>,
-        Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@kernel.org>,
-        Friedrich Welter <fritz@linux.ibm.com>, Fuad Tabba <tabba@google.com>,
-        Gautam Gala <ggala@linux.ibm.com>,
-        Hariharan Mari <hari55@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Hendrik Brueckner <brueckner@linux.ibm.com>,
-        Ilya Leoshkevich <iii@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
-        Marc Zyngier <maz@kernel.org>, Nico Boehr <nrb@linux.ibm.com>,
-        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
-        Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v7 02/23] KVM: Make device name configurable
-Message-ID: <20260903114241.33034-C-seiden@linux.ibm.com>
-References: <20260831144802.834315-1-seiden@linux.ibm.com>
- <20260831144802.834315-3-seiden@linux.ibm.com>
- <apdweRfqt4dTxcU9@google.com>
- <20260902075028.231001-D-seiden@linux.ibm.com>
- <aphLXQL1H2zYZgTi@google.com>
+	Thu, 3 Sep 2026 13:27:18 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id CF2A02004E;
+	Thu,  3 Sep 2026 13:27:17 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E1C1F20040;
+	Thu,  3 Sep 2026 13:27:16 +0000 (GMT)
+Received: from [9.111.55.202] (unknown [9.111.55.202])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  3 Sep 2026 13:27:16 +0000 (GMT)
+Message-ID: <d706435a-3984-4ef3-b319-1efc92517650@linux.ibm.com>
+Date: Thu, 3 Sep 2026 15:27:16 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aphLXQL1H2zYZgTi@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 21/23] KVM: s390: arm64: Implement vCPU IOCTLs
+To: Steffen Eiden <seiden@linux.ibm.com>, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org
+Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
+        Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@kernel.org>,
+        Friedrich Welter
+ <fritz@linux.ibm.com>, Fuad Tabba <tabba@google.com>,
+        Gautam Gala <ggala@linux.ibm.com>,
+        Hariharan Mari <hari55@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Hendrik Brueckner <brueckner@linux.ibm.com>,
+        Ilya Leoshkevich <iii@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
+        Marc Zyngier <maz@kernel.org>, Nico Boehr <nrb@linux.ibm.com>,
+        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
+        Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Vasily Gorbik
+ <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>
+References: <20260831144802.834315-1-seiden@linux.ibm.com>
+ <20260831144802.834315-22-seiden@linux.ibm.com>
+Content-Language: en-US
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; keydata=
+ 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
+In-Reply-To: <20260831144802.834315-22-seiden@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Authority-Analysis: v=2.4 cv=bc1bluPB c=1 sm=1 tr=0 ts=6a995d39 cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
- a=kj9zAlcOel0A:10 a=VdqzKS8jKosA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=RzCfie-kr_QcCd8fBx8p:22 a=OuOidQGzm_B0OR8t9-sA:9
- a=CjuIK1q_8ugA:10
-X-Proofpoint-Spam-Info: AW1haW4tMjYwOTAzMDEwMCBTYWx0ZWRfX6I//yFMP1cvb
- 2NSO8UtcbS/jeQvugs8aSITFHUubx5IDuYFtrPh776Rm440IrrG9V06vQwZk4Apbqql1Mo/zmhQ
- Kbu98tkJDhVTrcay/2quJr5yzNARM8c=
-X-Proofpoint-ORIG-GUID: PFKHzACBWoaNkpsFvvSuoBR3lbObVU9R
-X-Proofpoint-GUID: Z39W2fnS2iSIUk0mKJtmPKWfITGpItDI
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTAzMDEwMCBTYWx0ZWRfX5yoMhPcW5hld
- BSYUovIRTMpBfqaI5PY8NfO/hznkg14OqthzmsfqRtis/roYxWNnMh0UeE5A3A9mINIYzataINO
- m5mbnK0N17WYfJ4w4V3VSHXkKWPDyhAJchPu0ncyQL1t/hEfis116Pu5/ZIQuGr72yGXUomuO05
- qar4zin8TnoRPRhkvif4leyWJI1RA1T55RQ/+5qVgtyyfSb+oDH16eA6IyLWkDdaMQHVhqxjW4N
- rh7OZ7aYsuS0dYbbycwpP/ObNh/kQuhi8yc1QygjxFzUuLnlkGs7MmXt0wpPoNnOmFQoFPwlbnR
- Xio5HUs82IsLmULN+4kmxpRagb3nMBp9SNjMR+defDYovoRq0HhjhdYnOFXYA9/v8IS17ZTwdkX
- RJ/Rfootf80xDNOUceFSdXfcUKgSpSDxe2JFUp+HXb6aWwPWkVDm7oQWxDY51HWX1e27KlJ3/RU
- xaJxHFYeIifbL/hYI0w==
+X-Proofpoint-GUID: Re-AndqEYSkfIQe94bsKaIRQFl4-05IY
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTAzMDExMyBTYWx0ZWRfX/S21DBOLHWUt
+ lrZ5RjELVXOZHrOvQ9og3FVzamtx9ZWJnuuUkCT+1SItSyq3AkzF5rgkWC5Fp3c4FnnHAdE1xNe
+ cxt6EeEKpqIWyKrEYEo5nMueqzu1ey3ZecIaVAaCAqwxPqeLzHIJZr0FFGJ0hX22YQ1chSfu5US
+ bvRmV1tVwwyuHrUl1XAwFEr75ZN9JAPaqez1qpMn/g+4MY8IFapb7R5e0FRQTaMzEpgP+6iC0AB
+ 2mQuRUgjjFAASL21KhDA98HgvRFrhpGGKHdKGe7Rfk54jERdg1WtWJv9nvs0/Ienag3Vw4xQpaq
+ co77o+XreoVaNEz/ZFOGJjRN4ywCJDSG7hb8fUAfevH4jjhnMFFMn3oYXFs238ZxiyBzxkoMcUD
+ vhpN+Wb4OYp89Tm/mqUt9c9ZYIyqh93B6RAxE3DwbDLPXbYijEZl6J2RAcFOTLqwYgHJNeMdH46
+ rPc6a2fCZ+QpibBMCeA==
+X-Authority-Analysis: v=2.4 cv=Osl/DS/t c=1 sm=1 tr=0 ts=6a9975bb cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+ a=IkcTkHD0fZMA:10 a=VdqzKS8jKosA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=Y2IxJ9c9Rs8Kov3niI8_:22 a=VnNF1IyMAAAA:8
+ a=68K9mThq9ovHU1SOSbYA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTAzMDExMyBTYWx0ZWRfX2qg5HwtyAckk
+ 7gCuIKNO55JiyIGwKlHp1MgUYFecQ8Y83psnkoDHB6DdwRGvBwL6gPwJbXmdwDnmsOklY0SIR1A
+ loh8qYtAvhm3jzAf4jhSHeZu8j4+vlU=
+X-Proofpoint-ORIG-GUID: -5Q7whLG351pmqVYlITrN1rjX7Sxx1Bl
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
  definitions=2026-09-03_03,2026-09-03_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 suspectscore=0 adultscore=0 malwarescore=0 spamscore=0
- lowpriorityscore=0 phishscore=0 clxscore=1015 priorityscore=1501
- impostorscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
- definitions=main-2609030100
+ spamscore=0 malwarescore=0 suspectscore=0 bulkscore=0 lowpriorityscore=0
+ adultscore=0 impostorscore=0 phishscore=0 clxscore=1015 priorityscore=1501
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2609030113
 
-On Wed, Sep 02, 2026 at 09:14:21AM -0700, Sean Christopherson wrote:
-> On Wed, Sep 02, 2026, Steffen Eiden wrote:
-> > On Tue, Sep 01, 2026 at 05:40:25PM -0700, Sean Christopherson wrote:
-> > > On Mon, Aug 31, 2026, Steffen Eiden wrote:
-> > > > Allow KVM implementations to choose alternative device names. This is
-> > > > especially useful for architectures providing multiple KVM
-> > > > implementations simultaneously. Architectures providing multiple KVM
-> > > > implementations must compile the KVM common code once per
-> > > > implementation and mange symbols.
-> > > 
-> > > What about tracepoints?  Or do those show up as "kvm" and "kvm-arm64"?
-> > 
-> > Yes, I want them to show up as kvm and  kvm-arm64.
-> > 
-> > Thanks for pointing that out - I just noticed that I forgot to switch
-> > the trace system to kvm-arm64 for the common tracepoints in
-> > trace/events/kvm.h
-> > I only did it for the arch-local traces in PATCH 21.
-> > 
-> > I would just do the following:
-> > 
-> > diff --git a/include/trace/events/kvm.h b/include/trace/events/kvm.h
-> > index b282e3a86769..5d4f8a0693a3 100644
-> > --- a/include/trace/events/kvm.h
-> > +++ b/include/trace/events/kvm.h
-> > @@ -5,7 +5,11 @@
-> >  #include <linux/tracepoint.h>
-> > 
-> >  #undef TRACE_SYSTEM
-> > +#ifdef KVM_S390_ARM64
+On 8/31/26 4:47 PM, Steffen Eiden wrote:
+> Implement all required vCPU (arch) IOCTLs.
 > 
-> Side topic, I recommend choosing a macro name that doesn't have a near-collision
-> with CONFIG_KVM_S390_ARM64.  This *looks* like a typo, i.e. it looks like you
-> forgot the CONFIG_ prefix.  Especially since the macro is defined in the Makefile
-> and won't show up with e.g. "git grep -w KVM_S390_ARM64". E.g. KVM_S390_BUILD_ARM64
-> or something?
+> Co-developed-by: Andreas Grapentin <gra@linux.ibm.com>
+> Signed-off-by: Andreas Grapentin <gra@linux.ibm.com>
+> Co-developed-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+> Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+> Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
+> ---
 
-Interesting. The name was deliberately chosen to be similar. But I
-see that it could be confusing.
+[...]
 
-I am not totally happy with KVM_S390_BUILD_ARM64 but I cannot find a
-better name either.
+> +static void arm_vcpu_run(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm_sae_block *sae_block = &vcpu->arch.sae_block;
+> +
+> +	adjust_pc(vcpu);
+> +
+> +	local_irq_disable();
+> +	guest_timing_enter_irqoff();
+> +	guest_state_enter_irqoff();
+> +	local_irq_enable();
+> +
+> +	sae_block->icptr = 0;
 
-> 
-> Side topic #2, this entire approach seems extremely brittle unless you make it
-> all but impossible for non-KVM code to get at KVM structure definitions.  Outside
-> of KVM, all compilation units will see the s390 version of KVM structures.  Which
-> is "fine", but obviously dangerous and IMO asking for maintenance issues down the
-> road.
-> 
-> > +#define TRACE_SYSTEM kvm-arm64
-> > +#else
-> >  #define TRACE_SYSTEM kvm
-> > +#endif /* KVM_S390_ARM64 */
-> > 
-> >  #define ERSN(x) { KVM_EXIT_##x, "KVM_EXIT_" #x }
-> > 
-> > 
-> > This would leak a bit of arm on s390 into common KVM but I do not see
-> > another way.
-> 
-> Morpheus: Stop trying to use macros, and use macros!
-> 
-> The most annoying thing is that macro shenanigans don't play well with hyphens,
-> but that can be handled either by using a different macro for the trace name, or
-> by creating /dev/kvm_arm64 instead of /dev/kvm-arm64.  My vote would be to have
-> the device be /dev/kvm_arm64, assuming that doesn't cause problems elsewhere.
+We already do that in the function below, no?
+If possible I'd like to avoid setting ictpr here.
 
-I am not aware of any problems that could cause. It was just a personal
-preference IIRC. 
+> +
+> +	sae64a(sae_block);
+> +
+> +	local_irq_disable();
+> +	guest_state_exit_irqoff();
+> +	guest_timing_exit_irqoff();
+> +	local_irq_enable();
+> +}
+> +
+> +/** kvm_arch_vcpu_ioctl_run() - run arm64 vCPU
+> + *
+> + * Execute arm64 guest instructions using SAE.
+> + *
+> + * Returns:
+> + * 1 enter the guest (should not be observed by userspace)
+> + * 0 exit to userspace
+> + * < 0 exit to userspace, where the return value indicates n error
+> + *
+> + *
+> + */
+> +int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+> +{
+> +	DECLARE_KERNEL_FPU_ONSTACK32(fpu_save);
+> +	struct kvm_run *kvm_run = vcpu->run;
+> +	int ret;
+> +
+> +	if (kvm_run->exit_reason == KVM_EXIT_MMIO) {
+> +		ret = kvm_handle_mmio_return(vcpu);
+> +		if (ret <= 0)
+> +			return ret;
+> +	}
+> +
+> +	vcpu_load(vcpu);
+> +
+> +	kernel_fpu_begin(&fpu_save, KERNEL_FPC | KERNEL_VXR);
+> +	load_vx_regs((vcpu->arch.ctxt.vregs));
+> +
+> +	if (!vcpu->wants_to_run) {
+> +		ret = -EINTR;
+> +		goto out;
+> +	}
+> +
+> +	kvm_sigset_activate(vcpu);
+> +
+> +	might_fault();
+> +
+> +	kvm_vcpu_srcu_read_lock(vcpu);
+> +
+> +	ret = 1;
+> +	do {
+> +		if (signal_pending(current)) {
+> +			kvm_run->exit_reason = KVM_EXIT_INTR;
+> +			ret = -EINTR;
+> +			break;
+> +		}
+> +
+> +		if (need_resched())
+> +			schedule();
+> +
+> +		if (ret > 0)
+> +			ret = check_vcpu_requests(vcpu);
+> +
+> +		vcpu->arch.sae_block.icptr = 0;
 
-> And taking things a few steps further, we can solve the MMIO issue in a more
-> elegant way, and eliminate the runtime string building in this patch (after looking
-> more closely, that code needs to be jettisoned no matter what, there's simply no
-> reason to specify the names at runtime since they're separate compilation units).
-> 
-> Rather than splatter #defines throughout header files, deal with the bulk of the
-> pain in Makefile.kvm.  By feeding conditionals into Makefile.kvm, the s390+arm64
-> build can easily omit coalesced_mmio.o and async_pf.o, define __KVM_HAVE_ARCH_MMIO
-> programatically without having to change other architectures, and solve the naming
-> stuff.
+Here
 
-Yes, this is a great idea. Thank you. I second you, this looks more clean
-and stable than the stuff we came up with :) 
+> +
+> +		smp_store_mb(vcpu->mode, IN_GUEST_MODE);
+> +
+> +		if (kvm_request_pending(vcpu)) {
+> +			vcpu->mode = OUTSIDE_GUEST_MODE;
+> +			continue;
+> +		}
+> +
+> +		kvm_vcpu_srcu_read_unlock(vcpu);
+> +
+> +		arm_vcpu_run(vcpu);
+> +
+> +		vcpu->mode = OUTSIDE_GUEST_MODE;
+> +
+> +		kvm_vcpu_srcu_read_lock(vcpu);
+> +
+> +		ret = handle_exit(vcpu);
 
-I'll integrate it into the series and send it with the next round.
+ARM increases stat.exits here and since you copied the stat fields over 
+we could do that too.
 
-Thank you for your input. Very much appreciated.
+General question to the ARM maintainers:
+We'll be adding more stat fields in the very soon future.
+Are you fine with us adding them under any name or should we prefix them 
+so it's clear they exist because of our architecture / implementation 
+and will likely never be added to ARM KVM?
 
-	Steffen
+In the past we've added a lot of stats and I'd expect us to at least add 
+stats for every intercept reason.
 
-...
+> +
+> +	} while (ret > 0);
+> +
+> +	kvm_vcpu_srcu_read_unlock(vcpu);
+> +
+> +	kvm_sigset_deactivate(vcpu);
+> +out:
+> +	if (unlikely(vcpu_get_flag(vcpu, INCREMENT_PC)))
+> +		adjust_pc(vcpu);
+> +
+> +	save_vx_regs(vcpu->arch.ctxt.vregs);
+> +	kernel_fpu_end(&fpu_save, KERNEL_FPC | KERNEL_VXR);
+> +	vcpu_put(vcpu);
+> +
+> +	return ret;
+> +}
