@@ -1,114 +1,138 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45C6E4EE876
-	for <kvmarm@lists.linux.dev>; Thu,  3 Sep 2026 16:41:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8175C4F0526;
+	Thu,  3 Sep 2026 16:43:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788453697; cv=none; b=tAidpkqZ6uesqzT9N3eoGogod1Dmh2A4T2STa21zGOlT2J2BnFeTDf0CKSf2nLtJzNmwRjFsphHVh/BW+6ftBOiVrSsj+zr/JrF8mptrA7B49rhUi0cuxyToDQAGTkAkj2HYS0+TG0G8L3h9kapmFbJb7WbFrj3/z+GgROlQeI0=
+	t=1788453795; cv=none; b=nYefTHe5eJ3i0E9OAsCg2LZBfzIUc09NA+BV+e+Jmd9u6cZ0ihPhG4FiZMYvhKQAW3+cYpJg5R8VlKCW/HQPprV3lkRQe/lbyb4KsqWalQq1S3xMBVxk46QCxPkGbVQVGt6nuIr77rP1FAGN+rZi7jGC3I8KbnCApe2w30sNurs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788453697; c=relaxed/simple;
-	bh=jmE5t/QWYXGduwCXTsexmNTSqycO4dgO83zrtscZu3s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GcNNUVh62qDR3VtQzQkoiGZswGptMngTCtgoYdgN+2H3hpcEzlgFNlIAQ0faoPK5IniVfqOhAX2uW34+EXps1wqgAs701WYfzbJGM0hRRFZnev1sp2S+xXXSoxJkBb5SPywS96d+NgaiGnx+sp5Qv4W82gpUoT3z2AUs9PJue2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CCt/bSuD; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1788453795; c=relaxed/simple;
+	bh=ruthwdcgNXRMh1iMLpZh+ZVmUdADNUQe5UENTdH8Ojk=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=dCY7DL2HigV/IFAfR06wMGQzJ9LIfhQFW+UuPnJ4MAyfjX1MvYaKvsxv8Rpt99xrOHN3HnaN8J3r9izfFSmpM6CkUCMm/qXfqPAqFYbyJyk2NLGUgxIm0WePvbarPgMWj8gpwL9FQE7bwvw6YhS/dbKdQFnjc0iIv/KPi8roEOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KjGBtaLN; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CCt/bSuD"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1788453695;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=96jSKrblNa/MGHlSRt22d1bqrg1HZKp/dYSrKcWfd2w=;
-	b=CCt/bSuD60TgCPDUEZpXzyoqPpiXMarYmCjPx4EsMB3itKnSSSZggPRvotoFC+OJD8SoV7
-	Tr0AGH0aEXAbHWyWQqwySvZIw9eTLxp1l8Vt2tJRK6npgXOC16beL4CNVtd4MshaKsC4aQ
-	MsXq/0anIWspyXqMDO0xc0PCWHvEHDM=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-474-CijEqLfvOBm8Sa2ZPhQvEQ-1; Thu, 03 Sep 2026 12:41:33 -0400
-X-MC-Unique: CijEqLfvOBm8Sa2ZPhQvEQ-1
-X-Mimecast-MFC-AGG-ID: CijEqLfvOBm8Sa2ZPhQvEQ_1788453692
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-484362cb000so15997f8f.0
-        for <kvmarm@lists.linux.dev>; Thu, 03 Sep 2026 09:41:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788453692; x=1789058492;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=96jSKrblNa/MGHlSRt22d1bqrg1HZKp/dYSrKcWfd2w=;
-        b=QKoygIdh/tUy5hlnP0p0mk8Bt96zjYgerN0RjEslwMEGiLk+Abli/B41LM4xtlecEt
-         Aky7Z2BaoDMVPVggsfQxfMYA8JjJIPkRLZb/V+lu9nxIXR3sM5WAuU1EEQgU9n8ZVeEN
-         ewiCI9wuL4WzjSf21sa9fK8YdZkWC2/83/qicsL0aW5XuXZqoEo12vr5Kba0ItmiHNnt
-         S2wqmMeXbtJ32INEaUbnrybWL0L1GCesb/Z1raUqkGXAegV3qX+4koSVD4gSCJwfYubC
-         W6Nk4GfavIyNOJ4XoejQKwcwwLX4K7fvIaTZMm1mfWgt3ov3yRY41YMKf3O7tQl2UjYw
-         HTKQ==
-X-Forwarded-Encrypted: i=1; AKwUvBw+mIZZWnXHtbvmc5ejIWUuuzA/JOG7ggp2i1Kc15tzy+Y4VRrSXprssG3OLYUk8FQCPLSq7Cw=@lists.linux.dev
-X-Gm-Message-State: AFuF++nV7s6zkOOHdB4e81xPQ2AVRwPKyKh2nxBkaHoGSa2590lPXRN/
-	x3BxPNxOi7hpBEZDu7ubC/DqYVwL40MYkYSEnHDRWKIKnxSgRgebpMcjpoGwDvsFzvpXWfjcVuQ
-	gaViEuZLdZahoN4eiMBOJjd2JMVddqW6KQqqO9MTvs7/VeGIj1+ikDOpfW+NyfxjufBET7UJzVX
-	xlGOXReTmplp48KMUOEOfQBW8yUCBmO7Tj
-X-Gm-Gg: AYBFou0UCkL2vXExfbLylRt/tzbRDER+B+h1vr2TnYMUKy3irFxHJPQhXYrMsPLbqHp
-	gR+yWuHQ3eFVKQg/fKFNv9CYffUGQuCQ5rJKdceTH6ulPxhQOcXamQMGwwnJNW5+9PpcFkOsHeo
-	D9DmUuVprzZ55pChQLBBipLPelIfybZphnrJEc/DdxyQPYmZrCVvj64PnKceXdk+5zgYFNzYyLl
-	WPogwGg4M0TMCFAzGuMulNLHzCwn7VkGRW3t62OvQC1oGjnpfSeCTuge4Lr
-X-Received: by 2002:a05:6000:22c2:b0:484:3147:49c9 with SMTP id ffacd0b85a97d-48582315a47mr5571264f8f.2.1788453691964;
-        Thu, 03 Sep 2026 09:41:31 -0700 (PDT)
-X-Received: by 2002:a05:6000:22c2:b0:484:3147:49c9 with SMTP id
- ffacd0b85a97d-48582315a47mr5571189f8f.2.1788453691502; Thu, 03 Sep 2026
- 09:41:31 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KjGBtaLN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9716A1F000E9;
+	Thu,  3 Sep 2026 16:43:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788453793;
+	bh=GrNFBaQ/bi9wTfwsPk8pg2hjAaH4xTOE5iqvD7edL3g=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=KjGBtaLNTY4GXwRNT+d0Eg2v98Uar+vMtvG5FNEDHIkYlHTLZa97FYgvLvzbA+rY0
+	 d/uai079trgaTLLbsaIF1b43ao1pnviPnsKIuJzrN5pQdOs5pB1dQHWb4iu5+SJyfG
+	 4lrKl4aXUvesS7vN5kFpsAdgACpUQo/lckqtg0nhBznzR8UlwgTfX26slDymoUc2ID
+	 /jEFtOo1hd1J6bUvyEFMN+i9xQy80Ar1y9mMCSf0d8Jz3OskjBweYsHfrFPIxU30PR
+	 e4TGJDiBuQlEiLan5Pg+zqASqiWe+zAz7Y1dah8pAsrl6CaCUMF/7R0Ec0SGcG6O9R
+	 OJ+//+Y6jGVbA==
+From: sashiko-bot@kernel.org
+Subject: Re: [RFC PATCH v7 19/28] KVM: arm64: VHE: Context switch SPE state
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Alexandru Elisei" <alexandru.elisei@arm.com>
+Cc: kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, linux-perf-users@vger.kernel.org, "Oliver
+ Upton" <oupton@kernel.org>
+In-Reply-To: <20260903160623.315525-20-alexandru.elisei@arm.com>
+References: <20260903160623.315525-1-alexandru.elisei@arm.com>
+ <20260903160623.315525-20-alexandru.elisei@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 03 Sep 2026 16:43:13 +0000
+Message-Id: <20260903164313.9716A1F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20260831144802.834315-1-seiden@linux.ibm.com> <20260831144802.834315-24-seiden@linux.ibm.com>
- <aphMx5hsoXwIpNjt@google.com> <20260903083857.33034-B-seiden@linux.ibm.com>
- <apmHrnxRLl9BuVhn@google.com> <20260903154317.246414-A-seiden@linux.ibm.com> <apmhX8H-WUc3U4_N@google.com>
-In-Reply-To: <apmhX8H-WUc3U4_N@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 3 Sep 2026 18:41:18 +0200
-X-Gm-Features: AcwNN1UO9-vCqk6RvEI48oEKpR6Wrb2Fp2swzaiyckPlKKdzDRVW5sMiBpGtdhU
-Message-ID: <CABgObfYUYCRtmJkh1Ns4VBbWqk3ggnDu294G9rZ6tva56=F11Q@mail.gmail.com>
-Subject: Re: [PATCH v7 23/23] KVM: s390: arm64: Add KVM_S390_ARM64 Kconfig and Makefile
-To: Sean Christopherson <seanjc@google.com>
-Cc: Steffen Eiden <seiden@linux.ibm.com>, kvm <kvm@vger.kernel.org>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, 
-	"Kernel Mailing List, Linux" <linux-kernel@vger.kernel.org>, linux-s390 <linux-s390@vger.kernel.org>, 
-	Alexander Gordeev <agordeev@linux.ibm.com>, Andreas Grapentin <gra@linux.ibm.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
-	David Hildenbrand <david@kernel.org>, Friedrich Welter <fritz@linux.ibm.com>, Fuad Tabba <tabba@google.com>, 
-	Gautam Gala <ggala@linux.ibm.com>, Hariharan Mari <hari55@linux.ibm.com>, 
-	Heiko Carstens <hca@linux.ibm.com>, Hendrik Brueckner <brueckner@linux.ibm.com>, 
-	Ilya Leoshkevich <iii@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Joey Gouly <joey.gouly@arm.com>, Marc Zyngier <maz@kernel.org>, Nico Boehr <nrb@linux.ibm.com>, 
-	Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>, Oliver Upton <oupton@kernel.org>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Sven Schnelle <svens@linux.ibm.com>, 
-	Ulrich Weigand <Ulrich.Weigand@de.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
-	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: HEcgxxkea5qlqWIsHewTlhtbTWQWwdxEkMm_ebCKinU_1788453692
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
 
-Il gio 3 set 2026, 18:33 Sean Christopherson <seanjc@google.com> ha scritto:
->
-> How many people are running distro kernels on s390 hardware?  And how many distros
-> actually change the default KVM settings, e.g. to build KVM as a module instead of
-> baking it into the kernel?  My guess is "not many" and "almost none", i.e. the
-> actual impact on downstream users is likely miniscule.
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+s) to consider:
+- [High] Writing to PMBSR_EL1 after enabling the SPE profiling buffer via P=
+MBLIMITR_EL1 is CONSTRAINED UNPREDICTABLE and can corrupt hardware events.
+- [High] Host SPE sampling control registers (e.g., PMSNEVFR_EL1, PMSDSFR_E=
+L1) can be permanently corrupted by a malicious guest.
+--
 
-RHEL and SLES *are* distros, and I am not sure which bank or insurance
-company would be running non-distro kernels. :) So I assume you mean
-"how many people are running non-distro kernels on s390".
+commit 32125a6226fde42baaf9001e75434e4177067f24
+Author: Alexandru Elisei <alexandru.elisei@arm.com>
 
-At least RHEL builds KVM as a module for s390x, but it's not a
-problem. I agree with you that having the equivalent of INTEL/AMD, if
-possible, is a desirable self-check.
+KVM: arm64: VHE: Context switch SPE state
 
-Paolo
+Save and restore the SPE register state when a VCPU is run. The SPE
+resources are shared between the guest and the host (the resources are not
+partitioned) so KVM has to save the host state, change the owning
+translation regime, and then restore the guest state before entering a
+guest.
 
+> diff --git a/arch/arm64/kvm/hyp/vhe/spe-sr.c b/arch/arm64/kvm/hyp/vhe/spe=
+-sr.c
+> new file mode 100644
+> index 0000000000000..978620ad99fa5
+> --- /dev/null
+> +++ b/arch/arm64/kvm/hyp/vhe/spe-sr.c
+> @@ -0,0 +1,209 @@
+[ ... ]
+> +static void __kvm_spe_save_sampling_regs(struct kvm *kvm, struct kvm_cpu=
+_context *ctxt)
+> +{
+> +	/*
+> +	 * This is dependent on the VM features, and not the hardware features,
+> +	 * even for the host, because (a) guest accesses to PMSNEVFR_EL1 and
+> +	 * PMSDSFR_EL1 result in an undefined exception in the guest and (b)
+> +	 * they don't affect the guest unless the guest explicitly enables them,
+> +	 * and a well-behaved guest shouldn't enable them when the corresponding
+> +	 * feature is not advertised.
+> +	 */
+> +	if (kvm_spe_has_feat_spe_fne(kvm))
+> +		ctxt_sys_reg(ctxt, PMSNEVFR_EL1) =3D read_sysreg_s(SYS_PMSNEVFR_EL1);
+
+[Severity: High]
+Does this check of the guest's advertised features (kvm_spe_has_feat_spe_fn=
+e)
+leave the host's sampling control registers vulnerable to corruption?
+
+If the host physically supports FEAT_SPE_FNE but the KVM VM does not
+advertise it, KVM will skip saving and restoring the host's PMSNEVFR_EL1
+register. Because MDCR_EL2.TPMS =3D 0 is cleared on guest entry, these
+registers will not trap to EL2.
+
+A malicious guest could execute an msr instruction to PMSNEVFR_EL1 directly,
+overwriting the hardware register. When the guest exits, KVM skips restoring
+the host's value in __kvm_spe_restore_sampling_regs(), allowing the guest's
+malicious configuration to persist in the host execution context.
+
+Could this be checking the host's physical capabilities instead of the VM's
+advertised features when saving and restoring host state?
+
+[ ... ]
+> +void __kvm_spe_restore_guest_state_vhe(struct kvm_vcpu *vcpu, struct kvm=
+_cpu_context *guest_ctxt)
+> +{
+> +	u64 pmblimitr, pmbsr;
+> +
+> +	pmbsr =3D ctxt_sys_reg(guest_ctxt, PMBSR_EL1);
+> +	pmblimitr =3D ctxt_sys_reg(guest_ctxt, PMBLIMITR_EL1);
+> +	if (__kvm_spe_profiling_buffer_enabled(pmblimitr, pmbsr)) {
+> +		write_sysreg_s(ctxt_sys_reg(guest_ctxt, PMBPTR_EL1), SYS_PMBPTR_EL1);
+> +		isb();
+> +		write_sysreg_s(pmblimitr, SYS_PMBLIMITR_EL1);
+> +		isb();
+> +		/* A buffer management event preserves fields in PMBSR_EL1 */
+> +		write_sysreg_s(pmbsr, SYS_PMBSR_EL1);
+
+[Severity: High]
+Is it safe to write to PMBSR_EL1 after enabling the SPE profiling buffer via
+PMBLIMITR_EL1?
+
+According to the ARM Architecture Reference Manual, when the profiling buff=
+er
+is enabled, a direct write to PMBSR_EL1 is constrained unpredictable. This
+can corrupt hardware events or lead to unknown exceptions.
+
+In __kvm_spe_restore_host_state_vhe(), the PMBSR_EL1 register is correctly
+restored before PMBLIMITR_EL1. Should the guest restoration follow the same
+sequence to avoid unpredictable behavior?
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260903160623.3155=
+25-1-alexandru.elisei@arm.com?part=3D19
