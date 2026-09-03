@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C97D24CA785
-	for <kvmarm@lists.linux.dev>; Thu,  3 Sep 2026 16:07:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC6A3311968
+	for <kvmarm@lists.linux.dev>; Thu,  3 Sep 2026 16:07:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788451633; cv=none; b=OvvZRdMyhYRrG2+9hSoq3/e6dfq29xs38avXPYmiHPk7f6pn4hPyv7KxHl0WDTB825+sudK4I4w3719s8jAfdaEP++rnVvzzYa1pPH57qf1ad5XdYp8d1q6DRMZmnXHO3DxZvbT/atvztanio0xbQxCZJFjJ3XSE4wu2ng4FTEQ=
+	t=1788451635; cv=none; b=bnmjEYIx4W395G2L9f0bD6AXRUIKXze3WPdJnEPfBSjp/C508K0TZQnTQgiTjU8C61h6Zav0VgTdqeJPJmO09NJDwGG4uyccNlCzYtxOEIsIxqOgikPTh+9qg6kAUR5646lvs4RvInp9BKHKddq+SZx4KBeuc8f8tADLHB6NpBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788451633; c=relaxed/simple;
-	bh=ICG37A7E0DN2o9Fc5Ao1zY5J5NmiPPMaM5NoSgGgT7I=;
+	s=arc-20240116; t=1788451635; c=relaxed/simple;
+	bh=HykRoC+x7+WJpH6zqJw7sUTUkGOjuJltTihUTPx51TE=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=at7mX5eybakya+a1RAA4BOXpoplEZQGFxDWiA+l1P3yS9XORoNjVRXJcVPvNUc+G5VbGRNMWWmQFarMLzdgg2TJ1sx3eUjwDQExVdxclSaMdYdSbj0ejwmvu2J/3IVVtzMnh0lGbSj9D9whSV3nxJKWuYVZIONponCFjaKzmr1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=fTyeC0Qk; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=Z6DdydZYAQQayocvn+Kc89UGYUZS6RJLd97haPCMwo7t6AOQECrlGKYsusua6tPKYpQI+/O3bg16KwX9DDDu4x0URH4b5wIshz5P80xpHj3Em9hjQc10P6TK9eIvnHdHbP68cv0NXaR2VArFQvF3100J4E0obRh7NxTqqMwxEyI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=K90rYPg+; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="fTyeC0Qk"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="K90rYPg+"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 52D141650;
-	Thu,  3 Sep 2026 09:07:07 -0700 (PDT)
-Received: from e140010.cambridge.arm.com (e140010.arm.com [10.2.213.25])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 49A7F3F673;
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 62D341D34;
 	Thu,  3 Sep 2026 09:07:09 -0700 (PDT)
+Received: from e140010.cambridge.arm.com (e140010.arm.com [10.2.213.25])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5985F3F673;
+	Thu,  3 Sep 2026 09:07:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1788451631; bh=ICG37A7E0DN2o9Fc5Ao1zY5J5NmiPPMaM5NoSgGgT7I=;
+	t=1788451633; bh=HykRoC+x7+WJpH6zqJw7sUTUkGOjuJltTihUTPx51TE=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=fTyeC0QkHUTTijYjj919YtbsOsTKNFJz+gY6gh+u8HmhPkd9rZ5BN+OJL6rYwY3xO
-	 dAL5hsP2Au3breuNVmuqw6/V6tOO1wj85TZ4PBlYnjd47zZyDdUEgUQsYfBsZoRT5c
-	 IegzVD8ry51yiyP74iCylKns/qbtL4Vz4nxgNjsU=
+	b=K90rYPg+6dENgxgZASly10im1bD4yhpBSzckl5iGbAhOxrXgBsWaaeA+m/+IuItRc
+	 7/XegLpS62FtNtKB2aahfavnxtJ9g/cSR699hYuocLwYT0ehk6aTNZEfZckBlOm2uW
+	 HofCD2iPrXWrivry32oeisiHIKqrdQOLdloZ/Mzk=
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: maz@kernel.org,
 	oupton@kernel.org,
@@ -41,9 +41,9 @@ To: maz@kernel.org,
 	linux-perf-users@vger.kernel.org,
 	catalin.marinas@arm.com,
 	james.clark@linaro.org
-Subject: [RFC PATCH v7 17/28] KVM: arm64: Apply a RES0 mask to PMBLIMITR_EL1 writes
-Date: Thu,  3 Sep 2026 17:06:12 +0100
-Message-ID: <20260903160623.315525-18-alexandru.elisei@arm.com>
+Subject: [RFC PATCH v7 18/28] KVM: arm64: config: Use functions from spe.c to test FEAT_SPE_{FnE,FDS}
+Date: Thu,  3 Sep 2026 17:06:13 +0100
+Message-ID: <20260903160623.315525-19-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260903160623.315525-1-alexandru.elisei@arm.com>
 References: <20260903160623.315525-1-alexandru.elisei@arm.com>
@@ -55,200 +55,163 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-PMBLIMITR_EL1 is special, because it has feature enable fields. If those
-features are hidden from a guest, ignore them when the guest or the VMM
-attempt to set them.
-
-The least significant bits of the buffer limit address are RES0 based on
-the smallest granule implemented. Make sure they are treated as zero even
-if the smallest granule exposed to the VM is larger than what the hardware
-implements.
-
-Note that it is up to the user to write to the SPE buffer registers only
-after the VM features have been configured in the VM id registers.
+KVM's FGU mechanism will trap the registers introduced by FEAT_SPE_FnE and
+FEAT_SPE_FDS if the feature is not present for the VM. Move the functions
+that check for the presence of these features out of config.c and into
+spe.c, since that's where the bulk of SPE virtualization lies.
 
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- Documentation/virt/kvm/devices/vcpu.rst |  3 ++
- arch/arm64/include/asm/kvm_spe.h        |  7 +++++
- arch/arm64/kvm/spe.c                    | 40 +++++++++++++++++++++++--
- arch/arm64/kvm/sys_regs.c               | 38 +++++++++++++++++++++--
- 4 files changed, 83 insertions(+), 5 deletions(-)
+ arch/arm64/include/asm/kvm_spe.h | 11 +++++++++++
+ arch/arm64/kvm/config.c          | 30 +++++-------------------------
+ arch/arm64/kvm/spe.c             | 22 ++++++++++++++++++++++
+ 3 files changed, 38 insertions(+), 25 deletions(-)
 
-diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
-index e2eac48b9d28..eb352760869c 100644
---- a/Documentation/virt/kvm/devices/vcpu.rst
-+++ b/Documentation/virt/kvm/devices/vcpu.rst
-@@ -383,3 +383,6 @@ the in-kernel irqchip has been initialized.
- 
- KVM will refuse to run the VCPU and KVM_RUN will return an error if the SPE
- feature has been set for the VCPU, but SPE hasn't been initialized.
-+
-+Attempting to access any of the SPE registers until SPE has been initialized on
-+the VCPU will fail with -EBUSY.
 diff --git a/arch/arm64/include/asm/kvm_spe.h b/arch/arm64/include/asm/kvm_spe.h
-index 56dc9e660bef..3d8e9720daca 100644
+index 3d8e9720daca..618051dcf59f 100644
 --- a/arch/arm64/include/asm/kvm_spe.h
 +++ b/arch/arm64/include/asm/kvm_spe.h
-@@ -14,6 +14,7 @@ struct kvm_device_attr;
- struct arm_spe_pmu;
- struct kvm_spe {
- 	struct arm_spe_pmu *spe_pmu;
-+	u64 pmblimitr_el1_res0_mask;
- };
+@@ -43,6 +43,9 @@ u8 kvm_spe_get_pmsver(struct kvm *kvm);
  
- struct kvm_vcpu_spe {
-@@ -26,6 +27,8 @@ bool kvm_supports_spe(void);
- #define vcpu_has_spe(vcpu)					\
- 	(vcpu_has_feature(vcpu, KVM_ARM_VCPU_SPE))
- 
-+bool kvm_vcpu_spe_initialized(struct kvm_vcpu *vcpu);
+ bool kvm_spe_write_sysreg(struct kvm_vcpu *vcpu, int reg, u64 val);
+ u64 kvm_spe_read_sysreg(struct kvm_vcpu *vcpu, int reg);
 +
- int kvm_spe_vcpu_first_run_init(struct kvm_vcpu *vcpu);
- void kvm_spe_destroy_vm(struct kvm *kvm);
- 
-@@ -54,6 +57,10 @@ static __always_inline bool kvm_supports_spe(void)
- 
- #define vcpu_has_spe(vcpu)	false
- 
-+static inline bool kvm_vcpu_spe_initialized(struct kvm_vcpu *vcpu)
++bool kvm_spe_has_feat_spe_fne(struct kvm *kvm);
++bool kvm_spe_has_feat_spe_fds(struct kvm *kvm);
+ #else
+ struct kvm_spe {
+ };
+@@ -99,6 +102,14 @@ static inline u64 kvm_spe_read_sysreg(struct kvm_vcpu *vcpu, int reg)
+ {
+ 	return 0;
+ }
++static inline bool kvm_spe_has_feat_spe_fne(struct kvm *kvm)
 +{
 +	return false;
 +}
- static inline int kvm_spe_vcpu_first_run_init(struct kvm_vcpu *vcpu)
++static inline bool kvm_spe_has_feat_spe_fds(struct kvm *kvm)
++{
++	return false;
++}
+ #endif /* CONFIG_KVM_ARM_SPE */
+ 
+ #endif /* __ARM64_KVM_SPE_H__ */
+diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
+index 1053676551af..78e414ed736d 100644
+--- a/arch/arm64/kvm/config.c
++++ b/arch/arm64/kvm/config.c
+@@ -7,6 +7,7 @@
+ #include <linux/kvm_host.h>
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_nested.h>
++#include <asm/kvm_spe.h>
+ #include <asm/sysreg.h>
+ 
+ /*
+@@ -159,7 +160,6 @@ struct reg_feat_map_desc {
+ #define FEAT_GICv3		ID_AA64PFR0_EL1, GIC, IMP
+ #define FEAT_LOR		ID_AA64MMFR1_EL1, LO, IMP
+ #define FEAT_SPEv1p2		ID_AA64DFR0_EL1, PMSVer, V1P2
+-#define FEAT_SPEv1p4		ID_AA64DFR0_EL1, PMSVer, V1P4
+ #define FEAT_SPEv1p5		ID_AA64DFR0_EL1, PMSVer, V1P5
+ #define FEAT_ATS1A		ID_AA64ISAR2_EL1, ATS1A, IMP
+ #define FEAT_SPECRES2		ID_AA64ISAR1_EL1, SPECRES, COSP_RCTX
+@@ -292,26 +292,6 @@ static bool feat_sme_smps(struct kvm *kvm)
+ 		(read_sysreg_s(SYS_SMIDR_EL1) & SMIDR_EL1_SMPS));
+ }
+ 
+-static bool feat_spe_fds(struct kvm *kvm)
+-{
+-	/*
+-	 * Revisit this if KVM ever supports SPE -- this really should
+-	 * look at the guest's view of PMSIDR_EL1.
+-	 */
+-	return (kvm_has_feat(kvm, FEAT_SPEv1p4) &&
+-		(read_sysreg_s(SYS_PMSIDR_EL1) & PMSIDR_EL1_FDS));
+-}
+-
+-static bool feat_spe_fne(struct kvm *kvm)
+-{
+-	/*
+-	 * Revisit this if KVM ever supports SPE -- this really should
+-	 * look at the guest's view of PMSIDR_EL1.
+-	 */
+-	return (kvm_has_feat(kvm, FEAT_SPEv1p2) &&
+-		(read_sysreg_s(SYS_PMSIDR_EL1) & PMSIDR_EL1_FnE));
+-}
+-
+ static bool feat_trbe_mpam(struct kvm *kvm)
  {
- 	return 0;
+ 	/*
+@@ -547,7 +527,7 @@ static const struct reg_bits_to_feat_map hdfgrtr_feat_map[] = {
+ 		   HDFGRTR_EL2_PMBPTR_EL1	|
+ 		   HDFGRTR_EL2_PMBLIMITR_EL1,
+ 		   FEAT_SPE),
+-	NEEDS_FEAT(HDFGRTR_EL2_nPMSNEVFR_EL1, feat_spe_fne),
++	NEEDS_FEAT(HDFGRTR_EL2_nPMSNEVFR_EL1, kvm_spe_has_feat_spe_fne),
+ 	NEEDS_FEAT(HDFGRTR_EL2_nBRBDATA		|
+ 		   HDFGRTR_EL2_nBRBCTL		|
+ 		   HDFGRTR_EL2_nBRBIDR,
+@@ -615,7 +595,7 @@ static const struct reg_bits_to_feat_map hdfgwtr_feat_map[] = {
+ 		   HDFGWTR_EL2_PMBPTR_EL1	|
+ 		   HDFGWTR_EL2_PMBLIMITR_EL1,
+ 		   FEAT_SPE),
+-	NEEDS_FEAT(HDFGWTR_EL2_nPMSNEVFR_EL1, feat_spe_fne),
++	NEEDS_FEAT(HDFGWTR_EL2_nPMSNEVFR_EL1, kvm_spe_has_feat_spe_fne),
+ 	NEEDS_FEAT(HDFGWTR_EL2_nBRBDATA		|
+ 		   HDFGWTR_EL2_nBRBCTL,
+ 		   FEAT_BRBE),
+@@ -851,7 +831,7 @@ static const struct reg_bits_to_feat_map hdfgrtr2_feat_map[] = {
+ 		   HDFGRTR2_EL2_nPMSSDATA,
+ 		   FEAT_PMUv3_SS),
+ 	NEEDS_FEAT(HDFGRTR2_EL2_nPMIAR_EL1, FEAT_SEBEP),
+-	NEEDS_FEAT(HDFGRTR2_EL2_nPMSDSFR_EL1, feat_spe_fds),
++	NEEDS_FEAT(HDFGRTR2_EL2_nPMSDSFR_EL1, kvm_spe_has_feat_spe_fds),
+ 	NEEDS_FEAT(HDFGRTR2_EL2_nPMBMAR_EL1, FEAT_SPE_nVM),
+ 	NEEDS_FEAT(HDFGRTR2_EL2_nSPMACCESSR_EL1	|
+ 		   HDFGRTR2_EL2_nSPMCNTEN	|
+@@ -884,7 +864,7 @@ static const struct reg_bits_to_feat_map hdfgwtr2_feat_map[] = {
+ 		   feat_pmuv3p9),
+ 	NEEDS_FEAT(HDFGWTR2_EL2_nPMSSCR_EL1, FEAT_PMUv3_SS),
+ 	NEEDS_FEAT(HDFGWTR2_EL2_nPMIAR_EL1, FEAT_SEBEP),
+-	NEEDS_FEAT(HDFGWTR2_EL2_nPMSDSFR_EL1, feat_spe_fds),
++	NEEDS_FEAT(HDFGWTR2_EL2_nPMSDSFR_EL1, kvm_spe_has_feat_spe_fds),
+ 	NEEDS_FEAT(HDFGWTR2_EL2_nPMBMAR_EL1, FEAT_SPE_nVM),
+ 	NEEDS_FEAT(HDFGWTR2_EL2_nSPMACCESSR_EL1	|
+ 		   HDFGWTR2_EL2_nSPMCNTEN	|
 diff --git a/arch/arm64/kvm/spe.c b/arch/arm64/kvm/spe.c
-index 6a00a44c73ed..8c173a1f48bd 100644
+index 8c173a1f48bd..3b285b45332b 100644
 --- a/arch/arm64/kvm/spe.c
 +++ b/arch/arm64/kvm/spe.c
-@@ -60,13 +60,43 @@ bool kvm_supports_spe(void)
- 	return !list_empty(&spe_pmus);
+@@ -113,6 +113,28 @@ void kvm_spe_destroy_vm(struct kvm *kvm)
+ 	module_put(spe_pmu->pmu.module);
  }
  
--int kvm_spe_vcpu_first_run_init(struct kvm_vcpu *vcpu)
-+bool kvm_vcpu_spe_initialized(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_vcpu_spe *vcpu_spe = &vcpu->arch.vcpu_spe;
- 
--	if (!vcpu_spe->initialized)
-+	return vcpu_spe->initialized;
++bool kvm_spe_has_feat_spe_fds(struct kvm *kvm)
++{
++	struct arm_spe_pmu *spe_pmu = kvm->arch.kvm_spe.spe_pmu;
++
++	if (!spe_pmu)
++		return false;
++
++	return kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMSVer, V1P4) &&
++	       FIELD_GET(PMSIDR_EL1_FDS, spe_pmu->pmsidr_el1);
 +}
 +
-+static void kvm_spe_compute_pmblimitr_el1_res0_mask(struct kvm *kvm)
++bool kvm_spe_has_feat_spe_fne(struct kvm *kvm)
 +{
-+	u64 res0_mask = GENMASK_ULL(11, 8) | BIT(6) | GENMASK_ULL(4, 3);
++	struct arm_spe_pmu *spe_pmu = kvm->arch.kvm_spe.spe_pmu;
 +
-+	if (!kvm_has_feat(kvm, ID_AA64DFR2_EL1, SPE_nVM, IMP))
-+		res0_mask |= PMBLIMITR_EL1_nVM_MASK;
++	if (!spe_pmu)
++		return false;
 +
-+	if (!kvm_has_feat_enum(kvm, ID_AA64MMFR0_EL1, TGRAN4, NI))
-+		goto set_mask;
-+
-+	if (kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN16, IMP))
-+		res0_mask |= GENMASK_ULL(13, 12);
-+	else
-+		res0_mask |= GENMASK_ULL(15, 12);
-+
-+set_mask:
-+	WRITE_ONCE(kvm->arch.kvm_spe.pmblimitr_el1_res0_mask, res0_mask);
++	return kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMSVer, V1P2) &&
++	       FIELD_GET(PMSIDR_EL1_FnE, spe_pmu->pmsidr_el1);
 +}
 +
-+int kvm_spe_vcpu_first_run_init(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm *kvm = vcpu->kvm;
-+	struct kvm_spe *kvm_spe = &kvm->arch.kvm_spe;
-+
-+	if (!kvm_vcpu_spe_initialized(vcpu))
- 		return -EINVAL;
- 
-+	if (!kvm_spe->pmblimitr_el1_res0_mask)
-+		kvm_spe_compute_pmblimitr_el1_res0_mask(kvm);
-+
- 	return 0;
- }
- 
-@@ -85,8 +115,12 @@ void kvm_spe_destroy_vm(struct kvm *kvm)
- 
  bool kvm_spe_write_sysreg(struct kvm_vcpu *vcpu, int reg, u64 val)
  {
-+	struct kvm_spe *kvm_spe = &vcpu->kvm->arch.kvm_spe;
-+
- 	switch (reg) {
- 	case PMBLIMITR_EL1:
-+		val &= ~kvm_spe->pmblimitr_el1_res0_mask;
-+		fallthrough;
- 	case PMBSR_EL1:
- 	case PMBPTR_EL1:
- 		__vcpu_assign_sys_reg(vcpu, reg, val);
-@@ -217,7 +251,7 @@ int kvm_spe_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
- 	if (!vcpu_has_spe(vcpu))
- 		return -ENODEV;
- 
--	if (vcpu_spe->initialized)
-+	if (kvm_vcpu_spe_initialized(vcpu))
- 		return -EBUSY;
- 
- 	switch (attr->attr) {
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 89b01b6ac783..4c4bf88c9aa5 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1563,6 +1563,38 @@ static unsigned int spe_visibility(const struct kvm_vcpu *vcpu,
- 	return REG_HIDDEN;
- }
- 
-+static int set_user_spe_sysreg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
-+			       u64 val)
-+{
-+	int reg = r->reg;
-+
-+	if (!kvm_vcpu_spe_initialized(vcpu))
-+		return -EBUSY;
-+
-+	if (reg == PMBLIMITR_EL1 || reg == PMBPTR_EL1 || reg == PMBSR_EL1)
-+		kvm_spe_write_sysreg(vcpu, reg, val);
-+	else
-+		__vcpu_assign_sys_reg(vcpu, reg, val);
-+
-+	return 0;
-+}
-+
-+static int get_user_spe_sysreg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
-+			       u64 *val)
-+{
-+	int reg = r->reg;
-+
-+	if (!kvm_vcpu_spe_initialized(vcpu))
-+		return -EBUSY;
-+
-+	if (reg == PMBLIMITR_EL1 || reg == PMBPTR_EL1 || reg == PMBSR_EL1)
-+		*val = kvm_spe_read_sysreg(vcpu, reg);
-+	else
-+		*val = __vcpu_sys_reg(vcpu, reg);
-+
-+	return 0;
-+}
-+
- static bool access_spe_reg(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 			   const struct sys_reg_desc *r)
- {
-@@ -1610,11 +1642,13 @@ static bool access_spe_reg(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 
- #define SPE_SYS_REG(name)						\
- 	SYS_DESC(SYS_##name), .reg = name, .access = access_spe_reg,	\
--	.reset = reset_val, .val = 0, .visibility = spe_visibility
-+	.reset = reset_val, .val = 0, .visibility = spe_visibility,	\
-+	.set_user = set_user_spe_sysreg, .get_user = get_user_spe_sysreg
- 
- #define SPE_UNTRAPPED_REG(name)						\
- 	SYS_DESC(SYS_##name), .reg = name, .access = undef_access,	\
--	.reset = reset_val, .val = 0, .visibility = spe_visibility
-+	.reset = reset_val, .val = 0, .visibility = spe_visibility,	\
-+	.set_user = set_user_spe_sysreg, .get_user = get_user_spe_sysreg
- 
- /* Macro to expand the AMU counter and type registers*/
- #define AMU_AMEVCNTR0_EL0(n) { SYS_DESC(SYS_AMEVCNTR0_EL0(n)), undef_access }
+ 	struct kvm_spe *kvm_spe = &vcpu->kvm->arch.kvm_spe;
 -- 
 2.43.0
 
