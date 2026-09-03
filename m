@@ -1,117 +1,142 @@
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F40A1F875A;
-	Thu,  3 Sep 2026 01:01:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com [209.85.216.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ED4F34887E
+	for <kvmarm@lists.linux.dev>; Thu,  3 Sep 2026 02:34:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788397309; cv=none; b=FMWY2/hV25tHBmx4jsTeQxn8hiMDkDZX1w6+RMx5+OCy2PhqAxGUAFWvp1aI6zmXDhH/NYZTrErNVOpAHNCsICRrLhQey0mJlsuniNuTp+tr+uEqV4fu36q2MnXE20VmAPpG2RO5UyRqyF5s10stsfJV+a0XNSjXT9yFA4ucEGM=
+	t=1788402902; cv=none; b=mr4SPDVruYZNAf0Lcnubk8hGsklt9ssf/mD8mtClQXiLmBxXlF1Izh+K6zLAcQNvkIVQPe1JnBBcUFVkGpLL84BWBHEQLUFmurPTwZ2IPbI303g5jGZMeljHCqOGdHPNZEZ7VycJ7T+uuEQUy2gd4WwxEfGLVUx24qNuxwAOzj4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788397309; c=relaxed/simple;
-	bh=WwGnAA5ErGotDZh3VbAgEK5nIiocXB/JGkOeCgq4A54=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=HkJoMt9a7RrWkEl39XUB8wvExpgOsUSHIxWndnOySrKkWsjDBygTQit0sGby7QRTPzz1lB8P5I20NSc7veDfcGyGd/Z+fLf6sNt6u0ec6GpS0C//yKQn30uQc+rnGUjAHfePSw1p1O0ETZC4trmahJ6JGvK2T91R5Mntb1QBYNY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8Axj9H3xphq0f8HAA--.22932S3;
-	Thu, 03 Sep 2026 09:01:43 +0800 (CST)
-Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by front1 (Coremail) with SMTP id qMiowJDxRs30xphqzu0ZAA--.42143S2;
-	Thu, 03 Sep 2026 09:01:41 +0800 (CST)
-Subject: Re: [PATCH v2 02/20] KVM: selftests: Use the common minimum GPA for
- page tables on LoongArch
-To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
- Tianrui Zhao <zhaotianrui@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>,
- Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>,
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
- Steffen Eiden <seiden@linux.ibm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, Atish Patra <atish.patra@linux.dev>,
- Alexandre Ghiti <alex@ghiti.fr>, David Hildenbrand <david@kernel.org>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, loongarch@lists.linux.dev,
- kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
- linux-kernel@vger.kernel.org, Itaru Kitayama <itaru.kitayama@fujitsu.com>,
- Nicholas Piggin <npiggin@gmail.com>, Ritesh Harjani <ritesh.list@gmail.com>
-References: <20260902164123.2546762-1-seanjc@google.com>
- <20260902164123.2546762-3-seanjc@google.com>
-From: Bibo Mao <maobibo@loongson.cn>
-Message-ID: <170acb36-7542-e6f8-d834-250816ddfbfc@loongson.cn>
-Date: Thu, 3 Sep 2026 09:01:24 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1788402902; c=relaxed/simple;
+	bh=KttI8yN3SEE9knj1xRs/FNrG5jE/gzLZlVVCanD/Yjg=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=MlUzXIi/oXLgbbG9pxtpLNb1KNmNnma9ywBDoLu94q1pZTVYHBN+/uZqj4XYdJm1XfKwZMuOHs6jwGVaUBPshlTUHNA9Ug1xW5euylBt+bFTVf9CHw4w58jO1zTlUYJIC/5k7ZrrpRRo2L4mewVaez8GZxZySjuUCDL//wO2uxQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--loganodell.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=t9lxLB8B; arc=none smtp.client-ip=209.85.216.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--loganodell.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="t9lxLB8B"
+Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-38e1118e4abso3451774a91.0
+        for <kvmarm@lists.linux.dev>; Wed, 02 Sep 2026 19:34:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1788402896; x=1789007696; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=Z/CUOTjDyaAxtZC1lTIYdZbcKOF2SIWxflbwVxpxItE=;
+        b=t9lxLB8BOhqyGYJtj7Mlxn82IqyEKvzP8Rf354ECHj/4gTs6C3GGF0ztPlxzTi7v5Z
+         qvTNvY0dTB7BFYhSaHJ9EtsQgtC6SjEBkJKAdglDU+NOm2MFN4JexOjPJFYlIojXNqUh
+         viwPKqme8+XPEQkzT2m5YiLTaCI24RBnv59X/+pLsNZtS9LVzYnB89wgP8L4EZta+k/L
+         Fd3vtFHQbT7xaXxXDx03CaJui9BivGkcoDv28COX5q8V0AI+8mbBWQNK/tdxCfO/0wOF
+         9BgM9F9UdtbWizeSxKdvQ5NiYgV+fk7VNzP6LSKhuhWLwwzuSZNEwGl5RlfyuQIWbA36
+         +erw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788402896; x=1789007696;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=Z/CUOTjDyaAxtZC1lTIYdZbcKOF2SIWxflbwVxpxItE=;
+        b=FNwPI5AZQ7XaHSQIwyXV/17+0+yD5n3w6U2m2J6jSK5Znm8dOC09ykETH3fH7maEZ6
+         cts/9lurcfzfhFjq3Irs7fgwOu3xCNz2NKIb9eBLY5fp2E2BaGj1rIFegB2cDRQot1fD
+         PfYMOSbDycVZfHFYYJNGBH6A644EV8oGy5exlqwCAei72ANmhbZKiIGJ/HE25tyQBkNw
+         DBEL9KbiM6CaKfvMzjMTbgHFOI6oJu+YFOWTuo9BVF8oK1/zAo4ss0kNPW0WJv3N0X4f
+         XblDt5mD3iQYp/7jDxFOs17nXiD+6ClOqIkgZx+g6gcuF+jzwEYexFtV8sT4Q8aWM1GH
+         q3SA==
+X-Forwarded-Encrypted: i=1; AKwUvBwkf1xBX2j6oU0QdND+SCAIiZe2aUla7a5oCzNTEkpQd5CU+qUEQiZsNRAlqqN4EtiYRTQLgtE=@lists.linux.dev
+X-Gm-Message-State: AFuF++nr2xo/gv7QhFZAlOS2yGQUcIPvwkStxZpjTgI32vhVmoiwfQzP
+	ni9l3ixOrv693OaaVGoyjI5FUPCPLqbCNpwlzs5NsrMJaLrkgxDWFBau8+oaQWEhkvqTZd/IwMQ
+	SX1tezv1Sa2SWk1UT7Ol2Mw==
+X-Received: from dysc26.prod.google.com ([2002:a05:7300:3b1a:b0:332:2edd:e13a])
+ (user=loganodell job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:2d85:b0:398:9c00:29f0 with SMTP id 98e67ed59e1d1-39aee249bd7mr14082963a91.24.1788402895806;
+ Wed, 02 Sep 2026 19:34:55 -0700 (PDT)
+Date: Wed,  2 Sep 2026 19:34:49 -0700
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-In-Reply-To: <20260902164123.2546762-3-seanjc@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowJDxRs30xphqzu0ZAA--.42143S2
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoW7ZF43uFy8JrWDCF15CFWUJrc_yoW8CrWUpa
-	ykAryY9r4rGr17KFZ7WwnYqFy8Wa97GFWxAr1S9ryDurnrAry2gFWxKasrXFy5Z39Yq34S
-	v3WI93W5Za1kZwbCm3ZEXasCq-sJn29KB7ZKAUJUUUUJ529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUPFb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r106r15M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
-	Gr0_Gr1UM2kKe7AKxVWUtVW8ZwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYI
-	kI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUtVWr
-	XwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMx
-	k0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_GFv_Wryl42xK82IYc2Ij64vIr41l
-	4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_Jw0_GFylx2IqxVAqx4xG67AKxV
-	WUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI
-	7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Gr0_Xr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r
-	4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI
-	42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUSxhlDUUUU
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.55.0.979.g7e5102b832-goog
+Message-ID: <20260903023452.721732-1-loganodell@google.com>
+Subject: [RFC PATCH 0/3] liveupdate: Move to feature flags for LUO and memfd
+ ABI compatibility
+From: Logan Odell <loganodell@google.com>
+To: arnd@arndb.de, pasha.tatashin@soleen.com, rppt@kernel.org, 
+	pratyush@kernel.org, graf@amazon.com, akpm@linux-foundation.org, 
+	pbonzini@redhat.com, maz@kernel.org, oupton@kernel.org, seanjc@google.com, 
+	bhelgaas@google.com, alex@shazbot.org, jgg@nvidia.com, kevin.tian@intel.com, 
+	dwmw2@infradead.org, baolu.lu@linux.intel.com, joro@8bytes.org, 
+	will@kernel.org, robin.murphy@arm.com
+Cc: linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	kexec@lists.infradead.org, linux-mm@kvack.org, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-pci@vger.kernel.org, iommu@lists.linux.dev, 
+	Logan Odell <loganodell@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
+We're including maintainers from all subsystems that currently is or
+will be expected to participate in live update to ensure alignment on
+the path forward for compatibility.
 
+Currently, Live Update Orchestrator (LUO) and its file handlers rely on
+monolithic compatibility strings (such as "luo-v5" and "memfd-v1") to
+validate ABI compatibility across kexec live updates. Any modification
+to serialized structures requires bumping the version string, which
+strictly breaks compatibility between adjacent kernels even when changes
+are additive, backwards-compatible, or optional.
 
-On 2026/9/3 上午12:41, Sean Christopherson wrote:
-> Use the common minimum GPA for page tables (0x180000) on LoongArch instead
-> of LoongArch's custom minimum of 0x200000, so that LoongArch can use
-> vm_alloc_page_table() instead of open coding a rough equivalent.  There are
-> no known reasons why LoongArch can't use a lower, less-aligned minimum.
-> The more-aligned value was originally selected to support huge pages for
-> the guest, but that only requires the address of the final allocation to be
-> aligned, the addresses of page table pages is irrelevant on that front.
-> 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   tools/testing/selftests/kvm/lib/loongarch/processor.c | 3 +--
->   1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/lib/loongarch/processor.c b/tools/testing/selftests/kvm/lib/loongarch/processor.c
-> index 47bbde3e205a..057a77713542 100644
-> --- a/tools/testing/selftests/kvm/lib/loongarch/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/loongarch/processor.c
-> @@ -9,7 +9,6 @@
->   #include "processor.h"
->   #include "ucall_common.h"
->   
-> -#define LOONGARCH_PAGE_TABLE_PHYS_MIN		0x200000
->   #define LOONGARCH_GUEST_STACK_VADDR_MIN		0x200000
->   
->   static gpa_t invalid_pgtable[4];
-> @@ -57,7 +56,7 @@ void virt_arch_pgd_alloc(struct kvm_vm *vm)
->   	child = table = 0;
->   	for (i = 0; i < vm->mmu.pgtable_levels; i++) {
->   		invalid_pgtable[i] = child;
-> -		table = vm_phy_page_alloc(vm, LOONGARCH_PAGE_TABLE_PHYS_MIN,
-> +		table = vm_phy_page_alloc(vm, KVM_GUEST_PAGE_TABLE_MIN_PADDR,
->   				vm->memslots[MEM_REGION_PT]);
->   		TEST_ASSERT(table, "Fail to allocate page tale at level %d\n", i);
->   		virt_set_pgtable(vm, table, child);
-> 
-Reviewed-by: Bibo Mao <maobibo@loongson.cn>
+This RFC series transitions LUO and subsystem file handlers to use
+granular feature bitmasks instead of compatibility strings. We replace
+the compatibility string with a header structure that includes some
+reserved space to define the features that are included after the
+feature.
+
+We include 3 bits of data for each feature: supported, active, and
+required. When the supported bit is set in the next kernel, the previous
+kernel can serialize the feature and pass it to the next kernel. When
+the active bit is set, it means the previous occurred and the data for
+that feature is valid. When the required bit is set, it means that the
+next kernel must have the associated supported bit in order to be
+compatible.
+
+If a feature is required in that it cannot live update to a kernel that
+does not support the feature, it is expected that the feature not be
+active or required initially. This allows for an intermediate upgrade
+path.
+
+Overview of Changes:
+1. Define feature header and migrate luo_ser (Patch 1):
+  - Introudce the feature header with the supported, active, and
+    required bits.
+  - Replace the luo compatibility string with this new header.
+  - Validate the preserved size is at least the size of the header. This
+    breaks compatibility with the old way.
+
+2. Export feature header information to vmlinux (Patch 2):
+  - Adds a .liveupdate_features section in vmlinux containing
+  - Adds helper macros to export feature information for a given
+    subsystem
+  - Export luo's feature information
+
+3. Memfd Handler Migration (Patch 3):
+  - Migrate memfd to use the feature header instead of compatibility
+    strings
+
+Logan Odell (3):
+  luo: Move to feature flags instead of compatibility strings
+  luo: Export feature support to vmlinux section
+  luo: memfd: Move to feature flags instead of compatibility strings
+
+ include/asm-generic/vmlinux.lds.h |  12 ++++
+ include/linux/kho/abi/luo.h       | 114 +++++++++++++++++++++++++-----
+ include/linux/kho/abi/memfd.h     |  41 +++++++----
+ include/linux/liveupdate.h        |  22 ++++--
+ kernel/liveupdate/luo_core.c      |  60 ++++++++++++----
+ kernel/liveupdate/luo_file.c      |  28 ++++----
+ kernel/liveupdate/luo_flb.c       |   2 +-
+ lib/tests/liveupdate.c            |   2 +-
+ mm/memfd_luo.c                    |  40 ++++++++---
+ 9 files changed, 246 insertions(+), 75 deletions(-)
+
+-- 
+2.55.0.979.g7e5102b832-goog
 
