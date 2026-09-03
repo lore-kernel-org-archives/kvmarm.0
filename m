@@ -1,58 +1,120 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta1.migadu.com (out-251.mta1.migadu.com [95.215.58.251])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0F384EA378;
-	Thu,  3 Sep 2026 16:20:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 778644EA378
+	for <kvmarm@lists.linux.dev>; Thu,  3 Sep 2026 16:20:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.251
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788452453; cv=none; b=rF+CcqajJoUC4GwOUZoXKXSsiJ3Cxk61ZeXnskcqvsRO7npgvzwMIIG+wkaYiqS9O0iEAIcI5bKtO6EDIJt9MpQtT5dhq45LDlpLOzcO0HDfcPUgst2novkrZ7XaBRZqifADz5BRj5UJnC+Uq/yvPDBE+NjodVatWbgYBNr2K9k=
+	t=1788452459; cv=none; b=UhbNq8WN3p9xv+Seylj55zZJV6lugcU6AKoXZmUaerYSLCpZupbxYkC4/ybCxZ7GQuU9VyQIlLPVxIVglFPH+YkdMYtRrc7e/gm7VLX7R4wEvWI1WT5Q9YHiznKeqEAAAhOFpjsYViTIfbVTSE/WS/pchEcXc9mOJUGfKY0xyV4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788452453; c=relaxed/simple;
-	bh=9pwDyTc+1PYuW/7TMSpEGmRPiZyaYOCYIj2FzNf96S0=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=qmIL8fSibp3Ro7LlzTRDB9M8VUHqNc6p0IiuSABKX65cA+sYRf4aXJ5GAFlbZrnkuEkrUDvnGnTLd61rwosTsHuSeNcQpEx7odMuMhUpYAm/ViUnwSpk6pqzms/iUtheCqPIrZ3wNekRis/pFUbzbLT1UW0mCOAwwpRV7Kacy34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AppEbzRy; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788452459; c=relaxed/simple;
+	bh=AkJG1cubqnvO8sxUYeb9Y8S45m7KFZON1Zp+P7kN8ZI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=s3DHRzpbYj/RgFM3QH1dZ3mXs65WO1TFJjG6iJFBB949RXntUTi1AXr3v1PlzRVHawwgtEG9EtYwXqNBIyzrClr1a6jipAWjFjLy+jUqbzXhTUnIj0ik0SizFgDmUdyiqK9HAdCT8+XlQ3tb3eHGo3WF5chKVsQakp0k631soUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FDhaXeRU; arc=none smtp.client-ip=95.215.58.251
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AppEbzRy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8FF6D1F00A3D;
-	Thu,  3 Sep 2026 16:20:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788452451;
-	bh=9pwDyTc+1PYuW/7TMSpEGmRPiZyaYOCYIj2FzNf96S0=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=AppEbzRyTh297N0+Eq0LqhWtyexki+mJF3u/n3oPT8XRwwpHvRoRzI7ryA08/akLa
-	 I/JQ/eM+4Q+xFWM1GIzI5e68/wT2Es3lSud6oa0apsO9nfizSnwp3AwfomlqPBp5Mt
-	 5G0zlfKZns+Aq+s6NdLSLcmgOTcrlYsNwmSvlyk4C+IMgSH+aZwmqLMyww2YhHzvVI
-	 pIADQ4ReZ/mWRpNpCINOYpkSO23Y4GmCOVLzqmUytfNudhXDQ+5gmlC9c6kQFfqfxB
-	 TAj0rJRsBsn1ZA+LdP8k++a0Df/wN8V0BvllB05XGQhzUHg+xClrMMzZZ859hZTab9
-	 222oaV2aOAWng==
-From: sashiko-bot@kernel.org
-Subject: Re: [RFC PATCH v7 10/28] HACK! KVM: arm64: Disable SPE
- virtualization if nested virt is enabled
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Alexandru Elisei" <alexandru.elisei@arm.com>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>, linux-perf-users@vger.kernel.org
-In-Reply-To: <20260903160623.315525-11-alexandru.elisei@arm.com>
-References: <20260903160623.315525-1-alexandru.elisei@arm.com>
- <20260903160623.315525-11-alexandru.elisei@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 03 Sep 2026 16:20:51 +0000
-Message-Id: <20260903162051.8FF6D1F00A3D@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FDhaXeRU"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=AkJG1cubqnvO8sxUYeb9Y8S45m7KFZON1Zp+P7kN8ZI=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1788452455; v=1; x=1789057255;
+ b=FDhaXeRU50pKuP8NliSPlwEraupAgYC0+JJmeaGQxvHWYTEt2BCXvrLy5cqrP3gJgQad2kO/
+ /Vh7ur63AcockLbIOJUBee9H9di++RXR3drLekKj1gBSc5kQT8et5kp2b+b+ZhBf0MDSsGkXGay
+ 3ptPAzuCN7+G+HfClK0Z1+KA=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 6ded4fdd0c969b9a;
+	Thu, 03 Sep 2026 16:20:45 +0000
+X-Mizu-Trace-ID: 6ded4fdd0c969b9a
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b4a0b17359so7898e87.0
+        for <kvmarm@lists.linux.dev>; Thu, 03 Sep 2026 09:20:45 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBzFDegLxGiISsDR1IaHehOcGZDKYwfhuVO8krXxrcs5asTuUpVdhD+LeWO+NTyiK5tvCBIxPUo=@lists.linux.dev
+X-Gm-Message-State: AFuF++ntz9VSaLC2iSq0l3nijnfF+XAz9y5CmYuQVx602nf81qmaCtMS
+	4RKIaQ04ntZYiOrNLYJdgwutJLbPbFo7KVH3rN6qFEcbyGtRDDcHj784S4PUptq6CmUhG2AXh91
+	AzKOBl1w7MJpi7vt0dOHlZ9Np9OAg/4nUiXQIJtOb
+X-Received: by 2002:a05:6512:3b8e:b0:5b1:4fd9:ac with SMTP id
+ 2adb3069b0e04-5b60f98abf0mr143016e87.3.1788452444151; Thu, 03 Sep 2026
+ 09:20:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+References: <20260831163421.272420-1-fuad.tabba@linux.dev> <20260831163421.272420-3-fuad.tabba@linux.dev>
+ <apgjJVg0PmS3OudU@google.com>
+In-Reply-To: <apgjJVg0PmS3OudU@google.com>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Thu, 3 Sep 2026 17:20:07 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTzkUqmso49_XV2pPLBDbgqOe5Xnk=2+mWuX55NB2Nospw@mail.gmail.com>
+X-Gm-Features: AcwNN1UhKtG9WhVNbYyetZAICUndgBZHs9WEb955L7xRcf_KFNgwRj6BJQ8GY38
+Message-ID: <CA+EHjTzkUqmso49_XV2pPLBDbgqOe5Xnk=2+mWuX55NB2Nospw@mail.gmail.com>
+Subject: Re: [PATCH 02/17] KVM: arm64: Advertise the capabilities that
+ protected VMs support
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Quentin Perret <qperret@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-> For RFC only.
->=20
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+On Wed, 2 Sept 2026 at 14:22, Vincent Donnefort <vdonnefort@google.com> wrote:
+>
+> On Mon, Aug 31, 2026 at 05:34:06PM +0100, Fuad Tabba wrote:
+> > kvm_pkvm_ext_allowed() denies every capability it does not name, so a
+> > protected VM reports 0 for interfaces it implements: KVM_CHECK_EXTENSION
+> > denies KVM_CAP_ONE_REG while KVM_{GET,SET}_ONE_REG stage the guest's
+> > boot state.
+> >
+> > Allow the capabilities that work for a protected guest, the vGIC and
+> > the I/O bus being host-managed, subject to the restrictions the rest of
+> > this series adds.
+> >
+> > Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+> > ---
+> >  arch/arm64/include/asm/kvm_pkvm.h | 9 +++++++++
+> >  1 file changed, 9 insertions(+)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
+> > index beea00e693a0a..c4c834d55e503 100644
+> > --- a/arch/arm64/include/asm/kvm_pkvm.h
+> > +++ b/arch/arm64/include/asm/kvm_pkvm.h
+> > @@ -42,6 +42,15 @@ static inline bool kvm_pkvm_ext_allowed(struct kvm *kvm, long ext)
+> >       case KVM_CAP_ARM_VM_IPA_SIZE:
+> >       case KVM_CAP_ARM_PTRAUTH_ADDRESS:
+> >       case KVM_CAP_ARM_PTRAUTH_GENERIC:
+> > +     case KVM_CAP_ONE_REG:
+>
+> Shouldn't we bring the VCPU_PKVM_FINALIZED restriction in kvm_arch_vcpu_ioctl()
+> first before we allow SET_ONE_REG/GET_ONE_REG?
 
-Sashiko has reviewed this patch and found no issues. It looks great!
+KVM_{GET,SET}_ONE_REG don't go through kvm_pkvm_ext_allowed(), so
+they're as reachable before this patch as after it.
 
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260903160623.3155=
-25-1-alexandru.elisei@arm.com?part=3D10
+The ordering is wrong though, and there are a few more capabilities
+advertised here and restricted later. I'll fix it for all of them in
+v2.
 
+Thanks,
+/fuad
+
+>
+> > +     case KVM_CAP_MP_STATE:
+> > +     case KVM_CAP_VCPU_EVENTS:
+> > +     case KVM_CAP_VCPU_ATTRIBUTES:
+> > +     case KVM_CAP_IMMEDIATE_EXIT:
+> > +     case KVM_CAP_IOEVENTFD:
+> > +     case KVM_CAP_IRQFD_RESAMPLE:
+> > +     case KVM_CAP_ARM_IRQ_LINE_LAYOUT_2:
+> > +     case KVM_CAP_ARM_INJECT_SERROR_ESR:
+> >               return true;
+> >       case KVM_CAP_ARM_MTE:
+> >               return false;
+> > --
+> > 2.39.5
+> >
