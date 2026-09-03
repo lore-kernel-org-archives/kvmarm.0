@@ -1,110 +1,94 @@
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com [209.85.214.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99A774A6CF6
-	for <kvmarm@lists.linux.dev>; Thu,  3 Sep 2026 20:58:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACA324CCDC7;
+	Thu,  3 Sep 2026 23:16:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788469109; cv=none; b=YMrR+RlaUpA5YTNZz22DW1H2kSxiI0rfYRVPPkTRAmb9ltVjVYUQGEP7gnUf8CVG9QrIY1UEhC/tinDbdZROkX2DpK5140cymUYzZe3hNy55UY1hZAIfU5fqds9B7C2vBNy0i5rYaK6ezLwPLiEvtRp65LiUVLebgiC5El2/TBc=
+	t=1788477385; cv=none; b=O7Qc3wnmihvLgXAy6kz+1bqjC7Qn0+cpX2Z4M5k18Pq79ekomLZNwxlvvRFYtVTJgj80tKFN2wXJOw9OquRJzq6tagt8Tsi3XWQdVNGoBHTBAtuoNPUIRpZRTy1fCPdYHYGstAbXwN+8oPOYzn5CXzuitcO0YmdwELM72NZKmS8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788469109; c=relaxed/simple;
-	bh=L632ql4Sd/RozUuu0s8fdwZF7MOouQPT9rB6yRaOm7Q=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=EkPRM7iqBpSHQUtOkPVhRvoc3QOIHHhXLkcvanCK4pSJOq44o+SWYCxT4QmB6sFL7nZ9aFM1uWpL+Od6j29wuRR+2YGj4cOWzqSn70Etc/mPe3GjCNWHxcjE7qvIcBYu1ifOmTxkIDQvQw+1W80ULkk66c9ReJsS3dNU6OcyG4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gRqco5+C; arc=none smtp.client-ip=209.85.214.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1788477385; c=relaxed/simple;
+	bh=Kqp3K7FfT78LyAqnNA+N+3rE5LyP7h9v+UWaBdZW9L8=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=WYqR/W7qOxejtak5sx21S7xIcnI5RVvcanazjA5ix5NXfkcMXPBy1PQBT28I/0E267/q4ordla9lt1TDbQox7vqiI23kw5msWBWDrSXDayczAcRIEOVm9JZK9uwqdK9FV5N/nyvF35xK89Bi3LNmDs84agv2ERUgoccdBsj+ySg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZimDhuxI; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gRqco5+C"
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-2d6f80c76e6so4663125ad.3
-        for <kvmarm@lists.linux.dev>; Thu, 03 Sep 2026 13:58:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1788469098; x=1789073898; darn=lists.linux.dev;
-        h=content-transfer-encoding:content-type:cc:to:from:subject
-         :message-id:references:mime-version:in-reply-to:date:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=L632ql4Sd/RozUuu0s8fdwZF7MOouQPT9rB6yRaOm7Q=;
-        b=gRqco5+CmygNdzZD6oiAOr+CUY72T89wlZ/LvdeFFthNWhHdvZ8YnwggzyYj72hk5i
-         gGIN+LuXVNOkS48x/lmm6C+HIq8KtFZvTtkWO2x4KKyfGp87Wdd2t3m45TmyO5joIbCm
-         idP6sMObydxjYxYiWbPaI1kNVXEA+68esrRK9BZXbC80VkZGYLILaKdx3U9/PDAkmyp/
-         iT2j3Ydl2qli+72/KtAJGxm2XZE1QPzEWiF0RVOreNj6KJiGAYzaXY8IbU8ZQi5yeWY/
-         vEebfwOh/Hik1snw+vH+GjGk0qD/5C4siPrd9951OOqN0/2uvlePqQKdopo5fPmfiRg9
-         esgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788469098; x=1789073898;
-        h=content-transfer-encoding:content-type:cc:to:from:subject
-         :message-id:references:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=L632ql4Sd/RozUuu0s8fdwZF7MOouQPT9rB6yRaOm7Q=;
-        b=KQMNWzByu4yZL+UX2PyTYYLtdFIiqtn3NeTmcrDX3eXK770rKaANQ0P++w9kOdXs7y
-         E0WH8yFRmuFzcdZyLGDvU0HkvkDWtrTlNAyoISxN9e3uSc8Ogsl6EN2fw0QE9llwYMfg
-         0nnJaRpdVv9U3X2SD0xD+QFKRmZpSTWlXyQHE7sbejQVOQLUFdfqOeoFsih1P6pNdQj1
-         zBuojuKvAQGb9CUcCTcBQBw207xcFJOgAKZzzJpiuQXv8pHfBL/WcZeLymNxGPECYKsZ
-         IP7bWTV92TiZria/cxULL3Xr/wtjnk4+qyaNKbXrkW1oRdA3rVl02b5F5yJi039p8/av
-         iVjg==
-X-Forwarded-Encrypted: i=1; AKwUvBwJjG3aGxIt3heBl2Zlv6gVs6vGdqMjkaFVcu/jpehJU7nUALyx9JEJHMQUf02FU19TQ2Lq+vI=@lists.linux.dev
-X-Gm-Message-State: AFuF++mhU0DChWstZFz9mSf/3hK6O6kH06rz9yG2rVPukFsTclEXqLYj
-	IhuPjO31V/YXN5GP5hRr2a3Gqz3TXZp/+shMhT8RH9TGbhgCMoMPMLykA1XEpq1is9f20IGCoiN
-	MQ7WRZQ==
-X-Received: from plxj7.prod.google.com ([2002:a17:902:da87:b0:2d9:1c43:7134])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:120d:b0:2d8:d4cc:be65
- with SMTP id d9443c01a7336-2db12873c1fmr17910145ad.18.1788469097697; Thu, 03
- Sep 2026 13:58:17 -0700 (PDT)
-Date: Thu, 3 Sep 2026 13:58:17 -0700
-In-Reply-To: <CABgObfZL-qNSaNkNZDj0Kk41zw6UZ30vkSxc6T8wb-pOKab9Wg@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZimDhuxI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A53611F000E9;
+	Thu,  3 Sep 2026 23:16:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788477384;
+	bh=YzkNSVmu73Wg+xMwKSV7/J3QFwDq8+WVAzCbtfpU41A=;
+	h=From:Subject:Date:To:Cc;
+	b=ZimDhuxIWEmdWVNEsbR7+NVKKoiKvhETMmtTv//OPz/xTShu3AvNPTAq5t18ukNOq
+	 jywIOAY/HgZai7tut5ht08FvumtFWKJWCkZkSQphgkaHe72jlgQTPmwo5wzE36yENH
+	 ThMoix0IQ2oJoZUx2tcEpq34eSoId0WtRx9vHTTnDBNOjABzxfhSgv+GMS8OGguG4x
+	 n0c5K4Oz+wxoMzqj9SWgvUdYnnI6VZ/av9X3wV30VgHy60ukiacCVxM7ejXERdvgjJ
+	 nBpV2miOyBEndKdtYq9rCY3kTfxRkhgIvulcu2fSZSj90MlVOcChII7okwIJVjLDDy
+	 pyasgMg8rEDtQ==
+From: Mark Brown <broonie@kernel.org>
+Subject: [PATCH 0/2] KVM: arm64: Enable S1PIE for nVHE and hVHE
+Date: Fri, 04 Sep 2026 00:14:40 +0100
+Message-Id: <20260904-kvm-arm64-nvhe-pie-v1-0-29d59f245e6c@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <apdweRfqt4dTxcU9@google.com> <20260902075028.231001-D-seiden@linux.ibm.com>
- <aphLXQL1H2zYZgTi@google.com> <20260903114241.33034-C-seiden@linux.ibm.com>
- <apmEi1NmOUvmUBFP@google.com> <apmFClPZ2WcDINmT@google.com>
- <apmIGgMEN8w-kQAm@google.com> <19d4feb1-d703-4c62-8622-a6d5e9d6394c@redhat.com>
- <apmYPMMPCNzK9ZEA@google.com> <CABgObfZL-qNSaNkNZDj0Kk41zw6UZ30vkSxc6T8wb-pOKab9Wg@mail.gmail.com>
-Message-ID: <apnfaeWZoZTIsoZS@google.com>
-Subject: Re: [PATCH v7 02/23] KVM: Make device name configurable
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Steffen Eiden <seiden@linux.ibm.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	linux-s390@vger.kernel.org, Alexander Gordeev <agordeev@linux.ibm.com>, 
-	Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, David Hildenbrand <david@kernel.org>, 
-	Friedrich Welter <fritz@linux.ibm.com>, Fuad Tabba <tabba@google.com>, 
-	Gautam Gala <ggala@linux.ibm.com>, Hariharan Mari <hari55@linux.ibm.com>, 
-	Heiko Carstens <hca@linux.ibm.com>, Hendrik Brueckner <brueckner@linux.ibm.com>, 
-	Ilya Leoshkevich <iii@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Joey Gouly <joey.gouly@arm.com>, Marc Zyngier <maz@kernel.org>, Nico Boehr <nrb@linux.ibm.com>, 
-	Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>, Oliver Upton <oupton@kernel.org>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Sven Schnelle <svens@linux.ibm.com>, 
-	Ulrich Weigand <Ulrich.Weigand@de.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
-	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAGD/mWoC/yXMQQ6CMBBG4auQWTMJNKRWrmJYtPVHRkIlLTQmh
+ Ltbdfkt3jsoIQoS9dVBEVmSvEJBW1fkJxseYLkXk2qUbowyPOeFbVx0xyFP4FXA3hntu/YyXmG
+ phGvEKO/f9Db8nXb3hN++JzrPDwerKCJ2AAAA
+X-Change-ID: 20260828-kvm-arm64-nvhe-pie-cb86c417f9ea
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+ Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
+ Steffen Eiden <seiden@linux.ibm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Zenghui Yu <yuzenghui@huawei.com>, 
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+ Mark Rutland <mark.rutland@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+ linux-kernel@vger.kernel.org, Mark Brown <broonie@kernel.org>
+X-Mailer: b4 0.17-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1213; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=Kqp3K7FfT78LyAqnNA+N+3rE5LyP7h9v+UWaBdZW9L8=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBqmf/BrIDaGAlklwATNnNXtoreOYeo86LT6Bzc6
+ 9DZsNdIAa+JATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCapn/wQAKCRAk1otyXVSH
+ 0K0SB/9H9SLSIF1wblTncMr48qmLLBv+ArWZx2kw3fXOEb4aC0/wV0Tuk5CUFiyxEODntvt6Utg
+ zRKs0/1B7+C0AWhjMpfIVH8+79e1Djv0/zI/oL282624SXOAVICCqzZxf2qT428ExxqFqDprSmy
+ gSRwm5U6BQx/JPu4rH1C3cXgRQ7Ei4rcA56OYrDVrzLjLLj5FEjXu9OBGmcvryWF36z61WeCfHb
+ RGilypEQGg8MUDE5+hK/WLnU0WBwUuo/eb9mCIRgogjDQanPAT0llxmBKltbphyj9DCvuShGo5g
+ Qi1Cnq0SRkQAnSxZuwieb8rz0aFKrWI7mqQHNfCjS/GeM4th
+X-Developer-Key: i=broonie@kernel.org; a=openpgp;
+ fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-On Thu, Sep 03, 2026, Paolo Bonzini wrote:
-> On Thu, Sep 3, 2026 at 5:54=E2=80=AFPM Sean Christopherson <seanjc@google=
-.com> wrote:
-> > > I don't want KVM to be the. one that does things differently *once mo=
-re*.
-> >
-> > Too late :-D
-> >
-> > arch/arm64/kvm/hyp/nvhe/Makefile:ccflags-y :=3D -D__KVM_NVHE_HYPERVISOR=
-__ -D__DISABLE_EXPORTS -D__DISABLE_TRACE_MMIO__
-> > arch/arm64/kvm/hyp/vhe/Makefile:ccflags-y :=3D -D__KVM_VHE_HYPERVISOR__
->=20
-> Sure, VHE/nVHE is fair game because the nVHE case is in the same boat
-> as vDSO, arch/*/boot, and so on.
->=20
-> Looking at a grep for (cflags|CFLAGS).*\-D most are -DDEBUG,
-> -DDISABLE_BRANCH_PROFILING, -DDEFAULT_SYMBOL_NAMESPACE, etc. and in
-> most cases they seem like a bad idea. Don't do it for KVM please;
-> requiring -D for all architectures and for random pieces of config,
-> when you can put it in asm/kvm_host.h, is just as bad if not worse.
+When Stage 1 Permission Indirection (FEAT_S1PIE) support was merged KVM
+was updated to enable it in the VHE hypervisor but we do not currently
+use it in the nVHE hypervisor.  Update the nVHE hypervisor to use it as
+well, as with the initial merge of the S1PIE this should have no
+immediate practical impact but it makes the nVHE and VHE hypervisors
+more consistent and will be required for use of features like D128 and
+GCS which depend on permission indirection.
 
-Boo, it's never fun when a parent shows up and takes away your toys :-D
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
+Mark Brown (2):
+      KVM: arm64: Initialise TCR2_EL2 for nVHE mode
+      KVM: arm64: Enable S1PIE for nVHE and hVHE
+
+ arch/arm64/include/asm/kvm_asm.h     |  2 ++
+ arch/arm64/include/asm/kvm_pgtable.h | 26 ++++++++++++++++++++++++++
+ arch/arm64/kernel/asm-offsets.c      |  2 ++
+ arch/arm64/kvm/arm.c                 | 13 ++++++++++++-
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S   | 24 ++++++++++++++++++++++--
+ arch/arm64/kvm/hyp/pgtable.c         |  7 +++++++
+ 6 files changed, 71 insertions(+), 3 deletions(-)
+---
+base-commit: cee9395acd8043be0644b25c34bfa86623f2b935
+change-id: 20260828-kvm-arm64-nvhe-pie-cb86c417f9ea
+
+Best regards,
+--  
+Mark Brown <broonie@kernel.org>
+
