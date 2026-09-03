@@ -1,130 +1,56 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD09847F2D3;
-	Thu,  3 Sep 2026 16:10:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 929AC4EBAD0;
+	Thu,  3 Sep 2026 16:11:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788451848; cv=none; b=i7oN51fUnbdf4s7S8QqpWVQgUwcHD25pnJgy249uR/YVLhVBLLczrjONNG4HQtB+dYVIT76zI9H0Hahl2VAY+1EUwuuVd5+KsG2WN6fydR/YBRbPebNVxO++TWQccqCpWMmu7hNdKnnrvBPcqhSl+zCCf8DcZVAOSyB5AYfVWyU=
+	t=1788451904; cv=none; b=o17uyM5NcKfKhDIByqc+4dHORKJqAsXcGh6N0z6LAswfnAQlaZpZJ1KLKUje1+Y7J7A7NkWBu3/8QUcQTKSpL9RScrYjasxWdDo9q+qPoEeLLcfcmluKXAuTeuUMZveSQDKzyrPrzmoyXxUr5DkaTHHSy/2Qfo/CvVNU3mQp1cc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788451848; c=relaxed/simple;
-	bh=spJZ+iAfaUboSrfrYfHD1ZugMzuusDISfb/fmWfy7i4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rjIcK4LYmNlN4K6I3+mtzAQHcMO7xBFByyonNA6dv5qUgH642rjja3OsNj/SGkMI9O7RsIAQZHGp4yl3v6+2myKpP13JxLdXwzhfP546kbcQTTFyGp4fPBfmphFpynjK/3kzam1eDBsV1dR6Ye1ZPDZ5HffAFABZRpZgAWMzJAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=La7gvet+; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788451904; c=relaxed/simple;
+	bh=JPBzb+Eu+5h7idQxnV8cugdXmoUMgDNZ2DvvVYZ4FjA=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=TeaQSw0keKQtunztqbhkz4LwPpIu8MGJRhDezookMVRCfem86FO0Y/RiJH2w9exvQ2/Z3GAQo7Rv2Sy00P3SedZhXRukKKMBViGTLaZmUR4/o7/N/gYk8kAaOXC/nYwrhkitWIMjF9dcD4BCQPmGzzjQsiCjGR1HVucpn0onhtY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hMZX7nEq; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="La7gvet+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3F6E1F000E9;
-	Thu,  3 Sep 2026 16:10:42 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hMZX7nEq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41F351F000E9;
+	Thu,  3 Sep 2026 16:11:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788451847;
-	bh=pBXLV/aReRggToYPyghrVtwl5A0a39umqxSD8Pkwnbo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=La7gvet+3cgiB6ZHetPHOHJ/G5wn1zMPvJrFbrd1xKIBS1PvlfH2NKKWCxPKJKLTu
-	 naHfridSE8ebRQpg3ZSoCaKPKQ+An6rV489cLxgBFuFKQuDclp1WSuGsx9ksS0gNzX
-	 7LYGI++Oc5fp/g/htz2fhSsR/mWNMjIKCaC8lJAIJemJZ8ueF1IN4VxSCvtGZmk9XP
-	 W2wykO/AkuGaCivJ0M6NpGiF3GgMDoLSZKtM8bFiXa5Tq5+PPAf8d8/pyRQ5nJfzmW
-	 duFUjAY4dZm6V5YX+0kRFo72uUE6alj2NFxBMns5RskQBas+udohXUSmCpJ6PlxLTO
-	 O3wsJZ1TK7saw==
-Date: Thu, 3 Sep 2026 17:10:39 +0100
-From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Shuah Khan <shuah@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Fuad Tabba <fuad.tabba@linux.dev>, Peter Maydell <peter.maydell@linaro.org>, 
-	Leonardo Bras <leo.bras@arm.com>, Wei-Lin Chang <weilin.chang@arm.com>, 
-	Yao Yuan <yaoyuan@linux.alibaba.com>, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
-	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v20 01/14] arm64/gcs: Ensure FGTs for EL1 GCS
- instructions are disabled
-Message-ID: <apmXlJ3ScZ3-qlKV@gremlin>
-References: <20260901-arm64-gcs-v20-0-f31750bdfadb@kernel.org>
- <20260901-arm64-gcs-v20-1-f31750bdfadb@kernel.org>
+	s=k20260515; t=1788451903;
+	bh=JPBzb+Eu+5h7idQxnV8cugdXmoUMgDNZ2DvvVYZ4FjA=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=hMZX7nEqu0b6r576k/U1bUXtTfBnmYRh9PCSY6DVHIrQebI0RK0p/cKBDx/m8M3h2
+	 SlODRBbccVSyuDhQU/ipu5vMvBcdFVEnrUvKq23K8fjUE+KOt1MTgo3eJM9PI5QR4I
+	 oa1+PkuhDUo8rl3i+ZROn2bKIez4UyEiBtMh95Vq5H/NyiieP1JqhZ/R1NvoZEU9jR
+	 bSVcHsukW57uAejMa/iAn1+MgQi2N1gJvgShJaXWNUTrVNpCG5QddwXxc0C52Z7AhQ
+	 93poxPO6B8Zq9hdrxuPsGp6DhjYWkilsCtCp4Ahvzl8E7j/7xUDmPJLTR0Db13QI6f
+	 KLW5t8HRX57uw==
+From: sashiko-bot@kernel.org
+Subject: Re: [RFC PATCH v7 05/28] perf: arm_spe_pmu: Add PMBIDR_EL1 and
+ PMSIDR_EL1 to struct arm_spe_pmu
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Alexandru Elisei" <alexandru.elisei@arm.com>
+Cc: linux-perf-users@vger.kernel.org, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, "Oliver
+ Upton" <oupton@kernel.org>
+In-Reply-To: <20260903160623.315525-6-alexandru.elisei@arm.com>
+References: <20260903160623.315525-1-alexandru.elisei@arm.com>
+ <20260903160623.315525-6-alexandru.elisei@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 03 Sep 2026 16:11:42 +0000
+Message-Id: <20260903161143.41F351F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260901-arm64-gcs-v20-1-f31750bdfadb@kernel.org>
 
-On Tue, Sep 01, 2026 at 10:46:59PM +0100, Mark Brown wrote:
-> The initial EL2 setup for GCS did not include disabling of EL1 usage of
-> GCS instructions, also disable these traps.
->
-> Fixes: ff5181d8a2a8 ("arm64/gcs: Provide basic EL2 setup to allow GCS usage at EL0 and EL1")
-> Reviewed-by: Leonardo Bras <leo.bras@arm.com>
-> Signed-off-by: Mark Brown <broonie@kernel.org>
-> ---
->  arch/arm64/include/asm/el2_setup.h | 5 +++++
->  1 file changed, 5 insertions(+)
->
-> diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
-> index aa8ec9df8024..d308c6e6757d 100644
-> --- a/arch/arm64/include/asm/el2_setup.h
-> +++ b/arch/arm64/include/asm/el2_setup.h
-> @@ -393,6 +393,11 @@
->  	orr	x0, x0, #HFGRTR_EL2_nGCS_EL1_MASK
->  	orr	x0, x0, #HFGRTR_EL2_nGCS_EL0_MASK
->
-> +	/* Disable traps of GCS instructions at EL1 */
-> +	orr	x2, x2, #HFGITR_EL2_nGCSEPP_MASK
-> +	orr	x2, x2, #HFGITR_EL2_nGCSSTR_EL1_MASK
-> +	orr	x2, x2, #HFGITR_EL2_nGCSPUSHM_EL1_MASK
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
-(Forgive me being verbose here I'm thinking my way through things :)
+Sashiko has reviewed this patch and found no issues. It looks great!
 
-So this is effectively:
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260903160623.3155=
+25-1-alexandru.elisei@arm.com?part=3D5
 
-Set bits from these masks:
-
-	HFGITR_EL2_nGCSEPP_MASK |
-	HFGITR_EL2_nGCSSTR_EL1_MASK |
-	HFGITR_EL2_nGCSPUSHM_EL1_MASK
-
-Then (later instruction):
-
-msr_s	SYS_HFGITR_EL2, x2
-
-I.e. set the hypervisor fine-grained instruction register ([0]).
-
-And I can see from that document that for each bit:
-
-0b1
-Execution of the specified instructions is not trapped by this mechanism.
-
-So this correctly disables these instructions:
-
-GCSPUSHX
-GCSPOPCX
-GCSSTR
-GCSSTTR when PSTATE.UAO is 1
-GCSSTTR when the Effective value of HCR_EL2.{NV, NV1} is {1, 1}
-GCSPUSHM
-
-And these are the only listed GCS sets of instructions there.
-
-On that basis LGTM :)
-
-So:
-
-Reviewed-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
-
-[0]: https://support.arm.com/documentation/111107/2026-06/AArch64-Registers/HFGITR-EL2--Hypervisor-Fine-Grained-Instruction-Trap-Register
-
-
-> +
->  .Lskip_gce_fgt_\@:
->
->  .Lset_fgt_\@:
->
-> --
-> 2.47.3
->
->
-
---
-Cheers, Lorenzo
