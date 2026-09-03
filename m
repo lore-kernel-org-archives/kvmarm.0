@@ -1,59 +1,68 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83BDD4DD6DB;
-	Thu,  3 Sep 2026 16:12:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED8244AE138;
+	Thu,  3 Sep 2026 16:13:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788451946; cv=none; b=U9NPKS/BfFmkVsten2IgN7XwP3Dm4YQB3rz6CdE0nMBiMCBFQoHQlzwlsuSrg33nme/Nl0//9VR9bT0Cujri1Q0dqI+IvGkoK/lzF2TS2+JltYAq+G1W7A2UzIPn4ljf1VpSMpOgIqvEZpv1u7nTm7uFDtQRn1rAQQRYaNQc4E0=
+	t=1788452003; cv=none; b=bDn+d7m6h3d3dCY8xoEZwuNldCm3SS1NzDGI1nOdN53ywdtFPir7LSmbp+/vIXR2+7qKkxmDz3JEV3Sh/5X1zyDdo/RXnSsvCX+lLIJAcOx9BEr8GkY/YQjj/39KNz3StqvgixQrrY2m0HJYWu5k4JLpt0cXJc9eOTENuu7UdmA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788451946; c=relaxed/simple;
-	bh=Hr/hmL6NYthsMH/QZdUXZp9Eq3eoYz0WlgRPn5aYQP4=;
+	s=arc-20240116; t=1788452003; c=relaxed/simple;
+	bh=pQTgZM+NU01OQAleiM0P0/sB97WjcvHUraEuVgvlbeo=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=eZUyoQ2R/JpTzIWcOB9GHO2x+KaTWBXV79kbEzcEZ923MIPLmMEMg3CXc3iaMjFPexPnjMxnBaa/e5zV/Bf3/DNdGRZrnh8CrfoiY6Hi7fyaN9/iqirkRQ1FVU7ytUOgCdg/QBtPQmpJDFaY7tD2nvxBEWb0u4KbagI5Z4RCCzY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a/NOV7tZ; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=OczwxZtVJzymrBK9rKXFBW9yS8GgoLU4SeowHfoS2qCG/84R1IagmJsfDXmFiH/lCBOzJVvKNBDuP0KqTHFl+zypASxboUeeFyiesObDRtkkWqfn3UHATUdTh9fBOgr+OVJtCsxOjRM3IeH7UkXlFQ6ouBAPlcknzjiO6FVC0P8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X8jmUwOt; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a/NOV7tZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BB081F000E9;
-	Thu,  3 Sep 2026 16:12:25 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X8jmUwOt"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04D581F000E9;
+	Thu,  3 Sep 2026 16:13:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788451945;
-	bh=Hr/hmL6NYthsMH/QZdUXZp9Eq3eoYz0WlgRPn5aYQP4=;
+	s=k20260515; t=1788452001;
+	bh=kgU9rfti9Zn0z1Telc05Z2a4p3nvsgX6ZHUGIMmebEk=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=a/NOV7tZ17AdHK0gFT9jLF9hKXDMTyzpn/svgOi8vxwD/u/Vmh5P8dJVTxJUu0m4q
-	 Z4QAY47zIyAUf0dwu7WqC59Se6ga/BFdUKvykWsL2dp1ca+AugLLj9G0TEj/ihxWWi
-	 cIyzH42O7mQl5CuqDjaSQvjU3ORHXn34Sqn61dtd0ozxFShnfxxfAKEqvo/tW3JVkv
-	 Lp9n6702mRMMUfSrlMq3oUJl8aiYQcJjfEO8siX7Ex3sjgkVJOAagUsd52pZSf6exR
-	 KZUvqx81oI1QyJf8nnaaGyP13V24tqLtk1Qo3s0UgFGupT9iPNtq6Xr/lc4bV0CvmE
-	 HAXI9oQTJnEOQ==
+	b=X8jmUwOtOcLbYXQN+7rvxemPfQsZD3Rg/haUv8175YLlg6o3Psdy2/fzeT21HZWfw
+	 iQN2EndVkNsvNMRCnuBScEUqnpD14O7GhUntw0Xg0BKBaRYmm/9+GtUHYOKNVnSbW4
+	 wtMme8+psHTvyymDZNKQawl3K6yvz1veIxtQ2xS/KeuOzx3H4CBQ1Mm9qS0gfbpEoE
+	 acgTXVlTVpNeZS78Rp3SiOJsNoarbmBTeAynr5G2moEyOGItvu/jzYGYbbY7I/fiJA
+	 Olv2VhLlh+g+RaVtdxepT2qAhgkaWMvDcdbkJD+FWjF99MMaUAdjFUmEVTZbAlof30
+	 0/yYoNmT9CAmg==
 From: sashiko-bot@kernel.org
-Subject: Re: [RFC PATCH v7 02/28] arm64/sysreg: Define MDCR_EL2.E2PB values
+Subject: Re: [RFC PATCH v7 03/28] KVM: arm64: Add CONFIG_KVM_ARM_SPE Kconfig
+ option
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Alexandru Elisei" <alexandru.elisei@arm.com>
-Cc: "Marc Zyngier" <maz@kernel.org>, linux-perf-users@vger.kernel.org, "Oliver
- Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev
-In-Reply-To: <20260903160623.315525-3-alexandru.elisei@arm.com>
+Cc: "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, "Marc
+ Zyngier" <maz@kernel.org>, linux-perf-users@vger.kernel.org
+In-Reply-To: <20260903160623.315525-4-alexandru.elisei@arm.com>
 References: <20260903160623.315525-1-alexandru.elisei@arm.com>
- <20260903160623.315525-3-alexandru.elisei@arm.com>
+ <20260903160623.315525-4-alexandru.elisei@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 03 Sep 2026 16:12:24 +0000
-Message-Id: <20260903161225.1BB081F000E9@smtp.kernel.org>
+Date: Thu, 03 Sep 2026 16:13:20 +0000
+Message-Id: <20260903161321.04D581F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-> KVM will make use of the different values for MDCR_EL2.E2PB, document the=
-m.
+> Add a new configuration option that will be used for KVM SPE emulation.
+> CONFIG_KVM_ARM_SPE depends on the SPE driver being loaded because:
 >=20
-> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> 1. The SPE driver maintains a cpumask of physical CPUs that support SPE,
+>    and that will be used by KVM to emulate SPE on heterogeneous systems.
+>=20
+> 2. KVM will rely on the SPE driver enabling the SPE interrupt at the GIC
+>    level.
+>=20
+> The option will become user selectable after SPE support in KVM is
+> implemented.
+>=20
 > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
 Sashiko has reviewed this patch and found no issues. It looks great!
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260903160623.3155=
-25-1-alexandru.elisei@arm.com?part=3D2
+25-1-alexandru.elisei@arm.com?part=3D3
 
