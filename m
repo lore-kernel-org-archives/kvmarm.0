@@ -1,200 +1,228 @@
-Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013035.outbound.protection.outlook.com [40.107.162.35])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com [209.85.210.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 490F74B66F0;
-	Thu,  3 Sep 2026 14:34:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.35
-ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788446099; cv=fail; b=XBShTZ4deGHUYcKRPtxzgR/Z0Lg7RyZlmAktnSCUeNhP8JUg5HMlrOTZxYm5XsIbrzy6k3WTrirx3zwoJgptwlL9Zjj8idXgRQClyIgDPCeaEb9Z2Qp3S4z0/FoBqR3EkwQa2XmvoK0+xtojWB4gvE9p/CodvGavffpV8FMXsCw=
-ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788446099; c=relaxed/simple;
-	bh=0DS+K/M/PHzk4sBydblanGK2cHyAYoxU84CKlLlR/0Y=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=PzH+LsT21N8E9w8A29XuL9GnrrR9UoWoJdZWfwAt2qQo5EcPYg2KygoIvsOer0ZBKKFf9sSaAwP5gfp733BBP5iHQvCmH2ewedQzLEnQ3tvvk1sa/fKpH/94oMaCtG0ZpDXvkmk9m9a9hB8ZWMkkAptf5CH8NtOoB+h3VlnlHEk=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=DcVt1BDW; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=DcVt1BDW; arc=fail smtp.client-ip=40.107.162.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B31774BB5BA
+	for <kvmarm@lists.linux.dev>; Thu,  3 Sep 2026 14:44:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.200
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788446651; cv=none; b=lryEL3M9HauhFpUUxIXATX7T0nxPb20lbHrhJJHBzN7lSVtze2NdiGsPj9HJH3e9zAGceMSK2U/LtoUJRuBSwO+uvBMwpni25DVonobvHypw+4I/FNIZoDYMAOaHLxQLDxCmHJTKVmKHD7SX9nKgBFJ0qxOlB2MUVOzevvy2OMo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788446651; c=relaxed/simple;
+	bh=ELuqRbWl/d7dwnAoN/rZEEIZG2/ycBkDZSXJhJLTFps=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=hSAwpPUvoWpliT4RpS1yP/c95dVwibZkOnk7rhJbSeF9imJnR7PqUuJEVY2u3kgL8qoItQYYqdLRMWFVeB8kVNBSmgFZANKoBNGP7IxqolZruF80bJifGoEUali4MH9L4dRUBER0Ta+O96Yointgi0E/NmDykv+cV0pOIJNRLfM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=b8D3b7jO; arc=none smtp.client-ip=209.85.210.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="DcVt1BDW";
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="DcVt1BDW"
-ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
- b=eYE6DFyjba9mSxNzmHhpSHIGtxTIn7EBhHH7D+CH1JKHhinxAtbznFBe4aouQjv6itleM4DE/0gkJctr7Xj7g6ux4iRUDtdLacAhPX41mD4oxo6oAtvNYIz1ltd2NNt3QGcgGaGQUqxi45qrPbfXVrnqSe62bZjNTo8aNxdjszbIlSRToHS/kBt/vK0Jsdj9CioCbnFxcZPUl2WCX1W5Fcmwbq8+0OoSdBYMdcs3hoiIFwM+m+9+is2mFWFo0KFbtF2l4nBYxTfNitteYBe9A8ahFwLKSVicbLqakW7CzTL1JCJ+X3RWJrIrPDO/++vg4OS8MP2ONQ2x6AdNYYob5Q==
-ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0DS+K/M/PHzk4sBydblanGK2cHyAYoxU84CKlLlR/0Y=;
- b=JDirA21hMyRCeByusG3NEL1cCWP/r2aXhf++XzfI22tIalgD1iZZ4279YmsSnj+Ryrzs3E7H8ch3GEb5rAqHarM7GlYzPhArZfX+OFRzYj43tQRI07NqQ6K93/aEcFyQHH/hbTDsTjxOsi7Wtw9znJG3x0+HREQB8YSVlcu7oUct4URDQ37Aods9wfXZBVFewCN4aCUOIe+NhohxPSr+ShNw/VSj01/+86OwloJ4om6oYgG24x8ubCdwOCXhzn0kgz1ai+ErfHerksrJACfjmWgiY5kVQU4s+pZbMycqyPa9VfQO5Q+L0BzyTSvAfRHqACF9miwzIc+vGPNNGXQ2Dw==
-ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
- 4.158.2.129) smtp.rcpttodomain=lists.linux.dev smtp.mailfrom=arm.com;
- dmarc=pass (p=none sp=none pct=100) action=none header.from=arm.com;
- dkim=pass (signature was verified) header.d=arm.com; arc=pass (0 oda=1 ltdi=1
- spf=[1,1,smtp.mailfrom=arm.com] dkim=[1,1,header.d=arm.com]
- dmarc=[1,1,header.from=arm.com])
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0DS+K/M/PHzk4sBydblanGK2cHyAYoxU84CKlLlR/0Y=;
- b=DcVt1BDW6vtMBnW5C5t+dFd3+xhWS9HjliK+X46wVZ+c4KhlU1QGJ56DlcouWUj/Sy4lvjssFsrDsNVA1OGFf0KBHHDfDCNe8v0SwzEQZuvz4IVeVwSfhBFr25R8Cfytw7G0I9uvTAQ7wECHwZkDaqlrSnF036jsVDd16fL2Oic=
-Received: from AM0PR02CA0167.eurprd02.prod.outlook.com (2603:10a6:20b:28d::34)
- by DB9PR08MB8484.eurprd08.prod.outlook.com (2603:10a6:10:3d4::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.382.10; Thu, 3 Sep
- 2026 14:34:37 +0000
-Received: from AMS1EPF0000008E.eurprd05.prod.outlook.com
- (2603:10a6:20b:28d:cafe::62) by AM0PR02CA0167.outlook.office365.com
- (2603:10a6:20b:28d::34) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.382.10 via Frontend Transport; Thu, 3
- Sep 2026 14:34:37 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
- smtp.mailfrom=arm.com; dkim=pass (signature was verified)
- header.d=arm.com;dmarc=pass action=none header.from=arm.com;
-Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
- 4.158.2.129 as permitted sender) receiver=protection.outlook.com;
- client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
-Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
- AMS1EPF0000008E.mail.protection.outlook.com (10.167.242.85) with Microsoft
- SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.21.382.8
- via Frontend Transport; Thu, 3 Sep 2026 14:34:37 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=aWdWf/C4JkH8aYWWoWXRIuqJk06sFCMq1xULw+8teKrYtE+SteacNf0u7k7iiIfA95eIGbGGgSxFbsTKaR4JJHOJyRiGbL6xJxDF1V22BwHMO0RHm1cF3O4QSpV277Te7Q80fVlekhYFR5tCUO7PW6soHckc1ICfmCdet7FCyJJ9PKZE1gdKJhJ3rFNbjxVOd4CEafhiL7vJ7QPiu0JiW/aLEfDSt758hxoid/EKeYelhbfmWzGMm/SoMkK6H/9/uyJ7O7S0aKNbM7dGLmWSfcuiwYNaIBj+SEl3rVYgnwIRIV2d1LE9NVzuopibwuRpiTg5IB2Ecl1c7oSh5SsvMA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0DS+K/M/PHzk4sBydblanGK2cHyAYoxU84CKlLlR/0Y=;
- b=Ri1ANukUwMU611cs0GDmchbjUoVhJ+UPxhFejAc6CUXjpUpHj9wGm8H/Yt4EEhzx9Pg2uRdr9BbwECveacmkoQIoaUZY0bdGXdTCdX5ag9iBXZJrfCQ2i06xhr27HkmrPUkzL8JMsLE/A1UooN5Us1W5GyAdfEk40NbioPOL/I2/dShxKiCf790K7yTzeRd7otNhiTKFOCNZOI73xOT+x6ddlrWlGLfQp+t/FDiZgHNCeXyIKv6Y2aHi5sFpxrLY3TZWqkV7gX7VgMvsoVCKzilc7lTP5LXMCo4OaJ7cwNoj6wxi/FPtE9LubBxO2s0kkoyS/iwYz+d19A72RKagzA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
- header.d=arm.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0DS+K/M/PHzk4sBydblanGK2cHyAYoxU84CKlLlR/0Y=;
- b=DcVt1BDW6vtMBnW5C5t+dFd3+xhWS9HjliK+X46wVZ+c4KhlU1QGJ56DlcouWUj/Sy4lvjssFsrDsNVA1OGFf0KBHHDfDCNe8v0SwzEQZuvz4IVeVwSfhBFr25R8Cfytw7G0I9uvTAQ7wECHwZkDaqlrSnF036jsVDd16fL2Oic=
-Received: from PR2PR08MB4889.eurprd08.prod.outlook.com (2603:10a6:101:1d::23)
- by AS8PR08MB10069.eurprd08.prod.outlook.com (2603:10a6:20b:636::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.382.10; Thu, 3 Sep
- 2026 14:34:03 +0000
-Received: from PR2PR08MB4889.eurprd08.prod.outlook.com
- ([fe80::8bda:5986:a1f1:cb7e]) by PR2PR08MB4889.eurprd08.prod.outlook.com
- ([fe80::8bda:5986:a1f1:cb7e%4]) with mapi id 15.21.0382.007; Thu, 3 Sep 2026
- 14:34:03 +0000
-From: Sascha Bischoff <Sascha.Bischoff@arm.com>
-To: "sashiko-reviews@lists.linux.dev" <sashiko-reviews@lists.linux.dev>
-CC: "maz@kernel.org" <maz@kernel.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"oupton@kernel.org" <oupton@kernel.org>, nd <nd@arm.com>
-Subject: Re: [PATCH v5 04/49] KVM: arm64: gic-v5: Define remaining IRS MMIO
- registers
-Thread-Topic: [PATCH v5 04/49] KVM: arm64: gic-v5: Define remaining IRS MMIO
- registers
-Thread-Index: AQHdJl3vkq+RMpA+RkGrCzQaxX6g2baSfXoAgCqYUoA=
-Date: Thu, 3 Sep 2026 14:34:03 +0000
-Message-ID: <f3d56620d713e6dfd6d832fa99a26b419dbe6fe9.camel@arm.com>
-References: <20260807111159.429128-1-sascha.bischoff@arm.com>
-	 <20260807111159.429128-5-sascha.bischoff@arm.com>
-	 <20260807120559.38F7A1F000E9@smtp.kernel.org>
-In-Reply-To: <20260807120559.38F7A1F000E9@smtp.kernel.org>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.52.3-0ubuntu1.1 
-Authentication-Results-Original: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arm.com;
-x-ms-traffictypediagnostic:
-	PR2PR08MB4889:EE_|AS8PR08MB10069:EE_|AMS1EPF0000008E:EE_|DB9PR08MB8484:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0093a180-d93f-41e0-cee4-08df09c87b13
-x-checkrecipientrouted: true
-nodisclaimer: true
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam-Untrusted:
- BCL:0;ARA:13230040|376014|1800799024|23010399003|366016|38070700021|4143699003|11063799006|10067099003|22082099003|18002099003|56012099006;
-X-Microsoft-Antispam-Message-Info-Original:
- nSTOHjIpRjiH5vv+EV8DGZs0mLTPiBxpMjbKplttdJnTwO5tPdEn9KWQ0MKJYvWnt2ryPBl5JZNq6SRDRGiZStvfYjE/A4QsRxvlUKdm19z/XuY6sZk4gt56nufjLFFesXsK4VNMAcJF/eBBonaBXWD5ZjaCYCHb9NYxh4Z46jwDLGp8sOpCFuUFFXTp1DzU1spara3h99DRHa8GbwTezKoNSEz4+6z3hva2VDXtDn5dBJwOKgXioKOYHye+Bwuflwub47iGe9FXmbhTkEYGqCOBunRiPEKvh35CrP8gYRihpKqRTpYybnZRKxMxNUAox7QzlS5u1D7EC2+q5e6te3rmKxxh4aN3aQgCm7S7BTyxtALt/Uu6kR5d4//7zVz4Pwo4/RnZH3buEiK4sGNJmtjRu4t+n0/ngfucnz21qh9y9xffMPUxCfCD+ITfxvicMxZhe8zlGEk/n5NOpN1we24UDjNV0KrkFZLb1TA5h3ZXtilfRuhlLSV7jIcHHOzUMICHCc4/b+n3LVUjKLbiVDa0zwXM1BSi6furC9FjgJ61Vjxf28/wx9HDSnf+GsYcXzP3BbXZ58BtBnx+8fGL+FvycTMSI7S4Gso2VnCOxNbsbcZYV2bFKhQ5DMkpjgJW4mEURJ2Y5Wr1GETWVHqDCvtea+ki/K5hahSRxtavPHv0vGykg81M7ImtfrMcWoAhQAM9Ok0rHEJsCmpV6A+H0ppmsEFImLrndyugf/t1aXg=
-X-Forefront-Antispam-Report-Untrusted:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PR2PR08MB4889.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(23010399003)(366016)(38070700021)(4143699003)(11063799006)(10067099003)(22082099003)(18002099003)(56012099006);DIR:OUT;SFP:1101;
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <3B859594372077488A53821E0CF1B430@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="b8D3b7jO"
+Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-8553305b7c7so1963928b3a.3
+        for <kvmarm@lists.linux.dev>; Thu, 03 Sep 2026 07:44:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1788446639; x=1789051439; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=H0PiIrFTy0jAZPA55N8PvRPAL536lW/v4rDJ21ApSMo=;
+        b=b8D3b7jOzsTaaq0+PBGg6kp9dyeOpsf7yrUUL1/VrDlP+WJnGOezVKJn+urAXbk6RL
+         Ye0lRMUrzikJfiOj3QWR+ylxneLACgQ4bhEa7LhD1cDASI3s//5PFwJvTifaalzzlJpb
+         Aw9A0mW3V3RuKn8roDJNZ2woD/WDtFbKym12AFzmelqsymldIvAIofyLtZ/5BOlOIqEB
+         hiN6Z+HeOW5dYHFv0AX8KQLZFR7uDac9Sqf+HhdHx2YSSuMaf0QE7p9qM6P4xWvlI/Qy
+         5rjYTfnTOPjzG2bm/fI31EAyWMTgiEIxnVd1LUIiigjKB36pK5VzE586qotiEVWMfNAO
+         mYKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788446639; x=1789051439;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=H0PiIrFTy0jAZPA55N8PvRPAL536lW/v4rDJ21ApSMo=;
+        b=ARzELaBZpJcQIqpfBrLHTcwurnuvvmJnLdIZADJlmiiXA8KKgzfonehOAkReciopr1
+         vZiLuIdDDwjVp2pYSIJSyUXxagqPcevO+QWc8TwGx0b1zmN5MPYhz+rGr8wIGrn1GYii
+         Bl++iQj1pqNdi9bfw6HctAuJxfxKFQ0UEwvJx/Hduc5834AjA5iRw2Qa1mps1UVLh1L3
+         HJIlsZ+sJskTFQdxvLSMHBAWzRjkt79qXoJ9skWvHaht4E/FZCuWNle38k7tHKyKmXZc
+         sBCHqwh4AeWQERiTzC4cCVJh0XopYI5LVgiKM4P1O895f9u29eGGe61YQzM2pcaPzCjl
+         KwsQ==
+X-Forwarded-Encrypted: i=1; AKwUvBwr23AuPh06w6Zw2xCF/bNYp2Ul7raSqIy/rI7zGyEP2XdBNxbKUN95aUZTXng3u6ASC5+K5Rk=@lists.linux.dev
+X-Gm-Message-State: AFuF++k6HDH1ZkIZWX+mvUwSu2PLvAKsMZk7x3WGMb8U5QK/gK5wdE/E
+	f+oe1dEoqQAyMGfnfCdzuVQcdLLhQVvvP9iXacL1GHW68U+BWl99XJxeVcWs+0KqltVC9V/ZXH6
+	qMXNDrA==
+X-Received: from pfgr14.prod.google.com ([2002:a05:6a00:c48e:b0:847:926b:dc17])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:138d:b0:857:74ae:ad76
+ with SMTP id d2e1a72fcca58-86141ae9ad6mr626813b3a.26.1788446639057; Thu, 03
+ Sep 2026 07:43:59 -0700 (PDT)
+Date: Thu, 3 Sep 2026 07:43:58 -0700
+In-Reply-To: <20260903083857.33034-B-seiden@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked:
- w5AXsqZ4JN/tCqn2gg0jf7z9oxHpUC6zgZww2b8sf88yyTw86FrriPiWx2r8Jx+iBOJyZlm5Ife4ZjwKJaYjtUbumjNQBfXXYIUBWjB1mp0epzgij5sOcO0pxF7CmO9KsdD1HZxfOGtvLCbsfvY3JAP0HYElGS61BFBqvKjpEZWX6cvr1T0Bv6laSBJJ3UTr/w8mxyKtV+C1kWY81CFmOWu8Y+qNVF4XUnFaAKGKRyCJAioVQvBcXxDw3kyzLRx5whQ6Km2L3cT/W5gegMEW8K4N3wwMVgTZ2dtiur1s0S+LK33FtCtmHjPRa417zSouMTW2Ibu6sXwoTUC7Bm1fpg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR08MB10069
-X-EOPAttributedMessage: 0
-X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- AMS1EPF0000008E.eurprd05.prod.outlook.com
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	e6a470ba-bd77-4f0a-c92f-08df09c86700
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|35042699022|376014|23010399003|36860700016|14060799003|22082099003|18002099003|56012099006|11063799006|10067099003|4143699003;
-X-Microsoft-Antispam-Message-Info:
-	wwY2W5/37i56zF8maysvq65rptYRtwFB8rdAzgAISQbGrTsYOnITObtkPKcqyc14rpnllifi8LuWH6rnrocW7jt2fV8f56P+OpXaYo2hJ/o/TeFfN4+VKG0oMl1devlpNAOkJJQhcIbCU1eJta6FLoRSVv+SGpFy14TKG5LSNLFjx84xH3Pnr7b4mH75Ml/2649EFlrofeVOEPlx0XesGTGTMOYJkeGcSewgvzRWiuJofvM+PldsJTMbu2K0q7IKn57g8zgg3rClVqTgbiWrrRmN7Cgvmpj8jKuG7397/E6KASkdEpmyZPkuRzBzUI74bO+SMKtPTESClemLwNB7KC+gReymBdrxphAiTVAOnNSvdm9buDGhd42ZmKD9u9Pb/C2QH8mCJJy3HDXT/eG9qv2Zpoxr1O1AACOAiRcI1HMV9O1bjc4dGDBVhesDSZccy956sq15SOOeaMLg9yvDZnspY91b6vIWh6ywA3qUdc+GFMTxM/j4A/H+KgdLdrvTdM+H5V8R9VtXmfajp4aAH4n+kmJ9FKFY4jJuiA7q1SGmHkGpC1jfc3HFlq83yMTlz/VeYa7HOApqrH7kVwLdvcUHt8vVykIrkTUstFH23Yy8rWrGhpyGb8rzbFJ8u4tSWYel7mCaYaDGkIlTehgjvwPjs8Uu7Uto58pq1aFOdWk=
-X-Forefront-Antispam-Report:
-	CIP:4.158.2.129;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(35042699022)(376014)(23010399003)(36860700016)(14060799003)(22082099003)(18002099003)(56012099006)(11063799006)(10067099003)(4143699003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	GXv7XPVhbXgBf3tmr01gvC0Am+sUPtnBF0sR+HTlV3eLBDD1lNaIIkMXWuzDcA7BuCgRrL1VTQs3Z3O5k3s7NACTXQg+FMsQOzaCbx7OPb0BYRH+KLM17TxHyC4TGZigs+8NGUS4VJz72eAW3at1J+GSDuI7b0LJMF75mPXkm5uJ00ogzavKjtlRKx7/pyuR3L+6tO4QHBMft1S8S/S7zPpq9pBAhZXSEhgSIJP0dKcDWuDypVa5T393ekxoX+mBoNAC502PXPjp2p2u5XKzY6R7m3KM67kp0aH42k93ovz3/ODlHHhI0JKRj2odpvVzMYG6Bd1fVhkTqr+20FoCo3Lbaxmt0P2ARDfMR7f/J+2eGBHoo0Q/HKe1ayrSkvBr2p6Wxpxf7AazotUHKIRwnm2K4ZJS8bHlTG2CRTxj2hOPtlxvWAT7HZHyay3kiSwa
-X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Sep 2026 14:34:37.1910
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0093a180-d93f-41e0-cee4-08df09c87b13
-X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	AMS1EPF0000008E.eurprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR08MB8484
+Mime-Version: 1.0
+References: <20260831144802.834315-1-seiden@linux.ibm.com> <20260831144802.834315-24-seiden@linux.ibm.com>
+ <aphMx5hsoXwIpNjt@google.com> <20260903083857.33034-B-seiden@linux.ibm.com>
+Message-ID: <apmHrnxRLl9BuVhn@google.com>
+Subject: Re: [PATCH v7 23/23] KVM: s390: arm64: Add KVM_S390_ARM64 Kconfig and Makefile
+From: Sean Christopherson <seanjc@google.com>
+To: Steffen Eiden <seiden@linux.ibm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	linux-s390@vger.kernel.org, Alexander Gordeev <agordeev@linux.ibm.com>, 
+	Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, David Hildenbrand <david@kernel.org>, 
+	Friedrich Welter <fritz@linux.ibm.com>, Fuad Tabba <tabba@google.com>, 
+	Gautam Gala <ggala@linux.ibm.com>, Hariharan Mari <hari55@linux.ibm.com>, 
+	Heiko Carstens <hca@linux.ibm.com>, Hendrik Brueckner <brueckner@linux.ibm.com>, 
+	Ilya Leoshkevich <iii@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Joey Gouly <joey.gouly@arm.com>, Marc Zyngier <maz@kernel.org>, Nico Boehr <nrb@linux.ibm.com>, 
+	Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>, Oliver Upton <oupton@kernel.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Sven Schnelle <svens@linux.ibm.com>, Ulrich Weigand <Ulrich.Weigand@de.ibm.com>, 
+	Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>
+Content-Type: text/plain; charset="us-ascii"
 
-T24gRnJpLCAyMDI2LTA4LTA3IGF0IDEyOjA1ICswMDAwLCBzYXNoaWtvLWJvdEBrZXJuZWwub3Jn
-IHdyb3RlOg0KPiBUaGFuayB5b3UgZm9yIHlvdXIgY29udHJpYnV0aW9uISBTYXNoaWtvIEFJIHJl
-dmlldyBmb3VuZCAxIHBvdGVudGlhbA0KPiBpc3N1ZShzKSB0byBjb25zaWRlcjoNCj4gLSBbSGln
-aF0gYEdJQ1Y1X0lSU19TRVRMUElSYCBpcyBpbmNvcnJlY3RseSBkZWZpbmVkIHdpdGggYW4gb2Zm
-c2V0IG9mDQo+IGAweDAwMDBgLCB3aGljaCBhbGlhc2VzIHRoZSByZWFkLW9ubHkgYEdJQ1Y1X0lS
-U19JRFIwYCByZWdpc3Rlci4NCj4gLS0NCj4gDQo+IC0tLSBQYXRjaCBbNF06IFtQQVRDSCB2NSAw
-NC80OV0gS1ZNOiBhcm02NDogZ2ljLXY1OiBEZWZpbmUgcmVtYWluaW5nDQo+IElSUyBNTUlPIHJl
-Z2lzdGVycyAtLS0NCj4gY29tbWl0IDRlNTM1MzY5MmIyNjc3NjRhYmVkOTZjODEyNGMzYWViYzE5
-NGQ5Y2YNCj4gQXV0aG9yOiBTYXNjaGEgQmlzY2hvZmYgPFNhc2NoYS5CaXNjaG9mZkBhcm0uY29t
-Pg0KPiANCj4gS1ZNOiBhcm02NDogZ2ljLXY1OiBEZWZpbmUgcmVtYWluaW5nIElSUyBNTUlPIHJl
-Z2lzdGVycw0KPiANCj4gQ29tcGxldGUgdGhlIHNldCBvZiBkZWZpbmVkIElSUyBNTUlPIHJlZ2lz
-dGVycyBpbiB0aGUgR0lDdjUgaGVhZGVyDQo+IGZpbGUuDQo+IFVwIHVudGlsIG5vdywgdGhlIHNl
-dCBvZiBkZWZpbmVkIElSUyBNTUlPIHJlZ2lzdGVycyBoYXMgYmVlbiBkcml2ZW4NCj4gYnkNCj4g
-Y29kZSByZXF1aXJlbWVudHMuIEhvd2V2ZXIsIGluIG9yZGVyIHRvIHByb3Blcmx5IGVtdWxhdGUg
-dGhlIElSUyBNTUlPDQo+IGludGVyZmFjZSBpbiBLVk0sIHRoZSBmdWxsIHNldCBvZiBJUlMgTU1J
-TyByZWdpc3RlcnMgbmVlZHMgdG8gYmUNCj4gYWRkZWQuDQo+IA0KPiA+IGRpZmYgLS1naXQgYS9p
-bmNsdWRlL2xpbnV4L2lycWNoaXAvYXJtLWdpYy12NS5oDQo+ID4gYi9pbmNsdWRlL2xpbnV4L2ly
-cWNoaXAvYXJtLWdpYy12NS5oDQo+ID4gaW5kZXggNjgxYzVjNTEyMDdkNi4uODNjZmNkMDU2YjI1
-MCAxMDA2NDQNCj4gPiAtLS0gYS9pbmNsdWRlL2xpbnV4L2lycWNoaXAvYXJtLWdpYy12NS5oDQo+
-ID4gKysrIGIvaW5jbHVkZS9saW51eC9pcnFjaGlwL2FybS1naWMtdjUuaA0KPiA+IEBAIC02Miwy
-MCArNjIsMzQgQEANCj4gDQo+IFsgLi4uIF0NCj4gDQo+ID4gwqAvKg0KPiA+IMKgICogSVJTIHJl
-Z2lzdGVycyBhbmQgdGFibGVzIHN0cnVjdHVyZXMNCj4gPiDCoCAqLw0KPiA+IMKgI2RlZmluZSBH
-SUNWNV9JUlNfSURSMAkJCTB4MDAwMA0KPiA+IMKgI2RlZmluZSBHSUNWNV9JUlNfSURSMQkJCTB4
-MDAwNA0KPiA+IMKgI2RlZmluZSBHSUNWNV9JUlNfSURSMgkJCTB4MDAwOA0KPiANCj4gWyAuLi4g
-XQ0KPiANCj4gPiBAQCAtMTY2LDE1ICsyNTUsMTExIEBADQo+IA0KPiBbIC4uLiBdDQo+IA0KPiA+
-IMKgI2RlZmluZSBHSUNWNV9JU1RMMUVfVkFMSUQJCUJJVF9VTEwoMCkNCj4gPiArI2RlZmluZSBH
-SUNWNV9JUlNfSVNUTDFFX1NJWkUJCThVTA0KPiA+IMKgDQo+ID4gwqAjZGVmaW5lIEdJQ1Y1X0lT
-VEwxRV9MMl9BRERSX01BU0sJR0VOTUFTS19VTEwoNTUsIDEyKQ0KPiA+IMKgDQo+ID4gKyNkZWZp
-bmUgR0lDVjVfSVJTX1NFVExQSVIJCTB4MDAwMA0KPiANCj4gW1NldmVyaXR5OiBIaWdoXQ0KPiBJ
-cyBHSUNWNV9JUlNfU0VUTFBJUiBkZWZpbmVkIHdpdGggdGhlIGNvcnJlY3Qgb2Zmc2V0IGhlcmU/
-DQoNClllcy4gSXQgaXMgYXQgb2Zmc2V0IDAgaW50byB0aGUgU0VUTFBJIGZyYW1lLCB3aGljaCBp
-biBvdXINCmltcGxlbWVudGF0aW9uIGhhcHBlbnMgdG8gZm9sbG93IHRoZSBDT05GSUdfRlJBTUUu
-IFRoZSBvZmZzZXQgaXMNCmNvcnJlY3QgZm9yIHRoZSBmcmFtZSB0aGUgcmVnaXN0ZXIgaXMgaW4u
-DQoNCj4gDQo+IFRoaXMgYWxpYXNlcyB0aGUgcmVhZC1vbmx5IEdJQ1Y1X0lSU19JRFIwIHJlZ2lz
-dGVyIGRlZmluZWQgZWFybGllciBhdA0KPiAweDAwMDAuDQoNCkV4Y2VwdCB0aGF0IHRoZSBvZmZz
-ZXQgaXMgYXBwbGllZCB0byBhIGRpZmZlcmVudCBiYXNlIGFkZHJlc3MsIHNvIHRoaXMNCmlzIHBl
-cmZlY3RseSBmaW5lLg0KDQo+IA0KPiBJZiBLVk0gaW1wbGVtZW50cyB0aGUgSVJTIE1NSU8gZW11
-bGF0b3IgZXhwZWN0aW5nIGd1ZXN0IHdyaXRlcyB0byB0aGUNCj4gU0VUTFBJUg0KPiByZWdpc3Rl
-ciBhdCBvZmZzZXQgMHgwMDAwLCB3aWxsIGd1ZXN0cyBhdHRlbXB0aW5nIHRvIHVzZSB0aGUgY29y
-cmVjdA0KPiBhcmNoaXRlY3R1cmFsIG9mZnNldCBmb3IgU0VUTFBJUiBmYWlsPw0KDQpOby4NCg0K
-PiANCj4gQ291bGQgd3JpdGVzIHRvIDB4MDAwMCBhbHNvIGludGVyZmVyZSB3aXRoIElEUjAgZW11
-bGF0aW9uLA0KPiBwb3RlbnRpYWxseQ0KPiBicmVha2luZyBMUEkgZ2VuZXJhdGlvbiB2aWEgdGhl
-IElSUyBpbiB2aXJ0dWFsIG1hY2hpbmVzPw0KPiANCj4gPiArI2RlZmluZSBHSUNWNV9JUlNfU0VU
-TFBJUl9JRAkJR0VOTUFTSygyMywgMCkNCj4gPiArDQo+ID4gwqAvKg0KPiA+IMKgICogSVRTIHJl
-Z2lzdGVycyBhbmQgdGFibGVzIHN0cnVjdHVyZXMNCj4gPiDCoCAqLw0KPiANCg0KVGhhbmtzLA0K
-U2FzY2hhDQo=
+On Thu, Sep 03, 2026, Steffen Eiden wrote:
+> On Wed, Sep 02, 2026 at 09:20:23AM -0700, Sean Christopherson wrote:
+> > On Mon, Aug 31, 2026, Steffen Eiden wrote:
+> > > diff --git a/arch/s390/kvm/Kconfig b/arch/s390/kvm/Kconfig
+> > > index 8d3ee17a1bcb..9c69ea16031e 100644
+> > > --- a/arch/s390/kvm/Kconfig
+> > > +++ b/arch/s390/kvm/Kconfig
+> > > @@ -53,4 +53,33 @@ config KVM_S390_UCONTROL
+> > >  
+> > >  	  If unsure, say N.
+> > >  
+> > > +config KVM_S390_ARM64
+> > > +	def_tristate y
+> > > +	prompt "KVM support for hardware accelerated arm64 guests"
+> > > +	depends on HAS_IOMEM
+> > > +	depends on KVM
+> > 
+> > Is this actually necessary?  I.e. does kvm.ko need to be *loaded* in order for
+> > kvm-arm64.ko to be loaded?
+> > 
+> > If kvm-arm64.ko does indeed have a hard dependency on kvm.ko, then I think it
+> > makes sense to not have redundant "select" statements below.  As an outsider,
+> > it's super confusing because the KVM_S390_ARM64 are incomplete, e.g. are lacking
+> > things like VIRT_XFER_TO_GUEST_WORK (at least, I assume those are lacking), and
+> > makes it hard to see what is actually unique to kvm-arm64.ko.
+> > 
+> > If kvm-arm64.ko doesn't have a dependency on kvm.ko, e.g. to initialize hardware
+> > or something, then this "depends on" should go away.
+> 
+> 
+> It is a bit more complicated unfortunately. KVM_S390_ARM64 depends on
+> KVM as there is code around in the kernel & drivers (arch and common)
+> which depends on CONFIG_KVM we need as well. I did not want to leak arch
+> local configs to common code if I can avoid that.
+> I could change it to select KVM ? Do you have another idea on how to
+> solve this issue?
+
+I would do something similar to what KVM x86 does.
+
+> The two modules are completely independent at compile and runtime. So
+> kvm does not have to be loaded for kvm-arm64 to work.
+> 
+> VIRT_XFER_TO_GUEST_WORK is only lacking for now. I will add it later.
+> Currently the kvm-arm64 module is incomplete anyways but I did not want
+> to send a 60+patches series and rather stage the introduction over
+> multiple series.
+> 
+> I will remove the duplicated config selections. Thanks for pointing it
+> out. In previous series I had an explicit KVM_S390 config. Both KVM_S390
+> and KVM_ARM64 selected KVM. But this created too much churn around the
+> whole tech-stack 
+
+LOL, what exactly are you expecting to happen?  You're trying to squeeze support
+in for a completely different architecture, of course there's going to be churn.
+
+This absolutely needs to be as precisely and correct as possible, otherwise it'll
+be painfully difficult to maintain,  And to some extent, just for others to review.
+E.g. as is, it's at all not clear to me which of the IS_ENABLED(CONFIG_KVM) checks
+in arch/s390 apply to both flavors of virtualization, versus which are specific to
+"native" s390 virtualization.
+
+I realize this is outside of my immediate scope, but getting this "right" isn't
+just an s390 thing, because these details bleed into common KVM, and even affect
+other architectures, e.g. when trying to make "treewide" KVM changes.
+
+And FWIW, while it might seem daunting, from my perspective it's not actually that
+much churn to do things "right".  Provide KVM_S390_NATIVE, and then have KVM reflect
+the "weakest" of S390_NATIVE vs. S390_ARCH.  I.e. make KVM=m if either of the "real"
+KVMs will be a module.  That requires some creative shenanigans, but it's not hard,
+just weird.
+
+> (default config change, s390 is the odd one out for the KVM config meaning, ...).
+
+Nah, x86 is the odd one, where CONFIG_KVM=m doesn't even guarantee kvm.ko gets
+built :-)
+
+E.g. something like this, which probably doesn't compile and isn't the desired
+end state, as several of the Kconfig selections need to be reworked into #defines
+provided by header files, but AFAICT it does what I want/intend.
+
+config KVM
+	def_tristate m if (KVM_S390_NATIVE = m || KVM_S390_ARM64 = m)
+	select HAVE_KVM_CPU_RELAX_INTERCEPT
+	select KVM_COMMON
+	select HAVE_KVM_IRQCHIP
+	select HAVE_KVM_IRQ_ROUTING
+	select KVM_VFIO
+	select VIRT_XFER_TO_GUEST_WORK
+
+config KVM_S390_NATIVE
+	def_tristate y
+	prompt "Kernel-based Virtual Machine (KVM) support"
+	select KVM if (y && KVM_S390_ARM64 != m)
+	select KVM_ASYNC_PF
+	select KVM_ASYNC_PF_SYNC
+	select HAVE_KVM_NO_POLL
+	select KVM_MMU_LOCKLESS_AGING
+	select KVM_GENERIC_PRE_FAULT_MEMORY
+	select HAVE_KVM_INVALID_WAKEUPS
+	help
+	  Support hosting paravirtualized guest machines using the SIE
+	  virtualization capability on the mainframe. This should work
+	  on any 64bit machine.
+
+	  This module provides access to the hardware capabilities through
+	  a character device node named /dev/kvm.
+
+	  To compile this as a module, choose M here: the module
+	  will be called kvm.
+
+	  If unsure, say N.
+
+config KVM_S390_UCONTROL
+	bool "Userspace controlled virtual machines"
+	depends on KVM
+	help
+	  Allow CAP_SYS_ADMIN users to create KVM virtual machines that are
+	  controlled by userspace.
+
+	  If unsure, say N.
+
+config KVM_S390_ARM64
+	def_tristate y
+	prompt "KVM support for hardware accelerated arm64 guests"
+	depends on HAS_IOMEM
+	select KVM if (y && KVM_S390_NATIVE != m)
+	select GUEST_PERF_EVENTS if PERF_EVENTS
+	select HAVE_KVM_VCPU_RUN_PID_CHANGE
+	select HAVE_KVM_IRQ_BYPASS
+	select KVM_MMIO
+	select SCHED_INFO
+	select XARRAY_MULTI
+	help
+	  Enable support for hosting virtualized, hardware-accelerated arm64
+	  virtual machines on s390 systems using the Start ARM Execution (SAE)
+	  instruction. This requires hardware models that support the Arm
+	  execution facility (AEF).
+
+	  The module provides a character device named /dev/kvm-arm64 to expose
+	  the hardware capabilities.
+
+	  To compile this driver as a module, choose M here. The module will
+	  be called kvm-arm64.
+
+	  If unsure, say N.
