@@ -1,110 +1,137 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6A55481256;
-	Fri,  4 Sep 2026 12:14:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 656F348124D;
+	Fri,  4 Sep 2026 12:16:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788524100; cv=none; b=dwWyRRCbTiFFNNaj2XS8hMkIhrbQxe4ZxZI1hl23y9wZxuEUWzQkfHymgikL8OQK99rihncZCd3AX8nBACo/6GqiLD1uHyEbVWuomiuSFdC5d2gXN/DtNlsmWp01dBPFgsolc4CjlPcyNyR44NWDn8QVZ3BMiwdJwJKwwk73VMA=
+	t=1788524206; cv=none; b=n5PtUP4a8XCnOe2TRigZz/LA+TwNnY2F+gopuGgk6mTxiJ+L6PuJHTX+1Mp3SfVYR+NGeiAR9A2Q8P1J6TzHHZOJfsG3HbotNsQze1rJP6ZjDTPMW4SOSGl8AOD3BWaYBvTWRK1ZHRGv0IMSio0245sZ8joJji6NqzJA5YWgS8U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788524100; c=relaxed/simple;
-	bh=zhamTrL8FEsmE7nThaJYUK3rl+DWh6TRfkBjSr+EHBQ=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=aNIx4ypg6pETXGq7KQsPJmkOZM1E2G/auIo3jR30Vov8qsO4Kjph+mjHO7zsXANz3wLeGERyDngWptgPIJcqGF6k+AAySlXJOR9IX3AAXuTVIyRBAjmxSy1AoTEo+8q/u6snk/OeUjHnkQT5Ba7kd5otTCIoaeUttUpXDZWSHCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KUewX2Ef; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788524206; c=relaxed/simple;
+	bh=Jey8dTHOMZL8lhnLz/EEl3ZPEZ/I9uIeImx25dVzMjE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=m1E2NiiF+xnqDkVkF2Tmc039+k1a51AQr3ul6VzbhEzK3sIDNeyn+Ooybsu/fHA7+2aqCeoVZWoPWVXiy38WhvbRhJ4mfIk0M7GgGhmwTr2MKB1znutHG08/rksuv80JFCtisf8UAIWC2frNKdv7Edpqiaylsf+RMdDZNbkuJnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mu+FEdit; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KUewX2Ef"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 000151F00A3D;
-	Fri,  4 Sep 2026 12:14:57 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mu+FEdit"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED0B61F00A3E;
+	Fri,  4 Sep 2026 12:16:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788524098;
-	bh=wc8TqPztESYNTYvEF4MyCS+xrsLeJESj1BygbNvzmaQ=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=KUewX2EfQbJPgV/dZce3aMVcVzzzJ+FfZvvEo3t5YyJgKMQoZgTzWp2OexWTe60oO
-	 FG16PkKvKD8fK23jT5x9MBPC2OWDTEXvSJzKVjflzv7gKbWOnkkZaKbOdIPxLrkp6B
-	 65N5rTkdlqHpGKtE6ISMGiPtwZGzA53m3EUjucdDEY8gbcU00O9IcJyHvW8WcNH4jm
-	 k5K+pdl8ootk9VphhMaURxFaPN8tKc+NwibuZ7R23zUsdGAHC7AhskMFLoE2dGcs04
-	 nHiYXtLhx2KuW5Pk3iSDb++WMD70n/zEQxFVblaiI9bLvEybDXnYllkmgN/n9FPr5L
-	 Nb/nMI04RFQMA==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v6 06/49] arm64/sysreg: Update ICC_CR0_EL1 with LINK and
- LINK_IDLE fields
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Sascha Bischoff" <Sascha.Bischoff@arm.com>
-Cc: "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, kvm@vger.kernel.org, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260904113404.4051341-7-sascha.bischoff@arm.com>
-References: <20260904113404.4051341-1-sascha.bischoff@arm.com>
- <20260904113404.4051341-7-sascha.bischoff@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 04 Sep 2026 12:14:57 +0000
-Message-Id: <20260904121458.000151F00A3D@smtp.kernel.org>
+	s=k20260515; t=1788524205;
+	bh=CVzSSbg8XaitZU0IkO8eE2sTOp/ww7mlfLdDvjSnX2s=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=mu+FEditeFfFWeBQsjsOVdiyitKk6CkH6ibVFyfuaecAV4bM4QIW02DQV3LDNYkdB
+	 DYqIG+n415agvw+nw4fukOIh+OkXSoGaug+j4bw25BpQigNpuS7Pp7C6xKlEUMbIEE
+	 x6IsSYwP7vu6jDRi0CmIJhPs2xbLuhPXQeH+2dKjzpeogLjmJQkZtaq8HiSn5O4qdY
+	 hk2TTGga7vCGp050/nBj7gqyFsjBrW1RyMzCye7S1p5KCzXDEqpo8sZP9jUgAk68Oi
+	 rSPum/esWrV6+bQQ4qq0Kd7NB9fSh8LKdchZlUF4iP4hMzQIxxv9J4J/c5Is3a2tQv
+	 ZBovheJJhygbQ==
+Date: Fri, 4 Sep 2026 13:16:38 +0100
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Shuah Khan <shuah@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Fuad Tabba <fuad.tabba@linux.dev>, Peter Maydell <peter.maydell@linaro.org>, 
+	Leonardo Bras <leo.bras@arm.com>, Wei-Lin Chang <weilin.chang@arm.com>, 
+	Yao Yuan <yaoyuan@linux.alibaba.com>, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
+	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v20 04/14] KVM: arm64: Ensure GCS memory effects are
+ visible
+Message-ID: <apqyNz7cKC8thMfN@gremlin>
+References: <20260901-arm64-gcs-v20-0-f31750bdfadb@kernel.org>
+ <20260901-arm64-gcs-v20-4-f31750bdfadb@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260901-arm64-gcs-v20-4-f31750bdfadb@kernel.org>
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
+On Tue, Sep 01, 2026 at 10:47:02PM +0100, Mark Brown wrote:
+> In order to allow efficient implementation of GCS implementations are
+> permitted to do GCS specific caching, with barriers implicit in stack
+> switch operations and GCSB DSYNC as an explicit barrier.  Since we do
+> not use GCS in the hypervisor or host kernel the hypervisor cannot rely
+> on any barriers being present in vCPU context switches other than those
+> it explicitly inserts.  Add explicit barriers when loading and saving
+> vCPU state.
+>
+> Signed-off-by: Mark Brown <broonie@kernel.org>
 
-Pre-existing issues:
-- [High] Missing Context Synchronization Event (isb) after writing to ICC_C=
-R0_EL1 and other ICC_*_EL1 registers.
+LGTM so:
+
+Reviewed-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+
+> Reviewed-by: Yuan Yao <yaoyuan@linux.alibaba.com>
+> ---
+>  arch/arm64/kvm/arm.c               | 7 +++++++
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 7 +++++++
+>  2 files changed, 14 insertions(+)
+>
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 8b080804bc90..52f53f682e6a 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -755,6 +755,13 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+
+So this seems to be where -> vCPU unscheduled so the right place to do it.
+
+>  			vcpu_set_flag(vcpu, PKVM_HOST_STATE_DIRTY);
+>  	}
+>
+> +	/*
+> +	 * Ensure any GCS memory effects from the outgoing vCPU are
+> +	 * visible elsewhere.
+> +	 */
+> +	if (kvm_has_gcs(vcpu->kvm))
+> +		gcsb_dsync();
+
+Makes sense.
+
+I did notice the curious:
+
+static inline void gcsb_dsync(void)
+{
+	asm volatile(".inst 0xd503227f" : : : "memory");
+}
+
+And various sludging around suggests this is HINT #19 and guaranteed to be a nop
+on arches that don't implement the feature :)
+
+> +
+>  	kvm_vcpu_put_debug(vcpu);
+>  	kvm_arch_vcpu_put_fp(vcpu);
+>  	if (has_vhe())
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> index 9a3b92e626ad..534db037c5f6 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> @@ -261,6 +261,13 @@ static void sync_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
+
+And here similar for pKVM.
+
+>  	fpsimd_sve_sync(&hyp_vcpu->vcpu);
+>  	sync_debug_state(hyp_vcpu);
+>
+> +	/*
+> +	 * Ensure any GCS memory effects from the outgoing vCPU are
+> +	 * visible elsewhere even if the host skips syncing.
+> +	 */
+> +	if (kvm_has_gcs(hyp_vcpu->vcpu.kvm))
+> +		gcsb_dsync();
+> +
+>  	if (pkvm_hyp_vcpu_is_protected(hyp_vcpu)) {
+>  		host_vcpu->arch.ctxt = hyp_vcpu->vcpu.arch.ctxt;
+>  	} else {
+>
+> --
+> 2.47.3
+>
+>
+
 --
-
-commit 361cdcbfff4bc37ad48869321f633c176369b8d6
-Author: Sascha Bischoff <Sascha.Bischoff@arm.com>
-
-arm64/sysreg: Update ICC_CR0_EL1 with LINK and LINK_IDLE fields
-
-This commit adds the missing LINK and LINK_IDLE fields to the
-ICC_CR0_EL1 register definition in the arm64 sysreg generator.
-
-> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> index 94bf065c8ac71..e2d37ee221b84 100644
-> --- a/arch/arm64/tools/sysreg
-> +++ b/arch/arm64/tools/sysreg
-> @@ -3761,7 +3761,9 @@ Sysreg	ICC_CR0_EL1	3	1	12	0	1
->  Res0	63:39
->  Field	38	PID
->  Field	37:32	IPPT
-> -Res0	31:1
-> +Res0	31:3
-> +Field	2	LINK_IDLE
-> +Field	1	LINK
->  Field	0	EN
->  EndSysreg
-
-[Severity: High]
-This isn't a bug introduced by this patch, but while looking at
-ICC_CR0_EL1, it appears there might be a pre-existing missing Context
-Synchronization Event (isb) when writing to this register elsewhere in
-the tree.
-
-In drivers/irqchip/irq-gic-v5.c, gicv5_cpu_enable_interrupts() writes to
-SYS_ICC_CR0_EL1 to enable interrupts but returns without an isb():
-
-    cr0 =3D FIELD_PREP(ICC_CR0_EL1_EN, 1);
-    write_sysreg_s(cr0, SYS_ICC_CR0_EL1);
-}
-
-The same pattern exists in the selftests
-(tools/testing/selftests/kvm/include/arm64/gic_v5.h) for both enabling and
-disabling:
-
-gicv5_cpu_disable_interrupts()
-...
-    cr0 =3D FIELD_PREP(ICC_CR0_EL1_EN, 0);
-    write_sysreg_s(cr0, SYS_ICC_CR0_EL1);
-}
-
-Architectural guidelines mandate that writes to most ICC_*_EL1 registers
-require an isb() to be visible to subsequent instructions. Without this,
-could the CPU proceed under a stale interrupt configuration, potentially
-missing interrupts?
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260904113404.4051=
-341-1-sascha.bischoff@arm.com?part=3D6
+Cheers, Lorenzo
