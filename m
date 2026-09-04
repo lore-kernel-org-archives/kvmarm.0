@@ -1,119 +1,137 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com [209.85.221.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEE384A2A53;
-	Fri,  4 Sep 2026 13:27:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECC2049EC42
+	for <kvmarm@lists.linux.dev>; Fri,  4 Sep 2026 13:30:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788528453; cv=none; b=s1uIZkayU7JhqO3OVSDfCoApcixdUwEggRSb477hK05uH4eKAGMy5+4+eSr+Mw0+U5ToIsw1V/nJmnII94YFbd28JXpMQW7Pnno93l6A5/RhnVMoA3NMtgWf6kiIWXYq7To4K9iTQ3qBiekLf7GceGOH8iCyeIyufsRTh3YJ3DU=
+	t=1788528626; cv=none; b=EL+4yKjrI4BBCJdXnnIS7+HThaqZ8BPpnIVxdw0F5gN0QChKlwk3j+E/Okm2fGAoiImTUNp0QWnbPLUkaV/SxYaE+1R1ejfwRuV61EpBCbeVR0u0Pv/AQMP7Nf5xgo8sz1ihXjF2gAmVLhMkthid0Of1Ce+9+iIHrjfROckyKrg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788528453; c=relaxed/simple;
-	bh=BrKH1slhTJcB7fwRxUk3N8h9tBfv2C8yJycpH/t1uFg=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=JpglW0UpuY15nB5iOId2tHzB/4bdMk+MeI/8BTmkcFVHmcdPOHlWtBnGoH84olXcwDn1xyrpoeqDH4YFM2W6UuSyP5/RzMIdJgKuOtIoS9mRkDH6IzyYO4EPkCggan/QunpBXwJCL4xAzRzPZ/Y0YESFjeQ7ebPvsDl94iTZaZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EDyZIhqx; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788528626; c=relaxed/simple;
+	bh=Sc3lDWCpzcNSYkPYGJ1RWdAwe0ZaTgH6K4eWHiL+UxQ=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=NGEQoNZVlEZU3CwiGAgQ//58XLzYJGYRciUK5JMltg6eb/D1PmVzsrno8UQ5SxoNnYpVtUqgyELuQEuOggHnbcxcCnphtFSziZEm5vIVVwblhbrVSyl5HjnVOS7YBJfnyEEK9f8C94w6h6Zr5KnAtqrioutO8PrTAm3EyJqF6jg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GsnLnQmc; arc=none smtp.client-ip=209.85.221.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EDyZIhqx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40F7C1F00AC4;
-	Fri,  4 Sep 2026 13:27:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788528451;
-	bh=FZis4c6UEHZrhAYzuW4m8uTE8qNsZQwU/XB2IFp9ZnQ=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=EDyZIhqx9OBmnMylwEdvZsfXkI+D/V+mVLhwMevDV3C6IoYze2ZW1MJmZQmASo/Sw
-	 6LlsFQeBcHdCc/Q2/2WSvF0hn5eef3Ti94BNgnOGY+vocEu/ogC/15CrCY7kDum/X5
-	 KcqhPRLlmhaLxkI/ENJwBZnjDVboaOds2Ph/lnOXPXhk40sRXpIs8iyYYyzkIuDtns
-	 RTpN2cZ2BLs4WJ0bKnw5Gf1E0SbwqAuRW4GwdDSlUxhfBhRzE6T/DXG0SArUeJAJG1
-	 tk6wbbrCDYMzbiCVoLiCcpS3v+UZL55kV8O09y4S+x1GyxcTlXfYqWx2m5K1RWUyH4
-	 kqaSNbb+F0eSA==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v6 31/49] KVM: arm64: gic-v5: Add GICv5 EL1 sysreg
- userspace accessors
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Sascha Bischoff" <Sascha.Bischoff@arm.com>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260904113404.4051341-32-sascha.bischoff@arm.com>
-References: <20260904113404.4051341-1-sascha.bischoff@arm.com>
- <20260904113404.4051341-32-sascha.bischoff@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 04 Sep 2026 13:27:30 +0000
-Message-Id: <20260904132731.40F7C1F00AC4@smtp.kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GsnLnQmc"
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-48589603501so522702f8f.3
+        for <kvmarm@lists.linux.dev>; Fri, 04 Sep 2026 06:30:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1788528623; x=1789133423; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=+aPWbmTLZvhLqGM4vE8H/jD9xFWXLFtEDa5uftDvlQM=;
+        b=GsnLnQmcP2LaD8RiPaH0LTLtLBosGvlxaLYp7a2TDHi+YzKlbNBBdcVtI4T/Za5pOW
+         gK6Oyt50KaVs3dT+qkn8XPj4fDtb5tZAN+0GJHjwo5cJIKTHPazjDYt8vm5lP1k9TWSc
+         gMV6VFLE2WmJa6zwBF9LcosbGh2f9zw9mGQLxf99maq7jNEcdTbLAcgNj57lsIGmSc2q
+         wX8wJECAKQkE0gIGRZq6vp3SwY3XHle6Tt1vvot1AvCDTSbiQwUc93S8O0ZFiDl5DpV6
+         +XtRMySonU8DWZpe5mDvYmI8CFJ9xWb99zXKnkwMpiDVV0U87ZzW+GvDCTj4tgC5lUbJ
+         +TsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788528623; x=1789133423;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=+aPWbmTLZvhLqGM4vE8H/jD9xFWXLFtEDa5uftDvlQM=;
+        b=BtnoCG4kQxbnYlb8tJioEFwildTEu/z5CE5A0G+sPowKLWvRoQKH9cDlf8TNpHW82S
+         ykWUc/AE61+3v4+B40uyVoS4xMgvdTo0nr1dAv6ZV4ftlW6uIiYIrQa/r7QTCKsYpwb0
+         ZVEw7zJ91dOrs0JDdq8MrB2S4yaD6RfSNmpO42Z/7/38Ox5FgrU0Q1EIWwfvAw55aqLA
+         MAf7Tjv4kqFKYDEqvXejRJrnZsBtTzBgOXdGE/G8WuHDFTO079VZCG+3DPX1gqVbHjI+
+         SqN1CF79r0eOYlMlHxJtGOJERXkDK8igAa7iNcJZiske17H006jrGKiMcdfawV4cU52+
+         XlIA==
+X-Forwarded-Encrypted: i=1; AKwUvBzJSh+PWnYPCQcylsRjDCArDMLG3kZenMIe2tUfz8TrA+AJZehsBaJnZU3Jz0OrcLN5U1+1vWY=@lists.linux.dev
+X-Gm-Message-State: AFuF++nAt6HJzlnnJfxCONysDzPXm986TuN22zi98xWFDBFvyLXkueH1
+	5bedSFl9FUGBvdlWBkkFMS/sta2968YwVgSQ2sPQR07icKCvyrsMKqLuR0JGDVrrUNenHLaCpKE
+	SYNkOXl1zwuKTXg==
+X-Received: from wmbdx16.prod.google.com ([2002:a05:600c:63d0:b0:49c:edfd:aa4c])
+ (user=smostafa job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:4fc5:b0:49c:fe18:6dd5 with SMTP id 5b1f17b1804b1-49cfe186dfemr25609645e9.29.1788528622474;
+ Fri, 04 Sep 2026 06:30:22 -0700 (PDT)
+Date: Fri,  4 Sep 2026 13:28:53 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.55.0.979.g7e5102b832-goog
+Message-ID: <20260904132855.638117-1-smostafa@google.com>
+Subject: [PATCH v3 0/2] KVM: arm64: Add support for BBM level 3
+From: Mostafa Saleh <smostafa@google.com>
+To: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org
+Cc: maz@kernel.org, oupton@kernel.org, seiden@linux.ibm.com, 
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	catalin.marinas@arm.com, will@kernel.org, vdonnefort@google.com, 
+	tabba@google.com, sebastianene@google.com, keirf@google.com, 
+	qperret@google.com, linu.cherian@arm.com, Mostafa Saleh <smostafa@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [High] Incorrect priority mask for ICC_PPI_PRIORITYRx_EL1 registers (LSB-=
-aligned instead of MSB-aligned).
---
+This patch series adds support for BBM level 3 to KVM pgtable.
 
-commit 03cc6ad9380aa567c97ad187be2f0c81a5904007
-Author: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Changes from v2:
+https://lore.kernel.org/all/20260723182140.4025575-1-smostafa@google.com/
+- Add extra checks to ensure PTE updates with BBML3 follow the arm
+  architecture.
+- Limit the extra smp_wmb() to non shared walkers.
 
-KVM: arm64: gic-v5: Add GICv5 EL1 sysreg userspace accessors
+Motivation
+==========
+I have been looking into this for the context of:
+- Page table sharing between the host CPU stage-2 and the SMMUv3 for
+  protected KVM.
+- Use the pagtable code to populate SMMUv3 stage-2 shadowed
+  page table [1]
 
-This commit adds functions to handle userspace reads and writes of the GICv5
-EL1 system registers. This allows KVM to save and restore the GICv5 CPU
-interface state to support VM migration. Userspace writes are translated
-back into KVM's corresponding internal representation.
+However, BBM level 3 is still useful for CPU only operations as it
+avoids intermediately breaking translation.
 
-> diff --git a/arch/arm64/kvm/vgic-sys-reg-v5.c b/arch/arm64/kvm/vgic-sys-r=
-eg-v5.c
-> new file mode 100644
-> index 0000000000000..6b255eacbf60d
-> --- /dev/null
-> +++ b/arch/arm64/kvm/vgic-sys-reg-v5.c
-> @@ -0,0 +1,519 @@
-[ ... ]
-> +#include "vgic/vgic.h"
-> +#include "sys_regs.h"
-> +
-> +#define ICC_PPI_PRIORITYR_PRIORITY_MASK		REPEAT_BYTE(0x1f)
-> +
-> +static int set_gic_apr(struct kvm_vcpu *vcpu, const struct sys_reg_desc =
-*r,
-[ ... ]
-> +static int set_gic_ppi_priorityr(struct kvm_vcpu *vcpu,
-> +				 const struct sys_reg_desc *r, u64 val)
-> +{
-> +	struct vgic_v5_cpu_if *cpu_if =3D &vcpu->arch.vgic_cpu.vgic_v5;
-> +	int reg =3D ((r->CRm & 0x1) << 3) + r->Op2;
-> +
-> +	/* If we only support architected PPIs, return */
-> +	if (VGIC_V5_NR_PRIVATE_IRQS =3D=3D 64 && reg > 7)
-> +		return 0;
-> +
-> +	val &=3D ICC_PPI_PRIORITYR_PRIORITY_MASK;
+Design
+======
+Some of the conditions that BBM level 3 will be useful in (RWHZWS):
+1) Changing from block to table
+2) Changing from table to block
 
-[Severity: High]
-Does this apply the correct mask for the priority field?
+Initially, I encapsulated the full logic of BBM in one function,
+which was not readable, due to different ordering and dealing with
+CMO, TLBI.
 
-The GIC architecture aligns priority values to the most significant bits
-(MSBs) of the 8-bit priority field (for example, bits [7:3] for a 5-bit
-priority). The macro ICC_PPI_PRIORITYR_PRIORITY_MASK is defined earlier in
-this file as REPEAT_BYTE(0x1f), which preserves bits [4:0] and clears bits
-[7:5] for each byte.
+Instead, I kept the logic into 2 functions, where BBML3 is added in
+the make step.
 
-Since the actual priority bits are stored in the MSBs, clearing them during
-set_gic_ppi_priorityr() would effectively zero out the restored guest
-interrupt priorities when userspace restores the state during VM migration.
-This could cause interrupt priority inversion and prevent ICC_PMR_EL1 maski=
-ng
-from working correctly.
+One interesting case, as BBML3 will update the PTE atomically, it
+can only know it raced with another core at the point of the cmpxchg
+failing, unlike the SW implementation which locks the PTE first.
+And as we must issue CMOs to the new mapped page before the update,
+that means with BBML3 racing cores will issue redundant CMOs, to
+avoid this, we limit the use of BBML3 to systems with FWB and DIC.
 
-> +
-> +	/*
-> +	 * Although priorities are not regularly synced back to the vgic_irq
-> +	 * state, they are explicitly synced back here. This is to ensure that
-> +	 * any pending PPIs are evaluated correctly when first running the guest
-> +	 * after setting the state.
-> +	 */
+Testing
+=======
+This was tested with:
+- C1-Pro cores, unfortunately the version I have does not run
+  upstream, I backported the patches to Android kernel (6.18).
 
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260904113404.4051=
-341-1-sascha.bischoff@arm.com?part=3D31
+- mainline(7.3-rc1) kernel on a Qualcomm X1 with a hacked cpufeature
+  as it does not support BBM, I did not see conflict aborts or TLB
+  corruption.
+
+I tested with VHE and protected (hvhe) modes, running VMs
+(and protected), and running some selftests, that might exercise and
+stress this path tools/testing/selftests/kvm:
+- demand_paging_test
+- memslot_perf_test
+- memslot_modification_stress_test
+- dirty_log_test
+
+Mostafa Saleh (2):
+  KVM: arm64: Add stage2_clean_old_pte()
+  KVM: arm64: Support BBM level 3
+
+ arch/arm64/kvm/hyp/pgtable.c | 172 +++++++++++++++++++++++++----------
+ 1 file changed, 124 insertions(+), 48 deletions(-)
+
+-- 
+2.55.0.979.g7e5102b832-goog
+
