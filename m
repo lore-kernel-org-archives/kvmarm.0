@@ -1,179 +1,130 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7360F1FC0EA;
-	Fri,  4 Sep 2026 12:30:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B531489866;
+	Fri,  4 Sep 2026 12:36:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788525046; cv=none; b=ltJbQSlHGUosf/zNfR185PAO4wHhCqvPN0r4sX2Ox9DMz0VAzE9ifUkbKiV5CxmasguDAvuCuhpMTXKA9p5ELoq53HOCLlrkKRb2tduxVve+EC0E+Q/FHlrkr49ymfhOHHGoO7b+wHSsPNMzVPXGr7mDtBh2+nL0fNO5JWFnL2k=
+	t=1788525401; cv=none; b=Tka7Im3l6/kkZoij2VXvetOmbzDrOjzTdzEyceUAR+mcjZLdMOgLjvfyXkJ1hBUtofajBNZkMG4h/AKpTdsWnHrdooUKbIiZE+d4VCVg4B2Os6KI5TPmaCIys78Jz/IIyd6Qiof9ihoAIb/0IgS1vuU9gOS43FB20cLpIg4nefs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788525046; c=relaxed/simple;
-	bh=I4dONQeT+3uUQctSUds3N3GEumZBobJuky9CcdrmntQ=;
+	s=arc-20240116; t=1788525401; c=relaxed/simple;
+	bh=jyGWtrh0yNkOKSl9XyGILV7pZ2a1/SY0WwXvuC5Twi8=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=Q8EowqowS37EkcFXMzKVqWDsGhZ2HG8RHRs1KKQqM+Xlzi9ctIb03lEbORkDnK7UkNWbs3i2VwB3sVT9x6F5fs9OLLfXFlZzVXNK/0aYoFDUhrpFQBHK9zJEAnoe2IhqjtAya07WAZJnQBmEtFHQKMwQKZidXC+oT/AqdpyEr/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jMAlS0dI; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=p6GPuiN3abZ6Y5y7KucOdPoRXw+5ntaV0U7q8TWCNFtY/3Jh54d1ndHDM294p8AEiZr+SQZaR7FqaWZpLJnK8/GdJMCcA29XgS2Qok6BFzelcmCPn1GBBeBv8as7SYWaFCqkNHDpIMNaaGVgzkXIiWlx5qNFE3WfVp2Mqgn0HqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EnKCaTPw; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jMAlS0dI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D64931F00A3D;
-	Fri,  4 Sep 2026 12:30:44 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EnKCaTPw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 870D21F00A3D;
+	Fri,  4 Sep 2026 12:36:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788525045;
-	bh=r76Md1r2sa9jbgvLRSl91g22lbxr4bctxjEUplgh9aA=;
+	s=k20260515; t=1788525399;
+	bh=Z2QcIJnC/VG9bDJURhdTkLkAo20oWzXVh7umsMuHU0I=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=jMAlS0dI3HyEHNcUlfnmWvK4Rw7yDcuOMCmvN3EfyIsGEDoILl425caUb4FilvSPY
-	 /gi47Ni+Vumd2Ev7uumqmUzRqfIpMTqW7ZOAXrg7097OUUHyZ5x4mO1lZ7ZCPOP1gU
-	 4d7hFynIYEfhe4Z5HmxU+ijA2y1VaFXdO5/xr0alsXex/HQI6C9reoL/0fZwVmYHL6
-	 bDkPXtTmV6JfU+ZMo0IhLgD1MoKraPKR4+UNTHRyLMjxorLxcfrc4l/DDACUI9rYMB
-	 Gn9wIW6Eoe1KLkjXJyXHeWNRAirLZdLiGSi6VXfvuuDie4zfUZWDJPnsBGhSMWjG5j
-	 YLXwKzu9+qk5A==
+	b=EnKCaTPwDIpZK7d+HbZiLVVJaNZwgKJBGFl/vplgSHvYxzoqU069r7PNi02++56Hc
+	 J5cEmx32R8NZBV83W+RJDwiF6+LoAjFOuw4yVv6ZN/vs4PIMeEGvnv6EXFE3wxIfZD
+	 /k759pToNnNNi89nQxySC+/ho0SqzccZT5dWrlOVvv3z3WDQTuihQVyaEV4lLw0GIl
+	 AacJflZIP61mAiHPaRqbA8R7tdginXx+f+0jeuYeA5lCbBO4lFFhtglavWphJVA3U6
+	 vr39TtXjPorgs2IMZKF/uWs0RCNjAAJi33f9E8w8EoMD2hhRqBe5e7Ks1tOuvzNupQ
+	 TolcYwq27nmQw==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v6 10/49] KVM: arm64: gic-v5: Introduce guest IST alloc
- and management
+Subject: Re: [PATCH v6 13/49] KVM: arm64: gic-v5: Implement VPE IRS MMIO Ops
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Sascha Bischoff" <Sascha.Bischoff@arm.com>
 Cc: kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, kvm@vger.kernel.org, "Oliver
  Upton" <oupton@kernel.org>
-In-Reply-To: <20260904113404.4051341-11-sascha.bischoff@arm.com>
+In-Reply-To: <20260904113404.4051341-14-sascha.bischoff@arm.com>
 References: <20260904113404.4051341-1-sascha.bischoff@arm.com>
- <20260904113404.4051341-11-sascha.bischoff@arm.com>
+ <20260904113404.4051341-14-sascha.bischoff@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 04 Sep 2026 12:30:44 +0000
-Message-Id: <20260904123044.D64931F00A3D@smtp.kernel.org>
+Date: Fri, 04 Sep 2026 12:36:39 +0000
+Message-Id: <20260904123639.870D21F00A3D@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [High] Integer overflow in `l1sz` calculation causes a zero-size allocati=
-on and subsequent kernel panic during cache maintenance.
-- [High] DMA coherency cacheline-sharing bug in VMTE array causes the host =
-CPU to overwrite and destroy hardware IRS updates.
+- [Medium] Missing defensive idle check for VPE operations before initiatin=
+g VPE commands.
 --
 
-commit 6ec34cb3226f9d34ed3b83ac3a0c85077a487f20
+commit 81503b7ea1c4c11dba3bab36283047725b89c0a9
 Author: Sascha Bischoff <Sascha.Bischoff@arm.com>
 
-KVM: arm64: gic-v5: Introduce guest IST alloc and management
+KVM: arm64: gic-v5: Implement VPE IRS MMIO Ops
 
-This commit introduces the machinery to allocate guest Interrupt State Tabl=
-es
-(ISTs) for SPIs and LPIs in KVM for ARM64 GICv5. It provides functions to
-allocate linear and two-level ISTs, assign them to a VM via IRS doorbell
-commands, and free them on VM teardown.
+This commit introduces interfaces to make VPEs valid and configures them
+via the host's IRS interface. It extends the existing VPE-doorbell-based
+commands with VPE_MAKE_VALID.
 
-> diff --git a/arch/arm64/kvm/vgic/vgic-v5-tables.c b/arch/arm64/kvm/vgic/v=
-gic-v5-tables.c
-> index 7252d48431a5a..f088006f39674 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v5-tables.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v5-tables.c
+> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
+> --- a/arch/arm64/kvm/vgic/vgic-v5.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
 
 [ ... ]
 
-> @@ -679,3 +722,511 @@ int vgic_v5_vmte_free_vpe(struct kvm_vcpu *vcpu)
-
-[ ... ]
-
-> +static int vgic_v5_vmte_assign_ist(struct kvm *kvm, phys_addr_t ist_base,
-> +				   bool two_level, unsigned int id_bits,
-> +				   unsigned int l2sz, unsigned int istsz,
-> +				   bool spi_ist)
+> @@ -308,10 +320,73 @@ static int vgic_v5_irs_set_vist_invalid(u16 vm_id, =
+bool spi_ist)
+>  	return __vgic_v5_irs_update_vist_validity(vm_id, spi_ist, true);
+>  }
+> =20
+> +static int vgic_v5_irs_set_up_vpe(u16 vm_id, u16 vpe_id,
+> +				  irq_hw_number_t db_hwirq)
 > +{
+> +	u64 vmap_vper, dbr, selr;
+> +	u32 statusr, cr0;
+> +	int ret;
+> +
+> +	lockdep_assert_held(&vgic_v5_irs_lock);
+> +
+> +	/* Make sure that we are idle to begin with */
+> +	ret =3D vgic_v5_irs_wait_for_vm_op();
+> +	if (ret)
+> +		return ret;
+> +
+> +	/* Mark the VPE as valid */
+> +	vmap_vper =3D FIELD_PREP(GICV5_IRS_VMAP_VPER_VPE_ID, vpe_id) |
+> +		    FIELD_PREP(GICV5_IRS_VMAP_VPER_VM_ID, vm_id) |
+> +		    GICV5_IRS_VMAP_VPER_M;
+> +	irs_writeq_relaxed(vmap_vper, GICV5_IRS_VMAP_VPER);
+> +
+> +	/* Wait for the VPE to be marked valid in the VPET */
+> +	ret =3D vgic_v5_irs_wait_for_vm_op();
+> +	if (ret)
+> +		return ret;
+> +
+> +	selr =3D FIELD_PREP(GICV5_IRS_VPE_SELR_VPE_ID, vpe_id) |
+> +	       FIELD_PREP(GICV5_IRS_VPE_SELR_VM_ID, vm_id) |
+> +	       GICV5_IRS_VPE_SELR_S;
+> +	irs_writeq_relaxed(selr, GICV5_IRS_VPE_SELR);
+
+[Severity: Medium]
+Is a defensive idle check missing before we initiate this VPE command?
+
+This function ensures the VM interface is idle at the top using
+vgic_v5_irs_wait_for_vm_op(), but it does not do the same for the VPE
+interface before writing to GICV5_IRS_VPE_SELR.
+
+If a prior VPE operation timed out (for example, if
+vgic_v5_irs_wait_for_vpe_op() failed in a previous call), the function
+returns and vgic_v5_irs_lock is released. A subsequent call to
+vgic_v5_irs_set_up_vpe() would then write to GICV5_IRS_VPE_SELR while the
+hardware interface is still busy.
+
+Writing to the VPE interface while it is active could corrupt the state
+machine or result in unpredictable behavior. Should there be a preceding
+check that the vpe_op hardware interface is actually idle?
+
+> +
+> +	ret =3D vgic_v5_irs_wait_for_vpe_op();
+> +	if (ret)
+> +		return ret;
 
 [ ... ]
-
-> +	scoped_guard(raw_spinlock_irqsave, &vgic_v5_irs_lock) {
-> +		/* Bail if already allocated */
-> +		vgic_v5_clean_inval(vmte, sizeof(*vmte));
-> +		if (le64_to_cpu(READ_ONCE(vmte->val[section])) &
-> +		    GICV5_VMTEL2E_IST_VALID)
-> +			return -EINVAL;
-> +
-> +		WRITE_ONCE(vmte->val[section], cpu_to_le64(tmp));
-> +		vgic_v5_clean_inval(vmte, sizeof(*vmte));
-
-[Severity: High]
-Does this code inadvertently overwrite concurrent hardware IRS updates?
-
-The struct vmtl2_entry is exactly 32 bytes (__le64 val[4]), meaning two
-adjacent entries (e.g., vmte[0] and vmte[1]) share a single 64-byte CPU
-cache line. Assigning an IST requires an IRS doorbell operation, which caus=
-es
-the IRS hardware to write the VALID bit into the VMTE in main memory.
-
-If the host CPU concurrently writes to vmte[1] to configure another VM, the
-entire shared cache line becomes dirty in the CPU's cache. When the host
-executes vgic_v5_clean_inval() (dc civac), it writes back the entire
-dirty cache line to main memory. If the CPU's cache holds a stale copy of
-vmte[0] (without the VALID bit set by the IRS), this writeback will
-overwrite and destroy the IRS's update to vmte[0].
-
-Should struct vmtl2_entry be padded and aligned to SMP_CACHE_BYTES to
-prevent this false-sharing writeback corruption?
-
-> +	}
-
-[ ... ]
-
-> +static int vgic_v5_alloc_linear_ist(struct kvm *kvm, bool spi_ist,
-> +				    unsigned int id_bits, unsigned int istsz)
-> +{
-> +	const size_t n =3D max(5, id_bits + 1 + istsz);
-> +	u32 vm_id =3D vgic_v5_vm_id(kvm);
-> +	struct vgic_v5_vm_info *vmi;
-> +	__le64 *ist;
-> +	u32 l1sz;
-> +
-> +	vmi =3D xa_load(&vm_info, vm_id);
-> +	if (!vmi)
-> +		return -EINVAL;
-> +
-> +	/*
-> +	 * Allocate the IST. We only have one level, so we just use the L2 ISTE.
-> +	 */
-> +	l1sz =3D BIT(n + 1);
-> +	ist =3D kzalloc(l1sz, GFP_KERNEL_ACCOUNT);
-
-[Severity: High]
-Can this calculation overflow l1sz and cause a zero-size allocation?
-
-If the hardware IRS reports support for a large LPI ID space (e.g., 32 bits,
-idr2.id_bits =3D 31) but does not support two-level ISTs, the guest can
-request 32 bits of LPI IDs. The vgic_v5_alloc_linear_ist() function
-calculates n =3D max(5, 31 + 1 + 3) =3D 35. The size calculation BIT(n + 1)
-evaluates to BIT(36). Because l1sz is typed as a 32-bit integer (u32),
-1UL << 36 overflows and truncates to 0, causing kzalloc() to return the
-ZERO_SIZE_PTR (0x10).
-
-> +	if (!ist)
-> +		return -ENOMEM;
-> +
-> +	if (spi_ist) {
-> +		vmi->h_spi_ist =3D ist;
-> +	} else {
-> +		vmi->h_lpi_ist_structure =3D false;
-> +		vmi->h_lpi_ist =3D ist;
-> +	}
-> +
-> +	vgic_v5_clean_inval(ist, l1sz);
-
-[Severity: High]
-If ist is ZERO_SIZE_PTR (0x10) due to the overflow above, doesn't this
-cache maintenance operation panic the host?
-
-On arm64, dcache_by_line_op aligns this to 0x0 and executes a dc civac
-on address 0x0, which immediately causes an EL1 Translation Fault and a
-kernel panic. This appears reachable by an unprivileged guest via the emula=
-ted
-GICv5 IRS MMIO registers.
-
-> +
-> +	return 0;
-> +}
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260904113404.4051=
-341-1-sascha.bischoff@arm.com?part=3D10
+341-1-sascha.bischoff@arm.com?part=3D13
