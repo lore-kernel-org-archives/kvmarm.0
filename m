@@ -1,107 +1,147 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 850CD42D757;
-	Fri,  4 Sep 2026 13:21:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63184493637;
+	Fri,  4 Sep 2026 13:25:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788528065; cv=none; b=Aq7zTDe6o1+zKv7L6lwSQsI0lD4rMmU9wKBDnmTHwM7TI3eEJJ11WPzIEtW8OzOOKBwW5cbm7gHb6Y5CXhnuWK1EMfNiQTqSLBTFhYwUnZ0Z65ULwmATj5yKXOO6Lkw/3j/dxNJUWssSVKa2j2tLfK5iBR27vsCUQvXT0ppmtPU=
+	t=1788528315; cv=none; b=lljDiwCqmju/6SsS94bwrUwqXx/d0AxvEBt34ErTdS7upHevS8es2CZcH3YVtTbxmEZWyPhmn6Zb6vW56+eWEJELKjRXEnYXxq3Dd6DnVtE4/alH+jy+0ZfJDUayMEm3JtSsnW06rvy7RfwjXFqV3g4t0SBSiiZLVByJECk2zps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788528065; c=relaxed/simple;
-	bh=qYlbXxCESLnKTi15PNafXzFG9I32g8umk7IEaNs3F3E=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=czcpRzPc31EXlrQVFIX/iWNA8fdP7xA9Y1EVQnJaIDTKW9day/ouyG9aY76a/09uIyASE1aP1U6RooYlrM/RZRZc2DEfuoBo8A2rjBmG6RfYZHKP4YCneIrhntd0tRWYbJMKgLW2yJLilKL6WIIU910iuUCiiiKs05BXTucQQEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UxHEGf5/; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788528315; c=relaxed/simple;
+	bh=+x0ZADvFDyX6bEK7tqHxXeYBregC92koTtjI+WtQxm8=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=ChHcmhJjQag9plAn/i9UBAdnEEWAbqI8mBYWBvLpY1zSufUQ25/KgNdtUrG2vs4znz1Oizjlv3H8hy1J86AJM6Hv3CF3KgnNEWBu/kIkZdDk+e1YgETEbG6CIZvFV9hwB4e0YAOyTULtK9kF30usn4dAcYNAjX0kdqAEuEHq3xo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EZ8Yq9df; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UxHEGf5/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED7AD1F00A3D;
-	Fri,  4 Sep 2026 13:21:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EZ8Yq9df"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16D111F00A3D;
+	Fri,  4 Sep 2026 13:25:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788528061;
-	bh=Lv/0JtR0FodYX+QBu/pIWvc7PlCw0OO+KIN2P0yniD8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=UxHEGf5/vmUuVHamJ+CpV7i097/cbhGNzN8V3KtbBVSxZepixnY3TDFYXTccIFaE5
-	 Aa5GKvNRW+oawEo8iGOtKIDZLUKKjESayIKzn2sCUrbvFsplJyNmCWWB5FpfeeWc3w
-	 QgJSMamU31vlFvqymOkgZlPYHFSdmf2H10S/j/trwRpsVLNW+oC6ZI65+N7npM3WOU
-	 PqsbN5XJyrasw5jjaO9Ig7aoY7BKu2ZTMvrIr6bum5u891PnguYSMkYmjf2lSSrvdg
-	 2qzyk5wAbbv/3joPXvkPsX5MwLUOStlCAUFSDCJFDC5wsAIz56vZQFBrmQsZaUVTQV
-	 lIQ8TUUAtPRHQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1x2Tqk-00000004rhC-1x7s;
-	Fri, 04 Sep 2026 13:20:58 +0000
-Date: Fri, 04 Sep 2026 14:23:32 +0100
-Message-ID: <87y0dh40bv.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Will Deacon <will@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] KVM: arm64: Enable S1PIE for nVHE and hVHE
-In-Reply-To: <05f1e2f4-173a-4226-8c98-1452c20f0a47@sirena.org.uk>
-References: <20260904-kvm-arm64-nvhe-pie-v1-0-29d59f245e6c@kernel.org>
-	<20260904-kvm-arm64-nvhe-pie-v1-2-29d59f245e6c@kernel.org>
-	<86pkyt4gvt.wl-maz@kernel.org>
-	<eb788ad5-5bb3-4767-87b8-d35d9e3ab220@sirena.org.uk>
-	<apqrky27mJmUV9UA@willie-the-truck>
-	<05f1e2f4-173a-4226-8c98-1452c20f0a47@sirena.org.uk>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20260515; t=1788528310;
+	bh=4GGptH93lF25+JKTnAxykwT95pAsEY7BIIhCj6MkqFw=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=EZ8Yq9dfQLLR1dUhikShlk1/vpO9oKumhE9KtKbRAtStRsRdG3qBLRf/6VOAb8DZA
+	 kwyUvsZUfCebyNZgJL3mY5Bd4Cyu9D2Iknvwqpmw6zfJU4T/piGCUeHM7A4WSZvcQE
+	 QutIxjg9b2owEKRBMo0AF7LwfM4gTlQRsOfvY/Fj4QvcQ/7c1rXKPuQ4XfpvsnZ9t5
+	 57R+woVyELN/tLli0Niki30GLgUndAbwJctZq9E2CD5OmpXuXjapeI2rpQGySX3mYZ
+	 UqvZKm+Xlzl1Up1P8iWJW1tAb50U1TqY81reUCrwn9m6GqXN0Ti3Y1zPWOApHtClxM
+	 dV25kGHA54OgA==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v6 28/49] Documentation: KVM: Extend VGICv5 device
+ attribute docs
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Sascha Bischoff" <Sascha.Bischoff@arm.com>
+Cc: "Marc Zyngier" <maz@kernel.org>, kvm@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev
+In-Reply-To: <20260904113404.4051341-29-sascha.bischoff@arm.com>
+References: <20260904113404.4051341-1-sascha.bischoff@arm.com>
+ <20260904113404.4051341-29-sascha.bischoff@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 04 Sep 2026 13:25:09 +0000
+Message-Id: <20260904132510.16D111F00A3D@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, will@kernel.org, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 04 Sep 2026 12:48:14 +0100,
-Mark Brown <broonie@kernel.org> wrote:
-> 
-> On Fri, Sep 04, 2026 at 12:29:23PM +0100, Will Deacon wrote:
-> > On Fri, Sep 04, 2026 at 11:33:24AM +0100, Mark Brown wrote:
-> 
-> > > What about pKVM, my understanding was that that is very much an ongoing
-> > > concern and uses the nVHE hypervisor?  My expectation was that this
-> > > would only ever get used in hVHE configurations when people enable pKVM
-> > > on modern hardware, actual nVHE mode was mostly just carried along with
-> > > that.
-> 
-> > pKVM uses hVHE wherever it can nowadays, so I'm fine with only supporting
-> > S1PIE on hVHE and VHE configurations if that's easier to maintain. We
-> > just need to make sure that the failure mode for nVHE results in the
-> > feature being gracefully disabled, rather than e.g. crashing or quietly
-> > doing the wrong thing.
-> 
-> I figure that if we're supporting hVHE it will end up less complicated
-> to also enable nVHE, it reduces the potential for having bad or missing
-> fallback paths for features downstream of S1POE.  It's not like it's a
-> huge extra bit of code and it seems likely to save hassle down the line.
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+s) to consider:
+- [Critical] The GICv5 IRS address is now mandatory and SPIs are enabled by=
+ default, breaking existing userspace that creates PPI-only VGICv5 instance=
+s.
+- [Critical] KVM_DEV_ARM_VGIC_GRP_NR_IRQS is redefined for VGICv5 to mean o=
+nly the number of SPIs, breaking generic VMM logic.
+--
 
-It's not about the code size. it's about the code being *dead*. Nobody
-is going to maintain this configuration, because this is a silly one.
+commit 09cdbd6c9f58457f6d769b06163f573cb425aea3
+Author: Sascha Bischoff <Sascha.Bischoff@arm.com>
 
-KVM with E2H==0 has reached its architectural peak years ago. We're
-not adding anything to it anymore, and all new architectural bits
-require running with E2H==1.
+Documentation: KVM: Extend VGICv5 device attribute docs
 
-	M.
+This commit updates the VGICv5 documentation to cover PPI, SPI, and LPI
+interrupts, detailing how their pending state is injected. It also documents
+the mandatory GICv5 IRS address attribute and its GPA layout requirements.
+Finally, it explains the GICv5-specific interpretation of
+KVM_DEV_ARM_VGIC_GRP_NR_IRQS, which only counts SPIs instead of the total
+number of interrupts.
 
--- 
-Jazz isn't dead. It just smells funny.
+> diff --git a/Documentation/virt/kvm/devices/arm-vgic-v5.rst b/Documentati=
+on/virt/kvm/devices/arm-vgic-v5.rst
+> index 70b9162755c7e..c782ea4d4609c 100644
+> --- a/Documentation/virt/kvm/devices/arm-vgic-v5.rst
+> +++ b/Documentation/virt/kvm/devices/arm-vgic-v5.rst
+> @@ -12,12 +12,39 @@ Only one VGIC instance may be instantiated through th=
+is API.  The created VGIC
+
+[ ... ]
+
+> +      Setting the address of the IRS in GPA space is mandatory before VG=
+IC
+> +      resources are mapped, as the IRS is responsible for handling SPIs =
+and
+> +      LPIs. Failure to set the IRS address before the first vCPU run res=
+ults in
+> +      an error.
+
+[Severity: Critical]
+Does making the IRS address mandatory introduce a regression for existing
+userspace that creates PPI-only VGICv5 instances?
+
+If a VMM creates a VGICv5 without setting KVM_VGIC_V5_ADDR_TYPE_IRS, it loo=
+ks
+like it will now fail to boot:
+
+arch/arm64/kvm/vgic/vgic-init.c:kvm_vgic_map_resources() {
+	...
+	if (IS_VGIC_ADDR_UNDEF(irs_base)) {
+		ret =3D -ENXIO;
+		goto out_slots;
+	}
+	...
+}
+
+It appears it also rejects configuring 0 SPIs, which forces the mandatory
+use of the IRS:
+
+arch/arm64/kvm/vgic/vgic-kvm-device.c:vgic_set_common_attr() {
+	...
+	if (val < VGIC_V5_DEFAULT_NR_SPIS ||
+	...
+}
+
+Could this cause an ABI regression for legacy VMs that only use PPIs?
+
+> +
+> +  KVM_DEV_ARM_VGIC_GRP_NR_IRQS
+> +   Attributes:
+> +
+> +    A value describing the number of SPIs for this GIC instance. This is
+> +    GICv5-specific: unlike GICv2/v3, the value does not include SGIs or =
+PPIs.
+> +    The value ranges from 32 to KVM's VGICv5 maximum of 1024 SPIs, in
+> +    increments of 32. If userspace does not set this attribute, KVM uses=
+ 32
+> +    SPIs by default.
+
+[Severity: Critical]
+Does redefining KVM_DEV_ARM_VGIC_GRP_NR_IRQS to only represent the number of
+SPIs introduce a regression for generic VMM logic?
+
+For GICv2/v3, this attribute represents the total number of interrupts
+(32 + SPIs). However, for VGICv5, it seems the requested value is assigned
+directly to nr_spis without subtracting VGIC_NR_PRIVATE_IRQS:
+
+arch/arm64/kvm/vgic/vgic-kvm-device.c:vgic_set_common_attr() {
+	...
+	dev->kvm->arch.vgic.nr_spis =3D val;
+	...
+}
+
+If a generic VMM passes 32 + N (expecting N SPIs), won't it inadvertently
+allocate 32 additional SPIs? Could this inconsistency in the UAPI cause an
+ABI regression?
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260904113404.4051=
+341-1-sascha.bischoff@arm.com?part=3D28
