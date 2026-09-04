@@ -1,45 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C4C2311C32;
-	Fri,  4 Sep 2026 13:08:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E9073E3DB1;
+	Fri,  4 Sep 2026 13:10:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788527292; cv=none; b=TOhBE4c7eNRe85BtnrD2CzbclkQAYMVtB7KnjMw1rWNrhx8CAHiXkEkzneXxBD8GlZu7lPBigbiJm4ZZnhRT1WuKrgJ6Y3lvI/yOlPOwFBrZ2hS+UqUsVTmEMzXvGggPFFrNMkteUHLrPfi0g2dBWcmL8f9gKOjbUFwJJusjIZo=
+	t=1788527435; cv=none; b=ksdfMMLHmwqyq+AQ/nv71LuudYuqPaBwOeVQZiaaeTF3yKayjLfma3Xyt2rRReucAG4rujp0QV9nIXxMJiZbev8ld0OXL3lUAgRmHRnJzkN76ebs5oR93Od9EQsa2HNS+fK/pUlrY16sC4GmdCVp+bLhOt7WNEyngbEj+RQKSXs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788527292; c=relaxed/simple;
-	bh=jGdgWPwjXRzab3e5ApmpH/CITkVzWpz2G0/BMS9M20U=;
+	s=arc-20240116; t=1788527435; c=relaxed/simple;
+	bh=75LS+TRovCCu8zvP/Cp7jlHYolIsh5dwL4K8IPtUw0Y=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=UFGBQGwBRQSr39Vjpt2R5xw9fxPb7bypMmbTa+DmURJJa8p/XhD/Nq599WmIwTcIwndAe/2q/6LpyX5BWoaug3U+VVmUGVzqqfZGN/n97F5PR5RJEEPHAjmtBzrrT5XNw3MLWeymyruomMLpyCkWZB1SzpuSYJMRsarJmFy/jhY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a1dPzIoj; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=pOIuz484UPvQLXUI3yR+g1SR1YBtAwYxpLCZ0Vzx8EA4mbyyMD9Dhb3R01Cz416lMAUnow49tPsBWfs4JkmsvJaf6ikATjPikmalfbITSBVIrbJbuRtLYR7N/e52n6XcZsKHjOCNVVgShETI2PvfyceBcONkaqOYNsKl0a3acV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YW7+aO0r; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a1dPzIoj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A6851F00A3D;
-	Fri,  4 Sep 2026 13:08:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YW7+aO0r"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8832D1F00A3E;
+	Fri,  4 Sep 2026 13:10:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788527287;
-	bh=W6QWpNRlVwZmj4ZVXIep4F11w4wTqmyh6tjh89MqQkU=;
+	s=k20260515; t=1788527433;
+	bh=rRAmPYVehCEpJw4yQXulyrjK8qQpZasZaX7qAA3pJKA=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=a1dPzIojjl7vyB5otKXGGouGr4Jf9iinGVCmLVfHDxLryE7n03QLl8p7x48LascTC
-	 wXnFJ7eE2endcyIenUuCBQ0S0jO9C5kWlt8dKO9fh/WvKOm3cdZKDG3pE6KdG4HPPf
-	 /bLc6qHsQ+7t5QguaK5BVZ8VWLeL4vG33+B66AiywlvkEp7174qM6A73GP5RqJExpU
-	 4GwP5rLwCGlHJ6yulB6D6LSx0duAkCBHIsRS7TodC4AXNAfFuWuFdebfjMYHmH2P23
-	 v1C/9YetderRiceU2ZtnLiWd0ZxOsqvzkjrcbORwwgjElUF4bWbjuMjFPUF12oqjIr
-	 cu3+u1p/MOSMg==
+	b=YW7+aO0rFw06vtmcjO5jVZ8TkPDWY99Cx/2vhfmk/6k39GRQveS961bBVjt4mEBeD
+	 2Sfhy6t7QMxWlkJV7EhsL00d6sDJH4iRwe7DFd2XYHRCBXigZmfrI5y29mKS99WsQJ
+	 sf6dqAYPSb23jc0PdjvrvjQvR9SxIBwfyK6G85ky7NO6q5XNM9asc8BuPHJL7Fs0Ge
+	 U4nUgQkBVn4oIIqGZNpn3V6KaC1eLR3WxAW99gICZ44EblrAcIKN/+EwVIWsbPF3xa
+	 vjhWbbvjxXw9e7uF+4XPdVlr5Hi2Fu5euD7Qoi2RVIFAePUXa1zWbRrs100ZFarS0/
+	 oW6JFYmMDOdTQ==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v6 16/49] KVM: arm64: gic-v5: Request doorbells when
- VPEs enter WFI
+Subject: Re: [PATCH v6 22/49] KVM: arm64: gic-v5: Register the IRS IODEV
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Sascha Bischoff" <Sascha.Bischoff@arm.com>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, kvm@vger.kernel.org, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260904113404.4051341-17-sascha.bischoff@arm.com>
+Cc: kvm@vger.kernel.org, "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev
+In-Reply-To: <20260904113404.4051341-23-sascha.bischoff@arm.com>
 References: <20260904113404.4051341-1-sascha.bischoff@arm.com>
- <20260904113404.4051341-17-sascha.bischoff@arm.com>
+ <20260904113404.4051341-23-sascha.bischoff@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 04 Sep 2026 13:08:07 +0000
-Message-Id: <20260904130807.9A6851F00A3D@smtp.kernel.org>
+Date: Fri, 04 Sep 2026 13:10:33 +0000
+Message-Id: <20260904131033.8832D1F00A3E@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,50 +46,87 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [High] ABBA deadlock between scheduler `rq->lock` and IRQ `desc->lock`
+- [Medium] Memory leak of the `dist->spis` array if GICv5 initialization is=
+ retried after a failure.
 --
 
-commit 53b46a42489c35d884554bb95601a01f175a2eb9
+commit 67a160bda61ea35d934ec550a4467b5c6ecad827
 Author: Sascha Bischoff <Sascha.Bischoff@arm.com>
 
-    KVM: arm64: gic-v5: Request doorbells when VPEs enter WFI
-   =20
-    When a GICv5 VPE is made non-resident as part of the vcpu entering
-    WFI, request a VPE doorbell so that KVM can be notified when a
-    suitable SPI or LPI becomes pending for that VPE.
+KVM: arm64: gic-v5: Register the IRS IODEV
 
-> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-> index d7d6db5014269..5a058ef8fe701 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v5.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
-> @@ -1095,6 +1095,52 @@ void vgic_v5_put(struct kvm_vcpu *vcpu)
+Now that we have an emulated IRS, it needs to be registered, which
+ensures that guest accesses to the MMIO regions handled by the device
+are handled appropriately in KVM. Therefore, as part of
+vgic_map_resources, the GICv5 IRS IODEV is registered. If the address
+for the IRS is not provided, bail out reporting an error - this is not
+a supported config.
+
+> diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/=
+vgic-kvm-device.c
+> index 90be99443df3b..8c2c6886af4e3 100644
+> --- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
+> +++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+
 [ ... ]
-> +			/*
-> +			 * Make the doorbell affine to this CPU, if it isn't
-> +			 * already. Actively check the cpumask first as it is
-> +			 * cheaper than changing the affinity every time.
-> +			 */
-> +			if (!cpumask_test_cpu(cpu, aff)) {
-> +				int ret;
-> +
-> +				ret =3D irq_set_affinity(db_irq, cpumask_of(cpu));
 
-[Severity: High]
-Does this create a lock inversion between the scheduler's rq->lock and the
-IRQ desc->lock?
+> @@ -748,21 +778,25 @@ static int vgic_v5_set_attr(struct kvm_device *dev,
+>  {
+>  	switch (attr->group) {
+>  	case KVM_DEV_ARM_VGIC_GRP_ADDR:
+> +		break;
+>  	case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS:
+> -	case KVM_DEV_ARM_VGIC_GRP_NR_IRQS:
+>  		return -ENXIO;
+> +	case KVM_DEV_ARM_VGIC_GRP_NR_IRQS:
+> +		break;
+>  	case KVM_DEV_ARM_VGIC_GRP_CTRL:
+>  		switch (attr->attr) {
+>  		case KVM_DEV_ARM_VGIC_CTRL_INIT:
+> -			return vgic_set_common_attr(dev, attr);
+> +			break;
 
-When a guest executes WFI, KVM calls kvm_vcpu_block() -> schedule(), which
-acquires rq->lock. The scheduler then invokes preempt notifiers:
-fire_sched_out_preempt_notifiers() -> kvm_sched_out() -> kvm_arch_vcpu_put(=
-).
+[Severity: Medium]
+If userspace calls KVM_DEV_ARM_VGIC_CTRL_INIT and the routing setup fails in
+vgic_init(), does this leave dist->spis leaking if userspace retries the
+initialization?
 
-This eventually calls vgic_v5_put() while rq->lock is still held.
-irq_set_affinity() then unconditionally acquires desc->lock.
+When vgic_init() aborts due to a failure in
+kvm_vgic_setup_default_irq_routing(), it calls vgic_v5_teardown():
 
-Because the established kernel lock hierarchy requires taking desc->lock
-before rq->lock, this reversed order (rq->lock -> desc->lock) appears to
-introduce an ABBA deadlock.
+arch/arm64/kvm/vgic/vgic-init.c:vgic_init() {
+        ...
+        if (vgic_is_v5(kvm))
+                vgic_v5_teardown(kvm);
+
+        return ret;
+}
+
+However, it appears vgic_v5_teardown() does not free the dist->spis array.
+
+If userspace retries the init call, kvm_vgic_v5_irs_init() unconditionally
+allocates a new array over the old one:
+
+arch/arm64/kvm/vgic/vgic-irs-v5.c:kvm_vgic_v5_irs_init() {
+        ...
+        dist->spis =3D kcalloc(nr_spis, sizeof(struct vgic_irq), GFP_KERNEL=
+_ACCOUNT);
+        ...
+}
+
+Can this allow a misconfigured or malicious userspace to repeatedly leak
+memory (up to ~200KB per call) by retrying the initialization after a failu=
+re?
+
+>  		case KVM_DEV_ARM_VGIC_USERSPACE_PPIS:
+>  		default:
+>  			return -ENXIO;
+>  		}
+> +		break;
+>  	default:
+>  		return -ENXIO;
+>  	}
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260904113404.4051=
-341-1-sascha.bischoff@arm.com?part=3D16
+341-1-sascha.bischoff@arm.com?part=3D22
