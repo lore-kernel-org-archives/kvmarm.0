@@ -1,47 +1,46 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBD9244C66D
-	for <kvmarm@lists.linux.dev>; Fri,  4 Sep 2026 22:42:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FF3039A054
+	for <kvmarm@lists.linux.dev>; Fri,  4 Sep 2026 23:07:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.97
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788561750; cv=none; b=N937zQEGxVZWpdnZAghvzh1OopxzMRcJQFuNw4yKrWzLchN8qQl/KT0cTrwfTOQVT4rGPbbvOa+X4J9FYusa1obvDQ9OM045ny1B/icNCvA/LH6fOFBlLcAWHLE0dzPdRVXMrSX2O/zLmgXzK543/cExyLpizZl55Nz9ju+uIyg=
+	t=1788563256; cv=none; b=JyC3tI7AXRvpFGfCbR4cIC6uft9p55JPLRb9YLlsY2KwZH62SzxZPYh9JyMh4B/MkFUw5wtFlQbepk4ro+ZOR0YZEtVU/XmKXYFrYFQQyWsnsV9jgeLxA1wPhFiH6M3FqXMcmOJvY+jZVtqQ3YORqgXqKr7gWo4/81FUQ3VfvWM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788561750; c=relaxed/simple;
-	bh=rR1eH2wW2i/JEuOr8EFz618T5pL01rNqEvXg57Ahkls=;
+	s=arc-20240116; t=1788563256; c=relaxed/simple;
+	bh=WvttKtEcaCMI+iTMj6fHxLxcsoxDPGgctjnzDBBojTs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qzSuq/zun2vLMmUxYKAmO9d+++iZM1jGlZRFGgN42GaeHDcPCb+R5y3woKqNxfWzcSY96gCnHIjwEm2O0d+VJGqx7OPhvsssK66qQJ0yR/f/ImPwqmU8oz25ob6k74W7QYKf19W5hUtdEeA4661tIPLk5943+VKjQ3JebGpkfgQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=LObNHE3L; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=hlO2uwuQWv1JyxPFWiuaFsuL6ixSL66CwMH/wx4M1g3ZkMJATu35bxdDsQ2FGf5zSP6VqcNorlyEJy8HYHBvcrLxduHbPTyoATTBP1La/DRKY4k3GFycecHzd/3JID7gbskOYfqiiJx9Cqgr5PoVW37e3Rf8XS3zlgpmzR0GB9g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=QtMA2Ava; arc=none smtp.client-ip=115.124.30.97
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="LObNHE3L"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3949D1477;
-	Fri,  4 Sep 2026 15:42:23 -0700 (PDT)
-Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C4CA93F882;
-	Fri,  4 Sep 2026 15:42:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1788561746; bh=rR1eH2wW2i/JEuOr8EFz618T5pL01rNqEvXg57Ahkls=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LObNHE3LPAhzFKAFLLp09Rc2itWYjVcwjba/VQpDr9oz4nvxxpmGHlFnomJvxVurG
-	 K2Jx2j1ulInTavrbMF53oQknXko3+98UCJgoWLgYYhqcUS1XzJT+e0yatbcdUuxM8Y
-	 IaG6AEBKANyf3Idd2ER+sbkEevrYTNw4ht27eE1U=
-Date: Fri, 4 Sep 2026 23:42:15 +0100
-From: Wei-Lin Chang <weilin.chang@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Wang Han <wanghan@linux.alibaba.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	oupton@kernel.org, tabba@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, 
-	suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, ljs@kernel.org, 
-	itaru.kitayama@fujitsu.com
-Subject: Re: [PATCH v5 0/6] KVM: arm64: nv: Implement nested stage-2 reverse
- map (new data structure)
-Message-ID: <eylfcgxs2xzu57czyuhkpmum45lpxyccyu2yh3mipr67aq3xo6@xinygxzavoja>
-References: <20260810205038.118843-1-weilin.chang@arm.com>
- <20260902163500.1841671-1-wanghan@linux.alibaba.com>
- <877bl26aqg.wl-maz@kernel.org>
- <wsnf276xrun3g4hjr3t6alprapctg5z4kpj422v3hujqdjnrsa@swq4blkqvvj5>
- <875x0l5udh.wl-maz@kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="QtMA2Ava"
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1788563245; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=WvttKtEcaCMI+iTMj6fHxLxcsoxDPGgctjnzDBBojTs=;
+	b=QtMA2AvaD8LTH1kMmMvttySnxAbK2YVps5+i+iPnnjmkgaldwlNBjlnveFucvEXVzEvDhnlEoKzykLhYwZ8XYkUyxYNbu+Z5t1jFhbvDHKDOwYnfJXoRtDVd0pElPDbtblkgyacwCV7TyIFnc7BCxO5VyQiJ0VJ9T5LLbtDdCuY=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R171e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037009110;MF=yaoyuan@linux.alibaba.com;NM=1;PH=DS;RN=17;SR=0;TI=SMTPD_---0XAJiLbv_1788563243;
+Received: from localhost(mailfrom:yaoyuan@linux.alibaba.com fp:SMTPD_---0XAJiLbv_1788563243 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Sat, 05 Sep 2026 07:07:23 +0800
+Date: Sat, 5 Sep 2026 07:07:23 +0800
+From: Yao Yuan <yaoyuan@linux.alibaba.com>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>, 
+	Ben Horgan <ben.horgan@arm.com>, Xi Ruoyao <xry111@xry111.site>, 
+	Mark Rutland <mark.rutland@arm.com>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Gavin Shan <gshan@redhat.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: Trap guest MPAM accesses whenever MPAM is
+ implemented
+Message-ID: <ans4c7lc4v3ouekqkpxrqyenhsvxoe32zkw2qhqgvtiwsbkaji@rjbgkm3yzq63>
+References: <20260903160819.831518-1-fuad.tabba@linux.dev>
+ <xmhaptfcp2gyoovgus35yhx2uloe2zt3zniwscd2dwnatf2fii@jqobvjdmkqed>
+ <CA+EHjTwNJvqqeGtgxR2q+CRn5DJfigssLRcZxz-zY5XvATwOcQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -50,87 +49,61 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <875x0l5udh.wl-maz@kernel.org>
+In-Reply-To: <CA+EHjTwNJvqqeGtgxR2q+CRn5DJfigssLRcZxz-zY5XvATwOcQ@mail.gmail.com>
 
-On Fri, Sep 04, 2026 at 08:49:14AM +0100, Marc Zyngier wrote:
+On Fri, Sep 04, 2026 at 12:18:00PM +0800, Fuad Tabba wrote:
+> Hi Yuan,
+>
+> > > +static bool
+> > > +test_has_mpam_sysregs(const struct arm64_cpu_capabilities *entry, int __unused)
+> > > +{
+> > > + /* The registers exist whether or not firmware enabled MPAM. */
+> > > + return detect_ftr_has_mpam();
+> > > +}
+> >
+> > My understanding: arm64.nompam affects detect_ftr_has_mpam(),
+> > thus when arm64.nompam = 1 w/ MPAM is supported in hardware,
+> > the KVM's trap setting is skipped yet, and it's possible that
+> > SYS_MPAM2_EL2 and SYS_MPAMHCR_EL2 are configured not trap anything
+> > by firmware, thus guest can still access MPAM registers.
+> >
+> > Do we need check the raw id register values for the real support
+> > state of MPAM here ?
+>
+> Under arm64.nompam, finalise_el2_state skips the MPAM2_EL2 and
+> MPAMHCR_EL2 writes too, via the same check_override, so the kernel
+> does not clear the traps either. What a guest reaches there is
+> whatever EL3 left, UNKNOWN when EL3 is implemented.
 
-[...]
+That's what I was worried before w/ nompam = 1 for guest can still access
+the MPAM registers. Now it's fine to me w/ limitation on usage of nompam
+described in [1], the limitation on guest behavior described there yet.
+Thanks for the reply! I just not aware [1] before.
 
-> > > >
-> > > > The L1 was started with 8 vCPUs and 32 GiB of RAM using:
-> > > > 
-> > > >   qemu-system-aarch64 -smp 8 -m 32G \
-> > > >     -machine virt,accel=kvm,gic-version=3,virtualization=on \
-> > > >     -cpu host -nographic -enable-kvm \
-> > > >     -drive if=pflash,format=raw,readonly=on,file=pflash0_bak.img \
-> > > >     -drive if=pflash,format=raw,file=pflash1_bak.img \
-> > > >     -drive file=./ubuntu-vm.qcow2,format=qcow2,if=virtio,cache=none,aio=native \
-> > > >     -nic user,model=virtio-net-pci,hostfwd=tcp::11234-:22 \
-> > > >     -serial mon:stdio
-> > > > 
-> > > 
-> > > Puzzling. If you are only running an L1 in VHE mode, there is no
-> > > shadow S2, and therefore nothing to unmap. For shadow S2s to be built
-> > > and affect the MMU notifiers, you need to run an L2.
-> > 
-> > I was thinking the same at first, but realized even with L1 in VHE mode
-> > there is a small period of time where L1 runs in its EL1 during boot, so
-> > one nested MMU will become valid for each vCPU. That causes
-> > kvm_nested_s2_unmap() to iterate through the entire IPA space 8 times
-> > (-smp 8).
-> 
-> It should be one nested MMU for the whole VM, not one per vcpu.
-> That's assuming they share the same VMID+VTCR.
-> 
-> > What I am curious about is whether one single notifier unmap is enough
-> > to hang L1, or were there multiple notifier unmaps.
-> > 
-> > QEMU with -machine virt uses 40 IPA bits only, unmapping that takes:
-> > 1024  (4KB pages,  unmapping 1GB per iteration)
-> > 32768 (16KB pages, unmapping 32MB per iteration)
-> > 2048  (64KB pages, unmapping 512MB per iteration)
-> > iterations for each page size. There aren't many mappings in each
-> > iteration too. Does this really take that long on real hardware (even if
-> > this must be done 8 times)?
-> 
-> This should be close to being at zero cost, so something else is
-> amiss.
-> 
+> This patch is for the case where the kernel cleared the traps itself and
+> never set them again.
 
-Guess what? I am completely wrong once again.
+Yes next time I will explicitly say want to discuss something may
+related to the patch's main purpose.
 
-The complete range of the nested mmus isn't about the value
-supplied by KVM_VM_TYPE_ARM_IPA_SIZE. Instead it is the PARange exposed
-to the guest. That's because the guest hypervisor is allowed to expose
-whatever memory map it likes to its nested guests, as long as it is
-within the guest's PARange. This is explained clearly in
-init_nested_s2_mmu().
+>
+> Gating on the raw ID registers would make __activate_traps_mpam()
+> write MPAM2_EL2 on guest entry there. AFAICT that traps to EL3
+> wherever MPAM3_EL3.TRAPLOWER is still set, which is the firmware the
+> option is for: 10f885d63a0e ("arm64: Add override for MPAM") added it
+> for firmware that leaves the trap set and does not emulate it.
 
-Now the PARange exposed to guests should be much larger than 40bits. On
-the neoverse-n2 it should be 48bits (256TB), therefore the iterations
-required for each unmapping would be 256x:
+Make sense, it break the nompam actually on platform need it,
+this isn't good idea.
 
-262144  (4KB pages,  unmapping 1GB per iteration)
-8388608 (16KB pages, unmapping 32MB per iteration)
-524288  (64KB pages, unmapping 512MB per iteration)
+For the purpose of this patch:
 
-I think these numbers match the hang time Shuai have shown.
+Reviewed-by: Yuan Yao <yaoyuan@linux.alibaba.com>
 
-Just to demonstrate the difference I have tried manually limiting
-kvm_ipa_limit to 40, and tested with software emulation. Before the
-manual change a kvm_nested_s2_unmap() finished after 42 seconds, after
-limiting kvm_ipa_limit kvm_nested_s2_unmap() can finish in less than a
-second.
-
-With this, I think there aren't other underlying issues, it just is that
-slow unfortunately..
-
-Thanks,
-Wei-Lin Chang
-
-> Could you please have a look?
-> 
-> 	M.
-> 
-> -- 
-> Jazz isn't dead. It just smells funny.
+>
+> The arm64.nompam hazard is documented separately [1].
+>
+> Cheers,
+> /fuad
+>
+> [1] https://lore.kernel.org/all/20260903084809.2027326-1-fuad.tabba@linux.dev/
