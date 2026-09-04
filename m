@@ -1,156 +1,107 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B17FF33EB1A
-	for <kvmarm@lists.linux.dev>; Fri,  4 Sep 2026 13:16:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 850CD42D757;
+	Fri,  4 Sep 2026 13:21:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788527805; cv=none; b=iMO+6lm5qVfdm1TjQ/bXkBA99KS8lDX6uKqeA3Sh8/jqCGIOiXRY9/+2YDaMeUhnrQdDPcukof5xs7NqLuk01PHZ5aomPqSDI/nHx2CvK4FgsAtni515xvHyOm0iqjs5DjtXrVfh7xzZB9NKfATE+wQ2q8mJqRF0/S5yt7ntu+E=
+	t=1788528065; cv=none; b=Aq7zTDe6o1+zKv7L6lwSQsI0lD4rMmU9wKBDnmTHwM7TI3eEJJ11WPzIEtW8OzOOKBwW5cbm7gHb6Y5CXhnuWK1EMfNiQTqSLBTFhYwUnZ0Z65ULwmATj5yKXOO6Lkw/3j/dxNJUWssSVKa2j2tLfK5iBR27vsCUQvXT0ppmtPU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788527805; c=relaxed/simple;
-	bh=jGO6N6C9dHP5Vlqz2T7loYjP445aFxsAjEvjgUvOSyo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=qPNiMJmX7ZEaO/0oGbu0yQLw84eM8ESprBqNYe1d5Y9YXQv+PcUxBhDIdi50S1IXz/AQqY3mLvZ2dUzVfwX/3eudbIsKJ9AnLWvM6RBAyQG61r2dcxOvq29mvOg2BcNb8MVBgid3FOBbwApvioC1F3NlNG1vQltL5yUP/ZdPPJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=oQNKfnKw; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1788528065; c=relaxed/simple;
+	bh=qYlbXxCESLnKTi15PNafXzFG9I32g8umk7IEaNs3F3E=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=czcpRzPc31EXlrQVFIX/iWNA8fdP7xA9Y1EVQnJaIDTKW9day/ouyG9aY76a/09uIyASE1aP1U6RooYlrM/RZRZc2DEfuoBo8A2rjBmG6RfYZHKP4YCneIrhntd0tRWYbJMKgLW2yJLilKL6WIIU910iuUCiiiKs05BXTucQQEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UxHEGf5/; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="oQNKfnKw"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 37080143D;
-	Fri,  4 Sep 2026 06:16:39 -0700 (PDT)
-Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A8C783F7D8;
-	Fri,  4 Sep 2026 06:16:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1788527802; bh=jGO6N6C9dHP5Vlqz2T7loYjP445aFxsAjEvjgUvOSyo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=oQNKfnKwxRaaYoQL4lGr18lijYfEXLNJOiDyN8WLlo3ZT1dhN6UD2girIrq0ZkKCp
-	 8x7NcoIkjKNUYSYPu0DN0aH2aF4Sr0JwoBF5dVZ3Djy/Xe+4dkGmvDGHSCGcpGUyiy
-	 JS0mUsgBPhVldtu6okwQyRSMxfhNb0H5W4A7YDpQ=
-From: Leonardo Bras <leo.bras@arm.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UxHEGf5/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED7AD1F00A3D;
+	Fri,  4 Sep 2026 13:21:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788528061;
+	bh=Lv/0JtR0FodYX+QBu/pIWvc7PlCw0OO+KIN2P0yniD8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=UxHEGf5/vmUuVHamJ+CpV7i097/cbhGNzN8V3KtbBVSxZepixnY3TDFYXTccIFaE5
+	 Aa5GKvNRW+oawEo8iGOtKIDZLUKKjESayIKzn2sCUrbvFsplJyNmCWWB5FpfeeWc3w
+	 QgJSMamU31vlFvqymOkgZlPYHFSdmf2H10S/j/trwRpsVLNW+oC6ZI65+N7npM3WOU
+	 PqsbN5XJyrasw5jjaO9Ig7aoY7BKu2ZTMvrIr6bum5u891PnguYSMkYmjf2lSSrvdg
+	 2qzyk5wAbbv/3joPXvkPsX5MwLUOStlCAUFSDCJFDC5wsAIz56vZQFBrmQsZaUVTQV
+	 lIQ8TUUAtPRHQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1x2Tqk-00000004rhC-1x7s;
+	Fri, 04 Sep 2026 13:20:58 +0000
+Date: Fri, 04 Sep 2026 14:23:32 +0100
+Message-ID: <87y0dh40bv.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
 To: Mark Brown <broonie@kernel.org>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Shuah Khan <shuah@kernel.org>,
+Cc: Will Deacon <will@kernel.org>,
 	Oliver Upton <oupton@kernel.org>,
 	Fuad Tabba <fuad.tabba@linux.dev>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Wei-Lin Chang <weilin.chang@arm.com>,
-	Yao Yuan <yaoyuan@linux.alibaba.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
 	linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org,
 	kvmarm@lists.linux.dev,
-	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v20 06/14] KVM: arm64: Validate GCS exception lock when emulating ERET
-Date: Fri,  4 Sep 2026 14:16:34 +0100
-Message-ID: <aprEsh-xogu8zFnK@LeoBrasDK>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <2dfd8a6c-42c2-466c-b3d6-2313466fc3d5@sirena.org.uk>
-References: <20260901-arm64-gcs-v20-0-f31750bdfadb@kernel.org> <20260901-arm64-gcs-v20-6-f31750bdfadb@kernel.org> <apmUQETDlhTIuJIY@LeoBrasDK> <2dfd8a6c-42c2-466c-b3d6-2313466fc3d5@sirena.org.uk>
+Subject: Re: [PATCH 2/2] KVM: arm64: Enable S1PIE for nVHE and hVHE
+In-Reply-To: <05f1e2f4-173a-4226-8c98-1452c20f0a47@sirena.org.uk>
+References: <20260904-kvm-arm64-nvhe-pie-v1-0-29d59f245e6c@kernel.org>
+	<20260904-kvm-arm64-nvhe-pie-v1-2-29d59f245e6c@kernel.org>
+	<86pkyt4gvt.wl-maz@kernel.org>
+	<eb788ad5-5bb3-4767-87b8-d35d9e3ab220@sirena.org.uk>
+	<apqrky27mJmUV9UA@willie-the-truck>
+	<05f1e2f4-173a-4226-8c98-1452c20f0a47@sirena.org.uk>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, will@kernel.org, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, Sep 03, 2026 at 08:22:44PM +0100, Mark Brown wrote:
-> On Thu, Sep 03, 2026 at 04:37:37PM +0100, Leonardo Bras wrote:
-> > On Tue, Sep 01, 2026 at 10:47:04PM +0100, Mark Brown wrote:
+On Fri, 04 Sep 2026 12:48:14 +0100,
+Mark Brown <broonie@kernel.org> wrote:
 > 
-> > > +	return vcpu_read_sys_reg(vcpu, GCSCR_EL2) & GCSCR_ELx_EXLOCKEN;
-> > > +}
+> On Fri, Sep 04, 2026 at 12:29:23PM +0100, Will Deacon wrote:
+> > On Fri, Sep 04, 2026 at 11:33:24AM +0100, Mark Brown wrote:
 > 
-> > The above perfectly translates the GCS part of IllegalExceptionReturn().
+> > > What about pKVM, my understanding was that that is very much an ongoing
+> > > concern and uses the nVHE hypervisor?  My expectation was that this
+> > > would only ever get used in hVHE configurations when people enable pKVM
+> > > on modern hardware, actual nVHE mode was mostly just carried along with
+> > > that.
 > 
-> > It's a nit, as I suppose there should be no compiler warning on that, but
-> > the function should return a bool, and the last return line returns an u64.
+> > pKVM uses hVHE wherever it can nowadays, so I'm fine with only supporting
+> > S1PIE on hVHE and VHE configurations if that's easier to maintain. We
+> > just need to make sure that the failure mode for nVHE results in the
+> > feature being gracefully disabled, rather than e.g. crashing or quietly
+> > doing the wrong thing.
 > 
-> > Maybe adding a "return !!()" would be better?
-> 
-> There's no need to manually do translations like that in C, the
-> conversion of 0 to false and any non-zero value to true when an
-> integer is used in a boolean context is in the standard.
-> 
+> I figure that if we're supporting hVHE it will end up less complicated
+> to also enable nVHE, it reduces the potential for having bad or missing
+> fallback paths for features downstream of S1POE.  It's not like it's a
+> huge extra bit of code and it seems likely to save hassle down the line.
 
-Yeah, I am aware the conversion will happen anyway, but I remember someone 
-complaining about something like this in the past, that's why I sent as a 
-nit. 
+It's not about the code size. it's about the code being *dead*. Nobody
+is going to maintain this configuration, because this is a silly one.
 
-> > >  	 * - trying to return to EL1 with HCR_EL2.TGE set
-> > > +	 * - GCSCR_ELx.EXLOCKEN is 1 and PSTATE.EXLOCK is 0 when attempting
-> > > +	 *   to return from ELx the same EL.
-> > >  	 */
-> > >  	if (mode == PSR_MODE_EL3t   || mode == PSR_MODE_EL3h ||
-> > >  	    mode == 0b00001         || (mode & BIT(1))       ||
-> > >  	    (spsr & PSR_MODE32_BIT) ||
-> > > +	    kvm_check_illegal_exlock_return(vcpu, spsr) ||
-> > >  	    (vcpu_el2_tge_is_set(vcpu) && (mode == PSR_MODE_EL1t ||
-> > >  					   mode == PSR_MODE_EL1h))) {
-> > >  		u64 mask;
-> > 
-> > In IllegalExceptionReturn(), the GCS-related clause happens at the end, and 
-> > here it happens before the TGE one. Could this cause any weird behavior in 
-> > the future?
-> > 
-> > I get that by doing like this you don't change the last line of the "if", 
-> > but I wonder if that could change anything.
-> 
-> Given that we take the same action regardless of which or clause
-> triggers I can't see how it would matter.
+KVM with E2H==0 has reached its architectural peak years ago. We're
+not adding anything to it anymore, and all new architectural bits
+require running with E2H==1.
 
-I see... well, as long as neither test ever have any collateral effect, I 
-think it should not matter, then.
+	M.
 
-> 
-> > > --- a/arch/arm64/kvm/hyp/vhe/switch.c
-> > > +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-> > > @@ -383,6 +383,10 @@ static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
-> > >  		return false;
-> > >  	}
-> 
-> > > +	/* Push GCS exception lock failures into the slow path */
-> > > +	if (kvm_check_illegal_exlock_return(vcpu, spsr))
-> > > +		return false;
-> 
-> > >  	/* If ERETAx fails, take the slow path */
-> > >  	if (esr_iss_is_eretax(esr)) {
-> > >  		if (!(vcpu_has_ptrauth(vcpu) && kvm_auth_eretax(vcpu, &elr)))
-> 
-> > IIUC, this function will be called on the __kvm_vcpu_run_vhe() inner loop, 
-> > in the cases where the guest exited due to a eret. 
-> 
-> > What you change here is that in case of an illegal exlock return, it goes 
-> > out of the loop and return to host kernel, probably to deal with it in the 
-> > mentioned slowpath, the same way the ERETAx entry does.
-> 
-> > I don't question on this being needed. 
-> > I would just like to understand why this is needed here. 
-> 
-> > This does not seem to be related to nested, as this is called in 
-> > __fixup_guest_exit() and not in fixup_nv_guest_exit(). But would not 
-> > hardware be responsible for cheking this, then?
-> 
-> The code is here because it's part of the ERET handling, this should
-> only happen for NV as we're not trapping ERET instructions otherwise.
-
-Oh, makes sense!
-
-> We need this because ERETs from vEL2 are handled in software, modulo the
-> NV3 fast path mentioned at the top of the function.
-
-Oh, and this is done in __fixup_guest_exit() because vEL2 is not a 
-nested guest. It would be it's guests' exit that would be dealt in 
-fixup_nv_guest_exit().
-
-Is this correct?
-
-Thanks!
-Leo
+-- 
+Jazz isn't dead. It just smells funny.
