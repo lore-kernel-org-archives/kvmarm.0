@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6708446AF1B;
-	Fri,  4 Sep 2026 10:35:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EA6242B327;
+	Fri,  4 Sep 2026 10:35:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788518144; cv=none; b=aRT5QukXv2JbG8/3jLr9FKKv/hxB83jBgrW8BJeBWb09G+GQCqB+I3f15lkKJL8sRaMnVQcH+aqp08MnFkRHtzoV5PWyne6Mms4a6AEjh2r2qTrWj3GHjE3VVnh1+AtZNr44HWA0WyuTYW2dlIQoBR2TfbbCWhUcSEWag7tVe4g=
+	t=1788518150; cv=none; b=L1i5CyZcC+/6oKGCnujvEYBgpdHwe7aZNSZfPVXdhq2p8uS5Y6cHE4fDAvTUw2Uvgp3SXAFVOWyn6J5v/pONqpvQZJ7AV8+dNeAeJkkfLQtiz4C4G4knpb4eOU3eWj173cX3Uh78xNe7mSwcRtyQwtgyKYzSAe8KEieTohE4k1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788518144; c=relaxed/simple;
-	bh=6Emig9//T2dSJ2I19kbsWa5yXWNMzvoSSFCcG6vna6o=;
+	s=arc-20240116; t=1788518150; c=relaxed/simple;
+	bh=SPD7jwCA+0OipeuwCBppuiwCEwdNcIigiEdQ1zr2ctI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uBUunFeKwQFfWOBZCvadtC7DVJOg7xRSIGQvjnfeHOuw8mRPMc+6Q3ypO3Xt68kAhZAvZ8oeS5x9N5eJuRUrYeyh4He1oJjE0ZsIZ73eENkBc4lLSzwtAImLWcN1rIS0UzBK17ddS8ot7RJOqJODrSqXsCOYQ+Upk4Oo8PfXZSI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HmBc88Sd; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=BRpUYAQmbOocFQyqfwUIwFREIOMcfZDshYllKd69xjYRPDkZI3Sj5aTlum10Lav5dKVjau7QWiBBy1J4rXHOnPSQP7L6HpSjZD6W6UbsWSZo5Ayxn8cck+A8TyiNPmD9yAhXKChyc7cZXseUW/ZSQgdzsV0JBLb3BetUbft3iZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=afAcEPt7; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HmBc88Sd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF3DB1F00A3E;
-	Fri,  4 Sep 2026 10:35:36 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="afAcEPt7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA8701F00A3D;
+	Fri,  4 Sep 2026 10:35:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788518142;
-	bh=SRAlXDC5oqmsaoNnYadnzJXzxvCqL4owp1KVT95a8j0=;
+	s=k20260515; t=1788518147;
+	bh=ZGmY6QlBMQ2SHa5L+lxqX371JcTBS0qRTbNtw3modBQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=HmBc88SdcpB3sLSsxItcqYlx2jCkHAbj9Bncs+n91l+n9B+Stp2LJFgicwO3sQY+o
-	 q3ZNLnkrb8TZA/OiFg+s/ASpmDPKvhP1dap1Tw6rHbrSQqu8Mtuq2hadF0l5fNZODj
-	 U9o4opHpdRWCrUjRhPgaJ7km1q+9LW58RP0ftAw1jiFbJ0gY/rCDl3xwFaHd9pnhmY
-	 7vwK5pqh+HiXjnPllikjkUPkZ8acS+SSdD0BidBGJa1hZqGoR3edxRSJ4i7qb1Kh7h
-	 jEMgZJRCqJEXhzlOgXRAJp2gB6mnsYT01Ouwbqpr+J4H5fr1fsnc5MBylkorftR155
-	 159D+KNtdrmYw==
+	b=afAcEPt7t2fdenCPFl8yuDLqP8SmdEH9gpHntfCODggDHUt2jjg5qreIkzdmOXlYA
+	 x4ews9cAZJ9O6CjUnfOam1vQY8XW1bLQoMaElEYjJfzdeQwdVPo57aMaQ+MYlChkb/
+	 jncSj7jtk42gDhf5YfbIGQoKcLXDMu//IB+ZnaE6FdCfUulrbI7zRbsNHkkNJHD+WN
+	 tEzMjDkLTHrxH477gaEEWmumqlAOVuF7yPiFMW93YQOQ7KzLNllD7yjHdOLglOkK7q
+	 waPxaRvuNvR1faxdAgrGT1UZ63WzM64kCzi8pg8+2UjETDcJ5i1i+0lJGOoibAt5rf
+	 1EUc3qohWpZBA==
 From: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
 To: linux-coco@lists.linux.dev,
 	kvmarm@lists.linux.dev,
@@ -42,9 +42,9 @@ Cc: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Thomas Gleixner <tglx@kernel.org>,
 	Will Deacon <will@kernel.org>
-Subject: [PATCH v6 7/9] dma-buf: system_heap: Enforce shared-granule alignment for cc-shared buffers
-Date: Fri,  4 Sep 2026 16:04:50 +0530
-Message-ID: <20260904103452.1197239-8-aneesh.kumar@kernel.org>
+Subject: [PATCH v6 8/9] arm64: realm: Add RHI helper to query IPA state change alignment
+Date: Fri,  4 Sep 2026 16:04:51 +0530
+Message-ID: <20260904103452.1197239-9-aneesh.kumar@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260904103452.1197239-1-aneesh.kumar@kernel.org>
 References: <20260904103452.1197239-1-aneesh.kumar@kernel.org>
@@ -56,125 +56,157 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The system heap can allocate buffers that are decrypted and shared with the
-host. For confidential-computing guests, those shared buffers must cover
-whole shared-buffer granule; otherwise a userspace mmap of the dma-buf may
-expose only part of a host-managed granule and allow unintended access to
-adjacent private memory.
+Arm CCA guests need to know the granularity at which the host expects IPA
+state changes to be performed. This can be larger than the guest page size
+and is needed when deciding the alignment for memory shared with the host.
 
-Require cc-shared system-heap allocations to have a size aligned to
-mem_cc_shared_granule_size(), and allocate pages at least as large as the
-required granule. Keep the allocation bounded by the existing heap orders,
-but fall back to an exact minimum-order allocation when the required
-granule is not one of the preferred heap orders.
+Add the Realm Host Interface host configuration definitions and an
+get_ipa_state_change_alignment() helper. The helper uses RSI_HOST_CALL to
+query the supported HostConf version and features, reads the IPA change
+alignment when available, and falls back to PAGE_SIZE if the interface is
+unavailable or returns an invalid value.
 
 Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
 ---
- drivers/dma-buf/heaps/system_heap.c | 50 +++++++++++++++++++++++------
- 1 file changed, 41 insertions(+), 9 deletions(-)
+ drivers/firmware/arm_rmm/rsi.c | 46 ++++++++++++++++++++++++++++++++++
+ include/linux/arm-rsi-cmds.h   | 10 ++++++++
+ include/linux/arm-smccc-rhi.h  | 25 ++++++++++++++++++
+ include/linux/arm-smccc-rsi.h  |  7 ++++++
+ 4 files changed, 88 insertions(+)
+ create mode 100644 include/linux/arm-smccc-rhi.h
 
-diff --git a/drivers/dma-buf/heaps/system_heap.c b/drivers/dma-buf/heaps/system_heap.c
-index c8959eadc71d..9cbfcebe2088 100644
---- a/drivers/dma-buf/heaps/system_heap.c
-+++ b/drivers/dma-buf/heaps/system_heap.c
-@@ -55,7 +55,6 @@ struct dma_heap_attachment {
- #define HIGH_ORDER_GFP  (((GFP_HIGHUSER | __GFP_ZERO | __GFP_NOWARN \
- 				| __GFP_NORETRY) & ~__GFP_RECLAIM) \
- 				| __GFP_COMP)
--static gfp_t order_flags[] = {HIGH_ORDER_GFP, HIGH_ORDER_GFP, LOW_ORDER_GFP};
- /*
-  * The selection of the orders used for allocation (1MB, 64K, 4K) is designed
-  * to match with the sizes often found in IOMMUs. Using order 4 pages instead
-@@ -375,26 +374,44 @@ static const struct dma_buf_ops system_heap_buf_ops = {
- 	.release = system_heap_dma_buf_release,
- };
+diff --git a/drivers/firmware/arm_rmm/rsi.c b/drivers/firmware/arm_rmm/rsi.c
+index 52f40256bd78..2cd53f82432f 100644
+--- a/drivers/firmware/arm_rmm/rsi.c
++++ b/drivers/firmware/arm_rmm/rsi.c
+@@ -9,6 +9,7 @@
+ #include <linux/swiotlb.h>
+ #include <linux/platform_device.h>
+ #include <linux/arm-rsi-cmds.h>
++#include <linux/arm-smccc-rhi.h>
+ #include <linux/kobject.h>
+ #include <linux/sysfs.h>
  
-+static struct page *system_heap_alloc_order(unsigned int order)
-+{
-+	gfp_t flags = order ? HIGH_ORDER_GFP : LOW_ORDER_GFP;
-+
-+	if (mem_accounting)
-+		flags |= __GFP_ACCOUNT;
-+
-+	return alloc_pages(flags, order);
-+}
-+
- static struct page *alloc_largest_available(unsigned long size,
--					    unsigned int max_order)
-+					    unsigned int max_order,
-+					    unsigned int min_order)
- {
- 	struct page *page;
- 	int i;
--	gfp_t flags;
- 
- 	for (i = 0; i < NUM_ORDERS; i++) {
- 		if (size <  (PAGE_SIZE << orders[i]))
- 			continue;
--		if (max_order < orders[i])
-+
-+		if (max_order < orders[i] || orders[i] < min_order)
- 			continue;
--		flags = order_flags[i];
--		if (mem_accounting)
--			flags |= __GFP_ACCOUNT;
--		page = alloc_pages(flags, orders[i]);
-+
-+		page = system_heap_alloc_order(orders[i]);
- 		if (!page)
- 			continue;
- 		return page;
- 	}
-+	/*
-+	 * The required minimum order might not be one of the preferred heap
-+	 * orders. Allocate exactly min_order when it does not exceed the
-+	 * remaining size.
-+	 */
-+	if (min_order && min_order <= max_order &&
-+	    size >= (PAGE_SIZE << min_order))
-+		return system_heap_alloc_order(min_order);
-+
- 	return NULL;
+@@ -164,6 +165,51 @@ static int realm_register_memory_enc_ops(void)
+ 	return arm64_mem_crypt_ops_register(&realm_crypt_ops);
  }
  
-@@ -409,6 +426,8 @@ static struct dma_buf *system_heap_allocate(struct dma_heap *heap,
- 	unsigned int max_order = orders[0];
- 	struct system_heap_priv *priv = dma_heap_get_drvdata(heap);
- 	bool cc_shared = priv->cc_shared;
-+	unsigned int min_order = 0;
-+	size_t cc_granule_size;
- 	struct dma_buf *dmabuf;
- 	struct sg_table *table;
- 	struct scatterlist *sg;
-@@ -425,6 +444,18 @@ static struct dma_buf *system_heap_allocate(struct dma_heap *heap,
- 	buffer->heap = heap;
- 	buffer->len = len;
- 	buffer->cc_shared = cc_shared;
-+	if (cc_shared_buffer(buffer)) {
-+		cc_granule_size = mem_cc_shared_granule_size();
-+		if (!IS_ALIGNED(len, cc_granule_size)) {
-+			ret = -EINVAL;
-+			goto free_buffer;
-+		}
-+		min_order = get_order(cc_granule_size);
-+		if (min_order > max_order) {
-+			ret = -EINVAL;
-+			goto free_buffer;
-+		}
-+	}
++/* we need an aligned struct for rsi_host_call. slab is not yet ready */
++static struct rsi_host_call hostconf_call __initdata;
++static unsigned long __maybe_unused __init get_ipa_state_change_alignment(void)
++{
++	long ret;
++	unsigned long shared_granule_size;
++
++	hostconf_call.imm = 0;
++	hostconf_call.gprs[0] = RHI_HOSTCONF_VERSION;
++	ret = rsi_host_call(lm_alias(&hostconf_call));
++	if (ret != RSI_SUCCESS)
++		goto err_out;
++
++	if (hostconf_call.gprs[0] != RHI_HOSTCONF_VER_1_0)
++		goto err_out;
++
++	hostconf_call.imm = 0;
++	hostconf_call.gprs[0] = RHI_HOSTCONF_FEATURES;
++	ret = rsi_host_call(lm_alias(&hostconf_call));
++	if (ret != RSI_SUCCESS)
++		goto err_out;
++
++	if (!(hostconf_call.gprs[0] & __RHI_HOSTCONF_GET_IPA_CHANGE_ALIGNMENT))
++		goto err_out;
++
++	hostconf_call.imm = 0;
++	hostconf_call.gprs[0] = RHI_HOSTCONF_GET_IPA_CHANGE_ALIGNMENT;
++	ret = rsi_host_call(lm_alias(&hostconf_call));
++	if (ret != RSI_SUCCESS)
++		goto err_out;
++
++	shared_granule_size = hostconf_call.gprs[0];
++	if (shared_granule_size & (SZ_4K - 1) ||
++	    !is_power_of_2(shared_granule_size))
++		goto err_out;
++
++	return max(PAGE_SIZE, shared_granule_size);
++err_out:
++	/*
++	 * For failure condition assume host is built with 4K page size
++	 * and hence IPA state change alignment can be guest PAGE_SIZE.
++	 */
++	return PAGE_SIZE;
++}
++
+ void __init arm64_rsi_init(void)
+ {
+ 	if (arm_smccc_1_1_get_conduit() != SMCCC_CONDUIT_SMC)
+diff --git a/include/linux/arm-rsi-cmds.h b/include/linux/arm-rsi-cmds.h
+index 3f7a6a833993..996f1621b996 100644
+--- a/include/linux/arm-rsi-cmds.h
++++ b/include/linux/arm-rsi-cmds.h
+@@ -236,4 +236,14 @@ static inline unsigned long rsi_attestation_token_continue(phys_addr_t granule,
+ 	return res.a0;
+ }
  
- 	INIT_LIST_HEAD(&pages);
- 	i = 0;
-@@ -438,7 +469,8 @@ static struct dma_buf *system_heap_allocate(struct dma_heap *heap,
- 			goto free_buffer;
- 		}
++static inline unsigned long rsi_host_call(struct rsi_host_call *rhi_call)
++{
++	phys_addr_t addr = virt_to_phys(rhi_call);
++	struct arm_smccc_res res;
++
++	arm_smccc_1_1_invoke(SMC_RSI_HOST_CALL, addr, &res);
++
++	return res.a0;
++}
++
+ #endif /* __LINUX_ARM_RSI_CMDS_H_ */
+diff --git a/include/linux/arm-smccc-rhi.h b/include/linux/arm-smccc-rhi.h
+new file mode 100644
+index 000000000000..91a29996d72d
+--- /dev/null
++++ b/include/linux/arm-smccc-rhi.h
+@@ -0,0 +1,25 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Copyright (C) 2026 ARM Ltd.
++ */
++
++#ifndef __LINUX_ARM_SMCCC_RHI_H_
++#define __LINUX_ARM_SMCCC_RHI_H_
++
++#include <linux/arm-smccc.h>
++
++#define SMC_RHI_CALL(func)				\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,		\
++			   ARM_SMCCC_SMC_64,		\
++			   ARM_SMCCC_OWNER_STANDARD_HYP,\
++			   (func))
++
++#define RHI_HOSTCONF_VER_1_0		0x10000
++#define RHI_HOSTCONF_VERSION		SMC_RHI_CALL(0x004E)
++
++#define __RHI_HOSTCONF_GET_IPA_CHANGE_ALIGNMENT BIT(0)
++#define RHI_HOSTCONF_FEATURES		SMC_RHI_CALL(0x004F)
++
++#define RHI_HOSTCONF_GET_IPA_CHANGE_ALIGNMENT	SMC_RHI_CALL(0x0050)
++
++#endif /* __LINUX_ARM_SMCCC_RHI_H_ */
+diff --git a/include/linux/arm-smccc-rsi.h b/include/linux/arm-smccc-rsi.h
+index fddb77986f70..3532a3f08f4e 100644
+--- a/include/linux/arm-smccc-rsi.h
++++ b/include/linux/arm-smccc-rsi.h
+@@ -182,6 +182,13 @@ struct realm_config {
+  */
+ #define SMC_RSI_IPA_STATE_GET			SMC_RSI_FID(0x198)
  
--		page = alloc_largest_available(size_remaining, max_order);
-+		page = alloc_largest_available(size_remaining, max_order,
-+					       min_order);
- 		if (!page)
- 			goto free_buffer;
- 
++struct rsi_host_call {
++	union {
++		u16 imm;
++		u64 padding0;
++	};
++	u64 gprs[31];
++} __aligned(0x100);
+ /*
+  * Make a Host call.
+  *
 -- 
 2.43.0
 
