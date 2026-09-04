@@ -1,109 +1,190 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D842271450;
-	Fri,  4 Sep 2026 13:00:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 498EE2D94B5;
+	Fri,  4 Sep 2026 13:04:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788526825; cv=none; b=mJfn8CuX3zD8BH2V7LTBmyhTBobAqq4FBUGGorXRkF90My53uZvMWecG66zCwMFr6i861Z3HqlLbhx5WHF/efM/PQ+RjgtbePRGPHqkJUhCl2xXidhNgMxng4XZ0m92M8Hr75kG+khWrq3dbJN36gpVck/WVPo8KIOX9kemJ4jY=
+	t=1788527078; cv=none; b=fedLA+WzuwxQGn8zgCZ/ZbUsyHHd0ObokPq39EmnvgPwoWRTiXMdrjZaszKl76DCMA1BhvV76z+6xgufFFlyEJcgYizfRVmafvJKG+U+RJDBqOnSDIYDyDf2U0FGiVq6wKVfIOiN9/0FPw73uplCve+u3ilwZd8ZfI2rc6lMOjc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788526825; c=relaxed/simple;
-	bh=qMPxDXl8XswbWoVyvM2qtuaeRgT+hpd0hbJtDkX/6M4=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=ojgbJDKMk51MC+05MMMTvca6ntxRqBhIoVbWn94WnbEBdZiaGwS3lH5S/RzmC3O0E/5DhWx4b3DxcrwUzAOEpLwS8UUnBl0PvKa9LHFxnJoyXGUSoxrdmtRR42ijF0PP95ZkI7Xg7fw3Mp2HF7ButQAemWMESmO1i60uONZ+5mQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e0bEgo9s; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788527078; c=relaxed/simple;
+	bh=hgMkUm6ZJXGaN8CSWA74FoH3YB5D0Q8YypvHtnEdcWg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I6pJtf6pq6UQh3iXWKU+DFkLK0ZJxBEid9VNLUdxATUV0QItgyFwhJnurCl6908kJh7SS3l4TvimUbnqgwq0l74RigKZIiqpfZq2hEbZRWuoxhQEQRtCoJV5lPVDMbdTw+N7VfmftKCXdgZ2pZOIrgeCBaw+OIjU+Zkizsau8hU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FI9jXmPk; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e0bEgo9s"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A63291F00A3D;
-	Fri,  4 Sep 2026 13:00:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FI9jXmPk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F225F1F00A3D;
+	Fri,  4 Sep 2026 13:04:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788526824;
-	bh=5/CS0wcncUNX4qbevwTJ+1tLbDjwJRipOJK4Z9N8oqo=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=e0bEgo9sMmvX9TUMfo0z5AlOyYhScb4e0+fiuqK0R45m4peZht52iU5J3PvF3VEdH
-	 AuYHnzBRbRLerkIsyGVMZdpGNUD0YMV1UasvCm+S5kY18fNGx3MEH/u5WWWUZ+REU6
-	 2feRrSKCF0zUdBaUVKxz/8P5AwnqEYry3U204Z8SRa9xsHE5SP0gS9REz3jPgRtuOU
-	 JDr8dgT4mKTpui3Xk80aY8Gomebj8QwVdh5VdYby6GDo6BVrp4WewVZhgW1CO/QrOD
-	 WisK6S/Fw1t4v0/+INzq/8vMnnW0txvRQ7glZ/f6UMmdV/H+SGskfTkT/Ce3uggxtU
-	 K3+uipznHn62w==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v6 21/49] KVM: arm64: gic-v5: Initialise per-VM IRS
- state
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Sascha Bischoff" <Sascha.Bischoff@arm.com>
-Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-In-Reply-To: <20260904113404.4051341-22-sascha.bischoff@arm.com>
-References: <20260904113404.4051341-1-sascha.bischoff@arm.com>
- <20260904113404.4051341-22-sascha.bischoff@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 04 Sep 2026 13:00:23 +0000
-Message-Id: <20260904130023.A63291F00A3D@smtp.kernel.org>
+	s=k20260515; t=1788527077;
+	bh=4uzkzE9HQAjsck1RvYQ8k28kiSnXOy+3W2NVGAadN4A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=FI9jXmPkKkcA/J38KUy6UrC0lnv+GHJhr4JQlSroai4bNWSKzKJK6Jd8IeHsBM0iI
+	 PPjg7gu2zyFEDpkr1v6U/HQfRkQi+1qfIGq5A5rwkQftQWM4DOkNz1zWSvzb3pAiYd
+	 xIWckFefXGNa7lmCgHI+a81XYczWY5ODSX5GYJnaLN4nd+nuz/hYKBUW1rXmXK5d56
+	 h00Mmp1i8kzP+LCpD81ppXggZBiqkdC2kCxRSVMDLqi0y2dsEQRu2ReFT9ZJ8pF3IA
+	 sh+X5YPSFhtDClkhSsQ4e3he0mYS93R1OQwT+Kl5q+6GE7Oi3ZFALnCSfvVW8SVVXH
+	 CLTjn0y6S8+Zw==
+Date: Fri, 4 Sep 2026 14:04:30 +0100
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Shuah Khan <shuah@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Fuad Tabba <fuad.tabba@linux.dev>, Peter Maydell <peter.maydell@linaro.org>, 
+	Leonardo Bras <leo.bras@arm.com>, Wei-Lin Chang <weilin.chang@arm.com>, 
+	Yao Yuan <yaoyuan@linux.alibaba.com>, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
+	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v20 05/14] KVM: arm64: Set PSTATE.EXLOCK when entering an
+ exception
+Message-ID: <apq2uELk-VRvrg7w@gremlin>
+References: <20260901-arm64-gcs-v20-0-f31750bdfadb@kernel.org>
+ <20260901-arm64-gcs-v20-5-f31750bdfadb@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260901-arm64-gcs-v20-5-f31750bdfadb@kernel.org>
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [Medium] Memory leak of the `dist->spis` array across retries of `vgic_in=
-it()` on error paths.
---
+On Tue, Sep 01, 2026 at 10:47:03PM +0100, Mark Brown wrote:
+> As per DDI 0487 R_WTXBY we need to manage PSTATE.EXLOCK when entering an
 
-commit 13674819963e3cb02a4360c21cc165dd2bbdc227
-Author: Sascha Bischoff <Sascha.Bischoff@arm.com>
+I'm guessing this is the doc at this unreasonably huge URI? :)
 
-KVM: arm64: gic-v5: Initialise per-VM IRS state
+https://support.arm.com/documentation/ddi0487/mc/-Part-D-The-AArch64-System-Level-Architecture/-Chapter-D1-The-AArch64-System-Level-Programmers--Model/-D1-4-Exceptions/-D1-4-2-Exception-entry?lang=en#wtxby
 
-This commit allocates the per-VM emulated IRS state when creating a virtual
-GICv5 and initializes it. It establishes the IRS backing required for SPIs
-and LPIs during GICv5 initialization.
+> exception, when the exception is entered from a lower EL the bit is cleared
+> while if entering from the same EL it is set to GCSCR_ELx.EXLOCKEN.
+> Implement this behaviour in enter_exception64().
 
-> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-> index 5a058ef8fe701..bdf06dbff4231 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v5.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
+Ack, all makes sense and matches the doc.
 
-[ ... ]
+>
+> Reviewed-by: Yuan Yao <yaoyuan@linux.alibaba.com>
+> Signed-off-by: Mark Brown <broonie@kernel.org>
 
-> @@ -747,6 +748,11 @@ int vgic_v5_init(struct kvm *kvm)
->  			goto err;
->  	}
-> =20
-> +	/* Init IRS (and alloc SPI IST) */
-> +	ret =3D kvm_vgic_v5_irs_init(kvm, kvm->arch.vgic.nr_spis);
+All LGTM! A couple small nits but otherwise:
 
-[Severity: Medium]
-Does this leak the dist->spis array (up to ~106KB) if userspace retries
-initialization?
+Reviewed-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
 
-When kvm_vgic_v5_irs_init() is called here, it unconditionally allocates
-dist->spis without checking if it is already allocated:
+> ---
+>  arch/arm64/include/uapi/asm/ptrace.h |  1 +
+>  arch/arm64/kvm/hyp/exception.c       | 37 ++++++++++++++++++++++++++++++++++++
+>  2 files changed, 38 insertions(+)
+>
+> diff --git a/arch/arm64/include/uapi/asm/ptrace.h b/arch/arm64/include/uapi/asm/ptrace.h
+> index 15649a253a57..eed7f1226be6 100644
+> --- a/arch/arm64/include/uapi/asm/ptrace.h
+> +++ b/arch/arm64/include/uapi/asm/ptrace.h
+> @@ -56,6 +56,7 @@
+>  #define PSR_C_BIT	0x20000000
+>  #define PSR_Z_BIT	0x40000000
+>  #define PSR_N_BIT	0x80000000
+> +#define PSR_EXLOCK_BIT 0x400000000
 
-arch/arm64/kvm/vgic/vgic-irs-v5.c:kvm_vgic_v5_irs_init() {
-    ...
-    dist->spis =3D kcalloc(nr_spis, sizeof(struct vgic_irq),
-                         GFP_KERNEL_ACCOUNT);
-    ...
-}
+Ah yeah I see this matches BIT_ULL(34) /* PSTATE.EXLOCK */ in
+emulate-nested.c (which you later replace with this :)
 
-If a downstream step in vgic_init() fails (such as=20
-kvm_vgic_setup_default_irq_routing() returning an error), the error path
-calls vgic_v5_teardown(), which deliberately does not free dist->spis.
-
-If userspace retries the failed KVM_DEV_ARM_VGIC_CTRL_INIT ioctl, we will
-hit kvm_vgic_v5_irs_init() again and overwrite the old dist->spis pointer,
-leaking the previous allocation.
-
-Should kvm_vgic_v5_irs_init() check if dist->spis is already allocated, or
-should vgic_v5_teardown() free it on failure?
-
-> +	if (ret)
-> +		goto err;
+>
+>  #define PSR_BTYPE_SHIFT		10
+>
+> diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
+> index 754e2dc1df54..85c873644fe9 100644
+> --- a/arch/arm64/kvm/hyp/exception.c
+> +++ b/arch/arm64/kvm/hyp/exception.c
+> @@ -49,6 +49,38 @@ static void __vcpu_write_spsr_und(struct kvm_vcpu *vcpu, u64 val)
+>  		vcpu->arch.ctxt.spsr_und = val;
+>  }
+>
+> +static unsigned long compute_exlock(struct kvm_vcpu *vcpu,
+> +				    unsigned long mode,
+> +				    unsigned long target_mode)
+> +{
+> +	u64 gcscr;
 > +
->  	return 0;
+> +	if (!kvm_has_gcs(kern_hyp_va(vcpu->kvm)))
+> +		return 0;
+> +
+> +	/* GCS can't be enabled for 32 bit */
+> +	if (mode & PSR_MODE32_BIT)
+> +		return 0;
 
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260904113404.4051=
-341-1-sascha.bischoff@arm.com?part=3D21
+Ack makes sense.
+
+> +
+> +	/* When taking an exception to a higher EL EXLOCK is cleared. */
+> +	if ((mode | PSR_MODE_THREAD_BIT) != target_mode)
+> +		return 0;
+
+Ack makes sense as per doc.
+
+> +
+> +	/*
+> +	 * When taking an exception to the same EL EXLOCK is set to
+> +	 * the effective value of GCSR_ELx.EXLOCKEN.
+
+NIT: Typo? Other references to this here are for GCSCR_ELx.EXLOCKEN.
+
+> +	 */
+> +	if (is_hyp_ctxt(vcpu))
+> +		gcscr = vcpu_read_sys_reg(vcpu, GCSCR_EL2);
+
+I guess with VHE this does the automagically 'think it's in EL2' even if
+it's nested in EL1 stuff? :)
+
+> +	else
+> +		gcscr = vcpu_read_sys_reg(vcpu, GCSCR_EL1);
+> +
+> +	if (gcscr & GCSCR_ELx_EXLOCKEN)
+> +		return PSR_EXLOCK_BIT;
+
+This all LGTM.
+
+> +
+> +	return 0;
+> +}
+> +
+>  /*
+>   * This performs the exception entry at a given EL (@target_mode), stashing PC
+>   * and PSTATE into ELR and SPSR respectively, and compute the new PC/PSTATE.
+> @@ -138,6 +170,11 @@ static void enter_exception64(struct kvm_vcpu *vcpu, unsigned long target_mode,
+>  	// PSTATE.BTYPE is set to zero upon any exception to AArch64
+>  	// See ARM DDI 0487E.a, pages D1-2293 to D1-2294.
+>
+> +	// PSTATE.EXLOCK is set to 0 upon any exception to a higher
+> +	// EL, or to GCSCR_ELx.EXLOCKEN for an exception to the same
+> +	// exception level.  See ARM DDI 0487 R_WTXBY.
+
+Yeah confirmed:
+
+	"If FEAT_GCS is implemented, PSTATE.EXLOCK is updated based on the
+	 following situations:
+
+	 On taking an exception to the same Exception level, PSTATE.EXLOCK
+	 is set to the Effective value of GCSCR_ELx.EXLOCKEN for the
+	 current Exception level.
+
+	 On taking an exception to a higher Exception level, PSTATE.EXLOCK
+	 is set to 0."
+
+A slight nit is that maybe the comment should live with compute_exlock()
+but it's no big deal.
+
+> +	new |= compute_exlock(vcpu, mode, target_mode);
+> +
+>  	new |= PSR_D_BIT;
+>  	new |= PSR_A_BIT;
+>  	new |= PSR_I_BIT;
+>
+> --
+> 2.47.3
+>
+>
+
+--
+Cheers, Lorenzo
