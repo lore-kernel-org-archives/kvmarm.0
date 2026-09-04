@@ -1,57 +1,60 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D80937EFE4;
-	Fri,  4 Sep 2026 07:32:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E13D43B5837;
+	Fri,  4 Sep 2026 07:46:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788507128; cv=none; b=LoP9O0N01jzAiRgkXEaGetNr+Dc7n9h2tKyy0cJ36xV24nhofEmVfxSaB4oLgvlTBTbfxIW4R3p8+TJjwmxZQwa14o6ZaErhyCDBx8bmich71gvXt58g9CYZk2oePoGkm2iMArNQEhxCkGsMlDcM8ISP9DAh7l+GAsM3bt7q4+s=
+	t=1788508005; cv=none; b=dFrEG4phU+6isdZshXi9k9an+o+ZsQqda+h1AHTqk6UYr08qoFr78tO+thFLJ/KftQ+Zmd1Z+717f0l7Fqnm/56mDYh5qmmF6ue7XOf27xx2RBN5UZFLc5UODNap3FEm4koRkHYRsdw1eYOZ/GpR2pcteZx9Wbyaze5yobjM1rc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788507128; c=relaxed/simple;
-	bh=bVkBo0Z05i+SGG/dIbbpJdV3Jj/WQNtvdQDjSfIFbBk=;
+	s=arc-20240116; t=1788508005; c=relaxed/simple;
+	bh=CkZeulv6QbhQbxQAlOXX6Zc+UCqDcmjcHoUDCQrGh+0=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=egs097BFH0x9r4gyxbYRJrM5PtMR+/y2jb2qYA1kSjp9wOPMrkR3ONhRWVH+mpnPQV8aarJ0kvBpd0oOANHBn1A7/kau6GH2lsvuTmpYeywLcYtHCnciwCfV180JwF0z6Srf4KAXUfrTy5glGe9ibdy7ht03t6MtdNXNMWs1Luo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kOeJfiUW; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=PDjHZ8d6JbD0Vz3GAAGqAnTyP6L4VT81bS1M4J+LIOXf1QKsYQ2pAu621J/o5KcEvMO0Gzmp5pKQFsMpG0BMW2nMYeMCV5fYP1nH7YHmvjeBeyq66x7KOlzLxbtfpPdbTQ7DIteHJGysFFOunRS+yuEIEWlK1marHYPkLyhWOT8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EfFlHyFf; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kOeJfiUW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DE2E1F00A3E;
-	Fri,  4 Sep 2026 07:32:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EfFlHyFf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 692A31F00A3D;
+	Fri,  4 Sep 2026 07:46:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788507127;
-	bh=m3ysWNSFI4l+W86GmHiSPzBC8AxmIxoztdkJrzt+nPA=;
+	s=k20260515; t=1788508003;
+	bh=03eIS2DS8PjcdkHIfXExaV9bsKwUvGke/WEpmxbLmbc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=kOeJfiUWHYKZgY3TIrbthcGawTpvHDlWNQPl+NX0AANUYFL0GYcbHQMTTDTzFDCFU
-	 dWwx773ns04RWBvF52jFEvfW5q5c0L/c0UuUlnhj2VZVY4nSo9bPmJQea93gwcTHsh
-	 /7MCUQsd3zeSWNZEODXdviRTAhzjj0G8n6q7FFyJ1Pax/XwuPn2zwfhiFJ0QRXJDn1
-	 zfHNsKILlLH5VVmuF/COVzBKo9x5Pkbk/GIYRgUfpDs0z718UlGQSpHCQRxutnRUQw
-	 yQYdiUOSoEKF5rlAQDuCMtqQupagnVg0/B0+UF61F5debnMXFRaNUOKAO3S8eMHc5j
-	 o+uA4q8Ug78qw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	b=EfFlHyFfqKG6y7UZgTKd2iocNdwfSUvzqahd8EmGsV2i52JgN5UfmRtR98vYT7UrG
+	 SSASpzd1t/jyACeK9wZJWJbzWtwrrqd3z0rtrtcIGFvxhT7pd/PiFBM9pP70F+IKLA
+	 HxygD9c5hDcf847EDo45GBdd1U893ROcDZb88cUBj30MjZQlw3TTjkfHNmHp48E6D2
+	 fF7rraOFUG7YTAFWvJbwk3sKyLLjGMUCIyQt2oWoHVLPxlHdGoukiecvuiwe92g7T9
+	 /vj5tLLsKKTItfpJ2168htwZm3k0fvlUhpbiGCg69OXEbTE5Nvg416Bfafe4s1NDKg
+	 qKxWtcNnTHZKw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1x2OP6-00000004hDW-3dbh;
-	Fri, 04 Sep 2026 07:32:04 +0000
-Date: Fri, 04 Sep 2026 08:32:04 +0100
-Message-ID: <86o6ed4gln.wl-maz@kernel.org>
+	id 1x2OdF-00000004hTl-0MOb;
+	Fri, 04 Sep 2026 07:46:41 +0000
+Date: Fri, 04 Sep 2026 08:49:14 +0100
+Message-ID: <875x0l5udh.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
+To: Wei-Lin Chang <weilin.chang@arm.com>
+Cc: Wang Han <wanghan@linux.alibaba.com>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] KVM: arm64: Initialise TCR2_EL2 for nVHE mode
-In-Reply-To: <20260904-kvm-arm64-nvhe-pie-v1-1-29d59f245e6c@kernel.org>
-References: <20260904-kvm-arm64-nvhe-pie-v1-0-29d59f245e6c@kernel.org>
-	<20260904-kvm-arm64-nvhe-pie-v1-1-29d59f245e6c@kernel.org>
+	linux-kernel@vger.kernel.org,
+	oupton@kernel.org,
+	tabba@google.com,
+	joey.gouly@arm.com,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	ljs@kernel.org,
+	itaru.kitayama@fujitsu.com
+Subject: Re: [PATCH v5 0/6] KVM: arm64: nv: Implement nested stage-2 reverse map (new data structure)
+In-Reply-To: <wsnf276xrun3g4hjr3t6alprapctg5z4kpj422v3hujqdjnrsa@swq4blkqvvj5>
+References: <20260810205038.118843-1-weilin.chang@arm.com>
+	<20260902163500.1841671-1-wanghan@linux.alibaba.com>
+	<877bl26aqg.wl-maz@kernel.org>
+	<wsnf276xrun3g4hjr3t6alprapctg5z4kpj422v3hujqdjnrsa@swq4blkqvvj5>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -63,122 +66,79 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: weilin.chang@arm.com, wanghan@linux.alibaba.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, oupton@kernel.org, tabba@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, ljs@kernel.org, itaru.kitayama@fujitsu.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 04 Sep 2026 00:14:41 +0100,
-Mark Brown <broonie@kernel.org> wrote:
+On Thu, 03 Sep 2026 14:28:16 +0100,
+Wei-Lin Chang <weilin.chang@arm.com> wrote:
 > 
-> We currently only configure TCR2_EL2 in VHE mode, this is done in
-> __finalise_el2 which only runs for VHE. While all systems with TCR2_EL2
-> should have VHE support users may wish to run them in nVHE mode, for
-> example in order to use protected VMs.
+> On Thu, Sep 03, 2026 at 08:43:35AM +0100, Marc Zyngier wrote:
+> > On Wed, 02 Sep 2026 17:35:00 +0100,
+> > Wang Han <wanghan@linux.alibaba.com> wrote:
+> > > 
+> > > Hi Wei-Lin,
+> > > 
+> > > I tested this series on a Yitian 710 system with an ARM Neoverse-N2 CPU
+> > > (128 CPUs, 2 NUMA nodes).
+> > > 
+> > > Test environment
+> > > ----------------
+> > > 
+> > >   L0 kernel: Linux v7.2-rc6
+> > >   L1 guest: Ubuntu 26.04 LTS, kernel 7.0.0-27-generic (aarch64)
+> > >   QEMU: 10.2.3
+> > > 
+> > > L0 NUMA balancing was enabled (`/proc/sys/kernel/numa_balancing=1`).
+> > > The host was booted with `kvm_arm.mode=nested`.
+> > > 
+> > > This series fixes a functional hang that is exposed when NUMA balancing is
+> > > enabled.  The previous nested stage-2 unmap path is too slow for this
+> > > workload, making the performance problem user-visible: NUMA balancing can
+> > > leave the L1 guest unable to make progress and eventually hang during boot.
+> > >
+> > > The L1 was started with 8 vCPUs and 32 GiB of RAM using:
+> > > 
+> > >   qemu-system-aarch64 -smp 8 -m 32G \
+> > >     -machine virt,accel=kvm,gic-version=3,virtualization=on \
+> > >     -cpu host -nographic -enable-kvm \
+> > >     -drive if=pflash,format=raw,readonly=on,file=pflash0_bak.img \
+> > >     -drive if=pflash,format=raw,file=pflash1_bak.img \
+> > >     -drive file=./ubuntu-vm.qcow2,format=qcow2,if=virtio,cache=none,aio=native \
+> > >     -nic user,model=virtio-net-pci,hostfwd=tcp::11234-:22 \
+> > >     -serial mon:stdio
+> > > 
+> > 
+> > Puzzling. If you are only running an L1 in VHE mode, there is no
+> > shadow S2, and therefore nothing to unmap. For shadow S2s to be built
+> > and affect the MMU notifiers, you need to run an L2.
 > 
-> Determine the value to load for TCR2_EL2 in C code in a similar manner to
-> TCR_EL2, further patches will configure some bits in the register. When
-> resetting back to the hypervisor stub clear all bits in the register in
-> case something without support for TCR2_EL2 runs later.
-> 
-> The only practical impact should be if we are started with a misconfigured
-> TCR2_EL2.
-> 
-> Signed-off-by: Mark Brown <broonie@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_asm.h   |  1 +
->  arch/arm64/kernel/asm-offsets.c    |  1 +
->  arch/arm64/kvm/arm.c               |  5 ++++-
->  arch/arm64/kvm/hyp/nvhe/hyp-init.S | 18 ++++++++++++++++--
->  4 files changed, 22 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> index e5b92ac09e69..eb796436d6eb 100644
-> --- a/arch/arm64/include/asm/kvm_asm.h
-> +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -208,6 +208,7 @@ extern void *__vhe_undefined_symbol;
->  struct kvm_nvhe_init_params {
->  	unsigned long mair_el2;
->  	unsigned long tcr_el2;
-> +	unsigned long tcr2_el2;
->  	unsigned long tpidr_el2;
->  	unsigned long stack_hyp_va;
->  	unsigned long stack_pa;
-> diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
-> index 9c853ed3ceab..baffe58015d6 100644
-> --- a/arch/arm64/kernel/asm-offsets.c
-> +++ b/arch/arm64/kernel/asm-offsets.c
-> @@ -118,6 +118,7 @@ int main(void)
->    DEFINE(HOST_DATA_CONTEXT,	offsetof(struct kvm_host_data, host_ctxt));
->    DEFINE(NVHE_INIT_MAIR_EL2,	offsetof(struct kvm_nvhe_init_params, mair_el2));
->    DEFINE(NVHE_INIT_TCR_EL2,	offsetof(struct kvm_nvhe_init_params, tcr_el2));
-> +  DEFINE(NVHE_INIT_TCR2_EL2,	offsetof(struct kvm_nvhe_init_params, tcr2_el2));
->    DEFINE(NVHE_INIT_TPIDR_EL2,	offsetof(struct kvm_nvhe_init_params, tpidr_el2));
->    DEFINE(NVHE_INIT_STACK_HYP_VA,	offsetof(struct kvm_nvhe_init_params, stack_hyp_va));
->    DEFINE(NVHE_INIT_PGD_PA,	offsetof(struct kvm_nvhe_init_params, pgd_pa));
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 8b080804bc90..88eb0459ad4b 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -2158,7 +2158,7 @@ static int kvm_init_vector_slots(void)
->  static void __init cpu_prepare_hyp_mode(int cpu, u32 hyp_va_bits)
->  {
->  	struct kvm_nvhe_init_params *params = per_cpu_ptr_nvhe_sym(kvm_init_params, cpu);
-> -	unsigned long tcr;
-> +	unsigned long tcr, tcr2;
->  
->  	/*
->  	 * Calculate the raw per-cpu offset without a translation from the
-> @@ -2186,6 +2186,9 @@ static void __init cpu_prepare_hyp_mode(int cpu, u32 hyp_va_bits)
->  	tcr |= TCR_T0SZ(hyp_va_bits);
->  	params->tcr_el2 = tcr;
->  
-> +	tcr2 = 0;
-> +	params->tcr2_el2 = tcr2;
-> +
->  	params->pgd_pa = kvm_mmu_get_httbr();
->  	if (is_protected_kvm_enabled())
->  		params->hcr_el2 = HCR_HOST_NVHE_PROTECTED_FLAGS;
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-> index 0b3e0b28dfc7..a39de9c20d27 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-> @@ -137,8 +137,13 @@ alternative_if ARM64_HAS_CNP
->  alternative_else_nop_endif
->  	msr	ttbr0_el2, x2
->  
-> -	ldr	x0, [x0, #NVHE_INIT_TCR_EL2]
-> -	msr	tcr_el2, x0
-> +	ldr	x1, [x0, #NVHE_INIT_TCR_EL2]
-> +	msr	tcr_el2, x1
-> +
-> +alternative_if ARM64_HAS_TCR2
-> +	ldr	x1, [x0, #NVHE_INIT_TCR2_EL2]
-> +	msr	REG_TCR2_EL2, x1
-> +alternative_else_nop_endif
->  
->  	isb
->  
-> @@ -250,6 +255,15 @@ reset:
->  	mov_q	x5, INIT_SCTLR_EL2_MMU_OFF
->  	pre_disable_mmu_workaround
->  	msr	sctlr_el2, x5
-> +
-> +alternative_if ARM64_HAS_TCR2
-> +	/*
-> +	 * Disable any features we enabled in case the next user doesn't
-> +	 * have TCR2_EL2 support.
-> +	 */
-> +	msr	REG_TCR2_EL2, xzr
-> +alternative_else_nop_endif
-> +
+> I was thinking the same at first, but realized even with L1 in VHE mode
+> there is a small period of time where L1 runs in its EL1 during boot, so
+> one nested MMU will become valid for each vCPU. That causes
+> kvm_nested_s2_unmap() to iterate through the entire IPA space 8 times
+> (-smp 8).
 
-I don't see the point of this. The MMU is off, and if the next piece
-of SW can't correctly initialise the HW, that's its problem.
+It should be one nested MMU for the whole VM, not one per vcpu.
+That's assuming they share the same VMID+VTCR.
 
-And with this hunk gone, the rest should be moved to the following
-patch.
+> What I am curious about is whether one single notifier unmap is enough
+> to hang L1, or were there multiple notifier unmaps.
+> 
+> QEMU with -machine virt uses 40 IPA bits only, unmapping that takes:
+> 1024  (4KB pages,  unmapping 1GB per iteration)
+> 32768 (16KB pages, unmapping 32MB per iteration)
+> 2048  (64KB pages, unmapping 512MB per iteration)
+> iterations for each page size. There aren't many mappings in each
+> iteration too. Does this really take that long on real hardware (even if
+> this must be done 8 times)?
+
+This should be close to being at zero cost, so something else is
+amiss.
+
+Could you please have a look?
 
 	M.
 
 -- 
-Without deviation from the norm, progress is not possible.
+Jazz isn't dead. It just smells funny.
