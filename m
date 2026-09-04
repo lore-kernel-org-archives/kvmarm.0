@@ -1,147 +1,119 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63184493637;
-	Fri,  4 Sep 2026 13:25:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEE384A2A53;
+	Fri,  4 Sep 2026 13:27:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788528315; cv=none; b=lljDiwCqmju/6SsS94bwrUwqXx/d0AxvEBt34ErTdS7upHevS8es2CZcH3YVtTbxmEZWyPhmn6Zb6vW56+eWEJELKjRXEnYXxq3Dd6DnVtE4/alH+jy+0ZfJDUayMEm3JtSsnW06rvy7RfwjXFqV3g4t0SBSiiZLVByJECk2zps=
+	t=1788528453; cv=none; b=s1uIZkayU7JhqO3OVSDfCoApcixdUwEggRSb477hK05uH4eKAGMy5+4+eSr+Mw0+U5ToIsw1V/nJmnII94YFbd28JXpMQW7Pnno93l6A5/RhnVMoA3NMtgWf6kiIWXYq7To4K9iTQ3qBiekLf7GceGOH8iCyeIyufsRTh3YJ3DU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788528315; c=relaxed/simple;
-	bh=+x0ZADvFDyX6bEK7tqHxXeYBregC92koTtjI+WtQxm8=;
+	s=arc-20240116; t=1788528453; c=relaxed/simple;
+	bh=BrKH1slhTJcB7fwRxUk3N8h9tBfv2C8yJycpH/t1uFg=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=ChHcmhJjQag9plAn/i9UBAdnEEWAbqI8mBYWBvLpY1zSufUQ25/KgNdtUrG2vs4znz1Oizjlv3H8hy1J86AJM6Hv3CF3KgnNEWBu/kIkZdDk+e1YgETEbG6CIZvFV9hwB4e0YAOyTULtK9kF30usn4dAcYNAjX0kdqAEuEHq3xo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EZ8Yq9df; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=JpglW0UpuY15nB5iOId2tHzB/4bdMk+MeI/8BTmkcFVHmcdPOHlWtBnGoH84olXcwDn1xyrpoeqDH4YFM2W6UuSyP5/RzMIdJgKuOtIoS9mRkDH6IzyYO4EPkCggan/QunpBXwJCL4xAzRzPZ/Y0YESFjeQ7ebPvsDl94iTZaZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EDyZIhqx; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EZ8Yq9df"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16D111F00A3D;
-	Fri,  4 Sep 2026 13:25:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EDyZIhqx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40F7C1F00AC4;
+	Fri,  4 Sep 2026 13:27:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788528310;
-	bh=4GGptH93lF25+JKTnAxykwT95pAsEY7BIIhCj6MkqFw=;
+	s=k20260515; t=1788528451;
+	bh=FZis4c6UEHZrhAYzuW4m8uTE8qNsZQwU/XB2IFp9ZnQ=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=EZ8Yq9dfQLLR1dUhikShlk1/vpO9oKumhE9KtKbRAtStRsRdG3qBLRf/6VOAb8DZA
-	 kwyUvsZUfCebyNZgJL3mY5Bd4Cyu9D2Iknvwqpmw6zfJU4T/piGCUeHM7A4WSZvcQE
-	 QutIxjg9b2owEKRBMo0AF7LwfM4gTlQRsOfvY/Fj4QvcQ/7c1rXKPuQ4XfpvsnZ9t5
-	 57R+woVyELN/tLli0Niki30GLgUndAbwJctZq9E2CD5OmpXuXjapeI2rpQGySX3mYZ
-	 UqvZKm+Xlzl1Up1P8iWJW1tAb50U1TqY81reUCrwn9m6GqXN0Ti3Y1zPWOApHtClxM
-	 dV25kGHA54OgA==
+	b=EDyZIhqx9OBmnMylwEdvZsfXkI+D/V+mVLhwMevDV3C6IoYze2ZW1MJmZQmASo/Sw
+	 6LlsFQeBcHdCc/Q2/2WSvF0hn5eef3Ti94BNgnOGY+vocEu/ogC/15CrCY7kDum/X5
+	 KcqhPRLlmhaLxkI/ENJwBZnjDVboaOds2Ph/lnOXPXhk40sRXpIs8iyYYyzkIuDtns
+	 RTpN2cZ2BLs4WJ0bKnw5Gf1E0SbwqAuRW4GwdDSlUxhfBhRzE6T/DXG0SArUeJAJG1
+	 tk6wbbrCDYMzbiCVoLiCcpS3v+UZL55kV8O09y4S+x1GyxcTlXfYqWx2m5K1RWUyH4
+	 kqaSNbb+F0eSA==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v6 28/49] Documentation: KVM: Extend VGICv5 device
- attribute docs
+Subject: Re: [PATCH v6 31/49] KVM: arm64: gic-v5: Add GICv5 EL1 sysreg
+ userspace accessors
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Sascha Bischoff" <Sascha.Bischoff@arm.com>
-Cc: "Marc Zyngier" <maz@kernel.org>, kvm@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev
-In-Reply-To: <20260904113404.4051341-29-sascha.bischoff@arm.com>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20260904113404.4051341-32-sascha.bischoff@arm.com>
 References: <20260904113404.4051341-1-sascha.bischoff@arm.com>
- <20260904113404.4051341-29-sascha.bischoff@arm.com>
+ <20260904113404.4051341-32-sascha.bischoff@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 04 Sep 2026 13:25:09 +0000
-Message-Id: <20260904132510.16D111F00A3D@smtp.kernel.org>
+Date: Fri, 04 Sep 2026 13:27:30 +0000
+Message-Id: <20260904132731.40F7C1F00AC4@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [Critical] The GICv5 IRS address is now mandatory and SPIs are enabled by=
- default, breaking existing userspace that creates PPI-only VGICv5 instance=
-s.
-- [Critical] KVM_DEV_ARM_VGIC_GRP_NR_IRQS is redefined for VGICv5 to mean o=
-nly the number of SPIs, breaking generic VMM logic.
+- [High] Incorrect priority mask for ICC_PPI_PRIORITYRx_EL1 registers (LSB-=
+aligned instead of MSB-aligned).
 --
 
-commit 09cdbd6c9f58457f6d769b06163f573cb425aea3
+commit 03cc6ad9380aa567c97ad187be2f0c81a5904007
 Author: Sascha Bischoff <Sascha.Bischoff@arm.com>
 
-Documentation: KVM: Extend VGICv5 device attribute docs
+KVM: arm64: gic-v5: Add GICv5 EL1 sysreg userspace accessors
 
-This commit updates the VGICv5 documentation to cover PPI, SPI, and LPI
-interrupts, detailing how their pending state is injected. It also documents
-the mandatory GICv5 IRS address attribute and its GPA layout requirements.
-Finally, it explains the GICv5-specific interpretation of
-KVM_DEV_ARM_VGIC_GRP_NR_IRQS, which only counts SPIs instead of the total
-number of interrupts.
+This commit adds functions to handle userspace reads and writes of the GICv5
+EL1 system registers. This allows KVM to save and restore the GICv5 CPU
+interface state to support VM migration. Userspace writes are translated
+back into KVM's corresponding internal representation.
 
-> diff --git a/Documentation/virt/kvm/devices/arm-vgic-v5.rst b/Documentati=
-on/virt/kvm/devices/arm-vgic-v5.rst
-> index 70b9162755c7e..c782ea4d4609c 100644
-> --- a/Documentation/virt/kvm/devices/arm-vgic-v5.rst
-> +++ b/Documentation/virt/kvm/devices/arm-vgic-v5.rst
-> @@ -12,12 +12,39 @@ Only one VGIC instance may be instantiated through th=
-is API.  The created VGIC
-
+> diff --git a/arch/arm64/kvm/vgic-sys-reg-v5.c b/arch/arm64/kvm/vgic-sys-r=
+eg-v5.c
+> new file mode 100644
+> index 0000000000000..6b255eacbf60d
+> --- /dev/null
+> +++ b/arch/arm64/kvm/vgic-sys-reg-v5.c
+> @@ -0,0 +1,519 @@
 [ ... ]
+> +#include "vgic/vgic.h"
+> +#include "sys_regs.h"
+> +
+> +#define ICC_PPI_PRIORITYR_PRIORITY_MASK		REPEAT_BYTE(0x1f)
+> +
+> +static int set_gic_apr(struct kvm_vcpu *vcpu, const struct sys_reg_desc =
+*r,
+[ ... ]
+> +static int set_gic_ppi_priorityr(struct kvm_vcpu *vcpu,
+> +				 const struct sys_reg_desc *r, u64 val)
+> +{
+> +	struct vgic_v5_cpu_if *cpu_if =3D &vcpu->arch.vgic_cpu.vgic_v5;
+> +	int reg =3D ((r->CRm & 0x1) << 3) + r->Op2;
+> +
+> +	/* If we only support architected PPIs, return */
+> +	if (VGIC_V5_NR_PRIVATE_IRQS =3D=3D 64 && reg > 7)
+> +		return 0;
+> +
+> +	val &=3D ICC_PPI_PRIORITYR_PRIORITY_MASK;
 
-> +      Setting the address of the IRS in GPA space is mandatory before VG=
-IC
-> +      resources are mapped, as the IRS is responsible for handling SPIs =
-and
-> +      LPIs. Failure to set the IRS address before the first vCPU run res=
-ults in
-> +      an error.
+[Severity: High]
+Does this apply the correct mask for the priority field?
 
-[Severity: Critical]
-Does making the IRS address mandatory introduce a regression for existing
-userspace that creates PPI-only VGICv5 instances?
+The GIC architecture aligns priority values to the most significant bits
+(MSBs) of the 8-bit priority field (for example, bits [7:3] for a 5-bit
+priority). The macro ICC_PPI_PRIORITYR_PRIORITY_MASK is defined earlier in
+this file as REPEAT_BYTE(0x1f), which preserves bits [4:0] and clears bits
+[7:5] for each byte.
 
-If a VMM creates a VGICv5 without setting KVM_VGIC_V5_ADDR_TYPE_IRS, it loo=
-ks
-like it will now fail to boot:
-
-arch/arm64/kvm/vgic/vgic-init.c:kvm_vgic_map_resources() {
-	...
-	if (IS_VGIC_ADDR_UNDEF(irs_base)) {
-		ret =3D -ENXIO;
-		goto out_slots;
-	}
-	...
-}
-
-It appears it also rejects configuring 0 SPIs, which forces the mandatory
-use of the IRS:
-
-arch/arm64/kvm/vgic/vgic-kvm-device.c:vgic_set_common_attr() {
-	...
-	if (val < VGIC_V5_DEFAULT_NR_SPIS ||
-	...
-}
-
-Could this cause an ABI regression for legacy VMs that only use PPIs?
+Since the actual priority bits are stored in the MSBs, clearing them during
+set_gic_ppi_priorityr() would effectively zero out the restored guest
+interrupt priorities when userspace restores the state during VM migration.
+This could cause interrupt priority inversion and prevent ICC_PMR_EL1 maski=
+ng
+from working correctly.
 
 > +
-> +  KVM_DEV_ARM_VGIC_GRP_NR_IRQS
-> +   Attributes:
-> +
-> +    A value describing the number of SPIs for this GIC instance. This is
-> +    GICv5-specific: unlike GICv2/v3, the value does not include SGIs or =
-PPIs.
-> +    The value ranges from 32 to KVM's VGICv5 maximum of 1024 SPIs, in
-> +    increments of 32. If userspace does not set this attribute, KVM uses=
- 32
-> +    SPIs by default.
-
-[Severity: Critical]
-Does redefining KVM_DEV_ARM_VGIC_GRP_NR_IRQS to only represent the number of
-SPIs introduce a regression for generic VMM logic?
-
-For GICv2/v3, this attribute represents the total number of interrupts
-(32 + SPIs). However, for VGICv5, it seems the requested value is assigned
-directly to nr_spis without subtracting VGIC_NR_PRIVATE_IRQS:
-
-arch/arm64/kvm/vgic/vgic-kvm-device.c:vgic_set_common_attr() {
-	...
-	dev->kvm->arch.vgic.nr_spis =3D val;
-	...
-}
-
-If a generic VMM passes 32 + N (expecting N SPIs), won't it inadvertently
-allocate 32 additional SPIs? Could this inconsistency in the UAPI cause an
-ABI regression?
+> +	/*
+> +	 * Although priorities are not regularly synced back to the vgic_irq
+> +	 * state, they are explicitly synced back here. This is to ensure that
+> +	 * any pending PPIs are evaluated correctly when first running the guest
+> +	 * after setting the state.
+> +	 */
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260904113404.4051=
-341-1-sascha.bischoff@arm.com?part=3D28
+341-1-sascha.bischoff@arm.com?part=3D31
