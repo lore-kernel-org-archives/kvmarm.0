@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EA6242B327;
-	Fri,  4 Sep 2026 10:35:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25AED47143A;
+	Fri,  4 Sep 2026 10:35:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788518150; cv=none; b=L1i5CyZcC+/6oKGCnujvEYBgpdHwe7aZNSZfPVXdhq2p8uS5Y6cHE4fDAvTUw2Uvgp3SXAFVOWyn6J5v/pONqpvQZJ7AV8+dNeAeJkkfLQtiz4C4G4knpb4eOU3eWj173cX3Uh78xNe7mSwcRtyQwtgyKYzSAe8KEieTohE4k1g=
+	t=1788518156; cv=none; b=Iexdq0BLogUJ3wa4S70iwdAgXwO55IZSUOWJX6/24xXwJSJLF7z+FnAJdTwHLDNFGxtSeWjFktcDzvA8udonY+lGvKxPzzKPi6Qip/VGMb4NcwfmidJh+dCY+YEGHaa3MtfFo+LdqQ3i11e/NL4CvV+uQFj/jet5yI0/y7Q2XJQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788518150; c=relaxed/simple;
-	bh=SPD7jwCA+0OipeuwCBppuiwCEwdNcIigiEdQ1zr2ctI=;
+	s=arc-20240116; t=1788518156; c=relaxed/simple;
+	bh=nd6sf8naTpyYqcNuS3y+EeUYR4Zl5gEmukrd0lFeVSc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BRpUYAQmbOocFQyqfwUIwFREIOMcfZDshYllKd69xjYRPDkZI3Sj5aTlum10Lav5dKVjau7QWiBBy1J4rXHOnPSQP7L6HpSjZD6W6UbsWSZo5Ayxn8cck+A8TyiNPmD9yAhXKChyc7cZXseUW/ZSQgdzsV0JBLb3BetUbft3iZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=afAcEPt7; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=jP00SoZSDtNlRqU0JtMqx/RNrs8upjF/bevVg7NzEGgezgn+CFQTyUGGZegl1tBzjmm8Mx8SONQ2tf3DGgRoHkXVJ1lfe8I0k6P4++nxSui1seV8WlYIyUzvWCfG6RDOxU9t9NL3xhLgnsRcxUTcTSUfdT/h1UEGwvzV1ZUWi7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ag3TqrjJ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="afAcEPt7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA8701F00A3D;
-	Fri,  4 Sep 2026 10:35:42 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ag3TqrjJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65AAD1F00A3E;
+	Fri,  4 Sep 2026 10:35:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788518147;
-	bh=ZGmY6QlBMQ2SHa5L+lxqX371JcTBS0qRTbNtw3modBQ=;
+	s=k20260515; t=1788518153;
+	bh=u9I2WPocLUacIb6MXv6UW+BXVCGDKNGSQF8ffRh5uJE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=afAcEPt7t2fdenCPFl8yuDLqP8SmdEH9gpHntfCODggDHUt2jjg5qreIkzdmOXlYA
-	 x4ews9cAZJ9O6CjUnfOam1vQY8XW1bLQoMaElEYjJfzdeQwdVPo57aMaQ+MYlChkb/
-	 jncSj7jtk42gDhf5YfbIGQoKcLXDMu//IB+ZnaE6FdCfUulrbI7zRbsNHkkNJHD+WN
-	 tEzMjDkLTHrxH477gaEEWmumqlAOVuF7yPiFMW93YQOQ7KzLNllD7yjHdOLglOkK7q
-	 waPxaRvuNvR1faxdAgrGT1UZ63WzM64kCzi8pg8+2UjETDcJ5i1i+0lJGOoibAt5rf
-	 1EUc3qohWpZBA==
+	b=Ag3TqrjJK6NyKSY5HFriLni2RYiMqOyiczi4SedYu9aoxcW7VAiIQmq3OgqnuN+lO
+	 t48NCzb9u4ItoAs2nwdCm3BWWbyM8Xvcw4b6JOsIo8nyL+wIOL70dofHXvFQelH2ac
+	 rn+fVTW4+VlGbZZYilrDNAqmBV+FoOb6MZh3IgTYfl8Q4U4ujL6wxVBM1KCNyVlsKS
+	 nK/KT/uyhGZUhQI6zI29x8SiDyrL1zQquaWzefOINBzcZVtLdxb6pPiclH0+ORPito
+	 iSkjUKubJh7FuCBbH0uEHgDigwKXqLbpesSLWU023N2AVQpJipCrJ3qgT24kYgyhoC
+	 RwplQVNBH5AaQ==
 From: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
 To: linux-coco@lists.linux.dev,
 	kvmarm@lists.linux.dev,
@@ -42,9 +42,9 @@ Cc: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Thomas Gleixner <tglx@kernel.org>,
 	Will Deacon <will@kernel.org>
-Subject: [PATCH v6 8/9] arm64: realm: Add RHI helper to query IPA state change alignment
-Date: Fri,  4 Sep 2026 16:04:51 +0530
-Message-ID: <20260904103452.1197239-9-aneesh.kumar@kernel.org>
+Subject: [PATCH v6 9/9] arm64: realm: Expose the CCA shared granule size through mem_encrypt ops
+Date: Fri,  4 Sep 2026 16:04:52 +0530
+Message-ID: <20260904103452.1197239-10-aneesh.kumar@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260904103452.1197239-1-aneesh.kumar@kernel.org>
 References: <20260904103452.1197239-1-aneesh.kumar@kernel.org>
@@ -56,157 +56,158 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Arm CCA guests need to know the granularity at which the host expects IPA
-state changes to be performed. This can be larger than the guest page size
-and is needed when deciding the alignment for memory shared with the host.
+CCA guests must align shared/private memory transitions to the size
+reported by the host for IPA state changes. This size can be larger than
+PAGE_SIZE, so allowing a guest to convert only a PAGE_SIZE-sized subrange
+can leave the remaining part of that host-sized range in the wrong state.
 
-Add the Realm Host Interface host configuration definitions and an
-get_ipa_state_change_alignment() helper. The helper uses RSI_HOST_CALL to
-query the supported HostConf version and features, reads the IPA change
-alignment when available, and falls back to PAGE_SIZE if the interface is
-unavailable or returns an invalid value.
+Cache the RHI-reported IPA sate change alignment during Realm
+initialization and expose it through a new arm64 mem_encrypt callback. Use
+PAGE_SIZE as the default shared granule size when no backend callback is
+registered.
+
+Validate both the address and byte size passed to set_memory_encrypted()
+and set_memory_decrypted() against mem_cc_shared_granule_size() before
+calling into the backend. This prevents callers from converting only part
+of a host-managed page.
 
 Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
 ---
- drivers/firmware/arm_rmm/rsi.c | 46 ++++++++++++++++++++++++++++++++++
- include/linux/arm-rsi-cmds.h   | 10 ++++++++
- include/linux/arm-smccc-rhi.h  | 25 ++++++++++++++++++
- include/linux/arm-smccc-rsi.h  |  7 ++++++
- 4 files changed, 88 insertions(+)
- create mode 100644 include/linux/arm-smccc-rhi.h
+ arch/arm64/include/asm/mem_encrypt.h |  4 ++++
+ arch/arm64/mm/mem_encrypt.c          | 32 ++++++++++++++++++++++++----
+ drivers/firmware/arm_rmm/rsi.c       | 13 ++++++++++-
+ 3 files changed, 44 insertions(+), 5 deletions(-)
 
+diff --git a/arch/arm64/include/asm/mem_encrypt.h b/arch/arm64/include/asm/mem_encrypt.h
+index ef8b8463e52b..890faeed0eb3 100644
+--- a/arch/arm64/include/asm/mem_encrypt.h
++++ b/arch/arm64/include/asm/mem_encrypt.h
+@@ -10,6 +10,7 @@ struct device;
+ struct arm64_mem_crypt_ops {
+ 	int (*encrypt)(unsigned long addr, int numpages);
+ 	int (*decrypt)(unsigned long addr, int numpages);
++	size_t (*cc_shared_granule_size)(void);
+ };
+ 
+ int arm64_mem_crypt_ops_register(const struct arm64_mem_crypt_ops *ops);
+@@ -18,6 +19,9 @@ int set_memory_encrypted(unsigned long addr, int numpages);
+ int set_memory_decrypted(unsigned long addr, int numpages);
+ int __set_memory_enc_dec(unsigned long addr, int numpages, bool encrypt);
+ 
++#define mem_cc_shared_granule_size mem_cc_shared_granule_size
++size_t mem_cc_shared_granule_size(void);
++
+ static inline bool force_dma_unencrypted(struct device *dev)
+ {
+ 	return is_realm_world() || is_protected_kvm_guest();
+diff --git a/arch/arm64/mm/mem_encrypt.c b/arch/arm64/mm/mem_encrypt.c
+index ee3c0ab04384..69783c6a3c08 100644
+--- a/arch/arm64/mm/mem_encrypt.c
++++ b/arch/arm64/mm/mem_encrypt.c
+@@ -17,8 +17,7 @@
+ #include <linux/compiler.h>
+ #include <linux/err.h>
+ #include <linux/mm.h>
+-
+-#include <asm/mem_encrypt.h>
++#include <linux/mem_encrypt.h>
+ 
+ static const struct arm64_mem_crypt_ops *crypt_ops;
+ 
+@@ -33,18 +32,43 @@ int arm64_mem_crypt_ops_register(const struct arm64_mem_crypt_ops *ops)
+ 
+ int set_memory_encrypted(unsigned long addr, int numpages)
+ {
+-	if (likely(!crypt_ops) || WARN_ON(!PAGE_ALIGNED(addr)))
++	unsigned long size = (unsigned long)numpages << PAGE_SHIFT;
++
++	if (likely(!crypt_ops))
+ 		return 0;
+ 
++	if (WARN_ON(!IS_ALIGNED(addr, mem_cc_shared_granule_size())))
++		return -EINVAL;
++
++	if (WARN_ON(!IS_ALIGNED(size, mem_cc_shared_granule_size())))
++		return -EINVAL;
++
+ 	return crypt_ops->encrypt(addr, numpages);
+ }
+ EXPORT_SYMBOL_GPL(set_memory_encrypted);
+ 
+ int set_memory_decrypted(unsigned long addr, int numpages)
+ {
+-	if (likely(!crypt_ops) || WARN_ON(!PAGE_ALIGNED(addr)))
++	unsigned long size = (unsigned long)numpages << PAGE_SHIFT;
++
++	if (likely(!crypt_ops))
+ 		return 0;
+ 
++	if (WARN_ON(!IS_ALIGNED(addr, mem_cc_shared_granule_size())))
++		return -EINVAL;
++
++	if (WARN_ON(!IS_ALIGNED(size, mem_cc_shared_granule_size())))
++		return -EINVAL;
++
+ 	return crypt_ops->decrypt(addr, numpages);
+ }
+ EXPORT_SYMBOL_GPL(set_memory_decrypted);
++
++size_t mem_cc_shared_granule_size(void)
++{
++	if (likely(!crypt_ops) || !crypt_ops->cc_shared_granule_size)
++		return PAGE_SIZE;
++
++	return crypt_ops->cc_shared_granule_size();
++}
++EXPORT_SYMBOL_GPL(mem_cc_shared_granule_size);
 diff --git a/drivers/firmware/arm_rmm/rsi.c b/drivers/firmware/arm_rmm/rsi.c
-index 52f40256bd78..2cd53f82432f 100644
+index 2cd53f82432f..eeb797c6c2c7 100644
 --- a/drivers/firmware/arm_rmm/rsi.c
 +++ b/drivers/firmware/arm_rmm/rsi.c
-@@ -9,6 +9,7 @@
- #include <linux/swiotlb.h>
- #include <linux/platform_device.h>
- #include <linux/arm-rsi-cmds.h>
-+#include <linux/arm-smccc-rhi.h>
- #include <linux/kobject.h>
- #include <linux/sysfs.h>
+@@ -19,6 +19,7 @@
  
-@@ -164,6 +165,51 @@ static int realm_register_memory_enc_ops(void)
- 	return arm64_mem_crypt_ops_register(&realm_crypt_ops);
+ static struct realm_config config;
+ static struct kobject *cca_kobj;
++static unsigned long ipa_state_change_granule_size;
+ 
+ unsigned long prot_ns_shared;
+ EXPORT_SYMBOL(prot_ns_shared);
+@@ -155,9 +156,17 @@ static int realm_set_memory_decrypted(unsigned long addr, int numpages)
+ 	return ret;
  }
  
-+/* we need an aligned struct for rsi_host_call. slab is not yet ready */
-+static struct rsi_host_call hostconf_call __initdata;
-+static unsigned long __maybe_unused __init get_ipa_state_change_alignment(void)
++static size_t realm_cc_shared_granule_size(void)
 +{
-+	long ret;
-+	unsigned long shared_granule_size;
-+
-+	hostconf_call.imm = 0;
-+	hostconf_call.gprs[0] = RHI_HOSTCONF_VERSION;
-+	ret = rsi_host_call(lm_alias(&hostconf_call));
-+	if (ret != RSI_SUCCESS)
-+		goto err_out;
-+
-+	if (hostconf_call.gprs[0] != RHI_HOSTCONF_VER_1_0)
-+		goto err_out;
-+
-+	hostconf_call.imm = 0;
-+	hostconf_call.gprs[0] = RHI_HOSTCONF_FEATURES;
-+	ret = rsi_host_call(lm_alias(&hostconf_call));
-+	if (ret != RSI_SUCCESS)
-+		goto err_out;
-+
-+	if (!(hostconf_call.gprs[0] & __RHI_HOSTCONF_GET_IPA_CHANGE_ALIGNMENT))
-+		goto err_out;
-+
-+	hostconf_call.imm = 0;
-+	hostconf_call.gprs[0] = RHI_HOSTCONF_GET_IPA_CHANGE_ALIGNMENT;
-+	ret = rsi_host_call(lm_alias(&hostconf_call));
-+	if (ret != RSI_SUCCESS)
-+		goto err_out;
-+
-+	shared_granule_size = hostconf_call.gprs[0];
-+	if (shared_granule_size & (SZ_4K - 1) ||
-+	    !is_power_of_2(shared_granule_size))
-+		goto err_out;
-+
-+	return max(PAGE_SIZE, shared_granule_size);
-+err_out:
-+	/*
-+	 * For failure condition assume host is built with 4K page size
-+	 * and hence IPA state change alignment can be guest PAGE_SIZE.
-+	 */
++	if (is_realm_world())
++		return ipa_state_change_granule_size;
 +	return PAGE_SIZE;
 +}
 +
- void __init arm64_rsi_init(void)
+ static const struct arm64_mem_crypt_ops realm_crypt_ops = {
+ 	.encrypt = realm_set_memory_encrypted,
+ 	.decrypt = realm_set_memory_decrypted,
++	.cc_shared_granule_size = realm_cc_shared_granule_size,
+ };
+ 
+ static int realm_register_memory_enc_ops(void)
+@@ -167,7 +176,7 @@ static int realm_register_memory_enc_ops(void)
+ 
+ /* we need an aligned struct for rsi_host_call. slab is not yet ready */
+ static struct rsi_host_call hostconf_call __initdata;
+-static unsigned long __maybe_unused __init get_ipa_state_change_alignment(void)
++static unsigned long __init get_ipa_state_change_alignment(void)
  {
- 	if (arm_smccc_1_1_get_conduit() != SMCCC_CONDUIT_SMC)
-diff --git a/include/linux/arm-rsi-cmds.h b/include/linux/arm-rsi-cmds.h
-index 3f7a6a833993..996f1621b996 100644
---- a/include/linux/arm-rsi-cmds.h
-+++ b/include/linux/arm-rsi-cmds.h
-@@ -236,4 +236,14 @@ static inline unsigned long rsi_attestation_token_continue(phys_addr_t granule,
- 	return res.a0;
- }
+ 	long ret;
+ 	unsigned long shared_granule_size;
+@@ -218,6 +227,8 @@ void __init arm64_rsi_init(void)
+ 		return;
+ 	if (WARN_ON(rsi_get_realm_config(lm_alias(&config))))
+ 		return;
++
++	ipa_state_change_granule_size = get_ipa_state_change_alignment();
+ 	prot_ns_shared = __phys_to_pte_val(BIT(config.ipa_bits - 1));
  
-+static inline unsigned long rsi_host_call(struct rsi_host_call *rhi_call)
-+{
-+	phys_addr_t addr = virt_to_phys(rhi_call);
-+	struct arm_smccc_res res;
-+
-+	arm_smccc_1_1_invoke(SMC_RSI_HOST_CALL, addr, &res);
-+
-+	return res.a0;
-+}
-+
- #endif /* __LINUX_ARM_RSI_CMDS_H_ */
-diff --git a/include/linux/arm-smccc-rhi.h b/include/linux/arm-smccc-rhi.h
-new file mode 100644
-index 000000000000..91a29996d72d
---- /dev/null
-+++ b/include/linux/arm-smccc-rhi.h
-@@ -0,0 +1,25 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright (C) 2026 ARM Ltd.
-+ */
-+
-+#ifndef __LINUX_ARM_SMCCC_RHI_H_
-+#define __LINUX_ARM_SMCCC_RHI_H_
-+
-+#include <linux/arm-smccc.h>
-+
-+#define SMC_RHI_CALL(func)				\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,		\
-+			   ARM_SMCCC_SMC_64,		\
-+			   ARM_SMCCC_OWNER_STANDARD_HYP,\
-+			   (func))
-+
-+#define RHI_HOSTCONF_VER_1_0		0x10000
-+#define RHI_HOSTCONF_VERSION		SMC_RHI_CALL(0x004E)
-+
-+#define __RHI_HOSTCONF_GET_IPA_CHANGE_ALIGNMENT BIT(0)
-+#define RHI_HOSTCONF_FEATURES		SMC_RHI_CALL(0x004F)
-+
-+#define RHI_HOSTCONF_GET_IPA_CHANGE_ALIGNMENT	SMC_RHI_CALL(0x0050)
-+
-+#endif /* __LINUX_ARM_SMCCC_RHI_H_ */
-diff --git a/include/linux/arm-smccc-rsi.h b/include/linux/arm-smccc-rsi.h
-index fddb77986f70..3532a3f08f4e 100644
---- a/include/linux/arm-smccc-rsi.h
-+++ b/include/linux/arm-smccc-rsi.h
-@@ -182,6 +182,13 @@ struct realm_config {
-  */
- #define SMC_RSI_IPA_STATE_GET			SMC_RSI_FID(0x198)
- 
-+struct rsi_host_call {
-+	union {
-+		u16 imm;
-+		u64 padding0;
-+	};
-+	u64 gprs[31];
-+} __aligned(0x100);
- /*
-  * Make a Host call.
-  *
+ 	if (arm64_ioremap_prot_hook_register(realm_ioremap_hook))
 -- 
 2.43.0
 
