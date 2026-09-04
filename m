@@ -1,178 +1,129 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from esa8.hc1455-7.c3s2.iphmx.com (esa8.hc1455-7.c3s2.iphmx.com [139.138.61.253])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 563011BC2A
-	for <kvmarm@lists.linux.dev>; Fri,  4 Sep 2026 00:36:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BEC435F5ED
+	for <kvmarm@lists.linux.dev>; Fri,  4 Sep 2026 02:56:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.138.61.253
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788482197; cv=none; b=Qfc6NcgJ3opbco8/MiisRSlCW336DrxXi52qfGSVcDwVgckvp9fxWE5NePmeN0cfsuUl1LPjbBKWKfa+TfzHJyhZHWxFSay+iFqpL1HThAptOqX6ETBVbih8Z8PaYvvohIRvd4E4Hgue0W5OyOPSUYYODflVFwTzJUXvb/wz0hk=
+	t=1788490587; cv=none; b=Kq6rTgDT99gt2wdil3JxsGvrk5bYclOUDOUZ28VPaSjw5snJWCq+4mTliCzLTjEYVKFx/77tZR2pg3cTUFLJ4bx+cZraspVbLoOgbDHqDSrx3T0hNvYwsKRsmyeho/Ugp99MS1dhXmg5r/ee3jzbvB+ZyQ2ugf38krbrlMdEQQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788482197; c=relaxed/simple;
-	bh=x5LDPsdvbXimywbzcLmSFkCU3DoJpJnex4rJgmAGAVE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OftRIBCPLqFOPzzn1IUNACRkJ7mONKY/c0x3OAlSFCa1PeM+JRZeLobHRUu4sMqaQ8agozoGqOmIq3fVujZUKrvxZ9R6aOQVwOMiyFO72cMJ+8vv2RBOytI1d/ALo1V9tY/D+oz3GIPDN/9kygaTrvbqYXAweW+lZBrHzU/S8Y8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZHD3+8HY; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1788490587; c=relaxed/simple;
+	bh=M50a07QYaknMt62mPLnYdnzYtmToSOSevFA9tewdmGg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CW5W63HA8BxpBKyPpLFcGCQM/e/YjEg7BuHmalQv1TsSHVgS6f8DpVlgK8u3l6Ctsm2/QBKgAAhWT4CNWwyHGOFm2zeV1BZ7AP6Vxkle4SiHzE3VyrqmuPxb8wl3FUuGWVabqTtXqfvbhfUdzRrvYeHzwJx9AdaNGL6ADbmQQlw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=l/v2w5cS; arc=none smtp.client-ip=139.138.61.253
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZHD3+8HY"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1788482195;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=f6GMexSWWuoc9Cddr8yMae7nQERhafauV/Q+TnV8uPo=;
-	b=ZHD3+8HYAOqVcONtAwigZHibYQ7EZQJrHoVpmAUCOvS3RuyRAZ82FD0J2zgFlQBIWMCvXo
-	4603P2X2mOO5eNjQDkM8WTQak4yD0DJ1xNQ4RvJUMP9WJyP1t5DzJEzwxrZS2vnwhsxVBW
-	uMTu+ke9y4oOBnkLzabzkrvp6S3Nhtk=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-633-BWkoiCaANP6_EIuiIBdAlQ-1; Thu, 03 Sep 2026 20:36:33 -0400
-X-MC-Unique: BWkoiCaANP6_EIuiIBdAlQ-1
-X-Mimecast-MFC-AGG-ID: BWkoiCaANP6_EIuiIBdAlQ_1788482193
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-398dcfabbf8so1008396a91.0
-        for <kvmarm@lists.linux.dev>; Thu, 03 Sep 2026 17:36:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788482192; x=1789086992;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=f6GMexSWWuoc9Cddr8yMae7nQERhafauV/Q+TnV8uPo=;
-        b=DgDfxUiA0sKAsQ/JgROQN4ZmrW87m5kpFOmY2+NsmiDuxz8pHeKtQ27skOOwbZbcxG
-         Vtj2SWh4R5yikaV7wZ4cvMuDZ4s7M670X0wNmUUqT/mSZJKYBMXoj83V8hiNaxX/keCs
-         YiUJ9B+We73SAioDQfSu3TcN8ylpnGJC2tXTGD1YJqY9Ep0eYTS9vffqQtRbggvPtLDv
-         ddhDXF9NscMYEiTACa5TwLanB3+Mzukn/eEkkTUZFzm5VkUA/n92lZSp3WO90FSdEYvk
-         uBt/sfHQXTXaecs+WBCEl5tANCQoVURk2JfIMZ0wSHQ9tJGN8bStnMTPgju+gOBk5B3v
-         uy/g==
-X-Forwarded-Encrypted: i=1; AKwUvBxqKrVzoCE1FDLyn7crc1aCpRobG1Rd9nl3I6JhmZ67TDn+UwNLnyi5u1aSqxo7xUjtJwcgma4=@lists.linux.dev
-X-Gm-Message-State: AFuF++la+Z+a5ktm9nxi1eP2G39KFXzJIux8FiO4kaxaPMxlLcdN5HW/
-	qXyUcXsBrQIq5W57DVDleWr/E260yP2lyVF8VvoHhgKCzPWhPAuPRP1oOz7xRW9MFuYks6tpuLv
-	xrASNpDF0BSjO2++HGbNj5v8wApnBFm7Q48/AnC9ymNen7uRdI0ANoBHkxyYmS9Mw/w==
-X-Gm-Gg: AYBFou1GKvScAjBjt/yTDUfL5HWtG/HAm/+XLrqmBz9Q845SYF6vaVm8VBMipEUNgL2
-	ZSdtTwReVQHkq1sen7Drc1RXmY2xYeKruDhMEs4xLKFEy4hBF2Dwmt8aU/359sIxlWcgaqk+hIv
-	Xznxhea28/czafKL76nBTziAyw12nhsy4gjC+oaHizZ1QC217ri3kNMB5bhzVjs43p8Jj3ThkSs
-	i51+gdsisOT68DdPcusYhg4xmodwOXBQqYomCn+iMGB6wJcNa5wB2e/cmvjdoCs1r0YGgfc0eQh
-	Gy+Vp1wI7sJOx0hc68x7f2962CHISyVMX4nDoMHMnMktxY2tHRj94J/aKICZ6XDMk7OGgRnrS5l
-	xj+/e18TGQJYl5bOVHuXMokEd/Qna/ORA3IPKXTCnzQ==
-X-Received: by 2002:a17:90a:c106:b0:398:e1f4:bda1 with SMTP id 98e67ed59e1d1-39b2624cf3fmr3925672a91.21.1788482192419;
-        Thu, 03 Sep 2026 17:36:32 -0700 (PDT)
-X-Received: by 2002:a17:90a:c106:b0:398:e1f4:bda1 with SMTP id 98e67ed59e1d1-39b2624cf3fmr3925599a91.21.1788482191942;
-        Thu, 03 Sep 2026 17:36:31 -0700 (PDT)
-Received: from [192.168.68.51] (n175-34-8-244.mrk21.qld.optusnet.com.au. [175.34.8.244])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3339b8f44d7sm2233190eec.22.2026.09.03.17.36.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Sep 2026 17:36:30 -0700 (PDT)
-Message-ID: <a7fb4f62-bc2c-49f9-848f-9f64235f95a1@redhat.com>
-Date: Fri, 4 Sep 2026 10:36:19 +1000
+	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="l/v2w5cS"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
+  t=1788490589; x=1820026589;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=M50a07QYaknMt62mPLnYdnzYtmToSOSevFA9tewdmGg=;
+  b=l/v2w5cSr+3zdXno188Q4e1NqVhECpLCZ2GbRgoVG/9lQEszmGzIb3zA
+   PI3C4qmyPuIF5Na/wHrr6JwGr3t/vsbufKUsDDMOtNXYS90eVKP5RFlYs
+   mqJ9xoS9ix4sW54CyEX3AhULjBDsZm9cCUr2zuiXNjKzWfP2UjortMxQv
+   4DdsasUxvzpIjRIn7FFUdlwGjdpcVqfkLvSYnRbs3MR6gvquwn1sLz+nk
+   ocMPx21oRoXYhkVPqSvQVhYeWk5+tMjTexcbD9IqhEUa8yvxh6T+fAzGh
+   VrW771B18/AfTWQL80+F6Tykg0xXmSe8XcBbH3dLxICBE7W/pB86XPqw9
+   w==;
+X-CSE-ConnectionGUID: M2b9vsLsSfOAGHLUi8iLMg==
+X-CSE-MsgGUID: H0egcAt3S7mO1iROPFImvg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11895"; a="241798122"
+X-IronPort-AV: E=Sophos;i="6.25,260,1779116400"; 
+   d="scan'208";a="241798122"
+Received: from gmgwnl01.global.fujitsu.com ([52.143.17.124])
+  by esa8.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Sep 2026 11:55:18 +0900
+Received: from az2nlsmgm3.fujitsu.com (unknown [10.150.26.205])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by gmgwnl01.global.fujitsu.com (Postfix) with ESMTPS id E46F71C00640
+	for <kvmarm@lists.linux.dev>; Fri,  4 Sep 2026 02:55:13 +0000 (UTC)
+Received: from az2uksmom4.o.css.fujitsu.com (unknown [10.151.22.204])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by az2nlsmgm3.fujitsu.com (Postfix) with ESMTPS id 923371802ACF
+	for <kvmarm@lists.linux.dev>; Fri,  4 Sep 2026 02:55:13 +0000 (UTC)
+Received: from sm-arm-grace07 (unknown [10.124.178.20])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by az2uksmom4.o.css.fujitsu.com (Postfix) with ESMTPS id 5532740D1B9;
+	Fri,  4 Sep 2026 02:55:08 +0000 (UTC)
+Date: Fri, 4 Sep 2026 11:55:05 +0900
+From: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Takayuki Okamoto <tokamoto@fujitsu.com>
+Subject: Re: [PATCH 0/2] 52-bit VA guest mode ID support
+Message-ID: <apozCZSi00UZhqLJ@sm-arm-grace07>
+References: <20260826-arm64-52bit-va-v1-0-14ec98211363@fujitsu.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 5/5] KVM: guest_memfd: Stop returning struct page from
- PFN lookup
-To: Ackerley Tng <ackerleytng@google.com>,
- Sean Christopherson <seanjc@google.com>, Paolo Bonzini
- <pbonzini@redhat.com>, Thomas Gleixner <tglx@kernel.org>,
- Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
- Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
- "H. Peter Anvin" <hpa@zytor.com>, Ashish Kalra <ashish.kalra@amd.com>,
- Michael Roth <michael.roth@amd.com>, Brijesh Singh <brijesh.singh@amd.com>,
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
- Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will@kernel.org>, David Hildenbrand <david@kernel.org>,
- Yan Zhao <yan.y.zhao@intel.com>,
- "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
- Vishal Annapurve <vannapurve@google.com>, Fuad Tabba <fuad.tabba@linux.dev>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-References: <20260826-gmem-no-return-page-v4-0-3bb9c1ddb4e3@google.com>
- <20260826-gmem-no-return-page-v4-5-3bb9c1ddb4e3@google.com>
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20260826-gmem-no-return-page-v4-5-3bb9c1ddb4e3@google.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: 1KKRGMAfr1x8utMdGR386kvvNYAz-djAJRZ9Z27FZi4_1788482193
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260826-arm64-52bit-va-v1-0-14ec98211363@fujitsu.com>
 
-On 8/26/26 7:01 PM, Ackerley Tng wrote:
-> From: Sean Christopherson <seanjc@google.com>
+On Wed, Aug 26, 2026 at 06:18:33AM +0900, Itaru Kitayama wrote:
+> This patch series extends the arm64 KVM selftest framework
+> to support 52-bit guest virtual address (VA) modes in addition to
+> the existing 52-bit physical address (PA) configurations.
+> The motivation is to enable validation of LPA2 guest memory-management
+> behaviour in configurations that use a 52-bit VA space.
+> While the selftest framework already supports testing 52-bit PA
+> configurations, it lacks the ability to exercise guests running with
+> 52-bit virtual addresses, leaving part of the LPA2 functionality untested.
+> To address this, the series introduces new guest modes for 52-bit VA
+> operation, adds five-level page table support where required, and
+> performs runtime detection of host 52-bit VA capability so that
+> LPA2-enabled guest VA tests are executed only on supported systems.
 > 
-> KVM currently expects guest_memfd PFN lookups to return a refcounted struct
-> page, which callers hold across fault handling.
+> Testing:
 > 
-> Drop the page's refcount before returning from kvm_gmem_get_pfn() to
-> prepare for the in-place conversions series.
+> Built and tested on arm64.
+> Verified on QEMU with a V52-capable guest configuration.
+> Confirmed correct operation of high virtual address mappings by
+> exercising guest memory accesses in the 52-bit VA range.
 > 
-> CoCo shared-to-private conversion handling must inspect folio refcounts to
-> ensure exclusive ownership by guest_memfd. A concurrent guest page fault
-> taking a temporary reference on the folio causes conversions to fail due to
-> an elevated refcount.
-> 
-> While this refcount is also taken on host userspace page faults, that
-> refcount is taken on behalf of the host userspace page tables. This
-> refcount will be dropped when conversions unmaps the page. Either way, once
-> there's an mmap() or userspace mapping, the pages are open to way more
-> refcounts, transient or not. This patch focuses on just dropping refcounts
-> before handing KVM a page.
-> 
-> guest_memfd already notifies KVM of page invalidations, so callers within
-> KVM only need to respect the MMU invalidation protocol to safely rely on
-> guest_memfd for page presence.
-> 
-> Since the page refcounts are dropped, don't return the struct page pointer.
-> 
-> Not returning the struct page from the guest_memfd PFN lookup moves KVM
-> closer toward supporting memory backends that are not backed by struct
-> page.
-> 
-> Here are some notes on the cleanup in the callers of kvm_gmem_get_pfn():
-> 
-> kvm_release_faultin_page() in ARM's gmem_abort() originally also serves to
-> set the page dirty and accessed under some conditions. The dirty and
-> accessed flags don't matter for guest_memfd anyway, so it is safe to just
-> drop the call to kvm_release_faultin_page().
-> 
-> For ARM's kvm_translate_vncr(), the local page pointer must be initialized
-> to NULL so that the shared cleanup path that releases faulted-in pages
-> safely no-ops for guest_memfd.
-> 
-> For x86, no additional changes are required in the MMU fault path because
-> the page fault tracking structure is zero-initialized at the start of page
-> fault handling, ensuring the refcounted page pointer is already NULL.
-> 
-> Reported-by: Yan Zhao <yan.y.zhao@intel.com>
-> Closes: https://lore.kernel.org/all/anZ4W9o5pTWIEgMY@yzhao56-desk.sh.intel.com/
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> Co-developed-by: Yan Zhao <yan.y.zhao@intel.com>
-> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Reviewed-by: Michael Roth <michael.roth@amd.com>
-> Tested-by: Michael Roth <michael.roth@amd.com>
-> Tested-by: Yan Zhao <yan.y.zhao@intel.com>
-> Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
-> Tested-by: Fuad Tabba <fuad.tabba@linux.dev>
-> Co-developed-by: Ackerley Tng <ackerleytng@google.com>
-> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> Signed-off-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+> Reviewed-by: Takayuki Okamoto <tokamoto@fujitsu.com>
+
+I'd appreciate any comments on this series.
+
+Thanks,
+Itaru.
+
 > ---
->   arch/arm64/kvm/mmu.c     | 4 +---
->   arch/arm64/kvm/nested.c  | 4 ++--
->   arch/x86/kvm/mmu/mmu.c   | 2 +-
->   arch/x86/kvm/svm/sev.c   | 8 ++------
->   include/linux/kvm_host.h | 6 ++----
->   virt/kvm/guest_memfd.c   | 9 ++-------
->   6 files changed, 10 insertions(+), 23 deletions(-)
+> Itaru Kitayama (2):
+>       KVM: selftest: arm64: Support 5-level paging in stage 1 translation table
+>       KVM: selftests: arm64: Add 52-bit VA guest modes
 > 
-
-Reviewed-by: Gavin Shan <gshan@redhat.com>
-
-
+>  .../selftests/kvm/include/arm64/processor.h        |  2 +
+>  tools/testing/selftests/kvm/include/kvm_util.h     |  3 +
+>  tools/testing/selftests/kvm/lib/arm64/processor.c  | 87 ++++++++++++++++++++--
+>  tools/testing/selftests/kvm/lib/guest_modes.c      |  5 ++
+>  tools/testing/selftests/kvm/lib/kvm_util.c         | 11 +++
+>  5 files changed, 103 insertions(+), 5 deletions(-)
+> ---
+> base-commit: 8d3ae59288f1e7d58d76558a6ee96d533bc5019f
+> change-id: 20260825-arm64-52bit-va-32f1f4cd050d
+> 
+> Best regards,
+> --  
+> Itaru Kitayama <itaru.kitayama@fujitsu.com>
+> 
