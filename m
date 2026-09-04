@@ -1,179 +1,186 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A2CC48987B;
-	Fri,  4 Sep 2026 12:50:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E1BB4908C0;
+	Fri,  4 Sep 2026 12:59:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788526254; cv=none; b=oDEupd5OiXXGbaNo/fFYrUN2Kc+vzt5ifvghWhiFW0wocYXNwSahlopn+zC8Fn2f9QIxPLR6YIHQWp01WiPxM+0SamKFOeyfT2g5KM94zuUNGs2yt7UCRHYevh/UAk656b3cQ5e5hKTsYxoKoXMlXEbTYD31i3KWP5k6Dc2kLZo=
+	t=1788526789; cv=none; b=BDMDNK0tx1xucpMS+KU2OWp2lCNGWNhJfn7FIAXC8sYu2q5bqp1QAmAZjgNGaqB8horWcAB0aauCaXkxU94D30MPrrMnh0implGMZjiiQb7ROqqRfIi4WOok8DhcqsbkDDkWVgsgBaEKvEBe/3mgMEpBhl0dJX+M5YsR01GebGc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788526254; c=relaxed/simple;
-	bh=iIiKoaCB+UhasDvwCBoituzWTM3Iy85/DuAIaOfidoU=;
+	s=arc-20240116; t=1788526789; c=relaxed/simple;
+	bh=3VKXSot73052se9xaSvk717mS8+M7hRh5ECMRclQzIg=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=Kemh1NTPhXp9EYgT/TQeVDY7OoxoqBzOsM9v1xtzB7MqJN1m5KYGcF2L+2lBrLTuCgKGH9vww4uzybTwbxR+OhGDAV5okvhc3xn0u+SPeKD+iSbeTaVXDobMi/OsoedaO/Q6TPG211f4LL3rZHCO7VV7u7WY4Dkb2/BC/fnzjB4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f67fPuif; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=aZ39nv5T6p53Llv61UeujDVV9V7C93iCGSsdIu9kQ3S30eelUd8F/my6Nq3Ri5VkPQSMiTHHduxIGy3WDA4P0Sf07LzSSrUDPTBo80mPwJyCS9PuLRiofsPaGj26UzpGiKocN3wkeV77y2ClTsZ1xy56BLxyXw/R1pvKhyKqdhM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gjNkXkZ1; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f67fPuif"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4795B1F00A3D;
-	Fri,  4 Sep 2026 12:50:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gjNkXkZ1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C6B31F00A3D;
+	Fri,  4 Sep 2026 12:59:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788526252;
-	bh=TBbORKReER/1p0BUAlr1R7MM2dQJ91HXXrcH7eAwwTk=;
+	s=k20260515; t=1788526787;
+	bh=nla1aYeco31bhUzwa+Q67xU8QuD02qI+S77nQZYHrkM=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=f67fPuifYLs/gUA25nWqn4FnW5IebFY3rfJ7SCReq8OuUkDvIPhRXaye5Su+mloPf
-	 lWB2pynSrlXBuICE5d5OgN1IVkvkGad15b5qQtscV+ifL+xljJ8AZvSbHLxOaLGmQP
-	 pcAopd+X+eBj+GGu3oztWdN+eGIlQevIn/Ig48Qz4M7b3UhQcK64qQmOLe4MqqIHWy
-	 w1KXZrx71Ig914FAxoJuq+QNkrqW7HutQ46Qzk08e9MmRIbFFYMaJUfYAKrmTkw2cA
-	 JXR+BUCPAtLTEMDQPPCIRXvEeU608AvfRXSu2K8mHXJis/KwmQjBlpUJo0NJoZCHOi
-	 TnM7yrVw+rY0g==
+	b=gjNkXkZ1abc4zzcmfwIeHCQ6sPPhRPyp8F9AYghVe6MPH/Iwzjs0XbUuiPWB0rCsG
+	 FML/O7hIM+CJmucuUe1ZrBSLcOerDIM8vd/PHVKq/wFwLKS70rYaVGfvBxnn89LEdX
+	 hKTxtu0p8bU+AcG6cIsJSLCqvFoB+76sRCYERAKWz4drgTXuhz6Dv1owK27rsitIRE
+	 dmJmrT0GGqt9mG7afZPei6akbSFOvVqOk395FINcFFgfOpe/N36E2g8+J2AyhxvIUI
+	 l0Kn72EfFM1kadg8RiBQQHgUDlkupk4LMx2SqCQ5TpcayBRLhELkm0+Q2SrOZZNDEJ
+	 bYNU7giNbYnIQ==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v6 14/49] KVM: arm64: gic-v5: Set up VMTEs and VPE
- doorbells
+Subject: Re: [PATCH v6 20/49] KVM: arm64: gic-v5: Add GICv5 IRS IODEV and
+ MMIO emulation
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Sascha Bischoff" <Sascha.Bischoff@arm.com>
-Cc: kvm@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260904113404.4051341-15-sascha.bischoff@arm.com>
+Cc: "Marc Zyngier" <maz@kernel.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, "Oliver
+ Upton" <oupton@kernel.org>
+In-Reply-To: <20260904113404.4051341-21-sascha.bischoff@arm.com>
 References: <20260904113404.4051341-1-sascha.bischoff@arm.com>
- <20260904113404.4051341-15-sascha.bischoff@arm.com>
+ <20260904113404.4051341-21-sascha.bischoff@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 04 Sep 2026 12:50:51 +0000
-Message-Id: <20260904125052.4795B1F00A3D@smtp.kernel.org>
+Date: Fri, 04 Sep 2026 12:59:47 +0000
+Message-Id: <20260904125947.8C6B31F00A3D@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 3 potential issue(=
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
 s) to consider:
-- [High] Guest/Userspace-reachable WARN_ON() in vgic_v5_reset() allows unpr=
-ivileged Denial of Service
-- [High] Concurrent vCPU creation during vgic_v5_init() leads to out-of-bou=
-nds IRQ free
-- [High] Doorbell LPIs are freed and can be reallocated while still in use =
-by unresponsive hardware
+- [High] Missing `vgic_irq_is_mapped_level()` check when changing SPI trigg=
+er mode allows a guest to reconfigure a hardware-mapped level interrupt to =
+edge-triggered.
+- [Medium] Unconditional allocation of `dist->spis` in `kvm_vgic_v5_irs_ini=
+t` leaks memory if VGIC initialization fails and is retried.
 --
 
-commit 44d8f1c654ba05556ff20d22e8e4b8b74f493342
+commit 7fdccc0d6d5320405b4f8a3add8b9e063ba810fc
 Author: Sascha Bischoff <Sascha.Bischoff@arm.com>
-KVM: arm64: gic-v5: Set up VMTEs and VPE doorbells
 
-This commit sets up GICv5 VM table entries and VPE doorbells by allocating
-a VM ID and creating a per-VM VPE doorbell IRQ domain. It also provides the
-initialization and teardown paths to manage this state.
+KVM: arm64: gic-v5: Add GICv5 IRS IODEV and MMIO emulation
 
-> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-> index 455161e52f81b..5b599821b2da2 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v5.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
+This commit introduces an IODEV for the GICv5 IRS and its associated MMIO
+emulation to handle guest accesses. It adds support for querying and
+manipulating IRS registers, tracking selector states, and allocating or fre=
+eing
+host ISTs based on guest IST lifecycle.
+
+> diff --git a/arch/arm64/kvm/vgic/vgic-irs-v5.c b/arch/arm64/kvm/vgic/vgic=
+-irs-v5.c
+> new file mode 100644
+> index 0000000000000..76f5f40ecc1ce
+> --- /dev/null
+> +++ b/arch/arm64/kvm/vgic/vgic-irs-v5.c
 [ ... ]
-> @@ -562,33 +580,122 @@ void vgic_v5_reset(struct kvm_vcpu *vcpu)
->  	 * CPUIF (but potentially fewer in the IRS).
->  	 */
->  	vcpu->arch.vgic_cpu.num_pri_bits =3D 5;
-> +
-> +	/* Make the VPE valid in the VPET */
-> +	if (WARN_ON(vgic_v5_send_command(vcpu, VPE_MAKE_VALID)))
-> +		return;
-> +}
-
-[Severity: High]
-Can this WARN_ON be triggered by unprivileged userspace, potentially leading
-to a host panic if panic_on_warn is enabled?
-
-If userspace calls KVM_ARM_VCPU_INIT before KVM_DEV_ARM_VGIC_CTRL_INIT has
-successfully completed, the reset path reaches vgic_v5_reset() and attempts
-to send VPE_MAKE_VALID. Because the VGIC has not been initialized, the
-doorbell IRQ is still uninitialized (0). This causes vgic_v5_send_command()
-to return -ENXIO, directly hitting this warning.
-
-The KVM subsystem guidelines suggest that userspace-reachable warnings shou=
-ld
-be converted to normal error handling or rate-limited prints to avoid a
-denial of service.
-
-> +
-> +static void vgic_v5_free_doorbells(struct kvm *kvm, unsigned int nr_dbs)
+> +static void vgic_v5_mmio_write_irs_spi(struct kvm_vcpu *vcpu, gpa_t addr,
+> +				       unsigned int len, unsigned long val)
 > +{
-> +	struct vgic_v5_vm *vm =3D &kvm->arch.vgic.gicv5_vm;
-> +	struct kvm_vcpu *vcpu;
-> +	unsigned long i;
-> +	int db;
+> +	struct vgic_v5_irs *irs =3D vgic_v5_get_irs(vcpu);
+> +	const size_t offset =3D addr & (SZ_64K - 1);
+> +	struct vgic_irq *irq;
 > +
-> +	for (i =3D 0; i < nr_dbs; i++) {
-> +		vcpu =3D kvm_get_vcpu(kvm, i);
-> +		db =3D vgic_v5_vpe_db(vcpu);
-> +		if (!db)
-> +			continue;
+> +	switch (offset) {
+> +	case GICV5_IRS_SPI_SELR:
+> +		WRITE_ONCE(irs->spi_selr.id,
+> +			   FIELD_GET(GICV5_IRS_SPI_SELR_ID, val));
+> +		return;
+> +	case GICV5_IRS_SPI_CFGR: {
+> +		u32 id =3D READ_ONCE(irs->spi_selr.id);
 > +
-> +		free_irq(db, vcpu);
-> +		vcpu->arch.vgic_cpu.vgic_v5.gicv5_vpe.db =3D 0;
-> +	}
+> +		if (!vgic_v5_is_spi_selr_valid(irs, id))
+> +			return;
 > +
-> +	if (vm->vpe_db_base) {
-> +		irq_domain_free_irqs(vm->vpe_db_base,
-> +				     atomic_read(&kvm->online_vcpus));
+> +		/*
+> +		 * Find KVM's representation of the interrupt - we need to make
+> +		 * sure that KVM's view agrees with the guest's, else interrupt
+> +		 * injection won't work properly for level-triggered interrupts
+> +		 * (we fail to handle the clearing of the pending state if KVM
+> +		 * thinks that the interrupt is edge-triggered, which is the
+> +		 * default.)
+> +		 */
+> +		irq =3D vgic_get_irq(vcpu->kvm, vgic_v5_make_spi(id));
+> +		if (!irq)
+> +			return;
+> +
+> +		scoped_guard(raw_spinlock_irqsave, &irq->irq_lock) {
+> +			if (val & GICV5_IRS_SPI_CFGR_TM)
+> +				irq->config =3D VGIC_CONFIG_LEVEL;
+> +			else
+> +				irq->config =3D VGIC_CONFIG_EDGE;
+> +		}
 
 [Severity: High]
-Does this free more descriptors than were originally allocated if a vCPU is
-created concurrently?
+Could this assignment allow a guest to reconfigure a hardware-mapped level
+interrupt to edge-triggered?
 
-During vgic_v5_init(), the doorbell domain is sized based on a snapshot of
-atomic_read(&kvm->online_vcpus). If a userspace thread calls KVM_CREATE_VCPU
-concurrently, it increments created_vcpus and blocks on the config_lock.
-Initialization then proceeds with the older, smaller online_vcpus count.
-Once the vCPU creation completes, online_vcpus is incremented.
+By omitting a check against vgic_irq_is_mapped_level(irq) in
+vgic_v5_mmio_write_irs_spi() within arch/arm64/kvm/vgic/vgic-irs-v5.c, this
+update unconditionally modifies irq->config when the guest writes to the
+GICV5_IRS_SPI_CFGR MMIO register.
 
-When the VM is torn down, this code uses the new, larger online_vcpus count
-to free the domain interrupts, which results in an out-of-bounds free that
-could corrupt the LPI domain.
+For physical interrupts mapped into the guest (e.g., via VFIO), KVM requires
+the virtual trigger mode to remain level-triggered to properly manage physi=
+cal
+interrupt deactivation upon guest EOI. In GICv2/v3, vgic_mmio_write_icfgr()
+explicitly guards against this.
 
-> +		vm->vpe_db_base =3D 0;
-> +	}
-> +}
+This could lead to desynchronization of virtual and physical interrupt state
+machines, resulting in physical interrupt storms that can lock up the host.
+
 > +
-> +void vgic_v5_teardown(struct kvm *kvm)
+> +		vgic_put_irq(vcpu->kvm, irq);
+> +
+> +		return;
+> +	}
+[ ... ]
+> +int kvm_vgic_v5_irs_init(struct kvm *kvm, unsigned int nr_spis)
 > +{
 > +	struct vgic_dist *dist =3D &kvm->arch.vgic;
-> +	struct kvm_vcpu *vcpu, *vcpu0;
-> +	bool release_vm_id =3D true;
-> +	unsigned long i;
-> +	int rc;
-> +
-> +	lockdep_assert_held(&kvm->arch.config_lock);
+> +	struct vgic_v5_irs *irs =3D dist->vgic_v5_irs_data;
+> +	struct kvm_vcpu *vcpu0 =3D kvm_get_vcpu(kvm, 0);
+> +	size_t nr_spi_bits;
+> +	u64 mmfr0;
+> +	int ret, i;
 > +
 > +	/*
-> +	 * If the VM's ID isn't valid, then we either failed init very early or
-> +	 * we've been called a second time. Nothing to do here in either case.
+> +	 * We (KVM) allocate an Interrupt State Table (IST) for SPIs. The
+> +	 * hardware mandates that lower 6 bits of the address are 0. Each ISTE
+> +	 * is 4 bytes in size (or larger if metadata storage is required), so 16
+> +	 * entries would be enough for alignment. We require userspace to
+> +	 * provide at least 32 SPIs, so we always meet alignment requirements.
 > +	 */
-> +	if (kvm->arch.vgic.gicv5_vm.vm_id =3D=3D VGIC_V5_VM_ID_INVAL)
-> +		return;
+> +	if (nr_spis) {
+> +		dist->spis =3D kcalloc(nr_spis, sizeof(struct vgic_irq),
+> +				     GFP_KERNEL_ACCOUNT);
+> +		if (!dist->spis)
+> +			return -ENOMEM;
+
+[Severity: Medium]
+Is it possible for this allocation to permanently leak memory if VGIC
+initialization fails and is retried?
+
+In kvm_vgic_v5_irs_init() within arch/arm64/kvm/vgic/vgic-irs-v5.c, the
+dist->spis pointer is unconditionally overwritten here. If a failure occurs
+later in the initialization sequence (for example, during
+kvm_vgic_setup_default_irq_routing()), dist->initialized remains false, whi=
+ch
+allows host userspace to retry the KVM_DEV_ARM_VGIC_CTRL_INIT ioctl.
+
+If userspace retries the ioctl, kvm_vgic_v5_irs_init() will be called again=
+ and
+overwrite the dist->spis pointer without freeing the previous allocation.
+
 > +
-> +	if (kvm->arch.vgic.gicv5_vm.vmte_allocated) {
-> +		/* Make the VM invalid  */
-> +		vcpu0 =3D kvm_get_vcpu(kvm, 0);
-> +		rc =3D vgic_v5_send_command(vcpu0, VMTE_MAKE_INVALID);
-> +		if (rc) {
-> +			kvm_err("could not make VMTE invalid\n");
-> +			release_vm_id =3D false;
-> +			goto out_free_doorbells;
-
-[Severity: High]
-If the IRS hardware is wedged and VMTE_MAKE_INVALID fails, does jumping
-straight to out_free_doorbells cause a use-after-free of the LPIs?
-
-The error path correctly quarantines the VM ID by clearing release_vm_id to
-prevent immediate reuse. However, unconditionally branching to
-out_free_doorbells returns the doorbell IRQs to the global allocator. Since
-the wedged hardware still considers the VMTE valid, it could continue firing
-interrupts using the freed LPI numbers, potentially corrupting state if
-those LPIs are reallocated to other devices or VMs.
-
-> +		}
+> +		/*
+> +		 * In the following code we do not take the irq struct lock since
+> +		 * no other action on irq structs can happen while the VGIC is
+> +		 * not initialized yet.
+> +		 */
+> +		for (i =3D 0; i < nr_spis; i++) {
+> +			struct vgic_irq *irq =3D &dist->spis[i];
 [ ... ]
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260904113404.4051=
-341-1-sascha.bischoff@arm.com?part=3D14
+341-1-sascha.bischoff@arm.com?part=3D20
