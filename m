@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47E8F521211;
-	Fri,  4 Sep 2026 21:07:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC00837A4AF;
+	Fri,  4 Sep 2026 21:56:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788556078; cv=none; b=gA+mvmmkq1Ows4gUBMLZMqi2+s8sQnuOZFgdSmubypPOHkKsiRN3lda9gVkWIqkv0xBiwzjtxaAnRFjYGWL12HQhW32xwAYjK/dxdtwtQYfUcAtidwGMZs6oEe3tJQOrzV2C88Pgd7yBr1EX1WwBP1Yo19bexhnTJIQnaQi+DtU=
+	t=1788559011; cv=none; b=WxU6LsACShjMIY2SVsgVBlq9jgoUTvwqpuHdUjA1Zp3cdSnAlrCaqZ091a9+5V7stbrKJZctiqOSZp03PUT6KXluU9FqlnPXyZtqPFnIlRREau+rNJv1AHD0iz+IFfCE7GVJ7RmaAEeqVD80coOxEZAONdoQOrd87mFILG8ogIk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788556078; c=relaxed/simple;
-	bh=OcN3BZ4A6KpdYS+WMT/+ILplvgW62mU+jHQZrpov2J4=;
+	s=arc-20240116; t=1788559011; c=relaxed/simple;
+	bh=mDIvNTMMYeK7GsPNDD/Z4tGz1X/p8URxHyfgdZ5Z8DM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZdBH+Ah+Dr4qY20NJj1KXId4UavIuForYaHUkv6/7c7W8xTKoBC/A5DxoIjmDw3hk6CAZVWY1F5SYLg1Rl+ndDK0+ayAdakotLL1vAZ5+x4FGvtnizefV54x1sR0pXwxVo8POqOXxcHFIJRubn21zpi/a3E4Xy1YYdCR3YbmdYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S50/g39Y; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=oijWaEgT5mv0r5ufE1pnti8HfRMA18Sk2tITEOhzYXlYm4YHCYgEwHgKPZp0gf2LU1X/IkVbfqjECfZQQ2CmytZmC6ZOnPXIVF4gQDO8pySunXYRfVJaZ+bFC++rEJY5vYknMN56nMqR/zTfNW57AdDnI4KV0jEXHd9SLnUtCEY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RbHCANIi; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S50/g39Y"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 893101F00A3D;
-	Fri,  4 Sep 2026 21:07:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RbHCANIi"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D2201F00A3D;
+	Fri,  4 Sep 2026 21:56:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788556071;
-	bh=v7qKDhZ+F/2Bi/cyOsP+5DU9BRD5spx5V6SRGgxoqJo=;
+	s=k20260515; t=1788559010;
+	bh=WLLN6D/aLaiSZCc6VRO4G+fmb2F/w3i1SeqpgrJDHo4=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=S50/g39YB+UKTmtZhDM86RL7eGgd5uMqzVcDE1aAlJT8XMQAqeHfkE58X7ZAr26AU
-	 onB1eejg3jb1WO8cKRmxSPB3MvyMNkr+eT23R7PfSmy7LO9lko3ShF5ipG7JZ7cvjK
-	 q7gKapYUS2LKKN7GMUzxJQeSbrSD8BweqOm9/PJ3wP56Q8qBtTRvbEQXecVhtbHxyT
-	 V1F0xaFHoUj4i7tRvSu7cjG+ZxAaQ5wQiUaK5QERMs4M/zsPmmXntBhiXosa0wCNDL
-	 NGiSltNgHL1pCcWcMBTEQwVSodVuiSuCD2HOgsoLUQe9Mudv0UuHFyJgj7i2Mz0Lsq
-	 yQK3y0OxWGV8A==
+	b=RbHCANIivrUJeL+oLXqYTr+R4r3BsqdM4cQvevCYwT6Dx7hhRQHEHuxPhEGrzY8Dc
+	 93YNYH2AahXbS2hroX7eS4yqeIyySc5cq+STIsNypvImYjwxw+dGXsELvtimyuL3sf
+	 MGiGdlE1MZPDGo129o2qeReweS2riv51lC9YBXs/xgw1lRrAdMTMYheHdKdtPLwtCi
+	 DE0DNyXJJBHHOeuBboM7SwnWn9AS+YeWeqvy+b+zppTFa/pbyK6mIu+qp5r/5LUq0e
+	 WH9h7w+zBBOfDbeaMJbvDG31qh4E1s4THHW8iZgBuey2+RCgsZeZfaFEDtWExZbzdz
+	 3zz/va3OKRI+A==
 Received: by finisterre.sirena.org.uk (Postfix, from userid 1000)
-	id 77FD41AC52F1; Fri, 04 Sep 2026 22:07:49 +0100 (BST)
-Date: Fri, 4 Sep 2026 22:07:49 +0100
+	id 44EAA1AC52F1; Fri, 04 Sep 2026 22:56:48 +0100 (BST)
+Date: Fri, 4 Sep 2026 22:56:48 +0100
 From: Mark Brown <broonie@kernel.org>
-To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Leonardo Bras <leo.bras@arm.com>
 Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
@@ -38,20 +38,19 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Shuah Khan <shuah@kernel.org>, Oliver Upton <oupton@kernel.org>,
 	Fuad Tabba <fuad.tabba@linux.dev>,
 	Peter Maydell <peter.maydell@linaro.org>,
-	Leonardo Bras <leo.bras@arm.com>,
 	Wei-Lin Chang <weilin.chang@arm.com>,
 	Yao Yuan <yaoyuan@linux.alibaba.com>,
 	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
 	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v20 03/14] KVM: arm64: Manage GCS access and registers
- for guests
-Message-ID: <apszJZ17KUvd6BJ7@sirena.co.uk>
+Subject: Re: [PATCH v20 06/14] KVM: arm64: Validate GCS exception lock when
+ emulating ERET
+Message-ID: <aps-oNeG3RjzqHQs@sirena.co.uk>
 References: <20260901-arm64-gcs-v20-0-f31750bdfadb@kernel.org>
- <20260901-arm64-gcs-v20-3-f31750bdfadb@kernel.org>
- <apmfx08vccSd2MXw@gremlin>
- <d2659ac3-2f00-4fc4-8f9e-0585691a4ba2@sirena.org.uk>
- <apqA_SuoA6-TyHsS@gremlin>
+ <20260901-arm64-gcs-v20-6-f31750bdfadb@kernel.org>
+ <apmUQETDlhTIuJIY@LeoBrasDK>
+ <2dfd8a6c-42c2-466c-b3d6-2313466fc3d5@sirena.org.uk>
+ <aprEsh-xogu8zFnK@LeoBrasDK>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -59,78 +58,60 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="UxxT9yru8a/XGYWy"
+	protocol="application/pgp-signature"; boundary="TZSwDlEzCnBqnKB1"
 Content-Disposition: inline
-In-Reply-To: <apqA_SuoA6-TyHsS@gremlin>
+In-Reply-To: <aprEsh-xogu8zFnK@LeoBrasDK>
 X-Cookie: My vaseline is RUNNING...
 
 
---UxxT9yru8a/XGYWy
+--TZSwDlEzCnBqnKB1
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Sep 04, 2026 at 09:54:51AM +0100, Lorenzo Stoakes (ARM) wrote:
-> On Thu, Sep 03, 2026 at 09:41:26PM +0100, Mark Brown wrote:
+On Fri, Sep 04, 2026 at 02:16:34PM +0100, Leonardo Bras wrote:
+> On Thu, Sep 03, 2026 at 08:22:44PM +0100, Mark Brown wrote:
+> > On Thu, Sep 03, 2026 at 04:37:37PM +0100, Leonardo Bras wrote:
 
-> > originally written the code without expressing this dependency but on a
-> > previous version Marc asked for this nesting as an optimisation.  Since
-> > it's about optimisastion adding checks that don't otherwise exist on the
-> > restore path would doubtless get the similar complaints.  Exactly the
-> > same concerns were raised on v19.
+> > > > +	if (kvm_check_illegal_exlock_return(vcpu, spsr))
+> > > > +		return false;
 
-> Could you implement the nesting the same in the cases where there is a bare
-> ctx_has_gcs() as an alternative?
+> > > >  	/* If ERETAx fails, take the slow path */
+> > > >  	if (esr_iss_is_eretax(esr)) {
+> > > >  		if (!(vcpu_has_ptrauth(vcpu) && kvm_auth_eretax(vcpu, &elr)))
 
-> So then it'd always be tcrx -> s1pie -> gcs everywhere and that'd resolve things
-> also and make things symmetric.
+=2E..
 
-> You could also I think express the dependency if it makes sense to.
+> > We need this because ERETs from vEL2 are handled in software, modulo the
+> > NV3 fast path mentioned at the top of the function.
 
-Clearly we *can*, it's a question of what'd be acceptable - it'd result
-in the compiler emitting a bunch of extra alternatives and conditionals
-in the context switch path.
+> Oh, and this is done in __fixup_guest_exit() because vEL2 is not a=20
+> nested guest. It would be it's guests' exit that would be dealt in=20
+> fixup_nv_guest_exit().
 
-> > We could do checking of the ID registers at vCPU creation so we could
-> > avoid worrying about them in the fast path but there was also feedback
-> > about not doing that.  One idea I had was to generate feature
+> Is this correct?
 
-> Could you possibly check in sanitise_id_aa64pfr1_el1(), something like:
+Well, it's as much because that is the point where we handle the EC
+specifics.  __fixup_guest_exit() does general handling of guest exits
+that applies to all ECs and then dispatches to an EC specific handler,
+it is common code with nVHE.  When we have NV then fixup_nv_guest_exit()
+is run beforehand to do extra handling that applies to all ECs in the NV
+case, but any EC specifics for NV still go in the relevant EC specific
+handler.
 
-Sanitising the writes is a bit tricky since multiple ID registers are
-involved, TCRX and S1PIE are in ID_AA64MMFR3_EL1 while GCS is in
-ID_AA64PFR1_EL1 so you'd create an ordering constraint for userspace,
-and you'd also have to handle the case where TCR2 or S1PIE are turned
-off with GCS already enabled.  It feels like a bunch of complication,
-especially if you start applying the same approach with other features.
-
-If we're going to validate the ID registers it feels safer to check at
-the point where we finalise the ID registers and refuse to start the
-vCPU if there's an unsupportable configuration, that would mean the
-check would only need to be done in one place and userspace wouldn't
-trip over any ordering requirements with how it updates registers.  Only
-userspaces that set architecturally invalid configurations should see an
-error.  We could also handle things by fixing up the configuration at
-the same point, disabling features that are missing their dependencies,
-that's a bit more friendly in the short term but could lead to trouble
-later on as it means we hide issues in userspace.
-
-I think the best thing overall would be to leave the runtime paths as
-they are and refuse to run with an architecturally invalid setup, that
-would avoid bloating the fast path.
-
---UxxT9yru8a/XGYWy
+--TZSwDlEzCnBqnKB1
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmqbMyQACgkQJNaLcl1U
-h9DE8Qf/VR7HYcBaMw2G7Ups8tn2qUfYjOTJ99VnF8o6I1RpC8Nl2GgzkjHXBJyx
-/nQjWZNQ2wAy/rdn2lQtjolxCA4p5ZnYXJwG6dVQmDAKGSvJJ5MxqgRAt0i220TR
-F7XnsZKbtHp+rri39JMZoLszEfc28vUcUxh19+PF1UQfRaXniazCXbnBOAqyU6lM
-+ROUaor3Rve9TvHm/uqKw7eiDnyYIZjxn/nj3S9GdFwTVKstI0WX1iu+LHNPcuva
-qO3rGmzDFOtxScggNgCj497tEj1vvj8qb1Cz/+NnC5Px4NJKgqUq03twCDtTkWOr
-flTA3wHWYD88gDv/NRFpxyWaWE+XdQ==
-=j1jf
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmqbPp8ACgkQJNaLcl1U
+h9DFBwf8D5V/G8mDF5LtW3QQNUxhO8RJk17+tPVKa2yUGPdsVLrSA7bw5X/vbgDg
+WS485cIPTSH/+3VE9pa/EbV3gQps9QWT4FUIyMNEPS1Uk4M1VYYzRnXUd8vN7E7n
+9ZSEkjKz+O1MXm198k5LeY3vrLTDSH2ACHa+cIkp1Mf0eqV5cahEjEZYw0A0HL22
+5hYMKI69FWMHCU/Xu+KaNRuLmqA76LyzFWNCXAAuI9E4gM3Y4DVzmj0fwcAADwwP
+RRcvCAIazVSryyiTq2LnpE42nRWNAbTM6AUbwWEnvsrs01HU3YABGNkKZW04ilMu
+LMPVCobegoaSeXNobAfZsKW92a3nSA==
+=kVDG
 -----END PGP SIGNATURE-----
 
---UxxT9yru8a/XGYWy--
+--TZSwDlEzCnBqnKB1--
