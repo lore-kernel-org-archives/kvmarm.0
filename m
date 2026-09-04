@@ -1,362 +1,202 @@
-Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013003.outbound.protection.outlook.com [40.107.159.3])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 737B9472F6A
-	for <kvmarm@lists.linux.dev>; Fri,  4 Sep 2026 11:42:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.3
-ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788522160; cv=fail; b=O/YWj/Pr9ePiPRFIRczTelgnziDAVjPx1ID3imrbIf6W1liVInYhQpenbAr+WXHzEnKdUZ3enkotr8Tlf2EdUjZcUeaY9nfeXxWWjmiCuaczfEcKKTWx4Gzw6/tDekSR3VKR12vlcfzwvtnhFBMylyNeY+hjJwlM5pW/x3inJQk=
-ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788522160; c=relaxed/simple;
-	bh=J0ewR66rJpdGC3+C/ixptf0Oypc457QK/Ip6L7wmWIg=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=nJz1jGPKw5LxFWtZev+fqjGD937n5Vmkx0LyJ88S4xcqYGwYnBUdKshi3RhZvQ63gKUUkgM7UJ2kyIlR+1kRn6s+JV6ngzEiE6ESyyeSvmI5N125c1jEipMXZWvyQAybGz759GdbFJ8OxfGQxuAJhmWrjS9O/ExzIjlpwNJyLlg=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Z8DIg5IW; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Z8DIg5IW; arc=fail smtp.client-ip=40.107.159.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8180043E48D;
+	Fri,  4 Sep 2026 11:42:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788522171; cv=none; b=RtlK2/95ZaeZgAcqZ+qyn3tdN27FYi0HguetMToO1vtEhH+AQOPu2H+OyiRDFzerwGnE6meYTg8PJE+7z/SI5/48LnO1E1oukaQCxvLL4RwSRzIzDKFdXThrNoaifa8D63QjSZrjQL9k1AD9EiBWMZVvFWJy5SP1VwKHtUoTgpg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788522171; c=relaxed/simple;
+	bh=RqBV+FCCJMPhhS4Hj+fmI/FrEC3rPKwpyIsRAiEgqTg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hsWpk6Nat+9GvB++RPv4iEBK6ql7vK4w2fBURSEP9s+SEKB5PDYKBbcYiA5KL53hg7Xbl0EN/m9myWbxW7/wFRA6gEQdJilmZMkRKVO/7XvlKdItIdO/CyD1GQjT/KuOgYjq9DULe8nPCsPxuj4WkysnrawCDUYCiHjWl2ceIVs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=nTnws8er; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Z8DIg5IW";
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Z8DIg5IW"
-ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
- b=sSw0DHZlJqNf3OVcqyK9VNGhdZywGxeHt16dwD6dbUWgGJNpgveX7N63CKDRV2YXXd9JJPUhW/iuPTq3WDoo3HVZ3YJzgZQ/nVJQkzD98vTAo17wh7GrQiHpnPRG6qHQtiwZvaAmWH/OWZHzCkWiztt0s8FU5yq6JMQ8DXPQJasW9Alw0FLLdkwlKKIfdtR+yLR6ZLvs5bziRdDQy6WHBYBEc22i/1H+6uYoL9AXBckYaqQqdh7zKw6BD+hcVoJOJapYKAJh6mxNgVpOc8Ejfl452+5qUksuPqGrmmw3B2iIVbXKUWJt7q2uvsKLI2E7U1zRwYC20Oi28D89ntGo5g==
-ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4YFhqOjU7G6ZlD9/CD2c9W6+LhYkCvxAWgSioIMmAYY=;
- b=r2Hct2aLaYAWbnnaCxpdC9bOsZ6ch2Ngpy8aoo4at33J5FX6rrEfoZOeA+qi+6d41pmgdYpyflQeJncb0WkpKssrKTgjtQBV5kDebYAPNx9+fa44KpuMPbgKY7SKufAOiVe95mWA+u7WItCV4tIYMxvRym2nAHQXvMYsuRcOu5e7782XaIKYjaNDT9PAEofA6BFV75SWsLBAGS1w4LyGKQsS1MGjuscyNvTde36iFPoySdkZL2hx8Vyj6vvzHVayJtHP8Q5p0kpLnYhcnh4q9tXgXFOzR+611UTlZ+GouOr8eE3QjaX+T0X3CseoXcXKws1EG92d4sNlMSc5zlBNQw==
-ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
- 4.158.2.129) smtp.rcpttodomain=lists.infradead.org smtp.mailfrom=arm.com;
- dmarc=pass (p=none sp=none pct=100) action=none header.from=arm.com;
- dkim=pass (signature was verified) header.d=arm.com; arc=pass (0 oda=1 ltdi=1
- spf=[1,1,smtp.mailfrom=arm.com] dkim=[1,1,header.d=arm.com]
- dmarc=[1,1,header.from=arm.com])
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4YFhqOjU7G6ZlD9/CD2c9W6+LhYkCvxAWgSioIMmAYY=;
- b=Z8DIg5IWYFERU33SFrcZBctZAFItefpXW3lUznm+BWG+jENH2fnGzim03px505EuH/HiTVsK5l5gR8Z7pPKkZfUOrzmnuFvnJxRX67Fx6euxGK9C7xh59RZ+wuAuC1drjxpEHtP1Ex6kfa1DmEnYalAf9uT+DwYj4GTcuFFrHWI=
-Received: from DUZPR01CA0149.eurprd01.prod.exchangelabs.com
- (2603:10a6:10:4bd::25) by PR3PR08MB5754.eurprd08.prod.outlook.com
- (2603:10a6:102:91::15) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.382.10; Fri, 4 Sep
- 2026 11:42:27 +0000
-Received: from DU2PEPF00028D01.eurprd03.prod.outlook.com
- (2603:10a6:10:4bd:cafe::25) by DUZPR01CA0149.outlook.office365.com
- (2603:10a6:10:4bd::25) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.382.13 via Frontend Transport; Fri, 4
- Sep 2026 11:42:27 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
- smtp.mailfrom=arm.com; dkim=pass (signature was verified)
- header.d=arm.com;dmarc=pass action=none header.from=arm.com;
-Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
- 4.158.2.129 as permitted sender) receiver=protection.outlook.com;
- client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
-Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
- DU2PEPF00028D01.mail.protection.outlook.com (10.167.242.185) with Microsoft
- SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.21.382.8
- via Frontend Transport; Fri, 4 Sep 2026 11:42:27 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=H4EYUpVEXMRU8HKMU/A+xEpp1ZF9K2MHqA3g1oThLeq/T0yvyKWq+u0yC6ykAo7Ey6h/oHQQndlGlAFcXFobYNiWcGtAzHQzO+wwR4kbCEeCab0SEGsuINqfnJFWy/qoUeATDGT35k3EC4rt1V3rKMwr5u5lHIKGVaSffP1PQhINvCEV20OIa9SrPgKPdaAPuciYZ20SwmmB1k5PbUle6T3u9b0R62E5iWr20l0S3HstxRduZEJgG8qKuoHKofRsMoUtNzo6sfeIS1vf4P8XtmF3wN8m8x9m43+EdaVZw8NVMRkO9XzIZue11msuB29AtF5zc7jNFU1EZ5r0P8msyg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4YFhqOjU7G6ZlD9/CD2c9W6+LhYkCvxAWgSioIMmAYY=;
- b=KIulO5sOPE3T6lei1Z/ZCGNhSLqItNT1vDcFv2d8NIZ8IfhHtMxJ/xQeaJVr+Es9+olQokoUFlYGa6yGPPs+KZ1OnudDYY3zB7ow6WUK/BfQzoYiX9XgJyF3yFuIhs2UE7zWGVL6WjKpbItrimEvjfdEHusoeak2Dihgr7D/UbE7oXqmRVFLP81T6WtkoVn1c+O9D3i3HEHJOCCw60lE0JjNoedfzKE/YHQ+LfpWAFDFjng9deXxQA6CYEbN1xo4TrIM2GPXkYltUyyPSqzikByOdTCZhFhZs38mHbbpqQ8yD32c8M9f1DGdV6TbB75P0PptQpV97I7ZRvY1PkgM3A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
- header.d=arm.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4YFhqOjU7G6ZlD9/CD2c9W6+LhYkCvxAWgSioIMmAYY=;
- b=Z8DIg5IWYFERU33SFrcZBctZAFItefpXW3lUznm+BWG+jENH2fnGzim03px505EuH/HiTVsK5l5gR8Z7pPKkZfUOrzmnuFvnJxRX67Fx6euxGK9C7xh59RZ+wuAuC1drjxpEHtP1Ex6kfa1DmEnYalAf9uT+DwYj4GTcuFFrHWI=
-Received: from PR2PR08MB4889.eurprd08.prod.outlook.com (2603:10a6:101:1d::23)
- by GVXPR08MB10864.eurprd08.prod.outlook.com (2603:10a6:150:154::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.382.10; Fri, 4 Sep
- 2026 11:41:54 +0000
-Received: from PR2PR08MB4889.eurprd08.prod.outlook.com
- ([fe80::8bda:5986:a1f1:cb7e]) by PR2PR08MB4889.eurprd08.prod.outlook.com
- ([fe80::8bda:5986:a1f1:cb7e%4]) with mapi id 15.21.0382.007; Fri, 4 Sep 2026
- 11:41:54 +0000
-From: Sascha Bischoff <Sascha.Bischoff@arm.com>
-To: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-CC: nd <nd@arm.com>, "maz@kernel.org" <maz@kernel.org>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, Joey Gouly
-	<Joey.Gouly@arm.com>, Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>, "peter.maydell@linaro.org"
-	<peter.maydell@linaro.org>, "lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	Timothy Hayes <Timothy.Hayes@arm.com>, "fuad.tabba@linux.dev"
-	<fuad.tabba@linux.dev>
-Subject: [PATCH v6 15/49] KVM: arm64: gic-v5: Add resident/non-resident hyp
- calls
-Thread-Topic: [PATCH v6 15/49] KVM: arm64: gic-v5: Add resident/non-resident
- hyp calls
-Thread-Index: AQHdPGJhPqHwhHpo1Em2ZdhXJibSng==
-Date: Fri, 4 Sep 2026 11:41:53 +0000
-Message-ID: <20260904113404.4051341-16-sascha.bischoff@arm.com>
-References: <20260904113404.4051341-1-sascha.bischoff@arm.com>
-In-Reply-To: <20260904113404.4051341-1-sascha.bischoff@arm.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-mailer: git-send-email 2.34.1
-Authentication-Results-Original: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arm.com;
-x-ms-traffictypediagnostic:
-	PR2PR08MB4889:EE_|GVXPR08MB10864:EE_|DU2PEPF00028D01:EE_|PR3PR08MB5754:EE_
-X-MS-Office365-Filtering-Correlation-Id: daeff0f7-8c4a-499e-3b9b-08df0a799857
-x-checkrecipientrouted: true
-nodisclaimer: true
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam-Untrusted:
- BCL:0;ARA:13230040|376014|23010399003|1800799024|366016|10067099003|11063799006|22082099003|56012099006|38070700021|18002099003;
-X-Microsoft-Antispam-Message-Info-Original:
- UVX+S/n0WMdsm+E/8llX9vQJw2ZkhMfuNPRofyri7HTlt2nB9EHeCMX/V3HUriso3/eF6a+9xrXbv6rDAuh/hX7xkz68rocf94yb3EzITWBdNOSyy9aK+RaroBi69FFyIWecs5CPDHRrN4FPUehrQS5/oHvER22OmJV93nLgpmZN1+7jQeTWFrmAgANVwhS6TBnivjtNFaKM3rkciX+ZG+1SdWJ5YHtKSVKWtgasWRa6Tg1crT0K7H2wZnlpCxPbFUPzIP19izKXvrZAfIDO7+NN4r4c3hUvpuLsi4Vcbl82JGFfML/A/n3dJSzizZkeixWYgavSJoYv3kyRVTkswqm2LXyI0KBV6Xj7j16nibh/rd3Vc2dQCwnJOmhIQnMSJbtD19S5AsNE5y5qm/0q4Uwj3affca/cqTyVlGM2XcZ/yKXNixatjnCZdUbKLPxbB+UJ7BClr7DmDPVQdjCcFqlIKxIktHxx7lcD+dm80c/x7/oFECkEFbmVOTpPAPBFJofdOIJYYB4vnm+ZT7e0vqhGtVKn8pfg649nvv9N+uARGeJSJjGe6BmrBe0UP/mQni7iC2wyFg6BjdBj3ZW1Q7YMqsoyVEOls/X01ELYFKb+jzCNVE3RP7kumCpYgSU7cjRuFnbWKSfL+C8JQwfQTAyr6wqglym2StlRWBvt9NfDr9LrrqEoiP9reMgj0fIWwfEJb38ijoYE9Lf9VWoNnaFh97Iuw+0BUT1KvxFx8yg=
-X-Forefront-Antispam-Report-Untrusted:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PR2PR08MB4889.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(23010399003)(1800799024)(366016)(10067099003)(11063799006)(22082099003)(56012099006)(38070700021)(18002099003);DIR:OUT;SFP:1101;
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="nTnws8er"
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 684AVjYt1490808;
+	Fri, 4 Sep 2026 11:42:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=4WuBTyk+7ZTl6/gJBor58BJdLTP04b
+	Wzoe7W6rw9K+4=; b=nTnws8erhXkreeNw0t3p2smI/8V6K5SqBAIhw/3l0xHAcv
+	Erm6mQlRqxvWIJWa/75sWhhYQQGO7OG3KROguMrNg96E/UcRUtRAuGT7vlZfVEXa
+	+LB2L+vN11Ir2RcBtltMXPIgNs72wMpUT5MvFd1QuXm0p5mEOMRSBbZ2YChBp+Nn
+	wQrqfAj2n8lfJ+dDiyMIOjQApePFDdC+TSl9b9i/lsPUgpc1IDxNNjhH/DkR9pyy
+	S4kYXim9axqPSxn8ouoZdOdNIJQRNCK5pYYtkuAPKO2jij4MHvu09pnh9MU7EhwS
+	DdhQR/JnhRATbV548EfbGygGySlWx7IO8rv8gltw==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gbpx62fwc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 04 Sep 2026 11:42:30 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 684BfJ35010880;
+	Fri, 4 Sep 2026 11:42:29 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4gcarkmthc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 04 Sep 2026 11:42:29 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 684BgOtV45875696
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 4 Sep 2026 11:42:24 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7A4B52004E;
+	Fri,  4 Sep 2026 11:42:24 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C56DE20040;
+	Fri,  4 Sep 2026 11:42:18 +0000 (GMT)
+Received: from dhcp-9-123-3-18.bl1-in.ibm.com (unknown [9.123.3.18])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Fri,  4 Sep 2026 11:42:18 +0000 (GMT)
+Date: Fri, 4 Sep 2026 17:12:16 +0530
+From: Gautam Menghani <gautam@linux.ibm.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
+        Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
+        Steffen Eiden <seiden@linux.ibm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>, Atish Patra <atish.patra@linux.dev>,
+        Alexandre Ghiti <alex@ghiti.fr>, David Hildenbrand <david@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, loongarch@lists.linux.dev,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org,
+        Itaru Kitayama <itaru.kitayama@fujitsu.com>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Ritesh Harjani <ritesh.list@gmail.com>
+Subject: Re: [PATCH v2 11/20] KVM: selftests: Initialize vm->memslots[] with
+ invalid memslots during creation
+Message-ID: <apqumGjtfOspqygY@dhcp-9-123-3-18.bl1-in.ibm.com>
+References: <20260902164123.2546762-1-seanjc@google.com>
+ <20260902164123.2546762-12-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked:
- asv2/oyMjxx73k3/fLoODC0eqP4fOznFPDWBfAQFUBtKwr+Wy2QQZE2SoVlmf4AIbG9dg5AHmoLAWkjOBXs8xHUNpbPjtSTlvMhfKaUMBDoFwB5B3Gk5uQ5GLqmlydaToKO27Q0H4/FzICtiHd1Jqaek0fuAbOL5ayiNDuURBteDiCtNH8DC+vRZ8FhUGGVFUMxtjbxb6BSE2ivNAQhSSq9Qu704GebyPJcl9YfRkEibkpt4xeqgQPSwWfnd2Pnvr74j8npz4b8hPEN5frgI7N/+JCaL7qgKKNRErl55Zs4TuvI6Do7IDmfd12Bc776yeUC1bXdz/eNhfKXh35XAjw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GVXPR08MB10864
-X-EOPAttributedMessage: 0
-X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- DU2PEPF00028D01.eurprd03.prod.outlook.com
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	f2823d0f-dab5-42aa-b1af-08df0a798485
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|36860700016|14060799003|1800799024|35042699022|23010399003|376014|18002099003|22082099003|56012099006|10067099003|11063799006;
-X-Microsoft-Antispam-Message-Info:
-	qa7GyKQed3RlXtpB2lpbD6t4+mPwnF96XvMWYZBChznP6mQr+VER2nqLjN9UaY935geBo9X8f0dKZeqgV17w8G9u0Np17x9EIIir472uGxzEKJ8nnffbnLVYTbdynHnMsXipBDyehRJYCBxHERF9bS/jtL5+ZMZRySuiA7VKOnmq2le9Ms9DFcsAB5ap67ZAvHLTRl7hsQgw8XZbpK/TpOdnlKNSEuBf2lOlezpq3EYj7p8mQcrJYImsDibRQhuwoaBBl84vSc1WRA4uiGMb2gZBKwSdolGkppfIdZJQIbhq8hk8inN2Yo0gUjaG625zjFaN8osh2/t1n+pc4X934bkwA31EMW70YJa6FXEAiMgSLpa3kNx8RcE+sizd78lCwFU3ssZTkgE8iInZ0AFe5iTvXbSpD/ZL1H30LgEURkUDW7su85DYQ6Q+6Mmo4EbZ7eKJTstR9bcnLpA4eIvMw4n55I94VwzwvjOp1B0xsASQIqCUaft0y2VrrUaBgDn6AM7/xOTI+SIolgLUn6qUzYw6/OMX8ACkyEb0Pf+Pz0WlKmsbxH/lpL/G53LMfiGAUxSbRNR8Aktwx93MVj0eR7dCWvqzKS3P0lg0we/x67oNYHKsHhT2lmJoJ1yJrbYWqPZMpasAdVQu4dRw0UMGoua1ehG10MXT7IpcWI6DbMA=
-X-Forefront-Antispam-Report:
-	CIP:4.158.2.129;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(36860700016)(14060799003)(1800799024)(35042699022)(23010399003)(376014)(18002099003)(22082099003)(56012099006)(10067099003)(11063799006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	uU3wxI2Zm6iFlt4XKycXi8n04XvBN95JthdG+P2SElhtJl9Crdmb/jqsAnW0g4USmLkFPaQbJ5AydP6p1C67Y66kO8rjbuIKOmLlK5bB4s2tzT9gy7dPe4KL0mkcqW1uKf6wFQ5mtVjOoA5MYBKL3GfODBT7JSYjl0NPssnGWK0UdSRbC+DaN09VcozwQFvx40SU4tuCdDy7DdcXk89fFK+FEtEoxjVROsZnSVdPGRONUIXNuPfnvv8DBmWY/QdDmu/arCo7eMrK0WYdoWEh5q2BdzNpvneBAt8YjMDU7xqpX5y+rhEV8bWBTxTnBox2Q2BsdNXOHPKlxkocB+MjfXEl9+axBI9YhdDp3uuQ1IkpTWH61dzatqsiU/qBwHcrRK2pMleKT0rj+1hJW39oMC+QK5G/D4z24Q1AW4UKmlb7I9+L3WAzU5ZmOrigZvwB
-X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Sep 2026 11:42:27.1961
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: daeff0f7-8c4a-499e-3b9b-08df0a799857
-X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DU2PEPF00028D01.eurprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PR3PR08MB5754
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260902164123.2546762-12-seanjc@google.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Authority-Analysis: v=2.4 cv=PPc/P/qC c=1 sm=1 tr=0 ts=6a9aaea7 cx=c_pps
+ a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
+ a=kj9zAlcOel0A:10 a=VdqzKS8jKosA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=omOdbC7AAAAA:8
+ a=1XWaLZrsAAAA:8 a=VnNF1IyMAAAA:8 a=j0vlev5UKZ0XSpOR6SEA:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-GUID: K127SOBQgi0IcTlk75m4H1_Q2ziHQ3DQ
+X-Proofpoint-ORIG-GUID: 95cSaeGsDM3YPyi_8Bstk2nmoY8f_6SX
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTA0MDEwNCBTYWx0ZWRfX+sgzR96uIskc
+ L1xC/tLwzlhM8mk95oqvrIZaclLg66tCMY22rFeIBPrTvv5ihmMWj6eNhMSs1srj+rCxliAdcON
+ MB1TT718cfBrt3yTqsdZISpFSiS2+DM=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTA0MDEwNCBTYWx0ZWRfX+Ixd/av42HBX
+ ozSfb9Bg9GTIg9InKsUPb+Q1ECRhKMO6cfjbAyHxXXuyaO05TIoiGrLl5DZTkYqrgQTv3EF9zJi
+ bAx4/ZXSBoOszmum71DGEDteU6eN1I/I88w2wX++X2arV+IBlNmTQc68Ea5hlBXI7r5ufl8CTGK
+ rWVD+fZEWvX61zZ9uGC6KqLxsBuQnTzSLV80Uo/SeerZTFh5kAeYBuXvh1tzu0k/XMjR0NxJLbX
+ yccoMxaKlczM4Vnsq9AnuLszNasGW4x+lM8ZPWDBaImP3Hm6ct8vqXzQl00tcXBRIUIJHaVssZk
+ cukJoCzk5UbokxVLYh785GdUKARY87LKbBCocVhCQ2UFGYcjnt8JIIa5biitmwGT7opLjW6SPKk
+ ppoSCGPvqIU0ODB99ArygJ+62g+HIbiPijs30FoEN3zlFgj9U8NkvOkL4RUlZPzW8CjyiX/fPpo
+ WdXIQg2mS1vo/oJwbEQ==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-09-04_03,2026-09-03_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1011 phishscore=0 adultscore=0 suspectscore=0 bulkscore=0
+ spamscore=0 priorityscore=1501 impostorscore=0 malwarescore=0
+ lowpriorityscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
+ definitions=main-2609040104
 
-GICv5 introduces the concept of VPE residency - a VPE can be either
-resident or non-resident. When the VPE is resident, the IRS is allowed
-to select interrupts that target that VPE (or the VM) as the HPPI
-(Highest Priority Pending Interrupt). As the IRS handles both SPIs and
-LPIs, these will only be picked as the IRS's HPPI when a VPE is
-resident.
+On Wed, Sep 02, 2026 at 09:41:14AM -0700, Sean Christopherson wrote:
+> Initialize vm->memslots[] with an invalid memslots value during very
+> initial VM creation so that failure to configure the core memory regions
+> generates an immediate assert instead of potential weirdness, e.g. if slot0
+> is coincidentally valid.  This will also allow hardening the region APIs to
+> guard overriding a region's memslot multiple times.
+> 
+> Tested-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  tools/testing/selftests/kvm/include/kvm_util.h  | 2 ++
+>  tools/testing/selftests/kvm/lib/kvm_util.c      | 5 +++++
+>  tools/testing/selftests/kvm/lib/x86/processor.c | 5 ++++-
+>  3 files changed, 11 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+> index c56f342b16fd..304ef6af3268 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+> @@ -33,6 +33,8 @@
+>  
+>  #define NSEC_PER_SEC 1000000000L
+>  
+> +#define KVM_INVALID_MEMSLOT UINT_MAX
+> +
+>  struct userspace_mem_region {
+>  	struct kvm_userspace_memory_region2 region;
+>  	struct sparsebit *unused_phy_pages;
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index ce0d8fba4624..56df5b1d9c79 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -288,6 +288,7 @@ __weak void vm_populate_gva_bitmap(struct kvm_vm *vm)
+>  struct kvm_vm *____vm_create(struct vm_shape shape)
+>  {
+>  	struct kvm_vm *vm;
+> +	int i;
+>  
+>  	vm = calloc(1, sizeof(*vm));
+>  	TEST_ASSERT(vm != NULL, "Insufficient Memory");
+> @@ -296,6 +297,8 @@ struct kvm_vm *____vm_create(struct vm_shape shape)
+>  	vm->regions.gpa_tree = RB_ROOT;
+>  	vm->regions.hva_tree = RB_ROOT;
+>  	hash_init(vm->regions.slot_hash);
+> +	for (i = 0; i < NR_MEM_REGIONS; i++)
+> +		vm->memslots[i] = KVM_INVALID_MEMSLOT;
+>  
+>  	vm->mode = shape.mode;
+>  	vm->type = shape.type;
+> @@ -1190,6 +1193,8 @@ memslot2region(struct kvm_vm *vm, u32 memslot)
+>  {
+>  	struct userspace_mem_region *region;
+>  
+> +	TEST_ASSERT(memslot != KVM_INVALID_MEMSLOT, "vm->memslots[] unpopulated?");
+> +
+>  	hash_for_each_possible(vm->regions.slot_hash, region, slot_node,
+>  			       memslot)
+>  		if (region->region.slot == memslot)
+> diff --git a/tools/testing/selftests/kvm/lib/x86/processor.c b/tools/testing/selftests/kvm/lib/x86/processor.c
+> index d31fa81ea075..ea5fa59888af 100644
+> --- a/tools/testing/selftests/kvm/lib/x86/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/x86/processor.c
+> @@ -529,7 +529,10 @@ void tdp_identity_map_default_memslots(struct kvm_vm *vm)
+>  
+>  	/* Only memslot 0 is mapped here, ensure it's the only one being used */
+>  	for (s = 0; s < NR_MEM_REGIONS; s++)
+> -		TEST_ASSERT_EQ(vm->memslots[s], 0);
+> +		TEST_ASSERT(!vm->memslots[s] ||
+> +			    vm->memslots[s] == KVM_INVALID_MEMSLOT,
+> +			    "Unhandled memslot '%u' for type '%u'",
+> +			    vm->memslots[s], s);
+>  
+>  	i = (region->region.guest_phys_addr >> vm->page_shift) - 1;
+>  	last = i + (region->region.memory_size >> vm->page_shift);
+> -- 
+> 2.55.0.966.g6673acef38-goog
+> 
 
-A GICv5 VPE is made resident by writing ICH_CONTEXTR_EL2 with
-ICH_CONTEXTR_EL2.V set, together with valid VM and VPE IDs. This
-informs the IRS that a specific VPE is running, and that it can begin
-HPPI selection for that VPE. Making a VPE non-resident (by making the
-ICH_CONTEXTR_EL2 invalid) informs the IRS that the VPE is no longer
-running, and it stops HPPI selection for it.
 
-This change introduces two new hyp calls - one to make a VPE resident
-and its counterpart to make a VPE non-resident. As part of making a
-VPE resident, the resulting ICH_CONTEXTR_EL2.F bit is checked to catch
-residency faults. Such a fault indicates a broken VM/VPE setup, so
-warn and mark the VM dead.
-
-Both of these new hypercalls are explicitly no-ops with pKVM as we
-currently don't support the combination of GICv5 and pKVM.
-
-Furthermore, this change extends vgic_v5_load() and vgic_v5_put() to
-make the VPEs resident and non-resident, respectively. Hence, the VPE
-is considered resident for the entire load-to-put interval.
-
-Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
----
- arch/arm64/include/asm/kvm_asm.h   |  2 ++
- arch/arm64/include/asm/kvm_hyp.h   |  2 ++
- arch/arm64/kvm/hyp/nvhe/hyp-main.c | 22 ++++++++++++++++++++++
- arch/arm64/kvm/hyp/vgic-v5-sr.c    | 26 ++++++++++++++++++++++++++
- arch/arm64/kvm/vgic/vgic-v5.c      | 16 ++++++++++++++--
- include/kvm/arm_vgic.h             |  3 +++
- 6 files changed, 69 insertions(+), 2 deletions(-)
-
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_=
-asm.h
-index e5b92ac09e69e..55f7c5c74d1ab 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -87,6 +87,8 @@ enum __kvm_host_smccc_func {
- 	__KVM_HOST_SMCCC_FUNC___tracing_write_event,
- 	__KVM_HOST_SMCCC_FUNC___vgic_v3_save_aprs,
- 	__KVM_HOST_SMCCC_FUNC___vgic_v3_restore_vmcr_aprs,
-+	__KVM_HOST_SMCCC_FUNC___vgic_v5_make_resident,
-+	__KVM_HOST_SMCCC_FUNC___vgic_v5_make_non_resident,
- 	__KVM_HOST_SMCCC_FUNC___vgic_v5_save_apr,
- 	__KVM_HOST_SMCCC_FUNC___vgic_v5_restore_vmcr_apr,
-=20
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_=
-hyp.h
-index 4974492744cc8..8fcbbff719cce 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -88,6 +88,8 @@ void __vgic_v3_restore_vmcr_aprs(struct vgic_v3_cpu_if *c=
-pu_if);
- int __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu);
-=20
- /* GICv5 */
-+void __vgic_v5_make_resident(struct vgic_v5_cpu_if *cpu_if);
-+void __vgic_v5_make_non_resident(struct vgic_v5_cpu_if *cpu_if);
- void __vgic_v5_save_apr(struct vgic_v5_cpu_if *cpu_if);
- void __vgic_v5_restore_vmcr_apr(struct vgic_v5_cpu_if *cpu_if);
- /* No hypercalls for the following */
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/h=
-yp-main.c
-index 9a3b92e626adb..cd709eb426b5f 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -885,6 +885,26 @@ static void handle___tracing_write_event(struct kvm_cp=
-u_context *host_ctxt)
- 	trace_selftest(id);
- }
-=20
-+static void handle___vgic_v5_make_resident(struct kvm_cpu_context *host_ct=
-xt)
-+{
-+	DECLARE_REG(struct vgic_v5_cpu_if *, cpu_if, host_ctxt, 1);
-+
-+	if (unlikely(is_protected_kvm_enabled()))
-+		return;
-+
-+	__vgic_v5_make_resident(kern_hyp_va(cpu_if));
-+}
-+
-+static void handle___vgic_v5_make_non_resident(struct kvm_cpu_context *hos=
-t_ctxt)
-+{
-+	DECLARE_REG(struct vgic_v5_cpu_if *, cpu_if, host_ctxt, 1);
-+
-+	if (unlikely(is_protected_kvm_enabled()))
-+		return;
-+
-+	__vgic_v5_make_non_resident(kern_hyp_va(cpu_if));
-+}
-+
- static void handle___vgic_v5_save_apr(struct kvm_cpu_context *host_ctxt)
- {
- 	DECLARE_REG(struct vgic_v5_cpu_if *, cpu_if, host_ctxt, 1);
-@@ -932,6 +952,8 @@ static const hcall_t host_hcall[] =3D {
- 	HANDLE_FUNC(__tracing_write_event),
- 	HANDLE_FUNC(__vgic_v3_save_aprs),
- 	HANDLE_FUNC(__vgic_v3_restore_vmcr_aprs),
-+	HANDLE_FUNC(__vgic_v5_make_resident),
-+	HANDLE_FUNC(__vgic_v5_make_non_resident),
- 	HANDLE_FUNC(__vgic_v5_save_apr),
- 	HANDLE_FUNC(__vgic_v5_restore_vmcr_apr),
-=20
-diff --git a/arch/arm64/kvm/hyp/vgic-v5-sr.c b/arch/arm64/kvm/hyp/vgic-v5-s=
-r.c
-index 6d69dfe89a96c..f064045a31aee 100644
---- a/arch/arm64/kvm/hyp/vgic-v5-sr.c
-+++ b/arch/arm64/kvm/hyp/vgic-v5-sr.c
-@@ -7,6 +7,32 @@
-=20
- #include <asm/kvm_hyp.h>
-=20
-+void __vgic_v5_make_resident(struct vgic_v5_cpu_if *cpu_if)
-+{
-+	write_sysreg_s(cpu_if->vgic_contextr, SYS_ICH_CONTEXTR_EL2);
-+	isb();
-+
-+	/* Catch any faults */
-+	cpu_if->vgic_contextr =3D read_sysreg_s(SYS_ICH_CONTEXTR_EL2);
-+	if (!!FIELD_GET(ICH_CONTEXTR_EL2_F, cpu_if->vgic_contextr))
-+		return;
-+
-+	cpu_if->gicv5_vpe.resident =3D true;
-+}
-+
-+void __vgic_v5_make_non_resident(struct vgic_v5_cpu_if *cpu_if)
-+{
-+	/*
-+	 * Make as non-resident before actually making non-resident. Avoids race
-+	 * with doorbell arriving.
-+	 */
-+	cpu_if->gicv5_vpe.resident =3D false;
-+	dsb(st);
-+
-+	write_sysreg_s(cpu_if->vgic_contextr, SYS_ICH_CONTEXTR_EL2);
-+	isb();
-+}
-+
- void __vgic_v5_save_apr(struct vgic_v5_cpu_if *cpu_if)
- {
- 	cpu_if->vgic_apr =3D read_sysreg_s(SYS_ICH_APR_EL2);
-diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-index 5b599821b2da2..d7d6db5014269 100644
---- a/arch/arm64/kvm/vgic/vgic-v5.c
-+++ b/arch/arm64/kvm/vgic/vgic-v5.c
-@@ -1054,6 +1054,8 @@ void vgic_v5_flush_ppi_state(struct kvm_vcpu *vcpu)
- void vgic_v5_load(struct kvm_vcpu *vcpu)
- {
- 	struct vgic_v5_cpu_if *cpu_if =3D &vcpu->arch.vgic_cpu.vgic_v5;
-+	u16 vm =3D vgic_v5_vm_id(vcpu->kvm);
-+	u16 vpe =3D vgic_v5_vpe_id(vcpu);
-=20
- 	/*
- 	 * On the WFI path, vgic_load is called a second time. The first is when
-@@ -1066,7 +1068,15 @@ void vgic_v5_load(struct kvm_vcpu *vcpu)
-=20
- 	kvm_call_hyp(__vgic_v5_restore_vmcr_apr, cpu_if);
-=20
--	cpu_if->gicv5_vpe.resident =3D true;
-+	cpu_if->vgic_contextr =3D FIELD_PREP(ICH_CONTEXTR_EL2_V, true) |
-+				FIELD_PREP(ICH_CONTEXTR_EL2_VPE, vpe) |
-+				FIELD_PREP(ICH_CONTEXTR_EL2_VM, vm);
-+
-+	kvm_call_hyp(__vgic_v5_make_resident, cpu_if);
-+
-+	/* Failed to make the VPE resident? Bang! */
-+	if (WARN_ON(!!FIELD_GET(ICH_CONTEXTR_EL2_F, cpu_if->vgic_contextr)))
-+		kvm_vm_dead(vcpu->kvm);
- }
-=20
- void vgic_v5_put(struct kvm_vcpu *vcpu)
-@@ -1084,7 +1094,9 @@ void vgic_v5_put(struct kvm_vcpu *vcpu)
-=20
- 	kvm_call_hyp(__vgic_v5_save_apr, cpu_if);
-=20
--	cpu_if->gicv5_vpe.resident =3D false;
-+	cpu_if->vgic_contextr =3D 0;
-+
-+	kvm_call_hyp(__vgic_v5_make_non_resident, cpu_if);
-=20
- 	/* The shadow priority is only updated on entering WFI */
- 	if (vcpu_get_flag(vcpu, IN_WFI))
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index a00d5151536bd..aadd47c959b98 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -525,6 +525,9 @@ struct vgic_v5_cpu_if {
- 	 */
- 	u64	vgic_icsr;
-=20
-+	/* The contextr used to make VPEs resident and non-resident */
-+	u64	vgic_contextr;
-+
- 	struct gicv5_vpe gicv5_vpe;
- };
-=20
---=20
-2.34.1
+Acked-by: Gautam Menghani <gautam@linux.ibm.com>
