@@ -1,219 +1,289 @@
-Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011023.outbound.protection.outlook.com [52.101.70.23])
+Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FE6D3F4DD2;
-	Fri,  4 Sep 2026 06:37:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.23
-ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788503840; cv=fail; b=WuSUYeUjc4UHozl9Hh6mi0b+4o7KLcTCvNEeW98TbRXdeDl3tvU5nU2h6q6DHGNwAEGmnjG8NVDgaju9vEntv9BlwLEapKAiLNu/GWyekmPPgTZ7e+RDFSiYlKcc+ew9mOtvL29sa+CSC5Oh0rDCmzHBFUV7lbpDbU1tR2ixnT4=
-ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788503840; c=relaxed/simple;
-	bh=hooFxl6rRGq59JQXiQ9rETvMfI18JIzGCN96OnM78xM=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=tJtDp4NTOya/4COaIfZNcJivy1J/zh3jGv9znkT87z8w6T7Mp7MYwmJDTMIQqc4oYcsWopygwYK+U+NY+8yE8pKMIL7h5Cs8IMCI/so6+873au93NkWroQ/OyljCrvQ6zYBkVDHzJpLb9hqJFDwph/OU2WOGFI8H+hHAHEQ1XO8=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=FKaIktBk; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=FKaIktBk; arc=fail smtp.client-ip=52.101.70.23
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4E7B3A6B9A
+	for <kvmarm@lists.linux.dev>; Fri,  4 Sep 2026 07:01:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788505292; cv=none; b=YBy/vh3SmqGUGdVmuUxAM4GcLFLu3XDeDld8hK4+meUe1dOqhbwT8tJZTwCX60bwfXS1HpFISkZPVRKaUPQVDPNgOS+yMscVu3wMqrYn8KuG939683UCvcOS9QyIIFpTk1f6ya80VxycilEPoZjX8+rP9LZTCZh76Bk9n5Yyguw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788505292; c=relaxed/simple;
+	bh=fnQDIjjX21nOJR6vDXwyI8ruFKygzvOidjThFbQlgbM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DI7oToVBxbwlM7xkss/GnpXrOATi/XTyQqKZUn19FZbjKYFt9NeTf/riLhfnU6a74TJ1dOixQxoVxODBXAitNlZ3mmAz415onPjv4WnVCWlMQ/u/juRakmQfzQJ7YfoSqQu7shp33g/IEjkBYfCTTYZJUgbzVMESZS1rYkeK02c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Vx+A0nWH; arc=none smtp.client-ip=115.124.30.118
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="FKaIktBk";
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="FKaIktBk"
-ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
- b=GPdoB3ALMFmrVknCe+ts5WDt+KJchyC/Fik+SD4cQrAB5HjzJksfgRio4a/bfCYXMm5u6wrVSyqrx388Mw/XTtD7zbrMt0j0HZyJveEchLCW7gFmEHPGfGvsYeVC6MF71pg08dO1sfqF+2Yx/Y0m5MrpKRGIGmgJk3i4n9koDC4ISk4ZIcSp/hH9t4NxswqxtKT4+UQ7HuiXY1XzuEgejXTSS8YscNWO9tS10bWAh0wiJKzejiD2jXpyUumLoVU8h0UCfhb1+h07shS6Az4m6HPloirlscf8YFxAuskNAPte7PUmqnoi1HzWyTaQABXJqhsvM8KDqHpq2n/rcNEVnw==
-ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hooFxl6rRGq59JQXiQ9rETvMfI18JIzGCN96OnM78xM=;
- b=oC/SW/fnxIbvGc0HMGxX56aBChHP8Awr3pu9/0vg6HfXP77tlCKJPdD8rV4T0m1MCTI87ws1H8Msj95O+fZ6bCDKYSGJ9JP7h94gppziXkNEKrMX/VEFT2j4OXAG7TgtVjtsdag3t/BHagBi9g3FOQjQW4n2iHPWqanJoJJRrnRfTEVrUpcFeGX95p6K0V71XANU/yLCVkcs6zBbUddMgTkeuCYJ/xM1nR4EHgMMknxUZRA6/aNV14zegLpNe80caYwUrPT7oANYUpmWrgsoxObXHjiKcUZUjzksnbhxkF0a+if8FDDcw1Hb01LVM9YPFoYBnDeHQtZOe2/bxK0q5A==
-ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
- 4.158.2.129) smtp.rcpttodomain=lists.linux.dev smtp.mailfrom=arm.com;
- dmarc=pass (p=none sp=none pct=100) action=none header.from=arm.com;
- dkim=pass (signature was verified) header.d=arm.com; arc=pass (0 oda=1 ltdi=1
- spf=[1,1,smtp.mailfrom=arm.com] dkim=[1,1,header.d=arm.com]
- dmarc=[1,1,header.from=arm.com])
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hooFxl6rRGq59JQXiQ9rETvMfI18JIzGCN96OnM78xM=;
- b=FKaIktBkAUjdV/tjun2n6Swaj7DStA0rVxP3Ls9tiT8f5Da1FqS/eHDuPCG9P0haoXUJC7ulInvVD3tcBLIORINxbeBDvL8WNJD6eMRogZrkap/glVogyLijLiX3co3xwd2FTKvBEPPlo119g9lk5sPeANVcxLwB1095g1qQo50=
-Received: from PA7P264CA0279.FRAP264.PROD.OUTLOOK.COM (2603:10a6:102:373::20)
- by GV2PR08MB11313.eurprd08.prod.outlook.com (2603:10a6:150:2ca::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.382.10; Fri, 4 Sep
- 2026 06:37:12 +0000
-Received: from MI3PEPF0000848C.eurprd02.prod.outlook.com
- (2603:10a6:102:373:cafe::5b) by PA7P264CA0279.outlook.office365.com
- (2603:10a6:102:373::20) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.382.12 via Frontend Transport; Fri, 4
- Sep 2026 06:37:12 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
- smtp.mailfrom=arm.com; dkim=pass (signature was verified)
- header.d=arm.com;dmarc=pass action=none header.from=arm.com;
-Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
- 4.158.2.129 as permitted sender) receiver=protection.outlook.com;
- client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
-Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
- MI3PEPF0000848C.mail.protection.outlook.com (10.167.240.139) with Microsoft
- SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.21.382.8
- via Frontend Transport; Fri, 4 Sep 2026 06:37:11 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=yOB2/TZnYJSn1C2ut6ay6yVrzQA9HhBaBshFsga4PXxgJMaeL8AowLTN/F+/fRLHGazngSU6lNG2r0KXfWl1ofy2W4vT7mZ7IKYv0Q84r/e1+1sOgP1ovat5JNE1UpzIzZjg61yKyYJQLuNwQGQAWPqOAFP/gLvVoXatL4mShKnmrKVjGVm1Wh0Nhpfr5GVpZUbIULS3th05qdSKwWe0pWBzvSstW8VWixr3Vskm1EnPRYVBRHt/M8mXpvUbmFX2MInxptIgid3vf1qCEVsaAov5vFBaokIVhxx+56mKCXWrfAS/AGhmWm8ynRQPkD4NhTWy0rAuJwbo0Jhz7rVu7A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hooFxl6rRGq59JQXiQ9rETvMfI18JIzGCN96OnM78xM=;
- b=bauDZPuXEHTbqoDgR7poFO2IVH/9tVBtPuNwl54keRQD5kv3NuuBpiNRGIfRdNep7SPFvDv/5pxmCexdxmgwvXLriD4LC6Ey6C0yy/6CXDypBvcD1mYJswOH3TSs4LQ8GXy8WwvCRHGdzWBG3MjC5JSidNDKuhqtIv3Rego/02CoMLtqe/1rAlNaTZuf5DsAaMWkenq3Cjk4vz/0shEDBx+Mw4B8PNY3DNYaEQtB3dg+LTOo07t/PzF3I8gR3hH1sIg+lMCXSJ6XXDjtFVPJm9kNvQneibD7drrUZAavffP1rWqQNxwk216gG3vsf7vp+oCqoOULn5ZIB9NG9qnjsQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
- header.d=arm.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hooFxl6rRGq59JQXiQ9rETvMfI18JIzGCN96OnM78xM=;
- b=FKaIktBkAUjdV/tjun2n6Swaj7DStA0rVxP3Ls9tiT8f5Da1FqS/eHDuPCG9P0haoXUJC7ulInvVD3tcBLIORINxbeBDvL8WNJD6eMRogZrkap/glVogyLijLiX3co3xwd2FTKvBEPPlo119g9lk5sPeANVcxLwB1095g1qQo50=
-Received: from PR2PR08MB4889.eurprd08.prod.outlook.com (2603:10a6:101:1d::23)
- by DU0PR08MB9273.eurprd08.prod.outlook.com (2603:10a6:10:419::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.382.10; Fri, 4 Sep
- 2026 06:36:35 +0000
-Received: from PR2PR08MB4889.eurprd08.prod.outlook.com
- ([fe80::8bda:5986:a1f1:cb7e]) by PR2PR08MB4889.eurprd08.prod.outlook.com
- ([fe80::8bda:5986:a1f1:cb7e%4]) with mapi id 15.21.0382.007; Fri, 4 Sep 2026
- 06:36:34 +0000
-From: Sascha Bischoff <Sascha.Bischoff@arm.com>
-To: "sashiko-reviews@lists.linux.dev" <sashiko-reviews@lists.linux.dev>
-CC: "maz@kernel.org" <maz@kernel.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"oupton@kernel.org" <oupton@kernel.org>, nd <nd@arm.com>
-Subject: Re: [PATCH v5 07/49] KVM: arm64: gic-v5: Cache host IRS ID registers
-Thread-Topic: [PATCH v5 07/49] KVM: arm64: gic-v5: Cache host IRS ID registers
-Thread-Index: AQHdJl4mE3ixBMiMxk6G5aqxys8umraSg3GAgCufRQA=
-Date: Fri, 4 Sep 2026 06:36:34 +0000
-Message-ID: <789e1ff8ce9ba5bca19742682e90b5b83719e64a.camel@arm.com>
-References: <20260807111159.429128-1-sascha.bischoff@arm.com>
-	 <20260807111159.429128-8-sascha.bischoff@arm.com>
-	 <20260807122719.B87211F00AC4@smtp.kernel.org>
-In-Reply-To: <20260807122719.B87211F00AC4@smtp.kernel.org>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.52.3-0ubuntu1.1 
-Authentication-Results-Original: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arm.com;
-x-ms-traffictypediagnostic:
-	PR2PR08MB4889:EE_|DU0PR08MB9273:EE_|MI3PEPF0000848C:EE_|GV2PR08MB11313:EE_
-X-MS-Office365-Filtering-Correlation-Id: db458779-d62e-48d1-3961-08df0a4ef354
-x-checkrecipientrouted: true
-nodisclaimer: true
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam-Untrusted:
- BCL:0;ARA:13230040|23010399003|376014|366016|1800799024|38070700021|4143699003|11063799006|10067099003|6133799003|18002099003|22082099003|56012099006;
-X-Microsoft-Antispam-Message-Info-Original:
- 0ZEzMY3IpeETEQBTLg5E/sxXRGktzz9Jc04gsWltw/r3q+l4tWMazG+Itnmm58L0C9KmGO3A1axJd1DbJaGo/tT+n5DJF7p1yjA++MzLy9MAEIM8cO4BuI0/s8EchPpiGd11UNre/fHwQFNwqNk7E/+ZovBJV+ulA21WqYfXq9dav2pTT/T2Xi4W4LMDeDZZSLbluNgCBDbu/JvphjoxgjlZJMNZToXzu/3vDfIW2lJNbCnJ3DZTDHx4ZT2H2JZEMJD92ut+bTBy43wQnkcc3TrdpZj48LxmYFTw8cQEW9LUnDFZdU1wlqPtIzbuDsJZO0BqdBD0xI3u5ShIkaF5V6V9lpTIHmbPN6gZr+CiRNhNmPvkGFd8iLnlX1y4Kn1I+cHdyhMjdRwvdkzJCXGulsWylxwmxZ85j41VNE7lUW5uE0Mxt2V1YNY2iNhawBDk2ULHkIIgAlKHrkZL2kWTLiBUy6RrtgJKXPjG/mSZ1Xu2BEfG8Un28mlUkgxSx65sasfH+Jta3bXE/Yi+2Xod+gZU7GCoHjCNLpe+o5gy9ipnv/r2d/Ess+cWQ8gh23+rh2kkg0bQOxnpZYCQtJqLIT/lW/1FqIkgbEZrCFyZodM8qflaLKWoCQhpdzwS6X4/VzHyAE8XccUn5MMF+XY+lWSiHmuRYNkpPMIla5kKqTsSBzNxdN50iBdSVVJqQlcZCMVRh3PW/8rAxdXGYTMrtwrxfoG2fVXoedXz47Gy7aE=
-X-Forefront-Antispam-Report-Untrusted:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PR2PR08MB4889.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(376014)(366016)(1800799024)(38070700021)(4143699003)(11063799006)(10067099003)(6133799003)(18002099003)(22082099003)(56012099006);DIR:OUT;SFP:1101;
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <3D0EFE3F355C744E8ACDA4C501328C33@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Vx+A0nWH"
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1788505286; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=GtHiZDCuXeYFDJzlyfIddR3dnZAvYDkV/Xg1utvI214=;
+	b=Vx+A0nWHMMECTYcOaoWEV9tmdTTKnp3QQQh5rrz7lnkEaHnfOAL6ZwFMVyXO7UPphaOIg3qTtW3epofW35MdJIq+FKIbnBV1LgQNp60DKXI0XI3sg5HkyBxtIz5Hfw1EtWIUc83i5s43ADUL8MxjpnKcwyO2MMx/dP6C+ZsSqxs=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045098064;MF=xueshuai@linux.alibaba.com;NM=1;PH=DS;RN=15;SR=0;TI=SMTPD_---0XAHyf4B_1788505284;
+Received: from 30.246.160.252(mailfrom:xueshuai@linux.alibaba.com fp:SMTPD_---0XAHyf4B_1788505284 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Fri, 04 Sep 2026 15:01:25 +0800
+Message-ID: <46342b48-550e-42c1-9d9f-e800c72269c2@linux.alibaba.com>
+Date: Fri, 4 Sep 2026 15:01:24 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked:
- JE24Dg0qQDIEu+3WXPdXFv3d2M0pyEAlUf9+f8mmssL9IzPSNpe/m22TUQ0TW6tgxeYH/DAH8Am+hTM8sexLWcW7unn4WyjROl7131INQnV9Yq5fFWCPnymW1enJKGSZBVrxrJ/BbmOyPNI33AuBAmLZZBTRBznrdcJq4EMOfWAkZxdpMqEMbRYrNDimMx0OSNwcafp2ZP/aWPlWzKUguB6B3ew3fLVKl1v36ssf6Gm42iwfPLJHBOMUifpbw4eoXkMSEfUlCAz+nm4k6fcYt5SH11Gmm8yJunFT6i4Nb1JWiGPs3nRI2LMWNgVm8F9actrpC03F5XLpwX6yQMZamw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU0PR08MB9273
-X-EOPAttributedMessage: 0
-X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- MI3PEPF0000848C.eurprd02.prod.outlook.com
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	5fcd995f-9173-4241-fa41-08df0a4edd05
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|35042699022|23010399003|14060799003|36860700016|82310400026|1800799024|10067099003|6133799003|4143699003|11063799006|18002099003|22082099003|56012099006;
-X-Microsoft-Antispam-Message-Info:
-	1qv6YXcnsyh+FZWgmy8+XBnf7XaPE3aVjw+WhoWTL3UrpYw3HPHAll5drR+NbEUm20ZoBj+wuDar1ZAomKh4rYtFaNdsNFaPvUHXACzwliV/prjvF15+PaCXhQdmiahBrtUcjGTpwNLLt9mjJM1KgASqGlOn2nSCTEH2jzrH1oztOfLgLyb3COQyURAlQ+Jy4J5EusD2EcM1xM/7DrmgYse/GiDpMJ9FbK1wOUOC/SJBIq0o9AWQ//8WDRLwJ+87rpNIRrYuNcjf7dnxQ5tWHaPo5SJa8RWKYLC2Icavm4v8Im3Rc3G/CrGihiFIgVezrcXH72yqInL3c9hpgBfHfA+aocy6SIFFQxldEAvMRwYNBg9T6WFsuodXtdFYXYey48YptyVJubzFrVbQPChPPKbHE0OH3m19XL1WsYBZhreeYXBE0VM7SN0POrgo6YX2JtjjRC0dNkcTnoQ6Cr4jI13Hb1fcklETPfP8/64MTp4N8IbLZ4EU1RWLwrSHf9iEvaxQaYq5FE5k2adwIs4A6WzZx+Y5TCV5uYWcdboIX8EPK2UoP9Ny+vhDNPX+C0hKFT55R16dNbyP8OLHxb70FRMEpu8x71LV/ncXm/2SL2PQdF9jpoMg5iMhhlRcGbjEkbSH6rCphw9qHSgmBvDALgcsiz4aiT05f4ag7Iif8Ko=
-X-Forefront-Antispam-Report:
-	CIP:4.158.2.129;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(35042699022)(23010399003)(14060799003)(36860700016)(82310400026)(1800799024)(10067099003)(6133799003)(4143699003)(11063799006)(18002099003)(22082099003)(56012099006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	IfSylaMfvBXH7LIAoopFZX2RYqpsji8yhhzetBhhkYJtd/Y/08JaHS97/5iEMK+QR+VlDF/dQT5xy5V5m95ZhZ/iWXpfMOG6FxPFcMSYfgsZoaVfswepdhrmqkoNdBz/8wspXW7VgpZVg8OjH00Moa7bmJ249QT5N94e7sPTnI6QnKAwkecvdCFhWcbITdqZYDvKlMyHzeFzWYpoEVe3JnLA0n/bAvkcoFSsnoVzO4jvFUcpuuu72cza5pY6B+yF3+Ko3sYPAWySO64XEPFqDbkolu3MpljgB/5UirTC7joATDiX7jX1Bx9+h6tgQsOxunmGmJwnObfIZb2X0KAz5CsNSnV3nUUvNH8oR/7LgOBBvXgXLPU0/M1mW6vqt8u9tk3puWYA+EPY+YnNsdSUFcRT/qeMm9sdSrMxS+TzoGy/WxOETZOsX5ljJt7yU6MZ
-X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Sep 2026 06:37:11.4044
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: db458779-d62e-48d1-3961-08df0a4ef354
-X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	MI3PEPF0000848C.eurprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV2PR08MB11313
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 0/6] KVM: arm64: nv: Implement nested stage-2 reverse
+ map (new data structure)
+To: Wei-Lin Chang <weilin.chang@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Wang Han <wanghan@linux.alibaba.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ linux-kernel@vger.kernel.org, oupton@kernel.org, tabba@google.com,
+ joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com,
+ catalin.marinas@arm.com, will@kernel.org, ljs@kernel.org,
+ itaru.kitayama@fujitsu.com
+References: <20260810205038.118843-1-weilin.chang@arm.com>
+ <20260902163500.1841671-1-wanghan@linux.alibaba.com>
+ <877bl26aqg.wl-maz@kernel.org>
+ <wsnf276xrun3g4hjr3t6alprapctg5z4kpj422v3hujqdjnrsa@swq4blkqvvj5>
+From: Shuai Xue <xueshuai@linux.alibaba.com>
+In-Reply-To: <wsnf276xrun3g4hjr3t6alprapctg5z4kpj422v3hujqdjnrsa@swq4blkqvvj5>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-T24gRnJpLCAyMDI2LTA4LTA3IGF0IDEyOjI3ICswMDAwLCBzYXNoaWtvLWJvdEBrZXJuZWwub3Jn
-IHdyb3RlOg0KPiBUaGFuayB5b3UgZm9yIHlvdXIgY29udHJpYnV0aW9uISBTYXNoaWtvIEFJIHJl
-dmlldyBmb3VuZCAyIHBvdGVudGlhbA0KPiBpc3N1ZShzKSB0byBjb25zaWRlcjoNCj4gLSBbSGln
-aF0gVGhlIGhhcmR3YXJlLWJhc2VkIGxpbWl0IGZvciBtYXhpbXVtIHZDUFVzIGlzIHNpbGVudGx5
-DQo+IGNsb2JiZXJlZCBieSBhIGhhcmRjb2RlZCBtYXhpbXVtIGluIHRoZSBHSUN2MyBsZWdhY3kg
-ZmFsbGJhY2sgcGF0aC4NCj4gLSBbTWVkaXVtXSBUaGUgcmV0dXJuIHR5cGUgb2YgYHZnaWNfdjVf
-aXJzX3ZwZWRfc2l6ZSgpYCBpcyBgdTE2YCwNCj4gd2hpY2ggd2lsbCBzaWxlbnRseSB0cnVuY2F0
-ZSBkZXNjcmlwdG9yIHNpemVzIG9mIDY0S0Igb3IgbGFyZ2VyIHRvIDAuDQo+IC0tDQo+IA0KPiAt
-LS0gUGF0Y2ggWzddOiBbUEFUQ0ggdjUgMDcvNDldIEtWTTogYXJtNjQ6IGdpYy12NTogQ2FjaGUg
-aG9zdCBJUlMgSUQNCj4gcmVnaXN0ZXJzIC0tLQ0KPiBjb21taXQgZDgxODAyZGQ1OWZhZjk2YzU3
-MGJiNTA5ZTAwYWMzMzVkYWRhNzkwNA0KPiBBdXRob3I6IFNhc2NoYSBCaXNjaG9mZiA8U2FzY2hh
-LkJpc2Nob2ZmQGFybS5jb20+DQo+IA0KPiBLVk06IGFybTY0OiBnaWMtdjU6IENhY2hlIGhvc3Qg
-SVJTIElEIHJlZ2lzdGVycw0KPiDCoMKgwqAgDQo+IFRoaXMgY29tbWl0IGNhY2hlcyB0aGUgR0lD
-djUgSVJTIElEIHJlZ2lzdGVycyB0byBjb25maWd1cmUgdmlydHVhbC0NCj4gbWFjaGluZQ0KPiBy
-ZXNvdXJjZXMgYmFzZWQgb24gaGFyZHdhcmUgY2FwYWJpbGl0aWVzIHJhdGhlciB0aGFuIGV4dHJh
-Y3RpbmcNCj4gaW5kaXZpZHVhbA0KPiBmaWVsZHMuIEl0IGxpbWl0cyB0aGUgbWF4aW11bSBudW1i
-ZXIgb2YgdkNQVXMgdXNpbmcgdGhlIFZQRSBjYXBhY2l0eQ0KPiBmcm9tDQo+IHRoZSBjYWNoZWQg
-SVJTX0lEUjQgcmVnaXN0ZXIgd2hpbGUgcmV0YWluaW5nIEtWTSdzIHVwcGVyIGJvdW5kLg0KPiAN
-Cj4gPiBkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9rdm0vdmdpYy92Z2ljLXY1LmMNCj4gPiBiL2Fy
-Y2gvYXJtNjQva3ZtL3ZnaWMvdmdpYy12NS5jDQo+ID4gaW5kZXggZDQ3ODlmZjNlNzQwMi4uNDFj
-YTIwOThlY2I3MyAxMDA2NDQNCj4gPiAtLS0gYS9hcmNoL2FybTY0L2t2bS92Z2ljL3ZnaWMtdjUu
-Yw0KPiA+ICsrKyBiL2FyY2gvYXJtNjQva3ZtL3ZnaWMvdmdpYy12NS5jDQo+IA0KPiBbIC4uLiBd
-DQo+IA0KPiA+IEBAIC02MSwxMCArNzcsMTIgQEAgaW50IHZnaWNfdjVfcHJvYmUoY29uc3Qgc3Ry
-dWN0IGdpY19rdm1faW5mbw0KPiA+ICppbmZvKQ0KPiA+IMKgCQlnb3RvIHNraXBfdjU7DQo+ID4g
-wqAJfQ0KPiA+IMKgDQo+ID4gLQlrdm1fdmdpY19nbG9iYWxfc3RhdGUubWF4X2dpY192Y3B1cyA9
-IFZHSUNfVjVfTUFYX0NQVVM7DQo+ID4gLQ0KPiA+ICsJdmdpY192NV9pcnNfY2FjaGVfaWRfcmVn
-cyhpbmZvKTsNCj4gPiDCoAl2Z2ljX3Y1X2dldF9pbXBsZW1lbnRlZF9wcGlzKCk7DQo+ID4gwqAN
-Cj4gPiArCWt2bV92Z2ljX2dsb2JhbF9zdGF0ZS5tYXhfZ2ljX3ZjcHVzID0NCj4gPiBtaW4odmdp
-Y192NV9pcnNfbWF4X3ZwZXMoJmlyc19jYXBzKSwNCj4gPiArCQkJCQkJwqANCj4gPiBWR0lDX1Y1
-X01BWF9DUFVTKTsNCj4gPiArDQo+IA0KPiBbU2V2ZXJpdHk6IEhpZ2hdDQo+IERvZXMgdGhlIEdJ
-Q3YzIGxlZ2FjeSBmYWxsYmFjayBwYXRoIHVuZGVyIHRoZSBza2lwX3Y1IGxhYmVsIGluDQo+IHZn
-aWNfdjVfcHJvYmUoKQ0KPiBvdmVyd3JpdGUgdGhpcyBkeW5hbWljYWxseSBjb21wdXRlZCBoYXJk
-d2FyZSBsaW1pdD8NCg0KRmlyc3Qgb2YgYWxsLCB0aGlzIGlzbid0IGEgZmFsbGJhY2sgcGF0aC4g
-U2Vjb25kbHksIHdlIHRyZWF0IHRoZSBsaW1pdHMNCmZvciBHSUN2MyBhbmQgR0lDdjUgZGlmZmVy
-ZW50bHkuIFRoZSBHSUN2NSBsaW1pdCBjb21lcyBmcm9tIGEgcGh5c2ljYWwNCmxpbWl0IGluIHRo
-ZSBoYXJkd2FyZSwgYnV0IHRoZSBHSUN2MyBsaW1pdCBkb2VzIG5vdC4NCg0KIktWTTogYXJtNjQ6
-IGdpYy12NTogS2VlcCBHSUN2NSB2Q1BVIGxpbWl0IG1vZGVsLXNwZWNpZmljIiBleHBsaWNpdGx5
-DQptYWtlcyBzdXJlIHRoYXQgdGhlIHR3byBsaW1pdHMgYXJlIHRyZWF0ZWQgZGlmZmVyZW50bHkg
-Zm9yIHRoZQ0KZGlmZmVyZW50IEdJQyBtb2RlbHMuDQoNCj4gDQo+IElmIHRoZSBtYXhfZ2ljX3Zj
-cHVzIGxpbWl0IGlzIGxhdGVyIGV4cGFuZGVkIGJ5IGEgc3RhdGljIHZhbHVlIChsaWtlDQo+IFZH
-SUNfVjNfTUFYX0NQVVMgdmlhIGEgbWF4KCkgYXNzaWdubWVudCksIGNvdWxkIGl0IHBlcm1pdCB1
-c2Vyc3BhY2UNCj4gdG8gY3JlYXRlDQo+IG1vcmUgdkNQVXMgZm9yIGEgR0lDdjUgVk0gdGhhbiB0
-aGUgaGFyZHdhcmUgSVJTIGFjdHVhbGx5IHN1cHBvcnRzDQo+IChmb3IgZXhhbXBsZSwNCj4gYWxs
-b3dpbmcgNTEyIHZDUFVzIGV2ZW4gaWYgdGhlIGhhcmR3YXJlIHJlc3RyaWN0cyBpdCB0byAxNiBW
-UEVzKT8NCj4gDQo+ID4gwqAJcmV0ID0ga3ZtX3JlZ2lzdGVyX3ZnaWNfZGV2aWNlKEtWTV9ERVZf
-VFlQRV9BUk1fVkdJQ19WNSk7DQo+ID4gwqAJaWYgKHJldCkgew0KPiA+IMKgCQlrdm1fZXJyKCJD
-YW5ub3QgcmVnaXN0ZXIgR0lDdjUgS1ZNIGRldmljZS5cbiIpOw0KPiANCj4gPiBkaWZmIC0tZ2l0
-IGEvaW5jbHVkZS9rdm0vYXJtX3ZnaWMuaCBiL2luY2x1ZGUva3ZtL2FybV92Z2ljLmgNCj4gPiBp
-bmRleCBmZTQ5ZmI1NmRjM2M5Li5jNmYwYWI2OWY3YTJlIDEwMDY0NA0KPiA+IC0tLSBhL2luY2x1
-ZGUva3ZtL2FybV92Z2ljLmgNCj4gPiArKysgYi9pbmNsdWRlL2t2bS9hcm1fdmdpYy5oDQo+IA0K
-PiBbIC4uLiBdDQo+IA0KPiA+IEBAIC02MzAsNiArNjQ2LDY1IEBAIGludCB2Z2ljX3Y0X2xvYWQo
-c3RydWN0IGt2bV92Y3B1ICp2Y3B1KTsNCj4gPiDCoHZvaWQgdmdpY192NF9jb21taXQoc3RydWN0
-IGt2bV92Y3B1ICp2Y3B1KTsNCj4gPiDCoGludCB2Z2ljX3Y0X3B1dChzdHJ1Y3Qga3ZtX3ZjcHUg
-KnZjcHUpOw0KPiA+IMKgDQo+IA0KPiBbIC4uLiBdDQo+IA0KPiA+ICtzdGF0aWMgaW5saW5lIHUx
-NiB2Z2ljX3Y1X2lyc192cGVkX3NpemUoY29uc3Qgc3RydWN0DQo+ID4gdmdpY192NV9pcnNfY2Fw
-cyAqY2FwcykNCj4gPiArew0KPiA+ICsJcmV0dXJuIEJJVChGSUVMRF9HRVQoR0lDVjVfSVJTX0lE
-UjRfVlBFRF9TWiwgY2Fwcy0+aWRyNCkpOw0KPiA+ICt9DQo+ID4gKw0KPiANCj4gW1NldmVyaXR5
-OiBNZWRpdW1dDQo+IElmIGEgaGFyZHdhcmUgaW1wbGVtZW50YXRpb24gcmVwb3J0cyBhIHNpemUg
-cGFyYW1ldGVyIG9mIDE2IG9yDQo+IGdyZWF0ZXINCj4gKGluZGljYXRpbmcgNjRLQiBvciBtb3Jl
-KSwgd2lsbCB0aGUgQklUKCkgb3BlcmF0aW9uIGluDQo+IHZnaWNfdjVfaXJzX3ZwZWRfc2l6ZSgp
-DQo+IHJlc3VsdCBpbiA2NTUzNiBhbmQgc2lsZW50bHkgdHJ1bmNhdGUgdG8gMCB3aGVuIGNhc3Qg
-dG8gdGhlIHUxNg0KPiByZXR1cm4gdHlwZT8NCg0KVGhlIG1pbmltdW0gdmFsaWQgdmFsdWUgZm9y
-IHRoaXMgZmllbGQgaXMgMyBhbmQgdGhlIG1heGltdW0gdmFsaWQgdmFsdWUNCmlzIDEyLiBUaGlz
-IGlzIG5vdCBhbiBpc3N1ZS4NCg0KPiANCj4gQ291bGQgdGhpcyB6ZXJvLWJ5dGUgc2l6ZSBjYWxj
-dWxhdGlvbiBsZWFkIHRvIDAtYnl0ZSBhbGxvY2F0aW9ucyBvcg0KPiBpbmZpbml0ZQ0KPiBsb29w
-cyBpbiBkZXBlbmRlbnQgcmVzb3VyY2Ugc2l6aW5nPw0KPiANCk5vLg0KDQpUaGFua3MsDQpTYXNj
-aGENCg==
+
+
+On 9/3/26 9:28 PM, Wei-Lin Chang wrote:
+> On Thu, Sep 03, 2026 at 08:43:35AM +0100, Marc Zyngier wrote:
+>> On Wed, 02 Sep 2026 17:35:00 +0100,
+>> Wang Han <wanghan@linux.alibaba.com> wrote:
+>>>
+>>> Hi Wei-Lin,
+>>>
+>>> I tested this series on a Yitian 710 system with an ARM Neoverse-N2 CPU
+>>> (128 CPUs, 2 NUMA nodes).
+>>>
+>>> Test environment
+>>> ----------------
+>>>
+>>>    L0 kernel: Linux v7.2-rc6
+>>>    L1 guest: Ubuntu 26.04 LTS, kernel 7.0.0-27-generic (aarch64)
+>>>    QEMU: 10.2.3
+>>>
+>>> L0 NUMA balancing was enabled (`/proc/sys/kernel/numa_balancing=1`).
+>>> The host was booted with `kvm_arm.mode=nested`.
+>>>
+>>> This series fixes a functional hang that is exposed when NUMA balancing is
+>>> enabled.  The previous nested stage-2 unmap path is too slow for this
+>>> workload, making the performance problem user-visible: NUMA balancing can
+>>> leave the L1 guest unable to make progress and eventually hang during boot.
+>>>
+>>> The L1 was started with 8 vCPUs and 32 GiB of RAM using:
+>>>
+>>>    qemu-system-aarch64 -smp 8 -m 32G \
+>>>      -machine virt,accel=kvm,gic-version=3,virtualization=on \
+>>>      -cpu host -nographic -enable-kvm \
+>>>      -drive if=pflash,format=raw,readonly=on,file=pflash0_bak.img \
+>>>      -drive if=pflash,format=raw,file=pflash1_bak.img \
+>>>      -drive file=./ubuntu-vm.qcow2,format=qcow2,if=virtio,cache=none,aio=native \
+>>>      -nic user,model=virtio-net-pci,hostfwd=tcp::11234-:22 \
+>>>      -serial mon:stdio
+>>>
+>>
+>> Puzzling. If you are only running an L1 in VHE mode, there is no
+>> shadow S2, and therefore nothing to unmap. For shadow S2s to be built
+>> and affect the MMU notifiers, you need to run an L2.
+> 
+> I was thinking the same at first, but realized even with L1 in VHE mode
+> there is a small period of time where L1 runs in its EL1 during boot, so
+> one nested MMU will become valid for each vCPU. That causes
+> kvm_nested_s2_unmap() to iterate through the entire IPA space 8 times
+> (-smp 8).
+> 
+> What I am curious about is whether one single notifier unmap is enough
+> to hang L1, or were there multiple notifier unmaps.
+> 
+> QEMU with -machine virt uses 40 IPA bits only, unmapping that takes:
+> 1024  (4KB pages,  unmapping 1GB per iteration)
+> 32768 (16KB pages, unmapping 32MB per iteration)
+> 2048  (64KB pages, unmapping 512MB per iteration)
+> iterations for each page size. There aren't many mappings in each
+> iteration too. Does this really take that long on real hardware (even if
+> this must be done 8 times)?
+> 
+> Thanks,
+> Wei-Lin Chang
+> 
+>>
+>> So what are your actual test conditions?
+>>
+>> 	M.
+>>
+
+Hi, Wei-Lin and Marc,
+
+I was able to reproduce this issue and capture ftrace evidence that confirms
+the root cause. Below is the analysis, trace log, and timing data.
+
+## Problem
+
+Environment:
+- Host (L0): ARM64, KVM with virtualization=on (nested virtualization)
+- Guest (L1): Ubuntu 26.04, 8 vCPUs / 32 GB
+- Host NUMA balancing enabled, numad active
+
+When booting the L1 QEMU guest, the L1 kernel hits a soft lockup during
+early boot (~45 s):
+
+  [   45.646468] watchdog: BUG: soft lockup - CPU#0 stuck for 32s!
+  [kworker/0:2:330]
+  [   45.646882] watchdog: BUG: soft lockup - CPU#2 stuck for 29s!
+  [snap:1146]
+  [   45.647093] watchdog: BUG: soft lockup - CPU#3 stuck for 29s!
+  [snap:1141]
+  [   45.647242] watchdog: BUG: soft lockup - CPU#7 stuck for 29s!
+  [snap:1144]
+
+At the same time, L0 dmesg reports the QEMU main thread blocked in D-state
+for more than 120 s:
+
+  [11239.341817] INFO: task qemu-system-aar:170799 blocked in I/O wait for
+  more than 120 seconds.
+  ...
+    softleaf_entry_wait_on_locked+0x280/0x2d0
+    migration_entry_wait+0xdc/0x140
+    do_swap_page+0x834/0xd80
+    handle_pte_fault+0x208/0x2b8
+    __handle_mm_fault+0x228/0x528
+    handle_mm_fault+0xdc/0x2d8
+    do_page_fault+0x244/0x790
+    do_translation_fault+0x4c/0x88
+    do_mem_abort+0x4c/0xa0
+    el1_abort+0x50/0x80
+    el1h_64_sync_handler+0x50/0x108
+    el1h_64_sync+0x80/0x88
+    do_sys_poll+0x224/0x290
+    __arm64_sys_ppoll+0xa4/0x130
+
+Note: This is not a 100% reproducible failure. In my automated loop the hang
+reproduced on the 2nd boot attempt, but other attempts ran for 6–9 minutes
+without hitting it. The bug is clearly timing-dependent on NUMA migration
+activity during the L1 boot window.
+
+## Root cause
+
+The issue is in arch/arm64/kvm/nested.c:
+  void kvm_nested_s2_unmap(struct kvm *kvm, bool may_block)
+  {
+      int i;
+
+      lockdep_assert_held_write(&kvm->mmu_lock);
+
+      if (!kvm->arch.nested_mmus_size)
+          return;
+
+      for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
+          struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+
+          if (kvm_s2_mmu_valid(mmu))
+              kvm_stage2_unmap_range(mmu, 0, kvm_phys_size(mmu), may_block);
+      }
+
+      kvm_invalidate_vncr_ipa(kvm, 0, BIT(kvm->arch.mmu.pgt->ia_bits));
+  }
+
+When L0 NUMA balancing migrates a page belonging to the QEMU process, the
+MMU notifier path calls kvm_unmap_gfn_range():
+
+  bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+  {
+      ...
+      __unmap_stage2_range(&kvm->arch.mmu, range->start << PAGE_SHIFT,
+                           (range->end - range->start) << PAGE_SHIFT,
+                           range->may_block);
+
+      kvm_nested_s2_unmap(kvm, range->may_block);   /* full unmap */
+      return false;
+  }
+
+kvm_handle_hva_range() takes kvm->mmu_lock for writing before invoking the
+handler and releases it only after the handler returns
+(virt/kvm/kvm_main.c:622-642). Therefore, the entire kvm_nested_s2_unmap()
+runs under kvm->mmu_lock.
+
+The problem is that kvm_nested_s2_unmap() does not unmap only the affected
+GPA range. Instead, it unmaps the entire IPA space (0 to kvm_phys_size(mmu))
+for every nested S2 MMU. With nested virtualization enabled, this is very
+expensive.
+
+## Trace evidence
+
+I captured function_graph traces for kvm_unmap_gfn_range,
+kvm_nested_s2_unmap, and kvm_stage2_unmap_range, plus mm_migrate_pages
+tracepoints.
+
+1. numad-triggered full unmap
+    64)   numad-1888   |               |  /* set_migration_pte:
+  addr=fff790579000, pte=3040c319d9680 order=0 */
+    64)   numad-1888   |               |  kvm_unmap_gfn_range() {
+    64)   numad-1888   |               |    kvm_nested_s2_unmap() {
+    64)   numad-1888   | @ 877415.7 us |      kvm_stage2_unmap_range();
+    64)   numad-1888   | @ 877418.2 us |    }
+    64)   numad-1888   | @ 877422.0 us |  }
+
+Each set_migration_pte line is a single-page NUMA migration. Yet each
+migration triggers one full kvm_nested_s2_unmap() that takes 877 ms.
+
+Subsequent calls show per-page unmap durations between 841 ms and 1.16 s.
+
+2. QEMU threads blocked as well
+    23) qemu-sy-227844 |               |  kvm_unmap_gfn_range() {
+    23) qemu-sy-227844 |               |    kvm_nested_s2_unmap() {
+    23) qemu-sy-227844 | $ 1170521 us  |      kvm_stage2_unmap_range();
+    23) qemu-sy-227844 | $ 1170529 us |    }
+    23) qemu-sy-227844 | $ 1170542 us |  }
+
+QEMU's own threads also get stuck in the same full unmap, with one call
+reaching 6.67 s.
+
+3. Statistics
+┌──────────────┬───────┬──────────────────────────────────────┐
+│ Thread       │ Calls │ kvm_nested_s2_unmap duration         │
+├──────────────┼───────┼──────────────────────────────────────┤
+│ numad-1888   │ 59    │ min 0.84 s / avg 1.02 s / max 1.16 s │
+├──────────────┼───────┼──────────────────────────────────────┤
+│ QEMU threads │ 34    │ min 1.14 s / avg 5.14 s / max 6.67 s │
+└──────────────┴───────┴──────────────────────────────────────┘
+
+numad migrates pages one after another; each page holds kvm->mmu_lock for
+about one second. QEMU vCPU threads cannot acquire mmu_lock and also block
+on migration_entry_wait. The L1 guest vCPUs make no forward progress, and
+the watchdog fires.
+
+Soft lockup threshold check
+
+Read directly inside the L1 guest:
+
+  root@ubuntu-vm:~# cat /proc/sys/kernel/watchdog_thresh
+  10
+
+So the soft lockup threshold is 2 * watchdog_thresh = 20 s.
+
+The L1 guest reported stuck times of 29~32 s, which exceeds the 20 s
+threshold.
+
+## Conclusion
+
+The root cause is confirmed: kvm_nested_s2_unmap() performs a full IPA space
+unmap in the MMU notifier path instead of unmapping only the affected
+GPA/CPAI range. The interval-tree-based precise range unmap approach is the
+right fix.
+
+Please consider applying the patch that replaces the full unmap with
+kvm_nested_unmap_cipa_range() to avoid scanning the entire nested stage-2
+page table on every NUMA migration.
+
+Thanks,
+Shuai
+
