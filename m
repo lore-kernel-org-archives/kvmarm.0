@@ -1,205 +1,180 @@
-Received: from GVXPR05CU001.outbound.protection.outlook.com (mail-swedencentralazon11013036.outbound.protection.outlook.com [52.101.83.36])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 514C714A4CC
-	for <kvmarm@lists.linux.dev>; Fri,  4 Sep 2026 17:50:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.83.36
-ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788544236; cv=fail; b=aXersNAn8GHEtVRHkM9TdW6WuzgQz5dHT2/1P+siVi6gcLD3YcYZkxJp5hnSBV9o4illgqTGv1YfU3VISUJC4EL6zecYjYgicMLdsig/uPEsIWtffbKVBQo0ujlostThbPsW8y4UUY0g+Pl8gVQkx/ncipc+SfZku4JEXRrpKAI=
-ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788544236; c=relaxed/simple;
-	bh=AVXrHG0zb53WL2j0FjjDigV4fInRew4wVORGSKrCkcA=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=ddSV1VmUleueilGkfSQFKoOT5d6VMaDNAa5OAVrG1NJAtTxDohapgBIzny/2oifWJtDuv8COpgFnqLRr+UUXwJfwNscgzRV1W4knpg3esqGb9+H1ltmVMRyIZMl+aNyrAc81TvIrirN7wLR+XZ9H0RQbVi0BJ19pFIXdidCpL1M=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=ipHgp5cD; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=ipHgp5cD; arc=fail smtp.client-ip=52.101.83.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8293D37F8B6;
+	Fri,  4 Sep 2026 17:56:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788544587; cv=none; b=oTdgtux+G0lnKf9RIYWzO40BEJUO7iV771/2anPb/R8OLJKQvVPLp7Ev1J28WnZgi1bRnHCil8B7qudcg/nz4MMJDoxgUX/QXpWVH9dQwv2F/Px9hxyUCHAXEIUW6c/y2c13bNU7Idt6eCPaKnLUQVxCI3o3GI/3kQC37pwEv4k=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788544587; c=relaxed/simple;
+	bh=+i+qQOmlMnhgZmCjVjcybjYcoYiwWcxPC7QuojgQK1M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fGzcMAJHAZGdy23hNDXyojG7CVC89onUaPTVqkwvXV3X25XsOefszsnvg+HZCnx7NEMoFOhkxxE4KzA1+2/MNtAJvihlOPOK+3LGsNysS0O/UYJfvZkYIlriTfjovSNUQ563Ke2IP2bfTeiCtTxD/+T3xQ4qH0Z2cXoTf9MK11I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=qUmVpX7o; arc=none smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="ipHgp5cD";
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="ipHgp5cD"
-ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
- b=if5+T+WDWTfZ2aBSsZfvdWrygKyjPcmkXB3+oZR87z8mX22pRPhsKClNPQaMGp1/MomdimeRI839I2Ffh6tPZ6iwbmwMpYskYt9qy/bhU2HZm2hH5U5mp9+nzTenidRKfWLu5+wbElcKsJO8qGyab+R0IGCY00kR075H02I+pKwSAOuN8mNzHgtx3oc2qIruRXXOQI+MxyJWCkCidM/XtPA4xi8+5R2OoXZs1YlI6QjlqWPrETtAX3o7cOZRemGFEJLEJ0A7Gcm7KOODrJkjl8JWAHFGt/xZeI97XzhxEwh6VMZFHtY0CmiM7pZmPR36ch6dT1ucpBWPMwpTIb/ixw==
-ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Au9qBZSrPRP2TCzcQEmbtWXMpirGXIvPss+5U++NW5s=;
- b=wXkV+gZWkIm7JWTKJhVj94By2FKSsWlcZBWAByAweJBZ+dqgVAk/Q3lANDvO8bgPg1CyxkhxLBLtugGGVPA9x9ua9smWUgHG/as3X62NSGMhuy7IeYHe1K5n1Ko8b3ttDYJdk30SMihVaeVkCsKutw3ozineVcBUtncpVgriFGm/Ek4OK/u3+E05k4zip3YvAV8y8ECkM1KTa6tESd44I43oNbHcoEIbyOJz2w/2uPcGQVvkfoVtNYAcq5JiHWB3QPvdmH65NmmhOt3SQKWylmz5kaBo3uq5Go/aovW7bqp4X8s98AyUQy5vq8m+aINTdBp8YQw0AXVXkg7Lu7CEwQ==
-ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
- 4.158.2.129) smtp.rcpttodomain=lists.infradead.org smtp.mailfrom=arm.com;
- dmarc=pass (p=none sp=none pct=100) action=none header.from=arm.com;
- dkim=pass (signature was verified) header.d=arm.com; arc=pass (0 oda=1 ltdi=1
- spf=[1,1,smtp.mailfrom=arm.com] dkim=[1,1,header.d=arm.com]
- dmarc=[1,1,header.from=arm.com])
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Au9qBZSrPRP2TCzcQEmbtWXMpirGXIvPss+5U++NW5s=;
- b=ipHgp5cD5YN5ygyDxzUiMT9vFA2KOZwDTpWHA3MJL1W8QBfl0rSAEw7YaHjZXd9oWO+sMW2GHY324pSnakm3xpaVplzzkbSC+FUSWzepHgcP1ZGzy3xx0F0AockqYQQjgJxHRsyxeESdIpIBykwnO2SQyqFR+u0XbW6z+4f10j0=
-Received: from DU6P191CA0004.EURP191.PROD.OUTLOOK.COM (2603:10a6:10:540::21)
- by AM7PR08MB5381.eurprd08.prod.outlook.com (2603:10a6:20b:105::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.382.10; Fri, 4 Sep
- 2026 17:50:29 +0000
-Received: from DB1PEPF00050A00.eurprd03.prod.outlook.com
- (2603:10a6:10:540:cafe::3d) by DU6P191CA0004.outlook.office365.com
- (2603:10a6:10:540::21) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.382.12 via Frontend Transport; Fri, 4
- Sep 2026 17:50:29 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
- smtp.mailfrom=arm.com; dkim=pass (signature was verified)
- header.d=arm.com;dmarc=pass action=none header.from=arm.com;
-Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
- 4.158.2.129 as permitted sender) receiver=protection.outlook.com;
- client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
-Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
- DB1PEPF00050A00.mail.protection.outlook.com (10.167.242.42) with Microsoft
- SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.21.382.8
- via Frontend Transport; Fri, 4 Sep 2026 17:50:28 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=EvqqPED8N4VIpiJJLhyC6hibQxMf1Xa5RP5smx6yzokXEQCFRrdnHfkSAYvVCPJUK6R6nPr0Gatbhw+1f5dipuQ6tiintXE1a2WELdG/ne35GTN5KkwnAUbIgWO05mrl/IJ4W+PkmFpPuO6WRZ3OJTIhvtQVutrHj0aEILhrhoU4gjGtR/O3be6/zshd7t1/dikGYxz69y1RfaLS58g5JZgwMFWJfJURIqXpk3TzAHg95aYCBc3HnI3AixQAoSQg463I/5WuQ8VUmQc8TTnyUvnHkzDqn58P/KgXTNAbuMl0Dgy7CQgD/PoOemodQbZkhmw+lRfd5nsF6HO/aIn+Cg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Au9qBZSrPRP2TCzcQEmbtWXMpirGXIvPss+5U++NW5s=;
- b=oZmJp+Zn8VcPPeQivWOg6oZYuDBm5CESOfHkgwu9lSbXXMbI5NrwcO012boo0w59ARBysVTwZ/RI0vECseZ8titjHc4p4sFlG96B3tO6KAZiGHWnt2CF7XaMdozW8tMmCvjyJ/HL2ew2wDaYsj00REkuuhu3okgtxXQ/dZnrtqm15MSjOv1xS6lL0c3AZN4IS7Elxfl/6VsEnUmHZYnAyygbwhqb5Aa2+oDi8gNDsQu2wGWg1I0ABbYfLTEANvR4zq/XzXXgzfBlt9bHAdnzpYUiO9nlMF03ZTq74l8BW4Bh5MttwfKxZ8srym48qFIfjRUWc+aLq1h/WjhPZwORLw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
- header.d=arm.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Au9qBZSrPRP2TCzcQEmbtWXMpirGXIvPss+5U++NW5s=;
- b=ipHgp5cD5YN5ygyDxzUiMT9vFA2KOZwDTpWHA3MJL1W8QBfl0rSAEw7YaHjZXd9oWO+sMW2GHY324pSnakm3xpaVplzzkbSC+FUSWzepHgcP1ZGzy3xx0F0AockqYQQjgJxHRsyxeESdIpIBykwnO2SQyqFR+u0XbW6z+4f10j0=
-Received: from PR2PR08MB4889.eurprd08.prod.outlook.com (2603:10a6:101:1d::23)
- by AS1PR08MB7633.eurprd08.prod.outlook.com (2603:10a6:20b:475::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.382.10; Fri, 4 Sep
- 2026 17:49:56 +0000
-Received: from PR2PR08MB4889.eurprd08.prod.outlook.com
- ([fe80::8bda:5986:a1f1:cb7e]) by PR2PR08MB4889.eurprd08.prod.outlook.com
- ([fe80::8bda:5986:a1f1:cb7e%4]) with mapi id 15.21.0382.007; Fri, 4 Sep 2026
- 17:49:56 +0000
-From: Sascha Bischoff <Sascha.Bischoff@arm.com>
-To: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-CC: nd <nd@arm.com>, Catalin Marinas <Catalin.Marinas@arm.com>,
-	"will@kernel.org" <will@kernel.org>, Mark Rutland <Mark.Rutland@arm.com>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, "maz@kernel.org"
-	<maz@kernel.org>, "oupton@kernel.org" <oupton@kernel.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, Sashiko <sashiko-bot@kernel.org>
-Subject: [PATCH 2/2] arm64: tools: Fix GIC CDEOI instruction encoding
-Thread-Topic: [PATCH 2/2] arm64: tools: Fix GIC CDEOI instruction encoding
-Thread-Index: AQHdPJXMBL9BacxRjUytKyltfwcvSg==
-Date: Fri, 4 Sep 2026 17:49:56 +0000
-Message-ID: <20260904174855.76185-3-sascha.bischoff@arm.com>
-References: <20260904174855.76185-1-sascha.bischoff@arm.com>
-In-Reply-To: <20260904174855.76185-1-sascha.bischoff@arm.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-mailer: git-send-email 2.34.1
-Authentication-Results-Original: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arm.com;
-x-ms-traffictypediagnostic:
-	PR2PR08MB4889:EE_|AS1PR08MB7633:EE_|DB1PEPF00050A00:EE_|AM7PR08MB5381:EE_
-X-MS-Office365-Filtering-Correlation-Id: a0490b39-06b4-479a-ab2e-08df0aad0205
-x-checkrecipientrouted: true
-nodisclaimer: true
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam-Untrusted:
- BCL:0;ARA:13230040|366016|23010399003|1800799024|376014|38070700021|10067099003|22082099003|56012099006|11063799006|6133799003|18002099003;
-X-Microsoft-Antispam-Message-Info-Original:
- Z2VsFk5yy87RPgyqIuJlkVZf4WiWLChwPlBCVj3CuvsCwWJmhGoZ3HCyP3QJQs/8Z+1R7WBILyJPBjTLBxYM2PSaSSowSzqeA+jX/gEym4HPl/nMH+tMFZ8NbrLn2uEFFqejguN6V/MvWMbAfkEnO7QJ4h5/FZhF/U8B2AamtnsarlC3Xm82YQJLiUW1GhkX6SddMv2c+Ozn8bK5gsls52XBDG3FVPUIOg+mUs2ytkrGCSt4cWeTrdIrO18fMyXwf9MBiNL9EkJHdtupIDZf/5t8du/6UqZPHmalMoYp8E7XcxLOqP098fopaqPikQbYkJTjeuXcfQRzXXzoHYLIzAevfgy8SOrqyp6aPT4heEVgogzhKlSLc3KBe/VxfsAaQK5oAusAN//SnHcs/2pWyxumumkZRe1XR8CdddBAv40nIHu6vIAthmtFLp/FTVMvJcdcvFY7Z5K9JY/dFnp5ld+qz6Sr33KqeWtZjXGvtLuCeAfi8bjSC+83B3uFRIf0lY8/z6qPnghAnYCK8mpEst2k0PHFd2YqAN9065LqR9vs91rpx4xtsPX4rkpQ0vhwahfiduU3gTT7i0HSeoeDFYyGan+Z+VPgXOT/cJsa23atl5ikunifbByrGVMmZAKtVj6G2BD4vG4wF49Ya2z0KySvgkaZAGXcLqRCRcmziLZW0eEu05VKJBpuIR2uHEYJgq1csAh6HnKb4tlDyC1bz9ES+VKf0/AhzZufK7CdOCw=
-X-Forefront-Antispam-Report-Untrusted:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PR2PR08MB4889.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(23010399003)(1800799024)(376014)(38070700021)(10067099003)(22082099003)(56012099006)(11063799006)(6133799003)(18002099003);DIR:OUT;SFP:1101;
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="qUmVpX7o"
+Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 684GhG2d3185986;
+	Fri, 4 Sep 2026 17:55:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2025-04-25; bh=Tp/rQlVy5b9H8KkGE/UvNF5Djl53J
+	ttIzvuDDXZXs0w=; b=qUmVpX7o/+HsMehwD8MGS0jYqhpJSz0FrQmQ6LsiGkyvc
+	kSuJhPMBztlCctiWoErSwlGvaOp8nsUXMjZwT9INGW+O/T5+jhY0BQOKoVkARbdl
+	KoWOd1KTudfuQqhDZpGFwPsju1au1LyB9ejEN6Ufxy/M9YR/2Pen3omT6x6ZoKFN
+	NDUpB+f/PhDgxr2wHCwzdIz7ac36Klnr+0P65Bk7bBKC4nPlkqM9ogbP/XGHH7so
+	dVSJhomTHMceY7D6YOAll53Ecepm8QJ3TKxQzfRgl7MGsFPvNg1MBdWOHGOmUu+2
+	zz95oQTvikiACKg9FRL2K1KqhwECc9azZIaGLt/8A==
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4gbp72k5qd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 04 Sep 2026 17:55:54 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.7/8.18.1.7) with ESMTP id 684HoYTI016095;
+	Fri, 4 Sep 2026 17:55:53 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4gbnvv3675-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 04 Sep 2026 17:55:53 +0000 (GMT)
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.1.12) with ESMTP id 684HrwmF032217;
+	Fri, 4 Sep 2026 17:55:52 GMT
+Received: from donglzha-e6-vfio-setup.osdevelopmeniad.oraclevcn.com (donglzha-e6-vfio-setup.allregionaliads.osdevelopmeniad.oraclevcn.com [100.100.255.69])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 4gbnvv366p-1;
+	Fri, 04 Sep 2026 17:55:52 +0000 (GMT)
+From: Dongli Zhang <dongli.zhang@oracle.com>
+To: kvm@vger.kernel.org, kvmarm@lists.linux.dev, loongarch@lists.linux.dev,
+        kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org
+Cc: maz@kernel.org, oupton@kernel.org, fuad.tabba@linux.dev,
+        joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com,
+        yuzenghui@huawei.com, zhaotianrui@loongson.cn, maobibo@loongson.cn,
+        chenhuacai@kernel.org, anup@brainfault.org, atish.patra@linux.dev,
+        seanjc@google.com, pbonzini@redhat.com, shuah@kernel.org,
+        dwmw2@infradead.org, joe.jin@oracle.com
+Subject: [PATCH v2 0/4] KVM: Reset steal time accounting on vCPU pid change
+Date: Fri,  4 Sep 2026 17:55:22 +0000
+Message-ID: <20260904175550.430266-1-dongli.zhang@oracle.com>
+X-Mailer: git-send-email 2.43.7
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked:
- KEplQrO9apY/aD+cOht4L++cSEK0OqLgZnlZg1mKVwfFHLgvfU7HnU5PSlfWD+FIIcbLNhsw1iQ6wVTTedRS6m0Wm9DSyAes053jnwyE6v0lQVp/3rp7oMSYSirKk+LtT9Rah87Xo1gXSiN6sBjDZd8LfB5PhPvvIJwUNM2eluGiVsNAFv2KXKSn8USwuqnD6A49Irh2XAZfPCMife/uwzZ4TWvx/VIo3UJrbbelyQai7+7fmML6thHwzBHgHCKZlTHrKYi+VXSWhIP0LKX8wMEfdluJhbXQ+89eTUhj/OO0JCk5QRR0FmGybMwnXuY2782hfpuZMZgm9vvfQsYEew==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS1PR08MB7633
-X-EOPAttributedMessage: 0
-X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- DB1PEPF00050A00.eurprd03.prod.outlook.com
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	998cd1b0-758b-488e-f0f5-08df0aacee8e
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|23010399003|35042699022|36860700016|1800799024|82310400026|14060799003|11063799006|10067099003|6133799003|22082099003|18002099003|56012099006|13003099007;
-X-Microsoft-Antispam-Message-Info:
-	cbAa8pyNzVHgIUGAYL+CaNBI1j+mn1Ltw+XeZ4wqYExTyU1A6tbrgXP1UteIBDAIaS5Gdvg5Ieg7+XifYNWa5K2YuLV98FFaePn8Whu1X92a6SMY+1O1oR4bo59cIMVgT32P1PRqXmEu/7VgR+HY1s8sE91hH+17TSNUjvHV2yI4yfvAof2TL9PSe1YcscAVh+C+TLEt7Ac8FxWSiyYjGP6tNpYn0GZaBxZ33Xj83XPQUdzOGAQUxKnhYE0wKAViTmsRYAYa0QDnmqwzkUePqESzxco3dxAki+nZxZWRnzBCV+DQNNC+o06ae48r+2bdnl2JsqnOhFwlp/Y46gebEQ7oO8Hdj6Igsmd//H9FGBBP7Qw4e8V1Ai/vzumt416BD4oazuJTR8gqu1Ufq13zLbj22//Zlsi/yZm+CH8V+7hq02F2nPi8lbGRHsGgPHlBh399tDwSzWp2hStGvonH/9WpCqtsJaeyXZZuAJW1kaT17kHY60xrMbaSrWwai1H2EJtyCa1qOOeEf5DQwQBe1ur1N6QWN9DVV9hPRc9HexKxUXbXtbVVBN7OY7qfKsBNu/Y4ENuuPknklF7gb1cC3fe7aUHdwVm8ssm5YcV+OgevHsc+IHPRwHSjgfbY2sRcdu6NjGaqCsCSTfVgYxtxHfazKUT4k89JdP0WdvDLQWY=
-X-Forefront-Antispam-Report:
-	CIP:4.158.2.129;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(23010399003)(35042699022)(36860700016)(1800799024)(82310400026)(14060799003)(11063799006)(10067099003)(6133799003)(22082099003)(18002099003)(56012099006)(13003099007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	iEaO9RB/BQZRoARvyj4KBrusvHWC6I/6aJ46JgLATvWY57OA0ldmGJthKcIN6/XjIFLRm2OzRtSYwH3zxmM3ubPRDSOoXa3yMRz2C1y89GTEA4IwVTND/6Snugz071ZlbwNAIVswrpxqdmvNB95fG17vlaVKib+c+oPmXA+ONgv4wmBeGLPJTlgLGghvASe0hqgO5ILlHMxwy6o3V/cTml9/sA1HVwUbv1eTcrJiKS07T+P4W8cyP4cGYg3b+AeweWRyAnHiXJRgsJ45KU3db01c93gXViE8isfQVWjo5QEwfk/IebV+rSPPlC6RhzApSeatuM/cCA60gv004WAeghsgzhsKZHvygX1OZ3OUBWj3oXLnQhDsCk4UKXEm+ODhGa9uIBP40ueDhDbderBPZH45yEeuJ6aVervgjX62xW6NdXxKDn+BHZ8QSTJbyi+n
-X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Sep 2026 17:50:28.8418
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: a0490b39-06b4-479a-ab2e-08df0aad0205
-X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DB1PEPF00050A00.eurprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5381
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-09-04_05,2026-09-03_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0
+ mlxscore=0 bulkscore=0 lowpriorityscore=0 phishscore=0 adultscore=0
+ mlxlogscore=999 spamscore=0 suspectscore=0 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2606160000 definitions=main-2609040163
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTA0MDE2MyBTYWx0ZWRfX7n+VNjWgH3mr
+ JZx3pkbANN7dwqHVyLAS5IVrsoeWRPU3jdp0u/VtqMgZ8a9RZhONAFn6iMXT9PPQSA4NmJI+vZ5
+ 2jrRPIRMmK1pH07LKZf7sdEWovV4WORVYPMz4pSE18uSZkMZrtiH
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTA0MDE2MyBTYWx0ZWRfX8u1jin8Hwbe3
+ Ju0zFlBV+u6P6WOsEp9nLvWFpbDcOKWT33tE7w+ntOHeRjwxUwxIbkoq8XffFf5KdagV7vdILO6
+ GxA+FyLW7GZWd4A+tOstnevoKbj7yf1W5UX3BmsYhkLUZ4obsS5WUEM9SjeKB69BdSYSvv+m/v1
+ dGUAn5rV8IcHoNpJ6Bg8N1vaxdIga166yzQdmsjzAVI13z6T/3+Jl5d4NjQGejI61VyFQZ4j/Ic
+ DLR8IIFKaeUf/MLcl3mLOa/m+NPjhyIr0fPf+t9HM7mIBcxOq7cVXrDznHuhxfgGGmQC7Wuh9nQ
+ ls7TRglewyXOcgSBn8DFaN4gc39yhOBZY8TJK8CuVzgQu+lYwu49TDRAAdABgFL2I5dT7oiANDt
+ ymbjX/Z6J72hX0I+wFTLyiBtptgpZw1eIUjxVzdgy8ed+edsNCTifaeXa8buLpx5BaVBUGU4+qN
+ 7vPnz0t8FOW0cX+JMk9XHQspwwhmgFoexxptjQCM=
+X-Authority-Analysis: v=2.4 cv=G7os1dk5 c=1 sm=1 tr=0 ts=6a9b062a b=1 cx=c_pps
+ a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17
+ a=VdqzKS8jKosA:10 a=VkNPw1HP01LnGYTKEx00:22 a=jiCTI4zE5U7BLdzWsZGv:22
+ a=o5oIOnhZENCTenyL_yNV:22 a=VwQbUJbxAAAA:8 a=yPCof4ZbAAAA:8
+ a=jldH35smy0nQoxfUp5IA:9 a=5yU3S35YU4bGjq-dph-N:22 a=Bho9c0fBagfJEIQBS7DQ:22
+ cc=ntf awl=host:12101
+X-Proofpoint-GUID: jXUH9hFuxjT4XbU59qtQoreu8BjKnino
+X-Proofpoint-ORIG-GUID: jXUH9hFuxjT4XbU59qtQoreu8BjKnino
 
-The tools copy of write_sysreg_s() relies on the "rZ" constraint with
-the "%x0" modifier to select XZR for a constant zero. LLVM does not
-understand this combination and can select another general-purpose
-register instead.
+v1: https://lore.kernel.org/all/20260816053630.527528-1-dongli.zhang@oracle.com
 
-The GICv5 PPI selftest emits CDEOI through the tools copy. Its Rt field
-must select XZR, so using another register results in unpredictable
-behaviour.
+v1->v2:
+  - move the last_steal field in the main vcpu structure (suggested by
+    Marc Zyngier).
+  - Reset last_steal from the caller of kvm_arch_vcpu_run_pid_change().
 
-Mirror the kernel implementation so that a constant zero selects XZR
-regardless of the optimisation level.
+KVM does not support vCPU hotplug. When a vCPU is removed, its
+corresponding data structures are not freed by KVM. Instead, QEMU destroys
+only the userspace state and the vCPU thread, while the KVM vCPU fd remains
+open and parked in QEMU.
 
-Fixes: 0a9f38bf612b ("KVM: arm64: selftests: Introduce a minimal GICv5 PPI =
-selftest")
-Reported-by: Sashiko <sashiko-bot@kernel.org>
-Link: https://lore.kernel.org/r/20260807173928.3F6731F000E9@smtp.kernel.org
-Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
----
- tools/arch/arm64/include/asm/sysreg.h | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+As a result, vcpu->arch.st.last_steal is not reset. If the same vCPU is
+later re-created by QEMU, last_steal retains its old value, while
+current->sched_info.run_delay starts from zero since a new vCPU thread is
+created. This causes current->sched_info.run_delay - vcpu->arch.st.last_steal
+to produce a large, bogus value.
 
-diff --git a/tools/arch/arm64/include/asm/sysreg.h b/tools/arch/arm64/inclu=
-de/asm/sysreg.h
-index f75efe98e9df3..342790d13f788 100644
---- a/tools/arch/arm64/include/asm/sysreg.h
-+++ b/tools/arch/arm64/include/asm/sysreg.h
-@@ -1152,10 +1152,19 @@
- 	__val;								\
- })
-=20
-+/*
-+ * The "Z" constraint combined with the "%x0" template should be enough
-+ * to force XZR generation if (v) is a constant 0 value but LLVM does not
-+ * yet understand that modifier/constraint combo so a conditional is requi=
-red
-+ * to nudge the compiler into using XZR as a source for a 0 constant value=
-.
-+ */
- #define write_sysreg_s(v, r) do {					\
- 	u64 __val =3D (u64)(v);						\
- 	u32 __maybe_unused __check_r =3D (u32)(r);			\
--	asm volatile(__msr_s(r, "%x0") : : "rZ" (__val));		\
-+	if (__builtin_constant_p(v) && (u64)(v) =3D=3D 0)			\
-+		asm volatile(__msr_s(r, "xzr"));			\
-+	else								\
-+		asm volatile(__msr_s(r, "%x0") : : "r" (__val));	\
- } while (0)
-=20
- /*
---=20
-2.34.1
+For instance, current->sched_info.run_delay can become smaller than
+vcpu->arch.st.last_steal (see line 3804) if a QEMU vCPU is re-added after
+it has previously been removed.
+
+As a result, st->steal restarts from a very small value, close to
+current->sched_info.run_delay.
+
+3720 static void record_steal_time(struct kvm_vcpu *vcpu)
+3721 {
+... ...
+3803         unsafe_get_user(steal, &st->steal, out);
+3804         steal += current->sched_info.run_delay -
+3805                 vcpu->arch.st.last_steal;
+3806         vcpu->arch.st.last_steal = current->sched_info.run_delay;
+3807         unsafe_put_user(steal, &st->steal, out);
+
+
+This patchset resets last_steal when the vCPU PID changes, as suggested by
+Sean.
+
+Although David suggested accounting the run_delay left over from the
+previous vCPU PID, this series does not do that. It would be easy to make
+that work if KVM could simply assume every transition is a vCPU PID change.
+In practice, KVM does not always have enough information about the previous
+vCPU PID, e.g. after live migration, unless a new ioctl is introduced. For
+now, this series simply resets last_steal.
+
+Although David also suggested doing the same for Xen-on-KVM vCPUs, this
+series does not reset last_steal for Xen vCPUs. That change itself would
+not be difficult, but Xen uses a different mechanism to account downtime,
+including runnable time and offline time when a vCPU is not running. It may
+therefore need no additional ioctl, or a smaller ioctl extension, to account
+run_delay left over from the previous PID.
+
+As I have access to only x86 and arm64 KVM hosts, I created and validated
+the selftest on those two architectures only.
+
+Dongli Zhang (4)
+  KVM: Move last_steal to common struct kvm_vcpu
+  KVM: Reset last_steal on vCPU pid change
+  KVM: selftests: Test steal time across vCPU pid changes on x86
+  KVM: selftests: Add arm64 coverage for steal time pid changes
+
+ arch/arm64/include/asm/kvm_host.h               |   1 -
+ arch/arm64/kvm/Kconfig                          |   1 +
+ arch/arm64/kvm/pvtime.c                         |   8 +-
+ arch/loongarch/include/asm/kvm_host.h           |   1 -
+ arch/loongarch/kvm/Kconfig                      |   1 +
+ arch/loongarch/kvm/exit.c                       |   2 +-
+ arch/loongarch/kvm/vcpu.c                       |   6 +-
+ arch/riscv/include/asm/kvm_host.h               |   1 -
+ arch/riscv/kvm/Kconfig                          |   1 +
+ arch/riscv/kvm/vcpu_sbi_sta.c                   |  10 +-
+ arch/x86/include/asm/kvm_host.h                 |   1 -
+ arch/x86/kvm/Kconfig                            |   1 +
+ arch/x86/kvm/x86.c                              |   5 +-
+ include/linux/kvm_host.h                        |   4 +
+ tools/testing/selftests/kvm/Makefile.kvm        |   2 +
+ .../selftests/kvm/steal_time_change_pid.c       | 216 +++++++++++++++++++
+ virt/kvm/Kconfig                                |   3 +
+ virt/kvm/kvm_main.c                             |   4 +
+ 18 files changed, 248 insertions(+), 20 deletions(-)
+
+base-commit: 8ab1afb2eb246ab15b301cd255b5943d208a93c1
+
+Thank you very much!
+
+Dongli Zhang
+
