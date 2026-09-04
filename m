@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6159F44C678;
-	Fri,  4 Sep 2026 10:35:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9AEF3AC0EE;
+	Fri,  4 Sep 2026 10:35:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788518109; cv=none; b=BVntT64bf8AZUaSwVU7h77SKOI1nMAyZFl9jvu0dvq6NS22Xxg235mqNDqPjJwfFqjIzBNR4ewLYb4OxEuDO45fKZ41MZj6G/WfYCvkm3xXnD3jZ5iR0++b2N7HlqorpMSWkUn+4u/d+Txyce6JvojpyMs6+PUEH9c6xuDu88hM=
+	t=1788518115; cv=none; b=seBRSl4dZ5srxOLnYkU5cirQ+sbx6fwYYjqaBPxd/PeWp1WifyqBzR/T43DgCWujK3uuwGDRFc8bOyVj6PF1Yqpba1SR3u4j/IMnGBlslubdy3DqaFe2A0KlStaV05ozfyYUxKVOvdJpAkhh9GcsKws3br9mP9zItLKt7DJSYU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788518109; c=relaxed/simple;
-	bh=iZ+S/9LTyfsOPBBzau2MCrsTdSwO0f+hAAmt25eJ+hQ=;
+	s=arc-20240116; t=1788518115; c=relaxed/simple;
+	bh=cS0g/nDD61NS45zqSS8FVqMvbKkUuuYzbwvshF2J/pg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=V/xcz7bc/QZdi++erKC6ck3RMA+h6ip3W3RGInBDHIWwSkyIgn7wNdBCOkLq91TRfVZGyym3gmywme0HN3aU7i8kWwjS/uKrCeVHtoyKmWFvFTxCtoV9gw2vABrxpS7i13Ttd1JWDtxJ6g1C3gj55S5tj8q+qMAdZpX75akqJXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n94gtNfO; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=P4xMn8Zifc30MEMwoIxFW6WWAJz3ZIZFNkDOEZhCQ/XwoGYSsSQPcuzOPnWCVGv55K0ec854K7GEvb8LV8a32O8MjdKFBLO+TaMgSQe3mFdiWdPvQM4HyY/vG6I/2qUIm+DzGJgw/qBqN+OfHC+hjrKaP/u23Q0z1cXqb30gGCI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=erlD1+uD; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n94gtNfO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2D771F00A3E;
-	Fri,  4 Sep 2026 10:35:02 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="erlD1+uD"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5ED601F00A3D;
+	Fri,  4 Sep 2026 10:35:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788518107;
-	bh=9yCa15UdSNTilz8kPcvrpDVJ1NX5mcsjOV3wxcM11SI=;
+	s=k20260515; t=1788518113;
+	bh=/zkAw0Mk8GkqlqvyS44GmVtI+30wAgQRZHaj1Ir4nIo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=n94gtNfOXVpib0FqSMswq4TJBhowKoamIh5esJxUMOLzRML4Wqd1va+BRLyrw3z2E
-	 U7iZ7+4+mSvkdsg+XUxTcqYqdrv0DrxyDD1z/DaqmpozjfuLGwzmO25MIPzaKQ2GRv
-	 K1S6acdrKeUdBr8WovRoqksDi1FhGnIexXoMkND7W6o2/sltKmjYduLX2V8kOl3WMU
-	 XS3xEmJxv40hNvlY0ZXuyS3nu8mJtmiPFWvXgv5xcFI8LcNjHfW4sfPUCWKlFdg0un
-	 1jyXlYdDI+RIIEOfvHVrW+Wt3/mP2rJ2W3bqQ7nu9NaWkuCigAD/tYQW7+B6PvjVpz
-	 nE/SJ2oK8+Kcg==
+	b=erlD1+uDMTvmkBHPQ5hx5RxALAbZgQ13+Sb+kS0mqKvW7e5jYGpWWh2xzNUnu5uQJ
+	 ZSg4GPscYVOTRBVXtgSOMUOVhAXCNypcXz91wqLI6MFAljeyFJMMmQjY9Egjfglg/9
+	 k18YENiUpf1s3FOlaeQIMHjByg4dWZuwV1IIejRmuf0Ci3I4oS3MxKB7jSNR/c/6uK
+	 /utYsfZCevfUSnXx8MMabqlPwhTWfy0vzD4LW1mB+OiHQF+YCF0KpnVi7hUs3iLdj5
+	 5jX39qFoUpal0uFMDTOyaYv4Q1U0DERYHFB/cfddGK0X7rl8ubamTFMUByU28RWSEx
+	 pKFHjYeYUzPkA==
 From: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
 To: linux-coco@lists.linux.dev,
 	kvmarm@lists.linux.dev,
@@ -42,9 +42,9 @@ Cc: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Thomas Gleixner <tglx@kernel.org>,
 	Will Deacon <will@kernel.org>
-Subject: [PATCH v6 1/9] mm/mem_encrypt: Add helpers for shared-buffer alignment
-Date: Fri,  4 Sep 2026 16:04:44 +0530
-Message-ID: <20260904103452.1197239-2-aneesh.kumar@kernel.org>
+Subject: [PATCH v6 2/9] irqchip/gic-v3-its: Align shared ITS allocations to the CoCo shared granule size
+Date: Fri,  4 Sep 2026 16:04:45 +0530
+Message-ID: <20260904103452.1197239-3-aneesh.kumar@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260904103452.1197239-1-aneesh.kumar@kernel.org>
 References: <20260904103452.1197239-1-aneesh.kumar@kernel.org>
@@ -56,53 +56,51 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-confidential-computing guests may require shared buffers with alignment
-larger than the guest page size. As these buffers are shared with the host,
-which may manage shared/private state at a different page-size granularity,
-the required alignment must account for the host's page size as well.
+ITS tables allocated by the coco guest are shared with the hypervisor.
+These allocations must satisfy the host shared-buffer granule size so that
+the full converted range is safe for host access.
 
-Add helpers for querying the shared-buffer granule size and for rounding
-sizes up to that granule. The generic implementation defaults to PAGE_SIZE
-so that existing architectures keep their current behaviour unless they
-override the granule size.
+Allocate ITS pages using a size rounded up to the shared granule size and
+use the same allocation order when encrypting, decrypting and freeing the
+memory. Also grow the ITT cache in shared-granule sized chunks instead of
+assuming PAGE_SIZE is sufficient.
 
 Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
 ---
- include/linux/mem_encrypt.h | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ drivers/irqchip/irq-gic-v3-its.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/mem_encrypt.h b/include/linux/mem_encrypt.h
-index 07584c5e36fb..5d2a868f8d3d 100644
---- a/include/linux/mem_encrypt.h
-+++ b/include/linux/mem_encrypt.h
-@@ -11,6 +11,8 @@
- #define __MEM_ENCRYPT_H__
+diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+index e9807af23537..98d8fccbf0f2 100644
+--- a/drivers/irqchip/irq-gic-v3-its.c
++++ b/drivers/irqchip/irq-gic-v3-its.c
+@@ -216,6 +216,7 @@ static struct page *its_alloc_pages_node(int node, gfp_t gfp,
+ 	struct page *page;
+ 	int ret = 0;
  
- #ifndef __ASSEMBLY__
-+#include <linux/align.h>
-+#include <vdso/page.h>
++	order = get_order(mem_cc_align_to_shared_granule(PAGE_SIZE << order));
+ 	page = alloc_pages_node(node, gfp | gfp_flags_quirk, order);
  
- #ifdef CONFIG_ARCH_HAS_MEM_ENCRYPT
+ 	if (!page)
+@@ -241,6 +242,8 @@ static struct page *its_alloc_pages(gfp_t gfp, unsigned int order)
  
-@@ -54,6 +56,18 @@
- #define dma_addr_canonical(x)		(x)
- #endif
- 
-+#ifndef mem_cc_shared_granule_size
-+static inline size_t mem_cc_shared_granule_size(void)
-+{
-+	return PAGE_SIZE;
-+}
-+#endif
+ static void its_free_pages(void *addr, unsigned int order)
+ {
 +
-+static inline size_t mem_cc_align_to_shared_granule(size_t size)
-+{
-+	return ALIGN(size, mem_cc_shared_granule_size());
-+}
-+
- #endif	/* __ASSEMBLY__ */
++	order = get_order(mem_cc_align_to_shared_granule(PAGE_SIZE << order));
+ 	/*
+ 	 * If the memory cannot be encrypted again then we must leak the pages.
+ 	 * set_memory_encrypted() will already have WARNed.
+@@ -272,7 +275,8 @@ static void *itt_alloc_pool(int node, int size)
+ 		if (!page)
+ 			break;
  
- #endif	/* __MEM_ENCRYPT_H__ */
+-		gen_pool_add(itt_pool, (unsigned long)page_address(page), PAGE_SIZE, node);
++		gen_pool_add(itt_pool, (unsigned long)page_address(page),
++			     mem_cc_align_to_shared_granule(PAGE_SIZE), node);
+ 	} while (!addr);
+ 
+ 	return (void *)addr;
 -- 
 2.43.0
 
