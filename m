@@ -1,133 +1,99 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50B4A449B0C;
-	Fri,  4 Sep 2026 10:28:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A70D426694;
+	Fri,  4 Sep 2026 10:33:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788517729; cv=none; b=qJkTj+pFE+1pNOPLpWvHNyfe5GdORjEPQclWUInw6yPodhM9qHAVvHYGv+Rbgpbkd0iIWKl5t8x40iXgUEyuqReZlAVX9ekwMjuCC8Dpm4F05iATIJQVc0aTZ1lzgsTb5Zt7Ix4dLrzAwVlHFeRoJbgtfFFBPc0Se3alvZPwGx0=
+	t=1788518011; cv=none; b=ecjxazqHXsTyfy//43XEi3OMlT6cCpJV9mdvE+aRSk1e1X+OMnNODv6tP8LmHj/s/i0HeiNBEj2aSdVLODCRGc3DjG9b2ydt5pZgfvHIN3BzYnJbel9QxBScoJwMYlntoJE5spC4KrxEh2f4VRBpAx5ba9wa0X89wHd+y3EP3iM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788517729; c=relaxed/simple;
-	bh=yWTFTbyCD2ZbTDtZtPVjYhpiVB5RoJTV6RTzQNDXhn4=;
+	s=arc-20240116; t=1788518011; c=relaxed/simple;
+	bh=um+PdFFJR98kQldzpxMzgk/ZDhAliw12h80hk8FMLrg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NVVhe+pbXmcMpGxjgEd0+U7kQVHXD79A0W/pd7vZmsJu03YJ8gZ/V097tutcbQb+nOLpglG5gUOuXXl8aE9hB8ieI7vlQXAu6wLO9zGXkXiYcRiGcbZQIdOVmm5orG4Xy/AkOQmqdcm2BSaKMwXIOGthy+ebE2WG5S2ida+3hO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=KpIzOkyQ; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=ONysmmYHY/8IhygTRQ9GTCy09ExUTGZjOSP8BO1smSbwt3F51jHn2YSelcRhjPg7g5rBoBDTq9epDKsxEgBwV7xr9qTmBNrkCKw1tF68EbF54Txno0lpVy5sxyeSh02R1cbIC02CTnbWmRxASlA2Ceya9/DbPz8qUNWm4JaAW1w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kFuGwZ4h; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="KpIzOkyQ"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 082A0153B;
-	Fri,  4 Sep 2026 03:28:43 -0700 (PDT)
-Received: from e140010.arm.com (unknown [10.1.34.66])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DC5143F673;
-	Fri,  4 Sep 2026 03:28:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1788517726; bh=yWTFTbyCD2ZbTDtZtPVjYhpiVB5RoJTV6RTzQNDXhn4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=KpIzOkyQ+QnufWQpGim6KXXRX2l/4Az3H/34r5LLUJ4DIhaB4PM5+293HJQWL4Z6r
-	 3vmKplbwl+ywuVA7E0B4oQmK99EQIs+QFmVEFatAhLptOHGUVUFkSld8TJ9rsnXv6Q
-	 v580Ry3OeQsWod3Jvm1Moark6NIYtyD3De8+Qeoo=
-Date: Fri, 4 Sep 2026 11:28:41 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: sashiko-reviews@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-	Oliver Upton <oupton@kernel.org>, linux-perf-users@vger.kernel.org
-Subject: Re: [RFC PATCH v7 16/28] KVM: arm64: Add SPE system registers to
- VCPU context
-Message-ID: <apqdWR9Eyry6bBU7@e140010.arm.com>
-References: <20260903160623.315525-1-alexandru.elisei@arm.com>
- <20260903160623.315525-17-alexandru.elisei@arm.com>
- <20260903163250.3F3531F00A3D@smtp.kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kFuGwZ4h"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 323F61F00A3D;
+	Fri,  4 Sep 2026 10:33:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788518009;
+	bh=KA6Z2/LU2nu5o8uMhRKWPli4CzL+4jTmOudkvcs6Nvc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=kFuGwZ4htkAaxQDnVGD3u1NcaOHnoTNSbBzIBHfIMlM/r81LttdcFdSdVzog56lgC
+	 F4LfKaclWVS6r3c2xzyeHkHtEQs6HlmLKPN3ypnJF7sNqMavkmSuBFAOF+eyT50rR3
+	 YtOnugjv7rNuykj+n4ws9+JmNHXzHUPIc+5qLfuYwMaddkG21QUsqJmI1gTmuDZel5
+	 7YYHe7FyCz6n6eSjUXRsKbKBAYF2vwPhgJbWspmLOa3zK2RbzQDA81OGjfrlneGgAh
+	 o1qV/uUMw7SqQNOuPxtqYjbSGAXaT7DR7xRkJiyt/Kvd8zPsOpJNLhCjWqS4xyqx5q
+	 O4YjNEQ/ZFv8w==
+Date: Fri, 4 Sep 2026 11:33:24 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oupton@kernel.org>, Fuad Tabba <fuad.tabba@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] KVM: arm64: Enable S1PIE for nVHE and hVHE
+Message-ID: <eb788ad5-5bb3-4767-87b8-d35d9e3ab220@sirena.org.uk>
+References: <20260904-kvm-arm64-nvhe-pie-v1-0-29d59f245e6c@kernel.org>
+ <20260904-kvm-arm64-nvhe-pie-v1-2-29d59f245e6c@kernel.org>
+ <86pkyt4gvt.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="SRGhXbx+xRQ2WZrs"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260903163250.3F3531F00A3D@smtp.kernel.org>
+In-Reply-To: <86pkyt4gvt.wl-maz@kernel.org>
+X-Cookie: A is for Apple.
 
-Hi Sashiko,
 
-On Thu, Sep 03, 2026 at 04:32:49PM +0000, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> - [Low] WARN_ON_ONCE is incorrectly called with a string literal instead of a boolean condition.
-> --
-> 
-> commit aa1092f112d707ae630c6edfaa06e1cf58da7524
-> Author: Alexandru Elisei <alexandru.elisei@arm.com>
-> 
-> KVM: arm64: Add SPE system registers to VCPU context
-> 
-> This commit adds SPE registers to the VCPU context. It only traps the buffer
-> registers, allowing KVM to track the buffer enabled state for dirty page
-> logging and to sanitise writes to PMBLIMITR_EL1 based on exposed VM features.
-> 
-> [ ... ]
-> 
-> > diff --git a/arch/arm64/kvm/spe.c b/arch/arm64/kvm/spe.c
-> > index 4426d614a9e0b..6a00a44c73edf 100644
-> > --- a/arch/arm64/kvm/spe.c
-> > +++ b/arch/arm64/kvm/spe.c
-> 
-> [ ... ]
-> 
-> > @@ -82,6 +83,34 @@ void kvm_spe_destroy_vm(struct kvm *kvm)
-> >  	module_put(spe_pmu->pmu.module);
-> >  }
-> >  
-> > +bool kvm_spe_write_sysreg(struct kvm_vcpu *vcpu, int reg, u64 val)
-> > +{
-> > +	switch (reg) {
-> > +	case PMBLIMITR_EL1:
-> > +	case PMBSR_EL1:
-> > +	case PMBPTR_EL1:
-> > +		__vcpu_assign_sys_reg(vcpu, reg, val);
-> > +		break;
-> > +	default:
-> > +		WARN_ON_ONCE("unexpected trap");
-> 
-> [Severity: Low]
-> Does this macro call miss a boolean condition? The WARN_ON_ONCE macro
-> expects a boolean expression, but it is being passed a string literal here.
-> While this functionally evaluates to true because the string decays into a
-> non-null pointer, could this be considered an API misuse? Perhaps this
-> should use WARN_ONCE(1, "unexpected trap") or WARN_ON_ONCE(1) instead when
-> an unexpected trapped SPE register access falls through to the default case
-> in kvm_spe_write_sysreg().
-> 
-> > +	}
-> > +
-> > +	return true;
-> > +}
-> > +
-> > +u64 kvm_spe_read_sysreg(struct kvm_vcpu *vcpu, int reg)
-> > +{
-> > +	switch (reg) {
-> > +	case PMBLIMITR_EL1:
-> > +	case PMBSR_EL1:
-> > +	case PMBPTR_EL1:
-> > +		return __vcpu_sys_reg(vcpu, reg);
-> > +	default:
-> > +		WARN_ON_ONCE("unexpected trap");
-> 
-> [Severity: Low]
-> Similarly, should this use WARN_ONCE(1, "unexpected trap") instead of
-> passing a string literal directly into WARN_ON_ONCE when an unexpected
-> trapped read falls through to the default case in kvm_spe_read_sysreg()?
+--SRGhXbx+xRQ2WZrs
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Yeah, that's right, I'll fix both instances of the misuse of the macro.
+On Fri, Sep 04, 2026 at 08:25:58AM +0100, Marc Zyngier wrote:
+> Mark Brown <broonie@kernel.org> wrote:
 
-Thanks,
-Alex
+> > When FEAT_S1PIE (stage 1 permission indirection) is supported we
+> > currently enable and use it in the hypervisor when running in VHE mode
+> > but not when running in nVHE or hVHE mode.  While systems with
+> > FEAT_S1PIE would normally use VHE users can configure them for nVHE or
+> > hVHE, for example in order to run protected guests.  Enable FEAT_S1PIE
+> > with nVHE and hVHE.
 
-> 
-> > +		return 0;
-> > +	}
-> > +}
-> 
-> [ ... ]
-> 
-> -- 
-> Sashiko AI review · https://sashiko.dev/#/patchset/20260903160623.315525-1-alexandru.elisei@arm.com?part=16
+> No. nVHE is dead, and I'm not adding support for random stuff that
+> appeared over 10 years after v8.0. If you have S1PIE, you have VHE.
+
+> If you force the kernel to run with E2H==0, that's your own problem.
+
+What about pKVM, my understanding was that that is very much an ongoing
+concern and uses the nVHE hypervisor?  My expectation was that this
+would only ever get used in hVHE configurations when people enable pKVM
+on modern hardware, actual nVHE mode was mostly just carried along with
+that.
+
+--SRGhXbx+xRQ2WZrs
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmqannMACgkQJNaLcl1U
+h9ClCAf/VHBLEA44WZBa2i3kDIYbv8kQYBTPQtGFRc4TgF8ppyYGd/1uG1a4oLwT
+OnnTBuAmQtfxIYsQaUpK48EjYRr+nqWVn7prOwftXyzvFeNaWchCJwjYNMjfndHc
+qBQZkER5xOLeQ52Np/XMF0UarDT0VGkZinLql+a6bVd6VEYiYsvCH3dUs6GQ1ACM
+7+XetScfgfE95q1hBBiwz5nqaNWyrPE3omzHq8yLZ5ZVDG7S7QcG8PUsBrRUKmFb
+ppwT6bR9zQwshxF5OBkfp7uKA9t6h2+ueCp8LErLEx1KyiOy63w1TSpkCgKxyuMw
+n+x1qZTqmQx95z6mQSHoijN5M1/3uQ==
+=+aEE
+-----END PGP SIGNATURE-----
+
+--SRGhXbx+xRQ2WZrs--
