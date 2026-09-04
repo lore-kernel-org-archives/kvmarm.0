@@ -1,115 +1,133 @@
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 373EC47DD79
-	for <kvmarm@lists.linux.dev>; Fri,  4 Sep 2026 12:24:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 618AB483815;
+	Fri,  4 Sep 2026 12:24:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788524696; cv=none; b=SRr+/gbixYLN9FiZerXMgmDXmB2av+Obc9XzPtIDu0lSuYVi+rHSuJhaXyVQiGdhm9JQC18dK68fhCNL32kEDS4ZIIxRL3yre2B+SxJZ7o5RnIgFmGQkpvP5GWUlW09Pp25vWyLveL8799SKaj9PKluW3DQ0f8zrSX1YKvjuTOk=
+	t=1788524701; cv=none; b=Iva9BNA6VGpZY8R5500o4+XjJLdZgoU+Mt7UFSiMtgsoiAImrIEqnBxgS4NxxxPYnf95raesGm+/dj7wtO0adpxyF8UykXJGUsHa8+iEJBGbHdqLp/Oh6HkYqbBQBPKNCeN2LlX3zzgyivm7y50JYsOa+iD2z78FHn7YRrIyB2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788524696; c=relaxed/simple;
-	bh=f8aGNyC4hhuimPFgaao0DU0lrWnNx6TAWDdKIId6TYc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lnotAsXm4XNGoLktzd1NeQ6x7hyZpJaChLbEvmdl+Sh+EKYYi+Ph7JexXgxh6HLELWj894JfNdheGNXRifZ7MqigPrPsSJLQ+QE0rh/7h6wXLXPB6cyRbaE6YRKCkWnTOdb9PEaE6JAViuVritpC0jg3fVtLYV/Hii380z48oHc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qNNPBITn; arc=none smtp.client-ip=209.85.216.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1788524701; c=relaxed/simple;
+	bh=uJ7pu17YHRaKmgRtXA04K8SLek1ClTdMjBON17JgbeE=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=RwakQFhDNCKIHMc91Oy8WlFBFvNzqRxgL4lZu77OFmOQh9IhhSmn0X/VRBjo2zshpV+uyEfAR4WRL99gQKonCy+uOblJV+sWIXlAGMnl8Y6vODpsZ6mnZnET/uZxd2WkqquP41sx5+Nnb1PPhqjqdel3ODU96SyNx34Ijl4m0XY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XmI+VCti; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qNNPBITn"
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-3990fe066ebso706241a91.1
-        for <kvmarm@lists.linux.dev>; Fri, 04 Sep 2026 05:24:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788524694; x=1789129494; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=dSrYA1DkzHEof4sMwyJ4ZJLRu5Ytzn/ZSPLCLv7l2KM=;
-        b=qNNPBITnMvdTumIe2N9FmcRQgVYt9T1vHnKC2iCsLeNKYWV6psioeDTIcsUHo897zF
-         3lSljUw1RqZ6qMnkBLxFxOqtVvUvopY6tHHlEGOVO3mMlx4IMlcmn4lNUU5qXshg5ImW
-         1hlsMIIi+K/ZETNnqj1OHMkNL58ao5xbSREHiTN8lQcBFUytx8IMUMrd2F12bu2dRa3B
-         o5oIcZMtlgShKfdAnsUQMvS/4LNHgnlF0tiRKrVOFcQ0CWwNWx8Bj73H/ONjSNH+jBnL
-         J8sVIsYIqD4i/B1IJkFpDcEdgmJZ57YRdkObzt9Mt/KSfDmSd0IKqKMBbKmh7gcoXdp1
-         9kZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788524694; x=1789129494;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=dSrYA1DkzHEof4sMwyJ4ZJLRu5Ytzn/ZSPLCLv7l2KM=;
-        b=NVinDO+4fh9x5F5h7+YAKdxnV7iRju0oQdK2kioKdd1EBK37Pq5XPuNxU7EfTwnu1r
-         7E7DlR6FVB5aMaZpYhQGsNPcu6wFg21iswH8K0HrYZtjIplhgOUoPxLJ92FVnbS4YpLH
-         7+6pXnAWiP560DQE4XRclnRWIquS5xJTnka6KwGWiYuANZQzEhORLkeDvC88AhlPfgps
-         8zTyPz68DZ/yLT3hImjHepXluxaBKzt2/ZCenH+HlKU37RfKVCOzqRbJi9y+ssnkhUdi
-         kTD7A7z9eS5n+YH/+U+7OlrE1sWVEDEKa+UBxM8TaPdpGUtDI+66j2o0yttu1UxR8/7b
-         0Gkw==
-X-Forwarded-Encrypted: i=1; AKwUvBwZonUqy6+uGXSC78d0ZfEOAtrvL6q5F7IEg+/2UjXgwIT7cHw/lXvwGPQLBtnymVJ8f19xu1k=@lists.linux.dev
-X-Gm-Message-State: AFuF++lLLEzkLVi8VHgwqlHseq4XNxKxr+0RkwbAopN3cwkLFwkI/Dw+
-	epSnFiYIpHhH/68KW64yUksqbLfxyse7d4wFAm2uT4wAoWKFqHiOxA03
-X-Gm-Gg: AYBFou1WKI/5LqzXzcIacsU61deav6f+NXSF5ciBosxi7snfMhbWdXnroT1lHmzcJok
-	f0eh4vpVq02MSTH6lYinejFz+enT53P0Ye5BQfSulZZ4mCRddC8GggxZWjCnQgrxEjcToIWh/hk
-	vwDs9itOzQicraLULNMsUiSa/igdUKZ04GoFwC6BowDcPGkXEUXkSiWYZ5WFmJ0KR0+fN61wk0y
-	qZqDIs2Q+cnbyXagrEM/RLVf7bmw9Jy4lWz4PkrqznKXb3CcvDLoIcmx7Tjy0WQub4KAJl+ZCI6
-	lUkRHMg1AfgRah4pew9Ri3wvW8O56Ye6jg0YNgTfHtWieR1QXLG2UVSvbsBhjyMvwbaa27VUChH
-	Mh/wKQ0m2go+sCYlHnl0SLGfQX7ckCnCXplLmEBZT5Mutehhe/7A/nuvunealYFG0/onpLTVmIF
-	8rsZQvlCE63vuZ1JE6Cw3gOIe/hjOdegOMBWkXpj5/7Sb1fG2XwuVyLIAppQx+9GsgXmnseg0oh
-	8hEh29YQVONAH1QqmPkc5TmMzk=
-X-Received: by 2002:a17:90b:2e52:b0:38d:ddc2:7ccb with SMTP id 98e67ed59e1d1-39b260dd3efmr8705280a91.1.1788524694319;
-        Fri, 04 Sep 2026 05:24:54 -0700 (PDT)
-Received: from volcano9f6e-hostos.amd.com ([165.204.217.251])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3339b8f787esm5880860eec.23.2026.09.04.05.24.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Sep 2026 05:24:53 -0700 (PDT)
-From: Hemanth Selam <hemanth.selam@gmail.com>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>
-Cc: linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Subject: [PATCH 1/3] arm64: kvm: fix typo "synchonized" in comment
-Date: Fri,  4 Sep 2026 17:54:40 +0530
-Message-ID: <20260904122445.31163-2-hemanth.selam@gmail.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20260904122445.31163-1-hemanth.selam@gmail.com>
-References: <20260904122445.31163-1-hemanth.selam@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XmI+VCti"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6977B1F00A3F;
+	Fri,  4 Sep 2026 12:24:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788524699;
+	bh=uk3uHY1cPdZeA3snDZT2ocy72h5PzOV9PL0yPO27JQk=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=XmI+VCtiYOMyEcgJ94cyT1nMFarbCktopAetnqQtjlvSbiEfvaLpysWYwW1kU6FQl
+	 xa/WyG7am2FfWdSxF26xoJ/s5/AAqKHWFVDH37bD1zTYJxVcyOJaF8L8hA51KMC1Ob
+	 O6U/K1U6EjS2JwU76iJnNyTPksBwAfvnzf8ed8oLqtn09vHzWouNk/Bzgky35b36vK
+	 z7b2tIQ7O+DJ7BVrOMHQGUwq57PCoHcc2jmCp8HMplvZDeWKBKkwyPCYWnfUjcfuAz
+	 Dxf5o6ylngjKc5d5m3xgRKiAbD844D8YORGa7WZuwNI419VluaQtX2fD80/zq/SHjW
+	 18v7bWY7PsteQ==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v6 09/49] KVM: arm64: gic-v5: Create and manage VM and
+ VPE tables
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Sascha Bischoff" <Sascha.Bischoff@arm.com>
+Cc: "Marc Zyngier" <maz@kernel.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, "Oliver
+ Upton" <oupton@kernel.org>
+In-Reply-To: <20260904113404.4051341-10-sascha.bischoff@arm.com>
+References: <20260904113404.4051341-1-sascha.bischoff@arm.com>
+ <20260904113404.4051341-10-sascha.bischoff@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 04 Sep 2026 12:24:58 +0000
+Message-Id: <20260904122459.6977B1F00A3F@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-Correct "synchonized" to "synchronized", reported by scripts/checkpatch.pl
-using the misspelling list in scripts/spelling.txt.  Only touches comments,
-no code changes.
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [High] The Level 1 and linear Virtual Machine Table (VMT) allocations are=
+ not rounded up to `dma_get_cache_alignment()`, creating a severe risk of D=
+MA cacheline sharing and memory corruption on non-coherent systems.
+--
 
-Assisted-by: Cursor:claude-opus-5
-Signed-off-by: Hemanth Selam <hemanth.selam@gmail.com>
----
- arch/arm64/kvm/hyp/entry.S | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+commit 2a6fdf9c9daff6b8431875f64f4c14a50786f815
+Author: Sascha Bischoff <Sascha.Bischoff@arm.com>
 
-diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
-index 308100ed25de..9709905f21b5 100644
---- a/arch/arm64/kvm/hyp/entry.S
-+++ b/arch/arm64/kvm/hyp/entry.S
-@@ -46,7 +46,7 @@ alternative_else_nop_endif
- 
- 	// Ensure that __guest_enter() always provides a context
- 	// synchronization event so that callers don't need ISBs for anything
--	// that would usually be synchonized by the ERET.
-+	// that would usually be synchronized by the ERET.
- 	isb
- 	mov	x0, #ARM_EXCEPTION_IRQ
- 	ret
--- 
-2.48.1
+KVM: arm64: gic-v5: Create and manage VM and VPE tables
 
+This commit introduces support for allocating and managing Virtual Machine
+Tables (VMT) and Virtual PE Tables (VPET) required by GICv5. It handles both
+linear and two-level VMT allocations, manages cache maintenance for
+non-coherent systems, and coordinates access between the CPUs and the
+Interrupt Routing System (IRS).
+
+> diff --git a/arch/arm64/kvm/vgic/vgic-v5-tables.c b/arch/arm64/kvm/vgic/v=
+gic-v5-tables.c
+> new file mode 100644
+> index 0000000000000..7252d48431a5a
+> --- /dev/null
+> +++ b/arch/arm64/kvm/vgic/vgic-v5-tables.c
+
+[ ... ]
+
+> +static int vgic_v5_alloc_vmt_linear(unsigned int num_entries)
+> +{
+> +	vmt_info->linear.vmt_base =3D kzalloc_objs(*vmt_info->linear.vmt_base,
+> +						 num_entries);
+
+[Severity: High]
+Since the VMT is shared with the IRS and requires cache maintenance on
+non-coherent systems, should this allocation be rounded up to
+dma_get_cache_alignment()?
+
+If num_entries is small, this allocates exactly the requested size. For
+example, if this results in an 8-byte allocation, it could be placed in a
+generic slab cache (like kmalloc-8) and share a cacheline with unrelated
+objects. When vgic_v5_clean_inval() later issues a cache clean and
+invalidate to the Point of Coherency, it could write back the CPU's cached
+copy of the entire cacheline. If an unrelated object sharing the cacheline
+is undergoing concurrent DMA writes, those writes would be silently
+overwritten.
+
+> +	if (!vmt_info->linear.vmt_base)
+> +		return -ENOMEM;
+> +
+> +	vgic_v5_clean_inval(vmt_info->linear.vmt_base,
+> +			    num_entries * sizeof(struct vmtl2_entry));
+> +
+> +	return 0;
+> +}
+> +
+> +/*
+> + * Allocate the first level of a two-level VM table. The second-level VM=
+ tables
+> + * are allocated on demand (by vgic_v5_alloc_l2_vmt()).
+> + */
+> +static int vgic_v5_alloc_vmt_two_level(unsigned int num_entries)
+> +{
+
+[ ... ]
+
+> +	vmt_info->l2.num_l1_ents =3D (num_entries / GICV5_VMT_L2_TABLE_ENTRIES);
+> +	vmt_info->l2.vmt_base =3D kzalloc_objs(*vmt_info->l2.vmt_base,
+> +					     vmt_info->l2.num_l1_ents);
+
+[Severity: High]
+Similar to the linear VMT allocation, does this exact-sized allocation for
+the L1 VMT risk DMA cacheline tearing?
+
+If vmt_info->l2.num_l1_ents is small, it creates a severe risk of sharing a
+cacheline with unrelated slab objects. Padding it to
+dma_get_cache_alignment() (as is correctly done for vpet_base and vped_base
+in vgic_v5_vmte_init) would prevent cache maintenance from corrupting memory
+belonging to other subsystems.
+
+> +	if (!vmt_info->l2.vmt_base)
+> +		return -ENOMEM;
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260904113404.4051=
+341-1-sascha.bischoff@arm.com?part=3D9
