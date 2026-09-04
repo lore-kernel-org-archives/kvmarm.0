@@ -1,42 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E13D43B5837;
-	Fri,  4 Sep 2026 07:46:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 011173D812A;
+	Fri,  4 Sep 2026 07:51:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788508005; cv=none; b=dFrEG4phU+6isdZshXi9k9an+o+ZsQqda+h1AHTqk6UYr08qoFr78tO+thFLJ/KftQ+Zmd1Z+717f0l7Fqnm/56mDYh5qmmF6ue7XOf27xx2RBN5UZFLc5UODNap3FEm4koRkHYRsdw1eYOZ/GpR2pcteZx9Wbyaze5yobjM1rc=
+	t=1788508292; cv=none; b=G2zTWsz3bz+FKv963xlnhi4F++DrN1Kw9XbH+mkLkvHIY/mdbWxq1KjawXO4BoYKUapIvCSPMDHs238UdJJOofeXOgf0CENQ48Z+hzo/Sa+e56CUMFQpnNK+WxrM0is1pPitYLiiaUp4vOz+djUq1BUbpLteEQhOcvlH7ivLsWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788508005; c=relaxed/simple;
-	bh=CkZeulv6QbhQbxQAlOXX6Zc+UCqDcmjcHoUDCQrGh+0=;
+	s=arc-20240116; t=1788508292; c=relaxed/simple;
+	bh=vl7JJZa4/NdA/aF2AbiJiCqDLpZ1443pCF3bkVVzarE=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PDjHZ8d6JbD0Vz3GAAGqAnTyP6L4VT81bS1M4J+LIOXf1QKsYQ2pAu621J/o5KcEvMO0Gzmp5pKQFsMpG0BMW2nMYeMCV5fYP1nH7YHmvjeBeyq66x7KOlzLxbtfpPdbTQ7DIteHJGysFFOunRS+yuEIEWlK1marHYPkLyhWOT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EfFlHyFf; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=kUvSinauAFxk3ZEpVW6gzxlbkbtrHhnTU4ZqMGYiVLlqQ0YWPSQF1+oNhgQoWq/BHfY1m2ppfe1M1M+x/1DDiaI7rBqmpplhHRkvH5O23sYEAF2bR/hM5+S2o4rlseW9zQ4V92xdWgSvgTI9ZG2rEkheqKjAHI7SaFxT149QYmo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TLIw0zFg; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EfFlHyFf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 692A31F00A3D;
-	Fri,  4 Sep 2026 07:46:43 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TLIw0zFg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83B091F00A3D;
+	Fri,  4 Sep 2026 07:51:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788508003;
-	bh=03eIS2DS8PjcdkHIfXExaV9bsKwUvGke/WEpmxbLmbc=;
+	s=k20260515; t=1788508290;
+	bh=8+LnYxn6LugYvNdyOdQjROelzsYqUVDn0UISl/V+oKM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=EfFlHyFfqKG6y7UZgTKd2iocNdwfSUvzqahd8EmGsV2i52JgN5UfmRtR98vYT7UrG
-	 SSASpzd1t/jyACeK9wZJWJbzWtwrrqd3z0rtrtcIGFvxhT7pd/PiFBM9pP70F+IKLA
-	 HxygD9c5hDcf847EDo45GBdd1U893ROcDZb88cUBj30MjZQlw3TTjkfHNmHp48E6D2
-	 fF7rraOFUG7YTAFWvJbwk3sKyLLjGMUCIyQt2oWoHVLPxlHdGoukiecvuiwe92g7T9
-	 /vj5tLLsKKTItfpJ2168htwZm3k0fvlUhpbiGCg69OXEbTE5Nvg416Bfafe4s1NDKg
-	 qKxWtcNnTHZKw==
+	b=TLIw0zFgyzyv+MG+Kehh+5Mzp4S8C/RTGA6krixJPZtv5S+h6cAkjLIuSH+BlY5kt
+	 Fc8dgU2AKlSS9HZQLSVtoHZwpmYvcCaNZen2/4P2saZB2oMUJWVu6VOQgRZAueGZmV
+	 aKpanRlBQ412TeKxepE8u7zOSWohx6miD/DcsM7j/Ok6nbsJZBpxVfHRFWLYI+5SUf
+	 VbAyqfD9K2oXadPLIkkb3EQSMe+Cb0dA0dlFrsBVMwgflzU1C5m0hjXzIHGkpcYLyF
+	 lkdjrMyk5G88dNizwjUwiyDLMOazmLut+uvxPZ2IcXU0dezf33erGXckr7FgDs4l78
+	 4KzKLW3zvdsaQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1x2OdF-00000004hTl-0MOb;
-	Fri, 04 Sep 2026 07:46:41 +0000
-Date: Fri, 04 Sep 2026 08:49:14 +0100
-Message-ID: <875x0l5udh.wl-maz@kernel.org>
+	id 1x2Ohs-00000004haK-2Pgw;
+	Fri, 04 Sep 2026 07:51:28 +0000
+Date: Fri, 04 Sep 2026 08:54:02 +0100
+Message-ID: <874ig55u5h.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Wei-Lin Chang <weilin.chang@arm.com>
-Cc: Wang Han <wanghan@linux.alibaba.com>,
+To: Shuai Xue <xueshuai@linux.alibaba.com>
+Cc: Wei-Lin Chang <weilin.chang@arm.com>,
+	Wang Han <wanghan@linux.alibaba.com>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
@@ -50,11 +51,12 @@ Cc: Wang Han <wanghan@linux.alibaba.com>,
 	ljs@kernel.org,
 	itaru.kitayama@fujitsu.com
 Subject: Re: [PATCH v5 0/6] KVM: arm64: nv: Implement nested stage-2 reverse map (new data structure)
-In-Reply-To: <wsnf276xrun3g4hjr3t6alprapctg5z4kpj422v3hujqdjnrsa@swq4blkqvvj5>
+In-Reply-To: <46342b48-550e-42c1-9d9f-e800c72269c2@linux.alibaba.com>
 References: <20260810205038.118843-1-weilin.chang@arm.com>
 	<20260902163500.1841671-1-wanghan@linux.alibaba.com>
 	<877bl26aqg.wl-maz@kernel.org>
 	<wsnf276xrun3g4hjr3t6alprapctg5z4kpj422v3hujqdjnrsa@swq4blkqvvj5>
+	<46342b48-550e-42c1-9d9f-e800c72269c2@linux.alibaba.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -66,77 +68,112 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: weilin.chang@arm.com, wanghan@linux.alibaba.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, oupton@kernel.org, tabba@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, ljs@kernel.org, itaru.kitayama@fujitsu.com
+X-SA-Exim-Rcpt-To: xueshuai@linux.alibaba.com, weilin.chang@arm.com, wanghan@linux.alibaba.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, oupton@kernel.org, tabba@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, ljs@kernel.org, itaru.kitayama@fujitsu.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 03 Sep 2026 14:28:16 +0100,
-Wei-Lin Chang <weilin.chang@arm.com> wrote:
+On Fri, 04 Sep 2026 08:01:24 +0100,
+Shuai Xue <xueshuai@linux.alibaba.com> wrote:
 > 
-> On Thu, Sep 03, 2026 at 08:43:35AM +0100, Marc Zyngier wrote:
-> > On Wed, 02 Sep 2026 17:35:00 +0100,
-> > Wang Han <wanghan@linux.alibaba.com> wrote:
-> > > 
-> > > Hi Wei-Lin,
-> > > 
-> > > I tested this series on a Yitian 710 system with an ARM Neoverse-N2 CPU
-> > > (128 CPUs, 2 NUMA nodes).
-> > > 
-> > > Test environment
-> > > ----------------
-> > > 
-> > >   L0 kernel: Linux v7.2-rc6
-> > >   L1 guest: Ubuntu 26.04 LTS, kernel 7.0.0-27-generic (aarch64)
-> > >   QEMU: 10.2.3
-> > > 
-> > > L0 NUMA balancing was enabled (`/proc/sys/kernel/numa_balancing=1`).
-> > > The host was booted with `kvm_arm.mode=nested`.
-> > > 
-> > > This series fixes a functional hang that is exposed when NUMA balancing is
-> > > enabled.  The previous nested stage-2 unmap path is too slow for this
-> > > workload, making the performance problem user-visible: NUMA balancing can
-> > > leave the L1 guest unable to make progress and eventually hang during boot.
-> > >
-> > > The L1 was started with 8 vCPUs and 32 GiB of RAM using:
-> > > 
-> > >   qemu-system-aarch64 -smp 8 -m 32G \
-> > >     -machine virt,accel=kvm,gic-version=3,virtualization=on \
-> > >     -cpu host -nographic -enable-kvm \
-> > >     -drive if=pflash,format=raw,readonly=on,file=pflash0_bak.img \
-> > >     -drive if=pflash,format=raw,file=pflash1_bak.img \
-> > >     -drive file=./ubuntu-vm.qcow2,format=qcow2,if=virtio,cache=none,aio=native \
-> > >     -nic user,model=virtio-net-pci,hostfwd=tcp::11234-:22 \
-> > >     -serial mon:stdio
-> > > 
+> 
+> 
+> On 9/3/26 9:28 PM, Wei-Lin Chang wrote:
+> > On Thu, Sep 03, 2026 at 08:43:35AM +0100, Marc Zyngier wrote:
+> >> On Wed, 02 Sep 2026 17:35:00 +0100,
+> >> Wang Han <wanghan@linux.alibaba.com> wrote:
+> >>> 
+> >>> Hi Wei-Lin,
+> >>> 
+> >>> I tested this series on a Yitian 710 system with an ARM Neoverse-N2 CPU
+> >>> (128 CPUs, 2 NUMA nodes).
+> >>> 
+> >>> Test environment
+> >>> ----------------
+> >>> 
+> >>>    L0 kernel: Linux v7.2-rc6
+> >>>    L1 guest: Ubuntu 26.04 LTS, kernel 7.0.0-27-generic (aarch64)
+> >>>    QEMU: 10.2.3
+> >>> 
+> >>> L0 NUMA balancing was enabled (`/proc/sys/kernel/numa_balancing=1`).
+> >>> The host was booted with `kvm_arm.mode=nested`.
+> >>> 
+> >>> This series fixes a functional hang that is exposed when NUMA balancing is
+> >>> enabled.  The previous nested stage-2 unmap path is too slow for this
+> >>> workload, making the performance problem user-visible: NUMA balancing can
+> >>> leave the L1 guest unable to make progress and eventually hang during boot.
+> >>> 
+> >>> The L1 was started with 8 vCPUs and 32 GiB of RAM using:
+> >>> 
+> >>>    qemu-system-aarch64 -smp 8 -m 32G \
+> >>>      -machine virt,accel=kvm,gic-version=3,virtualization=on \
+> >>>      -cpu host -nographic -enable-kvm \
+> >>>      -drive if=pflash,format=raw,readonly=on,file=pflash0_bak.img \
+> >>>      -drive if=pflash,format=raw,file=pflash1_bak.img \
+> >>>      -drive file=./ubuntu-vm.qcow2,format=qcow2,if=virtio,cache=none,aio=native \
+> >>>      -nic user,model=virtio-net-pci,hostfwd=tcp::11234-:22 \
+> >>>      -serial mon:stdio
+> >>> 
+> >> 
+> >> Puzzling. If you are only running an L1 in VHE mode, there is no
+> >> shadow S2, and therefore nothing to unmap. For shadow S2s to be built
+> >> and affect the MMU notifiers, you need to run an L2.
 > > 
-> > Puzzling. If you are only running an L1 in VHE mode, there is no
-> > shadow S2, and therefore nothing to unmap. For shadow S2s to be built
-> > and affect the MMU notifiers, you need to run an L2.
+> > I was thinking the same at first, but realized even with L1 in VHE mode
+> > there is a small period of time where L1 runs in its EL1 during boot, so
+> > one nested MMU will become valid for each vCPU. That causes
+> > kvm_nested_s2_unmap() to iterate through the entire IPA space 8 times
+> > (-smp 8).
+> > 
+> > What I am curious about is whether one single notifier unmap is enough
+> > to hang L1, or were there multiple notifier unmaps.
+> > 
+> > QEMU with -machine virt uses 40 IPA bits only, unmapping that takes:
+> > 1024  (4KB pages,  unmapping 1GB per iteration)
+> > 32768 (16KB pages, unmapping 32MB per iteration)
+> > 2048  (64KB pages, unmapping 512MB per iteration)
+> > iterations for each page size. There aren't many mappings in each
+> > iteration too. Does this really take that long on real hardware (even if
+> > this must be done 8 times)?
+> > 
+> > Thanks,
+> > Wei-Lin Chang
+> > 
+> >> 
+> >> So what are your actual test conditions?
+> >> 
+> >> 	M.
+> >> 
 > 
-> I was thinking the same at first, but realized even with L1 in VHE mode
-> there is a small period of time where L1 runs in its EL1 during boot, so
-> one nested MMU will become valid for each vCPU. That causes
-> kvm_nested_s2_unmap() to iterate through the entire IPA space 8 times
-> (-smp 8).
-
-It should be one nested MMU for the whole VM, not one per vcpu.
-That's assuming they share the same VMID+VTCR.
-
-> What I am curious about is whether one single notifier unmap is enough
-> to hang L1, or were there multiple notifier unmaps.
+> Hi, Wei-Lin and Marc,
 > 
-> QEMU with -machine virt uses 40 IPA bits only, unmapping that takes:
-> 1024  (4KB pages,  unmapping 1GB per iteration)
-> 32768 (16KB pages, unmapping 32MB per iteration)
-> 2048  (64KB pages, unmapping 512MB per iteration)
-> iterations for each page size. There aren't many mappings in each
-> iteration too. Does this really take that long on real hardware (even if
-> this must be done 8 times)?
+> I was able to reproduce this issue and capture ftrace evidence that confirms
+> the root cause. Below is the analysis, trace log, and timing data.
 
-This should be close to being at zero cost, so something else is
-amiss.
+[...]
 
-Could you please have a look?
+> Each set_migration_pte line is a single-page NUMA migration. Yet each
+> migration triggers one full kvm_nested_s2_unmap() that takes 877 ms.
+
+And why is it taking so long? It should be *empty* after the first
+iteration.
+
+[...]
+
+> ## Conclusion
+> 
+> The root cause is confirmed: kvm_nested_s2_unmap() performs a full IPA space
+> unmap in the MMU notifier path instead of unmapping only the affected
+> GPA/CPAI range. The interval-tree-based precise range unmap approach is the
+> right fix.
+
+No. This just indicates that this is papering over a bigger problem,
+and your AI is jumping to conclusions.
+
+> Please consider applying the patch that replaces the full unmap with
+> kvm_nested_unmap_cipa_range() to avoid scanning the entire nested stage-2
+> page table on every NUMA migration.
+
+Not until we get to the bottom of this issue.
 
 	M.
 
