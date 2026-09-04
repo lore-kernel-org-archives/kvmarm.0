@@ -1,150 +1,76 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 327ED51C32A;
-	Fri,  4 Sep 2026 18:11:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33E1A3F0ABB;
+	Fri,  4 Sep 2026 19:30:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788545468; cv=none; b=s1PqybQ4vdGZZWagYzIOiNLrLAbOLQ5XhaTTnwAkVDa46YIlBNVaKOSO3Yu48tISj4fR1MrtAg5TKLkI7ZmIps9Ny3xC9hnHbjq3tE5wPcXBoDVXm3YSqcPOVpjaG9Twera462db47+QIKw+/UelFXDLslZaFy1BG1HEI92Ce5Q=
+	t=1788550214; cv=none; b=f5FPJy8/N+6nmBWpsOSxydeIuOnnmXwMCsYXmgOnpzntVT7qA0/IiUAXqGVcr4Ao+yv/p08nBNcXPnUhCTu0tN5d6s6I5Y8c8ZvKfKWid733Lm5GjAa3ExduSRRy5Idqd78lyswYetbLjuUJXAWAEHJjQeq91olDBXTD8cvlUDU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788545468; c=relaxed/simple;
-	bh=EapvxWNWy6tZzPP+ivrKYRudkb+Lrq4EpETndZMPegw=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=styjc/DO/v5FVv3S+k1KYhrZPgaq2g15NYYdo/coR6+GmeBPMi1sqwtI6Jhk6swTvHFogAcnHXFvbs6RJumAVFWTco8lgj3DEaRKH4AS2+7uGHR6dYZtI9b42opi1uZNErQck3Ejo0AzJB3wXi8U1Y7eCEr6iMP2PLO7XW0nL6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dtii09kC; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788550214; c=relaxed/simple;
+	bh=L5xdWyhhEkT68Y92M4hUoXa3BEgmRj9nUDWReYu4rjM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JaGQPiqA2ee3Y90gh3rOqzU+wNwczquiqZrups+YGYsZ6YZ9D4c5CVwSJ1NXFF4Hw6VY85CIpnhzuyKtaaMjVkseUkU6xamlv2lRtkV2krGqJFS7HHJoCuWEolX2AUXBU6e3VXFoBMhxgwmnXOlZdVdOgHqzd3ESQmDvlwN69Uw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=mYVblt/m; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dtii09kC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B25871F00A3D;
-	Fri,  4 Sep 2026 18:11:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788545465;
-	bh=VlM/auzmbD799O66sL928/awy9S44nY91MSnPD26CiM=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=dtii09kCO5JiA2Wj7zXVZ8/qfsXSuaYIwUG3TCB1ozImlwEFS/HGhMsXfXRpBBWfc
-	 o1uTWJvMniNsqpD0uJicTZUFkf3mMWCxR61b4mDd4OQAHFtaJrbc2M83tb8Ba8bDzl
-	 ePHGvd5GUu+1e5MfW3kJrhQ4qLAUkh7tyunLp0WHDw2L3KI65cvBTnP6DSQByHfdLv
-	 TnY52n8ynV1OSAacUCjyt+w3glaQTkift0IPa4Y2rHhDUJeiDBLWMswi/sTGK4u/nu
-	 ZWFslKK9KL5aExMp5qF5O9rbokDG2MQJFOiA4jzvMAKQty/YeBG1+tRMvpGvhMpkqH
-	 6TzICjIaZn2YA==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2 3/4] KVM: selftests: Test steal time across vCPU pid
- changes on x86
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Dongli Zhang" <dongli.zhang@oracle.com>
-Cc: kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, kvm@vger.kernel.org, "Oliver
- Upton" <oupton@kernel.org>
-In-Reply-To: <20260904175550.430266-4-dongli.zhang@oracle.com>
-References: <20260904175550.430266-1-dongli.zhang@oracle.com>
- <20260904175550.430266-4-dongli.zhang@oracle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 04 Sep 2026 18:11:03 +0000
-Message-Id: <20260904181104.B25871F00A3D@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="mYVblt/m"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=bvMB2U+mHvhYmKOUk84q4l4veB5CHun/Nhwbht5t0VQ=; b=mYVblt/mAAyra51VokhjYJJ8+R
+	Hv9sXtOe4/wUH4oTSqF3FhDvJRum1cEQIwK7YL182MN8nPu4hHW6Sp3Qy2iVYUL2PIN3GgUDIrbeF
+	RDKNBZ/7dsR7X+b6Muba4/D2gSaOJypIjLrv1t9lI39FUDjeykIG5HkyQFD9aV71JCCI=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1x2Zbr-0034X3-H7; Fri, 04 Sep 2026 21:29:59 +0200
+Date: Fri, 4 Sep 2026 21:29:59 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Hemanth Selam <hemanth.selam@gmail.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH 3/3] arm64: kvm: fix repeated word 'is' in comment
+Message-ID: <6e2ccf7b-f9c3-42ca-9d10-5a3a8819cf7a@lunn.ch>
+References: <20260904122445.31163-1-hemanth.selam@gmail.com>
+ <20260904122445.31163-4-hemanth.selam@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260904122445.31163-4-hemanth.selam@gmail.com>
 
-Thank you for your contribution! Sashiko AI review found 2 potential issue(=
-s) to consider:
-- [Medium] The delay accumulation loop can hang indefinitely because the ba=
-ckground thread uses a fixed wall-clock timeout instead of synchronizing wi=
-th the main thread.
-- [Medium] Unchecked return values from pthread APIs lead to undefined beha=
-vior and potential test hangs.
---
+On Fri, Sep 04, 2026 at 05:54:42PM +0530, Hemanth Selam wrote:
+> Drop the second 'is', reported by checkpatch.pl as a possible repeated
+> word.  Only touches a comment, no code changes.
 
-commit 4093ded4f0187a7d185578eeea38cf167b09f1d2
-Author: Dongli Zhang <dongli.zhang@oracle.com>
+I hope you are really looking at the sentence, understanding the
+sentence, and then modifying the sentence based on your understanding,
+not just removing the duplicate to make checkpatch happy.
 
-KVM: selftests: Test steal time across vCPU pid changes on x86
+You really do need to engage brain.
 
-This commit adds a selftest to verify that KVM correctly resets steal-time
-accounting when a vCPU is run from a new host thread. It creates a backgrou=
-nd
-thread to accumulate run delay and checks if the steal time remains monoton=
-ic
-across PID changes.
+You also should consider that this checkpatch warning has been around
+a while. Many of the real problems have already been fixed, so there
+is probably a high false positive rate for this check. So you need to
+be extra careful, or you are going to make things worse, not better.
 
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/steal_time_change_pid.c
-> @@ -0,0 +1,162 @@
-[ ... ]
-> +static void *do_steal_time(void *arg)
-> +{
-> +	struct timespec ts, stop;
-> +
-> +	clock_gettime(CLOCK_MONOTONIC, &ts);
-> +	stop =3D timespec_add_ns(ts, MIN_RUN_DELAY_NS);
-> +
-> +	while (timespec_to_ns(timespec_sub(ts, stop)) < 0)
-> +		clock_gettime(CLOCK_MONOTONIC, &ts);
+"The the in this sentence is the subject."
 
-[Severity: Medium]
-Does this background thread rely on a fixed wall-clock timeout instead of
-synchronizing with the main thread's delay accumulation?
+If you looked back in the archives maybe a month, there was somebody
+who get flamed for getting this sort of checkpatch fixup badly wrong.
 
-If scheduler interleaving allows the main thread to run during this window,
-its accumulated run delay will be strictly less than MIN_RUN_DELAY_NS when
-this thread exits. Once this thread exits, CPU 0 becomes uncontended and
-the main thread's delay accumulation loop will hang indefinitely.
-
-> +
-> +	return NULL;
-> +}
-[ ... ]
-> +int main(void)
-> +{
-> +	struct kvm_vcpu *vcpu;
-> +	struct kvm_vm *vm;
-> +	pthread_attr_t attr;
-> +	pthread_t thread;
-> +	cpu_set_t cpuset;
-> +	long run_delay;
-> +	long run_delay_delta;
-> +
-> +	ksft_print_header();
-> +	ksft_set_plan(1);
-> +
-> +	CPU_ZERO(&cpuset);
-> +	CPU_SET(0, &cpuset);
-> +	pthread_attr_init(&attr);
-> +	pthread_attr_setaffinity_np(&attr, sizeof(cpuset), &cpuset);
-> +	pthread_setaffinity_np(pthread_self(), sizeof(cpuset), &cpuset);
-
-[Severity: Medium]
-If this pthread_setaffinity_np call fails (for example, if CPU 0 is not in
-the allowed task mask), could the threads run on different CPUs? This would
-prevent the main thread from ever accumulating runqueue wait time, causing =
-it
-to hang forever in the sched_yield loop.
-
-[ ... ]
-> +	run_delay =3D get_run_delay();
-> +	pthread_create(&thread, &attr, do_steal_time, NULL);
-
-[Severity: Medium]
-If pthread_create fails due to resource limits, will the thread variable
-remain uninitialized?=20
-
-> +
-> +	while (get_run_delay() - run_delay < MIN_RUN_DELAY_NS)
-> +		sched_yield();
-
-[Severity: Medium]
-As mentioned above, if do_steal_time exits before MIN_RUN_DELAY_NS is
-accumulated by the main thread, does this spinloop hang permanently because
-the background thread is no longer consuming CPU time?
-
-> +
-> +	pthread_join(thread, NULL);
-
-[Severity: Medium]
-If the thread variable is uninitialized due to a prior pthread_create
-failure, does passing it unconditionally to pthread_join invoke undefined
-behavior?
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260904175550.4302=
-66-1-dongli.zhang@oracle.com?part=3D3
+    Andrew
