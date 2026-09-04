@@ -1,208 +1,92 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE5CD30EF86;
-	Fri,  4 Sep 2026 13:45:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 014E43EDE43;
+	Fri,  4 Sep 2026 13:54:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788529559; cv=none; b=B8xpDELvKYunSgyGNIXf9jjGNsSMbdgf4/07+g2kXhfMIs3NfiJZTxX4Ya0vUh9xv+H3VStZXkqkM9appI9424dofIInOlB05Ur8eyegwo8McC2KcgG2f34yytbGB1vY4kbaL3rSxl6xP3kzZKX5f5NBQQ1d6Ze7cDpOgt2oaHk=
+	t=1788530057; cv=none; b=ewgJhaHRbyo/msc37pABCfBK9Zdx21GmpQBllYVIa6w6Uea3fdU6gBQblrAHl++KWdV3V0HJRrkFHiMJYHZ5m9BIb53EafiPwNZSK/te1J+b38qr2lfva6TwGee1ZDJbgLHkCTD4hgAK9E117bcuwJ5CMdfhr5u3Ft6ydMSnacc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788529559; c=relaxed/simple;
-	bh=uBILfIAE4wAXjKxPSimgi2IVaLLcdAzi0ERSqo59Sy4=;
+	s=arc-20240116; t=1788530057; c=relaxed/simple;
+	bh=7MnOCOoccYNN9liJj+oDsXMNgtsf8zUHVcY4BoPfYKI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u/GyDHItvC2rj8xa3O4tctVXT2UuzhUqLl2JyYa/DcARkWgvHEy33i2/A1L6Z8bKbXcDcrczUAicZwtZGEXkvag5mO5woSuZLomZy2Km71NNkftIB/7CntzA8S8UUHta6RJ7W6jkIdFKUOR9kfjutM9cvt327VUmlxPwTUKP52Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=mSHPHHSf; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ogu1Bz870h+gRWqO9epE+SLmWTpzfEAS+Gy43CoOQpeuenohJTlzpOjY94xnwd8SS+EQk63gWABTOh/uZIdWTS33VVJDiTy4EnNEGEumRXNoMjxIkf1Klr2zQAMZFTTSojLPF82QvsCEHLwdKFdJ2DslqtetLwwn0ABDqckVIkE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mm9Z5z9y; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="mSHPHHSf"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 79556152B;
-	Fri,  4 Sep 2026 06:45:51 -0700 (PDT)
-Received: from e140010.arm.com (unknown [10.57.70.12])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 78D3B3F7D8;
-	Fri,  4 Sep 2026 06:45:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1788529555; bh=uBILfIAE4wAXjKxPSimgi2IVaLLcdAzi0ERSqo59Sy4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mSHPHHSfAXofkS3WNmrj1OpVV/ph9/XvcUR9HtIwLk6cThoT0KQLRDbLYIsLQVDEZ
-	 fJPYKbd1sMNvwVJzLTu6lmvYT7jWwKma0XfkjK3V3/cjR1nMNPt3rLZFOCn9//k+VF
-	 uRmSh02XndknZBpr6voZ4hz9N3qJIUVXQ8kz7wxc=
-Date: Fri, 4 Sep 2026 14:45:49 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: sashiko-reviews@lists.linux.dev
-Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
-	linux-perf-users@vger.kernel.org, Oliver Upton <oupton@kernel.org>
-Subject: Re: [RFC PATCH v7 20/28] KVM: arm64: Allow guest SPE physical
- timestamps only if kernel allows it
-Message-ID: <aprLjUt5i4FD4GHz@e140010.arm.com>
-References: <20260903160623.315525-1-alexandru.elisei@arm.com>
- <20260903160623.315525-21-alexandru.elisei@arm.com>
- <20260903164858.E55DC1F000E9@smtp.kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mm9Z5z9y"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D5C51F00A3D;
+	Fri,  4 Sep 2026 13:54:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788530055;
+	bh=7MnOCOoccYNN9liJj+oDsXMNgtsf8zUHVcY4BoPfYKI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=mm9Z5z9yzbdEbPnHuhM4YdBzxDvSpMOpAViKv7ZilL88h+7bYAlw9C2LataeP+rsV
+	 wEs5o9UpuY7q5lW0EkKcQ+SxXMDaW+E6LDbsLxQytYjCWJpi05nTq5lj4zIYT43DmV
+	 iZImGxwyJYChrCuuccYOBMF0VAx5UtC9ynNXwraE0mvYuk12nWEgwUIDIPBhnFCT1S
+	 re9GeK3EomXHmqMWg0lXfuHuxTA9Jrkl9bFlbt4wF9FrRp0ivEiuwo61krFVbDsCs5
+	 koHpAkAC0WsBoW4xVE3VaPjCbuKpPIYJzhK1/lKI7ZmkNjbh9xIdgYiE3oAi93sXmy
+	 2fj9OvzyRVePg==
+Received: by traversing.sirena.org.uk (Postfix, from userid 1000)
+	id CD82FD8C0E3; Fri, 04 Sep 2026 14:53:27 +0100 (BST)
+Date: Fri, 4 Sep 2026 14:53:27 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Will Deacon <will@kernel.org>, Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] KVM: arm64: Enable S1PIE for nVHE and hVHE
+Message-ID: <aprNV2HLQL9ByIcy@sirena.org.uk>
+References: <20260904-kvm-arm64-nvhe-pie-v1-0-29d59f245e6c@kernel.org>
+ <20260904-kvm-arm64-nvhe-pie-v1-2-29d59f245e6c@kernel.org>
+ <86pkyt4gvt.wl-maz@kernel.org>
+ <eb788ad5-5bb3-4767-87b8-d35d9e3ab220@sirena.org.uk>
+ <apqrky27mJmUV9UA@willie-the-truck>
+ <05f1e2f4-173a-4226-8c98-1452c20f0a47@sirena.org.uk>
+ <87y0dh40bv.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="21/OxgG6ehADjl2k"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260903164858.E55DC1F000E9@smtp.kernel.org>
+In-Reply-To: <87y0dh40bv.wl-maz@kernel.org>
+X-Cookie: Orders subject to approval.
 
-Hi Sashiko,
 
-On Thu, Sep 03, 2026 at 04:48:58PM +0000, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 4 potential issue(s) to consider:
-> - [High] Inverted logic for `perf_allow_kernel()` grants physical timestamps to unprivileged users and denies them to privileged users.
-> - [High] Capability check `perf_allow_kernel()` is evaluated at `KVM_RUN` time (TOCTOU) instead of VM/VCPU configuration time.
-> - [Medium] Silently-on guest-visible feature (SPE physical timestamps) breaks live migration and violates subsystem guidelines.
-> - [Medium] Concurrent first `KVM_RUN` invocations on multiple vCPUs cause a data race on the VM-wide `kvm_spe->guest_pmscr_el2`.
-> --
-> 
-> commit 8640bfaf0b943972e8c97350b961b39b15830f1b
-> Author: Alexandru Elisei <alexandru.elisei@arm.com>
-> 
-> KVM: arm64: Allow guest SPE physical timestamps only if kernel allows it
-> 
-> The SPE driver allows userspace to use physical timestamps for records only
-> if the kernel allows it, do the same for a virtual machine.
-> 
-> [ ... ]
-> 
-> > diff --git a/arch/arm64/kvm/hyp/vhe/spe-sr.c b/arch/arm64/kvm/hyp/vhe/spe-sr.c
-> > index 978620ad99fa5..3c32a1338cc8d 100644
-> > --- a/arch/arm64/kvm/hyp/vhe/spe-sr.c
-> > +++ b/arch/arm64/kvm/hyp/vhe/spe-sr.c
-> 
-> [ ... ]
-> 
-> > @@ -120,10 +121,10 @@ void __kvm_spe_restore_guest_state_vhe(struct kvm_vcpu *vcpu, struct kvm_cpu_con
-> >  		write_sysreg_s(pmbsr, SYS_PMBSR_EL1);
-> >  	}
-> >  
-> > -	__kvm_spe_restore_sampling_regs(vcpu->kvm, guest_ctxt);
-> > +	__kvm_spe_restore_sampling_regs(kvm, guest_ctxt);
-> >  
-> >  	write_sysreg_el1(ctxt_sys_reg(guest_ctxt, PMSCR_EL1), SYS_PMSCR);
-> > -	write_sysreg_el2(0, SYS_PMSCR);
-> > +	write_sysreg_el2(kvm->arch.kvm_spe.guest_pmscr_el2, SYS_PMSCR);
-> 
-> [Severity: Medium]
-> Can this read of kvm->arch.kvm_spe.guest_pmscr_el2 race with a concurrent
-> write from another vCPU?
+--21/OxgG6ehADjl2k
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Yes, it can.
+On Fri, Sep 04, 2026 at 02:23:32PM +0100, Marc Zyngier wrote:
 
-> 
-> If multiple vCPUs are starting their first KVM_RUN, one vCPU might complete
-> kvm_arch_vcpu_run_pid_change(), proceed to enter the guest, and execute
-> __kvm_spe_restore_guest_state_vhe(), reading guest_pmscr_el2.
-> 
-> Because kvm_spe_vcpu_first_run_init() performs unlocked writes to this
-> shared VM-wide variable, another vCPU could be modifying it at the same
-> time. Should this use READ_ONCE() and WRITE_ONCE() to prevent LKMM
-> violations and KCSAN data race splats?
+> KVM with E2H==0 has reached its architectural peak years ago. We're
+> not adding anything to it anymore, and all new architectural bits
+> require running with E2H==1.
 
-See below.
+OK, so you're OK with a hVHE only version of this then?
 
-> 
-> >  }
-> >  NOKPROBE_SYMBOL(__kvm_spe_restore_guest_state_vhe);
-> >  
-> > diff --git a/arch/arm64/kvm/spe.c b/arch/arm64/kvm/spe.c
-> > index af1e19cb8e9ae..68b751bdb384b 100644
-> > --- a/arch/arm64/kvm/spe.c
-> > +++ b/arch/arm64/kvm/spe.c
-> 
-> [ ... ]
-> 
-> > @@ -97,6 +99,12 @@ int kvm_spe_vcpu_first_run_init(struct kvm_vcpu *vcpu)
-> >  	if (!kvm_spe->pmblimitr_el1_res0_mask)
-> >  		kvm_spe_compute_pmblimitr_el1_res0_mask(kvm);
-> >  
-> > +	if (kvm_vm_has_ran_once(kvm))
-> > +		return 0;
-> > +
-> > +	if (perf_allow_kernel())
-> > +		kvm_spe->guest_pmscr_el2 = PMSCR_EL2_PCT_PHYS;
-> 
-> [Severity: High]
-> Does this logic invert the intended permission check?
-> 
-> The perf_allow_kernel() function returns 0 on success (access granted) and
-> a negative error code (like -EACCES) on failure. By evaluating to true when
-> access is denied, it seems we might be granting physical timestamps to
-> unprivileged users and incorrectly denying them to privileged users.
+--21/OxgG6ehADjl2k
+Content-Type: application/pgp-signature; name="signature.asc"
 
-That's correct, I assumed from the name that perf_allow_kernel() simply performs
-a permission check and returns true if perf is allowed to profile the kernel.
+-----BEGIN PGP SIGNATURE-----
 
-I'll be changing it to:
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmqazVIACgkQJNaLcl1U
+h9Biugf/eVNsyfMbo8kEv74/T0H2F1alqOYWFZhkSjSESmjQpgaVM6aBPxcpl5Vr
+ISD4qEFjzVB6IkpZHkDHuI15y/5Psk/27dIuT8iU3yz0eMWv5nQkVDFSwVgj4x4i
+GCpIKfx+VcMogifojtAxoKlXjIBYgjYGryM9LooxH4/Xea/J7dpEyMge+HDQhVtp
+kJOy7mhpTdu9y+UFEj6g2PN5zSXJHzMbsWWcnbqF+Lp8O6m8NC1Z++4S7cLUaygF
+tlW/Umd4bqA/1Rq3d4gTFoaHhhHs2Bnr+02vJ1dOBGW+8C0uK92MtFvEyUrritWu
+qsHkzSB/NQQHri54914dhFyB3B+4kA==
+=u0ZY
+-----END PGP SIGNATURE-----
 
-	if (!perf_allow_kernel())
-		kvm_spe->guest_pmscr_el2 = PMSCR_EL2_PCT_PHYS;
-
-(I remember fixing it locally, I guess I got confused about the name a second
-time).
-
-> 
-> [Severity: High]
-> Is kvm_spe_vcpu_first_run_init() the right place to check these
-> capabilities?
-> 
-> Checking perf_allow_kernel() here means it is evaluated during the KVM_RUN
-> ioctl, rather than during VM configuration. VMMs typically configure VMs
-> with full privileges but drop privileges before executing KVM_RUN for
-> sandboxing. Checking at KVM_RUN time will incorrectly deny physical
-> timestamps to properly sandboxed VMMs.
-> 
-> Furthermore, an unprivileged process could configure a VM and pass the vCPU
-> file descriptor to a privileged process, improperly gaining access to
-> physical timestamps using the privileged thread's capabilities.
-
-Sure, I can set the VM-wide PMSCR_EL2 value the first time the SPE PMU instance
-is assigned. Or maybe when KVM_ARM_VCPU_INIT is first called. I'll think about
-what is the best approach.
-
-> 
-> [Severity: Medium]
-> Could silently enabling SPE physical timestamps based on the host kernel
-> break live migration?
-> 
-> If a VM is migrated from a host where perf_allow_kernel() grants access to
-> one where it denies it, the guest would silently downgrade to virtual
-> timestamps, causing data corruption in the profiling trace.
-> 
-> The KVM guidelines require that new behavior the guest can observe must be
-> off by default and explicitly enabled through standard capability
-> negotiation (like a KVM_CAP_* or ID register flag). Should this require an
-> explicit opt-in from userspace instead?
-
-I think a better approach would be to update the documentation to let the
-system administrator know that the VM configuration depends on perf being
-allowed to profile the kernel, and it should be the same on the source and
-destination in the case of migration.
-
-> 
-> [Severity: Medium]
-> Can this write to kvm_spe->guest_pmscr_el2 happen concurrently across
-> multiple vCPUs?
-
-It can, should be fixed with the above approach.
-
-Thanks,
-Alex
-
-> 
-> The kvm_vm_has_ran_once(kvm) flag is not set until the end of
-> kvm_arch_vcpu_run_pid_change(), which happens after
-> kvm_spe_vcpu_first_run_init() completes. If multiple vCPUs start their
-> first KVM_RUN concurrently, they will all see kvm_vm_has_ran_once(kvm) as
-> false and write to this shared variable without synchronization.
-> 
-> > +
-> >  	return 0;
-> >  }
-> >
-> 
-> -- 
-> Sashiko AI review · https://sashiko.dev/#/patchset/20260903160623.315525-1-alexandru.elisei@arm.com?part=20
+--21/OxgG6ehADjl2k--
