@@ -1,112 +1,208 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D342347DD54;
-	Fri,  4 Sep 2026 13:45:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE5CD30EF86;
+	Fri,  4 Sep 2026 13:45:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788529548; cv=none; b=iupU6oP//xkGDsCk84EmXkjnU438mjKJ8ZANHBfdJm0ULJMDBxd8X07STxbABAJc3oUUaajjb5nTUbkME4zp7q7nqkmY2VrZiqUyvrperR4NKC+MwwNF6beNTB5jd3jFOcAg5/I1SrXXJ1yL5P1Be4InZdzeUADPAPiAIIgDfgg=
+	t=1788529559; cv=none; b=B8xpDELvKYunSgyGNIXf9jjGNsSMbdgf4/07+g2kXhfMIs3NfiJZTxX4Ya0vUh9xv+H3VStZXkqkM9appI9424dofIInOlB05Ur8eyegwo8McC2KcgG2f34yytbGB1vY4kbaL3rSxl6xP3kzZKX5f5NBQQ1d6Ze7cDpOgt2oaHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788529548; c=relaxed/simple;
-	bh=x0A1kB72ZpUPDKdBQWyRDq4/HRBE+lO3fb6GPu8hn1w=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=aV1lgsYo36FPWhJYRo4XzQYD/FtDvnlqPlh7q2vCrIpbV4H6AKyQcFeyZ+uX0hE0GuQCzpcGRGaOrVdS8Xiwhqm2uN7G7tDm9cKnpSde7Vvknid72v7v87e2Ur4rpqzzwMlsf7h9yyydITvV9dJJlJGA8yXgI9dyPfkZtBmwxtg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=db9pWl9R; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788529559; c=relaxed/simple;
+	bh=uBILfIAE4wAXjKxPSimgi2IVaLLcdAzi0ERSqo59Sy4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=u/GyDHItvC2rj8xa3O4tctVXT2UuzhUqLl2JyYa/DcARkWgvHEy33i2/A1L6Z8bKbXcDcrczUAicZwtZGEXkvag5mO5woSuZLomZy2Km71NNkftIB/7CntzA8S8UUHta6RJ7W6jkIdFKUOR9kfjutM9cvt327VUmlxPwTUKP52Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=mSHPHHSf; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="db9pWl9R"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2561F1F00A3D;
-	Fri,  4 Sep 2026 13:45:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788529546;
-	bh=CEN3eHGG8a4J8rPb3syRCgQ4tzK/RBznwyDvY1psSjI=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=db9pWl9RpjbBtlHsQY7OF8v12D2k0weK5fTMTPFRdUTgU65DCU+SCUll21QB8kFA9
-	 WrCKmMeRcgG4zVR5B7BiSlG4cgGuf1fZBjZRdjjvqz9H/TbFRtoTmE6iJXg7W9zJmZ
-	 8LZ5zvW8eQ2DHKZqfbSE0IJFyrp3AWVQyAPmDCb+pEHdobcaNk+0gkpzBndQhhYaSY
-	 1nYq32K173oJnF5iBAwHDCMhvK9zZ6WKGzyV8SY9B5vBW8cpJvhlpVCxezhsycPna/
-	 zGX3PN935/VwhZ8rxYWK3vSmNUXyCgaOg8jPvSesep39q0QobUTB4UXiicKJJ7vvMa
-	 ejDjFgxIT6H6Q==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v6 35/49] KVM: arm64: gic-v5: Implement save/restore
- mechanisms for ISTs
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Sascha Bischoff" <Sascha.Bischoff@arm.com>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260904113404.4051341-36-sascha.bischoff@arm.com>
-References: <20260904113404.4051341-1-sascha.bischoff@arm.com>
- <20260904113404.4051341-36-sascha.bischoff@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 04 Sep 2026 13:45:45 +0000
-Message-Id: <20260904134546.2561F1F00A3D@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="mSHPHHSf"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 79556152B;
+	Fri,  4 Sep 2026 06:45:51 -0700 (PDT)
+Received: from e140010.arm.com (unknown [10.57.70.12])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 78D3B3F7D8;
+	Fri,  4 Sep 2026 06:45:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1788529555; bh=uBILfIAE4wAXjKxPSimgi2IVaLLcdAzi0ERSqo59Sy4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=mSHPHHSfAXofkS3WNmrj1OpVV/ph9/XvcUR9HtIwLk6cThoT0KQLRDbLYIsLQVDEZ
+	 fJPYKbd1sMNvwVJzLTu6lmvYT7jWwKma0XfkjK3V3/cjR1nMNPt3rLZFOCn9//k+VF
+	 uRmSh02XndknZBpr6voZ4hz9N3qJIUVXQ8kz7wxc=
+Date: Fri, 4 Sep 2026 14:45:49 +0100
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: sashiko-reviews@lists.linux.dev
+Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
+	linux-perf-users@vger.kernel.org, Oliver Upton <oupton@kernel.org>
+Subject: Re: [RFC PATCH v7 20/28] KVM: arm64: Allow guest SPE physical
+ timestamps only if kernel allows it
+Message-ID: <aprLjUt5i4FD4GHz@e140010.arm.com>
+References: <20260903160623.315525-1-alexandru.elisei@arm.com>
+ <20260903160623.315525-21-alexandru.elisei@arm.com>
+ <20260903164858.E55DC1F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260903164858.E55DC1F000E9@smtp.kernel.org>
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [High] KVM fails to validate that restored pending LPIs have a valid IntI=
-D (>=3D 8192), allowing userspace to inject out-of-range LPIs into the hard=
-ware.
---
+Hi Sashiko,
 
-commit f80500170eda967b08d4456f691f187bea6f8d97
-Author: Sascha Bischoff <Sascha.Bischoff@arm.com>
+On Thu, Sep 03, 2026 at 04:48:58PM +0000, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 4 potential issue(s) to consider:
+> - [High] Inverted logic for `perf_allow_kernel()` grants physical timestamps to unprivileged users and denies them to privileged users.
+> - [High] Capability check `perf_allow_kernel()` is evaluated at `KVM_RUN` time (TOCTOU) instead of VM/VCPU configuration time.
+> - [Medium] Silently-on guest-visible feature (SPE physical timestamps) breaks live migration and violates subsystem guidelines.
+> - [Medium] Concurrent first `KVM_RUN` invocations on multiple vCPUs cause a data race on the VM-wide `kvm_spe->guest_pmscr_el2`.
+> --
+> 
+> commit 8640bfaf0b943972e8c97350b961b39b15830f1b
+> Author: Alexandru Elisei <alexandru.elisei@arm.com>
+> 
+> KVM: arm64: Allow guest SPE physical timestamps only if kernel allows it
+> 
+> The SPE driver allows userspace to use physical timestamps for records only
+> if the kernel allows it, do the same for a virtual machine.
+> 
+> [ ... ]
+> 
+> > diff --git a/arch/arm64/kvm/hyp/vhe/spe-sr.c b/arch/arm64/kvm/hyp/vhe/spe-sr.c
+> > index 978620ad99fa5..3c32a1338cc8d 100644
+> > --- a/arch/arm64/kvm/hyp/vhe/spe-sr.c
+> > +++ b/arch/arm64/kvm/hyp/vhe/spe-sr.c
+> 
+> [ ... ]
+> 
+> > @@ -120,10 +121,10 @@ void __kvm_spe_restore_guest_state_vhe(struct kvm_vcpu *vcpu, struct kvm_cpu_con
+> >  		write_sysreg_s(pmbsr, SYS_PMBSR_EL1);
+> >  	}
+> >  
+> > -	__kvm_spe_restore_sampling_regs(vcpu->kvm, guest_ctxt);
+> > +	__kvm_spe_restore_sampling_regs(kvm, guest_ctxt);
+> >  
+> >  	write_sysreg_el1(ctxt_sys_reg(guest_ctxt, PMSCR_EL1), SYS_PMSCR);
+> > -	write_sysreg_el2(0, SYS_PMSCR);
+> > +	write_sysreg_el2(kvm->arch.kvm_spe.guest_pmscr_el2, SYS_PMSCR);
+> 
+> [Severity: Medium]
+> Can this read of kvm->arch.kvm_spe.guest_pmscr_el2 race with a concurrent
+> write from another vCPU?
 
-KVM: arm64: gic-v5: Implement save/restore mechanisms for ISTs
+Yes, it can.
 
-This commit introduces the ability to save and restore Interrupt State Tabl=
-es
-(ISTs) for SPIs and LPIs in a GICv5 VM. Userspace provides migration storage
-via KVM_DEV_ARM_VGIC_GRP_IST, and KVM handles copying the state between the
-GICv5 hardware and these buffers while ensuring the VM remains quiesced.
+> 
+> If multiple vCPUs are starting their first KVM_RUN, one vCPU might complete
+> kvm_arch_vcpu_run_pid_change(), proceed to enter the guest, and execute
+> __kvm_spe_restore_guest_state_vhe(), reading guest_pmscr_el2.
+> 
+> Because kvm_spe_vcpu_first_run_init() performs unlocked writes to this
+> shared VM-wide variable, another vCPU could be modifying it at the same
+> time. Should this use READ_ONCE() and WRITE_ONCE() to prevent LKMM
+> violations and KCSAN data race splats?
 
-> diff --git a/arch/arm64/kvm/vgic/vgic-v5-tables.c b/arch/arm64/kvm/vgic/v=
-gic-v5-tables.c
-> --- a/arch/arm64/kvm/vgic/vgic-v5-tables.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v5-tables.c
-[ ... ]
-> +static int vgic_v5_process_iste(__le32 *iste, struct list_head *pending_=
-irqs,
-> +				u32 intid, u32 type)
-> +{
-> +	u32 iste_data =3D le32_to_cpu(READ_ONCE(*iste));
-> +	int ret;
-> +
-> +	/* Pending state is replayed later with VDPEND. */
-> +	if (iste_data & GICV5_ISTL2E_PENDING) {
-> +		ret =3D vgic_v5_track_pending_irq(pending_irqs, intid, type);
+See below.
 
-[Severity: High]
-Can userspace inject an out-of-range LPI by restoring a buffer with the
-pending bit set for an invalid index?
+> 
+> >  }
+> >  NOKPROBE_SYMBOL(__kvm_spe_restore_guest_state_vhe);
+> >  
+> > diff --git a/arch/arm64/kvm/spe.c b/arch/arm64/kvm/spe.c
+> > index af1e19cb8e9ae..68b751bdb384b 100644
+> > --- a/arch/arm64/kvm/spe.c
+> > +++ b/arch/arm64/kvm/spe.c
+> 
+> [ ... ]
+> 
+> > @@ -97,6 +99,12 @@ int kvm_spe_vcpu_first_run_init(struct kvm_vcpu *vcpu)
+> >  	if (!kvm_spe->pmblimitr_el1_res0_mask)
+> >  		kvm_spe_compute_pmblimitr_el1_res0_mask(kvm);
+> >  
+> > +	if (kvm_vm_has_ran_once(kvm))
+> > +		return 0;
+> > +
+> > +	if (perf_allow_kernel())
+> > +		kvm_spe->guest_pmscr_el2 = PMSCR_EL2_PCT_PHYS;
+> 
+> [Severity: High]
+> Does this logic invert the intended permission check?
+> 
+> The perf_allow_kernel() function returns 0 on success (access granted) and
+> a negative error code (like -EACCES) on failure. By evaluating to true when
+> access is denied, it seems we might be granting physical timestamps to
+> unprivileged users and incorrectly denying them to privileged users.
 
-When restoring the IST via KVM_DEV_ARM_VGIC_GRP_IST, KVM scans the
-userspace-provided buffer and calls vgic_v5_process_iste(). If the
-pending bit is set, it tracks the interrupt for later replay. However,
-there does not appear to be a check to ensure that the intid is within
-the valid range for LPIs (e.g., >=3D 8192).
+That's correct, I assumed from the name that perf_allow_kernel() simply performs
+a permission check and returns true if perf is allowed to profile the kernel.
 
-Executing a vdpend instruction with an LPI identifier less than 8192 is
-architecturally unpredictable. Could this allow a malicious userspace
-process to trigger a synchronous exception or SError at EL2, taking
-down the host hypervisor?
+I'll be changing it to:
 
-> +		if (ret)
-> +			return ret;
-> +	}
-> +
-> +	iste_data &=3D ~GICV5_ISTL2E_PENDING;
-> +	iste_data &=3D ~GICV5_ISTL2E_HWU;
-> +
-> +	WRITE_ONCE(*iste, cpu_to_le32(iste_data));
-> +
-> +	return 0;
-> +}
+	if (!perf_allow_kernel())
+		kvm_spe->guest_pmscr_el2 = PMSCR_EL2_PCT_PHYS;
 
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260904113404.4051=
-341-1-sascha.bischoff@arm.com?part=3D35
+(I remember fixing it locally, I guess I got confused about the name a second
+time).
+
+> 
+> [Severity: High]
+> Is kvm_spe_vcpu_first_run_init() the right place to check these
+> capabilities?
+> 
+> Checking perf_allow_kernel() here means it is evaluated during the KVM_RUN
+> ioctl, rather than during VM configuration. VMMs typically configure VMs
+> with full privileges but drop privileges before executing KVM_RUN for
+> sandboxing. Checking at KVM_RUN time will incorrectly deny physical
+> timestamps to properly sandboxed VMMs.
+> 
+> Furthermore, an unprivileged process could configure a VM and pass the vCPU
+> file descriptor to a privileged process, improperly gaining access to
+> physical timestamps using the privileged thread's capabilities.
+
+Sure, I can set the VM-wide PMSCR_EL2 value the first time the SPE PMU instance
+is assigned. Or maybe when KVM_ARM_VCPU_INIT is first called. I'll think about
+what is the best approach.
+
+> 
+> [Severity: Medium]
+> Could silently enabling SPE physical timestamps based on the host kernel
+> break live migration?
+> 
+> If a VM is migrated from a host where perf_allow_kernel() grants access to
+> one where it denies it, the guest would silently downgrade to virtual
+> timestamps, causing data corruption in the profiling trace.
+> 
+> The KVM guidelines require that new behavior the guest can observe must be
+> off by default and explicitly enabled through standard capability
+> negotiation (like a KVM_CAP_* or ID register flag). Should this require an
+> explicit opt-in from userspace instead?
+
+I think a better approach would be to update the documentation to let the
+system administrator know that the VM configuration depends on perf being
+allowed to profile the kernel, and it should be the same on the source and
+destination in the case of migration.
+
+> 
+> [Severity: Medium]
+> Can this write to kvm_spe->guest_pmscr_el2 happen concurrently across
+> multiple vCPUs?
+
+It can, should be fixed with the above approach.
+
+Thanks,
+Alex
+
+> 
+> The kvm_vm_has_ran_once(kvm) flag is not set until the end of
+> kvm_arch_vcpu_run_pid_change(), which happens after
+> kvm_spe_vcpu_first_run_init() completes. If multiple vCPUs start their
+> first KVM_RUN concurrently, they will all see kvm_vm_has_ran_once(kvm) as
+> false and write to this shared variable without synchronization.
+> 
+> > +
+> >  	return 0;
+> >  }
+> >
+> 
+> -- 
+> Sashiko AI review · https://sashiko.dev/#/patchset/20260903160623.315525-1-alexandru.elisei@arm.com?part=20
