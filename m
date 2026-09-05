@@ -1,111 +1,163 @@
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 993F723ABB9
-	for <kvmarm@lists.linux.dev>; Sat,  5 Sep 2026 09:07:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D1152874E6;
+	Sat,  5 Sep 2026 13:46:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788599229; cv=none; b=hLYySi095N+pgZVfiYFNhIoB9B9Hjjw2CYEv+3Rdzn5FDH30OAGm3WGJSrZ2U0cGFSh6lKTKzTPI6Mo8T7hbPJXrC/kMjIIwW2pTPIHseeK5yE2DuoybQ3EfvKXr+oLGqpHqKDqowUvAKYKok5KB7V5AphG+mlfzx/sjajuZBjM=
+	t=1788615978; cv=none; b=nXWpR+Ttt4pTtBicfyuC3ueUA0o6PSrtvem7Q7343wlAjsxUCN6x3Y4P8rIEimWq8uGClwF0yILzBzeyHe6cPl6YIkeKt1ltn6cLeLw7eED7PvbPV8W80kyzUWK2H7+vj7Ohy3b7tmZKHXPLCRlGm74zSLKjxd8Ul3RvCLs0nRc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788599229; c=relaxed/simple;
-	bh=rc5XxMzqZHN/h8i9gnu5Hvcap9+yLXVxJXL+WFRkUqk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hv/eH1Tv6inbW6OLtzPwAgTQMTCa78A9dT8pNSSbnV37ESmxn70vIh5BxtUKFHz8C/mmzNkgN8qpbdhclWyEWZSz0mOKBXVIdBQWYsF379HKGu3HsEKULEzNDH+RvsHlNFgww+muMcnT+zlpfsEXMy448iyTEdt+J/TVAYUeuR0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=abr8q7ZY; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1788615978; c=relaxed/simple;
+	bh=nw6fhZTnssNJ9AFFTMsK1RX9MQOx/jIgjT81SgsWk00=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Fo8Fx6OPkJkN2YY/slG9eTfXT3kF6jcWL0ln5zulheFjzUdvERUWnYhlC0Qlov/xORwa/pTZnmhArLwGJEaOsOQFPHvxOmG1hQQdRKpPu6Xe1R2IhNbpriLmmeCKk1oSIWk/0qbNyXVbhKVAYvF9xi/XsVI+KaZ3gcFdm3Of36Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KKYfrYUw; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="abr8q7ZY"
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-499ac87c92bso20776615e9.1
-        for <kvmarm@lists.linux.dev>; Sat, 05 Sep 2026 02:07:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788599226; x=1789204026; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=e3AIKTqtccN8F5dbw/sA+nWDkX82cUAi4NxD23crSBI=;
-        b=abr8q7ZYioiLk++TXUf9WDSfN/uo0GjhRV2+xAb9yxnSXkt6wFzvbFy07vOn/SLt5r
-         OHVe+DfbsaOSdD7Ib0PFPb0/9JWmh8SZcaXwu/qWX5HK0qd8dp6gsXeGhHqpoyIlNMvY
-         K6x2gwzk76GIMKPMTN81z4p1SXmIFT/QiMeBO89uuyT0fJc925wPQ11gOrzPQTcfn88S
-         IjOv8TH+uG+aWWD4BxTsH9hEdgjTfFlvAczsWBCphM9GeDypbQCfWPG7TZRlHnlH/4o6
-         jk2qJC4ptkoQjaVKbdsk/pMKw4FMeQK9Odblvv2VbpcsbF+PVqc2Dh+FWqDbzQrf9vxQ
-         LTew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788599226; x=1789204026;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=e3AIKTqtccN8F5dbw/sA+nWDkX82cUAi4NxD23crSBI=;
-        b=FiPT/d4EoJUjPXeG9/oRY9GJb+IlqX4Y5+cyWaBuIT4le0skegfzER3Wd7IBR/b+1e
-         Hky+tyPXrxjb5QMcQvlPd7ioEa9MnQ3aBcuUfiufgVfsTNJZ3pBiU+7LAn8W2gymb1IS
-         8cxNaI92n8fh5/f9pJJb7v/JmaWDA8SWOZd2K7d6cCkz7VDp8cDdv22v/RzZhR1vertn
-         jVBa4pIHFu6eyuZLb9zD5cFaxjaelY0MlUntVti25cBSZ5AhQjcbZ0OQ1x5ImLj9lkC+
-         F1S9D1a5gna290Bwl8Xlq4Tvlq5FxI5JzOYw/FMTyjg5U03w4YLwMoxNMGgUiqBU9dbN
-         SRyw==
-X-Forwarded-Encrypted: i=1; AKwUvBzOMgiKg6rfC3eXBSs2EBNwMyAv6tj1GlWUlcK2dJGwfPX37SGkVJ+MiNXhV1eELj2RgdAzEXU=@lists.linux.dev
-X-Gm-Message-State: AFuF++nSsaqxXDQ8vhvXDPOp5tIC8m2Fjv0eQKPHoRcTmZqQhV05mNaA
-	EbrkJC6JPNz/GNTOv89Ax+2V/9zfylskNNhIRlWyVd+Wk38gH/gPh+08
-X-Gm-Gg: AYBFou0QcI0tXHC07i1MPsZNhBI0OVJh0wvjxJ9uWPFBGJiC8jTYBr5MruHd3lHc49d
-	yGAaEDDkrby/oPzAJAI+gOWtNapK9xwGDWlpgHNXYlBIealxkWLlahJF5mHjnnKBA9XLvXF7FXv
-	nv0LwJPRxwHV6SxBjGxF1/ZfU4NA4iufRSxsMymOsnAIJcMNTX5fTveXzgABHTsfZ5yKFeYfq52
-	SKvf1JBYXGTfkkDnvzPSfrH1BKB17Zr+CefiZdLUMs9rvf7rN/InW1SMg5aTyErrEBARhoMu65i
-	aFI78hGNrGlp0R0TK+WYvUjxFKZDm0l9x8n39MY53y74BKtu17yOa9Ge/zdSZOsB5tOlKtwjk8U
-	jUsYFyTLXEJ+B+SxDk3kc4cUqnd3jU5XCoCrCMDlRGWXAKLV2o3pqfV02p+HCawKGnaHI1Pf0ep
-	UT4iJMEjO9FPI+wUWniMojNHdQk3dZOxu6y/iuBtCQH277/J9QeoBE6kdRpVMaKhpX6vexHpfHJ
-	dP7cvbYhAT7tTbY3KPq4WAYApgPMu6L7i7a/NBgyRJqmozfO+yeiua2BhI8WhrXjiY/6ORirQVW
-	17kL3vmmMGpH7/74fZ7/3s7tYqV9jz8MFmVJvLmskQaTt15BqBWqi/U9CE1E/EZuo3du
-X-Received: by 2002:a05:600c:6383:b0:49c:f4ff:e872 with SMTP id 5b1f17b1804b1-49cf820507cmr104027405e9.5.1788599225704;
-        Sat, 05 Sep 2026 02:07:05 -0700 (PDT)
-Received: from localhost.localdomain (dynamic-2a02-3100-a4eb-3001-c06d-af27-9fa2-ea53.310.pool.telefonica.de. [2a02:3100:a4eb:3001:c06d:af27:9fa2:ea53])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49d00a5b19dsm52248545e9.2.2026.09.05.02.07.03
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sat, 05 Sep 2026 02:07:05 -0700 (PDT)
-From: Karl Mehltretter <kmehltretter@gmail.com>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>
-Cc: Karl Mehltretter <kmehltretter@gmail.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KKYfrYUw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41BBE1F00A3D;
+	Sat,  5 Sep 2026 13:46:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788615974;
+	bh=RqcAI7pAD1odDIdi2AWSF2YS3bFn9A/ym55+hvQNRWc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=KKYfrYUws700otlYQUHyLcpOJNhQo01jl4qSFhjAYAEg0mtiyIbMeU6W/VHtKikB/
+	 Y83twcaz62+2oPyG0hn8yLdncehFHY2Y0rH/rjcUXLEDxwTCcWpDYsNr9w6g/1/tuM
+	 HEK0uIISqdM2ObqPBnCTrduionIOZnyuHl677fkE+Gluy6BTyIk9B5L7yFT40XI5gV
+	 JaPCzUij6A2+MGbbGPrMbv5s0m+5Z7WaxkPgzfm5+XYYWdJr1m+VU8P8B9uf1lKZSw
+	 9T3aSjGkx0Ic8KqclXZ40gBj+Fzu20sO0oSHBcPAVDn6JFErGBNvNlVxDVJrnjwDUV
+	 or0reerjfpCAQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1x2qih-00000005CjH-2Ap3;
+	Sat, 05 Sep 2026 13:46:11 +0000
+Date: Sat, 05 Sep 2026 14:48:41 +0100
+Message-ID: <87pkyr4xmu.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Wei-Lin Chang <weilin.chang@arm.com>
+Cc: Wang Han <wanghan@linux.alibaba.com>,
+	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	kvm@vger.kernel.org,
-	Jonathan Corbet <corbet@lwn.net>,
-	linux-doc@vger.kernel.org,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Randy Dunlap <rdunlap@infradead.org>
-Subject: [PATCH] Documentation: KVM: Fix the struct kvm_arm_device_addr name
-Date: Sat,  5 Sep 2026 11:06:55 +0200
-Message-Id: <20260905090655.40683-1-kmehltretter@gmail.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+	linux-kernel@vger.kernel.org,
+	oupton@kernel.org,
+	tabba@google.com,
+	joey.gouly@arm.com,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	ljs@kernel.org,
+	itaru.kitayama@fujitsu.com
+Subject: Re: [PATCH v5 0/6] KVM: arm64: nv: Implement nested stage-2 reverse map (new data structure)
+In-Reply-To: <eylfcgxs2xzu57czyuhkpmum45lpxyccyu2yh3mipr67aq3xo6@xinygxzavoja>
+References: <20260810205038.118843-1-weilin.chang@arm.com>
+	<20260902163500.1841671-1-wanghan@linux.alibaba.com>
+	<877bl26aqg.wl-maz@kernel.org>
+	<wsnf276xrun3g4hjr3t6alprapctg5z4kpj422v3hujqdjnrsa@swq4blkqvvj5>
+	<875x0l5udh.wl-maz@kernel.org>
+	<eylfcgxs2xzu57czyuhkpmum45lpxyccyu2yh3mipr67aq3xo6@xinygxzavoja>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: weilin.chang@arm.com, wanghan@linux.alibaba.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, oupton@kernel.org, tabba@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, ljs@kernel.org, itaru.kitayama@fujitsu.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-KVM_ARM_SET_DEVICE_ADDR takes struct kvm_arm_device_addr; the document
-names it struct kvm_arm_device_address, which does not exist.
+On Fri, 04 Sep 2026 23:42:15 +0100,
+Wei-Lin Chang <weilin.chang@arm.com> wrote:
+> 
+> On Fri, Sep 04, 2026 at 08:49:14AM +0100, Marc Zyngier wrote:
+> 
+> [...]
+> 
+> > > > >
+> > > > > The L1 was started with 8 vCPUs and 32 GiB of RAM using:
+> > > > > 
+> > > > >   qemu-system-aarch64 -smp 8 -m 32G \
+> > > > >     -machine virt,accel=kvm,gic-version=3,virtualization=on \
+> > > > >     -cpu host -nographic -enable-kvm \
+> > > > >     -drive if=pflash,format=raw,readonly=on,file=pflash0_bak.img \
+> > > > >     -drive if=pflash,format=raw,file=pflash1_bak.img \
+> > > > >     -drive file=./ubuntu-vm.qcow2,format=qcow2,if=virtio,cache=none,aio=native \
+> > > > >     -nic user,model=virtio-net-pci,hostfwd=tcp::11234-:22 \
+> > > > >     -serial mon:stdio
+> > > > > 
+> > > > 
+> > > > Puzzling. If you are only running an L1 in VHE mode, there is no
+> > > > shadow S2, and therefore nothing to unmap. For shadow S2s to be built
+> > > > and affect the MMU notifiers, you need to run an L2.
+> > > 
+> > > I was thinking the same at first, but realized even with L1 in VHE mode
+> > > there is a small period of time where L1 runs in its EL1 during boot, so
+> > > one nested MMU will become valid for each vCPU. That causes
+> > > kvm_nested_s2_unmap() to iterate through the entire IPA space 8 times
+> > > (-smp 8).
+> > 
+> > It should be one nested MMU for the whole VM, not one per vcpu.
+> > That's assuming they share the same VMID+VTCR.
+> > 
+> > > What I am curious about is whether one single notifier unmap is enough
+> > > to hang L1, or were there multiple notifier unmaps.
+> > > 
+> > > QEMU with -machine virt uses 40 IPA bits only, unmapping that takes:
+> > > 1024  (4KB pages,  unmapping 1GB per iteration)
+> > > 32768 (16KB pages, unmapping 32MB per iteration)
+> > > 2048  (64KB pages, unmapping 512MB per iteration)
+> > > iterations for each page size. There aren't many mappings in each
+> > > iteration too. Does this really take that long on real hardware (even if
+> > > this must be done 8 times)?
+> > 
+> > This should be close to being at zero cost, so something else is
+> > amiss.
+> > 
+> 
+> Guess what? I am completely wrong once again.
+> 
+> The complete range of the nested mmus isn't about the value
+> supplied by KVM_VM_TYPE_ARM_IPA_SIZE. Instead it is the PARange exposed
+> to the guest. That's because the guest hypervisor is allowed to expose
+> whatever memory map it likes to its nested guests, as long as it is
+> within the guest's PARange. This is explained clearly in
+> init_nested_s2_mmu().
+> 
+> Now the PARange exposed to guests should be much larger than 40bits. On
+> the neoverse-n2 it should be 48bits (256TB), therefore the iterations
+> required for each unmapping would be 256x:
+> 
+> 262144  (4KB pages,  unmapping 1GB per iteration)
+> 8388608 (16KB pages, unmapping 32MB per iteration)
+> 524288  (64KB pages, unmapping 512MB per iteration)
+> 
+> I think these numbers match the hang time Shuai have shown.
+>
+> Just to demonstrate the difference I have tried manually limiting
+> kvm_ipa_limit to 40, and tested with software emulation. Before the
+> manual change a kvm_nested_s2_unmap() finished after 42 seconds, after
+> limiting kvm_ipa_limit kvm_nested_s2_unmap() can finish in less than a
+> second.
+>
+> With this, I think there aren't other underlying issues, it just is that
+> slow unfortunately..
 
-Use the real name.
+I don't buy this. There should be very little mapped in the shadow S2,
+a few dozen pages at most. As you noticed, there is very little the
+kernel executes at EL1 before upgrading to EL2. Invalidating this
+should be cheap.  Furthermore, once invalidated after the last vcpu
+has booted, the cost should be exactly zero.
 
-Fixes: 3401d54696f9 ("KVM: ARM: Introduce KVM_ARM_SET_DEVICE_ADDR ioctl")
-Assisted-by: LLM
-Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
----
- Documentation/virt/kvm/api.rst | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+It seems that these two assumptions are not holding up, and I wonder
+why.
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index e0430cc750c9..7a2de8640226 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -3676,7 +3676,7 @@ type KVM_X86_REG_TYPE_MSR, but are NOT enumerated via KVM_GET_REG_LIST.
- :Capability: KVM_CAP_ARM_SET_DEVICE_ADDR
- :Architectures: arm64
- :Type: vm ioctl
--:Parameters: struct kvm_arm_device_address (in)
-+:Parameters: struct kvm_arm_device_addr (in)
- :Returns: 0 on success, -1 on error
- 
- Errors:
+	M.
+
 -- 
-2.53.0
-
+Jazz isn't dead. It just smells funny.
