@@ -1,123 +1,165 @@
-Received: from mta0.migadu.com (out-210.mta0.migadu.com [91.218.175.210])
+Received: from mta1.migadu.com (out-191.mta1.migadu.com [95.215.58.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D212833A9CF
-	for <kvmarm@lists.linux.dev>; Sun,  6 Sep 2026 16:46:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.210
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8862B3BB12B
+	for <kvmarm@lists.linux.dev>; Sun,  6 Sep 2026 17:05:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788713184; cv=none; b=ayFuuwroOf0mSi2/LRr/rhJR342D1fHXCv+Mcs7OkKhfeuUCOWtbaxUSWC9yx3mgfS+BCnt4l5j60xEq9VosR3xFzpbAgbim7OVi13smvg+WhCdgId/M4VSkGEw33WgCgac7/3tQ0Hd77yfr1//BxVu5i64DTMAUdrAKzQqSYNY=
+	t=1788714343; cv=none; b=M0crxA0At2IhbjfU9U8V49epZ7r83F+I/s9G4VcwnQY4Geq9FIVSoSjNDARQWOauXuur9GtNYLWf/3nKnDFbVZT9YLfzpAl2gon5TL0QdNkhFfVvLo3IobmpcB9EZKIAz/i1oo/pcihdmEjcuSSPwaDuWyEngOejEJoFA43Ry+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788713184; c=relaxed/simple;
-	bh=VjfV2POx+VicV5YfJjm4exSQwpAsSb4mPjx2PR7ZFvI=;
+	s=arc-20240116; t=1788714343; c=relaxed/simple;
+	bh=Jot0d4tdAX4ga7oGrQxB+O2Nf0GAD5rK+9m4nrHPeww=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sGiqFcCxcfpMccZX9KxqWGM3NxkXEmvLWI1ZDg6gMC+j3CklZ3bwkKNoORV5cIjp2p50tOFWlTBRpRBb8ypZImDMRblhKmxl4XFJm3UgElaj7k93OO8B2xikv5jnCX5syDefOfGXXpGkPopOSgTmbMkKYclCKEOCGe7aMgaMIPU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vkQKVic+; arc=none smtp.client-ip=91.218.175.210
+	 To:Cc:Content-Type; b=DzAiprqerfzE64MxiFg8qYaVTcq6Z+INT+9MkS8vC9g6o2avD3R0bxndpjgOo2dj1KNGiQffU/rcVWvC9fkTOZNk0e45MdFBFeYPgraaw36R8AVTUy2kfB9lrmhcQwXbPcupUEimMqcIZId1uAMVwmFlUaHy5amgjd+9R1GbB2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=MUthX1Eu; arc=none smtp.client-ip=95.215.58.191
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vkQKVic+"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MUthX1Eu"
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=VjfV2POx+VicV5YfJjm4exSQwpAsSb4mPjx2PR7ZFvI=;
+DKIM-Signature: a=rsa-sha256; bh=Jot0d4tdAX4ga7oGrQxB+O2Nf0GAD5rK+9m4nrHPeww=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1788713179; v=1; x=1789317979;
- b=vkQKVic+qgvtT9ZIc/Yib+9lUs7BuvmOU1JzhUGuMQz4OJRliVzjWxQejmfxDvgkW/PJBvrj
- Fab+2jHfBa/eIgt0lTnhsIvi71J8FKaeSgeuS6JC3CvaBxFYwbo6NTwA6MKgAX2vOxbKw5gxhM8
- BxlwHR5zHKF3ar/AoX0CI/Jk=
+ t=1788714336; v=1; x=1789319136;
+ b=MUthX1EuSn3CaF3uazWVsMUtJpQkwMykheVCykhxg2vhOHDcifZZnWM2NhavzWffu9OyrZ03
+ OktjCyaYu1xoIGOiaCJFvDQqeReoiCxToaENjDTGqOZSHlR09AzAGBniWvdrvl+asLHiD/QVkF5
+ nH6hBztKdaKj4d15v7bUSZLg=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id af0033f924939652;
-	Sun, 06 Sep 2026 16:46:19 +0000
-X-Mizu-Trace-ID: af0033f924939652
+Received: by smtp.migadu.com with ESMTPS id eb07d5af51e96472;
+	Sun, 06 Sep 2026 17:05:36 +0000
+X-Mizu-Trace-ID: eb07d5af51e96472
 X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b4a0b384b7so3740e87.0
-        for <kvmarm@lists.linux.dev>; Sun, 06 Sep 2026 09:46:15 -0700 (PDT)
-X-Gm-Message-State: AFuF++kSi3/Fj/GEuzrlt/qin5Z1+p0dUqZ9w0Vs9GtKjoGnIoD2TTy+
-	Z1o5mVctobwKgrnMI6u5pIqwLTWkIq0phZfeb+WGxp9mfGYJzbQvSSfn8Bi3NgNhNxXp6uRp77V
-	Fo5fd9WD6kF5If3KhOzpBvVBT4Eay1uAFdb+s6qMy
-X-Received: by 2002:a05:6512:3ba7:b0:5b1:571f:715f with SMTP id
- 2adb3069b0e04-5b74d427ec9mr96688e87.3.1788713174435; Sun, 06 Sep 2026
- 09:46:14 -0700 (PDT)
+Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b4a0b17358so3166e87.1
+        for <kvmarm@lists.linux.dev>; Sun, 06 Sep 2026 10:05:32 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBw3l+/u2dMISI4dMtqM8521OateE+Y4CTMRhQ+TWOWBpYlY0dr4nrLhCpn13J1qCbta5orM6lg=@lists.linux.dev
+X-Gm-Message-State: AFuF++mBOdKm6cN6zHf+9TPJGfRaPbjn4T4a/kUNxhQjaWLvCsK0IfOB
+	vxDaUnUmhTe9FdNCcZPgiZAuy05IeMwksJWvgHcc/pstFCO52LClpagiA2F1o8HQS4aQ7+0w8NU
+	jAl8FPOqjtZXIfuZ0g8eofUlJy4GpjOj50wmCUgwB
+X-Received: by 2002:a05:6512:3185:b0:5b6:19c6:a91b with SMTP id
+ 2adb3069b0e04-5b74d1e0c5bmr121728e87.14.1788714331510; Sun, 06 Sep 2026
+ 10:05:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260904174419.76057-1-sascha.bischoff@arm.com>
-In-Reply-To: <20260904174419.76057-1-sascha.bischoff@arm.com>
+References: <20260904175550.430266-1-dongli.zhang@oracle.com>
+In-Reply-To: <20260904175550.430266-1-dongli.zhang@oracle.com>
 From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Sun, 6 Sep 2026 17:45:37 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTzfG+y=1N3Jn5Pc8PpH0qmnmwQe5d0Z943n+PdEmY3wXQ@mail.gmail.com>
-X-Gm-Features: AcwNN1VwvQjebM9ocVZBouSeIGG6IYkrA31W30ISXubYppwaYJQVVM9dNYgL72I
-Message-ID: <CA+EHjTzfG+y=1N3Jn5Pc8PpH0qmnmwQe5d0Z943n+PdEmY3wXQ@mail.gmail.com>
-Subject: Re: [PATCH] KVM: arm64: vgic: Serialise CTRL_INIT against vCPU creation
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Cc: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, nd <nd@arm.com>, 
-	"maz@kernel.org" <maz@kernel.org>, "oupton@kernel.org" <oupton@kernel.org>, Joey Gouly <Joey.Gouly@arm.com>, 
-	"seiden@linux.ibm.com" <seiden@linux.ibm.com>, Suzuki Poulose <Suzuki.Poulose@arm.com>, 
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>, Sashiko <sashiko-bot@kernel.org>
+Date: Sun, 6 Sep 2026 18:04:55 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTzfJz-Svda-Fia5ZS30U4hTDu+S2OfieGM7qWWpT=Jj=g@mail.gmail.com>
+X-Gm-Features: AcwNN1VP4_TDp5r8i9di6gzQC14e3bohlNpxyyJkOQ7W-Gf2v9WuUtmDgfuRj38
+Message-ID: <CA+EHjTzfJz-Svda-Fia5ZS30U4hTDu+S2OfieGM7qWWpT=Jj=g@mail.gmail.com>
+Subject: Re: [PATCH v2 0/4] KVM: Reset steal time accounting on vCPU pid change
+To: Dongli Zhang <dongli.zhang@oracle.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, loongarch@lists.linux.dev, 
+	kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org, 
+	maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, zhaotianrui@loongson.cn, 
+	maobibo@loongson.cn, chenhuacai@kernel.org, anup@brainfault.org, 
+	atish.patra@linux.dev, seanjc@google.com, pbonzini@redhat.com, 
+	shuah@kernel.org, dwmw2@infradead.org, joe.jin@oracle.com
 Content-Type: text/plain; charset="UTF-8"
 
-Hi Sascha,
+Hi Dongli,
 
-On Fri, 4 Sept 2026 at 18:45, Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
+On Fri, 4 Sept 2026 at 18:56, Dongli Zhang <dongli.zhang@oracle.com> wrote:
 >
-> vgic_init() compares created_vcpus with online_vcpus to detect a vCPU
-> being created. However, CTRL_INIT only holds config_lock, while
-> admission of new vCPUs and updates to created_vcpus are protected by
-> kvm->lock.
+> v1: https://lore.kernel.org/all/20260816053630.527528-1-dongli.zhang@oracle.com
 >
-> A concurrent KVM_CREATE_VCPU can therefore increment created_vcpus
-> after vgic_init() checks the counters, then block on config_lock before
-> publishing the new vCPU. For a GICv4 VM, vgic_v4_init() consequently
-> sizes its vPE array using a stale online_vcpus value, leaving no vPE
-> entry for the new vCPU once its creation completes. The upcoming GICv5
-> IRS support would hit the same issue when sizing its doorbell domain.
->
-> Hold kvm->lock around CTRL_INIT. The existing counter check detects a
-> vCPU creation already in progress, while the lock prevents a new one
-> from starting until initialisation has completed.
+> v1->v2:
+>   - move the last_steal field in the main vcpu structure (suggested by
+>     Marc Zyngier).
+>   - Reset last_steal from the caller of kvm_arch_vcpu_run_pid_change().
 
-This also brings CTRL_INIT in line with the other vgic device flows
-that serialise against vCPU creation: kvm_vgic_create(), the GICv2
-register uaccess path, and SAVE_PENDING_TABLES just below it all hold
-kvm->lock across the config_lock section.
+I built and ran the series on QEMU/arm64: the new
+steal_time_change_pid selftest and the existing steal_time selftest
+both pass, and non-protected and protected guest boots are clean.
 
-> Fixes: f00327731131 ("KVM: arm64: Use config_lock to protect vgic state")
-> Reported-by: Sashiko <sashiko-bot@kernel.org>
-> Link: https://lore.kernel.org/r/20260807124506.ED85C1F000E9@smtp.kernel.org
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-
-Given that f00327731131 carried a stable tag, worth a Cc: stable?
-
-Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
 Tested-by: Fuad Tabba <fuad.tabba@linux.dev>
 
 Cheers,
 /fuad
 
-
-
-> ---
->  arch/arm64/kvm/vgic/vgic-kvm-device.c | 2 ++
->  1 file changed, 2 insertions(+)
 >
-> diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-> index 90be99443df3b..219881915bf41 100644
-> --- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
-> +++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-> @@ -255,9 +255,11 @@ static int vgic_set_common_attr(struct kvm_device *dev,
->         case KVM_DEV_ARM_VGIC_GRP_CTRL: {
->                 switch (attr->attr) {
->                 case KVM_DEV_ARM_VGIC_CTRL_INIT:
-> +                       mutex_lock(&dev->kvm->lock);
->                         mutex_lock(&dev->kvm->arch.config_lock);
->                         r = vgic_init(dev->kvm);
->                         mutex_unlock(&dev->kvm->arch.config_lock);
-> +                       mutex_unlock(&dev->kvm->lock);
->                         return r;
->                 case KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES:
->                         /*
-> --
-> 2.34.1
+> KVM does not support vCPU hotplug. When a vCPU is removed, its
+> corresponding data structures are not freed by KVM. Instead, QEMU destroys
+> only the userspace state and the vCPU thread, while the KVM vCPU fd remains
+> open and parked in QEMU.
+>
+> As a result, vcpu->arch.st.last_steal is not reset. If the same vCPU is
+> later re-created by QEMU, last_steal retains its old value, while
+> current->sched_info.run_delay starts from zero since a new vCPU thread is
+> created. This causes current->sched_info.run_delay - vcpu->arch.st.last_steal
+> to produce a large, bogus value.
+>
+> For instance, current->sched_info.run_delay can become smaller than
+> vcpu->arch.st.last_steal (see line 3804) if a QEMU vCPU is re-added after
+> it has previously been removed.
+>
+> As a result, st->steal restarts from a very small value, close to
+> current->sched_info.run_delay.
+>
+> 3720 static void record_steal_time(struct kvm_vcpu *vcpu)
+> 3721 {
+> ... ...
+> 3803         unsafe_get_user(steal, &st->steal, out);
+> 3804         steal += current->sched_info.run_delay -
+> 3805                 vcpu->arch.st.last_steal;
+> 3806         vcpu->arch.st.last_steal = current->sched_info.run_delay;
+> 3807         unsafe_put_user(steal, &st->steal, out);
+>
+>
+> This patchset resets last_steal when the vCPU PID changes, as suggested by
+> Sean.
+>
+> Although David suggested accounting the run_delay left over from the
+> previous vCPU PID, this series does not do that. It would be easy to make
+> that work if KVM could simply assume every transition is a vCPU PID change.
+> In practice, KVM does not always have enough information about the previous
+> vCPU PID, e.g. after live migration, unless a new ioctl is introduced. For
+> now, this series simply resets last_steal.
+>
+> Although David also suggested doing the same for Xen-on-KVM vCPUs, this
+> series does not reset last_steal for Xen vCPUs. That change itself would
+> not be difficult, but Xen uses a different mechanism to account downtime,
+> including runnable time and offline time when a vCPU is not running. It may
+> therefore need no additional ioctl, or a smaller ioctl extension, to account
+> run_delay left over from the previous PID.
+>
+> As I have access to only x86 and arm64 KVM hosts, I created and validated
+> the selftest on those two architectures only.
+>
+> Dongli Zhang (4)
+>   KVM: Move last_steal to common struct kvm_vcpu
+>   KVM: Reset last_steal on vCPU pid change
+>   KVM: selftests: Test steal time across vCPU pid changes on x86
+>   KVM: selftests: Add arm64 coverage for steal time pid changes
+>
+>  arch/arm64/include/asm/kvm_host.h               |   1 -
+>  arch/arm64/kvm/Kconfig                          |   1 +
+>  arch/arm64/kvm/pvtime.c                         |   8 +-
+>  arch/loongarch/include/asm/kvm_host.h           |   1 -
+>  arch/loongarch/kvm/Kconfig                      |   1 +
+>  arch/loongarch/kvm/exit.c                       |   2 +-
+>  arch/loongarch/kvm/vcpu.c                       |   6 +-
+>  arch/riscv/include/asm/kvm_host.h               |   1 -
+>  arch/riscv/kvm/Kconfig                          |   1 +
+>  arch/riscv/kvm/vcpu_sbi_sta.c                   |  10 +-
+>  arch/x86/include/asm/kvm_host.h                 |   1 -
+>  arch/x86/kvm/Kconfig                            |   1 +
+>  arch/x86/kvm/x86.c                              |   5 +-
+>  include/linux/kvm_host.h                        |   4 +
+>  tools/testing/selftests/kvm/Makefile.kvm        |   2 +
+>  .../selftests/kvm/steal_time_change_pid.c       | 216 +++++++++++++++++++
+>  virt/kvm/Kconfig                                |   3 +
+>  virt/kvm/kvm_main.c                             |   4 +
+>  18 files changed, 248 insertions(+), 20 deletions(-)
+>
+> base-commit: 8ab1afb2eb246ab15b301cd255b5943d208a93c1
+>
+> Thank you very much!
+>
+> Dongli Zhang
+>
