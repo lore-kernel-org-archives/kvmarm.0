@@ -1,90 +1,104 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F641339362;
-	Sun,  6 Sep 2026 19:53:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F7DD346FBC
+	for <kvmarm@lists.linux.dev>; Sun,  6 Sep 2026 19:56:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788724433; cv=none; b=FnMVUmh1bfQXIbx3KMGv+ru3np6MRplIP77r7w1hYkrjUB67SiNJkY6IZo5spTuldek0ZbWdiljGOEDibr54QFQ6ZuELNFdJFSAYMUHcgDZt7PGgZXA80z+M/nyiOahEfufUsFl5O3T3PLsO6YMgSWl8khBltQxocaMFyz0ILe0=
+	t=1788724606; cv=none; b=dVK+dbTe0hC9OwJP8veU8bvetQXrTNYM47c1fF/EhebIQCCIWvj+SnHYBOnmkuJJYWiQgbdQRANLuaNZ5+ZJbiV9kDFE/dM38CIIxo51+CCqqFN4vqShOfkqxavhvNoe0KNxNbMOdpZnRYN0B8HPDRP7zZ4iM+JcoSlGVDPOsp4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788724433; c=relaxed/simple;
-	bh=8keelnl4CzscbpgILS1t3dYcg1V0XmCwseCKnZ1DLBo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CNpKtbm7pCNtMLsXt1UvUnoKgYP0cgM4zEFRdbH3DqscEAymaCV85TEgvct3LCPH78rvXYmbLXnYMgqlKI00gdhPA6Z5kLP6Pz7hbkDaZGjZ46YQbIoVPQzJKuuE5vGBUuQgfrJ5HkNW9yQ8KajqYF0Tq8AiRW57bM8T+t0FTVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=pass smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=SvntvIWE; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1788724606; c=relaxed/simple;
+	bh=y/XPLT2vWCH2Ci7UhdoddehaDK9VeeTuUMEqj2C7FO4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N4h+NUYeiQrnwK7TtkxthrkJ83fJzh0KCkNADEfTlAHR2harAmIz7A3t+no4odh24RPyzLBY7n0tFsYY2L57E809wCU+WN6PombT2lwmhh/27xjvkCcdGez8hIJqYT8Hk9/2YuFsR6a5oCHAz9jef5GyVmeuB47HM8B1NqlMuO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=qGNzfZQm; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="SvntvIWE"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=wGZySnTODouTVoi6FvegzmrXkqgJBwxRhbPrYzFeY5Y=; b=SvntvIWEubIDpDW/HalUZjUHC8
-	ge/RWPE4Ne4N4Q1lnrswkEWypoRuz4Z6dqL0E/c/5+B8ZuHxHSF1Fgc+RQ6BVGYKE1DviV9qoK6eT
-	IEgdep8Cz7Tm08PycF9BrVIW9mMQMwIJkE/TIjUHoxB1EJxo9CHGbiM3imZwIR1sd+k3lTdHW8enq
-	PAtEoFGxj6Y1YF+VWDlnsrPmOqpu/wDAHJtsIIVkjfliN4jobzjDmgvPqHAERKGL6ZCivkBQE9DKg
-	KVYG1U6f78Q5jH9iB+5fxAbnQVWAMxCdMilKreVzTH7SLxzcdapCO/OaNO0HRqYwjW2hfo9KGPqvw
-	TkowRyRw==;
-Received: from [50.53.43.113] (helo=[192.168.254.34])
-	by bombadil.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1x3Iw2-00000005Wuk-1PPa;
-	Sun, 06 Sep 2026 19:53:50 +0000
-Message-ID: <e84f235f-5510-4b71-9232-744467aea8d2@infradead.org>
-Date: Sun, 6 Sep 2026 12:53:49 -0700
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="qGNzfZQm"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 149AA1477;
+	Sun,  6 Sep 2026 12:56:40 -0700 (PDT)
+Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9A4743F882;
+	Sun,  6 Sep 2026 12:56:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1788724603; bh=y/XPLT2vWCH2Ci7UhdoddehaDK9VeeTuUMEqj2C7FO4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qGNzfZQmDW7LQcK3lbFzxaP8rK0r7IDbMTGaVvTTr3NDCclKPbY0A64mBlQuD3lMq
+	 mz90z8weC54giXjafVk52TczR9jUrSns6tFXr2QLcHGnJbPWzmHZiYnl8tVhxt6KSg
+	 ER+D7SLBGAo2PKwffciz94syMFgZ+xpTJnlyng/E=
+Date: Sun, 6 Sep 2026 20:56:34 +0100
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, Oliver Upton <oupton@kernel.org>, Fuad Tabba <tabba@google.com>, 
+	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Lorenzo Stoakes <ljs@kernel.org>, 
+	Itaru Kitayama <itaru.kitayama@fujitsu.com>
+Subject: Re: [PATCH v5 2/6] KVM: arm64: nv: Introduce guest stage-2 tracking
+ structures
+Message-ID: <w4kihqs6n7ja7nr4sn3i2r4o2mspwj7k36w2fkh4kheizr6oj3@wfsea5mhnto6>
+References: <20260810205038.118843-1-weilin.chang@arm.com>
+ <20260810205038.118843-3-weilin.chang@arm.com>
+ <87mrtu4c21.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Documentation: KVM: Fix the struct kvm_arm_device_addr
- name
-To: Karl Mehltretter <kmehltretter@gmail.com>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oupton@kernel.org>
-Cc: kvmarm@lists.linux.dev, Paolo Bonzini <pbonzini@redhat.com>,
- kvm@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
- linux-doc@vger.kernel.org, Shuah Khan <skhan@linuxfoundation.org>
-References: <20260905090655.40683-1-kmehltretter@gmail.com>
-Content-Language: en-US
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20260905090655.40683-1-kmehltretter@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87mrtu4c21.wl-maz@kernel.org>
 
+On Sun, Sep 06, 2026 at 04:47:02PM +0100, Marc Zyngier wrote:
 
+[...]
 
-On 9/5/26 2:06 AM, Karl Mehltretter wrote:
-> KVM_ARM_SET_DEVICE_ADDR takes struct kvm_arm_device_addr; the document
-> names it struct kvm_arm_device_address, which does not exist.
+> > +/*
+> > + * Record of a guest stage-2 mapping, storing canonical and nested IPA
+> > + * ranges. Both ranges have the same size.
+> > + */
+> > +struct kvm_guest_s2_mapping {
+> > +	struct interval_tree_node canonical;
+> > +	struct interval_tree_node nested;
+> > +	struct kvm_s2_mmu *nested_mmu;
+> > +};
+> > +
 > 
-> Use the real name.
+> I'm trying hard to find a way to reduce the size of this structure,
+> because this is IMO the only real problem with this approach.
 > 
-> Fixes: 3401d54696f9 ("KVM: ARM: Introduce KVM_ARM_SET_DEVICE_ADDR ioctl")
-> Assisted-by: LLM
-> Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
-
-Reviewed-by: Randy Dunlap <rdunlap@infradead.org>
-Thanks.
-
-> ---
->  Documentation/virt/kvm/api.rst | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Obviously, the only thing we could kill is this nested_mmu field, as
+> everything else is used by the interval trees. I can see two ugly ways
+> to do that:
 > 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index e0430cc750c9..7a2de8640226 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -3676,7 +3676,7 @@ type KVM_X86_REG_TYPE_MSR, but are NOT enumerated via KVM_GET_REG_LIST.
->  :Capability: KVM_CAP_ARM_SET_DEVICE_ADDR
->  :Architectures: arm64
->  :Type: vm ioctl
-> -:Parameters: struct kvm_arm_device_address (in)
-> +:Parameters: struct kvm_arm_device_addr (in)
->  :Returns: 0 on success, -1 on error
->  
->  Errors:
+> - either we iterate over all shadow MMUs to find the corresponding
+>   'nested' node: really costly if we have a lot of mappings and/or a
+>   lot of shadow MMUs
+> 
+> - or we steal bits from the interval_tree_node to encode extra
+>   information. One realisation is that all addresses are PAGE_SIZE
+>   aligned, meaning that we have at least 12 bits that are always 0. We
+>   could, for example, encode an index in the bottom bits of the
+>   nested.start field. Probably easy enough, but may require some
+>   careful masking (and the addition of an index in the s2_mmu
+>   structure).
+> 
+> The result would be significant, as we could then use a 96 byte slab,
+> which means the cost of a 1GB @4k granularity could fall to 24MB.
 
--- 
-~Randy
+One way of meeting in the middle is to keep the nested_mmu pointer, and
+use a dedicated kmem cache. That cache will then hand out exact 104-byte
+objects.
+
+That's 26MB for 1GB @4K.
+
+This is a nice improvement from the current 128-byte allocations.
+Although it's not as good as 96-byte allocations, the code logic can
+remain simple. Would you take this approach?
+
+Thanks,
+Wei-Lin Chang
+
+[...]
