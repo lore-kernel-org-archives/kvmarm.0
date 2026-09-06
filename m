@@ -1,179 +1,123 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta0.migadu.com (out-210.mta0.migadu.com [91.218.175.210])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1980E36A363;
-	Sun,  6 Sep 2026 15:44:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D212833A9CF
+	for <kvmarm@lists.linux.dev>; Sun,  6 Sep 2026 16:46:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.210
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788709471; cv=none; b=k3WEIOQLQoRFrVakjARjiF6EBD3m0Q1O+SK90QAqp32H7XgjGPfjp0wC9PPQRAXeaMrqAJU8P6gQfFwylvcZI+vA8vuiReBMJHLg8BLvnuDHVgFk/HCXlt94Zd6I9ZUf5dMmR+zK271gwAemD0S/fIYJvaHcdsQzTuWakqn0hko=
+	t=1788713184; cv=none; b=ayFuuwroOf0mSi2/LRr/rhJR342D1fHXCv+Mcs7OkKhfeuUCOWtbaxUSWC9yx3mgfS+BCnt4l5j60xEq9VosR3xFzpbAgbim7OVi13smvg+WhCdgId/M4VSkGEw33WgCgac7/3tQ0Hd77yfr1//BxVu5i64DTMAUdrAKzQqSYNY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788709471; c=relaxed/simple;
-	bh=bUu/tmyXNBUf9ukmBoG7q6CTy7aQ9DGU/fBgJsrU9Dw=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=B7kvc+qQmPs8fuZQhSMP1/wDDfz7Hi1MglnJzEDfwWI3iBWfqdVGd9Blp0If5wUPgoaz8bU8WYAhfXIa533q6iynLQtx8HxjaDQa5qOqpxCvVNBAPZ4dt7JG3XhF+EO8oqLEgdhVgvFIojNc6x/kbroq19EMaMS/OYdhnsXj42o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OdcqP/vw; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788713184; c=relaxed/simple;
+	bh=VjfV2POx+VicV5YfJjm4exSQwpAsSb4mPjx2PR7ZFvI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=sGiqFcCxcfpMccZX9KxqWGM3NxkXEmvLWI1ZDg6gMC+j3CklZ3bwkKNoORV5cIjp2p50tOFWlTBRpRBb8ypZImDMRblhKmxl4XFJm3UgElaj7k93OO8B2xikv5jnCX5syDefOfGXXpGkPopOSgTmbMkKYclCKEOCGe7aMgaMIPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vkQKVic+; arc=none smtp.client-ip=91.218.175.210
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OdcqP/vw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F03F51F00A3A;
-	Sun,  6 Sep 2026 15:44:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788709470;
-	bh=JihxV/V344AJDLHX61A3DZDDBIEXJEfRoj7Xx/kGeoA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=OdcqP/vwKiEzFm+QZyJJK4nD4Y59+eRxZF7uUQoqPxGWGMfhe9LA/4m4hvOnhcYWv
-	 ZKlLKuIg4ZfOCKjylrSMukWDLdwCBZ1BPg5D+GXWRfgj1cGTwL0EslCRaKkTLwD1yO
-	 91HGkZ5B6cilZFdwhlSa03qxcYSOuWglTIO7KmRkzxSP0ffhBYVC/AnS1LRvo29jnI
-	 UMeiVqJ13nr2mezhZLj3l5VPzmXCSCZJULI02myHUiaW/ArcHckOvfy68DSMyfPVhj
-	 wRa+c+gXxLteyWsPsr9oo2Jae7tZ+pN/3Yvo7vLrMwqgL6Vx5I2aukb8/fnTij8GwR
-	 PwKqtAFFB+2EQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1x3F2h-00000005Quk-1bM5;
-	Sun, 06 Sep 2026 15:44:27 +0000
-Date: Sun, 06 Sep 2026 16:47:02 +0100
-Message-ID: <87mrtu4c21.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Wei-Lin Chang <weilin.chang@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <tabba@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Lorenzo Stoakes <ljs@kernel.org>,
-	Itaru Kitayama <itaru.kitayama@fujitsu.com>
-Subject: Re: [PATCH v5 2/6] KVM: arm64: nv: Introduce guest stage-2 tracking structures
-In-Reply-To: <20260810205038.118843-3-weilin.chang@arm.com>
-References: <20260810205038.118843-1-weilin.chang@arm.com>
-	<20260810205038.118843-3-weilin.chang@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vkQKVic+"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=VjfV2POx+VicV5YfJjm4exSQwpAsSb4mPjx2PR7ZFvI=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1788713179; v=1; x=1789317979;
+ b=vkQKVic+qgvtT9ZIc/Yib+9lUs7BuvmOU1JzhUGuMQz4OJRliVzjWxQejmfxDvgkW/PJBvrj
+ Fab+2jHfBa/eIgt0lTnhsIvi71J8FKaeSgeuS6JC3CvaBxFYwbo6NTwA6MKgAX2vOxbKw5gxhM8
+ BxlwHR5zHKF3ar/AoX0CI/Jk=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id af0033f924939652;
+	Sun, 06 Sep 2026 16:46:19 +0000
+X-Mizu-Trace-ID: af0033f924939652
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b4a0b384b7so3740e87.0
+        for <kvmarm@lists.linux.dev>; Sun, 06 Sep 2026 09:46:15 -0700 (PDT)
+X-Gm-Message-State: AFuF++kSi3/Fj/GEuzrlt/qin5Z1+p0dUqZ9w0Vs9GtKjoGnIoD2TTy+
+	Z1o5mVctobwKgrnMI6u5pIqwLTWkIq0phZfeb+WGxp9mfGYJzbQvSSfn8Bi3NgNhNxXp6uRp77V
+	Fo5fd9WD6kF5If3KhOzpBvVBT4Eay1uAFdb+s6qMy
+X-Received: by 2002:a05:6512:3ba7:b0:5b1:571f:715f with SMTP id
+ 2adb3069b0e04-5b74d427ec9mr96688e87.3.1788713174435; Sun, 06 Sep 2026
+ 09:46:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: weilin.chang@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, oupton@kernel.org, tabba@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, ljs@kernel.org, itaru.kitayama@fujitsu.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20260904174419.76057-1-sascha.bischoff@arm.com>
+In-Reply-To: <20260904174419.76057-1-sascha.bischoff@arm.com>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Sun, 6 Sep 2026 17:45:37 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTzfG+y=1N3Jn5Pc8PpH0qmnmwQe5d0Z943n+PdEmY3wXQ@mail.gmail.com>
+X-Gm-Features: AcwNN1VwvQjebM9ocVZBouSeIGG6IYkrA31W30ISXubYppwaYJQVVM9dNYgL72I
+Message-ID: <CA+EHjTzfG+y=1N3Jn5Pc8PpH0qmnmwQe5d0Z943n+PdEmY3wXQ@mail.gmail.com>
+Subject: Re: [PATCH] KVM: arm64: vgic: Serialise CTRL_INIT against vCPU creation
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, nd <nd@arm.com>, 
+	"maz@kernel.org" <maz@kernel.org>, "oupton@kernel.org" <oupton@kernel.org>, Joey Gouly <Joey.Gouly@arm.com>, 
+	"seiden@linux.ibm.com" <seiden@linux.ibm.com>, Suzuki Poulose <Suzuki.Poulose@arm.com>, 
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>, Sashiko <sashiko-bot@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 10 Aug 2026 21:50:34 +0100,
-Wei-Lin Chang <weilin.chang@arm.com> wrote:
-> 
-> In order to avoid unmapping all shadow stage-2 mappings when KVM
-> receives a MMU notifier unmap call, we have to keep track of the
-> canonical IPA -> nested IPA relationship of the shadow mappings
-> created. This essentially means tracking the guest's stage-2.
-> 
-> To do this, represent each mapping by struct kvm_guest_s2_mapping. It
-> stores the mapping's canonical IPA range and the nested IPA range using
-> two interval tree nodes. Both nodes will be inserted into their
-> respective interval trees called guest_s2_mappings. The canonical IPA
-> ranges will be stored in the tree within the canonical MMU, and the
-> nested IPA ranges will be stored in the corresponding nested MMU's tree.
-> 
-> For example:
-> 
-> struct kvm_guest_s2_mapping mapping1, mapping2;
-> 
->     ---------------------> mapping2.canonical
->     |                      mapping1.canonical
->     |                          ^   (both stored in canonical mmu's tree)
->     |                          |
-> --*****-----------------------*****----------- CIPA
->    \\\\\                      |||||                  mapping1.nested_mmu
->     \\\\\                     \\\\\                            |
->      \\\\\                     \\\\\                           v
-> ------\\\\\---------------------*****--------- NIPA #1 (nested mmu #1)
->        \\\\\                      |
->         \\\\\                     -> mapping1.nested
->          \\\\\                       (stored in nested mmu #1's tree)
->           \\\\\
-> -----------*****------------------------------ NIPA #2 (nested mmu #2)
->              |                                                 ^
->              -> mapping2.nested                                |
->                 (stored in nested mmu #2's tree)   mapping2.nested_mmu
-> 
-> Using the trees we can look up nodes in either of the IPA spaces, and
-> for each node, find the corresponding range in the other IPA space from
-> the other node in the enclosing kvm_guest_s2_mapping.
-> 
-> Define kvm_guest_s2_mapping and the interval tree here. Guest stage-2
-> mapping tracking will come in subsequent patches.
-> 
-> Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
+Hi Sascha,
+
+On Fri, 4 Sept 2026 at 18:45, Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
+>
+> vgic_init() compares created_vcpus with online_vcpus to detect a vCPU
+> being created. However, CTRL_INIT only holds config_lock, while
+> admission of new vCPUs and updates to created_vcpus are protected by
+> kvm->lock.
+>
+> A concurrent KVM_CREATE_VCPU can therefore increment created_vcpus
+> after vgic_init() checks the counters, then block on config_lock before
+> publishing the new vCPU. For a GICv4 VM, vgic_v4_init() consequently
+> sizes its vPE array using a stale online_vcpus value, leaving no vPE
+> entry for the new vCPU once its creation completes. The upcoming GICv5
+> IRS support would hit the same issue when sizing its doorbell domain.
+>
+> Hold kvm->lock around CTRL_INIT. The existing counter check detects a
+> vCPU creation already in progress, while the lock prevents a new one
+> from starting until initialisation has completed.
+
+This also brings CTRL_INIT in line with the other vgic device flows
+that serialise against vCPU creation: kvm_vgic_create(), the GICv2
+register uaccess path, and SAVE_PENDING_TABLES just below it all hold
+kvm->lock across the config_lock section.
+
+> Fixes: f00327731131 ("KVM: arm64: Use config_lock to protect vgic state")
+> Reported-by: Sashiko <sashiko-bot@kernel.org>
+> Link: https://lore.kernel.org/r/20260807124506.ED85C1F000E9@smtp.kernel.org
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+
+Given that f00327731131 carried a stable tag, worth a Cc: stable?
+
+Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
+Tested-by: Fuad Tabba <fuad.tabba@linux.dev>
+
+Cheers,
+/fuad
+
+
+
 > ---
->  arch/arm64/include/asm/kvm_host.h | 17 +++++++++++++++++
->  arch/arm64/kvm/mmu.c              | 30 ++++++++++++++++++++++++++++++
->  arch/arm64/kvm/nested.c           |  1 +
->  3 files changed, 48 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index bae2c4f92ef5..0695c4ef93f1 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -14,6 +14,7 @@
->  #include <linux/arm-smccc.h>
->  #include <linux/bitmap.h>
->  #include <linux/types.h>
-> +#include <linux/interval_tree.h>
->  #include <linux/jump_label.h>
->  #include <linux/kvm_types.h>
->  #include <linux/maple_tree.h>
-> @@ -150,6 +151,16 @@ struct kvm_vmid {
->  	atomic64_t id;
->  };
->  
-> +/*
-> + * Record of a guest stage-2 mapping, storing canonical and nested IPA
-> + * ranges. Both ranges have the same size.
-> + */
-> +struct kvm_guest_s2_mapping {
-> +	struct interval_tree_node canonical;
-> +	struct interval_tree_node nested;
-> +	struct kvm_s2_mmu *nested_mmu;
-> +};
-> +
-
-I'm trying hard to find a way to reduce the size of this structure,
-because this is IMO the only real problem with this approach.
-
-Obviously, the only thing we could kill is this nested_mmu field, as
-everything else is used by the interval trees. I can see two ugly ways
-to do that:
-
-- either we iterate over all shadow MMUs to find the corresponding
-  'nested' node: really costly if we have a lot of mappings and/or a
-  lot of shadow MMUs
-
-- or we steal bits from the interval_tree_node to encode extra
-  information. One realisation is that all addresses are PAGE_SIZE
-  aligned, meaning that we have at least 12 bits that are always 0. We
-  could, for example, encode an index in the bottom bits of the
-  nested.start field. Probably easy enough, but may require some
-  careful masking (and the addition of an index in the s2_mmu
-  structure).
-
-The result would be significant, as we could then use a 96 byte slab,
-which means the cost of a 1GB @4k granularity could fall to 24MB.
-
-I don't think this is an immediate blocker for this series, but I'd
-like to at least have a plan...
-
-Thoughts?
-
-	M.
-
--- 
-Jazz isn't dead. It just smells funny.
+>  arch/arm64/kvm/vgic/vgic-kvm-device.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+> index 90be99443df3b..219881915bf41 100644
+> --- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
+> +++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+> @@ -255,9 +255,11 @@ static int vgic_set_common_attr(struct kvm_device *dev,
+>         case KVM_DEV_ARM_VGIC_GRP_CTRL: {
+>                 switch (attr->attr) {
+>                 case KVM_DEV_ARM_VGIC_CTRL_INIT:
+> +                       mutex_lock(&dev->kvm->lock);
+>                         mutex_lock(&dev->kvm->arch.config_lock);
+>                         r = vgic_init(dev->kvm);
+>                         mutex_unlock(&dev->kvm->arch.config_lock);
+> +                       mutex_unlock(&dev->kvm->lock);
+>                         return r;
+>                 case KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES:
+>                         /*
+> --
+> 2.34.1
