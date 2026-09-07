@@ -1,41 +1,77 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DD32525A88
-	for <kvmarm@lists.linux.dev>; Mon,  7 Sep 2026 18:41:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from esa4.hc1455-7.c3s2.iphmx.com (esa4.hc1455-7.c3s2.iphmx.com [68.232.139.117])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D0F32D879E
+	for <kvmarm@lists.linux.dev>; Mon,  7 Sep 2026 21:25:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.139.117
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788806535; cv=none; b=fZ5mxJey00oEk+tvsiAWnRReeb3LwnqsFBt0d/Ktqr6o/+a4TO+DRAYuH3aswnQ0o9MiuTr7kuWHjvQJkKZvg4PIJrAkHNYR6kfvPjo+10Jzu8ZYL6HKxttj94DKIJgF5Fu07i/gebEoDpIzfbjhl/yIgwHIbct3cOo2qYp03H4=
+	t=1788816303; cv=none; b=RslEASfw0TD04XCMsg+z5A5ogQwVe+8N8M/tIXje/g779FlXt6fYC5qVy2tvWxXxioRD0dhFsop+zrqbf9ihtkHWfQZo94pPm5AIow0JxCL50I1uyCXjM/5e2rGYLpNNqaFiqME/0bsITGcyoktjDFQP3wQt7qn2zTYKi0BMMSk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788806535; c=relaxed/simple;
-	bh=oOAJaNc8fwgBRGZou+YwG8GwcsoIvMJQ0k0a4TIZy/s=;
+	s=arc-20240116; t=1788816303; c=relaxed/simple;
+	bh=sP6TqseWnq6F/rMwkPdxmagtSOyUxPFFpE+5Nu3dPv0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KBEoj7nSkAQFbSXFtC10p7qITA7jrazLitFaeUeIVE/FkKUFCCky//ZNECpzHi4rMRYXXzV90toZBNAIiEYIPcZNQmPM3RV5wFmg7r3iiHz3IefFVF+rg1A/MqiASawq9uNFvFveIxUSoDC6w3wTt+JLRS9EcS6awHhHD9FOpVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=M5eaoEi/; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=O71pJC4FN/Vmpp0uMnVR1p/feIGiVKND/y3kMvTR56BdXfM6CUG403AIwwHXbL7hyYlZM+rlULSNDMXGVgC7rq4YMt6EwzCYnNhO1P2ymwLhEtWOiOQdEMR5D8orM53Qukt37WGIp35rKYf5bvGtXlllVSpD3joyO0ADeJfZ5Ro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=NWRqyEC0; arc=none smtp.client-ip=68.232.139.117
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="M5eaoEi/"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 986621476;
-	Mon,  7 Sep 2026 11:41:45 -0700 (PDT)
-Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D57603F528;
-	Mon,  7 Sep 2026 11:41:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1788806509; bh=oOAJaNc8fwgBRGZou+YwG8GwcsoIvMJQ0k0a4TIZy/s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=M5eaoEi/0DWd2TdnMuk/JswwJZj75WRus7Ql1q+5a2MSL7qzb/IUiyPVu96k0DJxc
-	 /UZNp1gsDy7VWFjgwh4krvW93L0Kit1sFpSeJbc3tYtwkog3asHDgLkWUJzqbcLQcs
-	 r6ju8NUwqY2QKPfOpCHSesZ/5AD1JYKFD4kynPx4=
-Date: Mon, 7 Sep 2026 19:41:30 +0100
-From: Wei-Lin Chang <weilin.chang@arm.com>
-To: Vincent Donnefort <vdonnefort@google.com>, maz@kernel.org, 
-	oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
-Cc: joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
-	kernel-team@android.com, fuad.tabba@linux.dev, qperret@google.com, keirf@google.com
-Subject: Re: [PATCH 00/20] Huge mapping support for protected VMs
-Message-ID: <g46hgnsj7rltrqzfmm7lgkdxteaxositebvrpasyjwesygwmq7@mcustodfb26v>
-References: <20260803100904.3563942-1-vdonnefort@google.com>
+	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="NWRqyEC0"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
+  t=1788816306; x=1820352306;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=sP6TqseWnq6F/rMwkPdxmagtSOyUxPFFpE+5Nu3dPv0=;
+  b=NWRqyEC0IJc3e+2rAXnuJAO8u3P1H/ouScmoVXzxEATQfPaDlkS8n6og
+   2ar3ZjFhObiAhqZJyTSkm6N0d14GEPpTzvyWZOLqSCctowPuAx3fj4LW3
+   KXux3miKLdJEvBiYanc/O8WHE31ERO7bCBjc4wKIEp7AbRmpoNykl3wCH
+   qsK33dxI3JeNqpiL9Slb/mESmEWNEvP+mwHciybW67KJMGdo0LCZpJju1
+   Ranvc9dJL+2HKzuV78hy+UBqGLshzn6dY81PwUE3S7ERABq6y8r3ZitL8
+   oDBaw/jQ6t6Qo+wJNePYxKqMbljnKB7mXAalfwgoW0LElU8D9uw6zrN8f
+   w==;
+X-CSE-ConnectionGUID: oNC++1q8TP+xpiq1NJgZbw==
+X-CSE-MsgGUID: BrbrQ6paRfuoNDvSaJHoCA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11899"; a="253728455"
+X-IronPort-AV: E=Sophos;i="6.25,268,1779116400"; 
+   d="scan'208";a="253728455"
+Received: from gmgwuk01.global.fujitsu.com ([172.187.114.235])
+  by esa4.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2026 06:24:58 +0900
+Received: from az2uksmgm3.o.css.fujitsu.com (unknown [10.151.22.200])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by gmgwuk01.global.fujitsu.com (Postfix) with ESMTPS id F1989C020D9
+	for <kvmarm@lists.linux.dev>; Mon,  7 Sep 2026 21:24:53 +0000 (UTC)
+Received: from az2uksmom1.o.css.fujitsu.com (unknown [10.151.22.202])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by az2uksmgm3.o.css.fujitsu.com (Postfix) with ESMTPS id 9FBDAC00767
+	for <kvmarm@lists.linux.dev>; Mon,  7 Sep 2026 21:24:53 +0000 (UTC)
+Received: from sm-arm-grace07 (unknown [10.124.178.20])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by az2uksmom1.o.css.fujitsu.com (Postfix) with ESMTPS id 641E81800170;
+	Mon,  7 Sep 2026 21:24:48 +0000 (UTC)
+Date: Tue, 8 Sep 2026 06:24:45 +0900
+From: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Takayuki Okamoto <tokamoto@fujitsu.com>
+Subject: Re: [PATCH 2/2] KVM: selftests: arm64: Add 52-bit VA guest modes
+Message-ID: <ap8rnTINMJQqfYGL@sm-arm-grace07>
+References: <20260826-arm64-52bit-va-v1-0-14ec98211363@fujitsu.com>
+ <20260826-arm64-52bit-va-v1-2-14ec98211363@fujitsu.com>
+ <CA+EHjTyJpPd8HjaWBw0V6pHF9UR0w2UFmaKDe7U3O+Sj8wiyPg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -44,95 +80,83 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260803100904.3563942-1-vdonnefort@google.com>
+In-Reply-To: <CA+EHjTyJpPd8HjaWBw0V6pHF9UR0w2UFmaKDe7U3O+Sj8wiyPg@mail.gmail.com>
 
-Hi Vincent,
+Hi Fuad,
+On Fri, Sep 04, 2026 at 09:45:30AM +0100, Fuad Tabba wrote:
+> Hi Itaru,
+> 
+> On Tue, 25 Aug 2026 at 22:18, Itaru Kitayama <itaru.kitayama@fujitsu.com> wrote:
+> ...
+> > diff --git a/tools/testing/selftests/kvm/lib/arm64/processor.c b/tools/testing/selftests/kvm/lib/arm64/processor.c
+> > index 9108e14a9b5b..bcdf670c9eb8 100644
+> > --- a/tools/testing/selftests/kvm/lib/arm64/processor.c
+> > +++ b/tools/testing/selftests/kvm/lib/arm64/processor.c
+> > @@ -46,7 +46,7 @@ static u64 pud_index(struct kvm_vm *vm, gva_t gva)
+> >         u64 mask = (1UL << (vm->page_shift - 3)) - 1;
+> >
+> >         TEST_ASSERT(vm->mmu.pgtable_levels >= 4,
+> > -                   "Mode %d does not have at least 4 page table levels",
+> > +                   "Mode %d does not have >= 4 page table levels",
+> 
+> Patch 1 added this string one commit earlier. Could it go in with the
+> final wording there?
 
-On Mon, Aug 03, 2026 at 11:08:44AM +0100, Vincent Donnefort wrote:
-> Currently, pKVM handles stage-2 mappings and ownership tracking strictly
-> at the PAGE_SIZE level. This series extends pKVM to support PMD_SIZE
-> block mappings, thereby enabling Transparent Huge Pages (THP) for
-> protected guests. hugetlbfs is currently unsupported as it does not
-> appear as swapbacked.
-> 
-> Summary of changes:
-> 
-> 1. Enable host stage-2 block-level annotations:
-> 
-> The host stage-2 being annotated with the GFN of the guest on the
-> host->guest donation transitions, we allow block-level annotations to
-> ensure the host stage-2 mapping size matches the guest stage-2.
-> 
-> 2. Expand ownership transition HVCs:
-> 
-> Enable the ownership test to work with PMD_SIZE so we can test
-> transitions supporting more than PAGE_SIZE.
-> 
-> 3. Implements the `PKVM_HYP_REQ_SPLIT` hypervisor request:
-> 
-> Allows the hypervisor to ask the host to split a mapping. This ensures
-> the guest s2, pkvm_mapping tree and host s2 are always using the same
-> mapping size.
-> 
-> 4. Wires up THP support for pKVM guests.
-> 
-> Keir Fraser (1):
->   KVM: arm64: Prefault host stage-2 entries on block split
-> 
-> Vincent Donnefort (19):
->   KVM: arm64: Propagate host stage-2 annotated entries on block split
->   KVM: arm64: Allow block-level stage-2 annotation
->   KVM: arm64: Use block-level annotations when setting up the host
->     stage-2
->   KVM: arm64: Make pKVM ownership selftest an HVC
->   KVM: arm64: Add a range to __pkvm_host_share/unshare_hyp()
->   KVM: arm64: Add a range to __pkvm_host_donate_guest()
->   KVM: arm64: Add a range to __pkvm_host_reclaim_page_guest()
->   KVM: arm64: Add a range to __pkvm_guest_share_host()
->   KVM: arm64: Add a range to __pkvm_guest_unshare_host()
->   KVM: arm64: Add a range to pKVM ownership selftest
->   KVM: arm64: Handle huge mappings in
->     __pkvm_host_force_reclaim_page_guest()
->   KVM: arm64: Handle huge mappings in __pkvm_vcpu_in_poison_fault()
->   KVM: arm64: pkvm: Warn on guest stage-2 block collapse
->   KVM: arm64: Add pkvm_hyp_req infrastructure
->   KVM: arm64: Add __pkvm_host_split_guest HVC
->   KVM: arm64: Extend pKVM page ownership selftests to cover guest block
->     split
->   KVM: arm64: Add PKVM_HYP_REQ_SPLIT
->   KVM: arm64: Raise PKVM_HYP_REQ_SPLIT on guest to host sharing
->   KVM: arm64: Stage-2 huge mappings for protected VMs
-> 
->  arch/arm64/include/asm/kvm_asm.h              |  12 +-
->  arch/arm64/include/asm/kvm_host.h             |  19 +
->  arch/arm64/include/asm/kvm_pgtable.h          |   3 +-
->  arch/arm64/include/asm/kvm_pkvm.h             |  21 +-
->  arch/arm64/kvm/arm.c                          |   2 +
->  arch/arm64/kvm/handle_exit.c                  |   3 +
->  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  25 +-
->  arch/arm64/kvm/hyp/include/nvhe/memory.h      |   5 +
->  arch/arm64/kvm/hyp/include/nvhe/pkvm.h        |   6 +-
->  arch/arm64/kvm/hyp/nvhe/ffa.c                 |  12 +-
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  47 +-
->  arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 545 ++++++++++++------
->  arch/arm64/kvm/hyp/nvhe/pkvm.c                |  59 +-
->  arch/arm64/kvm/hyp/nvhe/setup.c               | 152 +++--
->  arch/arm64/kvm/hyp/pgtable.c                  | 113 +++-
->  arch/arm64/kvm/mmu.c                          |  72 ++-
->  arch/arm64/kvm/pkvm.c                         | 247 +++++++-
->  arch/arm64/kvm/trace_pkvm.h                   |  44 ++
->  18 files changed, 1036 insertions(+), 351 deletions(-)
->  create mode 100644 arch/arm64/kvm/trace_pkvm.h
+Surely, will fix in v2.
 
-The patches in this series are missing per patch stats like this here.
-I would recommend including that to help reviewing.
+> 
+> ...
+> 
+> > @@ -298,10 +304,14 @@ struct kvm_vm *____vm_create(struct vm_shape shape)
+> >
+> >         /* Setup mode specific traits. */
+> >         switch (vm->mode) {
+> > +       case VM_MODE_P52V52_4K:
+> > +               vm->mmu.pgtable_levels = 5;
+> > +               break;
+> 
+> This is now the deepest mode, so page_fault_test.c's sizing is stale:
+> 
+>    * VM_MODE_P48V48_4K is the mode with most PT pages; let's use
+>    * twice that just in case.
+>   pt_size = 26 * guest_page_size;
+> 
+> The margin still covers it. Could pt_size come from vm->mmu.pgtable_levels?
+
+I'm not the author of the page_fault_test.c for arm64, but so I'm
+guessing here; per the comment in the test, I dont think total number of
+levels determines pt_size, rather by the addresses prepared for the
+test.
+
+This stress test does not require high virtual addresses, though should
+we update the comment while at it?
 
 Thanks,
-Wei-Lin Chang
+Itaru.
 
 > 
+> Cheers,
+> /fuad
 > 
-> base-commit: f5098b6bae761e346ebcd9da7f95622c04733cff
-> -- 
-> 2.55.0.508.g3f0d502094-goog
+> 
+> >         case VM_MODE_P52V48_4K:
+> >                 vm->mmu.pgtable_levels = 4;
+> >                 break;
+> >         case VM_MODE_P52V48_64K:
+> > +       case VM_MODE_P52V52_64K:
+> >                 vm->mmu.pgtable_levels = 3;
+> >                 break;
+> >         case VM_MODE_P48V48_4K:
+> > @@ -322,6 +332,7 @@ struct kvm_vm *____vm_create(struct vm_shape shape)
+> >         case VM_MODE_P48V48_16K:
+> >         case VM_MODE_P40V48_16K:
+> >         case VM_MODE_P36V48_16K:
+> > +       case VM_MODE_P52V52_16K:
+> >                 vm->mmu.pgtable_levels = 4;
+> >                 break;
+> >         case VM_MODE_P47V47_16K:
+> >
+> > --
+> > 2.43.0
+> >
 > 
