@@ -1,389 +1,231 @@
-Received: from esa7.hc1455-7.c3s2.iphmx.com (esa7.hc1455-7.c3s2.iphmx.com [139.138.61.252])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9CFB3546D6;
-	Mon,  7 Sep 2026 07:45:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.138.61.252
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788767132; cv=none; b=eHU+UfZAdruoAdcN4lGD+s1lG73MHPBfDrVKMGxVySkXNAQ4FRlFHGmLVe8wp6nKmK3xYT+TAJHJi4MMNG6e+wKCe9qieBCg9w5DVMrT/4QCKboxJVqt3pKaBADaUkJBwDeA/kimWF0hKApVhFrj4X0vUnkrnZP6vxpH+/HvDpQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788767132; c=relaxed/simple;
-	bh=qk6/X7C3XmKrnAvXBqOLd12alMHlFiDTZ1WdU3G6n6s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WbNNGWdMm3m+VSu7EbYWHLrrUCI/uUGe5AWqVlKmcV7xF6GL8noangKRvNxdNQPOOJ8tYgxDWjVNaVCSR3fetjnhGK9TZJ+rGpRbhOLgkRT5tM+ZZpMfiXgw3EqIJgpvht/zsEhzuS8G4pmWCbTbjHaWQWHaijovwtgGIe+9Bc0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=O05hEGcd; arc=none smtp.client-ip=139.138.61.252
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EB5943CE4B
+	for <kvmarm@lists.linux.dev>; Mon,  7 Sep 2026 08:24:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788769449; cv=pass; b=F7M+4Oa6fgty4XpNgxh8/KjqJavjr1GQHiVLHRPROp2Uhg5cfZ9cDSFhj2Gf4xkc3CWx0AKTMRckMGqN2kK5YLypyS9/X5hPNlBh8LkF51QNKZZSCq+Ge5gnXRou2bFLu9hOOilzjDb89bWxTbEE3bA6uDy9y5NkfKR96wG5NpE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788769449; c=relaxed/simple;
+	bh=eW2heI0TSrLo005hXEi9RN2qzKnbcSMx1USmy+ENf4A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=h3OCmpycb4RuLklCVWj1GMbcCk4QBiX9ZJpDc56B1zShFzRo3ZSpv8QnHMBmFa4Infkaag4UvZXXW4RIqywe/7pqFPzYbqn4lD1E/5Kn8TBO71A8Nh9LTbXp1qeeDCWpw8Cflq5RRztQVfWj1IOUmANc4+imnNyZUo7gUmpybs8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault.org header.i=@brainfault.org header.b=kjsbKQVO; arc=pass smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="O05hEGcd"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
-  t=1788767130; x=1820303130;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=qk6/X7C3XmKrnAvXBqOLd12alMHlFiDTZ1WdU3G6n6s=;
-  b=O05hEGcdqf1hJtBPM0LobrbhySWi6pfzKa5xHeY6XAr1EupR4LSyifwi
-   HldlgdF/U1asz+PSBWLOJlV82NQPy1cz3vp7BxXWJO4l+CtHW0RhieQ8m
-   nbZ1QeDMJxGgf2CNWPrIiyWogQG+F/XALj2YbxzrESjwrUheGWCjjmHub
-   AZ/OgmRY6FmmFDUd/cHdVA7PIkuqkd4Q26/OGDA/z00DW+ikan4Om5SAZ
-   4vB78LhPhltpkzkuXbZOqSdrqzb9nkWaMl7L42+PxWuEkG0C/UgB7kd1m
-   serlDHXcKyvLLdikVk0ZAzpMDETH01hASVEFKLVvfq3YLWrmf7btux2+j
-   w==;
-X-CSE-ConnectionGUID: fls8pjTkSW24oKk1RzPIhg==
-X-CSE-MsgGUID: WJ9LO6wuSuaFAvORAescSA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11898"; a="233073508"
-X-IronPort-AV: E=Sophos;i="6.25,267,1779116400"; 
-   d="scan'208";a="233073508"
-Received: from gmgwuk01.global.fujitsu.com ([172.187.114.235])
-  by esa7.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Sep 2026 16:44:19 +0900
-Received: from az2uksmgm4.o.css.fujitsu.com (unknown [10.151.22.201])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by gmgwuk01.global.fujitsu.com (Postfix) with ESMTPS id CC6901C1C70E;
-	Mon,  7 Sep 2026 07:44:19 +0000 (UTC)
-Received: from az2nlsmom2.o.css.fujitsu.com (unknown [10.150.26.200])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by az2uksmgm4.o.css.fujitsu.com (Postfix) with ESMTPS id 7C0D914003C1;
-	Mon,  7 Sep 2026 07:44:19 +0000 (UTC)
-Received: from FCCLS0092175.localdomain (unknown [10.8.144.219])
-	by az2nlsmom2.o.css.fujitsu.com (Postfix) with SMTP id 860FB18002EE;
-	Mon,  7 Sep 2026 07:44:10 +0000 (UTC)
-Date: Mon, 7 Sep 2026 16:44:02 +0900
-From: Kohei Enju <enju.kohei@fujitsu.com>
-To: Gavin Shan <gshan@redhat.com>
-Cc: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev, Catalin Marinas <catalin.marinas@arm.com>, 
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>, 
-	Oliver Upton <oliver.upton@linux.dev>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, 
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev, 
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, Shanker Donthineni <sdonthineni@nvidia.com>, 
-	Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>, 
-	Emi Kisanuki <fj0570is@fujitsu.com>, Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com, 
-	Lorenzo Pieralisi <lpieralisi@kernel.org>
-Subject: Re: [PATCH v16 22/45] KVM: arm64: CCA: Handle RMI_EXIT_RIPAS_CHANGE
-Message-ID: <ap5p4PpuunQdm0WE@FCCLS0092175.localdomain>
-References: <20260803134403.80630-1-steven.price@arm.com>
- <20260803134403.80630-23-steven.price@arm.com>
- <ap49Orng5-oehc6J@FCCLS0092175.localdomain>
- <8a437df9-a591-4645-9cd8-55fc4f0ed534@redhat.com>
+	dkim=pass (2048-bit key) header.d=brainfault.org header.i=@brainfault.org header.b="kjsbKQVO"
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-4843e9c5960so3259106f8f.0
+        for <kvmarm@lists.linux.dev>; Mon, 07 Sep 2026 01:24:06 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1788769445; cv=none;
+        d=google.com; s=arc-20260327;
+        b=QxeYyq/AOKaC38dFyJBkZmBjFdpYq6bWeDX33C3Y/U9qMCfpM5brWlr05R9ABP9HMk
+         PK+tLBfqaSpaVvsAaOXkTpnBATrxtAcm2QUd1pLK6sQ+AZv8022KsEfiucWOQsFaR6Er
+         Afb5kWc8M6zwGjBsgMSjK5L7MHsEz9ycTejtOPO9n664TjwVxBxZT5VEukYGtlKM3hqO
+         p2tF5kt46xfa0J9cGu88vYVUT8Jo6K27hj1gIRQvTPLZ3OzuoTkr29saDvf4n7fstl4D
+         IWr/Cp2/PVhAKo20G6mKok0qG6RM2oYFFazPCyL81bugy4bMLWDEXt5Fdp97RglmHD5B
+         6rVw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=h6qiSySchwLDdn88HORNI+edfDP5k4+RIZ3ev8MYNCc=;
+        fh=FuZxML3DVmmmn3sfbkFvc0fxnoZBBOd+3JcnGcNOKqc=;
+        b=kawI5yZeNri7XVUfY5YHl/tjIbwtzY1IALuYDyvUbiVvPKTVbQRVliqHp+aukgPZ67
+         82lWRvdHmjArLEmyrOa1LnPLlVWjMAwUV0laUCfQnu+y2ocPHWBAZkXTttgUCIUnddM2
+         NFX5F4e3A51I/lS1MxAKYxb1+p6eP2QXFf/QgYN/uwql8Wd0UcJORU+DPIl0QYo8C8ic
+         jy+XdAw7b/OLridPQHj63nB7eFP9ZwCPOpvg83J9mnAX9/gktfdv9v3QT/YwXJTloa2K
+         Lx+GevMXVyYP7fis3T4cokuRm5Vf6OnxITl3UOLRNOolmXT7Jlp1P/dYfBCHzC5Ji8Gu
+         URgQ==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault.org; s=google; t=1788769445; x=1789374245; darn=lists.linux.dev;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=h6qiSySchwLDdn88HORNI+edfDP5k4+RIZ3ev8MYNCc=;
+        b=kjsbKQVOpAewjBgfDxqZPL5996xdu85QCa+JBtU+6nmZP6kZjicKmOpzxW2oGcQaqP
+         xVyXfBE3TERHCFWPDnCoF6Mnaz86eaLMYq7Kvz9xRkjK0HgKgyxC7gj9l3jFCd5m9G5Q
+         o0W8eImcJHoOOJM+989oW8Gp3mh28+WmN6VcxHL8f7FmPafqE5WqbTvOtevMVHpvPS1L
+         qYNINu+eBpFtRLoeMUKWkDpVibctpY5qqN+3O4Ibo+y26HpOVGUdCWOUt7lHl7zhJ5d8
+         MEsPGhejnl2vnTr1yPtYPz243PGOJGThLnsC0BTbsHYr18kShOqJy6H66snDYDgek/RO
+         dZxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788769445; x=1789374245;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=h6qiSySchwLDdn88HORNI+edfDP5k4+RIZ3ev8MYNCc=;
+        b=ogSdYGTpn4FHZtoPovG4aNV1KdBFXGCB7vqxrDAVyYCK97hfAnkc88ceP9XvJNep4Y
+         F8dTv/JMdgzEMaPkc9eY8l59volFbJRKIl1qGH4T4HjDqczDZa9cpwBLMBaBxn4qcyTD
+         SNUHhtsBvAleLyrmN4oPNVBlGjc8yDKCz7ZUVlvLlzCHp7gkY1RmuR0JdbHcE52MohKw
+         P12Z8dVx7G92Z3hYMRoFlmPAMVtS4yKHGaTRSTs4K5Hmz/joBPsMwVWIfYOhRmNgFxGf
+         fssFwYDpX0ylYwj20+hCf7E6siK0keVS90XNZicRTvAdIPO2eSMl7s+H/g0dIlsgWWi4
+         Rm4Q==
+X-Forwarded-Encrypted: i=1; AKwUvBwqhQZzzdJWmtnGZf2hFbp/G2LKhFJ0s13eMQFsLME0VHy9jF9+A5TCKpBj0uU1Qzj1Cyjdwks=@lists.linux.dev
+X-Gm-Message-State: AFuF++mEft7s0ALTMoZEvgBzm2Q1IdLimF7ODqhL34GomT5fNsmROFcl
+	ikLvJG1Jgx6rffexvTr1nULsA6tK62JATHqNGr4Ian9Z0WZbDjQTJ1BPW2L8l9ozb0Kh2FYsSOO
+	nNFC3yJirRXFjODhKVB42l3C08283wjfzGdLnF9D1MA==
+X-Gm-Gg: AYBFou199jChIkgekGos/zqOUDvSnhXa0f103AfEq9bheSAZKIkhb9KioKyXBZgsNwC
+	UXQr9b8K8SLv/osYSmPg6rOgAM7s/BZ6gvTLpGKOVb3Zm7jD9bX7SNSbUJxxNuIMRt89S+1ghpg
+	ABRWUOpiGsCvuwTGDrGNphFlKMCRUvREEEQgT1YKcCUalETjoosR5g8pQn8cHYtY9r/3S5DFt4Z
+	6c1cD0NRn0jGZQkZttE6MlHtSdSu3vYFGaV0YqOxB8P4FpoezR9givuy/OsHiGNfmnRQASiHdGL
+	vuJmqxHxoT8dBgK0gS17SS8Z3tPZu2fzbd+JIxyN4AcCNzdqNpQYa9Sy/IEvP0hTnUtLekNkaFr
+	RyoTddAQmer5wotvtB0zImzv61ZnTTRhpUdunz8eoGJMyoyb9AYHrh3pzjNIc16g=
+X-Received: by 2002:a05:6000:2f82:b0:485:8c16:5ef7 with SMTP id
+ ffacd0b85a97d-4858c166148mr18091871f8f.49.1788769445126; Mon, 07 Sep 2026
+ 01:24:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <8a437df9-a591-4645-9cd8-55fc4f0ed534@redhat.com>
+References: <20260902164123.2546762-1-seanjc@google.com> <20260902164123.2546762-11-seanjc@google.com>
+In-Reply-To: <20260902164123.2546762-11-seanjc@google.com>
+From: Anup Patel <anup@brainfault.org>
+Date: Mon, 7 Sep 2026 13:53:53 +0530
+X-Gm-Features: AcwNN1UOItNX8Zqa8yZNak7eVCaaP3xVxuE0lRNcn1acCna6Fm_hGPjVZ5FCvUw
+Message-ID: <CAAhSdy1zxu0cGnvpZEq_mPYRj07m7a+TA_8f0-sa=Mu7xtXvjA@mail.gmail.com>
+Subject: Re: [PATCH v2 10/20] KVM: selftests: Add a wrapper API to allocate
+ multiple page table pages
+To: Sean Christopherson <seanjc@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
+	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, 
+	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Fuad Tabba <fuad.tabba@linux.dev>, 
+	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Atish Patra <atish.patra@linux.dev>, Alexandre Ghiti <alex@ghiti.fr>, 
+	David Hildenbrand <david@kernel.org>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, Itaru Kitayama <itaru.kitayama@fujitsu.com>, 
+	Nicholas Piggin <npiggin@gmail.com>, Ritesh Harjani <ritesh.list@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 09/07 16:58, Gavin Shan wrote:
-> Hi Kohei,
-> 
-> On 9/7/26 3:05 PM, Kohei Enju wrote:
-> > Hi Steven,
-> > 
-> > On 08/03 14:43, Steven Price wrote:
-> > > The guest can request that a region of its protected address space is
-> > > switched between RIPAS_RAM and RIPAS_EMPTY (and back) using
-> > > RSI_IPA_STATE_SET. This causes a guest exit with the
-> > > RMI_EXIT_RIPAS_CHANGE code. We treat this as a request to convert a
-> > > protected region to unprotected (or back), exiting to the VMM to make
-> > > the necessary changes to the guest_memfd and memslot mappings. On the
-> > > next entry the RIPAS changes are committed by making RMI_RTT_SET_RIPAS
-> > > calls.
-> > > 
-> > > The VMM may wish to reject the RIPAS change requested by the guest. For
-> > > now it can only do this by no longer scheduling the VCPU as we don't
-> > > currently have a usecase for returning that rejection to the guest, but
-> > > by postponing the RMI_RTT_SET_RIPAS changes to entry we leave the door
-> > > open for adding a new ioctl in the future for this purpose.
-> > > 
-> > > Signed-off-by: Steven Price <steven.price@arm.com>
-> > > ---
-> > > Changes since v15:
-> > >   * Propagate negative error returns.
-> > > Changes since v14:
-> > >   * Use addition rather than bitwise OR for adding the shared_bit in
-> > >     realm_unmap_shared_range(), this handles the case where the region
-> > >     includes the last address (which means 'end' already has the bit
-> > >     set).
-> > > Changes since v13:
-> > >   * Switch to the new RMI_RTT_UNPROT_UNMAP range-based API.
-> > >   * Drop ugly hack for RMM bug which errored when the RIPAS was already
-> > >     set to the desired value.
-> > > Changes since v12:
-> > >   * Switch to the new RMM v2.0 RMI_RTT_DATA_UNMAP which can unmap an
-> > >     address range.
-> > > Changes since v11:
-> > >   * Combine the "Allow VMM to set RIPAS" patch into this one to avoid
-> > >     adding functions before they are used.
-> > >   * Drop the CAP for setting RIPAS and adapt to changes from previous
-> > >     patches.
-> > > Changes since v10:
-> > >   * Add comment explaining the assignment of rec->run->exit.ripas_base in
-> > >     kvm_complete_ripas_change().
-> > > Changes since v8:
-> > >   * Make use of ripas_change() from a previous patch to implement
-> > >     realm_set_ipa_state().
-> > >   * Update exit.ripas_base after a RIPAS change so that, if instead of
-> > >     entering the guest we exit to user space, we don't attempt to repeat
-> > >     the RIPAS change (triggering an error from the RMM).
-> > > Changes since v7:
-> > >   * Rework the loop in realm_set_ipa_state() to make it clear when the
-> > >     'next' output value of rmi_rtt_set_ripas() is used.
-> > > New patch for v7: The code was previously split awkwardly between two
-> > > other patches.
-> > > ---
-> > >   arch/arm64/include/asm/kvm_rmi.h |   6 +
-> > >   arch/arm64/kvm/mmu.c             |   8 +-
-> > >   arch/arm64/kvm/rmi.c             | 473 +++++++++++++++++++++++++++++++
-> > >   3 files changed, 484 insertions(+), 3 deletions(-)
-> > > 
-> > > [...]
-> > > +
-> > > +static int ripas_change(struct kvm *kvm,
-> > > +			struct kvm_vcpu *vcpu,
-> > > +			unsigned long ipa,
-> > > +			unsigned long end,
-> > > +			enum ripas_action action,
-> > > +			unsigned long *top_ipa)
-> > > +{
-> > > +	struct realm *realm = &kvm->arch.realm;
-> > > +	phys_addr_t rd_phys = virt_to_phys(realm->rd);
-> > > +	phys_addr_t rec_phys;
-> > > +	struct kvm_mmu_memory_cache *memcache = NULL;
-> > > +	long ret = 0;
-> > > +
-> > > +	if (vcpu) {
-> > > +		rec_phys = vcpu->arch.rec.rec_phys;
-> > > +		memcache = &vcpu->arch.mmu_page_cache;
-> > > +
-> > > +		WARN_ON(action != RIPAS_SET);
-> > > +	} else {
-> > > +		WARN_ON(action != RIPAS_INIT);
-> > > +	}
-> > > +
-> > > +	while (ipa < end) {
-> > > +		unsigned long next = ~0;
-> > > +
-> > > +		switch (action) {
-> > > +		case RIPAS_INIT:
-> > > +			ret = rmi_rtt_init_ripas(rd_phys, ipa, end, &next);
-> > > +			break;
-> > > +		case RIPAS_SET:
-> > > +			ret = rmi_rtt_set_ripas(rd_phys, rec_phys, ipa, end,
-> > > +						&next);
-> > > +			break;
-> > > +		}
-> > > +
-> > > +		if (ret < 0)
-> > > +			goto out;
-> > > +
-> > > +		switch (RMI_RETURN_STATUS(ret)) {
-> > > +		case RMI_SUCCESS:
-> > > +			ipa = next;
-> > > +			break;
-> > > +		case RMI_ERROR_RTT: {
-> > > +			int err_level = RMI_RETURN_INDEX(ret);
-> > > +			int level = find_map_level(realm, ipa, end);
-> > > +
-> > 
-> > I have been testing this series using TF-RMM from:
-> >    https://git.trustedfirmware.org/TF-RMM/tf-rmm.git topics/rmm-v2.0-poc_3
-> > 
-> > I found that Linux repeatedly issues the same SMC_RMI_RTT_SET_RIPAS call
-> > [0], eventually causing a soft lockup [1].
-> > 
-> > The root cause appears to be an RMM bug fixed by:
-> >    https://git.trustedfirmware.org/plugins/gitiles/TF-RMM/tf-rmm.git/+/38c1de0adf66
-> > 
-> > Without this fix, RMM returns RMI_ERROR_RTT at level 3. In this case,
-> > both err_level and level are 3. Since this is RIPAS_SET, the check below
-> > is skipped, realm_create_rtt_levels(realm, ipa, 3, 3, ...) is a no-op,
-> > and ipa does not advance. The same RMI is therefore retried
-> > indefinitely.
-> > 
-> 
-> FYI. This is a known issue, reported previously [1]. Following the discussions
-> in the thread will lead to the TF-RMM commit you mentioned.
-> 
-> [1] https://lore.kernel.org/linux-coco/d0ffbcb5-0cca-4d1e-9788-6b430345fa9b@redhat.com/
+On Wed, Sep 2, 2026 at 10:11=E2=80=AFPM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> Add vm_alloc_page_table_pages() and use it throughout arch code to replac=
+e
+> open coded equivalents.
+>
+> No functional change intended.
+>
+> Reviewed-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+> Tested-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-Hi Gavin,
+LGTM.
 
-Thank you for the FYI.
-I wasn't aware of that discussions, so I appreciate you pointing it out.
+For KVM RISC-V:
+Acked-by: Anup Patel <anup@brainfault.org>
 
-Thanks,
-Kohei
+Regards,
+Anup
 
-> 
-> Thanks,
-> Gavin
-> 
-> > > +			/*
-> > > +			 * If the operation failed at deeper level than
-> > > +			 * what is required for the address range, this
-> > > +			 * implies encountering an unexpected entry,
-> > > +			 * (e.g., RIPAS_DESTROYED), which the RMM prevents
-> > > +			 * us from modifying. This is only applicable for
-> > > +			 * RMI_RTT_INIT_RIPAS. All the other requests
-> > > +			 * are generated by the Realm and thus RMM should
-> > > +			 * be able to allow the transition.
-> > > +			 */
-> > > +			if (action == RIPAS_INIT && WARN_ON_ONCE(err_level >= level))
-> > > +				return -ENXIO;
-> > 
-> > Although the root cause is an RMM bug, should we also guard RIPAS_SET
-> > against this no-progress case?
-> > 
-> > Thanks,
-> > Kohei
-> > 
-> > [0]
-> >    SMC_RSI_VERSION                   10000 > RSI_SUCCESS 10000 10001
-> >    SMC_RSI_REALM_CONFIG              830e5000 > RSI_SUCCESS
-> >    SMC_RSI_IPA_STATE_SET             80000000 c0000000 1 0
-> >    SMC_RMI_RTT_SET_RIPAS             10060182000 10056e1c000 8000c000 c0000000 > RMI_ERROR_RTT 3
-> >    SMC_RMI_RTT_SET_RIPAS             10060182000 10056e1c000 8000c000 c0000000 > RMI_ERROR_RTT 3
-> >    SMC_RMI_RTT_SET_RIPAS             10060182000 10056e1c000 8000c000 c0000000 > RMI_ERROR_RTT 3
-> >    ... (the same SMC_RMI_RTT_SET_RIPAS call is logged repeatedly)
-> > 
-> > [1]
-> >    [  201.945663] CPU: 113 UID: 0 PID: 8093 Comm: kvm-vcpu-0
-> >    [...]
-> >    [  201.946291] pstate: 61402009 (nZCv daif +PAN -UAO -TCO +DIT -SSBS BTYPE=--)
-> >    [  201.946416] pc : arm_smccc_1_2_smc+0x34/0x70
-> >    [  201.946430] lr : rmi_smccc_invoke+0xc0/0x108
-> >    [  201.946442] sp : ffff8000b59ab5e0
-> >    [  201.946448] x29: ffff8000b59ab690 x28: 000000008313e000 x27: 0000000000000003
-> >    [  201.946510] x26: 000008241cb3c000 x25: ffffffffffffffff x24: ffff8000b59ab830
-> >    [  201.946569] x23: ffff8000b59ab7c0 x22: 0000082419daa000 x21: 000008241cb3c000
-> >    [  201.946701] x20: 00000000000000fb x19: ffff8000b59ab5f8 x18: 0000000000000000
-> >    [  201.946740] x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000000
-> >    [  201.947097] x14: 0000000000000000 x13: 0000000000000000 x12: 0000000000000000
-> >    [  201.947127] x11: 0000000000000000 x10: 0000000000000000 x9 : 0000000000000000
-> >    [  201.947550] x8 : 0000000000000000 x7 : 0000000000000000 x6 : 0000000000000000
-> >    [  201.947783] x5 : 0000000000000000 x4 : 00000000c0000000 x3 : 0000000000000000
-> >    [  201.947802] x2 : 0000000000000000 x1 : 0000000000000000 x0 : 0000000000000304
-> >    [  201.948305] Call trace:
-> >    [  201.948438]  arm_smccc_1_2_smc+0x34/0x70 (P)
-> >    [  201.948484]  rmi_sro_execute+0x24/0xd0
-> >    [  201.948571]  rmi_rtt_set_ripas.constprop.0+0x6c/0xb0
-> >    [  201.948698]  ripas_change+0xc4/0x1e8
-> >    [  201.948889]  kvm_rec_handle_request+0x190/0x308
-> >    [  201.948943]  check_vcpu_requests+0xcc/0x4f8
-> >    [  201.948960]  kvm_arch_vcpu_ioctl_run+0x208/0x7c0
-> >    [  201.948986]  kvm_vcpu_ioctl+0x174/0xac8
-> >    [  201.949062]  __arm64_sys_ioctl+0xb4/0x118
-> >    [  201.949089]  invoke_syscall.constprop.0+0xa8/0x100
-> >    [  201.949147]  do_el0_svc+0xb8/0xc8
-> >    [  201.949159]  el0_svc+0x48/0x1f8
-> >    [  201.949169]  el0t_64_sync_handler+0xa0/0xe8
-> >    [  201.949194]  el0t_64_sync+0x1ac/0x1b0
-> > 
-> > > +
-> > > +			ret = realm_create_rtt_levels(realm, ipa, err_level,
-> > > +						      level, memcache);
-> > > +			if (ret)
-> > > +				goto out;
-> > > +			/* Retry with the RTT levels in place */
-> > > +			break;
-> > > +		}
-> > > +		default:
-> > > +			WARN_ON(1);
-> > > +			ret = -ENXIO;
-> > > +			goto out;
-> > > +		}
-> > > +	}
-> > > +
-> > > +out:
-> > > +	if (top_ipa)
-> > > +		*top_ipa = ipa;
-> > > +
-> > > +	return ret;
-> > > +}
-> > > +
-> > > +static int realm_set_ipa_state(struct kvm_vcpu *vcpu,
-> > > +			       unsigned long start,
-> > > +			       unsigned long end,
-> > > +			       unsigned long ripas,
-> > > +			       unsigned long *top_ipa)
-> > > +{
-> > > +	struct kvm *kvm = vcpu->kvm;
-> > > +	int ret = ripas_change(kvm, vcpu, start, end, RIPAS_SET, top_ipa);
-> > > +
-> > > +	if (!ret && ripas == RMI_EMPTY && *top_ipa != start)
-> > > +		realm_unmap_private_range(kvm, start, *top_ipa, false);
-> > > +
-> > > +	return ret;
-> > > +}
-> > > +
-> > > +static int kvm_complete_ripas_change(struct kvm_vcpu *vcpu)
-> > > +{
-> > > +	struct kvm *kvm = vcpu->kvm;
-> > > +	struct realm_rec *rec = &vcpu->arch.rec;
-> > > +	unsigned long base = rec->run->exit.ripas_base;
-> > > +	unsigned long top = rec->run->exit.ripas_top;
-> > > +	unsigned long ripas = rec->run->exit.ripas_value;
-> > > +	unsigned long top_ipa = base;
-> > > +	int ret;
-> > > +
-> > > +	do {
-> > > +		kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_page_cache,
-> > > +					   kvm_mmu_cache_min_pages(vcpu->arch.hw_mmu));
-> > > +		write_lock(&kvm->mmu_lock);
-> > > +		ret = realm_set_ipa_state(vcpu, base, top, ripas, &top_ipa);
-> > > +		write_unlock(&kvm->mmu_lock);
-> > > +
-> > > +		if (ret == -ENOMEM) {
-> > > +			/* If no progress, then stop */
-> > > +			if (top_ipa == base)
-> > > +				break;
-> > > +			base = top_ipa;
-> > > +			continue;
-> > > +		}
-> > > +
-> > > +		if (WARN_RATELIMIT(ret,
-> > > +				   "Unable to satisfy RIPAS_CHANGE for %#lx - %#lx, ripas: %#lx\n",
-> > > +				   base, top, ripas))
-> > > +			break;
-> > > +
-> > > +		base = top_ipa;
-> > > +	} while (base < top);
-> > > +
-> > > +	/*
-> > > +	 * If this function is called again before the REC_ENTER call then
-> > > +	 * avoid calling realm_set_ipa_state() again by changing to the value
-> > > +	 * of ripas_base for the part that has already been covered. The RMM
-> > > +	 * ignores the contains of the rec_exit structure so this doesn't
-> > > +	 * affect the RMM.
-> > > +	 */
-> > > +	rec->run->exit.ripas_base = base;
-> > > +
-> > > +	return 1;
-> > > +}
-> > > +
-> > >   int kvm_rec_handle_request(struct kvm_vcpu *vcpu)
-> > >   {
-> > >   	struct realm_rec *rec = &vcpu->arch.rec;
-> > > @@ -224,6 +695,8 @@ int kvm_rec_handle_request(struct kvm_vcpu *vcpu)
-> > >   					vcpu_get_reg(vcpu, rt);
-> > >   		}
-> > >   		break;
-> > > +	case RMI_EXIT_RIPAS_CHANGE:
-> > > +		return kvm_complete_ripas_change(vcpu);
-> > >   	default:
-> > >   		KVM_BUG(1, vcpu->kvm, "Unhandled realm exit_reason");
-> > >   		return -ENXIO;
-> > > -- 
-> > > 2.43.0
-> > > 
-> > 
-> 
+
+> ---
+>  tools/testing/selftests/kvm/include/kvm_util.h    | 9 +++++++--
+>  tools/testing/selftests/kvm/lib/arm64/processor.c | 4 +---
+>  tools/testing/selftests/kvm/lib/riscv/processor.c | 4 +---
+>  tools/testing/selftests/kvm/lib/s390/processor.c  | 8 ++------
+>  4 files changed, 11 insertions(+), 14 deletions(-)
+>
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testi=
+ng/selftests/kvm/include/kvm_util.h
+> index d9d39a8894e2..c56f342b16fd 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+> @@ -1013,10 +1013,15 @@ static inline gpa_t vm_phy_page_alloc(struct kvm_=
+vm *vm, gpa_t min_gpa,
+>         return vm_phy_pages_alloc(vm, 1, min_gpa, memslot);
+>  }
+>
+> +static inline gpa_t vm_alloc_page_table_pages(struct kvm_vm *vm, size_t =
+nr_pages)
+> +{
+> +       return vm_phy_pages_alloc(vm, nr_pages, KVM_GUEST_PAGE_TABLE_MIN_=
+PADDR,
+> +                                 vm->memslots[MEM_REGION_PT]);
+> +}
+> +
+>  static inline gpa_t vm_alloc_page_table(struct kvm_vm *vm)
+>  {
+> -       return vm_phy_page_alloc(vm, KVM_GUEST_PAGE_TABLE_MIN_PADDR,
+> -                                vm->memslots[MEM_REGION_PT]);
+> +       return vm_alloc_page_table_pages(vm, 1);
+>  }
+>
+>  /*
+> diff --git a/tools/testing/selftests/kvm/lib/arm64/processor.c b/tools/te=
+sting/selftests/kvm/lib/arm64/processor.c
+> index 01325bf4d36f..2dcaa2c4a038 100644
+> --- a/tools/testing/selftests/kvm/lib/arm64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/arm64/processor.c
+> @@ -115,9 +115,7 @@ void virt_arch_pgd_alloc(struct kvm_vm *vm)
+>         if (vm->mmu.pgd_created)
+>                 return;
+>
+> -       vm->mmu.pgd =3D vm_phy_pages_alloc(vm, nr_pages,
+> -                                        KVM_GUEST_PAGE_TABLE_MIN_PADDR,
+> -                                        vm->memslots[MEM_REGION_PT]);
+> +       vm->mmu.pgd =3D vm_alloc_page_table_pages(vm, nr_pages);
+>         vm->mmu.pgd_created =3D true;
+>  }
+>
+> diff --git a/tools/testing/selftests/kvm/lib/riscv/processor.c b/tools/te=
+sting/selftests/kvm/lib/riscv/processor.c
+> index ded5429f3448..c175dcd14114 100644
+> --- a/tools/testing/selftests/kvm/lib/riscv/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/riscv/processor.c
+> @@ -69,9 +69,7 @@ void virt_arch_pgd_alloc(struct kvm_vm *vm)
+>         if (vm->mmu.pgd_created)
+>                 return;
+>
+> -       vm->mmu.pgd =3D vm_phy_pages_alloc(vm, nr_pages,
+> -                                        KVM_GUEST_PAGE_TABLE_MIN_PADDR,
+> -                                        vm->memslots[MEM_REGION_PT]);
+> +       vm->mmu.pgd =3D vm_alloc_page_table_pages(vm, nr_pages);
+>         vm->mmu.pgd_created =3D true;
+>  }
+>
+> diff --git a/tools/testing/selftests/kvm/lib/s390/processor.c b/tools/tes=
+ting/selftests/kvm/lib/s390/processor.c
+> index fb9dab92d4d1..33f49d743b5f 100644
+> --- a/tools/testing/selftests/kvm/lib/s390/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/s390/processor.c
+> @@ -20,9 +20,7 @@ void virt_arch_pgd_alloc(struct kvm_vm *vm)
+>         if (vm->mmu.pgd_created)
+>                 return;
+>
+> -       gpa =3D vm_phy_pages_alloc(vm, PAGES_PER_REGION,
+> -                                  KVM_GUEST_PAGE_TABLE_MIN_PADDR,
+> -                                  vm->memslots[MEM_REGION_PT]);
+> +       gpa =3D vm_alloc_page_table_pages(vm, PAGES_PER_REGION);
+>         memset(addr_gpa2hva(vm, gpa), 0xff, PAGES_PER_REGION * vm->page_s=
+ize);
+>
+>         vm->mmu.pgd =3D gpa;
+> @@ -38,9 +36,7 @@ static u64 virt_alloc_region(struct kvm_vm *vm, int ri)
+>  {
+>         u64 taddr;
+>
+> -       taddr =3D vm_phy_pages_alloc(vm,  ri < 4 ? PAGES_PER_REGION : 1,
+> -                                  KVM_GUEST_PAGE_TABLE_MIN_PADDR,
+> -                                  vm->memslots[MEM_REGION_PT]);
+> +       taddr =3D vm_alloc_page_table_pages(vm, ri < 4 ? PAGES_PER_REGION=
+ : 1);
+>         memset(addr_gpa2hva(vm, taddr), 0xff, PAGES_PER_REGION * vm->page=
+_size);
+>
+>         return (taddr & REGION_ENTRY_ORIGIN)
+> --
+> 2.55.0.966.g6673acef38-goog
+>
