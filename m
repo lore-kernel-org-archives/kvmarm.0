@@ -1,50 +1,43 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5F8D4CB8CA;
-	Mon,  7 Sep 2026 14:14:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E45548CD71
+	for <kvmarm@lists.linux.dev>; Mon,  7 Sep 2026 14:38:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788790483; cv=none; b=HL37NjqEKrNXB4+QBabFTP6FzaA7sc/noVMBMv4jfwUHrPstxsIizWBQxWb0aafm0qtg7/oMoSx2rwify958otWSnvTLo+4moXg4cWLgfvuzI5f3rXDnS20F65s81jn1gdyLDz9OiggNhz/U9z1ydy88UP3m8QjhIgQZNh6XJpk=
+	t=1788791894; cv=none; b=NAY2HZ6qPGjY7dmgRUTWMBk6P9mM2uiRooaEJc6c4KSLTOVsrDh/fqFnYzAcehbJ4zPxx7afzCoHHcVyOMzggAI7jvbQjhuj/utQA3rqyAUIzIsSHXEV6X/pD0k+OePZvt/dgHN17YgFN+svoZph+yOWCye01MaZuoegdBsXs3o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788790483; c=relaxed/simple;
-	bh=yvb3TKII5RqnvWR4KKPwM6Pa0eGdrgURYd2q830BwGg=;
+	s=arc-20240116; t=1788791894; c=relaxed/simple;
+	bh=WUNSoWZpeqdDZs8W4YWQUVGB39NYxjnCgCjxLQYs5jU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=npN6Qc211+Db9jgufvOGMPH9NugBn7h7ZuNPbmxY40MgiRlXhhbeCMZ1Eo9USTCJ57oLtNnwVfxsyplWHX7ERuUXNxnc4ZCDlyYIeC7MmRK+YyfDy2Z1qJSGORhWYF/6O255SST+f8dekGSriyCjwLkTo6uXyRLxNtH2LeQN+F8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NhoyMxVX; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=P4PuH0CPYUQRYJ9kD054QrTWV+F9XuJzwYgvIxlbw5AZA/bPHZPs8E0h0V7vvl8JXdhZW0Pzu31R1somZEEFYms6bEnAUpNATMQ3tpZpXOtAPa8EypLYesuOoeMrgWQeuMTvBza9xPE1Yk4TvWsJyR6K2j5rqJ2vpCoRtYd2uwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=IDdmMswX; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NhoyMxVX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E13F91F00A3A;
-	Mon,  7 Sep 2026 14:14:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788790481;
-	bh=vSaY8hFogQ8XMCarbwj5OucKl8VFySrfC7cRQOJejcs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=NhoyMxVXLvulJLaKclIWhey+zgZ3IDzhbkoezViwyf/Uj/o2j2rj5/DAnppDI556c
-	 RtNPIYDrUsFyY/9uH3cimmT0KElBGmbB8AVwypDnqQLonLQu+mwlhnZ3a3NAECgOfg
-	 1D39BRQRZ5XQofKPUoAIjIYrdWjbf1QPtmef6KMEZplUV0meDYbA5jOnhye1HgAcwl
-	 N/xK+z16UrOabUYhTrqi6r3KofzuzKLqLrymAtOrPvYv9IWjaKTXgA0Qt7ue4q3uip
-	 KoW8J315Vdl/a36GJCkPTqpZhN6ByI5J+3N7Yyux3QEeRuy62GRcVZclr4dnLoo09w
-	 zlF9rtE5IBO6w==
-Date: Mon, 7 Sep 2026 15:14:34 +0100
-From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Shuah Khan <shuah@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Fuad Tabba <fuad.tabba@linux.dev>, Peter Maydell <peter.maydell@linaro.org>, 
-	Leonardo Bras <leo.bras@arm.com>, Wei-Lin Chang <weilin.chang@arm.com>, 
-	Yao Yuan <yaoyuan@linux.alibaba.com>, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
-	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v20 03/14] KVM: arm64: Manage GCS access and registers
- for guests
-Message-ID: <ap7GPxGs3nhT70sS@gremlin>
-References: <20260901-arm64-gcs-v20-0-f31750bdfadb@kernel.org>
- <20260901-arm64-gcs-v20-3-f31750bdfadb@kernel.org>
- <apmfx08vccSd2MXw@gremlin>
- <d2659ac3-2f00-4fc4-8f9e-0585691a4ba2@sirena.org.uk>
- <apqA_SuoA6-TyHsS@gremlin>
- <apszJZ17KUvd6BJ7@sirena.co.uk>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="IDdmMswX"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9DF811476;
+	Mon,  7 Sep 2026 07:38:01 -0700 (PDT)
+Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 036B73F528;
+	Mon,  7 Sep 2026 07:38:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1788791885; bh=WUNSoWZpeqdDZs8W4YWQUVGB39NYxjnCgCjxLQYs5jU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=IDdmMswXM7Hyaxng4ZWtOFUzjYY9W9L3t2I6wgjA2csgfHO7soIZNCWzGxwQqTROn
+	 hpcnBPqMDP9HZ0hSK7TeQxX6tNaGzjaBJxu6YvgNmXFh/RE2pcDUeW6+vqOqDgEOIT
+	 /V36J4k5vsFR4Gtb88FtWgeQKGDXugPr/ss2KbfA=
+Date: Mon, 7 Sep 2026 15:37:56 +0100
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: Vincent Donnefort <vdonnefort@google.com>, maz@kernel.org, 
+	oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
+Cc: joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
+	kernel-team@android.com, fuad.tabba@linux.dev, qperret@google.com, keirf@google.com
+Subject: Re: [PATCH 04/20] KVM: arm64: Use block-level annotations when
+ setting up the host stage-2
+Message-ID: <n2cker7zphcsacuck5ovwtj6k622ykpadg6njs2qirhqxj5keh@ub2dnnarnmmm>
+References: <20260803100904.3563942-1-vdonnefort@google.com>
+ <20260803100904.3563942-5-vdonnefort@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -53,68 +46,91 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <apszJZ17KUvd6BJ7@sirena.co.uk>
+In-Reply-To: <20260803100904.3563942-5-vdonnefort@google.com>
 
-On Fri, Sep 04, 2026 at 10:07:49PM +0100, Mark Brown wrote:
-> On Fri, Sep 04, 2026 at 09:54:51AM +0100, Lorenzo Stoakes (ARM) wrote:
-> > On Thu, Sep 03, 2026 at 09:41:26PM +0100, Mark Brown wrote:
->
-> > > originally written the code without expressing this dependency but on a
-> > > previous version Marc asked for this nesting as an optimisation.  Since
-> > > it's about optimisastion adding checks that don't otherwise exist on the
-> > > restore path would doubtless get the similar complaints.  Exactly the
-> > > same concerns were raised on v19.
->
-> > Could you implement the nesting the same in the cases where there is a bare
-> > ctx_has_gcs() as an alternative?
->
-> > So then it'd always be tcrx -> s1pie -> gcs everywhere and that'd resolve things
-> > also and make things symmetric.
->
-> > You could also I think express the dependency if it makes sense to.
->
-> Clearly we *can*, it's a question of what'd be acceptable - it'd result
-> in the compiler emitting a bunch of extra alternatives and conditionals
-> in the context switch path.
+On Mon, Aug 03, 2026 at 11:08:48AM +0100, Vincent Donnefort wrote:
 
-Right. And that's presumably a rather _sensitive_ bit of code.
+[...]
 
->
-> > > We could do checking of the ID registers at vCPU creation so we could
-> > > avoid worrying about them in the fast path but there was also feedback
-> > > about not doing that.  One idea I had was to generate feature
->
-> > Could you possibly check in sanitise_id_aa64pfr1_el1(), something like:
->
-> Sanitising the writes is a bit tricky since multiple ID registers are
-> involved, TCRX and S1PIE are in ID_AA64MMFR3_EL1 while GCS is in
-> ID_AA64PFR1_EL1 so you'd create an ordering constraint for userspace,
-> and you'd also have to handle the case where TCR2 or S1PIE are turned
-> off with GCS already enabled.  It feels like a bunch of complication,
-> especially if you start applying the same approach with other features.
+> +static int fix_host_ownership_walker(const struct kvm_pgtable_visit_ctx *ctx,
+> +				     enum kvm_pgtable_walk_flags visit)
+> +{
+> +	struct fix_host_ownership_data *data = ctx->arg;
+> +	enum kvm_pgtable_prot prot = 0;
+> +	phys_addr_t phys = 0;
+> +	int ret;
+> +
+> +	if (kvm_pte_valid(ctx->old))
+> +		prot = kvm_pgtable_hyp_pte_prot(ctx->old);
+> +
+> +	if (!prot) {
+> +		/* Unchanged region */
+> +		if (!data->prot)
+> +			return 0;
+> +
+> +		goto apply_ownership;
+> +	}
+> +
+> +	phys = kvm_pte_to_phys(ctx->old);
+> +	if (!addr_is_memory(phys))
+> +		return -EINVAL;
+> +
+> +	/* We already know phys is contiguous as we walk the linear map */
+> +
+> +	if (prot != data->prot)
+> +		goto apply_ownership;
+> +
+> +	/* Accumulate in the current region */
+> +	data->size += kvm_granule_size(ctx->level);
+> +
+> +	return 0;
+> +
+> +apply_ownership:
+> +	ret = __fix_host_ownership(data);
+> +	if (ret)
+> +		return ret;
+> +
+> +	data->phys = phys;
+> +	data->size = kvm_granule_size(ctx->level);
+> +	data->prot = prot;
+> +
+> +	return 0;
+> +}
 
-Yeah, you're right, it is a bit of a nightmare and feels like it could get
-a bit combinatorial.
+I think this function can be simplified, if we check phys first:
 
->
-> If we're going to validate the ID registers it feels safer to check at
-> the point where we finalise the ID registers and refuse to start the
-> vCPU if there's an unsupportable configuration, that would mean the
-> check would only need to be done in one place and userspace wouldn't
-> trip over any ordering requirements with how it updates registers.  Only
-> userspaces that set architecturally invalid configurations should see an
-> error.  We could also handle things by fixing up the configuration at
-> the same point, disabling features that are missing their dependencies,
-> that's a bit more friendly in the short term but could lead to trouble
-> later on as it means we hide issues in userspace.
->
-> I think the best thing overall would be to leave the runtime paths as
-> they are and refuse to run with an architecturally invalid setup, that
-> would avoid bloating the fast path.
+static int fix_host_ownership_walker(const struct kvm_pgtable_visit_ctx *ctx,
+				     enum kvm_pgtable_walk_flags visit)
+{
+	struct fix_host_ownership_data *data = ctx->arg;
+	enum kvm_pgtable_prot prot = 0;
+	phys_addr_t phys = 0;
+	int ret;
 
-Ack, it'd be nice to not have to worry about that.
+	if (kvm_pte_valid(ctx->old))
+		prot = kvm_pgtable_hyp_pte_prot(ctx->old);
 
-Presumably we definitely want an oops on a GCS violation in general?
+	if (prot) {
+		phys = kvm_pte_to_phys(ctx->old);
+		if (!addr_is_memory(phys))
+			return -EINVAL;
+	}
 
---
-Cheers, Lorenzo
+	if (prot != data->prot) {
+		ret = __fix_host_ownership(data);
+		if (ret)
+			return ret;
+
+		data->phys = phys;
+		data->size = kvm_granule_size(ctx->level);
+		data->prot = prot;
+	} else {
+		data->size += kvm_granule_size(ctx->level);
+	}
+	return 0;
+}
+
+Did I miss anything?
+
+Thanks,
+Wei-Lin Chang
