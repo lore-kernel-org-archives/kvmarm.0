@@ -1,33 +1,33 @@
-Received: from mta1.migadu.com (out-214.mta1.migadu.com [95.215.58.214])
+Received: from mta0.migadu.com (out-18.mta0.migadu.com [91.218.175.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29B6040DB3B
-	for <kvmarm@lists.linux.dev>; Mon,  7 Sep 2026 07:00:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.214
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3398923815B
+	for <kvmarm@lists.linux.dev>; Mon,  7 Sep 2026 07:00:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788764416; cv=none; b=eU4XuuXIw1WiDt+mn72zQebY21hC3AWNogUdAklwhKlPrVcBOu7NXkVrpJp5vZr2hjD/R91jf14K8up3jKR9v/LsbRrT28zoBqDhZ6F+9NYe9LxVZfPfsa6OoscxwA8M1B2QyW8QmtSyBUmCKGEcMvvPGbWWMGpjOkxbalTyT5c=
+	t=1788764424; cv=none; b=LXjW+KUY/cPpG1mPxv2IRpCeaOMdqQYeQecLhU8mnjBzu5hy+cuvKm/7plPikN7GT/fGUgniFWbYH3mGw852WWqcSJhuY7VFb+Qz9BhpDcnlq4ATSrKX9hWt3z4IivGTGUqzQxIyht8i4/uBVRSglFx6Qq9pYqb/aaYLw38D0xI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788764416; c=relaxed/simple;
-	bh=PJujOV+1Z+2Pic9F+Xx2wknBh2QM3e+/EoajCgxNjqc=;
+	s=arc-20240116; t=1788764424; c=relaxed/simple;
+	bh=PK1z4T8+HJA4CmHfQi7yiSBW4CDCz2oM5Ruw56h1rLM=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=AcZJOWmOH8KI0wyFPB28S135ATf/qGeEm2fQpnjmCGbVWA5YbkbFEFJTOAomhj4ejD6vH8noW6d1lkq5CMExiLjD2OvXFYtBJnsQ7EJ0aqZKFwQfu32o3A3kggpfu/F4Ed05YhM13/dnvrStA2ee+hDQzMziYbO2x2B6+k0gMZs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=P2TwRGyZ; arc=none smtp.client-ip=95.215.58.214
+	 MIME-Version; b=hoeSQYHIcRnVNuwtHttKvWUCkc3GxDUBbMnG8SLatipDK0h3CrJzYR8Q3KHjOwL1TRPaSYBJ4/kO/sQkNrqTFvsEW6V+KCR4T8/ZRSasn3bbERD+sZNY4SGFu/rgI8b4zA8foay2wHKn6nk674LnXF9am7TK1NAWDgHKOWtrCU4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=KIAJh8wv; arc=none smtp.client-ip=91.218.175.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="P2TwRGyZ"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="KIAJh8wv"
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=PJujOV+1Z+2Pic9F+Xx2wknBh2QM3e+/EoajCgxNjqc=;
+DKIM-Signature: a=rsa-sha256; bh=PK1z4T8+HJA4CmHfQi7yiSBW4CDCz2oM5Ruw56h1rLM=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1788764404; v=1; x=1789369204;
- b=P2TwRGyZwiXu5ajKrw9H73ln7KXvD4eJTHrwvYXY0AcqwdbDSUs64fx3HS2B72RgB/Y5GqtV
- MbQAI9Fl/3E2mf0WYU4OIvL5Bl+gbeaaL8rKK0h1DUrgOTNAKFoAUsAtp4TxX45e7zM0ygC4m5m
- v59ObM2zaA3a5wBMnGUialDU=
+ t=1788764421; v=1; x=1789369221;
+ b=KIAJh8wvoMZVe8f+WnnXTzrEEeNxpQoEXly03XKOnbZM6Tikcmzz3BHEjfH87x7Ua5LfOTpy
+ X/Rrsj/2gN//A6JO8jRP/PFwCB6CRcex4RyaQcVD6nYZff2G3eGhKU5ynXoxda24qqRCB13EN3P
+ XYxmweHod7U3LWNm4X1E/Q1I=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id c859b1d3d590cc6f;
-	Mon, 07 Sep 2026 07:00:03 +0000
-X-Mizu-Trace-ID: c859b1d3d590cc6f
+Received: by smtp.migadu.com with ESMTPS id 1bd4e47017fc79c9;
+	Mon, 07 Sep 2026 07:00:07 +0000
+X-Mizu-Trace-ID: 1bd4e47017fc79c9
 X-Migadu-Flow: FLOW_OUT
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
@@ -44,9 +44,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Vincent Donnefort <vdonnefort@google.com>,
 	Quentin Perret <qperret@google.com>,
 	Fuad Tabba <tabba@google.com>
-Subject: [PATCH v2 01/17] KVM: arm64: Sync HCR_EL2.VSE back to the host vCPU under pKVM
-Date: Mon,  7 Sep 2026 07:59:46 +0100
-Message-Id: <20260907070002.3333525-2-fuad.tabba@linux.dev>
+Subject: [PATCH v2 02/17] KVM: arm64: Reject the PVTIME vCPU attribute for protected VMs
+Date: Mon,  7 Sep 2026 07:59:47 +0100
+Message-Id: <20260907070002.3333525-3-fuad.tabba@linux.dev>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20260907070002.3333525-1-fuad.tabba@linux.dev>
 References: <20260907070002.3333525-1-fuad.tabba@linux.dev>
@@ -58,37 +58,52 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-flush_hyp_vcpu() copies HCR_EL2.VSE from the host vCPU into the hyp
-vCPU on every entry, and nothing copies it back. Once the guest takes
-the vSError the hyp vCPU's copy clears with the hardware bit while the
-host's stays set, so the next entry pends the same SError again,
-KVM_GET_VCPU_EVENTS keeps reporting it, and kvm_arch_vcpu_runnable()
-never lets the vCPU block in WFI.
+pKVM currently doesn't support steal time for protected guests:
+KVM_CAP_STEAL_TIME reports 0 for them. The host still accepts the
+KVM_ARM_VCPU_PVTIME_CTRL attribute, whose IPA would point
+kvm_update_stolen_time() at the guest's private memory on every vCPU
+load. Return -EPERM for the attribute group instead.
 
-Reflect VSE back on every exit, which the flush-side comment already
-states.
-
-Fixes: 734dc8c01c838 ("KVM: arm64: Implement lazy vCPU state sync for non-protected guests")
 Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
- arch/arm64/kvm/hyp/nvhe/hyp-main.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ arch/arm64/kvm/guest.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 9a3b92e626adb..b6bfe502bcd04 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -276,6 +276,10 @@ static void sync_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
- 
- 	host_vcpu->arch.iflags		= hyp_vcpu->vcpu.arch.iflags;
- 
-+	/* Cleared by hardware once the guest takes the vSError. */
-+	host_vcpu->arch.hcr_el2 &= ~HCR_VSE;
-+	host_vcpu->arch.hcr_el2 |= hyp_vcpu->vcpu.arch.hcr_el2 & HCR_VSE;
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index b01d6622b8720..ab659795d4b2f 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -916,6 +916,10 @@ int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
+ 		ret = kvm_arm_timer_set_attr(vcpu, attr);
+ 		break;
+ 	case KVM_ARM_VCPU_PVTIME_CTRL:
++		/* Steal time is not advertised to protected guests. */
++		if (vcpu_is_protected(vcpu))
++			return -EPERM;
 +
- 	sync_hyp_vgic_state(hyp_vcpu);
- }
- 
+ 		ret = kvm_arm_pvtime_set_attr(vcpu, attr);
+ 		break;
+ 	default:
+@@ -939,6 +943,9 @@ int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
+ 		ret = kvm_arm_timer_get_attr(vcpu, attr);
+ 		break;
+ 	case KVM_ARM_VCPU_PVTIME_CTRL:
++		if (vcpu_is_protected(vcpu))
++			return -EPERM;
++
+ 		ret = kvm_arm_pvtime_get_attr(vcpu, attr);
+ 		break;
+ 	default:
+@@ -962,6 +969,9 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
+ 		ret = kvm_arm_timer_has_attr(vcpu, attr);
+ 		break;
+ 	case KVM_ARM_VCPU_PVTIME_CTRL:
++		if (vcpu_is_protected(vcpu))
++			return -EPERM;
++
+ 		ret = kvm_arm_pvtime_has_attr(vcpu, attr);
+ 		break;
+ 	default:
 -- 
 2.39.5
 
