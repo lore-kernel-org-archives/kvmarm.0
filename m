@@ -1,157 +1,103 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65E6A4F30D5
-	for <kvmarm@lists.linux.dev>; Mon,  7 Sep 2026 14:52:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B212C3DA7DF;
+	Mon,  7 Sep 2026 14:55:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788792778; cv=none; b=bP5Tg6tAAjCuozMv7hf0VNX5BIn+i+rjxxz8uy2hlD3lSBwyNiRhJOFCDPUuekRociqbHE8mIAJRBWQ/lWGg6q1qHEwbPOSOSqbWy7es06lNW/TBnPOIAENgBGOgtVdN8/rY/RDWfhQtKFhnIzB/xKa8VO15Ud7mQ9QzMx9ja+I=
+	t=1788792951; cv=none; b=CQklIewHFKW+MJJqM3z2cFhYff8LdqCLbhbXbvm1i3yurdLfgRIqwMwbUEiFPi8xlMpIxRSgDs+UoPqsYagdVYc0sWD0TzBoGyUQdFH2U2XIiEa2e/JUBjia2ECvi5I72lga9H3LXVl+ma2fs4suOsGklvZp2V1DqXdOC7SrdIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788792778; c=relaxed/simple;
-	bh=r3k3fDYG2MvTPsgaP6Offm+VihJbdwFTPeuaVnZh8MU=;
+	s=arc-20240116; t=1788792951; c=relaxed/simple;
+	bh=2jjD9H14qZFuN1A2ZEy20p76oWP14OoN1nDHd0sWhho=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DVm57WfHd+jfQRwxoh4j9D0/bxUHnjVfr+hzJf6HqXmUUoXlzQSF6HkyLntB83LvMd5nBG8e5KgjKqdTFES1ZcbmmBGNR3lCu4hTxXvdPb0yKFtJFUdNv4Agd7q4G90FIY4225zbQ9eW3HNtZhShKTFx+NRxdzx0unO5IdgswPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=qF1o4IpG; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=nMyj/mSPjSLvS+BRooqhOF194FHFVdHURo6knjiW1OaRyvY+dHnrEPA/Bgb2h73WmuKp6ncB2Mui0Hy1mmf3N+jQuKS4ROJXLul5LfJjyxXlpdcMpVS3pMaGNI6uxkbWkc29oReeunWa4DdJbMRWeNqj7CrsS8f6rd5I36+VCl8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GeB0F78r; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="qF1o4IpG"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6C1AE1476;
-	Mon,  7 Sep 2026 07:52:40 -0700 (PDT)
-Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AF5BC3F528;
-	Mon,  7 Sep 2026 07:52:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1788792764; bh=r3k3fDYG2MvTPsgaP6Offm+VihJbdwFTPeuaVnZh8MU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qF1o4IpGeCgp+dwszPCHkoxTcmnXtaGGWXUv2hK5Mgx59+6iDTmlxeJbgeE+Aj+F9
-	 xAhjHuG3OPANGiLXlPKvFuxpXGUcRcBa/MDvpnTy1puP+WL8qlKht9fgzigEGysL/y
-	 x596PS7ELJWcAbr42mzvdhrzPtTGQbDR5VFnyUvQ=
-Date: Mon, 7 Sep 2026 15:52:34 +0100
-From: Wei-Lin Chang <weilin.chang@arm.com>
-To: Vincent Donnefort <vdonnefort@google.com>, maz@kernel.org, 
-	oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
-Cc: joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
-	kernel-team@android.com, fuad.tabba@linux.dev, qperret@google.com, keirf@google.com
-Subject: Re: [PATCH 08/20] KVM: arm64: Add a range to
- __pkvm_host_reclaim_page_guest()
-Message-ID: <ggblnclfadr4oy7i3d43okgedqqx3ak5edhxfrjhceh4763xyw@iyxtswi72edn>
-References: <20260803100904.3563942-1-vdonnefort@google.com>
- <20260803100904.3563942-9-vdonnefort@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GeB0F78r"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF1881F00A3A;
+	Mon,  7 Sep 2026 14:55:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788792950;
+	bh=jZrePntlHVDK9rodlmxxLGUgDqQdmgMc0bpMFEHwxJ4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=GeB0F78rB6Y8pThJerenvvl44gFR6MWAitakMRGR8hHx3fAJn/RYT1io+zjG+kLV7
+	 QFLgkRNYf/Dolcv3sEpveUNbfVk9ubRQCaIVvZoV84Tekx87cV4Yt+/4sWLzmDKWRc
+	 y/etunm7qrGurs7vSFyLpC8LzsavBs4ZRO+7f0A1hDGYSi07b/r0tfWr8Bss6++GQ+
+	 7BazWC7NDYoxrKRO7e9pIFMXkQaLkwgLt4uGx0QIjTjWg345+vBehr+ksPLoOKiYNQ
+	 FbE06SF1xNCqx7/3XznXY0zkmsNjxaC/pE8nvtxdOqJJbSSDCTqz7UCXDYCduKY57W
+	 +VS1d0RYeYukQ==
+Date: Mon, 7 Sep 2026 15:55:43 +0100
+From: Mark Brown <broonie@kernel.org>
+To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Shuah Khan <shuah@kernel.org>, Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Leonardo Bras <leo.bras@arm.com>,
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	Yao Yuan <yaoyuan@linux.alibaba.com>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v20 03/14] KVM: arm64: Manage GCS access and registers
+ for guests
+Message-ID: <1effee02-41f0-4680-9a6f-9b9f12459ec1@sirena.org.uk>
+References: <20260901-arm64-gcs-v20-0-f31750bdfadb@kernel.org>
+ <20260901-arm64-gcs-v20-3-f31750bdfadb@kernel.org>
+ <apmfx08vccSd2MXw@gremlin>
+ <d2659ac3-2f00-4fc4-8f9e-0585691a4ba2@sirena.org.uk>
+ <apqA_SuoA6-TyHsS@gremlin>
+ <apszJZ17KUvd6BJ7@sirena.co.uk>
+ <ap7GPxGs3nhT70sS@gremlin>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="ii74x8XOAcc6drmt"
+Content-Disposition: inline
+In-Reply-To: <ap7GPxGs3nhT70sS@gremlin>
+X-Cookie: Who's on first?
+
+
+--ii74x8XOAcc6drmt
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260803100904.3563942-9-vdonnefort@google.com>
 
-On Mon, Aug 03, 2026 at 11:08:52AM +0100, Vincent Donnefort wrote:
+On Mon, Sep 07, 2026 at 03:14:34PM +0100, Lorenzo Stoakes (ARM) wrote:
+> On Fri, Sep 04, 2026 at 10:07:49PM +0100, Mark Brown wrote:
+> > On Fri, Sep 04, 2026 at 09:54:51AM +0100, Lorenzo Stoakes (ARM) wrote:
 
-[...]
+> > I think the best thing overall would be to leave the runtime paths as
+> > they are and refuse to run with an architecturally invalid setup, that
+> > would avoid bloating the fast path.
 
-> +int __pkvm_host_reclaim_page_guest(u64 gfn, u64 nr_pages, struct pkvm_hyp_vm *vm);
->  int __pkvm_host_share_guest(u64 pfn, u64 gfn, u64 nr_pages, struct pkvm_hyp_vcpu *vcpu,
->  			    enum kvm_pgtable_prot prot);
->  int __pkvm_host_unshare_guest(u64 gfn, u64 nr_pages, struct pkvm_hyp_vm *hyp_vm);
-> diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-> index f04cea5ff389..0d17e59d5335 100644
-> --- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-> +++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-> @@ -74,7 +74,7 @@ int __pkvm_init_vm(struct kvm *host_kvm, unsigned long vm_hva,
->  int __pkvm_init_vcpu(pkvm_handle_t handle, struct kvm_vcpu *host_vcpu,
->  		     unsigned long vcpu_hva);
->  
-> -int __pkvm_reclaim_dying_guest_page(pkvm_handle_t handle, u64 gfn);
-> +int __pkvm_reclaim_dying_guest_page(pkvm_handle_t handle, u64 gfn, u64 nr_pages);
+> Ack, it'd be nice to not have to worry about that.
 
-I feel like __pkvm_host_reclaim_"page"_guest(),
-__pkvm_reclaim_dying_guest_"page"() aren't good names since they deal
-with multiple pages now.
+> Presumably we definitely want an oops on a GCS violation in general?
 
-[...]
+Yes, the guest is going to want GCS exceptions delivering if they've
+enabled them and something triggers them.  It might also be relying on
+the GCS for stack traces even if nothing triggers any GCS related fault.
 
->  
-> -static int get_valid_guest_pte(struct pkvm_hyp_vm *vm, u64 ipa, kvm_pte_t *ptep, u64 *physp)
-> +static int __get_valid_guest_pte(struct pkvm_hyp_vm *vm, u64 ipa,
-> +				 kvm_pte_t *ptep, u64 *physp, s8 *levelp)
->  {
->  	kvm_pte_t pte;
->  	u64 phys;
-> @@ -905,20 +906,32 @@ static int get_valid_guest_pte(struct pkvm_hyp_vm *vm, u64 ipa, kvm_pte_t *ptep,
->  		return -EHWPOISON;
->  	if (!kvm_pte_valid(pte))
->  		return -ENOENT;
-> -	if (level != KVM_PGTABLE_LAST_LEVEL)
-> -		return -E2BIG;
->  
->  	phys = kvm_pte_to_phys(pte);
-> -	ret = check_range_allowed_memory(phys, phys + PAGE_SIZE);
-> +	ret = check_range_allowed_memory(phys, phys + kvm_granule_size(level));
->  	if (WARN_ON(ret))
->  		return ret;
->  
->  	*ptep = pte;
->  	*physp = phys;
-> +	*levelp = level;
->  
->  	return 0;
->  }
->  
-> +static int get_valid_guest_pte(struct pkvm_hyp_vm *vm, u64 ipa, u64 size,
-> +			       kvm_pte_t *ptep, u64 *physp)
-> +{
-> +	s8 level;
-> +	int ret;
-> +
-> +	ret = __get_valid_guest_pte(vm, ipa, ptep, physp, &level);
-> +	if (ret)
-> +		return ret;
-> +
-> +	return kvm_granule_size(level) == size ? 0 : -E2BIG;
-> +}
-> +
->  int __pkvm_vcpu_in_poison_fault(struct pkvm_hyp_vcpu *hyp_vcpu)
->  {
->  	struct pkvm_hyp_vm *vm = pkvm_hyp_vcpu_to_hyp_vm(hyp_vcpu);
-> @@ -1001,7 +1014,7 @@ int __pkvm_guest_share_host(struct pkvm_hyp_vcpu *vcpu, u64 gfn)
->  	host_lock_component();
->  	guest_lock_component(vm);
->  
-> -	ret = get_valid_guest_pte(vm, ipa, &pte, &phys);
-> +	ret = get_valid_guest_pte(vm, ipa, PAGE_SIZE, &pte, &phys);
->  	if (ret)
->  		goto unlock;
->  
-> @@ -1033,7 +1046,7 @@ int __pkvm_guest_unshare_host(struct pkvm_hyp_vcpu *vcpu, u64 gfn)
->  	host_lock_component();
->  	guest_lock_component(vm);
->  
-> -	ret = get_valid_guest_pte(vm, ipa, &pte, &phys);
-> +	ret = get_valid_guest_pte(vm, ipa, PAGE_SIZE, &pte, &phys);
->  	if (ret)
->  		goto unlock;
->  
-> @@ -1285,6 +1298,14 @@ static void hyp_poison_page(phys_addr_t phys)
->  	hyp_fixmap_unmap();
->  }
->  
-> +static void hyp_poison_range(phys_addr_t phys, u64 size)
-> +{
-> +	u64 offset;
-> +
-> +	for (offset = 0; offset < size; offset += PAGE_SIZE)
-> +		hyp_poison_page(phys + offset);
-> +}
-> +
+--ii74x8XOAcc6drmt
+Content-Type: application/pgp-signature; name="signature.asc"
 
-I believe get_valid_guest_pte and hyp_poison_range changes/addition can
-be made into its own patch, focusing on small helpers?
-If so I believe it can make reviewing easier.
+-----BEGIN PGP SIGNATURE-----
 
-Thanks,
-Wei-Lin Chang
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmqe0G8ACgkQJNaLcl1U
+h9AMhwf/ZEOA93+3vTR1PmXwHKzlv94Ja4BeBP/DlIKj2/RESX9cBT1C074Ii+JE
+6SpAj8Gm8mWroTcAFXodksUYQmNAlviEbpV+wmiPn8mRO3HaIagbvAvGbiQYRVEP
+mlcbLjt8qbCHmjiAkfL2JG2q4I7wvKhOHiQr3uRGaFuX+oAW8KRkesDw4ukC8GX8
+NaxmBY8DL33LFkIQTCYlyqF68vFM55S+UD+SxrOPpswmpptwu8+WuKG4WLpkQk5S
+EvjhRC2jwkT9746QCpt1Xyrilc05Xv1dkDTAa8GLHcfLwHwjkKivXcdXNFw8uLwV
+9xLwVcyB8p0TztiucJK0FzKKU7/RzQ==
+=KAik
+-----END PGP SIGNATURE-----
 
-[...]
+--ii74x8XOAcc6drmt--
