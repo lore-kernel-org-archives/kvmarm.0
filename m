@@ -1,102 +1,98 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81F0B436BEA;
-	Mon,  7 Sep 2026 11:47:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 688DD471414;
+	Mon,  7 Sep 2026 11:58:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788781631; cv=none; b=uwrEav22UCaI5n20qk2pMMwE5HwYFIm+I6swKVoT8TRdnm3XP38G+dc0JWwbf8VehatSI9WE1wyJF6y+EcV5n2BKl9eNQhTA5r3Zi2jKsUF9mP3FQATopYr1ZFBPV81aMukEagDkGgVSL6Y1jNRmBA2ctoBMORu+ITZZ2fxZRLs=
+	t=1788782310; cv=none; b=bauTITarg4jIaCjVZ+Nw0yN18Fo4PJCtdYRQ4EelaN5zys2dnUfI7xVMVNvDHV3J7TtuP4KmSLf2Jo1YUOXPgWwoLAMEFt3uSkrw7eDaeFjg3cxU+F/K0/Oy5UnSg6EmOQiP8UBxi9zBPQDMePtDiRzgKyeTx3Hn0VPaA0vk7UU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788781631; c=relaxed/simple;
-	bh=t7zfQYsesefqvJ7HSJmkoBA515XbmR5tcBI3bJrJXaI=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EyivWwPgE6jq8S0VpdU0CHpJGwldTiYNNOFrSzk+c5GI4YAhPff16Rd+4oF7nuTFTyRjZCLazt2n82uSvDD+/wELC3czBvXPYXoxQ5hJnspJb4QXxa9unTnvIU384MO6hHi+sagWuM/lSVU9gP46fxlgXEb8BXjIMmAbUY+P3To=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iFTDFwQs; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788782310; c=relaxed/simple;
+	bh=gHwRph0Z5WbvmGMENEbvpJ0xv8gch4+5KPFj4oIECLs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=A4JmLWnh4PLRwxt5Qct0pzE+gJuftpastPaRW6EtXwKlZT+LeRvdNrtaZ/PSUSNxsNLdiGZxnCH7zojDItihnAcSUEkT3mySDU0tBdwVC9guYJsvRfywYXoJjdQGPdUYqrMkjBOYmrk8godrBUWDyFCE8yeMXWe3V6fLjMnxPxc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=s0dj+247; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iFTDFwQs"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D5FB1F00A3D;
-	Mon,  7 Sep 2026 11:47:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788781630;
-	bh=DVB6LVe97eZNFBERy+A154kH+m53kcC25g88DpohPr0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=iFTDFwQsQbJl/5TzD0+XECiLo7850iz9UBtGyreADq2cKdAzQmn2QqtxS3u1Jsbru
-	 T7ADD1ZpbJmdIp7K0/sQEMjDrSdqnoDAQvpe/jbHJyuwN9JTn1Phst5EN6d5L8Q2Qp
-	 84J3i5PcTd8KZybNAkQcxe+193DshRNB6Nzaub8mc8QXpc+b1S4VVijj8v6s+zdXgE
-	 P3aWWuOLB0vAo3Dcdt8D3/ydht8W/Ye2fCFSjAPcE68AjKezyE2JoA1REXC3F2kf4H
-	 vdW7FvGO1UADE5HJspSSbOcKjYme76WJEiXGNuaEHBL+ONTHBDwIr0PfPvFC+Bi7xA
-	 9yeaCKJytc78Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1x3XoZ-00000005k3D-2akC;
-	Mon, 07 Sep 2026 11:47:07 +0000
-Date: Mon, 07 Sep 2026 12:47:07 +0100
-Message-ID: <86ecf5472c.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Kohei Enju <enju.kohei@fujitsu.com>
-Cc: Steven Price <steven.price@arm.com>,
-	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
-	Emi Kisanuki <fj0570is@fujitsu.com>,
-	Vishal Annapurve <vannapurve@google.com>,
-	WeiLin.Chang@arm.com,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>
-Subject: Re: [PATCH v16 22/45] KVM: arm64: CCA: Handle RMI_EXIT_RIPAS_CHANGE
-In-Reply-To: <ap6YrZiCdS6FI83p@FCCLS0092175.localdomain>
-References: <20260803134403.80630-1-steven.price@arm.com>
-	<20260803134403.80630-23-steven.price@arm.com>
-	<ap49Orng5-oehc6J@FCCLS0092175.localdomain>
-	<86fqzl4biu.wl-maz@kernel.org>
-	<ap6YrZiCdS6FI83p@FCCLS0092175.localdomain>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="s0dj+247"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C60F61476;
+	Mon,  7 Sep 2026 04:58:23 -0700 (PDT)
+Received: from [10.57.49.168] (unknown [10.57.49.168])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 19F283F7D8;
+	Mon,  7 Sep 2026 04:58:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1788782307; bh=gHwRph0Z5WbvmGMENEbvpJ0xv8gch4+5KPFj4oIECLs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=s0dj+247ZGrYRAJTtXRI8Mg3u9DU79+m+Ys2NgoXAglWLE1feLSkomIwC2zA5A5ge
+	 GJPItChzLznQD61LkUo/IXNotgwIpZb3y09ZXWvl3IEnl/PvOECdXuLkcRCKyRf9pa
+	 Knr4lxm9X2/ZziKIjE+LsKu7ai1sEcwkMLIHh/1I=
+Message-ID: <30b4137b-1445-49c0-bd1c-98dbac5d70f6@arm.com>
+Date: Mon, 7 Sep 2026 12:58:22 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: enju.kohei@fujitsu.com, steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com, aneesh.kumar@kernel.org, fj0570is@fujitsu.com, vannapurve@google.com, WeiLin.Chang@arm.com, lpieralisi@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v16 22/45] KVM: arm64: CCA: Handle RMI_EXIT_RIPAS_CHANGE
+Content-Language: en-GB
+To: Marc Zyngier <maz@kernel.org>, Kohei Enju <enju.kohei@fujitsu.com>
+Cc: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
+ Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
+ Lorenzo Pieralisi <lpieralisi@kernel.org>
+References: <20260803134403.80630-1-steven.price@arm.com>
+ <20260803134403.80630-23-steven.price@arm.com>
+ <ap49Orng5-oehc6J@FCCLS0092175.localdomain> <86fqzl4biu.wl-maz@kernel.org>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <86fqzl4biu.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, 07 Sep 2026 12:12:36 +0100,
-Kohei Enju <enju.kohei@fujitsu.com> wrote:
+On 07/09/2026 11:10, Marc Zyngier wrote:
+> On Mon, 07 Sep 2026 06:05:29 +0100,
+> Kohei Enju <enju.kohei@fujitsu.com> wrote:
+> 
+> [...]
+> 
+>> Although the root cause is an RMM bug, should we also guard RIPAS_SET
+>> against this no-progress case?
+> 
+> No. We really should *prevent* the kernel from using a known broken
+> RMM. Which brings me to one of my long standing request: how to we
+> enforce the minimum version of RMM that KVM is willing to work with?
 
-> Is there any ongoing work to address this that you are aware of? This
-> seems like a fairly broad topic that may require a separate discussion.
+(1) Do you mean the RMM ABI version ?
+(2) Or the particular build version of a given RMM firmware 
+implementation ?
 
-I don't think anyone is working on this yet.
+As far as (1) is considered, the kernel already sticks to a single
+version, v2.0 and doesn't support anything else. And we are fine with
+KVM/Linux supporting a single version of RMM and deprecating the
+support for older RMM versions as we decide to move on.
 
-But I guess that making it clear that this needs to be sorted *before*
-we merge the KVM CCA support should get things (and people) in motion.
+As for (2), the RMM ABI doesn't provide any information about the
+build/fix version for a given implementation. I will raise this
+within Arm.
 
-Thanks,
+Suzuki
 
-	M.
 
--- 
-Without deviation from the norm, progress is not possible.
+> 
+> We absolutely need to have a hard deprecation mechanism in place
+> before day-1.
+> 
+> 	M.
+> 
+
