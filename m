@@ -1,176 +1,195 @@
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+Received: from mta0.migadu.com (out-224.mta0.migadu.com [91.218.175.224])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE6CF456DF3
-	for <kvmarm@lists.linux.dev>; Mon,  7 Sep 2026 10:26:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6D1543E083
+	for <kvmarm@lists.linux.dev>; Mon,  7 Sep 2026 10:29:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.224
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788776811; cv=none; b=oXY7kXbcXx7kVq1ykhc9nszvYqsAMgg7DMjCd92k8gV81VwUpB/g3WlGji28DuRW03WmE42Y8/TkMgGw663fpn7XD31iaiBqZwvGtxt7S6siebJSSOwXwUj9bdG1pZcPxhwu1G0PhXjn5SEUwPtJnKBBOUcvOYXqUjV0LeaI8ME=
+	t=1788776962; cv=none; b=iu3TuZUoof/aju3XjepRzQbWRSkS6SMBWrxatxgqQH3huMMKlgG2jrW7PMHh4MQ9FovwhzPdmP84tENCSmLA++mTHBYtYqUIIJpzbuwGdtSZ6QCD+rd+/kEfKPqJRvPfIzNicPorDHgFtzaljE1sBzFAOYSt9rYCofBQS+n9jcs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788776811; c=relaxed/simple;
-	bh=p5HmnQvWHOjyvcUny5gt5xYv8IKsXutNKR2VnOqh4y4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NKKYIZTsTYUicsVKyd9jHP0q7+eApTKgrX/IAJSe5Lsxt6aQgug+Jfs3FCPzfJSFLIjORoslUE3mCzDoJaGo8qV2thxMGf4wgkvNGGmVoiGPtUv4x4V/ZUJU8nxXn5jAYtluiNLoa5WuqQItI2WZljBd7MbxFF2znNZFDmkEsS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NB1T7V5g; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1788776962; c=relaxed/simple;
+	bh=gr4ntL2ls1kQt9OlB8hZM5ulhfyIRqyK823Iegsl1Sk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NeOn5S6ZJ3yuhg3iiGXGGw6RrSOme8T+f3V5BRGPqJlHxu/Kr6zlAu86AhHy4E3RWc2Nooe1NKOlihNzjRxJWW0Nr7/9OvQSYK5wV1Dxx+VyrIx/nlbYERsnAe0VbWYU0x+MOAOT5HLua6R1aLDZktQTN/OySuqhKD5rbHhthJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=sLh7pfDM; arc=none smtp.client-ip=91.218.175.224
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NB1T7V5g"
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-c253425b253so475450166b.1
-        for <kvmarm@lists.linux.dev>; Mon, 07 Sep 2026 03:26:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1788776808; x=1789381608; darn=lists.linux.dev;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=zLowNBOJqUu3Tto51bSyxZ9lkn4QcoPSK7MWliyNp/8=;
-        b=NB1T7V5gwu3eMV58g4B9q5UKfgvG7nA7+w7FA8lPOf439Qo7m1hIvsfOkaVUqtruIe
-         io12/cZbMef+Ep0CkjnEXNeXLsXQtgNVkvXtQdY/zIjpXQM4ZeTiozd1yJfZPLiN8f4Y
-         QnSe29bEfyUSwtWZ/UWAthIk1W7nJsEfrtHwPcAH6PBXGIqrGr/7efc38x7gKSIMLj9z
-         YXIZmkIfvuJfZ4YqiTexPGxz4ECb3PgS9Xvxvcjo0yHVVJ4/jDdYsacJCwBFG8S6lRWc
-         leIRUPrAJfUlQRALlpLQUJlxYu1X3DrpJPKNU1br4czVMMKatpXXHKReYI1jedITVtOp
-         VfWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788776808; x=1789381608;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=zLowNBOJqUu3Tto51bSyxZ9lkn4QcoPSK7MWliyNp/8=;
-        b=Z8ScgBKzTveFHCd1/sDUERp8cZtKMDoSuNLJp04AVbErAv1VRvbHqkCfUAAcOAO2fF
-         H86evhl0tOkbkYp5G9/IMunITjZ1/Jx7At0TZhG8jfK1nMSq8BuTtqWR9NbPzPja2bTw
-         mXqFY6QKQudlC8pIaeLxZ9DQLMK7oYzeknnxyGk19Xxx5qRQQL4GJAX4aNi4H/9RtJjD
-         2XgYQdCL4ug5i3QizWKgGTTXDCL+2hUduajgCHwINe4pxdw2Q2KQMPjUzDhlq/MFHPpL
-         Br4eOYm3NBghbgx2zFnfuz681PKiN6EnFOM7USo63G2Ds4qcZFSSKqsusQ3/lyEQOr93
-         Ui9g==
-X-Gm-Message-State: AFuF++m3KJDwt2XzIL3t9evu7r1X5TbxRrKTwBbSThBVG09RgVAxuT2W
-	WZzFdJWuyH/+B/rzdsFDZqIMIoAnWWOTSdtYheuNUSkIKtKJJFqhuWJfcSHiKTvzcQ==
-X-Gm-Gg: AYBFou1LnHTbs4U7ITfv+Bevpiq6y0KEaA5tbwBfGp8OoVgRZZKWH6c9DGZYweuA4WF
-	ajm32oNE0qIvoexul3WzA5lSkmGv4WQZ43pYfqv7F1oFxsdFlYYv5RshqIJ7jTKv0l2vI71CiB4
-	m1nm1k8crHbE7UM5WuHfQ7L+oL2GPSPbGbtDMd3YbJK9Km93ZCuwDOFIYSNHCBNvtxJ4yZcay/a
-	YLOkMdfV8vrtl56w58s0aC6GtLRWp/uBVwCCK0gAy+WHiw9Nc9ea3NAEqHprKs3YiQIZd51va1y
-	2UNvXJONltcxDku4ZJ1+Go6vZmvAg+p/A1UiOhJKwnXive3RkIY9v4MJx5tUqOn/Ce4hV6feIiT
-	9VGA3Lb/EiH0vX1CCVT2xM4ISMwc2Y1nHMRZM5+qCa7d0b5i+qW5m8H8bKYShFW8edwzWizTA1F
-	xLbq0vhOorhg3tSqJ+7pFEY1kO4vn4+mDf/Cahxuup3WCABnDoCKn6hJGDkF2ek3nbvlsXmWucF
-	9vIhvx3buK4Hhqc0m316rF7/h7TiFCV
-X-Received: by 2002:a17:906:c14c:b0:c26:19de:9ae0 with SMTP id a640c23a62f3a-c2619dea7d1mr676057666b.31.1788776807270;
-        Mon, 07 Sep 2026 03:26:47 -0700 (PDT)
-Received: from google.com (135.91.155.104.bc.googleusercontent.com. [104.155.91.135])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c260d5277e6sm439479366b.27.2026.09.07.03.26.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Sep 2026 03:26:46 -0700 (PDT)
-Date: Mon, 7 Sep 2026 11:26:43 +0100
-From: Vincent Donnefort <vdonnefort@google.com>
-To: sashiko-reviews@lists.linux.dev
-Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>,
-	Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 19/20] KVM: arm64: Raise PKVM_HYP_REQ_SPLIT on guest to
- host sharing
-Message-ID: <ap6RY3HDxaiVQTpy@google.com>
-References: <20260803100904.3563942-1-vdonnefort@google.com>
- <20260803100904.3563942-20-vdonnefort@google.com>
- <20260803110203.0EB441F000E9@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="sLh7pfDM"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=gr4ntL2ls1kQt9OlB8hZM5ulhfyIRqyK823Iegsl1Sk=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1788776956; v=1; x=1789381756;
+ b=sLh7pfDMa6wElmZIHam4ysbLqEZxMjHo3M3BNPt3VYFHWJPZdo7TvLO6rnGRJx+EduiGQYh/
+ Mbeg+7UMzJ35zrC4Vlyv4dM2TDjBndUfkgodtGZhuUJjIksKFnBTXe83rQS5UolfxhnJfLb2U7f
+ dlX4n/o7SFC0cPm8aqxhJujY=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id e229a098b1f85d39;
+	Mon, 07 Sep 2026 10:29:16 +0000
+X-Mizu-Trace-ID: e229a098b1f85d39
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b4a0b17358so5813e87.1
+        for <kvmarm@lists.linux.dev>; Mon, 07 Sep 2026 03:29:11 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBzBvmvYcuCTrDsFjtmaWXhGgfH8YYfLcYskytDEAzuYHF+8ELTRsppxGiYWz3PEVJlOAzwFdRg=@lists.linux.dev
+X-Gm-Message-State: AFuF++lzCo/mt2qJfwC0KKI5VTRyMAZYgM1dzeAWAkm4DMYwBPoumIoP
+	tbdEpIHiHIseQ8YKiRdF8DyRgAvW/XsOZ4+rFTvTwv0rPYkRKsznw0/2MHL4PYlMjC+/Sv3cQjz
+	eEHiHPy6ziiNTxk5gaaQMVsHM8HWffGY0aw0wmlQG
+X-Received: by 2002:a05:6512:3d22:b0:5a8:6646:d7b4 with SMTP id
+ 2adb3069b0e04-5b74d1f915cmr158049e87.1.1788776950693; Mon, 07 Sep 2026
+ 03:29:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260803110203.0EB441F000E9@smtp.kernel.org>
+References: <20260903160819.831518-1-fuad.tabba@linux.dev> <dd850141-ea85-4d94-9793-393f24a2fdc2@arm.com>
+In-Reply-To: <dd850141-ea85-4d94-9793-393f24a2fdc2@arm.com>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Mon, 7 Sep 2026 11:28:34 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTyuLKYE1UL4XYvq4rxW7fgFNafdTY8H0=Qt6Hnjz3wYvQ@mail.gmail.com>
+X-Gm-Features: AcwNN1Wj8Xs--qUJv8B64ImQS5H8o3vx5bKORqTK09jwke8ojoQgldDdImoBrM8
+Message-ID: <CA+EHjTyuLKYE1UL4XYvq4rxW7fgFNafdTY8H0=Qt6Hnjz3wYvQ@mail.gmail.com>
+Subject: Re: [PATCH] KVM: arm64: Trap guest MPAM accesses whenever MPAM is implemented
+To: Ben Horgan <ben.horgan@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	James Morse <james.morse@arm.com>, Xi Ruoyao <xry111@xry111.site>, 
+	Mark Rutland <mark.rutland@arm.com>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Gavin Shan <gshan@redhat.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Aug 03, 2026 at 11:02:02AM +0000, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> - [High] Concurrent MEM_SHARE or MEM_UNSHARE on the same huge block causes the VM to be terminated with -EINVAL.
-> --
-> 
-> --- Patch [19]: [PATCH 19/20] KVM: arm64: Raise PKVM_HYP_REQ_SPLIT on guest to host sharing ---
-> commit 267c394d1b60753f90e3da486356d60c47b19643
-> Author: Vincent Donnefort <vdonnefort@google.com>
-> 
-> KVM: arm64: Raise PKVM_HYP_REQ_SPLIT on guest to host sharing
-> 
-> Pages shared by the guest with the host are annotated into the guest
-> stage-2. If the shared page is backed by a huge mapping, we need to
-> split it first.
-> 
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> > index 3b8e95b83bf45..57f4303aede10 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> 
-> [ ... ]
-> 
-> > -static void pkvm_memunshare_call(u64 *ret, struct kvm_vcpu *vcpu)
-> > +static bool pkvm_memunshare_call(u64 *ret, struct kvm_vcpu *vcpu, u64 *exit_code)
-> >  {
-> >  	struct pkvm_hyp_vcpu *hyp_vcpu;
-> >  	u64 ipa = smccc_get_arg1(vcpu);
-> > +	u64 gfn = hyp_phys_to_pfn(ipa);
-> >  
-> >  	if (!PAGE_ALIGNED(ipa))
-> > -		return;
-> > +		goto out_guest;
-> >  
-> >  	hyp_vcpu = container_of(vcpu, struct pkvm_hyp_vcpu, vcpu);
-> > -	if (!__pkvm_guest_unshare_host(hyp_vcpu, hyp_phys_to_pfn(ipa), 1))
-> > +	switch (__pkvm_guest_unshare_host(hyp_vcpu, gfn, 1)) {
-> > +	case 0:
-> >  		ret[0] = SMCCC_RET_SUCCESS;
-> > +		goto out_guest;
-> > +	case -E2BIG:
-> > +		*exit_code = pkvm_request_split(hyp_vcpu, gfn, 1);
-> > +		goto out_host;
-> 
-> [Severity: High]
-> Does this code handle concurrent MEM_UNSHARE or MEM_SHARE requests on the
-> same huge block correctly?
-> 
-> If two guest vCPUs concurrently execute HVC MEM_SHARE (or MEM_UNSHARE) on
-> different pages within the same PMD_SIZE stage-2 block, both vCPUs would
-> receive -E2BIG from get_valid_guest_pte() in EL2 and exit to the host with
-> PKVM_HYP_REQ_SPLIT.
-> 
-> Host thread A successfully handles the split request, splitting the block in
-> EL2 and the host's pkvm_mappings tree.
-> 
-> When host thread B handles the split request for the same block, it looks up
-> the mapping in __pkvm_pgtable_stage2_split():
-> 
-> arch/arm64/kvm/pkvm.c:__pkvm_pgtable_stage2_split() {
->     ...
-> 	mapping = pkvm_mapping_iter_first(&pgt->pkvm_mappings, ipa,
-> 					  ipa + size - 1);
-> 	if (!pkvm_mapping_can_split(mapping)) {
-> 		ret = -EINVAL;
-> 		goto unlock_mmu;
-> 	}
->     ...
-> }
-> 
-> Because it finds a PAGE_SIZE mapping (since it was just split),
-> pkvm_mapping_can_split() returns false, causing __pkvm_pgtable_stage2_split()
-> to return -EINVAL instead of returning 0 (success) or -EAGAIN to retry.
-> 
-> This -EINVAL error propagates up through pkvm_hyp_req_handle_split() and
-> handle_exit(), returning -EINVAL to userspace from KVM_RUN, which causes the
-> VMM to terminate the VM.
-> 
-> > +	}
-> > +
-> > +out_guest:
-> > +	return true;
-> > +out_host:
-> > +	return false;
+Hi Ben,
+
+On Mon, 7 Sept 2026 at 10:12, Ben Horgan <ben.horgan@arm.com> wrote:
+...
+> > diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+> > index 7404a6e83a930..8863ae99596bc 100644
+> > --- a/arch/arm64/include/asm/cpufeature.h
+> > +++ b/arch/arm64/include/asm/cpufeature.h
+> > @@ -873,6 +873,11 @@ static __always_inline bool system_supports_mpam_hcr(void)
+> >       return alternative_has_cap_unlikely(ARM64_MPAM_HCR);
 > >  }
-> 
-> -- 
-> Sashiko AI review · https://sashiko.dev/#/patchset/20260803100904.3563942-1-vdonnefort@google.com?part=19
+> >
+> > +static __always_inline bool system_supports_mpam_sysregs(void)
+> > +{
+> > +     return alternative_has_cap_unlikely(ARM64_MPAM_SYSREGS);
+> > +}
+>
+> The sashiko comments reminded me about the possibility of mismatched systems. I see two cases to
+> consider here. One is if the firmware doesn't touch the MPAM system registers and leaves
+> MPAM3_EL3.TRAPLOWER set to 1. In which case the user is required to add arm64.nompam to the cmdline
+> as the MPAM registers can't be accessed from EL2. The second is if the f/w clears
+> MPAM3_EL3.TRAPLOWER, in which case arm64.nompam can't be used without making MPAM1_EL1 etc, shared
+> between guests. Perhaps for these mismatched systems we need to unconditionally enable the EL2 traps
+> for the cpus that support MPAM and not advertise any support for MPAM. Furthermore, if we, before
+> kvm gets involved, unconditionally enable the EL2 traps on systems where MPAM can't be enabled then
+> I'm not sure that we need to distinguish system_supports_mpam_sysregs() and system_supports_mpam()
+> in the kvm code. What do you think? Does that fit in with the pattern of how cpu features are
+> generally handled?
 
-Hum, that is a good point. __pkvm_pgtable_stage2_split() shouldn't return an
-error if the mapping is already PAGE_SIZE.
+This patch misses that case. check_override reads the CPU's own ID
+registers, detect_ftr_has_mpam() the sanitised ones, so
+finalise_el2_state clears the traps and neither cap is set.
 
--- 
-Vincent
+Not advertising MPAM already happens, since a mismatch lowers the ID
+field to 0. The trap default is the missing half, and I agree it
+belongs in finalise_el2_state, which already computes whether
+MPAM2_EL2 can be touched. KVM then needs only system_supports_mpam(),
+and the cap goes.
+
+The one host left is a forced nVHE, where test_has_mpam()'s MPAM1_EL1
+read would trap before cpu_enable_mpam(). The respin makes the caps
+false when is_hyp_nvhe(), so MPAM is off there rather than the boot
+hanging [1].
+
+I'll respin along those lines.
+
+Cheers,
+/fuad
+
+[1] https://lore.kernel.org/all/apqrky27mJmUV9UA@willie-the-truck/
+
+
+>
+> Thanks,
+>
+> Ben
+>
+>
+> > +
+> >  static inline bool system_supports_pmuv3(void)
+> >  {
+> >       return cpus_have_final_cap(ARM64_HAS_PMUV3);
+> > diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> > index 17b83a2518a8f..36a27692e5cf7 100644
+> > --- a/arch/arm64/kernel/cpufeature.c
+> > +++ b/arch/arm64/kernel/cpufeature.c
+> > @@ -2501,6 +2501,13 @@ test_has_mpam(const struct arm64_cpu_capabilities *entry, int scope)
+> >       return (read_sysreg_s(SYS_MPAM1_EL1) & MPAM1_EL1_MPAMEN);
+> >  }
+> >
+> > +static bool
+> > +test_has_mpam_sysregs(const struct arm64_cpu_capabilities *entry, int __unused)
+> > +{
+> > +     /* The registers exist whether or not firmware enabled MPAM. */
+> > +     return detect_ftr_has_mpam();
+> > +}
+> > +
+> >  static void
+> >  cpu_enable_mpam(const struct arm64_cpu_capabilities *entry)
+> >  {
+> > @@ -3116,6 +3123,12 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+> >               .matches = test_has_mpam,
+> >               .cpu_enable = cpu_enable_mpam,
+> >       },
+> > +     {
+> > +             .desc = "Memory Partitioning And Monitoring system registers",
+> > +             .type = ARM64_CPUCAP_SYSTEM_FEATURE,
+> > +             .capability = ARM64_MPAM_SYSREGS,
+> > +             .matches = test_has_mpam_sysregs,
+> > +     },
+> >       {
+> >               .desc = "Memory Partitioning And Monitoring Virtualisation",
+> >               .type = ARM64_CPUCAP_SYSTEM_FEATURE,
+> > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > index 1ce7130e25490..8941335724f6b 100644
+> > --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > @@ -298,7 +298,7 @@ static inline void  __activate_traps_mpam(struct kvm_vcpu *vcpu)
+> >       u64 clr = MPAM2_EL2_EnMPAMSM;
+> >       u64 set = MPAM2_EL2_TRAPMPAM0EL1 | MPAM2_EL2_TRAPMPAM1EL1;
+> >
+> > -     if (!system_supports_mpam())
+> > +     if (!system_supports_mpam_sysregs())
+> >               return;
+> >
+> >       /* trap guest access to MPAMIDR_EL1 */
+> > @@ -317,7 +317,7 @@ static inline void __deactivate_traps_mpam(void)
+> >       u64 clr = MPAM2_EL2_TRAPMPAM0EL1 | MPAM2_EL2_TRAPMPAM1EL1 | MPAM2_EL2_TIDR;
+> >       u64 set = MPAM2_EL2_EnMPAMSM;
+> >
+> > -     if (!system_supports_mpam())
+> > +     if (!system_supports_mpam_sysregs())
+> >               return;
+> >
+> >       sysreg_clear_set_s(SYS_MPAM2_EL2, clr, set);
+> > diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+> > index 2775ba3359cfe..aa5be51385f68 100644
+> > --- a/arch/arm64/tools/cpucaps
+> > +++ b/arch/arm64/tools/cpucaps
+> > @@ -78,6 +78,7 @@ KVM_PROTECTED_MODE
+> >  MISMATCHED_CACHE_TYPE
+> >  MPAM
+> >  MPAM_HCR
+> > +MPAM_SYSREGS
+> >  MTE
+> >  MTE_ASYMM
+> >  MTE_FAR
+> >
+> > base-commit: cee9395acd8043be0644b25c34bfa86623f2b935
+>
