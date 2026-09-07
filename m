@@ -1,74 +1,75 @@
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBE8E3CB2D0
-	for <kvmarm@lists.linux.dev>; Mon,  7 Sep 2026 10:23:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE6CF456DF3
+	for <kvmarm@lists.linux.dev>; Mon,  7 Sep 2026 10:26:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788776598; cv=none; b=St6xsTzEZ8l3FhNODz5Zwk4To/WSW4BOslc1ILBixBorDfqGdQoDd8kWoMqBpJQA51TwPFoCFR5aCV2WqXVu+JCYjqXQzor5hgaO7PKveOf2drSec6FldodZXDludmmRZXbRX3wxzP7tvw/w6kt9/JuV+rmOOLYBpStBowonpQM=
+	t=1788776811; cv=none; b=oXY7kXbcXx7kVq1ykhc9nszvYqsAMgg7DMjCd92k8gV81VwUpB/g3WlGji28DuRW03WmE42Y8/TkMgGw663fpn7XD31iaiBqZwvGtxt7S6siebJSSOwXwUj9bdG1pZcPxhwu1G0PhXjn5SEUwPtJnKBBOUcvOYXqUjV0LeaI8ME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788776598; c=relaxed/simple;
-	bh=GjElOHGjjEP0wkXBEKPTrjP4jR20YlkR3af8X11tn4A=;
+	s=arc-20240116; t=1788776811; c=relaxed/simple;
+	bh=p5HmnQvWHOjyvcUny5gt5xYv8IKsXutNKR2VnOqh4y4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YweHPT/titH1OwoYN5EGuUYbk4FYjgyVDEkSxt/tsqTAOZg4C4kwdQwEa7o6+f2LW5qkIPnLvcN5eu/u0HJ9tmUXc57+coo+e1nzBZax7sONBFF8WdO2LDxdlS1pA7Yn+vbrfXq4echog0ugnhb31qgtzsnfAhb4CeRpvFNAAGk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=doHqbRv4; arc=none smtp.client-ip=209.85.218.41
+	 Content-Type:Content-Disposition:In-Reply-To; b=NKKYIZTsTYUicsVKyd9jHP0q7+eApTKgrX/IAJSe5Lsxt6aQgug+Jfs3FCPzfJSFLIjORoslUE3mCzDoJaGo8qV2thxMGf4wgkvNGGmVoiGPtUv4x4V/ZUJU8nxXn5jAYtluiNLoa5WuqQItI2WZljBd7MbxFF2znNZFDmkEsS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NB1T7V5g; arc=none smtp.client-ip=209.85.218.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="doHqbRv4"
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-c2055573c8cso409979466b.3
-        for <kvmarm@lists.linux.dev>; Mon, 07 Sep 2026 03:23:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NB1T7V5g"
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-c253425b253so475450166b.1
+        for <kvmarm@lists.linux.dev>; Mon, 07 Sep 2026 03:26:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1788776595; x=1789381395; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1788776808; x=1789381608; darn=lists.linux.dev;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :content-type:mime-version:references:message-id:subject:cc:to:from
          :date:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=bS1Xhtw50wNcRogCfMLw1Iql2rPD2ohrSvtL4dTfgo8=;
-        b=doHqbRv4zhlslzAuoCnPFDA7r2SX1ffK1SwUsxNXpWXtMQSA80dpwcuCfriSqhgwUf
-         LwkSAz69CxAlFBLUkoVM2rsnr8QbsNQyptjCcImQvm0OUOOSiDvINQYDwRmflUTbGOTA
-         2FII/JKh5oYTahrfSClXVrf6y0RrQj/DWuEO71ByzWWiR0TZwyxHlKksFFgT1km1Z5Eb
-         tofO1yuI9Bf16pKhmL8ud67vPhpUhe1AJQweqArCkB72bqFyVeJakUzdYu457uyI+2tw
-         1ZtyYIPU84dHpHbEj1a97ecS6leHd6D+GJ6loXBPTsLNgxcD4pbJMDthGTEbgi95LBYy
-         TJEg==
+        bh=zLowNBOJqUu3Tto51bSyxZ9lkn4QcoPSK7MWliyNp/8=;
+        b=NB1T7V5gwu3eMV58g4B9q5UKfgvG7nA7+w7FA8lPOf439Qo7m1hIvsfOkaVUqtruIe
+         io12/cZbMef+Ep0CkjnEXNeXLsXQtgNVkvXtQdY/zIjpXQM4ZeTiozd1yJfZPLiN8f4Y
+         QnSe29bEfyUSwtWZ/UWAthIk1W7nJsEfrtHwPcAH6PBXGIqrGr/7efc38x7gKSIMLj9z
+         YXIZmkIfvuJfZ4YqiTexPGxz4ECb3PgS9Xvxvcjo0yHVVJ4/jDdYsacJCwBFG8S6lRWc
+         leIRUPrAJfUlQRALlpLQUJlxYu1X3DrpJPKNU1br4czVMMKatpXXHKReYI1jedITVtOp
+         VfWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788776595; x=1789381395;
+        d=1e100.net; s=20251104; t=1788776808; x=1789381608;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :content-type:mime-version:references:message-id:subject:cc:to:from
          :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=bS1Xhtw50wNcRogCfMLw1Iql2rPD2ohrSvtL4dTfgo8=;
-        b=VL7iAOWVtMvfot6fwlHUBkdDbY9tzkFgzydonGjjoLMxuYWGo4big2cGB1OzouCaDR
-         EW1ne6JcFuzxn7SeyIeQJss+mV91jkv6O1tQjcSE42NZ0ivrO16IGd3O1PfcioSdZaSI
-         pKoYLe7d8Eh+FYwfFzCUZU26Ma3U4fG2Y6znUGbp3aG4K4p2nFTmpeilbJ9QFHuWwroE
-         Z+924h38E0wTfcMgW1buhy9OPKt7UcEJYlTT2+jkB8k2HHUSluctWNNOo/WHTIzYEKdd
-         gLc4xGO/fc7Fsekndqf0Z6SdE6GVXu+cuDlzvQlIVNkRRQcY6psiKOcPDFE1PcPbUV7h
-         RN9Q==
-X-Gm-Message-State: AFuF++lMxWi8l3ypgzh/VP9k2CLeVrkIYbi47WdIaOHbr1IZFVbvO4PI
-	SHeX9Mwg6iG/gUgJg9UziNj7ZSZPwiiyhtibRwS3ffvOtDxC6QOj/mK+hl4slAv+Eg==
-X-Gm-Gg: AYBFou3UA6fqZrlik7PZ4LAp9vM2Gx7bv9J2OctC7CJgnwO3Ou5169pV1CW//YtDUhs
-	qLPubdY6jSjzjp67uCNdP2K3SDQxtBzNLI/jo5exwgBG+SCojHqieyXZuogjZFiaWiG0UQ3P4O1
-	1QRkYna0rebgzgYhBGS5m6wfbJzMphBKSzqzcTuH9pO5dfWYVEo9/vgCCDms3prtDRp0c1sG6Ch
-	NTCmU3hJc2baRA3WD8JXm5NnpCFGM00fF6bppf7Qaeh2uWkMtNXWNP11UmKnOdaWZvnQkJDJSGo
-	/opgnxNU/wu4+yCbR7zTnuTFDRQvUOy9lj6xMO6WWwSDnSGBBfKWTwsWp8/5HvpdYgsX8h466f0
-	pE09UFgUeMDnIP6uZq6KQNYk2Tmr8vnJDEGQnyV8gHBfhUyKxKAQKVGdO4cpUq4gMnxX0xVmgR/
-	+T96quolCqPVh/atPSPAJZvP2DVzYHsqEKTog5hR95jWybBnQBlnYu/FWNv65Lh4EUKG3LzUd69
-	2PYwdvljY1UcPdIOhrp0WTzDDLfhwIz
-X-Received: by 2002:a17:907:d18:b0:c25:4cff:5d01 with SMTP id a640c23a62f3a-c260c9f4a3bmr789619966b.18.1788776594247;
-        Mon, 07 Sep 2026 03:23:14 -0700 (PDT)
+        bh=zLowNBOJqUu3Tto51bSyxZ9lkn4QcoPSK7MWliyNp/8=;
+        b=Z8ScgBKzTveFHCd1/sDUERp8cZtKMDoSuNLJp04AVbErAv1VRvbHqkCfUAAcOAO2fF
+         H86evhl0tOkbkYp5G9/IMunITjZ1/Jx7At0TZhG8jfK1nMSq8BuTtqWR9NbPzPja2bTw
+         mXqFY6QKQudlC8pIaeLxZ9DQLMK7oYzeknnxyGk19Xxx5qRQQL4GJAX4aNi4H/9RtJjD
+         2XgYQdCL4ug5i3QizWKgGTTXDCL+2hUduajgCHwINe4pxdw2Q2KQMPjUzDhlq/MFHPpL
+         Br4eOYm3NBghbgx2zFnfuz681PKiN6EnFOM7USo63G2Ds4qcZFSSKqsusQ3/lyEQOr93
+         Ui9g==
+X-Gm-Message-State: AFuF++m3KJDwt2XzIL3t9evu7r1X5TbxRrKTwBbSThBVG09RgVAxuT2W
+	WZzFdJWuyH/+B/rzdsFDZqIMIoAnWWOTSdtYheuNUSkIKtKJJFqhuWJfcSHiKTvzcQ==
+X-Gm-Gg: AYBFou1LnHTbs4U7ITfv+Bevpiq6y0KEaA5tbwBfGp8OoVgRZZKWH6c9DGZYweuA4WF
+	ajm32oNE0qIvoexul3WzA5lSkmGv4WQZ43pYfqv7F1oFxsdFlYYv5RshqIJ7jTKv0l2vI71CiB4
+	m1nm1k8crHbE7UM5WuHfQ7L+oL2GPSPbGbtDMd3YbJK9Km93ZCuwDOFIYSNHCBNvtxJ4yZcay/a
+	YLOkMdfV8vrtl56w58s0aC6GtLRWp/uBVwCCK0gAy+WHiw9Nc9ea3NAEqHprKs3YiQIZd51va1y
+	2UNvXJONltcxDku4ZJ1+Go6vZmvAg+p/A1UiOhJKwnXive3RkIY9v4MJx5tUqOn/Ce4hV6feIiT
+	9VGA3Lb/EiH0vX1CCVT2xM4ISMwc2Y1nHMRZM5+qCa7d0b5i+qW5m8H8bKYShFW8edwzWizTA1F
+	xLbq0vhOorhg3tSqJ+7pFEY1kO4vn4+mDf/Cahxuup3WCABnDoCKn6hJGDkF2ek3nbvlsXmWucF
+	9vIhvx3buK4Hhqc0m316rF7/h7TiFCV
+X-Received: by 2002:a17:906:c14c:b0:c26:19de:9ae0 with SMTP id a640c23a62f3a-c2619dea7d1mr676057666b.31.1788776807270;
+        Mon, 07 Sep 2026 03:26:47 -0700 (PDT)
 Received: from google.com (135.91.155.104.bc.googleusercontent.com. [104.155.91.135])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c260d036440sm449932666b.5.2026.09.07.03.23.13
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c260d5277e6sm439479366b.27.2026.09.07.03.26.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Sep 2026 03:23:13 -0700 (PDT)
-Date: Mon, 7 Sep 2026 11:23:10 +0100
+        Mon, 07 Sep 2026 03:26:46 -0700 (PDT)
+Date: Mon, 7 Sep 2026 11:26:43 +0100
 From: Vincent Donnefort <vdonnefort@google.com>
 To: sashiko-reviews@lists.linux.dev
 Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>,
 	Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 18/20] KVM: arm64: Add PKVM_HYP_REQ_SPLIT
-Message-ID: <ap6QjjJxysWVYCVM@google.com>
+Subject: Re: [PATCH 19/20] KVM: arm64: Raise PKVM_HYP_REQ_SPLIT on guest to
+ host sharing
+Message-ID: <ap6RY3HDxaiVQTpy@google.com>
 References: <20260803100904.3563942-1-vdonnefort@google.com>
- <20260803100904.3563942-19-vdonnefort@google.com>
- <20260803105411.B6ACE1F000E9@smtp.kernel.org>
+ <20260803100904.3563942-20-vdonnefort@google.com>
+ <20260803110203.0EB441F000E9@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -78,167 +79,98 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260803105411.B6ACE1F000E9@smtp.kernel.org>
+In-Reply-To: <20260803110203.0EB441F000E9@smtp.kernel.org>
 
-On Mon, Aug 03, 2026 at 10:54:11AM +0000, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 5 potential issue(s) to consider:
-> - [Critical] Time-of-Check to Time-of-Use (TOCTOU) race in `__pkvm_pgtable_stage2_split` due to missing MMU notifier retry protocol.
-> - [Critical] Using `pin_user_pages()` introduces a `FOLL_PIN` counting bias that causes massive memory leaks during KVM teardown.
-> - [High] Memory cgroup accounting bypass when allocating spare `pkvm_mapping` structures.
-> - [Medium] Splitting read-only guest mappings is incorrectly forbidden by requiring write access.
-> - [Low] `__pkvm_pgtable_stage2_split()` mixes `goto`-based error handling with scope-based `__free(kfree)` cleanup.
+On Mon, Aug 03, 2026 at 11:02:02AM +0000, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
+> - [High] Concurrent MEM_SHARE or MEM_UNSHARE on the same huge block causes the VM to be terminated with -EINVAL.
 > --
 > 
-> --- Patch [18]: [PATCH 18/20] KVM: arm64: Add PKVM_HYP_REQ_SPLIT ---
-> commit eb20478193ba08806cd19923ba4b65163db37c40
+> --- Patch [19]: [PATCH 19/20] KVM: arm64: Raise PKVM_HYP_REQ_SPLIT on guest to host sharing ---
+> commit 267c394d1b60753f90e3da486356d60c47b19643
 > Author: Vincent Donnefort <vdonnefort@google.com>
 > 
-> KVM: arm64: Add PKVM_HYP_REQ_SPLIT
+> KVM: arm64: Raise PKVM_HYP_REQ_SPLIT on guest to host sharing
 > 
-> This commit introduces a new pKVM hypervisor request, PKVM_HYP_REQ_SPLIT,
-> enabling the hypervisor to request the host to split stage-2 huge mappings.
-> This ensures synchronous splitting of both the guest stage-2 page tables
-> and the host's pkvm_mappings red-black tree, preventing concurrent
-> teardowns from observing inconsistent page sizes.
+> Pages shared by the guest with the host are annotated into the guest
+> stage-2. If the shared page is backed by a huge mapping, we need to
+> split it first.
 > 
-> > diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-> > index 379bdc2b258a6..089b77cf2f6a9 100644
-> > --- a/arch/arm64/kvm/pkvm.c
-> > +++ b/arch/arm64/kvm/pkvm.c
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> > index 3b8e95b83bf45..57f4303aede10 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
 > 
 > [ ... ]
 > 
-> > +static int pkvm_mapping_alloc_spares(struct list_head *head, u64 nr_spares)
-> > +{
-> > +	struct pkvm_mapping *m;
-> > +
-> > +	while (nr_spares--) {
-> > +		m = kzalloc_obj(*m);
+> > -static void pkvm_memunshare_call(u64 *ret, struct kvm_vcpu *vcpu)
+> > +static bool pkvm_memunshare_call(u64 *ret, struct kvm_vcpu *vcpu, u64 *exit_code)
+> >  {
+> >  	struct pkvm_hyp_vcpu *hyp_vcpu;
+> >  	u64 ipa = smccc_get_arg1(vcpu);
+> > +	u64 gfn = hyp_phys_to_pfn(ipa);
+> >  
+> >  	if (!PAGE_ALIGNED(ipa))
+> > -		return;
+> > +		goto out_guest;
+> >  
+> >  	hyp_vcpu = container_of(vcpu, struct pkvm_hyp_vcpu, vcpu);
+> > -	if (!__pkvm_guest_unshare_host(hyp_vcpu, hyp_phys_to_pfn(ipa), 1))
+> > +	switch (__pkvm_guest_unshare_host(hyp_vcpu, gfn, 1)) {
+> > +	case 0:
+> >  		ret[0] = SMCCC_RET_SUCCESS;
+> > +		goto out_guest;
+> > +	case -E2BIG:
+> > +		*exit_code = pkvm_request_split(hyp_vcpu, gfn, 1);
+> > +		goto out_host;
 > 
 > [Severity: High]
-> Does this bypass memory cgroup limits?
+> Does this code handle concurrent MEM_UNSHARE or MEM_SHARE requests on the
+> same huge block correctly?
 > 
-> This allocation uses kzalloc_obj() which defaults to GFP_KERNEL without
-> the __GFP_ACCOUNT flag.
+> If two guest vCPUs concurrently execute HVC MEM_SHARE (or MEM_UNSHARE) on
+> different pages within the same PMD_SIZE stage-2 block, both vCPUs would
+> receive -E2BIG from get_valid_guest_pte() in EL2 and exit to the host with
+> PKVM_HYP_REQ_SPLIT.
 > 
-> Because each PMD split allocates 511 structures, a guest could repeatedly
-> trigger splits across its memory footprint.
+> Host thread A successfully handles the split request, splitting the block in
+> EL2 and the host's pkvm_mappings tree.
 > 
-> Can this allow the guest to consume large amounts of uncharged host memory,
-> potentially leading to host memory exhaustion?
+> When host thread B handles the split request for the same block, it looks up
+> the mapping in __pkvm_pgtable_stage2_split():
 > 
-> > +		if (!m) {
-> > +			pkvm_mapping_free_spares(head);
-> > +			return -ENOMEM;
-> > +		}
-> > +
-> > +		list_add(&m->list, head);
+> arch/arm64/kvm/pkvm.c:__pkvm_pgtable_stage2_split() {
+>     ...
+> 	mapping = pkvm_mapping_iter_first(&pgt->pkvm_mappings, ipa,
+> 					  ipa + size - 1);
+> 	if (!pkvm_mapping_can_split(mapping)) {
+> 		ret = -EINVAL;
+> 		goto unlock_mmu;
+> 	}
+>     ...
+> }
+> 
+> Because it finds a PAGE_SIZE mapping (since it was just split),
+> pkvm_mapping_can_split() returns false, causing __pkvm_pgtable_stage2_split()
+> to return -EINVAL instead of returning 0 (success) or -EAGAIN to retry.
+> 
+> This -EINVAL error propagates up through pkvm_hyp_req_handle_split() and
+> handle_exit(), returning -EINVAL to userspace from KVM_RUN, which causes the
+> VMM to terminate the VM.
+> 
 > > +	}
 > > +
-> > +	return 0;
-> > +}
+> > +out_guest:
+> > +	return true;
+> > +out_host:
+> > +	return false;
+> >  }
 > 
-> [ ... ]
-> 
-> > +static int __pkvm_pgtable_stage2_split(struct kvm_vcpu *vcpu, phys_addr_t ipa, u64 size)
-> > +{
-> > +	struct kvm_hyp_memcache *mc = &vcpu->arch.pkvm_memcache;
-> > +	struct kvm_pgtable *pgt = vcpu->arch.hw_mmu->pgt;
-> > +	struct page **pages __free(kfree) = NULL;
-> 
-> [Severity: Low]
-> Is it safe to mix scope-based cleanup with goto error handling in this
-> function?
-> 
-> The pages array is declared with __free(kfree), but the function uses goto
-> labels like goto unlock_srcu and goto unlock_mmu for unwinding locks and
-> freeing the spares list.
-> 
-> The kernel cleanup guidelines note that functions should use either
-> scope-based cleanup for all resources or goto labels for all resources,
-> but not mix them, as it creates confusing ownership semantics.
-> 
-> > +	struct mm_struct *mm = current->mm;
-> > +	struct kvm_memory_slot *memslot;
-> 
-> [ ... ]
-> 
-> > +	idx = srcu_read_lock(&kvm->srcu);
-> > +	memslot = gfn_to_memslot(kvm, gfn);
-> > +	hva = gfn_to_hva_memslot_prot(memslot, gfn, &writable);
-> > +	if (kvm_is_error_hva(hva) || !writable) {
-> 
-> [Severity: Medium]
-> Should read-only mappings be allowed to split?
-> 
-> This explicitly checks that the memslot is writable and fails with -EFAULT
-> otherwise. It also passes FOLL_WRITE to pin_user_pages() later on.
-> 
-> However, splitting a huge page block into smaller PTEs changes the mapping
-> granularity without modifying the underlying memory contents.
-> 
-> Does requiring write access prevent the hypervisor from splitting read-only
-> stage-2 block mappings, such as guest ROMs?
-> 
-> > +		ret = -EFAULT;
-> > +		goto unlock_srcu;
-> > +	}
-> > +
-> > +	mmap_read_lock(mm);
-> > +	ret = pin_user_pages(hva, nr_pages, FOLL_HWPOISON | FOLL_LONGTERM | FOLL_WRITE, pages);
-> 
-> [Severity: Critical]
-> Does using pin_user_pages() here cause a permanent memory leak during KVM
-> teardown?
-> 
-> Calling pin_user_pages() adds a GUP_PIN_COUNTING_BIAS to the page refcount.
-> However, normal KVM stage-2 teardown drops references using standard
-> put_page() semantics which only subtracts one from the refcount.
-> 
-> When the VM is destroyed, will these tail pages retain phantom references
-> and be permanently leaked?
-> 
-> > +	mmap_read_unlock(mm);
-> > +	if (ret != nr_pages) {
-> > +		if (ret > 0)
-> > +			unpin_user_pages(pages, ret);
-> > +		ret = -EFAULT;
-> > +		goto unlock_srcu;
-> > +	}
-> > +
-> > +	write_lock(&kvm->mmu_lock);
-> > +	mapping = pkvm_mapping_iter_first(&pgt->pkvm_mappings, ipa, ipa + size - 1);
-> 
-> [Severity: Critical]
-> Is there a Time-of-Check to Time-of-Use race here since the MMU
-> notifier retry protocol is missing?
-> 
-> The resolution of the HVA to PFNs via pin_user_pages() happens outside
-> kvm->mmu_lock. A concurrent host MMU invalidation could unmap the region
-> and remove the pkvm_mapping, and a subsequent guest fault could establish
-> a new huge page mapping at the same IPA.
+> -- 
+> Sashiko AI review · https://sashiko.dev/#/patchset/20260803100904.3563942-1-vdonnefort@google.com?part=19
 
-This is called on the back of a hypervisor request. This is only for
-protected-VM and we do have an existing pin on the huge-page, preventing
-any unmap. 
-
-We do not use MMU notifier for protected VMs.
+Hum, that is a good point. __pkvm_pgtable_stage2_split() shouldn't return an
+error if the mapping is already PAGE_SIZE.
 
 -- 
 Vincent
-
-> 
-> When this thread acquires kvm->mmu_lock, it finds the new mapping in the
-> tree and proceeds to split it using the PFNs derived from the old mapping.
-> 
-> Without capturing kvm->mmu_invalidate_seq before GUP and checking
-> mmu_invalidate_retry() under the lock, can this lead to a refcount
-> underflow on the new huge page and a permanent leak of the old pages?
-> 
-> > +	if (!pkvm_mapping_can_split(mapping)) {
-> > +		ret = -EINVAL;
-> > +		goto unlock_mmu;
-> > +	}
-> 
-> -- 
-> Sashiko AI review · https://sashiko.dev/#/patchset/20260803100904.3563942-1-vdonnefort@google.com?part=18
