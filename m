@@ -1,98 +1,117 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5600F503BE1
-	for <kvmarm@lists.linux.dev>; Mon,  7 Sep 2026 16:32:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 117C545A29F
+	for <kvmarm@lists.linux.dev>; Mon,  7 Sep 2026 16:52:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788798734; cv=none; b=kcHZLHatoq2U//E9rTU79BAbTDSmreLFWWZIxfM5EK3F8G29KuI3yerXTdRtirsdU2jWFkgSy2z5jwgIiE8mDZL+QrrZBPjkyPkn2xvvUCUDtnFu7eTiYzvtRkQ6kT00CHoDJS0bZiXSoxvedRWKqib3Mxgn0TeLqU6bbP4A5Ds=
+	t=1788799968; cv=none; b=Wqskt0a7GewftMi2M4o5mIGnUdjmCfLJqWyuhzeUBaEtK8z59YnA5OFxrkTPxEcLrpGDh0sDAcIxJZI3SUDGQPSIbP0u2m0z70NAg/SXi6xsxtKM74Ya7n7V6bL/o3Qdvr4Uv22OBRMbyvKsV55hnWd4ScCFMuHFvuEUHocI4ag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788798734; c=relaxed/simple;
-	bh=J3cpVqpiyKWs1GQp5auo36NbnnOFiJCMegyvZYC5U7c=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=pag1sMPEcg4ZJEMybKeLZcHFK8wUNu3k/WAoztG+lwETb+mrjMscPr4h9OtnsOTJW+eLNixHsTc94VBNIEmZJHMMImbUgHyFaq47cxoyXCZAh3ZXZXpvaXZ8KvRlohg/uzERiHavNqGW/6VRtw2S/ceHUkQKlDjiPqV4MSNVuvY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZsCtz7zj; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788799968; c=relaxed/simple;
+	bh=9KGiycjC0t79RPzsvjfZKtPbm8KkSJBkxzKIHrahiz4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ew9oQpKKGpO4sSusCfdOiZBEoGeZAnQ5gc2U6+rbl4rOJnF2P9ZANJVp5m8sxKNDcLB/nKqIb/9VsPJGUDlcWtZvMflP8dO1fDeignpxgpd2YRx17sPnokJXT8wJP7eE5yMTUalHbFJ0Fk79BHdSiMGj210MxCR5jHDOoR+bvT8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=sDQVkBbA; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZsCtz7zj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 018E31F00A3A;
-	Mon,  7 Sep 2026 16:32:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788798733;
-	bh=F4o3MpSfJFbr3L379+Npu7y1XEXukleK7HbypayAIGU=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=ZsCtz7zjsYCSyqiEzxf2TDjdElANE95OU9xE2Tacms0+Du5H8RhA8264zZdNAtIzG
-	 Wo3f5Nc4VJCIhq3dhrZQ852c3APnLuiqYuG7mUYdzqGc7gYUb24MDN7vwpxrR169lr
-	 69FM6LmycTFl9eIRe11TEN3ZYBm3bXrrOpJ776imQyDBZpuoYI7FiRFNPVU1ZJxZEc
-	 Ny8pYsaFRnRT9ZBOyWJiHVW1CjqCENqR8bCwy59hVtYR+F2ypD+pA64asIhYxQWnyz
-	 gOlSTXULBhGa7HN/YNQ/bURqZKjmj/gDMDAo+lNu7zAeILdspE3+Ola394TQ9gk8ik
-	 avozy5TfQIrTA==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v17 1/1] arm64: mm: Handle Granule Protection Faults
- (GPFs)
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Suzuki K Poulose" <suzuki.poulose@arm.com>
-Cc: "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev
-In-Reply-To: <20260907162204.1479401-2-suzuki.poulose@arm.com>
-References: <20260907162204.1479401-1-suzuki.poulose@arm.com>
- <20260907162204.1479401-2-suzuki.poulose@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 07 Sep 2026 16:32:12 +0000
-Message-Id: <20260907163213.018E31F00A3A@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="sDQVkBbA"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3D47E1476;
+	Mon,  7 Sep 2026 09:52:42 -0700 (PDT)
+Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C3F933F528;
+	Mon,  7 Sep 2026 09:52:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1788799965; bh=9KGiycjC0t79RPzsvjfZKtPbm8KkSJBkxzKIHrahiz4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=sDQVkBbAvoRk8ASr2K6Iz+RksnpaYHjgHHet/FkQGGN4vkix5fYGu7aYvNa8MHLi6
+	 4lKTZb4ak4jryOZefEYZiYh7f6WtwgQl5dbEVw4K51hqJXB6KhyLINqtY2+MHsnYkW
+	 wRLsfN3MT3QtNNJicsORgjvJOdazczlrcG3NDgc0=
+Date: Mon, 7 Sep 2026 17:52:35 +0100
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: Vincent Donnefort <vdonnefort@google.com>, maz@kernel.org, 
+	oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
+Cc: joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
+	kernel-team@android.com, fuad.tabba@linux.dev, qperret@google.com, keirf@google.com
+Subject: Re: [PATCH 12/20] KVM: arm64: Handle huge mappings in
+ __pkvm_host_force_reclaim_page_guest()
+Message-ID: <yzeb47zjrxdsfztilng7n4e22fnsm4ncqjeqzmryc7sqncuqw6@pjtshmjxwelh>
+References: <20260803100904.3563942-1-vdonnefort@google.com>
+ <20260803100904.3563942-13-vdonnefort@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260803100904.3563942-13-vdonnefort@google.com>
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [Medium] Missing untagged_addr() in do_gpf_ptw() causes show_pte() to fai=
-l for tagged user addresses.
---
+On Mon, Aug 03, 2026 at 11:08:56AM +0100, Vincent Donnefort wrote:
 
-commit 33ff4ae42e692cd124830f34b7d3c5368fce252f
-Author: Steven Price <steven.price@arm.com>
+[...]
 
-arm64: mm: Handle Granule Protection Faults (GPFs)
-
-This commit introduces handlers for Granule Protection Faults (GPFs) which
-occur when accessing memory delegated to a realm. It issues a kernel oops
-for GPFs on page walks via do_gpf_ptw(), and sends a SIGBUS for non-page
-walk faults. It also handles fixups for spurious kernel GPFs.
-
-> diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
-> --- a/arch/arm64/mm/fault.c
-> +++ b/arch/arm64/mm/fault.c
-> @@ -910,6 +910,22 @@ static int do_tag_check_fault(unsigned long far, uns=
-igned long esr,
->  	return 0;
+> -static void hyp_poison_page(phys_addr_t phys)
+> +static void __hyp_poison_page(void *addr, size_t size)
+>  {
+> -	void *addr = hyp_fixmap_map(phys);
+> -
+> -	memset(addr, 0, PAGE_SIZE);
+> +	memset(addr, 0, size);
+>  	/*
+>  	 * Prefer kvm_flush_dcache_to_poc() over __clean_dcache_guest_page()
+>  	 * here as the latter may elide the CMO under the assumption that FWB
+> @@ -1304,19 +1302,15 @@ static void hyp_poison_page(phys_addr_t phys)
+>  	 * host stage-2 and would otherwise lead to a malicious host potentially
+>  	 * being able to read the contents of newly reclaimed guest pages.
+>  	 */
+> -	kvm_flush_dcache_to_poc(addr, PAGE_SIZE);
+> -	hyp_fixmap_unmap();
+> +	kvm_flush_dcache_to_poc(addr, size);
 >  }
-> =20
-> +static int do_gpf_ptw(unsigned long far, unsigned long esr, struct pt_re=
-gs *regs)
-> +{
-> +	const struct fault_info *inf =3D esr_to_fault_info(esr);
+>  
+>  static void hyp_poison_range(phys_addr_t phys, u64 size)
+>  {
+> -	u64 offset;
+> -
+> -	for (offset = 0; offset < size; offset += PAGE_SIZE)
+> -		hyp_poison_page(phys + offset);
+> +	__apply_guest_page(__hyp_va(phys), size, __hyp_poison_page);
+>  }
+
+Patch 8 introduces hyp_poison_range(), and it is reimplemented in
+another way here. Maybe just do it this way in the first time?
+
+>  
+> -static int host_stage2_get_guest_info(phys_addr_t phys, struct pkvm_hyp_vm **vm,
+> +static int host_stage2_get_guest_info(phys_addr_t phys, u64 *size, struct pkvm_hyp_vm **vm,
+>  				      u64 *gfn)
+>  {
+>  	enum pkvm_page_state state;
+> @@ -1344,34 +1338,43 @@ static int host_stage2_get_guest_info(phys_addr_t phys, struct pkvm_hyp_vm **vm,
+>  	if (ret)
+>  		return ret;
+>  
+> -	if (WARN_ON(level != KVM_PGTABLE_LAST_LEVEL))
+> -		return -EINVAL;
+> +	/* We only support either PAGE_SIZE or PMD_SIZE */
+> +	if (level < KVM_PGTABLE_LAST_LEVEL - 1)
+> +		return -E2BIG;
+>  
+> -	return host_stage2_decode_gfn_meta(pte, vm, gfn);
+> +	ret = host_stage2_decode_gfn_meta(pte, vm, gfn);
+> +	if (ret)
+> +		return ret;
 > +
-> +	die_kernel_fault(inf->name, far, esr, regs);
-
-[Severity: Medium]
-Does this code miss untagging the address before passing it to the oops
-handler?
-
-If a GPF on a page table walk is triggered by a tagged user pointer, passing
-the raw, tagged far value to die_kernel_fault() will prevent the page
-table dump from showing up in the panic output.
-
-In die_kernel_fault(), the address is passed to show_pte(addr). When
-show_pte() checks is_ttbr0_addr(addr), the lingering memory tag in the
-upper byte will cause the address to exceed TASK_SIZE. This makes
-show_pte() abort with "address between user and kernel address ranges"
-and return without dumping the PTE.
-
+> +	*size = kvm_granule_size(level);
+> +
 > +	return 0;
-> +}
 
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260907162204.1479=
-401-2-suzuki.poulose@arm.com?part=3D1
+This can also be moved into its own patch with get_valid_guest_pte(),
+hyp_poison_range() changes in my opinion.
+
+Thanks,
+Wei-Lin Chang
+
+[...]
