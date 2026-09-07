@@ -1,33 +1,33 @@
-Received: from mta0.migadu.com (out-84.mta0.migadu.com [91.218.175.84])
+Received: from mta1.migadu.com (out-26.mta1.migadu.com [95.215.58.26])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51948412C08
-	for <kvmarm@lists.linux.dev>; Mon,  7 Sep 2026 07:01:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29E47415F3C
+	for <kvmarm@lists.linux.dev>; Mon,  7 Sep 2026 07:01:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.26
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788764509; cv=none; b=Jxk5w6aSyCWP5W+1VkNsyBIsWMg3t/5iR3GQ8TEt1uAWc3ZcUwAlHqrP4WHXLf2OfZqTgWS6GSQ97XxuuodXF0xU292jUYxhfo8VfBD6X8qAhmEC9VvUwhVK0kLGX03nrq/Bse6WSzrtHeJDHDgRSWbcg364Xs60jPCBL1jPJAM=
+	t=1788764513; cv=none; b=kFaqfYq8Etlm+VVUrs2ZkAJ+46St7jcUap/ua0jb5NlI831/3euS+x3HU0T0mM+WoZucywklpan7dd0goQIbFcot8EMQFyAsxIq6JStPQCshJD8+n3UHn7UOVyR2wvik6zmXY28yeK4ZczNOyWYnvftB6F2O7DwbbJLyXH5XOO8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788764509; c=relaxed/simple;
-	bh=K+Cw1Rhs/pIXecXIjGAEGbyJhwCxhPQM371NHFscWfw=;
+	s=arc-20240116; t=1788764513; c=relaxed/simple;
+	bh=U/axjWQAfQSFNwOk+gQLgXnGQvfOgoP7MHtzfv1LyiQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=I1ccZJIN9+SxooBQ4Sf8SbvWWoRZgy1KlVPKfXSFVFT687UaEf8Un+FjiHfwoJ8TwZfAe6mVHdEGhHp5syKo5tgWVe8vUGqvskNGquxWkJgUYeVhIy99RL95i0cLOmoTbf1ysdqo4i0IsO91NhnMt3rWpNfFNqow4SNdPlIN3hw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=p8fNQnYu; arc=none smtp.client-ip=91.218.175.84
+	 MIME-Version; b=MXWjJg9OqRh1j4iMmrkWztfPjKfY/n5nb8cHLGptip4wTXPHVj5MjZLwQwYhcIRwbTcxs5B1UAO9KIYkMI6UmPuSlAFcihHCy74+Ov9+JxFA6NaWvJBV+RESFvjxb+ucG+u6Er+IHx6xTtAZe+z38MbzpoWP+Mb5Jgy4YitnKvc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=WGMKie+k; arc=none smtp.client-ip=95.215.58.26
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="p8fNQnYu"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="WGMKie+k"
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=K+Cw1Rhs/pIXecXIjGAEGbyJhwCxhPQM371NHFscWfw=;
+DKIM-Signature: a=rsa-sha256; bh=U/axjWQAfQSFNwOk+gQLgXnGQvfOgoP7MHtzfv1LyiQ=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1788764502; v=1; x=1789369302;
- b=p8fNQnYuVsFPhdAhPxr5iNDsAmcuAMoCKemaon+6vgdDeWzMd3SgfbLHHsReo1SazQqmPFUQ
- G6XsECqPrraRiSH+Ev8xUFHy6VOLDQKqyKiNvee3gKb8rAj9gBLGnabzf3t75eh0xftsbSURpzd
- a3tahqUpAkalCaOFzIan1hyA=
+ t=1788764498; v=1; x=1789369298;
+ b=WGMKie+k9l0m1QyQdxO2azYFgoj8SFmFgBdU0oZioZ6vybLS2TXoEZktugpuEn6L5bof695P
+ 0bPT1V0dTTa09Fujr/E2StjZF2M7u0b3DTLPJiYg1rlrthNoH3UsiwRcjn0jcNhjQdmI6cTNqlO
+ jZGOKmHPyJwD10igHXTEa2AE=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id d6bcb7f9e1bd0ff6;
-	Mon, 07 Sep 2026 07:01:42 +0000
-X-Mizu-Trace-ID: d6bcb7f9e1bd0ff6
+Received: by smtp.migadu.com with ESMTPS id d54cb9ebe02a4a1c;
+	Mon, 07 Sep 2026 07:01:38 +0000
+X-Mizu-Trace-ID: d54cb9ebe02a4a1c
 X-Migadu-Flow: FLOW_OUT
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
@@ -44,9 +44,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Vincent Donnefort <vdonnefort@google.com>,
 	Quentin Perret <qperret@google.com>,
 	Fuad Tabba <tabba@google.com>
-Subject: [PATCH v2 14/17] KVM: arm64: Reject host access to protected VM private state
-Date: Mon,  7 Sep 2026 07:59:59 +0100
-Message-Id: <20260907070002.3333525-15-fuad.tabba@linux.dev>
+Subject: [PATCH v2 13/17] KVM: arm64: Pend a protected guest's SError with HCR_EL2.VSE only
+Date: Mon,  7 Sep 2026 07:59:58 +0100
+Message-Id: <20260907070002.3333525-14-fuad.tabba@linux.dev>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20260907070002.3333525-1-fuad.tabba@linux.dev>
 References: <20260907070002.3333525-1-fuad.tabba@linux.dev>
@@ -58,97 +58,34 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-A protected vCPU's register and debug state is no longer exposed to
-the host. Host ioctls that would reach that state now fail rather
-than operate on a copy that is not the guest's:
-
-  - KVM_GET_ONE_REG and KVM_SET_ONE_REG return -EPERM once the vCPU has
-    run: the copy then holds reset values plus what the exit handlers
-    marshal out. Pre-run access still builds the guest's boot state.
-  - KVM_ARM_VCPU_INIT returns -EPERM once the vCPU has run: it would
-    reset the host copy alone and rewrite mp_state, which EL2 reads
-    only at hyp vCPU creation, so a vCPU the guest powered off would
-    come back RUNNABLE.
-  - KVM_SET_VCPU_EVENTS rejects external-abort injection with -EPERM;
-    SError injection is forwarded and stays permitted.
-  - KVM_SET_GUEST_DEBUG returns -EPERM: a protected guest's debug state
-    is hypervisor-owned.
+kvm_inject_serror_esr() emulates the exception entry when
+serror_is_masked() reads PSTATE.A clear, but the host has no view of a
+protected guest's PSTATE.A, and an emulated entry never reaches the
+guest: the SError is lost. Set VSE instead and let the guest's own
+PSTATE.A mask it.
 
 Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
- arch/arm64/kvm/arm.c   |  7 +++++++
- arch/arm64/kvm/guest.c | 19 +++++++++++++++++++
- 2 files changed, 26 insertions(+)
+ arch/arm64/kvm/inject_fault.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 5c2587da815ab..37a260b139795 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1750,6 +1750,13 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
- 	bool power_off = false;
- 	int ret;
- 
-+	/*
-+	 * Re-init would reset the host copy alone and rewrite mp_state
-+	 * after EL2 has read it. Pre-run init stays allowed.
-+	 */
-+	if (vcpu_is_protected(vcpu) && vcpu_has_run_once(vcpu))
-+		return -EPERM;
-+
- 	/*
- 	 * Treat the power-off vCPU feature as ephemeral. Clear the bit to avoid
- 	 * reflecting it in the finalized feature set, thus limiting its scope
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index ab659795d4b2f..abab580a659d4 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -701,6 +701,10 @@ int kvm_arm_copy_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
- 
- int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- {
-+	/* Once the vCPU has run, the host copy is not the guest's state. */
-+	if (vcpu_is_protected(vcpu) && vcpu_has_run_once(vcpu))
-+		return -EPERM;
-+
- 	/* We currently use nothing arch-specific in upper 32 bits */
- 	if ((reg->id & ~KVM_REG_SIZE_MASK) >> 32 != KVM_REG_ARM64 >> 32)
- 		return -EINVAL;
-@@ -718,6 +722,10 @@ int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 
- int kvm_arm_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- {
-+	/* Writes build the boot state; once run, EL2 owns the registers. */
-+	if (vcpu_is_protected(vcpu) && vcpu_has_run_once(vcpu))
-+		return -EPERM;
-+
- 	/* We currently use nothing arch-specific in upper 32 bits */
- 	if ((reg->id & ~KVM_REG_SIZE_MASK) >> 32 != KVM_REG_ARM64 >> 32)
- 		return -EINVAL;
-@@ -786,6 +794,13 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
- 	u64 esr = events->exception.serror_esr;
- 	int ret = 0;
- 
-+	/*
-+	 * EL2 injects an external abort only to complete a forwarded abort.
-+	 * SError injection is forwarded.
-+	 */
-+	if (vcpu_is_protected(vcpu) && ext_dabt_pending)
-+		return -EPERM;
-+
- 	/*
- 	 * Immediately commit the pending SEA to the vCPU's architectural
- 	 * state which is necessary since we do not return a pending SEA
-@@ -883,6 +898,10 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
- {
- 	trace_kvm_set_guest_debug(vcpu, dbg->control);
- 
-+	/* A protected guest's debug state is not exposed to the host. */
-+	if (vcpu_is_protected(vcpu))
-+		return -EPERM;
-+
- 	if (dbg->control & ~KVM_GUESTDBG_VALID_MASK)
- 		return -EINVAL;
- 
+diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+index d6c4fc16f8795..b88098a7e756c 100644
+--- a/arch/arm64/kvm/inject_fault.c
++++ b/arch/arm64/kvm/inject_fault.c
+@@ -378,8 +378,11 @@ int kvm_inject_serror_esr(struct kvm_vcpu *vcpu, u64 esr)
+ 	 *
+ 	 * As we're emulating the SError injection we need to explicitly populate
+ 	 * ESR_ELx.EC because hardware will not do it on our behalf.
++	 *
++	 * The host does not see a protected guest's PSTATE.A: leave the
++	 * vSError to HCR_EL2.VSE below, which the guest masks itself.
+ 	 */
+-	if (!serror_is_masked(vcpu)) {
++	if (!vcpu_is_protected(vcpu) && !serror_is_masked(vcpu)) {
+ 		pend_serror_exception(vcpu);
+ 		esr |= FIELD_PREP(ESR_ELx_EC_MASK, ESR_ELx_EC_SERROR) | ESR_ELx_IL;
+ 		vcpu_write_sys_reg(vcpu, esr, exception_esr_elx(vcpu));
 -- 
 2.39.5
 
