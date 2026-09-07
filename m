@@ -1,231 +1,150 @@
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+Received: from mta0.migadu.com (out-234.mta0.migadu.com [91.218.175.234])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EB5943CE4B
-	for <kvmarm@lists.linux.dev>; Mon,  7 Sep 2026 08:24:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.51
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788769449; cv=pass; b=F7M+4Oa6fgty4XpNgxh8/KjqJavjr1GQHiVLHRPROp2Uhg5cfZ9cDSFhj2Gf4xkc3CWx0AKTMRckMGqN2kK5YLypyS9/X5hPNlBh8LkF51QNKZZSCq+Ge5gnXRou2bFLu9hOOilzjDb89bWxTbEE3bA6uDy9y5NkfKR96wG5NpE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788769449; c=relaxed/simple;
-	bh=eW2heI0TSrLo005hXEi9RN2qzKnbcSMx1USmy+ENf4A=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FC95448BA8
+	for <kvmarm@lists.linux.dev>; Mon,  7 Sep 2026 09:12:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.234
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788772348; cv=none; b=HlQwucI9VyYEvdECoV6+d9UKuSmP4/++3cgInsvuB/tyztL6zLGL/SpIETOFySUwKjTb6L+Q/FVfBO3bwCIu0b7aw+ebqZLmuGgiDyEfTkeuImX9wUmDYn2TemlM+pmEX5UDLOQ0blal2is7YFKJQe6E+vvQ9lVZkg/UFSqhxTw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788772348; c=relaxed/simple;
+	bh=m5upJ1SWSf4KAgqhBc2GKFg4B6UurZsIgZcCshsGSfk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=h3OCmpycb4RuLklCVWj1GMbcCk4QBiX9ZJpDc56B1zShFzRo3ZSpv8QnHMBmFa4Infkaag4UvZXXW4RIqywe/7pqFPzYbqn4lD1E/5Kn8TBO71A8Nh9LTbXp1qeeDCWpw8Cflq5RRztQVfWj1IOUmANc4+imnNyZUo7gUmpybs8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault.org header.i=@brainfault.org header.b=kjsbKQVO; arc=pass smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+	 To:Cc:Content-Type; b=tNYSqm5e/6K1fIXXbwxjNXgqj+2knj0ILzDh13s3F7AjmWhaEhyKXWIeccJXwq7V2lvg4D8FHuOqVwssyRGU3PqtAN94niHoDMSbtbZW4ai0TCdBWfzW7qpCwhWRQsVxfRdHZ0X1phiNdfhCF57csB512H8foQ+GE2ti5q5nl/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xAdH3wU2; arc=none smtp.client-ip=91.218.175.234
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault.org header.i=@brainfault.org header.b="kjsbKQVO"
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-4843e9c5960so3259106f8f.0
-        for <kvmarm@lists.linux.dev>; Mon, 07 Sep 2026 01:24:06 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1788769445; cv=none;
-        d=google.com; s=arc-20260327;
-        b=QxeYyq/AOKaC38dFyJBkZmBjFdpYq6bWeDX33C3Y/U9qMCfpM5brWlr05R9ABP9HMk
-         PK+tLBfqaSpaVvsAaOXkTpnBATrxtAcm2QUd1pLK6sQ+AZv8022KsEfiucWOQsFaR6Er
-         Afb5kWc8M6zwGjBsgMSjK5L7MHsEz9ycTejtOPO9n664TjwVxBxZT5VEukYGtlKM3hqO
-         p2tF5kt46xfa0J9cGu88vYVUT8Jo6K27hj1gIRQvTPLZ3OzuoTkr29saDvf4n7fstl4D
-         IWr/Cp2/PVhAKo20G6mKok0qG6RM2oYFFazPCyL81bugy4bMLWDEXt5Fdp97RglmHD5B
-         6rVw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=h6qiSySchwLDdn88HORNI+edfDP5k4+RIZ3ev8MYNCc=;
-        fh=FuZxML3DVmmmn3sfbkFvc0fxnoZBBOd+3JcnGcNOKqc=;
-        b=kawI5yZeNri7XVUfY5YHl/tjIbwtzY1IALuYDyvUbiVvPKTVbQRVliqHp+aukgPZ67
-         82lWRvdHmjArLEmyrOa1LnPLlVWjMAwUV0laUCfQnu+y2ocPHWBAZkXTttgUCIUnddM2
-         NFX5F4e3A51I/lS1MxAKYxb1+p6eP2QXFf/QgYN/uwql8Wd0UcJORU+DPIl0QYo8C8ic
-         jy+XdAw7b/OLridPQHj63nB7eFP9ZwCPOpvg83J9mnAX9/gktfdv9v3QT/YwXJTloa2K
-         Lx+GevMXVyYP7fis3T4cokuRm5Vf6OnxITl3UOLRNOolmXT7Jlp1P/dYfBCHzC5Ji8Gu
-         URgQ==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault.org; s=google; t=1788769445; x=1789374245; darn=lists.linux.dev;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=h6qiSySchwLDdn88HORNI+edfDP5k4+RIZ3ev8MYNCc=;
-        b=kjsbKQVOpAewjBgfDxqZPL5996xdu85QCa+JBtU+6nmZP6kZjicKmOpzxW2oGcQaqP
-         xVyXfBE3TERHCFWPDnCoF6Mnaz86eaLMYq7Kvz9xRkjK0HgKgyxC7gj9l3jFCd5m9G5Q
-         o0W8eImcJHoOOJM+989oW8Gp3mh28+WmN6VcxHL8f7FmPafqE5WqbTvOtevMVHpvPS1L
-         qYNINu+eBpFtRLoeMUKWkDpVibctpY5qqN+3O4Ibo+y26HpOVGUdCWOUt7lHl7zhJ5d8
-         MEsPGhejnl2vnTr1yPtYPz243PGOJGThLnsC0BTbsHYr18kShOqJy6H66snDYDgek/RO
-         dZxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788769445; x=1789374245;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=h6qiSySchwLDdn88HORNI+edfDP5k4+RIZ3ev8MYNCc=;
-        b=ogSdYGTpn4FHZtoPovG4aNV1KdBFXGCB7vqxrDAVyYCK97hfAnkc88ceP9XvJNep4Y
-         F8dTv/JMdgzEMaPkc9eY8l59volFbJRKIl1qGH4T4HjDqczDZa9cpwBLMBaBxn4qcyTD
-         SNUHhtsBvAleLyrmN4oPNVBlGjc8yDKCz7ZUVlvLlzCHp7gkY1RmuR0JdbHcE52MohKw
-         P12Z8dVx7G92Z3hYMRoFlmPAMVtS4yKHGaTRSTs4K5Hmz/joBPsMwVWIfYOhRmNgFxGf
-         fssFwYDpX0ylYwj20+hCf7E6siK0keVS90XNZicRTvAdIPO2eSMl7s+H/g0dIlsgWWi4
-         Rm4Q==
-X-Forwarded-Encrypted: i=1; AKwUvBwqhQZzzdJWmtnGZf2hFbp/G2LKhFJ0s13eMQFsLME0VHy9jF9+A5TCKpBj0uU1Qzj1Cyjdwks=@lists.linux.dev
-X-Gm-Message-State: AFuF++mEft7s0ALTMoZEvgBzm2Q1IdLimF7ODqhL34GomT5fNsmROFcl
-	ikLvJG1Jgx6rffexvTr1nULsA6tK62JATHqNGr4Ian9Z0WZbDjQTJ1BPW2L8l9ozb0Kh2FYsSOO
-	nNFC3yJirRXFjODhKVB42l3C08283wjfzGdLnF9D1MA==
-X-Gm-Gg: AYBFou199jChIkgekGos/zqOUDvSnhXa0f103AfEq9bheSAZKIkhb9KioKyXBZgsNwC
-	UXQr9b8K8SLv/osYSmPg6rOgAM7s/BZ6gvTLpGKOVb3Zm7jD9bX7SNSbUJxxNuIMRt89S+1ghpg
-	ABRWUOpiGsCvuwTGDrGNphFlKMCRUvREEEQgT1YKcCUalETjoosR5g8pQn8cHYtY9r/3S5DFt4Z
-	6c1cD0NRn0jGZQkZttE6MlHtSdSu3vYFGaV0YqOxB8P4FpoezR9givuy/OsHiGNfmnRQASiHdGL
-	vuJmqxHxoT8dBgK0gS17SS8Z3tPZu2fzbd+JIxyN4AcCNzdqNpQYa9Sy/IEvP0hTnUtLekNkaFr
-	RyoTddAQmer5wotvtB0zImzv61ZnTTRhpUdunz8eoGJMyoyb9AYHrh3pzjNIc16g=
-X-Received: by 2002:a05:6000:2f82:b0:485:8c16:5ef7 with SMTP id
- ffacd0b85a97d-4858c166148mr18091871f8f.49.1788769445126; Mon, 07 Sep 2026
- 01:24:05 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xAdH3wU2"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=m5upJ1SWSf4KAgqhBc2GKFg4B6UurZsIgZcCshsGSfk=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1788772344; v=1; x=1789377144;
+ b=xAdH3wU2FzXVZ/28yHhY2LEqa7JvIL9iPjFYVXGaYAzH3gkNY5PMexG+sKt4Hx24zWfZfbtE
+ L5o5f6SgFiaCLGdgUCSz0F4bZVq+fjM19cPYBqaW1mhE3jNzuDS9Al0gzptWTh7044FvU6dLiBF
+ 7tOiMNkWQIpB2Vql17MHQw/8=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 0ee0c3e58bf3b942;
+	Mon, 07 Sep 2026 09:12:24 +0000
+X-Mizu-Trace-ID: 0ee0c3e58bf3b942
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b4a0b384c4so6887e87.1
+        for <kvmarm@lists.linux.dev>; Mon, 07 Sep 2026 02:12:23 -0700 (PDT)
+X-Gm-Message-State: AFuF++mS34kr30mTHVvYedjtIg78D6CxHzLSxnKjiS9jaMOpaId2ZpHj
+	GInK42EulZZpgl0WXOvL1KJuEXRGzUSkDmwiDub3DQ3qKJVu6tdNESw7Ph39NaslvF3/pdgvURZ
+	mauca8MlqT8HI86n3m98mWVZgtQd265VcV7vGW8pX
+X-Received: by 2002:a05:6512:3d24:b0:5b5:e890:1953 with SMTP id
+ 2adb3069b0e04-5b74d3f2031mr126511e87.12.1788772342236; Mon, 07 Sep 2026
+ 02:12:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260902164123.2546762-1-seanjc@google.com> <20260902164123.2546762-11-seanjc@google.com>
-In-Reply-To: <20260902164123.2546762-11-seanjc@google.com>
-From: Anup Patel <anup@brainfault.org>
-Date: Mon, 7 Sep 2026 13:53:53 +0530
-X-Gm-Features: AcwNN1UOItNX8Zqa8yZNak7eVCaaP3xVxuE0lRNcn1acCna6Fm_hGPjVZ5FCvUw
-Message-ID: <CAAhSdy1zxu0cGnvpZEq_mPYRj07m7a+TA_8f0-sa=Mu7xtXvjA@mail.gmail.com>
-Subject: Re: [PATCH v2 10/20] KVM: selftests: Add a wrapper API to allocate
- multiple page table pages
-To: Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
-	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, 
-	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Fuad Tabba <fuad.tabba@linux.dev>, 
-	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Atish Patra <atish.patra@linux.dev>, Alexandre Ghiti <alex@ghiti.fr>, 
-	David Hildenbrand <david@kernel.org>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, Itaru Kitayama <itaru.kitayama@fujitsu.com>, 
-	Nicholas Piggin <npiggin@gmail.com>, Ritesh Harjani <ritesh.list@gmail.com>
+References: <20260907070002.3333525-1-fuad.tabba@linux.dev>
+ <20260907070002.3333525-5-fuad.tabba@linux.dev> <20260907072331.A66021F00A3A@smtp.kernel.org>
+In-Reply-To: <20260907072331.A66021F00A3A@smtp.kernel.org>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Mon, 7 Sep 2026 10:11:45 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTxvZXgAcdteJGBKN8mTMm0fu+Z8J5DZzN5KGzBfve_25w@mail.gmail.com>
+X-Gm-Features: AcwNN1Wnh4tM_Q8WLCYpMkifhYqafgk5esWxc5PS649ZvzFiMI6o4z-L6LN_zog
+Message-ID: <CA+EHjTxvZXgAcdteJGBKN8mTMm0fu+Z8J5DZzN5KGzBfve_25w@mail.gmail.com>
+Subject: Re: [PATCH v2 04/17] KVM: arm64: Skip fixed-feature state flush for
+ protected vCPUs
+To: sashiko-reviews@lists.linux.dev
+Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>, 
+	Marc Zyngier <maz@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 2, 2026 at 10:11=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
+On Mon, 7 Sept 2026 at 08:23, <sashiko-bot@kernel.org> wrote:
 >
-> Add vm_alloc_page_table_pages() and use it throughout arch code to replac=
-e
-> open coded equivalents.
->
-> No functional change intended.
->
-> Reviewed-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
-> Tested-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Thank you for your contribution! Sashiko AI review found 1 potential issu=
+e(s) to consider:
+> - [High] State Leak and Host Integrity Bypass via Unswitched Debug Regist=
+ers for Protected vCPUs
 
-LGTM.
+Not this one, Sashiko.
 
-For KVM RISC-V:
-Acked-by: Anup Patel <anup@brainfault.org>
+...
 
-Regards,
-Anup
+> [Severity: High]
+> Does this early return in flush_debug_state() in
+> arch/arm64/kvm/hyp/nvhe/hyp-main.c bypass the debug register context swit=
+ch
+> for protected guests?
+>
+> By returning early here, hyp_vcpu->vcpu.arch.debug_owner is never updated
+> from the host and remains at its default VCPU_DEBUG_FREE. During the worl=
+d
+> switch, __debug_switch_to_guest_common() and
+> __debug_switch_to_host_common() return early if debug_owner =3D=3D FREE.
+> Consequently, KVM bypasses saving the host's live hardware debug register=
+s and
+> loading the guest's debug registers. The guest enters execution with the =
+host's
+> actual hardware breakpoint registers still active in the pipeline.
+>
+> Normally, this is mitigated because KVM sets MDCR_EL2.TDA to trap debug
+> accesses if the guest doesn't own the registers. However, for protected V=
+Ms,
+> pvm_init_traps_mdcr() only sets TDA if DebugVer is unimplemented. With
+> TDA unset, the protected guest can freely read the host's debug registers
+> (leaking host state) and overwrite them when it explicitly reads or write=
+s
+> DBGBVRn_EL1, DBGBCRn_EL1, or MDSCR_EL1.
+
+Self-hosted debug for protected VMs is still to come, as the cover
+says. Until then DebugVer is NI, so pvm_init_traps_mdcr() sets TDA and
+TDRA and the guest's debug register accesses trap, RAZ/WI or UNDEF.
+
+>
+> >       hyp_vcpu->vcpu.arch.debug_owner =3D host_vcpu->arch.debug_owner;
+> >
+> >       if (kvm_guest_owns_debug_regs(&hyp_vcpu->vcpu)) {
+>
+> [ ... ]
+>
+> > @@ -218,6 +221,9 @@ static void sync_debug_state(struct pkvm_hyp_vcpu *=
+hyp_vcpu)
+> >  {
+> >       struct kvm_vcpu *host_vcpu =3D hyp_vcpu->host_vcpu;
+> >
+> > +     if (pkvm_hyp_vcpu_is_protected(hyp_vcpu))
+> > +             return;
+> > +
+>
+> [Severity: High]
+> Does this early return in sync_debug_state() in
+> arch/arm64/kvm/hyp/nvhe/hyp-main.c skip restoring the host's debug regist=
+ers
+> upon guest exit?
+
+Same answer: the guest can't write them.
+
+Thanks,
+/fuad
 
 
-> ---
->  tools/testing/selftests/kvm/include/kvm_util.h    | 9 +++++++--
->  tools/testing/selftests/kvm/lib/arm64/processor.c | 4 +---
->  tools/testing/selftests/kvm/lib/riscv/processor.c | 4 +---
->  tools/testing/selftests/kvm/lib/s390/processor.c  | 8 ++------
->  4 files changed, 11 insertions(+), 14 deletions(-)
+
+/fuad
 >
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testi=
-ng/selftests/kvm/include/kvm_util.h
-> index d9d39a8894e2..c56f342b16fd 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> @@ -1013,10 +1013,15 @@ static inline gpa_t vm_phy_page_alloc(struct kvm_=
-vm *vm, gpa_t min_gpa,
->         return vm_phy_pages_alloc(vm, 1, min_gpa, memslot);
->  }
+> Because the context switch back to the host returns early due to the bypa=
+ssed
+> flush, any guest modifications to the hardware debug registers persist in=
+to the
+> host execution context. When the guest exits, the corrupted debug registe=
+rs
+> remain active when the host resumes execution, allowing an untrusted prot=
+ected
+> guest to mount an attack against the host kernel.
 >
-> +static inline gpa_t vm_alloc_page_table_pages(struct kvm_vm *vm, size_t =
-nr_pages)
-> +{
-> +       return vm_phy_pages_alloc(vm, nr_pages, KVM_GUEST_PAGE_TABLE_MIN_=
-PADDR,
-> +                                 vm->memslots[MEM_REGION_PT]);
-> +}
-> +
->  static inline gpa_t vm_alloc_page_table(struct kvm_vm *vm)
->  {
-> -       return vm_phy_page_alloc(vm, KVM_GUEST_PAGE_TABLE_MIN_PADDR,
-> -                                vm->memslots[MEM_REGION_PT]);
-> +       return vm_alloc_page_table_pages(vm, 1);
->  }
+> >       if (kvm_guest_owns_debug_regs(&hyp_vcpu->vcpu))
+> >               host_vcpu->arch.vcpu_debug_state =3D hyp_vcpu->vcpu.arch.=
+vcpu_debug_state;
 >
->  /*
-> diff --git a/tools/testing/selftests/kvm/lib/arm64/processor.c b/tools/te=
-sting/selftests/kvm/lib/arm64/processor.c
-> index 01325bf4d36f..2dcaa2c4a038 100644
-> --- a/tools/testing/selftests/kvm/lib/arm64/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/arm64/processor.c
-> @@ -115,9 +115,7 @@ void virt_arch_pgd_alloc(struct kvm_vm *vm)
->         if (vm->mmu.pgd_created)
->                 return;
->
-> -       vm->mmu.pgd =3D vm_phy_pages_alloc(vm, nr_pages,
-> -                                        KVM_GUEST_PAGE_TABLE_MIN_PADDR,
-> -                                        vm->memslots[MEM_REGION_PT]);
-> +       vm->mmu.pgd =3D vm_alloc_page_table_pages(vm, nr_pages);
->         vm->mmu.pgd_created =3D true;
->  }
->
-> diff --git a/tools/testing/selftests/kvm/lib/riscv/processor.c b/tools/te=
-sting/selftests/kvm/lib/riscv/processor.c
-> index ded5429f3448..c175dcd14114 100644
-> --- a/tools/testing/selftests/kvm/lib/riscv/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/riscv/processor.c
-> @@ -69,9 +69,7 @@ void virt_arch_pgd_alloc(struct kvm_vm *vm)
->         if (vm->mmu.pgd_created)
->                 return;
->
-> -       vm->mmu.pgd =3D vm_phy_pages_alloc(vm, nr_pages,
-> -                                        KVM_GUEST_PAGE_TABLE_MIN_PADDR,
-> -                                        vm->memslots[MEM_REGION_PT]);
-> +       vm->mmu.pgd =3D vm_alloc_page_table_pages(vm, nr_pages);
->         vm->mmu.pgd_created =3D true;
->  }
->
-> diff --git a/tools/testing/selftests/kvm/lib/s390/processor.c b/tools/tes=
-ting/selftests/kvm/lib/s390/processor.c
-> index fb9dab92d4d1..33f49d743b5f 100644
-> --- a/tools/testing/selftests/kvm/lib/s390/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/s390/processor.c
-> @@ -20,9 +20,7 @@ void virt_arch_pgd_alloc(struct kvm_vm *vm)
->         if (vm->mmu.pgd_created)
->                 return;
->
-> -       gpa =3D vm_phy_pages_alloc(vm, PAGES_PER_REGION,
-> -                                  KVM_GUEST_PAGE_TABLE_MIN_PADDR,
-> -                                  vm->memslots[MEM_REGION_PT]);
-> +       gpa =3D vm_alloc_page_table_pages(vm, PAGES_PER_REGION);
->         memset(addr_gpa2hva(vm, gpa), 0xff, PAGES_PER_REGION * vm->page_s=
-ize);
->
->         vm->mmu.pgd =3D gpa;
-> @@ -38,9 +36,7 @@ static u64 virt_alloc_region(struct kvm_vm *vm, int ri)
->  {
->         u64 taddr;
->
-> -       taddr =3D vm_phy_pages_alloc(vm,  ri < 4 ? PAGES_PER_REGION : 1,
-> -                                  KVM_GUEST_PAGE_TABLE_MIN_PADDR,
-> -                                  vm->memslots[MEM_REGION_PT]);
-> +       taddr =3D vm_alloc_page_table_pages(vm, ri < 4 ? PAGES_PER_REGION=
- : 1);
->         memset(addr_gpa2hva(vm, taddr), 0xff, PAGES_PER_REGION * vm->page=
-_size);
->
->         return (taddr & REGION_ENTRY_ORIGIN)
 > --
-> 2.55.0.966.g6673acef38-goog
->
+> Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260907070002.33=
+33525-1-fuad.tabba@linux.dev?part=3D4
