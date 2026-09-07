@@ -1,357 +1,165 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16A3544C4E2;
-	Mon,  7 Sep 2026 10:14:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6815630EF86;
+	Mon,  7 Sep 2026 10:14:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788776047; cv=none; b=pJ/SO40DcE0QJy9NUFn2n2303qAVeCjSSn1ZBuifXcy/2P5VpCi28L9LUZsxUbn39w7kF/o17h4F+rsOtamQi1uVeeREGZtcVpfy/9jysskcnXus3GSfgslly3xDhnB5Ui+egf84cr9ayrYEw6X6mX7GsxhbbqAv4EvUuikMci0=
+	t=1788776087; cv=none; b=XoDMO22XyfizebwlAdFN1t5PlotRE+TvJmGFBiZz31YhwpB25tbLvzgen3ugkNFLx4xJeLjNfOUjKgvueEi8GVyXnC/BXxSFKY3twbfSPUavE0FPQZW2BVd8stv0RbshCbihXoNxCDvsUQW/rL8ZRreX/mTdbwNyEkSVszsHztM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788776047; c=relaxed/simple;
-	bh=nJGrtqM89Umvqc+EXkj0IOaPX3tL+8TpqGzzdv9qJT4=;
+	s=arc-20240116; t=1788776087; c=relaxed/simple;
+	bh=alPNpabbOnB37h6nC1cs6jjEMFraQwNKa430EfuN7Wc=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=uCEuETYUgTRiI7oI8QM8gdTmEFPAefYYfeEjR+cYPbpmCGvSNWFyZUHOuGuVoUlWdSr9e8/CXxhdBTAI0LWMnvEht7glonSqDYN1KmpcS70UqU7qV2D5XrzESDDtzkU+4NPi+xKI+yhixLLkKYGT9NorHjABu1ppYeRDLQLbiW0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KG8E8Usk; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=ofYuGM4cVxOjB8zkwMCzM3H8WSXjTrsFrrvpoEnc6oUxwGnjoeJ02qoB7nXNAfFEEyA5BeoykmO2Oq7FKCWIktGlOONrcfAjNJeRxtmGGm+68jvBw+jNAsHFoql6OqSoUQTJJKJK26y/os+Ryop8pCI3lMjjsHngO7mn6JW1Io4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L7sAG9GI; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KG8E8Usk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 517191F00A3A;
-	Mon,  7 Sep 2026 10:14:05 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L7sAG9GI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DA321F00A3A;
+	Mon,  7 Sep 2026 10:14:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788776045;
-	bh=rmhgXU78dS9HRu9PphzIhUWmtLVWsT+/FkL3Jc7mjso=;
+	s=k20260515; t=1788776086;
+	bh=HMZ7+XOUJoEg4tdieoBk9owPXOkII+E58FEh5Zuv0Ws=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=KG8E8UskskKfJzjUMziutfWq9Kg1rkWsxOcZJ5uLKOd53JizA0f/jbAk1xmgZh4gB
-	 ir3pyVu1hPRPUDyp66g7mSbDLjLTlBM6X81nMIeGbebUu+OzgETvv9uay4FZd6kjjN
-	 WJ3hh12QPdhqQ3hv5wPrtVh7zERR+VnYEubCP53tRnRvOg2EPDtxGc3dmJyzCxXsY7
-	 31qyd2pQn730/MWEKO8FaofYXnPR//DK65p23O5haeE38YPJijj6mAokZfSyZAwimH
-	 w9h87uGCs2W52NsHzXMnQS7Jd7A5uNcFr8hIqcYk2Hj9+hXtPnIMRc/5APzwubrL+S
-	 7NmOLq+Whnudw==
+	b=L7sAG9GInez+FbdPrTp3Js+lWe7BxeVwgnKnv/WjbUaCYbsWmGFOXMXhURa90D7hQ
+	 ZvnkCAUtqr+UcgMqjfjQu444xKCeR6IeiDHbVSWObxcoB/Kd2oGcnuKn+Guzw5/gSu
+	 QZxckv1vMf5EZP3AYrd6soBDSLFogQaMh+8l7O6zXxcdjqdoAs9T+SQd5mIZpjbVec
+	 cRQ/oSXp7bcpdEqHGOJtBiic6ZrkoIa1rD2E3UGlbxpFPFPWx8PdE3JIDhigmRXZ7B
+	 pxrrKZ/ooGE0lFQyM6GFPt/ye5Zr5sRYwCFF2JqDkvZJT9K3NztO7xxtR4nXSBCz9n
+	 L1Ejw9yzfDDpA==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v17 4/7] firmware: arm_rmm: Add support for SRO
+Subject: Re: [PATCH v17 3/7] firmware: arm_rmm: Configure the RMM with the
+ host's page size
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Suzuki K Poulose" <suzuki.poulose@arm.com>
-Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, kvm@vger.kernel.org
-In-Reply-To: <20260907095942.1140734-5-suzuki.poulose@arm.com>
+Cc: kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, kvm@vger.kernel.org, "Oliver
+ Upton" <oupton@kernel.org>
+In-Reply-To: <20260907095942.1140734-4-suzuki.poulose@arm.com>
 References: <20260907095942.1140734-1-suzuki.poulose@arm.com>
- <20260907095942.1140734-5-suzuki.poulose@arm.com>
+ <20260907095942.1140734-4-suzuki.poulose@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 07 Sep 2026 10:14:04 +0000
-Message-Id: <20260907101405.517191F00A3A@smtp.kernel.org>
+Date: Mon, 07 Sep 2026 10:14:45 +0000
+Message-Id: <20260907101446.1DA321F00A3A@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 4 potential issue(=
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
 s) to consider:
-- [High] Infinite loop during SRO cancellation if the RMM continues to retu=
-rn an unexpected MEMREQ.
-- [High] Missing bounds check on `out_regs->a1` in `rmi_sro_donate_contig` =
-allows an integer overflow that can erroneously free actively consumed memo=
-ry.
-- [High] The error handler for `sro->addr_count` corruption in `rmi_sro_ens=
-ure_capacity` triggers an out-of-bounds read and arbitrary free.
-- [High] Potential infinite loop in `rmi_delegate_range` and `rmi_undelegat=
-e_range` on buggy RMM.
+- [High] The SMC call leaves parameters X2-X7 uninitialized, violating the =
+RMM's RES0 requirement.
+- [High] The `struct rmm_config` fields are populated using native endianne=
+ss, which breaks on Big Endian kernels.
 --
 
-commit c980046a949a7ff8e2698f0f01373297576d9896
+commit 1741e17729c2ff5e23bc8bfb00cc50a61f38ebb7
 Author: Steven Price <steven.price@arm.com>
-Subject: firmware: arm_rmm: Add support for SRO
+firmware: arm_rmm: Configure the RMM with the host's page size
 
-This commit introduces support for RMM v2.0 Stateful RMI Operations (SRO), =
-allowing SMCs to return with operations still in progress. It adds struct r=
-mi_sro_state to track memory allocated but not yet consumed or reclaimed, a=
-nd provides wrappers for SRO RMI commands.
+This commit adds support to configure the RMM's granule size to match the
+host's page size during kernel initialization. It reads the feature
+registers to ensure the requested page size is supported and sends the
+configuration to the RMM via an SMC call.
 
 > diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/arm_rmm/rm=
 i.c
-> index 76f91c145e1fd..42c973c3a98bb 100644
+> index 008a783407b4e..76f91c145e1fd 100644
 > --- a/drivers/firmware/arm_rmm/rmi.c
 > +++ b/drivers/firmware/arm_rmm/rmi.c
-> @@ -24,6 +25,513 @@ unsigned long rmi_feat_reg(unsigned long id)
+> @@ -77,6 +77,60 @@ static int rmi_read_features(void)
+>  	return 0;
 >  }
->  EXPORT_SYMBOL_GPL(rmi_feat_reg);
 > =20
-> +int rmi_delegate_range(phys_addr_t phys,
-> +		       unsigned long size,
-> +		       phys_addr_t *out_phys)
+> +static int rmi_configure(void)
 > +{
-> +	long ret =3D 0;
-> +	unsigned long top =3D phys + size;
-> +	unsigned long out_top;
+> +	unsigned long granule_feature;
+> +	unsigned long granule_size;
+> +	int ret =3D 0;
+> +	struct rmm_config *config;
 > +
-> +	while (phys < top) {
-> +		ret =3D rmi_granule_range_delegate(phys, top, &out_top);
-> +		if (ret =3D=3D RMI_SUCCESS)
-> +			phys =3D out_top;
+> +	switch (PAGE_SIZE) {
+[ ... ]
+> +
+> +	config =3D (struct rmm_config *)get_zeroed_page(GFP_KERNEL);
+> +	if (!config)
+> +		return -ENOMEM;
+> +
+> +	config->rmi_granule_size =3D granule_size;
+> +
+> +	/*
+> +	 * For now we set the tracking_region_size to 0 which is the only option
+> +	 * for 4KB PAGE_SIZE (1GB for 4KB PAGE_SIZE, 32MB/512MB for 16KB/64KB).
+> +	 * TODO: Support other tracking sizes via Kconfig option for other
+> +	 * PAGE_SIZES
+> +	 */
+> +	config->tracking_region_size =3D 0;
 
 [Severity: High]
-Could this loop indefinitely if a buggy RMM firmware returns RMI_SUCCESS but
-does not advance out_top beyond phys?
+Does this code handle endianness correctly?
 
-> +		else if (ret =3D=3D RMI_BUSY || ret =3D=3D RMI_BLOCKED)
-> +			cpu_relax();
-> +		else
-> +			break;
+The struct rmm_config fields are populated using native u64 assignments.
+On an ARM64 kernel compiled with CONFIG_CPU_BIG_ENDIAN=3Dy, this writes
+big-endian bytes into the shared memory. The RMM, which runs in little-endi=
+an
+at EL2, will misinterpret these fields.
+
+Will this cause the RMM firmware to read invalid configuration values (like=
+ a
+byte-swapped granule size) and fail to configure, breaking RMI support on B=
+ig
+Endian systems?
+
+> +
+> +	ret =3D rmi_rmm_config_set(virt_to_phys(config));
+> +	if (ret) {
+> +		pr_err("RMM config set failed\n");
+> +		ret =3D -EINVAL;
 > +	}
 > +
-> +	if (out_phys)
-> +		*out_phys =3D phys;
-> +
+> +	free_page((unsigned long)config);
 > +	return ret;
 > +}
-> +EXPORT_SYMBOL_GPL(rmi_delegate_range);
-> +
-> +int rmi_undelegate_range(phys_addr_t phys,
-> +			 unsigned long size)
-> +{
-> +	long ret =3D 0;
-> +	unsigned long top =3D phys + size;
-> +	unsigned long out_top;
-> +
-> +	while (phys < top) {
-> +		ret =3D rmi_granule_range_undelegate(phys, top, &out_top);
-> +		if (ret =3D=3D RMI_SUCCESS)
-> +			phys =3D out_top;
-
-[Severity: High]
-Does this undelegate loop carry the same infinite loop risk as the delegate=
- path
-if the hypervisor fails to advance out_top?
-
-> +		else if (ret =3D=3D RMI_BUSY || ret =3D=3D RMI_BLOCKED)
-> +			cpu_relax();
-> +		else
-> +			break;
-> +	}
-> +
-> +	return ret;
-> +}
-> +EXPORT_SYMBOL_GPL(rmi_undelegate_range);
-
 [ ... ]
-
-> +static int rmi_sro_donate_contig(struct rmi_sro_state *sro,
-> +				 unsigned long sro_handle,
-> +				 unsigned long donatereq,
-> +				 struct arm_smccc_1_2_regs *out_regs,
-> +				 gfp_t gfp)
+> diff --git a/include/linux/arm-rmi-cmds.h b/include/linux/arm-rmi-cmds.h
+> index 2fb1f7f86d71e..9aa27697e2377 100644
+> --- a/include/linux/arm-rmi-cmds.h
+> +++ b/include/linux/arm-rmi-cmds.h
+> @@ -12,6 +12,23 @@
+> =20
+>  unsigned long rmi_feat_reg(unsigned long id);
+> =20
+> +/**
+> + * rmi_rmm_config_set() - Configure the RMM
+> + * @cfg_ptr: PA of a struct rmm_config
+> + *
+> + * Sets configuration options on the RMM.
+> + *
+> + * Return: RMI return code
+> + */
+> +static inline int rmi_rmm_config_set(unsigned long cfg_ptr)
 > +{
-
-[ ... ]
-
-> +	rmi_op_mem_donate(sro_handle,
-> +			  virt_to_phys(&sro->addr_list[sro->addr_count]), 1,
-> +			  0, out_regs);
+> +	struct arm_smccc_res res;
 > +
-> +	unsigned long donated_granules =3D out_regs->a1;
-> +	unsigned long donated_size =3D donated_granules << PAGE_SHIFT;
+> +	arm_smccc_1_1_invoke(SMC_RMI_RMM_CONFIG_SET, cfg_ptr, &res);
 
 [Severity: High]
-Can donated_granules (out_regs->a1) be an untrusted large value from a
-compromised or buggy RMM?
+Does this SMC call leave parameters x2 through x7 uninitialized?
 
-If out_regs->a1 is excessively large, donated_granules << PAGE_SHIFT could
-overflow into a small integer value.
+The arm_smccc_1_1_invoke macro only generates inline assembly constraints
+for the explicitly provided arguments. It does not zero-pad omitted argumen=
+ts,
+leaving registers x2 through x7 with whatever was previously in them.
+
+Since the RMM firmware expects unused SMC parameters to be zero (RES0),
+could passing uninitialized values cause the RMM to reject the command
+with an INVALID_PARAMETER error and sporadically break RMM initialization?
 
 > +
-> +	if (donated_granules =3D=3D 0) {
-> +		/* No pages used by the RMM */
-> +		sro->addr_count++;
-> +	} else if (donated_size < size) {
-> +		phys =3D sro->addr_list[sro->addr_count] & RMI_ADDR_RANGE_ADDR_MASK;
-> +
-> +		/* Not all granules used by the RMM, free the remaining pages */
-> +		for (long i =3D donated_size; i < size; i +=3D PAGE_SIZE) {
-
-[Severity: High]
-If the integer overflow described above occurs, this check
-(donated_size < size) will incorrectly pass. Would this lead to the host
-allocator erroneously freeing memory that the RMM might still be actively
-using?
-
-> +			if (state =3D=3D RMI_OP_MEM_DELEGATED)
-> +				free_delegated_page(phys + i);
-> +			else
-> +				__free_page(phys_to_page(phys + i));
-> +		}
-> +	}
-> +
-> +	return 0;
+> +	return res.a0;
 > +}
-
-[ ... ]
-
-> +static int rmi_sro_reclaim(struct rmi_sro_state *sro,
-> +			   unsigned long sro_handle,
-> +			   struct arm_smccc_1_2_regs *out_regs)
-> +{
-> +	unsigned long capacity;
-> +	int ret;
-> +
-> +	ret =3D rmi_sro_ensure_capacity(sro, 1);
-> +	if (ret)
-> +		rmi_sro_free(sro);
-
-[Severity: High]
-Is it safe to pass sro to rmi_sro_free() here when rmi_sro_ensure_capacity()
-failed?
-
-If rmi_sro_ensure_capacity() detects corruption and returns -EOVERFLOW beca=
-use
-sro->addr_count > RMI_MAX_ADDR_LIST, calling rmi_sro_free() passes that same
-corrupted addr_count to the cleanup loop.
-
-> +
-> +	capacity =3D RMI_MAX_ADDR_LIST - sro->addr_count;
-> +
-> +	rmi_op_mem_reclaim(sro_handle,
-> +			   virt_to_phys(&sro->addr_list[sro->addr_count]),
-> +			   capacity, out_regs);
-> +
-> +	if (WARN_ON_ONCE(out_regs->a1 > capacity))
-> +		out_regs->a1 =3D capacity;
-> +
-> +	sro->addr_count +=3D out_regs->a1;
-> +
-> +	return 0;
-> +}
-> +
-> +void rmi_sro_free(struct rmi_sro_state *sro)
-> +{
-> +	for (int i =3D 0; i < sro->addr_count; i++) {
-
-[Severity: High]
-If sro->addr_count is corrupted and greater than RMI_MAX_ADDR_LIST, as caug=
-ht
-in the error path above, won't this loop use it as an upper bound, leading =
-to
-out-of-bounds array reads and arbitrary memory frees?
-
-> +		unsigned long entry =3D sro->addr_list[i];
-> +		unsigned long addr =3D RMI_ADDR_RANGE_ADDR(entry);
-> +		unsigned long unit_size =3D RMI_ADDR_RANGE_SIZE(entry);
-> +		unsigned long count =3D RMI_ADDR_RANGE_COUNT(entry);
-> +		unsigned long state =3D RMI_ADDR_RANGE_STATE(entry);
-> +		unsigned long size =3D donate_req_to_size(unit_size) * count;
-> +
-> +		if (state =3D=3D RMI_OP_MEM_DELEGATED) {
-> +			if (WARN_ON_ONCE(rmi_undelegate_range(addr, size))) {
-> +				/* Leak the pages */
-> +				continue;
-> +			}
-> +		}
-> +		free_pages_exact(phys_to_virt(addr), size);
-> +	}
-> +
-> +	sro->addr_count =3D 0;
-> +}
-> +EXPORT_SYMBOL_GPL(rmi_sro_free);
-
-[ ... ]
-
-> +long rmi_sro_memxfer_execute(struct rmi_sro_state *sro, gfp_t gfp)
-> +{
-> +	unsigned long sro_handle;
-> +	struct arm_smccc_1_2_regs *regs =3D &sro->regs;
-> +	bool cancelled =3D false;
-> +
-> +	rmi_smccc_invoke(regs, regs);
-> +
-> +	sro_handle =3D regs->a1;
-> +
-> +	while (RMI_RETURN_STATUS(regs->a0) =3D=3D RMI_INCOMPLETE) {
-> +		bool can_cancel =3D RMI_RETURN_CAN_CANCEL(regs->a0);
-> +		int ret =3D 0;
-> +
-> +		switch (RMI_RETURN_MEMREQ(regs->a0)) {
-
-[ ... ]
-
-> +		}
-> +
-> +		if (ret) {
-> +			/*
-> +			 * All memory donating SROs must be cancellable. So a
-> +			 * failure in memory allocation shouldn't be an issue.
-> +			 * However, if we encounter a random failure (e.g.,
-> +			 * buggy RMM), don't loop forever, just give up.
-> +			 */
-> +			if (WARN_ON_ONCE(!can_cancel))
-> +				return ret;
-> +
-> +			rmi_op_cancel(sro_handle, regs);
-> +			cancelled =3D true;
-> +
-> +			if (WARN_ON_ONCE(RMI_RETURN_STATUS(regs->a0) !=3D RMI_INCOMPLETE))
-> +				return ret;
-
-[Severity: High]
-Does this sequence create an infinite loop on a buggy RMM?
-
-If the RMM returns an unexpected MEMREQ and does not clear the can_cancel b=
-it in
-its return status after a cancellation is requested, the loop unconditional=
-ly
-re-issues the cancel command because it does not check the local cancelled =
-state.
-
-> +		}
-> +	}
-> +
-> +	if (cancelled)
-> +		return -ECANCELED;
-> +
-> +	return regs->a0;
-> +}
-> +EXPORT_SYMBOL_GPL(rmi_sro_memxfer_execute);
-> +
-> +/* For RMI commands that are stateful but not memory-transferring */
-> +long rmi_sro_execute(struct arm_smccc_1_2_regs *regs)
-> +{
-> +	unsigned long sro_handle;
-> +	bool cancelled =3D false;
-> +
-> +	rmi_smccc_invoke(regs, regs);
-> +
-> +	sro_handle =3D regs->a1;
-> +
-> +	while (RMI_RETURN_STATUS(regs->a0) =3D=3D RMI_INCOMPLETE) {
-> +		bool can_cancel =3D RMI_RETURN_CAN_CANCEL(regs->a0);
-> +
-> +		switch (RMI_RETURN_MEMREQ(regs->a0)) {
-> +		case RMI_OP_MEM_REQ_NONE:
-> +			rmi_op_continue(sro_handle, RMI_CONTINUE_KEEP_GOING,
-> +					regs);
-> +			break;
-> +		default:
-> +			WARN_ON_ONCE(1);
-> +			if (!can_cancel)
-> +				return regs->a0;
-> +
-> +			cancelled =3D true;
-> +			rmi_op_cancel(sro_handle, regs);
-
-[Severity: High]
-Could the same infinite loop vulnerability occur here for non-memory-transf=
-erring
-operations if the RMM continuously returns RMI_INCOMPLETE and an unexpected=
- MEMREQ
-without clearing can_cancel?
-
-> +		}
-> +	}
-> +
-> +	if (cancelled)
-> +		return -ECANCELED;
-> +
-> +	return regs->a0;
-> +}
-> +EXPORT_SYMBOL_GPL(rmi_sro_execute);
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260907095942.1140=
-734-1-suzuki.poulose@arm.com?part=3D4
+734-1-suzuki.poulose@arm.com?part=3D3
