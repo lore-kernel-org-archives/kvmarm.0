@@ -1,171 +1,133 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02C4344BCB8;
-	Mon,  7 Sep 2026 12:02:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49258481647;
+	Mon,  7 Sep 2026 12:13:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788782530; cv=none; b=ZYQtEzJu9QuXyvzfjzENUdRLxyVIkfTqsUMRLCc3Hzq4ipMpnyI6ETrm/tV9ShUrWofbl7NxJ3qdFZvk+ZsH9zUc6EgL8NiBCix3FyH61NmrXjJHQucatpN8wINXowZHJBhWOKnHOUX54HTdbEf66TQXJKuh9gHpBfJYxXy8/BI=
+	t=1788783224; cv=none; b=JfRMh0X8lXvwGDYFFqg0cLCS4CPdMm6iTZuZa5H/tHNwD65Al32LinAFiHJzgQbVNP+cMwgp2AK4UtQMGt8qp4gM0skpCm5Wt4f0GNWPFg+W4UgXZbMBYZ5ey0mVEg4IAjnjv8O+JSsryeHb1LFcetlf/xL7268/87rLPzk8SSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788782530; c=relaxed/simple;
-	bh=LThzrg00gVMIeM0h0R9AjJJnxJCrPPWDe4TdZJyEAPA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=N4bhZPmrK2PXVzvW6CeGKU2dZePIJW+QGPxBvOzMujOAi/eXA+TS508ECbJ461mAUSTXq9tJxkm7IGVi+m2yt0aQYo/eV4YkRDEEbn92cC9SfAbr7osgJOMGpYPHbnUJ7pzomNvZovl5AJVW79I6nS+h3SAh4z2N7IH5KcR55Pc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=nNhlCY86; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1788783224; c=relaxed/simple;
+	bh=OeCMYh2ct58YutWsNhvBSg6WQ7qg9AOBy+1MXwsc/uI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OXBU5kdyQqHo9G08rQH/VjsOhgVy60MLU7W9CezyjE2RtO0BGHpVztXVH+sGwE5mRHZ10J8DG8ZIH1o1/XGvrjL+UWl3C2ZkbVRH4jV9k0oViKlKF7feMqwlDHX1sQhRAuZKckMmToqttUlS8Zat1LuB8IKWUBXZ1AsgQLryTl8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IIBugRBA; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="nNhlCY86"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E2A1B1476;
-	Mon,  7 Sep 2026 05:02:04 -0700 (PDT)
-Received: from [10.57.49.168] (unknown [10.57.49.168])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D8FF53F7D8;
-	Mon,  7 Sep 2026 05:02:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1788782528; bh=LThzrg00gVMIeM0h0R9AjJJnxJCrPPWDe4TdZJyEAPA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=nNhlCY86J8f3IgqiCLmGlJGLH5/c2YmpMNQNK5Y1u2xHaxRF+4boAktPuBvyeuE/N
-	 Dbago0umceSclRNAX+A/64ruLdsburjpqVKlz+AXp6FBZnmJ1RecFJDKZ0HGVcIBK7
-	 jCRnrwdyEAAN/iwzxUqUM0MT5TLZidttN8vFEZi4=
-Message-ID: <bade4920-2db1-4a8a-99d1-ca2694647ec8@arm.com>
-Date: Mon, 7 Sep 2026 13:02:06 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IIBugRBA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D06FD1F00A3A;
+	Mon,  7 Sep 2026 12:13:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788783222;
+	bh=NecDGqlvwJfi+txz+jbfiLJQsG0Fh5Rj2eIZtOMxuME=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=IIBugRBA+PkC18oj9xBLFEzHli+iSNVYmSt7tIk1kQ1+XsUR6GiZ6dINOKxPmH8jR
+	 jRvmNqEEvz2nDcID7OimfgpAFd722XO4m7mymmTq35MP3LTel0gd/mU3c4/rNqge4x
+	 +M+gdtUn3t5FYykZZnJyvXYcb4OpnjSLblVv9ymySRe5BG5kWL5rWQD5Aq1HwPSxqA
+	 MJGm5mqIktY3l4/7o9OaIjGbeRg0+k4TQtaEjbt8LsVbT8Gk31bzirSnZan/v5n5EB
+	 AwVBb4EQnTOizOQnSq3hMhcNFTeB6xBn+K5ZCv/IqwYRvV3/7+Jlqm7SWXiRX0cU+o
+	 FpTdspeyt7XcQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1x3YEF-00000005kyX-1fLo;
+	Mon, 07 Sep 2026 12:13:40 +0000
+Date: Mon, 07 Sep 2026 13:13:38 +0100
+Message-ID: <86cxup45u5.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Kohei Enju <enju.kohei@fujitsu.com>,
+	Steven Price <steven.price@arm.com>,
+	kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei
+ <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>,
+	"Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>,
+	Emi Kisanuki <fj0570is@fujitsu.com>,
+	Vishal Annapurve <vannapurve@google.com>,
+	WeiLin.Chang@arm.com,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>
+Subject: Re: [PATCH v16 22/45] KVM: arm64: CCA: Handle RMI_EXIT_RIPAS_CHANGE
+In-Reply-To: <30b4137b-1445-49c0-bd1c-98dbac5d70f6@arm.com>
+References: <20260803134403.80630-1-steven.price@arm.com>
+	<20260803134403.80630-23-steven.price@arm.com>
+	<ap49Orng5-oehc6J@FCCLS0092175.localdomain>
+	<86fqzl4biu.wl-maz@kernel.org>
+	<30b4137b-1445-49c0-bd1c-98dbac5d70f6@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v17 3/7] firmware: arm_rmm: Configure the RMM with the
- host's page size
-Content-Language: en-GB
-To: sashiko-reviews@lists.linux.dev
-Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
- kvm@vger.kernel.org, Oliver Upton <oupton@kernel.org>
-References: <20260907095942.1140734-1-suzuki.poulose@arm.com>
- <20260907095942.1140734-4-suzuki.poulose@arm.com>
- <20260907101446.1DA321F00A3A@smtp.kernel.org>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20260907101446.1DA321F00A3A@smtp.kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, enju.kohei@fujitsu.com, steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com, aneesh.kumar@kernel.org, fj0570is@fujitsu.com, vannapurve@google.com, WeiLin.Chang@arm.com, lpieralisi@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 07/09/2026 11:14, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 2 potential issue(s) to consider:
-> - [High] The SMC call leaves parameters X2-X7 uninitialized, violating the RMM's RES0 requirement.
-> - [High] The `struct rmm_config` fields are populated using native endianness, which breaks on Big Endian kernels.
-> --
+On Mon, 07 Sep 2026 12:58:22 +0100,
+Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
 > 
-> commit 1741e17729c2ff5e23bc8bfb00cc50a61f38ebb7
-> Author: Steven Price <steven.price@arm.com>
-> firmware: arm_rmm: Configure the RMM with the host's page size
+> On 07/09/2026 11:10, Marc Zyngier wrote:
+> > On Mon, 07 Sep 2026 06:05:29 +0100,
+> > Kohei Enju <enju.kohei@fujitsu.com> wrote:
+> > 
+> > [...]
+> > 
+> >> Although the root cause is an RMM bug, should we also guard RIPAS_SET
+> >> against this no-progress case?
+> > 
+> > No. We really should *prevent* the kernel from using a known broken
+> > RMM. Which brings me to one of my long standing request: how to we
+> > enforce the minimum version of RMM that KVM is willing to work with?
 > 
-> This commit adds support to configure the RMM's granule size to match the
-> host's page size during kernel initialization. It reads the feature
-> registers to ensure the requested page size is supported and sends the
-> configuration to the RMM via an SMC call.
+> (1) Do you mean the RMM ABI version ?
+> (2) Or the particular build version of a given RMM firmware
+> implementation ?
 > 
->> diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/arm_rmm/rmi.c
->> index 008a783407b4e..76f91c145e1fd 100644
->> --- a/drivers/firmware/arm_rmm/rmi.c
->> +++ b/drivers/firmware/arm_rmm/rmi.c
->> @@ -77,6 +77,60 @@ static int rmi_read_features(void)
->>   	return 0;
->>   }
->>   
->> +static int rmi_configure(void)
->> +{
->> +	unsigned long granule_feature;
->> +	unsigned long granule_size;
->> +	int ret = 0;
->> +	struct rmm_config *config;
->> +
->> +	switch (PAGE_SIZE) {
-> [ ... ]
->> +
->> +	config = (struct rmm_config *)get_zeroed_page(GFP_KERNEL);
->> +	if (!config)
->> +		return -ENOMEM;
->> +
->> +	config->rmi_granule_size = granule_size;
->> +
->> +	/*
->> +	 * For now we set the tracking_region_size to 0 which is the only option
->> +	 * for 4KB PAGE_SIZE (1GB for 4KB PAGE_SIZE, 32MB/512MB for 16KB/64KB).
->> +	 * TODO: Support other tracking sizes via Kconfig option for other
->> +	 * PAGE_SIZES
->> +	 */
->> +	config->tracking_region_size = 0;
+> As far as (1) is considered, the kernel already sticks to a single
+> version, v2.0 and doesn't support anything else. And we are fine with
+> KVM/Linux supporting a single version of RMM and deprecating the
+> support for older RMM versions as we decide to move on.
 > 
-> [Severity: High]
-> Does this code handle endianness correctly?
-> 
-> The struct rmm_config fields are populated using native u64 assignments.
-> On an ARM64 kernel compiled with CONFIG_CPU_BIG_ENDIAN=y, this writes
-> big-endian bytes into the shared memory. The RMM, which runs in little-endian
-> at EL2, will misinterpret these fields.
-> 
-> Will this cause the RMM firmware to read invalid configuration values (like a
-> byte-swapped granule size) and fail to configure, breaking RMI support on Big
-> Endian systems?
-> 
+> As for (2), the RMM ABI doesn't provide any information about the
+> build/fix version for a given implementation. I will raise this
+> within Arm.
 
-We don't plan to support RMM for Big Endian Linux. I have now made the 
-ARCH_SUPPORTS_RMM to depend on !CPU_BIG_ENDIAN
+But it appears that only checking for RMM v2.0 wouldn't be sufficient
+in the case that Kohei faces. Nothing distinguishes a vanilla RMM from
+a fixed one, as we can only check for the ABI.
 
->> +
->> +	ret = rmi_rmm_config_set(virt_to_phys(config));
->> +	if (ret) {
->> +		pr_err("RMM config set failed\n");
->> +		ret = -EINVAL;
->> +	}
->> +
->> +	free_page((unsigned long)config);
->> +	return ret;
->> +}
-> [ ... ]
->> diff --git a/include/linux/arm-rmi-cmds.h b/include/linux/arm-rmi-cmds.h
->> index 2fb1f7f86d71e..9aa27697e2377 100644
->> --- a/include/linux/arm-rmi-cmds.h
->> +++ b/include/linux/arm-rmi-cmds.h
->> @@ -12,6 +12,23 @@
->>   
->>   unsigned long rmi_feat_reg(unsigned long id);
->>   
->> +/**
->> + * rmi_rmm_config_set() - Configure the RMM
->> + * @cfg_ptr: PA of a struct rmm_config
->> + *
->> + * Sets configuration options on the RMM.
->> + *
->> + * Return: RMI return code
->> + */
->> +static inline int rmi_rmm_config_set(unsigned long cfg_ptr)
->> +{
->> +	struct arm_smccc_res res;
->> +
->> +	arm_smccc_1_1_invoke(SMC_RMI_RMM_CONFIG_SET, cfg_ptr, &res);
-> 
-> [Severity: High]
-> Does this SMC call leave parameters x2 through x7 uninitialized?
-> 
-> The arm_smccc_1_1_invoke macro only generates inline assembly constraints
-> for the explicitly provided arguments. It does not zero-pad omitted arguments,
-> leaving registers x2 through x7 with whatever was previously in them.
-> 
-> Since the RMM firmware expects unused SMC parameters to be zero (RES0),
-> could passing uninitialized values cause the RMM to reject the command
-> with an INVALID_PARAMETER error and sporadically break RMM initialization?
+We need a way to identify *implementations* so that we can refuse to
+use one that is known to be broken. And given that each and every
+vendor already have their own toy RMM, each with their own "added
+value", it cannot be a simple "build number" identifier.
 
-Correct, I have now moved all RMI calls to smccc_1_2, making sure that
-all the undefined arguments are initialised to 0.
+This is not the first time I ask for this.
 
-Cheers
-Suzuki
+Thanks,
 
+	M.
 
-> 
->> +
->> +	return res.a0;
->> +}
-> 
-
+-- 
+Without deviation from the norm, progress is not possible.
