@@ -1,168 +1,357 @@
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D0993CF1FD
-	for <kvmarm@lists.linux.dev>; Mon,  7 Sep 2026 10:13:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16A3544C4E2;
+	Mon,  7 Sep 2026 10:14:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788776006; cv=none; b=Qt3YA0XI30Ereup23Xrz030N/BULMzx1fRkwGuSbY7J98b0ad3A8QhE4cSVrWTh2oMOXkZ/6BqtJt2SaDl1x1U+ss59dRoaePB/kC8PmwiXoVkjMZ6boaDoWu/LljGRdg891xotvj7omrOK7C2kpw9252m8TkOMqrdO5zYiL4pE=
+	t=1788776047; cv=none; b=pJ/SO40DcE0QJy9NUFn2n2303qAVeCjSSn1ZBuifXcy/2P5VpCi28L9LUZsxUbn39w7kF/o17h4F+rsOtamQi1uVeeREGZtcVpfy/9jysskcnXus3GSfgslly3xDhnB5Ui+egf84cr9ayrYEw6X6mX7GsxhbbqAv4EvUuikMci0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788776006; c=relaxed/simple;
-	bh=kwSRFB6k7ItQnpLwWCQSXDIvf7Rf9MlEIuIPfK0wwm8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rQSqZ7y6Jgq6eGugNO5GzhPZhCwbOS/bxkOYevLKfJNSkHZgd6WBMMEh3PK4Cg2HeQ07k2jFI9NgvoLCoS0TiBUEX7Zlm1RDOSogV5G7pYdQQNSjf3jyx/L1BTUYJao51hm9p7Q5NqOhe2qtY/zL3NcCTapcf1G4S13EynZS4Hk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RI3D2xCj; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1788776047; c=relaxed/simple;
+	bh=nJGrtqM89Umvqc+EXkj0IOaPX3tL+8TpqGzzdv9qJT4=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=uCEuETYUgTRiI7oI8QM8gdTmEFPAefYYfeEjR+cYPbpmCGvSNWFyZUHOuGuVoUlWdSr9e8/CXxhdBTAI0LWMnvEht7glonSqDYN1KmpcS70UqU7qV2D5XrzESDDtzkU+4NPi+xKI+yhixLLkKYGT9NorHjABu1ppYeRDLQLbiW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KG8E8Usk; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RI3D2xCj"
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-6a600a1caf8so5210313a12.2
-        for <kvmarm@lists.linux.dev>; Mon, 07 Sep 2026 03:13:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1788776003; x=1789380803; darn=lists.linux.dev;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=mCouEmK1v28vcP6B5gyWqSemurFnzRz5qnbZvA4aPCU=;
-        b=RI3D2xCjNzHtwdZZ7XdWZA1LPj/Yk2CzRPzYHN76D1H6ScyGDllsVI+/Ke0rSYYIKU
-         GszhaCQLdPV9Lg8p7e5ygrTJN8vikjgGVwRn1mJl7lS8xsg9gwcPpy50v4eeTesQDF+L
-         0fItwLG9/Vj73hQmPZSGw7qMb0JFflhs1e3bFprNVyZNR/WsMYvOb1w1kM6xeDLYPPzx
-         2E3/AN1ivoDv2gdupMKSJ5emnPjNE3dqU/CxO5ePn80x/Lyi9qUlYg9pnjK8HVzL3csL
-         heWPEu4gHojcSx99/uftAxRfgxx8RwveBFpj8nXR44rKtG0qF+nQ9unO+PTzYvmZXo1g
-         ubAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788776003; x=1789380803;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=mCouEmK1v28vcP6B5gyWqSemurFnzRz5qnbZvA4aPCU=;
-        b=T1whkY2lwKx7pRXWsjxhHL3DuMDCurYgW6VNlBA+lxDkKGMpQ675QHsgKmawp9QuBX
-         7VW9iIDb5j8zxjsV7TNVtybhmgn9B8KrF+hs5E2fdHJPx4Hf8Wvha1yNmV7ERWBDMhik
-         PziPqPZ2o77WGnk1SVlhSW+0jsAHQLzVW4SjAtyhghVOgHjkIzf3ubkYGLyHdiUOw3Xn
-         vkYhTxs4AM0wglwqFvQ5brmnbSAwg0udP27SgIqFuyh98m/7ggUK1+cBw2vqtnG2y0xt
-         LUaL6yLH/2hOW2RS2C4jRyYvg5FsC1NQRZ21+OtXAWSd5xO/P0vHesqJ+HTEPlwV1BV2
-         B6Ow==
-X-Gm-Message-State: AFuF++lzSJLLlHRTa/nH2z8MsQG3yPKaIKV83lgs7q5q6CxmHrP7A6R9
-	4aFi9BddF1C4HLDVmeKvHEEgdEy+l4g7JezatA1nXlaqDIiVsT7QApoD74WJEERxiA==
-X-Gm-Gg: AYBFou02VfjV0LmJsqYmphqJzzSAZPRquOkTZR0ZiKA5uLMC2isyi41HMoTJrTHk++P
-	kSTTN8SWZRZ/yZy0XrhKHl1kgjelfYnej5B0KqHv9SXEF6A3YBh4NGHgErBD24RUKqeP2adWdwh
-	fM8YduNebWQurCQlEtmPIlKbTqOvEy45w0+mt3FO5AKpR4WBSKdEQnxh/lZPI1bLRe1l23HrzC+
-	JrCazPrM0Zw6Zth1C7GYdhMoIfofKzt/+BvMJ9ZbsB1d7AgaANUoxvk5GQ36WEPquF66kY9Qkrf
-	BMrd1vJOfRwzVKypu9/QtDX7XijMV0tIC7++Rla1v384//hiF2Fs0NjgUu7G7X55BSYEtxjtTS3
-	NyPGhZyzGQ6rY7nKVVnR6EPG4Bqqg4YAel1syE4Ja0aNd75MyCocz2lu84kUgb8w2+8uIIbLx7W
-	rq2SzdXuMOj6CXAgbyLPsVA3CKYSG6OQ2g0IuDX02un1f9P0rccLSBT9cV7KcWoSiVlV8/mnasx
-	vDBCbcR862ykg+wxxT6ExOapJ5qb9W8
-X-Received: by 2002:a05:6402:4150:b0:6a7:ee56:8150 with SMTP id 4fb4d7f45d1cf-6a7ee568298mr6387365a12.30.1788776002246;
-        Mon, 07 Sep 2026 03:13:22 -0700 (PDT)
-Received: from google.com (135.91.155.104.bc.googleusercontent.com. [104.155.91.135])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6a7e6c1bee2sm4136565a12.29.2026.09.07.03.13.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Sep 2026 03:13:21 -0700 (PDT)
-Date: Mon, 7 Sep 2026 11:13:18 +0100
-From: Vincent Donnefort <vdonnefort@google.com>
-To: sashiko-reviews@lists.linux.dev
-Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>,
-	Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 11/20] KVM: arm64: Add a range to pKVM ownership selftest
-Message-ID: <ap6OPlYVvqbmAoGn@google.com>
-References: <20260803100904.3563942-1-vdonnefort@google.com>
- <20260803100904.3563942-12-vdonnefort@google.com>
- <20260803104848.EF8BC1F000E9@smtp.kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KG8E8Usk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 517191F00A3A;
+	Mon,  7 Sep 2026 10:14:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788776045;
+	bh=rmhgXU78dS9HRu9PphzIhUWmtLVWsT+/FkL3Jc7mjso=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=KG8E8UskskKfJzjUMziutfWq9Kg1rkWsxOcZJ5uLKOd53JizA0f/jbAk1xmgZh4gB
+	 ir3pyVu1hPRPUDyp66g7mSbDLjLTlBM6X81nMIeGbebUu+OzgETvv9uay4FZd6kjjN
+	 WJ3hh12QPdhqQ3hv5wPrtVh7zERR+VnYEubCP53tRnRvOg2EPDtxGc3dmJyzCxXsY7
+	 31qyd2pQn730/MWEKO8FaofYXnPR//DK65p23O5haeE38YPJijj6mAokZfSyZAwimH
+	 w9h87uGCs2W52NsHzXMnQS7Jd7A5uNcFr8hIqcYk2Hj9+hXtPnIMRc/5APzwubrL+S
+	 7NmOLq+Whnudw==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v17 4/7] firmware: arm_rmm: Add support for SRO
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Suzuki K Poulose" <suzuki.poulose@arm.com>
+Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, kvm@vger.kernel.org
+In-Reply-To: <20260907095942.1140734-5-suzuki.poulose@arm.com>
+References: <20260907095942.1140734-1-suzuki.poulose@arm.com>
+ <20260907095942.1140734-5-suzuki.poulose@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 07 Sep 2026 10:14:04 +0000
+Message-Id: <20260907101405.517191F00A3A@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260803104848.EF8BC1F000E9@smtp.kernel.org>
 
-On Mon, Aug 03, 2026 at 10:48:48AM +0000, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> - [High] The pKVM ownership selftest crashes the hypervisor during boot when testing block-granular ranges.
-> --
-> 
-> --- Patch [11]: [PATCH 11/20] KVM: arm64: Add a range to pKVM ownership selftest ---
-> commit e6586b2867cba4559d50173770f2de71da4f2380
-> Author: Vincent Donnefort <vdonnefort@google.com>
-> 
-> KVM: arm64: Add a range to pKVM ownership selftest
-> 
-> Extends pkvm_ownership_selftest() with a nr_pages argument to test state
-> transitions with both page-granular and block-granular ranges.
-> 
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > index a53600c853d4f..d5ee079a5d70d 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> [ ... ]
-> > @@ -1894,10 +1901,10 @@ int __pkvm_ownership_selftest(u64 pfn, u64 pgtable_pfn, unsigned long pgtable_nr
-> >  
-> >  	selftest_state.host = PKVM_PAGE_OWNED;
-> >  	selftest_state.guest[0] = PKVM_POISON;
-> >  	assert_transition_res(0,	__pkvm_host_force_reclaim_page_guest, phys);
-> 
-> [Severity: High]
-> Will this crash the hypervisor during boot when testing block-granular ranges?
-> 
-> When the selftest executes with a block-level range via PMD_ORDER, this
-> assertion expects __pkvm_host_force_reclaim_page_guest() to return 0. However,
-> __pkvm_host_force_reclaim_page_guest() hardcodes PAGE_SIZE internally:
-> 
-> arch/arm64/kvm/hyp/nvhe/mem_protect.c:__pkvm_host_force_reclaim_page_guest() {
->     ...
->     ret = get_valid_guest_pte(vm, ipa, PAGE_SIZE, &pte, &pa);
->     ...
-> }
-> 
-> Because the mapping installed for this run is block-granular,
-> get_valid_guest_pte() will return -E2BIG. This causes assert_transition_res()
-> to fail, which triggers a WARN_ON at EL2. Since WARN_ON expands to a fatal
-> BRK instruction at EL2, this results in a hypervisor panic during boot.
+Thank you for your contribution! Sashiko AI review found 4 potential issue(=
+s) to consider:
+- [High] Infinite loop during SRO cancellation if the RMM continues to retu=
+rn an unexpected MEMREQ.
+- [High] Missing bounds check on `out_regs->a1` in `rmi_sro_donate_contig` =
+allows an integer overflow that can erroneously free actively consumed memo=
+ry.
+- [High] The error handler for `sro->addr_count` corruption in `rmi_sro_ens=
+ure_capacity` triggers an out-of-bounds read and arbitrary free.
+- [High] Potential infinite loop in `rmi_delegate_range` and `rmi_undelegat=
+e_range` on buggy RMM.
+--
 
-There's an order issue. Both
+commit c980046a949a7ff8e2698f0f01373297576d9896
+Author: Steven Price <steven.price@arm.com>
+Subject: firmware: arm_rmm: Add support for SRO
 
-  Handle huge mappings in __pkvm_vcpu_in_poison_fault()
-  Handle huge mappings in __pkvm_host_force_reclaim_page_guest()
+This commit introduces support for RMM v2.0 Stateful RMI Operations (SRO), =
+allowing SMCs to return with operations still in progress. It adds struct r=
+mi_sro_state to track memory allocated but not yet consumed or reclaimed, a=
+nd provides wrappers for SRO RMI commands.
 
-Should come before this patch.
+> diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/arm_rmm/rm=
+i.c
+> index 76f91c145e1fd..42c973c3a98bb 100644
+> --- a/drivers/firmware/arm_rmm/rmi.c
+> +++ b/drivers/firmware/arm_rmm/rmi.c
+> @@ -24,6 +25,513 @@ unsigned long rmi_feat_reg(unsigned long id)
+>  }
+>  EXPORT_SYMBOL_GPL(rmi_feat_reg);
+> =20
+> +int rmi_delegate_range(phys_addr_t phys,
+> +		       unsigned long size,
+> +		       phys_addr_t *out_phys)
+> +{
+> +	long ret =3D 0;
+> +	unsigned long top =3D phys + size;
+> +	unsigned long out_top;
+> +
+> +	while (phys < top) {
+> +		ret =3D rmi_granule_range_delegate(phys, top, &out_top);
+> +		if (ret =3D=3D RMI_SUCCESS)
+> +			phys =3D out_top;
 
--- 
-Vincent
+[Severity: High]
+Could this loop indefinitely if a buggy RMM firmware returns RMI_SUCCESS but
+does not advance out_top beyond phys?
 
-> 
-> [ ... ]
-> > diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-> > index a9645480d1648..4d41a16cd5962 100644
-> > --- a/arch/arm64/kvm/pkvm.c
-> > +++ b/arch/arm64/kvm/pkvm.c
-> [ ... ]
-> > @@ -274,17 +283,9 @@ void __init pkvm_ownership_selftest(void)
-> >  	/* Memory for the VM page-table */
-> >  	pgtable = __get_free_pages(GFP_KERNEL, pgtable_order);
-> >  	if (!pgtable)
-> > -		goto out;
-> > -
-> > -	/* Page whose ownership will be tested */
-> > -	page = __get_free_page(GFP_KERNEL);
-> > -	if (!page)
-> > -		goto out;
-> > +		return;
-> >  
-> > -	ret = kvm_call_hyp_nvhe(__pkvm_ownership_selftest, virt_to_pfn((void *)page),
-> > -				virt_to_pfn((void *)pgtable), 1 << pgtable_order);
-> > -out:
-> > -	if (ret)
-> > -		kvm_err("Failed to run %s (%ld)\n", __func__, ret);
-> > +	__pkvm_ownership_selftest(0, pgtable, pgtable_order);
-> > +	__pkvm_ownership_selftest(PMD_ORDER, pgtable, pgtable_order);
-> >  
-> >  	free_pages(pgtable, pgtable_order);
-> > -	free_page(page);
-> >  }
-> 
-> -- 
-> Sashiko AI review · https://sashiko.dev/#/patchset/20260803100904.3563942-1-vdonnefort@google.com?part=11
+> +		else if (ret =3D=3D RMI_BUSY || ret =3D=3D RMI_BLOCKED)
+> +			cpu_relax();
+> +		else
+> +			break;
+> +	}
+> +
+> +	if (out_phys)
+> +		*out_phys =3D phys;
+> +
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL_GPL(rmi_delegate_range);
+> +
+> +int rmi_undelegate_range(phys_addr_t phys,
+> +			 unsigned long size)
+> +{
+> +	long ret =3D 0;
+> +	unsigned long top =3D phys + size;
+> +	unsigned long out_top;
+> +
+> +	while (phys < top) {
+> +		ret =3D rmi_granule_range_undelegate(phys, top, &out_top);
+> +		if (ret =3D=3D RMI_SUCCESS)
+> +			phys =3D out_top;
+
+[Severity: High]
+Does this undelegate loop carry the same infinite loop risk as the delegate=
+ path
+if the hypervisor fails to advance out_top?
+
+> +		else if (ret =3D=3D RMI_BUSY || ret =3D=3D RMI_BLOCKED)
+> +			cpu_relax();
+> +		else
+> +			break;
+> +	}
+> +
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL_GPL(rmi_undelegate_range);
+
+[ ... ]
+
+> +static int rmi_sro_donate_contig(struct rmi_sro_state *sro,
+> +				 unsigned long sro_handle,
+> +				 unsigned long donatereq,
+> +				 struct arm_smccc_1_2_regs *out_regs,
+> +				 gfp_t gfp)
+> +{
+
+[ ... ]
+
+> +	rmi_op_mem_donate(sro_handle,
+> +			  virt_to_phys(&sro->addr_list[sro->addr_count]), 1,
+> +			  0, out_regs);
+> +
+> +	unsigned long donated_granules =3D out_regs->a1;
+> +	unsigned long donated_size =3D donated_granules << PAGE_SHIFT;
+
+[Severity: High]
+Can donated_granules (out_regs->a1) be an untrusted large value from a
+compromised or buggy RMM?
+
+If out_regs->a1 is excessively large, donated_granules << PAGE_SHIFT could
+overflow into a small integer value.
+
+> +
+> +	if (donated_granules =3D=3D 0) {
+> +		/* No pages used by the RMM */
+> +		sro->addr_count++;
+> +	} else if (donated_size < size) {
+> +		phys =3D sro->addr_list[sro->addr_count] & RMI_ADDR_RANGE_ADDR_MASK;
+> +
+> +		/* Not all granules used by the RMM, free the remaining pages */
+> +		for (long i =3D donated_size; i < size; i +=3D PAGE_SIZE) {
+
+[Severity: High]
+If the integer overflow described above occurs, this check
+(donated_size < size) will incorrectly pass. Would this lead to the host
+allocator erroneously freeing memory that the RMM might still be actively
+using?
+
+> +			if (state =3D=3D RMI_OP_MEM_DELEGATED)
+> +				free_delegated_page(phys + i);
+> +			else
+> +				__free_page(phys_to_page(phys + i));
+> +		}
+> +	}
+> +
+> +	return 0;
+> +}
+
+[ ... ]
+
+> +static int rmi_sro_reclaim(struct rmi_sro_state *sro,
+> +			   unsigned long sro_handle,
+> +			   struct arm_smccc_1_2_regs *out_regs)
+> +{
+> +	unsigned long capacity;
+> +	int ret;
+> +
+> +	ret =3D rmi_sro_ensure_capacity(sro, 1);
+> +	if (ret)
+> +		rmi_sro_free(sro);
+
+[Severity: High]
+Is it safe to pass sro to rmi_sro_free() here when rmi_sro_ensure_capacity()
+failed?
+
+If rmi_sro_ensure_capacity() detects corruption and returns -EOVERFLOW beca=
+use
+sro->addr_count > RMI_MAX_ADDR_LIST, calling rmi_sro_free() passes that same
+corrupted addr_count to the cleanup loop.
+
+> +
+> +	capacity =3D RMI_MAX_ADDR_LIST - sro->addr_count;
+> +
+> +	rmi_op_mem_reclaim(sro_handle,
+> +			   virt_to_phys(&sro->addr_list[sro->addr_count]),
+> +			   capacity, out_regs);
+> +
+> +	if (WARN_ON_ONCE(out_regs->a1 > capacity))
+> +		out_regs->a1 =3D capacity;
+> +
+> +	sro->addr_count +=3D out_regs->a1;
+> +
+> +	return 0;
+> +}
+> +
+> +void rmi_sro_free(struct rmi_sro_state *sro)
+> +{
+> +	for (int i =3D 0; i < sro->addr_count; i++) {
+
+[Severity: High]
+If sro->addr_count is corrupted and greater than RMI_MAX_ADDR_LIST, as caug=
+ht
+in the error path above, won't this loop use it as an upper bound, leading =
+to
+out-of-bounds array reads and arbitrary memory frees?
+
+> +		unsigned long entry =3D sro->addr_list[i];
+> +		unsigned long addr =3D RMI_ADDR_RANGE_ADDR(entry);
+> +		unsigned long unit_size =3D RMI_ADDR_RANGE_SIZE(entry);
+> +		unsigned long count =3D RMI_ADDR_RANGE_COUNT(entry);
+> +		unsigned long state =3D RMI_ADDR_RANGE_STATE(entry);
+> +		unsigned long size =3D donate_req_to_size(unit_size) * count;
+> +
+> +		if (state =3D=3D RMI_OP_MEM_DELEGATED) {
+> +			if (WARN_ON_ONCE(rmi_undelegate_range(addr, size))) {
+> +				/* Leak the pages */
+> +				continue;
+> +			}
+> +		}
+> +		free_pages_exact(phys_to_virt(addr), size);
+> +	}
+> +
+> +	sro->addr_count =3D 0;
+> +}
+> +EXPORT_SYMBOL_GPL(rmi_sro_free);
+
+[ ... ]
+
+> +long rmi_sro_memxfer_execute(struct rmi_sro_state *sro, gfp_t gfp)
+> +{
+> +	unsigned long sro_handle;
+> +	struct arm_smccc_1_2_regs *regs =3D &sro->regs;
+> +	bool cancelled =3D false;
+> +
+> +	rmi_smccc_invoke(regs, regs);
+> +
+> +	sro_handle =3D regs->a1;
+> +
+> +	while (RMI_RETURN_STATUS(regs->a0) =3D=3D RMI_INCOMPLETE) {
+> +		bool can_cancel =3D RMI_RETURN_CAN_CANCEL(regs->a0);
+> +		int ret =3D 0;
+> +
+> +		switch (RMI_RETURN_MEMREQ(regs->a0)) {
+
+[ ... ]
+
+> +		}
+> +
+> +		if (ret) {
+> +			/*
+> +			 * All memory donating SROs must be cancellable. So a
+> +			 * failure in memory allocation shouldn't be an issue.
+> +			 * However, if we encounter a random failure (e.g.,
+> +			 * buggy RMM), don't loop forever, just give up.
+> +			 */
+> +			if (WARN_ON_ONCE(!can_cancel))
+> +				return ret;
+> +
+> +			rmi_op_cancel(sro_handle, regs);
+> +			cancelled =3D true;
+> +
+> +			if (WARN_ON_ONCE(RMI_RETURN_STATUS(regs->a0) !=3D RMI_INCOMPLETE))
+> +				return ret;
+
+[Severity: High]
+Does this sequence create an infinite loop on a buggy RMM?
+
+If the RMM returns an unexpected MEMREQ and does not clear the can_cancel b=
+it in
+its return status after a cancellation is requested, the loop unconditional=
+ly
+re-issues the cancel command because it does not check the local cancelled =
+state.
+
+> +		}
+> +	}
+> +
+> +	if (cancelled)
+> +		return -ECANCELED;
+> +
+> +	return regs->a0;
+> +}
+> +EXPORT_SYMBOL_GPL(rmi_sro_memxfer_execute);
+> +
+> +/* For RMI commands that are stateful but not memory-transferring */
+> +long rmi_sro_execute(struct arm_smccc_1_2_regs *regs)
+> +{
+> +	unsigned long sro_handle;
+> +	bool cancelled =3D false;
+> +
+> +	rmi_smccc_invoke(regs, regs);
+> +
+> +	sro_handle =3D regs->a1;
+> +
+> +	while (RMI_RETURN_STATUS(regs->a0) =3D=3D RMI_INCOMPLETE) {
+> +		bool can_cancel =3D RMI_RETURN_CAN_CANCEL(regs->a0);
+> +
+> +		switch (RMI_RETURN_MEMREQ(regs->a0)) {
+> +		case RMI_OP_MEM_REQ_NONE:
+> +			rmi_op_continue(sro_handle, RMI_CONTINUE_KEEP_GOING,
+> +					regs);
+> +			break;
+> +		default:
+> +			WARN_ON_ONCE(1);
+> +			if (!can_cancel)
+> +				return regs->a0;
+> +
+> +			cancelled =3D true;
+> +			rmi_op_cancel(sro_handle, regs);
+
+[Severity: High]
+Could the same infinite loop vulnerability occur here for non-memory-transf=
+erring
+operations if the RMM continuously returns RMI_INCOMPLETE and an unexpected=
+ MEMREQ
+without clearing can_cancel?
+
+> +		}
+> +	}
+> +
+> +	if (cancelled)
+> +		return -ECANCELED;
+> +
+> +	return regs->a0;
+> +}
+> +EXPORT_SYMBOL_GPL(rmi_sro_execute);
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260907095942.1140=
+734-1-suzuki.poulose@arm.com?part=3D4
