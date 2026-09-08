@@ -1,251 +1,235 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from esa7.hc1455-7.c3s2.iphmx.com (esa7.hc1455-7.c3s2.iphmx.com [139.138.61.252])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C884390613
-	for <kvmarm@lists.linux.dev>; Tue,  8 Sep 2026 07:04:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6A91396D25;
+	Tue,  8 Sep 2026 07:31:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.138.61.252
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788851066; cv=none; b=d9jtaASURU2ctOfz8JkaQU76V6f3D9kwCWqYiwQkPucjDwZrUNVKdmlY8FL/zbjfZvNV1+E99bLN11lr3k6e7X/Ycts/nRMn1PBeWX8gQl49sFRvx6yZrTtQ45SyvJKwhtUtXbbSYrT2YhpkIqkxijsQgz85JsGbNIH+5mjbuko=
+	t=1788852684; cv=none; b=mz7NO5K43aRKV/5dECQIaWkVZc/cxLu6iMIE12ZoblPOtuKHE2DpHZHlX1TbydzO+GS315mJlI+mFOccopWRoU+vGpGW1b2kwrGAd7DVR2/ng8Y0JhAFm2vCPH28+gC4gVRS8kyzrq9/h5ur6txG4zSQJbTqBVPrHdzNOL71KAM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788851066; c=relaxed/simple;
-	bh=qrkomyrl64HLPxtqsg1h0AiBeTvAcyfrPyl9zzD9wqI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=josjsnnlFx79ItkepEBpwKnC+YzDB+wwlio0dx876IHopF6A/Fi7qy4LkkaLDmXtJcKYMhJTZbwk54O81FRuSUAtfIvQd/NyGWYTYm5YjliGXZiR9cSslRR3nSymUyPZrodgv9DGyMkY43nZ7Klf/HyG9GpGNtk0F05rHttbV/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PVAPFNs7; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1788852684; c=relaxed/simple;
+	bh=8+quB6EjKOoEa1ZHF+bZNfsyz8/M/RI5EzR+EzA9+cI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lbtW/7rRIoxG1OcboVW3xC97mhNQxEeW9PSyVurgZjcek5umt6DhaPjRNwwnxN7hCMCwwUxIQpIJulPeXW6KMkrmVc5MShi5EiGFSk6TvB5K/2nqQ+gkxEQZ0o9H2jdHDn+3RelH4mYozfdgrxmhU1Xx20yfva1tiaeCX2u6dQ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=OBWHJjVg; arc=none smtp.client-ip=139.138.61.252
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PVAPFNs7"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1788851064;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Ol8taRaXNtmTj+LU+cXQwn5fB81XYMucQnFv/vJC8fU=;
-	b=PVAPFNs7m/Fc7hRZVn+eU0UkpINPLiE/gejR7Pw3FFyiOvUlgamk67HvsTe0OBhwczfqNT
-	qSwKfKLhcbCHg7Vlcg1TAIDRU064F54TWeWJhPoRx4RK93cr6HAvCsWp3yY2eyI7wMKrbo
-	k+YNZG81qXbT/wQau2CKyEk5ZzgAfy0=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-209-WqXIdM4iMQWh_El01bRsdw-1; Tue, 08 Sep 2026 03:04:23 -0400
-X-MC-Unique: WqXIdM4iMQWh_El01bRsdw-1
-X-Mimecast-MFC-AGG-ID: WqXIdM4iMQWh_El01bRsdw_1788851062
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-38dbf293831so9007343a91.3
-        for <kvmarm@lists.linux.dev>; Tue, 08 Sep 2026 00:04:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788851062; x=1789455862;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=Ol8taRaXNtmTj+LU+cXQwn5fB81XYMucQnFv/vJC8fU=;
-        b=gZPW1bfSbfWyJwqfNhi5VDvmbsFhZYQlgKHm587DSIjT9y7DpKL8Wmokqr9mlMciIV
-         s8QZC7lrn3mo1dAcEcP56vA2mva9nYMl8ADp2xfj+x23NvqPx952NrGBedggsxSAGkvJ
-         dv+N/h/MmYg1nL5NX6vjsurWBzIR+t0A3gyDnK5DRllnfKis68UcRz5B85AupojUl6ZJ
-         79i9kZsWcPLAbf5QchcykKxSiVWjtwwxxEw3+sj0Y4FQCCaot195y1bq4ixETT6i/iWQ
-         RJVdcp6fyLY82pbgxoCPzWFgrLs5WvVNrA6pOi04w0CZm7bk+bca2FCwHbEhuRX6XLBH
-         Ot1Q==
-X-Forwarded-Encrypted: i=1; AKwUvBx6jV4ZHwY0u7lLAMkLrroUJabNrIVK7n5BQK/Ka/xBslpyGVqp1Q3HZNz8CTDttbEBbtmPY7o=@lists.linux.dev
-X-Gm-Message-State: AFuF++kHvrpyxfCxbLHA393r6AhYpCthan2ONM3noGk97lILQnNB70v2
-	ZXe6oXMPBnY+49k7TxPLg/XNhZDzyaWizNVfZomQPndFDxlPAutWQszRYoGOTV0CxVBGWrtYYBx
-	rKm4r1G4NraQBadQCQX3KEZygGLmDptoPXBvQlP7WEwtelF+iQQ8n5xOn2vPE4zrmMg==
-X-Gm-Gg: AYBFou0FVkf/jyflQ+TKeSYSB2f/pP0JP+i3zIPmHgRK4U2wQQbwSCNlmwQLmmseDbS
-	Bg/BQJ5gpshhcLKh7sgtWoAmk7NaWQlNOuiFUR75wJ4rMrOlZj0rD+GMUcAu5uqShBWJs4Hit9h
-	PYi0TmjJ/J9jSfyVn9uYZOrKZ/xpaTWrng16qC2555TEUcBzAqQ4uX6M0GNkNmLeWcgJFzzGPXW
-	3azvs74EqhN2G20CQ6AHZQDximO3ljDNgmTKfSZIpbkVzM8ZR3oMBua8+73b1a2U327zV7Qq7yJ
-	jIqbsWRFckOHvJYaXvi9Dgxn4IwkK42iN/ZM+hRygBhoiYfnA/yOvrYV+5MFvTMyBMMRoCWJyuA
-	qv6dEs1MQnQlvo3O7zYP7PISo47LwtyBpZwl2jYoYfQ==
-X-Received: by 2002:a17:90b:43:b0:395:5eec:b932 with SMTP id 98e67ed59e1d1-39b26141c79mr43891699a91.11.1788851061754;
-        Tue, 08 Sep 2026 00:04:21 -0700 (PDT)
-X-Received: by 2002:a17:90b:43:b0:395:5eec:b932 with SMTP id 98e67ed59e1d1-39b26141c79mr43891602a91.11.1788851061212;
-        Tue, 08 Sep 2026 00:04:21 -0700 (PDT)
-Received: from [192.168.68.52] (n175-34-8-244.mrk21.qld.optusnet.com.au. [175.34.8.244])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-39b08bcc081sm30955490a91.6.2026.09.08.00.04.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Sep 2026 00:04:19 -0700 (PDT)
-Message-ID: <10893135-4757-44de-91b5-180a9774d868@redhat.com>
-Date: Tue, 8 Sep 2026 17:04:08 +1000
+	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="OBWHJjVg"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
+  t=1788852683; x=1820388683;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=8+quB6EjKOoEa1ZHF+bZNfsyz8/M/RI5EzR+EzA9+cI=;
+  b=OBWHJjVgB9NCgBuN7cUDVrettZzjdI67C7WyrY77OFAKzvwOWNszRddv
+   m+eL/uMuN2dtt9eKbXm6X6+48VE5gcOX5gPcNdaajtqKtv5JqGrSU1SbZ
+   pGlxNVEARMWnRk34Q0HSiUbio9+NyH5UCLfRqdtnqITiA98fuFIhf77TB
+   5b9sggssSxH6WgWmBTcyL/dxAKy9Ywd++abey3YxL099lzpBh+XUjsH//
+   u6UuzO9rzuC4SLtl3snoyQTImzcoxGZKi4AKlyRWyJrHboJ6XJ9KXTZN6
+   /ifTFppe9TfXtd2cn/uIiAhJPyqeQIbRrlX7bWF9jYyOcPr3USNRtEgVl
+   Q==;
+X-CSE-ConnectionGUID: R0PYcmgKT52YAXRnSriPWg==
+X-CSE-MsgGUID: +Cm6ScdNSVCbVQ3llSuXTw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11899"; a="233204743"
+X-IronPort-AV: E=Sophos;i="6.25,268,1779116400"; 
+   d="scan'208";a="233204743"
+Received: from gmgwuk01.global.fujitsu.com ([172.187.114.235])
+  by esa7.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2026 16:31:13 +0900
+Received: from az2uksmgm4.o.css.fujitsu.com (unknown [10.151.22.201])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by gmgwuk01.global.fujitsu.com (Postfix) with ESMTPS id 007B11C1C719;
+	Tue,  8 Sep 2026 07:31:13 +0000 (UTC)
+Received: from az2uksmom2.o.css.fujitsu.com (unknown [10.151.22.203])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by az2uksmgm4.o.css.fujitsu.com (Postfix) with ESMTPS id AD58F14003FD;
+	Tue,  8 Sep 2026 07:31:12 +0000 (UTC)
+Received: from FCCLS0092175.localdomain (unknown [10.9.15.163])
+	by az2uksmom2.o.css.fujitsu.com (Postfix) with SMTP id 4C91114000F7;
+	Tue,  8 Sep 2026 07:31:05 +0000 (UTC)
+Date: Tue, 8 Sep 2026 16:30:57 +0900
+From: Kohei Enju <enju.kohei@fujitsu.com>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org, 
+	will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org, 
+	gshan@redhat.com, joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com, 
+	linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com, 
+	alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com, 
+	lpieralisi@kernel.org, Mathieu Poirier <mathieu.poirier@linaro.org>
+Subject: Re: [PATCH v17 0/7] firmware: arm_rmm: Add RMM v2.0 base RMI support
+Message-ID: <ap-4lPkYzogPqs_V@FCCLS0092175.localdomain>
+References: <20260907095942.1140734-1-suzuki.poulose@arm.com>
+ <ap-C6NLnxuWWTMzi@FCCLS0092175.localdomain>
+ <f65216f6-cb7b-4b76-a7cc-79b332db2bd8@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v17 3/7] firmware: arm_rmm: Configure the RMM with the
- host's page size
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: maz@kernel.org, will@kernel.org, catalin.marinas@arm.com,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org,
- joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
- linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
- sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
- WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com
-References: <20260907095942.1140734-1-suzuki.poulose@arm.com>
- <20260907095942.1140734-4-suzuki.poulose@arm.com>
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20260907095942.1140734-4-suzuki.poulose@arm.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: VoZsivAMB5DS-2N0TKQXYzF7MfwNBea0wC23lNIZpCA_1788851062
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <f65216f6-cb7b-4b76-a7cc-79b332db2bd8@arm.com>
 
-Hi Suzuki,
-
-On 9/7/26 7:59 PM, Suzuki K Poulose wrote:
-> From: Steven Price <steven.price@arm.com>
+On 09/08 06:46, Suzuki K Poulose wrote:
+> Hi Kohei-San
 > 
-> RMM v2.0 brings the ability to set the RMM's granule size. Check the
-> feature registers and configure the RMM so that it matches the host's
-> page size. This means that operations can be done with a granularity
-> equal to PAGE_SIZE.
+> Linaro is best suited to answer this. I have Cc'ed Mathieu (and
+> Lorenzo), who may be able to help you here.
+
+Thank you for pointing me in the right direction and Ccing Mathieu and
+Lorenzo. 
+I'll wait for their response.
+
 > 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> ---
->   Changes since v15:
->    * Actually check the feature register for the host's page-size support.
->   Changes since v14:
->    * Move the implementation into drivers/firmware/arm_rmm.
->   Changes since v13:
->    * Moved out of KVM.
-> ---
->   drivers/firmware/arm_rmm/rmi.c | 58 ++++++++++++++++++++++++++++++++++
->   include/linux/arm-rmi-cmds.h   | 17 ++++++++++
->   2 files changed, 75 insertions(+)
+> On 08/09/2026 05:09, Kohei Enju wrote:
+> > Hi Suzuki,
+> > 
+> > On 09/07 10:59, Suzuki K Poulose wrote:
+> > > This series adds the generic firmware layer for talking to the Realm
+> > > Management Monitor (RMM), as specified by the RMM v2.0-bet3
+> > > specification[1]. It is the first part of the Arm CCA host support that
+> > > was previously posted as part of the larger KVM series.
+> > > 
+> > > The split allows this RMM support to be used as a base for other work,
+> > > including Aneesh's PCI IDE support with Arm CCA RMM as the TSM,
+> > >   without depending on the KVM Realm support that will follow as separate
+> > >   series. (See more on that below)
+> > > 
+> > > The series adds:
+> > > 
+> > >   * The RMI SMC definitions and direct-call wrappers.
+> > > 
+> > >   * RMM discovery and version checks during firmware init.
+> > > 
+> > >   * RMM host configuration, including the host page size.
+> > > 
+> > >   * Stateful RMI Operation (SRO) infrastructure for commands which the RMM
+> > >     can complete across multiple SMC calls while requesting or returning
+> > >     memory to the host.
+> > > 
+> > >   * Verification that granule tracking is available at fine granularity.
+> > >     Fine-grained tracking allows each granule in the system to be tracked
+> > >     independently, which is required before individual granules can be
+> > >     delegated. A future series will add support for dynamically supplying
+> > >     memory to the RMM for this tracking.
+> > > 
+> > >   * Support for fully firmware-managed systems, where the Granule Protection
+> > >     Tables for memory regions are allocated and managed by firmware. RMM v2.0
+> > >     also allows dynamic GPT creation on demand; support for that will be added
+> > >     in a later series.
+> > > 
+> > >   * Wrappers for the RMI commands that are used for managing the "Realm VM"
+> > >     lifecycle. This is added in to make it easier for the on-going KVM support
+> > >     to evolve in parallel pieces.
+> > > 
+> > > If the platform firmware cannot manage the granule tracking or the GPTs, we
+> > > bail out and deactivate the RMM, reclaiming any memory that we have donated.
+> > > 
+> > > The RMM v2.0 spec introduces Stateful RMI Operations (SROs), which allow
+> > > the RMM to complete an operation over several SMC calls while requesting
+> > > or returning memory to the host. This allows interrupts to be handled in
+> > > the middle of an operation and lets the RMM dynamically allocate memory
+> > > for internal tracking purposes. For example, RMI_REC_CREATE no longer
+> > > needs auxiliary granules to be provided up front, and can instead
+> > > request memory during the operation.
+> > > 
+> > > This series applies on v7.3-rc1 and a branch is available at [2]. The KVM
+> > > CCA support that builds on this series is available at [3] as an integration
+> > > branch. The KVM support depends on guest-memfd-in-place conversion support v12
+> > > from Ackerley [4], we plan to split that into parts, which apply cleanly on
+> > > v7.3-rcx without any dependency and is in progress. This will be made available
+> > > as soon as it is ready. Until then [3] shows how this base series enables KVM
+> > > CCA support. You may find the tf-RMM [5] and kvmtool support [6] below.
+> > > 
+> > > [1] RMM spec : https://support.arm.com/documentation/den0137/2-0bet3/
+> > > [2] This series: https://gitlab.arm.com/linux-arm/linux-cca.git cca/cca-host/fw_rmm/v17
+> > > [3] KVM CCA v17 integration branch: https://gitlab.arm.com/linux-arm/linux-cca.git cca/cca-host/kvm-integration/v17
+> > > [4] Gmem inplace conversion https://github.com/googleprodkernel/linux-cc/tree/guest_memfd-inplace-conversion-v12
+> > > [5] TF-RMM https://git.trustedfirmware.org/TF-RMM/tf-rmm.git main (commit: 134266ae)
+> > 
+> > I understand that QEMU-virt is not intended to model a realistic
+> > production platform and that QEMU-SBSA is generally preferred. However,
+> > I sometimes use QEMU-virt to test functionality quickly because it runs
+> > slightly faster than QEMU-SBSA.
+> > 
+> > I tested this series with QEMU-virt and found that RMM initialization
+> > failed during boot:
+> > 
+> >    [...]
+> >    INFO:    BL31: Initializing RMM
+> >    INFO:    RMM init start.
+> >    ERROR:   RMM init failed: -8
+> >    WARNING: BL31: RMM initialization failed
+> > 
+> > The following TF-A revision was used:
+> >    https://git.trustedfirmware.org/TF-A/trusted-firmware-a.git master (38269bb)
+> > 
+> > After investigating, I found that the failure was caused by the lack of
+> > a plat_rmmd_reserve_memory() implementation for the QEMU-virt platform
+> > in TF-A. Adding an implementation equivalent to the QEMU-SBSA one
+> > resolved the issue:
+> >      https://git.trustedfirmware.org/plugins/gitiles/TF-A/trusted-firmware-a.git/+/9d594743aa4d4e8160cdf025ea7538041648972c
+> > 
+> > Is QEMU virt still intended to be supported as an RME emulation
+> > platform? In particular, is this functionality simply not implemented
+> > yet, or is there a reason why RME support is not planned for QEMU virt?
+> > 
+> > If this is not the appropriate place to discuss this, please let me
 > 
-> diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/arm_rmm/rmi.c
-> index 008a783407b4e..76f91c145e1fd 100644
-> --- a/drivers/firmware/arm_rmm/rmi.c
-> +++ b/drivers/firmware/arm_rmm/rmi.c
-> @@ -77,6 +77,60 @@ static int rmi_read_features(void)
->   	return 0;
->   }
->   
-> +static int rmi_configure(void)
-> +{
-> +	unsigned long granule_feature;
-> +	unsigned long granule_size;
-> +	int ret = 0;
-> +	struct rmm_config *config;
-> +
-> +	switch (PAGE_SIZE) {
-> +	case SZ_4K:
-> +		granule_size = RMI_GRANULE_SIZE_4KB;
-> +		granule_feature = RMI_FEATURE_REGISTER_1_RMI_GRAN_SZ_4KB;
-> +		break;
-> +	case SZ_16K:
-> +		granule_size = RMI_GRANULE_SIZE_16KB;
-> +		granule_feature = RMI_FEATURE_REGISTER_1_RMI_GRAN_SZ_16KB;
-> +		break;
-> +	case SZ_64K:
-> +		granule_size = RMI_GRANULE_SIZE_64KB;
-> +		granule_feature = RMI_FEATURE_REGISTER_1_RMI_GRAN_SZ_64KB;
-> +		break;
-> +	default:
-> +		BUILD_BUG();
-> +	}
-> +
-> +	if (!(rmi_feat_reg(1) & granule_feature)) {
-> +		pr_err("RMM does not support %luKB granules\n",
-> +		       PAGE_SIZE >> 10);
-> +		return -ENXIO;
-> +	}
-> +
-> +	config = (struct rmm_config *)get_zeroed_page(GFP_KERNEL);
-> +	if (!config)
-> +		return -ENOMEM;
-
-An error message is needed here.
-
-	if (!config) {
-		pr_err("Unable to alloc RMM config memory\n");
-		return -ENOMEM;
-	}
-
-> +
-> +	config->rmi_granule_size = granule_size;
-> +
-> +	/*
-> +	 * For now we set the tracking_region_size to 0 which is the only option
-> +	 * for 4KB PAGE_SIZE (1GB for 4KB PAGE_SIZE, 32MB/512MB for 16KB/64KB).
-> +	 * TODO: Support other tracking sizes via Kconfig option for other
-> +	 * PAGE_SIZES
-> +	 */
-> +	config->tracking_region_size = 0;
-> +
-> +	ret = rmi_rmm_config_set(virt_to_phys(config));
-> +	if (ret) {
-> +		pr_err("RMM config set failed\n");
-> +		ret = -EINVAL;
-> +	}
-
-The error code from rmi_rmm_config_set() is indicative sometimes. Also, -ENXIO
-would be more appropriate than -EINVAL?
-
-	if (ret) {
-		pr_err("RMM config set failed (%d)\n", ret);
-		ret = -ENXIO;
-	}
-
-> +
-> +	free_page((unsigned long)config);
-> +	return ret;
-> +}
-> +
->   static int __init arm64_init_rmi(void)
->   {
->   	int ret;
-> @@ -90,6 +144,10 @@ static int __init arm64_init_rmi(void)
->   	if (ret)
->   		return ret;
->   
-> +	ret = rmi_configure();
-> +	if (ret)
-> +		return ret;
-> +
->   	return 0;
->   }
->   
-> diff --git a/include/linux/arm-rmi-cmds.h b/include/linux/arm-rmi-cmds.h
-> index 2fb1f7f86d71e..9aa27697e2377 100644
-> --- a/include/linux/arm-rmi-cmds.h
-> +++ b/include/linux/arm-rmi-cmds.h
-> @@ -12,6 +12,23 @@
->   
->   unsigned long rmi_feat_reg(unsigned long id);
->   
-> +/**
-> + * rmi_rmm_config_set() - Configure the RMM
-> + * @cfg_ptr: PA of a struct rmm_config
-> + *
-> + * Sets configuration options on the RMM.
-> + *
-> + * Return: RMI return code
-> + */
-> +static inline int rmi_rmm_config_set(unsigned long cfg_ptr)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_RMM_CONFIG_SET, cfg_ptr, &res);
-> +
-> +	return res.a0;
-> +}
-> +
-
-rmi_rmm_config_set() is used for once by rmi.c::rmi_configure(), I would not expose
-rmi_rmm_config_set() by combining the logic to rmi.c::rmi_configure().
-
->   /**
->    * rmi_features() - Read feature register
->    * @index: Feature register index
-
-Thanks,
-Gavin
-
+> Mathieu, Lorenzo,
+> 
+> Over to you folks :-)
+> 
+> Cheers
+> Suzuki
+> 
+> 
+> > know :)
+> > 
+> > Thanks,
+> > Kohei
+> > 
+> > > [6] kvmtool https://gitlab.arm.com/linux-arm/kvmtool-cca.git cca/kvm-v17
+> > > 
+> > > Known issues: RMMv2.0
+> > >   * RmiOpMemDonateReq:count (Uint14) is incompatible with RmiAddrRangeDesc4KB
+> > >    (Uint10) and RmiAddrRangeDesc16KB (Uint12). i.e., a larger contiguous request
+> > >    may not be satisfiable by the host. Arm is aware of this defect and a spec fix
+> > >    is in progress.
+> > > 
+> > > 
+> > > Steven Price (7):
+> > >    firmware: arm_rmm: Add SMC definitions for calling the RMM
+> > >    firmware: arm_rmm: Check for RMI support at init
+> > >    firmware: arm_rmm: Configure the RMM with the host's page size
+> > >    firmware: arm_rmm: Add support for SRO
+> > >    firmware: arm_rmm: Activate the RMM
+> > >    firmware: arm_rmm: Ensure the RMM has GPT entries for memory
+> > >    firmware: arm_rmm: Add wrappers for Realm related RMI commands
+> > > 
+> > >   arch/arm64/Kconfig                |   1 +
+> > >   arch/arm64/kernel/cpufeature.c    |   1 +
+> > >   drivers/firmware/Kconfig          |   1 +
+> > >   drivers/firmware/Makefile         |   1 +
+> > >   drivers/firmware/arm_rmm/Kconfig  |  26 +
+> > >   drivers/firmware/arm_rmm/Makefile |   2 +
+> > >   drivers/firmware/arm_rmm/rmi.c    | 819 ++++++++++++++++++++++++++++++
+> > >   include/linux/arm-rmi-cmds.h      | 678 +++++++++++++++++++++++++
+> > >   include/linux/arm-smccc-rmi.h     | 494 ++++++++++++++++++
+> > >   9 files changed, 2023 insertions(+)
+> > >   create mode 100644 drivers/firmware/arm_rmm/Kconfig
+> > >   create mode 100644 drivers/firmware/arm_rmm/Makefile
+> > >   create mode 100644 drivers/firmware/arm_rmm/rmi.c
+> > >   create mode 100644 include/linux/arm-rmi-cmds.h
+> > >   create mode 100644 include/linux/arm-smccc-rmi.h
+> > > 
+> > > -- 
+> > > 2.43.0
+> > > 
+> 
