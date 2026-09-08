@@ -1,38 +1,31 @@
-Received: from mta0.migadu.com (out-28.mta0.migadu.com [91.218.175.28])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B197352378A
-	for <kvmarm@lists.linux.dev>; Tue,  8 Sep 2026 11:07:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.28
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B64AA53ED1C;
+	Tue,  8 Sep 2026 12:53:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788865659; cv=none; b=Li95R7SUsqi4gs6l6XkCRTf89tidBGMzdM8lvEhJ+L1TvtEtwku89IXQugQJV8YMcRRw/ujpn+HIE5QhbgO1+6aIV1+nM+/U4tUc3dSGDiPyCeXWDpwqkC74LgO8iOSEEgWKImdpejhGA3vsICddMTigqXhJWpM8xlETO7X2C9o=
+	t=1788872016; cv=none; b=IS3xkCmOCVxaebYReqcTGCRJtig4qbQIlauHU/CEyEPkDehfzTjL39raGNbH0TRbGeqRNqWRLb84eBG9/PcGiw51G23ElZPAigzzTqDTmsM6GiSy6PBC2F5CuWcGoDiT3+TeolO9U8t05Vu3FNUTWBCbn8hpmaL9IxFh3wiwT/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788865659; c=relaxed/simple;
-	bh=n+vTJUIvsDxI7yNE//7ETqP96fI8JsmTAhqvehLBjCw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=g/5URdzdjMz2GqwcoOo0A5iFDrzMSRNwZIXgOgjGlDQCQSkVWlCa0Z4DDe/u1xACHV3JDhbuyLZJiH7XzRHn+VU7NqhEy3dKcpDnKuHwFZRCXPnEgtaEu9nMhkSZqKd2DM3GkV9iSAjV4Bc1MMyRLBnXh0MmeGpd7lnfuIqICYU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Fw9nXrdr; arc=none smtp.client-ip=91.218.175.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Fw9nXrdr"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=n+vTJUIvsDxI7yNE//7ETqP96fI8JsmTAhqvehLBjCw=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1788865654; v=1; x=1789470454;
- b=Fw9nXrdrrkkKWAhzydgvKtfzedI2UdLMt6vCEmBAHhH9Z4/NCbrhcVPjLyNIkqJj2r5nGM+0
- 491VgUcPWtwtCkSNTxhBJ2ofBbWhVaTiRj95lOsSH9VXguZpBtkdTo/qCnL7PrI/qLsQDRTgljq
- LwI6xy4ImfumwNednqaCJXSg=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 5f1e715ccda4b9bd;
-	Tue, 08 Sep 2026 11:07:34 +0000
-X-Mizu-Trace-ID: 5f1e715ccda4b9bd
-X-Migadu-Flow: FLOW_OUT
-From: Fuad Tabba <fuad.tabba@linux.dev>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>
-Cc: Will Deacon <will@kernel.org>,
+	s=arc-20240116; t=1788872016; c=relaxed/simple;
+	bh=SHszKqrGLoqQeDuO3gL6Yu9c18iVsW8OUxyygOggkEI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tdXdG1bMfK3ljWjLXNRnGpQVAB3Driw2G7yarpI2l6EyYcLFrya3jGL27/mQhZCm3gk8cINlyidHINre6b+vkQmoRyYKoVQfPF5QFGWRXSPrFCNZ/4NISGzLjxrVLHb8/6BI7BrjlbhUYC+tq+cYMe2sTr3SYiPRxvlklC+25N8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E57781F00A3E;
+	Tue,  8 Sep 2026 12:53:32 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1x3vJs-00000006D8h-2A4L;
+	Tue, 08 Sep 2026 12:53:00 +0000
+Date: Tue, 08 Sep 2026 13:53:00 +0100
+Message-ID: <864ifz52hf.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Oliver Upton <oupton@kernel.org>,
+	Will Deacon <will@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
@@ -49,176 +42,53 @@ Cc: Will Deacon <will@kernel.org>,
 	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 4/4] KVM: arm64: Check every private mapping is hyp-owned at pKVM init
-Date: Tue,  8 Sep 2026 12:07:13 +0100
-Message-Id: <20260908110713.1540304-5-fuad.tabba@linux.dev>
-X-Mailer: git-send-email 2.39.5
+Subject: Re: [PATCH 0/4] KVM: arm64: Fix host access to the EL2 stacks
 In-Reply-To: <20260908110713.1540304-1-fuad.tabba@linux.dev>
 References: <20260908110713.1540304-1-fuad.tabba@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, will@kernel.org, catalin.marinas@arm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, seiden@linux.ibm.com, mark.rutland@arm.com, vdonnefort@google.com, keirf@google.com, kaleshsingh@google.com, qperret@google.com, hk590@cam.ac.uk, tabba@google.com, stable@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-fix_host_ownership() transfers only what it walks, so a hyp mapping
-outside the linear map is not manipulated by the walk.
+On Tue, 08 Sep 2026 12:07:09 +0100,
+Fuad Tabba <fuad.tabba@linux.dev> wrote:
+> 
+> Hi folks,
+> 
+> The per-CPU EL2 stacks are initialised as host-owned after pKVM init.
+> fix_host_ownership() walks only the linear-map alias of each memblock
+> region, and the stacks, mapped in the private VA range for their guard
+> pages, have none.
+> 
+> Patch 1 is the fix, and it needs none of the other three. Patch 4 adds
+> the check that would have caught it and would catch similar instances
+> in the future: once the transfer is done, walk the private VA range and
+> fail init unless every valid leaf is hyp-owned, or is hyp text mapped
+> without write access.
+> 
+> Patch 2 is a fix in its own right, but to a different bug.
+> fix_host_ownership_walker() matches hyp text on its stage-1 permissions,
+> and that test hasn't matched on a non-hVHE host since 7.0, so hyp text
+> is donated there rather than left read-only. Nothing crashes, but the
+> instruction dump on hyp panic reads a page the host can't access, so
+> the Code: line comes out as question marks. It matches by physical
+> address instead, which is what patch 4 needs too. Patch 3 splits the
+> start of the range from the allocation cursor, with no functional
+> change, so patch 4 knows where the range begins.
 
-Walk the quarter of the VA space holding the private range and the
-vmemmap once the transfer is done, and fail init unless every valid
-leaf is hyp-owned: in the vmemmap when the page is memory, and in the
-host stage-2, where hyp text may instead be mapped without write
-access. A leaf that is not memory has no vmemmap entry and is checked
-against the host stage-2 alone. Hyp text is matched by physical
-address, since the only executable mapping in the range is the
-Spectre-v3a vectors, whose VA is a private allocation, and an
-executable mapping of anything else must not be host-readable. The
-vmemmap can be block-mapped, so the walker checks each page of a leaf.
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 
-Suggested-by: Will Deacon <will@kernel.org>
-Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
----
- arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  1 +
- arch/arm64/kvm/hyp/include/nvhe/mm.h          |  1 +
- arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 12 ++++
- arch/arm64/kvm/hyp/nvhe/mm.c                  | 59 +++++++++++++++++++
- arch/arm64/kvm/hyp/nvhe/setup.c               |  4 ++
- 5 files changed, 77 insertions(+)
+	M.
 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-index cab27f7bd423a..ec85a95471207 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-@@ -55,6 +55,7 @@ bool addr_is_memory(phys_addr_t phys);
- bool addr_is_hyp_text(phys_addr_t phys);
- int host_stage2_idmap_locked(phys_addr_t addr, u64 size, enum kvm_pgtable_prot prot);
- int host_stage2_set_owner_locked(phys_addr_t addr, u64 size, u8 owner_id);
-+bool host_stage2_pte_is_hyp_owned(kvm_pte_t pte);
- int kvm_host_prepare_stage2(void *pgt_pool_base);
- int kvm_guest_prepare_stage2(struct pkvm_hyp_vm *vm, void *pgd);
- void kvm_guest_destroy_stage2(struct pkvm_hyp_vm *vm);
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/mm.h b/arch/arm64/kvm/hyp/include/nvhe/mm.h
-index 6e83ce35c2f2e..31cae95ddb716 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/mm.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/mm.h
-@@ -29,6 +29,7 @@ int __pkvm_create_private_mapping(phys_addr_t phys, size_t size,
- 				  enum kvm_pgtable_prot prot,
- 				  unsigned long *haddr);
- int pkvm_create_stack(phys_addr_t phys, unsigned long *haddr);
-+int pkvm_check_host_ownership(void);
- int pkvm_alloc_private_va_range(size_t size, unsigned long *haddr);
- 
- #endif /* __KVM_HYP_MM_H */
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index d026f446bd8ef..a6a47c1e058b3 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -641,6 +641,18 @@ int host_stage2_set_owner_locked(phys_addr_t addr, u64 size, u8 owner_id)
- 	return ret;
- }
- 
-+bool host_stage2_pte_is_hyp_owned(kvm_pte_t pte)
-+{
-+	if (kvm_pte_valid(pte))
-+		return false;
-+
-+	if (FIELD_GET(KVM_INVALID_PTE_TYPE_MASK, pte) !=
-+	    KVM_HOST_INVALID_PTE_TYPE_DONATION)
-+		return false;
-+
-+	return FIELD_GET(KVM_HOST_DONATION_PTE_OWNER_MASK, pte) == PKVM_ID_HYP;
-+}
-+
- #define KVM_HOST_PTE_OWNER_GUEST_HANDLE_MASK	GENMASK(15, 0)
- /* We need 40 bits for the GFN to cover a 52-bit IPA with 4k pages and LPA2 */
- #define KVM_HOST_PTE_OWNER_GUEST_GFN_MASK	GENMASK(55, 16)
-diff --git a/arch/arm64/kvm/hyp/nvhe/mm.c b/arch/arm64/kvm/hyp/nvhe/mm.c
-index 422ee57be9560..29ab5ee9d57fc 100644
---- a/arch/arm64/kvm/hyp/nvhe/mm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mm.c
-@@ -472,6 +472,65 @@ int pkvm_create_stack(phys_addr_t phys, unsigned long *haddr)
- 	return ret;
- }
- 
-+static int check_page_ownership(phys_addr_t phys)
-+{
-+	kvm_pte_t pte;
-+	bool host_ok;
-+	int ret;
-+
-+	if (addr_is_memory(phys)) {
-+		struct hyp_page *page = hyp_phys_to_page(phys);
-+
-+		if (get_hyp_state(page) != PKVM_PAGE_OWNED ||
-+		    get_host_state(page) != PKVM_NOPAGE)
-+			return -EPERM;
-+	}
-+
-+	ret = kvm_pgtable_get_leaf(&host_mmu.pgt, phys, &pte, NULL);
-+	if (ret)
-+		return ret;
-+
-+	/* Hyp text may stay host-readable, see fix_host_ownership_walker(). */
-+	if (kvm_pte_valid(pte) && addr_is_hyp_text(phys))
-+		host_ok = !(kvm_pgtable_stage2_pte_prot(pte) & KVM_PGTABLE_PROT_W);
-+	else
-+		host_ok = host_stage2_pte_is_hyp_owned(pte);
-+
-+	return host_ok ? 0 : -EPERM;
-+}
-+
-+static int check_host_ownership_walker(const struct kvm_pgtable_visit_ctx *ctx,
-+				       enum kvm_pgtable_walk_flags visit)
-+{
-+	phys_addr_t phys, end;
-+	int ret;
-+
-+	if (!kvm_pte_valid(ctx->old))
-+		return 0;
-+
-+	phys = kvm_pte_to_phys(ctx->old);
-+	end = phys + kvm_granule_size(ctx->level);
-+	for (; phys < end; phys += PAGE_SIZE) {
-+		ret = check_page_ownership(phys);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+int pkvm_check_host_ownership(void)
-+{
-+	struct kvm_pgtable_walker walker = {
-+		.cb	= check_host_ownership_walker,
-+		.flags	= KVM_PGTABLE_WALK_LEAF,
-+	};
-+
-+	/* The private range and the vmemmap share one quarter of the VA space. */
-+	return kvm_pgtable_walk(&pkvm_pgtable, __io_map_base,
-+				BIT(pkvm_pgtable.ia_bits - 2), &walker);
-+}
-+
- static void *admit_host_page(void *arg)
- {
- 	struct kvm_hyp_memcache *host_mc = arg;
-diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-index bb667cd7080b4..45ac5f2ba4f7a 100644
---- a/arch/arm64/kvm/hyp/nvhe/setup.c
-+++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-@@ -334,6 +334,10 @@ void __noreturn __pkvm_init_finalise(void)
- 	if (ret)
- 		goto out;
- 
-+	ret = pkvm_check_host_ownership();
-+	if (ret)
-+		goto out;
-+
- 	ret = hyp_ffa_init(ffa_proxy_pages);
- 	if (ret)
- 		goto out;
 -- 
-2.39.5
-
+Without deviation from the norm, progress is not possible.
