@@ -1,235 +1,155 @@
-Received: from esa7.hc1455-7.c3s2.iphmx.com (esa7.hc1455-7.c3s2.iphmx.com [139.138.61.252])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta1.migadu.com (out-169.mta1.migadu.com [95.215.58.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6A91396D25;
-	Tue,  8 Sep 2026 07:31:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.138.61.252
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F2243A5E8E
+	for <kvmarm@lists.linux.dev>; Tue,  8 Sep 2026 07:55:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788852684; cv=none; b=mz7NO5K43aRKV/5dECQIaWkVZc/cxLu6iMIE12ZoblPOtuKHE2DpHZHlX1TbydzO+GS315mJlI+mFOccopWRoU+vGpGW1b2kwrGAd7DVR2/ng8Y0JhAFm2vCPH28+gC4gVRS8kyzrq9/h5ur6txG4zSQJbTqBVPrHdzNOL71KAM=
+	t=1788854148; cv=none; b=pyQD3TGC4avnp5QQL0Wbe7RxV3l6KlJTcnEVRKC1g/POzMpFu9dzATCbfO/HwAKLPt8GhOxOC2FUuk7eW3DFQgc9JHaocJLfsBpUF7fO0445mqP5KKpqzk2eGlWeFeQ9rMHOTvpK07suh1U3FfUt5YzGFpmNxUdtomlogWD6vlg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788852684; c=relaxed/simple;
-	bh=8+quB6EjKOoEa1ZHF+bZNfsyz8/M/RI5EzR+EzA9+cI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lbtW/7rRIoxG1OcboVW3xC97mhNQxEeW9PSyVurgZjcek5umt6DhaPjRNwwnxN7hCMCwwUxIQpIJulPeXW6KMkrmVc5MShi5EiGFSk6TvB5K/2nqQ+gkxEQZ0o9H2jdHDn+3RelH4mYozfdgrxmhU1Xx20yfva1tiaeCX2u6dQ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=OBWHJjVg; arc=none smtp.client-ip=139.138.61.252
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
+	s=arc-20240116; t=1788854148; c=relaxed/simple;
+	bh=r4hdO+l1tHybJlhIhjw+zD0e2eT2sYv8x5tSfI6vj+8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lwYHiTlEr49KdNx+Bms45Q2zCIxAOuQQE3o9i4sXljuoevhgBNs0BN/cV1gzEk25+FVvG+X74BLWprloUaBLSBXRTeK3rf4yHWN14rRGLN3+qFi5AKpujaui+v/hlaOUZ+lbQrd/NRJKbZpqqeD8pUwK7EiQ3nyKk1Sm2q+EfPw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Z9UmC3Uw; arc=none smtp.client-ip=95.215.58.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="OBWHJjVg"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
-  t=1788852683; x=1820388683;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=8+quB6EjKOoEa1ZHF+bZNfsyz8/M/RI5EzR+EzA9+cI=;
-  b=OBWHJjVgB9NCgBuN7cUDVrettZzjdI67C7WyrY77OFAKzvwOWNszRddv
-   m+eL/uMuN2dtt9eKbXm6X6+48VE5gcOX5gPcNdaajtqKtv5JqGrSU1SbZ
-   pGlxNVEARMWnRk34Q0HSiUbio9+NyH5UCLfRqdtnqITiA98fuFIhf77TB
-   5b9sggssSxH6WgWmBTcyL/dxAKy9Ywd++abey3YxL099lzpBh+XUjsH//
-   u6UuzO9rzuC4SLtl3snoyQTImzcoxGZKi4AKlyRWyJrHboJ6XJ9KXTZN6
-   /ifTFppe9TfXtd2cn/uIiAhJPyqeQIbRrlX7bWF9jYyOcPr3USNRtEgVl
-   Q==;
-X-CSE-ConnectionGUID: R0PYcmgKT52YAXRnSriPWg==
-X-CSE-MsgGUID: +Cm6ScdNSVCbVQ3llSuXTw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11899"; a="233204743"
-X-IronPort-AV: E=Sophos;i="6.25,268,1779116400"; 
-   d="scan'208";a="233204743"
-Received: from gmgwuk01.global.fujitsu.com ([172.187.114.235])
-  by esa7.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2026 16:31:13 +0900
-Received: from az2uksmgm4.o.css.fujitsu.com (unknown [10.151.22.201])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by gmgwuk01.global.fujitsu.com (Postfix) with ESMTPS id 007B11C1C719;
-	Tue,  8 Sep 2026 07:31:13 +0000 (UTC)
-Received: from az2uksmom2.o.css.fujitsu.com (unknown [10.151.22.203])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by az2uksmgm4.o.css.fujitsu.com (Postfix) with ESMTPS id AD58F14003FD;
-	Tue,  8 Sep 2026 07:31:12 +0000 (UTC)
-Received: from FCCLS0092175.localdomain (unknown [10.9.15.163])
-	by az2uksmom2.o.css.fujitsu.com (Postfix) with SMTP id 4C91114000F7;
-	Tue,  8 Sep 2026 07:31:05 +0000 (UTC)
-Date: Tue, 8 Sep 2026 16:30:57 +0900
-From: Kohei Enju <enju.kohei@fujitsu.com>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org, 
-	will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org, 
-	gshan@redhat.com, joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com, 
-	linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com, 
-	alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com, 
-	lpieralisi@kernel.org, Mathieu Poirier <mathieu.poirier@linaro.org>
-Subject: Re: [PATCH v17 0/7] firmware: arm_rmm: Add RMM v2.0 base RMI support
-Message-ID: <ap-4lPkYzogPqs_V@FCCLS0092175.localdomain>
-References: <20260907095942.1140734-1-suzuki.poulose@arm.com>
- <ap-C6NLnxuWWTMzi@FCCLS0092175.localdomain>
- <f65216f6-cb7b-4b76-a7cc-79b332db2bd8@arm.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Z9UmC3Uw"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=r4hdO+l1tHybJlhIhjw+zD0e2eT2sYv8x5tSfI6vj+8=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1788854144; v=1; x=1789458944;
+ b=Z9UmC3UwvlNH+8X9L9uuK7jMx8wC6QXmaMYikCmaV1iDYW9a4HsnzhOISd+cmJD5flMsVj4V
+ jJe7FXa3dIR8I8a12Vs18SNucJjwtciOhv3xT0RNz48def4eBqvJk0zfvsJSKL70vxUVuLhpgs+
+ e96fr9gR7geWnEBcQ2lbpC4M=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 0bb73f6aa57dee8e;
+	Tue, 08 Sep 2026 07:55:44 +0000
+X-Mizu-Trace-ID: 0bb73f6aa57dee8e
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b4a0b17359so14178e87.0
+        for <kvmarm@lists.linux.dev>; Tue, 08 Sep 2026 00:55:44 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBxOBGr3Hfz6jHyD5pVDxsa2zX2lPiPlSxkPCBfFMT81p0VbFY16WImHFaKA1w/MDeNK+5D0qN0=@lists.linux.dev
+X-Gm-Message-State: AFuF++nSPxbguxGPZTDLhEImmAK0nX+/bcQ6KB/sCDmijuVZ9XBx3wXz
+	WtdNYpo3wHyogtrdofPMAIDNv3avSkHAeLzvfzY5nvcfdkrw25cd4ti+/6fB+Qqvtbtv/8gzRqW
+	zt7f1ChN7kQHVnlfcYsAdKejqGNMM8oJAgEGvlyiY
+X-Received: by 2002:a05:6512:3185:b0:5b6:19c6:a91b with SMTP id
+ 2adb3069b0e04-5b74d1e0c5bmr294833e87.14.1788854142874; Tue, 08 Sep 2026
+ 00:55:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <f65216f6-cb7b-4b76-a7cc-79b332db2bd8@arm.com>
+References: <20260826-arm64-52bit-va-v1-0-14ec98211363@fujitsu.com>
+ <CA+EHjTwPmwPTMcgQB6zt47Kz6NPMr+FkGfq2Qq+Uxu+G427OEg@mail.gmail.com> <ap9wgBjYEDI-27N1@sm-arm-grace07>
+In-Reply-To: <ap9wgBjYEDI-27N1@sm-arm-grace07>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Tue, 8 Sep 2026 08:55:06 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTxy3vURKpjmcX86T+coXZN7sCfW=5L4TM3GH30xuz+zPA@mail.gmail.com>
+X-Gm-Features: AcwNN1UPBjEuQQThxfaCHXl31wDDjpU8d24LqbsGJMyA-76vtr69g4waCdr9dow
+Message-ID: <CA+EHjTxy3vURKpjmcX86T+coXZN7sCfW=5L4TM3GH30xuz+zPA@mail.gmail.com>
+Subject: Re: [PATCH 0/2] 52-bit VA guest mode ID support
+To: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Takayuki Okamoto <tokamoto@fujitsu.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 09/08 06:46, Suzuki K Poulose wrote:
-> Hi Kohei-San
-> 
-> Linaro is best suited to answer this. I have Cc'ed Mathieu (and
-> Lorenzo), who may be able to help you here.
+Hi Itaru,
 
-Thank you for pointing me in the right direction and Ccing Mathieu and
-Lorenzo. 
-I'll wait for their response.
+On Tue, 8 Sept 2026 at 03:18, Itaru Kitayama <itaru.kitayama@fujitsu.com> wrote:
+>
+> Hi Fuad,
+> On Fri, Sep 04, 2026 at 09:14:36AM +0100, Fuad Tabba wrote:
+> > On Tue, 25 Aug 2026 at 22:18, Itaru Kitayama <itaru.kitayama@fujitsu.com> wrote:
+> > >
+> > > This patch series extends the arm64 KVM selftest framework
+> > > to support 52-bit guest virtual address (VA) modes in addition to
+> > > the existing 52-bit physical address (PA) configurations.
+> > > The motivation is to enable validation of LPA2 guest memory-management
+> > > behaviour in configurations that use a 52-bit VA space.
+> > > While the selftest framework already supports testing 52-bit PA
+> > > configurations, it lacks the ability to exercise guests running with
+> > > 52-bit virtual addresses, leaving part of the LPA2 functionality untested.
+> >
+> > The series adds three 52-bit VA guest modes, but nothing in tree maps
+> > a guest VA high enough to use them. The mode-iterating tests map at a
+> > fixed low GVA, so pgd_index() returns 0 and only the first entry of
+> > the top level is ever used.
+> >
+> > What do you expect the modes to catch as they stand? The allocators
+> > already take a minimum GVA, so mapping high in one of those tests
+> > looks like a small change.
+>
+> I think at least a 4KB page is allocated for the level -1 translation table,
+> and entry 0 is populated with a Table descriptor pointing to the level 0 translation
+> table. But, no it does not test a nonzero top-level index.
 
-> 
-> On 08/09/2026 05:09, Kohei Enju wrote:
-> > Hi Suzuki,
-> > 
-> > On 09/07 10:59, Suzuki K Poulose wrote:
-> > > This series adds the generic firmware layer for talking to the Realm
-> > > Management Monitor (RMM), as specified by the RMM v2.0-bet3
-> > > specification[1]. It is the first part of the Arm CCA host support that
-> > > was previously posted as part of the larger KVM series.
-> > > 
-> > > The split allows this RMM support to be used as a base for other work,
-> > > including Aneesh's PCI IDE support with Arm CCA RMM as the TSM,
-> > >   without depending on the KVM Realm support that will follow as separate
-> > >   series. (See more on that below)
-> > > 
-> > > The series adds:
-> > > 
-> > >   * The RMI SMC definitions and direct-call wrappers.
-> > > 
-> > >   * RMM discovery and version checks during firmware init.
-> > > 
-> > >   * RMM host configuration, including the host page size.
-> > > 
-> > >   * Stateful RMI Operation (SRO) infrastructure for commands which the RMM
-> > >     can complete across multiple SMC calls while requesting or returning
-> > >     memory to the host.
-> > > 
-> > >   * Verification that granule tracking is available at fine granularity.
-> > >     Fine-grained tracking allows each granule in the system to be tracked
-> > >     independently, which is required before individual granules can be
-> > >     delegated. A future series will add support for dynamically supplying
-> > >     memory to the RMM for this tracking.
-> > > 
-> > >   * Support for fully firmware-managed systems, where the Granule Protection
-> > >     Tables for memory regions are allocated and managed by firmware. RMM v2.0
-> > >     also allows dynamic GPT creation on demand; support for that will be added
-> > >     in a later series.
-> > > 
-> > >   * Wrappers for the RMI commands that are used for managing the "Realm VM"
-> > >     lifecycle. This is added in to make it easier for the on-going KVM support
-> > >     to evolve in parallel pieces.
-> > > 
-> > > If the platform firmware cannot manage the granule tracking or the GPTs, we
-> > > bail out and deactivate the RMM, reclaiming any memory that we have donated.
-> > > 
-> > > The RMM v2.0 spec introduces Stateful RMI Operations (SROs), which allow
-> > > the RMM to complete an operation over several SMC calls while requesting
-> > > or returning memory to the host. This allows interrupts to be handled in
-> > > the middle of an operation and lets the RMM dynamically allocate memory
-> > > for internal tracking purposes. For example, RMI_REC_CREATE no longer
-> > > needs auxiliary granules to be provided up front, and can instead
-> > > request memory during the operation.
-> > > 
-> > > This series applies on v7.3-rc1 and a branch is available at [2]. The KVM
-> > > CCA support that builds on this series is available at [3] as an integration
-> > > branch. The KVM support depends on guest-memfd-in-place conversion support v12
-> > > from Ackerley [4], we plan to split that into parts, which apply cleanly on
-> > > v7.3-rcx without any dependency and is in progress. This will be made available
-> > > as soon as it is ready. Until then [3] shows how this base series enables KVM
-> > > CCA support. You may find the tf-RMM [5] and kvmtool support [6] below.
-> > > 
-> > > [1] RMM spec : https://support.arm.com/documentation/den0137/2-0bet3/
-> > > [2] This series: https://gitlab.arm.com/linux-arm/linux-cca.git cca/cca-host/fw_rmm/v17
-> > > [3] KVM CCA v17 integration branch: https://gitlab.arm.com/linux-arm/linux-cca.git cca/cca-host/kvm-integration/v17
-> > > [4] Gmem inplace conversion https://github.com/googleprodkernel/linux-cc/tree/guest_memfd-inplace-conversion-v12
-> > > [5] TF-RMM https://git.trustedfirmware.org/TF-RMM/tf-rmm.git main (commit: 134266ae)
-> > 
-> > I understand that QEMU-virt is not intended to model a realistic
-> > production platform and that QEMU-SBSA is generally preferred. However,
-> > I sometimes use QEMU-virt to test functionality quickly because it runs
-> > slightly faster than QEMU-SBSA.
-> > 
-> > I tested this series with QEMU-virt and found that RMM initialization
-> > failed during boot:
-> > 
-> >    [...]
-> >    INFO:    BL31: Initializing RMM
-> >    INFO:    RMM init start.
-> >    ERROR:   RMM init failed: -8
-> >    WARNING: BL31: RMM initialization failed
-> > 
-> > The following TF-A revision was used:
-> >    https://git.trustedfirmware.org/TF-A/trusted-firmware-a.git master (38269bb)
-> > 
-> > After investigating, I found that the failure was caused by the lack of
-> > a plat_rmmd_reserve_memory() implementation for the QEMU-virt platform
-> > in TF-A. Adding an implementation equivalent to the QEMU-SBSA one
-> > resolved the issue:
-> >      https://git.trustedfirmware.org/plugins/gitiles/TF-A/trusted-firmware-a.git/+/9d594743aa4d4e8160cdf025ea7538041648972c
-> > 
-> > Is QEMU virt still intended to be supported as an RME emulation
-> > platform? In particular, is this functionality simply not implemented
-> > yet, or is there a reason why RME support is not planned for QEMU virt?
-> > 
-> > If this is not the appropriate place to discuss this, please let me
-> 
-> Mathieu, Lorenzo,
-> 
-> Over to you folks :-)
-> 
-> Cheers
-> Suzuki
-> 
-> 
-> > know :)
-> > 
+Right, that's the gap. Every mode-iterating test maps at a fixed low
+GVA (0xc0000000), so the new modes only ever fill entry 0 of the top
+table. If the series adds the modes, it should add a test that drives
+a VA into the 52-bit range.
+
+> >
+> > > To address this, the series introduces new guest modes for 52-bit VA
+> > > operation, adds five-level page table support where required, and
+> > > performs runtime detection of host 52-bit VA capability so that
+> > > LPA2-enabled guest VA tests are executed only on supported systems.
+> > >
+> > > Testing:
+> > >
+> > > Built and tested on arm64.
+> > > Verified on QEMU with a V52-capable guest configuration.
+> > > Confirmed correct operation of high virtual address mappings by
+> > > exercising guest memory accesses in the 52-bit VA range.
+> >
+> > I could not reproduce "exercising guest memory accesses in the 52-bit
+> > VA range" with anything in tree either. Could you say which test you
+> > ran, which guest modes, and on what?
+>
+> I just in guest_code() of existing one of the kselftests, mapped and
+> accessed a page at 1ULL << 49 using virt_pg_map() and on QEMU TCG mode
+> as I don't currently have access to the machines LPA and LPA2 features.
+
+That test is what the series needs, and you've already written it.
+Folding a mode-iterating version in tree would exercise the modes and
+make the cover letter's "52-bit VA range" line reproducible. It runs
+under TCG, so no LPA2 hardware needed.
+
+Cheers,
+/fuad
+
+> Thanks,
+> Itaru.
+> >
 > > Thanks,
-> > Kohei
-> > 
-> > > [6] kvmtool https://gitlab.arm.com/linux-arm/kvmtool-cca.git cca/kvm-v17
-> > > 
-> > > Known issues: RMMv2.0
-> > >   * RmiOpMemDonateReq:count (Uint14) is incompatible with RmiAddrRangeDesc4KB
-> > >    (Uint10) and RmiAddrRangeDesc16KB (Uint12). i.e., a larger contiguous request
-> > >    may not be satisfiable by the host. Arm is aware of this defect and a spec fix
-> > >    is in progress.
-> > > 
-> > > 
-> > > Steven Price (7):
-> > >    firmware: arm_rmm: Add SMC definitions for calling the RMM
-> > >    firmware: arm_rmm: Check for RMI support at init
-> > >    firmware: arm_rmm: Configure the RMM with the host's page size
-> > >    firmware: arm_rmm: Add support for SRO
-> > >    firmware: arm_rmm: Activate the RMM
-> > >    firmware: arm_rmm: Ensure the RMM has GPT entries for memory
-> > >    firmware: arm_rmm: Add wrappers for Realm related RMI commands
-> > > 
-> > >   arch/arm64/Kconfig                |   1 +
-> > >   arch/arm64/kernel/cpufeature.c    |   1 +
-> > >   drivers/firmware/Kconfig          |   1 +
-> > >   drivers/firmware/Makefile         |   1 +
-> > >   drivers/firmware/arm_rmm/Kconfig  |  26 +
-> > >   drivers/firmware/arm_rmm/Makefile |   2 +
-> > >   drivers/firmware/arm_rmm/rmi.c    | 819 ++++++++++++++++++++++++++++++
-> > >   include/linux/arm-rmi-cmds.h      | 678 +++++++++++++++++++++++++
-> > >   include/linux/arm-smccc-rmi.h     | 494 ++++++++++++++++++
-> > >   9 files changed, 2023 insertions(+)
-> > >   create mode 100644 drivers/firmware/arm_rmm/Kconfig
-> > >   create mode 100644 drivers/firmware/arm_rmm/Makefile
-> > >   create mode 100644 drivers/firmware/arm_rmm/rmi.c
-> > >   create mode 100644 include/linux/arm-rmi-cmds.h
-> > >   create mode 100644 include/linux/arm-smccc-rmi.h
-> > > 
-> > > -- 
-> > > 2.43.0
-> > > 
-> 
+> > /fuad
+> >
+> > > Signed-off-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+> > > Reviewed-by: Takayuki Okamoto <tokamoto@fujitsu.com>
+> > > ---
+> > > Itaru Kitayama (2):
+> > >       KVM: selftest: arm64: Support 5-level paging in stage 1 translation table
+> > >       KVM: selftests: arm64: Add 52-bit VA guest modes
+> > >
+> > >  .../selftests/kvm/include/arm64/processor.h        |  2 +
+> > >  tools/testing/selftests/kvm/include/kvm_util.h     |  3 +
+> > >  tools/testing/selftests/kvm/lib/arm64/processor.c  | 87 ++++++++++++++++++++--
+> > >  tools/testing/selftests/kvm/lib/guest_modes.c      |  5 ++
+> > >  tools/testing/selftests/kvm/lib/kvm_util.c         | 11 +++
+> > >  5 files changed, 103 insertions(+), 5 deletions(-)
+> > > ---
+> > > base-commit: 8d3ae59288f1e7d58d76558a6ee96d533bc5019f
+> > > change-id: 20260825-arm64-52bit-va-32f1f4cd050d
+> > >
+> > > Best regards,
+> > > --
+> > > Itaru Kitayama <itaru.kitayama@fujitsu.com>
+> > >
