@@ -1,238 +1,182 @@
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mta1.migadu.com (out-147.mta1.migadu.com [95.215.58.147])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1D81552938
-	for <kvmarm@lists.linux.dev>; Tue,  8 Sep 2026 14:56:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6477A54DAE2
+	for <kvmarm@lists.linux.dev>; Tue,  8 Sep 2026 14:56:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.147
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788879393; cv=none; b=SiuSKFfQl8eoEoP8MspaQ8fRI6ZirnG7n9SMonLi36g85WoK3Cjs5BXO+wl1UaF49fATxr3fTKdHMXpiK7zZshFv9NB+ZSsb22YXyUEotdkYOEUV2Dh86vxvUGIFDgLVstGqk7RTaogaqKLr8QvxIhFru+gD7QksdH7z1O5Guw8=
+	t=1788879427; cv=none; b=SooEAPF/wlXOg7huOBXYPhNJ4Imf4hIaA3CKJbvrW+Q1NVMZN6svQdaeerr/+6lUNW8wdfU9HfZzc4bF9sLZrObYaXMDTo6Sm57k+GiNeGo16xEjK/dIOxQdBb8r1KaHdFR+Wjuj7fHXRGxjjf/oXMeILq4QI4Q0zcQ6LLiwzoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788879393; c=relaxed/simple;
-	bh=o3j8gsak151UtxIp4nOhl5fbHJfOldIJo7hs4nC0ZZs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kDGmNsjAR3KGFdwy+PL0NcWQplsE6jSH0hfk1gRlsdE1sq/TP/fIp+GTu/jGmoXO8KwkAUH+JtZU++h4dDK2Q22ZnbD6mvRiJQvWwRgoXGYP2ZAvJHN9yTAuZBAlhYnu56XzY4CX5LoAUz2rPN39VdpooknGEfTLfxcvXOCt4U8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iGgX0knX; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1788879427; c=relaxed/simple;
+	bh=59BreB6WDZ8NymSddyrIoizrxnFpCUS1IZh4cVCjkzw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=juqLqvtVeMcuFp2fd7TgIzxnBOPOJQ9wtlMsyrv5YEMOO3QioEcSXQfvvBYtUou5A3fxeFH7e8u7R1zASUVxiQW01/s4QHLxZyyyKIluFfSjVX4GM3BQrJvOobrpyZAnrFikfd9sfbhqN6JKP82bSix8+x6C+/IqH3Hv+iofvJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=iTiewRnf; arc=none smtp.client-ip=95.215.58.147
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iGgX0knX"
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-499ac87c92bso50960265e9.1
-        for <kvmarm@lists.linux.dev>; Tue, 08 Sep 2026 07:56:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1788879385; x=1789484185; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=uSaDyXNNPLHKZbj3b8+laIVszUdNsLcjgEBe5WQFgWo=;
-        b=iGgX0knXi5yfgWw3hnFpyuMVHDypgykvhkcgJ7O19PCCxSmQTKeOF5ljkZcGa3HFDb
-         w4ImW7Lo7idetDCWGZKaaO8k94IBwi4fIwIslZJvwmTlEQ0MJ9rxj6PFQg9A5X5BMFEL
-         QGJbDGd12eR9mf+gJJUiuMQl9KqQTECPydYttTyB/CfjUr3DShV/hgeMBk/fvxGotOmp
-         N1G56MGK73KBJ3DhKItG9JVLyu/PzOSTuA/wg4kk4Rlnhk4L5ztNDu+isB2Y5M3AYQXc
-         Hrv+qYqw9C0xHbXaJyr6ODyLDUHIBTDbq5dqZhZm30kNhA68ncBVNQ2mRhzzQN1uveN9
-         pvnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788879385; x=1789484185;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=uSaDyXNNPLHKZbj3b8+laIVszUdNsLcjgEBe5WQFgWo=;
-        b=sWWwdI/ghWL7ALWLVLBhti1WyshNaZqrDzSW6w9mLP8Kd+lVHopwp5W1tL5/vCKN9V
-         XIOF52lyjOTv4/6tRRQ7RJwWcuBGmVi85jAuSyK8Krn8L8wY3v1x3agv6BhXiMeGeA1S
-         07VJ1TY1R3S5c7Ism38hajERbuz3BrG7crhRXnnPD9JH7uvzNaP11HDBw/jEzMicXGLf
-         Nu/ZrAQISm63TBLtuTyOEiR/Vp4Urnjk3t+kQIBK4FB6nCtaLXC9r941mPRdO+18xYWL
-         omg8mKHwxjRiIVtr63C5O/7fmbgOio0nRVIl2rFpKVYSKCmux8Rt2Bz2YVTvNXbF40UK
-         Mc9w==
-X-Forwarded-Encrypted: i=1; AKwUvByA0q/8g2IEROLhpoGYjLBKpGxBLwnkHY9g17vKhY2ThiHHt7tHycdHVvd/bXUeCQAQDNTWBWE=@lists.linux.dev
-X-Gm-Message-State: AFuF++mroljd/9I/nrmoRmXgxq2sJqC3L4648QAOAIIX3L7BQibB566K
-	jK8Z9qD4zbJhPrFvI72iO4mpijZxBrh1IF7Ehyc7wRFjnKe+dNdExT/Whp+xBumQ7A==
-X-Gm-Gg: AYBFou0VU+RB8bXKVO2eQFfBcyrezleC4308DCosYhOJZDaQSzV5q5/uTvVoWi1q4Dm
-	4wis4LpmVFk/rtJ14tNLll3ynq0c3rTxDA4DKtpV4NF2VN47VQWCTYLrkax1EBHLIAJLHAPCRqP
-	kBDYyi4xdCSd9Pb5uFvccDQrxYeodQklDhe5b5c7I2UC8GKdcMyBW+dA+RSWIgE2CyHAdZEaMwT
-	eOD9ISgGQ1xqXqYArF/NavTsn9EJ5WshB4ekDPnxt2O2fPtGsh/8HEk0qBOPkxV743qOEg63wRR
-	X9g5h5zYVZ7hHmhy8YSjeGDyB7jWBt2zTCqZPkZrIOX7vmbGGbrZdI/KuU0Y9f5JJVCgcUzHvq5
-	tRygl3XxtofbogIlxxQIcb6zr8hoSqZ9joi+0NDTE44XHeScvZd6HBGl/qxWYaemkAhomXXmrtO
-	d7p74kOdY/g8NTnKVPnZpmrYWZ5aXSb/JoYrZ5TBnl6gJzy0fj6SjqtGUFyTEIEoo8TZPR7ATPr
-	Raj1Sfos8eGWEu2ZFCutWLxn0VnWtz0
-X-Received: by 2002:a05:600c:154f:b0:49c:fc6e:8cb5 with SMTP id 5b1f17b1804b1-49cfc6e8ee3mr300453305e9.25.1788879383965;
-        Tue, 08 Sep 2026 07:56:23 -0700 (PDT)
-Received: from google.com (135.91.155.104.bc.googleusercontent.com. [104.155.91.135])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49cf7703cc7sm399626395e9.4.2026.09.08.07.56.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Sep 2026 07:56:23 -0700 (PDT)
-Date: Tue, 8 Sep 2026 15:56:20 +0100
-From: Vincent Donnefort <vdonnefort@google.com>
-To: Wei-Lin Chang <weilin.chang@arm.com>
-Cc: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com,
-	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com,
-	fuad.tabba@linux.dev, qperret@google.com, keirf@google.com
-Subject: Re: [PATCH 18/20] KVM: arm64: Add PKVM_HYP_REQ_SPLIT
-Message-ID: <aqAiFGL4gm_j2HSv@google.com>
-References: <20260803100904.3563942-1-vdonnefort@google.com>
- <20260803100904.3563942-19-vdonnefort@google.com>
- <b55i2bcuqp2wgadrj5a6nuc3t4o7ordrlcugxhhjw37k6hrlks@2h7ulmokholz>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="iTiewRnf"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=59BreB6WDZ8NymSddyrIoizrxnFpCUS1IZh4cVCjkzw=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1788879412; v=1; x=1789484212;
+ b=iTiewRnfs6WhEPl9L4Ikt5xIDNDE4RYqzzb8xTatOmehzVb1mzeCo6YsfgP0Vp4xk5la3A3Q
+ 5IB6H7NCWu2NN9hztdn91IPx57MfbSTX2JmhP+7kB6u4D79ou4zGNHoxU7jXhuGBZVMNG6MfXrl
+ gQoOyU0vPxel1luFvzUhFWgs=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id f618ec6996b6b0c2;
+	Tue, 08 Sep 2026 14:56:52 +0000
+X-Mizu-Trace-ID: f618ec6996b6b0c2
+X-Migadu-Flow: FLOW_OUT
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>
+Cc: James Morse <james.morse@arm.com>,
+	Ben Horgan <ben.horgan@arm.com>,
+	Xi Ruoyao <xry111@xry111.site>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Yuan Yao <yaoyuan@linux.alibaba.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2] KVM: arm64: Trap guest MPAM accesses whenever MPAM is implemented
+Date: Tue,  8 Sep 2026 15:56:51 +0100
+Message-Id: <20260908145651.2828597-1-fuad.tabba@linux.dev>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b55i2bcuqp2wgadrj5a6nuc3t4o7ordrlcugxhhjw37k6hrlks@2h7ulmokholz>
+Content-Transfer-Encoding: 8bit
 
-[...]
+finalise_el2_state() clears the EL2 MPAM traps whenever the ID
+registers advertise MPAM, while KVM sets them only under ARM64_MPAM,
+which also requires MPAMEN. Without EL3 nothing sets that enable, so a
+guest reaches the MPAM registers while ID_AA64PFR0_EL1.MPAM reads 0
+for it.
 
-> > +static void pkvm_mapping_split(struct pkvm_mapping *mapping, struct kvm_pgtable *pgt,
-> > +			       struct list_head *spares)
-> > +{
-> > +	struct kvm *kvm = kvm_s2_mmu_to_kvm(pgt->mmu);
-> > +	u64 nr_pages = mapping->nr_pages - 1;
-> > +	gfn_t gfn = mapping->gfn + 1;
-> > +	u64 pfn = mapping->pfn + 1;
-> > +
-> > +	lockdep_assert_held_write(&kvm->mmu_lock);
-> > +
-> > +	pkvm_mapping_remove(mapping, &pgt->pkvm_mappings);
-> > +	mapping->nr_pages = 1;
-> > +	pkvm_mapping_insert(mapping, &pgt->pkvm_mappings);
-> > +
-> > +	while (nr_pages--) {
-> > +		struct pkvm_mapping *m;
-> > +
-> > +		if (WARN_ON(list_empty(spares)))
-> > +			break;
-> > +
-> > +		m = list_first_entry(spares, struct pkvm_mapping, list);
-> > +		list_del(&m->list);
-> > +
-> > +		m->nr_pages = 1;
-> > +		m->gfn = gfn++;
-> > +		m->pfn = pfn++;
-> > +
-> > +		pkvm_mapping_insert(m, &pgt->pkvm_mappings);
-> > +	}
-> > +}
-> > +
-> 
-> I don't see anything wrong with this linked list approach, but have you
-> considered just allocating an array of pointers for the allocated
-> pkvm_mappings? The union in pkvm_mappings can be avoided.
+Gate the traps on the ID registers alone: MPAMEN isn't a term in any
+MPAM accessor, so they take effect without it. The cap tests the
+sanitised ID fields, which never exceed a CPU's own, so it's set only
+where finalise_el2_state already wrote MPAM2_EL2. MPAM3_EL3.TRAPLOWER
+is clear there, and arm64.nompam turns the cap off too.
 
-I have, but it doesn't fit the reclaim path which frees pkvm_mapping as a single
-object.
+Fixes: 23b33d1e168c ("arm64: head.S: Initialise MPAM EL2 registers and disable traps")
+Reviewed-by: Yuan Yao <yaoyuan@linux.alibaba.com>
+Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+---
 
-> 
-> >  int pkvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
-> >  			     struct kvm_pgtable_mm_ops *mm_ops)
-> >  {
-> > @@ -619,6 +682,91 @@ int pkvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size, void
-> >  	return -EINVAL;
-> >  }
-> >  
-> > +/*
-> > + * Splitting is only expected on the back of a guest HVC, while
-> > + * pkvm_pgtable_stage2_split() can be called with dirty logging.
-> > + */
-> > +static int __pkvm_pgtable_stage2_split(struct kvm_vcpu *vcpu, phys_addr_t ipa, u64 size)
-> > +{
-> > +	struct kvm_hyp_memcache *mc = &vcpu->arch.pkvm_memcache;
-> > +	struct kvm_pgtable *pgt = vcpu->arch.hw_mmu->pgt;
-> > +	struct page **pages __free(kfree) = NULL;
-> > +	struct mm_struct *mm = current->mm;
-> > +	struct kvm_memory_slot *memslot;
-> > +	struct pkvm_mapping *mapping;
-> > +	struct kvm *kvm = vcpu->kvm;
-> > +	struct list_head spares;
-> > +	unsigned long hva;
-> > +	bool writable;
-> > +	u64 nr_pages;
-> > +	int ret, idx;
-> > +	gfn_t gfn;
-> > +
-> > +	if (WARN_ON(!kvm_vm_is_protected(kvm)))
-> > +		return -EINVAL;
-> > +
-> > +	if (!IS_ALIGNED(ipa, PMD_SIZE) || size != PMD_SIZE)
-> > +		return -EINVAL;
-> > +
-> > +	ret = topup_hyp_memcache(mc, 1);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	/* We already have 1 pin on the huge-page */
-> > +	gfn = gpa_to_gfn(ipa) + 1;
-> > +	nr_pages = (size / PAGE_SIZE) - 1;
-> > +	pages = kmalloc_objs(struct page *, nr_pages);
-> > +	if (!pages)
-> > +		return -ENOMEM;
-> > +
-> > +	INIT_LIST_HEAD(&spares);
-> > +	ret = pkvm_mapping_alloc_spares(&spares, nr_pages);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	idx = srcu_read_lock(&kvm->srcu);
-> > +	memslot = gfn_to_memslot(kvm, gfn);
-> > +	hva = gfn_to_hva_memslot_prot(memslot, gfn, &writable);
-> > +	if (kvm_is_error_hva(hva) || !writable) {
-> > +		ret = -EFAULT;
-> > +		goto unlock_srcu;
-> > +	}
-> > +
-> > +	mmap_read_lock(mm);
-> > +	ret = pin_user_pages(hva, nr_pages, FOLL_HWPOISON | FOLL_LONGTERM | FOLL_WRITE, pages);
-> 
-> If I am not mistaken this is for getting additional pins only. hva walk
-> and pages[] are just by-product.
-> 
-> Can we use folio_add_pins() here instead? Then I think we won't need
-> pages[], the hva walk, and unpin_user_pages().
+Notes:
+    Changes since v1:
+     - Commit message only. The code is unchanged, so Yuan Yao's
+       Reviewed-by is carried.
+     - Fixes: names the commit that cleared the traps, rather than the
+       one that added KVM's trapping.
+     - Says why the sanitised ID fields are the safe gate: the cap is set
+       only where finalise_el2_state already wrote MPAM2_EL2.
+    
+    Not covered, and answered on the v1 thread: a machine whose CPUs
+    differ on MPAM, raised by Ben and by sashiko.
+    
+    v1: https://lore.kernel.org/all/20260903160819.831518-1-fuad.tabba@linux.dev/
 
-Good point, folio_add_pins() sounds way simpler.
+ arch/arm64/include/asm/cpufeature.h     |  5 +++++
+ arch/arm64/kernel/cpufeature.c          | 13 +++++++++++++
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  4 ++--
+ arch/arm64/tools/cpucaps                |  1 +
+ 4 files changed, 21 insertions(+), 2 deletions(-)
 
+diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+index 7404a6e83a930..8863ae99596bc 100644
+--- a/arch/arm64/include/asm/cpufeature.h
++++ b/arch/arm64/include/asm/cpufeature.h
+@@ -873,6 +873,11 @@ static __always_inline bool system_supports_mpam_hcr(void)
+ 	return alternative_has_cap_unlikely(ARM64_MPAM_HCR);
+ }
+ 
++static __always_inline bool system_supports_mpam_sysregs(void)
++{
++	return alternative_has_cap_unlikely(ARM64_MPAM_SYSREGS);
++}
++
+ static inline bool system_supports_pmuv3(void)
+ {
+ 	return cpus_have_final_cap(ARM64_HAS_PMUV3);
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 17b83a2518a8f..36a27692e5cf7 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -2501,6 +2501,13 @@ test_has_mpam(const struct arm64_cpu_capabilities *entry, int scope)
+ 	return (read_sysreg_s(SYS_MPAM1_EL1) & MPAM1_EL1_MPAMEN);
+ }
+ 
++static bool
++test_has_mpam_sysregs(const struct arm64_cpu_capabilities *entry, int __unused)
++{
++	/* The registers exist whether or not firmware enabled MPAM. */
++	return detect_ftr_has_mpam();
++}
++
+ static void
+ cpu_enable_mpam(const struct arm64_cpu_capabilities *entry)
+ {
+@@ -3116,6 +3123,12 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.matches = test_has_mpam,
+ 		.cpu_enable = cpu_enable_mpam,
+ 	},
++	{
++		.desc = "Memory Partitioning And Monitoring system registers",
++		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
++		.capability = ARM64_MPAM_SYSREGS,
++		.matches = test_has_mpam_sysregs,
++	},
+ 	{
+ 		.desc = "Memory Partitioning And Monitoring Virtualisation",
+ 		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 1ce7130e25490..8941335724f6b 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -298,7 +298,7 @@ static inline void  __activate_traps_mpam(struct kvm_vcpu *vcpu)
+ 	u64 clr = MPAM2_EL2_EnMPAMSM;
+ 	u64 set = MPAM2_EL2_TRAPMPAM0EL1 | MPAM2_EL2_TRAPMPAM1EL1;
+ 
+-	if (!system_supports_mpam())
++	if (!system_supports_mpam_sysregs())
+ 		return;
+ 
+ 	/* trap guest access to MPAMIDR_EL1 */
+@@ -317,7 +317,7 @@ static inline void __deactivate_traps_mpam(void)
+ 	u64 clr = MPAM2_EL2_TRAPMPAM0EL1 | MPAM2_EL2_TRAPMPAM1EL1 | MPAM2_EL2_TIDR;
+ 	u64 set = MPAM2_EL2_EnMPAMSM;
+ 
+-	if (!system_supports_mpam())
++	if (!system_supports_mpam_sysregs())
+ 		return;
+ 
+ 	sysreg_clear_set_s(SYS_MPAM2_EL2, clr, set);
+diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+index 2775ba3359cfe..aa5be51385f68 100644
+--- a/arch/arm64/tools/cpucaps
++++ b/arch/arm64/tools/cpucaps
+@@ -78,6 +78,7 @@ KVM_PROTECTED_MODE
+ MISMATCHED_CACHE_TYPE
+ MPAM
+ MPAM_HCR
++MPAM_SYSREGS
+ MTE
+ MTE_ASYMM
+ MTE_FAR
 -- 
-Vincent
+2.39.5
 
-> 
-> Thanks,
-> Wei-Lin Chang
-> 
-> > +	mmap_read_unlock(mm);
-> > +	if (ret != nr_pages) {
-> > +		if (ret > 0)
-> > +			unpin_user_pages(pages, ret);
-> > +		ret = -EFAULT;
-> > +		goto unlock_srcu;
-> > +	}
-> > +
-> > +	write_lock(&kvm->mmu_lock);
-> > +	mapping = pkvm_mapping_iter_first(&pgt->pkvm_mappings, ipa, ipa + size - 1);
-> > +	if (!pkvm_mapping_can_split(mapping)) {
-> > +		ret = -EINVAL;
-> > +		goto unlock_mmu;
-> > +	}
-> > +
-> > +	ret = kvm_call_hyp_nvhe(__pkvm_host_split_guest, gpa_to_gfn(ipa), size / PAGE_SIZE);
-> > +	if (ret)
-> > +		goto unlock_mmu;
-> > +
-> > +	pkvm_mapping_split(mapping, pgt, &spares);
-> > +
-> > +unlock_mmu:
-> > +	write_unlock(&kvm->mmu_lock);
-> > +	if (ret)
-> > +		unpin_user_pages(pages, nr_pages);
-> > +
-> > +unlock_srcu:
-> > +	srcu_read_unlock(&kvm->srcu, idx);
-> > +	pkvm_mapping_free_spares(&spares);
-> > +
-> > +	return ret;
-> > +}
-> > +
-> 
-> [...]
-> 
