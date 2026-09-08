@@ -1,43 +1,43 @@
-Received: from mta1.migadu.com (out-155.mta1.migadu.com [95.215.58.155])
+Received: from mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 869A63A838A
-	for <kvmarm@lists.linux.dev>; Tue,  8 Sep 2026 08:08:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.155
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9516D3AE1A8
+	for <kvmarm@lists.linux.dev>; Tue,  8 Sep 2026 08:08:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788854924; cv=none; b=miLErRwKd3KljEdfX28vO40EvqGlJ3ojOndlf5SmHXuwh2EUGLeeW+n51VRN/pftzuWEWlhgEHNcdub8baBYHTkwqpWubYfvhoUrhAC+NityX4qVn+ZQOvNQRBDuFLEsLLoMHJDcf2sMC1R86+zxgepe59b/GTME3gjO9o6lCPE=
+	t=1788854936; cv=none; b=gIS/T0rClIjsKLwdmiq6yhSLEKu/Cr229kZNFWKyiwfqK6+gywrBBSgNCXhmx+wz10N3zhR9KsITyJ5oeQp7Q7iO6eCiOwL5Dytqyqg3P7Di8ID1jSIHNIo8/SqQ/jXUCU0zhZzvGwn7jz9WFRnwa6l8MlOKRHuL3EI8RfabOLk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788854924; c=relaxed/simple;
-	bh=wj96FLvK72m67pH3jNQ0C+1v/0ID0Ycr2wlTUU5TRzE=;
+	s=arc-20240116; t=1788854936; c=relaxed/simple;
+	bh=XGg4zKBZIdsYlLMLs2Et22MQ6qSUt/Oz2PZF17USj98=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fvQBVaF+aYuyv7TAeo9sdUcAyB3oY55VX4uwB7oC641RiKOTiXMjch9UHUCPzUhOsYWv6TkdsB+Co3PyE/gth0e8tAdBadvYrTzwjn+R2k8TRpK39rtiQiOVN+0jyCPJw/Q5LzSJwZKaEDj9XwNS9AisfTYCs7QyitcFFxYsNzg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=h/ymhbPy; arc=none smtp.client-ip=95.215.58.155
+	 To:Cc:Content-Type; b=OUMch6oBGD+BtYXg9JTsu53DbO1S9Fax9stu96IKqZgg/JoydyOHBQpigXcOXNL767oMFVzaYBSK9Xxv4LMh5pTOaglH82uWCh1mXSFFNTDItCCMuYtiBwVdVD0F53FxU5vb3lnotpp2DzU7uIcuGZe8mqOde7rrw0c/SqiT/5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Mlmo+YQs; arc=none smtp.client-ip=95.215.58.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="h/ymhbPy"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Mlmo+YQs"
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=wj96FLvK72m67pH3jNQ0C+1v/0ID0Ycr2wlTUU5TRzE=;
+DKIM-Signature: a=rsa-sha256; bh=XGg4zKBZIdsYlLMLs2Et22MQ6qSUt/Oz2PZF17USj98=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1788854920; v=1; x=1789459720;
- b=h/ymhbPyLoeIJLovY7rdy8gC73u2vpGOx3bWLVFpQpWHrJaNxrYMyBODiycho4ICuSthoMYN
- DcJv7BxQzZP0YR8wGuaXxShSblf9Zy/wM0AI9yLg/hS/O5Hfz+f9HJGVCSPg+Dn89YTk8016eoO
- iCGaGGh0KvboK1oEYzOL1Oag=
+ t=1788854932; v=1; x=1789459732;
+ b=Mlmo+YQsRFmtBH5iYzY6FOWx307HAgCWIFqnTY3SM3f79Wo+uhZJbGYBJJI0IIs6JJRDFWIE
+ GvbmGf932C2bm9c5GsIPm52hi6jijHdfhCoSQ9XzA0EjImPrJm8kIcLx7X+aeETjMZLoZrNVHmz
+ TKnl30lHWPqdcJWfZ3e/NW4A=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 2e6a948036b58959;
-	Tue, 08 Sep 2026 08:08:40 +0000
-X-Mizu-Trace-ID: 2e6a948036b58959
+Received: by smtp.migadu.com with ESMTPS id cfdab9a9098379f8;
+	Tue, 08 Sep 2026 08:08:52 +0000
+X-Mizu-Trace-ID: cfdab9a9098379f8
 X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b4a0b17358so10226e87.1
-        for <kvmarm@lists.linux.dev>; Tue, 08 Sep 2026 01:08:40 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBxxXl+QwfNOlwxK+VyEHCfIAFh1VHbtbqcnvBbBspzqhTBCYJrHTnoC6QnfxPmbC3U14lWp7BE=@lists.linux.dev
-X-Gm-Message-State: AFuF++m4lk2z0xQWg6iUPahPZZg59sTQwtdDQcicDAqyqLH21J5RA6af
-	n5lgC3ZSqkEpbzdC/zf1xpny4ox5kKGjucjSphBrZV8birffzYV2Eq9rGjqeuL7LW99XUiJ/IFi
-	gKAynndeJTJ0tjX3G5fPp0RtyXW4sgQI8dKt4SW6z
-X-Received: by 2002:a05:6512:6412:b0:5ae:b918:79d5 with SMTP id
- 2adb3069b0e04-5b74d1658d8mr213819e87.2.1788854919259; Tue, 08 Sep 2026
- 01:08:39 -0700 (PDT)
+Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b4a0b17359so14293e87.0
+        for <kvmarm@lists.linux.dev>; Tue, 08 Sep 2026 01:08:48 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBwsH8WLbZ9TQjAIA3/rE0sgG0LBBG+Wz8xWD57y3S3m5dxQzgtfe4OkTBkajP6JIrWaXr7D2Ko=@lists.linux.dev
+X-Gm-Message-State: AFuF++nZW/UYWUdQb3eM7/zCLICxIrvqfoBbg3WiFJCq3CCvz4f8wnLU
+	UalpgX8r482j3yDRNyRKULsPFvtx5qkEawpTVNkzn/SdTQRE8Pc9aRDbsAHk1Eg0gXaI9ackb3h
+	PbEv8zQRw2/YqVedO/oT84FxyJ6nWlfhEpW1edJZX
+X-Received: by 2002:a05:6512:1344:b0:5b6:186e:682f with SMTP id
+ 2adb3069b0e04-5b751a5bf63mr134070e87.0.1788854927331; Tue, 08 Sep 2026
+ 01:08:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -45,16 +45,15 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 References: <20260826-arm64-52bit-va-v1-0-14ec98211363@fujitsu.com>
- <20260826-arm64-52bit-va-v1-1-14ec98211363@fujitsu.com> <CA+EHjTy6EH-d=O+dtRdWdTUkS0zkXeW=auxiK6N5Dc-yihrYRw@mail.gmail.com>
- <ap9oag87vZiuTVer@sm-arm-grace07>
-In-Reply-To: <ap9oag87vZiuTVer@sm-arm-grace07>
+ <20260826-arm64-52bit-va-v1-2-14ec98211363@fujitsu.com> <CA+EHjTyJpPd8HjaWBw0V6pHF9UR0w2UFmaKDe7U3O+Sj8wiyPg@mail.gmail.com>
+ <ap8rnTINMJQqfYGL@sm-arm-grace07>
+In-Reply-To: <ap8rnTINMJQqfYGL@sm-arm-grace07>
 From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Tue, 8 Sep 2026 09:08:03 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTx+Dtt-v8_6g1Rj9vO6j_7zRwjxywjYUXbgUj+FfsV6Rg@mail.gmail.com>
-X-Gm-Features: AcwNN1WmotBPGHexNMlSdHcPHTVxfo5f6HxmhkMWAF9Pb_2HyxTj1nidelDjEwA
-Message-ID: <CA+EHjTx+Dtt-v8_6g1Rj9vO6j_7zRwjxywjYUXbgUj+FfsV6Rg@mail.gmail.com>
-Subject: Re: [PATCH 1/2] KVM: selftest: arm64: Support 5-level paging in stage
- 1 translation table
+Date: Tue, 8 Sep 2026 09:08:11 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTwhoZEORBjJcUb1WQbFT1TtX8x=BeeMJAcdpEBVJJ265Q@mail.gmail.com>
+X-Gm-Features: AcwNN1UAtKldnq8E5xQ_R8tgfkqEMJun_timebwDOYCwtGlMYwbA3T-yjMp633c
+Message-ID: <CA+EHjTwhoZEORBjJcUb1WQbFT1TtX8x=BeeMJAcdpEBVJJ265Q@mail.gmail.com>
+Subject: Re: [PATCH 2/2] KVM: selftests: arm64: Add 52-bit VA guest modes
 To: Itaru Kitayama <itaru.kitayama@fujitsu.com>
 Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
 	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
@@ -64,86 +63,95 @@ Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey Gouly 
 	linux-kernel@vger.kernel.org, Takayuki Okamoto <tokamoto@fujitsu.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Hi Itaru,
-
-On Tue, 8 Sept 2026 at 02:44, Itaru Kitayama <itaru.kitayama@fujitsu.com> wrote:
-...
-> > This changes what level means for the existing three-level modes:
-> > level 0 used to return the top-level entry and now trips the assert,
-> > level 1 used to return the leaf and now returns the top level. No
-> > caller in tree asks for either of those two levels, and the new
-> > numbering matches the architecture.
+On Mon, 7 Sept 2026 at 22:24, Itaru Kitayama <itaru.kitayama@fujitsu.com> wrote:
 >
-> Yes, as you checked this change won't break current tests, so if you
-> have better comments I will replace it with yours.
+> Hi Fuad,
+> On Fri, Sep 04, 2026 at 09:45:30AM +0100, Fuad Tabba wrote:
+> > Hi Itaru,
+> >
+> > On Tue, 25 Aug 2026 at 22:18, Itaru Kitayama <itaru.kitayama@fujitsu.com> wrote:
+> > ...
+> > > diff --git a/tools/testing/selftests/kvm/lib/arm64/processor.c b/tools/testing/selftests/kvm/lib/arm64/processor.c
+> > > index 9108e14a9b5b..bcdf670c9eb8 100644
+> > > --- a/tools/testing/selftests/kvm/lib/arm64/processor.c
+> > > +++ b/tools/testing/selftests/kvm/lib/arm64/processor.c
+> > > @@ -46,7 +46,7 @@ static u64 pud_index(struct kvm_vm *vm, gva_t gva)
+> > >         u64 mask = (1UL << (vm->page_shift - 3)) - 1;
+> > >
+> > >         TEST_ASSERT(vm->mmu.pgtable_levels >= 4,
+> > > -                   "Mode %d does not have at least 4 page table levels",
+> > > +                   "Mode %d does not have >= 4 page table levels",
+> >
+> > Patch 1 added this string one commit earlier. Could it go in with the
+> > final wording there?
+>
+> Surely, will fix in v2.
+>
+> >
+> > ...
+> >
+> > > @@ -298,10 +304,14 @@ struct kvm_vm *____vm_create(struct vm_shape shape)
+> > >
+> > >         /* Setup mode specific traits. */
+> > >         switch (vm->mode) {
+> > > +       case VM_MODE_P52V52_4K:
+> > > +               vm->mmu.pgtable_levels = 5;
+> > > +               break;
+> >
+> > This is now the deepest mode, so page_fault_test.c's sizing is stale:
+> >
+> >    * VM_MODE_P48V48_4K is the mode with most PT pages; let's use
+> >    * twice that just in case.
+> >   pt_size = 26 * guest_page_size;
+> >
+> > The margin still covers it. Could pt_size come from vm->mmu.pgtable_levels?
+>
+> I'm not the author of the page_fault_test.c for arm64, but so I'm
+> guessing here; per the comment in the test, I dont think total number of
+> levels determines pt_size, rather by the addresses prepared for the
+> test.
+>
+> This stress test does not require high virtual addresses, though should
+> we update the comment while at it?
 
-The code comment reads fine. What's worth adding is a commit-message
-note on the behavior change:
+You're right, pgtable_levels alone wouldn't capture it: what sizes
+pt_size is the granule and how much the test maps, not the depth.
 
-  For 3-level (64K) modes this renumbers the levels to match the
-  architecture: level 0 is no longer valid, level 1 is the top entry.
-  No in-tree caller passes those levels.
-
-...
-
-> Yes, I've dropped the _va_size() function and instead, expanded a bit
-> as you suggested the aarch64_get_supported_page_sizes() to check if vcpu
-> can address upto 52-bit VA space or not (48-bit max).
-
-Sounds good. One thing for v2: 52-bit VA support is per-granule, so a
-single 52-vs-48 result won't hold across granules.
-ID_AA64MMFR2_EL1.VARange is the 64K indicator. 4K and 16K get 52-bit
-VA from LPA2.
+So just updating the comment is enough: name VM_MODE_P52V52_4K as the
+deepest mode. At 5 levels it's the deepest any 4K mode uses, so the 2x
+margin holds and the constant won't need revisiting.
 
 Cheers,
 /fuad
 
+
+>
 > Thanks,
 > Itaru.
+>
 > >
 > > Cheers,
 > > /fuad
 > >
 > >
-> > > +{
-> > > +       struct kvm_vcpu_init preferred_init = {};
-> > > +       int kvm_fd, vm_fd, vcpu_fd, err;
-> > > +       u64 val;
-> > > +       u32 va_range;
-> > > +       struct kvm_one_reg reg = {
-> > > +               .id     = KVM_ARM64_SYS_REG(SYS_ID_AA64MMFR2_EL1),
-> > > +               .addr   = (u64)&val,
-> > > +       };
-> > > +
-> > > +       kvm_fd = open_kvm_dev_path_or_exit();
-> > > +       vm_fd = __kvm_ioctl(kvm_fd, KVM_CREATE_VM, NULL);
-> > > +       TEST_ASSERT(vm_fd >= 0, KVM_IOCTL_ERROR(KVM_CREATE_VM, vm_fd));
-> > > +
-> > > +       vcpu_fd = ioctl(vm_fd, KVM_CREATE_VCPU, 0);
-> > > +       TEST_ASSERT(vcpu_fd >= 0, KVM_IOCTL_ERROR(KVM_CREATE_VCPU, vcpu_fd));
-> > > +
-> > > +       err = ioctl(vm_fd, KVM_ARM_PREFERRED_TARGET, &preferred_init);
-> > > +       TEST_ASSERT(err == 0, KVM_IOCTL_ERROR(KVM_ARM_PREFERRED_TARGET, err));
-> > > +
-> > > +       err = ioctl(vcpu_fd, KVM_ARM_VCPU_INIT, &preferred_init);
-> > > +       TEST_ASSERT(err == 0, KVM_IOCTL_ERROR(KVM_ARM_VCPU_INIT, err));
-> > > +
-> > > +       err = ioctl(vcpu_fd, KVM_GET_ONE_REG, &reg);
-> > > +       TEST_ASSERT(err == 0, KVM_IOCTL_ERROR(KVM_GET_ONE_REG, err));
-> > > +
-> > > +       va_range = FIELD_GET(ID_AA64MMFR2_EL1_VARange, val);
-> > > +
-> > > +       close(vcpu_fd);
-> > > +       close(vm_fd);
-> > > +       close(kvm_fd);
-> > > +
-> > > +       return va_range >= ID_AA64MMFR2_EL1_VARange_52 ? 52 : 48;
-> > > +}
-> > > +
-> > >  void aarch64_get_supported_page_sizes(u32 ipa, u32 *ipa4k,
-> > >                                       u32 *ipa16k, u32 *ipa64k)
-> > >  {
+> > >         case VM_MODE_P52V48_4K:
+> > >                 vm->mmu.pgtable_levels = 4;
+> > >                 break;
+> > >         case VM_MODE_P52V48_64K:
+> > > +       case VM_MODE_P52V52_64K:
+> > >                 vm->mmu.pgtable_levels = 3;
+> > >                 break;
+> > >         case VM_MODE_P48V48_4K:
+> > > @@ -322,6 +332,7 @@ struct kvm_vm *____vm_create(struct vm_shape shape)
+> > >         case VM_MODE_P48V48_16K:
+> > >         case VM_MODE_P40V48_16K:
+> > >         case VM_MODE_P36V48_16K:
+> > > +       case VM_MODE_P52V52_16K:
+> > >                 vm->mmu.pgtable_levels = 4;
+> > >                 break;
+> > >         case VM_MODE_P47V47_16K:
 > > >
 > > > --
 > > > 2.43.0
 > > >
+> >
