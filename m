@@ -1,80 +1,86 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EEC62DCF6C;
-	Tue,  8 Sep 2026 20:50:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25A2D3BE63F;
+	Tue,  8 Sep 2026 20:55:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788900655; cv=none; b=mUpqwa1uwxH6Dj8nTFp6b72I1kopSdHkTBIt8qg1noHJAG4DhOs8LE87d2tU7vk96C+gj3e3W35Hd/FFLHwm0u5TCatlAHCrg8XR+Y9QPfM4Z4mUfQUaF5fweA6xWqupo3GbcKKPGTqCA0i+CNvz696CcSpfyT59td+8Wg2c008=
+	t=1788900933; cv=none; b=rKw03OeHXR58rZCaP5gZ6TsXFMe6d+iVKJ5y/kk+nttxD1NwaMF9XF71aAJCTY/fWMNU7XpTya2kJGIgM1LGAvlwgYZTXV0WGV8SOQmj7ydaBr7U7vxCxC1Z4Yya/6mpfEwYsT7jV/TtaChME7AUZpAk+OwS5k2FgF4m4l3pN/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788900655; c=relaxed/simple;
-	bh=vD8pyvJH9zExt6WnCQIxdMdMPT7fIPfl/Tt6ZaSa2io=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=ESuy31WMHPxkUE0umweR44S0PdT2pqtcbqC1HHisvbdeOiqniFx5aQM0qbUCCzBZ383XvSXdq9ikQcSDgxDh3PX8BbDZF9ilxe2RFQzS6Z8kQfhepagFHTrgGhRXDEPtRF8PgboWw43xLdulUnFgvy2PAmWWIeFQShmr6LjN7RA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ct01ES6L; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788900933; c=relaxed/simple;
+	bh=toPQwwfV7kExNIA7hPDUbKJWuQC5GHRKZSUYt5snD7c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DwozxVv6yNAsgyhX8tLt5RgBdbkhaGf/Cmh77ZaN/JMHcQENcK95MJB2nLUV7rDVKP/dNHWOFud3Ug+msAsm98EusDPX/I4ATgvjn0VdxGvXVfAwz/ZrWR8rvc9ZHDB/+O/jf5lp+7cZFEbZ3eeCXawxqofaytfmTWG8m3DltiQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bH432aN9; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ct01ES6L"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 458911F00A3A;
-	Tue,  8 Sep 2026 20:50:53 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bH432aN9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 874821F00A3D;
+	Tue,  8 Sep 2026 20:55:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788900654;
-	bh=vD8pyvJH9zExt6WnCQIxdMdMPT7fIPfl/Tt6ZaSa2io=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=Ct01ES6Luu+8LvDBzBh2nqCNSNHUgfpBzJaXjML+RJMmTOkUZQo6ubYHgsaqlIC+p
-	 1htTPGEpYOps6ztf5bmYa4fprchScdXUpKphHZqPNbjiAI+r+kFnEQzR4CiA0D1sW0
-	 ZdAofQpCalMdBzmLjftE1Wju59UjQWTI/ZkQUlyLaLu33YDGuxs9z5XrT+W0nKUGsE
-	 RatWbXhV8Vhivnhv9kpFYKwjpgSzjX+QOBcu2f5xhVXubc9P9VGAfXtlOq8nCTouHl
-	 yTwyu4T2glKdWqPZ11eCcGzyfzfcTJijoFh9RKQ5tDhl3jal/IURHmWhVPSM4gRdpl
-	 1U32vRYkpzBVA==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 37/39] fuse: dax: do not set VM_MIXEDMAP
-Reply-To: sashiko-reviews@lists.linux.dev
-To: =?utf-8?b?TG9yZW56byBTdG9ha2VzIChBUk0p?= <ljs@kernel.org>
-Cc: "Vasily Gorbik" <gor@linux.ibm.com>, bpf@vger.kernel.org, linux-scsi@vger.kernel.org, kvmarm@lists.linux.dev, "Heiko
- Carstens" <hca@linux.ibm.com>, kvm@vger.kernel.org, "Marc Zyngier" <maz@kernel.org>, "Oliver
- Upton" <oupton@kernel.org>, linux-s390@vger.kernel.org, "Alexander Gordeev" <agordeev@linux.ibm.com>, "Christian
- Borntraeger" <borntraeger@linux.ibm.com>, dri-devel@lists.freedesktop.org, selinux@vger.kernel.org, linux-perf-users@vger.kernel.org, linux-trace-kernel@vger.kernel.org
-In-Reply-To: <20260908-b4-mmap-prepare-vma-flag-sanify-v1-37-dacf19cce22b@kernel.org>
-References: <20260908-b4-mmap-prepare-vma-flag-sanify-v1-0-dacf19cce22b@kernel.org>
- <20260908-b4-mmap-prepare-vma-flag-sanify-v1-37-dacf19cce22b@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 08 Sep 2026 20:50:52 +0000
-Message-Id: <20260908205053.458911F00A3A@smtp.kernel.org>
+	s=k20260515; t=1788900931;
+	bh=1uibw2TfiC6HvFhUFm+IAjNAm8mfOIU1JNvWdlbkxPM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=bH432aN9Ku9p+MHpYzOcN9kJiqYoB6N0GR5WaCaABlRZurI8oD9dEZJL//xCzvevE
+	 kbU5I/dvqhKampcmVdFBn/yST50K1WgWzL+TNLm/yWXXMbnq4fJ98pcpWq0vLMxCLT
+	 bI33PPQfD14jkayWmljlqlSRTrFm7JCgNUJ17wmIA/UeqjvA6qFU7MnvrxnPK5wIf+
+	 6QhjdiQgmNmXalsoYEguKf9CjX2eXwSMIKYWj4qqTMBMbvpDjNn6sbbeuTwaf/4OkP
+	 jVWRPujL51Za1FiNlCBzUlZEmFaRUFLjEjaY+PeXrIJSugth6y2tL7KO+VSnOEmQQp
+	 JBrhSnsYmqrlQ==
+Date: Tue, 8 Sep 2026 21:55:27 +0100
+From: Mark Brown <broonie@kernel.org>
+To: sashiko-reviews@lists.linux.dev
+Cc: Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v2] KVM: arm64: Enable S1PIE for hVHE
+Message-ID: <009c4b0a-ee2f-4d0f-8525-3b09c7a36a5d@sirena.org.uk>
+References: <20260908-kvm-arm64-nvhe-pie-v2-1-79e42d28cc08@kernel.org>
+ <20260908203145.B735E1F00A3A@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="stSNjZ1uV2JeIt9k"
+Content-Disposition: inline
+In-Reply-To: <20260908203145.B735E1F00A3A@smtp.kernel.org>
+X-Cookie: The world is not octal despite DEC.
 
-> Commit e1fb4a086495 ("dax: remove VM_MIXEDMAP for fsdax and device dax")
-> prevented fsdax and device-dax from setting VM_MIXEDMAP, as DAX no longer
-> relies on it to direct core mm paths.
->=20
-> The fuse DAX implementation, added later, copied the old pattern and still
-> sets it.
->=20
-> Fuse DAX maps pages the same way fsdax does, via dax_iomap_fault() and
-> ultimately vmf_insert_page_mkwrite() and vmf_insert_folio_pmd(), which
-> insert ordinary refcounted pages and so do not require VM_MIXEDMAP.
->=20
-> Setting it only serves to mark the mapping as kernel-owned, making fuse D=
-AX
-> the sole DAX implementation whose mappings are unmergeable, cannot be
-> mlock()'d, eagerly copy page tables on fork and reject MADV_DOFORK and
-> MADV_DODUMP.
->=20
-> It also requires vma_is_special_huge() in mm/huge_memory.c to carve DAX o=
-ut
-> of its kernel-owned check explicitly.
->=20
-> There is no reason for fuse DAX to keep on using this flag so drop it.
->=20
-> Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
 
-Sashiko has reviewed this patch and found no issues. It looks great!
+--stSNjZ1uV2JeIt9k
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260908-b4-mmap-pr=
-epare-vma-flag-sanify-v1-0-dacf19cce22b@kernel.org?part=3D37
+On Tue, Sep 08, 2026 at 08:31:45PM +0000, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
 
+> > +	/* S1PIE is only enabled with TCR2_EL2.PIE if we are running hVHE */
+> > +	mov_q	x1, KVM_HVHE_PIR_EL2
+> > +	msr	REG_PIR_EL2, x1
+> > +	msr	REG_PIRE0_EL2, xzr
+
+> Does this initialization swap the target registers? Since hVHE uses TTBR0_EL2
+> for its translation regime, permission indirection for this space is governed
+> by PIRE0_EL2. By zeroing PIRE0_EL2 and writing the valid permissions to
+> PIR_EL2, won't this cause the CPU to evaluate execution permissions as No
+> Access and immediately trigger a Permission Fault when the MMU is enabled?
+
+This has been doing remarkably well in testing...
+
+--stSNjZ1uV2JeIt9k
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmqgdj8ACgkQJNaLcl1U
+h9AYxAf/Sug1t39pN0qQ0Z+d1SM6srXjocEHsy8V5bY8UfqmlEGF8DaEjfI+vdtX
+H2SrgbiLfm+j0V50FA/Ey6PKvKlWAu94oOOe6Bdeo3RHK3HFV8salC5f86EUYs3w
+rGFSRbS//jdIlEr3L0MOCQEcAOQIcPvCcrZYVXbKCpXY5Wp6fICv4JAEobc+Tjg4
+dOygQBeDgnas8TpGcvTMkrdOOjvdxu25lZ+eyEABU7rGVDzzyrPvRTnubdiKW9YR
+YxpCl8Qp3vtmevtfvcsv93HeNGRntx6HAPRDPQD6YiEVndwLLGmYtSphymtjGZGl
+/zcdHwU2ZbVEE3fGo/3iTNb5udwFXw==
+=14Up
+-----END PGP SIGNATURE-----
+
+--stSNjZ1uV2JeIt9k--
