@@ -1,144 +1,202 @@
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EEC6D531
-	for <kvmarm@lists.linux.dev>; Tue,  8 Sep 2026 13:04:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85277572661
+	for <kvmarm@lists.linux.dev>; Tue,  8 Sep 2026 13:15:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788872661; cv=none; b=Ni/z6kyK0XRfFsDM/b18BAwebEqDg4Rf+41uVPg8Ka1HDWCtp7spwL5zyui9v1gWU3hbE+0CVoCxCYX2G3TfO8sXHYVfmrFLUPQRKOhwb1+5Qgy7nhJl+WJtEANSm2w/OKgxvIrpQihuLXpg24NRV+cWpYPKFkQtu/Bae3v3LCI=
+	t=1788873333; cv=none; b=SLhOZRgJv/AuCDw87M74FyfDBHC4HMz0tpXiMzuME9JuOMmNXmKBWEPfadkt9TGeoFwZb3njujeObEsduhknqrTxVtI0GUp87KsEf11fgoBCAfC2+h2pAK0MQMM4VoI4bN9TODNxK64cS/qH4syQP3ReT6EB5L26bOjaua5D5V4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788872661; c=relaxed/simple;
-	bh=Us/q7SLbzZ4oV0cqtA9AUdygdN3iWgHORK09/87t+C0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=krUv/x6yDbKvRyL5PH6lx1El/IlCHcKk/CtD+kvM7xneISQQHe06gYMBj9yn//cFn6cxk4Sqj4qRVzILe2ZdsVdAtLO5JwAIpQQy8KQDrqH2Fr5T3li1HDcyhihNuHT4pV1v7ZgEX+yZmGq0nG3BDkPVXymehkkwZ8p4m2WF/E0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YtsbwTM1; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1788873333; c=relaxed/simple;
+	bh=rTMz/xlUFYVRRRGd5XADHoDI6DvwfIJL1qpU/Fb0hHk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MkhPWlUMVgMQkDjylz6SfSeulOS7YvmHFcVGGA/khonACE/6Z4vPWtBu6WaDOcVBUF5cnADv3wL7OJEusrd3lvfCmSX6w9C2qde8mqOgrk7yjsFXqJfU9u8mwEzwFmhGDoqHWEB+NHAzP0XSRBFS4lFbNhq4bq2WqQYs1LXUNbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=i3lnViUl; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YtsbwTM1"
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-6a18840e2abso6163624a12.0
-        for <kvmarm@lists.linux.dev>; Tue, 08 Sep 2026 06:04:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1788872648; x=1789477448; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=TF2FBSAbA99rTI7hgd6XJ5POJVbB9v0L/f44ZOGfZAY=;
-        b=YtsbwTM1Yq+B4ryyqZVQ+jlDPCaCErCcu+4yYjQQvFpzfXfttiYbAefFrjDYEFnZxr
-         8wS92OsEHZy856OslvEbYA2eAZ46WwfhcCmUsglPZKMs5C56daWMdeULiln9TUCR5hJq
-         UTUcmg4Pp4NZmGz4t+HRJZnvAZiCFpidcQLcfwhYP62ZFaPPe7rug1fFvBMXuKh9iTiw
-         FO20NchgYuJHUKlBMo+khqZv4yTTmZOddxf3myiC3F/WRJWNhtG9mgFLoSdQfDJRhQo5
-         TBwRW8GimPAIpyuwIlQWIUU+rddH3wDiK5ZXdmvhhmXJhy3vjt08mVXU6GqQeiGrh/mB
-         nSAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788872648; x=1789477448;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=TF2FBSAbA99rTI7hgd6XJ5POJVbB9v0L/f44ZOGfZAY=;
-        b=NuJsfPtwFCWwpEO2COLqd+BbdpoEJ0sDVyA4EqcJp1FoRBxtkRTg21atXlT6aH/rzW
-         jdpuCVAicLtsfpdoD+8bos7NwFf7kv+f+S//WOT518nkLFIaxPqzDFWRuK6DmWTyPESC
-         ab1vjbhc/JT0k+97a1qo6zkT6430e8daZ2Pp/M+EXNLsRE0moaObrSlmKNrMFNshInMx
-         kqJMWfXXD6PWdlg+PKtEp7n6vB27DTOgbiLcRyBl6Cf6rQXoUDTfvUxtCASLzzEblNHP
-         ZGYmjDUexLkj6JNB6i4NPyNCa7FSU9OnGo26AwDovgoxidfi8GWX4jqlc5QGs0tzLmbj
-         LHoA==
-X-Forwarded-Encrypted: i=1; AKwUvBzehbqW54t5E5bSR5c2oV/E7vgAAiCjHH6W5mA2Q/+lxIZGXs9uFGpdV9e1ifCm2G00jtnCN/o=@lists.linux.dev
-X-Gm-Message-State: AFuF++k8PcXAFiuy29sc0YGN2QxMq4UP9rO5f5Xfq8ESkkAJ0ShmHztI
-	pr0izhyfULNTktYRuefr5PAqAVkA5sNw3AaKAEcRLbtXXmNCk7u1d9ZtRSEYtsxR2A==
-X-Gm-Gg: AYBFou1SugxXxSNbzSO9RlGU0p35mfCOxHi+WAxTZwIZv92zMJ4dPabkw3ssEAxDjBe
-	FbzK6B2QdcyGMV9ACYYepp9Zj+wAPx5c9uaJb3Qoamin8OTCARTpXpjJuYHQ+HnC7vE/SeV28PB
-	V0l/qSYZKbz1OlCOcPhx5GgtAToM7aE1giPrgT7qLeU5tz186dwmBDuz3Rp2E+M+NfkwFkW8hVh
-	UqwHjQHPpWmPWoXnA2XCw7k87buDml3+zr2TgBGY+4RPXUZOe5JO2r9ff70UhGtaQIc2/pEefMJ
-	+zeI029gTOoRbzQTlEY0vB2lA/w8dUdW4nPEjNFdoIxjdM1cFVC4R3vVfyVcUAVj8sTdJkGMwTJ
-	rYYDb8IRJxvG+5HVHhVQp0b1t90pDFNaM772qHpPIzMwVmRJ57AuMcdCRt6VEusBXlEhRSC921q
-	mbGvg8Un4PIZzl8cLI5oHvKh0Neskpi3cMb0T9BJupOAChcqYT7ESWU8FfzViSPHalkVqrJuCUA
-	+abDYJ/9FtMlTZmsiIiem694YRZuR7i
-X-Received: by 2002:a17:907:c081:b0:c25:6230:dfcd with SMTP id a640c23a62f3a-c260c9e3320mr1176298766b.15.1788872647225;
-        Tue, 08 Sep 2026 06:04:07 -0700 (PDT)
-Received: from google.com (135.91.155.104.bc.googleusercontent.com. [104.155.91.135])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c260d582304sm623294966b.43.2026.09.08.06.04.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Sep 2026 06:04:06 -0700 (PDT)
-Date: Tue, 8 Sep 2026 14:04:03 +0100
-From: Vincent Donnefort <vdonnefort@google.com>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Mark Rutland <mark.rutland@arm.com>, Keir Fraser <keirf@google.com>,
-	Kalesh Singh <kaleshsingh@google.com>,
-	Quentin Perret <qperret@google.com>,
-	Hiroyuki Katsura <hk590@cam.ac.uk>, Fuad Tabba <tabba@google.com>,
-	stable@vger.kernel.org, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/4] KVM: arm64: Fix host access to the EL2 stacks
-Message-ID: <aqAHw8Is0bNBbXUl@google.com>
-References: <20260908110713.1540304-1-fuad.tabba@linux.dev>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="i3lnViUl"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C45BE1476;
+	Tue,  8 Sep 2026 06:15:24 -0700 (PDT)
+Received: from [10.2.212.8] (e134344.arm.com [10.2.212.8])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3A3583F7B4;
+	Tue,  8 Sep 2026 06:15:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1788873328; bh=rTMz/xlUFYVRRRGd5XADHoDI6DvwfIJL1qpU/Fb0hHk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=i3lnViUlTkdIdq8vFPwdhABKk1klUY2eE8I1NZTqXzzWk4B211p8HV0G84qurtHb9
+	 kXoVE4R8/aGfp/N8pI2DRKkcpkxk1af6HmQBWmeuG4tD3xvQMICZ0t0iX7ZEdvbcSK
+	 /ksnXZcaVkQjl79ddCxU9DqKSvB5LBajCzwwicZA=
+Message-ID: <18acfcfd-93e7-4319-9a2e-4fe1ccccacfd@arm.com>
+Date: Tue, 8 Sep 2026 14:15:24 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260908110713.1540304-1-fuad.tabba@linux.dev>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: arm64: Trap guest MPAM accesses whenever MPAM is
+ implemented
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ James Morse <james.morse@arm.com>, Xi Ruoyao <xry111@xry111.site>,
+ Mark Rutland <mark.rutland@arm.com>, Joey Gouly <joey.gouly@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, Steffen Eiden <seiden@linux.ibm.com>,
+ Gavin Shan <gshan@redhat.com>, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20260903160819.831518-1-fuad.tabba@linux.dev>
+ <dd850141-ea85-4d94-9793-393f24a2fdc2@arm.com>
+ <CA+EHjTyuLKYE1UL4XYvq4rxW7fgFNafdTY8H0=Qt6Hnjz3wYvQ@mail.gmail.com>
+ <CA+EHjTzZovYDUeoEryhdmP1bvqJyEDmOoPtT7PEDvS2y5puXYA@mail.gmail.com>
+Content-Language: en-US
+From: Ben Horgan <ben.horgan@arm.com>
+In-Reply-To: <CA+EHjTzZovYDUeoEryhdmP1bvqJyEDmOoPtT7PEDvS2y5puXYA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Sep 08, 2026 at 12:07:09PM +0100, Fuad Tabba wrote:
-> Hi folks,
+Hi Fuad,
+
+On 07/09/2026 16:00, Fuad Tabba wrote:
+> Hi Ben,
 > 
-> The per-CPU EL2 stacks are initialised as host-owned after pKVM init.
-> fix_host_ownership() walks only the linear-map alias of each memblock
-> region, and the stacks, mapped in the private VA range for their guard
-> pages, have none.
+> I built the respin first, and it didn't hold up.
 > 
-> Patch 1 is the fix, and it needs none of the other three. Patch 4 adds
-> the check that would have caught it and would catch similar instances
-> in the future: once the transfer is done, walk the private VA range and
-> fail init unless every valid leaf is hyp-owned, or is hyp text mapped
-> without write access.
+> On Mon, 7 Sept 2026 at 11:28, Fuad Tabba <fuad.tabba@linux.dev> wrote:
+> ...
+>> This patch misses that case. check_override reads the CPU's own ID
+>> registers, detect_ftr_has_mpam() the sanitised ones, so
+>> finalise_el2_state clears the traps and neither cap is set.
+>>
+>> Not advertising MPAM already happens, since a mismatch lowers the ID
+>> field to 0. The trap default is the missing half, and I agree it
+>> belongs in finalise_el2_state, which already computes whether
+>> MPAM2_EL2 can be touched. KVM then needs only system_supports_mpam(),
+>> and the cap goes.
 > 
-> Patch 2 is a fix in its own right, but to a different bug.
-> fix_host_ownership_walker() matches hyp text on its stage-1 permissions,
-> and that test hasn't matched on a non-hVHE host since 7.0, so hyp text
-> is donated there rather than left read-only. Nothing crashes, but the
-> instruction dump on hyp panic reads a page the host can't access, so
-> the Code: line comes out as question marks. It matches by physical
-> address instead, which is what patch 4 needs too. Patch 3 splits the
-> start of the range from the allocation cursor, with no functional
-> change, so patch 4 knows where the range begins.
+> finalise_el2_state can't set that default. Under nVHE and hVHE the
+> host is the trapped party, and cpufeature reads MPAMIDR_EL1 and
+> MPAM1_EL1 from EL1 before KVM exists, so the only way out is to stop
+> the host detecting MPAM.
 > 
-> Based on Linux 7.3-rc2 (df2908090cda3).
+>> The one host left is a forced nVHE, where test_has_mpam()'s MPAM1_EL1
+>> read would trap before cpu_enable_mpam(). The respin makes the caps
+>> false when is_hyp_nvhe(), so MPAM is off there rather than the boot
+>> hanging [1].
+> 
+> is_hyp_nvhe() is true on an hVHE host too, since
+> is_kernel_in_hyp_mode() reads CurrentEL. So that turns MPAM off for
+> every pKVM host on VHE hardware, not for a forced-nVHE corner. On the
+> AEM FVP with MPAM, a host booted kvm-arm.mode=protected detects MPAM
+> without the change and not with it.
+> 
+>> I'll respin along those lines.
+> 
+> Not along those lines :) I think that v2 would be v1 with a clearer
+> commit message, keeping both predicates. Merging them would give
+> resctrl the wrong answer, since it needs firmware to have enabled MPAM
+> where KVM's trapping needs only that the registers are implemented.
+> 
+> The mismatched machine stays uncovered, with this patch at least.
+> Closing it means deciding per CPU at EL2 from the CPU's own registers
+> rather than from a system-wide cap.
+
+
+Ok, there seems no way to properly handle mismatched systems anyway as CPUs can come online at any
+time. I don't know of any mismatched MPAM systems and they would be strange as the interface to the
+interconnect would on the CPUS that support MPAM require providing PARTID and PMG and the others not.
+
+Thanks,
+
+Ben
+
 > 
 > Cheers,
 > /fuad
 > 
-> Fuad Tabba (4):
->   KVM: arm64: Transfer the hyp stack pages out of the host stage-2
->   KVM: arm64: Match hyp text by physical address in fix_host_ownership()
->   KVM: arm64: Move the private VA allocation cursor to __io_map_next
->   KVM: arm64: Check every private mapping is hyp-owned at pKVM init
-> 
->  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  2 +
->  arch/arm64/kvm/hyp/include/nvhe/mm.h          |  1 +
->  arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 20 +++++
->  arch/arm64/kvm/hyp/nvhe/mm.c                  | 79 ++++++++++++++++---
->  arch/arm64/kvm/hyp/nvhe/setup.c               | 16 +++-
->  5 files changed, 108 insertions(+), 10 deletions(-)
-> 
-> 
-> base-commit: df2908090cda368b01ff43709f51890076c56157
-> -- 
-> 2.39.5
-> 
+>> Cheers,
+>> /fuad
+>>
+>> [1] https://lore.kernel.org/all/apqrky27mJmUV9UA@willie-the-truck/
+>>
+>>
+>>>
+>>> Thanks,
+>>>
+>>> Ben
+>>>
+>>>
+>>>> +
+>>>>  static inline bool system_supports_pmuv3(void)
+>>>>  {
+>>>>       return cpus_have_final_cap(ARM64_HAS_PMUV3);
+>>>> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+>>>> index 17b83a2518a8f..36a27692e5cf7 100644
+>>>> --- a/arch/arm64/kernel/cpufeature.c
+>>>> +++ b/arch/arm64/kernel/cpufeature.c
+>>>> @@ -2501,6 +2501,13 @@ test_has_mpam(const struct arm64_cpu_capabilities *entry, int scope)
+>>>>       return (read_sysreg_s(SYS_MPAM1_EL1) & MPAM1_EL1_MPAMEN);
+>>>>  }
+>>>>
+>>>> +static bool
+>>>> +test_has_mpam_sysregs(const struct arm64_cpu_capabilities *entry, int __unused)
+>>>> +{
+>>>> +     /* The registers exist whether or not firmware enabled MPAM. */
+>>>> +     return detect_ftr_has_mpam();
+>>>> +}
+>>>> +
+>>>>  static void
+>>>>  cpu_enable_mpam(const struct arm64_cpu_capabilities *entry)
+>>>>  {
+>>>> @@ -3116,6 +3123,12 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+>>>>               .matches = test_has_mpam,
+>>>>               .cpu_enable = cpu_enable_mpam,
+>>>>       },
+>>>> +     {
+>>>> +             .desc = "Memory Partitioning And Monitoring system registers",
+>>>> +             .type = ARM64_CPUCAP_SYSTEM_FEATURE,
+>>>> +             .capability = ARM64_MPAM_SYSREGS,
+>>>> +             .matches = test_has_mpam_sysregs,
+>>>> +     },
+>>>>       {
+>>>>               .desc = "Memory Partitioning And Monitoring Virtualisation",
+>>>>               .type = ARM64_CPUCAP_SYSTEM_FEATURE,
+>>>> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+>>>> index 1ce7130e25490..8941335724f6b 100644
+>>>> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+>>>> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+>>>> @@ -298,7 +298,7 @@ static inline void  __activate_traps_mpam(struct kvm_vcpu *vcpu)
+>>>>       u64 clr = MPAM2_EL2_EnMPAMSM;
+>>>>       u64 set = MPAM2_EL2_TRAPMPAM0EL1 | MPAM2_EL2_TRAPMPAM1EL1;
+>>>>
+>>>> -     if (!system_supports_mpam())
+>>>> +     if (!system_supports_mpam_sysregs())
+>>>>               return;
+>>>>
+>>>>       /* trap guest access to MPAMIDR_EL1 */
+>>>> @@ -317,7 +317,7 @@ static inline void __deactivate_traps_mpam(void)
+>>>>       u64 clr = MPAM2_EL2_TRAPMPAM0EL1 | MPAM2_EL2_TRAPMPAM1EL1 | MPAM2_EL2_TIDR;
+>>>>       u64 set = MPAM2_EL2_EnMPAMSM;
+>>>>
+>>>> -     if (!system_supports_mpam())
+>>>> +     if (!system_supports_mpam_sysregs())
+>>>>               return;
+>>>>
+>>>>       sysreg_clear_set_s(SYS_MPAM2_EL2, clr, set);
+>>>> diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+>>>> index 2775ba3359cfe..aa5be51385f68 100644
+>>>> --- a/arch/arm64/tools/cpucaps
+>>>> +++ b/arch/arm64/tools/cpucaps
+>>>> @@ -78,6 +78,7 @@ KVM_PROTECTED_MODE
+>>>>  MISMATCHED_CACHE_TYPE
+>>>>  MPAM
+>>>>  MPAM_HCR
+>>>> +MPAM_SYSREGS
+>>>>  MTE
+>>>>  MTE_ASYMM
+>>>>  MTE_FAR
+>>>>
+>>>> base-commit: cee9395acd8043be0644b25c34bfa86623f2b935
+>>>
 
-Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
-Tested-by: Vincent Donnefort <vdonnefort@google.com>
-
--- 
-Vincent
