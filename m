@@ -1,85 +1,131 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 922E33B1031;
-	Tue,  8 Sep 2026 20:28:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56D0733AD88
+	for <kvmarm@lists.linux.dev>; Tue,  8 Sep 2026 20:31:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788899329; cv=none; b=X1VSLVhQsx2c2DJUJ1aM3Ae31dCeOoOFuBrcKdSnZrGpMhLOT4/yx0zfT/T6uSHTWKiH/+8LjPSs322w7cSD1xtp8EkzZxOGS+QqZWtj0irwQNLjqZfaiPAur7K1/JEWCGeEYhoGDqbRjgMsWd/hFtY7z3jSAfRl7oZpaG6zpEI=
+	t=1788899507; cv=none; b=nIWhFH7Pu+j3MgmMU5u3lcbuyteqSztzLw0UyQmEmdLjFPZqLJwaEWcewrNITLhWzEOgxAO13NzVD716jCPa+bzSvLgJDJW+siTkr+2ducGQr49tW9DdZQ/gyWyXuLmO3tps2JTXnhskRo7Cr9Kmh5kq4FVY8m1Gu2ml0joV3rI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788899329; c=relaxed/simple;
-	bh=S6tE0uEfipTaQVVjMdd6O5/Vs/dJ9VaNo2fdl5bbGRQ=;
+	s=arc-20240116; t=1788899507; c=relaxed/simple;
+	bh=lGTl0otGojAcDg+A4KtBiY5DZQZAPrKd6C3f9h9ypPI=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=A/nGNhJmhR/cs+ey7p7lA524TKJkkezQKw29HOmgaMIozsI2yIsxHhAhkRMHPerDlS7v0W49/aU7CHjiXEJRy94p8QMs0AjXsSq43M+l6mbgSCscq9ge+PjLAoIsPeR/MFP9zGZHy7hXcoGiliIOX2GONJQCc1jRkx2Km7En7NY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QIcU+TT4; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=JF7P+MjzMmNd7qnuiCqMl5mP3fGWBUmSZgatvr2tRZMD5Bhw7O1VNFDOSeMbmoOL+JffhEztwl6ShVv682ZT0WIGZWvBd/f4tsdNOcG/ci0/SLFDWjSKLHZ52QnOpjgO/KPrcsK7VBKcA6kqbm18aSW80Zq/mQrkAcpgdoH2kSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k99yrSNn; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QIcU+TT4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89CE71F00A3A;
-	Tue,  8 Sep 2026 20:28:43 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k99yrSNn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B735E1F00A3A;
+	Tue,  8 Sep 2026 20:31:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788899324;
-	bh=S6tE0uEfipTaQVVjMdd6O5/Vs/dJ9VaNo2fdl5bbGRQ=;
+	s=k20260515; t=1788899506;
+	bh=A+ykyYEx8KacrHMgyxTFutardRMxgiAimqg31tTQDt0=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=QIcU+TT4km55OlwvKPUi/HitbxQoemt2pIlAm9eZzSCggpxtY6fmb3BUKG59Q72IB
-	 roECK+TdtDGYxye1yC29XAQ9+MzdmocReFcJ4r4tkNnSykIC8SHbjqGCZINuNM37nr
-	 D2cSbqXmgDXRHbQp6RXTDcp0qGYYvoYppIzA5IJLdET/4qNPAqpeGujkjtV5M8ijU0
-	 jAgJV0g1Pg+/PxM1JxabtVAg9sq/mcdHPEUqxJ1sbpDaqWrteDOjFNaHFUoGVN9Gz6
-	 J4bR4d6653K+x88nBNyS0gA3sZ1XVPnzJdLwYpOE5U7mle36yWXGlWIYkJfPfZ9kaL
-	 rCccthO2hghKQ==
+	b=k99yrSNnHhaMCRhbieFslDujjVu07xwdCXQvX2leLjAD0lE31CSM2jOU10lu5OtvZ
+	 fCxoCsZLTKYo6owJlDzWoLv1Rp26Qnf3RnzIBttYhIlsy+hocKU9DUY7Mp/OPf0asD
+	 6Qe9XdtcXpPvK+5vi8CwpWVFcic0cjvCXd4nKzSVO8cEyJHZBe10L7LjTvJkiLQKs7
+	 ujOTx2AEVEqgzdyVPnS9iLBMkRGb7Rjg8j2IwsUcos1CLlSdz3l8Mf3+m+ZYs+jH6f
+	 1BNet1oxbQwIlJnpW8aPpZeZ1EmIdPapsVUUK+AcfaDtfMgn0Raa9fBxe73EzfLjn/
+	 HI2vM4R3dEpkA==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 14/39] mm/vma: add vma[_flags]_is_kernel_owned()
- predicates
+Subject: Re: [PATCH v2] KVM: arm64: Enable S1PIE for hVHE
 Reply-To: sashiko-reviews@lists.linux.dev
-To: =?utf-8?b?TG9yZW56byBTdG9ha2VzIChBUk0p?= <ljs@kernel.org>
-Cc: linux-trace-kernel@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, linux-scsi@vger.kernel.org, linux-s390@vger.kernel.org, dri-devel@lists.freedesktop.org, bpf@vger.kernel.org, "Vasily
- Gorbik" <gor@linux.ibm.com>, selinux@vger.kernel.org, "Christian
- Borntraeger" <borntraeger@linux.ibm.com>, "Heiko Carstens" <hca@linux.ibm.com>, linux-perf-users@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev, "Alexander
- Gordeev" <agordeev@linux.ibm.com>, "Marc Zyngier" <maz@kernel.org>
-In-Reply-To: <20260908-b4-mmap-prepare-vma-flag-sanify-v1-14-dacf19cce22b@kernel.org>
-References: <20260908-b4-mmap-prepare-vma-flag-sanify-v1-0-dacf19cce22b@kernel.org>
- <20260908-b4-mmap-prepare-vma-flag-sanify-v1-14-dacf19cce22b@kernel.org>
+To: "Mark Brown" <broonie@kernel.org>
+Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev
+In-Reply-To: <20260908-kvm-arm64-nvhe-pie-v2-1-79e42d28cc08@kernel.org>
+References: <20260908-kvm-arm64-nvhe-pie-v2-1-79e42d28cc08@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 08 Sep 2026 20:28:43 +0000
-Message-Id: <20260908202843.89CE71F00A3A@smtp.kernel.org>
+Date: Tue, 08 Sep 2026 20:31:45 +0000
+Message-Id: <20260908203145.B735E1F00A3A@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-> Rather than referring to VMA flags with uncertain meaning, add a new
-> predicate that explicitly describes what possession of the VMA_PFNMAP_BIT
-> or VMA_MIXEDMAP_BIT flags mean, and then refer to that function for
-> determining VMA mergeability.
->=20
-> Either flag means the contents of the mapping are owned by the kernel,
-> usually a driver, rather than by the core mm: the memory may be MMIO,
-> kernel-allocated pages or even ordinary pages the driver maps itself, but
-> the core must not populate, reclaim, migrate, copy-on-write or merge the
-> range on its own initiative.
->=20
-> We initially also include VMA_IO_BIT here, as by implication, these must =
-be
-> kernel-owned. (mlock() also sets VMA_IO_BIT transiently on ordinary VMAs
-> while locking them, which is addressed later in this series.)
->=20
-> However the intent is to in future remove this, as no mapping should be
-> marked as an I/O mapping without also being marked with VMA_PFNMAP_BIT.
->=20
-> This forms the basis of further work intended to improve how we express V=
-MA
-> properties such as this.
->=20
-> Also update the VMA userland tests to reflect the change.
->=20
-> No functional change intended.
->=20
-> Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [Critical] S1PIE permission indirection registers are incorrectly swapped=
+ for hVHE mode, zeroing PIRE0_EL2 and causing an immediate fatal Permission=
+ Fault upon MMU enable.
+--
 
-Sashiko has reviewed this patch and found no issues. It looks great!
+commit 3004dc878365b596c5ed9c6a57b485c6d2028592
+Author: Mark Brown <broonie@kernel.org>
+Subject: KVM: arm64: Enable S1PIE for hVHE
+
+This patch enables S1PIE for the hypervisor when running in hVHE mode. It
+configures permission indirection to map to non-PIE meanings to minimize
+page table manipulation changes. It also explicitly configures TCR2_EL2
+when running in VHE or hVHE modes.
+
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe=
+/hyp-init.S
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+
+[ ... ]
+
+> @@ -137,8 +137,20 @@ alternative_if ARM64_HAS_CNP
+>  alternative_else_nop_endif
+>  	msr	ttbr0_el2, x2
+> =20
+> -	ldr	x0, [x0, #NVHE_INIT_TCR_EL2]
+> -	msr	tcr_el2, x0
+> +	ldr	x1, [x0, #NVHE_INIT_TCR_EL2]
+> +	msr	tcr_el2, x1
+> +
+> +alternative_if ARM64_HAS_S1PIE
+> +	/* S1PIE is only enabled with TCR2_EL2.PIE if we are running hVHE */
+> +	mov_q	x1, KVM_HVHE_PIR_EL2
+> +	msr	REG_PIR_EL2, x1
+> +	msr	REG_PIRE0_EL2, xzr
+
+[Severity: Critical]
+Does this initialization swap the target registers? Since hVHE uses TTBR0_E=
+L2
+for its translation regime, permission indirection for this space is govern=
+ed
+by PIRE0_EL2. By zeroing PIRE0_EL2 and writing the valid permissions to
+PIR_EL2, won't this cause the CPU to evaluate execution permissions as No
+Access and immediately trigger a Permission Fault when the MMU is enabled?
+
+> +alternative_else_nop_endif
+> +
+
+[ ... ]
+
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+
+[ ... ]
+
+> @@ -349,6 +349,14 @@ static int hyp_set_prot_attr(enum kvm_pgtable_prot p=
+rot, kvm_pte_t *ptep)
+> =20
+>  		if (system_supports_bti_kernel())
+>  			attr |=3D KVM_PTE_LEAF_ATTR_HI_S1_GP;
+> +	} else if (cpus_have_final_cap(ARM64_HAS_S1PIE) &&
+> +		   cpus_have_final_cap(ARM64_KVM_HVHE) &&
+> +		   (prot & KVM_PGTABLE_PROT_W)) {
+> +		/*
+> +		 * When using S1PIE for hVHE set DBM for writable
+> +		 * mappings since AP[2] is ineffective.
+> +		 */
+> +		attr |=3D KVM_PTE_LEAF_ATTR_HI_S1_DBM;
+>  	}
+
+[Severity: Critical]
+This comment correctly notes that DBM replaces AP[2], which is the encoding
+behavior specifically for the TTBR0 PIE encoding. Doesn't this further conf=
+irm
+that the permission configuration should be written to PIRE0_EL2 in the
+assembly initialization instead of PIR_EL2?
+
+> =20
+>  	if (cpus_have_final_cap(ARM64_KVM_HVHE)) {
 
 --=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260908-b4-mmap-pr=
-epare-vma-flag-sanify-v1-0-dacf19cce22b@kernel.org?part=3D14
-
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260908-kvm-arm64-=
+nvhe-pie-v2-1-79e42d28cc08@kernel.org?part=3D1
