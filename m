@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8736A582BAD;
-	Tue,  8 Sep 2026 16:23:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EECC057981C;
+	Tue,  8 Sep 2026 16:23:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788884618; cv=none; b=ggRvmUTU01exhB4mZEHAGE0jKJ6fDaDzK3YUfJKLuJdLBhqpz4q2X7lIOJQo5d1h5twfr4Bj3c31y0xEzZZ8F0ytPFauCq6998eQnzoiyv7LpYKLgGBsfmDAt0HvM4yezcfrNaHyEpB0f0VIK6Qy8d44Vp+TxR45AyD+gtG+WdI=
+	t=1788884622; cv=none; b=GOLmINGRnbn84q3S7d8uD5ZziY0weruzd7/7KVWF3Sgtz4UNBD2lU8SUYDeBXwWy6m/dX3Jkwhf3m0ahgWeAEVj/5FgSZobeUb7S/kcRbBqCNnhaOxVGlHxIxOcf5rTIy2NerHgINAMcmcZFHG1JMmFXIe3PKD7oV3WOf3UBE4U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788884618; c=relaxed/simple;
-	bh=rcvFiEHuSI+iYZssP4YUoc0XZJr7UrWElOyPy2d1u6g=;
+	s=arc-20240116; t=1788884622; c=relaxed/simple;
+	bh=CUFNiF/5y947+lSyvlccR1MDxDZzW2BioQzrsrm2Qto=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eOvLpHO1o+zcurSYQZhgm1FSTV8Ot5IuTavAWfDZ7ER88m3pRNpNWTpLwbhUbuiOns1stdu6m9qTKPB3DxAN1kP86nMMevNdXJ/iSpuyLdiaI2jkzhw8C8aL61TbJMJR6UfV5nLQp2CQmchKBsyFTw3b+vgKCE6+lUMa+ui/PMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=WMDCslfU; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=Ap7lVY3nKXhUWOz70wlO9MN2tMduoMYKJptuu8Kb6RVoD4l8WD86JUYnPCg8ypgUJ75Cv+deCazfHCiQGJ3nv9+eb5lVFSAJA6s2rvEiQ3byNcyv4gP2tN+Z5qGIAfE/hRPpCgLVwZP89mos/NtZzdVmUWXFFoOYoEjR5aD5brY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=N6Ry4fTc; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="WMDCslfU"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="N6Ry4fTc"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1FA6A1C01;
-	Tue,  8 Sep 2026 09:23:32 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B414C1477;
+	Tue,  8 Sep 2026 09:23:35 -0700 (PDT)
 Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.2.197.99])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 7C4D23F7B4;
-	Tue,  8 Sep 2026 09:23:32 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 214D83F7B4;
+	Tue,  8 Sep 2026 09:23:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1788884615; bh=rcvFiEHuSI+iYZssP4YUoc0XZJr7UrWElOyPy2d1u6g=;
+	t=1788884619; bh=CUFNiF/5y947+lSyvlccR1MDxDZzW2BioQzrsrm2Qto=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WMDCslfUN1dre+HAmE9X1Q55Ii1XoTfcKIVPrHjrgsDViNunXcJ4JIobAh6hKTNAJ
-	 ZGIcMsTnSSv9IWkenAEfgbsztp3S0KUdK6wB59Vh4pTkb7qGjsYDIfK46kUEG+/jLb
-	 GByUP/siteS2s9n4sz1vR7apwihT9vs85j+0VOpI=
+	b=N6Ry4fTcgU4eQHixy+4BGrZC4KulzSrwnQRFnZuaZnzv3hbjGqjznzcXXzFGmkHvi
+	 gQyjgIenUiTiXfhXLGAtGBnB4tMUuSLlgVK5HsvokijC3TAv7PNxdVT3PjconnGMPV
+	 f568LLkwgJJoBsNFGLYhaxXkIf48eErUA0lRbHxs=
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -50,9 +50,9 @@ Cc: maz@kernel.org,
 	lpieralisi@kernel.org,
 	enju.kohei@fujitsu.com,
 	Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v17 13/20] KVM: arm64: CCA: Add VCPU load/put for Realms
-Date: Tue,  8 Sep 2026 17:22:16 +0100
-Message-ID: <20260908162223.1683432-14-suzuki.poulose@arm.com>
+Subject: [PATCH v17 14/20] KVM: arm64: CCA: Don't expose unsupported capabilities for realm guests
+Date: Tue,  8 Sep 2026 17:22:17 +0100
+Message-ID: <20260908162223.1683432-15-suzuki.poulose@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260908162223.1683432-1-suzuki.poulose@arm.com>
 References: <20260908162223.1683432-1-suzuki.poulose@arm.com>
@@ -64,66 +64,77 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-RMM controls the VCPU settings and most are hidden from the KVM, except for the
-VGIC and timer bits.
-
-A later patch would add syncing the VCPU state into the Realm REC related SMC
-parameters.
+RMM v2.0 provides no mechanism for the host to perform debug operations
+on the guest. So limit the extensions that are visible to an allowlist
+so that only those capabilities we can support are advertised.
 
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+Signed-off-by: Steven Price <steven.price@arm.com>
 ---
- arch/arm64/kvm/arm.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+Changes since v13:
+ * Add missing check in kvm_vm_ioctl_enable_cap().
+Changes since v10:
+ * Add a kvm_realm_ext_allowed() function which limits which extensions
+   are exposed to an allowlist. This removes the need for special casing
+   various extensions.
+Changes since v7:
+ * Remove the helper functions and inline the kvm_is_realm() check with
+   a ternary operator.
+ * Rewrite the commit message to explain this patch.
+---
+ arch/arm64/kvm/arm.c | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
 diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index b5e0893ea16f1..3dfe0e03fab7a 100644
+index 3dfe0e03fab7a..fbb4d6651ab51 100644
 --- a/arch/arm64/kvm/arm.c
 +++ b/arch/arm64/kvm/arm.c
-@@ -807,6 +807,13 @@ static void pkvm_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 		     &vcpu->arch.vgic_cpu.vgic_v3);
+@@ -137,6 +137,25 @@ int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu)
+ 	return kvm_vcpu_exiting_guest_mode(vcpu) == IN_GUEST_MODE;
  }
  
-+static void realm_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
++static bool kvm_realm_ext_allowed(long ext)
 +{
-+	kvm_timer_vcpu_load(vcpu);
-+	kvm_vgic_load(vcpu);
-+	vcpu_set_wfx_traps(vcpu);
++	switch (ext) {
++	case KVM_CAP_IRQCHIP:
++	case KVM_CAP_ARM_PSCI:
++	case KVM_CAP_ARM_PSCI_0_2:
++	case KVM_CAP_NR_VCPUS:
++	case KVM_CAP_MAX_VCPUS:
++	case KVM_CAP_MAX_VCPU_ID:
++	case KVM_CAP_MSI_DEVID:
++	case KVM_CAP_ARM_VM_IPA_SIZE:
++	case KVM_CAP_ARM_PTRAUTH_ADDRESS:
++	case KVM_CAP_ARM_PTRAUTH_GENERIC:
++	case KVM_CAP_SYNC_MMU:
++		return true;
++	}
++	return false;
 +}
 +
- void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 			    struct kvm_enable_cap *cap)
  {
- 	vcpu->cpu = cpu;
-@@ -853,6 +860,12 @@ static void pkvm_vcpu_put(struct kvm_vcpu *vcpu)
- 	nvhe_vcpu_put(vcpu);
- }
+@@ -148,6 +167,9 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 	if (is_protected_kvm_enabled() && !kvm_pkvm_ext_allowed(kvm, cap->cap))
+ 		return -EINVAL;
  
-+static void realm_vcpu_put(struct kvm_vcpu *vcpu)
-+{
-+	kvm_timer_vcpu_put(vcpu);
-+	kvm_vgic_put(vcpu);
-+}
++	if (kvm && kvm_vm_is_realm(kvm) && !kvm_realm_ext_allowed(cap->cap))
++		return -EINVAL;
 +
- void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
- {
- 	vcpu->arch.vcpu_ops->vcpu_put(vcpu);
-@@ -2210,11 +2223,17 @@ static const struct kvm_vcpu_ops pkvm_vcpu_ops = {
- 	.vcpu_put = pkvm_vcpu_put,
- };
+ 	switch (cap->cap) {
+ 	case KVM_CAP_ARM_NISV_TO_USER:
+ 		r = 0;
+@@ -407,6 +429,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	if (is_protected_kvm_enabled() && !kvm_pkvm_ext_allowed(kvm, ext))
+ 		return 0;
  
-+static const struct kvm_vcpu_ops realm_vcpu_ops = {
-+	.vcpu_load = realm_vcpu_load,
-+	.vcpu_put = realm_vcpu_put,
-+};
++	if (kvm && kvm_vm_is_realm(kvm) && !kvm_realm_ext_allowed(ext))
++		return 0;
 +
- static const struct kvm_vcpu_ops *arm64_vcpu_ops[] = {
- 	[VM_VHE] = &vhe_vcpu_ops,
- 	[VM_NVHE] = &nvhe_vcpu_ops,
- 	[VM_PKVM] = &pkvm_vcpu_ops,
- 	[VM_PROTECTED_PKVM] = &pkvm_vcpu_ops,
-+	[VM_REALM] = &realm_vcpu_ops,
- };
- 
- static unsigned long nvhe_percpu_size(void)
+ 	switch (ext) {
+ 	case KVM_CAP_IRQCHIP:
+ 		r = vgic_present;
 -- 
 2.43.0
 
