@@ -1,154 +1,153 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8720E58FD1A;
-	Tue,  8 Sep 2026 17:00:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43282598C01;
+	Tue,  8 Sep 2026 18:58:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788886828; cv=none; b=Q+yQkJFfNqW9IDC7FX3rWGzAXWMxwz9i6E9kNVR64dbXaAv7UdW3rg5gEzHPJN+wdri/D6I7XeZxET1Y5nOFKZgvuw/bOfbZCjR1yJrCk9hplwvOfi2SWkrD0hgEiVgWbbIJ1RFJbPoPzeX61I1jhyFMf7oQyzYP7PxAkdQhPiw=
+	t=1788893912; cv=none; b=Guh84iw0yEaVbFRrHtVEoCI7rKy+n0/2HMEVe+2FNwTqJIUXdxTbb9gkS1jZN8mO6kyqow/5FIU687r3wufwer+Ugf89kqAHSTsDlpM6BpC3hR1t4fS+niBQ0Y47m3K9JW39sB/iMjp2E2TcfTVHO/dCTwhJIMOs51fsCTC/aCU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788886828; c=relaxed/simple;
-	bh=AfQ76jzVZcSQK+CgTCfGHcT2hJykkArR/lz2IXrizCA=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=BRCeO7vHEx36fHH7LuYVaAoOtup7oj+lgZqfX5eGV4/j3K9PZNhwZ320ocNWi46sxsQGfC+YzqyRP476dHAxUH2erArNfK1n6Uo3k2jN556fpCYL+uQFv8X08lhCz3nmEtEwlWM4oYrTKUbMcPQoyPtVc2B6jpxN9dZgK1V0+gM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ITX0Vjza; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788893912; c=relaxed/simple;
+	bh=y2y7T3KAoKP/KyE/uDm2tpyR/IuJRDUtV20f/glc+I0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YLisqI6Nh03CvqL+4htDpWS+tNAxBrZgq4PYBFOojCBcyixlH4cF4+AHkXiRpppomYear+W1guMcEzqvpbuZ7HMAYgHWL9iJtUIiO1NmEANOrywle5u+dvNnp61Le9RZATvmWtIn6lC8E1Vq5nWfyfHkuOPpuEgxEQCN3RRYnPs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=ju0/yovn; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ITX0Vjza"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B47BF1F00A3A;
-	Tue,  8 Sep 2026 17:00:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788886827;
-	bh=R3aUTAgcOgCxXBqx4Z/ixILWAA5GisGK5hEdionsHJc=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=ITX0VjzauQyaZeOH0LGNeZa5CJX95GzSbcFvhNCCsdk9F/JayU4L8BwP8Y897+wJR
-	 fhijY0qHxa4wyGyHFwhJlMFR4KzERmWxt+BRhw4DGGBePdODwl+SpgQ6nIRN1m1WMe
-	 YKvR+EzoiWHWcYs0IQDUMDh7s6eUqB0dWYItxkxU0RD2jFl7zxJJ/SvqQDvK/GpiHn
-	 qe1C0YzMh+UQi2S2IvEX5Mpx5vnNR+PdcuQQpfcg28RFPQz8LrYcsgCCXJ4pc0qdKG
-	 Ywe1U+4/2Vg3gjANp708wXROLmR5zb3/qFBiU8h94tk0h2qa9NBlXSsUGC0xarOyc2
-	 4woPSQykKNEmw==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v17 17/20] KVM: arm64: CCA: Provide an accurate register
- list
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Suzuki K Poulose" <suzuki.poulose@arm.com>
-Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-In-Reply-To: <20260908162223.1683432-18-suzuki.poulose@arm.com>
-References: <20260908162223.1683432-1-suzuki.poulose@arm.com>
- <20260908162223.1683432-18-suzuki.poulose@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 08 Sep 2026 17:00:25 +0000
-Message-Id: <20260908170026.B47BF1F00A3A@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="ju0/yovn"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BEF7F1476;
+	Tue,  8 Sep 2026 11:58:24 -0700 (PDT)
+Received: from [10.57.49.201] (unknown [10.57.49.201])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B10353F528;
+	Tue,  8 Sep 2026 11:58:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1788893908; bh=y2y7T3KAoKP/KyE/uDm2tpyR/IuJRDUtV20f/glc+I0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ju0/yovnlJCOYeq4SXLgmLOwzg4nf4S7aWebIHFJWp8+ngmDbqkoNtSAqLuIwicnS
+	 E1/g/tstnhlTxhCYpqRnrNtsH6gPbcc+Mag4k6LM7wP5waZrl7rBnB0G2Vc0i/1P46
+	 AhVfQceVon7sB2t75xRqT9oUlVPpI0NQTc5LxtbU=
+Message-ID: <f523ceb8-faa7-412d-9227-aca139e2bc1e@arm.com>
+Date: Tue, 8 Sep 2026 19:58:18 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v17 12/20] KVM: arm64: CCA: Support timers in realm RECs
+To: sashiko-reviews@lists.linux.dev
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, Marc Zyngier
+ <maz@kernel.org>, Oliver Upton <oupton@kernel.org>
+References: <20260908162223.1683432-1-suzuki.poulose@arm.com>
+ <20260908162223.1683432-13-suzuki.poulose@arm.com>
+ <20260908165643.50C501F00A3A@smtp.kernel.org>
+Content-Language: en-GB
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20260908165643.50C501F00A3A@smtp.kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Thank you for your contribution! Sashiko AI review found 2 potential issue(=
-s) to consider:
-- [Medium] KVM_GET_REG_LIST fails to restrict core registers to the 9 GP re=
-gisters for Realm VMs, exposing all core registers instead.
-- [Medium] Realm VM system register restrictions are only applied to KVM_GE=
-T_REG_LIST, allowing userspace to bypass them via KVM_SET_ONE_REG and KVM_G=
-ET_ONE_REG.
---
+On 08/09/2026 17:56, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
+> - [High] Realm VM timers are blackholed on GICv5 hosts due to unconditional physical interrupt masking combined with disabled direct injection.
+> --
+> 
+> commit 759ada4556cf9518a1b30ec3610b7b7833129bd9
+> Author: Steven Price <steven.price@arm.com>
+> 
+> KVM: arm64: CCA: Support timers in realm RECs
+> 
+> This commit adds support for handling timers when exiting a realm REC to the
+> normal world. It implements realm_timer_irq_ops which relies on the existing
+> software resampling mechanism for Realm timer interrupts.
+> 
+>> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+>> index eba84cab95d01..3eddf44f7b1dd 100644
+>> --- a/arch/arm64/kvm/arch_timer.c
+>> +++ b/arch/arm64/kvm/arch_timer.c
+> [ ... ]
+>> @@ -1609,8 +1623,12 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+>>   
+>>   	get_timer_map(vcpu, &map);
+>>   
+>> -	ops = vgic_is_v5(vcpu->kvm) ? &arch_timer_irq_ops_vgic_v5 :
+>> -				      &arch_timer_irq_ops;
+>> +	if (vcpu_is_rec(vcpu))
+>> +		ops = &realm_timer_irq_ops;
+>> +	else if (vgic_is_v5(vcpu->kvm))
+>> +		ops = &arch_timer_irq_ops_vgic_v5;
+>> +	else
+>> +		ops = &arch_timer_irq_ops;
+>>   
+>>   	for (int i = 0; i < nr_timers(vcpu); i++)
+>>   		kvm_vgic_set_irq_ops(vcpu, timer_irq(vcpu_get_timer(vcpu, i)), ops);
+> 
+> [Severity: High]
+> Will this cause Realm VM timers to be lost on a GICv5 host?
+> 
+> When a Realm VM is created on a GICv5 host, vcpu_is_rec(vcpu) takes precedence,
+> assigning realm_timer_irq_ops. However, this struct lacks the
+> .set_direct_injection callback used for hardware direct injection.
+> 
+> At the same time, because vgic_is_v5(vcpu->kvm) is still true for the host,
+> other timer paths will unconditionally assume direct injection is active. For
+> example, kvm_timer_update_irq() skips software injection:
+> 
+> kvm_timer_update_irq() {
+>          ...
+>          /* Skip injecting on GICv5 for directly injected (DVI'd) timers */
+>          if (vgic_is_v5(vcpu->kvm)) {
+>                  ...
+>                  if (map.direct_ptimer == timer_ctx ||
+>                      map.direct_vtimer == timer_ctx)
+>                          return;
+>          }
+> }
+> 
+> Additionally, kvm_timer_vcpu_load_gic() unconditionally masks the physical
+> timer interrupt for GICv5 setups:
+> 
+> kvm_timer_vcpu_load_gic() {
+>          ...
+>          phys_active |= pending;
+>          phys_active |= vgic_is_v5(vcpu->kvm);
+> 
+>          set_timer_irq_phys_active(ctx, phys_active);
+> }
+> 
+> Since hardware injection is not configured by the Realm ops and software
+> injection is bypassed due to the GICv5 checks, does this completely blackhole
+> timer interrupts for Realm VMs on GICv5 hardware?
+> 
 
-commit 1a82d37b0064cc3f1fa34c6757432fa355d160a3
-Author: Jean-Philippe Brucker <jpb@kernel.org>
+CCA doesn't support VGIC_V5. We only support VGIC_V3. I have added the 
+following patch to make sure this is mandated:
 
-KVM: arm64: CCA: Provide an accurate register list
-   =20
-Userspace can set a few registers with KVM_SET_ONE_REG (9 GP registers
-at runtime, and 3 system registers during initialization). Update the
-register list returned by KVM_GET_REG_LIST.
 
-> Userspace can set a few registers with KVM_SET_ONE_REG (9 GP registers
-> at runtime, and 3 system registers during initialization). Update the
-> register list returned by KVM_GET_REG_LIST.
 
-[Severity: Medium]
-Does KVM_GET_REG_LIST successfully restrict core registers to just the 9 GP
-registers for Realm VMs?
+---8>---
 
-Looking at copy_core_reg_indices(), it loops over the entire kvm_regs array
-without checking vcpu_is_rec(vcpu):
+KVM: arm64: CCA: Mandate VGIC_V3 for Realms
 
-arch/arm64/kvm/guest.c:copy_core_reg_indices() {
-	for (i =3D 0; i < sizeof(struct kvm_regs) / sizeof(__u32); i++) {
-		u64 reg =3D KVM_REG_ARM64 | KVM_REG_ARM_CORE | i;
-		int size =3D core_reg_size_from_offset(vcpu, i);
+Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 
-		if (size < 0)
-			continue;
-        ...
-}
+diff --git a/arch/arm64/kvm/vgic/vgic-init.c 
+b/arch/arm64/kvm/vgic/vgic-init.c
+index 4012df6002ea6..452c085073f3e 100644
+--- a/arch/arm64/kvm/vgic/vgic-init.c
++++ b/arch/arm64/kvm/vgic/vgic-init.c
+@@ -84,6 +84,9 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
+                 !kvm_vgic_global_state.can_emulate_gicv2)
+                 return -ENODEV;
 
-This appears to expose all core registers to the userspace array rather than
-limiting it to the 9 GP registers mentioned in the commit message.
++       /* Realms only support VGIC_V3 */
++       if (kvm_vm_is_realm(kvm) && type != KVM_DEV_TYPE_ARM_VGIC_V3)
++               return -ENODEV;
+         /*
+          * Ensure mutual exclusion with vCPU creation and any vCPU 
+ioctls by:
 
-[ ... ]
+Suzuki
 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 44aae52c473d7..a58c1fc13ea17 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
 
-[ ... ]
-
-> @@ -5693,11 +5693,26 @@ static bool copy_reg_to_user(const struct sys_reg=
-_desc *reg, u64 __user **uind)
->  	return true;
->  }
-> =20
-> +static inline bool kvm_realm_sys_reg_hidden_user(const struct kvm_vcpu *=
-vcpu,
-> +						 u64 reg)
-> +{
-> +	switch (reg) {
-> +	case SYS_ID_AA64DFR0_EL1:
-> +	case SYS_PMCR_EL0:
-> +		return false;
-> +	}
-> +	return true;
-> +}
-> +
->  static int walk_one_sys_reg(const struct kvm_vcpu *vcpu,
->  			    const struct sys_reg_desc *rd,
->  			    u64 __user **uind,
->  			    unsigned int *total)
->  {
-> +	if (vcpu_is_rec(vcpu) &&
-> +	    kvm_realm_sys_reg_hidden_user(vcpu, reg_to_encoding(rd)))
-> +		return 0;
-> +
-
-[Severity: Medium]
-Are the Realm system register restrictions bypassed by KVM_SET_ONE_REG and
-KVM_GET_ONE_REG?
-
-While this patch correctly hides the registers from KVM_GET_REG_LIST by
-checking kvm_realm_sys_reg_hidden_user() in walk_one_sys_reg(), it doesn't
-appear to add a similar check to the ioctl handlers for setting or getting
-individual registers.
-
-For example, in kvm_sys_reg_set_user(), the code only checks sysreg_hidden(=
-):
-
-arch/arm64/kvm/sys_regs.c:kvm_sys_reg_set_user() {
-    ...
-	r =3D id_to_sys_reg_desc(vcpu, id, table, num);
-	if (!r || sysreg_hidden(vcpu, r))
-		return -ENOENT;
-    ...
-}
-
-The getter similarly fails to enforce the Realm system register restriction=
-s.
-Does this allow userspace to directly read or overwrite hidden system
-registers on a Realm VM if they know the register ID, bypassing the CCA
-register protection boundary?
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260908162223.1683=
-432-1-suzuki.poulose@arm.com?part=3D17
