@@ -1,155 +1,243 @@
-Received: from mta1.migadu.com (out-169.mta1.migadu.com [95.215.58.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa10.hc1455-7.c3s2.iphmx.com (esa10.hc1455-7.c3s2.iphmx.com [139.138.36.225])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F2243A5E8E
-	for <kvmarm@lists.linux.dev>; Tue,  8 Sep 2026 07:55:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CDD13A785A;
+	Tue,  8 Sep 2026 08:00:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.138.36.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788854148; cv=none; b=pyQD3TGC4avnp5QQL0Wbe7RxV3l6KlJTcnEVRKC1g/POzMpFu9dzATCbfO/HwAKLPt8GhOxOC2FUuk7eW3DFQgc9JHaocJLfsBpUF7fO0445mqP5KKpqzk2eGlWeFeQ9rMHOTvpK07suh1U3FfUt5YzGFpmNxUdtomlogWD6vlg=
+	t=1788854439; cv=none; b=ZEI42CWO39AFbAjOjEV4sKrilLljmZ7QGSQkqzFFgxuI104y2GREeXWIZgyIiHiDn/9r48c6hGbY1MG6M9KeyBLQSd9b7Fw9JJqf9lw49/OPJG/+cgD0VokKA4W/2em6I2rrOpSicpv89WtOXMrIM6HUPUfmymmVKxDikXHxaVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788854148; c=relaxed/simple;
-	bh=r4hdO+l1tHybJlhIhjw+zD0e2eT2sYv8x5tSfI6vj+8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lwYHiTlEr49KdNx+Bms45Q2zCIxAOuQQE3o9i4sXljuoevhgBNs0BN/cV1gzEk25+FVvG+X74BLWprloUaBLSBXRTeK3rf4yHWN14rRGLN3+qFi5AKpujaui+v/hlaOUZ+lbQrd/NRJKbZpqqeD8pUwK7EiQ3nyKk1Sm2q+EfPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Z9UmC3Uw; arc=none smtp.client-ip=95.215.58.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1788854439; c=relaxed/simple;
+	bh=d6H21zget9O+foARLFAgFZea8RUu6p9eIXmnIG1xYl8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VR+n2yFN+Fngzb56pBzWKhfryoJwX9NwbOoOi9h6mgObhBp9ZaW5/hXPj4fGP5E3+jnx1BheUNpLltObr0aNpt4JOkw5FjdLLwZKcz1RIWGKinFoLMoGQY+4o8pDc4MmNCrt8qWjlRE+wniaPerij+EoeY/IzpWFm9eHqsJ5aPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=RWSCyjcY; arc=none smtp.client-ip=139.138.36.225
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Z9UmC3Uw"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=r4hdO+l1tHybJlhIhjw+zD0e2eT2sYv8x5tSfI6vj+8=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1788854144; v=1; x=1789458944;
- b=Z9UmC3UwvlNH+8X9L9uuK7jMx8wC6QXmaMYikCmaV1iDYW9a4HsnzhOISd+cmJD5flMsVj4V
- jJe7FXa3dIR8I8a12Vs18SNucJjwtciOhv3xT0RNz48def4eBqvJk0zfvsJSKL70vxUVuLhpgs+
- e96fr9gR7geWnEBcQ2lbpC4M=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 0bb73f6aa57dee8e;
-	Tue, 08 Sep 2026 07:55:44 +0000
-X-Mizu-Trace-ID: 0bb73f6aa57dee8e
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b4a0b17359so14178e87.0
-        for <kvmarm@lists.linux.dev>; Tue, 08 Sep 2026 00:55:44 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBxOBGr3Hfz6jHyD5pVDxsa2zX2lPiPlSxkPCBfFMT81p0VbFY16WImHFaKA1w/MDeNK+5D0qN0=@lists.linux.dev
-X-Gm-Message-State: AFuF++nSPxbguxGPZTDLhEImmAK0nX+/bcQ6KB/sCDmijuVZ9XBx3wXz
-	WtdNYpo3wHyogtrdofPMAIDNv3avSkHAeLzvfzY5nvcfdkrw25cd4ti+/6fB+Qqvtbtv/8gzRqW
-	zt7f1ChN7kQHVnlfcYsAdKejqGNMM8oJAgEGvlyiY
-X-Received: by 2002:a05:6512:3185:b0:5b6:19c6:a91b with SMTP id
- 2adb3069b0e04-5b74d1e0c5bmr294833e87.14.1788854142874; Tue, 08 Sep 2026
- 00:55:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="RWSCyjcY"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
+  t=1788854441; x=1820390441;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=d6H21zget9O+foARLFAgFZea8RUu6p9eIXmnIG1xYl8=;
+  b=RWSCyjcYC64q/Cz+QdDI4otzTFwieiUcZQ3JBmie9JOvaC/ValyJ70hp
+   PbUWT0HwECwrnmcPbtGeuvw/1Ju2H6P12B/Q/uZjI/Avv6QLYX9SMrjTr
+   hyON9USfgaxL+ykYWDBDzt82l/0txBVeXuDqm1MM9r+Ae7aZWgdViGeUT
+   IBpqlCgDdHA0x9cb0LX8HMRGNh8bUU8VhlmNaTXRL4uytkse/Ht8Kco/1
+   MfijLCzCWcablGaym24sggFiBPqKhKiaTZaH45UHvY4mecHHTEIpUxgfk
+   9fOiSSn1FalbpvnKFsD+h38NaMa5YvmDHsaH0J7y3mkez3RyYL8+GLZ/2
+   w==;
+X-CSE-ConnectionGUID: RvI6S93gRpSX3P3NcHp/VA==
+X-CSE-MsgGUID: I4/uBsh1SumUaEKh9MtT0A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11899"; a="240502948"
+X-IronPort-AV: E=Sophos;i="6.25,268,1779116400"; 
+   d="scan'208";a="240502948"
+Received: from gmgwuk01.global.fujitsu.com ([172.187.114.235])
+  by esa10.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2026 17:00:39 +0900
+Received: from az2uksmgm2.o.css.fujitsu.com (unknown [10.151.22.199])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by gmgwuk01.global.fujitsu.com (Postfix) with ESMTPS id 6EB3AC00224;
+	Tue,  8 Sep 2026 08:00:35 +0000 (UTC)
+Received: from az2nlsmom3.fujitsu.com (unknown [10.150.26.199])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by az2uksmgm2.o.css.fujitsu.com (Postfix) with ESMTPS id 1EBFD18002FE;
+	Tue,  8 Sep 2026 08:00:35 +0000 (UTC)
+Received: from FCCLS0092175.localdomain (unknown [10.9.15.163])
+	by az2nlsmom3.fujitsu.com (Postfix) with SMTP id 5B31C101BB76;
+	Tue,  8 Sep 2026 08:00:27 +0000 (UTC)
+Date: Tue, 8 Sep 2026 17:00:19 +0900
+From: Kohei Enju <enju.kohei@fujitsu.com>
+To: Gavin Shan <gshan@redhat.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, maz@kernel.org, will@kernel.org, catalin.marinas@arm.com, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, steven.price@arm.com, 
+	aneesh.kumar@kernel.org, oupton@kernel.org, joey.gouly@arm.com, tabba@google.com, 
+	yuzenghui@huawei.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, 
+	sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com, 
+	lpieralisi@kernel.org
+Subject: Re: [PATCH v17 3/7] firmware: arm_rmm: Configure the RMM with the
+ host's page size
+Message-ID: <ap--9pJdD_Y_j1aY@FCCLS0092175.localdomain>
+References: <20260907095942.1140734-1-suzuki.poulose@arm.com>
+ <20260907095942.1140734-4-suzuki.poulose@arm.com>
+ <10893135-4757-44de-91b5-180a9774d868@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260826-arm64-52bit-va-v1-0-14ec98211363@fujitsu.com>
- <CA+EHjTwPmwPTMcgQB6zt47Kz6NPMr+FkGfq2Qq+Uxu+G427OEg@mail.gmail.com> <ap9wgBjYEDI-27N1@sm-arm-grace07>
-In-Reply-To: <ap9wgBjYEDI-27N1@sm-arm-grace07>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Tue, 8 Sep 2026 08:55:06 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTxy3vURKpjmcX86T+coXZN7sCfW=5L4TM3GH30xuz+zPA@mail.gmail.com>
-X-Gm-Features: AcwNN1UPBjEuQQThxfaCHXl31wDDjpU8d24LqbsGJMyA-76vtr69g4waCdr9dow
-Message-ID: <CA+EHjTxy3vURKpjmcX86T+coXZN7sCfW=5L4TM3GH30xuz+zPA@mail.gmail.com>
-Subject: Re: [PATCH 0/2] 52-bit VA guest mode ID support
-To: Itaru Kitayama <itaru.kitayama@fujitsu.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Takayuki Okamoto <tokamoto@fujitsu.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <10893135-4757-44de-91b5-180a9774d868@redhat.com>
 
-Hi Itaru,
+Hi Gavin,
 
-On Tue, 8 Sept 2026 at 03:18, Itaru Kitayama <itaru.kitayama@fujitsu.com> wrote:
->
-> Hi Fuad,
-> On Fri, Sep 04, 2026 at 09:14:36AM +0100, Fuad Tabba wrote:
-> > On Tue, 25 Aug 2026 at 22:18, Itaru Kitayama <itaru.kitayama@fujitsu.com> wrote:
-> > >
-> > > This patch series extends the arm64 KVM selftest framework
-> > > to support 52-bit guest virtual address (VA) modes in addition to
-> > > the existing 52-bit physical address (PA) configurations.
-> > > The motivation is to enable validation of LPA2 guest memory-management
-> > > behaviour in configurations that use a 52-bit VA space.
-> > > While the selftest framework already supports testing 52-bit PA
-> > > configurations, it lacks the ability to exercise guests running with
-> > > 52-bit virtual addresses, leaving part of the LPA2 functionality untested.
-> >
-> > The series adds three 52-bit VA guest modes, but nothing in tree maps
-> > a guest VA high enough to use them. The mode-iterating tests map at a
-> > fixed low GVA, so pgd_index() returns 0 and only the first entry of
-> > the top level is ever used.
-> >
-> > What do you expect the modes to catch as they stand? The allocators
-> > already take a minimum GVA, so mapping high in one of those tests
-> > looks like a small change.
->
-> I think at least a 4KB page is allocated for the level -1 translation table,
-> and entry 0 is populated with a Table descriptor pointing to the level 0 translation
-> table. But, no it does not test a nonzero top-level index.
+On 09/08 17:04, Gavin Shan wrote:
+> Hi Suzuki,
+> 
+> On 9/7/26 7:59 PM, Suzuki K Poulose wrote:
+> > From: Steven Price <steven.price@arm.com>
+> > 
+> > RMM v2.0 brings the ability to set the RMM's granule size. Check the
+> > feature registers and configure the RMM so that it matches the host's
+> > page size. This means that operations can be done with a granularity
+> > equal to PAGE_SIZE.
+> > 
+> > Signed-off-by: Steven Price <steven.price@arm.com>
+> > Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> > ---
+> >   Changes since v15:
+> >    * Actually check the feature register for the host's page-size support.
+> >   Changes since v14:
+> >    * Move the implementation into drivers/firmware/arm_rmm.
+> >   Changes since v13:
+> >    * Moved out of KVM.
+> > ---
+> >   drivers/firmware/arm_rmm/rmi.c | 58 ++++++++++++++++++++++++++++++++++
+> >   include/linux/arm-rmi-cmds.h   | 17 ++++++++++
+> >   2 files changed, 75 insertions(+)
+> > 
+> > diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/arm_rmm/rmi.c
+> > index 008a783407b4e..76f91c145e1fd 100644
+> > --- a/drivers/firmware/arm_rmm/rmi.c
+> > +++ b/drivers/firmware/arm_rmm/rmi.c
+> > @@ -77,6 +77,60 @@ static int rmi_read_features(void)
+> >   	return 0;
+> >   }
+> > +static int rmi_configure(void)
+> > +{
+> > +	unsigned long granule_feature;
+> > +	unsigned long granule_size;
+> > +	int ret = 0;
+> > +	struct rmm_config *config;
+> > +
+> > +	switch (PAGE_SIZE) {
+> > +	case SZ_4K:
+> > +		granule_size = RMI_GRANULE_SIZE_4KB;
+> > +		granule_feature = RMI_FEATURE_REGISTER_1_RMI_GRAN_SZ_4KB;
+> > +		break;
+> > +	case SZ_16K:
+> > +		granule_size = RMI_GRANULE_SIZE_16KB;
+> > +		granule_feature = RMI_FEATURE_REGISTER_1_RMI_GRAN_SZ_16KB;
+> > +		break;
+> > +	case SZ_64K:
+> > +		granule_size = RMI_GRANULE_SIZE_64KB;
+> > +		granule_feature = RMI_FEATURE_REGISTER_1_RMI_GRAN_SZ_64KB;
+> > +		break;
+> > +	default:
+> > +		BUILD_BUG();
+> > +	}
+> > +
+> > +	if (!(rmi_feat_reg(1) & granule_feature)) {
+> > +		pr_err("RMM does not support %luKB granules\n",
+> > +		       PAGE_SIZE >> 10);
+> > +		return -ENXIO;
+> > +	}
+> > +
+> > +	config = (struct rmm_config *)get_zeroed_page(GFP_KERNEL);
+> > +	if (!config)
+> > +		return -ENOMEM;
+> 
+> An error message is needed here.
+> 
+> 	if (!config) {
+> 		pr_err("Unable to alloc RMM config memory\n");
+> 		return -ENOMEM;
+> 	}
 
-Right, that's the gap. Every mode-iterating test maps at a fixed low
-GVA (0xc0000000), so the new modes only ever fill entry 0 of the top
-table. If the series adds the modes, it should add a test that drives
-a VA into the 52-bit range.
+I largely agree with your suggestions, and they look reasonable to me.
 
-> >
-> > > To address this, the series introduces new guest modes for 52-bit VA
-> > > operation, adds five-level page table support where required, and
-> > > performs runtime detection of host 52-bit VA capability so that
-> > > LPA2-enabled guest VA tests are executed only on supported systems.
-> > >
-> > > Testing:
-> > >
-> > > Built and tested on arm64.
-> > > Verified on QEMU with a V52-capable guest configuration.
-> > > Confirmed correct operation of high virtual address mappings by
-> > > exercising guest memory accesses in the 52-bit VA range.
-> >
-> > I could not reproduce "exercising guest memory accesses in the 52-bit
-> > VA range" with anything in tree either. Could you say which test you
-> > ran, which guest modes, and on what?
->
-> I just in guest_code() of existing one of the kselftests, mapped and
-> accessed a page at 1ULL << 49 using virt_pg_map() and on QEMU TCG mode
-> as I don't currently have access to the machines LPA and LPA2 features.
+However, wouldn't this be redundant? Since __GFP_NOWARN is not set, the
+page allocator would normally emit an allocation failure warning with a
+stack trace anyway.
 
-That test is what the series needs, and you've already written it.
-Folding a mode-iterating version in tree would exercise the modes and
-make the cover letter's "52-bit VA range" line reproducible. It runs
-under TCG, so no LPA2 hardware needed.
+I don't have a strong preference, but as per "14) Allocating memory" in
+the coding style, I believe it would be considered unnecessary.
 
-Cheers,
-/fuad
+Thanks,
+Kohei
 
+> 
+> > +
+> > +	config->rmi_granule_size = granule_size;
+> > +
+> > +	/*
+> > +	 * For now we set the tracking_region_size to 0 which is the only option
+> > +	 * for 4KB PAGE_SIZE (1GB for 4KB PAGE_SIZE, 32MB/512MB for 16KB/64KB).
+> > +	 * TODO: Support other tracking sizes via Kconfig option for other
+> > +	 * PAGE_SIZES
+> > +	 */
+> > +	config->tracking_region_size = 0;
+> > +
+> > +	ret = rmi_rmm_config_set(virt_to_phys(config));
+> > +	if (ret) {
+> > +		pr_err("RMM config set failed\n");
+> > +		ret = -EINVAL;
+> > +	}
+> 
+> The error code from rmi_rmm_config_set() is indicative sometimes. Also, -ENXIO
+> would be more appropriate than -EINVAL?
+> 
+> 	if (ret) {
+> 		pr_err("RMM config set failed (%d)\n", ret);
+> 		ret = -ENXIO;
+> 	}
+> 
+> > +
+> > +	free_page((unsigned long)config);
+> > +	return ret;
+> > +}
+> > +
+> >   static int __init arm64_init_rmi(void)
+> >   {
+> >   	int ret;
+> > @@ -90,6 +144,10 @@ static int __init arm64_init_rmi(void)
+> >   	if (ret)
+> >   		return ret;
+> > +	ret = rmi_configure();
+> > +	if (ret)
+> > +		return ret;
+> > +
+> >   	return 0;
+> >   }
+> > diff --git a/include/linux/arm-rmi-cmds.h b/include/linux/arm-rmi-cmds.h
+> > index 2fb1f7f86d71e..9aa27697e2377 100644
+> > --- a/include/linux/arm-rmi-cmds.h
+> > +++ b/include/linux/arm-rmi-cmds.h
+> > @@ -12,6 +12,23 @@
+> >   unsigned long rmi_feat_reg(unsigned long id);
+> > +/**
+> > + * rmi_rmm_config_set() - Configure the RMM
+> > + * @cfg_ptr: PA of a struct rmm_config
+> > + *
+> > + * Sets configuration options on the RMM.
+> > + *
+> > + * Return: RMI return code
+> > + */
+> > +static inline int rmi_rmm_config_set(unsigned long cfg_ptr)
+> > +{
+> > +	struct arm_smccc_res res;
+> > +
+> > +	arm_smccc_1_1_invoke(SMC_RMI_RMM_CONFIG_SET, cfg_ptr, &res);
+> > +
+> > +	return res.a0;
+> > +}
+> > +
+> 
+> rmi_rmm_config_set() is used for once by rmi.c::rmi_configure(), I would not expose
+> rmi_rmm_config_set() by combining the logic to rmi.c::rmi_configure().
+> 
+> >   /**
+> >    * rmi_features() - Read feature register
+> >    * @index: Feature register index
+> 
 > Thanks,
-> Itaru.
-> >
-> > Thanks,
-> > /fuad
-> >
-> > > Signed-off-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
-> > > Reviewed-by: Takayuki Okamoto <tokamoto@fujitsu.com>
-> > > ---
-> > > Itaru Kitayama (2):
-> > >       KVM: selftest: arm64: Support 5-level paging in stage 1 translation table
-> > >       KVM: selftests: arm64: Add 52-bit VA guest modes
-> > >
-> > >  .../selftests/kvm/include/arm64/processor.h        |  2 +
-> > >  tools/testing/selftests/kvm/include/kvm_util.h     |  3 +
-> > >  tools/testing/selftests/kvm/lib/arm64/processor.c  | 87 ++++++++++++++++++++--
-> > >  tools/testing/selftests/kvm/lib/guest_modes.c      |  5 ++
-> > >  tools/testing/selftests/kvm/lib/kvm_util.c         | 11 +++
-> > >  5 files changed, 103 insertions(+), 5 deletions(-)
-> > > ---
-> > > base-commit: 8d3ae59288f1e7d58d76558a6ee96d533bc5019f
-> > > change-id: 20260825-arm64-52bit-va-32f1f4cd050d
-> > >
-> > > Best regards,
-> > > --
-> > > Itaru Kitayama <itaru.kitayama@fujitsu.com>
-> > >
+> Gavin
+> 
