@@ -1,32 +1,33 @@
-Received: from mta0.migadu.com (out-8.mta0.migadu.com [91.218.175.8])
+Received: from mta0.migadu.com (out-11.mta0.migadu.com [91.218.175.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A3BE525A93
-	for <kvmarm@lists.linux.dev>; Tue,  8 Sep 2026 11:07:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8192526AA1
+	for <kvmarm@lists.linux.dev>; Tue,  8 Sep 2026 11:07:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788865644; cv=none; b=rEmpwP6pCHgtZY8Cps7Y/JmL7URTaADatCL8hS9IuEYzjycx2TkttuNuMY+GWVP9nrxncyxzqB8mH9Sj8Uakx1HnnXu9dKEcbP/fvVBXnhE7Ypy6/0xq6SZ/U5BQsGcIJN0gRRPE0/DPauqcOvYo+7Y1g6Ze/MAYscPdNN5nhVU=
+	t=1788865648; cv=none; b=uN1U+hZAt03iH6/Ttq265W2AX3mATYd4FF+3b0Hy1+eMZZ8t3LeqRZST/NYoVll9Y5vG3QsxnLT7bsYhn4YJ7RTEO6ue2FBxgx4Q/jCh+gZfH5+eOg7sR2s1dyMF11bcDKm+v5/Xp+lhnalU/w/7elI6DDU0XDlThXpZJ7GACjQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788865644; c=relaxed/simple;
-	bh=nIpoc5sfHGTXjBAy3ABWY1KxxnQB5xQPhoL+P57mMcM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=VIR6A7ryKHpWN5zbxBngas37eMIe+ZnPTNFQAdW0PyxOcEfZupQt+aaeq8JsjzNcVPMSmmm/75ymJskuRNtXK2HCGYDTZt+ysN6MD8HQKTW11VxPo+6P/eR0He5flIwgkfTfabQGvzppKOu06DitepS31W4/0nuNILb6IQx1m/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Fky8TGAO; arc=none smtp.client-ip=91.218.175.8
+	s=arc-20240116; t=1788865648; c=relaxed/simple;
+	bh=DqhRUW75apnnRm/+NgVuUwPZB14lDLNVV5b0Gd4lk2M=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=A6ttNzx4uec4rNOcx9fGVAviQdJNa+z/oIiIzX6vvnwUJAQXm7eAZ7FhVwEnj0BqPxpO7jGsae80Ss/M9nOeOHndXtNAxsyN9L+GqCBenyQpqcTH3pw3AluB9X0yKYgTzqna+/WAeY85Wg+r6nqvaUdg/KonMhdq0IWr04OQazw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FY3PH6e4; arc=none smtp.client-ip=91.218.175.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Fky8TGAO"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FY3PH6e4"
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=nIpoc5sfHGTXjBAy3ABWY1KxxnQB5xQPhoL+P57mMcM=;
+DKIM-Signature: a=rsa-sha256; bh=DqhRUW75apnnRm/+NgVuUwPZB14lDLNVV5b0Gd4lk2M=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1788865638; v=1; x=1789470438;
- b=Fky8TGAOiy8DE0IDEkqE+srgvlRiIcysThTrBbw9d2Jad2Ij4Hb3t7FmNUWr5P4pNsDYzFCA
- WQkbeKjliMyLjAQ2HguMBM7+tGzA/BB2sv2+L0Om53PmGughuj3RTctPTFSlFoXOYnsKyq4X+V7
- 113EeIvbiHjPNDTofrB0bKx4=
+ t=1788865643; v=1; x=1789470443;
+ b=FY3PH6e4/aYAD4gMScM9UVHyVreFsVQy0ehzn3Ul7lA4Ok8aMo5YJtREe2gK8WO3ZNWHPdVQ
+ VqpQsEyfnPgMIofhh3IxjpYsazAxmONZvQrcw52uxHV0s8dHDHtgfY20aHO1kB1fO8MPyMimsBu
+ v8tTj891DabCsbMH2koAMVSk=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 6d105b631239bd15;
-	Tue, 08 Sep 2026 11:07:18 +0000
-X-Mizu-Trace-ID: 6d105b631239bd15
+Received: by smtp.migadu.com with ESMTPS id b5834c5c726827b5;
+	Tue, 08 Sep 2026 11:07:22 +0000
+X-Mizu-Trace-ID: b5834c5c726827b5
 X-Migadu-Flow: FLOW_OUT
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
@@ -48,10 +49,12 @@ Cc: Will Deacon <will@kernel.org>,
 	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 0/4] KVM: arm64: Fix host access to the EL2 stacks
-Date: Tue,  8 Sep 2026 12:07:09 +0100
-Message-Id: <20260908110713.1540304-1-fuad.tabba@linux.dev>
+Subject: [PATCH 1/4] KVM: arm64: Transfer the hyp stack pages out of the host stage-2
+Date: Tue,  8 Sep 2026 12:07:10 +0100
+Message-Id: <20260908110713.1540304-2-fuad.tabba@linux.dev>
 X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20260908110713.1540304-1-fuad.tabba@linux.dev>
+References: <20260908110713.1540304-1-fuad.tabba@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -60,49 +63,41 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi folks,
-
-The per-CPU EL2 stacks are initialised as host-owned after pKVM init.
 fix_host_ownership() walks only the linear-map alias of each memblock
-region, and the stacks, mapped in the private VA range for their guard
-pages, have none.
+region, and the per-CPU hyp stack, mapped in the private VA range for
+its guard page, has none.
 
-Patch 1 is the fix, and it needs none of the other three. Patch 4 adds
-the check that would have caught it and would catch similar instances
-in the future: once the transfer is done, walk the private VA range and
-fail init unless every valid leaf is hyp-owned, or is hyp text mapped
-without write access.
+Walk each stack's VA range with the same walker.
 
-Patch 2 is a fix in its own right, but to a different bug.
-fix_host_ownership_walker() matches hyp text on its stage-1 permissions,
-and that test hasn't matched on a non-hVHE host since 7.0, so hyp text
-is donated there rather than left read-only. Nothing crashes, but the
-instruction dump on hyp panic reads a page the host can't access, so
-the Code: line comes out as question marks. It matches by physical
-address instead, which is what patch 4 needs too. Patch 3 splits the
-start of the range from the allocation cursor, with no functional
-change, so patch 4 knows where the range begins.
+Fixes: 1a919b17ef012 ("KVM: arm64: Add guard pages for pKVM (protected nVHE) hypervisor stack")
+Reported-by: Hiroyuki Katsura <hk590@cam.ac.uk>
+Cc: stable@vger.kernel.org
+Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+---
+ arch/arm64/kvm/hyp/nvhe/setup.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-Based on Linux 7.3-rc2 (df2908090cda3).
-
-Cheers,
-/fuad
-
-Fuad Tabba (4):
-  KVM: arm64: Transfer the hyp stack pages out of the host stage-2
-  KVM: arm64: Match hyp text by physical address in fix_host_ownership()
-  KVM: arm64: Move the private VA allocation cursor to __io_map_next
-  KVM: arm64: Check every private mapping is hyp-owned at pKVM init
-
- arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  2 +
- arch/arm64/kvm/hyp/include/nvhe/mm.h          |  1 +
- arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 20 +++++
- arch/arm64/kvm/hyp/nvhe/mm.c                  | 79 ++++++++++++++++---
- arch/arm64/kvm/hyp/nvhe/setup.c               | 16 +++-
- 5 files changed, 108 insertions(+), 10 deletions(-)
-
-
-base-commit: df2908090cda368b01ff43709f51890076c56157
+diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+index 75b00c3233102..362f2891cb32e 100644
+--- a/arch/arm64/kvm/hyp/nvhe/setup.c
++++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+@@ -269,6 +269,16 @@ static int fix_host_ownership(void)
+ 			return ret;
+ 	}
+ 
++	/* The stacks sit in the private VA range, not the linear map. */
++	for (i = 0; i < hyp_nr_cpus; i++) {
++		struct kvm_nvhe_init_params *params = per_cpu_ptr(&kvm_init_params, i);
++		u64 start = params->stack_hyp_va - NVHE_STACK_SIZE;
++
++		ret = kvm_pgtable_walk(&pkvm_pgtable, start, NVHE_STACK_SIZE, &walker);
++		if (ret)
++			return ret;
++	}
++
+ 	return 0;
+ }
+ 
 -- 
 2.39.5
 
