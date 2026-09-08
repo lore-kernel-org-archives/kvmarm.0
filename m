@@ -1,33 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 901BA47C104;
-	Tue,  8 Sep 2026 20:17:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41A7347C101;
+	Tue,  8 Sep 2026 20:18:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788898672; cv=none; b=oHaBEsqbLf3uHJWO8q5XuYxES4lO8g/2oe0LHRgLwmp3Xa/79lJyf0Q60FrIYKeUKxoQavozxX8xUWTA7hLRloz36+06b4raVKpONyu60QMddp0j2jsyJ8nrYpkD1kabNWPPbwLgsxsDhCVbhFlw28BVUKevAxizRIVuDu7XKvQ=
+	t=1788898692; cv=none; b=BBgICPLa277YkmPh/dNGXIkbKYGItMdP2M0sz4/bONyNQrKeSLQVs/i7aP6e/cr7QPhp7OcD+91ufPSKKwDI0en9FDerYNkuhj9cKq3yblKQwmegvLbtDu/wSKBnNGV+4YUiQ2jcvffxciSwdbS9J1pcX9lj9KW0EgnodKiqojo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788898672; c=relaxed/simple;
-	bh=qMBkUez8hztn0ks5VgH4TTTqjnIQ9qDmO/pkcIsPwHk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=rCzn9YEBBSbBc157Cq01AOhGs4YNS9n+T2DDHei61lBwCwnfJiIJ9FfDqu7aej5mjRUFJJ7lJnaL09Svzn5MCVPJpT8GvErh0vt0wNJ2Bwunvu4UlNcDBnHEuVSLhNpG6bH7YsUE0kifFC68tTPzzc6INl6Z+vJQqWlkZUinZ3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i7awn6Fw; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788898692; c=relaxed/simple;
+	bh=hmAMxzQfefvCCrwcVcCxiVfaMiTF+Pgb+sQCkeg4Kig=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=AgnQdcQV+v+Mp/t6MC17qJzvDbBZHefRvgVRVxuaTIv6QZ4eBDQ8V9T6O+VlfVrApRKuRPFa49HOrPusnwystsyTBngh4RfeAI7OXMFvI2Y8f5T6R2TJv4htOPMR/wWzVNfQ11cXKUqOUOBoDEHhjxpiZWg2EIJfEldwCQk0BWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cTk/pVQq; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i7awn6Fw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8567F1F00A3D;
-	Tue,  8 Sep 2026 20:17:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cTk/pVQq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA1851F00A3E;
+	Tue,  8 Sep 2026 20:17:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788898671;
-	bh=z2KY5C4orcd0mQrMryfM2xss3Kray3gzMwxttwoOE1A=;
-	h=From:Date:Subject:To:Cc;
-	b=i7awn6FwPRCgiWafJFbk7O6fcN3u+EDxtpKKewpjGlY6uKv8EJ6UC5v0Yu0vOhiHR
-	 kfApNqFvjb48p+XJAt5RKj6jh25XA7mIyWN9prfNXPjEykR8ryfv9kRb6piR8aVqWu
-	 yBzra1ZP9KayOAK1f1Kyw0cwKv8Fp7PLtulKGyLFhh/Z+KvxcBw/wTwV3h8qn27XEd
-	 j4W7VmIvd2lISwYAx981VyO2XMXv5nWMc3sbWJPbrguTkQyvtoJ9Zn/28K92sEwped
-	 42XHvzJAVJ/Uy0eYM/c3GZ2MF/+6WlNi0lOXJ/HJuimeR4qfKc8P482d73rp/qme78
-	 szFTjOZq+/TKw==
-From: Mark Brown <broonie@kernel.org>
-Date: Tue, 08 Sep 2026 20:40:47 +0100
-Subject: [PATCH v2] KVM: arm64: Enable S1PIE for hVHE
+	s=k20260515; t=1788898691;
+	bh=xwVNipmsGeHH7kH0HTVwgKtcNjfCejEkzkDgwLIYh9c=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc;
+	b=cTk/pVQq+Ml50+8U3cKgvym6EXXSSbF8x0Wdv1pUdFwOO6GFrL7mk9u1HvQz1Y20m
+	 PARjv7kY71o6rXe77MqZLVNpWEac18T3/NcY/r71wL58s4eZQS+NcEPIT1/PDaYEZa
+	 e9EuH1Gt5PeOE5bE46z5N0qaGlgkhkuUAw2ig0ku8qPeYeumd5HiQ65cepVbU1LyoH
+	 VghL4LpBjhYAUKLKseYX6BWRHlZ3VHomfq/DS4WULxl3auuBivacmjrzn959XdDr+o
+	 qjM3a9Ii9IFxLHvU/uhnyztGSX4V6VC/hmJPP0efkOiN1f1DgAJfAbOGBdEhasO/jD
+	 dVYe6jSH5Xwmg==
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+Date: Tue, 08 Sep 2026 21:01:37 +0100
+Subject: [PATCH 33/39] mm: eliminate VMA_SPECIAL_FLAGS usage when hugetlb
+ explicitly tested
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -36,229 +38,169 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260908-kvm-arm64-nvhe-pie-v2-1-79e42d28cc08@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAL9koGoC/22Nyw6CMBBFf8XM2jGlKZW68j8MCygDjEghLTYaw
- r/LY+vyJPeeM0MgzxTgdprBU+TAg1tBnk9g28I1hFytDFJILTKZYRd7LHyvFbrYEo5MaMtMW5V
- ca0MFrMfRU82fXfrIDw7v8kl22kzbouUwDf67V2Oy7Y6AEepfICYoUJoqNbVUKWl778g7el0G3
- 0C+LMsPf2yyaMcAAAA=
-X-Change-ID: 20260828-kvm-arm64-nvhe-pie-cb86c417f9ea
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
- Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
- Steffen Eiden <seiden@linux.ibm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Zenghui Yu <yuzenghui@huawei.com>, 
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
- Mark Rutland <mark.rutland@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
- linux-kernel@vger.kernel.org, Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.17-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=8094; i=broonie@kernel.org;
- h=from:subject:message-id; bh=qMBkUez8hztn0ks5VgH4TTTqjnIQ9qDmO/pkcIsPwHk=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBqoG1qIUjE01MVMbpNQqYOVjv7gzWO0WTP8Q0Jr
- ijdU+t50rWJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCaqBtagAKCRAk1otyXVSH
- 0FIQB/4oBpL5I3vz0E2YU16VP1u6oqwDritmIZM6Sv2Q6+27GZIFQFPp9ODI8Ohbhgn2WC4TYZb
- sNz18RxKwEjuSgqwuc9UUMtSIMh9rRcNPU4WMVsXrjY+yyPgbWmNYKS8LDIGqQQ9Z+cVmYdK0pf
- J8rP38CEdznSijWJBijVOr9vA/bozwIedki0PhFjdllG79gJWky4m/75Ogbb6dY8qg8ZL5sxp0L
- mXAWUilgcf9l1hWcmwcTlBOR5rQBr6EJN4yyPm44nEuyl38GJVHqLYs59UHF3XmVc89fCjzSK/5
- 5TBNfrnXs5toer5S6OTUfwa+VF1GQ3NRG526i3NY52a/w8jM
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+Message-Id: <20260908-b4-mmap-prepare-vma-flag-sanify-v1-33-dacf19cce22b@kernel.org>
+References: <20260908-b4-mmap-prepare-vma-flag-sanify-v1-0-dacf19cce22b@kernel.org>
+In-Reply-To: <20260908-b4-mmap-prepare-vma-flag-sanify-v1-0-dacf19cce22b@kernel.org>
+To: Andrew Morton <akpm@linux-foundation.org>, 
+ "Liam R. Howlett" <liam@infradead.org>, Vlastimil Babka <vbabka@kernel.org>, 
+ Jann Horn <jannh@google.com>, Pedro Falcato <pfalcato@suse.de>, 
+ David Hildenbrand <david@kernel.org>, Mike Rapoport <rppt@kernel.org>, 
+ Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, 
+ Jonathan Corbet <corbet@lwn.net>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>, 
+ Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, 
+ Paul Moore <paul@paul-moore.com>, 
+ Stephen Smalley <stephen.smalley.work@gmail.com>, 
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+ Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
+ Kumar Kartikeya Dwivedi <memxor@gmail.com>, Zi Yan <ziy@nvidia.com>, 
+ Baolin Wang <baolin.wang@linux.alibaba.com>, 
+ Nico Pache <nico.pache@linux.dev>, Ryan Roberts <ryan.roberts@arm.com>, 
+ Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>, 
+ Lance Yang <lance.yang@linux.dev>, Usama Arif <usama.arif@linux.dev>, 
+ Kiryl Shutsemau <kas@kernel.org>, Doug Gilbert <dgilbert@interlog.com>, 
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>, 
+ "Martin K. Petersen" <mkp@kernel.org>, Jaya Kumar <jayalk@intworks.biz>, 
+ Simona Vetter <simona@ffwll.ch>, Helge Deller <deller@gmx.de>, 
+ Sebastian Reichel <sre@kernel.org>, John Hubbard <jhubbard@nvidia.com>, 
+ Peter Xu <peterx@redhat.com>, Masami Hiramatsu <mhiramat@kernel.org>, 
+ Oleg Nesterov <oleg@redhat.com>, Peter Zijlstra <peterz@infradead.org>, 
+ Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
+ x86@kernel.org, Arnaldo Carvalho de Melo <acme@kernel.org>, 
+ Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+ Rik van Riel <riel@surriel.com>, Harry Yoo <harry@kernel.org>, 
+ Juri Lelli <juri.lelli@redhat.com>, 
+ Vincent Guittot <vincent.guittot@linaro.org>, 
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
+ David Airlie <airlied@gmail.com>, Will Deacon <will@kernel.org>, 
+ "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, 
+ Nick Piggin <npiggin@gmail.com>, Arnd Bergmann <arnd@arndb.de>, 
+ Muchun Song <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>, 
+ "Matthew Wilcox (Oracle)" <willy@infradead.org>, Jan Kara <jack@suse.cz>, 
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+ Catalin Marinas <catalin.marinas@arm.com>, 
+ Madhavan Srinivasan <maddy@linux.ibm.com>, Anup Patel <anup@brainfault.org>, 
+ Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, 
+ Albert Ou <aou@eecs.berkeley.edu>, 
+ Christian Borntraeger <borntraeger@linux.ibm.com>, 
+ Janosch Frank <frankja@linux.ibm.com>, 
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, 
+ Alexander Gordeev <agordeev@linux.ibm.com>, 
+ Gerald Schaefer <gerald.schaefer@linux.ibm.com>, 
+ Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Andreas Larsson <andreas@gaisler.com>, 
+ Alexander Viro <viro@zeniv.linux.org.uk>, 
+ Christian Brauner <brauner@kernel.org>, 
+ Matthew Brost <matthew.brost@intel.com>, 
+ Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>, 
+ Byungchul Park <byungchul@sk.com>, Gregory Price <gourry@gourry.net>, 
+ Ying Huang <ying.huang@linux.alibaba.com>, 
+ Alistair Popple <apopple@nvidia.com>, Chris Li <chrisl@kernel.org>, 
+ Kairui Song <kasong@tencent.com>, Kemeng Shi <shikemeng@huaweicloud.com>, 
+ Nhat Pham <nphamcs@gmail.com>, Baoquan He <baoquan.he@linux.dev>, 
+ Youngjun Park <youngjun.park@lge.com>, Johannes Weiner <hannes@cmpxchg.org>, 
+ Qi Zheng <qi.zheng@linux.dev>, Shakeel Butt <shakeel.butt@linux.dev>, 
+ Axel Rasmussen <axelrasmussen@google.com>, Yuanchu Xie <yuanchu@google.com>, 
+ Wei Xu <weixugc@google.com>, Xu Xin <xu.xin16@zte.com.cn>, 
+ Chengming Zhou <chengming.zhou@linux.dev>, Michal Hocko <mhocko@kernel.org>, 
+ Miklos Szeredi <miklos@szeredi.hu>
+Cc: linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
+ linux-doc@vger.kernel.org, linux-usb@vger.kernel.org, 
+ linux-rdma@vger.kernel.org, selinux@vger.kernel.org, 
+ linux-sound@vger.kernel.org, bpf@vger.kernel.org, 
+ linux-scsi@vger.kernel.org, linux-fbdev@vger.kernel.org, 
+ dri-devel@lists.freedesktop.org, linux-trace-kernel@vger.kernel.org, 
+ linux-perf-users@vger.kernel.org, linux-arch@vger.kernel.org, 
+ linux-fsdevel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org, 
+ kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+ linux-s390@vger.kernel.org, sparclinux@vger.kernel.org, 
+ fuse-devel@lists.linux.dev, "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2543; i=ljs@kernel.org;
+ h=from:subject:message-id; bh=hmAMxzQfefvCCrwcVcCxiVfaMiTF+Pgb+sQCkeg4Kig=;
+ b=owGbwMvMwCV2fu7ZrsZH9SKMp9WSGLIWZG4rDL0wM1zo9r/ItAgHramdVwr1yv92T36ieSTxe
+ OBa5hO+HaUsDGJcDLJiiizPv4jvDxIJm9d5wd8NZg4rE8gQBi5OAZjIVHNGhp9eGnpT9J/vfMjT
+ 2NrLniVqE7l67xoXNg7v+pVielpf5BkZ7k6sb3armz1Zld8keddu08CEbxvuLdXo9v16gb/FYd1
+ 1FgA=
+X-Developer-Key: i=ljs@kernel.org; a=openpgp;
+ fpr=E7F417BF5214569E89D04F46CF9DCD8A81E27F14
 
-When FEAT_S1PIE (stage 1 permission indirection) is supported we
-currently enable and use it in the hypervisor when running in VHE mode
-but not when running in nVHE or hVHE mode.  While systems with
-FEAT_S1PIE would normally use VHE users can configure them for nVHE or
-hVHE.  Enable FEAT_S1PIE with hVHE only, hVHE is used for protected VMs
-but there is no real use case for nVHE mode on hardware with this
-feature.
+It is now an invariant that VMA_IO_BIT is not set except by kernel-owned
+mappings, so each existing VMA_SPECIAL_FLAGS test need only test for
+VMA_DONTEXPAND_BIT, VMA_PFNMAP_BIT and VMA_MIXEDMAP_BIT.
 
-AP[1] is one of the bits used to encode the indirected permissions.
-Since for hVHE this is always 0 we only configure the subset of
-indirected permissions that the system is expected to use.
+This is precisely a test for a kernel-owned or fixed mapping.
 
-With permission indirection read and write permissions must be encoded
-in the bits used by S1PIE, set DBM for writable mappings.  Only do this
-when using S1PIE, the hypervisor does not otherwise use DBM so no
-existing hypervisor code sets that bit.  Since the meaning is assigned
-via S1PIE this does not actually enable DBM, the mappings we configure
-just grant write permission.
+Update a number of callsites which already explicitly handle hugetlb
+mappings.
 
-In order to enable S1PIE we also need to configure TCR2_EL2 which is
-currently only done in __finalise_el2 which is VHE only, do so when the
-register is present.  When running in nVHE we leave TCR2_EL2.PIE
-disabled.  This ensures we have an explicit configuration for TCR2_EL2
-when it is present in the system.
+vma_supports_mlock() and ksm_compatible() also explicitly bail on droppable
+mappings - detecting kernel-owned, fixed or droppable mappings is handled
+by vma_is_persistent(), so in these cases use this predicate.
 
-For simplicity we unconditionally initialise PIR_EL2 and PIRE0_EL2 if
-FEAT_S1PIE is present, this will have no effect in nVHE mode since we
-set TCR2_EL2.PIE to 0.
+should_skip_vma() tests for locked, kernel-owned or fixed memory (having
+already excluded hugetlb mappings) so simply test for those there.
 
-This should have no practical impact other than causing any unexpected
-encodings to map to no permissions instead of their default meanings.
-It will mean that the configuration is closer to that in VHE mode, and
-will be required for future work enabling features like D128 and GCS
-which are only available via indirection.
+No functional change intended.
 
-Signed-off-by: Mark Brown <broonie@kernel.org>
+Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
 ---
-Changes in v2:
-- Rebase onto v7.3-rc2.
-- Don't bother cleaning up TCR2_EL2 on hypervisor exit, and squash the
-  handling into the S1PIE patch.
-- Remove support for nVHE mode.
-- Link to v1: https://patch.msgid.link/20260904-kvm-arm64-nvhe-pie-v1-0-29d59f245e6c@kernel.org
----
- arch/arm64/include/asm/kvm_arm.h     | 19 +++++++++++++++++++
- arch/arm64/include/asm/kvm_asm.h     |  1 +
- arch/arm64/include/asm/kvm_pgtable.h |  1 +
- arch/arm64/kernel/asm-offsets.c      |  1 +
- arch/arm64/kvm/arm.c                 |  8 +++++++-
- arch/arm64/kvm/hyp/nvhe/hyp-init.S   | 16 ++++++++++++++--
- arch/arm64/kvm/hyp/pgtable.c         |  8 ++++++++
- 7 files changed, 51 insertions(+), 3 deletions(-)
+ mm/internal.h | 4 +---
+ mm/ksm.c      | 4 +---
+ mm/vmscan.c   | 3 ++-
+ 3 files changed, 4 insertions(+), 7 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 4bfbd827c5aa..eecac91d41e4 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -345,4 +345,23 @@
- #define VCPU_RESET_PSTATE_SVC	(PSR_AA32_MODE_SVC | PSR_AA32_A_BIT | \
- 				 PSR_AA32_I_BIT | PSR_AA32_F_BIT)
+diff --git a/mm/internal.h b/mm/internal.h
+index 104bbca1eb57..6c004037913b 100644
+--- a/mm/internal.h
++++ b/mm/internal.h
+@@ -1112,9 +1112,7 @@ static inline struct file *maybe_unlock_mmap_for_io(struct vm_fault *vmf,
  
-+/*
-+ * Permission indirection configuration for the hVHE hypervisor when
-+ * we have FEAT_S1PIE. Like the host kernel we configure a mapping
-+ * mostly equivalent to the non-PIE meanings of the bits so the
-+ * page table manipulation code needs minimal updates for PIE.
-+ *
-+ * These mappings are minimal with only things used from the
-+ * hVHE hypervisor, nVHE is not supported.  Write permission is
-+ * controlled via DBM.
-+ */
-+
-+#define KVM_HYP_PIR_IDX(uxn, pxn, dbm, ap1) (((uxn) << 3) | ((pxn) << 2) | \
-+					     ((dbm) << 1) | (ap1))
-+
-+#define KVM_HVHE_PIR_EL2 (						\
-+	PIRx_ELx_PERM_PREP(KVM_HYP_PIR_IDX(0, 0, 0, 0), PIE_RX)	|	\
-+	PIRx_ELx_PERM_PREP(KVM_HYP_PIR_IDX(1, 1, 0, 0), PIE_R)	|	\
-+	PIRx_ELx_PERM_PREP(KVM_HYP_PIR_IDX(1, 1, 1, 0), PIE_RW))
-+
- #endif /* __ARM64_KVM_ARM_H__ */
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index e5b92ac09e69..eb796436d6eb 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -208,6 +208,7 @@ extern void *__vhe_undefined_symbol;
- struct kvm_nvhe_init_params {
- 	unsigned long mair_el2;
- 	unsigned long tcr_el2;
-+	unsigned long tcr2_el2;
- 	unsigned long tpidr_el2;
- 	unsigned long stack_hyp_va;
- 	unsigned long stack_pa;
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index 41a8687938eb..7b1b7ab3e88e 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -93,6 +93,7 @@ typedef u64 kvm_pte_t;
- 
- #define KVM_PTE_LEAF_ATTR_HI_S2_XN	GENMASK(54, 53)
- 
-+#define KVM_PTE_LEAF_ATTR_HI_S1_DBM	BIT(51)
- #define KVM_PTE_LEAF_ATTR_HI_S1_GP	BIT(50)
- 
- #define KVM_PTE_LEAF_ATTR_S2_PERMS	(KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R | \
-diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
-index 9c853ed3ceab..baffe58015d6 100644
---- a/arch/arm64/kernel/asm-offsets.c
-+++ b/arch/arm64/kernel/asm-offsets.c
-@@ -118,6 +118,7 @@ int main(void)
-   DEFINE(HOST_DATA_CONTEXT,	offsetof(struct kvm_host_data, host_ctxt));
-   DEFINE(NVHE_INIT_MAIR_EL2,	offsetof(struct kvm_nvhe_init_params, mair_el2));
-   DEFINE(NVHE_INIT_TCR_EL2,	offsetof(struct kvm_nvhe_init_params, tcr_el2));
-+  DEFINE(NVHE_INIT_TCR2_EL2,	offsetof(struct kvm_nvhe_init_params, tcr2_el2));
-   DEFINE(NVHE_INIT_TPIDR_EL2,	offsetof(struct kvm_nvhe_init_params, tpidr_el2));
-   DEFINE(NVHE_INIT_STACK_HYP_VA,	offsetof(struct kvm_nvhe_init_params, stack_hyp_va));
-   DEFINE(NVHE_INIT_PGD_PA,	offsetof(struct kvm_nvhe_init_params, pgd_pa));
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 8b080804bc90..607a6f808b1c 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -2158,7 +2158,7 @@ static int kvm_init_vector_slots(void)
- static void __init cpu_prepare_hyp_mode(int cpu, u32 hyp_va_bits)
+ static inline bool vma_supports_mlock(const struct vm_area_struct *vma)
  {
- 	struct kvm_nvhe_init_params *params = per_cpu_ptr_nvhe_sym(kvm_init_params, cpu);
--	unsigned long tcr;
-+	unsigned long tcr, tcr2;
+-	if (vma_test_any_mask(vma, VMA_SPECIAL_FLAGS))
+-		return false;
+-	if (vma_test_single_mask(vma, VMA_DROPPABLE))
++	if (!vma_is_persistent(vma))
+ 		return false;
+ 	if (vma_is_dax(vma) || vma_is_hugetlb(vma))
+ 		return false;
+diff --git a/mm/ksm.c b/mm/ksm.c
+index 624f37975e12..f80372bfd4b2 100644
+--- a/mm/ksm.c
++++ b/mm/ksm.c
+@@ -747,9 +747,7 @@ static bool ksm_compatible(const struct file *file, vma_flags_t vma_flags)
+ 	if (vma_flags_test_any(&vma_flags, VMA_SHARED_BIT, VMA_MAYSHARE_BIT,
+ 			       VMA_HUGETLB_BIT))
+ 		return false;
+-	if (vma_flags_test_single_mask(&vma_flags, VMA_DROPPABLE))
+-		return false;
+-	if (vma_flags_test_any_mask(&vma_flags, VMA_SPECIAL_FLAGS))
++	if (!vma_flags_is_persistent(&vma_flags))
+ 		return false;
+ 	if (file_is_dax(file))
+ 		return false;
+diff --git a/mm/vmscan.c b/mm/vmscan.c
+index 9cbfb90b0ad1..803754caf4fa 100644
+--- a/mm/vmscan.c
++++ b/mm/vmscan.c
+@@ -3419,7 +3419,8 @@ static int should_skip_vma(unsigned long start, unsigned long end, struct mm_wal
+ 	if (!vma_has_recency(vma))
+ 		return true;
  
- 	/*
- 	 * Calculate the raw per-cpu offset without a translation from the
-@@ -2186,6 +2186,12 @@ static void __init cpu_prepare_hyp_mode(int cpu, u32 hyp_va_bits)
- 	tcr |= TCR_T0SZ(hyp_va_bits);
- 	params->tcr_el2 = tcr;
+-	if (vma->vm_flags & (VM_LOCKED | VM_SPECIAL))
++	if (vma_test(vma, VMA_LOCKED_BIT) || vma_is_kernel_owned(vma) ||
++	    vma_is_fixed_mapping(vma))
+ 		return true;
  
-+	tcr2 = 0;
-+	if (cpus_have_final_cap(ARM64_HAS_S1PIE) &&
-+	    cpus_have_final_cap(ARM64_KVM_HVHE))
-+		tcr2 |= TCR2_EL2_PIE;
-+	params->tcr2_el2 = tcr2;
-+
- 	params->pgd_pa = kvm_mmu_get_httbr();
- 	if (is_protected_kvm_enabled())
- 		params->hcr_el2 = HCR_HOST_NVHE_PROTECTED_FLAGS;
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-index 0b3e0b28dfc7..cd5b75c8776f 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-@@ -137,8 +137,20 @@ alternative_if ARM64_HAS_CNP
- alternative_else_nop_endif
- 	msr	ttbr0_el2, x2
- 
--	ldr	x0, [x0, #NVHE_INIT_TCR_EL2]
--	msr	tcr_el2, x0
-+	ldr	x1, [x0, #NVHE_INIT_TCR_EL2]
-+	msr	tcr_el2, x1
-+
-+alternative_if ARM64_HAS_S1PIE
-+	/* S1PIE is only enabled with TCR2_EL2.PIE if we are running hVHE */
-+	mov_q	x1, KVM_HVHE_PIR_EL2
-+	msr	REG_PIR_EL2, x1
-+	msr	REG_PIRE0_EL2, xzr
-+alternative_else_nop_endif
-+
-+alternative_if ARM64_HAS_TCR2
-+	ldr	x1, [x0, #NVHE_INIT_TCR2_EL2]
-+	msr	REG_TCR2_EL2, x1
-+alternative_else_nop_endif
- 
- 	isb
- 
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index b74dd5ce1efd..5276c2874fe0 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -349,6 +349,14 @@ static int hyp_set_prot_attr(enum kvm_pgtable_prot prot, kvm_pte_t *ptep)
- 
- 		if (system_supports_bti_kernel())
- 			attr |= KVM_PTE_LEAF_ATTR_HI_S1_GP;
-+	} else if (cpus_have_final_cap(ARM64_HAS_S1PIE) &&
-+		   cpus_have_final_cap(ARM64_KVM_HVHE) &&
-+		   (prot & KVM_PGTABLE_PROT_W)) {
-+		/*
-+		 * When using S1PIE for hVHE set DBM for writable
-+		 * mappings since AP[2] is ineffective.
-+		 */
-+		attr |= KVM_PTE_LEAF_ATTR_HI_S1_DBM;
- 	}
- 
- 	if (cpus_have_final_cap(ARM64_KVM_HVHE)) {
+ 	if (vma == get_gate_vma(vma->vm_mm))
 
----
-base-commit: df2908090cda368b01ff43709f51890076c56157
-change-id: 20260828-kvm-arm64-nvhe-pie-cb86c417f9ea
-
-Best regards,
---  
-Mark Brown <broonie@kernel.org>
+-- 
+2.55.0
 
