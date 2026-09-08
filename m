@@ -1,44 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E05B58F09F;
-	Tue,  8 Sep 2026 16:56:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D852D534441;
+	Tue,  8 Sep 2026 16:57:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788886605; cv=none; b=GGvmEtZzE8zC2V6xki32qVT7bdUqNw5prd5Cxmnmc6/RtkLbjx3V52pod1SAetxxfXqFvrlJguJvqSjHb0gZ+8L+dUsm1w5SDwnLAd1O464lyRTgZcp3RcAD7CrIKQ04uRlLd7n3PzS1hOG/tq5x7PUasIQJpN3n/9xRgejXl0o=
+	t=1788886631; cv=none; b=jvv8u4/Yz4G5tdjspwkM4kGFpExS/8smYckRQ9UJo2QPvaT/4hy34KRJfYjuXFyiD5lp7gKwVGu+TSmvGlLoZAZnEcSPunAbGv+E7NxALZtJWKaeqQZ16ZYLq1n34w4MfLNIk+1/1WUAIwvBMEd7Csh1zXZvjumohNZuCBugujw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788886605; c=relaxed/simple;
-	bh=9WmAZGetd/RUdXfO7ETx95iUTd3l3J9zhXKl4v+7VD4=;
+	s=arc-20240116; t=1788886631; c=relaxed/simple;
+	bh=BQ72hC7FvvdiPt6lZyLBuLAHWTl9blRiPTF8/SSIp0U=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=ag+6vI7z14/YQG30eeYLSZ+IaTR7QuLKz3qt/uGIWd+bVefdctCiQFdKFuI+YVYAJdMq1duTvOcLhB9EG9MZyVnYL4diIlkI7bqcZZPSjUqV0tEibLuOtxBcHoU6QVC7qi4y21YP/3OgURvSHVy8B4u4B8ZVCJsYlsnW0Go4AU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U3T+UwbX; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=nSsgzI+ClzMR81vw5nU9GucjZT7ajhGfvPf8gS9AxaTXmUjLatcWrg4M31lhsGx2ukXJX7fpUOC2FFDJMri0l0KyXJUlUAD6jIuPikBC3A6+h2Pqujpk4atLrzE9PZFltnytzjG7eMLoSj1ojfSxfLLGIA2Nux98/wy6EeEPZ3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xxc2TEnn; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U3T+UwbX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50C501F00A3A;
-	Tue,  8 Sep 2026 16:56:43 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xxc2TEnn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2799B1F00A3D;
+	Tue,  8 Sep 2026 16:57:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788886603;
-	bh=PSVz+HZbd8+QIFrxArfJkKTLg2fBTYsOIS3WD5CX6LU=;
+	s=k20260515; t=1788886629;
+	bh=eTo0a5rr1uNawzqYrn7FaCEIUiM51g4mT38NjcCOk/M=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=U3T+UwbXSVaYN/8eFqHviQhNcYK3fnzSFKCIk3qbDMtjy4orO29q0DDULOtrB5x9n
-	 JkU20MN6LApf+VMWOe209PzfdUDXdalYWZbuc0n7fMd5mBHjpWyRIeGuM65CN26spT
-	 6ZlASgl8MbHnPP5+t4n6KrH3fEhsJmDheUX2HGkERL9JudSqKxsntdYHGTFa6TM20S
-	 DQ12UqAAM13wDA4kkBTfbM2QwfDvf0hqmJz4xsiAxLEILR6iqgCsXWsxA+oCNNaihZ
-	 EpcfedHm7Y7S6JPMwDS6pvfFG0Py4CmQpp8gUDvlpMM/XsfLJRpBEquLEEFYg11src
-	 dQjAW9fI7qqDg==
+	b=Xxc2TEnnKlBx1BmcqUNV8fKuyxVLOpO0hZUS7/iLaxT4ibl3svLxzSF1UtQJtwBNF
+	 1GBLfQXWLlJvtwU50aP4xvQrAbGLXyqlU3ZQhglP/u3tYCkADknEE9BhbVK2xEFCg7
+	 fHnq28oy2Gt5SKifuzyzDFYpxpepJfdYSJUIlP3CfCAWt3feXCDpCnmSV0127JamB0
+	 4z2FsfRRrr71i2XCuFf913wysdWl6u6BZxsv/sTTq/wOfnBG+iIBtYTui+51ka+YUc
+	 0+Ay+M1ZwSntOfMEpe/z2bh7vV5U5k+j1JurGkNn2IbM4baF3Jyz5dVQYDL7/uFggS
+	 /xpsTSnwXSmuw==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v17 12/20] KVM: arm64: CCA: Support timers in realm RECs
+Subject: Re: [PATCH v17 16/20] KVM: arm64: CCA: Provide register list for
+ unfinalized RECs
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Suzuki K Poulose" <suzuki.poulose@arm.com>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, "Marc Zyngier" <maz@kernel.org>, "Oliver
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, "Oliver
  Upton" <oupton@kernel.org>
-In-Reply-To: <20260908162223.1683432-13-suzuki.poulose@arm.com>
+In-Reply-To: <20260908162223.1683432-17-suzuki.poulose@arm.com>
 References: <20260908162223.1683432-1-suzuki.poulose@arm.com>
- <20260908162223.1683432-13-suzuki.poulose@arm.com>
+ <20260908162223.1683432-17-suzuki.poulose@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 08 Sep 2026 16:56:42 +0000
-Message-Id: <20260908165643.50C501F00A3A@smtp.kernel.org>
+Date: Tue, 08 Sep 2026 16:57:08 +0000
+Message-Id: <20260908165709.2799B1F00A3D@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,80 +48,87 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [High] Realm VM timers are blackholed on GICv5 hosts due to unconditional=
- physical interrupt masking combined with disabled direct injection.
+- [Medium] Mismatch between KVM_GET_REG_LIST implementation for RECs and it=
+s commit message / comment.
 --
 
-commit 759ada4556cf9518a1b30ec3610b7b7833129bd9
-Author: Steven Price <steven.price@arm.com>
+commit ce52f6b2727531d94e14139ee2966392538b6218
+Author: Jean-Philippe Brucker <jpb@kernel.org>
 
-KVM: arm64: CCA: Support timers in realm RECs
+KVM: arm64: CCA: Provide register list for unfinalized RECs
 
-This commit adds support for handling timers when exiting a realm REC to the
-normal world. It implements realm_timer_irq_ops which relies on the existing
-software resampling mechanism for Realm timer interrupts.
+This commit modifies the KVM_GET_REG_LIST ioctl handler to allow fetching
+the register list for Realm Execution Contexts (RECs) before the VCPUs are
+fully finalized, provided SVE is finalized. It adjusts the size probing and
+array copying logic to prevent -EPERM errors during late REC finalization.
 
-> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-> index eba84cab95d01..3eddf44f7b1dd 100644
-> --- a/arch/arm64/kvm/arch_timer.c
-> +++ b/arch/arm64/kvm/arch_timer.c
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
 [ ... ]
-> @@ -1609,8 +1623,12 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+> @@ -1980,6 +1980,18 @@ static int kvm_arm_vcpu_set_events(struct kvm_vcpu=
+ *vcpu,
+>  	return __kvm_arm_vcpu_set_events(vcpu, events);
+>  }
 > =20
->  	get_timer_map(vcpu, &map);
+> +/*
+> + * Realm VCPUs can be finalized after the Realm descriptor is created.
+> + * Allow the register list for RECs before the VCPUs are finalized, but
+> + * after the SVE is finalized.
+> + */
+> +static bool kvm_arm_vcpu_reg_list_allowed(struct kvm_vcpu *vcpu)
+> +{
+> +	if (kvm_arm_vcpu_is_finalized(vcpu))
+> +		return true;
+> +	return vcpu_is_rec(vcpu);
+> +}
+
+[Severity: Medium]
+Does this logic in kvm_arm_vcpu_reg_list_allowed() unconditionally allow
+RECs, bypassing the SVE finalization check? The comment explicitly states
+"but after the SVE is finalized," yet if the VCPU is a REC, this path
+returns true regardless of the SVE finalization status.
+
+> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> --- a/arch/arm64/kvm/guest.c
+> +++ b/arch/arm64/kvm/guest.c
+[ ... ]
+> @@ -616,9 +616,6 @@ static int copy_sve_reg_indices(const struct kvm_vcpu=
+ *vcpu,
+>  	if (!vcpu_has_sve(vcpu))
+>  		return 0;
 > =20
-> -	ops =3D vgic_is_v5(vcpu->kvm) ? &arch_timer_irq_ops_vgic_v5 :
-> -				      &arch_timer_irq_ops;
-> +	if (vcpu_is_rec(vcpu))
-> +		ops =3D &realm_timer_irq_ops;
-> +	else if (vgic_is_v5(vcpu->kvm))
-> +		ops =3D &arch_timer_irq_ops_vgic_v5;
-> +	else
-> +		ops =3D &arch_timer_irq_ops;
+> -	/* Policed by KVM_GET_REG_LIST: */
+> -	WARN_ON(!kvm_arm_vcpu_sve_finalized(vcpu));
+> -
+>  	/*
+>  	 * Enumerate this first, so that userspace can save/restore in
+>  	 * the order reported by KVM_GET_REG_LIST:
+> @@ -628,6 +625,9 @@ static int copy_sve_reg_indices(const struct kvm_vcpu=
+ *vcpu,
+>  		return -EFAULT;
+>  	++num_regs;
 > =20
->  	for (int i =3D 0; i < nr_timers(vcpu); i++)
->  		kvm_vgic_set_irq_ops(vcpu, timer_irq(vcpu_get_timer(vcpu, i)), ops);
+> +	if (!kvm_arm_vcpu_sve_finalized(vcpu))
+> +		return num_regs;
+> +
 
-[Severity: High]
-Will this cause Realm VM timers to be lost on a GICv5 host?
+[Severity: Medium]
+Does this return a positive success code (num_regs) rather than an error?
 
-When a Realm VM is created on a GICv5 host, vcpu_is_rec(vcpu) takes precede=
-nce,
-assigning realm_timer_irq_ops. However, this struct lacks the
-.set_direct_injection callback used for hardware direct injection.
+The commit message states that "a KVM_GET_REG_LIST call that only probes
+for the array size will now succeed even if SVE is not finalized, but that
+seems harmless since the following KVM_GET_REG_LIST with the full array
+will fail."=20
 
-At the same time, because vgic_is_v5(vcpu->kvm) is still true for the host,
-other timer paths will unconditionally assume direct injection is active. F=
-or
-example, kvm_timer_update_irq() skips software injection:
+Returning a positive number of registers here in copy_sve_reg_indices()
+causes the full array fetch to succeed silently instead of failing as the
+commit message claims.
 
-kvm_timer_update_irq() {
-        ...
-        /* Skip injecting on GICv5 for directly injected (DVI'd) timers */
-        if (vgic_is_v5(vcpu->kvm)) {
-                ...
-                if (map.direct_ptimer =3D=3D timer_ctx ||
-                    map.direct_vtimer =3D=3D timer_ctx)
-                        return;
-        }
-}
-
-Additionally, kvm_timer_vcpu_load_gic() unconditionally masks the physical
-timer interrupt for GICv5 setups:
-
-kvm_timer_vcpu_load_gic() {
-        ...
-        phys_active |=3D pending;
-        phys_active |=3D vgic_is_v5(vcpu->kvm);
-
-        set_timer_irq_phys_active(ctx, phys_active);
-}
-
-Since hardware injection is not configured by the Realm ops and software
-injection is bypassed due to the GICv5 checks, does this completely blackho=
-le
-timer interrupts for Realm VMs on GICv5 hardware?
+>  	for (i =3D 0; i < slices; i++) {
+>  		for (n =3D 0; n < SVE_NUM_ZREGS; n++) {
+>  			reg =3D KVM_REG_ARM64_SVE_ZREG(n, i);
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260908162223.1683=
-432-1-suzuki.poulose@arm.com?part=3D12
+432-1-suzuki.poulose@arm.com?part=3D16
