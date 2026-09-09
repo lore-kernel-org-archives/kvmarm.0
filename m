@@ -1,112 +1,179 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC34C54CF4A;
-	Wed,  9 Sep 2026 14:29:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC8E357981A
+	for <kvmarm@lists.linux.dev>; Wed,  9 Sep 2026 14:35:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788964178; cv=none; b=oPH0kcqLiMvDN+Lpp5rxBFmiZQ0wKB04QA7whJr8Z7GjTsOo4TQ0bmwTRY+wXSyRY3U94l8MVGK8ZDjthLZMVlKoZAcbSVaIpXSc9QCNbQin8aKMbtnkgogWpLwjne3SGK6g26v/vVt0EmRd1e9lO8jGik5OVSUNeJhThKaGCuo=
+	t=1788964544; cv=none; b=SZyx0wc0pGvBG/RueD9KSSyew5TEo+3dQvdf51O7IjDWn63aU9B+jSs0IZEltJBSmKPt6t5geZdmAN4amN/51oKINAJugtc4kOsAedbxUZtqtLga4N0NxEAvOQV8ZYBPZ392H46o+CjqxfETgO8elP5orsRmlkU55QHtyUmFacw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788964178; c=relaxed/simple;
-	bh=ZnKVmdJ0+txybHfevcWKArBIPP2qSbbM8PODeHjNXDk=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cZtSQ1nj0sihrTcDr4l9XwfNwMBIcP0S5KVEimkMHMYGWKHq7yWzo0S/Aw0o87ivlyRM0xxh31KWiawNqhS5yOytXLV/wWKzIjKPB0Abd27eB/vcvKXE1u3+nGoybi+cJ5mvaKUIx2eyaqsORfzxAsloV59eY0/ajKO7veBPdJk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mp3Gp/IS; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788964544; c=relaxed/simple;
+	bh=I9XuzW0cEz018KO1kKpVvVK/800kvyU3xHh5hRfnP+U=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=N973nIJsJF4EbpXSY2gWSna7RWXBCezRPGWva/FI+cClVQLYo8TuL+RtePAz3XW5DNZ2lq5xjdCe5HVaCcm3yVnFdrOLxlDsa9VoZ3EfxApij6eV9RzR/TVg4eZ8s1JXYxx2P5R7U/Ev2iik6OfpzqRhVi8aM3MA+4Vsx8S1CgY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=BqKs46+T; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mp3Gp/IS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAAF51F00A3D;
-	Wed,  9 Sep 2026 14:29:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788964176;
-	bh=Se2xxe/a85TgX4HpduI7NMXMmiSfdyKReYm83RyVZEQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=mp3Gp/ISYu0vSbDYm62I7Ze2c9HBeBzaxBegbj7Cl4LJvu2Cx3R6+UlQwruZjt7+m
-	 nbe2ijWJ7BVOVYQIahZ2RFFG5QxULySNYH9SM7TRKwVIj5K4ueimVojMtsRljmJHs0
-	 EjeFE/7bZQFanQIMoanZftO80yY+hcueMbxpeMYbPYzq97Ge8z3zcavsjAQt5jh7h7
-	 qBkR6cKZiFwCGD4emGSIg3Fc2lbBn/IDdWNAAHpyT2tom3krouV/+GC1Omj1QX6K8W
-	 32cchiGfWPaaU0DzqsB5qpgof+r6+e/bm2qjoUJTY1GM7f1hKNl4afbeUeVz9+L0rG
-	 uWTOrfen2DUfg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1x4JIs-00000006jPD-2fdc;
-	Wed, 09 Sep 2026 14:29:34 +0000
-Date: Wed, 09 Sep 2026 15:29:29 +0100
-Message-ID: <86zexq7b1y.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="BqKs46+T"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 037CB1691;
+	Wed,  9 Sep 2026 07:35:37 -0700 (PDT)
+Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 61A7C3F528;
+	Wed,  9 Sep 2026 07:35:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1788964540; bh=I9XuzW0cEz018KO1kKpVvVK/800kvyU3xHh5hRfnP+U=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=BqKs46+Tdriido5VOOEb+8dsa+BZ+2TaSdLHLwoQDJqu5BOmU8sslti7c6UK1BNkH
+	 c640ChcuSxdgZtAm/+cLOWochAsR310WLvdnktS3rOnEHNXnsitQUN2nRxBPpzY0Ui
+	 QGXmp+pK+/uKU5ureLNQspeJTVYWXAVhoE//ZfXw=
+From: Leonardo Bras <leo.bras@arm.com>
 To: Mark Brown <broonie@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
+Cc: Leonardo Bras <leo.bras@arm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	Yao Yuan <yaoyuan@linux.alibaba.com>,
 	linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org,
 	kvmarm@lists.linux.dev,
+	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] KVM: arm64: Enable S1PIE for hVHE
-In-Reply-To: <e3c716c2-66ef-4dd0-bcae-6df4ff814e48@sirena.org.uk>
-References: <20260908-kvm-arm64-nvhe-pie-v2-1-79e42d28cc08@kernel.org>
-	<861pb24v45.wl-maz@kernel.org>
-	<e3c716c2-66ef-4dd0-bcae-6df4ff814e48@sirena.org.uk>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+Subject: Re: [PATCH v20 08/14] KVM: arm64: Enforce EXLOCK for SPSR and ELR
+Date: Wed,  9 Sep 2026 15:35:32 +0100
+Message-ID: <aqFutNSGfEpJFKJl@LeoBrasDK>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260901-arm64-gcs-v20-8-f31750bdfadb@kernel.org>
+References: <20260901-arm64-gcs-v20-0-f31750bdfadb@kernel.org> <20260901-arm64-gcs-v20-8-f31750bdfadb@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-On Wed, 09 Sep 2026 13:17:33 +0100,
-Mark Brown <broonie@kernel.org> wrote:
+On Tue, Sep 01, 2026 at 10:47:06PM +0100, Mark Brown wrote:
+> As per I_CFFNS and the pseudocode for the SPSR_ELx and ELR_ELx registers
+> a GCS exception with ExType 1 is generated for attempts to write to
+> those registers when both GCSCR_ELx.EXLOCKEN and PSTATE.EXLOCK are set.
+> Ensure that this is enforced for guests if access to these registers
+> from the guest is handled by the hypervisor.
 > 
-> > > +alternative_if ARM64_HAS_TCR2
-> > > +	ldr	x1, [x0, #NVHE_INIT_TCR2_EL2]
-> > > +	msr	REG_TCR2_EL2, x1
-> > > +alternative_else_nop_endif
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_emulate.h |  8 +++++++
+>  arch/arm64/kvm/sys_regs.c            | 42 ++++++++++++++++++++++++++++++++----
+>  2 files changed, 46 insertions(+), 4 deletions(-)
 > 
-> > S1PIE implies TCR2. Why the additional alternatives?
-> 
-> That is true but TCR2 does not imply S1PIE, I wrote things this way so
-> that TCR2 is initialised even if we end up on a system where that is
-> present but S1PIE is not (or S1PIE is present but has been disabled by a
-> command line override).  This is during startup so it seemed reasonable
-> to write things in a straightforward and easy to read fashion.
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index 0cd91b3d6c82..e47ab38327de 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -81,6 +81,14 @@ int kvm_inject_nested_irq(struct kvm_vcpu *vcpu);
+>  int kvm_inject_nested_sea(struct kvm_vcpu *vcpu, bool iabt, u64 addr);
+>  int kvm_inject_nested_serror(struct kvm_vcpu *vcpu, u64 esr);
+>  
+> +static inline void kvm_inject_exlock(struct kvm_vcpu *vcpu)
+> +{
+> +	u64 esr = FIELD_PREP(ESR_ELx_EC_MASK, ESR_ELx_EC_GCS) | ESR_ELx_IL |
+> +		  FIELD_PREP(ESR_ELx_ExType_MASK, ESR_ELx_ExType_EXLOCK);
 
-Fair enough.
+Seems the likely encoding, based on reading the ESR_EL2 doc, not sure if 
+there is a better place to read that from.
 
-> > TBH, I think this is completely going the wrong way. Why can't we
-> > write this as a discrete enumeration of the permission combination we
-> > support (all 3 of them), and map that to the correct index?
-> 
-> I was deliberately following a similar pattern to that used for the host
-> kernel, intended to minimise code changes.  I will rework so we have an
-> alternative path for S1PIE rather than trying to share.
+> +
+> +	kvm_inject_sync(vcpu, esr);
+> +}
+> +
+>  static inline void kvm_inject_nested_sve_trap(struct kvm_vcpu *vcpu)
+>  {
+>  	u64 esr = FIELD_PREP(ESR_ELx_EC_MASK, ESR_ELx_EC_SVE) |
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index c5ce18b3f7d8..1f80c26a9839 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -2866,14 +2866,42 @@ static bool access_sp_el1(struct kvm_vcpu *vcpu,
+>  	return true;
+>  }
+>  
+> +static inline bool sysregs_exlocked(struct kvm_vcpu *vcpu)
+> +{
+> +	u64 gcscr;
+> +
+> +	if (!kvm_has_gcs(vcpu->kvm))
+> +		return false;
+> +
+> +	if (!(vcpu->arch.ctxt.regs.pstate & PSR_EXLOCK_BIT))
+> +		return false;
+> +
+> +	/*
+> +	 * Note that the EXLOCKEN for the running EL is checked
+> +	 * regardless of the register written to.
+> +	 */
+> +	if (is_hyp_ctxt(vcpu))
+> +		gcscr = vcpu_read_sys_reg(vcpu, GCSCR_EL2);
+> +	else
+> +		gcscr = vcpu_read_sys_reg(vcpu, GCSCR_EL1);
+> +
+> +	return gcscr & GCSCR_ELx_EXLOCKEN;
+> +}
+> +
 
-I think it is fine to keep the same indices as the kernel for
-permissions that map to something that can be expressed with direct
-permissions.
+Right, because on both ELR_ELx and SPSR_EL{1,2} we have to check if
+GCS is enabled && EXLOCKEN=1 && EXLOCK=1, 
+so any of those conditions being false mean no exlock injection is needed. 
 
-But indirect permissions are not additive, and therefore shouldn't be
-constructed as such. They are also more expressive, and there will
-be a point where we will want to have other permissions that cannot be
-expressed by "emulating" direct permissions (Execute-Only springs to
-mind).
 
-At this stage, this is not churn. This is an investment.
+>  static bool access_elr(struct kvm_vcpu *vcpu,
+>  		       struct sys_reg_params *p,
+>  		       const struct sys_reg_desc *r)
+>  {
+> -	if (p->is_write)
+> +	if (p->is_write) {
+> +		if (sysregs_exlocked(vcpu)) {
+> +			kvm_inject_exlock(vcpu);
+> +			return false;
+> +		}
+> +
+>  		vcpu_write_sys_reg(vcpu, p->regval, ELR_EL1);
+> -	else
+> +	} else {
+>  		p->regval = vcpu_read_sys_reg(vcpu, ELR_EL1);
+> +	}
+>  
+>  	return true;
+>  }
+> @@ -2882,10 +2910,16 @@ static bool access_spsr(struct kvm_vcpu *vcpu,
+>  			struct sys_reg_params *p,
+>  			const struct sys_reg_desc *r)
+>  {
+> -	if (p->is_write)
+> +	if (p->is_write) {
+> +		if (sysregs_exlocked(vcpu)) {
+> +			kvm_inject_exlock(vcpu);
+> +			return false;
+> +		}
+> +
+>  		__vcpu_assign_sys_reg(vcpu, SPSR_EL1, p->regval);
+> -	else
+> +	} else {
+>  		p->regval = __vcpu_sys_reg(vcpu, SPSR_EL1);
+> +	}
+>  
+>  	return true;
+>  }
 
-	M.
+FWIW:
+Reviewed-by: Leonardo Bras <leo.bras@arm.com>
 
--- 
-Without deviation from the norm, progress is not possible.
+Thanks!
+Leo
