@@ -1,208 +1,303 @@
-Received: from mx0b-002c1b01.pphosted.com (mx0b-002c1b01.pphosted.com [148.163.155.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60DAE48A8CC
-	for <kvmarm@lists.linux.dev>; Wed,  9 Sep 2026 09:04:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.155.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788944666; cv=fail; b=YfOGETwONkUzQTmk3iHSpIKCqrBjb3V70i1WSmrQpUDc8jxlPe1PIySfPy6MNX1VZJWgv1R+oZHUqnSuNk2GdVHyrEz9DygAq9OFDDl6DUJtn4FYEKBF7jZuyx5npGGiQpFXv985lYT2uhoYBb+KgCzcXC4J8XPJd1mSLOSue20=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788944666; c=relaxed/simple;
-	bh=oF9YtWzRCXZJfkMI2DAhG89uPx4x4tBvkcLaJYYTNe8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=b1bUwMbNtb1Ai5T5fVmkNgfEqSd0wrBtZWnVslLdALWvLmfrZ6dl7kqPtxs0tbx5xbhuj962UkSjEkdm3wxavZXNFSR9/5T9Krp2rW2phimKCTU6e3wh3VnpmSu+DdDV5bPvAjZvktRPLmDZ4GyPGpZSL+/0WwJ54bGDdqnPLW0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nutanix.com; spf=pass smtp.mailfrom=nutanix.com; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=Z5onsghh; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=iiXRN7Rg; arc=fail smtp.client-ip=148.163.155.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nutanix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nutanix.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7859F3A9856;
+	Wed,  9 Sep 2026 09:44:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788947070; cv=none; b=F4Sl9auIR5rXoGXg9FHcUlQIUibIK+dsrMTXa2KeHxaZyYyUdQh7uhyw3fTwZ0ROXPuz6yC0l7fzDWI7v3F2tONVQ5YA41aB9fzZkxeGvzWcW5opFaN1/7Q7SyRCTvH4JG376TrNKiyrLA2KM90tWrBx89l/3Z1iRhCFgfCDO/Y=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788947070; c=relaxed/simple;
+	bh=F20jaOy0211qVv8rThlOWOZd3AMl5/zgEpZA6DloFFk=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DWJECjmaQSqVQ7vKAflBmBavEYDrz1J4/Mqg10P4sr/KiDc6Gx8tBmFCNyQQPbgZIxcrHwFTHEEAcXor5MD8cXU8s+nFgOa4x+jT7SmQXytP1W88q79u3HaQJtjgfLqyokTlJUWWQoied3UOXGavdAv9eho14oKIqh/i696yXFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S45tUg7L; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="Z5onsghh";
-	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="iiXRN7Rg"
-Received: from pps.filterd (m0127841.ppops.net [127.0.0.1])
-	by mx0b-002c1b01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 688MfL7s229006;
-	Wed, 9 Sep 2026 01:47:15 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com; h=
-	cc:content-id:content-transfer-encoding:content-type:date:from
-	:in-reply-to:message-id:mime-version:references:subject:to; s=
-	proofpoint20171006; bh=oF9YtWzRCXZJfkMI2DAhG89uPx4x4tBvkcLaJYYTN
-	e8=; b=Z5onsghhJwqd/pGVjEwP4DIDVLeyjHeLEtc/Dpx6rXGr71MxL8TdeyEZw
-	S1h27XwAFKw2YfXTgiTM8lhzRg7DFx366ZoitnXxIC6MnPG9V/7o+hOYwNvpKy/e
-	/0y5IXmZx8mmdHjYBFgFJs8kChRVBdoZGiDYxCCYuzcOwVjaJmN2dJlQ59LOKgNK
-	OOPNGuY8qhKQu4wCQ+lh8N+f09x8MgGARbJYnyc7GM72PAHnT/5L8D1i83Affqnq
-	1rYjwG6sIkMTTKm+NV/IonFJJm3jCJFdH/63lc9gmSWR8KkPjwT+3xs8xYxXfTXZ
-	X8JuLCQ7VYXVAO5K8jYCxlVRzyjgQ==
-Received: from bn8pr05cu002.outbound.protection.outlook.com (mail-eastus2azon11021087.outbound.protection.outlook.com [52.101.57.87])
-	by mx0b-002c1b01.pphosted.com (PPS) with ESMTPS id 4gjp7m9wk1-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Wed, 09 Sep 2026 01:47:15 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=VpJSktze1HWWo/aXHPvQNHJLCE/v+C4UXd1CKAioPogGYp+wsFRkVKYNGNbPoQC1tnZmp0XWDtrbtbczonFU5wUtBJXCXc5OXDbRv9pkmNAPwALOG3FrpDiARprbmTrb8xqVYfCLNkouJXSH/7FYCBOmC+IGmrsOIQ0Pu5MhGIOXjWo/owSgkK2vfuQlheRJ9OW4QjV1RNVqIS+M1WAbS4JqOTResjIJ/I3naGdzchX4SJBtR7LI0aBm1YK9H1m2nuWR1cJSCRlIlp0gSCp0UhNOyC6GPSR/XUliDMwPUr3hIbhamD3LppdL7+XF5QXCZH9TB+s95A8ANbgd9lF1EQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oF9YtWzRCXZJfkMI2DAhG89uPx4x4tBvkcLaJYYTNe8=;
- b=LzywnY1dIVLETNAiA5TeNj96uNm1nwQHPu2dFq7m5Jis13L0P6xvQLRG6wZzecc2xr+Z83YKy9fyHwsPlFkHIZeNM2ARJwPwRmOzlgM9f8imsMqE/C60QTLXDqnKh1KYPBAN6Wqybx6CP8TWW3ONHYkteAxpeILW14saJgGuLiotZwamxKVyI38f8grHtCN9HGtOKJOPZZzFIPajNypaFF4VFu3L2cUXKLAMg4nBuH4JFAcIXcR/49j1RMYfPXEggAmWJwENcOPRha++gB5loVb45Lydia3VHnOYA4T/J5gUA/1wdtRYEY1eT1PAcx15TQArLmCN0moFENgse68sJQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
- dkim=pass header.d=nutanix.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oF9YtWzRCXZJfkMI2DAhG89uPx4x4tBvkcLaJYYTNe8=;
- b=iiXRN7RgsSz/4ODs6TkShpjwaFbADSypo0F9BYOlMrdPo2yIU2XSKCq2acytchPlOhRcgqUl6sxnLNxvU6gy45zxT2d0eGD3zddvhTFOESaDuZi3xuVweJG6O5lVmS290B6gvtesLMmqN2gNbMDzWc/eAU1b+zUGKHujMXuRSQ83EN/tslWXf3orzLU45OBamdePbuB3qMS2RLCaR6qc9mknviuPQw7RFjpZeEMkHCEfmY8C1NiutJ7Fre/zcbsxoLc/NunflH1Vi8YavCMwwAmKU31RNT7d2V0iglFdprrChvtp6nBgZJUTFdjdTpwYG+6WgP6lUoOe1AHj7bClag==
-Received: from SA2PR02MB7564.namprd02.prod.outlook.com (2603:10b6:806:146::23)
- by CH3PR02MB9713.namprd02.prod.outlook.com (2603:10b6:610:17b::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.406.7; Wed, 9 Sep 2026
- 08:47:13 +0000
-Received: from SA2PR02MB7564.namprd02.prod.outlook.com
- ([fe80::1ea5:acb6:ebe1:e1c4]) by SA2PR02MB7564.namprd02.prod.outlook.com
- ([fe80::1ea5:acb6:ebe1:e1c4%5]) with mapi id 15.21.0406.007; Wed, 9 Sep 2026
- 08:47:13 +0000
-From: Khushit Shah <khushit.shah@nutanix.com>
-To: Eric Auger <eric.auger@redhat.com>
-CC: "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "qemu-arm@nongnu.org"
-	<qemu-arm@nongnu.org>,
-        "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-        "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-        Shaju Abraham
-	<shaju.abraham@nutanix.com>,
-        "yangjinqian1@huawei.com"
-	<yangjinqian1@huawei.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
-        "sebott@redhat.com" <sebott@redhat.com>,
-        "skolothumtho@nvidia.com"
-	<skolothumtho@nvidia.com>,
-        "philmd@oss.qualcomm.com"
-	<philmd@oss.qualcomm.com>,
-        "maz@kernel.org" <maz@kernel.org>,
-        "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-        "pbonzini@redhat.com"
-	<pbonzini@redhat.com>,
-        "armbru@redhat.com" <armbru@redhat.com>,
-        "berrange@redhat.com" <berrange@redhat.com>,
-        "abologna@redhat.com"
-	<abologna@redhat.com>,
-        "jdenemar@redhat.com" <jdenemar@redhat.com>
-Subject: Re: [RFC PATCH v8 20/20] arm-qmp-cmds: introspection for ID register
- props
-Thread-Topic: [RFC PATCH v8 20/20] arm-qmp-cmds: introspection for ID register
- props
-Thread-Index: AQHdQDfPmdCCwMJ1t0+SvVyVZWQ5ZQ==
-Date: Wed, 9 Sep 2026 08:47:13 +0000
-Message-ID: <879F64C1-D472-4772-A4B7-A5733148201A@nutanix.com>
-References: <20260826093747.1670077-1-eric.auger@redhat.com>
- <20260826093747.1670077-21-eric.auger@redhat.com>
-In-Reply-To: <20260826093747.1670077-21-eric.auger@redhat.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SA2PR02MB7564:EE_|CH3PR02MB9713:EE_
-x-ms-office365-filtering-correlation-id: 1bb03392-f7c0-4fea-f2fa-08df0e4ef1a8
-x-proofpoint-crosstenant: true
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|1800799024|23010399003|7416014|376014|10067099003|4143699003|18002099003|22082099003|56012099006|38070700021;
-x-microsoft-antispam-message-info:
- Zuq+cuhote1Ea/sTm9qcqu4jqtmE3PGaoMRhkjampSSyitA5ubhSadf5s9sdZBuPHmVdg2G/QNH86TUQzbPLUpPOLfEtlwVbIRdMJuDuWgvTGpsgwGBPzhXhbs8SZea3mwat76Ta7flzhj584+MgMYonH89Oim7Nc8doQhOLT/XvdptcnHVAZLBfvU/m/Vz0c5SaptURWJ8QbGZ+7hzxx/pW4m3ioZzYgK+ux0Wfgq7UfSDPeq4naXOUdVWNY/FkrC9d7F/h/KMy03READpTNc1+N5jktV+ms8N0sBzlg4LLZLXk7rdwofgF27puvInBb7//Jb2tmhuu1vsVEdNWTBrVt9NI/+nZCO125PqGwsWmwy0ROf8om5UBAI15zGIbU0JHOaewXaCKRHvVuB7O5Ps2fEO4NlztPGzUNIx/M3o/BXez7txRmLUnzAosQ99a4xQJgF+f2rApmRAHIAP3JW4li3gr2DM6S0mfNJs6CARH+E2UW5Qx94yb6Ko/BUzWm8SpDJhQoWjnSSvQFQpUIWlGgwY6aotTLGnbFZCT3Tqq5L61Bpw0lkpPrDa6Y/Fcyp8UsK4dOH+yJaW7UcEzz0RMWDDdvRyb7JcILbBY8jP2OGUvdruyRopzP11VT+R16w/VhJtPznDjoTXh4ujtuVPiS63IIRHCTIsFdIyjXO0xQma4rbQH3xV0EV/fvgcB7YzX9lkN6pIppCsyhrnF449feib28Xcgn5DGAT8ZiGE=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA2PR02MB7564.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(23010399003)(7416014)(376014)(10067099003)(4143699003)(18002099003)(22082099003)(56012099006)(38070700021);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?QXBzS05QMVZLREJZRGp2MGp5aEt4QUZKMzdNK1BLY1dUKzJ3TTNRL1g0SUt0?=
- =?utf-8?B?WEhuaVlzQ3BvT28rMm5XcHVZai9HRFY4WTdFOEg5empZeWluOVdVbVc1TThY?=
- =?utf-8?B?VWhtTldFVldUVk0xbW4xbUI0aXJQdE5XakZNRlZycE9QYUkyM3ZoSGRhRTNi?=
- =?utf-8?B?d2hTMUhqZUM3Wm5oMkp0M09KaW9pU2ttNjBmd21QR0grZURWTFFzSGU2R2Jq?=
- =?utf-8?B?MGVkU2NOQzNtR21lMVR4a3lqRDRMcGRPNlZLcEdTMHhQR282VmtTbDZna25h?=
- =?utf-8?B?cVljZUJwenQxUGsrQnhqcjRza0ZzVnZnYisrdmJHUHZzdW5xOUFueCtJZ2d5?=
- =?utf-8?B?T3d6MFJxNWN2a3dzeEpoM1pDKzNtRWVJT0V1Q2FBVHdQZEU2VVN4RHdWdzFK?=
- =?utf-8?B?b1FleTVBTGltdElSTFF3NExnZkpweGR6YldDYit4bUVQZmFkN0RKWnlXbFd2?=
- =?utf-8?B?ays1WU4zODdvL1BIWjdKdDdvZmhhR0ZoV0lycDl3cXBicEFrUW1RSk8vN2hV?=
- =?utf-8?B?YW0vckgwMTkvRC9nbnVlaDkvbHRqeHFacXpFSVVpTXBUOUxJSjBRS25xTmxP?=
- =?utf-8?B?ekdLR1hKTng4aXNKaVhZQzFnYWx0NlBhODRnSTNLdVh5bFNlMnNXWGVrTkNy?=
- =?utf-8?B?V2JLZThiKysxZm9DRG5iQ0trVWJqZkJoSjBGcm1OcTZLb3FvYktNandqa0NC?=
- =?utf-8?B?WjR6RTdyam0zWG5xb3I3dHBBRCszSVlBdm1PN0tzQ0NmdTNqVzQvalVBWWR5?=
- =?utf-8?B?YkkybVhoM29oUHVVK0NKV2FWdEFjZ2RuUlZ5dHJPTXo5V0QwT0NuaTN3VExY?=
- =?utf-8?B?dVpEbitjdlBFM2xnenk0dmVXejhGNk93Z2lyTTBOSVVnajYwMjFyMTZOcTBn?=
- =?utf-8?B?S1NuT25Oci9tVU9Vd2FTODRVRWRock91TXZpRDBlRVVudzM5dzJlamsvaWxJ?=
- =?utf-8?B?K1FtbEpxYjgzenRsbmYwanNUN1IwODlaanFqM0ZKenJxN1k3YkQ0aUNtazJv?=
- =?utf-8?B?bmZkTWlUZG1GcTVFaTZCQituQm1DNDlaQlBDRlZSU0xiK3JNSnliZ0FZNlFa?=
- =?utf-8?B?bU5vQTRIOGJnYnRNMWhuaTVZM3lJdmFQaExMRU5kMHBoS2taWllIVXlPMzNk?=
- =?utf-8?B?SmxZaFVWVEdkYi9OM25QN2pjK2NHeTNOVHpWSkgwSmlkTmVUMzB3VFRVV0RR?=
- =?utf-8?B?OXV1RVU2RTljSlNYUkFzajhlUThWdTRpUnZ6MnhMdXVPK2tGNHpCeU4vakYr?=
- =?utf-8?B?SEdSSVVZcmZ3QjVSS3Z6K3lLamFlaittNDdCTWthTy81RFpoTzlwZ3VwZndu?=
- =?utf-8?B?N2FnOFR3YThMZ001UjZldzZRK0VkNTdIMHM0VXVndXNhMHlXdlEwQS9WUXhV?=
- =?utf-8?B?andySmF5TE52Q3oyWXVVKzcrYU1oSWl1ay8vc0YwSisrdFZ1NG1XZkZtLzFY?=
- =?utf-8?B?ai9DOXdFdVpLMFlUZ3llUnZiQWQyR0w2cXdYQk0vU1FqRFNVeWtTS0ppUGxt?=
- =?utf-8?B?NGY5V1FlZnlEdFkyd0o1L3BDVlU2NE9ndElhaTBJZlpkV2NZZFVkOTVJYjUy?=
- =?utf-8?B?YlhDd21BMDBoWFVXSzgyZDhTdGZzSGZ5emlFamZHc051azRIOXpNTHB2cXNx?=
- =?utf-8?B?c0QzcW5uakxoWHp0d2Z0RDJieFY0cTllVlh3S3JQODh0bXBSTEN6dlozVFRU?=
- =?utf-8?B?Vlo0OVRBTEMrMDBMNnovc0h6TEV1MHpwbnMyNkVZUEgvZHo4eFBiZGpvVEsr?=
- =?utf-8?B?TkRTeXZrd2FQVVRFWDZ1MWZRMnZwM1N0bFlNZTBhbDJOWWd0bFdVQlo1Uyts?=
- =?utf-8?B?NjZ2WXhjaDZ1SWN4QnB6eERaSzN1WmoxNEI0Q1VocDJxS212Ry9MbTBnSXVt?=
- =?utf-8?B?a1JzNFRxaVFQUTRFdVA0MytmZnIzUmM1akxzemh4OXBSZnRDcmFzVlhyNzVm?=
- =?utf-8?B?c252ZkdPT0Q3ZHFOZ2dKYWRXNTNOWGJHZjFpQTNuai9jeWpzQ3pLbWc2R2Z4?=
- =?utf-8?B?azh6YnRIZi9LczJKSkFzY2F6T0hwdlJYbThML1pISmNIZUppZWI0RE9BSnNu?=
- =?utf-8?B?eDY1bXNUR2ZxVTE4T3BIRVc3ZEpZSVAwNXZaVm9WMzU5MkFIaGY5UTJNcXRi?=
- =?utf-8?B?REcxY05MVGNBclREVXoyTzA0WFg0OCtWQjc5WTRaWHJRTUdyb2xlbEJBL3dm?=
- =?utf-8?B?RERDWUp4MzJ0Y2t2aXF4NmxhenUwYTE3RXJndXdjbU9QTVBzcjA5YXEzUVVt?=
- =?utf-8?B?Yk14S0NuZUZxYjg2bWk1V3JqNWtWeGtzWUtqU3BwaldQYkUzMU5RTUl2Qi84?=
- =?utf-8?B?Ni8yYXdHRS9WVU1uek95dkp3M2tzc24wcE9GNHBhenFQYTJsZm9tRTlVcTZm?=
- =?utf-8?Q?081sU0gNvzl8kSDk=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <E0A42DCF3D1766459E1E46D3C7C0E81A@namprd02.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S45tUg7L"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF0CB1F00A3D;
+	Wed,  9 Sep 2026 09:44:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788947069;
+	bh=4dN3Vm+A/q/0AWxfXoTAWqWfFbdTmy4SeL1/3qbxIyk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=S45tUg7LyI5EaKXJwuZ1sMfOExEKes0ouThD/mYbuZnoKFsV0K4EkDHgy4XUvJ5/E
+	 c+LiZ6EZdMXM0TmHwvM9Ka/ObBZNW91+wSkw1vw4QmCDxpVqpoO9zB1KKtuBwEiRDF
+	 SSzmd23RYV9ghTjF5FzjAfaNCTqQTtwOm3COlvpqOWKE07/2W0iystfe0sW+e3NYYX
+	 QZYIGlXlxQAFnEIvgWFVbVSiaqy7oRc1/P7PXalPY9sZ6jhJ4UwhuQEmaoX+TdLIRB
+	 psq66e8OBLS2J9IsYpxryC0DR/LzE/4O4u6nuYz1BoAqSmwD1vkA/J0gnx85thPTIe
+	 +ubcPZSrZC4nw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1x4Eqw-00000006cE9-2rlW;
+	Wed, 09 Sep 2026 09:44:26 +0000
+Date: Wed, 09 Sep 2026 10:44:26 +0100
+Message-ID: <861pb24v45.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] KVM: arm64: Enable S1PIE for hVHE
+In-Reply-To: <20260908-kvm-arm64-nvhe-pie-v2-1-79e42d28cc08@kernel.org>
+References: <20260908-kvm-arm64-nvhe-pie-v2-1-79e42d28cc08@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked:
-	rv0OOFvXZtn5UtFUpT/tNTSD2nORaPxDuWDLb2AhiI1SDWOuiN2JmtsgdrAY9c6Khi497xQ8DYmPdH7fF9OQou+0OUVWROG1XoA89P6DBEPFGGYl2XLSADLqftThxvvfQZ67SgjzO2epdc3iYY2AqGMs+Iw4Yko0VsloMnsMvxf0JGmJVN5S+Dokk1SPpQaVX6okFkndw8f10iC/+b+X7gAT/Wr5plprlukykFpKBDOmy1KKwzRLCWvzwpZrVwDVHC8yIHTLie4Kv6UlBAd7wZ2R1z+aFV7PAwY3T7u/hfR3KdOv0aHB8MMz1ERI/LTDYuCTH/nK9UB8D/8zYjyumw==
-X-OriginatorOrg: nutanix.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SA2PR02MB7564.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1bb03392-f7c0-4fea-f2fa-08df0e4ef1a8
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Sep 2026 08:47:13.4030
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: nEFny4kLXPeU1fgdyHnCAekNGfrzYM49qqmGzP6SlxYMlinCSjB0q1ARRLTANNuRAkWSRywL6AuXmF0MTTeV9jJUVf70NopsAcGKilgV6Ag=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR02MB9713
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTA5MDA5OCBTYWx0ZWRfX6oVc42hignhZ
- LsbGYpWBiRBw2VxBECY+0Epkd8987+TXfowQRW0kCn4Ptk3f/QpQ6+VZnnmVCWW4qHGfENGrMUx
- U1LtKbuR4vgr/gh2N1jWM6UcholXkIKDHwgg+sts+AVwxGOVKT7mjounFW7tApGAgPhBLKEhPpC
- rsBaW2ks/141cLRr+DA7/FnnBLj41fmhJt2uuoqQLrcT7M6NG8ZCvr5a5s+u9GJElsqBf6b3R0L
- pwVL4ekpmAn7GPzPLdba3m5+ZDTylcVQ4usylDpnd/0azDpF63A82noE3g8xGMq9A2eoq5kEphT
- EBhRr5cNcySM9Z11ZvgZxWqxA+eh6aAzRDvftUpMRLPpN+Wz8gYfE7IJHjkmm4TRv3D2fgyC42u
- +6NvGDzY3snNNZNwOktgfQZ96rhXH5ZgbZX9+Z+5WoxCeFRqA6F1ESs3i1nLEBaISpm32xjYhEE
- 3chRfeoIuYns4N/E6TA==
-X-Authority-Analysis: v=2.4 cv=d7fFDxjE c=1 sm=1 tr=0 ts=6aa11d13 cx=c_pps
- a=PDMYrpmLcA1CqgnwcVHdMQ==:117 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
- a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
- a=VdqzKS8jKosA:10 a=0kUYKlekyDsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VofLwUrZ8Iiv6rRUPXIb:22 a=jxMXjlTPpCISP5mWtjnE:22 a=20KFwNOVAAAA:8
- a=Uigu8AJExeiRF7gAJD0A:9 a=QEXdDO2ut3YA:10 a=QbcjlK4JNLEA:10
-X-Proofpoint-ORIG-GUID: 4EOH2-g7E0gqHJHDKN7IsKPOhSxyy2MD
-X-Proofpoint-Spam-Info: AW1haW4tMjYwOTA5MDA5OCBTYWx0ZWRfX0+08/0EKGWL9
- ZgIfmLtbmw8463gyQYMMd929DyqtLW5KIW0bTS6D+CnEAdKyn48kAafplXitcy3HyZRrLcafYQA
- Xru6cXr8AIXqR348iwTC+I1B8NTqlmQ=
-X-Proofpoint-GUID: 4EOH2-g7E0gqHJHDKN7IsKPOhSxyy2MD
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-09-08_03,2026-09-08_03,2025-10-01_01
-X-Proofpoint-Spam-Reason: safe
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-DQoNCj4gT24gMjYgQXVnIDIwMjYsIGF0IDM6MDbigK9QTSwgRXJpYyBBdWdlciA8ZXJpYy5hdWdl
-ckByZWRoYXQuY29tPiB3cm90ZToNCj4gDQo+ICsNCj4gKyAgICAgICAgaWYgKGt2bV9lbmFibGVk
-KCkpIHsNCj4gKyAgICAgICAgICAgIGt2bV9hcm1fZGVzdHJveV9zY3JhdGNoX2hvc3RfdmNwdShm
-ZGFycmF5KTsNCj4gKyAgICAgICAgfQ0KDQpIaSBFcmljLCANCg0KVGhlIGNyZWF0ZWQgbWF4IHNj
-cmF0Y2ggdkNQVSBpcyBsZWFrZWQgaWYgbW9kZWwucHJvcHMgaXMgbm90IHByZXNlbnQuDQoNCldh
-cm0gcmVnYXJkcywNCktodXNoaXQ=
+On Tue, 08 Sep 2026 20:40:47 +0100,
+Mark Brown <broonie@kernel.org> wrote:
+> 
+> When FEAT_S1PIE (stage 1 permission indirection) is supported we
+> currently enable and use it in the hypervisor when running in VHE mode
+> but not when running in nVHE or hVHE mode.  While systems with
+> FEAT_S1PIE would normally use VHE users can configure them for nVHE or
+
+Missing comma after VHE.
+
+> hVHE.  Enable FEAT_S1PIE with hVHE only, hVHE is used for protected VMs
+> but there is no real use case for nVHE mode on hardware with this
+> feature.
+
+That's not the reason. The reason is that there is no nVHE-only
+hardware with PIE, and that on VHE-capable HW, nVHE and hVHE are
+strictly equivalent. Therefore there is no need to add support for HW
+that does not exist.
+
+> 
+> AP[1] is one of the bits used to encode the indirected permissions.
+> Since for hVHE this is always 0 we only configure the subset of
+> indirected permissions that the system is expected to use.
+> 
+> With permission indirection read and write permissions must be encoded
+> in the bits used by S1PIE, set DBM for writable mappings.  Only do this
+> when using S1PIE, the hypervisor does not otherwise use DBM so no
+> existing hypervisor code sets that bit.  Since the meaning is assigned
+> via S1PIE this does not actually enable DBM, the mappings we configure
+> just grant write permission.
+> 
+> In order to enable S1PIE we also need to configure TCR2_EL2 which is
+> currently only done in __finalise_el2 which is VHE only, do so when the
+> register is present.  When running in nVHE we leave TCR2_EL2.PIE
+> disabled.  This ensures we have an explicit configuration for TCR2_EL2
+> when it is present in the system.
+>
+> For simplicity we unconditionally initialise PIR_EL2 and PIRE0_EL2 if
+> FEAT_S1PIE is present, this will have no effect in nVHE mode since we
+> set TCR2_EL2.PIE to 0.
+> 
+> This should have no practical impact other than causing any unexpected
+> encodings to map to no permissions instead of their default
+> meanings.
+
+What default meanings?
+
+> It will mean that the configuration is closer to that in VHE mode, and
+> will be required for future work enabling features like D128 and GCS
+> which are only available via indirection.
+> 
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+> ---
+> Changes in v2:
+> - Rebase onto v7.3-rc2.
+> - Don't bother cleaning up TCR2_EL2 on hypervisor exit, and squash the
+>   handling into the S1PIE patch.
+> - Remove support for nVHE mode.
+> - Link to v1: https://patch.msgid.link/20260904-kvm-arm64-nvhe-pie-v1-0-29d59f245e6c@kernel.org
+> ---
+>  arch/arm64/include/asm/kvm_arm.h     | 19 +++++++++++++++++++
+>  arch/arm64/include/asm/kvm_asm.h     |  1 +
+>  arch/arm64/include/asm/kvm_pgtable.h |  1 +
+>  arch/arm64/kernel/asm-offsets.c      |  1 +
+>  arch/arm64/kvm/arm.c                 |  8 +++++++-
+>  arch/arm64/kvm/hyp/nvhe/hyp-init.S   | 16 ++++++++++++++--
+>  arch/arm64/kvm/hyp/pgtable.c         |  8 ++++++++
+>  7 files changed, 51 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> index 4bfbd827c5aa..eecac91d41e4 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -345,4 +345,23 @@
+>  #define VCPU_RESET_PSTATE_SVC	(PSR_AA32_MODE_SVC | PSR_AA32_A_BIT | \
+>  				 PSR_AA32_I_BIT | PSR_AA32_F_BIT)
+>  
+> +/*
+> + * Permission indirection configuration for the hVHE hypervisor when
+> + * we have FEAT_S1PIE. Like the host kernel we configure a mapping
+> + * mostly equivalent to the non-PIE meanings of the bits so the
+> + * page table manipulation code needs minimal updates for PIE.
+> + *
+> + * These mappings are minimal with only things used from the
+> + * hVHE hypervisor, nVHE is not supported.  Write permission is
+> + * controlled via DBM.
+
+They are controlled by PIIndex[1]. Yes, this is the same bit. No, this
+doesn't mean the same thing. When PIE is enabled, DBM is in the PIE
+register.
+
+> + */
+> +
+> +#define KVM_HYP_PIR_IDX(uxn, pxn, dbm, ap1) (((uxn) << 3) | ((pxn) << 2) | \
+> +					     ((dbm) << 1) | (ap1))
+> +
+
+This is not what these bits are called. They are just PIIndex[] bits.
+
+> +#define KVM_HVHE_PIR_EL2 (						\
+> +	PIRx_ELx_PERM_PREP(KVM_HYP_PIR_IDX(0, 0, 0, 0), PIE_RX)	|	\
+> +	PIRx_ELx_PERM_PREP(KVM_HYP_PIR_IDX(1, 1, 0, 0), PIE_R)	|	\
+> +	PIRx_ELx_PERM_PREP(KVM_HYP_PIR_IDX(1, 1, 1, 0), PIE_RW))
+> +
+>  #endif /* __ARM64_KVM_ARM_H__ */
+> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> index e5b92ac09e69..eb796436d6eb 100644
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> @@ -208,6 +208,7 @@ extern void *__vhe_undefined_symbol;
+>  struct kvm_nvhe_init_params {
+>  	unsigned long mair_el2;
+>  	unsigned long tcr_el2;
+> +	unsigned long tcr2_el2;
+>  	unsigned long tpidr_el2;
+>  	unsigned long stack_hyp_va;
+>  	unsigned long stack_pa;
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index 41a8687938eb..7b1b7ab3e88e 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -93,6 +93,7 @@ typedef u64 kvm_pte_t;
+>  
+>  #define KVM_PTE_LEAF_ATTR_HI_S2_XN	GENMASK(54, 53)
+>  
+> +#define KVM_PTE_LEAF_ATTR_HI_S1_DBM	BIT(51)
+>  #define KVM_PTE_LEAF_ATTR_HI_S1_GP	BIT(50)
+>  
+>  #define KVM_PTE_LEAF_ATTR_S2_PERMS	(KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R | \
+> diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
+> index 9c853ed3ceab..baffe58015d6 100644
+> --- a/arch/arm64/kernel/asm-offsets.c
+> +++ b/arch/arm64/kernel/asm-offsets.c
+> @@ -118,6 +118,7 @@ int main(void)
+>    DEFINE(HOST_DATA_CONTEXT,	offsetof(struct kvm_host_data, host_ctxt));
+>    DEFINE(NVHE_INIT_MAIR_EL2,	offsetof(struct kvm_nvhe_init_params, mair_el2));
+>    DEFINE(NVHE_INIT_TCR_EL2,	offsetof(struct kvm_nvhe_init_params, tcr_el2));
+> +  DEFINE(NVHE_INIT_TCR2_EL2,	offsetof(struct kvm_nvhe_init_params, tcr2_el2));
+>    DEFINE(NVHE_INIT_TPIDR_EL2,	offsetof(struct kvm_nvhe_init_params, tpidr_el2));
+>    DEFINE(NVHE_INIT_STACK_HYP_VA,	offsetof(struct kvm_nvhe_init_params, stack_hyp_va));
+>    DEFINE(NVHE_INIT_PGD_PA,	offsetof(struct kvm_nvhe_init_params, pgd_pa));
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 8b080804bc90..607a6f808b1c 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -2158,7 +2158,7 @@ static int kvm_init_vector_slots(void)
+>  static void __init cpu_prepare_hyp_mode(int cpu, u32 hyp_va_bits)
+>  {
+>  	struct kvm_nvhe_init_params *params = per_cpu_ptr_nvhe_sym(kvm_init_params, cpu);
+> -	unsigned long tcr;
+> +	unsigned long tcr, tcr2;
+>  
+>  	/*
+>  	 * Calculate the raw per-cpu offset without a translation from the
+> @@ -2186,6 +2186,12 @@ static void __init cpu_prepare_hyp_mode(int cpu, u32 hyp_va_bits)
+>  	tcr |= TCR_T0SZ(hyp_va_bits);
+>  	params->tcr_el2 = tcr;
+>  
+> +	tcr2 = 0;
+> +	if (cpus_have_final_cap(ARM64_HAS_S1PIE) &&
+> +	    cpus_have_final_cap(ARM64_KVM_HVHE))
+> +		tcr2 |= TCR2_EL2_PIE;
+> +	params->tcr2_el2 = tcr2;
+> +
+>  	params->pgd_pa = kvm_mmu_get_httbr();
+>  	if (is_protected_kvm_enabled())
+>  		params->hcr_el2 = HCR_HOST_NVHE_PROTECTED_FLAGS;
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> index 0b3e0b28dfc7..cd5b75c8776f 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> @@ -137,8 +137,20 @@ alternative_if ARM64_HAS_CNP
+>  alternative_else_nop_endif
+>  	msr	ttbr0_el2, x2
+>  
+> -	ldr	x0, [x0, #NVHE_INIT_TCR_EL2]
+> -	msr	tcr_el2, x0
+> +	ldr	x1, [x0, #NVHE_INIT_TCR_EL2]
+> +	msr	tcr_el2, x1
+> +
+> +alternative_if ARM64_HAS_S1PIE
+> +	/* S1PIE is only enabled with TCR2_EL2.PIE if we are running hVHE */
+> +	mov_q	x1, KVM_HVHE_PIR_EL2
+> +	msr	REG_PIR_EL2, x1
+> +	msr	REG_PIRE0_EL2, xzr
+> +alternative_else_nop_endif
+> +
+> +alternative_if ARM64_HAS_TCR2
+> +	ldr	x1, [x0, #NVHE_INIT_TCR2_EL2]
+> +	msr	REG_TCR2_EL2, x1
+> +alternative_else_nop_endif
+
+S1PIE implies TCR2. Why the additional alternatives?
+
+>  
+>  	isb
+>  
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index b74dd5ce1efd..5276c2874fe0 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -349,6 +349,14 @@ static int hyp_set_prot_attr(enum kvm_pgtable_prot prot, kvm_pte_t *ptep)
+>  
+>  		if (system_supports_bti_kernel())
+>  			attr |= KVM_PTE_LEAF_ATTR_HI_S1_GP;
+> +	} else if (cpus_have_final_cap(ARM64_HAS_S1PIE) &&
+> +		   cpus_have_final_cap(ARM64_KVM_HVHE) &&
+> +		   (prot & KVM_PGTABLE_PROT_W)) {
+> +		/*
+> +		 * When using S1PIE for hVHE set DBM for writable
+> +		 * mappings since AP[2] is ineffective.
+
+It's not ineffective. It doesn't exist! See R_JJNHR.
+
+This is totally obfuscating what is really going on, which is really
+simple. We have 4 permission index bits in the PTE, and the both the
+code and comments should reflect that.
+
+> +		 */
+> +		attr |= KVM_PTE_LEAF_ATTR_HI_S1_DBM;
+
+So this sets PIIndex[1]. But It isn't obvious how this takes us from
+R(0x8) to RW(0xC). Where is PIIndex[3] coming from? It is supplied by
+the code following through the UXN/PXN bbits, but it is mind-boggling
+that we should rely on something deals with non-execution to control
+the *READ* permission.
+
+TBH, I think this is completely going the wrong way. Why can't we
+write this as a discrete enumeration of the permission combination we
+support (all 3 of them), and map that to the correct index?
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
