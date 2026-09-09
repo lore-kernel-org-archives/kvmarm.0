@@ -1,452 +1,111 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 518353A7D73
-	for <kvmarm@lists.linux.dev>; Wed,  9 Sep 2026 06:40:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C0F03D47A6;
+	Wed,  9 Sep 2026 07:08:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788936025; cv=none; b=j4wnwCOAsccZEZVif6oxZbtAh+0T8bUxwKtMkzI/7lh0ixWsn8mE0U+lOmylMDMHuAB7Zbx/I6heVajke/9Rh0HzL28g0fKwe8jpbEvSKGPpEEIe+gv6KsanfDd9MmDNVt3bqgmae6VrIhNz6jHP5N9FG8nP45bNkMRnphDHX7I=
+	t=1788937702; cv=none; b=OQGLRh7jAvkVHCzH2IIjv5mC5O4g6f5+i0dBuetQ1IpQcxU6RQkiyMl5tu98/sbx+OdkH7wdMUAl1jF/ZQLTj9sauhQMO9/D+/e+fuhwgOhTlMxVfeXTujBBhxQCDp446ryAyn8tPk7jWbMOjxDQQcw3eEvNnMftyjJrUw2oDqk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788936025; c=relaxed/simple;
-	bh=xjhTv/kIUIkXqTjzxhhfg3keGYHyaGpesz7JJG2KoTo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TQLTikxN813VkIfZ8qDvP1gXeUaibXAXNtwCTMYeH56qwgNhndoCqmhadTDxLQQoh/wWPyiK3ZjzLX1WwhGcyBPdNFOEADfjN/kxm8JSnWeSHPg6UbppNwLZpebl0G8aFbvHw7bXWuogybDdYSzzXYBWROaUY0SzBmnUjL04qWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XKXcTmVx; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1788937702; c=relaxed/simple;
+	bh=85m/WVhRK0Nr70jzw6PM0hOCCKtox/kbNoSOiIKqMQw=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KpQFIn2cRbn5Rv8VyK4LYqITB7hi9CJ9lLKwpr53/5Qyug+kPFLCBWcefcAM1CqeuX3o7jaLVifrD5U4hwLeh9j7WC8em+a2VMKdBdjlgLnCFJrLC0/Z9LNmBMe7eZrBB2btZ2bx8CctEJOYJAZFRxVSyEJSJin/ogHLjH3F47I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AuNdNzzc; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XKXcTmVx"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1788936022;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ROX0AzEGKtnku63/O4EIu9e6E88ExwOGJkGzN1mDSfs=;
-	b=XKXcTmVxg3lwUINUMqr2DdW6rV0SmBmNUIgyntAtaKzG0ZzJPPJ3d1wqm+sPgFcW/fn3Sy
-	1LMAP8O21owV6aInBghGoU61N9eR9BVxXYXnjb7xpNfjCRZr1R4R05NB/r5o+a4HODKc9D
-	LswiaEoHOAtHFcLe+iBeDRRlbPMh08s=
-Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
- [209.85.210.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-47-8OayDEn_M5aJPtXOzRaJ3A-1; Wed, 09 Sep 2026 02:40:21 -0400
-X-MC-Unique: 8OayDEn_M5aJPtXOzRaJ3A-1
-X-Mimecast-MFC-AGG-ID: 8OayDEn_M5aJPtXOzRaJ3A_1788936019
-Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-85602449126so3889981b3a.0
-        for <kvmarm@lists.linux.dev>; Tue, 08 Sep 2026 23:40:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788936019; x=1789540819;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=ROX0AzEGKtnku63/O4EIu9e6E88ExwOGJkGzN1mDSfs=;
-        b=a5OaO7rlLcZXkeyKC3af6koL7bq2x6m0IJDUZFwGfbMAd7DJ35BG5lMoQ7T9zMaCq1
-         wEwTYYVbInRiBCox/Qm2+jzSuNSPVbwxBWkqp5H73wXXb/zskbV/6Wvi+h0ijKx2nG/7
-         zNp6p1UJP/faHNkRD1HfRcA6cYPkMlM7e2F4256flji2OKbxy3YiTADijdcd4C0co3v0
-         1jb9upASLeOXJymM1MVC3/xvqzKU3M06nZT+5gkjmtr1r1A5ZcMaeWOulTv2UugxwViz
-         NUzrWSDOHfsraMr4wh/I/MDm1Jx0myNY5H2rzmOdO7hY/4YtkJtp0C8Gjr2yLvOyIOH0
-         V4sw==
-X-Forwarded-Encrypted: i=1; AKwUvBxoKyrFjAfAt5H9hi4mVYAbsm2Nyv/qX3I91XEhXxu0efuwQThSH62QX3QTPs5MQwhEnZepKww=@lists.linux.dev
-X-Gm-Message-State: AFuF++mtBJFCa/3WBLnscyc8kvUSnEtQqd9PgpSIOfQ9WqsmehPlD6uq
-	V4eRwm5hfhopOsB59At67YlpbegNTod3aXvaGUQK74uspB9zW9a3+EtE0SFXOIAJKp2TBrxBFMl
-	ikX7vk5fnKRzcwp3eXsmCS3ZABoKE3elpXimjSMQm1+2mPtdMMdu/6fd5Bw==
-X-Gm-Gg: AYBFou2N0/FnTXrfsrzMrK90u42wmaQTaK1LX1k95o6tRSjGSoZzmXMD7wL2AON6kQD
-	euwvlRtEzZYI8kP3y+/HejXkztS9VBZba+oyQUndV17qHi0PyovUId1ESsKtjGuhjbZ7VZ6VuCa
-	3szW1VVfeTg4jNr5usaKyrbz3a+bhNQ3U+r3ROb6XCOZkY9JE1fP1ozr/8yGNUnOGY2zvHfHedI
-	q5+kckZkpov1kbkDzBmt6qY2v5W14EvijcJdK0y61Ku0nXg9SvmoPaW+/0nJ9Xj9xylzp09Zizj
-	l2r3zB4FWId8PQNJDbszCTksOBkf+tx4cKX1zUciYYNxSfJtRXm/08G/IA2w1hf+AlvwLjO/CwA
-	j3iQmpaTYPO3Cp3t97iSMcghguHrHZjb7Hk2aKZ0fyg==
-X-Received: by 2002:a05:6a00:1702:b0:857:726d:270c with SMTP id d2e1a72fcca58-8616dd51063mr47210163b3a.24.1788936018860;
-        Tue, 08 Sep 2026 23:40:18 -0700 (PDT)
-X-Received: by 2002:a05:6a00:1702:b0:857:726d:270c with SMTP id d2e1a72fcca58-8616dd51063mr47210112b3a.24.1788936018206;
-        Tue, 08 Sep 2026 23:40:18 -0700 (PDT)
-Received: from [192.168.68.52] (n175-34-8-244.mrk21.qld.optusnet.com.au. [175.34.8.244])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8633cc0f7e2sm4760580b3a.37.2026.09.08.23.40.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Sep 2026 23:40:17 -0700 (PDT)
-Message-ID: <5d2aa6a0-61a3-4b0c-8866-58c4a7888de3@redhat.com>
-Date: Wed, 9 Sep 2026 16:40:04 +1000
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AuNdNzzc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2408F1F00A3A;
+	Wed,  9 Sep 2026 07:08:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788937701;
+	bh=LSejbcK7K/NRWiPAd3V+hVat+1lWh27LQ2BxueYmNfs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=AuNdNzzcISTmbTnqRhwF26bE3xybA9X5tQJiA7P35wtNOVZuqQ9G2PteliXeDgkB6
+	 PfdWO5f+ElqW3N60CgPjIB6kCqr4jW4hU9geXnKyVnecFP/k7IgU9KTJDVNihRA6lO
+	 qt4B7FoaFW6ebPfszA0GqFQ9f1cj3AZkK6HsA/tjPd/wMZvq5Z9siGzppwWzYmKiIl
+	 s13x/ZcJZWdXNIm8RRY/OOYMqUVHUEBFbMVhGBuxQuQJ0/vc3fOxdp1htwbPM5M919
+	 sewYJGb04BAPYGmvZTSDSzqsxCwuTMmMX8bNDQZI+6w/nc4jtUudCYwhnQVTp9weEM
+	 bFWUPhtMbR59w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1x4CPr-00000006YSG-0cJY;
+	Wed, 09 Sep 2026 07:08:19 +0000
+Date: Wed, 09 Sep 2026 08:08:18 +0100
+Message-ID: <8633vi52cd.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: sashiko-reviews@lists.linux.dev
+Cc: "Mark Brown" <broonie@kernel.org>,
+	"Oliver Upton" <oupton@kernel.org>,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v2] KVM: arm64: Enable S1PIE for hVHE
+In-Reply-To: <20260908203145.B735E1F00A3A@smtp.kernel.org>
+References: <20260908-kvm-arm64-nvhe-pie-v2-1-79e42d28cc08@kernel.org>
+	<20260908203145.B735E1F00A3A@smtp.kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v17 6/7] firmware: arm_rmm: Ensure the RMM has GPT entries
- for memory
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: maz@kernel.org, will@kernel.org, catalin.marinas@arm.com,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org,
- joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
- linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
- sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
- WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com
-References: <20260907095942.1140734-1-suzuki.poulose@arm.com>
- <20260907095942.1140734-7-suzuki.poulose@arm.com>
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20260907095942.1140734-7-suzuki.poulose@arm.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: 1ykJgCt-vX9H11aoKpj-urTmnH5tBl_8DA50aAOBO7Q_1788936019
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, broonie@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 9/7/26 7:59 PM, Suzuki K Poulose wrote:
-> From: Steven Price <steven.price@arm.com>
+On Tue, 08 Sep 2026 21:31:45 +0100,
+sashiko-bot@kernel.org wrote:
 > 
-> The RMM maintains the state of all the granules in the system to make
-> sure that the host is abiding by the rules. This state can be maintained
-> at different granularity, per page (TRACKING_FINE) or per region
-> (TRACKING_COARSE or TRACKING_INTERMEDIATE). The region size depends on the
-> underlying "RMI_GRANULE_SIZE". For a "coarse"/"intermediate" region, all pages
-> in the region must be of the same state, this implies we need to have "fine"
-> tracking for DRAM, so that we can delegate individual pages.
+> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
+> - [Critical] S1PIE permission indirection registers are incorrectly swapped for hVHE mode, zeroing PIRE0_EL2 and causing an immediate fatal Permission Fault upon MMU enable.
+> --
 > 
-> For now we only support a statically carved out memory for tracking
-> granules for the "fine" regions. This can be extended in the future to
-> allow modifying the tracking granularity and remove the need for a
-> static allocation by the firmware.
+> commit 3004dc878365b596c5ed9c6a57b485c6d2028592
+> Author: Mark Brown <broonie@kernel.org>
+> Subject: KVM: arm64: Enable S1PIE for hVHE
 > 
-> Similarly, the firmware may create L0 GPT entries describing the total
-> address space. But if we change the "PAS" (Physical Address Space) of a
-> granule, then the firmware may need to create L1 tables to track the PAS
-> at a finer granularity. Linux therefore checks if the platform firmware manages
-> the PAR region. i.e., the firmware is in charge of managing the L1 GPTs
-> (creation and the required memory for the GPT tables - via static carveouts)
-> without host intervention. Support for dynamic GPT creation by the host will be
-> added later.
+> This patch enables S1PIE for the hypervisor when running in hVHE mode. It
+> configures permission indirection to map to non-PIE meanings to minimize
+> page table manipulation changes. It also explicitly configures TCR2_EL2
+> when running in VHE or hVHE modes.
+>
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> > --- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
 > 
-> If the firmware requires us to manage the tracking or GPT memory, Deactivate
-> the RMM and reclaim any memory donated at RMM activation.
+> [ ... ]
 > 
-> Apply the same checks when hotplugged memory is brought online.
+> > @@ -137,8 +137,20 @@ alternative_if ARM64_HAS_CNP
+> >  alternative_else_nop_endif
+> >  	msr	ttbr0_el2, x2
+> >  
+> > -	ldr	x0, [x0, #NVHE_INIT_TCR_EL2]
+> > -	msr	tcr_el2, x0
+> > +	ldr	x1, [x0, #NVHE_INIT_TCR_EL2]
+> > +	msr	tcr_el2, x1
+> > +
+> > +alternative_if ARM64_HAS_S1PIE
+> > +	/* S1PIE is only enabled with TCR2_EL2.PIE if we are running hVHE */
+> > +	mov_q	x1, KVM_HVHE_PIR_EL2
+> > +	msr	REG_PIR_EL2, x1
+> > +	msr	REG_PIRE0_EL2, xzr
 > 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> [ Switch to RMI_GPT_L1_INFO for checking GPTs and deactivate RMM ]
-> Co-Developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> ---
->   Changes since v16:
->       * Check fine tracking and create L1 GPTs for hotplug-added memory.
->       * Clarify the L1 GPT setup and move the explanatory comment.
->       * Switch to using RMI_GPT_INFO command for checking the GPTs.
->       * Deactivate the RMM and reclaim the memory if we can't proceed.
->   Changes since v15:
->       * Skip firmware-reserved NOMAP memory in rmi_init_metadata()
->       * Handle negative error codes from wrappers.
->   Changes since v14:
->       * Move the implementation into drivers/firmware/arm_rmm.
->   Changes since v13:
->       * Moved out of KVM
-> ---
->   drivers/firmware/arm_rmm/rmi.c | 139 +++++++++++++++++++++++++++++++++
->   include/linux/arm-rmi-cmds.h   |  75 ++++++++++++++++++
->   2 files changed, 214 insertions(+)
-> 
-> diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/arm_rmm/rmi.c
-> index d969c8738efde..34058e34188d3 100644
-> --- a/drivers/firmware/arm_rmm/rmi.c
-> +++ b/drivers/firmware/arm_rmm/rmi.c
-> @@ -5,6 +5,7 @@
->   
->   #include <linux/cpufeature.h>
->   #include <linux/memblock.h>
-> +#include <linux/memory.h>
->   #include <linux/arm-rmi-cmds.h>
->   #include <linux/processor.h>
->   #include <linux/slab.h>
-> @@ -12,6 +13,8 @@
->   #include <asm/memory.h>
->   #include <asm/pgtable-hwdef.h>
->   
-> +static bool arm64_rmi_is_available;
-> +
->   /* Currently only the first 2 registers are used by Linux */
->   #define RMI_FEAT_REG_COUNT	2
->   static __ro_after_init unsigned long rmi_feat_reg_cache[RMI_FEAT_REG_COUNT];
-> @@ -639,6 +642,124 @@ static int rmi_configure(void)
->   	return ret;
->   }
->   
-> +/*
-> + * Make sure the area is tracked by RMM at FINE granularity.
-> + * We do not support changing the tracking yet.
-> + */
-> +static int rmi_verify_memory_tracking(phys_addr_t start, phys_addr_t end)
-> +{
-> +	while (start < end) {
-> +		unsigned long ret, category, state, next;
-> +
-> +		ret = rmi_granule_tracking_get(start, end, &category, &state, &next);
-> +		if (ret != RMI_SUCCESS)
-> +			return -ENOMEM;
-> +
-> +		if (state != RMI_TRACKING_FINE ||
-> +		    category != RMI_MEM_CATEGORY_CONVENTIONAL) {
-> +			/* TODO: Set granule tracking in this case */
-> +			pr_err("Granule tracking for region isn't fine/conventional: %llx-%lx\n",
-> +			       start, next);
-> +			return -ENODEV;
-> +		}
-> +		start = next;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +/*
-> + * We do not support creating L1 GPTs yet. So, make sure that
-> + * all the regions are managed by the firmware.
-> + */
-> +static int rmi_verify_gpt_firmware_managed(phys_addr_t start, phys_addr_t end)
-> +{
-> +	unsigned long l0gpt_sz;
-> +	unsigned long next, par_state;
-> +
-> +	l0gpt_sz = 1UL << (30 + FIELD_GET(RMI_FEATURE_REGISTER_1_L0GPTSZ,
-> +					  rmi_feat_reg(1)));
-> +	start = ALIGN_DOWN(start, l0gpt_sz);
-> +	end = ALIGN(end, l0gpt_sz);
-> +
-> +	while (start < end) {
-> +		long ret = rmi_gpt_info(start, end, &next, &par_state);
-> +
-> +		if (ret != RMI_SUCCESS)
-> +			return -ENOMEM;
-> +
-> +		if (par_state != RMI_GPT_PAR_PLAT) {
-> +			pr_err("GPT for the region is not managed by firmware %llx-%lx\n",
-> +				start, next);
-> +			return -ENOMEM;
+> [Severity: Critical]
+> Does this initialization swap the target registers? Since hVHE uses TTBR0_EL2
+> for its translation regime, permission indirection for this space is governed
+> by PIRE0_EL2. By zeroing PIRE0_EL2 and writing the valid permissions to
+> PIR_EL2, won't this cause the CPU to evaluate execution permissions as No
+> Access and immediately trigger a Permission Fault when the MMU is enabled?
 
-I guess -ENODEV is more appropriate:
+Utter nonsense. Refer to the definition and notice the "unprivileged"
+qualifier.
 
-			return -ENODEV
+	M.
 
-> +		}
-> +		start = next;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static int rmi_prepare_memory(phys_addr_t start, phys_addr_t end)
-> +{
-> +	int ret;
-> +
-> +	ret = rmi_verify_memory_tracking(start, end);
-> +	if (ret)
-> +		return ret;
-> +
-> +	return rmi_verify_gpt_firmware_managed(start, end);
-> +}
-> +
-> +static int rmi_init_metadata(void)
-> +{
-> +	phys_addr_t start, end;
-> +	struct memblock_region *r;
-> +
-> +	for_each_mem_region(r) {
-> +		int ret;
-> +
-> +		/* Firmware-reserved NOMAP regions are not usable system RAM */
-> +		if (memblock_is_nomap(r))
-> +			continue;
-> +
-> +		start = memblock_region_memory_base_pfn(r) << PAGE_SHIFT;
-> +		end = memblock_region_memory_end_pfn(r) << PAGE_SHIFT;
-> +
-> +		ret = rmi_prepare_memory(start, end);
-> +		if (ret)
-> +			return ret;
-
-The local variable 'start' and 'end' can be dropped:
-
-		ret = rmi_prepare_memory(PFN_PHYS(memblock_region_memory_base_pfn(r)),
-					 PFN_PHYS(memblock_region_memory_end_pfn(r)));
-		if (ret)
-			return ret;
-
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static int rmi_memory_notifier(struct notifier_block *nb,
-> +			       unsigned long action, void *data)
-> +{
-> +	struct memory_notify *arg = data;
-> +	phys_addr_t start, end;
-> +	int ret;
-> +
-> +	if (action != MEM_GOING_ONLINE)
-> +		return NOTIFY_DONE;
-> +
-> +	start = PFN_PHYS(arg->start_pfn);
-> +	end = PFN_PHYS(arg->start_pfn + arg->nr_pages);
-> +	ret = rmi_prepare_memory(start, end);
-> +
-> +	return notifier_from_errno(ret);
-> +}
-> +
-> +static struct notifier_block rmi_memory_nb = {
-> +	.notifier_call = rmi_memory_notifier,
-> +};
-> +
-> +bool is_rmi_available(void)
-> +{
-> +	return arm64_rmi_is_available;
-> +}
-> +EXPORT_SYMBOL_GPL(is_rmi_available);
-> +
->   static int __init arm64_init_rmi(void)
->   {
->   	int ret = 0;
-> @@ -666,8 +787,26 @@ static int __init arm64_init_rmi(void)
->   	if (ret) {
->   		pr_err("RMM activate failed\n");
->   		ret = ret < 0 ? ret : -ENXIO;
-> +		goto out_free_sro;
->   	}
->   
-> +	ret = rmi_init_metadata();
-> +	if (ret)
-> +		goto out_deactivate;
-> +
-> +	ret = register_memory_notifier(&rmi_memory_nb);
-> +	if (ret)
-> +		goto out_deactivate;
-> +
-> +	arm64_rmi_is_available = true;
-> +	pr_info("RMI configured\n");
-> +	kfree(sro);
-> +
-> +	return 0;
-> +
-> +out_deactivate:
-> +	rmi_rmm_deactivate(sro);
-> +out_free_sro:
->   	kfree(sro);
->   	return ret;
->   }
-> diff --git a/include/linux/arm-rmi-cmds.h b/include/linux/arm-rmi-cmds.h
-> index dea7c7004d35f..79e2c1f165112 100644
-> --- a/include/linux/arm-rmi-cmds.h
-> +++ b/include/linux/arm-rmi-cmds.h
-> @@ -35,6 +35,8 @@ static inline int rmi_undelegate_page(phys_addr_t phys)
->   	return rmi_undelegate_range(phys, PAGE_SIZE);
->   }
->   
-> +bool is_rmi_available(void);
-> +
->   long rmi_sro_memxfer_execute(struct rmi_sro_state *sro, gfp_t gfp);
->   void rmi_sro_free(struct rmi_sro_state *sro);
->   long rmi_sro_execute(struct arm_smccc_1_2_regs *regs);
-> @@ -64,6 +66,19 @@ static inline int rmi_rmm_config_set(unsigned long cfg_ptr)
->   	return res.a0;
->   }
->   
-> +/**
-> + * rmi_rmm_deactivate() - Deactivate the RMM and reclaim any memory donated at
-> + * rmi_rmm_activate()
-> + *
-> + * @sro: Preallocated SRO context to be used
-> + *
-> + * Return: 0 on success, positive RMI result code or negative Linux error code
-> + */
-> +static inline long rmi_rmm_deactivate(struct rmi_sro_state *sro)
-> +{
-> +	return rmi_sro_memxfer_cmd(sro, GFP_KERNEL, SMC_RMI_RMM_DEACTIVATE);
-> +}
-> +
-
-It seems rmi_rmm_deactivate() is used for once by rmi.c::arm64_init_rmi(). If so,
-we needn't to expose this function and just combine the logics to rmi.c::arm64_init_rmi().
-
->   /**
->    * rmi_rmm_activate() - Activate the RMM
->    * @sro: Preallocated SRO context to be used
-> @@ -75,6 +90,66 @@ static inline long rmi_rmm_activate(struct rmi_sro_state *sro)
->   	return rmi_sro_memxfer_cmd(sro, GFP_KERNEL, SMC_RMI_RMM_ACTIVATE);
->   }
->   
-> +/**
-> + * rmi_granule_tracking_get() - Get configuration of a Granule tracking region
-> + * @start: Base PA of the tracking region
-> + * @end: End of the PA region
-> + * @out_category: Memory category
-> + * @out_state: Tracking region state
-> + * @out_top: Top of the memory region
-> + *
-> + * Return: RMI return code
-> + */
-> +static inline int rmi_granule_tracking_get(unsigned long start,
-> +					   unsigned long end,
-> +					   unsigned long *out_category,
-> +					   unsigned long *out_state,
-> +					   unsigned long *out_top)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_GRANULE_TRACKING_GET, start, end, &res);
-> +
-> +	if (res.a0 == RMI_SUCCESS) {
-> +		if (out_category)
-> +			*out_category = res.a1;
-> +		if (out_state)
-> +			*out_state = res.a2;
-> +		if (out_top)
-> +			*out_top = res.a3;
-> +	}
-> +
-> +	return res.a0;
-> +}
-> +
-
-rmi_granule_tracking_get() is used for once by rmi.c::rmi_verify_memory_tracking(). We needn't
-expose rmi_granule_tracking_get() and combine its logic into rmi.c::rmi_verify_memory_tracking().
-
-> +/*
-> + * rmi_gpt_info - Query the GPT info for the given PAR.
-> + * @base: Base of the physical address region
-> + * @top: Top of the physical address region
-> + * @out_top: Top of the phyiscal address region for which
-> + *		the GPT @out_gpt_par_state is valid
-> + * @out_gpt_par_state: State of the GPT covered by [base, out_top)
-> + */
-> +static inline long rmi_gpt_info(unsigned long base, unsigned long end,
-> +			       unsigned long *out_top,
-> +			       unsigned long *out_gpt_par_state)
-> +{
-> +	struct arm_smccc_1_2_regs regs = {
-> +		SMC_RMI_GPT_INFO, base, end,
-> +	};
-> +
-> +	long ret = rmi_sro_execute(&regs);
-> +
-> +	if (ret == RMI_SUCCESS) {
-> +		if (out_top)
-> +			*out_top = regs.a1;
-> +		if (out_gpt_par_state)
-> +			*out_gpt_par_state = regs.a2;
-> +	}
-> +
-> +	return ret;
-> +}
-> +
-
-Similarly, rmi_gpt_info() is used for once by rmi.c::rmi_verify_gpt_firmware_managed(). We
-needn't expose this function and can combine the logic to rmi.c::rmi_verify_gpt_firmware_managed().
-
->   /**
->    * rmi_features() - Read feature register
->    * @index: Feature register index
-
-Thanks,
-Gavin
-
+-- 
+Without deviation from the norm, progress is not possible.
