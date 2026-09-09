@@ -1,128 +1,124 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE9C32CCB9
-	for <kvmarm@lists.linux.dev>; Wed,  9 Sep 2026 13:00:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788958817; cv=none; b=Pvempw6nVD25/ejVqMCk6gGBgPxp+YZoUBvPufuMPbpCb5FDP6hRs6Ymia5W8735yt+A/+w/R5To3xZ73ZBrt8OgzaWV/4sDsZsDsKSVZl5Xgb5xgib2ZeLH8/Hhhl+r7M//rleR6ru7hs+p5KEd7xHqhRyg3lFcpfwnCvngoyM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788958817; c=relaxed/simple;
-	bh=COoomdSG2FlqAOqhScp/Ic2bx4OeDuloT0b59UMRbdY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=K7edIsdE+ZvdqCn4lotMVsSje4uQk9jIAC2bOGHinmVTVWXUTu4fKBTUCpTjBpk7aah3s/HsOaddGQ3SjrARm8q6sxNA8RSbO5iiGQaYNRLZs+SCBZ5mRaV/gQCcVM67L0QA1IDazeV0pLZAbDSHXOLpmUyf+942jRCWJw4Jb+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=s58mQgbn; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from mail-lf2-f12.google.com (mail-lf2-f12.google.com [74.125.229.204])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BD925237B9
+	for <kvmarm@lists.linux.dev>; Wed,  9 Sep 2026 13:19:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.229.204
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788959971; cv=pass; b=spAYjouTnh62LQpBPcqxTdomsKeF/duzoejvVh2oFzqXzDNFU+I3qeJVSd0d6l+OZWRq9CphVNEbIpGqlEy1+P7IT0tS8ldGNuO0GPpXwi5Ye4aI+Fz4LS/OPxKVr2+zHnbTe2NmyWe0K4BG4DwT3fUkNjj2doeCUuXVesQK86U=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788959971; c=relaxed/simple;
+	bh=/lXKMho56Iawzotjf9gqPSSOK8+fhDi4DHNzWXgEKCw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Cn7JK6b+N218FL7nZ97SLDfoR73mrDQwxlSjduVW8G/OCFAxGyodz8Hwh8yO+H7otpUz1hsRmqmqgcVqbaY/MqN9u1tj4Nl/LXOwcluRMv/gUWklBJ8OLamg/G+h3/YJ4K/E8ZllXywT3U0trmqyh4tItLSFOrT1RSvsu+ks7Lc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lR88kbvy; arc=pass smtp.client-ip=74.125.229.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="s58mQgbn"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 52BEA1691;
-	Wed,  9 Sep 2026 06:00:11 -0700 (PDT)
-Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 545113F7B4;
-	Wed,  9 Sep 2026 06:00:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1788958815; bh=COoomdSG2FlqAOqhScp/Ic2bx4OeDuloT0b59UMRbdY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=s58mQgbnP66N0tSsR0ISNWZsvL2/PwI5BHGINryKYJdKCuLFiMKLHOvStA5xDsP4h
-	 HqJj8VAURT88yoH+vmDsR5Yo4Ea99qNf7dbdm+V55Qia3YuxFhOXOL8gqZ/CPX+7VP
-	 LVy3xukrI30eMDBzoMp9lI45Uq4J0Wnq6ZUaoJPQ=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Mark Brown <broonie@kernel.org>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Wei-Lin Chang <weilin.chang@arm.com>,
-	Yao Yuan <yaoyuan@linux.alibaba.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v20 07/14] KVM: arm64: Forward GCS exceptions to nested guests
-Date: Wed,  9 Sep 2026 14:00:06 +0100
-Message-ID: <aqFYVnIgvXGXzHk7@LeoBrasDK>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260901-arm64-gcs-v20-7-f31750bdfadb@kernel.org>
-References: <20260901-arm64-gcs-v20-0-f31750bdfadb@kernel.org> <20260901-arm64-gcs-v20-7-f31750bdfadb@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lR88kbvy"
+Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b4a0b17359so6958e87.0
+        for <kvmarm@lists.linux.dev>; Wed, 09 Sep 2026 06:19:26 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1788959965; cv=none;
+        d=google.com; s=arc-20260327;
+        b=S4m/ygIBEjYhbxAe1M7IYAK8DodHpmiBhhbLHAN5NCCQv8PQZ0LFZWCnBxl0M2xzr0
+         rmsqG7sfso+h1sWMZgeZGOf5SySHoTFHunoKuKm3QuSp2hGdoaCvytdIidaxtqO6+ULA
+         +6WdlXhW4oPd0HDsJvMQBuWnIbufLJOJU9HIc+aRkTEA1KOa23kq5UPLiI5WN+W88/E/
+         0fAGv9IxRcp9qTJ6/wcVYJPuuxvAKcQMkq9VMuPY1cuaXrb5Qalucb/5tPTs4YiiY0Ld
+         6/CR5upJLeoqo8zLW6vMjMXD+mFVwxLmC6o4WeWfatiHWrbaDNGXCw8mvve08pekVy7Z
+         QFUg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=STg7xRV8j3OkHmv1a51bOo5IRu3aXP7QERSx2DeQDNI=;
+        fh=Buje+HPtPHtZ0zQkSeCzeCZWKq6AuAhsLGdFm8k3g/E=;
+        b=WWEqOwv5W/AGVXdWLXLHNUB9iaRWzw/9PwY/QxMyXKEmTfW2heoYrzLufwHYZm6nxu
+         ehRfONLdVxYGOhVS2HJXXtIXRJ0o2jzN117X7Rhffv0QIu9rAGRTc6G7178AG5PCutpw
+         s2NonTILjsq99p92q9VUoZRHD+www0lCILbnxoDiEdc9ch62SpHm+sQKlUSEdMYt7+XE
+         1BcqNL7rgQs0YBf48w1LyeUWhpCan/6R5EWxyIi1My5af0fQNbQsQ932gPUfCR+s1eqQ
+         C+q0OOk6RtVH45S80+aQVipAyBHfdyu5UTBADWuqNz75f5VMGkA+ty/0xsOZwm5S2OBS
+         AU0Q==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1788959965; x=1789564765; darn=lists.linux.dev;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=STg7xRV8j3OkHmv1a51bOo5IRu3aXP7QERSx2DeQDNI=;
+        b=lR88kbvy/xMvM6qjtC5ojivt05zJeNE7ZrqxQA47dTAu7DM9PrGF5Bact19784LiVP
+         xWQZQptZjvZk6UgVzgGk9rhzDJ6Hf7gaFMVR4e03m7wVW5Vi8L3Bq8pz6nEGYzY/CsXu
+         lW5hdBi1M9K/M7HZRvUJIqTkVayo1msXwvsH60NS9lsxwlHoYivsGbB32MV3WaRNGjOe
+         zt7rCQLNzcIlW596gXyfkwl2pXuhmKvrN8hM7zhxpKIvuZ0+nIHvMOFFQ0jOUbH1VyX3
+         IU6fhKfyL91uLzLePQgQtjliHPGcGmVMN7VLbhNzvW9edgWUji1I+OExWfkzQY/yAl+A
+         5h5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788959965; x=1789564765;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=STg7xRV8j3OkHmv1a51bOo5IRu3aXP7QERSx2DeQDNI=;
+        b=BV8WtM35Eyaql8aO4kbdfmJOJa/nsKQhhacYswtwvA5IHWmX/UYKlSPISMPv0D3YHm
+         AW3s5dcBbeK5u+Xc6ZcBaWES+rlJQw1EphBiuuv6MigNBdFM/sfFA6LRbZWVpdm6ON5Q
+         FPzdSXBviANhsrxd/3fSiac7BJFJ4u0XVhKFHZ18arrhJzyD+NNuIRBCtdGO80O4gIHN
+         XrQbRIoC2eKbJ9NQpyJR92yrxeojL+nbhz7xZvCx9xMCWxwvLlnbISNlieaq9/iRdfeY
+         ct2cuwx+rs/rHJoBdJxxjGVIlx64b1O+Fg0EfNnucQoqj3jMn/XLf6YrUERJmKt8whJU
+         2hdA==
+X-Forwarded-Encrypted: i=1; AKwUvByhCdM+w9AF9R0Fgoaul3UYPlYL0kP+i5KB6bgH3TC0xwCW3H5H0JQ2a1P5UgilwoelThamNB8=@lists.linux.dev
+X-Gm-Message-State: AFuF++kOtW5GCkfdVdMLkUOGKzRXP5EmTlqdHpCf6uZgsCJOTcHbkVoK
+	BEVLW+FAtzzy4u5B5SAzcQgZVBOsKcaBsJuuD7EiRolnPGsD0shw5d3/kEgJik/NQZw3c4kqd8C
+	y+uH0h70U8ZLGB0yintETugyekUUnPk2a0ruKcAvw
+X-Gm-Gg: AYBFou1WguiVLJH7/Ta71Zp6NeBPu/NWWGDelN1dzgHuL08M17A1PrgJauHpEetaWkz
+	donWNZ4bOuGLNcx6jZZY5PQoITygZmLzD2P20iBsmXiiaC4SfRYuHIjFsqa2fjZWCDx6AJPciOx
+	fUg3UzpJfQc95yVDEejnyl8xpyz+zmhNhDBBgwbSWnOgBixmDod+Vog71sVA159OqhgU6Pwryi5
+	e5uqax6dfG0kZzwZUlKehv0GSSHoPSz1h2QtbG1IvSq+tHbt1MSynZ1WVyqIF2KSLPV3orVO1Dj
+	g5JeqX77KFs9QtdMAjnmAKDI1lLd9Pr0c437mKz3DWHJ7GygY5HPC3Jcd/jG878eOHbi5EjUoql
+	4sksCdUEj8Q==
+X-Received: by 2002:a05:6512:234e:b0:5b6:bea:f091 with SMTP id
+ 2adb3069b0e04-5b764bba2f4mr141895e87.10.1788959964067; Wed, 09 Sep 2026
+ 06:19:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+References: <20260908162223.1683432-1-suzuki.poulose@arm.com>
+In-Reply-To: <20260908162223.1683432-1-suzuki.poulose@arm.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Wed, 9 Sep 2026 14:18:47 +0100
+X-Gm-Features: AcwNN1W9J0hO2XvyP_iEth4oT8xwRLULtx1NyAOMY4yUoohn2-IYZWX_G_vBhiM
+Message-ID: <CA+EHjTzr-r1FRuJ-X3E38_SSHsNSz_vdO-8sFOtBdsiB3V_x=g@mail.gmail.com>
+Subject: Re: [PATCH v17 00/20] KVM: arm64: CCA: Add basic plumbing for Realms
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org, 
+	will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, steven.price@arm.com, 
+	aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com, 
+	joey.gouly@arm.com, yuzenghui@huawei.com, linux-coco@lists.linux.dev, 
+	gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com, 
+	alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com, 
+	lpieralisi@kernel.org, enju.kohei@fujitsu.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Sep 01, 2026 at 10:47:05PM +0100, Mark Brown wrote:
-> For nested guests where HFGITR_EL2.nGCSSTR_EL1 is clear or when there are
-> L2 GCS data check exceptions we need to forward the exception to the guest.
-> Add handling to do so.
-> 
-> Signed-off-by: Mark Brown <broonie@kernel.org>
-> ---
->  arch/arm64/kvm/handle_exit.c | 18 +++++++++++++++---
->  1 file changed, 15 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-> index db37678dcb05..a8198e96fcb4 100644
-> --- a/arch/arm64/kvm/handle_exit.c
-> +++ b/arch/arm64/kvm/handle_exit.c
-> @@ -304,12 +304,24 @@ static int handle_svc(struct kvm_vcpu *vcpu)
->  	return 1;
->  }
->  
-> +/*
-> + * We might get GCS exceptions that need to be forwarded to the
-> + * hypervisor when a nested guest has HFGITR_EL2.nGCSSTR_EL1 clear, or
-> + * for a GCS data check exception for a L2 guest.
-> + */
->  static int kvm_handle_gcs(struct kvm_vcpu *vcpu)
->  {
-> -	/* We don't expect GCS, so treat it with contempt */
-> -	if (kvm_has_feat(vcpu->kvm, ID_AA64PFR1_EL1, GCS, IMP))
-> -		WARN_ON_ONCE(1);
-> +	if (!kvm_has_gcs(vcpu->kvm)) {
-> +		kvm_inject_undefined(vcpu);
-> +		return 1;
-> +	}
->  
-> +	if (vcpu_has_nv(vcpu)) {
-> +		kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
-> +		return 1;
-> +	}
-> +
-> +	WARN_ON_ONCE(1);
->  	kvm_inject_undefined(vcpu);
->  	return 1;
->  }
+Hi Suzuki,
 
-Oh handle_gcs, if kvm_has_gcs() && kvm_has_nv() -> Inject synchronous 
-exception. Makes sense.
+On Tue, 8 Sept 2026 at 17:22, Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+...
+>  3) NEW: Enlighten KVM arm64 about the different VM types and use call backs for
+>    the VM type, rather than spilling the is_this_type_of_vm() everywhere. This is
+>    not complete yet, but it is largely functional. Adds VCPU and Stage2 MMU related
+>    callbacks with support for the existing VM types.
 
-(it kept bothering me that the !gcs and the gcs case do the same thing, 
-except for a warn_once. So I thougt on suggesting:
+A design thought on the vm_flavor dispatch tables. They're
+hand-maintained arrays indexed by enum, and a gap fails silently at
+runtime, not at build: arm64_vm_s2_ops[] has no VM_REALM row, so a
+realm VM would get NULL ops.
 
-+	if (!kvm_has_gcs(vcpu->kvm))
-+		goto inject_undef;
-[...]
-+	WARN_ON_ONCE(1);
-+inject_undef:
->       kvm_inject_undefined(vcpu);
->       return 1;
+How about something like declaring it unsized with
+BUILD_BUG_ON(ARRAY_SIZE(arm64_vm_s2_ops) != VM_FLAVOR_MAX), as
+host_hcall does? A non-NULL check of the selected ops' mandatory
+callbacks at VM init would catch the s2_ops naming typo Sashiko
+caught, where the rows point at zeroed forward-declared structs.
 
-But after it was done it did not look better.)
-
-
-So, FWIW:
-Reviewed-by: Leonardo Bras <leo.bras@arm.com>
-
-Thanks!
-Leo
+Cheers,
+/fuad
