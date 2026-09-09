@@ -1,84 +1,112 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC0FA523781;
-	Wed,  9 Sep 2026 13:52:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC34C54CF4A;
+	Wed,  9 Sep 2026 14:29:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788961968; cv=none; b=LCYVhvTA8GpBa4znkYxKYSlz3U6pz0k0BKvzDfWPTSIQqRgiHvtvvqlgTvLjjnvikDKgkeAA6z0Yv0rtMjdwad0jyEBH0LvVk4/7IWp13LFe9GlBEOPKkygOele6M2I6yVuqzBERpzUX+8ugq3z1L6GUTABR1LTAiWUr3czi7yw=
+	t=1788964178; cv=none; b=oPH0kcqLiMvDN+Lpp5rxBFmiZQ0wKB04QA7whJr8Z7GjTsOo4TQ0bmwTRY+wXSyRY3U94l8MVGK8ZDjthLZMVlKoZAcbSVaIpXSc9QCNbQin8aKMbtnkgogWpLwjne3SGK6g26v/vVt0EmRd1e9lO8jGik5OVSUNeJhThKaGCuo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788961968; c=relaxed/simple;
-	bh=0e+vVbTn7gtjt+ndYPN+Yizq0HsnlJMP58UYCyMUZOA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Cei12+2ayIG5mV+CSiJYlGTs6bLsRvvbEgsRPlNwMCyKsfNF3FuCaGV2WF5hL+ArN39AjMmFj4ZD+ayVGjRBFRxJ+CazGtGT5kpfUnL5d9YcHPzNNKllqly9vW+qC4AyQCLPI0M4CpVfhQYTBiS2WMti+kmgP5RZqt0xeaDW/tM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Esc5UWw4; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1788964178; c=relaxed/simple;
+	bh=ZnKVmdJ0+txybHfevcWKArBIPP2qSbbM8PODeHjNXDk=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cZtSQ1nj0sihrTcDr4l9XwfNwMBIcP0S5KVEimkMHMYGWKHq7yWzo0S/Aw0o87ivlyRM0xxh31KWiawNqhS5yOytXLV/wWKzIjKPB0Abd27eB/vcvKXE1u3+nGoybi+cJ5mvaKUIx2eyaqsORfzxAsloV59eY0/ajKO7veBPdJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mp3Gp/IS; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Esc5UWw4"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 42A4F176B;
-	Wed,  9 Sep 2026 06:52:42 -0700 (PDT)
-Received: from [10.2.197.99] (ewhatever.cambridge.arm.com [10.2.197.99])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D96BF3F7B4;
-	Wed,  9 Sep 2026 06:52:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1788961965; bh=0e+vVbTn7gtjt+ndYPN+Yizq0HsnlJMP58UYCyMUZOA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Esc5UWw4fKnlt/HxqgDDr4fptKWfnfQBakSmMsDI1AQng2kJ1KlAf2z1pXVfuhiEA
-	 DwlFBwnYkNFrr2nZ2dxOQpc8wESu8h59eS5xYd9P99CiZ7A+0SniEM8K9KVJoHdCp2
-	 9DCtlV43WnuuliMeTCs7hxjSk7+PhoPWPKp8O8Ao=
-Message-ID: <ce968e53-58b4-440c-94f4-fdba08dc6dc5@arm.com>
-Date: Wed, 9 Sep 2026 14:52:41 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mp3Gp/IS"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAAF51F00A3D;
+	Wed,  9 Sep 2026 14:29:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788964176;
+	bh=Se2xxe/a85TgX4HpduI7NMXMmiSfdyKReYm83RyVZEQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=mp3Gp/ISYu0vSbDYm62I7Ze2c9HBeBzaxBegbj7Cl4LJvu2Cx3R6+UlQwruZjt7+m
+	 nbe2ijWJ7BVOVYQIahZ2RFFG5QxULySNYH9SM7TRKwVIj5K4ueimVojMtsRljmJHs0
+	 EjeFE/7bZQFanQIMoanZftO80yY+hcueMbxpeMYbPYzq97Ge8z3zcavsjAQt5jh7h7
+	 qBkR6cKZiFwCGD4emGSIg3Fc2lbBn/IDdWNAAHpyT2tom3krouV/+GC1Omj1QX6K8W
+	 32cchiGfWPaaU0DzqsB5qpgof+r6+e/bm2qjoUJTY1GM7f1hKNl4afbeUeVz9+L0rG
+	 uWTOrfen2DUfg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1x4JIs-00000006jPD-2fdc;
+	Wed, 09 Sep 2026 14:29:34 +0000
+Date: Wed, 09 Sep 2026 15:29:29 +0100
+Message-ID: <86zexq7b1y.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] KVM: arm64: Enable S1PIE for hVHE
+In-Reply-To: <e3c716c2-66ef-4dd0-bcae-6df4ff814e48@sirena.org.uk>
+References: <20260908-kvm-arm64-nvhe-pie-v2-1-79e42d28cc08@kernel.org>
+	<861pb24v45.wl-maz@kernel.org>
+	<e3c716c2-66ef-4dd0-bcae-6df4ff814e48@sirena.org.uk>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v17 00/20] KVM: arm64: CCA: Add basic plumbing for Realms
-To: Fuad Tabba <tabba@google.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
- will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
- aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
- joey.gouly@arm.com, yuzenghui@huawei.com, linux-coco@lists.linux.dev,
- gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com,
- alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com,
- lpieralisi@kernel.org, enju.kohei@fujitsu.com
-References: <20260908162223.1683432-1-suzuki.poulose@arm.com>
- <CA+EHjTzr-r1FRuJ-X3E38_SSHsNSz_vdO-8sFOtBdsiB3V_x=g@mail.gmail.com>
-Content-Language: en-US
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <CA+EHjTzr-r1FRuJ-X3E38_SSHsNSz_vdO-8sFOtBdsiB3V_x=g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 09/09/2026 14:18, Fuad Tabba wrote:
-> Hi Suzuki,
+On Wed, 09 Sep 2026 13:17:33 +0100,
+Mark Brown <broonie@kernel.org> wrote:
 > 
-> On Tue, 8 Sept 2026 at 17:22, Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
-> ...
->>   3) NEW: Enlighten KVM arm64 about the different VM types and use call backs for
->>     the VM type, rather than spilling the is_this_type_of_vm() everywhere. This is
->>     not complete yet, but it is largely functional. Adds VCPU and Stage2 MMU related
->>     callbacks with support for the existing VM types.
+> > > +alternative_if ARM64_HAS_TCR2
+> > > +	ldr	x1, [x0, #NVHE_INIT_TCR2_EL2]
+> > > +	msr	REG_TCR2_EL2, x1
+> > > +alternative_else_nop_endif
 > 
-> A design thought on the vm_flavor dispatch tables. They're
-> hand-maintained arrays indexed by enum, and a gap fails silently at
-> runtime, not at build: arm64_vm_s2_ops[] has no VM_REALM row, so a
-> realm VM would get NULL ops.
+> > S1PIE implies TCR2. Why the additional alternatives?
 > 
-> How about something like declaring it unsized with
-> BUILD_BUG_ON(ARRAY_SIZE(arm64_vm_s2_ops) != VM_FLAVOR_MAX), as
-> host_hcall does? A non-NULL check of the selected ops' mandatory
-> callbacks at VM init would catch the s2_ops naming typo Sashiko
-> caught, where the rows point at zeroed forward-declared structs.
+> That is true but TCR2 does not imply S1PIE, I wrote things this way so
+> that TCR2 is initialised even if we end up on a system where that is
+> present but S1PIE is not (or S1PIE is present but has been disabled by a
+> command line override).  This is during startup so it seemed reasonable
+> to write things in a straightforward and easy to read fashion.
 
-Agreed, I will add that. The VM_REALM S2 ops will come in the next part,
-as we can't have anything meaningful without the RMI backends.
+Fair enough.
 
-Thanks for the review !
+> > TBH, I think this is completely going the wrong way. Why can't we
+> > write this as a discrete enumeration of the permission combination we
+> > support (all 3 of them), and map that to the correct index?
+> 
+> I was deliberately following a similar pattern to that used for the host
+> kernel, intended to minimise code changes.  I will rework so we have an
+> alternative path for S1PIE rather than trying to share.
 
-Cheers
-Suzuki
+I think it is fine to keep the same indices as the kernel for
+permissions that map to something that can be expressed with direct
+permissions.
 
+But indirect permissions are not additive, and therefore shouldn't be
+constructed as such. They are also more expressive, and there will
+be a point where we will want to have other permissions that cannot be
+expressed by "emulating" direct permissions (Execute-Only springs to
+mind).
+
+At this stage, this is not churn. This is an investment.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
