@@ -1,86 +1,81 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1CC25476CC;
-	Wed,  9 Sep 2026 11:31:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 842C9545288;
+	Wed,  9 Sep 2026 11:34:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788953464; cv=none; b=CctKmmc71NiI6KwiEPia+22r+fgoOSAuYNAqN5lSedgu93GYN407kyjCEfRtEfQ9a5WBzU/OUbZOS8GLxO3hL3O3MBbsebZhbXxpwOPvRweIIzXF7Gn0c6U27ImuBV8s9WZMjZcjPIwuWd7vnoARNgBmAWK8FGW+PI8Nq4C82jE=
+	t=1788953660; cv=none; b=Dp7xJLJxi4LsdZgkbGzgwJb7o4ovMShZK9oWlYp5vT9A6HXiEsI7bscnt92nz4InoVKqVPJG9hBWYPyB/QmNoxHKoCfR7dg9uve/uRDG3Gy8wpzLKpvDZXRwgEll6cWxB5WICBBmieamI61OVErBP+jg3AasPGwDDn1ttxWM1zQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788953464; c=relaxed/simple;
-	bh=aaks7dx+zR/tpBzvxXxBPfKtmQBuOjd3Zh0Fj5FHgHg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=n4oR19AUUB071FOTpPWV9OATg9eAqTR4A3McM/yzcaJHgfd0b01uP6TKf06f8fHmPM+05U/DMJnEiOtAfQ95gTnLZFif4Ry3ezjFH6bi3lp0aIRomICxlJ/uKfbeCJ2ZMb4vRw+jW5Cm8W3Ys3IvS01w+UkzUZsw8wXayCdj+rs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=lQJvoC0Q; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1788953660; c=relaxed/simple;
+	bh=BYY1z10WkjEwK2mb4dVa2Dd8xSUo3dhWo++giVKDhnw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=o5STOVcNODuqPBvOd+Jc4+ysLUEjcyP8ueGnLFp1wdM9deie4hkRtHPeJQly8nZigLpe8dWttXQd/4OmyVbLfX2JekVaxkTAFAPtowZSnudCI4C+hNEdy0/WDwefQ6yhSahzfw21ozUVdyJHYKTwvp2l2J6ExH/xb7sopRnnTTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yde7Jb30; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="lQJvoC0Q"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B04761691;
-	Wed,  9 Sep 2026 04:30:58 -0700 (PDT)
-Received: from [10.2.197.99] (ewhatever.cambridge.arm.com [10.2.197.99])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4D8803F528;
-	Wed,  9 Sep 2026 04:30:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1788953462; bh=aaks7dx+zR/tpBzvxXxBPfKtmQBuOjd3Zh0Fj5FHgHg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=lQJvoC0QzOh/jq7UI0GAjAsF1Q/iWY3o10jdXWoT7zw21KCbNnxAz5gfKurHMvfLu
-	 mEI20XdJxFeoWkJ7JAon3rjfwkkBR1egM788NX6lI83FPrPP5JdxUh4It1jMLCQBak
-	 p/xexTVknjsE6TV39WJPBmmPD5I0y63Rx5p+nJzI=
-Message-ID: <3d75ad7b-cce9-4658-8af3-2269db91c76c@arm.com>
-Date: Wed, 9 Sep 2026 12:30:57 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yde7Jb30"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3D401F00A3F;
+	Wed,  9 Sep 2026 11:34:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788953658;
+	bh=oSUP/FldKSKIh3rMEH+d3FwAjG9D+pH/7vnolvntLZ0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=Yde7Jb30UcygvXK1+GjsPtdnydHn1R+M/nx8DmYk/Yf32NI2SN6NuUACHfnYM5AmP
+	 N+MpZQaEiEU1VY8D0fYerMGmJBbrnNH5FeTDmz5idDk18YK/FpLWJe60skjL4KHLvr
+	 PeEpzfV6ykd0BDY3jXAbCr+HK9My1i/y6y8Wrw4KrvpeLobGeL0VGZ+RIggo7CyqOP
+	 1tTeQAZhegkLr9eFSXFKTSQiZV5QN+Er8GnUYkT+EnCQW0iQj6ytK9lzCj/BnwJlVR
+	 VylFoArNg/gAtvX6nhU4gSeUU43t0+01Kg2meWR8ZYhQkuGXr+BwlZDJBh2xPqi6sX
+	 knSUvbNG+XKNw==
+Date: Wed, 9 Sep 2026 12:34:11 +0100
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Shuah Khan <shuah@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Fuad Tabba <fuad.tabba@linux.dev>, Peter Maydell <peter.maydell@linaro.org>, 
+	Leonardo Bras <leo.bras@arm.com>, Wei-Lin Chang <weilin.chang@arm.com>, 
+	Yao Yuan <yaoyuan@linux.alibaba.com>, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
+	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v20 03/14] KVM: arm64: Manage GCS access and registers
+ for guests
+Message-ID: <aqFEGDkyZbXp1B0V@gremlin>
+References: <20260901-arm64-gcs-v20-0-f31750bdfadb@kernel.org>
+ <20260901-arm64-gcs-v20-3-f31750bdfadb@kernel.org>
+ <apmfx08vccSd2MXw@gremlin>
+ <d2659ac3-2f00-4fc4-8f9e-0585691a4ba2@sirena.org.uk>
+ <apqA_SuoA6-TyHsS@gremlin>
+ <apszJZ17KUvd6BJ7@sirena.co.uk>
+ <ap7GPxGs3nhT70sS@gremlin>
+ <1effee02-41f0-4680-9a6f-9b9f12459ec1@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v17 03/20] KVM: arm64: Track the type of VM in kvm_arch
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
- will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
- aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
- joey.gouly@arm.com, yuzenghui@huawei.com, linux-coco@lists.linux.dev,
- gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com,
- alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com,
- lpieralisi@kernel.org, enju.kohei@fujitsu.com
-References: <20260908162223.1683432-1-suzuki.poulose@arm.com>
- <20260908162223.1683432-4-suzuki.poulose@arm.com>
- <CA+EHjTybMZ1TORs25En0eb7_41FBcB=BK1ygYPy5cOHUnQO84A@mail.gmail.com>
-Content-Language: en-US
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <CA+EHjTybMZ1TORs25En0eb7_41FBcB=BK1ygYPy5cOHUnQO84A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1effee02-41f0-4680-9a6f-9b9f12459ec1@sirena.org.uk>
 
-On 09/09/2026 12:28, Fuad Tabba wrote:
-> Hi Suzuki,
-> 
-> On Tue, 8 Sept 2026 at 17:23, Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
->>
->> KVM arm64 has different types of VMs with all the different modes in which the
->> hypervisor code can be run. e.g., VHE, nVHE, PKVM etc. Then there is protected
->> VM and normal VMs with PKVM. We might soon add other types, e.g., Arm CCA Realm.
->> So in an effort to make the handling of these different types of VMs a bit more
->> friendlier to the eyes, add a VM flavor to the kvm_arch and we could then add
-> 
-> nit: "friendlier"
-> 
->> handlers for different operations based on the VM type.
->>
->> Keep the flavor initialisation at the beginning to allow for the detection
->> early enough and fail out on any unsupported requests. (e.g., protected on !PKVM)
-> 
-> In the commit msg and later in the code (not in the enum though), can
-> you please spell pKVM with a lower-case p?
+On Mon, Sep 07, 2026 at 03:55:43PM +0100, Mark Brown wrote:
+> On Mon, Sep 07, 2026 at 03:14:34PM +0100, Lorenzo Stoakes (ARM) wrote:
+> > On Fri, Sep 04, 2026 at 10:07:49PM +0100, Mark Brown wrote:
+> > > On Fri, Sep 04, 2026 at 09:54:51AM +0100, Lorenzo Stoakes (ARM) wrote:
+>
+> > > I think the best thing overall would be to leave the runtime paths as
+> > > they are and refuse to run with an architecturally invalid setup, that
+> > > would avoid bloating the fast path.
+>
+> > Ack, it'd be nice to not have to worry about that.
+>
+> > Presumably we definitely want an oops on a GCS violation in general?
+>
+> Yes, the guest is going to want GCS exceptions delivering if they've
+> enabled them and something triggers them.  It might also be relying on
+> the GCS for stack traces even if nothing triggers any GCS related fault.
 
-Ack.
+OK so the answer seems definitely to be disallowing the invalid config at
+runtime then I think! :)
 
-> 
-> Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
-
-Cheers
-Suzuki
-
-
+--
+Cheers, Lorenzo
