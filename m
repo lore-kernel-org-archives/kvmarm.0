@@ -1,99 +1,56 @@
-Received: from mail-qv2-f12.google.com (mail-qv2-f12.google.com [74.125.230.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 522F955C326
-	for <kvmarm@lists.linux.dev>; Wed,  9 Sep 2026 12:46:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.230.140
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE9C32CCB9
+	for <kvmarm@lists.linux.dev>; Wed,  9 Sep 2026 13:00:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788958002; cv=none; b=QOdLLGYH/zMCySTxTnroBrSUJHiwbizfpn81qz2Q/DlVkKvy9GHZ9XMh9Dx4xkEDfcfadgXKCl0z6Vke0suSYssAHIfmWyAMgfiESStWGbcFkFk/5kxFhXyeCGaCcoUKI2rTlcToCdeJvr3+ppRvL7Icc0WF7scakMXm3IanurM=
+	t=1788958817; cv=none; b=Pvempw6nVD25/ejVqMCk6gGBgPxp+YZoUBvPufuMPbpCb5FDP6hRs6Ymia5W8735yt+A/+w/R5To3xZ73ZBrt8OgzaWV/4sDsZsDsKSVZl5Xgb5xgib2ZeLH8/Hhhl+r7M//rleR6ru7hs+p5KEd7xHqhRyg3lFcpfwnCvngoyM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788958002; c=relaxed/simple;
-	bh=QDi/RLEV4NM3t1kYDBD1hT0dRtZz7+g9ZWoQx4FJiek=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S3HgUDjrBOdtuW15agfo7FQl0RIBT52kGpu2uwZ8PYvnSQUpgyD4z5kNPFemImbgJS3DJZhg/L6dW/vpV0Ws+Khdw8ghJquvXR0GChVn9dOccVYSHUhLtRZulDFlNkVh/1PohRGSUTuW3Ke76lmlFJ5h1gDeq+/y0U0dMe+GreI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=kW9K/j8D; arc=none smtp.client-ip=74.125.230.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+	s=arc-20240116; t=1788958817; c=relaxed/simple;
+	bh=COoomdSG2FlqAOqhScp/Ic2bx4OeDuloT0b59UMRbdY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=K7edIsdE+ZvdqCn4lotMVsSje4uQk9jIAC2bOGHinmVTVWXUTu4fKBTUCpTjBpk7aah3s/HsOaddGQ3SjrARm8q6sxNA8RSbO5iiGQaYNRLZs+SCBZ5mRaV/gQCcVM67L0QA1IDazeV0pLZAbDSHXOLpmUyf+942jRCWJw4Jb+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=s58mQgbn; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="kW9K/j8D"
-Received: by mail-qv2-f12.google.com with SMTP id 6a1803df08f44-90cdfbd148aso10002216d6.2
-        for <kvmarm@lists.linux.dev>; Wed, 09 Sep 2026 05:46:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1788957992; x=1789562792; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=+JBkF2wxS+es6K6okap3riPRAx5NmOpjF4k3ofV33EY=;
-        b=kW9K/j8Dfp7g0pn3q3B+8D7a26jlSQ7h/cJINRjzrp2bEjr2V6+5algvTs9DydY6nA
-         vbBaSeCBBPF7mkai9HROyO3ZsrzcCeCBq7SG1dIBHu8Xvx1RUPQ+GDgU+GbSLex71eEP
-         xpNzb0wVd+Bp+d9OBFScTv5aIo2auqZmnVhNZnchvI7Tu1kvqe3w8ZRacTLPNp5RitgC
-         Z7lf6/m5dmDVoQ/2MJrFmyDsyGTybkojCNawjOtr0vFoDdgFYsPZq01i0UjzHfnAQH32
-         2VJ698AYiAZHKFJFIlIfzGuLDcmu8PmOPp4Inuquxu9/FmFmJEW2RWDkrdtH3etqLy8B
-         q9ag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788957992; x=1789562792;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=+JBkF2wxS+es6K6okap3riPRAx5NmOpjF4k3ofV33EY=;
-        b=mwDrJLc9SeNvD8H0qx4xWkPhgJXKNVfRIo+DxP6zrDqrCsxl3dhItzZ7GEqpclseey
-         8Yp/C12Lyo+uR9mQMtEqsGig4c3XO78eNn4MTXRwZ9YnUUVi6qLKhlwfM7bEhMCh6uaY
-         VRflKsdi3CXe2qoCMCnUzifrD+JHNaXgSWdNouJVPXiZgk8QEJKT9YrYShXYdJNaMoVi
-         QFfjJfEaVdwNd+oicd7cVDd1pYAK1+t0lZqwZnlXs6TPbOezVxDR0pjr3yExnAHlJ2ex
-         zXwNo+80uow6K6Xo5wcTKHUi6h6F/cxgQ82TjnY6fzDFNk6czMa/HV80M/PUPXxzmCyj
-         2WWA==
-X-Forwarded-Encrypted: i=1; AKwUvBzGbmxqWWbePWM+xWFhd4DgEmxOWIfmFAq+SOCEpKHgm+gudhtVSWjRIhaGUc5xIlfBJQqLhkM=@lists.linux.dev
-X-Gm-Message-State: AFuF++mIgAYvbHQoGhXwYlX9S6hgZtCEWlLRv0/2lh+VOL02/zsxAlP1
-	1AWM3kYvHRq08vKJZMgWcbMWUvewkzqAkXjE+haw6LlDw36eyUoeUW+y1AIA7J9qXA0=
-X-Gm-Gg: AYBFou14h7czUZbHLWzahOQCAnJKnQCrYE6Y92SD+ruaFlS2sFNq2+Uf4jMXGG5xiqI
-	08Re8aIosXbEBsLBX5OWxURYXISjGUSFoj5GFPHaKyriAZG+Rd7C1bCsiWCyXPhJGmhBzDBDRcS
-	qyf6b1WFGOouijKCnA+yKcf1hrSyh9JmPrQokJDp4T84iWh+p+Evceq4ZKJNMA6WpxEKoF4hWEp
-	FoXTdNvlE87ikJvIoygU73doexlzwwif29E/1Kw77XbbdsI/kxOxRnzR7xGMoRxLBn68ye93Ezz
-	nSWiP9vxpb8SVNyBMyFKLqZn06sEa2/pLjcesnltnSU9x991KobCkUFWKkrEWLniOpaowbuk5PX
-	pdCSUs2eJ5bijCVubI6KGGI0sE1/QBszHJKTlZWIZcp8nvpSA8TWeGTya6z/5D5NlIo8kfLKa/1
-	RRN58cz199D7t4jAgAXPkt0jTkAbrBDTcOMhuodU5SjWe1FYEA+hs6zIeAjBiPZX1Cs+Ci/NkfM
-	cVoUMhU+tvBZPJ6U5GMI+f4+vJ4i8bmBwZ4s0JvZKT0QhdeE/PxVRCw
-X-Received: by 2002:a05:6214:ccc:b0:910:4080:dc4f with SMTP id 6a1803df08f44-9106b371c17mr87577676d6.4.1788957992321;
-        Wed, 09 Sep 2026 05:46:32 -0700 (PDT)
-Received: from ziepe.ca (hlfxns010zw-159-2-239-150.pppoe-dynamic.high-speed.ns.bellaliant.net. [159.2.239.150])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-91053b4992csm85467086d6.22.2026.09.09.05.46.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Sep 2026 05:46:30 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1x4Hh6-0000000Ge25-36Uc;
-	Wed, 09 Sep 2026 09:46:28 -0300
-Date: Wed, 9 Sep 2026 09:46:28 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>
-Cc: Nicolin Chen <nicolinc@nvidia.com>, linux-coco@lists.linux.dev,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, Alexey Kardashevskiy <aik@amd.com>,
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="s58mQgbn"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 52BEA1691;
+	Wed,  9 Sep 2026 06:00:11 -0700 (PDT)
+Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 545113F7B4;
+	Wed,  9 Sep 2026 06:00:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1788958815; bh=COoomdSG2FlqAOqhScp/Ic2bx4OeDuloT0b59UMRbdY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=s58mQgbnP66N0tSsR0ISNWZsvL2/PwI5BHGINryKYJdKCuLFiMKLHOvStA5xDsP4h
+	 HqJj8VAURT88yoH+vmDsR5Yo4Ea99qNf7dbdm+V55Qia3YuxFhOXOL8gqZ/CPX+7VP
+	 LVy3xukrI30eMDBzoMp9lI45Uq4J0Wnq6ZUaoJPQ=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Mark Brown <broonie@kernel.org>
+Cc: Leonardo Bras <leo.bras@arm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Joerg Roedel <joro@8bytes.org>, Jonathan Cameron <jic23@kernel.org>,
+	Will Deacon <will@kernel.org>,
 	Marc Zyngier <maz@kernel.org>,
-	Pranjal Shrivastava <praan@google.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Samuel Ortiz <sameo@rivosinc.com>,
-	Steven Price <steven.price@arm.com>,
-	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
-	Will Deacon <will@kernel.org>, Xu Yilun <yilun.xu@linux.intel.com>,
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Subject: Re: [RFC PATCH v4 03/16] iommu/arm-smmu-v3: Add initial pSMMU realm
- viommu plumbing
-Message-ID: <20260909124628.GH2543240@ziepe.ca>
-References: <yq5a8q5kkoz3.fsf@kernel.org>
- <20260902121700.GC2890729@ziepe.ca>
- <yq5aik4nztdt.fsf@kernel.org>
- <yq5aecfbzjyk.fsf@kernel.org>
- <20260902235609.GG2890729@ziepe.ca>
- <yq5a8q5izxz4.fsf@kernel.org>
- <20260903171704.GK2890729@ziepe.ca>
- <yq5acxupjsy2.fsf@kernel.org>
- <20260907125228.GB667892@ziepe.ca>
- <yq5atsnyag84.fsf@kernel.org>
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	Yao Yuan <yaoyuan@linux.alibaba.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v20 07/14] KVM: arm64: Forward GCS exceptions to nested guests
+Date: Wed,  9 Sep 2026 14:00:06 +0100
+Message-ID: <aqFYVnIgvXGXzHk7@LeoBrasDK>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260901-arm64-gcs-v20-7-f31750bdfadb@kernel.org>
+References: <20260901-arm64-gcs-v20-0-f31750bdfadb@kernel.org> <20260901-arm64-gcs-v20-7-f31750bdfadb@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -102,136 +59,70 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <yq5atsnyag84.fsf@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Sep 09, 2026 at 03:39:31PM +0530, Aneesh Kumar K.V wrote:
-> Jason Gunthorpe <jgg@ziepe.ca> writes:
+On Tue, Sep 01, 2026 at 10:47:05PM +0100, Mark Brown wrote:
+> For nested guests where HFGITR_EL2.nGCSSTR_EL1 is clear or when there are
+> L2 GCS data check exceptions we need to forward the exception to the guest.
+> Add handling to do so.
 > 
-> > On Mon, Sep 07, 2026 at 03:15:25PM +0530, Aneesh Kumar K.V wrote:
-> >
-> >> I looked into this, and it becomes fairly complicated. We can move all
-> >> vdev/TDI-related code to arm-smmu-realm-v3.c, but that would result in:
-> >
-> > I was going for the opposite, you'd move everything out of arm-smmu-v3
-> > and into the arm-cca-host and obtain the viommu through tsm_ops not
-> > through iommu_ops.
-> >
-> > I guess I pointed to that in another email.
-> >
-> > The only thing arm-smmu-v3 should provide is a simple function to give
-> > the pdev phys and irq parameters. arm-cca-host calls that when it
-> > creates an viommu object.
-> >
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+> ---
+>  arch/arm64/kvm/handle_exit.c | 18 +++++++++++++++---
+>  1 file changed, 15 insertions(+), 3 deletions(-)
 > 
-> 
-> So ended up with
-> 
-> static const struct tsm_viommu_ops cca_tsm_viommu_ops = {
-> 	.owner = THIS_MODULE,
-> 	.type = IOMMU_VIOMMU_TYPE_ARM_REALM_SMMUV3,
-> 	.get_size = cca_viommu_get_size,
-> 	.init = cca_viommu_init,
-> };
+> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> index db37678dcb05..a8198e96fcb4 100644
+> --- a/arch/arm64/kvm/handle_exit.c
+> +++ b/arch/arm64/kvm/handle_exit.c
+> @@ -304,12 +304,24 @@ static int handle_svc(struct kvm_vcpu *vcpu)
+>  	return 1;
+>  }
+>  
+> +/*
+> + * We might get GCS exceptions that need to be forwarded to the
+> + * hypervisor when a nested guest has HFGITR_EL2.nGCSSTR_EL1 clear, or
+> + * for a GCS data check exception for a L2 guest.
+> + */
+>  static int kvm_handle_gcs(struct kvm_vcpu *vcpu)
+>  {
+> -	/* We don't expect GCS, so treat it with contempt */
+> -	if (kvm_has_feat(vcpu->kvm, ID_AA64PFR1_EL1, GCS, IMP))
+> -		WARN_ON_ONCE(1);
+> +	if (!kvm_has_gcs(vcpu->kvm)) {
+> +		kvm_inject_undefined(vcpu);
+> +		return 1;
+> +	}
+>  
+> +	if (vcpu_has_nv(vcpu)) {
+> +		kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
+> +		return 1;
+> +	}
+> +
+> +	WARN_ON_ONCE(1);
+>  	kvm_inject_undefined(vcpu);
+>  	return 1;
+>  }
 
-OK, may also be fine in the main tsm ops? 
+Oh handle_gcs, if kvm_has_gcs() && kvm_has_nv() -> Inject synchronous 
+exception. Makes sense.
 
-> struct cca_viommu {
-> 	struct cca_psmmu *psmmu;
-> 	struct iommu_viommu_provider *iommu_provider;
-> 	const struct iommufd_viommu_ops *iommu_ops; // backing SMMU ops
+(it kept bothering me that the !gcs and the gcs case do the same thing, 
+except for a warn_once. So I thougt on suggesting:
 
-??
++	if (!kvm_has_gcs(vcpu->kvm))
++		goto inject_undef;
+[...]
++	WARN_ON_ONCE(1);
++inject_undef:
+>       kvm_inject_undefined(vcpu);
+>       return 1;
 
-The viommu created for a RMM owned vSMMU should have no connection to
-the normal SMMU driver? It just needs the psmmu information.
+But after it was done it did not look better.)
 
-We need to adjust iommufd side to know that this object cannot accept
-an iommu_domain, only a kvm fd. I don't want to pass in a fake
-iommu_domain that has nothing to do with how RMM will operate things.
 
-> static struct iommu_domain *
-> cca_viommu_alloc_domain_nested(struct iommufd_viommu *viommu, u32 flags,
-> 			       const struct iommu_user_data *user_data)
-> {
-> 	struct cca_viommu *cca = viommu->provider_data;
-> 
-> 	return cca->iommu_ops->alloc_domain_nested(viommu, flags, user_data);
-> }
-> 
-> static int cca_viommu_cache_invalidate(struct iommufd_viommu *viommu,
-> 				       struct iommu_user_data_array *array)
-> {
-> 	struct cca_viommu *cca = viommu->provider_data;
-> 
-> 	return cca->iommu_ops->cache_invalidate(viommu, array);
-> }
+So, FWIW:
+Reviewed-by: Leonardo Bras <leo.bras@arm.com>
 
-These ops should fail (just be NULL) not reflect to a psmmu.
- 
-> struct cca_vdevice {
-> 	struct iommufd_vdevice core;
-> 	struct pci_tsm_context *tsm_context;
-> 	struct cca_host_tdi host_tdi;
-
-Is the extra tdi struct still needed? Isn't cca_vdevice the tdi struct?
-
-> 	u32 l2_sid;
-> };
-> 
-> static const struct iommufd_viommu_ops cca_viommu_ops = {
-> 	.destroy = cca_viommu_destroy,
-> 	.alloc_domain_nested = cca_viommu_alloc_domain_nested,
-> 	.cache_invalidate = cca_viommu_cache_invalidate,
-> 	.vdevice_size = VDEVICE_STRUCT_SIZE(struct cca_vdevice, core),
-> 	.vdevice_init = cca_vdevice_init,
-> 	.vdevice_tsm_req = cca_vdevice_tsm_req,
-> };
-
-> 
-> and on iommu side
-> 
-> struct iommu_viommu_provider {
-> 	size_t size;
-> 	int (*init)(struct iommufd_viommu *viommu, struct device *dev,
-> 		    enum iommu_viommu_type type,
-> 		    struct iommu_domain *parent_domain,
-> 		    const struct iommu_user_data *user_data);
-> 	int (*get_params)(struct iommu_viommu_provider *provider,
-> 			  struct device *dev, enum iommu_viommu_type type,
-> 			  void *params, size_t params_size);
-> 	void (*release)(struct iommu_viommu_provider *provider);
-> 	void *data;
-> };
-
-Not sure what this is?
-
-> The TSM disconnect path will now fail while any vdevice is alive or
-> active. 
-
-Yes, that's makes sense.
-
-> Destroying a vdevice will unlock and destroy the VDEV. 
-
-Yes
-
-> I think we can also unmap its MMIO mappings at that point, provided
-> we track the mapping requests in a list alongside the vdevice
-> details.
-
-The mmio is owned by vfio, there should be a handshake in VFIO to
-remove mmio when it becomes private, otherwise I don't think we need
-to do anything more?
-
-> All CCA operations will use pci_tsm_pf0::lock, though I think the
-> locking can be made more fine-grained.
-
-Sure
- 
-> I will send a cleaned-up series so that we can review the code changes.
-
-Does it seems reasonable to you? Was there any oddness with modeling
-the vdev/bind through the viommu?
-
-Anyhow I'll look more closely when you are ready. Thanks
-
-Jason
+Thanks!
+Leo
