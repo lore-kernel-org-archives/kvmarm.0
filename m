@@ -1,166 +1,150 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E05824B2CBD;
-	Wed,  9 Sep 2026 10:09:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EF5252D2AA;
+	Wed,  9 Sep 2026 10:49:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788948583; cv=none; b=dVc+ZhQ5/eFXAjthSMeShyoSANsodwoORglaq8Hlo7IlYMoCTIKleEcUut3T63EVNgyCfaudsHdBfW51Vs0DA4mEzIrtt8ANaHf/k1yyiCE5dNKW0qhFfAcfn0NbZFpQ6f+96q2pztpjIpvkx/Y3N200cj4+3fPifGWqBmjFiMQ=
+	t=1788950943; cv=none; b=DqD/c9XrTZVu22XkbLyeDpXxaOM44jZ75lZZ+s5ytoZGO0ezqhEunwAa6dxWl2oyJkDiZ64DW7Eyu+PRA7mUxvyBK/VRaA6HTTIgQDhJiH9nu6iD3rCO12AHAMrsM81Uhz52YX7Wv7w6va13uiEAkgpn6I/FqdXFvugtLMtd9Zc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788948583; c=relaxed/simple;
-	bh=PRi9lqc8pogN77KOIMjGVdF0rVg9ebU0q7ETmQ1r7yo=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=dp9dMy+t1YpBlpPOM45eCTCNGDX6VQvDMj7/nP3DbzUavaGOLAxso74+08VGeaZJ7Wyr6Ftyfz1dfyqEHCIvBthJRoqMwegJ54+UVtCaV4sQyHo22j3h0TcmA5XZhyj8aFgqblXSqIylQwe+m9PQzmI+3rMIj/ilks91leMqAys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VeJPs6Mc; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788950943; c=relaxed/simple;
+	bh=zeocLTVX1WnILnL9Rh4q8tqHjE8N5oOKBQYluFzfuQQ=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rDAY2brmHeG1OHGOVS5ShSMpc3oTSPy5pQZHMvUp7egyXCkCuV0uW3LgiXecVFaTp+1if+gP5N2gHzjYmM+Y5oJ1FTpNezUAm5u+FL47zPRyjZiioOuIpDnTVpg7IoCpwYdR6pQZGXzS9tZM2VXbINkejKzVYjVAKvIGo25LMno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PZSuHxkK; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VeJPs6Mc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1EE581F00A3D;
-	Wed,  9 Sep 2026 10:09:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PZSuHxkK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C930C1F00A3A;
+	Wed,  9 Sep 2026 10:49:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788948581;
-	bh=HfjgJeFpXM7grjwxJfO9iaFDcmusZnd9R05IdvkkszY=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=VeJPs6McjFgTz/IiwdZe50yyfTdbdVtvaH6gF5gv/T/x86fxjvRe+A/K4vPgm3VSE
-	 lfKfhw97jMEtSumkA8PvJD1Z1TdnuwlPiBRHcMk2KdeE4Hyca3oSLDRmd1fs/n/YUt
-	 U3MmezgBgYg7oBD/V7aQY8WHM8NUhQgZLSGoeo65zlqnu5Zh7zrshGYPe5NeY9sEVW
-	 a7SOWrGlQpwUHancrAQKHS8xwE/X33ENjhn/KoxUAcHqW7upatus/oFeRXX2AIAsFz
-	 ZRVSMXlOOQ3RKspRQZ9kzV6lsfcQ0//E2HjAZLMk60VQVSBjQFGqpq6M/2QbNwEOHz
-	 AsHZ+b3dfH+JA==
-X-Mailer: emacs 31.1 (via feedmail 11-beta-1 I)
-From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Nicolin Chen <nicolinc@nvidia.com>, linux-coco@lists.linux.dev,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	s=k20260515; t=1788950941;
+	bh=da8Hbv3HviqmJ9T7cSFKFabYHW62tTClS0GobnwfGcI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=PZSuHxkKFO7ggcmK3I1z8YELYgZEcp910adYB1oLiU21I9eAnNoQALMw9c+AG3QaL
+	 4MkKytGdy/Rn0rP0L7wGnaRnDOdebbTbGxVd8DevtyCV3m/lIhIjCeqYzsL7qoX0Qf
+	 n5hTXSZ1KvCWKxZqToXyY95Z/1ie69rcvJtNmATBuP6BnTXH6HXwz3MPLvABwjVXia
+	 blFLwPIUx/x6NMy59YU9dJ4Cm4NEc50fdN7KysP7Ox30xaLW/KhFgohKxBE/SPtzkt
+	 a++w0iO9pMP8KLrHxBy/79J+OHy4ilpPHgeKFbjVh0UbMSwcpWVt1sxfAOzqB4JaNh
+	 3+ZtKMJuLR6Qg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1x4FrP-00000006dmG-1oSc;
+	Wed, 09 Sep 2026 10:48:59 +0000
+Date: Wed, 09 Sep 2026 11:48:58 +0100
+Message-ID: <86zexq3dk5.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Kohei Enju <enju.kohei@fujitsu.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
+	kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	will@kernel.org,
+	catalin.marinas@arm.com,
 	linux-kernel@vger.kernel.org,
-	Alexey Kardashevskiy <aik@amd.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Joerg Roedel <joro@8bytes.org>,
-	Jonathan Cameron <jic23@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Pranjal Shrivastava <praan@google.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Samuel Ortiz <sameo@rivosinc.com>,
-	Steven Price <steven.price@arm.com>,
-	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Xu Yilun <yilun.xu@linux.intel.com>,
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Subject: Re: [RFC PATCH v4 03/16] iommu/arm-smmu-v3: Add initial pSMMU realm
- viommu plumbing
-In-Reply-To: <20260907125228.GB667892@ziepe.ca>
-References: <yq5aecfdnv4i.fsf@kernel.org> <20260901143445.GC56830@ziepe.ca>
- <yq5a8q5kkoz3.fsf@kernel.org> <20260902121700.GC2890729@ziepe.ca>
- <yq5aik4nztdt.fsf@kernel.org> <yq5aecfbzjyk.fsf@kernel.org>
- <20260902235609.GG2890729@ziepe.ca> <yq5a8q5izxz4.fsf@kernel.org>
- <20260903171704.GK2890729@ziepe.ca> <yq5acxupjsy2.fsf@kernel.org>
- <20260907125228.GB667892@ziepe.ca>
-Date: Wed, 09 Sep 2026 15:39:31 +0530
-Message-ID: <yq5atsnyag84.fsf@kernel.org>
+	linux-arm-kernel@lists.infradead.org,
+	steven.price@arm.com,
+	aneesh.kumar@kernel.org,
+	oupton@kernel.org,
+	gshan@redhat.com,
+	joey.gouly@arm.com,
+	tabba@google.com,
+	yuzenghui@huawei.com,
+	linux-coco@lists.linux.dev,
+	gankulkarni@os.amperecomputing.com,
+	sdonthineni@nvidia.com,
+	alpergun@google.com,
+	fj0570is@fujitsu.com,
+	WeiLin.Chang@arm.com,
+	lpieralisi@kernel.org
+Subject: Re: [PATCH v17 06/20] KVM: arm64: CCA: Add a new mode for supporting Realm guests
+In-Reply-To: <aqDFcgzXOTWUkPtp@FCCLS0092175.localdomain>
+References: <20260908162223.1683432-1-suzuki.poulose@arm.com>
+	<20260908162223.1683432-7-suzuki.poulose@arm.com>
+	<aqDFcgzXOTWUkPtp@FCCLS0092175.localdomain>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: enju.kohei@fujitsu.com, suzuki.poulose@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com, joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com, lpieralisi@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Jason Gunthorpe <jgg@ziepe.ca> writes:
+On Wed, 09 Sep 2026 04:26:41 +0100,
+Kohei Enju <enju.kohei@fujitsu.com> wrote:
+> 
+> Hi Suzuki,
+> 
+> On 09/08 17:22, Suzuki K Poulose wrote:
+> > Add an explicit mode to support Arm CCA guests.
+> > 
+> > Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> > ---
+> >  Documentation/admin-guide/kernel-parameters.txt | 3 +++
+> >  arch/arm64/include/asm/kvm_host.h               | 1 +
+> >  arch/arm64/kvm/arm.c                            | 5 +++++
+> >  3 files changed, 9 insertions(+)
+> > 
+> > diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+> > index 68647ff4bdd24..1afe3df3b923e 100644
+> > --- a/Documentation/admin-guide/kernel-parameters.txt
+> > +++ b/Documentation/admin-guide/kernel-parameters.txt
+> > @@ -3256,6 +3256,9 @@ Kernel parameters
+> >  			nested: VHE-based mode with support for nested
+> >  				virtualization. Requires at least ARMv8.4
+> >  				hardware (with FEAT_NV2).
+> > +			rmm: Support for running confidential guests in Realm
+> > +			     world using RMM, as defined by Arm Confidential
+> > +			     Compute Architecture (CCA)
+> >  
+> >  			Defaults to VHE/nVHE based on hardware support. Setting
+> >  			mode to "protected" will disable kexec and hibernation
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index b2e99c5cb1cd3..31ae9d8d8e92f 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -69,6 +69,7 @@ enum kvm_mode {
+> >  	KVM_MODE_DEFAULT,
+> >  	KVM_MODE_PROTECTED,
+> >  	KVM_MODE_NV,
+> > +	KVM_MODE_RMM,
+> >  	KVM_MODE_NONE,
+> >  };
+> >  #ifdef CONFIG_KVM
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index 9af3bbb2f8c24..50f0adfadab38 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -3264,6 +3264,11 @@ static int __init early_kvm_mode_cfg(char *arg)
+> >  		return 0;
+> >  	}
+> >  
+> > +	if (strcmp(arg, "rmm") == 0 && !WARN_ON(!is_kernel_in_hyp_mode())) {
+> > +		kvm_mode = KVM_MODE_RMM;
+> > +		return 0;
+> > +	}
+> 
+> Does this make NV support and CCA Realm VM support mutually exclusive?
+> 
+> Until the v16 series, we could run Realm VMs with:
+>   'kvm-arm.mode=nested'
+> 
+> As far as the AArch64 architecture is concerned, there does not seem to
+> be a reason to make them mutually exclusive. I am therefore wondering
+> whether this restriction is intentional.
 
-> On Mon, Sep 07, 2026 at 03:15:25PM +0530, Aneesh Kumar K.V wrote:
->
->> I looked into this, and it becomes fairly complicated. We can move all
->> vdev/TDI-related code to arm-smmu-realm-v3.c, but that would result in:
->
-> I was going for the opposite, you'd move everything out of arm-smmu-v3
-> and into the arm-cca-host and obtain the viommu through tsm_ops not
-> through iommu_ops.
->
-> I guess I pointed to that in another email.
->
-> The only thing arm-smmu-v3 should provide is a simple function to give
-> the pdev phys and irq parameters. arm-cca-host calls that when it
-> creates an viommu object.
->
+I have a hack somewhere that will allow this, but this requires to
+change the above to be a capability mask rather than a simple
+enumeration. I'll see if I can spin that as a separate series.
 
+	M.
 
-So ended up with
-
-static const struct tsm_viommu_ops cca_tsm_viommu_ops = {
-	.owner = THIS_MODULE,
-	.type = IOMMU_VIOMMU_TYPE_ARM_REALM_SMMUV3,
-	.get_size = cca_viommu_get_size,
-	.init = cca_viommu_init,
-};
-
-struct cca_viommu {
-	struct cca_psmmu *psmmu;
-	struct iommu_viommu_provider *iommu_provider;
-	const struct iommufd_viommu_ops *iommu_ops; // backing SMMU ops
-};
-
-
-// backing ops are mostly used for
-
-static struct iommu_domain *
-cca_viommu_alloc_domain_nested(struct iommufd_viommu *viommu, u32 flags,
-			       const struct iommu_user_data *user_data)
-{
-	struct cca_viommu *cca = viommu->provider_data;
-
-	return cca->iommu_ops->alloc_domain_nested(viommu, flags, user_data);
-}
-
-static int cca_viommu_cache_invalidate(struct iommufd_viommu *viommu,
-				       struct iommu_user_data_array *array)
-{
-	struct cca_viommu *cca = viommu->provider_data;
-
-	return cca->iommu_ops->cache_invalidate(viommu, array);
-}
-
-
-struct cca_vdevice {
-	struct iommufd_vdevice core;
-	struct pci_tsm_context *tsm_context;
-	struct cca_host_tdi host_tdi;
-	u32 l2_sid;
-};
-
-static const struct iommufd_viommu_ops cca_viommu_ops = {
-	.destroy = cca_viommu_destroy,
-	.alloc_domain_nested = cca_viommu_alloc_domain_nested,
-	.cache_invalidate = cca_viommu_cache_invalidate,
-	.vdevice_size = VDEVICE_STRUCT_SIZE(struct cca_vdevice, core),
-	.vdevice_init = cca_vdevice_init,
-	.vdevice_tsm_req = cca_vdevice_tsm_req,
-};
-
-
-and on iommu side
-
-struct iommu_viommu_provider {
-	size_t size;
-	int (*init)(struct iommufd_viommu *viommu, struct device *dev,
-		    enum iommu_viommu_type type,
-		    struct iommu_domain *parent_domain,
-		    const struct iommu_user_data *user_data);
-	int (*get_params)(struct iommu_viommu_provider *provider,
-			  struct device *dev, enum iommu_viommu_type type,
-			  void *params, size_t params_size);
-	void (*release)(struct iommu_viommu_provider *provider);
-	void *data;
-};
-
-
-The TSM disconnect path will now fail while any vdevice is alive or
-active. Destroying a vdevice will unlock and destroy the VDEV. I think
-we can also unmap its MMIO mappings at that point, provided we track the
-mapping requests in a list alongside the vdevice details.
-
-All CCA operations will use pci_tsm_pf0::lock, though I think the
-locking can be made more fine-grained.
-
-I will send a cleaned-up series so that we can review the code changes.
-
--aneesh
+-- 
+Without deviation from the norm, progress is not possible.
