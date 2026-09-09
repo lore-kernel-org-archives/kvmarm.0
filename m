@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AEA6485953
-	for <kvmarm@lists.linux.dev>; Wed,  9 Sep 2026 22:20:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61288493D25
+	for <kvmarm@lists.linux.dev>; Wed,  9 Sep 2026 22:20:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788992438; cv=none; b=OnbJLxK4IhdCSJDnVRGJ5V1TipT4JJM/5U7Wx9zNT1vc2TajeTbU3cZkuT1+WqCvOy/owqUKn092+THR33u2N9Ej5W5QmlDH9PmVc0YcRJhlg7IIt3RzbtKDFx/ww9SCbzXWHbPUYrEjrML31FguX7ba13sbQo4mC41xScJupTU=
+	t=1788992442; cv=none; b=gWVAQk2eEmSHBAHFBlQSnut7Ta3htnopIlZBFAggMatvSsA99vl2kXEpfRAvfeisVLuGmnRNId11z57KFMhYlw4dxt6aFc66ZTEHjto3fg23GCQbh2YfmBKn2dz48i68WxpFt1Nw7XnY/I/Tr7QVgbUIogvoqv1NRtuLn0pGEW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788992438; c=relaxed/simple;
-	bh=qnAoJ45T08036wvpX/WkfEJH+QYHYhUDdjJ6HbWI1s4=;
+	s=arc-20240116; t=1788992442; c=relaxed/simple;
+	bh=2Zj3Dmo9EpuVmzBPycMtjwjtgRzdGVV0dVrMwlBYRV4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=O+TSFLDYcDaokZZiJUzeQs4AsL03Wia7ovP+JJtgMWl15UBLjrDCEQz8AJencyvGoHP1MwETM4o4bkE6s+zNMuczjbYTeI5e8eJrlMtgeODxg1mU8raz2hUO4b3szbBG/4BBEEjrcDIwkGoZ7+Cf1b3IIT7m4ih53yiUbTMqqbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=tjwKCZOd; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=NCTI7idXjTnHHRdzafwJlpGaa39dc5Bax6+LLYZO/jxV6Ni0FgjsyZhvFPl0K3qkAO7PIPGgLmcLnHYY7HCUiT3TdXcAaIjNIWaiTVWkG0ODQbovs7UKVuMPLIGDiEwT4MIbZ1ELdr6tdHG0nZ6EEJbr8CvUcjx/jnp//haJCZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=bTJGWN5A; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="tjwKCZOd"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="bTJGWN5A"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B6F51169C;
-	Wed,  9 Sep 2026 15:20:32 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1DE7A176B;
+	Wed,  9 Sep 2026 15:20:36 -0700 (PDT)
 Received: from workstation-e142269.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5DD4D3F7D8;
-	Wed,  9 Sep 2026 15:20:33 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B99893F7D8;
+	Wed,  9 Sep 2026 15:20:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1788992436; bh=qnAoJ45T08036wvpX/WkfEJH+QYHYhUDdjJ6HbWI1s4=;
+	t=1788992439; bh=2Zj3Dmo9EpuVmzBPycMtjwjtgRzdGVV0dVrMwlBYRV4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=tjwKCZOdoLo5AyBtHdhlAaQXe1F1jYJkOapBkzGgpkDFUTezCrN8D6jr0djz2qShE
-	 caoUJdLBT73B6ZF9a/5VVuCdHO/6lEvvl+IWbrjEwTMDTuETKRJUkUS5BHHJUPw48b
-	 1OuNfpPEvhJRRnCJ0/5wDQScBaWky/PF3X5+Z+Iw=
+	b=bTJGWN5AZ362QbrikchU8tYTkrLs1gB6ZIzsfKdYiQGKqxHsIxK52jS4XJQycsiXO
+	 W5MQzUVJuFtrO/45E9koHwt2f8gWdY/XkBO4cXQXE7/JUPycukn5y0Ifv3mNWia3hw
+	 wnAwmIZxXXnUrW9zTuxWuF2Bj6cDecu9RCtSp5LA=
 From: Wei-Lin Chang <weilin.chang@arm.com>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
@@ -48,9 +48,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Mark Brown <broonie@kernel.org>,
 	Anshuman Khandual <anshuman.khandual@arm.com>,
 	Wei-Lin Chang <weilin.chang@arm.com>
-Subject: [PATCH v1 2/3] arm64: sysreg: Add TCR_EL2 to sysreg infrastructure
-Date: Wed,  9 Sep 2026 23:20:14 +0100
-Message-ID: <20260909222015.3046432-3-weilin.chang@arm.com>
+Subject: [PATCH v1 3/3] KVM: arm64: Convert TCR_EL2 to config-driven sanitisation
+Date: Wed,  9 Sep 2026 23:20:15 +0100
+Message-ID: <20260909222015.3046432-4-weilin.chang@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260909222015.3046432-1-weilin.chang@arm.com>
 References: <20260909222015.3046432-1-weilin.chang@arm.com>
@@ -62,193 +62,227 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Convert TCR_EL2 to the sysreg infrastructure with data extracted from
+Feature dependencies of the fields in TCR_EL2 are extracted from
 Registers.json of the BSD licenced AARCHMRS
 (AARCHMRS_OPENSOURCE_A_profile_FAT-2026-06).
 
-There are two formats of TCR_EL2 based on whether the effective value of
-HCR_EL2.E2H is 0 or 1. For the E2H == 1 case, prefix the macros with
-"VHE_". For the E2H == 0 case, the macros are left unprefixed.
+Places where we slightly deviate from the above:
+
+ - Stick to the ARM ARM M.c requirement for TCR_EL2.TCMA*, which only
+   depends on FEAT_MTE2. This avoids updating ID_AA64PFR2_EL1 with new
+   VMTE* definitions that we don't know the meaning of, as they aren't
+   present in the ARM ARM yet.
+
+ - Ignore TCR_EL2.DS's requirement of needing the effective value of
+   TCR2_EL2.D128 be 0. This requires runtime detection of TCR2_EL2.D128
+   and we don't have D128 support yet.
+
+ - TCR_EL2.AS is dependent on FEAT_ASID16, this information is missing
+   from the json.
 
 Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
 ---
- arch/arm64/include/asm/kvm_arm.h |  13 ----
- arch/arm64/include/asm/sysreg.h  |   1 -
- arch/arm64/tools/sysreg          | 125 +++++++++++++++++++++++++++++++
- 3 files changed, 125 insertions(+), 14 deletions(-)
+ arch/arm64/include/asm/kvm_host.h |   2 +-
+ arch/arm64/kvm/config.c           | 113 ++++++++++++++++++++++++++++++
+ arch/arm64/kvm/nested.c           |   4 ++
+ 3 files changed, 118 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 4bfbd827c5aa..690c13d0b068 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -108,19 +108,6 @@
- #define MPAMHCR_HOST_FLAGS	0
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 27fe0cd5b2d7..6a5e22ca3430 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -516,7 +516,6 @@ enum vcpu_sysreg {
+ 	HACR_EL2,	/* Hypervisor Auxiliary Control Register */
+ 	TTBR0_EL2,	/* Translation Table Base Register 0 (EL2) */
+ 	TTBR1_EL2,	/* Translation Table Base Register 1 (EL2) */
+-	TCR_EL2,	/* Translation Control Register (EL2) */
+ 	PIRE0_EL2,	/* Permission Indirection Register 0 (EL2) */
+ 	PIR_EL2,	/* Permission Indirection Register 1 (EL2) */
+ 	POR_EL2,	/* Permission Overlay Register 2 (EL2) */
+@@ -541,6 +540,7 @@ enum vcpu_sysreg {
+ 	/* Anything from this can be RES0/RES1 sanitised */
+ 	MARKER(__SANITISED_REG_START__),
+ 	SCTLR_EL2,	/* System Control Register (EL2) */
++	TCR_EL2,	/* Translation Control Register (EL2) */
+ 	TCR2_EL2,	/* Extended Translation Control Register (EL2) */
+ 	SCTLR2_EL2,	/* System Control Register 2 (EL2) */
+ 	MDCR_EL2,	/* Monitor Debug Configuration Register (EL2) */
+diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
+index 1053676551af..3ccf5359a373 100644
+--- a/arch/arm64/kvm/config.c
++++ b/arch/arm64/kvm/config.c
+@@ -203,8 +203,11 @@ struct reg_feat_map_desc {
+ #define FEAT_CPA2		ID_AA64ISAR3_EL1, CPA, CPA2
+ #define FEAT_ASID2		ID_AA64MMFR4_EL1, ASID2, IMP
+ #define FEAT_MEC		ID_AA64MMFR3_EL1, MEC, IMP
++#define FEAT_HAF		ID_AA64MMFR1_EL1, HAFDBS, AF
+ #define FEAT_HAFT		ID_AA64MMFR1_EL1, HAFDBS, HAFT
++#define FEAT_HAFDBS		ID_AA64MMFR1_EL1, HAFDBS, DBM
+ #define FEAT_HDBSS		ID_AA64MMFR1_EL1, HAFDBS, HDBSS
++#define FEAT_HPDS		ID_AA64MMFR1_EL1, HPDS, IMP
+ #define FEAT_HPDS2		ID_AA64MMFR1_EL1, HPDS, HPDS2
+ #define FEAT_BTI		ID_AA64PFR1_EL1, BT, IMP
+ #define FEAT_ExS		ID_AA64MMFR0_EL1, EXS, IMP
+@@ -215,6 +218,10 @@ struct reg_feat_map_desc {
+ #define FEAT_MixedEndEL0	ID_AA64MMFR0_EL1, BIGENDEL0, IMP
+ #define FEAT_MTE_ASYNC		ID_AA64PFR1_EL1, MTE_frac, ASYNC
+ #define FEAT_MTE_STORE_ONLY	ID_AA64PFR2_EL1, MTESTOREONLY, IMP
++#define FEAT_MTE_CANONICAL_TAGS	ID_AA64PFR1_EL1, MTEX, MTE4
++#define FEAT_MTE_NO_ADDRESS_TAGS	ID_AA64PFR1_EL1, MTEX, MTE4
++#define FEAT_E0PD		ID_AA64MMFR2_EL1, E0PD, IMP
++#define FEAT_SVE		ID_AA64PFR0_EL1, SVE, IMP
+ #define FEAT_PAN		ID_AA64MMFR1_EL1, PAN, IMP
+ #define FEAT_PAN3		ID_AA64MMFR1_EL1, PAN, PAN3
+ #define FEAT_SSBS		ID_AA64PFR1_EL1, SSBS, IMP
+@@ -227,6 +234,19 @@ struct reg_feat_map_desc {
+ #define FEAT_GCIE		ID_AA64PFR2_EL1, GCIE, IMP
+ #define FEAT_NV3		ID_AA64MMFR4_EL1, NV_frac, NV3
  
- /* TCR_EL2 Registers bits */
--#define TCR_EL2_DS		(1UL << 32)
--#define TCR_EL2_RES1		((1U << 31) | (1 << 23))
--#define TCR_EL2_HPD		(1 << 24)
--#define TCR_EL2_HA		(1 << 21)
--#define TCR_EL2_TBI		(1 << 20)
--#define TCR_EL2_PS_SHIFT	16
--#define TCR_EL2_PS_MASK		(7 << TCR_EL2_PS_SHIFT)
--#define TCR_EL2_PS_40B		(2 << TCR_EL2_PS_SHIFT)
--#define TCR_EL2_TG0_MASK	TCR_TG0_MASK
--#define TCR_EL2_SH0_MASK	TCR_SH0_MASK
--#define TCR_EL2_ORGN0_MASK	TCR_ORGN0_MASK
--#define TCR_EL2_IRGN0_MASK	TCR_IRGN0_MASK
--#define TCR_EL2_T0SZ_MASK	0x3f
- #define TCR_EL2_MASK	(TCR_EL2_TG0_MASK | TCR_EL2_SH0_MASK | \
- 			 TCR_EL2_ORGN0_MASK | TCR_EL2_IRGN0_MASK)
- 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 7aa08d59d494..3499e5fab39e 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -514,7 +514,6 @@
- 
- #define SYS_TTBR0_EL2			sys_reg(3, 4, 2, 0, 0)
- #define SYS_TTBR1_EL2			sys_reg(3, 4, 2, 0, 1)
--#define SYS_TCR_EL2			sys_reg(3, 4, 2, 0, 2)
- #define SYS_VTTBR_EL2			sys_reg(3, 4, 2, 1, 0)
- 
- #define SYS_HAFGRTR_EL2			sys_reg(3, 4, 3, 1, 6)
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index 94bf065c8ac7..8d89f34580ba 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -5559,6 +5559,131 @@ Res0    6
- Field   5:0     T0SZ
- EndSysreg
- 
-+Sysreg	TCR_EL2		3	4	2	0	2
-+Prefix	VHE
-+Res0	63:62
-+Field	61	MTX1
-+Field	60	MTX0
-+Field	59	DS
-+Field	58	TCMA1
-+Field	57	TCMA0
-+Field	56	E0PD1
-+Field	55	E0PD0
-+Field	54	NFD1
-+Field	53	NFD0
-+Field	52	TBID1
-+Field	51	TBID0
-+Field	50	HWU162
-+Field	49	HWU161
-+Field	48	HWU160
-+Field	47	HWU159
-+Field	46	HWU062
-+Field	45	HWU061
-+Field	44	HWU060
-+Field	43	HWU059
-+Field	42	HPD1
-+Field	41	HPD0
-+Field	40	HD
-+Field	39	HA
-+Field	38	TBI1
-+Field	37	TBI0
-+Field	36	AS
-+Res0	35
-+Field	34:32	IPS
-+Enum	31:30	TG1
-+	0b01	16K
-+	0b10	4K
-+	0b11	64K
-+EndEnum
-+Enum	29:28	SH1
-+	0b00	NONE
-+	0b10	OUTER
-+	0b11	INNER
-+EndEnum
-+Enum	27:26	ORGN1
-+	0b00	NC
-+	0b01	WBWA
-+	0b10	WT
-+	0b11	WBnWA
-+EndEnum
-+Enum	25:24	IRGN1
-+	0b00	NC
-+	0b01	WBWA
-+	0b10	WT
-+	0b11	WBnWA
-+EndEnum
-+Field	23	EPD1
-+Field	22	A1
-+Field	21:16	T1SZ
-+Enum	15:14	TG0
-+	0b00	4K
-+	0b01	64K
-+	0b10	16K
-+EndEnum
-+Enum	13:12	SH0
-+	0b00	NONE
-+	0b10	OUTER
-+	0b11	INNER
-+EndEnum
-+Enum	11:10	ORGN0
-+	0b00	NC
-+	0b01	WBWA
-+	0b10	WT
-+	0b11	WBnWA
-+EndEnum
-+Enum	9:8	IRGN0
-+	0b00	NC
-+	0b01	WBWA
-+	0b10	WT
-+	0b11	WBnWA
-+EndEnum
-+Field	7	EPD0
-+Res0	6
-+Field	5:0	T0SZ
-+EndPrefix
-+Res0	63:34
-+Field	33	MTX
-+Field	32	DS
-+Res1	31
-+Field	30	TCMA
-+Field	29	TBID
-+Field	28	HWU62
-+Field	27	HWU61
-+Field	26	HWU60
-+Field	25	HWU59
-+Field	24	HPD
-+Res1	23
-+Field	22	HD
-+Field	21	HA
-+Field	20	TBI
-+Res0	19
-+Field	18:16	PS
-+Enum	15:14	TG0
-+	0b00	4K
-+	0b01	64K
-+	0b10	16K
-+EndEnum
-+Enum	13:12	SH0
-+	0b00	NONE
-+	0b10	OUTER
-+	0b11	INNER
-+EndEnum
-+Enum	11:10	ORGN0
-+	0b00	NC
-+	0b01	WBWA
-+	0b10	WT
-+	0b11	WBnWA
-+EndEnum
-+Enum	9:8	IRGN0
-+	0b00	NC
-+	0b01	WBWA
-+	0b10	WT
-+	0b11	WBnWA
-+EndEnum
-+Res0	7:6
-+Field	5:0	T0SZ
-+EndSysreg
++static bool feat_asid16(struct kvm *kvm)
++{
++	return kvm_has_feat_enum(kvm, ID_AA64MMFR0_EL1, ASIDBITS, 16);
++}
 +
- Sysreg	TCR_EL12        3	5	2	0	2
- Mapping	TCR_EL1
- EndSysreg
++static bool feat_mte_no_addr_tags_or_canonical_tags(struct kvm *kvm)
++{
++	bool no_addr_tags = kvm_has_feat(kvm, FEAT_MTE_NO_ADDRESS_TAGS);
++	bool canonical_tags = kvm_has_feat(kvm, FEAT_MTE_CANONICAL_TAGS);
++
++	return no_addr_tags || canonical_tags;
++}
++
+ static bool not_feat_aa64el3(struct kvm *kvm)
+ {
+ 	return !kvm_has_feat(kvm, FEAT_AA64EL3);
+@@ -1044,6 +1064,91 @@ static const struct reg_bits_to_feat_map sctlr2_feat_map[] = {
+ static const DECLARE_FEAT_MAP(sctlr2_desc, SCTLR2_EL1,
+ 			      sctlr2_feat_map, FEAT_SCTLR2);
+ 
++static const struct reg_bits_to_feat_map tcr_el2_vhe_feat_map[] = {
++	NEEDS_FEAT(VHE_TCR_EL2_MTX1	|
++		   VHE_TCR_EL2_MTX0,
++		   feat_mte_no_addr_tags_or_canonical_tags),
++	NEEDS_FEAT(VHE_TCR_EL2_DS, feat_lpa2),
++	NEEDS_FEAT(VHE_TCR_EL2_TCMA1	|
++		   VHE_TCR_EL2_TCMA0,
++		   FEAT_MTE2),
++	NEEDS_FEAT(VHE_TCR_EL2_E0PD1	|
++		   VHE_TCR_EL2_E0PD0,
++		   FEAT_E0PD),
++	NEEDS_FEAT(VHE_TCR_EL2_NFD1	|
++		   VHE_TCR_EL2_NFD0,
++		   FEAT_SVE),
++	NEEDS_FEAT(VHE_TCR_EL2_TBID1	|
++		   VHE_TCR_EL2_TBID0,
++		   feat_pauth),
++	NEEDS_FEAT(VHE_TCR_EL2_HWU162	|
++		   VHE_TCR_EL2_HWU161	|
++		   VHE_TCR_EL2_HWU160	|
++		   VHE_TCR_EL2_HWU159	|
++		   VHE_TCR_EL2_HWU062	|
++		   VHE_TCR_EL2_HWU061	|
++		   VHE_TCR_EL2_HWU060	|
++		   VHE_TCR_EL2_HWU059,
++		   FEAT_HPDS2),
++	NEEDS_FEAT(VHE_TCR_EL2_HPD1	|
++		   VHE_TCR_EL2_HPD0,
++		   FEAT_HPDS),
++	NEEDS_FEAT(VHE_TCR_EL2_HD, FEAT_HAFDBS),
++	NEEDS_FEAT(VHE_TCR_EL2_HA, FEAT_HAF),
++	NEEDS_FEAT(VHE_TCR_EL2_AS, feat_asid16),
++	NEEDS_FEAT(VHE_TCR_EL2_TBI1		|
++		   VHE_TCR_EL2_TBI0		|
++		   VHE_TCR_EL2_IPS		|
++		   VHE_TCR_EL2_TG1		|
++		   VHE_TCR_EL2_SH1		|
++		   VHE_TCR_EL2_ORGN1		|
++		   VHE_TCR_EL2_IRGN1		|
++		   VHE_TCR_EL2_EPD1		|
++		   VHE_TCR_EL2_A1		|
++		   VHE_TCR_EL2_T1SZ		|
++		   VHE_TCR_EL2_TG0		|
++		   VHE_TCR_EL2_SH0		|
++		   VHE_TCR_EL2_ORGN0		|
++		   VHE_TCR_EL2_IRGN0		|
++		   VHE_TCR_EL2_EPD0		|
++		   VHE_TCR_EL2_T0SZ,
++		   FEAT_AA64EL2),
++	FORCE_RES0(VHE_TCR_EL2_RES0),
++	FORCE_RES1(VHE_TCR_EL2_RES1),
++};
++
++static const DECLARE_FEAT_MAP(tcr_el2_vhe_desc, VHE_TCR_EL2,
++			      tcr_el2_vhe_feat_map, FEAT_AA64EL2);
++
++static const struct reg_bits_to_feat_map tcr_el2_nvhe_feat_map[] = {
++	NEEDS_FEAT(TCR_EL2_MTX,
++		   feat_mte_no_addr_tags_or_canonical_tags),
++	NEEDS_FEAT(TCR_EL2_DS, feat_lpa2),
++	NEEDS_FEAT(TCR_EL2_TCMA, FEAT_MTE2),
++	NEEDS_FEAT(TCR_EL2_TBID, feat_pauth),
++	NEEDS_FEAT(TCR_EL2_HWU62	|
++		   TCR_EL2_HWU61	|
++		   TCR_EL2_HWU60	|
++		   TCR_EL2_HWU59,
++		   FEAT_HPDS2),
++	NEEDS_FEAT(TCR_EL2_HPD, FEAT_HPDS),
++	NEEDS_FEAT(TCR_EL2_HD, FEAT_HAFDBS),
++	NEEDS_FEAT(TCR_EL2_HA, FEAT_HAF),
++	NEEDS_FEAT(TCR_EL2_TBI		|
++		   TCR_EL2_PS		|
++		   TCR_EL2_TG0		|
++		   TCR_EL2_SH0		|
++		   TCR_EL2_ORGN0	|
++		   TCR_EL2_IRGN0	|
++		   TCR_EL2_T0SZ,
++		   FEAT_AA64EL2),
++	FORCE_RES0(TCR_EL2_RES0),
++	FORCE_RES1(TCR_EL2_RES1),
++};
++
++static const DECLARE_FEAT_MAP(tcr_el2_nvhe_desc, TCR_EL2,
++			      tcr_el2_nvhe_feat_map, FEAT_AA64EL2);
++
+ static const struct reg_bits_to_feat_map tcr2_el2_feat_map[] = {
+ 	NEEDS_FEAT_FLAG(TCR2_EL2_FNG1	|
+ 			TCR2_EL2_FNG0	|
+@@ -1398,6 +1503,8 @@ void __init check_feature_map(void)
+ 	check_reg_desc(&hcr_desc);
+ 	check_reg_desc(&nvhcr_desc);
+ 	check_reg_desc(&sctlr2_desc);
++	check_reg_desc(&tcr_el2_vhe_desc);
++	check_reg_desc(&tcr_el2_nvhe_desc);
+ 	check_reg_desc(&tcr2_el2_desc);
+ 	check_reg_desc(&sctlr_el1_desc);
+ 	check_reg_desc(&sctlr_el2_desc);
+@@ -1611,6 +1718,12 @@ struct resx get_reg_fixed_bits(struct kvm *kvm, enum vcpu_sysreg reg)
+ 	case SCTLR2_EL2:
+ 		resx = compute_reg_resx_bits(kvm, &sctlr2_desc, 0, 0);
+ 		break;
++	case TCR_EL2:
++		if (kvm_has_feat(kvm, FEAT_E2H0))
++			resx = compute_reg_resx_bits(kvm, &tcr_el2_nvhe_desc, 0, 0);
++		else
++			resx = compute_reg_resx_bits(kvm, &tcr_el2_vhe_desc, 0, 0);
++		break;
+ 	case TCR2_EL2:
+ 		resx = compute_reg_resx_bits(kvm, &tcr2_el2_desc, 0, 0);
+ 		break;
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 1fd98117df23..5aa16d9d555b 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -1959,6 +1959,10 @@ int kvm_init_nv_sysregs(struct kvm_vcpu *vcpu)
+ 	resx = get_reg_fixed_bits(kvm, HFGITR2_EL2);
+ 	set_sysreg_masks(kvm, HFGITR2_EL2, resx);
+ 
++	/* TCR_EL2 */
++	resx = get_reg_fixed_bits(kvm, TCR_EL2);
++	set_sysreg_masks(kvm, TCR_EL2, resx);
++
+ 	/* TCR2_EL2 */
+ 	resx = get_reg_fixed_bits(kvm, TCR2_EL2);
+ 	set_sysreg_masks(kvm, TCR2_EL2, resx);
 -- 
 2.43.0
 
