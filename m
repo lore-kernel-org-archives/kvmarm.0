@@ -1,88 +1,180 @@
-Received: from mta1.migadu.com (out-146.mta1.migadu.com [95.215.58.146])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AB6A3822A6
-	for <kvmarm@lists.linux.dev>; Wed,  9 Sep 2026 07:37:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DE7D3002B9;
+	Wed,  9 Sep 2026 07:38:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788939443; cv=none; b=DxSfiU3pVGwyao0A3S1apETtQBmqHu8YVwOgO7mcJfl8CDdrHAVPv1Y7mZ34Kk9ti1QE/YiiEtOhyA5Yy/wqwzLUDEuDk5ArPNOZhFwGLGOqX4wIkeTRSSctnyHOJ4PriyzdWC7b4S0D3pER8CnkqKcfPJW4jxauELPCZ0POGOI=
+	t=1788939485; cv=none; b=LPpDvO14P9dvovPn8DBpbgZboEWgWseOh56r4Yl3HRsELiuo6wI5iGUvzvwyG7C2cybqA2tGiUKe2XyOvDNn17v21zvSMlnoP/DWtW19w+kjr4mq8hfcJYaeIMQkZuEmjQKtYsjAJRIVumrnWTQ1eFr4PDHQJUlqspWXIOWdwrs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788939443; c=relaxed/simple;
-	bh=W3MflD4KvxfjlYvuaglkAbbfr+JQGM3DGNPD2OgqTvE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TskPxkyDb3Lz7kogj9SfmvYXmEUJmVwoeC2K0VnQmdnzMgbR7ttEg2QepxZH+zZrk7h9shsTfruaVWw8w2jmTXtsSbwX3DxX27QjhgTyWXUbet2xvw8buK01Rzthwnk9Q0KTbMK0R/Kd7BWODeltakuh9CmYvR3tSjkItIgE1mE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=SDZYU/Ec; arc=none smtp.client-ip=95.215.58.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1788939485; c=relaxed/simple;
+	bh=nTAm35845aAqmOQtS6HyRYHkKn+bOdSMAV3QF5uJvY8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZdQmzFnen4pGM4M62lN7CkOLWz1/1MCEJEt2hgKO7FlRi4xKC9STZLFtV+TYQNNzy6w4guOP7Nnf0JOeDgs+Fl7UJqdo2lV+8wa+WPR92q+n7cn+23HaVocVKLhTHI0KyyiHyqIHIp0yxOlO+SUikaYa/YdguoVldsNeaQK4tos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=fMvwOMtK; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="SDZYU/Ec"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=W3MflD4KvxfjlYvuaglkAbbfr+JQGM3DGNPD2OgqTvE=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1788939438; v=1; x=1789544238;
- b=SDZYU/Ec3V5iIZ/wn6MiFBPF3I5zErZxrcAMMv8ENdNDPH6BH1HwJFjuZ+UR11IGTsdBjZFX
- WTLjvF6w30kSSYs7uZ2kqIO3yyeTX5J1yOoEgMftrhp2xCdUjbwxw9G1R6u3QnTnJ4Mgc8dZECA
- ljLcYd3EMwJ93pDpJUi4kqx8=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id cce488203a215758;
-	Wed, 09 Sep 2026 07:37:18 +0000
-X-Mizu-Trace-ID: cce488203a215758
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b4a0b384c4so4640e87.1
-        for <kvmarm@lists.linux.dev>; Wed, 09 Sep 2026 00:37:17 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBx+LgmrqleAi3YzwUC2DHBXqvnnoG+ffWlAOAKRBqU54kj+HEFaxcnqb5dvaz2fHfzqYrBCXIA=@lists.linux.dev
-X-Gm-Message-State: AFuF++l4PFQ07U3gMIfqV+B5ZBLkOwUffXa+CYqg8vW3vhl/KrC50GXL
-	W40lm0PXVQRY2Ow2rnaqb+AtqvVhZpKweTvZaVc4Nnem11rmP8RZ4fTh7RFRWVV6sqdDHO1j5+3
-	58+H2ecsoVGGJFKsHbQSfMB5MOaFP6XTBmwN6fDoZ
-X-Received: by 2002:a05:6512:288:b0:5b7:78bc:ec07 with SMTP id
- 2adb3069b0e04-5b778bcee15mr17247e87.14.1788939437032; Wed, 09 Sep 2026
- 00:37:17 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="fMvwOMtK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8484C1F00A3A;
+	Wed,  9 Sep 2026 07:38:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
+	s=korg; t=1788939483;
+	bh=z7WoiQ3kTHyw/Ii8U53W3jB43VLKD3M/+zE0Et0v4Dk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=fMvwOMtKjnQJHWqbGOBFRkxLXNBsibipPgj2Q6P064WQJWMW7wfdq4gqVuVvBLOBi
+	 mw2LdSGq7nWqdIa6eYDVqIpvJUSLUA2zonOikKUX6K36rwbteoOJo/Gwa7LLNDfbhI
+	 EHt9w7bjV4yHdhIGfrHtCRftSsoS+o6rrCDY1usY=
+Date: Wed, 9 Sep 2026 09:37:54 +0200
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	"Liam R. Howlett" <liam@infradead.org>,
+	Vlastimil Babka <vbabka@kernel.org>, Jann Horn <jannh@google.com>,
+	Pedro Falcato <pfalcato@suse.de>,
+	David Hildenbrand <david@kernel.org>,
+	Mike Rapoport <rppt@kernel.org>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Michal Hocko <mhocko@suse.com>, Jonathan Corbet <corbet@lwn.net>,
+	Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+	Paul Moore <paul@paul-moore.com>,
+	Stephen Smalley <stephen.smalley.work@gmail.com>,
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Zi Yan <ziy@nvidia.com>,
+	Baolin Wang <baolin.wang@linux.alibaba.com>,
+	Nico Pache <nico.pache@linux.dev>,
+	Ryan Roberts <ryan.roberts@arm.com>, Dev Jain <dev.jain@arm.com>,
+	Barry Song <baohua@kernel.org>, Lance Yang <lance.yang@linux.dev>,
+	Usama Arif <usama.arif@linux.dev>, Kiryl Shutsemau <kas@kernel.org>,
+	Doug Gilbert <dgilbert@interlog.com>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	"Martin K. Petersen" <mkp@kernel.org>,
+	Jaya Kumar <jayalk@intworks.biz>, Simona Vetter <simona@ffwll.ch>,
+	Helge Deller <deller@gmx.de>, Sebastian Reichel <sre@kernel.org>,
+	John Hubbard <jhubbard@nvidia.com>, Peter Xu <peterx@redhat.com>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Oleg Nesterov <oleg@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Rik van Riel <riel@surriel.com>, Harry Yoo <harry@kernel.org>,
+	Juri Lelli <juri.lelli@redhat.com>,
+	Vincent Guittot <vincent.guittot@linaro.org>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	David Airlie <airlied@gmail.com>, Will Deacon <will@kernel.org>,
+	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
+	Nick Piggin <npiggin@gmail.com>, Arnd Bergmann <arnd@arndb.de>,
+	Muchun Song <muchun.song@linux.dev>,
+	Oscar Salvador <osalvador@suse.de>,
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
+	Jan Kara <jack@suse.cz>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Andreas Larsson <andreas@gaisler.com>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>,
+	Matthew Brost <matthew.brost@intel.com>,
+	Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>,
+	Byungchul Park <byungchul@sk.com>,
+	Gregory Price <gourry@gourry.net>,
+	Ying Huang <ying.huang@linux.alibaba.com>,
+	Alistair Popple <apopple@nvidia.com>, Chris Li <chrisl@kernel.org>,
+	Kairui Song <kasong@tencent.com>,
+	Kemeng Shi <shikemeng@huaweicloud.com>,
+	Nhat Pham <nphamcs@gmail.com>, Baoquan He <baoquan.he@linux.dev>,
+	Youngjun Park <youngjun.park@lge.com>,
+	Johannes Weiner <hannes@cmpxchg.org>, Qi Zheng <qi.zheng@linux.dev>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Axel Rasmussen <axelrasmussen@google.com>,
+	Yuanchu Xie <yuanchu@google.com>, Wei Xu <weixugc@google.com>,
+	Xu Xin <xu.xin16@zte.com.cn>,
+	Chengming Zhou <chengming.zhou@linux.dev>,
+	Michal Hocko <mhocko@kernel.org>,
+	Miklos Szeredi <miklos@szeredi.hu>, linux-mm@kvack.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-usb@vger.kernel.org, linux-rdma@vger.kernel.org,
+	selinux@vger.kernel.org, linux-sound@vger.kernel.org,
+	bpf@vger.kernel.org, linux-scsi@vger.kernel.org,
+	linux-fbdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linux-trace-kernel@vger.kernel.org,
+	linux-perf-users@vger.kernel.org, linux-arch@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org,
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	sparclinux@vger.kernel.org, fuse-devel@lists.linux.dev
+Subject: Re: [PATCH 09/39] drivers/usb/mon: update to use mmap_prepare + map
+ kernel pages
+Message-ID: <2026090947-daycare-gentleman-9796@gregkh>
+References: <20260908-b4-mmap-prepare-vma-flag-sanify-v1-0-dacf19cce22b@kernel.org>
+ <20260908-b4-mmap-prepare-vma-flag-sanify-v1-9-dacf19cce22b@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260909063156.89636-1-kmehltretter@gmail.com>
-In-Reply-To: <20260909063156.89636-1-kmehltretter@gmail.com>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Wed, 9 Sep 2026 08:36:40 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTx3fmj_fkD_ybPANyTrEApMUyBscfP4JtP-F_MRL-L=2w@mail.gmail.com>
-X-Gm-Features: AcwNN1X7nBSrvOxVUlaJ6opTCQ7kc3b4t69IqzHQ2RwkJ6z5rM4K_pY4NvS2qiE
-Message-ID: <CA+EHjTx3fmj_fkD_ybPANyTrEApMUyBscfP4JtP-F_MRL-L=2w@mail.gmail.com>
-Subject: Re: [PATCH] KVM: arm64: Fix kvm_get_vtcr() kernel-doc
-To: Karl Mehltretter <kmehltretter@gmail.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Quentin Perret <qperret@google.com>, Joey Gouly <joey.gouly@arm.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260908-b4-mmap-prepare-vma-flag-sanify-v1-9-dacf19cce22b@kernel.org>
 
-Hi Karl,
+On Tue, Sep 08, 2026 at 09:01:13PM +0100, Lorenzo Stoakes (ARM) wrote:
+> Replace the deprecated .mmap hook with its replacement .mmap_prepare. As
+> part of this change, additionally take the approach of mapping pages upon
+> mmap rather than providing a fault handler.
+> 
+> The page span cannot be mutated when an mmap mapping is in place, so this
+> is safe to do in advance (the MON_IOCT_RING_SIZE ioctl operation exits
+> -EBUSY if it's attempted, gated by the rp->mmap_active reference count).
+> 
+> Utilise the newly introduced mmap_action_map_discontig_kernel_pages() to do
+> this, which allows for iteration over pages in mon_bin_discontig_get().
+> 
+> mon_bin_discontig_init() increments the rp->mmap_active reference count to
+> stabilise page spans. Should an error arise the core unmaps the VMA and
+> mon_bin_vma_close() drops the reference again.
+> 
+> The vm_ops->close hook implemented in mon_bin_vma_close() will ensure
+> correct reference count arithmetic upon unmap (with mon_bin_vma_open()
+> accounting for splitting).
+> 
+> The existing semantics are all retained, including not mapping past the
+> range of available pages, with a SIGBUS being raised in a userland process
+> that attempts to access past this point.
+> 
+> Ultimately insert_page() is invoked to insert each page, which increments
+> the reference count on each mapped page. This mimics what was being done
+> previously, only we pre-map the entire range rather than doing so on
+> demand.
+> 
+> The existing fault handler did nothing that required demand paging, and was
+> presumably implemented this way due for historic reasons.
+> 
+> One behavioural difference: pages are no longer faulted in on demand, so a
+> page discarded with MADV_DONTNEED is not repopulated and a subsequent
+> access raises SIGBUS, as with other pre-populated kernel mappings.
+> 
+> Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
 
-...
-
-Good catch, I'm a fan of documentation fixes :)
-
-While you're on that line, the description is also inaccurate, so you
-could fix both in one go and save a follow-up touching the same line:
-
-> - * @phys_shfit:        Value to set in VTCR_EL2.T0SZ.
-> + * @phys_shift:        Value to set in VTCR_EL2.T0SZ.
-
-kvm_get_vtcr() sets T0SZ to 64 - phys_shift, so phys_shift isn't the
-value written to the field, it's the IPA size in bits. Something like:
-
-     * @phys_shift:    IPA size, in bits.
-
-Cheers,
-/fuad
-
->
-> base-commit: 893e11787f78e43b534e252249ac3fff4d1333f8
-> --
-> 2.53.0
+Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
