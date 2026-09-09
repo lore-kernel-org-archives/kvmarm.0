@@ -1,124 +1,224 @@
-Received: from mail-lf2-f12.google.com (mail-lf2-f12.google.com [74.125.229.204])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BD925237B9
-	for <kvmarm@lists.linux.dev>; Wed,  9 Sep 2026 13:19:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.229.204
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788959971; cv=pass; b=spAYjouTnh62LQpBPcqxTdomsKeF/duzoejvVh2oFzqXzDNFU+I3qeJVSd0d6l+OZWRq9CphVNEbIpGqlEy1+P7IT0tS8ldGNuO0GPpXwi5Ye4aI+Fz4LS/OPxKVr2+zHnbTe2NmyWe0K4BG4DwT3fUkNjj2doeCUuXVesQK86U=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788959971; c=relaxed/simple;
-	bh=/lXKMho56Iawzotjf9gqPSSOK8+fhDi4DHNzWXgEKCw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Cn7JK6b+N218FL7nZ97SLDfoR73mrDQwxlSjduVW8G/OCFAxGyodz8Hwh8yO+H7otpUz1hsRmqmqgcVqbaY/MqN9u1tj4Nl/LXOwcluRMv/gUWklBJ8OLamg/G+h3/YJ4K/E8ZllXywT3U0trmqyh4tItLSFOrT1RSvsu+ks7Lc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lR88kbvy; arc=pass smtp.client-ip=74.125.229.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31A0C5437CC
+	for <kvmarm@lists.linux.dev>; Wed,  9 Sep 2026 13:51:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788961866; cv=none; b=kT/5NlvRCLAtGDFqEJKUgvUgUr+vPwqonQGtEJXp74hqU14QTAoGu62B9cFZ28iw49eVene+Vgsj1gqHKn82qfYzFjC/q6Ct/Lq8qats1NDd2ZwNOfow5lrNUhcbiYHgPPBmifptyPCtz6v9nfA4AzomZ+5JAU4XzdQuVYy/goQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788961866; c=relaxed/simple;
+	bh=qLBZINToZmCvUTu3/W9dwaMyG5PVK7PCPz8V6+Z0ALM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HNjtLuT5ILZxhq/KTCrcp16rPlFRO/u53Gip8LaT7nc8iSkKjJS/B3f7ji0UND49PvgK95uM7HHoXyHSDzSaUAUPcg0uX04S/04aopNZdcRe9xJtHpQ8kBAMJ+SVye2KKuHC32KpXydhn1okRLTeEKqQC9CjZ2g5fCdzuica3Yk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=amgA6GZe; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lR88kbvy"
-Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b4a0b17359so6958e87.0
-        for <kvmarm@lists.linux.dev>; Wed, 09 Sep 2026 06:19:26 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1788959965; cv=none;
-        d=google.com; s=arc-20260327;
-        b=S4m/ygIBEjYhbxAe1M7IYAK8DodHpmiBhhbLHAN5NCCQv8PQZ0LFZWCnBxl0M2xzr0
-         rmsqG7sfso+h1sWMZgeZGOf5SySHoTFHunoKuKm3QuSp2hGdoaCvytdIidaxtqO6+ULA
-         +6WdlXhW4oPd0HDsJvMQBuWnIbufLJOJU9HIc+aRkTEA1KOa23kq5UPLiI5WN+W88/E/
-         0fAGv9IxRcp9qTJ6/wcVYJPuuxvAKcQMkq9VMuPY1cuaXrb5Qalucb/5tPTs4YiiY0Ld
-         6/CR5upJLeoqo8zLW6vMjMXD+mFVwxLmC6o4WeWfatiHWrbaDNGXCw8mvve08pekVy7Z
-         QFUg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=STg7xRV8j3OkHmv1a51bOo5IRu3aXP7QERSx2DeQDNI=;
-        fh=Buje+HPtPHtZ0zQkSeCzeCZWKq6AuAhsLGdFm8k3g/E=;
-        b=WWEqOwv5W/AGVXdWLXLHNUB9iaRWzw/9PwY/QxMyXKEmTfW2heoYrzLufwHYZm6nxu
-         ehRfONLdVxYGOhVS2HJXXtIXRJ0o2jzN117X7Rhffv0QIu9rAGRTc6G7178AG5PCutpw
-         s2NonTILjsq99p92q9VUoZRHD+www0lCILbnxoDiEdc9ch62SpHm+sQKlUSEdMYt7+XE
-         1BcqNL7rgQs0YBf48w1LyeUWhpCan/6R5EWxyIi1My5af0fQNbQsQ932gPUfCR+s1eqQ
-         C+q0OOk6RtVH45S80+aQVipAyBHfdyu5UTBADWuqNz75f5VMGkA+ty/0xsOZwm5S2OBS
-         AU0Q==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1788959965; x=1789564765; darn=lists.linux.dev;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=STg7xRV8j3OkHmv1a51bOo5IRu3aXP7QERSx2DeQDNI=;
-        b=lR88kbvy/xMvM6qjtC5ojivt05zJeNE7ZrqxQA47dTAu7DM9PrGF5Bact19784LiVP
-         xWQZQptZjvZk6UgVzgGk9rhzDJ6Hf7gaFMVR4e03m7wVW5Vi8L3Bq8pz6nEGYzY/CsXu
-         lW5hdBi1M9K/M7HZRvUJIqTkVayo1msXwvsH60NS9lsxwlHoYivsGbB32MV3WaRNGjOe
-         zt7rCQLNzcIlW596gXyfkwl2pXuhmKvrN8hM7zhxpKIvuZ0+nIHvMOFFQ0jOUbH1VyX3
-         IU6fhKfyL91uLzLePQgQtjliHPGcGmVMN7VLbhNzvW9edgWUji1I+OExWfkzQY/yAl+A
-         5h5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788959965; x=1789564765;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=STg7xRV8j3OkHmv1a51bOo5IRu3aXP7QERSx2DeQDNI=;
-        b=BV8WtM35Eyaql8aO4kbdfmJOJa/nsKQhhacYswtwvA5IHWmX/UYKlSPISMPv0D3YHm
-         AW3s5dcBbeK5u+Xc6ZcBaWES+rlJQw1EphBiuuv6MigNBdFM/sfFA6LRbZWVpdm6ON5Q
-         FPzdSXBviANhsrxd/3fSiac7BJFJ4u0XVhKFHZ18arrhJzyD+NNuIRBCtdGO80O4gIHN
-         XrQbRIoC2eKbJ9NQpyJR92yrxeojL+nbhz7xZvCx9xMCWxwvLlnbISNlieaq9/iRdfeY
-         ct2cuwx+rs/rHJoBdJxxjGVIlx64b1O+Fg0EfNnucQoqj3jMn/XLf6YrUERJmKt8whJU
-         2hdA==
-X-Forwarded-Encrypted: i=1; AKwUvByhCdM+w9AF9R0Fgoaul3UYPlYL0kP+i5KB6bgH3TC0xwCW3H5H0JQ2a1P5UgilwoelThamNB8=@lists.linux.dev
-X-Gm-Message-State: AFuF++kOtW5GCkfdVdMLkUOGKzRXP5EmTlqdHpCf6uZgsCJOTcHbkVoK
-	BEVLW+FAtzzy4u5B5SAzcQgZVBOsKcaBsJuuD7EiRolnPGsD0shw5d3/kEgJik/NQZw3c4kqd8C
-	y+uH0h70U8ZLGB0yintETugyekUUnPk2a0ruKcAvw
-X-Gm-Gg: AYBFou1WguiVLJH7/Ta71Zp6NeBPu/NWWGDelN1dzgHuL08M17A1PrgJauHpEetaWkz
-	donWNZ4bOuGLNcx6jZZY5PQoITygZmLzD2P20iBsmXiiaC4SfRYuHIjFsqa2fjZWCDx6AJPciOx
-	fUg3UzpJfQc95yVDEejnyl8xpyz+zmhNhDBBgwbSWnOgBixmDod+Vog71sVA159OqhgU6Pwryi5
-	e5uqax6dfG0kZzwZUlKehv0GSSHoPSz1h2QtbG1IvSq+tHbt1MSynZ1WVyqIF2KSLPV3orVO1Dj
-	g5JeqX77KFs9QtdMAjnmAKDI1lLd9Pr0c437mKz3DWHJ7GygY5HPC3Jcd/jG878eOHbi5EjUoql
-	4sksCdUEj8Q==
-X-Received: by 2002:a05:6512:234e:b0:5b6:bea:f091 with SMTP id
- 2adb3069b0e04-5b764bba2f4mr141895e87.10.1788959964067; Wed, 09 Sep 2026
- 06:19:24 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="amgA6GZe"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C01961691;
+	Wed,  9 Sep 2026 06:50:58 -0700 (PDT)
+Received: from e143914.arm.com (e143914.arm.com [10.2.213.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A503D3F7B4;
+	Wed,  9 Sep 2026 06:51:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1788961862; bh=qLBZINToZmCvUTu3/W9dwaMyG5PVK7PCPz8V6+Z0ALM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=amgA6GZeKxs3Oae9wZr466PUH1elaPzNBUM5/PJ/4+Pn22MEqgH4DKALCBQElAREa
+	 hr12SJo8Zs6hcOcdsa3vuqO9Qe7bJKXSIeGdksWZ4EtA9XUTeGCcf3vy644IBF9teg
+	 ueq7HxBI48zgoQbcAUSfiND/Qj/bLUSUccDCy6NM=
+Date: Wed, 9 Sep 2026 14:50:12 +0100
+From: Joey Gouly <joey.gouly@arm.com>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Quentin Perret <qperret@google.com>, Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH v2 06/17] KVM: arm64: Add system register reset framework
+ for protected VMs
+Message-ID: <aqFkFF1ebFSHZLEN@e143914.arm.com>
+References: <20260907070002.3333525-1-fuad.tabba@linux.dev>
+ <20260907070002.3333525-7-fuad.tabba@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260908162223.1683432-1-suzuki.poulose@arm.com>
-In-Reply-To: <20260908162223.1683432-1-suzuki.poulose@arm.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Wed, 9 Sep 2026 14:18:47 +0100
-X-Gm-Features: AcwNN1W9J0hO2XvyP_iEth4oT8xwRLULtx1NyAOMY4yUoohn2-IYZWX_G_vBhiM
-Message-ID: <CA+EHjTzr-r1FRuJ-X3E38_SSHsNSz_vdO-8sFOtBdsiB3V_x=g@mail.gmail.com>
-Subject: Re: [PATCH v17 00/20] KVM: arm64: CCA: Add basic plumbing for Realms
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org, 
-	will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, steven.price@arm.com, 
-	aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com, 
-	joey.gouly@arm.com, yuzenghui@huawei.com, linux-coco@lists.linux.dev, 
-	gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com, 
-	alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com, 
-	lpieralisi@kernel.org, enju.kohei@fujitsu.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260907070002.3333525-7-fuad.tabba@linux.dev>
 
-Hi Suzuki,
+Hi Fuad,
 
-On Tue, 8 Sept 2026 at 17:22, Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
-...
->  3) NEW: Enlighten KVM arm64 about the different VM types and use call backs for
->    the VM type, rather than spilling the is_this_type_of_vm() everywhere. This is
->    not complete yet, but it is largely functional. Adds VCPU and Stage2 MMU related
->    callbacks with support for the existing VM types.
+On Mon, Sep 07, 2026 at 07:59:51AM +0100, Fuad Tabba wrote:
+> Add kvm_reset_pvm_sys_regs() and the pvm_sys_reg_reset_vals[] table
+> that drives it, and call it from init_pkvm_hyp_vcpu() for protected
+> vCPUs. The table holds the registers sys_regs.c resets that
+> __sysreg_restore_state_nvhe() loads for a protected vCPU. The rest of
+> the context keeps the zero the donated hyp vCPU page is cleared to. A
 
-A design thought on the vm_flavor dispatch tables. They're
-hand-maintained arrays indexed by enum, and a gap fails silently at
-runtime, not at build: arm64_vm_s2_ops[] has no VM_REALM row, so a
-realm VM would get NULL ops.
+If the context is zero'd, why is there RESET_ZERO()? If it's just for
+'completeness', worth noting here.
 
-How about something like declaring it unsized with
-BUILD_BUG_ON(ARRAY_SIZE(arm64_vm_s2_ops) != VM_FLAVOR_MAX), as
-host_hcall does? A non-NULL check of the selected ops' mandatory
-callbacks at VM init would catch the s2_ops naming typo Sashiko
-caught, where the rows point at zeroed forward-declared structs.
+> poison value stands in where sys_regs.c resets to UNKNOWN, and for
+> VBAR_EL1 and CONTEXTIDR_EL1 in place of the 0 it uses. MPIDR_EL1 is
+> derived from vcpu_id, as for any KVM guest. AMAIR_EL1 resets to 0
+> where sys_regs.c reads the hardware: the host writes it freely before
+> the hypercall, and it's loaded on every guest entry.
 
-Cheers,
-/fuad
+Also if you can just put a new line for each 'category' here would make
+it simpler to read.
+
+> 
+> Until the per-EC marshalling patch removes the host's full-context
+> copy from flush_hyp_vcpu(), that copy overwrites these values on every
+> entry, so this patch has no observable effect on its own.
+
+Thanks for adding this!
+
+> 
+> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+> ---
+>  arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  1 +
+>  arch/arm64/kvm/hyp/nvhe/pkvm.c         |  5 ++
+>  arch/arm64/kvm/hyp/nvhe/sys_regs.c     | 73 ++++++++++++++++++++++++--
+>  3 files changed, 75 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+> index 49a0a992047ba..a04b7c04d5135 100644
+> --- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+> @@ -95,6 +95,7 @@ bool kvm_handle_pvm_hvc64(struct kvm_vcpu *vcpu, u64 *exit_code);
+>  bool kvm_handle_pvm_sysreg(struct kvm_vcpu *vcpu, u64 *exit_code);
+>  bool kvm_handle_pvm_restricted(struct kvm_vcpu *vcpu, u64 *exit_code);
+>  void kvm_init_pvm_id_regs(struct kvm_vcpu *vcpu);
+> +void kvm_reset_pvm_sys_regs(struct kvm_vcpu *vcpu);
+>  int kvm_check_pvm_sysreg_table(void);
+>  
+>  #endif /* __ARM64_KVM_NVHE_PKVM_H__ */
+> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> index e85f13233da08..af334318d0a03 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> @@ -551,6 +551,11 @@ static int init_pkvm_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu,
+>  		goto done;
+>  
+>  	ret = pkvm_vcpu_init_sve(hyp_vcpu, host_vcpu);
+> +	if (ret)
+> +		goto done;
+> +
+> +	if (pkvm_hyp_vcpu_is_protected(hyp_vcpu))
+> +		kvm_reset_pvm_sys_regs(&hyp_vcpu->vcpu);
+>  done:
+>  	if (ret)
+>  		unpin_host_vcpu(host_vcpu);
+> diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+> index 8758c68017765..03d2c2447e0fd 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+> @@ -525,6 +525,66 @@ static const struct sys_reg_desc pvm_sys_reg_descs[] = {
+>  	/* Performance Monitoring Registers are restricted. */
+>  };
+>  
+> +struct sys_reg_desc_reset {
+> +	int reg;
+> +	void (*reset)(struct kvm_vcpu *vcpu, const struct sys_reg_desc_reset *rd);
+> +	u64 value;
+> +};
+> +
+> +static void reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc_reset *r)
+> +{
+> +	__vcpu_assign_sys_reg(vcpu, r->reg, kvm_calculate_mpidr(vcpu));
+> +}
+> +
+> +static void reset_value(struct kvm_vcpu *vcpu, const struct sys_reg_desc_reset *r)
+> +{
+> +	__vcpu_assign_sys_reg(vcpu, r->reg, r->value);
+> +}
+> +
+> +#define RESET_VAL(REG, RESET_VAL) {  REG, reset_value, RESET_VAL }
+> +
+> +#define RESET_ZERO(REG) RESET_VAL(REG, 0)
+> +
+> +#define RESET_UNKNOWN(REG) RESET_VAL(REG, 0x1de7ec7edbadc0deULL)
+> +
+> +#define RESET_FUNC(REG, RESET_FUNC) {  REG, RESET_FUNC, 0 }
+> +
+> +/* Sorted ascending by reg; kvm_check_pvm_sysreg_table() enforces it. */
+> +static const struct sys_reg_desc_reset pvm_sys_reg_reset_vals[] = {
+> +	RESET_FUNC(MPIDR_EL1, reset_mpidr),
+> +	RESET_UNKNOWN(TPIDR_EL0),
+> +	RESET_UNKNOWN(TPIDRRO_EL0),
+> +	RESET_UNKNOWN(TPIDR_EL1),
+> +	RESET_ZERO(CNTKCTL_EL1),
+> +	RESET_UNKNOWN(PAR_EL1),
+> +	RESET_ZERO(DISR_EL1),
+> +	RESET_ZERO(CPACR_EL1),
+> +	RESET_VAL(CONTEXTIDR_EL1, 0x00000000dbadc0deULL),
+> +	RESET_VAL(SCTLR_EL1, 0x00C50078ULL),
+> +	RESET_ZERO(TCR_EL1),
+> +	RESET_UNKNOWN(AFSR0_EL1),
+> +	RESET_UNKNOWN(AFSR1_EL1),
+> +	RESET_UNKNOWN(ESR_EL1),
+> +	RESET_UNKNOWN(MAIR_EL1),
+> +	RESET_ZERO(AMAIR_EL1),
+> +	RESET_ZERO(MDSCR_EL1),
+> +	RESET_UNKNOWN(TTBR0_EL1),
+> +	RESET_UNKNOWN(TTBR1_EL1),
+> +	RESET_UNKNOWN(FAR_EL1),
+> +	RESET_VAL(VBAR_EL1, 0x1de7ec7edbadc000ULL),
+> +};
+> +
+> +void kvm_reset_pvm_sys_regs(struct kvm_vcpu *vcpu)
+> +{
+> +	unsigned long i;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(pvm_sys_reg_reset_vals); i++) {
+> +		const struct sys_reg_desc_reset *r = &pvm_sys_reg_reset_vals[i];
+> +
+> +		r->reset(vcpu, r);
+> +	}
+> +}
+> +
+>  /*
+>   * Initializes feature registers for protected vms.
+>   */
+> @@ -550,16 +610,21 @@ void kvm_init_pvm_id_regs(struct kvm_vcpu *vcpu)
+>  }
+>  
+>  /*
+> - * Checks that the sysreg table is unique and in-order.
+> - *
+> - * Returns 0 if the table is consistent, or 1 otherwise.
+> + * Both tables must be unique and sorted ascending. pvm_sys_reg_descs.reg is the
+> + * sys_reg() encoding, pvm_sys_reg_reset_vals.reg the vcpu_sysreg index, so they
+> + * compare differently. BUG_ON() at __pkvm_init: fatal at boot.
+>   */
+>  int kvm_check_pvm_sysreg_table(void)
+>  {
+>  	unsigned int i;
+>  
+>  	for (i = 1; i < ARRAY_SIZE(pvm_sys_reg_descs); i++) {
+> -		if (cmp_sys_reg(&pvm_sys_reg_descs[i-1], &pvm_sys_reg_descs[i]) >= 0)
+> +		if (cmp_sys_reg(&pvm_sys_reg_descs[i - 1], &pvm_sys_reg_descs[i]) >= 0)
+> +			return 1;
+> +	}
+> +
+> +	for (i = 1; i < ARRAY_SIZE(pvm_sys_reg_reset_vals); i++) {
+> +		if (pvm_sys_reg_reset_vals[i - 1].reg >= pvm_sys_reg_reset_vals[i].reg)
+>  			return 1;
+>  	}
+>  
+
+Some minor commit message nits, and I see you're going to remove this
+sorting check.
+
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+
+Thanks,
+Joey
