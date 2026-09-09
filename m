@@ -1,142 +1,145 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta0.migadu.com (out-149.mta0.migadu.com [91.218.175.149])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 309F452E054;
-	Wed,  9 Sep 2026 12:17:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F20E55519BC
+	for <kvmarm@lists.linux.dev>; Wed,  9 Sep 2026 12:23:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.149
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788956260; cv=none; b=s4VJI0jQ4YSdk/6FfcnD/YGsAKkHzd5lLd8WdkKyI5IrorPXO451Cdufu8gJR/njasXVQRTu0ysfeoZ8a7AhuuVH/0sn4a4GX+J1mXIhBozVSID5bKCdHM/vVgjS+5owfbRIFksRwd6VpOgzpr+lzhKz0az0UukJaXIFjU+fwcI=
+	t=1788956633; cv=none; b=p/nhmAxPu2UAveTEQkkIXHpgARJpY9MNVokCb0aL+wSEq9Ex7GacQZaDJpPQ72NoOfftX0308sA2Ml6fxyDOTT3Wm9UjOLg6KACxAqo7CHynquS/w2gk74FgWNp/cmRssksUdHe3EM4s3AOyPxLETS7ERNa+KRFhkhXgtxVBkYM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788956260; c=relaxed/simple;
-	bh=uLcy+jggp2AjWvoSKdjgh2Z1kpnBks6fQKrmv0yE+jQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RpPSy10EeTMiyuplcM+0CrymslNLVJsbGfKVbalWtP+9++gp4TAXievulgKr+o6KZMfiMm6xCMjaFSH9MRr4XvBbT0sWZfcvvp5U5TntqKZwkdyZF7HczqN6WC622K64kksKGM6rf9YPyW69P5qZx33X6NIwMHTiCB9hzpfvIY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XtsvA6WM; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788956633; c=relaxed/simple;
+	bh=Cp5gjjtRZvsGv/c5qbUz1QdnpXy0ZN7bcc5rSOhblwE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MBdt2XV4Tp5tknSVZtn1fgIxylSh48f/5AuyzcpVNZdswJR73S+uaXuNKg777/Hb6kXd+1fFSZCSu/ysRN7BqX8zh2HkbbU8pksXiPvLtaUM5T4KO7JWFXNDGKQsPMWHCR6fd9yUw8SrnLYdci9VFW2EabIWBvv6GyLvmnSta4M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QeyZEueA; arc=none smtp.client-ip=91.218.175.149
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XtsvA6WM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 440B21F00ACA;
-	Wed,  9 Sep 2026 12:17:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788956258;
-	bh=prvGSj+fZwUA3hFUhb/5k8cPZC64I4Fvs/1jMwi2UW0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=XtsvA6WMsvy+Wz3Bt8v0Bdxjg2HPd0rypeZl5SXrxIgVGRT8K6jgPwU4m3cVxZQCm
-	 oDHPAIyVoAmgXZ2TE3fA4kJ6ndh5z9JktCCvs4KjO1tEYAW6pGXuzIsYs8w0lJ1Jfs
-	 dTN05KtGiIFCChfQdHpdwje0Sqx/jEgvapZmSgZBO1fsEswuEZ4eNL8jxNmbkuOCtK
-	 XWO33Mz1fkPNI800PG1f336LFJCdQiU/bTlnmHer56LSvMWwS+soEyRVm8Une2MAq/
-	 +mnQ3QKlY7Jql7clJFLnSDTMpFzj7QKxKPCxDsXElcKUkhzXnBqS/GZgyJhbl2zBj1
-	 9n+FrZQWu0TqQ==
-Date: Wed, 9 Sep 2026 13:17:33 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>, Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] KVM: arm64: Enable S1PIE for hVHE
-Message-ID: <e3c716c2-66ef-4dd0-bcae-6df4ff814e48@sirena.org.uk>
-References: <20260908-kvm-arm64-nvhe-pie-v2-1-79e42d28cc08@kernel.org>
- <861pb24v45.wl-maz@kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QeyZEueA"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=Cp5gjjtRZvsGv/c5qbUz1QdnpXy0ZN7bcc5rSOhblwE=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1788956628; v=1; x=1789561428;
+ b=QeyZEueAsyVMG3aJ9xVDectn6k0lo6ZSMBP0DDdCsaJQbWN1ovus13E4PHPBb+XBa0ZNWXRF
+ Uyg6sOQH1oiaTktOvrqrCuCRhDfEZ6crWMZsRNegqUixuEyXoh3hOgfj9WcxTkmUsmBl6OEYoPE
+ LuX/p9+IuDToSABd8BHMCHI0=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id d03a1d41400a3008;
+	Wed, 09 Sep 2026 12:23:48 +0000
+X-Mizu-Trace-ID: d03a1d41400a3008
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b4a0b384c4so6267e87.1
+        for <kvmarm@lists.linux.dev>; Wed, 09 Sep 2026 05:23:44 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvByVWhrMeL0E1AcTh7QiBbQ8RFkKNL1t8lZ1L+mKA2m5E2Z495Om7CXtpauqnfBY443PuVgReQE=@lists.linux.dev
+X-Gm-Message-State: AFuF++lvq7kqHeTvWdbsaiNi+jX9sRbtGk7uhWokTT8u3/jel8ebJpQZ
+	Ck/13NPIly4dj7nW/SFmCdXuEdifOl1ZdJTsuCs3DuDAo9Gs8u8WuTZDFHvwb9CR9hqWAWrvlqR
+	s8XHABB9owPEPys3M/DKD1bUMbxqVPgrFCUWodgto
+X-Received: by 2002:a05:6512:3b14:b0:5ae:b9c5:f29f with SMTP id
+ 2adb3069b0e04-5b7654ce193mr107092e87.2.1788956623620; Wed, 09 Sep 2026
+ 05:23:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="MuKrjLDOhzI+PFOi"
-Content-Disposition: inline
-In-Reply-To: <861pb24v45.wl-maz@kernel.org>
-X-Cookie: Postage will be paid by addressee.
+References: <20260908162223.1683432-1-suzuki.poulose@arm.com>
+ <20260908162223.1683432-11-suzuki.poulose@arm.com> <CA+EHjTw9ReyvsNT=y+-P6ng7VQ6Pvz9PFK9bO71qvTR1pOxx5Q@mail.gmail.com>
+ <6152fc41-65f0-460f-90b4-1454c11bcba6@arm.com>
+In-Reply-To: <6152fc41-65f0-460f-90b4-1454c11bcba6@arm.com>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Wed, 9 Sep 2026 13:23:07 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTxjk1JLR7Tf5LEfB_xypbUWnw3G3H-FT7bTE=nWTTRgAA@mail.gmail.com>
+X-Gm-Features: AcwNN1UdAORP9MO5wBUrYIVset4_Bi4mGv_qouuDykVa7m9ydt_n5FV9_UkyP28
+Message-ID: <CA+EHjTxjk1JLR7Tf5LEfB_xypbUWnw3G3H-FT7bTE=nWTTRgAA@mail.gmail.com>
+Subject: Re: [PATCH v17 10/20] KVM: arm64: coco: Disable Steal time accounting
+ for coco guests
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org, 
+	will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, steven.price@arm.com, 
+	aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com, 
+	joey.gouly@arm.com, yuzenghui@huawei.com, linux-coco@lists.linux.dev, 
+	gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com, 
+	alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com, 
+	lpieralisi@kernel.org, enju.kohei@fujitsu.com
+Content-Type: text/plain; charset="UTF-8"
 
+Hi Suzuki,
 
---MuKrjLDOhzI+PFOi
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+On Wed, 9 Sept 2026 at 12:52, Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+...
 
-On Wed, Sep 09, 2026 at 10:44:26AM +0100, Marc Zyngier wrote:
-> Mark Brown <broonie@kernel.org> wrote:
+> > I think it would be better to leave KVM_CAP_STEAL_TIME reported and
+> > instead reject the configuration for these VMs, returning -EPERM from
+> > the KVM_ARM_VCPU_PVTIME_CTRL attr. A capability query should report
+> > what the kernel supports, not whether a given VM may use it; gating it
+> > per-VM here is also inconsistent, since the !kvm clause leaves the
+> > system-fd cap at 1 while the VM-fd cap reads 0. And -EPERM says that
+>
+>
+> But isn't that we want from a VMM perspective ? i.e., enable PVTIME if
+> it is supported for the given VM (type). Rather than PVTIME is supported
+> by the KVM, so I can go enable it by default. But, we endup getting a
+> failure while we enable it. I encountered this with kvmtool, where
+> CAP_STEAL_TIME is reported true and even the HAS_DEVICE_ATTR goes
+> through fine, but SET_DEVICE_ATTR seemed to fail.
+>
+> Isn't it better to allow the VM to decide if the capability is supported
+> for the given VM type, like we are doing for other capabilities ?
 
-> > hVHE.  Enable FEAT_S1PIE with hVHE only, hVHE is used for protected VMs
-> > but there is no real use case for nVHE mode on hardware with this
-> > feature.
+You're right, per-VM capability reporting. My wires got crossed from
+the pKVM series and the kvmtool fixes. However, I'd still return
+-EPERM rather than -ENXIO from the attribute. The capability exists,
+it's just not permitted for a confidential VM, and -EPERM says exactly
+that, whereas -ENXIO reads as "no such feature".
 
-> That's not the reason. The reason is that there is no nVHE-only
-> hardware with PIE, and that on VHE-capable HW, nVHE and hVHE are
-> strictly equivalent. Therefore there is no need to add support for HW
-> that does not exist.
+Cheers,
+/fuad
 
-Right, that's the reason why there is no real use case for nVHE on this
-hardware - even where S1PIE capable hardware can run nVHE there is
-always a preferable mode that delivers the same functionality.  I'll
-make this more explicit.
-
-> > This should have no practical impact other than causing any unexpected
-> > encodings to map to no permissions instead of their default
-> > meanings.
-
-> What default meanings?
-
-The meanings that are defined when S1PIE is not enabled.  I will make
-this more explicit, or given your comments further down about not
-sharing code possibly just renumber so it's not a thing any more.
-
-> > +#define KVM_HYP_PIR_IDX(uxn, pxn, dbm, ap1) (((uxn) << 3) | ((pxn) << 2) | \
-> > +					     ((dbm) << 1) | (ap1))
-> > +
-
-> This is not what these bits are called. They are just PIIndex[] bits.
-
-I was trying to make it easier to map thing between non-S1PIE and S1PIE
-encodings, I'll rename and add a comment to help people follow when
-updating.
-
-> > +alternative_if ARM64_HAS_S1PIE
-> > +	/* S1PIE is only enabled with TCR2_EL2.PIE if we are running hVHE */
-> > +	mov_q	x1, KVM_HVHE_PIR_EL2
-> > +	msr	REG_PIR_EL2, x1
-> > +	msr	REG_PIRE0_EL2, xzr
-> > +alternative_else_nop_endif
-
-> > +alternative_if ARM64_HAS_TCR2
-> > +	ldr	x1, [x0, #NVHE_INIT_TCR2_EL2]
-> > +	msr	REG_TCR2_EL2, x1
-> > +alternative_else_nop_endif
-
-> S1PIE implies TCR2. Why the additional alternatives?
-
-That is true but TCR2 does not imply S1PIE, I wrote things this way so
-that TCR2 is initialised even if we end up on a system where that is
-present but S1PIE is not (or S1PIE is present but has been disabled by a
-command line override).  This is during startup so it seemed reasonable
-to write things in a straightforward and easy to read fashion.
-
-> TBH, I think this is completely going the wrong way. Why can't we
-> write this as a discrete enumeration of the permission combination we
-> support (all 3 of them), and map that to the correct index?
-
-I was deliberately following a similar pattern to that used for the host
-kernel, intended to minimise code changes.  I will rework so we have an
-alternative path for S1PIE rather than trying to share.
-
---MuKrjLDOhzI+PFOi
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmqhTlwACgkQJNaLcl1U
-h9DVCAf9FkLa9EZrlgi6pdkBsc+Zaeb31MjhKkDCcZjLX6spejzs3GGxFnfz3gax
-Rn3YMBzXTz0oB5cD9/nP0lAzr99Eq+HdHKbToBocm/U4R8eYZkWRN3flhnfkgRwN
-izCAbdK0aAMowX4UGyWPEfVtC71PNTkBegLTTfbChDRmEAmKv8LYSmFjaXywjmkd
-IMAecl+BnE8W2lMVDYVNvSJ4YO4dD1d/csfbixh1E87XeuyvOusrjAmbvvIENl4D
-9zC7/g8kwJBu4wGn5Jww2sjtWz0ou8oJKQMzQ1TvgcwTXec4YQebamZxFEaTB1fc
-dIT1nVqkE5JKtDXKVqmQBX72EOhrcA==
-=xhkR
------END PGP SIGNATURE-----
-
---MuKrjLDOhzI+PFOi--
+>
+> > steal-time exists but isn't permitted for a confidential VM, whereas
+> > -ENXIO reads as "no such feature".
+>
+> Cheers
+> Suzuki
+>
+>
+> >
+> > Cheers,
+> > /fuad
+> >
+> >>
+> >>   int kvm_arm_pvtime_set_attr(struct kvm_vcpu *vcpu,
+> >> @@ -81,7 +81,7 @@ int kvm_arm_pvtime_set_attr(struct kvm_vcpu *vcpu,
+> >>          int ret = 0;
+> >>          int idx;
+> >>
+> >> -       if (!kvm_arm_pvtime_supported() ||
+> >> +       if (!kvm_arm_pvtime_supported(kvm) ||
+> >>              attr->attr != KVM_ARM_VCPU_PVTIME_IPA)
+> >>                  return -ENXIO;
+> >>
+> >> @@ -110,7 +110,7 @@ int kvm_arm_pvtime_get_attr(struct kvm_vcpu *vcpu,
+> >>          u64 __user *user = (u64 __user *)attr->addr;
+> >>          u64 ipa;
+> >>
+> >> -       if (!kvm_arm_pvtime_supported() ||
+> >> +       if (!kvm_arm_pvtime_supported(vcpu->kvm) ||
+> >>              attr->attr != KVM_ARM_VCPU_PVTIME_IPA)
+> >>                  return -ENXIO;
+> >>
+> >> @@ -126,7 +126,7 @@ int kvm_arm_pvtime_has_attr(struct kvm_vcpu *vcpu,
+> >>   {
+> >>          switch (attr->attr) {
+> >>          case KVM_ARM_VCPU_PVTIME_IPA:
+> >> -               if (kvm_arm_pvtime_supported())
+> >> +               if (kvm_arm_pvtime_supported(vcpu->kvm))
+> >>                          return 0;
+> >>          }
+> >>          return -ENXIO;
+> >> --
+> >> 2.43.0
+> >>
+>
