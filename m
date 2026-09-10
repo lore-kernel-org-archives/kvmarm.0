@@ -1,59 +1,59 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D57B03603E9;
-	Thu, 10 Sep 2026 10:29:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57BFF3E6DE7;
+	Thu, 10 Sep 2026 10:29:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789036199; cv=none; b=LfctM9NvMU9i62m8urUWPCz1aYB/vxaDwgbiA43r/t9xkzXoUU9QW2jvBYRahGLj93zfYtozcRg2eDaA5w+zOwtpDucJAAbrSQtsPw0X/ShVl+L57f7P1gWwIg1dayebXeRVCSBTigvGrQNI/Y/eDMHlVWimApjBvV36u8Fmr+0=
+	t=1789036201; cv=none; b=t+U5tLUnNvnQdnnhvb5yx1BYYqh7Q4J3stgaarJfmgs4mZx6f4KS633V6vIGbdS8mX60C1RoYSg8yFrM1BMNVxzniNBO0Tipx3sXJzNfxxCe+RQG5ouj+Q/+OPg8dhtJlIafz44XMsscBj5g+jjyVtrQnOgOtCEWSZFoKGaJVFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789036199; c=relaxed/simple;
-	bh=nMikz4YNyY74FhKkPbaB0M6vAd7E6UR9CkOxWodXgl0=;
+	s=arc-20240116; t=1789036201; c=relaxed/simple;
+	bh=GcYodoSjkW/CMdZq6BFrx6NEBOv9IxjdSHA9auhtjTc=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Viz4T5/vNcUVwLSHU7ONQ8C8KLD0AOvue51/ejZFzbEF9wTx7jb2ZtSqQVbvUGLMe/o7/33HkDu1dFGJMVUibyb/KvDMTsk9q1+3Jzw0adZ2ICLln/cFRQhaQymEyp+K28BZ3gY3UttFJtxfFjv8pLITXLz9csC2OhesVp+09MA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=P7+8GjmT; arc=none smtp.client-ip=148.163.158.5
+	 MIME-Version:Content-Type; b=g02zS95X4tNq26R2sB0ZpiLedh31QIXZQNkLhkQvVn7XNRuVqGzrxc0bK3+m9ZBP1BZmH6y89etpLYvtFV5lvieNQB8UWfMflrIJp+AcBsgaIF/of5EfFWqDtb5af8MR4R+ultrGyd4GogM7dqPJbNya6Gg19paQcNcbOZ0bhtA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=cbBoC1WU; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="P7+8GjmT"
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68A91a2x2483650;
-	Thu, 10 Sep 2026 10:29:33 GMT
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="cbBoC1WU"
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68A91QMg576514;
+	Thu, 10 Sep 2026 10:29:38 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=OYWX0R
-	H8DOHLOCtrZgD5LV0gPTaI8JZ9RGIDCbaQ4cw=; b=P7+8GjmTmfO9IbkbHyUtT3
-	yj4tolE9XvbWiX0nAuk4RwkVuWrJGFN8lpjaL/3/dSmKmkGiML3tFomu/CpR5vUj
-	KxK7yrP1509pfoNhiR3kEb9I9KbYy5R1PyKn6knRYVWis6FnXbe5dETElkEe3kYx
-	g46FRrfzavQ8mx5/VrxBjwygZPWgaxG1NwJLC3VHAh9CMjcqMKCUTFdOoIZjV1jA
-	xVtYDmBTVzuepXootKCPXoigtAz6evR4JYn/P4x75g1on7OPCqscgfDTduenVq2O
-	+ViKXfg10Q6F8v4xLz7Ut5aq29bVX2Rc7HKWOcGzXe5jbgBp9N8pGv8AAxmrD65Q
+	:message-id:mime-version:references:subject:to; s=pp1; bh=2v8eQT
+	UiODkYCwW7fpRiVtvLEmXAN0QDrnYnUVfQNEQ=; b=cbBoC1WUvLIsh/Wj2cLPT2
+	vjPz/azRP2Hrwlumw/k42MGAwm24W5evh90rCcbAHhlhipSVKSOfLluTbJtU1jt6
+	Gx1m/p9cwc1yahl/k90Whze96rIxuzGLAWsoacYf1NXRxuNSdY2iIbvv9apQVJlc
+	UMZI8mcGuPuZuBg96KgDjH1Pcigve3p2ynl7rfqYTHLKARJK6yDYgZPAH82YY4WR
+	VAl1DJdg2jJ4oqrX3R8i38RcGwTWjtRRHNdV+FyDZlZBQqoJbTTQnBWLJIHA7E6v
+	y6sCElhwjdI/2YfJdtQKBJsmaGNvwQ7+69t6sq49a5r086FtooX5B8DWFJH5dewg
 	==
 Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gkd8suw2t-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gkd8n3wd8-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 10 Sep 2026 10:29:32 +0000 (GMT)
+	Thu, 10 Sep 2026 10:29:37 +0000 (GMT)
 Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 68AAQGVM004811;
-	Thu, 10 Sep 2026 10:29:31 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4gkcr33uhh-1
+	by ppma11.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 68AAQC9K004763;
+	Thu, 10 Sep 2026 10:29:36 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4gkcr33uj1-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 10 Sep 2026 10:29:31 +0000 (GMT)
+	Thu, 10 Sep 2026 10:29:36 +0000 (GMT)
 Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 68AATR4D47776036
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 68AATWNH43188604
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 10 Sep 2026 10:29:27 GMT
+	Thu, 10 Sep 2026 10:29:32 GMT
 Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4F43820043;
-	Thu, 10 Sep 2026 10:29:27 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 878092004D;
+	Thu, 10 Sep 2026 10:29:32 +0000 (GMT)
 Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id CCBF52004D;
-	Thu, 10 Sep 2026 10:29:24 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 00B2F2004F;
+	Thu, 10 Sep 2026 10:29:30 +0000 (GMT)
 Received: from p-imbrenda (unknown [9.111.48.108])
 	by smtpav04.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Thu, 10 Sep 2026 10:29:24 +0000 (GMT)
-Date: Thu, 10 Sep 2026 12:23:04 +0200
+	Thu, 10 Sep 2026 10:29:29 +0000 (GMT)
+Date: Thu, 10 Sep 2026 12:25:31 +0200
 From: Claudio Imbrenda <imbrenda@linux.ibm.com>
 To: Sean Christopherson <seanjc@google.com>
 Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
@@ -88,12 +88,12 @@ Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
         Itaru Kitayama <itaru.kitayama@fujitsu.com>,
         Nicholas Piggin <npiggin@gmail.com>,
         Ritesh Harjani <ritesh.list@gmail.com>
-Subject: Re: [PATCH v2 10/20] KVM: selftests: Add a wrapper API to allocate
- multiple page table pages
-Message-ID: <20260910122304.6d40fef8@p-imbrenda>
-In-Reply-To: <20260902164123.2546762-11-seanjc@google.com>
+Subject: Re: [PATCH v2 09/20] KVM: selftests: Use the innermost page
+ allocator API in s390's IRQ routing test
+Message-ID: <20260910122531.499b565b@p-imbrenda>
+In-Reply-To: <20260902164123.2546762-10-seanjc@google.com>
 References: <20260902164123.2546762-1-seanjc@google.com>
-	<20260902164123.2546762-11-seanjc@google.com>
+	<20260902164123.2546762-10-seanjc@google.com>
 Organization: IBM
 X-Mailer: Claws Mail 4.4.0 (GTK 3.24.52; x86_64-redhat-linux-gnu)
 Precedence: bulk
@@ -106,130 +106,65 @@ Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-Spam-Info: AW1haW4tMjYwOTEwMDExNSBTYWx0ZWRfX08DVpiXgVUnP
- 7wkmCcOivwBSbL6mAcR9h5OtqylZU+wRO7T/0OhkHu3k0F9M2m1PhsQsol+Dsr04QAaYbO9LWTA
- AcjtqJBo2ASCE02L2mnZK6R/G5B/GPY=
-X-Proofpoint-ORIG-GUID: IvVTL6gKWZTqBFbywVNu-ekREucvQ5cN
-X-Proofpoint-GUID: fv7SiSZpmApWyfA9kW2K8yKbFXky4vLj
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTEwMDExNSBTYWx0ZWRfX71qI+xHvh4bf
- ctcdWFcJsOpJVKJKIQSGHLkEqRx1ddggdES8ewtJQlfsbA8+JJBYfa5Ed9Ai4+nC8dmntCvvHoN
- loH9eVanahQx/KrTBtVW97tp5nLXdlH9X1zKiu+F8EBFS5YEZpx/lCqiwFTQlKQ5EhWuR3+52BM
- KAGKWMe1qlLPIkt/mbepxWRJfLQMGo4bAJFx2+7TpBKNMNZq6tdhILKXOZJVMz+tb/hVzBDk23J
- mx2lJv2a8fmsh2JeDO1QEQP/r2BGsSNv0F3H6OB3RFK3xBg/w8/vzy5SG+13gLTSpRh4zxdyPsg
- jEeNNMzUAw2/TD7JJDzGIbd+MTxliXTEsQrjVEKmCHWQykj5fSik5DIpSyqe32vLFIKRg33zmhR
- iy/bWzzggvGElTnykzoWsMzxhZ8nIzNZ4wFqF7tmS1nNABKjQShuwgqXBlwXKvUTvu4FXmiYM6C
- VAKXRDsAX7yg7LCXDUQ==
-X-Authority-Analysis: v=2.4 cv=PIGaavqC c=1 sm=1 tr=0 ts=6aa2868d cx=c_pps
+X-Authority-Analysis: v=2.4 cv=NMVAaE6g c=1 sm=1 tr=0 ts=6aa28691 cx=c_pps
  a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
  a=kj9zAlcOel0A:10 a=VdqzKS8jKosA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=RzCfie-kr_QcCd8fBx8p:22 a=1XWaLZrsAAAA:8
- a=omOdbC7AAAAA:8 a=VnNF1IyMAAAA:8 a=o3jzi3dQArLouIYA8mYA:9 a=CjuIK1q_8ugA:10
+ a=RnoormkPH1_aCDwRdu11:22 a=uAbxVGIbfxUO_5tXvNgY:22 a=1XWaLZrsAAAA:8
+ a=omOdbC7AAAAA:8 a=VnNF1IyMAAAA:8 a=ncMTWhVeLHM-VX_LCFkA:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-GUID: Se5IIme47yOD2YBAO0JHuYpxPj7OtfZR
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTEwMDExNSBTYWx0ZWRfX5cTAuBi1pOw0
+ eCaNg8ALKS6/QFSqT//okMnY45ig0qLvL0qlinYgrlkvM4y8dox1QEYYRVq1DSN5ZnVPcloYMzz
+ qzTs+Pk68w6UnwFc5Fcytw4kHMzGKU9lWP8PiUAG2m+ymP9PrpTKt4qGBIczpWCt8vrcJ127ixD
+ 9cOEVmc3sD09VEDPEv4MbzyTBatBFAjMRySMq6Z7uKPsboCi1kWWNEaH0zm6HKcEagQuJAm1OpN
+ tu1bwMh0zrZb1QtvY69KWvjYeUgL88ocCGgFWt5Kn7w04RiWEPHkblVyBo+h7CTLU/NVbmG19Go
+ YqhGsu0rcwe7fP7uzCqijdqHBfQYTU+Kf++VDwhvVRuQKgfW9isJuHzl54TDJJgLK0PXPFqBZzf
+ 9fLBbTJ21IPM+xgRHVm03S/vZUCBKv5qnjJ6iLnNIWb5KV5w5oRjKx9vfb5EpXDcGmx6NAjtmbx
+ 3eggPh0QRJRm864ZYpA==
+X-Proofpoint-ORIG-GUID: EeWyQkeZUCSSRdpkHyS1LNqruiFVZs4W
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTEwMDExNSBTYWx0ZWRfX6mMimO+EDNf/
+ eJupQqfyq8zKgx+xjT0vGZK4TqN7lyOx+e+F0dUZro+XG34zrPAU7eBBA1hL2I4JHSa/bG9nlqQ
+ X7lB6vw5V56GrdX2vG0c4Pn1Yf68Y1c=
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
  definitions=2026-09-10_03,2026-09-09_02,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 priorityscore=1501 bulkscore=0 adultscore=0 suspectscore=0
- lowpriorityscore=0 impostorscore=0 clxscore=1015 spamscore=0 malwarescore=0
+ spamscore=0 bulkscore=0 clxscore=1015 malwarescore=0 lowpriorityscore=0
+ priorityscore=1501 adultscore=0 suspectscore=0 impostorscore=0 phishscore=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
  reason=mlx scancount=1 engine=8.22.0-2609040000 definitions=main-2609100115
 
-On Wed,  2 Sep 2026 09:41:13 -0700
+On Wed,  2 Sep 2026 09:41:12 -0700
 Sean Christopherson <seanjc@google.com> wrote:
 
-> Add vm_alloc_page_table_pages() and use it throughout arch code to replace
-> open coded equivalents.
+> Use the quad-underscores page allocator in s390's IRQ routing test in
+> anticipation of dropping the @min_gpa param from the primary APIs.
+> 
+> Note, it's not entirely clear that the test *needs* to use a very magical
+> @min_gpa, i.e. it's possible a more elegant solution exists.  But that's a
+> problem for a different day.
 > 
 > No functional change intended.
 > 
-> Reviewed-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
 > Tested-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 
 Acked-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
 > ---
->  tools/testing/selftests/kvm/include/kvm_util.h    | 9 +++++++--
->  tools/testing/selftests/kvm/lib/arm64/processor.c | 4 +---
->  tools/testing/selftests/kvm/lib/riscv/processor.c | 4 +---
->  tools/testing/selftests/kvm/lib/s390/processor.c  | 8 ++------
->  4 files changed, 11 insertions(+), 14 deletions(-)
+>  tools/testing/selftests/kvm/s390/irq_routing.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-> index d9d39a8894e2..c56f342b16fd 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> @@ -1013,10 +1013,15 @@ static inline gpa_t vm_phy_page_alloc(struct kvm_vm *vm, gpa_t min_gpa,
->  	return vm_phy_pages_alloc(vm, 1, min_gpa, memslot);
->  }
+> diff --git a/tools/testing/selftests/kvm/s390/irq_routing.c b/tools/testing/selftests/kvm/s390/irq_routing.c
+> index f3839284ac08..cd26cc1aed80 100644
+> --- a/tools/testing/selftests/kvm/s390/irq_routing.c
+> +++ b/tools/testing/selftests/kvm/s390/irq_routing.c
+> @@ -36,7 +36,7 @@ static void test(void)
+>  	};
 >  
-> +static inline gpa_t vm_alloc_page_table_pages(struct kvm_vm *vm, size_t nr_pages)
-> +{
-> +	return vm_phy_pages_alloc(vm, nr_pages, KVM_GUEST_PAGE_TABLE_MIN_PADDR,
-> +				  vm->memslots[MEM_REGION_PT]);
-> +}
-> +
->  static inline gpa_t vm_alloc_page_table(struct kvm_vm *vm)
->  {
-> -	return vm_phy_page_alloc(vm, KVM_GUEST_PAGE_TABLE_MIN_PADDR,
-> -				 vm->memslots[MEM_REGION_PT]);
-> +	return vm_alloc_page_table_pages(vm, 1);
->  }
+>  	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
+> -	mem = vm_phy_pages_alloc(vm, 2, 4096 * 42, 0);
+> +	mem = ____vm_phy_pages_alloc(vm, 2, 4096 * 42, 0, false, false);
 >  
->  /*
-> diff --git a/tools/testing/selftests/kvm/lib/arm64/processor.c b/tools/testing/selftests/kvm/lib/arm64/processor.c
-> index 01325bf4d36f..2dcaa2c4a038 100644
-> --- a/tools/testing/selftests/kvm/lib/arm64/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/arm64/processor.c
-> @@ -115,9 +115,7 @@ void virt_arch_pgd_alloc(struct kvm_vm *vm)
->  	if (vm->mmu.pgd_created)
->  		return;
->  
-> -	vm->mmu.pgd = vm_phy_pages_alloc(vm, nr_pages,
-> -					 KVM_GUEST_PAGE_TABLE_MIN_PADDR,
-> -					 vm->memslots[MEM_REGION_PT]);
-> +	vm->mmu.pgd = vm_alloc_page_table_pages(vm, nr_pages);
->  	vm->mmu.pgd_created = true;
->  }
->  
-> diff --git a/tools/testing/selftests/kvm/lib/riscv/processor.c b/tools/testing/selftests/kvm/lib/riscv/processor.c
-> index ded5429f3448..c175dcd14114 100644
-> --- a/tools/testing/selftests/kvm/lib/riscv/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/riscv/processor.c
-> @@ -69,9 +69,7 @@ void virt_arch_pgd_alloc(struct kvm_vm *vm)
->  	if (vm->mmu.pgd_created)
->  		return;
->  
-> -	vm->mmu.pgd = vm_phy_pages_alloc(vm, nr_pages,
-> -					 KVM_GUEST_PAGE_TABLE_MIN_PADDR,
-> -					 vm->memslots[MEM_REGION_PT]);
-> +	vm->mmu.pgd = vm_alloc_page_table_pages(vm, nr_pages);
->  	vm->mmu.pgd_created = true;
->  }
->  
-> diff --git a/tools/testing/selftests/kvm/lib/s390/processor.c b/tools/testing/selftests/kvm/lib/s390/processor.c
-> index fb9dab92d4d1..33f49d743b5f 100644
-> --- a/tools/testing/selftests/kvm/lib/s390/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/s390/processor.c
-> @@ -20,9 +20,7 @@ void virt_arch_pgd_alloc(struct kvm_vm *vm)
->  	if (vm->mmu.pgd_created)
->  		return;
->  
-> -	gpa = vm_phy_pages_alloc(vm, PAGES_PER_REGION,
-> -				   KVM_GUEST_PAGE_TABLE_MIN_PADDR,
-> -				   vm->memslots[MEM_REGION_PT]);
-> +	gpa = vm_alloc_page_table_pages(vm, PAGES_PER_REGION);
->  	memset(addr_gpa2hva(vm, gpa), 0xff, PAGES_PER_REGION * vm->page_size);
->  
->  	vm->mmu.pgd = gpa;
-> @@ -38,9 +36,7 @@ static u64 virt_alloc_region(struct kvm_vm *vm, int ri)
->  {
->  	u64 taddr;
->  
-> -	taddr = vm_phy_pages_alloc(vm,  ri < 4 ? PAGES_PER_REGION : 1,
-> -				   KVM_GUEST_PAGE_TABLE_MIN_PADDR,
-> -				   vm->memslots[MEM_REGION_PT]);
-> +	taddr = vm_alloc_page_table_pages(vm, ri < 4 ? PAGES_PER_REGION : 1);
->  	memset(addr_gpa2hva(vm, taddr), 0xff, PAGES_PER_REGION * vm->page_size);
->  
->  	return (taddr & REGION_ENTRY_ORIGIN)
+>  	routing = kvm_gsi_routing_create();
+>  	routing->nr = 1;
 
