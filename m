@@ -1,120 +1,88 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 535EC419318;
-	Thu, 10 Sep 2026 10:58:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E3A946EC66
+	for <kvmarm@lists.linux.dev>; Thu, 10 Sep 2026 11:00:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789037899; cv=none; b=dMr3+7vOdckF48vrUJ/6wGRAPeyn/Km/fRp7qzw52atrjecZ1A5D7Qf3aedJglp1J8NN/iPP4furlJrUcRrVGwqRtI599qq9I3L4rIIvalA6vq728sCyTZ2b/eNXblhvCz04sYlx2BFUVk6yKK4iS5W39vvF2VffMR8wDhiErSc=
+	t=1789038010; cv=none; b=bW8hC4ATo5h5b8ujH/2LJhnhG4skXUvKo4/FoKXMAWUizHyV0chZhP4JnfNlFIGfWwHJfbTRvy8dYdbJ2MENEJiU6oMEVqBj+L7XFrNU4us+0nzZ0qepAm9lM45tr9dfD2ae47Cqgx1Pzlw8ijhWpv1Pn/U5ZgCqxcgwoj/vC9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789037899; c=relaxed/simple;
-	bh=91rDR9zsO+SuOgJBwk89aAsDm4E6GmQ4MSXkzU+1u9c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X5QQLmIPSqc7dfYLpJK2RuuGnQQJjds3gZHuiuSIrKQfaGlLhMZox78RfFMlmchjl5QfHaXP9BL1aKaka0GkiW7PnETSAUVRg0jvKnopO8LAu33eUQkJT03Wdx9IZEroMyjjF5wiAkFLQgSiXQNZIR2toedPKmE66AashkhCBfo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=s3xof/3l; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1789038010; c=relaxed/simple;
+	bh=UDzFuqayMptXRxyD0sVNI7x/dzCA7DIHFk14h2KsjfE=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References; b=O1clgqQ1wQbldBwgMXysjMMHWoEm8q+OuZqgW0GZ6O7LsfGAW+4P9N8ltFD+VKv4povwpSsKvKR1QIydcapvEKBMrFIkmXV66dBfcJffs4u3OxezOhF+/vgb8OY6CojYYXNypZLtiBeB6/E/XUr7RZ9XZICCrQ352kS6CooKaaw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=oAJf5NQo; arc=none smtp.client-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="s3xof/3l"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EE88E1570;
-	Thu, 10 Sep 2026 03:58:12 -0700 (PDT)
-Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 05E0A3F7B4;
-	Thu, 10 Sep 2026 03:58:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1789037896; bh=91rDR9zsO+SuOgJBwk89aAsDm4E6GmQ4MSXkzU+1u9c=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=s3xof/3lO0clFlEtwO/+KTIdaO/9WRnLtjeBbF9b7k5vqNhccMM0kkRxJ7SkoyjCf
-	 5YCQLTNyhIcLcdhIJ8xhowitXkCY3YVczcZ9Awd1iMenEEvVdu4RxlAhIGj2fQtsws
-	 3BBttAdf/dJWz4600XOlSIrbWPGMHZ0T+R4Uf7rc=
-Date: Thu, 10 Sep 2026 11:58:07 +0100
-From: Wei-Lin Chang <weilin.chang@arm.com>
-To: sashiko-reviews@lists.linux.dev
-Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oupton@kernel.org>
-Subject: Re: [PATCH v1 2/3] arm64: sysreg: Add TCR_EL2 to sysreg
- infrastructure
-Message-ID: <qzold5p6qgyawt4manlare7cuewlqik4i3vc5lrdidtzc6ac4v@ejf67iqd3nrj>
-References: <20260909222015.3046432-1-weilin.chang@arm.com>
- <20260909222015.3046432-3-weilin.chang@arm.com>
- <20260909223811.386071F00893@smtp.kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oAJf5NQo"
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-39675172593so5858444a91.2
+        for <kvmarm@lists.linux.dev>; Thu, 10 Sep 2026 04:00:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1789038007; x=1789642807; darn=lists.linux.dev;
+        h=references:message-id:date:in-reply-to:subject:cc:to:from:from:to
+         :cc:subject:date:message-id:reply-to:content-type;
+        bh=NSugWeaGjWWxPTsA0WEUYFCIdkRuKo99PwV/yfMvTEg=;
+        b=oAJf5NQo72cJLcP5Td4bhWsikaFGiEskYJDbePzh/sJ23gDHu8DrRRl3FsMg83ASe6
+         x+BeHD/qoeUQRcHuO32F7ShYGfGqFgrtMRXKFllKH7qxti958bHLjtmXGmAOb3lyV7nN
+         t/oY8qgJcOnL2ilzikWX3YJ3zyNo2raw6R/CnGomQwywtn4WLCCHgXucH+Wdd3o8TOpW
+         RH/jzv5rPilkIQzFOZFPnuWp2dxBbHqFKAaGyAs3CxeKw1UZdQJ5yjKDSsqcx2+URTtp
+         mZ/RIHcW4ifUbHPD8/KQa/zmz2ya/eIdY0ikcy6C0QUbtqHNUaERY/CqG1M0H7ynwSZR
+         ByDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1789038007; x=1789642807;
+        h=references:message-id:date:in-reply-to:subject:cc:to:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=NSugWeaGjWWxPTsA0WEUYFCIdkRuKo99PwV/yfMvTEg=;
+        b=TBe+oByjlikNti3wGGnWY+nysHCgd+urV7lfDkk4k+CpOA2eGe0E3fUWh8++1cLz4l
+         UwkgNNqum7xD0Fibgod/NxZosoZY4jZrOHKsHY1IfykhiG+MdalC0MKxfLtqF82tRqkf
+         9pJRiKJGHp96cqB3TCjnRs1Lou5sqABQ9C5Nr1ytFXI8Jk67qkNjUnT1foCkWMFHGdh8
+         imdhJdYmbqQhoPnHSgtZoj34em0wQEwtMZSecs6fVoi4dMp/Erb2Sn+/QhcPWbanHV1d
+         mTz3MTD4ApBzC5tNqAKA2FXbtjKwgpjkBKYhVXAWuzoc2MAuSJLVjCQYtwIUQFlUGMDN
+         zzwQ==
+X-Forwarded-Encrypted: i=1; AKwUvBw1thjIzt0ZRhSWH/TAGd+UWNXiJPCLk9WwxG/m6dk7I4BvEtCWkbJFAldSCLjZY/OWjv3D5yg=@lists.linux.dev
+X-Gm-Message-State: AFuF++mKT1ztvnWwDaBgmt8HIR9/L32tVQJTM8GSSZQTno/SiGMgeTTf
+	yY4iiE4Yu4cyRhyIGljaUMR2O92pLuB6RLdQLky2SHIIRcNmtQcE2ae5
+X-Gm-Gg: AYBFou0HwdC4f4gUiCKDQrVaHKYATRr4HP5d5X44Uei9fwkmx6u1cmR18oOGLJ5IxF1
+	xql6pe8UzU7mOuj7xMv447VzLovOb/lADsFqJDqy4cWjMFRKI/UgAGWnhuLoRs3tmwJop5jMZiu
+	IIsee5SH+/+5cd+BBehLbimDMh7HgETzMLoePxLbZyVavbdw/qW9GrQIYg+94BqzM53tT+wk2cI
+	10b3U0z/B0hb9iYQ6HsGrNxx0kfzinAPr+0cJRZdVYeKsJPm15ZHuKhUkG+ChEPdXK1YgCCvq0E
+	SBVvNY+ZeaaVaVonU+7iSQnk6YfX77F/P+HTDA8OcPfFLW9gzUTHVDhiO2NLSACMhBe8HHRis8N
+	Hc+F1xjKhGqfRgiAOkQRc4lPBcUwiA+bYhmSsMHoHKLoq9IoJkgN1jRyq1KZiabctCBbi28JL3l
+	6DGhyImrDMMgW51wdFxQHS2CLICtfj2rtfp6qVPn4r43j8D0uFBm8U8rpSgTiXJgKrbxVnfbly/
+	/ShzkRpKWb2ImVvvsCSxW4NXFQSNLUhhfoNl2UDz7D3lt6biSv93O8=
+X-Received: by 2002:a17:90b:3ec5:b0:398:9c00:29ed with SMTP id 98e67ed59e1d1-39b26277673mr58529054a91.21.1789038006053;
+        Thu, 10 Sep 2026 04:00:06 -0700 (PDT)
+Received: from pve-server ([49.205.216.49])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-143243f780csm46703778c88.13.2026.09.10.03.59.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Sep 2026 04:00:05 -0700 (PDT)
+From: Ritesh Harjani (IBM) <ritesh.list@gmail.com>
+To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc: Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, Atish Patra <atish.patra@linux.dev>, Alexandre Ghiti <alex@ghiti.fr>, David Hildenbrand <david@kernel.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, Itaru Kitayama <itaru.kitayama@fujitsu.com>, Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH v2 08/20] KVM: selftests: Use the innermost page allocator API in the memslot perf test
+In-Reply-To: <20260902164123.2546762-9-seanjc@google.com>
+Date: Thu, 10 Sep 2026 16:25:00 +0530
+Message-ID: <bja51im3.ritesh.list@gmail.com>
+References: <20260902164123.2546762-1-seanjc@google.com> <20260902164123.2546762-9-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260909223811.386071F00893@smtp.kernel.org>
 
-On Wed, Sep 09, 2026 at 10:38:10PM +0000, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> - [Medium] Declarative update to TCR_EL2 regenerates the TCR_EL2_RES1 aggregate mask which is consumed by C initialization, requiring confirmation of robustness to future value changes.
-> --
-> 
-> commit 522a184d95be9c0f88cc6fb418668546ef83e3e4
-> Author: Wei-Lin Chang <weilin.chang@arm.com>
-> 
->     arm64: sysreg: Add TCR_EL2 to sysreg infrastructure
->     
->     Convert TCR_EL2 to the sysreg infrastructure with data extracted from
->     Registers.json of the BSD licenced AARCHMRS
->     (AARCHMRS_OPENSOURCE_A_profile_FAT-2026-06).
-> 
-> > diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> > index 94bf065c8ac71..8d89f34580bac 100644
-> > --- a/arch/arm64/tools/sysreg
-> > +++ b/arch/arm64/tools/sysreg
-> [ ... ]
-> > +Sysreg	TCR_EL2		3	4	2	0	2
-> [ ... ]
-> > +Field	33	MTX
-> > +Field	32	DS
-> > +Res1	31
-> > +Field	30	TCMA
-> > +Field	29	TBID
-> > +Field	28	HWU62
-> > +Field	27	HWU61
-> > +Field	26	HWU60
-> > +Field	25	HWU59
-> > +Field	24	HPD
-> > +Res1	23
-> > +Field	22	HD
-> 
-> [Severity: Medium]
-> This isn't a bug, but this declarative update regenerates the TCR_EL2_RES1
-> aggregate mask. Are the C initialization consumers of this mask robust to its
-> value silently changing if a future .sysreg patch adds or removes a Res1 bit?
-> 
-> For example, the generated mask is OR'd into the initial EL2 register value:
-> 
-> arch/arm64/kvm/arm.c:cpu_prepare_hyp_mode() {
->     ...
->     tcr |= TCR_EL2_RES1 | FIELD_PREP(TCR_EL2_PS_MASK, ips);
->     ...
-> }
-> 
-> It is also used to initialize the guest emulation reset state in:
-> 
-> arch/arm64/kvm/sys_regs.c:sys_reg_descs[] = {
->     ...
->     EL2_REG(TCR_EL2, access_rw, reset_val, TCR_EL2_RES1),
->     ...
-> }
-> 
-> Because the generator's contract is to reflect global architectural truth, a
-> future edit that reclassifies a bit as Res1 will silently change the value of
-> TCR_EL2_RES1 without triggering a compiler or CI warning. Could you confirm
-> that these consumers do not rely on the previous static semantic value of the
-> mask?
+Sean Christopherson <seanjc@google.com> writes:
 
-I don't fully understand but doesn't this mean the architecture
-introduced a change that breaks existing software?
+> Use the quad-underscores physical page allocator API in the memslot perf
+> test in anticipation of converting the outer versions to take the memory
+> region type instead of the raw memslot.  Stating the obvious, the memslot
+> perf test creates and allocates from multiple memslots, and so can't use
+> MEM_REGION_TEST_DATA to communicate which region/slot to allocate from.
+>
+> No functional change intended.
+>
 
-Thanks,
-Wei-Lin Chang
+Agreed with the reasoning. LGTM.
 
-> 
-> -- 
-> Sashiko AI review · https://sashiko.dev/#/patchset/20260909222015.3046432-1-weilin.chang@arm.com?part=2
+Please feel free to add:
+Reviewed-by: Ritesh Harjani (IBM) <ritesh.list@gmail.com>
