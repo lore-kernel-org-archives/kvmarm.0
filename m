@@ -1,72 +1,72 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D957139023C
-	for <kvmarm@lists.linux.dev>; Thu, 10 Sep 2026 03:39:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66AFF39023C
+	for <kvmarm@lists.linux.dev>; Thu, 10 Sep 2026 03:40:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789011596; cv=none; b=RchOPo0qZb3KGUx7pnJll24K+pLacaykQZzGiEjm1mMwEP93JEC5xy9IRvhek8VNXCREuRBu1IQSG+zX5NEnOLanRdZesU769hLajuxNY9FQiMk2RkD1gChHCl6x1CwOgPrTYlAOG8E1t4BASCxKWWle3GqvThYCpylhfI5vzlo=
+	t=1789011628; cv=none; b=GUKN0Bta+MM7/JNGH869i1TovDqoqYh7QnDR5XpWADLchQ5hSCvUggL63CZuxNt4JcGUjZVsoB+S4T2+tyYS/VPrJU1lMra4ugadY6T52JSunwxWaRaJPlNZ0gLS4AIjRODby3nS4vhD3WXpep0890wtEh9u2saRgIpKNWKtHnE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789011596; c=relaxed/simple;
-	bh=focBHjviQ8M1TBPFAliwj2P5aU3X0nM6mqhHF/eu8mM=;
+	s=arc-20240116; t=1789011628; c=relaxed/simple;
+	bh=IkdLP5CMbNSeQcg1JlhjuFap/uVykSyWKF1wsJxcwHM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SXm6sy4d7mZB9VHVA2LssN3v7cBVc3WWjZtyyEtaNOlv77kvQ9ClXyQyNNONP7Hct/Clpwo5rDd8IE8oUO0a0RK+2s4pwD+HiWW9DPsF4U/1zw+sQC22irzgl/wmmrM+Hd6DRH9vKODG8qZrsJIvrvlvcyC17PY2TndX+hh6O8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Vggpw/+s; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=iSRGnKFRwR/GVJP0zs4MkwPBI9Gmfq+WWkruOAxYEVhN+7qC/YE13VuL2QB3CBNc1jV2k02sJEK2MVwp1oxI41AQ3UBsQx7bDWwcD3I5AmFYFT+dHw+YoFGFQ0xy2YgcmGYcJecfqPUGrrYOuEJC9II8UumvsV7qVSLcSVRUFuA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RyD3kQyP; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vggpw/+s"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RyD3kQyP"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1789011591;
+	s=mimecast20190719; t=1789011625;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Abwf0alfy8lmdT9uf0Uv5Evj+p5aY96/emuc9X9I3es=;
-	b=Vggpw/+sVBYVI9b1dE8Zz4C1YwZPeVt6BcE1x8KU6gcsPG/WHtQLlfCnZsdmE3wiAgud5r
-	DS1QWjrQYa9yeogInG7wGS7t0k/ZyYeky7+xqLOd75Cz1mqWSgkS9ukVypTIFNC/i0jIFL
-	HZ1q1nh4+6tl0bzDbISmiGRSkyk01A8=
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
- [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=/RRjDlW0kox/juFkyRROqpQ/BAv5W8k8xAzyOIl9/BY=;
+	b=RyD3kQyPq+QsUEFEVzhy5adF8PtlPWFDvGro5Gjb2Z1IoHUf4VCiFqIL3CFKdtDiprIYM2
+	O5PKVwciGBjxcclrY+pE0t75I4jWZHvsCQ95tVtD8z4wuc0MP3VN975pnuexZUS5HBklFz
+	I7eV0UpUQ6js+BxK/l/299VKyl8iKDo=
+Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
+ [209.85.215.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-114-K5OI0bsIM9Gp-OF5NalLnA-1; Wed, 09 Sep 2026 23:39:50 -0400
-X-MC-Unique: K5OI0bsIM9Gp-OF5NalLnA-1
-X-Mimecast-MFC-AGG-ID: K5OI0bsIM9Gp-OF5NalLnA_1789011589
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-38e8fee6af3so8834907a91.1
-        for <kvmarm@lists.linux.dev>; Wed, 09 Sep 2026 20:39:49 -0700 (PDT)
+ us-mta-612-lYcrUfniMPWCjoqkQHYaag-1; Wed, 09 Sep 2026 23:40:24 -0400
+X-MC-Unique: lYcrUfniMPWCjoqkQHYaag-1
+X-Mimecast-MFC-AGG-ID: lYcrUfniMPWCjoqkQHYaag_1789011623
+Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-cc132709c76so9168864a12.3
+        for <kvmarm@lists.linux.dev>; Wed, 09 Sep 2026 20:40:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789011589; x=1789616389;
+        d=1e100.net; s=20251104; t=1789011623; x=1789616423;
         h=content-transfer-encoding:content-type:in-reply-to:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=Abwf0alfy8lmdT9uf0Uv5Evj+p5aY96/emuc9X9I3es=;
-        b=MICmuXJc+UR06NOFoELXd4097YP0De0HxDIekr04J6bf3WUmefIfJ4+yYN4HP98SMT
-         RxdRV9nnHvukTIZjrh5+d0s3PcH2HwGY3nrgwafwvutRY2zS9ILZy2IqoYkeRVUc15E1
-         VXMVnXbdNMa73hanFzFbuuhQpFCUzSOnxZ5jcwqWGwjJfD+ESo7jlvhw3IKZU7JePjey
-         f+ay9ZGPecYa7exQKx7tVrbxvImZSizUK79vZG5i1Qawi/E6h2Td6MDjVevMtyXY2W1p
-         Nrrg2g/7fC+UJsYcQf+7bQj/1laePguFxoEBcTsFtr/wivRZ7+2Rr6nEp0gO8qE5nM+Q
-         D2VQ==
-X-Forwarded-Encrypted: i=1; AKwUvBxkc8UqrwS7dN/AV15IpOYT3hKtWoyt0dNqFgrbtrjkCPSR0OLAroc921olBhZIWFS3TqOAa0M=@lists.linux.dev
-X-Gm-Message-State: AFuF++nPgg16qiAYA1Dmo6Bx4flTcpothdDXQmHyp7MWxDvru6ejkI6C
-	wnD1lCbpBS0XNyPkQ3bM/MWNKF+jJp0MTbAp/DtjwLqAJkBxrWE4haBIgqF2ZMztKZKfcHR3gnW
-	bmTUjIk+0UDKy2jrQWxpmBJwYkefCA9pCfQzk41mZRZc8ZgGqyFtISBMA5g==
-X-Gm-Gg: AYBFou2M6+jO2rv3OIGxDmWRbASMVG5yvc3LG4zIoUq/JrmObfwgvOV0zVzj61dKF4L
-	YogFzJvk6LHNsd/uAhXy2OMMKg4K7uasJAeEnfPNvgYogRqlI4KW0D4/t2xslu+UYIYMR7qhbwg
-	AXMNsdXWeHNg7KDbF+7HjEsgy/KrYW/I+eA7x5cXxjERN4Klw+Ip22P0CgCmW4IFp0m5y7JLjMv
-	qTPYRuPSkHLLNgsnL9DEWqtlbFQvwagsFBLwy590yTCyGofmDFOWMm+10+o88NfN/+eUWiFeSmm
-	RZprM1CPk0O7sPLc0oMLaHumVaxm5ChDQf4+3RyZHQFHgc48WufQyclBcRxZ5ZYGFaKPOcKAnw8
-	cYX0HIN7c7/KSrvgIQq+Hz/vFS0zOasPTbClPJ9MshQ==
-X-Received: by 2002:a17:90b:3852:b0:38e:9ef9:eb97 with SMTP id 98e67ed59e1d1-39b26272d69mr58682607a91.16.1789011588764;
-        Wed, 09 Sep 2026 20:39:48 -0700 (PDT)
-X-Received: by 2002:a17:90b:3852:b0:38e:9ef9:eb97 with SMTP id 98e67ed59e1d1-39b26272d69mr58682526a91.16.1789011588237;
-        Wed, 09 Sep 2026 20:39:48 -0700 (PDT)
+        bh=/RRjDlW0kox/juFkyRROqpQ/BAv5W8k8xAzyOIl9/BY=;
+        b=OAUSQOYRwZQ2yaa8fPwr1yk/VTFqHgHQWMN0QsYa/Ux2JkGWxKNUMYtfdyZntZybbL
+         BuB/NZOqJTnVaz5gzmoVHmkpVHsUJAKYC8oHpSYvbd6fSWjWQA/+/0/YeIpZ2e8wKSU4
+         Nm3fpb8zu4s5bGRUCtxtOs+3RyMZF0X1ney5cObv9injmPoLaB8T78ju6jhwPdGzPkKN
+         DyUKmPFy+EHege0KVt9dKhB2yQUxs9YXuFl4Tpmo0tXR68NaSmIYZfbk/Mmi4F5/lk0k
+         afMp7A56CcwaGthIw4exf30WLI9rYcqljPttrd5twMMKqP5qmdORrG3Ywe/Z7fxFk1XW
+         eh0g==
+X-Forwarded-Encrypted: i=1; AKwUvBzCEJ6qdLfdyZRWu2z+c8MH+a6i7kFRqbQd5uy6qpGCMZvE/kjQPAZbaXx615G8/KUUuXBdmBg=@lists.linux.dev
+X-Gm-Message-State: AFuF++lrAQ4fMkYLNCJ+O09LpmAHwfDNX8w5HJsxGsk1ZIPo21Y8rWz3
+	nio2sFg8QZfXamzN7GGIE5DyIOVM5wvjR/rO6oGcFPDRdriXvUDeLevlC3ghfSnV6hTg3yBflss
+	m7TN7sCqHAzA1MJ7Cz8D1lBUcNokhn74ILeGqoKXFVsEJcE10tF8KSszT2w==
+X-Gm-Gg: AYBFou0JLHpDKK5gDfjbFl+cHdmYgXYhzjoKku92kceRNnwc+K7m75rU9w8yEyJnhPB
+	PNSNksX867WPYn9bIyCmFCj7kEa72z6f9qcYc22uAe1lInaLesYWNVSVu7Rn7BtWqawMhNJB53f
+	9ZVmQw4D4xLvsDCDzJg3YOMSomWZk+unsOl/ktrW+jbZahHqcbRWaOrhAYtomhKmwlVsKnEcOKV
+	nAx7i36t2qAkWSd/10f9FTk6kB049n0R/mAP45Pwz5S95WXDThPj5Igmq2dAZ3/yV5OaeycRHbz
+	3ddhbvgvMHu+At3HrwOexeMQUBW/8IQVMId1GSWKlLG/Ikd4WFEvFIhRZE3lgsPHIRGPf0eNhMy
+	RUN61rnHH67gqwoy/ILSx9JP58qkzuWzJnSof1AN/XA==
+X-Received: by 2002:a05:6300:85:b0:398:8870:b58f with SMTP id adf61e73a8af0-3dacbeed903mr8426018637.14.1789011622917;
+        Wed, 09 Sep 2026 20:40:22 -0700 (PDT)
+X-Received: by 2002:a05:6300:85:b0:398:8870:b58f with SMTP id adf61e73a8af0-3dacbeed903mr8425945637.14.1789011622523;
+        Wed, 09 Sep 2026 20:40:22 -0700 (PDT)
 Received: from [192.168.68.52] (n175-34-8-244.mrk21.qld.optusnet.com.au. [175.34.8.244])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-39d7e77498csm1527727a91.3.2026.09.09.20.39.38
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cc4aa39f605sm1053235a12.21.2026.09.09.20.40.12
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Sep 2026 20:39:47 -0700 (PDT)
-Message-ID: <3cd34b9c-7500-4993-86ff-c1ee9a86b601@redhat.com>
-Date: Thu, 10 Sep 2026 13:39:36 +1000
+        Wed, 09 Sep 2026 20:40:22 -0700 (PDT)
+Message-ID: <f24104a3-fe2a-4a71-acbc-a4c3d2d416d7@redhat.com>
+Date: Thu, 10 Sep 2026 13:40:10 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -74,7 +74,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v17 03/20] KVM: arm64: Track the type of VM in kvm_arch
+Subject: Re: [PATCH v17 02/20] KVM: arm64: Avoid including linux/kvm_host.h in
+ kvm_pgtable.h
 To: Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org,
  kvmarm@lists.linux.dev
 Cc: maz@kernel.org, will@kernel.org, catalin.marinas@arm.com,
@@ -85,191 +86,36 @@ Cc: maz@kernel.org, will@kernel.org, catalin.marinas@arm.com,
  sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
  WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com
 References: <20260908162223.1683432-1-suzuki.poulose@arm.com>
- <20260908162223.1683432-4-suzuki.poulose@arm.com>
+ <20260908162223.1683432-3-suzuki.poulose@arm.com>
 From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20260908162223.1683432-4-suzuki.poulose@arm.com>
+In-Reply-To: <20260908162223.1683432-3-suzuki.poulose@arm.com>
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: OE8d88gaf208ACvXG4cq94EKRiRJfEHj3xelYYD9yvQ_1789011589
+X-Mimecast-MFC-PROC-ID: wEhXoFzH9xax4Fhcnq-rbDzzBFOPioU8Q-oRhtBMk6k_1789011623
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi Suzuki,
-
 On 9/9/26 2:22 AM, Suzuki K Poulose wrote:
-> KVM arm64 has different types of VMs with all the different modes in which the
-> hypervisor code can be run. e.g., VHE, nVHE, PKVM etc. Then there is protected
-> VM and normal VMs with PKVM. We might soon add other types, e.g., Arm CCA Realm.
-> So in an effort to make the handling of these different types of VMs a bit more
-> friendlier to the eyes, add a VM flavor to the kvm_arch and we could then add
-> handlers for different operations based on the VM type.
+> From: Steven Price <steven.price@arm.com>
 > 
-> Keep the flavor initialisation at the beginning to allow for the detection
-> early enough and fail out on any unsupported requests. (e.g., protected on !PKVM)
+> To avoid future include cycles, drop the linux/kvm_host.h include in
+> kvm_pgtable.h and include the lightweight headers required for the types
+> and inline helpers used there. Additionally provide a forward
+> declaration for struct kvm_s2_mmu as it's only used as a pointer in this
+> file.
 > 
-> With that, use the vm_flavor to detect if a VM is protected VM on PKVM.
+> Both pgtable.c and kvm_pkvm.h relied on the indirect inclusion of
+> kvm_host.h, so make that explicit.
 > 
-> Based on a patch by Marc Zyngier
-> 
-> Suggested-by: Marc Zyngier <maz@kernel.org>
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Signed-off-by: Steven Price <steven.price@arm.com>
 > ---
->   arch/arm64/include/asm/kvm_host.h | 12 ++++++++++--
->   arch/arm64/kvm/arm.c              | 27 ++++++++++++++++++++++++---
->   arch/arm64/kvm/hyp/nvhe/pkvm.c    |  2 +-
->   arch/arm64/kvm/pkvm.c             |  1 -
->   4 files changed, 35 insertions(+), 7 deletions(-)
+> New patch in v13
+> ---
+>   arch/arm64/include/asm/kvm_pgtable.h | 6 +++++-
+>   arch/arm64/include/asm/kvm_pkvm.h    | 2 +-
+>   arch/arm64/kvm/hyp/pgtable.c         | 1 +
+>   3 files changed, 7 insertions(+), 2 deletions(-)
 > 
-
-Some nitpicks below. In either way:
-
 Reviewed-by: Gavin Shan <gshan@redhat.com>
-
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 27fe0cd5b2d7a..d0dccc9ad6aa8 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -257,7 +257,6 @@ struct kvm_protected_vm {
->   	pkvm_handle_t handle;
->   	struct kvm_hyp_memcache teardown_mc;
->   	struct kvm_hyp_memcache stage2_teardown_mc;
-> -	bool is_protected;
->   	bool is_created;
->   
->   	/*
-> @@ -306,9 +305,18 @@ enum fgt_group_id {
->   	__NR_FGT_GROUP_IDS__
->   };
->   
-> +enum kvm_arm_vm_flavor {
-> +	VM_NVHE,
-> +	VM_VHE,
-> +	VM_PKVM,		/* Normal guests on PKVM */
-> +	VM_PROTECTED_PKVM,	/* Protected VM */
-> +	VM_FLAVOR_MAX,
-> +};
-> +
->   struct kvm_arch {
->   	struct kvm_s2_mmu mmu;
->   
-> +	enum kvm_arm_vm_flavor vm_flavor;
->   	/*
->   	 * Fine-Grained UNDEF, mimicking the FGT layout defined by the
->   	 * architecture. We track them globally, as we present the
-> @@ -1504,7 +1512,7 @@ struct kvm *kvm_arch_alloc_vm(void);
->   
->   #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
->   
-> -#define kvm_vm_is_protected(kvm)	(is_protected_kvm_enabled() && (kvm)->arch.pkvm.is_protected)
-> +#define kvm_vm_is_protected(kvm)	((kvm)->arch.vm_flavor == VM_PROTECTED_PKVM)
->   
-
-Here we may introduce one more helper for generic use cases. It's going to
-be used in kvm_arch_init_vm().
-
-#define kvm_vm_flavor_eq(kvm, flavor)	((kvm)->arch.vm_flaor == (flavor))
-#define kvm_vm_is_protected(kvm)	kvm_vm_flavor_eq(kvm, VM_PROTECTED_PKVM)
-
->   #define vcpu_is_protected(vcpu)		kvm_vm_is_protected((vcpu)->kvm)
->   
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 8b080804bc90b..67f1ff9bc4fbe 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -214,6 +214,26 @@ static int kvm_arm_default_max_vcpus(void)
->   	return vgic_present ? kvm_vgic_get_max_vcpus() : KVM_MAX_VCPUS;
->   }
->   
-> +static int kvm_init_vm_flavor(struct kvm *kvm, unsigned long type)
-> +{
-> +	bool protected = type & KVM_VM_TYPE_ARM_PROTECTED;
-> +
-> +	if (is_protected_kvm_enabled()) {
-> +		if (protected)
-> +			kvm->arch.vm_flavor = VM_PROTECTED_PKVM;
-> +		else
-> +			kvm->arch.vm_flavor = VM_PKVM;
-> +	} else if (protected) {
-> +		return -EINVAL;
-> +	} else if (has_vhe()) {
-> +		kvm->arch.vm_flavor = VM_VHE;
-> +	} else {
-> +		kvm->arch.vm_flavor = VM_NVHE;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->   /**
->    * kvm_arch_init_vm - initializes a VM data structure
->    * @kvm:	pointer to the KVM struct
-> @@ -236,6 +256,10 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->   	mutex_unlock(&kvm->lock);
->   #endif
->   
-> +	ret = kvm_init_vm_flavor(kvm, type);
-> +	if (ret)
-> +		return ret;
-> +
->   	kvm_init_nested(kvm);
->   
->   	ret = kvm_share_hyp(kvm, kvm + 1);
-> @@ -260,9 +284,6 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->   		ret = pkvm_init_host_vm(kvm, type);
->   		if (ret)
->   			goto err_uninit_mmu;
-> -	} else if (type & KVM_VM_TYPE_ARM_PROTECTED) {
-> -		ret = -EINVAL;
-> -		goto err_uninit_mmu;
->   	}
->   
->   	kvm_vgic_early_init(kvm);
-
-We needn't depend on is_protected_kvm_enabled() to call pkvm_init_host_vm() because
-the output of is_protected_kvm_enabled() has been updated to kvm->arch.vm_flavor
-by previous call kvm_init_vm_flavor().
-
-	if (kvm_vm_is_protected(kvm) || kvm_vm_flavor_eq(kvm, VM_PKVM)) {
-		ret = pkvm_init_host_vm(kvm, type);
-		if (ret)
-			goto err_unit_mmu;
-	}
-
-> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> index 459bd9eb7e4bc..09961c0056f2b 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> @@ -432,7 +432,7 @@ static void init_pkvm_hyp_vm(struct kvm *host_kvm, struct pkvm_hyp_vm *hyp_vm,
->   
->   	hyp_vm->host_kvm = host_kvm;
->   	hyp_vm->kvm.created_vcpus = nr_vcpus;
-> -	hyp_vm->kvm.arch.pkvm.is_protected = READ_ONCE(host_kvm->arch.pkvm.is_protected);
-> +	hyp_vm->kvm.arch.vm_flavor = READ_ONCE(host_kvm->arch.vm_flavor);
->   	hyp_vm->kvm.arch.flags = 0;
->   	pkvm_init_features_from_host(hyp_vm, host_kvm);
->   
-> diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-> index 8e4c6e4bec123..3948fa46f4d75 100644
-> --- a/arch/arm64/kvm/pkvm.c
-> +++ b/arch/arm64/kvm/pkvm.c
-> @@ -240,7 +240,6 @@ int pkvm_init_host_vm(struct kvm *kvm, unsigned long type)
->   		return ret;
->   
->   	kvm->arch.pkvm.handle = ret;
-> -	kvm->arch.pkvm.is_protected = protected;
->   	if (protected) {
->   		pr_warn_once("kvm: protected VMs are experimental and for development only, tainting kernel\n");
->   		add_taint(TAINT_USER, LOCKDEP_STILL_OK);
-
-In pkvm_init_host_vm(), the local variable 'protected' is used for once
-and can be removed by:
-
-	if (kvm_vm_is_protected(kvm)) {
-		pr_warn_once(...);
-		add_taint(...);
-	}
-
-Thanks,
-Gavin
 
