@@ -1,70 +1,70 @@
-Received: from mail-oi1-f179.google.com (mail-oi1-f179.google.com [209.85.167.179])
+Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE74247143C
-	for <kvmarm@lists.linux.dev>; Thu, 10 Sep 2026 11:25:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A3F4472543
+	for <kvmarm@lists.linux.dev>; Thu, 10 Sep 2026 11:28:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789039532; cv=none; b=V+CG+t3ON/Iso5bH4Rhqh86HPxKq3JP9y/hVfJXHfT6eLej3qEkSjPdhUTDcs7N3NSbQqb0m9gKzC1c3OiTWPT7ihrqA3/FmVVOA+0eqbH3n6Da7VdJrhIze89lKDYIrJb3Wukf+xOm2eMmpFQMorvCVfmjzPA4g6xrK2W9tX9Q=
+	t=1789039689; cv=none; b=si7XlNJIaHRVEvdTI6K398hU6XzGEX1xDRamAqTMmjYTHNc+xPC0/l7PSrKq/Pq6DfD08SZauhCeNrF1C3ScYdlHI0bbpuVtQ/MahL0+yHsChZNuqhEGyrpzajN0QsEj+zqRzd56xqqTqMeKHQc9d2Ff34j4suy3rzURRpVs3YA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789039532; c=relaxed/simple;
-	bh=DzaaWZMUxb/8rJWyFS7HLbxklJPbE9+saYd1xLzHX/Q=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References; b=t6qrxCUVivwvc00mgyMEz1Z22BcXhElOBF7C9ULs1nBt06fUTDJBkIs4uD+Sa+aXBXYBN/y03oANLCYb9ApF9zMVYt4hGJKbAfBqYdX178chb6LO5W5S8VVnTZAUniJ9GxbeZ84Nr9R7tuMftQKgv3mLhfGgCJfs3Brw3SvW2lU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MG9EBu0t; arc=none smtp.client-ip=209.85.167.179
+	s=arc-20240116; t=1789039689; c=relaxed/simple;
+	bh=Rdvn6SlWN1pYD61UCQmrt7vWGIUZg8DLzgLld4sc614=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References; b=hueGXPlR/2VvtSXSByCW+wr5Q/NMxVU+WFvLf00VDb46W47rUFhXIeJY3Jxc3PgVRAdEKwg4YmYMMeI4CCGg9SSRpYPSdx5amyWwiBkMhY/11TvohxI9ps/sjEkqvM6FUkXIIY8H+f34Rhh3GdHzyjHEq5ZvNa5v2JnB0kuQamg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g3fx208q; arc=none smtp.client-ip=209.85.210.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MG9EBu0t"
-Received: by mail-oi1-f179.google.com with SMTP id 5614622812f47-4b28df1f600so5353317b6e.2
-        for <kvmarm@lists.linux.dev>; Thu, 10 Sep 2026 04:25:30 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g3fx208q"
+Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-7f48c750afcso6272064a34.0
+        for <kvmarm@lists.linux.dev>; Thu, 10 Sep 2026 04:28:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789039529; x=1789644329; darn=lists.linux.dev;
+        d=gmail.com; s=20251104; t=1789039687; x=1789644487; darn=lists.linux.dev;
         h=references:message-id:date:in-reply-to:subject:cc:to:from:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=rKoYJ3dn9mRGunMRInGIver5jTSz1tQREqhFgol67GU=;
-        b=MG9EBu0tatx/SYAcM7QvVppc9CR0ElykTp4fQ1+84MEzasDTmYl2psllBvJNDf/oDp
-         SjzIhhgpW9hcrKnccQMoFwcl7ocZ3/nM0X+PMnbN7GAUH6Tr8kG7cpLaEJevKBOUFZCx
-         dZDAjmL/0UJunHBFat7nFi0mbWmDsLXjMskTN9oEdMdWLtboTI2DVaN70WRw+29KBVul
-         GCKv6D4R4MOiTjboIfxPdloFc8ETCO+SQM35enS7Kga6ULAFRsMT/JgOhWRw0tBxAwxS
-         Qmw+sJe7WqNu/NPnsFqEVFY1uunpawsO4OqVxCLX1taJmigOA+W1pvpOWZ3PKM2mOu7v
-         ulRQ==
+        bh=Rdvn6SlWN1pYD61UCQmrt7vWGIUZg8DLzgLld4sc614=;
+        b=g3fx208qu0u1kyqQsSIXq7ASD4vHT7Z3WvZVACvloM7AggOw3mvxdHsONGEeypjUBQ
+         PO9KqX82F3svqqc3Qa+1xLASx2n9kRa3WZfXp1c+H7Og6nqKLKW8lwrVLF0Hc6p9rWXy
+         mjGJF9Qe9S6sn3WQirmfTYkU8TjoTU2gfAn481+5vWlH8TX+bGsbKirc9YpuunNqJOIq
+         eY+Z8nTxf+h2Knk+zw4+t1js/NKjPDF3ekDmTc56BS0z0Oqwn4AibabeQ6BKtoD6ym3L
+         CdrkMYEpC1Dsore808WvqIdEm2rN13Ky3C+DKKa8grMyYIq953mTf0sRw5B1sxXbxmIm
+         s2xw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789039529; x=1789644329;
+        d=1e100.net; s=20251104; t=1789039687; x=1789644487;
         h=references:message-id:date:in-reply-to:subject:cc:to:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=rKoYJ3dn9mRGunMRInGIver5jTSz1tQREqhFgol67GU=;
-        b=gPjM740os9cERJGGj1+Gr0M3HOOs8cxmCOHQz/KZTYPs3xtqvv+xZ9+tfIZGc0D1KG
-         8tB3qpDB+DIu5nmSPyzIcxPi1HQdBhrNTL13NK9H3vlBrBWNQXKfXwUJaaQVe7mMA28p
-         EmnmAftWKT2nq6Bu56s161h019TNPtes8sxxOdXSfNx4NdafCQ+PGAoE86HPYpgJFOl7
-         sfns1/zb1HjVgJUmNfBP3+6rb7o6GnZuKQ/7ueBt/Vr3ATVR/i8+Y1nMXyINERq3urWZ
-         hG07o6iuaokwZ1mtgbFHWHcvuMH0mU+0OZEhADubUiGPAtxdnAGJcB7joCJTsIFw3QEj
-         WEaw==
-X-Forwarded-Encrypted: i=1; AKwUvBx6o96lE+3QyntLFAk0kkJ/Y7d6bgq7TKsWXtH0Drsxi+z3UbtxaEQZ526d6jVbWCqMSWLCTU8=@lists.linux.dev
-X-Gm-Message-State: AFuF++nPJknYIfBNDTsFhGr4aJpGkG10fxlNkrmQ5wFoEgg/csXc1PqH
-	K+JgrU0L0+YxENUcD0NXcZZEluPErjwADFGMAQwljKUfsftnFfxfLDcr
-X-Gm-Gg: AYBFou1tfMzXUeOYRr1RgzvLiRv2SsjnFKj+X+GLhLORGm1w7KwbkwkC+fdQcAhv7zY
-	nrj5rD1r3i95G+9EEMIkfJTZ+MegRYUlAmUz9JJtGAD41pJb9hcfc/hmDu1N4GPlw1+tS2XsEfr
-	NbPOdfT+cZqUy9pV/AbzssF1gudyPK/hN0pW4DsdURF7jFGN3DXKqEJMm1HT+El7oWNDzZbP7TA
-	XYrDIyVItezJqwEWDByE0rJUunJXwcyQBRk4UMJ6/DNuBZbJCSWzw4yX/tMZV9SZrqbYfBxE5iE
-	7aeJDHMxhgmBXKx18473XLXd4ypVww3fUNuFEqQWVbbnQcAGqryFerXyyGrm/Tjl9j7Tlt36/kk
-	wmMmKe3+YMBo+02UIcT1dGckHOFhLTsCzt33NQOOevFPlX6GOJmSQIfRlrFmCScAJCNoIDAZoqP
-	v7wIVTUmXbL6FBWhcn836bw5P2vzcXWuMVElBDiE8S95ZUP2zk8w3M++3HNFOAmi76SjtWqS9qI
-	kfv6Icjp1YQpN4zEWrKgLHqEnF6+i3qOd2xuLMSTGCaJEQ8jQm1JTc=
-X-Received: by 2002:a05:6808:bca:b0:4b9:e6ab:d086 with SMTP id 5614622812f47-4b9e6abd362mr23531944b6e.38.1789039529448;
-        Thu, 10 Sep 2026 04:25:29 -0700 (PDT)
+        bh=Rdvn6SlWN1pYD61UCQmrt7vWGIUZg8DLzgLld4sc614=;
+        b=qg4+HAtFafqAPNIMcJWgDe6aFF0DefKi1HA7Vc6HyJmfUus7Om3HrLjCaIk96tgsRm
+         dVn0mpfbK17q+hVtpQREuS/vqD8lUItZsgfPIoBfU3wOo66nOHXt2HGZNL0FUtdelNuU
+         wO1+DeF4lyJraA6YRDpYIGg4yJaVMsUMiNwZvnyncM0UDCdZQQEk2/gtaL3sM7CZF4Yq
+         hm1LU/GBMsIccTReECT6JBghb8bY6Kz1jBgZzXILkvbuml+IY7YE7MLesMerqJgEFJln
+         abXsLG7fAWjbmJf8Jcv6UGi5kSXbAySkTNtzDHGG8l0/fa16A/cDHaUuxPc7zqsi5HyF
+         cFEQ==
+X-Forwarded-Encrypted: i=1; AKwUvBxUXcAbuWeu8UO3qoX9GtbmWopMvC7RNzFMDN0LB3qzqUrw2QHTHo76TyazzHPj1vmhTDg0ams=@lists.linux.dev
+X-Gm-Message-State: AFuF++nCpfU4Al7M+wugZcUBLJtvcL0BYW0KNuECAguT5hLW9o7rSaFP
+	wFrkOD2gHJzmnIyWylTzHRGKI5qCuHLOCETXPMrPwE+vpl7cDfF2/9oQ
+X-Gm-Gg: AYBFou0XqKjB9L+BHJQMgywGXIA9R8qQ//ul5cN1MvE4dvUN7fkOfQDoxMbgJiHwxOt
+	cuIVQCpd/2N0xGGk5NX/Bv8MUUVvVafAXUiV/udvnJxrP5YpH8ZVfFQcAD+6P29YI9eAFcDtUdX
+	5qnzy6UChqSSlnHjEe8XJguEpX+GU0Vu9nCdOpolX1ykuPwR+0qhnGjmCdeIg+u5mnD3Rl2TvUG
+	MdctnkRMFV3yGz6z5vyXBSG1BCV/5HBOqm8w1UDNY1Rm4A41u7r2ieAmo5KkB1w0Oe6ye7M5Uc5
+	pGfD3Si45slNVacpO6d/wB2ZDwnflwPMICrEJ0asNUehEaswJHsUeb+UbRFQ0M6dKdaUM0hKzOG
+	fKq8ZSpexlxpSbEIaBW9j2cJWkuLwoPVNgObp+/MtBrPqfJX3Qjemr2E2gLZinLi8sEGKgbi96G
+	45GRGnoDr8taan2bwa8lqA20zR7EZnqTCJQYjdx4k2ZXrmYWcOohGJK91AVl2gxrHUoMp8MQdxt
+	X5rz1/vE3JkliKGX690X41CekfOBn63huTIikTdInX9w7KitECNx0zaLgrzQJZokg==
+X-Received: by 2002:a05:6808:f09:b0:4b2:8ee8:8a38 with SMTP id 5614622812f47-4b95db6da80mr27637088b6e.0.1789039686755;
+        Thu, 10 Sep 2026 04:28:06 -0700 (PDT)
 Received: from pve-server ([49.205.216.49])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1435c2ae6b5sm6444309c88.1.2026.09.10.04.25.19
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-14332405e92sm49398440c88.8.2026.09.10.04.27.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Sep 2026 04:25:28 -0700 (PDT)
+        Thu, 10 Sep 2026 04:28:05 -0700 (PDT)
 From: Ritesh Harjani (IBM) <ritesh.list@gmail.com>
 To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>
 Cc: Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, Atish Patra <atish.patra@linux.dev>, Alexandre Ghiti <alex@ghiti.fr>, David Hildenbrand <david@kernel.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, Itaru Kitayama <itaru.kitayama@fujitsu.com>, Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH v2 12/20] KVM: selftests: Add APIs to override memory region types with custom memslots
-In-Reply-To: <20260902164123.2546762-13-seanjc@google.com>
-Date: Thu, 10 Sep 2026 16:48:26 +0530
-Message-ID: <5x0d1hj1.ritesh.list@gmail.com>
-References: <20260902164123.2546762-1-seanjc@google.com> <20260902164123.2546762-13-seanjc@google.com>
+Subject: Re: [PATCH v2 18/20] KVM: selftests: Use TEST_ASSERT(), not assert(), in vm_get_mem_region()
+In-Reply-To: <20260902164123.2546762-19-seanjc@google.com>
+Date: Thu, 10 Sep 2026 16:57:29 +0530
+Message-ID: <4ifx1h3y.ritesh.list@gmail.com>
+References: <20260902164123.2546762-1-seanjc@google.com> <20260902164123.2546762-19-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -73,56 +73,10 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Sean Christopherson <seanjc@google.com> writes:
 
-> Add and use APIs to override memory region types instead of open coding the
-> logic in tests, partly to dedup test code, but mostly to add some amount of
-> protection against conflicting overrides.  This will allow converting more
-> tests to override memory regions without taking on too much risk of bugs in
-> the long term, e.g. due to silently overriding a region multiple times.
->
-> Deliberately "unroll" the loops in __vm_create() and the CMMA test's
-> create_main_memslot() to avoid filling all memslots in anticipation of
-> adding an "extra" memslot that is for test use and *only* test use, i.e.
-> shouldn't be configured by core library code.
->
-> Converting tests to overriding memory regions will allow taking the region
-> type instead of the raw memslot in the physical page allocator APIs.
+> Use a proper selftests TEST_ASSERT() in vm_get_mem_region() so that bad
+> input is guaranteed to fail the test, and with the standard error message
+> format.
 >
 
-May I suggest few changes in the naming of these APIs:
-
-static inline void vm_override_mem_region(struct kvm_vm *vm,
-					      enum kvm_mem_region_type type,
-					      u32 slot)
-{
-	TEST_ASSERT(vm->memslots[type] == KVM_INVALID_MEMSLOT,
-		    "Memory region type '%u' was already overridden with slot=%u",
-		    type, vm->memslots[type]);
-
-	vm->memslots[type] = slot;
-}
-
-static inline void vm_override_add_mem_region_flags(struct kvm_vm *vm,
-					    enum kvm_mem_region_type type,
-					    enum vm_mem_backing_src_type src_type,
-					    gpa_t gpa, u32 slot, u64 npages,
-					    u32 flags)
-{
-	vm_override_mem_region(vm, type, slot);
-	vm_userspace_mem_region_add(vm, src_type, gpa, slot, npages, flags);
-}
-
-static inline void vm_override_add_mem_region(struct kvm_vm *vm,
-					  enum kvm_mem_region_type type,
-					  enum vm_mem_backing_src_type src_type,
-					  gpa_t gpa, u32 slot, u64 npages)
-{
-	vm_override_add_mem_region_flags(vm, type, src_type, gpa, slot, npages, 0);
-}
-
-Those "_add_" and "_flags" in the function names easily gives away
-the difference in the APIs, rather than differentiating via "__".
-
-However, logically the change looks good - so feel free to add:
-
+LGTM. Feel free to add:
 Reviewed-by: Ritesh Harjani (IBM) <ritesh.list@gmail.com>
-
