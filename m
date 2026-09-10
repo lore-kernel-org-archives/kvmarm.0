@@ -1,150 +1,114 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A0A3456E05;
-	Thu, 10 Sep 2026 10:40:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 072B033986F;
+	Thu, 10 Sep 2026 10:56:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789036860; cv=none; b=campJdZXaX8Z50SgT9QOHYSmpt9XrFqbuXEoDJZ/Ew1OZZ7dQeLITDJfgnb9DpEoPOQX0qOWMyWWOGbnm03ap0SCHsYr6GskAeMSWJJw4ciqHnCYrB9i0+tbBVOv5VQFqNDZd/Gnu6sRUjpkW3HcuEE7Ejgbm/nzt3FQn6auZV8=
+	t=1789037780; cv=none; b=pRKz/fcB/EjI0eRW28tBBCvtyBPoD17Q5KU4McpXvA12zAek8+7DzrWBeCw9FqZDJN2XYFGXpsfJiyds2NNeckDBHOMyupCOKI4h6wNuIYDtg0zABU8WV5j3gK9Qj3LS5Scuw6K//RK+f2lsjcscAf4s2ZHj+0yvfKtaLCy3RFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789036860; c=relaxed/simple;
-	bh=hkkcVOj/rSJNbATKfUukGH582NyaCnD1NBGF1zphExk=;
+	s=arc-20240116; t=1789037780; c=relaxed/simple;
+	bh=BR+Iyh2pr7tzL6ty9EUUcJcf5w9Qc/W2kyT2qXL0bvE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ogj8WnZtUSSnL6MWQ3x3SDmO59qBJtAZlnS7FKjDGzYpLYdWo1XZ6yB//MPO5tBSRw8MvRTM9OMVk9vSqW3EyBpyc8wFPOj1IyGqZFZinf6wCqBZY8/C1MSj880qjmlaR+QbfGNG2tRvkcIeCKMxdsw8/LjULaLO9MeiNGVpaWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b1EYKIpK; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=pI2L7ri+5CX+DI+8YTf+aVjDVl4GOsVJjuzAIrwG3HVTSjBhSe5lf5NSHjV+pf5ok9EsCSnwJRBsZfARgtmkuvzbE0fbXR1xJ2zQmL56vEVMGtQ+OQZFR7vgDAMPjio+P7EA0g+xBCd5nxJWy3ndxIgSDk5hsiYV1GV3qCR+PGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=e00ZG+wT; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b1EYKIpK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B305D1F00893;
-	Thu, 10 Sep 2026 10:40:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789036858;
-	bh=KWxT80cynlb4zIAOYzQS8Ncj1BaRkxy5Cmg155xMdQs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=b1EYKIpKm/JybExizljNgQKizptuBMZ8kMH8KT/8JlC207RHIAqutl7A3bWFHHdqe
-	 8rqzWkPBn/6YzUcXbJaF8uWbEdf7iRhK16HGLS1IpdAKC5JxD8vpATCuXozp75NPcM
-	 CrV/7Sl2KQZN8gABJf7/jjsKNZvUjwuO2KfgEQ0Dtu484kb6z1QjAPpcb5NvhKyY4C
-	 AgMCV3uTgBKXLJSSKkCLxbxI1wQswZiz0OvbcMHkcrs760ZQ9XNpYQ/+8I83y/+LVG
-	 /B/XpqZOkOcMwjlOC2xkuvujKjmrdRWa/4hr/kMHRTk9eoykIPT+6YDTGyo512kcS9
-	 9SdZ6ZHA27ipg==
-Date: Thu, 10 Sep 2026 11:40:51 +0100
-From: Will Deacon <will@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	James Morse <james.morse@arm.com>, Ben Horgan <ben.horgan@arm.com>,
-	Xi Ruoyao <xry111@xry111.site>, Mark Rutland <mark.rutland@arm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Steffen Eiden <seiden@linux.ibm.com>, Gavin Shan <gshan@redhat.com>,
-	Yuan Yao <yaoyuan@linux.alibaba.com>, Fuad Tabba <tabba@google.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] KVM: arm64: Trap guest MPAM accesses whenever MPAM is
- implemented
-Message-ID: <aqKJM3CF-i3VyJk2@willie-the-truck>
-References: <20260908145651.2828597-1-fuad.tabba@linux.dev>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="e00ZG+wT"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4EF481477;
+	Thu, 10 Sep 2026 03:56:09 -0700 (PDT)
+Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E568E3F7B4;
+	Thu, 10 Sep 2026 03:56:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1789037773; bh=BR+Iyh2pr7tzL6ty9EUUcJcf5w9Qc/W2kyT2qXL0bvE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=e00ZG+wTTiVMihiabXKmWzwOrCFXWXrAbbWvNrqWSylkQ2Y4X+A87Lde5bjpH6Ufl
+	 rSVzUa8gR4w+FJmx7hRvmYiO7H+gbRzC599SUFwXxL4aj3f3/tWFQGuVNg9Pg/xwYb
+	 APxOS3WZ/xdhLbHX0bvicsQgjRnaGA4v/sjUBldA=
+Date: Thu, 10 Sep 2026 11:56:05 +0100
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: sashiko-reviews@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev, 
+	Oliver Upton <oupton@kernel.org>
+Subject: Re: [PATCH v1 1/3] KVM: arm64: nv: Don't advertise FEAT_LPA2 for
+ guest stage-1
+Message-ID: <hucdlhnem5q2ykqxpxu4czjmac5uhazt5jbvgkawh6yqoidnhg@7p74vks5cqx6>
+References: <20260909222015.3046432-1-weilin.chang@arm.com>
+ <20260909222015.3046432-2-weilin.chang@arm.com>
+ <20260909224458.E7F0D1F00898@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20260908145651.2828597-1-fuad.tabba@linux.dev>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260909224458.E7F0D1F00898@smtp.kernel.org>
 
-On Tue, Sep 08, 2026 at 03:56:51PM +0100, Fuad Tabba wrote:
-> finalise_el2_state() clears the EL2 MPAM traps whenever the ID
-> registers advertise MPAM, while KVM sets them only under ARM64_MPAM,
-> which also requires MPAMEN. Without EL3 nothing sets that enable, so a
-> guest reaches the MPAM registers while ID_AA64PFR0_EL1.MPAM reads 0
-> for it.
+On Wed, Sep 09, 2026 at 10:44:58PM +0000, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
+> - [Medium] Equality checks for TGRAN4 and TGRAN16 fail to mask future architectural enum values, leaking unsupported hardware capabilities to NV guests.
+> --
 > 
-> Gate the traps on the ID registers alone: MPAMEN isn't a term in any
-> MPAM accessor, so they take effect without it. The cap tests the
-> sanitised ID fields, which never exceed a CPU's own, so it's set only
-> where finalise_el2_state already wrote MPAM2_EL2. MPAM3_EL3.TRAPLOWER
-> is clear there, and arm64.nompam turns the cap off too.
+> commit 6c2ebbb5542b3e22eaee90b7cf8d8cbbc9704e7c
+> Author: Wei-Lin Chang <weilin.chang@arm.com>
 > 
-> Fixes: 23b33d1e168c ("arm64: head.S: Initialise MPAM EL2 registers and disable traps")
-> Reviewed-by: Yuan Yao <yaoyuan@linux.alibaba.com>
-> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
-> ---
+> KVM: arm64: nv: Don't advertise FEAT_LPA2 for guest stage-1
 > 
-> Notes:
->     Changes since v1:
->      - Commit message only. The code is unchanged, so Yuan Yao's
->        Reviewed-by is carried.
->      - Fixes: names the commit that cleared the traps, rather than the
->        one that added KVM's trapping.
->      - Says why the sanitised ID fields are the safe gate: the cap is set
->        only where finalise_el2_state already wrote MPAM2_EL2.
->     
->     Not covered, and answered on the v1 thread: a machine whose CPUs
->     differ on MPAM, raised by Ben and by sashiko.
->     
->     v1: https://lore.kernel.org/all/20260903160819.831518-1-fuad.tabba@linux.dev/
+> There is no FEAT_LPA2 support for NV guests as of now, but we missed
+> limiting it for the non-stage-2 granule size fields (TGRAN4, TGRAN16) in
+> ID_AA64MMFR0_EL1. Add the sanitisation.
 > 
->  arch/arm64/include/asm/cpufeature.h     |  5 +++++
->  arch/arm64/kernel/cpufeature.c          | 13 +++++++++++++
->  arch/arm64/kvm/hyp/include/hyp/switch.h |  4 ++--
->  arch/arm64/tools/cpucaps                |  1 +
->  4 files changed, 21 insertions(+), 2 deletions(-)
+> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> > index 17123f0b6daba..4d1884b32fc48 100644
+> > --- a/arch/arm64/kvm/nested.c
+> > +++ b/arch/arm64/kvm/nested.c
+> > @@ -1731,6 +1731,19 @@ u64 limit_nv_id_reg(struct kvm *kvm, u32 reg, u64 val)
+> >  		/* Hide CNTPOFF if present */
+> >  		val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64MMFR0_EL1, ECV, IMP);
+> >  
+> > +		/* NV does not support FEAT_LPA2. */
+> > +		if (SYS_FIELD_GET(ID_AA64MMFR0_EL1, TGRAN4, val) ==
+> > +		    ID_AA64MMFR0_EL1_TGRAN4_52_BIT) {
 > 
-> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-> index 7404a6e83a930..8863ae99596bc 100644
-> --- a/arch/arm64/include/asm/cpufeature.h
-> +++ b/arch/arm64/include/asm/cpufeature.h
-> @@ -873,6 +873,11 @@ static __always_inline bool system_supports_mpam_hcr(void)
->  	return alternative_has_cap_unlikely(ARM64_MPAM_HCR);
->  }
->  
-> +static __always_inline bool system_supports_mpam_sysregs(void)
-> +{
-> +	return alternative_has_cap_unlikely(ARM64_MPAM_SYSREGS);
-> +}
-> +
->  static inline bool system_supports_pmuv3(void)
->  {
->  	return cpus_have_final_cap(ARM64_HAS_PMUV3);
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index 17b83a2518a8f..36a27692e5cf7 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -2501,6 +2501,13 @@ test_has_mpam(const struct arm64_cpu_capabilities *entry, int scope)
->  	return (read_sysreg_s(SYS_MPAM1_EL1) & MPAM1_EL1_MPAMEN);
->  }
->  
-> +static bool
-> +test_has_mpam_sysregs(const struct arm64_cpu_capabilities *entry, int __unused)
-> +{
-> +	/* The registers exist whether or not firmware enabled MPAM. */
-> +	return detect_ftr_has_mpam();
-> +}
-> +
->  static void
->  cpu_enable_mpam(const struct arm64_cpu_capabilities *entry)
->  {
-> @@ -3116,6 +3123,12 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
->  		.matches = test_has_mpam,
->  		.cpu_enable = cpu_enable_mpam,
->  	},
-> +	{
-> +		.desc = "Memory Partitioning And Monitoring system registers",
-> +		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-> +		.capability = ARM64_MPAM_SYSREGS,
-> +		.matches = test_has_mpam_sysregs,
-> +	},
+> [Severity: Medium]
+> Will this exact equality check fail to mask future architectural enum values?
+> 
+> If future hardware implements a capability enum value greater than 52_BIT for
+> TGRAN4, this check will evaluate to false, leaking the unsupported capability
+> to NV guests.
+> 
+> Could this be capped instead, perhaps using inequalities or the
+> ID_REG_LIMIT_FIELD_ENUM macro, to maintain forward compatibility?
 
-We already have two system capabilities for MPAM so I'm not overly keen
-to add a third, especially as the MPAM code is largely confined to the
-resctrl driver. In fact, this feels a bit similar to things like TRBE
-and SPE in the sense that (a) we have to probe it per-cpu (b) it can
-be disabled by a higher EL and (c) most of the code is in a driver, but
-KVM needs to know how to switch it.
+ID_REG_LIMIT_FIELD_ENUM works only for unsigned fields, perhaps it is
+worth extending it so it can deal with signed enums too.
 
-Neither TRBE nor SPE need entries in arm64_features[] at all, so something
-isn't right here...
+Thanks,
+Wei-Lin Chang
 
-Will
+> 
+> > +			val &= ~ID_AA64MMFR0_EL1_TGRAN4;
+> > +			val |= SYS_FIELD_PREP_ENUM(ID_AA64MMFR0_EL1, TGRAN4, IMP);
+> > +		}
+> > +
+> > +		if (SYS_FIELD_GET(ID_AA64MMFR0_EL1, TGRAN16, val) ==
+> > +		    ID_AA64MMFR0_EL1_TGRAN16_52_BIT) {
+> 
+> [Severity: Medium]
+> Similarly, will this exact equality check fail to mask future unsigned capability
+> values greater than 52_BIT for TGRAN16?
+> 
+> > +			val &= ~ID_AA64MMFR0_EL1_TGRAN16;
+> > +			val |= SYS_FIELD_PREP_ENUM(ID_AA64MMFR0_EL1, TGRAN16, IMP);
+> > +		}
+> > +
+> >  		/* Disallow unsupported S2 page sizes */
+> >  		switch (PAGE_SIZE) {
+> >  		case SZ_64K:
+> 
+> -- 
+> Sashiko AI review · https://sashiko.dev/#/patchset/20260909222015.3046432-1-weilin.chang@arm.com?part=1
