@@ -1,114 +1,108 @@
-Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com [209.85.214.198])
+Received: from mail-wm2-f12.google.com (mail-wm2-f12.google.com [74.125.225.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85D2F318BB5
-	for <kvmarm@lists.linux.dev>; Thu, 10 Sep 2026 00:58:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA46837F8B2
+	for <kvmarm@lists.linux.dev>; Thu, 10 Sep 2026 02:54:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.140
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789001912; cv=none; b=fKxA/H6SX7DCOoRvjN7n3VOlMebVzSBlnRso7ykm8xf3q32HWEDEUADwpU2/AJajKiHd/ZisiWaf4TEXq+Z8w48y0VXto4+BplNP6nJGt0KwssMB70N3vazJ3CdEGqraS1kxX2TghVOaCK/Q8JS4EdC4Xj8peCA0L8+xVd84JKs=
+	t=1789008897; cv=none; b=mY6xGv514hp6fbjSKK0gto11p4BEXd4sTFObgGl6ehazk/c2nuGbwhC4W1Fs0wt1osaqdlqPbqIuFTPMFG3jO5PGTlZrP3bJdXCy7wCCUIslZleEsJZtYZ8fwmH/UJ9261e+nEm7KUhcvCv0+nz/gW4AvEY4dyQW7xOnjObZPSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789001912; c=relaxed/simple;
-	bh=EMDY7SWycMHhwbwPHJdS4oL+eSVJ8O6B3SZMgf9trmQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=WzYv4hYAaPnowc3Q52D+LzwmYq69BORqmln0dEa6YpvKEqB7zRVcB+1x87CYAnoVPSb7H7PudqVcfvEO65xLbLubTHwGQZuZvHGa9jCy1e5evZKjK5y9jz+67bxIKa9QEKs2SZs7yxdLJmDQ6G5sNHPYbby0M1Cs0HtY+qdd2DM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ui7sjVj1; arc=none smtp.client-ip=209.85.214.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1789008897; c=relaxed/simple;
+	bh=0CsmXKkzESsxC+tRouCw17YPGjua4+WpOUOTalus1XE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HDw9PJHT4bmn5RS0wsahHwrbxvggBE9fjA/zd2bhP61X7m/gRhB2YiH/N1Ue+xbVmE55i2JobcGZuW9OccjBWLXn0SiL5GPIsRbrba6Rd60qzBYADPSzBGOZEK3c9IBk+ey1rNAsdTX8JXhh4ZvNv+uc9qoKyuiaojIHNfAQ5pU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b2mRVNmC; arc=none smtp.client-ip=74.125.225.140
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ui7sjVj1"
-Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-2d94f086fedso90759805ad.1
-        for <kvmarm@lists.linux.dev>; Wed, 09 Sep 2026 17:58:30 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b2mRVNmC"
+Received: by mail-wm2-f12.google.com with SMTP id 5b1f17b1804b1-49cd38e0e5dso10150905e9.2
+        for <kvmarm@lists.linux.dev>; Wed, 09 Sep 2026 19:54:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1789001910; x=1789606710; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=xgzlS1uxnCbzGMH5pUkXS6DY1hZkFu32UCS9PdpFsuk=;
-        b=ui7sjVj1u2EujwJCMubYYxBNYk5PLCs2NS72NqU54teDvlyDWofXkvAY4UF3SlqYiM
-         poyqBNCGcV1Z3x1rUth6xIej2XgvYzW5jfT0L0ITwKY4gYG3lgyoCLxrkDksn6/GjjEr
-         eQCBuu4PVI3oXtStJvtjOnl/ERYSu+3fM7qAZtWPx0emek0UGMtmSow6nJtEPvVPBofO
-         aDs9w5xBd2HCDQPc2M/NOO15Vwq3fTsyeG8WTsWls6THFYL29HVC8skcTISH/xk5qXWL
-         vOwQmt/p0TyHxVp/Fm900HQxBk0ai/wtu3uFbrlwVaY3Y2mpwP3H/Gy4aCBjx99+A/2M
-         rvPQ==
+        d=gmail.com; s=20251104; t=1789008894; x=1789613694; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=/bkqSDqoSS4X+8RqIhO4osWZcJjlcPnaK6w17Spzl4k=;
+        b=b2mRVNmCoet+zEvydPvAbFkhzwdArjPM0nxP5YOUxWWb/lLGg83ufHXsQnDewcWc5B
+         0makcYorMIDY2PQpIAeVfzuz+sXNlZnDpf/LqroTYdDa+MrMvY4aEa59+0Oqx2SNdcvm
+         PGzeoxjJU1jfUD0B0XnugCUcLTjT1qMGc6/4slnajqvU8ynE1HtavGm6bT/39QWx1ooa
+         ZrezfmnqVTsMxk/ugW5H32d+KPu5xYtOiZa/ZPgmtAXqZgsfWmZNPNURPIieQBGaLeBw
+         3F4Sb4kyzkK0hHxXfLo4KGtiIrd0ohV9cK3a9EOMqLRMhTRTlWdAWL6O4DoGc8WbzFzS
+         TxBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789001910; x=1789606710;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=xgzlS1uxnCbzGMH5pUkXS6DY1hZkFu32UCS9PdpFsuk=;
-        b=haFeuRwo818sGa39juUMxLtFiUG0xVJZIQ6wbQHXOiANvaFQCm+3pL6rHNDu0Mi+kW
-         iN1MmkTTUkQjkgXdwr0Y0aG9xnTY7AMxRT5QSA6sk3XN6Zyu5CjsTE9pPwDmqRbsNrsW
-         BMGqouiFN83ydSW4ktpb3R8B1iqt1e5IM7M55uwYa+neQeLyA+1TqrmjL16Z7nb/on63
-         1tLvnp/+bq3w/RHPJmECnE/17Lsv8g8YsVrDy+MNUQZK+y3PJ11K9sw8PvvjE4Q+yM2Q
-         9YQVK68zyVx2m/2Ex1tlpVl/9ErmCsFVooK5MXG5LlBpdn8vQELNmkOmLw6pHlXaBcR8
-         uzgA==
-X-Forwarded-Encrypted: i=1; AKwUvByIwfbn4ld7l95OM6/KgPRI31UZUGyAjBvNmI8nSmTeCGvLcwcBxCmf67wBQlZEhZgXvAv7rb4=@lists.linux.dev
-X-Gm-Message-State: AFuF++kVpJiZQ/VV9DRWFYeB5VGz0bX3nZL5SxsDCTt7CbPxZJcEJm8a
-	+qgiM4+vYXfHls5JKY10YIB6+UJFU/mel4CHgRSmFPp+YFFxb7PtycevdERna4MpBRuWVaSpmVD
-	g3qhpHA==
-X-Received: from plsk18.prod.google.com ([2002:a17:902:ba92:b0:2d2:c22c:7b8a])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:cf10:b0:2d9:3636:d01a
- with SMTP id d9443c01a7336-2db126669d3mr557854145ad.15.1789001909390; Wed, 09
- Sep 2026 17:58:29 -0700 (PDT)
-Date: Wed, 9 Sep 2026 17:58:28 -0700
-In-Reply-To: <20260905012403.GX4157646@nvidia.com>
+        d=1e100.net; s=20251104; t=1789008894; x=1789613694;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=/bkqSDqoSS4X+8RqIhO4osWZcJjlcPnaK6w17Spzl4k=;
+        b=PuIrP+I81sFRi307o9/lWlu2Iz2HJO9s1dNiyIm69MufBgbC8Urq4eVFo2F+i1BHHc
+         hLnMOqePKHS9eTpdHC+68RgDjj5hF5gUDKLod/cfXeVQ5cSEXeUQEB9kkHZBYvDopTAU
+         0wy22VFujS2e5KH1k2xJceCJRC3F6CmZEgLoTCIVk+V40ClZHlSSPHDkZsxwtTu1gTJE
+         NeQCktXGQGqVF0sdNDWTR8rQZQkiu8EJ46EqBqWZbknNw7yPXzb6bxCK8daseXhiP4XI
+         gOONFscN/NgOx914JZriPPpvasHuUrnYelu/V6YoTuAEYBbA23/nk9gNUsPx87ulOPOs
+         d2iA==
+X-Forwarded-Encrypted: i=1; AKwUvBxHOIWtbhr9Y8DwC5UfNCJ4VH/lyhIroDfhpuJ5285HAAPmjqsE8sbz/8lYACNyeV1y5MJZJOE=@lists.linux.dev
+X-Gm-Message-State: AFuF++kEar7c8nX7+pZ2Fh8veTwMIR/Qm5ACHiSmp+KwuxL45J8AQjcV
+	UsrhCGuor7I68sp/1X1PUEBDf31vb6+YxRoSEptYbT9oUHArjWGlumaW
+X-Gm-Gg: AYBFou0HUllxVk+dkrH8+xWw8wJ02znj6U0Aj/b/N2Of9jMrMH0UkotuCswV0r9uBEI
+	qeHAERRePctWVt3je2iCek7quN+tnIfyp5lzHB/dlFhwnNTM/IqlcSE617s6F2KGOIPJXwSbtOt
+	DkGOXj+jPvjSl6apkHD4TsYxXQrWuQAnnDt9clvo6C4QcVE+w423WZxiEa0g1Ni/xdB/PboaD1t
+	jb9748atXWdmmJ8z5XQkUb47e8mMzaYwsYCND+EeVRKN+byDzGEsCVjdvdS5gLxc42qpgd5OV5P
+	6eo+FMtzsbCZHS41M2wGt4s6uQW4ROAQtaN3ps9HFUKFLwaS985t+jymZjYkw4fluhc8+x/GlBp
+	GfPK58tOJV3hhVc2SxhBqZ80t0JQ+D9d9fVa8BCBAtT8NYiSbLxZT59a82oGHh1saeZw4tQmoQp
+	wH3UU0IGdoAONI6//5bANnjJWKzKkpHJQ9xC+CTr6meRdD4L1pqoT91cwJbmUOQ+cbfwfnouER2
+	twv+P7T3dhcsF3Drubx6wLEnBTHEe18aMKsVd8OMMNncH8DjMupSH6un7FkDM+Gs+j9G3g1g7x9
+	iIjeCvWCC8xmXWyUAzCZT+20EZYw2xInYrAjzS8CrU3GKqp0UkIiqu79K0rVS8t2MD7Fqq1E
+X-Received: by 2002:a05:600c:630a:b0:49c:f89b:f82 with SMTP id 5b1f17b1804b1-49d2592c540mr85347385e9.12.1789008893739;
+        Wed, 09 Sep 2026 19:54:53 -0700 (PDT)
+Received: from unknown748F3CBA5068 (dynamic-2a02-3100-b3d9-b901-0402-5aad-0ef4-88ac.310.pool.telefonica.de. [2a02:3100:b3d9:b901:402:5aad:ef4:88ac])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49d26c46b64sm33036055e9.13.2026.09.09.19.54.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Sep 2026 19:54:53 -0700 (PDT)
+Date: Thu, 10 Sep 2026 04:54:52 +0200
+From: Karl Mehltretter <kmehltretter@gmail.com>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Quentin Perret <qperret@google.com>, Joey Gouly <joey.gouly@arm.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: Fix kvm_get_vtcr() kernel-doc
+Message-ID: <aqIbvOvIe89_RYHT@gmail.com>
+References: <20260909063156.89636-1-kmehltretter@gmail.com>
+ <CA+EHjTx3fmj_fkD_ybPANyTrEApMUyBscfP4JtP-F_MRL-L=2w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20260903023452.721732-1-loganodell@google.com>
- <20260904160009.GV4157646@nvidia.com> <aptFFYqcSiBdMLE8@google.com> <20260905012403.GX4157646@nvidia.com>
-Message-ID: <aqIAtOoew-_6jw29@google.com>
-Subject: Re: [RFC PATCH 0/3] liveupdate: Move to feature flags for LUO and
- memfd ABI compatibility
-From: Sean Christopherson <seanjc@google.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: David Matlack <dmatlack@google.com>, Logan Odell <loganodell@google.com>, arnd@arndb.de, 
-	pasha.tatashin@soleen.com, rppt@kernel.org, pratyush@kernel.org, 
-	graf@amazon.com, akpm@linux-foundation.org, pbonzini@redhat.com, 
-	maz@kernel.org, oupton@kernel.org, bhelgaas@google.com, alex@shazbot.org, 
-	kevin.tian@intel.com, dwmw2@infradead.org, baolu.lu@linux.intel.com, 
-	joro@8bytes.org, will@kernel.org, robin.murphy@arm.com, 
-	linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	kexec@lists.infradead.org, linux-mm@kvack.org, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-pci@vger.kernel.org, iommu@lists.linux.dev
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTx3fmj_fkD_ybPANyTrEApMUyBscfP4JtP-F_MRL-L=2w@mail.gmail.com>
 
-On Fri, Sep 04, 2026, Jason Gunthorpe wrote:
-> On Fri, Sep 04, 2026 at 10:24:21PM +0000, David Matlack wrote:
+On Wed, Sep 09, 2026 at 08:36:40AM +0100, Fuad Tabba wrote:
+> Hi Karl,
+> While you're on that line, the description is also inaccurate, so you
+> could fix both in one go and save a follow-up touching the same line:
 > 
-> > The proposal here (which is inspired by the KVM UAPI) is to ensure every
-> > LUO ABI struct has 2 properties:
-> > 
-> >  1. A field to encode options/features (e.g. u64 flags).
-> >  2. A way way to grow without breaking backward compatibility (e.g. so
-> >     we can add new fields).
-> > 
-> > Each flag can mean whatever it needs to. e.g. It can indicate the
-> > precence of one or more fields (i.e. new fields in the struct), or it
-> > can mean a field now has a different meaning (i.e. union in the struct).
-> > 
-> > This would enable adding support for new features without breaking
-> > backward compatibility. Downstream users would have to ensure their
-> > kernel does not start using a new feature while it can still rollback to
-> > a version that does not support the new feature.
+> > - * @phys_shfit:        Value to set in VTCR_EL2.T0SZ.
+> > + * @phys_shift:        Value to set in VTCR_EL2.T0SZ.
 > 
-> This was never the biggest problem. The main issue was the functional
-> behaviors of the kernel that cannot be represented simply as data in a
-> struct with some flag bits.
+> kvm_get_vtcr() sets T0SZ to 64 - phys_shift, so phys_shift isn't the
+> value written to the field, it's the IPA size in bits. Something like:
 > 
-> Like for instance kernel A supports memfd folio sizes far larger than
-> kernel B because we fixed MAX_ORDER. You can't fix that just with
-> simplistic flags.
+>      * @phys_shift:    IPA size, in bits.
+> 
 
-Can you elaborate on why the folio sizes matter?  Honest question, because I don't
-understand why the serialization format wouldn't express things as "N contiguous
-pages starting at PFN X".  Then the implementation would rebuild its folios as
-appropriate.
+Hi Fuad. 
 
-I could see things like HugeTLB not working if someone booted the kernel with
-support for only 1GiB pages and then tried to feed it payload with sub-1GiB ranges.
-But to me, those sorts of things fall into the "well yeah, don't do that" category.
+well spotted. A typo seldom comes alone :)
+
+I'll fix that.
+
+Thanks,
+Karl
