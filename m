@@ -1,590 +1,212 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com [209.85.216.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C509A38D400;
-	Thu, 10 Sep 2026 15:32:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B0D6431A34
+	for <kvmarm@lists.linux.dev>; Thu, 10 Sep 2026 15:35:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789054377; cv=none; b=U3wbrccGTrGePNiEQiqusq4ImDsO38Lcl1ZfLXi2HcuQMHSK2tur3AVKuCiEWpOme5GtJsEyyZLsThQ+vUr2Yf1fjC1rjzDGuBKqgQW1eoONk1mj/FhDdEl7hceE95qNf2um15DDSPkAnc/gU7XXBB/oVW93ce3Lxe8yU4v7ZCk=
+	t=1789054557; cv=none; b=XgXemdoI+3zNJr2pqyd8nYIdrF4QR7m6Y+/eO6lk2CPBpepOnv3H2e1QzGBvLNvdN3tu72owxzhsQqQS7EFF+wSh4jiaWbiONfpLrT8FazwFIFV9Dsr1hHzGAf0nfO4LB8DkV1EGC/E8WpO9IbA+yZE+Uw6qfcql2fIH6sKQNxw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789054377; c=relaxed/simple;
-	bh=zOLjl9CIXZFNlY3XjUzPlJfvjtqZ6beBwCb9UF8DTDY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VgR0gxpXsK3k5hgNzva0HJblNFvEFGm5uK+8HbCdcBs4AjBl3wJftkbGbFRHgP8yu2+CzgrX0pXRQlV3HEEwb4a0tik3kcjFHbsM79KmBkpxNPTV+4NWriLsjnKyBxeFlH0gAj1MhmuLaOytuT/PLZ6eWn0nQL01Lq9x0gLqdd4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K/XiHLTI; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789054557; c=relaxed/simple;
+	bh=Xgcjqjf3P4MGGbQztdNdBHKpAHb0Y3bYS7ovsxn2/ek=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=onPJretQhsmo7JQ3I+8EFNF1sagPZyoNXMPFlAXdH6LcesHwmWdW1+E3+Y4HqejW/CpxLRjDiJOkJ+jrsY001OlsyFQlw6SXswJmEH3RL1O3P/to92a9SDPiAEU2aaGYwuOJfsW7+2H1gm5h0VrYJtRw75VX1voEqIBXJ40z41U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fp5zmmVD; arc=none smtp.client-ip=209.85.216.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K/XiHLTI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3471C1F000FF;
-	Thu, 10 Sep 2026 15:32:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789054375;
-	bh=6vb5ChOERdgx+BfNfpa3QgHVpj5eLttfujUZfrMna5s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=K/XiHLTIGjYcJXwlFdJ51anQzZSheOkgRMqYU8HMSQHz+BCJp0urGfihbbJFLmy17
-	 AxvPfn5mUoceuDnoDYamM+UBVl725kLAkP7I9aMJhH5Mpq44f5QElf6uHXpCv/CxLs
-	 vS0Q7COG6stHDxSmFhv5IQbidpbKIfysa7Rqdt26kBecRrAA+ygiLb7c7bHzl8DcZ5
-	 CRDMPX7THU7joN6POZ9m6aeUODQd5+wJQHJrGwhjR/8tYT5Wl0DsAntof8AYcu6OYz
-	 YWBNY7Yg6wSUZDU7orJu57n3W7McSfnZuf2GIjIk0vqf8Vl9Gu2gGOUrrNAP1hgA13
-	 WvAbNhL1QTRRg==
-Date: Thu, 10 Sep 2026 16:32:46 +0100
-From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Oliver Upton <oupton@kernel.org>, Fuad Tabba <tabba@google.com>, 
-	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	Jack Thomson <jackabt@amazon.com>, Jack Thomson <jackabt.amazon@gmail.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Vincent Donnefort <vdonnefort@google.com>, 
-	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Sean Christopherson <seanjc@google.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Leo Soares Passos <Leo.Bras@arm.com>
-Subject: Re: [PATCH 5/8] KVM: arm64: Implement KVM_PRE_FAULT_MEMORY
-Message-ID: <aqLFfbxa26ZGpJDh@gremlin>
-References: <20260825-kvm-arm-prefault-v1-0-befe8947702e@kernel.org>
- <20260825-kvm-arm-prefault-v1-5-befe8947702e@kernel.org>
- <86tsnx77c1.wl-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fp5zmmVD"
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-39533bb224cso4956508a91.3
+        for <kvmarm@lists.linux.dev>; Thu, 10 Sep 2026 08:35:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1789054555; x=1789659355; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=2+MOwVd/hSplAvFbBk52yvKLS3w7cDWTRO3ieRL0csc=;
+        b=fp5zmmVDdkf1G007+OCK8cBr9Z+VDHt+bwaPFnpCx40dCsENOS46rwxRwYYa5oPakk
+         qwFltJJ+iDE9ImfRKlaFNUwK48cNBar21e7xWKvA2xW4tnlIkjpPQXXupxmsKN4WYSqi
+         1l5/h2SKdc41KsCSuJCkKqa1OZhNBchdUmm1gLRQXLO/3KBbaMl5jBz/DNJWhHPtFedC
+         8PTzb0ef8jobmTkvjyNw5XP/Hubu6xGV2ETY84qjGv+ucmWCpF5WDOdVQ9GvZtyWTJZ8
+         AAgl6zk2mKFSbOkpRDUGaE6nqXcO5wL1ivn2G+kL3/by51ftcgdU7bPbJ71sH4Wsch97
+         6zIQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1789054555; x=1789659355;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=2+MOwVd/hSplAvFbBk52yvKLS3w7cDWTRO3ieRL0csc=;
+        b=ixENDn20gPXzkX/1WxaZApw00UXo8QTnqYnFaGVD9R+3nqgznwO7gntZ4Fi5GDBpZ5
+         sQFX8siYOmDUnuuwnrIfwdQ96fAsks/23B6NxASXRE56btqf3aYxDDso3FLwGZcVV/Zw
+         MyGiNcX6rkk7XyZ+3Tb7v+MlE8SgPSRSVv6y0gleupJx7G3TbIy1TiyM4+NCSIyBeS0w
+         lswCmhAcfSqtmnG4sbr5rUW0eWylzJyU7FKSMRKc5uP2Z1anH2UUrubSKBI2/utE4KNU
+         hmdoVWqUvOBmgvWPRdqRY9pAQYN8wqXnTiANHpRET+NP+ppo6xocVYa6ZAUI6PFuLyPC
+         Nj/A==
+X-Forwarded-Encrypted: i=1; AKwUvBxHWZmiyR+HUpGGoNi8thzT9ZOSOkCjSoeOC4ngEmqfat17eKdys1K+sM1mR1KY+I/4vAtTe3Q=@lists.linux.dev
+X-Gm-Message-State: AFuF++lS/XXk+OHi8g9PAriHFQaPYH/2rfmDIcMzEyVTgxEnEtYHzpEy
+	iYNeMcJkdtNv4WPlTkITJGZXOP+QgJkX2acu6nawfOYxIBVyMxRxj4hQbNhA+wRjtxtWYF3rwnH
+	NhsY7MA==
+X-Received: from pjbdt17.prod.google.com ([2002:a17:90a:fa51:b0:39d:8f18:feb5])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:6081:b0:39b:51cc:4586
+ with SMTP id 98e67ed59e1d1-39b51cc65admr27199424a91.19.1789054554982; Thu, 10
+ Sep 2026 08:35:54 -0700 (PDT)
+Date: Thu, 10 Sep 2026 08:35:54 -0700
+In-Reply-To: <20260910143448.GD3968357@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86tsnx77c1.wl-maz@kernel.org>
+Mime-Version: 1.0
+References: <20260903023452.721732-1-loganodell@google.com>
+ <20260904160009.GV4157646@nvidia.com> <aptFFYqcSiBdMLE8@google.com>
+ <20260905012403.GX4157646@nvidia.com> <aqIAtOoew-_6jw29@google.com> <20260910143448.GD3968357@nvidia.com>
+Message-ID: <aqLOWkuVKccR-I7W@google.com>
+Subject: Re: [RFC PATCH 0/3] liveupdate: Move to feature flags for LUO and
+ memfd ABI compatibility
+From: Sean Christopherson <seanjc@google.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: David Matlack <dmatlack@google.com>, Logan Odell <loganodell@google.com>, arnd@arndb.de, 
+	pasha.tatashin@soleen.com, rppt@kernel.org, pratyush@kernel.org, 
+	graf@amazon.com, akpm@linux-foundation.org, pbonzini@redhat.com, 
+	maz@kernel.org, oupton@kernel.org, bhelgaas@google.com, alex@shazbot.org, 
+	kevin.tian@intel.com, dwmw2@infradead.org, baolu.lu@linux.intel.com, 
+	joro@8bytes.org, will@kernel.org, robin.murphy@arm.com, 
+	linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	kexec@lists.infradead.org, linux-mm@kvack.org, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-pci@vger.kernel.org, iommu@lists.linux.dev
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Sep 10, 2026 at 11:02:06AM +0100, Marc Zyngier wrote:
-> On Tue, 25 Aug 2026 17:00:39 +0100,
-> "Lorenzo Stoakes (ARM)" <ljs@kernel.org> wrote:
-> >
-> > Implement KVM stage 2 page table pre-faulting for the arm64 architecture.
-> >
-> > Do the trivial plumbing by selecting CONFIG_KVM_GENERIC_PRE_FAULT_MEMORY in
-> > Kconfig, returning 1 in kvm_vm_ioctl_check_extension() for
-> > KVM_CAP_PRE_FAULT_MEMORY but false in kvm_pkvm_ext_allowed() to disallow
-> > its use for pKVM.
-> >
-> > Add kvm_arch_vcpu_pre_fault_memory() to actually implement the feature by
-> > pre-faulting stage 2 page tables for a specific GPA.
-> >
-> > Previous commits added the required foundations - gmem_abort() and
-> > user_mem_abort() determine esr and mmu from s2fd->esr and s2fd->mmu
-> > respectively, the granule size is returned by them in kvm_s2_fault_result
-> > and kvm_pgtable_get_leaf() accepts a walk flags parameter.
-> >
-> > Additionally, kvm_pgtable_get_leaf() now accepts a walk flag, meaning its
-> > page table walk can be performed with KVM_PGTABLE_WALK_SHARED set and thus
-> > can be performed under a read mmu_lock.
->
-> We really don't need a recap of the previous episodes... ;-)
+On Thu, Sep 10, 2026, Jason Gunthorpe wrote:
+> On Wed, Sep 09, 2026 at 05:58:28PM -0700, Sean Christopherson wrote:
+> > On Fri, Sep 04, 2026, Jason Gunthorpe wrote:
+> > > On Fri, Sep 04, 2026 at 10:24:21PM +0000, David Matlack wrote:
+> > > 
+> > > > The proposal here (which is inspired by the KVM UAPI) is to ensure every
+> > > > LUO ABI struct has 2 properties:
+> > > > 
+> > > >  1. A field to encode options/features (e.g. u64 flags).
+> > > >  2. A way way to grow without breaking backward compatibility (e.g. so
+> > > >     we can add new fields).
+> > > > 
+> > > > Each flag can mean whatever it needs to. e.g. It can indicate the
+> > > > precence of one or more fields (i.e. new fields in the struct), or it
+> > > > can mean a field now has a different meaning (i.e. union in the struct).
+> > > > 
+> > > > This would enable adding support for new features without breaking
+> > > > backward compatibility. Downstream users would have to ensure their
+> > > > kernel does not start using a new feature while it can still rollback to
+> > > > a version that does not support the new feature.
+> > > 
+> > > This was never the biggest problem. The main issue was the functional
+> > > behaviors of the kernel that cannot be represented simply as data in a
+> > > struct with some flag bits.
+> > > 
+> > > Like for instance kernel A supports memfd folio sizes far larger than
+> > > kernel B because we fixed MAX_ORDER. You can't fix that just with
+> > > simplistic flags.
+> > 
+> > Can you elaborate on why the folio sizes matter?  Honest question, because I don't
+> > understand why the serialization format wouldn't express things as "N contiguous
+> > pages starting at PFN X".  Then the implementation would rebuild its folios as
+> > appropriate.
+> 
+> That's an idyllic view, yes, but my point is (IIRC) we didn't do
+> exactly that for memfd.
 
-Haha fair enough ;) will drop.
+Well, y'all screwed up then.  I don't see why past mistakes should force other
+subsystems to support a flawed implementation.  Learn from the mistakes, add v2
+of serialization for memfd, and move on.
 
+> Sometimes you can do more and more work to try and be more and more
+> general but this is *alot* of work and even then eventually hits
+> problematic limits. Like what do you do with the sealing flags? That's
+> ABI breaking if the successor does not support them, and downgrades
+> make exactly that possible.
 >
-> >
-> > With these changes in place, implement pre-faulting by first trying a page
-> > table walk under the MMU read lock then, if it fails, injecting a
-> > synthetic data abort at the page table level at which the page table walk
-> > failed.
-> >
-> > This is necessarily racey as reclaim might happen at any time. Successfully
-> > pre-faulting can therefore only guarantee that each GPA was observed to be
-> > mapped at least once.
-> >
-> > Protected KVM (pKVM) is not supported at all because pKVM creates VMs and
-> > vCPUs when first run, meaning any attempt to pre-fault prior to this cannot
-> > succeed.
-> >
-> > Since the sensible use case for pre-faulting is doing so prior to vCPU run,
-> > and supporting only online pKVM vCPUs is confusing and inconsistent, simply
-> > don't support this at all.
-> >
-> > There is a subtlety when retrieving the hva: it seems natural to use
-> > gfn_to_hva_memslot(), but this errors out for read-only memslots.
-> >
-> > Since pre-faulting should fault in both read-only and read/write hvas, this
-> > isn't the correct API to use here.
-> >
-> > gfn_to_hva_memslot_prot() allows retrieval of read-only hvas, but has
-> > unclear semantics, so introduce gfn_to_hva_memslot_read() to wrap it.
-> >
-> > A retry mechanic is implemented when user_mem_abort() or gmem_abort() fail
-> > to map memory due to a benign failure where a hardware abort would not
-> > result in an error.
-> >
-> > These occur when the abort handler was raced by either an invalidation MMU
-> > notifier or a racing abort path.
-> >
-> > Since these faults are highly likely to succeed on immediate retry, retry
-> > up to MAX_PRE_FAULT_RETRIES times, after which -EAGAIN is ultimately
-> > returned to the caller.
-> >
-> > An invalid memslot (i.e. a memslot with the KVM_MEMSLOT_INVALID flag set)
-> > also results in the operation returning -EAGAIN without a retry mechanic.
-> >
-> > This is because an invalid memslot means the pre-fault operation raced with
-> > memslot reclaim, and since the SRCU lock is held, progress cannot be made.
-> >
-> > Therefore, when this happens, -EAGAIN indicates that userland should retry
-> > the ioctl, which will bounce the SRCU lock and permit forward progress.
-> >
-> > Finally, update the KVM API documentation to describe the changes,
-> > providing arm64-specific implementation details.
-> >
-> > This work is based with gratitude on Jack Thomson's original series, its
-> > previous revisions and the feedback they received.
->
-> Honestly, this whole commit message reads like a cover letter.
-> Consider writing something more succinct, which would be helped by
-> splitting the patch: if you have so much to say for a single patch,
-> that's probably that the patch is doing too many things.
+> A CSPish user can do things like patch the new sealing flag into their
+> current kernel (while preventing userspace from using it), ensure
+> everything is updated to that, then jump ahead to a newer kernel and
+> enjoy the new flag with full downgrade support. There is so much more
+> control on their part that makes the problem far more managably simple
+> that upstream does not get to have.
 
-Ack,
+I guess maybe we have a different definition of ABI? 
 
->
-> >
-> > Link: https://patch.msgid.link/20260612162354.73378-1-jackabt.amazon@gmail.com/
-> > Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
-> > ---
-> >  Documentation/virt/kvm/api.rst    |  17 +++-
-> >  arch/arm64/include/asm/kvm_pkvm.h |   2 +-
-> >  arch/arm64/kvm/Kconfig            |   1 +
-> >  arch/arm64/kvm/arm.c              |   1 +
-> >  arch/arm64/kvm/mmu.c              | 192 +++++++++++++++++++++++++++++++++++---
-> >  5 files changed, 198 insertions(+), 15 deletions(-)
-> >
-> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> > index 4988c32df4bf..6246f4a56bb9 100644
-> > --- a/Documentation/virt/kvm/api.rst
-> > +++ b/Documentation/virt/kvm/api.rst
-> > @@ -6485,7 +6485,7 @@ See KVM_SET_USER_MEMORY_REGION2 for additional details.
-> >  ---------------------------
-> >
-> >  :Capability: KVM_CAP_PRE_FAULT_MEMORY
-> > -:Architectures: none
-> > +:Architectures: x86, s390, arm64
-> >  :Type: vcpu ioctl
-> >  :Parameters: struct kvm_pre_fault_memory (in/out)
-> >  :Returns: 0 if at least one page is processed, < 0 on error
-> > @@ -6493,12 +6493,14 @@ See KVM_SET_USER_MEMORY_REGION2 for additional details.
-> >  Errors:
-> >
-> >    ========== ===============================================================
-> > +  EAGAIN     A race occurred before progress was made, but a retry may succeed.
-> >    EINVAL     The specified `gpa` and `size` were invalid (e.g. not
-> >               page aligned, causes an overflow, or size is zero), or the VM
-> >               is UCONTROL (s390).
-> >    ENOENT     The specified `gpa` is outside defined memslots.
-> >    EINTR      An unmasked signal is pending and no page was processed.
-> >    EFAULT     The parameter address was invalid.
-> > +  EHWPOISON  A poisoned host page was encountered.
-> >    EOPNOTSUPP Mapping memory for a GPA is unsupported by the
-> >               hypervisor, and/or for the current vCPU state/mode.
-> >    EIO        unexpected error conditions (also causes a WARN)
-> > @@ -6518,7 +6520,16 @@ Errors:
-> >  KVM_PRE_FAULT_MEMORY populates KVM's stage-2 page tables used to map memory
-> >  for the current vCPU state.  KVM maps memory as if the vCPU generated a
-> >  stage-2 read page fault, e.g. faults in memory as needed, but doesn't break
-> > -CoW.  On x86, KVM does not mark any newly created stage-2 PTE as Accessed.
-> > +CoW.  On arm64, KVM marks both existing and newly created stage-2 PTEs as
-> > +Accessed, on x86 it does not and for s390 it is not applicable.
->
-> Meh. See below.
->
-> > +
-> > +On arm64, a GPA is interpreted as an IPA, and never interpreted as the IPA
-> > +of a nested guest. Pre-faulting only populates canonical stage 2 page
-> > +tables.
-> > +
-> > +The feature is not supported on arm64 if the protected KVM (pKVM) feature
-> > +is enabled, as that results in vCPUs being instantiated on first run, which
-> > +renders pre-faulting useless.
->
-> I don't think we need to justify why this is not available with pKVM.
-> I expect pKVM to eventually support this through a slightly different
-> mechanism anyway.
+I'm not saying that upstream has to be 100% forwards and backwards compatible.
+I'm saying the serialization payload itself should communicate what features are
+effectively required.  I.e. *if* there are incompatibilities, they should be
+naturally expressed in the serialization format, not communicated out-of-band
+through magic numbers.
 
-OK, can just end the sentence at 'is enabled'.
+The scenario you describe fits exactly with what I am proposing.  Until something
+actually starts using the new sealing flag, the CSP can downgrade to older kernels
+at will.  And if the user cares about downgrading, then they need to prevent the
+flag from being used until the new kernel is rollback-safe and deployed to enough
+hosts to prevent stockout.
 
+> This is why I think the very idea we can support any version pair is
+> too much to ask for. We should focus on supporting a small set of
+> version pairs and not making it too invasive or hard in the kernel or
+> on the maintainers.
 >
-> >
-> >  In the case of confidential VM types where there is an initial set up of
-> >  private guest memory before the guest is 'finalized'/measured, this ioctl
-> > @@ -6533,7 +6544,7 @@ When the ioctl returns, the input values are updated to point to the
-> >  remaining range.  If `size` > 0 on return, the caller can just issue
-> >  the ioctl again with the same `struct kvm_map_memory` argument.
-> >
-> > -Shadow page tables cannot support this ioctl because they
-> > +On x86, Shadow page tables cannot support this ioctl because they
->
-> shadow
+> Thus live update within a stable branch only is my proposal for
+> upstream support.
+> 
+> If it really succeeds at that and it becomes very popular, then let's
+> discuss upstreaming doing additional version combinations.
 
-Oops yup!
+Why on earth would we have version numbers in the first place?  IMO, monotically
+increasing version numbers are flat out the worst way to communicate features.
 
->
-> >  are indexed by virtual address or nested guest physical address.
-> >  Calling this ioctl when the guest is using shadow page tables (for
-> >  example because it is running a nested guest with nested page tables)
->
-> Documentation updates in a separate patch, please.
+I am completely against supporting any scheme that relies on magic version numbers.
+It creates problems where none need exist, and checking for compatibility can't be
+sanely done in a programmatic way, because by definition it relies on magic numbers.
 
-Ack!
+E.g. if the ABI for a given component hasn't changed, why should anyone care if
+the overall "version" of the kernel is ahead or behind by N kernels?
 
->
-> > diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
-> > index beea00e693a0..4d6e5765e9e5 100644
-> > --- a/arch/arm64/include/asm/kvm_pkvm.h
-> > +++ b/arch/arm64/include/asm/kvm_pkvm.h
-> > @@ -44,9 +44,9 @@ static inline bool kvm_pkvm_ext_allowed(struct kvm *kvm, long ext)
-> >  	case KVM_CAP_ARM_PTRAUTH_GENERIC:
-> >  		return true;
-> >  	case KVM_CAP_ARM_MTE:
-> > -		return false;
-> >  	case KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE:
-> >  	case KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES:
-> > +	case KVM_CAP_PRE_FAULT_MEMORY:
-> >  		return false;
-> >  	default:
-> >  		return !kvm || !kvm_vm_is_protected(kvm);
-> > diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-> > index 449154f9a485..71233068b7cb 100644
-> > --- a/arch/arm64/kvm/Kconfig
-> > +++ b/arch/arm64/kvm/Kconfig
-> > @@ -37,6 +37,7 @@ menuconfig KVM
-> >  	select SCHED_INFO
-> >  	select GUEST_PERF_EVENTS if PERF_EVENTS
-> >  	select KVM_GUEST_MEMFD
-> > +	select KVM_GENERIC_PRE_FAULT_MEMORY
-> >  	help
-> >  	  Support hosting virtualized guest machines.
-> >
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index ccae82c1242b..58ac70f31d84 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -393,6 +393,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
-> >  	case KVM_CAP_COUNTER_OFFSET:
-> >  	case KVM_CAP_ARM_WRITABLE_IMP_ID_REGS:
-> >  	case KVM_CAP_ARM_SEA_TO_USER:
-> > +	case KVM_CAP_PRE_FAULT_MEMORY:
-> >  		r = 1;
-> >  		break;
-> >  	case KVM_CAP_SET_GUEST_DEBUG2:
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index 16299004f229..401ae538ae75 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -5,6 +5,7 @@
-> >   */
-> >
-> >  #include <linux/acpi.h>
-> > +#include <linux/cleanup.h>
-> >  #include <linux/mman.h>
-> >  #include <linux/kvm_host.h>
-> >  #include <linux/io.h>
-> > @@ -1554,9 +1555,9 @@ static void *get_mmu_memcache(struct kvm_vcpu *vcpu)
-> >  		return &vcpu->arch.pkvm_memcache;
-> >  }
-> >
-> > -static int topup_mmu_memcache(struct kvm_vcpu *vcpu, void *memcache)
-> > +static int topup_mmu_memcache(struct kvm_s2_mmu *mmu, void *memcache)
-> >  {
-> > -	int min_pages = kvm_mmu_cache_min_pages(vcpu->arch.hw_mmu);
-> > +	const int min_pages = kvm_mmu_cache_min_pages(mmu);
->
-> Changes to the memcache interface in a separate patch, please.
+> > I could see things like HugeTLB not working if someone booted the kernel with
+> > support for only 1GiB pages and then tried to feed it payload with sub-1GiB ranges.
+> > But to me, those sorts of things fall into the "well yeah, don't do that" category.
+> 
+> Okay, how about worse, todays kernel has hugetlbfs and there are
+> patches around to luo serialize that. Lots and lots of talks about a
+> post-hugetlbfs world out there.
 
-Ack!
+And?  Adding a compatibility layer to a future kernel so that it understands an
+incoming HugeTLBFS payload should be trivial.  I can totally see not wanting to
+support serializing a post-HugeTBLFS kernel's memory representation into the "old"
+format, though even that probably wouldn't be all that difficult.
 
->
-> >
-> >  	if (!is_protected_kvm_enabled())
-> >  		return kvm_mmu_topup_memory_cache(memcache, min_pages);
-> > @@ -1605,6 +1606,7 @@ struct kvm_s2_fault_desc {
-> >  	unsigned long		hva;
-> >  	unsigned long		esr;
-> >  	struct kvm_s2_mmu	*mmu;
-> > +	bool			pre_fault;
->
-> No, please, that's horrible. See below.
+> Do we want to constrain what is possible to ensure we accomodate this
+> hugetlbfs serialization? I vote no.
 
-Yeah, I think this was a carry-through from the original series. Will drop!
+In what way is providing strong ABI guarantees for individual components
+constraining HugeTBLFS serialization?
 
->
-> >  };
-> >
-> >  struct kvm_s2_fault_result {
-> > @@ -1664,7 +1666,7 @@ static int gmem_abort(const struct kvm_s2_fault_desc *s2fd,
-> >
-> >  	if (!perm_fault) {
-> >  		memcache = get_mmu_memcache(s2fd->vcpu);
-> > -		ret = topup_mmu_memcache(s2fd->vcpu, memcache);
-> > +		ret = topup_mmu_memcache(s2fd->mmu, memcache);
-> >  		if (ret)
-> >  			return ret;
-> >  	}
-> > @@ -1761,7 +1763,7 @@ static int pkvm_mem_abort(const struct kvm_s2_fault_desc *s2fd)
-> >  	int ret;
-> >
-> >  	hyp_memcache = get_mmu_memcache(vcpu);
-> > -	ret = topup_mmu_memcache(vcpu, hyp_memcache);
-> > +	ret = topup_mmu_memcache(s2fd->mmu, hyp_memcache);
-> >  	if (ret)
-> >  		return -ENOMEM;
-> >
-> > @@ -1953,6 +1955,8 @@ static int kvm_s2_fault_pin_pfn(const struct kvm_s2_fault_desc *s2fd,
-> >  				      &s2vi->map_writable, &s2vi->page);
-> >  	if (unlikely(is_error_noslot_pfn(s2vi->pfn))) {
-> >  		if (s2vi->pfn == KVM_PFN_ERR_HWPOISON) {
-> > +			if (s2fd->pre_fault)
-> > +				return -EHWPOISON;
->
-> I'd rather *always* return -EHWPOISON here, and move the signal
-> injection into the callers. That would much more consistent.
+> Do we want to reject the hugetlbfs serialization until we have a year
+> of debate outlining every possible ABI scenario? I also vote no.
 
-OK that is nicer :) Will do that instead.
+That's a bit of a strawman argument.  Is designing a forward-looking ABI easy?
+No, but IMO "a year" is a massive exaggeration of the effort required to come up
+with a scheme that can survive a variety of plausible upgrade/downgrade scenarios.
 
->
-> >  			kvm_send_hwpoison_signal(s2fd->hva, __ffs(s2vi->vma_pagesize));
-> >  			return 0;
-> >  		}
-> > @@ -2163,7 +2167,7 @@ static int user_mem_abort(const struct kvm_s2_fault_desc *s2fd,
-> >  	memcache = get_mmu_memcache(s2fd->vcpu);
-> >  	if (!perm_fault || memslot_is_logging(s2fd->memslot) ||
-> >  	    is_protected_kvm_enabled()) {
-> > -		ret = topup_mmu_memcache(s2fd->vcpu, memcache);
-> > +		ret = topup_mmu_memcache(s2fd->mmu, memcache);
-> >  		if (ret)
-> >  			return ret;
-> >  	}
-> > @@ -2185,18 +2189,22 @@ static int user_mem_abort(const struct kvm_s2_fault_desc *s2fd,
-> >  	return kvm_s2_fault_map(s2fd, &s2vi, prot, memcache, result);
-> >  }
-> >
-> > -/* Resolve the access fault by making the page young again. */
-> > -static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
-> > +static void __handle_access_fault(struct kvm_pgtable *pgt, phys_addr_t fault_ipa)
-> >  {
-> >  	enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_SHARED;
-> > -	struct kvm_s2_mmu *mmu;
-> >
-> >  	trace_kvm_access_fault(fault_ipa);
-> > +	KVM_PGT_FN(kvm_pgtable_stage2_mkyoung)(pgt, fault_ipa, flags);
-> > +}
-> > +
-> > +/* Resolve the access fault by making the page young again. */
-> > +static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
-> > +{
-> > +	struct kvm_s2_mmu *mmu;
-> >
-> > -	read_lock(&vcpu->kvm->mmu_lock);
-> > +	guard(read_lock)(&vcpu->kvm->mmu_lock);
-> >  	mmu = vcpu->arch.hw_mmu;
-> > -	KVM_PGT_FN(kvm_pgtable_stage2_mkyoung)(mmu->pgt, fault_ipa, flags);
-> > -	read_unlock(&vcpu->kvm->mmu_lock);
-> > +	__handle_access_fault(mmu->pgt, fault_ipa);
-> >  }
-> >
-> >  /*
-> > @@ -2834,3 +2842,165 @@ void kvm_toggle_cache(struct kvm_vcpu *vcpu, bool was_enabled)
-> >
-> >  	trace_kvm_toggle_cache(*vcpu_pc(vcpu), was_enabled, now_enabled);
-> >  }
-> > +
-> > +static bool kvm_pte_young_s2(kvm_pte_t pte)
-> > +{
-> > +	return pte & KVM_PTE_LEAF_ATTR_LO_S2_AF;
-> > +}
-> > +
-> > +static void kvm_pte_mkyoung_s2(struct kvm_pgtable *pgt, gpa_t gpa)
-> > +{
-> > +	struct kvm *kvm = kvm_s2_mmu_to_kvm(pgt->mmu);
-> > +
-> > +	lockdep_assert_held(&kvm->mmu_lock);
-> > +	/* Despite its name, doesn't fault here. */
-> > +	__handle_access_fault(pgt, gpa);
-> > +}
-> > +
-> > +/*
-> > + * Try to walk to the specified GPA in canonical mmu - if unmapped returns 0, if
-> > + * mapped returns the granule size, otherwise returns an error.
-> > + */
-> > +static long kvm_walk_s2(struct kvm_pgtable *pgt,
-> > +			gpa_t gpa, s8 *level)
-> > +{
-> > +	struct kvm *kvm = kvm_s2_mmu_to_kvm(pgt->mmu);
-> > +	kvm_pte_t pte;
-> > +	long ret;
-> > +
-> > +	guard(read_lock)(&kvm->mmu_lock);
-> > +
-> > +	ret = kvm_pgtable_get_leaf(pgt, gpa, &pte, level,
-> > +				   KVM_PGTABLE_WALK_SHARED);
-> > +	if (ret)
-> > +		return ret;
-> > +	/* Unpopulated, must fault. */
-> > +	if (!kvm_pte_valid(pte))
-> > +		return 0;
-> > +	/* Walked the entry so mark young. */
-> > +	if (!kvm_pte_young_s2(pte))
-> > +		kvm_pte_mkyoung_s2(pgt, gpa);
->
-> I'm not sold on this either. The contract with userspace is to map the
-> page at S2, not to pretend it has been accessed by the vcpu. I don't
-> see why we should do that, as this is a departure from an established
-> behaviour.
+And again, I'm not saying we have to support infinite compatibility.  If some
+future kernel drops HugeTLBFS, and we decide not to provide a shim to support
+downgrading (which IMO is totally reasonable), then it's on the user to understand
+that moving to that new kernel is a one-way street.  Given that dropping something
+like HugeTLBFS would require significant changes in the software stack, I think
+it's perfectly fine to put the burden of understanding the implications on the end
+user (though realistically, there would be a copious amount of documentation and
+deprecation warnings).
 
-Ack, yeah, that's fair enough.
+> Should we make a downgrade round trip a downstream problem? I think
+> so!
 
-Thinking was it's the 'equivalent of touching the pages', but for existing pages
-that's not the case at all.
-
-New pages will be born young, but that makes sense since you did actually do
-something (fault them in).
-
->
-> > +	return kvm_granule_size(*level);
-> > +}
-> > +
-> > +/* Synthesised data abort at specified page table level. */
-> > +#define PRE_FAULT_ESR(level)				\
-> > +	 ((ESR_ELx_EC_DABT_LOW << ESR_ELx_EC_SHIFT) |	\
-> > +	  ESR_ELx_IL | ESR_ELx_FSC_FAULT_L(level))
-> > +
-> > +/* Retrieve either a read-only or a read/write hva. */
-> > +static hva_t gfn_to_hva_memslot_read(struct kvm_memory_slot *slot, gfn_t gfn)
-> > +{
-> > +	return gfn_to_hva_memslot_prot(slot, gfn, /*writable=*/NULL);
-> > +}
-> > +
-> > +static long __pre_fault_s2(struct kvm_s2_mmu *mmu, struct kvm_vcpu *vcpu,
-> > +			   gpa_t gpa, struct kvm_memory_slot *memslot, s8 level)
-> > +{
-> > +	const bool is_gmem  = kvm_slot_has_gmem(memslot);
-> > +	const gfn_t gfn = gpa_to_gfn(gpa);
-> > +	const hva_t hva = is_gmem ? 0 : gfn_to_hva_memslot_read(memslot, gfn);
-> > +	const struct kvm_s2_fault_desc s2fd = {
-> > +		.vcpu		= vcpu,
-> > +		.fault_ipa	= gpa,
-> > +		.nested		= NULL,
-> > +		.memslot	= memslot,
-> > +		.hva		= hva,
-> > +		.esr		= PRE_FAULT_ESR(level),
-> > +		.mmu		= mmu,
-> > +		.pre_fault	= true,
-> > +	};
-> > +	struct kvm_s2_fault_result result = {};
-> > +	long ret;
-> > +
-> > +	if (kvm_is_error_hva(hva))
-> > +		return -EFAULT;
-> > +
-> > +	if (is_gmem)
-> > +		ret = gmem_abort(&s2fd, &result);
-> > +	else
-> > +		ret = user_mem_abort(&s2fd, &result);
-> > +	if (IS_ERR_VALUE(ret))
-> > +		return ret;
-> > +	if (!result.mapped)
-> > +		return -EAGAIN;
-> > +	return result.mapping_size;
-> > +}
-> > +
-> > +static long pre_fault_s2(struct kvm_s2_mmu *mmu, struct kvm_vcpu *vcpu,
-> > +			 gpa_t gpa, struct kvm_memory_slot *memslot)
-> > +{
-> > +	s8 level = KVM_PGTABLE_LAST_LEVEL;
->
-> level is the result of a successful walk. Why do we need to initialise
-> this to anything here? We don't seem to do that anywhere else.
-
-I feared that level wouldn't get assigned, but looking through the code, if
-kvm_walk_s2() returns 0 then it's always assigned so will update -> s8 level;
-
->
-> > +	long ret;
-> > +
-> > +	/* Try a walk first. */
-> > +	ret = kvm_walk_s2(mmu->pgt, gpa, &level);
-> > +	if (ret)
-> > +		return ret;
-> > +	/* OK, have to fault page in. */
-> > +	return __pre_fault_s2(mmu, vcpu, gpa, memslot, level);
-> > +}
-> > +
-> > +static unsigned long
-> > +pre_fault_bytes_consumed(gpa_t gpa, unsigned long granule_size,
-> > +			 unsigned long bytes_remaining)
-> > +{
-> > +	/* Granules are always a power-of-2. */
-> > +	const unsigned long granule_bytes_remaining =
-> > +		granule_size - (gpa % granule_size);
-> > +
-> > +	return min(granule_bytes_remaining, bytes_remaining);
-> > +}
-> > +
-> > +/* If you lose the race this many times, time to give up. */
-> > +#define MAX_PRE_FAULT_RETRIES 3
-> > +
-> > +/**
-> > + * kvm_arch_vcpu_pre_fault_memory - pre-fault stage-2 page tables for the
-> > + * specified GPA.
-> > + * @vcpu:	The VCPU pointer
-> > + * @range:	{gpa, size, flags} tuple
-> > + *
-> > + * The mapping performed is always best-effort - faulting in is necessarily
-> > + * racey. The ranges faulted in are canonical, nested page tables are ignored.
-> > + *
-> > + * If the GPA is already mapped, the page table entry is marked young.
-> > + *
-> > + * @range->gpa specifies the GPA to pre-fault, @range->size specifies how many
-> > + * bytes remain to be pre-faulted and @range->flags is reserved and must be 0.
-> > + *
-> > + * Returns: the number of bytes the pre-fault consumed, or an error.
-> > + */
-> > +long kvm_arch_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
-> > +				    struct kvm_pre_fault_memory *range)
-> > +{
-> > +	struct kvm *kvm = vcpu->kvm;
-> > +	const u64 bytes_remaining = range->size;
-> > +	struct kvm_s2_mmu *mmu = &kvm->arch.mmu; /* Canonical. */
-> > +	struct kvm_memory_slot *memslot;
-> > +	const gpa_t gpa = range->gpa;
-> > +	int num_retries = 0;
-> > +	long ret;
-> > +
-> > +	/*
-> > +	 * pKVM is unsupported as their vCPUs are instantiated on first run and
-> > +	 * pre-faulting only running vCPUs would be inconsistent and confusing.
-> > +	 */
-> > +	if (is_protected_kvm_enabled())
-> > +		return -EOPNOTSUPP;
-> > +
-> > +	memslot = gfn_to_memslot(kvm, gpa_to_gfn(gpa));
-> > +	if (!memslot)
-> > +		return -ENOENT;
-> > +	/* SRCU must be released for progress and only userland can do that. */
-> > +	if (memslot->flags & KVM_MEMSLOT_INVALID)
-> > +		return -EAGAIN;
-> > +
-> > +	do {
-> > +		ret = pre_fault_s2(mmu, vcpu, gpa, memslot);
-> > +	} while (ret == -EAGAIN && num_retries++ < MAX_PRE_FAULT_RETRIES);
-> > +
-> > +	if (IS_ERR_VALUE(ret))
-> > +		return ret;
-> > +	return pre_fault_bytes_consumed(gpa, ret, bytes_remaining);
-> > +}
-> >
->
-> Thanks,
->
-> 	M.
->
-> --
-> Without deviation from the norm, progress is not possible.
-
---
-Cheers, Lorenzo
+Hard NAK.  There will inevitably be boundaries that cannot be crossed, but I am
+not at all ok punting on downgrades.  To me, that's basically saying "we want to
+add just enough support upstream so that it's not too painful to carry full support
+out-of-tree".  That completely goes against the spirit of open source and upstream
+Linux, and I want no part of it.
