@@ -1,95 +1,102 @@
-Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com [209.85.210.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4590E47A876
-	for <kvmarm@lists.linux.dev>; Thu, 10 Sep 2026 11:46:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52D7847DD63;
+	Thu, 10 Sep 2026 11:55:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789040795; cv=none; b=FWsHigLeFF+Jt95WkvGkUQWUvf1+2L/5+PbT7+KnFXCjVemXKRa/BHekDiLRniFEB9vf3+/lsy5R9VjGQGPDAcLn4bCnushP73HuzYS/5Q9UCSYj/thSqlr618q5S6/twIAxmCSKH+Ztv+UrsanHzZCbJlNll+bFen2T4NcXAhY=
+	t=1789041305; cv=none; b=WQ2xjJ7gSjC70d/NFs3HBYJINEsjZ9Eh2ZOo9tB/1b53Jyo11c7M8iMvul6IWSUQXi+pwCrJAuAX44oQslXbdplYRdpyHlFx1Er/hoKzDPLoicW3l6ogJoRtZUpRDqykgMI8ck174TMsUgKxBn1GktU7GPPj5dRqlfdWWwOOnpw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789040795; c=relaxed/simple;
-	bh=+9G8GC05NdLHXF8cStdhp+Ruyt/HZZEYr3s5pM8Whfc=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References; b=OAfmts5KQMZhiXJzOVidouSpPCELc8nEdUi8FN3xxhUUucn4CqzauFsd4sJibkeXLVRO+Z27VU1eEcy5eFyxtTNfOohyg8AOvuW3u+zQnprvELWs7uuwL1oFBC5zPTUwF5mGFadKumFpzed0sKkB5U2RarueA4zeFCGfXmtsJJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VB2JOTzg; arc=none smtp.client-ip=209.85.210.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1789041305; c=relaxed/simple;
+	bh=+ZqHmy06NA420lWJ/kGBbAb4WZXxTgfB7KLb3uy3Re0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SHMP5EChCE6kofHodrX+dvRdMbQrf+I9HpD93U15UBS+xhJLsywOvfovDz5b6/NF3m59acH0pUvZRhcopAOXWcM3fCKkbJwV2ZveiyaA26qVYz1DqfjtOFzE80dyssKDiq4fhiFZC01Qx/4Lc8xbVpdHWrFNGKHYVC7rJidTxlM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h6eNZ+sX; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VB2JOTzg"
-Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-7eb61bbeb25so6775944a34.1
-        for <kvmarm@lists.linux.dev>; Thu, 10 Sep 2026 04:46:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789040785; x=1789645585; darn=lists.linux.dev;
-        h=references:message-id:date:in-reply-to:subject:cc:to:from:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=4oV1R7Sem2YZktphiH9OH9k3wSSCyVuVuzldh1QWGuY=;
-        b=VB2JOTzgYXxIR/p/+IebzVoFeUsQCI9fAesBKQ/falBZ1OSELHL/i3p1x9NFS3FVJw
-         WIyMFz+bu0MbOU+6ZoAibX7B8fQMNzE72DGTbAB1Ju8Cr0n6ExI+kYtvk1NQHVaEwNNb
-         78SVmIvc4H87r4LpFktip+Vylv0Pt9n7+/hAD1+5H5porFND/KPf6y/Vgg0kA0WWcTgf
-         5Ib5Pyhmk7rrHcE65seAUkL1v/cG8qkFEj2UyE2weCfS9DPhL1CyShaufHy6XpWFx2ch
-         T9F2NlaqTmD6FFlDbhwDbOX3fMtXiRnGXgxGKPAN6yIOHK4r2zkzQbd1TDhJicbztBnW
-         Oa9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789040785; x=1789645585;
-        h=references:message-id:date:in-reply-to:subject:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=4oV1R7Sem2YZktphiH9OH9k3wSSCyVuVuzldh1QWGuY=;
-        b=qmWRVVM2+bLqkN2VwRWjIIDeDzURZ+H3Jnvl+Zb+jRaTvCdIia4iozzZkqnK192YNU
-         Idt6frDM1qfVIHG2gdIdXT+buKjE2COXW9IzhOYxDZUoOxBiBUem7KmHJBtlK2A7oUAg
-         VreCFclMnskqWbcLxt1kxfGspj8HcwDJMYEAd7VVNhN/v86fO69JL9zConLVoJFwLMPY
-         0Bg6q5SZXLvbff/SAcVhuyHp49VsaaD9PLFaEhyDffh0gupZ4MSNnKVkDtq3JLg4/+XT
-         cZ3ckPHXAn3EJ/0KYTsYPWfsLorT2Otoi6RmA0kadv7jyFzSjtELuaShqFXbgFHqWUYF
-         3ECg==
-X-Forwarded-Encrypted: i=1; AKwUvByVssFZ3ys1eGRzHYr3idTUjVHFtdmJwbwxp9Cc7jjMvrGxPE2P3JxfCTT2FPK18YGmwQFinzE=@lists.linux.dev
-X-Gm-Message-State: AFuF++n575U22UVrGmwiNof+wdWoEZLYcFnTLNZclWB/iCvfunk9317N
-	QHvczEkn5OGvNxGJ0Ud+Le5MbyUEELSno0EiDIFsxm/Fwu5uslrn4wCu
-X-Gm-Gg: AYBFou2fpsnbWNHYbZWS1OLNRjb1iBOKSwyh1pRPl0s53WztznaIqjn2DbJ0ZXB3TmO
-	NAc51f4L9lsr+qjQ5X+lx7nSN2rZ2NSLWHBBF05GjsLBbiVCD6J12vAZoi/BtB9ikCUMyNHlCPo
-	rWG4bYih+haMxtY9yibSy2B51HddKApdsnV63LS7mERkRneXuC/k/BcksFZ28LFFAmxu+ltTXrf
-	cZXiaRqZk44NfTQautAiQyph1FPxmrtMtvgVL8JhjJ1bI6Pjcf+eTvJk7xCUAWfHazFhL8OLdg6
-	bm4Fy421KPvhKrm8whUpRbZ3VkVJwP4rKJZJNUMugn9dYl4bgrMC4U98Oo1RqAtiIeK1VpPAigJ
-	FDEFzHzmgfGOavZKdsWu7ayzS+AEsk3kr/fHwIJdgU9e1tjZSa1z8PRBaiVcIaDT8cL6eys7emS
-	nTOUiH2yqbjoJAdSUnrvIpNoDswUtMOGvsrjVP1kgdqCCEArbbC24+QXvsqcnone5k4p6ZfxTPT
-	X5kwOdT9M+z2ihhtRoVveICSYCOQHMYAYQF413G/2wXSxkh5/Kn9jo=
-X-Received: by 2002:a05:6820:180d:b0:6b7:8415:d78f with SMTP id 006d021491bc7-6b78415d8bbmr19129181eaf.58.1789040785360;
-        Thu, 10 Sep 2026 04:46:25 -0700 (PDT)
-Received: from pve-server ([49.205.216.49])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-143240d86c3sm46857652c88.0.2026.09.10.04.46.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Sep 2026 04:46:24 -0700 (PDT)
-From: Ritesh Harjani (IBM) <ritesh.list@gmail.com>
-To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, Atish Patra <atish.patra@linux.dev>, Alexandre Ghiti <alex@ghiti.fr>, David Hildenbrand <david@kernel.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, Itaru Kitayama <itaru.kitayama@fujitsu.com>, Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH v2 17/20] KVM: selftests: Take the memory region type, not memslot, in page allocators
-In-Reply-To: <20260902164123.2546762-18-seanjc@google.com>
-Date: Thu, 10 Sep 2026 17:10:56 +0530
-Message-ID: <33vh1ghj.ritesh.list@gmail.com>
-References: <20260902164123.2546762-1-seanjc@google.com> <20260902164123.2546762-18-seanjc@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h6eNZ+sX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 301CC1F000FF;
+	Thu, 10 Sep 2026 11:55:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789041303;
+	bh=DsIKaXsbd3oQK51GUuuShGYl+ZCD6Zk6ICZGAE3/Axc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=h6eNZ+sXw4AWxpLP3I4e+pMa5MNo4FUv4VC0feJItgCsK126jpBMVC8weELoNkxTF
+	 zQxWJHQzRu0pJwXOStLezi7jxyaWzHEQS/I1dPRQpClnXukfBc4Oc5sM06LYwZOE9o
+	 CLLLwFY11oZY3ww6MdO6/P9nDC73ki677zjqW4upfgcAQ9WXkm765BVaborzOKLK3v
+	 6/LsVfSoQ2aSa1dYT9B0fGXkBnf06J7900Rm9CCnOhFLhZhEAKDG1qNDmhtNcB8vui
+	 YhW4K7YjtuUvT686IpXcuSFllFZRFDmhLiV4aDP7V/0xf+dW/Lhh0Y+N8NgLHDsT5g
+	 mToSmHbES1Z+Q==
+Date: Thu, 10 Sep 2026 12:54:57 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Wei-Lin Chang <weilin.chang@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>, Fuad Tabba <fuad.tabba@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Sascha Bischoff <Sascha.Bischoff@arm.com>,
+	Ben Horgan <ben.horgan@arm.com>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Thomas Huth <thuth@redhat.com>,
+	James Clark <james.clark@linaro.org>,
+	Anshuman Khandual <anshuman.khandual@arm.com>
+Subject: Re: [PATCH v1 2/3] arm64: sysreg: Add TCR_EL2 to sysreg
+ infrastructure
+Message-ID: <01b5d61c-6a73-44a8-9ce0-8d42c4c193c1@sirena.org.uk>
+References: <20260909222015.3046432-1-weilin.chang@arm.com>
+ <20260909222015.3046432-3-weilin.chang@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="Wmlp6y25lOXpLuhH"
+Content-Disposition: inline
+In-Reply-To: <20260909222015.3046432-3-weilin.chang@arm.com>
+X-Cookie: Gravity brings me down.
 
-Sean Christopherson <seanjc@google.com> writes:
 
-> Take the memory region type instead of the memslot in all page allocator
-> APIs, except for the innermost quad-underscores function.  This will allow
-> automatically selecting the minimum GPA based on the allocation type, which
-> can't be done using the memslot due to all regions sharing a single memslot
-> by default.  PowerPC support will also leverage the type to ensure that
-> page table allocations are naturally aligned.
->
+--Wmlp6y25lOXpLuhH
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-yup, PowerPC can leverage this.
+On Wed, Sep 09, 2026 at 11:20:14PM +0100, Wei-Lin Chang wrote:
 
-> No functional change intended.
->
+> Convert TCR_EL2 to the sysreg infrastructure with data extracted from
+> Registers.json of the BSD licenced AARCHMRS
+> (AARCHMRS_OPENSOURCE_A_profile_FAT-2026-06).
 
-Sure, even though the callers are changed to pass type instead of slot,
-the inner page allocator is moved to pass vm->memslots[type] to
-____vm_phy_pages_alloc(). So no functional change.
+Checks out against DDI0601 2026-06.
 
-LGTM.
-Reviewed-by: Ritesh Harjani (IBM) <ritesh.list@gmail.com>
+> +Enum	13:12	SH0
+> +	0b00	NONE
+> +	0b10	OUTER
+> +	0b11	INNER
+> +EndEnum
 
+Could do NS, OS, IS but that's bikeshedding.  Either way:
+
+Reviewed-by: Mark Brown <broonie@kernel.org>
+
+--Wmlp6y25lOXpLuhH
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmqimpAACgkQJNaLcl1U
+h9Bt2gf9FCYK8yras4jKlP43pB+Zz0Gc3a2rukrzjFvszpCCCjYRFWmOl2K20HE6
+bRdz1EUVYc16pxo1iZVXDlXnnimRCV/Db0GD1K6N+cMOXhIQpYBp39MHN0adDoJM
+rB132cjtaeO4sTWSI8819q6+salvcjSlXhvbl5/TNj0cY3DDfBwHhAOaSFAGYvLW
+jSO4bT1Q1yGiczf2Vvt1Li1oPb/77YNDlqAS1ZIv0Tf/801d3NlpKcqUKap0Oe5g
+pOiEyKo40Ccyn91u4tjL+oON95n2FE/E4eYMaVmbmEoJhwTyOs4kqV5tAh61Y5Z2
+fYrVWaxzsMHx8NKfJIXyyF0koWk73g==
+=iUKZ
+-----END PGP SIGNATURE-----
+
+--Wmlp6y25lOXpLuhH--
