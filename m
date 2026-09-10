@@ -1,194 +1,129 @@
-Received: from mail-lf2-f12.google.com (mail-lf2-f12.google.com [74.125.229.204])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97F2E3B8406
-	for <kvmarm@lists.linux.dev>; Thu, 10 Sep 2026 18:57:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.229.204
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789066663; cv=pass; b=SCItuO1WAL5rT3WdMCxvMkPx7gzl51sXnEvhEiZLN0BlxNlCMKZDwrch7Of33NDbOdJqZ7MUMPYASqKzKm81LW514/jHTlVAMT2jxJJIpuiz/ZJZlNKpLy3ZpNF3H20oBxLvE85mc3czwC3A+cm5C9H4ho6p2If/lIaYroy1GsA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789066663; c=relaxed/simple;
-	bh=LvLi2WG97zBBaTutxiZFhYxTjRdgTSJJxA2epdOyf9k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VoQMnQUQ61hpC6rN7ra1pswym+3w9URiNX/AZWlAGbH6uiOHBjyA/kdVvclRxw8HR8oBkpr0wN8nizq9z6k60RhELYnaXzOVmUUrYpGaGkdBFknk6DVkEJEak5y4a3LXIO+Ffuct4SaXZs6rsIiMbjEaYBNMPG5Fh3XTthsGpgs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YRBy1tiy; arc=pass smtp.client-ip=74.125.229.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC01358E2DA
+	for <kvmarm@lists.linux.dev>; Thu, 10 Sep 2026 19:05:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1789067142; cv=none; b=nSjYfFiX106zp5w5WX75QxRL9Z7lDr0LnzkWGb8ROPMLRUnk1s+K8MDfH13nusTMsirgLH/EDCElHdNvS4iIUe+UhFfTKiGEpMBKTebX8zg72LbHzyZbOYXJd6lSfV0j6rTn4BR/HrytqEapLCVlsZINaO7AYwjFtf4iLR8hoXs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1789067142; c=relaxed/simple;
+	bh=BrRosa09qPfnnT8wFRJjyDdW1mX7VGPRwUOLAULnwBw=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=iQGvI3gPG6i9OF/udgiucRHXVqY4wyMot51fmDVb/n3VhjuURIeyRIGtSTCW7FoHGNlIauzgIteGmSbZxtruA/EWZkYedhFpGBf4uCDWU29Y5D13j2KbqFjGBVPhrG5dmrcJE2U0quAQWWLH+svaTlcgfV4e7mVZ+wu2I9DGfwc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hWrT9YHs; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YRBy1tiy"
-Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b78e073980so10175e87.1
-        for <kvmarm@lists.linux.dev>; Thu, 10 Sep 2026 11:57:41 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1789066660; cv=none;
-        d=google.com; s=arc-20260327;
-        b=YVxKVXALiyqfEDRmKjxxUwbZnXyZvUyIBlj3n0amcos4jkEMV51PV7EiUmI/krq60t
-         ymgK1hyY03DZJWSNurbf/yql/Yhdw5owf+PZBjK2zYiR54vFdMKIfUwlA8FYDqX9SDIy
-         WBUa5nLpASR4HMBydzj6PbhGqTmbLlyku4KP6uvBX/TIr+RvqYRUqXAf6iXSvP4ARnq/
-         DKlhWYlHgNyBLbXze60qJzxooLFC0/sZFZ6gXmNLLTpQCyICUVNmnm/mnZiE8rmRRgsm
-         nO0lEk+AHwBk6QQASaM4HnjncbmMtZpYIYMi5tWGguQaAqRBql+p4WeiThiQ5G7+NRDW
-         q7Pw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=ZrdVF7ALBocEe70y9+Oret+TDRXY2tEOhMpJsYsf+II=;
-        fh=7Dfp7GbOM5FyQhaLPVlvcIITJqt4srXHKaNqur8VdOY=;
-        b=anjHL+EaVXhkKHcGZf9aZTxULENOJbtw9Tk2PjJbjzoWxPLEb6iGPpTNw86haIAJjU
-         ZVQjOBV6tefn4kME4uR69SdDGw2eL7TOmODI/Y/Ax6aNlAZVvpuMH1O4aDGT5Hu90rx0
-         F9pClWhoQcFU+m6GKT/Wo81G6Owxpe1v0W6CdbTFnsYVdpM5xDCopsi53jKBPPVqfhGY
-         v8HIu9vbid7bhi8huTAG8R9aAAoWlpw53q6hR5Iv5y2ju4xGkLgKL+D+eF/FhHSJ+b3W
-         kCrYvnXy9GlNZEey/tCXnNNKfxB6olmrAqTzbHW+aM8XSu/0Q+QvYAVuhCU8gJvws3ij
-         SbSw==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hWrT9YHs"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-49b965570d7so2019675e9.0
+        for <kvmarm@lists.linux.dev>; Thu, 10 Sep 2026 12:05:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1789066660; x=1789671460; darn=lists.linux.dev;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=ZrdVF7ALBocEe70y9+Oret+TDRXY2tEOhMpJsYsf+II=;
-        b=YRBy1tiyOOTTaSuukWUUMQaOxefJ/my9OpvTg1boACYv2j9+VxCb77FPKOdKRf+s6Z
-         r+DyWEVoTnO05GyeZ8/Dn2yRt8BlglkOLBmTTkj03Ii25SEND3t1OnlIdB/9YcF7Bxtd
-         JrAdMy+y5ui88TLB6E6KdIt9Qcm/MlcbiUtXj1Sk88dygEivNeNQRl2315R7vN5zD1Il
-         j5F8/iHZqx1vCqxbulh8f70XAJ9C7uryXnCCGi1HA8qwBe5wUa2Xnp4+/vEYb0jkc9mb
-         qXsQUm3bKfP+ZudS2Jxe7F/2gQvQYgRBQpywmkQ1cFJ4lFa+WrmG5AkpwHfVu/m8SQ8Y
-         tD5Q==
+        d=gmail.com; s=20251104; t=1789067139; x=1789671939; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=bDPWQKpYK210YH7pdRtFQhVqun7oclqubAHor3TmIiA=;
+        b=hWrT9YHssyJFXbQk+eRKiPBqQv0QLDIvkQ3p52MNtUDV/7cEimxEojidGMJeLKbNb2
+         5LZt4g04dPxrdnXVtNfnOU1NzqYMk+hmQrQ961+41o0V1UMKh6Q19S3qCelp17M8yp1D
+         6HCWbrtzSZ1va4mb5Z4iiQ67cVfuGUa5CO+NmFj8RXWY1d9Ztahg9k26jB/PI0J/8JEr
+         6Pi5JzDQd+/BDZzVavZa9VOJWM8Bj4S5V+LHmq7bQp+eyGxLTzafWNeC+nV8lCjjFSQu
+         qTN+390b/Qr43hUucgTp7bY8aiXOTIHyIdUMN9yA+xMKbXYk1PHN0daQjKNZpfAaQJS5
+         QpTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789066660; x=1789671460;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=ZrdVF7ALBocEe70y9+Oret+TDRXY2tEOhMpJsYsf+II=;
-        b=fdzqvF6fDmdxsyZO0njs6u95ETsyy9Pwy560lLIQvnThbbvsn0bll07+i+wKJuhY5u
-         kK+nVbxcvbWthap8Oo2Zt7JTohIYUtSITuI22jYRAsFIiegJ8d807P5k4Ljj9Pi7OiWU
-         BWEO2HcAnkpCFVgC0rYjskwgHj4ESx8ReufDKM9CBT0tgI9o5JqvgTgIXecgoTN62zcb
-         U+ODh1P0eymI863A8vRQsAEDYRDGtvPS1uOnp+d8WZNDa09rOqbUN4THDiT7tf3V6Jht
-         Ia6UOv+vs7JhWKkdxa/4JOSdg0iNpfOY2nIIHbrFBPdT8jzkqfl1On1H06odF0cFXXhU
-         ezjg==
-X-Forwarded-Encrypted: i=1; AKwUvBwUPTgFTC4NX+Kjkwijqc3GUkhCQprKMuZPyxk2aS13Sz/xAa8pzsWol5PIN7rOKgxz5pmAP14=@lists.linux.dev
-X-Gm-Message-State: AFuF++lbh1UaYxNymq9IGw/JE+O449OFZqo+I2BrJsBqTpgZyvCK4h8D
-	94UG7X3jxJuGrASPIogyONvb2zHOCUAEEp62s6Bi8PsuX9WdSmsnZ+gb+JAuFURLQDAE9V9O55m
-	rlRGbR8qjt23+g19UcUcvF09PiyPvka8boSB3mg3F
-X-Gm-Gg: AYBFou3z4MkIGQoGOOgRRsy7nqLmHaq3d+jNKkPtyuBCH1AdNdQdIQrSoXoMqtlKHjO
-	AvbL8wyPODPTXpIELMNFlv+ZDz9TvfM1089SBXAbtXqxrgQbAsOax4bzxU0RjxdXcH+oqSFpLiY
-	Z7sthWMw8PAiQN8lUYUQYPw/IJO/6IsJXaS6GZb7dKoi6C/HDB72OGZYkHcoEmgythRu0Rq/ad6
-	kcU35zMvGVKCwZyxAEEkILwbSM7a8I0MuME7B1fWrboQ8V8REuRiIe8Y12O/UGgWeZMzTmnEopM
-	UWisg7QXSZkOJ2HFyJXoS5DxRXX0enTDpUaMYluRHasVFFEMwQjrjpoyulxUejVg9FLYyVliR8S
-	Y/Cjw433fzdmSY/044SGK456j
-X-Received: by 2002:a05:6512:108c:b0:5b2:a967:c0c9 with SMTP id
- 2adb3069b0e04-5b8a07ad04amr18706e87.7.1789066659207; Thu, 10 Sep 2026
- 11:57:39 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1789067139; x=1789671939;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=bDPWQKpYK210YH7pdRtFQhVqun7oclqubAHor3TmIiA=;
+        b=hxS/BwmxL/7ARVG+70Zvm/cMBN/0J+oZLiYD1a8Us2NQ93ubkdwfwIYPLeSJCCfdG8
+         9UoEt2wvAHQuzPTc8zv4IT+OSxWEmVqDXvBRHl8RgjfFJoMlv58a4UD0Sc2tldmaL6AS
+         ldYN6WtvaoqKBS39TO88Hisq7J7TV1U7JM7PbyhZE5I3Z0ptlq6O0gooEso3PFEwCMKY
+         wiqmIva+FVXrimj9hKiMtjj/lVJVkUbupJgjLsN1LxAYxbDlPpWES0TJsbKjQPCS20rp
+         WsEUX7A7G0jt5mPe5eqSMhohoeU8iF23R6esp86ipF2MjtoqMbIkjlnyeEkOMkBxGx5w
+         xyhQ==
+X-Forwarded-Encrypted: i=1; AKwUvBykNOfZRWDDkLTPrgwFfDIano/Qcw8JgQ0rfqa7NytyZZibcBbsfwwNfOsfEPpTEVLwPznBk9Y=@lists.linux.dev
+X-Gm-Message-State: AFuF++n2T+Hp2qM2J9MraoJbry2DUZ+rdF7yiMgEAsB73vVhpVxdGqm4
+	EKtvTJv++Bpq5sAfS/HMYYKHk53yKhTcqKZ1BRymeAu1RzU66YywwY6L
+X-Gm-Gg: AYBFou2tkaSCZzYmA110YvPL2tVgnPTy/wkRnHRk96Zucp6bMxFlbZc2LKoJqFYmyL5
+	wmBVnMG4GE7baBRz6LazLnbSJpHcAOqu8m7TC9Li1Jbw/gSE3DkGl+xeJDTW2KcgVpGsnJZIhCM
+	V489yMkgfUWrJAp6Cy9tqPtIxHUjSb1xznIXKAkW2Bym7VyuvWXGqg0wFUbIxbak1QvY1EvE8ni
+	ey3MIizA0Ul5vgg7/tQO/2I9+lyBAdDIjZfy2WXLUIWc43+1xSuLAyHmg88Z7JqDMmOTgqyFjx8
+	sWSijYmkZMtuBh1/qX7gTzzivLt9NYhtb0ibTwPJe4iOiYvJvREsuli1JY8yXuz63ApaobS0TpH
+	RBhCUOfT0lnLrC9FjGyGwqcKJS5SEukSwm2vsBEbHnlFLlcGYOlzno8NX/rzJkHSHCKnpQKi1LQ
+	QR3lZ3emwrCaM52n8AEmuTdHY8MJD400JoELBMyorjpRk4MLdsR9QLmrwbo2DEDPF5pPWH4Xerg
+	qr4Q/ZEl2J6adnFTzMSK8lT8gOIsaS6LAAfm3gQIyzyRNmyRwduEG5uO6bCMgsQr5CennEluZNb
+	8jMWats3JPBGijKrpC0ChE4rPSJY9je6P/39w2+gszO7ree8UHbIrWBFQP7yq1oEXSJKqQjDUC+
+	GkNbTZNY=
+X-Received: by 2002:a05:600c:1f8d:b0:499:be2d:c290 with SMTP id 5b1f17b1804b1-49e6198933cmr5181655e9.9.1789067138621;
+        Thu, 10 Sep 2026 12:05:38 -0700 (PDT)
+Received: from localhost.localdomain (dynamic-2a02-3100-b3d9-b901-601c-58ef-b3f5-74f5.310.pool.telefonica.de. [2a02:3100:b3d9:b901:601c:58ef:b3f5:74f5])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49e60adb075sm14811665e9.13.2026.09.10.12.05.37
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Thu, 10 Sep 2026 12:05:38 -0700 (PDT)
+From: Karl Mehltretter <kmehltretter@gmail.com>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>
+Cc: Karl Mehltretter <kmehltretter@gmail.com>,
+	Quentin Perret <qperret@google.com>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2] KVM: arm64: Fix kvm_get_vtcr() kernel-doc
+Date: Thu, 10 Sep 2026 21:05:28 +0200
+Message-Id: <20260910190528.4483-1-kmehltretter@gmail.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <CA+EHjTx3fmj_fkD_ybPANyTrEApMUyBscfP4JtP-F_MRL-L=2w@mail.gmail.com>
+References: <20260909063156.89636-1-kmehltretter@gmail.com> <CA+EHjTx3fmj_fkD_ybPANyTrEApMUyBscfP4JtP-F_MRL-L=2w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260825-kvm-arm-prefault-v1-0-befe8947702e@kernel.org> <20260825-kvm-arm-prefault-v1-8-befe8947702e@kernel.org>
-In-Reply-To: <20260825-kvm-arm-prefault-v1-8-befe8947702e@kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Thu, 10 Sep 2026 19:57:03 +0100
-X-Gm-Features: AcwNN1WRbRt_RViN6lNXEa633ZkRLMSCIUfMJ0FeZLRCcdVLjr-AEUXzwXInRdA
-Message-ID: <CA+EHjTy8m=b8D6sLOTv3AW05vXqFPRrTYvG7-t3D64Vt1+jAWQ@mail.gmail.com>
-Subject: Re: [PATCH 8/8] KVM: selftests: Add nested pre-fault test for arm64
-To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	Jack Thomson <jackabt@amazon.com>, Jack Thomson <jackabt.amazon@gmail.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Vincent Donnefort <vdonnefort@google.com>, 
-	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Sean Christopherson <seanjc@google.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Leo Soares Passos <Leo.Bras@arm.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hi,
+kvm_get_vtcr() takes a parameter named phys_shift, but its kernel-doc
+describes phys_shfit. This leaves the real parameter undescribed and
+adds an excess parameter description to the generated documentation.
 
-On Tue, 25 Aug 2026 at 17:02, Lorenzo Stoakes (ARM) <ljs@kernel.org> wrote:
-..
-> +int main(void)
-> +{
-> +       struct nested_s2_state s2;
-> +       struct kvm_vcpu_init init;
-> +       struct kvm_vcpu *vcpu;
-> +       struct kvm_vm *vm;
-> +       struct ucall uc;
-> +       u64 npages;
-> +
-> +       TEST_REQUIRE(kvm_check_cap(KVM_CAP_ARM_EL2));
+Correct the spelling and describe phys_shift as the IPA size in bits.
+The value written to VTCR_EL2.T0SZ is 64 - phys_shift, rather than
+phys_shift itself.
 
-Would test_supports_el2() work better here? It honours the NV=0
-opt-out, and since HAS_EL2 is set unconditionally below, NV=0 doesn't
-disable this test as things stand.
+Fixes: bcb25a2b86b4 ("KVM: arm64: Refactor kvm_arm_setup_stage2()")
+Suggested-by: Fuad Tabba <fuad.tabba@linux.dev>
+Assisted-by: LLM
+Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
+---
+Changes in v2:
+- Describe phys_shift as the IPA size in bits (Fuad).
 
-Cheers,
-/fuad
+ arch/arm64/include/asm/kvm_pgtable.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> +       TEST_REQUIRE(kvm_check_cap(KVM_CAP_PRE_FAULT_MEMORY));
-> +
-> +       vm = vm_create(1);
-> +
-> +       kvm_get_default_vcpu_target(vm, &init);
-> +       init.features[0] |= BIT(KVM_ARM_VCPU_HAS_EL2);
-> +       vcpu = aarch64_vcpu_add(vm, 0, &init, guest_code);
-> +       kvm_arch_vm_finalize_vcpus(vm);
-> +
-> +       npages = TEST_MEM_SIZE / vm->page_size;
-> +       vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, TEST_MEM_GPA,
-> +                                   TEST_MEM_SLOT, npages, 0);
-> +       virt_map(vm, TEST_MEM_GPA, TEST_MEM_GPA, npages);
-> +
-> +       vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
-> +                                   NESTED_S2_ROOT_GPA, NESTED_S2_ROOT_SLOT,
-> +                                   vm_adjust_num_guest_pages(vm->mode, 1), 0);
-> +
-> +       /* Run the guest until it has ERET'd from vEL2 to vEL1. */
-> +       vcpu_run(vcpu);
-> +       switch (get_ucall(vcpu, &uc)) {
-> +       case UCALL_SYNC:
-> +               TEST_ASSERT_EQ(uc.args[1], 1);
-> +               break;
-> +       case UCALL_ABORT:
-> +               REPORT_GUEST_ASSERT(uc);
-> +               break;
-> +       default:
-> +               TEST_FAIL("Unhandled ucall: %ld", uc.cmd);
-> +       }
-> +
-> +       /*
-> +        * The vCPU's last-run context is vEL1, backed by a shadow stage-2
-> +        * MMU. Enable nested stage-2 with an empty root so that the ioctl
-> +        * fails if it tries to interpret the userspace GPA as an L2 IPA.
-> +        *
-> +        * Prefault in two halves so that the second ioctl exercises a
-> +        * repeated shadow-MMU attach and canonical stage-2 swap.
-> +        *
-> +        * (Note that an implementation that wrongly populates shadow
-> +        * stage-2 page tables would not be caught as userland can't
-> +        * inspect these.)
-> +        */
-> +       s2 = enable_empty_nested_s2(vcpu);
-> +       pre_fault(vcpu, TEST_MEM_GPA, TEST_MEM_SIZE / 2);
-> +       pre_fault(vcpu, TEST_MEM_GPA + TEST_MEM_SIZE / 2, TEST_MEM_SIZE / 2);
-> +       restore_nested_s2(vcpu, &s2);
-> +
-> +       /* Resume at vEL1 and touch the prefaulted range. */
-> +       vcpu_run(vcpu);
-> +       switch (get_ucall(vcpu, &uc)) {
-> +       case UCALL_DONE:
-> +               break;
-> +       case UCALL_ABORT:
-> +               REPORT_GUEST_ASSERT(uc);
-> +               break;
-> +       default:
-> +               TEST_FAIL("Unhandled ucall: %ld", uc.cmd);
-> +       }
-> +
-> +       kvm_vm_free(vm);
-> +       return 0;
-> +}
->
-> --
-> 2.55.0
->
+diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+index 41a8687938eb..20d12da3d28e 100644
+--- a/arch/arm64/include/asm/kvm_pgtable.h
++++ b/arch/arm64/include/asm/kvm_pgtable.h
+@@ -532,7 +532,7 @@ u64 kvm_pgtable_hyp_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size);
+  * kvm_get_vtcr() - Helper to construct VTCR_EL2
+  * @mmfr0:	Sanitized value of SYS_ID_AA64MMFR0_EL1 register.
+  * @mmfr1:	Sanitized value of SYS_ID_AA64MMFR1_EL1 register.
+- * @phys_shfit:	Value to set in VTCR_EL2.T0SZ.
++ * @phys_shift:	IPA size, in bits.
+  *
+  * The VTCR value is common across all the physical CPUs on the system.
+  * We use system wide sanitised values to fill in different fields,
+
+base-commit: 893e11787f78e43b534e252249ac3fff4d1333f8
+-- 
+2.53.0
