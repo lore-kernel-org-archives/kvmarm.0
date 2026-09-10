@@ -1,97 +1,172 @@
-Received: from mail-pz2-f12.google.com (mail-pz2-f12.google.com [74.125.228.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE6E046D2C1
-	for <kvmarm@lists.linux.dev>; Thu, 10 Sep 2026 12:05:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.12
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 257414854FD;
+	Thu, 10 Sep 2026 12:15:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789041929; cv=none; b=Pm9yDNbqqq94v2nttXYqlq9cwgcV+fBE/bBZAnfg+iJGw5M+zBbu0Kg/zhRkgj6H12uRPzdo+baoopBTAdXG8CHGAmGL+UmRePTOMXu9AysqHtPztD7C5PbNHgEWA6aZwYn2YJbTCXBan3Z7vtpJmNwQLU4hRvPo+fNOrkz1tyo=
+	t=1789042527; cv=none; b=pgJ4Ooqtl9KxCL9sJ3yjOJFNkQnXufApHupwSzyP2iv1EPnlj8Vf8yrOjLlSHMw85Pp8ZAB9/gJ0GEu0IHzdHBcGuZg0VNRZfQECK1XQ/d1VltabJP509VcPSMN3SWUJDfcXXkQl1emsBHP/WV9ANPp7kyos+DzBus5t34y3OGk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789041929; c=relaxed/simple;
-	bh=DthyWf2+A2G2Y75caLR9paCIYHUzGrDRbammkA/3Uc4=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References; b=ESOxAQwMGEpMqRsA/8rknNn30AH3FEPRQZ2qOpbTIRyQkgMBC+Fj0e0uRO0g4RlPjbxq3wY3+4g2CDJuVpH1xAaZ6lCx7BmSa5pH17EUYlWZaxbB0eWNrc9uYonYwhX3RilSe4dD+qJVZOR0iguB0M8s34668hHjR4oGLePIRZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dqlW96hB; arc=none smtp.client-ip=74.125.228.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1789042527; c=relaxed/simple;
+	bh=BZ0bwMpbUYl98imC/LnUVp6ZHT8Fs8NKL7+q1FyBfSw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Zdf3LWoX1mOzZLQiDFj3R4rQu6HYTOd+fcJE2OOnHpJIfaahLlhKH+C7zxExU+oaJ2qR7NfJYupuBxjnzyBtiRAUxxw+cXYwH8rH9zgIUrZqGfh2KhFih2dOdtCOhsCC+gKfFbo3CH9UV3Q4NqqBcrLu76/dDtml3VCWkNobiZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=PpA+OU85; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dqlW96hB"
-Received: by mail-pz2-f12.google.com with SMTP id 41be03b00d2f7-cc4ae61629fso591829a12.2
-        for <kvmarm@lists.linux.dev>; Thu, 10 Sep 2026 05:05:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789041927; x=1789646727; darn=lists.linux.dev;
-        h=references:message-id:date:in-reply-to:subject:cc:to:from:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=j5p0fnZhfsutRgdRJoA23rs+n3VC6+9xK2KvWtfvI90=;
-        b=dqlW96hBwIpSrzeKtgkLK9MYVY2KEQi2m4sTXdqNOqpYHLxZU/RcvcbPlVeadnSYgS
-         F385cH2XEo+bi5FRW1do3J+hMgRwz0aldbtS7KrAzND+CReBJ1OyetarDrT1hVmFSpGa
-         /9Ew130EUAYTDa+YSz1lm15FxKC0QjvkPTfTL/i4UpByJQuMoWpnKGiLm6duUQsEPCS4
-         xMBHuiHl0bwS5IpClrp3GIWNNhXPeMubL2vLWqTPVPVUb+WPrRcK0dC5y9vq8YMstlw8
-         UWI7N33NP9XTpfN/GYw72zRkOkK5rpvhNXH9RNFn1jjbNs0KBx23kzZ2Ru04YW/zW6Ft
-         23bA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789041927; x=1789646727;
-        h=references:message-id:date:in-reply-to:subject:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=j5p0fnZhfsutRgdRJoA23rs+n3VC6+9xK2KvWtfvI90=;
-        b=DNVKywTJEfeOFapyYOUt1en8KGCSd3L690LglLza/fA5WYksELXsCj8zjjiOWoXddC
-         AqjjUMDCO3erDFZzeKrUkYz7IlQ+R2OPls6T9zm4u37kjREpLlZcYyCtyoM31WaOiJox
-         UquOtDNLlVKNf8oL3GWBVIc4pBNyRRRPL5en9sV3H4C/5JPxjlha9btFQ6ZVbuNw/vHo
-         cmShKOZ8nkLp/1jY+yQyb1FCF4Me25QUZQ0BzAZeB6qVcTj4Hy0nBTLmWq3X+nUxwX/H
-         N8hUFRK7UtgYs0O1hf3XosCNgXYKyUrxesjHXx8I4tUm+F9/QEf5FJ74yaaxk+n28Xs8
-         6tQQ==
-X-Forwarded-Encrypted: i=1; AKwUvBwyCMbY9FzA5+NddqRLxq70uodHpvUYDYiXLKSopmboe/6j4Vm5TjMTjlQBcDSJyMntBMnCzZA=@lists.linux.dev
-X-Gm-Message-State: AFuF++nK0whOitCNypP5BgpX7fXrtuB86koXkd021610mkUVgWfruQPl
-	Ac7cqN7Fcda3Opsl19SqqALbh6Ka6oZlsfEmysyuO6dAosZnP2yJF2oO
-X-Gm-Gg: AYBFou0ckXbGQQ7YkDSFu6P4ZDN53Nl8Uhn2Dz3wlfR0Qz4DfHlAVexTiJ/DcP+gF70
-	INtfF/9ZZwQwbaGRlN5pIU+lviIRhr45bViiB1KkxrtpVJjdGvDda9lChBMkW8Ogi0EsC/453wI
-	DODKx0ZQCY7WO6cjvvUVyjf8jrio3xFlna+UflkJ+SSG2vWqKTHOF4ufAiqUS8N2y6kXYsuyNpW
-	x+iRQe8/Qb96CQEew2j1MGvq4mYRLF3rv8WwV/3jX344JHSPjvKbQ88UCsul2m/yiUBkeUtPFde
-	vLMt/cw5PQ1karv3P1RKQY1i5LoFTNlvSoB8S5KxHc4f5wFijiuCDD+OcDVMAI+O2kqSMuyWigV
-	HBgxhFFP7TD30CY/S56iEEUQUw8uXLUi0s9QKNPeyefBomqIVvoTF4bHbOdc+PgGKSVScXZOCB8
-	D+9wBgxwG5VZU3SOfPscfHTJZmTt+NK/n3Ie+ru+rwcEmXpfLdfyZCbUJOECvxs2dEKhD8GyJC0
-	KS9HbF11u8S6bhlVfs0fPoKkkG+aqEktTaIDLsrFsXQ+3FYvOze1zU=
-X-Received: by 2002:a17:90a:ec8b:b0:399:1b64:e0d7 with SMTP id 98e67ed59e1d1-39d70bb1bd0mr11567376a91.19.1789041926812;
-        Thu, 10 Sep 2026 05:05:26 -0700 (PDT)
-Received: from pve-server ([49.205.216.49])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3339b608409sm59190560eec.21.2026.09.10.05.05.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Sep 2026 05:05:25 -0700 (PDT)
-From: Ritesh Harjani (IBM) <ritesh.list@gmail.com>
-To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, Atish Patra <atish.patra@linux.dev>, Alexandre Ghiti <alex@ghiti.fr>, David Hildenbrand <david@kernel.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, Itaru Kitayama <itaru.kitayama@fujitsu.com>, Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH v2 20/20] KVM: selftests: Add arch hook to force page tables to be naturally aligned
-In-Reply-To: <20260902164123.2546762-21-seanjc@google.com>
-Date: Thu, 10 Sep 2026 17:27:18 +0530
-Message-ID: <zexpz5cx.ritesh.list@gmail.com>
-References: <20260902164123.2546762-1-seanjc@google.com> <20260902164123.2546762-21-seanjc@google.com>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="PpA+OU85"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E82191477;
+	Thu, 10 Sep 2026 05:15:15 -0700 (PDT)
+Received: from [10.2.197.99] (ewhatever.cambridge.arm.com [10.2.197.99])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D917A3F7B4;
+	Thu, 10 Sep 2026 05:15:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1789042519; bh=BZ0bwMpbUYl98imC/LnUVp6ZHT8Fs8NKL7+q1FyBfSw=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=PpA+OU85ezlPJhcvRzyltlc3sLmspSNcp8IEN0cEDoAnP+F1N1IDKhOgoPmLbO4JF
+	 U7Q34Pyudz1F3oWJlZSQ6rkvqndYy+RFn5eEJ4slRwLLzN96Mhk0NdorXHJQkzMAyj
+	 55niiOxvp21t4Gu2gjbiMPdHv+OUeNlTRNL4ABEY=
+Message-ID: <881e6686-7320-49fb-a673-5f1a4d336b36@arm.com>
+Date: Thu, 10 Sep 2026 13:15:17 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v17 16/20] KVM: arm64: CCA: Provide register list for
+ unfinalized RECs
+To: sashiko-reviews@lists.linux.dev
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, Marc Zyngier
+ <maz@kernel.org>, Oliver Upton <oupton@kernel.org>
+References: <20260908162223.1683432-1-suzuki.poulose@arm.com>
+ <20260908162223.1683432-17-suzuki.poulose@arm.com>
+ <20260908165709.2799B1F00A3D@smtp.kernel.org>
+Content-Language: en-US
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20260908165709.2799B1F00A3D@smtp.kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Sean Christopherson <seanjc@google.com> writes:
+On 08/09/2026 17:57, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
+> - [Medium] Mismatch between KVM_GET_REG_LIST implementation for RECs and its commit message / comment.
+> --
+> 
+> commit ce52f6b2727531d94e14139ee2966392538b6218
+> Author: Jean-Philippe Brucker <jpb@kernel.org>
+> 
+> KVM: arm64: CCA: Provide register list for unfinalized RECs
+> 
+> This commit modifies the KVM_GET_REG_LIST ioctl handler to allow fetching
+> the register list for Realm Execution Contexts (RECs) before the VCPUs are
+> fully finalized, provided SVE is finalized. It adjusts the size probing and
+> array copying logic to prevent -EPERM errors during late REC finalization.
+> 
+>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+>> --- a/arch/arm64/kvm/arm.c
+>> +++ b/arch/arm64/kvm/arm.c
+> [ ... ]
+>> @@ -1980,6 +1980,18 @@ static int kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+>>   	return __kvm_arm_vcpu_set_events(vcpu, events);
+>>   }
+>>   
+>> +/*
+>> + * Realm VCPUs can be finalized after the Realm descriptor is created.
+>> + * Allow the register list for RECs before the VCPUs are finalized, but
+>> + * after the SVE is finalized.
+>> + */
+>> +static bool kvm_arm_vcpu_reg_list_allowed(struct kvm_vcpu *vcpu)
+>> +{
+>> +	if (kvm_arm_vcpu_is_finalized(vcpu))
+>> +		return true;
+>> +	return vcpu_is_rec(vcpu);
+>> +}
+> 
+> [Severity: Medium]
+> Does this logic in kvm_arm_vcpu_reg_list_allowed() unconditionally allow
+> RECs, bypassing the SVE finalization check? The comment explicitly states
+> "but after the SVE is finalized," yet if the VCPU is a REC, this path
+> returns true regardless of the SVE finalization status.
 
-> Add an arch hook to communicate to the core physical page allocator that
-> page table allocations need to be naturally aligned.  The hook will be used
-> for upcoming PowerPC support, which has MMU tables that are larger than the
-> guest base page size and need to be naturally aligned.
->
+I have fixed the commit description as below to make it clear.
 
-Thanks Sean, for these patches. I have addressed your review comments on
-v3 of PPC KVM selftests support and ported those on top of this series.
-I am still in the process of running the entire series on a real HW
-(and some todos/minor changes to be done).
+> 
+>> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+>> --- a/arch/arm64/kvm/guest.c
+>> +++ b/arch/arm64/kvm/guest.c
+> [ ... ]
+>> @@ -616,9 +616,6 @@ static int copy_sve_reg_indices(const struct kvm_vcpu *vcpu,
+>>   	if (!vcpu_has_sve(vcpu))
+>>   		return 0;
+>>   
+>> -	/* Policed by KVM_GET_REG_LIST: */
+>> -	WARN_ON(!kvm_arm_vcpu_sve_finalized(vcpu));
+>> -
+>>   	/*
+>>   	 * Enumerate this first, so that userspace can save/restore in
+>>   	 * the order reported by KVM_GET_REG_LIST:
+>> @@ -628,6 +625,9 @@ static int copy_sve_reg_indices(const struct kvm_vcpu *vcpu,
+>>   		return -EFAULT;
+>>   	++num_regs;
+>>   
+>> +	if (!kvm_arm_vcpu_sve_finalized(vcpu))
+>> +		return num_regs;
+>> +
+> 
+> [Severity: Medium]
+> Does this return a positive success code (num_regs) rather than an error?
+> 
+> The commit message states that "a KVM_GET_REG_LIST call that only probes
+> for the array size will now succeed even if SVE is not finalized, but that
+> seems harmless since the following KVM_GET_REG_LIST with the full array
+> will fail."
+> 
+> Returning a positive number of registers here in copy_sve_reg_indices()
+> causes the full array fetch to succeed silently instead of failing as the
+> commit message claims.
 
-Will soon post v4 of PPC KVM selftests on top of this change series.
+I have massaged the commit description as below, as the current one
+looks so outdated and vague.
 
-> Bury the hook in the physical page allocator to avoid having to plumb a
-> rarely used param into the main APIs.
->
-> Cc: Ritesh Harjani (IBM) <ritesh.list@gmail.com>
+---8>---
 
-As for this change. LGTM. Feel free to add:
+KVM: arm64: CCA: Expose SVE VL register before REC finalization 
 
-Reviewed-by: Ritesh Harjani (IBM) <ritesh.list@gmail.com>
+
+Userspace must configure the SVE vector length before the Realm is 
+created (as it is part of the parameter for Realm creation), but the
+Realm VCPUs cannot be finalized until after the Realm Descriptor has
+been created.
+
+KVM_GET_REG_LIST currently rejects the unfinalized VCPUs, which prevents
+the userspace from discovering and configuring the VLs for  the Realm.
+
+Allow KVM_GET_REG_LIST for unfinalized RECs and make the SVE register 
+
+enumeration handle the unfinalized case explicitly. i.e., only expose
+KVM_REG_ARM64_SVE_VLS before SVE is finalized.
+
+One adverse side effect of this change is that a KVM_GET_REG_LIST call
+that only probes for the array size will now succeed even if SVE is not
+finalized, but that seems harmless since the following KVM_GET_REG_LIST
+with the full array will fail.
+
+
+Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+Signed-off-by: Steven Price <steven.price@arm.com>
+Reviewed-by: Gavin Shan <gshan@redhat.com> 
+
+Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+
+
+
+Suzuki
+
+> 
+>>   	for (i = 0; i < slices; i++) {
+>>   		for (n = 0; n < SVE_NUM_ZREGS; n++) {
+>>   			reg = KVM_REG_ARM64_SVE_ZREG(n, i);
+> 
 
