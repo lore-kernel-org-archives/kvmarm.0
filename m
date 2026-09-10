@@ -1,102 +1,97 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pz2-f12.google.com (mail-pz2-f12.google.com [74.125.228.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52D7847DD63;
-	Thu, 10 Sep 2026 11:55:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE6E046D2C1
+	for <kvmarm@lists.linux.dev>; Thu, 10 Sep 2026 12:05:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789041305; cv=none; b=WQ2xjJ7gSjC70d/NFs3HBYJINEsjZ9Eh2ZOo9tB/1b53Jyo11c7M8iMvul6IWSUQXi+pwCrJAuAX44oQslXbdplYRdpyHlFx1Er/hoKzDPLoicW3l6ogJoRtZUpRDqykgMI8ck174TMsUgKxBn1GktU7GPPj5dRqlfdWWwOOnpw=
+	t=1789041929; cv=none; b=Pm9yDNbqqq94v2nttXYqlq9cwgcV+fBE/bBZAnfg+iJGw5M+zBbu0Kg/zhRkgj6H12uRPzdo+baoopBTAdXG8CHGAmGL+UmRePTOMXu9AysqHtPztD7C5PbNHgEWA6aZwYn2YJbTCXBan3Z7vtpJmNwQLU4hRvPo+fNOrkz1tyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789041305; c=relaxed/simple;
-	bh=+ZqHmy06NA420lWJ/kGBbAb4WZXxTgfB7KLb3uy3Re0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SHMP5EChCE6kofHodrX+dvRdMbQrf+I9HpD93U15UBS+xhJLsywOvfovDz5b6/NF3m59acH0pUvZRhcopAOXWcM3fCKkbJwV2ZveiyaA26qVYz1DqfjtOFzE80dyssKDiq4fhiFZC01Qx/4Lc8xbVpdHWrFNGKHYVC7rJidTxlM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h6eNZ+sX; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789041929; c=relaxed/simple;
+	bh=DthyWf2+A2G2Y75caLR9paCIYHUzGrDRbammkA/3Uc4=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References; b=ESOxAQwMGEpMqRsA/8rknNn30AH3FEPRQZ2qOpbTIRyQkgMBC+Fj0e0uRO0g4RlPjbxq3wY3+4g2CDJuVpH1xAaZ6lCx7BmSa5pH17EUYlWZaxbB0eWNrc9uYonYwhX3RilSe4dD+qJVZOR0iguB0M8s34668hHjR4oGLePIRZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dqlW96hB; arc=none smtp.client-ip=74.125.228.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h6eNZ+sX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 301CC1F000FF;
-	Thu, 10 Sep 2026 11:55:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789041303;
-	bh=DsIKaXsbd3oQK51GUuuShGYl+ZCD6Zk6ICZGAE3/Axc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=h6eNZ+sXw4AWxpLP3I4e+pMa5MNo4FUv4VC0feJItgCsK126jpBMVC8weELoNkxTF
-	 zQxWJHQzRu0pJwXOStLezi7jxyaWzHEQS/I1dPRQpClnXukfBc4Oc5sM06LYwZOE9o
-	 CLLLwFY11oZY3ww6MdO6/P9nDC73ki677zjqW4upfgcAQ9WXkm765BVaborzOKLK3v
-	 6/LsVfSoQ2aSa1dYT9B0fGXkBnf06J7900Rm9CCnOhFLhZhEAKDG1qNDmhtNcB8vui
-	 YhW4K7YjtuUvT686IpXcuSFllFZRFDmhLiV4aDP7V/0xf+dW/Lhh0Y+N8NgLHDsT5g
-	 mToSmHbES1Z+Q==
-Date: Thu, 10 Sep 2026 12:54:57 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Wei-Lin Chang <weilin.chang@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>, Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Sascha Bischoff <Sascha.Bischoff@arm.com>,
-	Ben Horgan <ben.horgan@arm.com>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Thomas Huth <thuth@redhat.com>,
-	James Clark <james.clark@linaro.org>,
-	Anshuman Khandual <anshuman.khandual@arm.com>
-Subject: Re: [PATCH v1 2/3] arm64: sysreg: Add TCR_EL2 to sysreg
- infrastructure
-Message-ID: <01b5d61c-6a73-44a8-9ce0-8d42c4c193c1@sirena.org.uk>
-References: <20260909222015.3046432-1-weilin.chang@arm.com>
- <20260909222015.3046432-3-weilin.chang@arm.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dqlW96hB"
+Received: by mail-pz2-f12.google.com with SMTP id 41be03b00d2f7-cc4ae61629fso591829a12.2
+        for <kvmarm@lists.linux.dev>; Thu, 10 Sep 2026 05:05:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1789041927; x=1789646727; darn=lists.linux.dev;
+        h=references:message-id:date:in-reply-to:subject:cc:to:from:from:to
+         :cc:subject:date:message-id:reply-to:content-type;
+        bh=j5p0fnZhfsutRgdRJoA23rs+n3VC6+9xK2KvWtfvI90=;
+        b=dqlW96hBwIpSrzeKtgkLK9MYVY2KEQi2m4sTXdqNOqpYHLxZU/RcvcbPlVeadnSYgS
+         F385cH2XEo+bi5FRW1do3J+hMgRwz0aldbtS7KrAzND+CReBJ1OyetarDrT1hVmFSpGa
+         /9Ew130EUAYTDa+YSz1lm15FxKC0QjvkPTfTL/i4UpByJQuMoWpnKGiLm6duUQsEPCS4
+         xMBHuiHl0bwS5IpClrp3GIWNNhXPeMubL2vLWqTPVPVUb+WPrRcK0dC5y9vq8YMstlw8
+         UWI7N33NP9XTpfN/GYw72zRkOkK5rpvhNXH9RNFn1jjbNs0KBx23kzZ2Ru04YW/zW6Ft
+         23bA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1789041927; x=1789646727;
+        h=references:message-id:date:in-reply-to:subject:cc:to:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=j5p0fnZhfsutRgdRJoA23rs+n3VC6+9xK2KvWtfvI90=;
+        b=DNVKywTJEfeOFapyYOUt1en8KGCSd3L690LglLza/fA5WYksELXsCj8zjjiOWoXddC
+         AqjjUMDCO3erDFZzeKrUkYz7IlQ+R2OPls6T9zm4u37kjREpLlZcYyCtyoM31WaOiJox
+         UquOtDNLlVKNf8oL3GWBVIc4pBNyRRRPL5en9sV3H4C/5JPxjlha9btFQ6ZVbuNw/vHo
+         cmShKOZ8nkLp/1jY+yQyb1FCF4Me25QUZQ0BzAZeB6qVcTj4Hy0nBTLmWq3X+nUxwX/H
+         N8hUFRK7UtgYs0O1hf3XosCNgXYKyUrxesjHXx8I4tUm+F9/QEf5FJ74yaaxk+n28Xs8
+         6tQQ==
+X-Forwarded-Encrypted: i=1; AKwUvBwyCMbY9FzA5+NddqRLxq70uodHpvUYDYiXLKSopmboe/6j4Vm5TjMTjlQBcDSJyMntBMnCzZA=@lists.linux.dev
+X-Gm-Message-State: AFuF++nK0whOitCNypP5BgpX7fXrtuB86koXkd021610mkUVgWfruQPl
+	Ac7cqN7Fcda3Opsl19SqqALbh6Ka6oZlsfEmysyuO6dAosZnP2yJF2oO
+X-Gm-Gg: AYBFou0ckXbGQQ7YkDSFu6P4ZDN53Nl8Uhn2Dz3wlfR0Qz4DfHlAVexTiJ/DcP+gF70
+	INtfF/9ZZwQwbaGRlN5pIU+lviIRhr45bViiB1KkxrtpVJjdGvDda9lChBMkW8Ogi0EsC/453wI
+	DODKx0ZQCY7WO6cjvvUVyjf8jrio3xFlna+UflkJ+SSG2vWqKTHOF4ufAiqUS8N2y6kXYsuyNpW
+	x+iRQe8/Qb96CQEew2j1MGvq4mYRLF3rv8WwV/3jX344JHSPjvKbQ88UCsul2m/yiUBkeUtPFde
+	vLMt/cw5PQ1karv3P1RKQY1i5LoFTNlvSoB8S5KxHc4f5wFijiuCDD+OcDVMAI+O2kqSMuyWigV
+	HBgxhFFP7TD30CY/S56iEEUQUw8uXLUi0s9QKNPeyefBomqIVvoTF4bHbOdc+PgGKSVScXZOCB8
+	D+9wBgxwG5VZU3SOfPscfHTJZmTt+NK/n3Ie+ru+rwcEmXpfLdfyZCbUJOECvxs2dEKhD8GyJC0
+	KS9HbF11u8S6bhlVfs0fPoKkkG+aqEktTaIDLsrFsXQ+3FYvOze1zU=
+X-Received: by 2002:a17:90a:ec8b:b0:399:1b64:e0d7 with SMTP id 98e67ed59e1d1-39d70bb1bd0mr11567376a91.19.1789041926812;
+        Thu, 10 Sep 2026 05:05:26 -0700 (PDT)
+Received: from pve-server ([49.205.216.49])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3339b608409sm59190560eec.21.2026.09.10.05.05.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Sep 2026 05:05:25 -0700 (PDT)
+From: Ritesh Harjani (IBM) <ritesh.list@gmail.com>
+To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc: Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, Atish Patra <atish.patra@linux.dev>, Alexandre Ghiti <alex@ghiti.fr>, David Hildenbrand <david@kernel.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, Itaru Kitayama <itaru.kitayama@fujitsu.com>, Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH v2 20/20] KVM: selftests: Add arch hook to force page tables to be naturally aligned
+In-Reply-To: <20260902164123.2546762-21-seanjc@google.com>
+Date: Thu, 10 Sep 2026 17:27:18 +0530
+Message-ID: <zexpz5cx.ritesh.list@gmail.com>
+References: <20260902164123.2546762-1-seanjc@google.com> <20260902164123.2546762-21-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="Wmlp6y25lOXpLuhH"
-Content-Disposition: inline
-In-Reply-To: <20260909222015.3046432-3-weilin.chang@arm.com>
-X-Cookie: Gravity brings me down.
 
+Sean Christopherson <seanjc@google.com> writes:
 
---Wmlp6y25lOXpLuhH
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+> Add an arch hook to communicate to the core physical page allocator that
+> page table allocations need to be naturally aligned.  The hook will be used
+> for upcoming PowerPC support, which has MMU tables that are larger than the
+> guest base page size and need to be naturally aligned.
+>
 
-On Wed, Sep 09, 2026 at 11:20:14PM +0100, Wei-Lin Chang wrote:
+Thanks Sean, for these patches. I have addressed your review comments on
+v3 of PPC KVM selftests support and ported those on top of this series.
+I am still in the process of running the entire series on a real HW
+(and some todos/minor changes to be done).
 
-> Convert TCR_EL2 to the sysreg infrastructure with data extracted from
-> Registers.json of the BSD licenced AARCHMRS
-> (AARCHMRS_OPENSOURCE_A_profile_FAT-2026-06).
+Will soon post v4 of PPC KVM selftests on top of this change series.
 
-Checks out against DDI0601 2026-06.
+> Bury the hook in the physical page allocator to avoid having to plumb a
+> rarely used param into the main APIs.
+>
+> Cc: Ritesh Harjani (IBM) <ritesh.list@gmail.com>
 
-> +Enum	13:12	SH0
-> +	0b00	NONE
-> +	0b10	OUTER
-> +	0b11	INNER
-> +EndEnum
+As for this change. LGTM. Feel free to add:
 
-Could do NS, OS, IS but that's bikeshedding.  Either way:
+Reviewed-by: Ritesh Harjani (IBM) <ritesh.list@gmail.com>
 
-Reviewed-by: Mark Brown <broonie@kernel.org>
-
---Wmlp6y25lOXpLuhH
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmqimpAACgkQJNaLcl1U
-h9Bt2gf9FCYK8yras4jKlP43pB+Zz0Gc3a2rukrzjFvszpCCCjYRFWmOl2K20HE6
-bRdz1EUVYc16pxo1iZVXDlXnnimRCV/Db0GD1K6N+cMOXhIQpYBp39MHN0adDoJM
-rB132cjtaeO4sTWSI8819q6+salvcjSlXhvbl5/TNj0cY3DDfBwHhAOaSFAGYvLW
-jSO4bT1Q1yGiczf2Vvt1Li1oPb/77YNDlqAS1ZIv0Tf/801d3NlpKcqUKap0Oe5g
-pOiEyKo40Ccyn91u4tjL+oON95n2FE/E4eYMaVmbmEoJhwTyOs4kqV5tAh61Y5Z2
-fYrVWaxzsMHx8NKfJIXyyF0koWk73g==
-=iUKZ
------END PGP SIGNATURE-----
-
---Wmlp6y25lOXpLuhH--
