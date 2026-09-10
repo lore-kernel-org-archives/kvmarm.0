@@ -1,85 +1,282 @@
-Received: from mail-pz2-f12.google.com (mail-pz2-f12.google.com [74.125.228.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DE2945D93D
-	for <kvmarm@lists.linux.dev>; Thu, 10 Sep 2026 11:09:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.12
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FEBD3EDE4D
+	for <kvmarm@lists.linux.dev>; Thu, 10 Sep 2026 11:11:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789038591; cv=none; b=Jt2GbayFo7E5c+zsi635MwjCdcSsb11gSjBsug2VTohTeVZTp3jyAVVpzXtp/LS9pByc9vqlrFQ9IqU1kNi6/7AGOj+tX6E4/ve41DmTseSeAP2uswssl9MtbvFJS0yNkuWt/8oFD+GJ8z9UKxAzHYZeEy6cB4dBUVk5m4T05iM=
+	t=1789038680; cv=none; b=lBPQiGaKL+YlnO8vn47+U5mA0CtnsinJmfdLDhsM0eR+a87jgVpNUjO/LwZy9g6BqYcr/C5S/sfV4TGoCLPKfjuyL5rfgFG0H3tvVUSKdw+nDhtILw3+8C8/QTvk6qzxe7CQESgKQJ4UkJ4bUxXyqaZmCxruVF4FCOWGmSIaUGg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789038591; c=relaxed/simple;
-	bh=Eo81uOdJ+VH0txQFT7CDWDmJC3Wu6IIZvi7ALvkgXzU=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References; b=rtOLS863fZOIH0gmIusysCpe9TlOY/T787TeMiNZdWJGrlt7AW/sw/n87iuVd2PI7J9z6pYKUD3BsjGa1AA0smyuXCXKVao4IEdYThzHir0DDVnq7Z2NQFTUqoj3YfvPpIwuV2jTbfEokOUumVm7lEpKc33u3dDUjgI7G2T+6jM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nkJD0N/p; arc=none smtp.client-ip=74.125.228.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1789038680; c=relaxed/simple;
+	bh=hZvDUgTtll3NGhQAGAmYrBFjuHQT35dtitiVt/ESS04=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=XwFVXTNTRwvvNNdCfxRTWGm3ziv8N3KDAsCGkWSmRZmZG+wB/Cr8ROU0syPs2BABYTTyexKK+ZWP219Qo+7ZWKDgYhmcGx3gS0aJgxWxgkuB257u69LuUhPsItaIQVJkDdCaQhHJvionZtgfXu9FrDvDeRjmCpt83GncBocAKHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=svDmKsu7; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nkJD0N/p"
-Received: by mail-pz2-f12.google.com with SMTP id 41be03b00d2f7-cc1cea4bfb6so640467a12.3
-        for <kvmarm@lists.linux.dev>; Thu, 10 Sep 2026 04:09:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789038588; x=1789643388; darn=lists.linux.dev;
-        h=references:message-id:date:in-reply-to:subject:cc:to:from:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=8QbTTWk563brFKzUulM5hzJdIlUHhbe3RJ1vb+Th/iE=;
-        b=nkJD0N/p/HH7QeqkklYrLD4QRtpTZHh3GjZF6nPNbjktZ6dcDhH4K9RP62MI6NUlbg
-         GOOimYMpHD4KKrVmil1NrTVIeQr3NqYhIdNsdojtR5Y7uaiJFyefV3Y9IkuQAyxahHNO
-         N21RLC2bSA9tCgZ0tLGjTUXP8F9/diD5RGNBVzAJ2dgGez5rATqk2GTN3YsE/+H94HF6
-         2Nkt/angchDyfYkCqqeOxG//VsRcK2+8jqCYb/916a3+LWlCu7taiOUwOA6Yjp9+weys
-         TZCj0vv/6Bzw62+IXQTvUSrVF4+nAdWy16bllT18H1SOlCJYOgColCBVEzXwxIU+hVYy
-         c6Rw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789038588; x=1789643388;
-        h=references:message-id:date:in-reply-to:subject:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=8QbTTWk563brFKzUulM5hzJdIlUHhbe3RJ1vb+Th/iE=;
-        b=Ri27fJtVJtyF+4wbxRJvj5PlNqZbS4IjJR6BHDRSsaWW6A3NK6LfM/uxgtGcbszT0N
-         8LpTUOmx4DRITwTiR9r6U7fPDXRv3ltCirYTI0okiglNqGCmb+GKbD5EnFnbRDGSBCDQ
-         oHzvK1BofrZdmfdpt0kYX8a8uFZ9ynGEW8fPS/WNkXYZB2Nkgq71JXUKPilr+VlA9Rhx
-         eXN4Y/IDW2DxT9+bFl7u0L10xPcunQDoMV5Sq1KhvGe1a4Y3NtOyoagV2IACvjoEzf5N
-         Yd0GPCBeniHg334hWBjvVZRiCAuEBNVD5o6amr/DWTsLlavvnXD2z0n2y4jUEuq6B+Yt
-         Dc7w==
-X-Forwarded-Encrypted: i=1; AKwUvBwECzKGcrAE52OCb44oRB6C3TxfFdFDBwTnY+6iy7afNlKJkfRFYyrvlr1X0T9KrpfKoZ2NK1I=@lists.linux.dev
-X-Gm-Message-State: AFuF++mgCeE1g+sBotpj+eFj/yc5taeq5asiS9Naw9hzZITK0SGnYCoC
-	uJV6Z8e0CvUITxtvwci0tbNp6xOhOnBVoe/+WDQ/g4hSN+DGQjNJnpQn
-X-Gm-Gg: AYBFou3coDGptOKjxY2k3zoP+Twy0S3W8laX/0ARNZYJwEH9FuOPlHV/xCcTgJkBNVe
-	9anRlCYypldH5HxRT9xsO15Iu+QxYUwx0eJF0Ovm7EvRGH19aaQ9gR1uqamRrlgWey8DBtq8+mF
-	Ob4NppzzQs+LJ3ObCLhzgZABbuFdPaoyNnzJSZayccMU+aym2TY2vesJmq9w2um1ziqKpG+zRdf
-	KNpxnCZCJb8P2Tn5qvuUTolyXxHlKk+tFm4B+ZqcyKv2ByWvRa+J/aInQt/Y/KA25suwZXMYEMd
-	7MSeVRllO81QBgarx51Ucq3aSI7sPDM7zZPGefAitzrCvRdV39j3FOmoF2hqVcVHO+emCZIy/4+
-	ZaPoLYN2vE6qQu9du8NIM+7A4DKIWc3rlBxaUvrSHQXRCmGhAdYtsy+WCVTdOZNlBGCwkZZmPjS
-	FiDoSty8GM279CA+RClQ8jfQa9XkYxfTyaJlhr+BgRdnnMAo1bw5ISflFjDXIkzOiTo5l+K7XUi
-	9WNydGFRHcENjt9BaUvxwKKpfFl7odOe3LeWrt3W/SzxFNgPqhj1PI=
-X-Received: by 2002:a17:90a:ec8b:b0:399:1b64:e0d7 with SMTP id 98e67ed59e1d1-39d70bb1bd0mr11082578a91.19.1789038588475;
-        Thu, 10 Sep 2026 04:09:48 -0700 (PDT)
-Received: from pve-server ([49.205.216.49])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1432424d27asm68881202c88.2.2026.09.10.04.09.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Sep 2026 04:09:47 -0700 (PDT)
-From: Ritesh Harjani (IBM) <ritesh.list@gmail.com>
-To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, Atish Patra <atish.patra@linux.dev>, Alexandre Ghiti <alex@ghiti.fr>, David Hildenbrand <david@kernel.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, Itaru Kitayama <itaru.kitayama@fujitsu.com>, Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH v2 11/20] KVM: selftests: Initialize vm->memslots[] with invalid memslots during creation
-In-Reply-To: <20260902164123.2546762-12-seanjc@google.com>
-Date: Thu, 10 Sep 2026 16:39:02 +0530
-Message-ID: <7bkt1hyp.ritesh.list@gmail.com>
-References: <20260902164123.2546762-1-seanjc@google.com> <20260902164123.2546762-12-seanjc@google.com>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="svDmKsu7"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 285AB153B;
+	Thu, 10 Sep 2026 04:11:14 -0700 (PDT)
+Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E943A3F528;
+	Thu, 10 Sep 2026 04:11:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1789038677; bh=hZvDUgTtll3NGhQAGAmYrBFjuHQT35dtitiVt/ESS04=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=svDmKsu7f7je4pU3Rt+WIgJmQ7bx9kQqXZOiX3UxMMnEhE/2eNc/qzjaATmFd43f4
+	 Eg8EcAMpkHahhga3dxePfGH/Y5nbJjNhM2ApdmhGvqHdnskcXRPOWALWU0J4b6IJWg
+	 gAvVwMZblJcmHiMddwT4zkuse/2FFCz2MFNRp7FU=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Mark Brown <broonie@kernel.org>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	Yao Yuan <yaoyuan@linux.alibaba.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v20 13/14] tools: Synchronise the kernel esr.h
+Date: Thu, 10 Sep 2026 12:10:59 +0100
+Message-ID: <aqKQQ_9uhkzXGmAH@LeoBrasDK>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260901-arm64-gcs-v20-13-f31750bdfadb@kernel.org>
+References: <20260901-arm64-gcs-v20-0-f31750bdfadb@kernel.org> <20260901-arm64-gcs-v20-13-f31750bdfadb@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-Sean Christopherson <seanjc@google.com> writes:
+On Tue, Sep 01, 2026 at 10:47:11PM +0100, Mark Brown wrote:
+> To pick up definitions for GCS.
+> 
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+> ---
+>  tools/arch/arm64/include/asm/esr.h | 113 +++++++++++++++++++++++++++++++++----
+>  1 file changed, 102 insertions(+), 11 deletions(-)
+> 
+> diff --git a/tools/arch/arm64/include/asm/esr.h b/tools/arch/arm64/include/asm/esr.h
+> index f3c6403e5ef2..24c6ebe3fd41 100644
+> --- a/tools/arch/arm64/include/asm/esr.h
+> +++ b/tools/arch/arm64/include/asm/esr.h
+> @@ -19,7 +19,8 @@
+>  #define ESR_ELx_EC_FP_ASIMD	UL(0x07)
+>  #define ESR_ELx_EC_CP10_ID	UL(0x08)	/* EL2 only */
+>  #define ESR_ELx_EC_PAC		UL(0x09)	/* EL2 and above */
+> -/* Unallocated EC: 0x0A - 0x0B */
+> +#define ESR_ELx_EC_OTHER	UL(0x0A)
+> +/* Unallocated EC: 0x0B */
+>  #define ESR_ELx_EC_CP14_64	UL(0x0C)
+>  #define ESR_ELx_EC_BTI		UL(0x0D)
+>  #define ESR_ELx_EC_ILL		UL(0x0E)
+> @@ -50,7 +51,8 @@
+>  #define ESR_ELx_EC_FP_EXC32	UL(0x28)
+>  /* Unallocated EC: 0x29 - 0x2B */
+>  #define ESR_ELx_EC_FP_EXC64	UL(0x2C)
+> -/* Unallocated EC: 0x2D - 0x2E */
+> +#define ESR_ELx_EC_GCS		UL(0x2D)
+> +/* Unallocated EC:  0x2E */
+>  #define ESR_ELx_EC_SERROR	UL(0x2F)
+>  #define ESR_ELx_EC_BREAKPT_LOW	UL(0x30)
+>  #define ESR_ELx_EC_BREAKPT_CUR	UL(0x31)
+> @@ -97,6 +99,8 @@
+>  #define ESR_ELx_AET_CE		(UL(6) << ESR_ELx_AET_SHIFT)
+>  
+>  /* Shared ISS field definitions for Data/Instruction aborts */
+> +#define ESR_ELx_VNCR_SHIFT	(13)
+> +#define ESR_ELx_VNCR		(UL(1) << ESR_ELx_VNCR_SHIFT)
+>  #define ESR_ELx_SET_SHIFT	(11)
+>  #define ESR_ELx_SET_MASK	(UL(3) << ESR_ELx_SET_SHIFT)
+>  #define ESR_ELx_FnV_SHIFT	(10)
+> @@ -119,6 +123,16 @@
+>  #define ESR_ELx_FSC_SEA_TTW(n)	(0x14 + (n))
+>  #define ESR_ELx_FSC_SECC	(0x18)
+>  #define ESR_ELx_FSC_SECC_TTW(n)	(0x1c + (n))
+> +#define ESR_ELx_FSC_EXCL_ATOMIC	(0x35)
+> +#define ESR_ELx_FSC_ADDRSZ	(0x00)
+> +
+> +/*
+> + * Annoyingly, the negative levels for Address size faults aren't laid out
+> + * contiguously (or in the desired order)
+> + */
+> +#define ESR_ELx_FSC_ADDRSZ_nL(n)	((n) == -1 ? 0x25 : 0x2C)
+> +#define ESR_ELx_FSC_ADDRSZ_L(n)		((n) < 0 ? ESR_ELx_FSC_ADDRSZ_nL(n) : \
+> +						   (ESR_ELx_FSC_ADDRSZ + (n)))
+>  
+>  /* Status codes for individual page table levels */
+>  #define ESR_ELx_FSC_ACCESS_L(n)	(ESR_ELx_FSC_ACCESS + (n))
+> @@ -141,12 +155,12 @@
+>  #define ESR_ELx_SF 		(UL(1) << ESR_ELx_SF_SHIFT)
+>  #define ESR_ELx_AR_SHIFT	(14)
+>  #define ESR_ELx_AR 		(UL(1) << ESR_ELx_AR_SHIFT)
+> -#define ESR_ELx_VNCR_SHIFT	(13)
+> -#define ESR_ELx_VNCR		(UL(1) << ESR_ELx_VNCR_SHIFT)
+>  #define ESR_ELx_CM_SHIFT	(8)
+>  #define ESR_ELx_CM 		(UL(1) << ESR_ELx_CM_SHIFT)
+>  
+>  /* ISS2 field definitions for Data Aborts */
+> +#define ESR_ELx_HDBSSF_SHIFT	(11)
+> +#define ESR_ELx_HDBSSF		(UL(1) << ESR_ELx_HDBSSF_SHIFT)
+>  #define ESR_ELx_TnD_SHIFT	(10)
+>  #define ESR_ELx_TnD 		(UL(1) << ESR_ELx_TnD_SHIFT)
+>  #define ESR_ELx_TagAccess_SHIFT	(9)
+> @@ -161,8 +175,6 @@
+>  #define ESR_ELx_Xs_MASK		(GENMASK_ULL(4, 0))
+>  
+>  /* ISS field definitions for exceptions taken in to Hyp */
+> -#define ESR_ELx_FSC_ADDRSZ	(0x00)
+> -#define ESR_ELx_FSC_ADDRSZ_L(n)	(ESR_ELx_FSC_ADDRSZ + (n))
+>  #define ESR_ELx_CV		(UL(1) << 24)
+>  #define ESR_ELx_COND_SHIFT	(20)
+>  #define ESR_ELx_COND_MASK	(UL(0xF) << ESR_ELx_COND_SHIFT)
+> @@ -174,6 +186,13 @@
+>  #define ESR_ELx_WFx_ISS_WFE	(UL(1) << 0)
+>  #define ESR_ELx_xVC_IMM_MASK	((UL(1) << 16) - 1)
+>  
+> +/* ISS definitions for LD64B/ST64B/{T,P}SBCSYNC instructions */
+> +#define ESR_ELx_ISS_OTHER_ST64BV	(0)
+> +#define ESR_ELx_ISS_OTHER_ST64BV0	(1)
+> +#define ESR_ELx_ISS_OTHER_LDST64B	(2)
+> +#define ESR_ELx_ISS_OTHER_TSBCSYNC	(3)
+> +#define ESR_ELx_ISS_OTHER_PSBCSYNC	(4)
+> +
+>  #define DISR_EL1_IDS		(UL(1) << 24)
+>  /*
+>   * DISR_EL1 and ESR_ELx share the bottom 13 bits, but the RES0 bits may mean
+> @@ -371,12 +390,14 @@
+>  /*
+>   * ISS values for SME traps
+>   */
+> +#define ESR_ELx_SME_ISS_SMTC_MASK		GENMASK(2, 0)
+> +#define ESR_ELx_SME_ISS_SMTC(esr)		((esr) & ESR_ELx_SME_ISS_SMTC_MASK)
+>  
+> -#define ESR_ELx_SME_ISS_SME_DISABLED	0
+> -#define ESR_ELx_SME_ISS_ILL		1
+> -#define ESR_ELx_SME_ISS_SM_DISABLED	2
+> -#define ESR_ELx_SME_ISS_ZA_DISABLED	3
+> -#define ESR_ELx_SME_ISS_ZT_DISABLED	4
+> +#define ESR_ELx_SME_ISS_SMTC_SME_DISABLED	0
+> +#define ESR_ELx_SME_ISS_SMTC_ILL		1
+> +#define ESR_ELx_SME_ISS_SMTC_SM_DISABLED	2
+> +#define ESR_ELx_SME_ISS_SMTC_ZA_DISABLED	3
+> +#define ESR_ELx_SME_ISS_SMTC_ZT_DISABLED	4
+>  
+>  /* ISS field definitions for MOPS exceptions */
+>  #define ESR_ELx_MOPS_ISS_MEM_INST	(UL(1) << 24)
+> @@ -387,6 +408,31 @@
+>  #define ESR_ELx_MOPS_ISS_SRCREG(esr)	(((esr) & (UL(0x1f) << 5)) >> 5)
+>  #define ESR_ELx_MOPS_ISS_SIZEREG(esr)	(((esr) & (UL(0x1f) << 0)) >> 0)
+>  
+> +/* ISS field definitions for GCS */
+> +#define ESR_ELx_ExType_SHIFT	(20)
+> +#define ESR_ELx_ExType_MASK		GENMASK(23, 20)
+> +#define ESR_ELx_Raddr_SHIFT		(10)
+> +#define ESR_ELx_Raddr_MASK		GENMASK(14, 10)
+> +#define ESR_ELx_Rn_SHIFT		(5)
+> +#define ESR_ELx_Rn_MASK			GENMASK(9, 5)
+> +#define ESR_ELx_Rvalue_SHIFT		5
+> +#define ESR_ELx_Rvalue_MASK		GENMASK(9, 5)
+> +#define ESR_ELx_IT_SHIFT		(0)
+> +#define ESR_ELx_IT_MASK			GENMASK(4, 0)
+> +
+> +#define ESR_ELx_ExType_DATA_CHECK	0
+> +#define ESR_ELx_ExType_EXLOCK		1
+> +#define ESR_ELx_ExType_STR		2
+> +
+> +#define ESR_ELx_IT_RET			0
+> +#define ESR_ELx_IT_GCSPOPM		1
+> +#define ESR_ELx_IT_RET_KEYA		2
+> +#define ESR_ELx_IT_RET_KEYB		3
+> +#define ESR_ELx_IT_GCSSS1		4
+> +#define ESR_ELx_IT_GCSSS2		5
+> +#define ESR_ELx_IT_GCSPOPCX		6
+> +#define ESR_ELx_IT_GCSPOPX		7
+> +
+>  #ifndef __ASSEMBLER__
+>  #include <asm/types.h>
+>  
+> @@ -408,6 +454,11 @@ static inline bool esr_is_cfi_brk(unsigned long esr)
+>  	       (esr_brk_comment(esr) & ~CFI_BRK_IMM_MASK) == CFI_BRK_IMM_BASE;
+>  }
+>  
+> +static inline bool esr_is_ubsan_brk(unsigned long esr)
+> +{
+> +	return (esr_brk_comment(esr) & ~UBSAN_BRK_MASK) == UBSAN_BRK_IMM;
+> +}
+> +
+>  static inline bool esr_fsc_is_translation_fault(unsigned long esr)
+>  {
+>  	esr = esr & ESR_ELx_FSC;
+> @@ -439,6 +490,46 @@ static inline bool esr_fsc_is_access_flag_fault(unsigned long esr)
+>  	       (esr == ESR_ELx_FSC_ACCESS_L(0));
+>  }
+>  
+> +static inline bool esr_fsc_is_excl_atomic_fault(unsigned long esr)
+> +{
+> +	esr = esr & ESR_ELx_FSC;
+> +
+> +	return esr == ESR_ELx_FSC_EXCL_ATOMIC;
+> +}
+> +
+> +static inline bool esr_fsc_is_addr_sz_fault(unsigned long esr)
+> +{
+> +	esr &= ESR_ELx_FSC;
+> +
+> +	return (esr == ESR_ELx_FSC_ADDRSZ_L(3))	||
+> +	       (esr == ESR_ELx_FSC_ADDRSZ_L(2))	||
+> +	       (esr == ESR_ELx_FSC_ADDRSZ_L(1)) ||
+> +	       (esr == ESR_ELx_FSC_ADDRSZ_L(0))	||
+> +	       (esr == ESR_ELx_FSC_ADDRSZ_L(-1));
+> +}
+> +
+> +static inline bool esr_fsc_is_sea_ttw(unsigned long esr)
+> +{
+> +	esr = esr & ESR_ELx_FSC;
+> +
+> +	return (esr == ESR_ELx_FSC_SEA_TTW(3)) ||
+> +	       (esr == ESR_ELx_FSC_SEA_TTW(2)) ||
+> +	       (esr == ESR_ELx_FSC_SEA_TTW(1)) ||
+> +	       (esr == ESR_ELx_FSC_SEA_TTW(0)) ||
+> +	       (esr == ESR_ELx_FSC_SEA_TTW(-1));
+> +}
+> +
+> +static inline bool esr_fsc_is_secc_ttw(unsigned long esr)
+> +{
+> +	esr = esr & ESR_ELx_FSC;
+> +
+> +	return (esr == ESR_ELx_FSC_SECC_TTW(3)) ||
+> +	       (esr == ESR_ELx_FSC_SECC_TTW(2)) ||
+> +	       (esr == ESR_ELx_FSC_SECC_TTW(1)) ||
+> +	       (esr == ESR_ELx_FSC_SECC_TTW(0)) ||
+> +	       (esr == ESR_ELx_FSC_SECC_TTW(-1));
+> +}
+> +
+>  /* Indicate whether ESR.EC==0x1A is for an ERETAx instruction */
+>  static inline bool esr_iss_is_eretax(unsigned long esr)
+>  {
+> 
+> -- 
+> 2.47.3
+> 
 
-> Initialize vm->memslots[] with an invalid memslots value during very
-> initial VM creation so that failure to configure the core memory regions
-> generates an immediate assert instead of potential weirdness, e.g. if slot0
-> is coincidentally valid.  This will also allow hardening the region APIs to
-> guard overriding a region's memslot multiple times.
->
+Checked agains the Arm ARM.
+FWIW:
 
-Sure. Looks good overall. Please feel free to add:
+Reviewed-by: Leonardo Bras <leo.bras@arm.com>
 
-Reviewed-by: Ritesh Harjani (IBM) <ritesh.list@gmail.com>
+Thanks!
+Leo
