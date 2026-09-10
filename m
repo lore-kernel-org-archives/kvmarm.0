@@ -1,86 +1,483 @@
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB3EF3C3C0F
-	for <kvmarm@lists.linux.dev>; Thu, 10 Sep 2026 06:38:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79DC33AC0E4;
+	Thu, 10 Sep 2026 08:40:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789022334; cv=none; b=bMD/UGeXW1jfeU9sZimznwFy+YG8q+MyfCir7j4bF5LH3djwt+npwT8cafDKwj/1YXoaHRSocH95qPHdPK/oB2R2+PX0BZRw3ps7/ue2xfsqTiXjCv2l9ucDNfgTgii5P/KropW75mGL002f5WCA6ovcnManrFfNBzxAlWLEdeE=
+	t=1789029606; cv=none; b=UF9/U0ge4/hMliL6tSR/VCuriX6xPHrTX768w685TBhNdi0LT3l2dT6TdQAt5Ssa/G4k4LSqUINsrz08zXUc6XGipOldNfz2DUgDqSCiT7dYyh6lHjnlp6iZ8vPTs70RwatCzT7iPOJXpDdT3kaCuoO3nSr7jrrQQnQCyrVlRng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789022334; c=relaxed/simple;
-	bh=TP/7+E4rrU+pDYrVqTFosm4KeNM9JoqKXMfQYJNgxAE=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References; b=j5C9ddthTrlAOImwEt9Y9cgoKgWjoReozngPS+T0Gy0qFUkcTV4vXcGi6mvj4m+cF0KC2fVyaBWhM+zq55+5mWdu4HtcYbicnBkSxmQ7pwRra9Hp0BcBEsNZ48vjXARxhhRfRM5txz52zrEqRqreYWyisYkrjngpsxq/0vCHY1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=q9eRCiSR; arc=none smtp.client-ip=209.85.216.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1789029606; c=relaxed/simple;
+	bh=t7jvF8Iz9GHLv5D97/m/gdB+PMWLEGUx/zfYyzYZq/Y=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mBasqrI9xgcCLEkgZvoSucZaDdW4h698wO/dRNbJ54cUNFN2XIicqh6vsWKuhnZ8vxHdvv+cPplVlvmGYndOTsLQQ0+nEnootPhLGdESbf5bdkIwZBhCDvrBl6y7PvITjbcf6fz0aiaO2kEaatPJX7gNo2Uo8rZgpTWW+FU1HJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UEIVeuRF; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q9eRCiSR"
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-398b3d66515so6895346a91.0
-        for <kvmarm@lists.linux.dev>; Wed, 09 Sep 2026 23:38:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789022332; x=1789627132; darn=lists.linux.dev;
-        h=references:message-id:date:in-reply-to:subject:cc:to:from:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=TP/7+E4rrU+pDYrVqTFosm4KeNM9JoqKXMfQYJNgxAE=;
-        b=q9eRCiSRfxIQVl9pX7KDjwiJQ1+/OG9r5mWhSR2Tv0Svp6vRXUQf+xsXwq5ecDiIiC
-         hv9mGnuXXHSDN7OojfWzVCrXATuG+T9M69GTYNNnFnRc/dMsKOg0n8xpQVq3h5/V6zED
-         NwiHOKZDFHidgUiVdX/QXSbbZijXUt2cbtZ8EU1y+YzdxlvfWZxYmpLV20xzANqV+Kvy
-         BBjVkspBOyNXNguezKq9Pfdiy+oYI9EPrjjdSqICIgR5hEFpRu/M7BwkBf+E/4JyLqRB
-         R2Wp+m2sQ7tXoA8IbCKA6fh7BUPn8dbzsmvHtIwEhLHmHIBj9Pvj63ccy//JHbPcDnG5
-         W2Dw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789022332; x=1789627132;
-        h=references:message-id:date:in-reply-to:subject:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=TP/7+E4rrU+pDYrVqTFosm4KeNM9JoqKXMfQYJNgxAE=;
-        b=Wj2Lw+G7Sd3XByWnygz/bDCbirPx1FPvLolmvtFJSjVO9sYKvfRC72BDenSsCaVi8F
-         w3jDvjkQJxQyJEoFDXaDD72KM1HQVLnuE9FPsK3iiq6abuEb84+d+fcN2rJb/OR+Ka/f
-         wBgTQnrXCZUt0Ez+NouIbvfigyyabXvQOBy5orIG4HO2nqKqWQHlGJcH77kxxIVAPCu9
-         0S61UhFGtivxW7f+uaAEACM3zxSUgb+4rFFWgDjBa+xnKK96IIWi0c12PynSE+AmUpVF
-         x68WpllNwdFzIe7R0c/3TnwLJhEmNUnYPJWDKafQ3w6Jk8WwTbpc15xbwrQrG0EQedK9
-         PdBg==
-X-Forwarded-Encrypted: i=1; AKwUvByzBKgH556RXo42JcrD9wi4fHA0mtVnGc+tKpihpRudWjIMWGb+/hxxYUooPUXtgnE8LZgX7Cw=@lists.linux.dev
-X-Gm-Message-State: AFuF++mgwsVuR2bFNN2P/ioTuoyjoH9/ZgUnSeBNScn4AT1qnTNASSE3
-	tFH8VveGHIrVCflLikXIPGHTF6XffYFTNaydLL8LbPbqiL4Gtjxkg43V
-X-Gm-Gg: AYBFou0qmHNalrEwhu3KJ9ezDoZuxRzGKQhyiJsPBCdNe3l4PyWlL4xr2O4JSwS1LG4
-	BC12oCCzHc8uHvVIoV6Hsk45QzqUIwQ1AeNYQ1wwZ7sjZnwJqKycR6TLYRlMYnSsP+UfGJomG+e
-	nuAu/TdNIQjPsWtZfQ+XQKOi7nlVLny5xXUP4rLJaRyK6/LaxZEJlvWAQxza10P386vpeUeapP6
-	+ZpmddKH+ByHx0T0fjDdyRQbyfP7TVEa7XzXIpILnw57EI55khe+vxCRXG0xc4tlHJt1TPuxK5j
-	H859/Xduk9+CZ2f8ta0X4pXuniBbOhwOyyZB3YX+/jjJ5pQFuZqErSk9iVVh/fXsnX2G0PAKNX8
-	ny8N+DGlqrJM6APmFmMzriZHaQYvIN9+uTXuxqKZrxPGilGvnBCtRqnPdowdrAL59ynTudp5dMN
-	f2CoIwlJiuJUqWc3O88tnzK8ey9FHh0SUIaR+vMLAvayX30a7mWV5uv1irrgLAP9WZf+6jBP5IK
-	a+iaA++n9alOtY3cQQwocfWIMTXjZOoAPGuBum5KroF6xQomy4phmbATqhqAUmjEQ==
-X-Received: by 2002:a17:90a:2c9:b0:39b:2b5a:8dc5 with SMTP id 98e67ed59e1d1-39b2b5a9b24mr38222127a91.6.1789022332072;
-        Wed, 09 Sep 2026 23:38:52 -0700 (PDT)
-Received: from pve-server ([49.205.216.49])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-33987ccf483sm10464300eec.20.2026.09.09.23.38.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Sep 2026 23:38:51 -0700 (PDT)
-From: Ritesh Harjani (IBM) <ritesh.list@gmail.com>
-To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, Atish Patra <atish.patra@linux.dev>, Alexandre Ghiti <alex@ghiti.fr>, David Hildenbrand <david@kernel.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, Itaru Kitayama <itaru.kitayama@fujitsu.com>, Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH v2 07/20] KVM: selftests: Make the single-page allocator APIs static inline
-In-Reply-To: <20260902164123.2546762-8-seanjc@google.com>
-Date: Thu, 10 Sep 2026 12:06:11 +0530
-Message-ID: <ecf11ulg.ritesh.list@gmail.com>
-References: <20260902164123.2546762-1-seanjc@google.com> <20260902164123.2546762-8-seanjc@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UEIVeuRF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0B8D1F00893;
+	Thu, 10 Sep 2026 08:40:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789029601;
+	bh=PjigoE6nGLfCU3p/r8i4vqMZVR1+c11DMTkFvmh0EH4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=UEIVeuRFa+hvQsz+xqp2nkyBV+pJwI8+ElqDK1L2XJbnyYG89pETB1JplW87obZbE
+	 i9nmWNckvZEjmcv58vI7SRz+ieFugkVVnKQJM8v5R2fiDobcL38N8bZTY3zZxkl9JO
+	 QTo0ulmtdI3TFVcl+fVIjuEhf/HLKQ3IjK4lua9/mL0Kct4wHOHX/eIak6D0bbgdt5
+	 dddvr1GpfG44UmUnPWbD+qbRj0qtFbkMMFupKYVD4Cy1Lp4HjhL96jPBiGNSOos+dF
+	 VonhxAq9gdA3jmni8iz8ZoqGY8ko08PtZ2cPf7SwBf8jvV6qOvecYRGpJOPWEJJvZM
+	 MyRmpMYJetPRg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1x4aK7-00000007A4S-0be4;
+	Thu, 10 Sep 2026 08:39:59 +0000
+Date: Thu, 10 Sep 2026 09:39:58 +0100
+Message-ID: <86wlst7b4x.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Jack Thomson <jackabt@amazon.com>,
+	Jack Thomson <jackabt.amazon@gmail.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	Leo Soares Passos <Leo.Bras@arm.com>
+Subject: Re: [PATCH 1/8] KVM: arm64: Propagate and use esr in s2fd when handling guest aborts
+In-Reply-To: <20260825-kvm-arm-prefault-v1-1-befe8947702e@kernel.org>
+References: <20260825-kvm-arm-prefault-v1-0-befe8947702e@kernel.org>
+	<20260825-kvm-arm-prefault-v1-1-befe8947702e@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ljs@kernel.org, catalin.marinas@arm.com, will@kernel.org, oupton@kernel.org, tabba@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, pbonzini@redhat.com, corbet@lwn.net, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, jackabt@amazon.com, jackabt.amazon@gmail.com, alexandru.elisei@arm.com, vdonnefort@google.com, aneesh.kumar@kernel.org, seanjc@google.com, imbrenda@linux.ibm.com, Leo.Bras@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Sean Christopherson <seanjc@google.com> writes:
+On Tue, 25 Aug 2026 17:00:35 +0100,
+"Lorenzo Stoakes (ARM)" <ljs@kernel.org> wrote:
+> 
+> kvm_handle_guest_abort() establishes a kvm_s2_fault_desc data structure,
+> s2fd, to store and propagate state to either pkvm_mem_abort(), gmem_abort()
+> or user_mem_abort() handlers.
+> 
+> Each of these, however, examines the Exception Syndrome Register (ESR) via
+> s2fd->vcpu.
+> 
+> Introduce an s2fd->esr field to abstract this and propagate it to callers.
+> 
+> The value of this (beyond refactoring) is to be able to later generate
+> faults with a synthetic esr, specifically to implement stage 2 page table
+> pre-faulting.
+> 
+> Abstract esr-specific predicates and helpers to the esr.h header and either
+> have vcpu wrappers call these, or eliminate them if they are not used
+> elsewhere.
+> 
+> Provide kvm_s2_fault_is_[write,exec,perm]() helpers for convenience.
+> 
+> Since kvm_s2_fault_map() either sets perm_fault_granule to the permission
+> fault granule or 0 if not a permission fault, implement
+> kvm_s2_perm_fault_granule() to do this directly.
+> 
+> Abort handlers which use kvm_s2_fault_desc - gmem_abort() and
+> user_mem_abort() - now only reference s2fd->esr and do not look it up in
+> any other way, which makes it safe to pass a synthetic s2fd->esr value to
+> these functions.
 
-> Move the single-page allocator APIs to kvm_util.h as inline functions, as
-> the are trivial wrappers, and unlike __vm_phy_pages_alloc(), are expected
-> to remain that way for the foreseeable future.
->
+Please split this. ESR helpers in one patch, hacking the MMU code to
+use it in another, s2fd->esr stuff last.
+
+> 
 > No functional change intended.
->
-> Tested-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> 
+> Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+> ---
+>  arch/arm64/include/asm/esr.h         | 129 +++++++++++++++++++++++++----------
+>  arch/arm64/include/asm/kvm_emulate.h |  52 ++++----------
+>  arch/arm64/kvm/mmu.c                 |  80 +++++++++++++---------
+>  3 files changed, 156 insertions(+), 105 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+> index f816f5d77f1a..162e90c832e9 100644
+> --- a/arch/arm64/include/asm/esr.h
+> +++ b/arch/arm64/include/asm/esr.h
+> @@ -437,6 +437,32 @@
+>  #ifndef __ASSEMBLER__
+>  #include <asm/types.h>
+>  
+> +static inline u8 esr_trap_get_class(unsigned long esr)
 
-LGTM. Feel free to add:
-Reviewed-by: Ritesh Harjani (IBM) <ritesh.list@gmail.com>
+nit: there is no notion of trap here. This is simply extracting the EC
+from the ESR. My personal (and wholly unreliable) taste would be to go
+for something like esr_get_ec().
+
+I appreciate that you are simply propagating the names used in KVM,
+but they were pretty poor the first place, and have only been kept to
+avoid churn.
+
+Also, 'inline' is a bit of a problem given that the callers are
+__always_inline for good reasons (see 5c37f1ae1c3358).
+
+> +{
+> +	return ESR_ELx_EC(esr);
+> +}
+> +
+> +static inline bool esr_trap_is_iabt(unsigned long esr)
+> +{
+> +	return esr_trap_get_class(esr) == ESR_ELx_EC_IABT_LOW;
+> +}
+> +
+> +static inline bool esr_abt_is_s1ptw(unsigned long esr)
+> +{
+> +	return esr & ESR_ELx_S1PTW;
+> +}
+> +
+> +/* Always check for S1PTW *before* using this. */
+> +static inline bool esr_dabt_is_write(unsigned long esr)
+> +{
+> +	return esr & ESR_ELx_WNR;
+> +}
+> +
+> +static inline bool esr_dabt_is_cm(unsigned long esr)
+> +{
+> +	return esr & ESR_ELx_CM;
+> +}
+> +
+>  static inline unsigned long esr_brk_comment(unsigned long esr)
+>  {
+>  	return esr & ESR_ELx_BRK64_ISS_COMMENT_MASK;
+> @@ -460,75 +486,104 @@ static inline bool esr_is_ubsan_brk(unsigned long esr)
+>  	return (esr_brk_comment(esr) & ~UBSAN_BRK_MASK) == UBSAN_BRK_IMM;
+>  }
+>  
+> +static inline u8 esr_fsc_get_fault(unsigned long esr)
+> +{
+> +	return esr & ESR_ELx_FSC;
+> +}
+> +
+>  static inline bool esr_fsc_is_translation_fault(unsigned long esr)
+>  {
+> -	esr = esr & ESR_ELx_FSC;
+> +	const u8 fault = esr_fsc_get_fault(esr);
+>  
+> -	return (esr == ESR_ELx_FSC_FAULT_L(3)) ||
+> -	       (esr == ESR_ELx_FSC_FAULT_L(2)) ||
+> -	       (esr == ESR_ELx_FSC_FAULT_L(1)) ||
+> -	       (esr == ESR_ELx_FSC_FAULT_L(0)) ||
+> -	       (esr == ESR_ELx_FSC_FAULT_L(-1));
+> +	return (fault == ESR_ELx_FSC_FAULT_L(3)) ||
+> +	       (fault == ESR_ELx_FSC_FAULT_L(2)) ||
+> +	       (fault == ESR_ELx_FSC_FAULT_L(1)) ||
+> +	       (fault == ESR_ELx_FSC_FAULT_L(0)) ||
+> +	       (fault == ESR_ELx_FSC_FAULT_L(-1));
+
+I really think we could do without this sort of churn.
+
+>  }
+>  
+>  static inline bool esr_fsc_is_permission_fault(unsigned long esr)
+>  {
+> -	esr = esr & ESR_ELx_FSC;
+> +	const u8 fault = esr_fsc_get_fault(esr);
+>  
+> -	return (esr == ESR_ELx_FSC_PERM_L(3)) ||
+> -	       (esr == ESR_ELx_FSC_PERM_L(2)) ||
+> -	       (esr == ESR_ELx_FSC_PERM_L(1)) ||
+> -	       (esr == ESR_ELx_FSC_PERM_L(0));
+> +	return (fault == ESR_ELx_FSC_PERM_L(3)) ||
+> +	       (fault == ESR_ELx_FSC_PERM_L(2)) ||
+> +	       (fault == ESR_ELx_FSC_PERM_L(1)) ||
+> +	       (fault == ESR_ELx_FSC_PERM_L(0));
+>  }
+>  
+>  static inline bool esr_fsc_is_access_flag_fault(unsigned long esr)
+>  {
+> -	esr = esr & ESR_ELx_FSC;
+> +	const u8 fault = esr_fsc_get_fault(esr);
+>  
+> -	return (esr == ESR_ELx_FSC_ACCESS_L(3)) ||
+> -	       (esr == ESR_ELx_FSC_ACCESS_L(2)) ||
+> -	       (esr == ESR_ELx_FSC_ACCESS_L(1)) ||
+> -	       (esr == ESR_ELx_FSC_ACCESS_L(0));
+> +	return (fault == ESR_ELx_FSC_ACCESS_L(3)) ||
+> +	       (fault == ESR_ELx_FSC_ACCESS_L(2)) ||
+> +	       (fault == ESR_ELx_FSC_ACCESS_L(1)) ||
+> +	       (fault == ESR_ELx_FSC_ACCESS_L(0));
+>  }
+>  
+>  static inline bool esr_fsc_is_excl_atomic_fault(unsigned long esr)
+>  {
+> -	esr = esr & ESR_ELx_FSC;
+> -
+> -	return esr == ESR_ELx_FSC_EXCL_ATOMIC;
+> +	return esr_fsc_get_fault(esr) == ESR_ELx_FSC_EXCL_ATOMIC;
+>  }
+>  
+>  static inline bool esr_fsc_is_addr_sz_fault(unsigned long esr)
+>  {
+> -	esr &= ESR_ELx_FSC;
+> +	const u8 fault = esr_fsc_get_fault(esr);
+> +
+> +	return (fault == ESR_ELx_FSC_ADDRSZ_L(3)) ||
+> +	       (fault == ESR_ELx_FSC_ADDRSZ_L(2)) ||
+> +	       (fault == ESR_ELx_FSC_ADDRSZ_L(1)) ||
+> +	       (fault == ESR_ELx_FSC_ADDRSZ_L(0)) ||
+> +	       (fault == ESR_ELx_FSC_ADDRSZ_L(-1));
+> +}
+> +
+> +static inline bool esr_abt_is_exec_fault(unsigned long esr)
+> +{
+> +	return esr_trap_is_iabt(esr) && !esr_abt_is_s1ptw(esr);
+> +}
+>  
+> -	return (esr == ESR_ELx_FSC_ADDRSZ_L(3))	||
+> -	       (esr == ESR_ELx_FSC_ADDRSZ_L(2))	||
+> -	       (esr == ESR_ELx_FSC_ADDRSZ_L(1)) ||
+> -	       (esr == ESR_ELx_FSC_ADDRSZ_L(0))	||
+> -	       (esr == ESR_ELx_FSC_ADDRSZ_L(-1));
+> +static inline bool esr_abt_is_sea(unsigned long esr)
+> +{
+> +	const u8 fault = esr_fsc_get_fault(esr);
+> +
+> +	switch (fault) {
+> +	case ESR_ELx_FSC_EXTABT:
+> +	case ESR_ELx_FSC_SEA_TTW(-1) ... ESR_ELx_FSC_SEA_TTW(3):
+> +	case ESR_ELx_FSC_SECC:
+> +	case ESR_ELx_FSC_SECC_TTW(-1) ... ESR_ELx_FSC_SECC_TTW(3):
+> +		return true;
+> +	default:
+> +		return false;
+> +	}
+> +}
+> +
+> +/* Not valid for negative levels. */
+> +static inline u64 esr_fsc_get_level(unsigned long esr)
+> +{
+> +	return esr & ESR_ELx_FSC_LEVEL;
+>  }
+
+If that's such an unreliable helper, why is it exposed to everyone
+instead of being kept local to the single caller?
+
+>  
+>  static inline bool esr_fsc_is_sea_ttw(unsigned long esr)
+>  {
+> -	esr = esr & ESR_ELx_FSC;
+> +	const u8 fault = esr_fsc_get_fault(esr);
+>  
+> -	return (esr == ESR_ELx_FSC_SEA_TTW(3)) ||
+> -	       (esr == ESR_ELx_FSC_SEA_TTW(2)) ||
+> -	       (esr == ESR_ELx_FSC_SEA_TTW(1)) ||
+> -	       (esr == ESR_ELx_FSC_SEA_TTW(0)) ||
+> -	       (esr == ESR_ELx_FSC_SEA_TTW(-1));
+> +	return (fault == ESR_ELx_FSC_SEA_TTW(3)) ||
+> +	       (fault == ESR_ELx_FSC_SEA_TTW(2)) ||
+> +	       (fault == ESR_ELx_FSC_SEA_TTW(1)) ||
+> +	       (fault == ESR_ELx_FSC_SEA_TTW(0)) ||
+> +	       (fault == ESR_ELx_FSC_SEA_TTW(-1));
+>  }
+>  
+>  static inline bool esr_fsc_is_secc_ttw(unsigned long esr)
+>  {
+> -	esr = esr & ESR_ELx_FSC;
+> +	const u8 fault = esr_fsc_get_fault(esr);
+>  
+> -	return (esr == ESR_ELx_FSC_SECC_TTW(3)) ||
+> -	       (esr == ESR_ELx_FSC_SECC_TTW(2)) ||
+> -	       (esr == ESR_ELx_FSC_SECC_TTW(1)) ||
+> -	       (esr == ESR_ELx_FSC_SECC_TTW(0)) ||
+> -	       (esr == ESR_ELx_FSC_SECC_TTW(-1));
+> +	return (fault == ESR_ELx_FSC_SECC_TTW(3)) ||
+> +	       (fault == ESR_ELx_FSC_SECC_TTW(2)) ||
+> +	       (fault == ESR_ELx_FSC_SECC_TTW(1)) ||
+> +	       (fault == ESR_ELx_FSC_SECC_TTW(0)) ||
+> +	       (fault == ESR_ELx_FSC_SECC_TTW(-1));
+>  }
+>  
+>  /* Indicate whether ESR.EC==0x1A is for an ERETAx instruction */
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index a3c1928bdf74..811d7a68a9f9 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -411,18 +411,13 @@ static __always_inline int kvm_vcpu_dabt_get_rd(const struct kvm_vcpu *vcpu)
+>  
+>  static __always_inline bool kvm_vcpu_abt_iss1tw(const struct kvm_vcpu *vcpu)
+>  {
+> -	return !!(kvm_vcpu_get_esr(vcpu) & ESR_ELx_S1PTW);
+> +	return esr_abt_is_s1ptw(kvm_vcpu_get_esr(vcpu));
+>  }
+>  
+>  /* Always check for S1PTW *before* using this. */
+>  static __always_inline bool kvm_vcpu_dabt_iswrite(const struct kvm_vcpu *vcpu)
+>  {
+> -	return kvm_vcpu_get_esr(vcpu) & ESR_ELx_WNR;
+> -}
+> -
+> -static inline bool kvm_vcpu_dabt_is_cm(const struct kvm_vcpu *vcpu)
+> -{
+> -	return !!(kvm_vcpu_get_esr(vcpu) & ESR_ELx_CM);
+> +	return esr_dabt_is_write(kvm_vcpu_get_esr(vcpu));
+>  }
+>  
+>  static __always_inline unsigned int kvm_vcpu_dabt_get_as(const struct kvm_vcpu *vcpu)
+> @@ -438,17 +433,12 @@ static __always_inline bool kvm_vcpu_trap_il_is32bit(const struct kvm_vcpu *vcpu
+>  
+>  static __always_inline u8 kvm_vcpu_trap_get_class(const struct kvm_vcpu *vcpu)
+>  {
+> -	return ESR_ELx_EC(kvm_vcpu_get_esr(vcpu));
+> +	return esr_trap_get_class(kvm_vcpu_get_esr(vcpu));
+>  }
+>  
+>  static inline bool kvm_vcpu_trap_is_iabt(const struct kvm_vcpu *vcpu)
+>  {
+> -	return kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_IABT_LOW;
+> -}
+> -
+> -static inline bool kvm_vcpu_trap_is_exec_fault(const struct kvm_vcpu *vcpu)
+> -{
+> -	return kvm_vcpu_trap_is_iabt(vcpu) && !kvm_vcpu_abt_iss1tw(vcpu);
+> +	return esr_trap_is_iabt(kvm_vcpu_get_esr(vcpu));
+>  }
+>  
+>  static __always_inline u8 kvm_vcpu_trap_get_fault(const struct kvm_vcpu *vcpu)
+> @@ -468,26 +458,9 @@ bool kvm_vcpu_trap_is_translation_fault(const struct kvm_vcpu *vcpu)
+>  	return esr_fsc_is_translation_fault(kvm_vcpu_get_esr(vcpu));
+>  }
+>  
+> -static inline
+> -u64 kvm_vcpu_trap_get_perm_fault_granule(const struct kvm_vcpu *vcpu)
+> -{
+> -	unsigned long esr = kvm_vcpu_get_esr(vcpu);
+> -
+> -	BUG_ON(!esr_fsc_is_permission_fault(esr));
+> -	return BIT(ARM64_HW_PGTABLE_LEVEL_SHIFT(esr & ESR_ELx_FSC_LEVEL));
+> -}
+> -
+>  static __always_inline bool kvm_vcpu_abt_issea(const struct kvm_vcpu *vcpu)
+>  {
+> -	switch (kvm_vcpu_trap_get_fault(vcpu)) {
+> -	case ESR_ELx_FSC_EXTABT:
+> -	case ESR_ELx_FSC_SEA_TTW(-1) ... ESR_ELx_FSC_SEA_TTW(3):
+> -	case ESR_ELx_FSC_SECC:
+> -	case ESR_ELx_FSC_SECC_TTW(-1) ... ESR_ELx_FSC_SECC_TTW(3):
+> -		return true;
+> -	default:
+> -		return false;
+> -	}
+> +	return esr_abt_is_sea(kvm_vcpu_get_esr(vcpu));
+>  }
+>  
+>  static __always_inline int kvm_vcpu_sys_get_rt(struct kvm_vcpu *vcpu)
+> @@ -496,9 +469,9 @@ static __always_inline int kvm_vcpu_sys_get_rt(struct kvm_vcpu *vcpu)
+>  	return ESR_ELx_SYS64_ISS_RT(esr);
+>  }
+>  
+> -static inline bool kvm_is_write_fault(struct kvm_vcpu *vcpu)
+> +static inline bool esr_abt_is_write_fault(unsigned long esr)
+>  {
+> -	if (kvm_vcpu_abt_iss1tw(vcpu)) {
+> +	if (esr_abt_is_s1ptw(esr)) {
+>  		/*
+>  		 * Only a permission fault on a S1PTW should be
+>  		 * considered as a write. Otherwise, page tables baked
+> @@ -511,13 +484,18 @@ static inline bool kvm_is_write_fault(struct kvm_vcpu *vcpu)
+>  		 * first), then a permission fault to allow the flags
+>  		 * to be set.
+>  		 */
+> -		return kvm_vcpu_trap_is_permission_fault(vcpu);
+> +		return esr_fsc_is_permission_fault(esr);
+>  	}
+>  
+> -	if (kvm_vcpu_trap_is_iabt(vcpu))
+> +	if (esr_trap_is_iabt(esr))
+>  		return false;
+>  
+> -	return kvm_vcpu_dabt_iswrite(vcpu);
+> +	return esr_dabt_is_write(esr);
+> +}
+> +
+> +static inline bool kvm_is_write_fault(struct kvm_vcpu *vcpu)
+> +{
+> +	return esr_abt_is_write_fault(kvm_vcpu_get_esr(vcpu));
+>  }
+>  
+>  static inline unsigned long kvm_vcpu_get_mpidr_aff(struct kvm_vcpu *vcpu)
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 74e7e7f7564c..30d605e87b01 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1603,12 +1603,38 @@ struct kvm_s2_fault_desc {
+>  	struct kvm_s2_trans	*nested;
+>  	struct kvm_memory_slot	*memslot;
+>  	unsigned long		hva;
+> +	unsigned long		esr;
+>  };
+>  
+> +static bool kvm_s2_fault_is_perm(const struct kvm_s2_fault_desc *s2fd)
+> +{
+> +	return esr_fsc_is_permission_fault(s2fd->esr);
+> +}
+> +
+> +static bool kvm_s2_fault_is_exec(const struct kvm_s2_fault_desc *s2fd)
+> +{
+> +	return esr_abt_is_exec_fault(s2fd->esr);
+> +}
+> +
+> +static bool kvm_s2_fault_is_write(const struct kvm_s2_fault_desc *s2fd)
+> +{
+> +	return esr_abt_is_write_fault(s2fd->esr);
+> +}
+> +
+> +static u64 kvm_s2_perm_fault_granule(const struct kvm_s2_fault_desc *s2fd)
+> +{
+> +	u64 level;
+> +
+> +	if (!kvm_s2_fault_is_perm(s2fd))
+> +		return 0;
+> +	level = esr_fsc_get_level(s2fd->esr);
+> +	return BIT(ARM64_HW_PGTABLE_LEVEL_SHIFT(level));
+> +}
+> +
+>  static int gmem_abort(const struct kvm_s2_fault_desc *s2fd)
+>  {
+>  	bool write_fault, exec_fault;
+> -	bool perm_fault = kvm_vcpu_trap_is_permission_fault(s2fd->vcpu);
+> +	const bool perm_fault = kvm_s2_fault_is_perm(s2fd);
+
+Please don't randomly introduce const local variables. I understand
+the benefit, but *if* we want to go down that road, then we do it for
+all the predicates, as a separate series, because this obviously
+applies to {exec,write}_fault as well.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
