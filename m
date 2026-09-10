@@ -1,33 +1,33 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 030A93C3429;
-	Thu, 10 Sep 2026 10:21:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ACBA3C8733;
+	Thu, 10 Sep 2026 10:27:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789035698; cv=none; b=oDrwjZ1ZjQNLDK5Gz2zNTs19JtREuQD9UQlsCV1YDHIY2K5lFfflhszkeuBEg085+SFuOD+u1VTvKXmnJXwj6/CG+Uh71ErQOVLawAOJ7hVuVD8T3MQMYaYC2XMaWpHXTFS+wvhE/Lgrz4OshHV7vTLQhfKKV8KOsDPBb7AILkE=
+	t=1789036080; cv=none; b=Qpp/LNKwPAGHr1j4lBvWtIPNXOIX/AjBdHZfGonFbtZNuqr1MFhW+ZCXQ/jbarXZr5ginIXYe1FjlHroZn2d7ReMTJOK9woAaoRExtSqNjJekyMJhKhRevx2z5QopXnMCMtnnwvhuk+pdNmMTcydThhtUP1O9/mjlWQnd3X2aEI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789035698; c=relaxed/simple;
-	bh=NdJwICU4hKphndkhJfKo4meJGdIZvN650SafLlOB/BM=;
+	s=arc-20240116; t=1789036080; c=relaxed/simple;
+	bh=aWQt/+Tvo/ggfRTd82k5+d6xlXw8sI7UgTyynHOeLvI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nIW9QmwO50LmRXoLs/2p8lVvlD2f9/XXepG/r8mjWRciSxhuqX6P/Bz1QEvQorWynR9hNl9MT4hMlmidRR88f4KI+zdH+BvlJICCI9CPhgJBUnrZsSkinCA+IC+Ey5Gvnk0/RWeaXvvq6aWACJhGPMeqFdbV0GogtF2lyURDeXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=k//7Ud38; arc=none smtp.client-ip=217.140.110.172
+	 In-Reply-To:Content-Type; b=HsjgUsh+IvACOco7ge83wrpyPh1AmVPbCHZjMHOn/LJFfDSZNi80Iy8O7hggkuGynibbGIGKBkIXtxaUs7Fh1HnRMDW18B2jjLIlzccSRK4H9n8bXXJB/CMmy90UGnxGt+/ZCbAMcDjQ3eQbiVx3HHqyLhIFB6xpsdu38HSD/Rc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=KYlafta4; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="k//7Ud38"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="KYlafta4"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 51C7D143D;
-	Thu, 10 Sep 2026 03:21:31 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C4E8D143D;
+	Thu, 10 Sep 2026 03:27:54 -0700 (PDT)
 Received: from [10.0.129.245] (unknown [10.0.129.245])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 899BA3F7B4;
-	Thu, 10 Sep 2026 03:21:31 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7E7D23F7B4;
+	Thu, 10 Sep 2026 03:27:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1789035695; bh=NdJwICU4hKphndkhJfKo4meJGdIZvN650SafLlOB/BM=;
+	t=1789036078; bh=aWQt/+Tvo/ggfRTd82k5+d6xlXw8sI7UgTyynHOeLvI=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=k//7Ud38dQTnvnKQxVZAcd73FhyR9Iv9bKLlrmoT04DSSuniGXJGJi8nFSmCLEuE8
-	 fX11Ow/pTfdIBC/fgh+DTGC9ZRproSkmFOyVb9rmmwngQfXyaH/MYJCYNZcxFenoQH
-	 YnDm/TS+rtBLyZhhM83WRgOUSjTOe3zhZn+o0zjo=
-Message-ID: <b7a8e864-d7a3-4765-8b62-c5452766769d@arm.com>
-Date: Thu, 10 Sep 2026 11:21:29 +0100
+	b=KYlafta4EkjMZWOAfvdk24/OlQIy6uIrL0Nvg71duaejrS5Ng65DY7mkcYqZLh0um
+	 5Im0f/4WGHfB13DFvJ55+kmxVIWDjNT3YvQ4WS4QtFD4gpq3nRSLPdfuh5Aai2eUDj
+	 Sizaon0gsCgqril8nrlevqCxDdy7//RcewiBGgl4=
+Message-ID: <d22c863b-ea81-472c-b2a9-28f99e5b6f92@arm.com>
+Date: Thu, 10 Sep 2026 11:27:54 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -35,124 +35,128 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v17 04/20] KVM: arm64: Refactor the vcpu_load to allow for
- VM specific callbacks
+Subject: Re: [PATCH v17 10/20] KVM: arm64: coco: Disable Steal time accounting
+ for coco guests
 Content-Language: en-GB
-To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: maz@kernel.org, will@kernel.org, catalin.marinas@arm.com,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org,
- joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
- linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
- sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
- WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
+ will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
+ aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
+ joey.gouly@arm.com, yuzenghui@huawei.com, linux-coco@lists.linux.dev,
+ gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com,
+ alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com,
+ lpieralisi@kernel.org, enju.kohei@fujitsu.com
 References: <20260908162223.1683432-1-suzuki.poulose@arm.com>
- <20260908162223.1683432-5-suzuki.poulose@arm.com>
- <a0c5c373-b5c2-4ad2-9e53-ede58c392972@redhat.com>
+ <20260908162223.1683432-11-suzuki.poulose@arm.com>
+ <CA+EHjTw9ReyvsNT=y+-P6ng7VQ6Pvz9PFK9bO71qvTR1pOxx5Q@mail.gmail.com>
+ <6152fc41-65f0-460f-90b4-1454c11bcba6@arm.com>
+ <CA+EHjTxjk1JLR7Tf5LEfB_xypbUWnw3G3H-FT7bTE=nWTTRgAA@mail.gmail.com>
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <a0c5c373-b5c2-4ad2-9e53-ede58c392972@redhat.com>
+In-Reply-To: <CA+EHjTxjk1JLR7Tf5LEfB_xypbUWnw3G3H-FT7bTE=nWTTRgAA@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 10/09/2026 05:00, Gavin Shan wrote:
+Hi Fuad
+
+On 09/09/2026 13:23, Fuad Tabba wrote:
 > Hi Suzuki,
 > 
-> On 9/9/26 2:22 AM, Suzuki K Poulose wrote:
->> Based on a work by Marc Zyngier
+> On Wed, 9 Sept 2026 at 12:52, Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+> ...
+> 
+>>> I think it would be better to leave KVM_CAP_STEAL_TIME reported and
+>>> instead reject the configuration for these VMs, returning -EPERM from
+>>> the KVM_ARM_VCPU_PVTIME_CTRL attr. A capability query should report
+>>> what the kernel supports, not whether a given VM may use it; gating it
+>>> per-VM here is also inconsistent, since the !kvm clause leaves the
+>>> system-fd cap at 1 while the VM-fd cap reads 0. And -EPERM says that
 >>
->> To keep the VCPU load/put handling cleaner with the different kinds of 
->> VM types,
->> we are about to introduce VM specific callbacks to do just the right 
->> thing.
->> In preparation for that, make some refactoring to add the change easier.
 >>
->> No functional changes intended.
+>> But isn't that we want from a VMM perspective ? i.e., enable PVTIME if
+>> it is supported for the given VM (type). Rather than PVTIME is supported
+>> by the KVM, so I can go enable it by default. But, we endup getting a
+>> failure while we enable it. I encountered this with kvmtool, where
+>> CAP_STEAL_TIME is reported true and even the HAS_DEVICE_ATTR goes
+>> through fine, but SET_DEVICE_ATTR seemed to fail.
 >>
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> ---
->>   arch/arm64/kvm/arm.c | 46 +++++++++++++++++++++++++++-----------------
->>   1 file changed, 28 insertions(+), 18 deletions(-)
->>
+>> Isn't it better to allow the VM to decide if the capability is supported
+>> for the given VM type, like we are doing for other capabilities ?
 > 
-> Nitpicks below, none of them are introduced by this patch itself. In 
-> either way:
-> 
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> You're right, per-VM capability reporting. My wires got crossed from
+> the pKVM series and the kvmtool fixes. However, I'd still return
+> -EPERM rather than -ENXIO from the attribute. The capability exists,
 
-Thank you !
+Just to make sure I understand the picture:
 
-> 
->> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> index 67f1ff9bc4fbe..51fc651267157 100644
->> --- a/arch/arm64/kvm/arm.c
->> +++ b/arch/arm64/kvm/arm.c
->> @@ -683,14 +683,11 @@ static bool kvm_vcpu_should_clear_twe(struct 
->> kvm_vcpu *vcpu)
->>       return single_task_running();
->>   }
->> -void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->> +static void vcpu_prepare_mmu(struct kvm_vcpu *vcpu)
->>   {
->>       struct kvm_s2_mmu *mmu;
->>       int *last_ran;
->> -    if (is_protected_kvm_enabled())
->> -        goto nommu;
->> -
->>       if (vcpu_has_nv(vcpu))
->>           kvm_vcpu_load_hw_mmu(vcpu);
->> @@ -720,10 +717,33 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, 
->> int cpu)
->>           kvm_call_hyp(__kvm_flush_cpu_context, mmu);
->>           *last_ran = vcpu->vcpu_idx;
->>       }
->> +}
->> +
->> +static void vcpu_set_wfx_traps(struct kvm_vcpu *vcpu)
->> +{
->> +    if (kvm_vcpu_should_clear_twe(vcpu))
->> +        vcpu->arch.hcr_el2 &= ~HCR_TWE;
->> +    else
->> +        vcpu->arch.hcr_el2 |= HCR_TWE;
->> +
->> +    if (kvm_vcpu_should_clear_twi(vcpu))
->> +        vcpu->arch.hcr_el2 &= ~HCR_TWI;
->> +    else
->> +        vcpu->arch.hcr_el2 |= HCR_TWI;
->> +}
->> +
-> 
-> It seems FIELD_MODIFY() can be applied here if no visible constraints 
-> exist:
-> 
->      FIELD_MODIFY(HCR_TWE, vcpu->arch.hcr_el2, ! 
-> kvm_vcpu_should_clear_twe(vcpu));
->      FIELD_MODIFY(HCR_TWI, vcpu->arch.hcr_el2, ! 
-> kvm_vcpu_should_clear_twi(vcpu));
+For coco VMs:
 
-I would leave this out for now. Can be a separate patch
+  - check extension on coco KVM, KVM_CAP_STEAL_TIME => 0
 
-> 
->> +static void vcpu_load_pvtime(struct kvm_vcpu *vcpu)
->> +{
->> +    if (kvm_arm_is_pvtime_enabled(&vcpu->arch))
->> +        kvm_make_request(KVM_REQ_RECORD_STEAL, vcpu);
->> +}
->> +
->> +void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->> +{
->> +    if (!is_protected_kvm_enabled())
->> +        vcpu_prepare_mmu(vcpu);
->>
-> 
-> I think we probably try to depend on kvm->arch.vm_flavor instead
-> of !is_protected_kvm_enabled().
-> 
->      struct kvm *kvm = vcpu->kvm;
-> 
->      if (kvm_vm_is_protected(kvm) || kvm_vm_flavor_eq(kvm, VM_PKVM))
->          vcpu_prepare_mmu(vcpu);
+And a follow up DEVICE_HAS_ATTR => -EPERM ?
 
-This will be removed as part of the call back in the next patch.
+But we tell the VMM, look you don't have the capabilit on this VM.
+But if you try to set the attribute isn't it more appropriate to
+say:
+  -ENXIO - No you don't have that feature on this VM (-ENXIO)
+rather than
+  -EPERM - No, I won't let you do that.
+
+Remember we are doing only in the "VM" context. It is a minor nit
+but I wanted to make sure we understand what we are thinking.
 
 Cheers
 Suzuki
+
+> it's just not permitted for a confidential VM, and -EPERM says exactly
+> that, whereas -ENXIO reads as "no such feature".
+> 
+> Cheers,
+> /fuad
+> 
+>>
+>>> steal-time exists but isn't permitted for a confidential VM, whereas
+>>> -ENXIO reads as "no such feature".
+>>
+>> Cheers
+>> Suzuki
+>>
+>>
+>>>
+>>> Cheers,
+>>> /fuad
+>>>
+>>>>
+>>>>    int kvm_arm_pvtime_set_attr(struct kvm_vcpu *vcpu,
+>>>> @@ -81,7 +81,7 @@ int kvm_arm_pvtime_set_attr(struct kvm_vcpu *vcpu,
+>>>>           int ret = 0;
+>>>>           int idx;
+>>>>
+>>>> -       if (!kvm_arm_pvtime_supported() ||
+>>>> +       if (!kvm_arm_pvtime_supported(kvm) ||
+>>>>               attr->attr != KVM_ARM_VCPU_PVTIME_IPA)
+>>>>                   return -ENXIO;
+>>>>
+>>>> @@ -110,7 +110,7 @@ int kvm_arm_pvtime_get_attr(struct kvm_vcpu *vcpu,
+>>>>           u64 __user *user = (u64 __user *)attr->addr;
+>>>>           u64 ipa;
+>>>>
+>>>> -       if (!kvm_arm_pvtime_supported() ||
+>>>> +       if (!kvm_arm_pvtime_supported(vcpu->kvm) ||
+>>>>               attr->attr != KVM_ARM_VCPU_PVTIME_IPA)
+>>>>                   return -ENXIO;
+>>>>
+>>>> @@ -126,7 +126,7 @@ int kvm_arm_pvtime_has_attr(struct kvm_vcpu *vcpu,
+>>>>    {
+>>>>           switch (attr->attr) {
+>>>>           case KVM_ARM_VCPU_PVTIME_IPA:
+>>>> -               if (kvm_arm_pvtime_supported())
+>>>> +               if (kvm_arm_pvtime_supported(vcpu->kvm))
+>>>>                           return 0;
+>>>>           }
+>>>>           return -ENXIO;
+>>>> --
+>>>> 2.43.0
+>>>>
+>>
+
