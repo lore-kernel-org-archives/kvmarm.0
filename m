@@ -1,85 +1,134 @@
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF38446C847
-	for <kvmarm@lists.linux.dev>; Thu, 10 Sep 2026 11:07:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FAAD3AA9D4;
+	Thu, 10 Sep 2026 11:08:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789038460; cv=none; b=LW3JWIZismLKb/aO/wVgIs/cLpkkZs+ZmSDLVsW+NgqdbDX2IRedZ3NBt6ZNGYngullhFPWZGEs1d+1CyYHVkaDECj+GM7jwWyT9dBkrGw3KOvjYSBB2MEAoplGNoqOBC7gMlAu+cRQAwtC2iXLYefSrNa+ivLkJcUHNUT6miN4=
+	t=1789038540; cv=none; b=D11usOOMvDjGpjnz0FFza4gmmpnL6zLO69sztGC7d0iqeyqcXuZD5YDzZkkeanxHBI9x5hun8keT6SGDysF6uAgIQTLF2U5hshqopQIqZhQAi/HGJUhujGmBAheIl3nzn+8ydSAfRa4Gxh1gVpaq7df+ruhKIFX//WiPkrbOmpE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789038460; c=relaxed/simple;
-	bh=70Xrz5Ek18W9RLHK+PGrZl6neyZSU/LQLxpuqNmBXms=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References; b=rCMeXP5/RUv1RboZPtDLYhQoHoNrbVYkMYNYtfRTtw7Du9Pmvp3P3lT3Gihp8wSXV4FfsYSIPDeFFNVHf78YhT2N/J7O5Ek5jLeR2qihgwIYBXTpSea/87bNfcIUvj/JPmQToUCo7XLOiarQp91Ls+D4be9l+XGn+bAlbhq0too=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qvtHzH49; arc=none smtp.client-ip=209.85.215.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1789038540; c=relaxed/simple;
+	bh=aqPRz5COknVjzSzNITH80cCpteLfipAsl2cDdoiqDVQ=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bNZH3JU/+7qQQlmIZDzIdpZrdFHedsvEX68ybXroHJVzCr/52ACOFbuFR1EfI3PwQwffmx8thFV+YVLr2M7ngOandMxtPaxdNtwP1shJv2Zssn2EeDlvK9FI34prlPOzA4riFMf2zNgy5EaOBiPrIAH2WM6A7PnL414Gfk/S870=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YALf3tBp; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qvtHzH49"
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-cc1c73645a1so5460055a12.1
-        for <kvmarm@lists.linux.dev>; Thu, 10 Sep 2026 04:07:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789038458; x=1789643258; darn=lists.linux.dev;
-        h=references:message-id:date:in-reply-to:subject:cc:to:from:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=70Xrz5Ek18W9RLHK+PGrZl6neyZSU/LQLxpuqNmBXms=;
-        b=qvtHzH49IpgVHGwxU6NgmtAYuseev/bySb6Apa3CaoWPwNHz2JsxHAY3rgKbRg5vcc
-         QeukSy/7mS32UfAcTqPxVN0pA5/0w39PKNvl5Gt76XGYklOZPmqQ2vZXZ7IwWVTcFOw8
-         giHIvjVLu3fEnop0UY5wVh6mYwPQkgNzS6p9s6kafgJD1MidTO6HIiNsNo5cECC8Urjm
-         OVAiHYE56281SkwnKAH3tEtSQ+n5eWXgADEqxR6xefMMRFF0i47A51zipELsiHnV1F/7
-         zwdq2c/wpojvTisKIdAcxhgJD6mLQ6pKspT+k+MsHz9QZnHob7czhv6U/qLMjLUhz67M
-         i3Fw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789038458; x=1789643258;
-        h=references:message-id:date:in-reply-to:subject:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=70Xrz5Ek18W9RLHK+PGrZl6neyZSU/LQLxpuqNmBXms=;
-        b=VjZE939AobBZ2bs7KHIgjJO/Ivho7K3xt6xnA+XRAw4ZQuD1a8lZYj53KsnXBC38ni
-         /NJ4OUiu0J2vfcP8tpv/7ghpQhDG0Jt+tCib0w/NXXSvwTnwSokeN9Q8l3yxENlephZu
-         4I1EHekZeVeUfGK1/F+Ho3bshpH8oIHMrW/g/Q4icT5SToyKW8v+CrYh8Od8ZnNZCASL
-         Cbk/lzVjYDn51Ndflbw6je+4ZPQK1EwIL2KXHkbJqNQeaDigM/MfZYnUSO6SlpJMVuiu
-         LH25ZhNQSZ1SFCeSzPP9ClOYhBorpKpQzhmLFqk5uXCRQ5/lVPJ4YfU3y8HqhoM1b7kz
-         h1fg==
-X-Forwarded-Encrypted: i=1; AKwUvBwR8IHp/xTb9py9novOQkMZe2X8KmwJkYi4lPTfQkdIJxNyEKgCB+QngnI89bzhwTUKzVcAyFM=@lists.linux.dev
-X-Gm-Message-State: AFuF++kqN9dpojk3N+6RXALgJc8NSdEhH8vsK6YiL1s9YUsa6FrGect/
-	AFvFiLgKAatE6ZmwwS2/s+3yGNEhJ6PmR+aGOx9YcSnYCJ80/9d6N9hM
-X-Gm-Gg: AYBFou160l4l6S3Ld6LsleTYDwAO3z9Cb1I+kqmJ2VT8KZ6ZcHi3xR/iprIXAlLgzJU
-	3CePqOK+Pd9NHw5OwyxvoYY0X2XBas/PKKh+AnvNerQAcjJWcdJKcy78pyjki/RSn1udkjhS84B
-	xqoAc3RuO4CT6eUzdm6bqMkh9oEU3tSaoPet6jQ6vRgYSzhxUCRBdKw4ZzbHje86cy0510LkDvI
-	RfS6PoPLc4jK6FwLK2votuyZ88IwkzoIN8BriSJiSzzi0fUy5ZOn79AOh+bG7tMFQhCW1eK8+qD
-	dCFP9UhP+qZT6UlK1Y+2Ixj3pMCzuxFOEYYcPEM5j6dc4X6ulwls+DtMHM5wapZ54XCgn0hwKuU
-	e1PBwsfUS9xXFTRDbvy+9pTPTvxJcvin7eD8RAiGdI7S9JsIA8UqYdR6YFKxX09FZ2cvZJsTTOm
-	ni69Zw3ZiZxlkgrlS4f5HOOWRn+Ou+WMi3+dy/wbAMxjIQIGCe/XudLWvBHesyQKusobQ5YS+Ly
-	O+1K2yYcGw8wAs1B5uvbT/v7bSDo3YICqy4/+azP9v+clO9Wh/lZPo=
-X-Received: by 2002:a17:90b:1b06:b0:398:9be9:ab8e with SMTP id 98e67ed59e1d1-39b2622ba26mr58218547a91.19.1789038457819;
-        Thu, 10 Sep 2026 04:07:37 -0700 (PDT)
-Received: from pve-server ([49.205.216.49])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3339a62be87sm43023781eec.6.2026.09.10.04.07.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Sep 2026 04:07:36 -0700 (PDT)
-From: Ritesh Harjani (IBM) <ritesh.list@gmail.com>
-To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, Atish Patra <atish.patra@linux.dev>, Alexandre Ghiti <alex@ghiti.fr>, David Hildenbrand <david@kernel.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, Itaru Kitayama <itaru.kitayama@fujitsu.com>, Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH v2 10/20] KVM: selftests: Add a wrapper API to allocate multiple page table pages
-In-Reply-To: <20260902164123.2546762-11-seanjc@google.com>
-Date: Thu, 10 Sep 2026 16:34:41 +0530
-Message-ID: <8q591i5y.ritesh.list@gmail.com>
-References: <20260902164123.2546762-1-seanjc@google.com> <20260902164123.2546762-11-seanjc@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YALf3tBp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4D951F000FF;
+	Thu, 10 Sep 2026 11:08:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789038537;
+	bh=x7qhrmT6HLun6jsVh88qBFkF1/a9MuNKLp5SlVHYpFk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=YALf3tBpfCON9TZe2Mv4+aJeq7WfpcvlqYIAyIr77+GrgYUoOGwZngBEBus8T5C63
+	 B38VYlbLw2otsmE6g/m4u8EGZuo+WlevckD2sZ7I9VkHtVFNdUIw5x7BKhES76BpDV
+	 7pBISJQsLlAJ7PUnO2Y6h2atyYCHvN/zNjiS3YVqWzwz7lBGQETAXPVEl0nkOeT8wY
+	 w71UIu5e9t1QOeFqkmwpXa6dj2tEjKOIZYwOvrjrjUGuF1mStHcgfcLVj89y9LMBO/
+	 REifa/XXAknlsEJYl6gJbBJ4OLAn/1LRsyZMVX/C6eWOXgS8BIXcxm9qttdiqcBcgx
+	 iXlQWxq6OOqZQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1x4ceF-00000007EEC-3kUD;
+	Thu, 10 Sep 2026 11:08:55 +0000
+Date: Thu, 10 Sep 2026 12:08:55 +0100
+Message-ID: <86se3h748o.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Oliver Upton <oupton@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Ben Horgan <ben.horgan@arm.com>,
+	Xi Ruoyao <xry111@xry111.site>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Yuan Yao <yaoyuan@linux.alibaba.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] KVM: arm64: Trap guest MPAM accesses whenever MPAM is implemented
+In-Reply-To: <20260908145651.2828597-1-fuad.tabba@linux.dev>
+References: <20260908145651.2828597-1-fuad.tabba@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, ben.horgan@arm.com, xry111@xry111.site, mark.rutland@arm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, seiden@linux.ibm.com, gshan@redhat.com, yaoyuan@linux.alibaba.com, tabba@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Sean Christopherson <seanjc@google.com> writes:
+On Tue, 08 Sep 2026 15:56:51 +0100,
+Fuad Tabba <fuad.tabba@linux.dev> wrote:
+> 
+> finalise_el2_state() clears the EL2 MPAM traps whenever the ID
+> registers advertise MPAM, while KVM sets them only under ARM64_MPAM,
+> which also requires MPAMEN. Without EL3 nothing sets that enable, so a
+> guest reaches the MPAM registers while ID_AA64PFR0_EL1.MPAM reads 0
+> for it.
+> 
+> Gate the traps on the ID registers alone: MPAMEN isn't a term in any
+> MPAM accessor, so they take effect without it. The cap tests the
+> sanitised ID fields, which never exceed a CPU's own, so it's set only
+> where finalise_el2_state already wrote MPAM2_EL2. MPAM3_EL3.TRAPLOWER
+> is clear there, and arm64.nompam turns the cap off too.
+> 
+> Fixes: 23b33d1e168c ("arm64: head.S: Initialise MPAM EL2 registers and disable traps")
+> Reviewed-by: Yuan Yao <yaoyuan@linux.alibaba.com>
+> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+> ---
+> 
+> Notes:
+>     Changes since v1:
+>      - Commit message only. The code is unchanged, so Yuan Yao's
+>        Reviewed-by is carried.
+>      - Fixes: names the commit that cleared the traps, rather than the
+>        one that added KVM's trapping.
+>      - Says why the sanitised ID fields are the safe gate: the cap is set
+>        only where finalise_el2_state already wrote MPAM2_EL2.
+>     
+>     Not covered, and answered on the v1 thread: a machine whose CPUs
+>     differ on MPAM, raised by Ben and by sashiko.
+>     
+>     v1: https://lore.kernel.org/all/20260903160819.831518-1-fuad.tabba@linux.dev/
+> 
+>  arch/arm64/include/asm/cpufeature.h     |  5 +++++
+>  arch/arm64/kernel/cpufeature.c          | 13 +++++++++++++
+>  arch/arm64/kvm/hyp/include/hyp/switch.h |  4 ++--
+>  arch/arm64/tools/cpucaps                |  1 +
+>  4 files changed, 21 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+> index 7404a6e83a930..8863ae99596bc 100644
+> --- a/arch/arm64/include/asm/cpufeature.h
+> +++ b/arch/arm64/include/asm/cpufeature.h
+> @@ -873,6 +873,11 @@ static __always_inline bool system_supports_mpam_hcr(void)
+>  	return alternative_has_cap_unlikely(ARM64_MPAM_HCR);
+>  }
+>  
+> +static __always_inline bool system_supports_mpam_sysregs(void)
+> +{
+> +	return alternative_has_cap_unlikely(ARM64_MPAM_SYSREGS);
+> +}
+> +
 
-> Add vm_alloc_page_table_pages() and use it throughout arch code to replace
-> open coded equivalents.
->
-> No functional change intended.
->
+What is the rationale for choosing alternative_has_cap_unlikely()
+instead of cpus_have_final_cap(), which is more wildly used?
 
-Straight forward change. LGTM.
+	M.
 
-Reviewed-by: Ritesh Harjani (IBM) <ritesh.list@gmail.com>
-
+-- 
+Without deviation from the norm, progress is not possible.
