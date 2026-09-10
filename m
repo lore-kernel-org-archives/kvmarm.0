@@ -1,92 +1,255 @@
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D3133D331A
-	for <kvmarm@lists.linux.dev>; Thu, 10 Sep 2026 06:34:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09E643CB542;
+	Thu, 10 Sep 2026 06:35:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789022086; cv=none; b=r0jDvUyg1ecnTonfoSpcc/I8QSoPz9l6Q6WzB5YhCJj7oMgnkuSbJNkeiENdJSM/2MMAMxJjHnYCyL5UPyraYQwMeLevdx4zGo06pICRmC2P6CDb8YW8xF9QSaE1MU81lshSoXTH8H/qb+Xa5FMEn9/wBio2lmVUsIe2Dn/KIO0=
+	t=1789022163; cv=none; b=PA6i2Oab54v3mZbG2L2ZgJlUq03reMb2oPVy6MOXdLza8x8H/0oaT0Pvu5mLMYEohquNuiytvEDM+d7x9TEOutepU21CRIpSrGp8uWLaMBJeFZNjnTraFCd3Qk6XRPRHdwpIkLdZekwTxgPAoLXtlPVvnEa+HPEOGvngE2K2xX8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789022086; c=relaxed/simple;
-	bh=/uaCqa1UBzrB4l/x0ktWW2Ji3uA4tmOrYEYh+8w3GLM=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References; b=DDFEoXGG8VI1UKg6d1XkJEUP/H8EQVgfnRVP+UUMDrj79OsHnrmFYh8iNxqIIsHiqrw3XgA1ZW1Ov1g5Ih+7SiaHtr9NJTo2bkJsnH5qL5AQt1IW1qe1M0p7AHKJ0HZ5XdFX4qXJjis9WS0diinmaG5huwHGo786Nc8kURB0Jj8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ljf8Neax; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1789022163; c=relaxed/simple;
+	bh=kumzXJBqaaaXDeADdZjd0wn2AlS+mSdcuauVEB3m0SI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hnsttTCuJwZhUYey503aKkeyF9XYsnIyZ2lv0hu39Leq0+c17ndbwYRypkWcS+KEoh0kFnXVLiqs6iDlFJqH15ZnZ6cJlXMf5oPSFE2+yU7GKIz1YHBwVvywre+DC7v+ehjjEyG/WEe5nu8QXLpp3xp1J7BZjqjJVrWXA/HLIFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=qF5OLKKu; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ljf8Neax"
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2d58efc7356so87626575ad.1
-        for <kvmarm@lists.linux.dev>; Wed, 09 Sep 2026 23:34:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789022084; x=1789626884; darn=lists.linux.dev;
-        h=references:message-id:date:in-reply-to:subject:cc:to:from:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=/uaCqa1UBzrB4l/x0ktWW2Ji3uA4tmOrYEYh+8w3GLM=;
-        b=ljf8NeaxmI96j1nmck4WiEDv41LOtZZcp0WLTLcpPiWVr1lcf5vjc1H8hbgMsUMR+r
-         VLsBPFpRoGr4K3DLeQsUNyGXV7e7N9wUWdMkH84MPzcSP8zktdz7D4BqO1+4KxHjkczj
-         kUUgDS8+5V+kr3m7WOH4wyp4d3XWvpHeQtpx+4hVmwcQ5siShHOKvidQ5Pfv+CdZGQe2
-         9khhCT9oqAi5DAve5Jw/8ejjUkgLZui467/3q1kY1nx4VXlDgTmcN7xQjmbJbn5D2qtG
-         VMIV2aHFzMebZYTWdQgNqfalSaJMiB7LhgvLCFULtIvqfqf1rsRuFOKcT2wQRbHLQp9U
-         vBmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789022084; x=1789626884;
-        h=references:message-id:date:in-reply-to:subject:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=/uaCqa1UBzrB4l/x0ktWW2Ji3uA4tmOrYEYh+8w3GLM=;
-        b=DnWCWnfWZHFFtAf3AzukUeob3s8kHp1P0VwXzV48/+YrgDo1HZObQ1AfbkZPDsvbjK
-         sGCj+iT3Mit2cT4g1Q9J2Fp6aK0oOXiKq+gKYCmR+eliiVIrLCI8XZtBZpXS8w29UwB+
-         rgi0Da0rT0aimYXRPIkDU+veuKZ7lSjVRqljBNBOd8509cxh9w1d6vUifKERxd5+5oAd
-         jw5wwOrKJtYph2rDdFdCY+iDHmUuGu6OJAlFOqjYIH3udj6EkGWE4eOKFV6sQgWEb5eu
-         2Hdx5g/kXF7NkDVCIrfhf9Ye9LQ0LmpHM4zV6qId3rFSUxTWzr277Q34zLGuBq8w+9ve
-         cESQ==
-X-Forwarded-Encrypted: i=1; AKwUvByDbskyQvamPcDeS13Jlzw5dQcjhGDWZ3hceZs+vh2cwbe+uc2Rn+a1A8d8l4LEBJihojuOX9s=@lists.linux.dev
-X-Gm-Message-State: AFuF++lS2TO8/3EGFECD3nKeSq35SD59+FCpUsatWABgk6JuN6AvsJcB
-	VEGwia9WMicEDAIFq3UvrZSW7KU6mkNFFoYIEvW87MpYQrq2slhgj/F1
-X-Gm-Gg: AYBFou29z8+IZXU74fTHsbz4Dyebl2zG2FjjE9kXKfxd/WKFOJS1zeXFFhiyoHLn1Rj
-	cT6LrdWHLrbsjkfXiPwjjhyc6KQ+3e6+6WrJNfJhcbm5i2YC5BbYLUsoU+g4ei3jcbwFIt5vldA
-	YI6ZwNoz7YUMKeLDo471XxfRgkIDrMdCjTu4xpB74HKtGgJ8gG6PySCaFoM4lqUqdxZ+g6AFHr+
-	EtASXsKbUtODjXcB4kTpaOq2nykT31+5CWY6JnPR2Z31F/Qbx2HM693OqwEfeRm89FPF87MgBBB
-	GBj2yXzveP9X19QMWb5nayCfECW3nLkeNaozeuyYk1sXcqLpgfgE/2aMu0q9iWu+lHWsqV+Zsro
-	MmRCkuty61j2Y5paHb9KdcF4v0kJ/gq8YPTckcqD6qXdceYJjKodQ0VoA4CkXpwFbFXmYtPkBrF
-	rYD8U44phRmvMDLkjhIjuSxFJcF/hZPZmx4LXtMFe5Bn0yRRPtIgHlbbUJ3YBhXyIbhlO6o/DrZ
-	zX3d1rBntCkGEMENeNgCc07meAyWUGMzWLeI32u2fYsp2fnThO5ceM=
-X-Received: by 2002:a17:90b:57d0:b0:395:4de0:b78f with SMTP id 98e67ed59e1d1-39b260d28eamr57429977a91.1.1789022083690;
-        Wed, 09 Sep 2026 23:34:43 -0700 (PDT)
-Received: from pve-server ([49.205.216.49])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-33987ccf483sm10434389eec.20.2026.09.09.23.34.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Sep 2026 23:34:42 -0700 (PDT)
-From: Ritesh Harjani (IBM) <ritesh.list@gmail.com>
-To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, Atish Patra <atish.patra@linux.dev>, Alexandre Ghiti <alex@ghiti.fr>, David Hildenbrand <david@kernel.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, Itaru Kitayama <itaru.kitayama@fujitsu.com>, Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH v2 06/20] KVM: selftests: Extend page allocator to support naturally aligned allocations
-In-Reply-To: <20260902164123.2546762-7-seanjc@google.com>
-Date: Thu, 10 Sep 2026 10:57:06 +0530
-Message-ID: <fqzh1xsl.ritesh.list@gmail.com>
-References: <20260902164123.2546762-1-seanjc@google.com> <20260902164123.2546762-7-seanjc@google.com>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="qF5OLKKu"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D40751570;
+	Wed,  9 Sep 2026 23:35:52 -0700 (PDT)
+Received: from [10.57.8.56] (unknown [10.57.8.56])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E11703F7B4;
+	Wed,  9 Sep 2026 23:35:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1789022156; bh=kumzXJBqaaaXDeADdZjd0wn2AlS+mSdcuauVEB3m0SI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=qF5OLKKuz5yjN123Vu3aY3Ez3e3J7MqGqqChZHjho0jgPyGoOTVyJVQ93PhNsTP/d
+	 ZRoZgAeFWG3kJEQY79JbZlpRyws55gl2DJJ63aXMXDnpRINvaZ7kmHaZe/9OkubJEt
+	 IIkFa7X4pIfEdVb/YlhxmvzQRi4CPsggJPsoOCCU=
+Message-ID: <92ab372a-0db0-46fe-bbfe-03649e18de37@arm.com>
+Date: Thu, 10 Sep 2026 07:35:52 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v17 03/20] KVM: arm64: Track the type of VM in kvm_arch
+To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: maz@kernel.org, will@kernel.org, catalin.marinas@arm.com,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org,
+ joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
+ linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
+ sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
+ WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com
+References: <20260908162223.1683432-1-suzuki.poulose@arm.com>
+ <20260908162223.1683432-4-suzuki.poulose@arm.com>
+ <3cd34b9c-7500-4993-86ff-c1ee9a86b601@redhat.com>
+Content-Language: en-GB
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <3cd34b9c-7500-4993-86ff-c1ee9a86b601@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Sean Christopherson <seanjc@google.com> writes:
+On 10/09/2026 04:39, Gavin Shan wrote:
+> Hi Suzuki,
+> 
+> On 9/9/26 2:22 AM, Suzuki K Poulose wrote:
+>> KVM arm64 has different types of VMs with all the different modes in 
+>> which the
+>> hypervisor code can be run. e.g., VHE, nVHE, PKVM etc. Then there is 
+>> protected
+>> VM and normal VMs with PKVM. We might soon add other types, e.g., Arm 
+>> CCA Realm.
+>> So in an effort to make the handling of these different types of VMs a 
+>> bit more
+>> friendlier to the eyes, add a VM flavor to the kvm_arch and we could 
+>> then add
+>> handlers for different operations based on the VM type.
+>>
+>> Keep the flavor initialisation at the beginning to allow for the 
+>> detection
+>> early enough and fail out on any unsupported requests. (e.g., 
+>> protected on !PKVM)
+>>
+>> With that, use the vm_flavor to detect if a VM is protected VM on PKVM.
+>>
+>> Based on a patch by Marc Zyngier
+>>
+>> Suggested-by: Marc Zyngier <maz@kernel.org>
+>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> ---
+>>   arch/arm64/include/asm/kvm_host.h | 12 ++++++++++--
+>>   arch/arm64/kvm/arm.c              | 27 ++++++++++++++++++++++++---
+>>   arch/arm64/kvm/hyp/nvhe/pkvm.c    |  2 +-
+>>   arch/arm64/kvm/pkvm.c             |  1 -
+>>   4 files changed, 35 insertions(+), 7 deletions(-)
+>>
+> 
+> Some nitpicks below. In either way:
+> 
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> 
+>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/ 
+>> asm/kvm_host.h
+>> index 27fe0cd5b2d7a..d0dccc9ad6aa8 100644
+>> --- a/arch/arm64/include/asm/kvm_host.h
+>> +++ b/arch/arm64/include/asm/kvm_host.h
+>> @@ -257,7 +257,6 @@ struct kvm_protected_vm {
+>>       pkvm_handle_t handle;
+>>       struct kvm_hyp_memcache teardown_mc;
+>>       struct kvm_hyp_memcache stage2_teardown_mc;
+>> -    bool is_protected;
+>>       bool is_created;
+>>       /*
+>> @@ -306,9 +305,18 @@ enum fgt_group_id {
+>>       __NR_FGT_GROUP_IDS__
+>>   };
+>> +enum kvm_arm_vm_flavor {
+>> +    VM_NVHE,
+>> +    VM_VHE,
+>> +    VM_PKVM,        /* Normal guests on PKVM */
+>> +    VM_PROTECTED_PKVM,    /* Protected VM */
+>> +    VM_FLAVOR_MAX,
+>> +};
+>> +
+>>   struct kvm_arch {
+>>       struct kvm_s2_mmu mmu;
+>> +    enum kvm_arm_vm_flavor vm_flavor;
+>>       /*
+>>        * Fine-Grained UNDEF, mimicking the FGT layout defined by the
+>>        * architecture. We track them globally, as we present the
+>> @@ -1504,7 +1512,7 @@ struct kvm *kvm_arch_alloc_vm(void);
+>>   #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
+>> -#define kvm_vm_is_protected(kvm)    (is_protected_kvm_enabled() && 
+>> (kvm)->arch.pkvm.is_protected)
+>> +#define kvm_vm_is_protected(kvm)    ((kvm)->arch.vm_flavor == 
+>> VM_PROTECTED_PKVM)
+> 
+> Here we may introduce one more helper for generic use cases. It's going to
+> be used in kvm_arch_init_vm().
+> 
+> #define kvm_vm_flavor_eq(kvm, flavor)    ((kvm)->arch.vm_flaor == (flavor))
+> #define kvm_vm_is_protected(kvm)    kvm_vm_flavor_eq(kvm, 
+> VM_PROTECTED_PKVM)
 
-> Extend the page allocator to support naturally aligned allocations, as some
-> flavors of PowerPC page tables require multiple guest pages per table, and
-> those tables need to be naturally aligned.
->
+see below.
 
-That's true.
+> 
+>>   #define vcpu_is_protected(vcpu)        kvm_vm_is_protected((vcpu)->kvm)
+>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+>> index 8b080804bc90b..67f1ff9bc4fbe 100644
+>> --- a/arch/arm64/kvm/arm.c
+>> +++ b/arch/arm64/kvm/arm.c
+>> @@ -214,6 +214,26 @@ static int kvm_arm_default_max_vcpus(void)
+>>       return vgic_present ? kvm_vgic_get_max_vcpus() : KVM_MAX_VCPUS;
+>>   }
+>> +static int kvm_init_vm_flavor(struct kvm *kvm, unsigned long type)
+>> +{
+>> +    bool protected = type & KVM_VM_TYPE_ARM_PROTECTED;
+>> +
+>> +    if (is_protected_kvm_enabled()) {
+>> +        if (protected)
+>> +            kvm->arch.vm_flavor = VM_PROTECTED_PKVM;
+>> +        else
+>> +            kvm->arch.vm_flavor = VM_PKVM;
+>> +    } else if (protected) {
+>> +        return -EINVAL;
+>> +    } else if (has_vhe()) {
+>> +        kvm->arch.vm_flavor = VM_VHE;
+>> +    } else {
+>> +        kvm->arch.vm_flavor = VM_NVHE;
+>> +    }
+>> +
+>> +    return 0;
+>> +}
+>> +
+>>   /**
+>>    * kvm_arch_init_vm - initializes a VM data structure
+>>    * @kvm:    pointer to the KVM struct
+>> @@ -236,6 +256,10 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned 
+>> long type)
+>>       mutex_unlock(&kvm->lock);
+>>   #endif
+>> +    ret = kvm_init_vm_flavor(kvm, type);
+>> +    if (ret)
+>> +        return ret;
+>> +
+>>       kvm_init_nested(kvm);
+>>       ret = kvm_share_hyp(kvm, kvm + 1);
+>> @@ -260,9 +284,6 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned 
+>> long type)
+>>           ret = pkvm_init_host_vm(kvm, type);
+>>           if (ret)
+>>               goto err_uninit_mmu;
+>> -    } else if (type & KVM_VM_TYPE_ARM_PROTECTED) {
+>> -        ret = -EINVAL;
+>> -        goto err_uninit_mmu;
+>>       }
+>>       kvm_vgic_early_init(kvm);
+> 
+> We needn't depend on is_protected_kvm_enabled() to call 
+> pkvm_init_host_vm() because
+> the output of is_protected_kvm_enabled() has been updated to kvm- 
+>  >arch.vm_flavor
+> by previous call kvm_init_vm_flavor().
 
-> Take care to align the potential base address *inside* the retry loop, i.e.
-> the base needs to be (re)aligned on every attempt.
->
-> Tested-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+TBH, thats a faster way to check if we are running on PKVM. I could
+add something linke kvm_vm_has_pkvm(kvm) which covers both VM_PKVM and
+VM_PROTECTED_PKVM.
 
-Thanks for sharing the changes. Looks good to me.
+> 
+>      if (kvm_vm_is_protected(kvm) || kvm_vm_flavor_eq(kvm, VM_PKVM)) {
+>          ret = pkvm_init_host_vm(kvm, type);
+>          if (ret)
+>              goto err_unit_mmu;
+>      }
 
-Feel free to add:
-Reviewed-by: Ritesh Harjani (IBM) <ritesh.list@gmail.com>
+And I can drop the type fron pkvm_init_host_vm with suggestion below.
+
+Cheers
+Suzuki
+
+> 
+>> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/ 
+>> pkvm.c
+>> index 459bd9eb7e4bc..09961c0056f2b 100644
+>> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
+>> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+>> @@ -432,7 +432,7 @@ static void init_pkvm_hyp_vm(struct kvm *host_kvm, 
+>> struct pkvm_hyp_vm *hyp_vm,
+>>       hyp_vm->host_kvm = host_kvm;
+>>       hyp_vm->kvm.created_vcpus = nr_vcpus;
+>> -    hyp_vm->kvm.arch.pkvm.is_protected = READ_ONCE(host_kvm- 
+>> >arch.pkvm.is_protected);
+>> +    hyp_vm->kvm.arch.vm_flavor = READ_ONCE(host_kvm->arch.vm_flavor);
+>>       hyp_vm->kvm.arch.flags = 0;
+>>       pkvm_init_features_from_host(hyp_vm, host_kvm);
+>> diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+>> index 8e4c6e4bec123..3948fa46f4d75 100644
+>> --- a/arch/arm64/kvm/pkvm.c
+>> +++ b/arch/arm64/kvm/pkvm.c
+>> @@ -240,7 +240,6 @@ int pkvm_init_host_vm(struct kvm *kvm, unsigned 
+>> long type)
+>>           return ret;
+>>       kvm->arch.pkvm.handle = ret;
+>> -    kvm->arch.pkvm.is_protected = protected;
+>>       if (protected) {
+>>           pr_warn_once("kvm: protected VMs are experimental and for 
+>> development only, tainting kernel\n");
+>>           add_taint(TAINT_USER, LOCKDEP_STILL_OK);
+> 
+> In pkvm_init_host_vm(), the local variable 'protected' is used for once
+> and can be removed by:
+> 
+>      if (kvm_vm_is_protected(kvm)) {
+>          pr_warn_once(...);
+>          add_taint(...);
+>      }
+> 
+> Thanks,
+> Gavin
+> 
+
