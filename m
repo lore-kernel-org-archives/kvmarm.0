@@ -1,96 +1,159 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C6E03C3F7B;
-	Thu, 10 Sep 2026 08:43:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C06F92F7F09;
+	Thu, 10 Sep 2026 08:49:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789029805; cv=none; b=aml/WdPWOcFpZWgY4uwDbLEPuHk9C7ChZ6PGBPmgmzNhTHwA0tYFcczuMsXhhjcjg5Vms/pNTDj/sisaY9F3IyWD5O9epZ1Lis1ynfyRnk48o1f3QAKiJYvK5c7AHGNGWKOP0e+8N8lW6ZaDPyQhOhOowf/yOlf+YaXuiQawftY=
+	t=1789030152; cv=none; b=M+z6Kll0omrpDUDCBEF7LNfZxdwDYcECbv3CDiHhld71mqODarzTiPgTyNM4kvudIC4CAu9TMhd1D02/HDH7Fjomc175558GMZ4ZW+bjfoSfHIJZOtl9jnnohGjP4skQOEKVSXldkhwZDBmOXLRiundzinlwD3RosjtsUTzfw0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789029805; c=relaxed/simple;
-	bh=pZUMNn7G6bEmWkSQbLz54BigM3O4mPAIKyE7XJ1QN/I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VYnQEzxZLN5GwxzTA4/kQtQpVl7LKa2XPeK61qg7yqIwhjx2w2KS9toxbQQEmjv/hdo9MSJBP//mMIlbD8/SIhmzYQ7TKo3ZOFLeDouDrgWX0UK2Rvi0By31qdQYRdUYmMg1273feRpUmm4E66tKi0o/39NBWnrfFWiNK2p1ECg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=EHjRVZpn; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1789030152; c=relaxed/simple;
+	bh=8IvN7qTgPgf/1PFeXvPLH9waCGOkjkd8FQOgd80O+XI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kuGNxfpjjbc2k8X9yq9mECeh3hYXD9NGSfMZbByipud0cPSV+tg2TyllGJRyqDGQQhkkuGnkdVB/kRqzmT2RzgsQlClbZWLOKEk7uWmzZ5wRkOaDZViGfq5NqR35iwgwmpJ0U+HfzEXQ9MSURtzVo1t2okwogxJkIQPW79phZ4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fCv/DXz2; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="EHjRVZpn"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EA6D81570;
-	Thu, 10 Sep 2026 01:43:18 -0700 (PDT)
-Received: from [10.0.129.245] (unknown [10.0.129.245])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A30433F7B4;
-	Thu, 10 Sep 2026 01:43:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1789029802; bh=pZUMNn7G6bEmWkSQbLz54BigM3O4mPAIKyE7XJ1QN/I=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=EHjRVZpnJR2Yspv1pcvSj5E8gglrpU8NcIRqk/eLWDvSmVhmkEnt5wHKbiTXtnFSU
-	 vm/P1PsmftSvQMuEhWVLOoJYES5EwyAheGCUV7Jar3sxHe6GayFDDE1GnvT012cb3G
-	 h34jwHoi3ZpFOpzyb3GvlaGfqIIVa8VCneQYTc48=
-Message-ID: <40d3312a-c695-44ed-857a-fc6bf293f3e6@arm.com>
-Date: Thu, 10 Sep 2026 09:43:17 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fCv/DXz2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 464D61F000FF;
+	Thu, 10 Sep 2026 08:49:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789030151;
+	bh=VfSkPLpOWWd+VItdFa754M+oss4bxhyEVWaKllCEoR8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=fCv/DXz2GkQ2jYCc7xWf/313wM6aqpMIKwHxF8glPgcMfbPMnyliOsMgk0eNk5TvB
+	 K2aAyl+mZ3uWjtAjaZxgMntiIelsMcMAV3PO3WbsqEYt8btVzE4hwLjoRho8NPTFCp
+	 ylUV3Vy11jQ16dTdv92dh9HXaccFqbBzIJXPRkRlaUkjAJU+FicEpBKbX9yH6sMlan
+	 ThjNz2rS7OHvSRrSP3iFzVAemCxMztIOdmabPmru+XPPuqZZnfLWfLGSYzGh6eaGpD
+	 mLDzImom5ri+WCsBPA/q1DHXzbpP0WyPnqld7JKpsmQfHDsHU4XLfhUs+xwXvZt+yK
+	 7Y19Sv23+VcSQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1x4aSy-00000007AGx-3Og4;
+	Thu, 10 Sep 2026 08:49:08 +0000
+Date: Thu, 10 Sep 2026 09:49:08 +0100
+Message-ID: <86v78d7apn.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Jack Thomson <jackabt@amazon.com>,
+	Jack Thomson <jackabt.amazon@gmail.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	Leo Soares Passos <Leo.Bras@arm.com>
+Subject: Re: [PATCH 3/8] KVM: arm64: Propagate and use kvm_s2_fault_result on S2 fault
+In-Reply-To: <20260825-kvm-arm-prefault-v1-3-befe8947702e@kernel.org>
+References: <20260825-kvm-arm-prefault-v1-0-befe8947702e@kernel.org>
+	<20260825-kvm-arm-prefault-v1-3-befe8947702e@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v17 06/20] KVM: arm64: CCA: Add a new mode for supporting
- Realm guests
-Content-Language: en-GB
-To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: maz@kernel.org, will@kernel.org, catalin.marinas@arm.com,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org,
- joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
- linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
- sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
- WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com
-References: <20260908162223.1683432-1-suzuki.poulose@arm.com>
- <20260908162223.1683432-7-suzuki.poulose@arm.com>
- <e66698e1-e582-4ff8-9881-4ddda5bc1d94@redhat.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <e66698e1-e582-4ff8-9881-4ddda5bc1d94@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ljs@kernel.org, catalin.marinas@arm.com, will@kernel.org, oupton@kernel.org, tabba@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, pbonzini@redhat.com, corbet@lwn.net, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, jackabt@amazon.com, jackabt.amazon@gmail.com, alexandru.elisei@arm.com, vdonnefort@google.com, aneesh.kumar@kernel.org, seanjc@google.com, imbrenda@linux.ibm.com, Leo.Bras@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 10/09/2026 06:53, Gavin Shan wrote:
-> Hi Suzuki,
+On Tue, 25 Aug 2026 17:00:37 +0100,
+"Lorenzo Stoakes (ARM)" <ljs@kernel.org> wrote:
 > 
-> On 9/9/26 2:22 AM, Suzuki K Poulose wrote:
->> Add an explicit mode to support Arm CCA guests.
->>
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> ---
->>   Documentation/admin-guide/kernel-parameters.txt | 3 +++
->>   arch/arm64/include/asm/kvm_host.h               | 1 +
->>   arch/arm64/kvm/arm.c                            | 5 +++++
->>   3 files changed, 9 insertions(+)
->>
->> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/ 
->> Documentation/admin-guide/kernel-parameters.txt
->> index 68647ff4bdd24..1afe3df3b923e 100644
->> --- a/Documentation/admin-guide/kernel-parameters.txt
->> +++ b/Documentation/admin-guide/kernel-parameters.txt
->> @@ -3256,6 +3256,9 @@ Kernel parameters
->>               nested: VHE-based mode with support for nested
->>                   virtualization. Requires at least ARMv8.4
->>                   hardware (with FEAT_NV2).
->> +            rmm: Support for running confidential guests in Realm
->> +                 world using RMM, as defined by Arm Confidential
->> +                 Compute Architecture (CCA)
->>
+> When stage 2 page tables fault the net result may either be that a page is
+> mapped, an error occurred or the fault should be retried (-EAGAIN).
 > 
-> I'm not sure, but 'realm' would be more appropriate name. rmm (Real 
-> Management Monitor) is
-> the term limited to the firmware to me. Besides, we have been using 
-> 'realm' broadly in this
-> series like kvm_vm_is_realm(), kvm_realm_state() and so on.
+> When a fault succeeds it may be upgraded to a PMD size via
+> transparent_hugepage_adjust().
+> 
+> In order to support KVM pre-faulting the outcome of the fault and the
+> mapping size must be recorded.
+> 
+> Track this in the new kvm_s2_fault_result struct, which is threaded through
+> gmem_abort(), user_mem_abort() and kvm_s2_fault_map().
+> 
+> PKVM and SEA aren't relevant to synthetic pre-faulting so neither
+> kvm_inject_sea() nor pkvm_mem_abort() are altered.
+> 
+> Actual hardware faulting doesn't require this information, so
+> kvm_handle_guest_abort() simply passes NULL kvm_s2_fault_result to
+> gmem_abort() and user_mem_abort().
+> 
+> Faults are necessarily ephemeral and pre-faulting can't guarantee what may
+> happen in parallel, so do not store the GFN or PFN in
+> kvm_s2_fault_result. Pre-faulting only needs to know what was mapped in at
+> the point of the fault.
+> 
+> This struct could be replaced with a pointer to an unsigned long, however
+> it's clearer to separate out the mapped flag and having a struct allows us
+> to easily add additional fields in future as needed.
+> 
+> No functional change intended.
+> 
+> Suggested-by: Vincent Donnefort <vdonnefort@google.com>
+> Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+> ---
+>  arch/arm64/kvm/mmu.c | 33 +++++++++++++++++++++++++++------
+>  1 file changed, 27 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 80cb520e25b9..da15da4e40e6 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1607,6 +1607,11 @@ struct kvm_s2_fault_desc {
+>  	struct kvm_s2_mmu	*mmu;
+>  };
+>  
+> +struct kvm_s2_fault_result {
+> +	unsigned long mapping_size;
+> +	bool mapped;
+> +};
+> +
+>  static bool kvm_s2_fault_is_perm(const struct kvm_s2_fault_desc *s2fd)
+>  {
+>  	return esr_fsc_is_permission_fault(s2fd->esr);
+> @@ -1632,7 +1637,17 @@ static u64 kvm_s2_perm_fault_granule(const struct kvm_s2_fault_desc *s2fd)
+>  	return BIT(ARM64_HW_PGTABLE_LEVEL_SHIFT(level));
+>  }
+>  
+> -static int gmem_abort(const struct kvm_s2_fault_desc *s2fd)
+> +static void populate_fault_result(struct kvm_s2_fault_result *result,
+> +				  unsigned long mapping_size)
+> +{
+> +	/* A THP upgrade may have altered mapping size. */
+> +	result->mapping_size = mapping_size;
+> +	/* -EAGAIN is swallowed so be explicit when we actually map. */
+> +	result->mapped = true;
 
-May be. But we use the "mode" of the hypervisor in question here, 
-mostly. e.g., nvhe, vhe, protected etc. So, I went with RMM (in favor
-of CCA). Does that make sense ? Also, we rely on firmware/arm_rmm for
-the support. So, it kind of make sense to keep it "rmm" ?
+I'm not sold on this boolean. I'd rather we use the fact that the
+fault handler has passed a result pointer to return -EAGAIN rather
+than turning into a 0, because that's a clear sign that the fault
+hasn't been generated by a vcpu.
 
-Cheers
-Suzuki
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
