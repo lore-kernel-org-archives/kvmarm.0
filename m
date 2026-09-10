@@ -1,180 +1,161 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55D87483BE5;
-	Thu, 10 Sep 2026 12:19:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mta1.migadu.com (out-108.mta1.migadu.com [95.215.58.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A6F4489FC0
+	for <kvmarm@lists.linux.dev>; Thu, 10 Sep 2026 12:43:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789042792; cv=none; b=NbEAxvZ14Wx1E2wyO/Azvi9FQubrubbJx9TtQ1o54oTt8lAmF09C3uZKZlL81pl08Yoke3yqbrn+vZwOt+OeboVq6pFLszk6WMOp+daa/Ul6YL4huZKtfdXHmN82O+TzCKil+AeEfkYud1ssCLUDDSOSG1dRy5+B2+dJVv8Ffcw=
+	t=1789044194; cv=none; b=GBNSCImvUKsBPcl42XxAkUYeNaGwWWZ9/8Bcji73ESTb2PonMa3POocbpSqRX7RX21rN2RGK8GaGCEvBwMxa8SGh6fPa3Ow4yAdgO1SSR+60ci1Pu/ZbFFLXPIyX5/iM1fFtXB/es9U+4ZF/3EbCLC/7xAmg+pTNmZM0rqpxvKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789042792; c=relaxed/simple;
-	bh=cgjIvGk64xm6wIC8g+V0Ot45lsy2Ho2erWZmfhiISqs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oxnNuImOsX6a4SzIJGxCGuCrdW7ZlKPXISAAs8uY1N5WU9Lpjy8xdORDfQrkP+gf4DPwRTtkadUs2vyoVHSUEol6/ZpM0oiGZilcOPqymHwQLxpawsQ5icIyYsb1h+oZEp2bszGAsYXFuUynfmWP5ZftyDU+Axd291NW0j74HwE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=NBheRzNO; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1789044194; c=relaxed/simple;
+	bh=TLJMW+UBHyf2hULFG74qvyh3xriAmI6y3qUkZriPhlo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Nb5szym/rnsiRxKvMgL41hZrkSEV9PXEgt8NHHR1i7h6WxF+w8pvfp3f1UXQWlaJkH1OHya/E/XucZ3XUHt1Z/UVhSd81sz9VdD2y6eZ8NOvBfUFo87JfQfwT++QuL6Nld0OfZwQlZXm0Ba/NlyGsDNLecR7d5SXMoH6EgZEmIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mHQ0xPc1; arc=none smtp.client-ip=95.215.58.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="NBheRzNO"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DDA07153B;
-	Thu, 10 Sep 2026 05:19:45 -0700 (PDT)
-Received: from [10.2.197.99] (ewhatever.cambridge.arm.com [10.2.197.99])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id ADC4A3F7B4;
-	Thu, 10 Sep 2026 05:19:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1789042789; bh=cgjIvGk64xm6wIC8g+V0Ot45lsy2Ho2erWZmfhiISqs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=NBheRzNO+EaTwIE+Pi/Plbx+7F7WlCuB8wg3buPDBtE4G4dEeJj35NT/q2J64qIHp
-	 u0tB9tx4whoghfgK57/iyVp5ydRmdrH37cT2NJnyaBBZjCatKKKE39Tn2mq1hYX+2D
-	 ie04ePScOrd4zIGdi6l6ROR7jGoyrGSbvILjtiqk=
-Message-ID: <cdbf8e5c-fd45-4970-9835-1fe2f4530f36@arm.com>
-Date: Thu, 10 Sep 2026 13:19:46 +0100
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mHQ0xPc1"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=TLJMW+UBHyf2hULFG74qvyh3xriAmI6y3qUkZriPhlo=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1789044187; v=1; x=1789648987;
+ b=mHQ0xPc1NTl7CIjNYa5HlI/RIV7OuKliN/tOYeoPzEK3gIy/32CyWsQTmYZmDA5VFsf1Xtvv
+ 3tpXo2S5dSsz3Yx2TQIkR830tExig0flM5/JpAqWvPaqvZGJGuQwq7zCq25ZAY23XsdvFnsstOP
+ pztJ3AjZOSDTAn5eH3Qu9exQ=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 9380a4fca1f8ec49;
+	Thu, 10 Sep 2026 12:43:07 +0000
+X-Mizu-Trace-ID: 9380a4fca1f8ec49
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b4a0b17359so5540e87.0
+        for <kvmarm@lists.linux.dev>; Thu, 10 Sep 2026 05:43:02 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBwhdqdBQjvGia+JwADYcy7CRbyCPoh1WIQrH50AQWykZABHQgWuHGFT3+/Uv0NjFpHZ+Nc0HdI=@lists.linux.dev
+X-Gm-Message-State: AFuF++kdKAtEa6ixUORkaLu+nfR1E3/tie3pIPdYCi+XK/p+L4NM6BRV
+	qVcRdtVnXnLbpCEVj8po8r18ZO+bsInNOOgAa7BOQZutgQd7tA5mtpRzuo5OJXDvjJK+zLXvpph
+	6PIti28FgXEwy/mh4Qm8aCbiUhkKbR6cOXQ5cjWMl
+X-Received: by 2002:a05:6512:234c:b0:5b6:19c6:a91b with SMTP id
+ 2adb3069b0e04-5b89a6da833mr113965e87.14.1789044182010; Thu, 10 Sep 2026
+ 05:43:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v17 09/20] KVM: arm64: coco: arch_timer: Prevent timer
- offset configuration
-To: sashiko-reviews@lists.linux.dev
-Cc: Oliver Upton <oupton@kernel.org>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>
 References: <20260908162223.1683432-1-suzuki.poulose@arm.com>
- <20260908162223.1683432-10-suzuki.poulose@arm.com>
- <20260908164641.416911F00A3A@smtp.kernel.org>
-Content-Language: en-US
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20260908164641.416911F00A3A@smtp.kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+ <20260908162223.1683432-11-suzuki.poulose@arm.com> <CA+EHjTw9ReyvsNT=y+-P6ng7VQ6Pvz9PFK9bO71qvTR1pOxx5Q@mail.gmail.com>
+ <6152fc41-65f0-460f-90b4-1454c11bcba6@arm.com> <CA+EHjTxjk1JLR7Tf5LEfB_xypbUWnw3G3H-FT7bTE=nWTTRgAA@mail.gmail.com>
+ <d22c863b-ea81-472c-b2a9-28f99e5b6f92@arm.com>
+In-Reply-To: <d22c863b-ea81-472c-b2a9-28f99e5b6f92@arm.com>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Thu, 10 Sep 2026 13:42:25 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTx744tg1c3vX0Ugo8YN7n-wtq9-rWdjjSP+UXi8_vvq7g@mail.gmail.com>
+X-Gm-Features: AcwNN1WSfg4g-Ni2N5yRIGRNfczplTeSi9HsXmirIR-L_CctNHI6kvs4aUKgPSE
+Message-ID: <CA+EHjTx744tg1c3vX0Ugo8YN7n-wtq9-rWdjjSP+UXi8_vvq7g@mail.gmail.com>
+Subject: Re: [PATCH v17 10/20] KVM: arm64: coco: Disable Steal time accounting
+ for coco guests
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org, 
+	will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, steven.price@arm.com, 
+	aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com, 
+	joey.gouly@arm.com, yuzenghui@huawei.com, linux-coco@lists.linux.dev, 
+	gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com, 
+	alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com, 
+	lpieralisi@kernel.org, enju.kohei@fujitsu.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 08/09/2026 17:46, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> 
-> Pre-existing issues:
-> - [High] Unprivileged host userspace can trigger a kernel WARN (and potential host panic) by setting SYS_CNTVCT_EL0 or SYS_CNTPCT_EL0 via KVM_SET_ONE_REG for a confidential VM.
-> --
-> 
-> commit 563a7eb94c0d2b010c530d4a42b1717738d5106a
-> Author: Suzuki K Poulose <suzuki.poulose@arm.com>
-> 
-> KVM: arm64: coco: arch_timer: Prevent timer offset configuration
->      
-> Confidential guests, including protected PKVM guests and Arm CCA Realms, always
-> runs with 0 timer offset. Prevent the configuration for them.
-> 
->> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
->> index 6ac3321f4c575..eba84cab95d01 100644
->> --- a/arch/arm64/kvm/arch_timer.c
->> +++ b/arch/arm64/kvm/arch_timer.c
->> @@ -1079,7 +1079,7 @@ static void timer_context_init(struct kvm_vcpu *vcpu, int timerid)
->>   
->>   	ctxt->timer_id = timerid;
->>   
->> -	if (!kvm_vm_is_protected(vcpu->kvm)) {
->> +	if (!vcpu_is_confidential(vcpu)) {
->>   		if (timerid == TIMER_VTIMER)
->>   			ctxt->offset.vm_offset = &kvm->arch.timer_data.voffset;
->>   		else
-> 
-> [ ... ]
-> 
->> @@ -1110,7 +1110,7 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
->>   		timer_context_init(vcpu, i);
->>   
->>   	/* Synchronize offsets across timers of a VM if not already provided */
->> -	if (!vcpu_is_protected(vcpu) &&
->> +	if (!vcpu_is_confidential(vcpu) &&
->>   	    !test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm->arch.flags)) {
->>   		timer_set_offset(vcpu_vtimer(vcpu), kvm_phys_timer_read());
->>   		timer_set_offset(vcpu_ptimer(vcpu), 0);
-> 
-> [Severity: High]
-> This is a pre-existing issue, but does this configuration allow unprivileged
-> host userspace to trigger a kernel WARN?
-> 
-> For confidential VMs, ctxt->offset.vm_offset is initialized to NULL in
-> timer_context_init(), and KVM_ARCH_FLAG_VM_COUNTER_OFFSET is skipped
-> here in kvm_timer_vcpu_init().
-> 
-> However, if userspace calls KVM_SET_ONE_REG for SYS_CNTVCT_EL0,
-> arch_timer_set_user() handles it like this:
-> 
-> arch/arm64/kvm/sys_regs.c:arch_timer_set_user() {
->      ...
->      case SYS_CNTVCT_EL0:
->          if (!test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm->arch.flags))
->              timer_set_offset(vcpu_vtimer(vcpu), kvm_phys_timer_read() - val);
->          return 0;
->      ...
-> }
-> 
-> Since the flag is clear for confidential VMs, this will unconditionally invoke
-> timer_set_offset() with a userspace-controlled offset.
-> 
-> In timer_set_offset():
-> 
-> include/kvm/arm_arch_timer.h:timer_set_offset() {
->      ...
->      if (!ctxt->offset.vm_offset) {
->          WARN(offset, "timer %d\n", arch_timer_ctx_index(ctxt));
->          return;
->      }
->      ...
-> }
-> 
-> Because vm_offset is NULL, this triggers the WARN if the computed offset is
-> non-zero. With panic_on_warn enabled (common in cloud environments), could
-> this allow unprivileged host userspace to panic the host?
+Hi Suzuki,
 
-I have added the following patch to the series to fix this :
+On Thu, 10 Sept 2026 at 11:28, Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+...
+> Just to make sure I understand the picture:
+>
+> For coco VMs:
+>
+>   - check extension on coco KVM, KVM_CAP_STEAL_TIME => 0
+>
+> And a follow up DEVICE_HAS_ATTR => -EPERM ?
+>
+> But we tell the VMM, look you don't have the capabilit on this VM.
+> But if you try to set the attribute isn't it more appropriate to
+> say:
+>   -ENXIO - No you don't have that feature on this VM (-ENXIO)
+> rather than
+>   -EPERM - No, I won't let you do that.
+>
+> Remember we are doing only in the "VM" context. It is a minor nit
+> but I wanted to make sure we understand what we are thinking.
 
-KVM: arm64: pKVM: Prevent setting CNTVCT_EL0/CNTPCT_EL0 for
-  protected VMs
+-ENXIO it is. I went back to api.rst for KVM_SET_DEVICE_ATTR: ENXIO is
+for a group or attribute that's "unknown/unsupported for this device",
+and EPERM for one that "cannot (currently) be accessed this way", a
+state or access-mode refusal, so a VM type that doesn't have the
+feature is the former. KVM_HAS_DEVICE_ATTR only documents ENXIO at
+all. Your patch is good as it is.
 
-Protected VMs run doesn't allow setting offsets for virtual and phyiscal 
-counters.
-However we don't prevent the userspace from trying to write to the 
-CNTVCT/CNTPCT
-registers. This would lead to KVM triggering a WARN() in 
-timer_set_offset() as
-the vm_offset pointer is set to NULL. Prevent this by denying the writes to
-them for protected VMs.
+Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
 
-Reported by Sashiko here
-  
-https://lore.kernel.org/all/20260908164641.416911F00A3A@smtp.kernel.org
+Cheers,
+/fuad
 
-Fixes: f7d05ee84a6a ("KVM: arm64: Prevent host from managing timer 
-offsets for protected VMs")
-Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
----
-  arch/arm64/kvm/sys_regs.c | 4 ++++
-  1 file changed, 4 insertions(+)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 44aae52c473d7..ba44873799b23 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1787,10 +1787,14 @@ static int arch_timer_set_user(struct kvm_vcpu 
-*vcpu,
-                 val &= ~ARCH_TIMER_CTRL_IT_STAT;
-                 break;
-         case SYS_CNTVCT_EL0:
-+               if (vcpu_is_protected(vcpu))
-+                       return -EPERM;
-                 if (!test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, 
-&vcpu->kvm->arch.flags))
-                         timer_set_offset(vcpu_vtimer(vcpu), 
-kvm_phys_timer_read() - val);
-                 return 0;
-         case SYS_CNTPCT_EL0:
-+               if (vcpu_is_protected(vcpu))
-+                       return -EPERM;
-                 if (!test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, 
-&vcpu->kvm->arch.flags))
-                         timer_set_offset(vcpu_ptimer(vcpu), 
-kvm_phys_timer_read() - val);
-                 return 0;
 
+>
+> Cheers
+> Suzuki
+>
+> > it's just not permitted for a confidential VM, and -EPERM says exactly
+> > that, whereas -ENXIO reads as "no such feature".
+> >
+> > Cheers,
+> > /fuad
+> >
+> >>
+> >>> steal-time exists but isn't permitted for a confidential VM, whereas
+> >>> -ENXIO reads as "no such feature".
+> >>
+> >> Cheers
+> >> Suzuki
+> >>
+> >>
+> >>>
+> >>> Cheers,
+> >>> /fuad
+> >>>
+> >>>>
+> >>>>    int kvm_arm_pvtime_set_attr(struct kvm_vcpu *vcpu,
+> >>>> @@ -81,7 +81,7 @@ int kvm_arm_pvtime_set_attr(struct kvm_vcpu *vcpu,
+> >>>>           int ret = 0;
+> >>>>           int idx;
+> >>>>
+> >>>> -       if (!kvm_arm_pvtime_supported() ||
+> >>>> +       if (!kvm_arm_pvtime_supported(kvm) ||
+> >>>>               attr->attr != KVM_ARM_VCPU_PVTIME_IPA)
+> >>>>                   return -ENXIO;
+> >>>>
+> >>>> @@ -110,7 +110,7 @@ int kvm_arm_pvtime_get_attr(struct kvm_vcpu *vcpu,
+> >>>>           u64 __user *user = (u64 __user *)attr->addr;
+> >>>>           u64 ipa;
+> >>>>
+> >>>> -       if (!kvm_arm_pvtime_supported() ||
+> >>>> +       if (!kvm_arm_pvtime_supported(vcpu->kvm) ||
+> >>>>               attr->attr != KVM_ARM_VCPU_PVTIME_IPA)
+> >>>>                   return -ENXIO;
+> >>>>
+> >>>> @@ -126,7 +126,7 @@ int kvm_arm_pvtime_has_attr(struct kvm_vcpu *vcpu,
+> >>>>    {
+> >>>>           switch (attr->attr) {
+> >>>>           case KVM_ARM_VCPU_PVTIME_IPA:
+> >>>> -               if (kvm_arm_pvtime_supported())
+> >>>> +               if (kvm_arm_pvtime_supported(vcpu->kvm))
+> >>>>                           return 0;
+> >>>>           }
+> >>>>           return -ENXIO;
+> >>>> --
+> >>>> 2.43.0
+> >>>>
+> >>
+>
