@@ -1,283 +1,523 @@
-Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11013033.outbound.protection.outlook.com [40.107.201.33])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD64F53ECEF;
-	Thu, 10 Sep 2026 17:12:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.201.33
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789060356; cv=fail; b=V/eKQuuYeCabhrpzJ9HVYFbIaBTteMp/SOiptm8djOVEK6EZaN8dLvftm53Xan/D+pYsq4doLpCYCPHaK5rlpj5dgyt8smQVW9t4+H+3C/7JCj0vXDTeN5Esj9aH3h+4vTO9ZQbSKBLqkZj+zISOeYFESBblyhwD6GQo/21ZvUk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789060356; c=relaxed/simple;
-	bh=mOkj8KfjzFNhpZfTh0Mg2iH3bMwNHqF28slsrW2Pqx8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=SA48TLQuaHGhQcVWaGQOmVApP7cwFpXLeYS1TkbVdCXM1dl2NDY5/GWGbEnI8haZafYyjxp8+UZn9AYDDP+cTWeWmffINNvCtUrQ5kTY6YcsvXWHsETG2yc4No4/SkumpqdQICpj72E32W8PHbzAFcoHLDu+5fPr+ecw/ljMJl0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=RcGWYLNs; arc=fail smtp.client-ip=40.107.201.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16AFD4FB9C9
+	for <kvmarm@lists.linux.dev>; Thu, 10 Sep 2026 17:20:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1789060859; cv=none; b=STJCF/JXP7TECX2i4Hc1K7r1TcUtfEIpezlnfhtLl46cTQaBQR09OGYfWtxyC1p0yiaNgljzMsxHdgOjTilzylnDVeZO8nUOkA9JOEJOfa3MmXCX68S5CnHW4KHqRKFeFVmUbfrgjjpwPyxuIFTWQNSuLFauoevwZNp/So7epuE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1789060859; c=relaxed/simple;
+	bh=On3RzrtMuST+P6UOEpazXCXmp06+AvInEz19sMd7mHs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=HLJ0qQs9IsYv3r8NSil+ZlHma/Si+cHNgaV8YU1i2ELeAprauZEyAM7/p8SwZ7BPawrdxudQJZTlLOdLszlgKt1vEDKaVZ2f9ZJG/H7Yh4dTPcdVcGhUZRUvyHZ059F7Yy63nqwtRy2bRIoFm9ejICSF6vyja7UfWRQHWxFI+pI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=NIkJP13v; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="RcGWYLNs"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=V7WvY/hQLeK1mELkx1Ir/mI1yoolyBz9LoS8kEqxCxNyhvLMTWHTmCZsSZBMPHPiznex37osU6tsd7skZtfXgpiRwMaJEhx/wbWSmATVBHE/9GeYYPgjf9pPfleehyK9CniIPxOKJIND8+xs0dcjRVdFS5XOkjJZP1A6DyZbiWkFGdg0l34GqR9hvWoxG6ShJBXhl15y2zsnjfDlUctebjWzmuMRDPuzvxp9a8W0wTE3Q4djKI1ZPjO6Nl8EGweZMkBStnsq1eY3BnshaQO4GyH9Uy+4oY5+IZtPUkve22LdWZoM33LbHy2tSvYFmrtL71bMHKGzbtpQ1J8VNkS3bg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=P7tMA52PfXUUwFSViKt8NC1NiassUU0VI3kSP2XbenY=;
- b=cTBMqnhdQmcQtZy3jUwNv3OM/RxiBPI9yasfI6Bk1Uxq7gWn94LMdlGIBMIaObonWVouXl3pkNWkmYIfBY9sm9KxyKlzAMqvKYiO/NVa2xGrF5/ZYU7iZQUXHQmJKCP8eeabKOAISE8un7euMNqUexWiZhZfPGsLMvFZIX0Ov6LA2WAjOM7MguLY0ZGcHdVjvVNWJpD3s4s99GDqs2b/QUfFeUZ9d9KfeQxPUWfrlcSQ0XOk29O0Gg22Y0voavJBosErfbjZ98SqfcZ3ZuKCCU7QENMBx4PwSRAxT9XH77xRsX63UnC1Y5wXzNd6uZDb0GQp8VHG7bn4kua50vDfFw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=P7tMA52PfXUUwFSViKt8NC1NiassUU0VI3kSP2XbenY=;
- b=RcGWYLNs1X7GvJmf1+PAHtmFIHz9OBDpwzMtHpErV3C0LOSruwewEmAyy3q0rdHYf7u11TyYr5wFSXbVKQRP9iz4RzUNVlpKM0w23EV0PbvmYeC2jLGoKM1lBNdWhlpdfWOU6+4W+YPvk0ROILJ7lhDtkS+b5Dc56aHTj+7u/5FDzsJ/Vv9RkWJSTD+16K/SPmBVLIpAtJxKZ3J2IApCEsrFvzEFYj6jRq/oR3IvtvIsi2EI35ZfbqYwdD8RP1zlIORSLdkeuWPRC5A8KXwTMjgTEVASNKE7f3vGMI7JmlT3wOFALujzMCrUTTx3qcObNNhlGcvx1RG1NxPxHd7gjg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV8PR12MB9620.namprd12.prod.outlook.com (2603:10b6:408:2a1::19)
- by IA1PR12MB6435.namprd12.prod.outlook.com (2603:10b6:208:3ad::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.406.9; Thu, 10 Sep
- 2026 17:12:12 +0000
-Received: from LV8PR12MB9620.namprd12.prod.outlook.com
- ([fe80::299d:f5e0:3550:1528]) by LV8PR12MB9620.namprd12.prod.outlook.com
- ([fe80::299d:f5e0:3550:1528%4]) with mapi id 15.21.0406.007; Thu, 10 Sep 2026
- 17:12:12 +0000
-Date: Thu, 10 Sep 2026 14:12:10 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: David Matlack <dmatlack@google.com>,
-	Logan Odell <loganodell@google.com>, arnd@arndb.de,
-	pasha.tatashin@soleen.com, rppt@kernel.org, pratyush@kernel.org,
-	graf@amazon.com, akpm@linux-foundation.org, pbonzini@redhat.com,
-	maz@kernel.org, oupton@kernel.org, bhelgaas@google.com,
-	alex@shazbot.org, kevin.tian@intel.com, dwmw2@infradead.org,
-	baolu.lu@linux.intel.com, joro@8bytes.org, will@kernel.org,
-	robin.murphy@arm.com, linux-arch@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kexec@lists.infradead.org,
-	linux-mm@kvack.org, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-pci@vger.kernel.org, iommu@lists.linux.dev
-Subject: Re: [RFC PATCH 0/3] liveupdate: Move to feature flags for LUO and
- memfd ABI compatibility
-Message-ID: <20260910171210.GF3968357@nvidia.com>
-References: <20260903023452.721732-1-loganodell@google.com>
- <20260904160009.GV4157646@nvidia.com>
- <aptFFYqcSiBdMLE8@google.com>
- <20260905012403.GX4157646@nvidia.com>
- <aqIAtOoew-_6jw29@google.com>
- <20260910143448.GD3968357@nvidia.com>
- <aqLOWkuVKccR-I7W@google.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aqLOWkuVKccR-I7W@google.com>
-X-ClientProxiedBy: CH0PR03CA0304.namprd03.prod.outlook.com
- (2603:10b6:610:118::28) To LV8PR12MB9620.namprd12.prod.outlook.com
- (2603:10b6:408:2a1::19)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="NIkJP13v"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2F9B822C8;
+	Thu, 10 Sep 2026 10:20:35 -0700 (PDT)
+Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C824B3F59E;
+	Thu, 10 Sep 2026 10:20:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1789060838; bh=On3RzrtMuST+P6UOEpazXCXmp06+AvInEz19sMd7mHs=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=NIkJP13vMwgWuA8pY6Byn4L+t3sch+R32k1IpiZZiCeTpdbg3AqX/4q++xC01ygAz
+	 fm7XgBkKel3wM78k8yrifS3zOCdX9YfiBNRm15a1aBiC6Dj9+EXITie3kr3IejRqBA
+	 6rdtMYH3WJLbad37l7xxVUUxX4vfkIPXwe1UpXKk=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Mark Brown <broonie@kernel.org>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	Yao Yuan <yaoyuan@linux.alibaba.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v20 14/14] KVM: selftests: arm64: Add GCS EXLOCK exception emulation test
+Date: Thu, 10 Sep 2026 18:20:30 +0100
+Message-ID: <aqLm3qT755sXH_D9@LeoBrasDK>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260901-arm64-gcs-v20-14-f31750bdfadb@kernel.org>
+References: <20260901-arm64-gcs-v20-0-f31750bdfadb@kernel.org> <20260901-arm64-gcs-v20-14-f31750bdfadb@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV8PR12MB9620:EE_|IA1PR12MB6435:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7d6e78ae-31bc-4215-ed82-08df0f5ea73f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|23010399003|376014|7416014|366016|1800799024|10067099003|6133799003|18002099003|22082099003|56012099006|4143699003|11063799006;
-X-Microsoft-Antispam-Message-Info:
-	GKQccKKe63WIeMQodEr1ChpdjstsQwwo3mgXmpgJ8KCe2Dh34FxJytuK5U5IlFyNR6UQQ+7sZvfDIDX8+I4g4myAMUJnHBa12AbufDNiqVf6v5GYXt5eBypXBMUuNLCL/LXXxTHmSKJO3jSad+C3La54HE92szCQgXjSiiTAKQLv3weE34zTwgiQ2s1Dn6866+Y+LGOps4aHe16nStsGYBHlSBBXI7LCMAGxyOqnhjxsI8YkNFGeofkwJL9VNGx87eXMplMdvH6TLa5KD9YqodmPoavfwBs8waT2PK5Uh42nCqXZpresxfhmJVFX7NQBDhiozjsecdOYfp6g0ZC0lzoea42JFgJK3/9/UUm5ZcaoxibtN1D6+DJgJphxQ9de4CxYYdtV38NS3mPhUqX04i2h9Q3uQCu0TIHaguNuuThaKIp3v6jkAs+J5PAW8Vc3jIWvwTl6TVmqVlbJshpkDzauEcNdZFJODAwd25gRJq2gQvs7HjfQy8eTFz0GTDd8XsOJgqx5HJh99MW+K2lwbz8ro0T6bWvaHfMAt9c8e9lecSm4Vv0B2lmG0bQStISVuMdL0aDRroF5G7qfcKUu6A4WNpAzEm+DGPogUL22mVQ0o1tGeVQ9168GGPjV5QxcKFOkvT6cR9Zqf8DF2qHSzaTQx0Twh4IDxgiCQNh/m1U=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV8PR12MB9620.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(376014)(7416014)(366016)(1800799024)(10067099003)(6133799003)(18002099003)(22082099003)(56012099006)(4143699003)(11063799006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?//bM3Afhm6tWeD55iMTwEtIEjrtpn7/llKkHijhqXiadIPQjebLiuJw9Afmb?=
- =?us-ascii?Q?WUdAKtnetQactYlUsRoGw8chgfVhmEzvaLP0UemehCwR1cK4GTqCRMwZmPy1?=
- =?us-ascii?Q?0KBPeYazOMMnApnIKlgDta0wkvh9J0FB2YY/Lmap7y4aTG8wB2KS3L9XqTaN?=
- =?us-ascii?Q?b7sH8hzHuhCL/is9SZzmXcZO1KvcU76vCOw97M3kRZSj7BzFuAs1X6WTqqm1?=
- =?us-ascii?Q?F4GManZNSo79KK8ri3+E1PQHNbHTQ3iy9JUIYAGiFw3NBt9PSKZFuMBzAoYk?=
- =?us-ascii?Q?MzXAXt9QxXjh2swZuz2U6vP5JGmwbLKuO03qEJFDclrU6cjKTwSc77mc4M3l?=
- =?us-ascii?Q?RDin4Zrk6AFgWqH13tCGq6n1wWq3Rt5AsJpK60vNeBvPSer0AsT8k90ufKJ6?=
- =?us-ascii?Q?MfkZp9CGgN697Z3ShkmPAUNKWxeq5wiyBzW2I5SLZ9DwRw4nxe123yZdMceM?=
- =?us-ascii?Q?QlcQEZOKN2a0AGXWx9z1Ws8xQ8jpayCKBL5V3m2ez0VS5PPgS1lPURKGYYhF?=
- =?us-ascii?Q?SzsiWJBUaz0bMkCP9yp8DvR+q8atAwmUS8D+0pat1HsP7yVJo4jeGVdrJYIy?=
- =?us-ascii?Q?KeD6QxDwJEutcdz1fOiy5D+yBj7IaV09piGVmJvWh1n94+EdlEyo5pRol4HX?=
- =?us-ascii?Q?c2YevB9sXKtHLh4smWTb/DYf2ztk7KCo/s7DM/NBIYTimN7hGAA4msPik9Bs?=
- =?us-ascii?Q?mUGXpUd6ZEDk2FOwLJzia3RR7SJF5LXMDDfRGjLL6PMU0p0bS2gIfvHOCOFV?=
- =?us-ascii?Q?0h5ZmCvFZAw+0YeqXxj6YN3S6U9EWLALS3Tcl81bRA1GaRSArYx6lXxt+uD7?=
- =?us-ascii?Q?0/mORqkUc/SXECmyAwUwZLne0lvRxbaQJpVTFYFSlbFOp0Mj+80BBqn0K5CN?=
- =?us-ascii?Q?pW6SrlSXUHPoN8pOcaofDcdt/t67+GzMl4/7+gGX7fpSu3bKH2gkGlpnloVN?=
- =?us-ascii?Q?fgqjdbvPbaz7mV5SSAGmYOWCDCnM/TMSlrMgbip+BdNC6H5iAlByoV0RrK/+?=
- =?us-ascii?Q?Zq3BnY1L3J4gxA1edHD/U+PZK5FB4Y7PTqFUIUyPA+Woj+y+7nc0TkP9mGoJ?=
- =?us-ascii?Q?/FbvRltJ1soaM/IbMyYXvkUnESap7C/MBcz633GDs986DMxnDKdF6X1d9AXA?=
- =?us-ascii?Q?qIG/m2AK52yWvPuLl2OIO+ieC42j5LOPWcS5GI0b2sAbW+sOIgVZTtzz1Cwa?=
- =?us-ascii?Q?1utBxWtAJZECS0stXVVfYq0lUgm5XAlBiCcefIUu/+CPB3TgOOynBp5es+3S?=
- =?us-ascii?Q?EB1ho8YIwot0lD9DSlwg34okMT8rzD78KHyzJCBaf1kVSnj5ObWfd4SCj3cS?=
- =?us-ascii?Q?1SPkTSnqHHSxWMxL97Q32MuJqF3Z8ZboFHvoF6X+sz69x/DrutVHdGWfHpx/?=
- =?us-ascii?Q?qwqKFT8WK5kj3ivxRFYAQkB7zQZSQLWq/NrObaE8TyoC4J1rF3Fy3O2/AZuW?=
- =?us-ascii?Q?hBxjcpVb0otBLcoc4FVO26pEpg3xKXP3ZCpYtdHsc6G+qg4NBv7q1XjNBjyV?=
- =?us-ascii?Q?Knhj++8Oy7yhJi2OC/HXNADRWKv4w0z5DbxWsyTC6YG98eUzIiMvEqB0E8CE?=
- =?us-ascii?Q?B60BlR9Ed8l+sbT7m5oQGAipBB1kKullYIYMTWU8fqH5sejOy4US3qXWu48m?=
- =?us-ascii?Q?yitxaJ7DNKj2TJucpjTI/zvdwg+6ggSFd41Jctf0tmLVVikoq7SNp8X3wlwn?=
- =?us-ascii?Q?im9Lkg4odRhvFhRMse7c416Hlpq/6ruOKVL4YOqb4b8j+EII?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7d6e78ae-31bc-4215-ed82-08df0f5ea73f
-X-MS-Exchange-CrossTenant-AuthSource: LV8PR12MB9620.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Sep 2026 17:12:11.9421
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Jy2mFyLKp5VkZYd66lrkn8GJLcfymEeIAcdGzDgsO7SncAeXDFDy/hGzq6ek9uTV
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6435
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-On Thu, Sep 10, 2026 at 08:35:54AM -0700, Sean Christopherson wrote:
-
-> I guess maybe we have a different definition of ABI? 
+On Tue, Sep 01, 2026 at 10:47:12PM +0100, Mark Brown wrote:
+> When running in vEL2 ERET is emulated, this means that we must emulate
+> the behaviour of GCSCR_EL2.EXLOCKEN. Add a test that validates the
+> behaviour.
 > 
-> I'm not saying that upstream has to be 100% forwards and backwards compatible.
-> I'm saying the serialization payload itself should communicate what features are
-> effectively required.  I.e. *if* there are incompatibilities, they should be
-> naturally expressed in the serialization format, not communicated out-of-band
-> through magic numbers.
-
-The ABI strings were introduced specifically because extension makes
-the actual compatibility indeterminate by userspace. 
-
-Keep in mind the actual goal here. Someone has kernel A and they need
-to blind kexec into kernel B and NOT have the machine explode, or all
-the VMs sitting on it lost.
-
-Meaning you must have a way to determine before the kexec if kernel A
-is producing something B will *accept*. Accept is not "parse and fail
-with EOPNOTSUPP" like most uapi schems. Aceept means bring in and
-actually fully support and use.
-
-So how do you solve this problem? You MUST declare in some kind of
-manifest exactly what ABIs are supported, in some way.
-
-> The scenario you describe fits exactly with what I am proposing.  
-
-It does not. What is really wanted here is to tell kernel A to only
-support ABI 1 for memfd and so kernel A will fail to serialize if it
-cannot do it because a newer seal flag was used.
-
-We do not want to succeed to serialize then fail to accept after
-kexec and have a dead machine.
-
-This is not anything like a normal uapi compatability problem.
-
-> actually starts using the new sealing flag, the CSP can downgrade to
-> older kernels at will.  And if the user cares about downgrading,
-> then they need to prevent the flag from being used until the new
-> kernel is rollback-safe and deployed to enough hosts to prevent
-> stockout.
-
-Yeah, CSP broadly has to do exactly this across a wide range of
-topics. It is a further reason why this feature is not exactly usable
-by a "mainstream" user :\
-
-> > This is why I think the very idea we can support any version pair is
-> > too much to ask for. We should focus on supporting a small set of
-> > version pairs and not making it too invasive or hard in the kernel or
-> > on the maintainers.
-> >
-> > Thus live update within a stable branch only is my proposal for
-> > upstream support.
-> > 
-> > If it really succeeds at that and it becomes very popular, then let's
-> > discuss upstreaming doing additional version combinations.
->
-> Why on earth would we have version numbers in the first place?  IMO, monotically
-> increasing version numbers are flat out the worst way to communicate
-> features.
-
-As above, discoverablility is a key requirement.
-
-Each version number is a very specific upstream defined ABI, in the
-sense if kernel A emits version X and kernel B accepts version X then
-kexec *must* work.
-
-You can make some manifest in other more complicated ways, but I'm
-deeply skeptical that is really going to bring any value. It feels
-like it is just increasing the testing matrix :\
- 
-> > > I could see things like HugeTLB not working if someone booted the kernel with
-> > > support for only 1GiB pages and then tried to feed it payload with sub-1GiB ranges.
-> > > But to me, those sorts of things fall into the "well yeah, don't do that" category.
-> > 
-> > Okay, how about worse, todays kernel has hugetlbfs and there are
-> > patches around to luo serialize that. Lots and lots of talks about a
-> > post-hugetlbfs world out there.
+> As per DDI0487 R_WTXBY PSTATE.EXLOCK is set to the value of
+> GCSCR_ELx.EXLOCKEN when taking an exception to the same exception level.
+> As per DDI0487 R_TYTWB if on exception return to the same EL
+> GCSCR_ELx.EXLOCKEN is 1 and PSTATE.EXLOCK is not 1 then the exception
+> return is illegal.
 > 
-> And?  Adding a compatibility layer to a future kernel so that it
-> understands an incoming HugeTLBFS payload should be trivial.
-
-From my experience that's optimistic :(
-
-> > Do we want to constrain what is possible to ensure we accomodate this
-> > hugetlbfs serialization? I vote no.
+> We nest handling of two UDFs to allow us to both observe and modify
+> PSTATE.EXLOCK, checking that expected exceptions are generated for ERET.
+> We also repeat the UDF tests having enabled fine grained traps for ERET
+> to try to ensure that the slow paths are taken.
 > 
-> In what way is providing strong ABI guarantees for individual components
-> constraining HugeTBLFS serialization?
-
-I bet it will. Other things we've looked at seemed to be like that.
-Even the above about "yall screwed up" with memfd has the problem
-already. I don't believe we can ever do this so right that it won't be
-constraining to the kernel internals.
-
-> > Do we want to reject the hugetlbfs serialization until we have a year
-> > of debate outlining every possible ABI scenario? I also vote no.
+> We also attempt to write to both SPSR_ELx and ELR_ELx, again using a UDF
+> handler to control PSTATE.EXLOCK. We do all this both with and without
+> having enabled EXLOCKEN, though only for code running at EL2 due to
+> framework limitations.
 > 
-> That's a bit of a strawman argument.  Is designing a forward-looking ABI easy?
-> No, but IMO "a year" is a massive exaggeration of the effort required to come up
-> with a scheme that can survive a variety of plausible upgrade/downgrade scenarios.
-
-Have you tried to get anything merged into the kernel lately? I've got
-lots of uncontroversial stuff pushed out past 4 months already. Some
-luo patches are close to a year already and don't even have any
-controversy.
-
-> And again, I'm not saying we have to support infinite compatibility.  
-
-Okay, I said same stable branch only, do you have some wider
-limitation in mind?
-
-> > Should we make a downgrade round trip a downstream problem? I think
-> > so!
+> For completeness we also inject a data abort from EL0 to EL2 with
+> GCSCR_EL2.EXLOCKEN set, ensuring that PSTATE.EXLOCK is not set.
 > 
-> Hard NAK.  There will inevitably be boundaries that cannot be crossed, but I am
-> not at all ok punting on downgrades.  To me, that's basically saying "we want to
-> add just enough support upstream so that it's not too painful to carry full support
-> out-of-tree".  That completely goes against the spirit of open source and upstream
-> Linux, and I want no part of it.
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+> ---
+>  tools/testing/selftests/kvm/Makefile.kvm           |   1 +
+>  tools/testing/selftests/kvm/arm64/gcs_exceptions.c | 346 +++++++++++++++++++++
+>  2 files changed, 347 insertions(+)
+> 
 
-I generally agree with you sentiment, but I think this is a unique
-case. I've asked around a fair bit, this is sufficiently complicated,
-requires alot of userspace that the CSPs are not open sourcing so has
-a very minimal usage foot print out side their world. I found one
-other possible user that might be more open source oriented..
+Hi Mark,
 
-So, if I was feeling unreasonable I'd say stay out of the upstream
-kernel entirely.
+Maybe because I am new to this type of selftest (i.e. the helpers), or 
+maybe because I don't understand some of the used mechanisms here, but this 
+selftest felt hard to understand, even though the commit message made 
+it sound very simple.
 
-Though, I think this could grow and maybe some open source ecosystem
-will develop around it. I don't know. I'm willing to give it a
-chance.
+So I will try to cover what I could understand, so please let me know if I 
+got something wrong.
 
-HOWEVER upstream is not some kind of free outsourcing for the CSP's
-proprietary forks! Do not ask maintainers to do significant and
-burdensome work that only a CSP is ever going to consume and can only
-really work in a closed proprietary environment. There is no "spirit
-of open source" in that kind of demand. I will be NAKing anything like
-that in my subsystems, I am not signing up to do live update stable
-ABI so the CSPs alone can have a better proprietary product.
+From both tests, the lower_el() one is the simplest: if the features are 
+there, you set TGE, EXLOCKEN and EXLOCK, and then do an KVM_SET_VCPU_EVENTS 
+ioctl which injects a dabt and commit_pending_events(). It should change 
+the PSTATE which you read and make sure EXLOCK=0.
+(This should be about the last sentence in your commit msg)
 
-This is how I come to my conclusion that upstream should support same
-stable branch only at this point. It minimizes the burden, it is a
-decent trail of the technology, and if things go well with a quality
-open ecosystem then sure, upstream can change its mind.
+For same_el(), 3 exception handlers are assigned to the vcpu: unknown, 
+ilegal, and GCS. You then run the guest once, and exit. Then you check the 
+exit reason.
 
-Jason
+In the guest code, you run a few tests for EXTLOCK={0,1} by basically 
+counting and checking how many times each handler was called, and if the 
+expected EXLOCK/EXLOCKEN states are correct. (Relying on R_WTXBY)
+
+When you run test_udf_exception() it will cause an udf(COLLECT) that will 
+itself cause an udf(VALIDATE), and if EXLOCKEN=1, it will cause an illegal 
+exception, which will by itself cause an udf(REPAIR). On EXLOCKEN=0, 
+setting EXLOCK=0 should not take an exception, and thus there should be no 
+illegal++, an just 2 undef. None should cause a gcs exception.
+That makes sense with the tests you do after the udf, as well as deciding 
+to check IL based on EXLOCKEN status.
+
+As for test_sysreg(), it will run for 4 tested registers with both EXLOCKEN 
+states. What it does it take an udf(reg), which will read then write that 
+read value to that register. If EXLOCKEN=1 it's expected to cause a gcs 
+fault. That makes sense with the gcs and udf counters check in the bottom.
+
+The part of re-running test_udf_exception() with HFGITR_EL2 set, IIUC, it 
+that part of fine-grained traps. It seems correct, although I am not seeing 
+any tests of the EC syndrome being 0x1A to make sure it's in use. 
+
+There are also a lot of expect_exlock being used as an int, even if it's a 
+bool. I understand the idea of summing it as we expect it to be 1 on true 
+or 0 on false, but is it really ok?
+Maybe we could change it to int, so we just set it when we enter 
+test_sysreg() or test_udf_exception() like:
+
+-	expect_exlock = enable_exlock;
++	expect_exlock = enable_exlock ? 1 : 0;
+
+If I got the workings right, and both above suggestions (0x1A and 
+bool->int) are either fixed or considered not an issue, then:
+
+Reviewed-by: Leonardo Bras <leo.bras@arm.com>
+
+Thanks!
+Leo
+
+> diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+> index 96bab7002d39..0286453ab223 100644
+> --- a/tools/testing/selftests/kvm/Makefile.kvm
+> +++ b/tools/testing/selftests/kvm/Makefile.kvm
+> @@ -179,6 +179,7 @@ TEST_GEN_PROGS_arm64 += arm64/hello_el2
+>  TEST_GEN_PROGS_arm64 += arm64/host_sve
+>  TEST_GEN_PROGS_arm64 += arm64/hypercalls
+>  TEST_GEN_PROGS_arm64 += arm64/external_aborts
+> +TEST_GEN_PROGS_arm64 += arm64/gcs_exceptions
+>  TEST_GEN_PROGS_arm64 += arm64/mmio_sign_ext
+>  TEST_GEN_PROGS_arm64 += arm64/page_fault_test
+>  TEST_GEN_PROGS_arm64 += arm64/psci_test
+> diff --git a/tools/testing/selftests/kvm/arm64/gcs_exceptions.c b/tools/testing/selftests/kvm/arm64/gcs_exceptions.c
+> new file mode 100644
+> index 000000000000..de5bc6590727
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/arm64/gcs_exceptions.c
+> @@ -0,0 +1,346 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Test KVM's handling of Guarded Control Stack exception state.
+> + */
+> +
+> +#include "kvm_util.h"
+> +#include "processor.h"
+> +#include "test_util.h"
+> +#include "ucall.h"
+> +
+> +#include <asm/ptrace.h>
+> +#include <asm/sysreg.h>
+> +
+> +#define PSTATE_IL_BIT	BIT(20)
+> +
+> +static void require_guest_gcs(struct kvm_vcpu *vcpu)
+> +{
+> +	u64 pfr1 = vcpu_get_reg(vcpu,
+> +				KVM_ARM64_SYS_REG(SYS_ID_AA64PFR1_EL1));
+> +
+> +	TEST_REQUIRE(SYS_FIELD_GET(ID_AA64PFR1_EL1, GCS, pfr1) >=
+> +		     ID_AA64PFR1_EL1_GCS_IMP);
+> +}
+> +
+> +static bool expect_exlock;
+> +static unsigned int undef_count;
+> +static unsigned int illegal_count;
+> +static unsigned int gcs_count;
+> +static u64 handler_pstate;
+> +static u64 illegal_pstate;
+> +
+> +static u64 expected_illegal_pc;
+> +static enum udf_mode {
+> +	UDF_COLLECT,	/* Initial UDF we collect PSTATE from */
+> +	UDF_VALIDATE,	/* Secondary UDF that collects and validates */
+> +	UDF_REPAIR,	/* UDF to clear EXLOCK */
+> +	UDF_ELR_EL1,	/* Write to ELR_EL1 with EXLOCK */
+> +	UDF_ELR_EL2,	/* Write to ELR_EL2 with EXLOCK */
+> +	UDF_SPSR_EL1,	/* Write to SPSR_EL1 with EXLOCK */
+> +	UDF_SPSR_EL2,	/* Write to SPSR_EL2 with EXLOCK */
+> +} udf_mode;
+> +
+> +static void guest_undef_handler(struct ex_regs *regs)
+> +{
+> +	u64 esr = read_sysreg(esr_el2);
+> +	u64 val;
+> +
+> +	undef_count++;
+> +
+> +	/* Just skip the instruction either way. */
+> +	GUEST_ASSERT_EQ(esr, ESR_ELx_IL);
+> +	regs->pc += 4;
+> +
+> +	switch (udf_mode) {
+> +	case UDF_COLLECT:
+> +		GUEST_ASSERT_EQ(read_sysreg_s(SYS_GCSCR_EL2) & GCSCR_ELx_EXLOCKEN,
+> +				expect_exlock ? GCSCR_ELx_EXLOCKEN : 0);
+> +
+> +		/*
+> +		 * If we want the nested exception handler to change
+> +		 * PSTATE it can't have EXLOCK set.
+> +		 */
+> +		write_sysreg_s(0, SYS_GCSCR_EL2);
+> +		isb();
+> +
+> +		/*
+> +		 * Take another exception without returning so we can
+> +		 * collect the EXLOCK state we're seeing here and make
+> +		 * our return illegal.
+> +		 */
+> +		expected_illegal_pc = regs->pc;
+> +		udf_mode = UDF_VALIDATE;
+> +		asm volatile("udf #0" ::: "memory");
+> +
+> +		/* Reenable so PSTATE.EXLOCK is checked */
+> +		write_sysreg_s(expect_exlock ? GCSCR_ELx_EXLOCKEN : 0,
+> +			       SYS_GCSCR_EL2);
+> +		isb();
+> +		break;
+> +
+> +	case UDF_VALIDATE:
+> +		GUEST_ASSERT_EQ(read_sysreg_s(SYS_GCSCR_EL2) & GCSCR_ELx_EXLOCKEN,
+> +				0);
+> +
+> +		/* Validate the EXLOCK of the original exception. */
+> +		handler_pstate = regs->pstate;
+> +		GUEST_ASSERT_EQ(!!(regs->pstate & PSR_EXLOCK_BIT),
+> +				expect_exlock);
+> +
+> +		/* Clearing PSTATE.EXLOCK triggers an illegal ERET. */
+> +		regs->pstate &= ~PSR_EXLOCK_BIT;
+> +		break;
+> +
+> +	case UDF_REPAIR:
+> +		GUEST_ASSERT_EQ(read_sysreg_s(SYS_GCSCR_EL2) & GCSCR_ELx_EXLOCKEN,
+> +				0);
+> +
+> +		/* Disable EXLOCK for the requesting context */
+> +		regs->pstate &= ~PSR_EXLOCK_BIT;
+> +		break;
+> +
+> +	case UDF_ELR_EL1:
+> +		GUEST_ASSERT_EQ(read_sysreg_s(SYS_GCSCR_EL2) & GCSCR_ELx_EXLOCKEN,
+> +				expect_exlock ? GCSCR_ELx_EXLOCKEN : 0);
+> +
+> +		asm volatile("mrs %0, elr_el1   \n\
+> +	                      msr elr_el1, %0"
+> +			     : "=r"(val) :: "memory");
+> +		break;
+> +
+> +	case UDF_ELR_EL2:
+> +		GUEST_ASSERT_EQ(read_sysreg_s(SYS_GCSCR_EL2) & GCSCR_ELx_EXLOCKEN,
+> +				expect_exlock ? GCSCR_ELx_EXLOCKEN : 0);
+> +
+> +		asm volatile("mrs %0, elr_el2   \n\
+> +	                      msr elr_el2, %0"
+> +			     : "=r"(val) :: "memory");
+> +		break;
+> +
+> +	case UDF_SPSR_EL1:
+> +		GUEST_ASSERT_EQ(read_sysreg_s(SYS_GCSCR_EL2) & GCSCR_ELx_EXLOCKEN,
+> +				expect_exlock ? GCSCR_ELx_EXLOCKEN : 0);
+> +
+> +		asm volatile("mrs %0, spsr_el1   \n\
+> +			      msr spsr_el1, %0"
+> +			     : "=r"(val) :: "memory");
+> +		break;
+> +
+> +	case UDF_SPSR_EL2:
+> +		GUEST_ASSERT_EQ(read_sysreg_s(SYS_GCSCR_EL2) & GCSCR_ELx_EXLOCKEN,
+> +				expect_exlock ? GCSCR_ELx_EXLOCKEN : 0);
+> +
+> +		asm volatile("mrs %0, spsr_el2   \n\
+> +			      msr spsr_el2, %0"
+> +			     : "=r"(val) :: "memory");
+> +		break;
+> +
+> +	default:
+> +		GUEST_FAIL("Invalid udf_mode");
+> +	}
+> +}
+> +
+> +static void guest_illegal_handler(struct ex_regs *regs)
+> +{
+> +	u64 esr = read_sysreg(esr_el2);
+> +
+> +	illegal_count++;
+> +	illegal_pstate = regs->pstate;
+> +
+> +	GUEST_ASSERT_EQ(ESR_ELx_EC(esr), ESR_ELx_EC_ILL);
+> +	GUEST_ASSERT(esr & ESR_ELx_IL);
+> +	GUEST_ASSERT(regs->pstate & PSTATE_IL_BIT);
+> +	GUEST_ASSERT(!(regs->pstate & PSR_EXLOCK_BIT));
+> +	GUEST_ASSERT_EQ(regs->pc, expected_illegal_pc);
+> +
+> +	/* Disable exception locking so we can repair the return state. */
+> +	write_sysreg_s(0, SYS_GCSCR_EL2);
+> +	isb();
+> +
+> +	/* We need our own EXLOCK clearing so we can repair the original */
+> +	udf_mode = UDF_REPAIR;
+> +	asm volatile("udf #0" ::: "memory");
+> +
+> +	/* Disable EXLOCK for the generating context, making things legal */
+> +	regs->pstate &= ~(PSTATE_IL_BIT | PSR_EXLOCK_BIT);
+> +}
+> +
+> +static void guest_gcs_handler(struct ex_regs *regs)
+> +{
+> +	u64 esr = read_sysreg(esr_el2);
+> +
+> +	gcs_count++;
+> +
+> +	GUEST_ASSERT_EQ(ESR_ELx_EC(esr), ESR_ELx_EC_GCS);
+> +	GUEST_ASSERT_EQ(FIELD_GET(ESR_ELx_ExType_MASK, esr),
+> +			ESR_ELx_ExType_EXLOCK);
+> +
+> +	/* Disabling EXLOCKEN makes sysreg writes legal. */
+> +	write_sysreg_s(0, SYS_GCSCR_EL2);
+> +	isb();
+> +}
+> +
+> +static noinline void test_udf_exception(bool enable_exlock)
+> +{
+> +	unsigned int initial_undef = undef_count;
+> +	unsigned int initial_illegal = illegal_count;
+> +	unsigned int initial_gcs = gcs_count;
+> +
+> +	expect_exlock = enable_exlock;
+> +	write_sysreg_s(enable_exlock ? GCSCR_ELx_EXLOCKEN : 0,
+> +		       SYS_GCSCR_EL2);
+> +	isb();
+> +
+> +	udf_mode = UDF_COLLECT;
+> +	asm volatile("udf #0" ::: "memory");
+> +
+> +	/* Leave GCS disabled even if a broken ERET skipped the ILL handler. */
+> +	write_sysreg_s(0, SYS_GCSCR_EL2);
+> +	isb();
+> +
+> +	GUEST_ASSERT_EQ(undef_count, initial_undef + 2 + enable_exlock);
+> +	GUEST_ASSERT_EQ(illegal_count, initial_illegal + enable_exlock);
+> +	GUEST_ASSERT_EQ(!!(handler_pstate & PSR_EXLOCK_BIT), enable_exlock);
+> +	if (enable_exlock)
+> +		GUEST_ASSERT(illegal_pstate & PSTATE_IL_BIT);
+> +	GUEST_ASSERT_EQ(initial_gcs, gcs_count);
+> +}
+> +
+> +static noinline void test_sysreg(enum udf_mode reg, bool enable_exlock)
+> +{
+> +	unsigned int initial_undef = undef_count;
+> +	unsigned int initial_gcs = gcs_count;
+> +
+> +	expect_exlock = enable_exlock;
+> +
+> +	write_sysreg_s(enable_exlock ? GCSCR_ELx_EXLOCKEN : 0,
+> +		       SYS_GCSCR_EL2);
+> +	isb();
+> +
+> +	udf_mode = reg;
+> +	asm volatile("udf #0" ::: "memory");
+> +
+> +	/* Ensure EXLOCK is disabled */
+> +	write_sysreg_s(0, SYS_GCSCR_EL2);
+> +	isb();
+> +
+> +	GUEST_ASSERT_EQ(gcs_count, initial_gcs + expect_exlock);
+> +	GUEST_ASSERT_EQ(undef_count, initial_undef + 1);
+> +}
+> +
+> +static void guest_code(void)
+> +{
+> +	GUEST_ASSERT_EQ(get_current_el(), 2);
+> +
+> +	/*
+> +	 * Try straightforwardly generating an exception without and
+> +	 * with EXLOCK.
+> +	 */
+> +	test_udf_exception(false);
+> +	test_sysreg(UDF_ELR_EL1, false);
+> +	test_sysreg(UDF_ELR_EL2, false);
+> +	test_sysreg(UDF_SPSR_EL1, false);]
+> +	test_sysreg(UDF_SPSR_EL2, false);
+> +
+> +	test_udf_exception(true);
+> +	test_sysreg(UDF_ELR_EL1, true);
+> +	test_sysreg(UDF_ELR_EL2, true);
+> +	test_sysreg(UDF_SPSR_EL1, true);
+> +	test_sysreg(UDF_SPSR_EL2, true);
+> +
+> +	/* Force ERET directly through the slow emulation path as well. */
+> +	sysreg_clear_set_s(SYS_HFGITR_EL2, 0, HFGITR_EL2_ERET);
+> +	isb();
+> +
+> +	test_udf_exception(false);
+> +
+> +	test_udf_exception(true);
+> +
+> +	sysreg_clear_set_s(SYS_HFGITR_EL2, HFGITR_EL2_ERET, 0);
+> +	isb();
+> +	GUEST_DONE();
+> +}
+> +
+> +static void test_exception_from_same_el(void)
+> +{
+> +	struct kvm_vcpu_init init;
+> +	struct kvm_vcpu *vcpu;
+> +	struct kvm_vm *vm;
+> +	struct ucall uc;
+> +
+> +	vm = vm_create(1);
+> +	kvm_get_default_vcpu_target(vm, &init);
+> +	init.features[0] |= BIT(KVM_ARM_VCPU_HAS_EL2);
+> +	vcpu = aarch64_vcpu_add(vm, 0, &init, guest_code);
+> +	require_guest_gcs(vcpu);
+> +
+> +	vm_init_descriptor_tables(vm);
+> +	vcpu_init_descriptor_tables(vcpu);
+> +	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
+> +				ESR_ELx_EC_UNKNOWN, guest_undef_handler);
+> +	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
+> +				ESR_ELx_EC_ILL, guest_illegal_handler);
+> +	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
+> +				ESR_ELx_EC_GCS, guest_gcs_handler);
+> +	kvm_arch_vm_finalize_vcpus(vm);
+> +
+> +	vcpu_run(vcpu);
+> +	switch (get_ucall(vcpu, &uc)) {
+> +	case UCALL_DONE:
+> +		break;
+> +	case UCALL_ABORT:
+> +		REPORT_GUEST_ASSERT(uc);
+> +		break;
+> +	default:
+> +		TEST_FAIL("Unhandled ucall: %ld", uc.cmd);
+> +	}
+> +
+> +	kvm_vm_free(vm);
+> +}
+> +
+> +static void test_exception_from_lower_el(void)
+> +{
+> +	struct kvm_vcpu_events events = {};
+> +	struct kvm_vcpu_init init;
+> +	struct kvm_vcpu *vcpu;
+> +	struct kvm_vm *vm;
+> +	u64 pstate;
+> +
+> +	vm = vm_create(1);
+> +	kvm_get_default_vcpu_target(vm, &init);
+> +	init.features[0] |= BIT(KVM_ARM_VCPU_HAS_EL2);
+> +	vcpu = aarch64_vcpu_add(vm, 0, &init, NULL);
+> +	require_guest_gcs(vcpu);
+> +	kvm_arch_vm_finalize_vcpus(vm);
+> +
+> +	/*
+> +	 * Inject an EL0 data abort to vEL2 with EXLOCK enabled for
+> +	 * vEL2.
+> +	 */
+> +	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_HCR_EL2),
+> +		     vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_HCR_EL2)) |
+> +		     HCR_EL2_TGE);
+> +	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_GCSCR_EL2),
+> +		     GCSCR_ELx_EXLOCKEN);
+> +	vcpu_set_reg(vcpu, ARM64_CORE_REG(regs.pstate),
+> +		     PSR_MODE_EL0t | PSR_EXLOCK_BIT);
+> +
+> +	events.exception.ext_dabt_pending = true;
+> +	vcpu_events_set(vcpu, &events);
+> +
+> +	pstate = vcpu_get_reg(vcpu, ARM64_CORE_REG(regs.pstate));
+> +	TEST_ASSERT_EQ(pstate & PSR_MODE_MASK, PSR_MODE_EL2h);
+> +	TEST_ASSERT(!(pstate & PSR_EXLOCK_BIT),
+> +		    "EXLOCK set on exception from a lower EL");
+> +
+> +	kvm_vm_free(vm);
+> +}
+> +
+> +int main(void)
+> +{
+> +	TEST_REQUIRE(kvm_check_cap(KVM_CAP_ARM_EL2));
+> +	test_exception_from_same_el();
+> +	test_exception_from_lower_el();
+> +
+> +	return 0;
+> +}
+> 
+> -- 
+> 2.47.3
+> 
+
+
+
