@@ -1,128 +1,98 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0936E46AA73;
-	Fri, 11 Sep 2026 09:09:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE9F0459AFC;
+	Fri, 11 Sep 2026 09:17:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789117742; cv=none; b=b1VTMsWNGkMpt1ZQ69oS2WyoeX/l/P7aBp1V6snJ0Gk4XW/3onR/3S0ry8D9ekNxix1wY1BzB+ciMMmqSWXxEVehvWolnQ/0rIfVeEnVOHcwWr2Xuu7GJ+3cFcEnvgaGIfj+ImaeQPFLRQblWkYYji4DqOeA2X0axF+gtX6PF9M=
+	t=1789118226; cv=none; b=rk3CdJbAEYbjXbKbEFqWjHaFAG/jk1s0yT9l6kdMCBs4iCY+EM1Z9DNI3pppwbwEG2aalQXIAxCSUlomM8rsq4b5f5jChKR3pwiWReAJ94m3aq2XEx84SXr2b+WvbA/lHpPJqBo9315w7R+XfVfykQ05sANJi1iNmNK80RjuNIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789117742; c=relaxed/simple;
-	bh=PiyS891VqAc9ihxRroUv3C0K5AEZMYjRAQHuWOEWCLo=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ntjm0aTbkMyQj4VzqLTc0u5K+nILkspRbrPChBIadJyLfBlyYF7LZ+dL+k6BkoLKv0ReOpBqt+kMvu2tRyUNLNpMZZH5eiInAut/eow/K7ZN5re3xUJzM4qLBwgJIoeKvtS3ErmxYbbtjk787L4OZTcNchpBqjPqtDYVshde428=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JIJ+9wt3; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789118226; c=relaxed/simple;
+	bh=y4VNhJAktDNpssOv4fj1+dd7jYwgGkHIusbvYWB/ZOM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rFSPKPmEtEUspzHucKGJD+E7Dx7A3ThjHqLk1bs4EMSS00faxE3gLejT+nhWiiM+X280Jy78y5Gm+w3szyy+AqKvSanxkIshocG+rjn9dZgUO2SjfMdamz45gk2qW7HzJO0ziDUAxJrLq9MPakRc1IhlJ2DIIKbnlU8xwdaT+MU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RbxSeSbZ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JIJ+9wt3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE4411F000FF;
-	Fri, 11 Sep 2026 09:09:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RbxSeSbZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 461631F00893;
+	Fri, 11 Sep 2026 09:16:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789117740;
-	bh=6o+QncrTqmoqAMM3f1Bikm2mAzRwxYrhaW4iMNLfgSQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=JIJ+9wt3rF81Eca2UtXQV4IcTUqdXhVTY8CAcPrThQRhMYBrE6gkZv1bb8U51pVaL
-	 4Xmks7Zs/q9xAsEP1K8jhx+dkRFEhndo+FikfrgAqqM2H/z/8bOem3RhEN97IMnkEi
-	 R1zx62K7s7lX9Sop6+WvP8mWAiuouAjk4QAE72HA6CcGhtAHE0BTaDTsKLtXiWMynA
-	 RXzE4KeUXHfxpMUOXxSN2c82wAeCo4E8dJLUiz9fKk9m+LpsP0Mgs6QaQcfCr6iCQg
-	 6x8VjZeU1vDdsZlKJu+LaDp4DLDLJmfKH1azBsTGW4ZZZ4ke5RoEHqglZgxq068568
-	 e8Hc1iO3/VOxw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1x4xFi-00000007fc4-3XmF;
-	Fri, 11 Sep 2026 09:08:58 +0000
-Date: Fri, 11 Sep 2026 10:08:58 +0100
-Message-ID: <86mrto6tp1.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Wei-Lin Chang <weilin.chang@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Sascha Bischoff <Sascha.Bischoff@arm.com>,
-	Ben Horgan <ben.horgan@arm.com>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Thomas Huth <thuth@redhat.com>,
-	James Clark <james.clark@linaro.org>,
-	Mark Brown <broonie@kernel.org>,
-	Anshuman Khandual <anshuman.khandual@arm.com>
-Subject: Re: [PATCH v1 1/3] KVM: arm64: nv: Don't advertise FEAT_LPA2 for guest stage-1
-In-Reply-To: <20260909222015.3046432-2-weilin.chang@arm.com>
-References: <20260909222015.3046432-1-weilin.chang@arm.com>
-	<20260909222015.3046432-2-weilin.chang@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20260515; t=1789118224;
+	bh=9sp1kFZZ0O6uT9i63Hix+4jeTVWCdlo9frW6hVcqvPU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=RbxSeSbZZUU0Ne8WJuZalWlgBdFvk4xRMp9Ec5R+eTdN31MG6FizPvealsA8XcP1v
+	 zNS5ieOGImLE2jalyPZo4vsiTdEfdUkdB7GmVkBOf1vxa4SHkKXsGBTvg0avzvhGGg
+	 deKE1DrgNkIX1pL2e9ZZ9QtOCasm9rCQZwiwcuv9+jAyGAYazY/1fZfbAtrB+Zh3ej
+	 NWcg19p2iAlvNl7WI95KE38yDNvPQOt8/ixv+HzhfDYf0JZnCUmE7FuSKFKpOvbPZu
+	 vwVSPh+NomvlJ4fIvsfBXc71GY1MwJdG0NzylODt5gOCTZANrP/D3O723K3yAQCT+4
+	 JhYiRwBiB3F2w==
+Date: Fri, 11 Sep 2026 10:16:55 +0100
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	Jack Thomson <jackabt@amazon.com>, Jack Thomson <jackabt.amazon@gmail.com>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Vincent Donnefort <vdonnefort@google.com>, 
+	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Sean Christopherson <seanjc@google.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Leo Soares Passos <Leo.Bras@arm.com>
+Subject: Re: [PATCH 0/8] KVM: arm64: Add KVM_PRE_FAULT_MEMORY support
+Message-ID: <aqPGWNxm0rOMRaXw@gremlin>
+References: <20260825-kvm-arm-prefault-v1-0-befe8947702e@kernel.org>
+ <CA+EHjTw=7M+ac5UCfM5yPmuX8RuqZN08TLfXAmTLbQgmuhNWtw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: weilin.chang@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, Sascha.Bischoff@arm.com, ben.horgan@arm.com, lpieralisi@kernel.org, thuth@redhat.com, james.clark@linaro.org, broonie@kernel.org, anshuman.khandual@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTw=7M+ac5UCfM5yPmuX8RuqZN08TLfXAmTLbQgmuhNWtw@mail.gmail.com>
 
-On Wed, 09 Sep 2026 23:20:13 +0100,
-Wei-Lin Chang <weilin.chang@arm.com> wrote:
-> 
-> There is no FEAT_LPA2 support for NV guests as of now, but we missed
-> limiting it for the non-stage-2 granule size fields (TGRAN4, TGRAN16) in
-> ID_AA64MMFR0_EL1. Add the sanitisation.
-> 
-> Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
-> ---
->  arch/arm64/kvm/nested.c | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 3c4fc566eafc..1fd98117df23 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -1731,6 +1731,19 @@ u64 limit_nv_id_reg(struct kvm *kvm, u32 reg, u64 val)
->  		/* Hide CNTPOFF if present */
->  		val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64MMFR0_EL1, ECV, IMP);
->  
-> +		/* NV does not support FEAT_LPA2. */
-> +		if (SYS_FIELD_GET(ID_AA64MMFR0_EL1, TGRAN4, val) ==
-> +		    ID_AA64MMFR0_EL1_TGRAN4_52_BIT) {
+On Thu, Sep 10, 2026 at 07:44:25PM +0100, Fuad Tabba wrote:
+> Hi Lorenzo,
+>
+> On Tue, 25 Aug 2026 at 17:01, Lorenzo Stoakes (ARM) <ljs@kernel.org> wrote:
+> >
+> > This series implements the KVM stage 2 page table pre-faulting feature for
+> > arm64.
+>
+> I know there's likely going to be a V2, but FWIW, I tested this series
+> as follows (finally managed to get protected mode running on my Mac):
+>
+> QEMU (arm64, -cpu max,pauth=off):
+> - Protected-mode host, boots non-protected and protected guests
+> - pre_fault_memory_test on a non-protected host, VHE and nVHE, all 13
+> guest modes
+> - nv_pre_fault_memory_test with kvm-arm.mode=nested
+>
+> FVP (AEM, FEAT_NV2):
+> - nv_pre_fault_memory_test with kvm-arm.mode=nested
+>
+> Apple M4 hardware, running as a KVM host at EL2 under Apple's nested
+> virtualization (nVHE only):
+> - pre_fault_memory_test, anonymous and anonymous_thp backing, over the five
+>   guest modes available there (the IPA is capped at 40 bits and the 64K
+>   granule isn't implemented)
+> - with kvm-arm.mode=protected, pre_fault_memory_test skips on
+>   KVM_CAP_PRE_FAULT_MEMORY, so the pKVM exclusion holds on a live pKVM host
+>
+> Tested-by: Fuad Tabba < fuad.tabba@linux.dev>
+> (happy to retest again when you respin)
 
-nit: keep both sides of == on a single line.
+Perfect, much appreciated thanks! :)
 
-> +			val &= ~ID_AA64MMFR0_EL1_TGRAN4;
-> +			val |= SYS_FIELD_PREP_ENUM(ID_AA64MMFR0_EL1, TGRAN4, IMP);
-> +		}
-> +
-> +		if (SYS_FIELD_GET(ID_AA64MMFR0_EL1, TGRAN16, val) ==
-> +		    ID_AA64MMFR0_EL1_TGRAN16_52_BIT) {
-> +			val &= ~ID_AA64MMFR0_EL1_TGRAN16;
-> +			val |= SYS_FIELD_PREP_ENUM(ID_AA64MMFR0_EL1, TGRAN16, IMP);
-> +		}
-> +
->  		/* Disallow unsupported S2 page sizes */
->  		switch (PAGE_SIZE) {
->  		case SZ_64K:
+I won't carry the tags forward to v2 just in case anything breaks there, so
+appreciate you taking another run at the v2 also thanks! :)
 
-In theory, we should also change the userspace interface to accept
-(but ignore) FEAT_LPA2 being set from userspace.
+>
+> Cheers,
+> /fuad
 
-But since there is no LPA2 HW in the wild, I'm not too worried about
-that. You probably want to Cc stable on this patch though.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+--
+Cheers, Lorenzo
