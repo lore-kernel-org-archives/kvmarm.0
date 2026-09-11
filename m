@@ -1,240 +1,198 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89DEC3E5595
-	for <kvmarm@lists.linux.dev>; Fri, 11 Sep 2026 12:43:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E9AC4749F6;
+	Fri, 11 Sep 2026 12:58:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789130593; cv=none; b=ngykL1xRwWGF8RPDm9GhrGpyE+8u4AxMBXpNPGQrkZSwQPibVZVhuqpm7avpYIyW30tUo4KVzMEIKf37D6LrrmdT1B6CVzmS6mE8G4KUskOG2puG0QQfzPOBQgn+nStHHFVtXQuV8Vwn0nKI42nHfAG8aHd09xaI43zl18T2MRk=
+	t=1789131527; cv=none; b=nCDW2+dH8zM1AjhCpTY/rWioacNfzKuHMDJW79JUeG5jzPmrFU7ygyqgvycDoDqeyEHNH8n0DCyD9Gn0ab2F3f647GjpqZ7nk7iwE8aKPa9W6cIkoW1RadgqO6SKCyN/nIRVfkOJfh3Rwql22Fp5RPqNMr3X9QTFnXpjePlULKM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789130593; c=relaxed/simple;
-	bh=AYEkP013J/2d/muDFR6I2PEvoL5OJnQHcQnfIXL8Gdw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q6Q0N8Tr4EMlrpRH5CH5F5tlW3eBKAOBzTa7cTb1PDeOeJPCVtch4Z1nv/DEGNSSXEOU+Hyi0J0VK7OBT+y+w4H3H/gEgDov52H6MQLUwtr5g4nsUUlRQLZQyNKXlRZqw4Y50W1bCkR0ZPzCVO1zh657FtIIVUc2pdSoCdiToY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Y7t2/5La; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1789131527; c=relaxed/simple;
+	bh=ODwQeyy5/R8kBiZjBOhXMKJoZML7I4OqcWMRfhmXyuU=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ezY4RDHTH9bJYBwcoQepIap3xXLPeEIJ6+u4nyRgTB8zbEcdbBWS56639bGjYaPiA+x1Haj0aZzifbPkWO6HXubjHa9R2+brWNFehZcAnGwZIlVZ+i8vQc8G0RJVQGRObVPdVzzHgP7BFCOXFpgzfLD3wHAi4csK1Tb679OMMnc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e5rB0Yy0; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Y7t2/5La"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4485B1655;
-	Fri, 11 Sep 2026 05:43:06 -0700 (PDT)
-Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 17A4F3F7B4;
-	Fri, 11 Sep 2026 05:43:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1789130589; bh=AYEkP013J/2d/muDFR6I2PEvoL5OJnQHcQnfIXL8Gdw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Y7t2/5Lam2g8qRhPXwbiismNNJmPzYkbs1njyR8gmpp7Vck5F0dEP+USPHwGkVj4y
-	 zyEVPrSL46la0hde1suMA5O66hKqdPYQmIy0jLuQtj8JZiZhItI8liJqlOlZKutbU7
-	 R7cp0KjoRS0TqixmTVP9fKudIHZb6fIM75NhVQfI=
-Date: Fri, 11 Sep 2026 13:42:57 +0100
-From: Wei-Lin Chang <weilin.chang@arm.com>
-To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>, 
-	Itaru Kitayama <itaru.kitayama@fujitsu.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Fuad Tabba <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	Jack Thomson <jackabt@amazon.com>, Jack Thomson <jackabt.amazon@gmail.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Vincent Donnefort <vdonnefort@google.com>, 
-	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Sean Christopherson <seanjc@google.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Leo Soares Passos <Leo.Bras@arm.com>
-Subject: Re: [PATCH 8/8] KVM: selftests: Add nested pre-fault test for arm64
-Message-ID: <g45xmukndzivuxowpjxlajrjzx2ljevliroenbx4h4wgrnpoi6@eozuucl3usi3>
-References: <20260825-kvm-arm-prefault-v1-0-befe8947702e@kernel.org>
- <20260825-kvm-arm-prefault-v1-8-befe8947702e@kernel.org>
- <aqOgEQKBGH-YqGr3@sm-arm-grace07>
- <aqPIUtNTJFwUvJME@gremlin>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e5rB0Yy0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1A331F00893;
+	Fri, 11 Sep 2026 12:58:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789131506;
+	bh=DKS3Y875g55w6+jRQCK0RAo8CGT+TF5uQ7AdPQA8+FE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=e5rB0Yy0vm91hHd8PcFabYm0S+Znfex9t24hSeR/jilv1yVwTiOtxiRWg8Vp4PnQq
+	 NruMAB0HQxZGz/RHTFtvsUVcS+iAwNHPQXN/Spu48j9TWM4FGKVPNIKkpmjiFZpYu9
+	 h993H8+S/GnD6/dfShgrfjlWAMnSf4fBkZhUqo5PzjfPojrhHMMzILlYTSK1t6yM7R
+	 TBZoCG4x+NcSkIIgM52hwWjh/cmmC0B1CGh7yMdlcDiTdwEQfDZZip6vxe/lJy0ane
+	 g5FIhs6dgguYOvC6+5kLLBjVOhgh7BfNACHfny9ogXFcW8l++JTBDk/PUK+8nlzmyI
+	 n5n3kfghnZXiA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1x50pj-00000007lFn-3IG3;
+	Fri, 11 Sep 2026 12:58:23 +0000
+Date: Fri, 11 Sep 2026 13:58:23 +0100
+Message-ID: <86jyos6j2o.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Oliver Upton <oupton@kernel.org>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Quentin Perret <qperret@google.com>,
+	Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH v2 14/17] KVM: arm64: Reject host access to protected VM private state
+In-Reply-To: <20260907070002.3333525-15-fuad.tabba@linux.dev>
+References: <20260907070002.3333525-1-fuad.tabba@linux.dev>
+	<20260907070002.3333525-15-fuad.tabba@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aqPIUtNTJFwUvJME@gremlin>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, vdonnefort@google.com, qperret@google.com, tabba@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Sep 11, 2026 at 10:32:17AM +0100, Lorenzo Stoakes (ARM) wrote:
-> +cc Wei-Lin
+On Mon, 07 Sep 2026 07:59:59 +0100,
+Fuad Tabba <fuad.tabba@linux.dev> wrote:
 > 
-> On Fri, Sep 11, 2026 at 03:30:41PM +0900, Itaru Kitayama wrote:
-> > Hi Lorenzo,
-> >
-> > On Tue, Aug 25, 2026 at 05:00:42PM +0100, Lorenzo Stoakes (ARM) wrote:
-> > > From: Jack Thomson <jackabt@amazon.com>
-> > >
-> > > Add an arm64 nested-virt selftest for KVM_PRE_FAULT_MEMORY. The guest
-> > > enters vEL1 and exits to userspace with a nested/shadow stage-2 MMU as
-> > > the vCPU's last-run context.
-> > >
-> > > Before prefaulting, userspace enables HCR_EL2.VM and points VTTBR_EL2 at
-> > > an empty nested stage-2 root. A prefault implementation that incorrectly
-> > > treats the userspace GPA as an L2 IPA will fail the ioctl; the correct
-> > > path targets the canonical stage-2 and succeeds.
-> > >
-> > > Restore the original nested state before resuming the guest, then touch
-> > > the prefaulted range to check that vEL1 still runs correctly.
-> > >
-> > > Signed-off-by: Jack Thomson <jackabt@amazon.com>
-> > > [ljs: partial progress, >4 KiB pgsize, commit msg, comment fixups]
-> > > Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
-> > > ---
-> > >  tools/testing/selftests/kvm/Makefile.kvm           |   1 +
-> > >  .../selftests/kvm/arm64/nv_pre_fault_memory_test.c | 206 +++++++++++++++++++++
-> > >  2 files changed, 207 insertions(+)
-> >
-> > I wonder whether this selftest can use functions Wei-Lin proposed
-> > some time ago [1]: 20260325003620.2214766-1-weilin.chang@arm.com
-> > or would you prefer this test as propose, since it is clear as
-> > to what needs to be done to enter L2.
+> A protected vCPU's register and debug state is no longer exposed to
+> the host. Host ioctls that would reach that state now fail rather
+> than operate on a copy that is not the guest's:
 > 
-> I think if these aren't merged yet then that could be a follow up?
+>   - KVM_GET_ONE_REG and KVM_SET_ONE_REG return -EPERM once the vCPU has
+>     run: the copy then holds reset values plus what the exit handlers
+>     marshal out. Pre-run access still builds the guest's boot state.
+>   - KVM_ARM_VCPU_INIT returns -EPERM once the vCPU has run: it would
+>     reset the host copy alone and rewrite mp_state, which EL2 reads
+>     only at hyp vCPU creation, so a vCPU the guest powered off would
+>     come back RUNNABLE.
+>   - KVM_SET_VCPU_EVENTS rejects external-abort injection with -EPERM;
+>     SError injection is forwarded and stays permitted.
+>   - KVM_SET_GUEST_DEBUG returns -EPERM: a protected guest's debug state
+>     is hypervisor-owned.
+> 
+> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+> ---
+>  arch/arm64/kvm/arm.c   |  7 +++++++
+>  arch/arm64/kvm/guest.c | 19 +++++++++++++++++++
+>  2 files changed, 26 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 5c2587da815ab..37a260b139795 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1750,6 +1750,13 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
+>  	bool power_off = false;
+>  	int ret;
+>  
+> +	/*
+> +	 * Re-init would reset the host copy alone and rewrite mp_state
+> +	 * after EL2 has read it. Pre-run init stays allowed.
+> +	 */
+> +	if (vcpu_is_protected(vcpu) && vcpu_has_run_once(vcpu))
+> +		return -EPERM;
+> +
+>  	/*
+>  	 * Treat the power-off vCPU feature as ephemeral. Clear the bit to avoid
+>  	 * reflecting it in the finalized feature set, thus limiting its scope
+> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> index ab659795d4b2f..abab580a659d4 100644
+> --- a/arch/arm64/kvm/guest.c
+> +++ b/arch/arm64/kvm/guest.c
+> @@ -701,6 +701,10 @@ int kvm_arm_copy_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
+>  
+>  int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>  {
+> +	/* Once the vCPU has run, the host copy is not the guest's state. */
+> +	if (vcpu_is_protected(vcpu) && vcpu_has_run_once(vcpu))
+> +		return -EPERM;
+> +
+>  	/* We currently use nothing arch-specific in upper 32 bits */
+>  	if ((reg->id & ~KVM_REG_SIZE_MASK) >> 32 != KVM_REG_ARM64 >> 32)
+>  		return -EINVAL;
+> @@ -718,6 +722,10 @@ int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>  
+>  int kvm_arm_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>  {
+> +	/* Writes build the boot state; once run, EL2 owns the registers. */
+> +	if (vcpu_is_protected(vcpu) && vcpu_has_run_once(vcpu))
+> +		return -EPERM;
+> +
 
-This selftest doesn't require setting up L1's stage-2 for L2, so to me
-the current approach is okay.
+Why can't these be moved to the ioctl callback? Something like:
 
-[...]
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index eaf583b771931..0ffd435bf6904 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1856,6 +1856,19 @@ static int kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+ 	return __kvm_arm_vcpu_set_events(vcpu, events);
+ }
+ 
++static long pkvm_filter_vcpu_ioctl(struct kvm_vcpu *vcpu, unsigned int ioctl)
++{
++	switch (ioctl) {
++	case KVM_ARM_VCPU_INIT:
++	case KVM_SET_ONE_REG:
++	case KVM_GET_ONE_REG:
++		if (vcpu_is_protected(vcpu) && vcpu_has_run_once(vcpu))
++			return -EPERM;
++	}
++
++	return 0;
++}
++
+ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 			 unsigned int ioctl, unsigned long arg)
+ {
+@@ -1864,6 +1877,10 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 	struct kvm_device_attr attr;
+ 	long r;
+ 
++	r = pvkm_filter_vcpu_ioctl(vcpu, ioctl);
++	if (r)
++		return r;
++
+ 	switch (ioctl) {
+ 	case KVM_ARM_VCPU_INIT: {
+ 		struct kvm_vcpu_init init;
 
-> > > +static void guest_code(void)
-> > > +{
-> > > +	u64 sp;
-> > > +
-> > > +	GUEST_ASSERT_EQ(get_current_el(), 2);
-> > > +
-> > > +	/*
-> > > +	 * Mirror the EL2 translation regime into the real EL1 registers so
-> > > +	 * that vEL1 runs on the test's stage-1 page tables. With E2H=1, the
-> > > +	 * _EL1 accessors read the EL2 registers, and the _EL12 accessors
-> > > +	 * write the real EL1 registers.
-> > > +	 */
-> > > +	write_sysreg_s(read_sysreg(sctlr_el1), SYS_SCTLR_EL12);
-> > > +	write_sysreg_s(read_sysreg(tcr_el1), SYS_TCR_EL12);
-> > > +	write_sysreg_s(read_sysreg(ttbr0_el1), SYS_TTBR0_EL12);
-> > > +	write_sysreg_s(read_sysreg(mair_el1), SYS_MAIR_EL12);
-> > > +	write_sysreg_s(read_sysreg(cpacr_el1), SYS_CPACR_EL12);
+>  	/* We currently use nothing arch-specific in upper 32 bits */
+>  	if ((reg->id & ~KVM_REG_SIZE_MASK) >> 32 != KVM_REG_ARM64 >> 32)
+>  		return -EINVAL;
+> @@ -786,6 +794,13 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+>  	u64 esr = events->exception.serror_esr;
+>  	int ret = 0;
+>  
+> +	/*
+> +	 * EL2 injects an external abort only to complete a forwarded abort.
+> +	 * SError injection is forwarded.
+> +	 */
+> +	if (vcpu_is_protected(vcpu) && ext_dabt_pending)
+> +		return -EPERM;
+> +
 
-Just FYI, the at.c selftest uses a macro for these.
-
-> > > +
-> > > +	/* Run vEL1 on the same stack. */
-> > > +	asm volatile("mov %0, sp" : "=r"(sp));
-> > > +	write_sysreg(sp, sp_el1);
-> > > +
-> > > +	/*
-> > > +	 * Drop TGE so that vEL1 is a nested context rather than host EL0.
-> > > +	 * KVM backs it with a shadow stage-2 MMU even though vstage-2 is
-> > > +	 * disabled (HCR_EL2.VM=0).
-> > > +	 */
-> > > +	write_sysreg(read_sysreg(hcr_el2) & ~HCR_EL2_TGE, hcr_el2);
-> > > +	isb();
-> > > +
-> > > +	write_sysreg(PSR_MODE_EL1h | PSR_F_BIT | PSR_I_BIT | PSR_A_BIT |
-> > > +		     PSR_D_BIT, spsr_el2);
-> > > +	write_sysreg((u64)guest_el1_code, elr_el2);
-> > > +	asm volatile("eret");
-> > > +
-> > > +	GUEST_ASSERT(false);
-> > > +}
-> > > +
-
-[...]
-
-> > > +
-> > > +static struct nested_s2_state enable_empty_nested_s2(struct kvm_vcpu *vcpu)
-> > > +{
-> > > +	struct nested_s2_state state = {
-> > > +		.hcr_el2 = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_HCR_EL2)),
-> > > +		.vttbr_el2 = vcpu_get_reg(vcpu,
-> > > +					   KVM_ARM64_SYS_REG(SYS_VTTBR_EL2)),
-> > > +	};
-> > > +
-> > > +	TEST_ASSERT(!(state.hcr_el2 & HCR_EL2_TGE),
-> > > +		    "vCPU should be in nested/vEL1 context");
-> > > +
-> > > +	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_VTTBR_EL2),
-> > > +		     NESTED_S2_ROOT_GPA);
-> > > +	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_HCR_EL2),
-> > > +		     state.hcr_el2 | HCR_EL2_VM);
-> > > +
-> > > +	return state;
-> > > +}
-> > > +
-> > > +static void restore_nested_s2(struct kvm_vcpu *vcpu,
-> > > +			      struct nested_s2_state *state)
-> > > +{
-> > > +	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_HCR_EL2), state->hcr_el2);
-> > > +	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_VTTBR_EL2),
-> > > +		     state->vttbr_el2);
-> > > +}
-> > > +
-> > > +int main(void)
-> > > +{
-> > > +	struct nested_s2_state s2;
-> > > +	struct kvm_vcpu_init init;
-> > > +	struct kvm_vcpu *vcpu;
-> > > +	struct kvm_vm *vm;
-> > > +	struct ucall uc;
-> > > +	u64 npages;
-> > > +
-
-[...]
-
-> > > +
-> > > +	/*
-> > > +	 * The vCPU's last-run context is vEL1, backed by a shadow stage-2
-> > > +	 * MMU. Enable nested stage-2 with an empty root so that the ioctl
-> > > +	 * fails if it tries to interpret the userspace GPA as an L2 IPA.
-> > > +	 *
-> > > +	 * Prefault in two halves so that the second ioctl exercises a
-> > > +	 * repeated shadow-MMU attach and canonical stage-2 swap.
-> > > +	 *
-> > > +	 * (Note that an implementation that wrongly populates shadow
-> > > +	 * stage-2 page tables would not be caught as userland can't
-> > > +	 * inspect these.)
-> > > +	 */
-> > > +	s2 = enable_empty_nested_s2(vcpu);
-> > > +	pre_fault(vcpu, TEST_MEM_GPA, TEST_MEM_SIZE / 2);
-> > > +	pre_fault(vcpu, TEST_MEM_GPA + TEST_MEM_SIZE / 2, TEST_MEM_SIZE / 2);
-> > > +	restore_nested_s2(vcpu, &s2);
-
-Sorry I don't get what enable_empty_nested_s2(), restore_nested_s2()
-brings to the test?
-
-After quickly going through the prefault implementation there isn't
-anything about it that is nested related, how would giving L2 an empty
-stage-2 translation affect the outcome if it misinterprets the GPA as an
-L2 IPA?
-
-In other words would there be potential false positives if we don't call
-these functions?
+Where is KVM_CAP_ARM_INJECT_EXT_DABT rejected?
 
 Thanks,
-Wei-Lin Chang
 
-> > > +
-> > > +	/* Resume at vEL1 and touch the prefaulted range. */
-> > > +	vcpu_run(vcpu);
-> > > +	switch (get_ucall(vcpu, &uc)) {
-> > > +	case UCALL_DONE:
-> > > +		break;
-> > > +	case UCALL_ABORT:
-> > > +		REPORT_GUEST_ASSERT(uc);
-> > > +		break;
-> > > +	default:
-> > > +		TEST_FAIL("Unhandled ucall: %ld", uc.cmd);
-> > > +	}
-> > > +
-> > > +	kvm_vm_free(vm);
-> > > +	return 0;
-> > > +}
-> > >
-> > > --
-> > > 2.55.0
-> > >
-> 
-> --
-> Cheers, Lorenzo
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
