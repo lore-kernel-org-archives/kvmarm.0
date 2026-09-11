@@ -1,190 +1,122 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21C78485926
-	for <kvmarm@lists.linux.dev>; Fri, 11 Sep 2026 13:28:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com [209.85.215.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A0C9485CE6
+	for <kvmarm@lists.linux.dev>; Fri, 11 Sep 2026 13:44:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789133288; cv=none; b=dJPU1/rx/TdBIQaflYUKxZ2ZeVBmXWQO2fiqp6MjyTw2GpTYD4vAQQoDKeqLBp1Q12zwGUdwga++eiZ7v2ndiH3k62ocR9Kf5h2tPD+Yhr4PgPm6ipG7lyjrNnpz5Q/rGzkMdpOSLh4mBwJteEsg8PUlL9JLgpt8kgObvr8RA+g=
+	t=1789134300; cv=none; b=FTTBhX/m4OLgwODG1WJ9trHsjVDi8OhxNv+ISVGTF03YtMH/GXgxHnVmTzOs8Qq9C1cBriiQqj0ez8Si3mkO5JrgUVradQ+gpq1xsz7Rsve/CBtlPHJPvoIe9UVKwVGGmDuuaAxrZTtVSNnU2zhEiP1nul3j8yGSbXoaPuCYnwQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789133288; c=relaxed/simple;
-	bh=4YD+Fk3HHL60l22D6521PP0drw4lBWBwFWKg00cHdOg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uWIN+7bV1hm3wa1akHgGjTc3MzpWU9uQbG2M4iE37r5Ew4ni7VX9DpcwUHgYRupQ8jS2UWIUxOcl1FVvozGSBWlvIUb3mcI+gkzu3Dr2JaOjnTb9MUN3KFtgQ5YkgHD2r8gsy9239v8uGMl2EuJoE9cgrY6WyrcXNIHjuIE7Kww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=PpsP4tqK; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1789134300; c=relaxed/simple;
+	bh=z1IBBN+1WUfDf5cT8bAka5f8p45OV+l+sxZzQy3xMvk=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=o3LtdN/fYdAiQfqjLwZ7d8frogIHzIf9N5BRUJ2tf5ohQcWoMmzlk/NcS+EkC48dbmZB5+CpTuVzrVYUUtEo05nno5n6KA56MQhLEfSkARL6EZfMs07VnYmFDWrIqh8g0XNhBtk9zUpWvrLi6VsOoS1PLLd8XMU5OsNni8IJSHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ewDHLYok; arc=none smtp.client-ip=209.85.215.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="PpsP4tqK"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D980A1655;
-	Fri, 11 Sep 2026 06:28:02 -0700 (PDT)
-Received: from [10.2.212.8] (e134344.arm.com [10.2.212.8])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 998CB3F59E;
-	Fri, 11 Sep 2026 06:28:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1789133286; bh=4YD+Fk3HHL60l22D6521PP0drw4lBWBwFWKg00cHdOg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=PpsP4tqKrtQfSCwZE+blAV5Ik4POSn6QJ1SVHQxpbSN7xEZQndzNNwrTj9bnG4p4p
-	 fyIXy/pnUo/2KQPsj2nQ0WIxx3foDqMy3DcGpHpTDFbGt5sDtP/ImD368c/lZbIYTb
-	 TgpgppBePyhRq7KB0b+tsBGrfJNDAkZ9WRajr744=
-Message-ID: <624c282f-4c48-4e06-a7e9-87f754db7b1b@arm.com>
-Date: Fri, 11 Sep 2026 14:27:57 +0100
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ewDHLYok"
+Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-cbee6bb8408so1114122a12.3
+        for <kvmarm@lists.linux.dev>; Fri, 11 Sep 2026 06:44:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1789134291; x=1789739091; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=35qTFGciq12kEJU+EMJ4woELZzEj6I4YMtoPAd4aNAQ=;
+        b=ewDHLYok0hz6jSUZb51Zl9R14qTwzUXqsAfXC4yGTS8ZzlV+7sGmt4nwqGCbGztQbe
+         GW/kCVqwNPO93zS7oPzQ9L2/gvV09aE8LrlMaNE8Lh8Q1kM1uap3w4GiRoEYO8n9clVU
+         0A6nWnsaWqV/EhpfhxDZ5GF18cD9f65U0M77Z/fIUKgotGYhat+0Rr76GeCxUig1ZlER
+         1lWrxtlpwIiBGSSUe60ET9L41tlUb0qCZyY9VSBsb+fV0DQAPXP86KVO0TR6gtLsXix2
+         aL/2nqRMBtLKAfV+aT5NvkA9gbxd3xIS1Bdx8j/7buGp1q4WVy5i8KTLvuyZ4O8b80tc
+         EPvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1789134291; x=1789739091;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=35qTFGciq12kEJU+EMJ4woELZzEj6I4YMtoPAd4aNAQ=;
+        b=KoCI0yBG6AQLbvIVxQnbJkY7FMN8A3VE6EABE3ZaiIOseN2GLc5N4R9cAC2FD/RKH5
+         YxqEhQ3F8XGcZbb8zfQCEN7rlhJ5RtQ5ZKr7qKRQOc7o4vNqvtMThDtDct5nfCw0Jef/
+         RPv4lcV9r/LvImhM1dMzI5LQemwIUpLGw+bMbIrh6SPBnf4aOdNgQoDcXrEwwqqgduZ1
+         lNilUloOvCdiKTKLt6J2DgH1+ec0ZKxc+1x9V6UGuaoj60kFhqBmQawtYZZVhUrjQ1tt
+         P4FO0MQ5AGQyOJeDjStdyx8IBuPKnYSn3GWWf4ahXlgWL+z6b+QQ0BYFxbxm14kDDyYe
+         rkHg==
+X-Forwarded-Encrypted: i=1; AKwUvBz9HLtw3YEe6z80RUf16o3memXDZdkCp4+L5nLAbCdoMGweVZPdfGfrptecj47rDPeLYbJf1HA=@lists.linux.dev
+X-Gm-Message-State: AFuF++msRsSgh28l3jSm0mOuC9ZmebWr8eC8wsDrh0qoSg7x5G5iwvGe
+	zqubS4E1ufxcOVoCVviHXhhK7P0WnI2UjzPRKyVyDM51xH7OhVs2qCziJU4E18Ectr0AsCvfSYw
+	R868R7w==
+X-Received: from pgjj10.prod.google.com ([2002:a63:230a:0:b0:cc4:5907:21e9])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:b08d:b0:3c6:61b9:917c
+ with SMTP id adf61e73a8af0-3daed1fd3cfmr8633653637.11.1789134291123; Fri, 11
+ Sep 2026 06:44:51 -0700 (PDT)
+Date: Fri, 11 Sep 2026 06:44:50 -0700
+In-Reply-To: <20260910225728.GB857650@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] KVM: arm64: Trap guest MPAM accesses whenever MPAM is
- implemented
-To: Fuad Tabba <fuad.tabba@linux.dev>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oupton@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will@kernel.org>
-Cc: James Morse <james.morse@arm.com>, Xi Ruoyao <xry111@xry111.site>,
- Mark Rutland <mark.rutland@arm.com>, Joey Gouly <joey.gouly@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, Steffen Eiden <seiden@linux.ibm.com>,
- Gavin Shan <gshan@redhat.com>, Yuan Yao <yaoyuan@linux.alibaba.com>,
- Fuad Tabba <tabba@google.com>, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-References: <20260911104715.307500-1-fuad.tabba@linux.dev>
-Content-Language: en-US
-From: Ben Horgan <ben.horgan@arm.com>
-In-Reply-To: <20260911104715.307500-1-fuad.tabba@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <aptFFYqcSiBdMLE8@google.com> <20260905012403.GX4157646@nvidia.com>
+ <aqIAtOoew-_6jw29@google.com> <20260910143448.GD3968357@nvidia.com>
+ <aqLOWkuVKccR-I7W@google.com> <20260910171210.GF3968357@nvidia.com>
+ <aqMgjXfTJ8u3n7Kj@google.com> <20260910221832.GH3968357@nvidia.com>
+ <aqMyXE-fD-UN6w5L@google.com> <20260910225728.GB857650@nvidia.com>
+Message-ID: <aqQF0gz3Q2weDyEd@google.com>
+Subject: Re: [RFC PATCH 0/3] liveupdate: Move to feature flags for LUO and
+ memfd ABI compatibility
+From: Sean Christopherson <seanjc@google.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: David Matlack <dmatlack@google.com>, Logan Odell <loganodell@google.com>, arnd@arndb.de, 
+	pasha.tatashin@soleen.com, rppt@kernel.org, pratyush@kernel.org, 
+	graf@amazon.com, akpm@linux-foundation.org, pbonzini@redhat.com, 
+	maz@kernel.org, oupton@kernel.org, bhelgaas@google.com, alex@shazbot.org, 
+	kevin.tian@intel.com, dwmw2@infradead.org, baolu.lu@linux.intel.com, 
+	joro@8bytes.org, will@kernel.org, robin.murphy@arm.com, 
+	linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	kexec@lists.infradead.org, linux-mm@kvack.org, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-pci@vger.kernel.org, iommu@lists.linux.dev
+Content-Type: text/plain; charset="us-ascii"
 
-Hi Fuad,
-
-On 11/09/2026 11:47, Fuad Tabba wrote:
-> finalise_el2_state() clears the EL2 MPAM traps whenever the ID
-> registers advertise MPAM, while KVM sets them only under ARM64_MPAM,
-> which also requires MPAMEN. Without EL3 nothing sets that enable, so a
-
-This "Without EL3..." part reads oddly to me. I guess what you are getting at is that the MPAMEN is
-read only apart from at the highest implemented exception level.
-
-> guest reaches the MPAM registers while ID_AA64PFR0_EL1.MPAM reads 0
-> for it.
+On Thu, Sep 10, 2026, Jason Gunthorpe wrote:
+> On Thu, Sep 10, 2026 at 03:42:36PM -0700, Sean Christopherson wrote:
+> > On Thu, Sep 10, 2026, Jason Gunthorpe wrote:
+> > > Sean's initial email was asking for strict never-break ABI compatability
+> > > rules on top, and that is what I've been reacting to.
+> > 
+> > No, I was never asking for that.  I think we just have a different interpretation
+> > of ABI, or rather are talking about different pieces of ABI.
+> > 
+> > I am still asking for never-break serialization format compatibility, i.e. the
+> > more literal save/restore ABI.  I'm not asking for full backwards/forwards
+> > compatibility across all kernels version, i.e. the higher level "kernel" ABI.
+> > 
+> > To phrase things differently: I am a-ok if kernels are inherently incompatible
+> > because they fundamentally operate differently and/or support different features.
+> > I am not ok if we end up with incompatible kernels because the save/restore
+> > interfaces and payloads are poorly designed, lack abstraction, etc.  
 > 
-> Gate on what finalise_el2_state() tests instead: this CPU's ID
-> registers with the arm64.nompam override applied, and its
-> MPAMIDR_EL1.HAS_HCR before writing MPAMHCR_EL2, which is UNDEFINED
-> without it. MPAMEN isn't a term in any MPAM accessor, so the traps
-> take effect without it.
+> I can more agree with this, it is mostly what I thought we'd end up
+> doing anyhow with version numbers and growing the structs not
+> replacing them.
 > 
-> Fixes: 31ff96c38ea3 ("KVM: arm64: Fix missing traps of guest accesses to the MPAM registers")
-> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+> So you still end up with a version label (string I guess?) because we
+> can break it from time to time, 
+   
+Why bother with a label/string?  I don't understand what it buys us; I see only
+pain.  Make the features discoverable and punt on all of the "is this pile of
+insanity my company has created compatible with this other pile of insanity?" to
+layers above the kernel.
 
-This looks good to me. Now that you're determining if the MPAM registers are present on a per CPU
-basis and using that via a host flag, the traps will be set on all CPUs that have MPAM registers
-unless overridden on the command line. IIUC this covers the mismatched CPU case as well and so all
-cases that the register can be safely accessed (arm64.nompam not required) are covered.
+IMO, trying to capture compatibility in a version string is doomed to fail.  To
+be useful, the version would have to be extremely sensitive to changes, otherwise
+userspace will have to do its own compatibility analysis/checks anyways.  And at
+that point, a verson string will be too restrictive, e.g. will mismatch due to
+changes in features the deployment isn't using.
 
-
-> ---
+> just the version should have the feature mechanism layered under it? I'm fine
+> with that
 > 
-> Notes:
->     Changes since v2:
->      - A per-CPU flag in kvm_host_data, set at KVM's CPU init from the ID
->        registers with the override applied, instead of a third cpucap
->        (Will). The probe checks presence only, since MPAM3_EL3.TRAPLOWER
->        can't be read at EL2.
->      - The MPAMHCR_EL2 branch reads this CPU's MPAMIDR_EL1 rather than the
->        sanitised ARM64_MPAM_HCR, which would otherwise have been the one
->        system-wide test left in a per-CPU function.
->      - Fixes: names the KVM commit that left this case open, rather than
->        the head.S commit that cleared the traps.
->      - Yuan's Reviewed-by dropped, since the mechanism changed.
->     
->     v2: https://lore.kernel.org/all/20260908145651.2828597-1-fuad.tabba@linux.dev/
->     v1: https://lore.kernel.org/all/20260903160819.831518-1-fuad.tabba@linux.dev/
-> 
->  arch/arm64/include/asm/kvm_host.h       |  1 +
->  arch/arm64/kvm/arm.c                    |  7 +++++++
->  arch/arm64/kvm/hyp/include/hyp/switch.h | 13 ++++++++-----
->  3 files changed, 16 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 27fe0cd5b2d7a..98ca2d9b9e18d 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -755,6 +755,7 @@ struct kvm_host_data {
->  #define KVM_HOST_DATA_FLAG_VCPU_IN_HYP_CONTEXT		4
->  #define KVM_HOST_DATA_FLAG_L1_VNCR_MAPPED		5
->  #define KVM_HOST_DATA_FLAG_HAS_BRBE			6
-> +#define KVM_HOST_DATA_FLAG_HAS_MPAM			7
->  	unsigned long flags;
->  
->  	struct kvm_cpu_context host_ctxt;
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 8b080804bc90b..fde75a63cf045 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -2281,9 +2281,16 @@ static void cpu_set_hyp_vector(void)
->  
->  static void cpu_hyp_init_context(void)
->  {
-> +	u64 pfr0 = __read_sysreg_by_encoding(SYS_ID_AA64PFR0_EL1);
-> +	u64 pfr1 = __read_sysreg_by_encoding(SYS_ID_AA64PFR1_EL1);
-> +
->  	kvm_init_host_cpu_context(host_data_ptr(host_ctxt));
->  	kvm_init_host_debug_data();
->  
-> +	/* The traps take effect without MPAMEN, which ARM64_MPAM requires. */
-> +	if (id_aa64pfr0_mpam(pfr0) || id_aa64pfr1_mpamfrac(pfr1))
-> +		host_data_set_flag(HAS_MPAM);
-> +
->  	if (!is_kernel_in_hyp_mode())
->  		cpu_init_hyp_mode();
->  }
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> index 1ce7130e25490..2cb611e2bd69b 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -298,14 +298,17 @@ static inline void  __activate_traps_mpam(struct kvm_vcpu *vcpu)
->  	u64 clr = MPAM2_EL2_EnMPAMSM;
->  	u64 set = MPAM2_EL2_TRAPMPAM0EL1 | MPAM2_EL2_TRAPMPAM1EL1;
->  
-> -	if (!system_supports_mpam())
-> +	if (!host_data_test_flag(HAS_MPAM))
->  		return;
->  
->  	/* trap guest access to MPAMIDR_EL1 */
-> -	if (system_supports_mpam_hcr()) {
-> +	if (read_sysreg_s(SYS_MPAMIDR_EL1) & MPAMIDR_EL1_HAS_HCR) {
->  		write_sysreg_s(MPAMHCR_EL2_TRAP_MPAMIDR_EL1, SYS_MPAMHCR_EL2);
->  	} else {
-> -		/* From v1.1 TIDR can trap MPAMIDR, set it unconditionally */
-> +		/*
-> +		 * TIDR is RES0 without MPAMIDR_EL1.HAS_TIDR, which MPAM v1.0
-> +		 * prohibits: such a PE without HAS_HCR can't trap MPAMIDR_EL1.
-> +		 */
-
-The lack of a trap too bad as all the fields of MPAMIDR_EL1 are read only.
-
-Reviewed-by: Ben Horgan <ben.horgan@arm.com>
-
-Thanks,
-
-Ben
-
->  		set |= MPAM2_EL2_TIDR;
->  	}
->  
-> @@ -317,12 +320,12 @@ static inline void __deactivate_traps_mpam(void)
->  	u64 clr = MPAM2_EL2_TRAPMPAM0EL1 | MPAM2_EL2_TRAPMPAM1EL1 | MPAM2_EL2_TIDR;
->  	u64 set = MPAM2_EL2_EnMPAMSM;
->  
-> -	if (!system_supports_mpam())
-> +	if (!host_data_test_flag(HAS_MPAM))
->  		return;
->  
->  	sysreg_clear_set_s(SYS_MPAM2_EL2, clr, set);
->  
-> -	if (system_supports_mpam_hcr())
-> +	if (read_sysreg_s(SYS_MPAMIDR_EL1) & MPAMIDR_EL1_HAS_HCR)
->  		write_sysreg_s(MPAMHCR_HOST_FLAGS, SYS_MPAMHCR_EL2);
->  }
->  
-
+> Jason
