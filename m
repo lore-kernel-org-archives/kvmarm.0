@@ -1,299 +1,181 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mta0.migadu.com (out-239.mta0.migadu.com [91.218.175.239])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 021D63E49D1;
-	Fri, 11 Sep 2026 11:06:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9419344AB88
+	for <kvmarm@lists.linux.dev>; Fri, 11 Sep 2026 11:27:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.239
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789124766; cv=none; b=gFUBeo+BRto4EDY6hyF8LMmTovcHWI0YoC9tXcoWYh/KxY3d8L6fsmi1lgSUrTeMWwf59UOZPevLOXQl93lCkB/eLHcEFjAzKV+AZELfsptcnnivZcrrsykJGAuetPbIa7T+xxl1o5TGDCNwAnHB2WaDcarMBqZf9JoCsCipnZw=
+	t=1789126037; cv=none; b=sx4bBAYCuWrrBw1WRnIZHrwcltPNC7FoR4n2lKmMkB5v9BmEt/ZiNg1zoW1djZ82nI5dNto7yLxnJZpm23KdXsmkMSCRskxhKEC0StHwgJNQ1mc/wShcxlsML4V0wSpIxNT9zzXW8fhAIZhpade2CnuwjNXyOCk7JyUqwb6CHVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789124766; c=relaxed/simple;
-	bh=JvrZmcfy2bFw4IXQVkv3bqKdNxJfP8Z2DTQ1f80pfug=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=J9JP67F7T63TlUXZcaJjtn40d0jZzRoqVAAab0IvHBPmH9H4UdeXRTbSi6cZaMIGADUou7Ctd0YKh40Ae8JGbddL0AGQrgEPwJjD2pNv/FqAZKrcWDpavyEgVFK2Z7BXzlBSvYWpVUYq4CB5c7YZPxHsr+TDlZvkXTw/clB2rvs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=mwIigjyH; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=b+7SUHz3; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=M6mKBOHb; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Bkf9+hFx; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1789126037; c=relaxed/simple;
+	bh=vpyKjLRGOj2W4xkPI8SZ0I4va0+wufP6r6XYtBNdJWk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=b8HfpH7yXyYBzV1VJr2xM/r6raWLg2n0Ad6pQE7w3mhiSNHYlRwymxjEaoD7wEtA9hbmGZJrYKlr8KPu9Ha6t8Ra1vkUiLnehDiu590J/gaDujDPV/ekttx+YCU3QWQiaTuTGChLuvyqCV16+AIxj1ZhUGKiNEFi1AKGIGmcH8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=HwQd73d9; arc=none smtp.client-ip=91.218.175.239
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="mwIigjyH";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="b+7SUHz3";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="M6mKBOHb";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Bkf9+hFx"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id E75961F8BB;
-	Fri, 11 Sep 2026 11:05:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1789124755; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=mCvWKSyOXghSRjrUIO25WhTluktNhI1ZIzrUisSCzog=;
-	b=mwIigjyH85mOyKyDVXiVISSPm5WD3X0MP0365zfajWOkcWSuPmB2ARy/C5YHIzZl3SzDbc
-	mexaobbpaHz9iWGcTvThfd3zMOtaWRmJiSjzZdg8xpZbcyM68ZMswW5SZPVvyxE5Mk7Slc
-	/YYukJn/1TLBc8A1dWlsFiL2rvGZo4E=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1789124755;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=mCvWKSyOXghSRjrUIO25WhTluktNhI1ZIzrUisSCzog=;
-	b=b+7SUHz3bESEaqJoCQKVGmpl3KrUrunJsFD9TELjfIDfQGfJXAJcfCB1Y/yJszE2SdjUyI
-	hA5MPiO3ytWkRLDQ==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1789124750; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=mCvWKSyOXghSRjrUIO25WhTluktNhI1ZIzrUisSCzog=;
-	b=M6mKBOHbiTWHmrq4OaTeygTN+927bG8HXBCzz3Y4jYZpN6W2TIiMwt5mhZdYJylNuC/eiN
-	276E04tyvopmopDYC/DjhTeHmHxTFJuP6nRvia45UtqLQRXbvqIOWCXqMt6H3llZgBfxVy
-	F5cdouDM8VEETMkpv1vrbWcWH10Fe/o=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1789124750;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=mCvWKSyOXghSRjrUIO25WhTluktNhI1ZIzrUisSCzog=;
-	b=Bkf9+hFx/ERl6em/gPGKeoPFenHrChRVNOZRCzaiyvdKpzPFysgsyvTYq0CeN+eOGKeIpz
-	kWOLNVOPOZL3xYAw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 7C59E132D3;
-	Fri, 11 Sep 2026 11:05:47 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id Qc6PFovgo2rzKAAAD6G6ig
-	(envelope-from <tzimmermann@suse.de>); Fri, 11 Sep 2026 11:05:47 +0000
-Message-ID: <d8683667-55d5-4d77-9dcb-19e49b3dc3c6@suse.de>
-Date: Fri, 11 Sep 2026 13:05:46 +0200
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="HwQd73d9"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=vpyKjLRGOj2W4xkPI8SZ0I4va0+wufP6r6XYtBNdJWk=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1789126026; v=1; x=1789730826;
+ b=HwQd73d9gNG+IPelh22CAqFI7kPeH74dM10dHc01tFA6OINvm1PsIUs5g+NJ/D2ycGkssTo/
+ e487Zp3baGZ5QfJeqrsDKj7Ud62Pr0MV+BWLRN9Kle0ii+1lDONGkHTkObFTH3TCOhmsi2eLqqN
+ +rDQzUWlX/404IihLESWsVJQ=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id a6a0ab3f8a6adf7c;
+	Fri, 11 Sep 2026 11:27:06 +0000
+X-Mizu-Trace-ID: a6a0ab3f8a6adf7c
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b78e073980so3961e87.1
+        for <kvmarm@lists.linux.dev>; Fri, 11 Sep 2026 04:27:02 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBx96B/T82BxCkUjP2ZX2M7Uaii7ULbapAT+XgyDqScDoaIay+EsdwZvUC48NSTF8enSMhLAF8I=@lists.linux.dev
+X-Gm-Message-State: AFuF++ks3m8guOo3+cLiljaOE1/Yd3jSg59LITsAcIbUO2xnK3yKtUv4
+	grqUHJ3OlM+j1qsPp5wzUoFC/pqT8erwwE7FxGkv4CiJhC2YRkaybffFmnDVzs/iuIZSa65WZ1p
+	M7MgIl5JOKbACEo+fZRKA5l7nDbi1iZWDdId38o0L
+X-Received: by 2002:a05:6512:405a:b0:5b8:9e63:dfb9 with SMTP id
+ 2adb3069b0e04-5b8a053c7f3mr116427e87.0.1789126021546; Fri, 11 Sep 2026
+ 04:27:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 18/39] fbdev: defio: assert FBINFO_VIRTFB, drop VM_IO, add
- VM_MIXEDMAP
-To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>,
- Andrew Morton <akpm@linux-foundation.org>,
- "Liam R. Howlett" <liam@infradead.org>, Vlastimil Babka <vbabka@kernel.org>,
- Jann Horn <jannh@google.com>, Pedro Falcato <pfalcato@suse.de>,
- David Hildenbrand <david@kernel.org>, Mike Rapoport <rppt@kernel.org>,
- Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>,
- Jonathan Corbet <corbet@lwn.net>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
- Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
- Paul Moore <paul@paul-moore.com>,
- Stephen Smalley <stephen.smalley.work@gmail.com>,
- Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
- Kumar Kartikeya Dwivedi <memxor@gmail.com>, Zi Yan <ziy@nvidia.com>,
- Baolin Wang <baolin.wang@linux.alibaba.com>,
- Nico Pache <nico.pache@linux.dev>, Ryan Roberts <ryan.roberts@arm.com>,
- Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>,
- Lance Yang <lance.yang@linux.dev>, Usama Arif <usama.arif@linux.dev>,
- Kiryl Shutsemau <kas@kernel.org>, Doug Gilbert <dgilbert@interlog.com>,
- "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
- "Martin K. Petersen" <mkp@kernel.org>, Jaya Kumar <jayalk@intworks.biz>,
- Simona Vetter <simona@ffwll.ch>, Helge Deller <deller@gmx.de>,
- Sebastian Reichel <sre@kernel.org>, John Hubbard <jhubbard@nvidia.com>,
- Peter Xu <peterx@redhat.com>, Masami Hiramatsu <mhiramat@kernel.org>,
- Oleg Nesterov <oleg@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
- Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- x86@kernel.org, Arnaldo Carvalho de Melo <acme@kernel.org>,
- Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- Rik van Riel <riel@surriel.com>, Harry Yoo <harry@kernel.org>,
- Juri Lelli <juri.lelli@redhat.com>,
- Vincent Guittot <vincent.guittot@linaro.org>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Maxime Ripard <mripard@kernel.org>, David Airlie <airlied@gmail.com>,
- Will Deacon <will@kernel.org>, "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
- Nick Piggin <npiggin@gmail.com>, Arnd Bergmann <arnd@arndb.de>,
- Muchun Song <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>,
- "Matthew Wilcox (Oracle)" <willy@infradead.org>, Jan Kara <jack@suse.cz>,
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Madhavan Srinivasan <maddy@linux.ibm.com>, Anup Patel <anup@brainfault.org>,
- Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
- Albert Ou <aou@eecs.berkeley.edu>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>,
- Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
- Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
- "David S. Miller" <davem@davemloft.net>,
- Andreas Larsson <andreas@gaisler.com>,
- Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>,
- Matthew Brost <matthew.brost@intel.com>,
- Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>,
- Byungchul Park <byungchul@sk.com>, Gregory Price <gourry@gourry.net>,
- Ying Huang <ying.huang@linux.alibaba.com>,
- Alistair Popple <apopple@nvidia.com>, Chris Li <chrisl@kernel.org>,
- Kairui Song <kasong@tencent.com>, Kemeng Shi <shikemeng@huaweicloud.com>,
- Nhat Pham <nphamcs@gmail.com>, Baoquan He <baoquan.he@linux.dev>,
- Youngjun Park <youngjun.park@lge.com>, Johannes Weiner <hannes@cmpxchg.org>,
- Qi Zheng <qi.zheng@linux.dev>, Shakeel Butt <shakeel.butt@linux.dev>,
- Axel Rasmussen <axelrasmussen@google.com>, Yuanchu Xie <yuanchu@google.com>,
- Wei Xu <weixugc@google.com>, Xu Xin <xu.xin16@zte.com.cn>,
- Chengming Zhou <chengming.zhou@linux.dev>, Michal Hocko <mhocko@kernel.org>,
- Miklos Szeredi <miklos@szeredi.hu>
-Cc: linux-mm@kvack.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-usb@vger.kernel.org,
- linux-rdma@vger.kernel.org, selinux@vger.kernel.org,
- linux-sound@vger.kernel.org, bpf@vger.kernel.org,
- linux-scsi@vger.kernel.org, linux-fbdev@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linux-trace-kernel@vger.kernel.org,
- linux-perf-users@vger.kernel.org, linux-arch@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
- kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
- linux-s390@vger.kernel.org, sparclinux@vger.kernel.org,
- fuse-devel@lists.linux.dev
-References: <20260908-b4-mmap-prepare-vma-flag-sanify-v1-0-dacf19cce22b@kernel.org>
- <20260908-b4-mmap-prepare-vma-flag-sanify-v1-18-dacf19cce22b@kernel.org>
-Content-Language: en-US
-From: Thomas Zimmermann <tzimmermann@suse.de>
-Autocrypt: addr=tzimmermann@suse.de; keydata=
- xsBNBFs50uABCADEHPidWt974CaxBVbrIBwqcq/WURinJ3+2WlIrKWspiP83vfZKaXhFYsdg
- XH47fDVbPPj+d6tQrw5lPQCyqjwrCPYnq3WlIBnGPJ4/jreTL6V+qfKRDlGLWFjZcsrPJGE0
- BeB5BbqP5erN1qylK9i3gPoQjXGhpBpQYwRrEyQyjuvk+Ev0K1Jc5tVDeJAuau3TGNgah4Yc
- hdHm3bkPjz9EErV85RwvImQ1dptvx6s7xzwXTgGAsaYZsL8WCwDaTuqFa1d1jjlaxg6+tZsB
- 9GluwvIhSezPgnEmimZDkGnZRRSFiGP8yjqTjjWuf0bSj5rUnTGiyLyRZRNGcXmu6hjlABEB
- AAHNJ1Rob21hcyBaaW1tZXJtYW5uIDx0emltbWVybWFubkBzdXNlLmRlPsLAjgQTAQgAOAIb
- AwULCQgHAgYVCgkICwIEFgIDAQIeAQIXgBYhBHIX+6yM6c9jRKFo5WgNwR1TC3ojBQJftODH
- AAoJEGgNwR1TC3ojx1wH/0hKGWugiqDgLNXLRD/4TfHBEKmxIrmfu9Z5t7vwUKfwhFL6hqvo
- lXPJJKQpQ2z8+X2vZm/slsLn7J1yjrOsoJhKABDi+3QWWSGkaGwRJAdPVVyJMfJRNNNIKwVb
- U6B1BkX2XDKDGffF4TxlOpSQzdtNI/9gleOoUA8+jy8knnDYzjBNOZqLG2FuTdicBXblz0Mf
- vg41gd9kCwYXDnD91rJU8tzylXv03E75NCaTxTM+FBXPmsAVYQ4GYhhgFt8S2UWMoaaABLDe
- 7l5FdnLdDEcbmd8uLU2CaG4W2cLrUaI4jz2XbkcPQkqTQ3EB67hYkjiEE6Zy3ggOitiQGcqp
- j//OwE0EWznS4AEIAMYmP4M/V+T5RY5at/g7rUdNsLhWv1APYrh9RQefODYHrNRHUE9eosYb
- T6XMryR9hT8XlGOYRwKWwiQBoWSDiTMo/Xi29jUnn4BXfI2px2DTXwc22LKtLAgTRjP+qbU6
- 3Y0xnQN29UGDbYgyyK51DW3H0If2a3JNsheAAK+Xc9baj0LGIc8T9uiEWHBnCH+RdhgATnWW
- GKdDegUR5BkDfDg5O/FISymJBHx2Dyoklv5g4BzkgqTqwmaYzsl8UxZKvbaxq0zbehDda8lv
- hFXodNFMAgTLJlLuDYOGLK2AwbrS3Sp0AEbkpdJBb44qVlGm5bApZouHeJ/+n+7r12+lqdsA
- EQEAAcLAdgQYAQgAIAIbDBYhBHIX+6yM6c9jRKFo5WgNwR1TC3ojBQJftOH6AAoJEGgNwR1T
- C3ojVSkIALpAPkIJPQoURPb1VWjh34l0HlglmYHvZszJWTXYwavHR8+k6Baa6H7ufXNQtThR
- yIxJrQLW6rV5lm7TjhffEhxVCn37+cg0zZ3j7zIsSS0rx/aMwi6VhFJA5hfn3T0TtrijKP4A
- SAQO9xD1Zk9/61JWk8OysuIh7MXkl0fxbRKWE93XeQBhIJHQfnc+YBLprdnxR446Sh8Wn/2D
- Ya8cavuWf2zrB6cZurs048xe0UbSW5AOSo4V9M0jzYI4nZqTmPxYyXbm30Kvmz0rYVRaitYJ
- 4kyYYMhuULvrJDMjZRvaNe52tkKAvMevcGdt38H4KSVXAylqyQOW5zvPc4/sq9c=
-In-Reply-To: <20260908-b4-mmap-prepare-vma-flag-sanify-v1-18-dacf19cce22b@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Score: -0.80
-X-Spam-Level: 
-X-Spamd-Result: default: False [-0.80 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	FORGED_RECIPIENTS(2.00)[m:liam@infradead.org,m:jannh@google.com,m:pfalcato@suse.de,m:surenb@google.com,m:mhocko@suse.com,m:dennis.dalessandro@cornelisnetworks.com,m:jgg@ziepe.ca,m:stephen.smalley.work@gmail.com,m:perex@perex.cz,m:tiwai@suse.com,m:daniel@iogearbox.net,m:eddyz87@gmail.com,m:memxor@gmail.com,m:ryan.roberts@arm.com,m:dev.jain@arm.com,m:dgilbert@interlog.com,m:James.Bottomley@HansenPartnership.com,m:jayalk@intworks.biz,m:simona@ffwll.ch,m:deller@gmx.de,m:peterx@redhat.com,m:oleg@redhat.com,m:peterz@infradead.org,m:mingo@redhat.com,m:bp@alien8.de,m:mark.rutland@arm.com,m:riel@surriel.com,m:juri.lelli@redhat.com,m:airlied@gmail.com,m:npiggin@gmail.com,m:arnd@arndb.de,m:osalvador@suse.de,m:willy@infradead.org,m:jack@suse.cz,m:catalin.marinas@arm.com,m:anup@brainfault.org,m:palmer@dabbelt.com,m:aou@eecs.berkeley.edu,m:davem@davemloft.net,m:andreas@gaisler.com,m:viro@zeniv.linux.org.uk,m:matthew.brost@intel.com,m:joshua.hahnjy@gmail.com,m:rakie.kim@sk.com,m:byungchul@sk.com,m
- :gourry@gourry.net,m:kasong@tencent.com,m:shikemeng@huaweicloud.com,m:nphamcs@gmail.com,s:linux-mm@kvack.org,s:youngjun.park@lge.com,s:chengming.zhou@linux.dev,s:qi.zheng@linux.dev,s:shakeel.butt@linux.dev,s:dri-devel@lists.freedesktop.org,s:kvm-riscv@lists.infradead.org,s:linux-arm-kernel@lists.infradead.org,s:linux-riscv@lists.infradead.org,s:fuse-devel@lists.linux.dev,s:kvmarm@lists.linux.dev,s:linuxppc-dev@lists.ozlabs.org];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-0.998];
-	MIME_GOOD(-0.10)[text/plain];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_RCPT(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	URIBL_BLOCKED(0.00)[suse.com:url,suse.de:mid,suse.de:email,imap1.dmz-prg2.suse.org:helo];
-	ARC_NA(0.00)[];
-	FREEMAIL_TO(0.00)[kernel.org,linux-foundation.org,infradead.org,google.com,suse.de,suse.com,lwn.net,linuxfoundation.org,cornelisnetworks.com,ziepe.ca,paul-moore.com,gmail.com,perex.cz,iogearbox.net,nvidia.com,linux.alibaba.com,linux.dev,arm.com,interlog.com,HansenPartnership.com,intworks.biz,ffwll.ch,gmx.de,redhat.com,alien8.de,linux.intel.com,surriel.com,linaro.org,arndb.de,suse.cz,linux.ibm.com,brainfault.org,dabbelt.com,eecs.berkeley.edu,davemloft.net,gaisler.com,zeniv.linux.org.uk,intel.com,sk.com,gourry.net,tencent.com,huaweicloud.com,lge.com,cmpxchg.org,zte.com.cn,szeredi.hu];
-	RCVD_TLS_ALL(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	R_RATELIMIT(0.00)[to_ip_from(RL3ijnbkbqi8cy7pgpqkbn6f4y)];
-	TO_MATCH_ENVRCPT_SOME(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[134];
-	RCVD_COUNT_TWO(0.00)[2];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:url,imap1.dmz-prg2.suse.org:helo,suse.de:mid,suse.de:email]
-X-Spam-Flag: NO
+References: <20260911104715.307500-1-fuad.tabba@linux.dev> <20260911110152.D086C1F000FF@smtp.kernel.org>
+In-Reply-To: <20260911110152.D086C1F000FF@smtp.kernel.org>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Fri, 11 Sep 2026 12:26:25 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTz_1kDi156qfVA__U7tKoRcHFN6nqxToGoHTgo+iCXnMg@mail.gmail.com>
+X-Gm-Features: AcwNN1XK5NZmQtmA_G87LkzjfrWgk16FdSVJre-x2uudy8mjxi7_qgOu0YA8lNk
+Message-ID: <CA+EHjTz_1kDi156qfVA__U7tKoRcHFN6nqxToGoHTgo+iCXnMg@mail.gmail.com>
+Subject: Re: [PATCH v3] KVM: arm64: Trap guest MPAM accesses whenever MPAM is implemented
+To: sashiko-reviews@lists.linux.dev
+Cc: Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-
-Am 08.09.26 um 22:01 schrieb Lorenzo Stoakes (ARM):
-> Currently all drivers which use defio allocate system memory. All of them
-> also set FBINFO_VIRTFB, other than ssd1307fb, however this driver allocates
-> system RAM, so simply failed to set this flag when it ought to.
+On Fri, 11 Sept 2026 at 12:02, <sashiko-bot@kernel.org> wrote:
 >
-> This patch sets FBINFO_VIRTFB on ssd1307fb probe, then drops setting VM_IO
-> in fb_deferred_io_mmap() and instead requires FBINFO_VIRTFB to be set,
-> erroring out with a kernel warning if not.
+> Thank you for your contribution! Sashiko AI review found 1 potential issu=
+e(s) to consider:
 >
-> The logic requires a page from the driver and since commit 1ecbc7dd2902
-> ("fbdev/deferred-io: Always call get_page() for framebuffer pages") has
-> always required it to be refcounted, so this was implicitly already the
-> case.
+> Pre-existing issues:
+> - [High] KVM fails to trap guest MPAM accesses if the host boots with the=
+ `arm64.nompam` kernel parameter on MPAM-capable hardware, potentially allo=
+wing the guest to bypass virtualization isolation.
+
+Right, and it's documented rather than fixed: [1].
+
+Cheers,
+/fuad
+
+[1] https://lore.kernel.org/all/20260908145622.2828319-1-fuad.tabba@linux.d=
+ev/
+
+> --
 >
-> Finally this patch sets VM_MIXEDMAP, as the logic is mapping
-> kernel-allocated memory so this is appropriate.
+> commit b4685c49d4f8e9f9eb2e612a24ecf71fcf533869
+> Author: Fuad Tabba <fuad.tabba@linux.dev>
 >
-> Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
-
-Reviewed-by: Thomas Zimmermann <tzimmermann@suse.de>
-
-> ---
->   drivers/video/fbdev/core/fb_defio.c | 6 +++---
->   drivers/video/fbdev/ssd1307fb.c     | 2 ++
->   2 files changed, 5 insertions(+), 3 deletions(-)
+> KVM: arm64: Trap guest MPAM accesses whenever MPAM is implemented
 >
-> diff --git a/drivers/video/fbdev/core/fb_defio.c b/drivers/video/fbdev/core/fb_defio.c
-> index fd00b86e1ae6..fb359ecc3966 100644
-> --- a/drivers/video/fbdev/core/fb_defio.c
-> +++ b/drivers/video/fbdev/core/fb_defio.c
-> @@ -366,13 +366,13 @@ int fb_deferred_io_mmap(struct fb_info *info, struct vm_area_struct *vma)
->   {
->   	vma->vm_page_prot = pgprot_decrypted(vma->vm_page_prot);
->   
-> +	if (WARN_ON_ONCE(!(info->flags & FBINFO_VIRTFB)))
-> +		return -EINVAL;
->   	if (!try_module_get(THIS_MODULE))
->   		return -EINVAL;
->   
->   	vma->vm_ops = &fb_deferred_io_vm_ops;
-> -	vm_flags_set(vma, VM_DONTEXPAND | VM_DONTDUMP);
-> -	if (!(info->flags & FBINFO_VIRTFB))
-> -		vm_flags_set(vma, VM_IO);
-> +	vm_flags_set(vma, VM_MIXEDMAP | VM_DONTEXPAND | VM_DONTDUMP);
->   	vma->vm_private_data = info->fbdefio_state;
->   
->   	fb_deferred_io_state_get(info->fbdefio_state); /* released in vma->vm_ops->close() */
-> diff --git a/drivers/video/fbdev/ssd1307fb.c b/drivers/video/fbdev/ssd1307fb.c
-> index c4fdecafd856..958514a35433 100644
-> --- a/drivers/video/fbdev/ssd1307fb.c
-> +++ b/drivers/video/fbdev/ssd1307fb.c
-> @@ -763,6 +763,8 @@ static int ssd1307fb_probe(struct i2c_client *client)
->   	info->fix.smem_start = __pa(vmem);
->   	info->fix.smem_len = vmem_size;
->   
-> +	info->flags = FBINFO_VIRTFB;
-> +
->   	fb_deferred_io_init(info);
->   
->   	i2c_set_clientdata(client, info);
+> This commit changes how KVM determines whether to trap guest MPAM accesse=
+s.
+> It relies on a per-CPU flag set based on the ID registers rather than usi=
+ng
+> the system-wide system_supports_mpam() check.
 >
-
--- 
---
-Thomas Zimmermann
-Graphics Driver Developer
-SUSE Software Solutions Germany GmbH
-Frankenstr. 146, 90461 Nürnberg, Germany, www.suse.com
-GF: Jochen Jaser, Andrew McDonald, (HRB 36809, AG Nürnberg)
-
-
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index 8b080804bc90b..fde75a63cf045 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -2281,9 +2281,16 @@ static void cpu_set_hyp_vector(void)
+> >
+> >  static void cpu_hyp_init_context(void)
+> >  {
+> > +     u64 pfr0 =3D __read_sysreg_by_encoding(SYS_ID_AA64PFR0_EL1);
+> > +     u64 pfr1 =3D __read_sysreg_by_encoding(SYS_ID_AA64PFR1_EL1);
+> > +
+>
+> [Severity: High]
+> This is a pre-existing issue, but does reading the software-overridden ID
+> register value here in cpu_hyp_init_context() allow the arm64.nompam kern=
+el
+> parameter to falsely report no MPAM hardware to the KVM trap initializati=
+on
+> logic?
+>
+> By using __read_sysreg_by_encoding(), the software override for arm64.nom=
+pam
+> forces the MPAM fields to 0. This causes the HAS_MPAM flag to evaluate to
+> false even when physical MPAM hardware is present.
+>
+> >       kvm_init_host_cpu_context(host_data_ptr(host_ctxt));
+> >       kvm_init_host_debug_data();
+> >
+> > +     /* The traps take effect without MPAMEN, which ARM64_MPAM require=
+s. */
+> > +     if (id_aa64pfr0_mpam(pfr0) || id_aa64pfr1_mpamfrac(pfr1))
+> > +             host_data_set_flag(HAS_MPAM);
+> >
+> >       if (!is_kernel_in_hyp_mode())
+> >               cpu_init_hyp_mode();
+>
+> [ ... ]
+>
+> > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/h=
+yp/include/hyp/switch.h
+> > index 1ce7130e25490..2cb611e2bd69b 100644
+> > --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > @@ -298,14 +298,17 @@ static inline void  __activate_traps_mpam(struct =
+kvm_vcpu *vcpu)
+> >       u64 clr =3D MPAM2_EL2_EnMPAMSM;
+> >       u64 set =3D MPAM2_EL2_TRAPMPAM0EL1 | MPAM2_EL2_TRAPMPAM1EL1;
+> >
+> > -     if (!system_supports_mpam())
+> > +     if (!host_data_test_flag(HAS_MPAM))
+> >               return;
+>
+> [Severity: High]
+> This isn't a bug introduced by this patch, but does skipping the guest MP=
+AM
+> trap activation in __activate_traps_mpam() based on the overridden HAS_MP=
+AM
+> flag leave the hardware trap state at its UNKNOWN reset value?
+>
+> When the host boots with the arm64.nompam parameter, HAS_MPAM is false. T=
+his
+> causes KVM to skip setting the MPAM2_EL2 trap bits (TRAPMPAM0EL1 and
+> TRAPMPAM1EL1) during guest entry. Additionally, the EL2 initialization in
+> finalise_el2_state() also skips initializing MPAM2_EL2 when the ID regist=
+ers
+> are overridden.
+>
+> Because MPAM2_EL2 is never initialized by the host, it retains its
+> architecturally UNKNOWN reset value. If its trap bits happen to reset to =
+0,
+> a guest can execute MPAM instructions without trapping to KVM. This would
+> allow the guest to bypass virtualization isolation and directly manipulat=
+e
+> memory bandwidth and cache partitioning across the system, potentially
+> causing resource starvation or side-channel information leaks.
+>
+> Does this patch codify and reinforce gating the trap initialization on th=
+e
+> overridden software ID registers rather than the physical hardware
+> capabilities?
+>
+> >
+> >       /* trap guest access to MPAMIDR_EL1 */
+> > -     if (system_supports_mpam_hcr()) {
+> > +     if (read_sysreg_s(SYS_MPAMIDR_EL1) & MPAMIDR_EL1_HAS_HCR) {
+> >               write_sysreg_s(MPAMHCR_EL2_TRAP_MPAMIDR_EL1, SYS_MPAMHCR_=
+EL2);
+>
+> --
+> Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260911104715.30=
+7500-1-fuad.tabba@linux.dev?part=3D1
