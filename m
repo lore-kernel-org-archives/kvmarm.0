@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE9F0459AFC;
-	Fri, 11 Sep 2026 09:17:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 624D246D2B4;
+	Fri, 11 Sep 2026 09:21:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789118226; cv=none; b=rk3CdJbAEYbjXbKbEFqWjHaFAG/jk1s0yT9l6kdMCBs4iCY+EM1Z9DNI3pppwbwEG2aalQXIAxCSUlomM8rsq4b5f5jChKR3pwiWReAJ94m3aq2XEx84SXr2b+WvbA/lHpPJqBo9315w7R+XfVfykQ05sANJi1iNmNK80RjuNIU=
+	t=1789118487; cv=none; b=ZxVDnhLQdZ642MxfZZuEAF3A2r+fIV4flbzg5FhC8PHG0EmDFKY4KsrQkc6otqEGDwOmnQ/Q4ML3zthSfaw4eqyhHnY2rZHEg9BLGm3xaOXpYO4c3SSC9qOKhgUSUHUrg/DUXj2RA43G3iBcy4JpQ1JJClBta7zxf0joMfTqRHA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789118226; c=relaxed/simple;
-	bh=y4VNhJAktDNpssOv4fj1+dd7jYwgGkHIusbvYWB/ZOM=;
+	s=arc-20240116; t=1789118487; c=relaxed/simple;
+	bh=sSPYvXAS+pe2UihmOVkjAmU6fCndo2uXYrc7/3ZTM9c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rFSPKPmEtEUspzHucKGJD+E7Dx7A3ThjHqLk1bs4EMSS00faxE3gLejT+nhWiiM+X280Jy78y5Gm+w3szyy+AqKvSanxkIshocG+rjn9dZgUO2SjfMdamz45gk2qW7HzJO0ziDUAxJrLq9MPakRc1IhlJ2DIIKbnlU8xwdaT+MU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RbxSeSbZ; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=HEJjl14wx4aXe1u4Yo3JAIH/RWuZ5U3OZdRuRiZLWJE3A8o/51gz8aLZlyIuCR1sjWodglQUvT+50u6AFBMm/wPz0TD5G8Z0Um/B/1H/2u1BGRZH4il6zwBQZV4G221Jw9jEBI9/ZtywXemgos5eqSgvFN5k7YWOTS3fDjWbpOY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a33dLmzY; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RbxSeSbZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 461631F00893;
-	Fri, 11 Sep 2026 09:16:58 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a33dLmzY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18FD41F000FF;
+	Fri, 11 Sep 2026 09:21:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789118224;
-	bh=9sp1kFZZ0O6uT9i63Hix+4jeTVWCdlo9frW6hVcqvPU=;
+	s=k20260515; t=1789118486;
+	bh=oxmQxrsMeqRHqVktx/UJ3IdFFga7UWvSUavLJ9XkLmA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=RbxSeSbZZUU0Ne8WJuZalWlgBdFvk4xRMp9Ec5R+eTdN31MG6FizPvealsA8XcP1v
-	 zNS5ieOGImLE2jalyPZo4vsiTdEfdUkdB7GmVkBOf1vxa4SHkKXsGBTvg0avzvhGGg
-	 deKE1DrgNkIX1pL2e9ZZ9QtOCasm9rCQZwiwcuv9+jAyGAYazY/1fZfbAtrB+Zh3ej
-	 NWcg19p2iAlvNl7WI95KE38yDNvPQOt8/ixv+HzhfDYf0JZnCUmE7FuSKFKpOvbPZu
-	 vwVSPh+NomvlJ4fIvsfBXc71GY1MwJdG0NzylODt5gOCTZANrP/D3O723K3yAQCT+4
-	 JhYiRwBiB3F2w==
-Date: Fri, 11 Sep 2026 10:16:55 +0100
+	b=a33dLmzYgclcf+h0y1zqNlrGUlx91lz83YB4ZqpgXrK6Ah+8Nfvau6tKK5KdEeuXd
+	 Dfux531lNaQrUZMYOx9mE3Xt+SJyYT3Pwf9INrmJCjVcmS7PtuCuEgssXaoy11URi7
+	 c+LKdnXUxnNCN5p/xbRkldiKd+FCoUjVVSduevBHRfHWphQ8t8yFEh4xouPXLw8FpX
+	 2qWA0Te2CVaU90nRBs5wkVVdMm9L249BMMjiauBEXlRIY4oo8tsN/QABKSQLOHUcAh
+	 GqOfOlHIhfM6MquRJ5kSTkCwA4s/52KTfnhDM1/pqee+JhU+Vr4vdo4VVRuVcauEpS
+	 S9SKCJgqbS/mg==
+Date: Fri, 11 Sep 2026 10:21:17 +0100
 From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
 To: Fuad Tabba <tabba@google.com>
 Cc: Catalin Marinas <catalin.marinas@arm.com>, 
@@ -40,10 +40,11 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>, Vincent Donnefort <vdonnefort@google.com>, 
 	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Sean Christopherson <seanjc@google.com>, 
 	Claudio Imbrenda <imbrenda@linux.ibm.com>, Leo Soares Passos <Leo.Bras@arm.com>
-Subject: Re: [PATCH 0/8] KVM: arm64: Add KVM_PRE_FAULT_MEMORY support
-Message-ID: <aqPGWNxm0rOMRaXw@gremlin>
+Subject: Re: [PATCH 8/8] KVM: selftests: Add nested pre-fault test for arm64
+Message-ID: <aqPH7yjXOIfCOpmE@gremlin>
 References: <20260825-kvm-arm-prefault-v1-0-befe8947702e@kernel.org>
- <CA+EHjTw=7M+ac5UCfM5yPmuX8RuqZN08TLfXAmTLbQgmuhNWtw@mail.gmail.com>
+ <20260825-kvm-arm-prefault-v1-8-befe8947702e@kernel.org>
+ <CA+EHjTy8m=b8D6sLOTv3AW05vXqFPRrTYvG7-t3D64Vt1+jAWQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -52,47 +53,101 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CA+EHjTw=7M+ac5UCfM5yPmuX8RuqZN08TLfXAmTLbQgmuhNWtw@mail.gmail.com>
+In-Reply-To: <CA+EHjTy8m=b8D6sLOTv3AW05vXqFPRrTYvG7-t3D64Vt1+jAWQ@mail.gmail.com>
 
-On Thu, Sep 10, 2026 at 07:44:25PM +0100, Fuad Tabba wrote:
-> Hi Lorenzo,
+On Thu, Sep 10, 2026 at 07:57:03PM +0100, Fuad Tabba wrote:
+> Hi,
 >
-> On Tue, 25 Aug 2026 at 17:01, Lorenzo Stoakes (ARM) <ljs@kernel.org> wrote:
-> >
-> > This series implements the KVM stage 2 page table pre-faulting feature for
-> > arm64.
+> On Tue, 25 Aug 2026 at 17:02, Lorenzo Stoakes (ARM) <ljs@kernel.org> wrote:
+> ..
+> > +int main(void)
+> > +{
+> > +       struct nested_s2_state s2;
+> > +       struct kvm_vcpu_init init;
+> > +       struct kvm_vcpu *vcpu;
+> > +       struct kvm_vm *vm;
+> > +       struct ucall uc;
+> > +       u64 npages;
+> > +
+> > +       TEST_REQUIRE(kvm_check_cap(KVM_CAP_ARM_EL2));
 >
-> I know there's likely going to be a V2, but FWIW, I tested this series
-> as follows (finally managed to get protected mode running on my Mac):
->
-> QEMU (arm64, -cpu max,pauth=off):
-> - Protected-mode host, boots non-protected and protected guests
-> - pre_fault_memory_test on a non-protected host, VHE and nVHE, all 13
-> guest modes
-> - nv_pre_fault_memory_test with kvm-arm.mode=nested
->
-> FVP (AEM, FEAT_NV2):
-> - nv_pre_fault_memory_test with kvm-arm.mode=nested
->
-> Apple M4 hardware, running as a KVM host at EL2 under Apple's nested
-> virtualization (nVHE only):
-> - pre_fault_memory_test, anonymous and anonymous_thp backing, over the five
->   guest modes available there (the IPA is capped at 40 bits and the 64K
->   granule isn't implemented)
-> - with kvm-arm.mode=protected, pre_fault_memory_test skips on
->   KVM_CAP_PRE_FAULT_MEMORY, so the pKVM exclusion holds on a live pKVM host
->
-> Tested-by: Fuad Tabba < fuad.tabba@linux.dev>
-> (happy to retest again when you respin)
+> Would test_supports_el2() work better here? It honours the NV=0
+> opt-out, and since HAS_EL2 is set unconditionally below, NV=0 doesn't
+> disable this test as things stand.
 
-Perfect, much appreciated thanks! :)
-
-I won't carry the tags forward to v2 just in case anything breaks there, so
-appreciate you taking another run at the v2 also thanks! :)
+That sounds sensible :) Will fix on respin.
 
 >
 > Cheers,
 > /fuad
+>
+> > +       TEST_REQUIRE(kvm_check_cap(KVM_CAP_PRE_FAULT_MEMORY));
+> > +
+> > +       vm = vm_create(1);
+> > +
+> > +       kvm_get_default_vcpu_target(vm, &init);
+> > +       init.features[0] |= BIT(KVM_ARM_VCPU_HAS_EL2);
+> > +       vcpu = aarch64_vcpu_add(vm, 0, &init, guest_code);
+> > +       kvm_arch_vm_finalize_vcpus(vm);
+> > +
+> > +       npages = TEST_MEM_SIZE / vm->page_size;
+> > +       vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, TEST_MEM_GPA,
+> > +                                   TEST_MEM_SLOT, npages, 0);
+> > +       virt_map(vm, TEST_MEM_GPA, TEST_MEM_GPA, npages);
+> > +
+> > +       vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
+> > +                                   NESTED_S2_ROOT_GPA, NESTED_S2_ROOT_SLOT,
+> > +                                   vm_adjust_num_guest_pages(vm->mode, 1), 0);
+> > +
+> > +       /* Run the guest until it has ERET'd from vEL2 to vEL1. */
+> > +       vcpu_run(vcpu);
+> > +       switch (get_ucall(vcpu, &uc)) {
+> > +       case UCALL_SYNC:
+> > +               TEST_ASSERT_EQ(uc.args[1], 1);
+> > +               break;
+> > +       case UCALL_ABORT:
+> > +               REPORT_GUEST_ASSERT(uc);
+> > +               break;
+> > +       default:
+> > +               TEST_FAIL("Unhandled ucall: %ld", uc.cmd);
+> > +       }
+> > +
+> > +       /*
+> > +        * The vCPU's last-run context is vEL1, backed by a shadow stage-2
+> > +        * MMU. Enable nested stage-2 with an empty root so that the ioctl
+> > +        * fails if it tries to interpret the userspace GPA as an L2 IPA.
+> > +        *
+> > +        * Prefault in two halves so that the second ioctl exercises a
+> > +        * repeated shadow-MMU attach and canonical stage-2 swap.
+> > +        *
+> > +        * (Note that an implementation that wrongly populates shadow
+> > +        * stage-2 page tables would not be caught as userland can't
+> > +        * inspect these.)
+> > +        */
+> > +       s2 = enable_empty_nested_s2(vcpu);
+> > +       pre_fault(vcpu, TEST_MEM_GPA, TEST_MEM_SIZE / 2);
+> > +       pre_fault(vcpu, TEST_MEM_GPA + TEST_MEM_SIZE / 2, TEST_MEM_SIZE / 2);
+> > +       restore_nested_s2(vcpu, &s2);
+> > +
+> > +       /* Resume at vEL1 and touch the prefaulted range. */
+> > +       vcpu_run(vcpu);
+> > +       switch (get_ucall(vcpu, &uc)) {
+> > +       case UCALL_DONE:
+> > +               break;
+> > +       case UCALL_ABORT:
+> > +               REPORT_GUEST_ASSERT(uc);
+> > +               break;
+> > +       default:
+> > +               TEST_FAIL("Unhandled ucall: %ld", uc.cmd);
+> > +       }
+> > +
+> > +       kvm_vm_free(vm);
+> > +       return 0;
+> > +}
+> >
+> > --
+> > 2.55.0
+> >
 
 --
 Cheers, Lorenzo
