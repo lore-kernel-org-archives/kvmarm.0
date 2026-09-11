@@ -1,155 +1,199 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 974B23A1CF8
-	for <kvmarm@lists.linux.dev>; Fri, 11 Sep 2026 17:16:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7059A4A8FEC;
+	Fri, 11 Sep 2026 17:54:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789147016; cv=none; b=WxB3yLx/HWfXqaZHlY130m/eWH0+ub5JEQMk2Ew0Th07/WbLC2VWvmJtUwXajn9jOVMtABbqYsq/BRRhbqhsEepvxOV2dKx2SV7ro084cagR8RhMzTlqzqwLdHHfbfWsvJ3GXghPhb4oGsy0kNqk86Ug8HWPZUbR1wNMI/NZy1s=
+	t=1789149284; cv=none; b=aKtg2rgat9HzkwiE8jha72lJSaC6NVuFk80iGZUBJQxVP1GRdMaX6QQtR9m0Gy5UgrWzv/iVr0+79KgFDPNA7ZkHWNZeIAvRO5boYJkdDoBAV15pQQkHo7NnleJqSkNhVkYffFYcV3QDRpuc6d11FTQhOJaiT1+9LlAyqKYD0xE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789147016; c=relaxed/simple;
-	bh=GMwpKaQo+b1xj3kxl72UkiN0737lUQVYesuUiulsvUs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JQajifkyPagRJKIi8aiMWCBxBkcNVBrgDhpEhdyUp6F3/YyhMvTO9rKS6qTyk7Jg8weo47Lhraag8fZ+j5WgcUQaTPeOWGxZTAPIG2a7G3KsAlXOju8XAQCCBHvwKdz0cfVYx7EI6Pe02xGGqXhxRBDBfU2WVcl0Tp2R2M3AjNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IRuAw8BP; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1789149284; c=relaxed/simple;
+	bh=oT2HAQRYlBxYWXZEJgDhIx6sNDjZsCE9IaHCPNajnNI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gMGV6YWZF2aFmna3PGzcIZN+DzjlO9t+JSuAex66A6+rQRicnrPQRFwtmwRBhLA8tMw78HbaZuoCmNA97Hmv9AJuuqH+D6jHHEA6aAjNwNUFGcaOqR+5YoTgmpgP+n6xQKDhkuJFP44fGgDojbUQWXZiMHBHAGMasQ+NbOt10x8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R/PEF628; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IRuAw8BP"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1789147006;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=2gLJ161dkwsq964nEcXmxhgBhqu8XXJwXX0byV6GR0o=;
-	b=IRuAw8BPbk3Vkq4w21unKNRAfLyvi1FTevTX4ySj9ie7E6dgoEGmxW+L6xyY89XZ3tTyRb
-	X8Mwk/mpO8bUzb7mbuZfafDxo6nCmwzbikorVo/P+yMavBBBnVhOf2OPc1Vl+u1I9knvPE
-	QxD/SCkFRrY2kVO+k7Lz5a5zYSyzsvs=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-648-Rj-cvUwGMAyGPQnZAnD2Fw-1; Fri,
- 11 Sep 2026 13:16:39 -0400
-X-MC-Unique: Rj-cvUwGMAyGPQnZAnD2Fw-1
-X-Mimecast-MFC-AGG-ID: Rj-cvUwGMAyGPQnZAnD2Fw_1789146996
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3F1851801366;
-	Fri, 11 Sep 2026 17:16:35 +0000 (UTC)
-Received: from [100.90.56.12] (headnet05.pony-001.prod.iad2.dc.redhat.com [10.2.32.117])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 21D561956095;
-	Fri, 11 Sep 2026 17:16:26 +0000 (UTC)
-Message-ID: <a3c2d0f6-a7b5-4344-b837-434aeac5dbc0@redhat.com>
-Date: Fri, 11 Sep 2026 19:16:23 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R/PEF628"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45E7A1F000FF;
+	Fri, 11 Sep 2026 17:54:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789149283;
+	bh=4FwTYwpGmaK+5ispCEK7HH92jJqAfeRrVmWamTSNnqs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=R/PEF628C82R18CCBiTVgSxDDQxOmmbSQCnHAqmpckaTKvXRHHjbFndk35q0VJwbm
+	 kb2jEKyMa0SLgFgUCZjypSy8TU4f91YFYaL79LnYDkmD5YZ7AL7XoikZdUl97oCh3x
+	 QlUxYbS81ijVUF5fVhlk944TP7D2LmZtxTQuDrzP5dxAVnzOZPYc7bhPn+cxm0sUWh
+	 B4hxxUT5Cc5n6F5+/wjf5RtfTI0VG6FXcU6ZU4ZIB3MMKn1qFBNrVgDZdCZnR5hRoj
+	 ktqkGCSA0q7dC/KO31sDOWJ1h+hudAjLc0nPKfhMCyskclXeDI5VaQY7ZPVta2w4Q2
+	 g7mHI+jtqwWgA==
+Date: Fri, 11 Sep 2026 12:54:37 -0500
+From: Serge Hallyn <sergeh@kernel.org>
+To: =?iso-8859-1?Q?J=F6rg_R=F6del?= <joro@8bytes.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>, ashish.kalra@amd.com,
+	michael.roth@amd.com, nsaenz@amazon.com, anelkz@amazon.de,
+	James.Bottomley@hansenpartnership.com,
+	Melody Wang <huibo.wang@amd.com>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
+	loongarch@lists.linux.dev, linux-mips@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+	x86@kernel.org, coconut-svsm@lists.linux.dev, joerg.roedel@amd.com
+Subject: Re: [PATCH 29/60] kvm: Implement KVM_CREATE_PLANE ioctl
+Message-ID: <aqRAXTdtUY_Yt8zJ@shallyn-amd>
+References: <20260608144252.351443-1-joro@8bytes.org>
+ <20260608144252.351443-30-joro@8bytes.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 0/3] liveupdate: Move to feature flags for LUO and
- memfd ABI compatibility
-To: Jason Gunthorpe <jgg@nvidia.com>, Sean Christopherson <seanjc@google.com>
-Cc: David Matlack <dmatlack@google.com>, Logan Odell <loganodell@google.com>,
- arnd@arndb.de, pasha.tatashin@soleen.com, rppt@kernel.org,
- pratyush@kernel.org, graf@amazon.com, akpm@linux-foundation.org,
- maz@kernel.org, oupton@kernel.org, bhelgaas@google.com, alex@shazbot.org,
- kevin.tian@intel.com, dwmw2@infradead.org, baolu.lu@linux.intel.com,
- joro@8bytes.org, will@kernel.org, robin.murphy@arm.com,
- linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org,
- kexec@lists.infradead.org, linux-mm@kvack.org, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- linux-pci@vger.kernel.org, iommu@lists.linux.dev
-References: <20260903023452.721732-1-loganodell@google.com>
- <20260904160009.GV4157646@nvidia.com> <aptFFYqcSiBdMLE8@google.com>
- <20260905012403.GX4157646@nvidia.com> <aqIAtOoew-_6jw29@google.com>
- <20260910143448.GD3968357@nvidia.com> <aqLOWkuVKccR-I7W@google.com>
- <20260910171210.GF3968357@nvidia.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <20260910171210.GF3968357@nvidia.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
-X-Mimecast-MFC-PROC-ID: L85i01oZ9vIQHD0xsuQxYn6qm49VMeDInt9sOqwwrGA_1789146996
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260608144252.351443-30-joro@8bytes.org>
 
-On 9/10/26 19:12, Jason Gunthorpe wrote:
-> Keep in mind the actual goal here. Someone has kernel A and they need
-> to blind kexec into kernel B and NOT have the machine explode, or all
-> the VMs sitting on it lost.
+On Mon, Jun 08, 2026 at 04:42:21PM +0200, Jörg Rödel wrote:
+> From: Paolo Bonzini <pbonzini@redhat.com>
 > 
-> Meaning you must have a way to determine before the kexec if kernel A
-> is producing something B will *accept*. Accept is not "parse and fail
-> with EOPNOTSUPP" like most uapi schems. Aceept means bring in and
-> actually fully support and use.
->
-> So how do you solve this problem? You MUST declare in some kind of
-> manifest exactly what ABIs are supported, in some way.
+> Add a new VM ioctl to create a new plane. It returns a new file
+> descriptor which supports per-plane ioctls.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> Co-developed-by: Joerg Roedel <joerg.roedel@amd.com>
+> Signed-off-by: Joerg Roedel <joerg.roedel@amd.com>
+> ---
+>  include/uapi/linux/kvm.h |  2 ++
+>  virt/kvm/kvm_main.c      | 75 ++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 77 insertions(+)
+> 
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 813f964a6dc1..24e34b8e4819 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1355,6 +1355,8 @@ struct kvm_s390_keyop {
+>  #define KVM_GET_DEVICE_ATTR	  _IOW(KVMIO,  0xe2, struct kvm_device_attr)
+>  #define KVM_HAS_DEVICE_ATTR	  _IOW(KVMIO,  0xe3, struct kvm_device_attr)
+>  
+> +#define KVM_CREATE_PLANE	  _IO(KVMIO, 0xe4)
+> +
+>  /*
+>   * ioctls for vcpu fds
+>   */
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 5a0277e2ac7c..03a44ff62f0f 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -4843,6 +4843,34 @@ static long kvm_vcpu_compat_ioctl(struct file *filp,
+>  }
+>  #endif
+>  
+> +static long kvm_plane_ioctl(struct file *filp, unsigned int ioctl,
+> +			    unsigned long arg)
+> +{
+> +	struct kvm_plane *plane = filp->private_data;
+> +
+> +	if (plane->kvm->mm != current->mm || plane->kvm->vm_dead)
+> +		return -EIO;
+> +
+> +	switch (ioctl) {
+> +	default:
+> +		return -ENOTTY;
+> +	}
+> +}
+> +
+> +static int kvm_plane_release(struct inode *inode, struct file *filp)
+> +{
+> +	struct kvm_plane *plane = filp->private_data;
+> +
+> +	kvm_put_kvm(plane->kvm);
+> +	return 0;
+> +}
+> +
+> +static struct file_operations kvm_plane_fops = {
+> +	.unlocked_ioctl = kvm_plane_ioctl,
+> +	.release = kvm_plane_release,
+> +	KVM_COMPAT(kvm_plane_ioctl),
+> +};
+> +
+>  static int kvm_device_mmap(struct file *filp, struct vm_area_struct *vma)
+>  {
+>  	struct kvm_device *dev = filp->private_data;
+> @@ -5288,6 +5316,49 @@ static int kvm_vm_ioctl_get_stats_fd(struct kvm *kvm)
+>  	return fd;
+>  }
+>  
+> +static int kvm_vm_ioctl_create_plane(struct kvm *kvm, unsigned id)
+> +{
+> +	struct kvm_plane *plane;
+> +	struct file *file;
+> +	int r, fd;
+> +
+> +	if (id >= kvm_arch_max_planes(kvm) ||
+> +	    WARN_ON_ONCE(id >= KVM_MAX_PLANES))
+> +		return -EINVAL;
+> +
+> +	guard(mutex)(&kvm->lock);
+> +	if (kvm->planes[id])
+> +		return -EEXIST;
+> +
+> +	fd = get_unused_fd_flags(O_CLOEXEC);
+> +	if (fd < 0)
+> +		return fd;
+> +
+> +	plane = kvm_create_plane(kvm, id);
+> +	if (!plane) {
+> +		r = -ENOMEM;
+> +		goto put_fd;
+> +	}
+> +
+> +	kvm_get_kvm(kvm);
+> +	file = anon_inode_getfile("kvm-plane", &kvm_plane_fops, plane, O_RDWR);
+> +	if (IS_ERR(file)) {
+> +		r = PTR_ERR(file);
+> +		goto put_kvm;
+> +	}
+> +
+> +	fd_install(fd, file);
+> +	return fd;
+> +
+> +put_kvm:
+> +	kvm_put_kvm(kvm);
+> +	kvm_destroy_one_plane(plane);
 
-You still have to pass out of band what B will accept.  Passing a string 
-or a bitvector doesn't change much.
+I believe shashiko is right here, and I don't see it changed in a later
+patch:  kvm->planes[id] will still point to the now-freed plane.
+Probably best if kvm_destroy_one_plane(plane) sets that to NULL itself
+after freeing the plane.
 
-The problem, again is that memfd is the easy case.  KVM would bump the 
-version number on every other release, as even a new serialized MSR will 
-be an incompatibility.
-
-Rather, forwards kexec *must* work (again, that's nothing but a variant 
-of "we don't break userspace") and for backwards kexec, well, you must 
-know what you're doing.  QEMU has been doing backwards live migration 
-forever, and QEMU is a gnarly C program that has grown by accretion as 
-we were learning all this stuff, so it's not impossible at all.
-
-> Yeah, CSP broadly has to do exactly this across a wide range of
-> topics. It is a further reason why this feature is not exactly usable
-> by a "mainstream" user :\
-It's not easy, but you aren't even trying to do it right in the kernel. 
-You are starting from *a* solution and saying that it makes the feature 
-hard to use.
-
-And I'm not saying to dismiss your work or ability, quite the contrary 
-in fact!  It's just that you're solving for the wrong complexity, and 
-only partially so because (if I'm not wrong) there's still the question 
-of how to bring the manifest of kernel B into kernel A.
-
-Paolo
-
+> +put_fd:
+> +	put_unused_fd(fd);
+> +	return r;
+> +}
+> +
+> +
+>  #define SANITY_CHECK_MEM_REGION_FIELD(field)					\
+>  do {										\
+>  	BUILD_BUG_ON(offsetof(struct kvm_userspace_memory_region, field) !=		\
+> @@ -5306,6 +5377,9 @@ static long kvm_vm_ioctl(struct file *filp,
+>  	if (kvm->mm != current->mm || kvm->vm_dead)
+>  		return -EIO;
+>  	switch (ioctl) {
+> +	case KVM_CREATE_PLANE:
+> +		r = kvm_vm_ioctl_create_plane(kvm, arg);
+> +		break;
+>  	case KVM_CREATE_VCPU:
+>  		r = kvm_vm_ioctl_create_vcpu(kvm, arg);
+>  		break;
+> @@ -6676,6 +6750,7 @@ int kvm_init(unsigned vcpu_size, unsigned vcpu_align, struct module *module)
+>  	kvm_chardev_ops.owner = module;
+>  	kvm_vm_fops.owner = module;
+>  	kvm_vcpu_fops.owner = module;
+> +	kvm_plane_fops.owner = module;
+>  	kvm_device_fops.owner = module;
+>  
+>  	kvm_preempt_ops.sched_in = kvm_sched_in;
+> -- 
+> 2.53.0
+> 
