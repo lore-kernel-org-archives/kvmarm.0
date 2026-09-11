@@ -1,72 +1,179 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FAE546D560;
-	Fri, 11 Sep 2026 08:44:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FC2247124D;
+	Fri, 11 Sep 2026 08:45:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789116253; cv=none; b=dxslZydIfkw51X6CDdiSV0hAq6YPRNIWEh9OyHdvHwvvyouUaPEwDXcXOczGPey0hkCo3IlCzpQrr3akr3NdVqkhMsPlLJhpX52fMDu/caixSgysMtBP/WH10Dl5rd/mdDkL8XFyMluiJ+TrIVXoIXwnASsAm9F+zM8iBE9nM6Q=
+	t=1789116338; cv=none; b=YuD5hvJ+5MO4LAymDLnAlBY+Su2QLPXeuM/4R9GAJzVDfgya1NGfVRJmcgemeZl3P+HHk5DyE5yzdFOjY1M6JdqmnfLNvWLX/UUKOCMWzrsD/dsXYmOrsRRAfkDCyUFpwm+lE4Fa3beOSM4wJdV8dEOFXdmyvvFo94j8weF5c3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789116253; c=relaxed/simple;
-	bh=vg4F0k6m+4+kzUXRLBavhu3U7lVZddOyXeiUGCg25js=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tJEvfzaLfL1nshbRzGsA4zwj69B6sdU0ai0WSKmDRabQU+mwMC8QorqyZAiuq127wjvYcr5U3T2q1EGij2pv6bhrWGzEKNGGQWPzpFvHiLmE71g1Yqf7bC2re8140FX0yDlN3o10B1ITRdmqSmp5XTd6jCOWs//nkYEMeccyxGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O8LgwFy4; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789116338; c=relaxed/simple;
+	bh=lAxjbinap1XjY/ldeZoqjwR6pdq+Zcex91oPLLGkok0=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=G+vjNUPIvgfG1O94AjgURqC1a9Q3/GMgSiXtYtt7AOp2QkTp4/uDtndmOUNMi06e0/VwBL4MzzYJlMtkEXdqnyFIJ6x0xj+PE6ebcOS7TUvvPM/M7FrzGfMTQ98k2ds5RrN1ICsOW3ZERdH4iy/0y8y6xrSdpECxT+4nGlTnoUM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dwYwYz5l; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O8LgwFy4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 493C41F000FF;
-	Fri, 11 Sep 2026 08:44:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dwYwYz5l"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 826F41F000FF;
+	Fri, 11 Sep 2026 08:45:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789116251;
-	bh=vg4F0k6m+4+kzUXRLBavhu3U7lVZddOyXeiUGCg25js=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=O8LgwFy42EhGdTvVn3EhBaT0y7CkuGzg0ms4nYS/vmCIFDDimi6eIzv4AkEWKgqms
-	 NqGCc+KcmrlqlgNtlz+n2ZAn4mt+1d8Bp4pARgvV6UsRPlOL3iAudNnMeciIWjKC2g
-	 486vaVWTK2vW3Ce1Dm30Xl8nAZ/wEBCEXjyK94T711Dc/0VHsFU/6aSgynNNqRxpf3
-	 jUhoSBJLZ+TLgVKvf4VfidcqsZ5rYg5XPEDJQ+S6G75ShYzOAq41nS1ot45lnbwUV9
-	 hu0hOO4mEzBDl9SIyLCAAQzW4jVsQwHfyNqVmRRU3S1ewkAB5uqLuUA2BaFjAaBLi+
-	 sYgWQPd8DNDsg==
-Date: Fri, 11 Sep 2026 09:44:04 +0100
-From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-To: Jonathan Davies <jonathan.davies@nutanix.com>
-Cc: catalin.marinas@arm.com, christoffer.dall@arm.com, 
-	fuad.tabba@linux.dev, joey.gouly@arm.com, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, maz@kernel.org, oupton@kernel.org, 
-	seiden@linux.ibm.com, stable@vger.kernel.org, suzuki.poulose@arm.com, 
-	weilin.chang@arm.com, will@kernel.org, yaoyuan@linux.alibaba.com, yuzenghui@huawei.com
-Subject: Re: [PATCH v3 2/2] KVM: arm64: nv: Fix null ptr deref on nested
- wp/unmap, teardown race
-Message-ID: <aqO_SORFOAXDyXw_@gremlin>
-References: <20260901-kvm-arm-nested-virt-fix-v3-2-b154676f7e4c@kernel.org>
- <9829c704-9592-4235-b97c-dc1f5e4ea795@nutanix.com>
+	s=k20260515; t=1789116333;
+	bh=6lmWq/6m5ggzERPQqqVSu3VLp/0FSG5x+a0xHxsrOas=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=dwYwYz5ljp9tG3t5pKzvZsLEOy5+gSnkTSMX8qH8cAVp3J4uAaT3bmdmwQxGr2Ja3
+	 dXum5KsGHaFzCLWm1HgvDML1we5awsTE54pMdz8iXZpS+wZYqwx8XVfdFWqDbnwxZG
+	 /Jk63UDOHsqB0FgK67TJ9gQaGrOjeJy2cTErTOO9hdguJHQNqK3ojxtsgef5LGnKBg
+	 L/KG3agkLXRXafPftZi4WRY5/7wTG9xx28w65EEO05V5wYfiSx3jbAJo6hnPgBy/ye
+	 yrp+D91+pkeByi+YY6EBVvJQ4MQCBuUjJV3dl/N5MChGgTexLK6p9kmYDzP/QSyWSI
+	 Ue3ZiiiuKm2IQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1x4wt1-00000007euX-11qC;
+	Fri, 11 Sep 2026 08:45:31 +0000
+Date: Fri, 11 Sep 2026 09:45:30 +0100
+Message-ID: <86pkyk6us5.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Wei-Lin Chang <weilin.chang@arm.com>
+Cc: sashiko-reviews@lists.linux.dev,
+	kvmarm@lists.linux.dev,
+	Oliver Upton <oupton@kernel.org>
+Subject: Re: [PATCH v1 2/3] arm64: sysreg: Add TCR_EL2 to sysreg infrastructure
+In-Reply-To: <qzold5p6qgyawt4manlare7cuewlqik4i3vc5lrdidtzc6ac4v@ejf67iqd3nrj>
+References: <20260909222015.3046432-1-weilin.chang@arm.com>
+	<20260909222015.3046432-3-weilin.chang@arm.com>
+	<20260909223811.386071F00893@smtp.kernel.org>
+	<qzold5p6qgyawt4manlare7cuewlqik4i3vc5lrdidtzc6ac4v@ejf67iqd3nrj>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9829c704-9592-4235-b97c-dc1f5e4ea795@nutanix.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: weilin.chang@arm.com, sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev, oupton@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Sep 11, 2026 at 09:12:20AM +0100, Jonathan Davies wrote:
-> On Tue, 01 Sep 2026, "Lorenzo Stoakes (ARM)" <ljs@kernel.org> wrote:
-> > This means that stage2_apply_range() can drop the kvm->mmu_lock and
-> > thus concurrent progress can be made in lockstep with
-> > kvm_arch_flush_shadow_all().
-> >
-> > If kvm_arch_flush_shadow_all() advances ahead of stage2_apply_range()
-> > and completes its operation it guarantees a NULL pointer deref.
->
-> I've reproducibly hit exactly this problem when running nested guests
-> with concurrent memory compaction on the L0 host. This patch fixes it
-> for me perfectly (applied to a 6.18 kernel).
->
-> So, for what it's worth:
->
-> Tested-by: Jonathan Davies <jonathan.davies@nutanix.com>
+On Thu, 10 Sep 2026 11:58:07 +0100,
+Wei-Lin Chang <weilin.chang@arm.com> wrote:
+> 
+> On Wed, Sep 09, 2026 at 10:38:10PM +0000, sashiko-bot@kernel.org wrote:
+> > Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
+> > - [Medium] Declarative update to TCR_EL2 regenerates the TCR_EL2_RES1 aggregate mask which is consumed by C initialization, requiring confirmation of robustness to future value changes.
+> > --
+> > 
+> > commit 522a184d95be9c0f88cc6fb418668546ef83e3e4
+> > Author: Wei-Lin Chang <weilin.chang@arm.com>
+> > 
+> >     arm64: sysreg: Add TCR_EL2 to sysreg infrastructure
+> >     
+> >     Convert TCR_EL2 to the sysreg infrastructure with data extracted from
+> >     Registers.json of the BSD licenced AARCHMRS
+> >     (AARCHMRS_OPENSOURCE_A_profile_FAT-2026-06).
+> > 
+> > > diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+> > > index 94bf065c8ac71..8d89f34580bac 100644
+> > > --- a/arch/arm64/tools/sysreg
+> > > +++ b/arch/arm64/tools/sysreg
+> > [ ... ]
+> > > +Sysreg	TCR_EL2		3	4	2	0	2
+> > [ ... ]
+> > > +Field	33	MTX
+> > > +Field	32	DS
+> > > +Res1	31
+> > > +Field	30	TCMA
+> > > +Field	29	TBID
+> > > +Field	28	HWU62
+> > > +Field	27	HWU61
+> > > +Field	26	HWU60
+> > > +Field	25	HWU59
+> > > +Field	24	HPD
+> > > +Res1	23
+> > > +Field	22	HD
+> > 
+> > [Severity: Medium]
+> > This isn't a bug, but this declarative update regenerates the TCR_EL2_RES1
+> > aggregate mask. Are the C initialization consumers of this mask robust to its
+> > value silently changing if a future .sysreg patch adds or removes a Res1 bit?
+> > 
+> > For example, the generated mask is OR'd into the initial EL2 register value:
+> > 
+> > arch/arm64/kvm/arm.c:cpu_prepare_hyp_mode() {
+> >     ...
+> >     tcr |= TCR_EL2_RES1 | FIELD_PREP(TCR_EL2_PS_MASK, ips);
+> >     ...
+> > }
 
-Amazing, thanks :)
+Nonsense. In this case, we run nVHE, and we use the !VHE
+definition. The hVHE path correctly derives the setting from TCR_EL1,
+which has the same format.
 
---
-Cheers, Lorenzo
+> > 
+> > It is also used to initialize the guest emulation reset state in:
+> > 
+> > arch/arm64/kvm/sys_regs.c:sys_reg_descs[] = {
+> >     ...
+> >     EL2_REG(TCR_EL2, access_rw, reset_val, TCR_EL2_RES1),
+> >     ...
+> > }
+
+This one is a potential bug, but not in the current revision of the
+architecture. Bits 23 and 31 are RES1 when E2H==0, but reset as
+UNKNOWN when E2H==1, so nothing breaks. This is just ugly.
+
+> > 
+> > Because the generator's contract is to reflect global architectural truth, a
+> > future edit that reclassifies a bit as Res1 will silently change the value of
+> > TCR_EL2_RES1 without triggering a compiler or CI warning. Could you confirm
+> > that these consumers do not rely on the previous static semantic value of the
+> > mask?
+> 
+> I don't fully understand but doesn't this mean the architecture
+> introduced a change that breaks existing software?
+
+That's exactly what VHE (and by extension HCR_EL2.E2H being RES1) did.
+Which is why I can't wait for FEAT_E2H0 to be eradicated (it is
+already forbidden in 9.6 as FEAT_SRMASK is mandatory).
+
+I think this is simply a case of providing a specific reset function
+for TCR_EL2 (untested).
+
+	M.
+
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 2c90e185c6e8e..964ecbfde9bb6 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -3275,6 +3275,14 @@ static u64 reset_mdcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+ 	return vcpu->kvm->arch.nr_pmu_counters;
+ }
+ 
++static u64 reset_tcr_el2(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
++{
++	__vcpu_assign_sys_reg(vcpu, r->reg,
++			      vcpu_has_feature(vcpu, KVM_ARM_VCPU_HAS_EL2_E2H0) ?
++			      TCR_EL2_RES1 : VHE_TCR_EL2_RES1);
++	return __vcpu_sys_reg(vcpu, r->reg);
++}
++
+ /*
+  * Architected system registers.
+  * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
+@@ -3853,7 +3861,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 
+ 	EL2_REG(TTBR0_EL2, access_rw, reset_val, 0),
+ 	EL2_REG(TTBR1_EL2, access_rw, reset_val, 0),
+-	EL2_REG(TCR_EL2, access_rw, reset_val, TCR_EL2_RES1),
++	EL2_REG(TCR_EL2, access_rw, reset_tcr_el2, 0),
+ 	EL2_REG_FILTERED(TCR2_EL2, access_rw, reset_val, TCR2_EL2_RES1,
+ 			 tcr2_el2_visibility),
+ 	EL2_REG_VNCR(VTTBR_EL2, reset_val, 0),
+
+-- 
+Without deviation from the norm, progress is not possible.
