@@ -1,32 +1,32 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E81F6372ED0
-	for <kvmarm@lists.linux.dev>; Fri, 11 Sep 2026 18:57:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 998913F0AAD
+	for <kvmarm@lists.linux.dev>; Fri, 11 Sep 2026 18:59:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789153051; cv=none; b=oxf+PfKslXqE+n46jekLINVKAg2oV1fWwhGMbjMiSzsCNcAlMvCzBMOIPNsMzAC0rnfhbiTXE82aBSO/1p6UErNOfTPjRB7vQvb4FmvPqhDsY1k08zN34PLuQl/f/jcfM043eOdHelVxDSmlAFklvlTLzqkTT6jgIa64+dm+HII=
+	t=1789153170; cv=none; b=CBqDivU//V1NuzhxErK7H35+FnBwdaLHquaoDNDc87XH8qPSeDIV7nxIAL1NvO2emgQCGzhci14X7ueAQnN6LWwnGfANSOaG8sXwcvXZbSpzg8c5u0DkgM3xs639ZcCwbVYHk4j+ILghHdTgJ4RzN96AOrcK6U3XAIVQWRSc5FM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789153051; c=relaxed/simple;
-	bh=wc9nLSphBOCT1DkhLyV+K0eqkiSCALgzgP5PlYhJbIA=;
+	s=arc-20240116; t=1789153170; c=relaxed/simple;
+	bh=+8g1zYfV+MqP/XVrXDogisrA+xn3PtXe8rEowf+uAHs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cKNIYTnewehst+68oN5xIp/Z8krybHsD7gpt44JhX/Vo42KJRbQuF3MgDZv15yL+Q3w9NK9E49MlQ8y1Q0e1RGbkB/qDLgT22JyIbuTN5Ipu7CWpCd1f6ZH0r6SWGRPa9HrLY/ZfiYiBYpcJTqg1A9O4UMj21VM9dCm4z0DcKRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=FVaR9MbJ; arc=none smtp.client-ip=217.140.110.172
+	 Content-Type:Content-Disposition:In-Reply-To; b=matUfm+be2m5QlzazcjWg7DiViAJbfahDlsuyPyRGO+C+ls1xZAAD8+YSdgIQlh4SE+SUPCGxlFKQZxq5/dYijvSeLutewuEkWqPgJb0iFwJIkAE7HN8NUPACP0jyz5pHUFTUsSZYLTAhxauJ8cYo9KfiyjYxXtSRxfJ8f4HtRY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=ik2q7jxm; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="FVaR9MbJ"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="ik2q7jxm"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6A1331477;
-	Fri, 11 Sep 2026 11:57:24 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 484581477;
+	Fri, 11 Sep 2026 11:59:23 -0700 (PDT)
 Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 00CC73F7B4;
-	Fri, 11 Sep 2026 11:57:24 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 035873F7B4;
+	Fri, 11 Sep 2026 11:59:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1789153048; bh=wc9nLSphBOCT1DkhLyV+K0eqkiSCALgzgP5PlYhJbIA=;
+	t=1789153166; bh=+8g1zYfV+MqP/XVrXDogisrA+xn3PtXe8rEowf+uAHs=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FVaR9MbJyw2GqzIHwA3ysXfqcfdAaAWFOi+2Ipcd7N4AcQM//flL019SAtbrnoxAt
-	 K8fe7QzwxzUkrvQRomXTzyWAeheFEtuCZ1yOS/pydtS0bdnetFtlfXIoI5rXopMN84
-	 EKhRjZzsVq8/ZulFFDblC1dwHkjbxb072t+XL0cw=
-Date: Fri, 11 Sep 2026 19:57:17 +0100
+	b=ik2q7jxmZUlUQgLOnijwkrlcbYbUaprkqRz02YZdoOtjfNkvAWALo7KkgbMfpfSYF
+	 5khDKX9d7ji4DtxIcIXo7jGqb+zmK/Cn2IFgA1l8DEuJJZJbqZOpb2RAVCz5KxPLki
+	 Lk1Kxlta61VcAk5TTWLOCcvzZSUby+04ueiTzjJ4=
+Date: Fri, 11 Sep 2026 19:59:16 +0100
 From: Wei-Lin Chang <weilin.chang@arm.com>
 To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev, 
 	linux-arm-kernel@lists.infradead.org
@@ -35,11 +35,11 @@ Cc: Steffen Eiden <seiden@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>, Fuad Tabba <fuad.tabba@linux.dev>, ljs@kernel.org, 
 	Shen Yongchao <grayhat@foxmail.com>, Karl Mehltretter <kmehltretter@gmail.com>, 
 	stable@vger.kernel.org
-Subject: Re: [PATCH v4 1/2] KVM: arm64: nv: Fix life cycle of the nested_mmus
- array
-Message-ID: <klqsux4hc7qalbo7pev3yjpv5tywenjdpinm7tjblhhdf3l2jy@n2s5lqc5jtwd>
+Subject: Re: [PATCH v4 2/2] KVM: arm64: nv: Delay freeing of shadow S2
+ structures until VM destruction
+Message-ID: <nmzxx2xi7cgzu3aswov2h7abzytbbirw4gzove5yfm3q5x72of@dwjxd6ut24ew>
 References: <20260911162203.1919330-1-maz@kernel.org>
- <20260911162203.1919330-2-maz@kernel.org>
+ <20260911162203.1919330-3-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,42 +48,21 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260911162203.1919330-2-maz@kernel.org>
+In-Reply-To: <20260911162203.1919330-3-maz@kernel.org>
 
-On Fri, Sep 11, 2026 at 05:22:02PM +0100, Marc Zyngier wrote:
-> The nested_mmus array holds the shadow page tables that are used when
-> a guest is running a nested context. These structures are allocated on
-> VCPU_INIT for whole guest, which implies that they may have to be
-> relocated as the array grows.
+On Fri, Sep 11, 2026 at 05:22:03PM +0100, Marc Zyngier wrote:
+> We free the shadow S2 structures from kvm_arch_flush_shadow_all(), which
+> is a Bad Idea(tm). Freeing the page tables is fair game (this is what
+> this callback is for), but freeing the container that could still be
+> referenced by another part of the system is not great.
 > 
-> Should a VCPU_INIT occur whilst a vcpu is actively running an L2 and
-> that the allocation requires relocation, that vcpu will still be
-> running with a pointer to the previous structure, which will have been
-> freed.
+> Instead, grow separate destructors that gets called when we tear the VM
+> down for good. From there, we can nuke both the individual MMUs as well
+> as the global array that points to them, safe in the knowledge that the
+> vcpus themselves have been destroyed already.
 > 
-> Fix this by turning the array of structures to an array of pointers,
-> which is now allocated at VM creation, sized to the absolute maximum
-> that KVM can handle.
-> 
-> In turn, each VCPU_INIT contributes S2_MMU_PER_VCPU to the pool. No
-> reallocation is ever performed, and the life cycle of each object is
-> much clearer:
-> 
-> - the nested_mmus array is allocated in kvm_init_nested(), and freed
->   in kvm_arch_destroy_vm()
-> 
-> - s2_mmu structures are allocated in kvm_vcpu_init_nested(), and freed
->   on kvm_arch_flush_shadow_all()
-> 
-> Finally, the freeing of vcpu->arch.vncr_array is made consistent
-> rather than being done on some failure paths, but not others.
-> 
-> Fixes: 4f128f8e1aaa ("KVM: arm64: nv: Support multiple nested Stage-2 mmu structures")
-> Reported-by: Shen Yongchao <grayhat@foxmail.com>
-> Reported-by: Karl Mehltretter <kmehltretter@gmail.com>
-> Suggested-by: Karl Mehltretter <kmehltretter@gmail.com>
-> Acked-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
-> Link: https://lore.kernel.org/r/20260803224405.41468-1-kmehltretter@gmail.com
+> Fixes: 4f128f8e1aaac ("KVM: arm64: nv: Support multiple nested Stage-2 mmu structures")
+> Reviewed-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > Cc: stable@vger.kernel.org
 
@@ -92,3 +71,4 @@ Reviewed-by: Wei-Lin Chang <weilin.chang@arm.com>
 > ---
 
 [...]
+
