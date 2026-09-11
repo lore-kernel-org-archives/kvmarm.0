@@ -1,109 +1,143 @@
-Received: from mta0.migadu.com (out-11.mta0.migadu.com [91.218.175.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86B0129CE9
-	for <kvmarm@lists.linux.dev>; Fri, 11 Sep 2026 10:58:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6084F3793A5
+	for <kvmarm@lists.linux.dev>; Fri, 11 Sep 2026 11:01:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789124340; cv=none; b=SYGmmcqLVZ9zidI56KtEuGEAucAQT6GfHu5sYpzpI8MiXEiEFgY/Fob+mfNqDXdl0Qb0sGE8Sk0p9ewPXTCnukNHjVVy/lMNGBitjOPS+ttBwNZnxFnNiPdJdZj/L/DBfziyzY0H4i9CS+9dNf81HTL5nIgmORGSOMDdMVVql+M=
+	t=1789124514; cv=none; b=QjCj6jz2fcDCmyJmh8ieYA0hRdyFlu5Glm9WgI8aGn4+pUO3Oe5hOqzd0p48MPe/mRQ6CunWzsHKk6oS/HQzdZBVI7SL7XyZbmcr8P3HOEM5yncHIJTPqdg6vC9AbssnHvW7OX6UIMgCu0rlevXAqgkEiGtJvLeWfXaWF5nMAEs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789124340; c=relaxed/simple;
-	bh=t54f66oISK5iLoC6zpVoCghpLtMAejdCBH7P2FWAB/4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UwUN0orWyjyxvtSUkGFu5YOt3DaPeLnxN4n3lhYjTwWm1qg9zWQBBNPGgQSQ5EZookUj7aVQw0DF0HFA+v45EcClXXUYNqgeuV74doVxSro6ILx3TcYYk7VNBTpLB3iQL2UJUDknkx3vJ/6KvKX1lcDUy2e9DYZZMMrKvEsTH70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kbR3gILi; arc=none smtp.client-ip=91.218.175.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1789124514; c=relaxed/simple;
+	bh=YuS0qmX9vYecbgEF78up39VM7x+3pZf5BvXtWuPZhOA=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=MW1UkMaUKmQ0XpTGbW6FjiZMfeEAZ83WzMdv1QzY17lYx2mLhzVjlo6mtdYfD1a3AdQWkac9bAYctj2UhwwRgv3yrD2Jpv9pbv0kzruSJm96Nqxbw0JLHzvcRxN1tRi5/XOjkst4SLQ257mVKetcUG8qAeGW54WYIxndLsYl8/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CxpOE/Lz; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kbR3gILi"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=t54f66oISK5iLoC6zpVoCghpLtMAejdCBH7P2FWAB/4=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1789124336; v=1; x=1789729136;
- b=kbR3gILi6Hf5CQ4sVZDpSoybhtZq/wkXLkD1lyFmNT7tMFagUU+ntJHiO8JlvCF7s3ddOWg0
- kRG4mWnGoA8fGupWKKJ3dglyujkIET2MX5HCw0QZRH9JTaJPnnTDtaHR/4wnN3axir/R9BnPwbY
- MXd6txmT1AGQIALwf3+ZU+jU=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id abb8551f105eb848;
-	Fri, 11 Sep 2026 10:58:55 +0000
-X-Mizu-Trace-ID: abb8551f105eb848
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b4a0b17359so4064e87.0
-        for <kvmarm@lists.linux.dev>; Fri, 11 Sep 2026 03:58:54 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBxWBz7Oo/K6f63ULQauv/uLZ40Z2sbOiINKygoTm7cexyacGI30pxMsuNZ6uimwS8fK4FrHvp8=@lists.linux.dev
-X-Gm-Message-State: AFuF++kHlW2tzGy0IcHIImBBv5uNSc5VTBFgyunm+Xp6PYFpvp6A2+2g
-	PCUcVz/pzUPavXiEtoM//WViYt0bMuTc+z0NtsSYCyb3YJ9HwVIrixY8Lq7iKlBstfNCZNLQX6v
-	/RrQkGtLTghk1TG9PhZTAsFq2lNXb3lsn0Oo6xaTL
-X-Received: by 2002:a05:6512:405a:b0:5b8:9e63:dfb9 with SMTP id
- 2adb3069b0e04-5b8a053c7f3mr113768e87.0.1789124334038; Fri, 11 Sep 2026
- 03:58:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CxpOE/Lz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D086C1F000FF;
+	Fri, 11 Sep 2026 11:01:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789124513;
+	bh=p8wdyj/n/LK7ITRNLkMJmbUpfkQAobDrPys1dkNN5SE=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=CxpOE/LznLVwU+lFe000mRQtB087Q51s06Sq6duIFJDLMEgh1n1Qi5XO/XceSuB7l
+	 hNfjGSSU+nmP4RsKSpN94al18bf+2anBX6RyOX200OM3J9Nu2wipddPzVmWfL3Svht
+	 es7Xm2kbP5Nwv5pFK3KPbwzpJbZ56JX0Mr0ST1WgrViY6D8NDx0tRWciTvQ7orN7yS
+	 LyMXaTR8tifgMabQEnBdbbjC6Q4QzW3OwG9pJK2y6g5FTqLdyFhELMs6/LvY1kPk7Z
+	 RxbdbOrYtbxYUA2IxIwfSCBFFLId3HPr2YL7sBWDqM7x5xivCG03CwpOavD5VD5eco
+	 91Qhy6h0ON7/Q==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v3] KVM: arm64: Trap guest MPAM accesses whenever MPAM
+ is implemented
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Fuad Tabba" <fuad.tabba@linux.dev>
+Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev
+In-Reply-To: <20260911104715.307500-1-fuad.tabba@linux.dev>
+References: <20260911104715.307500-1-fuad.tabba@linux.dev>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 11 Sep 2026 11:01:52 +0000
+Message-Id: <20260911110152.D086C1F000FF@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20260907070002.3333525-1-fuad.tabba@linux.dev>
- <20260907070002.3333525-14-fuad.tabba@linux.dev> <86ld986pyr.wl-maz@kernel.org>
-In-Reply-To: <86ld986pyr.wl-maz@kernel.org>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Fri, 11 Sep 2026 11:58:17 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTy5LOs7Uan9iDBDnTFBPMaA39cy1eDHYgTu=kEDHSB85w@mail.gmail.com>
-X-Gm-Features: AcwNN1Vx-RhBgSQI6So9JMpD9_gKVmdeipliE4IOgkG_23MW8gI5glXbC9akMCU
-Message-ID: <CA+EHjTy5LOs7Uan9iDBDnTFBPMaA39cy1eDHYgTu=kEDHSB85w@mail.gmail.com>
-Subject: Re: [PATCH v2 13/17] KVM: arm64: Pend a protected guest's SError with
- HCR_EL2.VSE only
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Vincent Donnefort <vdonnefort@google.com>, Quentin Perret <qperret@google.com>
-Content-Type: text/plain; charset="UTF-8"
 
-Hi Marc,
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
 
-On Fri, 11 Sept 2026 at 11:29, Marc Zyngier <maz@kernel.org> wrote:
-...
-> > diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-> > index d6c4fc16f8795..b88098a7e756c 100644
-> > --- a/arch/arm64/kvm/inject_fault.c
-> > +++ b/arch/arm64/kvm/inject_fault.c
-> > @@ -378,8 +378,11 @@ int kvm_inject_serror_esr(struct kvm_vcpu *vcpu, u64 esr)
-> >        *
-> >        * As we're emulating the SError injection we need to explicitly populate
-> >        * ESR_ELx.EC because hardware will not do it on our behalf.
-> > +      *
-> > +      * The host does not see a protected guest's PSTATE.A: leave the
-> > +      * vSError to HCR_EL2.VSE below, which the guest masks itself.
-> >        */
-> > -     if (!serror_is_masked(vcpu)) {
-> > +     if (!vcpu_is_protected(vcpu) && !serror_is_masked(vcpu)) {
-> >               pend_serror_exception(vcpu);
-> >               esr |= FIELD_PREP(ESR_ELx_EC_MASK, ESR_ELx_EC_SERROR) | ESR_ELx_IL;
-> >               vcpu_write_sys_reg(vcpu, esr, exception_esr_elx(vcpu));
->
-> I can't say I like this very much.
->
-> The fundamental premise is that as far as the host is concerned,
-> PSTATE.A is always set. So why can't we give the illusion of this at
-> all times?
->
-> That'd be a much cleaner approach.
+Pre-existing issues:
+- [High] KVM fails to trap guest MPAM accesses if the host boots with the `=
+arm64.nompam` kernel parameter on MPAM-capable hardware, potentially allowi=
+ng the guest to bypass virtualization isolation.
+--
 
-I'll have EL2 copy PSTATE out to the host with A set instead, and drop
-this patch in v3.
+commit b4685c49d4f8e9f9eb2e612a24ecf71fcf533869
+Author: Fuad Tabba <fuad.tabba@linux.dev>
 
-Cheers,
-/fuad
+KVM: arm64: Trap guest MPAM accesses whenever MPAM is implemented
 
+This commit changes how KVM determines whether to trap guest MPAM accesses.
+It relies on a per-CPU flag set based on the ID registers rather than using
+the system-wide system_supports_mpam() check.
 
->
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 8b080804bc90b..fde75a63cf045 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -2281,9 +2281,16 @@ static void cpu_set_hyp_vector(void)
+> =20
+>  static void cpu_hyp_init_context(void)
+>  {
+> +	u64 pfr0 =3D __read_sysreg_by_encoding(SYS_ID_AA64PFR0_EL1);
+> +	u64 pfr1 =3D __read_sysreg_by_encoding(SYS_ID_AA64PFR1_EL1);
+> +
+
+[Severity: High]
+This is a pre-existing issue, but does reading the software-overridden ID
+register value here in cpu_hyp_init_context() allow the arm64.nompam kernel
+parameter to falsely report no MPAM hardware to the KVM trap initialization
+logic?
+
+By using __read_sysreg_by_encoding(), the software override for arm64.nompam
+forces the MPAM fields to 0. This causes the HAS_MPAM flag to evaluate to
+false even when physical MPAM hardware is present.
+
+>  	kvm_init_host_cpu_context(host_data_ptr(host_ctxt));
+>  	kvm_init_host_debug_data();
+> =20
+> +	/* The traps take effect without MPAMEN, which ARM64_MPAM requires. */
+> +	if (id_aa64pfr0_mpam(pfr0) || id_aa64pfr1_mpamfrac(pfr1))
+> +		host_data_set_flag(HAS_MPAM);
+> =20
+>  	if (!is_kernel_in_hyp_mode())
+>  		cpu_init_hyp_mode();
+
+[ ... ]
+
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp=
+/include/hyp/switch.h
+> index 1ce7130e25490..2cb611e2bd69b 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -298,14 +298,17 @@ static inline void  __activate_traps_mpam(struct kv=
+m_vcpu *vcpu)
+>  	u64 clr =3D MPAM2_EL2_EnMPAMSM;
+>  	u64 set =3D MPAM2_EL2_TRAPMPAM0EL1 | MPAM2_EL2_TRAPMPAM1EL1;
+> =20
+> -	if (!system_supports_mpam())
+> +	if (!host_data_test_flag(HAS_MPAM))
+>  		return;
+
+[Severity: High]
+This isn't a bug introduced by this patch, but does skipping the guest MPAM
+trap activation in __activate_traps_mpam() based on the overridden HAS_MPAM
+flag leave the hardware trap state at its UNKNOWN reset value?
+
+When the host boots with the arm64.nompam parameter, HAS_MPAM is false. This
+causes KVM to skip setting the MPAM2_EL2 trap bits (TRAPMPAM0EL1 and
+TRAPMPAM1EL1) during guest entry. Additionally, the EL2 initialization in
+finalise_el2_state() also skips initializing MPAM2_EL2 when the ID registers
+are overridden.
+
+Because MPAM2_EL2 is never initialized by the host, it retains its
+architecturally UNKNOWN reset value. If its trap bits happen to reset to 0,
+a guest can execute MPAM instructions without trapping to KVM. This would
+allow the guest to bypass virtualization isolation and directly manipulate
+memory bandwidth and cache partitioning across the system, potentially
+causing resource starvation or side-channel information leaks.
+
+Does this patch codify and reinforce gating the trap initialization on the
+overridden software ID registers rather than the physical hardware
+capabilities?
+
+> =20
+>  	/* trap guest access to MPAMIDR_EL1 */
+> -	if (system_supports_mpam_hcr()) {
+> +	if (read_sysreg_s(SYS_MPAMIDR_EL1) & MPAMIDR_EL1_HAS_HCR) {
+>  		write_sysreg_s(MPAMHCR_EL2_TRAP_MPAMIDR_EL1, SYS_MPAMHCR_EL2);
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260911104715.3075=
+00-1-fuad.tabba@linux.dev?part=3D1
