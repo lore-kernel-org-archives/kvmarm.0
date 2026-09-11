@@ -1,112 +1,110 @@
-Received: from canpmsgout11.his.huawei.com (canpmsgout11.his.huawei.com [113.46.200.226])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08412449B17
-	for <kvmarm@lists.linux.dev>; Fri, 11 Sep 2026 08:20:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 852EE45629E;
+	Fri, 11 Sep 2026 08:22:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789114830; cv=none; b=TDQAHTzOKvzrmI+ofjaN1QgJe+osTAxV7bUAWn7A4PyGiZN4xJt5rddrE8oSLUuLip5j5T8UxIPE2TZ/YMyCObcdTr4w0qpEQ6sV+7TJO37wd3I64LGiSyFnnVEXnfTSvWaOjwH9+yWVRcWyPfG3fGCs+Doyp1KMyHKNy4nNaTs=
+	t=1789114975; cv=none; b=MGNUVLO0QHDL0jIyRhnDOWbt2uMVlyckaDXPgTiXec9kgJcWp0tI2KmxMOb5OySipST4ufzw08PxuHvasthWBP9WjBPgTEOL87YUJoxVH+3UIslwsAth7er6VLGnY4On4teLwIghtYcbTX19ZNLsiJvITeovydaKGf0BJ0ecr0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789114830; c=relaxed/simple;
-	bh=00IoiYJMvc428TUnHqRDhNjDZIuoPykN8PPXnyrtpcU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=eBzaZryqiwkMXPfM7kUfzmWFDCKW/UeBEVODidLEXI0dsVbA6lIuT5astznnjnPGUb4WiXLgMeH6J5GMNTHejBxHBGXmA1ut3XhJShB1CaPeKnL1X8xFARdnP84OWi89pwbCManEJUbhhk65r9sn4OUZw0DQyOo6swlxqwPWCJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=VUXwpXLP; arc=none smtp.client-ip=113.46.200.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1789114975; c=relaxed/simple;
+	bh=xxIKPGhoadvlNpHg9VvO+dip6HVru9ZuPlCAg318qiw=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=b5Ps6XeVNY6Sk4GgyQxKNFaE3k/S/9MCGcjI1IzL0Q7/l1n9AheR0FEQeg98+Rhd9zQqGBgAYbimbxW9W+6fqXrVVt+myfItG8WkrYRT43zzHlxxYumseWf7E+HLTqookfZdWF6FtaQcQ1EHpD6j5IAshe+NGXMqudkVt4vgGL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eLtGW9k1; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="VUXwpXLP"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=UPlgI6itf/jQAT/aGqHZlGQ1rbaMbhD6LnTalkOaXRQ=;
-	b=VUXwpXLPX3wlAPyKd9HP3OrmXW/ey4+zvbJbIX499s4n/+IXiH0dkVEQr5TrMy2E3XAeziUBI
-	RR1vctPY0rEiuDKk8KSfefyOOHQNi1FOLtB6ohyZdvDu1rfdf/aZquVFDwQ4S7mK7uJu0FiGKWR
-	iGRHUTDuyAd1BdWFcR4o6Lo=
-Received: from mail.maildlp.com (unknown [172.19.163.214])
-	by canpmsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4hh6dd0TMyzKm5t;
-	Fri, 11 Sep 2026 16:09:25 +0800 (CST)
-Received: from kwepemk200008.china.huawei.com (unknown [7.202.194.74])
-	by mail.maildlp.com (Postfix) with ESMTPS id 476474056C;
-	Fri, 11 Sep 2026 16:20:24 +0800 (CST)
-Received: from [10.67.109.254] (10.67.109.254) by
- kwepemk200008.china.huawei.com (7.202.194.74) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.45; Fri, 11 Sep 2026 16:20:22 +0800
-Message-ID: <66752c5a-8bdf-4895-b692-585ccfce3b01@huawei.com>
-Date: Fri, 11 Sep 2026 16:20:21 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eLtGW9k1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 397061F000FF;
+	Fri, 11 Sep 2026 08:22:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789114968;
+	bh=vq4SfWftBjb+1ax8UUsY+ELpur/pYPZ9uJzVZqYepYw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=eLtGW9k10hWeJj1jdS5ySUy72qqmLRIkOKzyvzlCH6fBomQF59drW7v8jiG4b4Q+7
+	 J6eoAkyBZKyNJLaJjhrRcb3bB/uGIiKJ1fJL8g4Uxt4AQGEvs0+CREvO74x8oNHw/q
+	 o45JgCVBr9rFLgMbXMr5+v1PXPdnJBUJHjr7BptUI/EfOTG0A1NSDXpwg4c+cJG+Fg
+	 aS2q3Xqd8sqTidYoK9Pmxc1sUsNv4osQZaobGJ754zQOERzex7UFElJkJ0t0QH7wpQ
+	 qV8m/SgUfo4XDZ4dxbMAkDmGKFll0UTg/iI8lrIaEa46Gqoj8LHzurEo+yMZwHVA6E
+	 lo1vQhBj9U1zg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1x4wX0-00000007eK4-0ac6;
+	Fri, 11 Sep 2026 08:22:46 +0000
+Date: Fri, 11 Sep 2026 09:22:45 +0100
+Message-ID: <86qzj06vu2.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Wei-Lin Chang <weilin.chang@arm.com>
+Cc: sashiko-reviews@lists.linux.dev,
+	kvmarm@lists.linux.dev,
+	Oliver Upton <oupton@kernel.org>
+Subject: Re: [PATCH v1 1/3] KVM: arm64: nv: Don't advertise FEAT_LPA2 for guest stage-1
+In-Reply-To: <hucdlhnem5q2ykqxpxu4czjmac5uhazt5jbvgkawh6yqoidnhg@7p74vks5cqx6>
+References: <20260909222015.3046432-1-weilin.chang@arm.com>
+	<20260909222015.3046432-2-weilin.chang@arm.com>
+	<20260909224458.E7F0D1F00898@smtp.kernel.org>
+	<hucdlhnem5q2ykqxpxu4czjmac5uhazt5jbvgkawh6yqoidnhg@7p74vks5cqx6>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 05/40] KVM: arm64: Make MPAMSM_EL1 accesses UNDEF
-To: Ben Horgan <ben.horgan@arm.com>
-CC: <amitsinght@marvell.com>, <baisheng.gao@unisoc.com>,
-	<baolin.wang@linux.alibaba.com>, <carl@os.amperecomputing.com>,
-	<dave.martin@arm.com>, <david@kernel.org>, <dfustini@baylibre.com>,
-	<fenghuay@nvidia.com>, <gshan@redhat.com>, <james.morse@arm.com>,
-	<jonathan.cameron@huawei.com>, <kobak@nvidia.com>, <lcherian@marvell.com>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-	<peternewman@google.com>, <punit.agrawal@oss.qualcomm.com>,
-	<quic_jiles@quicinc.com>, <reinette.chatre@intel.com>,
-	<rohit.mathew@arm.com>, <scott@os.amperecomputing.com>,
-	<sdonthineni@nvidia.com>, <tan.shaopeng@fujitsu.com>,
-	<xhao@linux.alibaba.com>, <catalin.marinas@arm.com>, <will@kernel.org>,
-	<corbet@lwn.net>, <maz@kernel.org>, <oupton@kernel.org>,
-	<joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <kvmarm@lists.linux.dev>,
-	<zengheng4@huawei.com>, <linux-doc@vger.kernel.org>, Shaopeng Tan
-	<tan.shaopeng@jp.fujitsu.com>
-References: <20260313144617.3420416-1-ben.horgan@arm.com>
- <20260313144617.3420416-6-ben.horgan@arm.com>
-From: Jinjie Ruan <ruanjinjie@huawei.com>
-In-Reply-To: <20260313144617.3420416-6-ben.horgan@arm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
- kwepemk200008.china.huawei.com (7.202.194.74)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: weilin.chang@arm.com, sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev, oupton@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-
-
-在 2026/3/13 22:45, Ben Horgan 写道:
-> The MPAMSM_EL1 register controls the MPAM labeling for an SMCU, Streaming
-> Mode Compute Unit. As there is no MPAM support in KVM, make sure MPAMSM_EL1
-> accesses trigger an UNDEF.
+On Thu, 10 Sep 2026 11:56:05 +0100,
+Wei-Lin Chang <weilin.chang@arm.com> wrote:
 > 
-> Tested-by: Gavin Shan <gshan@redhat.com>
-> Tested-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
-> Tested-by: Peter Newman <peternewman@google.com>
-> Tested-by: Zeng Heng <zengheng4@huawei.com>
-> Tested-by: Punit Agrawal <punit.agrawal@oss.qualcomm.com>
-> Reviewed-by: Zeng Heng <zengheng4@huawei.com>
-> Reviewed-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
-> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> Acked-by: Marc Zyngier <maz@kernel.org>
-> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
-> ---
-> Changes since v2:
-> Remove paragraph from commit on allowed range of values
-> ---
->  arch/arm64/kvm/sys_regs.c | 2 ++
->  1 file changed, 2 insertions(+)
+> On Wed, Sep 09, 2026 at 10:44:58PM +0000, sashiko-bot@kernel.org wrote:
+> > Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
+> > - [Medium] Equality checks for TGRAN4 and TGRAN16 fail to mask future architectural enum values, leaking unsupported hardware capabilities to NV guests.
+> > --
+> > 
+> > commit 6c2ebbb5542b3e22eaee90b7cf8d8cbbc9704e7c
+> > Author: Wei-Lin Chang <weilin.chang@arm.com>
+> > 
+> > KVM: arm64: nv: Don't advertise FEAT_LPA2 for guest stage-1
+> > 
+> > There is no FEAT_LPA2 support for NV guests as of now, but we missed
+> > limiting it for the non-stage-2 granule size fields (TGRAN4, TGRAN16) in
+> > ID_AA64MMFR0_EL1. Add the sanitisation.
+> > 
+> > > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> > > index 17123f0b6daba..4d1884b32fc48 100644
+> > > --- a/arch/arm64/kvm/nested.c
+> > > +++ b/arch/arm64/kvm/nested.c
+> > > @@ -1731,6 +1731,19 @@ u64 limit_nv_id_reg(struct kvm *kvm, u32 reg, u64 val)
+> > >  		/* Hide CNTPOFF if present */
+> > >  		val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64MMFR0_EL1, ECV, IMP);
+> > >  
+> > > +		/* NV does not support FEAT_LPA2. */
+> > > +		if (SYS_FIELD_GET(ID_AA64MMFR0_EL1, TGRAN4, val) ==
+> > > +		    ID_AA64MMFR0_EL1_TGRAN4_52_BIT) {
+> > 
+> > [Severity: Medium]
+> > Will this exact equality check fail to mask future architectural enum values?
+> > 
+> > If future hardware implements a capability enum value greater than 52_BIT for
+> > TGRAN4, this check will evaluate to false, leaking the unsupported capability
+> > to NV guests.
+> > 
+> > Could this be capped instead, perhaps using inequalities or the
+> > ID_REG_LIMIT_FIELD_ENUM macro, to maintain forward compatibility?
 > 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 1b4cacb6e918..0edd655934a9 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -3376,6 +3376,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  
->  	{ SYS_DESC(SYS_MPAM1_EL1), undef_access },
->  	{ SYS_DESC(SYS_MPAM0_EL1), undef_access },
-> +	{ SYS_DESC(SYS_MPAMSM_EL1), undef_access },
+> ID_REG_LIMIT_FIELD_ENUM works only for unsigned fields, perhaps it is
+> worth extending it so it can deal with signed enums too.
 
-Reviewed-by: Jinjie Ruan <ruanjinjie@huawei.com>
+Don't bother. We're not doing "crystal ball architecture".
 
-> +
->  	{ SYS_DESC(SYS_VBAR_EL1), access_rw, reset_val, VBAR_EL1, 0 },
->  	{ SYS_DESC(SYS_DISR_EL1), NULL, reset_val, DISR_EL1, 0 },
->  
+	M.
 
+-- 
+Without deviation from the norm, progress is not possible.
