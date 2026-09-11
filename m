@@ -1,44 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AB5D32824B
-	for <kvmarm@lists.linux.dev>; Fri, 11 Sep 2026 14:14:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11F9634B19F
+	for <kvmarm@lists.linux.dev>; Fri, 11 Sep 2026 14:20:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789136073; cv=none; b=lSODBjyveD5M2Cs18Rjzj/admaTJVpHo4n/+V73QsUlP2vkGw3q+azxM3q6kPwPJf974gfF6HzzHlQnndXVZERnZfEtdVpaA375f8jJ7woyfmwVveyT6QumZnb3scmRmqa/mWb/9iqsnw5sxDvTBZG/5vSiBM6878SsVzF2qt90=
+	t=1789136440; cv=none; b=GZU8YwasyWJJbGJ4eDDUT0CPV92zYtZAtwv0bby2JEjOhudaq3pVX4bFsvLOOrVq4BmUPQEAWXymtwXTEd/zG0WZpu5yy9smXVvSZU0Pv2sGJvsk7LFVTt6oEqDFDmZvYjmvhyjfvAeEov5IFS60sx8R6hVNnYRYx9MFTphnDAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789136073; c=relaxed/simple;
-	bh=pDUN6d9xf/0Ulv2yBbDG+SaBrY/qmiZW0EilfI6Nl14=;
+	s=arc-20240116; t=1789136440; c=relaxed/simple;
+	bh=2K1fPocGHWHp5vtFrlxnEctWcMxM2+a3F67aLZjp6C8=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=mUsuiGDSe/NOkIL9yp+YMAz/pRH0PdJOYvOr/lTsNKBirJXQm6G2AEIzm6T5dMMOZXdRfLCKu2Gv1Ce2ASwTZ8WkNr3ojedBHvXd4R2JeuZn7XS8pJjUICXF6+9bXV2lj87M/huV62COnyK+zi4tAQq+D5VhFy14omL5q+tju2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DsdezBld; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=n3V1rVPcHg6Y1gCjEP+6KNFCv4ewEuNcG6lR+NXgEFvd+EQqy7fzz6auw0muRN9M76mfHbxRxm4T4CiYN9xiVfr5viqmy1AeiPmzginC7Jp5gD1JIMdAVN5NCIAi74ucF2+BMn10hhzSPR9pdfUkIR6APxYqkBgZhMB3D5IYYAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dAG5jyIP; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DsdezBld"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CA051F008A2;
-	Fri, 11 Sep 2026 14:14:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dAG5jyIP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56F1C1F000FF;
+	Fri, 11 Sep 2026 14:20:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789136071;
-	bh=uhiEkK7UzITRRpRszCuyQ+mu/5yUf0Hn7ecNX/FbbzA=;
+	s=k20260515; t=1789136438;
+	bh=arD/Mle/6Y+6E60MfF7mUA8FjfzP9w2D9joks5WQe6A=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=DsdezBld4QdhYtI0rw3VHIj1QHQcEhxBm2Yslk/WjCHUqSR1IvaLnNzIoyae7JyLm
-	 NkBJNy/VGA44EqvWVOJqPJ52ctc96k3B1eNWI8bAP9F3DYXPGW2H0POC9jaK6wGQT0
-	 VW9wCJSMaSewmEAvWnigVjevTbnvfVNS5SDNWQWfnN5mvcN9qx2+EdCM1/F+EEoQ1m
-	 8X9v+Lmgrmzt/g4mRZSmu7Btencp/tNk0btVgwstyfpEXBv0tBDrbTVVGWYVqpSj6j
-	 OUUXkuHqN61x7luSjTr4Fxlm8gDYhX1zR45soFCri9ox/3Swj47ncsARP0KauKOgfm
-	 XKtD4pKOuzD/A==
+	b=dAG5jyIPAPqDB7ToYnRa2GETr7o8uwNwZisaErWrDakUaUyn43/JmboT21pBPnNxm
+	 dZ093OfTn6XuWgIWsSWSZIO+difdfvHTDxaLp08oz3QUVxTTWC4md9ZCU6YW7OzLhB
+	 X7gmpSxkOgBosaH8JJ2XPGvD18MyKK/4HYvHmcIfUM4iH5aojNeQS+EjYOLf+uXLyl
+	 c3t5Pt6oh+KZiTzBqsTUcmWUP2LJfrM0REectYu0hmJdRPoRUi4lyCVeOOCx714v6L
+	 Mba03HUWmbuc/B1SinIMWl28jU2L2ftsf2umn7ZBtPI3CtJz9Hw3tWAQ8iv1ePlFQP
+	 twISL+Cb+6hLw==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2 05/22] KVM: arm64: Make pKVM ownership selftest an
- HVC
+Subject: Re: [PATCH v2 22/22] KVM: arm64: Stage-2 huge mappings for
+ protected VMs
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Vincent Donnefort" <vdonnefort@google.com>
 Cc: "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>
-In-Reply-To: <20260911135053.146435-6-vdonnefort@google.com>
+In-Reply-To: <20260911135053.146435-23-vdonnefort@google.com>
 References: <20260911135053.146435-1-vdonnefort@google.com>
- <20260911135053.146435-6-vdonnefort@google.com>
+ <20260911135053.146435-23-vdonnefort@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 11 Sep 2026 14:14:31 +0000
-Message-Id: <20260911141431.9CA051F008A2@smtp.kernel.org>
+Date: Fri, 11 Sep 2026 14:20:37 +0000
+Message-Id: <20260911142038.56F1C1F000FF@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,95 +47,135 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 2 potential issue(=
 s) to consider:
-- [High] Exposing the pKVM ownership selftest as an HVC allows the untruste=
-d host to trigger an Out-Of-Bounds (OOB) write in hypervisor memory.
-- [Medium] Missing NULL check on `init_selftest_vm()` return value leads to=
- an EL2 panic on malicious host input.
+- [Critical] pkvm_pin_user_pages() returns 0 on -EHWPOISON without initiali=
+zing output parameters, leading to undefined behavior and potential system =
+compromise in pkvm_mem_abort().
+- [Medium] Unprivileged host userspace can trigger a WARN_ON_ONCE in pkvm_p=
+in_user_pages() via TOCTOU, leading to a host-side denial of service.
 --
 
-commit 8fb13365545b2fb6e99ef459c949f368c81f9f88
+commit 3d6ed4192aebc28eca33a0d8ed20d5a587ffa2cd
 Author: Vincent Donnefort <vdonnefort@google.com>
 
-KVM: arm64: Make pKVM ownership selftest an HVC
+KVM: arm64: Stage-2 huge mappings for protected VMs
 
-In preparation for testing the pKVM ownership with huge mappings,
-refactor the selftest to be triggered via an HVC using dynamically
-allocated memory from the host. This avoids wasting memory which would
-be even worse for testing ownership transitions for huge stage-2
-mappings.
+This commit enables PMD-sized stage-2 block mappings for protected VMs when
+the stage-1 mapping is backed by THPs. An entire PMD_SIZE mapping is donated
+to the guest upon finding a THP.
 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/n=
-vhe/mem_protect.c
-> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> @@ -1748,24 +1748,36 @@ static void assert_page_state(void)
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 9ba86450fe4af..218df096c72ed 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
 [ ... ]
-> +int __pkvm_ownership_selftest(u64 pfn, u64 pgtable_pfn, unsigned long pg=
-table_nr_pages)
+> +static int pkvm_pin_user_pages(const struct kvm_s2_fault_desc *s2fd, str=
+uct page **__page,
+> +			       unsigned long *__size, kvm_pfn_t *__pfn, gfn_t *__gfn)
 >  {
+>  	unsigned int flags =3D FOLL_HWPOISON | FOLL_LONGTERM | FOLL_WRITE;
+>  	struct kvm_vcpu *vcpu =3D s2fd->vcpu;
+>  	struct mm_struct *mm =3D current->mm;
+>  	struct kvm *kvm =3D vcpu->kvm;
+>  	struct page *page;
+> +	kvm_pfn_t pfn;
+> +	gfn_t gfn;
+> +	long ret;
+> =20
+> -	mmap_read_lock(mm);
+> +	guard(mmap_read_lock)(mm);
+> =20
+>  	ret =3D pin_user_pages(s2fd->hva, 1, flags, &page);
+> -	mmap_read_unlock(mm);
+> -
+>  	if (ret =3D=3D -EHWPOISON) {
+>  		kvm_send_hwpoison_signal(s2fd->hva, PAGE_SHIFT);
+> -		ret =3D 0;
+> -		goto dec_account;
+> +		return 0;
+
+[Severity: Critical]
+If pin_user_pages() returns -EHWPOISON, does this return 0 without
+initializing the output parameters (__page, __size, __pfn, __gfn)?
+
+>  	} else if (ret !=3D 1) {
+> -		ret =3D -EFAULT;
+> -		goto dec_account;
+> +		return -EFAULT;
+>  	} else if (!folio_test_swapbacked(page_folio(page))) {
 [ ... ]
-> +	selftest_vcpu =3D vcpu =3D init_selftest_vm(hyp_phys_to_virt(hyp_pfn_to=
-_phys(pgtable_pfn)),
-> +						pgtable_nr_pages);
->  	vm =3D pkvm_hyp_vcpu_to_hyp_vm(vcpu);
+> -		ret =3D -EIO;
+> -		goto unpin;
+> +		unpin_user_page(page);
+> +		return -EIO;
+> +	}
+> +
+> +	pfn =3D page_to_pfn(page);
+> +	gfn =3D gpa_to_gfn(s2fd->fault_ipa);
+> +
+> +	ret =3D transparent_hugepage_adjust(kvm, s2fd->memslot, s2fd->hva, &pfn=
+, &gfn);
+> +	if (ret < 0) {
+> +		unpin_user_page(page);
+> +		return ret;
+> +	} else if (ret =3D=3D PMD_SIZE && WARN_ON_ONCE(folio_size(page_folio(pa=
+ge)) < PMD_SIZE)) {
+> +		unpin_user_page(page);
+> +		return -EINVAL;
+>  	}
 
 [Severity: Medium]
-Is there a possibility of a NULL pointer dereference leading to an EL2 panic
-here? If the host issues the selftest HVC with pgtable_nr_pages set to 0,
-init_selftest_vm() evaluates seeded < min_pages as true and returns NULL.
-This NULL return is then unconditionally assigned to vcpu and immediately
-dereferenced in pkvm_hyp_vcpu_to_hyp_vm(vcpu).
+Could a concurrent page table modification trigger this warning? Since
+mmap_read_lock() is held here, if a concurrent thread holding the per-VMA
+lock (like madvise MADV_DONTNEED) zaps the page table and faults in a
+PMD-mapped THP at the same address, transparent_hugepage_adjust() might
+observe the new PMD mapping while the initially pinned page remains 4K.
 
-Should there be a check on the return value of init_selftest_vm() before
-using it?
+As this warning is reachable from unprivileged host userspace, could this
+be used for a host-side denial of service?
 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkv=
-m.c
-> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> @@ -762,7 +762,7 @@ static struct pkvm_hyp_vcpu selftest_vcpu =3D {
-[ ... ]
-> -struct pkvm_hyp_vcpu *init_selftest_vm(void *virt)
-> +struct pkvm_hyp_vcpu *init_selftest_vm(void *virt, u64 nr_pages)
->  {
-[ ... ]
->  	selftest_vm.kvm.arch.pkvm.handle =3D __pkvm_reserve_vm();
->  	insert_vm_table_entry(selftest_vm.kvm.arch.pkvm.handle, &selftest_vm);
->  	return &selftest_vcpu;
->  }
-> =20
->  void teardown_selftest_vm(void)
->  {
-> +	struct kvm_hyp_memcache *vcpu_mc =3D &selftest_vcpu.vcpu.arch.pkvm_memc=
-ache;
-> +	struct kvm_hyp_memcache mc =3D { 0 };
 > +
-> +	while (vcpu_mc->nr_pages)
-> +		hyp_put_page(&selftest_vm.pool, pop_hyp_memcache(vcpu_mc, hyp_phys_to_=
-virt));
+> +	*__page =3D page;
+> +	*__size =3D ret;
+> +	*__pfn =3D pfn;
+> +	*__gfn =3D gfn;
 > +
->  	hyp_spin_lock(&vm_table_lock);
->  	remove_vm_table_entry(selftest_vm.kvm.arch.pkvm.handle);
-
-[Severity: High]
-Can this sequence cause an out-of-bounds write in hypervisor memory?
-
-If the host calls the __pkvm_ownership_selftest HVC when the VM table is
-full, __pkvm_reserve_vm() fails and returns -ENOMEM. In init_selftest_vm(),
-this negative error code is assigned blindly to the handle.
-
-While insert_vm_table_entry() safely rejects the negative handle,
-teardown_selftest_vm() unconditionally calls remove_vm_table_entry()
-with it. Inside remove_vm_table_entry(), vm_handle_to_idx() converts
-the negative handle into a massive 32-bit unsigned index without bounds
-checking, resulting in an out-of-bounds write when vm_table[idx] =3D NULL
-executes.
-
->  	hyp_spin_unlock(&vm_table_lock);
+> +	return 0;
+> +}
 > +
-> +	reclaim_pgtable_pages(&selftest_vm, &mc);
->  }
+> +static int pkvm_mem_abort(const struct kvm_s2_fault_desc *s2fd)
+> +{
+> +	struct kvm_vcpu *vcpu =3D s2fd->vcpu;
+> +	struct kvm_pgtable *pgt =3D vcpu->arch.hw_mmu->pgt;
+> +	struct mm_struct *mm =3D current->mm;
+> +	struct kvm *kvm =3D vcpu->kvm;
+> +	unsigned long size;
+> +	void *hyp_memcache;
+> +	struct page *page;
+> +	kvm_pfn_t pfn;
+> +	gfn_t gfn;
+> +	int ret;
+> +
+> +	hyp_memcache =3D get_mmu_memcache(vcpu);
+> +	ret =3D topup_mmu_memcache(vcpu, hyp_memcache);
+> +	if (ret)
+> +		return -ENOMEM;
+> +
+> +	ret =3D pkvm_pin_user_pages(s2fd, &page, &size, &pfn, &gfn);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret =3D account_locked_vm(mm, size / PAGE_SIZE, true);
+
+[Severity: Critical]
+When pkvm_pin_user_pages() encounters a poisoned page, it returns 0. Will
+this caller then proceed to use the uninitialized size, page, pfn, and gfn
+variables?
+
+It looks like this could result in mapping arbitrary, uninitialized
+physical memory frames into the guest's stage-2 page tables. Furthermore,
+if the mapping fails, the error path appears to call unpin_user_page()
+with a garbage page pointer, which might cause a host kernel panic.
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260911135053.1464=
-35-1-vdonnefort@google.com?part=3D5
+35-1-vdonnefort@google.com?part=3D22
