@@ -1,330 +1,138 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65DCF3803C2;
-	Fri, 11 Sep 2026 09:32:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77CE4414417;
+	Fri, 11 Sep 2026 10:13:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789119147; cv=none; b=qQTnb9jvKu79Q4l0vGuCBCyQJQQoENAIQEKiMKjvwrqiSSWhWNJVbbtykg6Qx48neqT7GFwojHLtk6L6yE6d9DzGXeU8qC5B7wCX0MAbprFhw2DDrogrDsgHduSmTV/dlcSZ/Gf/uUPXENREpA/yxBxpSYliCY934DZ8+p4/LZM=
+	t=1789121634; cv=none; b=Lg/zhN32hLkvTlALdtKpez/njgpNduhAfla3RCstdoYG3T4dWPc+5quojVFaA7hxx0Kzdx2nuEQqPe2YHiFhSKxie63OowvN58BMmEDzDtpxfuaRr4bLH40NvUfaerm4oRvjZZRPHl94b+m7as74Si4mAqTFO9q/zi8Ik23RiqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789119147; c=relaxed/simple;
-	bh=Yih7f6/tNVBNBYGkVJA3bfFcNrZN2aPjeDZKrvcepGM=;
+	s=arc-20240116; t=1789121634; c=relaxed/simple;
+	bh=AJ4osXGfnva+GsW9Xj6wSlPvmOYx8+Z4McGwoEWWU6k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YwIaUWckVM7dktqcALVxfcaakL8erycw/k8wFtg9+EAhAakRSiwLhRumyd5NMaxx/fFxLrHYhGszeFTrLMS5dQ7ReeJePMRY/+9fVQ6elRemqqyTx2C3ujt0Kjui4YXKcwJCJjNWvsQLtA+iNYPybA3+6JT5Sj3FwGdykZ9Kw3Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PyVXNLha; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z/nz25oijYbnMnGJnkIP22Ji/priNezxuNzHqV/HGdcXC2YGF4/GGefAm901p7tRfiIpzS7mmp6x23O2UkT3x4gr26gTiMjXh5MniY6vJupw5sTv/ethNyNlA7hxgZVrwWIITjbJaY2GnZNuaqkXbKF1zQscN3PhvsB0YbWJXKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VXiIsYXG; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PyVXNLha"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CEA7C1F000FF;
-	Fri, 11 Sep 2026 09:32:19 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VXiIsYXG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88F4F1F000FF;
+	Fri, 11 Sep 2026 10:13:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789119146;
-	bh=AAnYNMY4qKWEt8VqW/gq+QbhtFwungyZcJ3iIQPiMA8=;
+	s=k20260515; t=1789121626;
+	bh=AJ4osXGfnva+GsW9Xj6wSlPvmOYx8+Z4McGwoEWWU6k=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=PyVXNLhamoEGYHMpL3Q4rsa62whZA3bWfw9FqxNQ9ZIkavOuDy970b4hzpf2VW5dg
-	 665PYTj+s7h/ZpnGzvIrO7TazHzP/S34FTp1JgiopifMNbEFVlz8LjHjFudfClI06S
-	 fTx1a+taFDlr6OMVCRlomCP09wbk7mrAuXNG3PuHZNmqmO8PmURwzsInlvjuYwC0MY
-	 kfDOwkFljeuVcpEWeZkbjNn2zn2wGDhTWG/JupNmCyWYIItr98C4LEgrD5I8aUCAui
-	 H4W2AMiROm14Ib7hqF0UXbne1UGnoeMO6gi2gMDXWquReVHt2aM95Kmicp6nwQXife
-	 ZCpaJ+H/2FLyQ==
-Date: Fri, 11 Sep 2026 10:32:17 +0100
+	b=VXiIsYXGW7V+CUC2hoUUxshBtk//170ahXby5qOmnHCTEG6nprU1IS50u25G/fRQk
+	 sf9ytH2Ce2iGqonEAUfAmBNxEiX0H5gDZvz851NX8EhIuDaWSIQBlPZWYHnVma0aGj
+	 blDmI4LY1KM28dzcRxXSp3rNd+ml+k1Jf5jXcr5BNdmFsP+f0lE+KyInKD5utrTv18
+	 j0kWa0ZAaMlc3Pw4wRDO2h4SoWYRal6ZvW3YmHkVxX6gQf6/JqWhQp1QSVXE2Kca+2
+	 BYYLTVktrg9Xqy9CLQ0dyOX4enXiqnPzEjwUfsC5vJviK7A/gYwNlJA1GGOz2i3bhy
+	 SIFHvCnClRnig==
+Date: Fri, 11 Sep 2026 11:13:15 +0100
 From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-To: Itaru Kitayama <itaru.kitayama@fujitsu.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Fuad Tabba <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	Jack Thomson <jackabt@amazon.com>, Jack Thomson <jackabt.amazon@gmail.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Vincent Donnefort <vdonnefort@google.com>, 
-	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Sean Christopherson <seanjc@google.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Leo Soares Passos <Leo.Bras@arm.com>, 
-	Wei-Lin Chang <weilin.chang@arm.com>
-Subject: Re: [PATCH 8/8] KVM: selftests: Add nested pre-fault test for arm64
-Message-ID: <aqPIUtNTJFwUvJME@gremlin>
-References: <20260825-kvm-arm-prefault-v1-0-befe8947702e@kernel.org>
- <20260825-kvm-arm-prefault-v1-8-befe8947702e@kernel.org>
- <aqOgEQKBGH-YqGr3@sm-arm-grace07>
+To: Jann Horn <jannh@google.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, 
+	"Liam R. Howlett" <liam@infradead.org>, Vlastimil Babka <vbabka@kernel.org>, 
+	Pedro Falcato <pfalcato@suse.de>, David Hildenbrand <david@kernel.org>, 
+	Mike Rapoport <rppt@kernel.org>, Suren Baghdasaryan <surenb@google.com>, 
+	Michal Hocko <mhocko@suse.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>, 
+	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, 
+	Paul Moore <paul@paul-moore.com>, Stephen Smalley <stephen.smalley.work@gmail.com>, 
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Zi Yan <ziy@nvidia.com>, 
+	Baolin Wang <baolin.wang@linux.alibaba.com>, Nico Pache <nico.pache@linux.dev>, 
+	Ryan Roberts <ryan.roberts@arm.com>, Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>, 
+	Lance Yang <lance.yang@linux.dev>, Usama Arif <usama.arif@linux.dev>, 
+	Kiryl Shutsemau <kas@kernel.org>, Doug Gilbert <dgilbert@interlog.com>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, "Martin K. Petersen" <mkp@kernel.org>, 
+	Jaya Kumar <jayalk@intworks.biz>, Simona Vetter <simona@ffwll.ch>, Helge Deller <deller@gmx.de>, 
+	Sebastian Reichel <sre@kernel.org>, John Hubbard <jhubbard@nvidia.com>, Peter Xu <peterx@redhat.com>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Oleg Nesterov <oleg@redhat.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@kernel.org>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, Arnaldo Carvalho de Melo <acme@kernel.org>, 
+	Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Rik van Riel <riel@surriel.com>, Harry Yoo <harry@kernel.org>, Juri Lelli <juri.lelli@redhat.com>, 
+	Vincent Guittot <vincent.guittot@linaro.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
+	Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
+	David Airlie <airlied@gmail.com>, Will Deacon <will@kernel.org>, 
+	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Nick Piggin <npiggin@gmail.com>, Arnd Bergmann <arnd@arndb.de>, 
+	Muchun Song <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>, 
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Jan Kara <jack@suse.cz>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oupton@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Madhavan Srinivasan <maddy@linux.ibm.com>, Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
+	Gerald Schaefer <gerald.schaefer@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, 
+	Vasily Gorbik <gor@linux.ibm.com>, "David S. Miller" <davem@davemloft.net>, 
+	Andreas Larsson <andreas@gaisler.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, Matthew Brost <matthew.brost@intel.com>, 
+	Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>, Byungchul Park <byungchul@sk.com>, 
+	Gregory Price <gourry@gourry.net>, Ying Huang <ying.huang@linux.alibaba.com>, 
+	Alistair Popple <apopple@nvidia.com>, Chris Li <chrisl@kernel.org>, Kairui Song <kasong@tencent.com>, 
+	Kemeng Shi <shikemeng@huaweicloud.com>, Nhat Pham <nphamcs@gmail.com>, Baoquan He <baoquan.he@linux.dev>, 
+	Youngjun Park <youngjun.park@lge.com>, Johannes Weiner <hannes@cmpxchg.org>, 
+	Qi Zheng <qi.zheng@linux.dev>, Shakeel Butt <shakeel.butt@linux.dev>, 
+	Axel Rasmussen <axelrasmussen@google.com>, Yuanchu Xie <yuanchu@google.com>, Wei Xu <weixugc@google.com>, 
+	Xu Xin <xu.xin16@zte.com.cn>, Chengming Zhou <chengming.zhou@linux.dev>, 
+	Michal Hocko <mhocko@kernel.org>, Miklos Szeredi <miklos@szeredi.hu>, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-usb@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, selinux@vger.kernel.org, linux-sound@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-scsi@vger.kernel.org, linux-fbdev@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, linux-trace-kernel@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org, linux-arch@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, 
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-s390@vger.kernel.org, sparclinux@vger.kernel.org, fuse-devel@lists.linux.dev
+Subject: Re: [PATCH 11/39] selinux: reject writable opens of policy file,
+ drop mmap shared/write check
+Message-ID: <aqPS_UHU3MotlchR@gremlin>
+References: <20260908-b4-mmap-prepare-vma-flag-sanify-v1-0-dacf19cce22b@kernel.org>
+ <20260908-b4-mmap-prepare-vma-flag-sanify-v1-11-dacf19cce22b@kernel.org>
+ <CAG48ez3Ucb8HyhjC1-fijFiYJsnWcTLYHvJjzMyU710mgegxnA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <aqOgEQKBGH-YqGr3@sm-arm-grace07>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAG48ez3Ucb8HyhjC1-fijFiYJsnWcTLYHvJjzMyU710mgegxnA@mail.gmail.com>
 
-+cc Wei-Lin
-
-On Fri, Sep 11, 2026 at 03:30:41PM +0900, Itaru Kitayama wrote:
-> Hi Lorenzo,
+On Tue, Sep 08, 2026 at 10:22:20PM +0200, Jann Horn wrote:
+> On Tue, Sep 8, 2026 at 10:07 PM Lorenzo Stoakes (ARM) <ljs@kernel.org> wrote:
+> > The policy file has no write method and is exposed read-only (S_IRUGO in
+> > selinux_files[]), yet sel_open_policy() performs no open mode check, so a
+> > CAP_DAC_OVERRIDE caller can open it O_RDWR. Reject FMODE_WRITE at open, as
+> > kernfs does.
+> >
+> > The file can then never be mapped with FMODE_WRITE, so do_mmap() always
+> > clears VM_MAYWRITE and VM_SHARED for MAP_SHARED mappings and the VM_SHARED
+> > check in sel_mmap_policy() cannot be reached. Remove it.
 >
-> On Tue, Aug 25, 2026 at 05:00:42PM +0100, Lorenzo Stoakes (ARM) wrote:
-> > From: Jack Thomson <jackabt@amazon.com>
+> You should also be able to remove the sel_mmap_policy_ops.page_mkwrite
+> handler, which is only for shared-writable faults, right?
+
+Yeah I think you're right, though I wonder if it's a bit out of scope for this
+change as it's focused on removing a VMA_MAYWRITE_BIT clearance for a
+non-kernel-owned VMA.
+
+So maybe one for a follow up?
+
+>
+> > This also stops sel_mmap_policy() clearing VM_MAYWRITE on a mapping that is
+> > neither a PFN map nor a mixed map, ahead of the core enforcing that only
+> > such mappings may do so.
 > >
-> > Add an arm64 nested-virt selftest for KVM_PRE_FAULT_MEMORY. The guest
-> > enters vEL1 and exits to userspace with a nested/shadow stage-2 MMU as
-> > the vCPU's last-run context.
-> >
-> > Before prefaulting, userspace enables HCR_EL2.VM and points VTTBR_EL2 at
-> > an empty nested stage-2 root. A prefault implementation that incorrectly
-> > treats the userspace GPA as an L2 IPA will fail the ioctl; the correct
-> > path targets the canonical stage-2 and succeeds.
-> >
-> > Restore the original nested state before resuming the guest, then touch
-> > the prefaulted range to check that vEL1 still runs correctly.
-> >
-> > Signed-off-by: Jack Thomson <jackabt@amazon.com>
-> > [ljs: partial progress, >4 KiB pgsize, commit msg, comment fixups]
 > > Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
-> > ---
-> >  tools/testing/selftests/kvm/Makefile.kvm           |   1 +
-> >  .../selftests/kvm/arm64/nv_pre_fault_memory_test.c | 206 +++++++++++++++++++++
-> >  2 files changed, 207 insertions(+)
 >
-> I wonder whether this selftest can use functions Wei-Lin proposed
-> some time ago [1]: 20260325003620.2214766-1-weilin.chang@arm.com
-> or would you prefer this test as propose, since it is clear as
-> to what needs to be done to enter L2.
+> Reviewed-by: Jann Horn <jannh@google.com>
 
-I think if these aren't merged yet then that could be a follow up?
-
->
-> Thanks,
-> Itaru.
->
-> >
-> > diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-> > index 66a9a4e62888..1e0edd0f99f7 100644
-> > --- a/tools/testing/selftests/kvm/Makefile.kvm
-> > +++ b/tools/testing/selftests/kvm/Makefile.kvm
-> > @@ -173,6 +173,7 @@ TEST_GEN_PROGS_arm64 += arm64/debug-exceptions
-> >  TEST_GEN_PROGS_arm64 += arm64/hello_el2
-> >  TEST_GEN_PROGS_arm64 += arm64/host_sve
-> >  TEST_GEN_PROGS_arm64 += arm64/hypercalls
-> > +TEST_GEN_PROGS_arm64 += arm64/nv_pre_fault_memory_test
-> >  TEST_GEN_PROGS_arm64 += arm64/external_aborts
-> >  TEST_GEN_PROGS_arm64 += arm64/mmio_sign_ext
-> >  TEST_GEN_PROGS_arm64 += arm64/page_fault_test
-> > diff --git a/tools/testing/selftests/kvm/arm64/nv_pre_fault_memory_test.c b/tools/testing/selftests/kvm/arm64/nv_pre_fault_memory_test.c
-> > new file mode 100644
-> > index 000000000000..b3833aea2a34
-> > --- /dev/null
-> > +++ b/tools/testing/selftests/kvm/arm64/nv_pre_fault_memory_test.c
-> > @@ -0,0 +1,206 @@
-> > +// SPDX-License-Identifier: GPL-2.0-only
-> > +/*
-> > + * nv_pre_fault_memory_test - Test KVM_PRE_FAULT_MEMORY on a vCPU whose
-> > + * last-run context is nested.
-> > + *
-> > + * The guest starts at vEL2, mirrors its EL2 translation regime into the
-> > + * real EL1 registers, drops HCR_EL2.TGE and ERETs to vEL1, then exits to
-> > + * userspace from vEL1 so that the vCPU's last-run context selects a
-> > + * shadow stage-2 MMU. Userspace then enables an empty nested stage-2
-> > + * before prefaulting. Prefaulting must target the canonical stage-2,
-> > + * regardless of the vCPU's nested state.
-> > + */
-> > +#include "kvm_util.h"
-> > +#include "processor.h"
-> > +#include "test_util.h"
-> > +#include "ucall.h"
-> > +
-> > +#include <asm/sysreg.h>
-> > +#include <linux/sizes.h>
-> > +
-> > +#define TEST_MEM_SLOT		10
-> > +#define NESTED_S2_ROOT_SLOT	11
-> > +#define TEST_MEM_SIZE		SZ_2M
-> > +#define TEST_MEM_GPA		SZ_1G
-> > +#define NESTED_S2_ROOT_GPA	(TEST_MEM_GPA + TEST_MEM_SIZE)
-> > +
-> > +struct nested_s2_state {
-> > +	u64 hcr_el2;
-> > +	u64 vttbr_el2;
-> > +};
-> > +
-> > +static void guest_el1_code(void)
-> > +{
-> > +	u64 offset;
-> > +
-> > +	GUEST_ASSERT_EQ(get_current_el(), 1);
-> > +
-> > +	/* Exit to userspace with the vEL1 (nested) context live. */
-> > +	GUEST_SYNC(1);
-> > +
-> > +	/*
-> > +	 * Touch the prefaulted range. vstage-2 is disabled, so the shadow
-> > +	 * stage-2 is a 1:1 view of the canonical IPA space.
-> > +	 */
-> > +	for (offset = 0; offset < TEST_MEM_SIZE; offset += SZ_4K)
-> > +		READ_ONCE(*(u64 *)(TEST_MEM_GPA + offset));
-> > +
-> > +	GUEST_DONE();
-> > +}
-> > +
-> > +static void guest_code(void)
-> > +{
-> > +	u64 sp;
-> > +
-> > +	GUEST_ASSERT_EQ(get_current_el(), 2);
-> > +
-> > +	/*
-> > +	 * Mirror the EL2 translation regime into the real EL1 registers so
-> > +	 * that vEL1 runs on the test's stage-1 page tables. With E2H=1, the
-> > +	 * _EL1 accessors read the EL2 registers, and the _EL12 accessors
-> > +	 * write the real EL1 registers.
-> > +	 */
-> > +	write_sysreg_s(read_sysreg(sctlr_el1), SYS_SCTLR_EL12);
-> > +	write_sysreg_s(read_sysreg(tcr_el1), SYS_TCR_EL12);
-> > +	write_sysreg_s(read_sysreg(ttbr0_el1), SYS_TTBR0_EL12);
-> > +	write_sysreg_s(read_sysreg(mair_el1), SYS_MAIR_EL12);
-> > +	write_sysreg_s(read_sysreg(cpacr_el1), SYS_CPACR_EL12);
-> > +
-> > +	/* Run vEL1 on the same stack. */
-> > +	asm volatile("mov %0, sp" : "=r"(sp));
-> > +	write_sysreg(sp, sp_el1);
-> > +
-> > +	/*
-> > +	 * Drop TGE so that vEL1 is a nested context rather than host EL0.
-> > +	 * KVM backs it with a shadow stage-2 MMU even though vstage-2 is
-> > +	 * disabled (HCR_EL2.VM=0).
-> > +	 */
-> > +	write_sysreg(read_sysreg(hcr_el2) & ~HCR_EL2_TGE, hcr_el2);
-> > +	isb();
-> > +
-> > +	write_sysreg(PSR_MODE_EL1h | PSR_F_BIT | PSR_I_BIT | PSR_A_BIT |
-> > +		     PSR_D_BIT, spsr_el2);
-> > +	write_sysreg((u64)guest_el1_code, elr_el2);
-> > +	asm volatile("eret");
-> > +
-> > +	GUEST_ASSERT(false);
-> > +}
-> > +
-> > +static void pre_fault(struct kvm_vcpu *vcpu, u64 gpa, u64 size)
-> > +{
-> > +	struct kvm_pre_fault_memory range = {
-> > +		.gpa = gpa,
-> > +		.size = size,
-> > +	};
-> > +	int ret;
-> > +
-> > +	do {
-> > +		ret = __vcpu_ioctl(vcpu, KVM_PRE_FAULT_MEMORY, &range);
-> > +	} while ((!ret && range.size) ||
-> > +		 (ret < 0 && (errno == EINTR || errno == EAGAIN)));
-> > +
-> > +	TEST_ASSERT(!ret, "KVM_PRE_FAULT_MEMORY failed, ret: %d errno: %d",
-> > +		    ret, errno);
-> > +	TEST_ASSERT_EQ(range.size, 0);
-> > +}
-> > +
-> > +static struct nested_s2_state enable_empty_nested_s2(struct kvm_vcpu *vcpu)
-> > +{
-> > +	struct nested_s2_state state = {
-> > +		.hcr_el2 = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_HCR_EL2)),
-> > +		.vttbr_el2 = vcpu_get_reg(vcpu,
-> > +					   KVM_ARM64_SYS_REG(SYS_VTTBR_EL2)),
-> > +	};
-> > +
-> > +	TEST_ASSERT(!(state.hcr_el2 & HCR_EL2_TGE),
-> > +		    "vCPU should be in nested/vEL1 context");
-> > +
-> > +	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_VTTBR_EL2),
-> > +		     NESTED_S2_ROOT_GPA);
-> > +	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_HCR_EL2),
-> > +		     state.hcr_el2 | HCR_EL2_VM);
-> > +
-> > +	return state;
-> > +}
-> > +
-> > +static void restore_nested_s2(struct kvm_vcpu *vcpu,
-> > +			      struct nested_s2_state *state)
-> > +{
-> > +	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_HCR_EL2), state->hcr_el2);
-> > +	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_VTTBR_EL2),
-> > +		     state->vttbr_el2);
-> > +}
-> > +
-> > +int main(void)
-> > +{
-> > +	struct nested_s2_state s2;
-> > +	struct kvm_vcpu_init init;
-> > +	struct kvm_vcpu *vcpu;
-> > +	struct kvm_vm *vm;
-> > +	struct ucall uc;
-> > +	u64 npages;
-> > +
-> > +	TEST_REQUIRE(kvm_check_cap(KVM_CAP_ARM_EL2));
-> > +	TEST_REQUIRE(kvm_check_cap(KVM_CAP_PRE_FAULT_MEMORY));
-> > +
-> > +	vm = vm_create(1);
-> > +
-> > +	kvm_get_default_vcpu_target(vm, &init);
-> > +	init.features[0] |= BIT(KVM_ARM_VCPU_HAS_EL2);
-> > +	vcpu = aarch64_vcpu_add(vm, 0, &init, guest_code);
-> > +	kvm_arch_vm_finalize_vcpus(vm);
-> > +
-> > +	npages = TEST_MEM_SIZE / vm->page_size;
-> > +	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, TEST_MEM_GPA,
-> > +				    TEST_MEM_SLOT, npages, 0);
-> > +	virt_map(vm, TEST_MEM_GPA, TEST_MEM_GPA, npages);
-> > +
-> > +	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
-> > +				    NESTED_S2_ROOT_GPA, NESTED_S2_ROOT_SLOT,
-> > +				    vm_adjust_num_guest_pages(vm->mode, 1), 0);
-> > +
-> > +	/* Run the guest until it has ERET'd from vEL2 to vEL1. */
-> > +	vcpu_run(vcpu);
-> > +	switch (get_ucall(vcpu, &uc)) {
-> > +	case UCALL_SYNC:
-> > +		TEST_ASSERT_EQ(uc.args[1], 1);
-> > +		break;
-> > +	case UCALL_ABORT:
-> > +		REPORT_GUEST_ASSERT(uc);
-> > +		break;
-> > +	default:
-> > +		TEST_FAIL("Unhandled ucall: %ld", uc.cmd);
-> > +	}
-> > +
-> > +	/*
-> > +	 * The vCPU's last-run context is vEL1, backed by a shadow stage-2
-> > +	 * MMU. Enable nested stage-2 with an empty root so that the ioctl
-> > +	 * fails if it tries to interpret the userspace GPA as an L2 IPA.
-> > +	 *
-> > +	 * Prefault in two halves so that the second ioctl exercises a
-> > +	 * repeated shadow-MMU attach and canonical stage-2 swap.
-> > +	 *
-> > +	 * (Note that an implementation that wrongly populates shadow
-> > +	 * stage-2 page tables would not be caught as userland can't
-> > +	 * inspect these.)
-> > +	 */
-> > +	s2 = enable_empty_nested_s2(vcpu);
-> > +	pre_fault(vcpu, TEST_MEM_GPA, TEST_MEM_SIZE / 2);
-> > +	pre_fault(vcpu, TEST_MEM_GPA + TEST_MEM_SIZE / 2, TEST_MEM_SIZE / 2);
-> > +	restore_nested_s2(vcpu, &s2);
-> > +
-> > +	/* Resume at vEL1 and touch the prefaulted range. */
-> > +	vcpu_run(vcpu);
-> > +	switch (get_ucall(vcpu, &uc)) {
-> > +	case UCALL_DONE:
-> > +		break;
-> > +	case UCALL_ABORT:
-> > +		REPORT_GUEST_ASSERT(uc);
-> > +		break;
-> > +	default:
-> > +		TEST_FAIL("Unhandled ucall: %ld", uc.cmd);
-> > +	}
-> > +
-> > +	kvm_vm_free(vm);
-> > +	return 0;
-> > +}
-> >
-> > --
-> > 2.55.0
-> >
+Thanks!
 
 --
 Cheers, Lorenzo
