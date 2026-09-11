@@ -1,317 +1,108 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9895C369224;
-	Fri, 11 Sep 2026 15:27:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 781AB39EF35;
+	Fri, 11 Sep 2026 15:29:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789140427; cv=none; b=Xk/zAnKiYS0D+yxBWo5Kdx35GivxREsjs3zQ37C/ULvwQZgcb/d5qM0tdozSFO7lGyNSd2lTG1GvXNS0KRKBL8FStD2Yny6VtOh6U+LQfC1BbQM4Y2Rm9G6WYV9ydxqFpv8fFLhoZm6qeySp4KbFBsKDBK9Wnhi3fgASQBhdN80=
+	t=1789140564; cv=none; b=UV3MCCqZiX5aOvD9IGtkS3xLRo+jlJo/brmSMIZ1dXhQEU9MIS8kJcudrKXqmyzleW/JEIRLI62Ry8L8fETgy0aiHNf5Vr+gLv0sTEwoH10RmzExAE1BKKHCuu79HqhaUvTqVYbXGSor65kumGITjnQ+8gKiOia7g+dvUyLZ0LY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789140427; c=relaxed/simple;
-	bh=5wypFqaLIJ3bRjeanmxcnt+OPl9YjifcfeYAa2y/Qy0=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ccKnq2rXvWClubyfDDa9mH0NDHD1GqcPN8ghGDzjX38OjZtlzkDbXtSkyFVLJOOBxth9sJdGqd8rTnpS0CYIDT6dcSqqYWf9zH2dnSKFSK8LAgtlnNv1biE6ipyJz3TuIvmRyQBs4KBh/R5whjFK+xtnnFvTdxl4IrUnlKmCykU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=agMogg7M; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789140564; c=relaxed/simple;
+	bh=/xb0Nb16G9yyks+ml9kb/BhM51LigV9IcfIjYK9Rc4E=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=fBsQwNhuQ+UQqRPXJU0q38EOAz0I9r3Hi7Es4H64OxOa+rmicrdIsnEN21OdZQt8ssWj35Yv1sEG2n/Bisw2v4POeYcdv6LsvxnoG26v6TqOpU/AJEFMx9lNFA+J52cgjRJ7ykhL3xKM1q1T+o1frZSNQec4bq2fxJMPkwrAfN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=p3fqa3Vd; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="agMogg7M"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B92A1F000FF;
-	Fri, 11 Sep 2026 15:27:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789140425;
-	bh=dL5SIEsYkL5CFvwQMkla31xLNVufHe8l4HQ4/Pcc7zE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=agMogg7MfwE6qQ+hq1iJshNCB1YrISD9q+Xy8K8HxRCjrJ0szmZjoDYNFODVMnW4+
-	 GMbyqli2WHZJOyRSEiXb6zMLnfw318oPj2C20GU4HuQP9i0KVdc9WYACfa9qfLN8GA
-	 wovSL8neofGZ6d76PawnIDdKHOdlQyMWQA7UFCL4frFJQZ2LGQxpKoofh+ZkgN5+sg
-	 SlhL9ITp/qb3mDs2QrXyx9OHVX6JM/tlmRMZr67pEvvhhTG+04sAdJU45vqiQjKHqd
-	 +GE7M9+x+EL5iTJzZq81pNnu8aPqGBTMqROfNZXnMoolXtRvC2r5yiX8PB2K4y0W67
-	 +SqV6khmMSqeA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1x539b-00000007p44-0ROi;
-	Fri, 11 Sep 2026 15:27:03 +0000
-Date: Fri, 11 Sep 2026 16:27:02 +0100
-Message-ID: <86h5jv7qrd.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Wei-Lin Chang <weilin.chang@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <tabba@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Lorenzo Stoakes <ljs@kernel.org>,
-	Itaru Kitayama <itaru.kitayama@fujitsu.com>
-Subject: Re: [PATCH v5 2/6] KVM: arm64: nv: Introduce guest stage-2 tracking structures
-In-Reply-To: <w4kihqs6n7ja7nr4sn3i2r4o2mspwj7k36w2fkh4kheizr6oj3@wfsea5mhnto6>
-References: <20260810205038.118843-1-weilin.chang@arm.com>
-	<20260810205038.118843-3-weilin.chang@arm.com>
-	<87mrtu4c21.wl-maz@kernel.org>
-	<w4kihqs6n7ja7nr4sn3i2r4o2mspwj7k36w2fkh4kheizr6oj3@wfsea5mhnto6>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="p3fqa3Vd"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 30BB516A3;
+	Fri, 11 Sep 2026 08:29:18 -0700 (PDT)
+Received: from [10.0.129.245] (unknown [10.0.129.245])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E56723F8C6;
+	Fri, 11 Sep 2026 08:29:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1789140561; bh=/xb0Nb16G9yyks+ml9kb/BhM51LigV9IcfIjYK9Rc4E=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=p3fqa3VdOpYwaS6o072jyxRYETcjmQ17Q9gq4SbokoxOYB4jszQP5QyKIJNk9qBUf
+	 N7TzV2DrG9fefESFhJVXKTizxlIGa7ubjd7dXFEs5w/ZSuhRionnydRPs08XlUjDEY
+	 94VHRvvW3Xm9TflxDf6eS8Hz6n50gvndA0MZoJAU=
+Message-ID: <89da8c52-9dd5-4ca3-81c6-1bf390029dc4@arm.com>
+Date: Fri, 11 Sep 2026 16:29:17 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: weilin.chang@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, oupton@kernel.org, tabba@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, ljs@kernel.org, itaru.kitayama@fujitsu.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v17 4/7] firmware: arm_rmm: Add support for SRO
+Content-Language: en-GB
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: maz@kernel.org, will@kernel.org, catalin.marinas@arm.com,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org,
+ joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
+ linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
+ sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
+ WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com
+References: <20260907095942.1140734-1-suzuki.poulose@arm.com>
+ <20260907095942.1140734-5-suzuki.poulose@arm.com>
+ <50d19bb3-6a08-462a-9c01-2eac8a8e286e@redhat.com>
+ <603b2de8-7636-4eb8-a378-21be986f4e44@arm.com>
+In-Reply-To: <603b2de8-7636-4eb8-a378-21be986f4e44@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Sun, 06 Sep 2026 20:56:34 +0100,
-Wei-Lin Chang <weilin.chang@arm.com> wrote:
->=20
-> On Sun, Sep 06, 2026 at 04:47:02PM +0100, Marc Zyngier wrote:
->=20
-> [...]
->=20
-> > > +/*
-> > > + * Record of a guest stage-2 mapping, storing canonical and nested I=
-PA
-> > > + * ranges. Both ranges have the same size.
-> > > + */
-> > > +struct kvm_guest_s2_mapping {
-> > > +	struct interval_tree_node canonical;
-> > > +	struct interval_tree_node nested;
-> > > +	struct kvm_s2_mmu *nested_mmu;
-> > > +};
-> > > +
-> >=20
-> > I'm trying hard to find a way to reduce the size of this structure,
-> > because this is IMO the only real problem with this approach.
-> >=20
-> > Obviously, the only thing we could kill is this nested_mmu field, as
-> > everything else is used by the interval trees. I can see two ugly ways
-> > to do that:
-> >=20
-> > - either we iterate over all shadow MMUs to find the corresponding
-> >   'nested' node: really costly if we have a lot of mappings and/or a
-> >   lot of shadow MMUs
-> >=20
-> > - or we steal bits from the interval_tree_node to encode extra
-> >   information. One realisation is that all addresses are PAGE_SIZE
-> >   aligned, meaning that we have at least 12 bits that are always 0. We
-> >   could, for example, encode an index in the bottom bits of the
-> >   nested.start field. Probably easy enough, but may require some
-> >   careful masking (and the addition of an index in the s2_mmu
-> >   structure).
-> >=20
-> > The result would be significant, as we could then use a 96 byte slab,
-> > which means the cost of a 1GB @4k granularity could fall to 24MB.
->=20
-> One way of meeting in the middle is to keep the nested_mmu pointer, and
-> use a dedicated kmem cache. That cache will then hand out exact 104-byte
-> objects.
->=20
-> That's 26MB for 1GB @4K.
->=20
-> This is a nice improvement from the current 128-byte allocations.
-> Although it's not as good as 96-byte allocations, the code logic can
-> remain simple. Would you take this approach?
+On 10/09/2026 10:51, Suzuki K Poulose wrote:
+> Hi Gavin
+> 
+> Thank you for the the review, much appreciated. Responses inline.
+> 
+> 
+> On 09/09/2026 05:10, Gavin Shan wrote:
+>> Hi Suzuki,
+>
+>>
+>>> +
+>>> +    sro->addr_count = 0;
+>>> +}
+>>> +EXPORT_SYMBOL_GPL(rmi_sro_free);
+>>> +
+>>> +long rmi_sro_memxfer_execute(struct rmi_sro_state *sro, gfp_t gfp)
+>>> +{
+>>> +    unsigned long sro_handle;
+>>> +    struct arm_smccc_1_2_regs *regs = &sro->regs;
+>>> +    bool cancelled = false;
+>>> +
+>>> +    rmi_smccc_invoke(regs, regs);
+>>> +
+>>> +    sro_handle = regs->a1;
+>>> +
+>>> +    while (RMI_RETURN_STATUS(regs->a0) == RMI_INCOMPLETE) {
+>>> +        bool can_cancel = RMI_RETURN_CAN_CANCEL(regs->a0);
+>>> +        int ret = 0;
+>>> +
+>>
+>> Strictly speaking, we need to refresh the SRO handle after every RMI 
+>> call.
+>>
+>>          bool can_cancel = RMI_RETURN_CAN_CANCEL(regs->a0);
+>>          unsigned long sro_handle = regs->a1;
+>>          int ret = 0;
+>>
+> 
+> Ack for both instances
 
-I don't think the logic has to be complicated to go all the way to 96
-bytes, see the patch below. I hope we can further trim it over time,
-but this would be a good start.
+This is not correct. e.g., after RMI_OP_MEM_DONATE and 
+RMI_OP_MEM_RECLAIM, the regs->a1 is the number of granules consumed or 
+reclaimed. The SRO handle once provided by an SRO triggering operation,
+is invalidated by the RMI_OP_CONTINUE() running to completion.
+i.e., RMI_OP_CONTINUE either completes with RMI_SUCCESS
 
-Thanks,
+OR
 
-	M.
+completes with a status other than RMI_BUSY or RMI_INCOMPLETE.
 
-
-=46rom 39e3bdaa1b02c460a1001a23a20dccca5501eb6d Mon Sep 17 00:00:00 2001
-From: Marc Zyngier <maz@kernel.org>
-Date: Tue, 8 Sep 2026 17:07:50 +0100
-Subject: [PATCH] KVM: arm64: Drop kvm_s2_mmu pointer from kvm_guest_s2_mapp=
-ing
-
-As it appears that the kvm_guest_s2_mapping structure is quite large,
-and results in a 128 byte slab allocation, there is some insentive
-to shrink a bit.
-
-For this, replace the S2 MMU back-pointer with an index tucked into
-the low bits of the nested.start field. This allows us to shrink
-the structure by 8 bytes, and therefore to fit in a 96 byte slab.
-
-The index is also stored in the S2 MMU structure itself, which
-comes for free as it fits in an existing hole. The structure is
-also repacked to avoid other disgracious holes.
-
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/kvm_host.h | 16 ++++++-----
- arch/arm64/kvm/nested.c           | 44 +++++++++++++++++++++++++------
- 2 files changed, 45 insertions(+), 15 deletions(-)
-
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm=
-_host.h
-index f12883a420817..4b3fc4d4a61f2 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -158,7 +158,6 @@ struct kvm_vmid {
- struct kvm_guest_s2_mapping {
- 	struct interval_tree_node canonical;
- 	struct interval_tree_node nested;
--	struct kvm_s2_mmu *nested_mmu;
- };
-=20
- struct kvm_s2_mmu {
-@@ -222,30 +221,33 @@ struct kvm_s2_mmu {
- 	u64	tlb_vttbr;
- 	u64	tlb_vtcr;
-=20
-+	/* Guest s2 mapping records indexed in this MMU's IPA space. */
-+	struct rb_root_cached guest_s2_mappings;
-+
- 	/*
- 	 * true when this represents a nested context where virtual
- 	 * HCR_EL2.VM =3D=3D 1
- 	 */
- 	bool	nested_stage2_enabled;
-=20
--#ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
--	struct dentry *shadow_pt_debugfs_dentry;
--#endif
--
- 	/*
- 	 * true when this MMU needs to be unmapped before being used for a new
- 	 * purpose.
- 	 */
- 	bool	pending_unmap;
-=20
--	/* Guest s2 mapping records indexed in this MMU's IPA space. */
--	struct rb_root_cached guest_s2_mappings;
-+	/* Index in the S2 MMU array, only valid for a shadow S2 */
-+	u16	s2_mmu_idx;
-=20
- 	/*
- 	 *  0: Nobody is currently using this, check vttbr for validity
- 	 * >0: Somebody is actively using this.
- 	 */
- 	atomic_t refcnt;
-+
-+#ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
-+	struct dentry *shadow_pt_debugfs_dentry;
-+#endif
- };
-=20
- struct kvm_arch_memory_slot {
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index e0941a261787c..540e52db9f180 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -45,11 +45,12 @@ struct vncr_tlb {
-  * will invalidate them more often).
-  */
- #define S2_MMU_PER_VCPU		2
-+#define S2_MMU_PER_VM		(KVM_MAX_VCPUS * S2_MMU_PER_VCPU)
-=20
- int kvm_init_nested(struct kvm *kvm)
- {
- 	kvm->arch.nested_mmus =3D kvmalloc_objs(struct kvm_s2_mmu *,
--					      KVM_MAX_VCPUS * S2_MMU_PER_VCPU,
-+					      S2_MMU_PER_VM,
- 					      GFP_KERNEL_ACCOUNT);
- 	kvm->arch.nested_mmus_size =3D 0;
- 	atomic_set(&kvm->arch.vncr_tlb_count, 0);
-@@ -128,8 +129,10 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
-=20
- 		guard(write_lock)(&kvm->mmu_lock);
-=20
--		for (i =3D 0; i < S2_MMU_PER_VCPU; i++)
-+		for (i =3D 0; i < S2_MMU_PER_VCPU; i++) {
-+			tmp[i].s2_mmu_idx =3D i + kvm->arch.nested_mmus_size;
- 			kvm->arch.nested_mmus[i + kvm->arch.nested_mmus_size] =3D &tmp[i];
-+		}
-=20
- 		kvm->arch.nested_mmus_size +=3D S2_MMU_PER_VCPU;
- 	}
-@@ -873,6 +876,27 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm=
-_vcpu *vcpu)
- 	return s2_mmu;
- }
-=20
-+#define S2_MMU_IDX_MASK	GENMASK_ULL(const_ilog2(S2_MMU_PER_VM) - 1, 0)
-+
-+static void tag_s2_mapping_mmu(struct kvm_guest_s2_mapping *mapping,
-+			       struct kvm_s2_mmu *mmu)
-+{
-+	BUILD_BUG_ON(const_ilog2(S2_MMU_PER_VM) >=3D 12);
-+	mapping->nested.start &=3D ~S2_MMU_IDX_MASK;
-+	mapping->nested.start |=3D mmu->s2_mmu_idx;
-+}
-+
-+static struct kvm_s2_mmu *s2_mapping_to_mmu(struct kvm *kvm,
-+					    struct kvm_guest_s2_mapping *mapping)
-+{
-+	return kvm->arch.nested_mmus[mapping->nested.start & S2_MMU_IDX_MASK];
-+}
-+
-+static unsigned long s2_mapping_to_nested_start(struct kvm_guest_s2_mappin=
-g *mapping)
-+{
-+	return mapping->nested.start & ~S2_MMU_IDX_MASK;
-+}
-+
- void kvm_record_guest_s2_mapping(struct kvm_s2_mmu *mmu, gpa_t canonical_i=
-pa,
- 				 gpa_t nested_ipa, size_t map_size,
- 				 struct kvm_guest_s2_mapping *mapping)
-@@ -890,7 +914,7 @@ void kvm_record_guest_s2_mapping(struct kvm_s2_mmu *mmu=
-, gpa_t canonical_ipa,
- 	mapping->nested.start    =3D nested_ipa;
- 	mapping->nested.last     =3D nested_ipa + map_size - 1;
-=20
--	mapping->nested_mmu      =3D mmu;
-+	tag_s2_mapping_mmu(mapping, mmu);
-=20
- 	guard(spinlock)(&kvm->arch.guest_s2_tracking_lock);
- 	interval_tree_insert(&mapping->nested, &mmu->guest_s2_mappings);
-@@ -1357,17 +1381,21 @@ void kvm_nested_unmap_cipa_range(struct kvm *kvm, g=
-pa_t cipa, size_t unmap_size,
-=20
- 	while ((node =3D interval_tree_iter_first(&kvm->arch.mmu.guest_s2_mapping=
-s,
- 						cipa, cipa_end))) {
-+		unsigned long nested_start;
-+		struct kvm_s2_mmu *mmu;
-+
- 		mapping =3D container_of(node, struct kvm_guest_s2_mapping,
- 				       canonical);
--		mapping_size =3D mapping->nested.last - mapping->nested.start + 1;
-+		nested_start =3D s2_mapping_to_nested_start(mapping);
-+		mmu =3D s2_mapping_to_mmu(kvm, mapping);
-=20
--		if (WARN_ON_ONCE(kvm_pgtable_stage2_unmap(mapping->nested_mmu->pgt,
--							  mapping->nested.start,
--							  mapping_size)))
-+		mapping_size =3D mapping->nested.last - nested_start + 1;
-+
-+		if (WARN_ON_ONCE(kvm_pgtable_stage2_unmap(mmu->pgt, nested_start, mappin=
-g_size)))
- 			return;
-=20
- 		interval_tree_remove(node, &kvm->arch.mmu.guest_s2_mappings);
--		interval_tree_remove(&mapping->nested, &mapping->nested_mmu->guest_s2_ma=
-ppings);
-+		interval_tree_remove(&mapping->nested, &mmu->guest_s2_mappings);
- 		kfree(mapping);
-=20
- 		if (may_block)
---=20
-2.47.3
-
---=20
-Without deviation from the norm, progress is not possible.
+Thanks
+Suzuki
