@@ -1,56 +1,56 @@
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com [209.85.128.70])
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com [209.85.208.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 826B6489886
-	for <kvmarm@lists.linux.dev>; Fri, 11 Sep 2026 13:51:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6763F40E8D6
+	for <kvmarm@lists.linux.dev>; Fri, 11 Sep 2026 13:51:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789134688; cv=none; b=GOAYR2Vg3epp+TjGQUrP7U+vyfDtX2apu3hjOCmy/hnhs2Twu2+GF3CUyMu/KRT8P3/faLsl5cvnXgrDBTYKSE9GZuFrHTMhaRLmCfsyEOXno7rbGc7Lz1kGIktyENgh+2VaJTByHfNI5ql55KDMzx+Nw+qa+i+QQ17rXXxaHn4=
+	t=1789134689; cv=none; b=YPxeAsEvLox7aFEHxG54mZqAWkNmQw0kB/maAHYKenzfZ6AI/XCT42TOOB89djdm4GPsHmq8pfIlAXbsF2ZLQJgb9qCawik6iY0NQ1sq0qoQ4Qbyerj6f2x9y8V6r1q3g9VEVzzdUHlxZV39Nw76JtF6ynglD5E2QBUeIQYWGvk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789134688; c=relaxed/simple;
-	bh=2kWRrbEYZpYX5eAcAlproxiqoCUv6QvvtruJH82qzyU=;
+	s=arc-20240116; t=1789134689; c=relaxed/simple;
+	bh=qWySg4maIfcimusRnp2qjWq9ZCAdJ+qT/Jx4w1eO6gE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=SKpBGL8xhk2d5n0MiDv/rm3A6QXbiFz8UU+hPIMLEOprh4vUObiYN0RTE97/TmdP1FVY0UvmJkwwQDWJtEmUQs3CDdvBRCYoJn6lXGKrR+Vd2nmkcM2BEl2jBUAi37B59ylHBNNdVtQsTR8OmZj5BvRY83ulR2B51RDn4guGjMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Kr3wjyYM; arc=none smtp.client-ip=209.85.128.70
+	 To:Cc:Content-Type; b=sq9yvcTWcmcJiwaaYYavk0v1XujD5j7p2/Uc3VYRZk6B0qhIVS4fxD2hDhhatF+7yTmvSa0q9REqTpfdm8NGfSa4dDEdVY0fHxrd0BlwKTV7CJlDHf3UbegXFyXguG/NLdacRm/U2pg7QhaWiAEzACYqgQAzD0H1xU3Gu8yeoaE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RgBATJAq; arc=none smtp.client-ip=209.85.208.71
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Kr3wjyYM"
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4955e865174so4645825e9.3
-        for <kvmarm@lists.linux.dev>; Fri, 11 Sep 2026 06:51:23 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RgBATJAq"
+Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-6a9b526a19fso1207145a12.3
+        for <kvmarm@lists.linux.dev>; Fri, 11 Sep 2026 06:51:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1789134681; x=1789739481; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1789134682; x=1789739482; darn=lists.linux.dev;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=Vymh7WtkCS2L1vZH6F2vEzmi/F3C/O1M/vjWHAIX6fs=;
-        b=Kr3wjyYMFr+oiUvY0J96vriqYUGcUBYAhBRv6H9F0AaHS+6vmvptCh0fijdKFArXm3
-         gNq4n9BKstm2OYX8U12/ywiOhGL77x+wltDviVdusgrBmeoNx+CCa9zu7vpR5suMG+qG
-         b2yI8EqoPu82A8Tnv9X/VC5+vxZnFyXZsYIpd9Z/DpowayPYhtVM3D00+i4dODAj4ket
-         GNa/6SHEJEwasuXBUgOg2HPLiQsOO5Wt0ZJgtLAUaZzTWtqbiyMPMJ9WvG8bU6dxLE9/
-         kP2mwza8qUQd7YZKWyQYKiG4t9E+f5fZdyWM4h6J3vleQr6EJPDmXG6TfixSnJYfZVNs
-         IYHg==
+        bh=/pTg2vf1jjIMBVtegu9b0KSVQwmbhLOaMelrOQMA6JM=;
+        b=RgBATJAqy3Yc2WoRQHtDmZnp0JM59An4Lthq1lfQ4lZXPVMWZ5a/nsoNNguUr97w5b
+         Du4+X8C3v9cnaQ0P6vPp7nWMt9NopNAIiw2AAx1YHaZjC78Qo7XDdX8zMMZJtcd6IH6l
+         TaV70ma3or4VBxHD3sBYumPAN0fSgi75DIH07mkonV45dyPE7otGKwBaJxCImEln6sfl
+         I3Cvv25YiW/XYPXs/vOh03sijSOWe3tUCN8eHdlL8157dZl4GmXg5ikC51H2GZEGDcay
+         jVeo1Wkh+NryyizA6I7+lrB3zhF/5GsKtHri9lxf33xUQGSV0aDeg+iJc9mtpIB6Mofj
+         8ULQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789134681; x=1789739481;
+        d=1e100.net; s=20251104; t=1789134682; x=1789739482;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=Vymh7WtkCS2L1vZH6F2vEzmi/F3C/O1M/vjWHAIX6fs=;
-        b=nYPRyOe0w8hqJvYvGzNa5NTqgowy5mJmBexzBcLs+zxCBjGZ4qQ34FOgHlD5og1JFT
-         /lF6eSoDe37y0rVAe/GO+Kewvt6HAcO8u1DUXmCZ3uAlmK7BjMXi7UlORJhGlsTpfwd6
-         Ka/EHEGYEezZ+WJ4KE/XQ2E2raz3Vzv/jvV1nQ8/1gW0GjRfFFgfabJ1Lyrii9LxXrCQ
-         GydgnGK9MkK2i2zvR/p6AD6McfKHQH1IiqVOh32/Q6TSMIawFFnyRhQZSYHVZt4YfH0F
-         T3C0xYUWZvNMh6QtPJqPyE+dv8VvptMRqHHIOr4Ttern0p2wlvpDgFQkEyKvbOJ3Maf9
-         eC2w==
-X-Forwarded-Encrypted: i=1; AKwUvBynydZGTsoq/hI3Yh/xYrySBT20L3I/TlmiTRi5Gs5X2Ddu4ZKfTdOFfQj+HnuIHSosEtKvl4M=@lists.linux.dev
-X-Gm-Message-State: AFuF++lP1JpqziM5IafW1YunRu/xuyshUJGXdBsVt/2VUIFcFdr0qw0h
-	bGr7OnSSkBDVKNdVX0t9EN6GErmfl2+MUFV3ZMPprwNMCf11dwYbhl8WFdy0EZ8y9I5GvPxFAID
-	Trbapnz6fDQLjHiiM5bbXaQ==
-X-Received: from wmon22.prod.google.com ([2002:a05:600c:4656:b0:498:88df:a3b0])
+        bh=/pTg2vf1jjIMBVtegu9b0KSVQwmbhLOaMelrOQMA6JM=;
+        b=hDXp2GFLdUqD1+Q/i5GPSdr04p+WzyyTCSnxURW5k0quaVJGMFO8Wno8hz/97gOwoa
+         5bL8BlnNF1BFBYeV7WTeKCfpui4NifzPVnc1M08A12jW3706UfXYpVw35/OChZrcmyao
+         v2VUpXAO7EGif2FTFh3Ww9Wv5ze50wG9fnz56Kw+RNFkxWQLLabfpDfTmli0zHG8xb3I
+         5Oww3ODbgAv2UgLYHQotFVHdnhZSFf55Bxmt+8nsjgHd1esFu9qznAMrtuleqHq9S0za
+         RAH0ZDVjOr7JE+NXOTaDnIvCln4cFJ9aMRqk4OKL8+zGKnIx4HzsLeoy/jUxLGKxcwQM
+         3ZnA==
+X-Forwarded-Encrypted: i=1; AKwUvBzg0uyUkk6HgCIY+2c2NQBwUuqNJO4vmS5RyE74mX4QVcMwGdz3K6j3/c+TjrDUe5xBpMDDsVc=@lists.linux.dev
+X-Gm-Message-State: AFuF++kBkJkf930FfJSAQBVRoenDUEXoDLa9Yxo92Rgtk9AK9n0Z96LQ
+	y2oUiiZZCiw1plP7iUyzesIqmWv5yqKWlyRojiIqruVVWjwVA2H/AbyFipwTKMTpK6CDcG/ua5S
+	fo+LpaUhIcItiwa490d18pA==
+X-Received: from edad9.prod.google.com ([2002:a05:6402:4009:b0:6a7:e6d1:c763])
  (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:37c4:b0:49d:93c:d903 with SMTP id 5b1f17b1804b1-49e619e0e8fmr50487405e9.20.1789134680903;
- Fri, 11 Sep 2026 06:51:20 -0700 (PDT)
-Date: Fri, 11 Sep 2026 14:50:47 +0100
+ 2002:a05:6402:3889:b0:6a9:a5e7:f8be with SMTP id 4fb4d7f45d1cf-6a9b5655206mr1868948a12.5.1789134681903;
+ Fri, 11 Sep 2026 06:51:21 -0700 (PDT)
+Date: Fri, 11 Sep 2026 14:50:48 +0100
 In-Reply-To: <20260911135053.146435-1-vdonnefort@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -60,8 +60,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20260911135053.146435-1-vdonnefort@google.com>
 X-Mailer: git-send-email 2.55.0.1007.g17ff1f9808-goog
-Message-ID: <20260911135053.146435-17-vdonnefort@google.com>
-Subject: [PATCH v2 16/22] KVM: arm64: Add pkvm_hyp_req infrastructure
+Message-ID: <20260911135053.146435-18-vdonnefort@google.com>
+Subject: [PATCH v2 17/22] KVM: arm64: Introduce kvm_pgtable_stage2_table_install()
 From: Vincent Donnefort <vdonnefort@google.com>
 To: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
 	linux-arm-kernel@lists.infradead.org
@@ -71,199 +71,167 @@ Cc: joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com,
 	weilin.chang@arm.com, Vincent Donnefort <vdonnefort@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-The pKVM hypervisor depends on the host for a lot of operations like
-memory allocation. Introduce a struct pkvm_hyp_req to enable the pKVM
-hypervisor to request resources from the host.
+The existing kvm_pgtable_stage2_split() is unfit for pKVM: it relies on
+kvm_mmu_memory_cache which pKVM doesn't use and has no easy way to
+handle pKVM-specific annotations.
 
-Additionally, introduce a trace event to track the handling of these
-requests.
+Add the pgtable helper kvm_pgtable_stage2_table_install() so pKVM can
+handle block splitting in mem_protect.c. That helper can take a table
+either populated with kvm_pgtable_stage2_create_unlinked() or one filled
+with annotations.
 
 Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 ---
- arch/arm64/include/asm/kvm_asm.h  | 10 ++++---
- arch/arm64/include/asm/kvm_host.h | 12 +++++++++
- arch/arm64/include/asm/kvm_pkvm.h |  1 +
- arch/arm64/kvm/handle_exit.c      |  3 +++
- arch/arm64/kvm/pkvm.c             | 20 ++++++++++++++
- arch/arm64/kvm/trace_pkvm.h       | 43 +++++++++++++++++++++++++++++++
- 6 files changed, 85 insertions(+), 4 deletions(-)
- create mode 100644 arch/arm64/kvm/trace_pkvm.h
+ arch/arm64/include/asm/kvm_pgtable.h | 12 ++++
+ arch/arm64/kvm/hyp/pgtable.c         | 85 ++++++++++++++++++++++++----
+ 2 files changed, 86 insertions(+), 11 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 95dd62e5601b..ec59f0fe9374 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -17,10 +17,11 @@
- #define ARM_EXCEPTION_IS_TRAP(x)  (ARM_EXCEPTION_CODE((x)) == ARM_EXCEPTION_TRAP)
- #define ARM_SERROR_PENDING(x)	  !!((x) & (1U << ARM_EXIT_WITH_SERROR_BIT))
+diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+index 41a8687938eb..24d6e05d8050 100644
+--- a/arch/arm64/include/asm/kvm_pgtable.h
++++ b/arch/arm64/include/asm/kvm_pgtable.h
+@@ -827,6 +827,18 @@ int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size);
+ int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size,
+ 			     struct kvm_mmu_memory_cache *mc);
  
--#define ARM_EXCEPTION_IRQ	  0
--#define ARM_EXCEPTION_EL1_SERROR  1
--#define ARM_EXCEPTION_TRAP	  2
--#define ARM_EXCEPTION_IL	  3
-+#define ARM_EXCEPTION_IRQ		0
-+#define ARM_EXCEPTION_EL1_SERROR	1
-+#define ARM_EXCEPTION_TRAP		2
-+#define ARM_EXCEPTION_IL		3
-+#define ARM_EXCEPTION_PKVM_HYP_REQ	4
- /* The hyp-stub will return this for any kvm_call_hyp() call */
- #define ARM_EXCEPTION_HYP_GONE	  HVC_STUB_ERR
- 
-@@ -28,6 +29,7 @@
- 	{ARM_EXCEPTION_IRQ,		"IRQ"		},	\
- 	{ARM_EXCEPTION_EL1_SERROR, 	"SERROR"	},	\
- 	{ARM_EXCEPTION_TRAP, 		"TRAP"		},	\
-+	{ARM_EXCEPTION_PKVM_HYP_REQ,	"PKVM_HYP_REQ"	},	\
- 	{ARM_EXCEPTION_HYP_GONE,	"HYP_GONE"	}
- 
- /*
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 27fe0cd5b2d7..ea76c0f3120e 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -85,6 +85,15 @@ u32 __attribute_const__ kvm_target_cpu(void);
- void kvm_reset_vcpu(struct kvm_vcpu *vcpu);
- void kvm_arm_vcpu_destroy(struct kvm_vcpu *vcpu);
- 
-+enum pkvm_hyp_req_type {
-+	PKVM_HYP_NO_REQ = 0,
-+	__PKVM_HYP_REQ_TYPE_MAX,
-+};
++/**
++ * kvm_pgtable_stage2_table_install() - Replace a stage-2 leaf entry with a table.
++ * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_create_unlinked().
++ * @addr:	Address identifying the leaf entry to replace.
++ * @size:	Size of the block to replace.
++ * @tab:	Pointer to the pre-allocated table to install.
++ *
++ * Return: 0 on success, negative error code on failure.
++ */
++int kvm_pgtable_stage2_table_install(struct kvm_pgtable *pgt, u64 addr, u64 size,
++				     kvm_pte_t *table);
 +
-+struct pkvm_hyp_req {
-+	u8 type;
-+};
-+
- struct kvm_hyp_memcache {
- 	phys_addr_t head;
- 	unsigned long nr_pages;
-@@ -929,6 +938,9 @@ struct kvm_vcpu_arch {
- 	/* Pages to top-up the pKVM/EL2 guest pool */
- 	struct kvm_hyp_memcache pkvm_memcache;
- 
-+	/* To be read on ARM_EXCEPTION_PKVM_HYP_REQ */
-+	struct pkvm_hyp_req pkvm_hyp_req;
-+
- 	/* Virtual SError ESR to restore when HCR_EL2.VSE is set */
- 	u64 vsesr_el2;
- 
-diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
-index ff8e93efcd7a..7240dcc4f395 100644
---- a/arch/arm64/include/asm/kvm_pkvm.h
-+++ b/arch/arm64/include/asm/kvm_pkvm.h
-@@ -22,6 +22,7 @@ int pkvm_create_hyp_vm(struct kvm *kvm);
- bool pkvm_hyp_vm_is_created(struct kvm *kvm);
- void pkvm_destroy_hyp_vm(struct kvm *kvm);
- int pkvm_create_hyp_vcpu(struct kvm_vcpu *vcpu);
-+int __pkvm_handle_vcpu_req(struct kvm_vcpu *vcpu);
- 
- #ifdef CONFIG_NVHE_EL2_DEBUG
- void pkvm_ownership_selftest(void);
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index db37678dcb05..90500b204e16 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -18,6 +18,7 @@
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_mmu.h>
- #include <asm/kvm_nested.h>
-+#include <asm/kvm_pkvm.h>
- #include <asm/debug-monitors.h>
- #include <asm/stacktrace/nvhe.h>
- #include <asm/traps.h>
-@@ -464,6 +465,8 @@ int handle_exit(struct kvm_vcpu *vcpu, int exception_index)
- 		return 1;
- 	case ARM_EXCEPTION_TRAP:
- 		return handle_trap_exceptions(vcpu);
-+	case ARM_EXCEPTION_PKVM_HYP_REQ:
-+		return __pkvm_handle_vcpu_req(vcpu);
- 	case ARM_EXCEPTION_HYP_GONE:
- 		/*
- 		 * EL2 has been reset to the hyp-stub. This happens when a guest
-diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index ae434f806455..02ad686d7661 100644
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -16,6 +16,9 @@
- 
- #include "hyp_constants.h"
- 
-+#define CREATE_TRACE_POINTS
-+#include "trace_pkvm.h"
-+
- DEFINE_STATIC_KEY_FALSE(kvm_protected_mode_initialized);
- 
- static struct memblock_region *hyp_memory = kvm_nvhe_sym(hyp_memory);
-@@ -632,3 +635,20 @@ bool pkvm_force_reclaim_guest_page(phys_addr_t phys)
- 
- 	return !ret || ret == -EAGAIN;
+ /**
+  * kvm_pgtable_walk() - Walk a page-table.
+  * @pgt:	Page-table structure initialised by kvm_pgtable_*_init().
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index c4ebae0544d4..6c85af51002d 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -1533,18 +1533,38 @@ static int stage2_block_get_nr_page_tables(s8 level)
+ 	};
  }
-+
-+static int pkvm_hyp_req_handle(struct pkvm_hyp_req *req, struct kvm_vcpu *vcpu)
+ 
++static int stage2_table_install(const struct kvm_pgtable_visit_ctx *ctx,
++				struct kvm_s2_mmu *mmu,
++				kvm_pte_t *table)
 +{
-+	int ret = -EINVAL;
++	kvm_pte_t new;
 +
-+	switch (req->type) {
-+	}
++	if (!stage2_try_break_pte(ctx, mmu))
++		return -EAGAIN;
 +
-+	trace_kvm_handle_pkvm_hyp_req(req, ret);
-+
-+	return ret;
++	/*
++	 * Note, the contents of the page table are guaranteed to be made
++	 * visible before the new PTE is assigned because stage2_make_pte()
++	 * writes the PTE using smp_store_release().
++	 */
++	new = kvm_init_table_pte(table, ctx->mm_ops);
++	stage2_make_pte(ctx, new);
++	return 0;
 +}
 +
-+int __pkvm_handle_vcpu_req(struct kvm_vcpu *vcpu)
+ static int stage2_split_walker(const struct kvm_pgtable_visit_ctx *ctx,
+ 			       enum kvm_pgtable_walk_flags visit)
+ {
+ 	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
+ 	struct kvm_mmu_memory_cache *mc = ctx->arg;
+-	struct kvm_s2_mmu *mmu;
+-	kvm_pte_t pte = ctx->old, new, *childp;
++	kvm_pte_t pte = ctx->old, *childp;
+ 	enum kvm_pgtable_prot prot;
++	struct kvm_s2_mmu *mmu;
+ 	s8 level = ctx->level;
+ 	bool force_pte;
+ 	int nr_pages;
+ 	u64 phys;
++	int ret;
+ 
+ 	/* No huge-pages exist at the last level */
+ 	if (level == KVM_PGTABLE_LAST_LEVEL)
+@@ -1586,18 +1606,12 @@ static int stage2_split_walker(const struct kvm_pgtable_visit_ctx *ctx,
+ 	if (IS_ERR(childp))
+ 		return PTR_ERR(childp);
+ 
+-	if (!stage2_try_break_pte(ctx, mmu)) {
++	ret = stage2_table_install(ctx, mmu, childp);
++	if (ret) {
+ 		kvm_pgtable_stage2_free_unlinked(mm_ops, childp, level);
+-		return -EAGAIN;
++		return ret;
+ 	}
+ 
+-	/*
+-	 * Note, the contents of the page table are guaranteed to be made
+-	 * visible before the new PTE is assigned because stage2_make_pte()
+-	 * writes the PTE using smp_store_release().
+-	 */
+-	new = kvm_init_table_pte(childp, mm_ops);
+-	stage2_make_pte(ctx, new);
+ 	return 0;
+ }
+ 
+@@ -1616,6 +1630,55 @@ int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size,
+ 	return ret;
+ }
+ 
++struct stage2_table_install_data {
++	struct kvm_s2_mmu	*mmu;
++	kvm_pte_t		*table;
++};
++
++static int stage2_table_install_walker(const struct kvm_pgtable_visit_ctx *ctx,
++				       enum kvm_pgtable_walk_flags visit)
 +{
-+	return pkvm_hyp_req_handle(&vcpu->arch.pkvm_hyp_req, vcpu) ?: 1;
++	struct stage2_table_install_data *data = ctx->arg;
++	struct kvm_s2_mmu *mmu = data->mmu;
++	kvm_pte_t *childp = data->table;
++
++	if (ctx->level == KVM_PGTABLE_LAST_LEVEL)
++		return -EINVAL;
++
++	if (ctx->addr != ctx->start ||
++	    ctx->end != ctx->addr + kvm_granule_size(ctx->level))
++		return -EINVAL;
++
++	/*
++	 * On success, return a positive value to prevent descending into the
++	 * new table.
++	 */
++	return stage2_table_install(ctx, mmu, childp) ?: 1;
 +}
-diff --git a/arch/arm64/kvm/trace_pkvm.h b/arch/arm64/kvm/trace_pkvm.h
-new file mode 100644
-index 000000000000..3966c111e3ad
---- /dev/null
-+++ b/arch/arm64/kvm/trace_pkvm.h
-@@ -0,0 +1,43 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#if !defined(_TRACE_PKVM_ARM64_KVM_H) || defined(TRACE_HEADER_MULTI_READ)
-+#define _TRACE_PKVM_ARM64_KVM_H
 +
-+#include <linux/tracepoint.h>
-+#include <asm/kvm_pkvm.h>
++int kvm_pgtable_stage2_table_install(struct kvm_pgtable *pgt, u64 addr, u64 size, kvm_pte_t *table)
++{
++	struct stage2_table_install_data data = {
++		.mmu	= pgt->mmu,
++		.table	= table,
++	};
++	struct kvm_pgtable_walker walker = {
++		.cb	= stage2_table_install_walker,
++		.flags	= KVM_PGTABLE_WALK_LEAF,
++		.arg	= &data,
++	};
++	int ret;
 +
-+#undef TRACE_SYSTEM
-+#define TRACE_SYSTEM kvm
++	ret = kvm_pgtable_walk(pgt, addr, size, &walker);
++	if (ret < 0)
++		return ret;
++	if (!ret)
++		return -EINVAL;
 +
-+TRACE_DEFINE_ENUM(PKVM_HYP_NO_REQ);
++	dsb(ishst);
++	return 0;
++}
 +
-+#define PKVM_HYP_REQ_TYPES \
-+	{ PKVM_HYP_NO_REQ, "NO_REQ" }
-+
-+TRACE_EVENT(kvm_handle_pkvm_hyp_req,
-+	TP_PROTO(struct pkvm_hyp_req *req, int ret),
-+	TP_ARGS(req, ret),
-+
-+	TP_STRUCT__entry(
-+		__field(u8,	type)
-+		__field(int,	ret)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->type = req->type;
-+		__entry->ret = ret;
-+	),
-+
-+	TP_printk("type: %s ret: %d",
-+		  __print_symbolic(__entry->type, PKVM_HYP_REQ_TYPES),
-+		  __entry->ret)
-+);
-+
-+#endif /* _TRACE_PKVM_ARM64_KVM_H */
-+
-+#undef TRACE_INCLUDE_PATH
-+#define TRACE_INCLUDE_PATH .
-+#undef TRACE_INCLUDE_FILE
-+#define TRACE_INCLUDE_FILE trace_pkvm
-+
-+/* This part must be outside protection */
-+#include <trace/define_trace.h>
+ int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
+ 			      struct kvm_pgtable_mm_ops *mm_ops,
+ 			      enum kvm_pgtable_stage2_flags flags,
 -- 
 2.55.0.1007.g17ff1f9808-goog
 
