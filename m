@@ -1,50 +1,64 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FC2247124D;
-	Fri, 11 Sep 2026 08:45:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB21346A607;
+	Fri, 11 Sep 2026 09:04:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789116338; cv=none; b=YuD5hvJ+5MO4LAymDLnAlBY+Su2QLPXeuM/4R9GAJzVDfgya1NGfVRJmcgemeZl3P+HHk5DyE5yzdFOjY1M6JdqmnfLNvWLX/UUKOCMWzrsD/dsXYmOrsRRAfkDCyUFpwm+lE4Fa3beOSM4wJdV8dEOFXdmyvvFo94j8weF5c3I=
+	t=1789117490; cv=none; b=rqYOksDEYs3gYXBqGrYtfBK0AD4FzsKRIUdvSx01DKh6SfgOP7hbGrfY9dIaAvzoozUelAMo/4rKv3XsjldRgIswp7QoxUI0yTxHF2UvosIdJaYFWEtLmTcsQxVXF86Hq/LBsH789izti9olLtAgaIlDBMl3vVv2gDbWXIVvn4g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789116338; c=relaxed/simple;
-	bh=lAxjbinap1XjY/ldeZoqjwR6pdq+Zcex91oPLLGkok0=;
+	s=arc-20240116; t=1789117490; c=relaxed/simple;
+	bh=gcqPq80SUA7rxj7I142glyxbIg30yOY6tScvJ6VGNqM=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=G+vjNUPIvgfG1O94AjgURqC1a9Q3/GMgSiXtYtt7AOp2QkTp4/uDtndmOUNMi06e0/VwBL4MzzYJlMtkEXdqnyFIJ6x0xj+PE6ebcOS7TUvvPM/M7FrzGfMTQ98k2ds5RrN1ICsOW3ZERdH4iy/0y8y6xrSdpECxT+4nGlTnoUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dwYwYz5l; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=oRe9MW6Fet9kwJguo9ylrn7kUqqoAdGyG2k8sUhiSe6PGqY2zdwfzX4GkaJE0XsMX4wNKHqTAuYDSO+KspILkm2Rp1gNEVQ0L2kOzLYifoj+AAR+Z3zEtuGNUv5f0qNd1PCQ/E0K8hO8EENT8a4kq6AaCYIpcJqXCjhWOWuM3/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VGTRONDC; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dwYwYz5l"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 826F41F000FF;
-	Fri, 11 Sep 2026 08:45:33 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VGTRONDC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0D6B1F000FF;
+	Fri, 11 Sep 2026 09:04:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789116333;
-	bh=6lmWq/6m5ggzERPQqqVSu3VLp/0FSG5x+a0xHxsrOas=;
+	s=k20260515; t=1789117488;
+	bh=YpqB/FGoINaAPksLXKH61CNA8zZaPI5+Q44rzGkgk1M=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=dwYwYz5ljp9tG3t5pKzvZsLEOy5+gSnkTSMX8qH8cAVp3J4uAaT3bmdmwQxGr2Ja3
-	 dXum5KsGHaFzCLWm1HgvDML1we5awsTE54pMdz8iXZpS+wZYqwx8XVfdFWqDbnwxZG
-	 /Jk63UDOHsqB0FgK67TJ9gQaGrOjeJy2cTErTOO9hdguJHQNqK3ojxtsgef5LGnKBg
-	 L/KG3agkLXRXafPftZi4WRY5/7wTG9xx28w65EEO05V5wYfiSx3jbAJo6hnPgBy/ye
-	 yrp+D91+pkeByi+YY6EBVvJQ4MQCBuUjJV3dl/N5MChGgTexLK6p9kmYDzP/QSyWSI
-	 Ue3ZiiiuKm2IQ==
+	b=VGTRONDCwCp/GaPq/iFR+dm0pEVqqK4RV39yKsjAMKQk4PzHAnT8n0+bL72mFj6gK
+	 xZkCBaFTY8bCfvWzx12I176Kp2CLGTYzuU++6vZSJqPkNVl/emHT/cY7xlmzZ0/fTz
+	 mVk5iCFRGEoYawFjy0mmp5/IwiYqIGhhQ+YFrWly6dYOTtZ09utRfDzF0B54ImjVd5
+	 DgNmdGkiIW+M0mVqNOgQhgMT1MlD4+P2ivH/bi7bFa4OR0K0MJ79K7CjmMQvRT0yMP
+	 9ScpcnWWENbFEEQDtWGv+3t4bWiPPK0d/k7Qa1GoZ2G9vUq18Uq2R/PSxSuNIdKs5C
+	 7wPkZJw8/rGsw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1x4wt1-00000007euX-11qC;
-	Fri, 11 Sep 2026 08:45:31 +0000
-Date: Fri, 11 Sep 2026 09:45:30 +0100
-Message-ID: <86pkyk6us5.wl-maz@kernel.org>
+	id 1x4xBe-00000007fSF-1c0P;
+	Fri, 11 Sep 2026 09:04:46 +0000
+Date: Fri, 11 Sep 2026 10:04:45 +0100
+Message-ID: <86o6e46tw2.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Wei-Lin Chang <weilin.chang@arm.com>
-Cc: sashiko-reviews@lists.linux.dev,
+Cc: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
-	Oliver Upton <oupton@kernel.org>
-Subject: Re: [PATCH v1 2/3] arm64: sysreg: Add TCR_EL2 to sysreg infrastructure
-In-Reply-To: <qzold5p6qgyawt4manlare7cuewlqik4i3vc5lrdidtzc6ac4v@ejf67iqd3nrj>
+	linux-kernel@vger.kernel.org,
+	Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Sascha Bischoff <Sascha.Bischoff@arm.com>,
+	Ben Horgan <ben.horgan@arm.com>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Thomas Huth <thuth@redhat.com>,
+	James Clark <james.clark@linaro.org>,
+	Mark Brown <broonie@kernel.org>,
+	Anshuman Khandual <anshuman.khandual@arm.com>
+Subject: Re: [PATCH v1 3/3] KVM: arm64: Convert TCR_EL2 to config-driven sanitisation
+In-Reply-To: <20260909222015.3046432-4-weilin.chang@arm.com>
 References: <20260909222015.3046432-1-weilin.chang@arm.com>
-	<20260909222015.3046432-3-weilin.chang@arm.com>
-	<20260909223811.386071F00893@smtp.kernel.org>
-	<qzold5p6qgyawt4manlare7cuewlqik4i3vc5lrdidtzc6ac4v@ejf67iqd3nrj>
+	<20260909222015.3046432-4-weilin.chang@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -56,124 +70,185 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: weilin.chang@arm.com, sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev, oupton@kernel.org
+X-SA-Exim-Rcpt-To: weilin.chang@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, Sascha.Bischoff@arm.com, ben.horgan@arm.com, lpieralisi@kernel.org, thuth@redhat.com, james.clark@linaro.org, broonie@kernel.org, anshuman.khandual@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 10 Sep 2026 11:58:07 +0100,
+On Wed, 09 Sep 2026 23:20:15 +0100,
 Wei-Lin Chang <weilin.chang@arm.com> wrote:
 > 
-> On Wed, Sep 09, 2026 at 10:38:10PM +0000, sashiko-bot@kernel.org wrote:
-> > Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> > - [Medium] Declarative update to TCR_EL2 regenerates the TCR_EL2_RES1 aggregate mask which is consumed by C initialization, requiring confirmation of robustness to future value changes.
-> > --
-> > 
-> > commit 522a184d95be9c0f88cc6fb418668546ef83e3e4
-> > Author: Wei-Lin Chang <weilin.chang@arm.com>
-> > 
-> >     arm64: sysreg: Add TCR_EL2 to sysreg infrastructure
-> >     
-> >     Convert TCR_EL2 to the sysreg infrastructure with data extracted from
-> >     Registers.json of the BSD licenced AARCHMRS
-> >     (AARCHMRS_OPENSOURCE_A_profile_FAT-2026-06).
-> > 
-> > > diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> > > index 94bf065c8ac71..8d89f34580bac 100644
-> > > --- a/arch/arm64/tools/sysreg
-> > > +++ b/arch/arm64/tools/sysreg
-> > [ ... ]
-> > > +Sysreg	TCR_EL2		3	4	2	0	2
-> > [ ... ]
-> > > +Field	33	MTX
-> > > +Field	32	DS
-> > > +Res1	31
-> > > +Field	30	TCMA
-> > > +Field	29	TBID
-> > > +Field	28	HWU62
-> > > +Field	27	HWU61
-> > > +Field	26	HWU60
-> > > +Field	25	HWU59
-> > > +Field	24	HPD
-> > > +Res1	23
-> > > +Field	22	HD
-> > 
-> > [Severity: Medium]
-> > This isn't a bug, but this declarative update regenerates the TCR_EL2_RES1
-> > aggregate mask. Are the C initialization consumers of this mask robust to its
-> > value silently changing if a future .sysreg patch adds or removes a Res1 bit?
-> > 
-> > For example, the generated mask is OR'd into the initial EL2 register value:
-> > 
-> > arch/arm64/kvm/arm.c:cpu_prepare_hyp_mode() {
-> >     ...
-> >     tcr |= TCR_EL2_RES1 | FIELD_PREP(TCR_EL2_PS_MASK, ips);
-> >     ...
-> > }
-
-Nonsense. In this case, we run nVHE, and we use the !VHE
-definition. The hVHE path correctly derives the setting from TCR_EL1,
-which has the same format.
-
-> > 
-> > It is also used to initialize the guest emulation reset state in:
-> > 
-> > arch/arm64/kvm/sys_regs.c:sys_reg_descs[] = {
-> >     ...
-> >     EL2_REG(TCR_EL2, access_rw, reset_val, TCR_EL2_RES1),
-> >     ...
-> > }
-
-This one is a potential bug, but not in the current revision of the
-architecture. Bits 23 and 31 are RES1 when E2H==0, but reset as
-UNKNOWN when E2H==1, so nothing breaks. This is just ugly.
-
-> > 
-> > Because the generator's contract is to reflect global architectural truth, a
-> > future edit that reclassifies a bit as Res1 will silently change the value of
-> > TCR_EL2_RES1 without triggering a compiler or CI warning. Could you confirm
-> > that these consumers do not rely on the previous static semantic value of the
-> > mask?
+> Feature dependencies of the fields in TCR_EL2 are extracted from
+> Registers.json of the BSD licenced AARCHMRS
+> (AARCHMRS_OPENSOURCE_A_profile_FAT-2026-06).
 > 
-> I don't fully understand but doesn't this mean the architecture
-> introduced a change that breaks existing software?
+> Places where we slightly deviate from the above:
+> 
+>  - Stick to the ARM ARM M.c requirement for TCR_EL2.TCMA*, which only
+>    depends on FEAT_MTE2. This avoids updating ID_AA64PFR2_EL1 with new
+>    VMTE* definitions that we don't know the meaning of, as they aren't
+>    present in the ARM ARM yet.
+> 
+>  - Ignore TCR_EL2.DS's requirement of needing the effective value of
+>    TCR2_EL2.D128 be 0. This requires runtime detection of TCR2_EL2.D128
+>    and we don't have D128 support yet.
 
-That's exactly what VHE (and by extension HCR_EL2.E2H being RES1) did.
-Which is why I can't wait for FEAT_E2H0 to be eradicated (it is
-already forbidden in 9.6 as FEAT_SRMASK is mandatory).
+The runtime stuff is never something we can do as part of the static
+initialisation. I think the way this is captured in the JSON is a bit
+hackish, and it should probably say:
 
-I think this is simply a case of providing a specific reset function
-for TCR_EL2 (untested).
+IsFeatureImplemented(FEAT_LPA2) && (EffectiveValue(TCR2_EL2.D128) == '0')
+
+which would naturally work.
+
+> 
+>  - TCR_EL2.AS is dependent on FEAT_ASID16, this information is missing
+>    from the json.
+> 
+> Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h |   2 +-
+>  arch/arm64/kvm/config.c           | 113 ++++++++++++++++++++++++++++++
+>  arch/arm64/kvm/nested.c           |   4 ++
+>  3 files changed, 118 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 27fe0cd5b2d7..6a5e22ca3430 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -516,7 +516,6 @@ enum vcpu_sysreg {
+>  	HACR_EL2,	/* Hypervisor Auxiliary Control Register */
+>  	TTBR0_EL2,	/* Translation Table Base Register 0 (EL2) */
+>  	TTBR1_EL2,	/* Translation Table Base Register 1 (EL2) */
+> -	TCR_EL2,	/* Translation Control Register (EL2) */
+>  	PIRE0_EL2,	/* Permission Indirection Register 0 (EL2) */
+>  	PIR_EL2,	/* Permission Indirection Register 1 (EL2) */
+>  	POR_EL2,	/* Permission Overlay Register 2 (EL2) */
+> @@ -541,6 +540,7 @@ enum vcpu_sysreg {
+>  	/* Anything from this can be RES0/RES1 sanitised */
+>  	MARKER(__SANITISED_REG_START__),
+>  	SCTLR_EL2,	/* System Control Register (EL2) */
+> +	TCR_EL2,	/* Translation Control Register (EL2) */
+>  	TCR2_EL2,	/* Extended Translation Control Register (EL2) */
+>  	SCTLR2_EL2,	/* System Control Register 2 (EL2) */
+>  	MDCR_EL2,	/* Monitor Debug Configuration Register (EL2) */
+> diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
+> index 1053676551af..3ccf5359a373 100644
+> --- a/arch/arm64/kvm/config.c
+> +++ b/arch/arm64/kvm/config.c
+> @@ -203,8 +203,11 @@ struct reg_feat_map_desc {
+>  #define FEAT_CPA2		ID_AA64ISAR3_EL1, CPA, CPA2
+>  #define FEAT_ASID2		ID_AA64MMFR4_EL1, ASID2, IMP
+>  #define FEAT_MEC		ID_AA64MMFR3_EL1, MEC, IMP
+> +#define FEAT_HAF		ID_AA64MMFR1_EL1, HAFDBS, AF
+>  #define FEAT_HAFT		ID_AA64MMFR1_EL1, HAFDBS, HAFT
+> +#define FEAT_HAFDBS		ID_AA64MMFR1_EL1, HAFDBS, DBM
+>  #define FEAT_HDBSS		ID_AA64MMFR1_EL1, HAFDBS, HDBSS
+> +#define FEAT_HPDS		ID_AA64MMFR1_EL1, HPDS, IMP
+>  #define FEAT_HPDS2		ID_AA64MMFR1_EL1, HPDS, HPDS2
+>  #define FEAT_BTI		ID_AA64PFR1_EL1, BT, IMP
+>  #define FEAT_ExS		ID_AA64MMFR0_EL1, EXS, IMP
+> @@ -215,6 +218,10 @@ struct reg_feat_map_desc {
+>  #define FEAT_MixedEndEL0	ID_AA64MMFR0_EL1, BIGENDEL0, IMP
+>  #define FEAT_MTE_ASYNC		ID_AA64PFR1_EL1, MTE_frac, ASYNC
+>  #define FEAT_MTE_STORE_ONLY	ID_AA64PFR2_EL1, MTESTOREONLY, IMP
+> +#define FEAT_MTE_CANONICAL_TAGS	ID_AA64PFR1_EL1, MTEX, MTE4
+> +#define FEAT_MTE_NO_ADDRESS_TAGS	ID_AA64PFR1_EL1, MTEX, MTE4
+> +#define FEAT_E0PD		ID_AA64MMFR2_EL1, E0PD, IMP
+> +#define FEAT_SVE		ID_AA64PFR0_EL1, SVE, IMP
+>  #define FEAT_PAN		ID_AA64MMFR1_EL1, PAN, IMP
+>  #define FEAT_PAN3		ID_AA64MMFR1_EL1, PAN, PAN3
+>  #define FEAT_SSBS		ID_AA64PFR1_EL1, SSBS, IMP
+> @@ -227,6 +234,19 @@ struct reg_feat_map_desc {
+>  #define FEAT_GCIE		ID_AA64PFR2_EL1, GCIE, IMP
+>  #define FEAT_NV3		ID_AA64MMFR4_EL1, NV_frac, NV3
+>  
+> +static bool feat_asid16(struct kvm *kvm)
+> +{
+> +	return kvm_has_feat_enum(kvm, ID_AA64MMFR0_EL1, ASIDBITS, 16);
+> +}
+> +
+> +static bool feat_mte_no_addr_tags_or_canonical_tags(struct kvm *kvm)
+> +{
+> +	bool no_addr_tags = kvm_has_feat(kvm, FEAT_MTE_NO_ADDRESS_TAGS);
+> +	bool canonical_tags = kvm_has_feat(kvm, FEAT_MTE_CANONICAL_TAGS);
+> +
+> +	return no_addr_tags || canonical_tags;
+> +}
+> +
+>  static bool not_feat_aa64el3(struct kvm *kvm)
+>  {
+>  	return !kvm_has_feat(kvm, FEAT_AA64EL3);
+> @@ -1044,6 +1064,91 @@ static const struct reg_bits_to_feat_map sctlr2_feat_map[] = {
+>  static const DECLARE_FEAT_MAP(sctlr2_desc, SCTLR2_EL1,
+>  			      sctlr2_feat_map, FEAT_SCTLR2);
+>  
+> +static const struct reg_bits_to_feat_map tcr_el2_vhe_feat_map[] = {
+
+Maybe be consistent with the generated field names and call the array
+'vhe_tcr_el2_feat_map'. Similarly for all the other names.
+
+> +	NEEDS_FEAT(VHE_TCR_EL2_MTX1	|
+> +		   VHE_TCR_EL2_MTX0,
+> +		   feat_mte_no_addr_tags_or_canonical_tags),
+> +	NEEDS_FEAT(VHE_TCR_EL2_DS, feat_lpa2),
+> +	NEEDS_FEAT(VHE_TCR_EL2_TCMA1	|
+> +		   VHE_TCR_EL2_TCMA0,
+> +		   FEAT_MTE2),
+> +	NEEDS_FEAT(VHE_TCR_EL2_E0PD1	|
+> +		   VHE_TCR_EL2_E0PD0,
+> +		   FEAT_E0PD),
+> +	NEEDS_FEAT(VHE_TCR_EL2_NFD1	|
+> +		   VHE_TCR_EL2_NFD0,
+> +		   FEAT_SVE),
+> +	NEEDS_FEAT(VHE_TCR_EL2_TBID1	|
+> +		   VHE_TCR_EL2_TBID0,
+> +		   feat_pauth),
+> +	NEEDS_FEAT(VHE_TCR_EL2_HWU162	|
+> +		   VHE_TCR_EL2_HWU161	|
+> +		   VHE_TCR_EL2_HWU160	|
+> +		   VHE_TCR_EL2_HWU159	|
+> +		   VHE_TCR_EL2_HWU062	|
+> +		   VHE_TCR_EL2_HWU061	|
+> +		   VHE_TCR_EL2_HWU060	|
+> +		   VHE_TCR_EL2_HWU059,
+> +		   FEAT_HPDS2),
+> +	NEEDS_FEAT(VHE_TCR_EL2_HPD1	|
+> +		   VHE_TCR_EL2_HPD0,
+> +		   FEAT_HPDS),
+> +	NEEDS_FEAT(VHE_TCR_EL2_HD, FEAT_HAFDBS),
+> +	NEEDS_FEAT(VHE_TCR_EL2_HA, FEAT_HAF),
+> +	NEEDS_FEAT(VHE_TCR_EL2_AS, feat_asid16),
+> +	NEEDS_FEAT(VHE_TCR_EL2_TBI1		|
+> +		   VHE_TCR_EL2_TBI0		|
+> +		   VHE_TCR_EL2_IPS		|
+> +		   VHE_TCR_EL2_TG1		|
+> +		   VHE_TCR_EL2_SH1		|
+> +		   VHE_TCR_EL2_ORGN1		|
+> +		   VHE_TCR_EL2_IRGN1		|
+> +		   VHE_TCR_EL2_EPD1		|
+> +		   VHE_TCR_EL2_A1		|
+> +		   VHE_TCR_EL2_T1SZ		|
+> +		   VHE_TCR_EL2_TG0		|
+> +		   VHE_TCR_EL2_SH0		|
+> +		   VHE_TCR_EL2_ORGN0		|
+> +		   VHE_TCR_EL2_IRGN0		|
+> +		   VHE_TCR_EL2_EPD0		|
+> +		   VHE_TCR_EL2_T0SZ,
+> +		   FEAT_AA64EL2),
+> +	FORCE_RES0(VHE_TCR_EL2_RES0),
+> +	FORCE_RES1(VHE_TCR_EL2_RES1),
+> +};
+> +
+> +static const DECLARE_FEAT_MAP(tcr_el2_vhe_desc, VHE_TCR_EL2,
+> +			      tcr_el2_vhe_feat_map, FEAT_AA64EL2);
+> +
+> +static const struct reg_bits_to_feat_map tcr_el2_nvhe_feat_map[] = {
+
+and drop the nvhe here.
+
+Thanks,
 
 	M.
-
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 2c90e185c6e8e..964ecbfde9bb6 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -3275,6 +3275,14 @@ static u64 reset_mdcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
- 	return vcpu->kvm->arch.nr_pmu_counters;
- }
- 
-+static u64 reset_tcr_el2(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
-+{
-+	__vcpu_assign_sys_reg(vcpu, r->reg,
-+			      vcpu_has_feature(vcpu, KVM_ARM_VCPU_HAS_EL2_E2H0) ?
-+			      TCR_EL2_RES1 : VHE_TCR_EL2_RES1);
-+	return __vcpu_sys_reg(vcpu, r->reg);
-+}
-+
- /*
-  * Architected system registers.
-  * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
-@@ -3853,7 +3861,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 
- 	EL2_REG(TTBR0_EL2, access_rw, reset_val, 0),
- 	EL2_REG(TTBR1_EL2, access_rw, reset_val, 0),
--	EL2_REG(TCR_EL2, access_rw, reset_val, TCR_EL2_RES1),
-+	EL2_REG(TCR_EL2, access_rw, reset_tcr_el2, 0),
- 	EL2_REG_FILTERED(TCR2_EL2, access_rw, reset_val, TCR2_EL2_RES1,
- 			 tcr2_el2_visibility),
- 	EL2_REG_VNCR(VTTBR_EL2, reset_val, 0),
 
 -- 
 Without deviation from the norm, progress is not possible.
