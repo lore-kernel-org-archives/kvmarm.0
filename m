@@ -1,160 +1,95 @@
-Received: from mta0.migadu.com (out-52.mta0.migadu.com [91.218.175.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7225445C6E0
-	for <kvmarm@lists.linux.dev>; Fri, 11 Sep 2026 13:07:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.52
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39BA14749C9
+	for <kvmarm@lists.linux.dev>; Fri, 11 Sep 2026 13:16:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789132039; cv=none; b=C8PKJF5LmsF+3485kI0hbZ+e/aVPB5UUHY3eDSFNzKLwbcaHfOQuZ1OpcW60MUzDfky8iBcJe3/i0mHFhr8CYPv0W4WKZ4nmxgRDcY0EK6RVh5D5w/hAmcchrGewsbnvOOcA7EXfDBNKlsxXVJ3kjUfL5mQOfphOY4NSwSaEKLk=
+	t=1789132590; cv=none; b=Lgkrom0eX1Hyd/kI6WDRE4wtVDHkrNg/v6RuL/djPmvcTRnOVGqcQUX8I7wuRcxWRmPQj3Znlu2j6zhRiQyspo7SXXLFkc3p6R0cfPXh8S1iEDfwvj4E1WzcgiDgzTWt7AcItrNo3SD1xrYnP6hmrwHJ8R+8D+BpPkgenSw/a/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789132039; c=relaxed/simple;
-	bh=8pvJVApeDyZ7aiv6BhbctxA5gKGIAQr+fiE6OB4oxLk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=snSvjboQW/d7+hvAw3PbyTElv2seWn4/7HREPE1rYdFgEk14k4xLOciglvRYFjAt3AizlCGXhDQI4uXziskucWPZaUcoV4M4AAa83mljF1JMjRQpObgjRrVr2iyKW8K37XhO+DWFlzA2mCzMJQgycbEgqGSCFp+GcD48VOOFZDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=DhtNHdsn; arc=none smtp.client-ip=91.218.175.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1789132590; c=relaxed/simple;
+	bh=rAPjrIWKifje2rtdcSgWJSLMEJH9EivwHOgVHlZZ3dE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LuvWo9RCmaZ4GWjnvts5b4wyHcwtr35jdk4x74CLCcweq4J0HmvhwuwzM2kMBzNcK8HnTF8ly2Zd+CuX05tu5XjiU4BR+qZ6kA3Atj5441R1HpbrG4lpwvwOoZhAJbGeJSGhQhijX8hu6hVzT3zTlI2xCX8piUjg62xTy6VfrjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=r0tu6ZAf; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="DhtNHdsn"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=8pvJVApeDyZ7aiv6BhbctxA5gKGIAQr+fiE6OB4oxLk=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1789132035; v=1; x=1789736835;
- b=DhtNHdsnFmBZLwhG6l2/LpNCkvgjzQNGKlfqvPO+3X6oU6aNunej1krTNMxyLgYP+lGryafI
- Ed/r1XWIipj9ZqGe7LS8epEXZ8/fktjBSHVFdCDMZ4syK6hbedfUa76dkUEiC5BzJvBqYjr4tDK
- uZFtz/AUxoZZDOO/HR5T1zQs=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 5d631c7e176f18da;
-	Fri, 11 Sep 2026 13:07:15 +0000
-X-Mizu-Trace-ID: 5d631c7e176f18da
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b4a0b384c4so4684e87.1
-        for <kvmarm@lists.linux.dev>; Fri, 11 Sep 2026 06:07:14 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvByM96jS+5Zb23aHwXtdH8nbTm7lBXun1oSn1KRDbvjgGK83wITl77HI40qgo4CvgGpM7P/lxds=@lists.linux.dev
-X-Gm-Message-State: AFuF++n9tlV9JUTS7aYlAkzYG0RkfD/KI1UjPUa7GjrD8YfJBmYnPhHz
-	V8fbvoLiy7NjDX2MovBEjimmFlP7UZ+s9lCNUvVxr7CclRxT6o+8VZ8uSUveMUr/Ks5P32RMuGO
-	soXpvS6cfvlOvPbhK6+TjLeaRiImlfoNqo2EhlYFI
-X-Received: by 2002:a05:6512:2352:b0:5a4:ec:53d9 with SMTP id
- 2adb3069b0e04-5b8a0e9870dmr120141e87.1.1789132033997; Fri, 11 Sep 2026
- 06:07:13 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="r0tu6ZAf"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E92EF1655;
+	Fri, 11 Sep 2026 06:16:23 -0700 (PDT)
+Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DB89C3F59E;
+	Fri, 11 Sep 2026 06:16:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1789132587; bh=rAPjrIWKifje2rtdcSgWJSLMEJH9EivwHOgVHlZZ3dE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=r0tu6ZAf4lq5MRFWS31tTOfRDtHvinmOQ29Vtb1/B0tftDLqhhW9HxUovv78dAyTZ
+	 HTwUhytsEIBHJGdWEgSNtLuAg6dikEXWnoGt77bmZGNluHbmTQHaLcOfbz4uZgX7+5
+	 D3tOkF0c+Au2ERScqBpcT3/fF96wVnhS+IuQXLTg=
+Date: Fri, 11 Sep 2026 14:16:18 +0100
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Fuad Tabba <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Lorenzo Stoakes <ljs@kernel.org>, 
+	Itaru Kitayama <itaru.kitayama@fujitsu.com>
+Subject: Re: [PATCH v5 0/6] KVM: arm64: nv: Implement nested stage-2 reverse
+ map (new data structure)
+Message-ID: <gerjpm62a2gszzggc6vuai22bf3prfquvfsp7ueumps7vz2ev3@odlmovaklg2b>
+References: <20260810205038.118843-1-weilin.chang@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260807164322.2970811-2-sebastianene@google.com> <20260807164322.2970811-6-sebastianene@google.com>
-In-Reply-To: <20260807164322.2970811-6-sebastianene@google.com>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Fri, 11 Sep 2026 14:06:37 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTxjF3bFyGPdZTjG2eaSGDn8qgkMn6mnpvR4DpNdmTo2hA@mail.gmail.com>
-X-Gm-Features: AcwNN1VrR2kYv2q8ZGCNc3rU7zWSpDHiv9N7fjGK0s-HcxCvjzx3fnURhDkVi2o
-Message-ID: <CA+EHjTxjF3bFyGPdZTjG2eaSGDn8qgkMn6mnpvR4DpNdmTo2hA@mail.gmail.com>
-Subject: Re: [PATCH v2 04/13] KVM: Parse the device tree and register the ITS
- region with pKVM
-To: Sebastian Ene <sebastianene@google.com>
-Cc: catalin.marinas@arm.com, joey.gouly@arm.com, mark.rutland@arm.com, 
-	maz@kernel.org, oupton@kernel.org, rananta@google.com, 
-	Sascha.Bischoff@arm.com, suzuki.poulose@arm.com, will@kernel.org, 
-	kvmarm@lists.linux.dev, android-kvm@google.com, bgrzesik@google.com, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	nathan@kernel.org, perlarsen@google.com, seiden@linux.ibm.com, 
-	smostafa@google.com, tglx@kernel.org, vdonnefort@google.com, 
-	vladimir.murzin@arm.com, yuzenghui@huawei.com, zenghui.yu@linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260810205038.118843-1-weilin.chang@arm.com>
 
-Hi Seb,
+On Mon, Aug 10, 2026 at 09:50:32PM +0100, Wei-Lin Chang wrote:
+> Hi,
+> 
+> This is v5 of optimizing the shadow s2 mmu unmapping during MMU
+> notifiers.
 
-On Fri, 7 Aug 2026 at 17:43, Sebastian Ene <sebastianene@google.com> wrote:
-...
-> +static int __init register_its_emulated_region(void)
-> +{
-> +       struct device_node *np;
-> +       struct resource res;
-> +       int i = 0;
-> +       int ret;
-> +
-> +       for_each_compatible_node(np, NULL, "arm,gic-v3-its") {
-> +               ret = of_address_to_resource(np, 0, &res);
-> +               if (ret)
-> +                       goto out_fail;
+I did a more targetted test of this series in a (ad-hoc) way similar to
+pkvm_ownership_selftest(). I allocated and initialized an in kernel VM,
+its locks, 2 nested_mmus, and a memcache.
 
-its_of_probe() also requires of_device_is_available() and
-msi-controller, and its_init() goes to its_acpi_probe() when the
-fwnode isn't an OF node.
+By calling kvm_pgtable_stage2_map(), kvm_record_guest_s2_mapping()
+together I create mappings and track them, then
+kvm_nested_unmap_cipa_range() simulates mmu notifier unmaps, and
+kvm_stage2_unmap_range() simulates L1 TLBIs.
 
-So a disabled node has its region taken from the host here, and on
-ACPI nothing matches at all: num_protected_reg stays 0, this returns
-0, and pKVM finalises with the ITS unmediated. The two DT checks are
-plain property queries, so they work this early. What's the intent for
-ACPI?
+Combining these I tried a few scenarios:
 
-> +
-> +               if (i >= PKVM_PROTECTED_REGS_NUM) {
-> +                       kvm_err("Out of protected region slots\n");
-> +                       ret = -ENOSPC;
-> +                       goto out_fail;
-> +               }
+1. Mapping the same CIPA in two nested mmus, and checked that
+   unmapping the CIPA it removes both mappings, but keeps unrelated
+   mappings.
 
-Tested after of_address_to_resource(), so a bad resource on the ninth
-node comes back as that error rather than -ENOSPC. Could the bound
-come first?
+2. Mapping a block and a page to an overlapping CIPA region, checked
+   that unmapping the overlapping CIPA regions removes both mappings.
 
-> +               /*
-> +                * Note: don't unmap the entire animal from the host because devices need
-> +                * to be able to access GITS_TRANSLATER to raise MSIs. If the
-> +                * page where GITS_TRANSLATER is given to HYP, devices won't be
-> +                * able to map it in their IOMMU when the IOMMU is managed by
-> +                * pKVM.
-> +                */
-> +               kvm_nvhe_sym(pkvm_protected_regs)[i].pfn = PHYS_PFN(res.start);
-> +               kvm_nvhe_sym(pkvm_protected_regs)[i].cb =
-> +                       lm_alias(&kvm_nvhe_sym(its_emulate_forward_req));
-> +               kvm_nvhe_sym(pkvm_protected_regs)[i].nr_pages =
-> +                       PFN_DOWN(min_t(u64, resource_size(&res), PAGE_ALIGN_DOWN(GITS_TRANSLATER)));
+3. Unmapping CIPA of the last page of a block, checking that the block
+   is removed, but keeps unrelated mappings.
 
-I don't think the ITS likes to be called an animal :P, and the next
-sentence is missing a word after "If the page where GITS_TRANSLATER
-is".
+4. Unmapping a CIPA range that starts in an empty region, checking that
+   it finds and removes the mappings inside the range, keeps unrelated
+   mappings.
 
-nr_pages is 0 for a resource smaller than a page. Could that be rejected?
+5. First map NIPA -> CIPA1, unmap that NIPA, then create NIPA -> CIPA2,
+   and check that unmapping the CIPA1 leaves the new mapping alone.
 
-> +
-> +               i++;
-> +       }
-> +
-> +       kvm_nvhe_sym(num_protected_reg) = i;
-> +       return 0;
-> +out_fail:
+6. Creating multiple identical mappings, and checked unmapping the
+   CIPA once removes the mapping.
 
-num_protected_reg is set on the success path only, so out_fail leaves
-it disagreeing with the entries already written. Inert today, but
-could the failure path zero it?
+The dumped shadow page tables all contain the expected mappings.
 
-Cheers,
-/fuad
+Thanks,
+Wei-Lin Chang
 
-> +       of_node_put(np);
-> +       return ret;
-> +}
-> +
->  void __init kvm_hyp_reserve(void)
->  {
->         u64 hyp_mem_pages = 0;
-> @@ -57,6 +103,12 @@ void __init kvm_hyp_reserve(void)
->                 return;
->         }
->
-> +       ret = register_its_emulated_region();
-> +       if (ret) {
-> +               kvm_err("Failed to register ITS region %d\n", ret);
-> +               return;
-> +       }
-> +
->         hyp_mem_pages += hyp_s1_pgtable_pages();
->         hyp_mem_pages += host_s2_pgtable_pages();
->         hyp_mem_pages += hyp_vm_table_pages();
-> --
-> 2.55.0.654.g21b8a5bc05-goog
->
+[...]
