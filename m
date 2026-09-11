@@ -1,90 +1,146 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ABEE49B202
-	for <kvmarm@lists.linux.dev>; Fri, 11 Sep 2026 16:22:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2CE9412276
+	for <kvmarm@lists.linux.dev>; Fri, 11 Sep 2026 16:44:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789143746; cv=none; b=ASufdCzYRfkpMqRrtfbsU2tx9JQGyTExC4W+Ccz6Hq0toyj7QmEJUM7CAFWVio8jzK6RS15+G5Wzztek6eoeogU8EoD5vJnwV+FRUA3stsIP0IAeP4IiTqSAeBbi61xVnUUkHGFIGMAkynhvFGNsIyT1/CQcLHhlE5vePR5eNx8=
+	t=1789145077; cv=none; b=eDe2CdxQYpIA+Gns46cDze4eSkDVeurIyNkoL2HouiGm3//IYYAUuObYE7EYxsSaqxMa3OjlVz3BO39Ifec8ZXCAUptFjuqxE/MdLl/X/x5Mwl0OQzfBqeO1fV9MO89EeMElM05ASpfbL3Ql3HYj6I6jt6Ccmmb7WOzGXLVdbAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789143746; c=relaxed/simple;
-	bh=Qe9iO6FdrqH0CaHufZOikqJvB+dhH5J874bgXPrFihg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AywRVliuxGiUOrTksWYUS7d1dFB7EgfiGGWIbxvhr+pSCOcOvf+mhhSvKYUUUgniflS7gUQDb9naBV0HkyrOEZTlVwr41u8YuBmj84Ksje6ImcLDb4D02jWaB/ITKV9/PrjTXmwAFL07A9AHDnLmgnGcZaJZWiXtigUB4U29RYA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SNga7xVx; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789145077; c=relaxed/simple;
+	bh=GG+gENUehx7lVq77d77dljTyol9fcXFYdOX/hdIgCQc=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=hCUnPotq6bvPjJ7wfqfjTMa0PpNz67EQxM49LNLMfZyLiyBb00e1vNw3s273h2ECrCauNLZHc9aN36sYyiScyZlUcRgPjYohsganVPqXumtAvjwLJM+p/PFD4/4BvQ748Bb+MTZ7nnVEvv6TSJUhwxCh6UqV6/ZR/fE+V5qSLoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UxVfQZWg; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SNga7xVx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0EFDD1F000FF;
-	Fri, 11 Sep 2026 16:22:24 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UxVfQZWg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38F2D1F00893;
+	Fri, 11 Sep 2026 16:44:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789143744;
-	bh=RdS7Wqx1sTQW56FHfN0F8MYke0Taf2Z8VE/SYcQlAKc=;
-	h=From:To:Cc:Subject:Date;
-	b=SNga7xVxglS3nXkDS0oG9a8sdDEq628Iww2bOjbe1k8tBzz4iq02lwlTpSJCRoin1
-	 2jFalVbF1fNzrMeIhizlVb+oZJNZgUvxItMf/+8F7LVvE6F6l3grY1o8eZx7t32Q3C
-	 JbZoMA82MgADt7UalOCIPLZwya3BvjmD/ABEaqwJMJLHFqODHy5HDvPRHL77XcMi7q
-	 Bo7uxVevv0mJ8KZT3VhcaocvP8OxbIrNNTNzDoyPThxq/U6wVBWbE9F+ziG1QfwwA3
-	 5bp9cfcc/WMvZ+cZbqqyV1fvSfuInMboNcv1UveB/0Acoi+FN9Un7nyg8TUXtqwrAp
-	 i7XziZeujvKDQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1x5417-00000007qRK-43EP;
-	Fri, 11 Sep 2026 16:22:22 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org
-Cc: Steffen Eiden <seiden@linux.ibm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	ljs@kernel.org,
-	Shen Yongchao <grayhat@foxmail.com>,
-	Karl Mehltretter <kmehltretter@gmail.com>,
-	Wei-Lin Chang <weilin.chang@arm.com>
-Subject: [PATCH v4 0/2] KVM: arm64: nv: Shadow S2 life-cycle fixes
-Date: Fri, 11 Sep 2026 17:22:01 +0100
-Message-ID: <20260911162203.1919330-1-maz@kernel.org>
-X-Mailer: git-send-email 2.47.3
+	s=k20260515; t=1789145075;
+	bh=ZpL804/XyJJQ4oNEzf5aqTvhDPDVi/tS9LB/+zZ4T00=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=UxVfQZWgNZpRm+D9g2n7AcFhf35W9noiW0u+di8YCDujg3b5OuesihrdbqrVFPsq2
+	 hu/ovJsjaiLSHCK6pdRgwo/NwrAiz8YTvZ67PD+A03rbpMG4FCxQhvfBpWWVHSHxzg
+	 rHRHRs8sfTEaTh8HctBYchAnfhQl+0XI46wz5zBTKLQguclZoSVJooLDp7/Id85Hup
+	 P/R6XyZ36KtOEx4gGigIMEjHyuRi/D8m+9K91RmavNcgPHV+MPcODmr7X9Z2RTA5dj
+	 OpLF8dtngYcAPzgZSzzIHdBoGG4qBLsqf+dB/sFKbxn4gU2vAt5Jw7mJC4g4oZMNFI
+	 KTsUCT0Ndr5qA==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v4 1/2] KVM: arm64: nv: Fix life cycle of the
+ nested_mmus array
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Marc Zyngier" <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20260911162203.1919330-2-maz@kernel.org>
+References: <20260911162203.1919330-1-maz@kernel.org>
+ <20260911162203.1919330-2-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 11 Sep 2026 16:44:34 +0000
+Message-Id: <20260911164435.38F2D1F00893@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, fuad.tabba@linux.dev, ljs@kernel.org, grayhat@foxmail.com, kmehltretter@gmail.com, weilin.chang@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-7.3-rc2 has introduced annoying conflicts with this, so in the spirit
-of making things a bit easier for Oliver, here's the version rebased
-on -rc2!
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [High] Data race in `kvm_arch_flush_shadow_all()` leads to garbage pointe=
+r dereference and kernel panic
+--
 
-* From v3 [1]
+commit 87dd1db0613c9f0d7e10bf7593d998a853fa1c02
+Author: Marc Zyngier <maz@kernel.org>
 
-  - Fixed spacing (Wei-Lin)
+KVM: arm64: nv: Fix life cycle of the nested_mmus array
+   =20
+This commit alters the life cycle of the nested_mmus array to allocate
+an array of pointers at VM creation time. It avoids reallocation during
+VCPU_INIT by sizing the array to the absolute maximum KVM can handle.
 
-  - Rebased on 7.3-rc2
+Link: https://lore.kernel.org/r/20260803224405.41468-1-kmehltretter@gmail.c=
+om
 
-  - Collected RB from Lorenzo, with thanks.
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 3c4fc566eafc6..0a32d6bd3f6c6 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+[ ... ]
+> @@ -45,11 +45,15 @@ struct vncr_tlb {
+>   */
+>  #define S2_MMU_PER_VCPU		2
+> =20
+> -void kvm_init_nested(struct kvm *kvm)
+> +int kvm_init_nested(struct kvm *kvm)
+>  {
+> -	kvm->arch.nested_mmus =3D NULL;
+> +	kvm->arch.nested_mmus =3D kvmalloc_objs(struct kvm_s2_mmu *,
+> +					      KVM_MAX_VCPUS * S2_MMU_PER_VCPU,
+> +					      GFP_KERNEL_ACCOUNT);
 
-[1] https://lore.kernel.org/all/20260821161829.1032561-1-maz@kernel.org
+[Severity: High]
+Does this allocation leave the pointer array filled with uninitialized memo=
+ry?
+Using kvmalloc_objs() without GFP_ZERO or __GFP_ZERO (or instead of
+kvzalloc_objs()) means the array might contain garbage pointers rather than
+being safely zeroed out.
 
-Marc Zyngier (2):
-  KVM: arm64: nv: Fix life cycle of the nested_mmus array
-  KVM: arm64: nv: Delay freeing of shadow S2 structures until VM
-    destruction
+[ ... ]
+> +		guard(write_lock)(&kvm->mmu_lock);
+> =20
+> -		for (int i =3D 0; i < kvm->arch.nested_mmus_size; i++)
+> -			tmp[i].pgt->mmu =3D &tmp[i];
+> +		for (i =3D 0; i < S2_MMU_PER_VCPU; i++)
+> +			kvm->arch.nested_mmus[i + kvm->arch.nested_mmus_size] =3D &tmp[i];
+> =20
+> -		swap(kvm->arch.nested_mmus, tmp);
+> -
+> -		write_unlock(&kvm->mmu_lock);
+> -
+> -		kvfree(tmp);
+> -	}
+> +		kvm->arch.nested_mmus_size +=3D S2_MMU_PER_VCPU;
 
- arch/arm64/include/asm/kvm_host.h   |   2 +-
- arch/arm64/include/asm/kvm_nested.h |   3 +-
- arch/arm64/kvm/arm.c                |   8 ++-
- arch/arm64/kvm/nested.c             | 100 ++++++++++++++--------------
- 4 files changed, 58 insertions(+), 55 deletions(-)
+[Severity: High]
+Could a CPU or compiler reorder this size increment to be visible before
+the pointer stores are complete? This block updates the array and size
+without memory barriers to order them.
 
--- 
-2.47.3
+[ ... ]
+>  void kvm_arch_flush_shadow_all(struct kvm *kvm)
+>  {
+> -	int i;
+> -
+> -	for (i =3D 0; i < kvm->arch.nested_mmus_size; i++) {
+> -		struct kvm_s2_mmu *mmu =3D &kvm->arch.nested_mmus[i];
+> +	for (int i =3D kvm->arch.nested_mmus_size - 1; i >=3D 0; i--) {
+> +		struct kvm_s2_mmu *mmu =3D kvm->arch.nested_mmus[i];
+> =20
+>  		if (!WARN_ON(atomic_read(&mmu->refcnt)))
 
+[Severity: High]
+Can this lockless read of the array encounter a garbage pointer?
+
+If kvm_arch_flush_shadow_all() is called concurrently with
+kvm_vcpu_init_nested() (for example, if userspace calls KVM_ARM_VCPU_INIT
+while concurrently terminating the process and triggering
+mmu_notifier_release()), it might read the newly incremented
+nested_mmus_size before the actual pointers are stored.
+
+Because the initial array allocation in kvm_init_nested() used
+kvmalloc_objs() without zeroing, the unwritten slots contain uninitialized
+memory. Reading a garbage pointer and dereferencing it here in
+atomic_read() could allow an unprivileged userspace process to cause a
+kernel panic. Pre-patch, the array elements were safely zero-initialized.
+
+I notice a later patch in this series (Patch 2) removes the
+kvm->arch.nested_mmus_size =3D 0 assignment but retains this same lockless
+loop in kvm_arch_flush_shadow_all(), which appears to leave this garbage
+pointer dereference risk unfixed.
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260911162203.1919=
+330-1-maz@kernel.org?part=3D1
