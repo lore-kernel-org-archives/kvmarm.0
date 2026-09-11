@@ -1,292 +1,141 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 924C2469851;
-	Fri, 11 Sep 2026 13:58:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AB5D32824B
+	for <kvmarm@lists.linux.dev>; Fri, 11 Sep 2026 14:14:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789135095; cv=none; b=tzDINT69foKKsBDt0ZXAhOl5Rb7GfxJukEgo9odwE3k6nzKpKykO2vAgNxj30jHeYyfCNMj21NarXqRt9mW688EKUsEMlJHkGqbKyMa2eweTALcew+qI2ezTlCUM5HM0f+W+RrspdOGD+/GA+P7X++cRjkiQC09LsnWE4M4pv4Y=
+	t=1789136073; cv=none; b=lSODBjyveD5M2Cs18Rjzj/admaTJVpHo4n/+V73QsUlP2vkGw3q+azxM3q6kPwPJf974gfF6HzzHlQnndXVZERnZfEtdVpaA375f8jJ7woyfmwVveyT6QumZnb3scmRmqa/mWb/9iqsnw5sxDvTBZG/5vSiBM6878SsVzF2qt90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789135095; c=relaxed/simple;
-	bh=Uk1GS8ziLkD8S2++403lKlnQQiAiGPVJIOAKgNp0s50=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GEpYjE4qBVy8FQ0y9+49Pmm2INQgYmx+wZDOMl1m62i0uuZir57WxslECe/pv7wZUMYhkKCTl40ETMVzOY9ZDrrLFwzCUrYo6f2dZPwDoHq7Pf3ggBXY04fsXdlxq4cPrz9hqm318U7kbuNKAjodAzLSRQwwBFqLRVA5g4Lsvtg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WjD1gVyh; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789136073; c=relaxed/simple;
+	bh=pDUN6d9xf/0Ulv2yBbDG+SaBrY/qmiZW0EilfI6Nl14=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=mUsuiGDSe/NOkIL9yp+YMAz/pRH0PdJOYvOr/lTsNKBirJXQm6G2AEIzm6T5dMMOZXdRfLCKu2Gv1Ce2ASwTZ8WkNr3ojedBHvXd4R2JeuZn7XS8pJjUICXF6+9bXV2lj87M/huV62COnyK+zi4tAQq+D5VhFy14omL5q+tju2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DsdezBld; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WjD1gVyh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 195021F00893;
-	Fri, 11 Sep 2026 13:58:13 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DsdezBld"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CA051F008A2;
+	Fri, 11 Sep 2026 14:14:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789135093;
-	bh=k8TDycb2cS/6xQtixvmpSHORaLCfzdYrrBcbgqHOSmg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=WjD1gVyhyKYKOEMJBfQ9v4UnulTwdMNhNtmQFZ6hel2Vf5GHDyOAJgB0U9uzf/jY5
-	 0Wo4qt1PsLQUBpVMnbRjshD9V/Y17sXA1qaj6JfyPI9Qq4DFcTuEO8fRjocwLQYldb
-	 VKLi1+SSJHc7xxNIsey94sHrv6xD+6CPbuAA4B7abAtIWd9glp4LKyauGB83ZDZ9N3
-	 2mvNYY2kCucpjLYceFWlMbBbXoxT5eZW5v4k6rzNj4ujsMID0Q/m9xR4655X7hI247
-	 gpkpAE2Y/XGje4b8Ha8qPK/uepukWv7IEka9Di1mBXKS8hltooMdSrhcybdyg9XmW1
-	 lBG8Z9MgQp4MQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1x51la-00000007mhN-461L;
-	Fri, 11 Sep 2026 13:58:11 +0000
-Date: Fri, 11 Sep 2026 14:58:10 +0100
-Message-ID: <86ik4b7uvh.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Oliver Upton <oupton@kernel.org>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Quentin Perret <qperret@google.com>,
-	Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH v2 10/17] KVM: arm64: Prevent host PC adjustments for protected vCPUs
-In-Reply-To: <20260907070002.3333525-11-fuad.tabba@linux.dev>
-References: <20260907070002.3333525-1-fuad.tabba@linux.dev>
-	<20260907070002.3333525-11-fuad.tabba@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20260515; t=1789136071;
+	bh=uhiEkK7UzITRRpRszCuyQ+mu/5yUf0Hn7ecNX/FbbzA=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=DsdezBld4QdhYtI0rw3VHIj1QHQcEhxBm2Yslk/WjCHUqSR1IvaLnNzIoyae7JyLm
+	 NkBJNy/VGA44EqvWVOJqPJ52ctc96k3B1eNWI8bAP9F3DYXPGW2H0POC9jaK6wGQT0
+	 VW9wCJSMaSewmEAvWnigVjevTbnvfVNS5SDNWQWfnN5mvcN9qx2+EdCM1/F+EEoQ1m
+	 8X9v+Lmgrmzt/g4mRZSmu7Btencp/tNk0btVgwstyfpEXBv0tBDrbTVVGWYVqpSj6j
+	 OUUXkuHqN61x7luSjTr4Fxlm8gDYhX1zR45soFCri9ox/3Swj47ncsARP0KauKOgfm
+	 XKtD4pKOuzD/A==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v2 05/22] KVM: arm64: Make pKVM ownership selftest an
+ HVC
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Vincent Donnefort" <vdonnefort@google.com>
+Cc: "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>
+In-Reply-To: <20260911135053.146435-6-vdonnefort@google.com>
+References: <20260911135053.146435-1-vdonnefort@google.com>
+ <20260911135053.146435-6-vdonnefort@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 11 Sep 2026 14:14:31 +0000
+Message-Id: <20260911141431.9CA051F008A2@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, vdonnefort@google.com, qperret@google.com, tabba@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 07 Sep 2026 07:59:55 +0100,
-Fuad Tabba <fuad.tabba@linux.dev> wrote:
-> 
-> __kvm_adjust_pc() lets the host advance a vCPU's PC or inject an
-> exception, which for a protected vCPU would let the host redirect
-> guest execution. Drop the request there: the entry handlers apply the
-> host's PC_UPDATE_REQ on re-entry, where EL2 allows it.
-> 
-> For a non-protected vCPU, adjusting the hyp vCPU while
-> PKVM_HOST_STATE_DIRTY is set loses the update at the next flush and
-> the guest re-executes an emulated MMIO access, so the flag selects
-> which copy to adjust. Adjusting the hyp vCPU copies PC_UPDATE_REQ in
-> and back out again. Without the copy back, INCREMENT_PC outlives the
-> adjustment and the next KVM_SET_VCPU_EVENTS trips
-> WARN_ON(INCREMENT_PC) in kvm_pend_exception().
-> 
-> Unloaded, the host copy is host-writable, so pin it and its VM before
-> adjusting. Only commit_pending_events(), under KVM_SET_VCPU_EVENTS,
-> reaches EL2 with no hyp vCPU loaded. KVM_RUN's call always has one.
-> enter_exception64() reads the VM's MTE flag and a host copy's
-> vcpu->kvm is host-written, so __kvm_adjust_pc_vm() takes the VM as a
-> parameter: the pinned host struct kvm when unloaded, the hyp VM
-> otherwise.
-> 
-> Suggested-by: Marc Zyngier <maz@kernel.org>
-> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
-> ---
->  arch/arm64/include/asm/kvm_asm.h   |  1 +
->  arch/arm64/kvm/hyp/exception.c     | 27 ++++++++++-------
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 47 +++++++++++++++++++++++++++++-
->  3 files changed, 63 insertions(+), 12 deletions(-)
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+s) to consider:
+- [High] Exposing the pKVM ownership selftest as an HVC allows the untruste=
+d host to trigger an Out-Of-Bounds (OOB) write in hypervisor memory.
+- [Medium] Missing NULL check on `init_selftest_vm()` return value leads to=
+ an EL2 panic on malicious host input.
+--
 
-I keep coming to this patch because I really dislike how invasive it
-is. Suggestions below.
+commit 8fb13365545b2fb6e99ef459c949f368c81f9f88
+Author: Vincent Donnefort <vdonnefort@google.com>
 
-> 
-> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> index e5b92ac09e69e..d149afee7b4bd 100644
-> --- a/arch/arm64/include/asm/kvm_asm.h
-> +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -280,6 +280,7 @@ extern int __kvm_at_s12(struct kvm_vcpu *vcpu, u32 op, u64 vaddr);
->  extern int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
->  
->  extern void __kvm_adjust_pc(struct kvm_vcpu *vcpu);
-> +extern void __kvm_adjust_pc_vm(struct kvm_vcpu *vcpu, struct kvm *kvm);
->  
->  extern bool __vgic_v3_get_gic_config(void);
->  extern void __vgic_v3_init_lrs(void);
-> diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
-> index 754e2dc1df54a..bf9d8efce9984 100644
-> --- a/arch/arm64/kvm/hyp/exception.c
-> +++ b/arch/arm64/kvm/hyp/exception.c
-> @@ -66,8 +66,8 @@ static void __vcpu_write_spsr_und(struct kvm_vcpu *vcpu, u64 val)
->   * Here we manipulate the fields in order of the AArch64 SPSR_ELx layout, from
->   * MSB to LSB.
->   */
-> -static void enter_exception64(struct kvm_vcpu *vcpu, unsigned long target_mode,
-> -			      enum exception_type type)
-> +static void enter_exception64(struct kvm_vcpu *vcpu, struct kvm *kvm,
-> +			      unsigned long target_mode, enum exception_type type)
+KVM: arm64: Make pKVM ownership selftest an HVC
+
+In preparation for testing the pKVM ownership with huge mappings,
+refactor the selftest to be triggered via an HVC using dynamically
+allocated memory from the host. This avoids wasting memory which would
+be even worse for testing ownership transitions for huge stage-2
+mappings.
+
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/n=
+vhe/mem_protect.c
+> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> @@ -1748,24 +1748,36 @@ static void assert_page_state(void)
+[ ... ]
+> +int __pkvm_ownership_selftest(u64 pfn, u64 pgtable_pfn, unsigned long pg=
+table_nr_pages)
 >  {
->  	unsigned long sctlr, vbar, old, new, mode;
->  	u64 exc_offset;
-> @@ -109,7 +109,7 @@ static void enter_exception64(struct kvm_vcpu *vcpu, unsigned long target_mode,
->  	new |= (old & PSR_C_BIT);
->  	new |= (old & PSR_V_BIT);
->  
-> -	if (kvm_has_mte(kern_hyp_va(vcpu->kvm)))
-> +	if (kvm_has_mte(kvm))
->  		new |= PSR_TCO_BIT;
+[ ... ]
+> +	selftest_vcpu =3D vcpu =3D init_selftest_vm(hyp_phys_to_virt(hyp_pfn_to=
+_phys(pgtable_pfn)),
+> +						pgtable_nr_pages);
+>  	vm =3D pkvm_hyp_vcpu_to_hyp_vm(vcpu);
 
-So this is the sole reason why we need to access the kvm structure,
-and the cause for all of this churn. Can't this be written as some
-form of:
+[Severity: Medium]
+Is there a possibility of a NULL pointer dereference leading to an EL2 panic
+here? If the host issues the selftest HVC with pgtable_nr_pages set to 0,
+init_selftest_vm() evaluates seeded < min_pages as true and returns NULL.
+This NULL return is then unconditionally assigned to vcpu and immediately
+dereferenced in pkvm_hyp_vcpu_to_hyp_vm(vcpu).
 
-	kvm = vcpu_get_kvm(vcpu);
+Should there be a check on the return value of init_selftest_vm() before
+using it?
 
-	[do whatever is needed]
-
-	vcpu_put_kvm(vcpu, kvm);
-
-where get/put do the pinning/unpinning as required? These helpers
-would become NOPs on VHE, for example.
-
->  
->  	new |= (old & PSR_DIT_BIT);
-> @@ -294,7 +294,7 @@ static void enter_exception32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
->  	*vcpu_pc(vcpu) = vect_offset;
->  }
->  
-> -static void kvm_inject_exception(struct kvm_vcpu *vcpu)
-> +static void kvm_inject_exception(struct kvm_vcpu *vcpu, struct kvm *kvm)
+> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkv=
+m.c
+> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> @@ -762,7 +762,7 @@ static struct pkvm_hyp_vcpu selftest_vcpu =3D {
+[ ... ]
+> -struct pkvm_hyp_vcpu *init_selftest_vm(void *virt)
+> +struct pkvm_hyp_vcpu *init_selftest_vm(void *virt, u64 nr_pages)
 >  {
->  	if (vcpu_el1_is_32bit(vcpu)) {
->  		switch (vcpu_get_flag(vcpu, EXCEPT_MASK)) {
-> @@ -314,23 +314,23 @@ static void kvm_inject_exception(struct kvm_vcpu *vcpu)
->  	} else {
->  		switch (vcpu_get_flag(vcpu, EXCEPT_MASK)) {
->  		case unpack_vcpu_flag(EXCEPT_AA64_EL1_SYNC):
-> -			enter_exception64(vcpu, PSR_MODE_EL1h, except_type_sync);
-> +			enter_exception64(vcpu, kvm, PSR_MODE_EL1h, except_type_sync);
->  			break;
->  
->  		case unpack_vcpu_flag(EXCEPT_AA64_EL1_SERR):
-> -			enter_exception64(vcpu, PSR_MODE_EL1h, except_type_serror);
-> +			enter_exception64(vcpu, kvm, PSR_MODE_EL1h, except_type_serror);
->  			break;
->  
->  		case unpack_vcpu_flag(EXCEPT_AA64_EL2_SYNC):
-> -			enter_exception64(vcpu, PSR_MODE_EL2h, except_type_sync);
-> +			enter_exception64(vcpu, kvm, PSR_MODE_EL2h, except_type_sync);
->  			break;
->  
->  		case unpack_vcpu_flag(EXCEPT_AA64_EL2_IRQ):
-> -			enter_exception64(vcpu, PSR_MODE_EL2h, except_type_irq);
-> +			enter_exception64(vcpu, kvm, PSR_MODE_EL2h, except_type_irq);
->  			break;
->  
->  		case unpack_vcpu_flag(EXCEPT_AA64_EL2_SERR):
-> -			enter_exception64(vcpu, PSR_MODE_EL2h, except_type_serror);
-> +			enter_exception64(vcpu, kvm, PSR_MODE_EL2h, except_type_serror);
->  			break;
->  
->  		default:
-> @@ -348,10 +348,10 @@ static void kvm_inject_exception(struct kvm_vcpu *vcpu)
->   * Adjust the guest PC (and potentially exception state) depending on
->   * flags provided by the emulation code.
->   */
-> -void __kvm_adjust_pc(struct kvm_vcpu *vcpu)
-> +void __kvm_adjust_pc_vm(struct kvm_vcpu *vcpu, struct kvm *kvm)
+[ ... ]
+>  	selftest_vm.kvm.arch.pkvm.handle =3D __pkvm_reserve_vm();
+>  	insert_vm_table_entry(selftest_vm.kvm.arch.pkvm.handle, &selftest_vm);
+>  	return &selftest_vcpu;
+>  }
+> =20
+>  void teardown_selftest_vm(void)
 >  {
->  	if (vcpu_get_flag(vcpu, PENDING_EXCEPTION)) {
-> -		kvm_inject_exception(vcpu);
-> +		kvm_inject_exception(vcpu, kvm);
->  		vcpu_clear_flag(vcpu, PENDING_EXCEPTION);
->  		vcpu_clear_flag(vcpu, EXCEPT_MASK);
->  	} else if (vcpu_get_flag(vcpu, INCREMENT_PC)) {
-> @@ -359,3 +359,8 @@ void __kvm_adjust_pc(struct kvm_vcpu *vcpu)
->  		vcpu_clear_flag(vcpu, INCREMENT_PC);
->  	}
+> +	struct kvm_hyp_memcache *vcpu_mc =3D &selftest_vcpu.vcpu.arch.pkvm_memc=
+ache;
+> +	struct kvm_hyp_memcache mc =3D { 0 };
+> +
+> +	while (vcpu_mc->nr_pages)
+> +		hyp_put_page(&selftest_vm.pool, pop_hyp_memcache(vcpu_mc, hyp_phys_to_=
+virt));
+> +
+>  	hyp_spin_lock(&vm_table_lock);
+>  	remove_vm_table_entry(selftest_vm.kvm.arch.pkvm.handle);
+
+[Severity: High]
+Can this sequence cause an out-of-bounds write in hypervisor memory?
+
+If the host calls the __pkvm_ownership_selftest HVC when the VM table is
+full, __pkvm_reserve_vm() fails and returns -ENOMEM. In init_selftest_vm(),
+this negative error code is assigned blindly to the handle.
+
+While insert_vm_table_entry() safely rejects the negative handle,
+teardown_selftest_vm() unconditionally calls remove_vm_table_entry()
+with it. Inside remove_vm_table_entry(), vm_handle_to_idx() converts
+the negative handle into a massive 32-bit unsigned index without bounds
+checking, resulting in an out-of-bounds write when vm_table[idx] =3D NULL
+executes.
+
+>  	hyp_spin_unlock(&vm_table_lock);
+> +
+> +	reclaim_pgtable_pages(&selftest_vm, &mc);
 >  }
-> +
-> +void __kvm_adjust_pc(struct kvm_vcpu *vcpu)
-> +{
-> +	__kvm_adjust_pc_vm(vcpu, kern_hyp_va(vcpu->kvm));
-> +}
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> index 051c2d95e3b7d..1a3f23e90e563 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -640,11 +640,56 @@ static void handle___pkvm_host_mkyoung_guest(struct kvm_cpu_context *host_ctxt)
->  	cpu_reg(host_ctxt, 1) =  ret;
->  }
->  
-> +static void adjust_pc_loaded(struct pkvm_hyp_vcpu *hyp_vcpu,
-> +			     struct kvm_vcpu *host_vcpu)
-> +{
-> +	/*
-> +	 * PKVM_HOST_STATE_DIRTY names the authoritative copy: the host's
-> +	 * when set, the hyp vCPU's otherwise. Adjust that one.
-> +	 */
-> +	if (vcpu_get_flag(host_vcpu, PKVM_HOST_STATE_DIRTY)) {
-> +		__kvm_adjust_pc_vm(host_vcpu, hyp_vcpu->vcpu.kvm);
-> +		return;
-> +	}
-> +
-> +	/* Reflect the consumed request back, otherwise it stays pending. */
-> +	vcpu_copy_flag(&hyp_vcpu->vcpu, host_vcpu, PC_UPDATE_REQ);
-> +	__kvm_adjust_pc(&hyp_vcpu->vcpu);
-> +	vcpu_copy_flag(host_vcpu, &hyp_vcpu->vcpu, PC_UPDATE_REQ);
 
-And this stuff could simply be a similar set of helpers in
-__kvm_adjust_pc(), the original one.
-
-> +}
-> +
-> +static void adjust_pc_unloaded(struct kvm_vcpu *host_vcpu)
-> +{
-> +	struct kvm *host_kvm;
-> +
-> +	if (!is_protected_kvm_enabled()) {
-> +		__kvm_adjust_pc(host_vcpu);
-> +		return;
-> +	}
-> +
-> +	/* The host copy is authoritative, used only while pinned. */
-> +	if (hyp_pin_shared_mem(host_vcpu, host_vcpu + 1))
-> +		return;
-
-Huh. Really?
-
-> +
-> +	host_kvm = kern_hyp_va(READ_ONCE(host_vcpu->kvm));
-> +	if (!hyp_pin_shared_mem(host_kvm, host_kvm + 1)) {
-> +		__kvm_adjust_pc_vm(host_vcpu, host_kvm);
-> +		hyp_unpin_shared_mem(host_kvm, host_kvm + 1);
-> +	}
-> +	hyp_unpin_shared_mem(host_vcpu, host_vcpu + 1);
-> +}
-> +
->  static void handle___kvm_adjust_pc(struct kvm_cpu_context *host_ctxt)
->  {
->  	DECLARE_REG(struct kvm_vcpu *, vcpu, host_ctxt, 1);
-> +	struct pkvm_hyp_vcpu *hyp_vcpu;
-> +	struct kvm_vcpu *host_vcpu;
->  
-> -	__kvm_adjust_pc(kern_hyp_va(vcpu));
-> +	host_vcpu = __get_host_hyp_vcpus(vcpu, &hyp_vcpu);
-> +	if (!hyp_vcpu)
-> +		adjust_pc_unloaded(kern_hyp_va(vcpu));
-> +	else if (!pkvm_hyp_vcpu_is_protected(hyp_vcpu))
-> +		adjust_pc_loaded(hyp_vcpu, host_vcpu);
->  }
->  
->  static void handle___kvm_flush_vm_context(struct kvm_cpu_context *host_ctxt)
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260911135053.1464=
+35-1-vdonnefort@google.com?part=3D5
