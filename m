@@ -1,202 +1,317 @@
-Received: from mail-oo2-f43.google.com (mail-oo2-f43.google.com [74.125.231.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E542B36E494
-	for <kvmarm@lists.linux.dev>; Fri, 11 Sep 2026 15:06:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.231.171
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789139171; cv=pass; b=icmdVQ0zhkQITi0rrrH20UfT5OLWLpUZOY//tfi0/Ugm0gMXrSuXr1CvQGcFZs1gRrK/eusZDTLP5fWFe1M9aQyY04aNTznyIVys/Sb13jk3qhI9z7uSfKGPzfXAxL4YJ6M888pUBhavC4FgbH5xxztZK3qahwY+JRMdu6qtwEE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789139171; c=relaxed/simple;
-	bh=31WGPI9CsS8AEb1QmZigfY8oBbhGb6+EPuGPGJKusUg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KfXRe5i9D+a+NM8wy3Qo9yLwraHEXmU5p09oGte36MpD0G1hLtTq9CICsfR9/8AANZVfHNWqW8s1Vza8EYSrKrnq0CbwUC8C5HLhQiNB1DlStVVxp5p9lQiFrrj/VTw6TqNbe8nEosC8kmLUo4MN0bugjrNrhYZ64m5H0fw32Hc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QYxdXNkM; arc=pass smtp.client-ip=74.125.231.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9895C369224;
+	Fri, 11 Sep 2026 15:27:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1789140427; cv=none; b=Xk/zAnKiYS0D+yxBWo5Kdx35GivxREsjs3zQ37C/ULvwQZgcb/d5qM0tdozSFO7lGyNSd2lTG1GvXNS0KRKBL8FStD2Yny6VtOh6U+LQfC1BbQM4Y2Rm9G6WYV9ydxqFpv8fFLhoZm6qeySp4KbFBsKDBK9Wnhi3fgASQBhdN80=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1789140427; c=relaxed/simple;
+	bh=5wypFqaLIJ3bRjeanmxcnt+OPl9YjifcfeYAa2y/Qy0=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ccKnq2rXvWClubyfDDa9mH0NDHD1GqcPN8ghGDzjX38OjZtlzkDbXtSkyFVLJOOBxth9sJdGqd8rTnpS0CYIDT6dcSqqYWf9zH2dnSKFSK8LAgtlnNv1biE6ipyJz3TuIvmRyQBs4KBh/R5whjFK+xtnnFvTdxl4IrUnlKmCykU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=agMogg7M; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QYxdXNkM"
-Received: by mail-oo2-f43.google.com with SMTP id 006d021491bc7-6b1ae6f5fc7so647604eaf.3
-        for <kvmarm@lists.linux.dev>; Fri, 11 Sep 2026 08:06:09 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1789139169; cv=none;
-        d=google.com; s=arc-20260327;
-        b=S818MJazc5OKE9ShSxfG6IfLOPox29A1HwWkkoEghsPwsxEGi1NSbB5dAHUpyGK5SO
-         hLoPjhXUEeh8QBZNEaUNRPTrCcRB4jmd2ukUl+DEyYnmzX8ICRHC5ex4OllPqu/Ensis
-         VWnPHh/tQtQ8n652VXOAmPCeOr0+i7ZwWVzS70RhBFSOmPHimpMycMn+vgx3ShuZ4WdU
-         ZyZChX5MIjawguKnewDUa6oK89hELIVPntRyroOqzkjF2O0vhy3MpcHsW0UpolZvDVUW
-         XCBZW4Cr8WPTWiT88HsLUnZB0cuSjG0RvzDL6i+tAO864Hz3u4ltg2XNKM9bzDlVjaci
-         xgOw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=31WGPI9CsS8AEb1QmZigfY8oBbhGb6+EPuGPGJKusUg=;
-        fh=bMg6cc1NUAv8rndVqwLFkhBL4sLEo+mxhip4IxEw/n8=;
-        b=UE3X2rGI+a7GDvqK7ba3A5C2TnLOp36gM+qicw26JYVxxuLYi4pjSSJSlg2vgbFOZp
-         LXYl6lefsK8/dr65pDvfWG0p6SYv34fApgRiEsLPk2Fjlb/xATa/+diUF6mmeklkh1ZC
-         KnaqZTDoNMD5cbaKOSPDIYFRmQLavW48u8AaI1EftUI3zmBbVoRLYt5XOgh2PHhm7XV6
-         7SWIxGjMaO2+g1tTMZtoCeHtV+vOwNTEuWmmAQ13PkFgdThUfS41wmnMZd0vU7ps8vQk
-         k9W3HB8K2pNsy6Fl9+50B+k7a89LUoR9WcY60NU3s/04L1a7AgCuddBGtQ2ksQ/+QAwV
-         hlZw==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789139169; x=1789743969; darn=lists.linux.dev;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=31WGPI9CsS8AEb1QmZigfY8oBbhGb6+EPuGPGJKusUg=;
-        b=QYxdXNkMIAcDjt4CItin7wMy9XEt8NlVgFOT9uCVQnD7dM2WCRgl4hWO3xcNjoGeXC
-         g8RiKQN7MF8y4ZhajB+7H0DORIau+/auuWiIqsUkk2YRq9b2tGasF7jrXFeu1GGh+vtK
-         hCCFIkc3zkmOcrHnp3SEZxUYVoAjeBaiVpBJXe6Nlqov37s9XveT4OWyKLoBluDSqiFM
-         v5WPzEI/dDi7oPiLXvmwWW1LIE8PFpGPME8iLmNnHZfW5Vdm0eM80ov9K8ej3rwhiS7w
-         9h/sMDEHXTLoYITMsyoiQYDR/EQ6xpLpNrBKp2n0Eopa2ueF45dMly6ZhmDd58uBkm9Q
-         TTdg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789139169; x=1789743969;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=31WGPI9CsS8AEb1QmZigfY8oBbhGb6+EPuGPGJKusUg=;
-        b=akJQbj6h4DFRH6w83eJ4324J2xs5V4ebUXxG33GA/zkDWKKGDUh7TivwgTSsQLRrHa
-         dP91z8Zs04ze2y/img7B0yvwjbzkAcE32RYP8+HXgL+vj6zIdGqpBxG/FnteZl+/hzb6
-         oasXE/esywx605Hr1IhYdKqDaAmgryJyPbpCP1aA7+b3xOf6W1aX55KKMSXkJ9axM+pW
-         LqkqOF1jqOsWk84AymdvmVte+dcfngq4kn7UbuxcTPWRRa2bQazGrmMLleRSTdLZWkUC
-         J3RnVtj5pBQzouayB9bHeIri195qIqsFZheZjE/zASSCrfSZb4ut/C/JiA9joN4ly389
-         bq2A==
-X-Forwarded-Encrypted: i=1; AKwUvBzpdYW627vcRqdyF93LYT2A/J9t4x+nrI3+NnRXyRyHFcVOl8VR/GQhfHCGqJUg99Fn5+oEG2c=@lists.linux.dev
-X-Gm-Message-State: AFuF++mFVP/dcty15NoQq3AOK5cfOe5uIc5S79yb+EMFypPVSdLT2zoY
-	GPygXmGnEugJUc8tNhEhFW+XehNyxdU/PXIsJe2CHi2FHfuW6qyZPBYf9mAT9gzW3ZM+qCrvXpk
-	2wwUxC0nfq5lv0Vwswjb/n4/afN+lv9w=
-X-Gm-Gg: AYBFou19r+pRLPZrvHJTlO84ZCIqQDmw4d3GlhY37ePyHiUGDe1lb2tCX8RcmAMPY9N
-	5c9QXbLB4duUrnUKC2xm2fxld0q3HjRULn14UMpE9on7KmbAJaosu1c1uw5vauiHZJ4XtPZJagW
-	RP0tNfogqjS0wQ5toTwXmHNaGEmsBuZUHTv8XX9sCkK0iX00/JZ4YNs2awiyz9vs4ZeibUwjk8W
-	D4vP3TjkijKhQiVAIT0BDn1sntgzFbqHy9HryjLzAQxxiMX6bB8a8ZualsQ9cEENOYvy5h5Zk1S
-	cCGUFACHeBWPqTQLeS4Zh0kv+/j46PeCzNkDzH48BBJNRQ9wRqM9wZU=
-X-Received: by 2002:a05:6820:8585:20b0:6b1:be9f:ce6c with SMTP id
- 006d021491bc7-6c0b9d4e35dmr4967721eaf.4.1789139168581; Fri, 11 Sep 2026
- 08:06:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="agMogg7M"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B92A1F000FF;
+	Fri, 11 Sep 2026 15:27:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789140425;
+	bh=dL5SIEsYkL5CFvwQMkla31xLNVufHe8l4HQ4/Pcc7zE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=agMogg7MfwE6qQ+hq1iJshNCB1YrISD9q+Xy8K8HxRCjrJ0szmZjoDYNFODVMnW4+
+	 GMbyqli2WHZJOyRSEiXb6zMLnfw318oPj2C20GU4HuQP9i0KVdc9WYACfa9qfLN8GA
+	 wovSL8neofGZ6d76PawnIDdKHOdlQyMWQA7UFCL4frFJQZ2LGQxpKoofh+ZkgN5+sg
+	 SlhL9ITp/qb3mDs2QrXyx9OHVX6JM/tlmRMZr67pEvvhhTG+04sAdJU45vqiQjKHqd
+	 +GE7M9+x+EL5iTJzZq81pNnu8aPqGBTMqROfNZXnMoolXtRvC2r5yiX8PB2K4y0W67
+	 +SqV6khmMSqeA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1x539b-00000007p44-0ROi;
+	Fri, 11 Sep 2026 15:27:03 +0000
+Date: Fri, 11 Sep 2026 16:27:02 +0100
+Message-ID: <86h5jv7qrd.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Wei-Lin Chang <weilin.chang@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Lorenzo Stoakes <ljs@kernel.org>,
+	Itaru Kitayama <itaru.kitayama@fujitsu.com>
+Subject: Re: [PATCH v5 2/6] KVM: arm64: nv: Introduce guest stage-2 tracking structures
+In-Reply-To: <w4kihqs6n7ja7nr4sn3i2r4o2mspwj7k36w2fkh4kheizr6oj3@wfsea5mhnto6>
+References: <20260810205038.118843-1-weilin.chang@arm.com>
+	<20260810205038.118843-3-weilin.chang@arm.com>
+	<87mrtu4c21.wl-maz@kernel.org>
+	<w4kihqs6n7ja7nr4sn3i2r4o2mspwj7k36w2fkh4kheizr6oj3@wfsea5mhnto6>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20260908-b4-mmap-prepare-vma-flag-sanify-v1-0-dacf19cce22b@kernel.org>
- <20260908-b4-mmap-prepare-vma-flag-sanify-v1-11-dacf19cce22b@kernel.org>
- <CAEjxPJ7hXSi=oLtQPV+7GEvN+txfYwZ-u-v_EysNHM0gSGNrCw@mail.gmail.com> <aqPUqU3eZeFrykj3@gremlin>
-In-Reply-To: <aqPUqU3eZeFrykj3@gremlin>
-From: Stephen Smalley <stephen.smalley.work@gmail.com>
-Date: Fri, 11 Sep 2026 11:05:57 -0400
-X-Gm-Features: AcwNN1UL9TCHStClpz4OqpdpVCOHFGRlTtL1ELl-GfcxGBMtPjfBSuHNlaSY27Y
-Message-ID: <CAEjxPJ6P19eKF-c+mm2BSr5_WpmhMTZjjUfSamv3SfOPO4SGVw@mail.gmail.com>
-Subject: Re: [PATCH 11/39] selinux: reject writable opens of policy file, drop
- mmap shared/write check
-To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, "Liam R. Howlett" <liam@infradead.org>, 
-	Vlastimil Babka <vbabka@kernel.org>, Jann Horn <jannh@google.com>, Pedro Falcato <pfalcato@suse.de>, 
-	David Hildenbrand <david@kernel.org>, Mike Rapoport <rppt@kernel.org>, 
-	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Leon Romanovsky <leon@kernel.org>, Paul Moore <paul@paul-moore.com>, Jaroslav Kysela <perex@perex.cz>, 
-	Takashi Iwai <tiwai@suse.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Zi Yan <ziy@nvidia.com>, 
-	Baolin Wang <baolin.wang@linux.alibaba.com>, Nico Pache <nico.pache@linux.dev>, 
-	Ryan Roberts <ryan.roberts@arm.com>, Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>, 
-	Lance Yang <lance.yang@linux.dev>, Usama Arif <usama.arif@linux.dev>, 
-	Kiryl Shutsemau <kas@kernel.org>, Doug Gilbert <dgilbert@interlog.com>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
-	"Martin K. Petersen" <mkp@kernel.org>, Jaya Kumar <jayalk@intworks.biz>, Simona Vetter <simona@ffwll.ch>, 
-	Helge Deller <deller@gmx.de>, Sebastian Reichel <sre@kernel.org>, John Hubbard <jhubbard@nvidia.com>, 
-	Peter Xu <peterx@redhat.com>, Masami Hiramatsu <mhiramat@kernel.org>, Oleg Nesterov <oleg@redhat.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Rik van Riel <riel@surriel.com>, Harry Yoo <harry@kernel.org>, 
-	Juri Lelli <juri.lelli@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>, 
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
-	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Will Deacon <will@kernel.org>, 
-	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Nick Piggin <npiggin@gmail.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Muchun Song <muchun.song@linux.dev>, 
-	Oscar Salvador <osalvador@suse.de>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, Jan Kara <jack@suse.cz>, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, 
-	Vasily Gorbik <gor@linux.ibm.com>, "David S. Miller" <davem@davemloft.net>, 
-	Andreas Larsson <andreas@gaisler.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, Matthew Brost <matthew.brost@intel.com>, 
-	Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>, 
-	Byungchul Park <byungchul@sk.com>, Gregory Price <gourry@gourry.net>, 
-	Ying Huang <ying.huang@linux.alibaba.com>, Alistair Popple <apopple@nvidia.com>, 
-	Chris Li <chrisl@kernel.org>, Kairui Song <kasong@tencent.com>, 
-	Kemeng Shi <shikemeng@huaweicloud.com>, Nhat Pham <nphamcs@gmail.com>, 
-	Baoquan He <baoquan.he@linux.dev>, Youngjun Park <youngjun.park@lge.com>, 
-	Johannes Weiner <hannes@cmpxchg.org>, Qi Zheng <qi.zheng@linux.dev>, 
-	Shakeel Butt <shakeel.butt@linux.dev>, Axel Rasmussen <axelrasmussen@google.com>, 
-	Yuanchu Xie <yuanchu@google.com>, Wei Xu <weixugc@google.com>, Xu Xin <xu.xin16@zte.com.cn>, 
-	Chengming Zhou <chengming.zhou@linux.dev>, Michal Hocko <mhocko@kernel.org>, 
-	Miklos Szeredi <miklos@szeredi.hu>, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-usb@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, selinux@vger.kernel.org, 
-	linux-sound@vger.kernel.org, bpf@vger.kernel.org, linux-scsi@vger.kernel.org, 
-	linux-fbdev@vger.kernel.org, dri-devel@lists.freedesktop.org, 
-	linux-trace-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, 
-	linux-arch@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-s390@vger.kernel.org, sparclinux@vger.kernel.org, 
-	fuse-devel@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: weilin.chang@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, oupton@kernel.org, tabba@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, ljs@kernel.org, itaru.kitayama@fujitsu.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Sep 11, 2026 at 6:16=E2=80=AFAM Lorenzo Stoakes (ARM) <ljs@kernel.o=
-rg> wrote:
->
-> On Thu, Sep 10, 2026 at 02:11:18PM -0400, Stephen Smalley wrote:
-> > On Tue, Sep 8, 2026 at 4:07=E2=80=AFPM Lorenzo Stoakes (ARM) <ljs@kerne=
-l.org> wrote:
-> > >
-> > > The policy file has no write method and is exposed read-only (S_IRUGO=
- in
-> > > selinux_files[]), yet sel_open_policy() performs no open mode check, =
-so a
-> > > CAP_DAC_OVERRIDE caller can open it O_RDWR. Reject FMODE_WRITE at ope=
-n, as
-> > > kernfs does.
-> > >
-> > > The file can then never be mapped with FMODE_WRITE, so do_mmap() alwa=
-ys
-> > > clears VM_MAYWRITE and VM_SHARED for MAP_SHARED mappings and the VM_S=
-HARED
-> > > check in sel_mmap_policy() cannot be reached. Remove it.
-> > >
-> > > This also stops sel_mmap_policy() clearing VM_MAYWRITE on a mapping t=
-hat is
-> > > neither a PFN map nor a mixed map, ahead of the core enforcing that o=
-nly
-> > > such mappings may do so.
-> > >
-> > > Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
-> >
-> > We should likely do something similar for the other sel_open_*() and
-> > sel_mmap_*() functions too.
-> > In particular, truncation of the status file can bring down systemd
-> > since it is mapped by libselinux.
->
-> Yeah I think there's definitely more that can be done there.
->
-> Though I think obviously that kind of stuff is better as a follow up as t=
-his
-> patch is focused on eliminating a case where VMA_MAYWRITE_BIT is cleared
-> incorrectly.
+On Sun, 06 Sep 2026 20:56:34 +0100,
+Wei-Lin Chang <weilin.chang@arm.com> wrote:
+>=20
+> On Sun, Sep 06, 2026 at 04:47:02PM +0100, Marc Zyngier wrote:
+>=20
+> [...]
+>=20
+> > > +/*
+> > > + * Record of a guest stage-2 mapping, storing canonical and nested I=
+PA
+> > > + * ranges. Both ranges have the same size.
+> > > + */
+> > > +struct kvm_guest_s2_mapping {
+> > > +	struct interval_tree_node canonical;
+> > > +	struct interval_tree_node nested;
+> > > +	struct kvm_s2_mmu *nested_mmu;
+> > > +};
+> > > +
+> >=20
+> > I'm trying hard to find a way to reduce the size of this structure,
+> > because this is IMO the only real problem with this approach.
+> >=20
+> > Obviously, the only thing we could kill is this nested_mmu field, as
+> > everything else is used by the interval trees. I can see two ugly ways
+> > to do that:
+> >=20
+> > - either we iterate over all shadow MMUs to find the corresponding
+> >   'nested' node: really costly if we have a lot of mappings and/or a
+> >   lot of shadow MMUs
+> >=20
+> > - or we steal bits from the interval_tree_node to encode extra
+> >   information. One realisation is that all addresses are PAGE_SIZE
+> >   aligned, meaning that we have at least 12 bits that are always 0. We
+> >   could, for example, encode an index in the bottom bits of the
+> >   nested.start field. Probably easy enough, but may require some
+> >   careful masking (and the addition of an index in the s2_mmu
+> >   structure).
+> >=20
+> > The result would be significant, as we could then use a 96 byte slab,
+> > which means the cost of a 1GB @4k granularity could fall to 24MB.
+>=20
+> One way of meeting in the middle is to keep the nested_mmu pointer, and
+> use a dedicated kmem cache. That cache will then hand out exact 104-byte
+> objects.
+>=20
+> That's 26MB for 1GB @4K.
+>=20
+> This is a nice improvement from the current 128-byte allocations.
+> Although it's not as good as 96-byte allocations, the code logic can
+> remain simple. Would you take this approach?
 
-Agreed, posted one for the status handlers at:
-https://lore.kernel.org/selinux/20260911145840.19039-2-stephen.smalley.work=
-@gmail.com/
+I don't think the logic has to be complicated to go all the way to 96
+bytes, see the patch below. I hope we can further trim it over time,
+but this would be a good start.
+
+Thanks,
+
+	M.
+
+
+=46rom 39e3bdaa1b02c460a1001a23a20dccca5501eb6d Mon Sep 17 00:00:00 2001
+From: Marc Zyngier <maz@kernel.org>
+Date: Tue, 8 Sep 2026 17:07:50 +0100
+Subject: [PATCH] KVM: arm64: Drop kvm_s2_mmu pointer from kvm_guest_s2_mapp=
+ing
+
+As it appears that the kvm_guest_s2_mapping structure is quite large,
+and results in a 128 byte slab allocation, there is some insentive
+to shrink a bit.
+
+For this, replace the S2 MMU back-pointer with an index tucked into
+the low bits of the nested.start field. This allows us to shrink
+the structure by 8 bytes, and therefore to fit in a 96 byte slab.
+
+The index is also stored in the S2 MMU structure itself, which
+comes for free as it fits in an existing hole. The structure is
+also repacked to avoid other disgracious holes.
+
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/include/asm/kvm_host.h | 16 ++++++-----
+ arch/arm64/kvm/nested.c           | 44 +++++++++++++++++++++++++------
+ 2 files changed, 45 insertions(+), 15 deletions(-)
+
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm=
+_host.h
+index f12883a420817..4b3fc4d4a61f2 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -158,7 +158,6 @@ struct kvm_vmid {
+ struct kvm_guest_s2_mapping {
+ 	struct interval_tree_node canonical;
+ 	struct interval_tree_node nested;
+-	struct kvm_s2_mmu *nested_mmu;
+ };
+=20
+ struct kvm_s2_mmu {
+@@ -222,30 +221,33 @@ struct kvm_s2_mmu {
+ 	u64	tlb_vttbr;
+ 	u64	tlb_vtcr;
+=20
++	/* Guest s2 mapping records indexed in this MMU's IPA space. */
++	struct rb_root_cached guest_s2_mappings;
++
+ 	/*
+ 	 * true when this represents a nested context where virtual
+ 	 * HCR_EL2.VM =3D=3D 1
+ 	 */
+ 	bool	nested_stage2_enabled;
+=20
+-#ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
+-	struct dentry *shadow_pt_debugfs_dentry;
+-#endif
+-
+ 	/*
+ 	 * true when this MMU needs to be unmapped before being used for a new
+ 	 * purpose.
+ 	 */
+ 	bool	pending_unmap;
+=20
+-	/* Guest s2 mapping records indexed in this MMU's IPA space. */
+-	struct rb_root_cached guest_s2_mappings;
++	/* Index in the S2 MMU array, only valid for a shadow S2 */
++	u16	s2_mmu_idx;
+=20
+ 	/*
+ 	 *  0: Nobody is currently using this, check vttbr for validity
+ 	 * >0: Somebody is actively using this.
+ 	 */
+ 	atomic_t refcnt;
++
++#ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
++	struct dentry *shadow_pt_debugfs_dentry;
++#endif
+ };
+=20
+ struct kvm_arch_memory_slot {
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index e0941a261787c..540e52db9f180 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -45,11 +45,12 @@ struct vncr_tlb {
+  * will invalidate them more often).
+  */
+ #define S2_MMU_PER_VCPU		2
++#define S2_MMU_PER_VM		(KVM_MAX_VCPUS * S2_MMU_PER_VCPU)
+=20
+ int kvm_init_nested(struct kvm *kvm)
+ {
+ 	kvm->arch.nested_mmus =3D kvmalloc_objs(struct kvm_s2_mmu *,
+-					      KVM_MAX_VCPUS * S2_MMU_PER_VCPU,
++					      S2_MMU_PER_VM,
+ 					      GFP_KERNEL_ACCOUNT);
+ 	kvm->arch.nested_mmus_size =3D 0;
+ 	atomic_set(&kvm->arch.vncr_tlb_count, 0);
+@@ -128,8 +129,10 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
+=20
+ 		guard(write_lock)(&kvm->mmu_lock);
+=20
+-		for (i =3D 0; i < S2_MMU_PER_VCPU; i++)
++		for (i =3D 0; i < S2_MMU_PER_VCPU; i++) {
++			tmp[i].s2_mmu_idx =3D i + kvm->arch.nested_mmus_size;
+ 			kvm->arch.nested_mmus[i + kvm->arch.nested_mmus_size] =3D &tmp[i];
++		}
+=20
+ 		kvm->arch.nested_mmus_size +=3D S2_MMU_PER_VCPU;
+ 	}
+@@ -873,6 +876,27 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm=
+_vcpu *vcpu)
+ 	return s2_mmu;
+ }
+=20
++#define S2_MMU_IDX_MASK	GENMASK_ULL(const_ilog2(S2_MMU_PER_VM) - 1, 0)
++
++static void tag_s2_mapping_mmu(struct kvm_guest_s2_mapping *mapping,
++			       struct kvm_s2_mmu *mmu)
++{
++	BUILD_BUG_ON(const_ilog2(S2_MMU_PER_VM) >=3D 12);
++	mapping->nested.start &=3D ~S2_MMU_IDX_MASK;
++	mapping->nested.start |=3D mmu->s2_mmu_idx;
++}
++
++static struct kvm_s2_mmu *s2_mapping_to_mmu(struct kvm *kvm,
++					    struct kvm_guest_s2_mapping *mapping)
++{
++	return kvm->arch.nested_mmus[mapping->nested.start & S2_MMU_IDX_MASK];
++}
++
++static unsigned long s2_mapping_to_nested_start(struct kvm_guest_s2_mappin=
+g *mapping)
++{
++	return mapping->nested.start & ~S2_MMU_IDX_MASK;
++}
++
+ void kvm_record_guest_s2_mapping(struct kvm_s2_mmu *mmu, gpa_t canonical_i=
+pa,
+ 				 gpa_t nested_ipa, size_t map_size,
+ 				 struct kvm_guest_s2_mapping *mapping)
+@@ -890,7 +914,7 @@ void kvm_record_guest_s2_mapping(struct kvm_s2_mmu *mmu=
+, gpa_t canonical_ipa,
+ 	mapping->nested.start    =3D nested_ipa;
+ 	mapping->nested.last     =3D nested_ipa + map_size - 1;
+=20
+-	mapping->nested_mmu      =3D mmu;
++	tag_s2_mapping_mmu(mapping, mmu);
+=20
+ 	guard(spinlock)(&kvm->arch.guest_s2_tracking_lock);
+ 	interval_tree_insert(&mapping->nested, &mmu->guest_s2_mappings);
+@@ -1357,17 +1381,21 @@ void kvm_nested_unmap_cipa_range(struct kvm *kvm, g=
+pa_t cipa, size_t unmap_size,
+=20
+ 	while ((node =3D interval_tree_iter_first(&kvm->arch.mmu.guest_s2_mapping=
+s,
+ 						cipa, cipa_end))) {
++		unsigned long nested_start;
++		struct kvm_s2_mmu *mmu;
++
+ 		mapping =3D container_of(node, struct kvm_guest_s2_mapping,
+ 				       canonical);
+-		mapping_size =3D mapping->nested.last - mapping->nested.start + 1;
++		nested_start =3D s2_mapping_to_nested_start(mapping);
++		mmu =3D s2_mapping_to_mmu(kvm, mapping);
+=20
+-		if (WARN_ON_ONCE(kvm_pgtable_stage2_unmap(mapping->nested_mmu->pgt,
+-							  mapping->nested.start,
+-							  mapping_size)))
++		mapping_size =3D mapping->nested.last - nested_start + 1;
++
++		if (WARN_ON_ONCE(kvm_pgtable_stage2_unmap(mmu->pgt, nested_start, mappin=
+g_size)))
+ 			return;
+=20
+ 		interval_tree_remove(node, &kvm->arch.mmu.guest_s2_mappings);
+-		interval_tree_remove(&mapping->nested, &mapping->nested_mmu->guest_s2_ma=
+ppings);
++		interval_tree_remove(&mapping->nested, &mmu->guest_s2_mappings);
+ 		kfree(mapping);
+=20
+ 		if (may_block)
+--=20
+2.47.3
+
+--=20
+Without deviation from the norm, progress is not possible.
