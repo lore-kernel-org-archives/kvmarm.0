@@ -1,98 +1,190 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta0.migadu.com (out-60.mta0.migadu.com [91.218.175.60])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3570942C514;
-	Sat, 12 Sep 2026 12:24:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D8093246ED
+	for <kvmarm@lists.linux.dev>; Sat, 12 Sep 2026 13:55:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.60
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789215855; cv=none; b=SrxG9BSx8TPslYO7X0KgWs6jgmkVyaPQXjz4WI17O1BMJB7TRJa77YqV2gRjg33VRVN4SYSnAkNpNJk8F4gjxW00rCaxhl+YuwE+epMINnqZBZjVpBPrBgn3mIZGIXiUYnxEEDwhRBdLlpbJ1ltISmA/DTug5X7qf8R6TnF9LVc=
+	t=1789221339; cv=none; b=e2NJdX/GPuSVvXiWjuJWMGXIfxCbsZvRSQyOOuCbcarzCM1Lz5oew9hy7iJlLv1W5hj6lJxmrH+RxTHxeS/+8uJe1pCwzDo/Esu72GDp8ff/CQL5qd55JQIJi5ogqcwdSNkQtKzc5664AEmp9h09eRnLc+P8bmTakLaKSKdJvB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789215855; c=relaxed/simple;
-	bh=CS8pf4UZODmbkC29k8w4yphJ/tPVP5UHSPMn9HloNj0=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VA3SVFfyrKtTa3Kgwy1h9ENYqdwaWDiHXdf2fbfvV7Al/gBdv91gqlaOBlWET8zZVICh7DuKTHOZkgy5R7V5yP3xqbRKeKNuIDk0VJ9U6z4jh5R/i48074OtJhtya9jiEO+OkUskp2wpTv1y1qqEYNfDjrm9H9w2lYu0wopZNow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cIbLyp98; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789221339; c=relaxed/simple;
+	bh=uVKfO6ncg/PGTTBfsU+Wi1xqY76vwNEhFuFMY8lh9ck=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SnTzlZhZ0fMLrHlEKW4JwP3CYBJKEzWjKQ+1RGAKJjAwSA4LzSWW6FFWxKxgBmBByAbd51wJT1g9IyPy06ym5Z8Ot4J7UTYze89ZGi0GxrlDHZ2iUUcvUyVERkcCiE3QZCL7GIYtmFKpDHU3+TTYtl6h44GuHQSQmJ/wLkVHStE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=nxBquGls; arc=none smtp.client-ip=91.218.175.60
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cIbLyp98"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B555D1F00893;
-	Sat, 12 Sep 2026 12:24:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789215853;
-	bh=MwPTM//i6FM3Z7OaQNRWjBG3Y4UxlxBNK7ODAKlkKWg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=cIbLyp98zvlcM1ra/sApj7D5Ra/6pQM2nU+oVG5Tsb5uJ3SKMBT/tuZCSQCdQp8n7
-	 aqs57vol6nPjRO1NOgCYWMTTO1ZlhIhiJhbCShxBfENUECwiV4pGaOB+xJpjPEFGu4
-	 PYQoq0OGPPQx7VF4xC9ILBGRcv5wgtrINpiUYXeeEityxgS/7QNXUb+P82Duj8gcSi
-	 HznxnT3ASo5igdQnL1ZascS/WA6EijM5Nmxf5x9JlMu/M8thwM/vTIW0GaH+SgvIRl
-	 TKgxpBbtcxHfiA0QsWT44H+qTBAS0RSLdUHndxRL3VLQeNiQOiOT01yZWVmjC2cTaG
-	 ie6jGnn4IDLbA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1x5MmB-000000085Sd-2Ra0;
-	Sat, 12 Sep 2026 12:24:11 +0000
-Date: Sat, 12 Sep 2026 13:24:11 +0100
-Message-ID: <86cxui7j4k.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Leonardo Bras <leo.bras@arm.com>
-Cc: Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Tian Zheng <zhengtian10@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 0/5] KVM: arm64: New PTE dirty-page encoding, HAFDBS new usage
-In-Reply-To: <20260901171558.2674031-1-leo.bras@arm.com>
-References: <20260901171558.2674031-1-leo.bras@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="nxBquGls"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=uVKfO6ncg/PGTTBfsU+Wi1xqY76vwNEhFuFMY8lh9ck=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1789221327; v=1; x=1789826127;
+ b=nxBquGlsSPf3sbgDAET8vPhUln5rGdMByvpGu0453LLXKkdw/ivp/8Lxr01MsBr5q7DH+XsA
+ oSVIbOYCOYRpbhUxTcPovsMlqP4rByNzRudn2luGtr8l4clvSoZiUx5E9J1/sUVDyB8r7rTpTOS
+ sjWj+Gz6MWx3S4fwMvjJg9KA=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 24005510728ef1cc;
+	Sat, 12 Sep 2026 13:55:27 +0000
+X-Mizu-Trace-ID: 24005510728ef1cc
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b4a0b17359so1986e87.0
+        for <kvmarm@lists.linux.dev>; Sat, 12 Sep 2026 06:55:27 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBwB23JFD0ab8iVjYjApOeAf47xHoa5aHx3il7GyfKmc8ZnUkpRmA2RbjWVfyl84eU75/X2JQrI=@lists.linux.dev
+X-Gm-Message-State: AFuF++n4zIB0H0vQDK9bgpX0tUBMNac8rf8ObBhuQlW4w831ZyNUJPhH
+	BZiz+FmyxXB7BslbnbzRHRSE+cn3fOJAKuFtcCwv+JxH7xBOv9dqLJ1oaGkVKJ89oyknm2nk2K3
+	VDVVB12Z9RslIV2n/RvXm13oOrcWBraiAcmqehjnd
+X-Received: by 2002:a05:6512:640a:b0:5b7:6707:e44c with SMTP id
+ 2adb3069b0e04-5b8a7942a1cmr77184e87.12.1789221324429; Sat, 12 Sep 2026
+ 06:55:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: leo.bras@arm.com, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, rananta@google.com, zhengtian10@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20260831192406.1341841-1-fuad.tabba@linux.dev>
+ <20260831192406.1341841-2-fuad.tabba@linux.dev> <3bb3d57a-1862-4645-a5e2-789d70e9fc73@arm.com>
+In-Reply-To: <3bb3d57a-1862-4645-a5e2-789d70e9fc73@arm.com>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Sat, 12 Sep 2026 14:54:48 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTwCs8B4du2=rAdoTOpOfh64p5cbW902e5g0u6NZT=r=gA@mail.gmail.com>
+X-Gm-Features: AcwNN1XXru80mbEi-flRa5yydU4FWkY-cYPHjVpGY3RKCxyPaNbWIT0oyGhQsoc
+Message-ID: <CA+EHjTwCs8B4du2=rAdoTOpOfh64p5cbW902e5g0u6NZT=r=gA@mail.gmail.com>
+Subject: Re: [PATCH kvmtool 1/5] arm64: Do not abort on register-dump failures
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, Will Deacon <will@kernel.org>, 
+	Julien Thierry <julien.thierry.kdev@gmail.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
+	Andre Przywara <andre.przywara@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Marc Zyngier <maz@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, 01 Sep 2026 18:15:51 +0100,
-Leonardo Bras <leo.bras@arm.com> wrote:
-> 
-> This series have 2 main goals:
-> 
-> 1 - Patches #1,#2,#3 : Change the PTE descriptor to use WD/WC/RO encodings
->     making use of the DBM bit, adapting all usages, and
+Hi Suzuki,
 
-What are WD and WC? I can sort of guess that this is write-dirty and
-write clean, but that's not exactly obvious. More importantly, you
-don't even explain *why* anything needs changing...
+On Sat, 12 Sept 2026 at 08:33, Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+>
+> On 31/08/2026 20:24, Fuad Tabba wrote:
+> > kvm_cpu__show_registers() and kvm_cpu__show_code() read the vCPU's core
+> > registers with KVM_GET_ONE_REG, and die() if the ioctl fails. Both are
+> > diagnostics. They run from the KVM_EXIT_DEBUG case in kvm_cpu__start(),
+> > from the "lkvm debug -d" dump path in handle_sigusr1(), and from the
+> > panic dump in kvm_cpu_thread().
+> >
+> > Once a protected vCPU has run, its registers belong to the guest and
+> > KVM_GET_ONE_REG returns -EPERM. Dying on that turns a diagnostic into a
+> > VMM abort.
+>
+> Marc once suggested that these could always succeed with junk values for
+> protected/Realm VMs. Do you think that is an option for pKVM ?
 
-> 2 - Patches #4,#5 are an RFC on using HAFDBS on a guest to avoid resetting
->     all PTEs to WC when dirty-logging starts, speeding-up startup.
-> 
-> (1) will also introduce a new walker for cleaning the dirty-bit, which will
-> clear the DBM bit if it's a block mapping (hugepage). This is needed as on
-> lazy-splitting we need to fault a write so we can do the lazy splitting.
-> This is needed for both the next patches, and for HDBSS & HACDBS
-> enablement.
+It's possible, the host copy is still there, but I'd rather not. Once
+the vCPU has run that copy is a mix rather than junk: the boot state
+the VMM wrote, plus what the exit handlers copy out (the PSTATE mode,
+x0 for an MMIO write, x0 to x2 for a forwarded PSCI call). A dump
+would show a live PSTATE beside the PC from boot, and the VMM has no
+way to distinguish them. With the error it prints that the state is
+unavailable, which is what this patch does.
 
-Again, this is incredibly opaque to the reviewer. What is the problem
-you are trying to solve? This is what a cover letter is for.
+It's also what the tree does for protected state elsewhere: s390
+returns -EINVAL from KVM_GET/SET_ONE_REG on a protected VM, and x86
+does the same from the register ioctls for the SEV-ES VM type, SNP and
+TDX. Legacy SEV-ES is the one place that succeeds silently, kept for
+backwards compatibility, and the commit that added the errors
+(517987e3fb19) describes that as a problem. Sean's rationale for TDX:
+KVM can't provide sane data, so it's userspace's job not to ask for it
+[1].
 
-	M.
+>
+> If we go with this approach :
+>
+> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 
--- 
-Without deviation from the norm, progress is not possible.
+Thanks, I'll add the tag. :)
+
+Cheers,
+/fuad
+
+[1] https://lore.kernel.org/all/482264f17fa0652faad9bd5364d652d11cb2ecb8.1625186503.git.isaku.yamahata@intel.com/
+
+>
+>
+> >
+> > Report that the register state is unavailable, with the errno, and
+> > return instead of dying.
+> >
+> > Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+> > ---
+> >   arm64/kvm-cpu.c | 36 ++++++++++++++++++++++++------------
+> >   1 file changed, 24 insertions(+), 12 deletions(-)
+> >
+> > diff --git a/arm64/kvm-cpu.c b/arm64/kvm-cpu.c
+> > index 3aa7684..c58d61f 100644
+> > --- a/arm64/kvm-cpu.c
+> > +++ b/arm64/kvm-cpu.c
+> > @@ -476,15 +476,19 @@ void kvm_cpu__show_code(struct kvm_cpu *vcpu)
+> >
+> >       dprintf(debug_fd, "\n*pc:\n");
+> >       reg.id = ARM64_CORE_REG(regs.pc);
+> > -     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
+> > -             die("KVM_GET_ONE_REG failed (show_code @ PC)");
+> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0) {
+> > +             pr_err("register state unavailable (pc): %s", strerror(errno));
+> > +             return;
+> > +     }
+>
+> >
+> >       kvm__dump_mem(vcpu->kvm, data, 32, debug_fd);
+> >
+> >       dprintf(debug_fd, "\n*lr:\n");
+> >       reg.id = ARM64_CORE_REG(regs.regs[30]);
+> > -     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
+> > -             die("KVM_GET_ONE_REG failed (show_code @ LR)");
+> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0) {
+> > +             pr_err("register state unavailable (lr): %s", strerror(errno));
+> > +             return;
+> > +     }
+> >
+> >       kvm__dump_mem(vcpu->kvm, data, 32, debug_fd);
+> >   }
+> > @@ -499,23 +503,31 @@ void kvm_cpu__show_registers(struct kvm_cpu *vcpu)
+> >       dprintf(debug_fd, "\n Registers:\n");
+> >
+> >       reg.id          = ARM64_CORE_REG(regs.pc);
+> > -     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
+> > -             die("KVM_GET_ONE_REG failed (pc)");
+> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0) {
+> > +             pr_err("register state unavailable (pc): %s", strerror(errno));
+> > +             return;
+> > +     }
+> >       dprintf(debug_fd, " PC:    0x%lx\n", data);
+> >
+> >       reg.id          = ARM64_CORE_REG(regs.pstate);
+> > -     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
+> > -             die("KVM_GET_ONE_REG failed (pstate)");
+> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0) {
+> > +             pr_err("register state unavailable (pstate): %s", strerror(errno));
+> > +             return;
+> > +     }
+> >       dprintf(debug_fd, " PSTATE:    0x%lx\n", data);
+> >
+> >       reg.id          = ARM64_CORE_REG(sp_el1);
+> > -     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
+> > -             die("KVM_GET_ONE_REG failed (sp_el1)");
+> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0) {
+> > +             pr_err("register state unavailable (sp_el1): %s", strerror(errno));
+> > +             return;
+> > +     }
+> >       dprintf(debug_fd, " SP_EL1:    0x%lx\n", data);
+> >
+> >       reg.id          = ARM64_CORE_REG(regs.regs[30]);
+> > -     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
+> > -             die("KVM_GET_ONE_REG failed (lr)");
+> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0) {
+> > +             pr_err("register state unavailable (lr): %s", strerror(errno));
+> > +             return;
+> > +     }
+> >       dprintf(debug_fd, " LR:    0x%lx\n", data);
+> >   }
+> >
+>
