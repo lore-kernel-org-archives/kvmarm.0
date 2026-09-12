@@ -1,81 +1,58 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B53B2429CC8;
-	Sat, 12 Sep 2026 11:43:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3570942C514;
+	Sat, 12 Sep 2026 12:24:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789213412; cv=none; b=mEtJhfIlnn8MouITUXFNEDO0h1qnEDEM6XbpiUElQwr/tCp0IACiNgqrQWBA8P6QI6J3iGmubHSCf49FcZhm9ibxiI+ShMZtTCfyjTuFf3vTJjjZcSzsbmA5qdZhCOLgxKbsXEMnm3YsCBWgpWrKR3HwzU/ghsHBRsjBTsO9MsA=
+	t=1789215855; cv=none; b=SrxG9BSx8TPslYO7X0KgWs6jgmkVyaPQXjz4WI17O1BMJB7TRJa77YqV2gRjg33VRVN4SYSnAkNpNJk8F4gjxW00rCaxhl+YuwE+epMINnqZBZjVpBPrBgn3mIZGIXiUYnxEEDwhRBdLlpbJ1ltISmA/DTug5X7qf8R6TnF9LVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789213412; c=relaxed/simple;
-	bh=TAAuZOGr/85DV5+Z7Dz9SB0m4XeycxoHFiH1U0fo8xQ=;
+	s=arc-20240116; t=1789215855; c=relaxed/simple;
+	bh=CS8pf4UZODmbkC29k8w4yphJ/tPVP5UHSPMn9HloNj0=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hif06+coYyq0h58X8epoQmqy+9Z9fBWQy40O+rAbAp2pfAM2A7r7tRfOBhMj3zgIL2M3mp1kq+c0U18LANpmvRnyxs0VIwWJ70XGMTH1jaeBVuc/QA2JfeOUM0sb79zDCnzpEFgQ9PkUJ3nmlsYLzqxrQ2BEoj9tzsnm611+Z9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cK5XlgfP; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=VA3SVFfyrKtTa3Kgwy1h9ENYqdwaWDiHXdf2fbfvV7Al/gBdv91gqlaOBlWET8zZVICh7DuKTHOZkgy5R7V5yP3xqbRKeKNuIDk0VJ9U6z4jh5R/i48074OtJhtya9jiEO+OkUskp2wpTv1y1qqEYNfDjrm9H9w2lYu0wopZNow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cIbLyp98; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cK5XlgfP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88A781F00893;
-	Sat, 12 Sep 2026 11:43:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cIbLyp98"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B555D1F00893;
+	Sat, 12 Sep 2026 12:24:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789213411;
-	bh=FluqXzh5k5qC80kIPbMVeqGTxq2K8dL/fFXy6Ui0ioU=;
+	s=k20260515; t=1789215853;
+	bh=MwPTM//i6FM3Z7OaQNRWjBG3Y4UxlxBNK7ODAKlkKWg=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=cK5XlgfPkupYP5E+vsxJ+64JEO2JtLPlE15k4Mh8bZmBOf41g0Y7tUKKpNBn4dZi5
-	 +dQGE5QpQwpwGkmBB/TV1FaS0Chj+kAm75gtK1QNRdX6dQ98Twu9fuQfV51yd2rBh3
-	 aHk4owDnHeAaYPsu61BKSShioTRuwr52FvDxJusrvPBfe8dNMD8w2r4TYC9gY/7tH8
-	 W+pun973OiWgJ+Ceb2yzNOB1ZTFgfXAAnvTY7bqI79eOHgXwK5ZPjDZcaKupHT4JW2
-	 G8tYUYsdxUr0OiePQztZ33u56eWGo8bhIfchdyLD/h8M10IpI+U931IcCKBr/MLW+K
-	 /mM8xwPF3/6jw==
+	b=cIbLyp98zvlcM1ra/sApj7D5Ra/6pQM2nU+oVG5Tsb5uJ3SKMBT/tuZCSQCdQp8n7
+	 aqs57vol6nPjRO1NOgCYWMTTO1ZlhIhiJhbCShxBfENUECwiV4pGaOB+xJpjPEFGu4
+	 PYQoq0OGPPQx7VF4xC9ILBGRcv5wgtrINpiUYXeeEityxgS/7QNXUb+P82Duj8gcSi
+	 HznxnT3ASo5igdQnL1ZascS/WA6EijM5Nmxf5x9JlMu/M8thwM/vTIW0GaH+SgvIRl
+	 TKgxpBbtcxHfiA0QsWT44H+qTBAS0RSLdUHndxRL3VLQeNiQOiOT01yZWVmjC2cTaG
+	 ie6jGnn4IDLbA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1x5M8n-000000085Bb-05E5;
-	Sat, 12 Sep 2026 11:43:29 +0000
-Date: Sat, 12 Sep 2026 12:43:28 +0100
-Message-ID: <86ecey7l0f.wl-maz@kernel.org>
+	id 1x5MmB-000000085Sd-2Ra0;
+	Sat, 12 Sep 2026 12:24:11 +0000
+Date: Sat, 12 Sep 2026 13:24:11 +0100
+Message-ID: <86cxui7j4k.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Steffen Eiden <seiden@linux.ibm.com>
-Cc: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Andreas Grapentin <gra@linux.ibm.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	David Hildenbrand <david@kernel.org>,
-	Friedrich Welter <fritz@linux.ibm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Gautam Gala <ggala@linux.ibm.com>,
-	Hariharan Mari <hari55@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Hendrik Brueckner <brueckner@linux.ibm.com>,
-	Ilya Leoshkevich <iii@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
+To: Leonardo Bras <leo.bras@arm.com>
+Cc: Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
 	Joey Gouly <joey.gouly@arm.com>,
-	Nico Boehr <nrb@linux.ibm.com>,
-	Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
-	Oliver Upton <oupton@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v7 11/23] KVM: arm64: Share arm64 code with s390
-In-Reply-To: <20260902124152.438647-C-seiden@linux.ibm.com>
-References: <20260831144802.834315-1-seiden@linux.ibm.com>
-	<20260831144802.834315-12-seiden@linux.ibm.com>
-	<87se3tmlrv.wl-maz@kernel.org>
-	<20260901084037.185345-C-seiden@linux.ibm.com>
-	<87mru0m76g.wl-maz@kernel.org>
-	<20260902124152.438647-C-seiden@linux.ibm.com>
+	Mark Rutland <mark.rutland@arm.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Tian Zheng <zhengtian10@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 0/5] KVM: arm64: New PTE dirty-page encoding, HAFDBS new usage
+In-Reply-To: <20260901171558.2674031-1-leo.bras@arm.com>
+References: <20260901171558.2674031-1-leo.bras@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -87,41 +64,33 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: seiden@linux.ibm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, agordeev@linux.ibm.com, gra@linux.ibm.com, arnd@arndb.de, catalin.marinas@arm.com, borntraeger@linux.ibm.com, imbrenda@linux.ibm.com, david@kernel.org, fritz@linux.ibm.com, tabba@google.com, ggala@linux.ibm.com, hari55@linux.ibm.com, hca@linux.ibm.com, brueckner@linux.ibm.com, iii@linux.ibm.com, frankja@linux.ibm.com, joey.gouly@arm.com, nrb@linux.ibm.com, oss@nina.schoetterlglausch.eu, oupton@kernel.org, pbonzini@redhat.com, seanjc@google.com, suzuki.poulose@arm.com, svens@linux.ibm.com, Ulrich.Weigand@de.ibm.com, gor@linux.ibm.com, will@kernel.org, yuzenghui@huawei.com
+X-SA-Exim-Rcpt-To: leo.bras@arm.com, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, rananta@google.com, zhengtian10@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 02 Sep 2026 13:41:52 +0100,
-Steffen Eiden <seiden@linux.ibm.com> wrote:
+On Tue, 01 Sep 2026 18:15:51 +0100,
+Leonardo Bras <leo.bras@arm.com> wrote:
+> 
+> This series have 2 main goals:
+> 
+> 1 - Patches #1,#2,#3 : Change the PTE descriptor to use WD/WC/RO encodings
+>     making use of the DBM bit, adapting all usages, and
 
-[...]
+What are WD and WC? I can sort of guess that this is write-dirty and
+write clean, but that's not exactly obvious. More importantly, you
+don't even explain *why* anything needs changing...
 
-> So my suggestion is:
+> 2 - Patches #4,#5 are an RFC on using HAFDBS on a guest to avoid resetting
+>     all PTEs to WC when dirty-logging starts, speeding-up startup.
 > 
-> For series 1 (and 2) s390 has its own, local implementation of
-> handle_exit without sharing any code with arm64 in regard to EC
-> 
-> When s390 has all the relevant code available (likely series 3) s390 can
-> switch to using most (if not all) EC handling code used by
-> arm_exit_handlers implemented in handle_exit.c.
-> 
-> This can be done without a mixed patch:
-> 
-> 1. Mark arm64 handle_exit.c as shared (roughly the first 400Loc w/o
->    includes) - s390 will not use it after this patch.
-> 2. remove the handle exit code from s390's handle_exit.c and include the
->    new generated handle_exit.inc
-> 
-> This approach brings us further into the share architecture not only code
-> approach you meantrioned in the comments regarding sys-regs. (I or
-> Andreas will provide a solution for this later :) ) 
-> 
-> Is that OK with you, what do you think?
+> (1) will also introduce a new walker for cleaning the dirty-bit, which will
+> clear the DBM bit if it's a block mapping (hugepage). This is needed as on
+> lazy-splitting we need to fault a write so we can do the lazy splitting.
+> This is needed for both the next patches, and for HDBSS & HACDBS
+> enablement.
 
-I *think* that's OK. I just want to make sure that in the long run, we
-don't end-up with pointless divergence.
-
-Thanks,
+Again, this is incredibly opaque to the reviewer. What is the problem
+you are trying to solve? This is what a cover letter is for.
 
 	M.
 
