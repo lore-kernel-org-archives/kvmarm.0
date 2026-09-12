@@ -1,562 +1,137 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05E1C419FC9;
-	Sat, 12 Sep 2026 08:37:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9D3844236B;
+	Sat, 12 Sep 2026 08:45:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789202231; cv=none; b=V9WMBqOO775eLUg1erLBMo3jAu1+oCr0GBbvEOcNGpmofzcfnN4A/ERYu+3rV1eN+Zhy/s9NVNr2o3qvStQuIi/zvNLAhoTxP95JmY6Y/ApIORIqGE7tvU/mxOda1qbr+ZQe6jNcVnKzUtLdWASFmfc7acyDXX6icotcJdrmE8Q=
+	t=1789202758; cv=none; b=qQnDy3P/nsOkI5ll5JKwk6+4AihYuFNgmpdXejbkXECTMK1QiNRWJp9UNLOk7A0Htb3HuSfQNUVUMY+wu6FVo5r+0u90Gi3RdXWDrC77GtfWjy1wZZy6MukdiVJ0MYAWTNE2t6UpYcdctmpQy+f2GBpo3ru13B9nADsiY9rHs30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789202231; c=relaxed/simple;
-	bh=EA0acj6C7MwLvbaDXhqfQLjRN3WvI9IPgVSA4imMoAk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=C2LCaWKQ74OX14awnBZd50Rt9FS0aXcINy6tlddw6UmqtAEI895qwLWeJvw8HUTyRKAhSV/oJC5lDLRYEktQ9/Yy/OIcWCrmYoPaXzDacXhgB4p0fnxdXrS58zFTYGFfPnYrZrm7y+BByyeewwKkkC/lFmvq+2dFYHrKc1qmqtc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=rVv48VS0; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1789202758; c=relaxed/simple;
+	bh=Z0omvdScSbZLkw0ntRAIOsZnksWg5VvFc4dd+XCsnnc=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=P30NWnnHTHwj9ZgoJJ0W+XDhl9MEtDjIRY1lrj2rjo5oyaRREHDcrTue40xawuDdyCxdgrMbLDfPbHHnT2tKuI2R4rwLrXua763PudyvXpYmQKDAKflcYz+mD8cMcmzhwI+FipRKCibxE4mppPTQwkOR0Olyc+bEHip1oo1J77E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ROjzWMV6; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="rVv48VS0"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7D4321713;
-	Sat, 12 Sep 2026 01:37:04 -0700 (PDT)
-Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.2.197.99])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 8669A3F7B4;
-	Sat, 12 Sep 2026 01:37:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1789202228; bh=EA0acj6C7MwLvbaDXhqfQLjRN3WvI9IPgVSA4imMoAk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=rVv48VS0RzbCy6SU92fyIGnDemUZ2/0PyMx/vfst3oFHgVStjlir7sFXUJtlP2EnA
-	 EU26X3KriNWCYYiYvItx+qE0PfhuTKsFKihVARj/vp4U7DCw1aklu1pi5hSRoXaY9J
-	 YmbROEvNdb/tSaIJtcEGB4rs5LYwt2zHzPvmvX4c=
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-To: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Cc: maz@kernel.org,
-	will@kernel.org,
-	catalin.marinas@arm.com,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	steven.price@arm.com,
-	aneesh.kumar@kernel.org,
-	oupton@kernel.org,
-	gshan@redhat.com,
-	joey.gouly@arm.com,
-	tabba@google.com,
-	yuzenghui@huawei.com,
-	linux-coco@lists.linux.dev,
-	gankulkarni@os.amperecomputing.com,
-	sdonthineni@nvidia.com,
-	alpergun@google.com,
-	fj0570is@fujitsu.com,
-	WeiLin.Chang@arm.com,
-	lpieralisi@kernel.org,
-	enju.kohei@fujitsu.com,
-	Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v18 7/7] firmware: arm_rmm: Add wrappers for Realm related RMI commands
-Date: Sat, 12 Sep 2026 09:36:10 +0100
-Message-ID: <20260912083611.2513845-8-suzuki.poulose@arm.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260912083611.2513845-1-suzuki.poulose@arm.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ROjzWMV6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B68E1F00893;
+	Sat, 12 Sep 2026 08:45:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789202756;
+	bh=mg3GaPxc2QIzLsAvDNUYVpscXXPep6mp7Ir4QMLFMA8=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=ROjzWMV6J9n9LjFAzpLgxrHQJfq74FniEZw289Hznr/grl9rhguJKQT52iP5aSXnh
+	 kkrPDsU0ssgqz73OBLoymRpCIPk/JrgKNAk3tTfFnL92VotX6utDfTL+fVcm1p14qt
+	 B+S0VJYzeHXh2XP1OGFFgb7k0tAppAOPE5tmNXN5gA1A7VGLUtL4SHemUQg8wmc1jy
+	 Af+SfBTUkxuFxT+kvD1qerdJMlLcDJwDEn3qvgBnwPs8hqxIfFxPJeX+M6q0ls0pL5
+	 99+YYQkyDrLG7fmBuZk7rRSwRWR9GCx4jLIippFUXiqTa8CqSNoydqzzq7fj8EYxep
+	 tW+j4CpyDOP1g==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v18 1/7] firmware: arm_rmm: Add SMC definitions for
+ calling the RMM
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Suzuki K Poulose" <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20260912083611.2513845-2-suzuki.poulose@arm.com>
 References: <20260912083611.2513845-1-suzuki.poulose@arm.com>
+ <20260912083611.2513845-2-suzuki.poulose@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 12 Sep 2026 08:45:55 +0000
+Message-Id: <20260912084556.2B68E1F00893@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-From: Steven Price <steven.price@arm.com>
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [Low] Usage of GENMASK and BIT macros for 64-bit masks causes Undefined B=
+ehavior on 32-bit architectures
+--
 
-Introduce wrappers for the RMI functions needed for creating and
-managing realm guests. This will be used by the KVM to manage the
-Realms
+commit cfdd0e3f2fb70671ab2dbb64f06ca56946732456
+Author: Steven Price <steven.price@arm.com>
 
-Signed-off-by: Steven Price <steven.price@arm.com>
-Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
----
-Changes since v17:
-  * Avoid nesting if conditions for output populating RMI calls
-  * Clean up comments
-  * Always use arm_smccc_1_2_invoke() for RMI calls.
-Changes since v16:
-  * Split into a separate patch and move away from arch/arm64 to
-    include/linux/.
-  * Also moved into the firmware_rmm series from the KVM CCA support.
-    This is done in a hope to reduce the merge conflicts and make
-    the KVM CCA upstreaming in independent parallel chunks
----
- include/linux/arm-rmi-cmds.h | 461 +++++++++++++++++++++++++++++++++++
- 1 file changed, 461 insertions(+)
+firmware: arm_rmm: Add SMC definitions for calling the RMM
 
-diff --git a/include/linux/arm-rmi-cmds.h b/include/linux/arm-rmi-cmds.h
-index 27a0c56944976..fd7ef7e82b246 100644
---- a/include/linux/arm-rmi-cmds.h
-+++ b/include/linux/arm-rmi-cmds.h
-@@ -76,4 +76,465 @@ long rmi_sro_execute(struct arm_smccc_1_2_regs *regs);
- 	__ret;								\
- })
- 
-+/**
-+ * rmi_rtt_data_map_init() - Create a mapping at protected IPA, copying contents
-+ *			     from a given non-secure source granule.
-+ * @rd: PA of the RD
-+ * @data: PA of the target granule mapped in the guest
-+ * @ipa: IPA at which the granule @data will be mapped in the guest
-+ * @src: PA of the source granule with contents
-+ * @flags: RMI_MEASURE_CONTENT if the contents should be measured
-+ *
-+ * Create a mapping from Protected IPA space to conventional memory, copying
-+ * contents from a Non-secure Granule provided by the caller.
-+ *
-+ * Return: 0 on success, positive RMI result code or negative Linux error code
-+ */
-+static inline long rmi_rtt_data_map_init(unsigned long rd, unsigned long data,
-+					 unsigned long ipa, unsigned long src,
-+					 unsigned long flags)
-+{
-+	struct arm_smccc_1_2_regs regs = {
-+		SMC_RMI_RTT_DATA_MAP_INIT, rd, data, ipa, src, flags
-+	};
-+
-+	return rmi_sro_execute(&regs);
-+}
-+
-+/**
-+ * rmi_rtt_data_map() - Create mappings in protected IPA range with unknown contents
-+ * @rd: PA of the RD
-+ * @base: Base of the target IPA range
-+ * @top: Top of the target IPA range
-+ * @flags: Flags
-+ * @oaddr: Output address set descriptor
-+ * @out_top: Top address of range which was processed.
-+ *
-+ * Return: 0 on success, positive RMI result code or negative Linux error code
-+ */
-+static inline long rmi_rtt_data_map(unsigned long rd,
-+				    unsigned long base,
-+				    unsigned long top,
-+				    unsigned long flags,
-+				    unsigned long oaddr,
-+				    unsigned long *out_top)
-+{
-+	struct arm_smccc_1_2_regs regs = {
-+		SMC_RMI_RTT_DATA_MAP, rd, base, top, flags, oaddr
-+	};
-+	long ret;
-+
-+	ret = rmi_sro_execute(&regs);
-+
-+	if (ret == RMI_SUCCESS && out_top)
-+		*out_top = regs.a1;
-+
-+	return ret;
-+}
-+
-+/**
-+ * rmi_rtt_data_unmap() - Remove mappings to conventional memory at a protected
-+ *			  IPA range
-+ * @rd: PA of the RD
-+ * @base: Base of the target IPA range
-+ * @top: Top of the target IPA range
-+ * @flags: Flags
-+ * @oaddr: Output address set descriptor
-+ * @out_top: Returns top IPA of range which has been unmapped
-+ * @out_range: Output address range
-+ * @out_count: Number of entries in output address list
-+ *
-+ * Removes mappings to convention memory with a target Protected IPA range.
-+ *
-+ * Return: 0 on success, positive RMI result code or negative Linux error code
-+ */
-+static inline long rmi_rtt_data_unmap(unsigned long rd,
-+				      unsigned long base,
-+				      unsigned long top,
-+				      unsigned long flags,
-+				      unsigned long oaddr,
-+				      unsigned long *out_top,
-+				      unsigned long *out_range,
-+				      unsigned long *out_count)
-+{
-+	struct arm_smccc_1_2_regs regs = {
-+		SMC_RMI_RTT_DATA_UNMAP, rd, base, top, flags, oaddr
-+	};
-+	long ret;
-+
-+	ret = rmi_sro_execute(&regs);
-+
-+	if (ret == RMI_SUCCESS) {
-+		if (out_top)
-+			*out_top = regs.a1;
-+		if (out_range)
-+			*out_range = regs.a2;
-+		if (out_count)
-+			*out_count = regs.a3;
-+	}
-+
-+	return ret;
-+}
-+
-+/**
-+ * rmi_psci_complete() - Complete pending PSCI command
-+ * @calling_rec: PA of the calling REC
-+ * @status: Status of the PSCI request
-+ *
-+ * Completes a pending PSCI command.
-+ *
-+ * Return: RMI return code
-+ */
-+static inline long rmi_psci_complete(unsigned long calling_rec,
-+				     unsigned long status)
-+{
-+	struct arm_smccc_1_2_regs regs = {
-+		SMC_RMI_PSCI_COMPLETE, calling_rec, status,
-+	};
-+
-+	rmi_smccc_invoke(&regs);
-+	return regs.a0;
-+}
-+
-+/**
-+ * rmi_realm_activate() - Activate a realm
-+ * @rd: PA of the RD
-+ *
-+ * Mark a realm as Active, signalling that creation is completed, allowing
-+ * execution of the realm.
-+ *
-+ * Return: RMI return code
-+ */
-+static inline long rmi_realm_activate(unsigned long rd)
-+{
-+	struct arm_smccc_1_2_regs regs = {
-+		SMC_RMI_REALM_ACTIVATE, rd,
-+	};
-+
-+	rmi_smccc_invoke(&regs);
-+	return regs.a0;
-+}
-+
-+/**
-+ * rmi_realm_create() - Create a realm
-+ * @rd: PA of the RD
-+ * @params: PA of realm parameters
-+ * @sro: Preallocated SRO context
-+ *
-+ * Create a new realm using the given parameters.
-+ *
-+ * Return: 0 on success, positive RMI result code or negative Linux error code
-+ */
-+static inline long rmi_realm_create(unsigned long rd, unsigned long params,
-+				    struct rmi_sro_state *sro)
-+{
-+	return rmi_sro_memxfer_cmd(sro, GFP_KERNEL,
-+				   SMC_RMI_REALM_CREATE, rd, params);
-+}
-+
-+/**
-+ * rmi_realm_terminate() - Terminate a realm
-+ * @rd: PA of the RD
-+ * @sro: Preallocated SRO context
-+ *
-+ * Terminates a realm, moving it into a ZOMBIE state
-+ *
-+ * Return: 0 on success, positive RMI result code or negative Linux error code
-+ */
-+static inline long rmi_realm_terminate(unsigned long rd,
-+				       struct rmi_sro_state *sro)
-+{
-+	return rmi_sro_memxfer_cmd(sro, GFP_KERNEL,
-+				   SMC_RMI_REALM_TERMINATE, rd);
-+}
-+
-+/**
-+ * rmi_realm_destroy() - Destroy a realm
-+ * @rd: PA of the RD
-+ * @sro: Preallocated SRO context
-+ *
-+ * Destroys a realm, all objects belonging to the realm must be destroyed first.
-+ *
-+ * Return: 0 on success, positive RMI result code or negative Linux error code
-+ */
-+static inline long rmi_realm_destroy(unsigned long rd,
-+				     struct rmi_sro_state *sro)
-+{
-+	return rmi_sro_memxfer_cmd(sro, GFP_KERNEL,
-+				   SMC_RMI_REALM_DESTROY, rd);
-+}
-+
-+/**
-+ * rmi_rec_create() - Create a REC
-+ * @rd: PA of the RD
-+ * @rec: PA of the target REC
-+ * @params: PA of REC parameters
-+ * @sro: Allocated SRO context to be used
-+ *
-+ * Create a REC using the parameters specified in the struct rec_params pointed
-+ * to by @params.
-+ *
-+ * Return: 0 on success, positive RMI result code or negative Linux error code
-+ */
-+static inline long rmi_rec_create(unsigned long rd,
-+				  unsigned long rec,
-+				  unsigned long params,
-+				  struct rmi_sro_state *sro)
-+{
-+	long ret;
-+
-+	sro->addr_count = 0;
-+	sro->regs = (struct arm_smccc_1_2_regs) {
-+		SMC_RMI_REC_CREATE, rd, rec, params
-+	};
-+	ret = rmi_sro_memxfer_execute(sro, GFP_KERNEL);
-+	rmi_sro_free(sro);
-+
-+	return ret;
-+}
-+
-+/**
-+ * rmi_rec_destroy() - Destroy a REC
-+ * @rec: PA of the target REC
-+ * @sro: Allocated SRO context to be used
-+ *
-+ * Destroys a REC. The REC must not be running.
-+ *
-+ * Return: 0 on success, positive RMI result code or negative Linux error code
-+ */
-+static inline long rmi_rec_destroy(unsigned long rec,
-+				   struct rmi_sro_state *sro)
-+{
-+	return rmi_sro_memxfer_cmd(sro, GFP_KERNEL, SMC_RMI_REC_DESTROY, rec);
-+}
-+
-+/**
-+ * rmi_rec_enter() - Enter a REC
-+ * @rec: PA of the target REC
-+ * @run_ptr: PA of RecRun structure
-+ *
-+ * Starts (or continues) execution within a REC.
-+ *
-+ * Return: RMI return code
-+ */
-+static inline long rmi_rec_enter(unsigned long rec, unsigned long run_ptr)
-+{
-+	struct arm_smccc_1_2_regs regs = {
-+		SMC_RMI_REC_ENTER, rec, run_ptr,
-+	};
-+
-+	rmi_smccc_invoke(&regs);
-+	return regs.a0;
-+}
-+
-+/**
-+ * rmi_rtt_create() - Creates an RTT
-+ * @rd: PA of the RD
-+ * @rtt: PA of the target RTT
-+ * @ipa: Base of the IPA range described by the RTT
-+ * @level: Depth of the RTT within the tree
-+ *
-+ * Creates an RTT (Realm Translation Table) at the specified level for the
-+ * translation of the specified address within the realm.
-+ *
-+ * Return: 0 on success, positive RMI result code or negative Linux error code
-+ */
-+static inline long rmi_rtt_create(unsigned long rd, unsigned long rtt,
-+				  unsigned long ipa, long level)
-+{
-+	struct arm_smccc_1_2_regs regs = {
-+		SMC_RMI_RTT_CREATE, rd, rtt, ipa, level
-+	};
-+
-+	return rmi_sro_execute(&regs);
-+}
-+
-+/**
-+ * rmi_rtt_destroy() - Destroy an RTT
-+ * @rd: PA of the RD
-+ * @ipa: Base of the IPA range described by the RTT
-+ * @level: RTT level
-+ * @out_rtt: Pointer to write the PA of the RTT which was destroyed
-+ * @out_top: Pointer to write the top IPA of non-live RTT entries, from entry
-+ * at which the RTT walk terminated.
-+ *
-+ * Destroys an RTT. The RTT must be non-live, i.e. none of the entries in the
-+ * table are in ASSIGNED or TABLE state.
-+ *
-+ * Return: 0 on success, positive RMI result code or negative Linux error code.
-+ */
-+static inline long rmi_rtt_destroy(unsigned long rd,
-+				   unsigned long ipa,
-+				   long level,
-+				   unsigned long *out_rtt,
-+				   unsigned long *out_top)
-+{
-+	struct arm_smccc_1_2_regs regs = {
-+		SMC_RMI_RTT_DESTROY, rd, ipa, level
-+	};
-+	long ret = rmi_sro_execute(&regs);
-+
-+	if (ret != RMI_SUCCESS)
-+		return ret;
-+
-+	if (out_rtt)
-+		*out_rtt = regs.a1;
-+	if (out_top)
-+		*out_top = regs.a2;
-+
-+	return RMI_SUCCESS;
-+}
-+
-+/**
-+ * rmi_rtt_fold() - Fold an RTT
-+ * @rd: PA of the RD
-+ * @ipa: Base of the IPA range described by the RTT
-+ * @level: Depth of the RTT within the tree
-+ * @out_rtt: Pointer to write the PA of the RTT which was destroyed
-+ *
-+ * Folds an RTT. If all entries with the RTT are 'homogeneous' the RTT can be
-+ * folded into the parent and the RTT destroyed.
-+ *
-+ * Return: 0 on success, positive RMI result code or negative Linux error code
-+ */
-+static inline long rmi_rtt_fold(unsigned long rd, unsigned long ipa,
-+				long level, unsigned long *out_rtt)
-+{
-+	struct arm_smccc_1_2_regs regs = {
-+		SMC_RMI_RTT_FOLD, rd, ipa, level
-+	};
-+	long ret = rmi_sro_execute(&regs);
-+
-+	if (ret == RMI_SUCCESS && out_rtt)
-+		*out_rtt = regs.a1;
-+
-+	return ret;
-+}
-+
-+/**
-+ * rmi_rtt_init_ripas() - Set RIPAS for new realm
-+ * @rd: PA of the RD
-+ * @base: Base of target IPA region
-+ * @top: Top of target IPA region
-+ * @out_top: Top IPA of range whose RIPAS was modified
-+ *
-+ * Sets the RIPAS of a target IPA range to RAM, for a realm in the NEW state.
-+ *
-+ * Return: 0 on success, positive RMI result code or negative Linux error code
-+ */
-+static inline long rmi_rtt_init_ripas(unsigned long rd, unsigned long base,
-+				      unsigned long top, unsigned long *out_top)
-+{
-+	struct arm_smccc_1_2_regs regs = {
-+		SMC_RMI_RTT_INIT_RIPAS, rd, base, top
-+	};
-+	long ret = rmi_sro_execute(&regs);
-+
-+	if (ret == RMI_SUCCESS && out_top)
-+		*out_top = regs.a1;
-+
-+	return ret;
-+}
-+
-+/**
-+ * rmi_rtt_unprot_map() - Map unprotected granules into a realm
-+ * @rd: PA of the RD
-+ * @base: Base IPA of the mapping
-+ * @top: Top of the target IPA range
-+ * @flags: Flags
-+ * @oaddr: Output address set descriptor
-+ * @out_top: Top IPA of range which has been mapped
-+ *
-+ * Create mappings to memory within a target unprotected IPA range.
-+ *
-+ * Return: 0 on success, positive RMI result code or negative Linux error code
-+ */
-+static inline long rmi_rtt_unprot_map(unsigned long rd,
-+				      unsigned long base,
-+				      unsigned long top,
-+				      unsigned long flags,
-+				      unsigned long oaddr,
-+				      unsigned long *out_top)
-+{
-+	struct arm_smccc_1_2_regs regs = {
-+		SMC_RMI_RTT_UNPROT_MAP, rd, base, top, flags, oaddr
-+	};
-+	long ret = rmi_sro_execute(&regs);
-+
-+	if (ret == RMI_SUCCESS && out_top)
-+		*out_top = regs.a1;
-+
-+	return ret;
-+}
-+
-+/**
-+ * rmi_rtt_set_ripas() - Set RIPAS for an running realm
-+ * @rd: PA of the RD
-+ * @rec: PA of the REC making the request
-+ * @base: Base of target IPA region
-+ * @top: Top of target IPA region
-+ * @out_top: Pointer to write top IPA of range whose RIPAS was modified
-+ *
-+ * Completes a request made by the realm to change the RIPAS of a target IPA
-+ * range.
-+ *
-+ * Return: 0 on success, positive RMI result code or negative Linux error code
-+ */
-+static inline long rmi_rtt_set_ripas(unsigned long rd, unsigned long rec,
-+				     unsigned long base, unsigned long top,
-+				     unsigned long *out_top)
-+{
-+	struct arm_smccc_1_2_regs regs = {
-+		SMC_RMI_RTT_SET_RIPAS, rd, rec, base, top
-+	};
-+	long ret = rmi_sro_execute(&regs);
-+
-+	if (ret == RMI_SUCCESS && out_top)
-+		*out_top = regs.a1;
-+
-+	return ret;
-+}
-+
-+/**
-+ * rmi_rtt_unprot_unmap() - Remove mappings within an unprotected IPA range
-+ * @rd: PA of the RD
-+ * @base: Base IPA of the mapping
-+ * @top: Top of the target IPA range
-+ * @flags: Flags
-+ * @oaddr: Output address set descriptor
-+ * @out_top: Top IPA which has been unmapped
-+ * @out_range: Output address range
-+ * @out_count: Number of entries in output address list
-+ *
-+ * Removes mappings to memory within a target unprotected IPA range.
-+ *
-+ * Return: 0 on success, positive RMI result code or negative Linux error code
-+ */
-+static inline long rmi_rtt_unprot_unmap(unsigned long rd,
-+					unsigned long base,
-+					unsigned long top,
-+					unsigned long flags,
-+					unsigned long oaddr,
-+					unsigned long *out_top,
-+					unsigned long *out_range,
-+					unsigned long *out_count)
-+{
-+	struct arm_smccc_1_2_regs regs = {
-+		SMC_RMI_RTT_UNPROT_UNMAP, rd, base, top, flags, oaddr
-+	};
-+	long ret = rmi_sro_execute(&regs);
-+
-+	if (ret != RMI_SUCCESS)
-+		return ret;
-+
-+	if (out_top)
-+		*out_top = regs.a1;
-+	if (out_range)
-+		*out_range = regs.a2;
-+	if (out_count)
-+		*out_count = regs.a3;
-+
-+	return RMI_SUCCESS;
-+}
-+
- #endif
--- 
-2.43.0
+This commit introduces SMC definitions for calling the Realm Management Mon=
+itor
+(RMM) from the host. The definitions are based on the ARM RMM specification
+version 2.0-bet3.
 
+Link: https://developer.arm.com/documentation/den0137/2-0bet3/
+
+> diff --git a/include/linux/arm-smccc-rmi.h b/include/linux/arm-smccc-rmi.h
+> new file mode 100644
+> index 0000000000000..214d6228dfc22
+> --- /dev/null
+> +++ b/include/linux/arm-smccc-rmi.h
+
+[ ... ]
+
+> +#define RMI_ADDR_TYPE_NONE		0
+> +#define RMI_ADDR_TYPE_SINGLE		1
+> +#define RMI_ADDR_TYPE_LIST		2
+> +
+> +#define RMI_ADDR_RANGE_STATE_MASK	GENMASK(63, 62)
+> +#define RMI_ADDR_RANGE_ADDR_MASK	GENMASK(51, PAGE_SHIFT)
+
+[Severity: Low]
+Can the use of GENMASK for bit positions >=3D 32 cause undefined behavior on
+32-bit architectures?=20
+
+The GENMASK macro evaluates to unsigned long, which is 32 bits wide on 32-b=
+it
+architectures. Shifting by 32 or more results in truncation or an
+out-of-bounds shift.
+
+Would it be better to use GENMASK_ULL here for these 64-bit masks?
+
+> +#define RMI_ADDR_RANGE_COUNT_MASK	GENMASK(PAGE_SHIFT - 1, 2)
+> +#define RMI_ADDR_RANGE_BLOCK_SIZE_MASK	GENMASK(1, 0)
+
+[ ... ]
+
+> +enum rmi_ripas {
+> +	RMI_EMPTY =3D 0,
+> +	RMI_RAM =3D 1,
+> +	RMI_DESTROYED =3D 2,
+> +	RMI_DEV =3D 3,
+> +};
+> +
+> +#define RMI_NO_MEASURE_CONTENT	0
+> +#define RMI_MEASURE_CONTENT	1
+> +
+> +#define RMI_FEATURE_REGISTER_0_S2OASZ			GENMASK(40, 33)
+> +#define RMI_FEATURE_REGISTER_0_L0GPT_BLOCK_DELEGATE	BIT(32)
+
+[Severity: Low]
+Similarly, will this GENMASK and BIT usage trigger the same undefined behav=
+ior
+when evaluated as unsigned long? Using GENMASK_ULL and BIT_ULL might avoid =
+this.
+
+> +#define RMI_FEATURE_REGISTER_0_PMU_NUM_CTRS		GENMASK(31, 27)
+> +#define RMI_FEATURE_REGISTER_0_PMU			BIT(26)
+
+[ ... ]
+
+> +#define RMI_FEATURE_REGISTER_3_RTT_S2AP_INDIRECT	BIT(6)
+> +#define RMI_FEATURE_REGISTER_3_RTT_PLANE		GENMASK(5, 4)
+> +#define RMI_FEATURE_REGISTER_3_MAX_NUM_AUX_PLANES	GENMASK(3, 0)
+> +
+> +#define RMI_FEATURE_REGISTER_4_MEC_COUNT		GENMASK(63, 0)
+
+[Severity: Low]
+Could GENMASK_ULL(63, 0) be used here as well?
+
+> +
+> +#define RMI_MEM_CATEGORY_CONVENTIONAL		0
+> +#define RMI_MEM_CATEGORY_DEV_NCOH		1
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260912083611.2513=
+845-1-suzuki.poulose@arm.com?part=3D1
