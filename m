@@ -1,229 +1,169 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F75241F5D8;
-	Sat, 12 Sep 2026 08:46:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8581C38D6A2;
+	Sat, 12 Sep 2026 08:48:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789202820; cv=none; b=XTFIPKHo944iBiCAnrThtsaXD9qmsk3iBG37I8ie59S5YIRvAA9FksMoRUN9D0gJT7RA34ijo9KnNDNeWnVn4F0ClB5XgCwz1dNAQ65Zgw1xtWj3EQCg/2Nr+1gpEDX8qGp0HhgARDCk8/RN7CR2p4XywBlrUtbS4aCheqkc0Z0=
+	t=1789202931; cv=none; b=TDC/l0NGkaATi564csPmFziwTI0YAIzTYxbAzHb62JFIhxB+PIy9usG2Vfezf+FIiNKwXSM3BB2y6UoAmnwgH8zwkXQGiACnZLQ5IYEQzQKe7MGkL3W/xzmCb1bW8HbKpV39PxDRgC+0rMEcSH+9/71cBDvH6ez0+yMVpwo9WA4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789202820; c=relaxed/simple;
-	bh=sTq8Rc2QROig7M25ZlHfiK01v/jqoBUaNk0ckk5tBpY=;
+	s=arc-20240116; t=1789202931; c=relaxed/simple;
+	bh=8uaBdVa3vktGkQW7UlQVNX7uUlD4996fwxnJ3HH7AOg=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=Pe2OCkbitTGIGjbjxsYmynAlux+O+kJA+zYqQ8uN3Lo8r+9FJUEuVtumNwg9Vcaa8GLtAlPcJZXKsEDpHF2QiavyBzoz5sszt0dhGh2HjXvK3yBnjhi15lGftuCJqj4UuKlRHceb/48wHLB4BJ8UmtbjObOsTmE9qQksPJAtYrQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MMsBHYfX; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=rAlBup2ZvoMnwhBpMBdiu74axn2MDhzmgttGhtQ2Z/AjqamoD0S3W8y96sCKr2l3QSWuou8Ls/XQet+NU/lhPpAGMI+6hpX60dUJXSN1t4Ltuiwi9DXyepee5wq31cCITpcJ2KsTSeC6qxO1aTQoqADR2zjs7ZWbUjYfZe1H39w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cULyLSWX; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MMsBHYfX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 655CF1F000FF;
-	Sat, 12 Sep 2026 08:46:54 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cULyLSWX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 285771F00898;
+	Sat, 12 Sep 2026 08:48:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789202814;
-	bh=3n4MGuKhD5DagvGPwhrL7U/37xTyFYHRFfhgKG0O/0c=;
+	s=k20260515; t=1789202927;
+	bh=oeruj1hDXHAgZSUz3uVc5kDVw6oz2R1yHWrt95UJLlI=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=MMsBHYfXlZDslF0fdZNhr6tGi1gJyYxP1qdJskShaYsdLcYe2bMbknpkY1VE38SNT
-	 hwAV5uqHmtUBh5SxkvvFofRDlv2A2uN3EpAk2bCV/fBihn/kzWF46b/WznillWQNEt
-	 0NK1PeVemh7/gW0gl/4SrviURfGFH80tNDl9LH6cpsAhXYiHXuOb5GVK2K6b3EIu6O
-	 tL1arsmcBxg55IhZm0zhGim87H66/sncGiR3GYwo5/vTJ03aSFAbMTUwaTUUJTK0Fc
-	 2w0bsnvaf6qsBWitacNBf/C7p8LxJVx3w5G7Y+lmydkWLFBUIFkuIC+I8JYKTaRNoz
-	 S65XLU/8qjKmA==
+	b=cULyLSWXurSR5f72NOgfodZ4w82kcXeIhpGL/luMaghOUJOzuAaTynNrJqNS0anAg
+	 bKCsHR2EyKVIodeZwYfV//m7dlFd8whiwxIkrXJa8pb7cmN37QnNbWn1U1HZh+298u
+	 9TnQSzGbBopb7JsMFrVU76Oqag2pb/4bUcQAOpuDGuJU/nvkKAHQDaVF0CPRG+CH2l
+	 bddmrBnFtBEmGkIIdgaAdhRvlv0U3M4pw8p9h9uLAeiP+bY2EIGiVpakxo0GlRDlbh
+	 oXhGlFZ0ak4KTPs7Y/3HDqAQdfLt9LAimZN8vUf8qnQNo06JucdRURF0cXjFKPeFXF
+	 90iFzO3xrYrAQ==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v18 6/7] firmware: arm_rmm: Ensure the RMM has GPT
- entries for memory
+Subject: Re: [PATCH v18 4/7] firmware: arm_rmm: Add support for SRO
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Suzuki K Poulose" <suzuki.poulose@arm.com>
-Cc: kvm@vger.kernel.org, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, "Oliver
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, "Oliver
  Upton" <oupton@kernel.org>
-In-Reply-To: <20260912083611.2513845-7-suzuki.poulose@arm.com>
+In-Reply-To: <20260912083611.2513845-5-suzuki.poulose@arm.com>
 References: <20260912083611.2513845-1-suzuki.poulose@arm.com>
- <20260912083611.2513845-7-suzuki.poulose@arm.com>
+ <20260912083611.2513845-5-suzuki.poulose@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 12 Sep 2026 08:46:54 +0000
-Message-Id: <20260912084654.655CF1F000FF@smtp.kernel.org>
+Date: Sat, 12 Sep 2026 08:48:46 +0000
+Message-Id: <20260912084847.285771F00898@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [High] Missing forward-progress check on firmware-provided boundaries (`n=
-ext`) can cause an infinite loop during boot or memory hotplug.
-- [High] Sub-page or inverted memblock regions are incorrectly expanded to =
-1GB blocks, resulting in out-of-bounds firmware queries that can falsely fa=
-il RMI initialization.
+- [High] `delegated_phys` is used uninitialized on the buggy RMM error path=
+ of `rmi_delegate_range()`, causing unpredictable undelegation sizes and le=
+aking/corrupting memory.
 --
 
-commit 9d5a0191d0b2d820e7529339f354ee6f7cd2d469
-Author: Steven Price <steven.price@arm.com>
+commit 860fe4975d9c1564e207c537f0159673fd509495
+Author: Suzuki K Poulose <suzuki.poulose@arm.com>
 
-firmware: arm_rmm: Ensure the RMM has GPT entries for memory
+firmware: arm_rmm: Add support for SRO
 
-This patch adds checks during initialization and hotplug to ensure that the
-firmware correctly tracks memory at fine granularity and manages L1 GPTs. If
-the firmware expects the host to manage tracking or GPT memory, the RMM is
-deactivated.
+RMM v2.0 introduces Stateful RMI Operations (SRO) where an SMC can return w=
+ith
+an operation still in progress. The SRO is tracked using a struct rmi_sro_s=
+tate
+object to manage memory donation and reclamation. This commit provides the =
+core
+infrastructure for SRO and adds delegate/undelegate range wrappers that use=
+ it.
 
 > diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/arm_rmm/rm=
 i.c
-> index ecc89e91d264d..583e1aca9b15a 100644
+> index 5b0e342ce3d58..4f9898ece7547 100644
 > --- a/drivers/firmware/arm_rmm/rmi.c
 > +++ b/drivers/firmware/arm_rmm/rmi.c
-
 [ ... ]
-
-> +static int rmi_verify_memory_tracking(phys_addr_t start, phys_addr_t end)
+> +int rmi_delegate_range(phys_addr_t phys,
+> +		       unsigned long size,
+> +		       phys_addr_t *out_phys)
 > +{
-> +	while (start < end) {
-> +		unsigned long ret, category, state, next;
+> +	long ret =3D 0;
+> +	unsigned long top =3D phys + size;
+> +	unsigned long out_top;
 > +
-> +		ret =3D rmi_granule_tracking_get(start, end, &category, &state, &next);
-> +		if (ret !=3D RMI_SUCCESS)
-> +			return -ENOMEM;
+> +	while (phys < top) {
+> +		ret =3D rmi_granule_range_delegate(phys, top, &out_top);
 > +
-> +		if (state !=3D RMI_TRACKING_FINE ||
-> +		    category !=3D RMI_MEM_CATEGORY_CONVENTIONAL) {
-> +			/* TODO: Set granule tracking in this case */
-> +			pr_err("Granule tracking for region isn't fine/conventional: %llx-%lx=
-\n",
-> +			       start, next);
-> +			return -ENODEV;
+> +		if (ret =3D=3D RMI_SUCCESS) {
+> +			/* Buggy RMM ? */
+> +			if (WARN_ON(out_top <=3D phys)) {
+> +				rmi_undelegate_range(top - size, size);
+> +				return -ENXIO;
+> +			}
+
+[Severity: High]
+If we take this buggy RMM error path, this function returns -ENXIO immediat=
+ely
+without setting *out_phys. Does this leave the caller's delegated_phys vari=
+able
+uninitialized?
+
+Also, doesn't rmi_undelegate_range(top - size, size) here undo the entire
+delegation, making the caller's own cleanup logic redundant and potentially
+conflicting?
+
+> +			phys =3D out_top;
+> +		} else {
+> +			break;
 > +		}
-> +		start =3D next;
-                ^^^^^^^^^^^^
-
-[Severity: High]
-Are we missing a forward-progress check here?
-
-If a buggy or malicious firmware returns a next boundary where next <=3D st=
-art,
-this loop will never terminate, resulting in a permanent kernel hang during
-boot or memory hotplug.
-
-The pre-existing rmi_undelegate_range() handles this exact scenario with:
-
-    if (WARN_ON(out_top <=3D phys))
-        return -ENXIO;
-
-Could we add a similar validation check here to verify next > start?
-
 > +	}
 > +
-> +	return 0;
+> +	if (out_phys)
+> +		*out_phys =3D phys;
+> +
+> +	return ret;
 > +}
-> +
-> +/*
-> + * We do not support creating L1 GPTs yet. So, make sure that
-> + * all the regions are managed by the firmware.
-> + */
-> +static int rmi_verify_gpt_firmware_managed(phys_addr_t start, phys_addr_=
-t end)
+[ ... ]
+> +static int rmi_sro_donate_contig(struct rmi_sro_state *sro,
+> +				 unsigned long sro_handle,
+> +				 unsigned long donatereq,
+> +				 struct arm_smccc_1_2_regs *out_regs,
+> +				 gfp_t gfp)
 > +{
-> +	unsigned long l0gpt_sz;
-> +	unsigned long next, par_state;
+[ ... ]
+> +	if (state =3D=3D RMI_OP_MEM_DELEGATED) {
+> +		phys_addr_t delegated_phys;
 > +
-> +	l0gpt_sz =3D 1UL << (30 + FIELD_GET(RMI_FEATURE_REGISTER_1_L0GPTSZ,
-> +					  rmi_feat_reg(1)));
-> +	start =3D ALIGN_DOWN(start, l0gpt_sz);
-> +	end =3D ALIGN(end, l0gpt_sz);
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-[Severity: High]
-Does this alignment expansion cause issues if the incoming range is inverte=
-d?
-
-As noted below in rmi_init_metadata(), if an inverted range (where
-start > end) is passed in, this alignment expands it into a massive block.
-
-For example, if start=3D0x2000 and end=3D0x1000, and l0gpt_sz is 1GB, this =
-expands
-to start=3D0 and end=3D1GB. The start < end loop condition then evaluates t=
-o true,
-and we end up querying the firmware for a 1GB block that might not be manag=
-ed
-by firmware, falsely failing initialization.
-
-> +
-> +	while (start < end) {
-> +		long ret =3D rmi_gpt_info(start, end, &next, &par_state);
-> +
-> +		if (ret !=3D RMI_SUCCESS)
-> +			return -ENOMEM;
-> +
-> +		if (par_state !=3D RMI_GPT_PAR_PLAT) {
-> +			pr_err("GPT for the region is not managed by firmware %llx-%lx\n",
-> +				start, next);
-> +			return -ENOMEM;
+> +		if (rmi_delegate_range(phys, size, &delegated_phys)) {
+> +			if (!rmi_undelegate_range(phys, delegated_phys - phys))
+> +				free_pages_exact(virt, size);
+> +			return -ENXIO;
 > +		}
-> +		start =3D next;
-                ^^^^^^^^^^^^
 
 [Severity: High]
-Similar to rmi_verify_memory_tracking(), is a forward-progress check
-needed here to prevent an infinite loop if the firmware returns a boundary
-where next <=3D start?
+If rmi_delegate_range() returns an error from the buggy RMM path,
+delegated_phys is completely uninitialized.
+
+Can this result in passing a garbage size (delegated_phys - phys) to
+rmi_undelegate_range(), attempting to undelegate an unpredictable physical
+memory region and preventing free_pages_exact() from executing?
 
 > +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static int rmi_prepare_memory(phys_addr_t start, phys_addr_t end)
+[ ... ]
+> +static int rmi_sro_donate_noncontig(struct rmi_sro_state *sro,
+> +				    unsigned long sro_handle,
+> +				    unsigned long donatereq,
+> +				    struct arm_smccc_1_2_regs *out_regs,
+> +				    gfp_t gfp)
 > +{
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[ ... ]
+> +		if (state =3D=3D RMI_OP_MEM_DELEGATED) {
+> +			phys_addr_t delegated_phys;
+> +
+> +			if (rmi_delegate_range(phys, block_size,
+> +					       &delegated_phys)) {
+> +				if (!rmi_undelegate_range(phys, delegated_phys - phys))
+> +					free_pages_exact(virt, block_size);
+> +				return -ENXIO;
+> +			}
 
 [Severity: High]
-Should there be an if (start >=3D end) return 0; check here?
+Similar to rmi_sro_donate_contig(), this code uses delegated_phys uninitial=
+ized
+if rmi_delegate_range() takes the buggy RMM error path. Could this lead to
+a similar memory leak and corruption risk?
 
-This would protect downstream logic and prevent empty or inverted regions f=
-rom
-reaching the alignment expansion in rmi_verify_gpt_firmware_managed().
-
-> +	int ret;
-> +
-> +	ret =3D rmi_verify_memory_tracking(start, end);
-> +	if (ret)
-> +		return ret;
-> +
-> +	return rmi_verify_gpt_firmware_managed(start, end);
-> +}
-> +
-> +static int rmi_init_metadata(void)
-> +{
-> +	phys_addr_t start, end;
-> +	struct memblock_region *r;
-> +
-> +	for_each_mem_region(r) {
-> +		int ret;
-> +
-> +		/* Firmware-reserved NOMAP regions are not usable system RAM */
-> +		if (memblock_is_nomap(r))
-> +			continue;
-> +
-> +		start =3D memblock_region_memory_base_pfn(r) << PAGE_SHIFT;
-> +		end =3D memblock_region_memory_end_pfn(r) << PAGE_SHIFT;
-                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-[Severity: High]
-Does this calculate an inverted range (start > end) for unaligned memblock
-regions smaller than a page?
-
-memblock_region_memory_base_pfn() rounds up, while
-memblock_region_memory_end_pfn() rounds down. For small, unaligned memory
-regions, this yields start > end.
-
-This inverted range then flows into rmi_prepare_memory() and gets
-incorrectly expanded to a full 1GB block in
-rmi_verify_gpt_firmware_managed(), leading to a fatal initialization failur=
-e.
-
-> +
-> +		ret =3D rmi_prepare_memory(start, end);
-> +		if (ret)
-> +			return ret;
-> +	}
+> +		}
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260912083611.2513=
-845-1-suzuki.poulose@arm.com?part=3D6
+845-1-suzuki.poulose@arm.com?part=3D4
