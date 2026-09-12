@@ -1,190 +1,115 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1E7419D8BC;
-	Sat, 12 Sep 2026 10:28:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51D9B46A600
+	for <kvmarm@lists.linux.dev>; Sat, 12 Sep 2026 10:48:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789208904; cv=none; b=rfBX6SZ0frSxF3qDELibRdibRN3FHDywBZL0mPYC9tF91j1hjLcDc0RN+j71KekENTR4cQg4b8QFWd1QbZJkEMfyjGs37LWMMOFd8yEeJBszqAIwLWAkacLKsGZ/hxInzQ99GFYLE9z0ULSA/CUvp1A/KPwPhB0eWw2DiCwv2fo=
+	t=1789210127; cv=none; b=HUx0iG/yEwMNbDph66ct2K6pmD8cYQUBwqrq6SR5jpBIEFe//MdZYJ1MrNa9lfVxCpPNvW0Cbd1aQyBBdQDfRkUHeqIASYJZsaJGKS3Z1ZCG6MaUzMPWgFM3SWAL6YreMqXWdmJzytenEh1kHhrF4Gj5SHZm2pt3vUbuQJ1tTXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789208904; c=relaxed/simple;
-	bh=HE6a7xCB9fyBWhSMjmYXu2+SaG5pCmShpeB7NuW8BOQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QEQiOR390K6W2GFj7Nl3LKrXJ8Wrj2LT7vTGI77lxY3BjIxOxaZSYjtXS96XMANPzrZoZFNr7jMljN3wJ7BO8PNux6JGjI3w9fItMbWjiaGgNcwr7tEuNYal4kO0GJBbhUyoxbwFTTephqwhXgmxR7kntRJxDsRQPAaPvaOCk+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=TUeIR6nA; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1789210127; c=relaxed/simple;
+	bh=b74vU1nJLP467oXw+kXIksRqSlbVsPjtfhJKPOUIZJk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=iJXogGlDEn3ya8PHKLUSeg/lci6mFWKQT0fMiaQcgkMFo2YPfVvKr3KdxKFkib4PCvgxEeMGQRxdFMM77uOflihaGvQf+4F0UENFLDDtRq+W8rrVaZIJamfqoQP4oPbYc64rfuXkdwLbAx4Wlg4Ys9XxrBXrBy9F+bRlDAxbi+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B9TY/W/0; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="TUeIR6nA"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9E5631713;
-	Sat, 12 Sep 2026 03:28:17 -0700 (PDT)
-Received: from [10.57.10.2] (unknown [10.57.10.2])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 784C13F7B4;
-	Sat, 12 Sep 2026 03:28:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1789208901; bh=HE6a7xCB9fyBWhSMjmYXu2+SaG5pCmShpeB7NuW8BOQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=TUeIR6nAdfBig/YdU4Y3FJ9oxgy59GA+iVrT/URmeKkFV4yy5DmsSP6Wqzph4VSNx
-	 FxtBScE6O6Z7BWRUsfmOUFV3pO55hTIc5TJnggx+WsI6Kuu8oZjaY1H6NW3PaE2tAg
-	 c2Ihk/6NJZZ5FuOtv9qSqp9MkDhDw8CX/IIX38tU=
-Message-ID: <74919bee-87c1-41b4-a244-143b6cfc2b01@arm.com>
-Date: Sat, 12 Sep 2026 11:28:18 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B9TY/W/0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F8C81F0089E;
+	Sat, 12 Sep 2026 10:48:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789210122;
+	bh=uPsS2T1yv9TxZ62g74tWsPG1tgtql7lQ5uggCY+tQEU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=B9TY/W/0OP8qWw2t6DM+wQ8UFUdvSqe9ASPSPQnmRKY44ylNK2HS0rkKDJSkVzIN8
+	 Zr7PhT5iDmkyJGeIWFUy1tVAHetvMOBAqXGJahsiJASSpE5G/unf/0gIagfAoF632B
+	 1UzyDjE/0bFgVih2M4UqC+ka3uADtwH8vTMQ4l1xnCKO3uTWbywGyuK0bStTiJ5eQu
+	 cUJSUcZYHujVmIu2Gfw+okU7pILxDEvoF/WmDnr7iaDV5plawYS5SydaFBeHOBMy6R
+	 UkCPya5xjGCqpJCIwlTENMqSVj9uId8vb6+eG/wfafSHomsUjkCMzQRP8I3bVsZCZA
+	 jKhY4dY/O7Dog==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1x5LHk-000000084hK-1hgD;
+	Sat, 12 Sep 2026 10:48:40 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org
+Cc: Wei-Lin Chang <weilin.chang@arm.com>,
+	Wang Han <wanghan@linux.alibaba.com>,
+	Shuai Xue <xueshuai@linux.alibaba.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Fuad Tabba <fuad.tabba@linux.dev>
+Subject: [PATCH 4/4] KVM: arm64: nv: Move TLBI VMALLS12E1* emulation over to kvm_stage2_unmap_all()
+Date: Sat, 12 Sep 2026 11:48:34 +0100
+Message-ID: <20260912104834.3093878-5-maz@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260912104834.3093878-1-maz@kernel.org>
+References: <20260912104834.3093878-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v18 4/7] firmware: arm_rmm: Add support for SRO
-Content-Language: en-GB
-To: sashiko-reviews@lists.linux.dev
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, Marc Zyngier
- <maz@kernel.org>, Oliver Upton <oupton@kernel.org>
-References: <20260912083611.2513845-1-suzuki.poulose@arm.com>
- <20260912083611.2513845-5-suzuki.poulose@arm.com>
- <20260912084847.285771F00898@smtp.kernel.org>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20260912084847.285771F00898@smtp.kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, weilin.chang@arm.com, wanghan@linux.alibaba.com, xueshuai@linux.alibaba.com, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, fuad.tabba@linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 12/09/2026 09:48, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> - [High] `delegated_phys` is used uninitialized on the buggy RMM error path of `rmi_delegate_range()`, causing unpredictable undelegation sizes and leaking/corrupting memory.
-> --
-> 
-> commit 860fe4975d9c1564e207c537f0159673fd509495
-> Author: Suzuki K Poulose <suzuki.poulose@arm.com>
-> 
-> firmware: arm_rmm: Add support for SRO
-> 
-> RMM v2.0 introduces Stateful RMI Operations (SRO) where an SMC can return with
-> an operation still in progress. The SRO is tracked using a struct rmi_sro_state
-> object to manage memory donation and reclamation. This commit provides the core
-> infrastructure for SRO and adds delegate/undelegate range wrappers that use it.
-> 
->> diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/arm_rmm/rmi.c
->> index 5b0e342ce3d58..4f9898ece7547 100644
->> --- a/drivers/firmware/arm_rmm/rmi.c
->> +++ b/drivers/firmware/arm_rmm/rmi.c
-> [ ... ]
->> +int rmi_delegate_range(phys_addr_t phys,
->> +		       unsigned long size,
->> +		       phys_addr_t *out_phys)
->> +{
->> +	long ret = 0;
->> +	unsigned long top = phys + size;
->> +	unsigned long out_top;
->> +
->> +	while (phys < top) {
->> +		ret = rmi_granule_range_delegate(phys, top, &out_top);
->> +
->> +		if (ret == RMI_SUCCESS) {
->> +			/* Buggy RMM ? */
->> +			if (WARN_ON(out_top <= phys)) {
->> +				rmi_undelegate_range(top - size, size);
->> +				return -ENXIO;
->> +			}
-> 
-> [Severity: High]
-> If we take this buggy RMM error path, this function returns -ENXIO immediately
-> without setting *out_phys. Does this leave the caller's delegated_phys variable
-> uninitialized?
-> 
-> Also, doesn't rmi_undelegate_range(top - size, size) here undo the entire
-> delegation, making the caller's own cleanup logic redundant and potentially
-> conflicting?
+Instead of emulating TLBI VMALLS12E1* with a range invalidation, use
+kvm_stage2_unmap_all() which is more efficient, specially in deeply
+nested cases.
 
-I have changed this hunk to :
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/sys_regs.c | 18 ++++++++----------
+ 1 file changed, 8 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/arm_rmm/rmi.c
-index 4f9898ece7547..bf7ae9a60e22b 100644
---- a/drivers/firmware/arm_rmm/rmi.c
-+++ b/drivers/firmware/arm_rmm/rmi.c
-@@ -154,8 +154,8 @@ int rmi_delegate_range(phys_addr_t phys,
-                 if (ret == RMI_SUCCESS) {
-                         /* Buggy RMM ? */
-                         if (WARN_ON(out_top <= phys)) {
--                               rmi_undelegate_range(top - size, size);
--                               return -ENXIO;
-+                               ret = -ENXIO;
-+                               break;
-                         }
-
-Which forces to return the "completed range so far". In any case, 
-UNDELEGATE on a mixed region, forces the RMM to skip the "undelegated"
-granules and complete the range. So, this is safe from the caller's 
-perspective. Also, we don't know how far the RMM progressed in
-case of a buggy result.
-
-> 
->> +			phys = out_top;
->> +		} else {
->> +			break;
->> +		}
->> +	}
->> +
->> +	if (out_phys)
->> +		*out_phys = phys;
->> +
->> +	return ret;
->> +}
-> [ ... ]
->> +static int rmi_sro_donate_contig(struct rmi_sro_state *sro,
->> +				 unsigned long sro_handle,
->> +				 unsigned long donatereq,
->> +				 struct arm_smccc_1_2_regs *out_regs,
->> +				 gfp_t gfp)
->> +{
-> [ ... ]
->> +	if (state == RMI_OP_MEM_DELEGATED) {
->> +		phys_addr_t delegated_phys;
->> +
->> +		if (rmi_delegate_range(phys, size, &delegated_phys)) {
->> +			if (!rmi_undelegate_range(phys, delegated_phys - phys))
->> +				free_pages_exact(virt, size);
->> +			return -ENXIO;
->> +		}
-> 
-> [Severity: High]
-> If rmi_delegate_range() returns an error from the buggy RMM path,
-> delegated_phys is completely uninitialized.
-> 
-> Can this result in passing a garbage size (delegated_phys - phys) to
-> rmi_undelegate_range(), attempting to undelegate an unpredictable physical
-> memory region and preventing free_pages_exact() from executing?
-
-Fixed as above.
-
-> 
->> +	}
-> [ ... ]
->> +static int rmi_sro_donate_noncontig(struct rmi_sro_state *sro,
->> +				    unsigned long sro_handle,
->> +				    unsigned long donatereq,
->> +				    struct arm_smccc_1_2_regs *out_regs,
->> +				    gfp_t gfp)
->> +{
-> [ ... ]
->> +		if (state == RMI_OP_MEM_DELEGATED) {
->> +			phys_addr_t delegated_phys;
->> +
->> +			if (rmi_delegate_range(phys, block_size,
->> +					       &delegated_phys)) {
->> +				if (!rmi_undelegate_range(phys, delegated_phys - phys))
->> +					free_pages_exact(virt, block_size);
->> +				return -ENXIO;
->> +			}
-> 
-> [Severity: High]
-> Similar to rmi_sro_donate_contig(), this code uses delegated_phys uninitialized
-> if rmi_delegate_range() takes the buggy RMM error path. Could this lead to
-> a similar memory leak and corruption risk?
-
-Fixed as above.
-
-Suzuki
-
->> +		}
-> 
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 44aae52c473d7..2c90e185c6e8e 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -4124,26 +4124,24 @@ static void s2_mmu_unmap_range(struct kvm_s2_mmu *mmu,
+ 	kvm_stage2_unmap_range(mmu, info->range.start, info->range.size, true);
+ }
+ 
++static void s2_mmu_unmap_all(struct kvm_s2_mmu *mmu,
++			     const union tlbi_info *info)
++{
++	kvm_stage2_unmap_all(mmu, true);
++}
++
+ static bool handle_vmalls12e1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 				const struct sys_reg_desc *r)
+ {
+ 	u32 sys_encoding = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
+-	u64 limit, vttbr;
++	u64 vttbr;
+ 
+ 	if (!kvm_supported_tlbi_s12_op(vcpu, sys_encoding))
+ 		return undef_access(vcpu, p, r);
+ 
+ 	vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
+-	limit = BIT_ULL(kvm_get_pa_bits(vcpu->kvm));
+ 
+-	kvm_s2_mmu_iterate_by_vmid(vcpu->kvm, get_vmid(vttbr),
+-				   &(union tlbi_info) {
+-					   .range = {
+-						   .start = 0,
+-						   .size = limit,
+-					   },
+-				   },
+-				   s2_mmu_unmap_range);
++	kvm_s2_mmu_iterate_by_vmid(vcpu->kvm, get_vmid(vttbr), NULL, s2_mmu_unmap_all);
+ 
+ 	return true;
+ }
+-- 
+2.47.3
 
