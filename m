@@ -1,150 +1,132 @@
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa12.hc1455-7.c3s2.iphmx.com (esa12.hc1455-7.c3s2.iphmx.com [139.138.37.100])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEFCB29B795
-	for <kvmarm@lists.linux.dev>; Sun, 13 Sep 2026 20:32:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 339A23DDDB0
+	for <kvmarm@lists.linux.dev>; Sun, 13 Sep 2026 23:27:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.138.37.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789331564; cv=none; b=CDR5Opv3uz+vx/L10i6VOMDOE0x9ZOqpYJM8zGBqCgu5rk1sChG8E/zmjLm3FJkDjQTdTBmKzGajr+VhsuZpiAs2j7xcfmuia0mSbJD3CHWeN+NekxKyb4Ax1IVkGSg31W5eMvKECH/oGYPviC5HpSkEnIlB9x7/GCfBuXmRbBQ=
+	t=1789342050; cv=none; b=EdITpQQANmeSv3wh2WkDrUoTqwY602+n6ljGuv5SSw5RsZ0ymKQiFA+tZk9rXhSXXRbymJajM02VCqhy9LwRYu72110izkxA3TzF0n5Xzi/BYtoeDpJksjPxdyM6+DIjtJ5EfXCxPiwp2EWhB1wbN+89YTaAic9V0rh/HI/GFSE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789331564; c=relaxed/simple;
-	bh=+3wvn+LcJLxs9CD5gPyXtjBBE2q6N0M4ucxIJ7iBUQE=;
+	s=arc-20240116; t=1789342050; c=relaxed/simple;
+	bh=ul+cr0z2BcSymh+TpscLFzMcdP7+m+oZ1R/UwzI1UOc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IFbmsrAu6oozXBypLBTjBE8TSJqw6RIrqBohNRr0Mnb3+/R3ZSjWOonmplc6jaFsotf7oDPRbkZQnIO1PO3lbsG5V1HPQu12FaU9EdrZSiCZzGNa4ReR7+Mf/2uD0WVQ8dq58zNm3r2iXok07qS1SUHZYtkMpZWY92UEdkuGwRI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VpPXr+xi; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=H2LQb2jH0ITEvLJk3dv8gEkVGVfVOhXYgMMu2kn8xFmoth4MDdPyYbBQyV4JzKMxDpdiAt5q2NZry7TMH1vFOa6q7qF/POtFEoQm+dKWptJ5JLvvF8vwwY8KnP8sTwJmXLn03o0n2xPup3Epvd1GUUbyiD3TBwRu9Y3J8fBMdUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=ArYvT5cd; arc=none smtp.client-ip=139.138.37.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VpPXr+xi"
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-49e78adf099so2667345e9.2
-        for <kvmarm@lists.linux.dev>; Sun, 13 Sep 2026 13:32:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1789331561; x=1789936361; darn=lists.linux.dev;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=9bQY7Y2h5Bi3Z75l523u4BoMdJvdggKly0nCHimUJnY=;
-        b=VpPXr+xiWa/p0u4IPVkaH4wBkzy+c77iF3+R+ntj9WyOkaYKIdi4vKCr2QP9d8xix2
-         fP/2f9+fX0wSluMoNyH8LsOIAs3W7QMH7NWg6Q7hFGulCjoI4sbqYvvhDFhYiFK9Nj1P
-         fx0cWqIaYrvXDRGRg0wx54mkv0gdLwxwvu89qRk0w90ppXfj7ZI9LLyU8qAMDlK0WO08
-         5J6UEPS3VX83RAlaMKn7HvYU0w0xZkYDMAfJa17C1xA9PRV1axE6NYRxKWOEf2VGytUn
-         ujP5wB9hBr94VAssmYhy4qr3p4BPoYy9bUGZasshbS5PVnTW4q5K5ARCiZPIgmFXtpeU
-         /v+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789331561; x=1789936361;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=9bQY7Y2h5Bi3Z75l523u4BoMdJvdggKly0nCHimUJnY=;
-        b=D+lsO9HPRAE6v1sSG89OLJp1SMy+PiQGwtnne83eNYfMQ0fYusf40+/2KDoVP/LzYB
-         J5P149aOTCF5o8PZnKrWtZUTPNiaYtWeC5Rzon2UwF+WDB2Pm61+eklaEZvtWuPwvE3E
-         rWB3qegyuzXuQwqBz4W7GXoAbgRfBeU/LWnRL0Z2UeNGch1BTCq4l9ud1JzP2BTg2brV
-         Ev84Fq6XkOy5mJFo+lj9G6ZrR1RqAw9SyVFLM+FEk2O0ZCOroefd1M/ID/7NJsFqqvP1
-         /VfHlCmSdFJfmOmBBn1ir3qhFvnVJ9cRe7x+2+TL3sdOXikjL98q5tw1Ac1enjSFx4qD
-         v/hQ==
-X-Gm-Message-State: AFuF++kqK0FcFgtdueyD6GH8a7w1jIng9LlGFjbxKvNOiP8fsc2/2NJn
-	dP7Ljalj/CGpLWBKUOI7cAEC/wHL7CpJYG7lTpDK5KTRqFOdd613zOEbb0ds9kiSUg==
-X-Gm-Gg: AYBFou2ltwGVwekkut28twQ/mTMjcDHJV05wQrQT7W6kXbrGinJbwIqtX13lCmfTo6F
-	Fj8O9l5VnnurJkyYa6AH3My06oi+haAZixbLqMP8KcPITPouNkew21B4ocxpT85/2Yp3aoW8BUr
-	THh9Mk2/UIiYxuQH0FdJ+rEFOrA0kg407H97olT11d6mV7xAd7sJl5SWXZz/buIa6KoMYiJzklE
-	lsDcgN+dg3YoExFMtL4u31l0HI+6grnzI2OKjlq9vcDZh5zeKWDNeNpTPkHQqzgdqWUofWlvvJd
-	KHm9A5xHy36vJ3EFy11Lr4cYXZIjbHFIVpY6IUpGoRkf+F9B1wsnizZUmGrgPAcxYYntNIkWvSV
-	lVTc5HpVoYWSA6HAEztgZ+lYT+BLOkjNJrXuliO72/jlNbGEFQrh+1TNaUdSiYKWLqZetF/mJEg
-	kNvfkClUJqw+YmrGCDkzvLxk7rkKPQFu4y/XRH1pNKg/Wwcx5fs4ov13BaLzGXWhJ/vC7AfPII1
-	Quu+buCoM3ydmOfhs2bPvMCrl91hji+FHnQnCRlWnqtQ4WnUpaDXZ0=
-X-Received: by 2002:a05:600c:1991:b0:49e:663c:c67e with SMTP id 5b1f17b1804b1-49e663cc7cdmr128057815e9.25.1789331560713;
-        Sun, 13 Sep 2026 13:32:40 -0700 (PDT)
-Received: from google.com (135.91.155.104.bc.googleusercontent.com. [104.155.91.135])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49e69f02e0bsm118285185e9.2.2026.09.13.13.32.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 13 Sep 2026 13:32:39 -0700 (PDT)
-Date: Sun, 13 Sep 2026 21:32:36 +0100
-From: Vincent Donnefort <vdonnefort@google.com>
-To: sashiko-reviews@lists.linux.dev
-Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>,
-	Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v1] KVM: arm64: Fix protected VMs fault on system with
- pages larger than 4K
-Message-ID: <aqcIZCglQ2B7LPnH@google.com>
-References: <20260913173516.3122436-1-vdonnefort@google.com>
- <20260913175105.A57AC1F000FF@smtp.kernel.org>
+	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="ArYvT5cd"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
+  t=1789342048; x=1820878048;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=ul+cr0z2BcSymh+TpscLFzMcdP7+m+oZ1R/UwzI1UOc=;
+  b=ArYvT5cdyGOw96dXg+CpxYDi18gVLrSyqcoBQ6znMWjfLx8CFbwSAtb6
+   S2eahUC7BQArRA4E/myaCYI2ACl6nG7iixXatztlowjqzpK98oEyvTLV9
+   8aoIdOoXdKE75knpl6Ygriv1rBX3TS/R5H0pW0kOoQfW9bwuNhulu/sVv
+   UHCX1Ey5beV5j2j5RVPtMO+GRcjJRmOlU3M1PCb+iulnHVg+kzTIIIM+f
+   bw5DLb6PbSm/m66wfpd0ZESFlyBbvIS/eu3fdFOv5Ud6Z6SmzZ2GmSxGC
+   2nP1YSANpfP7jSChpGYCZTHQuUVk5UtQ862iuk1mHhduQaHuXfQ0PP0Ou
+   Q==;
+X-CSE-ConnectionGUID: gPoxky2tR3qkDsO396Ip7g==
+X-CSE-MsgGUID: PxtBh6ADT0aVrtzBbfZoUg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11904"; a="232598963"
+X-IronPort-AV: E=Sophos;i="6.27,100,1786978800"; 
+   d="scan'208";a="232598963"
+Received: from gmgwnl01.global.fujitsu.com (HELO mgmgwnl01.global.fujitsu.com) ([52.143.17.124])
+  by esa12.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2026 08:27:20 +0900
+Received: from az2nlsmgm2.o.css.fujitsu.com (unknown [10.150.26.202])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mgmgwnl01.global.fujitsu.com (Postfix) with ESMTPS id DE9FC3D39
+	for <kvmarm@lists.linux.dev>; Sun, 13 Sep 2026 23:27:19 +0000 (UTC)
+Received: from az2uksmom4.o.css.fujitsu.com (unknown [10.151.22.204])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by az2nlsmgm2.o.css.fujitsu.com (Postfix) with ESMTPS id 8CCFF1C002B1
+	for <kvmarm@lists.linux.dev>; Sun, 13 Sep 2026 23:27:19 +0000 (UTC)
+Received: from sm-arm-grace07 (unknown [10.124.178.20])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by az2uksmom4.o.css.fujitsu.com (Postfix) with ESMTPS id 0032B404329;
+	Sun, 13 Sep 2026 23:27:14 +0000 (UTC)
+Date: Mon, 14 Sep 2026 08:27:12 +0900
+From: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	Wang Han <wanghan@linux.alibaba.com>,
+	Shuai Xue <xueshuai@linux.alibaba.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
+	Fuad Tabba <fuad.tabba@linux.dev>
+Subject: Re: [PATCH 0/4] KVM: arm64: Reduce overhead of full S2 teardown
+Message-ID: <aqcxUCr9828o1W8V@sm-arm-grace07>
+References: <20260912104834.3093878-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260913175105.A57AC1F000FF@smtp.kernel.org>
+In-Reply-To: <20260912104834.3093878-1-maz@kernel.org>
 
-On Sun, Sep 13, 2026 at 05:51:05PM +0000, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> - [High] gmem_abort() passes an unaligned fault_ipa to kvm_pgtable_stage2_map(), which triggers the new -EINVAL check on pKVM hosts.
-> --
-> 
-> commit 724c2b0f8e554f59f7c409467796ff8e9acf590b
-> Author: Vincent Donnefort <vdonnefort@google.com>
-> Subject: KVM: arm64: Fix protected VMs fault on system with pages larger than 4K
-> 
-> This commit aligns the fault IPA down to the page size for protected VMs
-> in pkvm_mem_abort(), similar to previous fixes for non-protected VMs.
-> It also adds a strict page-alignment check to pkvm_pgtable_stage2_map()
-> which returns -EINVAL if the address, size, or physical address are unaligned.
-> 
-> [ ... ]
-> 
-> > diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-> > index 8e4c6e4bec123..1ca27d01a3ec6 100644
-> > --- a/arch/arm64/kvm/pkvm.c
-> > +++ b/arch/arm64/kvm/pkvm.c
-> > @@ -414,6 +414,9 @@ int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
-> >  	u64 end = addr + size;
-> >  	int ret;
-> >  
-> > +	if (!PAGE_ALIGNED(addr | size | phys))
-> > +		return -EINVAL;
-> > +
-> 
-> [Severity: High]
-> Does this new check break non-protected VMs using guest_memfd on a pKVM host?
-> 
-> When gmem_abort() handles page faults for guest_memfd slots, it passes
-> s2fd->fault_ipa directly to kvm_pgtable_stage2_map() without aligning it
-> down to the page size:
-> 
-> arch/arm64/kvm/mmu.c:gmem_abort() {
->     ...
-> 	} else {
-> 		ret = KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, s2fd->fault_ipa,
-> 							 PAGE_SIZE,
-> 							 __pfn_to_phys(pfn),
-> 							 prot, memcache, flags);
-> 	}
->     ...
-> }
+Hi Marc,
 
-Ha right...
+On Sat, Sep 12, 2026 at 11:48:30AM +0100, Marc Zyngier wrote:
+> Tearing down a full S2 is a pretty involved process, resulting in a
+> lot of TLB invalidation. These TLBIs are either on a per leaf basis if
+> the HW doesn't support range invalidation, or by top-level range if it
+> does. Amusingly, the latter occurs even when nothing has been
+> unmapped.
+> 
+> Things are made worse with NV, as we have a bucket-load of shadow S2s,
+> and the need to invalidate them all on the back of an MMU notifier.
+> The latter will eventually be solved by the reverse-map tracking that
+> Wei-Lin is working on, but we need to be better at full-S2 teardown.
+> 
+> This small series adds a "no TLBI" unmapping primitive, which allows
+> the caller to then whack the TLBs using a VMID-wide invalidation. This
+> results in far fewer TLBIs, and a better recursive virtualisation as
+> we get far fewer traps as a consequence.
+> 
+> This applies on top of my shadow-s2 lifetime fixes, and is expected to
+> be a prefix to Wei-Lin's series.
 
-And actually I will do gfn_to_gpa(gfn)... that fits better the series I have
-sent for the protected VM huge pages.
+I've tested this series on QEMU with TCG mode, and it boots.
 
--- 
-Vincent
+Tested-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+
+Thanks,
+Itaru.
 
 > 
-> Since HPFAR_EL2 only aligns to 4K, on a 16K or 64K page host, the fault_ipa
-> passed from gmem_abort() will fail this new PAGE_ALIGNED check and return
-> -EINVAL. This prevents memory mapping and causes the VM fault handling to
-> abort.
+> Marc Zyngier (4):
+>   KVM: arm64: pgtable: Add Stage-2 unmap without TLBI primitive
+>   KVM: arm64: MMU: Add kvm_stage2_unmap_all() helper
+>   KVM: arm64: nv: Move full s2_mmu unmap over to kvm_stage2_unmap_all()
+>   KVM: arm64: nv: Move TLBI VMALLS12E1* emulation over to
+>     kvm_stage2_unmap_all()
 > 
-> Should gmem_abort() also be updated to apply ALIGN_DOWN to s2fd->fault_ipa,
-> just like pkvm_mem_abort() was fixed in this patch?
-> 
-> >  	lockdep_assert_held_write(&kvm->mmu_lock);
-> >  	mapping = pkvm_mapping_iter_first(&pgt->pkvm_mappings, addr, end - 1);
+>  arch/arm64/include/asm/kvm_mmu.h     |  1 +
+>  arch/arm64/include/asm/kvm_pgtable.h | 17 +++++++++++++
+>  arch/arm64/include/asm/kvm_pkvm.h    |  1 +
+>  arch/arm64/kvm/hyp/pgtable.c         | 38 +++++++++++++++++++++-------
+>  arch/arm64/kvm/mmu.c                 | 15 +++++++++++
+>  arch/arm64/kvm/nested.c              |  4 +--
+>  arch/arm64/kvm/pkvm.c                |  2 ++
+>  arch/arm64/kvm/sys_regs.c            | 18 ++++++-------
+>  8 files changed, 75 insertions(+), 21 deletions(-)
 > 
 > -- 
-> Sashiko AI review · https://sashiko.dev/#/patchset/20260913173516.3122436-1-vdonnefort@google.com?part=1
+> 2.47.3
+> 
+> 
