@@ -1,122 +1,112 @@
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 188FF37A848
-	for <kvmarm@lists.linux.dev>; Sun, 13 Sep 2026 17:35:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B1F3361976
+	for <kvmarm@lists.linux.dev>; Sun, 13 Sep 2026 17:51:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789320938; cv=none; b=PSGnpqkF+X8WXM19Cb9BnoUBJwt1llQlG/X4GqmZqFXC1sgajRL0iXavQE1rMj+WTTh447q3NfIPSBgbjWCRZS2xxcQgwsVzqEDIa/Z01klEB0b/ll+haDfZGqSRpgnEvY/tOhHD0vpIBCZb8rPT+LfGdqNTjnb10GJlQFljTB8=
+	t=1789321867; cv=none; b=t8udEjFTCRirNqnny6VxaYxO92kANp1aogFsDDb44jJikdwWIQHlrMBqMb+7Y0fZUBW0WKU4zuOU4chQvpRuReaAbG96HAmptsm51GP2VbCGQLCY9QlaQUW1XnNuxKGnRru4yMc4J+l8elpocW0SnX6O47og3dEAJbnuxfP0ViY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789320938; c=relaxed/simple;
-	bh=oojpCCn9S905n9dIf4cWhtFLz3VR0tFaovcpa1/k+Yw=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=XHnDQXCa2gIF0M4ZslVrXKdZBhikVWrUGSF3obyT5JdfshU8YM8HfTXubO69LRyVa8JoAIZzswYsAo65X6Zjx+x61CSvFMRUoLYcBkX8GcbeFevWVu4voKZeTt0C6ZoIen74FuJ5hHFeVZ63tJwjjtwV2kaW1BaH1KXRRH7XuKI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Yu5CWv/d; arc=none smtp.client-ip=209.85.128.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
+	s=arc-20240116; t=1789321867; c=relaxed/simple;
+	bh=wV+Ea5O648gDH19JqA6lFL8uIzT5+1nkWnhxVFsJvWE=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=az7CVkq/EreUA6PJApaIbIYmdc+muyW4yXOhRdnM3jxak33QjKnxXE4muqNhjLbAU5hxn8jOyW2dDQbShIpVSN6Ufi4pdh7CcQ9HA/JX8Ctyh+e2jptjRmUxiaPb0AijYEazNQ1Y32p32+r11zgkWk/lwKjsaP5Gxf/YFTQVfkU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HMOdbwTZ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Yu5CWv/d"
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-49e6422198fso15724055e9.1
-        for <kvmarm@lists.linux.dev>; Sun, 13 Sep 2026 10:35:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1789320935; x=1789925735; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=WrvnXTAqvwcTzxE8seUUXgtR7H/O9p43WXWIeIPgMYU=;
-        b=Yu5CWv/dLB+ojAu1QLI5th+sUFsGh+ioPh51/iIL+MiU1PQxqVrUfBuiyks+IplUKd
-         HdtcggCdfAqJuR7zFtHY9ZC5kiaKfLsj/C1LvxyZDAYbOps0Gwww4xTzIgivC/6LAvC9
-         eh/1ViazlH+UESMEUNi6UjKy4efQFz99Utp31Q95kbGRl5ogVnhM+ISAe3NfpCiWpKCH
-         R+uMCBZvxrILPpqR3wfCWUELravDzQmA+w/TNRtdUvbblCWN5nto4BFQUgmpWsZw2HpW
-         UByCghvZ/V6lrVEnC2AmIUmY3eobJTkgL5VoXBst7azerabj7KLshWs4F5yTY7DzJzMN
-         TRKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789320935; x=1789925735;
-        h=content-type:cc:to:from:subject:message-id:mime-version:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=WrvnXTAqvwcTzxE8seUUXgtR7H/O9p43WXWIeIPgMYU=;
-        b=qZIMeo3yc4wEf4xhSIWWVt4u7o9uTmm/X9q9bCOpQzDykN7hp/0jNEj/oqY/KICEQx
-         m4cqEqEz4MmHnk0L/2j3MrmtfGNXmakLtXSoogTaRqTIAFMEjPrPXnXZcakgFclC/JQz
-         Qge02Ox1Ngxcwc480DstytoiIyaw+mrqA1/jPkAHVTrLMhFK2GDfwuBHJgxoHTyUV6IQ
-         k1QPAmsdQr9P7S1S8m1GZkU5w0ZjoF/0umNm1V0dhyTqVo+JL2NseOODGtPmWDY24roT
-         +xdqC1ziXqpowxx8yyai9TsOI+VFhPP0f/0OOEvHFD00SQB0pSSd7HAJ+oHDJhmdepG9
-         L4PQ==
-X-Forwarded-Encrypted: i=1; AKwUvBzah+o0Q8Wi4gZQjCTtEIGoecksvNeAg7GPZUm4nwk6tDGhOl+L8cqMMMD7shFY5MByxquRcwE=@lists.linux.dev
-X-Gm-Message-State: AFuF++kHWQe1T7b4IWPrEp6WFpCD1pqb5nnitWVtwZ6VfTR2dd/yBlxg
-	XrNjeS6O3rminnHaJ8hDYYLvJ9JHXnZ7JiUT2O4p0MQn9tMmy3BJMGZ9O4CZQnemy7AKY0jK1Nh
-	4MZIc/A0RCZxeljZk6vpJgA==
-X-Received: from wrbfi2.prod.google.com ([2002:a05:6000:4402:b0:486:ef8f:f47])
- (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:c493:b0:49d:2607:4ada with SMTP id 5b1f17b1804b1-49e619bf31cmr255115085e9.14.1789320934793;
- Sun, 13 Sep 2026 10:35:34 -0700 (PDT)
-Date: Sun, 13 Sep 2026 18:35:16 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HMOdbwTZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A57AC1F000FF;
+	Sun, 13 Sep 2026 17:51:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789321865;
+	bh=sr27lRZX+84OKhFDydgoA6ib60H/VRpxjIzqDMMXloQ=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=HMOdbwTZESUyH6/WTUdu5DI0JDa20vXX2D9VXEpXW6V7AsC0cf7Im8lRv7YKH4eAN
+	 4y7gC/RUsIBBXl1dzST/vUHF6j8ZcnB+Jh6NvB5NC42bQIyhsmCulCCroRA8wayMVh
+	 gQmMaNo5ybbpV7fsL7TkTgF2xwe//9x5RgXXpNNCEpxpXL+CajHa8FpB820sDBumye
+	 CFEn6veT0O9RtfdsHxES/hImmaooeRJhSWwvbxySuYoL9+E0iIPALSBdng2Deb62f5
+	 PWaWpScuTu3r/3cNYQjGxJbI94yQlbAqLHbXyjYqLsSg+MV+DPlDWxJXFbpwV+gY5F
+	 1a+kVS2FgUuDw==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v1] KVM: arm64: Fix protected VMs fault on system with
+ pages larger than 4K
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Vincent Donnefort" <vdonnefort@google.com>
+Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20260913173516.3122436-1-vdonnefort@google.com>
+References: <20260913173516.3122436-1-vdonnefort@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 13 Sep 2026 17:51:05 +0000
+Message-Id: <20260913175105.A57AC1F000FF@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.55.0.1007.g17ff1f9808-goog
-Message-ID: <20260913173516.3122436-1-vdonnefort@google.com>
-Subject: [PATCH v1] KVM: arm64: Fix protected VMs fault on system with pages
- larger than 4K
-From: Vincent Donnefort <vdonnefort@google.com>
-To: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org
-Cc: joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
-	kernel-team@android.com, fuad.tabba@linux.dev, qperret@google.com, 
-	Vincent Donnefort <vdonnefort@google.com>
-Content-Type: text/plain; charset="UTF-8"
 
-Just like commit 08f97454b7fa ("KVM: arm64: Fix protected mode handling
-of pages larger than 4kB") fixed the boot of non-protected VMs on system
-larger than 4K pages, align the fault IPA down to the page-size for
-protected VMs.
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [High] gmem_abort() passes an unaligned fault_ipa to kvm_pgtable_stage2_m=
+ap(), which triggers the new -EINVAL check on pKVM hosts.
+--
 
-To paraphrase Marc, pkvm_pgtable_stage2_map() assumes the address passed
-as a parameter is aligned to the size of the intended mapping, while
-HPFAR_EL2 gives the IPA minus the bottom 12 bits, regardless of the
-system page size configuration.
+commit 724c2b0f8e554f59f7c409467796ff8e9acf590b
+Author: Vincent Donnefort <vdonnefort@google.com>
+Subject: KVM: arm64: Fix protected VMs fault on system with pages larger th=
+an 4K
 
-Add a check at the start of pkvm_pgtable_stage2_map() as we do not
-support !PAGE_ALIGNED arguments.
+This commit aligns the fault IPA down to the page size for protected VMs
+in pkvm_mem_abort(), similar to previous fixes for non-protected VMs.
+It also adds a strict page-alignment check to pkvm_pgtable_stage2_map()
+which returns -EINVAL if the address, size, or physical address are unalign=
+ed.
 
-Fixes: ea03466e806f ("KVM: arm64: Handle aborts from protected VMs")
-Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
----
- arch/arm64/kvm/mmu.c  | 2 +-
- arch/arm64/kvm/pkvm.c | 3 +++
- 2 files changed, 4 insertions(+), 1 deletion(-)
+[ ... ]
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 9ba86450fe4a..e8d98957531a 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1756,7 +1756,7 @@ static int pkvm_mem_abort(const struct kvm_s2_fault_desc *s2fd)
- 	}
- 
- 	write_lock(&kvm->mmu_lock);
--	ret = pkvm_pgtable_stage2_map(pgt, s2fd->fault_ipa, PAGE_SIZE,
-+	ret = pkvm_pgtable_stage2_map(pgt, ALIGN_DOWN(s2fd->fault_ipa, PAGE_SIZE), PAGE_SIZE,
- 				      page_to_phys(page), KVM_PGTABLE_PROT_RWX,
- 				      hyp_memcache, 0);
- 	write_unlock(&kvm->mmu_lock);
-diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index 8e4c6e4bec12..1ca27d01a3ec 100644
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -414,6 +414,9 @@ int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 	u64 end = addr + size;
- 	int ret;
- 
-+	if (!PAGE_ALIGNED(addr | size | phys))
-+		return -EINVAL;
-+
- 	lockdep_assert_held_write(&kvm->mmu_lock);
- 	mapping = pkvm_mapping_iter_first(&pgt->pkvm_mappings, addr, end - 1);
- 
+> diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+> index 8e4c6e4bec123..1ca27d01a3ec6 100644
+> --- a/arch/arm64/kvm/pkvm.c
+> +++ b/arch/arm64/kvm/pkvm.c
+> @@ -414,6 +414,9 @@ int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, =
+u64 addr, u64 size,
+>  	u64 end =3D addr + size;
+>  	int ret;
+> =20
+> +	if (!PAGE_ALIGNED(addr | size | phys))
+> +		return -EINVAL;
+> +
 
-base-commit: df2908090cda368b01ff43709f51890076c56157
--- 
-2.55.0.1007.g17ff1f9808-goog
+[Severity: High]
+Does this new check break non-protected VMs using guest_memfd on a pKVM hos=
+t?
 
+When gmem_abort() handles page faults for guest_memfd slots, it passes
+s2fd->fault_ipa directly to kvm_pgtable_stage2_map() without aligning it
+down to the page size:
+
+arch/arm64/kvm/mmu.c:gmem_abort() {
+    ...
+	} else {
+		ret =3D KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, s2fd->fault_ipa,
+							 PAGE_SIZE,
+							 __pfn_to_phys(pfn),
+							 prot, memcache, flags);
+	}
+    ...
+}
+
+Since HPFAR_EL2 only aligns to 4K, on a 16K or 64K page host, the fault_ipa
+passed from gmem_abort() will fail this new PAGE_ALIGNED check and return
+-EINVAL. This prevents memory mapping and causes the VM fault handling to
+abort.
+
+Should gmem_abort() also be updated to apply ALIGN_DOWN to s2fd->fault_ipa,
+just like pkvm_mem_abort() was fixed in this patch?
+
+>  	lockdep_assert_held_write(&kvm->mmu_lock);
+>  	mapping =3D pkvm_mapping_iter_first(&pgt->pkvm_mappings, addr, end - 1);
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260913173516.3122=
+436-1-vdonnefort@google.com?part=3D1
