@@ -1,61 +1,66 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52DFF3D47A1;
-	Sun, 13 Sep 2026 10:00:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05BD23E4C7F;
+	Sun, 13 Sep 2026 10:26:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789293630; cv=none; b=YgGGkZrzjeX6wE/TSm60mVPEUBOdm+gusnbyN5PkUTalxxRFPtHXRmefVciWAn1F+n6PzMbhl4XxRErrDr/+1pEu6aXBVsQiE9DlVAAJ40lvIBJXeUPisJMqqhRy+8MMiU5sTN5aifnv+ktqDhkRmM5QaiIf5G9DR9i+B8hUU+Q=
+	t=1789295220; cv=none; b=iFZKM5U1Um0ubd/wl6DxZLOazu/WepAfrwC4GCxdp1+VuKu72f9QZ+hsPE847dnY4oZNXGw11dukGZa/DoVC8N4VtxpDA+TaRjSzZEeAKBaQwH80Zve5eLlHKJ1bsKlp9vPRbOJ42u5HvO54mGe0GxDs49DJlK22othO7ujnVp4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789293630; c=relaxed/simple;
-	bh=9iHFkTGe08yADbf2MXnHpT84LIP8xl+f6E9L6ji2wWg=;
+	s=arc-20240116; t=1789295220; c=relaxed/simple;
+	bh=ZLX8NOH1OUjVKH2KjlT+1+vvXSxFp3Df20ZPxwvYFCw=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tF80U9DMxyGtV4cTyvRFkBdAdA/MteshCEnZk5adCw9uQaUdRNCLPnBDXQT4j2rbDAosAA1PyBSNJ8qRuVkdfOp3Kx0ZH/JHm35+8hcMNHsgIBlALNlI3Lku00a70hRxLjn+5s80qc1v1YWBX+3ZGaPAKGasYlqDHSHwmV3q45E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uc6NE47J; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=jct6SrrCItim2rvPrw9xKSbh10gTtRhyODSPc9cdw0UV1q4Y5vYEGEmOxBCqnSe76MZPH7NQNSDHVLGYyeF/in9GK4ZHw3lcCOyzra3Z1+4bw+hITztJsmUYMFyi9HFApvYH2uBUDmL9meggoiNQu+Kl03wkaVBNtnMvfWhs3Ug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HxcoM8ZX; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uc6NE47J"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E47681F000FF;
-	Sun, 13 Sep 2026 10:00:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HxcoM8ZX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20E9A1F000FF;
+	Sun, 13 Sep 2026 10:26:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789293628;
-	bh=yUhB/Xmeg30XhsREq6iJc4tei3Cw+4oVMaJgqTQh/Fc=;
+	s=k20260515; t=1789295206;
+	bh=CCyNmu1S4QSxghM5bhyr4PoubfLL8i9XAe0yigjLH6Y=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=Uc6NE47JoD/TgSICJzC9SdlxuYriLqEXrEj0yirkshjjUGO6AHRmOAQjrGSAmHuQs
-	 OW1o6PG5y9h2o+0vr708O/w9wlf+IYDBHfH0+me2FHMjD5AdpIVzuGI2NsPsfslrC0
-	 riPzzTtYiGDNn8ml/Q6kbT9ApTq92plRWS73gaNWOyt83mO2Yi5l3BVoEZ03ilITWF
-	 NHUfCiUsMdsPzoQOo3rUdrHiRsgeNK0qPMjgTTVIKNi8S8YSqvpVAEph9NQAs7k/Vv
-	 Sm4OPvzPQxllggLz4EKAPOVzRuKxZtOPxmZxHaPunPtYl0HZEOYq9Ix7BbYvTheHQQ
-	 M/lqZ1qsO1E4A==
+	b=HxcoM8ZXxZaNZrIj6+HVVWW1vHAG6K1S39AqGPxOTk0cJ2yrto7ofHs/WDrKv30n0
+	 8qd9TV37KTpXM9g/QdqQlp/GQAbfxi3l3g2wvy/BZJLOQoGHNHjJmzdWMtb4bZFs7J
+	 N2tR268wkupaNarLFzulRr8hj1RAXL2Zk/WC+rc0+EoKYwYoPf4NtNLY7NRdX2MdZP
+	 tpyk8+nh8A+CQ2+mWVHf1IZog4NM7nEra4hS5sjJVE1cZjNPoBXMbVgaNujyFAgeu/
+	 v5roWW+0X+HDJLoyS3Qo+5xqSw6PUbD6uR46WaLCcuak1FhJ0py0M5tWiJLVGQJc8I
+	 aZENK3W1L1Svw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1x5h0c-00000008GHI-39tq;
-	Sun, 13 Sep 2026 10:00:26 +0000
-Date: Sun, 13 Sep 2026 11:00:26 +0100
-Message-ID: <868q5579ol.wl-maz@kernel.org>
+	id 1x5hQ3-00000008GZK-37Ow;
+	Sun, 13 Sep 2026 10:26:43 +0000
+Date: Sun, 13 Sep 2026 11:26:43 +0100
+Message-ID: <867bkp78gs.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Oliver Upton <oupton@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Ben Horgan <ben.horgan@arm.com>,
-	Xi Ruoyao <xry111@xry111.site>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Yuan Yao <yaoyuan@linux.alibaba.com>,
-	Fuad Tabba <tabba@google.com>,
-	linux-arm-kernel@lists.infradead.org,
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3] KVM: arm64: Trap guest MPAM accesses whenever MPAM is implemented
-In-Reply-To: <20260911104715.307500-1-fuad.tabba@linux.dev>
-References: <20260911104715.307500-1-fuad.tabba@linux.dev>
+	will@kernel.org,
+	catalin.marinas@arm.com,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	steven.price@arm.com,
+	aneesh.kumar@kernel.org,
+	oupton@kernel.org,
+	gshan@redhat.com,
+	joey.gouly@arm.com,
+	tabba@google.com,
+	yuzenghui@huawei.com,
+	linux-coco@lists.linux.dev,
+	gankulkarni@os.amperecomputing.com,
+	sdonthineni@nvidia.com,
+	alpergun@google.com,
+	fj0570is@fujitsu.com,
+	WeiLin.Chang@arm.com,
+	lpieralisi@kernel.org,
+	enju.kohei@fujitsu.com
+Subject: Re: [PATCH v17 05/20] KVM: arm64: Add vcpu load/put call backs for flavors
+In-Reply-To: <20260908162223.1683432-6-suzuki.poulose@arm.com>
+References: <20260908162223.1683432-1-suzuki.poulose@arm.com>
+	<20260908162223.1683432-6-suzuki.poulose@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -67,111 +72,271 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, ben.horgan@arm.com, xry111@xry111.site, mark.rutland@arm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, seiden@linux.ibm.com, gshan@redhat.com, yaoyuan@linux.alibaba.com, tabba@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com, joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 11 Sep 2026 11:47:15 +0100,
-Fuad Tabba <fuad.tabba@linux.dev> wrote:
+On Tue, 08 Sep 2026 17:22:08 +0100,
+Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
 > 
-> finalise_el2_state() clears the EL2 MPAM traps whenever the ID
-> registers advertise MPAM, while KVM sets them only under ARM64_MPAM,
-> which also requires MPAMEN. Without EL3 nothing sets that enable, so a
-> guest reaches the MPAM registers while ID_AA64PFR0_EL1.MPAM reads 0
-> for it.
+> Add VM flavor specific handlers for VCPU load/put, in an effort to make it
+> easier to follow the code.
 > 
-> Gate on what finalise_el2_state() tests instead: this CPU's ID
-> registers with the arm64.nompam override applied, and its
-> MPAMIDR_EL1.HAS_HCR before writing MPAMHCR_EL2, which is UNDEFINED
-> without it. MPAMEN isn't a term in any MPAM accessor, so the traps
-> take effect without it.
+> Based on a patch by Marc Zyngier
 > 
-> Fixes: 31ff96c38ea3 ("KVM: arm64: Fix missing traps of guest accesses to the MPAM registers")
-> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+> Suggested-by: Marc Zyngier <maz@kernel.org>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 > ---
-> 
-> Notes:
->     Changes since v2:
->      - A per-CPU flag in kvm_host_data, set at KVM's CPU init from the ID
->        registers with the override applied, instead of a third cpucap
->        (Will). The probe checks presence only, since MPAM3_EL3.TRAPLOWER
->        can't be read at EL2.
->      - The MPAMHCR_EL2 branch reads this CPU's MPAMIDR_EL1 rather than the
->        sanitised ARM64_MPAM_HCR, which would otherwise have been the one
->        system-wide test left in a per-CPU function.
->      - Fixes: names the KVM commit that left this case open, rather than
->        the head.S commit that cleared the traps.
->      - Yuan's Reviewed-by dropped, since the mechanism changed.
->     
->     v2: https://lore.kernel.org/all/20260908145651.2828597-1-fuad.tabba@linux.dev/
->     v1: https://lore.kernel.org/all/20260903160819.831518-1-fuad.tabba@linux.dev/
-> 
->  arch/arm64/include/asm/kvm_host.h       |  1 +
->  arch/arm64/kvm/arm.c                    |  7 +++++++
->  arch/arm64/kvm/hyp/include/hyp/switch.h | 13 ++++++++-----
->  3 files changed, 16 insertions(+), 5 deletions(-)
+>  arch/arm64/include/asm/kvm_host.h |   6 ++
+>  arch/arm64/kvm/arm.c              | 156 ++++++++++++++++++++++--------
+>  2 files changed, 123 insertions(+), 39 deletions(-)
 > 
 > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 27fe0cd5b2d7a..98ca2d9b9e18d 100644
+> index d0dccc9ad6aa8..b2e99c5cb1cd3 100644
 > --- a/arch/arm64/include/asm/kvm_host.h
 > +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -755,6 +755,7 @@ struct kvm_host_data {
->  #define KVM_HOST_DATA_FLAG_VCPU_IN_HYP_CONTEXT		4
->  #define KVM_HOST_DATA_FLAG_L1_VNCR_MAPPED		5
->  #define KVM_HOST_DATA_FLAG_HAS_BRBE			6
-> +#define KVM_HOST_DATA_FLAG_HAS_MPAM			7
->  	unsigned long flags;
+> @@ -150,6 +150,11 @@ struct kvm_vmid {
+>  	atomic64_t id;
+>  };
 >  
->  	struct kvm_cpu_context host_ctxt;
+> +struct kvm_vcpu_ops {
+> +	void (*vcpu_load)(struct kvm_vcpu *vcpu, int cpu);
+> +	void (*vcpu_put)(struct kvm_vcpu *vcpu);
+> +};
+> +
+>  struct kvm_s2_mmu {
+>  	struct kvm_vmid vmid;
+>  
+> @@ -854,6 +859,7 @@ struct vncr_tlb;
+>  
+>  struct kvm_vcpu_arch {
+>  	struct kvm_cpu_context ctxt;
+> +	const struct kvm_vcpu_ops *vcpu_ops;
+>  
+>  	/*
+>  	 * Guest floating point state
 > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 8b080804bc90b..fde75a63cf045 100644
+> index 51fc651267157..9af3bbb2f8c24 100644
 > --- a/arch/arm64/kvm/arm.c
 > +++ b/arch/arm64/kvm/arm.c
-> @@ -2281,9 +2281,16 @@ static void cpu_set_hyp_vector(void)
+> @@ -74,6 +74,8 @@ struct kvm_ioctl_cap_map {
+>  	long ext;
+>  };
 >  
->  static void cpu_hyp_init_context(void)
->  {
-> +	u64 pfr0 = __read_sysreg_by_encoding(SYS_ID_AA64PFR0_EL1);
-> +	u64 pfr1 = __read_sysreg_by_encoding(SYS_ID_AA64PFR1_EL1);
+> +static const struct kvm_vcpu_ops *arm64_vcpu_ops[VM_FLAVOR_MAX];
 > +
-
-Why not directly read_sysreg(id_aa64pfr0_el1) and co?
-__read_sysreg_by_encoding() is useful when the encoding comes from a
-variable, but it looks odd in the case of a literal sysreg.
-
->  	kvm_init_host_cpu_context(host_data_ptr(host_ctxt));
->  	kvm_init_host_debug_data();
+>  /* Make KVM_CAP_NR_VCPUS the reference for features we always supported */
+>  #define KVM_CAP_ARM_BASIC	KVM_CAP_NR_VCPUS
 >  
-> +	/* The traps take effect without MPAMEN, which ARM64_MPAM requires. */
-> +	if (id_aa64pfr0_mpam(pfr0) || id_aa64pfr1_mpamfrac(pfr1))
-> +		host_data_set_flag(HAS_MPAM);
+> @@ -569,6 +571,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+>  	mutex_unlock(&vcpu->mutex);
+>  #endif
+>  
+> +	vcpu->arch.vcpu_ops = arm64_vcpu_ops[vcpu->kvm->arch.vm_flavor];
 > +
->  	if (!is_kernel_in_hyp_mode())
->  		cpu_init_hyp_mode();
+>  	/* Force users to call KVM_ARM_VCPU_INIT */
+>  	vcpu_clear_flag(vcpu, VCPU_INITIALIZED);
+>  
+> @@ -738,36 +742,72 @@ static void vcpu_load_pvtime(struct kvm_vcpu *vcpu)
+>  		kvm_make_request(KVM_REQ_RECORD_STEAL, vcpu);
 >  }
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> index 1ce7130e25490..2cb611e2bd69b 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -298,14 +298,17 @@ static inline void  __activate_traps_mpam(struct kvm_vcpu *vcpu)
->  	u64 clr = MPAM2_EL2_EnMPAMSM;
->  	u64 set = MPAM2_EL2_TRAPMPAM0EL1 | MPAM2_EL2_TRAPMPAM1EL1;
 >  
-> -	if (!system_supports_mpam())
-> +	if (!host_data_test_flag(HAS_MPAM))
->  		return;
+> +static void vhe_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+> +{
+> +	vcpu_prepare_mmu(vcpu);
+> +	/*
+> +	 * The timer must be loaded before the vgic to correctly set up physical
+> +	 * interrupt deactivation in nested state (e.g. timer interrupt).
+> +	 */
+> +	kvm_timer_vcpu_load(vcpu);
+> +	kvm_vgic_load(vcpu);
+> +	kvm_vcpu_load_debug(vcpu);
+> +	kvm_vcpu_load_fgt(vcpu);
+> +	kvm_vcpu_load_vhe(vcpu);
+> +	kvm_arch_vcpu_load_fp(vcpu);
+> +	kvm_vcpu_pmu_restore_guest(vcpu);
+> +
+> +	vcpu_load_pvtime(vcpu);
+> +	vcpu_set_wfx_traps(vcpu);
+> +	vcpu_set_pauth_traps(vcpu);
+> +}
+> +
+> +static void nvhe_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+> +{
+> +	vcpu_prepare_mmu(vcpu);
+> +	/*
+> +	 * The timer must be loaded before the vgic to correctly set up physical
+> +	 * interrupt deactivation in nested state (e.g. timer interrupt).
+> +	 */
+
+This comment makes no sense here -- it is strictly for VHE, which is
+the only mode to implement NV. Same thing for the pKVM vcpu_load().
+
+> +	kvm_timer_vcpu_load(vcpu);
+> +	kvm_vgic_load(vcpu);
+> +	kvm_vcpu_load_debug(vcpu);
+> +	kvm_vcpu_load_fgt(vcpu);
+> +	kvm_arch_vcpu_load_fp(vcpu);
+> +	kvm_vcpu_pmu_restore_guest(vcpu);
+> +
+> +	vcpu_load_pvtime(vcpu);
+> +	vcpu_set_wfx_traps(vcpu);
+> +	vcpu_set_pauth_traps(vcpu);
+> +}
+> +
+> +static void pkvm_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+> +{
+> +	/*
+> +	 * The timer must be loaded before the vgic to correctly set up physical
+> +	 * interrupt deactivation in nested state (e.g. timer interrupt).
+> +	 */
+> +	kvm_timer_vcpu_load(vcpu);
+> +	kvm_vgic_load(vcpu);
+> +	kvm_vcpu_load_debug(vcpu);
+> +	kvm_vcpu_load_fgt(vcpu);
+> +	kvm_arch_vcpu_load_fp(vcpu);
+> +	kvm_vcpu_pmu_restore_guest(vcpu);
+> +
+> +	vcpu_load_pvtime(vcpu);
+> +	vcpu_set_wfx_traps(vcpu);
+> +
+> +	kvm_call_hyp_nvhe(__pkvm_vcpu_load,
+> +			  vcpu->kvm->arch.pkvm.handle,
+> +			  vcpu->vcpu_idx, vcpu->arch.hcr_el2);
+> +	kvm_call_hyp(__vgic_v3_restore_vmcr_aprs,
+> +		     &vcpu->arch.vgic_cpu.vgic_v3);
+
+This can also be turned into a kvm_call_hyp_nvhe().
+
+> +}
+> +
+>  void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>  {
+> -	if (!is_protected_kvm_enabled())
+> -		vcpu_prepare_mmu(vcpu);
+> -
+>  	vcpu->cpu = cpu;
+> -	/*
+> -	 * The timer must be loaded before the vgic to correctly set up physical
+> -	 * interrupt deactivation in nested state (e.g. timer interrupt).
+> -	 */
+> -	kvm_timer_vcpu_load(vcpu);
+> -	kvm_vgic_load(vcpu);
+> -	kvm_vcpu_load_debug(vcpu);
+> -	kvm_vcpu_load_fgt(vcpu);
+> -	if (has_vhe())
+> -		kvm_vcpu_load_vhe(vcpu);
+> -	kvm_arch_vcpu_load_fp(vcpu);
+> -	kvm_vcpu_pmu_restore_guest(vcpu);
+> -
+> -	vcpu_load_pvtime(vcpu);
+> -	vcpu_set_wfx_traps(vcpu);
+> -	vcpu_set_pauth_traps(vcpu);
+> -
+> -	if (is_protected_kvm_enabled()) {
+> -		kvm_call_hyp_nvhe(__pkvm_vcpu_load,
+> -				  vcpu->kvm->arch.pkvm.handle,
+> -				  vcpu->vcpu_idx, vcpu->arch.hcr_el2);
+> -		kvm_call_hyp(__vgic_v3_restore_vmcr_aprs,
+> -			     &vcpu->arch.vgic_cpu.vgic_v3);
+> -	}
+> +	vcpu->arch.vcpu_ops->vcpu_load(vcpu, cpu);
 >  
->  	/* trap guest access to MPAMIDR_EL1 */
-> -	if (system_supports_mpam_hcr()) {
-> +	if (read_sysreg_s(SYS_MPAMIDR_EL1) & MPAMIDR_EL1_HAS_HCR) {
+>  	if (!cpumask_test_cpu(cpu, vcpu->kvm->arch.supported_cpus))
+>  		vcpu_set_on_unsupported_cpu(vcpu);
+> @@ -775,28 +815,44 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>  	vcpu->arch.pid = pid_nr(vcpu->pid);
+>  }
+>  
+> -void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+> +static void vhe_vcpu_put(struct kvm_vcpu *vcpu)
+>  {
+> -	if (is_protected_kvm_enabled()) {
+> -		kvm_call_hyp(__vgic_v3_save_aprs, &vcpu->arch.vgic_cpu.vgic_v3);
+> -		kvm_call_hyp_nvhe(__pkvm_vcpu_put);
+> -
+> -		/* __pkvm_vcpu_put implies a sync of the state */
+> -		if (!kvm_vm_is_protected(vcpu->kvm))
+> -			vcpu_set_flag(vcpu, PKVM_HOST_STATE_DIRTY);
+> -	}
+> -
+>  	kvm_vcpu_put_debug(vcpu);
+>  	kvm_arch_vcpu_put_fp(vcpu);
+> -	if (has_vhe())
+> -		kvm_vcpu_put_vhe(vcpu);
+> +	kvm_vcpu_put_vhe(vcpu);
+>  	kvm_timer_vcpu_put(vcpu);
+>  	kvm_vgic_put(vcpu);
+>  	kvm_vcpu_pmu_restore_host(vcpu);
+>  	if (vcpu_has_nv(vcpu))
+>  		kvm_vcpu_put_hw_mmu(vcpu);
+>  	kvm_arm_vmid_clear_active();
+> +}
+>  
+> +static void nvhe_vcpu_put(struct kvm_vcpu *vcpu)
+> +{
+> +	kvm_vcpu_put_debug(vcpu);
+> +	kvm_arch_vcpu_put_fp(vcpu);
+> +	kvm_timer_vcpu_put(vcpu);
+> +	kvm_vgic_put(vcpu);
+> +	kvm_vcpu_pmu_restore_host(vcpu);
+> +	kvm_arm_vmid_clear_active();
+> +}
+> +
+> +static void pkvm_vcpu_put(struct kvm_vcpu *vcpu)
+> +{
+> +	kvm_call_hyp(__vgic_v3_save_aprs, &vcpu->arch.vgic_cpu.vgic_v3);
 
-This is going to suck under NV. The host hypervisor is of course going
-to set MPAMHCR_EL2.TRAP_MPAMIDR_EL1, and we're in for a recursive trap
-on the hottest possible path in KVM. Which is silly as the actual
-write to MPAMHCR_EL2 is free (it lands in NVMem[]).
+Same thing here about kvm_call_hyp_nvhe().
 
-This really should be replaced by a flag called HAS_MPAM_HCR, just
-like you have HAS_MPAM.
+> +	kvm_call_hyp_nvhe(__pkvm_vcpu_put);
+> +
+> +	/* __pkvm_vcpu_put implies a sync of the state */
+> +	if (!kvm_vm_is_protected(vcpu->kvm))
+> +		vcpu_set_flag(vcpu, PKVM_HOST_STATE_DIRTY);
+> +
+> +	nvhe_vcpu_put(vcpu);
+
+I'm not overly fond of this. Yes, that was in my original patch. But
+for example, we end-up calling kvm_arm_vmid_clear_active() for pKVM.
+This is harmless, but conceptually wrong.
+
+I'd rather you expand the whole thing.
+
+> +}
+> +
+> +void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+> +{
+> +	vcpu->arch.vcpu_ops->vcpu_put(vcpu);
+>  	vcpu_clear_on_unsupported_cpu(vcpu);
+>  	vcpu->cpu = -1;
+>  }
+> @@ -2136,6 +2192,28 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
+>  	}
+>  }
+>  
+> +static const struct kvm_vcpu_ops vhe_vcpu_ops = {
+> +	.vcpu_load = vhe_vcpu_load,
+> +	.vcpu_put = vhe_vcpu_put,
+> +};
+> +
+> +static const struct kvm_vcpu_ops nvhe_vcpu_ops = {
+> +	.vcpu_load = nvhe_vcpu_load,
+> +	.vcpu_put = nvhe_vcpu_put,
+> +};
+> +
+> +static const struct kvm_vcpu_ops pkvm_vcpu_ops = {
+> +	.vcpu_load = pkvm_vcpu_load,
+> +	.vcpu_put = pkvm_vcpu_put,
+> +};
+> +
+> +static const struct kvm_vcpu_ops *arm64_vcpu_ops[] = {
+> +	[VM_VHE] = &vhe_vcpu_ops,
+> +	[VM_NVHE] = &nvhe_vcpu_ops,
+> +	[VM_PKVM] = &pkvm_vcpu_ops,
+> +	[VM_PROTECTED_PKVM] = &pkvm_vcpu_ops,
+
+nit: my OCD-self wants to align all the '=' signs vertically...
 
 Thanks,
 
