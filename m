@@ -1,152 +1,260 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 915AA344052;
-	Sun, 13 Sep 2026 07:05:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 271942BCF4C;
+	Sun, 13 Sep 2026 09:00:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789283124; cv=none; b=R/xgUd7tcZp+yeMhckup6xw8ZahOot69unZopWgK6Yyu3Dq8JpYVzqQLccnUaZ4o+P9jxn3m/+vCdKN70KpGqOVcMED6jMv+SfGYHL0iqI/MEKqQ7WTTSwIsHRJDeHAN8u+dpOlWShOZNe5Xwulc2+V+3meMBWwvepl4uNn5xNE=
+	t=1789290045; cv=none; b=KR6KXQ8ZSUniVPHx3vsF4ZmxKbb1UsPAJsixQjfssloqqwh923G1tVPwwK3tN7wuPG/IaEDKGgAIVo5EZfJ5W5zdutHkSZIMPEuRczqKAlxTGAEeCovxWvNqMV+F7PIpmuUcCIqX932cv0BAXkKxfG0fXh4pwpvAFmRDVdHhCJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789283124; c=relaxed/simple;
-	bh=tXmzQ9/0zxImuwG5nlQfSSjAFgmIBS5AnTHtSJv6yLk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=psYcWo9cE9vQRMVM230IBFzIWNpa5+LRVkbPaDNwN5SrRwn4jvQGVpyDY5WUmaNPpqQY7OfI6jrzg8xCs4aIl5HyQf3CHfZnU2XOtXXJAAKA1cmzB3qZnsdXste0SRUlW6vkJrfyBmzaiqTe6ijoV9dP+pn/qWHeKs/iXNNLqQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=fKYeFqPh; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1789290045; c=relaxed/simple;
+	bh=N1CmEFivJzlREhuwIalg5njp4mk5R2Wj4BrNNqkhfx4=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fKgU2H7wcpTmUgmf/5rjCU+tfK4B0aXXqAK3nMmGxUu569qx/jAD3r/xMk2EzvsZmjPC2RPNG0xMVYUn0xX+1Srzz8PLG71rhv633/wMx3LX4gTNmWAHrQ3JDRLmlJo+Lrs7rUlu+gtNlmh5R5hi1T7JMKEhTiMTlRXvhlnQVEg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UthaF+gf; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="fKYeFqPh"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D88F5153B;
-	Sun, 13 Sep 2026 00:05:16 -0700 (PDT)
-Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.2.197.99])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 096833F7D8;
-	Sun, 13 Sep 2026 00:05:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1789283120; bh=tXmzQ9/0zxImuwG5nlQfSSjAFgmIBS5AnTHtSJv6yLk=;
-	h=From:To:Cc:Subject:Date:From;
-	b=fKYeFqPh3Nbti/qjh+YehqPr6Aca/4iAqF2MXvYA0u+kaAREt8vNj+T8KAi3a6Rly
-	 rBcuzC95jeKQhJCf5FDEUVOmoK/RbImi7u0g+hnQr9U8v3H4AdsrkPf2FIlVF851S2
-	 DZzNOKDUFBta4oUb0hFRQDPRg0PpDM0aJ8FiPpsE=
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-To: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Cc: maz@kernel.org,
-	will@kernel.org,
-	catalin.marinas@arm.com,
-	linux-kernel@vger.kernel.org,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UthaF+gf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 937171F000FF;
+	Sun, 13 Sep 2026 09:00:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789290043;
+	bh=cWXg89SCX5L6br3CBQV2TN+5fImn2NEu6Y4SwCzRCyc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=UthaF+gfDFLyjbEmY3JRQ1UC7jN925nsfud1Ntl7n/JxdjV+vZVmgNKEN1XJtOQtB
+	 z0bGAI2NOg0NgvGWeyI1mjO/93cl7EyvjdajNgeBDUAmDnw79WY9WL4mekZro6dCYJ
+	 b+9qxxLNgWiOtmHehD3InPorFDqz8lLCTLSI1W5prDSaLtJp6kM7ABZ3fEnE0lXqN0
+	 ZNZ1+KD5Bhw9eobYCk4LZckyyTCF7UFB2EmW/pBDoGHl+c7P+1/EFbMJrRo+GLlZPp
+	 eqKpEcbNMJyFgd79mMBgbgsIe9/TG7F+BVkoFRjz34F76XaGmapalNwzyqN1F5i83J
+	 pjdXecmVyvogw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1x5g4n-00000008FjX-0nU0;
+	Sun, 13 Sep 2026 09:00:41 +0000
+Date: Sun, 13 Sep 2026 10:00:40 +0100
+Message-ID: <86bja17cg7.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Leonardo Bras <leo.bras@arm.com>
+Cc: Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Tian Zheng <zhengtian10@huawei.com>,
 	linux-arm-kernel@lists.infradead.org,
-	steven.price@arm.com,
-	aneesh.kumar@kernel.org,
-	oupton@kernel.org,
-	gshan@redhat.com,
-	joey.gouly@arm.com,
-	tabba@google.com,
-	yuzenghui@huawei.com,
-	linux-coco@lists.linux.dev,
-	gankulkarni@os.amperecomputing.com,
-	sdonthineni@nvidia.com,
-	alpergun@google.com,
-	fj0570is@fujitsu.com,
-	WeiLin.Chang@arm.com,
-	lpieralisi@kernel.org,
-	enju.kohei@fujitsu.com,
-	Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v18] arm64: mm: Handle Granule Protection Faults (GPFs)
-Date: Sun, 13 Sep 2026 08:04:58 +0100
-Message-ID: <20260913070459.2547407-1-suzuki.poulose@arm.com>
-X-Mailer: git-send-email 2.43.0
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 1/5] KVM: arm64: pgtables: Change write bit from S2AP_W to DBM
+In-Reply-To: <20260901171558.2674031-2-leo.bras@arm.com>
+References: <20260901171558.2674031-1-leo.bras@arm.com>
+	<20260901171558.2674031-2-leo.bras@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: leo.bras@arm.com, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, rananta@google.com, zhengtian10@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-From: Steven Price <steven.price@arm.com>
+On Tue, 01 Sep 2026 18:15:52 +0100,
+Leonardo Bras <leo.bras@arm.com> wrote:
+> 
+> As a first step of changing the encoding for the Stage2 PTE descriptor,
+> introduce the DBM bit, and adapt every usage of writable to use the DBM bit
+> (51) instead of S2AP[1]/Dirty bit (7).
+> 
+> For this step, we convert usages of RW(Dirty) -> WD(DBM|Dirty).
+> 
+> Signed-off-by: Leonardo Bras <leo.bras@arm.com>
+> ---
+>  arch/arm64/include/asm/kvm_pgtable.h | 3 +++
+>  arch/arm64/kvm/hyp/pgtable.c         | 8 +++++---
+>  arch/arm64/kvm/nested.c              | 4 +++-
+>  arch/arm64/kvm/ptdump.c              | 4 ++--
+>  4 files changed, 13 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index 41a8687938eb..37baa86d6fd8 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -86,24 +86,27 @@ typedef u64 kvm_pte_t;
+>  #define KVM_PTE_LEAF_ATTR_HI		GENMASK(63, 50)
+>  
+>  #define KVM_PTE_LEAF_ATTR_HI_SW		GENMASK(58, 55)
+>  
+>  #define KVM_PTE_LEAF_ATTR_HI_S1_XN	BIT(54)
+>  #define KVM_PTE_LEAF_ATTR_HI_S1_UXN	BIT(54)
+>  #define KVM_PTE_LEAF_ATTR_HI_S1_PXN	BIT(53)
+>  
+>  #define KVM_PTE_LEAF_ATTR_HI_S2_XN	GENMASK(54, 53)
+>  
+> +#define KVM_PTE_LEAF_ATTR_HI_S2_DBM	BIT(51)
+> +
+>  #define KVM_PTE_LEAF_ATTR_HI_S1_GP	BIT(50)
+>  
+>  #define KVM_PTE_LEAF_ATTR_S2_PERMS	(KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R | \
+>  					 KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W | \
+> +					 KVM_PTE_LEAF_ATTR_HI_S2_DBM | \
+>  					 KVM_PTE_LEAF_ATTR_HI_S2_XN)
+>  
+>  /* pKVM invalid pte encodings */
+>  #define KVM_INVALID_PTE_TYPE_MASK	GENMASK(63, 60)
+>  #define KVM_INVALID_PTE_ANNOT_MASK	~(KVM_PTE_VALID | \
+>  					  KVM_INVALID_PTE_TYPE_MASK)
+>  
+>  enum kvm_invalid_pte_type {
+>  	/*
+>  	 * Used to indicate a pte for which a 'break-before-make'
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index b74dd5ce1efd..ca49f1bd7c34 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -725,42 +725,43 @@ static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot p
+>  	}
+>  
+>  	r = stage2_set_xn_attr(prot, &attr);
+>  	if (r)
+>  		return r;
+>  
+>  	if (prot & KVM_PGTABLE_PROT_R)
+>  		attr |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R;
+>  
+>  	if (prot & KVM_PGTABLE_PROT_W)
+> -		attr |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
+> +		attr |= KVM_PTE_LEAF_ATTR_HI_S2_DBM | KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
 
-If the host attempts to access granules that have been delegated for use
-in a realm these accesses will be caught and will trigger a Granule
-Protection Fault (GPF).
+What makes it acceptable to always set DBM? This is an optional
+feature, and I'm not exactly comfortable setting bits that are
+supposed to be RES0. Yes, the HW should ignore it. But we have also
+seen quite a few broken designs in this area...
 
-A fault during a page walk signals a bug in the kernel and is handled by
-oopsing the kernel. A non-page walk fault could be caused by user space
-having access to a page which has been delegated to the kernel and will
-trigger a SIGBUS to allow debugging why user space is trying to access a
-delegated page.
+> +
+>
 
-There is work in progress to unmap the guest_memfd backed private pages from the
-linear map. Until we get that support, we could get spurious GPFs from within
-the kernel, e.g., load_unaligned_zeropad(). So, try to fix them up for now.
+Spurious newline.
 
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-Reviewed-by: Gavin Shan <gshan@redhat.com>
-Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
-Signed-off-by: Steven Price <steven.price@arm.com>
-Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
----
-Changes since v17:
- * Pass untagged address to die_kernel_fault() - Sashiko
- * Explicitly check !user_mode() for fixups - Catalin
- * Switch to BUS_OBJERR for si_code from SI_KERNEL - Catalin
- * Clarify the commit description about the upcoming work on
-   unmapping guest_memfd backed pages from linear map
-Changes since v16:
- * Update the commit description to indicate why we try to fixup GPFs
-Changes since v10:
- * Don't call arm64_notify_die() in do_gpf() but simply return 1.
-Changes since v2:
- * Include missing "Granule Protection Fault at level -1"
----
- arch/arm64/mm/fault.c | 30 ++++++++++++++++++++++++------
- 1 file changed, 24 insertions(+), 6 deletions(-)
+>  	if (!kvm_lpa2_is_enabled())
+>  		attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S2_SH, sh);
+>  
+>  	attr |= KVM_PTE_LEAF_ATTR_LO_S2_AF;
+>  	attr |= prot & KVM_PTE_LEAF_ATTR_HI_SW;
+>  	*ptep = attr;
+>  
+>  	return 0;
+>  }
 
-diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
-index 75c3e463df2ef..dc3a87902a60c 100644
---- a/arch/arm64/mm/fault.c
-+++ b/arch/arm64/mm/fault.c
-@@ -914,6 +914,24 @@ static int do_tag_check_fault(unsigned long far, unsigned long esr,
- 	return 0;
- }
- 
-+static int do_gpf_ptw(unsigned long far, unsigned long esr, struct pt_regs *regs)
-+{
-+	const struct fault_info *inf = esr_to_fault_info(esr);
-+	unsigned long addr = untagged_addr(far);
-+
-+	die_kernel_fault(inf->name, addr, esr, regs);
-+	return 0;
-+}
-+
-+static int do_gpf(unsigned long far, unsigned long esr, struct pt_regs *regs)
-+{
-+	if (!user_mode(regs) && !is_el1_instruction_abort(esr) &&
-+	    fixup_exception(regs, esr))
-+		return 0;
-+
-+	return 1;
-+}
-+
- static const struct fault_info fault_info[] = {
- 	{ do_bad,		SIGKILL, SI_KERNEL,	"ttbr address size fault"	},
- 	{ do_bad,		SIGKILL, SI_KERNEL,	"level 1 address size fault"	},
-@@ -950,12 +968,12 @@ static const struct fault_info fault_info[] = {
- 	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 32"			},
- 	{ do_alignment_fault,	SIGBUS,  BUS_ADRALN,	"alignment fault"		},
- 	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 34"			},
--	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 35"			},
--	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 36"			},
--	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 37"			},
--	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 38"			},
--	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 39"			},
--	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 40"			},
-+	{ do_gpf_ptw,		SIGKILL, SI_KERNEL,	"level -1 granule protection fault (translation table walk)" },
-+	{ do_gpf_ptw,		SIGKILL, SI_KERNEL,	"level 0 granule protection fault (translation table walk)" },
-+	{ do_gpf_ptw,		SIGKILL, SI_KERNEL,	"level 1 granule protection fault (translation table walk)" },
-+	{ do_gpf_ptw,		SIGKILL, SI_KERNEL,	"level 2 granule protection fault (translation table walk)" },
-+	{ do_gpf_ptw,		SIGKILL, SI_KERNEL,	"level 3 granule protection fault (translation table walk)" },
-+	{ do_gpf,		SIGBUS,  BUS_OBJERR,	"granule protection fault" },
- 	{ do_bad,		SIGKILL, SI_KERNEL,	"level -1 address size fault"	},
- 	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 42"			},
- 	{ do_translation_fault,	SIGSEGV, SEGV_MAPERR,	"level -1 translation fault"	},
+I don't know how you have configured git on your end, but there is *a
+lot* of context...
+
+>  
+>  enum kvm_pgtable_prot kvm_pgtable_stage2_pte_prot(kvm_pte_t pte)
+>  {
+>  	enum kvm_pgtable_prot prot = pte & KVM_PTE_LEAF_ATTR_HI_SW;
+>  
+>  	if (!kvm_pte_valid(pte))
+>  		return prot;
+>  
+>  	if (pte & KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R)
+>  		prot |= KVM_PGTABLE_PROT_R;
+> -	if (pte & KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W)
+> +	if (pte & KVM_PTE_LEAF_ATTR_HI_S2_DBM)
+>  		prot |= KVM_PGTABLE_PROT_W;
+>  
+>  	switch (FIELD_GET(KVM_PTE_LEAF_ATTR_HI_S2_XN, pte)) {
+>  	case 0b00:
+>  		prot |= KVM_PGTABLE_PROT_PX | KVM_PGTABLE_PROT_UX;
+>  		break;
+>  	case 0b01:
+>  		prot |= KVM_PGTABLE_PROT_UX;
+>  		break;
+>  	case 0b11:
+> @@ -1281,20 +1282,21 @@ static int stage2_update_leaf_attrs(struct kvm_pgtable *pgt, u64 addr,
+>  		*orig_pte = data.pte;
+>  
+>  	if (level)
+>  		*level = data.level;
+>  	return 0;
+>  }
+>  
+>  int kvm_pgtable_stage2_wrprotect(struct kvm_pgtable *pgt, u64 addr, u64 size)
+>  {
+>  	return stage2_update_leaf_attrs(pgt, addr, size, 0,
+> +					KVM_PTE_LEAF_ATTR_HI_S2_DBM |
+>  					KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W,
+>  					NULL, NULL,
+>  					KVM_PGTABLE_WALK_IGNORE_EAGAIN);
+>  }
+>  
+>  void kvm_pgtable_stage2_mkyoung(struct kvm_pgtable *pgt, u64 addr,
+>  				enum kvm_pgtable_walk_flags flags)
+>  {
+>  	int ret;
+>  
+> @@ -1361,21 +1363,21 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
+>  	s8 level;
+>  	int ret;
+>  
+>  	if (prot & KVM_PTE_LEAF_ATTR_HI_SW)
+>  		return -EINVAL;
+>  
+>  	if (prot & KVM_PGTABLE_PROT_R)
+>  		set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R;
+>  
+>  	if (prot & KVM_PGTABLE_PROT_W)
+> -		set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
+> +		set |= KVM_PTE_LEAF_ATTR_HI_S2_DBM | KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
+>  
+>  	if (prot & KVM_PGTABLE_PROT_X) {
+>  		ret = stage2_set_xn_attr(prot, &xn);
+>  		if (ret)
+>  			return ret;
+>  
+>  		set |= xn & KVM_PTE_LEAF_ATTR_HI_S2_XN;
+>  		clr |= ~xn & KVM_PTE_LEAF_ATTR_HI_S2_XN;
+>  	}
+>  
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 17123f0b6dab..eb8dfffc32c7 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -379,21 +379,23 @@ static int walk_nested_s2_pgd(struct kvm_vcpu *vcpu, phys_addr_t ipa,
+>  	}
+>  
+>  	addr_bottom += contiguous_bit_shift(desc, wi, level);
+>  
+>  	/* Calculate and return the result */
+>  	paddr = (desc & GENMASK_ULL(47, addr_bottom)) |
+>  		(ipa & GENMASK_ULL(addr_bottom - 1, 0));
+>  	out->output = paddr;
+>  	out->block_size = 1UL << ((3 - level) * stride + wi->pgshift);
+>  	out->readable = desc & KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R;
+> -	out->writable = desc & KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
+> +	/* Takes care of both RO/RW and RO/WC/WD encodings */
+> +	out->writable = desc & (KVM_PTE_LEAF_ATTR_HI_S2_DBM |
+> +				KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W);
+
+Absolutely NOT. For a start, NV doesn't support FEAT_HAFDBS. But even
+if it did, you are now actively corrupting memory by turning a RO
+mapping with a spurious DBM bit set into a writable mapping.
+VTCR_EL2.HD exists for a reason.
+
+Do you see why your blanket approach of equating DBM with writable is
+plain wrong?
+
+	M.
+
 -- 
-2.43.0
-
+Without deviation from the norm, progress is not possible.
