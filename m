@@ -1,205 +1,122 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 151E435950;
-	Sun, 13 Sep 2026 16:50:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 188FF37A848
+	for <kvmarm@lists.linux.dev>; Sun, 13 Sep 2026 17:35:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789318209; cv=none; b=Wg4wWF+1hWXK3RTgZAQMP08r0IlmdS4+O41vzuQnscrSd7sN2r68nbd3GG9avwgdFqHPQhpX8ZVaSTU2xBnnoRWjA4qu1rS3RVij/wQw8BjdEfMifC1uTUSrFwWdVmYhuIIN1ou2zviRiKQBieEXtng8O8jVtWx9evrojJdH4zo=
+	t=1789320938; cv=none; b=PSGnpqkF+X8WXM19Cb9BnoUBJwt1llQlG/X4GqmZqFXC1sgajRL0iXavQE1rMj+WTTh447q3NfIPSBgbjWCRZS2xxcQgwsVzqEDIa/Z01klEB0b/ll+haDfZGqSRpgnEvY/tOhHD0vpIBCZb8rPT+LfGdqNTjnb10GJlQFljTB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789318209; c=relaxed/simple;
-	bh=sCmGU+cEKoUvSnKU5qUyd3OvA2kbyOCOPO2fskJtYF0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nSsFP2P15FTxf8e1ZdZrer1imwi8DbKfccAMtzNbcIQF4deR7AhrRZ3WQyyjJUpK5DXZ1jZKJcd1lf7Nyj6qTG7y67LbyiNiX7fABiG1cfhhOW4Bvaw9RcojzBqf/oI2/Tl9uzXCaF0mj8Sgx2dcKVlMPWYzdEJ8k3+wiU5Hj9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=sJftGVir; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1789320938; c=relaxed/simple;
+	bh=oojpCCn9S905n9dIf4cWhtFLz3VR0tFaovcpa1/k+Yw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=XHnDQXCa2gIF0M4ZslVrXKdZBhikVWrUGSF3obyT5JdfshU8YM8HfTXubO69LRyVa8JoAIZzswYsAo65X6Zjx+x61CSvFMRUoLYcBkX8GcbeFevWVu4voKZeTt0C6ZoIen74FuJ5hHFeVZ63tJwjjtwV2kaW1BaH1KXRRH7XuKI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Yu5CWv/d; arc=none smtp.client-ip=209.85.128.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="sJftGVir"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7CDA21655;
-	Sun, 13 Sep 2026 09:50:01 -0700 (PDT)
-Received: from [10.57.10.40] (unknown [10.57.10.40])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 406AF3F59E;
-	Sun, 13 Sep 2026 09:50:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1789318205; bh=sCmGU+cEKoUvSnKU5qUyd3OvA2kbyOCOPO2fskJtYF0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=sJftGVirhU+yJ47n/RComPK6wJlmRkGfR9wXhGMSNU/MDSeTclom5Fn+ENHtHzORY
-	 yPHtiTFdUfbeQmhOVmhDPizfn48scvNyr9cOJVRxKOHCFqM2UUjIQTtyfznkayXRBV
-	 Eib+OIm6v4qg3so7amAwnZo6vJV5lirbkxxHtcek=
-Message-ID: <90100d75-85a6-4ccb-8939-33446857536d@arm.com>
-Date: Sun, 13 Sep 2026 17:50:00 +0100
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Yu5CWv/d"
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-49e6422198fso15724055e9.1
+        for <kvmarm@lists.linux.dev>; Sun, 13 Sep 2026 10:35:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1789320935; x=1789925735; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=WrvnXTAqvwcTzxE8seUUXgtR7H/O9p43WXWIeIPgMYU=;
+        b=Yu5CWv/dLB+ojAu1QLI5th+sUFsGh+ioPh51/iIL+MiU1PQxqVrUfBuiyks+IplUKd
+         HdtcggCdfAqJuR7zFtHY9ZC5kiaKfLsj/C1LvxyZDAYbOps0Gwww4xTzIgivC/6LAvC9
+         eh/1ViazlH+UESMEUNi6UjKy4efQFz99Utp31Q95kbGRl5ogVnhM+ISAe3NfpCiWpKCH
+         R+uMCBZvxrILPpqR3wfCWUELravDzQmA+w/TNRtdUvbblCWN5nto4BFQUgmpWsZw2HpW
+         UByCghvZ/V6lrVEnC2AmIUmY3eobJTkgL5VoXBst7azerabj7KLshWs4F5yTY7DzJzMN
+         TRKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1789320935; x=1789925735;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=WrvnXTAqvwcTzxE8seUUXgtR7H/O9p43WXWIeIPgMYU=;
+        b=qZIMeo3yc4wEf4xhSIWWVt4u7o9uTmm/X9q9bCOpQzDykN7hp/0jNEj/oqY/KICEQx
+         m4cqEqEz4MmHnk0L/2j3MrmtfGNXmakLtXSoogTaRqTIAFMEjPrPXnXZcakgFclC/JQz
+         Qge02Ox1Ngxcwc480DstytoiIyaw+mrqA1/jPkAHVTrLMhFK2GDfwuBHJgxoHTyUV6IQ
+         k1QPAmsdQr9P7S1S8m1GZkU5w0ZjoF/0umNm1V0dhyTqVo+JL2NseOODGtPmWDY24roT
+         +xdqC1ziXqpowxx8yyai9TsOI+VFhPP0f/0OOEvHFD00SQB0pSSd7HAJ+oHDJhmdepG9
+         L4PQ==
+X-Forwarded-Encrypted: i=1; AKwUvBzah+o0Q8Wi4gZQjCTtEIGoecksvNeAg7GPZUm4nwk6tDGhOl+L8cqMMMD7shFY5MByxquRcwE=@lists.linux.dev
+X-Gm-Message-State: AFuF++kHWQe1T7b4IWPrEp6WFpCD1pqb5nnitWVtwZ6VfTR2dd/yBlxg
+	XrNjeS6O3rminnHaJ8hDYYLvJ9JHXnZ7JiUT2O4p0MQn9tMmy3BJMGZ9O4CZQnemy7AKY0jK1Nh
+	4MZIc/A0RCZxeljZk6vpJgA==
+X-Received: from wrbfi2.prod.google.com ([2002:a05:6000:4402:b0:486:ef8f:f47])
+ (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:c493:b0:49d:2607:4ada with SMTP id 5b1f17b1804b1-49e619bf31cmr255115085e9.14.1789320934793;
+ Sun, 13 Sep 2026 10:35:34 -0700 (PDT)
+Date: Sun, 13 Sep 2026 18:35:16 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v17 05/20] KVM: arm64: Add vcpu load/put call backs for
- flavors
-Content-Language: en-GB
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, will@kernel.org,
- catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
- aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
- joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
- linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
- sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
- WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com
-References: <20260908162223.1683432-1-suzuki.poulose@arm.com>
- <20260908162223.1683432-6-suzuki.poulose@arm.com>
- <867bkp78gs.wl-maz@kernel.org>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <867bkp78gs.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.55.0.1007.g17ff1f9808-goog
+Message-ID: <20260913173516.3122436-1-vdonnefort@google.com>
+Subject: [PATCH v1] KVM: arm64: Fix protected VMs fault on system with pages
+ larger than 4K
+From: Vincent Donnefort <vdonnefort@google.com>
+To: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org
+Cc: joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
+	kernel-team@android.com, fuad.tabba@linux.dev, qperret@google.com, 
+	Vincent Donnefort <vdonnefort@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 13/09/2026 11:26, Marc Zyngier wrote:
-> On Tue, 08 Sep 2026 17:22:08 +0100,
-> Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
->>
->> Add VM flavor specific handlers for VCPU load/put, in an effort to make it
->> easier to follow the code.
->>
->> Based on a patch by Marc Zyngier
->>
->> Suggested-by: Marc Zyngier <maz@kernel.org>
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> ---
->>   arch/arm64/include/asm/kvm_host.h |   6 ++
->>   arch/arm64/kvm/arm.c              | 156 ++++++++++++++++++++++--------
->>   2 files changed, 123 insertions(+), 39 deletions(-)
->>
->> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->> index d0dccc9ad6aa8..b2e99c5cb1cd3 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -150,6 +150,11 @@ struct kvm_vmid {
->>   	atomic64_t id;
+Just like commit 08f97454b7fa ("KVM: arm64: Fix protected mode handling
+of pages larger than 4kB") fixed the boot of non-protected VMs on system
+larger than 4K pages, align the fault IPA down to the page-size for
+protected VMs.
 
-...
+To paraphrase Marc, pkvm_pgtable_stage2_map() assumes the address passed
+as a parameter is aligned to the size of the intended mapping, while
+HPFAR_EL2 gives the IPA minus the bottom 12 bits, regardless of the
+system page size configuration.
 
->> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> index 51fc651267157..9af3bbb2f8c24 100644
->> --- a/arch/arm64/kvm/arm.c
->> +++ b/arch/arm64/kvm/arm.c
->> @@ -74,6 +74,8 @@ struct kvm_ioctl_cap_map {
->>   	long ext;
->>   };
+Add a check at the start of pkvm_pgtable_stage2_map() as we do not
+support !PAGE_ALIGNED arguments.
 
-...
+Fixes: ea03466e806f ("KVM: arm64: Handle aborts from protected VMs")
+Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+---
+ arch/arm64/kvm/mmu.c  | 2 +-
+ arch/arm64/kvm/pkvm.c | 3 +++
+ 2 files changed, 4 insertions(+), 1 deletion(-)
 
->> +
->> +static void nvhe_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->> +{
->> +	vcpu_prepare_mmu(vcpu);
->> +	/*
->> +	 * The timer must be loaded before the vgic to correctly set up physical
->> +	 * interrupt deactivation in nested state (e.g. timer interrupt).
->> +	 */
-> 
-> This comment makes no sense here -- it is strictly for VHE, which is
-> the only mode to implement NV. Same thing for the pKVM vcpu_load().
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 9ba86450fe4a..e8d98957531a 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1756,7 +1756,7 @@ static int pkvm_mem_abort(const struct kvm_s2_fault_desc *s2fd)
+ 	}
+ 
+ 	write_lock(&kvm->mmu_lock);
+-	ret = pkvm_pgtable_stage2_map(pgt, s2fd->fault_ipa, PAGE_SIZE,
++	ret = pkvm_pgtable_stage2_map(pgt, ALIGN_DOWN(s2fd->fault_ipa, PAGE_SIZE), PAGE_SIZE,
+ 				      page_to_phys(page), KVM_PGTABLE_PROT_RWX,
+ 				      hyp_memcache, 0);
+ 	write_unlock(&kvm->mmu_lock);
+diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+index 8e4c6e4bec12..1ca27d01a3ec 100644
+--- a/arch/arm64/kvm/pkvm.c
++++ b/arch/arm64/kvm/pkvm.c
+@@ -414,6 +414,9 @@ int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
+ 	u64 end = addr + size;
+ 	int ret;
+ 
++	if (!PAGE_ALIGNED(addr | size | phys))
++		return -EINVAL;
++
+ 	lockdep_assert_held_write(&kvm->mmu_lock);
+ 	mapping = pkvm_mapping_iter_first(&pgt->pkvm_mappings, addr, end - 1);
+ 
 
-Ack, removed everywhere except for VHE.
-
-> 
->> +	kvm_timer_vcpu_load(vcpu);
->> +	kvm_vgic_load(vcpu);
->> +	kvm_vcpu_load_debug(vcpu);
->> +	kvm_vcpu_load_fgt(vcpu);
->> +	kvm_arch_vcpu_load_fp(vcpu);
->> +	kvm_vcpu_pmu_restore_guest(vcpu);
->> +
->> +	vcpu_load_pvtime(vcpu);
->> +	vcpu_set_wfx_traps(vcpu);
->> +	vcpu_set_pauth_traps(vcpu);
->> +}
->> +
->> +static void pkvm_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->> +{
->> +	/*
->> +	 * The timer must be loaded before the vgic to correctly set up physical
->> +	 * interrupt deactivation in nested state (e.g. timer interrupt).
->> +	 */
->> +	kvm_timer_vcpu_load(vcpu);
->> +	kvm_vgic_load(vcpu);
->> +	kvm_vcpu_load_debug(vcpu);
->> +	kvm_vcpu_load_fgt(vcpu);
->> +	kvm_arch_vcpu_load_fp(vcpu);
->> +	kvm_vcpu_pmu_restore_guest(vcpu);
->> +
->> +	vcpu_load_pvtime(vcpu);
->> +	vcpu_set_wfx_traps(vcpu);
->> +
->> +	kvm_call_hyp_nvhe(__pkvm_vcpu_load,
->> +			  vcpu->kvm->arch.pkvm.handle,
->> +			  vcpu->vcpu_idx, vcpu->arch.hcr_el2);
->> +	kvm_call_hyp(__vgic_v3_restore_vmcr_aprs,
->> +		     &vcpu->arch.vgic_cpu.vgic_v3);
-> 
-> This can also be turned into a kvm_call_hyp_nvhe().
-
-Ack
-
-> 
->> +}
->> +
-
-...
-
->> +
->> +static void pkvm_vcpu_put(struct kvm_vcpu *vcpu)
->> +{
->> +	kvm_call_hyp(__vgic_v3_save_aprs, &vcpu->arch.vgic_cpu.vgic_v3);
-> 
-> Same thing here about kvm_call_hyp_nvhe().
-
-Ack
-
-> 
->> +	kvm_call_hyp_nvhe(__pkvm_vcpu_put);
->> +
->> +	/* __pkvm_vcpu_put implies a sync of the state */
->> +	if (!kvm_vm_is_protected(vcpu->kvm))
->> +		vcpu_set_flag(vcpu, PKVM_HOST_STATE_DIRTY);
->> +
->> +	nvhe_vcpu_put(vcpu);
-> 
-> I'm not overly fond of this. Yes, that was in my original patch. But
-> for example, we end-up calling kvm_arm_vmid_clear_active() for pKVM.
-> This is harmless, but conceptually wrong.
-> 
-> I'd rather you expand the whole thing.
-
-Done
-
-> 
->> +}
->> +
->> +void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->> +{
->> +	vcpu->arch.vcpu_ops->vcpu_put(vcpu);
->>   	vcpu_clear_on_unsupported_cpu(vcpu);
->>   	vcpu->cpu = -1;
->>   }
->> @@ -2136,6 +2192,28 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
->>   	}
->>   }
-
->> +
->> +static const struct kvm_vcpu_ops *arm64_vcpu_ops[] = {
->> +	[VM_VHE] = &vhe_vcpu_ops,
->> +	[VM_NVHE] = &nvhe_vcpu_ops,
->> +	[VM_PKVM] = &pkvm_vcpu_ops,
->> +	[VM_PROTECTED_PKVM] = &pkvm_vcpu_ops,
-> 
-> nit: my OCD-self wants to align all the '=' signs vertically...
-
-I have switched to a macro initialiser, consistent with vm_s2_mmu_ops. 
-So it looks much cleaner
-
-Cheers
-Suzuki
+base-commit: df2908090cda368b01ff43709f51890076c56157
+-- 
+2.55.0.1007.g17ff1f9808-goog
 
