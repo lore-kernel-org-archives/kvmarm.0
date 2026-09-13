@@ -1,112 +1,97 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com [209.85.128.71])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B1F3361976
-	for <kvmarm@lists.linux.dev>; Sun, 13 Sep 2026 17:51:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0973C2931EE
+	for <kvmarm@lists.linux.dev>; Sun, 13 Sep 2026 20:31:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789321867; cv=none; b=t8udEjFTCRirNqnny6VxaYxO92kANp1aogFsDDb44jJikdwWIQHlrMBqMb+7Y0fZUBW0WKU4zuOU4chQvpRuReaAbG96HAmptsm51GP2VbCGQLCY9QlaQUW1XnNuxKGnRru4yMc4J+l8elpocW0SnX6O47og3dEAJbnuxfP0ViY=
+	t=1789331474; cv=none; b=J4yL8vlvT+Za/zBwXHlvfOzwb24b8pW4LrXhgaCZCDFppYiA55xuLf3XxFYF+JHvqwBR9S5IvOr4T5z0GZzp6+xPb6toRth4Q9B28ijGM1O5CKA+60lzuSd7+05ze0rrHjhaxhdZVh1GFyUoaxSP+waQD7wFmi5HuOkWKUcvOhY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789321867; c=relaxed/simple;
-	bh=wV+Ea5O648gDH19JqA6lFL8uIzT5+1nkWnhxVFsJvWE=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=az7CVkq/EreUA6PJApaIbIYmdc+muyW4yXOhRdnM3jxak33QjKnxXE4muqNhjLbAU5hxn8jOyW2dDQbShIpVSN6Ufi4pdh7CcQ9HA/JX8Ctyh+e2jptjRmUxiaPb0AijYEazNQ1Y32p32+r11zgkWk/lwKjsaP5Gxf/YFTQVfkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HMOdbwTZ; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789331474; c=relaxed/simple;
+	bh=VjWvJ6GwBTpH11FilsRB5EGaf7U1JBTe8QfjAPuJcbk=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=GTE55OkUjBfpFYk+NA23eczDM7S97JGauKA9YKE5m2vFi/1sXlCZGu1TPf/PTmYw/GAwLHENec8BYOgMzBPoEINFxrvpBdyiTUNf+H2Ya00gX2akTBWBzEcc2+/FseVW44J/qN7hwRKmM8nX8oU07ro+HfKdWNnvdiNRKipZaa4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oZ7BsrrX; arc=none smtp.client-ip=209.85.128.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HMOdbwTZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A57AC1F000FF;
-	Sun, 13 Sep 2026 17:51:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789321865;
-	bh=sr27lRZX+84OKhFDydgoA6ib60H/VRpxjIzqDMMXloQ=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=HMOdbwTZESUyH6/WTUdu5DI0JDa20vXX2D9VXEpXW6V7AsC0cf7Im8lRv7YKH4eAN
-	 4y7gC/RUsIBBXl1dzST/vUHF6j8ZcnB+Jh6NvB5NC42bQIyhsmCulCCroRA8wayMVh
-	 gQmMaNo5ybbpV7fsL7TkTgF2xwe//9x5RgXXpNNCEpxpXL+CajHa8FpB820sDBumye
-	 CFEn6veT0O9RtfdsHxES/hImmaooeRJhSWwvbxySuYoL9+E0iIPALSBdng2Deb62f5
-	 PWaWpScuTu3r/3cNYQjGxJbI94yQlbAqLHbXyjYqLsSg+MV+DPlDWxJXFbpwV+gY5F
-	 1a+kVS2FgUuDw==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v1] KVM: arm64: Fix protected VMs fault on system with
- pages larger than 4K
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Vincent Donnefort" <vdonnefort@google.com>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260913173516.3122436-1-vdonnefort@google.com>
-References: <20260913173516.3122436-1-vdonnefort@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 13 Sep 2026 17:51:05 +0000
-Message-Id: <20260913175105.A57AC1F000FF@smtp.kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oZ7BsrrX"
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-49e7631c43aso5580915e9.3
+        for <kvmarm@lists.linux.dev>; Sun, 13 Sep 2026 13:31:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1789331471; x=1789936271; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=nkInFxMRft8SM/EsWMHnh5CKtPWKT4sSAWgTUnaMbe4=;
+        b=oZ7BsrrXNelDXEWMdDaLAY1Dcm9C4QRe8JZ3E3tcq8IYLT7+Goj8TDU13oY00835wL
+         jffZviLkfzks9j/j0QNNspPpwj/XQPA83bHOjyrnzxRAkmhfSxcQJslhO9O5qKo/0K1f
+         o2M3ENtvAAs4MwjWPbAWpwnNTVEmc3RjiLN+nG1rdskQW4MrPSTSwFcx7v1fLBuUmtg9
+         PvUMpTYJjVU5vex1UfKLtBr+do11G4raBwtEzNbLF0/omKoETii6otnyBFmdJViIqCFG
+         XnMseF+ExGChqp2+RHmabRkAQmracEURvqRrdxCMvi0Yti+k1LaiUpBdCZVFWBD1Fjr5
+         qS2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1789331471; x=1789936271;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=nkInFxMRft8SM/EsWMHnh5CKtPWKT4sSAWgTUnaMbe4=;
+        b=HZbFW+TipwP3Z7QoP7v8wNVYMeceI1F+LV2uTqRAqHhSZ4Rppmr2aO+IXs/CNvWhxd
+         ZrZ/wCTjTwxtnUljCssPcspRacEUqsE3q/BAh4FtYjqzCm1Bo6zDmWSQlex/DfwPghj7
+         iYUtx9BH3r9NNCDHlscxS5nd58z+3KrgK1dMi7AtqsdAs9unrSksBeUwlMxY33EpNyDw
+         caHltumUF/xxsRT8Iir0HOLj7D0i8QV3qBD5cZzpatUNJYk3+75KGE7sR38VpEY5eS3U
+         2x4TV03RmmWnhkQdVk/vpSvENG1cNrYcuoOW9sUc963UjaMnB3xEwZLaIge58Dtov2dM
+         hypQ==
+X-Forwarded-Encrypted: i=1; AKwUvByHIXPGRP7sY7kiPUDrgdsyPLXerYWdW2QE3rZARShCREZU7Q0kZpSRcsBOMMGTHwEIjFkvbi4=@lists.linux.dev
+X-Gm-Message-State: AFuF++n2MdaojnFXgl1IpOKKoArpWwlHAB2vnSmogpJshmlxXT6S77s7
+	b4YfPxDj4Ka4lP5phvSAFobwDP0P51ooEMJb6147DfIFcdisAX9uu3tIE1y/t3Ui2mf0IhOX2+S
+	0M69oGLAHmZOWHBAtIqeYYw==
+X-Received: from wmcq22.prod.google.com ([2002:a05:600c:c116:b0:49e:6bc5:85ce])
+ (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:8411:b0:49d:1e09:694a with SMTP id 5b1f17b1804b1-49e619f5049mr328748215e9.11.1789331471258;
+ Sun, 13 Sep 2026 13:31:11 -0700 (PDT)
+Date: Sun, 13 Sep 2026 21:31:08 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.55.0.1007.g17ff1f9808-goog
+Message-ID: <20260913203108.3343404-1-vdonnefort@google.com>
+Subject: [PATCH v1] KVM: arm64: Advertise MMFR0 TGRAN for pVMs
+From: Vincent Donnefort <vdonnefort@google.com>
+To: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org
+Cc: joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
+	kernel-team@android.com, fuad.tabba@linux.dev, 
+	Vincent Donnefort <vdonnefort@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [High] gmem_abort() passes an unaligned fault_ipa to kvm_pgtable_stage2_m=
-ap(), which triggers the new -EINVAL check on pKVM hosts.
---
+Protected VMs can support granules bigger than 4K. Advertise TGRAN16 and
+TGRAN64. TGRAN4 wasn't advertised as it is enabled by default (supported
+when 0). Add it as well for consistence.
 
-commit 724c2b0f8e554f59f7c409467796ff8e9acf590b
-Author: Vincent Donnefort <vdonnefort@google.com>
-Subject: KVM: arm64: Fix protected VMs fault on system with pages larger th=
-an 4K
+Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+---
+ arch/arm64/kvm/hyp/nvhe/sys_regs.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-This commit aligns the fault IPA down to the page size for protected VMs
-in pkvm_mem_abort(), similar to previous fixes for non-protected VMs.
-It also adds a strict page-alignment check to pkvm_pgtable_stage2_map()
-which returns -EINVAL if the address, size, or physical address are unalign=
-ed.
+diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+index 8758c6801776..ec469d96516a 100644
+--- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
++++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+@@ -121,6 +121,9 @@ static const struct pvm_ftr_bits pvmid_aa64mmfr0[] = {
+ 	MAX_FEAT(ID_AA64MMFR0_EL1, SNSMEM, IMP),
+ 	MAX_FEAT(ID_AA64MMFR0_EL1, BIGENDEL0, IMP),
+ 	MAX_FEAT(ID_AA64MMFR0_EL1, EXS, IMP),
++	MAX_FEAT(ID_AA64MMFR0_EL1, TGRAN4, IMP),
++	MAX_FEAT(ID_AA64MMFR0_EL1, TGRAN16, IMP),
++	MAX_FEAT(ID_AA64MMFR0_EL1, TGRAN64, IMP),
+ 	FEAT_END
+ };
+ 
 
-[ ... ]
+base-commit: df2908090cda368b01ff43709f51890076c56157
+-- 
+2.55.0.1007.g17ff1f9808-goog
 
-> diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-> index 8e4c6e4bec123..1ca27d01a3ec6 100644
-> --- a/arch/arm64/kvm/pkvm.c
-> +++ b/arch/arm64/kvm/pkvm.c
-> @@ -414,6 +414,9 @@ int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, =
-u64 addr, u64 size,
->  	u64 end =3D addr + size;
->  	int ret;
-> =20
-> +	if (!PAGE_ALIGNED(addr | size | phys))
-> +		return -EINVAL;
-> +
-
-[Severity: High]
-Does this new check break non-protected VMs using guest_memfd on a pKVM hos=
-t?
-
-When gmem_abort() handles page faults for guest_memfd slots, it passes
-s2fd->fault_ipa directly to kvm_pgtable_stage2_map() without aligning it
-down to the page size:
-
-arch/arm64/kvm/mmu.c:gmem_abort() {
-    ...
-	} else {
-		ret =3D KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, s2fd->fault_ipa,
-							 PAGE_SIZE,
-							 __pfn_to_phys(pfn),
-							 prot, memcache, flags);
-	}
-    ...
-}
-
-Since HPFAR_EL2 only aligns to 4K, on a 16K or 64K page host, the fault_ipa
-passed from gmem_abort() will fail this new PAGE_ALIGNED check and return
--EINVAL. This prevents memory mapping and causes the VM fault handling to
-abort.
-
-Should gmem_abort() also be updated to apply ALIGN_DOWN to s2fd->fault_ipa,
-just like pkvm_mem_abort() was fixed in this patch?
-
->  	lockdep_assert_held_write(&kvm->mmu_lock);
->  	mapping =3D pkvm_mapping_iter_first(&pgt->pkvm_mappings, addr, end - 1);
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260913173516.3122=
-436-1-vdonnefort@google.com?part=3D1
