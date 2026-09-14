@@ -1,143 +1,324 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E18640B398
-	for <kvmarm@lists.linux.dev>; Mon, 14 Sep 2026 08:32:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 452A740B0FE;
+	Mon, 14 Sep 2026 08:38:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789374771; cv=none; b=qambDTzuVokTMU+zI+ZwOge7yD4rCVdUNtaCuCFle8tvtB5sdOP+zsvmctV0vumuMncBQJKXR9z4Kg9G4Tm3dZlOcHiF1+Q2HZCWNP/ZQtiArkzkewAywmi1BUryt4nxtpbDEuhct5c3b9ah6EJ7mUbILbr3mEFq2gfElU+aoa4=
+	t=1789375105; cv=none; b=nPs+0ueBIm4/jdcpwTLWtSWJvO2wsanoIlolHL0MCY43n4xwlHkE2fdW8DKwhRodB6shOij/qehEC2eesHjb+ZqVjCbRJXbXmnjhxrvXYQAhqaHOzBEXhAG4KFXKNruY6Z1o8qtgwOHSu9hWV685rXiabK3OmA3QWSnfKlyNa8I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789374771; c=relaxed/simple;
-	bh=ehdCgQhm5eYRTDU59jX+d3Ax2phw5tmcILcwp7ovUhs=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ngVXOSGP9BH0lMxjeB7ukCzHUmRK28VmTcHNxp0A3QxX32OBI29YllFwaxqgYnP+0s0za4Nxa/HXxXZFcvTeQ70qKdtJt9MZruClgUXHUityq1S+MFQnEiBZg5GqAnWrioDR7oONmzo1krwxZ0u/FsbuE5gMdCA3QAzkANnsDOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SLxMMun4; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789375105; c=relaxed/simple;
+	bh=44Zxr0bAzy/FVaHYHhpGrc8BaI6/0sVp1yPuJiyTLok=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pdh29jqzKvq1FsfbFs/lfLWFanSGAj7zL2Q4UPbhxhWLpfrM/RppnQRrD0Io1PNFVUDDNaSdsM5vbS1d3Fzdner0ibxUvcFKhiAkA215Afn7g1elTm25e/dYUOftW17HIYXeXXQgK4ZBKyioE7VCJAr9UJj4YtYFPJeJc2w4Mqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=trDYbUBd; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SLxMMun4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2298E1F00899;
-	Mon, 14 Sep 2026 08:32:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789374770;
-	bh=jqLaTSkRrvlodeW0BhtEHuSwEAtIDlnxV5dSZDwqPlU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=SLxMMun4FFsCDBpxh6yi7G6KxHMtGA8/TFOrzQBKXn1cVj2W+ypKVcCif6lXFsfWm
-	 qJIuteRsX586nEhIRo3f+5MGCidqBu6D7aCgM0K4GHHd5TZHmCvzqF1Iu9Je1kpjBy
-	 iiJT/+wsgqq5LFK2jTHHWqgS7Vzcj/S+fBMQwnFJEarsNpc2y+gAIT1VYeexxjUXTF
-	 qT1hujV2o22o6NVdyPnrLRKBiX791QN4qBFCyqGd8znuiFNAXlql6MdbA9HROpEd0c
-	 kTsha9BH2Kn0R8oML9NACimQjcMHSo2U7fKVogt4VbsVgWiOahx/GgGT4CmY7GHm4Y
-	 xYWNL4B96nIWg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1x627L-00000008VEv-3cST;
-	Mon, 14 Sep 2026 08:32:47 +0000
-Date: Mon, 14 Sep 2026 09:32:47 +0100
-Message-ID: <864ifs6xn4.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: oupton@kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	joey.gouly@arm.com,
-	seiden@linux.ibm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	kernel-team@android.com,
-	fuad.tabba@linux.dev,
-	qperret@google.com
-Subject: Re: [PATCH v2] KVM: arm64: Fix protected VM fault on system with pages larger than 4K
-In-Reply-To: <20260914075839.4019904-1-vdonnefort@google.com>
-References: <20260914075839.4019904-1-vdonnefort@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="trDYbUBd"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BFD041570;
+	Mon, 14 Sep 2026 01:38:15 -0700 (PDT)
+Received: from [10.0.128.139] (unknown [10.0.128.139])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CD7EC3F7B4;
+	Mon, 14 Sep 2026 01:38:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1789375099; bh=44Zxr0bAzy/FVaHYHhpGrc8BaI6/0sVp1yPuJiyTLok=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=trDYbUBd8UJwtxnr5vASuBR49N08Qhrp+erecALsuVHO5qeuyeEwlNO1jTQ9dzICy
+	 5RBCJaUgzOIw888gkG3fO+hInEVEOdJFYEAqqhFfwfoUUcwZoBACn0bOu1n6gl1/G9
+	 M/9oFTHq4omPIvlpXxn5YpbUoMmFgSEg5bpJPIF0=
+Message-ID: <dc733a28-cbca-46cb-a4bd-14840b1a0cc1@arm.com>
+Date: Mon, 14 Sep 2026 09:38:15 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: vdonnefort@google.com, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com, fuad.tabba@linux.dev, qperret@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v18 6/7] firmware: arm_rmm: Ensure the RMM has GPT entries
+ for memory
+Content-Language: en-GB
+To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: maz@kernel.org, will@kernel.org, catalin.marinas@arm.com,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org,
+ joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
+ linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
+ sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
+ WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com
+References: <20260912083611.2513845-1-suzuki.poulose@arm.com>
+ <20260912083611.2513845-7-suzuki.poulose@arm.com>
+ <b2fd288e-e0e7-49cc-b0cb-933fba501d79@redhat.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <b2fd288e-e0e7-49cc-b0cb-933fba501d79@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, 14 Sep 2026 08:58:39 +0100,
-Vincent Donnefort <vdonnefort@google.com> wrote:
+On 14/09/2026 06:41, Gavin Shan wrote:
+> On 9/12/26 6:36 PM, Suzuki K Poulose wrote:
+>> From: Steven Price <steven.price@arm.com>
+>>
+>> The RMM maintains the state of all the granules in the system to make
+>> sure that the host is abiding by the rules. This state can be maintained
+>> at different granularity, per page (TRACKING_FINE) or per region
+>> (TRACKING_COARSE or TRACKING_INTERMEDIATE). The region size depends on 
+>> the
+>> underlying "RMI_GRANULE_SIZE". For a "coarse"/"intermediate" region, 
+>> all pages
+>> in the region must be of the same state, this implies we need to have 
+>> "fine"
+>> tracking for DRAM, so that we can delegate individual pages.
+>>
+>> For now we only support a statically carved out memory for tracking
+>> granules for the "fine" regions. This can be extended in the future to
+>> allow modifying the tracking granularity and remove the need for a
+>> static allocation by the firmware.
+>>
+>> Similarly, the firmware may create L0 GPT entries describing the total
+>> address space. But if we change the "PAS" (Physical Address Space) of a
+>> granule, then the firmware may need to create L1 tables to track the PAS
+>> at a finer granularity. Linux therefore checks if the platform 
+>> firmware manages
+>> the PAR region. i.e., the firmware is in charge of managing the L1 GPTs
+>> (creation and the required memory for the GPT tables - via static 
+>> carveouts)
+>> without host intervention. Support for dynamic GPT creation by the 
+>> host will be
+>> added later.
+>>
+>> If the firmware requires us to manage the tracking or GPT memory, 
+>> Deactivate
+>> the RMM and reclaim any memory donated at RMM activation.
+>>
+>> Apply the same checks when hotplugged memory is brought online.
+>>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> [ Switch to RMI_GPT_L1_INFO for checking GPTs and deactivate RMM ]
+>> Co-Developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> ---
+>>   Changes since v17:
+>>       * Move wrappers that may not be used elsewhere, out of arm-rmi- 
+>> cmds.h
+>>   Changes since v16:
+>>       * Check fine tracking and create L1 GPTs for hotplug-added memory.
+>>       * Clarify the L1 GPT setup and move the explanatory comment.
+>>       * Switch to using RMI_GPT_INFO command for checking the GPTs.
+>>       * Deactivate the RMM and reclaim the memory if we can't proceed.
+>>   Changes since v15:
+>>       * Skip firmware-reserved NOMAP memory in rmi_init_metadata()
+>>       * Handle negative error codes from wrappers.
+>>   Changes since v14:
+>>       * Move the implementation into drivers/firmware/arm_rmm.
+>>   Changes since v13:
+>>       * Moved out of KVM
+>> ---
+>>   drivers/firmware/arm_rmm/rmi.c | 200 +++++++++++++++++++++++++++++++++
+>>   include/linux/arm-rmi-cmds.h   |   2 +
+>>   2 files changed, 202 insertions(+)
+>>
+>> diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/ 
+>> arm_rmm/rmi.c
+>> index ecc89e91d264d..583e1aca9b15a 100644
+>> --- a/drivers/firmware/arm_rmm/rmi.c
+>> +++ b/drivers/firmware/arm_rmm/rmi.c
+>> @@ -5,12 +5,15 @@
+>>   #include <linux/cpufeature.h>
+>>   #include <linux/memblock.h>
+>> +#include <linux/memory.h>
+>>   #include <linux/arm-rmi-cmds.h>
+>>   #include <linux/slab.h>
+>>   #include <asm/memory.h>
+>>   #include <asm/pgtable-hwdef.h>
+>> +static bool arm64_rmi_is_available;
+>> +
+>>   /* Currently only the first 2 registers are used by Linux */
+>>   #define RMI_FEAT_REG_COUNT    2
+>>   static unsigned long rmi_feat_reg_cache[RMI_FEAT_REG_COUNT] 
+>> __ro_after_init;
+>> @@ -68,6 +71,69 @@ static inline long 
+>> rmi_granule_range_undelegate(unsigned long base,
+>>       return ret;
+>>   }
+>> +/**
+>> + * rmi_granule_tracking_get() - Get configuration of a Granule 
+>> tracking region
+>> + * @start: Base PA of the tracking region
+>> + * @end: End of the PA region
+>> + * @out_category: Memory category
+>> + * @out_state: Tracking region state
+>> + * @out_top: Top of the memory region
+>> + *
+>> + * Return: RMI return code
+>> + */
+>> +static inline int rmi_granule_tracking_get(unsigned long start,
+>> +                       unsigned long end,
+>> +                       unsigned long *out_category,
+>> +                       unsigned long *out_state,
+>> +                       unsigned long *out_top)
+>> +{
+>> +    struct arm_smccc_1_2_regs regs = {
+>> +        SMC_RMI_GRANULE_TRACKING_GET, start, end,
+>> +    };
+>> +
+>> +    rmi_smccc_invoke(&regs);
+>> +
+>> +    if (regs.a0 != RMI_SUCCESS)
+>> +        return regs.a0;
+>> +
+>> +    if (out_category)
+>> +        *out_category = regs.a1;
+>> +    if (out_state)
+>> +        *out_state = regs.a2;
+>> +    if (out_top)
+>> +        *out_top = regs.a3;
+>> +
+>> +    return RMI_SUCCESS;
+>> +}
+>> +
+>> +/*
+>> + * rmi_gpt_info - Query the GPT info for the given PAR.
+>> + * @start: Base of the physical address region
+>> + * @top: Top of the physical address region
+>> + * @out_top: Top of the phyiscal address region for which
+>> + *        the GPT @out_gpt_par_state is valid
+>> + * @out_gpt_par_state: State of the GPT covered by [start, out_top)
+>> + */
+>> +static inline long rmi_gpt_info(unsigned long start, unsigned long end,
+>> +                unsigned long *out_top,
+>> +                unsigned long *out_gpt_par_state)
+>> +{
+>> +    struct arm_smccc_1_2_regs regs = {
+>> +        SMC_RMI_GPT_INFO, start, end,
+>> +    };
+>> +
+>> +    rmi_smccc_invoke(&regs);
+>> +    if (regs.a0 != RMI_SUCCESS)
+>> +        return regs.a0;
+>> +
+>> +    if (out_top)
+>> +        *out_top = regs.a1;
+>> +    if (out_gpt_par_state)
+>> +        *out_gpt_par_state = regs.a2;
+>> +
+>> +    return RMI_SUCCESS;
+>> +}
+>> +
+>>   /**
+>>    * rmi_features() - Read feature register
+>>    * @index: Feature register index
+>> @@ -759,6 +825,124 @@ static int rmi_configure(void)
+>>       return ret;
+>>   }
+>> +/*
+>> + * Make sure the area is tracked by RMM at FINE granularity.
+>> + * We do not support changing the tracking yet.
+>> + */
+>> +static int rmi_verify_memory_tracking(phys_addr_t start, phys_addr_t 
+>> end)
+>> +{
+>> +    while (start < end) {
+>> +        unsigned long ret, category, state, next;
+>> +
+>> +        ret = rmi_granule_tracking_get(start, end, &category, &state, 
+>> &next);
+>> +        if (ret != RMI_SUCCESS)
+>> +            return -ENOMEM;
+>> +
+>> +        if (state != RMI_TRACKING_FINE ||
+>> +            category != RMI_MEM_CATEGORY_CONVENTIONAL) {
+>> +            /* TODO: Set granule tracking in this case */
+>> +            pr_err("Granule tracking for region isn't fine/ 
+>> conventional: %llx-%lx\n",
+>> +                   start, next);
+>> +            return -ENODEV;
+>> +        }
+>> +        start = next;
+>> +    }
+>> +
+>> +    return 0;
+>> +}
+>> +
 > 
-> Just like commit 08f97454b7fa ("KVM: arm64: Fix protected mode handling
-> of pages larger than 4kB") fixed the boot of non-protected VMs on system
-> larger than 4K pages, align the fault IPA down to the page-size for
-> protected VMs.
+> I would suggest to drop rmi_granule_tracking_get() by combining its 
+> logics into
+> rmi_verify_memory_tracking().
 > 
-> To paraphrase Marc, pkvm_pgtable_stage2_map() assumes the address passed
-> as a parameter is aligned to the size of the intended mapping, while
-> HPFAR_EL2 gives the IPA minus the bottom 12 bits, regardless of the
-> system page size configuration.
+> /*
+>   * Make sure the area is tracked by RMM at FINE granularity.
+>   * We do not support changing the tracking yet.
+>   */
+> static int rmi_verify_memory_tracking(phys_addr_t start, phys_addr_t end)
+> {
+>          struct arm_smccc_1_2_regs args;
 > 
-> Add a check at the start of pkvm_pgtable_stage2_map() as we do not
-> support !PAGE_ALIGNED arguments and use the gfn as an argument in all
-> callers.
+>          while (start < end) {
+>                  args.a0 = SMC_RMI_GRANULE_TRACKING_GET;
+>                  args.a1 = start;
+>                  args.a2 = end;
+>                  rmi_smccc_invoke(&args);
 > 
-> Fixes: ea03466e806f ("KVM: arm64: Handle aborts from protected VMs")
-> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
-> ---
+>                  if (args.a0 != RMI_SUCCESS)
+>                          return -ENOMEM;
 > 
-> Changelog:
+>                  if (args.a1 != RMI_MEM_CATEGORY_CONVENTIONAL ||
+>                      args.a2 != RMI_TRACKING_FINE) {
+>                          /* TODO: Set granule tracking in this case */
+>                          pr_err("Granule tracking for region isn't fine/ 
+> conventional: %llx-%lx\n",
+>                                  start, args.a3);
+>                          return -ENODEV;
+
+I have moved the wrappers closer to the caller, but retained them to
+  make it easier to read the code.
+  e.g., error conditions around next >= start etc.
+
+>                  }
 > 
-> v2:
->   - Use gfn_to_gpa(gfn)
->   - Drop "phys" from the PAGE_ALIGNED check, it isn't a requirement.
->   - Fix gmem_abort() as well (Sashiko)
+>                  start = args.a3;
+>          }
 > 
-> v1: https://lore.kernel.org/all/20260913173516.3122436-1-vdonnefort@google.com/
+>          return 0;
+> }
+
+...
+
 > 
->  arch/arm64/kvm/mmu.c  | 7 ++++---
->  arch/arm64/kvm/pkvm.c | 3 +++
->  2 files changed, 7 insertions(+), 3 deletions(-)
+> I would suggest to drop rmi_gpt_info() by combining its logics into 
+> rmi_verify_gpt_firmware_managed().
 > 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 9ba86450fe4a..ee78201a44df 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1672,10 +1672,10 @@ static int gmem_abort(const struct kvm_s2_fault_desc *s2fd)
->  		 * PTE, which will be preserved.
->  		 */
 
-Context:
+Same as above.
 
-	if (s2fd->nested)
-		gfn = kvm_s2_trans_output(s2fd->nested) >> PAGE_SHIFT;
-	else
-		gfn = s2fd->fault_ipa >> PAGE_SHIFT;
+>> +
+>> +static int rmi_init_metadata(void)
+>> +{
+>> +    phys_addr_t start, end;
+>> +    struct memblock_region *r;
+>> +
+>> +    for_each_mem_region(r) {
+>> +        int ret;
+>> +
+>> +        /* Firmware-reserved NOMAP regions are not usable system RAM */
+>> +        if (memblock_is_nomap(r))
+>> +            continue;
+>> +
+>> +        start = memblock_region_memory_base_pfn(r) << PAGE_SHIFT;
+>> +        end = memblock_region_memory_end_pfn(r) << PAGE_SHIFT;
+>> +
+> 
+> nit: unnecessary to covert the physical address (struct 
+> memblock_region::base and (base + size))
+> to PFN and then convert PFN to physical address:
+> 
+>          start = PAGE_ALIGN(r->base);
+>          end = PAGE_ALIGN_DOWN(r->base + r->size);
+>          if (start >= end)
+>              continue;
 
-[...]
+Yes, I have handled this already per Sashiko review comment.
 
->  		prot &= ~KVM_NV_GUEST_MAP_SZ;
-> -		ret = KVM_PGT_FN(kvm_pgtable_stage2_relax_perms)(pgt, s2fd->fault_ipa,
-> +		ret = KVM_PGT_FN(kvm_pgtable_stage2_relax_perms)(pgt, gfn_to_gpa(gfn),
->  								 prot, flags);
->  	} else {
-> -		ret = KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, s2fd->fault_ipa, PAGE_SIZE,
-> +		ret = KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, gfn_to_gpa(gfn), PAGE_SIZE,
->  							 __pfn_to_phys(pfn), prot,
->  							 memcache, flags);
+Thank you for the review!
 
-So 'gfn' is not related to the faulting IPA in the nested case, but is
-the output address of the guest's own S2. You probably end-up with a
-livelock handling the same fault forever, or worse.
-
-It is a bit annoying that neither gmem nor pkvm are using
-kvm_s2_fault_vma_info, which has the ability to reports all the
-important stuff, as it would avoid this sort of bugs.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Cheers
+Suzuki
