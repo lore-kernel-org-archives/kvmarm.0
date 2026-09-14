@@ -1,156 +1,128 @@
-Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta0.migadu.com (out-35.mta0.migadu.com [91.218.175.35])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 663613803DF
-	for <kvmarm@lists.linux.dev>; Mon, 14 Sep 2026 06:44:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0140346FB3
+	for <kvmarm@lists.linux.dev>; Mon, 14 Sep 2026 06:51:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789368269; cv=none; b=qb3fiWZspoB7Hg2DikgmJh/MFtCYdP46XKGDdhUp5Py6UtL2P9MmNu9W5fr0WGm5bDO3s8vldgDn9sBLI2FEXPCW6oXu1ppp4QlQcfysxZeub7MajWbTMxNhnicQYu52l7/py1oS4DhCm8BE/6LWcpCCB5x3oTNNniFf5CdeGa8=
+	t=1789368706; cv=none; b=Uqbm/5k9e6F3ZmQCE+9kyqn9BpviBVxMlHVg6mxBeje6Xgj7Xh+f3+GgLqZdzE9vNBBXJheeM01c8FmVdtnObdmkAID6GhPXMoMOzy4IrG+KHsNHIRzwE0JKZ4lkUVoOld3Lznva8GsH2C3Zhjq5MtxRVd8dBteL1PPJ7l/7u2M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789368269; c=relaxed/simple;
-	bh=Wd+IhzUMNqudeorIJuhR9ZmngqyRXrIKFSbROvJ+2+U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Qy02OBAyo/QaGDbXbw0/ExG2ARrBNB6hnUNJIR/IPhqYokXGgU/Dwrqm2ynU4mgTnRivm5ZRzdjEnZWMvATwVB01HKnj4REF6+KRXWn2bor6aIo5uEU/689J8Pj0Io6LCbdsCHdxjuyOJZg+3IEmNytJhhsIxejDWSQ1U4cP/yI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=UHhgVyfl; arc=none smtp.client-ip=115.124.30.113
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+	s=arc-20240116; t=1789368706; c=relaxed/simple;
+	bh=ImB4OSlH78bkgJyJTPE0uJYasv+aHz+ywNLGej5cQLA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=EqSI3cHHJdgLtJHMp0u2WHdRXYWT3BxhT+RMAq41qVtZrHeKOL0K8Hp+uInXLor1PDqqB2qo4jxalFJB17H2v2DUGjCe4Ycwu7SEbx5vhnbMq2RlN20Eat7VConyiBtMHHkq5OOcjVS6vZVFpzANBgbJZ2v+TT6NvAg+UqgitRY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=I63itf2T; arc=none smtp.client-ip=91.218.175.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="UHhgVyfl"
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1789368257; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=R1MRlh6AE092pgDrBOK7zH37nTa3jlHIh7copY4WYSo=;
-	b=UHhgVyfl/lrgx0RaZ5SrQ+rkICOx0jSrMqVwzU0J8YKeWaP/aihUhF7CgBlA1QJFpaF9JZvzy762pNZLarDGyH+00tcKcRVKuSZLsYoH7MtmfLR8NrmgZgPPL0yu5VX5gOCXdxrVViGMN7c3wf3YTDRV7zv8gvOxdo371ChbD7Y=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045133197;MF=xueshuai@linux.alibaba.com;NM=1;PH=DS;RN=11;SR=0;TI=SMTPD_---0XArjucF_1789368256;
-Received: from 30.246.177.179(mailfrom:xueshuai@linux.alibaba.com fp:SMTPD_---0XArjucF_1789368256 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Mon, 14 Sep 2026 14:44:16 +0800
-Message-ID: <8bf3f266-06fd-49e0-8de8-33c7a044e997@linux.alibaba.com>
-Date: Mon, 14 Sep 2026 14:44:15 +0800
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="I63itf2T"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=ImB4OSlH78bkgJyJTPE0uJYasv+aHz+ywNLGej5cQLA=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1789368702; v=1; x=1789973502;
+ b=I63itf2TpHXHRYOL2bejHPSgIL4TyoUH7G9DZFd1ndDP78CzQxq6NIhI6beWg9OY6Q1adCB7
+ tdmfuETZll7DBwqMEEJ/OTFZMK0/faMYyFpSs/D+eDOG69L618k4zYrRNyfG15kVdgVYze0oCY2
+ aUVvq14una7IyZX5hAJmorI0=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 9d38ec8ca3f71a61;
+	Mon, 14 Sep 2026 06:51:42 +0000
+X-Mizu-Trace-ID: 9d38ec8ca3f71a61
+X-Migadu-Flow: FLOW_OUT
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: maz@kernel.org,
+	oupton@kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Cc: catalin.marinas@arm.com,
+	will@kernel.org,
+	joey.gouly@arm.com,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	mark.rutland@arm.com,
+	vdonnefort@google.com,
+	qperret@google.com,
+	tabba@google.com
+Subject: [PATCH] KVM: arm64: Pin the host vCPU before adjusting its PC under pKVM
+Date: Mon, 14 Sep 2026 07:51:36 +0100
+Message-Id: <20260914065136.3418404-1-fuad.tabba@linux.dev>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/4] KVM: arm64: Reduce overhead of full S2 teardown
-To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org
-Cc: Wei-Lin Chang <weilin.chang@arm.com>, Wang Han
- <wanghan@linux.alibaba.com>, Steffen Eiden <seiden@linux.ibm.com>,
- Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
- Fuad Tabba <fuad.tabba@linux.dev>
-References: <20260912104834.3093878-1-maz@kernel.org>
-From: Shuai Xue <xueshuai@linux.alibaba.com>
-In-Reply-To: <20260912104834.3093878-1-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+Under pKVM, a page the host shares with EL2 is mapped at EL2 only while
+it's pinned, and the host vCPU and its VM are pinned at the vCPU's
+first KVM_RUN. KVM_SET_VCPU_EVENTS with ext_dabt_pending reaches
+__kvm_adjust_pc() at EL2 before that, and dereferencing the unmapped
+host vCPU panics the hypervisor. Any process holding /dev/kvm on a
+pKVM host can trigger it.
 
+Pin the host vCPU around the adjustment when no hyp vCPU is loaded for
+it, and its VM too, for the MTE flag the exception entry reads. A
+loaded hyp vCPU implies both are pinned. A pin fails only for memory
+the host never shared, and the request is then dropped like any other
+bad host pointer.
 
-On 9/12/26 6:48 PM, Marc Zyngier wrote:
-> Tearing down a full S2 is a pretty involved process, resulting in a
-> lot of TLB invalidation. These TLBIs are either on a per leaf basis if
-> the HW doesn't support range invalidation, or by top-level range if it
-> does. Amusingly, the latter occurs even when nothing has been
-> unmapped.
-> 
-> Things are made worse with NV, as we have a bucket-load of shadow S2s,
-> and the need to invalidate them all on the back of an MMU notifier.
-> The latter will eventually be solved by the reverse-map tracking that
-> Wei-Lin is working on, but we need to be better at full-S2 teardown.
-> 
-> This small series adds a "no TLBI" unmapping primitive, which allows
-> the caller to then whack the TLBs using a VMID-wide invalidation. This
-> results in far fewer TLBIs, and a better recursive virtualisation as
-> we get far fewer traps as a consequence.
-> 
-> This applies on top of my shadow-s2 lifetime fixes, and is expected to
-> be a prefix to Wei-Lin's series.
-> 
-> Marc Zyngier (4):
->    KVM: arm64: pgtable: Add Stage-2 unmap without TLBI primitive
->    KVM: arm64: MMU: Add kvm_stage2_unmap_all() helper
->    KVM: arm64: nv: Move full s2_mmu unmap over to kvm_stage2_unmap_all()
->    KVM: arm64: nv: Move TLBI VMALLS12E1* emulation over to
->      kvm_stage2_unmap_all()
-> 
->   arch/arm64/include/asm/kvm_mmu.h     |  1 +
->   arch/arm64/include/asm/kvm_pgtable.h | 17 +++++++++++++
->   arch/arm64/include/asm/kvm_pkvm.h    |  1 +
->   arch/arm64/kvm/hyp/pgtable.c         | 38 +++++++++++++++++++++-------
->   arch/arm64/kvm/mmu.c                 | 15 +++++++++++
->   arch/arm64/kvm/nested.c              |  4 +--
->   arch/arm64/kvm/pkvm.c                |  2 ++
->   arch/arm64/kvm/sys_regs.c            | 18 ++++++-------
->   8 files changed, 75 insertions(+), 21 deletions(-)
-> 
+Fixes: efa1368ba9f4b ("KVM: arm64: Commit exceptions from KVM_SET_VCPU_EVENTS immediately")
+Cc: stable@vger.kernel.org
+Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+---
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c | 30 +++++++++++++++++++++++++++++-
+ 1 file changed, 29 insertions(+), 1 deletion(-)
 
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+index 9a3b92e626adb..e41b4c181eb62 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+@@ -539,11 +539,39 @@ static void handle___pkvm_host_mkyoung_guest(struct kvm_cpu_context *host_ctxt)
+ 	cpu_reg(host_ctxt, 1) =  ret;
+ }
+ 
++/*
++ * With no hyp vCPU loaded for it, the host vCPU and its VM may be unpinned,
++ * and so unmapped at EL2: both are pinned from the vCPU's first run, and
++ * KVM_SET_VCPU_EVENTS can reach here before that.
++ */
++static void adjust_pc_unloaded(struct kvm_vcpu *host_vcpu)
++{
++	struct kvm *host_kvm;
++
++	if (hyp_pin_shared_mem(host_vcpu, host_vcpu + 1))
++		return;
++
++	/* The exception entry reads the VM's MTE flag. */
++	host_kvm = kern_hyp_va(host_vcpu->kvm);
++	if (!hyp_pin_shared_mem(host_kvm, host_kvm + 1)) {
++		__kvm_adjust_pc(host_vcpu);
++		hyp_unpin_shared_mem(host_kvm, host_kvm + 1);
++	}
++
++	hyp_unpin_shared_mem(host_vcpu, host_vcpu + 1);
++}
++
+ static void handle___kvm_adjust_pc(struct kvm_cpu_context *host_ctxt)
+ {
+ 	DECLARE_REG(struct kvm_vcpu *, vcpu, host_ctxt, 1);
++	struct pkvm_hyp_vcpu *hyp_vcpu;
++	struct kvm_vcpu *host_vcpu;
+ 
+-	__kvm_adjust_pc(kern_hyp_va(vcpu));
++	host_vcpu = __get_host_hyp_vcpus(vcpu, &hyp_vcpu);
++	if (host_vcpu)
++		__kvm_adjust_pc(host_vcpu);
++	else
++		adjust_pc_unloaded(kern_hyp_va(vcpu));
+ }
+ 
+ static void handle___kvm_flush_vm_context(struct kvm_cpu_context *host_ctxt)
 
-Hi Marc,
+base-commit: fd73f4a6659897191fa0d40695fe370925dd3780
+-- 
+2.39.5
 
-Thanks for putting this series together. I reviewed the four patches
-and revisited the traces from my earlier Marc-only tests.
-
-I have a correctness concern about child page-table reclamation.
-
-1. Child page-table reclamation before the final TLBI
-
-In patch 1, SKIP_S2_TLBI suppresses invalidation for both leaf and table
-descriptors, while stage2_unmap_walker() still immediately releases
-empty child tables.
-
-For a child table with page_count(childp) == 1, the sequence is:
-
-   stage2_unmap_walker()
-     stage2_unmap_put_pte()
-       clear the parent table descriptor
-       skip its TLBI
-     mm_ops->put_page(childp)
-       kvm_s2_put_page()
-         put_page()              /* drop the child's last reference */
-
-   ... process the remaining address ranges ...
-
-   __kvm_tlb_flush_vmid()         /* final invalidation in patch 2 */
-
-This path does not use the free_unlinked_table()/call_rcu() deferred
-reclamation mechanism. The existing deferred-range-TLBI path still
-invalidates table descriptors immediately; the new flag skips that
-invalidation too.
-
-Patch 4 provides a caller operating on active shadow MMUs:
-kvm_s2_mmu_iterate_by_vmid() holds mmu_lock for write and visits valid
-matching shadow MMUs, but does not require refcnt == 0 or wait for
-other vCPUs using the MMU to exit.
-
-Another vCPU can therefore still use that shadow S2. The write lock
-excludes software page-table updates, not hardware table walks.
-The following interleaving is allowed:
-
-   vCPU B / hardware walker        vCPU A
-   ------------------------        ----------------------------
-   Holds an old reference to T
-                                   Clears parent, skips TLBI
-                                   Drops T's last reference
-                                   T is reused by the allocator
-   Accesses T via the old reference
-                                   Performs final VMID-wide TLBI
-
-The final flush barriers cannot retroactively protect a table that
-has already been freed and reused.
-
-Is there a lifetime guarantee for these active-MMU callers that I
-have missed? Otherwise, the corresponding invalidation needs to
-complete before the child table's memory can be reused.
-
-Retaining table-descriptor TLBI looks like a smaller correction
-that would still remove empty-range TLBI amplification. Batching
-those invalidations as well would require deferred child-table
-reclamation, accounting for the lock drop/reacquisition boundaries
-in the may_block path.
-
-Thanks.
-Shuai
