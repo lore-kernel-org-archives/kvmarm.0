@@ -1,149 +1,221 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFA913D8122;
-	Mon, 14 Sep 2026 12:24:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D247E39EF12;
+	Mon, 14 Sep 2026 12:26:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789388653; cv=none; b=dOYQD76CT2A+oJKdX4Wr0pJ2brPqp5WqcPTUqaXEmSBfYV5Qx92ctrtkvAxs239KJV3+NFey7rB0Nkae5xxei8bBYj4Qqmj4H+6yJX7k8CINdIqSqoVZOfkW9szdyH3lfA44jDKiL3ZFq0xMeSDvIX1M+lX2HMdjEVo57wUkjy4=
+	t=1789388798; cv=none; b=G0crNDBkRhWXVeaMcIIchLpoM4NMck3xpoLFAMOIX0qkleqO6YnRrnYYevj1AGXZSMJVaKAKnvTQPaFUrieXqLNxfqWPSn9wuXvmUyynTcByHsIvS+7j5s77IC1unwl71gCwuTO2TFkQNjj1LfdWgbQuhn7SdbObsR4/DGXGw94=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789388653; c=relaxed/simple;
-	bh=yufSdBbFpXzXEVfdix/XFSDqBRbGf6ORkkNeojbkAw8=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=VPJLPU5YKQewCTUJNO2LjSZj6MKDteKmXkxjrp/Jy55LyBhNqQpNMMtFNbPRJFhX4+YHnPzL0eIO46/UMmCR58ZgZ7rnOKH9YvDYm6rl2OXJOprmY4FZptjpiYvUIZJmTsDSawh8QRss9DFAYEpqAdTaAQzhDYo3GdYd7YFqzqM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c2bulrOe; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789388798; c=relaxed/simple;
+	bh=78T28CfC11xHjAOl1sq7P1//hmjKZwVVx3B8uhlN6B0=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=c03Podr4zC92BdhoIxxSr/wCaCsR/FhRQFggVwfDjuI9jWxumtaubsXl1eUdfDTkJN7UBTBVnRU8k0svH4vdwq4F6h21nPO4FISAiasGv1pgQ2x6vsKmfl43BA+HUJpmDux9C4PvkriTex9AJ9CP80O7p0gfkPAd6zdXcLAfDrs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d93HJtdo; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c2bulrOe"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A6E91F000FF;
-	Mon, 14 Sep 2026 12:24:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d93HJtdo"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DA711F000FF;
+	Mon, 14 Sep 2026 12:26:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789388651;
-	bh=xZIACiGEGDW4ntgXwrzMw0RdNU+StMM1bJnuvjNsNAY=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=c2bulrOeI859lV2logPQ2CR1QNAKpNbH2+0S6b/vrbIZJrjPlKvy1LgFqKStks9Hn
-	 tTZSeOwAPfoHPpN5ae/H9I893oy4ghnTzYXOMLnBhcTfyRBoKATmOCYVJEHI8NAyi9
-	 ojzNPp6ZLRtaYdp0Hq545urplET/zYvPsxlwg6hgRC9/7oItT6smMSt0Aq0cCqG6cd
-	 9N1Rz+VfBIkNPtQeZxoFSvNug+mR6GmOva2FOvC07GENFG4Txq+HrSIYs7NrEc9CDq
-	 vh5hHHZxvlQpZc3+3D6DAfwWD2AbX0P5XJYXrRE/9uNa4TUJnQE5TNNS+vfPn8kfAJ
-	 Nx+IBqgfHR9UQ==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v10 06/20] KVM: arm64: PMU: Preserve EL2 bitmap state
- during migration
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Akihiko Odaki" <odaki@rsg.ci.i.u-tokyo.ac.jp>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260914-hybrid-v10-6-92788053a691@rsg.ci.i.u-tokyo.ac.jp>
-References: <20260914-hybrid-v10-0-92788053a691@rsg.ci.i.u-tokyo.ac.jp>
- <20260914-hybrid-v10-6-92788053a691@rsg.ci.i.u-tokyo.ac.jp>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 14 Sep 2026 12:24:10 +0000
-Message-Id: <20260914122411.5A6E91F000FF@smtp.kernel.org>
+	s=k20260515; t=1789388796;
+	bh=9cesBeWPjuV+79g9ggA9zyeW1Rrm2zGZzQyniKaIpEY=;
+	h=From:Subject:Date:To:Cc;
+	b=d93HJtdoydPWf6reyNoURC5DkuZ8G5KiwzBay4+9gTUwvF+pR2rj3EFS3bIBZBN7g
+	 FxGmKbFYOhBHFiedgw7OPsYtD+GOJfvjNJHmJAVyOIQxlRNyk+CACHaL0I7ggH92RH
+	 ORyAwk0wZoJkibOcWkc8f+YyAefPdTWukjsnc+zAzSegQ/x3hKgxONyN6La5ZAUu6W
+	 QLH9XorGlUHYaISc0QmAHvRkZAMwHbmhjGXuiSgXysKTPxGdX0ES43OLO+HLaqLUeC
+	 8MuHkkj8krkIIz/KkVoOKD7p3yBdg1OqmgkheUOs45Dm15FCJm+2pfgOAwJe340Iyq
+	 LXzMLSdGKhEWg==
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+Subject: [PATCH v2 00/13] KVM: arm64: Add KVM_PRE_FAULT_MEMORY support
+Date: Mon, 14 Sep 2026 13:26:11 +0100
+Message-Id: <20260914-kvm-arm-prefault-v2-0-26fb47f74b73@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/22NzQ6CMBCEX4Xs2TVtgxQ8+R6GQysLNPzUbLHRE
+ N7dQjx6/GYy36wQiB0FuGYrMEUXnJ8TqFMGj97MHaFrEoMSqhClvOAQJzQ84ZOpNa9xwcraXEp
+ blJVuIM32wr0P5b1O3LuweP4cD1Hu6U+m/siiRIGWWiqrXGuh6DYQzzSePXdQb9v2BT35Q8WxA
+ AAA
+X-Change-ID: 20260815-kvm-arm-prefault-9bb411b6897d
+To: Catalin Marinas <catalin.marinas@arm.com>, 
+ Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+ Oliver Upton <oupton@kernel.org>, Fuad Tabba <tabba@google.com>, 
+ Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Zenghui Yu <yuzenghui@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+ Jonathan Corbet <corbet@lwn.net>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, Jack Thomson <jackabt@amazon.com>, 
+ Jack Thomson <jackabt.amazon@gmail.com>, 
+ Alexandru Elisei <alexandru.elisei@arm.com>, 
+ Vincent Donnefort <vdonnefort@google.com>, 
+ "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, 
+ Sean Christopherson <seanjc@google.com>, 
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, 
+ Leo Soares Passos <Leo.Bras@arm.com>, 
+ "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=6729; i=ljs@kernel.org;
+ h=from:subject:message-id; bh=78T28CfC11xHjAOl1sq7P1//hmjKZwVVx3B8uhlN6B0=;
+ b=owGbwMvMwCV2fu7ZrsZH9SKMp9WSGLKWP/8SfiQn4Crfqp5Tunp7OFssbAJj73/3V3whUM4qv
+ Xx5vWRoRykLgxgXg6yYIsvzL+L7g0TC5nVe8HeDmcPKBDKEgYtTACaiVcPwz9x2H/vT1fx6AuIT
+ 0xa8ePFEr+LejULHuo4FDpoJ0+yy9zH8lWzd+KFJau406x87pi4p6JrxQNYrckEa7/P1SRM0JiS
+ XcgEA
+X-Developer-Key: i=ljs@kernel.org; a=openpgp;
+ fpr=E7F417BF5214569E89D04F46CF9DCD8A81E27F14
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
+This series implements the KVM stage 2 page table pre-faulting feature for
+arm64.
 
-Pre-existing issues:
-- [High] Guest reads of PMU bitmap registers from EL1/EL0 fail to mask out =
-EL2-reserved counters (HPMN), violating the architectural RAZ requirement a=
-nd leaking EL2 PMU state.
---
+== Foundations ==
 
-commit 02155ef34a95aa6d00cf6402f40fbdccdad7a563
-Author: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
+The series begins by establishing required foundations:
 
-KVM: arm64: PMU: Preserve EL2 bitmap state during migration
+1. Updating kvm_s2_fault_desc to independently store the exception syndrome
+   register (ESR) value, and updating all code paths to use this value
+   exclusively.
 
-KVM_GET_ONE_REG and KVM_SET_ONE_REG transfer raw vCPU state for
-migration. Masking PMU bitmap registers with counters accessible at the
-current EL drops EL2-reserved bits when the vCPU is stopped in EL1 or
-EL0.
+This is needed so we can later generate a synthetic fault to perform the
+pre-faulting - we need to be sure the code doesn't grab an incorrect ESR
+from elsewhere.
 
-Use the implemented counter mask for these userspace accesses so the
-complete bitmap state survives migration. Guest register accesses
-continue to use the accessible counter mask.
+2. Updating kvm_s2_fault_desc to independently store the kvm_s2_mmu and
+   updating all code paths to use this value exclusively.
 
-Closes: https://sashiko.dev/#/patchset/20260720-hybrid-v9-0-2b713ca1b5dc@rs=
-g.ci.i.u-tokyo.ac.jp?part=3D5
+Similarly this is needed so we can generate a synthetic fault against the
+canonical stage 2 MMU (it would make no sense for it to touch nested shadow
+page tables) - we need to be sure that the code doesn't grab an incorrect
+MMU from elsewhere.
 
-> Use the implemented counter mask for these userspace accesses so the
-> complete bitmap state survives migration. Guest register accesses
-> continue to use the accessible counter mask.
+3. Updating the abort paths which consume kvm_s2_fault_desc to also return
+   a kvm_s2_fault_result data structure.
 
-[Severity: High]
-This isn't a bug introduced by this patch, but do the guest register access=
-es
-actually use the accessible counter mask for read paths?
+To perform pre-faulting the code must know the granule size of what was
+just walked. So the abort paths have to tell us what that was.
 
-When Nested Virtualization (NV) is active, an L1 hypervisor configures
-MDCR_EL2.HPMN to reserve PMU counters for itself. If the L2 guest (running
-at vEL1/vEL0) reads the PMU bitmap registers, it should read zero for these
-reserved counters to satisfy architectural RAZ requirements.
+4. Pass walk flags to kvm_pgtable_get_leaf() to permit walking page tables
+   under the MMU read lock.
 
-However, looking at the read paths in arch/arm64/kvm/sys_regs.c, the raw st=
-ate
-is returned without applying the accessible counter mask:
+This is Jack's patch, verbatim, which allows the use of the
+KVM_PGTABLE_WALK_SHARED flag to walk page tables under the MMU read lock.
 
-arch/arm64/kvm/sys_regs.c:access_pmcnten() {
-    ...
-	} else {
-		p->regval =3D __vcpu_sys_reg(vcpu, PMCNTENSET_EL0);
-	}
-    ...
-}
+Pre-faulting requires it to be able to work in parallel as specified by the
+API. The read lock precludes page tables being torn down behind our back.
 
-arch/arm64/kvm/sys_regs.c:access_pminten() {
-    ...
-	} else {
-		p->regval =3D __vcpu_sys_reg(vcpu, PMINTENSET_EL1);
-	}
-    ...
-}
+== Implementation ==
 
-arch/arm64/kvm/sys_regs.c:access_pmovs() {
-    ...
-	} else {
-		p->regval =3D __vcpu_sys_reg(vcpu, PMOVSSET_EL0);
-	}
-    ...
-}
+Pre-faulting is implemented in kvm_arch_vcpu_pre_fault_memory() whose job
+is to pre-fault the stage 2 page tables which map a specific GPA (which,
+for arm64, is the guest's IPA).
 
-Could this leak the L1 hypervisor's PMU configuration and overflow state
-to the untrusted L2 guest?
+This function is called by kvm_vcpu_pre_fault_memory() for each GPA in the
+range, which itself is ultimately invoked by userland via the
+KVM_PRE_FAULT_MEMORY ioctl.
 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 44aae52c473d7..42b6705bc21d1 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1326,7 +1326,7 @@ static bool access_pmu_evtyper(struct kvm_vcpu *vcp=
-u, struct sys_reg_params *p,
-> =20
->  static int set_pmreg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r=
-, u64 val)
->  {
-> -	u64 mask =3D kvm_pmu_accessible_counter_mask(vcpu);
-> +	u64 mask =3D kvm_pmu_implemented_counter_mask(vcpu);
-> =20
->  	__vcpu_assign_sys_reg(vcpu, r->reg, val & mask);
->  	kvm_make_request(KVM_REQ_RELOAD_PMU, vcpu);
-> @@ -1336,7 +1336,7 @@ static int set_pmreg(struct kvm_vcpu *vcpu, const s=
-truct sys_reg_desc *r, u64 va
-> =20
->  static int get_pmreg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r=
-, u64 *val)
->  {
-> -	u64 mask =3D kvm_pmu_accessible_counter_mask(vcpu);
-> +	u64 mask =3D kvm_pmu_implemented_counter_mask(vcpu);
-> =20
->  	*val =3D __vcpu_sys_reg(vcpu, r->reg) & mask;
->  	return 0;
+The implementation is simple - try to walk to the stage 2 page table
+mapping the GPA - if unmapped, fault it in through a synthetic page fault.
 
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260914-hybrid-v10=
--0-92788053a691@rsg.ci.i.u-tokyo.ac.jp?part=3D6
+pKVM is not supported regardless of whether the VM is protected or
+not.
+
+This is because pKVM instantiates vCPUs upon run, but pre-faulting is
+typically performed before a vCPU is run. It would be confusing and
+inconsistent to error out on non-running vCPUs but to pre-fault running
+ones.
+
+== Credits ==
+
+This series is based, with gratitude, on Jack Thomson's series and their
+respins (links provided below) as well as the feedback he received.
+
+The series includes Jack's v5 "KVM: arm64: Pass walk flags to
+kvm_pgtable_get_leaf()" patch verbatim and two of his test patches (with
+minor fixups), plus a nested pre-fault test based on his.
+
+Link: https://patch.msgid.link/20260612162354.73378-1-jackabt.amazon@gmail.com/
+Link: https://patch.msgid.link/20260113152643.18858-1-jackabt.amazon@gmail.com/
+Link: https://patch.msgid.link/20251119154910.97716-1-jackabt.amazon@gmail.com/
+Link: https://patch.msgid.link/20251013151502.6679-1-jackabt.amazon@gmail.com/
+Link: https://patch.msgid.link/20250911134648.58945-1-jackabt.amazon@gmail.com/
+
+== Reviewer Notes ==
+
+I synced with maintainers on this who asked me to take a look, as there hadn't
+been progress on the series for some time.
+
+Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+---
+v2:
+* Split series - Added 1/13 for the esr.h helpers, 2/13 for converting
+  callers to use them, and move what was 1/8 to 3/13 to propagate
+  s2fd->esr, as per Marc.
+* Made esr helpers __always_inline as per Marc.
+* Renamed esr_trap_get_class() -> esr_get_ec() + dropped churn as per Marc.
+* Updated 5/13 (was 3/8) to drop the kvm_s2_fault_result.mapped flag.
+* Also updated 5/13 so abort handlers return -EAGAIN instead of swallowing, as
+  per Marc.
+* Split implementation patch further -> topup_mmu_memcache() change to 6/13,
+  EHWPOISON change -> 7/13 and docs change -> 10/13, as per Marc.
+* No longer mkyoung existing walked ranges, updated docs to reflect, as per
+  Marc.
+* Eliminated s2fd->pre_fault as per Marc.
+* Eliminated the redundant page table level in pre_fault_s2() as per Marc.
+* Put the commit message for 9/13 on a diet as per Marc.
+* Fixed up commit message for 11/13 (was 6/8) to correct reasoning about
+  exit-reason assert, as per Fuad.
+* Simplified: nested test 13/13 (was 8/8), dropping the empty nested-S2
+  setup and using test_supports_el2() to handle NV=0 opt-out, as per
+  Wei-Lin and Fuad.
+* Re-authored patch 13/13 to me as the changes are substantial enough to
+  require it. Updated commit message to give Jack credit for original.
+
+v1:
+https://lore.kernel.org/r/20260825-kvm-arm-prefault-v1-0-befe8947702e@kernel.org
+
+---
+Jack Thomson (3):
+      KVM: arm64: Pass walk flags to kvm_pgtable_get_leaf()
+      KVM: selftests: Enable pre_fault_memory_test for arm64
+      KVM: selftests: Add option for different backing in pre-fault tests
+
+Lorenzo Stoakes (ARM) (10):
+      arm64: Add ESR fault helpers
+      KVM: arm64: Use ESR helpers in guest abort handling
+      KVM: arm64: Propagate and use esr in s2fd when handling guest aborts
+      KVM: arm64: Propagate and use mmu in s2fd when handling guest aborts
+      KVM: arm64: Propagate and use kvm_s2_fault_result on S2 fault
+      KVM: arm64: Size the stage-2 memcache from the fault MMU
+      KVM: arm64: Propagate EHWPOISON in kvm_s2_fault_pin_pfn()
+      KVM: arm64: Implement KVM_PRE_FAULT_MEMORY
+      Documentation: KVM: document arm64 KVM_PRE_FAULT_MEMORY
+      KVM: selftests: Add nested pre-fault test for arm64
+
+ Documentation/virt/kvm/api.rst                     |  18 +-
+ arch/arm64/include/asm/esr.h                       |  44 +++
+ arch/arm64/include/asm/kvm_emulate.h               |  52 ++--
+ arch/arm64/include/asm/kvm_pgtable.h               |   5 +-
+ arch/arm64/include/asm/kvm_pkvm.h                  |   2 +-
+ arch/arm64/kvm/Kconfig                             |   1 +
+ arch/arm64/kvm/arm.c                               |   1 +
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c              |  10 +-
+ arch/arm64/kvm/hyp/pgtable.c                       |   5 +-
+ arch/arm64/kvm/mmu.c                               | 300 +++++++++++++++++----
+ arch/arm64/kvm/nested.c                            |   2 +-
+ tools/testing/selftests/kvm/Makefile.kvm           |   2 +
+ .../selftests/kvm/arm64/nv_pre_fault_memory_test.c | 158 +++++++++++
+ .../testing/selftests/kvm/pre_fault_memory_test.c  | 152 +++++++++--
+ 14 files changed, 615 insertions(+), 137 deletions(-)
+---
+base-commit: aa8e5dc6a7a2a1141ab40706a51010adcd0e57d2
+change-id: 20260815-kvm-arm-prefault-9bb411b6897d
+
+Best regards,
+-- 
+Lorenzo Stoakes (ARM) <ljs@kernel.org>
+
