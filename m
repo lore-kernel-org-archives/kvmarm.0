@@ -1,99 +1,176 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65E8C81724;
-	Mon, 14 Sep 2026 07:44:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 044CC3905F4
+	for <kvmarm@lists.linux.dev>; Mon, 14 Sep 2026 07:54:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789371846; cv=none; b=XB9F6gxK9sAPg3XkVCfyEwSd4zk1TwuYyEAZSM63tq+lN9lymCJPV0YKCKFh4uCz1pDEGnOecNgijJxG+d1FFpz6V3lpW4M0ammg42i3ndZ/2sbVu4ZdK3bw4dqD/xaUDzZtDPoSjWOj1TqcAoPh9h9JmcOu+lZmaAQttsPXu54=
+	t=1789372493; cv=none; b=eUlRw9vcwYBepI9U2UoFLOAJhrL9Z3z4+HjVpWzvYWAbbpsXJSZ97yAXZXvjdvJe87UaemXHXCdGwr/i7TCla17XvwXwEY0YPNP9ykCrRERiDkYNQEwjzPqgbNikGgkrbTpEZLf8VfjxxkAcH+eabSlXTQJPyHTu3LE9x+9vWjw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789371846; c=relaxed/simple;
-	bh=LPv6WKphIl01nIpZXcRte1gWv7DmEQhxm2gkpyDARrA=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=nmHLWoq/5F14maRBZDyAJAUeg413hhD4sB0v2VcY5rnvZCgSNtiKV8nF+++A5DB14vrZPEGuHN1mNz0x8Co5WeFujsMpDcIoi0kF+YDvRzUl8R9h+O7jhPwF8sOG8JqQtDwewlNTax11Q7N6USZxdR7rqrNCzpLpXo4T/lCGGcM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DnHEbkbR; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789372493; c=relaxed/simple;
+	bh=bArJOzH0jmmCpUJgT39QaHyki9O1ZnIdy19LmKGn3M8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZRlCIaIXb8RyOjMCAVnSqzAXE3q/H1USxIMSSeRXO4xfnsBL3gl7dVNRyuOp3TR6lGD7S52ICCK6SaLe4rtNTZyZf1pTC5VaQWrxfkn0DTpS01DwRaArpxDUKV0rzY5Rs63aY+WaCyHTc3X1iOBQhpFMarpytN+sAgDGpRNsHjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=K/Pq8LoD; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DnHEbkbR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D220E1F000FF;
-	Mon, 14 Sep 2026 07:44:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789371845;
-	bh=5P3hP3y9yVIlvg/iA2khdJEuM4+4ZoX7xT/j7z4g1ok=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=DnHEbkbRsyCB6wYVS5eLk1mqaj9h8UPbxxLDbfQl7RWclo3oFu1NRzbKuLca7JX3T
-	 NeyXv4U1kEmDwEeYsikG/bu40pmXY8dII5QSSsmgjQNhxbAxIptyx4gOBk17qK7Bov
-	 APPEg4jhvrJQOlEStN9tadacI8OT4k2yf0UvbmSpZ2DqVKnu1uOkzAGBopP3RO4l7M
-	 HMp3naxGBdxKJILmOUGDoO42kFi+I9AT/3WcTngyOafyDxdeBf/RUDiCC4d5zJpOPi
-	 XqylIQahZZt2gY/eSfLRAeH9nqYu+n4eDCbyXywov5d1SP77pqWR3j2IGq5Q9X3Cpq
-	 0vUo/O3gkMK5g==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2 1/3] KVM: arm64: selftests: Support five-level
- stage-1 page tables
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Itaru Kitayama" <itaru.kitayama@fujitsu.com>
-Cc: kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, kvm@vger.kernel.org, "Oliver
- Upton" <oupton@kernel.org>
-In-Reply-To: <20260914-arm64-52bit-va-v2-1-3911cb9d4ad4@fujitsu.com>
-References: <20260914-arm64-52bit-va-v2-0-3911cb9d4ad4@fujitsu.com>
- <20260914-arm64-52bit-va-v2-1-3911cb9d4ad4@fujitsu.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 14 Sep 2026 07:44:04 +0000
-Message-Id: <20260914074404.D220E1F000FF@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K/Pq8LoD"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1789372490;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dYuLJW4P/YrBVk/hs4Chg8zTHAJI+p8avT4eA1ZbX3E=;
+	b=K/Pq8LoDUBD13F60SkSwcp3dve7L/af2PwcT2BuUG7vBAqnESlZdix5KRWukFN4tXo8U1n
+	TV8eIfuuNgYdnjRclVu7h79VuLB5WbJJFpxXVF6GkTkAHLmP9mHtOzBFOg8VMWOMWVnvw/
+	U87nL3kUBfL75qRLwEWPHBHjYr6TSDs=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-258--f-bSjScOZSgLTN4rKBeTg-1; Mon, 14 Sep 2026 03:54:49 -0400
+X-MC-Unique: -f-bSjScOZSgLTN4rKBeTg-1
+X-Mimecast-MFC-AGG-ID: -f-bSjScOZSgLTN4rKBeTg_1789372488
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-49e65bee41aso18807795e9.0
+        for <kvmarm@lists.linux.dev>; Mon, 14 Sep 2026 00:54:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1789372488; x=1789977288;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:reply-to:user-agent
+         :mime-version:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=dYuLJW4P/YrBVk/hs4Chg8zTHAJI+p8avT4eA1ZbX3E=;
+        b=YP0kNMqrhk+f5kOBLevqNjwcg6B7vafoR8Spa9txxfyvM6ItD1S1PF2ye916CDrmhw
+         AdZeR9dI2twN/7wS8oTbyt6zS47EAY6KNilpY/1+ygEzH/GaB4BiBIwiMZTi4hQCCuDj
+         VyFB5ga4T64ilas8gnlcklQXnr4uVsoz70ZMxzQbvzB5LiECLLFgVCzed6wbz7g4lnnp
+         9RlIJmIOyyALRERq6vsEv2ih5fZ329qgDDwi1GaAp7CT8P9A2dXYtIf+BnYRodyu0UnY
+         v1CSWVFbGgq9Ca/X3paI7hbWRU+AeuotT0uIARiXMS4XyPxfZ75tKlbMF2PP+MD0lS/q
+         XIYw==
+X-Forwarded-Encrypted: i=1; AKwUvBwsbDD5y2QDU3XoRzb+ZT926MyU2oB6IFkZJKkUKPQB+nwecBm1HAc7xp5SASpDulNp2/ndvlU=@lists.linux.dev
+X-Gm-Message-State: AFuF++mxTZSoFjzZVnaSnVtG5pFG5dYaw4JefOqfTPWQH8OwiQ7Z4dEY
+	YnpVqgYoLZFdpIHE0LUSd+R2FSd74qLfdqrLzzN2FyyWz51gwoF5zpee4dUKeWVDF0o/UPiuJZ3
+	16aletV/TQM2P4HLGoyKn0uwyRBmyHuCUKesALJeAVV2pHz4Qz1z/wfQNQA==
+X-Gm-Gg: AYBFou2b5GJthTv8SA0gEfZvFZrnMBCLkXCEoLwMv7komem0q8vl45dYJmH/nJ43z3R
+	GWUH2Je1q6js8NM4PwE2gAwUTD1wbTNEjDH8kQSlyq0e1vw/8T+nIImh0bQ6UfsVGK3SS4uAjUU
+	hIFILdUCG7hz9rQT8FwLCIHVxXJ3LKxuMufOTne/O3Zh5KSB2gQs+aMGJPYKA6fgxSX9xeEdQMD
+	JlVVZZN6HMDV3Bm3BRIWyk7Ecj9BSk0/lImqmWOSIzyu/TyvwwiGMweMb83Teyq//jpvi9QqaSs
+	qf2kVOAoGas12bZu08jvQPFz4oUYtRne/Swy6h7jC8CGCwZFgtekPcr43gnpai/f9Tn/fcorO68
+	1Ram5UBzJDDb00kXs2hKiIN68+WtrrnYzLQH+w/JWxFMt9cwn
+X-Received: by 2002:a05:600c:3484:b0:49c:f13e:e52 with SMTP id 5b1f17b1804b1-49e7a6865c1mr15391635e9.15.1789372488002;
+        Mon, 14 Sep 2026 00:54:48 -0700 (PDT)
+X-Received: by 2002:a05:600c:3484:b0:49c:f13e:e52 with SMTP id 5b1f17b1804b1-49e7a6865c1mr15391265e9.15.1789372487661;
+        Mon, 14 Sep 2026 00:54:47 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49e6499d57bsm442316115e9.3.2026.09.14.00.54.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 14 Sep 2026 00:54:46 -0700 (PDT)
+Message-ID: <7fdbeeb9-3439-49d2-9ad9-33c3379d58c4@redhat.com>
+Date: Mon, 14 Sep 2026 09:54:44 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Reply-To: eric.auger@redhat.com
+Subject: Re: [RFC PATCH v8 15/20] target/arm/kvm: Ignore and trace unexpected
+ writable reserved fields
+To: Shameer Kolothum Thodi <skolothumtho@nvidia.com>,
+ "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+ "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+ "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ "shaju.abraham@nutanix.com" <shaju.abraham@nutanix.com>,
+ "khushit.shah@nutanix.com" <khushit.shah@nutanix.com>,
+ "yangjinqian1@huawei.com" <yangjinqian1@huawei.com>,
+ "cohuck@redhat.com" <cohuck@redhat.com>,
+ "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
+ "sebott@redhat.com" <sebott@redhat.com>,
+ "philmd@oss.qualcomm.com" <philmd@oss.qualcomm.com>
+Cc: "maz@kernel.org" <maz@kernel.org>,
+ "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "armbru@redhat.com" <armbru@redhat.com>,
+ "berrange@redhat.com" <berrange@redhat.com>,
+ "abologna@redhat.com" <abologna@redhat.com>,
+ "jdenemar@redhat.com" <jdenemar@redhat.com>
+References: <20260826093747.1670077-1-eric.auger@redhat.com>
+ <20260826093747.1670077-16-eric.auger@redhat.com>
+ <SJ0PR12MB8614E4CF6C7C81CAE67A018DABBE2@SJ0PR12MB8614.namprd12.prod.outlook.com>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <SJ0PR12MB8614E4CF6C7C81CAE67A018DABBE2@SJ0PR12MB8614.namprd12.prod.outlook.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: QqLQsbbNkmaPyDn7g0IqIOcXAcpcrAQJ3USwEddOo30_1789372488
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [Low] The `type` array in `pte_dump` is missing the entry for P4D, causin=
-g it to print an empty string for level 0.
---
+Hi Shameer,
 
-commit ec0c73a180f67ed464cb14e88f74413194ff828e
-Author: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+On 9/11/26 3:50 PM, Shameer Kolothum Thodi wrote:
+> Hi Eric,
+>
+>> -----Original Message-----
+>> From: Eric Auger <eric.auger@redhat.com>
+>> Sent: 26 August 2026 10:36
+>> To: eric.auger.pro@gmail.com; eric.auger@redhat.com; qemu-
+>> devel@nongnu.org; qemu-arm@nongnu.org; kvmarm@lists.linux.dev;
+>> peter.maydell@linaro.org; shaju.abraham@nutanix.com;
+>> khushit.shah@nutanix.com; yangjinqian1@huawei.com;
+>> cohuck@redhat.com; richard.henderson@linaro.org; sebott@redhat.com;
+>> Shameer Kolothum Thodi <skolothumtho@nvidia.com>;
+>> philmd@oss.qualcomm.com
+>> Cc: maz@kernel.org; oliver.upton@linux.dev; pbonzini@redhat.com;
+>> armbru@redhat.com; berrange@redhat.com; abologna@redhat.com;
+>> jdenemar@redhat.com
+>> Subject: [RFC PATCH v8 15/20] target/arm/kvm: Ignore and trace unexpected
+>> writable reserved fields
+>>
+>> External email: Use caution opening links or attachments
+>>
+>>
+>> KVM currently reports some bits as writable whereas they are
+>> RES0 or RAZ. The code easily allows to do some sanity checking
+>> for such inconsistencies. Let's add a trace event when this is
+>> encountered and skip the field
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> ---
+>>  target/arm/kvm.c        | 8 ++++++++
+>>  target/arm/trace-events | 1 +
+>>  2 files changed, 9 insertions(+)
+>>
+>> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+>> index 2557d7b0d9..8ec9bc51cd 100644
+>> --- a/target/arm/kvm.c
+>> +++ b/target/arm/kvm.c
+>> @@ -433,6 +433,14 @@ decode_idreg_writemap(Object *obj,
+>> ARM64SysReg *reg)
+>>          }
+>>          lower = field->shift;
+>>          upper = field->shift + field->length - 1;
+>> +
+>> +        /* Sanity check the field is not a reserved field */
+>> +        if (strstr(field->name, "RES0") || strstr(field->name, "RES1") ||
+>> +            strstr(field->name, "RAZ")) {
+>> +            trace_unexpected_writable_reserved_field(reg->name, field->name,
+>> +                                                     lower, upper);
+> This hangs QEMU on my setup, the guest never starts.
+> I think, we need to advance map/i: 
+>
+> +            map &= ~MAKE_64BIT_MASK(lower, field->length);
+> +            i = ctz64(map);
 
-KVM: arm64: selftests: Support five-level stage-1 page tables
+Thank you for the report. Corrected in v9
 
-This commit adds support for five-level stage-1 page tables in the ARM64
-KVM selftests. It extends the page-table helpers and level validation to
-handle the new architectural level -1. This enables testing 52-bit VA
-configurations with a 4K translation granule.
+Eric
+>
+> Thanks,
+> Shameer
+>
 
-> diff --git a/tools/testing/selftests/kvm/lib/arm64/processor.c b/tools/te=
-sting/selftests/kvm/lib/arm64/processor.c
-> index 01325bf4d36fc..b589368bf8222 100644
-> --- a/tools/testing/selftests/kvm/lib/arm64/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/arm64/processor.c
-
-[ ... ]
-
-> @@ -214,7 +249,7 @@ u64 *virt_get_pte_hva_at_level(struct kvm_vm *vm, gva=
-_t gva, int level)
->  			goto unmapped_gva;
->  		break;
->  	default:
-> -		TEST_FAIL("Page table levels must be 2, 3, or 4");
-> +		TEST_FAIL("Page table levels must be 2, 3, 4, or 5");
->  	}
-> =20
->  	return ptep;
-
-[Severity: Low]
-Does this change miss updating the string names in pte_dump()?
-
-Looking at pte_dump() in tools/testing/selftests/kvm/lib/arm64/processor.c,
-the type array maps the translation level to its string name:
-
-	static const char * const type[] =3D { "", "pud", "pmd", "pte" };
-
-When the test framework is compiled with DEBUG and dumps a 5-level page
-table, virt_arch_dump() calculates the starting level for pte_dump() as 0.
-Since the array was not updated to include "p4d", debug output for level 0
-will print an empty string instead of "p4d".
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260914-arm64-52bi=
-t-va-v2-0-3911cb9d4ad4@fujitsu.com?part=3D1
