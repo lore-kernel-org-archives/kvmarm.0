@@ -1,87 +1,117 @@
-Received: from mta0.migadu.com (out-132.mta0.migadu.com [91.218.175.132])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 553FA3DCDBF
-	for <kvmarm@lists.linux.dev>; Mon, 14 Sep 2026 13:26:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.132
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A9383DAABC;
+	Mon, 14 Sep 2026 13:26:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789392367; cv=none; b=InBE16kw+zWC36BDQyHIlvuECiCMnEbfDelTXiJ9rI360F3v6N/cIzmE4zaTHzcBEBrXMCzwTXJiVwcVHAZqQS4gFGrMS4fRv0yHIcPUjdiJYp4ow8ERcikJx6RLU3XpknbX6U+TqrjgCHXbzWqJGNQFHQua4GfvtHuZebfDmSk=
+	t=1789392398; cv=none; b=kpjbQ+qB2ilGq2nO7yrZAE0OFJmraKqzBD2E/0rDZzl4Wzp98/B0VpFbXiHvGJSMoCw86Ti5V2VSA7amuPz7NK0BvNki4a23gb1kUUUu7H8qGBRn7xfVmSbp01rPDMYGFLvpwoUR2HlL4I3XwzKDNpCV+RKqTp1sFmftuRu26T0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789392367; c=relaxed/simple;
-	bh=+N3/FMtODxlYu0yzHGvAetRCmi/Ara+QGgp0mXejZKI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lPTlfMTPkO/KC34+BgN29tNJRUx2ZlXwLBNd7yoBpfj5/Uy1Wfmhbl5lLbnrrcQqXlryIp24woijv8r/HM4t6i1LlzqsYbs/FOjk0gqNptPk2CmWxPCuJuujwW2Fy9nk1mZh0rrnaOoOV/XmBY9EUI0HNtcPKO6ByAM51dp5asw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Tsk0Es2v; arc=none smtp.client-ip=91.218.175.132
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1789392398; c=relaxed/simple;
+	bh=kfv6urV0lGFie3Up9UNvhMRXg9moxSkFxwDMgJj7jgQ=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=XHTqnAWMmtmNnEZtt4h+Flm/ACtf71Q+CNknEMZPYSWg8R2DapNRH96/eAmN+PTm19o95uoQdPGvsT8ESott7gTjDF/wDYKLT61fK3filBAKogJY8DWFQSjLbdWERTUNjcfzE7mgyG2GsfT5BOwkwabzfGT/b4wbYRRyxur0iOw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nDnEvTX5; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Tsk0Es2v"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=+N3/FMtODxlYu0yzHGvAetRCmi/Ara+QGgp0mXejZKI=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1789392363; v=1; x=1789997163;
- b=Tsk0Es2v2PG6OZS/CS5Md6xhP7LbhnHUYwY4mJYIfWm5kL4IEMwjaQUE7j3jx8AHd8NDsG9x
- xAA6BbR5ZpOqnrnd5mknoCphb/WZPtxIWnpgfF5s81ADGZ0TRoYZ4DeoBnU+E/U624bMLdnKde1
- TGG2UKgbFLZl/QnKVhqAdRTk=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 3b41933d2db18385;
-	Mon, 14 Sep 2026 13:26:03 +0000
-X-Mizu-Trace-ID: 3b41933d2db18385
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b4a0b384b7so7800e87.0
-        for <kvmarm@lists.linux.dev>; Mon, 14 Sep 2026 06:25:58 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBzOQf6aY2fOkOo8+z0GY5CLBBXBu+14fEqP9z6V+2Fy2iXQf7JKBgrgp29Hg7kUBqQ3P4oQ8zU=@lists.linux.dev
-X-Gm-Message-State: AFuF++nxDJuuan5DPSF6AX/xFApxa1Nox66MnzO8RE5S9rJ/iZuEkGRu
-	jLSrlU0NI2kuQdVa3ZHxH5rmWRPL/XObhHBH7+8c0poJBo2pFPmtdcFFkjP6Urnrr+atNonkIpm
-	klFlpx60lWYenDJ4kEkm+F6JV8xBniT94geSOhAXR
-X-Received: by 2002:a05:6512:158b:b0:5b6:4ad:d6bb with SMTP id
- 2adb3069b0e04-5b8ae4c5899mr62300e87.16.1789392358016; Mon, 14 Sep 2026
- 06:25:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nDnEvTX5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C71771F00893;
+	Mon, 14 Sep 2026 13:26:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789392397;
+	bh=JAmq9K5/aIg+OWqR/4Bgpoi2B07sbGKS27pNZlGY1gI=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=nDnEvTX5prnxF/jQIY6SlS3BJOAW3lI9/L+vc7btUPqEqHzOA1Akb6di+7bIVIwAy
+	 wa+85YqYSAbu3NqL+Q73jaBsfi+43MxqtIABeYJUG7izwr2tFVurj5CMmrDsqtqtxz
+	 JBCIibC6lf9DjPU1azZVDIV9B1CWwumNpLLOPym7VGyS7lrvvhKEwY/Uyg1miblX83
+	 dfdSQrbBTqtsDq51zR4suExpBTGu412O0m97MZjtbZWiQwIRXAZ6wdu46/xLTeqfiF
+	 su1iJ8H3AfS6IQrHoS/QGacdHg+8ndMeWRm4YFxiVk/DQD05DXk0vfX1y6Db0t8AxI
+	 BrhO0kVmwRWyA==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v2 06/13] KVM: arm64: Size the stage-2 memcache from the
+ fault MMU
+Reply-To: sashiko-reviews@lists.linux.dev
+To: =?utf-8?b?TG9yZW56byBTdG9ha2VzIChBUk0p?= <ljs@kernel.org>
+Cc: kvm@vger.kernel.org, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, "Oliver
+ Upton" <oupton@kernel.org>
+In-Reply-To: <20260914-kvm-arm-prefault-v2-6-26fb47f74b73@kernel.org>
+References: <20260914-kvm-arm-prefault-v2-0-26fb47f74b73@kernel.org>
+ <20260914-kvm-arm-prefault-v2-6-26fb47f74b73@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 14 Sep 2026 13:26:36 +0000
+Message-Id: <20260914132636.C71771F00893@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20260913203108.3343404-1-vdonnefort@google.com>
-In-Reply-To: <20260913203108.3343404-1-vdonnefort@google.com>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Mon, 14 Sep 2026 14:25:21 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTxMq-HePyXDMoJGZGkdnQ6HXtFAe9pjH16e2V9De74oNQ@mail.gmail.com>
-X-Gm-Features: AcwNN1UW_r2mHiYhGRo37JOJzCoHDwSb5JGU4WvZjTv5ua45gr-aCFqUp_0FaZI
-Message-ID: <CA+EHjTxMq-HePyXDMoJGZGkdnQ6HXtFAe9pjH16e2V9De74oNQ@mail.gmail.com>
-Subject: Re: [PATCH v1] KVM: arm64: Advertise MMFR0 TGRAN for pVMs
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, 
-	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com
-Content-Type: text/plain; charset="UTF-8"
 
-Hi Vincent,
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
 
-On Sun, Sep 13, 2026 at 9:31 PM Vincent Donnefort <vdonnefort@google.com> wrote:
->
-> Protected VMs can support granules bigger than 4K. Advertise TGRAN16 and
-> TGRAN64. TGRAN4 wasn't advertised as it is enabled by default (supported
-> when 0). Add it as well for consistence.
+Pre-existing issues:
+- [High] The pKVM page fault handler `pkvm_mem_abort()` completely omits th=
+e mandatory MMU notifier invalidation retry protocol, risking the installat=
+ion of stale translations.
+--
 
-nit: consistency
+commit caf2d4f716079e3655b6e5fed2957d60fe0bf41c
+Author: Lorenzo Stoakes (ARM) <ljs@kernel.org>
 
-LGTM. However, could you fix the message for TGRAN4 and TGRAN64, and
-add a Fixes: tag for 6c30bfb18d0b ("KVM: arm64: Add handlers for
-protected VM System Registers")? 0 is IMP for both, so omitting them
-advertised them: on the M4, where TGRAN64 reads 0xf, a 64K guest spins
-at 100% with a silent console instead of parking. Those two lines are
-a fix, not just a consistency change.
+KVM: arm64: Size the stage-2 memcache from the fault MMU
 
-Tested under QEMU with protected and non-protected 4K and 16K guests,
-and on an M4 with protected 4K, 16K and 64K guests.
-Tested-by: Fuad Tabba <tabba@google.com>
+This commit updates topup_mmu_memcache() to take the target s2fd->mmu
+instead of the faulting vCPU. This allows the caller to control which MMU
+is used for sizing the memcache.
 
-With the commit message updated:
-Reviewed-by: Fuad Tabba <tabba@google.com>
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 13541218cadbe..8c23fef4ecf84 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
 
-Cheers,
-/fuad
+[ ... ]
+
+> @@ -1755,7 +1755,7 @@ static int pkvm_mem_abort(const struct kvm_s2_fault=
+_desc *s2fd)
+>  	int ret;
+> =20
+>  	hyp_memcache =3D get_mmu_memcache(vcpu);
+> -	ret =3D topup_mmu_memcache(vcpu, hyp_memcache);
+> +	ret =3D topup_mmu_memcache(s2fd->mmu, hyp_memcache);
+>  	if (ret)
+>  		return -ENOMEM;
+> =20
+
+[Severity: High]
+This is a pre-existing issue, but pkvm_mem_abort() appears to omit the MMU
+notifier invalidation retry protocol, risking the installation of stale
+translations.
+
+Further down in pkvm_mem_abort(), the physical frame is resolved using
+pin_user_pages() without first capturing the global mmu_invalidate_seq
+counter:
+
+        mmap_read_lock(mm);
+        ret =3D pin_user_pages(s2fd->hva, 1, flags, &page);
+        mmap_read_unlock(mm);
+
+The mapping is then committed to the stage-2 page tables under the lock
+without gating the installation on mmu_invalidate_retry():
+
+        write_lock(&kvm->mmu_lock);
+        ret =3D pkvm_pgtable_stage2_map(pgt, s2fd->fault_ipa, PAGE_SIZE,
+                                      page_to_phys(page), KVM_PGTABLE_PROT_=
+RWX,
+                                      hyp_memcache, 0);
+        write_unlock(&kvm->mmu_lock);
+
+Missing the retry check breaks KVM's invalidation retry protocol. Even when
+a page is pinned, a concurrent host MMU invalidation (e.g., from
+madvise(MADV_DONTNEED) or NUMA balancing) can overlap with the pin.
+
+Does this allow KVM to install stale translations, leading to memory
+corruption or guest-visible data leakage?
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260914-kvm-arm-pr=
+efault-v2-0-26fb47f74b73@kernel.org?part=3D6
