@@ -1,120 +1,142 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68871371D05;
-	Mon, 14 Sep 2026 08:19:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-ej2-f12.google.com (mail-ej2-f12.google.com [74.125.228.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F6403B42C7
+	for <kvmarm@lists.linux.dev>; Mon, 14 Sep 2026 08:20:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.140
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789373976; cv=none; b=dka2qd+33V6RTQzZ3SiGeakTYiNZ3WBs68TPdEn8DDPg+RSPkJ9cTKKSSt3cMyvhGQq6OpwzeFe5UAd3bjuWjvcmZPiu6q09dNRNCdxX4q7IiuzmnWnvmRNDPo7G73LDPMti5J3t1pHdywFskD14wUoV+j0RPBfVeka0KyeOiS4=
+	t=1789374002; cv=none; b=TZXsxPZrbMQ9STgsDqZUC7Dy76qV7j1Jry0pL1044Ln7J2qqoljuFm5vWu0I4JR4550SzZoAa4ZU+kIckfrhocXNY4rK6kmGMlsdgUKONQwL3erTneMNxrhIAeVI6KdweKZQ0wI2cmhsJquFq0jtiPgJlGyVLmT95d6MCOgqci8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789373976; c=relaxed/simple;
-	bh=m0ynvs3ASpXg1FC+68FV0PXhWfrNCCs02XWVdpFI/DQ=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=LCbHDmn5Mokbs0SvnuYbCd5tCkWPMx5Gq5SFin9P1x4I4fZqJqbqPpQ7D8OtqVXzYYSyPqazEpf1BSyvIzK/8t3939CIkE/Mpert9ltS9cJsZJqwVNBE10kZsKqZDSw17LRNdDQosoaGVzyJnVeOD7iywzl9ZnQ0XsiJ70P00xk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=qn7Y86S7; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1789374002; c=relaxed/simple;
+	bh=izHWduGA3qo4L4/PtjV4AW1D0r/sHQXHqiRNxba8CbQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=e+Mo8pLSG62PPZfHZyByOaoVe6nL7B1vGPEvZeA3nmmNUG4u6HSlD0yvev7Xff/rZ5h4CUTdCg71zXyDFG0mBPGCJJt62C+EnYi6/xwBz1IsHtR2OyCUfCaKp25StLTirP7+PEFpu+VuTLhFxXQposKeYNd5F8DW7+RuePYqPHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Te313Qkr; arc=none smtp.client-ip=74.125.228.140
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="qn7Y86S7"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2155F1570;
-	Mon, 14 Sep 2026 01:19:30 -0700 (PDT)
-Received: from [10.0.128.139] (unknown [10.0.128.139])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 347C73F7B4;
-	Mon, 14 Sep 2026 01:19:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1789373973; bh=m0ynvs3ASpXg1FC+68FV0PXhWfrNCCs02XWVdpFI/DQ=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=qn7Y86S79uT/YwzISi20g2289oLffqODkAmnxFgB2/f7TGFSQH0pkD3Flpjb9goCV
-	 JVxc5wzSGZPvwfsvk8giDVPvJZb6nSQiZf9vHgvAswACRxWTw5hI/Q8OEqEP2oUPT0
-	 WdpXR2joVP3TKazZtFh5ODPYF2WekqdLue2DS+xI=
-Message-ID: <1fca136f-5802-449a-81f1-3a76c31a2f74@arm.com>
-Date: Mon, 14 Sep 2026 09:19:29 +0100
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Te313Qkr"
+Received: by mail-ej2-f12.google.com with SMTP id a640c23a62f3a-c254f6c7a56so209852566b.1
+        for <kvmarm@lists.linux.dev>; Mon, 14 Sep 2026 01:20:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1789373999; x=1789978799; darn=lists.linux.dev;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=xUV02DPENLr5XEFdpQfIybzrUh+RnORP9zMn9lchDDk=;
+        b=Te313QkrwlIQVI3NwbGVSPkqRHqfULPB/qeeyAqDPSA61W6nDwpEfOvsVn4Ewez2fO
+         kH+QfbEOsfM9Ut7hYM/mgFLVM//lhSr7zFxb8nVWXR+ntGb6fg60oKukqcGelD/DrBBk
+         kjBpaL5wz3oZX0OHH8pbFP+Helj9TB8W0lj/J0cQrs6guEknRKLn13fuJo8/J6rKvSJM
+         QUqQ14XBbEUkgpGu97Vy+MQSStREMqVTE18cUdQf1jBntOLHDmwElE+9MyrKcr89HvZq
+         XGemIttl93oGfdY0O96M4foi0eJ/7fOomD2e7veldOKgUcnncRUf1/JU45NP53fmCPGx
+         rJ2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1789373999; x=1789978799;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=xUV02DPENLr5XEFdpQfIybzrUh+RnORP9zMn9lchDDk=;
+        b=jbk7DqUJlOHoxPwU2VKAdxi8hQM5PFRchPUSnbm/UnM9hXTkVyFnz4ItC6POMc34DI
+         nhkKETQmPzv3nWCKYA9mibmDY+d37vrWhzqecJuNqD345/Y8auHQr7tIxT1pGLrRyjZM
+         gKKMcxmMOIv+W1Denx1JcmiSbjU3YxPnUGKyXhIEDnQA4i19Vw+6u6MdiOlUHs9A+47d
+         I7XOnw1QU+iaQm42MawSPDdjgx1DPhGtFUv0F1d/2FLBuSx2BSpZu+E/adBS66oX1jUx
+         M/nIWQUAzvCXpr46PVFfBOmuonDRdQ925tfXP+7wxY9lhAfovJXpeipk1ZdOwUXW79aJ
+         US1Q==
+X-Gm-Message-State: AFuF++mviYKkhsUQAO9BBYmvvK5ox42Dl+sgPUeEz4qYYkIZgYL9vVfl
+	WtRkXJ+nK/8ARAeyc7H0iXoeIF+5qCEWyL8LT6k6PRSJMd3fDDEnFlJr8xpm84AIOQ==
+X-Gm-Gg: AYBFou1R2b/jZJ9nYpd8SI2114Gf+dPv1xl8YjyQiFmyXugeapYL9NafuIdoxqVl3dG
+	k2nvnyQ+B87MSHrYy5RDf/HDd4X79QUf6zgCM3oeU6TF+33gGFYPDdLmtL4s6YS+fTkj9xN1p2z
+	Ynqz8yIVdjK0AdiQ1sOLnqddGurU/KwNX0Ksi1KEs7nmwbb0vzt5ugY6sbpZQ5ABRm5FjFT1dP9
+	gxeNAYE8wZOIYV/tpeqqVChDeNQjejBfrCMOhB1km8JqMBiothbhJhQVmcnHMNfoTSD463eIuwI
+	MMDWTOBjHUIZ6dqBzC+G442PYAO1hyIKzGZX7v5Vltzc+naTO1QRIEgw37UXv6baCYfFIdKqzR9
+	ecc+AzdXFzItZWYZm8ZkWc2YogWD8Lh3d4DMEZqkQtcMQKm02GJIxhNdB5uvYtK2GF3HBwVlUjS
+	C0mlTTF9CkEnoM8s2JlJ0BOz5SRPdSdIwhSmynQ9aP7Q+lUmRqK0Y7obuwStV+OBklTlW/nbLIU
+	E/23Fxjrz33cNRX+ihcg+IAHLKDOWpp71ZH+sL8gSA=
+X-Received: by 2002:a17:906:8d8b:b0:c26:2b63:a746 with SMTP id a640c23a62f3a-c29b875c08fmr80332166b.49.1789373998141;
+        Mon, 14 Sep 2026 01:19:58 -0700 (PDT)
+Received: from google.com (135.91.155.104.bc.googleusercontent.com. [104.155.91.135])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c29660ff398sm405554066b.48.2026.09.14.01.19.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Sep 2026 01:19:57 -0700 (PDT)
+Date: Mon, 14 Sep 2026 09:19:53 +0100
+From: Vincent Donnefort <vdonnefort@google.com>
+To: sashiko-reviews@lists.linux.dev
+Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>,
+	Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v2] KVM: arm64: Fix protected VM fault on system with
+ pages larger than 4K
+Message-ID: <aqeuKWRMqxxSE4Jl@google.com>
+References: <20260914075839.4019904-1-vdonnefort@google.com>
+ <20260914081343.4FF891F000FF@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v18 4/7] firmware: arm_rmm: Add support for SRO
-Content-Language: en-GB
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: maz@kernel.org, will@kernel.org, catalin.marinas@arm.com,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org,
- joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
- linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
- sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
- WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com
-References: <20260912083611.2513845-1-suzuki.poulose@arm.com>
- <20260912083611.2513845-5-suzuki.poulose@arm.com>
- <f00d01d1-8df0-4865-8e52-c85171cf4ca5@redhat.com>
- <4f18aa66-2296-4b63-87f5-6ab493faecbc@arm.com>
-In-Reply-To: <4f18aa66-2296-4b63-87f5-6ab493faecbc@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260914081343.4FF891F000FF@smtp.kernel.org>
 
-On 14/09/2026 07:22, Suzuki K Poulose wrote:
-> Hi Gavin
+On Mon, Sep 14, 2026 at 08:13:42AM +0000, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
+> - [High] The patch incorrectly maps the guest PA (L1 IPA) instead of the guest IPA (L2 IPA) in the shadow stage-2 page tables for nested VMs in `gmem_abort()`.
+> --
 > 
-> Thank you for the review, I will address most of them. Responses inline.
+> commit 3995ce8aa44bf10fe23cdc5e9257510868df129d
+> Author: Vincent Donnefort <vdonnefort@google.com>
 > 
-> On 14/09/2026 06:04, Gavin Shan wrote:
->> On 9/12/26 6:36 PM, Suzuki K Poulose wrote:
->>> RMM v2.0 introduces the concept of "Stateful RMI Operations" (SRO). This
->>> means that an SMC can return with an operation still in progress. The
->>> host is expected to continue the operation until it reaches a conclusion
->>> (either success or failure). During this process the RMM can request
->>> additional memory ('donate') or hand memory back to the host
->>> ('reclaim'). The host can request an in progress operation is cancelled,
->>> but still continue the operation until it has completed (otherwise the
->>> incomplete operation may cause future RMM operations to fail).
->>>
->>> The SRO is tracked using a struct rmi_sro_state object which keeps track
->>> of any memory which has been allocated but not yet consumed by the RMM
->>> or reclaimed from the RMM. This allows the memory to be reused in a
->>> future request within the same operation. It will also permit an
->>> operation to be done in a context where memory allocation may be
->>> difficult (e.g. atomic context) with the option to abort the operation
->>> and retry the memory allocation outside of the atomic context. The
->>> memory stored in the struct rmi_sro_state object can then be reused on
->>> the subsequent attempt.
->>>
->>> Wrappers for SRO RMI commands are also provided here because they depend
->>> on the rmi_sro_execute() implementation added by this patch.
->>> Delegate/undelegate handles are also added here because they now use the
->>> SRO/stateful command infrastructure and are also used for the memory
->>> DONATE/RECLAIM flows.
->>>
->>> Signed-off-by: Steven Price <steven.price@arm.com>
->>> Co-Developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> KVM: arm64: Fix protected VM fault on system with pages larger than 4K
 > 
+> This commit aligns the fault IPA down to the page-size for protected VMs to
+> fix boot issues on systems with larger than 4K pages. It updates
+> pkvm_pgtable_stage2_map() to require page-aligned arguments and changes the
+> callers to pass gfn_to_gpa(gfn) instead of the raw fault_ipa.
 > 
+> Link: https://lore.kernel.org/all/20260913173516.3122436-1-vdonnefort@google.com/
 > 
->>> ---
->>>   drivers/firmware/arm_rmm/rmi.c | 586 +++++++++++++++++++++++++++++++++
->>>   include/linux/arm-rmi-cmds.h   |  41 +++
->>>   2 files changed, 627 insertions(+)
->>>
->>> diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/ 
->>> arm_rmm/rmi.c
->>> index 5b0e342ce3d58..4f9898ece7547 100644
->>> --- a/drivers/firmware/arm_rmm/rmi.c
->>> +++ b/drivers/firmware/arm_rmm/rmi.c
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index 9ba86450fe4af..ee78201a44df1 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -1672,10 +1672,10 @@ static int gmem_abort(const struct kvm_s2_fault_desc *s2fd)
+> >  		 * PTE, which will be preserved.
+> >  		 */
+> >  		prot &= ~KVM_NV_GUEST_MAP_SZ;
+> > -		ret = KVM_PGT_FN(kvm_pgtable_stage2_relax_perms)(pgt, s2fd->fault_ipa,
+> > +		ret = KVM_PGT_FN(kvm_pgtable_stage2_relax_perms)(pgt, gfn_to_gpa(gfn),
+> >  								 prot, flags);
+> >  	} else {
+> > -		ret = KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, s2fd->fault_ipa, PAGE_SIZE,
+> > +		ret = KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, gfn_to_gpa(gfn), PAGE_SIZE,
+> >  							 __pfn_to_phys(pfn), prot,
+> >  							 memcache, flags);
+> >  	}
 > 
->>
->> I would drop rmi_granule_range_{delegate, undelegate}() by combining 
->> their logics to
->> their only callers rmi_{delegate, undelegate}_range(). More details 
->> are provided for
->> rmi_{delegate, undelegate}_range() in the below.
+> [Severity: High]
+> Does this change break nested virtualization by mapping the guest PA (L1 IPA)
+> instead of the faulting guest IPA (L2 IPA)?
 > 
-> Ack
+> For nested VMs handled in gmem_abort(), gfn represents the L1 IPA. By
+> switching from s2fd->fault_ipa to gfn_to_gpa(gfn) in both
+> kvm_pgtable_stage2_relax_perms() and kvm_pgtable_stage2_map(), the shadow
+> stage-2 page tables now incorrectly install the mapping at the L1 IPA instead
+> of the expected L2 IPA.
+> 
+> This results in the L2 guest continuously faulting at the same L2 IPA, leading
+> to an infinite fault loop (DoS for the nested guest) and shadow page table
+> corruption. 
+> 
+> [ ... ]
+> 
+> -- 
+> Sashiko AI review � https://sashiko.dev/#/patchset/20260914075839.4019904-1-vdonnefort@google.com?part=1
 
-I have moved them closer, but kept the logic separate, since this is not
-a simple RMI call.
+That's indeed not possible to use gfn in gmem_abort() 
 
-Cheers
-Suzuki
+So I guess ALIGN_DOWN(s2fd->fault_ipa, PAGE_SIZE) will do.
 
+-- 
+Vincent
