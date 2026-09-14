@@ -1,133 +1,127 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta0.migadu.com (out-6.mta0.migadu.com [91.218.175.6])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D033F49551A;
-	Mon, 14 Sep 2026 17:39:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00DA6445AE3
+	for <kvmarm@lists.linux.dev>; Mon, 14 Sep 2026 17:42:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789407591; cv=none; b=Ec4hohnVdfp9QMwhtOjfFOMOR5gpdX2E6kJ/Rl3Bvq9BH6vx+gt3vI8gLlfs5KHTmUszngEC57SpTPKjOrc+/NeVHyLZkeGDkIsUdqVMoJsP+DDEpK5EogjC4VQu3H5gXaBMgXXl7p2Lg//y/0kp842+4kw5uqpYpDOzjbErOP0=
+	t=1789407735; cv=none; b=MBlsCvzuqkRoUhqpUDSTG6+sixapEvq0ADdQPo7Fht3shgqq1TIgwZX3RoN07QURPPZgdiK2QemWvDZvfoyGNLjMLB+bxmlEgIbsdbfaw3fuYnD7ChjN9QXMaTddZ3Dk2jsbPdnf9QpczXK7MRbynbTITd/WDvDAUqy/WKA0UGM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789407591; c=relaxed/simple;
-	bh=xowSs5X6y2jpvt1cr188yyhw9cv4PZ7/Udl8A89c+Ow=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=iYCCJfSkDTlZDWMDtLSYirWF3HhhjCzRqOGoLrUYr7nwQAU7JRjYBidvBzhgbzTs+kwG+yq6xeOtEeJxuN+JoCvqFYGfV/qihfE/+601E7Z2yss5QTXWItnOOotyjSASfXK9UgUItA/DqoTYsPcwWeZNN86xKZcZOf2vik3xE9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fq7P+Vba; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789407735; c=relaxed/simple;
+	bh=H3NkHegXyGUlyjvPCAtBxAqpQZBuP5a+mlCVvVxrsTg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=evt6qLbolsUYKyiGsorBx0JOPC+2r/SVBZQZnCdHeE7XLk3xZQ3JktD/mCxQgnHXNvWBXIyjvzLL6nasvz9TAdO/q2CX+pWN78/3X5iAwYu9/6Y8tXA4dQ0ZXAEDv1v8k7s50ABV60CYnH24dvBIHy5OOmHT5ysVwpHFSScD7G8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kq433Bu3; arc=none smtp.client-ip=91.218.175.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fq7P+Vba"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55DB21F000FF;
-	Mon, 14 Sep 2026 17:39:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789407589;
-	bh=kGvsKbS+uUAsgVL9R+R9s8xtSlNDiXgGCZNSCC3UYxQ=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=Fq7P+Vbaq+FUxkcYSDw+Br/lIyPdPsmBCkByCCCRnhL/a3rq2mASd5EWlFUDGvd4Q
-	 i4AxVMWt0Z9ROq260lRmw+9rttdDcGvg/9ktBTkIkX7tcu6/V6HXVOzYv3LsM9zV9c
-	 wMUcuABISg5aJZCsKF4T274WDnCg5coFpxq4D5pLD3hZ7WmDsVHQQ1EuTWfvzhCEdh
-	 hQyK8WhJ85Ryfxfa4VEJF3BDALbmafxqo2PLBzz+iyVXlgDbqhbwUr5fRA4AGfG5Iv
-	 b+/yhQXU1P8SQzW2s7gQ3BBJ7yNqApeASQPBgJWUs4pg8DhjgBdAJdxweGeXmvjUCZ
-	 vydiavCxwVxgQ==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2 11/40] infiniband: update hfi1 to use
- remap_vmalloc_range()
-Reply-To: sashiko-reviews@lists.linux.dev
-To: =?utf-8?b?TG9yZW56byBTdG9ha2VzIChBUk0p?= <ljs@kernel.org>
-Cc: "Vasily Gorbik" <gor@linux.ibm.com>, dri-devel@lists.freedesktop.org, "Oliver
- Upton" <oupton@kernel.org>, "Heiko Carstens" <hca@linux.ibm.com>, "Marc
- Zyngier" <maz@kernel.org>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, bpf@vger.kernel.org, "Christian
- Borntraeger" <borntraeger@linux.ibm.com>, linux-rdma@vger.kernel.org, selinux@vger.kernel.org, kvmarm@lists.linux.dev, linux-trace-kernel@vger.kernel.org, linux-scsi@vger.kernel.org, linux-perf-users@vger.kernel.org, "Alexander
- Gordeev" <agordeev@linux.ibm.com>
-In-Reply-To: <20260914-b4-mmap-prepare-vma-flag-sanify-v2-11-7d9781ed5361@kernel.org>
-References: <20260914-b4-mmap-prepare-vma-flag-sanify-v2-0-7d9781ed5361@kernel.org>
- <20260914-b4-mmap-prepare-vma-flag-sanify-v2-11-7d9781ed5361@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 14 Sep 2026 17:39:47 +0000
-Message-Id: <20260914173948.55DB21F000FF@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kq433Bu3"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=H3NkHegXyGUlyjvPCAtBxAqpQZBuP5a+mlCVvVxrsTg=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1789407730; v=1; x=1790012530;
+ b=kq433Bu3qMP2USix9OqvuXCO0IU5R4QOfdT+vpuQBrSd12zYQk19LZmBxYFdp3L1YIBz8MBb
+ vkuugvl563yb+tQtAakWerjdaVO1aGjZJTzN59aM88CMsp8Y484yyaoxDXppbKv9TN4lnCOXZtx
+ rUYQW8rSRpjxexzx0UQEU1NA=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id eb9c47586028273e;
+	Mon, 14 Sep 2026 17:42:10 +0000
+X-Mizu-Trace-ID: eb9c47586028273e
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b4a0b384b7so10500e87.0
+        for <kvmarm@lists.linux.dev>; Mon, 14 Sep 2026 10:42:08 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBxEhO1XcvGGWE2NWllMZ6UWuCHJnv+YXMuNAQuQwxkEspqFN+m7nR0ajgz7oOwulVXQIBkMYdw=@lists.linux.dev
+X-Gm-Message-State: AFuF++mBrIXJnMpWIMx7cUL5wWb84SfQn3VDAs7oTVSF8MWP2y16ds/P
+	xP6FPmTNTkmnwhbdFFid7y7p7ry3p7GjgqAcdNW91Ma85NS511EqPvLhHDrXiKdMKoJdDB9UWoY
+	jSRbRwC4uOWdgJiGAQhbFDyocNYcTkgiZgoz3HkVc
+X-Received: by 2002:ac2:5b83:0:b0:5b1:571f:715f with SMTP id
+ 2adb3069b0e04-5b8b2d5efccmr7429e87.3.1789407727631; Mon, 14 Sep 2026 10:42:07
+ -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+References: <20260830-host-direct-messages-v7-0-45f6e6db72c2@google.com> <20260830-host-direct-messages-v7-3-45f6e6db72c2@google.com>
+In-Reply-To: <20260830-host-direct-messages-v7-3-45f6e6db72c2@google.com>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Mon, 14 Sep 2026 18:41:31 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTzqCTc_8Y3jmR2R4c=SfBCpJ0pDy+4MCO-UHLbaxNW8rQ@mail.gmail.com>
+X-Gm-Features: AcwNN1WgO8h5j0RDDssCnFHMWznF85XnD9prWGY6qwmWeeRWnJoBTvrMxsiCagc
+Message-ID: <CA+EHjTzqCTc_8Y3jmR2R4c=SfBCpJ0pDy+4MCO-UHLbaxNW8rQ@mail.gmail.com>
+Subject: Re: [PATCH v7 3/3] KVM: arm64: Support FFA_MSG_SEND_DIRECT_REQ2 in
+ host handler
+To: perlarsen@google.com
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Yeoreum Yun <yeoreum.yun@arm.com>, Ben Horgan <ben.horgan@arm.com>, 
+	Oliver Upton <oupton@kernel.org>, Sebastien Ene <sebastianene@google.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [High] The patch breaks mmap for the EVENTS region for all dynamic contex=
-ts because remap_vmalloc_range() strictly requires the base address of the =
-vmalloc allocation, but the patch passes a pointer with an offset.
---
+Hi Per,
 
-commit b52cc1703a348bc2ace5ff6752750d7fd8d2282e
-Author: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+On Mon, 31 Aug 2026 at 00:08, Per Larsen via B4 Relay
+<devnull+perlarsen.google.com@kernel.org> wrote:
+...
+> -static void do_ffa_direct_msg(struct arm_smccc_1_2_regs *res,
+> +static void do_ffa_direct_msg(const u64 func_id,
+> +                             struct arm_smccc_1_2_regs *res,
+>                               struct kvm_cpu_context *ctxt)
+>  {
+>         DECLARE_REG(u64, endp, ctxt, 1);
+> @@ -894,8 +896,12 @@ static void do_ffa_direct_msg(struct arm_smccc_1_2_regs *res,
+>                 return;
+>         }
+>
+> -       /* filter out framework messages and validate SBZ/MBZ bits */
+> -       if (flags) {
+> +       /*
+> +        * filter out framework messages and validate SBZ/MBZ flag bits.
+> +        * FFA_MSG_SEND_DIRECT_REQ2 implies flag-less partition message.
+> +        */
+> +       if ((func_id == FFA_MSG_SEND_DIRECT_REQ ||
+> +            func_id == FFA_FN64_MSG_SEND_DIRECT_REQ) && flags) {
+>                 ffa_to_smccc_error(res, FFA_RET_INVALID_PARAMETERS);
+>                 return;
 
-infiniband: update hfi1 to use remap_vmalloc_range()
+flags holds x2, which on the REQ2 path is the UUID's low half, so the
+name reads as if REQ2 flags had been checked and found zero. Could it
+be w2 instead?
 
-This commit updates the hfi1 infiniband driver to use remap_vmalloc_range()
-for mapping chip memory from vmalloc'd ranges instead of using a custom
-fault handler. It aims to prevent exposing kernel virtual addresses and
-cleans up VM flags.
+Cheers,
+/fuad
 
-> diff --git a/drivers/infiniband/hw/hfi1/file_ops.c b/drivers/infiniband/h=
-w/hfi1/file_ops.c
-> --- a/drivers/infiniband/hw/hfi1/file_ops.c
-> +++ b/drivers/infiniband/hw/hfi1/file_ops.c
-> @@ -476,15 +472,10 @@ static int hfi1_file_mmap(struct file *fp, struct v=
-m_area_struct *vma)
->  		 * Use the page where this context's flags are. User level
->  		 * knows where it's own bitmap is within the page.
->  		 */
-> -		memaddr =3D (unsigned long)
-> -			(dd->events + uctxt_offset(uctxt)) & PAGE_MASK;
-> +		memvirt =3D dd->events + uctxt_offset(uctxt);
-> +		memvirt =3D (void *)(((uintptr_t)memvirt) & PAGE_MASK);
->  		memlen =3D PAGE_SIZE;
-> -		/*
-> -		 * v3.7 removes VM_RESERVED but the effect is kept by
-> -		 * using VM_IO.
-> -		 */
-> -		flags |=3D VM_IO | VM_DONTEXPAND;
-> -		vmf =3D 1;
-> +		is_vmalloc =3D 1;
->  		break;
->  	case STATUS:
 
-[ ... ]
-
-> @@ -559,12 +546,10 @@ static int hfi1_file_mmap(struct file *fp, struct v=
-m_area_struct *vma)
->  	}
-> =20
->  	vm_flags_reset(vma, flags);
-> -	mmap_cdbg(ctxt, subctxt, type, mapio, vmf, memaddr, memvirt, memdma,=20
-> +	mmap_cdbg(ctxt, subctxt, type, mapio, is_vmalloc, memaddr, memvirt, mem=
-dma,
->  		  memlen, vma);
-> -	if (vmf) {
-> -		vma->vm_pgoff =3D PFN_DOWN(memaddr);
-> -		vma->vm_ops =3D &vm_ops;
-> -		ret =3D 0;
-> +	if (is_vmalloc) {
-> +		ret =3D remap_vmalloc_range(vma, memvirt, 0);
-
-[Severity: High]
-Will this fail for secondary contexts where uctxt_offset(uctxt) > 0?
-
-When mapping the EVENTS region for any context > 0, memvirt is calculated as
-an offset from the vmalloc base address (dd->events). However,
-remap_vmalloc_range() strictly requires the exact base address of the
-vmalloc allocation.=20
-
-Because remap_vmalloc_range() expects the provided address to exactly match
-the area base address, won't it unconditionally return -EINVAL when passed
-this interior pointer?=20
-
-If so, does this mean userspace applications attempting to mmap the EVENTS
-page for any dynamic context will receive an unexpected -EINVAL error,
-breaking core functionality for secondary contexts?
-
->  	} else if (memdma) {
->  		ret =3D dma_mmap_coherent(&dd->pcidev->dev, vma,
->  					memvirt, memdma, memlen);
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260914-b4-mmap-pr=
-epare-vma-flag-sanify-v2-0-7d9781ed5361@kernel.org?part=3D11
+>         }
+> @@ -961,15 +967,20 @@ bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
+>         case FFA_PARTITION_INFO_GET:
+>                 do_ffa_part_get(&res, host_ctxt);
+>                 goto out_handled;
+> +       case FFA_MSG_SEND_DIRECT_REQ2:
+> +               if (!ffa_call_supported(func_id))
+> +                       goto out_not_supported;
+> +               fallthrough;
+>         case FFA_MSG_SEND_DIRECT_REQ:
+>         case FFA_FN64_MSG_SEND_DIRECT_REQ:
+> -               do_ffa_direct_msg(&res, host_ctxt);
+> +               do_ffa_direct_msg(func_id, &res, host_ctxt);
+>                 goto out_handled;
+>         }
+>
+>         if (ffa_call_supported(func_id))
+>                 return false; /* Pass through */
+>
+> +out_not_supported:
+>         ffa_to_smccc_error(&res, FFA_RET_NOT_SUPPORTED);
+>  out_handled:
+>         ffa_set_retval(host_ctxt, &res);
+>
+> --
+> 2.55.0.897.gb25b4bd76c-goog
+>
+>
