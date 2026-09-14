@@ -1,33 +1,33 @@
-Received: from mta0.migadu.com (out-110.mta0.migadu.com [91.218.175.110])
+Received: from mta0.migadu.com (out-125.mta0.migadu.com [91.218.175.125])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B786442B2F
-	for <kvmarm@lists.linux.dev>; Mon, 14 Sep 2026 11:34:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.110
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B2F63D9527
+	for <kvmarm@lists.linux.dev>; Mon, 14 Sep 2026 11:34:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.125
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789385646; cv=none; b=t8AAySX18WJf5Gcb2MbX3V/UqPPl9kGjOTjv1MP8aSKnso8S7YYmOPg800WdgqZ0HJj6Pr28KMX6SHR+h6xVj7ymPAp2CAqb3Pjbpujm7BFVsy4NJLD5+5mmxE/0+4GPFI6nmAr2gxd6wTRddCeldjlIizVa6SBM6AYSxZuKSLw=
+	t=1789385667; cv=none; b=sFjS/2AWeoD6sMB6UfQNVeDsKuMO+V8XL4qZkNlMFOfjBWHGavRxAY3ih30SLIQ5wSZKJv3yG4HPlaUSCNuDwr8ROCRaf9z+5fjMLohUyV8EYApmJRHJyDtcGZzB7Bqc+gLgsMJqaTb9IapHEVBkl02hVFfqTFQX9XmCBEZhJwY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789385646; c=relaxed/simple;
-	bh=a0XXK2LJtf2K95EZy+fqmSC24cV9GziA/Is/hqsGUM0=;
+	s=arc-20240116; t=1789385667; c=relaxed/simple;
+	bh=EG4jlttgnQRUvp6RBdIaHPH0rkeIxINr+dVWvqmOdKY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=nSdKX8el3Rgf1LNC93/C/83gdSdYqXwweOfHAN4GdoOezFAJBRccDxrxZS1KtJqf8bJy4RLiDPr9rsTgsIfRYqjihbOCbKUYDKvgTU1CihrogYY+t5GT12tGp3GB3BuSDS3rLkDK39QsBHq5YjrMRAIjcMIZ1qPRnl3iU1x5Eo0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Wv7AEVjj; arc=none smtp.client-ip=91.218.175.110
+	 MIME-Version; b=bY8B098Z0JcW6PQ88FbCRuBlZzYmnCOszSra0ItZFQtN6OyGAka7yLZYTfjvtEhLxTZK5uggcN7LRikJL8esRWOZSFktU9oYnowLwsx6zT5ozoDpBFNDRvlpXmXim246Hr0rUPXcxpgKENDZnVSKwrTK92GktMN0wCZwANGnX6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=KI9t/vkJ; arc=none smtp.client-ip=91.218.175.125
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Wv7AEVjj"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="KI9t/vkJ"
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=a0XXK2LJtf2K95EZy+fqmSC24cV9GziA/Is/hqsGUM0=;
+DKIM-Signature: a=rsa-sha256; bh=EG4jlttgnQRUvp6RBdIaHPH0rkeIxINr+dVWvqmOdKY=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1789385642; v=1; x=1789990442;
- b=Wv7AEVjjISeshHl/iCu3zoXhM8IWoov1Cnz21AHeOqXhxk/sL51zCz3uNiTwF6uh5LGQ0Cli
- 19RVrmzlTvM6TYuOGH2p8BaJWSozfb4fep4Hff5xqf0kS9hJPDSLN+1QiUGam0HEGmYME0y2rlk
- K4Nz7GgpqHnTmDsRv15BPjJY=
+ t=1789385663; v=1; x=1789990463;
+ b=KI9t/vkJILY9iVbSHOk1IhJolKbsSRWD2tNBnGPSARYnc5DdnwfX8Ee1nPh0Azorf0qaiPIL
+ MT87f4Lfn9Xx8HFoa17EZX/VdQLUPclZJ/yMS7JlnWZ0vvBypLBBTOzAYQXW9bOph4nxupAkaeH
+ 1HruzpY+6FVShnh/JESHYFsg=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id e93af363d53b2598;
-	Mon, 14 Sep 2026 11:34:02 +0000
-X-Mizu-Trace-ID: e93af363d53b2598
+Received: by smtp.migadu.com with ESMTPS id 1461c02063194a2b;
+	Mon, 14 Sep 2026 11:34:23 +0000
+X-Mizu-Trace-ID: 1461c02063194a2b
 X-Migadu-Flow: FLOW_OUT
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: maz@kernel.org,
@@ -46,9 +46,9 @@ Cc: catalin.marinas@arm.com,
 	vdonnefort@google.com,
 	qperret@google.com,
 	tabba@google.com
-Subject: [PATCH v3 04/18] KVM: arm64: Disable steal time for protected VMs
-Date: Mon, 14 Sep 2026 12:33:24 +0100
-Message-Id: <20260914113338.159227-5-fuad.tabba@linux.dev>
+Subject: [PATCH v3 05/18] KVM: arm64: Introduce per-EC entry handlers for pKVM
+Date: Mon, 14 Sep 2026 12:33:25 +0100
+Message-Id: <20260914113338.159227-6-fuad.tabba@linux.dev>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20260914113338.159227-1-fuad.tabba@linux.dev>
 References: <20260914113338.159227-1-fuad.tabba@linux.dev>
@@ -60,90 +60,179 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-pKVM doesn't support steal time for protected guests, and
-KVM_CAP_STEAL_TIME already reads 0 for them on the VM file descriptor,
-but kvm_arm_pvtime_supported() doesn't know the VM, so the host still
-accepts the KVM_ARM_VCPU_PVTIME_CTRL attribute, whose IPA would point
-kvm_update_stolen_time() at the guest's private memory on every vCPU
-load. Pass the VM in and return false for a protected one, so the
-attribute returns -ENXIO as it does where steal time isn't implemented.
+From: Marc Zyngier <maz@kernel.org>
 
+Add an ESR_EL2.EC-indexed handler table, entry_hyp_vm_handlers[],
+consulted from flush_hyp_vcpu() on re-entry when the previous exit was
+a trap: sync_hyp_vcpu() records the exit reason in the hyp vCPU as
+exit_code, and the trap's exception class comes from its ESR_EL2. Its
+single generic handler stands in until the per-EC marshalling patch
+replaces the table with protected-only ones.
+
+Entry carries the host's requested PC updates to the hyp vCPU: add
+vcpu_copy_flag() to copy a masked set of flags between the two vCPU
+structures, with PC_UPDATE_REQ covering INCREMENT_PC and the
+pending-exception flags. The wholesale iflags copy moves into the
+non-protected branch; a protected vCPU takes only PC_UPDATE_REQ.
+
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+Co-developed-by: Fuad Tabba <fuad.tabba@linux.dev>
 Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
- arch/arm64/include/asm/kvm_host.h |  2 +-
- arch/arm64/kvm/arm.c              |  2 +-
- arch/arm64/kvm/pvtime.c           | 10 +++++-----
- 3 files changed, 7 insertions(+), 7 deletions(-)
+ arch/arm64/include/asm/kvm_host.h      | 19 +++++++++++++
+ arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  3 ++
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c     | 39 +++++++++++++++++++++++---
+ 3 files changed, 57 insertions(+), 4 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 27fe0cd5b2d7a..286489a69dff5 100644
+index 286489a69dff5..37d0721d39a45 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -1346,7 +1346,7 @@ long kvm_hypercall_pv_features(struct kvm_vcpu *vcpu);
- gpa_t kvm_init_stolen_time(struct kvm_vcpu *vcpu);
- void kvm_update_stolen_time(struct kvm_vcpu *vcpu);
+@@ -1033,11 +1033,28 @@ struct kvm_vcpu_arch {
+ 		set;						\
+ 	})
  
--bool kvm_arm_pvtime_supported(void);
-+bool kvm_arm_pvtime_supported(struct kvm *kvm);
- int kvm_arm_pvtime_set_attr(struct kvm_vcpu *vcpu,
- 			    struct kvm_device_attr *attr);
- int kvm_arm_pvtime_get_attr(struct kvm_vcpu *vcpu,
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 8b080804bc90b..db36815630790 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -447,7 +447,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		r = system_supports_mte();
- 		break;
- 	case KVM_CAP_STEAL_TIME:
--		r = kvm_arm_pvtime_supported();
-+		r = kvm_arm_pvtime_supported(kvm);
- 		break;
- 	case KVM_CAP_ARM_EL1_32BIT:
- 		r = cpus_have_final_cap(ARM64_HAS_32BIT_EL1);
-diff --git a/arch/arm64/kvm/pvtime.c b/arch/arm64/kvm/pvtime.c
-index 4ceabaa4c30bd..053fe831fa541 100644
---- a/arch/arm64/kvm/pvtime.c
-+++ b/arch/arm64/kvm/pvtime.c
-@@ -67,9 +67,9 @@ gpa_t kvm_init_stolen_time(struct kvm_vcpu *vcpu)
- 	return base;
- }
++#define __vcpu_copy_flag(vt, vs, flagset, f, m)			\
++	do {							\
++		typeof(vs->arch.flagset) tmp, val;		\
++								\
++		__build_check_flag(vs, flagset, f, m);		\
++								\
++		val = READ_ONCE(vs->arch.flagset);		\
++		val &= (m);					\
++		__vcpu_flags_preempt_disable();			\
++		tmp = READ_ONCE(vt->arch.flagset);		\
++		tmp &= ~(m);					\
++		tmp |= val;					\
++		WRITE_ONCE(vt->arch.flagset, tmp);		\
++		__vcpu_flags_preempt_enable();			\
++	} while (0)
++
+ #define vcpu_get_flag(v, ...)	__vcpu_get_flag((v), __VA_ARGS__)
+ #define vcpu_set_flag(v, ...)	__vcpu_set_flag((v), __VA_ARGS__)
+ #define vcpu_clear_flag(v, ...)	__vcpu_clear_flag((v), __VA_ARGS__)
+ #define vcpu_test_and_clear_flag(v, ...)			\
+ 	__vcpu_test_and_clear_flag((v), __VA_ARGS__)
++#define vcpu_copy_flag(vt, vs, ...) __vcpu_copy_flag((vt), (vs), __VA_ARGS__)
  
--bool kvm_arm_pvtime_supported(void)
-+bool kvm_arm_pvtime_supported(struct kvm *kvm)
+ /* KVM_ARM_VCPU_INIT completed */
+ #define VCPU_INITIALIZED	__vcpu_single_flag(cflags, BIT(0))
+@@ -1055,6 +1072,8 @@ struct kvm_vcpu_arch {
+ #define INCREMENT_PC		__vcpu_single_flag(iflags, BIT(1))
+ /* Target EL/MODE (not a single flag, but let's abuse the macro) */
+ #define EXCEPT_MASK		__vcpu_single_flag(iflags, GENMASK(3, 1))
++/* Cover both PENDING_EXCEPTION and EXCEPT_MASK for global operations */
++#define PC_UPDATE_REQ		__vcpu_single_flag(iflags, GENMASK(3, 0))
+ /* Host-set: the hyp flushes the non-protected vCPU state in on entry */
+ #define PKVM_HOST_STATE_DIRTY	__vcpu_single_flag(iflags, BIT(4))
+ 
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+index c904647d2f760..49a0a992047ba 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+@@ -26,6 +26,9 @@ struct pkvm_hyp_vcpu {
+ 	 * per-cpu pointer tracking us. Otherwise, NULL if not loaded.
+ 	 */
+ 	struct pkvm_hyp_vcpu **loaded_hyp_vcpu;
++
++	/* The previous exit's ARM_EXCEPTION_* code. */
++	u32 exit_code;
+ };
+ 
+ /*
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+index 52a65b13b3810..ef65c3cd6f810 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+@@ -31,6 +31,17 @@ unsigned int hyp_gicv3_nr_lr;
+ 
+ void __kvm_hyp_host_forward_smc(struct kvm_cpu_context *host_ctxt);
+ 
++typedef void (*hyp_entry_exit_handler_fn)(struct pkvm_hyp_vcpu *);
++
++static void handle_vm_entry_generic(struct pkvm_hyp_vcpu *hyp_vcpu)
++{
++	vcpu_copy_flag(&hyp_vcpu->vcpu, hyp_vcpu->host_vcpu, PC_UPDATE_REQ);
++}
++
++static const hyp_entry_exit_handler_fn entry_hyp_vm_handlers[] = {
++	[0 ... ESR_ELx_EC_MAX]		= handle_vm_entry_generic,
++};
++
+ static void __hyp_sve_save_guest(struct kvm_vcpu *vcpu)
  {
--	return !!sched_info_on();
-+	return !!sched_info_on() && (!kvm || !kvm_vm_is_protected(kvm));
- }
- 
- int kvm_arm_pvtime_set_attr(struct kvm_vcpu *vcpu,
-@@ -81,7 +81,7 @@ int kvm_arm_pvtime_set_attr(struct kvm_vcpu *vcpu,
- 	int ret = 0;
- 	int idx;
- 
--	if (!kvm_arm_pvtime_supported() ||
-+	if (!kvm_arm_pvtime_supported(kvm) ||
- 	    attr->attr != KVM_ARM_VCPU_PVTIME_IPA)
- 		return -ENXIO;
- 
-@@ -110,7 +110,7 @@ int kvm_arm_pvtime_get_attr(struct kvm_vcpu *vcpu,
- 	u64 __user *user = (u64 __user *)attr->addr;
- 	u64 ipa;
- 
--	if (!kvm_arm_pvtime_supported() ||
-+	if (!kvm_arm_pvtime_supported(vcpu->kvm) ||
- 	    attr->attr != KVM_ARM_VCPU_PVTIME_IPA)
- 		return -ENXIO;
- 
-@@ -126,7 +126,7 @@ int kvm_arm_pvtime_has_attr(struct kvm_vcpu *vcpu,
+ 	__vcpu_assign_sys_reg(vcpu, ZCR_EL1, read_sysreg_el1(SYS_ZCR));
+@@ -216,6 +227,8 @@ static void sync_debug_state(struct pkvm_hyp_vcpu *hyp_vcpu)
+ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
  {
- 	switch (attr->attr) {
- 	case KVM_ARM_VCPU_PVTIME_IPA:
--		if (kvm_arm_pvtime_supported())
-+		if (kvm_arm_pvtime_supported(vcpu->kvm))
- 			return 0;
+ 	struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
++	hyp_entry_exit_handler_fn ec_handler;
++	u8 esr_ec;
+ 
+ 	fpsimd_sve_flush();
+ 	flush_debug_state(hyp_vcpu);
+@@ -228,6 +241,7 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
+ 	if (!pkvm_hyp_vcpu_is_protected(hyp_vcpu)) {
+ 		if (vcpu_get_flag(host_vcpu, PKVM_HOST_STATE_DIRTY))
+ 			flush_hyp_vcpu_state(hyp_vcpu);
++		hyp_vcpu->vcpu.arch.iflags = host_vcpu->arch.iflags;
+ 	} else {
+ 		hyp_vcpu->vcpu.arch.ctxt = host_vcpu->arch.ctxt;
  	}
- 	return -ENXIO;
+@@ -245,16 +259,31 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
+ 	hyp_vcpu->vcpu.arch.hcr_el2 |= READ_ONCE(host_vcpu->arch.hcr_el2) &
+ 						 (HCR_TWI | HCR_TWE | HCR_VSE);
+ 
+-	hyp_vcpu->vcpu.arch.iflags	= host_vcpu->arch.iflags;
+-
+ 	hyp_vcpu->vcpu.arch.vsesr_el2	= host_vcpu->arch.vsesr_el2;
+ 
+ 	flush_hyp_vgic_state(hyp_vcpu);
+ 
+ 	hyp_vcpu->vcpu.arch.pid = host_vcpu->arch.pid;
++
++	switch (ARM_EXCEPTION_CODE(hyp_vcpu->exit_code)) {
++	case ARM_EXCEPTION_IRQ:
++	case ARM_EXCEPTION_EL1_SERROR:
++	case ARM_EXCEPTION_IL:
++		break;
++	case ARM_EXCEPTION_TRAP:
++		esr_ec = ESR_ELx_EC(kvm_vcpu_get_esr(&hyp_vcpu->vcpu));
++		ec_handler = entry_hyp_vm_handlers[esr_ec];
++		if (ec_handler)
++			ec_handler(hyp_vcpu);
++		break;
++	default:
++		BUG();
++	}
++
++	hyp_vcpu->exit_code = 0;
+ }
+ 
+-static void sync_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
++static void sync_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu, u32 exit_reason)
+ {
+ 	struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
+ 
+@@ -281,6 +310,8 @@ static void sync_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
+ 	host_vcpu->arch.hcr_el2 |= hyp_vcpu->vcpu.arch.hcr_el2 & HCR_VSE;
+ 
+ 	sync_hyp_vgic_state(hyp_vcpu);
++
++	hyp_vcpu->exit_code = exit_reason;
+ }
+ 
+ static void handle___pkvm_vcpu_load(struct kvm_cpu_context *host_ctxt)
+@@ -395,7 +426,7 @@ static void handle___kvm_vcpu_run(struct kvm_cpu_context *host_ctxt)
+ 
+ 		ret = __kvm_vcpu_run(&hyp_vcpu->vcpu);
+ 
+-		sync_hyp_vcpu(hyp_vcpu);
++		sync_hyp_vcpu(hyp_vcpu, ret);
+ 	} else {
+ 		/* The host is fully trusted, run its vCPU directly. */
+ 		fpsimd_lazy_switch_to_guest(host_vcpu);
 -- 
 2.39.5
 
