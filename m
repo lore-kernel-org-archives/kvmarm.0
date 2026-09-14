@@ -1,89 +1,193 @@
-Received: from mta0.migadu.com (out-126.mta0.migadu.com [91.218.175.126])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2FD33E7635
-	for <kvmarm@lists.linux.dev>; Mon, 14 Sep 2026 08:13:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.126
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B542D397E9A
+	for <kvmarm@lists.linux.dev>; Mon, 14 Sep 2026 08:14:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789373641; cv=none; b=LdPs0WSLUYGDbpklB3lzuAhknbZRo3BeZ2ECOulXCB94neg930Jhn/3ZOesHW4X3oMPs0GijpJaEOCmP4otzrmjyLuuqlSLZ8xj3eqImzsFaRPU1Ry8MO8hUAJuSunTZq4IJS3q+kdfy7jqC34B4iXpH78317cd4kNWbXYcvx2c=
+	t=1789373669; cv=none; b=lo487h7vXW+/od7gCPcK4yPlqtZ5bHj6r8Hhe3pQ+GfpWaKZWH4V5Tb3hOjhRca9hB/HFNeA913oD9RI0xvHTo/7/Gt6kyD0eY/dxZfbXJospBG3iWkVTDtBPEc0vIfv4C3yvj/0XUcaKViE8B+EYmw/zqZ5wKtBR7y9LPoJ4gk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789373641; c=relaxed/simple;
-	bh=Ti/1G47FS/EQWMQAM+XxbuqCWRXpU8JeCwn0rHreoas=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Stwqrr//Ptgdm1IZjqneeqaj5UapOasui2Q2S91zpoDcdr+Gi+cMrjKe6T71b8zG6OUdjyEBzfEsc3Tg/oZx7/8gP/2w3OCNJ2VuYFGpCGFgG5jmuJ9azoOmH7rtVQOdPXQQP+EDTWFF3KsY6T1VUFfAkdVuC0q4zMH0jzu5qYI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=DPnw6wFB; arc=none smtp.client-ip=91.218.175.126
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1789373669; c=relaxed/simple;
+	bh=AZ2S+dXcYhmDHm7heQZ4mnRCtylRNieJycqxlE1+mX0=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iHBJGQ3Kmn/+R2VS20SRHB3ggELUPs69T9HGHXTkIbf1ab6PkWkv4sr+w5JuuDLGZf1I3ho6TlUNZNVurK3T7wmlAQdBjjU7BO8M7OlFIP4vCYUodQqspGh7k8ABM3oBbWQwxXlFSSY5wcrAzXux0has5mvQYY5zUMRTUfToeUk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dk0xkJ/Y; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="DPnw6wFB"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=Ti/1G47FS/EQWMQAM+XxbuqCWRXpU8JeCwn0rHreoas=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1789373638; v=1; x=1789978438;
- b=DPnw6wFBDqYmbpOeDZ6VeQNdBDM7/bnBeNwisFl/PhKirfhzwOPo1uUH6D/p84yw4QR6bURg
- HEOgs+uY7ik7x5uJfKzImvoz6xIZ6BcGBIlNOuusbhUCXhF7vG84sBRYNMw5W2fXV7nLS+Ire/I
- jGHMkxt2tlTOcoA+sKNzXiwg=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 724d3f8055b7a3a2;
-	Mon, 14 Sep 2026 08:13:48 +0000
-X-Mizu-Trace-ID: 724d3f8055b7a3a2
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b4a0b384b7so5625e87.0
-        for <kvmarm@lists.linux.dev>; Mon, 14 Sep 2026 01:13:47 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBzplQcvcRTKrN3o4I0HHK6wpP9M3LzNVvnaDSR0JGKXW3D6DcE/8X/FFiAaWcM3MKuUgK52GXY=@lists.linux.dev
-X-Gm-Message-State: AFuF++n/G9E87KWFHQhthbgMJu6wLQcWg4u2HBdA7Ho6ywkBTFnqCjbq
-	O6JEImyptR0EU2GcXoSADlp3J0USBpmudsFgrwBMfgbh+OUATAqWIu1jdapSMMOnqA39auuhBS5
-	cTbklCdgP+aKKREt0CZ7nSmfe/IhxHHO2b5u9k1GP
-X-Received: by 2002:a05:6512:6205:b0:5ae:cf5f:4a88 with SMTP id
- 2adb3069b0e04-5b8ae4b243cmr24745e87.8.1789373626863; Mon, 14 Sep 2026
- 01:13:46 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dk0xkJ/Y"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34F1B1F000FF;
+	Mon, 14 Sep 2026 08:14:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789373667;
+	bh=tO9EcZ8BtVFdBOVE4Ud6o8SU3U1Oo4QfM/ULdz0DwKA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=dk0xkJ/YuswTBFb+B7oeHafGMukZnGVYfXdb/BWBs2UN4GCxzDbeTHugLoQ12vuMZ
+	 hNByWIZ/RAT6pij/dPFfcr5gWqkTe8YbuMg3a5ATiWMA3nfHVc/bsgM0MI/tHFSkQA
+	 BTK80o29a9NNNhN/Qm+ZRDlG8I66IKCwxHhClLee1y6g2tlN5AbKX5Hy1f29lt4ELg
+	 9LX9TUiTQEF6ZwHiMHgmT/h/nKPq7PhC+w2DBF4b0ZjBjd3vwhq82zeMA1JNjzkrLR
+	 /rR6efiFyraMGeX0il4caWACSz7KAWvdCrSgyaV2P60ZuZDE8bIEKo97u6TiBaP3Rq
+	 jeC3YvlRqkg/A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1x61pY-00000008UjF-3kD0;
+	Mon, 14 Sep 2026 08:14:25 +0000
+Date: Mon, 14 Sep 2026 09:14:24 +0100
+Message-ID: <865x086yhr.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Shuai Xue <xueshuai@linux.alibaba.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	Wang Han
+ <wanghan@linux.alibaba.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Fuad Tabba <fuad.tabba@linux.dev>
+Subject: Re: [PATCH 0/4] KVM: arm64: Reduce overhead of full S2 teardown
+In-Reply-To: <8bf3f266-06fd-49e0-8de8-33c7a044e997@linux.alibaba.com>
+References: <20260912104834.3093878-1-maz@kernel.org>
+	<8bf3f266-06fd-49e0-8de8-33c7a044e997@linux.alibaba.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20260914065136.3418404-1-fuad.tabba@linux.dev> <20260914070536.877D91F000FF@smtp.kernel.org>
-In-Reply-To: <20260914070536.877D91F000FF@smtp.kernel.org>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Mon, 14 Sep 2026 09:13:10 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTyjXoxb6gZO4+X_cDh+z6e9cY75nZGsWFeOAOvBp+D0bg@mail.gmail.com>
-X-Gm-Features: AcwNN1UbQngGq-eYS1JXmeVvwbf0ZeR8W8FV59mmOoiAMGh32I9FP1sww3CFOi0
-Message-ID: <CA+EHjTyjXoxb6gZO4+X_cDh+z6e9cY75nZGsWFeOAOvBp+D0bg@mail.gmail.com>
-Subject: Re: [PATCH] KVM: arm64: Pin the host vCPU before adjusting its PC
- under pKVM
-To: sashiko-reviews@lists.linux.dev
-Cc: Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
-	Marc Zyngier <maz@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: xueshuai@linux.alibaba.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, weilin.chang@arm.com, wanghan@linux.alibaba.com, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, fuad.tabba@linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Sashiko, this one pierced.
+On Mon, 14 Sep 2026 07:44:15 +0100,
+Shuai Xue <xueshuai@linux.alibaba.com> wrote:
+> 
+> 
+> 
+> On 9/12/26 6:48 PM, Marc Zyngier wrote:
+> > Tearing down a full S2 is a pretty involved process, resulting in a
+> > lot of TLB invalidation. These TLBIs are either on a per leaf basis if
+> > the HW doesn't support range invalidation, or by top-level range if it
+> > does. Amusingly, the latter occurs even when nothing has been
+> > unmapped.
+> > 
+> > Things are made worse with NV, as we have a bucket-load of shadow S2s,
+> > and the need to invalidate them all on the back of an MMU notifier.
+> > The latter will eventually be solved by the reverse-map tracking that
+> > Wei-Lin is working on, but we need to be better at full-S2 teardown.
+> > 
+> > This small series adds a "no TLBI" unmapping primitive, which allows
+> > the caller to then whack the TLBs using a VMID-wide invalidation. This
+> > results in far fewer TLBIs, and a better recursive virtualisation as
+> > we get far fewer traps as a consequence.
+> > 
+> > This applies on top of my shadow-s2 lifetime fixes, and is expected to
+> > be a prefix to Wei-Lin's series.
+> > 
+> > Marc Zyngier (4):
+> >    KVM: arm64: pgtable: Add Stage-2 unmap without TLBI primitive
+> >    KVM: arm64: MMU: Add kvm_stage2_unmap_all() helper
+> >    KVM: arm64: nv: Move full s2_mmu unmap over to kvm_stage2_unmap_all()
+> >    KVM: arm64: nv: Move TLBI VMALLS12E1* emulation over to
+> >      kvm_stage2_unmap_all()
+> > 
+> >   arch/arm64/include/asm/kvm_mmu.h     |  1 +
+> >   arch/arm64/include/asm/kvm_pgtable.h | 17 +++++++++++++
+> >   arch/arm64/include/asm/kvm_pkvm.h    |  1 +
+> >   arch/arm64/kvm/hyp/pgtable.c         | 38 +++++++++++++++++++++-------
+> >   arch/arm64/kvm/mmu.c                 | 15 +++++++++++
+> >   arch/arm64/kvm/nested.c              |  4 +--
+> >   arch/arm64/kvm/pkvm.c                |  2 ++
+> >   arch/arm64/kvm/sys_regs.c            | 18 ++++++-------
+> >   8 files changed, 75 insertions(+), 21 deletions(-)
+> > 
+> 
+> 
+> Hi Marc,
+> 
+> Thanks for putting this series together. I reviewed the four patches
+> and revisited the traces from my earlier Marc-only tests.
+> 
+> I have a correctness concern about child page-table reclamation.
+>
 
-[...]
+You? Or your AI model? I'd really expect you to explain *your*
+perception of the problem rather than dumping the result of your AI in
+an email.
 
-> [Severity: Critical]
-> This is a pre-existing issue, but does this create a double-fetch (TOCTOU)
-> vulnerability that allows the host kernel to leak arbitrary EL2 memory?
+> 1. Child page-table reclamation before the final TLBI
+> 
+> In patch 1, SKIP_S2_TLBI suppresses invalidation for both leaf and table
+> descriptors, while stage2_unmap_walker() still immediately releases
+> empty child tables.
 
-[...]
+What is a "child" table?
 
-> If that bit is set, it updates the PSR_TCO_BIT in the vCPU's CPSR, which gets
-> written back to host-accessible memory in host_vcpu->arch.ctxt.regs.pstate. By
-> shifting the base address and observing the result, the host could leak
-> EL2-private or protected guest memory bit by bit.
+> 
+> For a child table with page_count(childp) == 1, the sequence is:
+> 
+>   stage2_unmap_walker()
+>     stage2_unmap_put_pte()
+>       clear the parent table descriptor
+>       skip its TLBI
+>     mm_ops->put_page(childp)
+>       kvm_s2_put_page()
+>         put_page()              /* drop the child's last reference */
+> 
+>   ... process the remaining address ranges ...
+> 
+>   __kvm_tlb_flush_vmid()         /* final invalidation in patch 2 */
+> 
+> This path does not use the free_unlinked_table()/call_rcu() deferred
+> reclamation mechanism. The existing deferred-range-TLBI path still
+> invalidates table descriptors immediately; the new flag skips that
+> invalidation too.
 
-The read in enter_exception64() is unvalidated on both paths. With a
-hyp vCPU loaded, the handler adjusts the host copy and nothing checks
-host_vcpu->kvm at all, so no race is needed. On the unloaded path the
-pin in this patch narrows the window rather than opening it. What
-leaks is one bit per probe (bit 1 of the word at a host-chosen hyp
-linear address, through PSR_TCO) on MTE-capable hardware, or a hyp
-panic on an unmapped address.
+And? What is the actual problem here?
 
-I'll send a v2 with a separate patch ahead of this one that gets the
-VM through a get/put pair at the read site, and drop the VM pin from
-this patch, since it then has nothing to protect.
+> 
+> Patch 4 provides a caller operating on active shadow MMUs:
+> kvm_s2_mmu_iterate_by_vmid() holds mmu_lock for write and visits valid
+> matching shadow MMUs, but does not require refcnt == 0 or wait for
+> other vCPUs using the MMU to exit.
 
-Cheers,
-/fuad
+Of course it doesn't, since this is simply emulating an instruction
+local to that vcpu. How would the actual HW "wait" for another CPU to
+stop using a set of translation?
+
+> 
+> Another vCPU can therefore still use that shadow S2. The write lock
+> excludes software page-table updates, not hardware table walks.
+> The following interleaving is allowed:
+> 
+>   vCPU B / hardware walker        vCPU A
+>   ------------------------        ----------------------------
+>   Holds an old reference to T
+>                                   Clears parent, skips TLBI
+>                                   Drops T's last reference
+>                                   T is reused by the allocator
+>   Accesses T via the old reference
+>                                   Performs final VMID-wide TLBI
+>
+> The final flush barriers cannot retroactively protect a table that
+> has already been freed and reused.
+
+T is a shadow page-table page on the host. How can vcpu B hold a
+reference on that page? It isn't even in the same address space.
+
+Now, I can see that B could have a VA that *translate through* T, and
+that's rather annoying.
+
+I'll have a think.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
