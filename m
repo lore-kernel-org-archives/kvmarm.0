@@ -1,137 +1,74 @@
-Received: from mta0.migadu.com (out-74.mta0.migadu.com [91.218.175.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8904F3783AE
-	for <kvmarm@lists.linux.dev>; Mon, 14 Sep 2026 17:45:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7551B379C5C;
+	Mon, 14 Sep 2026 17:57:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789407939; cv=none; b=SqmZ3xUsIodkKqTaN3S0GlgWpDatkCQFIJ8imy4D4Xcr/50joJtLsxG8LowDts/m0xVyzS5SSM+saE3PEJNohqUvH5tvxFyPaBwl7hQdJAZyF0pswOhL0Htw//CcysO160Y4+gCl7Fa3C1mDx6pBDp954/MGbNdfpejd4bNc3w8=
+	t=1789408632; cv=none; b=oellXi5bmzo0K0SLXVtUPCHWRUlp4PLUugBLEPE9t6lfiHII5sTXpHd6I645WSkwVPJ9HuTbc788h3uJViU2opJhVXv9WGnLbTq3/3KPF+UT00CGTmmLPZiY+apCNnVmZMKvDdLlburo2pHBSvpZ2X1lRSD0CCKNkly60aOLZoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789407939; c=relaxed/simple;
-	bh=PrgyValbiyYMTfVMJESIc+fLfCQaV5hw9qbA3T1oo9Q=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=oHMayeodod9AIzlRIPYSFyKZ+OPsidiU2fdXTjKE9Q3R21gjHE2cChSS2fGxzwJOhMbDlyh7QfMp4za5xkggbOU9daokmcMrORhLUPT6xWUogmkML3XuGMxuFz3mJc9PY+4mJYhtlAt6ZoFdz3JsZduUA9KD72rgesjizvhSVRI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RNvV8mMl; arc=none smtp.client-ip=91.218.175.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1789408632; c=relaxed/simple;
+	bh=WHAxO356QeI65K8FMrnonWX56V/LH6e9elTcvnVoWlk=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=D4ELBkVesrcBqTZuYpEkOrpSyeijMpO0HndetAYm3xHLxE9yGI6ThX014yoTnCreRkSLsis5JR+WYzdD+Zu6oC/L7xhN3ND5gH4nI/K8aUcKHx3i5T3c79LL6rLLd2k9nYU7VHHpUb6P0athZ/SCTJyQpXoUh4cZYclMy0pz6yk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YKrMGe5Z; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RNvV8mMl"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=PrgyValbiyYMTfVMJESIc+fLfCQaV5hw9qbA3T1oo9Q=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1789407935; v=1; x=1790012735;
- b=RNvV8mMlroXJNlt9iqOXpGir57TnBB1WiHxz/xeDTAOHxVFCqzuvinq4n0t8yOQ5rSockQnL
- X3YcH+U5l2z4ZvoXknyXe3ncHOrVpBBpGSmLG/smN7IoZutYhmpxz+NAGQ4AZTMF70kVEOZQb4r
- 1pzl5DHU46QEdc+2PQZHh7CI=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id a45841c83f61cc60;
-	Mon, 14 Sep 2026 17:45:22 +0000
-X-Mizu-Trace-ID: a45841c83f61cc60
-X-Migadu-Flow: FLOW_OUT
-From: Fuad Tabba <fuad.tabba@linux.dev>
-To: maz@kernel.org,
-	oupton@kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Cc: catalin.marinas@arm.com,
-	will@kernel.org,
-	joey.gouly@arm.com,
-	seiden@linux.ibm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	mark.rutland@arm.com,
-	vdonnefort@google.com,
-	qperret@google.com,
-	tabba@google.com
-Subject: [PATCH] KVM: arm64: Reject the stage-2 MMU pointer hypercalls under pKVM
-Date: Mon, 14 Sep 2026 18:45:21 +0100
-Message-Id: <20260914174521.832575-1-fuad.tabba@linux.dev>
-X-Mailer: git-send-email 2.39.5
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YKrMGe5Z"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39AD51F000FF;
+	Mon, 14 Sep 2026 17:57:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789408631;
+	bh=WHAxO356QeI65K8FMrnonWX56V/LH6e9elTcvnVoWlk=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=YKrMGe5ZrWmP2IYG3Jun3Vjv9FUR6gAckPZkcC30ml3mPYXnemCGJsVKf8Rj7xUCt
+	 z4HCL01q2Sfc71umZWC9p2shEG3xynK6qLlUh6CKbWOG66pOX8aXmAUsU4vOBhiRZt
+	 BIi0VKSvMtbAgUoX2/QIzysb9RwzR4VD8nK0XSfGxN1JGBW9VhUQhuBuXQbTuirMmI
+	 8S4QA52ZZvArZd802IgOlbMjNd27ZilDOXu3ch4olD2riPGArhTDLQZyfeNpPPx/5q
+	 NkDUJlXLMSo+Gfj4AIYvEquiv0K/WoBuM9/B5gUHhW3hLuDRvAWftvUI1ZCBf02mQD
+	 G2o1wLs4yXxOg==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v2 12/40] selinux: reject writable opens of policy file,
+ drop mmap shared/write check
+Reply-To: sashiko-reviews@lists.linux.dev
+To: =?utf-8?b?TG9yZW56byBTdG9ha2VzIChBUk0p?= <ljs@kernel.org>
+Cc: kvmarm@lists.linux.dev, "Alexander Gordeev" <agordeev@linux.ibm.com>, dri-devel@lists.freedesktop.org, "Christian
+ Borntraeger" <borntraeger@linux.ibm.com>, "Marc Zyngier" <maz@kernel.org>, linux-perf-users@vger.kernel.org, linux-s390@vger.kernel.org, linux-trace-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, linux-scsi@vger.kernel.org, kvm@vger.kernel.org, "Heiko
+ Carstens" <hca@linux.ibm.com>, selinux@vger.kernel.org, "Vasily Gorbik" <gor@linux.ibm.com>, bpf@vger.kernel.org, "Oliver
+ Upton" <oupton@kernel.org>
+In-Reply-To: <20260914-b4-mmap-prepare-vma-flag-sanify-v2-12-7d9781ed5361@kernel.org>
+References: <20260914-b4-mmap-prepare-vma-flag-sanify-v2-0-7d9781ed5361@kernel.org>
+ <20260914-b4-mmap-prepare-vma-flag-sanify-v2-12-7d9781ed5361@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 14 Sep 2026 17:57:09 +0000
+Message-Id: <20260914175710.39AD51F000FF@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-The five hypercalls that take a struct kvm_s2_mmu pointer remain
-callable after pKVM finalises, and each dereferences the host pointer
-in __load_stage2(). Under pKVM none of them has a valid caller: the
-host walks no guest stage-2, its TLB flushes go through the handle-based
-__pkvm_tlb_flush_vmid, and kvm_arch_vcpu_load() skips the CPU context
-flush.
+> The policy file has no write method and is exposed read-only (S_IRUGO in
+> selinux_files[]), yet sel_open_policy() performs no open mode check, so a
+> CAP_DAC_OVERRIDE caller can open it O_RDWR. Reject FMODE_WRITE at open, as
+> kernfs does.
+>=20
+> The file can then never be mapped with FMODE_WRITE, so do_mmap() always
+> clears VM_MAYWRITE and VM_SHARED for MAP_SHARED mappings and the VM_SHARED
+> check in sel_mmap_policy() cannot be reached. Remove it.
+>=20
+> This also stops sel_mmap_policy() clearing VM_MAYWRITE on a mapping that =
+is
+> neither a PFN map nor a mixed map, ahead of the core enforcing that only
+> such mappings may do so.
+>=20
+> Acked-by: Stephen Smalley <stephen.smalley.work@gmail.com>
+> Reviewed-by: Jann Horn <jannh@google.com>
+> Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
 
-Reject all five when protected mode is enabled.
+Sashiko has reviewed this patch and found no issues. It looks great!
 
-Reported-by: Sashiko <sashiko-bot@kernel.org>
-Closes: https://lore.kernel.org/all/20260914130152.F0D5F1F000FF@smtp.kernel.org/
-Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
----
-
-Notes:
-    No in-tree host path reaches these, so no Fixes: tag.
-
- arch/arm64/kvm/hyp/nvhe/hyp-main.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
-
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 9a3b92e626adb..4b0d00e55e2ea 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -557,6 +557,9 @@ static void handle___kvm_tlb_flush_vmid_ipa(struct kvm_cpu_context *host_ctxt)
- 	DECLARE_REG(phys_addr_t, ipa, host_ctxt, 2);
- 	DECLARE_REG(int, level, host_ctxt, 3);
- 
-+	if (unlikely(is_protected_kvm_enabled()))
-+		return;
-+
- 	__kvm_tlb_flush_vmid_ipa(kern_hyp_va(mmu), ipa, level);
- }
- 
-@@ -566,6 +569,9 @@ static void handle___kvm_tlb_flush_vmid_ipa_nsh(struct kvm_cpu_context *host_ctx
- 	DECLARE_REG(phys_addr_t, ipa, host_ctxt, 2);
- 	DECLARE_REG(int, level, host_ctxt, 3);
- 
-+	if (unlikely(is_protected_kvm_enabled()))
-+		return;
-+
- 	__kvm_tlb_flush_vmid_ipa_nsh(kern_hyp_va(mmu), ipa, level);
- }
- 
-@@ -576,6 +582,9 @@ handle___kvm_tlb_flush_vmid_range(struct kvm_cpu_context *host_ctxt)
- 	DECLARE_REG(phys_addr_t, start, host_ctxt, 2);
- 	DECLARE_REG(unsigned long, pages, host_ctxt, 3);
- 
-+	if (unlikely(is_protected_kvm_enabled()))
-+		return;
-+
- 	__kvm_tlb_flush_vmid_range(kern_hyp_va(mmu), start, pages);
- }
- 
-@@ -583,6 +592,9 @@ static void handle___kvm_tlb_flush_vmid(struct kvm_cpu_context *host_ctxt)
- {
- 	DECLARE_REG(struct kvm_s2_mmu *, mmu, host_ctxt, 1);
- 
-+	if (unlikely(is_protected_kvm_enabled()))
-+		return;
-+
- 	__kvm_tlb_flush_vmid(kern_hyp_va(mmu));
- }
- 
-@@ -602,6 +614,9 @@ static void handle___kvm_flush_cpu_context(struct kvm_cpu_context *host_ctxt)
- {
- 	DECLARE_REG(struct kvm_s2_mmu *, mmu, host_ctxt, 1);
- 
-+	if (unlikely(is_protected_kvm_enabled()))
-+		return;
-+
- 	__kvm_flush_cpu_context(kern_hyp_va(mmu));
- }
- 
-
-base-commit: fd73f4a6659897191fa0d40695fe370925dd3780
--- 
-2.39.5
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260914-b4-mmap-pr=
+epare-vma-flag-sanify-v2-0-7d9781ed5361@kernel.org?part=3D12
 
