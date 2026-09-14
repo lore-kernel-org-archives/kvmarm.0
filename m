@@ -1,193 +1,120 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B542D397E9A
-	for <kvmarm@lists.linux.dev>; Mon, 14 Sep 2026 08:14:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68871371D05;
+	Mon, 14 Sep 2026 08:19:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789373669; cv=none; b=lo487h7vXW+/od7gCPcK4yPlqtZ5bHj6r8Hhe3pQ+GfpWaKZWH4V5Tb3hOjhRca9hB/HFNeA913oD9RI0xvHTo/7/Gt6kyD0eY/dxZfbXJospBG3iWkVTDtBPEc0vIfv4C3yvj/0XUcaKViE8B+EYmw/zqZ5wKtBR7y9LPoJ4gk=
+	t=1789373976; cv=none; b=dka2qd+33V6RTQzZ3SiGeakTYiNZ3WBs68TPdEn8DDPg+RSPkJ9cTKKSSt3cMyvhGQq6OpwzeFe5UAd3bjuWjvcmZPiu6q09dNRNCdxX4q7IiuzmnWnvmRNDPo7G73LDPMti5J3t1pHdywFskD14wUoV+j0RPBfVeka0KyeOiS4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789373669; c=relaxed/simple;
-	bh=AZ2S+dXcYhmDHm7heQZ4mnRCtylRNieJycqxlE1+mX0=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iHBJGQ3Kmn/+R2VS20SRHB3ggELUPs69T9HGHXTkIbf1ab6PkWkv4sr+w5JuuDLGZf1I3ho6TlUNZNVurK3T7wmlAQdBjjU7BO8M7OlFIP4vCYUodQqspGh7k8ABM3oBbWQwxXlFSSY5wcrAzXux0has5mvQYY5zUMRTUfToeUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dk0xkJ/Y; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789373976; c=relaxed/simple;
+	bh=m0ynvs3ASpXg1FC+68FV0PXhWfrNCCs02XWVdpFI/DQ=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=LCbHDmn5Mokbs0SvnuYbCd5tCkWPMx5Gq5SFin9P1x4I4fZqJqbqPpQ7D8OtqVXzYYSyPqazEpf1BSyvIzK/8t3939CIkE/Mpert9ltS9cJsZJqwVNBE10kZsKqZDSw17LRNdDQosoaGVzyJnVeOD7iywzl9ZnQ0XsiJ70P00xk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=qn7Y86S7; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dk0xkJ/Y"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34F1B1F000FF;
-	Mon, 14 Sep 2026 08:14:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789373667;
-	bh=tO9EcZ8BtVFdBOVE4Ud6o8SU3U1Oo4QfM/ULdz0DwKA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=dk0xkJ/YuswTBFb+B7oeHafGMukZnGVYfXdb/BWBs2UN4GCxzDbeTHugLoQ12vuMZ
-	 hNByWIZ/RAT6pij/dPFfcr5gWqkTe8YbuMg3a5ATiWMA3nfHVc/bsgM0MI/tHFSkQA
-	 BTK80o29a9NNNhN/Qm+ZRDlG8I66IKCwxHhClLee1y6g2tlN5AbKX5Hy1f29lt4ELg
-	 9LX9TUiTQEF6ZwHiMHgmT/h/nKPq7PhC+w2DBF4b0ZjBjd3vwhq82zeMA1JNjzkrLR
-	 /rR6efiFyraMGeX0il4caWACSz7KAWvdCrSgyaV2P60ZuZDE8bIEKo97u6TiBaP3Rq
-	 jeC3YvlRqkg/A==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1x61pY-00000008UjF-3kD0;
-	Mon, 14 Sep 2026 08:14:25 +0000
-Date: Mon, 14 Sep 2026 09:14:24 +0100
-Message-ID: <865x086yhr.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Shuai Xue <xueshuai@linux.alibaba.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Wei-Lin Chang <weilin.chang@arm.com>,
-	Wang Han
- <wanghan@linux.alibaba.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Fuad Tabba <fuad.tabba@linux.dev>
-Subject: Re: [PATCH 0/4] KVM: arm64: Reduce overhead of full S2 teardown
-In-Reply-To: <8bf3f266-06fd-49e0-8de8-33c7a044e997@linux.alibaba.com>
-References: <20260912104834.3093878-1-maz@kernel.org>
-	<8bf3f266-06fd-49e0-8de8-33c7a044e997@linux.alibaba.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="qn7Y86S7"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2155F1570;
+	Mon, 14 Sep 2026 01:19:30 -0700 (PDT)
+Received: from [10.0.128.139] (unknown [10.0.128.139])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 347C73F7B4;
+	Mon, 14 Sep 2026 01:19:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1789373973; bh=m0ynvs3ASpXg1FC+68FV0PXhWfrNCCs02XWVdpFI/DQ=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=qn7Y86S79uT/YwzISi20g2289oLffqODkAmnxFgB2/f7TGFSQH0pkD3Flpjb9goCV
+	 JVxc5wzSGZPvwfsvk8giDVPvJZb6nSQiZf9vHgvAswACRxWTw5hI/Q8OEqEP2oUPT0
+	 WdpXR2joVP3TKazZtFh5ODPYF2WekqdLue2DS+xI=
+Message-ID: <1fca136f-5802-449a-81f1-3a76c31a2f74@arm.com>
+Date: Mon, 14 Sep 2026 09:19:29 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: xueshuai@linux.alibaba.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, weilin.chang@arm.com, wanghan@linux.alibaba.com, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, fuad.tabba@linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v18 4/7] firmware: arm_rmm: Add support for SRO
+Content-Language: en-GB
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: maz@kernel.org, will@kernel.org, catalin.marinas@arm.com,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org,
+ joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
+ linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
+ sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
+ WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com
+References: <20260912083611.2513845-1-suzuki.poulose@arm.com>
+ <20260912083611.2513845-5-suzuki.poulose@arm.com>
+ <f00d01d1-8df0-4865-8e52-c85171cf4ca5@redhat.com>
+ <4f18aa66-2296-4b63-87f5-6ab493faecbc@arm.com>
+In-Reply-To: <4f18aa66-2296-4b63-87f5-6ab493faecbc@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, 14 Sep 2026 07:44:15 +0100,
-Shuai Xue <xueshuai@linux.alibaba.com> wrote:
+On 14/09/2026 07:22, Suzuki K Poulose wrote:
+> Hi Gavin
+> 
+> Thank you for the review, I will address most of them. Responses inline.
+> 
+> On 14/09/2026 06:04, Gavin Shan wrote:
+>> On 9/12/26 6:36 PM, Suzuki K Poulose wrote:
+>>> RMM v2.0 introduces the concept of "Stateful RMI Operations" (SRO). This
+>>> means that an SMC can return with an operation still in progress. The
+>>> host is expected to continue the operation until it reaches a conclusion
+>>> (either success or failure). During this process the RMM can request
+>>> additional memory ('donate') or hand memory back to the host
+>>> ('reclaim'). The host can request an in progress operation is cancelled,
+>>> but still continue the operation until it has completed (otherwise the
+>>> incomplete operation may cause future RMM operations to fail).
+>>>
+>>> The SRO is tracked using a struct rmi_sro_state object which keeps track
+>>> of any memory which has been allocated but not yet consumed by the RMM
+>>> or reclaimed from the RMM. This allows the memory to be reused in a
+>>> future request within the same operation. It will also permit an
+>>> operation to be done in a context where memory allocation may be
+>>> difficult (e.g. atomic context) with the option to abort the operation
+>>> and retry the memory allocation outside of the atomic context. The
+>>> memory stored in the struct rmi_sro_state object can then be reused on
+>>> the subsequent attempt.
+>>>
+>>> Wrappers for SRO RMI commands are also provided here because they depend
+>>> on the rmi_sro_execute() implementation added by this patch.
+>>> Delegate/undelegate handles are also added here because they now use the
+>>> SRO/stateful command infrastructure and are also used for the memory
+>>> DONATE/RECLAIM flows.
+>>>
+>>> Signed-off-by: Steven Price <steven.price@arm.com>
+>>> Co-Developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 > 
 > 
 > 
-> On 9/12/26 6:48 PM, Marc Zyngier wrote:
-> > Tearing down a full S2 is a pretty involved process, resulting in a
-> > lot of TLB invalidation. These TLBIs are either on a per leaf basis if
-> > the HW doesn't support range invalidation, or by top-level range if it
-> > does. Amusingly, the latter occurs even when nothing has been
-> > unmapped.
-> > 
-> > Things are made worse with NV, as we have a bucket-load of shadow S2s,
-> > and the need to invalidate them all on the back of an MMU notifier.
-> > The latter will eventually be solved by the reverse-map tracking that
-> > Wei-Lin is working on, but we need to be better at full-S2 teardown.
-> > 
-> > This small series adds a "no TLBI" unmapping primitive, which allows
-> > the caller to then whack the TLBs using a VMID-wide invalidation. This
-> > results in far fewer TLBIs, and a better recursive virtualisation as
-> > we get far fewer traps as a consequence.
-> > 
-> > This applies on top of my shadow-s2 lifetime fixes, and is expected to
-> > be a prefix to Wei-Lin's series.
-> > 
-> > Marc Zyngier (4):
-> >    KVM: arm64: pgtable: Add Stage-2 unmap without TLBI primitive
-> >    KVM: arm64: MMU: Add kvm_stage2_unmap_all() helper
-> >    KVM: arm64: nv: Move full s2_mmu unmap over to kvm_stage2_unmap_all()
-> >    KVM: arm64: nv: Move TLBI VMALLS12E1* emulation over to
-> >      kvm_stage2_unmap_all()
-> > 
-> >   arch/arm64/include/asm/kvm_mmu.h     |  1 +
-> >   arch/arm64/include/asm/kvm_pgtable.h | 17 +++++++++++++
-> >   arch/arm64/include/asm/kvm_pkvm.h    |  1 +
-> >   arch/arm64/kvm/hyp/pgtable.c         | 38 +++++++++++++++++++++-------
-> >   arch/arm64/kvm/mmu.c                 | 15 +++++++++++
-> >   arch/arm64/kvm/nested.c              |  4 +--
-> >   arch/arm64/kvm/pkvm.c                |  2 ++
-> >   arch/arm64/kvm/sys_regs.c            | 18 ++++++-------
-> >   8 files changed, 75 insertions(+), 21 deletions(-)
-> > 
+>>> ---
+>>>   drivers/firmware/arm_rmm/rmi.c | 586 +++++++++++++++++++++++++++++++++
+>>>   include/linux/arm-rmi-cmds.h   |  41 +++
+>>>   2 files changed, 627 insertions(+)
+>>>
+>>> diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/ 
+>>> arm_rmm/rmi.c
+>>> index 5b0e342ce3d58..4f9898ece7547 100644
+>>> --- a/drivers/firmware/arm_rmm/rmi.c
+>>> +++ b/drivers/firmware/arm_rmm/rmi.c
 > 
+>>
+>> I would drop rmi_granule_range_{delegate, undelegate}() by combining 
+>> their logics to
+>> their only callers rmi_{delegate, undelegate}_range(). More details 
+>> are provided for
+>> rmi_{delegate, undelegate}_range() in the below.
 > 
-> Hi Marc,
-> 
-> Thanks for putting this series together. I reviewed the four patches
-> and revisited the traces from my earlier Marc-only tests.
-> 
-> I have a correctness concern about child page-table reclamation.
->
+> Ack
 
-You? Or your AI model? I'd really expect you to explain *your*
-perception of the problem rather than dumping the result of your AI in
-an email.
+I have moved them closer, but kept the logic separate, since this is not
+a simple RMI call.
 
-> 1. Child page-table reclamation before the final TLBI
-> 
-> In patch 1, SKIP_S2_TLBI suppresses invalidation for both leaf and table
-> descriptors, while stage2_unmap_walker() still immediately releases
-> empty child tables.
+Cheers
+Suzuki
 
-What is a "child" table?
-
-> 
-> For a child table with page_count(childp) == 1, the sequence is:
-> 
->   stage2_unmap_walker()
->     stage2_unmap_put_pte()
->       clear the parent table descriptor
->       skip its TLBI
->     mm_ops->put_page(childp)
->       kvm_s2_put_page()
->         put_page()              /* drop the child's last reference */
-> 
->   ... process the remaining address ranges ...
-> 
->   __kvm_tlb_flush_vmid()         /* final invalidation in patch 2 */
-> 
-> This path does not use the free_unlinked_table()/call_rcu() deferred
-> reclamation mechanism. The existing deferred-range-TLBI path still
-> invalidates table descriptors immediately; the new flag skips that
-> invalidation too.
-
-And? What is the actual problem here?
-
-> 
-> Patch 4 provides a caller operating on active shadow MMUs:
-> kvm_s2_mmu_iterate_by_vmid() holds mmu_lock for write and visits valid
-> matching shadow MMUs, but does not require refcnt == 0 or wait for
-> other vCPUs using the MMU to exit.
-
-Of course it doesn't, since this is simply emulating an instruction
-local to that vcpu. How would the actual HW "wait" for another CPU to
-stop using a set of translation?
-
-> 
-> Another vCPU can therefore still use that shadow S2. The write lock
-> excludes software page-table updates, not hardware table walks.
-> The following interleaving is allowed:
-> 
->   vCPU B / hardware walker        vCPU A
->   ------------------------        ----------------------------
->   Holds an old reference to T
->                                   Clears parent, skips TLBI
->                                   Drops T's last reference
->                                   T is reused by the allocator
->   Accesses T via the old reference
->                                   Performs final VMID-wide TLBI
->
-> The final flush barriers cannot retroactively protect a table that
-> has already been freed and reused.
-
-T is a shadow page-table page on the host. How can vcpu B hold a
-reference on that page? It isn't even in the same address space.
-
-Now, I can see that B could have a VA that *translate through* T, and
-that's rather annoying.
-
-I'll have a think.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
