@@ -1,181 +1,84 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 321C42FF675;
-	Mon, 14 Sep 2026 14:02:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mta0.migadu.com (out-87.mta0.migadu.com [91.218.175.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A28E3FD14F
+	for <kvmarm@lists.linux.dev>; Mon, 14 Sep 2026 14:28:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789394559; cv=none; b=fD+SWYx/I7wDem19nSHdtoIe8ugiP/JRUtYzaeVzVIzUL9VYhzAxe19xkj1rBlzN6vCB1BhBI71M/OzYgCRFmsmoB0B1limweMMuIp3c8asxaSIgYaMzo/+LEBIpjwJ5odzol3F/8QMIJUrQsj0WoCIOOT8ChE4OpdQbWrfQnpA=
+	t=1789396124; cv=none; b=iYd5eo0uof2N5m+WIzdQga/fFWAOdt9JqgN8w3Dv+aO5viCzeHSNoZ4Ubc1FvwMQkbz0z2QTFQfw+SBv81mTz8/47lyGhmc5Fkx3ZBh2jsHmSgP67wqt17aJ1Cpbbkcsbg67eybW/Hj43CYQDEo5+g75lzSKslLTcLTXVreW0C4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789394559; c=relaxed/simple;
-	bh=DFYtcB/Oi+25lkKqGHoqBfdSqnw6tByCRDZwTC/jjuI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MudTkFx9rufgmon/UmKGuSlUhzUB4fPjdrjIsOqZ+/8B2VwUxnO3WVZok/gBw61ZmTttPJELzOqQ4rOkQJC00b1OrP2qPGsP5JY4kqqxsxMhmIh4TtpFebUI1do2cpEPPhKuo3vcK7UDliL9j/R+Yus+xlfAoxuk8pGCb9iArW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=J2DNkFqm; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1789396124; c=relaxed/simple;
+	bh=CvmNfEBAQ89tGOMK7DQaeSfQgbqSiZwv8fzSb0HT698=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Wh8+2pMmrwSFLWpFM9hnsBvAGbYv9Ekq+EhoG094JLrO33zT6Btkr60OWQzIPO5uGzA2TTL7f+Ls8T7XXFs9QGc1NQ6G+uStsZIAFqB8S7mFwEB9WDChLLfadfQsFY+3CR+AAWOPbMeYf/FD2gWGkCS59+3fsFmSIaYCXXnM0Ic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Q+sm65BY; arc=none smtp.client-ip=91.218.175.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="J2DNkFqm"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DE99B1570;
-	Mon, 14 Sep 2026 07:02:31 -0700 (PDT)
-Received: from [10.0.128.139] (unknown [10.0.128.139])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 46F533F882;
-	Mon, 14 Sep 2026 07:02:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1789394555; bh=DFYtcB/Oi+25lkKqGHoqBfdSqnw6tByCRDZwTC/jjuI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=J2DNkFqmdAiXns7yDGCaFHwY8+MPmxxjgt9Snm1UwvQlYakyn6BB2oxIq1rBTjCIH
-	 FdEDRRxKwxS1Jcc6S1Sxuh21VJWfmDFFXBO9vsG8aT15x4/yCn7US+Qkxxo0jiZqy4
-	 Y2hcEdw0cSqvDxWgRPcZlKLynkxxaLcdLy5rGLfY=
-Message-ID: <657e69c2-d0e9-433a-b0d2-4f16bc94ee2c@arm.com>
-Date: Mon, 14 Sep 2026 15:02:30 +0100
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Q+sm65BY"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=CvmNfEBAQ89tGOMK7DQaeSfQgbqSiZwv8fzSb0HT698=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1789396118; v=1; x=1790000918;
+ b=Q+sm65BYCpGooXscDYjdG5dewdkLl3IVXoXuTcHtVzQF3PsawESAUc5fF046qkEJylKsyBzH
+ CntQqKTblmLzHRfji0AYUDhliPTc37dKxwutd/H297bgRfCANIP2iiw+MDx9mYOmURz1hVH7zqI
+ vbhBg6giZCN72XK+ZO4ohvO8=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id ad2d359a31b87417;
+	Mon, 14 Sep 2026 14:28:38 +0000
+X-Mizu-Trace-ID: ad2d359a31b87417
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b4a0b384b7so8520e87.0
+        for <kvmarm@lists.linux.dev>; Mon, 14 Sep 2026 07:28:35 -0700 (PDT)
+X-Gm-Message-State: AFuF++klM3veTHncnOYQiJb1EqdSFuzgYr1eEy0/mNUa99fpcKtZwYgU
+	W7ZRCL7yK0eG+ge2L2Blcz5K+azq5vQth+C1qVKvE8yfUuaUbZq/zFuTF1igG9nvQuEQD6cSoME
+	kEQCwf9RUJsmekDAvewRQ6+58KoeQ5UxUal4fyEN8
+X-Received: by 2002:a05:6512:118a:b0:5b6:4ad:d6ba with SMTP id
+ 2adb3069b0e04-5b8af7bc5c0mr71769e87.15.1789396114627; Mon, 14 Sep 2026
+ 07:28:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v18 4/7] firmware: arm_rmm: Add support for SRO
-Content-Language: en-GB
-To: Sudeep Holla <sudeep.holla@kernel.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
- will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
- aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
- joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
- linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
- sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
- WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com
-References: <20260912083611.2513845-1-suzuki.poulose@arm.com>
- <20260912083611.2513845-5-suzuki.poulose@arm.com>
- <20260914-talkative-healthy-pogona-334c03@sudeepholla>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20260914-talkative-healthy-pogona-334c03@sudeepholla>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20260914113338.159227-1-fuad.tabba@linux.dev> <20260914113338.159227-7-fuad.tabba@linux.dev>
+ <20260914134258.9A5B21F000FF@smtp.kernel.org>
+In-Reply-To: <20260914134258.9A5B21F000FF@smtp.kernel.org>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Mon, 14 Sep 2026 15:27:57 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTzGLLQCDgtiFnmSaLa+FaCXe9mpV8Dv=YQFSTgzZJOKng@mail.gmail.com>
+X-Gm-Features: AcwNN1Uf6gkXjrF04VkdmyLvncwzRoQVaTVrUEmF0X0QpCHkyW8BHKoHTdDRSes
+Message-ID: <CA+EHjTzGLLQCDgtiFnmSaLa+FaCXe9mpV8Dv=YQFSTgzZJOKng@mail.gmail.com>
+Subject: Re: [PATCH v3 06/18] KVM: arm64: Skip fixed-feature state flush for
+ protected vCPUs
+To: sashiko-reviews@lists.linux.dev
+Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>, 
+	Marc Zyngier <maz@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On 14/09/2026 13:50, Sudeep Holla wrote:
-> On Sat, Sep 12, 2026 at 09:36:07AM +0100, Suzuki K Poulose wrote:
->> RMM v2.0 introduces the concept of "Stateful RMI Operations" (SRO). This
->> means that an SMC can return with an operation still in progress. The
->> host is expected to continue the operation until it reaches a conclusion
->> (either success or failure). During this process the RMM can request
->> additional memory ('donate') or hand memory back to the host
->> ('reclaim'). The host can request an in progress operation is cancelled,
->> but still continue the operation until it has completed (otherwise the
->> incomplete operation may cause future RMM operations to fail).
->>
->> The SRO is tracked using a struct rmi_sro_state object which keeps track
->> of any memory which has been allocated but not yet consumed by the RMM
->> or reclaimed from the RMM. This allows the memory to be reused in a
->> future request within the same operation. It will also permit an
->> operation to be done in a context where memory allocation may be
->> difficult (e.g. atomic context) with the option to abort the operation
->> and retry the memory allocation outside of the atomic context. The
->> memory stored in the struct rmi_sro_state object can then be reused on
->> the subsequent attempt.
->>
->> Wrappers for SRO RMI commands are also provided here because they depend
->> on the rmi_sro_execute() implementation added by this patch.
->> Delegate/undelegate handles are also added here because they now use the
->> SRO/stateful command infrastructure and are also used for the memory
->> DONATE/RECLAIM flows.
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> Co-Developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> 
-> [...]
-> 
->> +static int rmi_sro_donate_noncontig(struct rmi_sro_state *sro,
->> +				    unsigned long sro_handle,
->> +				    unsigned long donatereq,
->> +				    struct arm_smccc_1_2_regs *out_regs,
->> +				    gfp_t gfp)
->> +{
->> +	unsigned long block_size_fld = RMI_DONATE_BLOCK_SIZE(donatereq);
->> +	unsigned long block_size = rmi_addr_block_size_to_bytes(block_size_fld);
->> +	unsigned long count = RMI_DONATE_COUNT(donatereq);
->> +	unsigned long state = RMI_DONATE_STATE(donatereq);
->> +	unsigned long found = 0;
->> +	unsigned long donated_granules;
->> +	unsigned long granules_per_block = block_size >> PAGE_SHIFT;
->> +	unsigned long consumed_blocks;
->> +	int addr_list_start = sro->addr_count;
->> +
->> +	int ret;
->> +
->> +	for (int i = 0; i < addr_list_start && found < count; i++) {
->> +		unsigned long entry = sro->addr_list[i];
->> +
->> +		if (RMI_ADDR_RANGE_BLOCK_SIZE(entry) == block_size_fld &&
->> +		    RMI_ADDR_RANGE_COUNT(entry) == 1 &&
->> +		    RMI_ADDR_RANGE_STATE(entry) == state) {
->> +			addr_list_start--;
->> +			swap(sro->addr_list[addr_list_start],
->> +			     sro->addr_list[i]);
->> +			found++;
->> +			i--;
->> +		}
->> +	}
->> +
->> +	ret = rmi_sro_ensure_capacity(sro, count - found);
->> +	if (ret)
->> +		return ret;
->> +
->> +	while (found < count) {
->> +		unsigned long addr_range;
->> +		void *virt = alloc_pages_exact(block_size, gfp);
->> +		phys_addr_t phys;
->> +
->> +		if (!virt)
->> +			return -ENOMEM;
->> +
->> +		phys = virt_to_phys(virt);
->> +
->> +		if (state == RMI_OP_MEM_DELEGATED) {
-> 
-> Based on my understanding, rmi_sro_memxfer_execute() is an exported function
-> and can be invoked by any module. The donatereq argument appears to accept one
-> of three operations:
-> 
-> RMI_OP_MEM_DELEGATED
-> RMI_OP_MEM_UNDELEGATED
-> RMI_OP_MEM_CONDITIONAL
+On Mon, 14 Sept 2026 at 14:43, <sashiko-bot@kernel.org> wrote:
+>
+> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
+> - [Critical] Early return in `flush_debug_state` leaves the protected guest's `debug_owner` as `VCPU_DEBUG_FREE`, completely bypassing hardware debug register context switching and exposing host physical debug registers to the guest.
 
-Ack
+Same finding as on v2, same answer.
 
-> 
-> Currently, the check confirming the state is RMI_OP_MEM_DELEGATED occurs
-> relatively late in the function execution. It seems this function is
-> explicitly designed to handle only RMI_OP_MEM_DELEGATED.
+[...]
+> [Severity: Critical]
+> Does this early return leave the protected guest's debug_owner as
+> VCPU_DEBUG_FREE (its zero-initialized value) instead of synchronizing it?
+> This could bypass hardware debug register context switching, potentially
+> exposing host physical debug registers to the guest.
+[...]
+> [Severity: Critical]
+> By moving the mdcr_el2 copy into the non-protected branch, does the protected
+> guest retain the EL2-computed mdcr_el2 where TDA is deliberately cleared?
 
-No, that is not correct. The function handles both OP_MEM_DELEGATED and
-OP_MEM_UNDELEGATED. In the former case, we explicitly "delegate" the
-pages before donating. The "UNDELEGATED" case doesn't need to do that
-extra step.
+The EL2-computed mdcr_el2 has TDA and TDRA set: a protected VM's
+DebugVer is NI, so pvm_init_traps_mdcr() sets both and the guest's
+debug register accesses trap. Keeping that value rather than the
+host's is what this patch is for.
 
-> 
-> Given that this is an exported interface, would it make sense to
-> fail-fast by moving this validation to the very beginning of the function?
-> Even if RMI_OP_MEM_CONDITIONAL is intended for future use, it should
-
-Yep, agree. We can rejec the CONDITIONAL ones.
-
-> probably be rejected as invalid for now. Also, it is not clear why the
-> current check is inside the loop while the state itself doesn't get
-> modified.
-
-As above, that check is additionally preparing the memory for RMM
-consumption.
-
-
-> 
-> If this is a valid concern, the same architectural pattern should likely be
-> applied to rmi_sro_donate_contig().
-> 
-
-Ack, we can reject the CONDITIONAL ones.
-
-Suzuki
-
+/fuad
