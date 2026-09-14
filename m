@@ -1,112 +1,89 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta0.migadu.com (out-126.mta0.migadu.com [91.218.175.126])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E575B35DA6E
-	for <kvmarm@lists.linux.dev>; Mon, 14 Sep 2026 08:13:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2FD33E7635
+	for <kvmarm@lists.linux.dev>; Mon, 14 Sep 2026 08:13:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.126
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789373625; cv=none; b=n/zEEHrR3bp9cgomWwVtnrenwaJF5eJkh8yrGl7K7wFV4FzulvCnOl2l7Yx+VTH8swLIMWc36aUGqj2O1kR7IOeVD0I3BDwe8WIoBflFYAth6QZ4ZRNpVWbY0QB5mdAD51g4gCC+Gd8L2Yd639HKSBwU2fBCy13y9IL0VVwX/ts=
+	t=1789373641; cv=none; b=LdPs0WSLUYGDbpklB3lzuAhknbZRo3BeZ2ECOulXCB94neg930Jhn/3ZOesHW4X3oMPs0GijpJaEOCmP4otzrmjyLuuqlSLZ8xj3eqImzsFaRPU1Ry8MO8hUAJuSunTZq4IJS3q+kdfy7jqC34B4iXpH78317cd4kNWbXYcvx2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789373625; c=relaxed/simple;
-	bh=3332vYASxIEtO54QWddAOWYU9gaD3TwuCQjW/OMCQJA=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=YGXWln1YOa7xUat8wjT+84QOxi5DzQQa+8faZD5K+73KwNGO8di8vvq7BtYz9hv8aHw/RquxH3ymHJ+xetwAkC9gipC+Z7pOY9qlCmynRZHy1vkrmTtFDx8fMWRzRR8xS7JbvfxO1m/CY4G2MqAzaF9pyNJskoPQcPAJLkGMTzw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cb8320s6; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789373641; c=relaxed/simple;
+	bh=Ti/1G47FS/EQWMQAM+XxbuqCWRXpU8JeCwn0rHreoas=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Stwqrr//Ptgdm1IZjqneeqaj5UapOasui2Q2S91zpoDcdr+Gi+cMrjKe6T71b8zG6OUdjyEBzfEsc3Tg/oZx7/8gP/2w3OCNJ2VuYFGpCGFgG5jmuJ9azoOmH7rtVQOdPXQQP+EDTWFF3KsY6T1VUFfAkdVuC0q4zMH0jzu5qYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=DPnw6wFB; arc=none smtp.client-ip=91.218.175.126
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cb8320s6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FF891F000FF;
-	Mon, 14 Sep 2026 08:13:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789373623;
-	bh=oTpgFyyPUfkT/qKJ0CS/w03C/SIV/FYMCPELU9kBEJM=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=cb8320s6MG3ghssyKi3XqTZxvVOdA+LSwlueOmUvuiSjED1YvrA/oZa36YOsWUV4L
-	 iaTniDrkPTzraHvgfaqj0hX/uGY4Y6djnq6jM/OMeuXBwoxr6ZMPyusUQcHuG7TDMr
-	 kxUeBvm7HXuYDNI2iJNEQK9QH22bhFU0egjYYqZxgxSgQ7aXc3cuyy1RPgsjaC3g1/
-	 SnVsubrxd2szRhGE2yroYdwZua2L8kNEyjI6RJo/0ObSWixtufu3Gft+B94+B8pCAx
-	 9ZeJzDuew4XHRyXGRV+SRT44W7ZPWrEB8qkgB49f0QYxPOUCfQEB2/oEWb88DW8JzD
-	 MnQ8n28n+3UtA==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2] KVM: arm64: Fix protected VM fault on system with
- pages larger than 4K
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Vincent Donnefort" <vdonnefort@google.com>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260914075839.4019904-1-vdonnefort@google.com>
-References: <20260914075839.4019904-1-vdonnefort@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 14 Sep 2026 08:13:42 +0000
-Message-Id: <20260914081343.4FF891F000FF@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="DPnw6wFB"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=Ti/1G47FS/EQWMQAM+XxbuqCWRXpU8JeCwn0rHreoas=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1789373638; v=1; x=1789978438;
+ b=DPnw6wFBDqYmbpOeDZ6VeQNdBDM7/bnBeNwisFl/PhKirfhzwOPo1uUH6D/p84yw4QR6bURg
+ HEOgs+uY7ik7x5uJfKzImvoz6xIZ6BcGBIlNOuusbhUCXhF7vG84sBRYNMw5W2fXV7nLS+Ire/I
+ jGHMkxt2tlTOcoA+sKNzXiwg=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 724d3f8055b7a3a2;
+	Mon, 14 Sep 2026 08:13:48 +0000
+X-Mizu-Trace-ID: 724d3f8055b7a3a2
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b4a0b384b7so5625e87.0
+        for <kvmarm@lists.linux.dev>; Mon, 14 Sep 2026 01:13:47 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBzplQcvcRTKrN3o4I0HHK6wpP9M3LzNVvnaDSR0JGKXW3D6DcE/8X/FFiAaWcM3MKuUgK52GXY=@lists.linux.dev
+X-Gm-Message-State: AFuF++n/G9E87KWFHQhthbgMJu6wLQcWg4u2HBdA7Ho6ywkBTFnqCjbq
+	O6JEImyptR0EU2GcXoSADlp3J0USBpmudsFgrwBMfgbh+OUATAqWIu1jdapSMMOnqA39auuhBS5
+	cTbklCdgP+aKKREt0CZ7nSmfe/IhxHHO2b5u9k1GP
+X-Received: by 2002:a05:6512:6205:b0:5ae:cf5f:4a88 with SMTP id
+ 2adb3069b0e04-5b8ae4b243cmr24745e87.8.1789373626863; Mon, 14 Sep 2026
+ 01:13:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+References: <20260914065136.3418404-1-fuad.tabba@linux.dev> <20260914070536.877D91F000FF@smtp.kernel.org>
+In-Reply-To: <20260914070536.877D91F000FF@smtp.kernel.org>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Mon, 14 Sep 2026 09:13:10 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTyjXoxb6gZO4+X_cDh+z6e9cY75nZGsWFeOAOvBp+D0bg@mail.gmail.com>
+X-Gm-Features: AcwNN1UbQngGq-eYS1JXmeVvwbf0ZeR8W8FV59mmOoiAMGh32I9FP1sww3CFOi0
+Message-ID: <CA+EHjTyjXoxb6gZO4+X_cDh+z6e9cY75nZGsWFeOAOvBp+D0bg@mail.gmail.com>
+Subject: Re: [PATCH] KVM: arm64: Pin the host vCPU before adjusting its PC
+ under pKVM
+To: sashiko-reviews@lists.linux.dev
+Cc: Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
+	Marc Zyngier <maz@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [High] The patch incorrectly maps the guest PA (L1 IPA) instead of the gu=
-est IPA (L2 IPA) in the shadow stage-2 page tables for nested VMs in `gmem_=
-abort()`.
---
+Sashiko, this one pierced.
 
-commit 3995ce8aa44bf10fe23cdc5e9257510868df129d
-Author: Vincent Donnefort <vdonnefort@google.com>
+[...]
 
-KVM: arm64: Fix protected VM fault on system with pages larger than 4K
+> [Severity: Critical]
+> This is a pre-existing issue, but does this create a double-fetch (TOCTOU)
+> vulnerability that allows the host kernel to leak arbitrary EL2 memory?
 
-This commit aligns the fault IPA down to the page-size for protected VMs to
-fix boot issues on systems with larger than 4K pages. It updates
-pkvm_pgtable_stage2_map() to require page-aligned arguments and changes the
-callers to pass gfn_to_gpa(gfn) instead of the raw fault_ipa.
+[...]
 
-Link: https://lore.kernel.org/all/20260913173516.3122436-1-vdonnefort@googl=
-e.com/
+> If that bit is set, it updates the PSR_TCO_BIT in the vCPU's CPSR, which gets
+> written back to host-accessible memory in host_vcpu->arch.ctxt.regs.pstate. By
+> shifting the base address and observing the result, the host could leak
+> EL2-private or protected guest memory bit by bit.
 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 9ba86450fe4af..ee78201a44df1 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1672,10 +1672,10 @@ static int gmem_abort(const struct kvm_s2_fault_d=
-esc *s2fd)
->  		 * PTE, which will be preserved.
->  		 */
->  		prot &=3D ~KVM_NV_GUEST_MAP_SZ;
-> -		ret =3D KVM_PGT_FN(kvm_pgtable_stage2_relax_perms)(pgt, s2fd->fault_ip=
-a,
-> +		ret =3D KVM_PGT_FN(kvm_pgtable_stage2_relax_perms)(pgt, gfn_to_gpa(gfn=
-),
->  								 prot, flags);
->  	} else {
-> -		ret =3D KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, s2fd->fault_ipa, PAGE_=
-SIZE,
-> +		ret =3D KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, gfn_to_gpa(gfn), PAGE_=
-SIZE,
->  							 __pfn_to_phys(pfn), prot,
->  							 memcache, flags);
->  	}
+The read in enter_exception64() is unvalidated on both paths. With a
+hyp vCPU loaded, the handler adjusts the host copy and nothing checks
+host_vcpu->kvm at all, so no race is needed. On the unloaded path the
+pin in this patch narrows the window rather than opening it. What
+leaks is one bit per probe (bit 1 of the word at a host-chosen hyp
+linear address, through PSR_TCO) on MTE-capable hardware, or a hyp
+panic on an unmapped address.
 
-[Severity: High]
-Does this change break nested virtualization by mapping the guest PA (L1 IP=
-A)
-instead of the faulting guest IPA (L2 IPA)?
+I'll send a v2 with a separate patch ahead of this one that gets the
+VM through a get/put pair at the read site, and drop the VM pin from
+this patch, since it then has nothing to protect.
 
-For nested VMs handled in gmem_abort(), gfn represents the L1 IPA. By
-switching from s2fd->fault_ipa to gfn_to_gpa(gfn) in both
-kvm_pgtable_stage2_relax_perms() and kvm_pgtable_stage2_map(), the shadow
-stage-2 page tables now incorrectly install the mapping at the L1 IPA inste=
-ad
-of the expected L2 IPA.
-
-This results in the L2 guest continuously faulting at the same L2 IPA, lead=
-ing
-to an infinite fault loop (DoS for the nested guest) and shadow page table
-corruption.=20
-
-[ ... ]
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260914075839.4019=
-904-1-vdonnefort@google.com?part=3D1
+Cheers,
+/fuad
