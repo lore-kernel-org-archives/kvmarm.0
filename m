@@ -1,244 +1,99 @@
-Received: from esa12.hc1455-7.c3s2.iphmx.com (esa12.hc1455-7.c3s2.iphmx.com [139.138.37.100])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D25E3EFFCC
-	for <kvmarm@lists.linux.dev>; Mon, 14 Sep 2026 07:31:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.138.37.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65E8C81724;
+	Mon, 14 Sep 2026 07:44:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789371083; cv=none; b=ZspzFrEBNlrWxhUG+PMcheyXcwt1XIsFhhoH2kqGWf906R1GYEUVFqEc75rmPcwdDtrIkSkQAD/hyEWoWUv+Dggl6mqAgYl7I7E1Y9AHoM53c/+5Hl/+FSApsl+SPJOBHz1ovo/QNbw8Pz0wwYblzlUcKbXcff4LCGMHogEkTmU=
+	t=1789371846; cv=none; b=XB9F6gxK9sAPg3XkVCfyEwSd4zk1TwuYyEAZSM63tq+lN9lymCJPV0YKCKFh4uCz1pDEGnOecNgijJxG+d1FFpz6V3lpW4M0ammg42i3ndZ/2sbVu4ZdK3bw4dqD/xaUDzZtDPoSjWOj1TqcAoPh9h9JmcOu+lZmaAQttsPXu54=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789371083; c=relaxed/simple;
-	bh=D/w0Nd7mMBMXBwcmirCSoGgamOmcMh+0zKgJNohHTyU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=P1x/y/4/ExtVLShtjcnHmTfHS7sjc0S5GJssu7ZY8M+nvLNvEGxNr0r2C/oRa78Hn6wNKS7pMeNiRp2KlCddXTJ4NqnQbaTV0wznOvZgLn5R3KxUwtXjqpPLjCIj4bf3Bq9IgB9VKb3M/2HAu70JLBbaOe3+rZdRnr1sY6lJxZo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=JbgYu0lx; arc=none smtp.client-ip=139.138.37.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
+	s=arc-20240116; t=1789371846; c=relaxed/simple;
+	bh=LPv6WKphIl01nIpZXcRte1gWv7DmEQhxm2gkpyDARrA=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=nmHLWoq/5F14maRBZDyAJAUeg413hhD4sB0v2VcY5rnvZCgSNtiKV8nF+++A5DB14vrZPEGuHN1mNz0x8Co5WeFujsMpDcIoi0kF+YDvRzUl8R9h+O7jhPwF8sOG8JqQtDwewlNTax11Q7N6USZxdR7rqrNCzpLpXo4T/lCGGcM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DnHEbkbR; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="JbgYu0lx"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
-  t=1789371081; x=1820907081;
-  h=from:date:subject:mime-version:content-transfer-encoding:
-   message-id:references:in-reply-to:to:cc;
-  bh=D/w0Nd7mMBMXBwcmirCSoGgamOmcMh+0zKgJNohHTyU=;
-  b=JbgYu0lxkTvxebDMPDMggUJEpZvFIXEAL9LWJaNtfFsE/K6o1GMhpYN0
-   gYf3AXyHJoCagm6lcgxtjekNNIAPo16xnabZ3o2WghBX7gIodxKJnj7pz
-   +JiLB8TmynXFU6CZ8zHsSF44ShkDKt6aZKA8JkksTStvFTu3TCepi9Jqz
-   /roq0YMFD8h3YdDt8FEeEgyUSgpHXHCDPkUgO34t6pbHGqKIRjgqP5mH3
-   /ix80YDUCz60Pg3N3a7K765VvpqMe//3G1qkC8v2Lz3pfuTF8l0d7UPqS
-   NJas+uC4bx+R4mWxUFWgl5+GPc0YMbszvDCozpaQ2cuPcibjTl5pzPLV/
-   w==;
-X-CSE-ConnectionGUID: SLepyXvPTTKtRf4v0vHkHQ==
-X-CSE-MsgGUID: lTpsYhOvTL2CCfcU0tmQRA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11904"; a="232694195"
-X-IronPort-AV: E=Sophos;i="6.27,102,1786978800"; 
-   d="scan'208";a="232694195"
-Received: from gmgwnl01.global.fujitsu.com ([52.143.17.124])
-  by esa12.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2026 16:31:19 +0900
-Received: from az2nlsmgm3.fujitsu.com (unknown [10.150.26.205])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by gmgwnl01.global.fujitsu.com (Postfix) with ESMTPS id A53BE1000370
-	for <kvmarm@lists.linux.dev>; Mon, 14 Sep 2026 07:31:19 +0000 (UTC)
-Received: from az2nlsmom2.o.css.fujitsu.com (unknown [10.150.26.200])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by az2nlsmgm3.fujitsu.com (Postfix) with ESMTPS id 538BF18019AE
-	for <kvmarm@lists.linux.dev>; Mon, 14 Sep 2026 07:31:19 +0000 (UTC)
-Received: from [127.0.1.1] (unknown [10.124.178.20])
-	by az2nlsmom2.o.css.fujitsu.com (Postfix) with ESMTP id 90E2A180012C;
-	Mon, 14 Sep 2026 07:31:13 +0000 (UTC)
-From: Itaru Kitayama <itaru.kitayama@fujitsu.com>
-Date: Mon, 14 Sep 2026 16:30:46 +0900
-Subject: [PATCH v2 3/3] KVM: arm64: selftests: Test 52-bit guest virtual
- addresses
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DnHEbkbR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D220E1F000FF;
+	Mon, 14 Sep 2026 07:44:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789371845;
+	bh=5P3hP3y9yVIlvg/iA2khdJEuM4+4ZoX7xT/j7z4g1ok=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=DnHEbkbRsyCB6wYVS5eLk1mqaj9h8UPbxxLDbfQl7RWclo3oFu1NRzbKuLca7JX3T
+	 NeyXv4U1kEmDwEeYsikG/bu40pmXY8dII5QSSsmgjQNhxbAxIptyx4gOBk17qK7Bov
+	 APPEg4jhvrJQOlEStN9tadacI8OT4k2yf0UvbmSpZ2DqVKnu1uOkzAGBopP3RO4l7M
+	 HMp3naxGBdxKJILmOUGDoO42kFi+I9AT/3WcTngyOafyDxdeBf/RUDiCC4d5zJpOPi
+	 XqylIQahZZt2gY/eSfLRAeH9nqYu+n4eDCbyXywov5d1SP77pqWR3j2IGq5Q9X3Cpq
+	 0vUo/O3gkMK5g==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v2 1/3] KVM: arm64: selftests: Support five-level
+ stage-1 page tables
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Itaru Kitayama" <itaru.kitayama@fujitsu.com>
+Cc: kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, kvm@vger.kernel.org, "Oliver
+ Upton" <oupton@kernel.org>
+In-Reply-To: <20260914-arm64-52bit-va-v2-1-3911cb9d4ad4@fujitsu.com>
+References: <20260914-arm64-52bit-va-v2-0-3911cb9d4ad4@fujitsu.com>
+ <20260914-arm64-52bit-va-v2-1-3911cb9d4ad4@fujitsu.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 14 Sep 2026 07:44:04 +0000
+Message-Id: <20260914074404.D220E1F000FF@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260914-arm64-52bit-va-v2-3-3911cb9d4ad4@fujitsu.com>
-References: <20260914-arm64-52bit-va-v2-0-3911cb9d4ad4@fujitsu.com>
-In-Reply-To: <20260914-arm64-52bit-va-v2-0-3911cb9d4ad4@fujitsu.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
- Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
- Steffen Eiden <seiden@linux.ibm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Zenghui Yu <yuzenghui@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, 
- Shuah Khan <shuah@kernel.org>, Sean Christopherson <seanjc@google.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
- kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Itaru Kitayama <itaru.kitayama@fujitsu.com>, 
- Takayuki Okamoto <tokamoto@fujitsu.com>
-X-Mailer: b4 0.16.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1789371056; l=4315;
- i=itaru.kitayama@fujitsu.com; s=20260825; h=from:subject:message-id;
- bh=D/w0Nd7mMBMXBwcmirCSoGgamOmcMh+0zKgJNohHTyU=;
- b=VA0ne9nO2NfJtWMm9NxCz3CmVr9fkGlNn8NDYp2vGUuIDTaOEeAvCHVW02A5c5d5QN+mOmvw6
- P533nSEpYopCtjYRq6O4Pb1k4WBfmehGom4eFkGDD9Sp51UzYxkxnBf
-X-Developer-Key: i=itaru.kitayama@fujitsu.com; a=ed25519;
- pk=g9bTnr9giRP7JwNSZHy+OMLQZBEUtSE9tUnXso0hH1Y=
 
-Exercise reads and writes through low and high guest virtual addresses
-in the 52-bit VA modes with 4K, 16K and 64K pages. Verify that mappings
-to the same GPA share data and mappings to distinct GPAs remain
-independent.
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [Low] The `type` array in `pte_dump` is missing the entry for P4D, causin=
+g it to print an empty string for level 0.
+--
 
-Signed-off-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
----
- tools/testing/selftests/kvm/Makefile.kvm     |   1 +
- tools/testing/selftests/kvm/arm64/lpa_test.c | 124 +++++++++++++++++++++++++++
- 2 files changed, 125 insertions(+)
+commit ec0c73a180f67ed464cb14e88f74413194ff828e
+Author: Itaru Kitayama <itaru.kitayama@fujitsu.com>
 
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index 96bab7002d39..1e9d059ffb24 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -179,6 +179,7 @@ TEST_GEN_PROGS_arm64 += arm64/hello_el2
- TEST_GEN_PROGS_arm64 += arm64/host_sve
- TEST_GEN_PROGS_arm64 += arm64/hypercalls
- TEST_GEN_PROGS_arm64 += arm64/external_aborts
-+TEST_GEN_PROGS_arm64 += arm64/lpa_test
- TEST_GEN_PROGS_arm64 += arm64/mmio_sign_ext
- TEST_GEN_PROGS_arm64 += arm64/page_fault_test
- TEST_GEN_PROGS_arm64 += arm64/psci_test
-diff --git a/tools/testing/selftests/kvm/arm64/lpa_test.c b/tools/testing/selftests/kvm/arm64/lpa_test.c
-new file mode 100644
-index 000000000000..8fe6f254db28
---- /dev/null
-+++ b/tools/testing/selftests/kvm/arm64/lpa_test.c
-@@ -0,0 +1,124 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Higher virtual addresses read/write test
-+ */
-+#include <test_util.h>
-+
-+#include "kvm_syscalls.h"
-+#include "kvm_util.h"
-+#include "ucall_common.h"
-+#include "guest_modes.h"
-+#include "processor.h"
-+
-+#define LOW_GVA		0xc0000000
-+#define HIGH_GVA (LOW_GVA | BIT(48))
-+
-+static void guest_code(void)
-+{
-+	u64 *low = (u64 *)LOW_GVA;
-+	u64 *high = (u64 *)HIGH_GVA;
-+
-+	WRITE_ONCE(*low, 1);
-+	GUEST_ASSERT_EQ(READ_ONCE(*high), 1);
-+	WRITE_ONCE(*high, 2);
-+	GUEST_ASSERT_EQ(READ_ONCE(*low), 2);
-+
-+	GUEST_SYNC(0);
-+
-+	asm volatile("dsb sy\n\t"
-+		     "tlbi vmalle1is\n\t"
-+		     "dsb sy\n\t"
-+		     "isb"
-+		     : : : "memory");
-+
-+	GUEST_SYNC(1); /* Host installs HIGH_GVA -> gpa_b. */
-+
-+	asm volatile("dsb sy\n\t"
-+		     "isb\n\t"
-+		     : : : "memory");
-+
-+	/* low and high map to different GPAs. */
-+	WRITE_ONCE(*low,  1);
-+	WRITE_ONCE(*high, 2);
-+
-+	/* Check both after both writes to detect accidental aliasing. */
-+	GUEST_ASSERT_EQ(READ_ONCE(*low),  1);
-+	GUEST_ASSERT_EQ(READ_ONCE(*high), 2);
-+
-+	/* Updating the low mapping must not change the high mapping. */
-+	WRITE_ONCE(*low, 3);
-+
-+	GUEST_ASSERT_EQ(READ_ONCE(*low),  3);
-+	GUEST_ASSERT_EQ(READ_ONCE(*high), 2);
-+
-+	GUEST_DONE();
-+}
-+
-+static void run_test(enum vm_guest_mode mode, void *arg)
-+{
-+	unsigned int *nr_tests = arg;
-+	struct kvm_vcpu_init init;
-+	struct kvm_vm *vm;
-+	struct kvm_vcpu *vcpu;
-+	struct ucall uc;
-+
-+	if (mode != VM_MODE_P52V52_4K &&
-+	    mode != VM_MODE_P52V52_16K &&
-+	    mode != VM_MODE_P52V52_64K)
-+		return;
-+
-+	vm = __vm_create(VM_SHAPE(mode), 1, 0);
-+	kvm_get_default_vcpu_target(vm, &init);
-+	vcpu = aarch64_vcpu_add(vm, 0, &init, guest_code);
-+	kvm_arch_vm_finalize_vcpus(vm);
-+
-+	vm_init_descriptor_tables(vm);
-+	vcpu_init_descriptor_tables(vcpu);
-+
-+	u64 gpa_a = vm_phy_pages_alloc(vm, 1, 0, 0);
-+	u64 gpa_b = vm_phy_pages_alloc(vm, 1, 0, 0);
-+
-+	virt_pg_map(vm, LOW_GVA, gpa_a);
-+	virt_pg_map(vm, HIGH_GVA, gpa_a);
-+
-+	for (;;) {
-+		vcpu_run(vcpu);
-+		switch (get_ucall(vcpu, &uc)) {
-+		case UCALL_DONE:
-+			goto done;
-+		case UCALL_ABORT:
-+			REPORT_GUEST_ASSERT(uc);
-+			break;
-+		case UCALL_SYNC:
-+			switch (uc.args[1]) {
-+			case 0:
-+				WRITE_ONCE(*virt_get_pte_hva(vm, HIGH_GVA), 0);
-+				break;
-+			case 1:
-+				virt_pg_map(vm, HIGH_GVA, gpa_b);
-+				break;
-+			default:
-+				TEST_FAIL("Unexpected sync stage: %lu\n", uc.args[1]);
-+			}
-+			/* Complete the host's PTE store before resuming the guest. */
-+			asm volatile("dsb sy" : : : "memory");
-+			break;
-+		default:
-+			TEST_FAIL("Unhandled ucall: %ld\n", uc.cmd);
-+		}
-+	}
-+
-+done:
-+	kvm_vm_free(vm);
-+	(*nr_tests)++;
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	unsigned int nr_tests = 0;
-+
-+	for_each_guest_mode(run_test, &nr_tests);
-+	if (!nr_tests)
-+		ksft_exit_skip("No supported 52-bit VA guest mode; skipping test\n");
-+	return 0;
-+}
+KVM: arm64: selftests: Support five-level stage-1 page tables
 
--- 
-2.43.0
+This commit adds support for five-level stage-1 page tables in the ARM64
+KVM selftests. It extends the page-table helpers and level validation to
+handle the new architectural level -1. This enables testing 52-bit VA
+configurations with a 4K translation granule.
 
+> diff --git a/tools/testing/selftests/kvm/lib/arm64/processor.c b/tools/te=
+sting/selftests/kvm/lib/arm64/processor.c
+> index 01325bf4d36fc..b589368bf8222 100644
+> --- a/tools/testing/selftests/kvm/lib/arm64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/arm64/processor.c
+
+[ ... ]
+
+> @@ -214,7 +249,7 @@ u64 *virt_get_pte_hva_at_level(struct kvm_vm *vm, gva=
+_t gva, int level)
+>  			goto unmapped_gva;
+>  		break;
+>  	default:
+> -		TEST_FAIL("Page table levels must be 2, 3, or 4");
+> +		TEST_FAIL("Page table levels must be 2, 3, 4, or 5");
+>  	}
+> =20
+>  	return ptep;
+
+[Severity: Low]
+Does this change miss updating the string names in pte_dump()?
+
+Looking at pte_dump() in tools/testing/selftests/kvm/lib/arm64/processor.c,
+the type array maps the translation level to its string name:
+
+	static const char * const type[] =3D { "", "pud", "pmd", "pte" };
+
+When the test framework is compiled with DEBUG and dumps a 5-level page
+table, virt_arch_dump() calculates the starting level for pte_dump() as 0.
+Since the array was not updated to include "p4d", debug output for level 0
+will print an empty string instead of "p4d".
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260914-arm64-52bi=
+t-va-v2-0-3911cb9d4ad4@fujitsu.com?part=3D1
