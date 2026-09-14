@@ -1,91 +1,145 @@
-Received: from mta0.migadu.com (out-36.mta0.migadu.com [91.218.175.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CB814734F7
-	for <kvmarm@lists.linux.dev>; Mon, 14 Sep 2026 12:58:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94B90485CC3
+	for <kvmarm@lists.linux.dev>; Mon, 14 Sep 2026 13:01:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789390721; cv=none; b=qWqOYnvVibgJySX07b6zSJuTMoX1F4SCNVedE1s98IrG+8Xkgok8QzFFjQANRfcuSOk6r3da/ZBI4MmyNfzzm1Ii1tebGNDA6opBGN7FMPX/ia7yI4Uj51xMlf/xBA/6p18MU6PMtNVCHeCwaVrvNvZ65vaRxmJrTyrywCynxgk=
+	t=1789390914; cv=none; b=tR56zcDEWXJBx8JvOcGc36ihqiQXM+3Di+zQ4U9diNnXpmq6HqpA7g5M68wH356xsfck+Q+ptyVpglfAPXxQl5awneZ2lg1DNxnEVUPKod0QteDvWWAS70+Pnwo2j3gYt1we+57/nYgRzSjK+ydZf/H1n3FNWktpeMYLKd3BaYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789390721; c=relaxed/simple;
-	bh=cr2R0muZQJAbH/2zo0/ZBnfmxN5tuFxhYming9+hGcc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TCkZnWbXtJ8nqyvYhkcwYGmUJs6hU7NXi6dHIPJ9ID+MHxwOs7qDi5XFJyAYovUgAdg3t+RlTYT9+enkcEzBzwl5o2mSi8TzgLtQDC2JM8E1qhKGddLTpyX4mwGEU1DMuTmRV7cHw/B067h8pn3aRbo3sGhhHnYWwAnCbNInNTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JDRQ+09b; arc=none smtp.client-ip=91.218.175.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1789390914; c=relaxed/simple;
+	bh=HXihBFKuM+TeMCltIocLboIkz4NjuAng8WGxVVTl9xg=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=ffxy+Bg9eeMEA1YdmUNYwvAHzTp15DLOttii8xIjL0eGDHUOF4aDmR6VGiKbCirlOgGqb0Jj0DLaOkQbYFynpN46/OgTEhgFsqav7pcpIFlUeRbsFbGqTk0k9TyqVVVwNb2qCN1Zbf6AT5xvdkUVLgs109zjnE4x29oAJEuoDcQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XyOYvktl; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JDRQ+09b"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=cr2R0muZQJAbH/2zo0/ZBnfmxN5tuFxhYming9+hGcc=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1789390718; v=1; x=1789995518;
- b=JDRQ+09bRJUJGjJZsL1xZ6JLy+LM+HvBswowUWJwMIT/lQS5gbdSXgPewQs2AH9PqVxT5gRr
- 3L/H44i0d58+6rQ8PzNAJ1pNRSjAFFOx1zS/vwxXbsIUk4yENJNm2VHOxCkWXvY4AnGXv9h+ap7
- zy/6ZzTPEqZr5m4MuQYbvKb4=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 89023a9896b98e15;
-	Mon, 14 Sep 2026 12:58:28 +0000
-X-Mizu-Trace-ID: 89023a9896b98e15
-X-Migadu-Flow: FLOW_OUT
-From: Fuad Tabba <fuad.tabba@linux.dev>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>
-Cc: Fuad Tabba <fuad.tabba@linux.dev>,
-	Fuad Tabba <tabba@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/2] KVM: arm64: Report SMCCC_VERSION and SMCCC_ARCH_FEATURES as implemented
-Date: Mon, 14 Sep 2026 13:58:26 +0100
-Message-Id: <20260914125827.1645980-1-fuad.tabba@linux.dev>
-X-Mailer: git-send-email 2.39.5
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XyOYvktl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0D5F1F000FF;
+	Mon, 14 Sep 2026 13:01:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789390913;
+	bh=w53SMl5H/sqwd5sswNVNY/ask4zw/X5pfRz5qy8sjpg=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=XyOYvktl2Q/nkAaPz2XSyVAGFBKPeischCG93I59TCXbowCbezhIteSBGfsRnkc/d
+	 pZezkjjp5iVfDJ/WuHO3kOW2LT0EbM0V34yhPK8rpicl/HKInsXghm+nadclety1on
+	 N66WIrBj/icGqKeRdzx470lCtRBw0+we0i0Ybd0J+3RK5vRWbHgUG0m6S3At1ZNplu
+	 21o8gRBcs7oRb9GFY/OZkf6T5Itfa9UzpIo9kjr5NjeiYwOXkYtyJT0K8L7zpIuKZ5
+	 9dlrSjXK0E3SnsZvym0lcXuvcrDSsj8jlhTof+4aR/97c8VT2df4yZVkQo8UsWVMA3
+	 YdxrYHct+wJFw==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v3 03/18] KVM: arm64: Pin the host vCPU before adjusting
+ its PC under pKVM
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Fuad Tabba" <fuad.tabba@linux.dev>
+Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20260914113338.159227-4-fuad.tabba@linux.dev>
+References: <20260914113338.159227-1-fuad.tabba@linux.dev>
+ <20260914113338.159227-4-fuad.tabba@linux.dev>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 14 Sep 2026 13:01:52 +0000
+Message-Id: <20260914130152.F0D5F1F000FF@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-KVM reports SMCCC v1.1 to guests, which makes SMCCC_VERSION and
-SMCCC_ARCH_FEATURES mandatory, and DEN0028H 7.3.6 requires
-SMCCC_ARCH_FEATURES to return SUCCESS for both function ids: "This
-function must return SUCCESS when arch_func_id is the SMCCC_VERSION or
-SMCCC_ARCH_FEATURES function id." With arch_func_id set to either, KVM's
-guest handler returns NOT_SUPPORTED. Return SUCCESS.
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
 
-A Linux guest is unaffected: it discovers SMCCC_VERSION through
-PSCI_FEATURES, and issues SMCCC_ARCH_FEATURES only with arch_func_id set
-to ARCH_SOC_ID, the ARCH_WORKAROUND_* ids or HV_PV_TIME_FEATURES.
+Pre-existing issues:
+- [Critical] Unmapped host `kvm_s2_mmu` pointer dereference in EL2 TLB flus=
+h handlers panics the hypervisor before the first KVM_RUN.
+--
 
-Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
----
- arch/arm64/kvm/hypercalls.c | 4 ++++
- 1 file changed, 4 insertions(+)
+commit 201c7baf4784bec3cde62591e1662c2fd50608dc
+Author: Fuad Tabba <fuad.tabba@linux.dev>
 
-diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-index b11b8821c9fbc..66f16bf9a8ea7 100644
---- a/arch/arm64/kvm/hypercalls.c
-+++ b/arch/arm64/kvm/hypercalls.c
-@@ -293,6 +293,10 @@ int kvm_smccc_call_handler(struct kvm_vcpu *vcpu)
- 	case ARM_SMCCC_ARCH_FEATURES_FUNC_ID:
- 		feature = smccc_get_arg1(vcpu);
- 		switch (feature) {
-+		case ARM_SMCCC_VERSION_FUNC_ID:
-+		case ARM_SMCCC_ARCH_FEATURES_FUNC_ID:
-+			val[0] = SMCCC_RET_SUCCESS;
-+			break;
- 		case ARM_SMCCC_ARCH_WORKAROUND_1:
- 			switch (arm64_get_spectre_v2_state()) {
- 			case SPECTRE_VULNERABLE:
--- 
-2.39.5
+KVM: arm64: Pin the host vCPU before adjusting its PC under pKVM
 
+This commit fixes a hypervisor panic in pKVM caused by dereferencing an
+unmapped host vCPU before its first KVM_RUN. It introduces temporary pinning
+of the host vCPU around __kvm_adjust_pc() when no hyp vCPU is loaded.
+
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe=
+/hyp-main.c
+> index b6bfe502bcd04..52a65b13b3810 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> @@ -546,8 +546,25 @@ static void handle___pkvm_host_mkyoung_guest(struct =
+kvm_cpu_context *host_ctxt)
+>  static void handle___kvm_adjust_pc(struct kvm_cpu_context *host_ctxt)
+>  {
+>  	DECLARE_REG(struct kvm_vcpu *, vcpu, host_ctxt, 1);
+> +	struct pkvm_hyp_vcpu *hyp_vcpu;
+> +	struct kvm_vcpu *host_vcpu;
+> +
+> +	host_vcpu =3D __get_host_hyp_vcpus(vcpu, &hyp_vcpu);
+> +	if (host_vcpu) {
+> +		__kvm_adjust_pc(host_vcpu);
+> +		return;
+> +	}
+> +
+> +	/*
+> +	 * With no hyp vCPU loaded for it, the host vCPU may be unpinned,
+> +	 * and so unmapped at EL2: its first run pins it.
+> +	 */
+> +	host_vcpu =3D kern_hyp_va(vcpu);
+> +	if (hyp_pin_shared_mem(host_vcpu, host_vcpu + 1))
+> +		return;
+> =20
+> -	__kvm_adjust_pc(kern_hyp_va(vcpu));
+> +	__kvm_adjust_pc(host_vcpu);
+> +	hyp_unpin_shared_mem(host_vcpu, host_vcpu + 1);
+>  }
+
+[Severity: Critical]
+This is a pre-existing issue, but does this same vulnerability apply to the
+TLB flush handlers in this file?
+
+If a userspace process creates a VM and a memory slot, and then immediately
+deletes it via KVM_SET_USER_MEMORY_REGION with a zero memory size before
+the first KVM_RUN, this triggers kvm_arch_flush_shadow_memslot().
+
+This unconditionally calls kvm_tlb_flush_vmid_range(), which issues an HVC
+call that ends up in handle___kvm_tlb_flush_vmid_range():
+
+arch/arm64/kvm/hyp/nvhe/hyp-main.c:handle___kvm_tlb_flush_vmid_range() {
+	DECLARE_REG(struct kvm_s2_mmu *, mmu, host_ctxt, 1);
+	DECLARE_REG(phys_addr_t, start, host_ctxt, 2);
+	DECLARE_REG(unsigned long, pages, host_ctxt, 3);
+
+	__kvm_tlb_flush_vmid_range(kern_hyp_va(mmu), start, pages);
+}
+
+Since the kvm struct (containing kvm_s2_mmu) is not pinned until
+pkvm_create_hyp_vm() runs during the first KVM_RUN, passing kern_hyp_va(mmu)
+without pinning it first might cause a data abort at EL2.
+
+The unmapped pointer is eventually dereferenced in enter_vmid_context():
+
+arch/arm64/kvm/hyp/nvhe/tlb.c:enter_vmid_context() {
+	...
+	__load_stage2(mmu);
+	...
+}
+
+arch/arm64/kvm/hyp/nvhe/tlb.c:__load_stage2() {
+	write_sysreg(mmu->vtcr, vtcr_el2);
+	...
+}
+
+Since this is the exact same sequence described in the commit message (a ho=
+st
+pointer unmapped at EL2 being dereferenced before the first run), should we
+also pin the mmu pointer around these TLB flush operations?
+
+> =20
+>  static void handle___kvm_flush_vm_context(struct kvm_cpu_context *host_c=
+txt)
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260914113338.1592=
+27-1-fuad.tabba@linux.dev?part=3D3
