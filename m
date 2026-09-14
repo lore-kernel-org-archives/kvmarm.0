@@ -1,93 +1,132 @@
-Received: from mta0.migadu.com (out-34.mta0.migadu.com [91.218.175.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEC232D2382
-	for <kvmarm@lists.linux.dev>; Mon, 14 Sep 2026 06:32:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.34
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B8BE26A0D5;
+	Mon, 14 Sep 2026 06:34:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789367547; cv=none; b=cod/kJU9D941X2nNQYkufanDW8H73xLdGCqqdFkaCmLLzpJRK/giwVCxGJuabxMP9ysL9WUDxtB3O/aUvUAsMSNTrrbCwqQPTay3QqE7Hm6K9SI8aQ4/iqqEdR/JT4t4E47IMDrspXZppDBHMsniQtSJ9kQ8vmWdGD6RV4kTYgQ=
+	t=1789367664; cv=none; b=J3RxK2MnI1eNL/SBmC1Qp11g8E5jjure0fxttO4HNr5wqNBOrsX/aeKWmbSPgutwQUtlao5mQ4m7Qho9tPF3xjc6tYlrzh3LJVsCtyySIIHCrij54EfAJBuFb+UNalmxPXre07kTpzIkUd1PZt1xMUv5WR7goj5RRktRJSzCXmw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789367547; c=relaxed/simple;
-	bh=u0xDEdzgIvp1jXjtMCIvp5g1TCOxOf/z9+CMM5yvNJ0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UF+d4SB95YSuynY/uHh/luadLIvDK51jaodrLAL4iChx3QWVeBksxfPoZzqOkcNXSeQCVB64BQI671bx9cxP9VFMk/3weS7gD2AWuPhN1NWW6NHJ9L/L13k7q5KAP7wsiBd4gOo8XEHR1d2Sumr6QEpVg7lxxGBxAX+WF6zNpvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=TASWVwSN; arc=none smtp.client-ip=91.218.175.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1789367664; c=relaxed/simple;
+	bh=3UFhIq4QHq9TytrWQywRZzXOkkTaNlRDCVMLHz/qIj0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=m1cFxjEHMYW+JwnhdTChF4wTwHfCgqEiPgiybAd4ztRA0q7q7fMSt9Zo00CKEOs+1YC94sNh0f9ypeGiWfINE2mvoy0l11GwWW7v4n0t09BP1xTAWl32aP5NL/DH7sOW9ymvfehOCf6bAZaVwwimV6GnNJyMqoJVyIEE9EBap6E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=MK8BiM95; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TASWVwSN"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=u0xDEdzgIvp1jXjtMCIvp5g1TCOxOf/z9+CMM5yvNJ0=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1789367543; v=1; x=1789972343;
- b=TASWVwSNKO3PxpZAi1h5mnCj0VYQ7ORaEERy+Rmnxv6YEtlO032d/XEyCCRSPYClOsXDmi0z
- FvgypBfky1x6i1RFIHRuclLOsntaGhgYBf+iDfn3Mchgtde67x0WZ+W8OYgFkboWdSygqbHKWEe
- JwPhVeMVJFBrCU9wHB8oXoEc=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id a99a44255697f6c6;
-	Mon, 14 Sep 2026 06:32:23 +0000
-X-Mizu-Trace-ID: a99a44255697f6c6
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b78e073980so5004e87.1
-        for <kvmarm@lists.linux.dev>; Sun, 13 Sep 2026 23:32:19 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBykiENU175ZZmcnYl+z7whZ7WcK/VOtlDWRmEkeZBatS+ZvB95zqLvACFcWp5pbz5wKHHx+k+0=@lists.linux.dev
-X-Gm-Message-State: AFuF++mZ8wkjKCkZZ8EvA/hoDTE7+9qm1qO62+duUKPMIyHwsBpdcc53
-	JIgZjDMDGIf7XT5au8qNFuMUbGwgR75PoBRhL22YtH/ix0CEdeIszF35+lFU3Q6QSrkb5OjERWU
-	sgyc1oD71jndhG/QzqOeSCv5fu5gpGmtWmlqQP0TS
-X-Received: by 2002:a05:6512:3e0e:b0:5b8:9e63:dfb9 with SMTP id
- 2adb3069b0e04-5b8ae42ae97mr21520e87.0.1789367538566; Sun, 13 Sep 2026
- 23:32:18 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="MK8BiM95"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 09A641570;
+	Sun, 13 Sep 2026 23:34:18 -0700 (PDT)
+Received: from [10.57.10.40] (unknown [10.57.10.40])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C28623F7B4;
+	Sun, 13 Sep 2026 23:34:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1789367661; bh=3UFhIq4QHq9TytrWQywRZzXOkkTaNlRDCVMLHz/qIj0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=MK8BiM95/KvV+tBcwk8Ima8+QslWVJKy2xivHr6522TXYYXfDNC/qhggcF5gATKdR
+	 TrrjiHONVKxa17sth4M+XYpVIG6qhwn4cZl8lIPEQxa9SjrixubT0ENswtzTlv5p5Y
+	 PaCRo9aJG3WP7tak+IsS8z2yN/Q22Li8OhMIbb3s=
+Message-ID: <a9587df6-b866-4d3b-880e-638537a96e3a@arm.com>
+Date: Mon, 14 Sep 2026 07:34:17 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260907070002.3333525-1-fuad.tabba@linux.dev>
- <20260907070002.3333525-15-fuad.tabba@linux.dev> <86jyos6j2o.wl-maz@kernel.org>
-In-Reply-To: <86jyos6j2o.wl-maz@kernel.org>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Mon, 14 Sep 2026 07:32:00 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTwL4dUC6_ok+OE=zhFK_Dhosc1Nji4Vp4hr+HYibF6cgQ@mail.gmail.com>
-X-Gm-Features: AcwNN1V3-IRZLy4EhuEzKp1SiumXuAoMIBvvNz1M8aC8VCuBKY3hnZnOfpboMkk
-Message-ID: <CA+EHjTwL4dUC6_ok+OE=zhFK_Dhosc1Nji4Vp4hr+HYibF6cgQ@mail.gmail.com>
-Subject: Re: [PATCH v2 14/17] KVM: arm64: Reject host access to protected VM
- private state
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Vincent Donnefort <vdonnefort@google.com>, Quentin Perret <qperret@google.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v18 3/7] firmware: arm_rmm: Configure the RMM with the
+ host's page size
+Content-Language: en-GB
+To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: maz@kernel.org, will@kernel.org, catalin.marinas@arm.com,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org,
+ joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
+ linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
+ sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
+ WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com
+References: <20260912083611.2513845-1-suzuki.poulose@arm.com>
+ <20260912083611.2513845-4-suzuki.poulose@arm.com>
+ <6d204c05-1338-4ee5-9ac9-5d9447e329ee@redhat.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <6d204c05-1338-4ee5-9ac9-5d9447e329ee@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi Marc,
+On 14/09/2026 02:21, Gavin Shan wrote:
+> On 9/12/26 6:36 PM, Suzuki K Poulose wrote:
+>> From: Steven Price <steven.price@arm.com>
+>>
+>> RMM v2.0 brings the ability to set the RMM's granule size. Check the
+>> feature registers and configure the RMM so that it matches the host's
+>> page size. This means that operations can be done with a granularity
+>> equal to PAGE_SIZE.
+>>
+>> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> ---
+>>   Changes since v17:
+>>    * Move rmi_config_set() out of the header file.
+>>    * Print the error message for rmi_config_set if it fails
+>>   Changes since v15:
+>>    * Actually check the feature register for the host's page-size 
+>> support.
+>>   Changes since v14:
+>>    * Move the implementation into drivers/firmware/arm_rmm.
+>>   Changes since v13:
+>>    * Moved out of KVM.
+>> ---
+>>   drivers/firmware/arm_rmm/rmi.c | 79 ++++++++++++++++++++++++++++++++++
+>>   1 file changed, 79 insertions(+)
+>>
+>> diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/ 
+>> arm_rmm/rmi.c
+>> index 2fd538c937dca..5b0e342ce3d58 100644
+>> --- a/drivers/firmware/arm_rmm/rmi.c
+>> +++ b/drivers/firmware/arm_rmm/rmi.c
+>> @@ -35,6 +35,25 @@ static int rmi_features(unsigned long index, 
+>> unsigned long *out)
+>>       return args.a0;
+>>   }
+>> +/**
+>> + * rmi_rmm_config_set() - Configure the RMM
+>> + * @cfg_ptr: PA of a struct rmm_config
+>> + *
+>> + * Sets configuration options on the RMM.
+>> + *
+>> + * Return: RMI return code
+>> + */
+>> +static int rmi_rmm_config_set(unsigned long cfg_ptr)
+>> +{
+>> +    struct arm_smccc_1_2_regs regs = {
+>> +        SMC_RMI_RMM_CONFIG_SET, cfg_ptr,
+>> +    };
+>> +
+>> +    rmi_smccc_invoke(&regs);
+>> +
+>> +    return regs.a0;
+>> +}
+>> +
+> 
+> The comments for rmi_rmm_config_set() can be dropped since its logic is 
+> simply enough and
+> the code is self-explainning. Besides, I would move this right before 
+> its only caller
+> rmi_configure().
 
-On Fri, 11 Sept 2026 at 13:58, Marc Zyngier <maz@kernel.org> wrote:
-[...]
-> Why can't these be moved to the ioctl callback? Something like:
->
-[...]
-> +static long pkvm_filter_vcpu_ioctl(struct kvm_vcpu *vcpu, unsigned int ioctl)
-[...]
+Ack
 
-Much nicer, I'll move the three has-run checks into that filter for
-v3. I think we need the other two where they are, though: the
-ext_dabt_pending check reads the payload, and KVM_SET_GUEST_DEBUG has
-its own case in kvm_vcpu_ioctl(), so it never gets as far as
-kvm_arch_vcpu_ioctl().
+> 
+> I would suggest drop this function by combining its logics into the only 
+> caller
+> rmi_configure(), seeing below for more details.
 
-> Where is KVM_CAP_ARM_INJECT_EXT_DABT rejected?
+That looks a bit odd in the middle of a function, given the argument 
+setting. I have moved it closer to the configure().
 
-In kvm_pkvm_ext_allowed(): on a protected VM it returns false for any
-capability it doesn't list, and patch 16 doesn't add this one, so
-KVM_CHECK_EXTENSION on the VM fd returns 0 for it (and for
-KVM_CAP_SET_GUEST_DEBUG). I'd keep the ioctl check too, for the VMM
-that doesn't ask, since userspace has been known to act silly. I'll
-say so in the commit message and in pkvm.rst (maybe not the silly
-part).
+Cheers
+Suzuki
 
-Thanks,
-/fuad
+
