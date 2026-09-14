@@ -1,117 +1,195 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A9383DAABC;
-	Mon, 14 Sep 2026 13:26:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E27EA46EF64;
+	Mon, 14 Sep 2026 13:42:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789392398; cv=none; b=kpjbQ+qB2ilGq2nO7yrZAE0OFJmraKqzBD2E/0rDZzl4Wzp98/B0VpFbXiHvGJSMoCw86Ti5V2VSA7amuPz7NK0BvNki4a23gb1kUUUu7H8qGBRn7xfVmSbp01rPDMYGFLvpwoUR2HlL4I3XwzKDNpCV+RKqTp1sFmftuRu26T0=
+	t=1789393371; cv=none; b=oo2ylPzPu1hrEz1QNk2pRbuS8nl7zaUPC2M+YsuNzVUliUpBSjP11DgTg6Unwzyan04JeuZLV0yO6ZJ60QVGKqL0P25y+walYj1T0f/q4Ga3gYs8NgCi9b8r7YAtSivip88NTAKlx8BAZc48Iwwi3aEreEDm+SfJTdmtLkDjEZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789392398; c=relaxed/simple;
-	bh=kfv6urV0lGFie3Up9UNvhMRXg9moxSkFxwDMgJj7jgQ=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=XHTqnAWMmtmNnEZtt4h+Flm/ACtf71Q+CNknEMZPYSWg8R2DapNRH96/eAmN+PTm19o95uoQdPGvsT8ESott7gTjDF/wDYKLT61fK3filBAKogJY8DWFQSjLbdWERTUNjcfzE7mgyG2GsfT5BOwkwabzfGT/b4wbYRRyxur0iOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nDnEvTX5; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789393371; c=relaxed/simple;
+	bh=ytG8ocPF34y4GXTp7tqgbP+za6+mvxCiVYZgdi98Zyk=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SE6pg7W+9IqP1LFu0Gcj40lOnjKvOsC2gQqXbA1VVZmDBDTV38OH77PsAKhlkREY1hDKYVM4aa5ddP4gkDqTZaWYd/Wa1hMtg4GaKSyvgAI6q8HU/4t3WdQ8oWawCG5RvxtSoAA3Pd2+vGky8RTG8orP1wZm81PnpelVs220ixY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I5tVHzlP; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nDnEvTX5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C71771F00893;
-	Mon, 14 Sep 2026 13:26:36 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I5tVHzlP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDA3E1F000FF;
+	Mon, 14 Sep 2026 13:42:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789392397;
-	bh=JAmq9K5/aIg+OWqR/4Bgpoi2B07sbGKS27pNZlGY1gI=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=nDnEvTX5prnxF/jQIY6SlS3BJOAW3lI9/L+vc7btUPqEqHzOA1Akb6di+7bIVIwAy
-	 wa+85YqYSAbu3NqL+Q73jaBsfi+43MxqtIABeYJUG7izwr2tFVurj5CMmrDsqtqtxz
-	 JBCIibC6lf9DjPU1azZVDIV9B1CWwumNpLLOPym7VGyS7lrvvhKEwY/Uyg1miblX83
-	 dfdSQrbBTqtsDq51zR4suExpBTGu412O0m97MZjtbZWiQwIRXAZ6wdu46/xLTeqfiF
-	 su1iJ8H3AfS6IQrHoS/QGacdHg+8ndMeWRm4YFxiVk/DQD05DXk0vfX1y6Db0t8AxI
-	 BrhO0kVmwRWyA==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2 06/13] KVM: arm64: Size the stage-2 memcache from the
- fault MMU
-Reply-To: sashiko-reviews@lists.linux.dev
-To: =?utf-8?b?TG9yZW56byBTdG9ha2VzIChBUk0p?= <ljs@kernel.org>
-Cc: kvm@vger.kernel.org, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, "Oliver
- Upton" <oupton@kernel.org>
-In-Reply-To: <20260914-kvm-arm-prefault-v2-6-26fb47f74b73@kernel.org>
-References: <20260914-kvm-arm-prefault-v2-0-26fb47f74b73@kernel.org>
- <20260914-kvm-arm-prefault-v2-6-26fb47f74b73@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 14 Sep 2026 13:26:36 +0000
-Message-Id: <20260914132636.C71771F00893@smtp.kernel.org>
+	s=k20260515; t=1789393369;
+	bh=uXYH+/nJwZIRRlJSJX40vXdbeohaBAmcqYLkggzgf14=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=I5tVHzlPAJ/KrsAxqyGne0O47j8Eak17IwUzmR7gf9kATOVcPOq+QFIGsAXMbBLYa
+	 es6/VLTkLxiZublfkTCPl/INOY0TE5ywDyS5quk4ZY+BeVZRLqNBoCllZGAVwA5R/A
+	 wDm9GpamkLRxefE9q+BjDQgA3BZjMX5ZM5+KyOvs4Q2Jj+BQ5ifegRcW/tsTZ94EHt
+	 54xVQng6Ayyl06kajswrKHcjWx+U+4UZTRyGtu0wCSIbcFCDcBTibTeNcBvaIU1yyo
+	 mHbQU1J7pOwNRUzYn1B9dfdLkgKdXDL2KKDH4vKyezywQ1xRXjew56hpgAeuUq0zHJ
+	 lK+nWGAeqloiA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1x66xL-00000008eJ3-3RBw;
+	Mon, 14 Sep 2026 13:42:47 +0000
+Date: Mon, 14 Sep 2026 14:42:47 +0100
+Message-ID: <8633vc6jag.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: oupton@kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	joey.gouly@arm.com,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	mark.rutland@arm.com,
+	steven.price@arm.com,
+	vdonnefort@google.com,
+	qperret@google.com,
+	tabba@google.com
+Subject: Re: [PATCH v3 12/18] KVM: arm64: Prevent host PC adjustments for protected vCPUs
+In-Reply-To: <20260914113338.159227-13-fuad.tabba@linux.dev>
+References: <20260914113338.159227-1-fuad.tabba@linux.dev>
+	<20260914113338.159227-13-fuad.tabba@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, steven.price@arm.com, vdonnefort@google.com, qperret@google.com, tabba@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
+On Mon, 14 Sep 2026 12:33:32 +0100,
+Fuad Tabba <fuad.tabba@linux.dev> wrote:
+> 
+> __kvm_adjust_pc() lets the host advance a vCPU's PC or inject an
+> exception, which for a protected vCPU would let the host redirect
+> guest execution. Drop the request there: the entry handlers apply the
+> host's PC_UPDATE_REQ on re-entry, where EL2 allows it.
+> 
+> __kvm_adjust_pc() adjusts the vCPU a get/put pair returns, the one it
+> was given outside pKVM. Both host callers hold the vCPU mutex, so a
+> hyp vCPU loaded for the vCPU is loaded on the calling CPU. The request
+> for a loaded protected vCPU is dropped. For a loaded non-protected
+> vCPU, PKVM_HOST_STATE_DIRTY selects the copy, since adjusting the hyp
+> vCPU while the host copy is authoritative loses the update at the next
+> flush. Adjusting the hyp vCPU copies PC_UPDATE_REQ in and back out
+> again: without the copy back, INCREMENT_PC outlives the adjustment and
+> the next KVM_SET_VCPU_EVENTS trips WARN_ON(INCREMENT_PC) in
+> kvm_pend_exception(). With no hyp vCPU loaded, as under
+> KVM_SET_VCPU_EVENTS, the host copy is adjusted as before.
+> 
+> Until the marshalling patch clears PC_UPDATE_REQ on the host copy at
+> exit, a KVM_RUN that returns to userspace with INCREMENT_PC set leaves
+> it on the host copy of a loaded protected vCPU, and a
+> KVM_SET_VCPU_EVENTS before the next run then trips that WARN_ON.
+> 
+> Suggested-by: Marc Zyngier <maz@kernel.org>
+> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+> ---
+>  arch/arm64/kvm/hyp/exception.c             | 21 +++++++++-----
+>  arch/arm64/kvm/hyp/include/hyp/adjust_pc.h | 19 +++++++++++++
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c         | 32 ++++++++++++++++++++++
+>  3 files changed, 65 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
+> index 6e60d890afa4a..7ea62e5304ae9 100644
+> --- a/arch/arm64/kvm/hyp/exception.c
+> +++ b/arch/arm64/kvm/hyp/exception.c
+> @@ -353,12 +353,19 @@ static void kvm_inject_exception(struct kvm_vcpu *vcpu)
+>   */
+>  void __kvm_adjust_pc(struct kvm_vcpu *vcpu)
+>  {
+> -	if (vcpu_get_flag(vcpu, PENDING_EXCEPTION)) {
+> -		kvm_inject_exception(vcpu);
+> -		vcpu_clear_flag(vcpu, PENDING_EXCEPTION);
+> -		vcpu_clear_flag(vcpu, EXCEPT_MASK);
+> -	} else if (vcpu_get_flag(vcpu, INCREMENT_PC)) {
+> -		kvm_skip_instr(vcpu);
+> -		vcpu_clear_flag(vcpu, INCREMENT_PC);
+> +	struct kvm_vcpu *target = pkvm_adjust_pc_get(vcpu);
 
-Pre-existing issues:
-- [High] The pKVM page fault handler `pkvm_mem_abort()` completely omits th=
-e mandatory MMU notifier invalidation retry protocol, risking the installat=
-ion of stale translations.
---
+nit: it is really odd to see this 'pkvm' prefix in generic code. The
+point of it is not only to abstract the pvkm complexity away, but also
+to have a wrapper that may be of use in other situations.
 
-commit caf2d4f716079e3655b6e5fed2957d60fe0bf41c
-Author: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+Don't respin the series just for this though, I may end-up changing
+this when applying it.
 
-KVM: arm64: Size the stage-2 memcache from the fault MMU
+> +	if (!target)
+> +		return;
+> +
 
-This commit updates topup_mmu_memcache() to take the target s2fd->mmu
-instead of the faulting vCPU. This allows the caller to control which MMU
-is used for sizing the memcache.
+I find this one scary, see below.
 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 13541218cadbe..8c23fef4ecf84 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
+[...]
 
-[ ... ]
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> index da8ab636063cf..1dcc75261dc08 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> @@ -642,6 +642,38 @@ static void handle___pkvm_host_mkyoung_guest(struct kvm_cpu_context *host_ctxt)
+>  	cpu_reg(host_ctxt, 1) =  ret;
+>  }
+>  
+> +/*
+> + * PKVM_HOST_STATE_DIRTY names the authoritative copy, the host's when set.
+> + * A loaded protected vCPU takes the request at its next entry instead.
+> + */
+> +struct kvm_vcpu *pkvm_adjust_pc_get(struct kvm_vcpu *vcpu)
+> +{
+> +	struct pkvm_hyp_vcpu *hyp_vcpu;
+> +
+> +	if (!is_protected_kvm_enabled())
+> +		return vcpu;
+> +
+> +	hyp_vcpu = pkvm_get_loaded_hyp_vcpu();
+> +	if (!hyp_vcpu || hyp_vcpu->host_vcpu != vcpu)
 
-> @@ -1755,7 +1755,7 @@ static int pkvm_mem_abort(const struct kvm_s2_fault=
-_desc *s2fd)
->  	int ret;
-> =20
->  	hyp_memcache =3D get_mmu_memcache(vcpu);
-> -	ret =3D topup_mmu_memcache(vcpu, hyp_memcache);
-> +	ret =3D topup_mmu_memcache(s2fd->mmu, hyp_memcache);
->  	if (ret)
->  		return -ENOMEM;
-> =20
+Under which circumstances do we get hyp_vcpu->host_vcpu != vcpu?
 
-[Severity: High]
-This is a pre-existing issue, but pkvm_mem_abort() appears to omit the MMU
-notifier invalidation retry protocol, risking the installation of stale
-translations.
+> +		return vcpu;
+> +
+> +	if (pkvm_hyp_vcpu_is_protected(hyp_vcpu))
+> +		return NULL;
 
-Further down in pkvm_mem_abort(), the physical frame is resolved using
-pin_user_pages() without first capturing the global mmu_invalidate_seq
-counter:
+Is it always the case that a protected vcpu cannot see its PC adjusted
+at all? How is PC updated after an exit for MMIO? I feel there is an
+interaction with the above, but I'm not 100% certain...
 
-        mmap_read_lock(mm);
-        ret =3D pin_user_pages(s2fd->hva, 1, flags, &page);
-        mmap_read_unlock(mm);
+> +
+> +	if (vcpu_get_flag(vcpu, PKVM_HOST_STATE_DIRTY))
+> +		return vcpu;
+> +
+> +	vcpu_copy_flag(&hyp_vcpu->vcpu, vcpu, PC_UPDATE_REQ);
+> +	return &hyp_vcpu->vcpu;
+> +}
+> +
+> +/* Reflect the consumed request back, otherwise it stays pending. */
+> +void pkvm_adjust_pc_put(struct kvm_vcpu *vcpu, struct kvm_vcpu *target)
+> +{
+> +	if (target != vcpu)
+> +		vcpu_copy_flag(vcpu, target, PC_UPDATE_REQ);
+> +}
+> +
+>  static void handle___kvm_adjust_pc(struct kvm_cpu_context *host_ctxt)
+>  {
+>  	DECLARE_REG(struct kvm_vcpu *, vcpu, host_ctxt, 1);
 
-The mapping is then committed to the stage-2 page tables under the lock
-without gating the installation on mmu_invalidate_retry():
+Thanks,
 
-        write_lock(&kvm->mmu_lock);
-        ret =3D pkvm_pgtable_stage2_map(pgt, s2fd->fault_ipa, PAGE_SIZE,
-                                      page_to_phys(page), KVM_PGTABLE_PROT_=
-RWX,
-                                      hyp_memcache, 0);
-        write_unlock(&kvm->mmu_lock);
+	M.
 
-Missing the retry check breaks KVM's invalidation retry protocol. Even when
-a page is pinned, a concurrent host MMU invalidation (e.g., from
-madvise(MADV_DONTNEED) or NUMA balancing) can overlap with the pin.
-
-Does this allow KVM to install stale translations, leading to memory
-corruption or guest-visible data leakage?
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260914-kvm-arm-pr=
-efault-v2-0-26fb47f74b73@kernel.org?part=3D6
+-- 
+Without deviation from the norm, progress is not possible.
