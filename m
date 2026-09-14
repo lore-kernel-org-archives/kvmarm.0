@@ -1,33 +1,33 @@
-Received: from mta0.migadu.com (out-137.mta0.migadu.com [91.218.175.137])
+Received: from mta0.migadu.com (out-145.mta0.migadu.com [91.218.175.145])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 276D3438488
-	for <kvmarm@lists.linux.dev>; Mon, 14 Sep 2026 11:34:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.137
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC2ED442379
+	for <kvmarm@lists.linux.dev>; Mon, 14 Sep 2026 11:34:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.145
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789385672; cv=none; b=aXTkAODWVGYN2EacQAFFwO0vf49ojnYWjT7c1PaSRQtrYI5irsUi6DPkdZWB+QLwqN0huL+VCUs6dSXlZ+qQYjgE9s2zwT+KVWD2QQXFW2KIof8XwYSsm8TKgXro0kmTN5q2KGawemRoLp45KwgefhqwJePLxQhocJEoNYPPYAo=
+	t=1789385673; cv=none; b=RJxWf6y6pVre7BCdCgdvBlPNvT/fM3OPX9K75von2heKDf16zkkhTIdtct9OmeUwKzdrSWjKkHVjQWNJeeGLd0PDA58Qx2twpap6ysqLNwDq7/p8HgadgsaJwxoyec4oYfCEaZR03UpRxSqGM04Zis5q0Efor/E7EiZGq3QBIjA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789385672; c=relaxed/simple;
-	bh=oTsKMUDCOl715EkCy23EGBmVp7/ht+R8heXxmY1NxEI=;
+	s=arc-20240116; t=1789385673; c=relaxed/simple;
+	bh=zOptQexS7lDj6c14lPjl14jvIGvWcUYj7AKr6A/egrA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=dzXNHMnqbda4JRjCSj+eFc0OU51JvcH8wx+5UdPDxr+jSKm9ViuSuhWa1KZjmv+VjUOENhQgnNkVVUSn1YRt6OyXg2vF84YjnJ60MASvBEWheN1HikAntDn5tPsIAJUp1tPg5hFju1GQc8NHa2fqlUXocxlWldVNTQPk+CeBL+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=SdgK5F7v; arc=none smtp.client-ip=91.218.175.137
+	 MIME-Version; b=FH+2aQHIv9FyhQ85yrUOc9Oq8Zv1qRJI33XNKpYY62kcSFy2vMFUmJjFMPZPKHJ/fq1cvmXrnskL0/sRRXAz2Uz0eri5QrH0iDWF+TilahDco61mMpGSF/JO7ar25HgZ9PraAaRuktSe+2GErEKBg7JWIR5Kz36p37G9VWGkCzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rblhoPtX; arc=none smtp.client-ip=91.218.175.145
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="SdgK5F7v"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rblhoPtX"
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=oTsKMUDCOl715EkCy23EGBmVp7/ht+R8heXxmY1NxEI=;
+DKIM-Signature: a=rsa-sha256; bh=zOptQexS7lDj6c14lPjl14jvIGvWcUYj7AKr6A/egrA=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1789385668; v=1; x=1789990468;
- b=SdgK5F7v8bdJUL+xFNSX0eAci3t7aBPfwj2rtiFeBNzf3xugOeC69IIl14kobZKnfWUJzSHe
- DaOwVJQ45KpX6gY/uxHRUcdCy928jV/99RV/jJzDJLYMKhm7cAq/ArF8//kz4M3k4sHzBj0uC/f
- N0M+jEn865s73AMDckSF3IEM=
+ t=1789385669; v=1; x=1789990469;
+ b=rblhoPtXxz492wXn2rmC6P3EigsQTY+kthB1QNO12W4cOY+i/ROSi0BXkW4l6TN0YVU3QxoB
+ CwMAiUC1wJIbdqe3K5g8Spk52TJYIV1upa47vih3fQe6/XuApALX9QGn7C7n71dxXzpU8oP738J
+ BwShJ+0BRmaKJ/bgcHf9dBE8=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id e6bab9579a540251;
-	Mon, 14 Sep 2026 11:34:28 +0000
-X-Mizu-Trace-ID: e6bab9579a540251
+Received: by smtp.migadu.com with ESMTPS id 4c887214f45f674d;
+	Mon, 14 Sep 2026 11:34:29 +0000
+X-Mizu-Trace-ID: 4c887214f45f674d
 X-Migadu-Flow: FLOW_OUT
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: maz@kernel.org,
@@ -46,9 +46,9 @@ Cc: catalin.marinas@arm.com,
 	vdonnefort@google.com,
 	qperret@google.com,
 	tabba@google.com
-Subject: [PATCH v3 06/18] KVM: arm64: Skip fixed-feature state flush for protected vCPUs
-Date: Mon, 14 Sep 2026 12:33:26 +0100
-Message-Id: <20260914113338.159227-7-fuad.tabba@linux.dev>
+Subject: [PATCH v3 07/18] KVM: arm64: Add {flush,sync}_hyp_timer_state() primitives
+Date: Mon, 14 Sep 2026 12:33:27 +0100
+Message-Id: <20260914113338.159227-8-fuad.tabba@linux.dev>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20260914113338.159227-1-fuad.tabba@linux.dev>
 References: <20260914113338.159227-1-fuad.tabba@linux.dev>
@@ -60,120 +60,96 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-flush_hyp_vcpu() copies the host's mdcr_el2, TWI/TWE and debug state
-into the hyp vCPU on every entry, so for a protected vCPU the host's
-trap configuration overrides the one pkvm_vcpu_init_traps() computed
-at EL2. Move the mdcr_el2 and TWI/TWE copies into the non-protected
-branch, and return early from flush_debug_state() and
-sync_debug_state() for a protected vCPU: its debug registers are
-hypervisor-owned, and it takes the host's TWI/TWE at vCPU load.
-MDCR_EL2.TDA traps only the guest's own accesses; it doesn't stop the
-world switch from loading host-supplied breakpoints and MDSCR_EL1.
+From: Marc Zyngier <maz@kernel.org>
 
-EL2's mdcr_el2 starts from 0, and HPMN == 0 is reserved without
-FEAT_HPMN0. Set HPMN at vCPU load to PMCR_EL0.N on a PE whose
-ID_AA64DFR0_EL1 implements PMUv3, the value the host's copy carried,
-read as kvm_init_host_debug_data() reads it: the PMUv3 cpucap is
-system-wide and off without CONFIG_HW_PERF_EVENTS. A protected guest's
-PMU accesses trap regardless.
+A protected guest's virtual timer is programmed from EL2's own copy of
+the state and read back there, so the host can't change the guest's
+deadline. cntvoff_el2 is zeroed, so the guest's virtual time is the
+physical time.
 
+The flush also preserves the guest's CNTV and CNTP CVAL/CTL across the
+host's full-context copy into the hyp vCPU, until the per-EC
+marshalling patch removes that copy.
+
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Co-developed-by: Fuad Tabba <fuad.tabba@linux.dev>
 Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
- arch/arm64/kvm/hyp/nvhe/hyp-main.c | 34 ++++++++++++++++++++++--------
- arch/arm64/kvm/hyp/nvhe/pkvm.c     |  2 +-
- 2 files changed, 26 insertions(+), 10 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c | 39 ++++++++++++++++++++++++++++++
+ 1 file changed, 39 insertions(+)
 
 diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index ef65c3cd6f810..229a4877d14f5 100644
+index 229a4877d14f5..9cc8ef16897c1 100644
 --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
 +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -200,6 +200,9 @@ static void flush_debug_state(struct pkvm_hyp_vcpu *hyp_vcpu)
- {
- 	struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
+@@ -154,6 +154,33 @@ static void sync_hyp_vgic_state(struct pkvm_hyp_vcpu *hyp_vcpu)
+ 		host_cpu_if->vgic_lr[i] = hyp_cpu_if->vgic_lr[i];
+ }
  
-+	if (pkvm_hyp_vcpu_is_protected(hyp_vcpu))
++static void flush_hyp_timer_state(struct pkvm_hyp_vcpu *hyp_vcpu)
++{
++	if (!pkvm_hyp_vcpu_is_protected(hyp_vcpu))
 +		return;
 +
- 	hyp_vcpu->vcpu.arch.debug_owner = host_vcpu->arch.debug_owner;
- 
- 	if (kvm_guest_owns_debug_regs(&hyp_vcpu->vcpu)) {
-@@ -218,6 +221,9 @@ static void sync_debug_state(struct pkvm_hyp_vcpu *hyp_vcpu)
- {
- 	struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
- 
-+	if (pkvm_hyp_vcpu_is_protected(hyp_vcpu))
++	/* A hyp vcpu has no offset, and sees vtime == ptime. */
++	write_sysreg(0, cntvoff_el2);
++	write_sysreg_el0(__vcpu_sys_reg(&hyp_vcpu->vcpu, CNTV_CVAL_EL0),
++			 SYS_CNTV_CVAL);
++	isb();
++	write_sysreg_el0(__vcpu_sys_reg(&hyp_vcpu->vcpu, CNTV_CTL_EL0),
++			 SYS_CNTV_CTL);
++}
++
++static void sync_hyp_timer_state(struct pkvm_hyp_vcpu *hyp_vcpu)
++{
++	if (!pkvm_hyp_vcpu_is_protected(hyp_vcpu))
 +		return;
 +
- 	if (kvm_guest_owns_debug_regs(&hyp_vcpu->vcpu))
- 		host_vcpu->arch.vcpu_debug_state = hyp_vcpu->vcpu.arch.vcpu_debug_state;
- 	else if (kvm_host_owns_debug_regs(&hyp_vcpu->vcpu))
-@@ -241,6 +247,12 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
- 	if (!pkvm_hyp_vcpu_is_protected(hyp_vcpu)) {
- 		if (vcpu_get_flag(host_vcpu, PKVM_HOST_STATE_DIRTY))
- 			flush_hyp_vcpu_state(hyp_vcpu);
++	/*
++	 * Preserve the vtimer state so that it is always correct,
++	 * even if the host tries to make a mess.
++	 */
++	__vcpu_assign_sys_reg(&hyp_vcpu->vcpu, CNTV_CVAL_EL0, read_sysreg_el0(SYS_CNTV_CVAL));
++	__vcpu_assign_sys_reg(&hyp_vcpu->vcpu, CNTV_CTL_EL0, read_sysreg_el0(SYS_CNTV_CTL));
++}
 +
-+		hyp_vcpu->vcpu.arch.hcr_el2 &= ~(HCR_TWI | HCR_TWE);
-+		hyp_vcpu->vcpu.arch.hcr_el2 |= READ_ONCE(host_vcpu->arch.hcr_el2) &
-+							 (HCR_TWI | HCR_TWE);
-+
-+		hyp_vcpu->vcpu.arch.mdcr_el2 = host_vcpu->arch.mdcr_el2;
+ static void __copy_vcpu_state(const struct kvm_vcpu *from_vcpu,
+ 			      struct kvm_vcpu *to_vcpu)
+ {
+@@ -255,7 +282,17 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
+ 		hyp_vcpu->vcpu.arch.mdcr_el2 = host_vcpu->arch.mdcr_el2;
  		hyp_vcpu->vcpu.arch.iflags = host_vcpu->arch.iflags;
  	} else {
++		u64 v_cval = hyp_vcpu->vcpu.arch.ctxt.sys_regs[CNTV_CVAL_EL0];
++		u64 v_ctl = hyp_vcpu->vcpu.arch.ctxt.sys_regs[CNTV_CTL_EL0];
++		u64 p_cval = hyp_vcpu->vcpu.arch.ctxt.sys_regs[CNTP_CVAL_EL0];
++		u64 p_ctl = hyp_vcpu->vcpu.arch.ctxt.sys_regs[CNTP_CTL_EL0];
++
  		hyp_vcpu->vcpu.arch.ctxt = host_vcpu->arch.ctxt;
-@@ -249,17 +261,13 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
- 	/* __hyp_running_vcpu must be NULL in a guest context. */
- 	hyp_vcpu->vcpu.arch.ctxt.__hyp_running_vcpu = NULL;
- 
--	hyp_vcpu->vcpu.arch.mdcr_el2	= host_vcpu->arch.mdcr_el2;
- 	/*
--	 * HCR_EL2.VSE is host-owned (a pending virtual SError to inject), not a
--	 * trap-control bit, so it must flow to the hyp vCPU alongside TWI/TWE
--	 * for the vSError to be delivered. sync_hyp_vcpu() reflects it back.
-+	 * A host-injected vSError is masked by the guest's own PSTATE.A, so it
-+	 * applies to protected guests too.
- 	 */
--	hyp_vcpu->vcpu.arch.hcr_el2 &= ~(HCR_TWI | HCR_TWE | HCR_VSE);
--	hyp_vcpu->vcpu.arch.hcr_el2 |= READ_ONCE(host_vcpu->arch.hcr_el2) &
--						 (HCR_TWI | HCR_TWE | HCR_VSE);
--
--	hyp_vcpu->vcpu.arch.vsesr_el2	= host_vcpu->arch.vsesr_el2;
-+	hyp_vcpu->vcpu.arch.hcr_el2 &= ~HCR_VSE;
-+	hyp_vcpu->vcpu.arch.hcr_el2 |= READ_ONCE(host_vcpu->arch.hcr_el2) & HCR_VSE;
-+	hyp_vcpu->vcpu.arch.vsesr_el2 = host_vcpu->arch.vsesr_el2;
- 
- 	flush_hyp_vgic_state(hyp_vcpu);
- 
-@@ -326,9 +334,17 @@ static void handle___pkvm_vcpu_load(struct kvm_cpu_context *host_ctxt)
- 		return;
- 
- 	if (pkvm_hyp_vcpu_is_protected(hyp_vcpu)) {
-+		u64 dfr0 = read_sysreg(id_aa64dfr0_el1);
 +
- 		/* Propagate WFx trapping flags */
- 		hyp_vcpu->vcpu.arch.hcr_el2 &= ~(HCR_TWE | HCR_TWI);
- 		hyp_vcpu->vcpu.arch.hcr_el2 |= hcr_el2 & (HCR_TWE | HCR_TWI);
-+
-+		/* HPMN == 0 is reserved without FEAT_HPMN0. */
-+		if (pmuv3_implemented(FIELD_GET(ID_AA64DFR0_EL1_PMUVer_MASK, dfr0)))
-+			u64p_replace_bits(&hyp_vcpu->vcpu.arch.mdcr_el2,
-+					  FIELD_GET(ARMV8_PMU_PMCR_N, read_sysreg(pmcr_el0)),
-+					  MDCR_EL2_HPMN);
- 	} else {
- 		memcpy(&hyp_vcpu->vcpu.arch.fgt, hyp_vcpu->host_vcpu->arch.fgt,
- 		       sizeof(hyp_vcpu->vcpu.arch.fgt));
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index 9bdc7a9b84b8c..d52c26c0959a8 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -104,7 +104,7 @@ static void pvm_init_traps_mdcr(struct kvm_vcpu *vcpu)
- 
- 	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMUVer, IMP)) {
- 		val |= MDCR_EL2_TPM | MDCR_EL2_TPMCR;
--		val &= ~(MDCR_EL2_HPME | MDCR_EL2_MTPME | MDCR_EL2_HPMN_MASK);
-+		val &= ~(MDCR_EL2_HPME | MDCR_EL2_MTPME);
++		hyp_vcpu->vcpu.arch.ctxt.sys_regs[CNTV_CVAL_EL0] = v_cval;
++		hyp_vcpu->vcpu.arch.ctxt.sys_regs[CNTV_CTL_EL0] = v_ctl;
++		hyp_vcpu->vcpu.arch.ctxt.sys_regs[CNTP_CVAL_EL0] = p_cval;
++		hyp_vcpu->vcpu.arch.ctxt.sys_regs[CNTP_CTL_EL0] = p_ctl;
  	}
  
- 	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, DebugVer, IMP))
+ 	/* __hyp_running_vcpu must be NULL in a guest context. */
+@@ -270,6 +307,7 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
+ 	hyp_vcpu->vcpu.arch.vsesr_el2 = host_vcpu->arch.vsesr_el2;
+ 
+ 	flush_hyp_vgic_state(hyp_vcpu);
++	flush_hyp_timer_state(hyp_vcpu);
+ 
+ 	hyp_vcpu->vcpu.arch.pid = host_vcpu->arch.pid;
+ 
+@@ -318,6 +356,7 @@ static void sync_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu, u32 exit_reason)
+ 	host_vcpu->arch.hcr_el2 |= hyp_vcpu->vcpu.arch.hcr_el2 & HCR_VSE;
+ 
+ 	sync_hyp_vgic_state(hyp_vcpu);
++	sync_hyp_timer_state(hyp_vcpu);
+ 
+ 	hyp_vcpu->exit_code = exit_reason;
+ }
 -- 
 2.39.5
 
