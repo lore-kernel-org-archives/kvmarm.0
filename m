@@ -1,115 +1,200 @@
-Received: from mta0.migadu.com (out-44.mta0.migadu.com [91.218.175.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2CD947126B
-	for <kvmarm@lists.linux.dev>; Mon, 14 Sep 2026 14:43:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.44
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 246783D6475;
+	Mon, 14 Sep 2026 14:48:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789397042; cv=none; b=hB4dOVF0kyEZdN2UyU0aDGxaUYKygjWuUGSqZy+sHkzzrIIcs4T3axxi+KHEx2ZMwmQueRq0AwYd64PMwxsWbLufIUCrCYdsc0asUjaOqtYHNe5nWnnBo0yyUo6jQ4+hg7U05nKa9twfV1InMZ5To7i0N8u8l5YBhxayHmBzW/k=
+	t=1789397290; cv=none; b=MD3W3Ojw3OzcqKTIwEnSdEhGQdxPomgvd7BsQay6vLV4KWNtoYUN3e0p6GxWXBYI7hcko6RRqtQPw2Prs/71a+eRwGYO4gKD78Q2OmMXQKOmiuacRLzjz53dOlYtDu1GaJyJq0C2cMl0Mo+lOSeGuLvcXyme31WAfB5Qa2A8gP8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789397042; c=relaxed/simple;
-	bh=ZOxEFV6yKVa+U+wttltPLAq7YKcnlIAuux7OwLuKqMI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BHbuCpBVhQiBvwTMBto3E6Hj5Hd8l3k0SBVXKeC6eHMmOQPMinfJk/gSaOku1PqULiDTZNAWU97e6nip+gxY69zuJQ7N1H97jzCbPyn2N84sMOR6GsSddUU+NzULQOH4rsvG4noQmPOkaovVOWBQM/9y4o705uaK2wkgavynR98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wvmibsLh; arc=none smtp.client-ip=91.218.175.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1789397290; c=relaxed/simple;
+	bh=sSuxvUZK/IInSTh3DMry4fm7u0hI8Ny9M1h4ityWlBI=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=MGkd+eLe3nm0rEyYYKOVQpWqI7sPl3vMQIZO2TD4G2qxocUjdDTWrttcwZFktT3bjQB3fF+9bHhUBluX0JnMA11/aBrKnk4KAVdt5ShWF9JUQfP7KyIRLgS8E17NrdyfP4ZDi5UtnK7NAypcH+lBjpA335wKLRNFl8HhoJ5Plj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=RDKoacyi; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wvmibsLh"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=ZOxEFV6yKVa+U+wttltPLAq7YKcnlIAuux7OwLuKqMI=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1789397037; v=1; x=1790001837;
- b=wvmibsLh5euIm+EX2e8EuQmLcO+WK0UDNnUjPd+SNMh6UGYsywEI4s1uoD768thhldVGjFHE
- DB6N3su8UTgT/R7NwYV46xKMTq21uxLR7GOeCLCCpusx7oSofUBSCm9Aul2B0UMgIP7cgsDcnX9
- plKEbVQD+7NdhVMi9+zK1LRs=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 3748073340fb3012;
-	Mon, 14 Sep 2026 14:43:57 +0000
-X-Mizu-Trace-ID: 3748073340fb3012
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b78e073980so8492e87.1
-        for <kvmarm@lists.linux.dev>; Mon, 14 Sep 2026 07:43:53 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBwa3VQCpdbEAwM6bx+kVWuw66//xqNWZSYVJTRvBtXEilp2eMScn/kw/sRanbyg72YbROqmnWo=@lists.linux.dev
-X-Gm-Message-State: AFuF++naLa8CkxdlOfmYMPX++ieU/ZktL0s0BbKL9FwKdMAPPt2NkpNM
-	l4rhycZbZJQktv/GNtzyteBaAjNAorJkPksGZAN2Vb1KTv5dj6pa44DlUgmH2n6wzru8u9ZxW3R
-	+DhYEZsFppIwpDucb51NOzXjf3kep5P7+w6QC+Z3x
-X-Received: by 2002:a05:6512:1555:b0:5b1:5e30:ab4d with SMTP id
- 2adb3069b0e04-5b8af7a5089mr55808e87.5.1789397032407; Mon, 14 Sep 2026
- 07:43:52 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="RDKoacyi"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 18646153B;
+	Mon, 14 Sep 2026 07:47:58 -0700 (PDT)
+Received: from [10.0.128.139] (unknown [10.0.128.139])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F20BB3F86F;
+	Mon, 14 Sep 2026 07:47:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1789397281; bh=sSuxvUZK/IInSTh3DMry4fm7u0hI8Ny9M1h4ityWlBI=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=RDKoacyiTEJcsnBood+kw6BJnBDDLH+xWOGOm6H1cuAOovgJDoklW3GMfhm4kiyXw
+	 bt5sMro68jYrRvGKIW7SRj5qwGXjpsFt150Xc8J274C1qzAGTpQWJs/IzKGVgX4AoL
+	 1B3JAd6cJRUW0jr84JP8ygSYFjCHkQ5JHh7cYJYM=
+Message-ID: <d5541663-3b64-4aaa-9ac6-b07ac0bc2c8a@arm.com>
+Date: Mon, 14 Sep 2026 15:47:57 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260914113338.159227-1-fuad.tabba@linux.dev> <20260914113338.159227-13-fuad.tabba@linux.dev>
- <8633vc6jag.wl-maz@kernel.org>
-In-Reply-To: <8633vc6jag.wl-maz@kernel.org>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Mon, 14 Sep 2026 15:43:16 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTy6F9tG=eRLMuykc12P-Oc2pjMoQqAz34iGR+Q5GzV2jQ@mail.gmail.com>
-X-Gm-Features: AcwNN1VwPAYbkVlaO1umpV1hjCIFKM3lgcDxKxOZL3M7XeNBLkF2CpyyCPMyBJY
-Message-ID: <CA+EHjTy6F9tG=eRLMuykc12P-Oc2pjMoQqAz34iGR+Q5GzV2jQ@mail.gmail.com>
-Subject: Re: [PATCH v3 12/18] KVM: arm64: Prevent host PC adjustments for
- protected vCPUs
-To: Marc Zyngier <maz@kernel.org>
-Cc: oupton@kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, 
-	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	mark.rutland@arm.com, steven.price@arm.com, vdonnefort@google.com, 
-	qperret@google.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v18 4/7] firmware: arm_rmm: Add support for SRO
+Content-Language: en-GB
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+To: Sudeep Holla <sudeep.holla@kernel.org>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
+ will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
+ aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
+ joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
+ linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
+ sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
+ WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com
+References: <20260912083611.2513845-1-suzuki.poulose@arm.com>
+ <20260912083611.2513845-5-suzuki.poulose@arm.com>
+ <20260914-talkative-healthy-pogona-334c03@sudeepholla>
+ <657e69c2-d0e9-433a-b0d2-4f16bc94ee2c@arm.com>
+In-Reply-To: <657e69c2-d0e9-433a-b0d2-4f16bc94ee2c@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi Marc,
+On 14/09/2026 15:02, Suzuki K Poulose wrote:
+> On 14/09/2026 13:50, Sudeep Holla wrote:
+>> On Sat, Sep 12, 2026 at 09:36:07AM +0100, Suzuki K Poulose wrote:
+>>> RMM v2.0 introduces the concept of "Stateful RMI Operations" (SRO). This
+>>> means that an SMC can return with an operation still in progress. The
+>>> host is expected to continue the operation until it reaches a conclusion
+>>> (either success or failure). During this process the RMM can request
+>>> additional memory ('donate') or hand memory back to the host
+>>> ('reclaim'). The host can request an in progress operation is cancelled,
+>>> but still continue the operation until it has completed (otherwise the
+>>> incomplete operation may cause future RMM operations to fail).
+>>>
+>>> The SRO is tracked using a struct rmi_sro_state object which keeps track
+>>> of any memory which has been allocated but not yet consumed by the RMM
+>>> or reclaimed from the RMM. This allows the memory to be reused in a
+>>> future request within the same operation. It will also permit an
+>>> operation to be done in a context where memory allocation may be
+>>> difficult (e.g. atomic context) with the option to abort the operation
+>>> and retry the memory allocation outside of the atomic context. The
+>>> memory stored in the struct rmi_sro_state object can then be reused on
+>>> the subsequent attempt.
+>>>
+>>> Wrappers for SRO RMI commands are also provided here because they depend
+>>> on the rmi_sro_execute() implementation added by this patch.
+>>> Delegate/undelegate handles are also added here because they now use the
+>>> SRO/stateful command infrastructure and are also used for the memory
+>>> DONATE/RECLAIM flows.
+>>>
+>>> Signed-off-by: Steven Price <steven.price@arm.com>
+>>> Co-Developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>
+>> [...]
+>>
+>>> +static int rmi_sro_donate_noncontig(struct rmi_sro_state *sro,
+>>> +                    unsigned long sro_handle,
+>>> +                    unsigned long donatereq,
+>>> +                    struct arm_smccc_1_2_regs *out_regs,
+>>> +                    gfp_t gfp)
+>>> +{
+>>> +    unsigned long block_size_fld = RMI_DONATE_BLOCK_SIZE(donatereq);
+>>> +    unsigned long block_size = 
+>>> rmi_addr_block_size_to_bytes(block_size_fld);
+>>> +    unsigned long count = RMI_DONATE_COUNT(donatereq);
+>>> +    unsigned long state = RMI_DONATE_STATE(donatereq);
+>>> +    unsigned long found = 0;
+>>> +    unsigned long donated_granules;
+>>> +    unsigned long granules_per_block = block_size >> PAGE_SHIFT;
+>>> +    unsigned long consumed_blocks;
+>>> +    int addr_list_start = sro->addr_count;
+>>> +
+>>> +    int ret;
+>>> +
+>>> +    for (int i = 0; i < addr_list_start && found < count; i++) {
+>>> +        unsigned long entry = sro->addr_list[i];
+>>> +
+>>> +        if (RMI_ADDR_RANGE_BLOCK_SIZE(entry) == block_size_fld &&
+>>> +            RMI_ADDR_RANGE_COUNT(entry) == 1 &&
+>>> +            RMI_ADDR_RANGE_STATE(entry) == state) {
+>>> +            addr_list_start--;
+>>> +            swap(sro->addr_list[addr_list_start],
+>>> +                 sro->addr_list[i]);
+>>> +            found++;
+>>> +            i--;
+>>> +        }
+>>> +    }
+>>> +
+>>> +    ret = rmi_sro_ensure_capacity(sro, count - found);
+>>> +    if (ret)
+>>> +        return ret;
+>>> +
+>>> +    while (found < count) {
+>>> +        unsigned long addr_range;
+>>> +        void *virt = alloc_pages_exact(block_size, gfp);
+>>> +        phys_addr_t phys;
+>>> +
+>>> +        if (!virt)
+>>> +            return -ENOMEM;
+>>> +
+>>> +        phys = virt_to_phys(virt);
+>>> +
+>>> +        if (state == RMI_OP_MEM_DELEGATED) {
+>>
+>> Based on my understanding, rmi_sro_memxfer_execute() is an exported 
+>> function
+>> and can be invoked by any module. The donatereq argument appears to 
+>> accept one
+>> of three operations:
+>>
+>> RMI_OP_MEM_DELEGATED
+>> RMI_OP_MEM_UNDELEGATED
+>> RMI_OP_MEM_CONDITIONAL
+> 
+> Ack
+> 
+>>
+>> Currently, the check confirming the state is RMI_OP_MEM_DELEGATED occurs
+>> relatively late in the function execution. It seems this function is
+>> explicitly designed to handle only RMI_OP_MEM_DELEGATED.
+> 
+> No, that is not correct. The function handles both OP_MEM_DELEGATED and
+> OP_MEM_UNDELEGATED. In the former case, we explicitly "delegate" the
+> pages before donating. The "UNDELEGATED" case doesn't need to do that
+> extra step.
+> 
+>>
+>> Given that this is an exported interface, would it make sense to
+>> fail-fast by moving this validation to the very beginning of the 
+>> function?
+>> Even if RMI_OP_MEM_CONDITIONAL is intended for future use, it should
+> 
+> Yep, agree. We can rejec the CONDITIONAL ones.
 
-On Mon, 14 Sept 2026 at 14:42, Marc Zyngier <maz@kernel.org> wrote:
-[...]
-> nit: it is really odd to see this 'pkvm' prefix in generic code. The
-> point of it is not only to abstract the pvkm complexity away, but also
-> to have a wrapper that may be of use in other situations.
->
-> Don't respin the series just for this though, I may end-up changing
-> this when applying it.
+For the record, the CONDITIONAL ones are required for self-describing
+cases for L1_GPT_CREATE and TRACKING_GRANULE_SET, where the RMM could
+accept DELEGATED granules for the objects (if not self describing) or
+UNDELEGATED granules  (if they are self-describing).
 
-Agree, if I respin I'll rename it.
+For now, we don't support such RMMs, so will reject the type for now.
 
-[...]
+Cheers
+Suzuki
 
-> > +   hyp_vcpu = pkvm_get_loaded_hyp_vcpu();
-> > +   if (!hyp_vcpu || hyp_vcpu->host_vcpu != vcpu)
->
-> Under which circumstances do we get hyp_vcpu->host_vcpu != vcpu?
+> 
+>> probably be rejected as invalid for now. Also, it is not clear why the
+>> current check is inside the loop while the state itself doesn't get
+>> modified.
+> 
+> As above, that check is additionally preparing the memory for RMM
+> consumption.
+> 
+> 
+>>
+>> If this is a valid concern, the same architectural pattern should 
+>> likely be
+>> applied to rmi_sro_donate_contig().
+>>
+> 
+> Ack, we can reject the CONDITIONAL ones.
+> 
+> Suzuki
+> 
 
-When EL2 calls __kvm_adjust_pc() on the hyp vCPU itself:
-__kvm_vcpu_run() at guest entry and inject_sync64() in nvhe/sys_regs.c
-both pass &hyp_vcpu->vcpu. There the vCPU passed is the one to adjust,
-so it's returned as is.
-
-> > +   if (pkvm_hyp_vcpu_is_protected(hyp_vcpu))
-> > +           return NULL;
->
-> Is it always the case that a protected vcpu cannot see its PC adjusted
-> at all? How is PC updated after an exit for MMIO? I feel there is an
-> interaction with the above, but I'm not 100% certain...
-
-The host can't adjust it directly, EL2 applies the host's request at
-the next entry. For MMIO, handle_pvm_exit_dabt() sets mmio_needed on
-the hyp vCPU from EL2's own syndrome, the host completes the access
-and kvm_handle_mmio_return() sets INCREMENT_PC on the host copy, and
-handle_pvm_entry_dabt() increments the hyp vCPU's PC at the next entry
-if EL2 had an MMIO pending, through the &hyp_vcpu->vcpu case above.
-
-The NULL return clears nothing, so the request stays on the host copy
-for that entry. It's reached from the epilogue of
-kvm_arch_vcpu_ioctl_run(), e.g. an MMIO completed on an immediate_exit
-run, and consuming it on the host copy there would clear INCREMENT_PC
-before EL2 sees it, so the guest would re-execute the access.
-
-"Drop" in the commit message and the adjust_pc.h comment reads as
-losing the request. I'll reword if I respin.
-
-Cheers,
-/fuad
