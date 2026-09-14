@@ -1,110 +1,159 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFE9145A284;
-	Mon, 14 Sep 2026 12:41:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF7B6495048;
+	Mon, 14 Sep 2026 12:50:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789389675; cv=none; b=IdYzRF2Qu2/6+YDdbc/I8LgQzh6yuRBTMMMGek9tujK4r+vKq/UlDNehLLSBSQr/zHqmCSdJoK6cpSPyscYowTxKKuJ8vBIM+Q/wG0cmgyoyRh//nb304gy308mYTRLOxQVsfY+nKjQXyHv+eKPd2xIpg9DfjnKqHA/Q/M9608o=
+	t=1789390216; cv=none; b=CLiNjKv3a0JKzXSR+071ZnaJaH/Pad6QFyeKKhBzYlSkw6sZ4v0Af+czjQPYDBLPUXSxoM9UFUAnMKHuvqJ/rJo2ALnh+W6ALutnJ6p7KbdtkXQ3g+xIk0PqIll9Vagowd4LSuaAEmfYpJ17uiuSXyDKHCAbFnro3a/INAJIiyg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789389675; c=relaxed/simple;
-	bh=6OdUupEoTI9x3lCh6YxYzy6R78ghSCLSRa4eUzlLKME=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=OkicHjWR9EfzYJrXh4qgkqhg9Z51ppSNeExCccS39HMvrFIbB9Tw2evQsZUndNMtfeeEAhJCDKbRuzcoZ4yEntr5fc+kfv8ZASkDilVcKyoniux0d3+QQcgs6WLXb4aGgIPPJY47SII+6ywgnqY89DXHiBAVrfVo1I6Uy5UgFG8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jLd9B7SF; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789390216; c=relaxed/simple;
+	bh=5tI1zpY8zLkyej9QbvMpvvC2TbxtSZN804gH9X3K+F8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A8wDDiE0EczCvlJHp8XyLxyvJG3IVEV8xvNNsNZLFknszxZbX0SvwwjtvDm8JWvfg4Xg0DWPV1qvr1uyuxIf4XYLnhFa5RID5fDf/QHbxyjGtgmEHaVu7z/yefDG4j9D3I3qgd8J5REyAmMVKHnNNg/wMuSlikA6b11mkFxU+mQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WBGGVmxO; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jLd9B7SF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07ED01F000FF;
-	Mon, 14 Sep 2026 12:41:12 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WBGGVmxO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DE0E1F0089D;
+	Mon, 14 Sep 2026 12:50:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789389673;
-	bh=WmRIV58agLlwNXVxN9Er09L3N2g5lQM1tRaoJRS5WgM=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=jLd9B7SFVjYhC4WfV3zKNa1J78VJue/dM1+qQWDGdxg+ZbsPF4g/4xKKI3DTOGiw9
-	 gpw/759L1KYTUyci+/rWFp3JTlUB7iVINttndLyVzov3FuXg41T7wzbdy/+D3+NOza
-	 29NU6LppGThgAzQYYvfaHKEMSH5UWc4cEPyi2a94Qpytp48CNFR4wOVuRxWGrAtMbI
-	 70CgzxwsgnGju8i2cWh/dysZRHCEwAp34LNwOYZgVkOnuEGRJu/k5PKqnMX/q9oifu
-	 SqgFHmxxRJLsnl6DcWmZTkUeRPCadJ6zAcIygtl7xXqGI19ppRAajYJE4L+5PYQJlp
-	 1WTHighhddksw==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2 01/13] arm64: Add ESR fault helpers
-Reply-To: sashiko-reviews@lists.linux.dev
-To: =?utf-8?b?TG9yZW56byBTdG9ha2VzIChBUk0p?= <ljs@kernel.org>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, kvm@vger.kernel.org, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260914-kvm-arm-prefault-v2-1-26fb47f74b73@kernel.org>
-References: <20260914-kvm-arm-prefault-v2-0-26fb47f74b73@kernel.org>
- <20260914-kvm-arm-prefault-v2-1-26fb47f74b73@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 14 Sep 2026 12:41:12 +0000
-Message-Id: <20260914124113.07ED01F000FF@smtp.kernel.org>
+	s=k20260515; t=1789390213;
+	bh=0KtDUE8QALpUJLh3cgBbWg1ocfjcrZvSFipwaQH4psI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=WBGGVmxOUCEh3LMm77M0VRx1+J+hDYYDfi9zOUc4kWZFJId3IhvguKBreC/qR0ter
+	 CQrsPrSD7gyL953Fccu8ukkFeSgc4F2UJcQR7mcb9I6Uwc3FublSEM9i92aofhTSur
+	 VozJDOfsIu7Fo9Jyh+v8qGZZKaGlMU1lY+cewReSvzimsh7yFSh/P45rflbt1Yu/A+
+	 uP7Cw0TQo+9nVuFxou8mg2bTfh6sLx/KrRnZm1TGcQwtKZn9PjFY0eVYTMqcKtrUC+
+	 42oFM9g3Z/+cKHQ0tKI6HynatUWCyTn2sNsq36Kh+MZlEmMFuWCL939rnXIp+z8kHh
+	 i+o/qTsTEqgkw==
+Date: Mon, 14 Sep 2026 13:50:07 +0100
+From: Sudeep Holla <sudeep.holla@kernel.org>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
+	Sudeep Holla <sudeep.holla@kernel.org>, will@kernel.org,
+	catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
+	aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
+	joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
+	linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
+	sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
+	WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com
+Subject: Re: [PATCH v18 4/7] firmware: arm_rmm: Add support for SRO
+Message-ID: <20260914-talkative-healthy-pogona-334c03@sudeepholla>
+References: <20260912083611.2513845-1-suzuki.poulose@arm.com>
+ <20260912083611.2513845-5-suzuki.poulose@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260912083611.2513845-5-suzuki.poulose@arm.com>
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [Low] Generic ESR helpers `esr_trap_is_iabt()` and `esr_abt_is_exec_fault=
-()` silently ignore instruction aborts from the current Exception level (`E=
-SR_ELx_EC_IABT_CUR`).
---
+On Sat, Sep 12, 2026 at 09:36:07AM +0100, Suzuki K Poulose wrote:
+> RMM v2.0 introduces the concept of "Stateful RMI Operations" (SRO). This
+> means that an SMC can return with an operation still in progress. The
+> host is expected to continue the operation until it reaches a conclusion
+> (either success or failure). During this process the RMM can request
+> additional memory ('donate') or hand memory back to the host
+> ('reclaim'). The host can request an in progress operation is cancelled,
+> but still continue the operation until it has completed (otherwise the
+> incomplete operation may cause future RMM operations to fail).
+> 
+> The SRO is tracked using a struct rmi_sro_state object which keeps track
+> of any memory which has been allocated but not yet consumed by the RMM
+> or reclaimed from the RMM. This allows the memory to be reused in a
+> future request within the same operation. It will also permit an
+> operation to be done in a context where memory allocation may be
+> difficult (e.g. atomic context) with the option to abort the operation
+> and retry the memory allocation outside of the atomic context. The
+> memory stored in the struct rmi_sro_state object can then be reused on
+> the subsequent attempt.
+> 
+> Wrappers for SRO RMI commands are also provided here because they depend
+> on the rmi_sro_execute() implementation added by this patch.
+> Delegate/undelegate handles are also added here because they now use the
+> SRO/stateful command infrastructure and are also used for the memory
+> DONATE/RECLAIM flows.
+> 
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> Co-Developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 
-commit 5b92bb137f8d48a92e83b6486d7d57faacb410df
-Author: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+[...]
 
-arm64: Add ESR fault helpers
-
-This commit adds helper functions that operate directly on ESR values, mirr=
-oring
-equivalent KVM vCPU wrappers to allow KVM's stage-2 fault handling to opera=
-te
-on plain ESR values.
-
-> diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-> index f816f5d77f1a5..9c0205983d9a8 100644
-> --- a/arch/arm64/include/asm/esr.h
-> +++ b/arch/arm64/include/asm/esr.h
-> @@ -437,6 +437,50 @@
->  #ifndef __ASSEMBLER__
->  #include <asm/types.h>
-> =20
-> +static __always_inline u8 esr_get_ec(unsigned long esr)
+> +static int rmi_sro_donate_noncontig(struct rmi_sro_state *sro,
+> +				    unsigned long sro_handle,
+> +				    unsigned long donatereq,
+> +				    struct arm_smccc_1_2_regs *out_regs,
+> +				    gfp_t gfp)
 > +{
-> +	return ESR_ELx_EC(esr);
-> +}
+> +	unsigned long block_size_fld = RMI_DONATE_BLOCK_SIZE(donatereq);
+> +	unsigned long block_size = rmi_addr_block_size_to_bytes(block_size_fld);
+> +	unsigned long count = RMI_DONATE_COUNT(donatereq);
+> +	unsigned long state = RMI_DONATE_STATE(donatereq);
+> +	unsigned long found = 0;
+> +	unsigned long donated_granules;
+> +	unsigned long granules_per_block = block_size >> PAGE_SHIFT;
+> +	unsigned long consumed_blocks;
+> +	int addr_list_start = sro->addr_count;
 > +
-> +static __always_inline bool esr_trap_is_iabt(unsigned long esr)
-> +{
-> +	return esr_get_ec(esr) =3D=3D ESR_ELx_EC_IABT_LOW;
-> +}
+> +	int ret;
+> +
+> +	for (int i = 0; i < addr_list_start && found < count; i++) {
+> +		unsigned long entry = sro->addr_list[i];
+> +
+> +		if (RMI_ADDR_RANGE_BLOCK_SIZE(entry) == block_size_fld &&
+> +		    RMI_ADDR_RANGE_COUNT(entry) == 1 &&
+> +		    RMI_ADDR_RANGE_STATE(entry) == state) {
+> +			addr_list_start--;
+> +			swap(sro->addr_list[addr_list_start],
+> +			     sro->addr_list[i]);
+> +			found++;
+> +			i--;
+> +		}
+> +	}
+> +
+> +	ret = rmi_sro_ensure_capacity(sro, count - found);
+> +	if (ret)
+> +		return ret;
+> +
+> +	while (found < count) {
+> +		unsigned long addr_range;
+> +		void *virt = alloc_pages_exact(block_size, gfp);
+> +		phys_addr_t phys;
+> +
+> +		if (!virt)
+> +			return -ENOMEM;
+> +
+> +		phys = virt_to_phys(virt);
+> +
+> +		if (state == RMI_OP_MEM_DELEGATED) {
 
-[Severity: Low]
-Does this intentionally ignore instruction aborts originating from the curr=
-ent
-Exception level (ESR_ELx_EC_IABT_CUR)?
+Based on my understanding, rmi_sro_memxfer_execute() is an exported function
+and can be invoked by any module. The donatereq argument appears to accept one
+of three operations:
 
-While this is safe for the current KVM stage-2 fault handling which only
-processes LOW traps, moving this to a generic architectural header with a
-generic name introduces a trap for future callers evaluating host kernel
-page faults. It also contrasts with esr_is_data_abort() in the same file,
-which correctly checks both LOW and CUR variants.
+RMI_OP_MEM_DELEGATED
+RMI_OP_MEM_UNDELEGATED
+RMI_OP_MEM_CONDITIONAL
 
-[ ... ]
+Currently, the check confirming the state is RMI_OP_MEM_DELEGATED occurs
+relatively late in the function execution. It seems this function is 
+explicitly designed to handle only RMI_OP_MEM_DELEGATED.
 
-> +static __always_inline bool esr_abt_is_exec_fault(unsigned long esr)
-> +{
-> +	return esr_trap_is_iabt(esr) && !esr_abt_is_s1ptw(esr);
-> +}
+Given that this is an exported interface, would it make sense to
+fail-fast by moving this validation to the very beginning of the function?
+Even if RMI_OP_MEM_CONDITIONAL is intended for future use, it should 
+probably be rejected as invalid for now. Also, it is not clear why the
+current check is inside the loop while the state itself doesn't get
+modified.
 
-[Severity: Low]
-Because this relies on esr_trap_is_iabt(), does this mean it will also
-misclassify current-EL execution faults?
+If this is a valid concern, the same architectural pattern should likely be
+applied to rmi_sro_donate_contig().
 
-[ ... ]
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260914-kvm-arm-pr=
-efault-v2-0-26fb47f74b73@kernel.org?part=3D1
+-- 
+Regards,
+Sudeep
