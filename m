@@ -1,155 +1,83 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta0.migadu.com (out-64.mta0.migadu.com [91.218.175.64])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D410472093
-	for <kvmarm@lists.linux.dev>; Mon, 14 Sep 2026 13:42:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62C04394EB0
+	for <kvmarm@lists.linux.dev>; Mon, 14 Sep 2026 14:01:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.64
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789393380; cv=none; b=FtEaELbtZ77T9D7s9K4rppDBN69x/L/0DL8KtAjwQPofnemoDUxlMd6WjygofgPDcquMqCYS9q69hZIg4z7fOO/ATc6q6ZDhMGaGjgvVxIHYyLIfRqzigPmYEWA+AfCN09jRp4fF2+U1Wxr6v2BdWClrZUpI3nHThl7q6mU9dqs=
+	t=1789394501; cv=none; b=ARMLw9uJqOK3nUvmsNEpicBxyCvWtRGKdeQxLzh9uXDx9ZikcJfnWDIxbxByUlYG69fszjETlhZqix5if46SV44UUAowYGST5TwImXF1AlyF+lPjQ0kSXg1ix3WDrOJPev1wVyHDRlyj0OkN6p1p8mwtuHbnqf3GkjOixRs/p1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789393380; c=relaxed/simple;
-	bh=mS4qWVd8sviF4ovA4wB4+v5UqsrIMGsbpO9jOrN9r2A=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=jGduDfSj9GinpYSznUc7ZcxObqxr72uuuW3tjxmuQKRpD6CaavaPM9d8nPMWrXafP4GxWU58uR1K4HiUg++eKxl9MLKX6ERsKqRkae2ob66BAxbk//TXuJ5+rXVby6BINbUXaPlNjhnSMrNF4YmW9UBi5UBIr+2w1NnbeRiGFdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PhyZhnPZ; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789394501; c=relaxed/simple;
+	bh=aXjrtqiXJoA/LX+vo9ztIrGq5juji/Jt2LOumdsvJdA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=I4GoqSI/El+WCkhG2WkUXOk5uz1L831gPe3+GfAVmvJ+T50QeDiRewmhHAMGV2+S+4zaNFQAkNffyqJKc7KEssC3CXuNtI84UwAtAFgZvoZ5c6TGPNEv5hsLdnhvuZvWB6l7qy02+TmyVlI46oWIoIQz/337hDmmVwjN4CPyUfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fVykSPJd; arc=none smtp.client-ip=91.218.175.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PhyZhnPZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A5B21F000FF;
-	Mon, 14 Sep 2026 13:42:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789393378;
-	bh=NgGyOq6Kv0kRSueMHmrPbIbVGS8r/kcWjymJBZ773pI=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=PhyZhnPZ0fQ/EO8oyz4/ZBDkVH57Sz4kP2qLiUVtDXKoZrg2/1bJy2+aIO5YBGFwP
-	 NwC22JBRA5n9gej+O/OjTg5IGwbKXHl7tMnpCxngsicbqX+6/7gkdaxH3FFZ+vL/bA
-	 /UAd/ezj3yEElA2BroVuEGEbFE3NFD+WAxe+64tHQ4DSkfwrWqHD9EHoJpXPNfm2OD
-	 Qo0ftwf7+dRUy3ZWy41bJraxa2aeQ0CV6O7gXqxUopUgGXhGDYTWe7nqtMB1OzDZqF
-	 2aS9VTKuQHdT2JflJoppDdRhDWlJgXP7f6LAK4aFNmsLjb5aoiDbtUwjEQeLYrrY8p
-	 b6eqdqr8wZgkQ==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v3 06/18] KVM: arm64: Skip fixed-feature state flush for
- protected vCPUs
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Fuad Tabba" <fuad.tabba@linux.dev>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260914113338.159227-7-fuad.tabba@linux.dev>
-References: <20260914113338.159227-1-fuad.tabba@linux.dev>
- <20260914113338.159227-7-fuad.tabba@linux.dev>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 14 Sep 2026 13:42:58 +0000
-Message-Id: <20260914134258.9A5B21F000FF@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fVykSPJd"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=aXjrtqiXJoA/LX+vo9ztIrGq5juji/Jt2LOumdsvJdA=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1789394496; v=1; x=1789999296;
+ b=fVykSPJddqrG6m3pCmfdaAbO0aiteOb+PmvQgr5DrObbPol+wqHf5GtXj7MOdsim/fJaJwS0
+ 5QXpJ2wH8TvUZ0Lvk8slbbIe9jxMXU3qRhmE6IuMYPCQpDXpGJpp0ujGikwvLgzd0ySAHrRxopa
+ nmumSMxY3p+1lmEfmNrIf3ec=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 7c56a09e8806736b;
+	Mon, 14 Sep 2026 14:01:36 +0000
+X-Mizu-Trace-ID: 7c56a09e8806736b
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b4a0b384b7so8172e87.0
+        for <kvmarm@lists.linux.dev>; Mon, 14 Sep 2026 07:01:31 -0700 (PDT)
+X-Gm-Message-State: AFuF++k2ttmXt+vwUFH7ZqaxDE3z4GTv12bNBCA2wKrI4K3OrVaTub6C
+	dD0WAODfqELN1Ct/EuW7LBqeQx1SoOoApzHq+hmx46ychZwrXeAYIGQoQEs/xfOe0fGthru1PaB
+	6vMwAHfMtRilmByvqhHXuqn/61XLgEkrwsnEoBsv7
+X-Received: by 2002:a05:6512:118a:b0:5b6:4ad:d6ba with SMTP id
+ 2adb3069b0e04-5b8af7bc5c0mr67742e87.15.1789394490822; Mon, 14 Sep 2026
+ 07:01:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+References: <20260914113338.159227-1-fuad.tabba@linux.dev> <20260914113338.159227-4-fuad.tabba@linux.dev>
+ <20260914130152.F0D5F1F000FF@smtp.kernel.org>
+In-Reply-To: <20260914130152.F0D5F1F000FF@smtp.kernel.org>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Mon, 14 Sep 2026 15:00:54 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTzHZTdjKUucBvZKDbxHAcnOHMBZxJRevA+GiWQDP83pOQ@mail.gmail.com>
+X-Gm-Features: AcwNN1XihQ6L_5NZ9k6Ku9xDFQszoCROVzbsUjq5p0JBwaP6L9c0nu0dTTIBf6E
+Message-ID: <CA+EHjTzHZTdjKUucBvZKDbxHAcnOHMBZxJRevA+GiWQDP83pOQ@mail.gmail.com>
+Subject: Re: [PATCH v3 03/18] KVM: arm64: Pin the host vCPU before adjusting
+ its PC under pKVM
+To: sashiko-reviews@lists.linux.dev
+Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>, 
+	Marc Zyngier <maz@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [Critical] Early return in `flush_debug_state` leaves the protected guest=
-'s `debug_owner` as `VCPU_DEBUG_FREE`, completely bypassing hardware debug =
-register context switching and exposing host physical debug registers to th=
-e guest.
---
+On Mon, 14 Sep 2026 at 14:01, <sashiko-bot@kernel.org> wrote:
+[...]
+> If a userspace process creates a VM and a memory slot, and then immediately
+> deletes it via KVM_SET_USER_MEMORY_REGION with a zero memory size before
+> the first KVM_RUN, this triggers kvm_arch_flush_shadow_memslot().
+>
+> This unconditionally calls kvm_tlb_flush_vmid_range(), which issues an HVC
+> call that ends up in handle___kvm_tlb_flush_vmid_range():
 
-commit 3ff31a206fa3951489ae8f183dab7b2241b1018e
-Author: Fuad Tabba <fuad.tabba@linux.dev>
+With pKVM enabled that path doesn't get there.
 
-KVM: arm64: Skip fixed-feature state flush for protected vCPUs
+[...]
+> Since this is the exact same sequence described in the commit message (a host
+> pointer unmapped at EL2 being dereferenced before the first run), should we
+> also pin the mmu pointer around these TLB flush operations?
 
-This commit skips the fixed-feature state flush for protected vCPUs by
-returning early in flush_debug_state() and sync_debug_state(), and moving t=
-he
-mdcr_el2 copy into the non-protected branch in flush_hyp_vcpu().
+The handlers are unvalidated, but under pKVM the host owns no guest
+stage-2, so none of the kvm_s2_mmu hypercalls has a valid caller
+there. Rather than pin, I'll send a separate patch that rejects them
+when protected mode is enabled.
 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe=
-/hyp-main.c
-> index ef65c3cd6f810..229a4877d14f5 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -200,6 +200,9 @@ static void flush_debug_state(struct pkvm_hyp_vcpu *h=
-yp_vcpu)
->  {
->  	struct kvm_vcpu *host_vcpu =3D hyp_vcpu->host_vcpu;
-> =20
-> +	if (pkvm_hyp_vcpu_is_protected(hyp_vcpu))
-> +		return;
-> +
-
-[Severity: Critical]
-Does this early return leave the protected guest's debug_owner as
-VCPU_DEBUG_FREE (its zero-initialized value) instead of synchronizing it?
-This could bypass hardware debug register context switching, potentially
-exposing host physical debug registers to the guest.
-
->  	hyp_vcpu->vcpu.arch.debug_owner =3D host_vcpu->arch.debug_owner;
-> =20
->  	if (kvm_guest_owns_debug_regs(&hyp_vcpu->vcpu)) {
-
-[ ... ]
-
-> @@ -218,6 +221,9 @@ static void sync_debug_state(struct pkvm_hyp_vcpu *hy=
-p_vcpu)
->  {
->  	struct kvm_vcpu *host_vcpu =3D hyp_vcpu->host_vcpu;
-> =20
-> +	if (pkvm_hyp_vcpu_is_protected(hyp_vcpu))
-> +		return;
-> +
-
-[Severity: Critical]
-Could this early return ignore debug state updates on exit, further
-contributing to the debug isolation bypass?
-
-If KVM's world switch sees !kvm_debug_regs_in_use(), it might skip restoring
-the host's debug registers.
-
->  	if (kvm_guest_owns_debug_regs(&hyp_vcpu->vcpu))
->  		host_vcpu->arch.vcpu_debug_state =3D hyp_vcpu->vcpu.arch.vcpu_debug_st=
-ate;
->  	else if (kvm_host_owns_debug_regs(&hyp_vcpu->vcpu))
-
-[ ... ]
-
-> @@ -241,6 +247,12 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp=
-_vcpu)
->  	if (!pkvm_hyp_vcpu_is_protected(hyp_vcpu)) {
->  		if (vcpu_get_flag(host_vcpu, PKVM_HOST_STATE_DIRTY))
->  			flush_hyp_vcpu_state(hyp_vcpu);
-> +
-> +		hyp_vcpu->vcpu.arch.hcr_el2 &=3D ~(HCR_TWI | HCR_TWE);
-> +		hyp_vcpu->vcpu.arch.hcr_el2 |=3D READ_ONCE(host_vcpu->arch.hcr_el2) &
-> +							 (HCR_TWI | HCR_TWE);
-> +
-> +		hyp_vcpu->vcpu.arch.mdcr_el2 =3D host_vcpu->arch.mdcr_el2;
-
-[Severity: Critical]
-By moving the mdcr_el2 copy into the non-protected branch, does the protect=
-ed
-guest retain the EL2-computed mdcr_el2 where TDA is deliberately cleared?
-
-This seems to prevent debug accesses from trapping. If a protected guest
-directly executes MSR DBGBVR0_EL1, <addr> without trapping to EL2, and KVM
-skips restoring the host's debug registers on exit due to the early returns
-above, the guest's malicious values could remain active when the host resum=
-es.
-
-If the host has breakpoints enabled (MDSCR_EL1.MDE =3D 1), these guest-inje=
-cted
-breakpoints could fire in the host kernel.
-
->  		hyp_vcpu->vcpu.arch.iflags =3D host_vcpu->arch.iflags;
->  	} else {
->  		hyp_vcpu->vcpu.arch.ctxt =3D host_vcpu->arch.ctxt;
-> @@ -249,17 +261,13 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hy=
-p_vcpu)
->  	/* __hyp_running_vcpu must be NULL in a guest context. */
->  	hyp_vcpu->vcpu.arch.ctxt.__hyp_running_vcpu =3D NULL;
-> =20
-> -	hyp_vcpu->vcpu.arch.mdcr_el2	=3D host_vcpu->arch.mdcr_el2;
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260914113338.1592=
-27-1-fuad.tabba@linux.dev?part=3D6
+Cheers,
+/fuad
