@@ -1,100 +1,328 @@
-Received: from mta0.migadu.com (out-214.mta0.migadu.com [91.218.175.214])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DFF2368D76
-	for <kvmarm@lists.linux.dev>; Mon, 14 Sep 2026 06:23:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.214
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FC7735FF5B;
+	Mon, 14 Sep 2026 06:23:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789366983; cv=none; b=YUxf7TDgOI3Wazdnbfqo3DbwOobaWVRh7/zETMOWle5oGPImfhoFgPGXAlzVw/bXyK/Riycq7/byazCxXvBYo8aJz0jHGDKfNUoSEJvVzMguAzXAXs3NG3jxsIX8kA2/E/0AHqEHVQL1TxYGxzuvZUttkNUktDuNLbahHPjaDZk=
+	t=1789366985; cv=none; b=Fo4fNOFGSFle+tV3pW/34HZIaH3esmqrKH9JGajrJ9Am4EQCBzZJs35OyG8mp6fP5XqPNp8aBuZvljd/TSnbbT0/tApUvdQhPkBO7MbdoTjwVy49IByL6AlA+Pd7q7Y+CUATO107AGsTSJR6yqft8SMU5JcJGgNminxJfbEXht0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789366983; c=relaxed/simple;
-	bh=VieHCLikamjyBABp5jihQYyq36aRCo8cSamzhnFC7ic=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jLcv4bvo3DJY9/zA5oNQNVNdTsrf5uuQEdM895yEaJszeVcYc1bv28mc8gHGEQubZD1PtlNZmNNjEXmFGZvXRe9seM9dl6iPTxHVIkyjkVAjmfcq/q/QtUcdnyQKBTpaoPcd0ydXDYl+0KbrpWUBmdT5qYS+e4hGW9GbbBpYMMk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=hM5dqN9F; arc=none smtp.client-ip=91.218.175.214
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1789366985; c=relaxed/simple;
+	bh=A33RJV2D0AN0N24mCbcvU4G5DcOAvXGh3mPfTyTsEU8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IKUDHpzunTltQAb5D50VV/IHq6o7NZ03aVJNUvi1pHoNx+pX2Aidhfo4F5ZuMi4b5cnyLQPEcNW7PxfxezkKkJZq0rJymX7/Ypcyw6OVASg0466y9KOLsZZ66DlZP3R5+c8UnW1J0Janmtr+bIYvWeH0BDPlQDBuwD/IKuTK8sw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=op48qBzZ; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="hM5dqN9F"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=VieHCLikamjyBABp5jihQYyq36aRCo8cSamzhnFC7ic=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1789366979; v=1; x=1789971779;
- b=hM5dqN9FM3OVDyz785uPeB0x3cvDDBAVsE9aiFs//2QkikvT8D6Pt3xhoPZ4blEdDS7FTxGd
- 0AEffd+uC7g8OyRNCE/lVUFftKVmI7xwTlLf8lXrm7hQXrxfInIyO+dABhljrWygp70WUsUErr4
- EFbnB8kkMxXPpLuIH7LVlA3Y=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id f0877cfbcf92d2fd;
-	Mon, 14 Sep 2026 06:22:59 +0000
-X-Mizu-Trace-ID: f0877cfbcf92d2fd
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b4a0b384b7so5053e87.0
-        for <kvmarm@lists.linux.dev>; Sun, 13 Sep 2026 23:22:59 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBykKpztwWmkhX7mjLJTp27qgRmELv6mQ/nsf9tQ2d/D1R40iDQNCQPRuBQTLxZtKn+RwZmQHf0=@lists.linux.dev
-X-Gm-Message-State: AFuF++kkReSlQwiFIrZqJ3vTIv4ziMA9kjf5VJRAL7oGpIOZ1MVli2e8
-	6XLtXYh2TLBfVpqVhdrv0H0+sgd/v7NFVUA6Zuo0yRMDLTiFFuLgdLmCEz2lIT8Vs0Nqyb3sUHM
-	22iNNi/H9GRK11Is+Vb0ie6RL+nCaSFvXhwvsy9rh
-X-Received: by 2002:a05:6512:b83:b0:5b4:9dba:7401 with SMTP id
- 2adb3069b0e04-5b8af7adabamr12439e87.11.1789366978483; Sun, 13 Sep 2026
- 23:22:58 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="op48qBzZ"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EF8FD1570;
+	Sun, 13 Sep 2026 23:22:56 -0700 (PDT)
+Received: from [10.57.10.40] (unknown [10.57.10.40])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AEF083F7B4;
+	Sun, 13 Sep 2026 23:22:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1789366980; bh=A33RJV2D0AN0N24mCbcvU4G5DcOAvXGh3mPfTyTsEU8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=op48qBzZwgyfzF0VPAvSFLZzpF+trv27JNawXFVF37FvxQcTi/T7McDrcQdOOdqnR
+	 82revSNtVjf5WuXwOqH8296xhdLN6t0a4jwy5DE4u9ztN6VUJH0fqQjATMhu26amVa
+	 gYrvzph+gXtKvfYuEiUsh3aj1Dh1G/kspPvLWsWY=
+Message-ID: <4f18aa66-2296-4b63-87f5-6ab493faecbc@arm.com>
+Date: Mon, 14 Sep 2026 07:22:56 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260907070002.3333525-1-fuad.tabba@linux.dev>
- <20260907070002.3333525-11-fuad.tabba@linux.dev> <aqQA26sBLaOxt5zF@e143914.arm.com>
-In-Reply-To: <aqQA26sBLaOxt5zF@e143914.arm.com>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Mon, 14 Sep 2026 07:21:00 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTyzoyfWVwi693=KOJnVtfm77WM7xVrK1qohggbXiK+jDA@mail.gmail.com>
-X-Gm-Features: AcwNN1UHmJL4XMDsOjIzilf9wFiDj9EFVHlfMzTGCSTBDYYPUYcacTlrGdZ2ZOU
-Message-ID: <CA+EHjTyzoyfWVwi693=KOJnVtfm77WM7xVrK1qohggbXiK+jDA@mail.gmail.com>
-Subject: Re: [PATCH v2 10/17] KVM: arm64: Prevent host PC adjustments for
- protected vCPUs
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Vincent Donnefort <vdonnefort@google.com>, 
-	Quentin Perret <qperret@google.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v18 4/7] firmware: arm_rmm: Add support for SRO
+Content-Language: en-GB
+To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: maz@kernel.org, will@kernel.org, catalin.marinas@arm.com,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org,
+ joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
+ linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
+ sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
+ WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com
+References: <20260912083611.2513845-1-suzuki.poulose@arm.com>
+ <20260912083611.2513845-5-suzuki.poulose@arm.com>
+ <f00d01d1-8df0-4865-8e52-c85171cf4ca5@redhat.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <f00d01d1-8df0-4865-8e52-c85171cf4ca5@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi Joey,
+Hi Gavin
 
-[...]
+Thank you for the review, I will address most of them. Responses inline.
 
->  For a non-protected vCPU, use PKVM_HOST_STATE_DIRTY to determine
->  whether to update the host vCPU or hyp vCPU.
-[...]
-> Feel free to not take the rewording, but it helped me understand a bit,
-> and felt clearer.
+On 14/09/2026 06:04, Gavin Shan wrote:
+> On 9/12/26 6:36 PM, Suzuki K Poulose wrote:
+>> RMM v2.0 introduces the concept of "Stateful RMI Operations" (SRO). This
+>> means that an SMC can return with an operation still in progress. The
+>> host is expected to continue the operation until it reaches a conclusion
+>> (either success or failure). During this process the RMM can request
+>> additional memory ('donate') or hand memory back to the host
+>> ('reclaim'). The host can request an in progress operation is cancelled,
+>> but still continue the operation until it has completed (otherwise the
+>> incomplete operation may cause future RMM operations to fail).
+>>
+>> The SRO is tracked using a struct rmi_sro_state object which keeps track
+>> of any memory which has been allocated but not yet consumed by the RMM
+>> or reclaimed from the RMM. This allows the memory to be reused in a
+>> future request within the same operation. It will also permit an
+>> operation to be done in a context where memory allocation may be
+>> difficult (e.g. atomic context) with the option to abort the operation
+>> and retry the memory allocation outside of the atomic context. The
+>> memory stored in the struct rmi_sro_state object can then be reused on
+>> the subsequent attempt.
+>>
+>> Wrappers for SRO RMI commands are also provided here because they depend
+>> on the rmi_sro_execute() implementation added by this patch.
+>> Delegate/undelegate handles are also added here because they now use the
+>> SRO/stateful command infrastructure and are also used for the memory
+>> DONATE/RECLAIM flows.
+>>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> Co-Developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 
-Marc had a second look at this patch and it came out reworked: the
-copy selection moved into __kvm_adjust_pc() behind a get/put pair, and
-the pinning moved out into its own fix. The pinning paragraph you
-reworded is gone from this patch, and the PKVM_HOST_STATE_DIRTY one is
-reworded along your lines.
 
-> Not sure here why we use hyp_vcpu->vcpu.kvm over host_vcpu->kvm, in
-> non-protected pKVM do we still not trust it?
 
-It was the pointer, not the VM: EL2 wasn't dereferencing a
-host-written pointer without pinning what it points at. Moot now, the
-host copy is adjusted with its own struct kvm, which the fix pins.
+>> ---
+>>   drivers/firmware/arm_rmm/rmi.c | 586 +++++++++++++++++++++++++++++++++
+>>   include/linux/arm-rmi-cmds.h   |  41 +++
+>>   2 files changed, 627 insertions(+)
+>>
+>> diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/ 
+>> arm_rmm/rmi.c
+>> index 5b0e342ce3d58..4f9898ece7547 100644
+>> --- a/drivers/firmware/arm_rmm/rmi.c
+>> +++ b/drivers/firmware/arm_rmm/rmi.c
 
->  /* Loaded protected vCPU: do nothing. */
+> 
+> I would drop rmi_granule_range_{delegate, undelegate}() by combining 
+> their logics to
+> their only callers rmi_{delegate, undelegate}_range(). More details are 
+> provided for
+> rmi_{delegate, undelegate}_range() in the below.
 
-The else clause went with the rework. The drop is a NULL from the get
-helper, with a comment there.
+Ack
 
-> Acked-by: Joey Gouly <joey.gouly@arm.com>
 
-Thanks! I've left it off v3 since the code you acked has changed under
-you, so I'd appreciate a second look there.
+> 
+>> +int rmi_delegate_range(phys_addr_t phys,
+>> +               unsigned long size,
+>> +               phys_addr_t *out_phys)
+>> +{
+>> +    long ret = 0;
+>> +    unsigned long top = phys + size;
+>> +    unsigned long out_top;
+>> +
+>> +    while (phys < top) {
+>> +        ret = rmi_granule_range_delegate(phys, top, &out_top);
+>> +
+>> +        if (ret == RMI_SUCCESS) {
+>> +            /* Buggy RMM ? */
+>> +            if (WARN_ON(out_top <= phys)) {
+>> +                rmi_undelegate_range(top - size, size);
+> 
+> [top - size, size] is incorrect because we may be delegating a sub-range 
+> of the
+> range of granules. It's actually the caller's responsibility to 
+> undelegate the
+> graunles that have been delegated.
+> 
+>              if (WARN_ON(out_top <= phys)) {
+>                  ret = -ENXIO;
+>                  break;
+>              }
 
-Cheers,
-/fuad
+Agree, I have done this already based on Sashiko review, and added a 
+comment too.
+
+
+
+> 
+>> +/*
+>> + * Convert the RmiAddrBlockSize to actual size. This is used in 
+>> RmiDonateReq
+>> + * and RmiAddrRangeDesc*.
+>> + */
+>> +static unsigned long rmi_addr_block_size_to_bytes(unsigned long 
+>> block_size_fld)
+>> +{
+>> +    return BIT(ARM64_HW_PGTABLE_LEVEL_SHIFT(3 - block_size_fld));
+>> +}
+>> +
+>> +/*
+>> + * free_addr_range: Free memory described by the address range entry, 
+>> which may
+>> + *            be partially consumed by RMM.
+>> + *
+>> + * @entry: RMI_ADDR_RANGE descriptor
+>> + * @consumed_size: Page aligned size consumed by the RMM from the 
+>> address range.
+>> + *
+>> + * If the state of the address is DELEGATED, undelegate it back, 
+>> before freeing.
+>> + * Leaks the memory if we cannot undelegate the range.
+>> + */
+>> +static void free_addr_range(unsigned long entry, unsigned long 
+>> consumed_size)
+>> +{
+>> +    unsigned long phys = RMI_ADDR_RANGE_ADDR(entry);
+>> +    unsigned long block_size_fld = RMI_ADDR_RANGE_BLOCK_SIZE(entry);
+>> +    unsigned long count = RMI_ADDR_RANGE_COUNT(entry);
+>> +    unsigned long state = RMI_ADDR_RANGE_STATE(entry);
+>> +    unsigned long size = rmi_addr_block_size_to_bytes(block_size_fld) 
+>> * count;
+>> +
+>> +    WARN_ON(!PAGE_ALIGNED(phys) || !PAGE_ALIGNED(consumed_size));
+>> +
+>> +    /* Adjust the address and size for partially consumed entry */
+>> +    phys += consumed_size;
+>> +    size -= consumed_size;
+>> +    /*
+>> +     * Undelegate the pages back if required. If we can't
+>> +     * change them back, leak the pages.
+>> +     */
+>> +    if (state == RMI_OP_MEM_DELEGATED &&
+>> +        WARN_ON(rmi_undelegate_range(phys, size)))
+>> +        return;
+>> +    free_pages_exact(phys_to_virt(phys), size);
+>> +}
+>> +
+>> +static void rmi_op_continue(unsigned long sro_handle, unsigned long 
+>> flags,
+>> +                struct arm_smccc_1_2_regs *out_regs)
+>> +{
+>> +    *out_regs = (struct arm_smccc_1_2_regs) {
+>> +        SMC_RMI_OP_CONTINUE, sro_handle, flags
+>> +    };
+>> +
+>> +    rmi_smccc_invoke(out_regs);
+>> +}
+>> +
+> 
+> The pattern 'regs' is used in some of the 'struct arm_smccc_1_2_regs' 
+> arguments
+> or variables in this series, which is incosistent to the existing 
+> patterns which
+> is either 'args' or 'res' by searching the source files using 'git grep 
+> arm_smccc_1_2_regs'.
+> So I would suggest we have the fixed the pattern 'args' :-)
+
+
+I would prefer to keep it "regs" as, unlike the smccc_1_1 calls, we
+pass "arm_smccc_1_2_regs" for both arguments and results. In this case
+we are using a single structure, so, to avoid the confusion, I
+intentionally used regs
+
+> 
+
+>> +
+>> +int rmi_free_delegated_page(phys_addr_t phys)
+>> +{
+>> +    if (WARN_ON_ONCE(rmi_undelegate_page(phys))) {
+>> +        /* Undelegate failed: leak the page */
+>> +        return -EBUSY;
+>> +    }
+>> +
+>> +    free_page((unsigned long)phys_to_virt(phys));
+>> +
+>> +    return 0;
+>> +}
+>> +EXPORT_SYMBOL_GPL(rmi_free_delegated_page);
+>> +
+> 
+> I would move rmi_free_delegated_page() right after rmi_undelegate_range().
+
+Ack
+
+
+>> +
+>> +static int rmi_sro_donate_noncontig(struct rmi_sro_state *sro,
+>> +                    unsigned long sro_handle,
+>> +                    unsigned long donatereq,
+>> +                    struct arm_smccc_1_2_regs *out_regs,
+>> +                    gfp_t gfp)
+>> +{
+>> +    unsigned long block_size_fld = RMI_DONATE_BLOCK_SIZE(donatereq);
+>> +    unsigned long block_size = 
+>> rmi_addr_block_size_to_bytes(block_size_fld);
+>> +    unsigned long count = RMI_DONATE_COUNT(donatereq);
+>> +    unsigned long state = RMI_DONATE_STATE(donatereq);
+>> +    unsigned long found = 0;
+>> +    unsigned long donated_granules;
+>> +    unsigned long granules_per_block = block_size >> PAGE_SHIFT;
+>> +    unsigned long consumed_blocks;
+>> +    int addr_list_start = sro->addr_count;
+>> +
+>          ^^^^^^
+> 
+> Unecessary blank line.
+
+Removed
+
+...
+
+>> +
+>> +void rmi_sro_free(struct rmi_sro_state *sro)
+>> +{
+>> +    /* Handle the worse */
+>> +    if (WARN_ON(sro->addr_count < 0))
+>> +        return;
+>> +
+>> +    if (WARN_ON(sro->addr_count > RMI_MAX_ADDR_LIST))
+>> +        sro->addr_count = RMI_MAX_ADDR_LIST;
+>> +
+>> +    for (int i = 0; i < sro->addr_count; i++)
+>> +        free_addr_range(sro->addr_list[i], 0);
+>> +
+>> +    sro->addr_count = 0;
+>> +}
+>> +EXPORT_SYMBOL_GPL(rmi_sro_free);
+>> +
+>> +long rmi_sro_memxfer_execute(struct rmi_sro_state *sro, gfp_t gfp)
+>> +{
+>> +    struct arm_smccc_1_2_regs *regs = &sro->regs;
+>> +    bool cancelled = false;
+>> +    unsigned long sro_handle;
+>> +
+>> +    rmi_smccc_invoke(regs);
+>> +
+>> +    sro_handle = regs->a1;
+>> +    while (RMI_RETURN_STATUS(regs->a0) == RMI_INCOMPLETE) {
+>> +        bool can_cancel = RMI_RETURN_CAN_CANCEL(regs->a0) == 
+>> RMI_OP_CAN_CANCEL;
+>> +        int ret = 0;
+>> +
+>> +        switch (RMI_RETURN_MEMREQ(regs->a0)) {
+>> +        case RMI_OP_MEM_REQ_NONE:
+>> +            rmi_op_continue(sro_handle, RMI_CONTINUE_KEEP_GOING,
+>> +                    regs);
+>> +            break;
+>> +        case RMI_OP_MEM_REQ_DONATE:
+>> +            ret = rmi_sro_donate(sro, sro_handle, regs->a2, regs,
+>> +                         gfp);
+>> +            break;
+>> +        case RMI_OP_MEM_REQ_RECLAIM:
+>> +            ret = rmi_sro_reclaim(sro, sro_handle, regs);
+>> +            break;
+>> +        default:
+>> +            ret = WARN_ON_ONCE(1);
+>> +            break;
+> 
+> "ret = WARN_ON_ONCE(1)" is same to "ret = true". I guess we would return
+> -EINVAL here.
+> 
+>              WARN_ON_ONCE(1);
+>              ret = -EINVAL;
+>              break;
+
+Ack, this should be -ENXIO
+
+Cheers
+
