@@ -1,114 +1,95 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta0.migadu.com (out-233.mta0.migadu.com [91.218.175.233])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE7A647DD44
-	for <kvmarm@lists.linux.dev>; Mon, 14 Sep 2026 16:23:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FA8B368D5A
+	for <kvmarm@lists.linux.dev>; Mon, 14 Sep 2026 16:24:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789402987; cv=none; b=ZeCEZA4z66c1UGgL+Rkb+hRhxHRRLuvkR1Gsp9GiWwZBSayJL4Kr8cOPrFLK8CfIU+1Eco44UGEg002p+oO8QazdTlM5kpP1QTkdSuFuMhDwjoPQwWbKXT0259soRuysBIEKfa8uLSdTDShitebYp95IROV4ayBPoN9Fx7C2NSU=
+	t=1789403045; cv=none; b=cTBHgkW4UXjKIIgji7YxLcOhOHZnY1C5AV4fYy7QtpXBjDv/d3dSHlVaDmQ+20nonvUQTeNnmg5sYCFNCZtmne2hCBiwAYcjSSOb6OrBR+KOxoZNHZ1uk9FwfnOQDmgRsaY5QmgD2qGcDCwUtT9+myWNbw37YRb038J8MSI5UYs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789402987; c=relaxed/simple;
-	bh=lsztI7xSTtuNUD0MNXX26uzFQaeUbFImiEJu0Xv7rt4=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=N4y9ruXUojhqdghtyKgb/1nDxV4kUz3Bt7Ib7SspP+vbo2FFTIzrpbKn/t9EGgAk6+z7p1jJU0rg+aktI0VHxDzir8zTa5qKmMp3W1E678bG+XPKnOBRgZzxriMwAWiFFU/3wpyF0sJREq5u07Nlav+bZArePwgSlda2JbsaHFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NV8vh6en; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789403045; c=relaxed/simple;
+	bh=+462xxdyeMC1GN/R2WQFu0vf/hv5y4sjHsNqOzNci58=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OdIuRPBLsKlUPk0Iya5p6vlEkaMzpfNkAKNx4Hs3Cx8r4RMr/XLJsFmqTGMg4XYVa9poNBW1AjRctG9QuvqtT+z+RxToeTY5Xp2x6xb59JUPyalRv99pxiZlQoraOSL24ghl1JswfaFkZ4N/zHyD8Cm1hlob9dU3h6/CEcHfsjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=V7T3YCKz; arc=none smtp.client-ip=91.218.175.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NV8vh6en"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0054D1F000FF;
-	Mon, 14 Sep 2026 16:23:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789402985;
-	bh=LuCt8zWedbt7RsRso3ShQGUEAUJuv+nPMo5OrWMdRqI=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=NV8vh6enELDRzRrncJkzG+MMumYOjHcSZJ2XpcnQn2wGkhVixFNt9rRnstD2tSJJf
-	 ZxdNilhkHce+2rXmKA3ifpDrd9ZejuMtS7G+sjboMojKsyNzy2PZuUvOzQCBLCkXFN
-	 ksXqsjM+ioblHFKcjeyzwTfsnJ6jL230t3DKqn17ZKURzfNkq1GYYXFApzq9Ld5d/A
-	 MTV49PWKl2xTe030lKSQHYf1VYLcC1IzGJqII1EPaoq4K8h9xct1TNXliXgJXGYKSa
-	 cShx4nNz0Q+ERXnfDZUe3fJuQlV+cnXg80ZvKr2mnUnHp7etpZeqv9LYnHczlftFc4
-	 iadyf9oL15Xpg==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v3 17/18] KVM: arm64: Advertise the capabilities that
- protected VMs support
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Fuad Tabba" <fuad.tabba@linux.dev>
-Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev
-In-Reply-To: <20260914113338.159227-18-fuad.tabba@linux.dev>
-References: <20260914113338.159227-1-fuad.tabba@linux.dev>
- <20260914113338.159227-18-fuad.tabba@linux.dev>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 14 Sep 2026 16:23:04 +0000
-Message-Id: <20260914162305.0054D1F000FF@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="V7T3YCKz"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=+462xxdyeMC1GN/R2WQFu0vf/hv5y4sjHsNqOzNci58=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1789403041; v=1; x=1790007841;
+ b=V7T3YCKz5vFV14QVyuD4y42Y18oMJy7rhUaOharFDbbZ1WnXwpiEFcxNeyFso/C156OrPfKR
+ hpozSI81ic8QMH/EuiwVcFjjM8zP5RQKSX0J7pQ/HvM43bfmo+LqQGHbsPyz56EMZ4tWEFFtsXJ
+ l+swkPb9Q9FsWWtF4A4ON/ps=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id bc63234f3f952a90;
+	Mon, 14 Sep 2026 16:24:01 +0000
+X-Mizu-Trace-ID: bc63234f3f952a90
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b4a0b17359so9846e87.0
+        for <kvmarm@lists.linux.dev>; Mon, 14 Sep 2026 09:23:57 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBwhr366E12R6EPEo+FyLaZE6Cb5DWJsn/FEZK3r2hUTnC5/EavSGj9mjnF4sqyjdMWWa1KO3wU=@lists.linux.dev
+X-Gm-Message-State: AFuF++mS7GdpqJW15I3wncXlyaHqsOT5ime9BKIhEdmRN1qggjafPJfV
+	x0jzo6v5ivVwS1wWc+hdugidUR1oMf2uaep2lpPY0+hauze0YRYdv465FPCFQydzsu4TLAcz61g
+	WNywBBd/h/WQPQMaJvdRQQy4wyZNjQPfrhCAbfKNK
+X-Received: by 2002:ac2:5681:0:b0:5ae:b1b3:145a with SMTP id
+ 2adb3069b0e04-5b8ae4c4829mr98689e87.6.1789403036316; Mon, 14 Sep 2026
+ 09:23:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+References: <20260830-host-direct-messages-v7-0-45f6e6db72c2@google.com> <20260830-host-direct-messages-v7-1-45f6e6db72c2@google.com>
+In-Reply-To: <20260830-host-direct-messages-v7-1-45f6e6db72c2@google.com>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Mon, 14 Sep 2026 17:23:19 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTx54xunFQxmAo_Ub+C4ZhhPvhixdkenfWV4rkF0jPCNsA@mail.gmail.com>
+X-Gm-Features: AcwNN1X2uetrRmFIoGYENcfcuU7e1BdSXNmH8r5ZduL9wOubCa5NrjEj-eVtpTM
+Message-ID: <CA+EHjTx54xunFQxmAo_Ub+C4ZhhPvhixdkenfWV4rkF0jPCNsA@mail.gmail.com>
+Subject: Re: [PATCH v7 1/3] KVM: arm64: Block host-initiated FF-A direct responses
+To: perlarsen@google.com
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Yeoreum Yun <yeoreum.yun@arm.com>, Ben Horgan <ben.horgan@arm.com>, 
+	Oliver Upton <oupton@kernel.org>, Sebastien Ene <sebastianene@google.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
+Hi Per,
 
-Pre-existing issues:
-- [High] Software SError injection via KVM_SET_VCPU_EVENTS silently fails f=
-or protected VMs and permanently leaves the host vCPU in a degraded state.
---
+On Mon, 31 Aug 2026 at 00:08, Per Larsen via B4 Relay
+<devnull+perlarsen.google.com@kernel.org> wrote:
+...
+> @@ -686,8 +686,10 @@ static bool ffa_call_supported(u64 func_id)
+>   case FFA_MSG_SEND:
+>   case FFA_MSG_POLL:
+>   case FFA_MSG_WAIT:
+> - /* 32-bit variants of 64-bit calls */
+> + /* The host is never the target of a direct request */
+>   case FFA_MSG_SEND_DIRECT_RESP:
+> + case FFA_FN64_MSG_SEND_DIRECT_RESP:
+> + /* 32-bit variants of 64-bit calls */
+>   case FFA_RXTX_MAP:
+>   case FFA_MEM_DONATE:
+>   case FFA_MEM_RETRIEVE_REQ:
 
-commit 3a73d995c015585fa4c9bb7392c4fb3d6d828c9c
-Author: Fuad Tabba <fuad.tabba@linux.dev>
-KVM: arm64: Advertise the capabilities that protected VMs support
+Sashiko asked whether the interfaces it listed should be added to the
+blocklist too. For FFA_FN64_NOTIFICATION_INFO_GET the answer looks
+like yes: FFA_FN_NATIVE() is FFA_FN64_##name on arm64, and
+ffa_notification_info_get() is the only in-tree caller, so the 32-bit
+entry a few lines below never matches what the host sends. Could you
+add it here?
 
-This patch updates kvm_pkvm_ext_allowed() to explicitly allow a list of
-capabilities that are expected to work for a protected guest, including
-various VCPU event and IRQ line capabilities.
+The other three aren't the same case. FFA_RX_RELEASE has to keep going
+through, since the host's release is what frees the hypervisor's RX
+buffer after do_ffa_part_get().
 
-> diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/k=
-vm_pkvm.h
-> index fbea052fa3e16..a165af0d75689 100644
-> --- a/arch/arm64/include/asm/kvm_pkvm.h
-> +++ b/arch/arm64/include/asm/kvm_pkvm.h
-> @@ -42,6 +42,15 @@ static inline bool kvm_pkvm_ext_allowed(struct kvm *kv=
-m, long ext)
->  	case KVM_CAP_ARM_VM_IPA_SIZE:
->  	case KVM_CAP_ARM_PTRAUTH_ADDRESS:
->  	case KVM_CAP_ARM_PTRAUTH_GENERIC:
-> +	case KVM_CAP_ONE_REG:
-> +	case KVM_CAP_MP_STATE:
-> +	case KVM_CAP_VCPU_EVENTS:
-> +	case KVM_CAP_VCPU_ATTRIBUTES:
-> +	case KVM_CAP_IMMEDIATE_EXIT:
-> +	case KVM_CAP_IOEVENTFD:
-> +	case KVM_CAP_IRQFD_RESAMPLE:
-> +	case KVM_CAP_ARM_IRQ_LINE_LAYOUT_2:
-> +	case KVM_CAP_ARM_INJECT_SERROR_ESR:
->  		return true;
-
-[Severity: High]
-This is a pre-existing issue, but advertising these capabilities formally
-exposes a bug where software SError injection is broken for protected VMs a=
-nd
-leaves the host vCPU in a permanently degraded state.
-
-If userspace sets an SError pending via KVM_SET_VCPU_EVENTS,
-kvm_inject_serror_esr() in arch/arm64/kvm/inject_fault.c attempts
-injection based on a stale host pstate. It sets PENDING_EXCEPTION
-and writes to the host's ESR_EL1.
-
-For a protected VM, this is mishandled at EL2. If the VM traps on an MMIO
-access, handle_pvm_entry_dabt() in arch/arm64/kvm/hyp/nvhe/hyp-main.c sees
-the PENDING_EXCEPTION flag left by the software injection and incorrectly
-injects a Synchronous External Abort (DABT) instead.
-
-Furthermore, EL2 does not clear PENDING_EXCEPTION on the host vcpu. When
-the host vCPU returns to userspace, kvm_arch_vcpu_ioctl_run() in
-arch/arm64/kvm/arm.c sees the uncleared flag. Because pkvm_adjust_pc_get()
-returns NULL for protected VMs, __kvm_adjust_pc() returns early without
-clearing the flag, triggering an unnecessary hypercall loop on every return
-to userspace.
-
-Does it make sense to delay advertising KVM_CAP_VCPU_EVENTS and
-KVM_CAP_ARM_INJECT_SERROR_ESR for protected VMs until the software SError
-injection path is fixed?
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260914113338.1592=
-27-1-fuad.tabba@linux.dev?part=3D17
+Cheers,
+/fuad
