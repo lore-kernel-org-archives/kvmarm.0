@@ -1,275 +1,123 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8577E4825AD;
-	Tue, 15 Sep 2026 21:20:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3C4433B969;
+	Tue, 15 Sep 2026 21:49:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789507243; cv=none; b=Y5NPfAezzhT0Ag34inYnhvzP3Vp7Qkz8J0/ZRygMitKcESY34I+zdycGAspNlTN8B4kxCizSb/Z3FDVj4zRq6YNO9peo1CS5yVIIEGRi9OInzAB/PkHdcK8pUH0G/YyxrG6XDhenjlzYhso6RL1/IlR+j2wWNppyI1KNmCJvauA=
+	t=1789508957; cv=none; b=g4JTkjA2PmY5t4CrUKScIHCGYjLX9lAtp+JAFK+wwmd3ZoaDdvE4EBDtXc2cs0BmuzaNyI2LQXqm2kCOhfrPGoq6qJKrMTUu3YYfSCpZwMyHuJEze1IRsMyK1dmUR3pHCMYyXJ65m//pbki6WX34FKuNCrIdAyOoobxWifRQeuw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789507243; c=relaxed/simple;
-	bh=LQViG0hlKh0Tbf4uhF7NC8leV+Z7xLVTw+9GggXNijo=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=JLbQhAOqGNTegV1rzxJMjJ8SOUOt8czsDJogfEvCK1qJFdOrLeFMwqVJgZWoGLEtMH1r6T6XHLKM8sHIk1k/rJ9lOirLo38YiN9VU3oRqWprrOJyJsRoeq9lBxtVSSnW4NeeIMNrXQsc5yj0oBaQEXwaN7aUGhZuv8ZQamdLP0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=hkwBkU3a; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1789508957; c=relaxed/simple;
+	bh=4Mh5YWpLGrRiK7zAXkaXbQmVg/ZurD93+09+Y8jTx+M=;
+	h=Date:From:To:Cc:Subject:Message-ID; b=dpcG4bYQyHV2HoX+J0dYgDJwqyyaRhEIrLN3iqy60eTRLLamDg6bKpbWiuJ0vHcuN1xCFPnjKsM68T6zTZBK3UyyXhgncKBj+NNOzxTNjk2wXVaam7YDnvOLhOPt+xKd65v0YKgVsAnbsFRv/Fqm2Y3GRWPEYo5X/4dfMGRcVdQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mK4KK4UY; arc=none smtp.client-ip=192.198.163.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="hkwBkU3a"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 225E7152B;
-	Tue, 15 Sep 2026 14:20:37 -0700 (PDT)
-Received: from [10.57.8.111] (unknown [10.57.8.111])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A8AD03F882;
-	Tue, 15 Sep 2026 14:20:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1789507240; bh=LQViG0hlKh0Tbf4uhF7NC8leV+Z7xLVTw+9GggXNijo=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=hkwBkU3aFMqKBvDmwcRh6Tkk9Rni4bu0ypgZpHfVxY46D9MrHa4yS37nopz6Vu+c/
-	 SHYBn8EzwiQmOWxeT8dLnP3ghvUbBI3VphIT+JwjCcKhuFMtAKYZJZS+f89bJOrgpm
-	 Wp54UDD7mSaWbIvDkhTYu6I1At0dZjkaZHrxk7Ls=
-Message-ID: <a4e7e6c3-d325-4f35-a17c-e02791cca326@arm.com>
-Date: Tue, 15 Sep 2026 22:20:36 +0100
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mK4KK4UY"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1789508954; x=1821044954;
+  h=date:from:to:cc:subject:message-id;
+  bh=4Mh5YWpLGrRiK7zAXkaXbQmVg/ZurD93+09+Y8jTx+M=;
+  b=mK4KK4UYXR5UYSBfHESWw8s9Hrw2bxB/mk9av8AN2IHsMmgCwf0QV8EU
+   Rz+X1Aq1on5uoUuscLR7U9lcwb4QN+h1sLMeaEpRwZYb5EsTx/R8p9ILU
+   LX61CGcatyv0MxjEAWgQNH3yJoebWWPNgAIs1T7FyC9BwRkTUL9hWTrCh
+   a+M/NPIe+tTqxPSy1FOLyd7y2p3G4O9yzPxN7rqBb1pf3yuEzeeOe/DNH
+   evnuHFjDUAd78AuyWWWqNo9SbAK9g+OAADs5zJkbaaLtCJ13E6paWIFTN
+   vWhgJX1mEQugV7yQEUZKBhRYZPjb6uTPW9G+b0h++4gn65XedAV33dCOl
+   A==;
+X-CSE-ConnectionGUID: bjKalSEhSkSbUDeVthDWfg==
+X-CSE-MsgGUID: KMUrjYB6TamY7uLNHgP0PA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11905"; a="395298"
+X-IronPort-AV: E=Sophos;i="6.27,103,1787036400"; 
+   d="scan'208";a="395298"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa115.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2026 14:49:14 -0700
+X-CSE-ConnectionGUID: hLb2xrbBQ161CTWIOpZ+xg==
+X-CSE-MsgGUID: 2z5BNDMlQAerbuvLzwFLtA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.27,103,1787036400"; 
+   d="scan'208";a="266930764"
+Received: from lkp-server01.sh.intel.com (HELO 462990a40a85) ([10.239.97.150])
+  by fmviesa009.fm.intel.com with ESMTP; 15 Sep 2026 14:49:12 -0700
+Received: from kbuild by 462990a40a85 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1x6b1Z-00000000577-3KBN;
+	Tue, 15 Sep 2026 21:49:09 +0000
+Date: Wed, 16 Sep 2026 05:48:32 +0800
+From: kernel test robot <lkp@intel.com>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: oe-kbuild-all@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>
+Subject: [kvmarm:next 31/83]
+ arch/arm64/kvm/vgic/vgic-irs-v5.c:1016:8: warning: variable 'addr' set but
+ not used
+Message-ID: <202609160555.JW0KTj94-lkp@intel.com>
+User-Agent: s-nail v14.9.25
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v18 01/23] KVM: arm64: protected VM: Handle set_one_reg
- CNTVCT_EL0/CNTPCT_EL0
-Content-Language: en-GB
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, will@kernel.org,
- catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
- aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
- joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
- linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
- sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
- WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com,
- Marc Zyngier <maz@krenel.org>
-References: <20260915160141.3543048-1-suzuki.poulose@arm.com>
- <20260915160141.3543048-2-suzuki.poulose@arm.com>
- <86o6dy5uob.wl-maz@kernel.org> <7c26c860-0543-459e-974b-72c59af261f9@arm.com>
-In-Reply-To: <7c26c860-0543-459e-974b-72c59af261f9@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
 
-On 15/09/2026 18:48, Suzuki K Poulose wrote:
-> On 15/09/2026 17:46, Marc Zyngier wrote:
->> On Tue, 15 Sep 2026 17:01:19 +0100,
->> Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
->>>
->>> Protected VMs doesn't allow setting offsets for virtual and phyiscal
->>> counters, as the offset is always fixed to 0. The VM ioclt is filtered
->>> out based on the cap. However we don't prevent the userspace from trying
->>> to write to the CNTVCT/CNTPCT registers. This would lead to KVM 
->>> triggering
->>> a WARN() in timer_set_offset() as the vm_offset pointer is set to NULL.
->>>
->>> Fix this by always "fixing" the timer offsets to 0 and marking that the
->>> timer offset is set in the kvm->arch.flags at pKVM init time. The
->>> userspace cannot use the KVM_ARM_SET_COUNTER_OFFSET, as it is blocked 
->>> for a
->>> protected VM.
->>>
->>> A userspace writing to the SYS_CNT*CT would observe success, without
->>> any real effect. This was chosen over preventing the writes to these
->>> registers and returning -EPERM.
->>>
->>> With that, we always have a valid vm_offset pointer, remove the 
->>> checks for
->>> vm_offset == NULL.
->>>
->>> Reported by Sashiko here
->>> https://lore.kernel.org/all/20260908164641.416911F00A3A@smtp.kernel.org
->>>
->>> Fixes: f7d05ee84a6a ("KVM: arm64: Prevent host from managing timer 
->>> offsets for protected VMs")
->>> Suggested-by: Marc Zyngier <maz@krenel.org>
->>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->>> ---
->>>   arch/arm64/kvm/arch_timer.c    | 15 +++++----------
->>>   arch/arm64/kvm/arm.c           | 15 +++++++++++++++
->>>   arch/arm64/kvm/hyp/nvhe/pkvm.c | 26 +++++++++++++-------------
->>>   include/kvm/arm_arch_timer.h   |  3 +--
->>>   4 files changed, 34 insertions(+), 25 deletions(-)
->>>
->>> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
->>> index 6ac3321f4c575..dda020da4c9c7 100644
->>> --- a/arch/arm64/kvm/arch_timer.c
->>> +++ b/arch/arm64/kvm/arch_timer.c
->>> @@ -1079,14 +1079,10 @@ static void timer_context_init(struct 
->>> kvm_vcpu *vcpu, int timerid)
->>>       ctxt->timer_id = timerid;
->>> -    if (!kvm_vm_is_protected(vcpu->kvm)) {
->>> -        if (timerid == TIMER_VTIMER)
->>> -            ctxt->offset.vm_offset = &kvm->arch.timer_data.voffset;
->>> -        else
->>> -            ctxt->offset.vm_offset = &kvm->arch.timer_data.poffset;
->>> -    } else {
->>> -        ctxt->offset.vm_offset = NULL;
->>> -    }
->>> +    if (timerid == TIMER_VTIMER)
->>> +        ctxt->offset.vm_offset = &kvm->arch.timer_data.voffset;
->>> +    else
->>> +        ctxt->offset.vm_offset = &kvm->arch.timer_data.poffset;
->>>       hrtimer_setup(&ctxt->hrtimer, kvm_hrtimer_expire, 
->>> CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
->>> @@ -1110,8 +1106,7 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
->>>           timer_context_init(vcpu, i);
->>>       /* Synchronize offsets across timers of a VM if not already 
->>> provided */
->>> -    if (!vcpu_is_protected(vcpu) &&
->>> -        !test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm- 
->>> >arch.flags)) {
->>> +    if (!test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm- 
->>> >arch.flags)) {
->>>           timer_set_offset(vcpu_vtimer(vcpu), kvm_phys_timer_read());
->>>           timer_set_offset(vcpu_ptimer(vcpu), 0);
->>>       }
->>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->>> index 8b080804bc90b..7c88508cac8a1 100644
->>> --- a/arch/arm64/kvm/arm.c
->>> +++ b/arch/arm64/kvm/arm.c
->>> @@ -214,6 +214,20 @@ static int kvm_arm_default_max_vcpus(void)
->>>       return vgic_present ? kvm_vgic_get_max_vcpus() : KVM_MAX_VCPUS;
->>>   }
->>> +/*
->>> + * Fix the counter offset to 0 for Protected VMs and mark the
->>> + * offset flag. The user can't set the offset via 
->>> KVM_ARM_SET_COUNTER_OFFSET.
->>> + */
->>> +static void kvm_arch_fix_timer_offsets(struct kvm *kvm)
->>> +{
->>> +    if (!kvm_vm_is_protected(kvm))
->>> +        return;
->>> +
->>> +    /* Fix the counter offset to 0 and mark the offset initialised */
->>> +    kvm->arch.timer_data.poffset = kvm->arch.timer_data.voffset = 0;
->>> +    set_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &kvm->arch.flags);
->>> +}
->>> +
->>>   /**
->>>    * kvm_arch_init_vm - initializes a VM data structure
->>>    * @kvm:    pointer to the KVM struct
->>> @@ -267,6 +281,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned 
->>> long type)
->>>       kvm_vgic_early_init(kvm);
->>> +    kvm_arch_fix_timer_offsets(kvm);
->>>       kvm_timer_init_vm(kvm);
->>
->> This should all be moved to the timer code.
->>
->>>       /* The maximum number of VCPUs is limited by the host's GIC 
->>> model */
->>> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/ 
->>> nvhe/pkvm.c
->>> index 459bd9eb7e4bc..e7b38eff63bd1 100644
->>> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
->>> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
->>> @@ -528,19 +528,19 @@ static int init_pkvm_hyp_vcpu(struct 
->>> pkvm_hyp_vcpu *hyp_vcpu,
->>>       hyp_vcpu->vcpu.arch.cflags = READ_ONCE(host_vcpu->arch.cflags);
->>>       hyp_vcpu->vcpu.arch.mp_state.mp_state = KVM_MP_STATE_STOPPED;
->>> -    if (!pkvm_hyp_vcpu_is_protected(hyp_vcpu)) {
->>> -        /*
->>> -         * Timer offsets are pointing to the untrusted KVM copy,
->>> -         * which is pinned in __pkvm_init_vm() for the VM life time.
->>> -         * It is worth noting that hyp_vm->host_kvm points to an EL2
->>> -         * linear map address and timer_get_offset() will use
->>> -         * kern_hyp_va() which is safe as it is idempotent.
->>> -         */
->>> -        vcpu_vtimer(&hyp_vcpu->vcpu)->offset.vm_offset =
->>> -            &hyp_vm->host_kvm->arch.timer_data.voffset;
->>> -        vcpu_ptimer(&hyp_vcpu->vcpu)->offset.vm_offset =
->>> -            &hyp_vm->host_kvm->arch.timer_data.poffset;
->>> -    }
->>> +    /*
->>> +     * Timer offsets are pointing to the untrusted KVM copy,
->>> +     * which is pinned in __pkvm_init_vm() for the VM life time.
->>> +     * It is worth noting that hyp_vm->host_kvm points to an EL2
->>> +     * linear map address and timer_get_offset() will use
->>> +     * kern_hyp_va() which is safe as it is idempotent.
->>> +     * Also for protected VMs the offset is fixed to 0 and is prevented
->>> +     * from changing.
->>> +     */
->>> +    vcpu_vtimer(&hyp_vcpu->vcpu)->offset.vm_offset =
->>> +        &hyp_vm->host_kvm->arch.timer_data.voffset;
->>> +    vcpu_ptimer(&hyp_vcpu->vcpu)->offset.vm_offset =
->>> +        &hyp_vm->host_kvm->arch.timer_data.poffset;
->>
->> I don't think this is right. Protected guests have no offset, and this
->> needs to be ensured by the hypervisor. Here, the host can change the
->> offset any time it wants, and that's not acceptable.
-> 
-> Ah, you're right. :facepalm:
-> 
->>
->>>       ret = pkvm_vcpu_init_sysregs(hyp_vcpu);
->>>       if (ret)
->>> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
->>> index bc6f2fdd7ad33..4f0aa3bb69f45 100644
->>> --- a/include/kvm/arm_arch_timer.h
->>> +++ b/include/kvm/arm_arch_timer.h
->>> @@ -176,8 +176,7 @@ static inline bool has_cntpoff(void)
->>>           if (__ctxt) {                        \
->>>               struct arch_timer_offset *ato = &__ctxt->offset;\
->>>                                       \
->>> -            if (ato->vm_offset)                \
->>> -                off += *KERN_HYP_VA(ato->vm_offset);    \
->>> +            off += *KERN_HYP_VA(ato->vm_offset);        \
->>>               if (ato->vcpu_offset)                \
->>>                   off += *KERN_HYP_VA(ato->vcpu_offset);    \
->>>           }                            \
->>
->> And as you drop the previous hunk, this also needs to be restored to
->> its original state.
-> 
-> Ack.
-> 
-> Suzuki
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git next
+head:   8476ce1f1e949a4eae0c0b8f06cf6ab51a3edfd0
+commit: 71091136d1452b6125579b210d29efec3e79681a [31/83] KVM: arm64: gic-v5: Handle userspace accesses to IRS MMIO region
+config: arm64-randconfig-003-20260916 (https://download.01.org/0day-ci/archive/20260916/202609160555.JW0KTj94-lkp@intel.com/config)
+compiler: aarch64-linux-gcc (GCC) 8.5.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260916/202609160555.JW0KTj94-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202609160555.JW0KTj94-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   arch/arm64/kvm/vgic/vgic-irs-v5.c: In function 'vgic_v5_has_attr_regs':
+>> arch/arm64/kvm/vgic/vgic-irs-v5.c:1016:8: warning: variable 'addr' set but not used [-Wunused-but-set-variable]
+     gpa_t addr, offset;
+           ^~~~
 
 
-This is how it looks like now, reworked.
+vim +/addr +1016 arch/arm64/kvm/vgic/vgic-irs-v5.c
 
+  1010	
+  1011	int vgic_v5_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr)
+  1012	{
+  1013		const struct vgic_register_region *region;
+  1014		struct vgic_reg_attr reg_attr;
+  1015		struct kvm_vcpu *vcpu;
+> 1016		gpa_t addr, offset;
+  1017		int ret, align;
+  1018	
+  1019		ret = vgic_v5_parse_attr(dev, attr, &reg_attr);
+  1020		if (ret)
+  1021			return ret;
+  1022	
+  1023		vcpu = reg_attr.vcpu;
+  1024		addr = reg_attr.addr;
+  1025	
+  1026		if (attr->group == KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS)
+  1027			return vgic_v5_has_cpu_sysregs_attr(vcpu, attr);
+  1028	
+  1029		offset = attr->attr;
+  1030	
+  1031		region = vgic_find_mmio_region(vgic_v5_irs_registers,
+  1032					       ARRAY_SIZE(vgic_v5_irs_registers),
+  1033					       offset);
+  1034		if (!region)
+  1035			return -ENXIO;
+  1036	
+  1037		align = region->access_flags & VGIC_ACCESS_64bit ? 0x7 : 0x3;
+  1038		if (offset & align)
+  1039			return -EINVAL;
+  1040	
+  1041		return 0;
+  1042	}
+  1043	
 
-diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-index 6ac3321f4c575..1c8fac222a643 100644
---- a/arch/arm64/kvm/arch_timer.c
-+++ b/arch/arm64/kvm/arch_timer.c
-@@ -1110,8 +1110,7 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
-                 timer_context_init(vcpu, i);
-
-         /* Synchronize offsets across timers of a VM if not already 
-provided */
--       if (!vcpu_is_protected(vcpu) &&
--           !test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, 
-&vcpu->kvm->arch.flags)) {
-+       if (!test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, 
-&vcpu->kvm->arch.flags)) {
-                 timer_set_offset(vcpu_vtimer(vcpu), kvm_phys_timer_read());
-                 timer_set_offset(vcpu_ptimer(vcpu), 0);
-         }
-@@ -1133,6 +1132,15 @@ void kvm_timer_init_vm(struct kvm *kvm)
-          */
-         for (int i = 0; i < NR_KVM_TIMERS; i++)
-                 kvm->arch.timer_data.ppi[i] = get_vgic_ppi(kvm, 
-default_ppi[i]);
-+
-+       /*
-+        * For the protected VMs, fix the counter offset to 0 by marking the
-+        * KVM_ARCH_FLAG_VM_COUNTER_OFFSET. This would also prevent 
-userspace
-+        * writes to CNTVCT_ELO & CNTPCT_EL0.
-+        * The user can't set the offset via vm ioctl 
-KVM_ARM_SET_COUNTER_OFFSET.
-+        */
-+       if (kvm_vm_is_protected(kvm))
-+               set_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &kvm->arch.flags);
-  }
-
-  void kvm_timer_cpu_up(void)
-
-
+--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
