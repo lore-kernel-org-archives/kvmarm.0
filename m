@@ -1,111 +1,246 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 993CF485939;
-	Tue, 15 Sep 2026 16:43:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 944F84B1293;
+	Tue, 15 Sep 2026 16:46:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789490631; cv=none; b=G+kClC/oi06pnQGzY+HExgtlxJUwQ3QR1y5+hZotiQJZsBfeM7j5sAVyAud+JqPB4cLfpUQF0HWshPAKb20BGW8+2GCul8UU2BX2b7SR34FjVFdrSyFCT/Q0372jgI4zdjCSL5o7eXPlcn5gSI3qo0vHJBiEisnpxthJ32hHwrQ=
+	t=1789490822; cv=none; b=lHbFrrakHnKfyHp7jXHKC9I/PPSh9xZapYsBE5OKrYwx5O4r4sSvH6PQy3WSZI/Qd8oIxUVZfGlzSuUEw9SX8bdLRBxqXYGeXSywODeMiDBipsasHOHZOfXQcZPxC6VO8FXeFfBi726QL9bcdhTHYGujCpfFpll9y9qChp1eH9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789490631; c=relaxed/simple;
-	bh=ldQeaUKYTLEakev2hYgPCK2QN9M8tQODLMhNfXbPp4M=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=MPxflFjtdfmvKUZCkrhwAgsh6X+CzIWPTzHgbGIN27DM3mDSalxiWNoz4VMtTYeQix4htBYihwgHubGtqljBL9VujgHnTSyvDGPozMkf4w2W7UYDE1Fvm+qiK+tCQ6s7MdzF9Q1G1mxUabOfpExSGZUl/l2D1+yHMkXxL/ia7Tg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PW/QLwgD; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789490822; c=relaxed/simple;
+	bh=E3RGqucTkwNYRRNmdVhT+ouYQLh7LNe5nsGlO2RJvqo=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MHxaxhwhcS+sAtK94H+jWd3nqj4jm5TWdzTjlx1iq6nFAkhKIF+Tt9wGrAX8W24WapzEh627RuFPTKaVslk55XtJbMVJpq52fklsODCjVTh7FCUElKr14MDdmgkUuXu+3mARTP9Dng0Gt6YL8+2VftOmOkS/R2U4rXkcR+FIw0s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fwuyI8Kc; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PW/QLwgD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D49711F000FF;
-	Tue, 15 Sep 2026 16:43:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fwuyI8Kc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C27A51F00898;
+	Tue, 15 Sep 2026 16:46:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789490627;
-	bh=TJbmUmxtpj6kfQp8djndKejSCzmy/kUVV0BqJIlBkwI=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=PW/QLwgD3KuOxBggfyiySlwabfGhFo3y7s68iX0r9Dfz5L1LM7HY4wd5nW1+q5qN0
-	 LvN2MipAoWAqHU0N2zEcvtO5X4HudfAcg8cG71tLZtA3W0S76eEzprKmvmnM4xOpxe
-	 jB8PdIfV1aT/vkA8rXLqUxvGB7vZoZiRNcjfrrPuLyOc4hWJN38itE0Jx6pFVtD7k2
-	 Irdcy3RR92bnp/JBVdmWAjHpE4cvDSPteFKMJNoojgkuBvqUgx/HgrtCfI5F6pCucj
-	 Og+NKIsryPvga9uqsnm9kc+jKsR/6O5fNgKnsWn5dJMbZg6UQrQ2a/KD/K1hu83X4N
-	 LL7YXLu9r/SgQ==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v18 20/23] KVM: arm64: CCA: Don't expose unsupported
- capabilities for realm guests
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Suzuki K Poulose" <suzuki.poulose@arm.com>
-Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, kvm@vger.kernel.org
-In-Reply-To: <20260915160141.3543048-21-suzuki.poulose@arm.com>
+	s=k20260515; t=1789490814;
+	bh=pUuXJb2gbvQrT4HY5aqTQDJfNZC8OLXN6trFm13CIQU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=fwuyI8Kc0QxbkoRtgBSrhhsXjraPd1OQdElgXeLCZm8iJgsahRWiRM86cA0cc5h6J
+	 reaDpKyy5qyodOFKoda8FYy5rmFVb31ZXONLQYTWFSCtrajZLuOKgJbj75awCyhdvN
+	 tR95RtTUi9V2shqYtaoZ/lKkqIvuqwB/Zj4llLC49V6V2frgMfu6yqPbivNyyh9yKf
+	 IkOczgj9dz6XZj5GgdNULl/rtD7SC57zDTGd74H6zGGKDfxD3Yp8DQCxmqcwpyLQd6
+	 WAFRjXxiDucDVYBpqWeOEIM83NHqnMbICgLubFkv1awI1Tsr56RSW0U04p94MqKw2p
+	 bbCC+sODN2dAQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1x6WJ1-00000009G1C-0emb;
+	Tue, 15 Sep 2026 16:46:51 +0000
+Date: Tue, 15 Sep 2026 17:46:44 +0100
+Message-ID: <86o6dy5uob.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	will@kernel.org,
+	catalin.marinas@arm.com,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	steven.price@arm.com,
+	aneesh.kumar@kernel.org,
+	oupton@kernel.org,
+	gshan@redhat.com,
+	joey.gouly@arm.com,
+	tabba@google.com,
+	yuzenghui@huawei.com,
+	linux-coco@lists.linux.dev,
+	gankulkarni@os.amperecomputing.com,
+	sdonthineni@nvidia.com,
+	alpergun@google.com,
+	fj0570is@fujitsu.com,
+	WeiLin.Chang@arm.com,
+	lpieralisi@kernel.org,
+	enju.kohei@fujitsu.com,
+	Marc Zyngier <maz@krenel.org>
+Subject: Re: [PATCH v18 01/23] KVM: arm64: protected VM: Handle set_one_reg CNTVCT_EL0/CNTPCT_EL0
+In-Reply-To: <20260915160141.3543048-2-suzuki.poulose@arm.com>
 References: <20260915160141.3543048-1-suzuki.poulose@arm.com>
- <20260915160141.3543048-21-suzuki.poulose@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 15 Sep 2026 16:43:46 +0000
-Message-Id: <20260915164346.D49711F000FF@smtp.kernel.org>
+	<20260915160141.3543048-2-suzuki.poulose@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com, joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com, maz@krenel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [High] kvm: host Denial of Service via WARN_ON_ONCE in kvm_arch_vm_ioctl_=
-allowed()
---
-
-commit f9fdb12a2363dfa41ace289596ec2d2bd95cde48
-Author: Suzuki K Poulose <suzuki.poulose@arm.com>
-KVM: arm64: CCA: Don't expose unsupported capabilities for realm guests
-
-This commit limits the capabilities allowed for Realm VMs and blocks
-vm_ioctls backed by unsupported capabilities. It introduces generic
-capability and ioctl filtering helpers kvm_arch_vm_ext_allowed() and
-kvm_arch_vm_ioctl_allowed() to support both pKVM and Realm guests.
-
+On Tue, 15 Sep 2026 17:01:19 +0100,
+Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+> 
+> Protected VMs doesn't allow setting offsets for virtual and phyiscal
+> counters, as the offset is always fixed to 0. The VM ioclt is filtered
+> out based on the cap. However we don't prevent the userspace from trying
+> to write to the CNTVCT/CNTPCT registers. This would lead to KVM triggering
+> a WARN() in timer_set_offset() as the vm_offset pointer is set to NULL.
+> 
+> Fix this by always "fixing" the timer offsets to 0 and marking that the
+> timer offset is set in the kvm->arch.flags at pKVM init time. The
+> userspace cannot use the KVM_ARM_SET_COUNTER_OFFSET, as it is blocked for a
+> protected VM.
+> 
+> A userspace writing to the SYS_CNT*CT would observe success, without
+> any real effect. This was chosen over preventing the writes to these
+> registers and returning -EPERM.
+> 
+> With that, we always have a valid vm_offset pointer, remove the checks for
+> vm_offset == NULL.
+> 
+> Reported by Sashiko here
+> https://lore.kernel.org/all/20260908164641.416911F00A3A@smtp.kernel.org
+> 
+> Fixes: f7d05ee84a6a ("KVM: arm64: Prevent host from managing timer offsets for protected VMs")
+> Suggested-by: Marc Zyngier <maz@krenel.org>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> ---
+>  arch/arm64/kvm/arch_timer.c    | 15 +++++----------
+>  arch/arm64/kvm/arm.c           | 15 +++++++++++++++
+>  arch/arm64/kvm/hyp/nvhe/pkvm.c | 26 +++++++++++++-------------
+>  include/kvm/arm_arch_timer.h   |  3 +--
+>  4 files changed, 34 insertions(+), 25 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> index 6ac3321f4c575..dda020da4c9c7 100644
+> --- a/arch/arm64/kvm/arch_timer.c
+> +++ b/arch/arm64/kvm/arch_timer.c
+> @@ -1079,14 +1079,10 @@ static void timer_context_init(struct kvm_vcpu *vcpu, int timerid)
+>  
+>  	ctxt->timer_id = timerid;
+>  
+> -	if (!kvm_vm_is_protected(vcpu->kvm)) {
+> -		if (timerid == TIMER_VTIMER)
+> -			ctxt->offset.vm_offset = &kvm->arch.timer_data.voffset;
+> -		else
+> -			ctxt->offset.vm_offset = &kvm->arch.timer_data.poffset;
+> -	} else {
+> -		ctxt->offset.vm_offset = NULL;
+> -	}
+> +	if (timerid == TIMER_VTIMER)
+> +		ctxt->offset.vm_offset = &kvm->arch.timer_data.voffset;
+> +	else
+> +		ctxt->offset.vm_offset = &kvm->arch.timer_data.poffset;
+>  
+>  	hrtimer_setup(&ctxt->hrtimer, kvm_hrtimer_expire, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
+>  
+> @@ -1110,8 +1106,7 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
+>  		timer_context_init(vcpu, i);
+>  
+>  	/* Synchronize offsets across timers of a VM if not already provided */
+> -	if (!vcpu_is_protected(vcpu) &&
+> -	    !test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm->arch.flags)) {
+> +	if (!test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm->arch.flags)) {
+>  		timer_set_offset(vcpu_vtimer(vcpu), kvm_phys_timer_read());
+>  		timer_set_offset(vcpu_ptimer(vcpu), 0);
+>  	}
 > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 8b080804bc90b..7c88508cac8a1 100644
 > --- a/arch/arm64/kvm/arm.c
 > +++ b/arch/arm64/kvm/arm.c
-[ ... ]
-> +static inline bool kvm_arch_vm_ioctl_allowed(struct kvm *kvm, unsigned i=
-nt ioctl)
+> @@ -214,6 +214,20 @@ static int kvm_arm_default_max_vcpus(void)
+>  	return vgic_present ? kvm_vgic_get_max_vcpus() : KVM_MAX_VCPUS;
+>  }
+>  
+> +/*
+> + * Fix the counter offset to 0 for Protected VMs and mark the
+> + * offset flag. The user can't set the offset via KVM_ARM_SET_COUNTER_OFFSET.
+> + */
+> +static void kvm_arch_fix_timer_offsets(struct kvm *kvm)
 > +{
-> +	long ext;
-> +	int r;
+> +	if (!kvm_vm_is_protected(kvm))
+> +		return;
 > +
-> +	r =3D kvm_get_cap_for_kvm_ioctl(ioctl, &ext);
-> +	if (WARN_ON_ONCE(r < 0))
-> +		return false;
+> +	/* Fix the counter offset to 0 and mark the offset initialised */
+> +	kvm->arch.timer_data.poffset = kvm->arch.timer_data.voffset = 0;
+> +	set_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &kvm->arch.flags);
+> +}
+> +
+>  /**
+>   * kvm_arch_init_vm - initializes a VM data structure
+>   * @kvm:	pointer to the KVM struct
+> @@ -267,6 +281,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>  
+>  	kvm_vgic_early_init(kvm);
+>  
+> +	kvm_arch_fix_timer_offsets(kvm);
+>  	kvm_timer_init_vm(kvm);
 
-[Severity: High]
-Could this allow an unprivileged host userspace process to crash the host?
+This should all be moved to the timer code.
 
-When kvm_arch_vm_ioctl() receives an unrecognized or garbage ioctl,=20
-kvm_get_cap_for_kvm_ioctl() returns a negative value. This evaluates to true
-and triggers the WARN_ON_ONCE() here. On systems configured with panic_on_w=
-arn
-(which is common in production and Android environments), this results in a
-kernel panic and a complete host denial of service.
+>  
+>  	/* The maximum number of VCPUs is limited by the host's GIC model */
+> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> index 459bd9eb7e4bc..e7b38eff63bd1 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> @@ -528,19 +528,19 @@ static int init_pkvm_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu,
+>  	hyp_vcpu->vcpu.arch.cflags = READ_ONCE(host_vcpu->arch.cflags);
+>  	hyp_vcpu->vcpu.arch.mp_state.mp_state = KVM_MP_STATE_STOPPED;
+>  
+> -	if (!pkvm_hyp_vcpu_is_protected(hyp_vcpu)) {
+> -		/*
+> -		 * Timer offsets are pointing to the untrusted KVM copy,
+> -		 * which is pinned in __pkvm_init_vm() for the VM life time.
+> -		 * It is worth noting that hyp_vm->host_kvm points to an EL2
+> -		 * linear map address and timer_get_offset() will use
+> -		 * kern_hyp_va() which is safe as it is idempotent.
+> -		 */
+> -		vcpu_vtimer(&hyp_vcpu->vcpu)->offset.vm_offset =
+> -			&hyp_vm->host_kvm->arch.timer_data.voffset;
+> -		vcpu_ptimer(&hyp_vcpu->vcpu)->offset.vm_offset =
+> -			&hyp_vm->host_kvm->arch.timer_data.poffset;
+> -	}
+> +	/*
+> +	 * Timer offsets are pointing to the untrusted KVM copy,
+> +	 * which is pinned in __pkvm_init_vm() for the VM life time.
+> +	 * It is worth noting that hyp_vm->host_kvm points to an EL2
+> +	 * linear map address and timer_get_offset() will use
+> +	 * kern_hyp_va() which is safe as it is idempotent.
+> +	 * Also for protected VMs the offset is fixed to 0 and is prevented
+> +	 * from changing.
+> +	 */
+> +	vcpu_vtimer(&hyp_vcpu->vcpu)->offset.vm_offset =
+> +		&hyp_vm->host_kvm->arch.timer_data.voffset;
+> +	vcpu_ptimer(&hyp_vcpu->vcpu)->offset.vm_offset =
+> +		&hyp_vm->host_kvm->arch.timer_data.poffset;
 
-[ ... ]
-> @@ -2150,7 +2202,7 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned i=
-nt ioctl, unsigned long arg)
->  	void __user *argp =3D (void __user *)arg;
->  	struct kvm_device_attr attr;
-> =20
-> -	if (is_protected_kvm_enabled() && !kvm_pkvm_ioctl_allowed(kvm, ioctl))
-> +	if (!kvm_arch_vm_ioctl_allowed(kvm, ioctl))
->  		return -EINVAL;
+I don't think this is right. Protected guests have no offset, and this
+needs to be ensured by the hypervisor. Here, the host can change the
+offset any time it wants, and that's not acceptable.
 
-[Severity: High]
-Does removing the is_protected_kvm_enabled() check expose the WARN_ON_ONCE()
-above to all ARM64 KVM deployments?
+>  
+>  	ret = pkvm_vcpu_init_sysregs(hyp_vcpu);
+>  	if (ret)
+> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+> index bc6f2fdd7ad33..4f0aa3bb69f45 100644
+> --- a/include/kvm/arm_arch_timer.h
+> +++ b/include/kvm/arm_arch_timer.h
+> @@ -176,8 +176,7 @@ static inline bool has_cntpoff(void)
+>  		if (__ctxt) {						\
+>  			struct arch_timer_offset *ato = &__ctxt->offset;\
+>  									\
+> -			if (ato->vm_offset)				\
+> -				off += *KERN_HYP_VA(ato->vm_offset);	\
+> +			off += *KERN_HYP_VA(ato->vm_offset);		\
+>  			if (ato->vcpu_offset)				\
+>  				off += *KERN_HYP_VA(ato->vcpu_offset);	\
+>  		}							\
 
-Previously, the warning in kvm_pkvm_ioctl_allowed() was strictly guarded by=
-=20
-is_protected_kvm_enabled(). By unconditionally calling=20
-kvm_arch_vm_ioctl_allowed() for all VMs, any local user with access to=20
-/dev/kvm can open a VM file descriptor and issue an unrecognized ioctl to=20
-trigger the warning. This exposes the panic condition to all ARM64 KVM=20
-deployments rather than strictly limiting it to pKVM configurations.
+And as you drop the previous hunk, this also needs to be restored to
+its original state.
 
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260915160141.3543=
-048-1-suzuki.poulose@arm.com?part=3D20
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
