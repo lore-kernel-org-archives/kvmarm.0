@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FB5542668B;
-	Tue, 15 Sep 2026 16:02:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE2674AA564;
+	Tue, 15 Sep 2026 16:02:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789488125; cv=none; b=u4mD19KJDjQChmHO2WzFgyI3Wc8wUj9b6Vf6B6sKWiCgjwtAULo6HUYmfQD1bshBUZzpRZ/fLhN28sa52jgI4D2Zp3Xt0HuPsKjNkpBuulMDOQpV36dXMgu83Ix3CJ8dxQZG8kOAB0V6BoUhcMVwltZOgPvwIdQ3C2hF7+zPlmE=
+	t=1789488128; cv=none; b=CB8hAXaKqJ0MRrdPfFJ7qfRCtF7JmvV86zBSEWupzNDlb8mlVb8rQkbQ23RAhjRq3DlGI8vDSWXebCwKcr9B2AVgzrSRPiOeD2hj7FewuxfEj6HNCZGKEkkULUIIRXKU9I5gZ20GbHpNGE3KvxI+dHnKr0aoGBPEzpU1yoAU6S4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789488125; c=relaxed/simple;
-	bh=8q9Rt/6mKLCfGe51uszKwi9iQrDRjaKLQZ+w4aPQW+c=;
+	s=arc-20240116; t=1789488128; c=relaxed/simple;
+	bh=9i06HhoyM7DumxjGYoPgI8El9s/cOdUwPNulQZnoz6U=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mLZcLoLOQoIlvQHvOz9UtDd3B4y2LV7TKWURvaGx3TLnCDvxwHe8fLGS+eKgLL0CTrumQBrDrMHVPJ0MOmQm1E6S9+PFQu3X7i5Sobt8EGorimADxfA6+9bfPIzV5v1ZyacyCVWCHZHPcXyqH9ssmGEQniVR5s9a8KS97d0mYi8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=nWbCCXse; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=WGHoJkMpyeX8VHSEGPu5Voo5IzbgOUDgTAaIGWtvzof/oj/T9rz8WS2I2rsWgKxP9GGq3GVCy0824aFxRvlW/A7yPwx+uYUvCECKXw0JUIGW1O7SY3uLc37pQc8M2tdWa9rW3zjHvOFL7DKiF+sW4blBuQtFOZg7mfQUYpH6H+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Px8dinwi; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="nWbCCXse"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Px8dinwi"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 72D53152B;
-	Tue, 15 Sep 2026 09:01:58 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8697A15A1;
+	Tue, 15 Sep 2026 09:02:01 -0700 (PDT)
 Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.2.197.99])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 365CA3F882;
-	Tue, 15 Sep 2026 09:01:59 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 54D743F882;
+	Tue, 15 Sep 2026 09:02:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1789488122; bh=8q9Rt/6mKLCfGe51uszKwi9iQrDRjaKLQZ+w4aPQW+c=;
+	t=1789488125; bh=9i06HhoyM7DumxjGYoPgI8El9s/cOdUwPNulQZnoz6U=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=nWbCCXsekbvTzwlFx/cCmPDi5S4a8fhGYI0dkfmWehsZtzCGn3bOI4RYcII0fMzGj
-	 Zlug/OpEpuJCmqxMH1VSwQh79dJapavF/xLh69AC4X3d+SoTEUZK700VxuFSm9iRhP
-	 tawEVg1kb81AP4bo1IX5ae463LenViZx8OMoLrSA=
+	b=Px8dinwiFlMpfwFzy4vAZgkYLalZ6Ms5ZuXXvu/UsexSs6rYBmhimmiQ/ZFiNYa9H
+	 XpHU/+PFKhyDxsex/mvWl6OEn2Pl9pQXrHxIwV8Sgv0lGlnToRrJFV/njmPaJbwNCY
+	 p0ZnZZRZZ+jjUONUyV5xNYsZjRG4VWc+O8qqfUQE=
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -49,11 +49,11 @@ Cc: maz@kernel.org,
 	WeiLin.Chang@arm.com,
 	lpieralisi@kernel.org,
 	enju.kohei@fujitsu.com,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Fuad Tabba <fuad.tabba@linux.dev>
-Subject: [PATCH v18 03/23] KVM: arm64: Include kvm_emulate.h in kvm/arm_psci.h
-Date: Tue, 15 Sep 2026 17:01:21 +0100
-Message-ID: <20260915160141.3543048-4-suzuki.poulose@arm.com>
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: [PATCH v18 04/23] KVM: arm64: Avoid including linux/kvm_host.h in kvm_pgtable.h
+Date: Tue, 15 Sep 2026 17:01:22 +0100
+Message-ID: <20260915160141.3543048-5-suzuki.poulose@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260915160141.3543048-1-suzuki.poulose@arm.com>
 References: <20260915160141.3543048-1-suzuki.poulose@arm.com>
@@ -63,40 +63,75 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Fix a potential build error (like below, when asm/kvm_emulate.h gets
-included after the kvm/arm_psci.h) by including the missing header file
-in kvm/arm_psci.h:
+From: Steven Price <steven.price@arm.com>
 
-./include/kvm/arm_psci.h: In function ‘kvm_psci_version’:
-./include/kvm/arm_psci.h:29:13: error: implicit declaration of function
-   ‘vcpu_has_feature’; did you mean ‘cpu_have_feature’? [-Werror=implicit-function-declaration]
-   29 |         if (vcpu_has_feature(vcpu, KVM_ARM_VCPU_PSCI_0_2)) {
-	         |             ^~~~~~~~~~~~~~~~
-			       |             cpu_have_feature
+To avoid future include cycles, drop the linux/kvm_host.h include in
+kvm_pgtable.h and include the lightweight headers required for the types
+and inline helpers used there. Additionally provide a forward
+declaration for struct kvm_s2_mmu as it's only used as a pointer in this
+file.
 
-Reviewed-by: Gavin Shan <gshan@redhat.com>
+Both pgtable.c and kvm_pkvm.h relied on the indirect inclusion of
+kvm_host.h, so make that explicit.
+
 Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
+Reviewed-by: Gavin Shan <gshan@redhat.com>
+Signed-off-by: Steven Price <steven.price@arm.com>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- include/kvm/arm_psci.h | 2 ++
- 1 file changed, 2 insertions(+)
+ arch/arm64/include/asm/kvm_pgtable.h | 6 +++++-
+ arch/arm64/include/asm/kvm_pkvm.h    | 2 +-
+ arch/arm64/kvm/hyp/pgtable.c         | 1 +
+ 3 files changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/include/kvm/arm_psci.h b/include/kvm/arm_psci.h
-index f86a006d67136..06c20612e9e7d 100644
---- a/include/kvm/arm_psci.h
-+++ b/include/kvm/arm_psci.h
-@@ -10,6 +10,8 @@
- #include <linux/kvm_host.h>
- #include <uapi/linux/psci.h>
+diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+index 41a8687938eb6..c2e4b29e605fc 100644
+--- a/arch/arm64/include/asm/kvm_pgtable.h
++++ b/arch/arm64/include/asm/kvm_pgtable.h
+@@ -8,9 +8,13 @@
+ #define __ARM64_KVM_PGTABLE_H__
  
-+#include <asm/kvm_emulate.h>
+ #include <linux/bits.h>
+-#include <linux/kvm_host.h>
++#include <linux/kvm_types.h>
++#include <linux/rbtree_types.h>
++#include <linux/rcupdate.h>
+ #include <linux/types.h>
+ 
++struct kvm_s2_mmu;
 +
- #define KVM_ARM_PSCI_0_1	PSCI_VERSION(0, 1)
- #define KVM_ARM_PSCI_0_2	PSCI_VERSION(0, 2)
- #define KVM_ARM_PSCI_1_0	PSCI_VERSION(1, 0)
+ #define KVM_PGTABLE_FIRST_LEVEL		-1
+ #define KVM_PGTABLE_LAST_LEVEL		3
+ 
+diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
+index beea00e693a0a..54a618d887fa4 100644
+--- a/arch/arm64/include/asm/kvm_pkvm.h
++++ b/arch/arm64/include/asm/kvm_pkvm.h
+@@ -7,9 +7,9 @@
+ #define __ARM64_KVM_PKVM_H__
+ 
+ #include <linux/arm_ffa.h>
++#include <linux/kvm_host.h>
+ #include <linux/memblock.h>
+ #include <linux/scatterlist.h>
+-#include <asm/kvm_host.h>
+ #include <asm/kvm_pgtable.h>
+ 
+ /* Maximum number of VMs that can co-exist under pKVM. */
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index b74dd5ce1efd3..f48253b9d88b5 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -8,6 +8,7 @@
+  */
+ 
+ #include <linux/bitfield.h>
++#include <linux/kvm_host.h>
+ #include <asm/kvm_pgtable.h>
+ #include <asm/stage2_pgtable.h>
+ 
 -- 
 2.43.0
 
