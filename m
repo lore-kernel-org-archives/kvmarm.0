@@ -1,144 +1,95 @@
-Received: from mail-wr2-f12.google.com (mail-wr2-f12.google.com [74.125.225.76])
+Received: from mta0.migadu.com (out-156.mta0.migadu.com [91.218.175.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 449A135F5ED
-	for <kvmarm@lists.linux.dev>; Tue, 15 Sep 2026 07:41:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 603DC43A812
+	for <kvmarm@lists.linux.dev>; Tue, 15 Sep 2026 08:44:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789458079; cv=none; b=qbj7mhHAebk1u3zLJVP8cPIx7VdmsVZ305LDl27FqPE5K9Dq/nug0fNiOuaVeVNgSvxQ84hrTZlvVIHqdIeH8eV67gIQsF8l6nS+JvhOv/QL3BTr/pI83qcUrPkCooLEDOzCEj74leWGZa+Kv3INd4EdSlWqDTQ8bkpAn/H+y/c=
+	t=1789461886; cv=none; b=cFCcEJS5mHiOD3E5D+3tSyjbS4GkxxBNAeaNM6oG3/wyBe/YENKPZTnDa1q62N2s8RDxotFMRIlN014GNQS43IUWKkGShYiyQzVmvFhen19e2rJFH+XqW2tC3UQf2o8wPpiG4IlmJOYRzz1Nz4KO8UFrhIFmTZ+XzI3jjiJWvvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789458079; c=relaxed/simple;
-	bh=kGrKfINzZexDuYxniulIsxOAKrXMWE2mntRu5HUl90I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fBhvUdapvfj4IjJrwWkBgg/AYkbGJlGKq9zV/KhI7Xgoeaj2aQ8QnAuLAm08DMQVyPrGueH522RJQLU6AdOi7KU0Qx8QpJ4arqbvfRNx15zLnTIVmmymrt+iVK86iV6N4M8yJvaEw3M051u5Lwgtvz4sfsH57Cryo8xSFSto/cA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WT5UpoL5; arc=none smtp.client-ip=74.125.225.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1789461886; c=relaxed/simple;
+	bh=5VNjXBdl2JBF32g6/pFWNc4t2873DtQP3kDUrQxNzQc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=KPl68kQjwMoHg8HY0yzbND7CkDUTS6DZYnvE4dyKwWgmKnUOMX1YdP8P22FFsWtE3oAaEvxaihURUFbEvOrCbaySpzMCTF7O1s60SfsBAXO5tmdI2EmrmRMXSKWYcjHd4folttjqIqa2c0h357Kt0XK9MbseJKvMT9l8JjDCLdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=diFC/f5l; arc=none smtp.client-ip=91.218.175.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WT5UpoL5"
-Received: by mail-wr2-f12.google.com with SMTP id ffacd0b85a97d-48434392b02so2293860f8f.3
-        for <kvmarm@lists.linux.dev>; Tue, 15 Sep 2026 00:41:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1789458077; x=1790062877; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=r9GzEG0V2MFSbPgXHqAbp6UbKpY+Or+jzCuC6xa616s=;
-        b=WT5UpoL5ofDf1EdoKB69ZrADcN1e4ch52Mjq5IE27xXjgnCl9Q0umTwHkzBUvh2gBa
-         JfpntWKQg9+dlNiLOFbOwJWLexV8PsNw5bDwyRzrkrMA0dXQ1kv2bXZWGd+YmCqbxuyC
-         waKvhCctTS34cNxT3Gm1Qlni2w1XLmJGo18NUXBkFFCddA7vD5g3W/4Kbtr50dWp0Npb
-         GEka0XX+thvhrVUNP35EtagjAHPpBgcemYIemF3LYmoLfjcyd5YnhSyYp3HF7+7HMZd4
-         QBBlFJv2b2XCZ1bZDiFsy8j4QjvmGrGIbQpQiv8K8P/5lolfRH9OoVeclWR/izBYCZVc
-         J3Hg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789458077; x=1790062877;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=r9GzEG0V2MFSbPgXHqAbp6UbKpY+Or+jzCuC6xa616s=;
-        b=ubSHtBXWUPsZG2/y5zavbhg8ry9JvuVANTMUPEp/fBtSa8SJ+NUtX2M0NBoolbb8N1
-         UvBAGYjFeK7pUMIoe2UjD9AeyG9aN3R6nBRAFHbT6uLYL6HbMNGFr6NP+h6QIdPV5Pyu
-         YaZ+YLX7ekSqfI1PGPZgcLbJiQ8PYyib4kAWC5kCQmwMt1OmHFwpEVFgEZSQVp6dNcxl
-         70uLoisX0cZblAW6VaYQrD8XVY1NDByAw49h59eOHzzNSazA+qk2Jb7XgtJJumvAv+50
-         Wm/whJfo9XvEIiKokg6irA2gFweUmmnPOAB15k57VR4cSpEJGSDHxmPz8qEGn5+xJBIT
-         YqUw==
-X-Forwarded-Encrypted: i=1; AKwUvBwsXp+l25VimmHROCpu3L7PuFvuO/MtnDsAXffE/K6TW8mVmR6nhjDZHRcB4YuK3YKdnqYqVzM=@lists.linux.dev
-X-Gm-Message-State: AFuF++kOvZYrrj69Agw0KBODARnOVIrUsYHHOn8Tf0hntvH9rsaMZav4
-	m4cJc8dXUReB9zEEU70WDA0uoTs5mwiHMhONIb4gA6cacbX/yWCI/z8whgxus3a5aQ==
-X-Gm-Gg: AYBFou1XtHjv23zlOoPF2rvKpDTRus5HaqpeQucBpKo360FCRemQmprhYu2bpUOZRcq
-	k8Ny0q1s9qVQRiBz+VVEAK6TwcYbj5i/bUBJz4h7qKYimZ6+YNbL+ONxPFN8f267NYw6NS6UG9v
-	UbtKQQeTWVHkQsZ5vbhUe2fHZezualXbWOHGvQCBqvWqW0BIlyWY9p5pIxmR5fdjWRn0g9eSsIV
-	2cHVf7iBCtmEzovWhmPoEkcvX2j/Ld70F4pLHFsnCaZ1+1nFrc/+/OH9fQLJTSZB4asxQ5Odq3P
-	vlgWBeLZTBZt5L2/e6Q2N3aJgcCz5gw3URXK45yuuYYwmEql3oYiDev6YOH62y+FfwbjeEn6RY2
-	poCxNB3OdbzlHs57L+DLa7Qv3Zt1XcugKVGsSTFTJOzsG3pawk8nZHnM3/UISMgYQe+yDjgsM/a
-	9PNghzhABGGCTOSeWK9El1nuk+9mCV1Zd11Yr4h/TVCzKOm7D+K437y9AkAftdKbvCpYEOIzwHv
-	UBBTjM0yXTPtrAHD/cH/+pfU98qX6HfbwKWuUPOxUaZ
-X-Received: by 2002:a05:6000:41f0:b0:487:89c:3adf with SMTP id ffacd0b85a97d-487089c3b93mr2625551f8f.11.1789458075963;
-        Tue, 15 Sep 2026 00:41:15 -0700 (PDT)
-Received: from google.com (135.91.155.104.bc.googleusercontent.com. [104.155.91.135])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-486eb33e020sm34226386f8f.18.2026.09.15.00.41.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Sep 2026 00:41:15 -0700 (PDT)
-Date: Tue, 15 Sep 2026 08:41:12 +0100
-From: Vincent Donnefort <vdonnefort@google.com>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com,
-	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	mark.rutland@arm.com, steven.price@arm.com, qperret@google.com,
-	tabba@google.com
-Subject: Re: [PATCH v2 2/2] KVM: arm64: Pin the host vCPU before adjusting
- its PC under pKVM
-Message-ID: <aqj2mOjeNWJD6726@google.com>
-References: <20260915070418.3209779-1-fuad.tabba@linux.dev>
- <20260915070418.3209779-3-fuad.tabba@linux.dev>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="diFC/f5l"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=5VNjXBdl2JBF32g6/pFWNc4t2873DtQP3kDUrQxNzQc=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1789461882; v=1; x=1790066682;
+ b=diFC/f5lFbLNJYpoWifyzgIGcvjI9vZzJNepeCiqnWVLfh+Cn90Du9CxuGt+eXqsZzKfGZWa
+ jypgTva2rJCEb3uFvn0yAusc/U8liDil5UwFczBDjxUKl9tMl+19rRlUs0ikchveX2g5lLcale0
+ Xu8dY1wItei6OGfaHDyrwCA8=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id c21aa090cc761614;
+	Tue, 15 Sep 2026 08:44:42 +0000
+X-Mizu-Trace-ID: c21aa090cc761614
+X-Migadu-Flow: FLOW_OUT
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>
+Cc: Sean Christopherson <seanjc@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Will Deacon <will@kernel.org>,
+	Fuad Tabba <tabba@google.com>,
+	kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 0/3] KVM: Replace VCPU_RUN with KVM_RUN in comments and docs
+Date: Tue, 15 Sep 2026 09:44:38 +0100
+Message-Id: <20260915084441.3846947-1-fuad.tabba@linux.dev>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260915070418.3209779-3-fuad.tabba@linux.dev>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Sep 15, 2026 at 08:04:18AM +0100, Fuad Tabba wrote:
-> Under pKVM, a page the host shares with EL2 is mapped at EL2 only while
-> it's pinned, and the host vCPU is pinned at its first KVM_RUN.
-> KVM_SET_VCPU_EVENTS with ext_dabt_pending reaches __kvm_adjust_pc() at
-> EL2 before that, and dereferencing the unmapped host vCPU panics the
-> hypervisor. Any process holding /dev/kvm on a pKVM host can trigger it.
-> 
-> Pin the host vCPU around the adjustment when no hyp vCPU is loaded for
-> it. A loaded hyp vCPU implies it's pinned. A pin fails only for memory
-> the host never shared, and the request is then dropped like any other
-> bad host pointer.
-> 
-> Fixes: efa1368ba9f4b ("KVM: arm64: Commit exceptions from KVM_SET_VCPU_EVENTS immediately")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
-> ---
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 19 ++++++++++++++++++-
->  1 file changed, 18 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> index 9a3b92e626adb..4cb7347db2514 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -542,8 +542,25 @@ static void handle___pkvm_host_mkyoung_guest(struct kvm_cpu_context *host_ctxt)
->  static void handle___kvm_adjust_pc(struct kvm_cpu_context *host_ctxt)
->  {
->  	DECLARE_REG(struct kvm_vcpu *, vcpu, host_ctxt, 1);
-> +	struct pkvm_hyp_vcpu *hyp_vcpu;
-> +	struct kvm_vcpu *host_vcpu;
->  
-> -	__kvm_adjust_pc(kern_hyp_va(vcpu));
-> +	host_vcpu = __get_host_hyp_vcpus(vcpu, &hyp_vcpu);
-> +	if (host_vcpu) {
-> +		__kvm_adjust_pc(host_vcpu);
-> +		return;
-> +	}
-> +
-> +	/*
-> +	 * With no hyp vCPU loaded for it, the host vCPU may be unpinned,
-> +	 * and so unmapped at EL2: its first run pins it.
-> +	 */
-> +	host_vcpu = kern_hyp_va(vcpu);
-> +	if (hyp_pin_shared_mem(host_vcpu, host_vcpu + 1))
-> +		return;
-> +
-> +	__kvm_adjust_pc(host_vcpu);
-> +	hyp_unpin_shared_mem(host_vcpu, host_vcpu + 1);
->  }
->  
->  static void handle___kvm_flush_vm_context(struct kvm_cpu_context *host_ctxt)
-> -- 
-> 2.39.5
->
+Hi folks,
 
-Reviewed-by: Vincent Donnefort <vdonnefor@google.com>
+This one has been bugging me for a while. Five comments and doc lines
+name a VCPU_RUN ioctl (KVM_VCPU_RUN in book3s_hv.c, VCPU RUN in
+kvm_host.h). The ioctl that enters the guest is KVM_RUN.
 
+The patches are independent and split by tree, one each for generic
+KVM, KVM/arm64 and Book3S HV, so each can go through its own
+maintainer. Nothing else in the tree refers to the ioctl by a wrong
+name.
+
+Based on Linux 7.3-rc3 (fd73f4a665989).
+
+Cheers,
+/fuad
+
+Fuad Tabba (3):
+  KVM: Fix comments that refer to the non-existent VCPU_RUN ioctl
+  KVM: arm64: Fix references to the non-existent VCPU_RUN ioctl
+  KVM: PPC: Book3S HV: Fix comment naming a non-existent KVM_VCPU_RUN
+    ioctl
+
+ Documentation/virt/kvm/arm/pkvm.rst | 2 +-
+ arch/arm64/kvm/arm.c                | 2 +-
+ arch/powerpc/kvm/book3s_hv.c        | 2 +-
+ include/linux/kvm_host.h            | 2 +-
+ virt/kvm/kvm_main.c                 | 2 +-
+ 5 files changed, 5 insertions(+), 5 deletions(-)
+
+
+base-commit: fd73f4a6659897191fa0d40695fe370925dd3780
 -- 
-Vincent
+2.39.5
+
