@@ -1,95 +1,116 @@
-Received: from mta0.migadu.com (out-156.mta0.migadu.com [91.218.175.156])
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 603DC43A812
-	for <kvmarm@lists.linux.dev>; Tue, 15 Sep 2026 08:44:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2519249364F
+	for <kvmarm@lists.linux.dev>; Tue, 15 Sep 2026 08:44:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789461886; cv=none; b=cFCcEJS5mHiOD3E5D+3tSyjbS4GkxxBNAeaNM6oG3/wyBe/YENKPZTnDa1q62N2s8RDxotFMRIlN014GNQS43IUWKkGShYiyQzVmvFhen19e2rJFH+XqW2tC3UQf2o8wPpiG4IlmJOYRzz1Nz4KO8UFrhIFmTZ+XzI3jjiJWvvs=
+	t=1789461889; cv=none; b=Nl1cRQrOVTzCEK1nzP/rhBtvatUgf0KsWswZ301JjcWqYUuPeaBRJs0s3Kbozoct1B2weuF1jfOffKq2FhTeVfiM7Fs5Ba5E+BPc7b8db0XrPUInShOo8qsgPcecYwH+GtjfEXy/NdPwdQG+v/AMDmu8stj8sH3qgJB1J4TH6Vw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789461886; c=relaxed/simple;
-	bh=5VNjXBdl2JBF32g6/pFWNc4t2873DtQP3kDUrQxNzQc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=KPl68kQjwMoHg8HY0yzbND7CkDUTS6DZYnvE4dyKwWgmKnUOMX1YdP8P22FFsWtE3oAaEvxaihURUFbEvOrCbaySpzMCTF7O1s60SfsBAXO5tmdI2EmrmRMXSKWYcjHd4folttjqIqa2c0h357Kt0XK9MbseJKvMT9l8JjDCLdc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=diFC/f5l; arc=none smtp.client-ip=91.218.175.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1789461889; c=relaxed/simple;
+	bh=vae5d+plLcM0IjChM+wNH4FShn+1kYkbp5FoYWeKmh0=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=YwNtc7VprdP4njqTpgwTgDFS6JghhjgUvTTPSsrZSg5Uh/5RntLWQGYfqS7WQRJubJprHrC+LMzkPDj0IllJu8TvY2W7i5oqydPL0yAgk5KzVSqsphCRd1VG4+4U8xie68ysx0/rg9BfuUvIuGZE9XI2YOEMP6RvxWJkDEec87Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dPRfEEJF; arc=none smtp.client-ip=209.85.221.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="diFC/f5l"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=5VNjXBdl2JBF32g6/pFWNc4t2873DtQP3kDUrQxNzQc=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1789461882; v=1; x=1790066682;
- b=diFC/f5lFbLNJYpoWifyzgIGcvjI9vZzJNepeCiqnWVLfh+Cn90Du9CxuGt+eXqsZzKfGZWa
- jypgTva2rJCEb3uFvn0yAusc/U8liDil5UwFczBDjxUKl9tMl+19rRlUs0ikchveX2g5lLcale0
- Xu8dY1wItei6OGfaHDyrwCA8=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id c21aa090cc761614;
-	Tue, 15 Sep 2026 08:44:42 +0000
-X-Mizu-Trace-ID: c21aa090cc761614
-X-Migadu-Flow: FLOW_OUT
-From: Fuad Tabba <fuad.tabba@linux.dev>
-To: Paolo Bonzini <pbonzini@redhat.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>
-Cc: Sean Christopherson <seanjc@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Will Deacon <will@kernel.org>,
-	Fuad Tabba <tabba@google.com>,
-	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 0/3] KVM: Replace VCPU_RUN with KVM_RUN in comments and docs
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dPRfEEJF"
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-486f77056cfso2302221f8f.2
+        for <kvmarm@lists.linux.dev>; Tue, 15 Sep 2026 01:44:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1789461885; x=1790066685; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=rohFya9ZM43Y/1RiL36Hho8NC7KJKzxy3Nb/imDOR5k=;
+        b=dPRfEEJFsx1Lg5179kLKzZk2vBHfEQa/99XRASgSniKCzSUqj+LysdP33EykIn5DoW
+         dUsMyg5yQq+rPJzNVwNZotzofGVADFe8KEwUbeaxZsd9hQOFsrDCsk7KUEpaAUbpbsRp
+         uwFS8i2MOX3xdL0SINEmH5FPQpwUVaNQ1TGB4KHSSn+2CBL99D3xzvEiMuZNkQs1FsTk
+         m7PjkOD7a833WQIOuAZFvoJDNp66qBx7Gu1Ca8Ag1+t5EzAKXiAG+1feKuFqgIzHLJyM
+         0T9BeEs8dO/OPtohaPSWLtQrvjB4Me9mXslZt7h2b7l8bR70mNnFsm9sH6fDjqkeBo2U
+         iU1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1789461885; x=1790066685;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=rohFya9ZM43Y/1RiL36Hho8NC7KJKzxy3Nb/imDOR5k=;
+        b=0wYFLUD9xLmyY893Qx0QAtkQhGjOEuW3+JqzPCcxJq+bXd9gI2ilbXehBMG+geXv9J
+         Iwb8F0ul/8uXr7qUVrwn1DfdTmChl9C0mXuVnpTEpqguE6aMvbeoBZRxP2PwYDoaXiUi
+         5s7H0pRUMoraj4NVXiaj7G4qpb6skYHiGBRjuVMz3Abz27UfaJM6GJmaIyFwu/bBTwnb
+         fxg7CuG56+daWU0y3Wlm9jf4U4U77tA1DogTMuw/i45virfw/UZZrn7qYir2drbP7RVO
+         6jHNyy5B0tbSu32qfZtk7b87l1WC+URp2lyaUSviJ95guGUkC0qK42iRMnzGkcfaqx31
+         5XYA==
+X-Forwarded-Encrypted: i=1; AKwUvBxCpywUMswne8XLcd7OuIiDRJVgrzhkPnSvfuw75wRqMB3GtSZROcn1kuBqZSNcBUJob09qntg=@lists.linux.dev
+X-Gm-Message-State: AFuF++naS6tgkXABDRTxiwpWXkSfGIbCJYm1OqOFH2iGpv2RG/Nafuur
+	e/S1sUZq1x2Elmxfq3hr2jMBDrKCLu2Du1/sEijFrMQ574U2Gqs3kWO5QzPKflzaZveB/ERtBD7
+	h0/SPuZOurZW19H4VXyPegg==
+X-Received: from wrdf9.prod.google.com ([2002:a5d:58e9:0:b0:47f:924b:588e])
+ (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6000:985:b0:482:fb97:2ae0 with SMTP id ffacd0b85a97d-48702ac0254mr7380237f8f.14.1789461884745;
+ Tue, 15 Sep 2026 01:44:44 -0700 (PDT)
 Date: Tue, 15 Sep 2026 09:44:38 +0100
-Message-Id: <20260915084441.3846947-1-fuad.tabba@linux.dev>
-X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.55.0.1032.g73a4cd73de-goog
+Message-ID: <20260915084438.2076072-1-vdonnefort@google.com>
+Subject: [PATCH v2] KVM: arm64: Advertise MMFR0 TGRAN for pVMs
+From: Vincent Donnefort <vdonnefort@google.com>
+To: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org
+Cc: joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
+	kernel-team@android.com, fuad.tabba@linux.dev, 
+	Vincent Donnefort <vdonnefort@google.com>, Fuad Tabba <tabba@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi folks,
+protected VM ID register emulation leaves unlisted fields at 0. This
+creates two issues for TGRAN:
 
-This one has been bugging me for a while. Five comments and doc lines
-name a VCPU_RUN ioctl (KVM_VCPU_RUN in book3s_hv.c, VCPU RUN in
-kvm_host.h). The ioctl that enters the guest is KVM_RUN.
+  * TGRAN16: 0 means non-implemented. It prevents 16KB protected VMs
+    from booting even when the hardware supports it.
 
-The patches are independent and split by tree, one each for generic
-KVM, KVM/arm64 and Book3S HV, so each can go through its own
-maintainer. Nothing else in the tree refers to the ioctl by a wrong
-name.
+  * TGRAN4|TGRAN64: 0 means implemented. This may falsely advertise the
+    feature even when the hardware does not support it.
 
-Based on Linux 7.3-rc3 (fd73f4a665989).
+Advertise all the TGRAN fields in pvmid_aa64mmfr0 so that the hardware
+support is properly propagated.
 
-Cheers,
-/fuad
+Fixes: 6c30bfb18d0b ("KVM: arm64: Add handlers for protected VM System Registers")
+Tested-by: Fuad Tabba <tabba@google.com>
+Reviewed-by: Fuad Tabba <tabba@google.com>
+Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+---
+ arch/arm64/kvm/hyp/nvhe/sys_regs.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Fuad Tabba (3):
-  KVM: Fix comments that refer to the non-existent VCPU_RUN ioctl
-  KVM: arm64: Fix references to the non-existent VCPU_RUN ioctl
-  KVM: PPC: Book3S HV: Fix comment naming a non-existent KVM_VCPU_RUN
-    ioctl
+Changelog:
 
- Documentation/virt/kvm/arm/pkvm.rst | 2 +-
- arch/arm64/kvm/arm.c                | 2 +-
- arch/powerpc/kvm/book3s_hv.c        | 2 +-
- include/linux/kvm_host.h            | 2 +-
- virt/kvm/kvm_main.c                 | 2 +-
- 5 files changed, 5 insertions(+), 5 deletions(-)
+v2:
+   - Collect Fuad's tags
+   - Reword commit message (Fuad)
 
+v1 (lore.kernel.org/all/20260913203108.3343404-1-vdonnefort@google.com)
+
+diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+index 8758c6801776..ec469d96516a 100644
+--- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
++++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+@@ -121,6 +121,9 @@ static const struct pvm_ftr_bits pvmid_aa64mmfr0[] = {
+ 	MAX_FEAT(ID_AA64MMFR0_EL1, SNSMEM, IMP),
+ 	MAX_FEAT(ID_AA64MMFR0_EL1, BIGENDEL0, IMP),
+ 	MAX_FEAT(ID_AA64MMFR0_EL1, EXS, IMP),
++	MAX_FEAT(ID_AA64MMFR0_EL1, TGRAN4, IMP),
++	MAX_FEAT(ID_AA64MMFR0_EL1, TGRAN16, IMP),
++	MAX_FEAT(ID_AA64MMFR0_EL1, TGRAN64, IMP),
+ 	FEAT_END
+ };
+ 
 
 base-commit: fd73f4a6659897191fa0d40695fe370925dd3780
 -- 
-2.39.5
+2.55.0.1032.g73a4cd73de-goog
 
