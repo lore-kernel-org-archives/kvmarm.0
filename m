@@ -1,56 +1,57 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1F6417BCA;
-	Tue, 15 Sep 2026 22:25:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49F11346E54;
+	Tue, 15 Sep 2026 22:25:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789511146; cv=none; b=gu5Pzs/U6OWSWiJoAnaTt2S5s4EE5TWWfOAq0V3gCQZdSIrKKwjnr1nd8Zp6G994hls0+SqW/v9R9gprBV2+xz1yBewMrTdT5Fl04E/+MJBQD/i86lepHAMGb6YDK4dr8dllv3JAKLyHiViCKjHT+GQnUHHry1vRS6dyfq+PxBs=
+	t=1789511147; cv=none; b=d5wnB37V6P7/yZy3lXmlclzF+bwy9pOS+eLw6X5fRVtaU2wqrtUmRazvkkuELDxNrBQGDOrJm9r0eJ7Tej9I38X7BOKyB4sXnW7NeDet/iybgkrnd5+58YzqcuLAQoUW7gLDAitkm54Vb6zjrcj64SINpR7tH6ij0TSCEbdYiss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789511146; c=relaxed/simple;
-	bh=WmWs9jPf1QhIbh0wratZlEyglAqvOhfdXBCOK1ktGew=;
+	s=arc-20240116; t=1789511147; c=relaxed/simple;
+	bh=qMMq4AGHkIj+I10WwWqI3FQuAWnG4vnD++yiDnBMwvA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lCCAJtC3Kvxo+okshAbGQjefA1C5eUhjCEosP1ryELOAgujvJdZcXsWV5udW6bhdY6IdqB5tni1AgtKW1h8RZtJ3Q5+xhcWCanaoeqqYbuM8brhhubwj8bSrvFXzCtSyMlO8jONoaRMMIfaCoAt0aDhNw/4WnT+uzlB7k+LGm6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i5IXNL+f; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=MFXwowK32e9tU4fop9FvxdxS1tcFBjehsiePlABWY+Jnmx2Hdm4W1UPfFHxLZrsrZDH3IHuxE7BOQ+7dQVCCTkyZFulCQRCN7yy7SSYGRPBtBlnCKARktwo5Wqk79hUi+1aXfkqIFAK7Q2ztJBFHVWT5NBNl5qILxktktP7qLcI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MERX6Eyv; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i5IXNL+f"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0EC881F000FF;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MERX6Eyv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6F731F0089C;
 	Tue, 15 Sep 2026 22:25:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1789511145;
-	bh=2kecQaR0F7g0/H9mop9k/ZA1PCRux2SHgqjXnuf3tgU=;
+	bh=UJHW2zr6j28wgdd6ygTO/gZ4sHjNUcda5NUyoTuBQYo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=i5IXNL+fVFTtOFiiRyVTkNuytpziNyfhPeJrdEo9rSE5W+iLdKiE3IJQYf+PtFR2x
-	 wTtpo6KRfyPuBDuWwyIB7v1BQAfmCl05JRLSWdlBCiZaDhMw3UucXQudZ3qG3tvEHW
-	 rbPFfmhXJf2YcVEeeN/pggWtlHx9N64OBke0aa+ueA0xGpd5MP/L8Z8VME3U24tApq
-	 TmPswHCzQD0LWELmWVs6W+hyy9+dKlpg08xPNt8/a4EorHlXr4r1aTMKNKrhKWVuPr
-	 2+BB4KwfZNPp+HgbCIq/92kvRyWg/hMn3yeb7u0Ck3LVPGzLWjmyjUSggfDR4Eu3k2
-	 z6n1C3Y21E0pQ==
+	b=MERX6EyvDfpB0PHv1/QcMnPYWf2eUGtcXzm448nfqp/QF82ovFpFp7Mh4MYe5QgQF
+	 5UUnashJUXeRsg52cTwkivpfVlej8DXRGjjxz0x/5Q0WRtNBmp2znjvp0jMr4GdFXt
+	 JA3MssY1tvM34B3JKfV/QsdQFgPvLmehW8BEXW3oXnhH7N89ni8QmFEsF2WtSjNBXf
+	 im3gEt4tU1uXSmhQRyrnfHpU7IxPnvMCEo1mUlIGITdY2uzvtUePnbyAJ/UE0Th5GR
+	 UvbuxOIgydC6WXK06waLaRT2NN0VFwjBmX00+7CYtk01O6CnuzRU8bV5fk0z0xCp5N
+	 3qXuVLff5ksjg==
 From: Oliver Upton <oupton@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>,
+To: Marc Zyngier <maz@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Oliver Upton <oupton@kernel.org>,
 	Will Deacon <will@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Mark Brown <broonie@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Leonardo Bras <leo.bras@arm.com>,
-	Wei-Lin Chang <weilin.chang@arm.com>,
-	Yao Yuan <yaoyuan@linux.alibaba.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Keir Fraser <keirf@google.com>,
+	Kalesh Singh <kaleshsingh@google.com>,
+	Quentin Perret <qperret@google.com>,
+	Hiroyuki Katsura <hk590@cam.ac.uk>,
+	stable@vger.kernel.org,
 	kvmarm@lists.linux.dev,
-	linux-kselftest@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: (subset) [PATCH v20 02/14] KVM: arm64: Fix FGT mapping for HFGITR_EL2.nGCSEPP
-Date: Tue, 15 Sep 2026 15:25:32 -0700
-Message-ID: <178951103683.10790.7238421458148276106.b4-ty@kernel.org>
+Subject: Re: [PATCH 0/4] KVM: arm64: Fix host access to the EL2 stacks
+Date: Tue, 15 Sep 2026 15:25:33 -0700
+Message-ID: <178951103697.10790.359285321366515778.b4-ty@kernel.org>
 X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260901-arm64-gcs-v20-2-f31750bdfadb@kernel.org>
-References: <20260901-arm64-gcs-v20-2-f31750bdfadb@kernel.org>
+In-Reply-To: <20260908110713.1540304-1-fuad.tabba@linux.dev>
+References: <20260908110713.1540304-1-fuad.tabba@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -60,18 +61,30 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-On Tue, 01 Sep 2026 22:47:00 +0100, Mark Brown wrote:
-> The encoding to trap mapping currently maps a FGT on OP_GCSPOPX to
-> HFGITR_EL2.nGCSEPP but as per DDI0601 2026-06 this FGT controls trapping
-> of GCSPUSHX and GCSPOPCX, and not the separate GCSPOPX instruction.
-> Update the mapping to reflect the architecture.
+On Tue, 08 Sep 2026 12:07:09 +0100, Fuad Tabba wrote:
+> The per-CPU EL2 stacks are initialised as host-owned after pKVM init.
+> fix_host_ownership() walks only the linear-map alias of each memblock
+> region, and the stacks, mapped in the private VA range for their guard
+> pages, have none.
 > 
+> Patch 1 is the fix, and it needs none of the other three. Patch 4 adds
+> the check that would have caught it and would catch similar instances
+> in the future: once the transfer is done, walk the private VA range and
+> fail init unless every valid leaf is hyp-owned, or is hyp text mapped
+> without write access.
 > 
+> [...]
 
 Applied to fixes, thanks!
 
-[02/14] KVM: arm64: Fix FGT mapping for HFGITR_EL2.nGCSEPP
-        https://git.kernel.org/kvmarm/kvmarm/c/089e4f3c4862
+[1/4] KVM: arm64: Transfer the hyp stack pages out of the host stage-2
+      https://git.kernel.org/kvmarm/kvmarm/c/3a8c562892b9
+[2/4] KVM: arm64: Match hyp text by physical address in fix_host_ownership()
+      https://git.kernel.org/kvmarm/kvmarm/c/5a8b505ede13
+[3/4] KVM: arm64: Move the private VA allocation cursor to __io_map_next
+      https://git.kernel.org/kvmarm/kvmarm/c/224584140114
+[4/4] KVM: arm64: Check every private mapping is hyp-owned at pKVM init
+      https://git.kernel.org/kvmarm/kvmarm/c/cfe80c3837f9
 
 --
 Best,
