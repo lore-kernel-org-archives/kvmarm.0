@@ -1,49 +1,58 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7787E472081;
-	Tue, 15 Sep 2026 09:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFE504746C8;
+	Tue, 15 Sep 2026 09:24:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789464026; cv=none; b=ZmzDLsSp1agYVDTb51Yc++Aeh+KeW8QO0bSli8zACAL0dS4x4NrkU5kZUtzhsX05EJaj1vK6YXHMA+YzozFccgSRM6ki5lk11YH0qyrXvaCO5VeoKF7u/HuFN8dSnztWOHlCg/4UJ4PgWKbAlMPOrSgnTr8Bz/Xz/lczsr/tDTc=
+	t=1789464292; cv=none; b=HOIRj5cd7W6sX5SVXITD23O8zogYxzRf5qKl7biQDl4zQJOIJfRMrruwxY/xTR7xwOD6FkUNBaxg+Tx0z10QhmlPPLNTmZq1xOXCxfcs7aD2TOwUoV/ztc5aCQbyjHDCdeQMLU4PFKSatIVWIsSLGc9shkbrfyiCfn0mS0rhig4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789464026; c=relaxed/simple;
-	bh=26Prvv4ObEV7ZWfzxYx+8ZTFd9nlpUgjnOhYz1ktl3M=;
+	s=arc-20240116; t=1789464292; c=relaxed/simple;
+	bh=P7CXovS5i1+s6MdDNvpFniTXg50CiWh55N6bd7oENHY=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=He10oe0pP6LQQEvQ/A/Og/MjEVbQ1UbJ/koMzURq5c5XFLhQ2yUb+2JVGax0X50KPm3N1ZVh9Ccyt1D0fvkpzBKOyXRadG4HcoEWutZi6zIgbG3NSAkO/dM2DgpN8WBx9pVNJY60CefK0sxPW6n8EbYgiChcNRPUJyi6IfgEnhg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bqJllKoF; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=JcD3603afMC3VaJbUTR6t/wIiNDvtSxXxAWOmhyaI4Xf2SsCwFZsTyW/3aS6Qi++wSEtrMrFlkzTlaKC/YS+TVywOYldvybSAUi1rc81gyRqTac6ppb/cCqssEnRX7MAA/6vyrP40YCxdmEPF1aT8se3slNJoEGi69SNpw8yaGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fotzjncR; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bqJllKoF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 233891F000FF;
-	Tue, 15 Sep 2026 09:20:25 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fotzjncR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 306681F00899;
+	Tue, 15 Sep 2026 09:24:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789464025;
-	bh=Gsfj64LTrr6T9ViJJFtqRYRZOhyDWuM3jZo4VsxBbsg=;
+	s=k20260515; t=1789464289;
+	bh=2Urobm8pH0RhpZPcqImG2kp6PxgGk+bUshP3+s8LvM4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=bqJllKoFYaoUJKKNTxyQfhB2fqK4oMEt/YrWjKVpzKz090aVWkljd5TIY5ogmH1ti
-	 mdl5vmN+ZAWYM+P5T+peGa/20+3hqqGgRFolwXG46xZhSwkbFz+oQlZaABRh+72xQ+
-	 O/UwTm6/YOWk+YRdUmuHXAIjhXMNZrwWZL3/2ZK8VZ/PUoNxnqLOhKMt7QRecUWrz1
-	 1+IoTF/9BW7yNghJjLDSWUco5CMLa6Jz9B6NVS6PzDrU6qQdmXBKXuLQzYNrXa44WE
-	 B/dw3xcMOMeaBqQ0SZ6mtX8uoDnE0nDVTPxjjICm41uYr8dNoEVDc/XW/htbaE2KXs
-	 X+v5ICcpie9Mw==
+	b=fotzjncRuGz2mEZgt940CxB2FO9xn/J3/QtSxglXaZEdeDTLvorADbSxmVIFBJ/Nd
+	 gSMhSKygkcppmo1+C+PwBvszwBzd/ZDrvv/6onCVo+ScMsS07VqsOQNx4iGgci5Ur5
+	 abL7CExSFJu624QuWD80PUcMA8DXUtarY10Kg3kUCzlouFZTcIJBGbAsEHQG19NZCO
+	 So3DOsPuA34KmevKPUAIS52SVEFtDouroj/RAE+egE618e4Tk5dHhv5RHmh2njtXyU
+	 r1db/jf+vUcAJjTNXgKiOWuODpkbHqpRlqvnHTiJQpGoIVmcV2r4zBRuHdXGTmRvHf
+	 +ybFCvweHA2mQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1x6PKw-000000091Sw-3mZd;
-	Tue, 15 Sep 2026 09:20:22 +0000
-Date: Tue, 15 Sep 2026 10:20:22 +0100
-Message-ID: <861pau7twp.wl-maz@kernel.org>
+	id 1x6PPD-000000091Zg-13i5;
+	Tue, 15 Sep 2026 09:24:47 +0000
+Date: Tue, 15 Sep 2026 10:24:46 +0100
+Message-ID: <86zexi6f4x.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: sashiko-reviews@lists.linux.dev,
-	Oliver Upton <oupton@kernel.org>,
-	kvmarm@lists.linux.dev
+Cc: oupton@kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	joey.gouly@arm.com,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	mark.rutland@arm.com,
+	vdonnefort@google.com,
+	qperret@google.com,
+	tabba@google.com
 Subject: Re: [PATCH] KVM: arm64: Reject the stage-2 MMU pointer hypercalls under pKVM
-In-Reply-To: <CA+EHjTwfY++rZNMmWvAAzHMLbGGy9NpBjAPaMLD_n02Vabx63w@mail.gmail.com>
+In-Reply-To: <20260914174521.832575-1-fuad.tabba@linux.dev>
 References: <20260914174521.832575-1-fuad.tabba@linux.dev>
-	<20260914175832.2A2D91F000FF@smtp.kernel.org>
-	<CA+EHjTwfY++rZNMmWvAAzHMLbGGy9NpBjAPaMLD_n02Vabx63w@mail.gmail.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -55,30 +64,125 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, sashiko-reviews@lists.linux.dev, oupton@kernel.org, kvmarm@lists.linux.dev
+X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, vdonnefort@google.com, qperret@google.com, tabba@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 14 Sep 2026 19:11:59 +0100,
+On Mon, 14 Sep 2026 18:45:21 +0100,
 Fuad Tabba <fuad.tabba@linux.dev> wrote:
 > 
-> On Mon, 14 Sept 2026 at 18:58, <sashiko-bot@kernel.org> wrote:
-> >
-> > Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> >
-> > Pre-existing issues:
-> > - [Critical] Hypercall handlers `handle___kvm_adjust_pc`, `handle___vgic_v5_save_apr`, and `handle___vgic_v5_restore_vmcr_apr` dereference host-provided pointers via `kern_hyp_va()` without validation, allowing a malicious host to corrupt EL2-private memory under pKVM.
+> The five hypercalls that take a struct kvm_s2_mmu pointer remain
+> callable after pKVM finalises, and each dereferences the host pointer
+> in __load_stage2(). Under pKVM none of them has a valid caller: the
+> host walks no guest stage-2, its TLB flushes go through the handle-based
+> __pkvm_tlb_flush_vmid, and kvm_arch_vcpu_load() skips the CPU context
+> flush.
 > 
-> All three are correct, and all three are already being fixed.
-> handle___kvm_adjust_pc in [1], the GICv5 handlers in [2], and the rest
-> in this patch.
+> Reject all five when protected mode is enabled.
+> 
+> Reported-by: Sashiko <sashiko-bot@kernel.org>
+> Closes: https://lore.kernel.org/all/20260914130152.F0D5F1F000FF@smtp.kernel.org/
+> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+> ---
+> 
+> Notes:
+>     No in-tree host path reaches these, so no Fixes: tag.
+> 
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 15 +++++++++++++++
+>  1 file changed, 15 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> index 9a3b92e626adb..4b0d00e55e2ea 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> @@ -557,6 +557,9 @@ static void handle___kvm_tlb_flush_vmid_ipa(struct kvm_cpu_context *host_ctxt)
+>  	DECLARE_REG(phys_addr_t, ipa, host_ctxt, 2);
+>  	DECLARE_REG(int, level, host_ctxt, 3);
+>  
+> +	if (unlikely(is_protected_kvm_enabled()))
+> +		return;
+> +
+>  	__kvm_tlb_flush_vmid_ipa(kern_hyp_va(mmu), ipa, level);
+>  }
+>  
+> @@ -566,6 +569,9 @@ static void handle___kvm_tlb_flush_vmid_ipa_nsh(struct kvm_cpu_context *host_ctx
+>  	DECLARE_REG(phys_addr_t, ipa, host_ctxt, 2);
+>  	DECLARE_REG(int, level, host_ctxt, 3);
+>  
+> +	if (unlikely(is_protected_kvm_enabled()))
+> +		return;
+> +
+>  	__kvm_tlb_flush_vmid_ipa_nsh(kern_hyp_va(mmu), ipa, level);
+>  }
+>  
+> @@ -576,6 +582,9 @@ handle___kvm_tlb_flush_vmid_range(struct kvm_cpu_context *host_ctxt)
+>  	DECLARE_REG(phys_addr_t, start, host_ctxt, 2);
+>  	DECLARE_REG(unsigned long, pages, host_ctxt, 3);
+>  
+> +	if (unlikely(is_protected_kvm_enabled()))
+> +		return;
+> +
+>  	__kvm_tlb_flush_vmid_range(kern_hyp_va(mmu), start, pages);
+>  }
+>  
+> @@ -583,6 +592,9 @@ static void handle___kvm_tlb_flush_vmid(struct kvm_cpu_context *host_ctxt)
+>  {
+>  	DECLARE_REG(struct kvm_s2_mmu *, mmu, host_ctxt, 1);
+>  
+> +	if (unlikely(is_protected_kvm_enabled()))
+> +		return;
+> +
+>  	__kvm_tlb_flush_vmid(kern_hyp_va(mmu));
+>  }
+>  
+> @@ -602,6 +614,9 @@ static void handle___kvm_flush_cpu_context(struct kvm_cpu_context *host_ctxt)
+>  {
+>  	DECLARE_REG(struct kvm_s2_mmu *, mmu, host_ctxt, 1);
+>  
+> +	if (unlikely(is_protected_kvm_enabled()))
+> +		return;
+> +
+>  	__kvm_flush_cpu_context(kern_hyp_va(mmu));
+>  }
+>  
 
-But that's part of the problem. I see a bunch of random patches
-addressing similar problems, sent without any logic.
+Anf why not __kvm_flush_vm_context()? It doesn't take a S2 MMU
+pointer, but it is still logically wrong to let this being called.
 
-You really need to group related patches together, because the only
-possible outcome of your current way of posting things is that I'll
-drop something on the floor.
+And the whole sprinkling of guards like this is just horrible. We
+already have a filtering mechanism, just make use of it:
+
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index bffdeb36da1d2..51bf30b671fe4 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -62,6 +62,11 @@ enum __kvm_host_smccc_func {
+ 	__KVM_HOST_SMCCC_FUNC___kvm_enable_ssbs,
+ 	__KVM_HOST_SMCCC_FUNC___vgic_v3_init_lrs,
+ 	__KVM_HOST_SMCCC_FUNC___vgic_v3_get_gic_config,
++	__KVM_HOST_SMCCC_FUNC___kvm_flush_vm_context,
++	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_ipa,
++	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_ipa_nsh,
++	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid,
++	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_range,
+ 
+ 	MARKER(__KVM_HOST_SMCCC_FUNC_MIN_PKVM),
+ 
+@@ -70,11 +75,6 @@ enum __kvm_host_smccc_func {
+ 	/* Hypercalls that are always available and common to [nh]VHE/pKVM. */
+ 	__KVM_HOST_SMCCC_FUNC___kvm_adjust_pc,
+ 	__KVM_HOST_SMCCC_FUNC___kvm_vcpu_run,
+-	__KVM_HOST_SMCCC_FUNC___kvm_flush_vm_context,
+-	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_ipa,
+-	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_ipa_nsh,
+-	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid,
+-	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_range,
+ 	__KVM_HOST_SMCCC_FUNC___kvm_flush_cpu_context,
+ 	__KVM_HOST_SMCCC_FUNC___kvm_timer_set_cntvoff,
+ 	__KVM_HOST_SMCCC_FUNC___tracing_load,
+
+
+Thanks,
 
 	M.
 
