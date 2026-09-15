@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0FE94AE8D2
-	for <kvmarm@lists.linux.dev>; Tue, 15 Sep 2026 15:43:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3517B4AEBD9
+	for <kvmarm@lists.linux.dev>; Tue, 15 Sep 2026 15:43:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789487018; cv=none; b=XSWkG2MTZ7mJLt97+mF+TKxMFfnt+IwkHR3VNCyomhGRfhUOuGRY4Ms69iFBO4S2GFp65DabRvHJwjOooUOgnUcG/dP7WCv7FX+oHLBgfZWsl7ILAJ2MJx1gjyiBtXkZHan4bFDDkCi3iewVFXIbqk+UvW8WhXHXA/8i1dpG5q0=
+	t=1789487021; cv=none; b=ePkV3WxdLgATVbFb2ZuT4+e+p9f5xzRyj5tKy7Lbcb+2hyt6Y/JNP8HfWHcanmQKznmcpsvPtCbnVhs16r94mGEkW3d66WrkVdevnHWORof3eXoWDtfOWPP3cgMUyivEG9wykS4sysesE7RcOMHIkiGWTuGQmEHVnwdf4dl9q7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789487018; c=relaxed/simple;
-	bh=E3MnILg53mlr4G1yo77+YKy7GVbSgPTcUYGivxV5F98=;
+	s=arc-20240116; t=1789487021; c=relaxed/simple;
+	bh=tfSyeTEKhMgIr2WJ2UOq+ZLRU580pd9eUWgwdsIJlT8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ubGSWMUUblfDzuQfejHqlteD3hGag3rSDSHwNpzr3UG0E2KjKwrAGEiUp625Oq1sjS1v1mTW3pgZMBX45Q4vv26XAKqH9IKjC7To8CmaECKT/tKGGniE5bii6uVSgJbVjh1/OrLmaXSYS5JsKu5C5zoyYqL3bu8Al5d2F1j5TdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=mzx1fa8p; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=iTmC3TkMaKMAW7cNvK56eADTQ5XhD1F+58Mh3bftqemwPpLFvyRp5ts+kroJ3f+lSNdk+DGeqLMr4QMWjGd6dUXliOuKIB6SHN9LCBpHyxOQRGX5I2e3nSuhDgSzpexv3I3UnL/sBFQUWkB1yvHtd/sdKO/WRI5E4DfiUDqqhoo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=BttJjvIg; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="mzx1fa8p"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="BttJjvIg"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BB10A15A1;
-	Tue, 15 Sep 2026 08:43:30 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9F349169E;
+	Tue, 15 Sep 2026 08:43:33 -0700 (PDT)
 Received: from workstation-e142269.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BDA633F882;
-	Tue, 15 Sep 2026 08:43:31 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A630B3F882;
+	Tue, 15 Sep 2026 08:43:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1789487014; bh=E3MnILg53mlr4G1yo77+YKy7GVbSgPTcUYGivxV5F98=;
+	t=1789487017; bh=tfSyeTEKhMgIr2WJ2UOq+ZLRU580pd9eUWgwdsIJlT8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=mzx1fa8pzN8/JLf9ZvF+Dm6cP90s9jDOH69MfvNPqpZetn3gnq61Lhd8D1ReXsGyV
-	 6bXhGoKKlFycdpXrTdkwfezNghzLl+9rFunvqA0IbGiMAZGeJAoxAb5fArUAoaRQC3
-	 zMWV2dgEj+6Yvo72y/SeVLg64X/8/R+jtSDTGpFg=
+	b=BttJjvIg/rpdGLg/BCbqiUIZvf9gneIEp6IsL8+WZGUrRw7/aaYlwoR0NnwpSYuvv
+	 zLu4fSGaj6PiOoTyWIjUxlEfFULgzxz41h9ODxukVWtdmFBPc55et/hID76TU9f46K
+	 gdYcRIulRp0fJUc+e7erQ/6cHKgcUId9tCPjaAs4=
 From: Wei-Lin Chang <weilin.chang@arm.com>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
@@ -45,9 +45,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Shuai Xue <xueshuai@linux.alibaba.com>,
 	"Lorenzo Stoakes (ARM)" <ljs@kernel.org>,
 	Wei-Lin Chang <weilin.chang@arm.com>
-Subject: [PATCH v6 4/7] KVM: arm64: nv: Track guest stage-2 mapping removal
-Date: Tue, 15 Sep 2026 16:43:02 +0100
-Message-ID: <20260915154305.3852871-5-weilin.chang@arm.com>
+Subject: [PATCH v6 5/7] KVM: arm64: nv: Avoid full shadow stage-2 unmap
+Date: Tue, 15 Sep 2026 16:43:03 +0100
+Message-ID: <20260915154305.3852871-6-weilin.chang@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260915154305.3852871-1-weilin.chang@arm.com>
 References: <20260915154305.3852871-1-weilin.chang@arm.com>
@@ -59,146 +59,123 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-kvm_stage2_unmap_range() is the helper to remove mappings from the
-stage-2 page tables. It is called during guest TLBI handling, memslot
-removal, nested mmu reuse, etc.
-
-Teach it about the guest stage-2 tracking trees and remove mappings from
-there when shadow mappings are removed. This keeps the tracking trees
-from having stale mappings pile up.
-
-Don't remove tracked mappings from the interval trees if they only
-partially overlap the removal range. For instance we can have a 4K
-shadow mapping tracked as a 2M range in the interval trees. It would be
-wrong to remove the tracked 2M range when a guest TLBI doesn't touch the
-4K mapped.
+With guest stage-2 tracking in place, we can improve MMU notifier unmaps
+from unmapping all existing shadow stage-2 mappings to only unmapping
+the ones affected by the given canonical IPA range.
 
 Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
 ---
- arch/arm64/include/asm/kvm_host.h   |  5 ++++-
  arch/arm64/include/asm/kvm_nested.h |  2 ++
- arch/arm64/kvm/mmu.c                | 23 +++++++++++++++++--
- arch/arm64/kvm/nested.c             | 34 +++++++++++++++++++++++++++++
- 4 files changed, 61 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/mmu.c                |  7 ++--
+ arch/arm64/kvm/nested.c             | 50 +++++++++++++++++++++++++++--
+ 3 files changed, 53 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 365ec57d6d7a..f12883a42081 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -340,7 +340,10 @@ struct kvm_arch {
- 	size_t nested_mmus_size;
- 	int nested_mmus_next;
- 
--	/* Guest s2 tracking trees access serialization. */
-+	/*
-+	 * Serializes guest s2 tracking trees access when the mmu_lock
-+	 * is only held for read.
-+	 */
- 	spinlock_t guest_s2_tracking_lock;
- 
- 	/* Interrupt controller */
 diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 2d71f686064a..954f532bc11b 100644
+index 954f532bc11b..0f899addafa8 100644
 --- a/arch/arm64/include/asm/kvm_nested.h
 +++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -81,6 +81,8 @@ extern void kvm_s2_mmu_iterate_by_vmid(struct kvm *kvm, u16 vmid,
- extern void kvm_record_guest_s2_mapping(struct kvm_s2_mmu *mmu, gpa_t canonical_ipa,
- 					gpa_t nested_ipa, size_t map_size,
- 					struct kvm_guest_s2_mapping *mapping);
-+extern void kvm_remove_guest_s2_mappings(struct kvm_s2_mmu *mmu,
-+					 gpa_t nipa, size_t size);
- extern void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu);
- extern void kvm_vcpu_put_hw_mmu(struct kvm_vcpu *vcpu);
+@@ -171,6 +171,8 @@ extern int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu,
+ 				    struct kvm_s2_trans *trans);
+ extern int kvm_inject_s2_fault(struct kvm_vcpu *vcpu, u64 esr_el2);
+ extern void kvm_nested_s2_wp(struct kvm *kvm);
++extern void kvm_nested_unmap_cipa_range(struct kvm *kvm, gpa_t cipa,
++					size_t unmap_size, bool may_block);
+ extern void kvm_nested_s2_unmap(struct kvm *kvm, bool may_block);
+ extern void kvm_nested_s2_flush(struct kvm *kvm);
  
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 9bc799553ce9..c46e92d67f04 100644
+index c46e92d67f04..b8ba2d09ed96 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -314,6 +314,19 @@ static void invalidate_icache_guest_page(void *va, size_t size)
-  * we then fully enforce cacheability of RAM, no matter what the guest
-  * does.
-  */
-+
-+static int kvm_pgtable_stage2_unmap_tracked(struct kvm_pgtable *pgt, u64 addr, u64 size)
-+{
-+	int ret;
-+
-+	ret = kvm_pgtable_stage2_unmap(pgt, addr, size);
-+	if (ret)
-+		return ret;
-+
-+	kvm_remove_guest_s2_mappings(pgt->mmu, addr, size);
-+	return 0;
-+}
-+
- /**
-  * __unmap_stage2_range -- Clear stage2 page table entries to unmap a range
-  * @mmu:   The KVM stage-2 MMU pointer
-@@ -331,11 +344,17 @@ static void __unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64
- {
- 	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
- 	phys_addr_t end = start + size;
-+	int (*fn)(struct kvm_pgtable *, u64, u64);
- 
- 	lockdep_assert_held_write(&kvm->mmu_lock);
- 	WARN_ON(size & ~PAGE_MASK);
--	WARN_ON(stage2_apply_range(mmu, start, end, KVM_PGT_FN(kvm_pgtable_stage2_unmap),
--				   may_block));
-+
-+	if (kvm_is_nested_s2_mmu(kvm, mmu))
-+		fn = kvm_pgtable_stage2_unmap_tracked;
-+	else
-+		fn = KVM_PGT_FN(kvm_pgtable_stage2_unmap);
-+
-+	WARN_ON(stage2_apply_range(mmu, start, end, fn, may_block));
+@@ -2525,8 +2525,9 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+ 	__unmap_stage2_range(&kvm->arch.mmu, range->start << PAGE_SHIFT,
+ 			     (range->end - range->start) << PAGE_SHIFT,
+ 			     range->may_block);
+-
+-	kvm_nested_s2_unmap(kvm, range->may_block);
++	kvm_nested_unmap_cipa_range(kvm, range->start << PAGE_SHIFT,
++				    (range->end - range->start) << PAGE_SHIFT,
++				    range->may_block);
+ 	return false;
  }
  
- void kvm_stage2_unmap_range(struct kvm_s2_mmu *mmu, phys_addr_t start,
+@@ -2808,7 +2809,7 @@ void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
+ 
+ 	write_lock(&kvm->mmu_lock);
+ 	kvm_stage2_unmap_range(&kvm->arch.mmu, gpa, size, true);
+-	kvm_nested_s2_unmap(kvm, true);
++	kvm_nested_unmap_cipa_range(kvm, gpa, size, true);
+ 	write_unlock(&kvm->mmu_lock);
+ }
+ 
 diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index d9acff507fd2..92a9a32f9f2b 100644
+index 92a9a32f9f2b..4cbb4f1b8b35 100644
 --- a/arch/arm64/kvm/nested.c
 +++ b/arch/arm64/kvm/nested.c
-@@ -897,6 +897,40 @@ void kvm_record_guest_s2_mapping(struct kvm_s2_mmu *mmu, gpa_t canonical_ipa,
- 	interval_tree_insert(&mapping->canonical, &kvm->arch.mmu.guest_s2_mappings);
+@@ -906,9 +906,8 @@ void kvm_remove_guest_s2_mappings(struct kvm_s2_mmu *mmu, gpa_t nipa,
+ 	gpa_t nipa_end = nipa + size - 1;
+ 
+ 	/*
+-	 * Guest s2 tracking interval trees are only accessed while holding the
+-	 * mmu_lock, hence we don't have to take guest_s2_tracking_lock if the
+-	 * mmu_lock is held for write.
++	 * See kvm_nested_unmap_cipa_range() for why guest_s2_tracking_lock
++	 * isn't taken here.
+ 	 */
+ 	lockdep_assert_held_write(&kvm->mmu_lock);
+ 
+@@ -1342,6 +1341,51 @@ void kvm_nested_s2_wp(struct kvm *kvm)
+ 	kvm_invalidate_vncr_ipa(kvm, 0, BIT(kvm->arch.mmu.pgt->ia_bits));
  }
  
-+void kvm_remove_guest_s2_mappings(struct kvm_s2_mmu *mmu, gpa_t nipa,
-+				  size_t size)
++void kvm_nested_unmap_cipa_range(struct kvm *kvm, gpa_t cipa, size_t unmap_size,
++				 bool may_block)
 +{
-+	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
-+	struct interval_tree_node *node, *next;
++	gpa_t cipa_end = cipa + unmap_size - 1;
 +	struct kvm_guest_s2_mapping *mapping;
-+	gpa_t nipa_end = nipa + size - 1;
++	struct interval_tree_node *node;
++	size_t mapping_size;
 +
 +	/*
 +	 * Guest s2 tracking interval trees are only accessed while holding the
 +	 * mmu_lock, hence we don't have to take guest_s2_tracking_lock if the
-+	 * mmu_lock is held for write.
++	 * mmu_lock is held for write. This saves us from having to manually
++	 * lock/unlock guest_s2_tracking_lock below around
++	 * cond_resched_rwlock_write().
 +	 */
 +	lockdep_assert_held_write(&kvm->mmu_lock);
 +
-+	node = interval_tree_iter_first(&mmu->guest_s2_mappings, nipa, nipa_end);
-+	while (node) {
-+		next = interval_tree_iter_next(node, nipa, nipa_end);
-+		mapping = container_of(node, struct kvm_guest_s2_mapping,
-+				       nested);
-+		/*
-+		 * Tracking must be conservative on removal, only remove
-+		 * mappings that are within the unmap range.
-+		 */
-+		if (nipa <= mapping->nested.start && nipa_end >= mapping->nested.last) {
-+			interval_tree_remove(&mapping->nested, &mmu->guest_s2_mappings);
-+			interval_tree_remove(&mapping->canonical,
-+					     &kvm->arch.mmu.guest_s2_mappings);
-+			kfree(mapping);
++	if (!kvm->arch.nested_mmus_size)
++		return;
++
++	while ((node = interval_tree_iter_first(&kvm->arch.mmu.guest_s2_mappings,
++						cipa, cipa_end))) {
++		mapping = container_of(node, struct kvm_guest_s2_mapping, canonical);
++		mapping_size = mapping->nested.last - mapping->nested.start + 1;
++
++		/* We could race against MMU teardown, which frees mmu->pgt. */
++		if (mapping->nested_mmu->pgt) {
++			if (WARN_ON_ONCE(kvm_pgtable_stage2_unmap(mapping->nested_mmu->pgt,
++								  mapping->nested.start,
++								  mapping_size)))
++				return;
++
++			interval_tree_remove(&mapping->nested,
++					     &mapping->nested_mmu->guest_s2_mappings);
 +		}
-+		node = next;
++		interval_tree_remove(node, &kvm->arch.mmu.guest_s2_mappings);
++		kfree(mapping);
++
++		if (may_block)
++			cond_resched_rwlock_write(&kvm->mmu_lock);
 +	}
++
++	kvm_invalidate_vncr_ipa(kvm, cipa, cipa + unmap_size);
 +}
 +
- void kvm_init_nested_s2_mmu(struct kvm_s2_mmu *mmu)
+ void kvm_nested_s2_unmap(struct kvm *kvm, bool may_block)
  {
- 	/* CnP being set denotes an invalid entry */
+ 	int i;
 -- 
 2.43.0
 
