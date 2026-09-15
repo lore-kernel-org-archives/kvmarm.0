@@ -1,33 +1,33 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9DCC3DA5B7;
-	Tue, 15 Sep 2026 17:49:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DBA94398F2;
+	Tue, 15 Sep 2026 17:51:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789494547; cv=none; b=aGWlmQGVXpRBUm+KsHzbB+Kl30liaHhH9ANWrUeg6x6ODZK7+dyHARss13ArucbhuzCn2JlHpcO9jQSL6dt0ba64W3udTD+re7J6qqkqNCLQzeuGhcJnVEEnOraA6GCrlCoun4NqpkhzRi+qHTINzVULyflgp7w1dLo1ml7AQhI=
+	t=1789494721; cv=none; b=QeOf5vbudACVSE/0vlc3OzKwO+Hfj5o5uRzH6NAUZRJQZcApmVmH60QoucyemOWkaQHeH55G8LmNR4Af+xxiWIUBavRCebHuNmCYBK2i37AK2Z8BFZgId5NLhhhiJEk/Re8xgbaBTUGKfnoiK4xSELAv0pzzZ9nG+s2wst4jtIM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789494547; c=relaxed/simple;
-	bh=tIOnU1MTP6xV2VV7knVj8q85l9UIZ6omydtjOabHinE=;
+	s=arc-20240116; t=1789494721; c=relaxed/simple;
+	bh=zjV2zQ6578Cea/PcaJJwVuCoXIsKb8OLzDKalNpaJ5g=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZZsFflS9OsnI8kVn43F1e3Fe9udhYSc+94IGdwTHSnvwbRleaVilcw0iEJQVnovUFn6t02jF2fxusugaBbYGC6hpu0U0D9dxq57D2ZXhwJmSFJ1XVpnFjpwL3LfsuljdYZjRSEBcoz/PfR0iR9tbkwm1dpBSLo3FLu/mAXb9p+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=SyvaDvlC; arc=none smtp.client-ip=217.140.110.172
+	 In-Reply-To:Content-Type; b=Wl9nN4ymAWMAGDyxwly7HJ7ocNmmh9TytWxLxLxsZtATIQeAoq2bSWoQAySk9focVpCBR3FylbIsi9uItO3YSy9TjpQuOOi2jsWp7dvzxU8wXaP9ffHz+uhSf6TPIVb+3eyJaWQPg/dACnH60Ki+59S1Wn85VLqMPT73rjsEAtk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=mxRm45AN; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="SyvaDvlC"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="mxRm45AN"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8A110153B;
-	Tue, 15 Sep 2026 10:49:00 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EA970153B;
+	Tue, 15 Sep 2026 10:51:48 -0700 (PDT)
 Received: from [192.168.1.148] (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 670C93F7B4;
-	Tue, 15 Sep 2026 10:49:01 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A87A53F7B4;
+	Tue, 15 Sep 2026 10:51:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1789494544; bh=tIOnU1MTP6xV2VV7knVj8q85l9UIZ6omydtjOabHinE=;
+	t=1789494712; bh=zjV2zQ6578Cea/PcaJJwVuCoXIsKb8OLzDKalNpaJ5g=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=SyvaDvlCTGucSv4noTWyrNiGQg0jG1bM+Y2Y7PhfKXtEkzoXn90D3+laJXePekIDT
-	 80C+vbRqd6Q+vXRTqBb1FBtZuus221dG620E7nvSnz71bPOZlSgLh6+klMZj03Lule
-	 0pOBtHK0ECS4SdvNQMgx0sGW+rVyXmEcpW0IGJqE=
-Message-ID: <7c26c860-0543-459e-974b-72c59af261f9@arm.com>
-Date: Tue, 15 Sep 2026 18:48:59 +0100
+	b=mxRm45ANNZ8yc+jBzPCsl0QdxLoUHDn0VsO6ObX13Vg5vrD/rFWpCLxMXJIw5P/r1
+	 raW0H3Ihc23Q5KWcCKwytQNkzK7QOjyRvPY5fFAJRYXkEqlMoAyU5Fv4gA5bCpLPiB
+	 LlUO2ByTjpuRqFQ32p2awHclC8LJApo9bw1ge+M4=
+Message-ID: <fe2830b4-d044-48ea-91b5-3ff705023d8c@arm.com>
+Date: Tue, 15 Sep 2026 18:51:50 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -35,200 +35,101 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v18 01/23] KVM: arm64: protected VM: Handle set_one_reg
- CNTVCT_EL0/CNTPCT_EL0
+Subject: Re: [PATCH v18 23/23] KVM: arm64: CCA: Control user register access
+ for Realms
 Content-Language: en-GB
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, will@kernel.org,
- catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
- aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
- joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
- linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
- sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
- WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com,
- Marc Zyngier <maz@krenel.org>
+To: sashiko-reviews@lists.linux.dev
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, Marc Zyngier
+ <maz@kernel.org>, Oliver Upton <oupton@kernel.org>
 References: <20260915160141.3543048-1-suzuki.poulose@arm.com>
- <20260915160141.3543048-2-suzuki.poulose@arm.com>
- <86o6dy5uob.wl-maz@kernel.org>
+ <20260915160141.3543048-24-suzuki.poulose@arm.com>
+ <20260915164907.9729B1F000FF@smtp.kernel.org>
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <86o6dy5uob.wl-maz@kernel.org>
+In-Reply-To: <20260915164907.9729B1F000FF@smtp.kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 15/09/2026 17:46, Marc Zyngier wrote:
-> On Tue, 15 Sep 2026 17:01:19 +0100,
-> Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
->>
->> Protected VMs doesn't allow setting offsets for virtual and phyiscal
->> counters, as the offset is always fixed to 0. The VM ioclt is filtered
->> out based on the cap. However we don't prevent the userspace from trying
->> to write to the CNTVCT/CNTPCT registers. This would lead to KVM triggering
->> a WARN() in timer_set_offset() as the vm_offset pointer is set to NULL.
->>
->> Fix this by always "fixing" the timer offsets to 0 and marking that the
->> timer offset is set in the kvm->arch.flags at pKVM init time. The
->> userspace cannot use the KVM_ARM_SET_COUNTER_OFFSET, as it is blocked for a
->> protected VM.
->>
->> A userspace writing to the SYS_CNT*CT would observe success, without
->> any real effect. This was chosen over preventing the writes to these
->> registers and returning -EPERM.
->>
->> With that, we always have a valid vm_offset pointer, remove the checks for
->> vm_offset == NULL.
->>
->> Reported by Sashiko here
->> https://lore.kernel.org/all/20260908164641.416911F00A3A@smtp.kernel.org
->>
->> Fixes: f7d05ee84a6a ("KVM: arm64: Prevent host from managing timer offsets for protected VMs")
->> Suggested-by: Marc Zyngier <maz@krenel.org>
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> ---
->>   arch/arm64/kvm/arch_timer.c    | 15 +++++----------
->>   arch/arm64/kvm/arm.c           | 15 +++++++++++++++
->>   arch/arm64/kvm/hyp/nvhe/pkvm.c | 26 +++++++++++++-------------
->>   include/kvm/arm_arch_timer.h   |  3 +--
->>   4 files changed, 34 insertions(+), 25 deletions(-)
->>
->> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
->> index 6ac3321f4c575..dda020da4c9c7 100644
->> --- a/arch/arm64/kvm/arch_timer.c
->> +++ b/arch/arm64/kvm/arch_timer.c
->> @@ -1079,14 +1079,10 @@ static void timer_context_init(struct kvm_vcpu *vcpu, int timerid)
->>   
->>   	ctxt->timer_id = timerid;
->>   
->> -	if (!kvm_vm_is_protected(vcpu->kvm)) {
->> -		if (timerid == TIMER_VTIMER)
->> -			ctxt->offset.vm_offset = &kvm->arch.timer_data.voffset;
->> -		else
->> -			ctxt->offset.vm_offset = &kvm->arch.timer_data.poffset;
->> -	} else {
->> -		ctxt->offset.vm_offset = NULL;
->> -	}
->> +	if (timerid == TIMER_VTIMER)
->> +		ctxt->offset.vm_offset = &kvm->arch.timer_data.voffset;
->> +	else
->> +		ctxt->offset.vm_offset = &kvm->arch.timer_data.poffset;
->>   
->>   	hrtimer_setup(&ctxt->hrtimer, kvm_hrtimer_expire, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
->>   
->> @@ -1110,8 +1106,7 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
->>   		timer_context_init(vcpu, i);
->>   
->>   	/* Synchronize offsets across timers of a VM if not already provided */
->> -	if (!vcpu_is_protected(vcpu) &&
->> -	    !test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm->arch.flags)) {
->> +	if (!test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm->arch.flags)) {
->>   		timer_set_offset(vcpu_vtimer(vcpu), kvm_phys_timer_read());
->>   		timer_set_offset(vcpu_ptimer(vcpu), 0);
->>   	}
->> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> index 8b080804bc90b..7c88508cac8a1 100644
->> --- a/arch/arm64/kvm/arm.c
->> +++ b/arch/arm64/kvm/arm.c
->> @@ -214,6 +214,20 @@ static int kvm_arm_default_max_vcpus(void)
->>   	return vgic_present ? kvm_vgic_get_max_vcpus() : KVM_MAX_VCPUS;
->>   }
->>   
->> +/*
->> + * Fix the counter offset to 0 for Protected VMs and mark the
->> + * offset flag. The user can't set the offset via KVM_ARM_SET_COUNTER_OFFSET.
->> + */
->> +static void kvm_arch_fix_timer_offsets(struct kvm *kvm)
+On 15/09/2026 17:49, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
+> - [High] arm64: kvm: KVM_SET_ONE_REG rejects PMCR_EL0 for Realm VMs breaking PMU config
+> --
+> 
+> commit 2d966a4231d9ac9707a0d74a6ba5b743ae7b69b3
+> Author: Jean-Philippe Brucker <jpb@kernel.org>
+> 
+> KVM: arm64: CCA: Control user register access for Realms
+> 
+> This commit restricts user register access for Realm VMs by limiting which
+> registers the VMM can read or modify. KVM explicitly allows access to
+> ID_AA64DFR0_EL1 and SVE_VLS for Realm parameter configuration before the Realm
+> Descriptor is created.
+> 
+>> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+>> --- a/arch/arm64/kvm/guest.c
+>> +++ b/arch/arm64/kvm/guest.c
+> [ ... ]
+>> +static bool validate_realm_set_reg(struct kvm_vcpu *vcpu,
+>> +				   const struct kvm_one_reg *reg)
 >> +{
->> +	if (!kvm_vm_is_protected(kvm))
->> +		return;
+>> +	if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_CORE) {
+>> +		u64 off = core_reg_offset_from_id(reg->id);
 >> +
->> +	/* Fix the counter offset to 0 and mark the offset initialised */
->> +	kvm->arch.timer_data.poffset = kvm->arch.timer_data.voffset = 0;
->> +	set_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &kvm->arch.flags);
+>> +		return kvm_realm_validate_core_reg(off);
+>> +	} else {
+>> +		switch (reg->id) {
+>> +		case KVM_REG_ARM_ID_AA64DFR0_EL1:
+>> +		case KVM_REG_ARM64_SVE_VLS:
+>> +			return true;
+>> +		}
+>> +	}
+>> +
+>> +	return false;
 >> +}
+> 
+> [Severity: High]
+> Does this logic unconditionally reject KVM_SET_ONE_REG calls for PMCR_EL0?
+> 
+> When the VMM attempts to restore or configure the PMU, kvm_arm_set_reg()
+> calls validate_realm_set_reg(). Because the UAPI equivalent of SYS_PMCR_EL0
+> is missing from this whitelist, the VMM is prevented from configuring the
+> number of PMU counters for Realm VMs, breaking VM initialization.
+> 
+>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+>> --- a/arch/arm64/kvm/sys_regs.c
+>> +++ b/arch/arm64/kvm/sys_regs.c
+> [ ... ]
+>> +static inline bool kvm_realm_sys_reg_hidden_user(const struct kvm_vcpu *vcpu,
+>> +						 u64 reg)
+>> +{
+>> +	if (!vcpu_is_rec(vcpu))
+>> +		return false;
 >> +
->>   /**
->>    * kvm_arch_init_vm - initializes a VM data structure
->>    * @kvm:	pointer to the KVM struct
->> @@ -267,6 +281,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->>   
->>   	kvm_vgic_early_init(kvm);
->>   
->> +	kvm_arch_fix_timer_offsets(kvm);
->>   	kvm_timer_init_vm(kvm);
+>> +	switch (reg) {
+>> +	case SYS_ID_AA64DFR0_EL1:
+>> +	case SYS_PMCR_EL0:
+>> +		return false;
+>> +	}
+>> +	return true;
+>> +}
 > 
-> This should all be moved to the timer code.
+> [Severity: High]
+> This explicitly unhides SYS_PMCR_EL0 in kvm_realm_sys_reg_hidden_user(),
+> meaning it is returned to the VMM via KVM_GET_REG_LIST.
 > 
->>   
->>   	/* The maximum number of VCPUs is limited by the host's GIC model */
->> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
->> index 459bd9eb7e4bc..e7b38eff63bd1 100644
->> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
->> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
->> @@ -528,19 +528,19 @@ static int init_pkvm_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu,
->>   	hyp_vcpu->vcpu.arch.cflags = READ_ONCE(host_vcpu->arch.cflags);
->>   	hyp_vcpu->vcpu.arch.mp_state.mp_state = KVM_MP_STATE_STOPPED;
->>   
->> -	if (!pkvm_hyp_vcpu_is_protected(hyp_vcpu)) {
->> -		/*
->> -		 * Timer offsets are pointing to the untrusted KVM copy,
->> -		 * which is pinned in __pkvm_init_vm() for the VM life time.
->> -		 * It is worth noting that hyp_vm->host_kvm points to an EL2
->> -		 * linear map address and timer_get_offset() will use
->> -		 * kern_hyp_va() which is safe as it is idempotent.
->> -		 */
->> -		vcpu_vtimer(&hyp_vcpu->vcpu)->offset.vm_offset =
->> -			&hyp_vm->host_kvm->arch.timer_data.voffset;
->> -		vcpu_ptimer(&hyp_vcpu->vcpu)->offset.vm_offset =
->> -			&hyp_vm->host_kvm->arch.timer_data.poffset;
->> -	}
->> +	/*
->> +	 * Timer offsets are pointing to the untrusted KVM copy,
->> +	 * which is pinned in __pkvm_init_vm() for the VM life time.
->> +	 * It is worth noting that hyp_vm->host_kvm points to an EL2
->> +	 * linear map address and timer_get_offset() will use
->> +	 * kern_hyp_va() which is safe as it is idempotent.
->> +	 * Also for protected VMs the offset is fixed to 0 and is prevented
->> +	 * from changing.
->> +	 */
->> +	vcpu_vtimer(&hyp_vcpu->vcpu)->offset.vm_offset =
->> +		&hyp_vm->host_kvm->arch.timer_data.voffset;
->> +	vcpu_ptimer(&hyp_vcpu->vcpu)->offset.vm_offset =
->> +		&hyp_vm->host_kvm->arch.timer_data.poffset;
+> Since validate_realm_set_reg() in arch/arm64/kvm/guest.c rejects writes to
+> the PMU register, does this create an ABI inconsistency where the register
+> is listed but cannot be set?
 > 
-> I don't think this is right. Protected guests have no offset, and this
-> needs to be ensured by the hypervisor. Here, the host can change the
-> offset any time it wants, and that's not acceptable.
+> Could this mismatch in configuration flow be corrected to allow PMU support
+> for Realm VMs?
 
-Ah, you're right. :facepalm:
+Yep, this is the idea. We don't have the PMU support in the current 
+integration branch. That said, I will remove the PMCR_EL0 from the 
+validate_realm_set_reg().
 
-> 
->>   
->>   	ret = pkvm_vcpu_init_sysregs(hyp_vcpu);
->>   	if (ret)
->> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
->> index bc6f2fdd7ad33..4f0aa3bb69f45 100644
->> --- a/include/kvm/arm_arch_timer.h
->> +++ b/include/kvm/arm_arch_timer.h
->> @@ -176,8 +176,7 @@ static inline bool has_cntpoff(void)
->>   		if (__ctxt) {						\
->>   			struct arch_timer_offset *ato = &__ctxt->offset;\
->>   									\
->> -			if (ato->vm_offset)				\
->> -				off += *KERN_HYP_VA(ato->vm_offset);	\
->> +			off += *KERN_HYP_VA(ato->vm_offset);		\
->>   			if (ato->vcpu_offset)				\
->>   				off += *KERN_HYP_VA(ato->vcpu_offset);	\
->>   		}							\
-> 
-> And as you drop the previous hunk, this also needs to be restored to
-> its original state.
-
-Ack.
-
+Cheers
 Suzuki
 
 
-> 
-> 	M.
 > 
 
