@@ -1,103 +1,121 @@
-Received: from mta0.migadu.com (out-58.mta0.migadu.com [91.218.175.58])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3868743847E
-	for <kvmarm@lists.linux.dev>; Tue, 15 Sep 2026 17:13:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.58
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D904B4BB266
+	for <kvmarm@lists.linux.dev>; Tue, 15 Sep 2026 17:33:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789492398; cv=none; b=DTvd6qqkgAzu8RcakYtUl7amgzR9yQv+22rmyvObrP7JLbWpciDlkANKF/GFd8uojAgXIC0a00Vx8eRdOI+Pwg/uQwuPu/M3m7Oleq2sDUNzaX5OvQ+kXFdhrm0XClkk/c14Uty0YRe1BGa0Kv1wY021odVEnTRAqSQny6N2UZ0=
+	t=1789493610; cv=none; b=Oztl1BgSehXF0z4xSEJggoc3VkLpxiAZ2wdRENHy+E7AsKe4zkXtdIpeVlLYCleqlW8vkzL4bQ/IxDU5Jw0ej+NhuVm15mblbCG0bmDIh0r7Cly96OBNoZhAiQI2Klg8hyS0E9gobKCKfmkOyjGYb0aeVi4bv/hcgvYwU0a+SNI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789492398; c=relaxed/simple;
-	bh=Jp96XiPKTcamQsTvuwBYBtrk9Zn8cDubgT6B+0WBg94=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NNaCjmIRSFrnNrSRi35efGLCECXPXi6XBS5qAcnjLleqFX8xBhM1LlI+6rk8DI9y5sn0oGDZ6Tf+nJaygsdyv5Vbu0S62EwV9zCdoBEmYzzjNhW/MGXh4jSp4lD73OaGO68X+sbBBGD9SZNZTi4CxpQ+yx/rOv9M8kcfIje7utg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=S89lTQTD; arc=none smtp.client-ip=91.218.175.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1789493610; c=relaxed/simple;
+	bh=/wWBh71FKUsFODK4w0sj0XMuvIkHLWs6/7O4iGiGBKU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=V7/xkqEyQhALHYZNpI9nQwHiRaLvYp3mqYFiYEPa4txe9f7Y1fwujSMw6+FP70Li+XUU7Zxy9CrWThyzHx/9N2Wv54E4H2eyftT+vXsgGmJvBvmWm2ogabdsXLYA6PGZ421CFS59PXK1C3AONKLbJj52PgaLAK2btmrAIRiFR5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=aUjCat8O; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="S89lTQTD"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=Jp96XiPKTcamQsTvuwBYBtrk9Zn8cDubgT6B+0WBg94=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1789492394; v=1; x=1790097194;
- b=S89lTQTDbxYYQEV0mQm7LHE5n4WgZxDkcLzLxnINvmluzrh2qFvyEWg9dvamvSGCUrYCbc4S
- KMLFhGUDoAzf5K232SIS1OwQ1EB0WR3LlCoJQj5fguzYy8GE9kEDLEtm5uaKO8ix7HdqTRJWpd9
- 5dHST/4+Oefrs6w3Pv57W0dU=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 249ba4af9897f66d;
-	Tue, 15 Sep 2026 17:13:14 +0000
-X-Mizu-Trace-ID: 249ba4af9897f66d
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b4a0b17359so413e87.0
-        for <kvmarm@lists.linux.dev>; Tue, 15 Sep 2026 10:13:10 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvByqGmFa6DtJgiyPUHLIugrLCT0UfZ1j0+bvonhLXH31AQkxTNDJCdsZmUWVudgmSmnelBXm4SU=@lists.linux.dev
-X-Gm-Message-State: AFuF++kCprwvOZleRPWlZB/2X8pRzBw8AgQ4nzX4xLgBJQij62P2sL9d
-	yfO6KPPPvhULAosqiZPi3zIRcrR0yyfwuEoIidFT0dUVq/gCziG1b0pMbR7mr6S3ifbZsqZFYxf
-	3MmRs+SokKhho0Zu3TcX0Pmcp1GpyPRSFU/cpP5IC
-X-Received: by 2002:a05:6512:1194:b0:5b7:6707:e44c with SMTP id
- 2adb3069b0e04-5b8b2d5785fmr187938e87.12.1789492389080; Tue, 15 Sep 2026
- 10:13:09 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="aUjCat8O"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 772CA153B;
+	Tue, 15 Sep 2026 10:33:24 -0700 (PDT)
+Received: from LeoBrasDK.cambridge.arm.com (unknown [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BA50C3F7B4;
+	Tue, 15 Sep 2026 10:33:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1789493608; bh=/wWBh71FKUsFODK4w0sj0XMuvIkHLWs6/7O4iGiGBKU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=aUjCat8OMGi/UwlPtErQ43yH9VypMnUbSmTWNPocpPm6e7I1TVgYOaKIcD495AVen
+	 hDOKJxTPcUrE2FGdKZV4EfYBPhfy32JTWr++X+AZ+2WM0JQIpEMd5a0HhVrMSeEX7b
+	 luo9N6b1nXMMeRmrJtRSuJyoyEzhgFJ0bAK1X86s=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Tian Zheng <zhengtian10@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 2/5] KVM: arm64: Add KVM_PGTABLE_PROT_DIRTY
+Date: Tue, 15 Sep 2026 18:33:23 +0100
+Message-ID: <aqmBY_v74r4GMttY@LeoBrasDK>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <86a4pl7c1m.wl-maz@kernel.org>
+References: <20260901171558.2674031-1-leo.bras@arm.com> <20260901171558.2674031-3-leo.bras@arm.com> <86a4pl7c1m.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260807164322.2970811-2-sebastianene@google.com> <20260807164322.2970811-14-sebastianene@google.com>
-In-Reply-To: <20260807164322.2970811-14-sebastianene@google.com>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Tue, 15 Sep 2026 18:12:32 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTxAb1vDZW2zf0L3S4JmWMULuNPcO=8KkwZt6TasSvEukQ@mail.gmail.com>
-X-Gm-Features: AcwNN1W6pe0lKiNtcjxGTo4pp5BEYRvaWFFOe0G_chQeibnLqZ86nTCgbdmtGNg
-Message-ID: <CA+EHjTxAb1vDZW2zf0L3S4JmWMULuNPcO=8KkwZt6TasSvEukQ@mail.gmail.com>
-Subject: Re: [PATCH v2 12/13] KVM: arm64: Prevent the host from programming
- new GITS_BASER tables
-To: Sebastian Ene <sebastianene@google.com>
-Cc: catalin.marinas@arm.com, joey.gouly@arm.com, mark.rutland@arm.com, 
-	maz@kernel.org, oupton@kernel.org, rananta@google.com, 
-	Sascha.Bischoff@arm.com, suzuki.poulose@arm.com, will@kernel.org, 
-	kvmarm@lists.linux.dev, android-kvm@google.com, bgrzesik@google.com, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	nathan@kernel.org, perlarsen@google.com, seiden@linux.ibm.com, 
-	smostafa@google.com, tglx@kernel.org, vdonnefort@google.com, 
-	vladimir.murzin@arm.com, yuzenghui@huawei.com, zenghui.yu@linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-Hi Sebastian,
+On Sun, Sep 13, 2026 at 10:09:25AM +0100, Marc Zyngier wrote:
+> On Tue, 01 Sep 2026 18:15:53 +0100,
+> Leonardo Bras <leo.bras@arm.com> wrote:
+> > 
+> > Second step of changing the encoding for the Stage2 PTE descriptor,
+> > introduce the concept of dirty page, so we can have a writable but not
+> > dirty (WC) page, and a writable and dirty (WD) page.
+> 
+> Why should we care about *setting* the dirty bit in the PTE? Under
+> what circumstance do we want to establish a mapping as being dirty?
 
-The GITS_BASER restriction is right, but the new range dispatch lets a
-sub-word write through and the masking is incomplete. A few things:
+We want a mapping to be dirty whenever it's writable and we don't want to 
+track it being changed anymore.
 
-On Fri, Aug 07, 2026 at 04:43:22PM +0000, Sebastian Ene wrote:
+A writable-dirty is for when a mapping can be written to, but still did not 
+happen.
 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/its_emulate.c b/arch/arm64/kvm/hyp/nvhe/its_emulate.c
-[...]
-> +static void baser_write(struct pkvm_protected_reg *region, u64 offset, u64 value)
-> +{
-[...]
-> +        value &= ~(GENMASK_ULL(47, 12) | GENMASK_ULL(9, 0));
-> +        value |= (baser & GENMASK_ULL(47, 12)) | (baser & GENMASK_ULL(9, 0));
+> 
+> The whole point of DBM is to only set something dirty when it is
+> written to, and this patch breaks this invariant.
+> 
+> Maybe you have a good reason to do so, but that's not explained.
 
-baser_write should force Valid[63] and the cache/shareability attrs
-from the snapshot too, not just PA and [9:0]. As is, the host can set
-Valid on a BASER that setup left invalid (pkvm_setup_its_shadow_baser
-only mediated tables that were valid in the snapshot), which activates
-a table whose L2s hyp never took, and it can change a table's
-cacheability/shareability. (Sashiko)
+Sorry it was not clear.
+The idea of this patch is to introduce the dirty state, without causing 
+any change in the behavior of the system.
 
-> +        writeq_relaxed(value, its->base + offset);
+Before patchset: 
+- RW : S2AP = 1
+- RO : S2AP = 0
 
-offset is the raw trapped offset. pkvm_its_emulate_handler now matches
-the whole GITS_BASER range (the num_registers change), but it still
-doesn't require reg_size == access_size or offset aligned to
-access_size, so a 4-byte write at GITS_BASER + 4 reaches baser_write
-with offset 0x104. This writeq is then a misaligned 64-bit Device
-write that alignment-faults to EL2 and takes hyp down. (Sashiko)
+After patch 1:
+- RW = WD: S2AP = 1, DBM = 1
+- RO     : S2AP = 0, DBM = 0
 
-And forcing the address from host_state->tables[].val only points at
-the right table once setup validates the snapshot against the hardware
-GITS_BASER<n>, the same setup gap as the tables patch.
+After patch 2:
+- WD : S2AP = 1, DBM = 1
+- WC : S2AP = 0, DBM = 1
+- RO : S2AP = 0, DBM = 0
 
-Cheers,
-/fuad
+That splits the concept of writable and dirty from the previous RW state, 
+so they can be independent.
+
+We can mark a page writable, without it being dirty, which allows HAFDBS in 
+the future to mark it dirty whenever it happens to receive a write. (and 
+use HDBSS to register it on a buffer, and so on)
+
+As of now there is no enablement of the HAFDBS, so up to this patch 
+there should not be any impact to users, as the DBM bit is ignored if 
+VTCR.HD=0.
+
+Patch 5 introduces an possible use of this using HAFDBS when dirty-tracking 
+is disabled to avoid marking all PTEs as clean at the dirty-track enable. 
+
+Does it look more clear now?
+Do you think adding parts of the above text in the commit message would 
+help?
+
+Thanks again!
+Leo
