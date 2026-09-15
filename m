@@ -1,123 +1,164 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.5])
+Received: from esa10.hc1455-7.c3s2.iphmx.com (esa10.hc1455-7.c3s2.iphmx.com [139.138.36.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3C4433B969;
-	Tue, 15 Sep 2026 21:49:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C866D33B969
+	for <kvmarm@lists.linux.dev>; Tue, 15 Sep 2026 21:50:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.138.36.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789508957; cv=none; b=g4JTkjA2PmY5t4CrUKScIHCGYjLX9lAtp+JAFK+wwmd3ZoaDdvE4EBDtXc2cs0BmuzaNyI2LQXqm2kCOhfrPGoq6qJKrMTUu3YYfSCpZwMyHuJEze1IRsMyK1dmUR3pHCMYyXJ65m//pbki6WX34FKuNCrIdAyOoobxWifRQeuw=
+	t=1789509015; cv=none; b=WMtX9upZNcnu1Wadi1pOwCAvlvrJvQdYLZ/kABxE8TEclJK0uYAcHftYiwe8ewD4+elf4MQ+nnRqcOJ35E1qBMEYLhuRrIHax/1oAKBEZOzzdwyM3rhqFt+l7Y0oBFIxFwK3Y8Icw+E1tlIuriSUn6UyUP8NY/fzH4x7nn5xn+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789508957; c=relaxed/simple;
-	bh=4Mh5YWpLGrRiK7zAXkaXbQmVg/ZurD93+09+Y8jTx+M=;
-	h=Date:From:To:Cc:Subject:Message-ID; b=dpcG4bYQyHV2HoX+J0dYgDJwqyyaRhEIrLN3iqy60eTRLLamDg6bKpbWiuJ0vHcuN1xCFPnjKsM68T6zTZBK3UyyXhgncKBj+NNOzxTNjk2wXVaam7YDnvOLhOPt+xKd65v0YKgVsAnbsFRv/Fqm2Y3GRWPEYo5X/4dfMGRcVdQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mK4KK4UY; arc=none smtp.client-ip=192.198.163.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1789509015; c=relaxed/simple;
+	bh=XBD1UvlBlRAVfbgJdKlrQtWgl0n/EsOA+/7NfYLSFM4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RZo4VUTC0e1Uffu4HVi5Hu2MA1kUom3GJcYMOrVeTdRHpyPvf+DgvDDdy48dlDdzWgyE4CMnj8dnN6VMVMzzYdFU1kYZSIT41R+rUGfuwBggJyqYzrLvxgZCklWmulQMrPNI6whqLwK3Bo+S8E83nAalH8DRG6ObU7IeRAI83jk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=NQlDH2Z4; arc=none smtp.client-ip=139.138.36.225
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mK4KK4UY"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1789508954; x=1821044954;
-  h=date:from:to:cc:subject:message-id;
-  bh=4Mh5YWpLGrRiK7zAXkaXbQmVg/ZurD93+09+Y8jTx+M=;
-  b=mK4KK4UYXR5UYSBfHESWw8s9Hrw2bxB/mk9av8AN2IHsMmgCwf0QV8EU
-   Rz+X1Aq1on5uoUuscLR7U9lcwb4QN+h1sLMeaEpRwZYb5EsTx/R8p9ILU
-   LX61CGcatyv0MxjEAWgQNH3yJoebWWPNgAIs1T7FyC9BwRkTUL9hWTrCh
-   a+M/NPIe+tTqxPSy1FOLyd7y2p3G4O9yzPxN7rqBb1pf3yuEzeeOe/DNH
-   evnuHFjDUAd78AuyWWWqNo9SbAK9g+OAADs5zJkbaaLtCJ13E6paWIFTN
-   vWhgJX1mEQugV7yQEUZKBhRYZPjb6uTPW9G+b0h++4gn65XedAV33dCOl
-   A==;
-X-CSE-ConnectionGUID: bjKalSEhSkSbUDeVthDWfg==
-X-CSE-MsgGUID: KMUrjYB6TamY7uLNHgP0PA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11905"; a="395298"
-X-IronPort-AV: E=Sophos;i="6.27,103,1787036400"; 
-   d="scan'208";a="395298"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa115.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2026 14:49:14 -0700
-X-CSE-ConnectionGUID: hLb2xrbBQ161CTWIOpZ+xg==
-X-CSE-MsgGUID: 2z5BNDMlQAerbuvLzwFLtA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.27,103,1787036400"; 
-   d="scan'208";a="266930764"
-Received: from lkp-server01.sh.intel.com (HELO 462990a40a85) ([10.239.97.150])
-  by fmviesa009.fm.intel.com with ESMTP; 15 Sep 2026 14:49:12 -0700
-Received: from kbuild by 462990a40a85 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1x6b1Z-00000000577-3KBN;
-	Tue, 15 Sep 2026 21:49:09 +0000
-Date: Wed, 16 Sep 2026 05:48:32 +0800
-From: kernel test robot <lkp@intel.com>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Cc: oe-kbuild-all@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>
-Subject: [kvmarm:next 31/83]
- arch/arm64/kvm/vgic/vgic-irs-v5.c:1016:8: warning: variable 'addr' set but
- not used
-Message-ID: <202609160555.JW0KTj94-lkp@intel.com>
-User-Agent: s-nail v14.9.25
+	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="NQlDH2Z4"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
+  t=1789509014; x=1821045014;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=XBD1UvlBlRAVfbgJdKlrQtWgl0n/EsOA+/7NfYLSFM4=;
+  b=NQlDH2Z4Zo9qcljSjsfrn767jVrpQQDZe4a0Atds3bEBEPV9JM7xBXWp
+   eAeIbANwcrJmP3Q/Cm8DgFM9s755gkIcrmHAcrX0gZNDxle1kKvDZW9e5
+   Wetc1ydO/H4LwdK/8GHPGGmN5YFt1w4pzZujpCb3dTWyCyWTqhitLasvo
+   WFc9EnWd6UNi5hGpibik4NKUz33nDUc4bVIrPGD4PVhweSCwuStuPO1PO
+   L7nYRuohWTl2bAAcQz/b49/nNx8qKRUNywwHNd1GS++hIIPUsIiQxkTYR
+   GE5yjbHSwTx5S70gl+/qm9o8UK2WMJ1tcrXhvAKMXReAbIAfMNnEWPn9o
+   g==;
+X-CSE-ConnectionGUID: oXz8rBTERSmEWK8VhyVhfg==
+X-CSE-MsgGUID: dAhgYb9bQ1GIR4CCkkm6iw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11905"; a="241349522"
+X-IronPort-AV: E=Sophos;i="6.27,103,1786978800"; 
+   d="scan'208";a="241349522"
+Received: from gmgwuk01.global.fujitsu.com ([172.187.114.235])
+  by esa10.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2026 06:50:06 +0900
+Received: from az2uksmgm2.o.css.fujitsu.com (unknown [10.151.22.199])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by gmgwuk01.global.fujitsu.com (Postfix) with ESMTPS id 3A2251C1C707
+	for <kvmarm@lists.linux.dev>; Tue, 15 Sep 2026 21:50:06 +0000 (UTC)
+Received: from az2uksmom3.o.css.fujitsu.com (unknown [10.151.22.205])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by az2uksmgm2.o.css.fujitsu.com (Postfix) with ESMTPS id E255F1800260
+	for <kvmarm@lists.linux.dev>; Tue, 15 Sep 2026 21:50:05 +0000 (UTC)
+Received: from sm-arm-grace07 (unknown [10.124.178.20])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by az2uksmom3.o.css.fujitsu.com (Postfix) with ESMTPS id 29FD410001C5;
+	Tue, 15 Sep 2026 21:49:59 +0000 (UTC)
+Date: Wed, 16 Sep 2026 06:49:57 +0900
+From: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+To: Wei-Lin Chang <weilin.chang@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>, Fuad Tabba <fuad.tabba@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Wang Han <wanghan@linux.alibaba.com>,
+	Shuai Xue <xueshuai@linux.alibaba.com>,
+	"Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+Subject: Re: [PATCH v6 0/7] KVM: arm64: nv: Implement nested stage-2 reverse
+ map
+Message-ID: <aqm9hXB6X9IQ8wHz@sm-arm-grace07>
+References: <20260915154305.3852871-1-weilin.chang@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260915154305.3852871-1-weilin.chang@arm.com>
 
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git next
-head:   8476ce1f1e949a4eae0c0b8f06cf6ab51a3edfd0
-commit: 71091136d1452b6125579b210d29efec3e79681a [31/83] KVM: arm64: gic-v5: Handle userspace accesses to IRS MMIO region
-config: arm64-randconfig-003-20260916 (https://download.01.org/0day-ci/archive/20260916/202609160555.JW0KTj94-lkp@intel.com/config)
-compiler: aarch64-linux-gcc (GCC) 8.5.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260916/202609160555.JW0KTj94-lkp@intel.com/reproduce)
+On Tue, Sep 15, 2026 at 04:42:58PM +0100, Wei-Lin Chang wrote:
+> Hi,
+> 
+> This is v6 of optimizing the shadow s2 mmu unmapping during MMU
+> notifiers.
+> 
+> This version fixes a few issues, and adds Marc's space optimization
+> for kvm_guest_s2_mapping [1]. Please see the changelog for the details.
+> 
+> Tested by booting L3, and running in-kernel targetted tests described
+> in [2]. v5 got some tested-by's from Itaru and Wang (thanks), I didn't
+> carry them over since some bugs fixed in v6 are non-obvious. Some
+> retest would be much appreciated!
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202609160555.JW0KTj94-lkp@intel.com/
+How did you boot into L3, with KVM selftest or recrusively boot on HW?
 
-All warnings (new ones prefixed by >>):
+Thanks,
+Itaru.
 
-   arch/arm64/kvm/vgic/vgic-irs-v5.c: In function 'vgic_v5_has_attr_regs':
->> arch/arm64/kvm/vgic/vgic-irs-v5.c:1016:8: warning: variable 'addr' set but not used [-Wunused-but-set-variable]
-     gpa_t addr, offset;
-           ^~~~
-
-
-vim +/addr +1016 arch/arm64/kvm/vgic/vgic-irs-v5.c
-
-  1010	
-  1011	int vgic_v5_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr)
-  1012	{
-  1013		const struct vgic_register_region *region;
-  1014		struct vgic_reg_attr reg_attr;
-  1015		struct kvm_vcpu *vcpu;
-> 1016		gpa_t addr, offset;
-  1017		int ret, align;
-  1018	
-  1019		ret = vgic_v5_parse_attr(dev, attr, &reg_attr);
-  1020		if (ret)
-  1021			return ret;
-  1022	
-  1023		vcpu = reg_attr.vcpu;
-  1024		addr = reg_attr.addr;
-  1025	
-  1026		if (attr->group == KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS)
-  1027			return vgic_v5_has_cpu_sysregs_attr(vcpu, attr);
-  1028	
-  1029		offset = attr->attr;
-  1030	
-  1031		region = vgic_find_mmio_region(vgic_v5_irs_registers,
-  1032					       ARRAY_SIZE(vgic_v5_irs_registers),
-  1033					       offset);
-  1034		if (!region)
-  1035			return -ENXIO;
-  1036	
-  1037		align = region->access_flags & VGIC_ACCESS_64bit ? 0x7 : 0x3;
-  1038		if (offset & align)
-  1039			return -EINVAL;
-  1040	
-  1041		return 0;
-  1042	}
-  1043	
-
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+> 
+> Series based on v7.3-rc3 + Marc's nested mmu lifecycle fixes [3].
+> 
+> * Changes from v5 [4]:
+> 
+>   - Align the addresses down to the mapping size when recording the
+>     guest s2 mappings. s2fd->fault_ipa isn't necessarily PAGE_SIZE aligned.
+> 
+>   - Record guest s2 mappings even when page table maps return -EAGAIN.
+>     kvm_pgtable_stage2_map() can create mappings while returning -EAGAIN.
+>     For example, a 2M block map (A) could race with a 4K page map (B):
+>     1. (A) maps the 2M block in kvm_pgtable_visitor_cb()
+>     2. (B) breaks that block into a table and maps 4K
+>     3. (A) reloads and finds the table after kvm_pgtable_visitor_cb(),
+>        then descends into it.
+>     4. (A) maps some 4K, but before it finishes reads entry mapped by (B).
+>     5. (A) returns -EAGAIN although it had mapped a few pages.
+>     In this case, we don't know what subrange is mapped, just track the whole
+>     requested mapping range.
+> 
+>   - Don't remove tracked mappings from the interval trees if they only
+>     partially overlap the removal range. Because of the previous bullet point
+>     we can have a 4K shadow mapping tracked as a 2M range in the interval
+>     trees. It would be wrong to remove the 2M range when a guest TLBI doesn't
+>     touch the 4K mapped.
+> 
+>   - Check mmu->pgt during mmu unmap notifier, as it could race against
+>     MMU teardown.
+> 
+>   - Make guest_s2_tracking_destroy() canonical mmu only. We simply don't
+>     need to detach the nodes from the nested mmus' trees. Freeing them
+>     during canonical mmu's teardown is enough.
+> 
+> Thanks!
+> 
+> [1]: https://lore.kernel.org/kvmarm/86h5jv7qrd.wl-maz@kernel.org/
+> [2]: https://lore.kernel.org/kvmarm/gerjpm62a2gszzggc6vuai22bf3prfquvfsp7ueumps7vz2ev3@odlmovaklg2b/
+> [3]: https://lore.kernel.org/kvmarm/20260911162203.1919330-1-maz@kernel.org/
+> [4]: https://lore.kernel.org/kvmarm/20260810205038.118843-1-weilin.chang@arm.com/
+> 
+> Marc Zyngier (1):
+>   KVM: arm64: nv: Drop kvm_s2_mmu pointer from kvm_guest_s2_mapping
+> 
+> Wei-Lin Chang (6):
+>   KVM: arm64: Use a variable for the canonical IPA in kvm_s2_fault_map()
+>   KVM: arm64: nv: Introduce guest stage-2 tracking structures
+>   KVM: arm64: nv: Track guest stage-2 mapping creation
+>   KVM: arm64: nv: Track guest stage-2 mapping removal
+>   KVM: arm64: nv: Avoid full shadow stage-2 unmap
+>   KVM: arm64: Refactor kvm_unmap_gfn_range() with common variables
+> 
+>  arch/arm64/include/asm/kvm_host.h   |  31 +++++-
+>  arch/arm64/include/asm/kvm_nested.h |   7 ++
+>  arch/arm64/kvm/mmu.c                | 109 +++++++++++++++++++---
+>  arch/arm64/kvm/nested.c             | 140 +++++++++++++++++++++++++++-
+>  4 files changed, 269 insertions(+), 18 deletions(-)
+> 
+> -- 
+> 2.43.0
+> 
