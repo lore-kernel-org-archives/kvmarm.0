@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE2674AA564;
-	Tue, 15 Sep 2026 16:02:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF08940A944;
+	Tue, 15 Sep 2026 16:02:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789488128; cv=none; b=CB8hAXaKqJ0MRrdPfFJ7qfRCtF7JmvV86zBSEWupzNDlb8mlVb8rQkbQ23RAhjRq3DlGI8vDSWXebCwKcr9B2AVgzrSRPiOeD2hj7FewuxfEj6HNCZGKEkkULUIIRXKU9I5gZ20GbHpNGE3KvxI+dHnKr0aoGBPEzpU1yoAU6S4=
+	t=1789488131; cv=none; b=b8pH6aaTKKlBYENktH7trnt6ZLiQuF4XB+/4Q8R3nDm//TcQLvWlkpnOcC18yMHVFDFdWjJNKN2/CaOE9dVrZ5BMTVSTeG4b4tZ3m47v7GhAFMs7FchEdlD24A04DqEeLSs6LeTGWjNlufTCHBIvAodddccwcrha2+SSq5yyhBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789488128; c=relaxed/simple;
-	bh=9i06HhoyM7DumxjGYoPgI8El9s/cOdUwPNulQZnoz6U=;
+	s=arc-20240116; t=1789488131; c=relaxed/simple;
+	bh=jG9ihcxiEJTt7tVd2KyBPA5CREP/rxRtBAPkiF4QgJg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WGHoJkMpyeX8VHSEGPu5Voo5IzbgOUDgTAaIGWtvzof/oj/T9rz8WS2I2rsWgKxP9GGq3GVCy0824aFxRvlW/A7yPwx+uYUvCECKXw0JUIGW1O7SY3uLc37pQc8M2tdWa9rW3zjHvOFL7DKiF+sW4blBuQtFOZg7mfQUYpH6H+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Px8dinwi; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=P+zYaufGWhDhK0WqxVJ5HgZRZ3OSaPD48eQdcgpTe2oitpIf3rtiU0EToIDRN8LwK8F5LddrnnxhWcR1wZaoLd59aO9SYVarl+iqGYj5WacXdCwQbs00UkNcZHoPRcVoXo/oQk/XdCB2cgxTKSZunQktkh7J5Jz6vpnFB20dhA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=CTVCxqCp; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Px8dinwi"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="CTVCxqCp"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8697A15A1;
-	Tue, 15 Sep 2026 09:02:01 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9D7C91570;
+	Tue, 15 Sep 2026 09:02:04 -0700 (PDT)
 Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.2.197.99])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 54D743F882;
-	Tue, 15 Sep 2026 09:02:02 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 6B2F63F882;
+	Tue, 15 Sep 2026 09:02:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1789488125; bh=9i06HhoyM7DumxjGYoPgI8El9s/cOdUwPNulQZnoz6U=;
+	t=1789488128; bh=jG9ihcxiEJTt7tVd2KyBPA5CREP/rxRtBAPkiF4QgJg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Px8dinwiFlMpfwFzy4vAZgkYLalZ6Ms5ZuXXvu/UsexSs6rYBmhimmiQ/ZFiNYa9H
-	 XpHU/+PFKhyDxsex/mvWl6OEn2Pl9pQXrHxIwV8Sgv0lGlnToRrJFV/njmPaJbwNCY
-	 p0ZnZZRZZ+jjUONUyV5xNYsZjRG4VWc+O8qqfUQE=
+	b=CTVCxqCpkgfesirYjDxLbvAxgs0+ftv7Bx8zVL9k11e6M5M8hJbtkdj4pyglAjjd5
+	 eYGmGau1EcL7TTaBOmNFHnBDkV4ThR95WTnkw8NrGPo0VExydt0aBgx27F7gTPgayx
+	 GV6K+aoIop/KEI27gKobUkvPGjzLWOAhMe/gyXik=
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -49,11 +49,11 @@ Cc: maz@kernel.org,
 	WeiLin.Chang@arm.com,
 	lpieralisi@kernel.org,
 	enju.kohei@fujitsu.com,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v18 04/23] KVM: arm64: Avoid including linux/kvm_host.h in kvm_pgtable.h
-Date: Tue, 15 Sep 2026 17:01:22 +0100
-Message-ID: <20260915160141.3543048-5-suzuki.poulose@arm.com>
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Fuad Tabba <fuad.tabba@linux.dev>
+Subject: [PATCH v18 05/23] KVM: arm64: Track the type of VM in kvm_arch
+Date: Tue, 15 Sep 2026 17:01:23 +0100
+Message-ID: <20260915160141.3543048-6-suzuki.poulose@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260915160141.3543048-1-suzuki.poulose@arm.com>
 References: <20260915160141.3543048-1-suzuki.poulose@arm.com>
@@ -65,73 +65,215 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Steven Price <steven.price@arm.com>
+KVM arm64 has different types of VMs with all the different modes in which the
+hypervisor code can be run. e.g., VHE, nVHE, PKVM etc. Then there is protected
+VM and normal VMs with PKVM. We might soon add other types, e.g., Arm CCA Realm.
+So in an effort to make the handling of these different types of VMs a bit more
+friendly to the eyes, add a VM flavor to the kvm_arch and we could then add
+handlers for different operations based on the VM type.
 
-To avoid future include cycles, drop the linux/kvm_host.h include in
-kvm_pgtable.h and include the lightweight headers required for the types
-and inline helpers used there. Additionally provide a forward
-declaration for struct kvm_s2_mmu as it's only used as a pointer in this
-file.
+Keep the flavor initialisation at the beginning to allow for the detection
+early enough and fail out on any unsupported requests. (e.g., protected on !pKVM)
 
-Both pgtable.c and kvm_pkvm.h relied on the indirect inclusion of
-kvm_host.h, so make that explicit.
+With that, use the vm_flavor to detect if a VM is protected VM on PKVM. A later
+patch would generalize the "protected" VM predicate to cater for all
+confidential compute VMs.
 
+Based on a patch by Marc Zyngier
+
+Suggested-by: Marc Zyngier <maz@kernel.org>
 Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
-Reviewed-by: Gavin Shan <gshan@redhat.com>
-Signed-off-by: Steven Price <steven.price@arm.com>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- arch/arm64/include/asm/kvm_pgtable.h | 6 +++++-
- arch/arm64/include/asm/kvm_pkvm.h    | 2 +-
- arch/arm64/kvm/hyp/pgtable.c         | 1 +
- 3 files changed, 7 insertions(+), 2 deletions(-)
+Changes since v17:
+ * s/PKVM/pKVM for the comments
+ * Drop type argument for pkvm_init_host_vm and also drop protected variable.
+ * Add helpers for checking if the VM is running on pKVM (kvm_vm_hyp_is_pkvm())
+ * Use kvm_vm_hyp_is_pkvm() to replace is_protected_kvm_enabled() with valid
+   kvm instance
+---
+ arch/arm64/include/asm/kvm_host.h | 14 +++++++++++--
+ arch/arm64/include/asm/kvm_pkvm.h |  2 +-
+ arch/arm64/kvm/arm.c              | 35 ++++++++++++++++++++++++-------
+ arch/arm64/kvm/hyp/nvhe/pkvm.c    |  2 +-
+ arch/arm64/kvm/pkvm.c             |  6 ++----
+ 5 files changed, 44 insertions(+), 15 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index 41a8687938eb6..c2e4b29e605fc 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -8,9 +8,13 @@
- #define __ARM64_KVM_PGTABLE_H__
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 286489a69dff5..39d04ff702bc1 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -257,7 +257,6 @@ struct kvm_protected_vm {
+ 	pkvm_handle_t handle;
+ 	struct kvm_hyp_memcache teardown_mc;
+ 	struct kvm_hyp_memcache stage2_teardown_mc;
+-	bool is_protected;
+ 	bool is_created;
  
- #include <linux/bits.h>
--#include <linux/kvm_host.h>
-+#include <linux/kvm_types.h>
-+#include <linux/rbtree_types.h>
-+#include <linux/rcupdate.h>
- #include <linux/types.h>
+ 	/*
+@@ -306,9 +305,18 @@ enum fgt_group_id {
+ 	__NR_FGT_GROUP_IDS__
+ };
  
-+struct kvm_s2_mmu;
++enum kvm_arm_vm_flavor {
++	VM_NVHE,
++	VM_VHE,
++	VM_PKVM,		/* Normal guests on pKVM */
++	VM_PROTECTED_PKVM,	/* Protected VM */
++	VM_FLAVOR_MAX,
++};
 +
- #define KVM_PGTABLE_FIRST_LEVEL		-1
- #define KVM_PGTABLE_LAST_LEVEL		3
+ struct kvm_arch {
+ 	struct kvm_s2_mmu mmu;
  
++	enum kvm_arm_vm_flavor vm_flavor;
+ 	/*
+ 	 * Fine-Grained UNDEF, mimicking the FGT layout defined by the
+ 	 * architecture. We track them globally, as we present the
+@@ -1504,8 +1512,10 @@ struct kvm *kvm_arch_alloc_vm(void);
+ 
+ #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
+ 
+-#define kvm_vm_is_protected(kvm)	(is_protected_kvm_enabled() && (kvm)->arch.pkvm.is_protected)
++#define kvm_vm_is_protected(kvm)	((kvm)->arch.vm_flavor == VM_PROTECTED_PKVM)
++#define kvm_vm_is_unprotected_pkvm(kvm)	((kvm)->arch.vm_flavor == VM_PKVM)
+ 
++#define kvm_vm_hyp_is_pkvm(kvm)		(is_protected_kvm_enabled())
+ #define vcpu_is_protected(vcpu)		kvm_vm_is_protected((vcpu)->kvm)
+ 
+ int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature);
 diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
-index beea00e693a0a..54a618d887fa4 100644
+index 54a618d887fa4..a1f3e05e75dc1 100644
 --- a/arch/arm64/include/asm/kvm_pkvm.h
 +++ b/arch/arm64/include/asm/kvm_pkvm.h
-@@ -7,9 +7,9 @@
- #define __ARM64_KVM_PKVM_H__
+@@ -17,7 +17,7 @@
  
- #include <linux/arm_ffa.h>
-+#include <linux/kvm_host.h>
- #include <linux/memblock.h>
- #include <linux/scatterlist.h>
--#include <asm/kvm_host.h>
- #include <asm/kvm_pgtable.h>
+ #define HYP_MEMBLOCK_REGIONS 128
  
- /* Maximum number of VMs that can co-exist under pKVM. */
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index b74dd5ce1efd3..f48253b9d88b5 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -8,6 +8,7 @@
-  */
+-int pkvm_init_host_vm(struct kvm *kvm, unsigned long type);
++int pkvm_init_host_vm(struct kvm *kvm);
+ int pkvm_create_hyp_vm(struct kvm *kvm);
+ bool pkvm_hyp_vm_is_created(struct kvm *kvm);
+ void pkvm_destroy_hyp_vm(struct kvm *kvm);
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 3fbdfce926475..4329c49fe49da 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -228,6 +228,26 @@ static void kvm_arch_fix_timer_offsets(struct kvm *kvm)
+ 	set_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &kvm->arch.flags);
+ }
  
- #include <linux/bitfield.h>
-+#include <linux/kvm_host.h>
- #include <asm/kvm_pgtable.h>
- #include <asm/stage2_pgtable.h>
++static int kvm_init_vm_flavor(struct kvm *kvm, unsigned long type)
++{
++	bool protected = type & KVM_VM_TYPE_ARM_PROTECTED;
++
++	if (is_protected_kvm_enabled()) {
++		if (protected)
++			kvm->arch.vm_flavor = VM_PROTECTED_PKVM;
++		else
++			kvm->arch.vm_flavor = VM_PKVM;
++	} else if (protected) {
++		return -EINVAL;
++	} else if (has_vhe()) {
++		kvm->arch.vm_flavor = VM_VHE;
++	} else {
++		kvm->arch.vm_flavor = VM_NVHE;
++	}
++
++	return 0;
++}
++
+ /**
+  * kvm_arch_init_vm - initializes a VM data structure
+  * @kvm:	pointer to the KVM struct
+@@ -250,6 +270,10 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ 	mutex_unlock(&kvm->lock);
+ #endif
  
++	ret = kvm_init_vm_flavor(kvm, type);
++	if (ret)
++		return ret;
++
+ 	kvm_init_nested(kvm);
+ 
+ 	ret = kvm_share_hyp(kvm, kvm + 1);
+@@ -266,17 +290,14 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ 	if (ret)
+ 		goto err_free_cpumask;
+ 
+-	if (is_protected_kvm_enabled()) {
++	if (kvm_vm_hyp_is_pkvm(kvm)) {
+ 		/*
+ 		 * If any failures occur after this is successful, make sure to
+ 		 * call __pkvm_unreserve_vm to unreserve the VM in hyp.
+ 		 */
+-		ret = pkvm_init_host_vm(kvm, type);
++		ret = pkvm_init_host_vm(kvm);
+ 		if (ret)
+ 			goto err_uninit_mmu;
+-	} else if (type & KVM_VM_TYPE_ARM_PROTECTED) {
+-		ret = -EINVAL;
+-		goto err_uninit_mmu;
+ 	}
+ 
+ 	kvm_vgic_early_init(kvm);
+@@ -341,7 +362,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+ 
+ 	kvm_vgic_destroy(kvm);
+ 
+-	if (is_protected_kvm_enabled())
++	if (kvm_vm_hyp_is_pkvm(kvm))
+ 		pkvm_destroy_hyp_vm(kvm);
+ 
+ 	kvm_uninit_stage2_mmu(kvm);
+@@ -603,7 +624,7 @@ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
+ 
+ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+ {
+-	if (!is_protected_kvm_enabled())
++	if (!kvm_vm_hyp_is_pkvm(vcpu->kvm))
+ 		kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_cache);
+ 	else
+ 		free_hyp_memcache(&vcpu->arch.pkvm_memcache);
+diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+index e7b38eff63bd1..9b69228f8402c 100644
+--- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
++++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+@@ -432,7 +432,7 @@ static void init_pkvm_hyp_vm(struct kvm *host_kvm, struct pkvm_hyp_vm *hyp_vm,
+ 
+ 	hyp_vm->host_kvm = host_kvm;
+ 	hyp_vm->kvm.created_vcpus = nr_vcpus;
+-	hyp_vm->kvm.arch.pkvm.is_protected = READ_ONCE(host_kvm->arch.pkvm.is_protected);
++	hyp_vm->kvm.arch.vm_flavor = READ_ONCE(host_kvm->arch.vm_flavor);
+ 	hyp_vm->kvm.arch.flags = 0;
+ 	pkvm_init_features_from_host(hyp_vm, host_kvm);
+ 
+diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+index 8e4c6e4bec123..8e9176a700926 100644
+--- a/arch/arm64/kvm/pkvm.c
++++ b/arch/arm64/kvm/pkvm.c
+@@ -229,10 +229,9 @@ void pkvm_destroy_hyp_vm(struct kvm *kvm)
+ 	mutex_unlock(&kvm->arch.config_lock);
+ }
+ 
+-int pkvm_init_host_vm(struct kvm *kvm, unsigned long type)
++int pkvm_init_host_vm(struct kvm *kvm)
+ {
+ 	int ret;
+-	bool protected = type & KVM_VM_TYPE_ARM_PROTECTED;
+ 
+ 	/* Reserve the VM in hyp and obtain a hyp handle for the VM. */
+ 	ret = kvm_call_hyp_nvhe(__pkvm_reserve_vm);
+@@ -240,8 +239,7 @@ int pkvm_init_host_vm(struct kvm *kvm, unsigned long type)
+ 		return ret;
+ 
+ 	kvm->arch.pkvm.handle = ret;
+-	kvm->arch.pkvm.is_protected = protected;
+-	if (protected) {
++	if (kvm_vm_is_protected(kvm)) {
+ 		pr_warn_once("kvm: protected VMs are experimental and for development only, tainting kernel\n");
+ 		add_taint(TAINT_USER, LOCKDEP_STILL_OK);
+ 	}
 -- 
 2.43.0
 
