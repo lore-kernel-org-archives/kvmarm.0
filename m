@@ -1,111 +1,153 @@
-Received: from mta0.migadu.com (out-223.mta0.migadu.com [91.218.175.223])
+Received: from mail-lr2-f40.google.com (mail-lr2-f40.google.com [74.125.230.104])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4C954CA769
-	for <kvmarm@lists.linux.dev>; Tue, 15 Sep 2026 18:51:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.223
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789498319; cv=none; b=ZAgzlNJEKbx3QwtbdkiDJ5RwTPAOvOP+fu0u2NwGYa6uaGaUIp48+Xf8/nlXL8F7a+UzxjDIZ0fSuLmFfb9Hxs5LbxVAaI1C2RZsssvpI/H/A97zI/QHSaI2E1tCkr7xk8mP1Xv7GP0TpuedqhlfUr2JBLUXs3A6uNsHC9JyJII=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789498319; c=relaxed/simple;
-	bh=wDUSmz48AJ/AWECTgc5Y2mr8+N5AQyAKi5Db/DMYbBU=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C78A446BE8
+	for <kvmarm@lists.linux.dev>; Tue, 15 Sep 2026 19:35:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.230.104
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1789500939; cv=pass; b=uKyNHMZ9gHT6MPpP3YSfUpBtlbPZNXUrffUVlih2Yc1FLcN/WBmYYh8j8FMB2xxKbk7obkiebdDLdZKmedTj6xtFh7O0K210neJzpEFxDzhODh77Zz2Mqc69XGGjLO9QFV3FtB81IIifXdi+aiZ7ZqdH/m4O1YC8+z8qLIcBxvk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1789500939; c=relaxed/simple;
+	bh=9iP5wCDaS9EpQ+gfjMA3+Yk2v+5OOuRQACmgXFd/pac=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LiM8nlrAkySbygzOICLGKGMi9SLiwE5boiWplcRqYli2PkyDvFge2vIkkH8Kq9l0wN1tKRFoxDSEK1P9m2LNLbppUzBnpbyXHk0iGw4JLnYkMy0nGgIiuw/wH5xLB81nFZ/av5+4GajOoJWlvdVKkzc06BVt9UdAi/cC18hIV0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YwULGCbN; arc=none smtp.client-ip=91.218.175.223
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	 To:Cc:Content-Type; b=ccx4Adf/b6VXIrEK6e81aqlybpD7WkFQDODaU1/5giRTkvrnBrqzXORJTE2GhduJC2eY80995cjdaQVb/b77qSFjAG8FQcTb862vyVKt5y5XbC3zF5+1UKApnCEKGL/Pzw2+EvyoL5JdHvf/nzpxFbmV1i3ccJCTwByk4nzs73k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AkyjGoGt; arc=pass smtp.client-ip=74.125.230.104
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YwULGCbN"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=wDUSmz48AJ/AWECTgc5Y2mr8+N5AQyAKi5Db/DMYbBU=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1789498313; v=1; x=1790103113;
- b=YwULGCbNeyF4AmcA857Udq8L1yp/B/HyiTnIpiduALFGUvjOTp4riKwKMnfh+dBlb+LEwmjl
- T+BlpckF8p4capP4szk1N1Z9bp/tFRurkEgNl0kV78050/5UwWiUsvTIs76taIkcxpDsdGT2ik6
- 8M6qPF5ZXoz1cdWfdBo13Zgw=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 506e1a48f87465cf;
-	Tue, 15 Sep 2026 18:51:53 +0000
-X-Mizu-Trace-ID: 506e1a48f87465cf
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b4a0b384c4so1316e87.1
-        for <kvmarm@lists.linux.dev>; Tue, 15 Sep 2026 11:51:49 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBxMQXxG5yGwinAYncDhOyLhjXPhomJC7475sy8Lw28X24oDjedBzTi8avB1mWtDHT//DX1oF/s=@lists.linux.dev
-X-Gm-Message-State: AFuF++mOcMYMgAAZRtlURgqEATj+RgJmtv6PwvQkjLAN/tDQPjWjeLCN
-	qSyRVLptueXSGicIFZq3W8RUn3kNx6UTmWQnd4/kj2ywcXb+JZH4xX9Z4tpu0qbnvXwoCLTkDkm
-	6ylYwJKU5HW8GaOh+xM4K9S+AW8kr5ROmUzpqtV5H
-X-Received: by 2002:a05:6512:460f:b0:5ae:b9c5:f29f with SMTP id
- 2adb3069b0e04-5b8b5c60361mr12106e87.2.1789498308370; Tue, 15 Sep 2026
- 11:51:48 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AkyjGoGt"
+Received: by mail-lr2-f40.google.com with SMTP id 38308e7fff4ca-3a5da7416f9so1728821fa.2
+        for <kvmarm@lists.linux.dev>; Tue, 15 Sep 2026 12:35:36 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1789500934; cv=none;
+        d=google.com; s=arc-20260327;
+        b=jgquHQ8CG1JHprUj3cvqr7Fdcj1Du3sutPRa7vw8EEP/L1LCkdnimmKphgyVU1WUs/
+         JPxGEX9d78Vc592W22TbIvY6FgFnT9arbPSndGv+tAgJeGnV6HPybwHJpfHbbSDbsbrw
+         1aNezZjUjFc9zyGrCMaOewq/+CdJSw80dIB6S6cm4efgOKLlzP81p/LlRJWun/cNsLFt
+         Gm4YxzfifKHoasR7ZjGKZzTFIP11cxuMtHxySo40VAjjsMUHgszR+f2dmhgzfq/yaS/d
+         IhxQDa2BVbr3nbVfnDZLch4YlNzQjCrnys2RU2TBQFqB6W3JzzrxsRyhdV3u3oTOioOz
+         wUTg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=3sluWAJ7si51ldKO+IEOlj7IVd+xFNM1gnjjRPbQIZI=;
+        fh=5qWHpPp0yHNHSkcxnKth6cZhL4Mlm4OQy/7w5L8BSXY=;
+        b=q4JvtEbgEdmdpBf1M7uRuGhkE9esS8I1OY6v1Hed7JzYXtIv6bX2fXblViVGUPRVP+
+         8tcAqCSiIWom1/WsgkOAkJsweAF+l10Wua/sJ9lx0RwhKlgmgGapxBhdoDkc9AM5uHQy
+         zru1BUxu5yCCGw+ooHsaKiB95V3r+2o8TDCLfDjeUuSJ/WJi3et4zOhnJw/NQr2+DfoS
+         Zj7T/r6AxmC/mf6eKbn+b1qMEpSnngOIt7pojfuzSBRfwaJw8RmpUWK+QEiaxRCnapYg
+         F2Y/EGmXFaCOiSX7gVHJYbKdGLTUDcN0g0C4cOATlgEyq+Xsmm1/sOW6cgfbjs9cD7Km
+         ZIsA==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1789500934; x=1790105734; darn=lists.linux.dev;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=3sluWAJ7si51ldKO+IEOlj7IVd+xFNM1gnjjRPbQIZI=;
+        b=AkyjGoGteUSBLUq33mfpaEwYHWAgdL4oCPO/H+BoaTyoYco1BK7TZchyuwRQ7Kseco
+         /a4Ros/+fGG016h0ee9wN1/CEh1vmcg2VqKpbsNKwIQk/ra2gQLN/+Fdci8053oWZKcG
+         GmTKc53PzK7lsmc1W23zhehOH83ibgJsMveNLsuHwbhKxyJEwQa6iCVFpQ1PL1l16kSp
+         0K69Cl/Q8SWhOMvKBNHfehCPi1aa6zEkjC9PPGGfQ6ThbE9R9FTz6Y5ceTXJ4MS4LrQm
+         m/LTRDaOjvExbngU/Do9M6aKNo9RN0sw5PJMNx2UPzVuF9aYNrZWN+y88ZddB8CYJwcu
+         XzZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1789500934; x=1790105734;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=3sluWAJ7si51ldKO+IEOlj7IVd+xFNM1gnjjRPbQIZI=;
+        b=Ytm/SMZ4EFOIgHXjPkfTvFskTXv1VeMLvE7H1GsYhulYfNrIcGgnrppFwkUUGcMbkB
+         qPZ1rEZ2HORsIpsTouEXbND6cr96cMHkunDs36CYfuNuWn/MJfSXiNBeIXJuVjildIEB
+         p2j+dbwHOkBDHab2tVohAaxYJHIs7dhnSHTXHuYyjNjJ6IUZHg++FlrbniJD3M3uvQix
+         cQxMwpP4Eb6BmqznJc3zEmWnAdFGMt8YArOXI99ZSEt9Tr0/umt4vMsnCDook/q/cUW0
+         ryaAnDW/IsxrLRuG/x/5fWxqAHNhsmI0BBWOplT8ZMkhFP035uhaAfk7gcgtPcaf9nzo
+         ioVg==
+X-Forwarded-Encrypted: i=1; AKwUvBxeF5syCgJf+eaBtgFo5dXidx3CS5jfWK56kVlLoBwhf1qjOsB0etyvZnmys/qcmPBiAA0Ho5s=@lists.linux.dev
+X-Gm-Message-State: AFuF++mBG3tpWZZBD3UAYxbRaakSmsAotLW/dpNq+w0AGtLojQOt4O2d
+	XuMsfElXlBj5pzstB0NUZ1ivubC5RWkSQ3OcBZhWtqOEwNRNMABsQ1G7CsF6vOLNy9VbCy35jBp
+	3XkW4B7HYLSwzQgyyqZgNB+n7g6i8PKKWQ5pWXqNU
+X-Gm-Gg: AYBFou0W/FGiFQ/7IvIYV8jwkshK76PxI0Syu9QLDFUbIPldPdzahGil/ZheB077Lpi
+	Wi4jcGUqZKpC0qsZxZzPJKaONa0I9yAT/rPjz/xNk3OJk9X5psUJocdNfpNMJZmeS7UtE1T1zFg
+	nKPFzrpfpXWfPjnW/svNA7H7wqpFVfLnE1x3ooXLiifxTXo89IeunJIgMYwZTdC3J4CM1YE0IXE
+	vm4OxApqFonckvuUmjF5+hdxlnRvIKi9c4JkGsotqguQDni/jwTc2A7Rh3Keoo9AxHd6RsttMVQ
+	lg2nmCHMdLANKKxhEsj9pyQA7hfEDq/4vZDTeq2E4KARbqkwrGNSk80Ouvc8Pn+c
+X-Received: by 2002:a05:651c:a114:20b0:3a4:9e46:235c with SMTP id
+ 38308e7fff4ca-3a5c89b031emr21060911fa.14.1789500933920; Tue, 15 Sep 2026
+ 12:35:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260911104715.307500-1-fuad.tabba@linux.dev> <868q5579ol.wl-maz@kernel.org>
-In-Reply-To: <868q5579ol.wl-maz@kernel.org>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Tue, 15 Sep 2026 19:51:00 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTw0U0d91Cv4NYEJvUuT=JabwZeeYwpZ2P1xyVeOVX46Ew@mail.gmail.com>
-X-Gm-Features: AcwNN1Wb_8an225Gnc8YhJ9UZVooFr4-IDtabofiCqvpuVnTcerWsfiGT6Va1mE
-Message-ID: <CA+EHjTw0U0d91Cv4NYEJvUuT=JabwZeeYwpZ2P1xyVeOVX46Ew@mail.gmail.com>
-Subject: Re: [PATCH v3] KVM: arm64: Trap guest MPAM accesses whenever MPAM is implemented
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>, Ben Horgan <ben.horgan@arm.com>, 
-	Xi Ruoyao <xry111@xry111.site>, Mark Rutland <mark.rutland@arm.com>, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Steffen Eiden <seiden@linux.ibm.com>, 
-	Gavin Shan <gshan@redhat.com>, Yuan Yao <yaoyuan@linux.alibaba.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org
+References: <20260912083611.2513845-1-suzuki.poulose@arm.com> <20260912083611.2513845-8-suzuki.poulose@arm.com>
+In-Reply-To: <20260912083611.2513845-8-suzuki.poulose@arm.com>
+From: Alper Gun <alpergun@google.com>
+Date: Tue, 15 Sep 2026 12:35:22 -0700
+X-Gm-Features: AcwNN1VS3YvKKCCRg1vDnBVkoWj-7p2fofNqSox_wrQ014s5kEA5YUvjF8gr3LY
+Message-ID: <CABpDEukTAc1m=g+rZRPPqaTwrvhUJPsFRWpFd0PxZsyWw5mR=Q@mail.gmail.com>
+Subject: Re: [PATCH v18 7/7] firmware: arm_rmm: Add wrappers for Realm related
+ RMI commands
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org, 
+	will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, steven.price@arm.com, 
+	aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com, 
+	joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com, 
+	linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, 
+	sdonthineni@nvidia.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com, 
+	lpieralisi@kernel.org, enju.kohei@fujitsu.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Marc,
-
-On Sun, 13 Sept 2026 at 11:00, Marc Zyngier <maz@kernel.org> wrote:
+On Sat, Sep 12, 2026 at 1:37=E2=80=AFAM Suzuki K Poulose <suzuki.poulose@ar=
+m.com> wrote:
 [...]
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-[...]
-> >  static void cpu_hyp_init_context(void)
-> >  {
-> > + u64 pfr0 = __read_sysreg_by_encoding(SYS_ID_AA64PFR0_EL1);
-> > + u64 pfr1 = __read_sysreg_by_encoding(SYS_ID_AA64PFR1_EL1);
-> > +
->
-> Why not directly read_sysreg(id_aa64pfr0_el1) and co?
-> __read_sysreg_by_encoding() is useful when the encoding comes from a
-> variable, but it looks odd in the case of a literal sysreg.
+> +/**
+> + * rmi_rtt_destroy() - Destroy an RTT
+> + * @rd: PA of the RD
+> + * @ipa: Base of the IPA range described by the RTT
+> + * @level: RTT level
+> + * @out_rtt: Pointer to write the PA of the RTT which was destroyed
+> + * @out_top: Pointer to write the top IPA of non-live RTT entries, from =
+entry
+> + * at which the RTT walk terminated.
+> + *
+> + * Destroys an RTT. The RTT must be non-live, i.e. none of the entries i=
+n the
+> + * table are in ASSIGNED or TABLE state.
+> + *
+> + * Return: 0 on success, positive RMI result code or negative Linux erro=
+r code.
+> + */
+> +static inline long rmi_rtt_destroy(unsigned long rd,
+> +                                  unsigned long ipa,
+> +                                  long level,
+> +                                  unsigned long *out_rtt,
+> +                                  unsigned long *out_top)
+> +{
+> +       struct arm_smccc_1_2_regs regs =3D {
+> +               SMC_RMI_RTT_DESTROY, rd, ipa, level
+> +       };
+> +       long ret =3D rmi_sro_execute(&regs);
+> +
+> +       if (ret !=3D RMI_SUCCESS)
+> +               return ret;
+> +
+> +       if (out_rtt)
+> +               *out_rtt =3D regs.a1;
+> +       if (out_top)
+> +               *out_top =3D regs.a2;
+> +
+> +       return RMI_SUCCESS;
+> +}
 
-It applies the arm64.nompam override, which is what
-finalise_el2_state() tests. With the override set, EL2 setup leaves
-the MPAM traps alone, and a raw read_sysreg() would still see MPAM in
-the ID registers, so KVM would write MPAM2_EL2 on exactly the firmware
-the option exists for. I'll add a comment.
+Doesn't out_top (regs.a2) need to be populated on RMI_ERROR_RTT as well?
+realm_tear_down_rtt_level() checks next_addr > addr under case
+RMI_ERROR_RTT: to determine whether the RTT is missing or has child tables
+that need recursive teardown.
 
-[...]
-> > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-[...]
-> > @@ -298,14 +298,17 @@ static inline void  __activate_traps_mpam(struct kvm_vcpu *vcpu)
-[...]
-> >   /* trap guest access to MPAMIDR_EL1 */
-> > - if (system_supports_mpam_hcr()) {
-> > + if (read_sysreg_s(SYS_MPAMIDR_EL1) & MPAMIDR_EL1_HAS_HCR) {
->
-> This is going to suck under NV. The host hypervisor is of course going
-> to set MPAMHCR_EL2.TRAP_MPAMIDR_EL1, and we're in for a recursive trap
-> on the hottest possible path in KVM. Which is silly as the actual
-> write to MPAMHCR_EL2 is free (it lands in NVMem[]).
->
-> This really should be replaced by a flag called HAS_MPAM_HCR, just
-> like you have HAS_MPAM.
-
-I'll probe MPAMIDR_EL1.HAS_HCR once in cpu_hyp_init_context(), next to
-HAS_MPAM, and test the flag in both trap functions instead.
-
-I'll hold off on v4 until Will has had a chance to comment as well.
-
-Cheers,
-/fuad
+Thanks,
+Alper
