@@ -1,97 +1,115 @@
-Received: from mta0.migadu.com (out-28.mta0.migadu.com [91.218.175.28])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5999A372B57
-	for <kvmarm@lists.linux.dev>; Tue, 15 Sep 2026 10:24:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.28
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A65E9480947
+	for <kvmarm@lists.linux.dev>; Tue, 15 Sep 2026 10:48:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789467864; cv=none; b=Tq2OjLLkrXtujjaxFXGLKamyt8N9hKJxjIs7xWYTr9rHINSusyxL4VAm7M/f98K51g7+m0IX0gJB+UefaTIYZijiqcwI+zO4MDy8UL+1GkrZDnU+tW/Ary0rKie0tR4/+IjmZEzPHLqjEo9ceaYd1Gjtr1Ln0X/8SBVWr9cQl2o=
+	t=1789469286; cv=none; b=hDeeFx1p7xxNb6/PIRCMfYHmFSw8+FbWh0eUsDJnAqEzMsvgabPMisS63sOEXstVs8OxVedsLViIkHLt9lvNEATv+xNnuPd1cnhD/BxO79ICvB9J+NRnplsZuTHsL1aY8SZ7jCM5f5Nv6uc5SDjkeYTzYnU/HIlE2Cikvs6D5QM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789467864; c=relaxed/simple;
-	bh=eEpTu0phK8BsqOnC0fc6MeL/3Km/1p8O2zPIqVueRhk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DfNrjvoT3FU91qHFIkHWgYd/0rjlYm6sm8NkriRSGo8hUK9aEmweD/qscj1GHukCoDPUIG7PwPVR2kJuygQQQvTQQSAQ7EWcbG0urW9VuBvVFm8vBvaBF5Nr+vQc+Fv6CB4diU0J/uEWrlP1I2VZ0zA0fnRvjR5XHq5jK+yfiis=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ooHg1/hv; arc=none smtp.client-ip=91.218.175.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1789469286; c=relaxed/simple;
+	bh=brY21PorPsciGcHuNVN5/hjjXSISCVYon+MJGGX8R/4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LLB9xxQqlHqN0GWgmcZuzOZW0cNkGFq6+whHTEl29MeTlGBX8p1UqPyshEitULkeOr4OA7EB8auWhF38UXJSUIeLHgaFhVCbtwgrCu5MT5V173iLwddPOPpI9EHyhxHVBDMKz1fATRh0Y4mMyk8A5JS46/zcqXjAPdETTlwCP8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=i002nmcy; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ooHg1/hv"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=eEpTu0phK8BsqOnC0fc6MeL/3Km/1p8O2zPIqVueRhk=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1789467860; v=1; x=1790072660;
- b=ooHg1/hvp+EDH5PFduN7/OPf1Af7TMW7ctTeKKXoHbfCcOl+WFzpLUsssk9s5fXOG1tGhCUs
- MhLxFsV3CbUDeEsOKzZwLfha2HP6Txez8DAFjQKAxkww36e4gTkL3r4UtmlZ+SYzbHSyoHLkrPT
- u2DNTiWKAT87BfrzJJJpwX4U=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id d06a58f98de88f4a;
-	Tue, 15 Sep 2026 10:24:20 +0000
-X-Mizu-Trace-ID: d06a58f98de88f4a
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b4a0b384c4so4415e87.1
-        for <kvmarm@lists.linux.dev>; Tue, 15 Sep 2026 03:24:16 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBwPhlQLIOKXtxqNleW3vzoijQ8yzTa6hUxooDD5QtleGsRQvhb/aqsN8NULBq+DYcXulzXFp7Q=@lists.linux.dev
-X-Gm-Message-State: AFuF++mstxLV56jlZTl94AYvJ4RCYTl8WgICaiIH5plmMLCvBlEuxzFV
-	y81BCFJ36yU3YXHTavC/1HZces1IVL6iPJaAYcDd5Mmxiej5QVDtaCvnzXEPoKwyxWzpe/BU3JB
-	45uvnqtthRyCVWdXW0PE6Mmu/8ZtR77cnJDYEaG2V
-X-Received: by 2002:a05:6512:3c91:b0:5b8:9e63:dfb4 with SMTP id
- 2adb3069b0e04-5b8b2d4f6a7mr177569e87.14.1789467855333; Tue, 15 Sep 2026
- 03:24:15 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="i002nmcy"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 31AD91570;
+	Tue, 15 Sep 2026 03:47:59 -0700 (PDT)
+Received: from e143914.arm.com (e143914.arm.com [10.2.213.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D081C3F7B4;
+	Tue, 15 Sep 2026 03:48:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1789469282; bh=brY21PorPsciGcHuNVN5/hjjXSISCVYon+MJGGX8R/4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=i002nmcy+W/6o87jdKBxvVPr5ompRaptkrUIwoJVN0YsKCZq3yEA3vZ3h1YSRkm0n
+	 nbXsSZVKReqgQjPKucdtcz6WChsPcMzZ4y86LmCByEvaiWWCCBAeOVFNbmQirN4hDF
+	 2NVNWpGXprPVwk+jAfMB6HML5wnEZUw4NpkMTjHY=
+Date: Tue, 15 Sep 2026 11:47:58 +0100
+From: Joey Gouly <joey.gouly@arm.com>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	catalin.marinas@arm.com, will@kernel.org, seiden@linux.ibm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com,
+	steven.price@arm.com, vdonnefort@google.com, qperret@google.com,
+	tabba@google.com
+Subject: Re: [PATCH v2 2/2] KVM: arm64: Pin the host vCPU before adjusting
+ its PC under pKVM
+Message-ID: <aqkiXqjSZyyqHZ5y@e143914.arm.com>
+References: <20260915070418.3209779-1-fuad.tabba@linux.dev>
+ <20260915070418.3209779-3-fuad.tabba@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260915070418.3209779-1-fuad.tabba@linux.dev>
- <20260915070418.3209779-2-fuad.tabba@linux.dev> <aqkbS810aDLyfS7D@e143914.arm.com>
-In-Reply-To: <aqkbS810aDLyfS7D@e143914.arm.com>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Tue, 15 Sep 2026 11:23:39 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTyc_OL6H8iyjO+hjU9gqxCaJQUv4CUSQ-R6ZRJvG=siDg@mail.gmail.com>
-X-Gm-Features: AcwNN1URDJWh2M5sOKluQk7udRVOG1eRZZAroybUEQB5EN27YFtm1788x3yXVpc
-Message-ID: <CA+EHjTyc_OL6H8iyjO+hjU9gqxCaJQUv4CUSQ-R6ZRJvG=siDg@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] KVM: arm64: Validate the host vCPU's VM before
- reading it under pKVM
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	catalin.marinas@arm.com, will@kernel.org, seiden@linux.ibm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, 
-	steven.price@arm.com, vdonnefort@google.com, qperret@google.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260915070418.3209779-3-fuad.tabba@linux.dev>
 
-Hi Joey,
+Hi,
 
-On Tue, 15 Sept 2026 at 11:17, Joey Gouly <joey.gouly@arm.com> wrote:
-[...]
-> > -     if (kvm_has_mte(kern_hyp_va(vcpu->kvm)))
-> > +     kvm = vcpu_get_kvm(vcpu);
-> > +     if (kvm && kvm_has_mte(kvm))
->
-> It's fine to use the "host->kvm" here because even if sets this bit on
-> the host vCPU, the per-entry handlers in the other series won't copy
-> across the TCO bit.
-> Right?
+On Tue, Sep 15, 2026 at 08:04:18AM +0100, Fuad Tabba wrote:
+> Under pKVM, a page the host shares with EL2 is mapped at EL2 only while
+> it's pinned, and the host vCPU is pinned at its first KVM_RUN.
+> KVM_SET_VCPU_EVENTS with ext_dabt_pending reaches __kvm_adjust_pc() at
+> EL2 before that, and dereferencing the unmapped host vCPU panics the
+> hypervisor. Any process holding /dev/kvm on a pKVM host can trigger it.
+> 
+> Pin the host vCPU around the adjustment when no hyp vCPU is loaded for
+> it. A loaded hyp vCPU implies it's pinned. A pin fails only for memory
+> the host never shared, and the request is then dropped like any other
+> bad host pointer.
+> 
+> Fixes: efa1368ba9f4b ("KVM: arm64: Commit exceptions from KVM_SET_VCPU_EVENTS immediately")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+> ---
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 19 ++++++++++++++++++-
+>  1 file changed, 18 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> index 9a3b92e626adb..4cb7347db2514 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> @@ -542,8 +542,25 @@ static void handle___pkvm_host_mkyoung_guest(struct kvm_cpu_context *host_ctxt)
+>  static void handle___kvm_adjust_pc(struct kvm_cpu_context *host_ctxt)
+>  {
+>  	DECLARE_REG(struct kvm_vcpu *, vcpu, host_ctxt, 1);
+> +	struct pkvm_hyp_vcpu *hyp_vcpu;
+> +	struct kvm_vcpu *host_vcpu;
+>  
+> -	__kvm_adjust_pc(kern_hyp_va(vcpu));
+> +	host_vcpu = __get_host_hyp_vcpus(vcpu, &hyp_vcpu);
+> +	if (host_vcpu) {
+> +		__kvm_adjust_pc(host_vcpu);
+> +		return;
+> +	}
+> +
+> +	/*
+> +	 * With no hyp vCPU loaded for it, the host vCPU may be unpinned,
+> +	 * and so unmapped at EL2: its first run pins it.
 
-Yes.
+* A pin only fails if the memory was never shared, drop the request if
+* it is a bad host pointer.
 
-> >               new |= PSR_TCO_BIT;
-> > +     vcpu_put_kvm(vcpu, kvm);
-> >
-> >       new |= (old & PSR_DIT_BIT);
-> >
->
-> [snip]
->
-> Agree with the nits that Vincent suggested!
->
-> Let's see if this sticks this time:
-> Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+Or something like the commit message says.
 
-Carrying it over for the respin, thanks again!
-/fuad
+> +	 */
+> +	host_vcpu = kern_hyp_va(vcpu);
+> +	if (hyp_pin_shared_mem(host_vcpu, host_vcpu + 1))
+> +		return;
+> +
+> +	__kvm_adjust_pc(host_vcpu);
+> +	hyp_unpin_shared_mem(host_vcpu, host_vcpu + 1);
+>  }
+>  
+>  static void handle___kvm_flush_vm_context(struct kvm_cpu_context *host_ctxt)
 
-> Thanks,
-> Joey
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+
+Thanks,
+Joey
