@@ -1,144 +1,151 @@
-Received: from mta0.migadu.com (out-28.mta0.migadu.com [91.218.175.28])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E630E4A1DF6
-	for <kvmarm@lists.linux.dev>; Tue, 15 Sep 2026 15:28:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.28
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 608934AA575
+	for <kvmarm@lists.linux.dev>; Tue, 15 Sep 2026 15:31:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789486095; cv=none; b=O5T/dApHyOMvfZcaW+wvtx2mUbdacOFHhOONauRGoVI7csST3Male48sJKKHzHDronJibhk7FgJ+VqfHOmqv57UxCF+Z2o5J39IMbkqgUJWJV1RdhZm1uhV8Bf20AMkStlgfgQM82wRSz/UlNFRaa5TcGolVwjWTNnrfoXuSL2g=
+	t=1789486311; cv=none; b=rWemwmQWRrOmrXRn3dW9+X23WfF7wkT2oHduQgaZZpbPVGq0sawf8pemDcbaDt5mg1Z7ShyVsNFvY4ojbtpeNgwxUg7krLvZPGl2z4/plNw8ZRTw0Tg/+gcy+BkL+yKlBeUqVzyJhoZ0Nhr62RSvUn5lf+X+O688x52haSaTuQA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789486095; c=relaxed/simple;
-	bh=seZKkNZqkA1n+JFBn6WE809ZUioCrb4l3ZQsXTwS4L0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nOdXLXdbo32hRT2IrNa6FQwTfee3eBrCotbABwObKEfT7B0GhpQyMUZIxK8dQdE2h4g1Qg2E+QwuhJL/dBAkyiOSr6R1mADiulSknP4gSGLJEEpTPAE+Op+UlvjLP0qmia6ml+AMYE9J80OQvGs39HZLpFY219nErHzn3ICdTTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=at5eLmXA; arc=none smtp.client-ip=91.218.175.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1789486311; c=relaxed/simple;
+	bh=mWQLtln8JqbVDxWmmM1gM2C1W+U+J79wvJLkPCMUbsc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=lU+8b1pYTjlNyN8b+pNcIowAFmOBbMQZ3lLquJjosrOnVs1IvkBeoHkIXxPav9zwtj2v6SUse+ahwOsMjdAnoWz5ZGziJfd4VQfmOkXP742N4yjeLQlIc4umV804Y1XFBGUXw8WaVlx+qrwhlOeVDgoHAarXGQuGQ03HV54bfNA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=IyZL4wyq; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="at5eLmXA"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=seZKkNZqkA1n+JFBn6WE809ZUioCrb4l3ZQsXTwS4L0=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1789486090; v=1; x=1790090890;
- b=at5eLmXAw7RvEADUG4BCJ4Febd+HDc0dd3JZJXVaByPP0MZlhw3YqLl2mFa00YgnDqo5W3+U
- ciWpjsmZSzNniaBoY2eHSvhic5mVX36wJ9ITFUYGIc68LMrv3HX8PE4YXe0NdxGkjOcEhyeTTV6
- E/kS0t4xbtc2OftrYgMlsf0k=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id f7f7c991e9437d1f;
-	Tue, 15 Sep 2026 15:28:10 +0000
-X-Mizu-Trace-ID: f7f7c991e9437d1f
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf2-f13.google.com with SMTP id 2adb3069b0e04-5b4a0b384c4so1285e87.1
-        for <kvmarm@lists.linux.dev>; Tue, 15 Sep 2026 08:28:08 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBwTPxg/gUTIX3wYvpjtZu6K3CN9oYn2srefUBnRbxZn+CVybfySOPBcVoEoaPWckFxpHPdiPcE=@lists.linux.dev
-X-Gm-Message-State: AFuF++nM1pXPygSYxH36eNdC1Y+k1mXlrFHkDR9zpqHwNjet89gdqZWC
-	P0V8oc100sX/SCuO1U2THJmzJkU4wwE5MsHF8512iCeiKC+39a3tJH4sjl87rhGCxANhny27Yzr
-	plX+uMVs7LMHzn++gvIAxMLiNoYgM5kVoGd6erpIX
-X-Received: by 2002:a05:6512:2341:b0:5b4:9dba:7403 with SMTP id
- 2adb3069b0e04-5b8b3201e59mr131289e87.13.1789486087447; Tue, 15 Sep 2026
- 08:28:07 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="IyZL4wyq"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1000B1570;
+	Tue, 15 Sep 2026 08:31:41 -0700 (PDT)
+Received: from LeoBrasDK.cambridge.arm.com (unknown [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 535D63F882;
+	Tue, 15 Sep 2026 08:31:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1789486304; bh=mWQLtln8JqbVDxWmmM1gM2C1W+U+J79wvJLkPCMUbsc=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=IyZL4wyqQLgwyeFgfbXMZ6/AZ5Vx7sUqICfywxm2TJ0en2J04PaaVeSAiGOiHpcKC
+	 r9MG8QNuZVXKL5gt0h1UVTA6bAs4B0uCvTejoQYitQkyI1Nlhghtdm0C0ug7v04xja
+	 aRyVIPm5GXXYIsd5UFOH5OJDHf4tBqe/b/LNPmGU=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Tian Zheng <zhengtian10@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 0/5] KVM: arm64: New PTE dirty-page encoding, HAFDBS new usage
+Date: Tue, 15 Sep 2026 16:31:36 +0100
+Message-ID: <aqlk2ApfQvHAs1j_@LeoBrasDK>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <86cxui7j4k.wl-maz@kernel.org>
+References: <20260901171558.2674031-1-leo.bras@arm.com> <86cxui7j4k.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260807164322.2970811-2-sebastianene@google.com> <20260807164322.2970811-10-sebastianene@google.com>
-In-Reply-To: <20260807164322.2970811-10-sebastianene@google.com>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Tue, 15 Sep 2026 16:27:31 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTzeCib1J2fyKM42GW5rgKQEE9_Dox_tGA5YJux0YoY5rg@mail.gmail.com>
-X-Gm-Features: AcwNN1WkkAN_-WeQ6aFBf7fnAFZAi-s925Hdj_6AYFNinV0IdRsiozOwPKsbvOA
-Message-ID: <CA+EHjTzeCib1J2fyKM42GW5rgKQEE9_Dox_tGA5YJux0YoY5rg@mail.gmail.com>
-Subject: Re: [PATCH v2 08/13] KVM: arm64: Trap & emulate the ITS MAPD command
-To: Sebastian Ene <sebastianene@google.com>
-Cc: catalin.marinas@arm.com, joey.gouly@arm.com, mark.rutland@arm.com, 
-	maz@kernel.org, oupton@kernel.org, rananta@google.com, 
-	Sascha.Bischoff@arm.com, suzuki.poulose@arm.com, will@kernel.org, 
-	kvmarm@lists.linux.dev, android-kvm@google.com, bgrzesik@google.com, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	nathan@kernel.org, perlarsen@google.com, seiden@linux.ibm.com, 
-	smostafa@google.com, tglx@kernel.org, vdonnefort@google.com, 
-	vladimir.murzin@arm.com, yuzenghui@huawei.com, zenghui.yu@linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-Hi Sebastian,
+On Sat, Sep 12, 2026 at 01:24:11PM +0100, Marc Zyngier wrote:
+> On Tue, 01 Sep 2026 18:15:51 +0100,
+> Leonardo Bras <leo.bras@arm.com> wrote:
+> > 
+> > This series have 2 main goals:
+> > 
+> > 1 - Patches #1,#2,#3 : Change the PTE descriptor to use WD/WC/RO encodings
+> >     making use of the DBM bit, adapting all usages, and
+> 
+> What are WD and WC? I can sort of guess that this is write-dirty and
+> write clean, but that's not exactly obvious. More importantly, you
+> don't even explain *why* anything needs changing...
+> 
+> > 2 - Patches #4,#5 are an RFC on using HAFDBS on a guest to avoid resetting
+> >     all PTEs to WC when dirty-logging starts, speeding-up startup.
+> > 
+> > (1) will also introduce a new walker for cleaning the dirty-bit, which will
+> > clear the DBM bit if it's a block mapping (hugepage). This is needed as on
+> > lazy-splitting we need to fault a write so we can do the lazy splitting.
+> > This is needed for both the next patches, and for HDBSS & HACDBS
+> > enablement.
+> 
+> Again, this is incredibly opaque to the reviewer. What is the problem
+> you are trying to solve? This is what a cover letter is for.
 
-The MAPD emulation is the right idea, but there's a fair bit to fix.
-The main ones:
+Hi Marc, thanks for reviewing!
 
-On Fri, Aug 07, 2026 at 04:43:18PM +0000, Sebastian Ene wrote:
+Okay, I will try to explain it better on the next version. What do you 
+think of this text:
 
-[...]
+===================
 
-> +static int get_num_itt_pages(struct its_priv_state *its, u8 num_bits)
-> +{
-[...]
-> +        return PAGE_ALIGN(sz) >> PAGE_SHIFT;
-> +}
+This series have 2 main goals:
+1 - Introduce a new PTE encoding (Patches #1, #2, #3)
+2 - An idea to use HAFDBS on a guest to avoid resetting all PTEs to WC 
+    when dirty-logging starts
 
-This needs the ITT's intra-page offset. itt_addr is only 256-byte
-aligned (GENMASK(51, 8)), so PAGE_ALIGN(sz) undercounts by a page when
-the ITT starts mid-page, and track_pfn() then leaves the tail page
-unpinned for the host to repurpose before a MAPTI.
-PAGE_ALIGN((itt_addr & ~PAGE_MASK) + sz) >> PAGE_SHIFT. (Sashiko)
+Goal 1:
 
-> +        new_entry = snapshot_table[new_entry_index];
-> +        prev_entry = original_table[new_entry_index];
-> +        if (!((new_entry ^ prev_entry) & GITS_BASER_VALID))
-> +                return 0;
-> +
-> +        if (rollback)
-> +                new_entry = new_entry ^ GITS_BASER_VALID;
-[...]
-> +        original_table[new_entry_index] = new_entry;
+Patches #1, #2, #3: Before adding Stage-2 support to HAFDBS, HDBSS and 
+HACDBS, we need to change the PTE descriptor encoding, as the DBM bit 
+is required on mappings for those hardware engines to actually being 
+able to update the PTEs. Currently what we have is:
 
-The rollback here never runs. The forward pass ends with
-original_table[idx] = new_entry, so on rollback the guard above sees
-snapshot and original with the same valid bit and returns before the
-flip. A failed MAPD then never gives the L2 back, and original stays
-mapped. (Sashiko)
+- Read-Only  (RO): S2AP[1]=0
+- Read-Write (RW): S2AP[1]=1 
 
-> +        if (new_entry & GITS_BASER_VALID)
-> +                ret = __pkvm_host_donate_hyp(hyp_phys_to_pfn(new_entry & PHYS_MASK), table->psz >> PAGE_SHIFT);
+and for them to work with the new features, we need to have: 
 
-Could the L2 address be checked psz-aligned first?
-hyp_phys_to_pfn(new_entry & PHYS_MASK) rounds down to a page, but the
-ITS uses the full address copied into original, so an unaligned entry
-runs the ITS into the next, undonated page. (Sashiko)
+- Read-Only (RO):      DBM=0, S2AP[1]=0
+- Writable-Clean (WC): DBM=1, S2AP[1]=0
+- Writable-Dirty (WD): DBM=1, S2AP[1]=1
 
-> +                        } else {
-> +                                return hyp_pin_shared_mem(virt, virt + PAGE_SIZE);
-> +                        }
+WC and WD are described in the Arm ARM, on R_XZFQH and R_BRFGY.
 
-A duplicate MAPD for the same device and pfn pins again here, so the
-refcount climbs with no new slot and track_pfn_remove()'s single unpin
-can't free the page. (Sashiko)
+We also need to prepare for dealing with lazy splitting when HAFDBS is 
+enabled: since it updates the PTE without taking a fault on guest write, it 
+means we can't have lazy splitting if we mark all PTEs as WC. 
+To address that, there is a suggestion to set, on dirty-track enable:
 
-> +                        if (ret == -EBUSY)
-> +                                return 0;
-[...]
-> +        return -EINVAL;
+- All pages as WC, as they don't need splitting, and
+- All blocks as RO, as they are required to fault to do lazy splitting
 
-Two things in track_pfn_remove(). The -EBUSY return skips the memset
-that frees the dte_entry slot, so the slot leaks. And the trailing
--EINVAL, for a V=0 unmap of an ITT that isn't tracked, propagates up
-and stalls the queue, where a legal unmap shouldn't. (Sashiko)
+In order to have that, a new walker is introduced to have a different 
+behavior depending on the entry's level.
 
-> +        ret = check_table_update(its, device_id, GITS_BASER_TYPE_DEVICE, rollback);
-> +        if (ret)
-> +                return ret;
-> +
-> +        return track_pfn(its, device_id, itt_pfn, num_pages, remove);
+This is needed for the Goal 2, as well as for HDBSS enablement.
 
-If track_pfn() fails after check_table_update() donated the L2,
-nothing undoes the donation: process_cmd()'s forward-failure path in
-cwriter_write() just returns, with no rollback. (Sashiko)
 
-The snapshot-L1 TOCTOU during rollback (another host CPU can rewrite
-it while this one holds its_lock in EL2) and the old-ITT leak on a
-re-MAPD are real too. (Sashiko)
+Goal 2:
 
-Cheers,
-/fuad
+Patches #4,#5 are an RFC on using HAFDBS on a guest to avoid resetting
+all PTEs to WC when dirty-logging starts, making it faster.
+
+I really just want feedback to understand if it's worth pursuing. 
+
+My main idea is that we can use HAFDBS _outside_ dirty-logging to only mark
+dirty the pages that were actually written to. 
+
+That is supposed to make it faster to transverse the pagetables when we 
+need to clean the dirty-bit, as there is potentially less atomic writes to 
+perform. 
+
+The price paid for that is disabling HAFDBS on every vcpu before we can 
+start cleaning the pages, during a dirty-track request.
+
+Please let me know of what you think!
+
+Thanks!
+Leo
