@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4CA442046E;
-	Tue, 15 Sep 2026 16:01:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FB5542668B;
+	Tue, 15 Sep 2026 16:02:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789488122; cv=none; b=m1wPfxo3zZd7SaRy5TMfsI9miFC+72kE85eVcTsEFSDCYn5+WO2hh5/W9PSe42iYb/mUDOO8ug+6JANd87Em3cspDvHriRTTix52P9vZjbsrUYsMaky+b/Uxv8TcjEdiAQedQy3ogz+yjGlxAECi17n6Rn8+dGuPR3cM8uPJMiM=
+	t=1789488125; cv=none; b=u4mD19KJDjQChmHO2WzFgyI3Wc8wUj9b6Vf6B6sKWiCgjwtAULo6HUYmfQD1bshBUZzpRZ/fLhN28sa52jgI4D2Zp3Xt0HuPsKjNkpBuulMDOQpV36dXMgu83Ix3CJ8dxQZG8kOAB0V6BoUhcMVwltZOgPvwIdQ3C2hF7+zPlmE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789488122; c=relaxed/simple;
-	bh=4g56UIu1zufZ3C4kHXyidjnLSZAyImym4hJ7wVm8PBQ=;
+	s=arc-20240116; t=1789488125; c=relaxed/simple;
+	bh=8q9Rt/6mKLCfGe51uszKwi9iQrDRjaKLQZ+w4aPQW+c=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WOrhfw+gg0hJMcXWN8JN33hulNeQ2/DdjOhCJYD0DMt5rQrZGoPti7PiZTD4+cev2V0uKn48N6oLyIOKOxoIfn6leDqC0aGqqVzCtMRKLaaZLnPeJ7Gt6Py0DYJTgjakh3y5CsJi99rUEcsWM2PWxwtQbjPfmHKFDDmuhB9XBbk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=e0VWjglM; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version:Content-Type; b=mLZcLoLOQoIlvQHvOz9UtDd3B4y2LV7TKWURvaGx3TLnCDvxwHe8fLGS+eKgLL0CTrumQBrDrMHVPJ0MOmQm1E6S9+PFQu3X7i5Sobt8EGorimADxfA6+9bfPIzV5v1ZyacyCVWCHZHPcXyqH9ssmGEQniVR5s9a8KS97d0mYi8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=nWbCCXse; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="e0VWjglM"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="nWbCCXse"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5224815A1;
-	Tue, 15 Sep 2026 09:01:55 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 72D53152B;
+	Tue, 15 Sep 2026 09:01:58 -0700 (PDT)
 Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.2.197.99])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 21F1C3F882;
-	Tue, 15 Sep 2026 09:01:56 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 365CA3F882;
+	Tue, 15 Sep 2026 09:01:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1789488118; bh=4g56UIu1zufZ3C4kHXyidjnLSZAyImym4hJ7wVm8PBQ=;
+	t=1789488122; bh=8q9Rt/6mKLCfGe51uszKwi9iQrDRjaKLQZ+w4aPQW+c=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=e0VWjglMYFuxmawU54dYGpmI6IFj7UT9XO0yHYiWDam3sdCT8tQZtlpl4C8+/R2BO
-	 cB+CDhM5Mxaj1BJdLgQod+wCjQ6TNJHd0cICEb1w4hkrVL79a7jxOchLRhxq7bzuIn
-	 vHzvG2q9o9HBlyAfRGH3xtCsw398U56YcC7GI4XM=
+	b=nWbCCXsekbvTzwlFx/cCmPDi5S4a8fhGYI0dkfmWehsZtzCGn3bOI4RYcII0fMzGj
+	 Zlug/OpEpuJCmqxMH1VSwQh79dJapavF/xLh69AC4X3d+SoTEUZK700VxuFSm9iRhP
+	 tawEVg1kb81AP4bo1IX5ae463LenViZx8OMoLrSA=
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -51,9 +51,9 @@ Cc: maz@kernel.org,
 	enju.kohei@fujitsu.com,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Fuad Tabba <fuad.tabba@linux.dev>
-Subject: [PATCH v18 02/23] KVM: arm64: Disable Steal time accounting for protected guests
-Date: Tue, 15 Sep 2026 17:01:20 +0100
-Message-ID: <20260915160141.3543048-3-suzuki.poulose@arm.com>
+Subject: [PATCH v18 03/23] KVM: arm64: Include kvm_emulate.h in kvm/arm_psci.h
+Date: Tue, 15 Sep 2026 17:01:21 +0100
+Message-ID: <20260915160141.3543048-4-suzuki.poulose@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260915160141.3543048-1-suzuki.poulose@arm.com>
 References: <20260915160141.3543048-1-suzuki.poulose@arm.com>
@@ -63,95 +63,40 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-PVTIME support is advertised by KVM_CAP_STEAL_TIME, which doesn't take into
-account the kvm instance. Even with that, a VMM could skip the CAP check and
-proceed to configure the PVTIME as we don't do further check on the DEVICE_CTRL.
-Tighten this up by passing the KVM instance around wherever possible and
-catch things early
+Fix a potential build error (like below, when asm/kvm_emulate.h gets
+included after the kvm/arm_psci.h) by including the missing header file
+in kvm/arm_psci.h:
 
+./include/kvm/arm_psci.h: In function ‘kvm_psci_version’:
+./include/kvm/arm_psci.h:29:13: error: implicit declaration of function
+   ‘vcpu_has_feature’; did you mean ‘cpu_have_feature’? [-Werror=implicit-function-declaration]
+   29 |         if (vcpu_has_feature(vcpu, KVM_ARM_VCPU_PSCI_0_2)) {
+	         |             ^~~~~~~~~~~~~~~~
+			       |             cpu_have_feature
+
+Reviewed-by: Gavin Shan <gshan@redhat.com>
 Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- arch/arm64/include/asm/kvm_host.h |  2 +-
- arch/arm64/kvm/arm.c              |  2 +-
- arch/arm64/kvm/pvtime.c           | 14 +++++++-------
- 3 files changed, 9 insertions(+), 9 deletions(-)
+ include/kvm/arm_psci.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 27fe0cd5b2d7a..286489a69dff5 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -1346,7 +1346,7 @@ long kvm_hypercall_pv_features(struct kvm_vcpu *vcpu);
- gpa_t kvm_init_stolen_time(struct kvm_vcpu *vcpu);
- void kvm_update_stolen_time(struct kvm_vcpu *vcpu);
+diff --git a/include/kvm/arm_psci.h b/include/kvm/arm_psci.h
+index f86a006d67136..06c20612e9e7d 100644
+--- a/include/kvm/arm_psci.h
++++ b/include/kvm/arm_psci.h
+@@ -10,6 +10,8 @@
+ #include <linux/kvm_host.h>
+ #include <uapi/linux/psci.h>
  
--bool kvm_arm_pvtime_supported(void);
-+bool kvm_arm_pvtime_supported(struct kvm *kvm);
- int kvm_arm_pvtime_set_attr(struct kvm_vcpu *vcpu,
- 			    struct kvm_device_attr *attr);
- int kvm_arm_pvtime_get_attr(struct kvm_vcpu *vcpu,
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 7c88508cac8a1..3fbdfce926475 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -462,7 +462,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		r = system_supports_mte();
- 		break;
- 	case KVM_CAP_STEAL_TIME:
--		r = kvm_arm_pvtime_supported();
-+		r = kvm_arm_pvtime_supported(kvm);
- 		break;
- 	case KVM_CAP_ARM_EL1_32BIT:
- 		r = cpus_have_final_cap(ARM64_HAS_32BIT_EL1);
-diff --git a/arch/arm64/kvm/pvtime.c b/arch/arm64/kvm/pvtime.c
-index 4ceabaa4c30bd..579e0a4720ad2 100644
---- a/arch/arm64/kvm/pvtime.c
-+++ b/arch/arm64/kvm/pvtime.c
-@@ -67,9 +67,9 @@ gpa_t kvm_init_stolen_time(struct kvm_vcpu *vcpu)
- 	return base;
- }
- 
--bool kvm_arm_pvtime_supported(void)
-+bool kvm_arm_pvtime_supported(struct kvm *kvm)
- {
--	return !!sched_info_on();
-+	return !!sched_info_on() && (!kvm || !kvm_vm_is_protected(kvm));
- }
- 
- int kvm_arm_pvtime_set_attr(struct kvm_vcpu *vcpu,
-@@ -81,8 +81,8 @@ int kvm_arm_pvtime_set_attr(struct kvm_vcpu *vcpu,
- 	int ret = 0;
- 	int idx;
- 
--	if (!kvm_arm_pvtime_supported() ||
--	    attr->attr != KVM_ARM_VCPU_PVTIME_IPA)
-+	if (!kvm_arm_pvtime_supported(kvm) ||
-+	    (attr->attr != KVM_ARM_VCPU_PVTIME_IPA))
- 		return -ENXIO;
- 
- 	if (get_user(ipa, user))
-@@ -110,8 +110,8 @@ int kvm_arm_pvtime_get_attr(struct kvm_vcpu *vcpu,
- 	u64 __user *user = (u64 __user *)attr->addr;
- 	u64 ipa;
- 
--	if (!kvm_arm_pvtime_supported() ||
--	    attr->attr != KVM_ARM_VCPU_PVTIME_IPA)
-+	if (!kvm_arm_pvtime_supported(vcpu->kvm) ||
-+	    (attr->attr != KVM_ARM_VCPU_PVTIME_IPA))
- 		return -ENXIO;
- 
- 	ipa = vcpu->arch.steal.base;
-@@ -126,7 +126,7 @@ int kvm_arm_pvtime_has_attr(struct kvm_vcpu *vcpu,
- {
- 	switch (attr->attr) {
- 	case KVM_ARM_VCPU_PVTIME_IPA:
--		if (kvm_arm_pvtime_supported())
-+		if (kvm_arm_pvtime_supported(vcpu->kvm))
- 			return 0;
- 	}
- 	return -ENXIO;
++#include <asm/kvm_emulate.h>
++
+ #define KVM_ARM_PSCI_0_1	PSCI_VERSION(0, 1)
+ #define KVM_ARM_PSCI_0_2	PSCI_VERSION(0, 2)
+ #define KVM_ARM_PSCI_1_0	PSCI_VERSION(1, 0)
 -- 
 2.43.0
 
