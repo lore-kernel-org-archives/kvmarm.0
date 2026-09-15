@@ -1,327 +1,152 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A983C4CA29C;
-	Tue, 15 Sep 2026 16:03:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C26974052B1;
+	Tue, 15 Sep 2026 16:18:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789488185; cv=none; b=jKyvda+bvO5Lg04zGsS4qySyYNWESE2XzKFOiqIdfCjAgPAsz+PudZe8cm5eQdAqy+sNqABe7mcyfuJSZPQ+tZTjX/0IQq6n4bjpABmL4RdmrtN62zRpqsA2JqSsNiwzn3gWDGzCvuugKv2lhjbLdsBlEJ4ZcVgCNZDGfwjygvA=
+	t=1789489137; cv=none; b=uO1H2sCeFZWUlzZDDnNdbnXR7DKLzWKCudiC/QMUr+EkHZd/6bHbXVUxTAlhr0yykLjwrfSwiOrgWxBfr9InbOfLg8elZ1MDfF4kNdPT2xmPgYU88vbiCO/Rrv7SP1SURchFvzPCtGaO7iWbLoV+eXBmbhCnqW31ASq5VC8Al8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789488185; c=relaxed/simple;
-	bh=mmi6VEWU9VuEsCf9DcQoojukGEJWWKDyBgEMumw2iIQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CvtgfiooJQZFCfhTGX/hKcjNkza1cBmzQbKwboFfRRS5dWKeYv5yp3zewQS/fza0zUz3SMRBKfBmXn4ZHONLqR7KsJ8Cy3DZsQ6rgH5VpCZrSQSY0akPqj62Ia1av+G1DSa4tE800Z2vvnfgi+v76/8FPHRpbaZcsXAFXJ9N3QY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=bdFSVjp8; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1789489137; c=relaxed/simple;
+	bh=93qzettE2VOiPkQMfL8fTk0T5bEOhvx2ege9fRVQFPg=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=p37ZB3/haZ58IMkB5sWkAsGGw6U3nB7m7Kmd/oeWlwqRn+3QlXknbPTcZlSBNYyJHA1Qvg/mpxWK4wv+A/7f2PrqLhXH2rM4tmWogEVZFz5mdvDe5EpctTO6yZx/fz5po4N6TfESpNokk0mTRFxbhjKCfiMuuwbIGpjEjnnOq6w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mlEVze9X; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="bdFSVjp8"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8DC0C1D70;
-	Tue, 15 Sep 2026 09:02:58 -0700 (PDT)
-Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.2.197.99])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 5B2393F882;
-	Tue, 15 Sep 2026 09:02:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1789488182; bh=mmi6VEWU9VuEsCf9DcQoojukGEJWWKDyBgEMumw2iIQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=bdFSVjp8EvWuv6uNe0bC1gC3Jff0pK6fz9Hf2o4MnE+98QgymeO15EnDC9P22GGd9
-	 l7vgRs+WZmKl8iEr0eiPGo0S9vdQKjdb/zyvk5zuQbJyG2rWdBKbDjEwx30+Nr9HaI
-	 cSyJ2tI8Du1VTwP83+HE99Yfxy+noLq2+HtENGyI=
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-To: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Cc: maz@kernel.org,
-	will@kernel.org,
-	catalin.marinas@arm.com,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	steven.price@arm.com,
-	aneesh.kumar@kernel.org,
-	oupton@kernel.org,
-	gshan@redhat.com,
-	joey.gouly@arm.com,
-	tabba@google.com,
-	yuzenghui@huawei.com,
-	linux-coco@lists.linux.dev,
-	gankulkarni@os.amperecomputing.com,
-	sdonthineni@nvidia.com,
-	alpergun@google.com,
-	fj0570is@fujitsu.com,
-	WeiLin.Chang@arm.com,
-	lpieralisi@kernel.org,
-	enju.kohei@fujitsu.com,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v18 23/23] KVM: arm64: CCA: Control user register access for Realms
-Date: Tue, 15 Sep 2026 17:01:41 +0100
-Message-ID: <20260915160141.3543048-24-suzuki.poulose@arm.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260915160141.3543048-1-suzuki.poulose@arm.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mlEVze9X"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32AEF1F000FF;
+	Tue, 15 Sep 2026 16:18:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789489135;
+	bh=M/VLoSH8ApHKebIib2xn7O9XHPMcOrwtqkCYvwi0UKY=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=mlEVze9X29r7bHlus9SKGyjScZzdI5It9i6H2Q9WTnZkd0okoEqNCG3uFOMBqwJXK
+	 pPheJW0nfdCPxvLc5v72/7U1goQFHGrCOdW+Rpptgu1DnPaJ5V9SUWFE/mrWnA/9wb
+	 yUHzanckEI/FoZqxHQNVX2WrN7fhDnFbR7rcUAu/Q+7arJ5gqBOGlQWhKfwMey6siw
+	 nw1g1rxqWeretDSEFMybIWgbhP4jWe1kg53uSHjAnYQh3amapx48gAkW+uCF5hb+Eo
+	 xnXgj1lBPvoh0eOZzAW+h/9YVMz5rexvYJ6Z4c6uH/VO2J6BmPRL0O1K0XCuvXwgA3
+	 Kc95iNkhG7H5A==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v18 01/23] KVM: arm64: protected VM: Handle set_one_reg
+ CNTVCT_EL0/CNTPCT_EL0
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Suzuki K Poulose" <suzuki.poulose@arm.com>
+Cc: "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, "Marc
+ Zyngier" <maz@kernel.org>, kvm@vger.kernel.org
+In-Reply-To: <20260915160141.3543048-2-suzuki.poulose@arm.com>
 References: <20260915160141.3543048-1-suzuki.poulose@arm.com>
+ <20260915160141.3543048-2-suzuki.poulose@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 15 Sep 2026 16:18:54 +0000
+Message-Id: <20260915161855.32AEF1F000FF@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [High] kvm: arm64: pKVM: protected VM timer offset vulnerable to host TOC=
+TOU
+--
 
-The RMM restricts the access to the register states that the host can
-read/modify for a given Realm.
+commit 960552f9d7645214acac73b01e88ba381530e333
+Author: Suzuki K Poulose <suzuki.poulose@arm.com>
+Date:   Tue Sep 15 16:01:19 2026 +0000
 
-e.g., At VCPU creation, can modify GPRS (x0-x30) and PC.
-      While servicing SMCCC calls via RSI_HOST_CALL or servicing PSCI requests.
-      MMIO emulation in the unprotected space.
+    KVM: arm64: protected VM: Handle set_one_reg CNTVCT_EL0/CNTPCT_EL0
+   =20
+This commit fixes a WARN() in timer_set_offset() caused by userspace writing
+to CNTVCT/CNTPCT registers for protected VMs. It accomplishes this by setti=
+ng
+the timer offsets to 0 and marking the offset initialized at pKVM init time,
+removing the need for the vm_offset pointer to be NULL.
 
-Additionally we use the sysreg configuration to advertise/configure the following
-Realm parameters, which are required before the Realm Descriptor is created:
- - SVE Vector Length
- - Number of HW Breakpoints/Watchpoints
- - PMU Counters.
+Link: https://lore.kernel.org/all/20260908164641.416911F00A3A@smtp.kernel.o=
+rg
 
-Thus KVM also additionally allows access to ID_AA64DFR0_EL1 and SVE_VLS for
-the configuration of Realm creation paramters.
+[ ... ]
+> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkv=
+m.c
+> index 459bd9eb7e4bc..e7b38eff63bd1 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> @@ -528,19 +528,19 @@ static int init_pkvm_hyp_vcpu(struct pkvm_hyp_vcpu =
+*hyp_vcpu,
+>  	hyp_vcpu->vcpu.arch.cflags =3D READ_ONCE(host_vcpu->arch.cflags);
+>  	hyp_vcpu->vcpu.arch.mp_state.mp_state =3D KVM_MP_STATE_STOPPED;
+> =20
+> -	if (!pkvm_hyp_vcpu_is_protected(hyp_vcpu)) {
+> -		/*
+> -		 * Timer offsets are pointing to the untrusted KVM copy,
+> -		 * which is pinned in __pkvm_init_vm() for the VM life time.
+> -		 * It is worth noting that hyp_vm->host_kvm points to an EL2
+> -		 * linear map address and timer_get_offset() will use
+> -		 * kern_hyp_va() which is safe as it is idempotent.
+> -		 */
+> -		vcpu_vtimer(&hyp_vcpu->vcpu)->offset.vm_offset =3D
+> -			&hyp_vm->host_kvm->arch.timer_data.voffset;
+> -		vcpu_ptimer(&hyp_vcpu->vcpu)->offset.vm_offset =3D
+> -			&hyp_vm->host_kvm->arch.timer_data.poffset;
+> -	}
+> +	/*
+> +	 * Timer offsets are pointing to the untrusted KVM copy,
+> +	 * which is pinned in __pkvm_init_vm() for the VM life time.
+> +	 * It is worth noting that hyp_vm->host_kvm points to an EL2
+> +	 * linear map address and timer_get_offset() will use
+> +	 * kern_hyp_va() which is safe as it is idempotent.
+> +	 * Also for protected VMs the offset is fixed to 0 and is prevented
+> +	 * from changing.
+> +	 */
+> +	vcpu_vtimer(&hyp_vcpu->vcpu)->offset.vm_offset =3D
+> +		&hyp_vm->host_kvm->arch.timer_data.voffset;
+> +	vcpu_ptimer(&hyp_vcpu->vcpu)->offset.vm_offset =3D
+> +		&hyp_vm->host_kvm->arch.timer_data.poffset;
 
-The RMM makes similar restrictions for reading of the guest's registers
-(this is *confidential* compute after all), however we don't impose the
-restriction here. This allows the VMM to read (stale) values from the
-registers which might be useful to read back the initial values even if
-the RMM doesn't provide the latest version. For migration of a realm VM,
-a new interface will be needed so that the VMM can receive an
-(encrypted) blob of the VM's state.
+[Severity: High]
+Does this change introduce a TOCTOU regression for protected VMs? By removi=
+ng
+the !pkvm_hyp_vcpu_is_protected() check in init_pkvm_hyp_vcpu(), the protec=
+ted
+VM's vm_offset is now unconditionally assigned to point to the untrusted ho=
+st
+memory back-pointer (hyp_vm->host_kvm).
 
-Reflect the above in KVM_GET_REG_LIST, KVM_SET_ONE_REG calls.
+Under the pKVM threat model, the host kernel is untrusted. If the host
+modifies the voffset or poffset in its timer_data at runtime, EL2 will read
+this manipulated value. This could allow a compromised host kernel to alter
+the virtual and physical timer offsets observed by a protected VM, violating
+guest integrity.
 
-Reviewed-by: Gavin Shan <gshan@redhat.com>
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
-Signed-off-by: Steven Price <steven.price@arm.com>
-Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
----
-Changes since v17:
-  - Merge related changes into one single patch for the user set/get registers
-    I have retained the Review tags, as the code hasn't changed, just the patches
-    were merged into a single one with the same tags.
-  - Limit KVM_GET_REG_LIST to the allowed CORE registers.
+Should the offset instead be derived from the EL2-private &hyp_vm->kvm
+structure or statically set to 0 for protected VMs?
 
-Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
----
- arch/arm64/kvm/guest.c      | 63 +++++++++++++++++++++++++++++++++++++
- arch/arm64/kvm/hypercalls.c |  4 +--
- arch/arm64/kvm/sys_regs.c   | 29 +++++++++++++----
- 3 files changed, 88 insertions(+), 8 deletions(-)
+[ ... ]
+> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+> index bc6f2fdd7ad33..4f0aa3bb69f45 100644
+> --- a/include/kvm/arm_arch_timer.h
+> +++ b/include/kvm/arm_arch_timer.h
+> @@ -176,8 +176,7 @@ static inline bool has_cntpoff(void)
+>  		if (__ctxt) {						\
+>  			struct arch_timer_offset *ato =3D &__ctxt->offset;\
+>  									\
+> -			if (ato->vm_offset)				\
+> -				off +=3D *KERN_HYP_VA(ato->vm_offset);	\
+> +			off +=3D *KERN_HYP_VA(ato->vm_offset);		\
+>  			if (ato->vcpu_offset)				\
+>  				off +=3D *KERN_HYP_VA(ato->vcpu_offset);	\
+>  		}							\
 
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index c3ca369882273..4ec95810ca89b 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -73,6 +73,25 @@ static u64 core_reg_offset_from_id(u64 id)
- 	return id & ~(KVM_REG_ARCH_MASK | KVM_REG_SIZE_MASK | KVM_REG_ARM_CORE);
- }
- 
-+static bool kvm_realm_validate_core_reg(u64 off)
-+{
-+	/*
-+	 * Note that GPRs can only sometimes be controlled by the VMM.
-+	 * For PSCI only X0-X6 are used, higher registers are ignored (restored
-+	 * from the REC).
-+	 * For HOST_CALL all of X0-X30 are copied to the RsiHostCall structure.
-+	 * For emulated MMIO X0 is always used.
-+	 * PC can only be set before the realm is activated.
-+	 */
-+	switch (off) {
-+	case KVM_REG_ARM_CORE_REG(regs.regs[0]) ...
-+	     KVM_REG_ARM_CORE_REG(regs.regs[30]):
-+	case KVM_REG_ARM_CORE_REG(regs.pc):
-+		return true;
-+	}
-+	return false;
-+}
-+
- static int core_reg_size_from_offset(const struct kvm_vcpu *vcpu, u64 off)
- {
- 	int size;
-@@ -553,6 +572,9 @@ static int copy_core_reg_indices(const struct kvm_vcpu *vcpu,
- 		u64 reg = KVM_REG_ARM64 | KVM_REG_ARM_CORE | i;
- 		int size = core_reg_size_from_offset(vcpu, i);
- 
-+		if (vcpu_is_rec(vcpu) && !kvm_realm_validate_core_reg(i))
-+			continue;
-+
- 		if (size < 0)
- 			continue;
- 
-@@ -598,6 +620,9 @@ static unsigned long num_sve_regs(const struct kvm_vcpu *vcpu)
- 	if (!vcpu_has_sve(vcpu))
- 		return 0;
- 
-+	if (kvm_vm_is_realm(vcpu->kvm))
-+		return 1; /* KVM_REG_ARM64_SVE_VLS */
-+
- 	if (!kvm_arm_vcpu_sve_finalized(vcpu))
- 		return 1; /* KVM_REG_ARM64_SVE_VLS */
- 
-@@ -625,6 +650,10 @@ static int copy_sve_reg_indices(const struct kvm_vcpu *vcpu,
- 		return -EFAULT;
- 	++num_regs;
- 
-+	/* For Realms only support SVE_VLS */
-+	if (kvm_vm_is_realm(vcpu->kvm))
-+		return num_regs;
-+
- 	if (!kvm_arm_vcpu_sve_finalized(vcpu))
- 		return num_regs;
- 
-@@ -705,6 +734,11 @@ int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 	if ((reg->id & ~KVM_REG_SIZE_MASK) >> 32 != KVM_REG_ARM64 >> 32)
- 		return -EINVAL;
- 
-+	/*
-+	  * We don't filter out the register reads for Realms, like we do for
-+	  * the user writes. We expose junk data for the VMM instead of
-+	  * denying the requests.
-+	  */
- 	switch (reg->id & KVM_REG_ARM_COPROC_MASK) {
- 	case KVM_REG_ARM_CORE:	return get_core_reg(vcpu, reg);
- 	case KVM_REG_ARM_FW:
-@@ -716,12 +750,41 @@ int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 	return kvm_arm_sys_reg_get_reg(vcpu, reg);
- }
- 
-+#define KVM_REG_ARM_ID_AA64DFR0_EL1	ARM64_SYS_REG(3, 0, 0, 5, 0)
-+/*
-+ * The RMI ABI only enables setting some GPRs and PC. The selection of GPRs
-+ * that are available depends on the Realm state and the reason for the last
-+ * exit.  All other registers are reset to architectural or otherwise defined
-+ * reset values by the RMM, except for a few configuration fields that
-+ * correspond to Realm parameters.
-+ */
-+static bool validate_realm_set_reg(struct kvm_vcpu *vcpu,
-+				   const struct kvm_one_reg *reg)
-+{
-+	if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_CORE) {
-+		u64 off = core_reg_offset_from_id(reg->id);
-+
-+		return kvm_realm_validate_core_reg(off);
-+	} else {
-+		switch (reg->id) {
-+		case KVM_REG_ARM_ID_AA64DFR0_EL1:
-+		case KVM_REG_ARM64_SVE_VLS:
-+			return true;
-+		}
-+	}
-+
-+	return false;
-+}
-+
- int kvm_arm_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- {
- 	/* We currently use nothing arch-specific in upper 32 bits */
- 	if ((reg->id & ~KVM_REG_SIZE_MASK) >> 32 != KVM_REG_ARM64 >> 32)
- 		return -EINVAL;
- 
-+	if (kvm_vm_is_realm(vcpu->kvm) && !validate_realm_set_reg(vcpu, reg))
-+		return -EINVAL;
-+
- 	switch (reg->id & KVM_REG_ARM_COPROC_MASK) {
- 	case KVM_REG_ARM_CORE:	return set_core_reg(vcpu, reg);
- 	case KVM_REG_ARM_FW:
-diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-index b11b8821c9fbc..2b1e6fdeb4d5c 100644
---- a/arch/arm64/kvm/hypercalls.c
-+++ b/arch/arm64/kvm/hypercalls.c
-@@ -414,14 +414,14 @@ void kvm_arm_teardown_hypercalls(struct kvm *kvm)
- 
- int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu)
- {
--	return ARRAY_SIZE(kvm_arm_fw_reg_ids);
-+	return vcpu_is_rec(vcpu) ? 0 : ARRAY_SIZE(kvm_arm_fw_reg_ids);
- }
- 
- int kvm_arm_copy_fw_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
- {
- 	int i;
- 
--	for (i = 0; i < ARRAY_SIZE(kvm_arm_fw_reg_ids); i++) {
-+	for (i = 0; i < kvm_arm_get_fw_num_regs(vcpu); i++) {
- 		if (put_user(kvm_arm_fw_reg_ids[i], uindices++))
- 			return -EFAULT;
- 	}
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 44aae52c473d7..520cec19f49fa 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -5638,18 +5638,18 @@ int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
- 				    sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
- }
- 
--static unsigned int num_demux_regs(void)
-+static inline unsigned int num_demux_regs(struct kvm_vcpu *vcpu)
- {
--	return CSSELR_MAX;
-+	return vcpu_is_rec(vcpu) ? 0 : CSSELR_MAX;
- }
- 
--static int write_demux_regids(u64 __user *uindices)
-+static int write_demux_regids(struct kvm_vcpu *vcpu, u64 __user *uindices)
- {
- 	u64 val = KVM_REG_ARM64 | KVM_REG_SIZE_U32 | KVM_REG_ARM_DEMUX;
- 	unsigned int i;
- 
- 	val |= KVM_REG_ARM_DEMUX_ID_CCSIDR;
--	for (i = 0; i < CSSELR_MAX; i++) {
-+	for (i = 0; i < num_demux_regs(vcpu); i++) {
- 		if (put_user(val | i, uindices))
- 			return -EFAULT;
- 		uindices++;
-@@ -5693,11 +5693,28 @@ static bool copy_reg_to_user(const struct sys_reg_desc *reg, u64 __user **uind)
- 	return true;
- }
- 
-+static inline bool kvm_realm_sys_reg_hidden_user(const struct kvm_vcpu *vcpu,
-+						 u64 reg)
-+{
-+	if (!vcpu_is_rec(vcpu))
-+		return false;
-+
-+	switch (reg) {
-+	case SYS_ID_AA64DFR0_EL1:
-+	case SYS_PMCR_EL0:
-+		return false;
-+	}
-+	return true;
-+}
-+
- static int walk_one_sys_reg(const struct kvm_vcpu *vcpu,
- 			    const struct sys_reg_desc *rd,
- 			    u64 __user **uind,
- 			    unsigned int *total)
- {
-+	if (kvm_realm_sys_reg_hidden_user(vcpu, reg_to_encoding(rd)))
-+		return 0;
-+
- 	/*
- 	 * Ignore registers we trap but don't save,
- 	 * and for which no custom user accessor is provided.
-@@ -5735,7 +5752,7 @@ static int walk_sys_regs(struct kvm_vcpu *vcpu, u64 __user *uind)
- 
- unsigned long kvm_arm_num_sys_reg_descs(struct kvm_vcpu *vcpu)
- {
--	return num_demux_regs()
-+	return num_demux_regs(vcpu)
- 		+ walk_sys_regs(vcpu, (u64 __user *)NULL);
- }
- 
-@@ -5748,7 +5765,7 @@ int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
- 		return err;
- 	uindices += err;
- 
--	return write_demux_regids(uindices);
-+	return write_demux_regids(vcpu, uindices);
- }
- 
- #define KVM_ARM_FEATURE_ID_RANGE_INDEX(r)			\
--- 
-2.43.0
+[Severity: High]
+Since the pointer is now unconditionally assigned to host memory for protec=
+ted
+VMs, EL2 will dereference this host-controlled pointer here in
+timer_get_offset() via KERN_HYP_VA(). Can this cause the hypervisor to read=
+ a
+security-sensitive value from untrusted host memory?
 
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260915160141.3543=
+048-1-suzuki.poulose@arm.com?part=3D1
