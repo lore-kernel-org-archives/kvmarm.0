@@ -1,30 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78DC448D88E
-	for <kvmarm@lists.linux.dev>; Tue, 15 Sep 2026 15:43:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65F994AE13B
+	for <kvmarm@lists.linux.dev>; Tue, 15 Sep 2026 15:43:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789487006; cv=none; b=FpcggpjmdYAt3BoZoCKgrVLNZtjiRA9finO5x2OJMEeO5esFrwxndlo4aSX+uYg0Jy7tJ5hxvrPxY+2TwvXpIo+oEpnYanMhVjErLOfZajUL/fAiwRSvhUV5Qp/cG5XSlCe0R1KKXRd4IRCbOoNSLkQDJJQwrYiymeeBMH/+9HU=
+	t=1789487008; cv=none; b=KrFxdUNzzgsAQt28c1tlY44p5X8mbmg0AYsZufctS96X+ORPfhMdMSTzppDCVhg17IZtjxRHESGdzZ2RbJi59eF8XpDaR5P6hTo4TEapVpjLbzWtJdjhWW6i05kGWNW9hvEDwFA5vgIt3f8llAObfa5LZ5YYoSdUEKXaVfeEM2g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789487006; c=relaxed/simple;
-	bh=dGCyRyad+R3eTVvMaV3UbHKKwBABsVheRnTDSo9R3QI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AcUooiHHjWDFCdGNT1JOZ8gVNHYCBGmziKUs535pER8jxKbNA1NInKoByquL/irkIutjrhP1DcV3WzQ+xs+bcfWm2O6WLjb5UhluFxH6bxW4i5O5c35c6K1zRUgJYg0H/nSGGIY0Wx9UAreCos+0HVNq1oZsNfGcq4uEZq7kJ7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=crRRscH3; arc=none smtp.client-ip=217.140.110.172
+	s=arc-20240116; t=1789487008; c=relaxed/simple;
+	bh=bZH0Iynr6p+MO32RA+61Q08tGhF1f84xWPwOzk0oSQg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=oH7Q6lYzrIsG6/a301cjS6+0xG34+6tgE7kcgjQDnejkmPKL1r92UBExIQyE4s/zGJTsFJDyWRYOkl+ZtFoRwOusNlzFVvpaiEjT8gjio+KMsEqsnxUvb4ls/Wn8fv03BG0miKGpayC/1tE97Wz5QwjO7GlHk46ezM65W3niHuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=a9zfF35p; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="crRRscH3"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="a9zfF35p"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 23BDA1570;
-	Tue, 15 Sep 2026 08:43:19 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0754F15A1;
+	Tue, 15 Sep 2026 08:43:22 -0700 (PDT)
 Received: from workstation-e142269.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 235873F882;
-	Tue, 15 Sep 2026 08:43:20 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0DE353F882;
+	Tue, 15 Sep 2026 08:43:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1789487002; bh=dGCyRyad+R3eTVvMaV3UbHKKwBABsVheRnTDSo9R3QI=;
-	h=From:To:Cc:Subject:Date:From;
-	b=crRRscH3OrO9Zfmax7p89GH6tKP3LypEq486sailvOhs1x+pILaPsAFgFoEhZt/3z
-	 RSBFwRy/1/4FbN0cUHwn4EvBnFTJz0NNAryNGTEo+zmtf7t3yTdELLaK0RDF8XG3jt
-	 bVZN6VKKjSvpdnX+tdrJSVjZpcxoaVQ2+Ej9uwSQ=
+	t=1789487005; bh=bZH0Iynr6p+MO32RA+61Q08tGhF1f84xWPwOzk0oSQg=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=a9zfF35ptiQKPV6uAEtV4LGz/dwzssa8UXO1LXm+fFsAt50zgS1WS0p9R9WtTP0mv
+	 ILZKF6wXaHJ4ubXDjbEBeJ2jpQbWYpqbllmxP7vXTiGTrU7rzgOAUfAlOXmt/UDVyS
+	 enKUPDKPdh86GkKeqeortrsS7pg0S6hVelAx8/yA=
 From: Wei-Lin Chang <weilin.chang@arm.com>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
@@ -44,10 +45,12 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Shuai Xue <xueshuai@linux.alibaba.com>,
 	"Lorenzo Stoakes (ARM)" <ljs@kernel.org>,
 	Wei-Lin Chang <weilin.chang@arm.com>
-Subject: [PATCH v6 0/7] KVM: arm64: nv: Implement nested stage-2 reverse map
-Date: Tue, 15 Sep 2026 16:42:58 +0100
-Message-ID: <20260915154305.3852871-1-weilin.chang@arm.com>
+Subject: [PATCH v6 1/7] KVM: arm64: Use a variable for the canonical IPA in kvm_s2_fault_map()
+Date: Tue, 15 Sep 2026 16:42:59 +0100
+Message-ID: <20260915154305.3852871-2-weilin.chang@arm.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260915154305.3852871-1-weilin.chang@arm.com>
+References: <20260915154305.3852871-1-weilin.chang@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -56,75 +59,58 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi,
+Create a variable to store the canonical IPA, instead of calculating it
+when needed. This will be useful when we need to use the canonical IPA
+for guest stage-2 tracking later.
 
-This is v6 of optimizing the shadow s2 mmu unmapping during MMU
-notifiers.
+Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
+---
+ arch/arm64/kvm/mmu.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-This version fixes a few issues, and adds Marc's space optimization
-for kvm_guest_s2_mapping [1]. Please see the changelog for the details.
-
-Tested by booting L3, and running in-kernel targetted tests described
-in [2]. v5 got some tested-by's from Itaru and Wang (thanks), I didn't
-carry them over since some bugs fixed in v6 are non-obvious. Some
-retest would be much appreciated!
-
-Series based on v7.3-rc3 + Marc's nested mmu lifecycle fixes [3].
-
-* Changes from v5 [4]:
-
-  - Align the addresses down to the mapping size when recording the
-    guest s2 mappings. s2fd->fault_ipa isn't necessarily PAGE_SIZE aligned.
-
-  - Record guest s2 mappings even when page table maps return -EAGAIN.
-    kvm_pgtable_stage2_map() can create mappings while returning -EAGAIN.
-    For example, a 2M block map (A) could race with a 4K page map (B):
-    1. (A) maps the 2M block in kvm_pgtable_visitor_cb()
-    2. (B) breaks that block into a table and maps 4K
-    3. (A) reloads and finds the table after kvm_pgtable_visitor_cb(),
-       then descends into it.
-    4. (A) maps some 4K, but before it finishes reads entry mapped by (B).
-    5. (A) returns -EAGAIN although it had mapped a few pages.
-    In this case, we don't know what subrange is mapped, just track the whole
-    requested mapping range.
-
-  - Don't remove tracked mappings from the interval trees if they only
-    partially overlap the removal range. Because of the previous bullet point
-    we can have a 4K shadow mapping tracked as a 2M range in the interval
-    trees. It would be wrong to remove the 2M range when a guest TLBI doesn't
-    touch the 4K mapped.
-
-  - Check mmu->pgt during mmu unmap notifier, as it could race against
-    MMU teardown.
-
-  - Make guest_s2_tracking_destroy() canonical mmu only. We simply don't
-    need to detach the nodes from the nested mmus' trees. Freeing them
-    during canonical mmu's teardown is enough.
-
-Thanks!
-
-[1]: https://lore.kernel.org/kvmarm/86h5jv7qrd.wl-maz@kernel.org/
-[2]: https://lore.kernel.org/kvmarm/gerjpm62a2gszzggc6vuai22bf3prfquvfsp7ueumps7vz2ev3@odlmovaklg2b/
-[3]: https://lore.kernel.org/kvmarm/20260911162203.1919330-1-maz@kernel.org/
-[4]: https://lore.kernel.org/kvmarm/20260810205038.118843-1-weilin.chang@arm.com/
-
-Marc Zyngier (1):
-  KVM: arm64: nv: Drop kvm_s2_mmu pointer from kvm_guest_s2_mapping
-
-Wei-Lin Chang (6):
-  KVM: arm64: Use a variable for the canonical IPA in kvm_s2_fault_map()
-  KVM: arm64: nv: Introduce guest stage-2 tracking structures
-  KVM: arm64: nv: Track guest stage-2 mapping creation
-  KVM: arm64: nv: Track guest stage-2 mapping removal
-  KVM: arm64: nv: Avoid full shadow stage-2 unmap
-  KVM: arm64: Refactor kvm_unmap_gfn_range() with common variables
-
- arch/arm64/include/asm/kvm_host.h   |  31 +++++-
- arch/arm64/include/asm/kvm_nested.h |   7 ++
- arch/arm64/kvm/mmu.c                | 109 +++++++++++++++++++---
- arch/arm64/kvm/nested.c             | 140 +++++++++++++++++++++++++++-
- 4 files changed, 269 insertions(+), 18 deletions(-)
-
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 9ba86450fe4a..671e2941d619 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -2021,6 +2021,7 @@ static int kvm_s2_fault_map(const struct kvm_s2_fault_desc *s2fd,
+ 	enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_SHARED;
+ 	bool writable = prot & KVM_PGTABLE_PROT_W;
+ 	struct kvm *kvm = s2fd->vcpu->kvm;
++	phys_addr_t canonical_ipa;
+ 	struct kvm_pgtable *pgt;
+ 	long perm_fault_granule;
+ 	long mapping_size;
+@@ -2039,6 +2040,7 @@ static int kvm_s2_fault_map(const struct kvm_s2_fault_desc *s2fd,
+ 	mapping_size = s2vi->vma_pagesize;
+ 	pfn = s2vi->pfn;
+ 	gfn = s2vi->gfn;
++	canonical_ipa = gfn_to_gpa(get_canonical_gfn(s2fd, s2vi));
+ 
+ 	/*
+ 	 * If we are not forced to use page mapping, check if we are
+@@ -2057,6 +2059,7 @@ static int kvm_s2_fault_map(const struct kvm_s2_fault_desc *s2fd,
+ 				goto out_unlock;
+ 			}
+ 		}
++		canonical_ipa = ALIGN_DOWN(canonical_ipa, mapping_size);
+ 	}
+ 
+ 	if (!perm_fault_granule && !s2vi->map_non_cacheable && kvm_has_mte(kvm))
+@@ -2090,11 +2093,9 @@ static int kvm_s2_fault_map(const struct kvm_s2_fault_desc *s2fd,
+ 	 * making sure we adjust the canonical IPA if the mapping size has
+ 	 * been updated (via a THP upgrade, for example).
+ 	 */
+-	if (writable && !ret) {
+-		phys_addr_t ipa = gfn_to_gpa(get_canonical_gfn(s2fd, s2vi));
+-		ipa &= ~(mapping_size - 1);
+-		mark_page_dirty_in_slot(kvm, s2fd->memslot, gpa_to_gfn(ipa));
+-	}
++	if (writable && !ret)
++		mark_page_dirty_in_slot(kvm, s2fd->memslot,
++					gpa_to_gfn(canonical_ipa));
+ 
+ 	if (ret != -EAGAIN)
+ 		return ret;
 -- 
 2.43.0
 
