@@ -1,80 +1,79 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 844664756CE;
-	Tue, 15 Sep 2026 22:25:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44305379EE0;
+	Tue, 15 Sep 2026 22:49:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789511150; cv=none; b=Yvkw9tHAopHLRuw/89vNWHepW/weHiLvRPt6+xL4fXi8el44GM+xqaum6yMrUcA429e9CsA3bWY/oyrRtPh0BZdKM/7u7q02R/d88myY9272i8aWlSbFHhuCdE03xSulkHlxxD9LHiUJpsLglhNtiD1wHtDbM1IU3IeTJFJPoqE=
+	t=1789512558; cv=none; b=iFhmTMnsDFyen+ictpvXFpR+JNBqlMnYNeE73UUsSN+nTWioBtk2waPfAk+Bs/mtGD7KRH1ys6/d+AZK/mt5E37Okof+kKPJLigt7ph3Ok92cMZwnmOe4zqGZ4XB0uO81QfVEu0w5Jl2iE8mDP2t1qMrjcSSc1IZRP1EiVxYgWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789511150; c=relaxed/simple;
-	bh=pw3Hb3ywPDAx4MtbECEBY7wrRbYrnt5sZDofeJN8zww=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Q4T6GmqsFhUFMkpO03balExQGux5SO77cCzxLFttqN3L43OhkoE9EcyuBF1JTQYuyWUk3Hp/dygySDxvJgMSw/ZWR2Iqfv3l95R3KR9D4T1MQmMzJHflkhxOyeJEMG95w3SjowglUhbbG1vvOW8YkfG5QAZMxIB18KHK08W3hxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YfCs8JiC; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789512558; c=relaxed/simple;
+	bh=I6hnICVO3eviiYVtsdEcR+XTrIwdAQhCm+cOfFPVG1Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q5A4TXvMYK/iRxNMOLp7xuqZAWR6jAS4srey9+77XLMywoJ+yVDKbX5JmUq56UhO3gPhsq3mFY6nWGql/Pnu+rclAlh2PPqFZka06Mv+dNuSl2/RQNWszB8ab2vuTclUQk986LDqvXS/n1bfKXOiRqa6NcaPty2ixgg/auNUBvM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FpiSvfNs; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YfCs8JiC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1898B1F0089C;
-	Tue, 15 Sep 2026 22:25:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FpiSvfNs"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7DC31F000FF;
+	Tue, 15 Sep 2026 22:49:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789511148;
-	bh=WEoMCLrX9qhF+MwQQKI/YpW0gHCUAmFuEJOXHcmJAuk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=YfCs8JiCZJFo7pJtYAP9WfYkj9QsUFVBDEzHAyjRp8Q+9tIAX+Sa9bPBKDFQvJhls
-	 Ebkc8cPPMjMJWICaQcO/Qtkp+NonXkp8ZNUG6ym+FSZn1qPVAX5sBvWR2guBbtOTTq
-	 fbC2dQwH4eKCUdqMEWBeqWAGmF7xy8w+l/X6SxcSRw3yrp9e8lsBnnRDZGOdKXwKvo
-	 CLfXLpMAvJxijQLRoXdCPv6+inCT91+1NSGx12Xd/0dxHrpUsRFfo0mCikD0uATrQh
-	 x9xhid87wFNyUKNPFTH7CE4GdByWh0MoZCApyOZ66th6UJPECeMW/Till70ZWIi9RX
-	 mCVkQ0J+n0Z5g==
+	s=k20260515; t=1789512556;
+	bh=kZzsGaXPUVqWdbiJlm0sqmPG8X19xHFYaAJPDTPlT8A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=FpiSvfNsjtOquI9DAMwpgwxVSzGM0L4KGw3+pi75m44IuyDlheeQQIl1+YMvU9oFQ
+	 AbAdF1z1neMsu20+Cn89GlfetfTJNG6KskbLbYv6g9hFfElcfrjntm+dBC0GUSbbTj
+	 JG6H4DK7Hfom1M7NsWMP8Prhjk2OdKvC39flf+OkUHVpSTKq7djpYOapPadN5IIAcx
+	 RGR5l84P/9GoEiQsdexAwg7wccAeY8+B1QPAP3lmms1vMOb4SV7xboNBz1kb9fkGFH
+	 e4FBNL/+nhZsr6j4HOfJeYxLWTAEQownhFAJAx5t6pd5ZuWyVsA8PX7hx21cv9sZlA
+	 UyV9uuhTWBXNg==
+Date: Tue, 15 Sep 2026 15:49:15 -0700
 From: Oliver Upton <oupton@kernel.org>
-To: Marc Zyngier <maz@kernel.org>,
-	Sean Christopherson <seanjc@google.com>,
-	Zenghui Yu <zenghui.yu@linux.dev>,
-	Sebastian Ott <sebott@redhat.com>
-Cc: Oliver Upton <oupton@kernel.org>,
-	Jiakai Xu <xujiakai2025@iscas.ac.cn>,
-	Shuah Khan <shuah@kernel.org>,
-	Andrew Jones <andrew.jones@oss.qualcomm.com>,
-	Anup Patel <anup@brainfault.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2] KVM: selftests: fix steal_time for arm64 with host page size > 4K
-Date: Tue, 15 Sep 2026 15:25:40 -0700
-Message-ID: <178951103688.10790.15889982999400525367.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260914131013.60334-1-sebott@redhat.com>
-References: <20260914131013.60334-1-sebott@redhat.com>
+To: Wei-Lin Chang <weilin.chang@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Itaru Kitayama <itaru.kitayama@fujitsu.com>,
+	Wang Han <wanghan@linux.alibaba.com>,
+	Shuai Xue <xueshuai@linux.alibaba.com>,
+	"Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+Subject: Re: [PATCH v6 0/7] KVM: arm64: nv: Implement nested stage-2 reverse
+ map
+Message-ID: <aqnLa0_QSGlIs2qn@kernel.org>
+References: <20260915154305.3852871-1-weilin.chang@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260915154305.3852871-1-weilin.chang@arm.com>
 
-On Mon, 14 Sep 2026 15:10:13 +0200, Sebastian Ott wrote:
-> Fix the following failure when running with 16K host page size:
-> ==== Test Assertion Failure ====
->   lib/kvm_util.c:991: vm_adjust_num_guest_pages(vm->mode, npages) == npages
->   pid=873 tid=873 errno=0 - Success
->      1  0x0000000000405a27: vm_mem_add at kvm_util.c:991
->      2  0x000000000040241f: check_steal_time_uapi at steal_time.c:223 (discriminator 7)
->      3   (inlined by) main at steal_time.c:539 (discriminator 7)
->      4  0x00007fff8b57af3b: ?? ??:0
->      5  0x00007fff8b57b007: ?? ??:0
->      6  0x0000000000402b6f: _start at ??:?
->   Number of guest pages is not compatible with the host. Try npages=4
+On Tue, Sep 15, 2026 at 04:42:58PM +0100, Wei-Lin Chang wrote:
+> Hi,
 > 
-> [...]
+> This is v6 of optimizing the shadow s2 mmu unmapping during MMU
+> notifiers.
+> 
+> This version fixes a few issues, and adds Marc's space optimization
+> for kvm_guest_s2_mapping [1]. Please see the changelog for the details.
+> 
+> Tested by booting L3, and running in-kernel targetted tests described
+> in [2]. v5 got some tested-by's from Itaru and Wang (thanks), I didn't
+> carry them over since some bugs fixed in v6 are non-obvious. Some
+> retest would be much appreciated!
+> 
+> Series based on v7.3-rc3 + Marc's nested mmu lifecycle fixes [3].
 
-Applied to fixes, thanks!
+Looking pretty good to me, thanks Wei-Lin!
 
-[1/1] KVM: selftests: fix steal_time for arm64 with host page size > 4K
-      https://git.kernel.org/kvmarm/kvmarm/c/96e6757cb067
+Reviewed-by: Oliver Upton <oupton@kernel.org>
 
---
-Best,
+Thanks,
 Oliver
