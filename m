@@ -1,78 +1,103 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv2-f12.google.com (mail-qv2-f12.google.com [74.125.230.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F7003C09FB
-	for <kvmarm@lists.linux.dev>; Tue, 15 Sep 2026 13:28:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A8143D7D82
+	for <kvmarm@lists.linux.dev>; Tue, 15 Sep 2026 13:43:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.230.140
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789478897; cv=none; b=e+c33cvOIKUGFxT+yb29r+YWjGHbihnVuWWCa6T96Lr+CwkYVCqeSEBjQoq6opieS/gaaN62VHToG0GzxxuGo7ICx6ENGO3ggOFwKL+OSWUSAEZZG4r5D7F4FzdQ+RU7mmhLYLZ2UceeNQlC6mm8zAaG7E2VCmbIaIhTtFs9KKM=
+	t=1789479803; cv=none; b=bD9uOG552QjGCgo/tyQckk0kx9WxW5b661nVi2v9difJq0K8zEBBtjuhaSn2siv5y2MncwcAJ36zF6RBv76NFP76xXxhV9852B2Ev/ehchVP/3mqQam1cbzh78neTYjPV9+YDfJgQxhlC9DY/88INZWkRYxm7YwxwGF6zo89U3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789478897; c=relaxed/simple;
-	bh=8oS9W40Kxi3jCDLjbplhmNHApFzpmxWBjEyHqggrd0A=;
+	s=arc-20240116; t=1789479803; c=relaxed/simple;
+	bh=fW074i0HkgvCy5bvA0+X/e729P0Fz+Gm4Rjq7TMc70g=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t486iOVfZSkZ+F6y+yGAD9KMbs9N6nKEkE6gJfrnTft7j7xfLYzYbpTTu2Yib8hIivr0ySeOOGcUPa0ZllSAdxLERGBvyWtTWkMMPI8QzaGGIkb9GlHeshmVogWnfGjUhQRngxttf0UYWDiQF7SaWXthuR5Vxx1t4gzCK5oTUBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Jnmr+6bd; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=e0rm0UR6DHORBAMSKM+U5QfS9DNfuz1F8Gj1hOtnj8XF62wfq8gyW9pE8Pg1mmDTDCiDH6PnLxNhGrcTJxx3hTYGeqwsoahtggBpbzcfIvfFHQL40ha0jZc2oPrzQR+QFhzFdVCvDxZtimNv8x3llHWC+yshVJ7L9O5yzXjTqhE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=DXO1voxI; arc=none smtp.client-ip=74.125.230.140
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Jnmr+6bd"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68FD1cwV879799;
-	Tue, 15 Sep 2026 13:28:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=8oS9W40Kxi3jCDLjbplhmNHApFzpmx
-	WBjEyHqggrd0A=; b=Jnmr+6bd5JlMLNu1gUkunm9XI3jex6vE/3DA/zjHS4Nlnd
-	QQzW3P//6McQCzjWz959MU60PUorYfn3houYI4t3dMOJGjUIdsw2/AupgiWzOT0b
-	D3La1ggZhB0CqFFBRjptRLE/q02J9reVfo7iZG84tIrp5z/jeK2icg5tkv5hCBlU
-	BZt9REZHCEM0sz0OYEinvxGb7TP2FDV9fPXYwZmgkIy9jvoBWkCtCR63lGjvORPO
-	CJoS4CIpkAzl4n6dnw8hCU/inXvRxtKRvSUIUQ032EWKBcRSHlA/5YeGAbpDhQB/
-	JvYI07jM0enx7oBMLcaWb4NQYgUEByg3IfJmxlbw==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gmx83q97x-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Tue, 15 Sep 2026 13:28:01 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 68FD56PQ739092;
-	Tue, 15 Sep 2026 13:28:00 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4gpw6d2364-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 15 Sep 2026 13:28:00 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 68FDRusb42402280
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 15 Sep 2026 13:27:56 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6CEA42005A;
-	Tue, 15 Sep 2026 13:27:56 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C78632004B;
-	Tue, 15 Sep 2026 13:27:52 +0000 (GMT)
-Received: from dhcp-9-123-3-18.bl1-in.ibm.com (unknown [9.123.3.18])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Tue, 15 Sep 2026 13:27:52 +0000 (GMT)
-Date: Tue, 15 Sep 2026 18:57:49 +0530
-From: Gautam Menghani <gautam@linux.ibm.com>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oupton@kernel.org>,
-        Madhavan Srinivasan <maddy@linux.ibm.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Joey Gouly <joey.gouly@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Steffen Eiden <seiden@linux.ibm.com>,
-        Nicholas Piggin <npiggin@gmail.com>, Will Deacon <will@kernel.org>,
-        Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-        linux-doc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/3] KVM: PPC: Book3S HV: Fix comment naming a
- non-existent KVM_VCPU_RUN ioctl
-Message-ID: <aqlH1QKaLP-4mNy3@dhcp-9-123-3-18.bl1-in.ibm.com>
-References: <20260915084441.3846947-1-fuad.tabba@linux.dev>
- <20260915084441.3846947-4-fuad.tabba@linux.dev>
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="DXO1voxI"
+Received: by mail-qv2-f12.google.com with SMTP id 6a1803df08f44-910399d8b09so27976106d6.2
+        for <kvmarm@lists.linux.dev>; Tue, 15 Sep 2026 06:43:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1789479800; x=1790084600; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=bSXuxco/xIMIgeK0msm6noQ0z/sdWL5ZlVJapMHGK5U=;
+        b=DXO1voxIC0HTEmjvOjbLzCNI9SLesSm6yNBU7RDbXjkFhH3r71KBx9w4fSZLP5UeXo
+         eO5CZa54jy0C4z+iQ3KQxfSYmC5Ri83KCZwdcqqkgnkaeIqwJ50xvOpPThIjGEFGtz92
+         2BLvBxAcmVWOlcPbTqdTJwPH2nzG6URWRDyvcoWt+7fcQX3p+RqVWQ4grP3pe7BfNiS0
+         mGrZhIGSNnVGh8u4Y0hEuBsOBtTmjM3/HJmJNdRjfwvN2alMucTEp/lMnJu4ZllPvLFe
+         qyB3qWnLwgsIVx57Rbjxiooer0mPvM9CgPs+CyLovaOUotsgIBhEov6X555ZyKzF48xm
+         YFZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1789479800; x=1790084600;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=bSXuxco/xIMIgeK0msm6noQ0z/sdWL5ZlVJapMHGK5U=;
+        b=r1eO6eb10phEtS4VoJ4bzb3HINRL88vl0Gz9yghNkf3ZGOg+/5NSVBDZgibMez22tS
+         7SykbleRSKvXvC+WTEFp1Pp76LwTRuz1cgWKO41BgFriIq/PP0RuONeNQOEIfZTOePl7
+         dnZBRrvHJL+ZBefKBVvjcdDd43BNHE/nlquuQPLysF6feCv0mPIqq++AO9/1zOOAknI5
+         z9UegX1kuXfT4s9H1UC218CZHr46o6BDwkxijy65m0yN+LGyfIYSJ7YGtDADtE5svwPl
+         Q8XoGI2tHKRwHFIiJEikhTe5uz6xvenl/3ggWyUu6VAlVCwflx9G8qSB6HU4PVK4BOMM
+         2pVA==
+X-Forwarded-Encrypted: i=1; AKwUvBxesV21xD8GtUQo/XV8pLcGLRVZpHkwG7zXhu00rK8qL2kpdjRPCpDI4mR4acZc1ZTV+lvol+M=@lists.linux.dev
+X-Gm-Message-State: AFuF++l9Yk/+egslGPzk94xU+kOc2eWdm6Qh8fpdyBB9uFznmXQyURwa
+	oTANvxPOt2yz5bETa9WEb3BJTZ9kvBgPEJJa3qsF4Z7znsKYnMOPSJYA7QuW8f77/fE=
+X-Gm-Gg: AYBFou19uoXYMjLLxwoIvib8r0WjYV+W/3OMLUmnQVJFFOiAfBXgMYJuNhlG5g9aVm6
+	seOH1FfYfEsao6o/WwaBU0L5O8oWGPC93f2LQZkD8hSK0zVQsBAk/NcJyPksj9EcZmyn5N1E6F6
+	UG+ahiVKUqhy5/a4M/J3O6ngvfri7rbqH78ZhMLCqJ05pCCZoMSbjZCvepKHk5Oat9d0PJI/Ebf
+	VNFi1kLTVwh2C0Ri2guk80+ErrS+ZjlcmhSf5RM/yWttou2DGV09mFaTVKcmXI0U0fbYpUkqPC+
+	/yTrh9mJv/xD9tUIblSlSxtfdIHNVG9+TZ2GH+s5DEBQAU+sVm9hMN7vVZLVqPmDFxzlhlujqvv
+	K1fSJHFWEyCkE8Ke5iKpFtPOI+nso8P4ff/9zNOIm/tafuStUlFmoOto/cHQm+OAd2+C4lZP2pC
+	96/xU4RMXio0J1mY83T4EvnQdN2WMDfWCUFpyg3+kvlsrhPTGyUSN9b3LfIvl4IijRnZsGyKBYS
+	xgeOiFX3j4sN216yLGVv+D4BCTx9tWsTlWIxrmbEMf6MOjR6SvF/Tff
+X-Received: by 2002:a05:6214:4986:b0:90c:d6fc:e284 with SMTP id 6a1803df08f44-9122e54a861mr120216456d6.17.1789479799946;
+        Tue, 15 Sep 2026 06:43:19 -0700 (PDT)
+Received: from ziepe.ca (hlfxns010zw-159-2-239-150.pppoe-dynamic.high-speed.ns.bellaliant.net. [159.2.239.150])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-9120f4d51ffsm124036106d6.45.2026.09.15.06.43.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Sep 2026 06:43:19 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1x6TRO-00000004bnd-23bE;
+	Tue, 15 Sep 2026 10:43:18 -0300
+Date: Tue, 15 Sep 2026 10:43:18 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: "Tian, Kevin" <kevin.tian@intel.com>
+Cc: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
+	Nicolin Chen <nicolinc@nvidia.com>,
+	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Alexey Kardashevskiy <aik@amd.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Joerg Roedel <joro@8bytes.org>, Jonathan Cameron <jic23@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Pranjal Shrivastava <praan@google.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Samuel Ortiz <sameo@rivosinc.com>,
+	Steven Price <steven.price@arm.com>,
+	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
+	Will Deacon <will@kernel.org>, Xu Yilun <yilun.xu@linux.intel.com>,
+	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+Subject: Re: [RFC PATCH v4 03/16] iommu/arm-smmu-v3: Add initial pSMMU realm
+ viommu plumbing
+Message-ID: <20260915134318.GB3196566@ziepe.ca>
+References: <20260902235609.GG2890729@ziepe.ca>
+ <yq5a8q5izxz4.fsf@kernel.org>
+ <20260903171704.GK2890729@ziepe.ca>
+ <yq5acxupjsy2.fsf@kernel.org>
+ <20260907125228.GB667892@ziepe.ca>
+ <yq5atsnyag84.fsf@kernel.org>
+ <20260909124628.GH2543240@ziepe.ca>
+ <CO1PR11MB4835512E374074A5F4AD0A6C8CBF2@CO1PR11MB4835.namprd11.prod.outlook.com>
+ <20260910124632.GB4083318@ziepe.ca>
+ <CO1PR11MB4835FF972283C09D7D683DAE8CBA2@CO1PR11MB4835.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -81,34 +106,72 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260915084441.3846947-4-fuad.tabba@linux.dev>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTE1MDE4OSBTYWx0ZWRfX/MU2l+5qWr4I
- vzvkD9PCj/CkBx1I7vx5Oj8Na5YrnftJRDDwyQrA52HalBXJX3nuUoaQl7EAYLK8nMjVCiRXnXa
- uB8FISwe7UlfD3H1tNLohmnrZNcMh0QfWR1VSPvhxPOwS0MPWpKFagUi9IZOzg8U2fxOlWTOtf0
- T+s9sKyF8sBKI0YIe3dq2UAPQhrNjtRZPqdxzNJaMLAlMgfPnvDIvaZhGE35CC5ALfkzPatiiPc
- wmxBNb54WGtlC+Ctdx7sqgqPGRMeUYN6Jlt0DR0bMCGuWlMok/cDDB9y3kvp6QRI4yG0QApwRia
- Di8DZfMBZjF1PSy1yU8Kst8nLkZKfgv2SZXKVxnT/QF8z7ib3htj6c7idmtUjSf3hOTusLaQG1S
- FLNE2joxenwVqHiB1Dl8InHzmlAJmAjY5wcReV4+TN+lp6q3MQsWCbzI6GMzYguMSo5MKHMhevh
- TyTndstMDaWOy8n+oTA==
-X-Proofpoint-ORIG-GUID: _0Ubch5FA5CSZaCYcQERoegakgj3a6NK
-X-Proofpoint-GUID: y3fBKQ0zr8qklAFyFjxogaJ2nr2fiwy2
-X-Proofpoint-Spam-Info: AW1haW4tMjYwOTE1MDE4OSBTYWx0ZWRfX95G/Cj0NlyCS
- ZlbGyfEmhHWE1n0L9K/FzaFP+nlglsN69dqeW/TBgnO6H3BYUGlTOlEXApU7sfJlo0PRr9yldgM
- +7Rtl9HD+wH3+IaJ8lrzei531JaoVU0=
-X-Authority-Analysis: v=2.4 cv=cY9HPXDM c=1 sm=1 tr=0 ts=6aa947e1 cx=c_pps
- a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
- a=kj9zAlcOel0A:10 a=VdqzKS8jKosA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=VnNF1IyMAAAA:8
- a=90UzZmcSQ78tuVnzBuAA:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-09-15_04,2026-09-14_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 spamscore=0 bulkscore=0 clxscore=1011 suspectscore=0
- impostorscore=0 malwarescore=0 phishscore=0 adultscore=0 lowpriorityscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2609040000 definitions=main-2609150189
+In-Reply-To: <CO1PR11MB4835FF972283C09D7D683DAE8CBA2@CO1PR11MB4835.namprd11.prod.outlook.com>
 
-Reviewed-by: Gautam Menghani <gautam@linux.ibm.com>
+On Tue, Sep 15, 2026 at 07:13:48AM +0000, Tian, Kevin wrote:
+> > Yes, this already has to be true or our lifecylce model is
+> > nonsense. Once the iommufd creates the vdevice the guest is running
+> > and we cannot disconnect it without unplugging it from the guest. Thus
+> > the locking can rely on that. Within an iommufd ioctl context the vdev
+> > and underlying connection must be stable.
+> 
+> btw looks a related suggestion is having the tsm driver (arm-cca-host
+> here) implement the viommu ops while leaving the original smmu driver
+> largely intact, and "obtain the viommu through tsm_ops not through
+> iommu_ops".
+> 
+> It's not super clear to me about the implication behind after reading
+> related discussions and what the "obtain" part means. 
+> 
+> Could you help elaborate this part?
+> 
+> The old way is kind of:
+> 
+> vdevice_tsm_ops -> tsm_ops -> tsm driver -> iommu driver
+> 
+> then it will become:
+> 
+> viommu_ops (tsm related) -> tsm_driver
+> 
+> where tsm driver will fully handle tsm related viommu_ops?
+
+At least for ARM there is effectively no entanglement with the actual
+host iommu driver. The viommu is entirely provided by software in the
+RMM world, so it can have its own dedicated driver. In ARM T=1
+transactions are alwayus routed to the RMM's iommu and there is no
+relation to the host.
+
+I am interested how Intel works here, but I thought it was similar.
+
+AMD is different and I suspect AMD will have to continue to use the
+viommu from the AMD iommu driver, but I am not sure.
+
+> btw I held the impression of blocked operations from past discussion [1].
+> Initial attempt tried to proactively unbind the TDI upon any operations 
+> which may transit the TDI to the ERROR state. Then the suggestion at
+> the moment was:
+
+With this construction the iommufd vdev is created and permanently
+exist as long as the VM and viommu exist.
+
+How/when the tsm driver links this to a arch specific "bind/unbind"
+operation is more up to that driver, but I would expect what is
+thought of as "bind" should be the affiliation of the device's T=1
+stream with the viommu and the target VM. It should not be sensitive
+to the TDISP state.
+
+That is not prohibited, the TSM driver could do some auto
+"bind/unbind" whatever that means triggered by ops or tdisp state
+changing under the covers. But this cannot leak out as some kind of
+asynchronous vdev destruction.
+
+> " But now the suggestion is never let VFIO do unbind, instead VFIO
+> should block these operations when device is bound. "
+> 
+> [1] https://lore.kernel.org/all/aEFmPaYorqaYCKBY@yilunxu-OptiPlex-7050/
+
+IDK, if the host wants to put a device into error I don't see why the
+kernel should block it? There are many reasons a device can reach
+error, that needs to be handled.
+
+Jason
