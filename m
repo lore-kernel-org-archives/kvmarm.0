@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70D3212B94;
-	Wed, 16 Sep 2026 00:10:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B862926461F;
+	Wed, 16 Sep 2026 00:37:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789517405; cv=none; b=MunbpEfrSufxubQDdJKY+l6LR0xJWAErDLpmHwuCH45m6GQCqmZFOqhO87e9YeGs8LTYrzaoDq7jbtrz8Mhwo8ucoFJboaRd4poOS4QVOEx6XaJbgwgKHSt9mV2LMKXziO1aYotOFZK55BhGnul8SFrwN2/IjwXOjBUVzOzKIsM=
+	t=1789519039; cv=none; b=GtatC9zg3xcWwLOrjCqX/1I+LM4uuE3ssKy2XZ02zK7v09VYrRTywsTaf+J6tpwCV/1PwZO+779avJ5FeJFWQPPWC3af+sno/tXJtbohV7wfMT2TX0PMmtIZbyBS2I/vThWHQTxL6PXZTNTTrRTce/LiWRtI7uAdbl8buGXFLBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789517405; c=relaxed/simple;
-	bh=Nxr29Svr+GBcgYKvDck8LYvMEjhuKbwVMcchNAgsyS8=;
+	s=arc-20240116; t=1789519039; c=relaxed/simple;
+	bh=ue53jCiy2LEZYlyTYduuCH59J6dHDmi8VzF1KRLqTC4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I7eQnNSBKBxMp73mEr2WEDoP/ET/Kk0z2YV0WAHj8iExFW2zPBeNHmdmeoz918yeNBLj8CrWQXzDcT0IqD93dYbD4vzInmBkjHs4tK9ZVciikskE3ox3cCM33YMhfDyYPkCvWkdF0oom/IZopu20nFwOwwB85s5gkVCHn0Gjsog=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RdjvVjG3; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=MTpnBHZe0Yhr9gCBLS0TnncoM2aWePY5TFySvA12UKvwJGiT6oJ7C4Tu6PFQCDhHRi6fyf4tibtbxiz4OTk8Sf/YmdUmXQxUeDLYmcFtSUKPFrS9dwu07AXrcbdFzpgKLsInb7QCAtDJXr7YCEZjJt2juoNkX6rsXBcQ0WHSIuY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iOo+6B/Y; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RdjvVjG3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB61F1F000FF;
-	Wed, 16 Sep 2026 00:10:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iOo+6B/Y"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 139BE1F000FF;
+	Wed, 16 Sep 2026 00:37:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789517403;
-	bh=OX/Q4Xcbeg0d5BQzko4QkNB2NOczHVBCeUwREevD7Z0=;
+	s=k20260515; t=1789519037;
+	bh=KhXpFZ9VswPhvLkxuik9i+Nt4jMBXcRn/oG41k/T1uI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=RdjvVjG3GIin6HVpH0/MUgK1Z5vnWCtgo5zie1W5Sd+hyQ5PimcvwW5vN7JoixCHQ
-	 wbbsA6EUiakuhOD+ZFT9IlSRF24dUqRHYxHOQ2gNotP+hAxGTKF1NGVNqoFm+tLur/
-	 rRnCXiUcBzLMPeqXe+TDaVDsljSo+q5BBuFc7r/UZyGfu+0E5932a+MRF9b/XHL9ba
-	 PdssASIrSbDo//dye7rRvh693myIoAKtAkusy+aGg32eO4/gqLBZYP2xLQxYrtBT24
-	 HB6TlSMRQZbT8JMz9FWwcoDidqPWj33D/TjYdxeRPABhSWmf7mP7YBzOjuZnjBrNIr
-	 LZQdx8vc4TuoQ==
-Date: Tue, 15 Sep 2026 17:10:02 -0700
+	b=iOo+6B/Yvvx05OkVOSWtJrtXZBBctiElUpb+YdCas1bze8OsVyQZ6cXF3ODvv6xyU
+	 19Dmokvl6NZMSZO/0u9No8KATqKry+dWiIrGu8ClSBu7Jv8v9YZJydNnRzK1epCf+2
+	 uyDZBY9TEr3sbezw7f8OIaiF437g7W3s0bhLbrlCTNNng5pdkKdsPvF1IoXS5+ESSF
+	 R3zAWlDbzgZgdUtWwe7XtrSvgYjplCmgJRJiQbqMsCBYAgq+g1I6pinLUg5N8OLO2X
+	 9yE8I4xTnhcvnkpYUOhUHemT1p7MjLWorbUBBkc7YcafptTkdhqkUt4DduVfe+LL4K
+	 xY0MFIWY2cwkQ==
+Date: Tue, 15 Sep 2026 17:37:15 -0700
 From: Oliver Upton <oupton@kernel.org>
 To: Leonardo Bras <leo.bras@arm.com>
 Cc: Marc Zyngier <maz@kernel.org>, Fuad Tabba <fuad.tabba@linux.dev>,
@@ -40,11 +40,13 @@ Cc: Marc Zyngier <maz@kernel.org>, Fuad Tabba <fuad.tabba@linux.dev>,
 	Tian Zheng <zhengtian10@huawei.com>,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 5/5] KVM: arm64: Enable HAFDBS for guests not on
- migration
-Message-ID: <aqneWnlsdpocLIl6@kernel.org>
+Subject: Re: [RFC PATCH 1/5] KVM: arm64: pgtables: Change write bit from
+ S2AP_W to DBM
+Message-ID: <aqnku2TcFzIKhjQl@kernel.org>
 References: <20260901171558.2674031-1-leo.bras@arm.com>
- <20260901171558.2674031-6-leo.bras@arm.com>
+ <20260901171558.2674031-2-leo.bras@arm.com>
+ <86bja17cg7.wl-maz@kernel.org>
+ <aql8jY4o8SzjJuFU@LeoBrasDK>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -53,95 +55,77 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260901171558.2674031-6-leo.bras@arm.com>
+In-Reply-To: <aql8jY4o8SzjJuFU@LeoBrasDK>
 
-Hi,
-
-On Tue, Sep 01, 2026 at 06:15:56PM +0100, Leonardo Bras wrote:
-> When dirty-logging is disabled, even non-write faults make a page dirty,
-> which avoids a second fault when the page is actually written to.
+On Tue, Sep 15, 2026 at 06:12:45PM +0100, Leonardo Bras wrote:
+> > Yes, the HW should ignore it. But we have also
+> > seen quite a few broken designs in this area...
+> > 
 > 
-> On dirty-logging enable, this approach causes all (writable) pages on the
-> memslot to be marked clean, even if they were not written to, which can
-> take a lot of time, while holding the MMU lock, doing atomic writes to
-> PTEs.
-
-Do you have any performance numbers for this? Enabling HAFDBS seems a
-bit involved to avoid some stores on the first pass.
-
-> So, if the system supports VHE + HAFDBS, keep the non-write-faulted page as
-> writable-clean, and let HAFDBS update that on demand when a write happens.
+> I lack experience on what bad thing could happen. So I will expand on what 
+> I belive to understand up to here:
 > 
-> When dirty-tracking actually starts, disable HAFDBS as having it on
-> avoids the same fault that is used for dirty-logging.
+> - The PTE is in memory, so the DBM bit can be set regardless of being RES0
+> - For SW pagetable walking, I don't think 'bit 51 == 0' is checked
+> - For HW pagetable walking, maybe some faulty implementation may rely on 
+>   bit51 being RES0, and fault otherwise.
 > 
-> Signed-off-by: Leonardo Bras <leo.bras@arm.com>
-> ---
->  arch/arm64/include/asm/kvm_mmu.h    |  6 ++++++
->  arch/arm64/include/asm/kvm_nested.h |  9 +++++++--
->  arch/arm64/kvm/arm.c                |  7 +++++++
->  arch/arm64/kvm/mmu.c                | 26 +++++++++++++++++++++++++-
->  4 files changed, 45 insertions(+), 3 deletions(-)
+> If that's the case, then we would have to actually support both encodings, 
+> and only enable the new one if HAFDBS is available in the system. 
 > 
-> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-> index 6eae7e7e2a68..3defa1a988d3 100644
-> --- a/arch/arm64/include/asm/kvm_mmu.h
-> +++ b/arch/arm64/include/asm/kvm_mmu.h
-> @@ -383,20 +383,26 @@ static inline void kvm_fault_unlock(struct kvm *kvm)
->   * and CMOs are NOP'd. This has the effect of no longer requiring a
->   * KVA for addresses mapped into the S2. The presence of these features
->   * are thus necessary to support cacheable S2 mapping of VM_PFNMAP.
->   */
->  static inline bool kvm_supports_cacheable_pfnmap(void)
->  {
->  	return cpus_have_final_cap(ARM64_HAS_STAGE2_FWB) &&
->  	       cpus_have_final_cap(ARM64_HAS_CACHE_DIC);
->  }
->  
-> +static inline bool kvm_supports_hafdbs(struct kvm *kvm)
-> +{
-> +	return IS_ENABLED(CONFIG_ARM64_HW_AFDBM) &&
+> I just wonder how high are the chances to have such a broken design, 
+> or other broken designs did not come to my mind, and if we have to start 
+> with that multiple-encoding option.
 
-cpucap_is_possible() is the right place to park this.
+FWIW, the host stage-1 already uses the DBM bit unconditionally,
+treating it as a software bit on implementations without HAFDBS.
+Although given the quality of any garden variety Arm MMU I understand
+where Marc is coming from.
 
-> 						      has_vhe() &&
+I don't think the HAFDBS enablement is complicated enough to be done in
+a separate series without any meaningful users, nor would I really be
+interested in taking it without, say, HDBSS.
 
-I don't see a reason why this needs to be constrained to VHE-only.
+Can you please work with Tian to get a combined series out for this?
 
-> +		!kvm_vcpu_has_nv(kvm) && cpus_have_final_cap(ARM64_HW_DBM);
+> > > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> > > index 17123f0b6dab..eb8dfffc32c7 100644
+> > > --- a/arch/arm64/kvm/nested.c
+> > > +++ b/arch/arm64/kvm/nested.c
+> > > @@ -379,21 +379,23 @@ static int walk_nested_s2_pgd(struct kvm_vcpu *vcpu, phys_addr_t ipa,
+> > >  	}
+> > >  
+> > >  	addr_bottom += contiguous_bit_shift(desc, wi, level);
+> > >  
+> > >  	/* Calculate and return the result */
+> > >  	paddr = (desc & GENMASK_ULL(47, addr_bottom)) |
+> > >  		(ipa & GENMASK_ULL(addr_bottom - 1, 0));
+> > >  	out->output = paddr;
+> > >  	out->block_size = 1UL << ((3 - level) * stride + wi->pgshift);
+> > >  	out->readable = desc & KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R;
+> > > -	out->writable = desc & KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
+> > > +	/* Takes care of both RO/RW and RO/WC/WD encodings */
+> > > +	out->writable = desc & (KVM_PTE_LEAF_ATTR_HI_S2_DBM |
+> > > +				KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W);
+> > 
+> > Absolutely NOT. For a start, NV doesn't support FEAT_HAFDBS. But even
+> > if it did, you are now actively corrupting memory by turning a RO
+> > mapping with a spurious DBM bit set into a writable mapping.
+> > VTCR_EL2.HD exists for a reason.
+> > 
+> > Do you see why your blanket approach of equating DBM with writable is
+> > plain wrong?
+> 
+> Sorry, not really... please help me understand it.
+> 
+> When you say a spurious DBM bit, what does it mean?
 
-Same thing goes for nested... KVM can make use of HAFDBS in the
-canonical stage-2 MMU (or even a shadow stage-2) independent of the
-guest hypervisor.
+You've implemented the exact sort of bug that was alluded to above. In
+this case it's a software page table walker consuming DBM regardless of
+the value of VTCR_EL2.HD.
 
->  #ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
->  void kvm_s2_ptdump_create_debugfs(struct kvm *kvm);
->  void kvm_nested_s2_ptdump_create_debugfs(struct kvm_s2_mmu *mmu);
->  void kvm_nested_s2_ptdump_remove_debugfs(struct kvm_s2_mmu *mmu);
->  #else
->  static inline void kvm_s2_ptdump_create_debugfs(struct kvm *kvm) {}
->  static inline void kvm_nested_s2_ptdump_create_debugfs(struct kvm_s2_mmu *mmu) {}
->  static inline void kvm_nested_s2_ptdump_remove_debugfs(struct kvm_s2_mmu *mmu) {}
->  #endif /* CONFIG_PTDUMP_STAGE2_DEBUGFS */
->  
-> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-> index 1ed708335809..9242b5d665af 100644
-> --- a/arch/arm64/include/asm/kvm_nested.h
-> +++ b/arch/arm64/include/asm/kvm_nested.h
-> @@ -1,24 +1,29 @@
->  /* SPDX-License-Identifier: GPL-2.0 */
->  #ifndef __ARM64_KVM_NESTED_H
->  #define __ARM64_KVM_NESTED_H
->  
->  #include <linux/bitfield.h>
->  #include <linux/kvm_host.h>
->  #include <asm/kvm_emulate.h>
->  #include <asm/kvm_pgtable.h>
->  
-> -static inline bool vcpu_has_nv(const struct kvm_vcpu *vcpu)
-> +static inline bool kvm_vcpu_has_nv(const struct kvm *kvm)
-
-The name would suggest this thing takes a vcpu pointer...
+If the guest hypervisor sets VTCR_EL2.HD=0, the expectation is that the
+shadow stage-2 MMU treats the corresponding bit in the PTE as RES0.
 
 Thanks,
 Oliver
