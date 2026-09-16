@@ -1,214 +1,245 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B77B4C226B;
-	Wed, 16 Sep 2026 16:17:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA146530DEC;
+	Wed, 16 Sep 2026 16:27:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789575478; cv=none; b=pj0rNx3uMgHUNFePwXWbgs188h3pSgIV+HSXIHBytj/2hFRS0j+WO/6ppuZ25b7ydjAPoPepxNs+vQzB64QosxERM5SmIGqNXG0ih6kTq8CuVr3lG6DL1XfYTBcLphA68ebS2M8MYmbQohZUE3/rwPvWRK9NkjmX4bpxCNeqgXk=
+	t=1789576070; cv=none; b=r7Jy7gxpgfy4rV1//IlcfeWA9rZfeXcXcvarpXKfqE/lbD87uuMjzlBreEXR2BJA7j29b9141l8lqBztBi17VTMsX09ZtKsTByqLZJqyc0HAeCnc3JnrzoIPkWPW334AG/PLMjtf5c6KGAmvbS6wkflmlESQxgNDhAGlsiO3dmA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789575478; c=relaxed/simple;
-	bh=p3tHar0dLjbf4nNwS6ekOIUqzn63ULh+WZ3W0oLTGoo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uCD6DhCU9jDBWXIb5mmxYB4pQ9Ob0XA+4uv9UOWyFjFE0hdeRQktickcE+SuhFZ2T/uFMRk5gEY1YHkuKSd8IhSM7AB7IvvudhpciGybM6Mfx05F67+hY1zGIDW7H/BLfGXldeS3iJmeTBLAL6/Sme8fWfPFKn6eOECNxIIldYc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=cn6Vo8NC; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1789576070; c=relaxed/simple;
+	bh=vwki1WboN3tyzrW0mxsEgCsHlLPU27C8Wfgu6rAxjQI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rYvpGCpIujQ5llcpD56g7j7xxhSUUd/KzoqoMZq+DKFw9oDRnU9SNIGAx1MsNlpNE29Oq4bFQM1H0t1x3wN/UqwQJ5htuhe37hpqenNPtC+ZgIWCg6KJh815c/qFhtf5adnzh00xF3cR9+4aDA7ZHxsGnroNRbBaDBX1w9eZWI0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CsFUdgf2; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="cn6Vo8NC"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BCF451516;
-	Wed, 16 Sep 2026 09:17:51 -0700 (PDT)
-Received: from [10.57.8.14] (unknown [10.57.8.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 76BF43F7B4;
-	Wed, 16 Sep 2026 09:17:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1789575475; bh=p3tHar0dLjbf4nNwS6ekOIUqzn63ULh+WZ3W0oLTGoo=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=cn6Vo8NCPcegLEUNK1RPA8H5PEILXVRQTJQ0cZ22KykkzbVPmh3J4vOId9XA0Z+Rc
-	 kQVHuuBeJR4G+Z4A3QZ5PHT0nng89xsb+GtY1WCGoGnODFg4yXAbRUtfTx4ZRskudM
-	 CY59agMktmzbpubX7yNFseXn1IiE4HaasgegGCpc=
-Message-ID: <05239c7a-bdee-4d24-9375-c5b3497a4f78@arm.com>
-Date: Wed, 16 Sep 2026 17:17:51 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CsFUdgf2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDD801F00893;
+	Wed, 16 Sep 2026 16:27:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789576055;
+	bh=TgVu3p5uICF4iZHEkTZjZru9hK9LNYjA++8/1STw7BM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=CsFUdgf2e+8fqwHIGFPB05TrJAw6N24PTMQwuvf98ZFUXfOldmbE7I+bndH2NJ0ir
+	 xQSgcjYpCO0WuckExu+mc99X/rgJsInD0pkVhCFrt1Dli1jSgpxyEthmeXuPhs3tGu
+	 w7XM3udF/tHFEKMpz7JWQPHsFhZWgxH+s0sFOg4B1hExOYkK4ebaOkE0t3FSNwQcOC
+	 J/ICjs6Qlpr+qBlSiRtToQW+rEAZ0CLzSqh9LOipn0qkU5iNjp5E4PY1xR005F4iwF
+	 hk+zLoWuYDf0oFJKNbtDq7ddEj/oZXrumHzQUcV0s4586NTRp1TaGiMiKMi0Pf4JBl
+	 0M70QJWA/6xmA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1x6sTs-00000009iFg-1p6Q;
+	Wed, 16 Sep 2026 16:27:32 +0000
+Date: Wed, 16 Sep 2026 17:27:04 +0100
+Message-ID: <86bj9x5fhj.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: oupton@kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	joey.gouly@arm.com,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	mark.rutland@arm.com,
+	steven.price@arm.com,
+	vdonnefort@google.com,
+	qperret@google.com,
+	tabba@google.com
+Subject: Re: [PATCH v3 14/18] KVM: arm64: Add per-EC entry/exit state marshalling for protected guests
+In-Reply-To: <20260914113338.159227-15-fuad.tabba@linux.dev>
+References: <20260914113338.159227-1-fuad.tabba@linux.dev>
+	<20260914113338.159227-15-fuad.tabba@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 9/9] arm64: realm: Expose the CCA shared granule size
- through mem_encrypt ops
-Content-Language: en-GB
-To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
- linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- iommu@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Jason Gunthorpe
- <jgg@ziepe.ca>, Marc Zyngier <maz@kernel.org>,
- Marek Szyprowski <m.szyprowski@samsung.com>,
- Robin Murphy <robin.murphy@arm.com>, Steven Price <steven.price@arm.com>,
- Thomas Gleixner <tglx@kernel.org>, Will Deacon <will@kernel.org>
-References: <20260904103452.1197239-1-aneesh.kumar@kernel.org>
- <20260904103452.1197239-10-aneesh.kumar@kernel.org>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20260904103452.1197239-10-aneesh.kumar@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, steven.price@arm.com, vdonnefort@google.com, qperret@google.com, tabba@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 04/09/2026 11:34, Aneesh Kumar K.V (Arm) wrote:
-> CCA guests must align shared/private memory transitions to the size
-> reported by the host for IPA state changes. This size can be larger than
-> PAGE_SIZE, so allowing a guest to convert only a PAGE_SIZE-sized subrange
-> can leave the remaining part of that host-sized range in the wrong state.
+On Mon, 14 Sep 2026 12:33:34 +0100,
+Fuad Tabba <fuad.tabba@linux.dev> wrote:
 > 
-> Cache the RHI-reported IPA sate change alignment during Realm
-> initialization and expose it through a new arm64 mem_encrypt callback. Use
-> PAGE_SIZE as the default shared granule size when no backend callback is
-> registered.
+> Move a protected guest's state between the hyp vCPU and the host per
+> exception class instead of copying the whole context. Add
+> entry_hyp_pvm_handlers[] and exit_hyp_pvm_handlers[] for WFx, SYS64,
+> IABT, DABT and HVC64, and route protected guests through them: on exit
+> each handler copies out only what its class needs, and on re-entry
+> only what the host may have changed: the PC update or exception it
+> requested (PC_UPDATE_REQ), the value of a read it emulated, and a
+> forwarded PSCI call's return value. entry_hyp_vm_handlers[] is
+> removed: a non-protected vCPU's iflags are copied wholesale.
 > 
-> Validate both the address and byte size passed to set_memory_encrypted()
-> and set_memory_decrypted() against mem_cc_shared_granule_size() before
-> calling into the backend. This prevents callers from converting only part
-> of a host-managed page.
+> The host's fault view is EL2's own syndrome with the guest register
+> index withheld, the deferred SError syndrome (DISR_EL1), and the
+> addresses each class needs. The value of a written register is passed
+> in r0. MMIO data is clamped to the access width and, for a load,
+> sign-extended at EL2 from EL2's syndrome. Endianness stays with the
+> host. A data abort's PC update is taken for a completed MMIO access,
+> and for a cache maintenance operation the host skips on unbacked
+> memory, as it does for any guest.
 > 
-> Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
-
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-
-
+> The host's copy of a protected vCPU's PSTATE is a view the guest never
+> runs from: its reset value has PSTATE.A set, and EL2 sets PSTATE.A in
+> the mode it copies out regardless of the guest's, so, unless the VMM
+> wrote the host copy's PSTATE or SCTLR2_EL1 before the first run,
+> serror_is_masked() is true and kvm_inject_serror_esr() pends a
+> host-injected SError through HCR_EL2.VSE, masked by the guest's own
+> PSTATE.A, instead of emulating the entry on that copy.
+> 
+> Neither dispatch runs for a trap taken with an SError pending: EL2
+> doesn't handle it, and the guest replays it once the host has
+> injected the SError. The exit handlers would otherwise marshal a trap
+> EL2 never handled, and handle_pvm_exit_hvc64() would panic on an
+> unfiltered function id.
+> 
+> For HVC64, only the PSCI calls EL2 forwards reach the host: the exit
+> handler passes the function id and the arguments each call needs, and
+> the entry handler returns the host's result. A CPU_ON the host failed
+> is rolled back to OFF and returned as INTERNAL_FAILURE, or as
+> ALREADY_ON when that's what the host returned: PSCI defines it as the
+> retry signal for a CPU_ON that reaches the implementation before the
+> target's CPU_OFF has been processed (DEN0022 section 6.6), which a
+> guest that doesn't poll AFFINITY_INFO first can do. A target that
+> already ran returns SUCCESS. The rollback leaves the published reset
+> state in place: clearing it races a fresh CPU_ON's publication and
+> wedges the target at ON_PENDING, and the entry point left behind is one
+> the guest supplied. The rollback's cmpxchg carries no generation, so
+> one that lands after a later CPU_ON has republished ON_PENDING cancels
+> that cycle too. The target is then OFF at EL2 while the host has it
+> runnable, and its CPU_ONs return ALREADY_ON until the VMM stops it
+> again.
+> 
+> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 > ---
->   arch/arm64/include/asm/mem_encrypt.h |  4 ++++
->   arch/arm64/mm/mem_encrypt.c          | 32 ++++++++++++++++++++++++----
->   drivers/firmware/arm_rmm/rsi.c       | 13 ++++++++++-
->   3 files changed, 44 insertions(+), 5 deletions(-)
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 430 +++++++++++++++++++++++++++--
+>  1 file changed, 407 insertions(+), 23 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/mem_encrypt.h b/arch/arm64/include/asm/mem_encrypt.h
-> index ef8b8463e52b..890faeed0eb3 100644
-> --- a/arch/arm64/include/asm/mem_encrypt.h
-> +++ b/arch/arm64/include/asm/mem_encrypt.h
-> @@ -10,6 +10,7 @@ struct device;
->   struct arm64_mem_crypt_ops {
->   	int (*encrypt)(unsigned long addr, int numpages);
->   	int (*decrypt)(unsigned long addr, int numpages);
-> +	size_t (*cc_shared_granule_size)(void);
->   };
->   
->   int arm64_mem_crypt_ops_register(const struct arm64_mem_crypt_ops *ops);
-> @@ -18,6 +19,9 @@ int set_memory_encrypted(unsigned long addr, int numpages);
->   int set_memory_decrypted(unsigned long addr, int numpages);
->   int __set_memory_enc_dec(unsigned long addr, int numpages, bool encrypt);
->   
-> +#define mem_cc_shared_granule_size mem_cc_shared_granule_size
-> +size_t mem_cc_shared_granule_size(void);
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> index 1dcc75261dc08..3d59c4827c42a 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> @@ -4,6 +4,8 @@
+>   * Author: Andrew Scull <ascull@google.com>
+>   */
+>  
+> +#include <kvm/arm_hypercalls.h>
 > +
->   static inline bool force_dma_unencrypted(struct device *dev)
->   {
->   	return is_realm_world() || is_protected_kvm_guest();
-> diff --git a/arch/arm64/mm/mem_encrypt.c b/arch/arm64/mm/mem_encrypt.c
-> index ee3c0ab04384..69783c6a3c08 100644
-> --- a/arch/arm64/mm/mem_encrypt.c
-> +++ b/arch/arm64/mm/mem_encrypt.c
-> @@ -17,8 +17,7 @@
->   #include <linux/compiler.h>
->   #include <linux/err.h>
->   #include <linux/mm.h>
-> -
-> -#include <asm/mem_encrypt.h>
-> +#include <linux/mem_encrypt.h>
->   
->   static const struct arm64_mem_crypt_ops *crypt_ops;
->   
-> @@ -33,18 +32,43 @@ int arm64_mem_crypt_ops_register(const struct arm64_mem_crypt_ops *ops)
->   
->   int set_memory_encrypted(unsigned long addr, int numpages)
->   {
-> -	if (likely(!crypt_ops) || WARN_ON(!PAGE_ALIGNED(addr)))
-> +	unsigned long size = (unsigned long)numpages << PAGE_SHIFT;
-> +
-> +	if (likely(!crypt_ops))
->   		return 0;
->   
-> +	if (WARN_ON(!IS_ALIGNED(addr, mem_cc_shared_granule_size())))
-> +		return -EINVAL;
-> +
-> +	if (WARN_ON(!IS_ALIGNED(size, mem_cc_shared_granule_size())))
-> +		return -EINVAL;
-> +
->   	return crypt_ops->encrypt(addr, numpages);
->   }
->   EXPORT_SYMBOL_GPL(set_memory_encrypted);
->   
->   int set_memory_decrypted(unsigned long addr, int numpages)
->   {
-> -	if (likely(!crypt_ops) || WARN_ON(!PAGE_ALIGNED(addr)))
-> +	unsigned long size = (unsigned long)numpages << PAGE_SHIFT;
-> +
-> +	if (likely(!crypt_ops))
->   		return 0;
->   
-> +	if (WARN_ON(!IS_ALIGNED(addr, mem_cc_shared_granule_size())))
-> +		return -EINVAL;
-> +
-> +	if (WARN_ON(!IS_ALIGNED(size, mem_cc_shared_granule_size())))
-> +		return -EINVAL;
-> +
->   	return crypt_ops->decrypt(addr, numpages);
->   }
->   EXPORT_SYMBOL_GPL(set_memory_decrypted);
-> +
-> +size_t mem_cc_shared_granule_size(void)
+>  #include <hyp/adjust_pc.h>
+>  #include <hyp/switch.h>
+>  
+> @@ -34,13 +36,366 @@ void __kvm_hyp_host_forward_smc(struct kvm_cpu_context *host_ctxt);
+>  
+>  typedef void (*hyp_entry_exit_handler_fn)(struct pkvm_hyp_vcpu *);
+>  
+> -static void handle_vm_entry_generic(struct pkvm_hyp_vcpu *hyp_vcpu)
+> +static bool pvm_sys64_is_write(u64 esr)
+>  {
+> -	vcpu_copy_flag(&hyp_vcpu->vcpu, hyp_vcpu->host_vcpu, PC_UPDATE_REQ);
+> +	return (esr & ESR_ELx_SYS64_ISS_DIR_MASK) == ESR_ELx_SYS64_ISS_DIR_WRITE;
+>  }
+>  
+> -static const hyp_entry_exit_handler_fn entry_hyp_vm_handlers[] = {
+> -	[0 ... ESR_ELx_EC_MAX]		= handle_vm_entry_generic,
+> +static void handle_pvm_entry_wfx(struct pkvm_hyp_vcpu *hyp_vcpu)
 > +{
-> +	if (likely(!crypt_ops) || !crypt_ops->cc_shared_granule_size)
-> +		return PAGE_SIZE;
+> +	struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
 > +
-> +	return crypt_ops->cc_shared_granule_size();
-> +}
-> +EXPORT_SYMBOL_GPL(mem_cc_shared_granule_size);
-> diff --git a/drivers/firmware/arm_rmm/rsi.c b/drivers/firmware/arm_rmm/rsi.c
-> index 2cd53f82432f..eeb797c6c2c7 100644
-> --- a/drivers/firmware/arm_rmm/rsi.c
-> +++ b/drivers/firmware/arm_rmm/rsi.c
-> @@ -19,6 +19,7 @@
->   
->   static struct realm_config config;
->   static struct kobject *cca_kobj;
-> +static unsigned long ipa_state_change_granule_size;
->   
->   unsigned long prot_ns_shared;
->   EXPORT_SYMBOL(prot_ns_shared);
-> @@ -155,9 +156,17 @@ static int realm_set_memory_decrypted(unsigned long addr, int numpages)
->   	return ret;
->   }
->   
-> +static size_t realm_cc_shared_granule_size(void)
-> +{
-> +	if (is_realm_world())
-> +		return ipa_state_change_granule_size;
-> +	return PAGE_SIZE;
+> +	/* Exceptions have priority; the host injects none on WFx. */
+> +	if (vcpu_get_flag(host_vcpu, PENDING_EXCEPTION))
+> +		return;
+> +
+> +	if (vcpu_get_flag(host_vcpu, INCREMENT_PC)) {
+> +		vcpu_clear_flag(&hyp_vcpu->vcpu, PC_UPDATE_REQ);
+> +		kvm_incr_pc(&hyp_vcpu->vcpu);
+> +	}
 > +}
 > +
->   static const struct arm64_mem_crypt_ops realm_crypt_ops = {
->   	.encrypt = realm_set_memory_encrypted,
->   	.decrypt = realm_set_memory_decrypted,
-> +	.cc_shared_granule_size = realm_cc_shared_granule_size,
->   };
->   
->   static int realm_register_memory_enc_ops(void)
-> @@ -167,7 +176,7 @@ static int realm_register_memory_enc_ops(void)
->   
->   /* we need an aligned struct for rsi_host_call. slab is not yet ready */
->   static struct rsi_host_call hostconf_call __initdata;
-> -static unsigned long __maybe_unused __init get_ipa_state_change_alignment(void)
-> +static unsigned long __init get_ipa_state_change_alignment(void)
->   {
->   	long ret;
->   	unsigned long shared_granule_size;
-> @@ -218,6 +227,8 @@ void __init arm64_rsi_init(void)
->   		return;
->   	if (WARN_ON(rsi_get_realm_config(lm_alias(&config))))
->   		return;
+> +static void handle_pvm_entry_sys64(struct pkvm_hyp_vcpu *hyp_vcpu)
+> +{
+> +	struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
+> +	bool pc_update;
 > +
-> +	ipa_state_change_granule_size = get_ipa_state_change_alignment();
->   	prot_ns_shared = __phys_to_pte_val(BIT(config.ipa_bits - 1));
->   
->   	if (arm64_ioremap_prot_hook_register(realm_ioremap_hook))
+> +	/* Exceptions have priority over anything else */
+> +	if (vcpu_get_flag(host_vcpu, PENDING_EXCEPTION)) {
+> +		/* A host-requested exception on SYS64 is always an UNDEF. */
+> +		u32 esr = (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT) | ESR_ELx_IL;
+> +
+> +		__vcpu_assign_sys_reg(&hyp_vcpu->vcpu, ESR_EL1, esr);
+> +		kvm_pend_exception(&hyp_vcpu->vcpu, EXCEPT_AA64_EL1_SYNC);
+> +		return;
+> +	}
+> +
+> +	/* Handle PC increment on a host-emulated access */
+> +	pc_update = vcpu_get_flag(host_vcpu, INCREMENT_PC);
+> +	if (pc_update) {
+> +		vcpu_clear_flag(&hyp_vcpu->vcpu, PC_UPDATE_REQ);
+> +		kvm_incr_pc(&hyp_vcpu->vcpu);
+> +	}
+> +
+> +	/* If the host emulated a read access, update the register */
+> +	if (pc_update &&
+> +	    !pvm_sys64_is_write(hyp_vcpu->vcpu.arch.fault.esr_el2)) {
+> +		/* r0 as transfer register between the guest and the host. */
+> +		u64 rt_val = READ_ONCE(host_vcpu->arch.ctxt.regs.regs[0]);
 
+Why isn't this
+
+		rt_val = READ_ONCE(vcpu_gp_regs(host_vcpu)->regs[0]);
+
+and similarly everywhere else?
+
+[...]
+
+> +static void handle_pvm_exit_sys64(struct pkvm_hyp_vcpu *hyp_vcpu)
+> +{
+> +	struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
+> +	u32 esr_el2 = hyp_vcpu->vcpu.arch.fault.esr_el2;
+> +
+> +	/* The mode is required for the host to emulate some sysregs */
+> +	host_vcpu->arch.ctxt.regs.pstate =
+> +		pvm_host_pstate(hyp_vcpu->vcpu.arch.ctxt.regs.pstate);
+> +
+> +	/* r0 as transfer register between the guest and the host. */
+> +	if (pvm_sys64_is_write(esr_el2)) {
+> +		int rt = kvm_vcpu_sys_get_rt(&hyp_vcpu->vcpu);
+> +		u64 rt_val = vcpu_get_reg(&hyp_vcpu->vcpu, rt);
+> +
+> +		host_vcpu->arch.ctxt.regs.regs[0] = rt_val;
+
+and this should be
+
+		vcpu_set_reg(host_vcpu, 0, rt_val);
+
+assuming you don't need a WRITE_ONCE() to match the READ_ONCE() in the
+other direction.
+
+> +	}
+> +}
+> +
+> +static void handle_pvm_exit_iabt(struct pkvm_hyp_vcpu *hyp_vcpu)
+> +{
+> +	hyp_vcpu->host_vcpu->arch.fault.hpfar_el2 =
+> +		hyp_vcpu->vcpu.arch.fault.hpfar_el2;
+
+Please keep assignments on a single line (everywhere).
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
