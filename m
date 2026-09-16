@@ -1,233 +1,189 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FFF034BA42
-	for <kvmarm@lists.linux.dev>; Wed, 16 Sep 2026 14:49:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6281B377EC3
+	for <kvmarm@lists.linux.dev>; Wed, 16 Sep 2026 15:00:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789570198; cv=none; b=OxecWedLrIS8dUivCoPbhPm7O32dCHDso/HuioXAZc57myKkFKDlpc2LWwUQtUQj+2klPFIX41EVhTyEH0NKJpRudOiifx/dfmIwtveAy9jL3jLqhwtJQZFzdIjmQ3wO+9ERDzFWxbivHnUY/fNtSfFBXJZOyTdJ6DthxfU8b+Q=
+	t=1789570829; cv=none; b=fuQjCZo10dYy2aG7bcjosKEwJkgzFzq9E716LdqICcEHquw63YI9TY8XYRKuEYHxRG/Csw2UJ81rJN4t07ICk4ONW811YPvjeLg7MPX7KerIRgnpSoArKbsPmJkV4indMNCp76iL2hpCLS35vjgte2si1R3Iz3yOSvu3Z7ODGOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789570198; c=relaxed/simple;
-	bh=K7TsinJBeFRDz79yuKIVbPkbAgAcXq01EUz2GHsso7E=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:content-type; b=R9d0+BPLazHC/b36Egi9ApJslyyRbqMPF9zQxKuz23OTKBhhX8APF6EfRbWv1/DnbrebMexKs7bTv3Kh1UEQ09ARSbW3AxM4E3/Lm9yK5WXal+h0Wc9AuFXVPL8wapD7WgsAD1WYY/xrWcw0QL9KS9ypK6xjsIb38gfNaSnc5lE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GVWw6bem; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1789570829; c=relaxed/simple;
+	bh=4mYZuYY/4TWRRwSCtvsKG9o4ifIS9Tyl9n2rO1QSNAM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jZonO4oWMMleuwcARjdpknsYwGx+AqrCNb/S3MO2Po4XHB8EN6lpqaVFQ7KnETtlOulXNKCHYTqLQ5lzMQJnsmmTxXLOCgdjQMLH/e8Fj4AK1fX9eo4C0CsUihR760YxrZUctstoHHXs8rXNzCkmuOaIJracUyJ0SOtgwPhApO4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=DSW5uGXc; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GVWw6bem"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1789570196;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=21aU7UhXnHgR/6w5hwgjYgtJnBBg+5g7CRArB90PO+E=;
-	b=GVWw6bem7HKyzrTuWcHk5g03Z13B7xHO00J1mg2fju1KGW85xHXvVD4b0pxFLK3RODUfkj
-	i9nYY5FU7JRz5g4DmFSilmzACzrC4Cxf/DLvn5vFI3E7pXVAeXZCIrddTmY8wANFNA/Po7
-	7XuEqhUf4zpBHhl3pWOzLGkaC7P5ZgY=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-711-E1qQf1r2OxKltG9UghULZw-1; Wed,
- 16 Sep 2026 10:49:50 -0400
-X-MC-Unique: E1qQf1r2OxKltG9UghULZw-1
-X-Mimecast-MFC-AGG-ID: E1qQf1r2OxKltG9UghULZw_1789570188
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C6B3F185589F;
-	Wed, 16 Sep 2026 14:49:48 +0000 (UTC)
-Received: from laptop.redhat.corp (headnet04.pony-001.prod.iad2.dc.redhat.com [10.2.32.116])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id ACF9919560AB;
-	Wed, 16 Sep 2026 14:49:43 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com,
-	eric.auger@redhat.com,
-	qemu-devel@nongnu.org,
-	qemu-arm@nongnu.org,
-	kvmarm@lists.linux.dev,
-	peter.maydell@linaro.org,
-	shaju.abraham@nutanix.com,
-	khushit.shah@nutanix.com,
-	yangjinqian1@huawei.com,
-	cohuck@redhat.com,
-	richard.henderson@linaro.org,
-	sebott@redhat.com,
-	skolothumtho@nvidia.com,
-	philmd@oss.qualcomm.com
-Cc: maz@kernel.org,
-	oliver.upton@linux.dev,
-	pbonzini@redhat.com,
-	armbru@redhat.com,
-	berrange@redhat.com,
-	abologna@redhat.com,
-	jdenemar@redhat.com
-Subject: [PATCH v9 26/26] arm/cpu-features: document ID reg properties
-Date: Wed, 16 Sep 2026 16:45:49 +0200
-Message-ID: <20260916144721.751810-27-eric.auger@redhat.com>
-In-Reply-To: <20260916144721.751810-1-eric.auger@redhat.com>
-References: <20260916144721.751810-1-eric.auger@redhat.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="DSW5uGXc"
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68GEVxdJ3863290;
+	Wed, 16 Sep 2026 15:00:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=j9wYFqkMO68SYOCGbriFllUPMhixN2
+	gtllHySmb7w5g=; b=DSW5uGXcNBEav274LLwLVkQJJXunKRGXxm0hv6idwZZISp
+	jNx9tZ9aNgkx+oEM1BlRNdtXGx3Cc4ARJgmyUfNis7HfO07p6U0UKavc97fP4TvX
+	oUcKb36q2dUDMm8TJVws4WFM9cJ9al6mM7s9nLrvqdsO0eaFsWJLrcrt2t5Rxnmy
+	3t8fBs6c4Tiv/7v2y0dlBG0Fu4Dc2oqUQMAMGah5/jUTvPz8CLIwIe4myfy2ySV9
+	W/BBCPM2X/1Dd12JPrdXNmuwK4osTJfDO8sj2iYqVv41qJ9SUTMTBST9uZvh18Az
+	oRfEATaVPd6dFEd0FsIWB4YjaGjhMJuMTNVnbaCw==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gmv5hw4vu-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Wed, 16 Sep 2026 15:00:08 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 68GEaDkJ1571790;
+	Wed, 16 Sep 2026 15:00:08 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4gq03bxty3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 16 Sep 2026 15:00:07 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 68GF03fh49873402
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 16 Sep 2026 15:00:03 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3DA662004B;
+	Wed, 16 Sep 2026 15:00:03 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5059C20040;
+	Wed, 16 Sep 2026 15:00:02 +0000 (GMT)
+Received: from osiris (unknown [9.111.20.35])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Wed, 16 Sep 2026 15:00:02 +0000 (GMT)
+Date: Wed, 16 Sep 2026 17:00:01 +0200
+From: Steffen Eiden <seiden@linux.ibm.com>
+To: Janosch Frank <frankja@linux.ibm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, Alexander Gordeev <agordeev@linux.ibm.com>,
+        Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@kernel.org>,
+        Friedrich Welter <fritz@linux.ibm.com>, Fuad Tabba <tabba@google.com>,
+        Gautam Gala <ggala@linux.ibm.com>,
+        Hariharan Mari <hari55@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Hendrik Brueckner <brueckner@linux.ibm.com>,
+        Ilya Leoshkevich <iii@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
+        Marc Zyngier <maz@kernel.org>, Nico Boehr <nrb@linux.ibm.com>,
+        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
+        Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v7 21/23] KVM: s390: arm64: Implement vCPU IOCTLs
+Message-ID: <20260916150001.202565-D-seiden@linux.ibm.com>
+References: <20260831144802.834315-1-seiden@linux.ibm.com>
+ <20260831144802.834315-22-seiden@linux.ibm.com>
+ <d706435a-3984-4ef3-b319-1efc92517650@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
-X-Mimecast-MFC-PROC-ID: zeMWK9_VoOQONFWkcWuWIb6GsA3U6oUB7gLB8zG7-IM_1789570188
-X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-content-type: text/plain; charset="US-ASCII"; x-default=true
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d706435a-3984-4ef3-b319-1efc92517650@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTE2MDE5NiBTYWx0ZWRfXxeAY1ElL61t/
+ DSYaS/30ktfKLmCi1Je1B8oA5SSK0YMYFdINg32ZZXjlxEc9UVimA+x4ax64svDgzOof3EE+8Cq
+ Vl8VAQsLH6OyJehRfezU1Slb3TVCSuZRAL9WWS3smLcYBp41FSMALFI1GRXyRzvYpwhzchIjlIb
+ CkraEYnR4xehufNRYTAt45GmKn5YprnOrEXn+lXaPv8GrkVyfwHxDdUH/jkyYa+BwuOXTH5DASu
+ kDegQycer+tXRRKiwObfFg6xsGp1+6tFw5IjK0QCpvpWHQ01ArLIpW1V7WjxcWuRkSv3LPrY4WX
+ WTvUpoy2w1zB1MT+a+DaUVsEOXz87JpHkY8arJG1M5FfIGhZmq5O7Kpopd6aVb6eogrOYMABlIe
+ vitrrgpi7QOp3DeMtsyo4XAdnUcOb3Oh/j+6VjF+J1g12DjFVEw5gMZ+jmN4OVH6vugtF3ro7tt
+ US9PSysZIEbXkVY+LSw==
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTE2MDE5NiBTYWx0ZWRfXxG44vfSHFzXS
+ 7DdX+PaMTaaPE/YyCzXnSUPL9HrecC741FwX1UnjFTWpWFPm3oI14f3lIBWA7I+3UY306cDUbZK
+ R4kIROXqO89uOkaiabda0mrXWcATLjE=
+X-Authority-Analysis: v=2.4 cv=Zsx4uN7G c=1 sm=1 tr=0 ts=6aaaaef9 cx=c_pps
+ a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
+ a=kj9zAlcOel0A:10 a=VdqzKS8jKosA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=Y2IxJ9c9Rs8Kov3niI8_:22 a=VnNF1IyMAAAA:8
+ a=2EDVkJ_xZdsl-fsxt_cA:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-ORIG-GUID: CcjZPhrNXuk_fD7ZBanhcQxmk7O2fTAK
+X-Proofpoint-GUID: pSdKo_eOc1M7lhhBdE68zGvs-QjHxbP6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-09-16_02,2026-09-16_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 impostorscore=0 clxscore=1015 priorityscore=1501
+ lowpriorityscore=0 bulkscore=0 adultscore=0 phishscore=0 spamscore=0
+ suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2609040000
+ definitions=main-2609160196
 
-From: Cornelia Huck <cohuck@redhat.com>
+On Thu, Sep 03, 2026 at 03:27:16PM +0200, Janosch Frank wrote:
+> On 8/31/26 4:47 PM, Steffen Eiden wrote:
+> > Implement all required vCPU (arch) IOCTLs.
+> > 
+> > Co-developed-by: Andreas Grapentin <gra@linux.ibm.com>
+> > Signed-off-by: Andreas Grapentin <gra@linux.ibm.com>
+> > Co-developed-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+> > Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+> > Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
+> > ---
+> 
+> [...]
+> 
+> > +static void arm_vcpu_run(struct kvm_vcpu *vcpu)
+> > +{
+> > +	struct kvm_sae_block *sae_block = &vcpu->arch.sae_block;
+> > +
+> > +	adjust_pc(vcpu);
+> > +
+> > +	local_irq_disable();
+> > +	guest_timing_enter_irqoff();
+> > +	guest_state_enter_irqoff();
+> > +	local_irq_enable();
+> > +
+> > +	sae_block->icptr = 0;
+> 
+> We already do that in the function below, no?
+> If possible I'd like to avoid setting ictpr here.
+>
 
-Add some documentation for how individual ID registers can be
-configured with the host cpu model.
+yes, removed it at this location. thanks.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
----
- docs/system/arm/cpu-features.rst | 100 ++++++++++++++++++++++++++++---
- 1 file changed, 92 insertions(+), 8 deletions(-)
 
-diff --git a/docs/system/arm/cpu-features.rst b/docs/system/arm/cpu-features.rst
-index 10b0eff27e..e298e3f503 100644
---- a/docs/system/arm/cpu-features.rst
-+++ b/docs/system/arm/cpu-features.rst
-@@ -2,7 +2,10 @@ Arm CPU Features
- ================
- 
- CPU features are optional features that a CPU of supporting type may
--choose to implement or not.  In QEMU, optional CPU features have
-+choose to implement or not.  QEMU provides two different mechanisms
-+to configure those features:
-+
-+1. For most CPU models, optional CPU features may have
- corresponding boolean CPU proprieties that, when enabled, indicate
- that the feature is implemented, and, conversely, when disabled,
- indicate that it is not implemented. An example of an Arm CPU feature
-@@ -31,6 +34,31 @@ running guests in AArch32.
- CPU features that are inherently specific to KVM are
- prefixed with "kvm-" and are described in "KVM VCPU Features".
- 
-+2. Additionally, the ``host`` CPU model on KVM allows to overwrite
-+a subset of the ID register fields. Not all ID register fields are
-+writable: this depends on host. For those which are writable, and for
-+those only, the host model exposes SYSREG_<IDREG>_<FIELD> properties.
-+IDREG and FIELD names are those used in the ARM Architecture Reference
-+Manual.
-+
-+Values set with those properties override the initial values retrieved
-+from the vcpu after legacy composite property settings (sve, pauth, ...)
-+have applied, would it be at machine level of vcpu level.
-+
-+SYSREG_<IDREG>_<FIELD> properties are applied at the end of the chain
-+and do not substitute to legacy composite options. In other words, if
-+you want to use pauth, you still need to set pauth=on. Indeed legacy
-+options do more than exposing a different value for ID registers. They
-+may also interact with KVM to prepare the VCPU for this feature (for
-+instance at VCPU init time). Whereas SYSREG_<IDREG>_<FIELD> properties
-+only change the final value of the ID register. Inconsistent settings
-+between legacy composite options (at machine level of cpu level) which
-+impact vcpu and low level SYSREG_<IDREG>_<FIELD> are forbidden and are
-+rejected at best. SYSREG_<IDREG>_<FIELD> properties are essentially used
-+to tune the host vcpu model so that it allows migration between different
-+hardware.
-+
-+
- CPU Feature Probing
- ===================
- 
-@@ -126,13 +154,20 @@ A note about CPU models and KVM
- 
- Named CPU models generally do not work with KVM.  There are a few cases
- that do work, e.g. using the named CPU model ``cortex-a57`` with KVM on a
--seattle host, but mostly if KVM is enabled the ``host`` CPU type must be
--used.  This means the guest is provided all the same CPU features as the
--host CPU type has.  And, for this reason, the ``host`` CPU type should
--enable all CPU features that the host has by default.  Indeed it's even
--a bit strange to allow disabling CPU features that the host has when using
--the ``host`` CPU type, but in the absence of CPU models it's the best we can
--do if we want to launch guests without all the host's CPU features enabled.
-+seattle host, but mostly if KVM is enabled, the ``host`` CPU model must be
-+used.
-+
-+Using the ``host`` type means the guest is provided all the same CPU
-+features as the host CPU type has.  And, for this reason, the ``host``
-+CPU type should enable all CPU features that the host has by default.
-+
-+In case some features need to be hidden from the guest, and the host kernel
-+supports it, the ``host`` model can be instructed to disable individual
-+ID register values. This is especially useful for migration purposes.
-+However, this interface will not allow configuring an arbitrary set of
-+features; the ID registers must describe a subset of the host's features,
-+and all differences to the host's configuration must actually be supported
-+by the kernel to be deconfigured.
- 
- Enabling KVM also affects the ``query-cpu-model-expansion`` QMP command.  The
- affect is not only limited to specific features, as pointed out in example
-@@ -169,6 +204,13 @@ disabling many SVE vector lengths would be quite verbose, the ``sve<N>`` CPU
- properties have special semantics (see "SVE CPU Property Parsing
- Semantics").
- 
-+Additionally, if supported by KVM on the host kernel, the ``host`` CPU model
-+may be configured via individual ID register field properties, for example::
-+
-+  $ qemu-system-aarch64 -M virt -cpu host,SYSREG_ID_AA64ISAR0_EL1_DP=0x0
-+
-+This forces ID_AA64ISAR0_EL1 DP field to 0.
-+
- KVM VCPU Features
- =================
- 
-@@ -495,3 +537,45 @@ Legal values for ``S`` are 30, 34, 36, and 39; the default is 30.
- 
- As with ``x-rme``, the ``x-l0gptsz`` property may be renamed or
- removed in some future QEMU release.
-+
-+Configuring CPU features via ID register fields
-+===============================================
-+
-+Note that this is currently only supported under KVM, and with the
-+``host`` CPU model.
-+
-+Querying available ID register fields
-+-------------------------------------
-+
-+QEMU will create properties for all ID register fields that are
-+reported as being writable by the kernel, and that are known to the
-+QEMU instance. Therefore, the same QEMU binary may expose different
-+properties when run under a different kernel.
-+
-+To find out all available writable ID register fields, use the
-+``query-cpu-model-expansion`` QMP command::
-+
-+  (QEMU) query-cpu-model-expansion type=full model={"name":"host"}
-+  {"return": {
-+   "model": {"name": "host", "props": {
-+   "SYSREG_ID_AA64PFR0_EL1_EL3": 1, "SYSREG_ID_AA64ISAR2_EL1_CLRBHB": 0,
-+   "SYSREG_CTR_EL0_L1Ip": 3, "SYSREG_CTR_EL0_DminLine": 4,
-+   "SYSREG_ID_AA64MMFR0_EL1_BIGEND": 1, "SYSREG_ID_AA64MMFR1_EL1_ECBHB": 0,
-+   "SYSREG_ID_AA64MMFR2_EL1_CnP": 1, "SYSREG_ID_DFR0_EL1_PerfMon": 4,
-+   "SYSREG_ID_AA64PFR0_EL1_DIT": 0, "SYSREG_ID_AA64MMFR1_EL1_HAFDBS": 2,
-+   "SYSREG_ID_AA64ISAR0_EL1_FHM": 0, "SYSREG_ID_AA64ISAR2_EL1_CSSC": 0,
-+   "SYSREG_ID_AA64ISAR0_EL1_DP": 1, (...)
-+   }}}}
-+
-+If a certain field in an ID register does not show up in this list, it
-+is not writable with the specific host kernel.
-+
-+A note on compatibility
-+-----------------------
-+
-+A common use case for providing a defined set of ID register values is
-+to be able to present a fixed set of features to a guest, often referred
-+to as "stable guest ABI". This may take the form of ironing out differences
-+between two similar CPUs with the intention of being able to migrate
-+between machines with those CPUs, or providing the same CPU across Linux
-+kernel updates on the host.
--- 
-2.53.0
+...
 
+> > +		kvm_vcpu_srcu_read_unlock(vcpu);
+> > +
+> > +		arm_vcpu_run(vcpu);
+> > +
+> > +		vcpu->mode = OUTSIDE_GUEST_MODE;
+> > +
+> > +		kvm_vcpu_srcu_read_lock(vcpu);
+> > +
+> > +		ret = handle_exit(vcpu);
+> 
+> ARM increases stat.exits here and since you copied the stat fields over we
+> could do that too.
+
+Good catch, thanks. Adding the stat.
+> 
+> General question to the ARM maintainers:
+> We'll be adding more stat fields in the very soon future.
+> Are you fine with us adding them under any name or should we prefix them so
+> it's clear they exist because of our architecture / implementation and will
+> likely never be added to ARM KVM?
+> 
+> In the past we've added a lot of stats and I'd expect us to at least add
+> stats for every intercept reason.
+
+That is the exact reason I copied the struct and not reuse the arm64
+defenition. I already added a gmap stat we have but native arm not.
+
+If the stat is meaningfull I am all for adding the stat to arm as well.
+
+	Steffen
