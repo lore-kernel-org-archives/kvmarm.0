@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA146530DEC;
-	Wed, 16 Sep 2026 16:27:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C6874C33D8;
+	Wed, 16 Sep 2026 16:30:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789576070; cv=none; b=r7Jy7gxpgfy4rV1//IlcfeWA9rZfeXcXcvarpXKfqE/lbD87uuMjzlBreEXR2BJA7j29b9141l8lqBztBi17VTMsX09ZtKsTByqLZJqyc0HAeCnc3JnrzoIPkWPW334AG/PLMjtf5c6KGAmvbS6wkflmlESQxgNDhAGlsiO3dmA=
+	t=1789576255; cv=none; b=bB0QzpGzq8Ljdk3u35D7DQq6bsF/5vf2n4ICcPfO68WbXeT9o6PbZmlTlRfcrFMnqRfQ1jVi4hEwubooja0Q2jUjbTg6hfZPLo3lHwQyIfPrRu4P9N4ct7TzIbJQMoTNfOchLqSMo4/CRC+RJD6viasm0g+fkT2eepaqPubY2QE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789576070; c=relaxed/simple;
-	bh=vwki1WboN3tyzrW0mxsEgCsHlLPU27C8Wfgu6rAxjQI=;
+	s=arc-20240116; t=1789576255; c=relaxed/simple;
+	bh=GpR/9Wyih36StK+PYry4Qeuqz6DpEIpOVqgowvgJid8=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rYvpGCpIujQ5llcpD56g7j7xxhSUUd/KzoqoMZq+DKFw9oDRnU9SNIGAx1MsNlpNE29Oq4bFQM1H0t1x3wN/UqwQJ5htuhe37hpqenNPtC+ZgIWCg6KJh815c/qFhtf5adnzh00xF3cR9+4aDA7ZHxsGnroNRbBaDBX1w9eZWI0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CsFUdgf2; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=MWc7zHIH1xBUBiIEzfjykTeT+jaAle4fpS3e+trmi1qxatI1Sx/lr0kei0UgLdvlZbzK/tDz20aZQaqtWTRvMg94o8sCFZV1aauI7n/0Zamb4rqbythuMeUTKrbetJXzDnS6ybbi+7uaqe1fGEGd+o3v+2lzvW6tup4MW3/ljjo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QaLwMVew; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CsFUdgf2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDD801F00893;
-	Wed, 16 Sep 2026 16:27:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QaLwMVew"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B7A01F00893;
+	Wed, 16 Sep 2026 16:30:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789576055;
-	bh=TgVu3p5uICF4iZHEkTZjZru9hK9LNYjA++8/1STw7BM=;
+	s=k20260515; t=1789576253;
+	bh=ODT+t7xp89lxqSyYSz0cPUXtoch46ObqS7q3+uB/lnk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=CsFUdgf2e+8fqwHIGFPB05TrJAw6N24PTMQwuvf98ZFUXfOldmbE7I+bndH2NJ0ir
-	 xQSgcjYpCO0WuckExu+mc99X/rgJsInD0pkVhCFrt1Dli1jSgpxyEthmeXuPhs3tGu
-	 w7XM3udF/tHFEKMpz7JWQPHsFhZWgxH+s0sFOg4B1hExOYkK4ebaOkE0t3FSNwQcOC
-	 J/ICjs6Qlpr+qBlSiRtToQW+rEAZ0CLzSqh9LOipn0qkU5iNjp5E4PY1xR005F4iwF
-	 hk+zLoWuYDf0oFJKNbtDq7ddEj/oZXrumHzQUcV0s4586NTRp1TaGiMiKMi0Pf4JBl
-	 0M70QJWA/6xmA==
+	b=QaLwMVewhdPZdmohVX1Jzp2I7Hd30CA6gLburQEePbixidMdJjINdjcxpKLCbGmv+
+	 bcD9KJmhgFasn+q/iqDdcL8t3xZ8Jdlex7pvS5EeyOG0cW8dKs4tKusdnhT4J4O/4h
+	 DYecIVDZ4CtTJjPrNWPVXmdGs1Hr7zS2QQMEH6lJQWhDV480m3SFuBq5qZxaby+s0U
+	 rPM2zYcKkrypc1xzEkCJZBl+ryBMZQY3P+NWks+YmebJ9MandBLYQbW28IrO2lkC89
+	 l29YajnZL3vZHLNX3KAtmEEBYk+PrQWVhD5PSebU/GKZbfE1WF8k7ls0NTsDdFp5f0
+	 5Kb/vY687JXEg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1x6sTs-00000009iFg-1p6Q;
-	Wed, 16 Sep 2026 16:27:32 +0000
-Date: Wed, 16 Sep 2026 17:27:04 +0100
-Message-ID: <86bj9x5fhj.wl-maz@kernel.org>
+	id 1x6sX5-00000009iN3-0lXB;
+	Wed, 16 Sep 2026 16:30:51 +0000
+Date: Wed, 16 Sep 2026 17:30:50 +0100
+Message-ID: <86a4ph5fb9.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Fuad Tabba <fuad.tabba@linux.dev>
 Cc: oupton@kernel.org,
@@ -51,10 +51,10 @@ Cc: oupton@kernel.org,
 	vdonnefort@google.com,
 	qperret@google.com,
 	tabba@google.com
-Subject: Re: [PATCH v3 14/18] KVM: arm64: Add per-EC entry/exit state marshalling for protected guests
-In-Reply-To: <20260914113338.159227-15-fuad.tabba@linux.dev>
+Subject: Re: [PATCH v3 15/18] KVM: arm64: Reject host access to protected VM private state
+In-Reply-To: <20260914113338.159227-16-fuad.tabba@linux.dev>
 References: <20260914113338.159227-1-fuad.tabba@linux.dev>
-	<20260914113338.159227-15-fuad.tabba@linux.dev>
+	<20260914113338.159227-16-fuad.tabba@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -70,174 +70,77 @@ X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, kvmarm@lists.linux.d
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 14 Sep 2026 12:33:34 +0100,
+On Mon, 14 Sep 2026 12:33:35 +0100,
 Fuad Tabba <fuad.tabba@linux.dev> wrote:
 > 
-> Move a protected guest's state between the hyp vCPU and the host per
-> exception class instead of copying the whole context. Add
-> entry_hyp_pvm_handlers[] and exit_hyp_pvm_handlers[] for WFx, SYS64,
-> IABT, DABT and HVC64, and route protected guests through them: on exit
-> each handler copies out only what its class needs, and on re-entry
-> only what the host may have changed: the PC update or exception it
-> requested (PC_UPDATE_REQ), the value of a read it emulated, and a
-> forwarded PSCI call's return value. entry_hyp_vm_handlers[] is
-> removed: a non-protected vCPU's iflags are copied wholesale.
+> A protected vCPU's register and debug state is no longer exposed to
+> the host. Host ioctls that would reach that state now fail rather
+> than operate on a copy that isn't the guest's:
 > 
-> The host's fault view is EL2's own syndrome with the guest register
-> index withheld, the deferred SError syndrome (DISR_EL1), and the
-> addresses each class needs. The value of a written register is passed
-> in r0. MMIO data is clamped to the access width and, for a load,
-> sign-extended at EL2 from EL2's syndrome. Endianness stays with the
-> host. A data abort's PC update is taken for a completed MMIO access,
-> and for a cache maintenance operation the host skips on unbacked
-> memory, as it does for any guest.
+>   - KVM_GET_ONE_REG and KVM_SET_ONE_REG return -EPERM once the vCPU has
+>     run: the copy then holds reset values plus what the exit handlers
+>     marshal out. Pre-run access still builds the guest's boot state.
+>   - KVM_ARM_VCPU_INIT returns -EPERM once the vCPU has run: it would
+>     reset the host copy alone and rewrite mp_state, which EL2 reads
+>     only at hyp vCPU creation, so a vCPU the guest powered off would
+>     come back RUNNABLE.
+>   - KVM_SET_VCPU_EVENTS rejects external-abort injection with -EPERM;
+>     SError injection is forwarded and stays permitted.
+>   - KVM_SET_GUEST_DEBUG returns -EPERM: a protected guest's debug state
+>     is hypervisor-owned.
 > 
-> The host's copy of a protected vCPU's PSTATE is a view the guest never
-> runs from: its reset value has PSTATE.A set, and EL2 sets PSTATE.A in
-> the mode it copies out regardless of the guest's, so, unless the VMM
-> wrote the host copy's PSTATE or SCTLR2_EL1 before the first run,
-> serror_is_masked() is true and kvm_inject_serror_esr() pends a
-> host-injected SError through HCR_EL2.VSE, masked by the guest's own
-> PSTATE.A, instead of emulating the entry on that copy.
+> The KVM_{GET,SET}_ONE_REG and KVM_ARM_VCPU_INIT checks are one filter
+> on the ioctl number in kvm_arch_vcpu_ioctl(), the only caller of the
+> three functions they were in. Its -EPERM now precedes the cases'
+> -EFAULT and the ONE_REG case's pending-reset handling, which the next
+> KVM_RUN performs. The external-abort check reads the payload, and
+> KVM_SET_GUEST_DEBUG has its own case in kvm_vcpu_ioctl(), so it never
+> reaches kvm_arch_vcpu_ioctl(): those two stay in their handlers.
 > 
-> Neither dispatch runs for a trap taken with an SError pending: EL2
-> doesn't handle it, and the guest replays it once the host has
-> injected the SError. The exit handlers would otherwise marshal a trap
-> EL2 never handled, and handle_pvm_exit_hvc64() would panic on an
-> unfiltered function id.
-> 
-> For HVC64, only the PSCI calls EL2 forwards reach the host: the exit
-> handler passes the function id and the arguments each call needs, and
-> the entry handler returns the host's result. A CPU_ON the host failed
-> is rolled back to OFF and returned as INTERNAL_FAILURE, or as
-> ALREADY_ON when that's what the host returned: PSCI defines it as the
-> retry signal for a CPU_ON that reaches the implementation before the
-> target's CPU_OFF has been processed (DEN0022 section 6.6), which a
-> guest that doesn't poll AFFINITY_INFO first can do. A target that
-> already ran returns SUCCESS. The rollback leaves the published reset
-> state in place: clearing it races a fresh CPU_ON's publication and
-> wedges the target at ON_PENDING, and the entry point left behind is one
-> the guest supplied. The rollback's cmpxchg carries no generation, so
-> one that lands after a later CPU_ON has republished ON_PENDING cancels
-> that cycle too. The target is then OFF at EL2 while the host has it
-> runnable, and its CPU_ONs return ALREADY_ON until the VMM stops it
-> again.
+> KVM_CHECK_EXTENSION returns 0 for KVM_CAP_ARM_INJECT_EXT_DABT and
+> KVM_CAP_SET_GUEST_DEBUG on a protected VM: kvm_pkvm_ext_allowed()
+> returns false on every capability it doesn't list, and the patch that
+> advertises the capabilities protected VMs support leaves these two
+> out. The two ioctl checks stay for a VMM that doesn't query
+> KVM_CHECK_EXTENSION.
 > 
 > Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 > ---
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 430 +++++++++++++++++++++++++++--
->  1 file changed, 407 insertions(+), 23 deletions(-)
+>  arch/arm64/kvm/arm.c   | 21 +++++++++++++++++++++
+>  arch/arm64/kvm/guest.c | 11 +++++++++++
+>  2 files changed, 32 insertions(+)
 > 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> index 1dcc75261dc08..3d59c4827c42a 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -4,6 +4,8 @@
->   * Author: Andrew Scull <ascull@google.com>
->   */
->  
-> +#include <kvm/arm_hypercalls.h>
-> +
->  #include <hyp/adjust_pc.h>
->  #include <hyp/switch.h>
->  
-> @@ -34,13 +36,366 @@ void __kvm_hyp_host_forward_smc(struct kvm_cpu_context *host_ctxt);
->  
->  typedef void (*hyp_entry_exit_handler_fn)(struct pkvm_hyp_vcpu *);
->  
-> -static void handle_vm_entry_generic(struct pkvm_hyp_vcpu *hyp_vcpu)
-> +static bool pvm_sys64_is_write(u64 esr)
->  {
-> -	vcpu_copy_flag(&hyp_vcpu->vcpu, hyp_vcpu->host_vcpu, PC_UPDATE_REQ);
-> +	return (esr & ESR_ELx_SYS64_ISS_DIR_MASK) == ESR_ELx_SYS64_ISS_DIR_WRITE;
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index ca6e109b3e5d6..0362f5f235e02 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1865,6 +1865,23 @@ static int kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+>  	return __kvm_arm_vcpu_set_events(vcpu, events);
 >  }
 >  
-> -static const hyp_entry_exit_handler_fn entry_hyp_vm_handlers[] = {
-> -	[0 ... ESR_ELx_EC_MAX]		= handle_vm_entry_generic,
-> +static void handle_pvm_entry_wfx(struct pkvm_hyp_vcpu *hyp_vcpu)
+> +/*
+> + * Once a protected vCPU has run, the host copy is not the guest's state,
+> + * and EL2 has read mp_state, which it does only at hyp vCPU creation.
+> + */
+> +static long pkvm_filter_vcpu_ioctl(struct kvm_vcpu *vcpu, unsigned int ioctl)
 > +{
-> +	struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
-> +
-> +	/* Exceptions have priority; the host injects none on WFx. */
-> +	if (vcpu_get_flag(host_vcpu, PENDING_EXCEPTION))
-> +		return;
-> +
-> +	if (vcpu_get_flag(host_vcpu, INCREMENT_PC)) {
-> +		vcpu_clear_flag(&hyp_vcpu->vcpu, PC_UPDATE_REQ);
-> +		kvm_incr_pc(&hyp_vcpu->vcpu);
+> +	switch (ioctl) {
+> +	case KVM_ARM_VCPU_INIT:
+> +	case KVM_SET_ONE_REG:
+> +	case KVM_GET_ONE_REG:
+> +		if (vcpu_is_protected(vcpu) && vcpu_has_run_once(vcpu))
+> +			return -EPERM;
 > +	}
+> +
+> +	return 0;
 > +}
 > +
-> +static void handle_pvm_entry_sys64(struct pkvm_hyp_vcpu *hyp_vcpu)
-> +{
-> +	struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
-> +	bool pc_update;
-> +
-> +	/* Exceptions have priority over anything else */
-> +	if (vcpu_get_flag(host_vcpu, PENDING_EXCEPTION)) {
-> +		/* A host-requested exception on SYS64 is always an UNDEF. */
-> +		u32 esr = (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT) | ESR_ELx_IL;
-> +
-> +		__vcpu_assign_sys_reg(&hyp_vcpu->vcpu, ESR_EL1, esr);
-> +		kvm_pend_exception(&hyp_vcpu->vcpu, EXCEPT_AA64_EL1_SYNC);
-> +		return;
-> +	}
-> +
-> +	/* Handle PC increment on a host-emulated access */
-> +	pc_update = vcpu_get_flag(host_vcpu, INCREMENT_PC);
-> +	if (pc_update) {
-> +		vcpu_clear_flag(&hyp_vcpu->vcpu, PC_UPDATE_REQ);
-> +		kvm_incr_pc(&hyp_vcpu->vcpu);
-> +	}
-> +
-> +	/* If the host emulated a read access, update the register */
-> +	if (pc_update &&
-> +	    !pvm_sys64_is_write(hyp_vcpu->vcpu.arch.fault.esr_el2)) {
-> +		/* r0 as transfer register between the guest and the host. */
-> +		u64 rt_val = READ_ONCE(host_vcpu->arch.ctxt.regs.regs[0]);
 
-Why isn't this
+I'm not keen on returning -EPERM for the ONE_REG stuff. For a start,
+X0 *is* valid on MMIO, and when you want to support LD64B and co,
+you'll need to show the actual data there.
 
-		rt_val = READ_ONCE(vcpu_gp_regs(host_vcpu)->regs[0]);
-
-and similarly everywhere else?
-
-[...]
-
-> +static void handle_pvm_exit_sys64(struct pkvm_hyp_vcpu *hyp_vcpu)
-> +{
-> +	struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
-> +	u32 esr_el2 = hyp_vcpu->vcpu.arch.fault.esr_el2;
-> +
-> +	/* The mode is required for the host to emulate some sysregs */
-> +	host_vcpu->arch.ctxt.regs.pstate =
-> +		pvm_host_pstate(hyp_vcpu->vcpu.arch.ctxt.regs.pstate);
-> +
-> +	/* r0 as transfer register between the guest and the host. */
-> +	if (pvm_sys64_is_write(esr_el2)) {
-> +		int rt = kvm_vcpu_sys_get_rt(&hyp_vcpu->vcpu);
-> +		u64 rt_val = vcpu_get_reg(&hyp_vcpu->vcpu, rt);
-> +
-> +		host_vcpu->arch.ctxt.regs.regs[0] = rt_val;
-
-and this should be
-
-		vcpu_set_reg(host_vcpu, 0, rt_val);
-
-assuming you don't need a WRITE_ONCE() to match the READ_ONCE() in the
-other direction.
-
-> +	}
-> +}
-> +
-> +static void handle_pvm_exit_iabt(struct pkvm_hyp_vcpu *hyp_vcpu)
-> +{
-> +	hyp_vcpu->host_vcpu->arch.fault.hpfar_el2 =
-> +		hyp_vcpu->vcpu.arch.fault.hpfar_el2;
-
-Please keep assignments on a single line (everywhere).
-
-Thanks,
+I'd rather return what is in the host vcpu structure, as normal.
 
 	M.
 
