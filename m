@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BDB13F075D;
-	Wed, 16 Sep 2026 07:04:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0C663FA5E6;
+	Wed, 16 Sep 2026 07:08:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789542297; cv=none; b=Mc2kIKKOyeQ55geoNLRSpbT2cqcnyn3Tv1ub8QVAVUr/ggACcs8IYaQIHKrF2X7P6Q3KoqLw9Tyj5tfyZfaQ4PBI/FUBgqtKdn8Tt9wr9vT9BeQ90uSpMhC5a9hOyzptuqnWie+akaQkc2bdd5XatAdLhhd5+9YY+QaLVMszG4U=
+	t=1789542516; cv=none; b=oJ09dtxd8Sk33lbpUzGzOYFfjxYpCMUn0vtXWbCDxt3kqCs8b/PXDCGAvw/Atk89Wn52fOM1bxq5snp3s9n5yxePqYDmkjV2ZcHz5LlcZFJyMQvxaGzKlOV7TUX0n15GkdAdedLkhQerLTm3rBc54aPtzcuSfCcqTKCXLU02Tfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789542297; c=relaxed/simple;
-	bh=xMnq3uzVoAmaiIsnEU84IZTo1wWIyDH0jpogKeuTURg=;
+	s=arc-20240116; t=1789542516; c=relaxed/simple;
+	bh=gpeeW/gMx+8SleefY5VurrnGj9VqNZmlOcqEB5znQNk=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pGNOu/pBklX5CSDkm0cP1rnP4+/A2J6oimq75uURZygg57uY4H8KRawZIX77pbUFAYN2NgccpsgpX+JtGqvdLSAgXe06b/1kYNiIvIbOEBskNedEkw7RFxZm4boKDec4jbcJwsyhK4ipf9L4jot6ZTVQQ8yMysBxUA+avaFxgnw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q4NP19Sb; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=LiAzNdqve4GPOW49vNA5ki7LASp3qe99AgXxoLgeg5OxQdP8r1SjuvmUNoBmcNAdIBS/gsFw1ZIlCoVzzZ+pKzCbSKius4wv+gl1wfM6SmU3NYskYg00JdcXETI4mnTGRKbZpg3V2xT771RPfG9u62Jvc2TvbPkA5Nzrziu7Rxk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YkY9epgZ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q4NP19Sb"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB9D31F000FF;
-	Wed, 16 Sep 2026 07:04:55 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YkY9epgZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98EB31F00898;
+	Wed, 16 Sep 2026 07:08:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789542296;
-	bh=ijfOOZd0pqERrTuVYZCNeIuM97HHT4M3Ng/p5mLJTb8=;
+	s=k20260515; t=1789542502;
+	bh=iPPSs8t6HCHVvLUXUgpO1nMbCgpWJ+6yj0K1jackD7s=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=Q4NP19SbuFICPDiwdiSSqrh0hVqa8/rRI63q89d6415EmMuU0T0GJ1vJfy9CI/z6T
-	 qOIIQ7rRPKuzkY3GSQCPO4paBLZHMrCzdfsALXiwBe5QaPJwG8e5kjOmXtmYTI/MXC
-	 m2XuuBk2g7HibnfcxmZFhNdCu4K9VfGVA/PMueG3XGFJ0Sym6f5hgNcTD6Azx2RIGU
-	 Dt8imczitPjeUG2YbF9gxHLsnVoEa9jbKP2Owu/Z3d8xYkWNCiDkqIFEqPnyekbs+4
-	 AFq9akTLhAn9ID5JZkNEmajXvT4N2mmMbWoXoApIXWK61QJk9nwzNMa3cYvMA+PZNO
-	 2U0YG2kIfOZ9w==
+	b=YkY9epgZqkRRY9guKEgBDs7Lrde5h0502AJqdL3UjjLO4zAiKI+VCt5VduXcMAem3
+	 oqZ6jDg1cYkvxGBIDMn2widDGu+3Cbmy5bBn2ESdQcsU9I5qwg+mQ/sV4p/4aNiVCb
+	 f7+yEXm64vKGHUL6SNWMneQ5YkEZ+9TzVX2s295G/FF7oqJUGpWcfCj8uqzeUcUJNe
+	 KaAysJjArdWcETF2PGvOLrgKqqobWEobF9ySCIBHAjln4M/juXRQXFltsBctqWWBfU
+	 LwC+gjm5rEcD7Ee4qicj38SzW2ixE80V3baShhwOpG+ZSZWzdy/aZlEqQ1OinGeaU1
+	 ZAUW/CB7gEXNA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1x6jhN-00000009Tjo-2mC2;
-	Wed, 16 Sep 2026 07:04:53 +0000
-Date: Wed, 16 Sep 2026 08:04:53 +0100
-Message-ID: <86mrth65ii.wl-maz@kernel.org>
+	id 1x6jki-00000009Tp9-2nPE;
+	Wed, 16 Sep 2026 07:08:20 +0000
+Date: Wed, 16 Sep 2026 08:08:20 +0100
+Message-ID: <86ld9165cr.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Itaru Kitayama <itaru.kitayama@fujitsu.com>
 Cc: Wei-Lin Chang <weilin.chang@arm.com>,
@@ -53,9 +53,11 @@ Cc: Wei-Lin Chang <weilin.chang@arm.com>,
 	Shuai Xue <xueshuai@linux.alibaba.com>,
 	"Lorenzo Stoakes (ARM)" <ljs@kernel.org>
 Subject: Re: [PATCH v6 0/7] KVM: arm64: nv: Implement nested stage-2 reverse map
-In-Reply-To: <aqoh27cSs5gMHeAL@sm-arm-grace07>
+In-Reply-To: <aqnUWp_VJXUCcJnQ@sm-arm-grace07>
 References: <20260915154305.3852871-1-weilin.chang@arm.com>
-	<aqoh27cSs5gMHeAL@sm-arm-grace07>
+	<aqm9hXB6X9IQ8wHz@sm-arm-grace07>
+	<m6ldbr7hdafmoycx7xjcbsg62mblcakcu52ndowwzqgxdjb3q3@huv4i5bfxtza>
+	<aqnUWp_VJXUCcJnQ@sm-arm-grace07>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -71,49 +73,38 @@ X-SA-Exim-Rcpt-To: itaru.kitayama@fujitsu.com, weilin.chang@arm.com, linux-arm-k
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 16 Sep 2026 05:58:03 +0100,
+On Wed, 16 Sep 2026 00:27:22 +0100,
 Itaru Kitayama <itaru.kitayama@fujitsu.com> wrote:
 > 
-> Hi Wei-Lin,
-> 
-> On Tue, Sep 15, 2026 at 04:42:58PM +0100, Wei-Lin Chang wrote:
-> > Hi,
+> On Wed, Sep 16, 2026 at 12:22:30AM +0100, Wei-Lin Chang wrote:
+> > On Wed, Sep 16, 2026 at 06:49:57AM +0900, Itaru Kitayama wrote:
+> > > On Tue, Sep 15, 2026 at 04:42:58PM +0100, Wei-Lin Chang wrote:
+> > > > Hi,
+> > > > 
+> > > > This is v6 of optimizing the shadow s2 mmu unmapping during MMU
+> > > > notifiers.
+> > > > 
+> > > > This version fixes a few issues, and adds Marc's space optimization
+> > > > for kvm_guest_s2_mapping [1]. Please see the changelog for the details.
+> > > > 
+> > > > Tested by booting L3, and running in-kernel targetted tests described
+> > > > in [2]. v5 got some tested-by's from Itaru and Wang (thanks), I didn't
+> > > > carry them over since some bugs fixed in v6 are non-obvious. Some
+> > > > retest would be much appreciated!
+> > > 
+> > > How did you boot into L3, with KVM selftest or recrusively boot on HW?
 > > 
-> > This is v6 of optimizing the shadow s2 mmu unmapping during MMU
-> > notifiers.
-> > 
-> > This version fixes a few issues, and adds Marc's space optimization
-> > for kvm_guest_s2_mapping [1]. Please see the changelog for the details.
-> > 
-> > Tested by booting L3, and running in-kernel targetted tests described
-> > in [2]. v5 got some tested-by's from Itaru and Wang (thanks), I didn't
-> > carry them over since some bugs fixed in v6 are non-obvious. Some
-> > retest would be much appreciated!
-> > 
-> > Series based on v7.3-rc3 + Marc's nested mmu lifecycle fixes [3].
+> > I just recrusively booted VMs on hardware. :)
 > 
-> Observed on QEMU (accel tcg) only, but I saw:
-> 
-> [ 1812.052752] BUG: sleeping function called from invalid context at kernel/locking/rwsem.c:1630
-> [ 1812.052896] in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 596, name: shadow_stage2
-> 
-> The kernel is built on top of Marc's fix and your version six series, but
-> the fix for debugfs will be posted later?
-> 
-> Your hello_nested and shadow_stage2 ran without an issue.
-> 
-> Tested-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+> Good. Then I actually tried that on Grace CPUs, but letting L1 boot 
+> with nested mode did not print "VHE+NV2" KVM init log in dmesg, thus not
+> able to boot L3. Do I need to add other than kvm.arm-mode=nested to command line?
 
-So you have established that there is a critical locking bug, make
-sure you don't communicate any information to help narrow where that
-bug is, and yet give your Tested-by: tag?
-
-What is the point? I'm baffled.
-
-Can you at least provide an indication of what you did to get there as
-well as the full backtrace?
+kvm-arm.mode=nested, as documented. That also puts in perspective your
+TB tag on the whole series...
 
 	M.
+
 
 -- 
 Without deviation from the norm, progress is not possible.
