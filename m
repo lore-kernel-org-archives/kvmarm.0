@@ -1,52 +1,78 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from esa1.hc1455-7.c3s2.iphmx.com (esa1.hc1455-7.c3s2.iphmx.com [207.54.90.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B862926461F;
-	Wed, 16 Sep 2026 00:37:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D1DF31B130
+	for <kvmarm@lists.linux.dev>; Wed, 16 Sep 2026 04:58:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.54.90.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789519039; cv=none; b=GtatC9zg3xcWwLOrjCqX/1I+LM4uuE3ssKy2XZ02zK7v09VYrRTywsTaf+J6tpwCV/1PwZO+779avJ5FeJFWQPPWC3af+sno/tXJtbohV7wfMT2TX0PMmtIZbyBS2I/vThWHQTxL6PXZTNTTrRTce/LiWRtI7uAdbl8buGXFLBU=
+	t=1789534702; cv=none; b=Pu3VzKoSpGokCBebCgjVlePdkLJzBNQjWpNhKX2FNS5kEAGRKrLsn7dDIEWtj9+2ACLtDSWwFeha8j1zbvbw+6CRua/8VC9228nh6KV92lxHQlJVNN50eT0e2Fk8VSzzaGf3Lv0GjUUjzwxcpmm4SiXvzelTkcv6hDoIi3xDmLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789519039; c=relaxed/simple;
-	bh=ue53jCiy2LEZYlyTYduuCH59J6dHDmi8VzF1KRLqTC4=;
+	s=arc-20240116; t=1789534702; c=relaxed/simple;
+	bh=SnAcro5Dui87SihtGm652xAlG5XwDxA05uuCThf6Qp4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MTpnBHZe0Yhr9gCBLS0TnncoM2aWePY5TFySvA12UKvwJGiT6oJ7C4Tu6PFQCDhHRi6fyf4tibtbxiz4OTk8Sf/YmdUmXQxUeDLYmcFtSUKPFrS9dwu07AXrcbdFzpgKLsInb7QCAtDJXr7YCEZjJt2juoNkX6rsXBcQ0WHSIuY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iOo+6B/Y; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=UXLCdIslcbwmfqBIYO/GcO5Hi6bDHs9+T5xK1JTevTMSL/CvkhidfJwHY1YeBS4xueCs9oSnRNruxBg5qAzisMIpsvNpRBGQKVxDSC6UJOvWvcYLuzTkAkzj9roAfnOEmUEpvvpSKYbeusdW9UtDK8f+utAKPVBxdOWqp7YRM6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=uIIWP4gF; arc=none smtp.client-ip=207.54.90.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iOo+6B/Y"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 139BE1F000FF;
-	Wed, 16 Sep 2026 00:37:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789519037;
-	bh=KhXpFZ9VswPhvLkxuik9i+Nt4jMBXcRn/oG41k/T1uI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=iOo+6B/Yvvx05OkVOSWtJrtXZBBctiElUpb+YdCas1bze8OsVyQZ6cXF3ODvv6xyU
-	 19Dmokvl6NZMSZO/0u9No8KATqKry+dWiIrGu8ClSBu7Jv8v9YZJydNnRzK1epCf+2
-	 uyDZBY9TEr3sbezw7f8OIaiF437g7W3s0bhLbrlCTNNng5pdkKdsPvF1IoXS5+ESSF
-	 R3zAWlDbzgZgdUtWwe7XtrSvgYjplCmgJRJiQbqMsCBYAgq+g1I6pinLUg5N8OLO2X
-	 9yE8I4xTnhcvnkpYUOhUHemT1p7MjLWorbUBBkc7YcafptTkdhqkUt4DduVfe+LL4K
-	 xY0MFIWY2cwkQ==
-Date: Tue, 15 Sep 2026 17:37:15 -0700
-From: Oliver Upton <oupton@kernel.org>
-To: Leonardo Bras <leo.bras@arm.com>
-Cc: Marc Zyngier <maz@kernel.org>, Fuad Tabba <fuad.tabba@linux.dev>,
+	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="uIIWP4gF"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
+  t=1789534705; x=1821070705;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=SnAcro5Dui87SihtGm652xAlG5XwDxA05uuCThf6Qp4=;
+  b=uIIWP4gFFId3491bzGj67WGag7pRJig9n6Pe1CTviKS+lu7ooiFkW0kI
+   zieg+JC6f+V7gVw3UL0/9FVhujKAy0Ok7fegohwvL+AWY7+/akxhXfK+k
+   Ez21ljLjsYvQI/LN8nln1rEYERLBgYcJl2ggNqtB/KbVAJRMy0uxuLND7
+   w+eyVmdKlAq+JQUp7QvqCBZcxN8xChQQf/XiWxPPjhUzBhZSa4zm5rpRj
+   6miYZ5yfCoQJpayk2AydM6SBfN634jbOPJwC+xmRkwtZZ9RyU5L0mJ3Q0
+   tyJpbC00ai9XaVvc7Hi7QaEmc5WzH96X4MHXGzPZmkC6i8hWI6HEeCDbe
+   Q==;
+X-CSE-ConnectionGUID: GJXO5kmcQreFjaRR2q6NyA==
+X-CSE-MsgGUID: qMKfUJCRQU+FhHn5hgmctA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11905"; a="255212538"
+X-IronPort-AV: E=Sophos;i="6.27,103,1786978800"; 
+   d="scan'208";a="255212538"
+Received: from gmgwnl01.global.fujitsu.com ([52.143.17.124])
+  by esa1.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2026 13:58:17 +0900
+Received: from az2nlsmgm2.o.css.fujitsu.com (unknown [10.150.26.202])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by gmgwnl01.global.fujitsu.com (Postfix) with ESMTPS id B4EDB407547
+	for <kvmarm@lists.linux.dev>; Wed, 16 Sep 2026 04:58:12 +0000 (UTC)
+Received: from az2nlsmom3.fujitsu.com (unknown [10.150.26.199])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by az2nlsmgm2.o.css.fujitsu.com (Postfix) with ESMTPS id 653741C00152
+	for <kvmarm@lists.linux.dev>; Wed, 16 Sep 2026 04:58:12 +0000 (UTC)
+Received: from sm-arm-grace07 (unknown [10.124.178.20])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by az2nlsmom3.fujitsu.com (Postfix) with ESMTPS id 497CD100019E;
+	Wed, 16 Sep 2026 04:58:06 +0000 (UTC)
+Date: Wed, 16 Sep 2026 13:58:03 +0900
+From: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+To: Wei-Lin Chang <weilin.chang@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>, Fuad Tabba <fuad.tabba@linux.dev>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Tian Zheng <zhengtian10@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 1/5] KVM: arm64: pgtables: Change write bit from
- S2AP_W to DBM
-Message-ID: <aqnku2TcFzIKhjQl@kernel.org>
-References: <20260901171558.2674031-1-leo.bras@arm.com>
- <20260901171558.2674031-2-leo.bras@arm.com>
- <86bja17cg7.wl-maz@kernel.org>
- <aql8jY4o8SzjJuFU@LeoBrasDK>
+	Wang Han <wanghan@linux.alibaba.com>,
+	Shuai Xue <xueshuai@linux.alibaba.com>,
+	"Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+Subject: Re: [PATCH v6 0/7] KVM: arm64: nv: Implement nested stage-2 reverse
+ map
+Message-ID: <aqoh27cSs5gMHeAL@sm-arm-grace07>
+References: <20260915154305.3852871-1-weilin.chang@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -55,77 +81,96 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aql8jY4o8SzjJuFU@LeoBrasDK>
+In-Reply-To: <20260915154305.3852871-1-weilin.chang@arm.com>
 
-On Tue, Sep 15, 2026 at 06:12:45PM +0100, Leonardo Bras wrote:
-> > Yes, the HW should ignore it. But we have also
-> > seen quite a few broken designs in this area...
-> > 
+Hi Wei-Lin,
+
+On Tue, Sep 15, 2026 at 04:42:58PM +0100, Wei-Lin Chang wrote:
+> Hi,
 > 
-> I lack experience on what bad thing could happen. So I will expand on what 
-> I belive to understand up to here:
+> This is v6 of optimizing the shadow s2 mmu unmapping during MMU
+> notifiers.
 > 
-> - The PTE is in memory, so the DBM bit can be set regardless of being RES0
-> - For SW pagetable walking, I don't think 'bit 51 == 0' is checked
-> - For HW pagetable walking, maybe some faulty implementation may rely on 
->   bit51 being RES0, and fault otherwise.
+> This version fixes a few issues, and adds Marc's space optimization
+> for kvm_guest_s2_mapping [1]. Please see the changelog for the details.
 > 
-> If that's the case, then we would have to actually support both encodings, 
-> and only enable the new one if HAFDBS is available in the system. 
+> Tested by booting L3, and running in-kernel targetted tests described
+> in [2]. v5 got some tested-by's from Itaru and Wang (thanks), I didn't
+> carry them over since some bugs fixed in v6 are non-obvious. Some
+> retest would be much appreciated!
 > 
-> I just wonder how high are the chances to have such a broken design, 
-> or other broken designs did not come to my mind, and if we have to start 
-> with that multiple-encoding option.
+> Series based on v7.3-rc3 + Marc's nested mmu lifecycle fixes [3].
 
-FWIW, the host stage-1 already uses the DBM bit unconditionally,
-treating it as a software bit on implementations without HAFDBS.
-Although given the quality of any garden variety Arm MMU I understand
-where Marc is coming from.
+Observed on QEMU (accel tcg) only, but I saw:
 
-I don't think the HAFDBS enablement is complicated enough to be done in
-a separate series without any meaningful users, nor would I really be
-interested in taking it without, say, HDBSS.
+[ 1812.052752] BUG: sleeping function called from invalid context at kernel/locking/rwsem.c:1630
+[ 1812.052896] in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 596, name: shadow_stage2
 
-Can you please work with Tian to get a combined series out for this?
+The kernel is built on top of Marc's fix and your version six series, but
+the fix for debugfs will be posted later?
 
-> > > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> > > index 17123f0b6dab..eb8dfffc32c7 100644
-> > > --- a/arch/arm64/kvm/nested.c
-> > > +++ b/arch/arm64/kvm/nested.c
-> > > @@ -379,21 +379,23 @@ static int walk_nested_s2_pgd(struct kvm_vcpu *vcpu, phys_addr_t ipa,
-> > >  	}
-> > >  
-> > >  	addr_bottom += contiguous_bit_shift(desc, wi, level);
-> > >  
-> > >  	/* Calculate and return the result */
-> > >  	paddr = (desc & GENMASK_ULL(47, addr_bottom)) |
-> > >  		(ipa & GENMASK_ULL(addr_bottom - 1, 0));
-> > >  	out->output = paddr;
-> > >  	out->block_size = 1UL << ((3 - level) * stride + wi->pgshift);
-> > >  	out->readable = desc & KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R;
-> > > -	out->writable = desc & KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
-> > > +	/* Takes care of both RO/RW and RO/WC/WD encodings */
-> > > +	out->writable = desc & (KVM_PTE_LEAF_ATTR_HI_S2_DBM |
-> > > +				KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W);
-> > 
-> > Absolutely NOT. For a start, NV doesn't support FEAT_HAFDBS. But even
-> > if it did, you are now actively corrupting memory by turning a RO
-> > mapping with a spurious DBM bit set into a writable mapping.
-> > VTCR_EL2.HD exists for a reason.
-> > 
-> > Do you see why your blanket approach of equating DBM with writable is
-> > plain wrong?
-> 
-> Sorry, not really... please help me understand it.
-> 
-> When you say a spurious DBM bit, what does it mean?
+Your hello_nested and shadow_stage2 ran without an issue.
 
-You've implemented the exact sort of bug that was alluded to above. In
-this case it's a software page table walker consuming DBM regardless of
-the value of VTCR_EL2.HD.
-
-If the guest hypervisor sets VTCR_EL2.HD=0, the expectation is that the
-shadow stage-2 MMU treats the corresponding bit in the PTE as RES0.
+Tested-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
 
 Thanks,
-Oliver
+Itaru.
+
+> 
+> * Changes from v5 [4]:
+> 
+>   - Align the addresses down to the mapping size when recording the
+>     guest s2 mappings. s2fd->fault_ipa isn't necessarily PAGE_SIZE aligned.
+> 
+>   - Record guest s2 mappings even when page table maps return -EAGAIN.
+>     kvm_pgtable_stage2_map() can create mappings while returning -EAGAIN.
+>     For example, a 2M block map (A) could race with a 4K page map (B):
+>     1. (A) maps the 2M block in kvm_pgtable_visitor_cb()
+>     2. (B) breaks that block into a table and maps 4K
+>     3. (A) reloads and finds the table after kvm_pgtable_visitor_cb(),
+>        then descends into it.
+>     4. (A) maps some 4K, but before it finishes reads entry mapped by (B).
+>     5. (A) returns -EAGAIN although it had mapped a few pages.
+>     In this case, we don't know what subrange is mapped, just track the whole
+>     requested mapping range.
+> 
+>   - Don't remove tracked mappings from the interval trees if they only
+>     partially overlap the removal range. Because of the previous bullet point
+>     we can have a 4K shadow mapping tracked as a 2M range in the interval
+>     trees. It would be wrong to remove the 2M range when a guest TLBI doesn't
+>     touch the 4K mapped.
+> 
+>   - Check mmu->pgt during mmu unmap notifier, as it could race against
+>     MMU teardown.
+> 
+>   - Make guest_s2_tracking_destroy() canonical mmu only. We simply don't
+>     need to detach the nodes from the nested mmus' trees. Freeing them
+>     during canonical mmu's teardown is enough.
+> 
+> Thanks!
+> 
+> [1]: https://lore.kernel.org/kvmarm/86h5jv7qrd.wl-maz@kernel.org/
+> [2]: https://lore.kernel.org/kvmarm/gerjpm62a2gszzggc6vuai22bf3prfquvfsp7ueumps7vz2ev3@odlmovaklg2b/
+> [3]: https://lore.kernel.org/kvmarm/20260911162203.1919330-1-maz@kernel.org/
+> [4]: https://lore.kernel.org/kvmarm/20260810205038.118843-1-weilin.chang@arm.com/
+> 
+> Marc Zyngier (1):
+>   KVM: arm64: nv: Drop kvm_s2_mmu pointer from kvm_guest_s2_mapping
+> 
+> Wei-Lin Chang (6):
+>   KVM: arm64: Use a variable for the canonical IPA in kvm_s2_fault_map()
+>   KVM: arm64: nv: Introduce guest stage-2 tracking structures
+>   KVM: arm64: nv: Track guest stage-2 mapping creation
+>   KVM: arm64: nv: Track guest stage-2 mapping removal
+>   KVM: arm64: nv: Avoid full shadow stage-2 unmap
+>   KVM: arm64: Refactor kvm_unmap_gfn_range() with common variables
+> 
+>  arch/arm64/include/asm/kvm_host.h   |  31 +++++-
+>  arch/arm64/include/asm/kvm_nested.h |   7 ++
+>  arch/arm64/kvm/mmu.c                | 109 +++++++++++++++++++---
+>  arch/arm64/kvm/nested.c             | 140 +++++++++++++++++++++++++++-
+>  4 files changed, 269 insertions(+), 18 deletions(-)
+> 
+> -- 
+> 2.43.0
+> 
