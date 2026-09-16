@@ -1,47 +1,47 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3ABA328243
-	for <kvmarm@lists.linux.dev>; Wed, 16 Sep 2026 14:47:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DF8D35C687
+	for <kvmarm@lists.linux.dev>; Wed, 16 Sep 2026 14:47:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789570076; cv=none; b=ovIwoc9ItrHHyN1Lxj5uG3hO1fXGgVtT/eyO47kbMyIXgS40ZuekfD7BytX2MsmUolmhfog5nz0cJDNAgQW60rHhPe8nyw/foRJtyLBn7jrFMwihHJzTywTORwAXJDDt3ZpNZZFcv65HYjNUwRF7d43nHVLsao3AhFGH6P3fCsw=
+	t=1789570083; cv=none; b=YiFZ/LXSdZzkXRSjHenBz92hykK4+omePca4I1pSTp+33nminH6xeG4J6Lnvkn5UGxrpr4HLpfi1ciL3957gajBrul5g5dPh/DGTGot4OdxvspjDwRn0E00ARAY27C7VNIK4CNlz+za3xSS8R4ZNkNPUJERINY4Ej7+HC/iyZ/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789570076; c=relaxed/simple;
-	bh=ewgOZCWQeGzPofoaX+GIZ33sYnT4SdqUI/O5Nm6UwLU=;
+	s=arc-20240116; t=1789570083; c=relaxed/simple;
+	bh=RLDCzJkia/UGqOaVjqQ6btRMSdgv0996DfLKAF/lbIU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:content-type; b=TDlODKcz9b8o4EYr1Fr7cmIv4m0Dzy7r01T1X9MtPMZt5vgHKAXcvdrEf36luLh8Pl9TOvI+fSm+IEHJ0E3p7WEJzwMwyVOHt540YD0x1mMHIe62WCD3R9jcjGLcstDXYEbu0DRyNfDKvQvUxxN8iO9NGKhWab0fXrL9DGhJiqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=grZ4H5Nt; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version:content-type; b=oLA7KHaJn0mN8RuoYDuqMuYAiwUevSQHuSf0RS4/H3ebPd8J7rPZkoI1YuG/MeyoZSRA7DGhCIzXI6dkllGuY/1Ngh9TpEr9+Re01um9182TGEmvrK0hHCLd88Tbxx+Cyb098oTDY7Zr9ectj13wqF93gIW09scmIqEBIhnYOGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cvTNHFGT; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="grZ4H5Nt"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cvTNHFGT"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1789570073;
+	s=mimecast20190719; t=1789570079;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=voHwf+YFtdVEzgBWVvYQX13hhjEDTySDg3UzKLNi7tE=;
-	b=grZ4H5Ntxa2RgtjaNR1SeFhQPNkEUmGN8g5B7wK1D4/ODC/kmyk4oJle3S9XH1+g43TXvL
-	BXU7LhsXR6+2ZrgZ2BZzLnvpvIuw92uR1E40XcfAWZsSHpFDoUQ6xiY1PXl4vFWuIRTuff
-	fKwWuYTBkU/cvYHIkufdMi4yZIZCIWs=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	bh=CYMDAiuX3NMXS8zhqozIt3cUizP2vJsejo6cSarl3BA=;
+	b=cvTNHFGTg/21yfqxem5h+sWcBuDK6FrrrsB50I6yhCceT85jdZ9vckdplY4yZA2x+8pLT/
+	7l/LPDLzdzV4r0sRW06udXz835BdtbhhuHJT6Oo0SxHMirRkiSNEICFaNTgZpadhqn/GmU
+	5mQxrKYT7Mcb/0Gph4xpEyh6wsJaq0w=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-61-N-yAzRzJNbe-QSxHG2e-ng-1; Wed,
- 16 Sep 2026 10:47:50 -0400
-X-MC-Unique: N-yAzRzJNbe-QSxHG2e-ng-1
-X-Mimecast-MFC-AGG-ID: N-yAzRzJNbe-QSxHG2e-ng_1789570068
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-447-gQg_Eu7xMh-2uSLynwL-zQ-1; Wed,
+ 16 Sep 2026 10:47:55 -0400
+X-MC-Unique: gQg_Eu7xMh-2uSLynwL-zQ-1
+X-Mimecast-MFC-AGG-ID: gQg_Eu7xMh-2uSLynwL-zQ_1789570073
 Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 11BCC182A100;
-	Wed, 16 Sep 2026 14:47:48 +0000 (UTC)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 82B841944DC5;
+	Wed, 16 Sep 2026 14:47:53 +0000 (UTC)
 Received: from laptop.redhat.corp (headnet04.pony-001.prod.iad2.dc.redhat.com [10.2.32.116])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id ADA8F1955F73;
-	Wed, 16 Sep 2026 14:47:42 +0000 (UTC)
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6F63019560AB;
+	Wed, 16 Sep 2026 14:47:48 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com,
 	eric.auger@redhat.com,
@@ -64,9 +64,9 @@ Cc: maz@kernel.org,
 	berrange@redhat.com,
 	abologna@redhat.com,
 	jdenemar@redhat.com
-Subject: [PATCH v9 03/26] target/arm/cpu-sysregs.h.inc: Update with automatic generation
-Date: Wed, 16 Sep 2026 16:45:26 +0200
-Message-ID: <20260916144721.751810-4-eric.auger@redhat.com>
+Subject: [PATCH v9 04/26] arm/cpu: Add infra to handle generated ID register definitions
+Date: Wed, 16 Sep 2026 16:45:27 +0200
+Message-ID: <20260916144721.751810-5-eric.auger@redhat.com>
 In-Reply-To: <20260916144721.751810-1-eric.auger@redhat.com>
 References: <20260916144721.751810-1-eric.auger@redhat.com>
 Precedence: bulk
@@ -76,56 +76,72 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
-X-Mimecast-MFC-PROC-ID: vk34zvdBEWqm63rGGGpb5l9AidMZhXdxcfSEygT2yX8_1789570068
+X-Mimecast-MFC-PROC-ID: bOfNLY6Y5N_rri8KVf950JZUvbGAlvmK0FOVPYztPTA_1789570073
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 content-type: text/plain; charset="US-ASCII"; x-default=true
 
-Generated definitions with scripts/update-aarch64-cpu-sysregs-header.py
-based on "AARCHMRS containing the JSON files for Arm A-profile
-architecture (2026-03)" Registers.json file.
+Introduce an infrastructure to store the definition of all ID regs:
+This include their name, index and array of named fields.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-Reviewed-by: Shameer Kolothum <skolothumtho@nvidia.com>
----
- target/arm/cpu-sysregs.h.inc | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+Co-authored-by: Khushit Shah <khushit.shah@nutanix.com>
+Signed-off-by: Khushit Shah <khushit.shah@nutanix.com>
 
-diff --git a/target/arm/cpu-sysregs.h.inc b/target/arm/cpu-sysregs.h.inc
-index ec5a12b0f4..8b77c490d4 100644
---- a/target/arm/cpu-sysregs.h.inc
-+++ b/target/arm/cpu-sysregs.h.inc
-@@ -1,11 +1,18 @@
- /* SPDX-License-Identifier: GPL-2.0-or-later */
+---
+v7 -> v8:
+- remove typedef struct ArmIdRegArchVal
+
+v5 -> v6:
+- add ArmIdRegArchVal
+---
+ target/arm/cpu-idregs.h | 36 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
+ create mode 100644 target/arm/cpu-idregs.h
+
+diff --git a/target/arm/cpu-idregs.h b/target/arm/cpu-idregs.h
+new file mode 100644
+index 0000000000..98c7a7518f
+--- /dev/null
++++ b/target/arm/cpu-idregs.h
+@@ -0,0 +1,36 @@
++/*
++ * handle ID registers and their fields
++ *
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ */
++#ifndef TARGET_ARM_CPU_IDREGS_H
++#define TARGET_ARM_CPU_IDREGS_H
 +
-+/* This file is autogenerated by scripts/update-aarch64-cpu-sysregs-header.py */
-+/* DEF(<name>, <op0>, <op1>, <crn>, <crm>, <op2>) */
++#include "qemu/osdep.h"
++#include "qemu/error-report.h"
++#include "cpu.h"
++#include "cpu-sysregs.h"
 +
-+DEF(AIDR_EL1, 3, 1, 0, 0, 7)
- DEF(CLIDR_EL1, 3, 1, 0, 0, 1)
- DEF(CTR_EL0, 3, 3, 0, 0, 1)
- DEF(DCZID_EL0, 3, 3, 0, 0, 7)
-+DEF(GMID_EL1, 3, 1, 0, 0, 4)
- DEF(ID_AA64AFR0_EL1, 3, 0, 0, 5, 4)
- DEF(ID_AA64AFR1_EL1, 3, 0, 0, 5, 5)
- DEF(ID_AA64DFR0_EL1, 3, 0, 0, 5, 0)
- DEF(ID_AA64DFR1_EL1, 3, 0, 0, 5, 1)
-+DEF(ID_AA64DFR2_EL1, 3, 0, 0, 5, 2)
- DEF(ID_AA64FPFR0_EL1, 3, 0, 0, 4, 7)
- DEF(ID_AA64ISAR0_EL1, 3, 0, 0, 6, 0)
- DEF(ID_AA64ISAR1_EL1, 3, 0, 0, 6, 1)
-@@ -40,6 +47,10 @@ DEF(ID_MMFR5_EL1, 3, 0, 0, 3, 6)
- DEF(ID_PFR0_EL1, 3, 0, 0, 1, 0)
- DEF(ID_PFR1_EL1, 3, 0, 0, 1, 1)
- DEF(ID_PFR2_EL1, 3, 0, 0, 3, 4)
-+DEF(MIDR_EL1, 3, 0, 0, 0, 0)
-+DEF(MPIDR_EL1, 3, 0, 0, 0, 5)
- DEF(MVFR0_EL1, 3, 0, 0, 3, 0)
- DEF(MVFR1_EL1, 3, 0, 0, 3, 1)
- DEF(MVFR2_EL1, 3, 0, 0, 3, 2)
-+DEF(REVIDR_EL1, 3, 0, 0, 0, 6)
-+DEF(SMIDR_EL1, 3, 1, 0, 0, 6)
++typedef struct ARM64SysRegField {
++    const char *name; /* name of the field, for instance CTR_EL0_IDC */
++    ARMIDRegisterIdx index; /* parent register, e.g. CTR_EL0_IDX */
++    int shift; /* lsb of the field in the register */
++    int length; /* highest bit number */
++    uint64_t *arch_vals;
++    uint32_t arch_vals_count;
++} ARM64SysRegField;
++
++typedef struct ARM64SysReg {
++    const char *name;   /* name of the sysreg, for instance CTR_EL0 */
++    ARMIDRegisterIdx index; /* register index, e.g. CTR_EL0_IDX */
++    struct ARM64SysRegField *fields;
++    uint32_t fields_count;
++    uint64_t writable_mask;
++} ARM64SysReg;
++
++/*
++ * List of exposed ID regs (automatically populated from AARCHMRS Registers.json)
++ */
++extern ARM64SysReg arm64_id_regs[NUM_ID_IDX];
++
++#endif
 -- 
 2.53.0
 
