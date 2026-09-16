@@ -1,125 +1,78 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26C1E495AD7;
-	Wed, 16 Sep 2026 16:43:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7814A595754;
+	Wed, 16 Sep 2026 16:56:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789577020; cv=none; b=guEBjJPz4l1rt+c397W1l1B/LvW3YKZiWEswPBCZDroZI7xCxsclZ7FIwqGGrFj1C/M0t+bv9Kwv8kzvYJZlx5z4+55zjwz6kvsFxqIlsMuz+Qie5b6rua02PAlwsk1H1maVKq4WcIL/RPkacWtnxpT252922sFdGPIQ3C0wWbM=
+	t=1789577802; cv=none; b=aUTGajJQi5pLItIdt3n9cIoxqT89SKRbtyIR13mu1fMGgv0WhjZJNMxrXzrGjbRQEITMmAbTQ+CgylRWdAJ2a0jsj29S7ejzyAzlDR+VffhZgFg9sfTQRkvx4sG0kCFwR/M1DdsN35DrRjw5dOLuBg6q70uvuOHWOgyAeVMwzLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789577020; c=relaxed/simple;
-	bh=1gw/Wnw27B072D15xLwsTlTYudOjIfpJY0cqXLpIrdQ=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IBxLZDTq9YPhdS5zI3vvEc+PDgVjr4F2kSse5UL3li9rSMv0bWG/dZ0P7GSxXzbTrTRXyY66iRtBvxi8qD9oy3zoeBdY1LklRtM+cvHXeBH/3qnox34wnezHeg9TKtUxn+E8ShhcJQZJ2eyG07gKkUK+rYPxBrSWNeV0M8f3k/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=og3EaWrj; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789577802; c=relaxed/simple;
+	bh=9fSY0YtZszmnwmnH72T2AXZffe4pzVRSX07T/e91g2w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pFAVUURrwCO9+bDAFhqxlW2gQHh5AQcEiw4xMGvHm5EOfge9RpDxuTcX9YukJCLgDIyTRMltaFRq9iiU75moJtYnfKJd7P2AqvriIm9aK8ijp0il9RH4juJgCfWbzKB4KKZ30qS0jmmf18J/8cxo74Ww2XNEtcJSbM8jATeljJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Vef64xh9; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="og3EaWrj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F22271F0089F;
-	Wed, 16 Sep 2026 16:43:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789577003;
-	bh=G5fdoWcd4IbAkK7p7KKtFU9jGsN4lvSTG0kjXK87Z/s=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=og3EaWrjP8c7fsXDATC1SKvtJnQZOm079+ugLkbY/nxtak8GydZhXjNiHQh4izk1S
-	 OEdZu0no6ojvJzKlYaCjTo+uODYvNXNicXce1FBem5USIcbi5UoL1Lq8q4BY26W4h+
-	 vi9S6qWyIuqYH5o/KOaL5pakpQ9iDn1kPgjdKZg1OYGweIae7DIX9QPAMwZ+BJ4X2y
-	 i7jkvUXB2IthoHvpvGPvYC/JAFEszLThLjj7PJaTksZF+vCSJjM18q0j3PQJR+u3fn
-	 kt6lOrDXIwHQW/AjDHFCGjA2907tj+tnP+PdCd8c6GDsRDnkBKHUqfouoKfjAmdLGO
-	 sv8qB16AoZFSw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1x6sjA-00000009igi-3lRZ;
-	Wed, 16 Sep 2026 16:43:21 +0000
-Date: Wed, 16 Sep 2026 17:43:20 +0100
-Message-ID: <868q515eqf.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: oupton@kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	joey.gouly@arm.com,
-	seiden@linux.ibm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	mark.rutland@arm.com,
-	steven.price@arm.com,
-	vdonnefort@google.com,
-	qperret@google.com,
-	tabba@google.com
-Subject: Re: [PATCH v3 16/18] KVM: arm64: Reject host power-on of a vCPU that EL2 holds powered off
-In-Reply-To: <20260914113338.159227-17-fuad.tabba@linux.dev>
-References: <20260914113338.159227-1-fuad.tabba@linux.dev>
-	<20260914113338.159227-17-fuad.tabba@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Vef64xh9"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 386EA1476;
+	Wed, 16 Sep 2026 09:56:33 -0700 (PDT)
+Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AE4803FAA1;
+	Wed, 16 Sep 2026 09:56:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1789577796; bh=9fSY0YtZszmnwmnH72T2AXZffe4pzVRSX07T/e91g2w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Vef64xh9KpWL2pmX8x3XXeNP4dknBKucoXLhzKgP8teEasVYgR9XZfcGfJUzoKvj4
+	 i0/ODhioxM1eIhQIAitKxdZrFXMdEimBOUh2fwKYciRlYZdBxTX72iTZbsWkTBen4V
+	 tdy5aVDJnMqpujftXrCqeSXXJH5WsRVooO60ju9U=
+Date: Wed, 16 Sep 2026 17:56:30 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
+	will@kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
+	aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
+	joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
+	linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
+	sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
+	WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com
+Subject: Re: [PATCH v18] arm64: mm: Handle Granule Protection Faults (GPFs)
+Message-ID: <aqrKPkMPeHdtCVGg@arm.com>
+References: <20260913070459.2547407-1-suzuki.poulose@arm.com>
+ <aqrGPK0lFBFXL2qY@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, steven.price@arm.com, vdonnefort@google.com, qperret@google.com, tabba@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aqrGPK0lFBFXL2qY@arm.com>
 
-On Mon, 14 Sep 2026 12:33:36 +0100,
-Fuad Tabba <fuad.tabba@linux.dev> wrote:
+On Wed, Sep 16, 2026 at 05:39:31PM +0100, Catalin Marinas wrote:
+> On Sun, Sep 13, 2026 at 08:04:58AM +0100, Suzuki K Poulose wrote:
+> > +static int do_gpf(unsigned long far, unsigned long esr, struct pt_regs *regs)
+> > +{
+> > +	if (!user_mode(regs) && !is_el1_instruction_abort(esr) &&
+> > +	    fixup_exception(regs, esr))
+> > +		return 0;
+> > +
+> > +	return 1;
+> > +}
 > 
-> A protected vCPU's power state belongs to EL2, which changes it only
-> on the guest's own PSCI calls. KVM_SET_MP_STATE(RUNNABLE) on a vCPU
-> EL2 holds powered off changes the host's copy alone, and the guest's
-> next CPU_ON of that vCPU then fails: mp_state is no longer STOPPED, so
-> the host returns ALREADY_ON, and the guest's retry fails the same way
-> until the VMM stops the vCPU again. SUSPENDED has the same effect.
-> 
-> Track at the host whether EL2 holds a protected vCPU powered off and
-> return -EPERM for both writes in that state. STOPPED stays permitted,
-> so a VMM can pause a vCPU, and RUNNABLE on a vCPU EL2 has powered on,
-> so it can resume one.
-> 
-> The guest's CPU_ON is gated on the same record rather than on STOPPED.
-> A VMM that sets STOPPED between the target's CPU_OFF exit and the
-> host's power-off of it would otherwise let the CPU_ON through, and the
-> power-off would then record the target powered off while EL2 holds it
-> ON_PENDING, with no way back before VM teardown. Gated on the record,
-> that CPU_ON returns ALREADY_ON and the retry succeeds once the
-> power-off has run.
-> 
-> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
-> ---
->  arch/arm64/include/asm/kvm_host.h |  2 ++
->  arch/arm64/kvm/arm.c              | 19 +++++++++++++++++++
->  arch/arm64/kvm/pkvm.c             | 21 +++++++++++++++++----
->  arch/arm64/kvm/psci.c             | 10 +++++++++-
->  4 files changed, 47 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 37d0721d39a45..2e2c051dd8e62 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -922,6 +922,8 @@ struct kvm_vcpu_arch {
->  	/* vcpu power state */
->  	struct kvm_mp_state mp_state;
->  	spinlock_t mp_state_lock;
-> +	/* EL2 holds the protected vCPU powered off. Under mp_state_lock. */
-> +	bool pkvm_powered_off;
+> We discussed briefly offline. With the latest patches around, would we
+> ever end up with private memory mapped in the VMM and hence the GPF? If
+> not, I would still keep this handling but add a
+> WARN_ON_ONCE(user_mode(regs)).
 
-I'm definitely not keen on yet another random boolean to describe some
-new state. We already have mp_state. Why can't we use one of the
-unused encodings and check that, since it very much looks like a case
-of "let userspace change the MP_STATE unless EL2 says otherwise".
+Actually, even better:
 
-Can that be made to work?
+	WARN_ON_ONCE(is_ttbr0_addr(untagged_addr(far)));
 
-	M.
+to capture uaccess. The user_mode() test you have above can stay the
+same.
 
 -- 
-Without deviation from the norm, progress is not possible.
+Catalin
