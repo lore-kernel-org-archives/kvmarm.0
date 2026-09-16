@@ -1,47 +1,47 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2919C30216D
-	for <kvmarm@lists.linux.dev>; Wed, 16 Sep 2026 14:49:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6650D3546D6
+	for <kvmarm@lists.linux.dev>; Wed, 16 Sep 2026 14:49:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789570175; cv=none; b=b+QEKTW3dGmbmQocY5M4KNA6dqS75klCOk30yOPhpBnWBOW7yNAguInVwV+PoGASzrCDbxovkS6DWxuU+HYLmJ1alYRvMnTpRJZ9yjsbRB6LV6g0qiTicH+vOxMc17k2r5FEgMTvYbhXr/zB9vQmJ3yi3Evh/tV30Jfs4syjfYA=
+	t=1789570180; cv=none; b=gsBSXB//uTHbFeD186E9M1Ia0SQmwaLS3HZ2fa2mXzy4xbnfO1Kp7RL1XtwZ6x7Pzxmje4P+8Zj5v7jW1f4GTL/lDr73ldBkqnkW2N2wh2mgb1LesUUBd//aaFuFRtmPNt5o79p5A1qefGvga07m2oLb/vvNY0hR/Ftdgo+mBRs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789570175; c=relaxed/simple;
-	bh=PH7782k5m4Mk3/ObYi6UCpeIhkGicvcpIB8drAp/EKU=;
+	s=arc-20240116; t=1789570180; c=relaxed/simple;
+	bh=w9UsymA8IlDgZOuoAw/B4AucbECOyPgPKsrX6YxICV8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:content-type; b=i8L2P3/NuQlSdV5ABpZLMaRPdHkToPmNMjvTgPhzA7QOxDYfd/RuyOyPDmtKpYhndirjR+qZGZj/Hlb+aSMy6FbERpQGc4A3PUCTMY1Tcx/MtyHYof57MA4FhNwUWlzTlfNlLWJ71xKF7prSoGr7EcC0hx+PON4IkRPKplZiZFo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ImKAsdpr; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version:content-type; b=mzRE+bt7sjIQzdlFArpNwHkI5c7lro3ZNY06tY05V9zVzRIfXP3Tulj9Ft6DP4jXk0mUPYF9Ouk3DzsxcqhIRL2P3DWr5xaXtPL/T8U+f4tPxV4wsQ19r7N6+g6ylOtj33BpgUtfUYHeWmFzDlH005JC+0LGoDxFPJ2pa0470LA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LiwcmajB; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ImKAsdpr"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LiwcmajB"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1789570173;
+	s=mimecast20190719; t=1789570178;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=e02JHTK5vtyACAt9OjPCN3RGbXnELCnkz1SQgi2oqUc=;
-	b=ImKAsdprh6YE8zLwoerS5/xy1yzX4W7HWI5sJAVbPA7wORI4v0nrMW+fw5TPzP1oMVUmsA
-	xVceayI8KeyymtZ8pM/QxOP8D0IJ8C1MZ4BxGaBG9S8rwyenaMM1tYoB/JxdK1gyy80GgQ
-	AN3WWAG8fEQQuNqttvAxWoiO5M31fLc=
+	bh=nHTQyV3fsb5dGPVizKLS+8CWG7EJNOQy7+/Wy/+0kNs=;
+	b=LiwcmajBZsL/g0ca/+FZq9++QhpopzeCzQXptrUfGp1bZTnmu8kuIL1X7nv0L8fRaBlcZX
+	4Uc1EY0YF4RSX8QvfjjIT0Ab9OiUVrLWtT9hcAOPF2PVel4U/DbUZCkqFvELQgJFW0HWIR
+	eihcBBGDvJt62jFLsQOLsdoFBAgSIzI=
 Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-355-pDKpRdLvO4mUUX9UnosilA-1; Wed,
- 16 Sep 2026 10:49:29 -0400
-X-MC-Unique: pDKpRdLvO4mUUX9UnosilA-1
-X-Mimecast-MFC-AGG-ID: pDKpRdLvO4mUUX9UnosilA_1789570167
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-648-yGtr9CB3M_GUjxiL2SnAzQ-1; Wed,
+ 16 Sep 2026 10:49:34 -0400
+X-MC-Unique: yGtr9CB3M_GUjxiL2SnAzQ-1
+X-Mimecast-MFC-AGG-ID: yGtr9CB3M_GUjxiL2SnAzQ_1789570172
 Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 99FF2183019A;
-	Wed, 16 Sep 2026 14:49:27 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D0F9E1829E28;
+	Wed, 16 Sep 2026 14:49:32 +0000 (UTC)
 Received: from laptop.redhat.corp (headnet04.pony-001.prod.iad2.dc.redhat.com [10.2.32.116])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id EA73919560AB;
-	Wed, 16 Sep 2026 14:49:22 +0000 (UTC)
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id F35C219560AB;
+	Wed, 16 Sep 2026 14:49:27 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com,
 	eric.auger@redhat.com,
@@ -64,9 +64,9 @@ Cc: maz@kernel.org,
 	berrange@redhat.com,
 	abologna@redhat.com,
 	jdenemar@redhat.com
-Subject: [PATCH v9 22/26] target/arm/kvm: Add an error handle to kvm_arm_create_scratch_host_vcpu
-Date: Wed, 16 Sep 2026 16:45:45 +0200
-Message-ID: <20260916144721.751810-23-eric.auger@redhat.com>
+Subject: [PATCH v9 23/26] target/arm/kvm: Introduce kvm_arm_vcpu_prepare_init_features helper
+Date: Wed, 16 Sep 2026 16:45:46 +0200
+Message-ID: <20260916144721.751810-24-eric.auger@redhat.com>
 In-Reply-To: <20260916144721.751810-1-eric.auger@redhat.com>
 References: <20260916144721.751810-1-eric.auger@redhat.com>
 Precedence: bulk
@@ -76,121 +76,85 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
-X-Mimecast-MFC-PROC-ID: rv6H_3gtG83vO5WzkdhYe1q-vEJuxV0NtmCYzo5Kn9c_1789570167
+X-Mimecast-MFC-PROC-ID: BUFn3ncH87dVTM7q_F6j-HFKFjT41C5H29yUrsKIjVY_1789570172
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 content-type: text/plain; charset="US-ASCII"; x-default=true
 
-This allows to report a precise error message if any error occurs.
+Factorize the code that initializes the kvm init features from the
+cpu settings in a helper. Use it kvm_arch_init_vcpu(). Soon it will
+be used by another function.
+
+The only change in the code relates to the check of kvm_state. The
+future caller won't have the VM created when calling the helper and
+for this caller it is OK ignoring PSCI version setting.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- target/arm/kvm_arm.h |  3 ++-
- target/arm/kvm.c     | 15 ++++++++++++---
- 2 files changed, 14 insertions(+), 4 deletions(-)
+ target/arm/kvm.c | 36 ++++++++++++++++++++++--------------
+ 1 file changed, 22 insertions(+), 14 deletions(-)
 
-diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
-index bace69efed..185018e00c 100644
---- a/target/arm/kvm_arm.h
-+++ b/target/arm/kvm_arm.h
-@@ -106,6 +106,7 @@ struct kvm_vcpu_init;
-  * @init: filled in with the necessary values for creating a host
-  * vcpu. If NULL is provided, will not init the vCPU (though the cpufd
-  * will still be set up).
-+ * @errp: Error handle
-  *
-  * Create a scratch vcpu in its own VM of the type preferred by the host
-  * kernel (as would be used for '-cpu host'), for purposes of probing it
-@@ -115,7 +116,7 @@ struct kvm_vcpu_init;
-  * false on failure (and fdarray and init are not valid).
-  */
- bool kvm_arm_create_scratch_host_vcpu(int *fdarray,
--                                      struct kvm_vcpu_init *init);
-+                                      struct kvm_vcpu_init *init, Error **errp);
- 
- /**
-  * kvm_arm_destroy_scratch_host_vcpu:
 diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index f7ca0e0250..43fb61bef4 100644
+index 43fb61bef4..a459942a73 100644
 --- a/target/arm/kvm.c
 +++ b/target/arm/kvm.c
-@@ -107,13 +107,14 @@ static int kvm_arm_vcpu_finalize(ARMCPU *cpu, int feature)
+@@ -2448,27 +2448,18 @@ static int kvm_arm_apply_sysreg_props(ARMCPU *cpu, Error **errp)
+     return 0;
  }
  
- bool kvm_arm_create_scratch_host_vcpu(int *fdarray,
--                                      struct kvm_vcpu_init *init)
-+                                      struct kvm_vcpu_init *init, Error **errp)
+-int kvm_arch_init_vcpu(CPUState *cs, Error **errp)
++/* Determine init features for this CPU */
++static void kvm_arm_vcpu_prepare_init_features(ARMCPU *cpu)
  {
-     int ret = 0, kvmfd = -1, vmfd = -1, cpufd = -1;
-     int max_vm_pa_size;
+-    int ret;
+-    uint64_t mpidr;
+-    ARMCPU *cpu = ARM_CPU(cs);
++    CPUState *cs = CPU(cpu);
+     CPUARMState *env = &cpu->env;
+-    uint64_t psciver;
  
-     kvmfd = qemu_open_old("/dev/kvm", O_RDWR);
-     if (kvmfd < 0) {
-+        error_setg(errp, "Failed opening /dev/kvm");
-         goto err;
+-    if (cpu->kvm_target == QEMU_KVM_ARM_TARGET_NONE) {
+-        error_setg(errp, "KVM is not supported for this guest CPU type");
+-        return -EINVAL;
+-    }
+-
+-    qemu_add_vm_change_state_handler(kvm_arm_vm_state_change, cpu);
+-
+-    /* Determine init features for this CPU */
+     memset(cpu->kvm_init_features, 0, sizeof(cpu->kvm_init_features));
++
+     if (cs->start_powered_off) {
+         cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_POWER_OFF;
      }
-     max_vm_pa_size = ioctl(kvmfd, KVM_CHECK_EXTENSION, KVM_CAP_ARM_VM_IPA_SIZE);
-@@ -124,6 +125,7 @@ bool kvm_arm_create_scratch_host_vcpu(int *fdarray,
-         vmfd = ioctl(kvmfd, KVM_CREATE_VM, max_vm_pa_size);
-     } while (vmfd == -1 && errno == EINTR);
-     if (vmfd < 0) {
-+        error_setg(errp, "Failed creating the scratch VM");
-         goto err;
+-    if (cpu->psci_version != QEMU_PSCI_VERSION_0_1 &&
++    if (cpu->psci_version != QEMU_PSCI_VERSION_0_1 && cs->kvm_state &&
+         kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_PSCI_0_2)) {
+         /*
+          * Versions >= v0.2 are backward compatible with v0.2
+@@ -2492,6 +2483,23 @@ int kvm_arch_init_vcpu(CPUState *cs, Error **errp)
+     if (cpu->has_el2 && kvm_arm_el2_supported()) {
+         cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_HAS_EL2;
      }
++}
++
++int kvm_arch_init_vcpu(CPUState *cs, Error **errp)
++{
++    int ret;
++    uint64_t mpidr;
++    ARMCPU *cpu = ARM_CPU(cs);
++    uint64_t psciver;
++
++    if (cpu->kvm_target == QEMU_KVM_ARM_TARGET_NONE) {
++        error_setg(errp, "KVM is not supported for this guest CPU type");
++        return -EINVAL;
++    }
++
++    qemu_add_vm_change_state_handler(kvm_arm_vm_state_change, cpu);
++
++    kvm_arm_vcpu_prepare_init_features(cpu);
  
-@@ -143,6 +145,7 @@ bool kvm_arm_create_scratch_host_vcpu(int *fdarray,
- 
-     cpufd = ioctl(vmfd, KVM_CREATE_VCPU, 0);
-     if (cpufd < 0) {
-+        error_setg(errp, "Failed creating the scratch VCPU");
-         goto err;
-     }
- 
-@@ -156,12 +159,14 @@ bool kvm_arm_create_scratch_host_vcpu(int *fdarray,
- 
-         ret = ioctl(vmfd, KVM_ARM_PREFERRED_TARGET, &preferred);
-         if (ret < 0) {
-+            error_setg(errp, "Failed getting the preferred target");
-             goto err;
-         }
-         init->target = preferred.target;
-     }
-     ret = ioctl(cpufd, KVM_ARM_VCPU_INIT, init);
-     if (ret < 0) {
-+        error_setg(errp, "Failed the init of the scratch vcpu");
-         goto err;
-     }
- 
-@@ -659,6 +664,7 @@ kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
-     bool el2_supported;
-     bool pmu_supported = false;
-     uint64_t features = 0;
-+    Error *local_err = NULL;
-     int err;
- 
-     ahcf->target = QEMU_KVM_ARM_TARGET_NONE;
-@@ -706,7 +712,8 @@ kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
-         features |= 1ULL << ARM_FEATURE_PMU;
-     }
- 
--    if (!kvm_arm_create_scratch_host_vcpu(fdarray, &init)) {
-+    if (!kvm_arm_create_scratch_host_vcpu(fdarray, &init, &local_err)) {
-+        error_report_err(local_err);
-         return;
-     }
- 
-@@ -3093,8 +3100,10 @@ void arm_cpu_kvm_set_irq(void *arm_cpu, int irq, int level)
- void arm_gic_cap_kvm_probe(GICCapability *v2, GICCapability *v3)
- {
-     int fdarray[3];
-+    Error *err = NULL;
- 
--    if (!kvm_arm_create_scratch_host_vcpu(fdarray, NULL)) {
-+    if (!kvm_arm_create_scratch_host_vcpu(fdarray, NULL, &err)) {
-+        error_report_err(err);
-         return;
-     }
- 
+     /* Do KVM_ARM_VCPU_INIT ioctl */
+     ret = kvm_arm_vcpu_init(cpu);
 -- 
 2.53.0
 
