@@ -1,88 +1,50 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6281B377EC3
-	for <kvmarm@lists.linux.dev>; Wed, 16 Sep 2026 15:00:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D88752B1E8
+	for <kvmarm@lists.linux.dev>; Wed, 16 Sep 2026 15:29:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789570829; cv=none; b=fuQjCZo10dYy2aG7bcjosKEwJkgzFzq9E716LdqICcEHquw63YI9TY8XYRKuEYHxRG/Csw2UJ81rJN4t07ICk4ONW811YPvjeLg7MPX7KerIRgnpSoArKbsPmJkV4indMNCp76iL2hpCLS35vjgte2si1R3Iz3yOSvu3Z7ODGOM=
+	t=1789572549; cv=none; b=gHz/sJuai1q8+8zu77Pgm0lQXeSi/t1q02JDOJRJ7+gpH9/Wo/bwUYAHRJR1SSxmWaIQUPw7XxFqeC+TxLB6e/eQnInwLZ6XPMQputnpUcFZKiDH6OZ2Yob+YjJXy2UZzK5Fmrh4EFDyFfR+DEEXnuM7QLpFScRBoVE2zin3lgM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789570829; c=relaxed/simple;
-	bh=4mYZuYY/4TWRRwSCtvsKG9o4ifIS9Tyl9n2rO1QSNAM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jZonO4oWMMleuwcARjdpknsYwGx+AqrCNb/S3MO2Po4XHB8EN6lpqaVFQ7KnETtlOulXNKCHYTqLQ5lzMQJnsmmTxXLOCgdjQMLH/e8Fj4AK1fX9eo4C0CsUihR760YxrZUctstoHHXs8rXNzCkmuOaIJracUyJ0SOtgwPhApO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=DSW5uGXc; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1789572549; c=relaxed/simple;
+	bh=Tk/oV1RDmp/CGIbATSgjssjZIrJAg5EVOITLC/Nolfo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=egAs2tJvwEZR9IQl2N+7XKszSXIOgFo4iKPU06Q0vTAq1YRN1bu+EDO7oTSI4OieybgiUcJ/EzF9z6ebljQbRR6SI+XTAtbCxUHtSiIoJaXsPjwFC8s0p0KAKv86gShujEAuSKEk/qf6WzAOYJTHuGomBYAGLeNQPaEZ4m+SBlM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=RZmFFjdh; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="DSW5uGXc"
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68GEVxdJ3863290;
-	Wed, 16 Sep 2026 15:00:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=j9wYFqkMO68SYOCGbriFllUPMhixN2
-	gtllHySmb7w5g=; b=DSW5uGXcNBEav274LLwLVkQJJXunKRGXxm0hv6idwZZISp
-	jNx9tZ9aNgkx+oEM1BlRNdtXGx3Cc4ARJgmyUfNis7HfO07p6U0UKavc97fP4TvX
-	oUcKb36q2dUDMm8TJVws4WFM9cJ9al6mM7s9nLrvqdsO0eaFsWJLrcrt2t5Rxnmy
-	3t8fBs6c4Tiv/7v2y0dlBG0Fu4Dc2oqUQMAMGah5/jUTvPz8CLIwIe4myfy2ySV9
-	W/BBCPM2X/1Dd12JPrdXNmuwK4osTJfDO8sj2iYqVv41qJ9SUTMTBST9uZvh18Az
-	oRfEATaVPd6dFEd0FsIWB4YjaGjhMJuMTNVnbaCw==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gmv5hw4vu-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Wed, 16 Sep 2026 15:00:08 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 68GEaDkJ1571790;
-	Wed, 16 Sep 2026 15:00:08 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4gq03bxty3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 16 Sep 2026 15:00:07 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 68GF03fh49873402
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 16 Sep 2026 15:00:03 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3DA662004B;
-	Wed, 16 Sep 2026 15:00:03 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5059C20040;
-	Wed, 16 Sep 2026 15:00:02 +0000 (GMT)
-Received: from osiris (unknown [9.111.20.35])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Wed, 16 Sep 2026 15:00:02 +0000 (GMT)
-Date: Wed, 16 Sep 2026 17:00:01 +0200
-From: Steffen Eiden <seiden@linux.ibm.com>
-To: Janosch Frank <frankja@linux.ibm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, Alexander Gordeev <agordeev@linux.ibm.com>,
-        Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@kernel.org>,
-        Friedrich Welter <fritz@linux.ibm.com>, Fuad Tabba <tabba@google.com>,
-        Gautam Gala <ggala@linux.ibm.com>,
-        Hariharan Mari <hari55@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Hendrik Brueckner <brueckner@linux.ibm.com>,
-        Ilya Leoshkevich <iii@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
-        Marc Zyngier <maz@kernel.org>, Nico Boehr <nrb@linux.ibm.com>,
-        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
-        Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v7 21/23] KVM: s390: arm64: Implement vCPU IOCTLs
-Message-ID: <20260916150001.202565-D-seiden@linux.ibm.com>
-References: <20260831144802.834315-1-seiden@linux.ibm.com>
- <20260831144802.834315-22-seiden@linux.ibm.com>
- <d706435a-3984-4ef3-b319-1efc92517650@linux.ibm.com>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="RZmFFjdh"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A3DEE1516;
+	Wed, 16 Sep 2026 08:28:57 -0700 (PDT)
+Received: from LeoBrasDK.cambridge.arm.com (unknown [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 70DD63F86F;
+	Wed, 16 Sep 2026 08:28:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1789572541; bh=Tk/oV1RDmp/CGIbATSgjssjZIrJAg5EVOITLC/Nolfo=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=RZmFFjdhnLqMIN4dSvn7FZPHQA3OYgOox//NEWGvj3m63GKde+702yDG6Mk6ZIZAM
+	 ESxtcIPsTFG1fJ8KlRL6UUDCYDjWFplj713Hz1Uk8bsZ/jGCd/zZYnYE8ATyIO9HXd
+	 84XZMcJiKc3Mm1Leg7x9KLFB0iyF2JPO50bpuBv4=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Linus Walleij <linusw@kernel.org>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	Usama Anjum <usama.anjum@arm.com>
+Subject: Re: [PATCH v2] arm64: clear_page[s] using memset
+Date: Wed, 16 Sep 2026 16:28:51 +0100
+Message-ID: <aqq1sxdQNZ93oV9A@LeoBrasDK>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260916-aarch64-clear-pages-c-v2-1-0393769f7912@kernel.org>
+References: <20260916-aarch64-clear-pages-c-v2-1-0393769f7912@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -91,99 +53,221 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d706435a-3984-4ef3-b319-1efc92517650@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTE2MDE5NiBTYWx0ZWRfXxeAY1ElL61t/
- DSYaS/30ktfKLmCi1Je1B8oA5SSK0YMYFdINg32ZZXjlxEc9UVimA+x4ax64svDgzOof3EE+8Cq
- Vl8VAQsLH6OyJehRfezU1Slb3TVCSuZRAL9WWS3smLcYBp41FSMALFI1GRXyRzvYpwhzchIjlIb
- CkraEYnR4xehufNRYTAt45GmKn5YprnOrEXn+lXaPv8GrkVyfwHxDdUH/jkyYa+BwuOXTH5DASu
- kDegQycer+tXRRKiwObfFg6xsGp1+6tFw5IjK0QCpvpWHQ01ArLIpW1V7WjxcWuRkSv3LPrY4WX
- WTvUpoy2w1zB1MT+a+DaUVsEOXz87JpHkY8arJG1M5FfIGhZmq5O7Kpopd6aVb6eogrOYMABlIe
- vitrrgpi7QOp3DeMtsyo4XAdnUcOb3Oh/j+6VjF+J1g12DjFVEw5gMZ+jmN4OVH6vugtF3ro7tt
- US9PSysZIEbXkVY+LSw==
-X-Proofpoint-Spam-Info: AW1haW4tMjYwOTE2MDE5NiBTYWx0ZWRfXxG44vfSHFzXS
- 7DdX+PaMTaaPE/YyCzXnSUPL9HrecC741FwX1UnjFTWpWFPm3oI14f3lIBWA7I+3UY306cDUbZK
- R4kIROXqO89uOkaiabda0mrXWcATLjE=
-X-Authority-Analysis: v=2.4 cv=Zsx4uN7G c=1 sm=1 tr=0 ts=6aaaaef9 cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=kj9zAlcOel0A:10 a=VdqzKS8jKosA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=Y2IxJ9c9Rs8Kov3niI8_:22 a=VnNF1IyMAAAA:8
- a=2EDVkJ_xZdsl-fsxt_cA:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-ORIG-GUID: CcjZPhrNXuk_fD7ZBanhcQxmk7O2fTAK
-X-Proofpoint-GUID: pSdKo_eOc1M7lhhBdE68zGvs-QjHxbP6
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-09-16_02,2026-09-16_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 impostorscore=0 clxscore=1015 priorityscore=1501
- lowpriorityscore=0 bulkscore=0 adultscore=0 phishscore=0 spamscore=0
- suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2609040000
- definitions=main-2609160196
+Content-Transfer-Encoding: 8bit
 
-On Thu, Sep 03, 2026 at 03:27:16PM +0200, Janosch Frank wrote:
-> On 8/31/26 4:47 PM, Steffen Eiden wrote:
-> > Implement all required vCPU (arch) IOCTLs.
-> > 
-> > Co-developed-by: Andreas Grapentin <gra@linux.ibm.com>
-> > Signed-off-by: Andreas Grapentin <gra@linux.ibm.com>
-> > Co-developed-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-> > Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-> > Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
-> > ---
+On Wed, Sep 16, 2026 at 12:03:56PM +0200, Linus Walleij wrote:
+> There is no need to try to second-guess the compiler when
+> clearing memory. Just call memset() like everyone else.
 > 
-> [...]
+> Since memset() already has an architecture-local MOPS
+> optimization, we do not need to do anything else to preserve
+> the MOPS optimization.
 > 
-> > +static void arm_vcpu_run(struct kvm_vcpu *vcpu)
-> > +{
-> > +	struct kvm_sae_block *sae_block = &vcpu->arch.sae_block;
-> > +
-> > +	adjust_pc(vcpu);
-> > +
-> > +	local_irq_disable();
-> > +	guest_timing_enter_irqoff();
-> > +	guest_state_enter_irqoff();
-> > +	local_irq_enable();
-> > +
-> > +	sae_block->icptr = 0;
+> While at it, implement the shorthand for directly calling
+> the new prototype clear_pages() for larger page chunks.
 > 
-> We already do that in the function below, no?
-> If possible I'd like to avoid setting ictpr here.
->
-
-yes, removed it at this location. thanks.
-
-
-...
-
-> > +		kvm_vcpu_srcu_read_unlock(vcpu);
-> > +
-> > +		arm_vcpu_run(vcpu);
-> > +
-> > +		vcpu->mode = OUTSIDE_GUEST_MODE;
-> > +
-> > +		kvm_vcpu_srcu_read_lock(vcpu);
-> > +
-> > +		ret = handle_exit(vcpu);
+> No performance regressions can be seen, the fastpath
+> benchmarks differences are in the noise.
 > 
-> ARM increases stat.exits here and since you copied the stat fields over we
-> could do that too.
-
-Good catch, thanks. Adding the stat.
+> Usama Anjum tested next-20260821 with one warm-up and three repeats
+> in four sessions, for a total of 12 measured runs. The commands were:
 > 
-> General question to the ARM maintainers:
-> We'll be adding more stat fields in the very soon future.
-> Are you fine with us adding them under any name or should we prefix them so
-> it's clear they exist because of our architecture / implementation and will
-> likely never be added to ARM KVM?
+>   perf bench mem memset -k 1GB -f default -s 16GB
+>   perf bench mem mmap -p 1GB -f demand -s 32GB -l 5
+>   perf bench mem mmap -p 4KB -f demand -s 32GB -l 5
 > 
-> In the past we've added a lot of stats and I'd expect us to at least add
-> stats for every intercept reason.
+> The results were:
+> 
+> aws-m7g.metal:
+>   Benchmark    Base bytes/sec   Change with patch
+>   memset 1GB   63932542232.12                1.92%
+>   mmap 1GB     63272579168.03               -0.57%
+>   mmap 4KB     49692830849.48               -1.11%
+> 
+> cesw-aarch64-ampereone-1s-a192-32x:
+>   Benchmark    Base bytes/sec   Change with patch
+>   memset 1GB   33895562998.71                0.25%
+>   mmap 1GB     34338454210.17                1.16%
+>   mmap 4KB     25687107580.90               -0.85%
+> 
+> Assisted-by: LLM
+> Suggested-by: Will Deacon <will@kernel.org>
+> Tested-by: Usama Anjum <usama.anjum@arm.com>
+> Link: https://lore.kernel.org/linux-arm-kernel/20260303-aarch64-clear-pages-v1-1-ad0c3ee9a555@kernel.org/
+> Link: https://lore.kernel.org/linux-arm-kernel/67ab6c51-4511-46ab-931b-a4323551147a@arm.com/
+> Signed-off-by: Linus Walleij <linusw@kernel.org>
+> ---
+> Changes in v2:
+> - Rebased on v7.3-rc1
+> - Include Usama Anjum's performance results and Tested-by tag.
+> - Link to v1: https://lore.kernel.org/r/20260306-aarch64-clear-pages-c-v1-1-77c1bb0f1c21@kernel.org
+> ---
+>  arch/arm64/include/asm/page.h    | 13 +++++++++-
+>  arch/arm64/kernel/image-vars.h   |  1 -
+>  arch/arm64/kvm/hyp/nvhe/Makefile |  2 +-
+>  arch/arm64/lib/Makefile          |  2 +-
+>  arch/arm64/lib/clear_page.S      | 53 ----------------------------------------
+>  5 files changed, 14 insertions(+), 57 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/page.h b/arch/arm64/include/asm/page.h
+> index 58200de8a221..b2eaa63d9056 100644
+> --- a/arch/arm64/include/asm/page.h
+> +++ b/arch/arm64/include/asm/page.h
+> @@ -13,6 +13,7 @@
+>  #ifndef __ASSEMBLER__
+>  
+>  #include <linux/personality.h> /* for READ_IMPLIES_EXEC */
+> +#include <linux/string.h> /* for memset() */
+>  #include <linux/types.h> /* for gfp_t */
+>  #include <asm/pgtable-types.h>
+>  
+> @@ -20,7 +21,17 @@ struct page;
+>  struct vm_area_struct;
+>  
+>  extern void copy_page(void *to, const void *from);
+> -extern void clear_page(void *to);
+> +
+> +static inline void clear_pages(void *addr, unsigned int npages)
+> +{
+> +	memset(addr, 0, npages * PAGE_SIZE);
+> +}
+> +#define clear_pages clear_pages
+> +
+> +static inline void clear_page(void *addr)
+> +{
+> +	clear_pages(addr, 1);
+> +}
+>  
+>  void copy_user_highpage(struct page *to, struct page *from,
+>  			unsigned long vaddr, struct vm_area_struct *vma);
+> diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
+> index 14beb7b9d304..facda8137d9b 100644
+> --- a/arch/arm64/kernel/image-vars.h
+> +++ b/arch/arm64/kernel/image-vars.h
+> @@ -119,7 +119,6 @@ KVM_NVHE_ALIAS(__start___kvm_ex_table);
+>  KVM_NVHE_ALIAS(__stop___kvm_ex_table);
+>  
+>  /* Position-independent library routines */
+> -KVM_NVHE_ALIAS_HYP(clear_page, __pi_clear_page);
+>  KVM_NVHE_ALIAS_HYP(copy_page, __pi_copy_page);
+>  KVM_NVHE_ALIAS_HYP(memcpy, __pi_memcpy);
+>  KVM_NVHE_ALIAS_HYP(memset, __pi_memset);
+> diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
+> index f57450ebcb49..2ed489bf544e 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/Makefile
+> +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+> @@ -17,7 +17,7 @@ ccflags-y += -fno-stack-protector	\
+>  hostprogs := gen-hyprel
+>  HOST_EXTRACFLAGS += -I$(objtree)/include
+>  
+> -lib-objs := clear_page.o copy_page.o memcpy.o memset.o tishift.o
+> +lib-objs := copy_page.o memcpy.o memset.o tishift.o
+>  lib-objs := $(addprefix ../../../lib/, $(lib-objs))
+>  
+>  CFLAGS_switch.nvhe.o += -Wno-override-init
+> diff --git a/arch/arm64/lib/Makefile b/arch/arm64/lib/Makefile
+> index b33e1ca4a781..38ffd359123c 100644
+> --- a/arch/arm64/lib/Makefile
+> +++ b/arch/arm64/lib/Makefile
+> @@ -5,7 +5,7 @@ KCSAN_SANITIZE_delay.o := n
+>  
+>  lib-y		:= clear_user.o delay.o copy_from_user.o		\
+>  		   copy_to_user.o copy_page.o				\
+> -		   clear_page.o csum.o insn.o memchr.o memcpy.o		\
+> +		   csum.o insn.o memchr.o memcpy.o			\
+>  		   memset.o memcmp.o strcmp.o strncmp.o strlen.o	\
+>  		   strnlen.o strchr.o strrchr.o tishift.o
+>  
+> diff --git a/arch/arm64/lib/clear_page.S b/arch/arm64/lib/clear_page.S
+> deleted file mode 100644
+> index bd6f7d5eb6eb..000000000000
+> --- a/arch/arm64/lib/clear_page.S
+> +++ /dev/null
+> @@ -1,53 +0,0 @@
+> -/* SPDX-License-Identifier: GPL-2.0-only */
+> -/*
+> - * Copyright (C) 2012 ARM Ltd.
+> - */
+> -
+> -#include <linux/linkage.h>
+> -#include <linux/const.h>
+> -#include <asm/assembler.h>
+> -#include <asm/page.h>
+> -
+> -/*
+> - * Clear page @dest
+> - *
+> - * Parameters:
+> - *	x0 - dest
+> - */
+> -SYM_FUNC_START(__pi_clear_page)
+> -#ifdef CONFIG_AS_HAS_MOPS
+> -	.arch_extension mops
+> -alternative_if_not ARM64_HAS_MOPS
+> -	b	.Lno_mops
+> -alternative_else_nop_endif
+> -
+> -	mov	x1, #PAGE_SIZE
+> -	setpn	[x0]!, x1!, xzr
+> -	setmn	[x0]!, x1!, xzr
+> -	seten	[x0]!, x1!, xzr
+> -	ret
+> -.Lno_mops:
+> -#endif
+> -	mrs	x1, dczid_el0
+> -	tbnz	x1, #4, 2f	/* Branch if DC ZVA is prohibited */
+> -	and	w1, w1, #0xf
+> -	mov	x2, #4
+> -	lsl	x1, x2, x1
+> -
+> -1:	dc	zva, x0
+> -	add	x0, x0, x1
+> -	tst	x0, #(PAGE_SIZE - 1)
+> -	b.ne	1b
+> -	ret
+> -
+> -2:	stnp	xzr, xzr, [x0]
+> -	stnp	xzr, xzr, [x0, #16]
+> -	stnp	xzr, xzr, [x0, #32]
+> -	stnp	xzr, xzr, [x0, #48]
+> -	add	x0, x0, #64
+> -	tst	x0, #(PAGE_SIZE - 1)
+> -	b.ne	2b
+> -	ret
+> -SYM_FUNC_END(__pi_clear_page)
+> -SYM_FUNC_ALIAS(clear_page, __pi_clear_page)
+> -EXPORT_SYMBOL(clear_page)
+> 
+> ---
+> base-commit: cee9395acd8043be0644b25c34bfa86623f2b935
+> change-id: 20260305-aarch64-clear-pages-c-590dae98c333
+> 
+> Best regards,
+> --  
+> Linus Walleij <linusw@kernel.org>
+> 
+> 
 
-That is the exact reason I copied the struct and not reuse the arm64
-defenition. I already added a gmap stat we have but native arm not.
+Oh, cool!
+You remove an in-kernel asm implementation to favor the standard memset(), 
+which allows you to also have a batched clear_pages() version, which should 
+also be a bit more optimized than the do-while loop running clear_page().
 
-If the stat is meaningfull I am all for adding the stat to arm as well.
+Last thing I would check is if there is any particular part of the current 
+clear_page() that could have different behavior than the one in memset(), 
+and if it would cause any kind of unexpected impact. 
 
-	Steffen
+Looking on that, I see that the memset() implementation uses setp, setm, 
+sete, while the clear_page()'s uses setpn, setmn, setn for the case with 
+MOPS. But then, reading into the docs, the instructions seem pretty much 
+the same thing. 
+
+The arguments seem the same idea, exept for clear_page() always being xzr 
+instead of the memset value in xn, but should be the same thing.
+
+The generic (no-MOPS) version is very different, though, which is expected 
+as the purpose of clean_page() is a particular case of memset(). Was any 
+test ran in machines without FEAT_MOPS?
+
+Thanks!
+Leo
