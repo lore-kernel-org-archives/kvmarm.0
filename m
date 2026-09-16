@@ -1,33 +1,33 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31DD6443E43;
-	Wed, 16 Sep 2026 08:27:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25CD83E639B;
+	Wed, 16 Sep 2026 08:29:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789547274; cv=none; b=RBGD/byg2pYa17GvxVFkCrp02V3TfNY+31uV2T+N5XQscBh3hGf1M5TNBBxD670jVBJvR5nokEajhXarX1L2gGBziGj+1FzSuDC7vT05Fa22ejfSXIgw0n7Lw4aQs9RJkEmk+uDrquMl9ogo9eUxmOMT8WBcf2xd8xzTf1wCzZc=
+	t=1789547391; cv=none; b=Bxlq1fuhQtlOJbf83dxAY03mxdLS+JeWBR7t3rw9T3rwDEpftojJ6dCqNFijjD4cyCra4F8kS/cz5I72BPNaAtq2Gvm9R9gbZYI/8esLucnvDXMofPlEfL3EWPHbtVysMCkGslJjkXnuTKOeEWrQWlH8GVMSCfjwSFHt8FvM9vU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789547274; c=relaxed/simple;
-	bh=SC9sfcMnJ/PEFobWZVnmMbUTIFBvDkYTVdafgFGlQM4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qtJR6dt6k6SevpxiEayYTiqQSwFw2KisXlWGR+7b3hhNPtJ1T+FduVPVQEkSkd1Zfs2l+4I/66UZ3d4l+7vE4BXJvxWcMogwqcIU4H4qDvwtp+EBbmhmCqHj1GI0C4/dJ7MsMdm9HgZ5NHtZ1hzcpTKeQxT1piuzAtIhXCT3jNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=cZLOlYqd; arc=none smtp.client-ip=217.140.110.172
+	s=arc-20240116; t=1789547391; c=relaxed/simple;
+	bh=y55ACC3MPUfOeusEzJNUnJR+YNOw7CmGAYFFZG69fOM=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=EUKgA15Dt1cIpe6EBJRvp31SWtLuNccxcwBTLI6OH9xjnPuwEjf1MB2wfKeIDO7S8wNrZM5XlH2AQ3501zuyGqP0/FdB4VnAYS280XjVUp2pICm9hcoouqMjG/KnjDrfcrkhadJIv6jii6waikSruutCc6YmZkavaRvKqOTjmDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=IVLNFXo7; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="cZLOlYqd"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="IVLNFXo7"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E8033152B;
-	Wed, 16 Sep 2026 01:27:48 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DF092152B;
+	Wed, 16 Sep 2026 01:29:45 -0700 (PDT)
 Received: from [10.0.128.139] (unknown [10.0.128.139])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4A97B3F882;
-	Wed, 16 Sep 2026 01:27:49 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BDA623F882;
+	Wed, 16 Sep 2026 01:29:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1789547272; bh=SC9sfcMnJ/PEFobWZVnmMbUTIFBvDkYTVdafgFGlQM4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=cZLOlYqdunxqc5S8b7CsUOJR8q77ehv8styLLAf+uYgcAzeNJ/oXYr8R0jA/Ycd0U
-	 KN2fN/br8WnzGMNA7hcXsuDr0ExCzIwtWprwMg3biLx/h0ryGDAIcjyuTEq/eM/wDt
-	 IEbppHN1ZOW6OEyEnesegpbr7fdkusEc4UKbYE3M=
-Message-ID: <5c4a9d72-2f46-4121-8e9f-ae85f28eff1f@arm.com>
-Date: Wed, 16 Sep 2026 09:27:47 +0100
+	t=1789547389; bh=y55ACC3MPUfOeusEzJNUnJR+YNOw7CmGAYFFZG69fOM=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=IVLNFXo7GeAU8Xo5pmHQ1MHSQ3ZU8IGha06VwIrdgjVX2p9OPrAwXhk7dujDGXGBj
+	 CtC9UsgPBlBPaS0h/XPyJS+/ciKGCsXUQJ4HFHEmNlKYjAtEHZSyEt4hMpCRy6SzQP
+	 wUps3ACm3E14i5O4dVE1QwXxXGqEcQEXXJCjWAAA=
+Message-ID: <a53512f8-251b-4081-8d19-7957de3fc678@arm.com>
+Date: Wed, 16 Sep 2026 09:29:47 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -35,88 +35,99 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v18 01/23] KVM: arm64: protected VM: Handle set_one_reg
- CNTVCT_EL0/CNTPCT_EL0
+Subject: Re: [PATCH v18 20/23] KVM: arm64: CCA: Don't expose unsupported
+ capabilities for realm guests
 Content-Language: en-GB
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, will@kernel.org,
- catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
- aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
- joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
- linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
- sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
- WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com,
- Marc Zyngier <maz@krenel.org>
-References: <20260915160141.3543048-1-suzuki.poulose@arm.com>
- <20260915160141.3543048-2-suzuki.poulose@arm.com>
- <86o6dy5uob.wl-maz@kernel.org> <7c26c860-0543-459e-974b-72c59af261f9@arm.com>
- <a4e7e6c3-d325-4f35-a17c-e02791cca326@arm.com> <86ik45626u.wl-maz@kernel.org>
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <86ik45626u.wl-maz@kernel.org>
+To: sashiko-reviews@lists.linux.dev
+Cc: Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>,
+ kvmarm@lists.linux.dev, kvm@vger.kernel.org
+References: <20260915160141.3543048-1-suzuki.poulose@arm.com>
+ <20260915160141.3543048-21-suzuki.poulose@arm.com>
+ <20260915164346.D49711F000FF@smtp.kernel.org>
+ <6c3b2732-052c-47b8-905d-32aad2871ef8@arm.com>
+In-Reply-To: <6c3b2732-052c-47b8-905d-32aad2871ef8@arm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 16/09/2026 09:16, Marc Zyngier wrote:
-> On Tue, 15 Sep 2026 22:20:36 +0100,
-> Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+On 15/09/2026 18:55, Suzuki K Poulose wrote:
+> On 15/09/2026 17:43, sashiko-bot@kernel.org wrote:
+>> Thank you for your contribution! Sashiko AI review found 1 potential 
+>> issue(s) to consider:
+>> - [High] kvm: host Denial of Service via WARN_ON_ONCE in 
+>> kvm_arch_vm_ioctl_allowed()
+>> -- 
 >>
->> This is how it looks like now, reworked.
+>> commit f9fdb12a2363dfa41ace289596ec2d2bd95cde48
+>> Author: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> KVM: arm64: CCA: Don't expose unsupported capabilities for realm guests
 >>
+>> This commit limits the capabilities allowed for Realm VMs and blocks
+>> vm_ioctls backed by unsupported capabilities. It introduces generic
+>> capability and ioctl filtering helpers kvm_arch_vm_ext_allowed() and
+>> kvm_arch_vm_ioctl_allowed() to support both pKVM and Realm guests.
 >>
->> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
->> index 6ac3321f4c575..1c8fac222a643 100644
->> --- a/arch/arm64/kvm/arch_timer.c
->> +++ b/arch/arm64/kvm/arch_timer.c
->> @@ -1110,8 +1110,7 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
->>                  timer_context_init(vcpu, i);
+>>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+>>> --- a/arch/arm64/kvm/arm.c
+>>> +++ b/arch/arm64/kvm/arm.c
+>> [ ... ]
+>>> +static inline bool kvm_arch_vm_ioctl_allowed(struct kvm *kvm, 
+>>> unsigned int ioctl)
+>>> +{
+>>> +    long ext;
+>>> +    int r;
+>>> +
+>>> +    r = kvm_get_cap_for_kvm_ioctl(ioctl, &ext);
+>>> +    if (WARN_ON_ONCE(r < 0))
+>>> +        return false;
 >>
->>          /* Synchronize offsets across timers of a VM if not already
->> provided */
->> -       if (!vcpu_is_protected(vcpu) &&
->> -           !test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET,
->> &vcpu->kvm->arch.flags)) {
->> +       if (!test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET,
->> &vcpu->kvm->arch.flags)) {
->>                  timer_set_offset(vcpu_vtimer(vcpu), kvm_phys_timer_read());
->>                  timer_set_offset(vcpu_ptimer(vcpu), 0);
->>          }
->> @@ -1133,6 +1132,15 @@ void kvm_timer_init_vm(struct kvm *kvm)
->>           */
->>          for (int i = 0; i < NR_KVM_TIMERS; i++)
->>                  kvm->arch.timer_data.ppi[i] = get_vgic_ppi(kvm,
->> default_ppi[i]);
->> +
->> +       /*
->> +        * For the protected VMs, fix the counter offset to 0 by marking the
->> +        * KVM_ARCH_FLAG_VM_COUNTER_OFFSET. This would also prevent
->> userspace
->> +        * writes to CNTVCT_ELO & CNTPCT_EL0.
->> +        * The user can't set the offset via vm ioctl
->> KVM_ARM_SET_COUNTER_OFFSET.
->> +        */
+>> [Severity: High]
+>> Could this allow an unprivileged host userspace process to crash the 
+>> host?
 > 
-> This is a bit wordy. Something like:
+> This is addressed by a patch from Fuad, hence I didn't try to fix that
+> here.
 > 
-> 	Protected VMs don't allow any offset being set from userspace,
-> 	either set via writes to the counters or using the dedicated
-> 	ioctl. Pretend the offset has already been set and rely on the
-> 	default offset being 0.
+> https://lore.kernel.org/all/20260914093838.1082637-1-fuad.tabba@linux.dev
 > 
->> +       if (kvm_vm_is_protected(kvm))
->> +               set_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &kvm->arch.flags);
->>   }
+> 
 >>
->>   void kvm_timer_cpu_up(void)
+>> When kvm_arch_vm_ioctl() receives an unrecognized or garbage ioctl,
+>> kvm_get_cap_for_kvm_ioctl() returns a negative value. This evaluates 
+>> to true
+>> and triggers the WARN_ON_ONCE() here. On systems configured with 
+>> panic_on_warn
+>> (which is common in production and Android environments), this results 
+>> in a
+>> kernel panic and a complete host denial of service.
+>>
+>> [ ... ]
+>>> @@ -2150,7 +2202,7 @@ int kvm_arch_vm_ioctl(struct file *filp, 
+>>> unsigned int ioctl, unsigned long arg)
+>>>       void __user *argp = (void __user *)arg;
+>>>       struct kvm_device_attr attr;
+>>> -    if (is_protected_kvm_enabled() && !kvm_pkvm_ioctl_allowed(kvm, 
+>>> ioctl))
+>>> +    if (!kvm_arch_vm_ioctl_allowed(kvm, ioctl))
+>>>           return -EINVAL;
+>>
+>> [Severity: High]
+>> Does removing the is_protected_kvm_enabled() check expose the 
+>> WARN_ON_ONCE()
+>> above to all ARM64 KVM deployments?
 > 
-> Otherwise LGTM.
+> Thats right, I will add the following check in the 
+> kvm_arch_vm_ioctl_allowed()
+> 
+> if (!kvm || !kvm_vm_is_hyp_distrusting(kvm))
+>      return true;
 
-Thanks,
+Thats not correct. It should be :
+
+if (!is_protected_kvm_enabled() &&
+     (!kvm || !kvm_is_realm(kvm)))
+	return true;
 
 Cheers
 Suzuki
-
-> 
-> 	M.
-> 
 
