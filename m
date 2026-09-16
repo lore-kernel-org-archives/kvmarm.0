@@ -1,103 +1,54 @@
-Received: from mail-qk2-f12.google.com (mail-qk2-f12.google.com [74.125.230.204])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EC744AA3EA
-	for <kvmarm@lists.linux.dev>; Wed, 16 Sep 2026 12:39:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.230.204
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91A774F0554
+	for <kvmarm@lists.linux.dev>; Wed, 16 Sep 2026 13:03:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789562399; cv=none; b=sdjXhXYds4Gwi6U6DJQX4y2rRLnM3nTYpRNQHPm6Pn/+BtyNPEpSMTO7fMsK60cMh37QNIoNGqJvu8f/yzbIDJcq0h9jDqfuPdZxYWYnaxE7LuPbvigfmYB2iTDTX5YZZ2qM4jeGO7nJbuHW1H8uJFZqhA9ihbqYY0QWEEid6Bw=
+	t=1789563835; cv=none; b=V3atZOwM+RomNkz8IxXQ5HtogR1sCtrETYtsJbgFzj770d7XkHHNCoM9AJ5nPBQBpJd1dbj5Ii1vU2EH1wzMbuzKrMYA9MnreRsEZTE9dlSYkHtdx9b0OuLC7ymL6ZxwnarEM4ljpho1WOJ8DHYcHhB8vz5yeYuv+QozVaur5es=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789562399; c=relaxed/simple;
-	bh=gGoqbGDprEWmwT1B9MSHH6QmD1IQdF3fmGx24ee3Hik=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oGvQI+4zHkJfUJO+OIx1D0L75c5Snf10OA94mXKwZF/1sTn28tb/Bi/C1eQas8kgLD12IiG3+Dn4CqsMOotRq3/OUHRxB7XtESGrugETy4gpsvqUPoRmsKDVVJvQf3dYqKZMcrZQmm4L7M1CL+yFEWEoBbMtiRzM88OHrv3CL/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=Ew0rFzY2; arc=none smtp.client-ip=74.125.230.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+	s=arc-20240116; t=1789563835; c=relaxed/simple;
+	bh=ybBOpgHUoAg23QCDB90NXKXwaf6KfWZrKX6JSKHFY2U=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=c1a+Veb7E+i0r7NcCHCTdMGUcI5cZR8lD/xaWmuRVLuHipRliHsWe57UIx4adiv3ZFWPYff8KPl4MeU6TJE0GCROe1ckbsJ61HY89dWKiqm+vmdGS2/TDwVJtHhHdCaktdwIw0BdlhVX+7MzQfOMCO7lYkSx3G3BXpDYCkwqmBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=s7qg14sw; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="Ew0rFzY2"
-Received: by mail-qk2-f12.google.com with SMTP id af79cd13be357-93910ca5aa8so82483285a.3
-        for <kvmarm@lists.linux.dev>; Wed, 16 Sep 2026 05:39:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1789562396; x=1790167196; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=TUDIe9gR+rSLhhhfLCdbqdanDu9FYyFLld3nExrjk8M=;
-        b=Ew0rFzY2yPpAyieFUY5/UITv7hamDUOXY4wn69E/spfZLpbXAA1K5jdZkAS7yVnGcA
-         fhMruDWBgYb0bK78QKZ1w0qDBiH+Of76vLL0HqxLQEofrV9zZtPD9UquxQMbQVrIonfu
-         1zhADcNyju+WYvtZKKw+fyXiILcfDGgIas+trqg2RuwfUAIqjFvidMD0shUPlpI3M6zL
-         GlxtQuIMLWjlmhau+fsVAXacZNB2qhhum1yfPwil64VuvqhidwE3J3d5+8Bi4a9lrD7n
-         5B1IHmiPxxLVMQRWwPNq80xJzyPzGDSo9qNlnj/dMCxpB+vydimCAz5MMWg99ZBzN7a/
-         RksQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789562396; x=1790167196;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=TUDIe9gR+rSLhhhfLCdbqdanDu9FYyFLld3nExrjk8M=;
-        b=ZQBjXMT0hKt8l9Srg8GKA/Hx4CCgKXpiKckl+bFEgJgx4oDNiIyinQPyVfgMSLciWa
-         xgBoGcelgLHlBQSJP6nNWGwAxu42KTq+1OlXf6/VNmhfpkJteNsTeVOUSyIkN2s+0SH6
-         Y3RNtaBkEWVcnTuw3BMx/nAbMF7N7ynxSKO1qVnRr+5SromP1hbQXOY23W0ZEOXYozzn
-         2V3RFWpSy3cKXsin5Ej3qWepqWNr9FtsFuYEaZZRY3Sf6zDkm+vD4WCYOkSbnIyEyY5S
-         eyyZG6MECT3gigY/qwItjYMNVl0yj6FyIRQLBIbAlrslo9v/Gt4fd1kErioBwm3xkEFE
-         f0VA==
-X-Forwarded-Encrypted: i=1; AKwUvBzoIY5y0OCvDZXIZ5SHD+mTjEPru67rGh5hJv0nqeBkSfHQoA9HEU7gWf63Xg/H/O1JmimkEIk=@lists.linux.dev
-X-Gm-Message-State: AFuF++lXpXDtyAAK74/FoQ7i0OHjqAyrVW0DtC376NV+7QvwcCrQ2FUu
-	xnFyMsnb4wuL4NwzCUdoI8xeipXL6XjfS6fRaJGSlQrd3dt9u8SDxXM57HlS7NnnhNU=
-X-Gm-Gg: AYBFou3Zxw1KV/3v1N4Yy/t/40zJm5TbVpH0MukMGV9mzFF1dgn1LaBaio4ubD0ULaf
-	sVrZ18CFBV5u7c/VrhR3IazU+PKz8+WHpeaAVfyYLJ2CZ5JWiu/pqTADAKHMlD15fNeIG7XH1Y2
-	jKzvypVP6H42xUHnuTjElV3ZINJ6cwte6fhnIFdeiHVXedXEqABOA93gmqEumdaoRUzDr9+aDxl
-	nbEffymKRFnLm/QlYYpiVb721fKzVMivWJmp7P86+cfs4Aer4gYF5/sX1y7KXQsKd1dVBwv9DVy
-	aCoiMWUututkIs33x8uzuoZYsxMeEirS6RbDbd2FIh+vdfL6KEf0bv4YCfDWK4NvT2e83tEvvAt
-	hyldHsC3UPCaS2cp4ktrPfOvC3sapV/XexWawnPLqOHS1ajGNFhZpCh4qXD/vErMU0xj2zzWzRM
-	4kFZZrAYlEq+1Z+/rFg+aZ0izrl1kZ4T0NJ+7Vf5EDs2NmYroZdu4mlwYux3GWvTjH8P+BKV75H
-	hOW8PQHYBnCJABvk6z4lCE83fSywsUzAiQ0WDiO+yho5vBA/CNkYpXL2xy7vDQ2ZmA=
-X-Received: by 2002:a05:620a:4542:b0:93a:1540:a75d with SMTP id af79cd13be357-93bb78f1ddfmr339230785a.37.1789562395834;
-        Wed, 16 Sep 2026 05:39:55 -0700 (PDT)
-Received: from ziepe.ca (hlfxns010zw-159-2-239-150.pppoe-dynamic.high-speed.ns.bellaliant.net. [159.2.239.150])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-93b780cfdd7sm206826385a.6.2026.09.16.05.39.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Sep 2026 05:39:54 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1x6ova-000000098HD-0Q4W;
-	Wed, 16 Sep 2026 09:39:54 -0300
-Date: Wed, 16 Sep 2026 09:39:54 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: "Tian, Kevin" <kevin.tian@intel.com>
-Cc: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
-	Nicolin Chen <nicolinc@nvidia.com>,
-	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Alexey Kardashevskiy <aik@amd.com>,
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="s7qg14sw"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 568B8176A;
+	Wed, 16 Sep 2026 06:03:48 -0700 (PDT)
+Received: from LeoBrasDK.cambridge.arm.com (unknown [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F40CD3F86F;
+	Wed, 16 Sep 2026 06:03:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1789563831; bh=ybBOpgHUoAg23QCDB90NXKXwaf6KfWZrKX6JSKHFY2U=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=s7qg14swUJqwHx4qs2CJRJcQNy3SpPMyRCPrj9MDw6COoF5iFUz3ZmH3rCe4B7ipH
+	 8ySUNAVrnJ6a15LsFhwaqLtP6xOJki+3hPTuhZh+aBiP8QlrldBSGh8BHzm2bzHRIU
+	 NHSc0HKHhHGgZMGL4hLIQLmeQJG5hEpDlPhfgPjk=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Joerg Roedel <joro@8bytes.org>, Jonathan Cameron <jic23@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Pranjal Shrivastava <praan@google.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Samuel Ortiz <sameo@rivosinc.com>,
-	Steven Price <steven.price@arm.com>,
-	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
-	Will Deacon <will@kernel.org>, Xu Yilun <yilun.xu@linux.intel.com>,
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Subject: Re: [RFC PATCH v4 03/16] iommu/arm-smmu-v3: Add initial pSMMU realm
- viommu plumbing
-Message-ID: <20260916123954.GC3196566@ziepe.ca>
-References: <20260903171704.GK2890729@ziepe.ca>
- <yq5acxupjsy2.fsf@kernel.org>
- <20260907125228.GB667892@ziepe.ca>
- <yq5atsnyag84.fsf@kernel.org>
- <20260909124628.GH2543240@ziepe.ca>
- <CO1PR11MB4835512E374074A5F4AD0A6C8CBF2@CO1PR11MB4835.namprd11.prod.outlook.com>
- <20260910124632.GB4083318@ziepe.ca>
- <CO1PR11MB4835FF972283C09D7D683DAE8CBA2@CO1PR11MB4835.namprd11.prod.outlook.com>
- <20260915134318.GB3196566@ziepe.ca>
- <CO1PR11MB4835562E7714F368E669D3B48CB92@CO1PR11MB4835.namprd11.prod.outlook.com>
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Tian Zheng <zhengtian10@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 1/5] KVM: arm64: pgtables: Change write bit from S2AP_W to DBM
+Date: Wed, 16 Sep 2026 14:03:41 +0100
+Message-ID: <aqqTrWW-kUjb0pGJ@LeoBrasDK>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <86h5jp61jo.wl-maz@kernel.org>
+References: <20260901171558.2674031-1-leo.bras@arm.com> <20260901171558.2674031-2-leo.bras@arm.com> <86bja17cg7.wl-maz@kernel.org> <aql8jY4o8SzjJuFU@LeoBrasDK> <86h5jp61jo.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -106,125 +57,276 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CO1PR11MB4835562E7714F368E669D3B48CB92@CO1PR11MB4835.namprd11.prod.outlook.com>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Sep 16, 2026 at 05:54:57AM +0000, Tian, Kevin wrote:
-> > At least for ARM there is effectively no entanglement with the actual
-> > host iommu driver. The viommu is entirely provided by software in the
-> > RMM world, so it can have its own dedicated driver. In ARM T=1
-> > transactions are alwayus routed to the RMM's iommu and there is no
-> > relation to the host.
+On Wed, Sep 16, 2026 at 09:30:35AM +0100, Marc Zyngier wrote:
+> On Tue, 15 Sep 2026 18:12:45 +0100,
+> Leonardo Bras <leo.bras@arm.com> wrote:
 > > 
-> > I am interested how Intel works here, but I thought it was similar.
+> > On Sun, Sep 13, 2026 at 10:00:40AM +0100, Marc Zyngier wrote:
+> > > On Tue, 01 Sep 2026 18:15:52 +0100,
+> > > Leonardo Bras <leo.bras@arm.com> wrote:
+> > > > 
+> > > > As a first step of changing the encoding for the Stage2 PTE descriptor,
+> > > > introduce the DBM bit, and adapt every usage of writable to use the DBM bit
+> > > > (51) instead of S2AP[1]/Dirty bit (7).
+> > > > 
+> > > > For this step, we convert usages of RW(Dirty) -> WD(DBM|Dirty).
+> > > > 
+> > > > Signed-off-by: Leonardo Bras <leo.bras@arm.com>
+> > > > ---
+> > > >  arch/arm64/include/asm/kvm_pgtable.h | 3 +++
+> > > >  arch/arm64/kvm/hyp/pgtable.c         | 8 +++++---
+> > > >  arch/arm64/kvm/nested.c              | 4 +++-
+> > > >  arch/arm64/kvm/ptdump.c              | 4 ++--
+> > > >  4 files changed, 13 insertions(+), 6 deletions(-)
+> > > > 
+> > > > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> > > > index 41a8687938eb..37baa86d6fd8 100644
+> > > > --- a/arch/arm64/include/asm/kvm_pgtable.h
+> > > > +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> > > > @@ -86,24 +86,27 @@ typedef u64 kvm_pte_t;
+> > > >  #define KVM_PTE_LEAF_ATTR_HI		GENMASK(63, 50)
+> > > >  
+> > > >  #define KVM_PTE_LEAF_ATTR_HI_SW		GENMASK(58, 55)
+> > > >  
+> > > >  #define KVM_PTE_LEAF_ATTR_HI_S1_XN	BIT(54)
+> > > >  #define KVM_PTE_LEAF_ATTR_HI_S1_UXN	BIT(54)
+> > > >  #define KVM_PTE_LEAF_ATTR_HI_S1_PXN	BIT(53)
+> > > >  
+> > > >  #define KVM_PTE_LEAF_ATTR_HI_S2_XN	GENMASK(54, 53)
+> > > >  
+> > > > +#define KVM_PTE_LEAF_ATTR_HI_S2_DBM	BIT(51)
+> > > > +
+> > > >  #define KVM_PTE_LEAF_ATTR_HI_S1_GP	BIT(50)
+> > > >  
+> > > >  #define KVM_PTE_LEAF_ATTR_S2_PERMS	(KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R | \
+> > > >  					 KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W | \
+> > > > +					 KVM_PTE_LEAF_ATTR_HI_S2_DBM | \
+> > > >  					 KVM_PTE_LEAF_ATTR_HI_S2_XN)
+> > > >  
+> > > >  /* pKVM invalid pte encodings */
+> > > >  #define KVM_INVALID_PTE_TYPE_MASK	GENMASK(63, 60)
+> > > >  #define KVM_INVALID_PTE_ANNOT_MASK	~(KVM_PTE_VALID | \
+> > > >  					  KVM_INVALID_PTE_TYPE_MASK)
+> > > >  
+> > > >  enum kvm_invalid_pte_type {
+> > > >  	/*
+> > > >  	 * Used to indicate a pte for which a 'break-before-make'
+> > > > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> > > > index b74dd5ce1efd..ca49f1bd7c34 100644
+> > > > --- a/arch/arm64/kvm/hyp/pgtable.c
+> > > > +++ b/arch/arm64/kvm/hyp/pgtable.c
+> > > > @@ -725,42 +725,43 @@ static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot p
+> > > >  	}
+> > > >  
+> > > >  	r = stage2_set_xn_attr(prot, &attr);
+> > > >  	if (r)
+> > > >  		return r;
+> > > >  
+> > > >  	if (prot & KVM_PGTABLE_PROT_R)
+> > > >  		attr |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R;
+> > > >  
+> > > >  	if (prot & KVM_PGTABLE_PROT_W)
+> > > > -		attr |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
+> > > > +		attr |= KVM_PTE_LEAF_ATTR_HI_S2_DBM | KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
+> > > 
+> > > What makes it acceptable to always set DBM? This is an optional
+> > > feature, and I'm not exactly comfortable setting bits that are
+> > > supposed to be RES0. 
+> > 
+> > The alternative would be to introduce WC/WD as an alternative encoding
+> > infrastructure, and keep making decisions based on having HAFDBS available 
+> > or in the system. My intention was to adapt things in a way to avoid 
+> > multiple behaviors if we could avoid.
+> > 
+> > My rationale is, based on our possibility of setting DBM=1:
+> > If HAFDBS/HDBSS/HACDBS are not available, or available but disabled, 
+> > then the DBM bit is just ignored:
+> > RO -> RO
+> > WC -> RO
+> > WD -> RW
+> > 
+> > (for reference:
+> > - Read-Only (RO):      DBM=0, S2AP[1]=0
+> > - Writable-Clean (WC): DBM=1, S2AP[1]=0
+> > - Writable-Dirty (WD): DBM=1, S2AP[1]=1
+> > )
+> > 
+> > And the behavior should just the same as what we have today.
+> > 
+> > 
+> > > Yes, the HW should ignore it. But we have also
+> > > seen quite a few broken designs in this area...
+> > > 
+> > 
+> > I lack experience on what bad thing could happen. So I will expand on what 
+> > I belive to understand up to here:
+> > 
+> > - The PTE is in memory, so the DBM bit can be set regardless of being RES0
+> > - For SW pagetable walking, I don't think 'bit 51 == 0' is checked
+> > - For HW pagetable walking, maybe some faulty implementation may rely on 
+> >   bit51 being RES0, and fault otherwise.
+> > 
+> > If that's the case, then we would have to actually support both encodings, 
+> > and only enable the new one if HAFDBS is available in the system. 
+> > 
+> > I just wonder how high are the chances to have such a broken design, 
+> > or other broken designs did not come to my mind, and if we have to start 
+> > with that multiple-encoding option.
+> > 
+> > > > +
+> > > >
+> > > 
+> > > Spurious newline.
+> > > 
+> > 
+> > Oh, ok, will get rid of it.
+> > 
+> > > >  	if (!kvm_lpa2_is_enabled())
+> > > >  		attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S2_SH, sh);
+> > > >  
+> > > >  	attr |= KVM_PTE_LEAF_ATTR_LO_S2_AF;
+> > > >  	attr |= prot & KVM_PTE_LEAF_ATTR_HI_SW;
+> > > >  	*ptep = attr;
+> > > >  
+> > > >  	return 0;
+> > > >  }
+> > > 
+> > > I don't know how you have configured git on your end, but there is *a
+> > > lot* of context...
+> > > 
+> > 
+> > diff.context=10, i.e. 10 lines before and after a change.
+> > To me it looks helpful to get more context around the change. 
+> > 
+> > I can change it back to 5 if it bothers you.
+> > 
+> > > >  
+> > > >  enum kvm_pgtable_prot kvm_pgtable_stage2_pte_prot(kvm_pte_t pte)
+> > > >  {
+> > > >  	enum kvm_pgtable_prot prot = pte & KVM_PTE_LEAF_ATTR_HI_SW;
+> > > >  
+> > > >  	if (!kvm_pte_valid(pte))
+> > > >  		return prot;
+> > > >  
+> > > >  	if (pte & KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R)
+> > > >  		prot |= KVM_PGTABLE_PROT_R;
+> > > > -	if (pte & KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W)
+> > > > +	if (pte & KVM_PTE_LEAF_ATTR_HI_S2_DBM)
+> > > >  		prot |= KVM_PGTABLE_PROT_W;
+> > > >  
+> > > >  	switch (FIELD_GET(KVM_PTE_LEAF_ATTR_HI_S2_XN, pte)) {
+> > > >  	case 0b00:
+> > > >  		prot |= KVM_PGTABLE_PROT_PX | KVM_PGTABLE_PROT_UX;
+> > > >  		break;
+> > > >  	case 0b01:
+> > > >  		prot |= KVM_PGTABLE_PROT_UX;
+> > > >  		break;
+> > > >  	case 0b11:
+> > > > @@ -1281,20 +1282,21 @@ static int stage2_update_leaf_attrs(struct kvm_pgtable *pgt, u64 addr,
+> > > >  		*orig_pte = data.pte;
+> > > >  
+> > > >  	if (level)
+> > > >  		*level = data.level;
+> > > >  	return 0;
+> > > >  }
+> > > >  
+> > > >  int kvm_pgtable_stage2_wrprotect(struct kvm_pgtable *pgt, u64 addr, u64 size)
+> > > >  {
+> > > >  	return stage2_update_leaf_attrs(pgt, addr, size, 0,
+> > > > +					KVM_PTE_LEAF_ATTR_HI_S2_DBM |
+> > > >  					KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W,
+> > > >  					NULL, NULL,
+> > > >  					KVM_PGTABLE_WALK_IGNORE_EAGAIN);
+> > > >  }
+> > > >  
+> > > >  void kvm_pgtable_stage2_mkyoung(struct kvm_pgtable *pgt, u64 addr,
+> > > >  				enum kvm_pgtable_walk_flags flags)
+> > > >  {
+> > > >  	int ret;
+> > > >  
+> > > > @@ -1361,21 +1363,21 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
+> > > >  	s8 level;
+> > > >  	int ret;
+> > > >  
+> > > >  	if (prot & KVM_PTE_LEAF_ATTR_HI_SW)
+> > > >  		return -EINVAL;
+> > > >  
+> > > >  	if (prot & KVM_PGTABLE_PROT_R)
+> > > >  		set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R;
+> > > >  
+> > > >  	if (prot & KVM_PGTABLE_PROT_W)
+> > > > -		set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
+> > > > +		set |= KVM_PTE_LEAF_ATTR_HI_S2_DBM | KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
+> > > >  
+> > > >  	if (prot & KVM_PGTABLE_PROT_X) {
+> > > >  		ret = stage2_set_xn_attr(prot, &xn);
+> > > >  		if (ret)
+> > > >  			return ret;
+> > > >  
+> > > >  		set |= xn & KVM_PTE_LEAF_ATTR_HI_S2_XN;
+> > > >  		clr |= ~xn & KVM_PTE_LEAF_ATTR_HI_S2_XN;
+> > > >  	}
+> > > >  
+> > > > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> > > > index 17123f0b6dab..eb8dfffc32c7 100644
+> > > > --- a/arch/arm64/kvm/nested.c
+> > > > +++ b/arch/arm64/kvm/nested.c
+> > > > @@ -379,21 +379,23 @@ static int walk_nested_s2_pgd(struct kvm_vcpu *vcpu, phys_addr_t ipa,
+> > > >  	}
+> > > >  
+> > > >  	addr_bottom += contiguous_bit_shift(desc, wi, level);
+> > > >  
+> > > >  	/* Calculate and return the result */
+> > > >  	paddr = (desc & GENMASK_ULL(47, addr_bottom)) |
+> > > >  		(ipa & GENMASK_ULL(addr_bottom - 1, 0));
+> > > >  	out->output = paddr;
+> > > >  	out->block_size = 1UL << ((3 - level) * stride + wi->pgshift);
+> > > >  	out->readable = desc & KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R;
+> > > > -	out->writable = desc & KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
+> > > > +	/* Takes care of both RO/RW and RO/WC/WD encodings */
+> > > > +	out->writable = desc & (KVM_PTE_LEAF_ATTR_HI_S2_DBM |
+> > > > +				KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W);
+> > > 
+> > > Absolutely NOT. For a start, NV doesn't support FEAT_HAFDBS. But even
+> > > if it did, you are now actively corrupting memory by turning a RO
+> > > mapping with a spurious DBM bit set into a writable mapping.
+> > > VTCR_EL2.HD exists for a reason.
+> > > 
+> > > Do you see why your blanket approach of equating DBM with writable is
+> > > plain wrong?
+> > 
+> > Sorry, not really... please help me understand it.
+> > 
+> > When you say a spurious DBM bit, what does it mean?
+> > 
+> > All I can think is something like a buggy HW implementation setting DBM in 
+> > a HAFDBS-disabled machine, which has been unnoticed up to now, and now 
+> > could cause problems.
 > 
-> Largely yes. Main difference at Intel side is that TDX still relies on the
-> host to initiate iotlb invalidation (upon notification from KVM on S-EPT
-> change). Currently we put this logic in intel-iommu driver but it's more
-> about wrapping invalidation info and passing it to the firmware. Moving
-> it into the tsm driver should be straightforward.
-> 
-> Maybe there'll be other subtle connections to host iommu driver but
-> it doesn't sound a hard problem to solve.
+> And pray tell, what is it to have HAFDBS being disabled at S2? Instead
+> of throwing the book at me, you should probably read it, and specially
+> the effects of VTCR_EL2.HD.
 
-Okay, so I saw the driver posting for basic iommu support, can we try
-to rework that to be split out like Aneesh is doing so everything
-about TDX calls lives in tsm and intel iommu only provides a small API
-surface to exchange whatever details are needed to bootstrap TDX
-module?
+Sorry, I did not mean to "trow a book" at you here, I was just trying to 
+figure out what was wrong, and given I was not able to do it by myself I 
+thought it was a good idea to ask you.
 
-> > AMD is different and I suspect AMD will have to continue to use the
-> > viommu from the AMD iommu driver, but I am not sure.
-> 
-> ARM/Intel may support guest viommu in the future. 
+I just did not want to do that in an effortless way, so I gathered the 
+stuff that I previously thougt to understand, and brought them to the 
+discussion so it could be easier to point what I got wrong. 
 
-ARM supports guest viommu today, it is in the public spec. Secure
-guest vSMMU is entirely handled inside the RMM and has no connection
-to the host iommu driver. It is a <100 line ++ on top of Aneesh's
-work, Nicolin posted a draft at one point in those threads.
+As for your question, the effects of VTCR_EL2.HD is to actually mark the 
+page as dirty (S2AP=1) when an writable-clean page (DBM=1, S2AP=0) gets 
+writen to. DBM seems to act as permission to let the hardware change the 
+S2AP bit when HAFDBS available & enabled. 
 
-I anticipate a future intel guest T=1 viommu should be the same.
+So if we want to use DBM as writable, we have to make sure we have 
+VTCR_EL2.HD=0, or we are indeed intending to use HAFDBS here.
 
-Thus I expect Intel/ARM to have two viommus, one that handles the T=1
-stream owned by the TSM driver and implemented entirely by calling
-TDX/RMM.
+Not sure if I get your point here.
 
-One that handles the T=0 stream owned by the iommu driver - and it
-already exists.
+Thanks!
+Leo
 
-> So AMD's case is a good reference. 
-
-I think, AMD is completely different. I keep forgetting thier thing,
-but IIRC they have a secure DTE but instead of having the secure word
-control the translation it controls the RMP and you end up using the
-host's translation for T=1 traffic. This is fundamentally different
-from how Intel and ARM are doing it where the actually IOVA translate
-is under the control of the secure world.
-
-Both Intel and ARM put the S-EPT into the iommu HW directly.
-
-So, I expect Intel to have an API similar to ARM. When you create the
-TSM viommu you tell it if the TDX module should create a secure guest
-visible VT-d emulation. TDX module has to perform the entire emulation
-because it must be trusted. Existing viommu ops should cover the
-remaining to register pdevices as vdevices, provide the vBDF and so
-on.
-
-> > How/when the tsm driver links this to a arch specific "bind/unbind"
-> > operation is more up to that driver, but I would expect what is
-> > thought of as "bind" should be the affiliation of the device's T=1
-> > stream with the viommu and the target VM. It should not be sensitive
-> > to the TDISP state.
-> 
-> Not sure about this part.
-> 
-> Each arch has its own definition about the binding flow (about 'how'),
-> but sharing a common step by sending TDISP message to transit the
-> TDI into the CONFIG_LOCKED state upon guest request (i.e. 'when').
-
-Sure, the LOCKED command can be relayed from the guest, but that
-shouldn't be called BIND. locked/unlock/run/err is taking a iommufd
-vdev that is already affiliated with the VM to a specific TDISP state
-
-> According to the TDISP spec, memory reads/writes with T bit set is
-> accepted only when the TDI is in RUN state (except MSI/MSI-X writes
-> are allowed with T bit set in LOCKED but I don't think any arch supports
-> it yet).
-
-Sure
-
-> So your definition of 'bind' essentially affiliate it to the RUN state?
-
-No, it is informing the secure world that a physical PCI function is
-now a virtual PCI function, is a TDI, and is in a certain VM.
-
-Outside virtual hotplug this is a permanent action when the VM is
-created.
-
-> > That is not prohibited, the TSM driver could do some auto
-> > "bind/unbind" whatever that means triggered by ops or tdisp state
-> > changing under the covers. But this cannot leak out as some kind of
-> > asynchronous vdev destruction.
-> 
-> Maybe it'd be clearer using an example e.g. ARM to clarify the
-> suggested split. Or wait for Aneesh's next version...
-
-In ARM:
-
-BIND is RMI_VDEV_CREATE it links a physical device to a virtual
-device in a realm.
-
-RMI_VSMMU_CREATE can attach a vSMMU to the realm and there is some way
-to link the VDEV And the VSMMU together
-
-Some sequence of RMI_VDEV_COMMUNICATE, RMI_VDEV_LOCK, RMI_VDEV_UNLOCK
-and a few others manipulate the UNLOCKED/LOCKED/RUN/ERR TDISP state of
-the VDEV.
-
-I assume TDX has the same general shape, I don't know how you could
-implement this in a radically different way?
-
-So iommufd viommu create calls RMI_VSMMU_CREATE
-   iommufd vdev create calls RMI_VDEV_CREATE
-   iommufd viommu op ioctl calls the COMMUNICATE/LOCK/UNLOCK
-
-Jason
