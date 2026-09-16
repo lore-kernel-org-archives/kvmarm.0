@@ -1,45 +1,54 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE49D4B0CBA
-	for <kvmarm@lists.linux.dev>; Wed, 16 Sep 2026 11:01:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA4A54772A7
+	for <kvmarm@lists.linux.dev>; Wed, 16 Sep 2026 11:22:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789556472; cv=none; b=CKt6uFVeBsxd2bTE4poFuXx030rpMQJmZQ1D9dXXfrH19+JqUnKVb4dLb159eklVRdTz/FQ92efgVjicphDqfx1QWalc2oEbffJI4AelNl10R5XcUUFNBmFGB0Wkyr8TuXag7Y4DqiaVTKTqL9DUj6s51QNUKnswJEmwxhMsFU8=
+	t=1789557743; cv=none; b=EndVg0YspqylzD7EmT6D0fNVKZwBE2QJK6JTr8uGQiyIQhTVvQx1ageZFGySnz4EdsgpIGyYc+yoAyoMVbbXut+pCbss2BihBk7xZCXOGEXFGiYav4I9jMV6pA82TnD/AmHSuWbEMSfOpI2RWJVCovPzFBuDPuWI5Y0l4PhC8j4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789556472; c=relaxed/simple;
-	bh=le64yFWu89IwQTgKsaA74r4GubOSVodhBlaIxBJsy1Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dPqY3ZY+PgqWZ+Do1IvYleleYpZP41hSF1vY+cqSm765STKczTT+bP+huh8xRxQKjsz9rl/nfFrd8qNobqe3/5JAihw4rsqquESm1/dz2V7/3ppf5uUykIHf9fG/PPJ2nmtzVQ0Gbk050WFKiLCRrAE9AdqOhNFLf4exuBiKBAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=VeHro92U; arc=none smtp.client-ip=217.140.110.172
+	s=arc-20240116; t=1789557743; c=relaxed/simple;
+	bh=SpZeWShggoHQnmxhsOFx/oKPgEiPdIUl3gcqEzwY8o4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=uh0Sb6vNZlDoeSUymX4ZAoYpv8ofczKFxe37cHv1Gvz1BmO+MMDAs5UzFSg9M1wrmOU8nwoNjURUT6cEhWbr4E8FDmQS70tlR9QEejCmSzgHtLNLqvC9UlzSNgVpKy40j7nT+L0YNeunokH8mTiZglNWS5dMck4iSWcqYA539jM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=d+g/E/Wb; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="VeHro92U"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="d+g/E/Wb"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 45062152B;
-	Wed, 16 Sep 2026 04:00:56 -0700 (PDT)
-Received: from e143914.arm.com (e143914.arm.com [10.2.213.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C886E3F882;
-	Wed, 16 Sep 2026 04:00:57 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AEE49152B;
+	Wed, 16 Sep 2026 04:22:08 -0700 (PDT)
+Received: from LeoBrasDK.cambridge.arm.com (unknown [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5A1483F86F;
+	Wed, 16 Sep 2026 04:22:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1789556459; bh=le64yFWu89IwQTgKsaA74r4GubOSVodhBlaIxBJsy1Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VeHro92U0oRR3vwxd1JwJpCnnmvxSmWT5qbm9wVCD7uvApw8F7Ka2crYiiXwI/uTp
-	 vYgQG5zxs0l8zCLSiKde0WIau2Hjc31y+np0XjwrxTCwkutglwEtnOahfk5+ISkDxT
-	 ywM/0JFHlDAknHew+79UxH+X+H1IL6vXMKYOgB44=
-Date: Wed, 16 Sep 2026 12:00:52 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	catalin.marinas@arm.com, will@kernel.org, seiden@linux.ibm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com,
-	vdonnefort@google.com, qperret@google.com, Sascha.Bischoff@arm.com,
-	steven.price@arm.com, tabba@google.com
-Subject: Re: [PATCH 3/7] KVM: arm64: Validate the host-provided vgic model in
- pKVM
-Message-ID: <aqp25JLeqyCKtCQH@e143914.arm.com>
-References: <20260915123846.2317931-1-fuad.tabba@linux.dev>
- <20260915123846.2317931-4-fuad.tabba@linux.dev>
+	t=1789557732; bh=SpZeWShggoHQnmxhsOFx/oKPgEiPdIUl3gcqEzwY8o4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=d+g/E/WbonaThoed9wBDUOQiGEQ6jYTYFOks5xSiHifAf58WA7Ip8QvxsgSqtP7nz
+	 2TOmoEjkdFD2DLu9VQnj2mAD1f0rZwo1Ehc6T58nKtp3gGrVWQBcpIxxwsE1Zmid7Z
+	 soTsBLx9ghIknGFW8TMEdZYHLIO060uy5WRShYWs=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Oliver Upton <oupton@kernel.org>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Tian Zheng <zhengtian10@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 1/5] KVM: arm64: pgtables: Change write bit from S2AP_W to DBM
+Date: Wed, 16 Sep 2026 12:22:05 +0100
+Message-ID: <aqp73SxO78o7LJTs@LeoBrasDK>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <aqnku2TcFzIKhjQl@kernel.org>
+References: <20260901171558.2674031-1-leo.bras@arm.com> <20260901171558.2674031-2-leo.bras@arm.com> <86bja17cg7.wl-maz@kernel.org> <aql8jY4o8SzjJuFU@LeoBrasDK> <aqnku2TcFzIKhjQl@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,64 +57,100 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260915123846.2317931-4-fuad.tabba@linux.dev>
+Content-Transfer-Encoding: 8bit
 
-Question(s)
-   |
-   |
-   v
-
-On Tue, Sep 15, 2026 at 01:38:42PM +0100, Fuad Tabba wrote:
-> EL2 copies vgic_model from the host's struct kvm unchecked, and the nVHE
-> world switch dispatches on it with no cpucap guard. A host writing
-> KVM_DEV_TYPE_ARM_VGIC_V5 makes EL2 access GICv5 CPU interface registers
-> that are UNDEFINED without FEAT_GCIE, and panics the hypervisor on any
-> GICv3 machine.
+On Tue, Sep 15, 2026 at 05:37:15PM -0700, Oliver Upton wrote:
+> On Tue, Sep 15, 2026 at 06:12:45PM +0100, Leonardo Bras wrote:
+> > > Yes, the HW should ignore it. But we have also
+> > > seen quite a few broken designs in this area...
+> > > 
+> > 
+> > I lack experience on what bad thing could happen. So I will expand on what 
+> > I belive to understand up to here:
+> > 
+> > - The PTE is in memory, so the DBM bit can be set regardless of being RES0
+> > - For SW pagetable walking, I don't think 'bit 51 == 0' is checked
+> > - For HW pagetable walking, maybe some faulty implementation may rely on 
+> >   bit51 being RES0, and fault otherwise.
+> > 
+> > If that's the case, then we would have to actually support both encodings, 
+> > and only enable the new one if HAFDBS is available in the system. 
+> > 
+> > I just wonder how high are the chances to have such a broken design, 
+> > or other broken designs did not come to my mind, and if we have to start 
+> > with that multiple-encoding option.
 > 
-> Accept only GICv3, the one model pKVM supports, forcing anything else
-> to 0.
+> FWIW, the host stage-1 already uses the DBM bit unconditionally,
+> treating it as a software bit on implementations without HAFDBS.
+> Although given the quality of any garden variety Arm MMU I understand
+> where Marc is coming from.
 > 
-> Fixes: 9b8e3d4ca0e73 ("KVM: arm64: gic-v5: Implement GICv5 load/put and save/restore")
-> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
-> ---
->  arch/arm64/kvm/hyp/nvhe/pkvm.c | 10 ++++++++--
->  1 file changed, 8 insertions(+), 2 deletions(-)
+> I don't think the HAFDBS enablement is complicated enough to be done in
+> a separate series without any meaningful users, nor would I really be
+> interested in taking it without, say, HDBSS.
 > 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> index 459bd9eb7e4bc..4c33c863e90e1 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> @@ -340,13 +340,19 @@ static void pkvm_init_features_from_host(struct pkvm_hyp_vm *hyp_vm, const struc
->  {
->  	struct kvm *kvm = &hyp_vm->kvm;
->  	unsigned long host_arch_flags = READ_ONCE(host_kvm->arch.flags);
-> +	u32 vgic_model = READ_ONCE(host_kvm->arch.vgic.vgic_model);
->  	DECLARE_BITMAP(allowed_features, KVM_VCPU_MAX_FEATURES);
->  
->  	/* CTR_EL0 is always under host control, even for protected VMs. */
->  	hyp_vm->kvm.arch.ctr_el0 = host_kvm->arch.ctr_el0;
->  
-> -	/* Preserve the vgic model so that GICv3 emulation works */
-> -	hyp_vm->kvm.arch.vgic.vgic_model = host_kvm->arch.vgic.vgic_model;
-> +	/*
-> +	 * GICv3 is the only model pKVM runs, and the GICv5 world switch
-> +	 * touches registers UNDEFINED at EL2 without FEAT_GCIE.
-> +	 */
-> +	if (vgic_model != KVM_DEV_TYPE_ARM_VGIC_V3)
-> +		vgic_model = 0;
-> +	hyp_vm->kvm.arch.vgic.vgic_model = vgic_model;
-
-A bit confused by what is expected by writing 0 here? I would have maybe
-expected to refuse running this VM? What happens if the host writes some
-garbage here, so vgic_model=0, but then tries to access gic-v3
-registers?
-
-Thanks,
-Joey
-
->  
->  	/* No restrictions for non-protected VMs. */
->  	if (!kvm_vm_is_protected(kvm)) {
-> -- 
-> 2.39.5
+> Can you please work with Tian to get a combined series out for this?
 > 
+
+Hi Oliver, thanks for reviewing!
+
+Sure, one of the reasons I sent like this is so Tian could use it as a base 
+for his next version.
+
+
+> > > > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> > > > index 17123f0b6dab..eb8dfffc32c7 100644
+> > > > --- a/arch/arm64/kvm/nested.c
+> > > > +++ b/arch/arm64/kvm/nested.c
+> > > > @@ -379,21 +379,23 @@ static int walk_nested_s2_pgd(struct kvm_vcpu *vcpu, phys_addr_t ipa,
+> > > >  	}
+> > > >  
+> > > >  	addr_bottom += contiguous_bit_shift(desc, wi, level);
+> > > >  
+> > > >  	/* Calculate and return the result */
+> > > >  	paddr = (desc & GENMASK_ULL(47, addr_bottom)) |
+> > > >  		(ipa & GENMASK_ULL(addr_bottom - 1, 0));
+> > > >  	out->output = paddr;
+> > > >  	out->block_size = 1UL << ((3 - level) * stride + wi->pgshift);
+> > > >  	out->readable = desc & KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R;
+> > > > -	out->writable = desc & KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
+> > > > +	/* Takes care of both RO/RW and RO/WC/WD encodings */
+> > > > +	out->writable = desc & (KVM_PTE_LEAF_ATTR_HI_S2_DBM |
+> > > > +				KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W);
+> > > 
+> > > Absolutely NOT. For a start, NV doesn't support FEAT_HAFDBS. But even
+> > > if it did, you are now actively corrupting memory by turning a RO
+> > > mapping with a spurious DBM bit set into a writable mapping.
+> > > VTCR_EL2.HD exists for a reason.
+> > > 
+> > > Do you see why your blanket approach of equating DBM with writable is
+> > > plain wrong?
+> > 
+> > Sorry, not really... please help me understand it.
+> > 
+> > When you say a spurious DBM bit, what does it mean?
+> 
+> You've implemented the exact sort of bug that was alluded to above. In
+> this case it's a software page table walker consuming DBM regardless of
+> the value of VTCR_EL2.HD.
+> 
+
+So you mean that DBM being treated as "writable" could _only_ happen if we 
+have VTCR_EL2.HD=1? I was previously under the impression that it could be 
+used regardless of HD value.
+
+> If the guest hypervisor sets VTCR_EL2.HD=0, the expectation is that the
+> shadow stage-2 MMU treats the corresponding bit in the PTE as RES0.
+> 
+
+Okay, I think I can see it now: since the guest hypervisor could use RO/RW, 
+and has no decoupled concept of dirty and writable, it could think all 
+writable pages are dirty when we run above function.
+
+So.. would it make sense to have an out->dirty, which we would check based 
+on S2AP while out->writable is compared against DBM, and we change the 
+logic that uses out->writable to properly match it, maybe based on the 
+guest having the feature enabled?
+
+Thanks for your patience on explaining this!
+Leo
