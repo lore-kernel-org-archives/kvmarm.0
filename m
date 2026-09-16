@@ -1,177 +1,167 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 923574B2713
-	for <kvmarm@lists.linux.dev>; Wed, 16 Sep 2026 23:16:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 656ED42CB1C;
+	Wed, 16 Sep 2026 23:27:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789600614; cv=none; b=plSIWJtM76mGsEwXV3t+iLkX2/jVVsKm9DbUIJjwIQ4VSUz7izxpBJwZ55T6wD2eao4Mwk2sDNI0ufTZnOJk/DFuf5y/wKOuOJOa7qpz4tB/tstSpE2qg5T7sWNGcI08bwm0jf03CmoWydWqWlwtc1JrNNhLvOm5wCOp3ApfL9s=
+	t=1789601242; cv=none; b=fKGXsWlMhHuQV2mwKAO0LHfGBiE/Z3U3yscc2txb32m6iMQ3Rm7YYIbz4PX7HEfoPJ1jB4wZ9/J5iW+tWJYMtgxOY3ogssa5m29crFLICcxr8Dh2V76s5R2/N3WFE9KfRblXrTg2YRiSuYfsTI2Lq7WG807PzwuGB6nKMtME5yE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789600614; c=relaxed/simple;
-	bh=jw01Rk1BSpeUAUDE5yQP+WWRPzS6xBkA/HjioPjX8II=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=f3tr2dio/uD2ywCA3PR/J6FnxcU/afK1yAebaim7QCro3vDalcbDPAYs3d4tGFGVl+xr7CHTTxkCHhR1ohbOMZovAJAqDuORoG4EAbg7aENPY9G3DsTRXu1djfl+3QDWZxtd3q13apT5n6d4EF4tJNQzC02bgKzVR64HkOL43eA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M1ooN2GA; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789601242; c=relaxed/simple;
+	bh=kVukq6PGE++Zf2M92DLF9J8c1ZNhBniKUYbXKgjndWA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ftFFwG3P5y3kUzLfv1xjeUGFdiZ7F9+6eIcFQlO7SbuvO963vmyvp3RXTkcK3i0uRy0Hk1sziMoj1PBRA4n4NYiCDy4CJzYFCNmCCx0G333/KyGvhS4dsegZmXVhXIUS4kTwQh3mZpM2HUAme+bFEGa/HinZOZaGhfftYhYR9pk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kequ4qrL; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M1ooN2GA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E44E51F0089A;
-	Wed, 16 Sep 2026 23:16:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kequ4qrL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD1371F000FF;
+	Wed, 16 Sep 2026 23:27:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789600613;
-	bh=vK3Xp7l0UJAuNSmsAs5fgAVNc47EhKS6du8qeF+Q2q0=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=M1ooN2GAwFOUpjBBmFOnRg0GT7B20nQv+GN5cLfMAQpHL/hkPNoUkW40ddIPHft51
-	 A4/i0ysJKcI1hPeushgW1zCx3XX9gb5IKX5rsTP/DCNpeSezlXqa9OQdWaE1Q8b19H
-	 u7s8YR+tlfrfSr4B6uvqVw6HdejBGKBXbAx6cpOT3+m8/cJaN84uiEdG/aHh/ZVPa9
-	 JbBalSeRD45GU4arN83Gmfkj9EuJSb6bzuiYRDb6eHhDxxaqEYNtR5cqM716UpLpyQ
-	 f3vUW4QHGqemLoPROqrPKt8RDNxVa7ciDYnJmM9VOc1NGFX2uqS5YqPNdoF/GWoctM
-	 X9qqVmcQGSN4g==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v3 1/2] KVM: arm64: ptdump: Check the page tables aren't
- freed when accessing
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Wei-Lin Chang" <weilin.chang@arm.com>
-Cc: "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev
-In-Reply-To: <20260916230337.4162485-2-weilin.chang@arm.com>
-References: <20260916230337.4162485-1-weilin.chang@arm.com>
- <20260916230337.4162485-2-weilin.chang@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 16 Sep 2026 23:16:52 +0000
-Message-Id: <20260916231652.E44E51F0089A@smtp.kernel.org>
+	s=k20260515; t=1789601241;
+	bh=DdxpGXS/wnimnfN1olqkWbYsmp9jSsthllf3I7l40Ts=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=kequ4qrLA/stLLGW3CIkibGQx0JSpzNkkyEC2GB6l4KbXM1pbpDkBhKYpRYWyRIwm
+	 caDnU8ZHFn/B0sKQskme34CLjplcus9b7TlWQJacNToFnA5bAbOllLlXZYmDH6zMAm
+	 BXDoZnZZixhR6e0K0+UCYtZ5PemfnyR03j1heAsH8SrfhE6fWfTDnJoje2bpD5xFml
+	 DnzY5Qkw80HsnXUwaPjQDtVsHgv0yFNKNOwH0BcPlZ2kCqNFiEGbI5HkXrq3RxF3bS
+	 dCDvCwKGfBp8TcOEIkQbawKkW9Lox0zzpsfJ6q9uANwzcHOQHf6I8KpzbqcV35R5vS
+	 UCDetSCvp93rw==
+Date: Wed, 16 Sep 2026 16:27:19 -0700
+From: Oliver Upton <oupton@kernel.org>
+To: Leonardo Bras <leo.bras@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>, Fuad Tabba <fuad.tabba@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Tian Zheng <zhengtian10@huawei.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 5/5] KVM: arm64: Enable HAFDBS for guests not on
+ migration
+Message-ID: <aqsl1_IqnV2r8kUL@kernel.org>
+References: <20260901171558.2674031-1-leo.bras@arm.com>
+ <20260901171558.2674031-6-leo.bras@arm.com>
+ <aqneWnlsdpocLIl6@kernel.org>
+ <aqqhDs3NyjtkZzXK@LeoBrasDK>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aqqhDs3NyjtkZzXK@LeoBrasDK>
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [Medium] kvm: arm64: ptdump: prolonged write_lock on mmu_lock causes lock=
- contention
---
+On Wed, Sep 16, 2026 at 03:00:46PM +0100, Leonardo Bras wrote:
+> On Tue, Sep 15, 2026 at 05:10:02PM -0700, Oliver Upton wrote:
+> > Hi,
+> > 
+> > On Tue, Sep 01, 2026 at 06:15:56PM +0100, Leonardo Bras wrote:
+> > > When dirty-logging is disabled, even non-write faults make a page dirty,
+> > > which avoids a second fault when the page is actually written to.
+> > > 
+> > > On dirty-logging enable, this approach causes all (writable) pages on the
+> > > memslot to be marked clean, even if they were not written to, which can
+> > > take a lot of time, while holding the MMU lock, doing atomic writes to
+> > > PTEs.
+> > 
+> > Do you have any performance numbers for this? Enabling HAFDBS seems a
+> > bit involved to avoid some stores on the first pass.
+> 
+> Not yet, but if the idea does not look too crazy I can find hardware and 
+> collect some data :)
 
-commit 6e17983aae35d9aa5807fc7910feb63951dae7e2
-Author: Wei-Lin Chang <weilin.chang@arm.com>
-KVM: arm64: ptdump: Check the page tables aren't freed when accessing
+TBH this looks like a micro-optimization so I'm not expecting the
+performance gains to justify the behavior change.
 
-This patch adds checks to ensure that stage-2 page tables are not freed dur=
-ing
-access when debugfs ptdump files are opened or read. It uses mmu_lock to
-protect the existence of the page tables and switches related handlers to
-keep a pointer to the mmu instead.
+> > > 						      has_vhe() &&
+> > 
+> > I don't see a reason why this needs to be constrained to VHE-only.
+> > 
+> 
+> Humm, in nVHE would not the host kernel run in EL1?
+> I thought that this being a feature that depends on EL2 registers host 
+> would need to be in EL2 to make use of it.
+> 
+> That being said, I understand very little of how this works, so I 
+> constrained to VHE only at the start.
+> 
+> Would this work in nVHE?
 
-Link: https://lore.kernel.org/kvmarm/20260623144054.B91D21F000E9@smtp.kerne=
-l.org/
+We already pass a stage-2 MMU configuration to EL2 from EL1 in nVHE and
+hVHE. How is this any different?
 
-> diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
-> index 69899797dbad8..4ead856c181a0 100644
-> --- a/arch/arm64/kvm/ptdump.c
-> +++ b/arch/arm64/kvm/ptdump.c
-[ ... ]
->  static struct kvm_ptdump_guest_state *kvm_ptdump_parser_create(struct kv=
-m_s2_mmu *mmu)
->  {
-> +	struct kvm *kvm =3D kvm_s2_mmu_to_kvm(mmu);
->  	struct kvm_ptdump_guest_state *st;
-> -	struct kvm_pgtable *pgtable =3D mmu->pgt;
-> +	s8 start_level;
->  	int ret;
-> =20
-> +	/*
-> +	 * We only need the pgt start level to initialize the ptdump, get it
-> +	 * while holding the mmu_lock. It's fine if the pgt gets freed
-> +	 * afterwards, we'll check again when doing the actual dump.
-> +	 */
-> +	scoped_guard(write_lock, &kvm->mmu_lock) {
+I'm not opposed to making features VHE-only, but there needs to be some
+amount of reasoning to justify it.
 
-[Severity: Medium]
-Does this code unnecessarily acquire the exclusive write lock just to read =
-the
-start_level in kvm_ptdump_parser_create()?
+> > > +		!kvm_vcpu_has_nv(kvm) && cpus_have_final_cap(ARM64_HW_DBM);
+> > 
+> > Same thing goes for nested... KVM can make use of HAFDBS in the
+> > canonical stage-2 MMU (or even a shadow stage-2) independent of the
+> > guest hypervisor.
+> > 
+> 
+> Humm, I remember reaching the conclusion that it could not be used if the 
+> guest supported NV. Let's say:
+> 
+> L0 - Host	- Has HAFDBS enabled
+> L1 - Hypervisor - Has HAFDBS disabled
+> L2 - Guest	-
+> 
+> Let's say guest writes to a page, and the shadow S2 has DBM=1, so it's 
+> marked as WD by HAFDBS. Since no fault was taken, how would the L1 be able 
+> to update it's S2 pagetables to mark the page dirty?
+> 
+> (We would have to transverse the Shadow S2 Pagetable updating the original 
+> S2 pagetable)
+> 
+> I was wondering, thought, that we could emulate it in the last level 
+> hypervisor, if it's guest does not support nested guests. That would mean 
+> we can have the last-1 level hypervisor to update the S2 pagetable on the 
+> last level hypervisor without it having to fault. Ex:
+> 
+> L0 Host - HAFDBS disabled
+> [...]
+> Ln-1 Hypervisor - HAFDBS disabled
+> Ln   Hypervisor - HAFDBS enabled
+> Ln+1 Guest - No E2H feature
+> 
+> When the guest writes to a page, the host should receive a fault, that IIUC 
+> have to propagate down up to Ln Hyp. If Ln Hyp has HAFDBS, we could skip 
+> injecting a fault in Ln Hyp, as  Ln-1 Hyp could emulate HAFDBS and write 
+> the dirty bit to S2 pagetagle of Ln+1 guest, that resides in Ln memory.
+> 
+> Not sure if the troulbe would be worth, though.
+> Does it make sense?
 
-Since this is a read-only field check, acquiring the write lock could conte=
-nd
-with VM page faults. Could read_lock be used here instead?
+I'm not following your reasoning here. Treat the shadow stage-2 MMU as a
+TLB; that TLB is filled with a writable translation when S2AP[1]=1 in the
+L1 translation.
 
-> +		if (mmu->pgt)
-> +			start_level =3D mmu->pgt->start_level;
-> +		else
-> +			return ERR_PTR(-ENOENT);
-> +	}
-[ ... ]
-> @@ -149,6 +162,9 @@ static int kvm_ptdump_guest_show(struct seq_file *m, =
-void *unused)
->  	};
-> =20
->  	guard(write_lock)(&kvm->mmu_lock);
+The dirty state of the pseudo-TLB is completely internal. You could then
+layer HAFDBS for the L1 translation on top of this (which we don't
+support) by potentially relaxing the descriptor _before_ evaluating the
+resulting permissions. You'd then take write permission faults to set
+S2AP[1] in the L1 translation.
 
-[Severity: Medium]
-Does this sequence create a denial of service regression by holding the
-exclusive write lock for the entire duration of a heavy page table walk?
+> > The name would suggest this thing takes a vcpu pointer...
+> > 
+> 
+> Ah, that name was based on
+> #define kvm_vcpu_has_feature(k, f)  __vcpu_has_feature(&(k)->arch, #(f))
+> 
+> That takes a kvm struct to check the kvm_arch one, instead of looking into 
+> the vcpu. I did it like this because there were some scenarios it was not 
+> quite straightforward to get the vcpu to use vcpu_has_nv(), which takes a 
+> vcpu.
 
-The full page table walk is performed synchronously while the exclusive lock
-is held later in kvm_ptdump_guest_show():
+This thing probably should've been "kvm_has_vcpu_feature()" or similar to
+massage the expected typing.
 
-    ret =3D kvm_pgtable_walk(mmu->pgt, 0, BIT(mmu->pgt->ia_bits), &walker);
-
-This prolonged read-only walk blocks all VM page faults, causing severe lock
-contention.
-
-Since a user reading the ptdump file from debugfs can trigger this path, it
-may allow host userspace to stall all vCPUs. Is it possible to perform this
-walk using read_lock instead?
-
-> +	if (!mmu->pgt)
-> +		return 0;
-> +
->  	st->parser_state =3D (struct ptdump_pg_state) {
-[ ... ]
-> @@ -211,17 +227,27 @@ static const struct file_operations kvm_ptdump_gues=
-t_fops =3D {
-> =20
->  static int kvm_pgtable_range_show(struct seq_file *m, void *unused)
->  {
-> -	struct kvm_pgtable *pgtable =3D m->private;
-> +	struct kvm_s2_mmu *mmu =3D m->private;
-> +	struct kvm *kvm =3D kvm_s2_mmu_to_kvm(mmu);
-> +
-> +	guard(write_lock)(&kvm->mmu_lock);
-
-[Severity: Medium]
-Does this code unnecessarily acquire the exclusive write lock for a read-on=
-ly
-field check in kvm_pgtable_range_show()?
-
-> +
-> +	if (mmu->pgt)
-> +		seq_printf(m, "%2u\n", mmu->pgt->ia_bits);
-> =20
-> -	seq_printf(m, "%2u\n", pgtable->ia_bits);
->  	return 0;
->  }
-> =20
->  static int kvm_pgtable_levels_show(struct seq_file *m, void *unused)
->  {
-> -	struct kvm_pgtable *pgtable =3D m->private;
-> +	struct kvm_s2_mmu *mmu =3D m->private;
-> +	struct kvm *kvm =3D kvm_s2_mmu_to_kvm(mmu);
-> +
-> +	guard(write_lock)(&kvm->mmu_lock);
-
-[Severity: Medium]
-Similarly, does this code unnecessarily acquire the exclusive write lock fo=
-r a
-read-only field check in kvm_pgtable_levels_show()?
-
-> +
-> +	if (mmu->pgt)
-> +		seq_printf(m, "%1d\n", KVM_PGTABLE_MAX_LEVELS - mmu->pgt->start_level);
-> =20
-> -	seq_printf(m, "%1d\n", KVM_PGTABLE_MAX_LEVELS - pgtable->start_level);
->  	return 0;
->  }
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260916230337.4162=
-485-1-weilin.chang@arm.com?part=3D1
+Thanks,
+Oliver
