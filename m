@@ -1,139 +1,122 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDA8F477E3B;
-	Wed, 16 Sep 2026 08:16:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31DD6443E43;
+	Wed, 16 Sep 2026 08:27:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789546622; cv=none; b=ndgcP6w9dFjg/0ZjUwRi49p1xDiFck7NxYQpnBo7/qiYeKF3haibbdZY6CceYgX11zYOLfHqg6dntTYnRzqDKdg1OhyeAvJ8owEVllkhclFGThrm3lQz0Zdp9RrJM7uf7bSXB2E96c08ZRsAUEzeUs3goRUw1MUaHXl639dgPC4=
+	t=1789547274; cv=none; b=RBGD/byg2pYa17GvxVFkCrp02V3TfNY+31uV2T+N5XQscBh3hGf1M5TNBBxD670jVBJvR5nokEajhXarX1L2gGBziGj+1FzSuDC7vT05Fa22ejfSXIgw0n7Lw4aQs9RJkEmk+uDrquMl9ogo9eUxmOMT8WBcf2xd8xzTf1wCzZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789546622; c=relaxed/simple;
-	bh=dtktspgZqgkVbLoipRf+Ced0AALPpZJn+tJTsPPQQgA=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BUbEEnHcz9fJPhVisUy26zSMJIca+Jnf59qDcWfHSwxwyTLRK1xLg4KAyT/ZPi4J1iVNeosH9JkCgij5qzm0IzYKASg+M6F1vsCAF0mIHqmpJbDqRjrvwtVNZ31wMrndRay6dzJq0VkRtb+KZYJozV8gZuDOKuGd+aqvcb82zPE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OJSzhIY+; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789547274; c=relaxed/simple;
+	bh=SC9sfcMnJ/PEFobWZVnmMbUTIFBvDkYTVdafgFGlQM4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qtJR6dt6k6SevpxiEayYTiqQSwFw2KisXlWGR+7b3hhNPtJ1T+FduVPVQEkSkd1Zfs2l+4I/66UZ3d4l+7vE4BXJvxWcMogwqcIU4H4qDvwtp+EBbmhmCqHj1GI0C4/dJ7MsMdm9HgZ5NHtZ1hzcpTKeQxT1piuzAtIhXCT3jNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=cZLOlYqd; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OJSzhIY+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77E9A1F000FF;
-	Wed, 16 Sep 2026 08:16:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789546604;
-	bh=ZJiy+EQgetwOr93GvKDb0H7whWYuf28kIErFLyYFFc8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=OJSzhIY+9YFR7vTobkyFlM67gI7Nd8rxuhwx+l8fI9Od3FMyji5O5PMePTRto08TJ
-	 BtdgC7Tocn2rZFyGXEB2C0jVq8PpAzOvTjAPV4ZlV6I/EBH/FE6e4uXL6LfnJTLtAP
-	 B12okfMVFwD3XoS+mmCoVp0GI5Ijuvp38O1rExuR4zma5UxX2jzB1W3NBQXgENhs6z
-	 0XCVmmrKrV8/dNzqhBJjcDZiP0Aq6NYJnnPJMQOOpizHVeocE3X5lepWNkDg+/+YfR
-	 RN7wEWSfYCk1vXy+f2+9h7+r4baEIYhn/3OZGpTlLb3Lrbk+zg24GOAHfGAiCJbPzz
-	 lvnuUoetnMh1Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1x6kos-00000009VTD-0vIh;
-	Wed, 16 Sep 2026 08:16:42 +0000
-Date: Wed, 16 Sep 2026 09:16:41 +0100
-Message-ID: <86ik45626u.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	will@kernel.org,
-	catalin.marinas@arm.com,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	steven.price@arm.com,
-	aneesh.kumar@kernel.org,
-	oupton@kernel.org,
-	gshan@redhat.com,
-	joey.gouly@arm.com,
-	tabba@google.com,
-	yuzenghui@huawei.com,
-	linux-coco@lists.linux.dev,
-	gankulkarni@os.amperecomputing.com,
-	sdonthineni@nvidia.com,
-	alpergun@google.com,
-	fj0570is@fujitsu.com,
-	WeiLin.Chang@arm.com,
-	lpieralisi@kernel.org,
-	enju.kohei@fujitsu.com,
-	Marc Zyngier <maz@krenel.org>
-Subject: Re: [PATCH v18 01/23] KVM: arm64: protected VM: Handle set_one_reg CNTVCT_EL0/CNTPCT_EL0
-In-Reply-To: <a4e7e6c3-d325-4f35-a17c-e02791cca326@arm.com>
-References: <20260915160141.3543048-1-suzuki.poulose@arm.com>
-	<20260915160141.3543048-2-suzuki.poulose@arm.com>
-	<86o6dy5uob.wl-maz@kernel.org>
-	<7c26c860-0543-459e-974b-72c59af261f9@arm.com>
-	<a4e7e6c3-d325-4f35-a17c-e02791cca326@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="cZLOlYqd"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E8033152B;
+	Wed, 16 Sep 2026 01:27:48 -0700 (PDT)
+Received: from [10.0.128.139] (unknown [10.0.128.139])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4A97B3F882;
+	Wed, 16 Sep 2026 01:27:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1789547272; bh=SC9sfcMnJ/PEFobWZVnmMbUTIFBvDkYTVdafgFGlQM4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=cZLOlYqdunxqc5S8b7CsUOJR8q77ehv8styLLAf+uYgcAzeNJ/oXYr8R0jA/Ycd0U
+	 KN2fN/br8WnzGMNA7hcXsuDr0ExCzIwtWprwMg3biLx/h0ryGDAIcjyuTEq/eM/wDt
+	 IEbppHN1ZOW6OEyEnesegpbr7fdkusEc4UKbYE3M=
+Message-ID: <5c4a9d72-2f46-4121-8e9f-ae85f28eff1f@arm.com>
+Date: Wed, 16 Sep 2026 09:27:47 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com, joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com, maz@krenel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v18 01/23] KVM: arm64: protected VM: Handle set_one_reg
+ CNTVCT_EL0/CNTPCT_EL0
+Content-Language: en-GB
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, will@kernel.org,
+ catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
+ aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
+ joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
+ linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
+ sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
+ WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com,
+ Marc Zyngier <maz@krenel.org>
+References: <20260915160141.3543048-1-suzuki.poulose@arm.com>
+ <20260915160141.3543048-2-suzuki.poulose@arm.com>
+ <86o6dy5uob.wl-maz@kernel.org> <7c26c860-0543-459e-974b-72c59af261f9@arm.com>
+ <a4e7e6c3-d325-4f35-a17c-e02791cca326@arm.com> <86ik45626u.wl-maz@kernel.org>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <86ik45626u.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, 15 Sep 2026 22:20:36 +0100,
-Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+On 16/09/2026 09:16, Marc Zyngier wrote:
+> On Tue, 15 Sep 2026 22:20:36 +0100,
+> Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+>>
+>> This is how it looks like now, reworked.
+>>
+>>
+>> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+>> index 6ac3321f4c575..1c8fac222a643 100644
+>> --- a/arch/arm64/kvm/arch_timer.c
+>> +++ b/arch/arm64/kvm/arch_timer.c
+>> @@ -1110,8 +1110,7 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
+>>                  timer_context_init(vcpu, i);
+>>
+>>          /* Synchronize offsets across timers of a VM if not already
+>> provided */
+>> -       if (!vcpu_is_protected(vcpu) &&
+>> -           !test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET,
+>> &vcpu->kvm->arch.flags)) {
+>> +       if (!test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET,
+>> &vcpu->kvm->arch.flags)) {
+>>                  timer_set_offset(vcpu_vtimer(vcpu), kvm_phys_timer_read());
+>>                  timer_set_offset(vcpu_ptimer(vcpu), 0);
+>>          }
+>> @@ -1133,6 +1132,15 @@ void kvm_timer_init_vm(struct kvm *kvm)
+>>           */
+>>          for (int i = 0; i < NR_KVM_TIMERS; i++)
+>>                  kvm->arch.timer_data.ppi[i] = get_vgic_ppi(kvm,
+>> default_ppi[i]);
+>> +
+>> +       /*
+>> +        * For the protected VMs, fix the counter offset to 0 by marking the
+>> +        * KVM_ARCH_FLAG_VM_COUNTER_OFFSET. This would also prevent
+>> userspace
+>> +        * writes to CNTVCT_ELO & CNTPCT_EL0.
+>> +        * The user can't set the offset via vm ioctl
+>> KVM_ARM_SET_COUNTER_OFFSET.
+>> +        */
 > 
-> This is how it looks like now, reworked.
+> This is a bit wordy. Something like:
 > 
+> 	Protected VMs don't allow any offset being set from userspace,
+> 	either set via writes to the counters or using the dedicated
+> 	ioctl. Pretend the offset has already been set and rely on the
+> 	default offset being 0.
 > 
-> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-> index 6ac3321f4c575..1c8fac222a643 100644
-> --- a/arch/arm64/kvm/arch_timer.c
-> +++ b/arch/arm64/kvm/arch_timer.c
-> @@ -1110,8 +1110,7 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
->                 timer_context_init(vcpu, i);
+>> +       if (kvm_vm_is_protected(kvm))
+>> +               set_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &kvm->arch.flags);
+>>   }
+>>
+>>   void kvm_timer_cpu_up(void)
 > 
->         /* Synchronize offsets across timers of a VM if not already
-> provided */
-> -       if (!vcpu_is_protected(vcpu) &&
-> -           !test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET,
-> &vcpu->kvm->arch.flags)) {
-> +       if (!test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET,
-> &vcpu->kvm->arch.flags)) {
->                 timer_set_offset(vcpu_vtimer(vcpu), kvm_phys_timer_read());
->                 timer_set_offset(vcpu_ptimer(vcpu), 0);
->         }
-> @@ -1133,6 +1132,15 @@ void kvm_timer_init_vm(struct kvm *kvm)
->          */
->         for (int i = 0; i < NR_KVM_TIMERS; i++)
->                 kvm->arch.timer_data.ppi[i] = get_vgic_ppi(kvm,
-> default_ppi[i]);
-> +
-> +       /*
-> +        * For the protected VMs, fix the counter offset to 0 by marking the
-> +        * KVM_ARCH_FLAG_VM_COUNTER_OFFSET. This would also prevent
-> userspace
-> +        * writes to CNTVCT_ELO & CNTPCT_EL0.
-> +        * The user can't set the offset via vm ioctl
-> KVM_ARM_SET_COUNTER_OFFSET.
-> +        */
+> Otherwise LGTM.
 
-This is a bit wordy. Something like:
+Thanks,
 
-	Protected VMs don't allow any offset being set from userspace,
-	either set via writes to the counters or using the dedicated
-	ioctl. Pretend the offset has already been set and rely on the
-	default offset being 0.
+Cheers
+Suzuki
 
-> +       if (kvm_vm_is_protected(kvm))
-> +               set_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &kvm->arch.flags);
->  }
 > 
->  void kvm_timer_cpu_up(void)
+> 	M.
+> 
 
-Otherwise LGTM.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
