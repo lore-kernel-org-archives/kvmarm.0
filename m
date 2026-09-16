@@ -1,144 +1,126 @@
-Received: from mail-lf2-f12.google.com (mail-lf2-f12.google.com [74.125.229.204])
+Received: from mta0.migadu.com (out-26.mta0.migadu.com [91.218.175.26])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D1CE4A207F
-	for <kvmarm@lists.linux.dev>; Wed, 16 Sep 2026 18:23:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.229.204
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789583037; cv=pass; b=GFxvCNHQX83irJ17qOrDadhrxi+bot9PpCRlqrbb0zzA1UEPJoLynY0gbQKK6ZP/1IzF5M38cXIlNnkHM7gvf97kbcb1ZgaVOFO4m4qoBrxrKj6og6sROie0NBV46xk5jMpxD8wcu9lmfQ21zuLkuYZs1L8LNfiENn2eyqpvF/Y=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789583037; c=relaxed/simple;
-	bh=K1VkZN9Ax/ivqRQhY6l3VgzDLSp6+7t77YixSnLTILA=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 873D6361965
+	for <kvmarm@lists.linux.dev>; Wed, 16 Sep 2026 19:06:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.26
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1789585622; cv=none; b=sHN8xpbGg/ncHMCfyO2/fVmt6dAfo2N4DdbgVAXIcd81N05FuxV861ZDTaEkyt/XkFkkRQ4Po9+MrQgofoHQBEA+tSjT+brvFrN79AacJdcrCs4bXYXa1YlJt71GLQKNkhxT8RxZYl115xCKWxbj+R7Z4c45meBNcPmGKkw066g=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1789585622; c=relaxed/simple;
+	bh=clIAd+ElCPuqeSOiRCrGYr2080Rs0+u4Ja4zpAJS57o=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sDrkY4kTBVkly27rjYW6cVrb11FNu+bE66347HoKJSPE0h00pBGhG0qvl7DW6Eys+p7/r+fhGOLdn87QDIdFDVQ4ht0sgYSMtcpD3n9lvQvqYwueqoM/p5lXyvveUUpjJ6EFAsLCK4Xc1CebITDYhXInnP5aYql4q9Ms9bM4T48=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JDPChipd; arc=pass smtp.client-ip=74.125.229.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	 To:Cc:Content-Type; b=Dg6sfijgpJkvdUTVHPqHmfbx5anqyk0/BQxuTfZeQfsVJ2GgEFjmnmMJKmXVxstO4uWiGYwf+KeaeMHzTpckdfM1kamXYWaRbaW7+iLxgF+p6B86l5eEhEMCn4bPJRDfhYBb490CQ6pT639nsUdmd/4dxeKOv8nLFSPRuMG66dg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mSpdKaM6; arc=none smtp.client-ip=91.218.175.26
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JDPChipd"
-Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b5e4f1b846so1698235e87.0
-        for <kvmarm@lists.linux.dev>; Wed, 16 Sep 2026 11:23:33 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1789583011; cv=none;
-        d=google.com; s=arc-20260327;
-        b=qvL6idPMPC6H8iTwdE2omYFpDu8sION55FAxMe3rzdKUG3DOQVvfAnxeCNKUQT2pfR
-         cZXGdbFaESh1+/Gf7vCfKDmzUe32COeUvjdZpuVXQRF+5OGM67TWe9SRLAT1mOukud5W
-         iBsCM1EE0FToTLtu5bjKHlu5TMTiudQQUjCID4O+mbkHmlKX5l1HAXbByMZUzGdz6DN6
-         /xuq0HPPUjdzQWu/v8Ir/3GpKcRcCF9IXxDEIxGG7vLzBbVIyuT1+d1iZCtfHRJ/irbY
-         ZmEO7F5ipgc1fV5sa4lPyQOTlT/RWwiaRChFe7eLaGH05ZIje7PAkC87pRwjFkCP8jbI
-         IkIg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=iA6WOY7U5Hpnzgqa3cIbAuP1d1sT3cNwxEh5sU4xF5Y=;
-        fh=VyX9z3jySm6QV4VgD9Ix5Si/QMLCPzz3oa83KCHC9bs=;
-        b=qTxpEDUVOnNTfGTarQp8KTQyz1KdpvICXNwnjpoSAAroC0H+yWRIshlDP+TyxHZjvw
-         POBBM5Lj2gn0ei2R8cvGod59SNbtMzfglw/SVEMaXZjoMRsL9g1sBJV2ir179MGggrIN
-         O5rcd3pKm61dL2RSs+6KTvBv9koANHNHcmGYoKRh8OA3gv5NoC6ybItcMMb34KmPfcHB
-         V0jw86ONSR8xo5HkTcmI4ksRI7haLfP2UesebJQWtcaWGvc6WOJwCvNCksTQsvj/O4pV
-         1Io45Akwj5d7RGe+qNNP8XoTIscUrLJzWKU0RMjbCcqL4WZ9UUx7HeZdhCwPcKcON3ee
-         wPwg==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1789583011; x=1790187811; darn=lists.linux.dev;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=iA6WOY7U5Hpnzgqa3cIbAuP1d1sT3cNwxEh5sU4xF5Y=;
-        b=JDPChipduRYrBvPo4aR28TNSvEdUz7CQX3aOqzKMBUu8nUv/A6WIzWUOnHRAVqv1Kl
-         6WJG8I5KOtcWTuit0h0R8WpHELpIGT3ZPeFYYm9bo71wOGaEVzRI27MYoSAQPimJThwz
-         j7V0m36C+jXei/RgjYHdcOUUsrwqB0YnzKoyhtIsTvEl0ClIgrlZ1q1ar0Fyuod7RyCt
-         CRyU0EjdhcmAbxNiieNvprkory5j63zXzQVMNrlzt6bt39N2BWEmbC24f2M2qVsdx1Br
-         a4ld038GxHBPW6OYqGQ3PxbZCVtVbFNSjnZ4ETbr8SQR1MX0ur2ZTsSxdYfjrW+ktvuF
-         fAiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789583011; x=1790187811;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=iA6WOY7U5Hpnzgqa3cIbAuP1d1sT3cNwxEh5sU4xF5Y=;
-        b=nsUj4KIYmzMvOsSfRbTqrL6JMtQt0QknvhrtB6doD7lOLn6zpGFlh16dKKGsdRFDET
-         juu2l19GnzXDz7If9pLMywkmb4Zg8MNOA5WdRrimV33syjX5rYXo6q+rpTRuIL62GRwz
-         ShAREXD73DWYFC5U2ZUiJguWOA3yc2cpqY5c8KJNfxvpRywKsWZXpQ8urt6h86P9sNcB
-         AU0n2rjGD5ix4QxrA4ggHRLP8gXKEspBeXtLryqr84kdfzvO/DMZGyG/IZQlVvEt3m4n
-         Uiers1EIl+/IJY3MZlcV3aFEbxzy9HL6+9g4VSKZ/6iJ1WDqHa7a/T4nTlaGtzzETQXn
-         ATCg==
-X-Forwarded-Encrypted: i=1; AKwUvBwYBWSqKSK++Wna6USLbRCSWhO/u8lbqU51x4Yw127Ek+CVF8Lfqt/23VnhdAu96unwaDUKj/o=@lists.linux.dev
-X-Gm-Message-State: AFuF++mEYYqQF7fca5zDh20BtXqUd/si1hdQA5j9Yp3bgE4XXogQga10
-	OX/LwxuHtKUXCF7mhqymMz1RE3W6Q9ZgsnVAOl1fHXTmDZBGyG9FVKq7YhWUFwFPHhJFSChcZX3
-	z8nNFVHXSPbuIkx5OX6yMfL3RnfGQYTeW8xIEX+Dk
-X-Gm-Gg: AYBFou0S1ShB71w1PYUPeRDcg1USJKNnjWAcOAyiW39vo0EWuUKbhGIZJfUBgakt1x1
-	S903NAe7uW7/cML/dO4qBTLwdLb9zsF8huMLAujbmuqZxbIep5tNbckDbktd3mhc0G2jYtcPB2t
-	oEnTZKh+0jw9ZOihWhv9E99bbv0YEpB1XZSeapZtW1R44Hcaqp7hzILw8WPneVs3ZMfv+klL2zJ
-	hRGoTXAvTK3X1olpkei1nWmYznYpk8Rliej115EVWLLGBl0uAhuPnuwuQYUrjSRyArIFGRhbEQO
-	GjontgCVM/KzX/vqikxqvQWGBAU9PoMM+aBVJxkfhvVtiZX69fztqw==
-X-Received: by 2002:a05:6512:1293:b0:5b6:1a7c:aa13 with SMTP id
- 2adb3069b0e04-5b8b6640be1mr1009695e87.43.1789583011057; Wed, 16 Sep 2026
- 11:23:31 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mSpdKaM6"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=clIAd+ElCPuqeSOiRCrGYr2080Rs0+u4Ja4zpAJS57o=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1789585604; v=1; x=1790190404;
+ b=mSpdKaM6l/DK8WBKKybXFLMOJSNj12S0FO2rPXyAM4B1gleODzbgNvFXNo46YjGGdF5o8QU7
+ wqC9fzIs2oyJaz9Uh7TGwzee7lwEE0de4SmugZ0nTsZr2u/fYp/awToJ1EJScSMKXXyROJdCAFH
+ xEPcjiulE5VxgwKYpMfaT4Pc=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 2ddb626cea38722f;
+	Wed, 16 Sep 2026 19:06:34 +0000
+X-Mizu-Trace-ID: 2ddb626cea38722f
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b78e073980so839e87.1
+        for <kvmarm@lists.linux.dev>; Wed, 16 Sep 2026 12:06:34 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBz43diDfEujjTK9ZhFpHz3gqjybdaA2kB4TuOBlpAkYeFkjTTWvQ2Q++Oc/D7Dj2jaLFwGa2EU=@lists.linux.dev
+X-Gm-Message-State: AFuF++mHuHwK1p96tOYtZKFR95iV6QqWpOCB5HNjR3Q+UD3eZgRyiJus
+	MnSM8KBsckiBHpTkoXrwcLs6xzD1sl+2zFUTIgivq3QFJ3Ija3dFf8irbpNkRpLWjj4SP5CK7hx
+	EzUGGT6HO9G6ya0L67YIQGKee6nylkeInL/+Cmnn9
+X-Received: by 2002:a05:6512:3d10:b0:5b8:b380:3c89 with SMTP id
+ 2adb3069b0e04-5b8ba99b7ffmr23508e87.0.1789585593571; Wed, 16 Sep 2026
+ 12:06:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260912083611.2513845-1-suzuki.poulose@arm.com> <20260912083611.2513845-7-suzuki.poulose@arm.com>
-In-Reply-To: <20260912083611.2513845-7-suzuki.poulose@arm.com>
-From: Alper Gun <alpergun@google.com>
-Date: Wed, 16 Sep 2026 11:23:19 -0700
-X-Gm-Features: AcwNN1Xa9rZlSKbZ1HJXqNvz676wwtG0Dzc3HxbzhCyZpg8GXZHTQsxrOGLMh6o
-Message-ID: <CABpDEum16ZzLSjd7Yg2Ge6VjwL8S8xxtSs_AsqOeNT9-9FNKKQ@mail.gmail.com>
-Subject: Re: [PATCH v18 6/7] firmware: arm_rmm: Ensure the RMM has GPT entries
- for memory
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org, 
-	will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, steven.price@arm.com, 
-	aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com, 
-	joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com, 
-	linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, 
-	sdonthineni@nvidia.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com, 
-	lpieralisi@kernel.org, enju.kohei@fujitsu.com
+References: <20260914113338.159227-1-fuad.tabba@linux.dev> <20260914113338.159227-15-fuad.tabba@linux.dev>
+ <86bj9x5fhj.wl-maz@kernel.org>
+In-Reply-To: <86bj9x5fhj.wl-maz@kernel.org>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Wed, 16 Sep 2026 20:05:57 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTy8R3yxFHmTti9mBgjQGJKnH44v9WvDQ2k9cWFECaYoQg@mail.gmail.com>
+X-Gm-Features: AcwNN1X5PZX5WDCSedlv_R_n84PSTr-QRRvORTCqs34THsNi7n9PRABFR4_9-2c
+Message-ID: <CA+EHjTy8R3yxFHmTti9mBgjQGJKnH44v9WvDQ2k9cWFECaYoQg@mail.gmail.com>
+Subject: Re: [PATCH v3 14/18] KVM: arm64: Add per-EC entry/exit state
+ marshalling for protected guests
+To: Marc Zyngier <maz@kernel.org>
+Cc: oupton@kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, 
+	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	mark.rutland@arm.com, steven.price@arm.com, vdonnefort@google.com, 
+	qperret@google.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Sat, Sep 12, 2026 at 1:37=E2=80=AFAM Suzuki K Poulose <suzuki.poulose@ar=
-m.com> wrote:
+Hi Marc,
+
+On Wed, 16 Sept 2026 at 17:27, Marc Zyngier <maz@kernel.org> wrote:
 [...]
-> +static int rmi_init_metadata(void)
-> +{
-> +       phys_addr_t start, end;
-> +       struct memblock_region *r;
-> +
-> +       for_each_mem_region(r) {
-> +               int ret;
-> +
-> +               /* Firmware-reserved NOMAP regions are not usable system =
-RAM */
-> +               if (memblock_is_nomap(r))
-> +                       continue;
-> +
-> +               start =3D memblock_region_memory_base_pfn(r) << PAGE_SHIF=
-T;
-> +               end =3D memblock_region_memory_end_pfn(r) << PAGE_SHIFT;
-> +
-> +               ret =3D rmi_prepare_memory(start, end);
-> +               if (ret)
-> +                       return ret;
-> +       }
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+[...]
+> > +static void handle_pvm_entry_sys64(struct pkvm_hyp_vcpu *hyp_vcpu)
+[...]
+> > +        /* If the host emulated a read access, update the register */
+> > +        if (pc_update &&
+> > +            !pvm_sys64_is_write(hyp_vcpu->vcpu.arch.fault.esr_el2)) {
+> > +                /* r0 as transfer register between the guest and the host. */
+> > +                u64 rt_val = READ_ONCE(host_vcpu->arch.ctxt.regs.regs[0]);
+>
+> Why isn't this
+>
+>                 rt_val = READ_ONCE(vcpu_gp_regs(host_vcpu)->regs[0]);
+>
+> and similarly everywhere else?
 
-Hi Suzuki,
+Old code momentum. I'll use the accessors throughout in v4.
 
-What happens if a system has memory regions in memblock that are not
-tracked by RMM (e.g. CXL memory)?
+[...]
+> > +static void handle_pvm_exit_sys64(struct pkvm_hyp_vcpu *hyp_vcpu)
+> > +{
+> > +        struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
+> > +        u32 esr_el2 = hyp_vcpu->vcpu.arch.fault.esr_el2;
+> > +
+> > +        /* The mode is required for the host to emulate some sysregs */
+> > +        host_vcpu->arch.ctxt.regs.pstate =
+> > +                pvm_host_pstate(hyp_vcpu->vcpu.arch.ctxt.regs.pstate);
+> > +
+> > +        /* r0 as transfer register between the guest and the host. */
+> > +        if (pvm_sys64_is_write(esr_el2)) {
+> > +                int rt = kvm_vcpu_sys_get_rt(&hyp_vcpu->vcpu);
+> > +                u64 rt_val = vcpu_get_reg(&hyp_vcpu->vcpu, rt);
+> > +
+> > +                host_vcpu->arch.ctxt.regs.regs[0] = rt_val;
+>
+> and this should be
+>
+>                 vcpu_set_reg(host_vcpu, 0, rt_val);
+>
+> assuming you don't need a WRITE_ONCE() to match the READ_ONCE() in the
+> other direction.
 
-Currently, rmi_verify_memory_tracking() returns -ENODEV for untracked
-regions, causing rmi_init_metadata() to abort and disable CCA
-system-wide.
+No WRITE_ONCE() needed, EL2 is the only writer on the way out. I'll
+switch to vcpu_set_reg().
 
-Shouldn't rmi_init_metadata() skip untracked regions (continue) with a
-warning/info log instead of aborting? That would allow Realm support
-for conventional DRAM while leaving untracked memory for the host.
+[...]
+> > +static void handle_pvm_exit_iabt(struct pkvm_hyp_vcpu *hyp_vcpu)
+> > +{
+> > +        hyp_vcpu->host_vcpu->arch.fault.hpfar_el2 =
+> > +                hyp_vcpu->vcpu.arch.fault.hpfar_el2;
+>
+> Please keep assignments on a single line (everywhere).
 
-Thanks,
-Alper
+Will do.
+
+Cheers,
+/fuad
