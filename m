@@ -1,141 +1,71 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta0.migadu.com (out-110.mta0.migadu.com [91.218.175.110])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3810E499F3F;
-	Thu, 17 Sep 2026 11:44:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FA0A4DE703
+	for <kvmarm@lists.linux.dev>; Thu, 17 Sep 2026 11:45:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.110
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789645481; cv=none; b=Jtv9jm6KtZbrhuECCL3xgQjTFzrvwIQ0IEG2pita0krjWvMGlZieaMGd2we7DMaCLQrqlfPIxxiVtvErw0ATkmMr1p0j4u5GV6o1PBZNw3YCLohIryD2VgatHn/hN7gSzHEHLt7FqNEl3cydOlwRsZP/tSAYnd38p45bgvQ4n0w=
+	t=1789645563; cv=none; b=pJpfcw1WXJI9jLA2oOQAWhNDwC3PDlYLyqIxvb0dZH8rSjsIE5HyTJJgFPVwE/mJ/H09+GN17pW9KXL2iGffg/8LkVPFz64W1rEsabhDcui0DDM/nO+hyHey9GYn8eymyOeG2aMeT/TtiTgnqT4bp/BMKReruO1ddjtwh2f/IbI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789645481; c=relaxed/simple;
-	bh=9fk8DuS3xaMxi3w7E+95eYEhlbRKrkO3TvCl5Aro4JE=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kPPiyM8RhWM479OIbMlTpQDz7cxBodF611SrV3bCaIxILeEBsZkIbFXV65ezw/bPmF+o9H33Tmedx9efIEz8jI5HLLVvNNlE813LJKCJa2VJkWonFACe2d9rlDMU8ZyZ5+1Lq5iFMjBJS4Nbf4mJMyHV4WtFWjR9WguYVsE+8CM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SJLkhzyB; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789645563; c=relaxed/simple;
+	bh=XoCNKh3avr1vbPszp0DFF5P7sdLgXW+7ysUJYNoTYl4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bOdHGCitSvuzjPM+5ORqnA31Z0aKehXwsSmxcC/ZrCfO4KH44EQfPhgFR2e+frJ8SL0a/tzT1HJad0Fiw2DBfvkYQTWrpcPJzX6868u7yXSX/Xi3twQ2c9mChO1hFExBEFaOQXyEnM9x4FJzT3W6pHIdWDPykmSGSQi6nb42m54=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ZlHqCtLV; arc=none smtp.client-ip=91.218.175.110
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SJLkhzyB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78F571F000FF;
-	Thu, 17 Sep 2026 11:44:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789645469;
-	bh=e9qhpzkkMBbVAXFsklQI980TtIUfZrl+0QN1jIBTTMY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=SJLkhzyBRQ08ZPvr206nCLCuog6/XL+QQ07i0ccbURnOVPFuSkkf7ys6hPVhOyoEd
-	 1+HSWrqiKkPk/Jxf7ID26yYYAXFkudJlqIhf3U0hz92bhcJcRmOHjA5SwnmLMkdJJS
-	 G2zgkkkP7r4i87QxQiPnP5nM9HJ/vOx298LIOpDvMBuA8arpELZgDjNd/dlopwfChu
-	 96Rtx5g3a2azPcdzsWzJRDqBRzQonnszEJ4N7A71lhWk65trAv2VkASUQCvVEMnqKc
-	 bYTmTDumXjMCNlUvvUhFMFOVM+qjMEe44+RqLtEjAup5u0O5vG/1cMNCi1TzVByUdh
-	 mDcH0c9N2cIJQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1x7AXT-0000000A42P-2EhZ;
-	Thu, 17 Sep 2026 11:44:27 +0000
-Date: Thu, 17 Sep 2026 12:44:26 +0100
-Message-ID: <8633v85ch1.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: kvm@vger.kernel.org,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ZlHqCtLV"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=XoCNKh3avr1vbPszp0DFF5P7sdLgXW+7ysUJYNoTYl4=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1789645553; v=1; x=1790250353;
+ b=ZlHqCtLVz61x1ppMwJL3OUseRGO4gzL/ogKJ6PPJeDtRCzbpC0vsW0U6tX6NoVM3HEnvCOhE
+ NgEn1pPFWiM8uUV8DicDlDF6KXG9vzOyOHopLNCmoRrDt1kBmUogfLaVJDX6vEeNQWNnsb2lK47
+ pZcSRTVS4NZV+A59YqBq/6Y8=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id fd273b443532bc7d;
+	Thu, 17 Sep 2026 11:45:53 +0000
+X-Mizu-Trace-ID: fd273b443532bc7d
+X-Migadu-Flow: FLOW_OUT
+From: Zenghui Yu <zenghui.yu@linux.dev>
+To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev,
-	will@kernel.org,
-	catalin.marinas@arm.com,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	steven.price@arm.com,
-	aneesh.kumar@kernel.org,
-	oupton@kernel.org,
-	gshan@redhat.com,
-	joey.gouly@arm.com,
-	tabba@google.com,
-	yuzenghui@huawei.com,
-	linux-coco@lists.linux.dev,
-	gankulkarni@os.amperecomputing.com,
-	sdonthineni@nvidia.com,
-	alpergun@google.com,
-	fj0570is@fujitsu.com,
-	WeiLin.Chang@arm.com,
-	lpieralisi@kernel.org,
-	enju.kohei@fujitsu.com
-Subject: Re: [PATCH v18 12/23] KVM: arm64: Widen the scope of "protected" VMs
-In-Reply-To: <20260915160141.3543048-13-suzuki.poulose@arm.com>
-References: <20260915160141.3543048-1-suzuki.poulose@arm.com>
-	<20260915160141.3543048-13-suzuki.poulose@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	linux-kernel@vger.kernel.org
+Cc: pbonzini@redhat.com,
+	seanjc@google.com,
+	"Zenghui Yu (Huawei)" <zenghui.yu@linux.dev>
+Subject: [PATCH 0/3] KVM: selftests: access_tracking_perf_test fixes and cleanups
+Date: Thu, 17 Sep 2026 19:45:40 +0800
+Message-ID: <20260917114543.85044-1-zenghui.yu@linux.dev>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com, joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Tue, 15 Sep 2026 17:01:30 +0100,
-Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
-> 
-> On arm64 we have "protected" VMs that run on PKVM as a confidential compute
-> guest. Given we already have the construct of "kvm_vm_is_protected" in the core
-> KVM code, use that for all confidential compute guests including Realms that
-> we are about to add.
-> 
-> Use the VM flavor to detect the "protected" VMs by introducing a marker.
-> Add explicit helper to detect if a given VM is a "protected" VM under PKVM.
-> Change the existing users that precisely want to check the VM type. These
-> include :
->   - kvm_arch_prepare_memory_region - For preventing memslot changes after pVM
->     creation.
-> 
-> All the others are retained as a wider check for confidential guest VMs.
-> These are:
->  - kvm_vm_ioctl_set_counter_offset - For disallowing timer offset configuration
->  - io_mem_abort for dabt handling without valid syndrome information
-> 
-> Both of which are true for Realms too.
-> 
-> Realms support is restricted to VHE host and thus "kvm_vm_is_protected()"
-> checks in the pkvm hyp specific code doesn't need to change, as the only
-> protected guests it deals with is "protected PKVM" guests.
-> 
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> ---
->  arch/arm64/include/asm/kvm_host.h | 4 +++-
->  arch/arm64/kvm/mmu.c              | 2 +-
->  2 files changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 7ce46d853c47e..1bb43c57fb0f0 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -329,6 +329,7 @@ enum kvm_arm_vm_flavor {
->  	VM_NVHE,
->  	VM_VHE,
->  	VM_PKVM,		/* Normal guests on pKVM */
-> +	MARKER(__VM_PROTECTED),
->  	VM_PROTECTED_PKVM,	/* Protected VM */
->  	VM_FLAVOR_MAX,
->  };
-> @@ -1535,7 +1536,8 @@ struct kvm *kvm_arch_alloc_vm(void);
->  
->  #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
->  
-> -#define kvm_vm_is_protected(kvm)	((kvm)->arch.vm_flavor == VM_PROTECTED_PKVM)
-> +#define kvm_vm_is_protected(kvm)	((kvm)->arch.vm_flavor >= __VM_PROTECTED)
-> +#define kvm_vm_is_protected_pkvm(kvm)	((kvm)->arch.vm_flavor == VM_PROTECTED_PKVM)
->  #define kvm_vm_is_unprotected_pkvm(kvm)	((kvm)->arch.vm_flavor == VM_PKVM)
->
+From: "Zenghui Yu (Huawei)" <zenghui.yu@linux.dev>
 
-This really should be added from where you introduce the enumeration,
-as my original patch did. Otherwise, this is pure churn for no benefit.
+Patch 1 fixes a deterministic failure of access_tracking_perf_test when the
+host page size is bigger than the guest's, e.g. the 4K guest modes on a 64K
+arm64 host: page_idle tracks idleness per host page, so walk the test
+region at that granularity.  Patches 2 and 3 are two small cleanups found
+along the way.
 
-Thanks,
+Tested on an arm64 host with 64K pages.
 
-	M.
+Zenghui Yu (Huawei) (3):
+  KVM: selftests: Fix access_tracking_perf_test for larger host page
+    size
+  KVM: selftests: Add missing newline to access_tracking_perf_test help
+  KVM: selftests: Remove destroy_cgroup() from access_tracking_perf_test
+
+ .../selftests/kvm/access_tracking_perf_test.c | 23 +++++++++++--------
+ 1 file changed, 14 insertions(+), 9 deletions(-)
 
 -- 
-Without deviation from the norm, progress is not possible.
+2.53.0
+
