@@ -1,131 +1,107 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B433D4A483B;
-	Thu, 17 Sep 2026 10:36:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C274C4B0E2F;
+	Thu, 17 Sep 2026 10:59:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789641420; cv=none; b=d8pvwUJIJfwRhrODSEDKtNw3+7gxKr7vAKS5Aqt1nYyAopZbfoaJIx2Zk4ZyPI+ALCs0NlV+l+PHKQj9It9ZkTVyeFADS9SLMkw+OcHNZNe4z43tVixbXslMUbWZ9RhA1Xms5/2wi2rKacP9N0TFIoSO8qGo16VnEVqD/lFPtEY=
+	t=1789642769; cv=none; b=NZuCAE21QrGNAkeu2dPINmocZqyfXKN9yzVCNoEyby093urWTnEhIcY2yqkw8noAferjO9zIG/UQcP3sV0NmDYQPvsfkRyob3sdIKPmwN38uyEEKix/ua4FgPHRtQTCCjWDenKo4Gc65il/78wOrx6g86Xaj4fG34Dc0FJ6ShaM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789641420; c=relaxed/simple;
-	bh=HFJCSpH6FLoOTK/OMrzkNYKid6wglsq3WkOL5d44zXM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CzKiIKcyDv0UJlZ1hQE1fXBPFWMdOYCKl+egeeR6xDCIxB4ZEH4Mk6nhzGi9TmtUKp7oPK8wCxG/JcxtHE1LwmILIxcX0CZOQMHvGJIqrPnO6Ypxjy5hXqiDqhDEuKnyU97LTNb4rdKOt3ixVoTjPrstLxkiu1QtXLfSX09zldg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=K6ceyb1d; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1789642769; c=relaxed/simple;
+	bh=rtq+KPDWjAOe8tvlJSjm0uLXI5F0yzZs7OGN9p0kt1M=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=INkxkMx1xh/8eX+I6ylFCfAeOxiKK+erXQf3qS7faTbcFfmZqB1A8KUqnFXivzG7VE0PqPBfOKEiPMOSLpZr3Syan8Ubn0FM48CZ7g1Nawz4k2rD1rm6ZjL9p8g5pSxD6Xoe6nInwAuWbuz7vDLspZKddBkHaKvKVIInXOW7Svo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CFkfgEEA; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="K6ceyb1d"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1947C1476;
-	Thu, 17 Sep 2026 03:36:50 -0700 (PDT)
-Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1F8EB3FAA1;
-	Thu, 17 Sep 2026 03:36:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1789641413; bh=HFJCSpH6FLoOTK/OMrzkNYKid6wglsq3WkOL5d44zXM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=K6ceyb1dKbKDTE5CusZ/Ez78cvFyWYSRzt51rGQj21EJGMTXwtEoWVwN+MKWmPxAa
-	 +i6+l/BOQYpzJKhugeyBhipf5dPVdu+voBzZNIuWyAf6B9teCVjp56PmIpVl/d0D1x
-	 WU7VtqOhSd0OYneIlsRPF1fDHFjVDDdly5Kq3OU4=
-Date: Thu, 17 Sep 2026 11:36:48 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
-	will@kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
-	aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
-	joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
-	linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
-	sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
-	WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com
-Subject: Re: [PATCH v18] arm64: mm: Handle Granule Protection Faults (GPFs)
-Message-ID: <aqvCwM_73qMpqzvV@arm.com>
-References: <20260913070459.2547407-1-suzuki.poulose@arm.com>
- <aqrGPK0lFBFXL2qY@arm.com>
- <985520fa-99b0-4620-bfee-8e6321b36104@arm.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CFkfgEEA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E157A1F00898;
+	Thu, 17 Sep 2026 10:59:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789642756;
+	bh=8pvb3DrQTOeiip8i/IQe7dJP7/pPWH7CBfuHAq/9GoM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=CFkfgEEAfb4TssHRW4txBICPiBcbUS2rNEE8waAlHV0plSW9FG1AHr93v902SYLd8
+	 A0pdE3yBg01GQAl2o07+sJdflrXa2lPLrDbFxps1XpXURChdVNzIh0Tl0X965+Gtgo
+	 M3qPMJBoOMT6dyXJeIpGTkN/D9AETxVrMExYoh9/SdrO9lN1oDfqfXQhesBz43QJ0Y
+	 JLGbfBpnROj/zhvuM3iX+iWJAyb5sq0eXlDLcrSuxLuptHtNVD4mlZ9kclveLVa2kP
+	 TUF/GbihNlluTkfPtBe2rIOhr8cdNEfEHSzNu8sFmMtk8SC6Y64rago8pTSOuV2YW+
+	 IHF8p3JH4SzoA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1x79pi-0000000A32Y-1qZt;
+	Thu, 17 Sep 2026 10:59:14 +0000
+Date: Thu, 17 Sep 2026 11:59:14 +0100
+Message-ID: <864ifo5ekd.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Oliver Upton <oupton@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Ben Horgan <ben.horgan@arm.com>,
+	Xi Ruoyao <xry111@xry111.site>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Yuan Yao <yaoyuan@linux.alibaba.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3] KVM: arm64: Trap guest MPAM accesses whenever MPAM is implemented
+In-Reply-To: <CA+EHjTw0U0d91Cv4NYEJvUuT=JabwZeeYwpZ2P1xyVeOVX46Ew@mail.gmail.com>
+References: <20260911104715.307500-1-fuad.tabba@linux.dev>
+	<868q5579ol.wl-maz@kernel.org>
+	<CA+EHjTw0U0d91Cv4NYEJvUuT=JabwZeeYwpZ2P1xyVeOVX46Ew@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <985520fa-99b0-4620-bfee-8e6321b36104@arm.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, ben.horgan@arm.com, xry111@xry111.site, mark.rutland@arm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, seiden@linux.ibm.com, gshan@redhat.com, yaoyuan@linux.alibaba.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Suzuki,
-
-On Thu, Sep 17, 2026 at 10:03:14AM +0100, Suzuki K Poulose wrote:
-> On 16/09/2026 17:39, Catalin Marinas wrote:
-> > On Sun, Sep 13, 2026 at 08:04:58AM +0100, Suzuki K Poulose wrote:
-> > > diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
-> > > index 75c3e463df2ef..dc3a87902a60c 100644
-> > > --- a/arch/arm64/mm/fault.c
-> > > +++ b/arch/arm64/mm/fault.c
-> > > @@ -914,6 +914,24 @@ static int do_tag_check_fault(unsigned long far, unsigned long esr,
-> > >   	return 0;
-> > >   }
-> > > +static int do_gpf_ptw(unsigned long far, unsigned long esr, struct pt_regs *regs)
-> > > +{
-> > > +	const struct fault_info *inf = esr_to_fault_info(esr);
-> > > +	unsigned long addr = untagged_addr(far);
-> > > +
-> > > +	die_kernel_fault(inf->name, addr, esr, regs);
-> > > +	return 0;
-> > > +}
-> > > +
-> > > +static int do_gpf(unsigned long far, unsigned long esr, struct pt_regs *regs)
-> > > +{
-> > > +	if (!user_mode(regs) && !is_el1_instruction_abort(esr) &&
-> > > +	    fixup_exception(regs, esr))
-> > > +		return 0;
-> > > +
-> > > +	return 1;
-> > > +}
-> > 
-> > We discussed briefly offline. With the latest patches around, would we
-> > ever end up with private memory mapped in the VMM and hence the GPF? If
-> > not, I would still keep this handling but add a
-> > WARN_ON_ONCE(user_mode(regs)).
-> > 
-> > However, can we end up delegating a non-guest_memfd memslot page as
-> > protected?
-> > 
-> > I played a bit with codex and it reckons it's possible if a guest_memfd
-> > memslot is deleted after its IPA range has been initialised with
-> > RIPAS=RAM. Removing the memslot unmaps and undelegates any data pages
-> > but leaves the RMM state as RAM. The VMM can then install an ordinary
-> > memslot over the same GPA range.
+On Tue, 15 Sep 2026 19:51:00 +0100,
+Fuad Tabba <fuad.tabba@linux.dev> wrote:
 > 
-> This should be prevented by the following predicates:
+> Hi Marc,
 > 
-> 1) Realms only support guest_memfd backed memslots for mappable memory.
-> 2) Memslots cannot be created after the Realm is created, as is with the
-> protected VMs. (This check seems to have been lost over the iterations,
->  but should be reinstated).
-
-If that's the intended model, I think it should work. But v18 doesn't
-enforce either of them. I noticed the second predicate for pKVM only -
-your 'Widen the scope of "protected" VMs' patch makes this restriction
-explicit to pKVM.
-
-For the first one, if !kvm_slot_has_gmem(), it simply continues with the
-registration.
-
-> > A subsequent private-IPA S2 fault sees the non-guest_memfd slot, takes
-> > user_mem_abort(), GUPs the user page and passes it to
-> > realm_map_protected(). The userspace mapping remains present, so a later
-> > EL0 access can generate a GPF.
+> On Sun, 13 Sept 2026 at 11:00, Marc Zyngier <maz@kernel.org> wrote:
+> [...]
+> > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> [...]
+> > >  static void cpu_hyp_init_context(void)
+> > >  {
+> > > + u64 pfr0 = __read_sysreg_by_encoding(SYS_ID_AA64PFR0_EL1);
+> > > + u64 pfr1 = __read_sysreg_by_encoding(SYS_ID_AA64PFR1_EL1);
+> > > +
+> >
+> > Why not directly read_sysreg(id_aa64pfr0_el1) and co?
+> > __read_sysreg_by_encoding() is useful when the encoding comes from a
+> > variable, but it looks odd in the case of a literal sysreg.
 > 
-> The Realm mem abort code should prevent this by ensuring that the
-> memslot is backed by gmem for private_faults. With the mandate of
-> in-place conversion, even the shared pages must come from the
-> gmem backed memslots.
+> It applies the arm64.nompam override, which is what
+> finalise_el2_state() tests. With the override set, EL2 setup leaves
+> the MPAM traps alone, and a raw read_sysreg() would still see MPAM in
+> the ID registers, so KVM would write MPAM2_EL2 on exactly the firmware
+> the option exists for. I'll add a comment.
 
-IIUC this only works if the memslot is gmem but I can't see what
-prevents ordinary slots from being assigned to realms. I think we can
-enter the user_mem_abort() -> realm_map_ipa() for ordinary slots unless
-we prevent the deletion of the original slots and enforce gmem only
-slots early.
+Ah, good point. A comment would help indeed.
+
+Thanks,
+
+	M.
 
 -- 
-Catalin
+Without deviation from the norm, progress is not possible.
