@@ -1,122 +1,71 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCA3F3DB328;
-	Thu, 17 Sep 2026 07:57:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02C943D9524;
+	Thu, 17 Sep 2026 07:58:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789631822; cv=none; b=uuN9S3PolKmFOgax2lliqODFYMYj3eklFOrpDMtmbXfsIoy2TbYHkvXcYfY7JrMO3bryP1n9lmlckNlF0Qtx86TPM2lkkkT3SyLlSlJniRii9VGcMuzcweltxebmxc4Tlcm+brCJgwusKCsE4eHtEoL69CkHe1R0v410Sym1w6Y=
+	t=1789631913; cv=none; b=jjY3egHphIRB3t+4Z/v0Fdfjj5cVba22b23F4o0CWA9kuBSYbGXXZd99gN+2OU7ve2grjceEooLXeaM69f7KApHFVhgy4RAIsXEpV4FQd93DymZhSWsyO/9/+dRG1sg/HLgy6MKMVdCARpo+7NHGpwUUBZnrYbK19BYa6vHqTsM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789631822; c=relaxed/simple;
-	bh=flwm51PTddp8bOXmpbcTF9d5R+dkajh8ncYWbuDyxRk=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Wl1EVw+WD8NBRXgSrnX3nFrWT7BxdQmjfKAW7cAtSdlvEz5LoQXWu5QEA+rwa+qLMcF0y+5PzR3DhMwNv6lJLHMEPEsifmdMhNcQsVmUT/Sx0RvkGLBP+tfy0RxVGk9vdnzi7FaSnojOFJvlWp6Bw7jQy1isRT+f9b3JY/xzjh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fyv8H5Zd; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789631913; c=relaxed/simple;
+	bh=RRfDq16oxGgKtBw9UeQmNtYm4ST9qaYOgq1HK0Ny8A8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q6a5xLJyrE2AWDLvpnqwTdxkXJvGl6lR0X3T0WDakhNmVTDNDeH/RRYFgK6utTuJkJ5UfzczvxvsGO1zPjMuwBjfH0R+RxV4q5D4QJ0bVaCFyEFXbW1VOdKPUrYtk3D9+cD0A5bM8WZE90X6Gu+NmE2GaF7Xuox4UwhHsdcTHTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=f4wC/Tvn; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fyv8H5Zd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CED881F000FF;
-	Thu, 17 Sep 2026 07:56:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789631819;
-	bh=c5nHfb0sN8awpqWQUUf2qpdir+xWpEhP8GLUQyh2snk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=Fyv8H5ZdWDAqKNy6lCNwJD0GdWelLq+Vv2VWJUXPR6sk2T8RpIum4o7exvCiYCrXa
-	 K2bv4rHCB1g95P02+cxUnWktKD2D1RXLBoN5uBDgzStA/jYBMb61thlz9XfCFcBmjf
-	 JVWL2KsLc11C3KUc7hdz6pBoGJXxSjIKmccgxEwAE1+c7P3Ltvnwuqs/YQvfrdk31s
-	 +BmuVlwfoA1IuTTOsPprMrg/m1s1tAxP/Pgi5jn6EOolMiHLGAFls9ppYoEQm842QI
-	 VJNzx47uYGIXfwegd9vqV2QnK0geFPdfYDKOFBxz0cCAxg+DNZkvH4UjCbPhuPB4zC
-	 /5hZvKqt5DfCg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1x76zJ-00000009yQd-1QJv;
-	Thu, 17 Sep 2026 07:56:57 +0000
-Date: Thu, 17 Sep 2026 08:56:56 +0100
-Message-ID: <867bkk5n07.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Itaru Kitayama <itaru.kitayama@fujitsu.com>
-Cc: Wei-Lin Chang <weilin.chang@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Wang Han <wanghan@linux.alibaba.com>,
-	Shuai Xue <xueshuai@linux.alibaba.com>,
-	"Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Subject: Re: [PATCH v6 0/7] KVM: arm64: nv: Implement nested stage-2 reverse map
-In-Reply-To: <aquN5ytDxt44uORD@sm-arm-grace07>
-References: <20260915154305.3852871-1-weilin.chang@arm.com>
-	<aqm9hXB6X9IQ8wHz@sm-arm-grace07>
-	<m6ldbr7hdafmoycx7xjcbsg62mblcakcu52ndowwzqgxdjb3q3@huv4i5bfxtza>
-	<aqnUWp_VJXUCcJnQ@sm-arm-grace07>
-	<86ld9165cr.wl-maz@kernel.org>
-	<aquN5ytDxt44uORD@sm-arm-grace07>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="f4wC/Tvn"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C4F851476;
+	Thu, 17 Sep 2026 00:58:26 -0700 (PDT)
+Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B1D4B3F7B4;
+	Thu, 17 Sep 2026 00:58:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1789631910; bh=RRfDq16oxGgKtBw9UeQmNtYm4ST9qaYOgq1HK0Ny8A8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=f4wC/TvnWaNgPI27Dfy+Nrnm0xEIKICSS0D4shLai0nf6X//HHrkuIFoWvfQ+w1mP
+	 XBlhRCgFI09l+Ayz0I9KRZNU4Uol8xNufG0CUKYMPjKpPh7zh4QZ1X3bc38dYeR9RW
+	 Z7cso9/xLARHAJCe+Be3ye8vh/HNKsc1XvD/la1s=
+Date: Thu, 17 Sep 2026 08:58:25 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
+	will@kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
+	aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
+	joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
+	linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
+	sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
+	WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com
+Subject: Re: [PATCH v18] arm64: mm: Handle Granule Protection Faults (GPFs)
+Message-ID: <aqudod8kM5AjkCFY@arm.com>
+References: <20260913070459.2547407-1-suzuki.poulose@arm.com>
+ <aqrGPK0lFBFXL2qY@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: itaru.kitayama@fujitsu.com, weilin.chang@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, wanghan@linux.alibaba.com, xueshuai@linux.alibaba.com, ljs@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aqrGPK0lFBFXL2qY@arm.com>
 
-On Thu, 17 Sep 2026 07:51:19 +0100,
-Itaru Kitayama <itaru.kitayama@fujitsu.com> wrote:
+On Wed, Sep 16, 2026 at 05:39:24PM +0100, Catalin Marinas wrote:
+> However, can we end up delegating a non-guest_memfd memslot page as
+> protected?
 > 
-> On Wed, Sep 16, 2026 at 08:08:20AM +0100, Marc Zyngier wrote:
-> > On Wed, 16 Sep 2026 00:27:22 +0100,
-> > Itaru Kitayama <itaru.kitayama@fujitsu.com> wrote:
-> > > 
-> > > On Wed, Sep 16, 2026 at 12:22:30AM +0100, Wei-Lin Chang wrote:
-> > > > On Wed, Sep 16, 2026 at 06:49:57AM +0900, Itaru Kitayama wrote:
-> > > > > On Tue, Sep 15, 2026 at 04:42:58PM +0100, Wei-Lin Chang wrote:
-> > > > > > Hi,
-> > > > > > 
-> > > > > > This is v6 of optimizing the shadow s2 mmu unmapping during MMU
-> > > > > > notifiers.
-> > > > > > 
-> > > > > > This version fixes a few issues, and adds Marc's space optimization
-> > > > > > for kvm_guest_s2_mapping [1]. Please see the changelog for the details.
-> > > > > > 
-> > > > > > Tested by booting L3, and running in-kernel targetted tests described
-> > > > > > in [2]. v5 got some tested-by's from Itaru and Wang (thanks), I didn't
-> > > > > > carry them over since some bugs fixed in v6 are non-obvious. Some
-> > > > > > retest would be much appreciated!
-> > > > > 
-> > > > > How did you boot into L3, with KVM selftest or recrusively boot on HW?
-> > > > 
-> > > > I just recrusively booted VMs on hardware. :)
-> > > 
-> > > Good. Then I actually tried that on Grace CPUs, but letting L1 boot 
-> > > with nested mode did not print "VHE+NV2" KVM init log in dmesg, thus not
-> > > able to boot L3. Do I need to add other than kvm.arm-mode=nested to command line?
-> > 
-> > kvm-arm.mode=nested, as documented. That also puts in perspective your
-> > TB tag on the whole series...
-> 
-> Yes. Using kvmtool's --nested option did not bring vCPU with the VHE+NV2 boot
-> log. The Host kernel is Wei-Lin's version 6 booted on Grace CPUs, and
-> the guest kernel is today's kvmarm/fixes plus Wei-Lin's shadow stage 2 ptdump fix.
+> I played a bit with codex and it reckons it's possible if a guest_memfd
+> memslot is deleted after its IPA range has been initialised with
+> RIPAS=RAM. Removing the memslot unmaps and undelegates any data pages
+> but leaves the RMM state as RAM. The VMM can then install an ordinary
+> memslot over the same GPA range.
 
-What have you tested exactly? If you're not able to boot a working L1
-guest as a NV2 hypervisor, you're probably doing something wrong.
-
-	M.
+After some more digging, I think RIPAS becomes DESTROYED after
+undelegation but it doesn't change much. A subsequent guest access to
+the private IPA still exits to the host which will attempt to delegate
+it again even if it's no longer guest_memfd. RIPAS remains DESTROYED but
+GPT is now REALM (and potentially a valid user mapping).
 
 -- 
-Without deviation from the norm, progress is not possible.
+Catalin
