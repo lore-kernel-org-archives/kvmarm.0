@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B2864F391E
-	for <kvmarm@lists.linux.dev>; Thu, 17 Sep 2026 15:49:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C22D4F3912
+	for <kvmarm@lists.linux.dev>; Thu, 17 Sep 2026 15:49:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789660209; cv=none; b=hDokEa1sFJkcfip2y0JIjWKAHzEJm/lAAvJrmrRf6TCNLP+iwgFy4lzSGosEOvcI7vkqzVhD9jfi83K3hka0VpF6TZEEIMmcSbMBTZ0jsTo/jnz1XSGkYyEGpIz7RAuiiUB5u2JLlB659QHRWws8sgmkVekrAy1F1WklHMal/aU=
+	t=1789660209; cv=none; b=GPZJjOgFi01ry6vNk4D/2nmTPBdTdabc0C38/oGDfWINMZ5uXefdsCjj3NoLaC4r33sFroBSuHEBT7USSeIioKhDrPKd2Pfz+P2cFQD0SikurhtBn1uoyefwH7EJTiNJtjFxPxfOrwlPdzmwJZf15e4PXh+01QzEcOjpVFFPlmw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1789660209; c=relaxed/simple;
-	bh=Lo6AV22VRneWsIefgdLEObQ+PyLMSU+PUdesn29k7vU=;
+	bh=Y+WAhNdJhbgyJ+wetEYORxE9hRaKg6woWRaKFt4pY+0=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JCE1YrZT4FO+DbiQPhEUWT8s0fPBV0U/zjh96806Ma8kCzNAyJdkxAxivxGUtmdc+MSnYAac6onSafGHYKDI8Fxf8Tyz+rnaKT1B8So7BAFp/tv+1pcBt0u45HnVu0kIf0oswwXRJV8q/JUnCt2dscSMzW3nCCD3qzmpFFJ54kk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=HqMQ7y1N; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=WPDBWsu8Dej8DgGuwtaiWpgs4HxaGBcRBYBDvKutEf1Dn4l3RtQJLKwRbrIgggd2Vh0KWevSPTkcb60ya8ktiXfpDgduvJu2VvPJFSDsf+zM8O/VxV3We8OWdwXUcbqjz0FKpkTns3xSi0242VdtmR+DmcuUPAl+0NEsXNQ/JOI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Z9CUTph2; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="HqMQ7y1N"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Z9CUTph2"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DBC221F02;
-	Thu, 17 Sep 2026 08:49:53 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1BE861596;
+	Thu, 17 Sep 2026 08:49:50 -0700 (PDT)
 Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D5B8D3F7B4;
-	Thu, 17 Sep 2026 08:49:55 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 181ED3FAF5;
+	Thu, 17 Sep 2026 08:49:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1789660197; bh=Lo6AV22VRneWsIefgdLEObQ+PyLMSU+PUdesn29k7vU=;
+	t=1789660193; bh=Y+WAhNdJhbgyJ+wetEYORxE9hRaKg6woWRaKFt4pY+0=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=HqMQ7y1NjYYhNLV6P6MSdQ0gKeXAB3leFW40Y01KSRjD6ov9xcgPVxsdlzsUqmS/P
-	 TooQLQJwZDxxFT6jvlRFOiyW0aUahgVayPy5Mq/YirIzLr4hbqPia4ydi7vvEyJ/DY
-	 aN/vQEaDGYPwO5nCFB5enf8Js0PwQhL11rGtuE8k=
+	b=Z9CUTph21YGv5I1DbJ14S+bn2vY2OisXJwdCvVyFDhcPMITMEPjdn1kxCHU/iNRSR
+	 wUtRhSOgzztzvSMq0oTCUBUotNOtPPSt2OSzxMQq6gU2fY2wJ1TtXzvCVG6LJn0n02
+	 tdRzodyagqrnqZ6k5+Wx8o2L3XMxpOjK/aIZEU44=
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: will@kernel.org,
 	julien.thierry.kdev@gmail.com,
@@ -39,9 +39,9 @@ To: will@kernel.org,
 	yuzenghui@huawei.com,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
-Subject: [PATCH kvmtool 3/7] arm64: Free the temporary cpumask in vcpu_affinity_parser()
-Date: Thu, 17 Sep 2026 16:49:28 +0100
-Message-ID: <20260917154932.193943-4-alexandru.elisei@arm.com>
+Subject: [PATCH kvmtool 1/7] arm64: Pass the number of elements as the first argument to calloc()
+Date: Thu, 17 Sep 2026 16:49:26 +0100
+Message-ID: <20260917154932.193943-2-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260917154932.193943-1-alexandru.elisei@arm.com>
 References: <20260917154932.193943-1-alexandru.elisei@arm.com>
@@ -53,51 +53,42 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Free the local variable 'cpumask' when the function is successful.
+man 3 calloc is pretty clear that the first argument to calloc() is the
+number of elements to be allocated, and the second argument is the size
+of one element. Fix the instances where the order was inversed.
 
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- arm64/kvm.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+ arm64/kvm.c | 2 +-
+ arm64/pmu.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/arm64/kvm.c b/arm64/kvm.c
-index 5f3ed9f6d201..88b3622766bf 100644
+index 36b3284e4a92..cdd673542aea 100644
 --- a/arm64/kvm.c
 +++ b/arm64/kvm.c
-@@ -451,7 +451,8 @@ int vcpu_affinity_parser(const struct option *opt, const char *arg, int unset)
- 	const char *cpulist = arg;
- 	cpumask_t *cpumask;
- 	size_t setsize;
--	int cpu, ret;
-+	int ret = 0;
-+	int cpu;
+@@ -454,7 +454,7 @@ int vcpu_affinity_parser(const struct option *opt, const char *arg, int unset)
  
  	kvm->cfg.arch.vcpu_affinity = cpulist;
  
-@@ -460,10 +461,8 @@ int vcpu_affinity_parser(const struct option *opt, const char *arg, int unset)
+-	cpumask = calloc(1, cpumask_size());
++	cpumask = calloc(cpumask_size(), 1);
+ 	if (!cpumask)
  		die_perror("calloc");
  
- 	ret = cpulist_parse(cpulist, cpumask);
--	if (ret) {
--		free(cpumask);
--		return ret;
--	}
-+	if (ret)
-+		goto out_free;
+diff --git a/arm64/pmu.c b/arm64/pmu.c
+index ef7faca1b71d..49d58ddd529b 100644
+--- a/arm64/pmu.c
++++ b/arm64/pmu.c
+@@ -192,7 +192,7 @@ static int find_pmu(struct kvm *kvm)
+ 	cpumask_t *cpumask;
+ 	int i, this_cpu;
  
- 	kvm->arch.vcpu_affinity_cpuset = CPU_ALLOC(NR_CPUS);
- 	if (!kvm->arch.vcpu_affinity_cpuset)
-@@ -474,7 +473,9 @@ int vcpu_affinity_parser(const struct option *opt, const char *arg, int unset)
- 	for_each_cpu(cpu, cpumask)
- 		CPU_SET_S(cpu, setsize, kvm->arch.vcpu_affinity_cpuset);
+-	cpumask = calloc(1, cpumask_size());
++	cpumask = calloc(cpumask_size(), 1);
+ 	if (!cpumask)
+ 		die_perror("calloc");
  
--	return 0;
-+out_free:
-+	free(cpumask);
-+	return ret;
- }
- 
- void kvm__arch_validate_cfg(struct kvm *kvm)
 -- 
 2.55.0
 
