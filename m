@@ -1,168 +1,132 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60B8444C51C;
-	Thu, 17 Sep 2026 09:03:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mta0.migadu.com (out-115.mta0.migadu.com [91.218.175.115])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE6FD418348
+	for <kvmarm@lists.linux.dev>; Thu, 17 Sep 2026 09:18:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.115
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789635804; cv=none; b=N8cynybh4La2D+CcDfU+Rv52Mi6xkshFof0n3FYg6U71R+u8LThB2mLr1g3Dvs6JbfSqxldWsZBrx2OILfAtyb270nzO1waCkGXXvG8HD7bZNA5t9QmGBPLKrehXdwXk4FVrKJtaAcRS7HSI6eXvLVRqEnS9XZwVnggctAwJeQE=
+	t=1789636717; cv=none; b=fA13Izx0/u3loVF3LU+3IyPclyQ2DnSRV/pjq1lGyghahy8gC0gVINBkRkCQUScOgpbi1sK/u7HaTPlPTTTHoh5Bp+wRxdVXrlvPJ2FgKHZFyj28RfxjRwjtIzm7bc19bs7VQDOM7NEFz5/KeMVHKf6U9qB3yxW90N024fh2nos=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789635804; c=relaxed/simple;
-	bh=H7DYV+GTC/oHo8YbGXHgYOr8KdParA1BZBiqphABHmU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ML9qFHWdLUbeLbRVN5LVRx3uJOy/PiVbs6xAdUW+mxhNI9w/L0Oboy2zAPxtoWg9RL3Q/P+CZ7DyPgHJE41QIDs1kUUQtRNcNH9ax4tWIiSlDNe48QOboawAiDy1FHkSq0n5zufmgLTXs54Y7AKzFum8LfpCc7WGtolGLD6WtvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=dkj0kbfu; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1789636717; c=relaxed/simple;
+	bh=qQPrpFqFbLdTmOWfZG9ZieuKIf9/ArvaIv1uQrUh0t4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hYv/DCLCdsHMDtV19hiZlRzwwePmg7C7y5W9sF2YUSrJCljxELpEZSvnp8EsGPzlVu/FJr0Btiva5yLD/fcfrLTigEfecACLXKn6wf4I8xZ7wx54eT04BrnHks//WyvWmYwryr3+gu2cE51KBdK2hpVrZyUQ/NOuXaHt4zepw5M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xQMkT2xm; arc=none smtp.client-ip=91.218.175.115
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="dkj0kbfu"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B80E81476;
-	Thu, 17 Sep 2026 02:03:16 -0700 (PDT)
-Received: from [10.0.128.139] (unknown [10.0.128.139])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2C9BE3FAA1;
-	Thu, 17 Sep 2026 02:03:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1789635800; bh=H7DYV+GTC/oHo8YbGXHgYOr8KdParA1BZBiqphABHmU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=dkj0kbfuI7IiL7YpSyZcZi7LZlvJ0O/YQmyiiNMdPRMKFCWI6B508cxJQglO1aVel
-	 kKb5m0Voqhe1auzEBi4BCZzLSTlHuEXNxHm7678XJVsvUPYou8SnT1shjudXR0xIGX
-	 Vj4vKBm+vvGH1MBwES6/fam0h85SJsUTzuxUPgNc=
-Message-ID: <985520fa-99b0-4620-bfee-8e6321b36104@arm.com>
-Date: Thu, 17 Sep 2026 10:03:14 +0100
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xQMkT2xm"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=qQPrpFqFbLdTmOWfZG9ZieuKIf9/ArvaIv1uQrUh0t4=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1789636712; v=1; x=1790241512;
+ b=xQMkT2xm7tnXgGB2fvULnHiNzu5QsAHf0o5HzkIm1BohsdAy69q1UcFvkurt2KartI9ENuln
+ pQ6VFV78NMeoLoSk6CTRK59B6fkHJuO9Ul86J3u5VenZDu+7ca+T8H0VkuSm+8mkmf7qfV0guy7
+ 2/S/G+0BbqKQSeTHSgFCH2K4=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 7de1b4b5002de0bd;
+	Thu, 17 Sep 2026 09:18:32 +0000
+X-Mizu-Trace-ID: 7de1b4b5002de0bd
+X-Migadu-Flow: FLOW_OUT
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: maz@kernel.org,
+	oupton@kernel.org
+Cc: joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	mark.rutland@arm.com,
+	qperret@google.com,
+	vdonnefort@google.com,
+	martijnbogaard@google.com,
+	seiden@linux.ibm.com,
+	tabba@google.com,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v1 0/4] KVM: arm64: Honour KVM_VM_TYPE_ARM_IPA_SIZE under pKVM
+Date: Thu, 17 Sep 2026 10:18:22 +0100
+Message-Id: <20260917091826.2639205-1-fuad.tabba@linux.dev>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v18] arm64: mm: Handle Granule Protection Faults (GPFs)
-Content-Language: en-GB
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
- will@kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
- aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
- joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
- linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
- sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
- WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com
-References: <20260913070459.2547407-1-suzuki.poulose@arm.com>
- <aqrGPK0lFBFXL2qY@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <aqrGPK0lFBFXL2qY@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Catalin
+Hi folks,
 
-On 16/09/2026 17:39, Catalin Marinas wrote:
-> On Sun, Sep 13, 2026 at 08:04:58AM +0100, Suzuki K Poulose wrote:
->> From: Steven Price <steven.price@arm.com>
->>
->> If the host attempts to access granules that have been delegated for use
->> in a realm these accesses will be caught and will trigger a Granule
->> Protection Fault (GPF).
->>
->> A fault during a page walk signals a bug in the kernel and is handled by
->> oopsing the kernel. A non-page walk fault could be caused by user space
->> having access to a page which has been delegated to the kernel and will
->> trigger a SIGBUS to allow debugging why user space is trying to access a
->> delegated page.
->>
->> There is work in progress to unmap the guest_memfd backed private pages from the
->> linear map. Until we get that support, we could get spurious GPFs from within
->> the kernel, e.g., load_unaligned_zeropad(). So, try to fix them up for now.
->>
->> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Reviewed-by: Gavin Shan <gshan@redhat.com>
->> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> ---
->> Changes since v17:
->>   * Pass untagged address to die_kernel_fault() - Sashiko
->>   * Explicitly check !user_mode() for fixups - Catalin
->>   * Switch to BUS_OBJERR for si_code from SI_KERNEL - Catalin
->>   * Clarify the commit description about the upcoming work on
->>     unmapping guest_memfd backed pages from linear map
->> Changes since v16:
->>   * Update the commit description to indicate why we try to fixup GPFs
->> Changes since v10:
->>   * Don't call arm64_notify_die() in do_gpf() but simply return 1.
->> Changes since v2:
->>   * Include missing "Granule Protection Fault at level -1"
->> ---
->>   arch/arm64/mm/fault.c | 30 ++++++++++++++++++++++++------
->>   1 file changed, 24 insertions(+), 6 deletions(-)
->>
->> diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
->> index 75c3e463df2ef..dc3a87902a60c 100644
->> --- a/arch/arm64/mm/fault.c
->> +++ b/arch/arm64/mm/fault.c
->> @@ -914,6 +914,24 @@ static int do_tag_check_fault(unsigned long far, unsigned long esr,
->>   	return 0;
->>   }
->>   
->> +static int do_gpf_ptw(unsigned long far, unsigned long esr, struct pt_regs *regs)
->> +{
->> +	const struct fault_info *inf = esr_to_fault_info(esr);
->> +	unsigned long addr = untagged_addr(far);
->> +
->> +	die_kernel_fault(inf->name, addr, esr, regs);
->> +	return 0;
->> +}
->> +
->> +static int do_gpf(unsigned long far, unsigned long esr, struct pt_regs *regs)
->> +{
->> +	if (!user_mode(regs) && !is_el1_instruction_abort(esr) &&
->> +	    fixup_exception(regs, esr))
->> +		return 0;
->> +
->> +	return 1;
->> +}
-> 
-> We discussed briefly offline. With the latest patches around, would we
-> ever end up with private memory mapped in the VMM and hence the GPF? If
-> not, I would still keep this handling but add a
-> WARN_ON_ONCE(user_mode(regs)).
-> 
-> However, can we end up delegating a non-guest_memfd memslot page as
-> protected?
-> 
-> I played a bit with codex and it reckons it's possible if a guest_memfd
-> memslot is deleted after its IPA range has been initialised with
-> RIPAS=RAM. Removing the memslot unmaps and undelegates any data pages
-> but leaves the RMM state as RAM. The VMM can then install an ordinary
-> memslot over the same GPA range.
+pKVM has ignored KVM_VM_TYPE_ARM_IPA_SIZE since it started running
+guest stage 2 at EL2 (v6.2): every VM gets the host's IPA limit,
+whatever its VMM requested, and an out-of-range request that every
+other host rejects with -EINVAL is accepted. This series makes pKVM
+handle the type the way KVM does everywhere else, fixes the bugs that
+causes, and two found on the way.
 
-This should be prevented by the following predicates:
+Ignoring the type has two consequences I hit while testing the ITS table
+save series [1]: vgic_init fails on any pKVM host whose limit exceeds 40
+bits, because the addresses it expects a 40-bit VM to reject are in
+range; and on a 64K kernel built for 48-bit PAs on a 52-bit part the
+host sizes a VM at 52 bits while EL2 gives it 48, so a memslot above
+2^48 the host accepts can't be mapped.
 
-1) Realms only support guest_memfd backed memslots for mappable memory.
-2) Memslots cannot be created after the Realm is created, as is with the
-protected VMs. (This check seems to have been lost over the iterations,
-  but should be reinstated).
+Patch 3 is the fix. EL2 takes the IPA size from the VTCR the host
+sized the VM with, bounded by the same rule as the host's limit, and
+the host-side override goes: the request is range-checked and the VM
+gets the size it requested, so the VMM owns the guest's IPA layout on
+a pKVM host too, and the host and EL2 agree on it.
 
-> 
-> A subsequent private-IPA S2 fault sees the non-guest_memfd slot, takes
-> user_mem_abort(), GUPs the user page and passes it to
-> realm_map_protected(). The userspace mapping remains present, so a later
-> EL0 access can generate a GPF.
+The rest supports that. Patch 1 moves the limit rule into a helper EL2
+can share. Patch 2 rejects a pgd donation that's page-aligned but not
+aligned to its own size, which crashes EL2 today; patch 3 changes how
+that size is computed, so the check goes in first. Patch 4 frees a VM
+vgic_init and vgic_v5 leak when the GIC probe fails.
 
-The Realm mem abort code should prevent this by ensuring that the
-memslot is backed by gmem for private_faults. With the mandate of
-in-place conversion, even the shared pages must come from the
-gmem backed memslots.
+A VMM that requests less than the host limit under pKVM, the 40-bit
+default type included, now gets that size, and on a host whose limit is
+below 40 bits the default type is refused, as it is without pKVM.
+kvmtool requests the smallest size its RAM needs, for protected VMs
+too, and crosvm requests the limit, so neither places anything beyond
+its request.
 
-> 
-> What's worse, I think it can even trick the kernel into doing a memcpy()
-> access (via GUP). Hmm, does such ordinary slot page even remain pinned?
-> There are other kernel parts that could access it.
-> 
-> I don't think it changes this patch but if the above is possible, we
-> should definitely get it tightened on the other series (and here we can
-> add the warning).
+vgic_init passes with this, its range checks untouched, on QEMU under
+pKVM and VHE at 52- and 48-bit host IPA limits. On a 64K/PA_BITS_48 pKVM
+host a guest mapping above 2^48 fails without patch 3 and works with it.
+On an M4, whose limit is 40 bits, pKVM used to create a VM for a 44-bit
+request and give a 36-bit VM a 40-bit stage 2; with this it refuses the
+first and bounds the second, as the same machine does without pKVM.
 
-Agreed. I will address these concerns in the kvm part2 of the CCA changes.
+Based on Linux 7.3-rc3 (fd73f4a665989; also applies to kvmarm/next
+8476ce1f1e949).
 
-Cheers
-Suzuki
+Cheers,
+/fuad
+
+[1] https://lore.kernel.org/all/20260821064445.615838-1-fuad.tabba@linux.dev/
+
+Fuad Tabba (3):
+  KVM: arm64: Move the IPA limit rule into kvm_get_ipa_max()
+  KVM: arm64: Honour the requested IPA size under pKVM
+  KVM: arm64: selftests: Free the VM when the GIC device probe fails
+
+Quentin Perret (1):
+  KVM: arm64: Check PGD alignment when creating a pVM
+
+ arch/arm64/include/asm/kvm_pgtable.h          | 15 ++++++++++++
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         |  2 +-
+ arch/arm64/kvm/hyp/nvhe/pkvm.c                | 24 +++++++++++++++----
+ arch/arm64/kvm/mmu.c                          |  4 +---
+ arch/arm64/kvm/reset.c                        | 12 +---------
+ tools/testing/selftests/kvm/arm64/vgic_init.c |  4 +++-
+ tools/testing/selftests/kvm/arm64/vgic_v5.c   |  4 +++-
+ 7 files changed, 44 insertions(+), 21 deletions(-)
+
+
+base-commit: fd73f4a6659897191fa0d40695fe370925dd3780
+-- 
+2.39.5
+
