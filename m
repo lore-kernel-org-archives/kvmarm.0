@@ -1,103 +1,95 @@
-Received: from mta0.migadu.com (out-147.mta0.migadu.com [91.218.175.147])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5678D4078D3
-	for <kvmarm@lists.linux.dev>; Thu, 17 Sep 2026 18:43:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.147
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E58A83D3D1B
+	for <kvmarm@lists.linux.dev>; Thu, 17 Sep 2026 19:31:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789670605; cv=none; b=CRAutnC8Mtu2TlJU4UKp6/appK67E/WS1wO5Cl2QiXll196DH2bhxr8XbQnnchJm+FIFb0P4TfQwkC9O5OVpmbFUr/0Ee5dIexuX0B0kwxfasEvTLZ0Q4wmYJvElnFh8esCJdgnrw4XMjdTjT1bTp4Ya2jbaGZBTurt7spizGII=
+	t=1789673464; cv=none; b=DKkfER+yPFHwLED7QfoH/ZH+460+h7+pc887J7hQYkLLcQAEeHMve7LDGCJXzxttWIuMyKWlJmwnpjgyMa/9yJSy61qbSGTlwTpe0DbfO+/OE5SPrMvaZ/WaJ+eZ/RgPkqFRgwhHldJxv38j88ymrT1hCoIwqeYQjZ+5niQzjCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789670605; c=relaxed/simple;
-	bh=dddSXRxdIdu49NHzZiLViRMhRwi+PNMj8+As+AEkJag=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LUpXEK7mj2zNGdWsONF+iK+jHti7vkWqMmAaqHCibJlTPc25aRq9eKpQiE3ixg35ZL+Y5ANP9JYYe3+1I3vyMfwUrxPrzPA1pUgZZ34EgmlbYxAdzmUa/s3xROTTXI+CQSUsiOTL8x2keAx9Xu21cQHu7XWaAh0xKChQCwCL6TU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Tj6PGV+x; arc=none smtp.client-ip=91.218.175.147
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1789673464; c=relaxed/simple;
+	bh=Gb0RN/m9mh8iOtufEqLHMLjTufZb8KtDn+YQ8GIuUTw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BtrlqwM28kAYAL+ofPC801ILrep8oc4EXxZSo9oHBwjn/P6aE5Pwb409C5A/Rh59UxWnSF4QQE6D8oI01Dtr8y6Zc1rdcrzOuy9GloMB03aOemS+2JPf+y0dyHmzyA8AKIdNniEYxBlQtfKaWyK7y54NezZb/BS6WO6oDr3SDgY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=DOpOdo2r; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Tj6PGV+x"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=dddSXRxdIdu49NHzZiLViRMhRwi+PNMj8+As+AEkJag=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1789670601; v=1; x=1790275401;
- b=Tj6PGV+x2kRvQVkzB9HmG4sivJgD/A8xawrwf3XlyfhujCHKG1U9KK8IeZY7YOZr3nKD7uEN
- ca7Hu7L5eRalYKs59xGbO8I0fYKJf04vwvJD10L1AzpbLRQMI037XGNZ3gKnzFT07PpwrRA32os
- KuiDk2NEpwUq3owIxfNkpNG8=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 91442ad1485b3699;
-	Thu, 17 Sep 2026 18:43:21 +0000
-X-Mizu-Trace-ID: 91442ad1485b3699
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-5b778bdb5b8so1326e87.1
-        for <kvmarm@lists.linux.dev>; Thu, 17 Sep 2026 11:43:19 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvByOcJpW5jQl46atDc3B2WYVkNgWa8PY5apUmzRkqE47di7ul6+ApzPhHgW2QbkSnEBdhE3jmyI=@lists.linux.dev
-X-Gm-Message-State: AFuF++lr/v5cvHY2j0cABvKzngIoIMPTK1IfDUEeS5XBmh6PrLC84yVL
-	hsw2m97gzS5Cd46O/MRKeR2PZf980EOig6fXoI2xXLfBBQAog6N1QoXBOw3J19LrdEsOokG82Or
-	qG0CFOWgFTZdNxaRAe/ArSoV+bJhtkY1wigOGPMn/
-X-Received: by 2002:a05:6512:2241:b0:5ae:b918:79d5 with SMTP id
- 2adb3069b0e04-5b8c1021042mr20644e87.2.1789670599138; Thu, 17 Sep 2026
- 11:43:19 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="DOpOdo2r"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9480D1476;
+	Thu, 17 Sep 2026 12:30:57 -0700 (PDT)
+Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3DE343F7B4;
+	Thu, 17 Sep 2026 12:30:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1789673461; bh=Gb0RN/m9mh8iOtufEqLHMLjTufZb8KtDn+YQ8GIuUTw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DOpOdo2rdUM5LYOSxm6J7IaJIKhEZ39OXU03jJgsqEUxPwKUDmAcEuY43y3Pa9F1D
+	 Nj62v8/4YZzJsxHMU3UFrahkHCYzXsy1Glpryt++e5loKPZZfEcC2TrjqqOarBhmfg
+	 zgMT9N4uoMYppi4jtARUjBxC//1zanKKuJzBTCXo=
+Date: Thu, 17 Sep 2026 20:30:49 +0100
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Sebastian Ene <sebastianene@google.com>, Itaru Kitayama <itaru.kitayama@fujitsu.com>, 
+	Sashiko AI <sashiko-bot@kernel.org>, stable@vger.kernel.org
+Subject: Re: [PATCH v3 1/2] KVM: arm64: ptdump: Check the page tables aren't
+ freed when accessing
+Message-ID: <ezplrvcw7buhd75v5rezvkhbgdfldxklqavdpnxl2fad5thswe@kctrvkjzr6cs>
+References: <20260916230337.4162485-1-weilin.chang@arm.com>
+ <20260916230337.4162485-2-weilin.chang@arm.com>
+ <aqugxlnqegPzMpB-@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260914113338.159227-1-fuad.tabba@linux.dev> <20260914113338.159227-16-fuad.tabba@linux.dev>
- <86a4ph5fb9.wl-maz@kernel.org> <CA+EHjTzCQkeXQQcCDwABLR2w+NTmKTG3V6RSmhzYNayaoYXw3g@mail.gmail.com>
- <865x045mke.wl-maz@kernel.org>
-In-Reply-To: <865x045mke.wl-maz@kernel.org>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Thu, 17 Sep 2026 19:42:42 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTx1rGTZ-8Knj_JJJJtcUhU1o3Qmw8gr=iNkWEgX7Lv6vA@mail.gmail.com>
-X-Gm-Features: AcwNN1W2zdyru-EwkMeGvOAl12MsTWv2Fg6M62Lipeq-f3z_dccz0p-vzgpTsTw
-Message-ID: <CA+EHjTx1rGTZ-8Knj_JJJJtcUhU1o3Qmw8gr=iNkWEgX7Lv6vA@mail.gmail.com>
-Subject: Re: [PATCH v3 15/18] KVM: arm64: Reject host access to protected VM
- private state
-To: Marc Zyngier <maz@kernel.org>
-Cc: oupton@kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, 
-	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	mark.rutland@arm.com, steven.price@arm.com, vdonnefort@google.com, 
-	qperret@google.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aqugxlnqegPzMpB-@google.com>
 
-Hi Marc,
+On Thu, Sep 17, 2026 at 09:11:50AM +0100, Vincent Donnefort wrote:
+> On Thu, Sep 17, 2026 at 12:03:36AM +0100, Wei-Lin Chang wrote:
+> > An open debugfs file keeps the KVM structure alive, but does not prevent
+> > mmu notifier release from freeing the stage-2 page tables when the VMM’s
+> > address space is torn down. Therefore page tables belonging to the mmus
+> > could have been freed when a thread opens or reads the ptdump files.
+> > Take the mmu_lock and check mmu->pgt is still alive before accessing the
+> > page tables.
+> 
+> As Sashiko said, the read_lock is probably enough, including the existing one in
+> kvm_ptdump_guest_show()
+> 
+> With that change:
+> 
+> Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
+> Tested-by: Vincent Donnefort <vdonnefort@google.com>
 
-On Thu, 17 Sept 2026 at 09:06, Marc Zyngier <maz@kernel.org> wrote:
-[...]
-> News flash, this is not x86, nor s390. I don't feel constrained by
-> other architecture, and we deviate *everywhere* already.
+Thanks for the review and testing!
 
-Not x86 nor s390: and I'm grateful for that every day :P
+I agree taking read_lock is enough for most of these, but changing
+kvm_ptdump_guest_show() to read_lock could result in a dump showing
+weird output e.g. 0-sized ranges. This happens when the dump reads a
+block, and a parallel fault turns that block into a table, and the dump
+descends into the table later.
 
-[...]
-> A protected-aware VMM already knows it cannot obtain the registers.
->
-> I don't want to have to revisit the userspace interface once you have
-> to relax it, because I know for sure that you will have to.
+This is debugfs afterall so I think it isn't a dealbreaker, but it adds
+another purpose to this patch. Maybe we can change
+kvm_ptdump_guest_show() into taking a read_lock when someone reports a
+scalability problem when dumping the page tables.
 
-What the error buys is that a read outside what EL2 copies out fails
-rather than returning the copy, which is what a register dump would
-otherwise print. But then how would the VMM know, once EL2 starts
-copying more out on an exit it already gets, that those registers are
-now the guest's? A cap is all I can think of, but I may well be
-missing something. With the error, the relaxation is a window on that
-exit for the registers EL2 copies out, and a read that succeeds there
-returns something EL2 copied out.
+I'll stick to changing the other ones into taking the read_lock now.
 
-> As far as LD64B is concerned, there is no place to copy anything in
-> the run structure, and the relaxation would require to cover all the
-> GPRs, ESR, and FAR. At this stage, returning whatever is there is the
-> correct thing to do IMO.
+For future reference: KVM_PGTABLE_WALK_SHARED is required if we want to
+change kvm_ptdump_guest_show() into taking a read_lock.
 
-For a protected VM the operands would go through fixed registers, the
-way x0 carries the MMIO data today, so the window on that exit is
-those registers rather than all the GPRs.
+Thanks,
+Wei-Lin Chang
 
-Hoping this one doesn't return -EPERM :)
-
-Cheers,
-/fuad
+> 
