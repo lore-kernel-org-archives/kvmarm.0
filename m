@@ -1,50 +1,53 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B3F94E324C
-	for <kvmarm@lists.linux.dev>; Thu, 17 Sep 2026 15:50:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mta0.migadu.com (out-205.mta0.migadu.com [91.218.175.205])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5EFA4EFFD6
+	for <kvmarm@lists.linux.dev>; Thu, 17 Sep 2026 16:20:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789660216; cv=none; b=HblxDsxYIc+q56axZ7CMtFJDwZ7pyq+9TJt4SayOZz/xQWr5yu1RSz2oT0FqAtRi7DLGOe6dfMRisUVvQmDusYSGRJOsLmyJ/6QXA652ZmkIStonWzJzi5yKkmIwFZFE2edIdgvx/bqNfRe+2s1TpQiJ6V4dpK3BmVAZX9tJ0Zg=
+	t=1789662058; cv=none; b=s6XyCUEy5/7teZoNrnlpT3kHkHiwXtWLMyWx4xsU01rDsfjtNLs6tGYXzrMtvKBqcbWhQHCNLPH578E8z1H7rrudWR1slhNZykk4TawSv7MpD6Tc9ofyyzd3J8V61eL9gu6SzaLmDcx4AL0/P+BKTFODfnIzyP0gQv9NxLQ5tvQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789660216; c=relaxed/simple;
-	bh=cHsGbWLCLxXBI4lUtqUmuQxwVcmNT7ZyqT4IRSi2tiE=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CsTDgkUDImGUnCeqEMyGUwqwZbiuBYwKxZn1smhfLhIHRZ0+yDww8I+ZlSxa5jCHHcfGC3ziGvk+FsrYiaZUuM1MET8Fov8ozaqmIdw6/G2MxE1EvXzbUcDdaZuz3SpZHX8Ko2mR5UuimtS5y04BC1BJlHszRGWgYU4BVAR45OQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=r3OvUjxL; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1789662058; c=relaxed/simple;
+	bh=4ZCPZ+9Q6roBF3CJHBhT63aw+NcWPYPDK3zziyG/hEY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=sGBgxyE9AeBn/2ty/MNEZHlt2A5xhmEinhbbZTsJ9+tsJpyzTRl1+y/lXA1xcF1iyTVPz0zOmBCukW7ih8b/Vp4SgqZJ44M5Bfpa907Z0CO+hz1YORDuCNJejBw6OMUSPCwnM2r9dr00FF7Wvyc/SxI1NzeqtUXyQO59inZmGW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=EXmNWqV0; arc=none smtp.client-ip=91.218.175.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="r3OvUjxL"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8BEB01476;
-	Thu, 17 Sep 2026 08:50:01 -0700 (PDT)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 843423FAF5;
-	Thu, 17 Sep 2026 08:50:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1789660205; bh=cHsGbWLCLxXBI4lUtqUmuQxwVcmNT7ZyqT4IRSi2tiE=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=r3OvUjxLq4CfRvuueg+rGjG5kpnwf2lfALvWD7a1eVpboIgHqK04/GMdNVKNUvjVr
-	 mtEVm79IjfkjZ7UewRBSJhs8KK9Iv/4/fG+1hG9PKIDycozpUI7UNlYKOg0UkQHWGr
-	 NdIYPGWY5euvvJdgOVmpul5ZFvNFzu9SzBet5sqA=
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: will@kernel.org,
-	julien.thierry.kdev@gmail.com,
-	kvm@vger.kernel.org,
-	maz@kernel.org,
-	oupton@kernel.org,
-	fuad.tabba@linux.dev,
-	joey.gouly@arm.com,
-	seiden@linux.ibm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="EXmNWqV0"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=4ZCPZ+9Q6roBF3CJHBhT63aw+NcWPYPDK3zziyG/hEY=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1789662053; v=1; x=1790266853;
+ b=EXmNWqV0qoEYJqOslp9DcBmEO6pIsDiDtyEwlar36I/6lUppACfue4Q4EpgBpO0lyJMS8vgk
+ 4JkDCtaZUcSK7TmB3LNj3myRy22XF21bMS+YRognHUI0G2wcLH0Bec8WgaE/AdL+lsStYLhS/e3
+ om+ZJbDYPLblb/YN3omLwUbM=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id efb44d216b9e5b22;
+	Thu, 17 Sep 2026 16:20:21 +0000
+X-Mizu-Trace-ID: efb44d216b9e5b22
+X-Migadu-Flow: FLOW_OUT
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>
+Cc: Hyunwoo Kim <imv4bel@gmail.com>,
+	Eric Auger <eauger@redhat.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Will Deacon <will@kernel.org>,
+	Sascha Bischoff <sascha.bischoff@arm.com>,
+	Sebastian Ene <sebastianene@google.com>,
+	Fuad Tabba <tabba@google.com>,
+	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Subject: [RFC PATCH kvmtool 7/7] Don't apply --vcpu-affinity to threads spawned from VCPUs
-Date: Thu, 17 Sep 2026 16:49:32 +0100
-Message-ID: <20260917154932.193943-8-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260917154932.193943-1-alexandru.elisei@arm.com>
-References: <20260917154932.193943-1-alexandru.elisei@arm.com>
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: arm64: vgic-its: Update GITS_CTLR.Enabled under its_lock
+Date: Thu, 17 Sep 2026 17:20:20 +0100
+Message-Id: <20260917162020.1612577-1-fuad.tabba@linux.dev>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -53,172 +56,72 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Threads spawned with pthread_create() inherit the parent's affinity. For
-kvmtool, threads spawned from the VCPU threads, like the virtio threads,
-will inherit the affinity specified with --vcpu-affinity, instead of
-inheriting the main process' affinity. Make kvm_create_thread() use the
-main thread's affinity when spawning new threads.
+vgic_mmio_write_its_ctlr() clears its->enabled and invalidates the
+translation cache under cmd_lock, but vgic_its_resolve_lpi() tests the
+bit and populates the cache under its_lock. An injection that passed
+the test before the disable can cache its translation after the
+invalidation, and the cached path then injects from a disabled ITS.
 
-A command like this:
+Commit 13031fb6b835 ("KVM: arm64: vgic-its: Drop the translation cache
+reference only for the erased entry") made the concurrent invalidations
+safe but left this window open. The linked v2 closed it, and Oliver
+withdrew his own diff there over a kvm->lock/vcpu->mutex inversion in
+its vgic_its_invalidate_all_caches() hunk.
 
-$ taskset -c 0-5 ./lkvm run .. --vcpu-affinity 6-11
+Take its_lock around the store and the invalidation, nested under
+cmd_lock as the command handlers do. This is the v2's GITS_CTLR half,
+widened to cover the store, and it has no such inversion.
 
-will work as expected and all kvmtool threads will be pinned to CPUs 0-5,
-instead of some of them being pinned on the same CPUs as the VCPUs.
-
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Fixes: 8201d1028caa ("KVM: arm64: vgic-its: Maintain a translation cache per ITS")
+Reported-by: Hyunwoo Kim <imv4bel@gmail.com>
+Link: https://lore.kernel.org/ah6Lsi4MfKUU6wBR@v4bel/
+Cc: stable@vger.kernel.org
+Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
- arm64/pmu.c       | 19 +++----------------
- include/kvm/kvm.h |  1 +
- kvm.c             | 15 +++++++++++++++
- util/util.c       | 33 +++++++++++++++++----------------
- 4 files changed, 36 insertions(+), 32 deletions(-)
 
-diff --git a/arm64/pmu.c b/arm64/pmu.c
-index bd3f225842be..10d1641b42cc 100644
---- a/arm64/pmu.c
-+++ b/arm64/pmu.c
-@@ -200,20 +200,10 @@ static int find_pmu(struct kvm *kvm)
+Notes:
+    Based on v7.3-rc3, applies cleanly to kvmarm/fixes.
+    
+    Picking up the fix Marc was worried had stalled [1]. Unlike the v2's
+    GITS_CTLR hunk [2], the its->enabled store is inside the locked section
+    too, so the enable test in vgic_its_resolve_lpi() is serialized by the
+    lock rather than by store order.
+    
+    vgic_its_invalidate_all_caches(), the GICR_CTLR.EnableLPIs path, is
+    left as is: it can take neither kvm->lock (it runs with vcpu->mutex
+    held) nor config_lock (the userspace GICR_CTLR route already holds it).
+    It belongs to the locking cleanup Oliver deferred as a long-term fix
+    when he withdrew the v2 [3].
+    
+    [1] https://lore.kernel.org/861pbr6emw.wl-maz@kernel.org/
+    [2] https://lore.kernel.org/ah6Lsi4MfKUU6wBR@v4bel/
+    [3] https://lore.kernel.org/ah9KeH8bFl8NOveO@kernel.org/
+
+ arch/arm64/kvm/vgic/vgic-its.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+index 9e782a4fea7e5..70b4acf1bf81d 100644
+--- a/arch/arm64/kvm/vgic/vgic-its.c
++++ b/arch/arm64/kvm/vgic/vgic-its.c
+@@ -1738,9 +1738,15 @@ static void vgic_mmio_write_its_ctlr(struct kvm *kvm, struct vgic_its *its,
+ 		 !(its->cbaser & GITS_CBASER_VALID)))
+ 		goto out;
  
- 	setsize = CPU_ALLOC_SIZE(NR_CPUS);
++	/*
++	 * vgic_its_resolve_lpi() tests the enable bit and populates the
++	 * translation cache under its_lock.
++	 */
++	mutex_lock(&its->its_lock);
+ 	its->enabled = !!(val & GITS_CTLR_ENABLE);
+ 	if (!its->enabled)
+ 		vgic_its_invalidate_cache(its);
++	mutex_unlock(&its->its_lock);
  
--	if (kvm->vcpu_affinity) {
-+	if (kvm->vcpu_affinity)
- 		affinity = kvm->vcpu_affinity;
--	} else {
--		affinity = CPU_ALLOC(NR_CPUS);
--		if (!affinity)
--			die_perror("CPU_ALLOC");
--		CPU_ZERO_S(setsize, affinity);
--
--		ret = sched_getaffinity(0, setsize, affinity);
--		if (ret < 0) {
--			ret = -errno;
--			goto out_free;
--		}
--	}
-+	else
-+		affinity = kvm->main_affinity;
- 
- 	for (i = 0; i < NR_CPUS; i ++) {
- 		if (CPU_ISSET_S(i, setsize, affinity))
-@@ -222,10 +212,7 @@ static int find_pmu(struct kvm *kvm)
- 
- 	ret = find_pmu_cpumask(kvm, cpumask);
- 
--out_free:
- 	free(cpumask);
--	if (!kvm->vcpu_affinity)
--		CPU_FREE(affinity);
- 	return ret;
- }
- 
-diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
-index 01c4f5fa952d..91a30bbbbfd0 100644
---- a/include/kvm/kvm.h
-+++ b/include/kvm/kvm.h
-@@ -102,6 +102,7 @@ struct kvm {
- 	int                     nr_disks;
- 
- 	int			vm_state;
-+	cpu_set_t		*main_affinity;
- 	cpu_set_t		*vcpu_affinity;
- 
- #ifdef KVM_BRLOCK_DEBUG
-diff --git a/kvm.c b/kvm.c
-index e29b73d27f33..7bc91cce97b0 100644
---- a/kvm.c
-+++ b/kvm.c
-@@ -156,6 +156,9 @@ static int kvm__check_extensions(struct kvm *kvm)
- struct kvm *kvm__new(void)
- {
- 	struct kvm *kvm = calloc(1, sizeof(*kvm));
-+	size_t setsize;
-+	int ret;
-+
- 	if (!kvm)
- 		return ERR_PTR(-ENOMEM);
- 
-@@ -168,6 +171,17 @@ struct kvm *kvm__new(void)
- 	kvm->brlock_sem = (pthread_rwlock_t) PTHREAD_RWLOCK_INITIALIZER;
- #endif
- 
-+	kvm->main_affinity = CPU_ALLOC(NR_CPUS);
-+	if (!kvm->main_affinity)
-+		die_perror("CPU_ALLOC");
-+
-+	setsize = CPU_ALLOC_SIZE(NR_CPUS);
-+	CPU_ZERO_S(setsize, kvm->main_affinity);
-+
-+	ret = sched_getaffinity(0, setsize, kvm->main_affinity);
-+	if (ret)
-+		die_perror("sched_getaffinity");
-+
- 	return kvm;
- }
- 
-@@ -182,6 +196,7 @@ int kvm__exit(struct kvm *kvm)
- 		free(bank);
- 	}
- 
-+	CPU_FREE(kvm->main_affinity);
- 	if (kvm->vcpu_affinity)
- 		CPU_FREE(kvm->vcpu_affinity);
- 
-diff --git a/util/util.c b/util/util.c
-index 7238fe57bace..a779eb59817c 100644
---- a/util/util.c
-+++ b/util/util.c
-@@ -207,28 +207,15 @@ void *mmap_guest_memfd(struct kvm *kvm, u64 size)
- 	return addr;
- }
- 
--int kvm_create_thread(struct kvm *kvm, pthread_t *thread,
--		      void *(*start_routine)(void *), void *arg)
--{
--	int ret;
--
--	ret = pthread_create(thread, NULL, start_routine, arg);
--	if (ret)
--		errno = ret;
--
--	return -ret;
--}
--
--int kvm_create_vcpu_thread(struct kvm *kvm, pthread_t *thread,
--			   void *(*start_routine)(void *), void *arg)
-+static int __kvm_create_thread(struct kvm *kvm, cpu_set_t *affinity,
-+			       pthread_t *thread, void *(*start_routine)(void *),
-+			       void *arg)
- {
- 	pthread_attr_t attr;
--	cpu_set_t *affinity;
- 	int ret;
- 
- 	pthread_attr_init(&attr);
- 
--	affinity = kvm->vcpu_affinity;
- 	if (affinity) {
- 		ret = pthread_attr_setaffinity_np(&attr, sizeof(cpu_set_t), affinity);
- 		if (ret) {
-@@ -247,3 +234,17 @@ int kvm_create_vcpu_thread(struct kvm *kvm, pthread_t *thread,
- 
- 	return -ret;
- }
-+
-+int kvm_create_thread(struct kvm *kvm, pthread_t *thread,
-+		      void *(*start_routine)(void *), void *arg)
-+{
-+	return __kvm_create_thread(kvm, kvm->main_affinity, thread,
-+				   start_routine, arg);
-+}
-+
-+int kvm_create_vcpu_thread(struct kvm *kvm, pthread_t *thread,
-+			   void *(*start_routine)(void *), void *arg)
-+{
-+	return __kvm_create_thread(kvm, kvm->vcpu_affinity, thread,
-+				   start_routine, arg);
-+}
+ 	/*
+ 	 * Try to process any pending commands. This function bails out early
+
+base-commit: fd73f4a6659897191fa0d40695fe370925dd3780
 -- 
-2.55.0
+2.39.5
 
