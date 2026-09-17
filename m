@@ -1,178 +1,99 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta0.migadu.com (out-212.mta0.migadu.com [91.218.175.212])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 384584D6C4C
-	for <kvmarm@lists.linux.dev>; Thu, 17 Sep 2026 11:08:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5DFB49EC5E
+	for <kvmarm@lists.linux.dev>; Thu, 17 Sep 2026 11:25:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.212
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789643309; cv=none; b=rOuLIBuDCzjH760utSYd/w/UfqmUb7UBU6TbybEMzbeAWr0UiBClDA8zwdVly3CVexAJiPw6XoUXYjB3y7+MRBiDN5rvXlQwhu7lzhz7uqrhfbfLdh3138wBeVZRGNfbOChhtQay8OtOyakdP/qBwXidpWud7o/rP5Rj2wsZU/8=
+	t=1789644306; cv=none; b=NFhaBRCbsg+X1qO0B5KIQZ3DpMVK8HBJe9D4KgLEQljmbox+r2CGMmoFiJrfQXJqTu791FhrZ0rtLNfB9Xr4RdJrcHxOlwF54l1Hqyfy5AIg3ghb0ZC9WoQmK/guke3u7wtwFYX+ZTyGcenXE3kAXwl5CCRyD6ZRoSxrR0hb37o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789643309; c=relaxed/simple;
-	bh=U6sRt3MH61AETE0tQWH8DY2BopUUu9nziSOIAOJRU2E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Kz51cfgqQWFMY3dnm6bHcP9t4QDpOOWI8RC5HxTAAbfslWCyhterda9ZtK9ILOO2YGieKB/cSX0g5kAcgnRUBLdfM9nu+Tl/ZVDHIA1HzFPjt7KBsVW/AVOuMbXq7o+9aTl8hVUNCrzPaTulTz750br9SCVgu+hHCYEPvCZyDvs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=IHSiW0KJ; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1789644306; c=relaxed/simple;
+	bh=6cLtGQr3NeN6cuI+wwoUX8J3Vbq5/m8fhyoeTXSQu5k=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jPfSbfP6rnahJ9o6Yo4dXL1Su40LhH+nPCp0CQlAdeUFlJ6u4+HTeDjJG75d1VDdkWR/0W1Myszv6grRidAseagxLewgv9+Jk4RoA+8LmngRvuY6nQoqXKz3ZLYu94Wiq4h6K/r3cAn6GLNn2K/A2ewtUG07Svugifa0YsaMEHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qC9k0bfm; arc=none smtp.client-ip=91.218.175.212
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="IHSiW0KJ"
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68HA1bb52232904;
-	Thu, 17 Sep 2026 11:07:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=4WuSM5
-	6Hoz16tISafbBQ67/yekGRCtTtY+uMPijQV6U=; b=IHSiW0KJ1Uwc7rKvZo/0m9
-	CznRcEo1/QD/CiqdWum/JbgRIopRP+Y4qCCrQ/xApMsLbvyPxMPGWDy5aHe259YP
-	xlmBgQ1PcLEmbS+eZ3yxf1VOp5dOpOBlggJjXtLiOoVag0zVJ+QHuE9qQv1wphXx
-	CJvClFcQ2uRIxBgQ7FD0oDphiFiV2zrT2Gyhs4lqr6FQuxYT9NZwDx6iK6S4K1OT
-	CFjIJp8ddmLbobVjgFV1nbaQtXCsj3gKfnM17WT9uU2RrL7QbIQXoWH+Lapa7HQF
-	zNTv9EYveIk5zv+NsnGVOcZ9DXuC/rwnCghIQz9OoHlg6WwWv+t8DqvwwmNjHpew
-	==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gmxcv9dyy-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Thu, 17 Sep 2026 11:07:53 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 68H9aTbw2917896;
-	Thu, 17 Sep 2026 11:07:52 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4gr5xa1xy2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 17 Sep 2026 11:07:52 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 68HB7mVE43319692
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 17 Sep 2026 11:07:48 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id AFB0920043;
-	Thu, 17 Sep 2026 11:07:48 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id EC55B20040;
-	Thu, 17 Sep 2026 11:07:47 +0000 (GMT)
-Received: from [9.224.77.173] (unknown [9.224.77.173])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 17 Sep 2026 11:07:47 +0000 (GMT)
-Message-ID: <51286424-e802-4ea9-b958-925fee8025ed@linux.ibm.com>
-Date: Thu, 17 Sep 2026 13:07:47 +0200
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qC9k0bfm"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=6cLtGQr3NeN6cuI+wwoUX8J3Vbq5/m8fhyoeTXSQu5k=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1789644302; v=1; x=1790249102;
+ b=qC9k0bfm/iQfsofJonIYzADcO87fOSekzQP2hDmHHo8izbCSh6qJzz4uJ8x/vWOaFr/tiKHi
+ C44LZxPIuPK15c9ZEvUAesJbjhWPoDNWblUYMf463VuA+GhudcCQ3OMXj1Fr934agqq4rRg6an4
+ tIhlmm1Xbn2lePWHK9qsM+N4=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 1b45eebb5321840a;
+	Thu, 17 Sep 2026 11:25:02 +0000
+X-Mizu-Trace-ID: 1b45eebb5321840a
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-5b83c1421ecso867e87.1
+        for <kvmarm@lists.linux.dev>; Thu, 17 Sep 2026 04:24:59 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBzBjP1EOi8l2dcarD3+04phGKVrgQ4DkHCJZAqB5L1tSD8sVYURD+qS/Xs/c1MmyFS50gfgboY=@lists.linux.dev
+X-Gm-Message-State: AFuF++ndnPp53nW7UthQfOlqsQcebbZIIl38QE2+kaeXsweHoivckWHJ
+	q0OH2Y64t5ozSXmB8TjbhZoLHkRDnFRo/3SsFEfubSDzUIcrNyp7uFVEb61KpyvtinbwIBojKQY
+	/R/dE9mPaSWY57jrVjGzVw4CRQ+4vyMKjSLzEZNEz
+X-Received: by 2002:a05:6512:3054:b0:5b6:4ad:d6ba with SMTP id
+ 2adb3069b0e04-5b8bff4a5d7mr13058e87.15.1789644298430; Thu, 17 Sep 2026
+ 04:24:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 23/23] KVM: s390: arm64: Add KVM_S390_ARM64 Kconfig and
- Makefile
-To: Sean Christopherson <seanjc@google.com>,
-        Steffen Eiden <seiden@linux.ibm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, Alexander Gordeev <agordeev@linux.ibm.com>,
-        Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@kernel.org>,
-        Friedrich Welter
- <fritz@linux.ibm.com>, Fuad Tabba <tabba@google.com>,
-        Gautam Gala <ggala@linux.ibm.com>,
-        Hariharan Mari <hari55@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Hendrik Brueckner <brueckner@linux.ibm.com>,
-        Ilya Leoshkevich <iii@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
-        Marc Zyngier <maz@kernel.org>, Nico Boehr <nrb@linux.ibm.com>,
-        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
-        Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Vasily Gorbik
- <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>
-References: <20260831144802.834315-1-seiden@linux.ibm.com>
- <20260831144802.834315-24-seiden@linux.ibm.com> <aphMx5hsoXwIpNjt@google.com>
- <20260903083857.33034-B-seiden@linux.ibm.com> <apmHrnxRLl9BuVhn@google.com>
- <20260903154317.246414-A-seiden@linux.ibm.com> <apmhX8H-WUc3U4_N@google.com>
-Content-Language: en-US
-From: Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <apmhX8H-WUc3U4_N@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-Spam-Info: AW1haW4tMjYwOTE3MDE1MyBTYWx0ZWRfXxvXgm8oqRp19
- nQrhg9EQ/0iT2IXEFt08BHaHhUsgrKyvoPi+NFAeU3UU5WQjtMwZp8b7tXugIn2k7CFo6eFSYwM
- tQwG/muNP2QjgP5jk4v4+zXUwT3/rLA=
-X-Proofpoint-ORIG-GUID: 6Ugh16w0kSKYc6k82HwIr7iH6p4aBU1L
-X-Proofpoint-GUID: pYhdyPFgJVLZ4pZZ3Lh06XuplLJMgZjH
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTE3MDE1MyBTYWx0ZWRfX/J3l0K/K4T4/
- k1Qu9iTB8gKSi3qzkVLZPgP5TuALabaJDnd0MM3f5Gfs6A3UuW2z5HRDT37VSdiByJGRkKXsnt/
- XOynhvAAg3kUEdrZQAY9MefMR0mynOoSp0QD+EiQJsNr8q3FYo0H2f9/gwmBogBuA7yIZWL7vXa
- 2OdgbCkRNP6cGH52IOdVvccZYRJr+ZGXqtsHoQzsIKw0y06Uxy20/0kbI6c71TV/3pkRUS/xPpp
- aYFNvov7S/8RkhmCAX8Wd5caY/2pU2zltPV9DvQjkG3v1RUDfNSlPLSdq+i19bOaDJ3R7dbeZGJ
- a2XzEvBlGSfRqWfT3/Yytvo4VkqO6/KSzA0ca6GBLbLuLDPYODZTwW1N+kLnoXRCKAtTK3Ari4L
- Boxt4IoBYN6InRSXQuM1d7iJT+Gsl0k1gKTlXbDsX+JifTUSAMxeYELUMQKy9/uWQw77Vpwc87J
- J/UxAnI0um8eOvNI4wg==
-X-Authority-Analysis: v=2.4 cv=F+7C5ahN c=1 sm=1 tr=0 ts=6aabca0a cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
- a=IkcTkHD0fZMA:10 a=VdqzKS8jKosA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=RzCfie-kr_QcCd8fBx8p:22 a=nRLfC78URy_-QQUzUV8A:9
- a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-09-17_02,2026-09-16_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 suspectscore=0 phishscore=0 clxscore=1011 malwarescore=0
- lowpriorityscore=0 bulkscore=0 spamscore=0 impostorscore=0 adultscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2609040000 definitions=main-2609170153
+References: <20260915160141.3543048-1-suzuki.poulose@arm.com> <20260915160141.3543048-6-suzuki.poulose@arm.com>
+In-Reply-To: <20260915160141.3543048-6-suzuki.poulose@arm.com>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Thu, 17 Sep 2026 12:24:21 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTz65G0MM=tOrzmk=jMweBX1us6FqfrmSkQs4KSyAEoxhg@mail.gmail.com>
+X-Gm-Features: AcwNN1VFMe-nqpetX5NFULE-T8FsNAG-h344sw-wYzui_i8Ztl6ucWB9ep0N7uI
+Message-ID: <CA+EHjTz65G0MM=tOrzmk=jMweBX1us6FqfrmSkQs4KSyAEoxhg@mail.gmail.com>
+Subject: Re: [PATCH v18 05/23] KVM: arm64: Track the type of VM in kvm_arch
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org, 
+	will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, steven.price@arm.com, 
+	aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com, 
+	joey.gouly@arm.com, yuzenghui@huawei.com, linux-coco@lists.linux.dev, 
+	gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com, 
+	alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com, 
+	lpieralisi@kernel.org, enju.kohei@fujitsu.com
+Content-Type: text/plain; charset="UTF-8"
 
+Hi Suzuki,
 
+On Tue, 15 Sep 2026 17:01:23 +0100, Suzuki K Poulose
+<suzuki.poulose@arm.com> wrote:
+[...]
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+[...]
+> +#define kvm_vm_hyp_is_pkvm(kvm)                (is_protected_kvm_enabled())
 
-Am 03.09.26 um 18:33 schrieb Sean Christopherson:
-> On Thu, Sep 03, 2026, Steffen Eiden wrote:
->> On Thu, Sep 03, 2026 at 07:43:58AM -0700, Sean Christopherson wrote:
->>> And FWIW, while it might seem daunting, from my perspective it's not actually that
->>> much churn to do things "right".  Provide KVM_S390_NATIVE, and then have KVM reflect
->>> the "weakest" of S390_NATIVE vs. S390_ARCH.  I.e. make KVM=m if either of the "real"
->>> KVMs will be a module.  That requires some creative shenanigans, but it's not hard,
->>> just weird.
->>
->> FYI the first versions of this series had a 3 configs approach very
->> similar to yours.
->>
->> IIRC it was not so much the churn we have in (upstream) kernel code but
->> more on the distro side and to everyone building the kernel in their
->> favourite architecture (s390 :))
-> 
-> How many people are running distro kernels on s390 hardware?  And how many distros
-> actually change the default KVM settings, e.g. to build KVM as a module instead of
-> baking it into the kernel?  My guess is "not many" and "almost none", i.e. the
-> actual impact on downstream users is likely miniscule.
-> 
->> Suddenly the KVM config changed its behaviour (effectively becoming a noop)
-> 
-> Not really, because "KVM" itself is inaccessible (well, unless someone is hand-
-> editing .configs or generating them by script, but that's their own fault).
-> E.g. upgrading to a new kernel will explicitly prompt the user to choose for both
-> KVM_S390_NATIVE and KVM_S390_ARM64 (or whatever they get called).
-> 
->> I am starting to think that having no separate config option for arm on
->> s390 might be the easisest way. Just KVM and guard both modules behind
->> it. It reduces the config space bloat and I do not see a reason why somoeone
->> should only compile one KVM module but not the other. kvm-arm64 won't
->> load if you do not have the hardware anyways.
-> 
-> Because there may be an unforseen need down the road?  Smushing things together
-> after the fact is generally easy, pulling things apart without breaking everything
-> is usually much, much harder.
-> 
->> But I am not opposed to the x86 approach. Just thinking loud.
->>
->> Anyways, I am off for vacation expect a reduced reply frequency from my
->> side :)
-Yet another option
-I think there is value in keeping the config space simpte for users.
-Why not simply keep CONFIG_KVM and it will disable, module build, compile-in
-both variants.
+I'd keep is_protected_kvm_enabled() at the three call sites: this
+takes a VM and ignores it, so it reads as per-VM when it's the mode,
+and patch 20's comment about not being able to use the kvm_vm_ helpers
+with a NULL kvm goes away too.
+
+> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+[...]
+> @@ -432,7 +432,7 @@ static void init_pkvm_hyp_vm(struct kvm *host_kvm, struct pkvm_hyp_vm *hyp_vm,
+>
+>          hyp_vm->host_kvm = host_kvm;
+>          hyp_vm->kvm.created_vcpus = nr_vcpus;
+> -        hyp_vm->kvm.arch.pkvm.is_protected = READ_ONCE(host_kvm->arch.pkvm.is_protected);
+> +        hyp_vm->kvm.arch.vm_flavor = READ_ONCE(host_kvm->arch.vm_flavor);
+
+Could EL2 reduce this to VM_PKVM or VM_PROTECTED_PKVM here instead of
+storing what it reads? The host supplies the value, and it's now an
+enum rather than a bool. Patch 12 relies on EL2 only ever seeing those
+two, and with VM_REALM above the marker a host-written value passes
+kvm_vm_is_protected() but not the == form, if EL2 ever adds one.
+
+Both hunks are new since v17, which is where I gave the Reviewed-by.
+Happy to keep it if you can settle these please.
+
+Cheers,
+/fuad
