@@ -1,114 +1,163 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3D0151477D
-	for <kvmarm@lists.linux.dev>; Thu, 17 Sep 2026 13:10:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789650623; cv=none; b=d+csnIucDIyj96CIxH/Zyq6SXuNesxsW8XIzuKEPwrAqcdh+xmmkt+L083EhSKXrx6QQupqFQb222QcKlamtac/RNKq5i+05m0AoVQ4jAhbq+n3hb4CY5/W/iRB7eaxXG9f0uicvqh24415hmcfP4c7IkX/oeJne3B/aeshsoTs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789650623; c=relaxed/simple;
-	bh=8g2Hl15QHCdOC9CCW8r88cxWOvni9RLKJzm2oJjk8hU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nUq0ZbunDMhj1tQEiFf+9y1CiH/osh2FBWr4WXt2FsW1YlO7awGIo/rcRmKDUfrVh5tn4gfXNf9FfWDYBui+Tkx6lo/wDL+S9AsGISqn5JCFqapKf5UalSzJdjXkLrNht3eU2AMy5ycXmto9NlpAHs3xVNulQNC47l7FXfUHKQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=NJe9mzHo; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8E5D51FCC0
+	for <kvmarm@lists.linux.dev>; Thu, 17 Sep 2026 13:17:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1789651045; cv=pass; b=VlomSmwemRtRtRYaW+Ujqb/XHv1if8fV4cEQvfu7BEd+L7lw9o0Jh2NoxPJA049s7G2iRPClPI7qx0eI6r424LsY5KVWpNLXAH1HWXq7UiRN4bkoNjC+nKZUqXk6sSKjK5O24mmecSfD+DsH3NK733ztohx3kvmE8cdrNaejW/0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1789651045; c=relaxed/simple;
+	bh=kO4HLKikSv+g/tlkono8w2r9mfJw0DOnYzMEnSqFOZQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HV9+yEI7cgtmZ8pYoqAyaf7BgM4E0ijBqTB4Kj3rJFJiXZ7xfaii46gCd+RZQZ542/v5N3y526h0Xl8NY7HIQvcPnOsQMUNph0KumDGZz7NR8EGhuNwcgaVtWHcUZicuHHDpXx7pXDbZtdInvAd9nBqUwTk5ivEcfzT1tl1JFY4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wZRpOz5H; arc=pass smtp.client-ip=209.85.167.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="NJe9mzHo"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 18C83143D;
-	Thu, 17 Sep 2026 06:10:14 -0700 (PDT)
-Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B59773F7B4;
-	Thu, 17 Sep 2026 06:10:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1789650617; bh=8g2Hl15QHCdOC9CCW8r88cxWOvni9RLKJzm2oJjk8hU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NJe9mzHoryiEfw6XtB5v8p8/e2oE3zGCJA7l8BfNRixqxKExCGwFMO8sOWitejOKH
-	 hebfkN6+0WygqeddyugzEWlz/aVq/BjEqdTwWeZaLj2pGear6JwdunwS2Ajk9ZNeoi
-	 aew8XnHW2Qt/tdO/vbtT+8TuoDxGmvql4AeyXDDA=
-Date: Thu, 17 Sep 2026 14:10:00 +0100
-From: Wei-Lin Chang <weilin.chang@arm.com>
-To: Itaru Kitayama <itaru.kitayama@fujitsu.com>, 
-	Marc Zyngier <maz@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, Oliver Upton <oupton@kernel.org>, 
-	Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Wang Han <wanghan@linux.alibaba.com>, Shuai Xue <xueshuai@linux.alibaba.com>, 
-	"Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Subject: Re: [PATCH v6 0/7] KVM: arm64: nv: Implement nested stage-2 reverse
- map
-Message-ID: <rxvpsusccy6xanwik5ierefwi5jgue5ifgqd27pxaxzhbqlovl@odobtcfgizzx>
-References: <20260915154305.3852871-1-weilin.chang@arm.com>
- <aqm9hXB6X9IQ8wHz@sm-arm-grace07>
- <m6ldbr7hdafmoycx7xjcbsg62mblcakcu52ndowwzqgxdjb3q3@huv4i5bfxtza>
- <aqnUWp_VJXUCcJnQ@sm-arm-grace07>
- <86ld9165cr.wl-maz@kernel.org>
- <aquN5ytDxt44uORD@sm-arm-grace07>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wZRpOz5H"
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-5b7658501ccso1867e87.0
+        for <kvmarm@lists.linux.dev>; Thu, 17 Sep 2026 06:17:23 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1789651042; cv=none;
+        d=google.com; s=arc-20260327;
+        b=CKNYZXwefRqwvn2pGt5iVbq2Z3V4y4E/iPuKhqqSQdAx0RbKt0rNEHfXGek2JKKwRT
+         3uSyrr9TP6Zcis+GU/IDZ6ehvXIE16aDvIYLKmQYOyRxFkExaVKJWpVhiQ9FVVR4+9mD
+         FW29WsU8eUNpHjlc2A3QLC3YsLqNkhhMte53fSDnHHqKSPQ0JdsBy7zRcX5XBgrz988M
+         e2pfXRt/2cVKij4E4J35AfxXR8lQqBa+U65JxwCqvyTD5PkmJQwF27hc5xZR7xYzzQtn
+         YRc9y+2uxwljjoM3TMC4dTq//3CDSamvKjuxT6R42z2X8be6gWwP91zaPipCFlY/ygBF
+         9jvw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=yvMJselGvAoMrhysUaGitx662yndDSgH+0mQM9lz22E=;
+        fh=45kMozODe+KgLIKjwLKKd9NepntzlUj+/rxut3l/0pE=;
+        b=XXHcjE+gblOk5Vz/ytVzRPOQ1WpgERU+WkiKdiAlIICRxLTmbuz+DmyMua+4mg+WgA
+         8m73oi9o4vzkZVJBzDmms1IZUxkO2+oXs0W+dtVkwFxSaqiUSTY/PHpvEnnuhUwkMhqN
+         O2aKnKk+i8X0wt2aoMvTjk1uptjsZe/qA4oQb+fUD3yfGk6cEIQf84ezPlFAR6P4l891
+         tjA27NZCPDRXqTERlZ1D9eTwHVvFx1XrKquIMdNf2S299HyxC5/gng0LGIDzs+ulmaAu
+         9isIXF3jHw2hUArye69+aZy73CnJOGJbqWYAKwu4nte1VASu2tVqmc7rIac61R27fayZ
+         O9eQ==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1789651041; x=1790255841; darn=lists.linux.dev;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=yvMJselGvAoMrhysUaGitx662yndDSgH+0mQM9lz22E=;
+        b=wZRpOz5HQwYjIvmx/8gyhh+ZLjQFIdNmketC08Ayd6oJ71aWP18IgGAVp1zTcr74UU
+         XlP6AAxyTuuuXCDVGdsory87YFTxJtT8YxP6lbf7FFp4Uxy/RKru+T2URkx4d1Nzhs55
+         RG3xee0y/9Yl4Be3wOizB3YXYYgaaHRLdqL8n9ZfbrJ+rZH7kOFg0locYnNVQrXQWJE7
+         PE2i6cmz99NHAMbSHXZdkvDNlypbcColPN1wsA6abwCWmUVGsUHDE0gYEqFm5pUdwvZK
+         DYC40h7wr+FpXHacZvJuAR2UcgvTS1zIsA29pwgWGaMq02ukX9sSHYFElH/vk9IzMTn/
+         ZbFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1789651042; x=1790255842;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=yvMJselGvAoMrhysUaGitx662yndDSgH+0mQM9lz22E=;
+        b=tOakYBVWrmlFu/ZPCjFne52zb5kDyZ5DPKJ8r4d1EG0518oeNfy59zF0kahYUsmY+4
+         9WTvkBXUWMRwCdeFh1gVbqcFmpfpcHPdum7E6PB2AiA41pJumApfV1UJGk2aPdKJJeAT
+         OfnzSnvniQhSUPhk+gOBtaCOYModaOW0AiTkcs9YmvKskQAvyxh4eUupEYPMgQHnn4En
+         kqzwYoo/Gzb1QmY4kABK3mAmfVGUObZwuNevxpXXiJx/d3Hl3UbuvOAN01G14HMJv5zL
+         KwKufOwFmyYa+Af1edDr0SvcyyVKPDkyCV6owmAdwVDYGskiIQe5Szn4m2qGyTak1FuZ
+         +ySA==
+X-Forwarded-Encrypted: i=1; AKwUvByHKVq3t1nGj0OZT9GXnFkKOA92e0sieDcUgH+BGERsP7iOd2dCkpOhweT14sv+r0CccC1NA44=@lists.linux.dev
+X-Gm-Message-State: AFuF++nN1q8+69umy75L/hPdBBdH7vsoXWdAvSS9cpTfghF9yOIG6fKf
+	yPMIg+lnhiBReMFt81xb260ZfSfDRZ0pOLCvxlhnLWlsILXuwyR0HQY2WNFboidTOmelwn05hs+
+	QCkPdey/U9jFfTqjE1dZU5EW5Ox2wx4TPpQYz0vIU
+X-Gm-Gg: AYBFou0mFWm2PmxzTj1OH69bOrPVkqiRJgEyTp585YSw2oxQboiKFyCX8gOF+oeJUqK
+	QOaHKWebwD6Z/yAJcXAFMfS6FCxaepCgQjZy9DxO7QgBZ4WJSfQLgrSp/sPKfIqMcPbMFfifecy
+	EDXiCOUolxAs7XIob1/RBIGP/JFWR0u+Ty76jikeAfeNdUXKqvjoPRg7S28KBLTCWuV/mabN7YQ
+	Tw6cfc5iyR4d4YxLGDncXLX1xT1L7G8fFUDEyQJV2LznmebbjeXkp1wzBrfozYgTLsJPoEeeKu6
+	OMML55YsFsq7prAOHM6pWBjfNSH1fkZcDpyf/isifSjIqiqYy64TGxqBsCGe90AuHcsn/dTKbqF
+	VxRakFKuvf7tXXQ==
+X-Received: by 2002:ac2:4c50:0:b0:5b2:8963:e5d4 with SMTP id
+ 2adb3069b0e04-5b8bff1d051mr39681e87.5.1789651041084; Thu, 17 Sep 2026
+ 06:17:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aquN5ytDxt44uORD@sm-arm-grace07>
+References: <20260915160141.3543048-1-suzuki.poulose@arm.com> <20260915160141.3543048-21-suzuki.poulose@arm.com>
+In-Reply-To: <20260915160141.3543048-21-suzuki.poulose@arm.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Thu, 17 Sep 2026 14:16:44 +0100
+X-Gm-Features: AcwNN1VtWWKyrr6h6sFHMUccgZH0Chs5OMidTNSOoiZ_fDx_6ZmQhtU1SR2DO2Y
+Message-ID: <CA+EHjTwYqTFzGdNPproWW5L6j5pNqmuWeFuu9HbHa8LBLPvY2A@mail.gmail.com>
+Subject: Re: [PATCH v18 20/23] KVM: arm64: CCA: Don't expose unsupported
+ capabilities for realm guests
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org, 
+	will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, steven.price@arm.com, 
+	aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com, 
+	joey.gouly@arm.com, yuzenghui@huawei.com, linux-coco@lists.linux.dev, 
+	gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com, 
+	alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com, 
+	lpieralisi@kernel.org, enju.kohei@fujitsu.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Sep 17, 2026 at 03:51:19PM +0900, Itaru Kitayama wrote:
-> On Wed, Sep 16, 2026 at 08:08:20AM +0100, Marc Zyngier wrote:
-> > On Wed, 16 Sep 2026 00:27:22 +0100,
-> > Itaru Kitayama <itaru.kitayama@fujitsu.com> wrote:
-> > > 
-> > > On Wed, Sep 16, 2026 at 12:22:30AM +0100, Wei-Lin Chang wrote:
-> > > > On Wed, Sep 16, 2026 at 06:49:57AM +0900, Itaru Kitayama wrote:
-> > > > > On Tue, Sep 15, 2026 at 04:42:58PM +0100, Wei-Lin Chang wrote:
-> > > > > > Hi,
-> > > > > > 
-> > > > > > This is v6 of optimizing the shadow s2 mmu unmapping during MMU
-> > > > > > notifiers.
-> > > > > > 
-> > > > > > This version fixes a few issues, and adds Marc's space optimization
-> > > > > > for kvm_guest_s2_mapping [1]. Please see the changelog for the details.
-> > > > > > 
-> > > > > > Tested by booting L3, and running in-kernel targetted tests described
-> > > > > > in [2]. v5 got some tested-by's from Itaru and Wang (thanks), I didn't
-> > > > > > carry them over since some bugs fixed in v6 are non-obvious. Some
-> > > > > > retest would be much appreciated!
-> > > > > 
-> > > > > How did you boot into L3, with KVM selftest or recrusively boot on HW?
-> > > > 
-> > > > I just recrusively booted VMs on hardware. :)
-> > > 
-> > > Good. Then I actually tried that on Grace CPUs, but letting L1 boot 
-> > > with nested mode did not print "VHE+NV2" KVM init log in dmesg, thus not
-> > > able to boot L3. Do I need to add other than kvm.arm-mode=nested to command line?
-> > 
-> > kvm-arm.mode=nested, as documented. That also puts in perspective your
-> > TB tag on the whole series...
-> 
-> Yes. Using kvmtool's --nested option did not bring vCPU with the VHE+NV2 boot
-> log. The Host kernel is Wei-Lin's version 6 booted on Grace CPUs, and
-> the guest kernel is today's kvmarm/fixes plus Wei-Lin's shadow stage 2 ptdump fix.
+Hi Suzuki,
 
-I'm not sure what you did exactly, but just to be clear, you need to
-pass kvm-arm.mode=nested to L1's command line as well, in addition to
-kvmtool's --nested option.
+On Tue, 15 Sep 2026 17:01:38 +0100, Suzuki K Poulose
+<suzuki.poulose@arm.com> wrote:
+[...]
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+[...]
+> +static inline bool kvm_realm_ext_allowed(long ext)
+> +{
+> +        switch (ext) {
+> +        case KVM_CAP_ARM_PSCI:
+> +        case KVM_CAP_ARM_PSCI_0_2:
+> +        case KVM_CAP_NR_VCPUS:
+> +        case KVM_CAP_MAX_VCPUS:
+> +        case KVM_CAP_MAX_VCPU_ID:
+> +        case KVM_CAP_MSI_DEVID:
+> +        case KVM_CAP_ARM_VM_IPA_SIZE:
+> +        case KVM_CAP_ARM_SVE:
+> +        case KVM_CAP_ONE_REG:
+> +        case KVM_CAP_ARM_PTRAUTH_ADDRESS:
+> +        case KVM_CAP_ARM_PTRAUTH_GENERIC:
+> +        case KVM_CAP_SYNC_MMU:
+> +                return true;
+> +        }
+> +        return false;
+> +}
 
-./lkvm run --nested -p kvm-arm.mode=nested <...>
+I'd keep KVM_CAP_IRQCHIP in this list. api.rst has it advertising
+KVM_IRQ_LINE as well as KVM_CREATE_IRQCHIP, so the cap means in-kernel
+irqchip rather than GICv2, and the GICv2 case is already rejected by
+patch 18 in kvm_vgic_create(). It also keeps the two protected lists
+the same where the support is the same. And could this live in
+kvm_rmi.h, next to where kvm_pkvm_ext_allowed() lives in kvm_pkvm.h,
+rather than in arm.c?
 
-Thanks,
-Wei-Lin Chang
+[...]
+> +static inline bool kvm_arch_vm_ioctl_allowed(struct kvm *kvm, unsigned int ioctl)
+> +{
+> +        long ext;
+> +        int r;
+> +
+> +        r = kvm_get_cap_for_kvm_ioctl(ioctl, &ext);
+> +        if (WARN_ON_ONCE(r < 0))
+> +                return false;
 
-> 
-> Thanks,
-> Itaru.
-> 
-> > 
-> > 	M.
-> > 
-> > 
-> > -- 
-> > Without deviation from the norm, progress is not possible.
+You told Sashiko my fix covers this one [1], but that fix changes
+kvm_pkvm_ioctl_allowed(), which this patch deletes, so the `if (r <
+0)` has to go into this copy too. The guard you posted for the second
+finding still leaves the WARN reachable on pKVM and Realm hosts, which
+is the case the fix removed.
+
+nit: kvm_arch_ is the prefix generic KVM uses for the hooks it calls
+into the arch. For two static helpers in arm.c, kvm_vm_ext_allowed()
+and kvm_vm_ioctl_allowed() would avoid the collision, and the same for
+kvm_arch_vm_ext_allowed() above.
+
+Cheers,
+/fuad
+
+[1] https://lore.kernel.org/all/20260914093838.1082637-1-fuad.tabba@linux.dev/
