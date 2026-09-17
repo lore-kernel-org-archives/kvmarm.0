@@ -1,33 +1,33 @@
-Received: from mta0.migadu.com (out-123.mta0.migadu.com [91.218.175.123])
+Received: from mta0.migadu.com (out-130.mta0.migadu.com [91.218.175.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A8424DE729
-	for <kvmarm@lists.linux.dev>; Thu, 17 Sep 2026 11:46:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 272244D2EE6
+	for <kvmarm@lists.linux.dev>; Thu, 17 Sep 2026 11:46:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789645576; cv=none; b=Xay1vxNGMtTae3yVjZla5rK7NdqIcxn1Doo5IjRB0WqJE9UPXz1+y3Ul1/S6Z9OitFjFdtTnymM8y7iUWujTBfwiAta1XGVurCTEBox7zc50qCB1/EBI6piF8Fvu6tyQMwVBmrQuQxLHWhCHzMJtJd6XAKK+Wg4cHw0TzKoKDZo=
+	t=1789645583; cv=none; b=Sii9At35n8CoNyNfeYclghvtIVwwG/C7WTNkgIpsPTExvSwWoKP3VjynhUsDf30jbaISU6ztXaZL8WlmJU1ABwvBLSmObMcQfpQzOePTmI4ndfKthVQ7BL8IzuvW+lZkg6AeXt94tBGNiV9g1fFQSyEOEyV66q48i7RtKhiZ2+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789645576; c=relaxed/simple;
-	bh=qDI4BZ1rw9EhNWsZxeTYF88y9ggTNgPhlWojNlf71ak=;
+	s=arc-20240116; t=1789645583; c=relaxed/simple;
+	bh=I+y/yZhjqmrKJ1vXwT9TgPxkQscaL8DMJp5rQ22dsrc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cRLbK+7V5qI8k47p8q0x9pAWLQuRtuortcTDHQvrERMBYl+W4XeZzPEAof0LQM9wB5r3C7LAYzmUdMLT/pA5vZ5ViFG3dAK+dCQPOCSNjVT5bw+u56OFgj0AjDYSJP6ypjW3Die0ncmCe4DoO1x+JmWOpeEfFMQxPQ+40+H6dsU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CoMPZ8i3; arc=none smtp.client-ip=91.218.175.123
+	 MIME-Version; b=a9BZrBvrc6Fqrx5sbcknk1Envb9jIa94JbkNkuDpNuCiLk7k0aoKh/U834/jzIy+IuPTJCp4W8JC3XJPhRwWvyMT6cAzZUBCaxMDEyUUyK2NGFMFDAiRXdGX6/bkG4B8vpjZv9F+Y7ZHcHTYSjHj6LK0YxBZxyeQxh2L4Z3RZE8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=idNUoWmC; arc=none smtp.client-ip=91.218.175.130
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CoMPZ8i3"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="idNUoWmC"
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=qDI4BZ1rw9EhNWsZxeTYF88y9ggTNgPhlWojNlf71ak=;
+DKIM-Signature: a=rsa-sha256; bh=I+y/yZhjqmrKJ1vXwT9TgPxkQscaL8DMJp5rQ22dsrc=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1789645566; v=1; x=1790250366;
- b=CoMPZ8i3K64LDNHT4dzLO6DwE5ruXzSnarwzy0cYenxMi+RmocFaWdAd5csnL3ZnjJVRDaRk
- GKg97chSjzIEX9K2QvAcg0dnFULuB3+m31vklo9UzqtVdFx4zk2veWll3MzvZs5ktvjwJ7mynBv
- hXoDHct4BTg9xpWKW1q+PHXs=
+ t=1789645573; v=1; x=1790250373;
+ b=idNUoWmCSpPAg8zsXKrtRgklDgCHJwseeWf+tM83SaFSBsv2BejnrbtclsPcM79HRu9LHBpz
+ msxKlIsyQCNsjhN5mesfMpIfZrunrROLrHolVWxiaBS0WErevSFh34HshSlpFtmwGgHZSPoVHCB
+ 2MGUpHB4EvfbiImEPiVxgosY=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 92ac47b8f8b690fb;
-	Thu, 17 Sep 2026 11:46:06 +0000
-X-Mizu-Trace-ID: 92ac47b8f8b690fb
+Received: by smtp.migadu.com with ESMTPS id 9c4b709d4d1133f3;
+	Thu, 17 Sep 2026 11:46:13 +0000
+X-Mizu-Trace-ID: 9c4b709d4d1133f3
 X-Migadu-Flow: FLOW_OUT
 From: Zenghui Yu <zenghui.yu@linux.dev>
 To: kvm@vger.kernel.org,
@@ -36,9 +36,9 @@ To: kvm@vger.kernel.org,
 Cc: pbonzini@redhat.com,
 	seanjc@google.com,
 	"Zenghui Yu (Huawei)" <zenghui.yu@linux.dev>
-Subject: [PATCH 2/3] KVM: selftests: Add missing newline to access_tracking_perf_test help
-Date: Thu, 17 Sep 2026 19:45:42 +0800
-Message-ID: <20260917114543.85044-3-zenghui.yu@linux.dev>
+Subject: [PATCH 3/3] KVM: selftests: Remove destroy_cgroup() from access_tracking_perf_test
+Date: Thu, 17 Sep 2026 19:45:43 +0800
+Message-ID: <20260917114543.85044-4-zenghui.yu@linux.dev>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260917114543.85044-1-zenghui.yu@linux.dev>
 References: <20260917114543.85044-1-zenghui.yu@linux.dev>
@@ -52,28 +52,29 @@ Content-Transfer-Encoding: 8bit
 
 From: "Zenghui Yu (Huawei)" <zenghui.yu@linux.dev>
 
-The help text for the -h option is printed without a trailing newline, so
-it runs together with the first line of the guest mode help that follows
-it.  Add the missing newline.
+destroy_cgroup() is not called anywhere.  Remove the dead helper.
 
 Signed-off-by: Zenghui Yu (Huawei) <zenghui.yu@linux.dev>
 ---
- tools/testing/selftests/kvm/access_tracking_perf_test.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tools/testing/selftests/kvm/access_tracking_perf_test.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/access_tracking_perf_test.c b/tools/testing/selftests/kvm/access_tracking_perf_test.c
-index bcdfeb9c22d8..98ace8b8b4ac 100644
+index 98ace8b8b4ac..9b83e4efcaf9 100644
 --- a/tools/testing/selftests/kvm/access_tracking_perf_test.c
 +++ b/tools/testing/selftests/kvm/access_tracking_perf_test.c
-@@ -504,7 +504,7 @@ static void help(char *name)
- 	printf("usage: %s [-h] [-m mode] [-b vcpu_bytes] [-v vcpus] [-o]  [-s mem_type]\n",
- 	       name);
- 	puts("");
--	printf(" -h: Display this help message.");
-+	printf(" -h: Display this help message.\n");
- 	guest_modes_help();
- 	printf(" -b: specify the size of the memory region which should be\n"
- 	       "     dirtied by each vCPU. e.g. 10M or 3G.\n"
+@@ -523,11 +523,6 @@ static void help(char *name)
+ 	exit(0);
+ }
+ 
+-void destroy_cgroup(char *cg)
+-{
+-	printf("Destroying cgroup: %s\n", cg);
+-}
+-
+ int main(int argc, char *argv[])
+ {
+ 	struct test_params params = {
 -- 
 2.53.0
 
