@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D762C4E0B63
-	for <kvmarm@lists.linux.dev>; Thu, 17 Sep 2026 21:42:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF05A4A4EF4
+	for <kvmarm@lists.linux.dev>; Thu, 17 Sep 2026 21:42:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789681371; cv=none; b=f67iMNZVuAyHDDEx2I22LlJlLSl+RbMtKfwuIhmQAK5nPWLEUfIUbiAUEmudGpwe2Zln1Qiw5ZpP721yi4DZHTYV6s4ojjCshh4NCHjO8GD5B2+Wh3eazZgz6TRZzuDwabSITWIIRC+k2hI1SeiCiR+Z7CacKGDOt3DAmQwwZU0=
+	t=1789681377; cv=none; b=uWeFLyevdqnj6rICl79TvMTdl6xBsO1CCRPwyQq5F5G7WLFUZHz1G27KaUUP8NfmpctYcpGdjbihrtCkVdymhmia7kLcN1UAvw793b6mxSx6q5DQIRBSTk5N0brrvJaBbgrqC4SWiLcqbT6dVxaLyPzdjuO7/r2XApd8WdxeBmQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789681371; c=relaxed/simple;
-	bh=JBtsMsEWMNLNADwgEQVSFvPtiXOMRzZv66KQLvRb/3c=;
+	s=arc-20240116; t=1789681377; c=relaxed/simple;
+	bh=+w+K3RyabmLpuqtKSmYuMaQ4+sQQEcnPLOH8AtHmFDo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QJwln3pbgEUAEVO1vVKOYJMHAAQnMsZvvhQUgBI4R7yFMQCBnEq1av4BL6tQWQmgokpXzbkAr6/khYRAZvm2LbAThKdsbkm0tbl0Cu/nyjhVEITgPAI4/c7YV2QjKQTb2QFkMFfb5s+FsJr7BKJhnQborEi9+QrV10GcpsTAYU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=RGMe4ec0; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=UEmPD9I8b5W5GczgPSqeO0BKBT+289nUym7VofYqzMXzKro75Jb8WubTuHQ1jUn4zQ+0fRDXPxBHGY9GLYphOrNhqEtuZxfWIx2D14wSQWZuRyGyavRjaA4RRMwAYYtwkNx1saF4Xo7qZVuN0GjkeiZ836X6TzOwOEEL4Qi+V0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=AilCQqIG; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="RGMe4ec0"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="AilCQqIG"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7DB451476;
-	Thu, 17 Sep 2026 14:42:43 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 077951596;
+	Thu, 17 Sep 2026 14:42:47 -0700 (PDT)
 Received: from workstation-e142269.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DE9D73F7B4;
-	Thu, 17 Sep 2026 14:42:43 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6697A3F7B4;
+	Thu, 17 Sep 2026 14:42:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1789681367; bh=JBtsMsEWMNLNADwgEQVSFvPtiXOMRzZv66KQLvRb/3c=;
+	t=1789681370; bh=+w+K3RyabmLpuqtKSmYuMaQ4+sQQEcnPLOH8AtHmFDo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=RGMe4ec0GnMldFTCsRadt9jQTsoquZh1dSTBA5mHUebCdNDTIgVjxhP95G7609gFW
-	 NVunWx1akWr5N7Qv+HgMo02/WBKEsoI9/yR/1lHW9IQG/FIBhl93qNp3hbUfElbku4
-	 kgW+8sGXgFxTHOad2HE1iuYY2LuZ8EwHl2zrLCZw=
+	b=AilCQqIGPWmkwXPA3QPx47V8r7tEAHPf6dVVvrVNYkx0D8kz9embwVVG34yron5qN
+	 i2I1lbxJKB8XfOwNPUVVHJHRuisSAzYgvRiSxjzcSJWimFU4NnzWyT/k12IH/WPYIF
+	 we4ZZ5Fy8DTuYiwQKCeKalfh4INCHl64X5r41rAM=
 From: Wei-Lin Chang <weilin.chang@arm.com>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
@@ -49,9 +49,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Thomas Huth <thuth@redhat.com>,
 	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
 	Wei-Lin Chang <weilin.chang@arm.com>
-Subject: [PATCH v2 2/4] arm64: sysreg: Add TCR_EL2 to sysreg infrastructure
-Date: Thu, 17 Sep 2026 22:42:12 +0100
-Message-ID: <20260917214215.74135-3-weilin.chang@arm.com>
+Subject: [PATCH v2 3/4] KVM: arm64: Reset TCR_EL2 according to guest's E2H mode
+Date: Thu, 17 Sep 2026 22:42:13 +0100
+Message-ID: <20260917214215.74135-4-weilin.chang@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260917214215.74135-1-weilin.chang@arm.com>
 References: <20260917214215.74135-1-weilin.chang@arm.com>
@@ -63,194 +63,53 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Convert TCR_EL2 to the sysreg infrastructure with data extracted from
-Registers.json of the BSD licenced AARCHMRS
-(AARCHMRS_OPENSOURCE_A_profile_FAT-2026-06).
+From: Marc Zyngier <maz@kernel.org>
 
-There are two formats of TCR_EL2 based on whether the effective value of
-HCR_EL2.E2H is 0 or 1. For the E2H == 1 case, prefix the macros with
-"VHE_". For the E2H == 0 case, the macros are left unprefixed.
+Previously vCPU TCR_EL2's reset value didn't consider TCR_EL2's
+different formats based on the value of HCR_EL2.E2H. It always resets to
+the E2H == 0 version.
 
-Reviewed-by: Mark Brown <broonie@kernel.org>
+This didn't cause any problem because the bits set in the E2H == 0
+version (TCR_EL2_RES1) all reset to UNKNOWN for E2H == 1 per the
+architecture.
+
+Still, it's better to fix it. Choose the correct reset value by checking
+KVM_ARM_VCPU_HAS_EL2_E2H0.
+
+Signed-off-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
 ---
- arch/arm64/include/asm/kvm_arm.h |  13 ----
- arch/arm64/include/asm/sysreg.h  |   1 -
- arch/arm64/tools/sysreg          | 125 +++++++++++++++++++++++++++++++
- 3 files changed, 125 insertions(+), 14 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 4bfbd827c5aa..690c13d0b068 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -108,19 +108,6 @@
- #define MPAMHCR_HOST_FLAGS	0
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 44aae52c473d..62c059747fbb 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -3275,6 +3275,14 @@ static u64 reset_mdcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+ 	return vcpu->kvm->arch.nr_pmu_counters;
+ }
  
- /* TCR_EL2 Registers bits */
--#define TCR_EL2_DS		(1UL << 32)
--#define TCR_EL2_RES1		((1U << 31) | (1 << 23))
--#define TCR_EL2_HPD		(1 << 24)
--#define TCR_EL2_HA		(1 << 21)
--#define TCR_EL2_TBI		(1 << 20)
--#define TCR_EL2_PS_SHIFT	16
--#define TCR_EL2_PS_MASK		(7 << TCR_EL2_PS_SHIFT)
--#define TCR_EL2_PS_40B		(2 << TCR_EL2_PS_SHIFT)
--#define TCR_EL2_TG0_MASK	TCR_TG0_MASK
--#define TCR_EL2_SH0_MASK	TCR_SH0_MASK
--#define TCR_EL2_ORGN0_MASK	TCR_ORGN0_MASK
--#define TCR_EL2_IRGN0_MASK	TCR_IRGN0_MASK
--#define TCR_EL2_T0SZ_MASK	0x3f
- #define TCR_EL2_MASK	(TCR_EL2_TG0_MASK | TCR_EL2_SH0_MASK | \
- 			 TCR_EL2_ORGN0_MASK | TCR_EL2_IRGN0_MASK)
- 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 7aa08d59d494..3499e5fab39e 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -514,7 +514,6 @@
- 
- #define SYS_TTBR0_EL2			sys_reg(3, 4, 2, 0, 0)
- #define SYS_TTBR1_EL2			sys_reg(3, 4, 2, 0, 1)
--#define SYS_TCR_EL2			sys_reg(3, 4, 2, 0, 2)
- #define SYS_VTTBR_EL2			sys_reg(3, 4, 2, 1, 0)
- 
- #define SYS_HAFGRTR_EL2			sys_reg(3, 4, 3, 1, 6)
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index e2d37ee221b8..5093598ac5f7 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -5561,6 +5561,131 @@ Res0    6
- Field   5:0     T0SZ
- EndSysreg
- 
-+Sysreg	TCR_EL2		3	4	2	0	2
-+Prefix	VHE
-+Res0	63:62
-+Field	61	MTX1
-+Field	60	MTX0
-+Field	59	DS
-+Field	58	TCMA1
-+Field	57	TCMA0
-+Field	56	E0PD1
-+Field	55	E0PD0
-+Field	54	NFD1
-+Field	53	NFD0
-+Field	52	TBID1
-+Field	51	TBID0
-+Field	50	HWU162
-+Field	49	HWU161
-+Field	48	HWU160
-+Field	47	HWU159
-+Field	46	HWU062
-+Field	45	HWU061
-+Field	44	HWU060
-+Field	43	HWU059
-+Field	42	HPD1
-+Field	41	HPD0
-+Field	40	HD
-+Field	39	HA
-+Field	38	TBI1
-+Field	37	TBI0
-+Field	36	AS
-+Res0	35
-+Field	34:32	IPS
-+Enum	31:30	TG1
-+	0b01	16K
-+	0b10	4K
-+	0b11	64K
-+EndEnum
-+Enum	29:28	SH1
-+	0b00	NONE
-+	0b10	OUTER
-+	0b11	INNER
-+EndEnum
-+Enum	27:26	ORGN1
-+	0b00	NC
-+	0b01	WBWA
-+	0b10	WT
-+	0b11	WBnWA
-+EndEnum
-+Enum	25:24	IRGN1
-+	0b00	NC
-+	0b01	WBWA
-+	0b10	WT
-+	0b11	WBnWA
-+EndEnum
-+Field	23	EPD1
-+Field	22	A1
-+Field	21:16	T1SZ
-+Enum	15:14	TG0
-+	0b00	4K
-+	0b01	64K
-+	0b10	16K
-+EndEnum
-+Enum	13:12	SH0
-+	0b00	NONE
-+	0b10	OUTER
-+	0b11	INNER
-+EndEnum
-+Enum	11:10	ORGN0
-+	0b00	NC
-+	0b01	WBWA
-+	0b10	WT
-+	0b11	WBnWA
-+EndEnum
-+Enum	9:8	IRGN0
-+	0b00	NC
-+	0b01	WBWA
-+	0b10	WT
-+	0b11	WBnWA
-+EndEnum
-+Field	7	EPD0
-+Res0	6
-+Field	5:0	T0SZ
-+EndPrefix
-+Res0	63:34
-+Field	33	MTX
-+Field	32	DS
-+Res1	31
-+Field	30	TCMA
-+Field	29	TBID
-+Field	28	HWU62
-+Field	27	HWU61
-+Field	26	HWU60
-+Field	25	HWU59
-+Field	24	HPD
-+Res1	23
-+Field	22	HD
-+Field	21	HA
-+Field	20	TBI
-+Res0	19
-+Field	18:16	PS
-+Enum	15:14	TG0
-+	0b00	4K
-+	0b01	64K
-+	0b10	16K
-+EndEnum
-+Enum	13:12	SH0
-+	0b00	NONE
-+	0b10	OUTER
-+	0b11	INNER
-+EndEnum
-+Enum	11:10	ORGN0
-+	0b00	NC
-+	0b01	WBWA
-+	0b10	WT
-+	0b11	WBnWA
-+EndEnum
-+Enum	9:8	IRGN0
-+	0b00	NC
-+	0b01	WBWA
-+	0b10	WT
-+	0b11	WBnWA
-+EndEnum
-+Res0	7:6
-+Field	5:0	T0SZ
-+EndSysreg
++static u64 reset_tcr_el2(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
++{
++	__vcpu_assign_sys_reg(vcpu, r->reg,
++			      vcpu_has_feature(vcpu, KVM_ARM_VCPU_HAS_EL2_E2H0) ?
++			      TCR_EL2_RES1 : VHE_TCR_EL2_RES1);
++	return __vcpu_sys_reg(vcpu, r->reg);
++}
 +
- Sysreg	TCR_EL12        3	5	2	0	2
- Mapping	TCR_EL1
- EndSysreg
+ /*
+  * Architected system registers.
+  * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
+@@ -3853,7 +3861,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 
+ 	EL2_REG(TTBR0_EL2, access_rw, reset_val, 0),
+ 	EL2_REG(TTBR1_EL2, access_rw, reset_val, 0),
+-	EL2_REG(TCR_EL2, access_rw, reset_val, TCR_EL2_RES1),
++	EL2_REG(TCR_EL2, access_rw, reset_tcr_el2, 0),
+ 	EL2_REG_FILTERED(TCR2_EL2, access_rw, reset_val, TCR2_EL2_RES1,
+ 			 tcr2_el2_visibility),
+ 	EL2_REG_VNCR(VTTBR_EL2, reset_val, 0),
 -- 
 2.43.0
 
