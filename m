@@ -1,115 +1,99 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72F5351AEC1;
-	Fri, 18 Sep 2026 18:19:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E363493D57;
+	Fri, 18 Sep 2026 19:16:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789755599; cv=none; b=uZ4gqk4hzLtt2Gxo24wpeR5Vwqtkx/zOHLpuUd4pXZpo1rrs6tlp0gCqZ3txszwuAMyUgxPvoHByaIRgRYfLIBL96vjnu6zZbiqiO3bf3Ak/AR6D18W0ACZgNgWOFe6pBSTlmqrXiZxykACRWtRc6mMWAnfXHy1G4ICTSy7+BYU=
+	t=1789758965; cv=none; b=BGrXeN/cXJtLo25OoCzcx7s0W0Sie7EZpJAp/Ph7064tPiTxQlp2jja8o15X1FfX0KiuTddWPCi/djjkZ6fXC+CExG7UVgMmVZtIVxibzZTwJXYECVoIiJpin5MqRKMWk3DUeU0kjwKKgpElwO5D/jZhNGPcsIC1025uXeGyA6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789755599; c=relaxed/simple;
-	bh=2dKl2Ks9kaUzo1Ol4g2yAg1ZM79evmXhl4vh2ixXST0=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=AFyVVYbqYCsahvK97LWtwxIsur3LloRRWo0Nl/au4+zy9TMEZUsv3IzNMkjetz41OYI8et0R910rSin7Q2p/vPipV3vsEEou0WMP8uYn1aXaDyVpr0zzhVU/c9CXPxX5d9/80DpOMrvY0KRAH2cygNfSLbT3vnwkfGDCI9TL55o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SwDCB+VT; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789758965; c=relaxed/simple;
+	bh=02Tc3qN4e2T7uvZ8T6wuZ3F3SvaD4Aa6PB7Tar/GMWk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cQybX5cvJoN8iiZbEeWn2Tfk7AdGSfiyIGR98fSaqLJhDGvjHl4RdrbXSpzhRuArA6onfby/H9pHF29h4/ixbWqZKQddMud8sAJ7FzvDv5cTZUwH1Wfy2eZ6Pe3kpj3JeLIjYD3NuZSorIomjSMDb/dTBL19ArnWhw6UFztNqNM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YKw6sfhq; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SwDCB+VT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 643671F000FF;
-	Fri, 18 Sep 2026 18:19:57 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YKw6sfhq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B71C01F000FF;
+	Fri, 18 Sep 2026 19:15:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789755598;
-	bh=krBlm5UecImFXaj8qTF7VVyVleWMYC7KPUA5P4no+RQ=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=SwDCB+VTPqYB4jteqrvvUdtTvR0PEwtNdNFgPfrHGuta71lYTNWAiyBFUeqo+N0F3
-	 ZPfiQ6Yw8qj3Bww4gEK4IpJOvSskeAoj+ZbmoWP1Vr+J9Sn2lNsNUKpzDdwdp50I8h
-	 Yg2DslrhyNUh8xkLU5vfD+6IruKdgjjg2rkugoAdXDVwFjgayzIEneaAaH7Ofn6j+t
-	 l//YisGd5dwqn1c563EdK62tR4L8cjRKaaJQiNd0GENyUtxeR2eoQqdmfknOacHSq8
-	 jtOb0fb7yv2xEWUhTss7S/fTK7YYNwXQj3OtrgZLHaLhqpstRYyIdDKK80yzxN/sHV
-	 BHvnKk9iYUwmw==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v8 29/29] KVM: s390: Enforce no unexpected external
- symbol exports in s390 KVM
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Steffen Eiden" <seiden@linux.ibm.com>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, kvm@vger.kernel.org, "Vasily
- Gorbik" <gor@linux.ibm.com>, "Christian Borntraeger" <borntraeger@linux.ibm.com>, "Alexander
- Gordeev" <agordeev@linux.ibm.com>, "Heiko Carstens" <hca@linux.ibm.com>, linux-s390@vger.kernel.org, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260918133107.1042730-30-seiden@linux.ibm.com>
-References: <20260918133107.1042730-1-seiden@linux.ibm.com>
- <20260918133107.1042730-30-seiden@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 18 Sep 2026 18:19:56 +0000
-Message-Id: <20260918181957.643671F000FF@smtp.kernel.org>
+	s=k20260515; t=1789758957;
+	bh=c8IYTH9i4dCWQ3YBYlg4BiRyNyAFEn5b5sEjDutkcG8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=YKw6sfhqahSo98FQ4YDH83GDubZmslsBOzCwRX5YmDgRq4HgmZJeuxuuLlj7Wn12F
+	 JIG9OZfecc0o4NNUKdBwXgChQhS5qOW5SdJLY5S/tVMCBbxqGzDuUYl3TxbWLC4EWy
+	 gUwN/Y4EcNvvttHTWMxLeq+kzDOwANwRuOCT/6YcFyJh6UdAjROaC9kgfsRGBH8KH+
+	 A4JafannxaoNil5bz7YTyuzn0Hju8miNiJ13qxM+0cR67wm7FhxSZFInUOc9moQ2PD
+	 81EZNkvRtpWmJJtckhzdjUremJPwG4eaSA0hyhPDyp97TmxvhDFVwX9xBfBgsD8hcd
+	 GD22mktcJix5g==
+Date: Fri, 18 Sep 2026 12:15:56 -0700
+From: Oliver Upton <oupton@kernel.org>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Yuchao Zhang <ndaugoing@gmail.com>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH v2] KVM: arm64: vgic: Do not remove in-flight LPIs from
+ AP list on disable
+Message-ID: <aq2N7HYbQw7zbpCq@kernel.org>
+References: <20260918040214.85580-1-ndaugoing@gmail.com>
+ <20260918040214.85580-2-ndaugoing@gmail.com>
+ <CA+EHjTx8zzvgqj99TKWfRD58X-M8v+hs9358_r_1zZonFNEsgw@mail.gmail.com>
+ <CAC2BP3K-fvW2s2j2ys+kPMuxrzeMw9yc6MrAk7U7CqCpb2WePQ@mail.gmail.com>
+ <CA+EHjTx9bTDuTnGgkrCcaAG+1S1Lx6+1BZnuhJcWNTJxWXkAHw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTx9bTDuTnGgkrCcaAG+1S1Lx6+1BZnuhJcWNTJxWXkAHw@mail.gmail.com>
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [Low] Makefile: kvm_check_exports prints false-positive violations in err=
-or log
---
+On Fri, Sep 18, 2026 at 12:58:17PM +0100, Fuad Tabba wrote:
+> Hi Yuchao,
+> 
+> On Fri, 18 Sept 2026 at 12:51, Yuchao Zhang <ndaugoing@gmail.com> wrote:
+> >
+> > Hi Fuad,
+> >
+> > Thanks a lot for pointing me to that thread! I was not aware of
+> > Hyunwoo's earlier report and the discussion with Oliver and Marc.
+> >
+> > I'll read through the thread and their rationale on the ap_list_lock
+> > approach. I'm happy to defer to Hyunwoo's effort to avoid duplicate
+> > work.
+> 
+> I'm not sure you should defer to their effort. It doesn't seem like
+> Hyunwoo has done any work on this for a while. I just wanted to point
+> you to the existing discussion.
 
-commit 539bcae6d5e99f65300c56bf0e306743cc8f639c
-Author: Steffen Eiden <seiden@linux.ibm.com>
+Yuchao if you have cycles I would definitely appreciate it if you can
+pursue a fix. My view hasn't changed since before: let's make that
+traversal of the ap_list is done under the ap_list_lock, as this is not
+intended to be walked lock-free.
 
-KVM: s390: Enforce no unexpected external symbol exports in s390 KVM
+Taking a step back, the whole cross-vCPU LPI disabling always leaves me
+feeling ill... Really when RWP=0 becomes visible from another vCPU we
+need to guarantee that the LPIs have been actually retired, meaning we
+can't have one sitting in an LR. Even with the locking fix I think we
+miss this.
 
-Add a Makefile check to arch/s390/kvm that fails the build on any
-EXPORT_SYMBOL_GPL or EXPORT_SYMBOL not in the allowed list. A symbol
-may only use EXPORT_SYMBOL_GPL if it is defined in exactly one of the
-two s390 KVM modules (kvm or kvm-arm64).
+Given how unlikely it is for well-behaved software to disable LPIs
+remotely in the first place, I wonder if we should just halt the VM
+similar to how we handle accesses to the active state. That's a really
+big hammer but we've had a lot of bugs in this department and I'm
+somewhat biased towards an obviously correct solution.
 
-> diff --git a/arch/s390/kvm/arm64/Makefile b/arch/s390/kvm/arm64/Makefile
-> index bd78d64939d1a..d84d3be74037d 100644
-> --- a/arch/s390/kvm/arm64/Makefile
-> +++ b/arch/s390/kvm/arm64/Makefile
+We wouldn't need to do this for a vCPU disabling LPIs on its own
+redistributor since we've already exited the guest.
 
-[ ... ]
+I'll think on it a bit more.
 
-> @@ -91,3 +92,16 @@ targets +=3D kvm-unnamespaced.o kvm_symbol_list kvm-na=
-mespaced.o
->  endif
-> =20
->  obj-$(CONFIG_KVM) +=3D kvm-arm64.o
-> +
-> +# Fail the build if there is unexpected EXPORT_SYMBOL_GPL (or EXPORT_SYM=
-BOL)
-> +# usage in arm64 KVM code. A symbol may only use EXPORT_SYMBOL_GPL if it=
- is
-> +# defined in exactly one of the two s390 KVM modules (kvm or kvm_arm64).=
- A
-> +# symbol defined in both would cause a conflict during linking if builti=
-n is
-> +# selected. Catch the issue early.
-> +
-> +# This "symbol" is not exported by arm on s390 but still in the source c=
-ode and the
-> +# export check scans unexpanded source code.
-> +kvm_exports_allowed :=3D kvm_file_to_kvm_fn
-> +
-> +$(eval $(call kvm_check_exports,EXPORT_SYMBOL_GPL))
-
-[Severity: Low]
-Will kvm_check_exports print false-positive violations in the error log her=
-e?
-
-While KVM_CHECK_EXPORT_DIRS is overridden in this Makefile to restrict the
-export check to its own specific directories, __kvm_get_exports ignores this
-customization and hardcodes the search path to:
-$(srctree)/virt/kvm $(srctree)/arch/$(SRCARCH)/kvm
-
-This search path covers the entire s390/kvm tree. If an unwanted export
-triggers a build error in the arm64 module, the error message invoking
-__kvm_get_exports will inadvertently list valid, allowed exports from the
-s390 module as unwanted occurrences.
-
-> +$(eval $(call kvm_check_exports,EXPORT_SYMBOL))
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260918133107.1042=
-730-1-seiden@linux.ibm.com?part=3D29
+Oliver
