@@ -1,117 +1,160 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 457001A3029;
-	Fri, 18 Sep 2026 09:47:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 846BD4A3866;
+	Fri, 18 Sep 2026 10:39:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789724842; cv=none; b=aZSgFhvllpR3YMaC6YVvx2NrHH5knkLND16JPH0P6DwTWo0w9/+ipJGNiueS3w+BRalSFrRTHKcvaZQstVtqwo8MzgrU6Zt53cigiShdhL4xufALKr/xRrmYhudmjvUQ/ENmTbjRxMdqZCFOUgq6sacUNXhLb+8mohdXqBfcP4k=
+	t=1789727992; cv=none; b=ckdfbarQCbNyp4svWI8Syq4Hwes6rhAZaJd3VefnxrQRhJ/j2jz/efeJmwebOA5oECA67b+5MhBgYXs2kSC4fURUeYm0MLi99bWvAlIjQuvyEBWWMtPb533W6nX9mq6jTB30Cz2kMf1cd7JGJimDQzAvQc+H7Sv+VjanXKHVpts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789724842; c=relaxed/simple;
-	bh=eSlqW067KZEESlksS4pzEEOFJpVLZHMuQ6i8lq4fTU4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eOACZQMqjW0V+DVbllckaUK0ogqU0RUTs6mfpgLckdTx7b9upuUFj4q91W/mbQG2zYTYYpFkZBmwsf4GawpRFKSyKSCCnbwc6h3VsS/NeuCt9d9bLnm+kCjh8s0CGD0ci48BxglCjwzfLchGu1HAOzKZ1GKGniI46KZ94ZmkwT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=fETqMfGi; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1789727992; c=relaxed/simple;
+	bh=Q3effGCMdhsIowj3+2D3KI8Gvn6WszBpcgNaEbD3C5o=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=LYzivFUc31n8MJdcxtm7qoFijL3Bd6Nl3MmmDnaLSrinakcWHe3S1Yq0xxM0NioqeqBOBsIHi1dO/dh3JAqOTzY1aQNr99owymtm3gS/ylviUk+55SWUM0gN7jmZrwJpAv2Dm25wNtC/CRkT7HEAwrdYsAIYyKTu5eK/bx0TCiY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hBcdchVY; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="fETqMfGi"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D3186168F;
-	Fri, 18 Sep 2026 02:47:15 -0700 (PDT)
-Received: from [10.57.6.197] (unknown [10.57.6.197])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 801D93F882;
-	Fri, 18 Sep 2026 02:47:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1789724839; bh=eSlqW067KZEESlksS4pzEEOFJpVLZHMuQ6i8lq4fTU4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=fETqMfGisKk6NTxLoU1SBAaZzF4uzWxwEO9GudmINWmDd6C/oSVjhWMWDT2uStWJ5
-	 ycmJ+DkKfZGrxwDKDUK3kQ1Wtz273cxB6y7o27WOQyO49zZ/JZpH46scbKmQExn0DR
-	 sZ95l4hiNczrmOzTk5BdWjJEPwCKoXP6SGVSRv7s=
-Message-ID: <76fb1cc8-60f4-4725-a839-76fcf928e232@arm.com>
-Date: Fri, 18 Sep 2026 10:47:14 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hBcdchVY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5BC7F1F0089C;
+	Fri, 18 Sep 2026 10:39:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789727989;
+	bh=l6Kjwu9OSKxioUG7up9HvmTZyOT5q6Qmeq/xm2VHMYM=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date;
+	b=hBcdchVYzJfSkDZhhMg2J1WA+1AG5z73Fi/mCSF+R4bC8Q0+wQ6SFnK8li8MQ5Q/w
+	 gNODIKxkqE6vg9V+nbab0ZpgdPCSKmiAdiEPIZFHJs8FUf6w+G0E9l2NDWUZXJG3Sv
+	 WanFtejBRsZus0xR+KPUrKcV9zMcNJlG03TmUcH5uvbP7FFfwMzcbzh9uKquWSWhyE
+	 7Lp1OCdyAEYUHz20gYOkBvITSgGOpPC0lkc5fsCfaDUaT79jSKdanNfBUoU1Bikat+
+	 MXTbtjjSR3HHbSG/gSP7S10xTM/AxEtPrr+0W8SOdUKuV6dQGyEExsIZWjeDQ3hYC2
+	 WhOQpiXnNZH/A==
+X-Mailer: emacs 31.1 (via feedmail 11-beta-1 I)
+From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>,
+	linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, iommu@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Marc Zyngier <maz@kernel.org>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Steven Price <steven.price@arm.com>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v6 8/9] arm64: realm: Add RHI helper to query IPA state
+ change alignment
+In-Reply-To: <73c921bb-9897-481d-bcb2-ef9b578a7c9f@arm.com>
+References: <20260904103452.1197239-1-aneesh.kumar@kernel.org>
+ <20260904103452.1197239-9-aneesh.kumar@kernel.org>
+ <73c921bb-9897-481d-bcb2-ef9b578a7c9f@arm.com>
+Date: Fri, 18 Sep 2026 16:09:42 +0530
+Message-ID: <yq5awlsizvv5.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v18 05/23] KVM: arm64: Track the type of VM in kvm_arch
-Content-Language: en-GB
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
- will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
- aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
- joey.gouly@arm.com, yuzenghui@huawei.com, linux-coco@lists.linux.dev,
- gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com,
- alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com,
- lpieralisi@kernel.org, enju.kohei@fujitsu.com
-References: <20260915160141.3543048-1-suzuki.poulose@arm.com>
- <20260915160141.3543048-6-suzuki.poulose@arm.com>
- <CA+EHjTz65G0MM=tOrzmk=jMweBX1us6FqfrmSkQs4KSyAEoxhg@mail.gmail.com>
- <e26cbb4e-84e2-4fcc-9eb0-93bfd4aff4a7@arm.com>
- <CA+EHjTw6TOSEs1GtUcUy9WACpGRJBA9yTn9Ro_+tiD=XkeHr4g@mail.gmail.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <CA+EHjTw6TOSEs1GtUcUy9WACpGRJBA9yTn9Ro_+tiD=XkeHr4g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
-On 18/09/2026 10:14, Fuad Tabba wrote:
-> Hi Suzuki,
-> 
-> On <date>, Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
-> [...]
->> +       if (WARN_ON_ONCE(!kvm))
->> +               return false;
+Suzuki K Poulose <suzuki.poulose@arm.com> writes:
+
+> On 04/09/2026 11:34, Aneesh Kumar K.V (Arm) wrote:
+>> Arm CCA guests need to know the granularity at which the host expects IPA
+>> state changes to be performed. This can be larger than the guest page size
+>> and is needed when deciding the alignment for memory shared with the host.
+>> 
+>> Add the Realm Host Interface host configuration definitions and an
+>> get_ipa_state_change_alignment() helper. The helper uses RSI_HOST_CALL to
+>> query the supported HostConf version and features, reads the IPA change
+>> alignment when available, and falls back to PAGE_SIZE if the interface is
+>> unavailable or returns an invalid value.
+>> 
+>> Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
+>
+> It may be worth mentioning the document number and may be the link
+> for RHI spec.
+>
+> e.g., The Realm Host Interface specification Arm DEN00148 defines ...
+>
+>
+>
+>> ---
+>>   drivers/firmware/arm_rmm/rsi.c | 46 ++++++++++++++++++++++++++++++++++
+>>   include/linux/arm-rsi-cmds.h   | 10 ++++++++
+>>   include/linux/arm-smccc-rhi.h  | 25 ++++++++++++++++++
+>>   include/linux/arm-smccc-rsi.h  |  7 ++++++
+>>   4 files changed, 88 insertions(+)
+>>   create mode 100644 include/linux/arm-smccc-rhi.h
+>> 
+>> diff --git a/drivers/firmware/arm_rmm/rsi.c b/drivers/firmware/arm_rmm/rsi.c
+>> index 52f40256bd78..2cd53f82432f 100644
+>> --- a/drivers/firmware/arm_rmm/rsi.c
+>> +++ b/drivers/firmware/arm_rmm/rsi.c
+>> @@ -9,6 +9,7 @@
+>>   #include <linux/swiotlb.h>
+>>   #include <linux/platform_device.h>
+>>   #include <linux/arm-rsi-cmds.h>
+>> +#include <linux/arm-smccc-rhi.h>
+>>   #include <linux/kobject.h>
+>>   #include <linux/sysfs.h>
+>>   
+>> @@ -164,6 +165,51 @@ static int realm_register_memory_enc_ops(void)
+>>   	return arm64_mem_crypt_ops_register(&realm_crypt_ops);
+>>   }
+>>   
+>> +/* we need an aligned struct for rsi_host_call. slab is not yet ready */
+>> +static struct rsi_host_call hostconf_call __initdata;
+>> +static unsigned long __maybe_unused __init get_ipa_state_change_alignment(void)
+>> +{
+>> +	long ret;
+>> +	unsigned long shared_granule_size;
 >> +
->> +       /* Cover both pKVM host and Realm VMs */
->> +       if (!kvm_vm_hyp_is_distrusting(kvm))
->> +               return true;
-> 
-> I'd drop the WARN_ON_ONCE. 
+>> +	hostconf_call.imm = 0;
+>> +	hostconf_call.gprs[0] = RHI_HOSTCONF_VERSION;
+>
+> Do we need to 0 out the other GPRs for RES0 arguments ?
+>
+>> +	ret = rsi_host_call(lm_alias(&hostconf_call));
+>> +	if (ret != RSI_SUCCESS)
+>> +		goto err_out;
+>> +
+>> +	if (hostconf_call.gprs[0] != RHI_HOSTCONF_VER_1_0)
+>> +		goto err_out;
+>> +
+>> +	hostconf_call.imm = 0;
+>> +	hostconf_call.gprs[0] = RHI_HOSTCONF_FEATURES;
+>
+> Same here, especially gprs[] could be overwritten by the results from
+> the Host for the previous call.
+>
 
-I would say, we need it. i.e., we are filtering kvm_arch_vm_ioctl(),
-where it is called from the kvm instance ioctl. So, kvm must be !NULL.
+ [ ... 75 lines skipped ... ] 
+
+>> +
+>> +#define RHI_HOSTCONF_VER_1_0		0x10000
+>> +#define RHI_HOSTCONF_VERSION		SMC_RHI_CALL(0x004E)
+>> +
+>> +#define __RHI_HOSTCONF_GET_IPA_CHANGE_ALIGNMENT BIT(0)
+>
+> minor nit: Could this be:
+>
+> RHI_HOSTCONF_FEATURE_GET_IPA_CHANGE_ALIGNMENT	BIT(0)
+>
+> to indicate this applies to the RHI_HOSTCONF_FEATURES output ?
+>
 
 
-> And this early return needs the `>=` from
-> patch 13, or non-protected pKVM VMs skip the filter.
-> 
+Will make this change.
 
-Of course, This snippet is for Patch 20 and I have fixed the comparison.
+-	hostconf_call.imm = 0;
++	memset(&hostconf_call, 0, sizeof(hostconf_call));
+ 	hostconf_call.gprs[0] = RHI_HOSTCONF_FEATURES;
+ 	ret = rsi_host_call(lm_alias(&hostconf_call));
+ 	if (ret != RSI_SUCCESS)
+ 		goto err_out;
+ 
+-	if (!(hostconf_call.gprs[0] & __RHI_HOSTCONF_GET_IPA_CHANGE_ALIGNMENT))
++	if (!(hostconf_call.gprs[0] & RHI_HOSTCONF_FEATURE_GET_IPA_CHANGE_ALIGNMENT))
+ 		goto err_out;
 
-
->> I resorted to is_protected_kvm_enabled() to make it faster than using
->> the vm_flavor checks. I could rever those anyways.
-> 
-> Agreed it's the faster test. I'd just call it by name at the three
-> sites rather than through a macro.
-> 
->> Do you mean something like :
->>
->>          if (kvm_vm_is_protected_pkvm(host_kvm))
->>                  hyp_vm->kvm.arch.vm_flavor = VM_PROTECTED_PKVM;
->>          else
->>                  hyp_vm->kvm.arch.vm_flavor = VM_PKVM;
-> 
-> Yes, exactly that.
-> 
->> Do we additionally need to WARN_ON() if we encounter a VM_REALM ?
-> 
-> No, the host shouldn't be able to trigger a WARN at EL2.
-
-Alright.
-
-> 
->> Apologies, I thought this one didn't change, but later patches changes
->> them, which is why I kept this.
-> 
-> No worries. With those two in, please keep the tag.
-
-Thanks
-Suzuki
-
-> 
-> Cheers,
-> /fuad
-
+-aneesh
