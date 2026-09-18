@@ -1,235 +1,123 @@
-Received: from mail-oo2-f43.google.com (mail-oo2-f43.google.com [74.125.231.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2813D3CC7D3
-	for <kvmarm@lists.linux.dev>; Fri, 18 Sep 2026 04:02:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5BB93546D6;
+	Fri, 18 Sep 2026 05:54:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789704149; cv=none; b=TH2XU4yUGrkWa2kaCnVX4IPZ2mPawMZNYfIhBrdCu3WZkF8uZbvguktoOiFEK1nvlU2JmXDmbbLkG+CKRKC/oiR7R4YH43fUSRdXbkGD+OFVuAfrYEKkpfFRAC4fKxtXKMaa6d8s6K+IAbyoNlWKSRwj24bpciEckVX6d/e06og=
+	t=1789710852; cv=none; b=MFQamKCSwz/c1NdbimDpydtdte72p6SSNKbw7hzFm/hFH7Oz/zeXLe6vjVCk81GZS/BKZ/hCdA9BDUVV64Z3PrQGad25UQbT50Zegl6G5uOQxlfmDOV8HYNUXWSSLkKKzlNZ1q/PRV+beWzgrtICPlFZ81n993c9UeHSKMQLNsg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789704149; c=relaxed/simple;
-	bh=ZckKQ4112DYF0KI3JADcgajE6KoLSnrCaC10uo1xbCM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Epe4/wUUbYZXXIald1rUuOJhBAhAr6oJcpTmNdekg3tMvUwK6m4mOF09jmHdD9lo0wAc3x6Vrz5q8X19D3ziHZ3t9RoSjUcxKvRdqMcfk+B3yJ7nhQQ/JmMLvXh3bv1LV2dTvyjTlRbkVZTVNrk2lyHpAiw6PU/eB+Bd+D2BYcU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C6T/kwzF; arc=none smtp.client-ip=74.125.231.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1789710852; c=relaxed/simple;
+	bh=lmlV7xFHRVTdsb3n+oqHHiehmNTVMleq48/Xf23jFaU=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=GZhhnoHBxPlpJTXT9nBJPCa8zV/p0iJ9JL7tc+ovbHKwBPsLuBPGPNrmkV5bu3TPdpEYgyCXrVP9twxwaFqwBSPzzT1cUyl2VFXP/5Zo4DUzjQ2yNKzBLF2pLP4jiB/n6nXoE5OL6C/zFUAzY3p2ip4eb8/HRUwdx2H8BpUFyas=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Z+FfgJmW; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C6T/kwzF"
-Received: by mail-oo2-f43.google.com with SMTP id 006d021491bc7-6b1ae6b2010so191498eaf.0
-        for <kvmarm@lists.linux.dev>; Thu, 17 Sep 2026 21:02:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789704147; x=1790308947; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=YLHxgWDH6NZEUyidyM1IgI1xUcXj8vFEb1hVxsczrbo=;
-        b=C6T/kwzFUA3Pg7N7OqIHSgp4y1WR2Gl5xHr2CVanaQ/GMpXV/DjXF4C8TLpqUhxDGK
-         yZWxoflFXEZkW+GpIT7AIjpPLzsdBtw98l6q29NHoIHXKNwMbNR7s+FXWN9q5Osp2dzt
-         vij/F8pD9R3+NbNR5yzvwDZgvnhcswt6n/dq0BG+OZZv/o9BydGAfPMw7jYPHfNgs/dG
-         1+96qsIT6MCpQw6akOZJUM37UONhW5D6RZ/R4tmxPDY/R9Nmga7NBAKQwbWUf5w3N/63
-         s3Gq/5WGaGn7VRj8t5cC7c3D/JmjbVqJRWSpK1pSOm/qRbGD6VQ4HsTV7fDeNMu0W8zw
-         KjXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789704147; x=1790308947;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=YLHxgWDH6NZEUyidyM1IgI1xUcXj8vFEb1hVxsczrbo=;
-        b=gPuj6JTmLk8vZtdLksEBO0juYe3gW7cILF7LKUt9i+B3RAikCL2hkKe2V0Lr8OCpuS
-         NZhNo86qA+JZT4Oaa5O7bV5O1IBPognM868jquMI9UHBZPVlO8+xTmz4LCRx8YGtI3BQ
-         0/QiTGVJUM45uVRdIJ4oDBx+wP4UVXeHDHGRvznVAHtRvqVeg83isSuqYfDe++FanojZ
-         hOatBzkwP3DB3aLPRolnJNwAV+XOT+FkaS9mvxdZHc04z/5Zo4zVHl/+xge7FSH5KWfn
-         0nSqbwV38NEsnmOZvWnuTQuEb7gNylyPW1ELlN9IPYttkXfZpGAj7NPClDQGP7uYbxNn
-         KFZQ==
-X-Forwarded-Encrypted: i=1; AKwUvBzV8hL7flTBeUCe6o/2kIuWR/JA36Sc8qrmA9v/NOxdY5StwkEXIzm9pBWuRVfjKGUbwJXS63Y=@lists.linux.dev
-X-Gm-Message-State: AFuF++k6P6gsOvNuEbKuYSgq+9aSJ5VY+QuEUOEKc6jkDz/l6NmH9omO
-	Lb1qo6bEeLb8Y3WHcu4bTwf66GRi0NqxAOpxk6VQb4tz1+Cy84YA+F/G
-X-Gm-Gg: AYBFou3xsqjy9VYPlf8PJblqED3aJ3uKBCiuTeEJ4QHL7WLqBX4NCfII720hpB3SxME
-	Rseev1JTpkj6SiISe31um+1+SiTF2yYuu68lkVNN4kIet2zHIJYxAIDj55bb+H0QT/gVYQOuZ8m
-	pr1EEy5UN0Xi38gmH376PaPMA8FF3Qzq/e8jR/wz0L6Bgym0wcWbqdDUzO2fagQbmWPTPVceQRc
-	EXJ729Pp1IFEXZD45MQrwfOvQUe3pRpNA5JIKxxiLw09qE+RRTKmm2BEF3CxFU+vQxmi1SztzvI
-	bEtAKHP9pdorv2zq36xijbls5xRehsLCE5hNgV+vuqzwA4wXyERW02MCfvMbptdpvCUJ/pb5KYn
-	i/o58PElizuS3AtH1Pkj4eP+3NIJ8F/2j0123N+N0wQZ5lPCd8OgaFmL6I6vYPdkX9+hCF+DFoL
-	s29mWA07RTXOOEb+De46jDeOsZ3mwCvsXyyJcy+YwVr8N16x03ORJp9DFz7cAnbrWnBFZZgGYn1
-	n5rlEfXuQWIHKtNH/jdb1pSXnuvd+wJisIpY3w=
-X-Received: by 2002:a4a:edc7:0:b0:6bd:f333:7b83 with SMTP id 006d021491bc7-6ca9a44dc18mr1362602eaf.16.1789704146860;
-        Thu, 17 Sep 2026 21:02:26 -0700 (PDT)
-Received: from localhost.localdomain ([2409:8a1e:2e81:7320:608a:778a:c473:ac82])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-33c287be968sm719908eec.26.2026.09.17.21.02.23
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 17 Sep 2026 21:02:26 -0700 (PDT)
-From: zjamg <ndaugoing@gmail.com>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>
-Cc: James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Yuchao Zhang <ndaugoing@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH v2] KVM: arm64: vgic: Do not remove in-flight LPIs from AP list on disable
-Date: Fri, 18 Sep 2026 12:02:14 +0800
-Message-ID: <20260918040214.85580-2-ndaugoing@gmail.com>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20260918040214.85580-1-ndaugoing@gmail.com>
-References: <20260918040214.85580-1-ndaugoing@gmail.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Z+FfgJmW"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1789710851; x=1821246851;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=lmlV7xFHRVTdsb3n+oqHHiehmNTVMleq48/Xf23jFaU=;
+  b=Z+FfgJmWVX6RtGyFUJtUeeq7kckzlwrPI2+rHGt+l5PuhqauHqEcHnkG
+   tUzf7EK2ttIqwcseloRbyljNUMQJmH/Mra898O3p1a/C0dHrUOJ13jzDy
+   23ikrb04EHTdCtT94xO9ZbJMNnfQ1clukEvAnzaLJtUbZcLA8xFMqL4TA
+   6e0nQlA446SrtHZ0hH3voh2a0DC3pwwtwSjWojwEF1LYWfgv+mYdOC32C
+   8ILoaAyNfS3aPHtYDDIPl5m5bB0e5/urfEt1Inqfvb+GtRlhPjK6tdtk9
+   Im9ZJ4evNLob7teeLioLxX3zE7BOAc/v9c9PTjzkdYYMqUU8soDsL2F/F
+   Q==;
+X-CSE-ConnectionGUID: CLt4ALYLS26RcMaEReOh1w==
+X-CSE-MsgGUID: vGN24ODUS0yaHGde8srmWg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11905"; a="90326546"
+X-IronPort-AV: E=Sophos;i="6.27,103,1787036400"; 
+   d="scan'208";a="90326546"
+Received: from fmviesa013.fm.intel.com ([10.60.135.153])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Sep 2026 22:54:10 -0700
+X-CSE-ConnectionGUID: KgABx0ZsR3iY4fYq/tVq2Q==
+X-CSE-MsgGUID: GZcbDF/7SxSIjyTZ91er0w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.27,103,1787036400"; 
+   d="scan'208";a="2628589"
+Received: from unknown (HELO [10.238.1.188]) ([10.238.1.188])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Sep 2026 22:54:05 -0700
+Message-ID: <2ba47d98-21b5-40de-9df0-be6676ade064@linux.intel.com>
+Date: Fri, 18 Sep 2026 13:54:02 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Cc: baolu.lu@linux.intel.com, "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
+ Nicolin Chen <nicolinc@nvidia.com>,
+ "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+ "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ Alexey Kardashevskiy <aik@amd.com>, Catalin Marinas
+ <catalin.marinas@arm.com>, Dan Williams <dan.j.williams@intel.com>,
+ Joerg Roedel <joro@8bytes.org>, Jonathan Cameron <jic23@kernel.org>,
+ Marc Zyngier <maz@kernel.org>, Pranjal Shrivastava <praan@google.com>,
+ Robin Murphy <robin.murphy@arm.com>, Samuel Ortiz <sameo@rivosinc.com>,
+ Steven Price <steven.price@arm.com>,
+ Suzuki K Poulose <Suzuki.Poulose@arm.com>, Will Deacon <will@kernel.org>,
+ Xu Yilun <yilun.xu@linux.intel.com>,
+ Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+Subject: Re: [RFC PATCH v4 03/16] iommu/arm-smmu-v3: Add initial pSMMU realm
+ viommu plumbing
+To: Jason Gunthorpe <jgg@ziepe.ca>, "Tian, Kevin" <kevin.tian@intel.com>
+References: <20260903171704.GK2890729@ziepe.ca> <yq5acxupjsy2.fsf@kernel.org>
+ <20260907125228.GB667892@ziepe.ca> <yq5atsnyag84.fsf@kernel.org>
+ <20260909124628.GH2543240@ziepe.ca>
+ <CO1PR11MB4835512E374074A5F4AD0A6C8CBF2@CO1PR11MB4835.namprd11.prod.outlook.com>
+ <20260910124632.GB4083318@ziepe.ca>
+ <CO1PR11MB4835FF972283C09D7D683DAE8CBA2@CO1PR11MB4835.namprd11.prod.outlook.com>
+ <20260915134318.GB3196566@ziepe.ca>
+ <CO1PR11MB4835562E7714F368E669D3B48CB92@CO1PR11MB4835.namprd11.prod.outlook.com>
+ <20260916123954.GC3196566@ziepe.ca>
+Content-Language: en-US
+From: Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <20260916123954.GC3196566@ziepe.ca>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-From: Yuchao Zhang <ndaugoing@gmail.com>
+On 9/16/2026 8:39 PM, Jason Gunthorpe wrote:
+> On Wed, Sep 16, 2026 at 05:54:57AM +0000, Tian, Kevin wrote:
+>>> At least for ARM there is effectively no entanglement with the actual
+>>> host iommu driver. The viommu is entirely provided by software in the
+>>> RMM world, so it can have its own dedicated driver. In ARM T=1
+>>> transactions are alwayus routed to the RMM's iommu and there is no
+>>> relation to the host.
+>>>
+>>> I am interested how Intel works here, but I thought it was similar.
+>> Largely yes. Main difference at Intel side is that TDX still relies on the
+>> host to initiate iotlb invalidation (upon notification from KVM on S-EPT
+>> change). Currently we put this logic in intel-iommu driver but it's more
+>> about wrapping invalidation info and passing it to the firmware. Moving
+>> it into the tsm driver should be straightforward.
+>>
+>> Maybe there'll be other subtle connections to host iommu driver but
+>> it doesn't sound a hard problem to solve.
+> Okay, so I saw the driver posting for basic iommu support, can we try
+> to rework that to be split out like Aneesh is doing so everything
+> about TDX calls lives in tsm and intel iommu only provides a small API
+> surface to exchange whatever details are needed to bootstrap TDX
+> module?
 
-By code inspection, a race condition and potential Use-After-Free/crash
-exists between remote LPI disabling and local LR folding when EOImode==0.
+Are you referring to this series?
 
-Commit 6da5e537f5af ("KVM: arm64: vgic: Pick EOIcount deactivations from
-AP-list tail") introduced tracking the last interrupt placed in a List
-Register in per-CPU host data (*host_data_ptr(last_lr_irq)) and traverses
-the remaining ap_list via list_for_each_entry_continue() in
-vgic_v3_fold_lr_state().
+https://lore.kernel.org/linux-iommu/20260915074235.1219183-1-baolu.lu@linux.intel.com/
 
-However, an interrupt loaded into an LR can be an LPI. While vCPU-B is
-running the guest, another vCPU-A can write to vCPU-B's redistributor
-GICR_CTLR to clear EnableLPIs, which dispatches vgic_flush_pending_lpis().
+It initializes the iommu managed by the secure world (the TDX module).
 
-vgic_flush_pending_lpis() unconditionally removes all LPIs from ap_list
-without checking whether the interrupt is currently in an LR
-(irq->on_lr):
-- It calls list_del(&irq->ap_list), setting ap_list.next to LIST_POISON1,
-  and drops the AP-list reference.
-- If the LPI is unmapped or its translation cache was invalidated, the
-  vgic_irq refcount drops to zero and the object is freed via RCU.
-- Meanwhile, vCPU-B's per-CPU *host_data_ptr(last_lr_irq) cannot be
-  cleared by remote vCPUs and is left dangling.
+I’m happy to rework it as you suggested by moving most of the TDX-
+related code into the tsm driver and leaving the host iommu driver to
+provide only the necessary assistance.
 
-When vCPU-B subsequently exits the guest:
-1. vgic_v3_fold_lr_state() resumes using the unlinked last_lr_irq.
-2. list_for_each_entry_continue() unconditionally evaluates
-   list_next_entry(irq, ap_list) during loop initialization, accessing
-   LIST_POISON1 (or freed memory).
-3. If eoicount > 0, it attempts guard(raw_spinlock)(&irq->irq_lock) on
-   the poisoned address, leading to an immediate host kernel panic.
-
-Fix this by:
-1. In vgic_flush_pending_lpis(), do not remove LPIs that are currently
-   in-flight in an LR (irq->on_lr == true). They will be naturally pruned
-   by the owning vCPU's vgic_prune_ap_list() after LR folding.
-2. In vgic_fold_state(), clear *host_data_ptr(last_lr_irq) after folding
-   so that no stale pointer survives past guest execution.
-3. In vgic_v3_fold_lr_state() and vgic_v2_fold_lr_state(), bail out
-   immediately if eoicount is zero, avoiding unnecessary list_next_entry()
-   evaluation.
-4. In vgic_v3_fold_lr(), do not resurrect the pending state of an edge
-   LPI folded while the redistributor has LPIs disabled.
-   vgic_flush_pending_lpis() cannot remotely clear the LRs of a running
-   vCPU, so such an LPI would otherwise be requeued and re-injected
-   while GICR_CTLR.EnableLPIs is 0, violating the flush semantics (and
-   the architecture, which gives no expectation of the pending state
-   being retained across a disable).
-
-Note: this closes the primary race (the last_lr_irq node itself is no
-longer unlinkable while in-flight), but the fold traversal can still
-race with a remote flush unlinking a subsequent non-LR node in the
-ap_list tail. Fully closing that window needs the fold side to take
-references before dropping locks (in the spirit of the prune-side fix
-in commit 7258770e5814 ("KVM: arm64: vgic: Handle race between
-interrupt affinity change and LPI disabling")) and is left as a
-follow-up.
-
-Fixes: 6da5e537f5af ("KVM: arm64: vgic: Pick EOIcount deactivations from AP-list tail")
-Cc: stable@vger.kernel.org
-Signed-off-by: Yuchao Zhang <ndaugoing@gmail.com>
----
- arch/arm64/kvm/vgic/vgic-v2.c |  3 +++
- arch/arm64/kvm/vgic/vgic-v3.c | 14 ++++++++++++--
- arch/arm64/kvm/vgic/vgic.c    | 10 +++++++---
- 3 files changed, 22 insertions(+), 5 deletions(-)
-
-diff --git a/arch/arm64/kvm/vgic/vgic-v2.c b/arch/arm64/kvm/vgic/vgic-v2.c
-index 7182f63fc938..7b6cd05ce32d 100644
---- a/arch/arm64/kvm/vgic/vgic-v2.c
-+++ b/arch/arm64/kvm/vgic/vgic-v2.c
-@@ -122,6 +122,9 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
- 	for (int lr = 0; lr < vgic_cpu->vgic_v2.used_lrs; lr++)
- 		vgic_v2_fold_lr(vcpu, cpuif->vgic_lr[lr]);
- 
-+	if (!eoicount)
-+		return;
-+
- 	/* See the GICv3 equivalent for the EOIcount handling rationale */
- 	list_for_each_entry_continue(irq, &vgic_cpu->ap_list_head, ap_list) {
- 		u32 lr;
-diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-index 726e20a1da6e..dd1314f4543d 100644
---- a/arch/arm64/kvm/vgic/vgic-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3.c
-@@ -96,9 +96,16 @@ static void vgic_v3_fold_lr(struct kvm_vcpu *vcpu, u64 val)
- 		deactivated = irq->active && !(val & ICH_LR_ACTIVE_BIT);
- 		irq->active = !!(val & ICH_LR_ACTIVE_BIT);
- 
--		/* Edge is the only case where we preserve the pending bit */
-+		/*
-+		 * Edge is the only case where we preserve the pending bit.
-+		 * Do not resurrect the pending state of LPIs once the
-+		 * redistributor has them disabled: vgic_flush_pending_lpis()
-+		 * has discarded them, and the LRs of a running vCPU cannot
-+		 * be remotely cleared.
-+		 */
- 		if (irq->config == VGIC_CONFIG_EDGE &&
--		    (val & ICH_LR_PENDING_BIT))
-+		    (val & ICH_LR_PENDING_BIT) &&
-+		    (irq->intid < VGIC_MIN_LPI || vgic_lpis_enabled(vcpu)))
- 			irq->pending_latch = true;
- 
- 		/*
-@@ -155,6 +162,9 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
- 	for (int lr = 0; lr < cpuif->used_lrs; lr++)
- 		vgic_v3_fold_lr(vcpu, cpuif->vgic_lr[lr]);
- 
-+	if (!eoicount)
-+		return;
-+
- 	/*
- 	 * EOIMode=0: use EOIcount to emulate deactivation. We are
- 	 * guaranteed to deactivate in reverse order of the activation, so
-diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-index b25303d9919f..0d7d75c3ac93 100644
---- a/arch/arm64/kvm/vgic/vgic.c
-+++ b/arch/arm64/kvm/vgic/vgic.c
-@@ -205,10 +205,12 @@ void vgic_flush_pending_lpis(struct kvm_vcpu *vcpu)
- 		if (irq_is_lpi(vcpu->kvm, irq->intid)) {
- 			raw_spin_lock(&irq->irq_lock);
- 			irq->pending_latch = false;
--			list_del(&irq->ap_list);
--			irq->vcpu = NULL;
-+			if (!irq->on_lr) {
-+				list_del(&irq->ap_list);
-+				irq->vcpu = NULL;
-+				deleted |= vgic_put_irq_norelease(vcpu->kvm, irq);
-+			}
- 			raw_spin_unlock(&irq->irq_lock);
--			deleted |= vgic_put_irq_norelease(vcpu->kvm, irq);
- 		}
- 	}
- 
-@@ -873,6 +875,8 @@ static void vgic_fold_state(struct kvm_vcpu *vcpu)
- 		vgic_v2_fold_lr_state(vcpu);
- 	else
- 		vgic_v3_fold_lr_state(vcpu);
-+
-+	*host_data_ptr(last_lr_irq) = NULL;
- }
- 
- /* Requires the irq_lock to be held. */
--- 
-2.53.0
-
+Thanks,
+baolu
