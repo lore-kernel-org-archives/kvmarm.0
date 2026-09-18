@@ -1,88 +1,69 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17DDF4E50B6;
-	Fri, 18 Sep 2026 15:07:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93B113D3327;
+	Fri, 18 Sep 2026 15:15:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789744057; cv=none; b=hlof5MjxzbxbiEpyFty6mW7GTwo5ngNdWp027Bc11zpJmTKAghmxFsrGE/XUMzhDIGCeqKotq6s8Lyq4aLCi4gI2hD3yyOkrD+o+fOBgqMyVm3aix9vErvpyzORIxBJXvZZjn0AZz0nIxI9Mpwwb9txn9AJDFxLJR8pxQ16N5cQ=
+	t=1789744545; cv=none; b=JSHAAoh211y59QkPCrlnoGXdlSfOqhom2oxXDTM045ybDo7P/X0iLnFNpVv9cIPqQ1LAVv3SY/nu3dH5QfJqe/vZnnhLRA+wbLEqNFt/oZTHE3z5WUZyz5zYgz5lWX/+f+4S2QkbZYzFV1amg+Hff6vak0Rf/dxEOoLx+AcbQ28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789744057; c=relaxed/simple;
-	bh=lMLG2gJ31BEBJ/Ad0p3AI5oG5oKsdUvV4z4DPWrAz6A=;
+	s=arc-20240116; t=1789744545; c=relaxed/simple;
+	bh=KOuKxdOCrkCm+UwZ5a2UNF3hopOtjkYgdNAn9ZA0M4Y=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=nFaPy8pcJF+1GIQlynlDqJNwIp2MsY8tsoI3ha9cw/rQNlPZWnyX25hV3YI3DjUKUIx/uouxZBF0KmxiIClPkJjJSEafL4mXTFRJm9mF3tY+vY6lggzFz2JMcrvyKdNczyfSfft0HU+OsvMbxXh4LxZ8RveUbK+u8VhYiT55o3U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eCwVvqH7; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=HVgpp403oop5Qd6plhfafuW8xxBr5zOrzgeqE/s09FNOBGb4rY/Mw+3lfqIlBpBq8vj2g4ZzLh+GDxjHEgHCthlz0R9U8ZfKygGcGxx7AsNeOOtXXDZdQjBs0yNQoc27wWEJsd5nUL2mMA6QHOdKLSXUKSw/s2RLQ9stRDKOvGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ORSqZQcs; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eCwVvqH7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 415CF1F00898;
-	Fri, 18 Sep 2026 15:07:35 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ORSqZQcs"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6687D1F000FF;
+	Fri, 18 Sep 2026 15:15:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789744055;
-	bh=96Sf3ePwD7C5+Tsxwx0kN+h73AW1l18RlQBhRiue1p0=;
+	s=k20260515; t=1789744541;
+	bh=KOuKxdOCrkCm+UwZ5a2UNF3hopOtjkYgdNAn9ZA0M4Y=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=eCwVvqH77082DM7wIzkD2hbGVvge8GJfgUROcsIRvq1d9Yfq4GLd9cyxMeXUv1Cx5
-	 M8fxcanp5heiihNXooURO8Z+Ix2krz+qooqrxSO1rF20RvYPc7WczsQAR8ZWcQc+CW
-	 YlKcYK6a6ghFc9gODWHBs0oC8ZYHCulV5XI5N4J811u1PL1lwi92yWRzE3GNA80jAv
-	 sQQd4d489Mlp54Tx1tjkF9QAwPG5UKHq3IL/gf/sTOWJLS6eordP/h4nCwL0nub+qA
-	 U40CE1hNjfIED5bvGxy6vPLr1fWeoXzKhprha8Jdmp0APmn2iD6gEhY39blggBOvHL
-	 tY9TblrRP56Qg==
+	b=ORSqZQcslBDY6AY6BNjRqqHC7STo1MAgXrNF0vaJyMIhIrP7D3h5aTZKwfdw3kVoU
+	 ss3gHHhSY2WThXMR5GRYmuf6GqYAei9RyVcIEA6GIsV2Wj8iMh8/ojKFQq2OAy8JB/
+	 o64TVlt00ygkWtfoPrcBBjkefepz5pUoflRC22nmnr3s66nF0OdEb3/wV7KIUjDUaJ
+	 mgbPyVvx2JcG79rcm08WRtQMTtkFclHyruMaKHwYeOgHsnynTa9z7qi6R4hE478x/f
+	 DaPni6kcCb/bv0JZP8euudg3/HZAKCDxQ7CBfERCGi/bt60kL3Mhh5lpogKKM+s1mq
+	 Zk3/R6zzZ5j9g==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v8 08/29] KVM: Move architecture capability Kconfigs to
- header defines
+Subject: Re: [PATCH v8 09/29] KVM: Replace CONFIG_KVM_MMIO with KVM_NO_MMIO
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Steffen Eiden" <seiden@linux.ibm.com>
-Cc: "Alexander Gordeev" <agordeev@linux.ibm.com>, "Christian Borntraeger" <borntraeger@linux.ibm.com>, "Marc
- Zyngier" <maz@kernel.org>, "Vasily Gorbik" <gor@linux.ibm.com>, linux-s390@vger.kernel.org, "Heiko
- Carstens" <hca@linux.ibm.com>, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, kvm@vger.kernel.org
-In-Reply-To: <20260918133107.1042730-9-seiden@linux.ibm.com>
+Cc: "Marc Zyngier" <maz@kernel.org>, "Christian Borntraeger" <borntraeger@linux.ibm.com>, kvm@vger.kernel.org, linux-s390@vger.kernel.org, "Heiko
+ Carstens" <hca@linux.ibm.com>, "Alexander Gordeev" <agordeev@linux.ibm.com>, "Vasily
+ Gorbik" <gor@linux.ibm.com>, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev
+In-Reply-To: <20260918133107.1042730-10-seiden@linux.ibm.com>
 References: <20260918133107.1042730-1-seiden@linux.ibm.com>
- <20260918133107.1042730-9-seiden@linux.ibm.com>
+ <20260918133107.1042730-10-seiden@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 18 Sep 2026 15:07:34 +0000
-Message-Id: <20260918150735.415CF1F00898@smtp.kernel.org>
+Date: Fri, 18 Sep 2026 15:15:41 +0000
+Message-Id: <20260918151541.6687D1F000FF@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [Low] kconfig: syntax error in virt/kvm/Kconfig due to 'booCONFIG_ltt' ty=
-po
---
+> Defining KVM_MMIO is not flexible enough for multi-KVM systems where one
+> KVM implements MMIO but others do not. Therefore, remove KVM_MMIO from
+> the config space and use the macro KVM_NO_MMIO instead.
+> Define KVM_NO_MMIO for KVM/s390 and for selected KVM/powerpc
+> configurations.
+>=20
+> coalesced_mmio.c is now always compiled&linked. However, for
+> architectures/configurations defining KVM_NO_MMIO this effectively
+> collapses to an empty object with no mmio code.
+>=20
+> No functional changes.
+>=20
+> Suggested-by: Marc Zyngier <maz@kernel.org>
+> Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
 
-commit ee51b43b92593e9aef02197487e12632baf77f58
-Author: Steffen Eiden <seiden@linux.ibm.com>
-
-KVM: Move architecture capability Kconfigs to header defines
-
-Historically, KVM feature opt-ins and callbacks (e.g. read-only memory,
-MSI routing, generic pre-fault memory, lockless aging, halt-polling
-controls, and vcpu run PID changes) were configured globally via Kconfig
-symbols (CONFIG_HAVE_KVM_* and CONFIG_KVM_*).
-
-With s390 hosting multiple independent KVM implementations within the
-same kernel build (native s390 KVM and arm64 on s390), global Kconfig
-selections force both implementations to inherit options that only apply
-to one of them.
-
-> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-> index c3c0ee253fc77..008b110ebdb7a 100644
-> --- a/virt/kvm/Kconfig
-> +++ b/virt/kvm/Kconfig
-> @@ -9,7 +9,7 @@ config KVM_COMMON
->         select PREEMPT_NOTIFIERS
-> =20
->  config HAVE_KVM_PFNCACHE
-> -       bool
-> +       booCONFIG_ltt
-
-[Severity: Low]
-Is booCONFIG_ltt a typo for bool under config HAVE_KVM_PFNCACHE in
-virt/kvm/Kconfig?
+Sashiko has reviewed this patch and found no issues. It looks great!
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260918133107.1042=
-730-1-seiden@linux.ibm.com?part=3D8
+730-1-seiden@linux.ibm.com?part=3D9
+
