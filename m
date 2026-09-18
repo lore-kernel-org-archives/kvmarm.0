@@ -1,207 +1,139 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED79B3A5453
-	for <kvmarm@lists.linux.dev>; Fri, 18 Sep 2026 08:33:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86F5A4BD36B;
+	Fri, 18 Sep 2026 08:59:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789720425; cv=none; b=iib6rIlyUVswAOTSBC5fUAPilc0I+6vP7G63Drzn5tgnmaLGzuB9z6BjQg6TsAyQyjaiN0bDANJrAJv0A3kEZK3CiMVRH1svLfWxO2mg8JN3YSeJYID6A/ptEw722gzcL9hUgBaJlDOpokky+Olr4nDp4xPLsgfjFX7KyDn4wQg=
+	t=1789721961; cv=none; b=joVqwJKV3wOdi+SNae+nVBSjM4rjQUP2Hz9xLo3jxSTmhLtyYsrJwVqw8FTgm0Ug+ooN95rYYlrbszw2EqSPfTwUrlpTTuvxg1l40iq/pZyWIF7Gv7C6ACYOyZDnj7OTgaZRRw/Oh6VOs+I03nW798JUxkZsRTbnsK44BJrRGYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789720425; c=relaxed/simple;
-	bh=T9YKqTTutWagLABWP+gtWS4ig4+Bau4DVZs3YOch0v4=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=FvW7zuyg4Av7UDoQr7Ylu4I1qsUSuarX6XncGmZHETZ3g5lU+OHNHz3DIBwliGxS8DKS+fUu2KfIAx6xNdmUm4V0gUQp0DqRG7gIzDwIvCqmrnMPyQ6fFn0gVrWB+1s3pX/X4dKfZJ/ASxl+4JN9/s4QN21MXmr2fuoU538f+bk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FzFa9P2F; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789721961; c=relaxed/simple;
+	bh=1M1QtH7NdzkDYZ09YQzOvcKU43QqUz+DMQ3u7GB+BTA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MdyDjQ8AZLWyX9fK0TEqIQn0H01WPJSiHY+1V1uAUNuvZszsy3i/XRFWP9+oPnn2u14sHvB9lKKn11DX2a83ucDcYUdkxJLhrbtWFs0pniB2T8ZrPsYLllT3hKgJKJR2KJWYgFu60lpPBORtS7aENuywcfXPV/gsVHbCyMr0XW4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=gMhNVUf7; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FzFa9P2F"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 884541F000FF;
-	Fri, 18 Sep 2026 08:33:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789720423;
-	bh=97h56jdCHBhjTkM/7B7CO6yARgE5mfyDITnUZWWvhrc=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=FzFa9P2FKOeDefsp14U4JOhvdRENNdPkkdhenMc092mBaJEQH9ox5d5jGEogA4GQP
-	 1GpVpRbkm5JuNwhpa1LRgDTKZmvgrfyHQuBCpnPQyRsLEeHqm/AGqlehhBdmPySiAC
-	 pDWn0yHNUGcSTvn1AVuWLuOQaoo8iGFlEImFAmV7G536UcbxnjoOIKvVWvuGk5ch5k
-	 FI5BtHZEmuX7RhSw2dUW2b1DbgWMS0l0DNEsDhw4QhicBTMqZcbVWcGqEKhUthF+L5
-	 EPHdNnWVY5vRgVO87SA4p8CB1WMI6x1vWuMzoRnbXxqeiI6fCCvhRNI9sJ+xb1BQRo
-	 pZxFioZr7HKdQ==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 2/2] KVM: arm64: Add VGIC v3 batch register access
- implementation
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Yize Wang" <wangyize7@huawei.com>
-Cc: kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>
-In-Reply-To: <20260918081930.4014735-3-wangyize7@huawei.com>
-References: <20260918081930.4014735-1-wangyize7@huawei.com>
- <20260918081930.4014735-3-wangyize7@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 18 Sep 2026 08:33:43 +0000
-Message-Id: <20260918083343.884541F000FF@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="gMhNVUf7"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F1C06168F;
+	Fri, 18 Sep 2026 01:59:14 -0700 (PDT)
+Received: from [10.57.6.197] (unknown [10.57.6.197])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A15FA3F86F;
+	Fri, 18 Sep 2026 01:59:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1789721958; bh=1M1QtH7NdzkDYZ09YQzOvcKU43QqUz+DMQ3u7GB+BTA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=gMhNVUf7FU14C3AvALw/IJRAU0r5ZC7LybOmBcwkNWc+DAjCckG9KnP01I1wmlwyC
+	 jwkpPhL4ENWatRqaHBHlgShatqY/nVK4er+43d5StSotzGLtEXPJotp0f1EKvtUnpj
+	 Bzj946PL96YGt37gh2bvsO5zxsWPabKAQrRAacd0=
+Message-ID: <e26cbb4e-84e2-4fcc-9eb0-93bfd4aff4a7@arm.com>
+Date: Fri, 18 Sep 2026 09:59:14 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v18 05/23] KVM: arm64: Track the type of VM in kvm_arch
+Content-Language: en-GB
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
+ will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
+ aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
+ joey.gouly@arm.com, yuzenghui@huawei.com, linux-coco@lists.linux.dev,
+ gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com,
+ alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com,
+ lpieralisi@kernel.org, enju.kohei@fujitsu.com
+References: <20260915160141.3543048-1-suzuki.poulose@arm.com>
+ <20260915160141.3543048-6-suzuki.poulose@arm.com>
+ <CA+EHjTz65G0MM=tOrzmk=jMweBX1us6FqfrmSkQs4KSyAEoxhg@mail.gmail.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <CA+EHjTz65G0MM=tOrzmk=jMweBX1us6FqfrmSkQs4KSyAEoxhg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Thank you for your contribution! Sashiko AI review found 4 potential issue(=
-s) to consider:
-- [Critical] kvm: arm64: vgic: allow userspace to bypass VGIC locks via KVM=
-_DEV_ARM_VGIC_ATTR_FLAG_LOCKED
-- [High] kvm: arm64: vgic: user memory access under VM locks in batch acces=
-s enables deadlock
-- [Medium] kvm: arm64: vgic: un-ratelimited pr_err in batch access allows u=
-serspace log flooding
-- [Medium] kvm: arm64: vgic: batch access fails to return first error or co=
-py results to userspace
---
+On 17/09/2026 12:24, Fuad Tabba wrote:
+> Hi Suzuki,
+> 
+> On Tue, 15 Sep 2026 17:01:23 +0100, Suzuki K Poulose
+> <suzuki.poulose@arm.com> wrote:
+> [...]
+>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> [...]
+>> +#define kvm_vm_hyp_is_pkvm(kvm)                (is_protected_kvm_enabled())
+> 
+> I'd keep is_protected_kvm_enabled() at the three call sites: this
+> takes a VM and ignores it, so it reads as per-VM when it's the mode,
+> and patch 20's comment about not being able to use the kvm_vm_ helpers
+> with a NULL kvm goes away too.
 
-commit 4bb3fc1e279eb19b2c3ca453e47c56bcab743a11
-Author: Yize Wang <wangyize7@huawei.com>
+Actually, that comment is invalid. kvm_arch_vm_ioctl_allowed, is only
+called from the kvm_arch_vm_ioctl() with a valid kvm instance. I have 
+changed that hunk to:
 
-KVM: arm64: Add VGIC v3 batch register access implementation
 
-This commit adds vgic_v3_batch_access() to allow userspace to read or write
-multiple VGIC registers in a single system call. It introduces a new flag
-KVM_DEV_ARM_VGIC_ATTR_FLAG_LOCKED to prevent repeated locking and unlocking
-during these batch accesses.
++/*
++ * Check whether the KVM VM IOCTL is allowed. For pKVM and Realm VMs, 
+certain
++ * ioctls are not allowed. Further, certain features are allowed only for
++ * non-protected VMs in pKVM.
++ */
++static inline bool kvm_arch_vm_ioctl_allowed(struct kvm *kvm, unsigned 
+int ioctl)
++{
++       long ext;
++       int r;
++
++       /*
++        * We are guaranteed to be called with a valid kvm instance, as the
++        * only caller is kvm_arch_vm_ioctl(). Catch any deviations, as we
++        * rely on the kvm instance below.
++        */
++       if (WARN_ON_ONCE(!kvm))
++               return false;
++
++       /* Cover both pKVM host and Realm VMs */
++       if (!kvm_vm_hyp_is_distrusting(kvm))
++               return true;
++
 
-> diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/=
-vgic-kvm-device.c
-> --- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
-> +++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-> @@ -566,14 +566,21 @@ static int vgic_v3_attr_regs_access(struct kvm_devi=
-ce *dev,
->  			return -EFAULT;
->  	}
-> =20
-> -	mutex_lock(&dev->kvm->lock);
-> +	/* If the caller has not indicated that it already holds the necessary =
-locks
-> +	 * (e.g., via KVM_DEV_ARM_VGIC_ATTR_FLAG_LOCKED), we must acquire the V=
-M lock
-> +	 * and pause all VCPUs to ensure consistent access to VGIC state. This =
-prevents
-> +	 * race conditions with concurrent interrupt injection or VCPU executio=
-n.
-> +	 */
-> +	if (attr->flags !=3D KVM_DEV_ARM_VGIC_ATTR_FLAG_LOCKED) {
-> +		mutex_lock(&dev->kvm->lock);
+I resorted to is_protected_kvm_enabled() to make it faster than using
+the vm_flavor checks. I could rever those anyways.
 
-[Severity: Critical]
-Can userspace bypass the VGIC data structure locks by setting this flag
-directly?
+> 
+>> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> [...]
+>> @@ -432,7 +432,7 @@ static void init_pkvm_hyp_vm(struct kvm *host_kvm, struct pkvm_hyp_vm *hyp_vm,
+>>
+>>           hyp_vm->host_kvm = host_kvm;
+>>           hyp_vm->kvm.created_vcpus = nr_vcpus;
+>> -        hyp_vm->kvm.arch.pkvm.is_protected = READ_ONCE(host_kvm->arch.pkvm.is_protected);
+>> +        hyp_vm->kvm.arch.vm_flavor = READ_ONCE(host_kvm->arch.vm_flavor);
+> 
+> Could EL2 reduce this to VM_PKVM or VM_PROTECTED_PKVM here instead of
+> storing what it reads? The host supplies the value, and it's now an
+> enum rather than a bool. Patch 12 relies on EL2 only ever seeing those
+> two, and with VM_REALM above the marker a host-written value passes
+> kvm_vm_is_protected() but not the == form, if EL2 ever adds one.
 
-If a userspace process invokes KVM_SET_DEVICE_ATTR or KVM_GET_DEVICE_ATTR
-with attr->flags explicitly set to KVM_DEV_ARM_VGIC_ATTR_FLAG_LOCKED,
-vgic_v3_attr_regs_access() will skip acquiring kvm->lock,
-kvm->arch.config_lock, and all VCPU mutexes.
+Do you mean something like :
 
-Could this allow concurrent modifications to internal VGIC state, leading
-to race conditions or use-after-free regressions?
+	if (kvm_vm_is_protected_pkvm(host_kvm))
+		hyp_vm->kvm.arch.vm_flavor = VM_PROTECTED_PKVM;
+	else
+		hyp_vm->kvm.arch.vm_flavor = VM_PKVM;
 
-[ ... ]
+Do we additionally need to WARN_ON() if we encounter a VM_REALM ?
 
-> +/* vgic_v3_batch_access - Batch access to VGIC registers
-> + *
-> + * @dev: The VGIC device
-> + * @attr: The device attribute containing the batch entries
-> + * @is_write: True for write, false for read
-> + *
-> + * This function allows userspace to read or write multiple VGIC registe=
-rs
-> + * in a single system call, reducing overhead during live migration.
-> + *
-> + * Returns: 0 on success, or the first error encountered.
-> + * Individual entry errors are stored in entries[i].error.
-> + */
-> +static int vgic_v3_batch_access(struct kvm_device *dev,
-> +				struct kvm_device_attr *attr, bool is_write)
-> +{
-[ ... ]
-> +	mutex_lock(&dev->kvm->lock);
-> +	if (kvm_trylock_all_vcpus(dev->kvm)) {
-> +		mutex_unlock(&dev->kvm->lock);
-> +		kvfree(entries);
-> +		return -EBUSY;
-> +	}
-> +	mutex_lock(&dev->kvm->arch.config_lock);
-> +
-> +	/* Process each entry in the batch */
-> +	for (i =3D 0; i < count; i++) {
-> +		int err;
-> +
-> +		sub_attr.group =3D entries[i].group;
-> +		sub_attr.attr =3D entries[i].attr;
-> +		sub_attr.addr =3D (unsigned long)uentries +
-> +			i * sizeof(struct kvm_dev_arm_vgic_batch_entry) +
-> +			offsetof(struct kvm_dev_arm_vgic_batch_entry, val);
-> +
-> +		/* Set flag to indicate that locks are already held.
-> +		 * This prevents vgic_v3_attr_regs_access from acquiring locks again,
-> +		 * avoiding deadlock and overhead.
-> +		 */
-> +		sub_attr.flags =3D KVM_DEV_ARM_VGIC_ATTR_FLAG_LOCKED;
-> +
-> +		err =3D vgic_v3_attr_regs_access(dev, &sub_attr, is_write);
+> 
+> Both hunks are new since v17, which is where I gave the Reviewed-by.
+> Happy to keep it if you can settle these please.
 
-[Severity: High]
-Does executing a user memory access while holding VM locks introduce a
-deadlock regression?
+Apologies, I thought this one didn't change, but later patches changes 
+them, which is why I kept this.
 
-Here sub_attr.addr is assigned a userspace address (uentries), which is
-then passed into vgic_v3_attr_regs_access(). Inside
-vgic_v3_attr_regs_access(), this address is accessed using put_user()
-or get_user():
+Cheers
+Suzuki
 
-    if (!ret && uaccess && !is_write) {
-        u32 __user *uaddr =3D (u32 __user *)(unsigned long)attr->addr;
-        ret =3D put_user(val, uaddr);
-    }
-
-Since the batch caller holds kvm->lock, kvm->arch.config_lock, and all
-vcpu->mutexes, could an untrusted userspace process point uentries to
-userfaultfd-managed memory and intentionally stall the page fault? This
-would keep all global VM and VCPU locks held indefinitely, hanging the VM.
-
-> +
-> +		if (err) {
-> +			pr_err("group %d attr %lld get err %d\n",
-> +				sub_attr.group, sub_attr.attr, err);
-
-[Severity: Medium]
-Is there a risk of userspace flooding the host kernel log buffer here?
-
-This is an unconditional pr_err() driven by user-supplied inputs. Since
-there is no rate limiting and the loop does not abort on error, a batch of
-up to 4096 invalid VGIC attribute entries could spam dmesg and degrade
-host performance.
-
-> +			ret =3D err;
-> +		}
-> +	}
-> +
-> +	mutex_unlock(&dev->kvm->arch.config_lock);
-> +	kvm_unlock_all_vcpus(dev->kvm);
-> +	mutex_unlock(&dev->kvm->lock);
-> +
-> +	kvfree(entries);
-> +	return ret;
-> +}
-
-[Severity: Medium]
-Does this code fail to return the first error or copy the results back to
-userspace?
-
-The function header indicates it should return the first error and store
-individual errors in entries[i].error. However, the loop overwrites ret
-with the most recent error instead of returning immediately.
-
-Furthermore, the entries array is freed here without being copied back to
-user memory, meaning userspace has no way to determine which register
-access actually failed.
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260918081930.4014=
-735-1-wangyize7@huawei.com?part=3D2
