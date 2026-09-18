@@ -1,57 +1,57 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 359B24F7CDD
-	for <kvmarm@lists.linux.dev>; Fri, 18 Sep 2026 13:31:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60B7C4F85AA
+	for <kvmarm@lists.linux.dev>; Fri, 18 Sep 2026 13:31:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789738305; cv=none; b=SEZ4Rqgc7DyieJ+LP9bhsLWSzlsAB7KQ/oen6qItfQsgc5YOvbGDqo98AvIrYO/NFxlDGIR0xBUirBxWZGcF+aBHwTQleaE4n1+034AhrzOz7+bc/MeC7O8k7m7L6W+QxO7M7v96yXqsUQYpZ1nJ4mWOC8A/UWdGECAFW9tjwoM=
+	t=1789738305; cv=none; b=NoRPYffTnyqxzVPNeBXeAcqSFG8gCn94HcSc9CajiFh9AuvsSZbh1djVeykrhcffATZTJgdmD1Zy+5YNsaxqug/ofvuQtaXBs7D9ix0dF6bdKU6ue4Axer3J0gqhJWhm2VwVPX2ubHhyplr2/i2D/JKSVrE03lKWlhbvfRmhSWo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1789738305; c=relaxed/simple;
-	bh=xgyFBZkX1lfguFXAovdRbxiILkOiqxiVY2yq3ZyfKUY=;
+	bh=F2ax8f7E7S119mESAGQy4tAkYSakdMymgCGBt6gUQUU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hWQMj1zcoELCbYH0KZOfjTEWtqJL2ihoYcNQ+Eh8n8dWdZJHISQLace7gP+qNPFQ6wtITj9/tdhKx/E4h+bq89HnIVak7IdnsaLTNiTlgtyzPhuTSohhj3LxZRco/cuTJ2DvbD4uhe2xegQZ02LRxBApgC5cfTf6OtN4Pw7lFiM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=a4ViReZa; arc=none smtp.client-ip=148.163.158.5
+	 MIME-Version; b=KTQjBPoSq4sTWm8DS385X1j1Blflv3qw6k9phSBUq8+Q0rvhWp5ORkARJq2FdyoMvoA6BbR8QQNSxrN3ugs0lhMVdia7uGMYcmgvEkPze8y+7ZnaLHtO3JV5AIqIm34cD9pRhAeeT2XHZxZj+TGZp/0sf9Wo3HUSclG3ULToIrY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=oHqNUUK7; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="a4ViReZa"
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68IA1hDv3979521;
-	Fri, 18 Sep 2026 13:31:22 GMT
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="oHqNUUK7"
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68IA1PqA960700;
+	Fri, 18 Sep 2026 13:31:19 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=6ujg5jeqG2oaiYOFz
-	tA2vnfZWM7LZJyeIoTsnRjkAX8=; b=a4ViReZa5ZcXRJ0nVKwGfniPy4RRrDwFl
-	7zZl5x7AIO8CINzb2SPs/B2xhthzSxjPy2UxT1P6YZAW6dZbFQU6uQ5OjspAmHZS
-	8N/LLh1S917gjpUNLsmkH/j3TAFLXe6EjMOYx+MLqoATUif5tHB3gA7bG95ENzKS
-	xuOqHR2x2rSWF+Ac7RCSS5P6KZRX5HH6KK4QO1l6UaaCfdLR9qb/+OR+V02dozWF
-	l11HZID2JsSf7u5pO7ZtTgwEkQIAVWJb33w5sTu6eFJnmK3CqWc5HFnBF/96LjKZ
-	KCsRNwqtrKy75qvZ1TKAnCn5freAzNXAqwKy0/FIMa7USp+bpUxxg==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gmw5eftsj-1
+	:mime-version:references:subject:to; s=pp1; bh=3mqGfRoVdfq7E+mHT
+	QJBKISisjVhVOSDyzLzlLFbT8s=; b=oHqNUUK7QtMJohudWNUbZxVKDHJRlu5fw
+	288+rIASaeOtn28sQrhlMqsqmNQYs5k5syQ5UYCuFlRk2+oI8RUMaUPJYf2CF1HT
+	KrThW66f53oDnLzybVQOv6iDyCfqdLV3bjfdPT1QYvM3ZGzTX29rgBEIDC7JY8bs
+	y1iC5ub7G0YO16LwDO2lCw5pOOIooE1fO8M/SG8zZ4kNgJ7IUMhAC2pjCfK/dT1x
+	O8LX7W1+BSf2pQIFDCwi0ZPz1bRfsgn4MOzt11i1VRWkfkjvAE1CoWl0TWP9Hg4L
+	uIphVLhKUOQN4SVChheEYd5FWmvq0wYiztJnPLHcBpu4QRGnMR5Xg==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gmxf5gb6k-1
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Fri, 18 Sep 2026 13:31:21 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 68IDNs2H739440;
-	Fri, 18 Sep 2026 13:31:20 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4gs56q88u3-1
+	Fri, 18 Sep 2026 13:31:18 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 68IDOLxU1684689;
+	Fri, 18 Sep 2026 13:31:17 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4gs4tv8bh5-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 18 Sep 2026 13:31:20 +0000 (GMT)
+	Fri, 18 Sep 2026 13:31:17 +0000 (GMT)
 Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 68IDVCQF53215498
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 68IDVAtJ51642848
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 18 Sep 2026 13:31:12 GMT
+	Fri, 18 Sep 2026 13:31:10 GMT
 Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7C7DC20049;
-	Fri, 18 Sep 2026 13:31:12 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 0412C20040;
+	Fri, 18 Sep 2026 13:31:10 +0000 (GMT)
 Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2DE082004B;
-	Fri, 18 Sep 2026 13:31:12 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id A8A832004B;
+	Fri, 18 Sep 2026 13:31:09 +0000 (GMT)
 Received: from tuxmaker.lnxne.boe (unknown [9.87.85.9])
 	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 18 Sep 2026 13:31:12 +0000 (GMT)
+	Fri, 18 Sep 2026 13:31:09 +0000 (GMT)
 From: Steffen Eiden <seiden@linux.ibm.com>
 To: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
         linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
@@ -77,9 +77,9 @@ Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
         Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v8 12/29] arm64: sysreg: Convert SPSR_ELx to automatic register generation
-Date: Fri, 18 Sep 2026 15:30:49 +0200
-Message-ID: <20260918133107.1042730-13-seiden@linux.ibm.com>
+Subject: [PATCH v8 05/29] KVM: Restrict kvm_get_kvm/kvm_put_kvm export to internal KVM modules
+Date: Fri, 18 Sep 2026 15:30:42 +0200
+Message-ID: <20260918133107.1042730-6-seiden@linux.ibm.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260918133107.1042730-1-seiden@linux.ibm.com>
 References: <20260918133107.1042730-1-seiden@linux.ibm.com>
@@ -92,132 +92,93 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTE4MDE4NCBTYWx0ZWRfX9SeeaGmrAO6i
- eSs60ivzBVn0Ia8MEbS3fNkVfiaSu7oXTD4opt8F4NIygUYrBCjxkF4JMltZ0eGXa2OhN+IaKEq
- nLGirM+xCgjfOU82M6r6gwy66u5z7MPM3r4GPQDEYot+jL44P3ypDx26NfIuybOcHVmdmKqxg02
- 3uQ+O29K32ZbaisbAP7HAJ82M+5ucJbuSSmXchD64uSnMksURhISnZ8RJfQRXdz/RA2zm2LOnYx
- cHzuHA6MjVxS47LtfDxc5TZazqm/HiNe8t+6euZTlnGn4yU05YeGrvrtKl26YcK2uuSroDNphaS
- FsPFLwSmCKSujo72H3OpHncFFbGaSKq3ZZuUBDtXly90oFc4uerRqxkrcPLu2VwgOc0Gdp5eALQ
- pjWNBuzOuaV8fnCCCTf8mexkDUExa4PcvGvRRE5LC7aDZuSV1uGzkNFnjj1Jp4rBBVPcAnvxWYN
- sVDZhXJOR9io8FgHcDg==
-X-Authority-Analysis: v=2.4 cv=E/NYNqdl c=1 sm=1 tr=0 ts=6aad3d29 cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+X-Proofpoint-GUID: IzGp1T9JHTVQGhSGOM8MW0mgylfcyXqI
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTE4MDE4NCBTYWx0ZWRfX/Ce7xezjbWGc
+ qVkDsiLCaMfAhjqgZ+cHJvVobHmEsQKxt0wSKboXRDAgAmKMhvXeyug1/kVmlJWftHXcll0D7Ft
+ P9Z4ziUSWtPBeTADmfH6Z1hzUc3egOk=
+X-Authority-Analysis: v=2.4 cv=cvgOAF4i c=1 sm=1 tr=0 ts=6aad3d27 cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
  a=VdqzKS8jKosA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
- a=V8glGbnc2Ofi9Qvn3v5h:22 a=VnNF1IyMAAAA:8 a=qAnUzrOnmDNqMeXR4cMA:9
-X-Proofpoint-ORIG-GUID: oSxcbNzd3Cv9LjDtWOtb6m-y7R9u6NOs
-X-Proofpoint-Spam-Info: AW1haW4tMjYwOTE4MDE4NCBTYWx0ZWRfX1tW5FVWgaOiZ
- l1gJhiJepboIh873XtOWXf81KyrhD967GRegWRYWu6KDg7bOfI9XdGpla19GFtsmFPNdrX4rqkf
- WowuEGGZujLyCg3UZX+BnDt99jqT0z0=
-X-Proofpoint-GUID: WvcPuc0D3J2eK4oREXHIxHlFwLPERoiI
+ a=U7nrCbtTmkRpXpFmAIza:22 a=1XWaLZrsAAAA:8 a=VnNF1IyMAAAA:8
+ a=cWV-k8hB2h86IYwIXi4A:9
+X-Proofpoint-ORIG-GUID: 2cK9Jgsw_kboKG4yhhAg5SVvhmho0g-i
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTE4MDE4NCBTYWx0ZWRfX9/m04V2tjKkt
+ u0p1Ywr4vzs+xtCXCwLsTXBrSimc9Y1jKn/WJjwZB/2bKRp3mkp2plHyZQ1W3tY3s5ub7D9Go9H
+ ozdg0N7BltEBDJaLyUuMoPJaugHRV71DJXj0S/ylryqgi+B0ajOIFIy/6RzyXNEtn8pOP8ukGPx
+ GbZU1kYkjpD3E9gHMzxUpjI7OioFRiiolwAdirWiT2zdHN7IuY2iLOh4fdR+RxAOOOy98PsreTq
+ rTkEXXC7WSGsCYMC4RUq8sCtshZSG0jodu6T+VOsPaNMjjXTl2TdW7eZmGFVB8kyWS7Lv/Iw083
+ PV+cJDNdbvjv0aveIZbnoP4Z0tp62Bm77PwCbloSB60lRQffrOdTaqnTD12NV8/TX+VmMNf61uR
+ YRXJxYsPCNpQVYUyEJIR1PJTPozDoK5DJpZfSTTOEVLwQPfj+/XfGemwxabGyjOmNdVq87KyhhJ
+ ugNvtwvzD4kJBYryP0Q==
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
  definitions=2026-09-18_03,2026-09-16_02,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 lowpriorityscore=0 priorityscore=1501 spamscore=0
- adultscore=0 clxscore=1015 bulkscore=0 malwarescore=0 suspectscore=0
- phishscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ malwarescore=0 lowpriorityscore=0 clxscore=1015 priorityscore=1501
+ suspectscore=0 bulkscore=0 impostorscore=0 phishscore=0 spamscore=0
+ adultscore=0 classifier=typeunknown authscore=0 authtc= authcc=
  route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2609040000
  definitions=main-2609180184
 
-Convert SPSR_EL{1, 2, 12} to automatic register generation as per
-DDIO616 2026-06. No functional change.
+Switch kvm_get_kvm, kvm_get_kvm_safe, and kvm_put_kvm from
+EXPORT_SYMBOL_GPL to EXPORT_SYMBOL_FOR_KVM_INTERNAL. These symbols are
+now only used within KVM itself. No external module needs them now that
+VFIO uses file-based reference counting. Remove the corresponding
+exemptions from the x86 KVM Makefile exports check.
 
+Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
 ---
- arch/arm64/include/asm/sysreg.h |  3 --
- arch/arm64/tools/sysreg         | 51 +++++++++++++++++++++++++++++++++
- 2 files changed, 51 insertions(+), 3 deletions(-)
+ arch/x86/kvm/Makefile | 5 +----
+ virt/kvm/kvm_main.c   | 6 +++---
+ 2 files changed, 4 insertions(+), 7 deletions(-)
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 4bfdac9401bd..1aa601c95188 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -295,7 +295,6 @@
- #define SYS_APGAKEYLO_EL1		sys_reg(3, 0, 2, 3, 0)
- #define SYS_APGAKEYHI_EL1		sys_reg(3, 0, 2, 3, 1)
+diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
+index e6d395ede9e2..c6bf463f5032 100644
+--- a/arch/x86/kvm/Makefile
++++ b/arch/x86/kvm/Makefile
+@@ -61,10 +61,7 @@ exports_grep_trailer := --include='*.[ch]' -nrw $(srctree)/virt/kvm $(srctree)/a
+ 				-e kvm_page_track_unregister_notifier \
+ 				-e kvm_write_track_add_gfn \
+ 				-e kvm_write_track_remove_gfn \
+-				-e kvm_file_to_kvm_fn \
+-				-e kvm_get_kvm \
+-				-e kvm_get_kvm_safe \
+-				-e kvm_put_kvm
++				-e kvm_file_to_kvm_fn
  
--#define SYS_SPSR_EL1			sys_reg(3, 0, 4, 0, 0)
- #define SYS_ELR_EL1			sys_reg(3, 0, 4, 0, 1)
+ # Force grep to emit a goofy group separator that can in turn be replaced with
+ # the above newline macro (newlines in Make are a nightmare).  Note, grep only
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index bab71d398236..891a67cb365a 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1314,7 +1314,7 @@ void kvm_get_kvm(struct kvm *kvm)
+ {
+ 	refcount_inc(&kvm->users_count);
+ }
+-EXPORT_SYMBOL_GPL(kvm_get_kvm);
++EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_get_kvm);
  
- #define SYS_ICC_PMR_EL1			sys_reg(3, 0, 4, 6, 0)
-@@ -518,7 +517,6 @@
- #define SYS_VTTBR_EL2			sys_reg(3, 4, 2, 1, 0)
+ /*
+  * Make sure the vm is not during destruction, which is a safe version of
+@@ -1324,14 +1324,14 @@ bool kvm_get_kvm_safe(struct kvm *kvm)
+ {
+ 	return refcount_inc_not_zero(&kvm->users_count);
+ }
+-EXPORT_SYMBOL_GPL(kvm_get_kvm_safe);
++EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_get_kvm_safe);
  
- #define SYS_HAFGRTR_EL2			sys_reg(3, 4, 3, 1, 6)
--#define SYS_SPSR_EL2			sys_reg(3, 4, 4, 0, 0)
- #define SYS_ELR_EL2			sys_reg(3, 4, 4, 0, 1)
- #define SYS_SP_EL1			sys_reg(3, 4, 4, 1, 0)
- #define SYS_SPSR_irq			sys_reg(3, 4, 4, 3, 0)
-@@ -604,7 +602,6 @@
- #define SYS_BRBCR_EL12			sys_reg(2, 5, 9, 0, 0)
- #define SYS_TTBR0_EL12			sys_reg(3, 5, 2, 0, 0)
- #define SYS_TTBR1_EL12			sys_reg(3, 5, 2, 0, 1)
--#define SYS_SPSR_EL12			sys_reg(3, 5, 4, 0, 0)
- #define SYS_ELR_EL12			sys_reg(3, 5, 4, 0, 1)
- #define SYS_AFSR0_EL12			sys_reg(3, 5, 5, 1, 0)
- #define SYS_AFSR1_EL12			sys_reg(3, 5, 5, 1, 1)
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index e2d37ee221b8..893b5f9df575 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -401,6 +401,57 @@ Res0	3:1
- Field	0	SO
- EndSysreg
+ void kvm_put_kvm(struct kvm *kvm)
+ {
+ 	if (refcount_dec_and_test(&kvm->users_count))
+ 		kvm_destroy_vm(kvm);
+ }
+-EXPORT_SYMBOL_GPL(kvm_put_kvm);
++EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_put_kvm);
  
-+SysregFields	SPSR_ELx
-+Res0	63:37
-+Field	36	UINJ
-+Field	35	PACM
-+Field	34	EXLOCK
-+Res0	33
-+Field	32	PM
-+Field	31	N
-+Field	30	Z
-+Field	29	C
-+Field	28	V
-+Res0	27:26
-+Field	25	TCO
-+Field	24	DIT
-+Field	23	UAO
-+Field	22	PAN
-+Field	21	SS
-+Field	20	IL
-+Res0	19:14
-+Field	13	ALLINT
-+Field	12	SSBS
-+Field	11:10	BTYPE
-+Field	9	D
-+Field	8	A
-+Field	7	I
-+Field	6	F
-+Res0	5
-+Field	4	M4
-+Enum	3:0	M
-+	0b0000	EL0
-+	0b0100	EL1t
-+	0b0101	EL1h
-+	0b1000	EL2t
-+	0b1001	EL2h
-+	0b1100	EL3t
-+	0b1101	EL3h
-+EndEnum
-+EndSysregFields
-+
-+Sysreg	SPSR_EL1	3	0	4	0	0
-+Fields	SPSR_ELx
-+EndSysreg
-+
-+Sysreg	SPSR_EL2	3	4	4	0	0
-+Fields	SPSR_ELx
-+EndSysreg
-+
-+Sysreg	SPSR_EL12	3	5	4	0	0
-+Mapping	SPSR_EL1
-+EndSysreg
-+
- Sysreg ID_PFR0_EL1	3	0	0	1	0
- Res0	63:32
- UnsignedEnum	31:28	RAS
+ /*
+  * Used to put a reference that was taken on behalf of an object associated
 -- 
 2.53.0
 
