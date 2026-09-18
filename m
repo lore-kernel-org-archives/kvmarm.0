@@ -1,59 +1,55 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6441392838;
-	Fri, 18 Sep 2026 12:08:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58C3F4B66FB;
+	Fri, 18 Sep 2026 12:22:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789733329; cv=none; b=XXT3lTBAS9OXlti75rtWhS6aEcXeKg0azzGPK5hEXhRDAM+e10sGQwQX2LzM0dkwGffpaCJTUiF61XMsUxtXnFcajOa7xsdV5TlVISic8sTCWIRYrW2XFv/WlfZ+Yc5xrFvlQ+TQPqEq5/RiFAylRlhjiIWC++SaWEg6q+iibig=
+	t=1789734141; cv=none; b=sBfCwWHohnLeSP9Jb2uUYuuwWs+lW6V4zvZqbq8qwYFAvm9F8tgKMxV+SgCVLp6hfZ8zlECq1cOz5uJFXWC6hl9F2qDKJIhNxyA81VJq1p63yaHCSVnxcNyLYb//LgF4NmuLN7QnwASUHD4uu0JbASNoW7/WWyKuffotDkOHIDI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789733329; c=relaxed/simple;
-	bh=3HbIWXGLsOu382WvPEzkFJrJvJlDUfpVXL/Umg8mu3w=;
+	s=arc-20240116; t=1789734141; c=relaxed/simple;
+	bh=lEELuZkcKmWVga9GWoWIwjLxbdU3EaN+HUnTEhXOFqM=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ge9WOYGD58gjNk7ne/Wd5xWyeFt4JMwz+NLBBhj8p+ruAzVIJRov824GB4QU7CDpmJ5zGcd35s9bJ1RqCufIormsmqs59waLtW0X2ssg3A0sQrfC2hPIPWp4l1mgDu6+M8ndjZRRPJVzfVbSsS4luamIQ+0GB4tytBzovLmkMC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hZOcONQZ; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=MFQOKTkY2W6NZtUpcKSQeAGeJQJTfZYheC0ouTuf+SPc9q/3GXFMl5UrrxQGpDcX9h4+kytH9iIp76n8SK2H9E7Rg+HLTOPKOntIJCiaHJjNeUswtdUiEmLIXVo4am1DTUc4M9DYajW2LPGwDxZgt/NsoAn7ZTjMwiN8krfpCsE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MJesS2IT; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hZOcONQZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 996E91F000FF;
-	Fri, 18 Sep 2026 12:08:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MJesS2IT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED4871F000FF;
+	Fri, 18 Sep 2026 12:22:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789733328;
-	bh=G4d5dLgZ43pLk8TSCsaTKNXKqimNxe33+rcdWHI4/Ps=;
+	s=k20260515; t=1789734140;
+	bh=d/FKmRJTFKjN61zM8Shm3EAv+49OCi1rIwEX+Kc9iSg=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=hZOcONQZM/7dyiIb7+ABgovOGFzxsjfE2GXrUOCGH3p9zOIG/4jfmxC5JYF5R9Sxp
-	 qTDnAMT/Ef0urHdJFDozTZ2B0qR2F3RRtYT0qWVv57+fZraHO+fzv210gGOILxIDie
-	 v7e+pclrwT/8hXbswE+Lt+7bM/Lq/6fXNzwO/myEvu2IqBgIqzZcR6PcMA9TIsReeZ
-	 FpSDpRBecChPm4MR7yYy226fD6lD//juIo8yyt8yIlbxWerkFMKtvBNX0Fiy+ZEi9q
-	 A4ivdS240J/HG8JJGwUt7DtTaVk6iSPpL3KlPk6W4YWmyVAH0IyHBQ2c1kYs694LUQ
-	 0ar2KY27fkkmA==
+	b=MJesS2IT6/CHQ8vTOBoPSbef7+P6PbR2delYAoJYpAXdZsBdcgZEqlBghTt5CsHY7
+	 hAbqG0D7N4L3tby5YPivtWfDGi66Qi0FNXPngGYBShEonzaaIWD7KnP5OhQnkgptVM
+	 652QvrSsvRnykVQI0a3Vko6PpsZ3uQ8ATwXDzZnKa/Swqjgj4Da5UtijM124K4IgY6
+	 C5xydH+0DoxjvZ4eXZK/zDcy96qKKQSXxt7JRmS4N+uY49M901pUlzszpBb6hI2j/k
+	 iSQ6uNcbTTBrx7AcXHY4SjXR2OL4w+dkh6xts1vQrkyCuFALhh6nf29Uyj37jUdvns
+	 4GazOT4QfNwjA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1x7XOY-0000000Aaln-1a8h;
-	Fri, 18 Sep 2026 12:08:46 +0000
-Date: Fri, 18 Sep 2026 13:08:45 +0100
-Message-ID: <861paq69te.wl-maz@kernel.org>
+	id 1x7Xbd-0000000Ab7M-3nmh;
+	Fri, 18 Sep 2026 12:22:17 +0000
+Date: Fri, 18 Sep 2026 13:22:17 +0100
+Message-ID: <86zexe4ume.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Yize Wang <wangyize7@huawei.com>
-Cc: <kvmarm@lists.linux.dev>,
-	<linux-arm-kernel@lists.infradead.org>,
-	<linux-kernel@vger.kernel.org>,
-	<oupton@kernel.org>,
-	<catalin.marinas@arm.com>,
-	<will@kernel.org>,
-	<fuad.tabba@linux.dev>,
-	<joey.gouly@arm.com>,
-	<seiden@linux.ibm.com>,
-	<suzuki.poulose@arm.com>,
-	<yuzenghui@huawei.com>,
-	<mark.rutland@arm.com>,
-	<zhengchuan@huawei.com>,
-	<jiangjiacheng@huawei.com>,
-	<yize_w1110@163.com>
-Subject: Re: [PATCH 0/2] Batch register access for live migration optimization
-In-Reply-To: <20260918081930.4014735-1-wangyize7@huawei.com>
-References: <20260918081930.4014735-1-wangyize7@huawei.com>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: will@kernel.org,
+	julien.thierry.kdev@gmail.com,
+	kvm@vger.kernel.org,
+	oupton@kernel.org,
+	fuad.tabba@linux.dev,
+	joey.gouly@arm.com,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH kvmtool 0/7] Fix --vcpu-affinity
+In-Reply-To: <20260917154932.193943-1-alexandru.elisei@arm.com>
+References: <20260917154932.193943-1-alexandru.elisei@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -65,59 +61,21 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: wangyize7@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, oupton@kernel.org, catalin.marinas@arm.com, will@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, zhengchuan@huawei.com, jiangjiacheng@huawei.com, yize_w1110@163.com
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, will@kernel.org, julien.thierry.kdev@gmail.com, kvm@vger.kernel.org, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 18 Sep 2026 09:18:13 +0100,
-Yize Wang <wangyize7@huawei.com> wrote:
+On Thu, 17 Sep 2026 16:49:25 +0100,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > 
-> This series adds batch register access support to KVM/arm64 to reduce
-> syscall overhead during VM live migration.
-> 
-> Currently, QEMU issues one ioctl per register when saving/restoring VGIC
-> state. On large VM configurations this means tens of thousands of syscalls,
-> where lock acquisition and context switch overhead dominates migration
-> downtime. Thus, we provide a batch register method to allow userspace
-> read/write multiple distributor and redistributor registers in a single call.
-> In this way, we can significantly reduce syscalls and migration downtime.
-> 
-> Test the VM migration time under pressure conditions.
-> The VM specifications for migration are as follows:
-> - VM use 4-K page;
-> - the number of VCPU is 160;
-> - the total memory is 320Gigabit;
-> - use 'Redis SET-benchmark' to pressurize VM;
-> 
-> Performance results (3-run average, ms):
->     | Metric              | Without patch | With patch | Improvement |
->     |---------------------|---------------|------------|-------------|
->     | Migration downtime  |        536    |     321    |     40%     |
->     | Source (total)      |        344    |     230    |     33%     |
->     |   - VGIC put        |        158    |      40    |     75%     |
->     |   - VGIC get        |        120    |      19    |     84%     |
->     | Destination (total) |        192    |      91    |     53%     |
->     |   - VGIC put        |        132    |      27    |     80%     |
-> 
-> Yize Wang (2):
->   KVM: arm64: Add batch group constant and data structure to UAPI header
->   KVM: arm64: Add VGIC v3 batch register access implementation
+> Tested on an Orion board and a x86 machine. On the x86 machine, there's was this
+> one thread called 'kvm-nx-lpage-re' which had affinity of the VCPUs, but I
+> couldn't figure out where it was created. I grep'ed for each part of the name in
+> the source node, no luck. I used strace, and couldn't see a clone call that
+> returned the corresponding pid. Any clues would be appreciated.
 
-Questions:
-
-- Why only the MMIO registers?
-
-- Why not the sysregs?
-
-- Why only the GIC?
-
-- Why not all of the state?
-
-- Where is the corresponding userspace code?
-
-More importantly, since this is about batching system calls:
-
-- Why can't this be done with io_uring instead?
+This is a KVM internal thread, from what I can tell. See
+arch/x86/kvm/mmu/mmu.c::kvm_mmu_start_lpage_recovery().
 
 	M.
 
