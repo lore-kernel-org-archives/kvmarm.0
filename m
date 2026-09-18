@@ -1,57 +1,57 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60B7C4F85AA
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B22D4F85B4
 	for <kvmarm@lists.linux.dev>; Fri, 18 Sep 2026 13:31:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789738305; cv=none; b=NoRPYffTnyqxzVPNeBXeAcqSFG8gCn94HcSc9CajiFh9AuvsSZbh1djVeykrhcffATZTJgdmD1Zy+5YNsaxqug/ofvuQtaXBs7D9ix0dF6bdKU6ue4Axer3J0gqhJWhm2VwVPX2ubHhyplr2/i2D/JKSVrE03lKWlhbvfRmhSWo=
+	t=1789738306; cv=none; b=Q0srwlcGOCRcH73IO8MlgqzRCWc0OwUqaY/S+3g10wk/4L3l2ysjW4hqG+yyZB6bqJ454x7E4Y94LWKDmfLGP4LkhR3XLOYPy1YOVYL2wKb5UiJSh6lwMadRQpPzlHt84LyaiVpp6Q2NYLcCh6GorJDBx4luRaBofHZSFhw+e/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789738305; c=relaxed/simple;
-	bh=F2ax8f7E7S119mESAGQy4tAkYSakdMymgCGBt6gUQUU=;
+	s=arc-20240116; t=1789738306; c=relaxed/simple;
+	bh=QfQ8k6bv2crdYgt2de4mPlgLdFS3kW2o5ooo31+T+k4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KTQjBPoSq4sTWm8DS385X1j1Blflv3qw6k9phSBUq8+Q0rvhWp5ORkARJq2FdyoMvoA6BbR8QQNSxrN3ugs0lhMVdia7uGMYcmgvEkPze8y+7ZnaLHtO3JV5AIqIm34cD9pRhAeeT2XHZxZj+TGZp/0sf9Wo3HUSclG3ULToIrY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=oHqNUUK7; arc=none smtp.client-ip=148.163.156.1
+	 MIME-Version; b=ttu0lDy0X8+PwydYtApLL/L8XsRdRSNBUCjhOyjfkUz/UEfKAt7Yw3XyIqhLR0mVQuIvZ68AiUeC7lZlgUKlEY5Iajud9qRPkrFlRbO+BEHMe45WQ4124VUG/gf0/VNAXMBEAGr/cLRtTcGLKQb8bZlPZ6PPM/McXob0/HMKTAg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=TxuRd6GE; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="oHqNUUK7"
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68IA1PqA960700;
-	Fri, 18 Sep 2026 13:31:19 GMT
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="TxuRd6GE"
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68IA1fgq803525;
+	Fri, 18 Sep 2026 13:31:21 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=3mqGfRoVdfq7E+mHT
-	QJBKISisjVhVOSDyzLzlLFbT8s=; b=oHqNUUK7QtMJohudWNUbZxVKDHJRlu5fw
-	288+rIASaeOtn28sQrhlMqsqmNQYs5k5syQ5UYCuFlRk2+oI8RUMaUPJYf2CF1HT
-	KrThW66f53oDnLzybVQOv6iDyCfqdLV3bjfdPT1QYvM3ZGzTX29rgBEIDC7JY8bs
-	y1iC5ub7G0YO16LwDO2lCw5pOOIooE1fO8M/SG8zZ4kNgJ7IUMhAC2pjCfK/dT1x
-	O8LX7W1+BSf2pQIFDCwi0ZPz1bRfsgn4MOzt11i1VRWkfkjvAE1CoWl0TWP9Hg4L
-	uIphVLhKUOQN4SVChheEYd5FWmvq0wYiztJnPLHcBpu4QRGnMR5Xg==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gmxf5gb6k-1
+	:mime-version:references:subject:to; s=pp1; bh=RH7/ACgaLAD7xiHpi
+	23Sm9CXa397B2KbF2Zs4gvs6bI=; b=TxuRd6GEvIDaUeTuWYkqIuTGCWsIJbI0f
+	PAYs+vRgRT6tMsjwfK2YGOxQw9zFaMriFhZfvdyuSBDjYyEXlk3YTalTNonK9FUY
+	h+lsaHq+qEdrQaGMCFiN9KWMfnsWcnmm+UHKDZfAZv38Y+GV0uACDWKiGiigWYIt
+	GlrpGuT0GvkfCL3i0kY1lEYCU7mhMZjwpKlfMN2HM6XluFH5UxDMvD58NWmCJbsx
+	nZbXkTNTZDTbtf5lnXfrN/CXd2nGtEfWAu+7ow7uJbXPNEi7RNssfRp4V5PbRcx+
+	FJzWMJDeeAYZE0/nBBPPv9XEoWRzH4tBJDYLJNtRVE9hq72S+Yw2A==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gmv5j8145-1
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Fri, 18 Sep 2026 13:31:18 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 68IDOLxU1684689;
-	Fri, 18 Sep 2026 13:31:17 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4gs4tv8bh5-1
+	Fri, 18 Sep 2026 13:31:20 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 68IDOCl1695830;
+	Fri, 18 Sep 2026 13:31:20 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4gra3fek79-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 18 Sep 2026 13:31:17 +0000 (GMT)
+	Fri, 18 Sep 2026 13:31:19 +0000 (GMT)
 Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 68IDVAtJ51642848
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 68IDV8ao51642828
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 18 Sep 2026 13:31:10 GMT
+	Fri, 18 Sep 2026 13:31:09 GMT
 Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0412C20040;
-	Fri, 18 Sep 2026 13:31:10 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id DCBE220040;
+	Fri, 18 Sep 2026 13:31:08 +0000 (GMT)
 Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A8A832004B;
-	Fri, 18 Sep 2026 13:31:09 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 8E59020049;
+	Fri, 18 Sep 2026 13:31:08 +0000 (GMT)
 Received: from tuxmaker.lnxne.boe (unknown [9.87.85.9])
 	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 18 Sep 2026 13:31:09 +0000 (GMT)
+	Fri, 18 Sep 2026 13:31:08 +0000 (GMT)
 From: Steffen Eiden <seiden@linux.ibm.com>
 To: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
         linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
@@ -77,9 +77,9 @@ Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
         Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v8 05/29] KVM: Restrict kvm_get_kvm/kvm_put_kvm export to internal KVM modules
-Date: Fri, 18 Sep 2026 15:30:42 +0200
-Message-ID: <20260918133107.1042730-6-seiden@linux.ibm.com>
+Subject: [PATCH v8 02/29] KVM: Add file back-pointer to struct kvm
+Date: Fri, 18 Sep 2026 15:30:39 +0200
+Message-ID: <20260918133107.1042730-3-seiden@linux.ibm.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260918133107.1042730-1-seiden@linux.ibm.com>
 References: <20260918133107.1042730-1-seiden@linux.ibm.com>
@@ -92,93 +92,86 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-GUID: IzGp1T9JHTVQGhSGOM8MW0mgylfcyXqI
-X-Proofpoint-Spam-Info: AW1haW4tMjYwOTE4MDE4NCBTYWx0ZWRfX/Ce7xezjbWGc
- qVkDsiLCaMfAhjqgZ+cHJvVobHmEsQKxt0wSKboXRDAgAmKMhvXeyug1/kVmlJWftHXcll0D7Ft
- P9Z4ziUSWtPBeTADmfH6Z1hzUc3egOk=
-X-Authority-Analysis: v=2.4 cv=cvgOAF4i c=1 sm=1 tr=0 ts=6aad3d27 cx=c_pps
- a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTE4MDE4NCBTYWx0ZWRfX9xIhu1g9ugrX
+ rH4DjmJFGl8+lyQPTbtptshAtETCkgumxcoebAzSqdVptl4BKNfxgmwR5CWWeHNj7t4X+XFS8H8
+ OoJ6tytuZd6znqTlmLnzkuow6Wvvvt7QOF3rDLpsGX9J9g+3p4Xomo8WC3nb8PUWtTi/mTaIYWJ
+ h/LiiGRKzWIL/Z/rthHqr+/ZaXTt4zwM5qjoFvMS86ULz/cj7OZ7+tWCC+WY0V99GxVa9a+9KeH
+ AWeh38cbWwX/lJj3E1pBPLHTuDZvVuwmZ80jHiEmW3zcOfp8VpIwkmOWAaCUjhtcVZV7IFU5I0l
+ Of8O38piHZDqih2GmuoXZt1zG78Xl+UlH46BuLtjTDr6xLsRUc/RjbGTfmolG4xa0Y2Z55hqCvr
+ 00WibjrLsXQ/zdx3KxpQlpxxJyYxEw6L3GLKzhQisz7pKVLlLNikNfYme9U2e1hIIMppWnVYD6V
+ FwyDd/RYi2DSNNZgTPg==
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTE4MDE4NCBTYWx0ZWRfX6I+kRjZoQGyD
+ vpYKSCuMscvu/Vxtyd30LkMGo8FBLEAp5tGdrIUeTJhqCCdShCZc9ERtbIZc2O96UMP7Bak0sR6
+ /JYJ/q3d4yvfGTiBlulpDZ8UMOewdvI=
+X-Authority-Analysis: v=2.4 cv=Zsx4uN7G c=1 sm=1 tr=0 ts=6aad3d29 cx=c_pps
+ a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
  a=VdqzKS8jKosA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
- a=U7nrCbtTmkRpXpFmAIza:22 a=1XWaLZrsAAAA:8 a=VnNF1IyMAAAA:8
- a=cWV-k8hB2h86IYwIXi4A:9
-X-Proofpoint-ORIG-GUID: 2cK9Jgsw_kboKG4yhhAg5SVvhmho0g-i
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTE4MDE4NCBTYWx0ZWRfX9/m04V2tjKkt
- u0p1Ywr4vzs+xtCXCwLsTXBrSimc9Y1jKn/WJjwZB/2bKRp3mkp2plHyZQ1W3tY3s5ub7D9Go9H
- ozdg0N7BltEBDJaLyUuMoPJaugHRV71DJXj0S/ylryqgi+B0ajOIFIy/6RzyXNEtn8pOP8ukGPx
- GbZU1kYkjpD3E9gHMzxUpjI7OioFRiiolwAdirWiT2zdHN7IuY2iLOh4fdR+RxAOOOy98PsreTq
- rTkEXXC7WSGsCYMC4RUq8sCtshZSG0jodu6T+VOsPaNMjjXTl2TdW7eZmGFVB8kyWS7Lv/Iw083
- PV+cJDNdbvjv0aveIZbnoP4Z0tp62Bm77PwCbloSB60lRQffrOdTaqnTD12NV8/TX+VmMNf61uR
- YRXJxYsPCNpQVYUyEJIR1PJTPozDoK5DJpZfSTTOEVLwQPfj+/XfGemwxabGyjOmNdVq87KyhhJ
- ugNvtwvzD4kJBYryP0Q==
+ a=Y2IxJ9c9Rs8Kov3niI8_:22 a=1XWaLZrsAAAA:8 a=VnNF1IyMAAAA:8
+ a=q3OYOvv_GcRzabu4IdsA:9
+X-Proofpoint-ORIG-GUID: hhakXsoQk_t-0CLSijhO_PAbfQM46rA6
+X-Proofpoint-GUID: tNskIW43qKDl8CnCnNcc1c165n-p9K5N
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
  definitions=2026-09-18_03,2026-09-16_02,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 lowpriorityscore=0 clxscore=1015 priorityscore=1501
- suspectscore=0 bulkscore=0 impostorscore=0 phishscore=0 spamscore=0
- adultscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ malwarescore=0 impostorscore=0 clxscore=1015 priorityscore=1501
+ lowpriorityscore=0 bulkscore=0 adultscore=0 phishscore=0 spamscore=0
+ suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
  route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2609040000
  definitions=main-2609180184
 
-Switch kvm_get_kvm, kvm_get_kvm_safe, and kvm_put_kvm from
-EXPORT_SYMBOL_GPL to EXPORT_SYMBOL_FOR_KVM_INTERNAL. These symbols are
-now only used within KVM itself. No external module needs them now that
-VFIO uses file-based reference counting. Remove the corresponding
-exemptions from the x86 KVM Makefile exports check.
+Add kvm->file as a no-reference back-pointer to the VM file in struct
+kvm. The pointer is set at VM creation time and cleared under
+WRITE_ONCE() in kvm_vm_release() before the file is freed.
+Callers storing the file must take their own reference.
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
+Co-developed-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
 ---
- arch/x86/kvm/Makefile | 5 +----
- virt/kvm/kvm_main.c   | 6 +++---
- 2 files changed, 4 insertions(+), 7 deletions(-)
+ include/linux/kvm_host.h | 6 ++++++
+ virt/kvm/kvm_main.c      | 4 ++++
+ 2 files changed, 10 insertions(+)
 
-diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
-index e6d395ede9e2..c6bf463f5032 100644
---- a/arch/x86/kvm/Makefile
-+++ b/arch/x86/kvm/Makefile
-@@ -61,10 +61,7 @@ exports_grep_trailer := --include='*.[ch]' -nrw $(srctree)/virt/kvm $(srctree)/a
- 				-e kvm_page_track_unregister_notifier \
- 				-e kvm_write_track_add_gfn \
- 				-e kvm_write_track_remove_gfn \
--				-e kvm_file_to_kvm_fn \
--				-e kvm_get_kvm \
--				-e kvm_get_kvm_safe \
--				-e kvm_put_kvm
-+				-e kvm_file_to_kvm_fn
- 
- # Force grep to emit a goofy group separator that can in turn be replaced with
- # the above newline macro (newlines in Make are a nightmare).  Note, grep only
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index a1bf6d4a8f46..2b56fb4e8555 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -784,6 +784,12 @@ struct kvm {
+ 	 * kvm_swap_active_memslots().
+ 	 */
+ 	struct mutex slots_arch_lock;
++	/*
++	 * Back-reference to the VM file for subsystems (e.g., VFIO). Holds no
++	 * reference to avoid pinning the VM. Callers storing the file must
++	 * take their own reference.
++	 */
++	struct file *file;
+ 	struct mm_struct *mm; /* userspace tied to this vm */
+ 	unsigned long nr_memslot_pages;
+ 	/* The two memslot sets - active and inactive (per address space) */
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index bab71d398236..891a67cb365a 100644
+index 0172ca94f82e..bab71d398236 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -1314,7 +1314,7 @@ void kvm_get_kvm(struct kvm *kvm)
- {
- 	refcount_inc(&kvm->users_count);
- }
--EXPORT_SYMBOL_GPL(kvm_get_kvm);
-+EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_get_kvm);
+@@ -1352,6 +1352,8 @@ static int kvm_vm_release(struct inode *inode, struct file *filp)
  
- /*
-  * Make sure the vm is not during destruction, which is a safe version of
-@@ -1324,14 +1324,14 @@ bool kvm_get_kvm_safe(struct kvm *kvm)
- {
- 	return refcount_inc_not_zero(&kvm->users_count);
- }
--EXPORT_SYMBOL_GPL(kvm_get_kvm_safe);
-+EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_get_kvm_safe);
+ 	kvm_irqfd_release(kvm);
  
- void kvm_put_kvm(struct kvm *kvm)
- {
- 	if (refcount_dec_and_test(&kvm->users_count))
- 		kvm_destroy_vm(kvm);
++	WRITE_ONCE(kvm->file, NULL);
++
+ 	kvm_put_kvm(kvm);
+ 	return 0;
  }
--EXPORT_SYMBOL_GPL(kvm_put_kvm);
-+EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_put_kvm);
+@@ -5532,6 +5534,8 @@ static int kvm_dev_ioctl_create_vm(unsigned long type)
+ 		goto put_kvm;
+ 	}
  
- /*
-  * Used to put a reference that was taken on behalf of an object associated
++	kvm->file = file;
++
+ 	/*
+ 	 * Don't call kvm_put_kvm anymore at this point; file->f_op is
+ 	 * already set, with ->release() being kvm_vm_release().  In error
 -- 
 2.53.0
 
