@@ -1,61 +1,69 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F293502571;
-	Fri, 18 Sep 2026 15:24:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C10450128E;
+	Fri, 18 Sep 2026 15:28:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789745056; cv=none; b=qdq29mtnrxzRpBZzoCcQo4Mtbq3EbCBUOtXwcJuXkshQV68aemMHccjwpuWYwjWKWSnQ2Hu0eR3ajkzoPkiChT8RyKOKKuMrAmFPi0maOyljvJDpaVUQF6CgXkGoD+t8YMItnV0FZEhpc2EFFhOidb+rBSlyvnc0mU6vQbiZac4=
+	t=1789745301; cv=none; b=jA5g2Mg3UNIR5AHyYPY1r1qAhd8f70M09MWdNyYpdELLKeXF7Vadt0iTi+mvLZVSiVh1GRVF/SvitwGrXo20wbA9i+GBwZ8WHKwZJXxBlgI49iWuEhxkzmSGrjTyFL83hSQakK+E8kNb1jOw3e982H5vFVG0xhYP1BO0XqiR16Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789745056; c=relaxed/simple;
-	bh=/p9iO8x1eL2Psxw4ft6JjRp6oALN/CCyUBy0JJL7jJ4=;
+	s=arc-20240116; t=1789745301; c=relaxed/simple;
+	bh=IXyyspzrawdPOwrrcMBVjA9eW6qbsWrW93RiPOP1KfY=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=alT2Gn2E1G3S2mxbtyEsYJK0cEFmy+Bd2q9fxqspklLDrY6tLN0dR8mOs5trlMyLl2keQ68GDvKe8mrCuXNmM0nN6jcczIUfVGHXHS2/fFV7pzcjrvVFhNVD6sZPkJs6XomrHkAtf9LY8123WuEXpMkdx2KzMEAXxLAdP3lJEiY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DkFJBpSd; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=olg3kYctTJu5jS9b+DMvQccWvQdmjqxBx3aEoOzGzJyI9NyotesiDIpBJGn+VC+1RwWiHNP3ohNtJdKTYls7MTzvbVVSkon92ubVs7AxQVnKitEIHYEGRSlaAO75XJR1AoDrYIU3TkdSTWFi+CrZokXwVi55tttMbCGer1Xhq0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IT+kQF0R; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DkFJBpSd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5871D1F000FF;
-	Fri, 18 Sep 2026 15:24:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IT+kQF0R"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50A521F000FF;
+	Fri, 18 Sep 2026 15:28:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789745054;
-	bh=/p9iO8x1eL2Psxw4ft6JjRp6oALN/CCyUBy0JJL7jJ4=;
+	s=k20260515; t=1789745299;
+	bh=IXyyspzrawdPOwrrcMBVjA9eW6qbsWrW93RiPOP1KfY=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=DkFJBpSdKDRWhywOVGh+4B2CuoMnvqQUgfEUKEfawbBUXTsckkoIhA5ybvlOlR3uP
-	 bvbHReVotzWbOCMz/Rq8nMZzF7X25rQrNtzjAZgkKGCqkrnGYbYq7OQwAAma5ORSCb
-	 rcVQHLKVC1bbdQSu5PYXNVoMY347dJGAciKErzuuK1Ey3zV8xpk3t8MdFFEHPpmIbO
-	 S7Ls8gwB6da7DiMluDrIUl5srzW33Ru65/o894MuMzFavVwj9XnnZnDqI46jRgI3uC
-	 AnPGQq8pcml0sk+m8mZVHeQat2+Bo4bSlIC3TvwXLyuf0qOrk5qW4P4P2+tKIFSfuK
-	 Qva3LOB08K/rA==
+	b=IT+kQF0R0RCML3nEZmzL2MHfQQBNzb1K/UmVG6KB+RaTpI/ptZmHm69GHfMVw9ebM
+	 msRX3UpiONA8SfwgUDF1zKIQRngdiu8dE6e7xuOQWf1ZOZPZHv+F9RIoetFdacBXhS
+	 CzsDovA5IFPTCd6qr+bDyP4aPXut9b89QN39+TfpdRyU/GUv0aFK79vK5wIF1rhoOo
+	 y8w+jAZ0o/kYIG4rj2HtS02bkLFccoRd+HDGE2BypUukDOni536xcfdZgLyFnpuHf1
+	 PlefhdKjKWiBj73UoN6wrhAXWgbIxDYubebxYVEmK84sT7EQZcj46Eb34tTwfHVbLJ
+	 tG7rjEIze461g==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v8 12/29] arm64: sysreg: Convert SPSR_ELx to automatic
- register generation
+Subject: Re: [PATCH v8 13/29] KVM: arm64: Access elements of vcpu_gp_regs
+ individually
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Steffen Eiden" <seiden@linux.ibm.com>
-Cc: kvmarm@lists.linux.dev, "Alexander Gordeev" <agordeev@linux.ibm.com>, kvm@vger.kernel.org, "Christian
- Borntraeger" <borntraeger@linux.ibm.com>, "Heiko Carstens" <hca@linux.ibm.com>, "Oliver
- Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, linux-s390@vger.kernel.org, "Vasily
- Gorbik" <gor@linux.ibm.com>
-In-Reply-To: <20260918133107.1042730-13-seiden@linux.ibm.com>
+Cc: "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, linux-s390@vger.kernel.org, "Vasily
+ Gorbik" <gor@linux.ibm.com>, kvmarm@lists.linux.dev, "Alexander Gordeev" <agordeev@linux.ibm.com>, "Heiko
+ Carstens" <hca@linux.ibm.com>, "Christian Borntraeger" <borntraeger@linux.ibm.com>, kvm@vger.kernel.org
+In-Reply-To: <20260918133107.1042730-14-seiden@linux.ibm.com>
 References: <20260918133107.1042730-1-seiden@linux.ibm.com>
- <20260918133107.1042730-13-seiden@linux.ibm.com>
+ <20260918133107.1042730-14-seiden@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 18 Sep 2026 15:24:13 +0000
-Message-Id: <20260918152414.5871D1F000FF@smtp.kernel.org>
+Date: Fri, 18 Sep 2026 15:28:18 +0000
+Message-Id: <20260918152819.50A521F000FF@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-> Convert SPSR_EL{1, 2, 12} to automatic register generation as per
-> DDIO616 2026-06. No functional change.
+> While for arm64 the members of vcpu_gp_regs are allocated continuous
+> this is not necessarily true for other architectures implementing ARM.
 >=20
+> Let vcpu_gp_regs() no longer return the address of the user_pt_regs in
+> the vcpu context but the address of the gp-register array field in the
+> user_pt_reg struct. Note, this change semantically excludes pc from the
+> GPRs.
+>=20
+> No functional change.
+>=20
+> Co-developed-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+> Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
 > Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
 
 Sashiko has reviewed this patch and found no issues. It looks great!
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260918133107.1042=
-730-1-seiden@linux.ibm.com?part=3D12
+730-1-seiden@linux.ibm.com?part=3D13
 
