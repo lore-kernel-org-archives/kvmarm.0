@@ -1,90 +1,92 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta0.migadu.com (out-111.mta0.migadu.com [91.218.175.111])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBD663CC33C;
-	Fri, 18 Sep 2026 06:07:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D65343B42E3
+	for <kvmarm@lists.linux.dev>; Fri, 18 Sep 2026 07:22:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789711651; cv=none; b=YzU+h3yStjZcHjKp+jrgdWNtfuGVpJERxof0n2PUaOqcZ5HwiuY2Zd0r+tcicxesNmyDV8p48WfE9fcWfhxffBKrnHYQLwi2h/kqaUufrEEkrsMESegLdyys2+9qTNdYqYP/RgEFA+JR2xWGQjNAigZnxeccAtbXiKh6lfwNpwo=
+	t=1789716177; cv=none; b=Mw3+xlisLH5/RXsWVv0Eo1czHsg8FhV/uBeryTU72Tv9aUI9OHo5KItNAAIDpmQLN2ELhFx1+jOUsNZ21txuLVVca2MqpMwNK8/PWiNlgylhKiwLS7nwwiiDvIF+qY2OYUkafa8x57TvrPq29nUPVMrUCRvlyid2Y8/N5ark/SI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789711651; c=relaxed/simple;
-	bh=Fn6rADDGdB42fgFMk2BH+v/fIX9Rf7QfewJfhr7z/C8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=ntHY0+ky0rvn3fg4YMFF9/taXuJxgtH3hdMtsnb8acFoiMRl5nvmY79ey1mkensxPa7XqNfNGn1ov0XIWREzyL1vhGtwTcfBd7OVckISM7FjprA05B0n/l33Va+hmJNWjybsCLVDCxzMldvv9L9r0Sq4NdbwMZhFX2KI0OLkiM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h4WFQ/8W; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789716177; c=relaxed/simple;
+	bh=dNme8uRIYN0dXbX3fo0hsH8S0MXXz3OARTVkTdVwCds=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TceboXwogXY42kGcROgNpbMzRS19Iej6+PKjBj2Ww/x9N931IVbn0guX2IQUewcwOAjaROh3s9vgrKzh+YA/vJrnCGW2wMlIHuSVgqrdAwESAjSvE4sVBkIHdIPOudtjkqd72krss7QIBsJPPADxlN3KglTf8CJrocLWNAsCCnU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=azSJLlBY; arc=none smtp.client-ip=91.218.175.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h4WFQ/8W"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A26481F00893;
-	Fri, 18 Sep 2026 06:07:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789711648;
-	bh=rwSgmxUrtbpCmxPEYK9er5gynnTViPyV6I3RqSz3ERI=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=h4WFQ/8Wc/jggR8sKMBzi2Zlht6du789DaDJ0xTGa3JZxxXMy3ltKR660bjxlErF1
-	 FT3+cxLFUPnHHaKuFhc++j4Z8W+41fqBWqnj+1PY3zM/0Oh13Q+kd44C9AHaB9B7Js
-	 COpd1XPqwmy3nelnzVqVVOVLWvRdF6WcrA/ZQHy4UdIUXA/7QZLnFcKZPzAVTgqYLy
-	 UEvNgLl/qu6IGBTHfLvqNRg7x1W8+0ImKiTUDfRJsRQe6fR2Uc8kv7O9tytP0pQRTu
-	 3BrOT1anVyp1KVv1s4Gam0IwYcCAh2bwKD5Xyr3XUGsM73cIzWpMqH+zhQ4F78TITo
-	 CTSF7QWrP/pgQ==
-X-Mailer: emacs 31.1 (via feedmail 11-beta-1 I)
-From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: Ankit Agrawal <ankita@nvidia.com>,
-	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Cc: Alexey Kardashevskiy <aik@amd.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Jonathan Cameron <jic23@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Samuel Ortiz <sameo@rivosinc.com>,
-	Steven Price <steven.price@arm.com>,
-	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Xu Yilun <yilun.xu@linux.intel.com>
-Subject: Re: [PATCH v5 11/15] coco: host: arm64: Connect RMM pdev streams
- for IDE devices
-In-Reply-To: <SAWPR12MB9992670293875EF547CA440A18B0872@SAWPR12MB999267.namprd12.prod.outlook.com>
-References: <20260910140509.868402-1-aneesh.kumar@kernel.org>
- <20260910140509.868402-12-aneesh.kumar@kernel.org>
- <SAWPR12MB9992670293875EF547CA440A18B0872@SAWPR12MB999267.namprd12.prod.outlook.com>
-Date: Fri, 18 Sep 2026 11:37:20 +0530
-Message-ID: <yq5aa4pf149z.fsf@kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="azSJLlBY"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=dNme8uRIYN0dXbX3fo0hsH8S0MXXz3OARTVkTdVwCds=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1789716173; v=1; x=1790320973;
+ b=azSJLlBY+Ud7Zbrksgh3OGEzgNVPYu6TeLzMhPkuGRywPEpjiJqKNu48dEQr1B6lprapAMIG
+ unhqKIj9quN5X52808jZjCSV2J77mDO3Dh7kHj5N6e8tWO479HKw1esg4G/92/7wqVg2Cjke/0Q
+ M1uQZZcm0x0yWe6VV3kzPnhU=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 1646a3016cc926ce;
+	Fri, 18 Sep 2026 07:22:53 +0000
+X-Mizu-Trace-ID: 1646a3016cc926ce
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5b8c42da963so338e87.0
+        for <kvmarm@lists.linux.dev>; Fri, 18 Sep 2026 00:22:49 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBzD2InFaz8SUXNpZiKyHIO/DaAj7efhfMlOV3anumYqBUu0ggYBuFixWy9YHw1vsbeEI/OOdCE=@lists.linux.dev
+X-Gm-Message-State: AFuF++lP4csDXGmpHADfUsIKrsV38qCmJhDSvMEbLJl/yrwq9DhVHYpb
+	smYM2u8uV/aqoJm2yBbcWIfdeeL2C5mdkEO8clWkZgpsxJNxA2GdC9viP4/7ipaUt9KHAQ2kUH8
+	UKDEume+t4hhCwQzhxUXfTKEBQOHzAusO4hi1pp/O
+X-Received: by 2002:a05:6512:2344:b0:5b1:ca0b:25d2 with SMTP id
+ 2adb3069b0e04-5b8c101ffcdmr104708e87.4.1789716168414; Fri, 18 Sep 2026
+ 00:22:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20260918040214.85580-1-ndaugoing@gmail.com> <20260918040214.85580-2-ndaugoing@gmail.com>
+In-Reply-To: <20260918040214.85580-2-ndaugoing@gmail.com>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Fri, 18 Sep 2026 08:22:12 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTx8zzvgqj99TKWfRD58X-M8v+hs9358_r_1zZonFNEsgw@mail.gmail.com>
+X-Gm-Features: AcwNN1VwD5DsYs2cjOJY92QTdxd3reBSIUtzU8JUmsF3mGfW8sf3G3EvUGgiBaw
+Message-ID: <CA+EHjTx8zzvgqj99TKWfRD58X-M8v+hs9358_r_1zZonFNEsgw@mail.gmail.com>
+Subject: Re: [PATCH v2] KVM: arm64: vgic: Do not remove in-flight LPIs from AP
+ list on disable
+To: zjamg <ndaugoing@gmail.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Ankit Agrawal <ankita@nvidia.com> writes:
+Hi Yuchao,
 
-> Hi Aneesh
->
-> As I read it, the address ranges handed to RMM in this patch are captured
-> once and at the point cca_tsm_connect() runs. That becomes the address
-> range RMM has on record for the pdev/stream going forward.
->
-> So a couple of questions on that..
-> 1.  Is connect -> {driver probe / vfio-pci bind } the intended
->      sequence or is that ordering left entirely to userspace/VMM policy?
->
+On Fri, 18 Sep 2026 12:02:14 +0800, Yuchao Zhang <ndaugoing@gmail.com> wrote:
 
-We can tsm connect the device even while its driver is bound.
+[...]
 
-> 2. Are the resources/BARs captured at connect time assumed to be
->     fixed for the lifetime of the PDEV? If a PCI rescan (or resource
->     reassignment such as pci=realloc, a hotplug re-enumeration
->     happens after connect, is that expected to be rejected/blocked?
+> Note: this closes the primary race (the last_lr_irq node itself is no
+> longer unlinkable while in-flight), but the fold traversal can still
+> race with a remote flush unlinking a subsequent non-LR node in the
+> ap_list tail. Fully closing that window needs the fold side to take
+> references before dropping locks (in the spirit of the prune-side fix
+> in commit 7258770e5814 ("KVM: arm64: vgic: Handle race between
+> interrupt affinity change and LPI disabling")) and is left as a
+> follow-up.
 
+This is the same race Hyunwoo reported back in June [1]. You might
+want to have a look at that thread first: Oliver and Marc's view there
+was that the fix is to take the ap_list_lock in
+vgic_v3_fold_lr_state() [2][3], and Hyunwoo posted a draft of that
+[4].
 
-IIUC, a normal rescan neither rereads nor relocates an already known and
-assigned BAR? To discover an externally changed BAR, the device would
-normally need to be removed before rescanning. Device removal reaches
-pci_destroy_dev(), which calls pci_tsm_destroy() -> pci_tsm_disconnect()
+Cheers,
+/fuad
 
-
--aneesh
+[1] https://lore.kernel.org/r/aiHrGM1f8czcUby4@v4bel
+[2] https://lore.kernel.org/r/aiJi5a3JJ-TbWL-s@kernel.org
+[3] https://lore.kernel.org/r/87a4t99z9n.wl-maz@kernel.org
+[4] https://lore.kernel.org/r/aiXvwGD1hS6vwLEd@v4bel
