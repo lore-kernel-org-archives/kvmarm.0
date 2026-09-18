@@ -1,98 +1,48 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8801448D1B;
-	Fri, 18 Sep 2026 13:21:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E15843AEF4A;
+	Fri, 18 Sep 2026 13:21:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789737673; cv=none; b=C1Gkdqpnb04cnL0tJUSmFO+ZCT9gnl9xjewlFCxorB6KM7U/JN1l/2AWeBF5lwq0a77vHn9Fc7oqBn/bJ+/+ut25+8N8GNIFLStspC3+yZz7bO97msUWj4ez+FHcHRlPxhF2LvdlZR2AcnNY0+EewYYzyOwV6gT4UCzWQghqBC4=
+	t=1789737701; cv=none; b=UkiS4AC403JUJIO8HSUWCKAPZPltpqNiavYKxdNCGAV1Zni6Nev17iPznFQtDwY8bYPm6Xa5eThiQUMKzRj1gcqbvFQKp9Bu8oDDxFJRuLiiI2Kj+69ev1A9gn8QD5c+OMDz2QcWnq4HSN68Hma2xIrvyRoi5vXEiOg1j6rgeYc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789737673; c=relaxed/simple;
-	bh=q9MlBAFpzeRNsgJB0XNvJREWaiaMY04cUxk1fBjFkvc=;
+	s=arc-20240116; t=1789737701; c=relaxed/simple;
+	bh=jwlABf0+GNUxYAMHJeg/RdtMKCWv4gzK7GpEl5pWmiI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cKpxoJbRsUh5mGAFv60qahKypt2bThhDWziWgBddfqhbUNKGZJTE035X5wP2Pp8ejw5JSdbjdL/WRsWCZd4/0Cj4rlU3sqTxFngGSYCJul6x3WN2Rh1nVdJsJWMYVX19XpxcCREY8mXzulSsn7b0+0NxpLmbkHUTw0vQ5FbM7wA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TfzaMgjx; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=te/rqOmohyDnjoCtTIpjVKoANVq0aEjvFy+uQ6VfjUePDoogKLZNYKI8v0Pd3CbuXPdd/fLSFUcPYSzk76DwD+qhA94KF5e+Rb9TYWPkmNpcJ9JsYitICuXkPk/A6amlNJb32nKUiS1zE1zLnImROBBQv/bEY8sUM8qGK0d6LF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JwCL8z9e; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TfzaMgjx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67ECF1F000FF;
-	Fri, 18 Sep 2026 13:20:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JwCL8z9e"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9965A1F000FF;
+	Fri, 18 Sep 2026 13:21:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789737669;
-	bh=0xpULa2wThyMyC/xm34rNy2PVoRdKfkNjg/wDjNfAbA=;
+	s=k20260515; t=1789737699;
+	bh=oT3Yk6DS2Kbe2735RSd4cf+nXdJU5X+2AoC8BP1PwxU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=TfzaMgjxtuNYRSbgy2oM9VNvelBoHpssOxVnn3XSg1NBMWU+/jyuXP6IaWZPY1CyA
-	 HdBMtjIknOhPruLGftRV7i8l8p2FKFX9fh6wCnG6H7oIwP4PW1xdz9+MUzns7blyED
-	 /oRJYHsPVqdDxPAyuN2AzxSAiLvBhcP8CKPzAWi22BWwuNke+22ALcPYId6jeNIBML
-	 tQQNk+We4UYkN+CSHkOuucCPZKJx6kWkj+b3NHpOKoKa54bgQVSWJGafkpCLc8uAXu
-	 3AdyFrmOR8pMPgGGIaBQnhqN7aE1U/3MowHa1LPEb32ScKkPhZnAMxVtJ6HiM44AnV
-	 XbSuPP1rSj3rQ==
-Date: Fri, 18 Sep 2026 14:20:34 +0100
-From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: Mike Rapoport <rppt@kernel.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, "Liam R. Howlett" <liam@infradead.org>, 
-	Vlastimil Babka <vbabka@kernel.org>, Jann Horn <jannh@google.com>, Pedro Falcato <pfalcato@suse.de>, 
-	David Hildenbrand <david@kernel.org>, Suren Baghdasaryan <surenb@google.com>, 
-	Michal Hocko <mhocko@suse.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, 
-	Paul Moore <paul@paul-moore.com>, Stephen Smalley <stephen.smalley.work@gmail.com>, 
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Zi Yan <ziy@nvidia.com>, 
-	Baolin Wang <baolin.wang@linux.alibaba.com>, Nico Pache <nico.pache@linux.dev>, 
-	Ryan Roberts <ryan.roberts@arm.com>, Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>, 
-	Lance Yang <lance.yang@linux.dev>, Usama Arif <usama.arif@linux.dev>, 
-	Kiryl Shutsemau <kas@kernel.org>, Doug Gilbert <dgilbert@interlog.com>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, "Martin K. Petersen" <mkp@kernel.org>, 
-	Jaya Kumar <jayalk@intworks.biz>, Simona Vetter <simona@ffwll.ch>, Helge Deller <deller@gmx.de>, 
-	Sebastian Reichel <sre@kernel.org>, John Hubbard <jhubbard@nvidia.com>, Peter Xu <peterx@redhat.com>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Oleg Nesterov <oleg@redhat.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@kernel.org>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, Arnaldo Carvalho de Melo <acme@kernel.org>, 
-	Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Rik van Riel <riel@surriel.com>, Harry Yoo <harry@kernel.org>, Juri Lelli <juri.lelli@redhat.com>, 
-	Vincent Guittot <vincent.guittot@linaro.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
-	Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
-	David Airlie <airlied@gmail.com>, Will Deacon <will@kernel.org>, 
-	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Nick Piggin <npiggin@gmail.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Muchun Song <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>, 
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Jan Kara <jack@suse.cz>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oupton@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Madhavan Srinivasan <maddy@linux.ibm.com>, Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, 
-	Vasily Gorbik <gor@linux.ibm.com>, "David S. Miller" <davem@davemloft.net>, 
-	Andreas Larsson <andreas@gaisler.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, Matthew Brost <matthew.brost@intel.com>, 
-	Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>, Byungchul Park <byungchul@sk.com>, 
-	Gregory Price <gourry@gourry.net>, Ying Huang <ying.huang@linux.alibaba.com>, 
-	Alistair Popple <apopple@nvidia.com>, Chris Li <chrisl@kernel.org>, Kairui Song <kasong@tencent.com>, 
-	Kemeng Shi <shikemeng@huaweicloud.com>, Nhat Pham <nphamcs@gmail.com>, Baoquan He <baoquan.he@linux.dev>, 
-	Youngjun Park <youngjun.park@lge.com>, Johannes Weiner <hannes@cmpxchg.org>, 
-	Qi Zheng <qi.zheng@linux.dev>, Shakeel Butt <shakeel.butt@linux.dev>, 
-	Axel Rasmussen <axelrasmussen@google.com>, Yuanchu Xie <yuanchu@google.com>, Wei Xu <weixugc@google.com>, 
-	Chengming Zhou <chengming.zhou@linux.dev>, Michal Hocko <mhocko@kernel.org>, 
-	Miklos Szeredi <miklos@szeredi.hu>, Xu Xin <xu.xin@linux.dev>, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-usb@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, selinux@vger.kernel.org, linux-sound@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-scsi@vger.kernel.org, linux-fbdev@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, linux-trace-kernel@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org, linux-arch@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, 
-	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-s390@vger.kernel.org, sparclinux@vger.kernel.org, fuse-devel@lists.linux.dev
-Subject: Re: [PATCH v2 01/40] mm/vma: fix mmap_prepare file handling, remove
- file_doesnt_need_get
-Message-ID: <aq06hcheI4OGi_3A@gremlin>
-References: <20260914-b4-mmap-prepare-vma-flag-sanify-v2-0-7d9781ed5361@kernel.org>
- <20260914-b4-mmap-prepare-vma-flag-sanify-v2-1-7d9781ed5361@kernel.org>
- <aquz9Z9JrK_H_E0g@kernel.org>
- <aq01JFp8hRReyY-O@gmail.com>
+	b=JwCL8z9eL3OL6zrYiXmtaUkJFT7xMiqf3sWLeC9MXzTjC4nRbl0DmS6ip/aXy1RKD
+	 ovYMViPUbj+1cC539eR/fx2SZK7AwPJ6AtG61W3w2Tv9ODcwPixrpwYuz7wr9QuK/x
+	 PrUuCvKjdt1e8CP51HwR9MA1SOOm+tqxPVY0W7HmxwMXfbM0Mxq+JgfolRWm1YxAYG
+	 9nzPLilf6e86z41wF0aJcRaZh2cLK+lw3nl4wI7d4YyGIbWj5S0LdrGDQMm/DAIl89
+	 y5EIUSsoBgUYz73wEeMDLrVldXaQqhylnMry7a5bWfyBwxfkbFq6tooY95+UHcN4oG
+	 UsiuijPk+SRIw==
+Date: Fri, 18 Sep 2026 14:21:31 +0100
+From: Will Deacon <will@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Fuad Tabba <fuad.tabba@linux.dev>, oupton@kernel.org,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, catalin.marinas@arm.com,
+	joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, mark.rutland@arm.com, steven.price@arm.com,
+	vdonnefort@google.com, qperret@google.com
+Subject: Re: [PATCH v3 15/18] KVM: arm64: Reject host access to protected VM
+ private state
+Message-ID: <aq0628Ci4pfEj0KG@willie-the-truck>
+References: <20260914113338.159227-1-fuad.tabba@linux.dev>
+ <20260914113338.159227-16-fuad.tabba@linux.dev>
+ <86a4ph5fb9.wl-maz@kernel.org>
+ <CA+EHjTzCQkeXQQcCDwABLR2w+NTmKTG3V6RSmhzYNayaoYXw3g@mail.gmail.com>
+ <865x045mke.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -101,104 +51,111 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aq01JFp8hRReyY-O@gmail.com>
+In-Reply-To: <865x045mke.wl-maz@kernel.org>
 
-On Fri, Sep 18, 2026 at 05:57:51AM -0700, Breno Leitao wrote:
-> On Thu, Sep 17, 2026 at 12:33:41PM +0300, Mike Rapoport wrote:
-> > On Mon, Sep 14, 2026 at 03:57:21PM +0100, Lorenzo Stoakes (ARM) wrote:
-> > > The map->file_doesnt_need_get flag is confusing and the existing
-> > > implementation has holes.
-> > >
-> > > Drivers are permitted to change the owning file of a mapping. If they do
-> > > so, they are required to take a reference on that file.
-> > >
-> > > The mmap() operation which ultimately invokes __mmap_region() is guaranteed
-> > > to drop the refcount for the original file the mapping was made under, but
-> > > this is not true for the replaced file.
-> > >
-> > > This has been addressed so far by tracking map->file_doesnt_need_get, which
-> > > is rather poorly named and unfortunately fails to correctly track whether
-> > > or not an additional put were needed in a number of cases.
-> > >
-> > > Make life easier by removing this flag, and instead drop the reference for
-> > > both mmap_prepare and the deprecated mmap callback in a new function
-> > > put_map().
-> > >
-> > > Track whether this needs to be done by aligning mmap_state with
-> > > vm_area_desc and store the original file in the map->file field, keeping
-> > > the updated file in map->vm_file.
-> > >
-> > > In order to have the same behaviour for both types of hooks, only drop the
-> > > reference __mmap_new_file_vma() itself took in its error path, deferring
-> > > the replaced file's reference to put_map().
-> > >
-> > > To make this work correctly, map->vm_file has to be updated before any
-> > > error handling, so update __mmap_new_file_vma() and call_mmap_prepare() to
-> > > set this field first.
-> > >
-> > > Also when mmap_prepare() changes the file and is then merged, the reference
-> > > count also must be decremented, so update the logic to call put_map() in
-> > > this case too.
-> > >
-> > > Also update __compat_vma_mmap() to manually perform this step for stacked
-> > > file systems using the compatibility layer, and update
-> > > compat_set_vma_from_desc() to replace vma_set_file() with a correct
-> > > refcount/file update.
-> > >
-> > > No in-tree driver is impacted by the incorrect implementation of this
-> > > currently (no driver that does this is mergeable for one), so this does not
-> > > need to be a fix.
-> >
-> > But the patch iteslf needs to be fixed :)
-> >
-> > It seems to be the change that broke the CI.
-> >
-> > The rest is from LLM, take it with a grain of salt :)
-> >
-> > mm-ci mm-unstable red build - bisect analysis
-> > ==============================================
-> >
-> > Bad commit: 2a937a04babf1 "mm/vma: fix mmap_prepare file handling, remove
-> > file_doesnt_need_get" - first patch of Lorenzo Stoakes' 40-patch series
-> > "mm: make VMA flag semantics explicit, eliminate VM_SPECIAL" (v2).
-> > https://lore.kernel.org/all/20260914-b4-mmap-prepare-vma-flag-sanify-v2-0-7d9781ed5361@kernel.org
-> >
-> > Symptom: tools/testing/selftests/mm/pfnmap.c triggers
-> > "BUG: Bad page map in process pfnmap" during __zap_vma_range()/vm_normal_page(),
-> > seen on process exit/munmap. CI's run-mm-selftests.sh greps guest dmesg for
-> > BUG|WARNING and fails the job regardless of the test's own exit code.
->
-> I am seeing something similar here and stress-ng can reproduce it:
->
->       WARNING: mm/memory.c:3225 at do_remap_pfn_range+0x9b4/0x9f0, CPU#25: stress-ng-dev/354858
->       Call trace:
->        do_remap_pfn_range+0x9b4/0x9f0 (P)
->        remap_pfn_range_complete+0xac/0xd0
->        mmap_action_complete+0xcc/0x3d8
->        mmap_region+0xb54/0x1978
->        do_mmap+0x588/0xb18
->        vm_mmap_pgoff+0x1e4/0x320
->        ksys_mmap_pgoff+0x2d8/0x510
->        __arm64_sys_mmap+0x100/0x128
->
->       BUG: Bad page map in process stress-ng-dev  pte:0160000000000fcf
->       addr:0000ffe8d9080000 vm_flags:00000071 anon_vma:0000000000000000 mapping:ffff0000a0c4ea98 index:0 (file) ffe8d9080 (anon)
->       file:mem fault:0x0 mmap:0x0 mmap_prepare: mmap_mem_prepare read_folio:0x0
->       Call trace:
->        print_bad_page_map+0x63c/0x740
->        vm_normal_page+0x228/0x240
->        __zap_vma_range+0xbe0/0x34a0
->        unmap_vmas+0x240/0x318
->        unmap_region+0x12c/0x238
->        vms_complete_munmap_vmas+0x318/0x958
->        do_vmi_align_munmap+0x254/0x2f8
->        do_vmi_munmap+0xc4/0xf8
->        __vm_munmap+0x174/0x288
->        __arm64_sys_munmap+0x70/0x90
+Hi Marc, Fuad,
 
-Yup I already fixed it and respun the series :)
+On Thu, Sep 17, 2026 at 09:06:25AM +0100, Marc Zyngier wrote:
+> On Wed, 16 Sep 2026 20:07:28 +0100,
+> Fuad Tabba <fuad.tabba@linux.dev> wrote:
+> > On Wed, 16 Sept 2026 at 17:30, Marc Zyngier <maz@kernel.org> wrote:
+> > [...]
+> > > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > [...]
+> > > > +/*
+> > > > + * Once a protected vCPU has run, the host copy is not the guest's state,
+> > > > + * and EL2 has read mp_state, which it does only at hyp vCPU creation.
+> > > > + */
+> > > > +static long pkvm_filter_vcpu_ioctl(struct kvm_vcpu *vcpu, unsigned int ioctl)
+> > > > +{
+> > > > +        switch (ioctl) {
+> > > > +        case KVM_ARM_VCPU_INIT:
+> > > > +        case KVM_SET_ONE_REG:
+> > > > +        case KVM_GET_ONE_REG:
+> > > > +                if (vcpu_is_protected(vcpu) && vcpu_has_run_once(vcpu))
+> > > > +                        return -EPERM;
+> > > > +        }
+> > > > +
+> > > > +        return 0;
+> > > > +}
+> > > > +
+> > >
+> > > I'm not keen on returning -EPERM for the ONE_REG stuff. For a start,
+> > > X0 *is* valid on MMIO, and when you want to support LD64B and co,
+> > > you'll need to show the actual data there.
+> > >
+> > > I'd rather return what is in the host vcpu structure, as normal.
 
-https://lore.kernel.org/all/20260917-b4-mmap-prepare-vma-flag-sanify-v3-0-4583d8a23bca@kernel.org/
+I just wanted to chuck my thoughts in here, as some of this is my fault
+and it would be really helpful to discuss it on the list. As you probably
+know, on Android, pKVM has the semantics you describe above: the ONE_REG
+calls succeed, but the register state isn't propagated to the guest once
+it's started running. I think we largely did it this way because we were
+solving a million problems at once during the initial development and
+having to pipe-clean VMMs wasn't particularly appealing at the time.
+It's also worth adding that, to my knowledge, we've never had any issues
+in Android because of this decision.
 
---
-Cheers, Lorenzo
+So, based on that, it really sounds like it's the best option. If it ain't
+broke, don't fix it!
+
+*However*, I can't think of another upstream interface that behaves like
+that and, when we came to document it, it was quite difficult to explain
+it in a way that could be extended in the future. If we say that ONE_REG
+doesn't propagate to the vCPU after first run and returns whatever was
+last written, then userspace could (even accidentally) rely on that. If
+we wanted to extend it, I think we'd not only need a method to advertise
+the new behaviour (which I think you probably want even if ONE_REG
+returned an error before) but also an opt-in for userspace to say that
+it's ok with the new behaviour. In some ways, it feels a bit like the
+"unchecked flags" problem for syscall arguments.
+
+> > I think we should keep the error, for the reason s390 returns -EINVAL
+> > from ONE_REG on a protected vCPU and x86 does from the register ioctls
+> > for protected VM types:
+> 
+> News flash, this is not x86, nor s390. I don't feel constrained by
+> other architecture, and we deviate *everywhere* already.
+
+Right, this wasn't the rationale.
+
+> > once the vCPU has run, the copy is the VMM's
+> > boot state plus what the exit handlers copy out, and the VMM can't
+> > distinguish them. x0 on MMIO is one of those fields, but the VMM reads
+> > it from kvm_run->mmio. For LD64B, EL2 would copy the operands out the
+> > same way and the error could be relaxed to those registers. Loosening
+> > later breaks nobody. The comment and the message do overstate it by
+> > calling the copy "not the guest's state", and I'll reword both in v4.
+> > More on the kvmtool thread [1].
+> 
+> A protected-aware VMM already knows it cannot obtain the registers.
+
+I think you can use that argument both ways: if the VMM knows it cannot
+obtain the registers, then it's fine to return an error if the VMM does
+something wrong.
+
+In our recent investigation, it turned out that both kvmtool and crosvm
+were perfectly happy with ONE_REG returning an error in normal operation
+but we needed a handful of fixes for kvmtool [1] to handle things like
+the 'debug' command.
+
+If it's helpful, we can ask the crosvm developers here if they have
+opinions for/against the two behaviours?
+
+> I don't want to have to revisit the userspace interface once you have
+> to relax it, because I know for sure that you will have to.
+
+I think we'll have to do that either way, no? The VMM needs a way to
+know that ONE_REG works and the situations in which it works. If the old
+behaviour wasn't to return an error, it's also going to need a way to
+enable the new behaviour.
+
+> As far as LD64B is concerned, there is no place to copy anything in
+> the run structure, and the relaxation would require to cover all the
+> GPRs, ESR, and FAR. At this stage, returning whatever is there is the
+> correct thing to do IMO.
+
+The nice thing about that is that we can presumably tie it in with LD64B
+support for protected VMs.
+
+Will
