@@ -1,46 +1,47 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C9B15172C2;
-	Fri, 18 Sep 2026 16:14:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE1FD5158BD;
+	Fri, 18 Sep 2026 16:28:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789748090; cv=none; b=hl9DfQD35fxxFBdpWjnm51cTwhMr4lFlxswFKs+Cu+wSQdiIUwcmkUVGb9lOz5dB/i9hsAAOVNnrbL5X+GiJLKnUcY81w6SQCHNjTdM1BR+xfED71pLY5oqDn7Ty83YvPPHdJf/j9bL7e54QUhRLGmW4Fcv9SZHa1FBHnMO+oxI=
+	t=1789748899; cv=none; b=j0rzIIWqdwoPlIwQXNP6RkeHlQARtiS3jirvoRRQv+Ouqpo6Z29V0DbLsVLPwA8pYJwWnjd/Vvt5phXkX8HkQo0ac0eL+aDZk8AmxW9xX4bYNXtndYZ+GY0vXeKxkMoKao+ao2NWx8J/b67L1Q/rS93GvCpzVsmepplI+eFsSiE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789748090; c=relaxed/simple;
-	bh=l9nYo3fnLVcP3EfwMY2HprXsggbhOGLXy3Rp82L/0ng=;
+	s=arc-20240116; t=1789748899; c=relaxed/simple;
+	bh=tzCFpUnckKZJcYA8Q8I0dDzdDgypn2YHTLdWGr0BlKw=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=shUdXpAdW8vZiqrIT9mFggmRb6I/awHiDTiNHymv7DLqS8a0orP1ncJZtSlPJdXhfd2wcIMlxzUjy3HHrY7E51Kyt4NKx5gkUJsW2G2DhNxuCc+7KhAQgxQ+l8RhM8CB0KBJx5Yc0MukC+s7BlirW8ZoPXRDk5ODhPrJErC6fkc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k8cf7bZb; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=pJT1rrNurN4cZWz29wJFlUQeblsG0i+6ITH7GS6q4dJdAPCClYiWk1A4t/rGiDQhHzYsrlVy2qT22X+vWRazmLQsyDfj3t6C/qp/fhY3PqeHRqp7BMlyjgOUBGzynKfdADbyoqmM5NFw4+QRzYniS81Zzkgro7n3xfQdax7FOo8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HDJx44W5; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k8cf7bZb"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B61C1F0089A;
-	Fri, 18 Sep 2026 16:14:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HDJx44W5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 831321F000FF;
+	Fri, 18 Sep 2026 16:28:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789748089;
-	bh=OIio10vJFuWpSQCOrKEwPrmMGhRjb55Qi4/sWOshmbk=;
+	s=k20260515; t=1789748890;
+	bh=Oog97d45GBWxizIp3e8XEIos1HPU6lzu/8vqoiXky/g=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=k8cf7bZbFSdo6H80Fsnx77yNEQxSTpwZSx05d3kPyzIaXh5cCPUUOQohxb4kdwl2X
-	 vV4FhquCU/ZN2Z4zv1V7QY9N4N8lJFDs+ddxLR8tPVHPqIEt1cFWHuc/oWDd0mqdpK
-	 DCbu+zjp2n9GrWLRpIB1MVyTi4Pe8LyucixB0evn0KhMF+5uq7bRvHjETlPXzO4JyE
-	 JtkKl5wNX/1unBLmziQuoA0XZDTDq+VVgGjoZaHdAAjCmZNBn2/s58dG/4YbGmgyeH
-	 MgB34uc1rO+tFXp7K2fmPE7sDMokIOZwMU3CVoM5QtG6HpLZjVdvd3kwxh2TmC/2XJ
-	 pCgPUx8NLImCA==
+	b=HDJx44W5tKdI01OUf5JqIr44QNAziDvu6Np0IxcMjBFypQjbFKko3Z3VWILqpxvoY
+	 NJgyN2LREGkpSL6aPIP57RK1ULbjAuZOrNJb8vE9cCsGFlxJnd0m4JzAcYw7EJIWEU
+	 W/bvqPviyJ+fvGHNq+gQ67Ug+fbHrVKLQZ0IHW/c+P8ltC1dMLFGE4RuSSJ3Iq/6oe
+	 QTIPe/3XRXag66HtlwGFeJXKXKZqaJW0B5ySIsi/wH2d21Z6uBy2/IoGIvauR3V9y1
+	 hGmpyn4vnhkqx7huwTkEm6bLb5B3VsYtD5QqyKnEKzE9GWgyIepf6X+wrlUy1FMgd+
+	 soTF/ZwnPq51w==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v8 19/29] KVM: s390: Use arm64 code
+Subject: Re: [PATCH v8 20/29] s390: Introduce Start Arm Execution
+ instruction
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Steffen Eiden" <seiden@linux.ibm.com>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>, linux-s390@vger.kernel.org, "Christian
- Borntraeger" <borntraeger@linux.ibm.com>, "Heiko Carstens" <hca@linux.ibm.com>, "Vasily
- Gorbik" <gor@linux.ibm.com>, kvm@vger.kernel.org, "Alexander Gordeev" <agordeev@linux.ibm.com>
-In-Reply-To: <20260918133107.1042730-20-seiden@linux.ibm.com>
+Cc: "Alexander Gordeev" <agordeev@linux.ibm.com>, "Marc Zyngier" <maz@kernel.org>, linux-s390@vger.kernel.org, "Christian
+ Borntraeger" <borntraeger@linux.ibm.com>, kvmarm@lists.linux.dev, "Heiko
+ Carstens" <hca@linux.ibm.com>, "Oliver Upton" <oupton@kernel.org>, "Vasily
+ Gorbik" <gor@linux.ibm.com>, kvm@vger.kernel.org
+In-Reply-To: <20260918133107.1042730-21-seiden@linux.ibm.com>
 References: <20260918133107.1042730-1-seiden@linux.ibm.com>
- <20260918133107.1042730-20-seiden@linux.ibm.com>
+ <20260918133107.1042730-21-seiden@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 18 Sep 2026 16:14:48 +0000
-Message-Id: <20260918161448.9B61C1F0089A@smtp.kernel.org>
+Date: Fri, 18 Sep 2026 16:28:09 +0000
+Message-Id: <20260918162809.831321F000FF@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -49,60 +50,54 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [Medium] build: cross-arch C code extraction via awk breaks tooling and m=
-odularity
+- [Medium] s390: missing `nop` padding after SAE instruction execution
 --
 
-commit e83a74be06a131ec905dd0c83821e6279b998572
+commit 97e095ed7008049c3b17921733022a1015bd2720
 Author: Steffen Eiden <seiden@linux.ibm.com>
 
-KVM: s390: Use arm64 code
+s390: Introduce Start Arm Execution instruction
 
-This commit introduces build infrastructure to extract marked sections
-from ARM64 C files into generated .inc files for use in the s390 KVM
-host code. It adds the copy-arm64c.awk script that searches for
-ARM64_S390_COMMON markers and copies the matched code verbatim.
+This commit introduces the Start Arm Execution (SAE) instruction to enable
+accelerated execution of arm64 virtual machines on s390. It adds the
+necessary assembly wrapper __sae64a, control blocks, and architecture
+types.
 
-> diff --git a/arch/s390/kvm/arm64/copy-arm64c.awk b/arch/s390/kvm/arm64/co=
-py-arm64c.awk
-> new file mode 100644
-> index 0000000000000..5561619aa70c8
-> --- /dev/null
-> +++ b/arch/s390/kvm/arm64/copy-arm64c.awk
-> @@ -0,0 +1,72 @@
-[ ... ]
-> +BEGIN {
-> +	# Constants
-> +	start_pattern =3D "^#ifdef ARM64_S390_COMMON$"
-> +	end_pattern =3D "^#endif /\\* ARM64_S390_COMMON \\*/$"
-
-[Severity: Medium]
-Does tightly coupling the s390 build to the exact source code formatting
-in the arm64 tree present a maintenance burden?
-
-Sharing architecture code via text extraction of C files violates kernel
-modularity principles. It imposes a burden on ARM64 maintainers who must
-now preserve s390-specific markers (ARM64_S390_COMMON) and formatting.
-The established Linux kernel paradigm for cross-architecture code sharing
-is to abstract common logic into standalone .c files in a shared
-location (e.g., virt/kvm/).
+> diff --git a/arch/s390/kernel/entry.S b/arch/s390/kernel/entry.S
+> --- a/arch/s390/kernel/entry.S
+> +++ b/arch/s390/kernel/entry.S
 
 [ ... ]
-> +copying {
-> +	gsub(/#include <asm\//, "#include <arm64/")
-> +	gsub(/#include <uapi\/asm\//, "#include <uapi/arm64/")
-> +	print
-> +	next
-> +}
+
+> @@ -245,6 +245,28 @@ EXPORT_SYMBOL(__sie64a)
+>  EXPORT_SYMBOL(sie_exit)
+>  #endif
+> =20
+> +#if IS_ENABLED(CONFIG_KVM)
+> +/*
+> + * __sae64a calling convention:
+> + * %r2 pointer to sae control block physical address
+> + */
+> +SYM_FUNC_START(__sae64a)
+> +	stmg	%r6,%r14,__SF_GPRS(%r15)	# store kernel registers
+> +	STBEAR	__SF_SAE_BEAR(%r15)		# save breaking event address register
+> +	.insn	rre,0xb9a50000,%r2,0		# Start Arm Execution
+> +	LBEAR	__SF_SAE_BEAR(%r15)		# restore breaking event address register
 
 [Severity: Medium]
-Does copying C source code into a new file without emitting C preprocessor
-#line directives break standard developer tooling?
+Should there be a nopr 7 padding inserted after the SAE instruction here?
 
-Without #line directives, compiler errors, warnings, and debugger (GDB)
-symbols will map to the generated .inc files instead of the original
-arch/arm64 source, degrading debuggability.
+For the SIE instruction, the handler explicitly includes a nopr 7 cushion=20
+because if a machine check is triggered by the immediately following instru=
+ction
+(in this case LBEAR), the hardware may incorrectly attribute the exception =
+to
+the guest context instead of the host.
+
+Since the hardware behavior for SAE likely mirrors SIE, does this path requ=
+ire
+similar padding to safely handle machine-check boundaries?
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260918133107.1042=
-730-1-seiden@linux.ibm.com?part=3D19
+730-1-seiden@linux.ibm.com?part=3D20
