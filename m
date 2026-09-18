@@ -1,131 +1,123 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16BC23DF008;
-	Fri, 18 Sep 2026 14:37:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFBFF4F5E14
+	for <kvmarm@lists.linux.dev>; Fri, 18 Sep 2026 14:55:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789742224; cv=none; b=tKLb8DgK109fVC01UbOfylxKHl3LQH+sHxvM+Cinc1tPDdXSg1i8/cc9f94ffEVMU+4S+CVK7O9rjFPvm+8Z1soI6zY7/WJVn8xFadER65btq6rPT6N4rqC4b+8JEy97UGnOoq+Vq8BFZr8qYbY3u1Gy6h0h6fnava8b2Aj537Y=
+	t=1789743317; cv=none; b=MEhUgSsOu+ha2/eHV4amlhnLbZRFjMRrwy3fdpthDhBZRCe+OEEbCSCQ+2S6k9uQKv1lYern8agr4L3kc42xd9IXZin8kwqBVrkDnFkSqLf252sk67BIrC5i96n62iUQ2sn/8CqVwHI9/mEwLdZDaO1hfz0Vg9CEOt0b3CLsjEA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789742224; c=relaxed/simple;
-	bh=ntPS0z+vV0xUCpyNprGPNVKRsReblUECMKWxCnZx8jg=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=ZqPCkn1Jf2TOEcBYXa3rZliH0P3vb9GUzjCGxzCaLx2SGUq4ceKCBAjuHSWuIRi6k1c1oc2TfXF4AiZlN+W5DbTXLVk2MBL4ZdMYt3yEW/rYpqFQrLFxJ6kZBq0IoGe27/ECtlHb6q95fldCcFAZW5JEkEb3ov+AZwsR02LNflQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fnKQj0bN; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789743317; c=relaxed/simple;
+	bh=95Lr+PmMj7HxN1XXw1kqIJrzTIPr/Sc8TW+cNaDyjn8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=ug4/g1lbs2bzl7hMIv2Y2pEv7ZMBrkbJnXsWNBPsZyWTNZz9pCzzA7/nCs/o7i+4D2GFceUv3szsTH7rr6CpZtFZzGojxMPy1FU2fpgVLMLGwPXf7wzvhOFzbPQ6TpLCXbBfL8kiKstPMM7kgsL36sBEj49u1w1A5AT1KLmBmjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=b/NZSPRy; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fnKQj0bN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 670161F000FF;
-	Fri, 18 Sep 2026 14:37:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789742223;
-	bh=n7kP1DCQMHPQrreAhxr3a+3LyX8C/Su2w8QZWEiOw4A=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=fnKQj0bNjpR1j4YwR3qLJUuCzmkcVj1f8TD7tBhur7zUBXeVdSPk0kNSvg7xlwZt1
-	 dC/b7q24xeDlLsZZ5+VwuJo6dnfO+XapYiZfnpCEGre4dnsd9p6/Ecx2V5Iho7koz6
-	 Zbjtysy2hEH8VMkvwgy0FMyK8EEM2OvNYz2thy4aJmdm6CZbAaFDqsuHZAtPRRqlCP
-	 Abuxmf583o7KxZxeppn3sWJwyEWBSOQ0hyenjMGK3GbrxtW7zmYOcIc2l2MoQGAO35
-	 vV8globw6xQwhXtkIWvIi03/3M0Fnwi0aV6R505FzNtZ2X1ig0DZs8TaNaT+pyysBh
-	 P+Ze0N9TWZEpw==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v8 06/29] KVM: Move export symbol check macros to
- Makefile.kvm
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Steffen Eiden" <seiden@linux.ibm.com>
-Cc: kvm@vger.kernel.org, "Marc Zyngier" <maz@kernel.org>, "Alexander Gordeev" <agordeev@linux.ibm.com>, kvmarm@lists.linux.dev, "Vasily
- Gorbik" <gor@linux.ibm.com>, "Oliver Upton" <oupton@kernel.org>, linux-s390@vger.kernel.org, "Heiko
- Carstens" <hca@linux.ibm.com>, "Christian Borntraeger" <borntraeger@linux.ibm.com>
-In-Reply-To: <20260918133107.1042730-7-seiden@linux.ibm.com>
-References: <20260918133107.1042730-1-seiden@linux.ibm.com>
- <20260918133107.1042730-7-seiden@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 18 Sep 2026 14:37:01 +0000
-Message-Id: <20260918143702.670161F000FF@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="b/NZSPRy"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5FC49168F;
+	Fri, 18 Sep 2026 07:55:09 -0700 (PDT)
+Received: from LeoBrasDK.cambridge.arm.com (unknown [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7D5D13F86C;
+	Fri, 18 Sep 2026 07:55:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1789743312; bh=95Lr+PmMj7HxN1XXw1kqIJrzTIPr/Sc8TW+cNaDyjn8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=b/NZSPRyN/bSoalpu3s5V5H20FRSOcJzsD81iElRkXTaKFAoGewQ/s/UNwuafals/
+	 iHVXNR3LedtXDn/t9CGHPbp4E6VicXkPtS6pLTmrhqi9ULV6pLAYuAwP+GiK+BWaZM
+	 zIdMrFPruAoPHFSA9pw8xWVHTTbi3mz5P6FFAoxQ=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Oliver Upton <oupton@kernel.org>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	kvmarm@lists.linux.dev,
+	Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>
+Subject: Re: [PATCH 00/22] KVM: arm64: nv: Implement FEAT_HAFDBS, FEAT_HAFT
+Date: Fri, 18 Sep 2026 15:55:03 +0100
+Message-ID: <aq1Qx0z_aUNvm44n@LeoBrasDK>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260623184201.1518871-1-oupton@kernel.org>
+References: <20260623184201.1518871-1-oupton@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [Low] kvm: missing arch export symbol check due to $(ARCH) vs $(SRCARCH)
---
+On Tue, Jun 23, 2026 at 11:41:39AM -0700, Oliver Upton wrote:
+> KVM's support for hardware descriptor updates has been lacking, owing in
+> large part to the fact that the most widely available NV2 hardware
+> actually lacks HAFDBS :)
+> 
+> This series brings support for hardware dirty state and table Access
+> flags to the nested MMU. While KVM uses neither of these features, the
+> kernel definitely does in the stage-1 page tables. Since there is only
+> one hypervisor to rule them all, implementing this stuff at stage-2 is
+> mostly motivated by the desire to enable guest stage-1 :)
+> 
+> Implementing dirty state at stage-2 is a bit more challenging than
+> anticipated, I'm in the middle of seeking a relaxation from Arm that
+> would make this all architectural. See the last patch for the details.
+> 
+> Applies to kvmarm/fixes since this depends on some of the earlier VNCR
+> rework. Lightly tested on an implementation with HAFT.
+> 
+> Oliver Upton (22):
+>   KVM: arm64: nv: Introduce struct for stage-2 walk step
+>   KVM: arm64: nv: Consolidate computation of stage-2 permissions
+>   KVM: arm64: nv: Get rid of kvm_s2_trans*() accessors
+>   KVM: arm64: nv: Only shadow writable-dirty guest descs as writable
+>   KVM: arm64: nv: Pass an access descriptor for stage-2 walks
+>   KVM: arm64: nv: Use a helper for stage-2 descriptor updates
+>   KVM: arm64: nv: Set dirty state at stage-2
+>   KVM: arm64: nv: Treat DBM as writable at stage-2
+>   KVM: arm64: Compute S1 permissions as part of s1_walk()
+>   KVM: arm64: Plumb through access descriptor for stage-1
+>   KVM: arm64: Use a struct for stage-1 walk context
+>   KVM: arm64: Create helper for stage-1 descriptor updates
+>   KVM: arm64: Set dirty state at stage-1
+>   KVM: arm64: Grant write permission when DBM is set at S1
+>   KVM: arm64: Don't update descriptors for "non-arch" access
+>   KVM: arm64: nv: Expose FEAT_HAFDBS
+>   KVM: arm64: Set Access flag on table descriptors at stage-1
+>   KVM: arm64: nv: Set access flag on table descriptors at stage-2
+>   KVM: arm64: nv: Expose FEAT_HAFT
+>   KVM: arm64: selftests: Only test AF behavior for emulated AT insns
+>   KVM: arm64: selftests: Test that AT emulation for FEAT_HAFT
+>   HACK: KVM: arm64: nv: Set the dirty state for CMOs that fetch for
+>     write
+> 
+>  arch/arm64/include/asm/kvm_arm.h       |   1 +
+>  arch/arm64/include/asm/kvm_nested.h    |  94 +++------
+>  arch/arm64/include/asm/kvm_pgtable.h   |  17 +-
+>  arch/arm64/kvm/at.c                    | 267 +++++++++++++++++--------
+>  arch/arm64/kvm/hyp/pgtable.c           |  11 -
+>  arch/arm64/kvm/mmu.c                   |  36 +++-
+>  arch/arm64/kvm/nested.c                | 251 ++++++++++++++++-------
+>  tools/testing/selftests/kvm/arm64/at.c | 102 ++++++++--
+>  8 files changed, 515 insertions(+), 264 deletions(-)
+> 
+> 
+> base-commit: d098bb75d14fde2f12155f1a95ec0168160867ce
+> -- 
+> 2.47.3
+> 
 
-commit df2119cb096c289e1baffa51941e2be7e3687ea1
-Author: Steffen Eiden <seiden@linux.ibm.com>
+Hi Oliver,
 
-KVM: Move export symbol check macros to Makefile.kvm
+I spent some time trying to study NV, and I think I can understand the 
+patchset a bit better now, so I would like to share my review on it.
 
-The EXPORT_SYMBOL_GPL/EXPORT_SYMBOL enforcement logic in
-arch/x86/kvm/Makefile is useful for any KVM architecture wanting to
-restrict the exported symbols. Move the check macros to
-virt/kvm/Makefile.kvm so they can be shared.
+I will start reviewing it, so please let me know if you prefer if I wait 
+for a next version, or something like that.
 
-> diff --git a/virt/kvm/Makefile.kvm b/virt/kvm/Makefile.kvm
-> index d047d4cf58c9f..dd40544b8ecb1 100644
-> --- a/virt/kvm/Makefile.kvm
-> +++ b/virt/kvm/Makefile.kvm
-
-[ ... ]
-
-> @@ -13,3 +13,36 @@ kvm-$(CONFIG_HAVE_KVM_IRQ_ROUTING) +=3D $(KVM)/irqchip=
-.o
->  kvm-$(CONFIG_HAVE_KVM_DIRTY_RING) +=3D $(KVM)/dirty_ring.o
->  kvm-$(CONFIG_HAVE_KVM_PFNCACHE) +=3D $(KVM)/pfncache.o
->  kvm-$(CONFIG_KVM_GUEST_MEMFD) +=3D $(KVM)/guest_memfd.o
-> +
-> +# Force grep to emit a goofy group separator that can in turn be replace=
-d with
-> +# the above newline macro (newlines in Make are a nightmare).  Note, gre=
-p only
-> +# prints the group separator when N lines of context are requested via -=
-C,
-> +# a.k.a. --NUM.  Simply request zero lines.  Print the separator only af=
-ter
-> +# filtering out expected exports to avoid extra newlines in the error me=
-ssage.
-> +define __kvm_get_exports
-> +$(shell grep "$(1)" -C0 --include=3D'*.[ch]' -nrw \
-> +	$(srctree)/virt/kvm $(srctree)/arch/$(SRCARCH)/kvm \
-
-[Severity: Low]
-Does this hardcoded path create a mismatch between the counting and reporti=
-ng
-phases?
-
-By using $(SRCARCH) here instead of reusing the $(KVM_CHECK_EXPORT_DIRS)
-variable, __kvm_get_exports and kvm_check_exports use different source
-directories for their grep commands.
-
-> +	$(addprefix | grep -v -e ,$(kvm_exports_allowed)) \
-> +	| grep "$(1)" -C0 --group-separator=3D"!SEP!")
-> +endef
-> +
-> +
-> +KVM_CHECK_EXPORT_DIRS ?=3D $(srctree)/virt/kvm $(srctree)/arch/$(ARCH)/k=
-vm
-
-[Severity: Low]
-Will using $(ARCH) instead of $(SRCARCH) cause the check to miss the actual
-architecture source directory during compilation?
-
-On architectures like x86_64, $(ARCH) evaluates to x86_64, but the actual
-source directory is mapped to arch/x86 (which is what $(SRCARCH) resolves t=
-o).
-
-This causes grep inside kvm_check_exports to silently skip arch/x86_64/kvm
-because the directory does not exist, missing the EXPORT_SYMBOL validation
-entirely for the architecture-specific KVM code.
-
-> +
-> +# Fail the build if any unwanted $(1) usage is found outside kvm_exports=
-_allowed.
-> +define kvm_check_exports
-> +kvm_nr_exports :=3D $(shell grep "$(1)" --include=3D'*.[ch]' -nrw \
-> +	$(KVM_CHECK_EXPORT_DIRS) \
-> +	$(addprefix | grep -v -e ,$(kvm_exports_allowed)) | wc -l)
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260918133107.1042=
-730-1-seiden@linux.ibm.com?part=3D6
+Thanks!
+Leo
