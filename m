@@ -1,123 +1,194 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFBFF4F5E14
-	for <kvmarm@lists.linux.dev>; Fri, 18 Sep 2026 14:55:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A4914FDA76;
+	Fri, 18 Sep 2026 14:58:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789743317; cv=none; b=MEhUgSsOu+ha2/eHV4amlhnLbZRFjMRrwy3fdpthDhBZRCe+OEEbCSCQ+2S6k9uQKv1lYern8agr4L3kc42xd9IXZin8kwqBVrkDnFkSqLf252sk67BIrC5i96n62iUQ2sn/8CqVwHI9/mEwLdZDaO1hfz0Vg9CEOt0b3CLsjEA=
+	t=1789743495; cv=none; b=qQw38hS+HWuNI27vmB6Pimq2/A6xnOb7ChORmMSZdA4qOf3ebUSIWnZjeU1qID0H+uyvnCm4MdjE9MVaOeJWtDaCBHcRUuqX6gjyeS2VifvD71PrMOGKcp0HR5XBk6+MVjcp1Vi4/byr/d4gVrdA3tlw4s39Zh45GWO4nCPrnBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789743317; c=relaxed/simple;
-	bh=95Lr+PmMj7HxN1XXw1kqIJrzTIPr/Sc8TW+cNaDyjn8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=ug4/g1lbs2bzl7hMIv2Y2pEv7ZMBrkbJnXsWNBPsZyWTNZz9pCzzA7/nCs/o7i+4D2GFceUv3szsTH7rr6CpZtFZzGojxMPy1FU2fpgVLMLGwPXf7wzvhOFzbPQ6TpLCXbBfL8kiKstPMM7kgsL36sBEj49u1w1A5AT1KLmBmjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=b/NZSPRy; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1789743495; c=relaxed/simple;
+	bh=RF1s6mLH/teaAVMBltKOXpAY10cWmutijpOAWgvqd5M=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=U+zJwF+yUImArWWlUrjuGlhBgJ03/b0rT7FNQ5xqNPxCpNI3I3hm5RpkcV234Xn3v83ex8BEMlAmFUEOeaKowjkctSEamm1BeoFIT2/CD7gFXkz88c3pRMIVH2s8JBMMhQMW7Jna9u8WbCWE0B5LWVxDxTvcOxCXFl+j/gq549k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DVZQdrwL; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="b/NZSPRy"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5FC49168F;
-	Fri, 18 Sep 2026 07:55:09 -0700 (PDT)
-Received: from LeoBrasDK.cambridge.arm.com (unknown [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7D5D13F86C;
-	Fri, 18 Sep 2026 07:55:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1789743312; bh=95Lr+PmMj7HxN1XXw1kqIJrzTIPr/Sc8TW+cNaDyjn8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=b/NZSPRyN/bSoalpu3s5V5H20FRSOcJzsD81iElRkXTaKFAoGewQ/s/UNwuafals/
-	 iHVXNR3LedtXDn/t9CGHPbp4E6VicXkPtS6pLTmrhqi9ULV6pLAYuAwP+GiK+BWaZM
-	 zIdMrFPruAoPHFSA9pw8xWVHTTbi3mz5P6FFAoxQ=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Oliver Upton <oupton@kernel.org>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	kvmarm@lists.linux.dev,
-	Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Wei-Lin Chang <weilin.chang@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>
-Subject: Re: [PATCH 00/22] KVM: arm64: nv: Implement FEAT_HAFDBS, FEAT_HAFT
-Date: Fri, 18 Sep 2026 15:55:03 +0100
-Message-ID: <aq1Qx0z_aUNvm44n@LeoBrasDK>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260623184201.1518871-1-oupton@kernel.org>
-References: <20260623184201.1518871-1-oupton@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DVZQdrwL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CEE131F00898;
+	Fri, 18 Sep 2026 14:58:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789743494;
+	bh=+aMLP3BCeP896xtPE7BbMOwBTSyhVeEGlc2T6/YOQOw=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=DVZQdrwLwjIWqK1W3V17xY1NMSJptPahMpZw07NlGySJC95UMAmxYaEsyE6kQAbXV
+	 KxpWd7Xpa35RU6DjxYenT5F3IHRQ734hY1Lfgzcib9j+CjZSOvR2/GB4x/bA53IlG9
+	 xO7+YCyK5Meyun3Tgfb+7+Ac+LdlKsMPtkeLKygNM0OjAp3gLWrKcaQGMshkMA1Px2
+	 QSAZYbXaH6WucAozGbifILf9RmdYjHSRs72UVXz1z1vPCVH10otvW/Y0Bw+zxcB/bI
+	 N8c0k65Uta3JtoQmAliEYP+YVPUyzf97VRVUw1ZH9uukOzeURBEX0FT9mH1nC1q9kR
+	 zirxD/oXq7Ixg==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v8 07/29] KVM: Make device name configurable
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Steffen Eiden" <seiden@linux.ibm.com>
+Cc: "Marc Zyngier" <maz@kernel.org>, "Alexander Gordeev" <agordeev@linux.ibm.com>, "Heiko
+ Carstens" <hca@linux.ibm.com>, linux-s390@vger.kernel.org, "Vasily Gorbik" <gor@linux.ibm.com>, kvmarm@lists.linux.dev, kvm@vger.kernel.org, "Christian
+ Borntraeger" <borntraeger@linux.ibm.com>, "Oliver Upton" <oupton@kernel.org>
+In-Reply-To: <20260918133107.1042730-8-seiden@linux.ibm.com>
+References: <20260918133107.1042730-1-seiden@linux.ibm.com>
+ <20260918133107.1042730-8-seiden@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 18 Sep 2026 14:58:13 +0000
+Message-Id: <20260918145813.CEE131F00898@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
 
-On Tue, Jun 23, 2026 at 11:41:39AM -0700, Oliver Upton wrote:
-> KVM's support for hardware descriptor updates has been lacking, owing in
-> large part to the fact that the most widely available NV2 hardware
-> actually lacks HAFDBS :)
-> 
-> This series brings support for hardware dirty state and table Access
-> flags to the nested MMU. While KVM uses neither of these features, the
-> kernel definitely does in the stage-1 page tables. Since there is only
-> one hypervisor to rule them all, implementing this stuff at stage-2 is
-> mostly motivated by the desire to enable guest stage-1 :)
-> 
-> Implementing dirty state at stage-2 is a bit more challenging than
-> anticipated, I'm in the middle of seeking a relaxation from Arm that
-> would make this all architectural. See the last patch for the details.
-> 
-> Applies to kvmarm/fixes since this depends on some of the earlier VNCR
-> rework. Lightly tested on an implementation with HAFT.
-> 
-> Oliver Upton (22):
->   KVM: arm64: nv: Introduce struct for stage-2 walk step
->   KVM: arm64: nv: Consolidate computation of stage-2 permissions
->   KVM: arm64: nv: Get rid of kvm_s2_trans*() accessors
->   KVM: arm64: nv: Only shadow writable-dirty guest descs as writable
->   KVM: arm64: nv: Pass an access descriptor for stage-2 walks
->   KVM: arm64: nv: Use a helper for stage-2 descriptor updates
->   KVM: arm64: nv: Set dirty state at stage-2
->   KVM: arm64: nv: Treat DBM as writable at stage-2
->   KVM: arm64: Compute S1 permissions as part of s1_walk()
->   KVM: arm64: Plumb through access descriptor for stage-1
->   KVM: arm64: Use a struct for stage-1 walk context
->   KVM: arm64: Create helper for stage-1 descriptor updates
->   KVM: arm64: Set dirty state at stage-1
->   KVM: arm64: Grant write permission when DBM is set at S1
->   KVM: arm64: Don't update descriptors for "non-arch" access
->   KVM: arm64: nv: Expose FEAT_HAFDBS
->   KVM: arm64: Set Access flag on table descriptors at stage-1
->   KVM: arm64: nv: Set access flag on table descriptors at stage-2
->   KVM: arm64: nv: Expose FEAT_HAFT
->   KVM: arm64: selftests: Only test AF behavior for emulated AT insns
->   KVM: arm64: selftests: Test that AT emulation for FEAT_HAFT
->   HACK: KVM: arm64: nv: Set the dirty state for CMOs that fetch for
->     write
-> 
->  arch/arm64/include/asm/kvm_arm.h       |   1 +
->  arch/arm64/include/asm/kvm_nested.h    |  94 +++------
->  arch/arm64/include/asm/kvm_pgtable.h   |  17 +-
->  arch/arm64/kvm/at.c                    | 267 +++++++++++++++++--------
->  arch/arm64/kvm/hyp/pgtable.c           |  11 -
->  arch/arm64/kvm/mmu.c                   |  36 +++-
->  arch/arm64/kvm/nested.c                | 251 ++++++++++++++++-------
->  tools/testing/selftests/kvm/arm64/at.c | 102 ++++++++--
->  8 files changed, 515 insertions(+), 264 deletions(-)
-> 
-> 
-> base-commit: d098bb75d14fde2f12155f1a95ec0168160867ce
-> -- 
-> 2.47.3
-> 
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+s) to consider:
+- [Medium] kvm: KVM_DEV_STRING macro evaluates to literal "KVM_DEV_NAME_vcp=
+u"
+- [Low] kvm: hardcoded "kvm" strings bypass the configurable device name
+--
 
-Hi Oliver,
+commit d598c93c97a669f28341c88d4d371abfd9c3b335
+Author: Steffen Eiden <seiden@linux.ibm.com>
 
-I spent some time trying to study NV, and I think I can understand the 
-patchset a bit better now, so I would like to share my review on it.
+KVM: Make device name configurable
 
-I will start reviewing it, so please let me know if you prefer if I wait 
-for a next version, or something like that.
+Allow KVM implementations to choose alternative device names. This is
+especially useful for architectures providing multiple KVM
+implementations simultaneously.
 
-Thanks!
-Leo
+[ ... ]
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 2b56fb4e85557..5926478563e88 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -45,6 +45,9 @@
+>  #include <asm/kvm_host.h>
+>  #include <linux/kvm_dirty_ring.h>
+> =20
+> +#define __KVM_DEV_STRING(name, x) __stringify(name ## _ ## x)
+> +#define KVM_DEV_STRING(x) __KVM_DEV_STRING(KVM_DEV_NAME, x)
+
+[Severity: Medium]
+Does KVM_DEV_STRING(vcpu) expand to the literal string "KVM_DEV_NAME_vcpu"
+instead of the expected configured name?
+
+Because the name parameter in __KVM_DEV_STRING is adjacent to the ##
+token-pasting operator, the C preprocessor does not macro-expand it before
+pasting. The tokens KVM_DEV_NAME, _, and vcpu are pasted into
+KVM_DEV_NAME_vcpu, which __stringify converts to the literal string.
+
+Does this need an extra level of macro indirection to evaluate the arguments
+before pasting?
+
+[ ... ]
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 891a67cb365ab..4f25e170b542c 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -5596,8 +5596,8 @@ static struct file_operations kvm_chardev_ops =3D {
+>  };
+> =20
+>  static struct miscdevice kvm_dev =3D {
+> -	KVM_MINOR,
+> -	"kvm",
+> +	KVM_DEV_MINOR,
+> +	__stringify(KVM_DEV_NAME),
+
+[Severity: Low]
+Are there other hardcoded "kvm" strings that will bypass this configurable
+device name when creating a VM or interacting with KVM infrastructure?
+
+For instance, processes utilizing different KVM implementations will have
+indistinguishable workqueues and anonymous inodes, reducing observability:
+
+virt/kvm/eventfd.c:kvm_irqfd_init() {
+    ...
+    irqfd_cleanup_wq =3D alloc_workqueue("kvm-irqfd-cleanup", WQ_PERCPU, 0);
+    ...
+}
+
+virt/kvm/kvm_main.c:kvm_create_vm() {
+    ...
+    file =3D anon_inode_getfile("kvm-vm", &kvm_vm_fops, kvm, O_RDWR);
+    ...
+}
+
+And also hardcoded log prefixes:
+
+virt/kvm/kvm_main.c:kvm_shutdown() {
+    ...
+    pr_info("kvm: exiting hardware virtualization\n");
+    ...
+}
+
+Do these strings also need to use the configured device name to ensure
+concurrent KVM instances are cleanly segregated?
+
+[Severity: Low]
+This is a pre-existing issue, but does generic multiple KVM support conflict
+with hardcoded core kernel singletons?
+
+If architectures using CONFIG_KVM_GENERIC_HARDWARE_ENABLING attempt to load
+multiple KVM modules simultaneously, the second module will fail to initial=
+ize.
+The core hotplug subsystem returns -EBUSY when a second implementation invo=
+kes
+it since the hotplug state is statically assigned:
+
+virt/kvm/kvm_main.c:kvm_enable_virtualization() {
+    ...
+    r =3D cpuhp_setup_state(CPUHP_AP_KVM_ONLINE, "kvm/cpu:online",
+                          kvm_online_cpu, kvm_offline_cpu);
+    ...
+}
+
+Also, concurrent registrations of guest info callbacks trigger a WARN_ON_ON=
+CE
+since the core kernel only maintains a single pointer:
+
+virt/kvm/kvm_main.c:__kvm_register_perf_callbacks() {
+    ...
+    perf_register_guest_info_callbacks(&kvm_guest_cbs);
+    ...
+}
+
+Can these singletons be adjusted to support concurrent implementations?
+
+>  	&kvm_chardev_ops,
+>  };
+> =20
+[ ... ]
+> @@ -6521,7 +6521,7 @@ int kvm_init(unsigned vcpu_size, unsigned vcpu_alig=
+n, struct module *module)
+>  	if (!vcpu_align)
+>  		vcpu_align =3D __alignof__(struct kvm_vcpu);
+>  	kvm_vcpu_cache =3D
+> -		kmem_cache_create_usercopy("kvm_vcpu", vcpu_size, vcpu_align,
+> +		kmem_cache_create_usercopy(KVM_DEV_STRING(vcpu), vcpu_size, vcpu_align,
+
+[Severity: Medium]
+With the KVM_DEV_STRING() macro evaluating to the literal string
+"KVM_DEV_NAME_vcpu", will all KVM modules unconditionally attempt to create=
+ a
+kmem_cache named literally "KVM_DEV_NAME_vcpu" during module initialization?
+
+This causes duplicate slab names across multiple KVM implementations, leadi=
+ng
+to sysfs creation warnings (SLUB: Unable to add cache KVM_DEV_NAME_vcpu to
+sysfs) and broken observability in /proc/slabinfo. Although SLUB permits
+duplicate names and proceeds with cache creation, this seems to break the
+intended uniqueness.
+
+>  					   SLAB_ACCOUNT,
+>  					   offsetof(struct kvm_vcpu, arch),
+>  					   offsetofend(struct kvm_vcpu, stats_id)
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260918133107.1042=
+730-1-seiden@linux.ibm.com?part=3D7
