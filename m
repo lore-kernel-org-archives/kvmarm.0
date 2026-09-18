@@ -1,138 +1,125 @@
-Received: from mta0.migadu.com (out-78.mta0.migadu.com [91.218.175.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20BC34EB85A
-	for <kvmarm@lists.linux.dev>; Fri, 18 Sep 2026 12:05:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6441392838;
+	Fri, 18 Sep 2026 12:08:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789733161; cv=none; b=pav00sePdZ/USbF275/UOQgPUyJJPxBpYQLWSL1aKtUyz5px2VSDvSLeWhx5IaqV+wJXap58xRaPXMPQ3D0ZGXPJc0NJ/6JSQVPLejbydMdrNcMkBSjPpTQnstO+wd56dZ5E2d8twTzh9ln7IoUFoMJ6fWfpBo2vP2OFwQhz+i8=
+	t=1789733329; cv=none; b=XXT3lTBAS9OXlti75rtWhS6aEcXeKg0azzGPK5hEXhRDAM+e10sGQwQX2LzM0dkwGffpaCJTUiF61XMsUxtXnFcajOa7xsdV5TlVISic8sTCWIRYrW2XFv/WlfZ+Yc5xrFvlQ+TQPqEq5/RiFAylRlhjiIWC++SaWEg6q+iibig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789733161; c=relaxed/simple;
-	bh=GQDpK0dc1fRX5xqYlgvNb2kn+E+OlZng7gkPioKRS90=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=gS60B3IeJEdjbDk6M3lKYa28Hm5VL4aSP8duRdnoHImBhv8D9FKlgbOSXlNtnQMgjF8JkHFsZO65hWc0NXZWOR2U798DOL2Bu7azcI049hZuS1toYLxxjj6U2KVQ9VJkecQf/LdY60n6XB9IO6TIAJ6zzER1F03hADf5vVOwf1Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=khqJ+9GZ; arc=none smtp.client-ip=91.218.175.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1789733329; c=relaxed/simple;
+	bh=3HbIWXGLsOu382WvPEzkFJrJvJlDUfpVXL/Umg8mu3w=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Ge9WOYGD58gjNk7ne/Wd5xWyeFt4JMwz+NLBBhj8p+ruAzVIJRov824GB4QU7CDpmJ5zGcd35s9bJ1RqCufIormsmqs59waLtW0X2ssg3A0sQrfC2hPIPWp4l1mgDu6+M8ndjZRRPJVzfVbSsS4luamIQ+0GB4tytBzovLmkMC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hZOcONQZ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="khqJ+9GZ"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=GQDpK0dc1fRX5xqYlgvNb2kn+E+OlZng7gkPioKRS90=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1789733158; v=1; x=1790337958;
- b=khqJ+9GZiuJ1ZP+SQKoK3VQx6poPai44MRzzoEo8XFFNK5cKHZoJTsVpGEkYcL90ZWotBEUk
- mFXmRxCVTx1Q716ywLagGhulelI76nV8i/LBRoeqk0TzORZcd09xC5bEhbd11YR7njZMjHi5/uI
- UjGjt4jW6zwIEor5E01W7ClQ=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 4620aac8f7d1920a;
-	Fri, 18 Sep 2026 12:05:58 +0000
-X-Mizu-Trace-ID: 4620aac8f7d1920a
-X-Migadu-Flow: FLOW_OUT
-From: Fuad Tabba <fuad.tabba@linux.dev>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Will Deacon <will@kernel.org>,
-	Lorenzo Stoakes <ljs@kernel.org>,
-	Jack Thomson <jackabt@amazon.com>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Fuad Tabba <tabba@google.com>
-Subject: [PATCH] KVM: arm64: Restore the VM's feature bitmap when kvm_setup_vcpu() fails
-Date: Fri, 18 Sep 2026 13:05:53 +0100
-Message-Id: <20260918120553.163139-1-fuad.tabba@linux.dev>
-X-Mailer: git-send-email 2.39.5
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hZOcONQZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 996E91F000FF;
+	Fri, 18 Sep 2026 12:08:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789733328;
+	bh=G4d5dLgZ43pLk8TSCsaTKNXKqimNxe33+rcdWHI4/Ps=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=hZOcONQZM/7dyiIb7+ABgovOGFzxsjfE2GXrUOCGH3p9zOIG/4jfmxC5JYF5R9Sxp
+	 qTDnAMT/Ef0urHdJFDozTZ2B0qR2F3RRtYT0qWVv57+fZraHO+fzv210gGOILxIDie
+	 v7e+pclrwT/8hXbswE+Lt+7bM/Lq/6fXNzwO/myEvu2IqBgIqzZcR6PcMA9TIsReeZ
+	 FpSDpRBecChPm4MR7yYy226fD6lD//juIo8yyt8yIlbxWerkFMKtvBNX0Fiy+ZEi9q
+	 A4ivdS240J/HG8JJGwUt7DtTaVk6iSPpL3KlPk6W4YWmyVAH0IyHBQ2c1kYs694LUQ
+	 0ar2KY27fkkmA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1x7XOY-0000000Aaln-1a8h;
+	Fri, 18 Sep 2026 12:08:46 +0000
+Date: Fri, 18 Sep 2026 13:08:45 +0100
+Message-ID: <861paq69te.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Yize Wang <wangyize7@huawei.com>
+Cc: <kvmarm@lists.linux.dev>,
+	<linux-arm-kernel@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>,
+	<oupton@kernel.org>,
+	<catalin.marinas@arm.com>,
+	<will@kernel.org>,
+	<fuad.tabba@linux.dev>,
+	<joey.gouly@arm.com>,
+	<seiden@linux.ibm.com>,
+	<suzuki.poulose@arm.com>,
+	<yuzenghui@huawei.com>,
+	<mark.rutland@arm.com>,
+	<zhengchuan@huawei.com>,
+	<jiangjiacheng@huawei.com>,
+	<yize_w1110@163.com>
+Subject: Re: [PATCH 0/2] Batch register access for live migration optimization
+In-Reply-To: <20260918081930.4014735-1-wangyize7@huawei.com>
+References: <20260918081930.4014735-1-wangyize7@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: wangyize7@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, oupton@kernel.org, catalin.marinas@arm.com, will@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, zhengchuan@huawei.com, jiangjiacheng@huawei.com, yize_w1110@163.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-__kvm_vcpu_set_target() copies the requested features into the VM-wide
-bitmap before kvm_setup_vcpu() runs and doesn't undo it when setup
-fails, so a rejected KVM_ARM_VCPU_INIT leaves the VM recording features
-that were never set up. With HAS_EL2 | HAS_EL2_E2H0 on a host without
-FEAT_NV1, kvm_vcpu_init_nested() returns -EINVAL before it allocates any
-nested stage-2 MMU, and vcpu_has_nv() is then true with
-nested_mmus_size == 0; its -ENOMEM paths do the same on a VM's first
-INIT.
+On Fri, 18 Sep 2026 09:18:13 +0100,
+Yize Wang <wangyize7@huawei.com> wrote:
+> 
+> This series adds batch register access support to KVM/arm64 to reduce
+> syscall overhead during VM live migration.
+> 
+> Currently, QEMU issues one ioctl per register when saving/restoring VGIC
+> state. On large VM configurations this means tens of thousands of syscalls,
+> where lock acquisition and context switch overhead dominates migration
+> downtime. Thus, we provide a batch register method to allow userspace
+> read/write multiple distributor and redistributor registers in a single call.
+> In this way, we can significantly reduce syscalls and migration downtime.
+> 
+> Test the VM migration time under pressure conditions.
+> The VM specifications for migration are as follows:
+> - VM use 4-K page;
+> - the number of VCPU is 160;
+> - the total memory is 320Gigabit;
+> - use 'Redis SET-benchmark' to pressurize VM;
+> 
+> Performance results (3-run average, ms):
+>     | Metric              | Without patch | With patch | Improvement |
+>     |---------------------|---------------|------------|-------------|
+>     | Migration downtime  |        536    |     321    |     40%     |
+>     | Source (total)      |        344    |     230    |     33%     |
+>     |   - VGIC put        |        158    |      40    |     75%     |
+>     |   - VGIC get        |        120    |      19    |     84%     |
+>     | Destination (total) |        192    |      91    |     53%     |
+>     |   - VGIC put        |        132    |      27    |     80%     |
+> 
+> Yize Wang (2):
+>   KVM: arm64: Add batch group constant and data structure to UAPI header
+>   KVM: arm64: Add VGIC v3 batch register access implementation
 
-Nothing in the tree loads a vCPU whose init failed, so this is latent.
-The pending KVM_PRE_FAULT_MEMORY series for arm64 does, and the second
-such load NULL-dereferences in get_s2_mmu_nested() under mmu_lock.
+Questions:
 
-Setup reads the VM-wide bitmap, so the copy can't be deferred; restore
-the previous value instead when kvm_setup_vcpu() fails.
+- Why only the MMIO registers?
 
-Fixes: 1de10b7d13a97 ("KVM: arm64: Get rid of vCPU-scoped feature bitmap")
-Fixes: 427733579744e ("KVM: arm64: Select default PMU in KVM_ARM_VCPU_INIT handler")
-Link: https://lore.kernel.org/r/20260825-kvm-arm-prefault-v1-0-befe8947702e@kernel.org/
-Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
----
-The series' generic kvm_vcpu_pre_fault_memory() calls vcpu_load()
-before any arm64 hook, so there is no arm64 check it can pass through
-first. Reproduced on kvmarm/next plus the series under
-QEMU (-cpu max with an Apple M2 MIDR, which has_nv1() denies;
-kvm-arm.mode=nested): KVM_ARM_VCPU_INIT with HAS_EL2 | HAS_EL2_E2H0
-returns -EINVAL, then KVM_PRE_FAULT_MEMORY twice. The first call loads
-with hw_mmu still the canonical MMU and its vcpu_put() clears hw_mmu;
-the second takes the !hw_mmu path into get_s2_mmu_nested(), whose
-search over nested_mmus_size == 0 leaves s2_mmu NULL for the
-BUG_ON(atomic_read(&s2_mmu->refcnt)):
+- Why not the sysregs?
 
-  Unable to handle kernel NULL pointer dereference at virtual address 0000000000000074
-  Call trace:
-   kvm_vcpu_load_hw_mmu+0x94/0x2c0 (P)
-   kvm_arch_vcpu_load+0x2a8/0x5e8
-   kvm_vcpu_pre_fault_memory+0xa0/0x1b8
-   kvm_vcpu_ioctl+0x40c/0x6d0
+- Why only the GIC?
 
-The thread dies with mmu_lock held for write and an RCU stall in
-queued_write_lock_slowpath() follows. With the fix both calls return
--ENOENT and the host is unaffected. Applies unchanged to v7.3-rc3.
+- Why not all of the state?
 
- arch/arm64/kvm/arm.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+- Where is the corresponding userspace code?
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index eaf583b771931..c2eb9b6da80f4 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1685,6 +1685,7 @@ static int kvm_setup_vcpu(struct kvm_vcpu *vcpu)
- static int __kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
- 				 const struct kvm_vcpu_init *init)
- {
-+	DECLARE_BITMAP(old_features, KVM_VCPU_MAX_FEATURES);
- 	unsigned long features = init->features[0];
- 	struct kvm *kvm = vcpu->kvm;
- 	int ret = -EINVAL;
-@@ -1695,11 +1696,17 @@ static int __kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
- 	    kvm_vcpu_init_changed(vcpu, init))
- 		goto out_unlock;
- 
-+	/* Setup reads the VM-wide bitmap, so undo the copy if setup fails. */
-+	bitmap_copy(old_features, kvm->arch.vcpu_features,
-+		    KVM_VCPU_MAX_FEATURES);
- 	bitmap_copy(kvm->arch.vcpu_features, &features, KVM_VCPU_MAX_FEATURES);
- 
- 	ret = kvm_setup_vcpu(vcpu);
--	if (ret)
-+	if (ret) {
-+		bitmap_copy(kvm->arch.vcpu_features, old_features,
-+			    KVM_VCPU_MAX_FEATURES);
- 		goto out_unlock;
-+	}
- 
- 	/* Now we know what it is, we can reset it. */
- 	kvm_reset_vcpu(vcpu);
+More importantly, since this is about batching system calls:
 
-base-commit: 089e4f3c4862ba3f29dff2361caa8084879194fd
+- Why can't this be done with io_uring instead?
+
+	M.
+
 -- 
-2.39.5
-
+Without deviation from the norm, progress is not possible.
