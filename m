@@ -1,56 +1,98 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 355F1303A04;
-	Sat, 19 Sep 2026 14:57:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDBF919CD0A;
+	Sat, 19 Sep 2026 15:06:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789829860; cv=none; b=IWTLfffCmLVIb5LSuNUQ4sl0732xDOcDOsHbyUStkU/oOj6QcuSuePgYhTnjpP3L2L8M4I158lPDc4A8eVUde84zvScm5+qVYkZjguSeI10kRycaHO6K7JKmMlz9u+bdfNfpG+ZoDZPtnQwuAxKRm7gpsy5HptQogw36//ytrJ8=
+	t=1789830390; cv=none; b=segRBTkTWZltSw5vnkNjq2iS3LD9cDdNndWXPAjmRbQ2Z2cML7u1xmaB6eNhXyR64haOWswX/Q7lGMDnM7vogOAOa5x1vVHRvJ9iwAmZzegzHOMPOdESmVLU0bML5uvfXQ0XzoQaHIdL2u6xTLgPsoIlEIp9KzjvgGki0rUun4I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789829860; c=relaxed/simple;
-	bh=qSz4ttqsgCsAykTOdJCcoito5Se4r2s9OpkfsKZ/9NE=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=TkXDRb9EhBYbZDpu+xSruQ9giVVoHh+J2uMcs2TfXAaSVrYnpvgTdGNOI6bdRGhugU/qrqF06013pR/wFbUGD2uwWFrJC9NrxoeyarBmTKO1hX/oGAsb6hNOerGezzKaq1xLyG8z79Kaxrj7jRcJss/e5q7o5LpULZaC6bnUXbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UBShnuzN; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789830390; c=relaxed/simple;
+	bh=NpUWm8hyKk1UnzYiX/6WSmpR37UXuUGnDVdN3XjCOQE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KBpYTlsZkfKm9X3A0IVOridj2t30Hd9Zw8wP+gIWxnfundslfdPeqmnUVcvn4MLaj4BuN+iZWgLX53ksxsIXwJ2RLQnNvlcIrhYJul9sUDvhikV6Yc8KxPKgneyaxuII64y0FzTqIiD/KNuATmu5gStGHMNgmLQPl2CJ+iacxZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mZ7NEov0; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UBShnuzN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 625771F000FF;
-	Sat, 19 Sep 2026 14:57:33 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mZ7NEov0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8E8F1F000FF;
+	Sat, 19 Sep 2026 15:05:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789829858;
-	bh=hwMYKiZPm2y3OBoj9z4kIBVQqZuXs87GFGfojHIy3GI=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=UBShnuzNZLY5og2swhM4JcZuGUbhPH621d//TSqzd2LqOAKbXceBslQVOOgg8miXi
-	 zdz+Y5QD+3s7s2Fs1KrPH3/QXoactcKBWC5ACpGPxZb8CQ16JfU6wGGR06sSjXryeg
-	 wwh4ijWHZolW5VujXMK+b8lwaC86kFlNficqje1oRsYLXNZQ89AqY5ppFc8RNoPnQO
-	 3qZaGA3VE/rpzlRAsvtuTOcJskD1lONFY2tmQMpwPOxmNg3aONxm53/ef2NcoZyAcI
-	 A8gpYWaej6HgpdnU0VZtcKQFzTjivjVP+dZP/yiadqBmUZYuApvepJ6NreVJ/fcaVm
-	 a5i1GjcIAVf0Q==
-X-Mailer: emacs 31.1 (via feedmail 11-beta-1 I)
-From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: Jason Gunthorpe <jgg@ziepe.ca>,
-	Christian =?utf-8?Q?K=C3=B6nig?= <christian.koenig@amd.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, iommu@lists.linux.dev,
-	Marc Zyngier <maz@kernel.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Thomas Gleixner <tglx@kernel.org>,
-	Will Deacon <will@kernel.org>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	"T.J. Mercier" <tjmercier@google.com>
-Subject: Re: [PATCH v6 7/9] dma-buf: system_heap: Enforce shared-granule
- alignment for cc-shared buffers
-In-Reply-To: <20260918153642.GD11599@ziepe.ca>
-References: <aq1V3oeDdvXobt8J@arm.com>
- <97c30fce-9bda-4c61-b1b9-10297b89c8d9@amd.com>
- <20260918153642.GD11599@ziepe.ca>
-Date: Sat, 19 Sep 2026 20:27:29 +0530
-Message-ID: <yq5atsnl47c6.fsf@kernel.org>
+	s=k20260515; t=1789830388;
+	bh=6E/2ltl35xPsVBq7dCp8kX3P3iYtwP2nwvmHYrMGiao=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=mZ7NEov07DW0ZDR9skjWGGxQUM0tilYV9cJ7x872u31P1qu1yVnwdU0E77jSYzczU
+	 Rq0n7dEgh+A9eWTU+kdQxDU5tKshnvcxTa3XN1JDv7zPJ7mxY5KgfDql95Wg5316wn
+	 kqxgLNkCZWg1I6A6O0IhltPcOlOLcVqsjbFRvGscwxEQOwDG8XewmgyU6Ujr9SqTuc
+	 zEYCMum6E9yTv2amUuljbVi6GJTLEO9nOY5NLyIChsn3u7MRozdIRj+bylE4/Ua89o
+	 aFiTM/yy7p1O+kilDkoW7RGJH5LX4eZ8RZkWZXZPSrDaZInSmA804tyjxuFh+fgV9t
+	 5tO9QHfxFsFFQ==
+Date: Sat, 19 Sep 2026 16:05:57 +0100
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Suren Baghdasaryan <surenb@google.com>
+Cc: "David Hildenbrand (Arm)" <david@kernel.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, "Liam R. Howlett" <liam@infradead.org>, 
+	Vlastimil Babka <vbabka@kernel.org>, Jann Horn <jannh@google.com>, Pedro Falcato <pfalcato@suse.de>, 
+	Mike Rapoport <rppt@kernel.org>, Michal Hocko <mhocko@suse.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>, 
+	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, 
+	Paul Moore <paul@paul-moore.com>, Stephen Smalley <stephen.smalley.work@gmail.com>, 
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Zi Yan <ziy@nvidia.com>, 
+	Baolin Wang <baolin.wang@linux.alibaba.com>, Nico Pache <nico.pache@linux.dev>, 
+	Ryan Roberts <ryan.roberts@arm.com>, Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>, 
+	Lance Yang <lance.yang@linux.dev>, Usama Arif <usama.arif@linux.dev>, 
+	Kiryl Shutsemau <kas@kernel.org>, Doug Gilbert <dgilbert@interlog.com>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, "Martin K. Petersen" <mkp@kernel.org>, 
+	Jaya Kumar <jayalk@intworks.biz>, Simona Vetter <simona@ffwll.ch>, Helge Deller <deller@gmx.de>, 
+	Sebastian Reichel <sre@kernel.org>, John Hubbard <jhubbard@nvidia.com>, Peter Xu <peterx@redhat.com>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Oleg Nesterov <oleg@redhat.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@kernel.org>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, Arnaldo Carvalho de Melo <acme@kernel.org>, 
+	Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Rik van Riel <riel@surriel.com>, Harry Yoo <harry@kernel.org>, Juri Lelli <juri.lelli@redhat.com>, 
+	Vincent Guittot <vincent.guittot@linaro.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
+	Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
+	David Airlie <airlied@gmail.com>, Will Deacon <will@kernel.org>, 
+	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Nick Piggin <npiggin@gmail.com>, Arnd Bergmann <arnd@arndb.de>, 
+	Muchun Song <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>, 
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Jan Kara <jack@suse.cz>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oupton@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Madhavan Srinivasan <maddy@linux.ibm.com>, Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
+	Gerald Schaefer <gerald.schaefer@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, 
+	Vasily Gorbik <gor@linux.ibm.com>, "David S. Miller" <davem@davemloft.net>, 
+	Andreas Larsson <andreas@gaisler.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, Matthew Brost <matthew.brost@intel.com>, 
+	Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>, Byungchul Park <byungchul@sk.com>, 
+	Gregory Price <gourry@gourry.net>, Ying Huang <ying.huang@linux.alibaba.com>, 
+	Alistair Popple <apopple@nvidia.com>, Chris Li <chrisl@kernel.org>, Kairui Song <kasong@tencent.com>, 
+	Kemeng Shi <shikemeng@huaweicloud.com>, Nhat Pham <nphamcs@gmail.com>, Baoquan He <baoquan.he@linux.dev>, 
+	Youngjun Park <youngjun.park@lge.com>, Johannes Weiner <hannes@cmpxchg.org>, 
+	Qi Zheng <qi.zheng@linux.dev>, Shakeel Butt <shakeel.butt@linux.dev>, 
+	Axel Rasmussen <axelrasmussen@google.com>, Yuanchu Xie <yuanchu@google.com>, Wei Xu <weixugc@google.com>, 
+	Chengming Zhou <chengming.zhou@linux.dev>, Michal Hocko <mhocko@kernel.org>, 
+	Miklos Szeredi <miklos@szeredi.hu>, Xu Xin <xu.xin@linux.dev>, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-usb@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, selinux@vger.kernel.org, linux-sound@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-scsi@vger.kernel.org, linux-fbdev@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, linux-trace-kernel@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org, linux-arch@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, 
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-s390@vger.kernel.org, sparclinux@vger.kernel.org, fuse-devel@lists.linux.dev, 
+	Takashi Iwai <tiwai@suse.de>
+Subject: Re: [PATCH v2 00/40] mm: make VMA flag semantics explicit, eliminate
+ VM_SPECIAL
+Message-ID: <aq6kzpK7wPl3iFGe@gremlin>
+References: <20260914-b4-mmap-prepare-vma-flag-sanify-v2-0-7d9781ed5361@kernel.org>
+ <20260914180811.057cba8fcc48d6e0b53a2683@linux-foundation.org>
+ <0b064fe6-ddb3-4f26-a1f2-2e9dd88d590f@kernel.org>
+ <CAJuCfpFBichJH4OcmSHTb1rOuQBT6k5pXeua9_KgpWjDBKvsYw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -58,150 +100,45 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJuCfpFBichJH4OcmSHTb1rOuQBT6k5pXeua9_KgpWjDBKvsYw@mail.gmail.com>
 
-Jason Gunthorpe <jgg@ziepe.ca> writes:
-
-> On Fri, Sep 18, 2026 at 05:23:32PM +0200, Christian K=C3=B6nig wrote:
->> On 9/18/26 17:16, Catalin Marinas wrote:
->> > First, none of the DMA-BUF maintainers have been cc'ed. It might be fi=
-ne
->> > for an RFC but this series got to version 6. We need their feedback.
->>=20
->> Yeah, thanks for doing this.
->> > On Fri, Sep 04, 2026 at 04:04:50PM +0530, Aneesh Kumar K.V (Arm) wrote:
->> >> The system heap can allocate buffers that are decrypted and shared wi=
-th the
->> >> host. For confidential-computing guests, those shared buffers must co=
-ver
->> >> whole shared-buffer granule; otherwise a userspace mmap of the dma-bu=
-f may
->> >> expose only part of a host-managed granule and allow unintended acces=
-s to
->> >> adjacent private memory.
->> >>
->> >> Require cc-shared system-heap allocations to have a size aligned to
->> >> mem_cc_shared_granule_size(), and allocate pages at least as large as=
- the
->> >> required granule. Keep the allocation bounded by the existing heap or=
-ders,
->> >> but fall back to an exact minimum-order allocation when the required
->> >> granule is not one of the preferred heap orders.
->>=20
->> Uff, I don't think we can do that.
->>=20
->> That is massively platform specific behavior in a non platform
->> specific code.
+On Fri, Sep 18, 2026 at 01:31:24PM -0700, Suren Baghdasaryan wrote:
+> On Fri, Sep 18, 2026 at 1:21 PM David Hildenbrand (Arm)
+> <david@kernel.org> wrote:
+> >
+> > On 9/15/26 03:08, Andrew Morton wrote:
+> > > On Mon, 14 Sep 2026 15:57:20 +0100 "Lorenzo Stoakes (ARM)" <ljs@kernel.org> wrote:
+> > >
+> > >> The VM_SPECIAL / VMA_SPECIAL_FLAGS mask conflates several unrelated
+> > >> properties:
+> > >>
+> > >> ...
+> > >>
+> > >> It's all rather a mess.
+> > >>
+> > >> This series brings some order to things by both limiting what drivers can
+> > >> do with VMA flags and switching to using predicates that describe
+> > >> behaviour, not arbitrary flags.
+> > >
+> > > That's a lot of patches.
+> > >
+> > > Review is thin and I expect this won't improve a lot.  Lots of "no
+> > > functional changes" changes.
+> >
+> > I'll expect to go through all of them. Might just take a bit ;)
 >
-> What we really need is an allocator API that does all this for the caller.
+> ditto
+
+Thanks guys!
+
 >
-> It has been pointed out a few times, Aneesh maybe you need to try to
-> tackle that?
->
-> dmabuf heap just wants
->
-> 'allocate me an array of shared folios totaling XX bytes'
->
-> Arch code can figure out how to do it. If some ARM configs only give
-> order 4 folios or whatever then dmabuf heap doesn't care.
->
-> And solve the double/triple zeroing problem.
->
+> >
+> > --
+> > Cheers,
+> >
+> > David
 
-Agreed. Moving all the CoCo shared-allocation rules into one place makes
-this easier to follow.
-
-+static struct page *system_heap_alloc_order(unsigned int order, gfp_t flag=
-s,
-+					    bool cc_shared)
-+{
-+	struct cc_shared_pages mem;
-+
-+	if (!cc_shared)
-+		return alloc_pages(flags, order);
-+
-+	/* The shared granule can raise the actual allocation order. */
-+	flags |=3D __GFP_COMP;
-+	if (alloc_cc_shared_pages(flags, PAGE_SIZE << order, &mem))
-+		return NULL;
-+
-+	return mem.page;
-+}
-+
- static struct page *alloc_largest_available(unsigned long size,
--					    unsigned int max_order)
-+					    unsigned int max_order,
-+					    bool cc_shared)
- {
- 	struct page *page;
-	int i;
- 	gfp_t flags;
-=20
- 	for (i =3D 0; i < NUM_ORDERS; i++) {
- 		if (size <  (PAGE_SIZE << orders[i]))
- 			continue;
- 		if (max_order < orders[i])
- 			continue;
- 		flags =3D order_flags[i];
- 		if (mem_accounting)
- 			flags |=3D __GFP_ACCOUNT;
--		page =3D alloc_pages(flags, orders[i]);
-+		page =3D system_heap_alloc_order(orders[i], flags, cc_shared);
- 		if (!page)
- 			continue;
- 		return page;
-
-
-with mm/cc_shared.c having
-
-int alloc_cc_shared_pages_node(int nid, gfp_t gfp, size_t requested,
-			       struct cc_shared_pages *mem)
-{
-	struct cc_shared_layout layout;
-	struct page *page;
-	unsigned int order;
-	bool zero =3D gfp & __GFP_ZERO;
-	int ret;
-
-	if (!mem)
-		return -EINVAL;
-
-	ret =3D cc_shared_calc_layout(requested, &layout);
-	if (ret)
-		return ret;
-
-	order =3D get_order(layout.shared_size);
-	if (order > MAX_PAGE_ORDER)
-		return -EINVAL;
-
-	/*
-	 * State transitions require a linear-map address and may modify memory.
-	 * Allocate from low memory and defer requested zeroing until afterwards.
-	 */
-	gfp &=3D ~(__GFP_HIGHMEM | __GFP_ZERO);
-	if (nid =3D=3D NUMA_NO_NODE)
-		page =3D alloc_pages(gfp, order);
-	else
-		page =3D alloc_pages_node(nid, gfp, order);
-	if (!page)
-		return -ENOMEM;
-
-	ret =3D cc_make_shared(page_address(page), layout.shared_size);
-	if (ret) {
-		if (!cc_make_private(page_address(page), layout.shared_size))
-			__free_pages(page, order);
-		else
-			pr_warn_ratelimited("leaking %zu bytes with uncertain shared state\n",
-					    layout.shared_size);
-		return ret;
-	}
-
-	if (zero)
-		memset(page_address(page), 0, layout.shared_size);
-
-	mem->page =3D page;
-	mem->shared_size =3D layout.shared_size;
-	return 0;
-}
-
--aneesh
+--
+Cheers, Lorenzo
