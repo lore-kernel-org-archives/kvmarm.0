@@ -1,109 +1,253 @@
-Received: from mail-wm2-f12.google.com (mail-wm2-f12.google.com [74.125.225.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3307631F9B9
-	for <kvmarm@lists.linux.dev>; Sat, 19 Sep 2026 05:18:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 147C33B2D39;
+	Sat, 19 Sep 2026 09:22:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789795118; cv=none; b=XplRyeqNtJZWQF0v2/jEmPrd4rQpgI5i7brYXjzuqhlm2+yeAvppyEqgnwBdxeCHtsUan7ad4DUqFN9zEyBbX7bb3fjuE2qYY9Hbe1F1wNpxXs0j3cYH5MnhSwZ0un8GcmGbvfwJkfSJ9KoXWmbks6f2YvBH5z5+hpzCCrdPyD8=
+	t=1789809775; cv=none; b=RxSSElwBg4F1WCiKzZRuAzrFcqqFgow59MvS+YZOrQqhzAg/M+GALlx88uzLDlo0jUjTAx/4LSNxXwzUBGGvTvJaDDCX+jkf5Ep3buT5PSlIBRpmw72ms9de71R71ED5bjg80vC44+8/FxfcVpj7TH1XosEwoVadnQf6uwxkmuA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789795118; c=relaxed/simple;
-	bh=1tUtuUrEXlXgTzbEoxh1BpuPhgQ2b2BnNT3+Ec05ZYs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pqVDIQRNPKyYDoFsc244tr3Q/GNmzXvG8kSHsaiazeInUpLzZ7CVgexzYCEBIJJe/4vN/V4jrGjV6Pf7QI05LZ33J6fqd/KU+Njv9wS3t0yr3YRKF8FmUrz3djh4q4IKM/SZhSxSHbq2CdReNJpaD/d8PohSZkXFl1O2fLXfmPc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CndpAX/e; arc=none smtp.client-ip=74.125.225.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1789809775; c=relaxed/simple;
+	bh=s0Q9Jr7Ajsxct8ZN+S1ktDBZtevCFOzsYwmtNormGOg=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jbJ43ZA5/j1nfeG6YCWB+Ax7Ha/Gc6LCnYn4s2+Bw6v4ksO1PFRoTfOBQDzmtJXHEllfvlTRAlGlYXAEBTx8Qm1eam4LVnmqF5N7Wja4enszZw7sDQesRQK3x+yPeP3NodSbantGNAZsZsik5VV+tK3l8aSF1ZqyHzIb+AeD49g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=moAckOx/; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CndpAX/e"
-Received: by mail-wm2-f12.google.com with SMTP id 5b1f17b1804b1-49b912d3931so10073625e9.3
-        for <kvmarm@lists.linux.dev>; Fri, 18 Sep 2026 22:18:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789795115; x=1790399915; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=sBBnfsQ+/vg6cjSZvG+Kg56eu8vn625PDpD6taCDHRs=;
-        b=CndpAX/eAMJsoxuSarFGpMpBQyuSXD8BE5E0JTj85l/NqkdH3e3IMWvT6M5ALAOF4F
-         dsm5YjJiz6h7McgyxhosiNI6BXkhHg93/ZteUj4AQ/6G/GWGvvI/kFATGy9g16+AtxtJ
-         TNj5eZ3AfMuGnRIsCKisgUPRo2EZ5CskKjtQB9NfmqDcOGhL8r5sbNYZcu7N9pXkm5Zh
-         TKo6g2f5j1RyZWmedUZAeAV/5r3lc/+DYgT4cGAxhIvq3HC7ocpI0tOFJZm4JAvSltIt
-         yn9cVhEnx+QEau8JteLXvIU8Z47FytMC4N8gjvYLlu2U03jtOQDbGiUp+eDvqOXRTxF7
-         +dvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789795115; x=1790399915;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=sBBnfsQ+/vg6cjSZvG+Kg56eu8vn625PDpD6taCDHRs=;
-        b=ueDYoMBrbnm3YGRNtzRQZ2hAPCD98BubnxYHOJ3r9hgzRZ8VpgZfd/ZYBk0dZYqlMH
-         3jM+5vKayasuXsYCCJeBkg8DGP9be9cauWml97gXOKRzxR9oiQk4LWdE9vLvVQSBowTI
-         ngrsF+641yu2YptW87LdglFv3yfXSHIG1/P0P+8kLHxMP08qddf8MAeopVnYTt0donaF
-         pM4Z38Eg7HlpwiqU9hkdqTQiyzHkO2/BB3xiOGbX9YBBJTZAutLj3/+8I8chIUx4yr1U
-         kT3CvOjo9YNS5q4w29A6sESo5sxiIUMDdp6/lgEM1JspDPPG+QP5SKT5oDbqeuTohWGt
-         qGGg==
-X-Forwarded-Encrypted: i=1; AKwUvBwC8hmFdPYihZIvK48C83w30I7CMEKM6UasbUyV2lsc9woXWslPqGIhQOxnrkhwtMCd0UDhQ20=@lists.linux.dev
-X-Gm-Message-State: AFuF++lJc9w/BKplnz1VyTBlvDa2V5xZdPL/gdc00t4wTP4ezT0apvPM
-	MXCbR3GoSwQMzwWCXeqHOHGQgW96aKoXsyk8QHR9ixD6DYyJOTnOdw5t
-X-Gm-Gg: AYBFou1IxCk9H5EOtuf4D+YYfjK56G1+wfgCB81y8DR2QfKa3H/chz7iKOls8du2GlU
-	lMOtGa484+I1/IIR6/fJodxn0oUHvrczxIR0p2B+Th7bFhAWWV+lsyuw8kiTWGkdkL56fzNOVWJ
-	pcK1A7dBySnS3R5GNhIya931XG2WJ4RogaNZxzvE6gHtX/r8GQl/bRr2q73vVAcEinpQYFBV2H7
-	2keLPOstW+nPzEm/iiDxojh7mY26SP2cdisTT7INhFoMZ+xERwO//gks9JUOwvE3aao0uSig5qK
-	D9KvFN4WbMiwny1pHtbr4F3eJp2NkOJbgT5PRi8pOhzEyxI4AIlxa8NjaBjYCzvhrfpvbeT5LcQ
-	Xz5nxodOUpl4S8IXsPN9D0rD7kaYa00/RUb3/RcC9222kP3dtjquPCJIP1d4ILHd1VKR6/g+JSX
-	39skGzKqCSK3nqFZOziRCWYCUWOwgkDOEiZSyM4bLP7Kd7AcV4yNR7n2S8d0AYjjMBfOo5vHXMD
-	yeSJzsG+WtpMwqSYyV5cQiVu1HluetZaPqedmLorXcjUrofhMdw4vW/rUQUs6VRdGtIDsoH2Kxz
-	X03bwWK3KkWJxMb64wToJWuRlBXrjV1sa9agL4dp7PqPEHh82zrdMMzd2rI2TssV6g3SyiHT1MM
-	nYNHO/nBFGqkNrq8=
-X-Received: by 2002:a05:600c:3f0b:b0:49b:d45:703e with SMTP id 5b1f17b1804b1-49fc56aa68amr61228495e9.8.1789795115151;
-        Fri, 18 Sep 2026 22:18:35 -0700 (PDT)
-Received: from MacBook-Pro-von-Karl.localdomain (dynamic-2a02-3100-a017-2b01-05fe-203b-7cd2-a640.310.pool.telefonica.de. [2a02:3100:a017:2b01:5fe:203b:7cd2:a640])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49fcda2140bsm30392735e9.1.2026.09.18.22.18.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Sep 2026 22:18:33 -0700 (PDT)
-Date: Sat, 19 Sep 2026 07:18:32 +0200
-From: Karl Mehltretter <kmehltretter@gmail.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
-	Fuad Tabba <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: Fix AArch32 DBGBXVR<n> handling
-Message-ID: <aq4awYi4eQwgcZ-E@gmail.com>
-References: <20260810005616.13227-1-kmehltretter@gmail.com>
- <86qzk69x2j.wl-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="moAckOx/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F9801F000FF;
+	Sat, 19 Sep 2026 09:22:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789809773;
+	bh=p2++DSH7qzxPkUFh8j6R7Yh1w31wukoOyoqI9yjfdzM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=moAckOx/BPVEJ1RzH3Y4pPsnwzsAWrGRbxm3lk29vHVa/fqmDMYCpF8+laeQ8Fiqm
+	 vJhorci6+huPu6TpBGzoelksDEEX/IQiY0dRJ0mKPS8vlQ/rAh0mISFmMwPMe8fkf1
+	 VoCJfmw5k5d/ljYIKnyFd/KA8OvSz+JnXAT/Mfq4+z/EkVjnzbktETwTRcTKJDyUeL
+	 qmOr6mQ+wNCd2qyZnDppyIokInddhCdc52KGjbvXGaA4q4msaibojUzdBfB+kvBbj6
+	 eqmb2BzIbv7iOmAHMreAvi62AE1MhsBlYOLjxCeddTeWJ5Igubyss5hwZ4xz0RXamk
+	 5cGYpvHhLpGjg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1x7rHX-0000000AvKU-1Eeq;
+	Sat, 19 Sep 2026 09:22:51 +0000
+Date: Sat, 19 Sep 2026 10:25:57 +0100
+Message-ID: <87h5jl4moq.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	nd <nd@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Joey Gouly
+	<Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org"
+	<peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	Timothy Hayes <Timothy.Hayes@arm.com>,
+	"fuad.tabba@linux.dev"
+	<fuad.tabba@linux.dev>
+Subject: Re: [PATCH v6 09/49] KVM: arm64: gic-v5: Create and manage VM and VPE tables
+In-Reply-To: <20260904113404.4051341-10-sascha.bischoff@arm.com>
+References: <20260904113404.4051341-1-sascha.bischoff@arm.com>
+	<20260904113404.4051341-10-sascha.bischoff@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86qzk69x2j.wl-maz@kernel.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com, fuad.tabba@linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, Aug 10, 2026 at 09:52:36AM +0100, Marc Zyngier wrote:
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index 5d5c579d4579..2862df188155 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -889,6 +889,7 @@ static u64 *demux_wb_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd)
-> >  	struct kvm_guest_debug_arch *dbg = &vcpu->arch.vcpu_debug_state;
-> >  
-> >  	switch (rd->Op2) {
-> > +	case 0b001:
-> >  	case 0b100:
-> >  		return &dbg->dbg_bvr[rd->CRm];
-> >  	case 0b101:
+On Fri, 04 Sep 2026 12:38:51 +0100,
+Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 > 
-> Reviewed-by: Marc Zyngier <maz@kernel.org>
-> Cc: stable@vger.kernel.org
+> GICv5 uses a set of in-memory tables to track and manage VM state.
+> These must be allocated by the hypervisor and provided to the IRS.
+> 
+> The VMT (Virtual Machine Table) is a linear or two-level table
+> comprising VMT Entries (VMTEs). Each VMTE describes the state for a
+> single VM. This state includes things such as the SPI and LPI IST
+> configuration (coming in a future commit), an implementation-defined
+> VM Descriptor, and a VPE Table (VPET).
+> 
+> The VPET contains one entry per possible VPE ID belonging to a VM. It
+> is used to mark a VPE as valid and provide the address of an
+> implementation-defined VPE Descriptor (VPED), which the hardware uses
+> to track and manage VPE state.
+> 
+> Allocate each VM's VPEDs as a single dense array indexed by vcpu_idx,
+> while the VPET remains indexed by the userspace-provided vcpu_id. This
+> keeps VPED storage proportional to the number of vCPUs even when their
+> IDs are sparse.
+> 
+> The VMT and VPET are shared with the IRS. On systems with a
+> non-coherent IRS, cache maintenance operates at cache-line
+> granularity, while multiple entries can occupy the same cache line.
+> Use a common lock for CPU accesses to these tables and IRS command
+> processing so that writing back one entry cannot overwrite an IRS
+> update to a neighbouring entry.
+> 
+> The implementation-defined VMD and VPED storage is also visible to the
+> IRS. Round these allocations up to whole cache lines to prevent cache
+> maintenance from corrupting unrelated slab objects. Initialise the
+> storage before publishing its addresses to the IRS.
+> 
+> This commit adds support for allocating the VMT and its descriptor
+> backing state, and for managing VMTEs. The VMTEs can be initialised or
+> released for reuse. VM IDs are allocated with an IDA, while an XArray
+> tracks the host-side allocations associated with populated VMTEs.
+> 
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+> ---
+>  arch/arm64/kvm/Makefile              |   2 +-
+>  arch/arm64/kvm/vgic/vgic-init.c      |   2 +
+>  arch/arm64/kvm/vgic/vgic-v5-tables.c | 681 +++++++++++++++++++++++++++
+>  arch/arm64/kvm/vgic/vgic-v5-tables.h | 100 ++++
+>  arch/arm64/kvm/vgic/vgic-v5.c        |  19 +
+>  drivers/irqchip/irq-gic-v5-irs.c     |  12 +-
+>  include/kvm/arm_vgic.h               |   4 +
+>  include/linux/irqchip/arm-gic-v5.h   |  14 +-
+>  8 files changed, 824 insertions(+), 10 deletions(-)
+>  create mode 100644 arch/arm64/kvm/vgic/vgic-v5-tables.c
+>  create mode 100644 arch/arm64/kvm/vgic/vgic-v5-tables.h
 > 
 
-Friendly ping on this patch. It already has a Reviewed-by.
+[...]
 
-Thanks,
-Karl
+The lkp bot is reporting some interesting issues in
+202609190650.liMAzwjF-lkp@intel.com:
+
+> +	/* Allocate and assign the VM Descriptor, if required. */
+> +	if (vmt_info->vmd_size != 0) {
+> +		vmd_alloc_size = round_up(vmt_info->vmd_size,
+> +					  dma_get_cache_alignment());
+> +		vmd = kzalloc(vmd_alloc_size, GFP_KERNEL);
+> +		if (!vmd) {
+> +			ret = -ENOMEM;
+> +			goto out_fail;
+> +		}
+> +
+> +		/* Stash the VA so we can free it later */
+> +		vmi->vmd_base = vmd;
+
+The VMD is dynamically allocated.
+
+> +
+> +		tmp = FIELD_PREP(GICV5_VMTEL2E_VMD_ADDR,
+> +				 virt_to_phys(vmd) >> GICV5_VMTEL2E_VMD_ADDR_SHIFT);
+> +		vmte_val0 = tmp;
+> +	}
+> +
+> +	/*
+> +	 * Allocate and assign the VPE Table.
+> +	 *
+> +	 * First of all, iterate over all vcpus to find the highest VPE ID we
+> +	 * require - we need to ensure that we have enough storage for all
+> +	 * vcpu_id values that userspace has picked and not just the total
+> +	 * number of vcpus. This gives us the number of VPEs required for the
+> +	 * VM.
+> +	 *
+> +	 * Round up the number of VPEs to a whole power of two as we cannot
+> +	 * describe non-powers-of-two in the VMTE field as it conveys the number
+> +	 * of ID bits used and not the number of vPEs. IRS_IDR1.IAFFID_BITS is
+> +	 * encoded as N - 1, so expose at least one VPE ID bit even for a
+> +	 * single-vCPU VM to keep the views consistent.
+> +	 */
+> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+> +		u16 vpe_id = vgic_v5_vpe_id(vcpu);
+> +
+> +		if (vpe_id > max_vpe_id)
+> +			max_vpe_id = vpe_id;
+> +	}
+> +
+> +	nr_cpus = max(2UL, roundup_pow_of_two(max_vpe_id + 1));
+> +	vmi->vpe_id_bits = fls(nr_cpus) - 1;
+> +
+> +	vpet_alloc_size = round_up((size_t)nr_cpus * sizeof(*vpet),
+> +				   dma_get_cache_alignment());
+> +	vpet = kzalloc(vpet_alloc_size, GFP_KERNEL);
+> +	if (!vpet) {
+> +		ret = -ENOMEM;
+> +		goto out_fail;
+> +	}
+> +
+> +	/* Stash the VA so we can free it later */
+> +	vmi->vpet_base = vpet;
+
+and so is the VPET.
+
+[...]
+
+> diff --git a/arch/arm64/kvm/vgic/vgic-v5-tables.h b/arch/arm64/kvm/vgic/vgic-v5-tables.h
+> new file mode 100644
+> index 0000000000000..962be0c7cd3f6
+> --- /dev/null
+> +++ b/arch/arm64/kvm/vgic/vgic-v5-tables.h
+> @@ -0,0 +1,100 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Copyright (C) 2025, 2026 Arm Ltd.
+> + */
+> +
+> +#ifndef __KVM_ARM_VGICV5_TABLES_H__
+> +#define __KVM_ARM_VGICV5_TABLES_H__
+> +
+> +#include <linux/spinlock.h>
+> +#include <linux/idr.h>
+> +#include <linux/irqchip/arm-gic-v5.h>
+> +
+> +/* Level 1 Virtual Machine Table Entry */
+> +typedef __le64 vmtl1_entry;
+> +
+> +/* Level 2 Virtual Machine Table Entry */
+> +struct vmtl2_entry {
+> +	__le64 val[4];
+> +};
+> +
+> +/* Virtual PE Table Entry */
+> +typedef __le64 vpe_entry;
+> +
+> +struct vgic_v5_vm_info {
+> +	void __iomem		*vmd_base;
+> +	vpe_entry __iomem	*vpet_base;
+
+But pointers to allocated memory cannot be __iomem, as this qualifies
+MMIO registers.
+
+I'll queue the change below on top.
+
+	M.
+
+diff --git a/arch/arm64/kvm/vgic/vgic-v5-tables.h b/arch/arm64/kvm/vgic/vgic-v5-tables.h
+index b2ffbe68c05b4..89096926563f7 100644
+--- a/arch/arm64/kvm/vgic/vgic-v5-tables.h
++++ b/arch/arm64/kvm/vgic/vgic-v5-tables.h
+@@ -23,8 +23,8 @@ struct vmtl2_entry {
+ typedef __le64 vpe_entry;
+ 
+ struct vgic_v5_vm_info {
+-	void __iomem		*vmd_base;
+-	vpe_entry __iomem	*vpet_base;
++	void			*vmd_base;
++	vpe_entry		*vpet_base;
+ 	void			*vped_base;
+ 	u8			vpe_id_bits;
+ 
+
+
+-- 
+Jazz isn't dead. It just smells funny.
