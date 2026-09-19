@@ -1,130 +1,93 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F34C23D7DF;
-	Sat, 19 Sep 2026 09:33:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9777D64A8C
+	for <kvmarm@lists.linux.dev>; Sat, 19 Sep 2026 12:31:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789810389; cv=none; b=gFnyxujcdqIG+qhmiXCBRuVrx9neyHfGiMk9FjGbYCSMY9zuw+Lw/8oKqKHqSlrcxX7SBSP0hcLo3wt7+o7KX2ksI3sDQATjdPMKs+QwWFAJmkINdcZ0IrcTmMrr7UTi7VRxLfhAgExnCGGGnZJy734/9kHh3IOPpPVYKXCqgQI=
+	t=1789821116; cv=none; b=C1ZACi7PBhkARHhhovXY5p3h9BE6a7WVBuzWySOXrjoyZAsCqHsMAWEXA+7V8qMnZu9pJbTDi9ysDI/59rTLX3+CX+/sR75vtGjxw+NwalCRKKH57aG/d8cAxTUpOkgcxLMsYNWvqeG5L8/wOnCI2GRUTRHC8JDB4AZ/dWNJItU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789810389; c=relaxed/simple;
-	bh=37Tkp54FuTweTIX79ZXQH1nZlgF0Y6dt687PbaKTug8=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IpFwy2hux1LJkdQU+ceK/Oc8lOr/MFXTJrgqj5z5UAUddW+TigQ7Odd2mQF/HH7EjcJ+TfyOng1JiMaSQHwLEf9JAYFBVKPtchm8YrDmuw9xxI9GqLcfmplnJLOA6mP+ASmdmuMjqV3GXbDk64/WwkMSl86HYJUfXo4S+tb31/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XDsjrrlC; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789821116; c=relaxed/simple;
+	bh=d09jg3LLlE5cdmDX1DN9DZz3HSUF55KfYSW1NN18Jt4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=f0/vd6pdJcuK6lIITCqP8Z8M3ACDlLkJKuehtQj2esF8b5CJCELcRCt/uxTivj8ybvCm2LA4Zj2xRb26cNmtrPHR4mg7RDyFk3lyQSO0LoPSQB09iqnmxHWS53ObAG1+CU5CHtOvC8kxRlsmDxIyHDFYyByfhjrf73VrtNunF78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YZIdgLXE; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XDsjrrlC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C87281F000FF;
-	Sat, 19 Sep 2026 09:33:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YZIdgLXE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 300B71F000FF;
+	Sat, 19 Sep 2026 12:31:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789810387;
-	bh=0caxOyaJoh8KN4zezLmE5kiSj3XpRezHw9bAKEfHF+E=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=XDsjrrlC/bjieVDUM7zOk8gB4UIJFl0ddaQ+sC2uP+/yLsu5viZfE67d6SlH0ixE1
-	 qMAhmknJmMs7wGx8sQt27EdAOeDgKn1hK6JGmYWAbpkIcecakZ5L7iOHcB2tH23SJe
-	 X3FrTs3okSimGbCy3EAnHnLSh29C1NmKKzXLlSqFnEf06RizFeAvfziU3V9CKhGjbz
-	 n2XSP826Kn3M6DQ4nGxKzM439GmgWbwsKqsR25CJHdxO3IVh6AuKF5kw/EaLS+aYm/
-	 tzHXNRduo/Mj4wn+pnsUqB+mrcuz6UClC7uu8bBQqoZf5N8Qa0Nx/ni3qeiTf0aIet
-	 FuUGVQfh4gWOQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	s=k20260515; t=1789821115;
+	bh=GBqFniyZ3g3+J9Du6G8y0kPV5tZ80T53Bvj1N2LISzw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=YZIdgLXELNEnTvoOi0DxTzoE2DAGAHWLUO64Q1UJ39nmIpz+UNYa7dhOzBDgi9BEy
+	 vfgwgBeBhf/Mm42rFMBOj7WS+o8SJSDSVpxBXTcu0m6M4ZVUYABR3DpI+m7DuhBfPb
+	 N+Kz0jQ9ZluYO3lTSHmvPygkGil/4jCXT0p7Bhcg7V27b63r1NHlJDZ0ZLJk/I3kIY
+	 SRz2oZGBuVkExi1Ud0Wdwi1XtPZdTA6i+kY3d5V5IbwJ27Bd9AZI0nem+BD9EQYsSk
+	 jPiCuY8jfBUzCCDp+th8E8WcpSzk7TxJYpoDG1v+FKQncvIbuziyOg3dTQ3sZ7g4CZ
+	 P7tUbNFe/TB/A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1x7rRR-0000000AvOn-27ai;
-	Sat, 19 Sep 2026 09:33:05 +0000
-Date: Sat, 19 Sep 2026 10:36:12 +0100
-Message-ID: <87fqz54m7n.wl-maz@kernel.org>
+	id 1x7uET-0000000AwvV-1QLo;
+	Sat, 19 Sep 2026 12:31:53 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Cc: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	nd <nd@arm.com>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	Joey Gouly
-	<Joey.Gouly@arm.com>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org"
-	<peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	Timothy Hayes <Timothy.Hayes@arm.com>,
-	"fuad.tabba@linux.dev"
-	<fuad.tabba@linux.dev>
-Subject: Re: [PATCH v6 35/49] KVM: arm64: gic-v5: Implement save/restore mechanisms for ISTs
-In-Reply-To: <20260904113404.4051341-36-sascha.bischoff@arm.com>
-References: <20260904113404.4051341-1-sascha.bischoff@arm.com>
-	<20260904113404.4051341-36-sascha.bischoff@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org
+Cc: Steffen Eiden <seiden@linux.ibm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Sascha Bischoff <sascha.bischoff@arm.com>
+Subject: [PATCH 1/4] KVM: arm64: vgic-v5: Drop __iomem attribute from {vmd,vpet}_base
+Date: Sat, 19 Sep 2026 13:31:47 +0100
+Message-ID: <20260919123150.3283606-2-maz@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260919123150.3283606-1-maz@kernel.org>
+References: <20260919123150.3283606-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com, fuad.tabba@linux.dev
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, fuad.tabba@linux.dev, sascha.bischoff@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 04 Sep 2026 12:52:03 +0100,
-Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
+Both vmd_base and vpet_base are pointers to kmalloc'd memory, and
+therefore cannot carry the __iomem attribute, which designates pointers
+to MMIO.
 
-Another LKP bot sparse finding at 202609191215.to1MBYak-lkp@intel.com:
+Drop the abusive qualifier.
 
-> +/*
-> + * Save a linear host IST to userspace memory.
-> + *
-> + * Only the architected 32-bit ISTE state is stored. Metadata is skipped when
-> + * striding through the host IST.
-> + */
-> +static int vgic_v5_save_linear_ist(const struct vgic_v5_ist_desc *ist,
-> +				   u32 __user *uaddr, size_t nr_entries)
-> +{
-> +	__le32 h_iste;
-> +	size_t index;
-> +	int ret;
-> +
-> +	vgic_v5_clean_inval(ist->base,
-> +			    GICV5_LINEAR_IST_SIZE(ist->id_bits, ist->istsz));
-> +
-> +	for (index = 0; index < nr_entries; index++) {
-> +		__le32 *h_iste_addr = ist->base + index * ist->iste_size;
-> +
-> +		h_iste = READ_ONCE(*h_iste_addr);
-> +		ret = put_user(h_iste, uaddr);
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202609190650.liMAzwjF-lkp@intel.com/
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/vgic/vgic-v5-tables.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-h_iste is an __le32, while uaddr is a pointer to u32. Not great, even
-if arm64 BE is now dead. I'll queue this:
-
-@@ -1459,7 +1459,6 @@ static int vgic_v5_get_lpi_ist_desc(struct kvm *kvm,
- static int vgic_v5_save_linear_ist(const struct vgic_v5_ist_desc *ist,
- 				   u32 __user *uaddr, size_t nr_entries)
- {
--	__le32 h_iste;
- 	size_t index;
- 	int ret;
+diff --git a/arch/arm64/kvm/vgic/vgic-v5-tables.h b/arch/arm64/kvm/vgic/vgic-v5-tables.h
+index b2ffbe68c05b4..89096926563f7 100644
+--- a/arch/arm64/kvm/vgic/vgic-v5-tables.h
++++ b/arch/arm64/kvm/vgic/vgic-v5-tables.h
+@@ -23,8 +23,8 @@ struct vmtl2_entry {
+ typedef __le64 vpe_entry;
  
-@@ -1468,8 +1467,9 @@ static int vgic_v5_save_linear_ist(const struct vgic_v5_ist_desc *ist,
+ struct vgic_v5_vm_info {
+-	void __iomem		*vmd_base;
+-	vpe_entry __iomem	*vpet_base;
++	void			*vmd_base;
++	vpe_entry		*vpet_base;
+ 	void			*vped_base;
+ 	u8			vpe_id_bits;
  
- 	for (index = 0; index < nr_entries; index++) {
- 		__le32 *h_iste_addr = ist->base + index * ist->iste_size;
-+		u32 h_iste;
- 
--		h_iste = READ_ONCE(*h_iste_addr);
-+		h_iste = le32_to_cpu(READ_ONCE(*h_iste_addr));
- 		ret = put_user(h_iste, uaddr);
- 		if (ret)
- 			return ret;
-
-Thanks,
-
-	M.
-
 -- 
-Jazz isn't dead. It just smells funny.
+2.47.3
+
