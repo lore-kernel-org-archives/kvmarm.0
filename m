@@ -1,39 +1,91 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FCAC30C35F;
-	Sat, 19 Sep 2026 18:36:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E713345725
+	for <kvmarm@lists.linux.dev>; Sat, 19 Sep 2026 21:35:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789842979; cv=none; b=NSp9MckaVuQadKEzIylfTx9wm+FGOtc3NzNoznUtvbN11lM0GLA4lnqTr+aQnSZAMHmpjKIFExv77xIMfOvEomz6Op+SiVRkQBkk60sQCmb5KtDwx6oLsCaFqFpWUHeRgkbiS99e6lZXB0pJhNtaOE4DfqMz49PatbnmVzh41+E=
+	t=1789853736; cv=none; b=FJUUa82oQsvCOEnD2IpLef+zfyDtETJot0lHwGF3oZGnWDt9ttNQuf93glccK0XNu5ZjgbQs+6evR4BNfJS1w/QcPr4RqrtCUO4csCNauBkb+/pwrDW7cdadgIGKijKJZ50pNDbx9779dfk1eaZXPIb5LPC1hCBCF28fDQz0nYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789842979; c=relaxed/simple;
-	bh=hCo2pZtmoPJecO1D2Wh1r0QRR9FPOXCuGWEogFvw6Mo=;
+	s=arc-20240116; t=1789853736; c=relaxed/simple;
+	bh=xlefR/akgVIwwabPG2m/iCIg0y04aOCKWgO4pB6evyM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=scXMyzRiq8cf7kgzbWoSSfcIsoFHg1F/FSDR9agIokcyNcLA7UEmU9qx0R5D5yNf63yxtdpW+WCbp3VXqkknufjQO01HCBr6vYlD0coS/QHtTo5TGhD7e1npCep6V2PEdmVONal6LJV27XnD4V6Jgloghe3bj8ksQO9T9CD0ZFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RuZGTp7Z; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=kd9QBW5FihPkZhx1+M7JQv0YAuzO5DSxnWLhZ8u2QjeK79ZzV+9Yr0o6Q1093mC+v6JhnWrvf23RZngak1FoqGSRyM9EP6o+k2ksHDYHq2Oi6O3fBKPIrbwgNe/7D8gJNxWj+T9cpXMjukgUHJHx47f+TkwP8K9JMUY8uiier0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=PAIIwRAV; arc=none smtp.client-ip=209.85.222.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RuZGTp7Z"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38BDD1F000FF;
-	Sat, 19 Sep 2026 18:36:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789842978;
-	bh=GtjH5GaHbdy/dzwtgEaK5zRKcSSFxLPn+4OR5BHpbyc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=RuZGTp7ZSb57vSwDD3EswVj0UWtSRkQbQpWJW8S3Ih0b60DdBhgn2RxbAsJ8290Qq
-	 2QT6sy+VMd57E/tT6QZ09jFfXdHlz8IiHBg3CDjmXpO782yzp4hXW6cyvSQjOlJoAT
-	 j4sVa6ys0pukZ6BVum8PRaCdP1gQtw8wIdTXg6/uLoJ820dEo/75VMWVE9wPfn0o1M
-	 WpbLgnNW82jIDVmjt6QBXZloCORLwJ9St8a0dhGIVT9/rnN6AEZVAYtup0ubjEh7BN
-	 kW+01akXZd6APv++pHCf2mkRcBchbWZGeJ6NP3WrSFCWpNrZG3fjBVGqu1Giam2YSb
-	 q1B0TfDruJJkA==
-Date: Sat, 19 Sep 2026 11:36:17 -0700
-From: Oliver Upton <oupton@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, Sean Christopherson <seanjc@google.com>,
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 7.3, round #1
-Message-ID: <aq7WIW052XXHJWlL@kernel.org>
-References: <aq7ViMljbhjibseX@kernel.org>
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="PAIIwRAV"
+Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-93bfa610b7eso24840885a.0
+        for <kvmarm@lists.linux.dev>; Sat, 19 Sep 2026 14:35:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1789853734; x=1790458534; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=kmW9yHmD8Dyy4s5qckAMeYd2CA7UfeC/px2jAWNVXJs=;
+        b=PAIIwRAVAe/WOVLevVuGYmY8odDwwmClsabEE1TRoPCyBQVTkftWVtryVD6Rq4PB5b
+         JuYT0Kbw8Y+F4I5/lknGcqUqWFNKTFOqg6viUlUbqd9NNFpUf3G32ejGnHj2hwYXyI87
+         yev3NlHmIFZc6shHVWsGR32tdAfqmB+zZYdq8RFHfAvJZak79eZqw/O6Zf6lL7/ECtJx
+         6Upaa3DgBuS6jtsiTb0hXTXsnmH6UmADpQlapn0YE+Y3lZ9SzSQVDph5f8dzTTVSOXz0
+         ZEBQqxoFeBLTTmwoGfLEn5wlE1HNv54u23UGsJgJ9HmPD9Owad1jGFGmLwmjQPIUO96Y
+         TrDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1789853734; x=1790458534;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=kmW9yHmD8Dyy4s5qckAMeYd2CA7UfeC/px2jAWNVXJs=;
+        b=mqMXv32mKJrMdRkbGNWm5orF9MFP25bwisBDi/69yBZjD2gRSav4vI1zDUDhSCWQVQ
+         Yc0LQBjXnkblO34jYNgAkmX5EwHTXBJZHHUl+k9FWMytzUBn06x1ItBsLZG7iPEsCW/W
+         wv3nL1PlRQlmptdxjwmlFKkr2K4Bnu2OE4MGzWcQkbn8vq3XyoZc9liFCj15YQ7+w80w
+         bTTqiSuQ9I/ipNmZG4vbpweHgFAr2sDsC6zYOww4gzo1F9ggaSQPd6UtRWs0NwIPi5p1
+         gPulTvJp1cey48BbjTlP7wnKMiH+n0miz1T/9TO/B39cgOXqb9fD9QCMOiGrtotv+ulg
+         yEBA==
+X-Forwarded-Encrypted: i=1; AKwUvByV3YYatE0ZRHjwBFdsgq/YfLIpQjvCfJJddq3LTMvSCOcEFEcEsp/kbmsPAvVHNlb7yFxL2H0=@lists.linux.dev
+X-Gm-Message-State: AFuF++mhqGOauuZhdq05smWinOPhjbTRPxuEtNWrFSRF2Vd35onhPDIy
+	m2VnduEXjPU5RGAD5I4s3YaJvKA12Snu2NDa425L78uzdUd6i3lolj455+liiuUe+k0=
+X-Gm-Gg: AYBFou1QksoT5ljiX6p1BIxmyhZBjl5vbUzgjA3ozGDmQSt1c0+Grzhn1B12hwohDlk
+	OiFEQEqkK65lZ6Ljtsh0FSMHDomUYVbdfSAQjCzv/jhf11L53j1euh3Zje9pRdDM5JtHb7c47Ia
+	wj0eXW6Ive3yMHgUHevvn5kE08fs5AJE7uGt8Bj5/ZKq4nLtrZ0kXYX3PttPybe8mblDk9237Xk
+	kPNvQWD2T+tBIz0ObyB0YUMXyuctLpypFGcW3FIQSKmXKQRAnAmfLPPWPZ+mJlcgV3STVRv8mJW
+	AFb6tuiOnXl5E8+dsoINC33x+o+yXjI4Q24QCgvwhkkkJVSYNix70/S6tNSObJBsXskLwuD96Kj
+	AbIIeFUWin/ZoPPVyhnrcsUV7m6y8psjWjZ9XteZBTvEmadnV67n1OSXweJiJnSvnnfz579PrY6
+	1eOoZgFhoCGwTB78/PjGFP2PvSVlOkqo6+o1pNXS3MGXkeVzcpT4wlO1pbbiZUaHGdCXUPE85As
+	3Cwo2gYv1MvfkhGf+Z1roQRl0s1nvEBKUoMxkyEzQCvz3abQVFHVYOF
+X-Received: by 2002:a05:620a:4416:b0:939:fe55:402a with SMTP id af79cd13be357-93bf577e246mr341980385a.31.1789853733973;
+        Sat, 19 Sep 2026 14:35:33 -0700 (PDT)
+Received: from ziepe.ca (hlfxns010zw-159-2-239-150.pppoe-dynamic.high-speed.ns.bellaliant.net. [159.2.239.150])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-93bed72215fsm275561085a.1.2026.09.19.14.35.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 19 Sep 2026 14:35:32 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1x82iZ-00000003aXY-2gnK;
+	Sat, 19 Sep 2026 18:35:31 -0300
+Date: Sat, 19 Sep 2026 18:35:31 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>
+Cc: Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	iommu@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Steven Price <steven.price@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Thomas Gleixner <tglx@kernel.org>, Will Deacon <will@kernel.org>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	"T.J. Mercier" <tjmercier@google.com>
+Subject: Re: [PATCH v6 7/9] dma-buf: system_heap: Enforce shared-granule
+ alignment for cc-shared buffers
+Message-ID: <20260919213531.GI11599@ziepe.ca>
+References: <aq1V3oeDdvXobt8J@arm.com>
+ <97c30fce-9bda-4c61-b1b9-10297b89c8d9@amd.com>
+ <20260918153642.GD11599@ziepe.ca>
+ <yq5atsnl47c6.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -42,145 +94,31 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aq7ViMljbhjibseX@kernel.org>
+In-Reply-To: <yq5atsnl47c6.fsf@kernel.org>
 
-On Sat, Sep 19, 2026 at 11:33:45AM -0700, Oliver Upton wrote:
-> Hi Paolo,
-> 
-> Here's the first pile of fixes for 7.3.
-> 
-> The diff is definitely on the larger end, although this is mostly
-> explained by the inclusion of a selftest for the ITS table changes
-> which are quite tricky. Also worth noting that this selftest mixed poorly
-> in next with Sean's PPC selftest prefix due to the library changes [*].
-> 
-> Otherwise, the most noteworthy change here is definitely the pKVM patches
-> to unmap the EL2 hypervisor's stack pages from the host, for obvious
-> reasons...
-> 
-> Details on the rest of it can be found in the tag. Please expect at
-> least one more pull for 7.3, there's some additional changes that are
-> still brewing.
-> 
-> Please pull.
+On Sat, Sep 19, 2026 at 08:27:29PM +0530, Aneesh Kumar K.V wrote:
+ 
+> +static struct page *system_heap_alloc_order(unsigned int order, gfp_t flags,
+> +					    bool cc_shared)
+> +{
+> +	struct cc_shared_pages mem;
+> +
+> +	if (!cc_shared)
+> +		return alloc_pages(flags, order);
+> +
+> +	/* The shared granule can raise the actual allocation order. */
+> +	flags |= __GFP_COMP;
+> +	if (alloc_cc_shared_pages(flags, PAGE_SIZE << order, &mem))
+> +		return NULL;
 
-Haven't caffeinated enough yet.
+Oh yeah that's surprisingly easy because of how this loop works with
+order
 
-Just in case it wasn't clear, this is a
-conflict with 7.4 material and based on the conversation I expect Sean
-to work around it.
+Makes sense to me
 
-[*]: https://lore.kernel.org/linux-next/aqqap3DngKznNrSA@sirena.org.uk/
+> int alloc_cc_shared_pages_node(int nid, gfp_t gfp, size_t requested,
+> 			       struct cc_shared_pages *mem)
 
-> Thanks,
-> Oliver
-> 
-> The following changes since commit fd73f4a6659897191fa0d40695fe370925dd3780:
-> 
->   Linux 7.3-rc3 (2026-09-13 14:38:02 -0700)
-> 
-> are available in the Git repository at:
-> 
->   https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git/ tags/kvmarm-fixes-7.3-1
-> 
-> for you to fetch changes up to 6b1bca1b1ab77f60a62087337bfe6e2f0efb9e6d:
-> 
->   KVM: arm64: Fix AArch32 DBGBXVR<n> handling (2026-09-19 11:14:22 -0700)
-> 
-> ----------------------------------------------------------------
-> KVM/arm64 changes for 7.3, take #2
-> 
->  - Invalidate the ITS translation cache when the guest changes the
->    base address of the ITS tables (Fuad Tabba)
-> 
->  - Skip saving ITS devices with device IDs that are out-of-bounds
->    rather than failing the entire ITS save ioctl (Fuad Tabba)
-> 
->  - Close race between VM teardown and invalidations of nested MMUs
->    when handling MMU operations that are allowed to block
->    (Lorenzo Stoakes)
-> 
->  - Various fixes for the handling of the host's untrusted SVE
->    configuration in pKVM (Fuad Tabba)
-> 
->  - Make sure that empty SMCCC ranges based at 0 are rejected by the
->    kvm_smccc_set_filter() (Karl Mehltretter)
-> 
->  - Revoke the host mapping for pKVM's private stack pages, along
->    with a new sanity check that all mappings in the hyp's private
->    VA range have been correctly marked as hyp-owned (Fuad Tabba)
-> 
->  - Lifetime fixes for the array of shadow stage-2 MMUs, ensuring that
->    concurrent vCPU initialization cannot relocate in-use MMUs. Defer
->    the freeing of shadow stage-2 MMUs to the point that no other users
->    (e.g. MMU notifier) could reference them (Marc Zyngier)
-> 
->  - Drop useless WARN when rejecting an unsupported ioctl for pKVM
->    (Fuad Tabba)
-> 
->  - Fix the steal_time selftest to install correctly-sized mappings for
->    non-4K hosts (Sebastian Ott)
-> 
->  - Correct mapping of fine-grained trap for GCSPOPX instruction
->    (Mark Brown)
-> 
->  - Fix KVM_BUG_ON() due to missing handling of DBGBXVR<n> from 32-bit
->    guests (Karl Mehltretter)
-> 
-> ----------------------------------------------------------------
-> Fuad Tabba (13):
->       KVM: arm64: vgic-its: Free the caches when GITS_BASER changes
->       Revert "KVM: arm64: vgic-its: Don't save collections the table cannot hold"
->       KVM: arm64: vgic-its: Skip unreachable devices instead of failing the save
->       KVM: arm64: selftests: Add ITS table save tests
->       KVM: arm64: Validate the SVE vector length in pkvm_vcpu_init_sve()
->       KVM: arm64: Do not clear VM-wide SVE feature on vCPU init failure
->       KVM: arm64: Key unpin_host_sve_state() on the state it unpins
->       KVM: arm64: Derive GUEST_HAS_SVE from the SVE feature bit at EL2
->       KVM: arm64: Transfer the hyp stack pages out of the host stage-2
->       KVM: arm64: Match hyp text by physical address in fix_host_ownership()
->       KVM: arm64: Move the private VA allocation cursor to __io_map_next
->       KVM: arm64: Check every private mapping is hyp-owned at pKVM init
->       KVM: arm64: Don't WARN on an unknown VM ioctl in protected mode
-> 
-> Karl Mehltretter (3):
->       KVM: arm64: Return -EINVAL for an empty SMCCC filter range at base 0
->       KVM: arm64: selftests: Test empty SMCCC filter range at base 0
->       KVM: arm64: Fix AArch32 DBGBXVR<n> handling
-> 
-> Lorenzo Stoakes (ARM) (2):
->       KVM: arm64: Fix spurious warning for benign stage 2 teardown race
->       KVM: arm64: nv: Fix null ptr deref on nested wp/unmap, teardown race
-> 
-> Marc Zyngier (2):
->       KVM: arm64: nv: Fix life cycle of the nested_mmus array
->       KVM: arm64: nv: Delay freeing of shadow S2 structures until VM destruction
-> 
-> Mark Brown (1):
->       KVM: arm64: Fix FGT mapping for HFGITR_EL2.nGCSEPP
-> 
-> Sebastian Ott (1):
->       KVM: selftests: fix steal_time for arm64 with host page size > 4K
-> 
->  arch/arm64/include/asm/kvm_host.h                 |   2 +-
->  arch/arm64/include/asm/kvm_nested.h               |   3 +-
->  arch/arm64/include/asm/kvm_pkvm.h                 |   3 +-
->  arch/arm64/kvm/arm.c                              |   8 +-
->  arch/arm64/kvm/emulate-nested.c                   |   2 +-
->  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h     |   2 +
->  arch/arm64/kvm/hyp/include/nvhe/mm.h              |   1 +
->  arch/arm64/kvm/hyp/nvhe/mem_protect.c             |  20 +
->  arch/arm64/kvm/hyp/nvhe/mm.c                      |  79 +++-
->  arch/arm64/kvm/hyp/nvhe/pkvm.c                    |  29 +-
->  arch/arm64/kvm/hyp/nvhe/setup.c                   |  16 +-
->  arch/arm64/kvm/hypercalls.c                       |   3 +-
->  arch/arm64/kvm/mmu.c                              |  15 +-
->  arch/arm64/kvm/nested.c                           | 111 +++---
->  arch/arm64/kvm/sys_regs.c                         |   1 +
->  arch/arm64/kvm/vgic/vgic-its.c                    |  46 ++-
->  tools/testing/selftests/kvm/Makefile.kvm          |   1 +
->  tools/testing/selftests/kvm/arm64/smccc_filter.c  |   4 +
->  tools/testing/selftests/kvm/arm64/vgic_its_save.c | 441 ++++++++++++++++++++++
->  tools/testing/selftests/kvm/steal_time.c          |  30 +-
->  20 files changed, 700 insertions(+), 117 deletions(-)
->  create mode 100644 tools/testing/selftests/kvm/arm64/vgic_its_save.c
+This argument order is a little weird from mm norms?
+
+Jason
