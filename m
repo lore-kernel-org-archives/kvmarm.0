@@ -1,139 +1,80 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F5432C0F7F;
-	Sat, 19 Sep 2026 15:47:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A219A32AAA8;
+	Sat, 19 Sep 2026 18:11:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789832852; cv=none; b=t273mw56gXbtNBRISXzdOWojWkfYFQNQiuDbgGgpa+PH+pWgJV8RI6BNjBL67C0pTRe7/S8tONmvQJCrluSYr6q2in8CP+SuMsyPwLKG5dJavMG1DXwHWYUGD8+fy/LMhw/vTtgDnpc76t78xNzIaq+zGFvxfnxIfkIzFzRAISc=
+	t=1789841478; cv=none; b=V84xrSXj/7qEFPXxbPi4zKGSl4pZ1SekjbzBKsfT38u0Y6fC60FcOrWCRjDe/78qvPzZ4vcb6kPTtmGiBOOtAKMAv5hgF+Eva6LS74SZgMJjqjoG8mWtUZsupZvDIcarQRWXriddVQ+ELx0BHXatjMiUB//FaXEIwnyBKZrlpYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789832852; c=relaxed/simple;
-	bh=L8JdDIdahX9jBR4MTVRaMlg2TrsyyQPLNqfeVDeiEuM=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Y2feI5qCwH2zp1tU4LEQugBvP9c9XwRdt6gwlzhrcqLZ063e+fRjS5T1KCE9NJaKZ7JMByvceV/OlCisav53u9pO6EIqXmD83NBJA2T4Nkf1JhDJDZAjb5kyODfcztBep04R6j175JasX01usY1e3JskWTS5Jwmc/8otNaNwq64=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jt7mRTIh; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789841478; c=relaxed/simple;
+	bh=OzsqDzyleP0kWw9mJn/AoFDmTbY/lwfcYFUdNZ8b3vY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dD/o9KNPyNQkyQGdRcKnqDqURR2GnLFJBW7FRkm7GhQV7nRAYLiy9X+QcYJNFJSCoT1KsezxbAL9Snb+/7VEzyKpo5dptMNRdwcEEDTSUghrWeA6ZksjVtVw7SsNlvQznZgz4Tbz7VzCRwjWn63TlWaeTbInEZ+a7mynBaK3VK8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UQq4YRL8; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jt7mRTIh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 259441F000FF;
-	Sat, 19 Sep 2026 15:47:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UQq4YRL8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50C7C1F000FF;
+	Sat, 19 Sep 2026 18:11:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789832851;
-	bh=TvAuYE9a/SDHD1fvdcUafvtliLFXioE7PRAJICPhaZU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=jt7mRTIhBhF5A0suAIUUUUHcXByj82ywHmIqSlmNTByQXMGDTrhqz0g9xpPHqVW/Q
-	 EopPW02VNDy4p1hz8okjVAVf7zbKHHwnlNXe99jwOVWfR/PRNppolPy8nRxWNTkg5l
-	 qeF6O2PT+V63XPBYYnw/w98nhrpPoVZuWmgfajcR+W7zoC2BEnsFRXRekwD56qbpky
-	 JGO70iaLsMrbT/yGU6d+9YxTnopOJU7CwdiwCYarxvEKDN8GxlFZmYOk+eCpVx0/Xt
-	 dnC1k4n3Ce6LRr3jGulVAPIKrYcE+0fRy5qIK9LnErz4kY6QB+AAYxlInAJpnBnccs
-	 dEu7vN2m4GoEw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1x7xHl-0000000Aypf-0qov;
-	Sat, 19 Sep 2026 15:47:29 +0000
-Date: Sat, 19 Sep 2026 16:50:35 +0100
-Message-ID: <87cxu944vo.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: sashiko-reviews@lists.linux.dev
-Cc: "Oliver Upton" <oupton@kernel.org>,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH 4/4] KVM: arm64: vgic-v5: Correctly handle host ISTE __le32 conversion
-In-Reply-To: <20260919123905.515941F000FF@smtp.kernel.org>
-References: <20260919123150.3283606-1-maz@kernel.org>
-	<20260919123150.3283606-5-maz@kernel.org>
-	<20260919123905.515941F000FF@smtp.kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20260515; t=1789841477;
+	bh=i9vVM2tMTDcLQ7MTmdYRaKZNtkheWY0pH5YNF/l7tWw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=UQq4YRL8vpyzhOa3jR+GwyVRYi9UjMAhG3+Ueip91Q+T0OctKW9a/9ofnXFXcR35Z
+	 MwaUC1lnh9dIsnkhN6CUgiOaZn8U4zB5v/aq2/jF8JsvCj4cSWGQBoZCsi3c6fgtfl
+	 pbWRHt9/4D66jh0HjRdxo2Q7isbXsNlFPJ3WERYPBAtDyItbnoBoRphq9wXpi6U1vQ
+	 qrV9rQJW5JoMaq/UMooOQtToSQOlj/ng8xe1tvdS/kLPq4ZtwVmxSwTm0ikdzLHYpY
+	 /fynCZoYyZTtlr3vzfsXV+YLCeN1xVOMNncmXhGkq7Cj0TwuWjuuyM+TmJbKfmXuXA
+	 kkMVwbnhVf7wA==
+From: Oliver Upton <oupton@kernel.org>
+To: Marc Zyngier <maz@kernel.org>,
+	kvmarm@lists.linux.dev,
+	Karl Mehltretter <kmehltretter@gmail.com>
+Cc: Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Fuad Tabba <fuad.tabba@linux.dev>
+Subject: Re: [PATCH] KVM: arm64: Fix AArch32 DBGBXVR<n> handling
+Date: Sat, 19 Sep 2026 11:11:14 -0700
+Message-ID: <178984145401.38162.12449211285441501967.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260810005616.13227-1-kmehltretter@gmail.com>
+References: <20260810005616.13227-1-kmehltretter@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sashiko-reviews@lists.linux.dev, oupton@kernel.org, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On Sat, 19 Sep 2026 13:39:04 +0100,
-sashiko-bot@kernel.org wrote:
+On Mon, 10 Aug 2026 02:56:16 +0200, Karl Mehltretter wrote:
+> The consolidation of the breakpoint and watchpoint register accessors
+> switched DBGBXVR<n> from trap_bvr() to trap_dbg_wb_reg(). The latter
+> selects backing storage with demux_wb_reg(), which only handles Op2 values
+> 4 through 7. Since DBGBXVR<n> uses Op2 1, an AArch32 guest access hits
+> KVM_BUG_ON() and marks the VM dead.
 > 
-> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> - [Medium] kvm: arm64: code and commit message mismatch regarding h_iste type
-> --
+> DBGBXVR<n> aliases DBGBVR<n>_EL1[63:32], and its AA32(HI) descriptor
+> already selects the upper half. Map Op2 1 to dbg_bvr[] alongside Op2 4,
+> restoring the pre-regression behavior.
 > 
-> commit a916f514228ceaaf50a5546f6df29cea59ab15f1
-> Author: Marc Zyngier <maz@kernel.org>
-> 
-> KVM: arm64: vgic-v5: Correctly handle host ISTE __le32 conversion
-> 
-> This commit addresses a sparse warning by modifying the endianness
-> conversion of the host ISTE. The intent is to define h_iste as a u32
-> instead of __le32, doing the conversion at the point of access.
-> 
-> Closes: https://lore.kernel.org/oe-kbuild-all/202609191215.to1MBYak-lkp@intel.com/
-> 
-> > diff --git a/arch/arm64/kvm/vgic/vgic-v5-tables.c b/arch/arm64/kvm/vgic/vgic-v5-tables.c
-> > index 2c8d0f360506c..aae5cf05f3907 100644
-> > --- a/arch/arm64/kvm/vgic/vgic-v5-tables.c
-> > +++ b/arch/arm64/kvm/vgic/vgic-v5-tables.c
-> 
-> [ ... ]
-> 
-> > @@ -1520,7 +1520,7 @@ static int vgic_v5_save_two_level_ist(const struct vgic_v5_ist_desc *ist,
-> >  			h_iste = *(__le32 *)(h_l2_ist_base +
-> >  					     h_l2_index * ist->iste_size);
-> >  
-> > -			ret = put_user(h_iste, uaddr);
-> > +			ret = put_user(le32_to_cpu(h_iste), uaddr);
-> >  			if (ret)
-> >  				return ret;
-> 
-> [Severity: Medium]
-> Is the refactoring in vgic_v5_save_two_level_ist() incomplete?
-> 
-> The commit message explicitly states "define h_iste as a u32", and this
-> pattern was applied to the other three functions modified in the file.
-> However, in vgic_v5_save_two_level_ist(), the h_iste variable retains
-> its __le32 type at the top of the function, and the conversion is instead
-> done inline within the put_user() call.
-> 
-> Does this variable also need to be redefined as a u32 to remain consistent
-> with the commit description and the rest of the patch?
+> [...]
 
-I'll add this to this patch.
+Thanks for pinging, this slipped between the cracks.
 
-	M.
+Applied to fixes, thanks!
 
-diff --git a/arch/arm64/kvm/vgic/vgic-v5-tables.c b/arch/arm64/kvm/vgic/vgic-v5-tables.c
-index aae5cf05f3907..d577e485ebe9e 100644
---- a/arch/arm64/kvm/vgic/vgic-v5-tables.c
-+++ b/arch/arm64/kvm/vgic/vgic-v5-tables.c
-@@ -1490,7 +1490,6 @@ static int vgic_v5_save_two_level_ist(const struct vgic_v5_ist_desc *ist,
- 	struct vgic_v5_two_level_ist_shape shape;
- 	size_t h_l1_index, h_l2_index;
- 	void *h_l2_ist_base;
--	__le32 h_iste;
- 	int ret;
- 
- 	shape = vgic_v5_two_level_ist_shape(ist);
-@@ -1517,10 +1516,10 @@ static int vgic_v5_save_two_level_ist(const struct vgic_v5_ist_desc *ist,
- 				    shape.l2_entries * ist->iste_size);
- 
- 		for (h_l2_index = 0; h_l2_index < shape.l2_entries; h_l2_index++) {
--			h_iste = *(__le32 *)(h_l2_ist_base +
--					     h_l2_index * ist->iste_size);
-+			void *h_iste_addr = h_l2_ist_base + h_l2_index * ist->iste_size;
-+			u32 h_iste = le32_to_cpu(*(__le32 *)h_iste_addr);
- 
--			ret = put_user(le32_to_cpu(h_iste), uaddr);
-+			ret = put_user(h_iste, uaddr);
- 			if (ret)
- 				return ret;
- 
+[1/1] KVM: arm64: Fix AArch32 DBGBXVR<n> handling
+      https://git.kernel.org/kvmarm/kvmarm/c/239763bda716
 
--- 
-Jazz isn't dead. It just smells funny.
+--
+Best,
+Oliver
