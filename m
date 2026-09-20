@@ -1,561 +1,240 @@
-Received: from mail-yx2-f13.google.com (mail-yx2-f13.google.com [74.125.224.141])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A084E48A2BC
-	for <kvmarm@lists.linux.dev>; Sun, 20 Sep 2026 19:40:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.141
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2858F472F61;
+	Sun, 20 Sep 2026 21:29:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789933253; cv=none; b=SsBkNzwfFS8eGClzU0OH+DYf+DkvrHRRr2QSl6S8AJnTgpFWaPbHfJQWa3KsFAcey5msPG+3YqOnEaN7GjfBYBJRgx/Ao1INuwu5PGuJVFnPwsp4g9mhFqcDL0ksyP94EYM4U6WZBy5MUcF51lNlRSQDmfAx7Np5xcF83sVF5Jw=
+	t=1789939749; cv=none; b=lpMN2ylMZQZSm1ERLTw3kkMRiddkzjc9+et6lVAHoF2J4dBh538/zDyE0jmmk7phllMqThWof10W1u5Yltb14gAf2SwLpRddpYH75C33pFA2ph6j0Id0BxMDkste2osv+hUbJxmHB8hqiKXPCFMGWi7wdT2f8AK88wCXHtqBbw0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789933253; c=relaxed/simple;
-	bh=OqE4NGOzg8RMlLq3uxKh4S9QJ/wR9RdtbS1nxkkZHO0=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EYL9ezlJk/RQeOsKiYelCwLHQ1IidEk9MSC0LliXwdP3OBQ8BoWv/NGRk6a6hWUG3AODNAAQdjJaCj/LbAo1XhPm93ZTC7sEgiW7mLj3AY1pCb+jByZG5pCdxRybHNsQ25qLxeH4dZip22TocUEwPIKV6u3J3ZBpMZzn8pq27zU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=soleen.com; spf=pass smtp.mailfrom=soleen.com; dkim=pass (2048-bit key) header.d=soleen.com header.i=@soleen.com header.b=Pmyox6J8; arc=none smtp.client-ip=74.125.224.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=soleen.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=soleen.com
+	s=arc-20240116; t=1789939749; c=relaxed/simple;
+	bh=YOxM7mYuAqSXik0KdEeyH6ok23wJVcNKpc/A4Ommq9Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=oYDyBRcAfV7YmyATkSDgn0HulnKaw5gMYks1edyNSxOobuCgYPVd6l+G1o7IAmohstCYlF08NaK5luKsSZ5jGHdQy0JYcP+wQP3fw4WjO1fjlL7CJdr0XV/XGH0/ah2XAMOwz9YEELm+/no/hGty3W4NOnffFDllGY7WGzY4n/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Q1cQdxHq; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=soleen.com header.i=@soleen.com header.b="Pmyox6J8"
-Received: by mail-yx2-f13.google.com with SMTP id 956f58d0204a3-66e4aa8d882so2362803d50.0
-        for <kvmarm@lists.linux.dev>; Sun, 20 Sep 2026 12:40:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=soleen.com; s=google; t=1789933249; x=1790538049; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=k5hDLFKTi0Cs1ZiX/XYeG+c49YMslw+nL6Py3nD0h7s=;
-        b=Pmyox6J8J5uQ5JGB76D3IlOMorBEoo3W/nnpgOVT5fkBMalkJikpl/igd8zs2hi6zR
-         ScGFZubOPlFVmrYbOedkU72KI2osO5KtXu5ckGXOf4dbV5WLta8nps8ViK3jiL6XL6WD
-         7Oj9iZdRWi3aNpDZGU1ioWF0jbvtf2y7KayXS/7GGzkR8f1phabmplk7EGJ+MBcQYBPu
-         5OSsSDmySmgCOm2ZKqhUI1EfN4I6UKclKlbkTnb5WN2x+LXEEZpLphpjCe0T4lYrlVJR
-         +k1aa9pQftKL+Djp1lil9A4ROki+lueVvel78WmLsk6vGWYXxlpYVz5m8/3jaYgWUpoS
-         EqIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789933249; x=1790538049;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=k5hDLFKTi0Cs1ZiX/XYeG+c49YMslw+nL6Py3nD0h7s=;
-        b=vfhQtzJIPQPKM/edKQMECF2cU7Q0XErBKStkRkm53aB+5NTKez3dfVB/PJNyqBmpGT
-         ciu7tMi5quXEDNzDI2bRFfds3rt9TdW4+JBgYZz3kolpDh1equcRKO+Fcah8nE5rrp8C
-         KbrjSOrowg3JzSa9GoeUzXrsl6mviUVbwEIvbS9egdSVGonZ0YknZ2H1MISa3KY9bfHU
-         LEucQwAx+ra3OERlDhJvp8FWV5GBLPvpG1rlUvk0TY5HBFy1rPHkDzD6Irh1HZ3bpegO
-         3boTd+PSHLPQijdEqy/rm9q+rEyItyHSM3D+gwFmK5mdhcP2R7ie633mmob/NoQSw41E
-         zk0A==
-X-Forwarded-Encrypted: i=1; AKwUvBylItt+BfP3BWlcMVI/qYx2A/tXvHki4U4ScPdBt2AAHZVhHhPOH+HKKXn3D8YNIkNZj6OE0Z4=@lists.linux.dev
-X-Gm-Message-State: AFuF++n26kC5pQHIR5R8PEqih+k+7twU5JHE9/A/DkLEsZIAYRcN427y
-	Xm2Bugk5R0Rh1u9hFj/zwT+rbd4Y5335Is1PcZuT6CyO29oycPJqO4P6M0XVj14xZ0E=
-X-Gm-Gg: AYBFou2AWlmA/AxivoTJu9blOW5VyFcJ3rwnBUkvRzOeCgfIAAJiBxfGBZCAUecgnTv
-	GVsBJPei47KlSC6NBRfaII1r3NzRpMZLOgl0iUW3WUN20dDIzWK0ePTUodzwIOK1RKBRVpW81Tm
-	Wrn3NcCFshhz+sJXebc7H2SqUPR9XtJDnz45fPqePFBAmB//qPej5bDgOCOKjf6HbnUKOrTPJim
-	TPzMbz5F5hG3jh0aOY3HK2PtARJIBgcjtkROlOhNHZXCuxwKhbc3jMaQ0qKlUz7IogAqo7PaFMH
-	nmoszemCg5Rbsb28wJoRIDfY4gYg8d8w4KeWa4Q9iDS0wR6jPNQos7PkfcA96XURPHPMNQmUN+t
-	iwYYIwnu9AceQPq1nd4MRHYfdrpY4Pnd/OOpbKRNt6sSw4uzgRNQV1j40eymVSyXdRNzdKogGqd
-	7nJg/6vJi7nW5ewsFB39sLUCEeCOSDShuapb23MA1izISeZVkPDj8a7y32ywgj3lwChg0ROCM0A
-	gdMIrvYm2scwiGo9RtA8eAGDbdDkECzAZVyExe33wKNhirDkgMCyZbb1pzpEedfAv+awYTNB1LI
-	Gd2suV2LCpWzTqix3WBDVXkQ6sSeEw==
-X-Received: by 2002:a05:690e:4085:b0:671:5653:8564 with SMTP id 956f58d0204a3-6717fe32f3dmr3086661d50.91.1789933249448;
-        Sun, 20 Sep 2026 12:40:49 -0700 (PDT)
-Received: from soleen.c.googlers.com.com (16.49.199.35.bc.googleusercontent.com. [35.199.49.16])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-67298d74ef4sm2650188d50.0.2026.09.20.12.40.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 20 Sep 2026 12:40:48 -0700 (PDT)
-From: Pasha Tatashin <pasha.tatashin@soleen.com>
-To: linux-kselftest@vger.kernel.org,
-	legion@kernel.org,
-	kees@kernel.org,
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Q1cQdxHq"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AAF081596;
+	Sun, 20 Sep 2026 14:28:58 -0700 (PDT)
+Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.2.197.99])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 70D953F632;
+	Sun, 20 Sep 2026 14:28:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1789939742; bh=YOxM7mYuAqSXik0KdEeyH6ok23wJVcNKpc/A4Ommq9Y=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Q1cQdxHqsioG2kuZAGaSW/qCTI3nPP0zSKR7tiBSBR/MZmxOIPpYVEIVo46N1Jvtp
+	 XZ0+OsPc4FxsRfOfytkEBVEpkO9mNFUblsk1dD2aJmQ/jHUfbuX4AszGLz4jJw2JI+
+	 BsLvNjMLnPcPDcE86OdiAEE/u7oe29Qtl0KtiQVk=
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+To: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Cc: maz@kernel.org,
 	will@kernel.org,
-	ruanjinjie@huawei.com,
-	atomlin@atomlin.com,
-	rppt@kernel.org,
-	jani.nikula@intel.com,
-	hamzamahfooz@linux.microsoft.com,
-	joey.gouly@arm.com,
-	tglx@kernel.org,
-	nsc@kernel.org,
-	alexandre.chartre@oracle.com,
-	james.morse@arm.com,
-	dianders@chromium.org,
-	bp@alien8.de,
-	jpoimboe@kernel.org,
-	shuah@kernel.org,
 	catalin.marinas@arm.com,
-	linux-kbuild@vger.kernel.org,
-	linux-arch@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	jaredwhite@microsoft.com,
-	johan@kernel.org,
-	pbonzini@redhat.com,
-	mingo@redhat.com,
-	linux-mm@kvack.org,
-	seanjc@google.com,
-	mark.rutland@arm.com,
-	vdonnefort@google.com,
-	tarunsahu@google.com,
-	gshan@redhat.com,
-	skhan@linuxfoundation.org,
-	linux-doc@vger.kernel.org,
-	xur@google.com,
-	djbw@kernel.org,
-	oupton@kernel.org,
-	nogikh@google.com,
-	sumitg@nvidia.com,
 	linux-kernel@vger.kernel.org,
-	zengheng4@huawei.com,
-	peterz@infradead.org,
-	corbet@lwn.net,
-	suzuki.poulose@arm.com,
-	luto@kernel.org,
-	hpa@zytor.com,
-	zhangpengjie2@huawei.com,
-	x86@kernel.org,
-	yuzenghui@huawei.com,
-	jic23@kernel.org,
-	ardb@kernel.org,
-	pasha.tatashin@soleen.com,
-	petr.pavlu@suse.com,
-	ryan.roberts@arm.com,
-	kexec@lists.infradead.org,
-	pratyush@kernel.org,
-	dave.hansen@linux.intel.com,
-	rdunlap@infradead.org,
-	kvm@vger.kernel.org,
-	fuad.tabba@linux.dev,
-	maz@kernel.org,
-	mbenes@suse.cz,
-	jgross@suse.com,
-	seiden@linux.ibm.com,
-	pierre.gondois@arm.com,
-	song@kernel.org,
-	nathan@kernel.org,
-	pmladek@suse.com,
-	graf@amazon.com,
-	chao.gao@intel.com,
-	zhenglifeng1@huawei.com,
-	arnd@arndb.de,
-	sidnayyar@google.com,
 	linux-arm-kernel@lists.infradead.org,
-	vladimir.murzin@arm.com,
-	kas@kernel.org
-Subject: [RFC PATCH 39/46] KVM: VMX: Integrate Caretaker VMX detach serialization and KVM registration
-Date: Sun, 20 Sep 2026 15:36:43 -0400
-Message-ID: <20260920193650.3373435-40-pasha.tatashin@soleen.com>
-X-Mailer: git-send-email 2.55.0.1082.g2b9226bbc0-goog
-In-Reply-To: <20260920193650.3373435-1-pasha.tatashin@soleen.com>
-References: <20260920193650.3373435-1-pasha.tatashin@soleen.com>
+	steven.price@arm.com,
+	aneesh.kumar@kernel.org,
+	oupton@kernel.org,
+	gshan@redhat.com,
+	joey.gouly@arm.com,
+	tabba@google.com,
+	yuzenghui@huawei.com,
+	linux-coco@lists.linux.dev,
+	gankulkarni@os.amperecomputing.com,
+	sdonthineni@nvidia.com,
+	alpergun@google.com,
+	fj0570is@fujitsu.com,
+	WeiLin.Chang@arm.com,
+	lpieralisi@kernel.org,
+	enju.kohei@fujitsu.com,
+	Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: [PATCH v19 00/20] KVM: arm64: CCA: Add basic plumbing for Realms
+Date: Sun, 20 Sep 2026 22:28:25 +0100
+Message-ID: <20260920212845.707-1-suzuki.poulose@arm.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Complete Intel VMX Caretaker detach-time serialization, vCPU sync,
-and ops registration in arch/x86/kvm/vmx/caretaker.c.
+This series is a trimmed down version of the Arm CCA KVM support, previously
+posted here [0]. Like in the v17, we have tried to split the entire series
+into the following chunks.
 
-Signed-off-by: Pasha Tatashin <pasha.tatashin@soleen.com>
----
- arch/x86/kvm/Makefile        |   9 +
- arch/x86/kvm/vmx/caretaker.c | 322 ++++++++++++++++++++++++++++++++++-
- arch/x86/kvm/vmx/vmx.c       |   4 +
- 3 files changed, 333 insertions(+), 2 deletions(-)
+ 1) Base RMM RMI support under drivers/firmware/arm_rmm -> [1]
+ 2) Linux Host support for handling GPFs - [2]
+ 3) NEW: Enlighten KVM arm64 about the different VM types and use call
+    backs for the VM type, rather than spilling the is_this_type_of_vm()
+    everywhere. Adds VCPU and Stage2 MMU related callbacks with support
+    for the existing VM types. There are other places where we may be
+    able to abstract, but those need careful performance evaluations
+    to make sure they are fit (e.g., vcpu_run)
 
-diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
-index 11e67c072258..b550a3fd0708 100644
---- a/arch/x86/kvm/Makefile
-+++ b/arch/x86/kvm/Makefile
-@@ -18,6 +18,8 @@ kvm-$(CONFIG_KVM_SMM)	+= smm.o
- 
- kvm-intel-y		+= vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o \
- 			   vmx/nested.o vmx/posted_intr.o vmx/main.o
-+kvm-intel-$(CONFIG_KVM_CARETAKER) += vmx/caretaker.o vmx/caretaker_vmenter.o
-+
- 
- kvm-intel-$(CONFIG_X86_SGX_KVM)	+= vmx/sgx.o
- kvm-intel-$(CONFIG_KVM_HYPERV)	+= vmx/hyperv.o vmx/hyperv_evmcs.o
-@@ -44,6 +46,13 @@ $(obj)/svm/vmenter.o: $(obj)/kvm-asm-offsets.h
- AFLAGS_vmx/vmenter.o    := -iquote $(obj)
- $(obj)/vmx/vmenter.o: $(obj)/kvm-asm-offsets.h
- 
-+AFLAGS_vmx/caretaker_vmenter.o := -iquote $(obj)
-+$(obj)/vmx/caretaker_vmenter.o: $(obj)/kvm-asm-offsets.h
-+
-+CFLAGS_REMOVE_vmx/caretaker.o = $(CC_FLAGS_FTRACE)
-+CFLAGS_vmx/caretaker.o := -fno-stack-protector
-+
-+
- $(obj)/kvm-asm-offsets.h: $(obj)/kvm-asm-offsets.s FORCE
- 	$(call filechk,offsets,__KVM_ASM_OFFSETS_H__)
- 
-diff --git a/arch/x86/kvm/vmx/caretaker.c b/arch/x86/kvm/vmx/caretaker.c
-index 47b4743650e5..efef1c30c0d1 100644
---- a/arch/x86/kvm/vmx/caretaker.c
-+++ b/arch/x86/kvm/vmx/caretaker.c
-@@ -49,8 +49,8 @@ static int vmx_caretaker_init_page(struct caretaker_vmx_page *cvp,
- 	u64 basic_msr, misc_msr;
- 	int ret;
- 
--	if (!vmx->vmcs01.vmcs)
--		return -EINVAL;
-+	if (!vmx->vmcs01.vmcs || is_guest_mode(vcpu))
-+		return -EOPNOTSUPP;
- 
- 	ret = kvm_x86_caretaker_init_common_page(&cvp->common, vcpu, sizeof(*cvp));
- 	if (ret)
-@@ -336,5 +336,323 @@ vmx_caretaker_init_host_vmcs(struct caretaker_vmx_page *cvp)
- 		vmx_vmwrite(PLE_WINDOW, 4096);
- 	}
- 	vmx_vmwrite(CPU_BASED_VM_EXEC_CONTROL, cpu_ctl);
-+
-+	/*
-+	 * Disable hardware MSR autoload lists while running in Caretaker so
-+	 * VM-entry/VM-exit do not dereference unpreserved host vmx->msr_autoload
-+	 * memory after kexec.
-+	 */
-+	vmx_vmwrite(VM_EXIT_MSR_LOAD_COUNT, 0);
-+	vmx_vmwrite(VM_EXIT_MSR_STORE_COUNT, 0);
-+	vmx_vmwrite(VM_ENTRY_MSR_LOAD_COUNT, 0);
-+}
-+
-+/*
-+ * Guest-visible VMCS fields carried from the VMCS the caretaker ran the vCPU
-+ * on to the VMCS the new kernel allocated for it.
-+ *
-+ * The new kernel does not adopt the old VMCS: it belongs to the previous
-+ * kernel's struct loaded_vmcs, whose layout is not part of any handover ABI,
-+ * and the VMCS region itself is opaque and implementation defined.  So the
-+ * architecturally defined guest state is copied field by field instead.
-+ *
-+ * GUEST_IA32_EFER is handled separately because it is only written back when
-+ * the caretaker actually recorded a value for it.
-+ */
-+static const u16 vmx_caretaker_guest_fields[] = {
-+	GUEST_CS_SELECTOR,	GUEST_CS_LIMIT,
-+	GUEST_CS_AR_BYTES,	GUEST_CS_BASE,
-+	GUEST_SS_SELECTOR,	GUEST_SS_LIMIT,
-+	GUEST_SS_AR_BYTES,	GUEST_SS_BASE,
-+	GUEST_DS_SELECTOR,	GUEST_DS_LIMIT,
-+	GUEST_DS_AR_BYTES,	GUEST_DS_BASE,
-+	GUEST_ES_SELECTOR,	GUEST_ES_LIMIT,
-+	GUEST_ES_AR_BYTES,	GUEST_ES_BASE,
-+	GUEST_FS_SELECTOR,	GUEST_FS_LIMIT,
-+	GUEST_FS_AR_BYTES,	GUEST_FS_BASE,
-+	GUEST_GS_SELECTOR,	GUEST_GS_LIMIT,
-+	GUEST_GS_AR_BYTES,	GUEST_GS_BASE,
-+	GUEST_TR_SELECTOR,	GUEST_TR_LIMIT,
-+	GUEST_TR_AR_BYTES,	GUEST_TR_BASE,
-+	GUEST_LDTR_SELECTOR,	GUEST_LDTR_LIMIT,
-+	GUEST_LDTR_AR_BYTES,	GUEST_LDTR_BASE,
-+	GUEST_GDTR_LIMIT,	GUEST_GDTR_BASE,
-+	GUEST_IDTR_LIMIT,	GUEST_IDTR_BASE,
-+	GUEST_INTERRUPTIBILITY_INFO,
-+	GUEST_ACTIVITY_STATE,
-+	GUEST_IA32_DEBUGCTL,
-+	GUEST_SYSENTER_CS,
-+	GUEST_SYSENTER_ESP,
-+	GUEST_SYSENTER_EIP,
-+};
-+
-+static void
-+vmx_caretaker_sync_vcpu(struct kvm_vcpu *vcpu, void *vcpu_data)
-+{
-+	struct kvm_caretaker_arch_ser *abi = vcpu_data;
-+	struct vcpu_vmx *vmx = to_vmx(vcpu);
-+	phys_addr_t cur_vmcs_pa = vmx->loaded_vmcs ? virt_to_phys(vmx->loaded_vmcs->vmcs) : 0;
-+	struct vmcs *prev_vmcs;
-+
-+	guard(preempt)();
-+	prev_vmcs = this_cpu_read(current_vmcs);
-+
-+	if (abi->vmcs_pa && cur_vmcs_pa && abi->vmcs_pa != cur_vmcs_pa) {
-+		/* 42 * 8 bytes; this runs on the host stack, not a preserved one. */
-+		unsigned long val[ARRAY_SIZE(vmx_caretaker_guest_fields)];
-+		unsigned long guest_efer;
-+		int i;
-+
-+		asm volatile("vmptrld %0" : : "m" (abi->vmcs_pa) : "memory", "cc");
-+
-+		for (i = 0; i < ARRAY_SIZE(vmx_caretaker_guest_fields); i++)
-+			val[i] = vmx_vmread(vmx_caretaker_guest_fields[i]);
-+		guest_efer = vmx_caretaker_read_efer();
-+
-+		asm volatile("vmclear %0" : : "m" (abi->vmcs_pa) : "memory", "cc");
-+		asm volatile("vmptrld %0" : : "m" (cur_vmcs_pa) : "memory", "cc");
-+
-+		for (i = 0; i < ARRAY_SIZE(vmx_caretaker_guest_fields); i++)
-+			vmx_vmwrite(vmx_caretaker_guest_fields[i], val[i]);
-+		if (guest_efer)
-+			vmx_vmwrite(GUEST_IA32_EFER, guest_efer);
-+
-+		abi->vmcs_pa = cur_vmcs_pa;
-+	} else if (cur_vmcs_pa) {
-+		asm volatile("vmptrld %0" : : "m" (cur_vmcs_pa) : "memory", "cc");
-+	}
-+
-+	kvm_x86_caretaker_sync_vcpu_common(vcpu);
-+
-+	if (vmx->loaded_vmcs) {
-+		pin_controls_clearbit(vmx, PIN_BASED_VMX_PREEMPTION_TIMER);
-+		vmcs_write32(PIN_BASED_VM_EXEC_CONTROL, pin_controls_get(vmx));
-+		vmcs_write32(CPU_BASED_VM_EXEC_CONTROL, exec_controls_get(vmx));
-+		vmcs_write32(VMX_PREEMPTION_TIMER_VALUE, 0);
-+		vmcs_write32(VM_EXIT_MSR_LOAD_COUNT, vmx->msr_autoload.host.nr);
-+		vmcs_write32(VM_ENTRY_MSR_LOAD_COUNT, vmx->msr_autoload.guest.nr);
-+		memset(&vmx->loaded_vmcs->host_state, 0,
-+		       sizeof(struct vmcs_host_state));
-+		list_del_init(&vmx->loaded_vmcs->loaded_vmcss_on_cpu_link);
-+		vmx->loaded_vmcs->cpu = -1;
-+		vmx->loaded_vmcs->launched = 0;
-+	}
-+	vmx_segment_cache_clear(vmx);
-+	vmx->vt.guest_state_loaded = false;
-+	vmx->guest_uret_msrs_loaded = false;
-+
-+	vmcs_write32(VM_ENTRY_INTR_INFO_FIELD, 0);
-+	vmcs_write32(GUEST_INTERRUPTIBILITY_INFO, 0);
-+	vmcs_write32(GUEST_ACTIVITY_STATE, GUEST_ACTIVITY_ACTIVE);
-+	vmcs_writel(GUEST_PENDING_DBG_EXCEPTIONS, 0);
-+
-+	vmcs_writel(GUEST_RIP, kvm_rip_read(vcpu));
-+	vmcs_writel(GUEST_RSP, kvm_rsp_read(vcpu));
-+	vmcs_writel(GUEST_RFLAGS, kvm_get_rflags(vcpu));
-+	vmx_set_cr0(vcpu, vcpu->arch.cr0);
-+	vmcs_writel(GUEST_CR3, vcpu->arch.cr3);
-+	vmx_set_cr4(vcpu, vcpu->arch.cr4);
-+	vmx_set_efer(vcpu, vcpu->arch.efer);
-+
-+	if (vmx->loaded_vmcs)
-+		vmx_set_constant_host_state(vmx);
-+
-+	if (cur_vmcs_pa)
-+		asm volatile("vmclear %0" : : "m" (cur_vmcs_pa) : "memory", "cc");
-+
-+	if (prev_vmcs && (!vmx->loaded_vmcs || prev_vmcs != vmx->loaded_vmcs->vmcs)) {
-+		vmcs_load(prev_vmcs);
-+		this_cpu_write(current_vmcs, prev_vmcs);
-+	} else {
-+		this_cpu_write(current_vmcs, NULL);
-+	}
-+}
-+
-+static __cpu_preserved_text void
-+vmx_caretaker_detach_serialize(void *page, struct kvm_vcpu_arch_ser *state)
-+{
-+	struct caretaker_vmx_page *cvp = page;
-+
-+	kvm_x86_caretaker_detach_serialize_common(&cvp->common, state);
-+	kvm_x86_caretaker_update_msr(state, MSR_STAR, cvp->star);
-+	kvm_x86_caretaker_update_msr(state, MSR_LSTAR, cvp->lstar);
-+	kvm_x86_caretaker_update_msr(state, MSR_SYSCALL_MASK, cvp->fmask);
-+	kvm_x86_caretaker_update_msr(state, MSR_KERNEL_GS_BASE,
-+				     cvp->common.kernel_gs_base);
-+}
-+
-+static __cpu_preserved_text void vmx_caretaker_arm_timer(void *page, u64 deadline_ticks)
-+{
-+	struct caretaker_vmx_page *cvp = page;
-+	u32 shift = (cvp && cvp->timer_shift) ? cvp->timer_shift : VMX_PREEMPTION_TIMER_SHIFT;
-+	u32 timer_value = 0;
-+	u32 pin;
-+
-+	if (deadline_ticks) {
-+		u64 now = arch_oncore_read_counter();
-+
-+		if (deadline_ticks > now) {
-+			u64 remaining = deadline_ticks - now;
-+
-+			timer_value = (u32)(remaining >> shift);
-+			if (timer_value == 0)
-+				timer_value = 1;
-+		} else {
-+			timer_value = 1;
-+		}
-+	}
-+
-+	if (timer_value > 0) {
-+		vmx_vmwrite(VMX_PREEMPTION_TIMER_VALUE, timer_value);
-+		pin = (u32)vmx_vmread(PIN_BASED_VM_EXEC_CONTROL);
-+		pin |= PIN_BASED_VMX_PREEMPTION_TIMER;
-+		vmx_vmwrite(PIN_BASED_VM_EXEC_CONTROL, pin);
-+	} else {
-+		vmx_caretaker_disarm_timer(page);
-+	}
- }
- 
-+static __cpu_preserved_text void
-+vmx_caretaker_advance_rip(void *page, u64 rip)
-+{
-+	struct caretaker_vmx_page *cvp = page;
-+
-+	cvp->common.last_exit_rip = rip;
-+	vmx_vmwrite(GUEST_RIP, rip);
-+}
-+
-+static __cpu_preserved_text void vmx_caretaker_pre_enter(void *page)
-+{
-+	struct caretaker_vmx_page *cvp = page;
-+
-+	/* Ensure VMX is active on this core */
-+	if (!(__read_cr4() & X86_CR4_VMXE)) {
-+		asm volatile("mov %0, %%cr4" : : "r" (__read_cr4() | X86_CR4_VMXE) : "memory");
-+		if (cvp->vmxon_pa) {
-+			asm volatile("1: vmxon %[vmxon_pa]\n\t"
-+				     "2:\n\t"
-+				     _ASM_EXTABLE(1b, 2b)
-+				     : : [vmxon_pa] "m" (cvp->vmxon_pa)
-+				     : "memory", "cc");
-+		}
-+	}
-+
-+	/* Activate VMCS on this pCPU */
-+	asm volatile("vmptrld %0" : : "m" (cvp->common.abi.vmcs_pa) : "memory", "cc");
-+
-+	/* Configure Caretaker host VMCS */
-+	vmx_caretaker_init_host_vmcs(cvp);
-+
-+	if (cvp->common.arch_state)
-+		native_write_cr2(cvp->common.arch_state->sregs.cr2);
-+
-+	native_wrmsrq(MSR_STAR, cvp->star);
-+	native_wrmsrq(MSR_LSTAR, cvp->lstar);
-+	native_wrmsrq(MSR_SYSCALL_MASK, cvp->fmask);
-+}
-+
-+static __cpu_preserved_text void
-+vmx_caretaker_read_seg(struct kvm_segment *var, u16 sel_field,
-+		       u16 base_field, u16 limit_field, u16 ar_field)
-+{
-+	u32 ar = (u32)vmx_vmread(ar_field);
-+
-+	var->base = vmx_vmread(base_field);
-+	var->limit = (u32)vmx_vmread(limit_field);
-+	var->selector = (u16)vmx_vmread(sel_field);
-+	var->unusable = (ar >> 16) & 1;
-+	var->type = ar & 15;
-+	var->s = (ar >> 4) & 1;
-+	var->dpl = (ar >> 5) & 3;
-+	var->present = !var->unusable;
-+	var->avl = (ar >> 12) & 1;
-+	var->l = (ar >> 13) & 1;
-+	var->db = (ar >> 14) & 1;
-+	var->g = (ar >> 15) & 1;
-+}
-+
-+static __cpu_preserved_text void vmx_caretaker_post_exit(void *page)
-+{
-+	struct caretaker_vmx_page *cvp = page;
-+	struct kvm_vcpu_arch_ser *state = cvp->common.arch_state;
-+	u64 efer;
-+
-+	cvp->star = native_rdmsrq(MSR_STAR);
-+	cvp->lstar = native_rdmsrq(MSR_LSTAR);
-+	cvp->fmask = native_rdmsrq(MSR_SYSCALL_MASK);
-+
-+	cvp->common.cr0 = vmx_caretaker_read_cr0();
-+	cvp->common.cr3 = vmx_vmread(GUEST_CR3);
-+	cvp->common.cr4 = vmx_caretaker_read_cr4();
-+	efer = vmx_caretaker_read_efer();
-+	if (efer)
-+		cvp->common.efer = efer;
-+	cvp->common.last_exit_rip = vmx_vmread(GUEST_RIP);
-+	cvp->common.last_exit_rsp = vmx_vmread(GUEST_RSP);
-+	cvp->common.last_exit_rflags = vmx_vmread(GUEST_RFLAGS);
-+
-+	if (state) {
-+		state->sregs.cr2 = native_read_cr2();
-+		vmx_caretaker_read_seg(&state->sregs.cs, GUEST_CS_SELECTOR,
-+				       GUEST_CS_BASE, GUEST_CS_LIMIT, GUEST_CS_AR_BYTES);
-+		vmx_caretaker_read_seg(&state->sregs.ds, GUEST_DS_SELECTOR,
-+				       GUEST_DS_BASE, GUEST_DS_LIMIT, GUEST_DS_AR_BYTES);
-+		vmx_caretaker_read_seg(&state->sregs.es, GUEST_ES_SELECTOR,
-+				       GUEST_ES_BASE, GUEST_ES_LIMIT, GUEST_ES_AR_BYTES);
-+		vmx_caretaker_read_seg(&state->sregs.fs, GUEST_FS_SELECTOR,
-+				       GUEST_FS_BASE, GUEST_FS_LIMIT, GUEST_FS_AR_BYTES);
-+		vmx_caretaker_read_seg(&state->sregs.gs, GUEST_GS_SELECTOR,
-+				       GUEST_GS_BASE, GUEST_GS_LIMIT, GUEST_GS_AR_BYTES);
-+		vmx_caretaker_read_seg(&state->sregs.ss, GUEST_SS_SELECTOR,
-+				       GUEST_SS_BASE, GUEST_SS_LIMIT, GUEST_SS_AR_BYTES);
-+		vmx_caretaker_read_seg(&state->sregs.tr, GUEST_TR_SELECTOR,
-+				       GUEST_TR_BASE, GUEST_TR_LIMIT, GUEST_TR_AR_BYTES);
-+		vmx_caretaker_read_seg(&state->sregs.ldt, GUEST_LDTR_SELECTOR,
-+				       GUEST_LDTR_BASE, GUEST_LDTR_LIMIT, GUEST_LDTR_AR_BYTES);
-+		state->sregs.gdt.base = vmx_vmread(GUEST_GDTR_BASE);
-+		state->sregs.gdt.limit = (u16)vmx_vmread(GUEST_GDTR_LIMIT);
-+		state->sregs.idt.base = vmx_vmread(GUEST_IDTR_BASE);
-+		state->sregs.idt.limit = (u16)vmx_vmread(GUEST_IDTR_LIMIT);
-+
-+		kvm_x86_caretaker_update_msr(state, MSR_IA32_SYSENTER_CS,
-+					     vmx_vmread(GUEST_SYSENTER_CS));
-+		kvm_x86_caretaker_update_msr(state, MSR_IA32_SYSENTER_ESP,
-+					     vmx_vmread(GUEST_SYSENTER_ESP));
-+		kvm_x86_caretaker_update_msr(state, MSR_IA32_SYSENTER_EIP,
-+					     vmx_vmread(GUEST_SYSENTER_EIP));
-+	}
-+
-+	/* Flush VMCS cache so host and incoming kernel see latest guest state */
-+	asm volatile("vmclear %0" : : "m" (cvp->common.abi.vmcs_pa) : "memory", "cc");
-+}
-+
-+static const struct kvm_x86_caretaker_runtime_ops vmx_caretaker_runtime_ops __cpu_preserved_data = {
-+	.detach_serialize = vmx_caretaker_detach_serialize,
-+	.common = {
-+		.enter_guest = vmx_caretaker_enter,
-+		.decode_exit = vmx_caretaker_decode_exit,
-+		.handle_arch_exit = kvm_x86_caretaker_handle_exit,
-+		.advance_rip = vmx_caretaker_advance_rip,
-+		.arm_timer = vmx_caretaker_arm_timer,
-+		.disarm_timer = vmx_caretaker_disarm_timer,
-+		.pre_run = vmx_caretaker_pre_enter,
-+		.post_run = vmx_caretaker_post_exit,
-+	},
-+};
-+
-+static const struct kvm_x86_caretaker_ops vmx_caretaker_ops = {
-+	.name = "vmx",
-+	.init = vmx_caretaker_init,
-+	.sync_vcpu = vmx_caretaker_sync_vcpu,
-+	.runtime = &vmx_caretaker_runtime_ops,
-+};
-+
-+void vmx_caretaker_register(void)
-+{
-+	kvm_x86_caretaker_register_ops(&vmx_caretaker_ops);
-+}
-+
-+void vmx_caretaker_unregister(void)
-+{
-+	kvm_x86_caretaker_unregister_ops(&vmx_caretaker_ops);
-+}
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 48b6e69f99bf..817623f7429a 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -54,6 +54,7 @@
- #include <trace/events/ipi.h>
- 
- #include "capabilities.h"
-+#include "caretaker.h"
- #include "common.h"
- #include "cpuid.h"
- #include "hyperv.h"
-@@ -8548,6 +8549,7 @@ void vmx_migrate_timers(struct kvm_vcpu *vcpu)
- 
- void vmx_hardware_unsetup(void)
- {
-+	vmx_caretaker_unregister();
- 	kvm_set_posted_intr_wakeup_handler(NULL);
- 
- 	if (nested)
-@@ -8855,6 +8857,8 @@ __init int vmx_hardware_setup(void)
- 
- 	kvm_caps.inapplicable_quirks &= ~KVM_X86_QUIRK_IGNORE_GUEST_PAT;
- 
-+	vmx_caretaker_register();
-+
- 	return 0;
- }
- 
+   With that in place we generalise the predicate "kvm_vm_is_protected()"
+   to cover all  "Confidential" VMs (which includes Protected VM and Realms),
+   allowing us to handle common themes without having to do things like :
+
+     if (kvm_vm_is_protected() || kvm_vm_is_realm())
+
+   Also replaces the code with precise check for a given VM type to
+   avoiding combination of if (). e.g,, kvm_vm_is_unprotected_pkvm(kvm).
+   The checks under arch/arm64/kvm/{nvhe,pkvm} still retain the vm_is_protected()
+   check as pVMs are the only possible protected VMs there.
+   
+ 4) Bare minimal Realm VM support without the actual functionality to
+    run a Realm. This would help the maintainers to review the series in
+    smaller chunks. This doesn't depend on [1] and can be independently
+    merged, without being "functional".
+    This series includes vcpu operations and the s2 vm operations, which
+    do need the RMI driver backend to be meaningful. But the KVM handler
+    is in the right shape. The remaining changes would be added once the
+    RMI firmware library lands. Also covers the SET_ONE_REG/GET_ONE_REG
+
+ 5) Core implementation of the RMI driver for KVM and actual enablement of the
+    Realm support. This depends on (1), (2) and the guest-memfd-in-place
+    conversion series v12 from Ackerley. This is available here at the integration
+    branch [3]
+
+This series is comprised of (3) and (4) above.
+
+The integration branch has been tested with the following components:
+
+  tf-RMM:   main branch (commit 5e6e2acd) compliant to RMM-v2.0-beta3 [4]
+  kvmtool: git@git.gitlab.arm.com:linux-arm/kvmtool-cca.git cca/kvm-v18
+
+[0] Arm CCA KVM Support v16 : https://lore.kernel.org/all/20260803134403.80630-1-steven.price@arm.com
+[1] Linux firmware RMI https://lore.kernel.org/all/20260912083611.2513845-1-suzuki.poulose@arm.com
+[2] Linux GPF Host https://lore.kernel.org/all/20260913070459.2547407-1-suzuki.poulose@arm.com
+[3] https://git.gitlab.arm.com/linux-arm/linux-cca/ cca/cca-host/kvm-v19/integration
+[4] https://support.arm.com/documentation/den0137/2-0bet3/
+
+Changes since v18:
+  https://lore.kernel.org/all/20260915160141.3543048-1-suzuki.poulose@arm.com
+
+ - Patch count down by 3, after merging different patches together, see more below
+ - Retain NULL vm_offset for pVMs and move the counter offset flag initialisation
+   to kvm_timer_init_vm() - Marc
+ - Merge widening the scope of kvm_vm_is_protected() to the patch where the
+   flavors are introduced(Marc) and also dropped Fuad's reviewed-by, as the
+   patch is now bigger.
+ - Merge "Use kvm_vm_is_unprotected_pkvm" for !kvm_vm_is_protected to patch
+   where flavor is introuced.
+ - Merge "vgic-v3" mandate and preventing vgic-v2 mappings to a single patch,
+   where kvm_vm_hyp_is_distrusting() introduced - Fuad
+ - Drop kvm_vm_hyp_is_pkvm(), reverting to is_protected_kvm_enabled()
+ - Use is_protected_kvm_enabeld() for pKVM guest flavor checks.
+ - s/PKVM/pKVM for commit descriptions too
+ - Make sure the vm_mem_abort callback is !NULL at init time.
+ - Bail out early for !pKVM && !Realm VMs in kvm_vm_ioctl_allowed(). Use
+   kvm_vm_hyp_is_distrusting()
+ - WARN_ON_ONCE(!kvm) for kvm_vm_ioctl_allowed() as it must be only called with
+   a valid kvm instance and only from kvm_arch_vm_ioctl()
+ - Rename kvm_arch_vm_{ext,ioctl}_allowed => kvm_vm_{ext,ioctl}_allowed - Fuad
+ - Move kvm_realm_ext_allowed() to asm/kvm_rmi.h - Fuad
+ - Don't expose PMCR_EL0 to the userspace until we support PMU
+
+
+Changes since v17:
+https://lore.kernel.org/all/20260908162223.1683432-1-suzuki.poulose@arm.com 
+
+ - Add a patch to fix pKVM handling of SYS_CNTVCT/CNTPCT to override the counter
+   offset (Patch1)
+ - Restrict Realms to VGIC v3 only - New patch
+ - Add kvm_vm_is_unprotected() to replace is_protected_kvm_enabled() &&
+   !kvm_vm_is_protected() - New patch
+ - Use macro to initialize the per-flavor vcpu, s2_vm ops
+ - Add a wrapper to initialise vcpu and s2_vm ops with a BUILD_BUG_ON()
+   for the array size checks against VM flavour types
+ - Drop forward decalaration of the vcpu, s2_vm operations that spoiled the
+   fun ;-)
+ - Remove irrelevant comment about the order of timer loading for !VHE
+ - Use the explicti kvm_call_hyp_nvhe for pKVM specific ops
+ - Don't call nvhe_vcpu_put from pkvm_vcpu_put, open code them
+ - Drop cpu argument for vcpu_load() callback. We set the cpu
+   before the callbacks are invoked
+ - Drop kvm_vm_is_confidential(), instead widen the scope of kvm_vm_is_protected()
+   to cover pVMs and Realms. Add an explicit helper kvm_vm_is_protected_pkvm()
+   for the cases where we need to check for a "pVM on pKVM"
+ - Add kvm_vm_hyp_is_pkvm() for checking if the VM is running on pKVM.
+   covers both unprotected and pvms. But really uses is_protected_kvm_enabled()
+   under the hood
+ - Add kvm_vm_hyp_is_distrusting() to cover pKVM guests (both protected and
+   unprotected) and Realms. Use this for preventing the vgic v2 mapping into
+   Stage2 for a guest
+ - Drop superfluous !kvm check from kvm_vm_ioctl_enable_cap() - Sashiko
+ - Drop KVM_CAP_CREATE_IRQCHIP, as we don't support VGIC_V2 for Realms
+ - Filter out the vm_ioctls that are based on blocked cap.
+ - Repurpose the pkvm plumbing for filtering the caps and ioctl to generic
+   and plumb the Realm support in
+ - s/PKVM/pKVM for the comments
+ - Drop type argument for pkvm_init_host_vm and also drop protected variable,
+   now that we have the vm_flavor to check.
+ - Use kvm_vm_hyp_is_pkvm() to replace is_protected_kvm_enabled() with valid
+   kvm instance
+ - CCA: Merge the GET/SET REG handling patches into a single patch
+ - CCA: Reword the commit description for SVE VL access handling
+ - Reordered the patches to group the Realm realted to changes to the rear end
+
+Jean-Philippe Brucker (2):
+  KVM: arm64: CCA: Expose SVE VL register before VCPU finalization
+  KVM: arm64: CCA: Control user register access for Realms
+
+Steven Price (4):
+  KVM: arm64: Avoid including linux/kvm_host.h in kvm_pgtable.h
+  KVM: arm64: CCA: Introduce Realms
+  KVM: arm64: CCA: WARN on injected undef exceptions
+  KVM: arm64: CCA: Support timers in realm RECs
+
+Suzuki K Poulose (14):
+  KVM: arm64: protected VM: Handle user writes to CNTVCT_EL0/CNTPCT_EL0
+  KVM: arm64: Disable Steal time accounting for protected guests
+  KVM: arm64: Include kvm_emulate.h in kvm/arm_psci.h
+  KVM: arm64: Track the type of VM in kvm_arch
+  KVM: arm64: Refactor the vcpu_load to allow for VM specific callbacks
+  KVM: arm64: Add vcpu load/put call backs for flavors
+  KVM: arm64: Reuse kvm_stage2_unmap_range in kvm_unmap_gfn_range
+  KVM: arm64: Add VM specific callback for S2 MMU operations
+  KVM: arm64: Abstract out memory abort handling
+  KVM: arm64: Mandate VGIC v3 for for VMs running on hyp that don't
+    trust the host
+  KVM: arm64: CCA: Add a new mode for supporting Realm guests
+  KVM: arm64: CCA: Add VCPU load/put for Realms
+  KVM: arm64: CCA: Add bare minimal S2 operations for Realm
+  KVM: arm64: CCA: Don't expose unsupported capabilities for realm
+    guests
+
+ .../admin-guide/kernel-parameters.txt         |   3 +
+ arch/arm64/include/asm/kvm_emulate.h          |  16 +
+ arch/arm64/include/asm/kvm_host.h             |  69 +++-
+ arch/arm64/include/asm/kvm_pgtable.h          |   6 +-
+ arch/arm64/include/asm/kvm_pkvm.h             |  25 +-
+ arch/arm64/include/asm/kvm_rmi.h              |  84 +++++
+ arch/arm64/include/asm/virt.h                 |   1 +
+ arch/arm64/kvm/Makefile                       |   2 +-
+ arch/arm64/kvm/arch_timer.c                   |  34 +-
+ arch/arm64/kvm/arm.c                          | 300 +++++++++++++++---
+ arch/arm64/kvm/guest.c                        |  73 ++++-
+ arch/arm64/kvm/handle_exit.c                  |   2 +-
+ arch/arm64/kvm/hyp/nvhe/pkvm.c                |   6 +-
+ arch/arm64/kvm/hyp/pgtable.c                  |   1 +
+ arch/arm64/kvm/hypercalls.c                   |   4 +-
+ arch/arm64/kvm/inject_fault.c                 |   1 +
+ arch/arm64/kvm/mmu.c                          | 210 +++++++++---
+ arch/arm64/kvm/pkvm.c                         |   6 +-
+ arch/arm64/kvm/pvtime.c                       |  14 +-
+ arch/arm64/kvm/rmi.c                          |  18 ++
+ arch/arm64/kvm/sys_regs.c                     |  28 +-
+ arch/arm64/kvm/vgic/vgic-init.c               |   2 +
+ include/kvm/arm_psci.h                        |   2 +
+ 23 files changed, 752 insertions(+), 155 deletions(-)
+ create mode 100644 arch/arm64/include/asm/kvm_rmi.h
+ create mode 100644 arch/arm64/kvm/rmi.c
+
 -- 
-2.55.0.1082.g2b9226bbc0-goog
+2.43.0
 
