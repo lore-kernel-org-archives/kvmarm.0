@@ -1,65 +1,65 @@
 Received: from mail-yx2-f42.google.com (mail-yx2-f42.google.com [74.125.224.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23BEF47D952
-	for <kvmarm@lists.linux.dev>; Sun, 20 Sep 2026 19:39:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADF89477287
+	for <kvmarm@lists.linux.dev>; Sun, 20 Sep 2026 19:39:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789933153; cv=none; b=DL1cBF0G1zWogD0EuqDjh5aNYJKH+7ZI1Qf168I/wHG0fqu+Gj1KjjJL85ShzryyhnNUq4MbqmwhgsWCn6rgZeM678X6301GVHbitdtOHlo/inKDr2l7McUZhMXF8CXqfyDfuhHe+BavXp5Ijj+wTv3CPgx3H/7BU6DYQpLyRBE=
+	t=1789933160; cv=none; b=Uyci3MJXU9TK+LtzH0vL+VhIw4Q/yM4vv8PuHcoNtjHNMxgZGfcrWt803duHLwXLxGaaapV4foLuxiqcZcdtBi1fY1fSRIOvTAsW4M8Ptui0f5R0/3ZGYJ4Oj7f0mFjwO+Sn4yDv2sZsDUsCYx6ySWp8MK4eSzztIF2Ope95yUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789933153; c=relaxed/simple;
-	bh=Y1uk7z81ukhofe/vSmwFM2Y0N/XlaFoNJ7JURZkhshM=;
+	s=arc-20240116; t=1789933160; c=relaxed/simple;
+	bh=ecMTvF3y9YX9wt5R/rOdU59+hWMsUmT0QbE/UEYrczY=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tIwTALdqZJy0FOhegyMFNjfbw2JH502SB4hUbQoV+Mqy5wam5AC/xjL1oQyOMi/eYfFwhzlty695/Tl/uP0PUY19PbxqU8WRdpCbmAXPGqH1fY+Im9Tna9WoCC+O1L8BBx0Usx07CEbeU+yjfLmaeoyk78Hb5pX0K+yz+sTtC/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=soleen.com; spf=pass smtp.mailfrom=soleen.com; dkim=pass (2048-bit key) header.d=soleen.com header.i=@soleen.com header.b=KGsZ6cN4; arc=none smtp.client-ip=74.125.224.170
+	 MIME-Version; b=ibIFv8jhs1HZZPs33RrNCbTMzSRckTa7TJAg/fdP9tuOekAYNPZSP9A0YPnGgy91etMzvtrIcstUhTa/sPOKR4XQhJHb63+BURqE5E6CF5EP1omDMT3pjaCF6LmTWFKaVJ4bpVtNeJLTTc5Vm+ogSdX0dv8yjnZWcXOLPw0XRZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=soleen.com; spf=pass smtp.mailfrom=soleen.com; dkim=pass (2048-bit key) header.d=soleen.com header.i=@soleen.com header.b=PZnhJIGa; arc=none smtp.client-ip=74.125.224.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=soleen.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=soleen.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=soleen.com header.i=@soleen.com header.b="KGsZ6cN4"
-Received: by mail-yx2-f42.google.com with SMTP id 00721157ae682-8961cca9193so28171237b3.3
-        for <kvmarm@lists.linux.dev>; Sun, 20 Sep 2026 12:39:11 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=soleen.com header.i=@soleen.com header.b="PZnhJIGa"
+Received: by mail-yx2-f42.google.com with SMTP id 00721157ae682-895fd505832so15693347b3.3
+        for <kvmarm@lists.linux.dev>; Sun, 20 Sep 2026 12:39:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=soleen.com; s=google; t=1789933150; x=1790537950; darn=lists.linux.dev;
+        d=soleen.com; s=google; t=1789933157; x=1790537957; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=8DswF+PpHLQLFXIsTsYB07zyWStQD5M14yzCJNkAmPg=;
-        b=KGsZ6cN4x7NtM6Obme2IHbQCn9NuOCuPHynIrAS/oyTe8Mh6PXw7mfnLIBQPScIMiF
-         DnZKkVAKVxnZcqCFNJKmn/aYtXA6pcZYHCiW1mBMlOt7huR2fS+t5IeF4RWydi/2LfWm
-         G+gxNOD772MMuCcX5a+tYYaaqavtmCHzckgePfOXyYK/mCA4DD1Aw3JjMpOQOuWH4lPQ
-         MzCGvNecGrR8IjRH/bZ+bDegWiSdVHY3lALq5Kl2ta/feCuXh3R01jN2OKt3az76gGFM
-         uMl+ahHrFGd+fwkdkbj3Gm3KnhqOW98xPd08DYCgv9Arg+pLJMrpVhz9MZUF4OR21ffo
-         nptQ==
+        bh=GOyD94xneAEU7+yzaxi3P4vCBB/CkWgVuLYMi+o49fI=;
+        b=PZnhJIGahrgPhlrPcBj1I2oeTLO/o9sZgmLK7cJoIZLAJezSQbBJzcDfoDQGgX5bq9
+         zhdmQmX067AgQQwu+pzcUdQQGTiu7PfC4FxqFVUe7heCYWgzXARXMa65IkMBjQxp6xkf
+         V/TKE4Ugr26I1qHCcs2e/MC5r7wbv+1cZEKPdwHl3ua+AwjQo6aGF1O0hvP1n5A4BlUq
+         O0Jo1ZueDAt2A8peh46cj/yqO0Xgu+nZExQ5KCH+94nG6FipMm3OaPBo++eatn0CgQMx
+         o1c0pVbtjrEu3++cwClaY8dQxICR7bDVtMzx6JywGEVGSGlElACSO5aAqpsdLNTAVtbj
+         tqjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789933150; x=1790537950;
+        d=1e100.net; s=20260707; t=1789933157; x=1790537957;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=8DswF+PpHLQLFXIsTsYB07zyWStQD5M14yzCJNkAmPg=;
-        b=nvCBjyYpMgiD0IQv1/ZcToGlM6iziLCMXS6GZZ5DFOS3+KptPcBafs+RBJ9o0EhXIv
-         BAKfRHosf8jmJq/FLMwH3ytTiCC8CZxxCxavzf/CV74rIrG1jfaOXugO76qcgD3fWyNy
-         gwFFQq4Zp50s3gYRKq/6b1spoBtqYDTdkdpCwIFT5akR9UHnpRmJIvOvZHReWOAgscMf
-         EeK/4p/uEfHGjq+WFy+0SkaQEq30v8fQFYEqFmQgX4t4q1Y+3ZUstE5iDSxP+UPw+MN+
-         l8CD1dhz3gnoYcqrZAieKgH/ia6mmPAgzcU8MIbo68tuYFUiho+Idfe43fE6e9KgUv/k
-         cwZA==
-X-Forwarded-Encrypted: i=1; AKwUvBwBsOUF/tMrqCV9w45dOnTVLDBGHafXFz0P9SllhDpIHmMEIrHiRnMKmWXJxodCARGDDutrwqQ=@lists.linux.dev
-X-Gm-Message-State: AFuF++n3wPcU6RVmnb+uDVLz7mks5NSzPK+PujPGfLln+5oMuLVY4KDz
-	APAGmF3kBr6WhZoKOtXyUhvIJn/9kxDD2xtP6iy9f7bXJne2/IDv9cRpC7zoSi7Kv2I=
-X-Gm-Gg: AYBFou2025BUKtqY3KsZWB6ZvlOeG3B/JKXb9rf7AX5v2d3zFfgh3IHgoIaqxVVEvXF
-	ihzg8XAtMfABgmMobslTmxVub/Z30TQtC6DM4IVT6SL2EpapURR7GEuMPvBw0f+HNfEHHN4kc2s
-	xpYh0r4IGB3UyOtiYX15TO5bMl8KKxaqUMmezLWgra1ILtXQ+gog3nOWppKVPxlfiKwrUePeN/a
-	Ya2G8vneE7M8UVd0W41odJxwYKHYFVkN90XAKy33he+jGMfdE9XomIamnCquRSfNWIt6bpoWjnp
-	QXYcdeZmzFWJ6YVaHCCLVe2pcoIBXhRc//UWzU1/NXPpht00Sue8fo73mHhEgdWLHPunUJtXJhF
-	Ee2gFJdtxtDwuK07FtFYMufs1jHhH8T/gZpd0js9JHJeNgbL1QFnNcJoRrXhTebUx2KkVQuQfPj
-	kraqQ1a+35ynAXI377VwS34hHx7QuSDgRkkYmk+Phii2+IWtPycdVnVnOj24nR/vjVhZu/k93Mc
-	jKhjwuO/D9P5eFP+nfef43GgEKbvROQwN7KmXg7V+I9JZHoD9ngM8ZZDPhOq9DKSYgvSDHcjf9M
-	HifFTX0+JfiIkWfasSM=
-X-Received: by 2002:a05:690c:39d:b0:89b:6b8c:8edf with SMTP id 00721157ae682-89b6b8c9360mr12390877b3.50.1789933150155;
-        Sun, 20 Sep 2026 12:39:10 -0700 (PDT)
+        bh=GOyD94xneAEU7+yzaxi3P4vCBB/CkWgVuLYMi+o49fI=;
+        b=UUEKZktzrd1641+g/AmTlkbX04acWes9hQuMHRvZlkgscZFeOVnOP3Sph2nVpR+/UG
+         PdtU01lLgHwDCOHOBt3aIIrhwzijrU8pMo45OlJWiYRU+RdaUc85fGEnwH9qwLI7Y+oV
+         5ebH9mPlvp+caUdgiSKx97RZ83paBe6nvPWOF0OD3yygl1162Ti3y/thCLFu7HnFA36d
+         6rCqp76CbdfhiLoYLJVTuT9KLI3ayuivANkEI7hcn9PL8u5SkLnmUXm0KgkjR+YVbkNZ
+         3cavCM0P4T9rO76KT7WcOaiow8vV+5HlPfUZPQSbDbwcpEMhLsIdMF2K4L4aNfn9EKA6
+         pGVQ==
+X-Forwarded-Encrypted: i=1; AKwUvBxY9ihHPvV7BEmV6kDzc1nv+eHxNeg87hsJtq/FxDjRN+AdGXwZGlq267BSG2K+8W0/gFHN2tY=@lists.linux.dev
+X-Gm-Message-State: AFuF++nctZIxQOM5Z7UZaYZaGGi1+DZ98Bd7x45PNO8KXpbWywUoDLep
+	PlDNlMb44cAYNsM1ItF7nefb1zZy2Pm7SSl/k/JPLoOMUX2gUyiB7NLQLZbdP5WNnA8=
+X-Gm-Gg: AYBFou0VYLA9Wk43PGQIPwto21iixovjwqmfmrwtoqoC170ZVNJwbKMYvcos19JkUy/
+	0xW0snbQya7S5w73zNr06MV0arIDIo4pzdyVG9fUE/JO2RbQNlSfNvYwlKn0StWN7eI3A7wbB7P
+	ooIlXp04f78M//rMSlUjkVk3qh8Q622qKZ+xK/2qX3Fd09sFGlnCtkYVVK7Mk83/x632vAKtY5q
+	0LW2cHxbA3iLgfgiXsO9Uz/txzG2QkWoCMqAavGeEEh0u9NPZOZn9NWWeCTvmUY25lgtmYAHmfm
+	AAX0tgMNBPq8bD+qPb5GNTFWQ2VdPMsF/95csV6s+/wOQ34fhD9o3NO9968ROtgF6IJ4qbqOPXM
+	qB1lWBKwvQFwTVglPCoNwsNNJ5UNqilARixGJqdFAsP+ZnlQKCoPF2uAB3A0Ltp36UgYhgTO1gI
+	R6+QroepC1MZaR+hyDJGRgZrElsTgZ5hNVRCmmQXpC1ayDqDDc0HZZtV7SGjJfuY0hxyPdQuMtp
+	9MqPjkC7mpgh+tQHZlStnwQQhq3NCX4NSKz9+HcxkiZAGph48FgYT9fmAtdCrOnvQoNBrBbvLDJ
+	LMFX51w/NnQ6/gAZvW4=
+X-Received: by 2002:a05:690c:e3cf:b0:845:ddf4:a399 with SMTP id 00721157ae682-897308f89e5mr31680887b3.11.1789933156801;
+        Sun, 20 Sep 2026 12:39:16 -0700 (PDT)
 Received: from soleen.c.googlers.com.com (16.49.199.35.bc.googleusercontent.com. [35.199.49.16])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-89a41521471sm19169577b3.6.2026.09.20.12.39.07
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-89a4761747asm18686667b3.30.2026.09.20.12.39.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 20 Sep 2026 12:39:09 -0700 (PDT)
+        Sun, 20 Sep 2026 12:39:15 -0700 (PDT)
 From: Pasha Tatashin <pasha.tatashin@soleen.com>
 To: linux-kselftest@vger.kernel.org,
 	legion@kernel.org,
@@ -137,9 +137,9 @@ To: linux-kselftest@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	vladimir.murzin@arm.com,
 	kas@kernel.org
-Subject: [RFC PATCH 23/46] Documentation: liveupdate: Add physical CPU preservation documentation
-Date: Sun, 20 Sep 2026 15:36:27 -0400
-Message-ID: <20260920193650.3373435-24-pasha.tatashin@soleen.com>
+Subject: [RFC PATCH 24/46] MAINTAINERS: Add entry for KVM Caretaker
+Date: Sun, 20 Sep 2026 15:36:28 -0400
+Message-ID: <20260920193650.3373435-25-pasha.tatashin@soleen.com>
 X-Mailer: git-send-email 2.55.0.1082.g2b9226bbc0-goog
 In-Reply-To: <20260920193650.3373435-1-pasha.tatashin@soleen.com>
 References: <20260920193650.3373435-1-pasha.tatashin@soleen.com>
@@ -151,74 +151,36 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add documentation for physical CPU preservation subsystem, workload
-attachment API, architecture backend hooks, and KHO serialization ABI.
+Add KERNEL VIRTUAL MACHINE CARETAKER section in MAINTAINERS covering
+Caretaker headers, architecture backends, and core execution files.
 
 Signed-off-by: Pasha Tatashin <pasha.tatashin@soleen.com>
 ---
- Documentation/liveupdate/cpu_preservation.rst | 34 +++++++++++++++++++
- Documentation/liveupdate/index.rst            | 11 ++++++
- 2 files changed, 45 insertions(+)
- create mode 100644 Documentation/liveupdate/cpu_preservation.rst
- create mode 100644 Documentation/liveupdate/index.rst
+ MAINTAINERS | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/Documentation/liveupdate/cpu_preservation.rst b/Documentation/liveupdate/cpu_preservation.rst
-new file mode 100644
-index 000000000000..a7a534188685
---- /dev/null
-+++ b/Documentation/liveupdate/cpu_preservation.rst
-@@ -0,0 +1,34 @@
-+.. SPDX-License-Identifier: GPL-2.0-or-later
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 23f332cfbd16..86806245041e 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -14296,6 +14296,17 @@ F:	tools/kvm/
+ F:	tools/testing/selftests/kvm/
+ F:	virt/kvm/*
+ 
++KERNEL VIRTUAL MACHINE CARETAKER
++M:	Pasha Tatashin <pasha.tatashin@soleen.com>
++L:	kvm@vger.kernel.org
++L:	kexec@lists.infradead.org
++S:	Maintained
++F:	arch/*/include/asm/kvm_caretaker*
++F:	arch/*/kvm/*caretaker*
++F:	arch/x86/kvm/mmu/kho.c
++F:	include/linux/kvm_caretaker.h
++F:	virt/kvm/caretaker*.c
 +
-+=========================
-+Physical CPU Preservation
-+=========================
-+
-+.. kernel-doc:: kernel/liveupdate/cpu_preserve.c
-+   :doc: Preserved CPU Subsystem
-+
-+CPU Preservation Workload API
-+=============================
-+
-+.. kernel-doc:: kernel/liveupdate/cpu_preserve.c
-+   :export:
-+
-+Architecture Backend Interface
-+==============================
-+
-+.. kernel-doc:: include/linux/cpu_preserve.h
-+
-+CPU Preservation ABI
-+====================
-+
-+.. kernel-doc:: include/linux/kho/abi/cpu.h
-+   :doc: CPU Preservation Live Update ABI
-+
-+.. kernel-doc:: include/linux/kho/abi/cpu.h
-+
-+See Also
-+========
-+
-+- :doc:`/core-api/liveupdate`
-+- :doc:`/liveupdate/vmm`
-+- :doc:`/mm/memfd_preservation`
-diff --git a/Documentation/liveupdate/index.rst b/Documentation/liveupdate/index.rst
-new file mode 100644
-index 000000000000..415ac748c9f7
---- /dev/null
-+++ b/Documentation/liveupdate/index.rst
-@@ -0,0 +1,11 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+===========
-+Live Update
-+===========
-+
-+.. toctree::
-+   :maxdepth: 1
-+
-+   vmm
-+   cpu_preservation
+ KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)
+ M:	Marc Zyngier <maz@kernel.org>
+ M:	Oliver Upton <oupton@kernel.org>
 -- 
 2.55.0.1082.g2b9226bbc0-goog
 
