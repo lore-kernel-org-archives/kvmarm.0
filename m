@@ -1,65 +1,65 @@
-Received: from mail-yx2-f13.google.com (mail-yx2-f13.google.com [74.125.224.141])
+Received: from mail-yx2-f43.google.com (mail-yx2-f43.google.com [74.125.224.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0009E486B8F
-	for <kvmarm@lists.linux.dev>; Sun, 20 Sep 2026 19:40:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB15E486E7E
+	for <kvmarm@lists.linux.dev>; Sun, 20 Sep 2026 19:40:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789933221; cv=none; b=JYMF9iIvJ6q49QEQ2dMidegDU0fk3uBwx7Sa3S1UP0CtxEVmsPlb5REa49iWvgpqNwsVv2x6Dp2qim6JU+635RDhrfn3ahbRPbA1lAEhnFNPD55iff3uvw3V8J/VXiavBI0fVPi+nIep5XWwkrDYakiFxJwXvo7f/UcH/ZYnYvU=
+	t=1789933228; cv=none; b=er4NzIFL448nRd4XTZCZQsvMumZ4jek93Rfp5jyYxzxh0xxDcCq8VnaX673dLQ3jHnap5hCIwWclNeVPYZFrp0PVMSDn+kWexpXLhJwCY/Uu6HtQslJCp5Jc5E9N6OmibfviFxcB+7wfTPQmLIb88GV6ziAr/uoEOkBSCHTz3MQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789933221; c=relaxed/simple;
-	bh=mCIoZuoMY+IBAKdDMsYQQIR91MDw4b5hVFEekbjU484=;
+	s=arc-20240116; t=1789933228; c=relaxed/simple;
+	bh=hPICxA3qZrBv+5X1CJQSZ6HRil7MNnhhw7WoGm+62cU=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=P2DOFwC6wDuI4K8Xfp0IGAGYGm5sceYhAJ5DtQ+BrilB0H3zjBEz14lKaFXep2ETqKGwggZkXvZDNBIzWG9FTwsHlnWgwhgfG18M+vAScFr4IGdRR/afNPOIr8mUJjxUjh7rzWAQBVg/E4Dy4LnxpFIYFo4uTnVJwNQk1Hq8Nuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=soleen.com; spf=pass smtp.mailfrom=soleen.com; dkim=pass (2048-bit key) header.d=soleen.com header.i=@soleen.com header.b=OEJCSWyo; arc=none smtp.client-ip=74.125.224.141
+	 MIME-Version; b=Ha/0hlz2JEHjhDpAfk6nuPZm/Jy80aV2VKj6xJxJM82cTLmsGc5yLmg4hoxIr4ieLa/bcZ5hAGwRN7U4czCt9W0N14+QAjesS8Www2woGnq3RiDfru1ra6pdUgCJSHTfBC4zM9ioTpdcWW0flrufrzMb0gISTgwTbXa47Hs+os4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=soleen.com; spf=pass smtp.mailfrom=soleen.com; dkim=pass (2048-bit key) header.d=soleen.com header.i=@soleen.com header.b=jsIhc33I; arc=none smtp.client-ip=74.125.224.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=soleen.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=soleen.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=soleen.com header.i=@soleen.com header.b="OEJCSWyo"
-Received: by mail-yx2-f13.google.com with SMTP id 956f58d0204a3-66e4ab20f4bso2224169d50.0
-        for <kvmarm@lists.linux.dev>; Sun, 20 Sep 2026 12:40:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=soleen.com header.i=@soleen.com header.b="jsIhc33I"
+Received: by mail-yx2-f43.google.com with SMTP id 00721157ae682-85d4ddd179eso17261867b3.3
+        for <kvmarm@lists.linux.dev>; Sun, 20 Sep 2026 12:40:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=soleen.com; s=google; t=1789933218; x=1790538018; darn=lists.linux.dev;
+        d=soleen.com; s=google; t=1789933225; x=1790538025; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=EGHl9G2Q8EmXvEbGL4UYBvGbfn4j1FoYD4wdklwyMj4=;
-        b=OEJCSWyoM5g0f59nrEH/uPVV1s8UBkOOqtDgh900q5+0bvUySc/I50I9aM5etQM5q4
-         3kh+kvSFWmoNqaLbt8gp2iMzvg4gd+0FkNo803baA2Sdq6HnNkJ+5YMkVr+SvB7sNM/l
-         2iGIiuNeBiQUqEtxoGhzcl2lDqSpPc7MHS+ZUwRGXGx0SsKvIodqa06i7ggWi2bPJsFv
-         3MISW4st9Kfy5kkyxyMfXTj54EnEzBrnUeG3yF9F+4muJksSuGOikL82Pa9K+tPVjnvz
-         exe+NlA+XKqRga9GizAHt6R12zWW/F92UKyjkUsXImA33ri9u/OF7VIbBw5BKbLgi3wc
-         l19w==
+        bh=VWkA9vhMZ3eDi8wOrToSquxZz2LpFkjbEEG2BMmzAhs=;
+        b=jsIhc33ISTVKXgLTqv/j+umopAcVH9k+/QTLXFJYLZ+B7kc+OGO5wvFr4I4Bla4Cu5
+         elPKdtBjiN2EmTMb7q9x1ic+9c8dCBaO4V1yhHQaZYkqh0zTtbDLYemss6TN+pUqVJk1
+         Re+923DG/GZw9NV5XI3yhXTonXmzMjp8RyhkzFBnf7idcP7w24Fetg82I33sB8+lVjD4
+         V9aomsD3fdaC3HCsCTju7qDuzV9RZP3kiuR0OpiZUtkbqMIM0bCRcorxqIDOkk0EYgYV
+         ztU0Mdm8bZg+ZeUzwUW8X1OyjG8NFfJ4M95XYJRJSQDkr5c+yFKr2OkFHJYwb5p6K5AY
+         OEQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789933218; x=1790538018;
+        d=1e100.net; s=20260707; t=1789933225; x=1790538025;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=EGHl9G2Q8EmXvEbGL4UYBvGbfn4j1FoYD4wdklwyMj4=;
-        b=ZG12oZtYnQhS/qsq7WEIwtcz83FVBp8abG8u0YTRcuhLEou8v3RqZW5NuM2jQd2HF7
-         hSsP6gV+9faLEiLdtUpwmIHEl+wsAK2y2UhsOTGxRtJRB8zv6TGqa6iI1xZ5oW5ZSUPm
-         ZV/uS257gN4iZHJW7sI9m7Cc0MyTToWYmcnWeacZ+YfscgfXbdK6xGaF1dVeC/yTs7UE
-         +yC0k26098hNGUskEqsl6ND9Vh/qL7RkrSyFSPq5iXnFtwAsBHXCKaAJE4s4rd1FrrLF
-         Tr1bedajqv5rlEHiS7EtL1jNFpp//YxTEkq5FsAQjYjMVscFI7OlrsN3ved3ElUe849L
-         Dg+A==
-X-Forwarded-Encrypted: i=1; AKwUvBwI7rcfEt4mBMh1E9AnkWsr17/03GRmKmRU+kW9VqWADzqc+/t1PA4+KkUNmbSnlrFkMNKEoUI=@lists.linux.dev
-X-Gm-Message-State: AFuF++n8vXO4wDMajIRHUtjdjUqSwuZj/ZOlldi+0spVPngN29myqLLI
-	ecQoandZJYSmk0wDWJin9/bIpBsJf0DJmILr2tM35HD3sZ0U8ZQ9MIac0eOAVe1HhZc=
-X-Gm-Gg: AYBFou3oVjHtdF1DF2wB1P9jZwHkQd/5/xpLXoaj0MB+ARUvEwvu0KTp2WzwQeJrQsd
-	1dbkHBwv3hv9tDYHrtB9WgnufGY4jOv8cxg4v6w8+/B0ZvlkfcqS6hc+p80pPnKRo3CyqL4zZxr
-	XIGVi4vr8nHNwN84Cnc0srZhD08PHgGIdyQGI3+GBIwb6lGLGsgQtouujat7z8MDMB2ghNrt9kd
-	U92YuJL5Y0RpESBviU70wXSs+3jevSKlCjnEFJlkKjyEx4iBqesuOLBQAFnxwuuwRQUoeScHRmK
-	JxAJsWL2EZADpyKE7pHwXBNRDwYWh+oXKc4muihPBudBJ5n7DUk6rPYm8J4ZgOmEfERTzZRfpQM
-	339sBdUPLhDMGa8gCfySIONbnRzDEko0GC5dPAKB6cHr43H8jhfGeXMt/LIUXhQH5ABycMfkSLY
-	5JleNpDtsEUluu0d3HnBhbng/EABmQY19LnecvX5N0SXVOUCt3/fEfffMbSEo2mNdXPaUreGiyL
-	pFGmyCnpJj5wjFdP6NC8e+Q0rZPM4TCJFxxV9rrLxvJ59U81FLve9X/M7BCcKuL7igMMp7yQf4L
-	3I0RaGUnBkmapcJey8Rthc1pIbYaDg==
-X-Received: by 2002:a05:690e:12c4:b0:672:99e0:ebda with SMTP id 956f58d0204a3-67299e0ee4emr1603719d50.114.1789933217886;
-        Sun, 20 Sep 2026 12:40:17 -0700 (PDT)
+        bh=VWkA9vhMZ3eDi8wOrToSquxZz2LpFkjbEEG2BMmzAhs=;
+        b=a73F1tmSo4DONceHA1tYj4E3SN53lcea7LvU3Tqm7OsUNS+qnikeUyvwXEkzegtCV9
+         TgySOpN2bmYkGfjGV7+S5NbhJcNvejNGrykU7hh+kY/xIKph+IfHEVnVziawPYRGuzyz
+         aMTvaYM4Zcf6XOmrqGxUaXlj3baJZlPEuoH/JSW0dX7ordcIlCoDe7zpAgRpBejMEvbV
+         hEThTNrMjc2b1WM1h+Z71BVJRwM26w5DJpqKSbuWjWDIhLSKGSs+oFIq3v6T3VzzRxEV
+         8RX6ruNQrJutwWvSHO7AIArrE/ktOVAhnPR9olKgpQnyYeyJPMFBokcyDPqmZWYnuL13
+         TtvQ==
+X-Forwarded-Encrypted: i=1; AKwUvBz7ow/TBuOuqBJlI8GhK4+fORnM82lmpEDSUVDm0FyQ8RS4TI9PFtYwe+KT/A0bVeZeQfPOr64=@lists.linux.dev
+X-Gm-Message-State: AFuF++kr19NSPyWObP9GE2Ru6fLXJ9MfVVTCSbMJzBY1WX3DBhtYkEBk
+	J9BUcNOthmy7wLS7zCTExi9cX1sSuwi2fGp0WmmZhNpHHvI8eUDfZTqPe7Fmlc1psRI=
+X-Gm-Gg: AYBFou25Mdf6wer0xm0SK8ZO53m65xViivET2X9xRni6pqzfaVVpbzoO+ZTNcK3aOlW
+	EOAv1uFgxBlwmbRh4bvuhssGU7RJnnwE7VRp2I13QVI3c/WmJKgXops30p2wbBUUBg46QkHoYWT
+	txFrxWL7FkrgNN7mu2F4H2TJFfwVdXpP9vWezwH+n4UQzNpx6EqPSU5XJUDvq1JtuYZXyiH0hEE
+	3I1fVjmWrHl25xDZi9Sw9SAgO+rbti8Oi89Y35kiS0zqHRP0hwHfdFMtd9qLPfXy3EFUc28+dsd
+	fUqJUBSZuYnEleQGr6pw4oA0K8Tub7kFBbxbcoKWG4fMtuBXrRoN58cAi0PYVIQs5CFqyD3hep0
+	nqviOowjbPBjtSPPOITZEuURxRK7/V40QONFiTFb+5xY1UVoarp+KBodKG6FWnhixGskZVqwLZ7
+	nDnrJtbioRd2aLxczQYoyRKebR4v/HjC9Q9Gkvl5KFYjGDU9SvEszazRj1J7mvN5Uc725F85Fcg
+	G1934ZOnA8aY0j3lh+9BvjTB9PztbQ0wIRER1uB1Cmx9m1OjHpStmvpZXhySa3/mNekmp6fhD8q
+	UQqplXoDUj7H6FQ92FM=
+X-Received: by 2002:a05:690c:c622:b0:89a:63da:cbeb with SMTP id 00721157ae682-89a63dacd09mr12701467b3.49.1789933224682;
+        Sun, 20 Sep 2026 12:40:24 -0700 (PDT)
 Received: from soleen.c.googlers.com.com (16.49.199.35.bc.googleusercontent.com. [35.199.49.16])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-89a45d8fb9asm18884327b3.17.2026.09.20.12.40.14
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-89a46e4f919sm18972057b3.24.2026.09.20.12.40.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 20 Sep 2026 12:40:16 -0700 (PDT)
+        Sun, 20 Sep 2026 12:40:23 -0700 (PDT)
 From: Pasha Tatashin <pasha.tatashin@soleen.com>
 To: linux-kselftest@vger.kernel.org,
 	legion@kernel.org,
@@ -137,9 +137,9 @@ To: linux-kselftest@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	vladimir.murzin@arm.com,
 	kas@kernel.org
-Subject: [RFC PATCH 34/46] KVM: x86: Implement Caretaker LAPIC timer and interrupt injection
-Date: Sun, 20 Sep 2026 15:36:38 -0400
-Message-ID: <20260920193650.3373435-35-pasha.tatashin@soleen.com>
+Subject: [RFC PATCH 35/46] KVM: x86: Implement Caretaker VM-exit dispatch and instruction decoders
+Date: Sun, 20 Sep 2026 15:36:39 -0400
+Message-ID: <20260920193650.3373435-36-pasha.tatashin@soleen.com>
 X-Mailer: git-send-email 2.55.0.1082.g2b9226bbc0-goog
 In-Reply-To: <20260920193650.3373435-1-pasha.tatashin@soleen.com>
 References: <20260920193650.3373435-1-pasha.tatashin@soleen.com>
@@ -151,333 +151,618 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Implement standalone Caretaker LAPIC timer deadline programming and
-interrupt injection helpers in arch/x86/kvm/caretaker.c.
+Implement standalone Caretaker VM-exit decoding, MSR/CPUID handling,
+and I/O port emulation in arch/x86/kvm/caretaker.c.
 
 Signed-off-by: Pasha Tatashin <pasha.tatashin@soleen.com>
 ---
- arch/x86/kvm/caretaker.c | 312 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 312 insertions(+)
- create mode 100644 arch/x86/kvm/caretaker.c
+ arch/x86/kvm/caretaker.c | 593 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 593 insertions(+)
 
 diff --git a/arch/x86/kvm/caretaker.c b/arch/x86/kvm/caretaker.c
-new file mode 100644
-index 000000000000..9e0f20cbb137
---- /dev/null
+index 9e0f20cbb137..dd2b2d582b69 100644
+--- a/arch/x86/kvm/caretaker.c
 +++ b/arch/x86/kvm/caretaker.c
-@@ -0,0 +1,312 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (c) 2026, Google LLC.
-+ * Pasha Tatashin <pasha.tatashin@soleen.com>
-+ *
-+ * x86 KVM Caretaker execution loop and hardware virtualization attachment.
-+ */
-+
-+#include <linux/cpu.h>
-+#include <linux/cpu_preserve.h>
-+#include <linux/delay.h>
-+#include <linux/kexec_handover.h>
-+#include <linux/kho/abi/kvm.h>
-+#include <linux/kvm_host.h>
-+#include <linux/oncore.h>
-+#include <linux/smp.h>
-+#include <uapi/linux/serial_reg.h>
-+
-+#include <asm/apic.h>
-+#include <asm/cpu_entry_area.h>
-+#include <linux/cpu_preserve.h>
-+#include <asm/desc.h>
-+#include <asm/fpu/api.h>
-+#include <asm/fixmap.h>
-+#include <asm/irq_vectors.h>
-+#include <linux/kvm_host.h>
-+#include <asm/msr.h>
-+#include <linux/sync_core.h>
-+#include <asm/trapnr.h>
-+#include <asm/virt.h>
-+
-+#include "caretaker.h"
-+#include "cpuid.h"
-+#include "lapic.h"
-+#include "regs.h"
-+#include "x86.h"
-+
-+/* Host register state saved around an on-core caretaker run. */
-+struct caretaker_x86_host_state {
-+	struct desc_ptr orig_idt;
-+	unsigned long orig_cr2;
-+	unsigned long orig_fs_base;
-+	unsigned long orig_gs_base;
-+	unsigned long orig_kernel_gs_base;
-+	u64 orig_star;
-+	u64 orig_lstar;
-+	u64 orig_fmask;
-+};
-+
-+/* Defined below their first use. */
-+static void kvm_x86_caretaker_save_gprs(struct kvm_vcpu *vcpu, u64 *gprs);
-+static void kvm_x86_caretaker_init_idt(gate_desc *idt);
-+static void kvm_x86_caretaker_init_gdt_tss(struct desc_struct *gdt,
-+					   struct x86_hw_tss *tss,
-+					   unsigned long stack_top);
-+
-+/*
-+ * A preserved page is handed over by physical address.  The SME/SEV C-bit is
-+ * an encryption attribute, not part of the address, so strip it before
-+ * forming a kernel virtual address.
-+ *
-+ * Both helpers are __always_inline because callers live in
-+ * __cpu_preserved_text: an out-of-line copy would sit outside the section
-+ * that survives the kexec.
-+ */
-+static __always_inline void *caretaker_pa_to_va(u64 pa)
+@@ -260,6 +260,599 @@ static void kvm_x86_caretaker_init_gdt_tss(struct desc_struct *gdt,
+ 	caretaker_set_tss_desc(gdt, (unsigned long)tss, sizeof(struct x86_hw_tss) - 1);
+ }
+ 
++static void __cpu_preserved_text
++kvm_x86_caretaker_load_desc(struct desc_struct *gdt, size_t gdt_size,
++			    gate_desc *idt, size_t idt_size,
++			    void *tss)
 +{
-+	return phys_to_virt(__sme_clr(pa));
++	struct desc_ptr gdt_desc = {
++		.size = gdt_size - 1,
++		.address = (unsigned long)gdt,
++	};
++	struct desc_ptr idt_desc = {
++		.size = idt_size - 1,
++		.address = (unsigned long)idt,
++	};
++
++	caretaker_set_tss_desc(gdt, (unsigned long)tss, sizeof(struct x86_hw_tss) - 1);
++	load_gdt(&gdt_desc);
++	native_load_idt(&idt_desc);
++	asm volatile("ltr %w0" : : "q" ((u16)(GDT_ENTRY_TSS * 8)));
 +}
 +
-+/* The control block is embedded in the vendor-agnostic caretaker page. */
-+static __always_inline struct caretaker_x86_page *
-+cxp_from_cb(struct kvm_caretaker_cb_ser *cb)
++static __caretaker_text void
++kvm_x86_caretaker_save_host_state(struct caretaker_x86_host_state *host,
++				  struct caretaker_x86_page *cxp)
 +{
-+	return container_of(cb, struct caretaker_x86_page, abi.cb);
++	struct cpu_preserved_stack_context *sctx;
++	u64 apic_base;
++
++	store_idt(&host->orig_idt);
++	host->orig_cr2 = native_read_cr2();
++	/*
++	 * MSR_FS_BASE is in the guest-writable passthrough set below, so it
++	 * has to be saved here or a guest WRMSR to it survives the run and
++	 * corrupts the host's FS base.
++	 */
++	host->orig_fs_base = native_rdmsrq(MSR_FS_BASE);
++	host->orig_gs_base = native_rdmsrq(MSR_GS_BASE);
++	host->orig_kernel_gs_base = native_rdmsrq(MSR_KERNEL_GS_BASE);
++	host->orig_star = native_rdmsrq(MSR_STAR);
++	host->orig_lstar = native_rdmsrq(MSR_LSTAR);
++	host->orig_fmask = native_rdmsrq(MSR_SYSCALL_MASK);
++
++	/* Ensure Local APIC is software enabled */
++	apic_base = native_rdmsrq(MSR_IA32_APICBASE);
++	if (!(apic_base & MSR_IA32_APICBASE_ENABLE))
++		native_wrmsrq(MSR_IA32_APICBASE,
++			      apic_base | MSR_IA32_APICBASE_ENABLE);
++
++	/* Switch to self-contained Caretaker GDT, IDT, and TSS before CR3 switch */
++	kvm_x86_caretaker_load_desc(cxp->gdt, sizeof(cxp->gdt),
++				    caretaker_x86_idt, sizeof(caretaker_x86_idt),
++				    &cxp->tss);
++
++	/* Switch to preserved CR3 if specified */
++	sctx = cpu_preserved_get_stack_context();
++	if (sctx && sctx->session_pgd_pa)
++		cxp->host_cr3 = sctx->session_pgd_pa;
++	else if (!cxp->host_cr3 && x86_caretaker_pgd_pa)
++		cxp->host_cr3 = x86_caretaker_pgd_pa;
++	if (cxp->host_cr3 && __read_cr3() != cxp->host_cr3)
++		write_cr3(cxp->host_cr3);
++
++	raw_local_irq_disable();
 +}
 +
-+static const struct kvm_x86_caretaker_ops *kvm_x86_caretaker_ops __cpu_preserved_data;
-+
-+void kvm_x86_caretaker_register_ops(const struct kvm_x86_caretaker_ops *ops)
++static __caretaker_text void
++kvm_x86_caretaker_restore_host_state(const struct caretaker_x86_host_state *host,
++				     int pcpu)
 +{
-+	WRITE_ONCE(kvm_x86_caretaker_ops, ops);
-+}
-+EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_x86_caretaker_register_ops);
++	/*
++	 * Restore unconditionally.  These are all in the guest-writable
++	 * passthrough set, so skipping the write when the saved value happens
++	 * to be zero leaves the *guest's* value live in the host MSR.
++	 */
++	native_write_cr2(host->orig_cr2);
++	native_wrmsrq(MSR_FS_BASE, host->orig_fs_base);
++	native_wrmsrq(MSR_GS_BASE, host->orig_gs_base);
++	native_wrmsrq(MSR_KERNEL_GS_BASE, host->orig_kernel_gs_base);
++	native_wrmsrq(MSR_LSTAR, host->orig_lstar);
++	native_wrmsrq(MSR_STAR, host->orig_star);
++	native_wrmsrq(MSR_SYSCALL_MASK, host->orig_fmask);
 +
-+void kvm_x86_caretaker_unregister_ops(const struct kvm_x86_caretaker_ops *ops)
-+{
-+	if (kvm_x86_caretaker_ops == ops)
-+		WRITE_ONCE(kvm_x86_caretaker_ops, NULL);
-+}
-+EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_x86_caretaker_unregister_ops);
-+
-+static bool caretaker_x86_has_tsc_deadline __cpu_preserved_data;
-+static u32 caretaker_x86_lapic_timer_period __cpu_preserved_data;
-+static u32 caretaker_x86_tsc_khz __cpu_preserved_data;
-+gate_desc caretaker_x86_idt[IDT_ENTRIES] __caretaker_data __aligned(16);
-+EXPORT_SYMBOL_FOR_KVM_INTERNAL(caretaker_x86_idt);
-+static bool caretaker_x86_idt_initialized;
-+
-+static void kvm_x86_caretaker_init_uart(struct caretaker_uart *uart)
-+{
-+	if (!uart)
-+		return;
-+
-+	uart->lcr = UART_LCR_WLEN8;
-+	uart->ier = 0x00;
-+	uart->mcr = UART_MCR_DTR | UART_MCR_RTS;
-+	uart->scr = 0x00;
-+	uart->dll = 0x01;
-+	uart->dlm = 0x00;
++	if (cpu_is_preserved(pcpu))
++		arch_cpu_preserved_load_desc();
++	else if (host->orig_idt.size)
++		native_load_idt(&host->orig_idt);
 +}
 +
-+int kvm_x86_caretaker_preserve_page(struct kvm_caretaker_arch_ser *abi,
-+				    struct page *page)
-+{
-+	int ret;
-+
-+	if (WARN_ON_ONCE(abi->nr_preserved_pages >= KVM_X86_CARETAKER_MAX_PAGES))
-+		return -ENOSPC;
-+
-+	ret = kho_preserve_pages(page, 1);
-+	if (ret)
-+		return ret;
-+
-+	abi->preserved_pages_pa[abi->nr_preserved_pages++] = page_to_phys(page);
-+	return 0;
-+}
-+EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_x86_caretaker_preserve_page);
-+
-+void kvm_x86_caretaker_unpreserve_pages(struct kvm_caretaker_arch_ser *abi)
++__caretaker_text void
++kvm_x86_caretaker_update_msr(struct kvm_vcpu_arch_ser *state,
++			     u32 msr, u64 val)
 +{
 +	u32 i;
 +
-+	for (i = 0; i < abi->nr_preserved_pages; i++)
-+		kho_unpreserve_pages(phys_to_page(__sme_clr(abi->preserved_pages_pa[i])), 1);
-+	abi->nr_preserved_pages = 0;
-+}
-+EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_x86_caretaker_unpreserve_pages);
-+
-+int kvm_x86_caretaker_init_common_page(struct caretaker_x86_page *cxp,
-+				       struct kvm_vcpu *vcpu,
-+				       size_t full_page_size)
-+{
-+	struct oncore_session *sess;
-+	phys_addr_t pgd_pa;
-+	u32 apic_id;
-+	int pcpu;
-+	int ret;
-+
-+	if (!cxp || !vcpu)
-+		return -EINVAL;
-+
-+	caretaker_x86_has_tsc_deadline = boot_cpu_has(X86_FEATURE_TSC_DEADLINE_TIMER);
-+	caretaker_x86_lapic_timer_period = lapic_timer_period;
-+	caretaker_x86_tsc_khz = tsc_khz;
-+	cpu_preserved_clean(&caretaker_x86_has_tsc_deadline);
-+	cpu_preserved_clean(&caretaker_x86_lapic_timer_period);
-+	cpu_preserved_clean(&caretaker_x86_tsc_khz);
-+	if (!caretaker_x86_idt_initialized) {
-+		kvm_x86_caretaker_init_idt(caretaker_x86_idt);
-+		cpu_preserved_clean_sz(caretaker_x86_idt, sizeof(caretaker_x86_idt));
-+		caretaker_x86_idt_initialized = true;
-+	}
-+
-+	memset(cxp, 0, full_page_size);
-+
-+	kvm_caretaker_init_common_vcpu(&cxp->vcpu, &cxp->abi.cb, vcpu, cxp,
-+				       full_page_size, NULL, cxp);
-+
-+	pcpu = cxp->abi.cb.pcpu_id;
-+
-+	apic_id = apic->cpu_present_to_apicid(pcpu);
-+	if (apic_id == BAD_APICID)
-+		apic_id = pcpu;
-+	cxp->abi.apic_id = apic_id;
-+
-+	kvm_x86_caretaker_init_uart(&cxp->uart);
-+
-+	cxp->save_guest_fpu = boot_cpu_has(X86_FEATURE_XSAVE) &&
-+			      !fpstate_is_confidential(&vcpu->arch.guest_fpu);
-+
-+	/* Capture guest GPRs */
-+	kvm_x86_caretaker_save_gprs(vcpu, &cxp->rax);
-+
-+	/* Preserved CR3 from session or fallback to global cpu_preserve page table */
-+	sess = oncore_job_session(vcpu->caretaker.job);
-+	pgd_pa = oncore_session_get_pgd_pa(sess);
-+	cxp->host_cr3 = pgd_pa ? pgd_pa : x86_caretaker_pgd_pa;
-+	cxp->cr3 = kvm_read_cr3(vcpu);
-+	cxp->cr0 = kvm_read_cr0(vcpu);
-+	cxp->cr4 = kvm_read_cr4(vcpu);
-+	cxp->efer = vcpu->arch.efer;
-+
-+	/* Build KHO-preserved Host GDT and TSS */
-+	kvm_x86_caretaker_init_gdt_tss(cxp->gdt, &cxp->tss,
-+				       (unsigned long)&cxp->stack[CXP_STACK_SIZE]);
-+
-+	/* Preserve in-kernel local APIC register page across kexec */
-+	if (vcpu->arch.apic && vcpu->arch.apic->regs) {
-+		ret = kvm_x86_caretaker_preserve_page(&cxp->abi,
-+						      virt_to_page(vcpu->arch.apic->regs));
-+		if (ret)
-+			return ret;
-+	}
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_x86_caretaker_init_common_page);
-+
-+static void kvm_x86_caretaker_save_gprs(struct kvm_vcpu *vcpu, u64 *gprs)
-+{
-+	gprs[0]  = kvm_register_read_raw(vcpu, VCPU_REGS_RAX);
-+	gprs[1]  = kvm_register_read_raw(vcpu, VCPU_REGS_RBX);
-+	gprs[2]  = kvm_register_read_raw(vcpu, VCPU_REGS_RCX);
-+	gprs[3]  = kvm_register_read_raw(vcpu, VCPU_REGS_RDX);
-+	gprs[4]  = kvm_register_read_raw(vcpu, VCPU_REGS_RSI);
-+	gprs[5]  = kvm_register_read_raw(vcpu, VCPU_REGS_RDI);
-+	gprs[6]  = kvm_register_read_raw(vcpu, VCPU_REGS_RBP);
-+	gprs[7]  = kvm_register_read_raw(vcpu, VCPU_REGS_R8);
-+	gprs[8]  = kvm_register_read_raw(vcpu, VCPU_REGS_R9);
-+	gprs[9]  = kvm_register_read_raw(vcpu, VCPU_REGS_R10);
-+	gprs[10] = kvm_register_read_raw(vcpu, VCPU_REGS_R11);
-+	gprs[11] = kvm_register_read_raw(vcpu, VCPU_REGS_R12);
-+	gprs[12] = kvm_register_read_raw(vcpu, VCPU_REGS_R13);
-+	gprs[13] = kvm_register_read_raw(vcpu, VCPU_REGS_R14);
-+	gprs[14] = kvm_register_read_raw(vcpu, VCPU_REGS_R15);
-+}
-+
-+static void kvm_x86_caretaker_init_idt(gate_desc *idt)
-+{
-+	int v;
-+
-+	for (v = 0; v < IDT_ENTRIES; v++) {
-+		bool has_err = (v == X86_TRAP_DF ||
-+				(v >= X86_TRAP_TS && v <= X86_TRAP_PF) ||
-+				v == X86_TRAP_AC || v == X86_TRAP_CP ||
-+				v == X86_TRAP_VC || v == 30);
-+		unsigned long handler = (v >= FIRST_EXTERNAL_VECTOR) ?
-+			(unsigned long)&x86_preserved_apic_eoi_stub :
-+			(has_err ? (unsigned long)&x86_preserved_iret_err_stub :
-+				   (unsigned long)&x86_preserved_iret_stub);
-+
-+		pack_gate(&idt[v], GATE_INTERRUPT, handler, 0, 0, __KERNEL_CS);
-+	}
-+}
-+
-+static void kvm_x86_caretaker_init_gdt_tss(struct desc_struct *gdt,
-+					   struct x86_hw_tss *tss,
-+					   unsigned long stack_top)
-+{
-+	int k;
-+
-+	memcpy(gdt, get_current_gdt_ro(), sizeof(struct desc_struct) * GDT_ENTRIES);
-+	memset(tss, 0, sizeof(*tss));
-+	tss->sp0 = stack_top;
-+	tss->io_bitmap_base = sizeof(*tss);
-+	for (k = 0; k < ARRAY_SIZE(tss->ist); k++)
-+		tss->ist[k] = stack_top;
-+
-+	caretaker_set_tss_desc(gdt, (unsigned long)tss, sizeof(struct x86_hw_tss) - 1);
-+}
-+
-+__caretaker_text void kvm_x86_caretaker_arm_timer(u64 deadline_ticks)
-+{
-+	if (!deadline_ticks)
++	if (!state)
 +		return;
 +
-+	if (caretaker_x86_has_tsc_deadline) {
-+		u32 lvtt = LOCAL_TIMER_VECTOR | APIC_LVT_TIMER_TSCDEADLINE;
-+
-+		native_wrmsrq(APIC_BASE_MSR + (APIC_LVTT >> 4), lvtt);
-+		native_wrmsrq(MSR_IA32_TSC_DEADLINE, deadline_ticks);
-+	} else {
-+		u64 now = rdtsc();
-+		u64 delta_tsc = (deadline_ticks > now) ? (deadline_ticks - now) : 1;
-+		u32 lvtt = LOCAL_TIMER_VECTOR;
-+		u64 count;
-+
-+		if (caretaker_x86_tsc_khz != 0 && caretaker_x86_lapic_timer_period != 0) {
-+			u64 period = caretaker_x86_lapic_timer_period;
-+			u64 apic_khz = (period * HZ) / 1000ULL;
-+
-+			count = (delta_tsc * apic_khz) /
-+				((u64)caretaker_x86_tsc_khz * 16ULL);
-+		} else {
-+			count = delta_tsc >> 4;
++	for (i = 0; i < state->num_msrs; i++) {
++		if (state->msrs[i].index == msr) {
++			state->msrs[i].data = val;
++			return;
 +		}
-+		if (count == 0)
-+			count = 1;
-+		if (count > U32_MAX)
-+			count = U32_MAX;
-+
-+		native_wrmsrq(APIC_BASE_MSR + (APIC_TDCR >> 4),
-+			      APIC_TDR_DIV_16);
-+		native_wrmsrq(APIC_BASE_MSR + (APIC_LVTT >> 4), lvtt);
-+		native_wrmsrq(APIC_BASE_MSR + (APIC_TMICT >> 4), (u32)count);
 +	}
 +}
-+EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_x86_caretaker_arm_timer);
++EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_x86_caretaker_update_msr);
 +
-+__caretaker_text void kvm_x86_caretaker_disarm_timer(void)
++static __caretaker_text bool
++kvm_x86_caretaker_read_msr(const struct kvm_vcpu_arch_ser *state,
++			   u32 msr, u64 *val)
 +{
-+	if (caretaker_x86_has_tsc_deadline)
-+		native_wrmsrq(MSR_IA32_TSC_DEADLINE, 0);
-+	else
-+		native_wrmsrq(APIC_BASE_MSR + (APIC_TMICT >> 4), 0);
++	u32 i;
 +
-+	native_wrmsrq(APIC_BASE_MSR + (APIC_LVTT >> 4),
-+		      APIC_LVT_MASKED | LOCAL_TIMER_VECTOR);
++	if (!state)
++		return false;
++
++	for (i = 0; i < state->num_msrs; i++) {
++		if (state->msrs[i].index == msr) {
++			*val = state->msrs[i].data;
++			return true;
++		}
++	}
++	return false;
 +}
-+EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_x86_caretaker_disarm_timer);
 +
++/*
++ * Capture the guest FPU registers into the LUO ABI buffer.
++ *
++ * The Caretaker runs the guest with the guest's FPU state live in hardware,
++ * restoring it via XRSTOR64 at the start of each quantum and saving it via
++ * XSAVE64 at the end of each quantum and upon detach.
++ *
++ * XSAVE -- as opposed to XSAVES -- writes the standard, non-compacted layout,
++ * which is bit-for-bit the uAPI struct kvm_xsave layout that the incoming
++ * kernel feeds to fpu_copy_uabi_to_guest_fpstate().  No format conversion is
++ * needed and the ABI stays uAPI.
++ *
++ * The requested-feature bitmap comes from the XCR0 recorded at preserve time
++ * rather than from XGETBV, because XGETBV requires CR4.OSXSAVE and the guest
++ * is free to clear it.  The recorded value cannot have gone stale: the
++ * Caretaker never emulates XSETBV, so the guest cannot change XCR0 while it
++ * runs here.
++ *
++ * The destination cannot overflow: kvm_arch_vcpu_luo_preserve() refuses the
++ * preserve when guest_fpu.uabi_size exceeds sizeof(struct kvm_xsave), and
++ * RFBM is a subset of guest_supported_xcr0, which is what uabi_size sizes.
++ */
++__caretaker_text static void
++caretaker_save_guest_fpu(struct caretaker_x86_page *cxp,
++			 struct kvm_vcpu_arch_ser *state)
++{
++	union fpregs_state *xstate = (union fpregs_state *)state->xsave.region;
++	u64 rfbm = state->xcrs.xcrs[0].value | XFEATURE_MASK_FPSSE;
++
++	if (!cxp->save_guest_fpu)
++		return;
++
++	if (native_read_cr0() & X86_CR0_TS)
++		asm volatile("clts" : : : "memory");
++
++	/*
++	 * XSAVE leaves XSTATE_BV bits for components outside RFBM untouched,
++	 * so the preserve-time header would survive and advertise stale
++	 * component data.  Clear it and let XSAVE set only what it writes.
++	 */
++	cpu_preserved_memset(&xstate->xsave.header, 0,
++			     sizeof(xstate->xsave.header));
++
++	asm volatile("1: xsave64 %[buf]\n\t"
++		     "2:\n\t"
++		     _ASM_EXTABLE(1b, 2b)
++		     : [buf] "+m" (*xstate)
++		     : "a" ((u32)rfbm), "d" ((u32)(rfbm >> 32))
++		     : "memory");
++}
++
++__caretaker_text void
++kvm_x86_caretaker_detach_serialize_common(struct caretaker_x86_page *cxp,
++					  struct kvm_vcpu_arch_ser *state)
++{
++	if (!cxp || !state)
++		return;
++
++	state->regs.rax = cxp->rax;
++	state->regs.rbx = cxp->rbx;
++	state->regs.rcx = cxp->rcx;
++	state->regs.rdx = cxp->rdx;
++	state->regs.rsi = cxp->rsi;
++	state->regs.rdi = cxp->rdi;
++	state->regs.rbp = cxp->rbp;
++	state->regs.r8  = cxp->r8;
++	state->regs.r9  = cxp->r9;
++	state->regs.r10 = cxp->r10;
++	state->regs.r11 = cxp->r11;
++	state->regs.r12 = cxp->r12;
++	state->regs.r13 = cxp->r13;
++	state->regs.r14 = cxp->r14;
++	state->regs.r15 = cxp->r15;
++
++	if (cxp->last_exit_rip)
++		state->regs.rip = cxp->last_exit_rip;
++	if (cxp->last_exit_rsp)
++		state->regs.rsp = cxp->last_exit_rsp;
++	if (cxp->last_exit_rflags)
++		state->regs.rflags = cxp->last_exit_rflags;
++
++	if (cxp->cr0)
++		state->sregs.cr0 = cxp->cr0;
++	if (cxp->cr3)
++		state->sregs.cr3 = cxp->cr3;
++	if (cxp->cr4)
++		state->sregs.cr4 = cxp->cr4;
++	if (cxp->efer)
++		state->sregs.efer = cxp->efer;
++
++	state->events.exception.injected = 0;
++	state->events.interrupt.injected = 0;
++
++	caretaker_save_guest_fpu(cxp, state);
++}
++EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_x86_caretaker_detach_serialize_common);
++
++void kvm_x86_caretaker_sync_vcpu_common(struct kvm_vcpu *vcpu)
++{
++	kvm_register_mark_dirty(vcpu, VCPU_REG_CR3);
++	kvm_clear_interrupt_queue(vcpu);
++	kvm_clear_exception_queue(vcpu);
++
++	vcpu->cpu = -1;
++	kvm_make_request(KVM_REQ_LOAD_MMU_PGD, vcpu);
++	kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
++	kvm_make_request(KVM_REQ_RECALC_INTERCEPTS, vcpu);
++}
++EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_x86_caretaker_sync_vcpu_common);
++
++static __caretaker_text void kvm_caretaker_emulate_cpuid(u64 *rax,
++							 u64 *rbx,
++							 u64 *rcx,
++							 u64 *rdx)
++{
++	unsigned int a = (unsigned int)*rax;
++	unsigned int b = (unsigned int)*rbx;
++	unsigned int c = (unsigned int)*rcx;
++	unsigned int d = (unsigned int)*rdx;
++
++	asm volatile("cpuid"
++		     : "=a" (a), "=b" (b), "=c" (c), "=d" (d)
++		     : "0" (a), "2" (c));
++
++	*rax = a;
++	*rbx = b;
++	*rcx = c;
++	*rdx = d;
++}
++
++static __caretaker_text bool kvm_caretaker_emulate_msr(struct caretaker_x86_page *cxp,
++						       u32 msr, bool write,
++						       u64 *rax,
++						       u64 *rdx)
++{
++	bool x2apic = msr >= APIC_BASE_MSR &&
++		      msr < APIC_BASE_MSR + X2APIC_MSR_COUNT;
++	u32 apic_id = cxp ? cxp->abi.cb.vcpu_id : 0;
++	u64 val;
++
++	if (write) {
++		val = (u32)(*rax) | ((*rdx) << 32);
++
++		/*
++		 * Guest x2APIC writes are not emulated.  ICR would send an
++		 * IPI, TMICT would arm the APIC timer, and the LVT and TPR
++		 * registers reprogram delivery.  The caretaker implements
++		 * none of that, so absorbing the write promises the guest an
++		 * interrupt that will never arrive -- it wedges rather than
++		 * stalls, and it cannot tell the difference.
++		 *
++		 * Park instead, and let the incoming kernel's full KVM apply
++		 * the write to the emulated LAPIC when it reclaims the vCPU.
++		 *
++		 * Exception: APIC_EOI (0x80b).  If a vCPU was caught inside an
++		 * interrupt handler when detached, acknowledging EOI lets it
++		 * finish the ISR and IRETQ back to user space; kvm_luo clears
++		 * APIC_ISR on retrieve anyway.
++		 */
++		if (x2apic) {
++			if (msr == APIC_BASE_MSR + (APIC_EOI >> 4))
++				return true;
++			return false;
++		}
++
++		switch (msr) {
++		case MSR_IA32_SPEC_CTRL:
++		case MSR_IA32_PRED_CMD:
++			/*
++			 * The guest is arming a speculation mitigation
++			 * (IBRS/STIBP/SSBD, or an IBPB barrier).  The
++			 * caretaker does not apply these, so acknowledging
++			 * the write would leave the guest believing it is
++			 * protected when it is not -- a security downgrade
++			 * the guest cannot observe.
++			 *
++			 * Refuse the exit instead: the vCPU parks here and
++			 * the incoming kernel's KVM applies the write for
++			 * real when it reclaims the vCPU.
++			 */
++			return false;
++		case MSR_IA32_TSC_DEADLINE:
++			/*
++			 * Record the guest's next timer deadline in preserved
++			 * arch_state so full KVM restores and arms it upon
++			 * reclaiming the vCPU, while allowing a guest caught
++			 * in its timer ISR to return to user space.
++			 */
++			if (cxp && cxp->arch_state)
++				kvm_x86_caretaker_update_msr(cxp->arch_state,
++							     MSR_IA32_TSC_DEADLINE,
++							     val);
++			return true;
++		case MSR_IA32_TSC:
++		case MSR_IA32_TSC_ADJUST:
++			/*
++			 * Discarding these silently rewrites the guest's view of
++			 * time.
++			 */
++			return false;
++		case MSR_KERNEL_GS_BASE:
++			/* Also cached, so the read side can answer without an rdmsr. */
++			if (cxp)
++				cxp->kernel_gs_base = val;
++			fallthrough;
++		case MSR_FS_BASE:
++		case MSR_GS_BASE:
++		case MSR_LSTAR:
++		case MSR_STAR:
++		case MSR_SYSCALL_MASK:
++			native_wrmsrq(msr, val);
++			return true;
++		case MSR_IA32_APICBASE:
++			/*
++			 * This used to be passed through to native_wrmsrq(),
++			 * which let the guest relocate or disable the *physical*
++			 * APIC of the CPU the caretaker is running on.  Nothing
++			 * saved or restored it around the run, so the damage
++			 * outlived the guest: on the "staying in this kernel"
++			 * path there is no INIT-SIPI-SIPI to clean up after.
++			 *
++			 * APIC base is host state here.  Refuse the write.
++			 */
++			return false;
++		}
++		return false;
++	}
++
++	if (x2apic) {
++		switch ((msr - APIC_BASE_MSR) << 4) {
++		case APIC_ID:
++			val = apic_id;
++			break;
++		case APIC_LVR:
++			val = CARETAKER_APIC_LVR;
++			break;
++		case APIC_SPIV:
++			val = APIC_SPIV_APIC_ENABLED | APIC_VECTOR_MASK;
++			break;
++		case APIC_LDR:
++			val = ((apic_id >> 4) << 16) | (1U << (apic_id & 0xf));
++			break;
++		default:
++			/*
++			 * ICR, IRR, ISR, TMCCT and friends.  Zero reads as
++			 * "nothing pending" or "timer already expired", which
++			 * the guest cannot distinguish from the truth.  The four
++			 * cases above are answered because they are static
++			 * identity registers whose values really are known.
++			 */
++			return false;
++		}
++		goto out;
++	}
++
++	switch (msr) {
++	case MSR_IA32_SPEC_CTRL:
++		/*
++		 * Returning 0 here would tell the guest its speculation
++		 * mitigations are disabled, which is both wrong and
++		 * unobservable.  Park instead; see the write path above.
++		 */
++		return false;
++	case MSR_IA32_TSC:
++		val = rdtsc();
++		break;
++	case MSR_IA32_TSC_DEADLINE:
++		if (cxp && kvm_x86_caretaker_read_msr(cxp->arch_state,
++						      MSR_IA32_TSC_DEADLINE,
++						      &val))
++			break;
++		return false;
++	case MSR_IA32_TSC_ADJUST:
++		return false;
++	case MSR_KERNEL_GS_BASE:
++		if (cxp && cxp->kernel_gs_base)
++			val = cxp->kernel_gs_base;
++		else
++			val = native_rdmsrq(MSR_KERNEL_GS_BASE);
++		break;
++	case MSR_IA32_APICBASE:
++		val = native_rdmsrq(MSR_IA32_APICBASE);
++		if (!val)
++			val = APIC_DEFAULT_PHYS_BASE | MSR_IA32_APICBASE_ENABLE;
++		if (cxp && apic_id == 0)
++			val |= MSR_IA32_APICBASE_BSP;
++		else
++			val &= ~MSR_IA32_APICBASE_BSP;
++		break;
++	case MSR_FS_BASE:
++	case MSR_GS_BASE:
++	case MSR_LSTAR:
++	case MSR_STAR:
++	case MSR_SYSCALL_MASK:
++		val = native_rdmsrq(msr);
++		break;
++	default:
++		return false;
++	}
++
++out:
++	*rax = (u32)val;
++	*rdx = (u32)(val >> 32);
++	return true;
++}
++
++static bool __cpu_preserved_text
++kvm_x86_caretaker_emulate_uart8250(struct caretaker_uart *uart,
++				   u16 port, int in, int size,
++				   unsigned long *rax)
++{
++	u8 offset;
++
++	if (port < COM1_PORT_BASE || port > COM1_PORT_END)
++		return false;
++
++	offset = port - COM1_PORT_BASE;
++
++	if (in) {
++		unsigned long val = 0;
++
++		switch (offset) {
++		case UART_RX:
++			val = (uart && (uart->lcr & UART_LCR_DLAB)) ? uart->dll : 0;
++			break;
++		case UART_IER:
++			val = (uart && (uart->lcr & UART_LCR_DLAB)) ? uart->dlm :
++				(uart ? uart->ier : 0);
++			break;
++		case UART_IIR:
++			val = UART_IIR_NO_INT;
++			break;
++		case UART_LCR:
++			val = uart ? uart->lcr : UART_LCR_WLEN8;
++			break;
++		case UART_MCR:
++			val = uart ? uart->mcr : (UART_MCR_DTR | UART_MCR_RTS);
++			break;
++		case UART_LSR:
++			val = UART_LSR_TEMT | UART_LSR_THRE;
++			break;
++		case UART_MSR:
++			val = UART_MSR_DCD | UART_MSR_DSR | UART_MSR_CTS;
++			break;
++		case UART_SCR:
++			val = uart ? uart->scr : 0;
++			break;
++		}
++
++		if (size < (int)sizeof(unsigned long)) {
++			unsigned long mask = (1UL << (size * 8)) - 1;
++			*rax = (*rax & ~mask) | (val & mask);
++		} else {
++			*rax = val;
++		}
++	} else {
++		u8 out_val = (u8)*rax;
++
++		if (uart) {
++			switch (offset) {
++			case UART_TX:
++				if (uart->lcr & UART_LCR_DLAB)
++					uart->dll = out_val;
++				break;
++			case UART_IER:
++				if (uart->lcr & UART_LCR_DLAB)
++					uart->dlm = out_val;
++				else
++					uart->ier = out_val;
++				break;
++			case UART_LCR:
++				uart->lcr = out_val;
++				break;
++			case UART_MCR:
++				uart->mcr = out_val;
++				break;
++			case UART_SCR:
++				uart->scr = out_val;
++				break;
++			}
++		}
++	}
++
++	return true;
++}
++STACK_FRAME_NON_STANDARD(kvm_x86_caretaker_emulate_uart8250);
++
++__caretaker_text bool
++kvm_x86_caretaker_handle_exit(void *data, struct kvm_caretaker_exit *exit)
++{
++	struct caretaker_x86_page *cxp = data;
++	bool handled = false;
++
++	if (exit->type == KVM_CARETAKER_EXIT_CROSS_VCPU) {
++		/*
++		 * x86 has no cross-vCPU emulation.  The decoders route
++		 * VMCALL, APIC_ACCESS, APIC_WRITE, EOI_INDUCED and
++		 * INTERRUPT_WINDOW here, and every one of them has a
++		 * guest-visible effect the Caretaker cannot produce: a
++		 * hypercall it cannot service, an APIC register write it
++		 * cannot apply, an EOI it cannot retire, an IPI it cannot
++		 * deliver to a vCPU parked on another core.
++		 *
++		 * Returning true absorbed all of it.  Worse, nothing
++		 * advanced RIP afterwards, so VMCALL re-executed forever.
++		 *
++		 * Stall instead.  The vCPU parks on the instruction and the
++		 * incoming kernel's full KVM emulates it properly.  arm64
++		 * does handle its CROSS_VCPU case (SGI delivery) and keeps
++		 * returning true.
++		 */
++		return false;
++	}
++
++	switch ((int)exit->type) {
++	case KVM_CARETAKER_EXIT_CONSOLE: {
++		unsigned long *target = exit->mmio_io.val_ptr ?
++					(unsigned long *)exit->mmio_io.val_ptr :
++					(unsigned long *)&exit->mmio_io.val;
++
++		handled = kvm_x86_caretaker_emulate_uart8250(&cxp->uart,
++							     (u16)exit->mmio_io.addr,
++							     !exit->mmio_io.is_write,
++							     exit->mmio_io.size,
++							     target);
++		break;
++	}
++	case KVM_CARETAKER_EXIT_CPUID:
++		kvm_caretaker_emulate_cpuid(&cxp->rax, &cxp->rbx, &cxp->rcx, &cxp->rdx);
++		handled = true;
++		break;
++	case KVM_CARETAKER_EXIT_MSR:
++		handled = kvm_caretaker_emulate_msr(cxp, exit->msr.msr, exit->msr.is_write,
++						    &cxp->rax, &cxp->rdx);
++		break;
++	case KVM_CARETAKER_EXIT_RDTSC: {
++		u64 tsc = rdtsc();
++
++		cxp->rax = (u32)tsc;
++		cxp->rdx = (u32)(tsc >> 32);
++		handled = true;
++		break;
++	}
++	case KVM_CARETAKER_EXIT_INSN_STEP:
++		handled = true;
++		break;
++	case KVM_CARETAKER_EXIT_ARCH:
++	default:
++		/*
++		 * Nothing above recognised this exit, so nothing emulated it.
++		 * Advancing RIP here would step over an instruction whose
++		 * architectural effect never happened (MOV to CRn, XSETBV,
++		 * INVLPG, WBINVD, RDPMC, ...), leaving the guest running on
++		 * silently wrong state with no way to detect it.
++		 *
++		 * Report the exit as unhandled instead.  The caretaker run
++		 * loop stops re-entering the guest and the vCPU stays parked
++		 * on this instruction until the incoming kernel reclaims it
++		 * and full KVM emulates the exit properly.
++		 */
++		return false;
++	}
++
++	if (handled)
++		exit->rip += exit->insn_len;
++
++	return handled;
++}
++EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_x86_caretaker_handle_exit);
++
+ __caretaker_text void kvm_x86_caretaker_arm_timer(u64 deadline_ticks)
+ {
+ 	if (!deadline_ticks)
 -- 
 2.55.0.1082.g2b9226bbc0-goog
 
