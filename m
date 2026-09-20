@@ -1,44 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B38D447ACEB;
-	Sun, 20 Sep 2026 21:38:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0B6147CA78;
+	Sun, 20 Sep 2026 21:44:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789940328; cv=none; b=iqtBTpSU7TYVmzNCRjKbOzLWUIahs9l4bkwRzUqk9+WvHLifP2mj8ArYuzwxWkQXZKbG57jZolw3dOgdsb2jJTWsHVhexcXN459ZP+t6yzwc9dUBQ1IcVTnG/BsYKBW7ZLyJ1yxuTzq9at6Xi108TdRqpQzqBOnAz4rQoTKXtYs=
+	t=1789940663; cv=none; b=Y9UqPBSJcCZCh4tZ6U9k207lMS20aLDe6biFbUVK8Wjq9tYQtXDKxAbOxWwFyHVj98ZTTH3DAGNkjVIcNjv7kf0ZN8gw7iooUl8x6182IV+LoqvEo8pV4OE3DCVpxzhtpNjpKJdSDo1twuPzMpqY1O9yrut5md6CVLgCW1UZYb8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789940328; c=relaxed/simple;
-	bh=G1BBIx2Gf8U+dWpTIAGva/UtiTXBVUPy5h79F8Abp7s=;
+	s=arc-20240116; t=1789940663; c=relaxed/simple;
+	bh=qhT5C6zKySKu1rSsPNT8ibOTVYUw2vcAXIPCmejvnLg=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=R0ecVeXpV7+aYe2HWr1bppOQMKrgghy01LW37W1SUWQKbEFYmDqjHxLHx07o7QOIBTo0U1OfCYCRJ4jhs+mbqmV/k4nrRZxDCn7NxWsQ+bOLNIf8w27gzYWk/mNcB9VHgNhhz+ldNE+a1Hn1IjtN6/TgOW1AnPzhbVAXShVLPQY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DquADkVr; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=oImIWCgDcZKOaXgvwAgX5ga5TLjRuN4RXYFlCHsqEylW3uF92hAz2Fe4liUZ99jdzs93GG2wBXbfRzIrYuocGpksFVU/GhZIj6ePip9RUQ2TilBQD/lKt2BOD1eaKGDp1xkeCixbHspQFcxVHjI/TZOa4KVlTuOaP/ypF8YoRqE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J1sH415G; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DquADkVr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 411DE1F000FF;
-	Sun, 20 Sep 2026 21:38:38 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J1sH415G"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D84B81F000FF;
+	Sun, 20 Sep 2026 21:44:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789940318;
-	bh=NiXnL7R3Ia8WFqWlgEzb7e90baUkz5w8lwWBHfm289I=;
+	s=k20260515; t=1789940662;
+	bh=eHhSSxLGVoPebUWjHE8p0EIJe3Z1HUGjjOLRQNBoKb0=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=DquADkVrVaPnPc/vj9H7vU+3JyR+bn/VNV0f3QGbjn7iJydctcnzLzMz8xlPw1I5A
-	 YG9IDuhGFqhptfYZ3GePh3CYOt9VXZRqQ5SzAev9LMxfH0J3ZadzSlGNfTrNiz0L7i
-	 Y63YpwSviVt3cLiPuljc4BWJt/N8j28CrrhgM/yTML1fL3Xh7Qq7WcHXFS5p+VFuCM
-	 dhNcp6y+CmAWGPv77Q1v1u4iOiAGYcYp+bNTmELjkLGws3+25R8TL3aRINHuPtcmOe
-	 ubAK6ZR+SfDHh5avK26fU1dbWWWO+Rqn0V3TVe9ngYV6bFbXNZ703Jx+DOAOgTn0RT
-	 tOo+6/tDXhdTA==
+	b=J1sH415Ghlc7B+j+Xq2hED7VZvkU3taWbs5O5LmOqLHMrrFsbCxLzbA9YV5wLnRgf
+	 uYpyC1ZZTJdT5E4hrxMC7TAJVLre0kgveXOiNVKNkh7QBl1ybmGeY0IJEtrtaORHMl
+	 2XlgDQsmtB0NKa8+3xcgMNwhkL8aZxVzp1eJr8teTX4Af1HnFx8xKf9siqzNee0WvB
+	 20BHhcp1ffoyeXUyyLUlm9w1mmqR/uldJOtPR9ITmXW5/MTTw46Z9HVglRUX/XsFTu
+	 Yx0XD++NDRjRko9htKr9DnfQOj1NA/djnkKrOt6VGygtZHeQ3LFkA5N580DI9zP5zy
+	 gUs7baWdo/OYg==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v19 05/20] KVM: arm64: Track the type of VM in kvm_arch
+Subject: Re: [PATCH v19 02/20] KVM: arm64: Disable Steal time accounting for
+ protected guests
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Suzuki K Poulose" <suzuki.poulose@arm.com>
-Cc: "Marc Zyngier" <maz@kernel.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, "Oliver
- Upton" <oupton@kernel.org>
-In-Reply-To: <20260920212845.707-6-suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev
+In-Reply-To: <20260920212845.707-3-suzuki.poulose@arm.com>
 References: <20260920212845.707-1-suzuki.poulose@arm.com>
- <20260920212845.707-6-suzuki.poulose@arm.com>
+ <20260920212845.707-3-suzuki.poulose@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 20 Sep 2026 21:38:37 +0000
-Message-Id: <20260920213838.411DE1F000FF@smtp.kernel.org>
+Date: Sun, 20 Sep 2026 21:44:21 +0000
+Message-Id: <20260920214421.D84B81F000FF@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,53 +47,73 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [Medium] kvm: arm64: missing READ_ONCE() when reading untrusted host_kvm =
-vm_flavor at EL2
+- [Medium] arm64: kvm: contradictory SMCCC advertisement for PV_TIME on pro=
+tected VMs
 --
 
-commit d04a2a8ee6aa64b39d1116da1e8bfebec72b4499
+commit db2c057e4ceefd58162587d4fd417788a4db3dbc
 Author: Suzuki K Poulose <suzuki.poulose@arm.com>
 
-    KVM: arm64: Track the type of VM in kvm_arch
+    KVM: arm64: Disable Steal time accounting for protected guests
    =20
-    KVM arm64 has different types of VMs with all the different modes in wh=
-ich
-    the hypervisor code can be run. e.g., VHE, nVHE, pKVM etc. Then there is
-    protected VM and normal VMs with pKVM. We might soon add other types,
-    e.g., Arm CCA Realm.
+    PVTIME support is advertised by KVM_CAP_STEAL_TIME, which doesn't take =
+into
+    account the kvm instance. Even with that, a VMM could skip the CAP check
+    and proceed to configure the PVTIME as we don't do further check on the
+    DEVICE_CTRL. Tighten this up by passing the KVM instance around wherever
+    possible and catch things early.
 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkv=
-m.c
-> index 459bd9eb7e4bc..57e2eef6d7426 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> @@ -432,7 +432,11 @@ static void init_pkvm_hyp_vm(struct kvm *host_kvm, s=
-truct pkvm_hyp_vm *hyp_vm,
+> diff --git a/arch/arm64/kvm/pvtime.c b/arch/arm64/kvm/pvtime.c
+> index 4ceabaa4c30bd..579e0a4720ad2 100644
+> --- a/arch/arm64/kvm/pvtime.c
+> +++ b/arch/arm64/kvm/pvtime.c
+> @@ -67,9 +67,9 @@ gpa_t kvm_init_stolen_time(struct kvm_vcpu *vcpu)
+>  	return base;
+>  }
 > =20
->  	hyp_vm->host_kvm =3D host_kvm;
->  	hyp_vm->kvm.created_vcpus =3D nr_vcpus;
-> -	hyp_vm->kvm.arch.pkvm.is_protected =3D READ_ONCE(host_kvm->arch.pkvm.is=
-_protected);
-> +	if (kvm_vm_is_protected(host_kvm))
-> +		hyp_vm->kvm.arch.vm_flavor =3D VM_PROTECTED_PKVM;
-> +	else
-> +		hyp_vm->kvm.arch.vm_flavor =3D VM_PKVM;
+> -bool kvm_arm_pvtime_supported(void)
+> +bool kvm_arm_pvtime_supported(struct kvm *kvm)
+>  {
+> -	return !!sched_info_on();
+> +	return !!sched_info_on() && (!kvm || !kvm_vm_is_protected(kvm));
+>  }
 
 [Severity: Medium]
-Does init_pkvm_hyp_vm() evaluate the untrusted host memory directly without
-READ_ONCE()?
+Does this create a contradictory SMCCC advertisement for protected VMs?
 
-The pKVM EL2 trust boundary requires that data from host memory must be
-copied to private EL2 memory before validating or acting on it.
+A protected guest querying ARM_SMCCC_ARCH_FEATURES_FUNC_ID for
+ARM_SMCCC_HV_PV_TIME_FEATURES in kvm_smccc_call_handler() will receive
+SMCCC_RET_SUCCESS because the KVM_REG_ARM_STD_HYP_BIT_PV_TIME bit is
+still set in std_hyp_bmap:
 
-The macro kvm_vm_is_protected(host_kvm) evaluates host_kvm->arch.vm_flavor =
-in
-the condition. The previous code safely used
-READ_ONCE(host_kvm->arch.pkvm.is_protected).
+arch/arm64/kvm/hypercalls.c:kvm_smccc_call_handler() {
+	...
+	case ARM_SMCCC_HV_PV_TIME_FEATURES:
+		if (test_bit(KVM_REG_ARM_STD_HYP_BIT_PV_TIME,
+			     &smccc_feat->std_hyp_bmap))
+			val[0] =3D SMCCC_RET_SUCCESS;
+		break;
+	...
+}
 
-Could we wrap the host memory read with READ_ONCE() to prevent
-compiler-induced tearing or optimization issues?
+However, when the guest actually invokes the feature,
+kvm_hypercall_pv_features() returns SMCCC_RET_NOT_SUPPORTED because
+the IPA is unconfigured:
+
+arch/arm64/kvm/pvtime.c:kvm_hypercall_pv_features() {
+	...
+	case ARM_SMCCC_HV_PV_TIME_FEATURES:
+	case ARM_SMCCC_HV_PV_TIME_ST:
+		if (vcpu->arch.steal.base !=3D INVALID_GPA)
+			val =3D SMCCC_RET_SUCCESS;
+		break;
+	...
+}
+
+This violates the SMCCC ABI by advertising ARM_SMCCC_HV_PV_TIME_FEATURES
+as supported but returning NOT_SUPPORTED when it is invoked. Should the
+KVM_REG_ARM_STD_HYP_BIT_PV_TIME bit be cleared for protected VMs?
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260920212845.707-=
-1-suzuki.poulose@arm.com?part=3D5
+1-suzuki.poulose@arm.com?part=3D2
