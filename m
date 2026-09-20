@@ -1,30 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2858F472F61;
-	Sun, 20 Sep 2026 21:29:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD10B4746CC;
+	Sun, 20 Sep 2026 21:29:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789939749; cv=none; b=lpMN2ylMZQZSm1ERLTw3kkMRiddkzjc9+et6lVAHoF2J4dBh538/zDyE0jmmk7phllMqThWof10W1u5Yltb14gAf2SwLpRddpYH75C33pFA2ph6j0Id0BxMDkste2osv+hUbJxmHB8hqiKXPCFMGWi7wdT2f8AK88wCXHtqBbw0=
+	t=1789939750; cv=none; b=DUbkZR4c2gWaFY0D45M2zwWcfhJE6L29MEh7SZ4NAlRURkm19XazouF2s6460f+qxfWsfPA8GKRulP/rZXOs9jAlkVntRX4UJdugtvIIHBJQPtzeqky2lQFAhSwJ4mu4C+X45kenBWqv01as2JRYhvk10wO7vtrwZEwuNTtenqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789939749; c=relaxed/simple;
-	bh=YOxM7mYuAqSXik0KdEeyH6ok23wJVcNKpc/A4Ommq9Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=oYDyBRcAfV7YmyATkSDgn0HulnKaw5gMYks1edyNSxOobuCgYPVd6l+G1o7IAmohstCYlF08NaK5luKsSZ5jGHdQy0JYcP+wQP3fw4WjO1fjlL7CJdr0XV/XGH0/ah2XAMOwz9YEELm+/no/hGty3W4NOnffFDllGY7WGzY4n/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Q1cQdxHq; arc=none smtp.client-ip=217.140.110.172
+	s=arc-20240116; t=1789939750; c=relaxed/simple;
+	bh=hqmO4UXFa4NaBlHK0LJVbTw3LVO/B0mbInSUdRwIiNA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=sI1SKMcXi4hfMc7cmdBZVPPW0BK8mzz6mfdxbBfy5MDJiyAdNXqr8dg95Q1oprL/3zCN9kLss2gpe9sAWVaEqHaLXfq3sUOq979+CcKONa8/lAZKZwb7e1eeDlg2kVdluEQUUMpBg9j6ZbptdSZtrBOurJ6zJOeKG1x+ChK0DvQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=H31Bgjl0; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Q1cQdxHq"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="H31Bgjl0"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AAF081596;
-	Sun, 20 Sep 2026 14:28:58 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B756A15A1;
+	Sun, 20 Sep 2026 14:29:01 -0700 (PDT)
 Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.2.197.99])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 70D953F632;
-	Sun, 20 Sep 2026 14:28:59 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 81D3D3F632;
+	Sun, 20 Sep 2026 14:29:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1789939742; bh=YOxM7mYuAqSXik0KdEeyH6ok23wJVcNKpc/A4Ommq9Y=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Q1cQdxHqsioG2kuZAGaSW/qCTI3nPP0zSKR7tiBSBR/MZmxOIPpYVEIVo46N1Jvtp
-	 XZ0+OsPc4FxsRfOfytkEBVEpkO9mNFUblsk1dD2aJmQ/jHUfbuX4AszGLz4jJw2JI+
-	 BsLvNjMLnPcPDcE86OdiAEE/u7oe29Qtl0KtiQVk=
+	t=1789939745; bh=hqmO4UXFa4NaBlHK0LJVbTw3LVO/B0mbInSUdRwIiNA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=H31Bgjl0ATGrNoIKHGiMj8aBWTwSHxu9K4bi2XqouHfWZWehUW3DVOgQcCeZbAfGi
+	 B8MLUbX7u6epok94rEYyk2RAvquu9o2aHDz9OgK1dErtE4u6axRDIhJcC3Hg+dH/Dg
+	 v7aO5nv8rAuOHHISg/v4pnSnu/dapx0s173oO46Q=
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -49,192 +50,78 @@ Cc: maz@kernel.org,
 	lpieralisi@kernel.org,
 	enju.kohei@fujitsu.com,
 	Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v19 00/20] KVM: arm64: CCA: Add basic plumbing for Realms
-Date: Sun, 20 Sep 2026 22:28:25 +0100
-Message-ID: <20260920212845.707-1-suzuki.poulose@arm.com>
+Subject: [PATCH v19 01/20] KVM: arm64: protected VM: Handle user writes to CNTVCT_EL0/CNTPCT_EL0
+Date: Sun, 20 Sep 2026 22:28:26 +0100
+Message-ID: <20260920212845.707-2-suzuki.poulose@arm.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260920212845.707-1-suzuki.poulose@arm.com>
+References: <20260920212845.707-1-suzuki.poulose@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-This series is a trimmed down version of the Arm CCA KVM support, previously
-posted here [0]. Like in the v17, we have tried to split the entire series
-into the following chunks.
+Protected VMs doesn't allow setting offsets for virtual and phyiscal
+counters, as the offset is always fixed to 0. The VM ioclt is filtered
+out based on the cap. However we don't prevent the userspace from trying
+to write to the CNTVCT/CNTPCT registers. This would lead to KVM triggering
+a WARN() in timer_set_offset() as the vm_offset pointer is set to NULL.
 
- 1) Base RMM RMI support under drivers/firmware/arm_rmm -> [1]
- 2) Linux Host support for handling GPFs - [2]
- 3) NEW: Enlighten KVM arm64 about the different VM types and use call
-    backs for the VM type, rather than spilling the is_this_type_of_vm()
-    everywhere. Adds VCPU and Stage2 MMU related callbacks with support
-    for the existing VM types. There are other places where we may be
-    able to abstract, but those need careful performance evaluations
-    to make sure they are fit (e.g., vcpu_run)
+Fix this by always "fixing" the timer offsets to 0 and marking that the
+timer offset is set in the kvm->arch.flags at KVM init time for protected
+VMs. A userspace writing to the CNT*CT_EL0 would observe success, without
+any real effect. This was chosen over preventing the writes to these
+registers and returning -EPERM.
 
-   With that in place we generalise the predicate "kvm_vm_is_protected()"
-   to cover all  "Confidential" VMs (which includes Protected VM and Realms),
-   allowing us to handle common themes without having to do things like :
+Reported by Sashiko
 
-     if (kvm_vm_is_protected() || kvm_vm_is_realm())
-
-   Also replaces the code with precise check for a given VM type to
-   avoiding combination of if (). e.g,, kvm_vm_is_unprotected_pkvm(kvm).
-   The checks under arch/arm64/kvm/{nvhe,pkvm} still retain the vm_is_protected()
-   check as pVMs are the only possible protected VMs there.
-   
- 4) Bare minimal Realm VM support without the actual functionality to
-    run a Realm. This would help the maintainers to review the series in
-    smaller chunks. This doesn't depend on [1] and can be independently
-    merged, without being "functional".
-    This series includes vcpu operations and the s2 vm operations, which
-    do need the RMI driver backend to be meaningful. But the KVM handler
-    is in the right shape. The remaining changes would be added once the
-    RMI firmware library lands. Also covers the SET_ONE_REG/GET_ONE_REG
-
- 5) Core implementation of the RMI driver for KVM and actual enablement of the
-    Realm support. This depends on (1), (2) and the guest-memfd-in-place
-    conversion series v12 from Ackerley. This is available here at the integration
-    branch [3]
-
-This series is comprised of (3) and (4) above.
-
-The integration branch has been tested with the following components:
-
-  tf-RMM:   main branch (commit 5e6e2acd) compliant to RMM-v2.0-beta3 [4]
-  kvmtool: git@git.gitlab.arm.com:linux-arm/kvmtool-cca.git cca/kvm-v18
-
-[0] Arm CCA KVM Support v16 : https://lore.kernel.org/all/20260803134403.80630-1-steven.price@arm.com
-[1] Linux firmware RMI https://lore.kernel.org/all/20260912083611.2513845-1-suzuki.poulose@arm.com
-[2] Linux GPF Host https://lore.kernel.org/all/20260913070459.2547407-1-suzuki.poulose@arm.com
-[3] https://git.gitlab.arm.com/linux-arm/linux-cca/ cca/cca-host/kvm-v19/integration
-[4] https://support.arm.com/documentation/den0137/2-0bet3/
-
+Link: https://lore.kernel.org/all/20260908164641.416911F00A3A@smtp.kernel.org
+Fixes: f7d05ee84a6a ("KVM: arm64: Prevent host from managing timer offsets for protected VMs")
+Suggested-by: Marc Zyngier <maz@kernel.org>
+Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+---
 Changes since v18:
-  https://lore.kernel.org/all/20260915160141.3543048-1-suzuki.poulose@arm.com
+ - Retain NULL vm_offset for protected VMs to avoid host tampering with the
+   offset.
+ - Moved the flag setting into kvm_timer_init_vm(), where it should have been
+   in the first place
+---
+ arch/arm64/kvm/arch_timer.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
- - Patch count down by 3, after merging different patches together, see more below
- - Retain NULL vm_offset for pVMs and move the counter offset flag initialisation
-   to kvm_timer_init_vm() - Marc
- - Merge widening the scope of kvm_vm_is_protected() to the patch where the
-   flavors are introduced(Marc) and also dropped Fuad's reviewed-by, as the
-   patch is now bigger.
- - Merge "Use kvm_vm_is_unprotected_pkvm" for !kvm_vm_is_protected to patch
-   where flavor is introuced.
- - Merge "vgic-v3" mandate and preventing vgic-v2 mappings to a single patch,
-   where kvm_vm_hyp_is_distrusting() introduced - Fuad
- - Drop kvm_vm_hyp_is_pkvm(), reverting to is_protected_kvm_enabled()
- - Use is_protected_kvm_enabeld() for pKVM guest flavor checks.
- - s/PKVM/pKVM for commit descriptions too
- - Make sure the vm_mem_abort callback is !NULL at init time.
- - Bail out early for !pKVM && !Realm VMs in kvm_vm_ioctl_allowed(). Use
-   kvm_vm_hyp_is_distrusting()
- - WARN_ON_ONCE(!kvm) for kvm_vm_ioctl_allowed() as it must be only called with
-   a valid kvm instance and only from kvm_arch_vm_ioctl()
- - Rename kvm_arch_vm_{ext,ioctl}_allowed => kvm_vm_{ext,ioctl}_allowed - Fuad
- - Move kvm_realm_ext_allowed() to asm/kvm_rmi.h - Fuad
- - Don't expose PMCR_EL0 to the userspace until we support PMU
-
-
-Changes since v17:
-https://lore.kernel.org/all/20260908162223.1683432-1-suzuki.poulose@arm.com 
-
- - Add a patch to fix pKVM handling of SYS_CNTVCT/CNTPCT to override the counter
-   offset (Patch1)
- - Restrict Realms to VGIC v3 only - New patch
- - Add kvm_vm_is_unprotected() to replace is_protected_kvm_enabled() &&
-   !kvm_vm_is_protected() - New patch
- - Use macro to initialize the per-flavor vcpu, s2_vm ops
- - Add a wrapper to initialise vcpu and s2_vm ops with a BUILD_BUG_ON()
-   for the array size checks against VM flavour types
- - Drop forward decalaration of the vcpu, s2_vm operations that spoiled the
-   fun ;-)
- - Remove irrelevant comment about the order of timer loading for !VHE
- - Use the explicti kvm_call_hyp_nvhe for pKVM specific ops
- - Don't call nvhe_vcpu_put from pkvm_vcpu_put, open code them
- - Drop cpu argument for vcpu_load() callback. We set the cpu
-   before the callbacks are invoked
- - Drop kvm_vm_is_confidential(), instead widen the scope of kvm_vm_is_protected()
-   to cover pVMs and Realms. Add an explicit helper kvm_vm_is_protected_pkvm()
-   for the cases where we need to check for a "pVM on pKVM"
- - Add kvm_vm_hyp_is_pkvm() for checking if the VM is running on pKVM.
-   covers both unprotected and pvms. But really uses is_protected_kvm_enabled()
-   under the hood
- - Add kvm_vm_hyp_is_distrusting() to cover pKVM guests (both protected and
-   unprotected) and Realms. Use this for preventing the vgic v2 mapping into
-   Stage2 for a guest
- - Drop superfluous !kvm check from kvm_vm_ioctl_enable_cap() - Sashiko
- - Drop KVM_CAP_CREATE_IRQCHIP, as we don't support VGIC_V2 for Realms
- - Filter out the vm_ioctls that are based on blocked cap.
- - Repurpose the pkvm plumbing for filtering the caps and ioctl to generic
-   and plumb the Realm support in
- - s/PKVM/pKVM for the comments
- - Drop type argument for pkvm_init_host_vm and also drop protected variable,
-   now that we have the vm_flavor to check.
- - Use kvm_vm_hyp_is_pkvm() to replace is_protected_kvm_enabled() with valid
-   kvm instance
- - CCA: Merge the GET/SET REG handling patches into a single patch
- - CCA: Reword the commit description for SVE VL access handling
- - Reordered the patches to group the Realm realted to changes to the rear end
-
-Jean-Philippe Brucker (2):
-  KVM: arm64: CCA: Expose SVE VL register before VCPU finalization
-  KVM: arm64: CCA: Control user register access for Realms
-
-Steven Price (4):
-  KVM: arm64: Avoid including linux/kvm_host.h in kvm_pgtable.h
-  KVM: arm64: CCA: Introduce Realms
-  KVM: arm64: CCA: WARN on injected undef exceptions
-  KVM: arm64: CCA: Support timers in realm RECs
-
-Suzuki K Poulose (14):
-  KVM: arm64: protected VM: Handle user writes to CNTVCT_EL0/CNTPCT_EL0
-  KVM: arm64: Disable Steal time accounting for protected guests
-  KVM: arm64: Include kvm_emulate.h in kvm/arm_psci.h
-  KVM: arm64: Track the type of VM in kvm_arch
-  KVM: arm64: Refactor the vcpu_load to allow for VM specific callbacks
-  KVM: arm64: Add vcpu load/put call backs for flavors
-  KVM: arm64: Reuse kvm_stage2_unmap_range in kvm_unmap_gfn_range
-  KVM: arm64: Add VM specific callback for S2 MMU operations
-  KVM: arm64: Abstract out memory abort handling
-  KVM: arm64: Mandate VGIC v3 for for VMs running on hyp that don't
-    trust the host
-  KVM: arm64: CCA: Add a new mode for supporting Realm guests
-  KVM: arm64: CCA: Add VCPU load/put for Realms
-  KVM: arm64: CCA: Add bare minimal S2 operations for Realm
-  KVM: arm64: CCA: Don't expose unsupported capabilities for realm
-    guests
-
- .../admin-guide/kernel-parameters.txt         |   3 +
- arch/arm64/include/asm/kvm_emulate.h          |  16 +
- arch/arm64/include/asm/kvm_host.h             |  69 +++-
- arch/arm64/include/asm/kvm_pgtable.h          |   6 +-
- arch/arm64/include/asm/kvm_pkvm.h             |  25 +-
- arch/arm64/include/asm/kvm_rmi.h              |  84 +++++
- arch/arm64/include/asm/virt.h                 |   1 +
- arch/arm64/kvm/Makefile                       |   2 +-
- arch/arm64/kvm/arch_timer.c                   |  34 +-
- arch/arm64/kvm/arm.c                          | 300 +++++++++++++++---
- arch/arm64/kvm/guest.c                        |  73 ++++-
- arch/arm64/kvm/handle_exit.c                  |   2 +-
- arch/arm64/kvm/hyp/nvhe/pkvm.c                |   6 +-
- arch/arm64/kvm/hyp/pgtable.c                  |   1 +
- arch/arm64/kvm/hypercalls.c                   |   4 +-
- arch/arm64/kvm/inject_fault.c                 |   1 +
- arch/arm64/kvm/mmu.c                          | 210 +++++++++---
- arch/arm64/kvm/pkvm.c                         |   6 +-
- arch/arm64/kvm/pvtime.c                       |  14 +-
- arch/arm64/kvm/rmi.c                          |  18 ++
- arch/arm64/kvm/sys_regs.c                     |  28 +-
- arch/arm64/kvm/vgic/vgic-init.c               |   2 +
- include/kvm/arm_psci.h                        |   2 +
- 23 files changed, 752 insertions(+), 155 deletions(-)
- create mode 100644 arch/arm64/include/asm/kvm_rmi.h
- create mode 100644 arch/arm64/kvm/rmi.c
-
+diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+index 6ac3321f4c575..226cd5a495c8b 100644
+--- a/arch/arm64/kvm/arch_timer.c
++++ b/arch/arm64/kvm/arch_timer.c
+@@ -1110,8 +1110,7 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
+ 		timer_context_init(vcpu, i);
+ 
+ 	/* Synchronize offsets across timers of a VM if not already provided */
+-	if (!vcpu_is_protected(vcpu) &&
+-	    !test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm->arch.flags)) {
++	if (!test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm->arch.flags)) {
+ 		timer_set_offset(vcpu_vtimer(vcpu), kvm_phys_timer_read());
+ 		timer_set_offset(vcpu_ptimer(vcpu), 0);
+ 	}
+@@ -1133,6 +1132,15 @@ void kvm_timer_init_vm(struct kvm *kvm)
+ 	 */
+ 	for (int i = 0; i < NR_KVM_TIMERS; i++)
+ 		kvm->arch.timer_data.ppi[i] = get_vgic_ppi(kvm, default_ppi[i]);
++
++	/*
++	 * Protected VMs don't allow any offset being set from userspace,
++	 * either set via writes to the counters or using the dedicated
++	 * ioctl. Pretend the offset has already been set and rely on the
++	 * default offset being 0.
++	 */
++	if (kvm_vm_is_protected(kvm))
++		set_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &kvm->arch.flags);
+ }
+ 
+ void kvm_timer_cpu_up(void)
 -- 
 2.43.0
 
