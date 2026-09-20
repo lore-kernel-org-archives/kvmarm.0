@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D75984718F7;
-	Sun, 20 Sep 2026 21:29:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55CE14718F7;
+	Sun, 20 Sep 2026 21:29:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789939765; cv=none; b=XOTXGvZNYflElHcvMCc3fEsuRO+Zzu6R8hLft9EgTZz7lqX7LhcNWvWS22bsowdn7WTqa+7dJi25Fqsk5QqUrAGRBqfsSvbmWAYII1/9nNMHruPSDnVlvDf0V3ajWHs0mGEBvwn7Y3JcQVAm3ThG/TXzxZv65srrFou0jx82zkk=
+	t=1789939772; cv=none; b=UP8t2MnXX6KREULMQFK8RZQZPzybj8kfUKWApy2RK/DmhYht6AVHalvMwP6fyjTT/QTydwisEjJNtA4ReqbI7+C3HMMmFCLEzYz+LsM1PaAGbz0TP8o2VPZSIV0Kjw+RLCksYWoTc22usm4zJD1ukFJA1yxfFR9AtSSeGqm/h8M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789939765; c=relaxed/simple;
-	bh=WqaPkSBA5sqiKlN1tvI7sIeq04xzAphtbNNVKQf9rCw=;
+	s=arc-20240116; t=1789939772; c=relaxed/simple;
+	bh=xWBRQ2iZnL1JYRZR7SER1/+fXiX3ZfT1xA7aqCXLF9A=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rvEqP9vXIdGOYyLSNUIXyu8JiZjuYuExLH3576s8+ZJQbmdgmbdmqamWf8UupLJiwTAS08LC6i+fngk6lO8setW2oD/SK1JeMFyvIG0+zWc9OXFkKRtjoZd4Z/XuWRkjG+9tg3ZtpN5fIYwnVfvd+P6BT/A1NGEa202i4LA+9IY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=XfuMjbvg; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=X2eCPy1qu7H8B/WBXChCatMxbCM+swl6trSbgzUdnzxcGCVuy7uj6IKpEsORsZVM9w7H3nrgzd2Zq8ghHpu2AHfl32lgQW+uEmHlXufN+DAzm4QpTTxJ4SF1F6UQkFqNadUghKnvL1ozvSllQn4GLG9pM4O5Al2P1Id1xCsKUNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=QjGhEq1C; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="XfuMjbvg"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="QjGhEq1C"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6D4B115A1;
-	Sun, 20 Sep 2026 14:29:17 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AB60C1596;
+	Sun, 20 Sep 2026 14:29:23 -0700 (PDT)
 Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.2.197.99])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 35CA93F632;
-	Sun, 20 Sep 2026 14:29:18 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 5591C3F632;
+	Sun, 20 Sep 2026 14:29:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1789939761; bh=WqaPkSBA5sqiKlN1tvI7sIeq04xzAphtbNNVKQf9rCw=;
+	t=1789939767; bh=xWBRQ2iZnL1JYRZR7SER1/+fXiX3ZfT1xA7aqCXLF9A=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=XfuMjbvghKnYmFjjqe+o0jqKC6szm13dQyGttgtdkOCcfbKlpcwAqLStnmLqYWmVk
-	 nX5q1ILC863bCYFygy0ciX4dNe58mMhi2HroxrkMmOcB5DinhcHXJVjZkEoojG2VBF
-	 9v1kt0TjX0XLUXfb2Lt8z79wQ1VNuARLgtaLzb9E=
+	b=QjGhEq1CcR8oyElFmpjIHT/xx5we7EOOqmzmwwei/jCpyg10QAI8WQmns+VA7zOGf
+	 8KOvMB+ImofXDqZR2bjIXqRkDi7fY4XfYogIMtc3mDJI/bx5wxxqe3qgcZJaOBiPv7
+	 +iTXgBJlRiM8ojV5CEfqCRZb0JDP/bEyuDVuOFMw=
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -49,10 +49,11 @@ Cc: maz@kernel.org,
 	WeiLin.Chang@arm.com,
 	lpieralisi@kernel.org,
 	enju.kohei@fujitsu.com,
-	Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v19 06/20] KVM: arm64: Refactor the vcpu_load to allow for VM specific callbacks
-Date: Sun, 20 Sep 2026 22:28:31 +0100
-Message-ID: <20260920212845.707-7-suzuki.poulose@arm.com>
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Fuad Tabba <fuad.tabba@linux.dev>
+Subject: [PATCH v19 08/20] KVM: arm64: Reuse kvm_stage2_unmap_range in kvm_unmap_gfn_range
+Date: Sun, 20 Sep 2026 22:28:33 +0100
+Message-ID: <20260920212845.707-9-suzuki.poulose@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260920212845.707-1-suzuki.poulose@arm.com>
 References: <20260920212845.707-1-suzuki.poulose@arm.com>
@@ -64,106 +65,42 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-To keep the VCPU load/put handling cleaner with the different kinds of VM
-types, we are about to introduce VM specific callbacks to do just the right
-thing. In preparation for that, make some refactoring to add the change
-easier.
+In preparation for adding VM specific backends for stage2 operation,
+switch to kvm_stage2_unmap_range() instead of __unmap_stage2_range()
+from the kvm_unmap_gfn_range(). Drop the bail out check for protected
+VMs and defer that to the one in kvm_stage2_unmap_range(). Later we
+would replace the logic in kvm_stage2_unmap_range() with VM specific
+backends.
 
-No functional changes intended. Based on a work by Marc Zyngier.
+No functional changes intended.
 
-Reviewed-by: Gavin Shan <gshan@redhat.com>
+Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- arch/arm64/kvm/arm.c | 48 ++++++++++++++++++++++++++------------------
- 1 file changed, 29 insertions(+), 19 deletions(-)
+ arch/arm64/kvm/mmu.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 8c784b266a8e8..c74706ed9a531 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -683,14 +683,11 @@ static bool kvm_vcpu_should_clear_twe(struct kvm_vcpu *vcpu)
- 	return single_task_running();
- }
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 0f4e8b71fa85d..03f2017a7404a 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -2436,12 +2436,12 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
  
--void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
-+static void vcpu_prepare_mmu(struct kvm_vcpu *vcpu)
+ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
  {
- 	struct kvm_s2_mmu *mmu;
- 	int *last_ran;
+-	if (!kvm->arch.mmu.pgt || kvm_vm_is_protected(kvm))
++	if (!kvm->arch.mmu.pgt)
+ 		return false;
  
--	if (is_protected_kvm_enabled())
--		goto nommu;
--
- 	if (vcpu_has_nv(vcpu))
- 		kvm_vcpu_load_hw_mmu(vcpu);
+-	__unmap_stage2_range(&kvm->arch.mmu, range->start << PAGE_SHIFT,
+-			     (range->end - range->start) << PAGE_SHIFT,
+-			     range->may_block);
++	kvm_stage2_unmap_range(&kvm->arch.mmu, range->start << PAGE_SHIFT,
++				(range->end - range->start) << PAGE_SHIFT,
++				range->may_block);
  
-@@ -720,10 +717,33 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 		kvm_call_hyp(__kvm_flush_cpu_context, mmu);
- 		*last_ran = vcpu->vcpu_idx;
- 	}
-+}
-+
-+static void vcpu_set_wfx_traps(struct kvm_vcpu *vcpu)
-+{
-+	if (kvm_vcpu_should_clear_twe(vcpu))
-+		vcpu->arch.hcr_el2 &= ~HCR_TWE;
-+	else
-+		vcpu->arch.hcr_el2 |= HCR_TWE;
-+
-+	if (kvm_vcpu_should_clear_twi(vcpu))
-+		vcpu->arch.hcr_el2 &= ~HCR_TWI;
-+	else
-+		vcpu->arch.hcr_el2 |= HCR_TWI;
-+}
-+
-+static void vcpu_load_pvtime(struct kvm_vcpu *vcpu)
-+{
-+	if (kvm_arm_is_pvtime_enabled(&vcpu->arch))
-+		kvm_make_request(KVM_REQ_RECORD_STEAL, vcpu);
-+}
-+
-+void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
-+{
-+	if (!is_protected_kvm_enabled())
-+		vcpu_prepare_mmu(vcpu);
- 
--nommu:
- 	vcpu->cpu = cpu;
--
- 	/*
- 	 * The timer must be loaded before the vgic to correctly set up physical
- 	 * interrupt deactivation in nested state (e.g. timer interrupt).
-@@ -736,19 +756,9 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 		kvm_vcpu_load_vhe(vcpu);
- 	kvm_arch_vcpu_load_fp(vcpu);
- 	kvm_vcpu_pmu_restore_guest(vcpu);
--	if (kvm_arm_is_pvtime_enabled(&vcpu->arch))
--		kvm_make_request(KVM_REQ_RECORD_STEAL, vcpu);
--
--	if (kvm_vcpu_should_clear_twe(vcpu))
--		vcpu->arch.hcr_el2 &= ~HCR_TWE;
--	else
--		vcpu->arch.hcr_el2 |= HCR_TWE;
--
--	if (kvm_vcpu_should_clear_twi(vcpu))
--		vcpu->arch.hcr_el2 &= ~HCR_TWI;
--	else
--		vcpu->arch.hcr_el2 |= HCR_TWI;
- 
-+	vcpu_load_pvtime(vcpu);
-+	vcpu_set_wfx_traps(vcpu);
- 	vcpu_set_pauth_traps(vcpu);
- 
- 	if (is_protected_kvm_enabled()) {
-@@ -772,7 +782,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
- 		kvm_call_hyp_nvhe(__pkvm_vcpu_put);
- 
- 		/* __pkvm_vcpu_put implies a sync of the state */
--		if (!kvm_vm_is_protected(vcpu->kvm))
-+		if (kvm_vm_is_unprotected_pkvm(vcpu->kvm))
- 			vcpu_set_flag(vcpu, PKVM_HOST_STATE_DIRTY);
- 	}
- 
+ 	kvm_nested_s2_unmap(kvm, range->may_block);
+ 	return false;
 -- 
 2.43.0
 
