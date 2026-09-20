@@ -1,124 +1,110 @@
-Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E713345725
-	for <kvmarm@lists.linux.dev>; Sat, 19 Sep 2026 21:35:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8D7821CA02
+	for <kvmarm@lists.linux.dev>; Sun, 20 Sep 2026 01:33:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789853736; cv=none; b=FJUUa82oQsvCOEnD2IpLef+zfyDtETJot0lHwGF3oZGnWDt9ttNQuf93glccK0XNu5ZjgbQs+6evR4BNfJS1w/QcPr4RqrtCUO4csCNauBkb+/pwrDW7cdadgIGKijKJZ50pNDbx9779dfk1eaZXPIb5LPC1hCBCF28fDQz0nYA=
+	t=1789867997; cv=none; b=CaLSSY6/+TOGxmZEU5BEPICjcVpARIDGdoD3yRRtiRE8UbR5oFf2gdrp0LDOJLFrV2h3JdOHs53nsM3JgFPlE/oSKbP0KqITuZ0xKapYNAkPPoFJfHp/Pz0uHYMeTxJgYZOJC7ZilXNeGzXEDYGBL6AQwoqR8J4UAqeZ4Y3MPT8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789853736; c=relaxed/simple;
-	bh=xlefR/akgVIwwabPG2m/iCIg0y04aOCKWgO4pB6evyM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kd9QBW5FihPkZhx1+M7JQv0YAuzO5DSxnWLhZ8u2QjeK79ZzV+9Yr0o6Q1093mC+v6JhnWrvf23RZngak1FoqGSRyM9EP6o+k2ksHDYHq2Oi6O3fBKPIrbwgNe/7D8gJNxWj+T9cpXMjukgUHJHx47f+TkwP8K9JMUY8uiier0A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=PAIIwRAV; arc=none smtp.client-ip=209.85.222.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+	s=arc-20240116; t=1789867997; c=relaxed/simple;
+	bh=5zpZpGxLh4Xc825xkk+RerisAKufOfgMDCrJS5lXFnQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mqMbx2P5w6gnvgi798WVi1RFvb0e4czw08CfETlWNktIEusLLEBM2qz89r66i/Ox0tkI2MnMIjkDfWi63tO3HDqDZZEKVk7O9MCYAcaRbgMWZDS3r+ZP6rTt2//wakF5e3sld2mMnNzBKNDKK1fiXoFh+cnnPqPVrr5Fi90ZL7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=SOZeGbHp; arc=none smtp.client-ip=115.124.30.119
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="PAIIwRAV"
-Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-93bfa610b7eso24840885a.0
-        for <kvmarm@lists.linux.dev>; Sat, 19 Sep 2026 14:35:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1789853734; x=1790458534; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=kmW9yHmD8Dyy4s5qckAMeYd2CA7UfeC/px2jAWNVXJs=;
-        b=PAIIwRAVAe/WOVLevVuGYmY8odDwwmClsabEE1TRoPCyBQVTkftWVtryVD6Rq4PB5b
-         JuYT0Kbw8Y+F4I5/lknGcqUqWFNKTFOqg6viUlUbqd9NNFpUf3G32ejGnHj2hwYXyI87
-         yev3NlHmIFZc6shHVWsGR32tdAfqmB+zZYdq8RFHfAvJZak79eZqw/O6Zf6lL7/ECtJx
-         6Upaa3DgBuS6jtsiTb0hXTXsnmH6UmADpQlapn0YE+Y3lZ9SzSQVDph5f8dzTTVSOXz0
-         ZEBQqxoFeBLTTmwoGfLEn5wlE1HNv54u23UGsJgJ9HmPD9Owad1jGFGmLwmjQPIUO96Y
-         TrDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789853734; x=1790458534;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=kmW9yHmD8Dyy4s5qckAMeYd2CA7UfeC/px2jAWNVXJs=;
-        b=mqMXv32mKJrMdRkbGNWm5orF9MFP25bwisBDi/69yBZjD2gRSav4vI1zDUDhSCWQVQ
-         Yc0LQBjXnkblO34jYNgAkmX5EwHTXBJZHHUl+k9FWMytzUBn06x1ItBsLZG7iPEsCW/W
-         wv3nL1PlRQlmptdxjwmlFKkr2K4Bnu2OE4MGzWcQkbn8vq3XyoZc9liFCj15YQ7+w80w
-         bTTqiSuQ9I/ipNmZG4vbpweHgFAr2sDsC6zYOww4gzo1F9ggaSQPd6UtRWs0NwIPi5p1
-         gPulTvJp1cey48BbjTlP7wnKMiH+n0miz1T/9TO/B39cgOXqb9fD9QCMOiGrtotv+ulg
-         yEBA==
-X-Forwarded-Encrypted: i=1; AKwUvByV3YYatE0ZRHjwBFdsgq/YfLIpQjvCfJJddq3LTMvSCOcEFEcEsp/kbmsPAvVHNlb7yFxL2H0=@lists.linux.dev
-X-Gm-Message-State: AFuF++mhqGOauuZhdq05smWinOPhjbTRPxuEtNWrFSRF2Vd35onhPDIy
-	m2VnduEXjPU5RGAD5I4s3YaJvKA12Snu2NDa425L78uzdUd6i3lolj455+liiuUe+k0=
-X-Gm-Gg: AYBFou1QksoT5ljiX6p1BIxmyhZBjl5vbUzgjA3ozGDmQSt1c0+Grzhn1B12hwohDlk
-	OiFEQEqkK65lZ6Ljtsh0FSMHDomUYVbdfSAQjCzv/jhf11L53j1euh3Zje9pRdDM5JtHb7c47Ia
-	wj0eXW6Ive3yMHgUHevvn5kE08fs5AJE7uGt8Bj5/ZKq4nLtrZ0kXYX3PttPybe8mblDk9237Xk
-	kPNvQWD2T+tBIz0ObyB0YUMXyuctLpypFGcW3FIQSKmXKQRAnAmfLPPWPZ+mJlcgV3STVRv8mJW
-	AFb6tuiOnXl5E8+dsoINC33x+o+yXjI4Q24QCgvwhkkkJVSYNix70/S6tNSObJBsXskLwuD96Kj
-	AbIIeFUWin/ZoPPVyhnrcsUV7m6y8psjWjZ9XteZBTvEmadnV67n1OSXweJiJnSvnnfz579PrY6
-	1eOoZgFhoCGwTB78/PjGFP2PvSVlOkqo6+o1pNXS3MGXkeVzcpT4wlO1pbbiZUaHGdCXUPE85As
-	3Cwo2gYv1MvfkhGf+Z1roQRl0s1nvEBKUoMxkyEzQCvz3abQVFHVYOF
-X-Received: by 2002:a05:620a:4416:b0:939:fe55:402a with SMTP id af79cd13be357-93bf577e246mr341980385a.31.1789853733973;
-        Sat, 19 Sep 2026 14:35:33 -0700 (PDT)
-Received: from ziepe.ca (hlfxns010zw-159-2-239-150.pppoe-dynamic.high-speed.ns.bellaliant.net. [159.2.239.150])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-93bed72215fsm275561085a.1.2026.09.19.14.35.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 19 Sep 2026 14:35:32 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1x82iZ-00000003aXY-2gnK;
-	Sat, 19 Sep 2026 18:35:31 -0300
-Date: Sat, 19 Sep 2026 18:35:31 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>
-Cc: Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	iommu@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Thomas Gleixner <tglx@kernel.org>, Will Deacon <will@kernel.org>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	"T.J. Mercier" <tjmercier@google.com>
-Subject: Re: [PATCH v6 7/9] dma-buf: system_heap: Enforce shared-granule
- alignment for cc-shared buffers
-Message-ID: <20260919213531.GI11599@ziepe.ca>
-References: <aq1V3oeDdvXobt8J@arm.com>
- <97c30fce-9bda-4c61-b1b9-10297b89c8d9@amd.com>
- <20260918153642.GD11599@ziepe.ca>
- <yq5atsnl47c6.fsf@kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="SOZeGbHp"
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1789867992; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=WpODz2I1SYGcsUWYzvIvLHX+tQtY3cfA1JpYBgPLg5s=;
+	b=SOZeGbHpm68jLD+ehQ8WyUrD46mlNedg+OR9Hgil7RRHYN6evDofWk6YrvqfVfU7ZWMuvZ4oll6nILe+F8nmFV/M3MxiyMU5oKbNVl1ilrqJwi2JTG4HKiujeX6lAt0QwsyaSIRhToNr9bVxFJ4ZbCsNgDrTho47aIBNotEyNNw=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033032089153;MF=xueshuai@linux.alibaba.com;NM=1;PH=DS;RN=17;SR=0;TI=SMTPD_---0XBEinmW_1789867989;
+Received: from 30.246.177.75(mailfrom:xueshuai@linux.alibaba.com fp:SMTPD_---0XBEinmW_1789867989 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Sun, 20 Sep 2026 09:33:10 +0800
+Message-ID: <b3da18cc-78b2-45cf-9ea8-ce867c631834@linux.alibaba.com>
+Date: Sun, 20 Sep 2026 09:33:08 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <yq5atsnl47c6.fsf@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 0/7] KVM: arm64: nv: Implement nested stage-2 reverse
+ map
+To: Wei-Lin Chang <weilin.chang@arm.com>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ linux-kernel@vger.kernel.org
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+ Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
+ Steffen Eiden <seiden@linux.ibm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ Itaru Kitayama <itaru.kitayama@fujitsu.com>,
+ Wang Han <wanghan@linux.alibaba.com>, "Lorenzo Stoakes (ARM)"
+ <ljs@kernel.org>
+References: <20260915154305.3852871-1-weilin.chang@arm.com>
+From: Shuai Xue <xueshuai@linux.alibaba.com>
+In-Reply-To: <20260915154305.3852871-1-weilin.chang@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sat, Sep 19, 2026 at 08:27:29PM +0530, Aneesh Kumar K.V wrote:
- 
-> +static struct page *system_heap_alloc_order(unsigned int order, gfp_t flags,
-> +					    bool cc_shared)
-> +{
-> +	struct cc_shared_pages mem;
-> +
-> +	if (!cc_shared)
-> +		return alloc_pages(flags, order);
-> +
-> +	/* The shared granule can raise the actual allocation order. */
-> +	flags |= __GFP_COMP;
-> +	if (alloc_cc_shared_pages(flags, PAGE_SIZE << order, &mem))
-> +		return NULL;
 
-Oh yeah that's surprisingly easy because of how this loop works with
-order
 
-Makes sense to me
+On 9/15/26 11:42 PM, Wei-Lin Chang wrote:
+> Hi,
+> 
+> This is v6 of optimizing the shadow s2 mmu unmapping during MMU
+> notifiers.
+> 
+> This version fixes a few issues, and adds Marc's space optimization
+> for kvm_guest_s2_mapping [1]. Please see the changelog for the details.
+> 
+> Tested by booting L3, and running in-kernel targetted tests described
+> in [2]. v5 got some tested-by's from Itaru and Wang (thanks), I didn't
+> carry them over since some bugs fixed in v6 are non-obvious. Some
+> retest would be much appreciated!
+> 
+> Series based on v7.3-rc3 + Marc's nested mmu lifecycle fixes [3].
+>
 
-> int alloc_cc_shared_pages_node(int nid, gfp_t gfp, size_t requested,
-> 			       struct cc_shared_pages *mem)
+Hi Wei-Lin,
 
-This argument order is a little weird from mm norms?
+Thanks for the updated series.
 
-Jason
+I tested all seven patches on top of v7.3-rc3 with Marc's two
+nested MMU lifetime fixes, using the L1 boot workload that previously
+triggered soft lockups during host NUMA migration.
+
+The setup was:
+   - ARM64 host with nested virtualization enabled
+   - Automatic NUMA balancing enabled, with numad running
+   - QEMU 10.2.3, virtualization=on
+   - Ubuntu 26.04 L1 guest, 8 vCPUs and 32 GiB RAM
+
+Each trial used a fresh overlay backed by the same read-only golden
+image. I ran 15 boot trials, observing each for at least 600 seconds.
+
+   Result                         Count
+   -----------------------------  -----
+   Trials reaching guest login    15/15
+   Trials with guest soft lockups   0/15
+   Guest RCU stalls                   0
+   Host hung-task reports             0
+   Host soft lockups                  0
+
+Tracing confirmed that host page migration and the reverse-map
+recording path were exercised. I did not reproduce the original
+soft lockup in this batch.
+
+For the series:
+
+Tested-by: Shuai Xue <xueshuai@linux.alibaba.com>
+
+Thanks,
+Shuai
