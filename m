@@ -1,153 +1,214 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B498A35C691;
-	Sun, 20 Sep 2026 22:24:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A7A9381E85;
+	Sun, 20 Sep 2026 23:44:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789943069; cv=none; b=m0HjCOeROS5803Uj7rzXEATVz4S3UBk/6a9na98gWkxUwODFW782wHeQJym7QftdrLxCp7xe1C0QQmuvGJ3Or1LjOhVDhGwDIW/CVoTDKu7nMKFzhbDmOd8SYKtGdJVJ7hc1IdlN7zP9LQKmEOrBd5mMtW25tszzAV2+k9ZEMak=
+	t=1789947861; cv=none; b=GIh+Lx1Ks3qm1ik46Ewrhl0+2tddjAo536o9xUliG+ddFZxgRZOp90vb93M5dDwDRrQaQ8qpsFhwgyD1P2cL7mIxDx1Dg8DnHV0fjzg32Ti5fOO/7aDShzSD1FxUFBU9ioeK6peCdR2QRDdM/jWQP6Dsos0UX0Ucrt/3VrP6OZ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789943069; c=relaxed/simple;
-	bh=1ZS7e05FbYh7KMoROmspJnYoQ1J9lqld6iIIZSlFfwA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Nsmi5/dzvmlxaq4IVNq6hrPJxQKNsn8RhBlat0ouxdRQUOoxYmSu2u/zsnhz1BeVNRH25DX7bf7IZy3aaxOv9IOEKn4FceoLooaEJH9V5PlRKzq5ZMhLHyKkXQhq1b8+EG7zJQuQ38BpqYcCyGbwUvoIKN3CN1b7WrwOuQjFw/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=MGtCYWsS; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1789947861; c=relaxed/simple;
+	bh=NczCZCvelbh2DiKWBvhDsS1eAyJzODmxOyVI0w6rl+g=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hXhnXvD4Mx5JPk26mZS6eJAjfc3BXz8fW3qDFJ8afcj3LSMnmtN6WpybJUxQBKwetB2XsB2Ukzo7CxMqhRq+N/G+5XI9RXViciX7r8EM78miqIWS4TtaJje7IICJApZYkL+cTMIOhloILJq3Lh/+fgWLfLkZqOcrn4NB/I0RgXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M4GDNNnT; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="MGtCYWsS"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 706431596;
-	Sun, 20 Sep 2026 15:24:23 -0700 (PDT)
-Received: from [10.57.7.79] (unknown [10.57.7.79])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3ED8D3F86F;
-	Sun, 20 Sep 2026 15:24:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1789943067; bh=1ZS7e05FbYh7KMoROmspJnYoQ1J9lqld6iIIZSlFfwA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=MGtCYWsSEdW8LBPB3kQPNubq15/L2DS0DwwFbRepXaYcbkQjWvsY+9LAFT7/4yRNP
-	 DA3n68lXTvTunOwr+Sw+y3zrA7VmnvRKVD1lft5QAKaGuYoxO2zzNn3z8iLLY4rPVn
-	 2Rmqe5o110+HerOEaoHXN8+FTjg89BdrvnS9cSPo=
-Message-ID: <a955032c-3e49-4b51-bf93-dd9718bed16a@arm.com>
-Date: Sun, 20 Sep 2026 23:24:24 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M4GDNNnT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3CAA1F000FF;
+	Sun, 20 Sep 2026 23:44:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789947859;
+	bh=X9HLtWrXaOTuUK+nG2yl6QFGEein9ygVixc0w+5swe0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=M4GDNNnTeF5eGGFDFDotg0zFmQTUNCrL988FwACg40unjM0j9Az3bajlBxb48L60L
+	 ESNIR5NWBxQoLvKhHcs559vXOWPV3OK73MOP4WTYkausKddbPOG5dh2EEqwWnledTt
+	 g2E4kGV/5eiYI2cl2rnjlxmDfXQD9FcEiQJpriv/zcEybGZ1/osZdcugdJdoUlkLtA
+	 fmZKAHLF4cWnCIVsL7CGpAc9OhHP9TNhUbiLAVqv6Lnb9QBzpS2r2moWK3aCZkGXwD
+	 uIM118aeqGROwpbrZe2OUJpL9FrCMPLvlrw3+GeRuTKsHJGyxNBswClNyAwqwRD4j+
+	 e/BhBwVvkOa2w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1x8RCj-0000000BIz4-0GnL;
+	Sun, 20 Sep 2026 23:44:17 +0000
+Date: Mon, 21 Sep 2026 00:47:20 +0100
+Message-ID: <87bj9r4h9z.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Yuchao Zhang <ndaugoing@gmail.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Fuad Tabba <tabba@google.com>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 0/1] KVM: arm64: vgic: Drop last_lr_irq and serialize overflow EOI replay
+In-Reply-To: <20260920014911.58616-1-ndaugoing@gmail.com>
+References: <20260918040214.85580-1-ndaugoing@gmail.com>
+	<20260920014911.58616-1-ndaugoing@gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v19 02/20] KVM: arm64: Disable Steal time accounting for
- protected guests
-Content-Language: en-GB
-To: sashiko-reviews@lists.linux.dev
-Cc: kvm@vger.kernel.org, Oliver Upton <oupton@kernel.org>,
- Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev
-References: <20260920212845.707-1-suzuki.poulose@arm.com>
- <20260920212845.707-3-suzuki.poulose@arm.com>
- <20260920214421.D84B81F000FF@smtp.kernel.org>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20260920214421.D84B81F000FF@smtp.kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ndaugoing@gmail.com, oliver.upton@linux.dev, tabba@google.com, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 20/09/2026 22:44, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> - [Medium] arm64: kvm: contradictory SMCCC advertisement for PV_TIME on protected VMs
-> --
+On Sun, 20 Sep 2026 02:49:10 +0100,
+Yuchao Zhang <ndaugoing@gmail.com> wrote:
 > 
-> commit db2c057e4ceefd58162587d4fd417788a4db3dbc
-> Author: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Hi Marc, Oliver, Fuad, and KVM/arm64 maintainers,
 > 
->      KVM: arm64: Disable Steal time accounting for protected guests
->      
->      PVTIME support is advertised by KVM_CAP_STEAL_TIME, which doesn't take into
->      account the kvm instance. Even with that, a VMM could skip the CAP check
->      and proceed to configure the PVTIME as we don't do further check on the
->      DEVICE_CTRL. Tighten this up by passing the KVM instance around wherever
->      possible and catch things early.
+> Following up on the discussion around the remote LPI disable vs LR fold
+> race [1], this series addresses the issue at its root: the last_lr_irq
+> cursor introduced in commit 6da5e537f5af ("KVM: arm64: vgic: Pick EOIcount
+> deactivations from AP-list tail").
 > 
->> diff --git a/arch/arm64/kvm/pvtime.c b/arch/arm64/kvm/pvtime.c
->> index 4ceabaa4c30bd..579e0a4720ad2 100644
->> --- a/arch/arm64/kvm/pvtime.c
->> +++ b/arch/arm64/kvm/pvtime.c
->> @@ -67,9 +67,9 @@ gpa_t kvm_init_stolen_time(struct kvm_vcpu *vcpu)
->>   	return base;
->>   }
->>   
->> -bool kvm_arm_pvtime_supported(void)
->> +bool kvm_arm_pvtime_supported(struct kvm *kvm)
->>   {
->> -	return !!sched_info_on();
->> +	return !!sched_info_on() && (!kvm || !kvm_vm_is_protected(kvm));
->>   }
-> 
-> [Severity: Medium]
-> Does this create a contradictory SMCCC advertisement for protected VMs?
-> 
-> A protected guest querying ARM_SMCCC_ARCH_FEATURES_FUNC_ID for
-> ARM_SMCCC_HV_PV_TIME_FEATURES in kvm_smccc_call_handler() will receive
-> SMCCC_RET_SUCCESS because the KVM_REG_ARM_STD_HYP_BIT_PV_TIME bit is
-> still set in std_hyp_bmap:
+> Problem:
+> vgic_v3_fold_lr_state() / vgic_v2_fold_lr_state() walk the overflow tail
+> of the ap_list starting from *host_data_ptr(last_lr_irq) without holding
+> ap_list_lock. Caching this raw pointer across the entire guest execution
+> leaves it vulnerable to concurrent modification: when a remote vCPU
+> disables LPIs via GICR_CTLR, vgic_flush_pending_lpis() unlinks the node
+> with list_del() and drops its reference, leaving last_lr_irq pointing to
+> a poisoned or freed object. When the vCPU exits, the walk dereferences
+> corrupted memory, causing a kernel panic or UAF.
 
-This looks like an existing issue in the code. I have something
-like this to fix this :
-
-diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-index b11b8821c9fbc..6fabcd8aaacb9 100644
---- a/arch/arm64/kvm/hypercalls.c
-+++ b/arch/arm64/kvm/hypercalls.c
-@@ -402,6 +402,9 @@ void kvm_arm_init_hypercalls(struct kvm *kvm)
-
-         smccc_feat->std_bmap = KVM_ARM_SMCCC_STD_FEATURES;
-         smccc_feat->std_hyp_bmap = KVM_ARM_SMCCC_STD_HYP_FEATURES;
-+       /* Clear PV_TIME support for protected VMs */
-+       if (kvm_vm_is_protected(kvm))
-+               clear_bit(KVM_REG_ARM_STD_HYP_BIT_PV_TIME, 
-&smccc_feat->std_hyp_bmap);
-         smccc_feat->vendor_hyp_bmap = KVM_ARM_SMCCC_VENDOR_HYP_FEATURES;
-
-         mt_init(&kvm->arch.smccc_filter);
-@@ -532,6 +535,9 @@ static int kvm_arm_set_fw_reg_bmap(struct kvm_vcpu 
-*vcpu, u64 reg_id, u64 val)
-         case KVM_REG_ARM_STD_HYP_BMAP:
-                 fw_reg_bmap = &smccc_feat->std_hyp_bmap;
-                 fw_reg_features = KVM_ARM_SMCCC_STD_HYP_FEATURES;
-+               /* PV_TIME is not supported for protected VMs */
-+               if (vcpu_is_protected(vcpu))
-+                       clear_bit(KVM_REG_ARM_STD_HYP_BIT_PV_TIME, 
-&fw_reg_features);
-                 break;
-         case KVM_REG_ARM_VENDOR_HYP_BMAP:
-                 fw_reg_bmap = &smccc_feat->vendor_hyp_bmap;
-
-Suzuki
+Why can't this be solved by simply taking a reference on the object
+pointed to by last_lr_irq?
 
 > 
-> arch/arm64/kvm/hypercalls.c:kvm_smccc_call_handler() {
-> 	...
-> 	case ARM_SMCCC_HV_PV_TIME_FEATURES:
-> 		if (test_bit(KVM_REG_ARM_STD_HYP_BIT_PV_TIME,
-> 			     &smccc_feat->std_hyp_bmap))
-> 			val[0] = SMCCC_RET_SUCCESS;
-> 		break;
-> 	...
-> }
-> 
-> However, when the guest actually invokes the feature,
-> kvm_hypercall_pv_features() returns SMCCC_RET_NOT_SUPPORTED because
-> the IPA is unconfigured:
-> 
-> arch/arm64/kvm/pvtime.c:kvm_hypercall_pv_features() {
-> 	...
-> 	case ARM_SMCCC_HV_PV_TIME_FEATURES:
-> 	case ARM_SMCCC_HV_PV_TIME_ST:
-> 		if (vcpu->arch.steal.base != INVALID_GPA)
-> 			val = SMCCC_RET_SUCCESS;
-> 		break;
-> 	...
-> }
-> 
-> This violates the SMCCC ABI by advertising ARM_SMCCC_HV_PV_TIME_FEATURES
-> as supported but returning NOT_SUPPORTED when it is invoked. Should the
-> KVM_REG_ARM_STD_HYP_BIT_PV_TIME bit be cleared for protected VMs?
-> 
+> Oliver and Marc suggested taking ap_list_lock in
+> vgic_v3_fold_lr_state() [2][3]. I tried that approach first, but it
+> runs into the following lock-order problems:
+> 1. kvm_notify_acked_irq() grabs regular spinlocks and can re-enter
+>    vgic_queue_irq_unlock() (which takes ap_list_lock), causing deadlock.
+> 2. vgic_put_irq() is a no-op for SPI/PPI, but for LPIs it calls
+>    refcount_dec_and_lock_irqsave() which acquires dist->lpi_xa.xa_lock
+>    when dropping the last reference. That lock sits above ap_list_lock
+>    in the lock ordering, so calling vgic_put_irq() under ap_list_lock
+>    causes lock inversion.
 
+Which is why we have vgic_put_irq_norelease() and
+vgic_release_deleted_lpis(), which allow deferring the release until
+we're in a suitable context. But that's beside the point.
+
+> Addressing these under a global fold lock requires deferring all EOI'ed
+> SPI notifications to a stack bitmap and deferring LPI releases with
+
+Which stack bitmap?
+
+> vgic_put_irq_norelease(), penalizing the fast path for all exits even
+> though folding hardware LRs does not touch ap_list at all. It also still
+> requires pinning and clearing the per-CPU last_lr_irq pointer.
+
+An uncontended atomic access is hardly an overhead, is it? Where is
+the overhead? And I don't understand what you're saying about the LRs
+not affecting the ap_list... They *always* do.
+
+> 
+> Changes since v2:
+> - Replaced the skip-unlink approach of v2 with dropping the last_lr_irq
+>   cursor entirely and serializing only the overflow EOI replay under
+>   ap_list_lock (per Oliver and Marc's suggestion [2][3]).
+> 
+> The cleaner approach in this patch:
+> 1. Drop the fragile last_lr_irq per-CPU cursor entirely.
+> 2. The common fast path (folding hardware LRs) runs natively without
+>    ap_list_lock. We record the INTIDs of the used LRs in a small stack
+>    array (VGIC_V3_MAX_LRS / VGIC_V2_MAX_LRS entries).
+
+Why is v2 even under consideration? LPIs are strictly v3 (ignoring
+v5 here), and non-LPIs are statically allocated, meaning they can't
+vanish under your feet.
+
+> 3. If eoicount == 0 (the vast majority of guest exits), clear
+>    cpuif->used_lrs = 0 and return immediately without taking ap_list_lock.
+> 4. If unlikely(eoicount > 0), acquire ap_list_lock only to scan the ap_list
+>    and pin (via vgic_get_irq_ref) up to eoicount active interrupts that
+>    were not in hardware LRs. The scan is a linear walk over at most 16/64
+>    LR INTIDs per candidate, on the rare eoicount > 0 path - bounded and
+
+What makes you think this is acceptable? It really isn't. The point is
+that this is not limited to 16 entries. That's the whole point of
+EOIcount, which spans up to 31 simultaneously active priorities.
+
+I have no idea what you describe is achieving, TBH. And looking at the
+patch, I see a quadratic behaviour, which doesn't strike me as low
+overhead...
+
+>    acceptable. lr_intids[] only records INTIDs from the used_lrs range;
+>    the extraction mask mirrors vgic_fold_lr() exactly
+>    (ICH_LR_VIRTUAL_ID_MASK for GICv3, GICH_LR_VIRTUALID for GICv2),
+>    so no stale or invalid slot can produce a false match.
+> 5. Drop ap_list_lock immediately, and then replay their deactivations
+>    outside the lock, naturally eliminating both eventfd re-entrancy and
+>    lpi_xa lock inversions without changing any function signatures.
+>    vgic_fold_lr() has no error path, so cpuif->used_lrs = 0 is always
+>    reached after a complete fold, with no risk of partial cleanup.
+> 
+> Note on EOIcount hardware limits:
+> ICH_HCR_EL2.EOIcount (GICv3) and GICH_HCR.EOICount (GICv2) are both
+> 5-bit fields, giving a maximum value of 31. The targets[32] stack array
+> and min_t(u32, eoicount, ARRAY_SIZE(targets)) bound together ensure no
+> overflow even if hardware writes an unexpected value.
+> 
+> Note on EOIcount source:
+> For GICv3, eoicount is read from cpuif->vgic_hcr, which is populated by
+> __vgic_v3_save_state right before ICH_HCR_EL2 is cleared in hardware.
+> For GICv2, vgic_v2_save_state reads GICH_HCR via MMIO into the same
+> cpuif->vgic_hcr field (when LRENPIE is set) before writing 0 to GICH_HCR.
+> In both cases the software copy is the only valid source; reading the
+> hardware register after save would return 0.
+> 
+> Note on scope:
+> This series fixes the use-after-free in the ap_list traversal caused by
+> last_lr_irq. It does not address the separate concern raised by Oliver
+> in [2] about a pending LPI still sitting in an LR when RWP=0 becomes
+> visible to another vCPU; that may require a stronger approach (e.g.
+> halting the VM) and I am happy to follow up separately.
+
+This has all the hallmarks of an AI gone wild.
+
+The problem is correctly described (last_lr_irq doesn't hold a
+reference on the irq), but the proposed solution is completely
+ignoring it, and implements... something else.
+
+I've hacked something at [1], which:
+
+- changes the behaviour of last_lr_irq to only be non-NULL when the
+  LRs are full.
+
+- take a reference on the irq flagged as last_lr_irq, and drop this
+  reference in vgic_prune_ap_list(), contributing to the LPIs being
+  freed once the ap_list_lock is dropped.
+
+- stop the world when a vcpu disable LPIs. We could do slightly
+  better, but it isn't worth the hassle for something that *never*
+  happens.
+
+I only boot tested a small nested guest (L1 + L2) with lockdep on my
+laptop, and nothing caught fire. Please give it a go.
+
+You also seem to have a reproducer for this, it'd be good if you could
+turn it into a selftest.
+
+Thanks,
+
+	M.
+
+[1] https://web.git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/vgic-last_lr_irq-fixes
+
+-- 
+Jazz isn't dead. It just smells funny.
