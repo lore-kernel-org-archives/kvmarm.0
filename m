@@ -1,155 +1,118 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A44624A3F1D
-	for <kvmarm@lists.linux.dev>; Mon, 21 Sep 2026 14:15:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAC9A310645;
+	Mon, 21 Sep 2026 14:17:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790000152; cv=none; b=Ty4KX4Fc8JHBcFFa/qaLhD3KxwT2kUFqlRqALhK4/yf1WMS2vD0pyQcgV1hmpU7osTT+BVBoLkaxtLbv2SY/YYmzo1s9fnukbW58H3pxtHFy1kizm8C7utSTPMwiI5qQbxMUPQ2baDXQ11rVCYNc3AiD71SVApMew6vwcrEWHPY=
+	t=1790000223; cv=none; b=t8z0GV/wfEHTWpH7Im6YwPXKo56+ZrRxB1Er053UvIylTIkVsBQQc6a2UetcVzQrE5TyKGNY8IgcFEzTY+noUqWT7E2jlqbH8+qoGA9KfAAN3N0oHLHfhSGZY7RMmlUTSigpjRolnkj4ozN2kehuy+Q/1seZ9aZrZhkTfkouo9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790000152; c=relaxed/simple;
-	bh=GFF0q4XjecnXvt26SXMCNpoTC+BgSNXJBJ9ZFMXMeO4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=AyvQjLyfoj+cvoiCWKWXAxmaQiDHWf0EsWZ6gc0eGfp66lqyIejdG/jyEx2PhZmxeQ5W/VqigtQkp+BsBME09hPQr6pmzRlUjsfWz0/6rn5G1ZMfvUyfkjKEpM4dX4Q+3m+E3Irl69slHRRc9CS2uhUjy12M3rE3wS9inlAn9fw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=nJ1MVoEu; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1790000223; c=relaxed/simple;
+	bh=2qq8KfM2YOSpp0BCA0r02D0yFEX0yj1ZCE2mOf/9jU8=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=Dvsnsa7tSiUGP7qrNC9KEkbhzekSkUgFJkJhZUy4RDKn/HeW0wjGQu/GUX1CsTExsXHr5l3o5rIJw3Tr4+n9oe3SeVCQ/CQT08U+tpSsBo/vgDdRpYLpZ7LJCjtVSxIZvbcOUfxjQXqMRCC8utXA73VqaMDu/ngWt50T/aSLE1c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QBfd496z; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="nJ1MVoEu"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 84FB819F0;
-	Mon, 21 Sep 2026 07:15:45 -0700 (PDT)
-Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 144EF3F86C;
-	Mon, 21 Sep 2026 07:15:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1790000149; bh=GFF0q4XjecnXvt26SXMCNpoTC+BgSNXJBJ9ZFMXMeO4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=nJ1MVoEuIS2S2b3v4/MsCYgyL3+L2ycb3tuEcEo4wIdwkIxtUqibdbHbl0md3gOCh
-	 3PyPr7xV34llOnb87+K4KMB0JoLyNNke5iONl/pyL2ruV30zfjjnm1GsPfscv3Pxeu
-	 QqOiQ4/zuG+aHIQBG4xBv2zHFfN8u6UEEBIRa7Ac=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Tian Zheng <zhengtian10@huawei.com>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 1/5] KVM: arm64: pgtables: Change write bit from S2AP_W to DBM
-Date: Mon, 21 Sep 2026 15:15:44 +0100
-Message-ID: <arE8EOPh1-NWtFIU@LeoBrasDK>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <eb629070-a02f-426a-92ee-b2c8f9e2aa9a@huawei.com>
-References: <20260901171558.2674031-1-leo.bras@arm.com> <20260901171558.2674031-2-leo.bras@arm.com> <86bja17cg7.wl-maz@kernel.org> <aql8jY4o8SzjJuFU@LeoBrasDK> <aqnku2TcFzIKhjQl@kernel.org> <aqp73SxO78o7LJTs@LeoBrasDK> <eb629070-a02f-426a-92ee-b2c8f9e2aa9a@huawei.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QBfd496z"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33CFD1F000FF;
+	Mon, 21 Sep 2026 14:17:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790000221;
+	bh=JVtOhCEnFF4VMLoP4FDqz9BM7LYVVOhqz0dAz47yYnM=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=QBfd496z8brZlJiAq6yr49Fz4QaVh5Qg03HGrh16xJAtRh+HIlk9l6PDEhrkG65dI
+	 ekltsVd/Z4vbRFTGL02WUqDhwx5320Ni2bbK8B2KqQtYRDtEdyYNLpkZ7D4yg+BRLF
+	 tMuZMQTIsY9F8gCBCD2z+LpDN7PXLVlREPUbD1SmfXA8tL2JC598bSyDW0Sqw50TVE
+	 FhC+lit9CAR09D+jGg4onNf3MBXblWUQxF2652xGdtdYA/ygNyGOjUTl0/FYkzF+Oo
+	 eA9MabTRscmD+43/IjWikviUV+7nL/U0yVRQSnlrfuYMuum6mwf6wYNu4haQh2o6IK
+	 1YzSfFUMX9Yhg==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH 3/3] KVM: arm64: selftests: Test a timer set past the
+ counter's wrap
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Fuad Tabba" <fuad.tabba@linux.dev>
+Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+In-Reply-To: <20260921140427.2211373-4-fuad.tabba@linux.dev>
+References: <20260921140427.2211373-1-fuad.tabba@linux.dev>
+ <20260921140427.2211373-4-fuad.tabba@linux.dev>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 21 Sep 2026 14:17:00 +0000
+Message-Id: <20260921141701.33CFD1F000FF@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
 
-On Fri, Sep 18, 2026 at 05:39:17PM +0800, Tian Zheng wrote:
-> 
-> 
-> On 9/16/2026 7:22 PM, Leonardo Bras wrote:
-> > On Tue, Sep 15, 2026 at 05:37:15PM -0700, Oliver Upton wrote:
-> > > On Tue, Sep 15, 2026 at 06:12:45PM +0100, Leonardo Bras wrote:
-> > > > > Yes, the HW should ignore it. But we have also
-> > > > > seen quite a few broken designs in this area...
-> > > > > 
-> > > > 
-> > > > I lack experience on what bad thing could happen. So I will expand on what
-> > > > I belive to understand up to here:
-> > > > 
-> > > > - The PTE is in memory, so the DBM bit can be set regardless of being RES0
-> > > > - For SW pagetable walking, I don't think 'bit 51 == 0' is checked
-> > > > - For HW pagetable walking, maybe some faulty implementation may rely on
-> > > >    bit51 being RES0, and fault otherwise.
-> > > > 
-> > > > If that's the case, then we would have to actually support both encodings,
-> > > > and only enable the new one if HAFDBS is available in the system.
-> > > > 
-> > > > I just wonder how high are the chances to have such a broken design,
-> > > > or other broken designs did not come to my mind, and if we have to start
-> > > > with that multiple-encoding option.
-> > > 
-> > > FWIW, the host stage-1 already uses the DBM bit unconditionally,
-> > > treating it as a software bit on implementations without HAFDBS.
-> > > Although given the quality of any garden variety Arm MMU I understand
-> > > where Marc is coming from.
-> > > 
-> > > I don't think the HAFDBS enablement is complicated enough to be done in
-> > > a separate series without any meaningful users, nor would I really be
-> > > interested in taking it without, say, HDBSS.
-> > > 
-> > > Can you please work with Tian to get a combined series out for this?
-> > > 
-> > 
-> > Hi Oliver, thanks for reviewing!
-> > 
-> > Sure, one of the reasons I sent like this is so Tian could use it as a base
-> > for his next version.
-> > 
-> > 
-> 
-> Hi Oliver, Leo,
-> 
-> Works for us. I plan to send HDBSS v5 maybe next week with this series
-> merged in. Both dirty-tracking consumers are already built on top of the
-> DBM approach: dirty ring and dirty bitmap.
-> 
-> Leo, with your blessing, I'd like to pick patches 1-4 into the HDBSS
-> tree with your Signed-off-by preserved and mine added on top, plus some
-> bug fixes on top of this RFC series.
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [Medium] selftests: flaky test due to scheduling delay in test_timers_pas=
+t_counter_wrap
+--
 
-Yeah, no problem on my side. I would just observe the maintainers' comments 
-on those before merging them.
+commit 8788b1ebd8d97a89915e8766ef7a7c75ad83b3c9
+Author: Fuad Tabba <fuad.tabba@linux.dev>
 
-> 
-> For patch 5, I'd like to rework it into a derived hardware dirty mode
-> that replaces both kvm_set_hafdbs() and our earlier HDBSS enable/disable
-> hooks, so the whole thing lands as one series.
-> 
+KVM: arm64: selftests: Test a timer set past the counter's wrap
 
-My intention when I wrote that patch was to add a base so you could add 
-HDBSS on kvm_arch_commit_memory_region() with new patch such as:
+This commit adds a KVM selftest to verify timer behavior when programmed
+with a cval past the counter's wrap point. It programs an unmasked timer
+and tests that no unexpected interrupts fire since the guest's counter
+cannot realistically reach the deadline.
 
-	/* Disable HAFDBS when dirty-logging starts */
-	if (kvm_supports_hafdbs(kvm))
-		kvm_set_hafdbs(kvm, 0);
-+	else
-+		kvm_enable_hdbss(kvm);
-...
+> diff --git a/tools/testing/selftests/kvm/arm64/arch_timer_edge_cases.c b/=
+tools/testing/selftests/kvm/arm64/arch_timer_edge_cases.c
+> index d9c9377a63256..69986a7f0d37d 100644
+> --- a/tools/testing/selftests/kvm/arm64/arch_timer_edge_cases.c
+> +++ b/tools/testing/selftests/kvm/arm64/arch_timer_edge_cases.c
 
-	/* If dirty-logging was canceled, set HAFDBS back on */
-	if (kvm_supports_hafdbs(kvm) &&
-	    atomic_read(&kvm->nr_memslots_dirty_logging) == 0)
-		kvm_set_hafdbs(kvm, 1);
-+	else
-+		kvm_disable_hdbss(kvm);
+[ ... ]
 
+> +/*
+> + * With the counter at wait_ms, a tval of -(wait_ms + long_wait_ms) puts=
+ cval
+> + * within long_wait_ms of the counter's wrap: a deadline further away th=
+an the
+> + * counter can reach. Unmasked, so an early ISTATUS shows up as an IRQ.
+> + */
+> +static void test_timers_past_counter_wrap(enum arch_timer timer)
+> +{
+> +	s32 tval =3D -(s32)msec_to_cycles(test_args.wait_ms + test_args.long_wa=
+it_ms);
+> +	int i;
+> +
+> +	for (i =3D 0; i < ARRAY_SIZE(sleep_method); i++) {
+> +		sleep_method_t sm =3D sleep_method[i];
+> +
+> +		local_irq_disable();
+> +		set_counter(timer, msec_to_cycles(test_args.wait_ms));
+> +		set_tval_irq(timer, tval, CTL_ENABLE);
 
-That being said, I need to run tests to make sure the usage of HAFDBS 
-outside of dirty_tracking makes any sense in terms of performance, but if 
-that's not the case, it would be fine to rework it so it does not 
-enable/disable HAFDBS there.
+[Severity: Medium]
+Could this sequence lead to a flaky test on a loaded host system?
 
-> Performance looks good in both dirty ring and dirty bitmap scenarios so
-> far.
-> 
+If a host scheduling delay exceeds long_wait_ms between setting the counter
+and writing the TVAL, the guest's CNT can advance such that:
+CNT > wait_ms + long_wait_ms
 
-Awesome!
+When set_tval_irq() then executes, the hardware calculates the absolute
+deadline as CVAL =3D CNT + TVAL. Because TVAL is a negative value of
+-(wait_ms + long_wait_ms), CVAL evaluates to a small positive number
+instead of wrapping around to near U64_MAX.
 
-Thanks!
-Leo
+Since CVAL is now less than CNT, the timer condition (CNT >=3D CVAL) is
+met immediately, and the hardware legitimately fires the unmasked timer.
+This would cause the subsequent assert_irqs_handled(0) check to fail.
+
+> +		sm(timer, msecs_to_usecs(test_args.wait_ms) + TIMEOUT_NO_IRQ_US);
+> +		local_irq_enable();
+> +		isb();
+> +		assert_irqs_handled(0);
+> +		timer_set_ctl(timer, CTL_IMASK);
+> +	}
+> +}
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260921140427.2211=
+373-1-fuad.tabba@linux.dev?part=3D3
