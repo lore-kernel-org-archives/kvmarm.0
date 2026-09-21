@@ -1,357 +1,175 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 697B9486431;
-	Mon, 21 Sep 2026 09:27:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EF11497B6B
+	for <kvmarm@lists.linux.dev>; Mon, 21 Sep 2026 09:28:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789982879; cv=none; b=Gw8QlcKp0tF2DnL0JbnY1MlUxbqs93wE7atl8tLQwhOLTCUGXsWADla0UU21XqQdUmmlE5g4M2middO5/ON1+AEpkX9Ns7qlEDZbACcqqBVOU7yPZfIY1R6D2q5QQR0GolxF2CSdGTcN0DguZGMpgEIr7xhR7vq9mzqjtsw4t/E=
+	t=1789982923; cv=none; b=lhs1bTfelrGrAh8w8SA4JSJpVknM+vCXHU+pYjjtkJEkp2feX3wAgVAqUCsM46JGeVU0ZEN6D9sScGkd4GqWY/mVRS/EwUx2hytJsJdwyVGMjxF9pk16eZZnSV+886bhIUdn3DB5AZOPsi+P1Z1Y+O3zBTigGjGLpG5Z/609bog=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789982879; c=relaxed/simple;
-	bh=ZTBtfMgrW8AVZtlxHjrB7je5cwXndDnFsVDtzCf5SAk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XTgg/QNgEeVZvtTZh6IifWAUQzGpiZMy0OJv5Gewq2Z8xoLTwCmDi9CsC1OoUBWu+N6RzY0+Cb7Axb/X9ORxwLJEwF5nKHX/zjarJ/L5BPlE6/b6p5ETrF1Gy0YWMqplLIJZB7lhbK3MUUN7POqzvsFL0ry859VTjF8TE+29VcA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=TkC2tykb; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1789982923; c=relaxed/simple;
+	bh=phUmEey2KTaFFCHe3tz5iY5i7uUrJ8JToLD52Kf/15k=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=HUHC4WLMI/3Kz1IOMbzBc60DHb2/59b8k/fOqZ06uJmQCA1jw8cuaLJnd8Hpo9zom5edetZZi+MuiSZc6ilHJR0jrQ4GdwSiENmaz+w0C61pUMmn3UKxFxNlwn1qVulB5Ih8RPijO52l10/VHhmzlkpRkFopUDhS1RPSo945+IE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=Px9FDAq9; arc=none smtp.client-ip=220.197.31.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="TkC2tykb"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 98B4F1476;
-	Mon, 21 Sep 2026 02:27:47 -0700 (PDT)
-Received: from [10.0.128.141] (unknown [10.0.128.141])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D74603F86F;
-	Mon, 21 Sep 2026 02:27:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1789982871; bh=ZTBtfMgrW8AVZtlxHjrB7je5cwXndDnFsVDtzCf5SAk=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=TkC2tykbS6fuXOOVNsxlJt/ZCdRJVqaSv+ZbV/fy/dp/i/FCK5r7pviztK8PJrsmN
-	 K5OUDt8Ib1Lkz4NnQEx7A4QnQ+0SH/pH/XRwppfJvtueM/pGYpy8q3aUtfoiwsuBNO
-	 kc2IYVS2cwBgcv0sa8gPseAz1rwmBbj4wCSB5zwk=
-Message-ID: <d7ccaf22-5bde-4344-8bf0-a5a17dcac0f3@arm.com>
-Date: Mon, 21 Sep 2026 10:27:46 +0100
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="Px9FDAq9"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=Date:From:To:Subject:Message-ID:MIME-Version:
+	Content-Type; bh=zdLl1CStt/w3jatHVQVxNNngXmh7u7s/kl0WhZ6jI6s=;
+	b=Px9FDAq9aHUPNZAcGIHD3M2+04zjMbPX2xcpooeX0uzL9Z9oiwpyOyQIyxi4AE
+	w8zogl/TyayWrO2YvfaIrwCkntVNDA9chgzvw+UhJtXg3bOFUxIHwVlh0zFukwgI
+	YoIuFMUs2G5/2kaVguiF9+1hnESu/+owNS73oE5Bgkhzc=
+Received: from localhost (unknown [])
+	by gzsmtp2 (Coremail) with SMTP id PSgvCgDXRr2V+LBqZlMwAg--.3777S2;
+	Mon, 21 Sep 2026 17:27:50 +0800 (CST)
+Date: Mon, 21 Sep 2026 17:27:47 +0800
+From: Hao Zhang <hao_zhang_kdev@163.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oupton@kernel.org>, Fuad Tabba <fuad.tabba@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 2/2] KVM: selftests: Test arm64 stolen time after failed
+ updates
+Message-ID: <arD4k4RqkTetKtvi@192.168.1.215>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v18 1/7] firmware: arm_rmm: Add SMC definitions for
- calling the RMM
-Content-Language: en-GB
-To: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
- will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
- aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
- joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
- linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
- sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
- WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com
-References: <20260912083611.2513845-1-suzuki.poulose@arm.com>
- <20260912083611.2513845-2-suzuki.poulose@arm.com>
- <178978126540.2352296.16845657485139032765.b4-review@b4>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <178978126540.2352296.16845657485139032765.b4-review@b4>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <arD24ru13owcE1Ms@192.168.1.215>
+X-CM-TRANSID:PSgvCgDXRr2V+LBqZlMwAg--.3777S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxXryDtr43JryktF13uw43trb_yoWrGFy8pa
+	92kF1jgr4UK3ZFkr1Syr1DZFs8Gw4kJr42qr97u34rArs8KFsxtrs7KFy0qF1xArZ3XFn3
+	ZFWrKr9FgrWDXF7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jUjjgUUUUU=
+X-CM-SenderInfo: pkdrs65kdqwshngh4qqrwthudrp/xtbC3hYqHWqw+JZDYgAA3q
 
-On 19/09/2026 02:27, Jonathan Cameron wrote:
->> The RMM (Realm Management Monitor) provides functionality that can be
->> accessed by SMC calls from the host.
->>
->> The SMC definitions are based on DEN0137[1] version 2.0-bet3
->>
->> [1] https://developer.arm.com/documentation/den0137/2-0bet3/
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> 
-> With Gavin's nitpicks and the GENMASK_ULL() from sashiko, just a few
-> comments inline.  Mostly on subtle inconsistencies that really don't
-> matter that much.
-> 
->>   include/linux/arm-smccc-rmi.h | 497 ++++++++++++++++++++++++++++++++++
->>   1 file changed, 497 insertions(+)
->>   create mode 100644 include/linux/arm-smccc-rmi.h
->>
->> diff --git a/include/linux/arm-smccc-rmi.h b/include/linux/arm-smccc-rmi.h
->> new file mode 100644
->> index 000000000000..214d6228dfc2
->> --- /dev/null
->> +++ b/include/linux/arm-smccc-rmi.h
->> @@ -0,0 +1,497 @@
->> +/* SPDX-License-Identifier: GPL-2.0 */
->> +/*
->> + * Copyright (C) 2023-2026 ARM Ltd.
->> + *
->> + * The values and structures in this file are from the Realm Management Monitor
->> + * specification (DEN0137) version 2.0-bet3:
->> + * https://developer.arm.com/documentation/den0137/2-0bet3/
->> + */
->> +
->> +#ifndef __LINUX_ARM_SMCCC_RMI_H_
->> +#define __LINUX_ARM_SMCCC_RMI_H_
->> +
->> +#include <linux/arm-smccc.h>
->> +#include <linux/bitfield.h>
->> +#include <linux/bits.h>
->> +#include <linux/build_bug.h>
->> +#include <linux/sizes.h>
->> +
->> +#include <asm/page.h>
->> +
->> +#define SMC_RMI_CALL(func)				\
->> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,		\
->> +			   ARM_SMCCC_SMC_64,		\
->> +			   ARM_SMCCC_OWNER_STANDARD,	\
->> +			   (func))
-> 
-> Obviously it is v18 so probably a future thing but nothing about this
-> is RMI specific.  Could be used for ARM_SMCCC_TRNG_RND64 for instance.
-> I'm not entirely sure what we'd call such a macro
-> 
-> ARM_SMCCC_CALL_VAL64_STD() maybe?
+From: Hao Zhang <zhanghao1@kylinos.cn>
 
-ARM_SMCCC_STD_CALL64_VAL() ?
+Use mprotect() to keep the stolen-time page readable while removing
+write access.  This allows kvm_get_guest() to succeed and forces the
+subsequent kvm_put_guest() to fail.
 
-But, I would leave it as a wider cleanup in the tree as a separate
-series.
+Accumulate vCPU run delay, trigger the failed update, restore write
+access, and run the vCPU again.  Verify that the successful retry
+includes the delay that could not be reported by the failed update.
 
-> 
-> I'm not just not keen on macros whose names to me hint at something
-> special. FWIW this also matches SMC_RSI_FID() and FFA_SMC64().
-> Isn't it nice when we have a predictable naming scheme :)
-> 
-> FID (for Function IDentifier) is in the spec, so maybe?
-> 
-> Anyhow, I don't really care that much.
-> 
->> +
->> +#define SMC_RMI_VERSION				SMC_RMI_CALL(0x0150)
->> +
-> 
-> 
->> +#define RMI_ABI_MAJOR_VERSION	2
->> +#define RMI_ABI_MINOR_VERSION	0
->> +
->> +#define RMI_ABI_VERSION_GET_MAJOR(version) ((version) >> 16)
-> 
-> I'd mask it.  Mostly because that would shout that it is only 15 bits.
-> 
+Without the fix, KVM advances last_steal on the failed write and the
+test observes that the accumulated delay is lost.
 
-Ack
+Signed-off-by: Hao Zhang <zhanghao1@kylinos.cn>
+---
+ tools/testing/selftests/kvm/steal_time.c | 58 +++++++++++++++++++++++++++++++-
+ 1 file changed, 57 insertions(+), 1 deletion(-)
 
->> +#define RMI_ABI_VERSION_GET_MINOR(version) ((version) & 0xFFFF)
->> +#define RMI_ABI_VERSION(major, minor)      (((major) << 16) | (minor))
-> 
-> I'd go all in on FIELD_PREP() / FIELD_GET() + GENMASK just for the
-> sake of consistency + not having to be careful that everything is
-> checked for fit to keep the LLM bots happy.
-> 
->> +
->> +#define RMI_RETURN_STATUS_MASK		GENMASK(7, 0)
->> +#define RMI_RETURN_INDEX_MASK		GENMASK(15, 8)
->> +#define RMI_RETURN_MEMREQ_MASK		GENMASK(9, 8)
->> +#define RMI_RETURN_CAN_CANCEL_MASK	BIT(10)
->> +
->> +#define RMI_RETURN_STATUS(ret)		FIELD_GET(RMI_RETURN_STATUS_MASK, ret)
->> +#define RMI_RETURN_INDEX(ret)		FIELD_GET(RMI_RETURN_INDEX_MASK, ret)
-> 
-> What's this one?  I can't find anything in the spec that matches it
-> and as far as I can tell you don't use it in this series.
-
-This is coming from RmiResultDataLevel. See RmiResult type.
-This was renamed after we introduce the RmiResultDataIncomplete.
-It is used in the KVM code to find the "level" where a command
-failed/walked.
-
-I could rename it to RMI_RESULT_DATA_LEVEL() ?
-Similarly RMI_RESULT_STATUS instead of RMI_RETURN_*
-
-> 
->> +#define RMI_RETURN_MEMREQ(ret)		FIELD_GET(RMI_RETURN_MEMREQ_MASK, ret)
->> +#define RMI_RETURN_CAN_CANCEL(ret)	FIELD_GET(RMI_RETURN_CAN_CANCEL_MASK, ret)
-
-> These are obscure enough to find in the spec I'd give a comment just
-> to save the sanity of anyone looking for them.
-
-As above, they are really RMI_RESULT_DATA_INCOMPLETE_*
-
-> 
->> +/*
->> + * Note many of these fields are smaller than u64 but all fields have u64
->> + * alignment, so use u64 to ensure correct alignment.
-> 
-> Obviously this is only going to run on arm64 so it's not critical, but
-> more generally u64s aren't always 64 bit aligned.  So if you 'really'
-> care aligned_u64 is there to ensure it.  Meh, arm64 so fine.
-
-Agreed, I am worried about the churn in the consumer code. Also, like
-you said, this is only for ARM64. So, I would pass it.
-
-> 
->> + */
->> +struct rmm_config {
->> +	union { /* 0x0 */
->> +		struct {
->> +			u64 tracking_region_size;
->> +			u64 rmi_granule_size;
->> +		};
->> +		u8 sizer[SZ_4K];
->> +	};
->> +};
->> +
->> +static_assert(sizeof(struct rmm_config) == SZ_4K);
->> +
->> +#define RMI_REALM_PARAM_FLAG_SVE		BIT(1)
->> +#define RMI_REALM_PARAM_FLAG_PMU		BIT(2)
->> +#define RMI_REALM_PARAM_FLAG_DA			BIT(3)
->> +#define RMI_REALM_PARAM_FLAG_LFA_POLICY		GENMASK(6, 5)
->> +#define RMI_REALM_PARAM_FLAG_MEC_POLICY		GENMASK(8, 7)
-> 
-> Tiny bit inconsistent. When do you decide _MASK is needed and when
-> not?  Seems a little too random for multibit fields.
-
-I will try to clean this up.
-
->> +
->> +struct rec_params {
->> +	union { /* 0x0 */
->> +		u64 flags;
->> +		u8 padding0[0x100];
->> +	};
->> +	union { /* 0x100 */
->> +		u64 mpidr;
->> +		u8 padding1[0x100];
->> +	};
->> +	union { /* 0x200 */
->> +		u64 pc;
->> +		u8 padding2[0x100];
->> +	};
->> +	union { /* 0x300 */
->> +		u64 gprs[REC_CREATE_NR_GPRS];
->> +		u8 padding3[0xd00];
->> +	};
->> +};
->> +
->> +static_assert(sizeof(struct rec_params) == SZ_4K);
-> Whilst the assert works and is need to prevent oversized the
-> dos never seem to provide any indication of the final trailing
-> padding other than indirectly and I don't like maths on Fridays ;).
-
-Agree it is a bit obscure, but ...
-
-> Maybe union the inner union set with a u8 [SZ_4K]?
-> 
-
-That doesn't help if the other one runs past SZ_4K ?
-
->> +
->> +struct rec_exit {
->> +	union { /* 0x000 */
->> +		u8 exit_reason;
->> +		u8 padding0[0x100];
->> +	};
->> +	union { /* 0x100 */
->> +		struct {
->> +			u64 esr;
->> +			u64 far;
->> +			u64 hpfar;
->> +			u64 rtt_tree;
->> +		};
->> +		u8 padding1[0x100];
->> +	};
->> +	union { /* 0x200 */
->> +		u64 gprs[REC_RUN_GPRS];
->> +		u8 padding2[0x100];
->> +	};
->> +	union { /* 0x300 */
->> +		u8 padding3[0x100];
-> 
-> Why does this one exist rather than padding above
-> by 0x200?  Other structures don't seem to keep
-> to a specific stride so I'm not sure what this gives
-> you here.
-
-
-That looks like a field was removed over the RMM spec iterations.
-I will fold this into the padding above.
-
-> 
->> +	};
->> +	union { /* 0x400 */
->> +		struct {
->> +			u64 cntp_ctl;
->> +			u64 cntp_cval;
->> +			u64 cntv_ctl;
->> +			u64 cntv_cval;
->> +		};
->> +		u8 padding4[0x100];
->> +	};
->> +	union { /* 0x500 */
->> +		struct {
->> +			u64 ripas_base;
->> +			u64 ripas_top;
->> +			u8 ripas_value;
->> +			u8 padding5[0xf];
-> 
-> In various other places you just use a u64 for a u8
-> + padding. Why is this one special? And for that matter
-> various other fields later in this particular structure?
-
-Please feel free to point out, if you spot any. I am happy
-to fix them.
-
-> 
->> +			u64 s2ap_base;
->> +			u64 s2ap_top;
->> +			u64 vdev_id_1;
->> +			u64 vdev_id_2;
->> +			u64 dev_mem_base;
->> +			u64 dev_mem_top;
->> +			u64 dev_mem_pa;
->> +		};
->> +		u8 padding6[0x100];
->> +	};
->> +	union { /* 0x600 */
->> +		struct {
->> +			u16 imm;
->> +			u8 padding7[0x6];
->> +			u64 plane;
->> +		};
->> +		u8 padding8[0x100];
->> +	};
->> +	union { /* 0x700 */
->> +		struct {
->> +			u8 pmu_ovf_status;
->> +			u8 padding9[0xf];
->> +			u64 vsmmu;
->> +		};
->> +		u8 padding10[0x100];
->> +	};
->> +};
->> +
->> +static_assert(sizeof(struct rec_exit) == SZ_2K);
-> 
->> +
->> +/* RMI_RTT_UNPROT_MAP_FLAGS definitions */
-> 
-> How this counts as a 'flags' field is slightly beyond me, but
-> indeed matches the spec naming even though it's a grab bag
-> of small fields...
-> 
->> +#define RMI_RTT_UNPROT_MAP_FLAGS_OADDR_TYPE	GENMASK(1, 0)
->> +#define RMI_RTT_UNPROT_MAP_FLAGS_LIST_COUNT	GENMASK(15, 2)
->> +#define RMI_RTT_UNPROT_MAP_FLAGS_MEMATTR	GENMASK(18, 16)
->> +#define RMI_RTT_UNPROT_MAP_FLAGS_S2AP		GENMASK(22, 19)
-> 
-> Nothing signficant enough in here to absolutely require changes so
-> Reviewed-by: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
-
-Thanks
-
-Suzuki
-
-
-> 
+diff --git a/tools/testing/selftests/kvm/steal_time.c b/tools/testing/selftests/kvm/steal_time.c
+index bc3c62b72c58..fbdd55fa5ab6 100644
+--- a/tools/testing/selftests/kvm/steal_time.c
++++ b/tools/testing/selftests/kvm/steal_time.c
+@@ -8,6 +8,8 @@
+ #include <time.h>
+ #include <sched.h>
+ #include <pthread.h>
++#include <sys/mman.h>
++#include <unistd.h>
+ #include <linux/kernel.h>
+ #include <asm/kvm.h>
+ #ifdef __riscv
+@@ -162,6 +164,15 @@ static void guest_code(int cpu)
+ 
+ 	check_status(st);
+ 	WRITE_ONCE(guest_stolen_time[cpu], st->st_time);
++	if (!cpu) {
++		/*
++		 * Let userspace trigger a failed stolen-time update, then retry
++		 * the update after restoring write access.
++		 */
++		GUEST_SYNC(2);
++		GUEST_SYNC(3);
++		WRITE_ONCE(guest_stolen_time[cpu], st->st_time);
++	}
+ 	GUEST_DONE();
+ }
+ 
+@@ -469,9 +480,10 @@ static void check_steal_time_uapi(void)
+ static void *do_steal_time(void *arg)
+ {
+ 	struct timespec ts, stop;
++	unsigned long duration = arg ? *(unsigned long *)arg : MIN_RUN_DELAY_NS;
+ 
+ 	clock_gettime(CLOCK_MONOTONIC, &ts);
+-	stop = timespec_add_ns(ts, MIN_RUN_DELAY_NS);
++	stop = timespec_add_ns(ts, duration);
+ 
+ 	while (1) {
+ 		clock_gettime(CLOCK_MONOTONIC, &ts);
+@@ -500,6 +512,45 @@ static void run_vcpu(struct kvm_vcpu *vcpu)
+ 	}
+ }
+ 
++#ifdef __aarch64__
++static void test_failed_stolen_time_update(struct kvm_vcpu *vcpu)
++{
++	struct kvm_vm *vm = vcpu->vm;
++	struct st_time *st = addr_gva2hva(vm, ST_GPA_BASE);
++	unsigned long duration = 100 * 1000 * 1000UL;
++	u64 stolen_time = st->st_time;
++	long run_delay;
++	pthread_t thread;
++
++	/*
++	 * Keep the page readable so that kvm_get_guest() succeeds, but make
++	 * kvm_put_guest() fail when KVM attempts to update stolen time.
++	 */
++	TEST_ASSERT(!mprotect(st, getpagesize(), PROT_READ),
++		    "Failed to make stolen time page read-only");
++
++	run_delay = get_run_delay();
++	kvm_pthread_create(&thread, NULL, do_steal_time, &duration);
++	do
++		sched_yield();
++	while (get_run_delay() - run_delay < duration / 5);
++	kvm_pthread_join(thread, NULL);
++	run_delay = get_run_delay() - run_delay;
++
++	/* The update fails, but the guest must still be able to run. */
++	run_vcpu(vcpu);
++	TEST_ASSERT(st->st_time == stolen_time,
++		    "Stolen time changed on a read-only page");
++
++	TEST_ASSERT(!mprotect(st, getpagesize(), PROT_READ | PROT_WRITE),
++		    "Failed to restore stolen time page write access");
++	run_vcpu(vcpu);
++	TEST_ASSERT(st->st_time - stolen_time >= run_delay,
++		    "Lost stolen time after a failed update: expected >= %ld, got %lu",
++		    run_delay, (unsigned long)(st->st_time - stolen_time));
++}
++#endif
++
+ int main(int ac, char **av)
+ {
+ 	struct kvm_vcpu *vcpus[NR_VCPUS];
+@@ -569,6 +620,11 @@ int main(int ac, char **av)
+ 			    "Expected stolen time >= %ld, got %ld",
+ 			    run_delay, stolen_time);
+ 
++#ifdef __aarch64__
++		if (!i)
++			test_failed_stolen_time_update(vcpus[i]);
++#endif
++
+ 		if (verbose) {
+ 			ksft_print_msg("VCPU%d: total-stolen-time=%ld test-stolen-time=%ld%s\n",
+ 				       i, guest_stolen_time[i], stolen_time,
+-- 
+2.15.0
 
