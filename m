@@ -1,232 +1,121 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F312838F92D;
-	Mon, 21 Sep 2026 10:03:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C851F3E451B
+	for <kvmarm@lists.linux.dev>; Mon, 21 Sep 2026 10:10:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789984983; cv=none; b=Gk4WopUOwProWlMgsfzj+KtO6XdtNUCRSCTaR8OcPUdSClhusKwolIm4CYy6CrjmvNrjrwL40vzZAImxO2MrMZc0gsYgcOPfJ/F2voSozMqVZnsKV7vIyR41YwY/NOJFi/BYuuamtLcAmLmpE15E4nl3YpjneAeat36V0gBCpR0=
+	t=1789985424; cv=none; b=d5A8v7bu2TVCxWKcMhrVhyyk9M6rXpP+un9xLW3wSF0Ed1dIhSovWEyM7BLUYwQ0ax9sIksPo/Bg/Q2mxAdv5bxV7VvMg3WKm2EBrG/DYufGQCv5nqd29mcKnVr+FDNIHa1Y9y3GLXFxq2l1rdVvqterv8IsWwYmZVYdpMveg5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789984983; c=relaxed/simple;
-	bh=2Bi9HNrID2cE7gcX784v6dveXii59tEhPSRzCiZgdgs=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=JwRkFyM2VajxeEncIBhk0aRZzTsb3MVL9IQk+ViMe3FF7QvVZOLOoHnRijXLGiGTZw2a+PKCtNcze0GUno5TQJZs3q2JnxiaqKwXK5GTwjmy6S9eHs22TwUL2vvGEQec1O2YvLeUEuEixT26tGLhv7Tmu+p118X1jRCLCYIYOzY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=blOJwDP8; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1789985424; c=relaxed/simple;
+	bh=v0P4ayQReWgnEDJQOUIqGqH/JIvX4Upl7U9Sz/eEyJc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ms920Lkm5uOmkpjata97JAC2f15BYENpNhoX5XrICeiOoxXVp7aDceEwHS9D8gjqNU3as8zc85hRUn/4Ztv+Vus68w0NgeZwOIFY90PPTaekXk5S8YaidVO3fG0azEa1cS29te0uHbsPhwCVpV7TeP6OvKkp4C4Z0XNz/akbT2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YcCYJyCf; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="blOJwDP8"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BC1CC1CE0;
-	Mon, 21 Sep 2026 03:02:56 -0700 (PDT)
-Received: from [10.0.128.141] (unknown [10.0.128.141])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7A6DB3F86F;
-	Mon, 21 Sep 2026 03:02:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1789984980; bh=2Bi9HNrID2cE7gcX784v6dveXii59tEhPSRzCiZgdgs=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=blOJwDP8A/onBBJLnCPxUp9mIb8MzS7wS1+7wngcIelq7GcWJvaTjSVFF1Ytq/w3R
-	 x1av8/QUs0lhT01IoJteJ3chVaJ+FHMaSGYVCI5C4ujUt7eSTRkRLr5foUzByLlrWt
-	 EwI7qlCQh+NLED+A0IIYKTIEedohHbTqb02OPxBY=
-Message-ID: <45fb9520-7003-412f-9ab1-14e2a762c816@arm.com>
-Date: Mon, 21 Sep 2026 11:02:56 +0100
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YcCYJyCf"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1789985421;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YA3vQgRKFGawP1ePJiuBgfbEVZaFG6kWjdLmIbJG/cc=;
+	b=YcCYJyCfnFUed2mgr/UqsUeBImA/JWi+KnmCKyl/AIiWu+W/4G9wZG9LJdcCXNqE1TURpN
+	7YxKD+GdE26/g/N9TtSGopF9CIK5Z0TpyjeSc0L48AWZK9tlBShalwjj2Guy+1MjlrORcI
+	hLwL7c84lxYaaOomnFrCs1kYju+/rIA=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-691-OnvV6xdyO4KhUZRc_oW-vg-1; Mon, 21 Sep 2026 06:10:18 -0400
+X-MC-Unique: OnvV6xdyO4KhUZRc_oW-vg-1
+X-Mimecast-MFC-AGG-ID: OnvV6xdyO4KhUZRc_oW-vg_1789985417
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-49cdc4080ddso15687055e9.1
+        for <kvmarm@lists.linux.dev>; Mon, 21 Sep 2026 03:10:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1789985417; x=1790590217;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=YA3vQgRKFGawP1ePJiuBgfbEVZaFG6kWjdLmIbJG/cc=;
+        b=SpHHU6heZ3Sf4KuBX3B5gs6NPzvl5s8w2y7iutN6YmUWMrQPB7aTUIgOrJpB63Pggg
+         DZj4Ezor3YGoTQzwmJmigZ6oMycbOxHgnfBv3Z17OsJHa69jKU/mRWoK3RuGOW1DgktP
+         C9FJmbfnBrhcwBRxyGpRFJm6oNt3wt0swp9jelNHLiPtwyVtPRhvosB9pffK+EsqomBs
+         MLAzMI7Qb+17/lfWwsGNPm0jSMBPkDfrIm6+6ObTvIweWeoeILcklS8lBio6ggIhjJ+Y
+         DpAan3ub6EZuMZdjkcLD/eDgZVKMv74z8lKsyTZFP6B8iFJZie6ZAnBvVM0LlLL3WiKY
+         3Png==
+X-Forwarded-Encrypted: i=1; AKwUvByILHBvrR5qQr0QJiKVznQGH6Hk03SmDUxY4qV2psfXZ0v7yOmZhj1uCwJol+GwOl+Mu1+18Ik=@lists.linux.dev
+X-Gm-Message-State: AFuF++lDVU9KaTeVIGkXem5xLgxRvu0rOY4dQvbFxbjj7ZB9Oivuf5/Y
+	/14hbO/6u619UetccQ6v82c+9xKmf9OtEl8/v/4nwEqWLeyIK7Aq1lWuxVJVuMHvUTcHtff7x2V
+	9Zg5mTiECuHgAL+/rXb2Mni5ZQ8vE0Mz4JZo0BevZibN0croVmsgSaRakjrx+3xE3840/52CJiw
+	Wz9o3ANdpsgJPXqcOPgiDfYe95iCK4dPhz
+X-Gm-Gg: AYBFou1cjOaSRwNKA2zhKB8UYih3OTxo/AlTdicfky5iw8igEp/Un3aVzFiyTvbS9uZ
+	z3CByl603e214SCvgcBpSyV3EcLY22NKCHidpupu43yw8euqXx6iaducGkZB0lBX0hnZa+Zh0C4
+	SWt2Hpwtwpcp1p+SbzPAlqJ2N0CHx69WmhSw+jlBj/o5whuddWL5Bt9rKVwtXBlfravIPFQUJZV
+	/c1fzBFYgePsZWVSkCQiU+2HGtWdtOGWwNYfpR3umkKuGfj6uM5nxdc9Jg0mA==
+X-Received: by 2002:a05:600c:37c3:b0:49c:e37e:4389 with SMTP id 5b1f17b1804b1-49fc4f8528cmr144125045e9.4.1789985416916;
+        Mon, 21 Sep 2026 03:10:16 -0700 (PDT)
+X-Received: by 2002:a05:600c:37c3:b0:49c:e37e:4389 with SMTP id
+ 5b1f17b1804b1-49fc4f8528cmr144124745e9.4.1789985416539; Mon, 21 Sep 2026
+ 03:10:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v18 1/7] firmware: arm_rmm: Add SMC definitions for
- calling the RMM
-Content-Language: en-GB
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-To: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
- will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
- aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
- joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
- linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
- sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
- WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com
-References: <20260912083611.2513845-1-suzuki.poulose@arm.com>
- <20260912083611.2513845-2-suzuki.poulose@arm.com>
- <178978126540.2352296.16845657485139032765.b4-review@b4>
- <d7ccaf22-5bde-4344-8bf0-a5a17dcac0f3@arm.com>
-In-Reply-To: <d7ccaf22-5bde-4344-8bf0-a5a17dcac0f3@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <aq7ViMljbhjibseX@kernel.org> <aq7WIW052XXHJWlL@kernel.org>
+In-Reply-To: <aq7WIW052XXHJWlL@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon, 21 Sep 2026 12:10:04 +0200
+X-Gm-Features: AcwNN1XAAsJ94cGxHRMtNqiGnGs3RDz6T6V8oXiFTADje5gE4RX36YH8CZ6l8Ic
+Message-ID: <CABgObfZYa8uwsAgKnr6952qMZf6jjf_AsJBmxeS8zYLLRSGD_g@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 7.3, round #1
+To: Oliver Upton <oupton@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Sean Christopherson <seanjc@google.com>, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: S4sDYK182aqmxb6C_Q2rB-HE3IQOdl0WsCB5ADAODj8_1789985417
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 21/09/2026 10:27, Suzuki K Poulose wrote:
-> On 19/09/2026 02:27, Jonathan Cameron wrote:
->>> The RMM (Realm Management Monitor) provides functionality that can be
->>> accessed by SMC calls from the host.
->>>
->>> The SMC definitions are based on DEN0137[1] version 2.0-bet3
->>>
->>> [1] https://developer.arm.com/documentation/den0137/2-0bet3/
->>>
->>> Signed-off-by: Steven Price <steven.price@arm.com>
->>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->>
->> With Gavin's nitpicks and the GENMASK_ULL() from sashiko, just a few
->> comments inline.  Mostly on subtle inconsistencies that really don't
->> matter that much.
->>
->>>   include/linux/arm-smccc-rmi.h | 497 ++++++++++++++++++++++++++++++++++
->>>   1 file changed, 497 insertions(+)
->>>   create mode 100644 include/linux/arm-smccc-rmi.h
->>>
->>> diff --git a/include/linux/arm-smccc-rmi.h b/include/linux/arm-smccc- 
->>> rmi.h
->>> new file mode 100644
->>> index 000000000000..214d6228dfc2
->>> --- /dev/null
->>> +++ b/include/linux/arm-smccc-rmi.h
->>> @@ -0,0 +1,497 @@
->>> +/* SPDX-License-Identifier: GPL-2.0 */
->>> +/*
->>> + * Copyright (C) 2023-2026 ARM Ltd.
->>> + *
->>> + * The values and structures in this file are from the Realm 
->>> Management Monitor
->>> + * specification (DEN0137) version 2.0-bet3:
->>> + * https://developer.arm.com/documentation/den0137/2-0bet3/
->>> + */
->>> +
->>> +#ifndef __LINUX_ARM_SMCCC_RMI_H_
->>> +#define __LINUX_ARM_SMCCC_RMI_H_
->>> +
->>> +#include <linux/arm-smccc.h>
->>> +#include <linux/bitfield.h>
->>> +#include <linux/bits.h>
->>> +#include <linux/build_bug.h>
->>> +#include <linux/sizes.h>
->>> +
->>> +#include <asm/page.h>
->>> +
->>> +#define SMC_RMI_CALL(func)                \
->>> +    ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,        \
->>> +               ARM_SMCCC_SMC_64,        \
->>> +               ARM_SMCCC_OWNER_STANDARD,    \
->>> +               (func))
->>
->> Obviously it is v18 so probably a future thing but nothing about this
->> is RMI specific.  Could be used for ARM_SMCCC_TRNG_RND64 for instance.
->> I'm not entirely sure what we'd call such a macro
->>
->> ARM_SMCCC_CALL_VAL64_STD() maybe?
-> 
-> ARM_SMCCC_STD_CALL64_VAL() ?
-> 
-> But, I would leave it as a wider cleanup in the tree as a separate
-> series.
-> 
->>
->> I'm not just not keen on macros whose names to me hint at something
->> special. FWIW this also matches SMC_RSI_FID() and FFA_SMC64().
->> Isn't it nice when we have a predictable naming scheme :)
->>
->> FID (for Function IDentifier) is in the spec, so maybe?
->>
->> Anyhow, I don't really care that much.
->>
->>> +
->>> +#define SMC_RMI_VERSION                SMC_RMI_CALL(0x0150)
->>> +
->>
->>
->>> +#define RMI_ABI_MAJOR_VERSION    2
->>> +#define RMI_ABI_MINOR_VERSION    0
->>> +
->>> +#define RMI_ABI_VERSION_GET_MAJOR(version) ((version) >> 16)
->>
->> I'd mask it.  Mostly because that would shout that it is only 15 bits.
->>
-> 
-> Ack
-> 
->>> +#define RMI_ABI_VERSION_GET_MINOR(version) ((version) & 0xFFFF)
->>> +#define RMI_ABI_VERSION(major, minor)      (((major) << 16) | (minor))
->>
->> I'd go all in on FIELD_PREP() / FIELD_GET() + GENMASK just for the
->> sake of consistency + not having to be careful that everything is
->> checked for fit to keep the LLM bots happy.
->>
->>> +
->>> +#define RMI_RETURN_STATUS_MASK        GENMASK(7, 0)
->>> +#define RMI_RETURN_INDEX_MASK        GENMASK(15, 8)
->>> +#define RMI_RETURN_MEMREQ_MASK        GENMASK(9, 8)
->>> +#define RMI_RETURN_CAN_CANCEL_MASK    BIT(10)
->>> +
->>> +#define RMI_RETURN_STATUS(ret)        
->>> FIELD_GET(RMI_RETURN_STATUS_MASK, ret)
->>> +#define RMI_RETURN_INDEX(ret)        
->>> FIELD_GET(RMI_RETURN_INDEX_MASK, ret)
->>
->> What's this one?  I can't find anything in the spec that matches it
->> and as far as I can tell you don't use it in this series.
-> 
-> This is coming from RmiResultDataLevel. See RmiResult type.
-> This was renamed after we introduce the RmiResultDataIncomplete.
-> It is used in the KVM code to find the "level" where a command
-> failed/walked.
-> 
-> I could rename it to RMI_RESULT_DATA_LEVEL() ?
-> Similarly RMI_RESULT_STATUS instead of RMI_RETURN_*
-> 
->>
->>> +#define RMI_RETURN_MEMREQ(ret)        
->>> FIELD_GET(RMI_RETURN_MEMREQ_MASK, ret)
->>> +#define RMI_RETURN_CAN_CANCEL(ret)    
->>> FIELD_GET(RMI_RETURN_CAN_CANCEL_MASK, ret)
-> 
->> These are obscure enough to find in the spec I'd give a comment just
->> to save the sanity of anyone looking for them.
-> 
-> As above, they are really RMI_RESULT_DATA_INCOMPLETE_*
-> 
->>
->>> +/*
->>> + * Note many of these fields are smaller than u64 but all fields 
->>> have u64
->>> + * alignment, so use u64 to ensure correct alignment.
->>
->> Obviously this is only going to run on arm64 so it's not critical, but
->> more generally u64s aren't always 64 bit aligned.  So if you 'really'
->> care aligned_u64 is there to ensure it.  Meh, arm64 so fine.
-> 
-> Agreed, I am worried about the churn in the consumer code. Also, like
-> you said, this is only for ARM64. So, I would pass it.
-> 
->>
->>> + */
->>> +struct rmm_config {
->>> +    union { /* 0x0 */
->>> +        struct {
->>> +            u64 tracking_region_size;
->>> +            u64 rmi_granule_size;
->>> +        };
->>> +        u8 sizer[SZ_4K];
->>> +    };
->>> +};
->>> +
->>> +static_assert(sizeof(struct rmm_config) == SZ_4K);
->>> +
->>> +#define RMI_REALM_PARAM_FLAG_SVE        BIT(1)
->>> +#define RMI_REALM_PARAM_FLAG_PMU        BIT(2)
->>> +#define RMI_REALM_PARAM_FLAG_DA            BIT(3)
->>> +#define RMI_REALM_PARAM_FLAG_LFA_POLICY        GENMASK(6, 5)
->>> +#define RMI_REALM_PARAM_FLAG_MEC_POLICY        GENMASK(8, 7)
->>
->> Tiny bit inconsistent. When do you decide _MASK is needed and when
->> not?  Seems a little too random for multibit fields.
-> 
-> I will try to clean this up.
+On Sat, Sep 19, 2026 at 8:36=E2=80=AFPM Oliver Upton <oupton@kernel.org> wr=
+ote:
+>
+> On Sat, Sep 19, 2026 at 11:33:45AM -0700, Oliver Upton wrote:
+> > Hi Paolo,
+> >
+> > Here's the first pile of fixes for 7.3.
+> >
+> > The diff is definitely on the larger end, although this is mostly
+> > explained by the inclusion of a selftest for the ITS table changes
+> > which are quite tricky. Also worth noting that this selftest mixed poor=
+ly
+> > in next with Sean's PPC selftest prefix due to the library changes [*].
+> >
+> > Otherwise, the most noteworthy change here is definitely the pKVM patch=
+es
+> > to unmap the EL2 hypervisor's stack pages from the host, for obvious
+> > reasons...
+> >
+> > Details on the rest of it can be found in the tag. Please expect at
+> > least one more pull for 7.3, there's some additional changes that are
+> > still brewing.
+> >
+> > Please pull.
+>
+> Haven't caffeinated enough yet.
+>
+> Just in case it wasn't clear, this is a
+> conflict with 7.4 material and based on the conversation I expect Sean
+> to work around it.
 
-Actually, this is used when we don't consume them from RMM. i.e.,
-we never call FIELD_GET() on them. But thats not a reason for
-not being consistent in naming. I can fix it
+Yep, one of us will handle it.  Pulled now, thanks and sorry for missing rc=
+4!
 
-Cheers
-Suzuki
+Paolo
 
