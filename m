@@ -1,63 +1,63 @@
 Received: from mx0b-002c1b01.pphosted.com (mx0b-002c1b01.pphosted.com [148.163.155.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 322513563E8
-	for <kvmarm@lists.linux.dev>; Mon, 21 Sep 2026 13:03:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C6AD49890A
+	for <kvmarm@lists.linux.dev>; Mon, 21 Sep 2026 13:04:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.155.12
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789995805; cv=fail; b=AFqddRSKk+s0I76WnFKdjXvf0n0wIYV8RF0soVMbv9P0eIlwmb7ljV/QKDooSaI/SnNVqVJeFR9qH0zrDv83U7wFt9q1kcUQClrBg03KX/YeMRp8nFNQSzmcKBY/XboiKEOKS0l2/8Chfo0If+ikDWKbLWYJBV+SYNib4P9AORk=
+	t=1789995868; cv=fail; b=Yim+FAKe+3DHKPJg3ff1mVUlbQqKRC9yntGpEqadY1TdsZn9AsVazctduKHNJ3TvvaanX1nhB+4imp5sKqFuDXbEziO7ulvfQpEg/+g6IL2MbYkIJOmfQS8g6wcHAAihyGWf7UH6EzAIz4KvrQBZ3AfLhNzz5PEoxZFp5sjA9PU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789995805; c=relaxed/simple;
-	bh=CheDa6AvUiL89PcRlD2rgpTYTbjaanQOYfAlfhlx9QU=;
+	s=arc-20240116; t=1789995868; c=relaxed/simple;
+	bh=GA9K2rpfJii0tD1+2V57rIO17lhdqPZA8AzVfwZPsj4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=brpUp5kf45IMJ2sq48QRNHiVgLQhnXZ8MCU0loAU+1Pt5R5BxqUQsgY/7bSk9QYjaK0q/p+l48X4sfqYDzc2lnXufzOnNGtZE7oGlwl1o4mFlwG3RRRUw2WZ+PJAZxFArZagMDn6m2stxO/XmAUOpHwp72WlCm7/7CMi5sBoasA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nutanix.com; spf=pass smtp.mailfrom=nutanix.com; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=buOCn+ex; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=m+knEgBr; arc=fail smtp.client-ip=148.163.155.12
+	 Content-Type:MIME-Version; b=J4UqbuttXm+iepcQEUknT+ss1sph1DciJVn8C00sHS7IHB2y8vquq6wvcXj2pwhQkyag+3QcmnsLjRV0F9qXybcSse0nvYKqhjXxUxiEreFBpkezmTO5RXmu4HgPdvTwru89ctXeyDPSBQB6q4bk+UvtPxHKE7BffhEfpW5V2rE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nutanix.com; spf=pass smtp.mailfrom=nutanix.com; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=QVbefnEy; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=v8dpAbRm; arc=fail smtp.client-ip=148.163.155.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nutanix.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nutanix.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="buOCn+ex";
-	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="m+knEgBr"
-Received: from pps.filterd (m0127844.ppops.net [127.0.0.1])
-	by mx0b-002c1b01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68LAfaiZ685521;
-	Mon, 21 Sep 2026 05:33:44 -0700
+	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="QVbefnEy";
+	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="v8dpAbRm"
+Received: from pps.filterd (m0127841.ppops.net [127.0.0.1])
+	by mx0b-002c1b01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68LAflUH774316;
+	Mon, 21 Sep 2026 05:33:40 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=
-	proofpoint20171006; bh=k1cPfr67ixrfZp04B//b0+CWNo2WG54jyUkoNrahS
-	z8=; b=buOCn+ex9UbUbjbxKxNoyqFk7T1mTvms+/Sm2OK7HGMY4KSJ31t4qOJt8
-	djSzJdU+Je9didfmVYWhLQmzT+u9/kbYwCCH8t4wipOKe0RXtzqYbMImprJQXlqb
-	Q4e9XwvhsClwL3/hY0b7cL27SU/PckPZrX7yUN4/GwJZiC3kZunC31qkCbAX+P6X
-	cPuenGzWJESPmMLaYQ3eSKTp56GWNRMBufBP+87JtCfGelygU4SZ4jBSIs48LCx9
-	ZyqDFcBXa7O8RJAbwT0md7hv96wWqWeA2zBVBVnKLnPATJJOmplYG9UkB3P1eNr0
-	9Y0XGr+rI/VDvnkaQVz87eYv5ZnEA==
-Received: from mw6pr02cu001.outbound.protection.outlook.com (mail-westus2azon11022084.outbound.protection.outlook.com [52.101.48.84])
-	by mx0b-002c1b01.pphosted.com (PPS) with ESMTPS id 4gsswvtxe8-2
+	proofpoint20171006; bh=pr81Oh6zOc7AJNkrhtUWdfxnIJ6AYkrUs51BxVtNI
+	fE=; b=QVbefnEyAmOO2fAWz8IGFW06v93EQ7TjLY2NYMsnu0xyA7P5An4abTp5h
+	AzLNFea+S3x+0cnKgkPtqUG5deR3WQELvTpZo5AuhGeK4J2ZowiBp0/dVUY623iF
+	Y9u587peU3EVRCGM1hzuHpKazwhALdu1j43vLhdk+nulRTZ7yiI44LosLNktNd7e
+	CkGEcoO5y+JkBJ5VWhDySx1hFP0j0TMr+8zqZXJ/pSIZR59CMYvZt3DHs2yrhXrf
+	2IwsL91i/Cxhh3DK2g79uH6vL6tDtRTn8izeQsZZ1uvmGYkiumlMxjpoDbiGaHmd
+	rU4iQi1aghSTEjIqQSC1mq4mCjmPw==
+Received: from bn8pr05cu002.outbound.protection.outlook.com (mail-eastus2azon11021115.outbound.protection.outlook.com [52.101.57.115])
+	by mx0b-002c1b01.pphosted.com (PPS) with ESMTPS id 4gsqx831cb-4
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Mon, 21 Sep 2026 05:33:44 -0700 (PDT)
+	Mon, 21 Sep 2026 05:33:40 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=BuUnvHgRpGiXUq6XoIaBUea45L8pL356Rpsw4+G5TLDb2A20H41mT8ZDEx+WauK2pm1CXA/gF1SqRygnvMxr3JUSQh8U8EQXHMQlIQiyHrPSHIpZdsWiwlr84amoFBCGiRbV1SCgPpMPtN+kai8/VBlOtmULEPeILjvXcmsCgHvsXiNZl8W2knX5BCR8nKskkByROv8E0VuMUwjCadgtIU72akeVCSJhqS3UB4f4XFkqgnoN1A4UHNroOC3VXe/me537dO2Y+56lbPNyvb2F01n3jv11LhpNxOT16Wz1kNjQNp/HpjrhZktnkVKLFAdKcQC3q+wWdkX5pGq0wI1jyQ==
+ b=gkeHeXOCsjrBbR+MyYoX/nAUM4rVV0mtAHaapPHgubA0b5qi3ZxgWthQNfOrccTycp/PJShzf6eRaMCX9DhGkRun2V8mm3quAIvuhol+LK5cOvMb/zCUiAItT10GiR6cMi3vyynqtVmbH2qWmzx7lNMT0Y36UVwD9/+m1ATXxfgDBDqoCPNwW+4TxVl1FLDrviuey82cVCuXo0Ja8va1QhUbux/yfEVD+O/c6KG80zwvSDqh7VKkMRlmiTOcUoP7A/sf4sZKporpTDi8ofmD05Z5eLK5QJsEESqPgCBi/lS1Msn3/oDdCNVOAHlElftfIyGVqDAzQ80rAdKspOKLnw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=k1cPfr67ixrfZp04B//b0+CWNo2WG54jyUkoNrahSz8=;
- b=ghwsrDmxiyCJGI9vC4yEm9P0DCseJR0YkyhjO0VOGp0tD5kVfdzdW/2QK2+CwEf6XyP5quSw3A6uhTwBbP6GhvB/4XVftVWXAC3necr+CJ6ZPa+rrDPbvGNS10RWp0i8zZEBGHlpp5yxrv1RgdfqctGLzpGnxE4CIjOYBr1M1lsksB2zTPuYJgL1YAByaeq49XpijoKXsiE1XglO9xBGpUBYz21mQ51pRuEHSnWeKqYI5hK4ZRc7UUcCRCGfTBbEiDiJN3wLm2Nhhz/01OHGLOqzM05WQnMPbgKSbaTPsDcthvF17GDEcD/ZxtFjUlHadWN9fAYqSvmw6t2MXWjILw==
+ bh=pr81Oh6zOc7AJNkrhtUWdfxnIJ6AYkrUs51BxVtNIfE=;
+ b=NATj1ISKulwf3bChIwPzt7aQOSyo28B5FxGTjB4SRDdp6VgME4w8iF8FDRAh+D+zRPGkbh43L3staecZSmQXvKstbq8Sv4fvUG3ElAye0RDCruHlQHAUrlF3jGdydvw0zEwPwF1NRfAb6plHIsWso4yyhNOpxALJ+uF8UGqgW8XLGejfyAGuPTK0Z5J9UnaNz4//YBjJLx+uX8Y5anScGhfFHobgTM6P+vJk1QqF8AuC0B1yi9Yv88DkY0DAcQxnWSTlnNbATdR3Td7cfFfuplRzJmBA6/7qRNu4/LrzAGU7jHF3vqv/kevB2M8R9ZK/vTIGdUWToytGDE8NJGJVxw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
  dkim=pass header.d=nutanix.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
  s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=k1cPfr67ixrfZp04B//b0+CWNo2WG54jyUkoNrahSz8=;
- b=m+knEgBrFbSMo9/s6VHvlquf46pRLxBW/B/nIzKL8wOjSywzsRYTgzweY0ZuyflXD/Ckn+k3MmDFXljoX+ZNTjKFN1hMnvxu8ySBr9+ooAGlv4A83xwte2nqAHoeGO+MbMs4Ywun2zpudLo+R5tChZYeFv+g42htpOZINANo+lTNR8Iv11LSNQ1Cbt70x9gnGqy91Wzol7lqfUHwYdujQu9dRxth0RM/suVjg5SonCqHXMcTUj98oIaCw4A1hBL1g3fL78mUhDKXjmRuCDQX4kdxw/l5gig+uA80oU3zF5+lxMnMEQ7xXA6kPzUpJM0W1GYQSEQyt+Bl/YhJKFluVQ==
+ bh=pr81Oh6zOc7AJNkrhtUWdfxnIJ6AYkrUs51BxVtNIfE=;
+ b=v8dpAbRmBzf+6fxTwcAIe3tP5EqkEAgTOM9C5bogQPY0Cqz/SMmhPEnnMbNH75dqyY959OiQKO9QoQiVePauXWwMtM/VbviXQLsx2AvTstm17+ix3RsN9ttOiqvSoOqc+x4/w6Fwov1q6/6x+2T8UCjH104YoaPKopIItJCSfocI7EbrtBafZnIoH5vp1Nt6lqU25hOygClna7eTeJpZ2BhHofEy9CTQxnlHE8iwSMPFEalOHTc9fjTN3KtcgRyLRiktls0XGT1gr6qkhZqMIGvm3AefWXMHeG18EU/wQzZqqTHIBJ7xMJ/v0RtrMBhq2nXPRi8upJS5noLVTOQxtA==
 Received: from SA2PR02MB7564.namprd02.prod.outlook.com (2603:10b6:806:146::23)
- by BY5PR02MB6868.namprd02.prod.outlook.com (2603:10b6:a03:234::9) with
+ by SJ0PR02MB7534.namprd02.prod.outlook.com (2603:10b6:a03:320::21) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.428.16; Mon, 21 Sep
- 2026 12:33:41 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.428.13; Mon, 21 Sep
+ 2026 12:33:30 +0000
 Received: from SA2PR02MB7564.namprd02.prod.outlook.com
  ([fe80::1ea5:acb6:ebe1:e1c4]) by SA2PR02MB7564.namprd02.prod.outlook.com
  ([fe80::1ea5:acb6:ebe1:e1c4%5]) with mapi id 15.21.0428.015; Mon, 21 Sep 2026
- 12:33:41 +0000
+ 12:33:30 +0000
 From: Khushit Shah <khushit.shah@nutanix.com>
 To: qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvmarm@lists.linux.dev,
         eric.auger@redhat.com
@@ -68,9 +68,9 @@ Cc: cohuck@redhat.com, peter.maydell@linaro.org, richard.henderson@linaro.org,
         philmd@linaro.org, yangjinqian1@huawei.com, shaju.abraham@nutanix.com,
         mark.caveayland@nutanix.com, khushit.shah@nutanix.com,
         ping@khushitshah.com, sandesh.patel@nutanix.com
-Subject: [RFC PATCH v4 23/25] qmp: add query-cpu-props-info command
-Date: Mon, 21 Sep 2026 12:32:47 +0000
-Message-ID: <20260921123249.1708067-24-khushit.shah@nutanix.com>
+Subject: [RFC PATCH v4 11/25] target/arm: disable PMU support for named CPU models
+Date: Mon, 21 Sep 2026 12:32:35 +0000
+Message-ID: <20260921123249.1708067-12-khushit.shah@nutanix.com>
 X-Mailer: git-send-email 2.43.7
 In-Reply-To: <20260921123249.1708067-1-khushit.shah@nutanix.com>
 References: <20260921123249.1708067-1-khushit.shah@nutanix.com>
@@ -86,249 +86,113 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PR02MB7564:EE_|BY5PR02MB6868:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1d1c4e86-e091-44e1-a898-08df17dc915d
+X-MS-TrafficTypeDiagnostic: SA2PR02MB7564:EE_|SJ0PR02MB7534:EE_
+X-MS-Office365-Filtering-Correlation-Id: afd0e491-6182-4c4e-6b19-08df17dc8b1d
 x-proofpoint-crosstenant: true
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|7416014|376014|23010399003|1800799024|10067099003|56012099006|3023799007|6133799003|22082099003|18002099003;
+	BCL:0;ARA:13230040|376014|23010399003|1800799024|7416014|366016|56012099006|18002099003|22082099003|10067099003;
 X-Microsoft-Antispam-Message-Info:
-	tAkAwIuCcn2HFWFp85LylDW9NMP4Hc9vryuaL0/d+8KB8bOkuh2K9xpkqK8ghHHX9Dqm3NjaEnT6vN5QkxjlIJEQ/hys/gV2JmSP8R9eMgqGgRpklzsarhEo9Z65Q/C9EqtlKl+GlIyGreS1tY/b59CgWJbSLX4wGdXIyDfvJf90M+1pY0IndmqWOrz+vVU0nFJnCGWvmK7ReF2fEtz7l2vxIpDle5v1rZDfetNt6dUH+FV9J9pyz3IGihmJDajxUuHgCmlvjHMZlaQrENpy0CpYjUl485hpeTmlmV5M6xVRewq6mIK9bC0k1HYqq+vZaHQukEmD8Nou4iBMB4ZKDepf7pQwNaZL5WY/vVOundw23NyCvy2cjGDIL7IhEaCjLtlPJ8yQKB2r0BN1wPogHAhhiBcMbsZTfwRbyG8BETyvf86ONGReZw3JlUgccUGG2H9aapPCPCFupEbvQ/FzokW9VCOUR7d8a/Xj/aNkCLd4V/hJNnJ64GoxYt5pyhX9uPSJxSLqeuX4tsYaLS7g1H+9UKeRvZGtXo+Cg1l78KJ28L9V4wLXcYP9dkUcYEDt/+DD+KAgQDBeFghuDIpMy8RL8Q+fw0yclhonD83uENuJcJ3oK01Mtc/zx6SXvqjgTWxZMLnRxaeoIEMImrklXDCClrnFVD7tdUk6YZWpZYA=
+	D6jP0kXtb/7e4nDi/VEzPa70/N+j5/0prNPbxP4yzk/3e0/MbDIl7DewnLdvD4vPAPOp4lmQuGpcE8k17IZemflr8JFVxTpkr8LrthpFqeVy4Ck/yzBD/xGZ2KU/93b4Hn5pM46R1FywsKlHad/yCLsYTjJz9ukRvnKdJOgfA1TYVdmPgs/dA6MQTjh2GamXzGHWs5U5jRmJcBRmei6gZ9RBw5m3yfjWrEYmJEUihTJhq2WbFPmN2+Xq3Krf9J/dCFlO1OTfZE38QQYHLA/fKoGUf1jFOlFIsLjh71kKn4n2tz2vldr0+ClG2ULvTkqRuyF+LJ1taxJa66JYi/KqLjlOXJHPYT5SLSzD/GHIVuJ+NiIvC4amrjobhNUglzbGw6OutIT724l1qrV+VOGMyPT+pZEkVE50g3HVPfcwV3E2TjVxpKMsA0YkfwhpKi66noJLafM/VuJaeB3+opuYBnHOT9R5KnH81DphdXdjD9eZPNw78+fOCUfWZZv9nolguG5DjNz73k/kYfSffLe0o49F1DvG3o0sZScR4bxy7uTNbh9Fn1vYbjRVjSkMGXAO+2UiuXSet4KY1KXRJKC5TltCCQJQip8Xm4THBqhhuM3pWxNvwP3kvAhEZEPFmQVJHct1HAMkMKu002Dga2IfZQvDS1ywAjDz03SqqA6MTc0=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA2PR02MB7564.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(23010399003)(1800799024)(10067099003)(56012099006)(3023799007)(6133799003)(22082099003)(18002099003);DIR:OUT;SFP:1102;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA2PR02MB7564.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(23010399003)(1800799024)(7416014)(366016)(56012099006)(18002099003)(22082099003)(10067099003);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?r8+8SXBZfhmggWok+O/Vix0gDKPW8ly/lnuCBFrMbdqdqHT11RDzSw1yi+3g?=
- =?us-ascii?Q?kGDYTaZn8d/liueucK7q9ddg0aTBn2fcAVUzNSsjXUFVeCuOY2PC4RXHbkPl?=
- =?us-ascii?Q?zd9pggq4jDQcbxsCKYvR0EkLmRHuxhoS4epWL7cEup64IlvkYIkOMHMSV8kJ?=
- =?us-ascii?Q?u5DnT2KS+Hmau1C7T/g8X+v8pa6bObmToL1aV1+t3o12fRBhT/qoxofNyHVW?=
- =?us-ascii?Q?YNVnSKYeeWJIKtOh63ARDAqQCUroX1PuB1RMBnfQ9B9b9kI+sj3SySmKd2su?=
- =?us-ascii?Q?bjY5SjlqZn8TwVKZ2oGD8vO913OBXvc1y+8q0VZuiUUhy3pfzDB1vteSwjdi?=
- =?us-ascii?Q?xB2cmGMZ31Sopf5X8uk+HJjjgQi3yoyAMi8kkFmSkvcG9Ddr/trwxvBDOuEj?=
- =?us-ascii?Q?6rVH0TCRsCtvHt5+FBz5TyUBnOHTnVBVFNG9mYwe7BEmSXEGGyaBnN/aIuec?=
- =?us-ascii?Q?LEXn++rVw0cWkIVGG33PJ9REFC+K0RowsZRuLLZnyrQAuTW4XJSAsrcUUrpt?=
- =?us-ascii?Q?xXBd4FOr+qdcBE2YRB/nZ0Eq3ZXkQrgk1m/PThD1P7blOcux1wlT9BvYe0nx?=
- =?us-ascii?Q?VoIdA3qrWomM13Gv7tVGhzS8NWBughNTuVG2orKx7fK3N/VrKijA19wyrdn1?=
- =?us-ascii?Q?GAfC6XNLH/QvxNccvbQTWlvG0dZPrkK5iTFfA+aRAaovRbAP+mceeuXkceJs?=
- =?us-ascii?Q?cBI9oKMk6AJ7dnPGtyCvO2I8fObpmwNEcQe2cRuz2coXrSS/xShYL4LcDIN+?=
- =?us-ascii?Q?RwuaexefFe3KhlmHRdXLa5HP0ih0jHnkc+VoZd9BWRfivcVUfsI2uSeh9yQJ?=
- =?us-ascii?Q?vtqm+zgwVWsVi+/aI8PUYebZSgcQIx/+Zg6RW53nPg6OaQlORDe8tlxl9bAz?=
- =?us-ascii?Q?l9PVXD0eSixyUX0DknM+Ep1n8vrWwJAW+AQe2hwT5/F970LvV4T8ybC9Lz18?=
- =?us-ascii?Q?zNQ1jZnt/JOdGFLlTp36RT91yV2WkKAUOw3rpKrn8KlnpM1zVXAnwk+j6aJp?=
- =?us-ascii?Q?bkYqel44eIuvgGb+wnvxHvEonxS6B3ZtzKZBLxlZLjHXsUY/Yqlf+TobzK4T?=
- =?us-ascii?Q?4/DsiLn8SBz37Z79enFMPbZ4eiqE1otKJwEv+ndFb3CJkBYxns97fzNFTLCM?=
- =?us-ascii?Q?vKsC5XkXWw2JO+bZX1KuMbrLHGFKxCrPdZclun+MpriWRZr0+rkrwMedUpo1?=
- =?us-ascii?Q?IslotXUD1iyQQdIpemqAfTpxzG9hFlMHUDWVQHTM2DGuA0OmgphxUoEzjqi6?=
- =?us-ascii?Q?H6PNu8glVuTxvJNaAvwIzWU+72ZanLIaCKO+JpdqwhwIjt3OwKOPtgLqDQZu?=
- =?us-ascii?Q?whsjcJ024PlBD+2DaPjzCd07ArOo8xomx/VTmuwAd86CcNRugNQE4tXrOq2v?=
- =?us-ascii?Q?Q9/lRfmdRxsTyhSPKAZorAcF9z3YaIfnUGRjCU/47lOIiZFbFvqdEnqPvw1W?=
- =?us-ascii?Q?5ym4a5pvuX7KhxXpS22U9zHSuZrOvqt4oR7n7237au6pRlWktJJ7JmkvmqwW?=
- =?us-ascii?Q?aIgG40iovobaH4XCFEQ+214IG/+ofU6177zvPx2oknSbbOncsh29xfbKGjiO?=
- =?us-ascii?Q?wEGUfaXEhZtPcuqZtB4y+NEH/zEV4SFeDnixvvj0YSFhFV//n0jfv2/dchcv?=
- =?us-ascii?Q?ifnJxWgSaoboO+eVxDcc04l85yHAese0IH2hyxKyfh+V9mHsuY2HKY+aV8dS?=
- =?us-ascii?Q?bmoIQq32DdQj4aGLRJwzmJG6aAJHIwVRn7NPAypnTTjBjGRpOByFZaJsHXuO?=
- =?us-ascii?Q?gOrs576+gToDWiYWhcp7OOP1SmEwbWc=3D?=
+	=?us-ascii?Q?3Q7mzo1VOejr2ATrpv6UfGaxvV3E/NBhriwAJREGavxDwkVtR/TviQXr3fBn?=
+ =?us-ascii?Q?YqwGeuM3CpmGKCZfsGtSCzlG8dizdOAfPvl9eLmBbqzMRsv4foOII8y0wOhT?=
+ =?us-ascii?Q?0EsVb4HnQwMLt1K+MMiAgpQR68sOxPEhLxnWZo2Nt1xb2seMPT05Jk3U0QT9?=
+ =?us-ascii?Q?8B9CCxnD2IDUj+TZilM5MDBouxQ6sY3j5DMVyi1dIZGzA4QdkIhShsai1BAF?=
+ =?us-ascii?Q?Qsm1aEmkta5HtmeKT4Ho+NNjTW0lmxzYg3uIxoJ+jEuJ/+J4B5mZRYiARJHM?=
+ =?us-ascii?Q?kQqxwH3mE4EKeoQGEFgRGACJ01NHgRyXtOzLareyaIdOJFdgJfRg13QMviOK?=
+ =?us-ascii?Q?tvOygMD7SyIwrrcwfjrWwKeTIrAJPeVLCFNfd5FRmahEZZCD5ouEdqz7exMV?=
+ =?us-ascii?Q?fn03wEuKZZGykxEhT64uw98tcbqyw9dvTD5Or45bBiZAW8uWctbXHsedNtjl?=
+ =?us-ascii?Q?33Tu5/UO08rXBcEPF9KakOn5jD5CIIoATPGjB1oojk0eSKVjthWFABxJGi7/?=
+ =?us-ascii?Q?j7afsBhBBKjZzBhzkVuoL9NXoFpesz15jqbF2mTVDirAn3zx1Ovc7XpdsbyX?=
+ =?us-ascii?Q?qfcOpGo3VrpV1rKeT0EWEvDFMWDoRPhQAGLcgaEM0g0/41ivNYNWS1GGwnvO?=
+ =?us-ascii?Q?UIXoTsMpdUMLw/G6TDW4ZSwjrkSAkLSibmCC/BgdxrCjUul6ulRYdzXqI7S+?=
+ =?us-ascii?Q?TVuZ7Xx2iidFs8ywvNWL8WuZx7ZAWIOu7IR3x0hpTkKlYQjT1Q5h5a+OmELV?=
+ =?us-ascii?Q?KTD5ZUzqmY6q73K9qmq8QVxJh9NrfwKQFZzo1klPdqaVMJ+LvKZfgRdTuNTZ?=
+ =?us-ascii?Q?KPfCwY1IgI57IeutaWy5VUWtTpkng7fBggJ0zvQmv8eL/FbfBVG6M0XC+AFy?=
+ =?us-ascii?Q?+GUueA6JkEBTWcV3N/jgtNwjlE8L+Ttw2EO8efG3eAN/izkwiq3DpLmGZjlj?=
+ =?us-ascii?Q?XSqz0Cg7IyRT4Lahz1nCifA9IcVmUCIPK2UlSwAmYLpiBF+hX3gdF4xi2Z/B?=
+ =?us-ascii?Q?f/hmLgz7h+6p0NVH+VsFIeLABSW2ZLnArlIeL1jk7VNuq9hhckobwqpYJxxz?=
+ =?us-ascii?Q?/XgjXGX57BKme6qkM1XCSCR7E9HPiv4QwYyNhbRnkLQB5OD8RZsMkQF/Q8CB?=
+ =?us-ascii?Q?FpbazkDEf1u09o3Z43hhADGTiMYGF782DpQ1qBW1eEOCMvkbzqP0jh94cxyO?=
+ =?us-ascii?Q?NZKy1XJd3jKjPHyTCvRJRtMv6ERzodcvFUIq39f4stIaV0YIaWCrE0A2//H8?=
+ =?us-ascii?Q?9ynw+HFif7/lpuQFpv/PLmZYM9eWZC9oLOL4LrQ7bhT7fKsivA5evkjuDVFp?=
+ =?us-ascii?Q?s81JZDncJ3gEBJJaxUtclPeDKKytYTJzhGMeAvOaTRVIHAPXudR9yjpPssZ2?=
+ =?us-ascii?Q?Tdlwf/X9FShcAPYXvwxGKVIiWXISCoBEGiAQileKnIakBN618eWGT+PrZ8vm?=
+ =?us-ascii?Q?4ihtNzCRds583AovfpaI4whf1iRobKCjNrOVn0q1A8/Csl5Lj0b2kIBuK4f8?=
+ =?us-ascii?Q?+87Mc2R5q+n7pfxQknKeOHtouY6qYUbnYMWup52Tt/969nEAXAtAxvxHnMs9?=
+ =?us-ascii?Q?VifOPGTD7esUhdB5Bavo4uLBqIaiTW8EpD0IQ0V6UrqqHWBBD4VXRiTjoT3i?=
+ =?us-ascii?Q?3V1U/Xal0C6JHZoAYmpRCe8A6MtRCsZO1aAtGTwMDUnsDcNhTHFIRw5e+gKA?=
+ =?us-ascii?Q?Z93S1u0KNp9jtaQXpLUEKa1cyy3wbJOcOzwSem+8h/d6Jm9er1NXwjiPNUsQ?=
+ =?us-ascii?Q?pTkCe3K84HxHm1TMK0TRiWlJ47y2Fj8=3D?=
 X-Exchange-RoutingPolicyChecked:
-	DN0HyK+Zl3qMCTrcjsYRqRprZ0lZRLV7M+QLckswobkCNNHggMXxY4g7H+0eg+DfaBR+2Fyf4OWLOsmUuVH20n4NAnG16guNO1kp+AMXFuYC2xCZrPlcVxvcJVskxoi8ALmt4iZYm/mbr7F243p4p3ZPfnerOSPnzMvicggzERuxMr5Y/rPCUqOB93Ncm8QZ7Ag/rlJf549lT/zKSLrZ7WUpdZLm1+SfECq/6OXeHv8drDeuMYJAjGdTzy1qCWZhBVs8APaImNwUXm8OWv9yAVujKBXztmmJEOUQ7Et8E4mX3XNDjvj+4GcntpDOYEQsg+m98Kf0OC71w+DtDyuLBA==
+	NgG8sQnZnAbgQ6AkKhHkk6Hbc+Ct05dEF35cbe9uIOwWjwTp+vqDoOF0XPNlxTot/EL3/7MGvJybsZGZ6brxfRGne3lZ1EH+F0g6vzAAqY6CCd/jgT9TrA3MGuI0+RwQF4kOoLhLQD2y8G4VmtPyBlqOoY6+wG95v27p4rT3PehwqC/THvdu4v0UJZuoKlaoI3wDYs/6Nq8PigZaFS0hRQQzBQBGe4/gzGNEBV8cD+e4bLkLV1eO3SntUW8Zkn+rEPJBaj9rANYux4OutmTBC7u1u1P9CpDHsfXr+oxiCNqhXkPJwZ6vkspkdQxeX9NVQ1mqUoxlf7qJnVscFLT4EQ==
 X-OriginatorOrg: nutanix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1d1c4e86-e091-44e1-a898-08df17dc915d
+X-MS-Exchange-CrossTenant-Network-Message-Id: afd0e491-6182-4c4e-6b19-08df17dc8b1d
 X-MS-Exchange-CrossTenant-AuthSource: SA2PR02MB7564.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Sep 2026 12:33:40.9818
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Sep 2026 12:33:30.5441
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: bb047546-786f-4de1-bd75-24e5b6f79043
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: meQ/eAXcIHPxWQz8HRbMwATJyGVDM7qLAJFMcu1U75aOvey/QZVlOfu6/k+lwWDztXdbF0M7yLtBQoq6r+9mb+7J1mv2i0OgPJplIxpWNYA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR02MB6868
-X-Proofpoint-GUID: m9-HqkCgd9VNOBx-K6-8GRWuPffq_Da3
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTIxMDE4MiBTYWx0ZWRfX14tfmKfSMi/q
- XYr0O1Wk+gFXL1zpPG6dc6iOIIdDYNVn1bqCwYMpXCIwHurPXjRZcNn7uBZqWiHjdDDpROgt4ci
- Y3G5I9YMDKz8W2/a5/vnrnDbhnm+Z3XKc2SUrlRio9QHCnsycnByaZ6IeRllrkBHhQiwg3okGZk
- 4gWGVOsj6Fj+O3FmSpvLJJYmBg1Qh56QSHzASY5/AVE7eLWZyhWjCc0O9TbhjnS8TY1YsZ4/ny/
- XY8kNmsL6DV3lHY5Ovb3oKdkNx3Tg4Uxhqh7WO38pfzOyLE2csh34G4Og2PKaHCBJrL7cg0bStI
- OR3bdrgnHBA/dVeruY0CXSVmRDq+EcRvtJVwEEn1ZAJKzbSL1I/OseUq6ROLXD+I29ZWd9RuWWP
- AS42hq3wrhkOcmJV8BCxLEDSIC8lT4j2/amSUf9jf+7D8HEYNORNcXgphpOlBFaFBxYS+OxhETA
- 2D2tYmc5MefXCrAQamQ==
-X-Proofpoint-ORIG-GUID: m9-HqkCgd9VNOBx-K6-8GRWuPffq_Da3
-X-Proofpoint-Spam-Info: AW1haW4tMjYwOTIxMDE4MiBTYWx0ZWRfX/N4qu3GkPtmU
- Vl2A43F85VWJb/zR/jJ+RVqDSte/GJyuGK2TynYFmgm0DiQ6sRWI/+tBGrOvdTliQYFuFqPx5nx
- agn01bKX6oktROBx45TSrZiC+ZDI5As=
-X-Authority-Analysis: v=2.4 cv=J8g/fwnS c=1 sm=1 tr=0 ts=6ab12428 cx=c_pps
- a=fn/DPt3lPG6OhtMeQbTPHg==:117 a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19
+X-MS-Exchange-CrossTenant-UserPrincipalName: ew8VNJdlLl62qlIMcFXwkWuKpAxTm+uXVfSpFkCCDfV7ZIVrhJvTYXimW1CSA8i7MMPPIQ7hG7mEkfi0e4l/FK78e6PZ7CQXzdol15oQETc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR02MB7534
+X-Authority-Analysis: v=2.4 cv=KInPn1Fo c=1 sm=1 tr=0 ts=6ab12424 cx=c_pps
+ a=jYOLmuRG9FCngycrw98U6Q==:117 a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19
  a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19
  a=xqWC_Br6kY4A:10 a=VdqzKS8jKosA:10 a=0kUYKlekyDsA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=VofLwUrZ8Iiv6rRUPXIb:22 a=0LlEyIVc8U2lsR7dKhuH:22
- a=64Cc0HZtAAAA:8 a=ttUzrGzlu7rhztxTIxsA:9
+ a=VkNPw1HP01LnGYTKEx00:22 a=VofLwUrZ8Iiv6rRUPXIb:22 a=jxMXjlTPpCISP5mWtjnE:22
+ a=64Cc0HZtAAAA:8 a=qDXpWOp4m997Zg2teoIA:9
+X-Proofpoint-ORIG-GUID: zx3YAXciy01Ng93oubWafOhhI1GTI9-h
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTIxMDE4MiBTYWx0ZWRfX953Nie+i29Wk
+ 14suM4ne0F8cfmWNey96scE9M6ji+ARsL4CsNMRuN8KS5ZuvE/yVo5PO0MoTZvv5VzPwUUNfcHE
+ 9GSuhExDW2cnwtKSq5LoY9VJCe2lTdM=
+X-Proofpoint-GUID: zx3YAXciy01Ng93oubWafOhhI1GTI9-h
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTIxMDE4MiBTYWx0ZWRfX3aWj+jDiWbs1
+ F+zQZV8QFIfcABYCPUo2P+XX46EOc0j0V5oeGcblJVdeSSwx8vXu1zVJa0bcOmvgk629M5qNMZB
+ 6dGqgGvKPj8L8srPUkIPN09bEgDrnCiTWd+fi4f+NgyBaZ0BF6wbm6LGnZ8OpjVIvW7Rdhf7j+z
+ YIIDKAZVCHUruW3/KJhjy/7Kbd43s2a6mpGVKBml0pFyzISlJB2P9BwpdTKUEetTMynACZQzddV
+ AjKmujuYhtkoBKuf2FUFj0X4pF1EjSgxEccNdFYtvKntetgZLZu9Z3bDgytfZuPNvtetowPNE4B
+ IQ4KvtJzVTgwDlJUs9yC7RjVE5D8hUvuVzVOfeivrhnBcasCD933LOgpQC2i8RK/tADhcOzgbRN
+ DhIDR/AcCE9DsXd2DboQEEjPMhq3AC5cARgQITeS7ALSOQzNvFos5pTAiEBdu3ss4+RM22RQiNC
+ efPX9trPiIkwMz/wLnQ==
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
  definitions=2026-09-21_04,2026-09-16_02,2025-10-01_01
 X-Proofpoint-Spam-Reason: safe
 
-Introduce the 'query-cpu-props-info' QMP command. For each CPU model
-property, it reports the type (boolean or number) and the set of values
-supported under the active accelerator and host.
+Under KVM, the guest PMU is backed by the host PMU (event set, PMCR.N,
+and PMCEID), which may not be portable across heterogeneous hosts.
 
-This helps the management stack to discover which values are supported
-for a given CPU property. This is especially important for non-boolean
-properties, where knowing that the host has value 'x' does not
-inherently reveal the full range of valid values supported on the host.
-For example, an Arm host with CTR_EL0.L1Ip=3 (PIPT) also allows 2
-(VIPT) but a host with CTR_EL0.L1Ip=2 does not allow CTR_EL0.L1Ip=3
-for a guest.
-
-For numerical properties, the supported values are expressed as a list
-of inclusive {min, max} ranges. For boolean properties, they are
-represented as a list of true/false values.
-
-The command and its return types (CpuPropertyType, CpuPropertyInfo and
-friends) are defined in qapi/machine.json rather than an Arm-specific
-schema, since the concept applies to other targets (e.g. x86, RISC-V)
-too. Targets that do not implement it return an error.
-(The following commit implements the command for Arm KVM.)
+Disable PMU support for named CPU models by clearing ARM_FEATURE_PMU in
+the named-model init path so arm_cpu_post_init() does not create the
+"pmu" property.
 
 Signed-off-by: Khushit Shah <khushit.shah@nutanix.com>
 ---
- qapi/machine.json          | 82 ++++++++++++++++++++++++++++++++++++++
- stubs/meson.build          |  1 +
- stubs/qmp-cpu-props-info.c | 12 ++++++
- tests/qtest/qmp-cmd-test.c |  1 +
- 4 files changed, 96 insertions(+)
- create mode 100644 stubs/qmp-cpu-props-info.c
+ target/arm/cpu-models.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/qapi/machine.json b/qapi/machine.json
-index 2d63c1bac3..6e65bdad86 100644
---- a/qapi/machine.json
-+++ b/qapi/machine.json
-@@ -2291,3 +2291,85 @@
- # Since: 1.2
- ##
- { 'command': 'query-cpu-definitions', 'returns': ['CpuDefinitionInfo'] }
+diff --git a/target/arm/cpu-models.c b/target/arm/cpu-models.c
+index fed3197186..153ee10ae6 100644
+--- a/target/arm/cpu-models.c
++++ b/target/arm/cpu-models.c
+@@ -159,6 +159,10 @@ static void arm_named_cpu_initfn(Object *obj)
+     /* 1.b Properly set RES1 fields. */
+     reset_res1_fields(cpu);
+ 
++    /* Disable PMU for named CPU models. */
++    unset_feature(&cpu->env, ARM_FEATURE_PMU);
++    cpu->has_pmu = false;
 +
-+##
-+# @CpuPropertyType:
-+#
-+# The type of a CPU model property.
-+#
-+# @boolean: the property is of type boolean.
-+#
-+# @number: the property is of type unsigned integer.
-+#
-+# Since: 11.2
-+##
-+{ 'enum': 'CpuPropertyType',
-+  'data': [ 'boolean', 'number' ] }
-+
-+##
-+# @CpuPropertyValueRange:
-+#
-+# An inclusive range of numeric values supported for the property.
-+#
-+# @min: the lowest supported value.
-+#
-+# @max: the highest supported value.
-+#
-+# Since: 11.2
-+##
-+{ 'struct': 'CpuPropertyValueRange',
-+  'data': { 'min': 'uint64', 'max': 'uint64' } }
-+
-+##
-+# @CpuPropertyInfoBoolean:
-+#
-+# @supported-values: list of boolean values supported for the
-+#     property.
-+#
-+# Since: 11.2
-+##
-+{ 'struct': 'CpuPropertyInfoBoolean',
-+  'data': { 'supported-values': ['bool'] } }
-+
-+##
-+# @CpuPropertyInfoNumber:
-+#
-+# @supported-values: list of numeric value ranges supported
-+#     for the property.
-+#
-+# Since: 11.2
-+##
-+{ 'struct': 'CpuPropertyInfoNumber',
-+  'data': { 'supported-values': ['CpuPropertyValueRange'] } }
-+
-+##
-+# @CpuPropertyInfo:
-+#
-+# Information about a single CPU model property, including the values
-+# the host/accelerator supports for it.
-+#
-+# @name: the name of the property.
-+#
-+# @type: the type of the property, which selects the layout of
-+#     @supported-values.
-+#
-+# Since: 11.2
-+##
-+{ 'union': 'CpuPropertyInfo',
-+  'base': { 'name': 'str',
-+            'type': 'CpuPropertyType' },
-+  'discriminator': 'type',
-+  'data': { 'boolean': 'CpuPropertyInfoBoolean',
-+            'number': 'CpuPropertyInfoNumber' } }
-+
-+##
-+# @query-cpu-props-info:
-+#
-+# Return information about the CPU model properties.  For each
-+# property it reports the values supported under the active
-+# accelerator and host.
-+#
-+# Since: 11.2
-+##
-+{ 'command': 'query-cpu-props-info',
-+  'returns': ['CpuPropertyInfo'] }
-diff --git a/stubs/meson.build b/stubs/meson.build
-index 3b2f2680b1..3bb4028bab 100644
---- a/stubs/meson.build
-+++ b/stubs/meson.build
-@@ -83,6 +83,7 @@ if have_system
-   stub_ss.add(files('qmp-i386-sgx.c'))
-   stub_ss.add(files('qmp-i386-xen.c'))
-   stub_ss.add(files('qmp-cpu.c'))
-+  stub_ss.add(files('qmp-cpu-props-info.c'))
-   stub_ss.add(files('qmp-cpu-s390x.c'))
-   stub_ss.add(files('qmp-cpu-s390x-kvm.c'))
-   stub_ss.add(files('hmp-cmd-info_mem.c'))
-diff --git a/stubs/qmp-cpu-props-info.c b/stubs/qmp-cpu-props-info.c
-new file mode 100644
-index 0000000000..36b0530b98
---- /dev/null
-+++ b/stubs/qmp-cpu-props-info.c
-@@ -0,0 +1,12 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "qapi/qapi-commands-machine.h"
-+
-+CpuPropertyInfoList *
-+qmp_query_cpu_props_info(Error **errp)
-+{
-+    error_setg(errp, "query-cpu-props-info not supported on this target");
-+    return NULL;
-+}
-diff --git a/tests/qtest/qmp-cmd-test.c b/tests/qtest/qmp-cmd-test.c
-index 279a8f5614..2c25dbd8cb 100644
---- a/tests/qtest/qmp-cmd-test.c
-+++ b/tests/qtest/qmp-cmd-test.c
-@@ -100,6 +100,7 @@ static bool query_is_ignored(const char *cmd)
-         "add-fd",
-         /* Success depends on target arch: */
-         "query-cpu-definitions",  /* arm, i386, ppc, s390x */
-+        "query-cpu-props-info", /* arm + kvm */
-         "query-gic-capabilities", /* arm */
-         "query-s390x-cpu-polarization", /* s390x */
-         /* Success depends on target-specific build configuration: */
+     /* 2. Add sveNNNN and SYSREG_ properties */
+     aarch64_add_sve_properties(obj);
+     aarch64_add_idregs_properties(obj);
 -- 
 2.52.0
 
