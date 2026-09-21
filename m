@@ -1,101 +1,132 @@
-Received: from mta1.migadu.com (out-3.mta1.migadu.com [95.215.58.3])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2C7446AA6C
-	for <kvmarm@lists.linux.dev>; Mon, 21 Sep 2026 10:10:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.3
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE2BE3B2FDF;
+	Mon, 21 Sep 2026 10:14:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789985445; cv=none; b=PH0q4hBCCGyn4+STPBwUjgF2/Da7twahPIbV8ikRt2aQSpqg9kZUfVA00KPHgVVhuDuLJBLmH7973cSKchbnlvzzglyonprF+7SG+cV58kW8ikhrt5wPnb689buzKVUvZj5CS23d4hBKWP7xjSaNujCWTda2vzpSvqHlXoQc3Cg=
+	t=1789985669; cv=none; b=HogbSpxBvkMeTShiT3iyjQ/gizh5KtO5qym1VpP6/2dpf73kQn9KTHayb+/Xr0+1i4o8thtDCe0QbAfYdwah4zJ/qU33EYq0GY1mS3C57irplut/AsW8qP/S9rqzSJdFKQLBEOh6OIBptTtiysP9p/56jMY9xFlGNM0y1JTSrBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789985445; c=relaxed/simple;
-	bh=0WEUwWA13h6lSIRRHugW7N81xLfWs7SnLHtINewqeBo=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Mp9cNkPI6NhQtp6osUZ1KxCu0p5zIFoW8X96IjNqO29bfUJOOI6IutAC9qPIe75Bp3pymSBAXpXaWCmDzTqsBKiCpt6JD0HdRAnN6y1uo3y5bGpeVIkTTIGwhC7t6M9/IhjQsirZeNrWB5MviunNBNBqu6gk2A19ecZwV+q7Mwg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=hdhewLO8; arc=none smtp.client-ip=95.215.58.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1789985669; c=relaxed/simple;
+	bh=X21Q+N08xUOyF31kxvte0qv2v56innxWRBgC11u9YPg=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=UsQFLCdzhD1iLmxlMacZM+xCcVYrUyrgfTyqfON+xw0acEFj17uqKFFEF31l2OACnLX20xPe/DzObE/AtPeEcZRC4YYpFPv5SGEpD1ppVpwml32C9rsYfd7TDExOu00rwDf6clcO8R+97cZ/vP7TzKME8WifrV1t8BOehjQHPrI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=bi8wj6lS; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="hdhewLO8"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=0WEUwWA13h6lSIRRHugW7N81xLfWs7SnLHtINewqeBo=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1789985441; v=1; x=1790590241;
- b=hdhewLO8IRIHObIEz8+0C9kBmser7+1cdmUfPOwOB3HAz7dt73431HNwews1PbNLVfusSj/B
- xJIlGH5fuZFXHpzzpNlAoBNQkkJL8cHKbcHXy0rZlTvnOn4f9tQAu1ILq5UAwn6aCb01ipY+GRW
- Ip5FJF01O2pwmFCFQmnhNlhc=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id cf336d2bb085442c;
-	Mon, 21 Sep 2026 10:10:41 +0000
-X-Mizu-Trace-ID: cf336d2bb085442c
-X-Migadu-Flow: FLOW_OUT
-From: Fuad Tabba <fuad.tabba@linux.dev>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Quentin Perret <qperret@google.com>,
-	Sebastian Ene <sebastianene@google.com>,
-	Hyunwoo Kim <imv4bel@gmail.com>,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Shuah Khan <shuah@kernel.org>,
-	Fuad Tabba <tabba@google.com>
-Subject: [PATCH v2 2/2] KVM: arm64: selftests: Check SError is not pending after delivery
-Date: Mon, 21 Sep 2026 11:10:30 +0100
-Message-Id: <20260921101030.1231605-3-fuad.tabba@linux.dev>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20260921101030.1231605-1-fuad.tabba@linux.dev>
-References: <20260921101030.1231605-1-fuad.tabba@linux.dev>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="bi8wj6lS"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7ED0A1CE0;
+	Mon, 21 Sep 2026 03:14:23 -0700 (PDT)
+Received: from [10.0.128.141] (unknown [10.0.128.141])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 173203F86C;
+	Mon, 21 Sep 2026 03:14:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1789985667; bh=X21Q+N08xUOyF31kxvte0qv2v56innxWRBgC11u9YPg=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=bi8wj6lSXbc+slgPhtQo8H+KMor5M5yzY0r8RQQqFvDPPtgRm0RMutnIRxaToRdTG
+	 YWI+Jnobq16nw+PjJSrqSjkJr7INZTwpehy3S8gXoDGcYoHz2kHClYB+y772yLyN7Z
+	 EPCugkdEQQwCspBynGN7LkS+G00+KuamtoSo/uq0=
+Message-ID: <eb4a30a0-abd2-4334-b5f3-62621ec5a19e@arm.com>
+Date: Mon, 21 Sep 2026 11:14:22 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v18 1/7] firmware: arm_rmm: Add SMC definitions for
+ calling the RMM
+Content-Language: en-GB
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+To: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
+ will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
+ aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
+ joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
+ linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
+ sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
+ WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com
+References: <20260912083611.2513845-1-suzuki.poulose@arm.com>
+ <20260912083611.2513845-2-suzuki.poulose@arm.com>
+ <178978126540.2352296.16845657485139032765.b4-review@b4>
+ <d7ccaf22-5bde-4344-8bf0-a5a17dcac0f3@arm.com>
+In-Reply-To: <d7ccaf22-5bde-4344-8bf0-a5a17dcac0f3@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-test_serror() never looks at the vCPU after the SError is delivered, so
-a stale pending SError goes unnoticed. Read the vCPU events back and
-check the SError is no longer pending.
+On 21/09/2026 10:27, Suzuki K Poulose wrote:
+> On 19/09/2026 02:27, Jonathan Cameron wrote:
+>>> The RMM (Realm Management Monitor) provides functionality that can be
+>>> accessed by SMC calls from the host.
+>>>
+>>> The SMC definitions are based on DEN0137[1] version 2.0-bet3
+>>>
+>>> [1] https://developer.arm.com/documentation/den0137/2-0bet3/
+>>>
+>>> Signed-off-by: Steven Price <steven.price@arm.com>
+>>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>
+>> With Gavin's nitpicks and the GENMASK_ULL() from sashiko, just a few
+>> comments inline.  Mostly on subtle inconsistencies that really don't
+>> matter that much.
+>>
+>>>   include/linux/arm-smccc-rmi.h | 497 ++++++++++++++++++++++++++++++++++
+>>>   1 file changed, 497 insertions(+)
+>>>   create mode 100644 include/linux/arm-smccc-rmi.h
+>>>
+>>> diff --git a/include/linux/arm-smccc-rmi.h b/include/linux/arm-smccc- 
+>>> rmi.h
+>>> new file mode 100644
+>>> index 000000000000..214d6228dfc2
+>>> --- /dev/null
+>>> +++ b/include/linux/arm-smccc-rmi.h
 
-Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
----
- tools/testing/selftests/kvm/arm64/external_aborts.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+..
 
-diff --git a/tools/testing/selftests/kvm/arm64/external_aborts.c b/tools/testing/selftests/kvm/arm64/external_aborts.c
-index d8fe17a6cc592..b276a4998a92c 100644
---- a/tools/testing/selftests/kvm/arm64/external_aborts.c
-+++ b/tools/testing/selftests/kvm/arm64/external_aborts.c
-@@ -239,6 +239,7 @@ static void test_serror_guest(void)
- 
- static void test_serror(void)
- {
-+	struct kvm_vcpu_events events;
- 	struct kvm_vcpu *vcpu;
- 	struct kvm_vm *vm = vm_create_with_dabt_handler(&vcpu, test_serror_guest,
- 							unexpected_dabt_handler);
-@@ -247,6 +248,11 @@ static void test_serror(void)
- 
- 	vcpu_inject_serror(vcpu);
- 	vcpu_run_expect_done(vcpu);
-+
-+	vcpu_events_get(vcpu, &events);
-+	TEST_ASSERT(!events.exception.serror_pending,
-+		    "SError still pending after the guest took it");
-+
- 	kvm_vm_free(vm);
- }
- 
--- 
-2.39.5
+>>> +
+>>> +struct rec_exit {
+>>> +    union { /* 0x000 */
+>>> +        u8 exit_reason;
+>>> +        u8 padding0[0x100];
 
+...
+
+>>
+>>> +    };
+>>> +    union { /* 0x400 */
+>>> +        struct {
+>>> +            u64 cntp_ctl;
+>>> +            u64 cntp_cval;
+>>> +            u64 cntv_ctl;
+>>> +            u64 cntv_cval;
+>>> +        };
+>>> +        u8 padding4[0x100];
+>>> +    };
+>>> +    union { /* 0x500 */
+>>> +        struct {
+>>> +            u64 ripas_base;
+>>> +            u64 ripas_top;
+>>> +            u8 ripas_value;
+>>> +            u8 padding5[0xf];
+>>
+>> In various other places you just use a u64 for a u8
+>> + padding. Why is this one special? And for that matter
+>> various other fields later in this particular structure?
+> 
+> Please feel free to point out, if you spot any. I am happy
+> to fix them.
+
+I took a look and the padding is for extra "u64" bits in there.
+e.g, ripas_value offset = 0x510 and the s2ap_base is really at 0x520
+not 0x518. Same applies for the pmu_ovf_status and vsmmu.
+
+So, I would leave them as they are. The rest are consistent.
+e.g, num_bps and num_wps. in realm_parameter
+
+Cheers
+Suzuki
+
+
+>
