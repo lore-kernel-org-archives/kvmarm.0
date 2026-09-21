@@ -1,118 +1,92 @@
-Received: from mta0.migadu.com (out-23.mta0.migadu.com [91.218.175.23])
+Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com [209.85.215.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B5A24A3877
-	for <kvmarm@lists.linux.dev>; Mon, 21 Sep 2026 14:04:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.23
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A0B730568B
+	for <kvmarm@lists.linux.dev>; Mon, 21 Sep 2026 14:05:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789999483; cv=none; b=C5gsehmRs7wUbAav79D4pVPXcIeovtxmX7/lffA3Ib35C8XhKwtX1leLyQ6y4pHvHF3eqo2Uj19fvhP+uV/0J+aQrLnDZm1RUbcBMLVa7+A/4tbiw3pUI3RNNcACggSKu6U+CZHqIFwbVfrnjubWW/l4LxzklhrJ7nMM4Ct6xC4=
+	t=1789999557; cv=none; b=CmsLnLp23bM+YZDYsofdI0MB5BZza1+AqwTjzXvzuS3FwbuY7vef6inx8OTFl79Dgqb5M3tf+NNapepX3YFCkWpE3ZNWbdhHtaJ5axQzorZNA3idfNaJE3wcVoFSVdB2QgiXN+UVOoAML/k4YgAKEFHVo74by8zLyNMIWuzTmoc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789999483; c=relaxed/simple;
-	bh=ie878rU/JdV+WHZq6reEkW3LocI09006Gd3UryYGcEA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=dX7UusGzZ/HLCKhdMzXjnOHB3YmzYOZX79Q7nqp6aNwyesdYLtTWR8GO4zzHTmQr6NSRdQlyVOMwhWQXsx/6AijdHBMRpJeRUjAhqWEl/CkrEpEnV6eS5qS8BJp+xbmTDBWvrXN82JjNwYy4SOtCeV6rMtAZhaMOYoigXPRr/MA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Ym+yjfJS; arc=none smtp.client-ip=91.218.175.23
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1789999557; c=relaxed/simple;
+	bh=HYGgnNmi3QVtldKOycpSOnTBz70WPgmKQmW8PXNpJz4=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=ch+Q4mkDpIv34OrtL49POeF4zahPKxqlGEttoE5pUbo8ZfrQ3p23tp5YYYKJ4NewdG51CAwR7cVDyTRSBNC+crUFnIyBM4JQcIuoQc/fgrfWQUXxpk0aqKnJ9pmjYIe6jyLIwMRmvu2ZDkZ9x5c2iIZJIVbAirIQLSHYo72nUb0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=A9Gq5bSm; arc=none smtp.client-ip=209.85.215.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ym+yjfJS"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=ie878rU/JdV+WHZq6reEkW3LocI09006Gd3UryYGcEA=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1789999479; v=1; x=1790604279;
- b=Ym+yjfJSNoAEEYEZ8nF7MSCaOlkglFvG2PXUFTZUSCR2WK5OnYpE4u5G9is82wrKVkT62a4N
- 3BKH6UbTddmpZt07+o7ZsSKH+CNw6hyAPpGlQybfsJ5CmBCRHD0QRiaeTp1SU8NtV/OZ11iSrDi
- U11Fua0vRpoxEyOe7hpcnV+U=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id ad4db469fc531011;
-	Mon, 21 Sep 2026 14:04:39 +0000
-X-Mizu-Trace-ID: ad4db469fc531011
-X-Migadu-Flow: FLOW_OUT
-From: Fuad Tabba <fuad.tabba@linux.dev>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Zenghui Yu <zenghui.yu@linux.dev>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Will Deacon <will@kernel.org>,
-	Fuad Tabba <tabba@google.com>,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH 3/3] KVM: arm64: selftests: Test a timer set past the counter's wrap
-Date: Mon, 21 Sep 2026 15:04:27 +0100
-Message-Id: <20260921140427.2211373-4-fuad.tabba@linux.dev>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20260921140427.2211373-1-fuad.tabba@linux.dev>
-References: <20260921140427.2211373-1-fuad.tabba@linux.dev>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="A9Gq5bSm"
+Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-cc489e7a701so4499897a12.2
+        for <kvmarm@lists.linux.dev>; Mon, 21 Sep 2026 07:05:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1789999555; x=1790604355; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=kDaByuob3STQywTT3cAOlaBCTEAiWYMVBfjiNkGWQmQ=;
+        b=A9Gq5bSm7+t8RnTGoNJDwYiNKBtPVTZ6RAAYMlQxArmzjW9Ir1eyVBEfbm4VS5GFrZ
+         N3ii1X5IBRod0GxByMieagUN9TdMbSgrRRKOT8uZtTD1Vi6HtQ8xDxmi9sAMTsUPgnia
+         0pawDESnERDHxkHCalkDFbbySX5jhyBxpc1QIpL7EZrAciokJnQhFu5Y5TrY2FQeezCh
+         kM6ktRfzH822P1CJgFejfOd+Oby7vSEHcDQHLe/hRwoAiAAom6rTarKbiIiNjCIWWXxy
+         jayLGE1EUKnoCe8TZxaE/tJmYO2J13Z9qSi7QYqetb2QoZklsySnCR09HmvX4F4TTs6n
+         vJlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1789999555; x=1790604355;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=kDaByuob3STQywTT3cAOlaBCTEAiWYMVBfjiNkGWQmQ=;
+        b=Aa8daaPvByc21bUX3PtSEWsp5/ZvCQYvpOwa7ZPxKxlOvFUnQV2wImlhkcGz/KUjIW
+         t+CuVwWMS1eE3hsikV+J3VBUCcEjSw9z1F5VN7Il9P2dtdtCBKBgY536Zn58mKOGW2X8
+         rJJ6Z8mZR9eIiiXLUYn6qwTsbG919JIiaVqCW9Db9tcsPr21WZeQOaHuFJ6Tcmcjti1O
+         Oe9oZpOO40Fz/Yp4McAeZKvrpNmFd37qTaGFlm4Zj0K7En7pwFYEh+wGKusSW0h78oCp
+         BS9Jrn5d8ZRDDYkdgeen6utXFJSi3WKlpAsqTZAPpy/NMRPGgUi0HNi2P4ohpgWUGoRx
+         u5ag==
+X-Forwarded-Encrypted: i=1; AKwUvBzdkP1Lcdw9MnrIEgJ/e5QEz6MsHHqtwM77Q1tCX2SwEfiqidkTxHZ3lehPj2dNpGcfNnO9a4I=@lists.linux.dev
+X-Gm-Message-State: AFuF++n9FxBh1Bi7dnpo3vT9GpENc5b2fqJAsgD8JnlmY95jT2AFD8ef
+	JBVebMe5ZbrL0p0/MrHarJF+CnYja1QFQZR2tFgK3nyrJN/5EzpZYUoRyhJbR6a10AAZ6tBkhO5
+	INvHKMg==
+X-Received: from pgdt6.prod.google.com ([2002:a05:6a02:3006:b0:cc4:e953:2e4b])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:3d07:b0:3d3:aec2:4dcd
+ with SMTP id adf61e73a8af0-3dd8c48ee7amr18530514637.25.1789999555175; Mon, 21
+ Sep 2026 07:05:55 -0700 (PDT)
+Date: Mon, 21 Sep 2026 07:05:02 -0700
+In-Reply-To: <20260806214618.82180-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20260806214618.82180-1-seanjc@google.com>
+X-Mailer: git-send-email 2.55.0.1082.g2b9226bbc0-goog
+Message-ID: <178999694044.717318.4471496122366852907.b4-ty@google.com>
+Subject: Re: [PATCH] KVM: Never clear KVM_REQ_VM_DEAD from a vCPU's requests
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>
+Cc: Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
 
-Program an unmasked timer whose cval sits within long_wait_ms of the
-counter's wrap while the guest's counter is at wait_ms, and expect no
-interrupt. The guest's counter can't reach it, but a host that applies
-the timer's offset by adding it to cval wraps the sum into the past and
-fires at once. The one existing case with a cval past the wrap, in the
-sanity checks, runs with the timer masked and can't see that.
+On Thu, 06 Aug 2026 14:46:18 -0700, Sean Christopherson wrote:
+> Use kvm_test_request() instead of kvm_check_request() when querying
+> KVM_REQ_VM_DEAD, i.e. don't clear KVM_REQ_VM_DEAD, as the entire purpose
+> of KVM_REQ_VM_DEAD is to prevent the vCPU from enterring the guest ever
+> again, even if userspace insists on redoing KVM_RUN.
+> 
+> Ensuring KVM_REQ_VM_DEAD is never cleared will allow relaxing KVM's rule
+> that ioctls can't be invoked on dead VMs, to only disallow ioctls if the
+> VM is bugged, i.e. if KVM hit a KVM_BUG_ON().
+> 
+> [...]
 
-Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
----
- .../kvm/arm64/arch_timer_edge_cases.c         | 25 +++++++++++++++++++
- 1 file changed, 25 insertions(+)
+Applied to kvm-x86 fixes, thanks!
 
-diff --git a/tools/testing/selftests/kvm/arm64/arch_timer_edge_cases.c b/tools/testing/selftests/kvm/arm64/arch_timer_edge_cases.c
-index d9c9377a63256..69986a7f0d37d 100644
---- a/tools/testing/selftests/kvm/arm64/arch_timer_edge_cases.c
-+++ b/tools/testing/selftests/kvm/arm64/arch_timer_edge_cases.c
-@@ -787,6 +787,30 @@ static void test_timers_in_the_past(enum arch_timer timer)
- 	}
- }
- 
-+/*
-+ * With the counter at wait_ms, a tval of -(wait_ms + long_wait_ms) puts cval
-+ * within long_wait_ms of the counter's wrap: a deadline further away than the
-+ * counter can reach. Unmasked, so an early ISTATUS shows up as an IRQ.
-+ */
-+static void test_timers_past_counter_wrap(enum arch_timer timer)
-+{
-+	s32 tval = -(s32)msec_to_cycles(test_args.wait_ms + test_args.long_wait_ms);
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(sleep_method); i++) {
-+		sleep_method_t sm = sleep_method[i];
-+
-+		local_irq_disable();
-+		set_counter(timer, msec_to_cycles(test_args.wait_ms));
-+		set_tval_irq(timer, tval, CTL_ENABLE);
-+		sm(timer, msecs_to_usecs(test_args.wait_ms) + TIMEOUT_NO_IRQ_US);
-+		local_irq_enable();
-+		isb();
-+		assert_irqs_handled(0);
-+		timer_set_ctl(timer, CTL_IMASK);
-+	}
-+}
-+
- static void test_long_timer_delays(enum arch_timer timer)
- {
- 	s32 tval = (s32)msec_to_cycles(test_args.long_wait_ms);
-@@ -806,6 +830,7 @@ static void guest_run_iteration(enum arch_timer timer)
- 	test_basic_functionality(timer);
- 	test_timers_sanity_checks(timer);
- 
-+	test_timers_past_counter_wrap(timer);
- 	test_timers_above_tval_max(timer);
- 	test_timers_in_the_past(timer);
- 
--- 
-2.39.5
+[1/1] KVM: Never clear KVM_REQ_VM_DEAD from a vCPU's requests
+      https://github.com/kvm-x86/linux/commit/8cd280282d12
 
+--
+https://github.com/kvm-x86/linux/tree/next
