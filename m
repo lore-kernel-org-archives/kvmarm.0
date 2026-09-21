@@ -1,254 +1,109 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F4DF3BCD19
-	for <kvmarm@lists.linux.dev>; Mon, 21 Sep 2026 16:18:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com [209.85.218.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 708FC4E01FE
+	for <kvmarm@lists.linux.dev>; Mon, 21 Sep 2026 16:47:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790007525; cv=none; b=R0BQXdazgd8M/L84yh6oiK3Sh6uykS1WG+GyFct19D3IkFHYV7zZBwIy4ZwnOEI8v+JouHZO9WzcIL4Qwa6r79OE7InOaw3Y0CQTE2kGe5nAqZs0sPyK1wUItzmtLRw/GfmldKdkKrP3X+g5dyhk3lzFy7B5HkdXmUtMyMQ6MaU=
+	t=1790009281; cv=none; b=VRhnpBCtITtyPZ1oEcY/70JmeQXT3wa1HiPFVgl+/0Jg/n8i+eF+SFPs8XX/V/cgZDA/NhdH1CF55UUlLS3cS54qVQqjqeb0GoLRTn62JRK/WQ/xq6FVxhZkdMDv1OLz8d6pSpZjhXtN/x9jTPn9Bqyxbp/caRfa1f0CNacEE+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790007525; c=relaxed/simple;
-	bh=1asISL2/ZGDCBD+sHMZzlwad+IPLP82ADapuwv+Ffug=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=YyVynMZaggn91VGdJfSfnk3xU1hutvt+uwDXh7OaZDfP1z/Tw+LQvFTeStwItUi57v+GKLxLbYcPpiJqnWNoe9KTjGsP45a+iY4E+Is1OM4bP6mZ5u8ubx/ST11q8V5xHxld2rVyjEHVGhR9AKLwbH+JvSCmNbnzw/OyzQ7yrRQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=VaIS4Adm; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1790009281; c=relaxed/simple;
+	bh=/pOEvHUq5bjsocoido3qq4LRiw3/HY/pteCfDkJrc4o=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=d6KU/oQmb/zcil+VwAAkoWlfxovCWazzmARFAOsiLLsVpjr4YWhWVCsbP8sdnmhRduvvDpceAMo2t1WYeY0aKF2WkKqjwoWKRplWqrLihc+iYp14RnemG0qq/RUafGZVSJS6Ugw7V5o1GWZ9Fb67C9w41aTV+yezUT+5TllvPBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--snehalreddy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AbftSXq3; arc=none smtp.client-ip=209.85.218.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--snehalreddy.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="VaIS4Adm"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 58328176C;
-	Mon, 21 Sep 2026 09:18:39 -0700 (PDT)
-Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6FAFA3F86C;
-	Mon, 21 Sep 2026 09:18:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1790007522; bh=1asISL2/ZGDCBD+sHMZzlwad+IPLP82ADapuwv+Ffug=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=VaIS4AdmXt6cjtE+9hzK9x5AMr4mgcUEVfiCX8Mv1FVNIebcMvKki97KGtln1oZmt
-	 CwehMtpiy+4cv/TutqsVoBNZzMCCQ+t7eoSaO8+jyepPcUEnmajPY0h/9OxuTMiF7a
-	 uGsUP1dtEXZcX3t1jdb5NyK7QMfzDR5H9oFXTurQ=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Oliver Upton <oupton@kernel.org>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	kvmarm@lists.linux.dev,
-	Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Wei-Lin Chang <weilin.chang@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>
-Subject: Re: [PATCH 03/22] KVM: arm64: nv: Get rid of kvm_s2_trans*() accessors
-Date: Mon, 21 Sep 2026 17:18:20 +0100
-Message-ID: <arFYzJAVAcN7FGzK@LeoBrasDK>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260623184201.1518871-4-oupton@kernel.org>
-References: <20260623184201.1518871-1-oupton@kernel.org> <20260623184201.1518871-4-oupton@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AbftSXq3"
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-c252686999cso313216766b.2
+        for <kvmarm@lists.linux.dev>; Mon, 21 Sep 2026 09:47:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1790009278; x=1790614078; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=wFHA1uhtwa0uaPPbQchvbVnkxkm1bjsmx5CIxWxkScA=;
+        b=AbftSXq3e8ioHiY/eLrIDuzzZOjAYGKAmIo6+sLVxEzL6nVW86ykz44WRxqD9Oq21n
+         rn1h2H9eJPYOj1ZRHc/neWuMDQirnn+ID2fxi1WSitx07TiM6NVRTJHOlcs+oC2PhBSS
+         vmHbzm4M7R5u3UB6JYD+zAVUI4bjELUjKkK9X5WWiI6LjIOvLUG5wwk4WfhggsdR+f/z
+         C9+iJQ65OnSycU6mtA8U8CRxYMUh5UrGDJr1cQ73CQseNdSDNWk8dT3GoAsNUvHSXxnt
+         09ZIq12mqpLLhaV2gkNGPPa0dDs2lnqVFVBRsKwbflWiR1GQLz9628zucgXyq2weMXHU
+         gArQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790009278; x=1790614078;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=wFHA1uhtwa0uaPPbQchvbVnkxkm1bjsmx5CIxWxkScA=;
+        b=L0b7PbiSAzfx109ZgyB17JEvk3guQCxv1BrweXj49h4TLYWYPYWhp4ExpRsMraZyB1
+         YXlJBjvqDfqNpjBj9j/5qWIC0cvtTY3FBE9p1mxlGwAwTAZDBzMOcJCy28/e8p6tAK1L
+         D0N3+1rcLOedqb+Xlo+uiHsvXm5NqKv4637rx2emuMR1nzhiT0KqTs8olp42VMZls9QO
+         StM9v5gCjmzIV4orf9e125xnrZlFpD2r9UdPt4OV/eXqWqdPQ8bmkmryjwZi38MhHhiC
+         MtWo4/Teow5NKDgO+1IEyJgaRQGZYlpxWEGhLAMZBQeaX6y4T7JTGXZfi0/Fb3wLHlOP
+         5++w==
+X-Forwarded-Encrypted: i=1; AKwUvBzbQb5Bny/bByzheOsjBob3Ez2Pjd18kHparbVIY21vh1HQS3FZWrADL7QA2gW4Rl8Gjd2yZFs=@lists.linux.dev
+X-Gm-Message-State: AFuF++mwMKiCTh9XUtHW+81CHz6qLsQbs5PC0F2CNqEknjjrwz+o/Qnb
+	R51U3yNrEtVXsUUnjqwe/G4Iz+wMl9OQ2Gx9M89VjpfefsveLUq2BYljF9hHhi8S8Ae5h4zHp9y
+	Gzr35LLmgweG1YFypnqsaAQoD/g==
+X-Received: from ejrs22.prod.google.com ([2002:a17:906:6c96:b0:c25:19d1:3b10])
+ (user=snehalreddy job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:907:6d06:b0:c21:9b4b:2690 with SMTP id a640c23a62f3a-c2a156a963cmr1038418866b.17.1790009277272;
+ Mon, 21 Sep 2026 09:47:57 -0700 (PDT)
+Date: Mon, 21 Sep 2026 16:47:46 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.55.0.1082.g2b9226bbc0-goog
+Message-ID: <20260921164748.2958578-1-snehalreddy@google.com>
+Subject: [PATCH 0/2] KVM: arm64: Support FFA_FN64_MEM_RECLAIM2 in host handler
+From: Snehal Koukuntla <snehalreddy@google.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Sudeep Holla <sudeep.holla@kernel.org>
+Cc: Vincent Donnefort <vdonnefort@google.com>, Fuad Tabba <fuad.tabba@linux.dev>, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Mark Rutland <mark.rutland@arm.com>, Sebastian Ene <sebastianene@google.com>, 
+	Mostafa Saleh <smostafa@google.com>, Snehal Koukuntla <snehalreddy@google.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Jun 23, 2026 at 11:41:42AM -0700, Oliver Upton wrote:
-> Access the aptly named fields in kvm_s2_trans directly rather than
-> indirecting through useless getters.
-> 
-> Signed-off-by: Oliver Upton <oupton@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_nested.h | 35 -----------------------------
->  arch/arm64/kvm/at.c                 |  6 ++---
->  arch/arm64/kvm/mmu.c                | 20 ++++++++---------
->  arch/arm64/kvm/nested.c             |  4 ++--
->  4 files changed, 15 insertions(+), 50 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-> index aa27f12cf2d4..3b36ed7c7608 100644
-> --- a/arch/arm64/include/asm/kvm_nested.h
-> +++ b/arch/arm64/include/asm/kvm_nested.h
-> @@ -98,47 +98,12 @@ struct kvm_s2_trans {
->  	bool		ux;
->  };
->  
-> -static inline phys_addr_t kvm_s2_trans_output(struct kvm_s2_trans *trans)
-> -{
-> -	return trans->output;
-> -}
-> -
-> -static inline unsigned long kvm_s2_trans_size(struct kvm_s2_trans *trans)
-> -{
-> -	return trans->block_size;
-> -}
-> -
-> -static inline u32 kvm_s2_trans_esr(struct kvm_s2_trans *trans)
-> -{
-> -	return trans->esr;
-> -}
-> -
-> -static inline bool kvm_s2_trans_readable(struct kvm_s2_trans *trans)
-> -{
-> -	return trans->readable;
-> -}
-> -
-> -static inline bool kvm_s2_trans_writable(struct kvm_s2_trans *trans)
-> -{
-> -	return trans->writable;
-> -}
-> -
->  static inline bool kvm_has_xnx(struct kvm *kvm)
->  {
->  	return cpus_have_final_cap(ARM64_HAS_XNX) &&
->  		kvm_has_feat(kvm, ID_AA64MMFR1_EL1, XNX, IMP);
->  }
->  
-> -static inline bool kvm_s2_trans_exec_el0(struct kvm *kvm, struct kvm_s2_trans *trans)
-> -{
-> -	return trans->ux;
-> -}
-> -
-> -static inline bool kvm_s2_trans_exec_el1(struct kvm *kvm, struct kvm_s2_trans *trans)
-> -{
-> -	return trans->px;
-> -}
-> -
->  extern int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
->  			      struct kvm_s2_trans *result);
->  extern int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu,
-> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-> index 8263c648207b..86b499e7a9a0 100644
-> --- a/arch/arm64/kvm/at.c
-> +++ b/arch/arm64/kvm/at.c
-> @@ -494,14 +494,14 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
->  				return ret;
->  			}
->  
-> -			if (!kvm_s2_trans_readable(&s2_trans)) {
-> +			if (!s2_trans.readable) {
->  				fail_s1_walk(wr, ESR_ELx_FSC_PERM_L(level),
->  					     true);
->  
->  				return -EPERM;
->  			}
->  
-> -			ipa = kvm_s2_trans_output(&s2_trans);
-> +			ipa = s2_trans.output;
->  		}
->  
->  		if (wi->filter) {
-> @@ -582,7 +582,7 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
->  		new_desc |= PTE_AF;
->  
->  	if (new_desc != desc) {
-> -		if (wi->s2 && !kvm_s2_trans_writable(&s2_trans)) {
-> +		if (wi->s2 && !s2_trans.writable) {
->  			fail_s1_walk(wr, ESR_ELx_FSC_PERM_L(level), true);
->  			return -EPERM;
->  		}
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 8811ad60cf72..07bd1e3ae9fb 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1572,9 +1572,9 @@ static int topup_mmu_memcache(struct kvm_vcpu *vcpu, void *memcache)
->  static enum kvm_pgtable_prot adjust_nested_fault_perms(struct kvm_s2_trans *nested,
->  						       enum kvm_pgtable_prot prot)
->  {
-> -	if (!kvm_s2_trans_writable(nested))
-> +	if (!nested->writable)
->  		prot &= ~KVM_PGTABLE_PROT_W;
-> -	if (!kvm_s2_trans_readable(nested))
-> +	if (!nested->readable)
->  		prot &= ~KVM_PGTABLE_PROT_R;
->  
->  	return prot | kvm_encode_nested_level(nested);
-> @@ -1584,9 +1584,9 @@ static enum kvm_pgtable_prot adjust_nested_exec_perms(struct kvm *kvm,
->  						      struct kvm_s2_trans *nested,
->  						      enum kvm_pgtable_prot prot)
->  {
-> -	if (!kvm_s2_trans_exec_el0(kvm, nested))
-> +	if (!nested->ux)
->  		prot &= ~KVM_PGTABLE_PROT_UX;
-> -	if (!kvm_s2_trans_exec_el1(kvm, nested))
-> +	if (!nested->px)
->  		prot &= ~KVM_PGTABLE_PROT_PX;
->  
->  	return prot;
-> @@ -1623,7 +1623,7 @@ static int gmem_abort(const struct kvm_s2_fault_desc *s2fd)
->  	}
->  
->  	if (s2fd->nested)
-> -		gfn = kvm_s2_trans_output(s2fd->nested) >> PAGE_SHIFT;
-> +		gfn = s2fd->nested->output >> PAGE_SHIFT;
->  	else
->  		gfn = s2fd->fault_ipa >> PAGE_SHIFT;
->  
-> @@ -1817,7 +1817,7 @@ static short kvm_s2_resolve_vma_size(const struct kvm_s2_fault_desc *s2fd,
->  		 * can only create a block mapping if the guest stage 2 page
->  		 * table uses at least as big a mapping.
->  		 */
-> -		max_map_size = min(kvm_s2_trans_size(s2fd->nested), max_map_size);
-> +		max_map_size = min(s2fd->nested->block_size, max_map_size);
->  
->  		/*
->  		 * Be careful that if the mapping size falls between
-> @@ -1891,7 +1891,7 @@ static gfn_t get_canonical_gfn(const struct kvm_s2_fault_desc *s2fd,
->  	if (!s2fd->nested)
->  		return s2vi->gfn;
->  
-> -	ipa = kvm_s2_trans_output(s2fd->nested);
-> +	ipa = s2fd->nested->output;
->  	return ALIGN_DOWN(ipa, s2vi->vma_pagesize) >> PAGE_SHIFT;
->  }
->  
-> @@ -2322,19 +2322,19 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
->  		}
->  
->  		if (ret) {
-> -			esr = kvm_s2_trans_esr(&nested_trans);
-> +			esr = nested_trans.esr;
->  			kvm_inject_s2_fault(vcpu, esr);
->  			goto out_unlock;
->  		}
->  
->  		ret = kvm_s2_handle_perm_fault(vcpu, &nested_trans);
->  		if (ret) {
-> -			esr = kvm_s2_trans_esr(&nested_trans);
-> +			esr = nested_trans.esr;
->  			kvm_inject_s2_fault(vcpu, esr);
->  			goto out_unlock;
->  		}
->  
-> -		ipa = kvm_s2_trans_output(&nested_trans);
-> +		ipa = nested_trans.output;
->  		nested = &nested_trans;
->  	}
->  
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index c9300703bd0d..b247bc1d83fa 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -954,9 +954,9 @@ int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu, struct kvm_s2_trans *trans)
->  
->  	if (kvm_vcpu_trap_is_iabt(vcpu)) {
->  		if (vcpu_mode_priv(vcpu))
-> -			forward_fault = !kvm_s2_trans_exec_el1(vcpu->kvm, trans);
-> +			forward_fault = !trans->px;
->  		else
-> -			forward_fault = !kvm_s2_trans_exec_el0(vcpu->kvm, trans);
-> +			forward_fault = !trans->ux;
->  	} else {
->  		bool write_fault = kvm_is_write_fault(vcpu);
->  
-> -- 
-> 2.47.3
-> 
+The Arm Firmware Framework for Arm A-profile (FF-A) v1.3 ALP5
+specification (DEN0140 rev J) [1] introduces the optional
+FFA_MEM_RECLAIM2 (0xC4000091) ABI.
 
-Pretty straightforward, couldn't see any issue.
+Reclaiming large memory regions with the existing FFA_MEM_RECLAIM ABI
+can take significant time, or relies on a stateful time-slicing
+mechanism in the Relayer. FFA_MEM_RECLAIM2 allows an Owner to reclaim
+exclusive access to a subset of pages from a shared or lent memory
+region by passing an array of constituent memory region descriptors in
+its TX buffer along with a starting descriptor byte offset and initial
+page index. The Relayer returns the number of 4K pages reclaimed in
+that invocation without maintaining intermediate transaction state.
 
-FWIW:
-Reviewed-by: Leonardo Bras <leo.bras@arm.com>
+This series adds the FFA_FN64_MEM_RECLAIM2 function ID definition and
+implements host proxy support in the pKVM nVHE FF-A handler, unsharing
+the reclaimed pages in the host stage-2 page tables upon a successful
+reclaim response from EL3/SPMD.
 
-Thanks!
-Leo
+This series is based on kvmarm/next, as Patch 2 uses
+ffa_check_unused_args_sbz() introduced in commit 3e9df0b0ebd5
+("KVM: arm64: Enforce strict SBZ checks in the FF-A proxy").
+
+[1] https://support.arm.com/documentation/den0140/j
+
+Snehal Koukuntla (2):
+  firmware: arm_ffa: Add FFA_FN64_MEM_RECLAIM2 function ID
+  KVM: arm64: Support FFA_FN64_MEM_RECLAIM2 in host handler
+
+ arch/arm64/kvm/hyp/nvhe/ffa.c | 117 ++++++++++++++++++++++++++++++++++
+ include/linux/arm_ffa.h       |   1 +
+ 2 files changed, 118 insertions(+)
+
+
+base-commit: 23ddf997ab16b5f4aa9f948f5a68f5b35e4e398f
+-- 
+2.55.0.1082.g2b9226bbc0-goog
 
