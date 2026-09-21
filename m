@@ -1,33 +1,33 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17FFB34EF15;
-	Mon, 21 Sep 2026 09:33:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F312838F92D;
+	Mon, 21 Sep 2026 10:03:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789983184; cv=none; b=gSRtc1BoMNdZ3tYgl4msoeAX4lFXEVbvClA0X6jfPiagnoeVl0gGvA6q8S3ihLHCG06GHVzR9O+yAv6eVm1dkOPdHYmBZXK13HgjdIIFv7ygiC5bTHgYq68MplI84UaN9TWvOlF79tHX0dOGn210B8bGJMUkDkywrU9d//xeehA=
+	t=1789984983; cv=none; b=Gk4WopUOwProWlMgsfzj+KtO6XdtNUCRSCTaR8OcPUdSClhusKwolIm4CYy6CrjmvNrjrwL40vzZAImxO2MrMZc0gsYgcOPfJ/F2voSozMqVZnsKV7vIyR41YwY/NOJFi/BYuuamtLcAmLmpE15E4nl3YpjneAeat36V0gBCpR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789983184; c=relaxed/simple;
-	bh=B+BCQeVg0IeeUhu6Ob/UgCt/CZY7OCEK8gMHWMyBohk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aX3f6EksUURliZyFcqINHzjD5B86B7XI96FnI4qYTh+hI6YV9cANowbogFNDhrAgtDbCihyHLO8hRswIi3i84aFHlxnrRFk9mr8XPqjSNeo7VO9sVQtE2Oa9rvFDE3WNpRRpGu0IsKTcNdGs3Wb8aJv6gmFY2G/rU8mhqA2oCbI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=vrTxUkU5; arc=none smtp.client-ip=217.140.110.172
+	s=arc-20240116; t=1789984983; c=relaxed/simple;
+	bh=2Bi9HNrID2cE7gcX784v6dveXii59tEhPSRzCiZgdgs=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=JwRkFyM2VajxeEncIBhk0aRZzTsb3MVL9IQk+ViMe3FF7QvVZOLOoHnRijXLGiGTZw2a+PKCtNcze0GUno5TQJZs3q2JnxiaqKwXK5GTwjmy6S9eHs22TwUL2vvGEQec1O2YvLeUEuEixT26tGLhv7Tmu+p118X1jRCLCYIYOzY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=blOJwDP8; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="vrTxUkU5"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="blOJwDP8"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EAEA61476;
-	Mon, 21 Sep 2026 02:32:58 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BC1CC1CE0;
+	Mon, 21 Sep 2026 03:02:56 -0700 (PDT)
 Received: from [10.0.128.141] (unknown [10.0.128.141])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 28C9B3F86F;
-	Mon, 21 Sep 2026 02:32:59 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7A6DB3F86F;
+	Mon, 21 Sep 2026 03:02:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1789983182; bh=B+BCQeVg0IeeUhu6Ob/UgCt/CZY7OCEK8gMHWMyBohk=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=vrTxUkU5EokJyM+O6vocnZOre+9Hm/zL/psZb2j5wq0ib0aPS77g8TxaTl+R6pBo7
-	 vxkpDKVN4HocH01hrrylZzzdL9upfpdvpXEealrDA1Ba5SMWmFOqqaqVjfxjeLR5jt
-	 DSNnAGCwoigCPtBiotCwuNvfddJajT2mvtAGQIxM=
-Message-ID: <65b0c03b-36b9-4e60-aa55-c3b4b85e21ee@arm.com>
-Date: Mon, 21 Sep 2026 10:32:57 +0100
+	t=1789984980; bh=2Bi9HNrID2cE7gcX784v6dveXii59tEhPSRzCiZgdgs=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=blOJwDP8A/onBBJLnCPxUp9mIb8MzS7wS1+7wngcIelq7GcWJvaTjSVFF1Ytq/w3R
+	 x1av8/QUs0lhT01IoJteJ3chVaJ+FHMaSGYVCI5C4ujUt7eSTRkRLr5foUzByLlrWt
+	 EwI7qlCQh+NLED+A0IIYKTIEedohHbTqb02OPxBY=
+Message-ID: <45fb9520-7003-412f-9ab1-14e2a762c816@arm.com>
+Date: Mon, 21 Sep 2026 11:02:56 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -35,9 +35,10 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v18 6/7] firmware: arm_rmm: Ensure the RMM has GPT entries
- for memory
+Subject: Re: [PATCH v18 1/7] firmware: arm_rmm: Add SMC definitions for
+ calling the RMM
 Content-Language: en-GB
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
 To: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
 Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
  will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
@@ -48,131 +49,183 @@ Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
  sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
  WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com
 References: <20260912083611.2513845-1-suzuki.poulose@arm.com>
- <20260912083611.2513845-7-suzuki.poulose@arm.com>
- <178978126543.2352296.12214136703168879825.b4-review@b4>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <178978126543.2352296.12214136703168879825.b4-review@b4>
+ <20260912083611.2513845-2-suzuki.poulose@arm.com>
+ <178978126540.2352296.16845657485139032765.b4-review@b4>
+ <d7ccaf22-5bde-4344-8bf0-a5a17dcac0f3@arm.com>
+In-Reply-To: <d7ccaf22-5bde-4344-8bf0-a5a17dcac0f3@arm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 19/09/2026 02:27, Jonathan Cameron wrote:
->> The RMM maintains the state of all the granules in the system to make
->> sure that the host is abiding by the rules. This state can be maintained
->> at different granularity, per page (TRACKING_FINE) or per region
->> (TRACKING_COARSE or TRACKING_INTERMEDIATE). The region size depends on the
->> underlying "RMI_GRANULE_SIZE". For a "coarse"/"intermediate" region, all pages
->> in the region must be of the same state, this implies we need to have "fine"
->> tracking for DRAM, so that we can delegate individual pages.
+On 21/09/2026 10:27, Suzuki K Poulose wrote:
+> On 19/09/2026 02:27, Jonathan Cameron wrote:
+>>> The RMM (Realm Management Monitor) provides functionality that can be
+>>> accessed by SMC calls from the host.
+>>>
+>>> The SMC definitions are based on DEN0137[1] version 2.0-bet3
+>>>
+>>> [1] https://developer.arm.com/documentation/den0137/2-0bet3/
+>>>
+>>> Signed-off-by: Steven Price <steven.price@arm.com>
+>>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 >>
->> For now we only support a statically carved out memory for tracking
->> granules for the "fine" regions. This can be extended in the future to
->> allow modifying the tracking granularity and remove the need for a
->> static allocation by the firmware.
+>> With Gavin's nitpicks and the GENMASK_ULL() from sashiko, just a few
+>> comments inline.  Mostly on subtle inconsistencies that really don't
+>> matter that much.
 >>
->> Similarly, the firmware may create L0 GPT entries describing the total
->> address space. But if we change the "PAS" (Physical Address Space) of a
->> granule, then the firmware may need to create L1 tables to track the PAS
->> at a finer granularity. Linux therefore checks if the platform firmware manages
->> the PAR region. i.e., the firmware is in charge of managing the L1 GPTs
->> (creation and the required memory for the GPT tables - via static carveouts)
->> without host intervention. Support for dynamic GPT creation by the host will be
->> added later.
+>>>   include/linux/arm-smccc-rmi.h | 497 ++++++++++++++++++++++++++++++++++
+>>>   1 file changed, 497 insertions(+)
+>>>   create mode 100644 include/linux/arm-smccc-rmi.h
+>>>
+>>> diff --git a/include/linux/arm-smccc-rmi.h b/include/linux/arm-smccc- 
+>>> rmi.h
+>>> new file mode 100644
+>>> index 000000000000..214d6228dfc2
+>>> --- /dev/null
+>>> +++ b/include/linux/arm-smccc-rmi.h
+>>> @@ -0,0 +1,497 @@
+>>> +/* SPDX-License-Identifier: GPL-2.0 */
+>>> +/*
+>>> + * Copyright (C) 2023-2026 ARM Ltd.
+>>> + *
+>>> + * The values and structures in this file are from the Realm 
+>>> Management Monitor
+>>> + * specification (DEN0137) version 2.0-bet3:
+>>> + * https://developer.arm.com/documentation/den0137/2-0bet3/
+>>> + */
+>>> +
+>>> +#ifndef __LINUX_ARM_SMCCC_RMI_H_
+>>> +#define __LINUX_ARM_SMCCC_RMI_H_
+>>> +
+>>> +#include <linux/arm-smccc.h>
+>>> +#include <linux/bitfield.h>
+>>> +#include <linux/bits.h>
+>>> +#include <linux/build_bug.h>
+>>> +#include <linux/sizes.h>
+>>> +
+>>> +#include <asm/page.h>
+>>> +
+>>> +#define SMC_RMI_CALL(func)                \
+>>> +    ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,        \
+>>> +               ARM_SMCCC_SMC_64,        \
+>>> +               ARM_SMCCC_OWNER_STANDARD,    \
+>>> +               (func))
 >>
->> If the firmware requires us to manage the tracking or GPT memory, Deactivate
->> the RMM and reclaim any memory donated at RMM activation.
+>> Obviously it is v18 so probably a future thing but nothing about this
+>> is RMI specific.  Could be used for ARM_SMCCC_TRNG_RND64 for instance.
+>> I'm not entirely sure what we'd call such a macro
 >>
->> Apply the same checks when hotplugged memory is brought online.
+>> ARM_SMCCC_CALL_VAL64_STD() maybe?
+> 
+> ARM_SMCCC_STD_CALL64_VAL() ?
+> 
+> But, I would leave it as a wider cleanup in the tree as a separate
+> series.
+> 
 >>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> [ Switch to RMI_GPT_L1_INFO for checking GPTs and deactivate RMM ]
->> Co-Developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> 
-> A few comments inline.
-> 
-> 
->> ---
->>   Changes since v17:
->>       * Move wrappers that may not be used elsewhere, out of arm-rmi-cmds.h
->>   Changes since v16:
->>       * Check fine tracking and create L1 GPTs for hotplug-added memory.
->>       * Clarify the L1 GPT setup and move the explanatory comment.
->>       * Switch to using RMI_GPT_INFO command for checking the GPTs.
->>       * Deactivate the RMM and reclaim the memory if we can't proceed.
->>   Changes since v15:
->>       * Skip firmware-reserved NOMAP memory in rmi_init_metadata()
->>       * Handle negative error codes from wrappers.
->>   Changes since v14:
->>       * Move the implementation into drivers/firmware/arm_rmm.
->>   Changes since v13:
->>       * Moved out of KVM
->> ---
->>   drivers/firmware/arm_rmm/rmi.c | 200 +++++++++++++++++++++++++++++++++
->>   include/linux/arm-rmi-cmds.h   |   2 +
->>   2 files changed, 202 insertions(+)
+>> I'm not just not keen on macros whose names to me hint at something
+>> special. FWIW this also matches SMC_RSI_FID() and FFA_SMC64().
+>> Isn't it nice when we have a predictable naming scheme :)
 >>
->> diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/arm_rmm/rmi.c
->> index ecc89e91d264..583e1aca9b15 100644
->> --- a/drivers/firmware/arm_rmm/rmi.c
->> +++ b/drivers/firmware/arm_rmm/rmi.c
+>> FID (for Function IDentifier) is in the spec, so maybe?
+>>
+>> Anyhow, I don't really care that much.
+>>
+>>> +
+>>> +#define SMC_RMI_VERSION                SMC_RMI_CALL(0x0150)
+>>> +
+>>
+>>
+>>> +#define RMI_ABI_MAJOR_VERSION    2
+>>> +#define RMI_ABI_MINOR_VERSION    0
+>>> +
+>>> +#define RMI_ABI_VERSION_GET_MAJOR(version) ((version) >> 16)
+>>
+>> I'd mask it.  Mostly because that would shout that it is only 15 bits.
+>>
 > 
+> Ack
 > 
->> + */
->> +static inline long rmi_gpt_info(unsigned long start, unsigned long end,
+>>> +#define RMI_ABI_VERSION_GET_MINOR(version) ((version) & 0xFFFF)
+>>> +#define RMI_ABI_VERSION(major, minor)      (((major) << 16) | (minor))
+>>
+>> I'd go all in on FIELD_PREP() / FIELD_GET() + GENMASK just for the
+>> sake of consistency + not having to be careful that everything is
+>> checked for fit to keep the LLM bots happy.
+>>
+>>> +
+>>> +#define RMI_RETURN_STATUS_MASK        GENMASK(7, 0)
+>>> +#define RMI_RETURN_INDEX_MASK        GENMASK(15, 8)
+>>> +#define RMI_RETURN_MEMREQ_MASK        GENMASK(9, 8)
+>>> +#define RMI_RETURN_CAN_CANCEL_MASK    BIT(10)
+>>> +
+>>> +#define RMI_RETURN_STATUS(ret)        
+>>> FIELD_GET(RMI_RETURN_STATUS_MASK, ret)
+>>> +#define RMI_RETURN_INDEX(ret)        
+>>> FIELD_GET(RMI_RETURN_INDEX_MASK, ret)
+>>
+>> What's this one?  I can't find anything in the spec that matches it
+>> and as far as I can tell you don't use it in this series.
 > 
-> Why inline vs letting compiler make it's mind up?
-> Same in other places
+> This is coming from RmiResultDataLevel. See RmiResult type.
+> This was renamed after we introduce the RmiResultDataIncomplete.
+> It is used in the KVM code to find the "level" where a command
+> failed/walked.
 > 
->> +				unsigned long *out_top,
->> +				unsigned long *out_gpt_par_state)
->> +{
->> +	struct arm_smccc_1_2_regs regs = {
->> +		SMC_RMI_GPT_INFO, start, end,
->> +	};
->> +
->> +	rmi_smccc_invoke(&regs);
->> +	if (regs.a0 != RMI_SUCCESS)
->> +		return regs.a0;
->> +
->> +	if (out_top)
->> +		*out_top = regs.a1;
->> +	if (out_gpt_par_state)
->> +		*out_gpt_par_state = regs.a2;
->> +
->> +	return RMI_SUCCESS;
->> +}
+> I could rename it to RMI_RESULT_DATA_LEVEL() ?
+> Similarly RMI_RESULT_STATUS instead of RMI_RETURN_*
 > 
+>>
+>>> +#define RMI_RETURN_MEMREQ(ret)        
+>>> FIELD_GET(RMI_RETURN_MEMREQ_MASK, ret)
+>>> +#define RMI_RETURN_CAN_CANCEL(ret)    
+>>> FIELD_GET(RMI_RETURN_CAN_CANCEL_MASK, ret)
 > 
+>> These are obscure enough to find in the spec I'd give a comment just
+>> to save the sanity of anyone looking for them.
 > 
->>   static int __init arm64_init_rmi(void)
->>   {
->>   	int ret;
->> @@ -786,8 +970,24 @@ static int __init arm64_init_rmi(void)
->>   	if (ret) {
->>   		pr_err("RMM activate failed\n");
->>   		ret = ret < 0 ? ret : -ENXIO;
->> +		return ret;
+> As above, they are really RMI_RESULT_DATA_INCOMPLETE_*
 > 
-> Why did this change?
+>>
+>>> +/*
+>>> + * Note many of these fields are smaller than u64 but all fields 
+>>> have u64
+>>> + * alignment, so use u64 to ensure correct alignment.
+>>
+>> Obviously this is only going to run on arm64 so it's not critical, but
+>> more generally u64s aren't always 64 bit aligned.  So if you 'really'
+>> care aligned_u64 is there to ensure it.  Meh, arm64 so fine.
+> 
+> Agreed, I am worried about the churn in the consumer code. Also, like
+> you said, this is only for ARM64. So, I would pass it.
+> 
+>>
+>>> + */
+>>> +struct rmm_config {
+>>> +    union { /* 0x0 */
+>>> +        struct {
+>>> +            u64 tracking_region_size;
+>>> +            u64 rmi_granule_size;
+>>> +        };
+>>> +        u8 sizer[SZ_4K];
+>>> +    };
+>>> +};
+>>> +
+>>> +static_assert(sizeof(struct rmm_config) == SZ_4K);
+>>> +
+>>> +#define RMI_REALM_PARAM_FLAG_SVE        BIT(1)
+>>> +#define RMI_REALM_PARAM_FLAG_PMU        BIT(2)
+>>> +#define RMI_REALM_PARAM_FLAG_DA            BIT(3)
+>>> +#define RMI_REALM_PARAM_FLAG_LFA_POLICY        GENMASK(6, 5)
+>>> +#define RMI_REALM_PARAM_FLAG_MEC_POLICY        GENMASK(8, 7)
+>>
+>> Tiny bit inconsistent. When do you decide _MASK is needed and when
+>> not?  Seems a little too random for multibit fields.
+> 
+> I will try to clean this up.
 
-Rebase messed up. I will restore it.
-
-> 
->>   	}
->>   
->> +	ret = rmi_init_metadata();
->> +	if (ret)
-> 
-> And this is hitting another bit of guidance in cleanup.h.
-> Functions shouldn't be mixing __free and friends with
-> gotos.  Again, not a bug here but there are large ugly
-> monsters around this stuff, hence the blanket guidance.
-> I haven't thought that hard on how you avoid it here, but
-> usually it's a combination of suitable helpers and wrappers
-> and resulting code is often more readable as a result.
-> 
-
-I will see if I can improve it.
+Actually, this is used when we don't consume them from RMM. i.e.,
+we never call FIELD_GET() on them. But thats not a reason for
+not being consistent in naming. I can fix it
 
 Cheers
 Suzuki
